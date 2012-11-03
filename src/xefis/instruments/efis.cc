@@ -253,8 +253,7 @@ EFIS::paint_heading (QPainter& painter)
 void
 EFIS::paint_roll (QPainter& painter)
 {
-	const float w = std::min (width(), height()) * 3.f / 9.f;
-	const float h = std::min (width(), height()) * 3.f / 9.f;
+	float const w = std::min (width(), height()) * 3.f / 9.f;
 
 	painter.save();
 
@@ -264,24 +263,24 @@ EFIS::paint_roll (QPainter& painter)
 	painter.setBrush (QBrush (QColor (255, 255, 255)));
 
 	painter.setTransform (_center_transform);
-	painter.setClipRect (QRectF (-w, -h, 2.f * w, 2.25f * h));
+	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
 	for (float deg: { -60.f, -45.f, -30.f, -20.f, -10.f, 0.f, +10.f, +20.f, +30.f, +45.f, +60.f })
 	{
 		painter.setTransform (_center_transform);
 		painter.rotate (1.f * deg);
-		painter.translate (0.f, -0.79f * h);
+		painter.translate (0.f, -0.795f * w);
 
 		if (deg == 0.f)
 		{
 			// Triangle:
 			QPointF p0 (0.f, 0.f);
-			QPointF px (0.025f * h, 0.f);
-			QPointF py (0.f, 0.05f * h);
+			QPointF px (0.025f * w, 0.f);
+			QPointF py (0.f, 0.05f * w);
 			painter.drawPolygon (QPolygonF() << p0 << p0 - px - py << p0 + px - py);
 		}
 		else
 		{
-			float length = -0.05f * h;
+			float length = -0.05f * w;
 			if (std::abs (std::fmod (deg, 30.f)) < 1.f)
 				length *= 2.f;
 			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
@@ -289,16 +288,16 @@ EFIS::paint_roll (QPainter& painter)
 	}
 
 	float const bold_width = pen_width (3.f);
-	QPointF a (0, 0.01f * h); // Miter
-	QPointF b (-0.052f * h, 0.1f * h);
-	QPointF c (+0.052f * h, 0.1f * h);
-	QPointF x0 (0.001f * h, 0.f);
-	QPointF y0 (0.f, 0.005f * h);
-	QPointF x1 (0.001f * h, 0.f);
+	QPointF a (0, 0.01f * w); // Miter
+	QPointF b (-0.052f * w, 0.1f * w);
+	QPointF c (+0.052f * w, 0.1f * w);
+	QPointF x0 (0.001f * w, 0.f);
+	QPointF y0 (0.f, 0.005f * w);
+	QPointF x1 (0.001f * w, 0.f);
 	QPointF y1 (0.f, 1.f * bold_width);
 
 	painter.setTransform (_roll_transform * _center_transform);
-	painter.translate (0.f, -0.79f * h);
+	painter.translate (0.f, -0.79f * w);
 	painter.setBrush (QBrush (QColor (255, 255, 255)));
 	painter.drawPolyline (QPolygonF() << b << a << c);
 	painter.drawPolygon (QPolygonF() << b - x0 + y0 << b + x1 + y1 << c - x1 + y1 << c + x0 + y0);
