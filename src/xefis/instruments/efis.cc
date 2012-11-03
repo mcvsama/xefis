@@ -57,8 +57,8 @@ EFIS::test()
 void
 EFIS::paintEvent (QPaintEvent* paint_event)
 {
-	const float w = width();
-	const float h = height();
+	float const w = width();
+	float const h = height();
 
 	float p = floored_mod (pitch() + 180.f, 360.f) - 180.f;
 	float r = floored_mod (roll() + 180.f, 360.f) - 180.f;
@@ -117,9 +117,9 @@ EFIS::paint_horizon (QPainter& painter)
 	painter.save();
 	painter.setTransform (_horizon_transform * _center_transform);
 
-	const float max = std::max (width(), height());
-	const float w_max = 2.f * max;
-	const float h_max = 10.f * max;
+	float const max = std::max (width(), height());
+	float const w_max = 2.f * max;
+	float const h_max = 10.f * max;
 	// Sky and ground:
 	painter.fillRect (-w_max, -h_max, 2.f * w_max, h_max + 1.f, QBrush (_sky_color, Qt::SolidPattern));
 	painter.fillRect (-w_max, 0.f, 2.f * w_max, h_max, QBrush (_ground_color, Qt::SolidPattern));
@@ -134,9 +134,9 @@ EFIS::paint_pitch_scale (QPainter& painter)
 	QFont font = _font;
 	font.setPixelSize (pen_width (10.f));
 
-	const float w = std::min (width(), height()) * 2.f / 9.f;
-	const float z = 0.5f * w;
-	const float fpxs = font.pixelSize();
+	float const w = std::min (width(), height()) * 2.f / 9.f;
+	float const z = 0.5f * w;
+	float const fpxs = font.pixelSize();
 
 	painter.save();
 	// Clip rectangle before and after rotation:
@@ -205,8 +205,8 @@ EFIS::paint_heading (QPainter& painter)
 	QFont font = _font;
 	font.setPixelSize (pen_width (10.f));
 
-	const float w = std::min (width(), height()) * 2.f / 9.f;
-	const float fpxs = font.pixelSize();
+	float const w = std::min (width(), height()) * 2.f / 9.f;
+	float const fpxs = font.pixelSize();
 
 	painter.save();
 	// Clip rectangle before and after rotation:
