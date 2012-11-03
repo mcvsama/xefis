@@ -1,0 +1,9 @@
+LANGUAGE=en # This is for Vim, when doing :make Vim jumps to right file on errors, but only when Make uses english messages.
+.PHONY: all
+
+all:
+	make all -C ..
+
+%:
+	@CWD="`pwd`" cd .. && make -s $@ && cd $$CWD
+

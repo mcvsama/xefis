@@ -1,0 +1,5 @@
+/.build
+/.branch
+/.commit
+/release
+/Makefile.local
