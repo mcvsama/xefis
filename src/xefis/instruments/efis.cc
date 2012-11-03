@@ -229,10 +229,19 @@ EFIS::paint_heading (QPainter& painter)
 	{
 		float d10 = heading_to_px (deg);
 		float d05 = heading_to_px (deg + 5);
+		QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
+		if (text == "0")
+			text = "N";
+		else if (text == "9")
+			text = "E";
+		else if (text == "18")
+			text = "S";
+		else if (text == "27")
+			text = "W";
 		// 10° lines:
 		painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
 		text_painter.drawText (QRectF (d10 - 2.f * fpxs, 0.05f * fpxs, 4.f * fpxs, fpxs),
-							   Qt::AlignVCenter | Qt::AlignHCenter, QString::number (floored_mod (1.f * deg, 360.f) / 10));
+							   Qt::AlignVCenter | Qt::AlignHCenter, text);
 		// 5° lines:
 		painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 	}
