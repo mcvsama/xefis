@@ -65,6 +65,12 @@ class EFIS: public QWidget
 	void
 	set_altitude (Feet);
 
+	Feet
+	climb_rate() const;
+
+	void
+	set_climb_rate (Feet feet_per_minute);
+
 	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
@@ -116,12 +122,18 @@ class EFIS: public QWidget
 	void
 	paint_altitude (QPainter&);
 
+	void
+	paint_climb_rate (QPainter&);
+
   private:
 	float
 	pitch_to_px (Degrees degrees) const;
 
 	float
 	heading_to_px (Degrees degrees) const;
+
+	float
+	scale_cbr (Feet climb_rate) const;
 
 	float
 	pen_width (float scale = 1.0f) const;
@@ -148,6 +160,7 @@ class EFIS: public QWidget
 	Degrees		_heading	= 0.f;
 	Knots		_ias		= 0.f;
 	Feet		_altitude	= 0.f;
+	Feet		_cbr		= 0.f;
 
 	static const char _digits[];
 };
@@ -224,6 +237,21 @@ inline void
 EFIS::set_altitude (Feet altitude)
 {
 	_altitude = altitude;
+	update();
+}
+
+
+inline Feet
+EFIS::climb_rate() const
+{
+	return _cbr;
+}
+
+
+inline void
+EFIS::set_climb_rate (Feet feet_per_minute)
+{
+	_cbr = feet_per_minute;
 	update();
 }
 

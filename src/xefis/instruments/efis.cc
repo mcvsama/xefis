@@ -41,7 +41,7 @@ EFIS::EFIS (QWidget* parent):
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
-	_ground_color.setHsv (39, 219, 127);
+	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (16, 0, 67, 0x60);
 	_font = QApplication::font();
 
@@ -78,8 +78,8 @@ EFIS::read_input()
 				set_heading (value.toFloat());
 			else if (var == "altitude")
 				set_altitude (value.toFloat());
-//			else if (var == "cbr")
-//				set_cbr (value.toFloat());
+			else if (var == "cbr")
+				set_climb_rate (value.toFloat());
 			else if (var == "pitch")
 				set_pitch (value.toFloat());
 			else if (var == "roll")
@@ -149,6 +149,7 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	paint_center_cross (painter);
 	paint_speed (painter);
 	paint_altitude (painter);
+	paint_climb_rate (painter);
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
@@ -175,6 +176,8 @@ EFIS::paint_horizon (QPainter& painter)
 void
 EFIS::paint_pitch_scale (QPainter& painter)
 {
+	// TODO don't draw invisible lines/numbers
+
 	// TODO set rounded clip path on top
 	QFont font = _font;
 	font.setPixelSize (font_size (10.f));
@@ -423,9 +426,10 @@ EFIS::paint_speed (QPainter& painter)
 	painter.setTransform (_center_transform);
 	painter.translate (-0.9f * w, 0.f);
 
+	QRectF ladder (-0.725f * box_w, -0.95f * w, box_w, 1.9f * w);
 	painter.setPen (border_pen);
 	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (-0.775f * box_w, -w, box_w, 2.f * w);
+	painter.drawRect (ladder);
 
 	int digits = 3;
 	if (speed >= 1000.0f - 0.5f)
@@ -515,9 +519,10 @@ EFIS::paint_altitude (QPainter& painter)
 	painter.setTransform (_center_transform);
 	painter.translate (0.9f * w, 0.f);
 
+	QRectF ladder (-0.225f * box_w, -0.95f * w, box_w, 1.9f * w);
 	painter.setPen (border_pen);
 	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (-0.225f * box_w, -w, box_w, 2.f * w);
+	painter.drawRect (ladder);
 
 	int const b_digits = 2;
 	int const s_digits = 3;
@@ -571,5 +576,95 @@ EFIS::paint_altitude (QPainter& painter)
 	text_painter.drawText (box_00011_m10, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f - 2.f, 10.f))) + "0");
 
 	painter.restore();
+}
+
+
+void
+EFIS::paint_climb_rate (QPainter& painter)
+{
+	float const w = std::min (width(), height()) * 3.5f / 9.f;
+	float const box_w = 0.35f * w;
+
+	// TODO cache, update on resize
+	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
+	border_pen.setJoinStyle (Qt::MiterJoin);
+	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
+	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
+	QPen thin_white_pen (QPen (QColor (255, 255, 255), pen_width (0.5f), Qt::SolidLine));
+
+	QFont font = _font;
+	font.setPixelSize (font_size (10.f));
+	font.setBold (true);
+
+	painter.save();
+
+	float const x = w / 18.f;
+	float const y = x * 4.f;
+
+	painter.setTransform (_center_transform);
+	painter.translate (0.9f * w + box_w + 1.5 * x, 0.f);
+
+	painter.setPen (border_pen);
+	painter.setBrush (QBrush (_ladder_color));
+	painter.drawPolygon (QPolygonF()
+		<< QPointF (0.0f, -0.9 * y)
+		<< QPointF (-1.5f * x, -0.9 * y - x)
+		<< QPointF (-1.5f * x, -2.85f * y - x)
+		<< QPointF (+0.5f * x, -2.85f * y - x)
+		<< QPointF (2.5f * x, -1.5f * y - x)
+		<< QPointF (2.5f * x, +1.5f * y + x)
+		<< QPointF (+0.5f * x, +2.85f * y + x)
+		<< QPointF (-1.5f * x, +2.85f * y + x)
+		<< QPointF (-1.5f * x, +0.9 * y + x)
+		<< QPointF (0.0f, +0.9 * y));
+
+	TextPainter text_painter (painter);
+
+	float const line_w = 0.35 * x;
+
+	painter.setFont (font);
+	painter.setPen (bold_white_pen);
+	painter.drawLine (QPointF (0.f, 0.f), QPointF (x, 0.f));
+	for (float kfpm: { -6.f, -2.f, -1.f, +1.f, +2.f, +6.f })
+	{
+		float posy = -2.75f * y * scale_cbr (kfpm * 1000.f);
+		QRectF num_rect (-1.5f * x, posy - x, 1.3f * x, 2.f * x);
+		painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
+		text_painter.drawText (num_rect, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (kfpm))));
+	}
+	painter.setPen (thin_white_pen);
+	for (float kfpm: { -4.f, -1.5f, -0.5f, +0.5f, +1.5f, +4.f })
+	{
+		float posy = -2.75f * y * scale_cbr (kfpm * 1000.f);
+		painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
+	}
+
+	painter.setClipRect (QRectF (0.5f * x, -2.75f * y - x,
+								 2.0f * x, 5.5f * y + 2.f * x));
+	painter.setPen (bold_white_pen);
+	painter.drawLine (QPointF (5.f * x, 0.f), QPointF (line_w, -2.75f * y * scale_cbr (_cbr)));
+
+	painter.restore();
+}
+
+
+float
+EFIS::scale_cbr (Feet climb_rate) const
+{
+	Feet cbr = std::abs (climb_rate);
+
+	if (cbr < 1000.f)
+		cbr = cbr / 1000.f * 0.46f;
+	else if (cbr < 2000)
+		cbr = 0.46f + 0.32f * (cbr - 1000.f) / 1000.f;
+	else if (cbr < 6000)
+		cbr = 0.78f + 0.22f * (cbr - 2000.f) / 4000.f;
+	else
+		cbr = 1.f;
+
+	if (climb_rate < 0.f)
+		cbr *= -1.f;
+
+	return cbr;
 }
 
