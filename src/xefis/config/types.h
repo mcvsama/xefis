@@ -22,6 +22,8 @@
 
 
 typedef float Degrees;
+typedef float Knots;
+typedef float Feet;
 
 #endif
 

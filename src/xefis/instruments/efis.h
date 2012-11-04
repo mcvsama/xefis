@@ -19,6 +19,7 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtGui/QPixmap>
+#include <QtNetwork/QUdpSocket>
 
 // Standard:
 #include <cstddef>
@@ -52,6 +53,18 @@ class EFIS: public QWidget
 	void
 	set_heading (Degrees);
 
+	Knots
+	ias() const;
+
+	void
+	set_ias (Knots);
+
+	Feet
+	altitude() const;
+
+	void
+	set_altitude (Feet);
+
 	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
@@ -72,25 +85,36 @@ class EFIS: public QWidget
 	set_ground_color (QColor const&);
 
   public slots:
-	// XXX
+	/**
+	 * Read and apply FlightGear datagrams from UDP socket.
+	 */
 	void
-	test();
+	read_input();
 
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
 
 	void
-	paint_horizon (QPainter& painter);
+	paint_horizon (QPainter&);
 
 	void
-	paint_pitch_scale (QPainter& painter);
+	paint_pitch_scale (QPainter&);
 
 	void
-	paint_heading (QPainter& heading);
+	paint_heading (QPainter&);
 
 	void
-	paint_roll (QPainter& painter);
+	paint_roll (QPainter&);
+
+	void
+	paint_center_cross (QPainter&);
+
+	void
+	paint_speed (QPainter&);
+
+	void
+	paint_altitude (QPainter&);
 
   private:
 	float
@@ -112,11 +136,14 @@ class EFIS: public QWidget
 	QTransform	_horizon_transform;
 	QFont		_font;
 	Degrees		_fov		= 120.f;
+	QUdpSocket*	_input;
 
 	// Parameters:
 	Degrees		_pitch		= 0.f;
 	Degrees		_roll		= 0.f;
 	Degrees		_heading	= 0.f;
+	Knots		_ias		= 0.f;
+	Feet		_altitude	= 0.f;
 };
 
 
@@ -161,6 +188,36 @@ inline void
 EFIS::set_heading (Degrees degrees)
 {
 	_heading = degrees;
+	update();
+}
+
+
+inline Knots
+EFIS::ias() const
+{
+	return _ias;
+}
+
+
+inline void
+EFIS::set_ias (Knots ias)
+{
+	_ias = ias;
+	update();
+}
+
+
+inline Feet
+EFIS::altitude() const
+{
+	return _altitude;
+}
+
+
+inline void
+EFIS::set_altitude (Feet altitude)
+{
+	_altitude = altitude;
 	update();
 }
 

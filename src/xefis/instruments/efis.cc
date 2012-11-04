@@ -17,40 +17,76 @@
 #include <cmath>
 
 // Qt:
-#include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
 
 // Xefis:
+#include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
 
 // Local:
 #include "efis.h"
 
+/*
+ * TODO cache TextPainter result. (TextPainter::Cache class that holds rendered pixmaps)
+ */
 
 EFIS::EFIS (QWidget* parent):
 	QWidget (parent, nullptr)
 {
 	setAttribute (Qt::WA_NoBackground);
-	_sky_color.setHsv (210, 255, 204);
-	_ground_color.setHsv (30, 255, 101);
+	_sky_color.setHsv (213, 217, 255);
+	_ground_color.setHsv (39, 219, 127);
 	_font = QApplication::font();
 
-	// XXX for testing purposes only:
-	QTimer* timer = new QTimer (this);
-	QObject::connect (timer, SIGNAL (timeout()), this, SLOT (test()));
-	timer->start (40);
+	_input = new QUdpSocket (this);
+	_input->bind (QHostAddress::LocalHost, 9000);
+	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 }
 
 
-// XXX
 void
-EFIS::test()
+EFIS::read_input()
 {
-	set_roll (roll() + 0.1f);
-	set_pitch (pitch() - 0.1f);
-	set_heading (heading() + 0.25f);
+	while (_input->hasPendingDatagrams())
+	{
+		QByteArray datagram;
+		datagram.resize (_input->pendingDatagramSize());
+		QHostAddress sender_host;
+		uint16_t sender_port;
+
+		_input->readDatagram (datagram.data(), datagram.size(), &sender_host, &sender_port);
+
+		QString line (datagram);
+		for (QString pair: QString (datagram).split (',', QString::SkipEmptyParts))
+		{
+			QStringList split_pair = pair.split ('=');
+			if (split_pair.size() != 2)
+				continue;
+			QString var = split_pair[0];
+			QString value = split_pair[1];
+
+			if (var == "ias")
+				set_ias (value.toFloat());
+			else if (var == "heading")
+				set_heading (value.toFloat());
+			else if (var == "altitude")
+				set_altitude (value.toFloat());
+//			else if (var == "cbr")
+//				set_cbr (value.toFloat());
+			else if (var == "pitch")
+				set_pitch (value.toFloat());
+			else if (var == "roll")
+				set_roll (value.toFloat());
+//			else if (var == "latitude")
+//				set_latitude (value.toFloat());
+//			else if (var == "longitude")
+//				set_longitude (value.toFloat());
+//			else if (var == "time")
+//				set_time (value.toInt());
+		}
+	}
 }
 
 
@@ -85,10 +121,10 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	_pitch_transform.translate (0.f, -pitch_to_px (p));
 
 	_roll_transform.reset();
-	_roll_transform.rotate (r);
+	_roll_transform.rotate (-r);
 
 	_heading_transform.reset();
-	_heading_transform.translate (heading_to_px (hdg), 0.f);
+	_heading_transform.translate (-heading_to_px (hdg), 0.f);
 
 	// Total transform of horizon (heading is not really necessary here):
 	_horizon_transform = _pitch_transform * _roll_transform;
@@ -105,6 +141,9 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	paint_pitch_scale (painter);
 	paint_heading (painter);
 	paint_roll (painter);
+	paint_center_cross (painter);
+	paint_speed (painter);
+	paint_altitude (painter);
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
@@ -205,7 +244,7 @@ EFIS::paint_heading (QPainter& painter)
 	QFont font = _font;
 	font.setPixelSize (pen_width (10.f));
 
-	float const w = std::min (width(), height()) * 2.f / 9.f;
+	float const w = std::min (width(), height()) * 2.25f / 9.f;
 	float const fpxs = font.pixelSize();
 
 	painter.save();
@@ -220,12 +259,12 @@ EFIS::paint_heading (QPainter& painter)
 	TextPainter text_painter (painter);
 
 	painter.setTransform (_horizon_transform * _center_transform);
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width (1.5f), Qt::SolidLine));
+	painter.setPen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
 	painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
 	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 
 	painter.setTransform (_heading_transform * _horizon_transform * _center_transform);
-	for (int deg = -360; deg < 360; deg += 10)
+	for (int deg = -360; deg < 450; deg += 10)
 	{
 		float d10 = heading_to_px (deg);
 		float d05 = heading_to_px (deg + 5);
@@ -301,6 +340,104 @@ EFIS::paint_roll (QPainter& painter)
 	painter.setBrush (QBrush (QColor (255, 255, 255)));
 	painter.drawPolyline (QPolygonF() << b << a << c);
 	painter.drawPolygon (QPolygonF() << b - x0 + y0 << b + x1 + y1 << c - x1 + y1 << c + x0 + y0);
+
+	painter.restore();
+}
+
+
+void
+EFIS::paint_center_cross (QPainter& painter)
+{
+	float const w = std::min (width(), height()) * 3.f / 9.f;
+
+	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine);
+	white_pen.setJoinStyle (Qt::MiterJoin);
+
+	painter.save();
+
+	painter.setTransform (_center_transform);
+	painter.setPen (white_pen);
+	painter.setBrush (QBrush (QColor (0, 0, 0)));
+
+	QPointF x (0.025f * w, 0.f);
+	QPointF y (0.f, 0.025f * w);
+	QPolygonF a = QPolygonF()
+		<< -x - y
+		<<  x - y
+		<<  x + y
+		<< -x + y;
+	QPolygonF b = QPolygonF()
+		<< -25.f * x - y
+		<< -11.f * x - y
+		<< -11.f * x + 4.f * y
+		<< -13.f * x + 4.f * y
+		<< -13.f * x + y
+		<< -25.f * x + y;
+
+	painter.drawPolygon (a);
+	painter.drawPolygon (b);
+	painter.scale (-1.f, 1.f);
+	painter.drawPolygon (b);
+
+	painter.restore();
+}
+
+
+void
+EFIS::paint_speed (QPainter& painter)
+{
+	float const w = std::min (width(), height()) * 3.5f / 9.f;
+	float const box_w = 0.35f * w;
+
+	QPen no_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::NoPen));
+	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
+	white_pen.setJoinStyle (Qt::MiterJoin);
+
+	painter.save();
+
+	painter.setTransform (_center_transform);
+	painter.translate (-w, 0.f);
+
+	painter.setPen (no_pen);
+	painter.setBrush (QBrush (QColor (0, 0, 0, 0x60)));
+	painter.drawRect (-0.275f * w, -w, box_w, 2.f * w);
+
+	painter.setPen (white_pen);
+	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
+	float const x = w / 25.f;
+	painter.drawPolygon (QPolygonF()
+		<< QPointF (0.f, 0.f)
+		<< QPointF (-x, -x)
+		<< QPointF (-x, -2.5f * x)
+		<< QPointF (-0.9f * box_w, -2.5f * x)
+		<< QPointF (-0.9f * box_w, +2.5f * x)
+		<< QPointF (-x, +2.5f * x)
+		<< QPointF (-x, +x));
+
+	TextPainter text_painter (painter);
+
+//	QRectF box = QRectF ();
+//	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, _ias / 10);
+
+	painter.restore();
+}
+
+
+void
+EFIS::paint_altitude (QPainter& painter)
+{
+	float const w = std::min (width(), height()) * 3.5f / 9.f;
+
+	painter.save();
+
+	painter.setTransform (_center_transform);
+	painter.translate (w, 0.f);
+
+	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::NoPen));
+	painter.setBrush (QBrush (QColor (0, 0, 0, 0x60)));
+	painter.drawRect (-0.15f * w, -w, 0.35f * w, 2.f * w);
+
+	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 
 	painter.restore();
 }

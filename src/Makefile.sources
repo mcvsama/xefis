@@ -2,8 +2,8 @@
 
 -include Makefile.conf
 
-PKGCONFIG_LIBS	+= $(shell pkg-config --libs QtCore QtGui)
-PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags QtCore QtGui)
+PKGCONFIG_LIBS	+= $(shell pkg-config --libs QtCore QtGui QtNetwork)
+PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags QtCore QtGui QtNetwork)
 
 ifeq ($(PROFILING), 1)
 	PROFILING_CXXFLAGS = -pg -fno-omit-frame-pointer
