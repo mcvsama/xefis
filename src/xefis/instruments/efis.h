@@ -126,9 +126,13 @@ class EFIS: public QWidget
 	float
 	pen_width (float scale = 1.0f) const;
 
+	float
+	font_size (float scale = 1.0f) const;
+
   private:
 	QColor		_sky_color;
 	QColor		_ground_color;
+	QColor		_ladder_color;
 	QTransform	_center_transform;
 	QTransform	_pitch_transform;
 	QTransform	_roll_transform;
@@ -144,6 +148,8 @@ class EFIS: public QWidget
 	Degrees		_heading	= 0.f;
 	Knots		_ias		= 0.f;
 	Feet		_altitude	= 0.f;
+
+	static const char _digits[];
 };
 
 
@@ -256,7 +262,8 @@ EFIS::set_ground_color (QColor const& color)
 inline float
 EFIS::pitch_to_px (Degrees degrees) const
 {
-	return -degrees / _fov * std::max (width(), height());
+	float const correction = 0.775f;
+	return -degrees / (_fov * correction) * std::min (width(), height());
 }
 
 
@@ -269,7 +276,14 @@ EFIS::heading_to_px (Degrees degrees) const
 inline float
 EFIS::pen_width (float scale) const
 {
-	return scale * std::max (width(), height()) / 500.f;
+	return scale * std::min (width(), height()) / 315.f;
+}
+
+
+inline float
+EFIS::font_size (float scale) const
+{
+	return scale * std::min (width(), height()) / 375.f;
 }
 
 #endif

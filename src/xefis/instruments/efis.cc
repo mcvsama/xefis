@@ -28,6 +28,10 @@
 // Local:
 #include "efis.h"
 
+
+const char EFIS::_digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+
 /*
  * TODO cache TextPainter result. (TextPainter::Cache class that holds rendered pixmaps)
  */
@@ -38,6 +42,7 @@ EFIS::EFIS (QWidget* parent):
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (39, 219, 127);
+	_ladder_color = QColor (16, 0, 67, 0x60);
 	_font = QApplication::font();
 
 	_input = new QUdpSocket (this);
@@ -170,8 +175,10 @@ EFIS::paint_horizon (QPainter& painter)
 void
 EFIS::paint_pitch_scale (QPainter& painter)
 {
+	// TODO set rounded clip path on top
 	QFont font = _font;
-	font.setPixelSize (pen_width (10.f));
+	font.setPixelSize (font_size (10.f));
+	font.setBold (true);
 
 	float const w = std::min (width(), height()) * 2.f / 9.f;
 	float const z = 0.5f * w;
@@ -180,9 +187,9 @@ EFIS::paint_pitch_scale (QPainter& painter)
 	painter.save();
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.f * w));
+	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.2f * w));
 	painter.setTransform (_roll_transform * _center_transform);
-	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.f * w), Qt::IntersectClip);
+	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform * _center_transform);
 	painter.setFont (font);
 
@@ -241,8 +248,10 @@ EFIS::paint_pitch_scale (QPainter& painter)
 void
 EFIS::paint_heading (QPainter& painter)
 {
+	// TODO cache it:
 	QFont font = _font;
-	font.setPixelSize (pen_width (10.f));
+	font.setPixelSize (font_size (10.f));
+	font.setBold (true);
 
 	float const w = std::min (width(), height()) * 2.25f / 9.f;
 	float const fpxs = font.pixelSize();
@@ -350,7 +359,7 @@ EFIS::paint_center_cross (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.f / 9.f;
 
-	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine);
+	QPen white_pen (QColor (255, 255, 255), pen_width (1.5f), Qt::SolidLine);
 	white_pen.setJoinStyle (Qt::MiterJoin);
 
 	painter.save();
@@ -388,36 +397,78 @@ EFIS::paint_speed (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
+	float const speed = std::min (std::max (0.0f, _ias), 9999.9f);
+	int const rounded_speed = static_cast<int> (speed + 0.5f);
 
-	QPen no_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::NoPen));
+	// TODO cache, update on resize
+	QFont font = _font;
+	font.setPixelSize (font_size (20.f));
+	font.setBold (true);
+
+	// TODO cache, update on resize
+	QFontMetrics font_metrics (font);
+	float digit_width = 0;
+	for (char c: _digits)
+		digit_width = std::max (digit_width, static_cast<float> (font_metrics.width (c)));
+	float const digit_height = 1.55f * digit_width;
+
+	// TODO cache, update on resize
+	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
+	border_pen.setJoinStyle (Qt::MiterJoin);
 	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 	white_pen.setJoinStyle (Qt::MiterJoin);
 
 	painter.save();
 
 	painter.setTransform (_center_transform);
-	painter.translate (-w, 0.f);
+	painter.translate (-0.9f * w, 0.f);
 
-	painter.setPen (no_pen);
-	painter.setBrush (QBrush (QColor (0, 0, 0, 0x60)));
-	painter.drawRect (-0.275f * w, -w, box_w, 2.f * w);
+	painter.setPen (border_pen);
+	painter.setBrush (QBrush (_ladder_color));
+	painter.drawRect (-0.775f * box_w, -w, box_w, 2.f * w);
+
+	int digits = 3;
+	if (speed >= 1000.0f - 0.5f)
+		digits = 4;
+
+	float const margin = 0.25f * digit_width;
+	float const x = w / 25.f;
+
+	QRectF black_box (-digits * digit_width - 2.f * margin - x, -digit_height,
+					  +digits * digit_width + 2.f * margin, 2.f * digit_height);
 
 	painter.setPen (white_pen);
 	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
-	float const x = w / 25.f;
 	painter.drawPolygon (QPolygonF()
 		<< QPointF (0.f, 0.f)
 		<< QPointF (-x, -x)
-		<< QPointF (-x, -2.5f * x)
-		<< QPointF (-0.9f * box_w, -2.5f * x)
-		<< QPointF (-0.9f * box_w, +2.5f * x)
-		<< QPointF (-x, +2.5f * x)
+		<< black_box.topRight()
+		<< black_box.topLeft()
+		<< black_box.bottomLeft()
+		<< black_box.bottomRight()
 		<< QPointF (-x, +x));
 
 	TextPainter text_painter (painter);
 
-//	QRectF box = QRectF ();
-//	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, _ias / 10);
+	// 110 part of the speed:
+	painter.setFont (font);
+	QRectF box_10 = black_box.adjusted (margin, margin, -margin - digit_width, -margin);
+	text_painter.drawText (box_10, Qt::AlignVCenter | Qt::AlignRight, QString::number (static_cast<int> (speed + 0.5f) / 10));
+
+	// 001 part of the speed:
+	QRectF box_01 (box_10.right(), box_10.top(), digit_width, box_10.height());
+	QRectF box_01_p1 = box_01.translated (0.f, -digit_height);
+	QRectF box_01_m1 = box_01.translated (0.f, +digit_height);
+	painter.setClipRect (box_01);
+	painter.translate (0.f, -digit_height * (rounded_speed - speed));
+	text_painter.drawText (box_01_p1, Qt::AlignVCenter | Qt::AlignLeft,
+						   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed + 1.f, 10.f))));
+	text_painter.drawText (box_01, Qt::AlignVCenter | Qt::AlignLeft,
+						   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed, 10.f))));
+	// Don't draw negative values:
+	if (speed > 0.5f)
+		text_painter.drawText (box_01_m1, Qt::AlignVCenter | Qt::AlignLeft,
+							   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed - 1.f, 10.f))));
 
 	painter.restore();
 }
@@ -427,17 +478,97 @@ void
 EFIS::paint_altitude (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
+	float const box_w = 0.35f * w;
+	float const altitude = std::min (std::max (_altitude, -9999.f), 99999.9f);
+	float const minus = _altitude < 0.f ? -1.f : 1.f;
+	int const rounded_altitude = static_cast<int> (altitude + minus * 10.f) / 20 * 20;
+
+	// TODO cache, update on resize
+	QFont b_font = _font;
+	b_font.setPixelSize (font_size (20.f));
+	b_font.setBold (true);
+	QFont s_font = _font;
+	s_font.setPixelSize (font_size (16.f));
+	s_font.setBold (true);
+
+	// TODO cache, update on resize
+	QFontMetrics b_font_metrics (b_font);
+	float b_digit_width = 0;
+	for (char c: _digits)
+		b_digit_width = std::max (b_digit_width, static_cast<float> (b_font_metrics.width (c)));
+	float const b_digit_height = 1.55f * b_digit_width;
+	QFontMetrics s_font_metrics (s_font);
+	float s_digit_width = 0;
+	for (char c: _digits)
+		s_digit_width = std::max (s_digit_width, static_cast<float> (s_font_metrics.width (c)));
+	float const s_digit_height = 1.55f * s_digit_width;
+
+	// TODO cache, update on resize
+	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
+	border_pen.setJoinStyle (Qt::MiterJoin);
+	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
+	white_pen.setJoinStyle (Qt::MiterJoin);
+	QPen red_pen (QPen (QColor (255, 0, 0), pen_width(), Qt::SolidLine));
 
 	painter.save();
 
 	painter.setTransform (_center_transform);
-	painter.translate (w, 0.f);
+	painter.translate (0.9f * w, 0.f);
 
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::NoPen));
-	painter.setBrush (QBrush (QColor (0, 0, 0, 0x60)));
-	painter.drawRect (-0.15f * w, -w, 0.35f * w, 2.f * w);
+	painter.setPen (border_pen);
+	painter.setBrush (QBrush (_ladder_color));
+	painter.drawRect (-0.225f * box_w, -w, box_w, 2.f * w);
 
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
+	int const b_digits = 2;
+	int const s_digits = 3;
+
+	float const margin = 0.25f * b_digit_width;
+	float const x = w / 25.f;
+
+	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
+	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
+	QRectF black_box (x, -0.5f * b_digits_box.height(),
+					  b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
+	b_digits_box.translate (x, -0.5f * b_digits_box.height());
+	s_digits_box.translate (x + b_digits_box.width(), -0.5f * s_digits_box.height());
+
+	painter.setPen (white_pen);
+	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
+	painter.drawPolygon (QPolygonF()
+		<< QPointF (0.f, 0.f)
+		<< QPointF (+x, -x)
+		<< black_box.topLeft()
+		<< black_box.topRight()
+		<< black_box.bottomRight()
+		<< black_box.bottomLeft()
+		<< QPointF (+x, +x));
+
+	TextPainter text_painter (painter);
+
+	painter.setFont (b_font);
+	if (minus < 0.f)
+		painter.setPen (red_pen);
+
+	// 11000 part of the altitude:
+	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
+	QString minus_sign_s = minus < 0.f ? "-" : "";
+	text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight, minus_sign_s + QString::number (std::abs (rounded_altitude / 1000)));
+
+	painter.setFont (s_font);
+
+	// 00100 part of the altitude:
+	QRectF box_00100 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
+	text_painter.drawText (box_00100, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs ((rounded_altitude / 100) % 10)));
+
+	// 00011 part of the altitude:
+	QRectF box_00011 = box_00100.adjusted (s_digit_width, 0.f, 0.f, 0.f);
+	QRectF box_00011_p10 = box_00011.translated (0.f, -s_digit_height);
+	QRectF box_00011_m10 = box_00011.translated (0.f, +s_digit_height);
+	painter.setClipRect (box_00011);
+	painter.translate (0.f, -s_digit_height * (rounded_altitude - altitude) / 20.f);
+	text_painter.drawText (box_00011_p10, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f + 2.f, 10.f))) + "0");
+	text_painter.drawText (box_00011, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f, 10.f))) + "0");
+	text_painter.drawText (box_00011_m10, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f - 2.f, 10.f))) + "0");
 
 	painter.restore();
 }

@@ -41,7 +41,11 @@ TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 	ov_painter.setPen (_painter.pen());
 	ov_painter.setFont (font);
 
-	_buffer.fill (QColor (0, 0, 0, 0).rgba());
+	// We don't know target background color, so fill the buffer
+	// with the desired text color (pen color) with 0 alpha.
+	QColor fill_color = _painter.pen().color();
+	fill_color.setAlpha (0);
+	_buffer.fill (fill_color.rgba());
 	ov_painter.drawText (_buffer.rect(), flags, text);
 	_painter.drawImage (target, _buffer, _buffer.rect());
 }
