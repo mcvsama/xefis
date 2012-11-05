@@ -30,7 +30,8 @@
 #include "efis.h"
 
 
-const char EFIS::_digits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const char EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const char* EFIS::MINUS_SIGN = "−";
 
 
 /*
@@ -130,7 +131,7 @@ EFIS::read_input()
 					_input_alert_timer->start (_input_alert_timeout * 1000.f);
 			}
 			else if (_show_input_alert && !_input_alert_hide_timer->isActive())
-				_input_alert_hide_timer->start (250);
+				_input_alert_hide_timer->start (350);
 		}
 	}
 }
@@ -461,20 +462,9 @@ EFIS::paint_speed (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
+	float const x = w / 25.f;
 	float const speed = std::min (std::max (0.0f, _ias), 9999.9f);
 	int const rounded_speed = static_cast<int> (speed + 0.5f);
-
-	// TODO cache, update on resize
-	QFont font = _font;
-	font.setPixelSize (font_size (20.f));
-	font.setBold (true);
-
-	// TODO cache, update on resize
-	QFontMetrics font_metrics (font);
-	float digit_width = 0;
-	for (char c: _digits)
-		digit_width = std::max (digit_width, static_cast<float> (font_metrics.width (c)));
-	float const digit_height = 1.55f * digit_width;
 
 	// TODO cache, update on resize
 	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
@@ -482,25 +472,83 @@ EFIS::paint_speed (QPainter& painter)
 	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 	white_pen.setJoinStyle (Qt::MiterJoin);
 
-	painter.save();
+	// TODO cache, update on resize
+	QFont actual_speed_font = _font;
+	actual_speed_font.setPixelSize (font_size (20.f));
+	actual_speed_font.setBold (true);
 
-	painter.setTransform (_center_transform);
-	painter.translate (-0.9f * w, 0.f);
+	// TODO cache, update on resize
+	float const digit_width = get_digit_width (actual_speed_font);
+	float const digit_height = 1.55f * digit_width;
 
-	QRectF ladder (-0.725f * box_w, -0.95f * w, box_w, 1.9f * w);
-	painter.setPen (border_pen);
-	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (ladder);
-
+	// Black indicator stuff:
 	int digits = 3;
 	if (speed >= 1000.0f - 0.5f)
 		digits = 4;
 
 	float const margin = 0.25f * digit_width;
-	float const x = w / 25.f;
 
 	QRectF black_box (-digits * digit_width - 2.f * margin - x, -digit_height,
 					  +digits * digit_width + 2.f * margin, 2.f * digit_height);
+
+	TextPainter text_painter (painter);
+	painter.save();
+
+	painter.setTransform (_center_transform);
+	painter.translate (-0.9f * w, 0.f);
+
+	// Ladder:
+
+	// TODO cache, update on resize
+	QFont ladder_font = _font;
+	ladder_font.setPixelSize (font_size (13.f));
+	ladder_font.setBold (true);
+	float const ladder_digit_width = get_digit_width (ladder_font);
+	float const ladder_digit_height = 1.75f * ladder_digit_width;
+
+	QRectF ladder_box (-0.775f * box_w, -0.95f * w, box_w, 1.9f * w);
+	painter.setPen (border_pen);
+	painter.setBrush (QBrush (_ladder_color));
+	painter.drawRect (ladder_box);
+	painter.setFont (ladder_font);
+
+	float const extent = 124.f;
+	int const line_every = 10;
+	int const num_every = 20;
+
+	float max_shown = speed + extent / 2.f;
+	float min_shown = speed - extent / 2.f;
+	if (min_shown < 0.f)
+		min_shown = 0.f;
+
+	// Special clipping that leaves some margin around black indicator:
+	QPainterPath clip_path;
+	QPainterPath clip_path_2;
+	clip_path.addRect (ladder_box);
+	clip_path_2.addRect (black_box.adjusted (0.f, -0.5f * x, 0.f, +0.5f * x));
+	clip_path -= clip_path_2;
+
+	painter.save();
+	painter.setClipPath (clip_path);
+	painter.setPen (white_pen);
+	// -+line_every is to have drawn also numbers that barely fit the scale.
+	for (int kt = (static_cast<int> (min_shown) / line_every) * line_every - line_every;
+		 kt <= max_shown + line_every;
+		 kt += line_every)
+	{
+		if (kt < 0)
+			continue;
+		float posy = -0.95f * w * (kt - speed) / (extent / 2.f);
+		painter.drawLine (QPointF (0.01f * box_w, posy), QPointF (0.275 * box_w, posy));
+
+		if (kt % num_every == 0)
+			text_painter.drawText (QRectF (-4.f * ladder_digit_width - x, -0.5f * ladder_digit_height + posy,
+										   +4.f * ladder_digit_width, ladder_digit_height),
+								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
+	}
+	painter.restore();
+
+	// Black indicator:
 
 	painter.setPen (white_pen);
 	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
@@ -513,10 +561,8 @@ EFIS::paint_speed (QPainter& painter)
 		<< black_box.bottomRight()
 		<< QPointF (-x, +x));
 
-	TextPainter text_painter (painter);
-
 	// 110 part of the speed:
-	painter.setFont (font);
+	painter.setFont (actual_speed_font);
 	QRectF box_10 = black_box.adjusted (margin, margin, -margin - digit_width, -margin);
 	text_painter.drawText (box_10, Qt::AlignVCenter | Qt::AlignRight, QString::number (static_cast<int> (speed + 0.5f) / 10));
 
@@ -544,9 +590,19 @@ EFIS::paint_altitude (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
-	float const altitude = std::min (std::max (_altitude, -9999.f), 99999.9f);
+	float const x = w / 25.f;
+	float const altitude = std::min (std::max (_altitude, -9999.f), 99999.9f);;
 	float const minus = _altitude < 0.f ? -1.f : 1.f;
 	int const rounded_altitude = static_cast<int> (altitude + minus * 10.f) / 20 * 20;
+
+	// TODO cache, update on resize
+	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
+	border_pen.setJoinStyle (Qt::MiterJoin);
+	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
+	white_pen.setJoinStyle (Qt::MiterJoin);
+	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (2.5f), Qt::SolidLine));
+	bold_white_pen.setJoinStyle (Qt::MiterJoin);
+	QPen red_pen (QPen (QColor (255, 128, 128), pen_width(), Qt::SolidLine));
 
 	// TODO cache, update on resize
 	QFont b_font = _font;
@@ -557,39 +613,15 @@ EFIS::paint_altitude (QPainter& painter)
 	s_font.setBold (true);
 
 	// TODO cache, update on resize
-	QFontMetrics b_font_metrics (b_font);
-	float b_digit_width = 0;
-	for (char c: _digits)
-		b_digit_width = std::max (b_digit_width, static_cast<float> (b_font_metrics.width (c)));
+	float const b_digit_width = get_digit_width (b_font);
 	float const b_digit_height = 1.55f * b_digit_width;
-	QFontMetrics s_font_metrics (s_font);
-	float s_digit_width = 0;
-	for (char c: _digits)
-		s_digit_width = std::max (s_digit_width, static_cast<float> (s_font_metrics.width (c)));
+	float const s_digit_width = get_digit_width (s_font);
 	float const s_digit_height = 1.55f * s_digit_width;
-
-	// TODO cache, update on resize
-	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
-	border_pen.setJoinStyle (Qt::MiterJoin);
-	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-	white_pen.setJoinStyle (Qt::MiterJoin);
-	QPen red_pen (QPen (QColor (255, 0, 0), pen_width(), Qt::SolidLine));
-
-	painter.save();
-
-	painter.setTransform (_center_transform);
-	painter.translate (0.9f * w, 0.f);
-
-	QRectF ladder (-0.225f * box_w, -0.95f * w, box_w, 1.9f * w);
-	painter.setPen (border_pen);
-	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (ladder);
 
 	int const b_digits = 2;
 	int const s_digits = 3;
 
 	float const margin = 0.25f * b_digit_width;
-	float const x = w / 25.f;
 
 	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
 	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
@@ -597,6 +629,92 @@ EFIS::paint_altitude (QPainter& painter)
 					  b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
 	b_digits_box.translate (x, -0.5f * b_digits_box.height());
 	s_digits_box.translate (x + b_digits_box.width(), -0.5f * s_digits_box.height());
+
+	QFont b_ladder_font = _font;
+	b_ladder_font.setPixelSize (font_size (13.f));
+	b_ladder_font.setBold (true);
+	float const b_ladder_digit_width = get_digit_width (b_ladder_font);
+	float const b_ladder_digit_height = 1.75f * b_ladder_digit_width;
+
+	QFont s_ladder_font = _font;
+	s_ladder_font.setPixelSize (font_size (10.f));
+	s_ladder_font.setBold (true);
+	float const s_ladder_digit_width = get_digit_width (s_ladder_font);
+	float const s_ladder_digit_height = 1.75f * s_ladder_digit_width;
+
+	TextPainter text_painter (painter);
+	painter.save();
+
+	painter.setTransform (_center_transform);
+	painter.translate (0.9f * w, 0.f);
+
+	// Ladder:
+
+	QRectF ladder_box (-0.225f * box_w, -0.95f * w, box_w, 1.9f * w);
+	painter.setPen (border_pen);
+	painter.setBrush (QBrush (_ladder_color));
+	painter.drawRect (ladder_box);
+
+	float const extent = 825.f;
+	int const line_every = 100;
+	int const num_every = 200;
+	int const bold_every = 500;
+
+	float max_shown = altitude + extent / 2.f;
+	float min_shown = altitude - extent / 2.f;
+
+	// Special clipping that leaves some margin around black indicator:
+	QPainterPath clip_path;
+	QPainterPath clip_path_2;
+	clip_path.addRect (ladder_box);
+	clip_path_2.addRect (black_box.adjusted (0.f, -0.5f * x, 0.f, +0.5f * x));
+	clip_path -= clip_path_2;
+
+	painter.save();
+	painter.setClipPath (clip_path);
+	// -+line_every is to have drawn also numbers that barely fit the scale.
+	for (int ft = (static_cast<int> (min_shown) / line_every) * line_every - line_every;
+		 ft <= max_shown + line_every;
+		 ft += line_every)
+	{
+		float posy = -0.95f * w * (ft - altitude) / (extent / 2.f);
+
+		if (ft % bold_every == 0)
+			painter.setPen (bold_white_pen);
+		else
+			painter.setPen (white_pen);
+		painter.drawLine (QPointF (-0.01f * box_w, posy), QPointF (-0.275 * box_w, posy));
+
+		if (ft % num_every == 0)
+		{
+			QRectF big_text_box (0.5f * x, -0.5f * b_ladder_digit_height + posy,
+								 2.f * b_ladder_digit_width, b_ladder_digit_height);
+			if (std::abs (ft) / 1000 > 0)
+			{
+				QString big_text = QString::number (ft / 1000);
+				painter.setFont (b_ladder_font);
+				text_painter.drawText (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text);
+			}
+
+			QString small_text = QString ("%1").arg (QString::number (ft % 1000), 3, '0');
+			if (ft == 0)
+				small_text = "0";
+			painter.setFont (s_ladder_font);
+			QRectF small_text_box (0.5f * x + 2.1f * b_ladder_digit_width, -0.5f * s_ladder_digit_height + posy,
+								   3.f * s_ladder_digit_width, s_ladder_digit_height);
+			text_painter.drawText (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text);
+			// Minus sign?
+			if (ft < 0)
+			{
+				if (ft > -1000)
+					text_painter.drawText (small_text_box.adjusted (-s_ladder_digit_width, 0.f, 0.f, 0.f),
+										   Qt::AlignVCenter | Qt::AlignLeft, MINUS_SIGN);
+			}
+		}
+	}
+	painter.restore();
+
+	// Black indicator:
 
 	painter.setPen (white_pen);
 	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
@@ -609,15 +727,13 @@ EFIS::paint_altitude (QPainter& painter)
 		<< black_box.bottomLeft()
 		<< QPointF (+x, +x));
 
-	TextPainter text_painter (painter);
-
 	painter.setFont (b_font);
 	if (minus < 0.f)
 		painter.setPen (red_pen);
 
 	// 11000 part of the altitude:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = minus < 0.f ? "-" : "";
+	QString minus_sign_s = minus < 0.f ? MINUS_SIGN : "";
 	text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight, minus_sign_s + QString::number (std::abs (rounded_altitude / 1000)));
 
 	painter.setFont (s_font);
@@ -760,5 +876,16 @@ EFIS::scale_cbr (Feet climb_rate) const
 		cbr *= -1.f;
 
 	return cbr;
+}
+
+
+int
+EFIS::get_digit_width (QFont& font) const
+{
+	QFontMetrics font_metrics (font);
+	int digit_width = 0;
+	for (char c: DIGITS)
+		digit_width = std::max (digit_width, font_metrics.width (c));
+	return digit_width;
 }
 

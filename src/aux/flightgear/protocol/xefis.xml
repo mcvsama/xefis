@@ -15,10 +15,34 @@
 				<node>/instrumentation/airspeed-indicator/indicated-speed-kt</node>
 			</chunk>
 			<chunk>
+				<name>groundspeed</name>
+				<type>float</type>
+				<format>gs=%f</format>
+				<node>/velocities/groundspeed-kt</node>
+			</chunk>
+			<chunk>
+				<name>tas</name>
+				<type>float</type>
+				<format>tas=%f</format>
+				<node>/instrumentation/airspeed-indicator/true-speed-kt</node>
+			</chunk>
+			<chunk>
+				<name>mach</name>
+				<type>float</type>
+				<format>mach=%f</format>
+				<node>/velocities/mach</node>
+			</chunk>
+			<chunk>
 				<name>heading</name>
 				<type>float</type>
 				<format>heading=%f</format>
 				<node>/orientation/heading-deg</node>
+			</chunk>
+			<chunk>
+				<name>heading-mag</name>
+				<type>float</type>
+				<format>heading-mag=%f</format>
+				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
 			<chunk>
 				<name>altitude</name>
@@ -27,10 +51,22 @@
 				<node>/instrumentation/altimeter/indicated-altitude-ft</node>
 			</chunk>
 			<chunk>
-				<name>cbr</name>
+				<name>altimeter-inhg</name>
+				<type>float</type>
+				<format>altimeter-inhg=%f</format>
+				<node>/instrumentation/altimeter/setting-inhg</node>
+			</chunk>
+			<chunk>
+				<name>cbr-fpm</name>
 				<type>float</type>
 				<format>cbr=%f</format>
 				<node>/instrumentation/vertical-speed-indicator/indicated-speed-fpm</node>
+			</chunk>
+			<chunk>
+				<name>cbr-2-fps</name>
+				<type>float</type>
+				<format>cbr-2=%f</format>
+				<node>/velocities/vertical-speed-fps</node>
 			</chunk>
 			<chunk>
 				<name>pitch</name>

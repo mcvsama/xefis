@@ -24,6 +24,8 @@
 typedef float Degrees;
 typedef float Knots;
 typedef float Feet;
+typedef float FeetPerMinute;
+typedef float Seconds;
 
 #endif
 

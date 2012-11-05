@@ -23,6 +23,7 @@
 
 // Qt:
 #include <QtCore/QTextCodec>
+#include <QtGui/QFontDatabase>
 
 // Xefis:
 #include <xefis/config/version.h>
@@ -59,6 +60,20 @@ int main (int argc, char** argv, char**)
 			QApplication* app = new QApplication (argc, argv);
 			// Qt preparations:
 			QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF-8"));
+			QFontDatabase font_db;
+			// Try to select best font:
+			for (QString font: { "Black", "Bold", "BoldCondensed", "Condensed", "Light", "Medium", "Regular", "Thin" })
+				QFontDatabase::addApplicationFont ("share/fonts/Roboto/Roboto-" + font + ".ttf");
+			for (auto font_family: { "Roboto", "Bitstream Vera Sans Mono", "Ubuntu Mono", "Droid Sans", "Trebuchet MS", "monospace" })
+			{
+				QFont font (font_family);
+				QFontInfo font_info (font);
+				if (font_info.exactMatch())
+				{
+					QApplication::setFont (font);
+					break;
+				}
+			}
 			// Now casting QString to std::string|const char* will yield UTF-8 encoded strings.
 			// Also std::strings and const chars* are expected to be encoded in UTF-8.
 			EFIS* efis = new EFIS (nullptr);

@@ -164,6 +164,9 @@ class EFIS: public QWidget
 	float
 	font_size (float scale = 1.0f) const;
 
+	int
+	get_digit_width (QFont&) const;
+
   private:
 	QColor		_sky_color;
 	QColor		_ground_color;
@@ -189,7 +192,8 @@ class EFIS: public QWidget
 	Feet		_altitude				= 0.f;
 	Feet		_cbr					= 0.f;
 
-	static const char _digits[];
+	static const char DIGITS[];
+	static const char* MINUS_SIGN;
 };
 
 
