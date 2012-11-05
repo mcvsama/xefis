@@ -1,0 +1,4 @@
+#!/bin/sh
+
+make -C src && src/.build/$(uname -m)/xefis.run
+
