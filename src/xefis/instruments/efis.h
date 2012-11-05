@@ -35,6 +35,13 @@ class EFIS: public QWidget
   public:
 	EFIS (QWidget* parent);
 
+	/**
+	 * Show input alert when data is not coming for given period of time.
+	 * Pass 0.f to disable. Default is 110 ms.
+	 */
+	void
+	set_input_alert_timeout (Seconds timeout);
+
 	Degrees
 	roll() const;
 
@@ -97,6 +104,19 @@ class EFIS: public QWidget
 	void
 	read_input();
 
+	/**
+	 * Show input alert (when there's no incoming
+	 * data from external source).
+	 */
+	void
+	input_timeout();
+
+	/**
+	 * Hide input alert.
+	 */
+	void
+	input_ok();
+
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
@@ -125,6 +145,9 @@ class EFIS: public QWidget
 	void
 	paint_climb_rate (QPainter&);
 
+	void
+	paint_input_alert (QPainter&);
+
   private:
 	float
 	pitch_to_px (Degrees degrees) const;
@@ -151,16 +174,20 @@ class EFIS: public QWidget
 	QTransform	_heading_transform;
 	QTransform	_horizon_transform;
 	QFont		_font;
-	Degrees		_fov		= 120.f;
-	QUdpSocket*	_input;
+	Degrees		_fov					= 120.f;
+	QUdpSocket*	_input					= nullptr;
+	Seconds		_input_alert_timeout	= 0.0f;
+	QTimer*		_input_alert_timer		= nullptr;
+	QTimer*		_input_alert_hide_timer	= nullptr;
+	bool		_show_input_alert		= false;
 
 	// Parameters:
-	Degrees		_pitch		= 0.f;
-	Degrees		_roll		= 0.f;
-	Degrees		_heading	= 0.f;
-	Knots		_ias		= 0.f;
-	Feet		_altitude	= 0.f;
-	Feet		_cbr		= 0.f;
+	Degrees		_pitch					= 0.f;
+	Degrees		_roll					= 0.f;
+	Degrees		_heading				= 0.f;
+	Knots		_ias					= 0.f;
+	Feet		_altitude				= 0.f;
+	Feet		_cbr					= 0.f;
 
 	static const char _digits[];
 };

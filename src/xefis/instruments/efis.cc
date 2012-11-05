@@ -17,6 +17,7 @@
 #include <cmath>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtGui/QApplication>
 #include <QtGui/QPainter>
 
@@ -48,6 +49,34 @@ EFIS::EFIS (QWidget* parent):
 	_input = new QUdpSocket (this);
 	_input->bind (QHostAddress::LocalHost, 9000);
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
+
+	_input_alert_timer = new QTimer (this);
+	_input_alert_timer->setSingleShot (true);
+	QObject::connect (_input_alert_timer, SIGNAL (timeout()), this, SLOT (input_timeout()));
+
+	_input_alert_hide_timer = new QTimer (this);
+	_input_alert_hide_timer->setSingleShot (true);
+	QObject::connect (_input_alert_hide_timer, SIGNAL (timeout()), this, SLOT (input_ok()));
+
+	// Default alert timeout:
+	set_input_alert_timeout (0.15f);
+}
+
+
+void
+EFIS::set_input_alert_timeout (Seconds timeout)
+{
+	_input_alert_timeout = timeout;
+
+	if (_input_alert_timeout > 0.f)
+		_input_alert_timer->start (_input_alert_timeout * 1000.f);
+	else
+	{
+		_show_input_alert = false;
+		_input_alert_timer->stop();
+		_input_alert_hide_timer->stop();
+		update();
+	}
 }
 
 
@@ -66,6 +95,8 @@ EFIS::read_input()
 		QString line (datagram);
 		for (QString pair: QString (datagram).split (',', QString::SkipEmptyParts))
 		{
+			bool no_control = false;
+
 			QStringList split_pair = pair.split ('=');
 			if (split_pair.size() != 2)
 				continue;
@@ -84,14 +115,41 @@ EFIS::read_input()
 				set_pitch (value.toFloat());
 			else if (var == "roll")
 				set_roll (value.toFloat());
+			else
+				no_control = true;
 //			else if (var == "latitude")
 //				set_latitude (value.toFloat());
 //			else if (var == "longitude")
 //				set_longitude (value.toFloat());
 //			else if (var == "time")
 //				set_time (value.toInt());
+
+			if (no_control)
+			{
+				if (_input_alert_timeout > 0.f)
+					_input_alert_timer->start (_input_alert_timeout * 1000.f);
+			}
+			else if (_show_input_alert && !_input_alert_hide_timer->isActive())
+				_input_alert_hide_timer->start (250);
 		}
 	}
+}
+
+
+void
+EFIS::input_timeout()
+{
+	_input_alert_hide_timer->stop();
+	_show_input_alert = true;
+	update();
+}
+
+
+void
+EFIS::input_ok()
+{
+	_show_input_alert = false;
+	update();
 }
 
 
@@ -150,6 +208,9 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	paint_speed (painter);
 	paint_altitude (painter);
 	paint_climb_rate (painter);
+
+	if (_show_input_alert)
+		paint_input_alert (painter);
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
@@ -643,6 +704,39 @@ EFIS::paint_climb_rate (QPainter& painter)
 								 2.0f * x, 5.5f * y + 2.f * x));
 	painter.setPen (bold_white_pen);
 	painter.drawLine (QPointF (5.f * x, 0.f), QPointF (line_w, -2.75f * y * scale_cbr (_cbr)));
+
+	painter.restore();
+}
+
+
+void
+EFIS::paint_input_alert (QPainter& painter)
+{
+	painter.save();
+
+	QFont font = _font;
+	font.setPixelSize (font_size (30.f));
+	font.setBold (true);
+
+	QString alert = "NO INPUT";
+
+	QFontMetrics font_metrics (font);
+	int width = font_metrics.width (alert);
+
+	QPen pen (QColor (255, 255, 255), pen_width (2.f), Qt::SolidLine);
+	pen.setJoinStyle (Qt::MiterJoin);
+
+	painter.setTransform (_center_transform);
+	painter.setPen (pen);
+	painter.setBrush (QBrush (QColor (0xdd, 0, 0, 0xdd)));
+	painter.setFont (font);
+
+	QRectF rect (-0.6f * width, -0.6f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
+
+	painter.drawRect (rect);
+	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
+
+	// TODO font_metrics.height() in other places where font height is needed
 
 	painter.restore();
 }
