@@ -525,7 +525,7 @@ EFIS::paint_speed (QPainter& painter)
 	QPainterPath clip_path;
 	QPainterPath clip_path_2;
 	clip_path.addRect (ladder_box);
-	clip_path_2.addRect (black_box.adjusted (0.f, -0.5f * x, 0.f, +0.5f * x));
+	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
 	clip_path -= clip_path_2;
 
 	painter.save();
@@ -667,7 +667,7 @@ EFIS::paint_altitude (QPainter& painter)
 	QPainterPath clip_path;
 	QPainterPath clip_path_2;
 	clip_path.addRect (ladder_box);
-	clip_path_2.addRect (black_box.adjusted (0.f, -0.5f * x, 0.f, +0.5f * x));
+	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
 	clip_path -= clip_path_2;
 
 	painter.save();
