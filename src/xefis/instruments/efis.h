@@ -335,7 +335,7 @@ EFIS::heading_to_px (Degrees degrees) const
 inline float
 EFIS::pen_width (float scale) const
 {
-	return scale * std::min (width(), height()) / 315.f;
+	return scale * std::min (width(), height()) / 325.f;
 }
 
 
