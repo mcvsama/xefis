@@ -34,10 +34,6 @@ const char EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 const char* EFIS::MINUS_SIGN = "−";
 
 
-/*
- * TODO cache TextPainter result. (TextPainter::Cache class that holds rendered pixmaps)
- */
-
 EFIS::EFIS (QWidget* parent):
 	QWidget (parent, nullptr)
 {
@@ -48,7 +44,7 @@ EFIS::EFIS (QWidget* parent):
 	_font = QApplication::font();
 
 	_input = new QUdpSocket (this);
-	_input->bind (QHostAddress::LocalHost, 9000);
+	_input->bind (QHostAddress::LocalHost, 9000, QUdpSocket::ShareAddress);
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 
 	_input_alert_timer = new QTimer (this);
