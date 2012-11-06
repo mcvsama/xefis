@@ -258,7 +258,7 @@ EFIS::paint_pitch_scale (QPainter& painter)
 	painter.setTransform (_horizon_transform * _center_transform);
 	painter.setFont (font);
 
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 
 	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 	// 10° lines, exclude +/-90°:
@@ -330,7 +330,7 @@ EFIS::paint_heading (QPainter& painter)
 	painter.setTransform (_horizon_transform * _center_transform);
 	painter.setFont (font);
 
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 
 	painter.setTransform (_horizon_transform * _center_transform);
 	painter.setPen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
@@ -491,7 +491,7 @@ EFIS::paint_speed (QPainter& painter)
 	QRectF black_box (-digits * digit_width - 2.f * margin - x, -digit_height,
 					  +digits * digit_width + 2.f * margin, 2.f * digit_height);
 
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.save();
 
 	painter.setTransform (_center_transform);
@@ -642,7 +642,7 @@ EFIS::paint_altitude (QPainter& painter)
 	float const s_ladder_digit_width = get_digit_width (s_ladder_font);
 	float const s_ladder_digit_height = 1.75f * s_ladder_digit_width;
 
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.save();
 
 	painter.setTransform (_center_transform);
@@ -795,7 +795,7 @@ EFIS::paint_climb_rate (QPainter& painter)
 		<< QPointF (-1.5f * x, +0.9 * y + x)
 		<< QPointF (0.0f, +0.9 * y));
 
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 
 	float const line_w = 0.35 * x;
 

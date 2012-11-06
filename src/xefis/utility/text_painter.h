@@ -16,6 +16,8 @@
 
 // Standard:
 #include <cstddef>
+#include <tuple>
+#include <map>
 
 // Qt:
 #include <QtGui/QPainter>
@@ -32,16 +34,59 @@
 class TextPainter
 {
   public:
-	TextPainter (QPainter& painter, float oversampling_factor = 2.0f);
+	/**
+	 * Stores drawn images.
+	 */
+	class Cache
+	{
+		struct Key
+		{
+			QRect	size;
+			QColor	color;
+			QString	text;
+			int		flags;
+
+			bool
+			operator< (Key const& other) const;
+		};
+
+		typedef std::map<Key, QImage> CacheMap;
+
+	  public:
+		QImage*
+		load_image (QRect const& size, QColor const& color, QString const& text, int flags);
+
+		void
+		store_image (QRect const& size, QColor const& color, QString const& text, int flags, QImage& image);
+
+	  private:
+		CacheMap _cache;
+	};
+
+  public:
+	TextPainter (QPainter& painter, Cache* cache = nullptr, float oversampling_factor = 2.0f);
 
 	void
 	drawText (QRectF const& target, int flags, QString const& text);
 
   private:
+	Cache*		_cache;
 	QPainter&	_painter;
 	QImage		_buffer;
 	float		_oversampling_factor;
 };
+
+
+inline bool
+TextPainter::Cache::Key::operator< (Key const& other) const
+{
+	Key const& a = *this;
+	Key const& b = other;
+
+	return
+		std::make_tuple (a.size.top(), a.size.left(), a.size.bottom(), a.size.right(), a.color.rgba(), a.text, a.flags) <
+		std::make_tuple (b.size.top(), b.size.left(), b.size.bottom(), b.size.right(), b.color.rgba(), b.text, b.flags);
+}
 
 #endif
 

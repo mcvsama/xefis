@@ -26,6 +26,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/text_painter.h>
 
 
 class EFIS: public QWidget
@@ -168,29 +169,30 @@ class EFIS: public QWidget
 	get_digit_width (QFont&) const;
 
   private:
-	QColor		_sky_color;
-	QColor		_ground_color;
-	QColor		_ladder_color;
-	QTransform	_center_transform;
-	QTransform	_pitch_transform;
-	QTransform	_roll_transform;
-	QTransform	_heading_transform;
-	QTransform	_horizon_transform;
-	QFont		_font;
-	Degrees		_fov					= 120.f;
-	QUdpSocket*	_input					= nullptr;
-	Seconds		_input_alert_timeout	= 0.0f;
-	QTimer*		_input_alert_timer		= nullptr;
-	QTimer*		_input_alert_hide_timer	= nullptr;
-	bool		_show_input_alert		= false;
+	QColor				_sky_color;
+	QColor				_ground_color;
+	QColor				_ladder_color;
+	QTransform			_center_transform;
+	QTransform			_pitch_transform;
+	QTransform			_roll_transform;
+	QTransform			_heading_transform;
+	QTransform			_horizon_transform;
+	QFont				_font;
+	Degrees				_fov					= 120.f;
+	QUdpSocket*			_input					= nullptr;
+	Seconds				_input_alert_timeout	= 0.0f;
+	QTimer*				_input_alert_timer		= nullptr;
+	QTimer*				_input_alert_hide_timer	= nullptr;
+	bool				_show_input_alert		= false;
+	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
-	Degrees		_pitch					= 0.f;
-	Degrees		_roll					= 0.f;
-	Degrees		_heading				= 0.f;
-	Knots		_ias					= 0.f;
-	Feet		_altitude				= 0.f;
-	Feet		_cbr					= 0.f;
+	Degrees				_pitch					= 0.f;
+	Degrees				_roll					= 0.f;
+	Degrees				_heading				= 0.f;
+	Knots				_ias					= 0.f;
+	Feet				_altitude				= 0.f;
+	Feet				_cbr					= 0.f;
 
 	static const char DIGITS[];
 	static const char* MINUS_SIGN;

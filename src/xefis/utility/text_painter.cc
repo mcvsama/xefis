@@ -18,7 +18,25 @@
 #include "text_painter.h"
 
 
-TextPainter::TextPainter (QPainter& painter, float oversampling_factor):
+QImage*
+TextPainter::Cache::load_image (QRect const& size, QColor const& color, QString const& text, int flags)
+{
+	CacheMap::iterator img = _cache.find (Key { size, color, text, flags });
+	if (img == _cache.end())
+		return nullptr;
+	return &img->second;
+}
+
+
+void
+TextPainter::Cache::store_image (QRect const& size, QColor const& color, QString const& text, int flags, QImage& image)
+{
+	_cache[Key { size, color, text, flags }] = image;
+}
+
+
+TextPainter::TextPainter (QPainter& painter, Cache* cache, float oversampling_factor):
+	_cache (cache),
 	_painter (painter),
 	_buffer (1, 1, QImage::Format_ARGB32),
 	_oversampling_factor (oversampling_factor)
@@ -29,8 +47,20 @@ TextPainter::TextPainter (QPainter& painter, float oversampling_factor):
 void
 TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 {
-	if (_buffer.rect() != target)
-		_buffer = QImage (_oversampling_factor * target.width(), _oversampling_factor * target.height(), QImage::Format_ARGB32);
+	QRect target_int_rect (0, 0, _oversampling_factor * target.width(), _oversampling_factor * target.height());
+
+	if (_cache)
+	{
+		QImage* cached = _cache->load_image (target_int_rect, _painter.pen().color(), text, flags);
+		if (cached)
+		{
+			_painter.drawImage (target, *cached, cached->rect());
+			return;
+		}
+	}
+
+	if (_buffer.rect() != target_int_rect)
+		_buffer = QImage (target_int_rect.width(), target_int_rect.height(), QImage::Format_ARGB32);
 
 	QFont font = _painter.font();
 	font.setPixelSize (_oversampling_factor * font.pixelSize());
@@ -47,6 +77,10 @@ TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 	fill_color.setAlpha (0);
 	_buffer.fill (fill_color.rgba());
 	ov_painter.drawText (_buffer.rect(), flags, text);
+
+	if (_cache)
+		_cache->store_image (target_int_rect, _painter.pen().color(), text, flags, _buffer);
+
 	_painter.drawImage (target, _buffer, _buffer.rect());
 }
 
