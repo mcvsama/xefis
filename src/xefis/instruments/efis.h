@@ -35,6 +35,7 @@ class EFIS: public QWidget
 	Q_OBJECT
 
 	typedef std::map<QString, Knots> SpeedBugs;
+	typedef std::map<QString, Feet> AltitudeBugs;
 
   public:
 	static const char* AP;
@@ -86,7 +87,7 @@ class EFIS: public QWidget
 	set_climb_rate (Feet feet_per_minute);
 
 	/**
-	 * Return speed bug value.
+	 * Return speed bug value or 0.0f if not found.
 	 */
 	Knots
 	speed_bug (QString name) const;
@@ -105,6 +106,25 @@ class EFIS: public QWidget
 	remove_speed_bug (QString name);
 
 	/**
+	 * Return altitude bug value of 0.0f if not found.
+	 */
+	Feet
+	altitude_bug (QString name) const;
+
+	/**
+	 * Add new altitude bug. A special value EFIS::AP ("A/P")
+	 * renders autopilot-style bug instead of a regular one.
+	 */
+	void
+	add_altitude_bug (QString name, Feet altitude);
+
+	/**
+	 * Remove an altitude bug.
+	 */
+	void
+	remove_altitude_bug (QString name);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -116,12 +136,6 @@ class EFIS: public QWidget
 	 */
 	void
 	set_fov (Degrees);
-
-	void
-	set_sky_color (QColor const&);
-
-	void
-	set_ground_color (QColor const&);
 
   public slots:
 	/**
@@ -218,6 +232,7 @@ class EFIS: public QWidget
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;
+	QColor				_autopilot_color;
 	QTransform			_center_transform;
 	QTransform			_pitch_transform;
 	QTransform			_roll_transform;
@@ -240,6 +255,7 @@ class EFIS: public QWidget
 	Feet				_altitude					= 0.f;
 	Feet				_cbr						= 0.f;
 	SpeedBugs			_speed_bugs;
+	AltitudeBugs		_altitude_bugs;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
@@ -362,6 +378,32 @@ EFIS::remove_speed_bug (QString name)
 }
 
 
+inline Feet
+EFIS::altitude_bug (QString name) const
+{
+	auto it = _altitude_bugs.find (name);
+	if (it != _altitude_bugs.end())
+		return it->second;
+	return 0.f;
+}
+
+
+inline void
+EFIS::add_altitude_bug (QString name, Feet altitude)
+{
+	_altitude_bugs[name] = altitude;
+	update();
+}
+
+
+inline void
+EFIS::remove_altitude_bug (QString name)
+{
+	_altitude_bugs.erase (name);
+	update();
+}
+
+
 inline Degrees
 EFIS::fov() const
 {
@@ -373,22 +415,6 @@ inline void
 EFIS::set_fov (Degrees degrees)
 {
 	_fov = degrees;
-	update();
-}
-
-
-inline void
-EFIS::set_sky_color (QColor const& color)
-{
-	_sky_color = color;
-	update();
-}
-
-
-inline void
-EFIS::set_ground_color (QColor const& color)
-{
-	_ground_color = color;
 	update();
 }
 

@@ -42,6 +42,7 @@ EFIS::EFIS (QWidget* parent):
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (16, 0, 67, 0x60);
+	_autopilot_color = QColor (255, 100, 255);
 	_font = QApplication::font();
 
 	_input = new QUdpSocket (this);
@@ -527,6 +528,8 @@ EFIS::paint_speed (QPainter& painter)
 	};
 
 	painter.save();
+
+	// Draw ladder:
 	painter.setClipPath (clip_path);
 	painter.setPen (white_pen);
 	// -+line_every is to have drawn also numbers that barely fit the scale.
@@ -546,18 +549,18 @@ EFIS::paint_speed (QPainter& painter)
 	}
 
 	// Draw speed bugs:
-	painter.setPen (speed_bug_pen);
 	painter.setFont (speed_bug_font);
 	QPainterPath translated_clip_path = clip_path.translated (0.5f * x, 0.f);
 	for (auto& bug: _speed_bugs)
 	{
+		// AP bug should be drawn last, to be on top:
 		if (bug.first == AP)
-		{
-			//TODO
-		}
-		else if (bug.second > min_shown && bug.second < max_shown)
+			continue;
+
+		if (bug.second > min_shown && bug.second < max_shown)
 		{
 			float posy = kt_to_px (bug.second);
+			painter.setPen (speed_bug_pen);
 			painter.setClipPath (translated_clip_path);
 			painter.drawLine (QPointF (0.1f * box_w, posy), QPointF (0.275 * box_w, posy));
 			painter.setClipping (false);
@@ -565,6 +568,26 @@ EFIS::paint_speed (QPainter& painter)
 										   box_w, speed_bug_digit_height),
 								   Qt::AlignVCenter | Qt::AlignLeft, bug.first);
 		}
+	}
+
+	// AP bug:
+	auto ap_bug = _speed_bugs.find (AP);
+	if (ap_bug != _speed_bugs.end())
+	{
+		float posy = kt_to_px (ap_bug->second);
+		QPolygonF bug_shape = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (+x, -x)
+			<< QPointF (4.f * x, -x)
+			<< QPointF (4.f * x, +x)
+			<< QPointF (+x, +x);
+		painter.setClipRect (ladder_box.translated (4.f * x, 0.f));
+		painter.translate (0.25f * x, posy);
+		painter.setBrush (Qt::NoBrush);
+		painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		painter.drawPolygon (bug_shape);
+		painter.setPen (QPen (_autopilot_color, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		painter.drawPolygon (bug_shape);
 	}
 
 	painter.restore();
