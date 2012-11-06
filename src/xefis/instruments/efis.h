@@ -186,6 +186,10 @@ class EFIS: public QWidget
 	float				_font_13_digit_width;
 	float				_font_16_digit_width;
 	float				_font_20_digit_width;
+	float				_font_10_digit_height;
+	float				_font_13_digit_height;
+	float				_font_16_digit_height;
+	float				_font_20_digit_height;
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;
