@@ -123,6 +123,9 @@ class EFIS: public QWidget
 	paintEvent (QPaintEvent*) override;
 
 	void
+	resizeEvent (QResizeEvent*) override;
+
+	void
 	paint_horizon (QPainter&);
 
 	void
@@ -171,7 +174,18 @@ class EFIS: public QWidget
 	int
 	get_digit_width (QFont&) const;
 
+	void
+	update_fonts();
+
   private:
+	QFont				_font_10_bold;
+	QFont				_font_13_bold;
+	QFont				_font_16_bold;
+	QFont				_font_20_bold;
+	float				_font_10_digit_width;
+	float				_font_13_digit_width;
+	float				_font_16_digit_width;
+	float				_font_20_digit_width;
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;

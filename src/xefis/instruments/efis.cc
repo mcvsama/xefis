@@ -57,6 +57,7 @@ EFIS::EFIS (QWidget* parent):
 
 	// Default alert timeout:
 	set_input_alert_timeout (0.15f);
+	update_fonts();
 }
 
 
@@ -215,6 +216,13 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 
 
 void
+EFIS::resizeEvent (QResizeEvent*)
+{
+	update_fonts();
+}
+
+
+void
 EFIS::paint_horizon (QPainter& painter)
 {
 	painter.save();
@@ -309,13 +317,8 @@ EFIS::paint_pitch_scale (QPainter& painter)
 void
 EFIS::paint_heading (QPainter& painter)
 {
-	// TODO cache it:
-	QFont font = _font;
-	font.setPixelSize (font_size (10.f));
-	font.setBold (true);
-
 	float const w = std::min (width(), height()) * 2.25f / 9.f;
-	float const fpxs = font.pixelSize();
+	float const fpxs = _font_10_bold.pixelSize();
 
 	painter.save();
 	// Clip rectangle before and after rotation:
@@ -324,7 +327,7 @@ EFIS::paint_heading (QPainter& painter)
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform * _center_transform);
-	painter.setFont (font);
+	painter.setFont (_font_10_bold);
 
 	TextPainter text_painter (painter, &_text_painter_cache);
 
@@ -468,13 +471,8 @@ EFIS::paint_speed (QPainter& painter)
 	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 	white_pen.setJoinStyle (Qt::MiterJoin);
 
-	// TODO cache, update on resize
-	QFont actual_speed_font = _font;
-	actual_speed_font.setPixelSize (font_size (20.f));
-	actual_speed_font.setBold (true);
-
-	// TODO cache, update on resize
-	float const digit_width = get_digit_width (actual_speed_font);
+	QFont actual_speed_font = _font_20_bold;
+	float const digit_width = _font_20_digit_width;
 	float const digit_height = 1.55f * digit_width;
 
 	// Black indicator stuff:
@@ -495,11 +493,8 @@ EFIS::paint_speed (QPainter& painter)
 
 	// Ladder:
 
-	// TODO cache, update on resize
-	QFont ladder_font = _font;
-	ladder_font.setPixelSize (font_size (13.f));
-	ladder_font.setBold (true);
-	float const ladder_digit_width = get_digit_width (ladder_font);
+	QFont ladder_font = _font_13_bold;
+	float const ladder_digit_width = _font_13_digit_width;
 	float const ladder_digit_height = 1.75f * ladder_digit_width;
 
 	QRectF ladder_box (-0.775f * box_w, -0.95f * w, box_w, 1.9f * w);
@@ -600,18 +595,12 @@ EFIS::paint_altitude (QPainter& painter)
 	bold_white_pen.setJoinStyle (Qt::MiterJoin);
 	QPen red_pen (QPen (QColor (255, 128, 128), pen_width(), Qt::SolidLine));
 
-	// TODO cache, update on resize
-	QFont b_font = _font;
-	b_font.setPixelSize (font_size (20.f));
-	b_font.setBold (true);
-	QFont s_font = _font;
-	s_font.setPixelSize (font_size (16.f));
-	s_font.setBold (true);
-
-	// TODO cache, update on resize
-	float const b_digit_width = get_digit_width (b_font);
+	QFont b_font = _font_20_bold;
+	float const b_digit_width = _font_20_digit_width;
 	float const b_digit_height = 1.55f * b_digit_width;
-	float const s_digit_width = get_digit_width (s_font);
+
+	QFont s_font = _font_16_bold;
+	float const s_digit_width = _font_16_digit_width;
 	float const s_digit_height = 1.55f * s_digit_width;
 
 	int const b_digits = 2;
@@ -626,16 +615,12 @@ EFIS::paint_altitude (QPainter& painter)
 	b_digits_box.translate (x, -0.5f * b_digits_box.height());
 	s_digits_box.translate (x + b_digits_box.width(), -0.5f * s_digits_box.height());
 
-	QFont b_ladder_font = _font;
-	b_ladder_font.setPixelSize (font_size (13.f));
-	b_ladder_font.setBold (true);
-	float const b_ladder_digit_width = get_digit_width (b_ladder_font);
+	QFont b_ladder_font = _font_13_bold;
+	float const b_ladder_digit_width = _font_13_digit_width;
 	float const b_ladder_digit_height = 1.75f * b_ladder_digit_width;
 
-	QFont s_ladder_font = _font;
-	s_ladder_font.setPixelSize (font_size (10.f));
-	s_ladder_font.setBold (true);
-	float const s_ladder_digit_width = get_digit_width (s_ladder_font);
+	QFont s_ladder_font = _font_10_bold;
+	float const s_ladder_digit_width = _font_10_digit_width;
 	float const s_ladder_digit_height = 1.75f * s_ladder_digit_width;
 
 	TextPainter text_painter (painter, &_text_painter_cache);
@@ -765,10 +750,6 @@ EFIS::paint_climb_rate (QPainter& painter)
 	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
 	QPen thin_white_pen (QPen (QColor (255, 255, 255), pen_width (0.5f), Qt::SolidLine));
 
-	QFont font = _font;
-	font.setPixelSize (font_size (10.f));
-	font.setBold (true);
-
 	painter.save();
 
 	float const x = w / 18.f;
@@ -795,7 +776,7 @@ EFIS::paint_climb_rate (QPainter& painter)
 
 	float const line_w = 0.35 * x;
 
-	painter.setFont (font);
+	painter.setFont (_font_10_bold);
 	painter.setPen (bold_white_pen);
 	painter.drawLine (QPointF (0.f, 0.f), QPointF (x, 0.f));
 	for (float kfpm: { -6.f, -2.f, -1.f, +1.f, +2.f, +6.f })
@@ -897,5 +878,30 @@ EFIS::get_digit_width (QFont& font) const
 	for (char c: DIGITS)
 		digit_width = std::max (digit_width, font_metrics.width (c));
 	return digit_width;
+}
+
+
+void
+EFIS::update_fonts()
+{
+	_font_10_bold = _font;
+	_font_10_bold.setPixelSize (font_size (10.f));
+	_font_10_bold.setBold (true);
+	_font_10_digit_width = get_digit_width (_font_10_bold);
+
+	_font_13_bold = _font;
+	_font_13_bold.setPixelSize (font_size (13.f));
+	_font_13_bold.setBold (true);
+	_font_13_digit_width = get_digit_width (_font_13_bold);
+
+	_font_16_bold = _font;
+	_font_16_bold.setPixelSize (font_size (16.f));
+	_font_16_bold.setBold (true);
+	_font_16_digit_width = get_digit_width (_font_16_bold);
+
+	_font_20_bold = _font;
+	_font_20_bold.setPixelSize (font_size (20.f));
+	_font_20_bold.setBold (true);
+	_font_20_digit_width = get_digit_width (_font_20_bold);
 }
 
