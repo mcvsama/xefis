@@ -150,6 +150,9 @@ class EFIS: public QWidget
 	paint_input_alert (QPainter&);
 
   private:
+	QPainterPath
+	get_pitch_scale_clipping_path() const;
+
 	float
 	pitch_to_px (Degrees degrees) const;
 

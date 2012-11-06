@@ -236,7 +236,6 @@ EFIS::paint_pitch_scale (QPainter& painter)
 {
 	// TODO don't draw invisible lines/numbers
 
-	// TODO set rounded clip path on top
 	QFont font = _font;
 	font.setPixelSize (font_size (10.f));
 	font.setBold (true);
@@ -246,9 +245,10 @@ EFIS::paint_pitch_scale (QPainter& painter)
 	float const fpxs = font.pixelSize();
 
 	painter.save();
+
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.2f * w));
+	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform * _center_transform);
@@ -320,9 +320,9 @@ EFIS::paint_heading (QPainter& painter)
 	painter.save();
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.f * w));
+	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
-	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.f * w), Qt::IntersectClip);
+	painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform * _center_transform);
 	painter.setFont (font);
 
@@ -851,6 +851,20 @@ EFIS::paint_input_alert (QPainter& painter)
 	// TODO font_metrics.height() in other places where font height is needed
 
 	painter.restore();
+}
+
+
+QPainterPath
+EFIS::get_pitch_scale_clipping_path() const
+{
+	float const w = std::min (width(), height()) * 2.f / 9.f;
+
+	QPainterPath clip_path;
+	clip_path.setFillRule (Qt::WindingFill);
+	clip_path.addEllipse (QRectF (-1.175f * w, -1.175f * w, 2.35f * w, 2.35f * w));
+	clip_path.addRect (QRectF (-1.175f * w, 0.f, 2.35f * w, 1.375f * w));
+
+	return clip_path;
 }
 
 
