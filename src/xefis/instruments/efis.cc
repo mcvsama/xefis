@@ -486,7 +486,7 @@ EFIS::paint_speed (QPainter& painter)
 	if (speed >= 1000.0f - 0.5f)
 		digits = 4;
 
-	float const margin = 0.25f * digit_width;
+	float const margin = 0.2f * digit_width;
 
 	QRectF black_box (-digits * digit_width - 2.f * margin - x, -digit_height,
 					  +digits * digit_width + 2.f * margin, 2.f * digit_height);
@@ -600,7 +600,7 @@ EFIS::paint_altitude (QPainter& painter)
 	border_pen.setJoinStyle (Qt::MiterJoin);
 	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
 	white_pen.setJoinStyle (Qt::MiterJoin);
-	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (2.5f), Qt::SolidLine));
+	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (3.f), Qt::SolidLine));
 	bold_white_pen.setJoinStyle (Qt::MiterJoin);
 	QPen red_pen (QPen (QColor (255, 128, 128), pen_width(), Qt::SolidLine));
 
@@ -621,7 +621,7 @@ EFIS::paint_altitude (QPainter& painter)
 	int const b_digits = 2;
 	int const s_digits = 3;
 
-	float const margin = 0.25f * b_digit_width;
+	float const margin = 0.2f * b_digit_width;
 
 	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
 	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
