@@ -839,8 +839,8 @@ EFIS::get_pitch_scale_clipping_path() const
 
 	QPainterPath clip_path;
 	clip_path.setFillRule (Qt::WindingFill);
-	clip_path.addEllipse (QRectF (-1.175f * w, -1.175f * w, 2.35f * w, 2.35f * w));
-	clip_path.addRect (QRectF (-1.175f * w, 0.f, 2.35f * w, 1.375f * w));
+	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
+	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
 
 	return clip_path;
 }
