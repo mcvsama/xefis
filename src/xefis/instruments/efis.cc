@@ -30,6 +30,7 @@
 #include "efis.h"
 
 
+const char* EFIS::AP = "A/P";
 const char EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 const char* EFIS::MINUS_SIGN = "−";
 
@@ -369,8 +370,7 @@ EFIS::paint_roll (QPainter& painter)
 
 	painter.save();
 
-	QPen pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine);
-	pen.setJoinStyle (Qt::MiterJoin);
+	QPen pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	painter.setPen (pen);
 	painter.setBrush (QBrush (QColor (255, 255, 255)));
 
@@ -423,8 +423,7 @@ EFIS::paint_center_cross (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.f / 9.f;
 
-	QPen white_pen (QColor (255, 255, 255), pen_width (1.5f), Qt::SolidLine);
-	white_pen.setJoinStyle (Qt::MiterJoin);
+	QPen white_pen (QColor (255, 255, 255), pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	painter.save();
 
@@ -465,14 +464,16 @@ EFIS::paint_speed (QPainter& painter)
 	float const speed = std::min (std::max (0.0f, _ias), 9999.9f);
 	int const rounded_speed = static_cast<int> (speed + 0.5f);
 
-	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
-	border_pen.setJoinStyle (Qt::MiterJoin);
-	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-	white_pen.setJoinStyle (Qt::MiterJoin);
+	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen speed_bug_pen (QColor (0, 255, 0), pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	QFont actual_speed_font = _font_20_bold;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
+
+	QFont speed_bug_font = _font_10_bold;
+	float const speed_bug_digit_height = _font_10_digit_height;
 
 	// Black indicator stuff:
 	int digits = 3;
@@ -490,7 +491,9 @@ EFIS::paint_speed (QPainter& painter)
 	painter.setTransform (_center_transform);
 	painter.translate (-0.9f * w, 0.f);
 
-	// Ladder:
+	/*
+	 * Ladder
+	 */
 
 	QFont ladder_font = _font_13_bold;
 	float const ladder_digit_width = _font_13_digit_width;
@@ -518,6 +521,11 @@ EFIS::paint_speed (QPainter& painter)
 	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
 	clip_path -= clip_path_2;
 
+	// Returns px-position of the given speed on the ladder:
+	auto kt_to_px = [&](Knots kt) -> float {
+		return -0.95f * w * (kt - speed) / (extent / 2.f);
+	};
+
 	painter.save();
 	painter.setClipPath (clip_path);
 	painter.setPen (white_pen);
@@ -528,7 +536,7 @@ EFIS::paint_speed (QPainter& painter)
 	{
 		if (kt < 0)
 			continue;
-		float posy = -0.95f * w * (kt - speed) / (extent / 2.f);
+		float posy = kt_to_px (kt);
 		painter.drawLine (QPointF (0.01f * box_w, posy), QPointF (0.275 * box_w, posy));
 
 		if (kt % num_every == 0)
@@ -536,9 +544,34 @@ EFIS::paint_speed (QPainter& painter)
 										   +4.f * ladder_digit_width, ladder_digit_height),
 								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
 	}
+
+	// Draw speed bugs:
+	painter.setPen (speed_bug_pen);
+	painter.setFont (speed_bug_font);
+	QPainterPath translated_clip_path = clip_path.translated (0.5f * x, 0.f);
+	for (auto& bug: _speed_bugs)
+	{
+		if (bug.first == AP)
+		{
+			//TODO
+		}
+		else if (bug.second > min_shown && bug.second < max_shown)
+		{
+			float posy = kt_to_px (bug.second);
+			painter.setClipPath (translated_clip_path);
+			painter.drawLine (QPointF (0.1f * box_w, posy), QPointF (0.275 * box_w, posy));
+			painter.setClipping (false);
+			text_painter.drawText (QRectF (0.3f * box_w, posy - 0.5f * speed_bug_digit_height,
+										   box_w, speed_bug_digit_height),
+								   Qt::AlignVCenter | Qt::AlignLeft, bug.first);
+		}
+	}
+
 	painter.restore();
 
-	// Black indicator:
+	/*
+	 * Black indicator
+	 */
 
 	painter.setPen (white_pen);
 	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
@@ -585,13 +618,10 @@ EFIS::paint_altitude (QPainter& painter)
 	float const minus = _altitude < 0.f ? -1.f : 1.f;
 	int const rounded_altitude = static_cast<int> (altitude + minus * 10.f) / 20 * 20;
 
-	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
-	border_pen.setJoinStyle (Qt::MiterJoin);
-	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-	white_pen.setJoinStyle (Qt::MiterJoin);
-	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (3.f), Qt::SolidLine));
-	bold_white_pen.setJoinStyle (Qt::MiterJoin);
-	QPen red_pen (QPen (QColor (255, 128, 128), pen_width(), Qt::SolidLine));
+	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen bold_white_pen (QColor (255, 255, 255), pen_width (3.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen red_pen (QColor (255, 128, 128), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	QFont b_font = _font_20_bold;
 	float const b_digit_width = _font_20_digit_width;
@@ -741,11 +771,10 @@ EFIS::paint_climb_rate (QPainter& painter)
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
 
-	QPen border_pen (QPen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine));
-	border_pen.setJoinStyle (Qt::MiterJoin);
-	QPen white_pen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-	QPen bold_white_pen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
-	QPen thin_white_pen (QPen (QColor (255, 255, 255), pen_width (0.5f), Qt::SolidLine));
+	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen bold_white_pen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen thin_white_pen (QColor (255, 255, 255), pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	painter.save();
 
@@ -813,8 +842,7 @@ EFIS::paint_input_alert (QPainter& painter)
 	QFontMetrics font_metrics (font);
 	int width = font_metrics.width (alert);
 
-	QPen pen (QColor (255, 255, 255), pen_width (2.f), Qt::SolidLine);
-	pen.setJoinStyle (Qt::MiterJoin);
+	QPen pen (QColor (255, 255, 255), pen_width (2.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	painter.setTransform (_center_transform);
 	painter.setPen (pen);

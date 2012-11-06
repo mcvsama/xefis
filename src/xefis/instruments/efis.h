@@ -23,6 +23,7 @@
 
 // Standard:
 #include <cstddef>
+#include <map>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -32,6 +33,11 @@
 class EFIS: public QWidget
 {
 	Q_OBJECT
+
+	typedef std::map<QString, Knots> SpeedBugs;
+
+  public:
+	static const char* AP;
 
   public:
 	EFIS (QWidget* parent);
@@ -78,6 +84,25 @@ class EFIS: public QWidget
 
 	void
 	set_climb_rate (Feet feet_per_minute);
+
+	/**
+	 * Return speed bug value.
+	 */
+	Knots
+	speed_bug (QString name) const;
+
+	/**
+	 * Add new speed bug. A special value EFIS::AP ("A/P")
+	 * renders autopilot-style bug instead of a regular one.
+	 */
+	void
+	add_speed_bug (QString name, Knots speed);
+
+	/**
+	 * Remove a speed bug.
+	 */
+	void
+	remove_speed_bug (QString name);
 
 	/**
 	 * Return field of view.
@@ -199,24 +224,25 @@ class EFIS: public QWidget
 	QTransform			_heading_transform;
 	QTransform			_horizon_transform;
 	QFont				_font;
-	Degrees				_fov					= 120.f;
-	QUdpSocket*			_input					= nullptr;
-	Seconds				_input_alert_timeout	= 0.0f;
-	QTimer*				_input_alert_timer		= nullptr;
-	QTimer*				_input_alert_hide_timer	= nullptr;
-	bool				_show_input_alert		= false;
+	Degrees				_fov						= 120.f;
+	QUdpSocket*			_input						= nullptr;
+	Seconds				_input_alert_timeout		= 0.0f;
+	QTimer*				_input_alert_timer			= nullptr;
+	QTimer*				_input_alert_hide_timer		= nullptr;
+	bool				_show_input_alert			= false;
 	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
-	Degrees				_pitch					= 0.f;
-	Degrees				_roll					= 0.f;
-	Degrees				_heading				= 0.f;
-	Knots				_ias					= 0.f;
-	Feet				_altitude				= 0.f;
-	Feet				_cbr					= 0.f;
+	Degrees				_pitch						= 0.f;
+	Degrees				_roll						= 0.f;
+	Degrees				_heading					= 0.f;
+	Knots				_ias						= 0.f;
+	Feet				_altitude					= 0.f;
+	Feet				_cbr						= 0.f;
+	SpeedBugs			_speed_bugs;
 
-	static const char DIGITS[];
-	static const char* MINUS_SIGN;
+	static const char	DIGITS[];
+	static const char*	MINUS_SIGN;
 };
 
 
@@ -306,6 +332,32 @@ inline void
 EFIS::set_climb_rate (Feet feet_per_minute)
 {
 	_cbr = feet_per_minute;
+	update();
+}
+
+
+inline Knots
+EFIS::speed_bug (QString name) const
+{
+	auto it = _speed_bugs.find (name);
+	if (it != _speed_bugs.end())
+		return it->second;
+	return 0.f;
+}
+
+
+inline void
+EFIS::add_speed_bug (QString name, Knots speed)
+{
+	_speed_bugs[name] = speed;
+	update();
+}
+
+
+inline void
+EFIS::remove_speed_bug (QString name)
+{
+	_speed_bugs.erase (name);
 	update();
 }
 
