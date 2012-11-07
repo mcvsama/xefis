@@ -42,7 +42,7 @@ EFIS::EFIS (QWidget* parent):
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (16, 0, 67, 0x60);
-	_autopilot_color = QColor (255, 100, 255);
+	_autopilot_color = QColor (250, 140, 255);
 	_font = QApplication::font();
 
 	_input = new QUdpSocket (this);
@@ -574,7 +574,8 @@ EFIS::paint_speed (QPainter& painter)
 	auto ap_bug = _speed_bugs.find (AP);
 	if (ap_bug != _speed_bugs.end())
 	{
-		float posy = kt_to_px (ap_bug->second);
+		float posy = bound (kt_to_px (ap_bug->second),
+							static_cast<float> (-ladder_box.height() / 2.f), static_cast<float> (ladder_box.height() / 2.f));
 		QPolygonF bug_shape = QPolygonF()
 			<< QPointF (0.f, 0.f)
 			<< QPointF (+x, -x)
@@ -702,14 +703,21 @@ EFIS::paint_altitude (QPainter& painter)
 	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
 	clip_path -= clip_path_2;
 
+	// Returns px-position of the given altitude on the ladder:
+	auto ft_to_px = [&](Knots ft) -> float {
+		return -0.95f * w * (ft - altitude) / (extent / 2.f);
+	};
+
 	painter.save();
+
+	// Draw ladder:
 	painter.setClipPath (clip_path);
 	// -+line_every is to have drawn also numbers that barely fit the scale.
 	for (int ft = (static_cast<int> (min_shown) / line_every) * line_every - line_every;
 		 ft <= max_shown + line_every;
 		 ft += line_every)
 	{
-		float posy = -0.95f * w * (ft - altitude) / (extent / 2.f);
+		float posy = ft_to_px (ft);
 
 		if (ft % bold_every == 0)
 			painter.setPen (bold_white_pen);
@@ -744,6 +752,30 @@ EFIS::paint_altitude (QPainter& painter)
 			}
 		}
 	}
+
+	// AP bug:
+	auto ap_bug = _altitude_bugs.find (AP);
+	if (ap_bug != _altitude_bugs.end())
+	{
+		float posy = bound (ft_to_px (ap_bug->second),
+							static_cast<float> (-ladder_box.height() / 2), static_cast<float> (ladder_box.height() / 2));
+		QPolygonF bug_shape = QPolygonF()
+			<< QPointF (-2.5f * x, 0.f)
+			<< QPointF (-3.5f * x, -x)
+			<< QPointF (-3.5f * x, black_box.top())
+			<< QPointF (black_box.left(), black_box.top())
+			<< QPointF (black_box.left(), black_box.bottom())
+			<< QPointF (-3.5f * x, black_box.bottom())
+			<< QPointF (-3.5f * x, +x);
+		painter.setClipRect (ladder_box.translated (-4.f * x, 0.f));
+		painter.translate (0.25f * x, posy);
+		painter.setBrush (Qt::NoBrush);
+		painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		painter.drawPolygon (bug_shape);
+		painter.setPen (QPen (_autopilot_color, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		painter.drawPolygon (bug_shape);
+	}
+
 	painter.restore();
 
 	// Black indicator:

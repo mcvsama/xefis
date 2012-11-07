@@ -51,5 +51,17 @@ template<class Number>
 		return n - (d * std::floor (n / d));
 	}
 
+
+template<class Value>
+	inline constexpr Value
+	bound (Value value, Value min, Value max) noexcept
+	{
+		return value < min
+			? min
+			: value > max
+				? max
+				: value;
+	}
+
 #endif
 
