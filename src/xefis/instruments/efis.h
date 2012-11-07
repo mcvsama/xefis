@@ -101,6 +101,7 @@ class EFIS: public QWidget
 
 	/**
 	 * Remove a speed bug.
+	 * Pass QString::null to remove all speed bugs.
 	 */
 	void
 	remove_speed_bug (QString name);
@@ -120,6 +121,7 @@ class EFIS: public QWidget
 
 	/**
 	 * Remove an altitude bug.
+	 * Pass QString::null to remove all altitude bugs.
 	 */
 	void
 	remove_altitude_bug (QString name);
@@ -373,7 +375,10 @@ EFIS::add_speed_bug (QString name, Knots speed)
 inline void
 EFIS::remove_speed_bug (QString name)
 {
-	_speed_bugs.erase (name);
+	if (name.isNull())
+		_speed_bugs.clear();
+	else
+		_speed_bugs.erase (name);
 	update();
 }
 
@@ -399,7 +404,10 @@ EFIS::add_altitude_bug (QString name, Feet altitude)
 inline void
 EFIS::remove_altitude_bug (QString name)
 {
-	_altitude_bugs.erase (name);
+	if (name.isNull())
+		_altitude_bugs.clear();
+	else
+		_altitude_bugs.erase (name);
 	update();
 }
 
