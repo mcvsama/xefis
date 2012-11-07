@@ -30,9 +30,414 @@
 #include "efis.h"
 
 
-const char* EFIS::AP = "A/P";
-const char EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-const char* EFIS::MINUS_SIGN = "−";
+const char*	EFIS::AP = "A/P";
+const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const char*	EFIS::MINUS_SIGN = "−";
+
+
+EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, float altitude):
+	_efis (efis),
+	_painter (painter),
+	_text_painter (_painter, &_efis._text_painter_cache),
+	_altitude (bound (altitude, -9999.f, +99999.f)),
+	_extent (825.f),
+	_sgn (_altitude < 0.f ? -1.f : 1.f),
+	_min_shown (_altitude - _extent / 2.f),
+	_max_shown (_altitude + _extent / 2.f),
+	_rounded_altitude (static_cast<int> (_altitude + _sgn * 10.f) / 20 * 20),
+	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
+	_ladder_pen (_efis._ladder_color, _efis.pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_white_pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_bold_white_pen (QColor (255, 255, 255), _efis.pen_width (3.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_negative_altitude_pen (QColor (255, 128, 128), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)
+{ }
+
+
+void
+EFIS::AltitudeLadder::paint()
+{
+	float const x = _ladder_rect.width() / 4.0f;
+
+	_painter.save();
+
+	_painter.setPen (_ladder_pen);
+	_painter.setBrush (_efis._ladder_color);
+	_painter.drawRect (_ladder_rect);
+
+	paint_black_box (x, true);
+	paint_ladder_scale (x);
+	paint_bugs (x);
+	paint_black_box (x);
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect)
+{
+	QFont b_font = _efis._font_20_bold;
+	float const b_digit_width = _efis._font_20_digit_width;
+	float const b_digit_height = _efis._font_20_digit_height;
+
+	QFont s_font = _efis._font_16_bold;
+	float const s_digit_width = _efis._font_16_digit_width;
+	float const s_digit_height = _efis._font_16_digit_height;
+
+	int const b_digits = 2;
+	int const s_digits = 3;
+	float const margin = 0.2f * b_digit_width;
+
+	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
+	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
+	_black_box_rect = QRectF (0.f, -0.5f * b_digits_box.height(),
+							  b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
+
+	if (only_compute_black_box_rect)
+		return;
+
+	b_digits_box.translate (0.f, -0.5f * b_digits_box.height());
+	s_digits_box.translate (b_digits_box.width(), -0.5f * s_digits_box.height());
+
+	_painter.save();
+	_painter.translate (-0.75f * x, 0.f);
+
+	_painter.setPen (_white_pen);
+	_painter.setBrush (QBrush (QColor (0, 0, 0)));
+	_painter.drawPolygon (QPolygonF()
+		<< QPointF (-0.5f * x, 0.f)
+		<< QPointF (0.f, -0.5f * x)
+		<< _black_box_rect.topLeft()
+		<< _black_box_rect.topRight()
+		<< _black_box_rect.bottomRight()
+		<< _black_box_rect.bottomLeft()
+		<< QPointF (0.f, +0.5f * x));
+
+	_painter.setFont (b_font);
+	if (_sgn < 0.f)
+		_painter.setPen (_negative_altitude_pen);
+
+	// 11000 part of the altitude:
+	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
+	QString minus_sign_s = _sgn < 0.f ? MINUS_SIGN : "";
+	_text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
+							minus_sign_s + QString::number (std::abs (_rounded_altitude / 1000)));
+
+	_painter.setFont (s_font);
+
+	// 00100 part of the altitude:
+	QRectF box_00100 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
+	_text_painter.drawText (box_00100, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs ((_rounded_altitude / 100) % 10)));
+
+	// 00011 part of the altitude:
+	QRectF box_00011 = box_00100.adjusted (s_digit_width, 0.f, 0.f, 0.f);
+	QRectF box_00011_p10 = box_00011.translated (0.f, -s_digit_height);
+	QRectF box_00011_m10 = box_00011.translated (0.f, +s_digit_height);
+	_painter.setClipRect (box_00011);
+	_painter.translate (0.f, -s_digit_height * (_rounded_altitude - _altitude) / 20.f);
+	_text_painter.drawText (box_00011_p10, Qt::AlignVCenter | Qt::AlignLeft,
+							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f + 2.f, 10.f))) + "0");
+	_text_painter.drawText (box_00011, Qt::AlignVCenter | Qt::AlignLeft,
+							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f, 10.f))) + "0");
+	_text_painter.drawText (box_00011_m10, Qt::AlignVCenter | Qt::AlignLeft,
+							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f - 2.f, 10.f))) + "0");
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AltitudeLadder::paint_ladder_scale (float x)
+{
+	int const line_every = 100;
+	int const num_every = 200;
+	int const bold_every = 500;
+
+	QFont b_ladder_font = _efis._font_13_bold;
+	float const b_ladder_digit_width = _efis._font_13_digit_width;
+	float const b_ladder_digit_height = _efis._font_13_digit_height;
+
+	QFont s_ladder_font = _efis._font_10_bold;
+	float const s_ladder_digit_width = _efis._font_10_digit_width;
+	float const s_ladder_digit_height = _efis._font_10_digit_height;
+
+	// Special clipping that leaves some margin around black indicator:
+	QPainterPath clip_path_m;
+	clip_path_m.addRect (_black_box_rect.translated (-x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
+	QPainterPath clip_path;
+	clip_path.addRect (_ladder_rect);
+	clip_path -= clip_path_m;
+
+	_painter.save();
+	_painter.setClipPath (clip_path);
+	_painter.translate (-2.f * x, 0.f);
+
+	// -+line_every is to have drawn also numbers that barely fit the scale.
+	for (int ft = (static_cast<int> (_min_shown) / line_every) * line_every - line_every;
+		 ft <= _max_shown + line_every;
+		 ft += line_every)
+	{
+		float posy = ft_to_px (ft);
+
+		_painter.setPen (ft % bold_every == 0 ? _bold_white_pen : _white_pen);
+		_painter.drawLine (QPointF (0.f, posy), QPointF (0.8f * x, posy));
+
+		if (ft % num_every == 0)
+		{
+			QRectF big_text_box (1.1f * x, -0.5f * b_ladder_digit_height + posy,
+								 2.f * b_ladder_digit_width, b_ladder_digit_height);
+			if (std::abs (ft) / 1000 > 0)
+			{
+				QString big_text = QString::number (ft / 1000);
+				_painter.setFont (b_ladder_font);
+				_text_painter.drawText (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text);
+			}
+
+			QString small_text = QString ("%1").arg (QString::number (ft % 1000), 3, '0');
+			if (ft == 0)
+				small_text = "0";
+			_painter.setFont (s_ladder_font);
+			QRectF small_text_box (1.1f * x + 2.1f * b_ladder_digit_width, -0.5f * s_ladder_digit_height + posy,
+								   3.f * s_ladder_digit_width, s_ladder_digit_height);
+			_text_painter.drawText (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text);
+			// Minus sign?
+			if (ft < 0)
+			{
+				if (ft > -1000)
+					_text_painter.drawText (small_text_box.adjusted (-s_ladder_digit_width, 0.f, 0.f, 0.f),
+											Qt::AlignVCenter | Qt::AlignLeft, MINUS_SIGN);
+			}
+		}
+	}
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AltitudeLadder::paint_bugs (float x)
+{
+	_painter.save();
+
+	// TODO regular bugs
+
+	// AP bug:
+	auto ap_bug = _efis._altitude_bugs.find (AP);
+	if (ap_bug != _efis._altitude_bugs.end())
+	{
+		float posy = bound (ft_to_px (ap_bug->second),
+							static_cast<float> (-_ladder_rect.height() / 2), static_cast<float> (_ladder_rect.height() / 2));
+		QPolygonF bug_shape = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (-0.5f * x, -0.5f * x)
+			<< QPointF (-0.5f * x, _black_box_rect.top())
+			<< QPointF (+1.4f * x, _black_box_rect.top())
+			<< QPointF (+1.4f * x, _black_box_rect.bottom())
+			<< QPointF (-0.5f * x, _black_box_rect.bottom())
+			<< QPointF (-0.5f * x, +0.5f * x);
+		_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
+		_painter.translate (-2.f * x, posy);
+		_painter.setBrush (Qt::NoBrush);
+		_painter.setPen (QPen (_efis._autopilot_color.darker (400), _efis.pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		_painter.drawPolygon (bug_shape);
+		_painter.setPen (QPen (_efis._autopilot_color, _efis.pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		_painter.drawPolygon (bug_shape);
+	}
+
+	_painter.restore();
+}
+
+
+EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter, float speed):
+	_efis (efis),
+	_painter (painter),
+	_text_painter (_painter, &_efis._text_painter_cache),
+	_speed (bound (speed, 0.f, 9999.9f)),
+	_extent (124.f),
+	_min_shown (_speed - _extent / 2.f),
+	_max_shown (_speed + _extent / 2.f),
+	_rounded_speed (static_cast<int> (speed + 0.5f)),
+	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
+	_ladder_pen (_efis._ladder_color, _efis.pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_white_pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_speed_bug_pen (QColor (0, 255, 0), _efis.pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)
+{ }
+
+
+void
+EFIS::SpeedLadder::paint()
+{
+	float const x = _ladder_rect.width() / 4.0f;
+
+	_painter.save();
+
+	_painter.setPen (_ladder_pen);
+	_painter.setBrush (_efis._ladder_color);
+	_painter.drawRect (_ladder_rect);
+
+	paint_black_box (x, true);
+	paint_ladder_scale (x);
+	paint_bugs (x);
+	paint_black_box (x);
+
+	_painter.restore();
+}
+
+
+void
+EFIS::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
+{
+	QFont actual_speed_font = _efis._font_20_bold;
+	float const digit_width = _efis._font_20_digit_width;
+	float const digit_height = _efis._font_20_digit_height;
+
+	int digits = 3;
+	if (_speed >= 1000.0f - 0.5f)
+		digits = 4;
+	float const margin = 0.2f * digit_width;
+
+	_black_box_rect = QRectF (-digits * digit_width - 2.f * margin, -digit_height,
+							  +digits * digit_width + 2.f * margin, 2.f * digit_height);
+
+	if (only_compute_black_box_rect)
+		return;
+
+	_painter.save();
+	_painter.translate (+0.75f * x, 0.f);
+
+	_painter.setPen (_white_pen);
+	_painter.setBrush (QBrush (QColor (0, 0, 0)));
+	_painter.drawPolygon (QPolygonF()
+		<< QPointF (+0.5f * x, 0.f)
+		<< QPointF (0.f, -0.5f * x)
+		<< _black_box_rect.topRight()
+		<< _black_box_rect.topLeft()
+		<< _black_box_rect.bottomLeft()
+		<< _black_box_rect.bottomRight()
+		<< QPointF (0.f, +0.5f * x));
+
+	// 110 part of the speed:
+	_painter.setFont (actual_speed_font);
+	QRectF box_10 = _black_box_rect.adjusted (margin, margin, -margin - digit_width, -margin);
+	_text_painter.drawText (box_10, Qt::AlignVCenter | Qt::AlignRight, QString::number (static_cast<int> (_speed + 0.5f) / 10));
+
+	// 001 part of the speed:
+	QRectF box_01 (box_10.right(), box_10.top(), digit_width, box_10.height());
+	QRectF box_01_p1 = box_01.translated (0.f, -digit_height);
+	QRectF box_01_m1 = box_01.translated (0.f, +digit_height);
+	_painter.setClipRect (box_01);
+	_painter.translate (0.f, -digit_height * (_rounded_speed - _speed));
+	_text_painter.drawText (box_01_p1, Qt::AlignVCenter | Qt::AlignLeft,
+							QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed + 1.f, 10.f))));
+	_text_painter.drawText (box_01, Qt::AlignVCenter | Qt::AlignLeft,
+							QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed, 10.f))));
+	// Don't draw negative values:
+	if (_speed > 0.5f)
+		_text_painter.drawText (box_01_m1, Qt::AlignVCenter | Qt::AlignLeft,
+								QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed - 1.f, 10.f))));
+
+	_painter.restore();
+}
+
+
+void
+EFIS::SpeedLadder::paint_ladder_scale (float x)
+{
+	QFont ladder_font = _efis._font_13_bold;
+	float const ladder_digit_width = _efis._font_13_digit_width;
+	float const ladder_digit_height = _efis._font_13_digit_height;
+
+	_painter.setFont (ladder_font);
+
+	int const line_every = 10;
+	int const num_every = 20;
+
+	if (_min_shown < 0.f)
+		_min_shown = 0.f;
+
+	// Special clipping that leaves some margin around black indicator:
+	QPainterPath clip_path_m;
+	clip_path_m.addRect (_black_box_rect.translated (x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
+	QPainterPath clip_path;
+	clip_path.addRect (_ladder_rect);
+	clip_path -= clip_path_m;
+
+	_painter.save();
+	_painter.setClipPath (clip_path);
+	_painter.translate (2.f * x, 0.f);
+
+	_painter.setPen (_white_pen);
+	// -+line_every is to have drawn also numbers that barely fit the scale.
+	for (int kt = (static_cast<int> (_min_shown) / line_every) * line_every - line_every;
+		 kt <= _max_shown + line_every;
+		 kt += line_every)
+	{
+		if (kt < 0)
+			continue;
+		float posy = kt_to_px (kt);
+		_painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
+
+		if (kt % num_every == 0)
+			_text_painter.drawText (QRectF (-4.f * ladder_digit_width - 1.25f * x, -0.5f * ladder_digit_height + posy,
+											+4.f * ladder_digit_width, ladder_digit_height),
+									Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
+	}
+
+	_painter.restore();
+}
+
+
+void
+EFIS::SpeedLadder::paint_bugs (float x)
+{
+	QFont speed_bug_font = _efis._font_10_bold;
+	float const speed_bug_digit_height = _efis._font_10_digit_height;
+
+	_painter.save();
+	_painter.setFont (speed_bug_font);
+
+	for (auto& bug: _efis._speed_bugs)
+	{
+		// AP bug should be drawn last, to be on top:
+		if (bug.first == AP)
+			continue;
+
+		if (bug.second > _min_shown && bug.second < _max_shown)
+		{
+			float posy = kt_to_px (bug.second);
+			_painter.setPen (_speed_bug_pen);
+			_painter.setClipRect (_ladder_rect.translated (x, 0.f));
+			_painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
+			_painter.setClipping (false);
+			_text_painter.drawText (QRectF (2.5f * x, posy - 0.5f * speed_bug_digit_height,
+											2.f * x, speed_bug_digit_height),
+									Qt::AlignVCenter | Qt::AlignLeft, bug.first);
+		}
+	}
+
+	// AP bug:
+	auto ap_bug = _efis._speed_bugs.find (AP);
+	if (ap_bug != _efis._speed_bugs.end())
+	{
+		float posy = bound (kt_to_px (ap_bug->second),
+							static_cast<float> (-_ladder_rect.height() / 2.f), static_cast<float> (_ladder_rect.height() / 2.f));
+		QPolygonF bug_shape = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (+0.5f * x, -0.5f * x)
+			<< QPointF (2.f * x, -0.5f * x)
+			<< QPointF (2.f * x, +0.5f * x)
+			<< QPointF (+0.5f * x, +0.5f * x);
+		_painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
+		_painter.translate (1.25f * x, posy);
+		_painter.setBrush (Qt::NoBrush);
+		_painter.setPen (QPen (_efis._autopilot_color.darker (400), _efis.pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		_painter.drawPolygon (bug_shape);
+		_painter.setPen (QPen (_efis._autopilot_color, _efis.pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		_painter.drawPolygon (bug_shape);
+	}
+
+	_painter.restore();
+}
 
 
 EFIS::EFIS (QWidget* parent):
@@ -43,6 +448,8 @@ EFIS::EFIS (QWidget* parent):
 	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (16, 0, 67, 0x60);
 	_autopilot_color = QColor (250, 140, 255);
+	_navigation_color = QColor (0, 255, 0);
+	_ladder_border_color = QColor (0, 0, 0, 0x70);
 	_font = QApplication::font();
 
 	_input = new QUdpSocket (this);
@@ -205,9 +612,23 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	paint_heading (painter);
 	paint_roll (painter);
 	paint_center_cross (painter);
-	paint_speed (painter);
-	paint_altitude (painter);
+
+	painter.save();
+	SpeedLadder sl (*this, painter, _ias);
+	painter.setTransform (_center_transform);
+	painter.translate (-0.4f * wh(), 0.f);
+	sl.paint();
+	painter.restore();
+
+	painter.save();
+	AltitudeLadder al (*this, painter, _altitude);
+	painter.setTransform (_center_transform);
+	painter.translate (+0.4f * wh(), 0.f);
+	al.paint();
+	painter.restore();
+
 	paint_climb_rate (painter);
+	paint_pressure (painter);
 
 	if (_show_input_alert)
 		paint_input_alert (painter);
@@ -457,379 +878,15 @@ EFIS::paint_center_cross (QPainter& painter)
 
 
 void
-EFIS::paint_speed (QPainter& painter)
-{
-	float const w = std::min (width(), height()) * 3.5f / 9.f;
-	float const box_w = 0.35f * w;
-	float const x = w / 25.f;
-	float const speed = std::min (std::max (0.0f, _ias), 9999.9f);
-	int const rounded_speed = static_cast<int> (speed + 0.5f);
-
-	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen speed_bug_pen (QColor (0, 255, 0), pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-
-	QFont actual_speed_font = _font_20_bold;
-	float const digit_width = _font_20_digit_width;
-	float const digit_height = _font_20_digit_height;
-
-	QFont speed_bug_font = _font_10_bold;
-	float const speed_bug_digit_height = _font_10_digit_height;
-
-	// Black indicator stuff:
-	int digits = 3;
-	if (speed >= 1000.0f - 0.5f)
-		digits = 4;
-
-	float const margin = 0.2f * digit_width;
-
-	QRectF black_box (-digits * digit_width - 2.f * margin - x, -digit_height,
-					  +digits * digit_width + 2.f * margin, 2.f * digit_height);
-
-	TextPainter text_painter (painter, &_text_painter_cache);
-	painter.save();
-
-	painter.setTransform (_center_transform);
-	painter.translate (-0.9f * w, 0.f);
-
-	/*
-	 * Ladder
-	 */
-
-	QFont ladder_font = _font_13_bold;
-	float const ladder_digit_width = _font_13_digit_width;
-	float const ladder_digit_height = _font_13_digit_height;
-
-	QRectF ladder_box (-0.775f * box_w, -0.95f * w, box_w, 1.9f * w);
-	painter.setPen (border_pen);
-	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (ladder_box);
-	painter.setFont (ladder_font);
-
-	float const extent = 124.f;
-	int const line_every = 10;
-	int const num_every = 20;
-
-	float max_shown = speed + extent / 2.f;
-	float min_shown = speed - extent / 2.f;
-	if (min_shown < 0.f)
-		min_shown = 0.f;
-
-	// Special clipping that leaves some margin around black indicator:
-	QPainterPath clip_path;
-	QPainterPath clip_path_2;
-	clip_path.addRect (ladder_box);
-	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
-	clip_path -= clip_path_2;
-
-	// Returns px-position of the given speed on the ladder:
-	auto kt_to_px = [&](Knots kt) -> float {
-		return -0.95f * w * (kt - speed) / (extent / 2.f);
-	};
-
-	painter.save();
-
-	// Draw ladder:
-	painter.setClipPath (clip_path);
-	painter.setPen (white_pen);
-	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int kt = (static_cast<int> (min_shown) / line_every) * line_every - line_every;
-		 kt <= max_shown + line_every;
-		 kt += line_every)
-	{
-		if (kt < 0)
-			continue;
-		float posy = kt_to_px (kt);
-		painter.drawLine (QPointF (0.01f * box_w, posy), QPointF (0.275 * box_w, posy));
-
-		if (kt % num_every == 0)
-			text_painter.drawText (QRectF (-4.f * ladder_digit_width - x, -0.5f * ladder_digit_height + posy,
-										   +4.f * ladder_digit_width, ladder_digit_height),
-								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
-	}
-
-	// Draw speed bugs:
-	painter.setFont (speed_bug_font);
-	QPainterPath translated_clip_path = clip_path.translated (0.5f * x, 0.f);
-	for (auto& bug: _speed_bugs)
-	{
-		// AP bug should be drawn last, to be on top:
-		if (bug.first == AP)
-			continue;
-
-		if (bug.second > min_shown && bug.second < max_shown)
-		{
-			float posy = kt_to_px (bug.second);
-			painter.setPen (speed_bug_pen);
-			painter.setClipPath (translated_clip_path);
-			painter.drawLine (QPointF (0.1f * box_w, posy), QPointF (0.275 * box_w, posy));
-			painter.setClipping (false);
-			text_painter.drawText (QRectF (0.3f * box_w, posy - 0.5f * speed_bug_digit_height,
-										   box_w, speed_bug_digit_height),
-								   Qt::AlignVCenter | Qt::AlignLeft, bug.first);
-		}
-	}
-
-	// AP bug:
-	auto ap_bug = _speed_bugs.find (AP);
-	if (ap_bug != _speed_bugs.end())
-	{
-		float posy = bound (kt_to_px (ap_bug->second),
-							static_cast<float> (-ladder_box.height() / 2.f), static_cast<float> (ladder_box.height() / 2.f));
-		QPolygonF bug_shape = QPolygonF()
-			<< QPointF (0.f, 0.f)
-			<< QPointF (+x, -x)
-			<< QPointF (4.f * x, -x)
-			<< QPointF (4.f * x, +x)
-			<< QPointF (+x, +x);
-		painter.setClipRect (ladder_box.translated (4.f * x, 0.f));
-		painter.translate (0.25f * x, posy);
-		painter.setBrush (Qt::NoBrush);
-		painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-		painter.drawPolygon (bug_shape);
-		painter.setPen (QPen (_autopilot_color, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-		painter.drawPolygon (bug_shape);
-	}
-
-	painter.restore();
-
-	/*
-	 * Black indicator
-	 */
-
-	painter.setPen (white_pen);
-	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
-	painter.drawPolygon (QPolygonF()
-		<< QPointF (0.f, 0.f)
-		<< QPointF (-x, -x)
-		<< black_box.topRight()
-		<< black_box.topLeft()
-		<< black_box.bottomLeft()
-		<< black_box.bottomRight()
-		<< QPointF (-x, +x));
-
-	// 110 part of the speed:
-	painter.setFont (actual_speed_font);
-	QRectF box_10 = black_box.adjusted (margin, margin, -margin - digit_width, -margin);
-	text_painter.drawText (box_10, Qt::AlignVCenter | Qt::AlignRight, QString::number (static_cast<int> (speed + 0.5f) / 10));
-
-	// 001 part of the speed:
-	QRectF box_01 (box_10.right(), box_10.top(), digit_width, box_10.height());
-	QRectF box_01_p1 = box_01.translated (0.f, -digit_height);
-	QRectF box_01_m1 = box_01.translated (0.f, +digit_height);
-	painter.setClipRect (box_01);
-	painter.translate (0.f, -digit_height * (rounded_speed - speed));
-	text_painter.drawText (box_01_p1, Qt::AlignVCenter | Qt::AlignLeft,
-						   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed + 1.f, 10.f))));
-	text_painter.drawText (box_01, Qt::AlignVCenter | Qt::AlignLeft,
-						   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed, 10.f))));
-	// Don't draw negative values:
-	if (speed > 0.5f)
-		text_painter.drawText (box_01_m1, Qt::AlignVCenter | Qt::AlignLeft,
-							   QString::number (static_cast<int> (floored_mod (1.f * rounded_speed - 1.f, 10.f))));
-
-	painter.restore();
-}
-
-
-void
-EFIS::paint_altitude (QPainter& painter)
-{
-	float const w = std::min (width(), height()) * 3.5f / 9.f;
-	float const box_w = 0.35f * w;
-	float const x = w / 25.f;
-	float const altitude = std::min (std::max (_altitude, -9999.f), 99999.9f);;
-	float const minus = _altitude < 0.f ? -1.f : 1.f;
-	int const rounded_altitude = static_cast<int> (altitude + minus * 10.f) / 20 * 20;
-
-	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen bold_white_pen (QColor (255, 255, 255), pen_width (3.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen red_pen (QColor (255, 128, 128), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-
-	QFont b_font = _font_20_bold;
-	float const b_digit_width = _font_20_digit_width;
-	float const b_digit_height = _font_20_digit_height;
-
-	QFont s_font = _font_16_bold;
-	float const s_digit_width = _font_16_digit_width;
-	float const s_digit_height = _font_16_digit_height;
-
-	int const b_digits = 2;
-	int const s_digits = 3;
-
-	float const margin = 0.2f * b_digit_width;
-
-	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
-	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
-	QRectF black_box (x, -0.5f * b_digits_box.height(),
-					  b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
-	b_digits_box.translate (x, -0.5f * b_digits_box.height());
-	s_digits_box.translate (x + b_digits_box.width(), -0.5f * s_digits_box.height());
-
-	QFont b_ladder_font = _font_13_bold;
-	float const b_ladder_digit_width = _font_13_digit_width;
-	float const b_ladder_digit_height = _font_13_digit_height;
-
-	QFont s_ladder_font = _font_10_bold;
-	float const s_ladder_digit_width = _font_10_digit_width;
-	float const s_ladder_digit_height = _font_10_digit_height;
-
-	TextPainter text_painter (painter, &_text_painter_cache);
-	painter.save();
-
-	painter.setTransform (_center_transform);
-	painter.translate (0.9f * w, 0.f);
-
-	// Ladder:
-
-	QRectF ladder_box (-0.225f * box_w, -0.95f * w, box_w, 1.9f * w);
-	painter.setPen (border_pen);
-	painter.setBrush (QBrush (_ladder_color));
-	painter.drawRect (ladder_box);
-
-	float const extent = 825.f;
-	int const line_every = 100;
-	int const num_every = 200;
-	int const bold_every = 500;
-
-	float max_shown = altitude + extent / 2.f;
-	float min_shown = altitude - extent / 2.f;
-
-	// Special clipping that leaves some margin around black indicator:
-	QPainterPath clip_path;
-	QPainterPath clip_path_2;
-	clip_path.addRect (ladder_box);
-	clip_path_2.addRect (black_box.adjusted (0.f, -0.4f * x, 0.f, +0.4f * x));
-	clip_path -= clip_path_2;
-
-	// Returns px-position of the given altitude on the ladder:
-	auto ft_to_px = [&](Knots ft) -> float {
-		return -0.95f * w * (ft - altitude) / (extent / 2.f);
-	};
-
-	painter.save();
-
-	// Draw ladder:
-	painter.setClipPath (clip_path);
-	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int ft = (static_cast<int> (min_shown) / line_every) * line_every - line_every;
-		 ft <= max_shown + line_every;
-		 ft += line_every)
-	{
-		float posy = ft_to_px (ft);
-
-		if (ft % bold_every == 0)
-			painter.setPen (bold_white_pen);
-		else
-			painter.setPen (white_pen);
-		painter.drawLine (QPointF (-0.01f * box_w, posy), QPointF (-0.275 * box_w, posy));
-
-		if (ft % num_every == 0)
-		{
-			QRectF big_text_box (0.5f * x, -0.5f * b_ladder_digit_height + posy,
-								 2.f * b_ladder_digit_width, b_ladder_digit_height);
-			if (std::abs (ft) / 1000 > 0)
-			{
-				QString big_text = QString::number (ft / 1000);
-				painter.setFont (b_ladder_font);
-				text_painter.drawText (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text);
-			}
-
-			QString small_text = QString ("%1").arg (QString::number (ft % 1000), 3, '0');
-			if (ft == 0)
-				small_text = "0";
-			painter.setFont (s_ladder_font);
-			QRectF small_text_box (0.5f * x + 2.1f * b_ladder_digit_width, -0.4f * s_ladder_digit_height + posy,
-								   3.f * s_ladder_digit_width, s_ladder_digit_height);
-			text_painter.drawText (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text);
-			// Minus sign?
-			if (ft < 0)
-			{
-				if (ft > -1000)
-					text_painter.drawText (small_text_box.adjusted (-s_ladder_digit_width, 0.f, 0.f, 0.f),
-										   Qt::AlignVCenter | Qt::AlignLeft, MINUS_SIGN);
-			}
-		}
-	}
-
-	// AP bug:
-	auto ap_bug = _altitude_bugs.find (AP);
-	if (ap_bug != _altitude_bugs.end())
-	{
-		float posy = bound (ft_to_px (ap_bug->second),
-							static_cast<float> (-ladder_box.height() / 2), static_cast<float> (ladder_box.height() / 2));
-		QPolygonF bug_shape = QPolygonF()
-			<< QPointF (-2.5f * x, 0.f)
-			<< QPointF (-3.5f * x, -x)
-			<< QPointF (-3.5f * x, black_box.top())
-			<< QPointF (black_box.left(), black_box.top())
-			<< QPointF (black_box.left(), black_box.bottom())
-			<< QPointF (-3.5f * x, black_box.bottom())
-			<< QPointF (-3.5f * x, +x);
-		painter.setClipRect (ladder_box.translated (-4.f * x, 0.f));
-		painter.translate (0.25f * x, posy);
-		painter.setBrush (Qt::NoBrush);
-		painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-		painter.drawPolygon (bug_shape);
-		painter.setPen (QPen (_autopilot_color, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-		painter.drawPolygon (bug_shape);
-	}
-
-	painter.restore();
-
-	// Black indicator:
-
-	painter.setPen (white_pen);
-	painter.setBrush (QBrush (QColor (0, 0, 0, 255)));
-	painter.drawPolygon (QPolygonF()
-		<< QPointF (0.f, 0.f)
-		<< QPointF (+x, -x)
-		<< black_box.topLeft()
-		<< black_box.topRight()
-		<< black_box.bottomRight()
-		<< black_box.bottomLeft()
-		<< QPointF (+x, +x));
-
-	painter.setFont (b_font);
-	if (minus < 0.f)
-		painter.setPen (red_pen);
-
-	// 11000 part of the altitude:
-	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = minus < 0.f ? MINUS_SIGN : "";
-	text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight, minus_sign_s + QString::number (std::abs (rounded_altitude / 1000)));
-
-	painter.setFont (s_font);
-
-	// 00100 part of the altitude:
-	QRectF box_00100 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
-	text_painter.drawText (box_00100, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs ((rounded_altitude / 100) % 10)));
-
-	// 00011 part of the altitude:
-	QRectF box_00011 = box_00100.adjusted (s_digit_width, 0.f, 0.f, 0.f);
-	QRectF box_00011_p10 = box_00011.translated (0.f, -s_digit_height);
-	QRectF box_00011_m10 = box_00011.translated (0.f, +s_digit_height);
-	painter.setClipRect (box_00011);
-	painter.translate (0.f, -s_digit_height * (rounded_altitude - altitude) / 20.f);
-	text_painter.drawText (box_00011_p10, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f + 2.f, 10.f))) + "0");
-	text_painter.drawText (box_00011, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f, 10.f))) + "0");
-	text_painter.drawText (box_00011_m10, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs (std::fmod (rounded_altitude / 10.f - 2.f, 10.f))) + "0");
-
-	painter.restore();
-}
-
-
-void
 EFIS::paint_climb_rate (QPainter& painter)
 {
 	float const w = std::min (width(), height()) * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
 
-	QPen border_pen (QColor (0, 0, 0, 0x70), 0.5f * pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen white_pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen bold_white_pen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen thin_white_pen (QColor (255, 255, 255), pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen bold_white_pen = get_pen (QColor (255, 255, 255), 1.25f);
+	QPen thin_white_pen = get_pen (QColor (255, 255, 255), 0.50f);
+	QPen ladder_pen = get_pen (_ladder_color, 1.f);
+	QBrush ladder_brush (_ladder_color);
 
 	painter.save();
 
@@ -839,8 +896,8 @@ EFIS::paint_climb_rate (QPainter& painter)
 	painter.setTransform (_center_transform);
 	painter.translate (0.9f * w + box_w + 1.5 * x, 0.f);
 
-	painter.setPen (border_pen);
-	painter.setBrush (QBrush (_ladder_color));
+	painter.setPen (ladder_pen);
+	painter.setBrush (ladder_brush);
 	painter.drawPolygon (QPolygonF()
 		<< QPointF (0.0f, -0.9 * y)
 		<< QPointF (-1.5f * x, -0.9 * y - x)
@@ -884,6 +941,12 @@ EFIS::paint_climb_rate (QPainter& painter)
 
 
 void
+EFIS::paint_pressure (QPainter& painter)
+{
+}
+
+
+void
 EFIS::paint_input_alert (QPainter& painter)
 {
 	painter.save();
@@ -904,12 +967,10 @@ EFIS::paint_input_alert (QPainter& painter)
 	painter.setBrush (QBrush (QColor (0xdd, 0, 0, 0xdd)));
 	painter.setFont (font);
 
-	QRectF rect (-0.6f * width, -0.6f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
+	QRectF rect (-0.6f * width, 0.5f * height() - 1.4f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
 
 	painter.drawRect (rect);
 	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
-
-	// TODO font_metrics.height() in other places where font height is needed
 
 	painter.restore();
 }

@@ -47,7 +47,7 @@ TextPainter::TextPainter (QPainter& painter, Cache* cache, float oversampling_fa
 void
 TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 {
-	QRect target_int_rect (0, 0, _oversampling_factor * target.width(), _oversampling_factor * target.height());
+	QRect target_int_rect (0, 0, std::ceil (_oversampling_factor * target.width()), std::ceil (_oversampling_factor * target.height()));
 
 	if (_cache)
 	{

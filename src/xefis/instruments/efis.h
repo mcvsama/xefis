@@ -37,6 +37,89 @@ class EFIS: public QWidget
 	typedef std::map<QString, Knots> SpeedBugs;
 	typedef std::map<QString, Feet> AltitudeBugs;
 
+	class AltitudeLadder
+	{
+	  public:
+		AltitudeLadder (EFIS&, QPainter&, float altitude);
+
+		void
+		paint();
+
+	  private:
+		void
+		paint_black_box (float x, bool only_compute_black_box_rect = false);
+
+		void
+		paint_ladder_scale (float x);
+
+		void
+		paint_bugs (float x);
+
+		float
+		ft_to_px (Feet ft) const;
+
+	  private:
+		EFIS&		_efis;
+		QPainter&	_painter;
+		TextPainter	_text_painter;
+		float		_altitude;
+		float		_extent;
+		float		_sgn;
+		float		_min_shown;
+		float		_max_shown;
+		int			_rounded_altitude;
+		QRectF		_ladder_rect;
+		QPen		_ladder_pen;
+		QRectF		_black_box_rect;
+		QPen		_black_box_pen;
+		QPen		_white_pen;//TODO zamienić, poniższe też
+		QPen		_bold_white_pen;
+		QPen		_negative_altitude_pen;
+	};
+
+	class SpeedLadder
+	{
+	  public:
+		SpeedLadder (EFIS&, QPainter&, float speed);
+
+		void
+		paint();
+
+	  private:
+		void
+		paint_black_box (float x, bool only_compute_black_box_rect = false);
+
+		void
+		paint_ladder_scale (float x);
+
+		void
+		paint_bugs (float x);
+
+		float
+		kt_to_px (Knots ft) const;
+
+	  private:
+		EFIS&		_efis;
+		QPainter&	_painter;
+		TextPainter	_text_painter;
+		float		_speed;
+		float		_extent;
+		float		_min_shown;
+		float		_max_shown;
+		int			_rounded_speed;
+		QRectF		_ladder_rect;
+		QPen		_ladder_pen;
+		QRectF		_black_box_rect;
+		QPen		_black_box_pen;
+		QPen		_white_pen;//TODO zamienić, poniższe też
+		QPen		_speed_bug_pen;
+	};
+
+	class AttitudeDirectorIndicator
+	{
+		// TODO pitch + roll + heading
+	};
+
   public:
 	static const char* AP;
 
@@ -127,6 +210,24 @@ class EFIS: public QWidget
 	remove_altitude_bug (QString name);
 
 	/**
+	 * Set pressure indicator (inHg)
+	 */
+	void
+	set_pressure (InHg pressure);
+
+	/**
+	 * Return current pressure indicator value.
+	 */
+	InHg
+	pressure() const;
+
+	/**
+	 * Show or hide pressure indicator.
+	 */
+	void
+	set_pressure_visibility (bool visible);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -182,18 +283,24 @@ class EFIS: public QWidget
 	paint_center_cross (QPainter&);
 
 	void
-	paint_speed (QPainter&);
-
-	void
-	paint_altitude (QPainter&);
-
-	void
 	paint_climb_rate (QPainter&);
+
+	void
+	paint_pressure (QPainter&);
 
 	void
 	paint_input_alert (QPainter&);
 
   private:
+	/**
+	 * Return min (width(), height());
+	 */
+	float
+	wh() const;
+
+	QPen
+	get_pen (QColor const& color, float width);
+
 	QPainterPath
 	get_pitch_scale_clipping_path() const;
 
@@ -234,7 +341,9 @@ class EFIS: public QWidget
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;
+	QColor				_ladder_border_color;
 	QColor				_autopilot_color;
+	QColor				_navigation_color;
 	QTransform			_center_transform;
 	QTransform			_pitch_transform;
 	QTransform			_roll_transform;
@@ -258,10 +367,26 @@ class EFIS: public QWidget
 	Feet				_cbr						= 0.f;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
+	InHg				_pressure					= 0.f;
+	bool				_pressure_visible			= false;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
 };
+
+
+inline float
+EFIS::AltitudeLadder::ft_to_px (Feet ft) const
+{
+	return -0.5f * _ladder_rect.height() * (ft - _altitude) / (_extent / 2.f);
+}
+
+
+inline float
+EFIS::SpeedLadder::kt_to_px (Knots kt) const
+{
+	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
+}
 
 
 inline Degrees
@@ -412,6 +537,29 @@ EFIS::remove_altitude_bug (QString name)
 }
 
 
+inline void
+EFIS::set_pressure (InHg pressure)
+{
+	_pressure = pressure;
+	update();
+}
+
+
+inline InHg
+EFIS::pressure() const
+{
+	return _pressure;
+}
+
+
+inline void
+EFIS::set_pressure_visibility (bool visible)
+{
+	_pressure_visible = visible;
+	update();
+}
+
+
 inline Degrees
 EFIS::fov() const
 {
@@ -424,6 +572,20 @@ EFIS::set_fov (Degrees degrees)
 {
 	_fov = degrees;
 	update();
+}
+
+
+inline float
+EFIS::wh() const
+{
+	return std::min (width(), height());
+}
+
+
+inline QPen
+EFIS::get_pen (QColor const& color, float width)
+{
+	return QPen (color, pen_width (width), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 }
 
 
