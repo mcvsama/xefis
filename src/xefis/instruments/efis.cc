@@ -35,7 +35,7 @@ const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 const char*	EFIS::MINUS_SIGN = "−";
 
 
-EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, float altitude):
+EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, Feet altitude):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
@@ -248,7 +248,7 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 }
 
 
-EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter, float speed):
+EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter, Knots speed):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
@@ -440,6 +440,256 @@ EFIS::SpeedLadder::paint_bugs (float x)
 }
 
 
+// TODO refactor AttitudeDirectorIndicator methods
+EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter& painter, Degrees pitch, Degrees roll, Degrees heading):
+	_efis (efis),
+	_painter (painter),
+	_text_painter (_painter, &_efis._text_painter_cache),
+	_pitch (pitch),
+	_roll (roll),
+	_heading (heading)
+{
+	float p = floored_mod (_pitch + 180.f, 360.f) - 180.f;
+	float r = floored_mod (_roll + 180.f, 360.f) - 180.f;
+	float hdg = floored_mod (_heading, 360.f);
+
+	// Mirroring, eg. -180° pitch is the same
+	// as 0° pitch with roll inverted:
+	if (p < -90.f)
+	{
+		p = -180.f - p;
+		r = +180.f - r;
+	}
+	else if (p > 90.f)
+	{
+		p = +180.f - p;
+		r = +180.f - r;
+	}
+
+	_pitch_transform.reset();
+	_pitch_transform.translate (0.f, -pitch_to_px (p));
+
+	_roll_transform.reset();
+	_roll_transform.rotate (-r);
+
+	_heading_transform.reset();
+	_heading_transform.translate (-heading_to_px (hdg), 0.f);
+
+	// Total transform of horizon (heading is not really necessary here):
+	_horizon_transform = _pitch_transform * _roll_transform;
+}
+
+
+void
+EFIS::AttitudeDirectorIndicator::paint()
+{
+	paint_horizon();
+	paint_pitch();
+	paint_roll();
+	paint_heading();
+}
+
+
+void
+EFIS::AttitudeDirectorIndicator::paint_horizon()
+{
+	_painter.save();
+	_painter.setTransform (_horizon_transform * _efis._center_transform);
+
+	float const max = std::max (_efis.width(), _efis.height());
+	float const w_max = 2.f * max;
+	float const h_max = 10.f * max;
+	// Sky and ground:
+	_painter.fillRect (-w_max, -h_max, 2.f * w_max, h_max + 1.f, QBrush (_efis._sky_color, Qt::SolidPattern));
+	_painter.fillRect (-w_max, 0.f, 2.f * w_max, h_max, QBrush (_efis._ground_color, Qt::SolidPattern));
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AttitudeDirectorIndicator::paint_pitch()
+{
+	float const w = _efis.wh() * 2.f / 9.f;
+	float const z = 0.5f * w;
+	float const fpxs = _efis._font_10_bold.pixelSize();
+
+	// TODO cache pens, name them correctly
+
+	_painter.save();
+
+	// Clip rectangle before and after rotation:
+	_painter.setClipPath (get_pitch_scale_clipping_path());
+	_painter.setTransform (_roll_transform * _efis._center_transform);
+	_painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
+	_painter.setTransform (_horizon_transform * _efis._center_transform);
+	_painter.setFont (_efis._font_10_bold);
+
+	_painter.setPen (QPen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine));
+	// 10° lines, exclude +/-90°:
+	for (int deg = -180; deg < 180; deg += 10)
+	{
+		if (deg == -90 || deg == 0 || deg == 90)
+			continue;
+		float d = pitch_to_px (deg);
+		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
+		// Degs number:
+		int abs_deg = std::abs (deg);
+		QString deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
+		// Text:
+		QRectF lbox = QRectF (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF rbox = QRectF (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		_text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t);
+		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t);
+	}
+	// 5° lines:
+	for (int deg = -180; deg < 180; deg += 5)
+	{
+		if (deg % 10 == 0)
+			continue;
+		float d = pitch_to_px (deg);
+		_painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
+	}
+	// 2.5° lines:
+	for (int deg = -1800; deg < 1800; deg += 25)
+	{
+		if (deg % 50 == 0)
+			continue;
+		float d = pitch_to_px (deg / 10.f);
+		_painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
+	}
+
+	_painter.setPen (QPen (QColor (255, 255, 255), _efis.pen_width (1.75f), Qt::SolidLine));
+	// -90°, 90° lines:
+	for (float deg: { -90.f, 90.f })
+	{
+		float d = pitch_to_px (deg);
+		_painter.drawLine (QPointF (-z * 1.5f, d), QPointF (z * 1.5f, d));
+		QRectF lbox = QRectF (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF rbox = QRectF (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		_text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, "90");
+		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, "90");
+	}
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AttitudeDirectorIndicator::paint_roll()
+{
+	float const w = _efis.wh() * 3.f / 9.f;
+
+	_painter.save();
+
+	QPen pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_painter.setPen (pen);
+	_painter.setBrush (QBrush (QColor (255, 255, 255)));
+
+	_painter.setTransform (_efis._center_transform);
+	_painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
+	for (float deg: { -60.f, -45.f, -30.f, -20.f, -10.f, 0.f, +10.f, +20.f, +30.f, +45.f, +60.f })
+	{
+		_painter.setTransform (_efis._center_transform);
+		_painter.rotate (1.f * deg);
+		_painter.translate (0.f, -0.795f * w);
+
+		if (deg == 0.f)
+		{
+			// Triangle:
+			QPointF p0 (0.f, 0.f);
+			QPointF px (0.025f * w, 0.f);
+			QPointF py (0.f, 0.05f * w);
+			_painter.drawPolygon (QPolygonF() << p0 << p0 - px - py << p0 + px - py);
+		}
+		else
+		{
+			float length = -0.05f * w;
+			if (std::abs (std::fmod (deg, 30.f)) < 1.f)
+				length *= 2.f;
+			_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
+		}
+	}
+
+	float const bold_width = _efis.pen_width (3.f);
+	QPointF a (0, 0.01f * w); // Miter
+	QPointF b (-0.052f * w, 0.1f * w);
+	QPointF c (+0.052f * w, 0.1f * w);
+	QPointF x0 (0.001f * w, 0.f);
+	QPointF y0 (0.f, 0.005f * w);
+	QPointF x1 (0.001f * w, 0.f);
+	QPointF y1 (0.f, 1.f * bold_width);
+
+	_painter.setTransform (_roll_transform * _efis._center_transform);
+	_painter.translate (0.f, -0.79f * w);
+	_painter.setBrush (QBrush (QColor (255, 255, 255)));
+	_painter.drawPolyline (QPolygonF() << b << a << c);
+	_painter.drawPolygon (QPolygonF() << b - x0 + y0 << b + x1 + y1 << c - x1 + y1 << c + x0 + y0);
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AttitudeDirectorIndicator::paint_heading()
+{
+	float const w = _efis.wh() * 2.25f / 9.f;
+	float const fpxs = _efis._font_10_bold.pixelSize();
+
+	_painter.save();
+	// Clip rectangle before and after rotation:
+	_painter.setTransform (_efis._center_transform);
+	_painter.setClipPath (get_pitch_scale_clipping_path());
+	_painter.setTransform (_roll_transform * _efis._center_transform);
+	_painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
+	_painter.setTransform (_horizon_transform * _efis._center_transform);
+	_painter.setFont (_efis._font_10_bold);
+
+	_painter.setTransform (_horizon_transform * _efis._center_transform);
+	_painter.setPen (QPen (QColor (255, 255, 255), _efis.pen_width (1.25f), Qt::SolidLine));
+	_painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
+	_painter.setPen (QPen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine));
+
+	_painter.setTransform (_heading_transform * _horizon_transform * _efis._center_transform);
+	for (int deg = -360; deg < 450; deg += 10)
+	{
+		float d10 = heading_to_px (deg);
+		float d05 = heading_to_px (deg + 5);
+		QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
+		if (text == "0")
+			text = "N";
+		else if (text == "9")
+			text = "E";
+		else if (text == "18")
+			text = "S";
+		else if (text == "27")
+			text = "W";
+		// 10° lines:
+		_painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
+		_text_painter.drawText (QRectF (d10 - 2.f * fpxs, 0.05f * fpxs, 4.f * fpxs, fpxs),
+							   Qt::AlignVCenter | Qt::AlignHCenter, text);
+		// 5° lines:
+		_painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
+	}
+
+	_painter.restore();
+}
+
+
+QPainterPath
+EFIS::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
+{
+	float const w = _efis.wh() * 2.f / 9.f;
+
+	QPainterPath clip_path;
+	clip_path.setFillRule (Qt::WindingFill);
+	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
+	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
+
+	return clip_path;
+}
+
+
 EFIS::EFIS (QWidget* parent):
 	QWidget (parent, nullptr)
 {
@@ -566,38 +816,8 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	float const w = width();
 	float const h = height();
 
-	float p = floored_mod (pitch() + 180.f, 360.f) - 180.f;
-	float r = floored_mod (roll() + 180.f, 360.f) - 180.f;
-	float hdg = floored_mod (heading(), 360.f);
-
-	// Mirroring, eg. -180° pitch is the same
-	// as 0° pitch with roll inverted:
-	if (p < -90.f)
-	{
-		p = -180.f - p;
-		r = +180.f - r;
-	}
-	else if (p > 90.f)
-	{
-		p = +180.f - p;
-		r = +180.f - r;
-	}
-
-	// Prepare useful transforms:
 	_center_transform.reset();
 	_center_transform.translate (w / 2.f, h / 2.f);
-
-	_pitch_transform.reset();
-	_pitch_transform.translate (0.f, -pitch_to_px (p));
-
-	_roll_transform.reset();
-	_roll_transform.rotate (-r);
-
-	_heading_transform.reset();
-	_heading_transform.translate (-heading_to_px (hdg), 0.f);
-
-	// Total transform of horizon (heading is not really necessary here):
-	_horizon_transform = _pitch_transform * _roll_transform;
 
 	// Draw on buffer:
 	QPixmap buffer (w, h);
@@ -607,22 +827,23 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
-	paint_horizon (painter);
-	paint_pitch_scale (painter);
-	paint_heading (painter);
-	paint_roll (painter);
+	painter.setTransform (_center_transform);
+
+	painter.save();
+	AttitudeDirectorIndicator adi (*this, painter, _pitch, _roll, _heading);
+	adi.paint();
+	painter.restore();
+
 	paint_center_cross (painter);
 
 	painter.save();
 	SpeedLadder sl (*this, painter, _ias);
-	painter.setTransform (_center_transform);
 	painter.translate (-0.4f * wh(), 0.f);
 	sl.paint();
 	painter.restore();
 
 	painter.save();
 	AltitudeLadder al (*this, painter, _altitude);
-	painter.setTransform (_center_transform);
 	painter.translate (+0.4f * wh(), 0.f);
 	al.paint();
 	painter.restore();
@@ -646,204 +867,9 @@ EFIS::resizeEvent (QResizeEvent*)
 
 
 void
-EFIS::paint_horizon (QPainter& painter)
-{
-	painter.save();
-	painter.setTransform (_horizon_transform * _center_transform);
-
-	float const max = std::max (width(), height());
-	float const w_max = 2.f * max;
-	float const h_max = 10.f * max;
-	// Sky and ground:
-	painter.fillRect (-w_max, -h_max, 2.f * w_max, h_max + 1.f, QBrush (_sky_color, Qt::SolidPattern));
-	painter.fillRect (-w_max, 0.f, 2.f * w_max, h_max, QBrush (_ground_color, Qt::SolidPattern));
-
-	painter.restore();
-}
-
-
-void
-EFIS::paint_pitch_scale (QPainter& painter)
-{
-	// TODO don't draw invisible lines/numbers
-
-	QFont font = _font;
-	font.setPixelSize (font_size (10.f));
-	font.setBold (true);
-
-	float const w = std::min (width(), height()) * 2.f / 9.f;
-	float const z = 0.5f * w;
-	float const fpxs = font.pixelSize();
-
-	painter.save();
-
-	// Clip rectangle before and after rotation:
-	painter.setTransform (_center_transform);
-	painter.setClipPath (get_pitch_scale_clipping_path());
-	painter.setTransform (_roll_transform * _center_transform);
-	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
-	painter.setTransform (_horizon_transform * _center_transform);
-	painter.setFont (font);
-
-	TextPainter text_painter (painter, &_text_painter_cache);
-
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-	// 10° lines, exclude +/-90°:
-	for (int deg = -180; deg < 180; deg += 10)
-	{
-		if (deg == -90 || deg == 0 || deg == 90)
-			continue;
-		float d = pitch_to_px (deg);
-		painter.drawLine (QPointF (-z, d), QPointF (z, d));
-		// Degs number:
-		int abs_deg = std::abs (deg);
-		QString deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
-		// Text:
-		QRectF lbox = QRectF (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		QRectF rbox = QRectF (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t);
-		text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t);
-	}
-	// 5° lines:
-	for (int deg = -180; deg < 180; deg += 5)
-	{
-		if (deg % 10 == 0)
-			continue;
-		float d = pitch_to_px (deg);
-		painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
-	}
-	// 2.5° lines:
-	for (int deg = -1800; deg < 1800; deg += 25)
-	{
-		if (deg % 50 == 0)
-			continue;
-		float d = pitch_to_px (deg / 10.f);
-		painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
-	}
-
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width (1.75f), Qt::SolidLine));
-	// -90°, 90° lines:
-	for (float deg: { -90.f, 90.f })
-	{
-		float d = pitch_to_px (deg);
-		painter.drawLine (QPointF (-z * 1.5f, d), QPointF (z * 1.5f, d));
-		QRectF lbox = QRectF (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		QRectF rbox = QRectF (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, "90");
-		text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, "90");
-	}
-
-	painter.restore();
-}
-
-
-void
-EFIS::paint_heading (QPainter& painter)
-{
-	float const w = std::min (width(), height()) * 2.25f / 9.f;
-	float const fpxs = _font_10_bold.pixelSize();
-
-	painter.save();
-	// Clip rectangle before and after rotation:
-	painter.setTransform (_center_transform);
-	painter.setClipPath (get_pitch_scale_clipping_path());
-	painter.setTransform (_roll_transform * _center_transform);
-	painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
-	painter.setTransform (_horizon_transform * _center_transform);
-	painter.setFont (_font_10_bold);
-
-	TextPainter text_painter (painter, &_text_painter_cache);
-
-	painter.setTransform (_horizon_transform * _center_transform);
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width (1.25f), Qt::SolidLine));
-	painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
-	painter.setPen (QPen (QColor (255, 255, 255), pen_width(), Qt::SolidLine));
-
-	painter.setTransform (_heading_transform * _horizon_transform * _center_transform);
-	for (int deg = -360; deg < 450; deg += 10)
-	{
-		float d10 = heading_to_px (deg);
-		float d05 = heading_to_px (deg + 5);
-		QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
-		if (text == "0")
-			text = "N";
-		else if (text == "9")
-			text = "E";
-		else if (text == "18")
-			text = "S";
-		else if (text == "27")
-			text = "W";
-		// 10° lines:
-		painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
-		text_painter.drawText (QRectF (d10 - 2.f * fpxs, 0.05f * fpxs, 4.f * fpxs, fpxs),
-							   Qt::AlignVCenter | Qt::AlignHCenter, text);
-		// 5° lines:
-		painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
-	}
-
-	painter.restore();
-}
-
-
-void
-EFIS::paint_roll (QPainter& painter)
-{
-	float const w = std::min (width(), height()) * 3.f / 9.f;
-
-	painter.save();
-
-	QPen pen (QColor (255, 255, 255), pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	painter.setPen (pen);
-	painter.setBrush (QBrush (QColor (255, 255, 255)));
-
-	painter.setTransform (_center_transform);
-	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
-	for (float deg: { -60.f, -45.f, -30.f, -20.f, -10.f, 0.f, +10.f, +20.f, +30.f, +45.f, +60.f })
-	{
-		painter.setTransform (_center_transform);
-		painter.rotate (1.f * deg);
-		painter.translate (0.f, -0.795f * w);
-
-		if (deg == 0.f)
-		{
-			// Triangle:
-			QPointF p0 (0.f, 0.f);
-			QPointF px (0.025f * w, 0.f);
-			QPointF py (0.f, 0.05f * w);
-			painter.drawPolygon (QPolygonF() << p0 << p0 - px - py << p0 + px - py);
-		}
-		else
-		{
-			float length = -0.05f * w;
-			if (std::abs (std::fmod (deg, 30.f)) < 1.f)
-				length *= 2.f;
-			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
-		}
-	}
-
-	float const bold_width = pen_width (3.f);
-	QPointF a (0, 0.01f * w); // Miter
-	QPointF b (-0.052f * w, 0.1f * w);
-	QPointF c (+0.052f * w, 0.1f * w);
-	QPointF x0 (0.001f * w, 0.f);
-	QPointF y0 (0.f, 0.005f * w);
-	QPointF x1 (0.001f * w, 0.f);
-	QPointF y1 (0.f, 1.f * bold_width);
-
-	painter.setTransform (_roll_transform * _center_transform);
-	painter.translate (0.f, -0.79f * w);
-	painter.setBrush (QBrush (QColor (255, 255, 255)));
-	painter.drawPolyline (QPolygonF() << b << a << c);
-	painter.drawPolygon (QPolygonF() << b - x0 + y0 << b + x1 + y1 << c - x1 + y1 << c + x0 + y0);
-
-	painter.restore();
-}
-
-
-void
 EFIS::paint_center_cross (QPainter& painter)
 {
-	float const w = std::min (width(), height()) * 3.f / 9.f;
+	float const w = wh() * 3.f / 9.f;
 
 	QPen white_pen (QColor (255, 255, 255), pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
@@ -880,7 +906,7 @@ EFIS::paint_center_cross (QPainter& painter)
 void
 EFIS::paint_climb_rate (QPainter& painter)
 {
-	float const w = std::min (width(), height()) * 3.5f / 9.f;
+	float const w = wh() * 3.5f / 9.f;
 	float const box_w = 0.35f * w;
 
 	QPen bold_white_pen = get_pen (QColor (255, 255, 255), 1.25f);
@@ -943,6 +969,20 @@ EFIS::paint_climb_rate (QPainter& painter)
 void
 EFIS::paint_pressure (QPainter& painter)
 {
+	painter.save();
+
+#if 0
+	QRectF ladder_rect = get_altitude_ladder_rect();
+	QRectF rect (ladder_rect.left(), ladder_rect.bottom(), ladder_rect.width(), 2.f * _font_10_digit_height);
+
+	painter.setTransform (_center_transform);
+	painter.setPen (QPen (_navigation_color, pen_width()));
+	painter.setFont (_font_13_bold);
+
+	TextPainter text_painter (painter, &_text_painter_cache);
+	text_painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, "29.92");
+#endif
+	painter.restore();
 }
 
 
@@ -973,20 +1013,6 @@ EFIS::paint_input_alert (QPainter& painter)
 	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
 
 	painter.restore();
-}
-
-
-QPainterPath
-EFIS::get_pitch_scale_clipping_path() const
-{
-	float const w = std::min (width(), height()) * 2.f / 9.f;
-
-	QPainterPath clip_path;
-	clip_path.setFillRule (Qt::WindingFill);
-	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
-	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
-
-	return clip_path;
 }
 
 

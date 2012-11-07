@@ -40,7 +40,7 @@ class EFIS: public QWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFIS&, QPainter&, float altitude);
+		AltitudeLadder (EFIS&, QPainter&, Feet altitude);
 
 		void
 		paint();
@@ -62,11 +62,11 @@ class EFIS: public QWidget
 		EFIS&		_efis;
 		QPainter&	_painter;
 		TextPainter	_text_painter;
-		float		_altitude;
-		float		_extent;
+		Feet		_altitude;
+		Feet		_extent;
 		float		_sgn;
-		float		_min_shown;
-		float		_max_shown;
+		Feet		_min_shown;
+		Feet		_max_shown;
 		int			_rounded_altitude;
 		QRectF		_ladder_rect;
 		QPen		_ladder_pen;
@@ -80,7 +80,7 @@ class EFIS: public QWidget
 	class SpeedLadder
 	{
 	  public:
-		SpeedLadder (EFIS&, QPainter&, float speed);
+		SpeedLadder (EFIS&, QPainter&, Knots speed);
 
 		void
 		paint();
@@ -102,10 +102,10 @@ class EFIS: public QWidget
 		EFIS&		_efis;
 		QPainter&	_painter;
 		TextPainter	_text_painter;
-		float		_speed;
-		float		_extent;
-		float		_min_shown;
-		float		_max_shown;
+		Knots		_speed;
+		Knots		_extent;
+		Knots		_min_shown;
+		Knots		_max_shown;
 		int			_rounded_speed;
 		QRectF		_ladder_rect;
 		QPen		_ladder_pen;
@@ -117,7 +117,45 @@ class EFIS: public QWidget
 
 	class AttitudeDirectorIndicator
 	{
-		// TODO pitch + roll + heading
+	  public:
+		AttitudeDirectorIndicator (EFIS&, QPainter&, Degrees pitch, Degrees roll, Degrees heading);
+
+		void
+		paint();
+
+	  private:
+		void
+		paint_horizon();
+
+		void
+		paint_pitch();
+
+		void
+		paint_roll();
+
+		void
+		paint_heading();
+
+		QPainterPath
+		get_pitch_scale_clipping_path() const;
+
+		float
+		pitch_to_px (Degrees degrees) const;
+
+		float
+		heading_to_px (Degrees degrees) const;
+
+	  private:
+		EFIS&		_efis;
+		QPainter&	_painter;
+		TextPainter	_text_painter;
+		Degrees		_pitch;
+		Degrees		_roll;
+		Degrees		_heading;
+		QTransform	_pitch_transform;
+		QTransform	_roll_transform;
+		QTransform	_heading_transform;
+		QTransform	_horizon_transform;
 	};
 
   public:
@@ -268,18 +306,6 @@ class EFIS: public QWidget
 	resizeEvent (QResizeEvent*) override;
 
 	void
-	paint_horizon (QPainter&);
-
-	void
-	paint_pitch_scale (QPainter&);
-
-	void
-	paint_heading (QPainter&);
-
-	void
-	paint_roll (QPainter&);
-
-	void
 	paint_center_cross (QPainter&);
 
 	void
@@ -300,15 +326,6 @@ class EFIS: public QWidget
 
 	QPen
 	get_pen (QColor const& color, float width);
-
-	QPainterPath
-	get_pitch_scale_clipping_path() const;
-
-	float
-	pitch_to_px (Degrees degrees) const;
-
-	float
-	heading_to_px (Degrees degrees) const;
 
 	float
 	scale_cbr (Feet climb_rate) const;
@@ -345,10 +362,6 @@ class EFIS: public QWidget
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
 	QTransform			_center_transform;
-	QTransform			_pitch_transform;
-	QTransform			_roll_transform;
-	QTransform			_heading_transform;
-	QTransform			_horizon_transform;
 	QFont				_font;
 	Degrees				_fov						= 120.f;
 	QUdpSocket*			_input						= nullptr;
@@ -386,6 +399,21 @@ inline float
 EFIS::SpeedLadder::kt_to_px (Knots kt) const
 {
 	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
+}
+
+
+inline float
+EFIS::AttitudeDirectorIndicator::pitch_to_px (Degrees degrees) const
+{
+	float const correction = 0.775f;
+	return -degrees / (_efis._fov * correction) * _efis.wh();
+}
+
+
+inline float
+EFIS::AttitudeDirectorIndicator::heading_to_px (Degrees degrees) const
+{
+	return pitch_to_px (-degrees);
 }
 
 
@@ -590,30 +618,16 @@ EFIS::get_pen (QColor const& color, float width)
 
 
 inline float
-EFIS::pitch_to_px (Degrees degrees) const
-{
-	float const correction = 0.775f;
-	return -degrees / (_fov * correction) * std::min (width(), height());
-}
-
-
-inline float
-EFIS::heading_to_px (Degrees degrees) const
-{
-	return pitch_to_px (-degrees);
-}
-
-inline float
 EFIS::pen_width (float scale) const
 {
-	return scale * std::min (width(), height()) / 325.f;
+	return scale * wh() / 325.f;
 }
 
 
 inline float
 EFIS::font_size (float scale) const
 {
-	return scale * std::min (width(), height()) / 375.f;
+	return scale * wh() / 375.f;
 }
 
 #endif
