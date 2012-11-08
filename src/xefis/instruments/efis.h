@@ -40,7 +40,7 @@ class EFIS: public QWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFIS&, QPainter&, Feet altitude, FeetPerMinute climb_rate);
+		AltitudeLadder (EFIS&, QPainter&, Feet altitude, FeetPerMinute climb_rate, InHg pressure);
 
 		void
 		paint();
@@ -73,6 +73,7 @@ class EFIS: public QWidget
 		TextPainter		_text_painter;
 		Feet			_altitude;
 		FeetPerMinute	_climb_rate;
+		float			_pressure;
 		Feet			_extent;
 		float			_sgn;
 		Feet			_min_shown;
@@ -607,7 +608,7 @@ EFIS::set_fov (Degrees degrees)
 inline float
 EFIS::wh() const
 {
-	return std::min (width(), height());
+	return std::min (0.8f * width(), 1.f * height());
 }
 
 

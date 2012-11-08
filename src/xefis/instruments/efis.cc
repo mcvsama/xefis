@@ -35,12 +35,13 @@ const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 const char*	EFIS::MINUS_SIGN = "−";
 
 
-EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, Feet altitude, FeetPerMinute climb_rate):
+EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, Feet altitude, FeetPerMinute climb_rate, InHg pressure):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
 	_altitude (bound (altitude, -9999.f, +99999.f)),
 	_climb_rate (bound (climb_rate, -7000.f, +7000.f)),
+	_pressure (bound (pressure, 0.f, 99.99f)),
 	_extent (825.f),
 	_sgn (_altitude < 0.f ? -1.f : 1.f),
 	_min_shown (_altitude - _extent / 2.f),
@@ -71,7 +72,8 @@ EFIS::AltitudeLadder::paint()
 	paint_bugs (x);
 	paint_climb_rate (x);
 	paint_black_box (x);
-	paint_pressure (x);
+	if (_efis._pressure_visible)
+		paint_pressure (x);
 
 	_painter.restore();
 }
@@ -255,9 +257,6 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 void
 EFIS::AltitudeLadder::paint_climb_rate (float x)
 {
-	float const w = _efis.wh() * 3.5f / 9.f;
-	float const box_w = 0.35f * w;
-
 	QPen bold_white_pen = _efis.get_pen (QColor (255, 255, 255), 1.25f);
 	QPen thin_white_pen = _efis.get_pen (QColor (255, 255, 255), 0.50f);
 	QBrush ladder_brush (_efis._ladder_color);
@@ -286,7 +285,7 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 
 	_painter.setFont (_efis._font_10_bold);
 	_painter.setPen (bold_white_pen);
-	_painter.drawLine (QPointF (0.f, 0.f), QPointF (x, 0.f));
+	_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.5f * x, 0.f));
 	for (float kfpm: { -6.f, -2.f, -1.f, +1.f, +2.f, +6.f })
 	{
 		float posy = -2.f * y * scale_cbr (kfpm * 1000.f);
@@ -300,9 +299,9 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 		float posy = -2.f * y * scale_cbr (kfpm * 1000.f);
 		_painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
-	_painter.setClipRect (QRectF (0.5f * x, -2.75f * y - x, (1.66f - 0.5f) * x, 5.5f * y + 2.f * x));
+	_painter.setClipRect (QRectF (0.25f * x, -2.75f * y - x, (1.66f - 0.25f) * x, 5.5f * y + 2.f * x));
 	_painter.setPen (bold_white_pen);
-	_painter.drawLine (QPointF (5.f * x, 0.f), QPointF (line_w, -2.75f * y * scale_cbr (_climb_rate)));
+	_painter.drawLine (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_climb_rate)));
 
 	_painter.restore();
 }
@@ -312,18 +311,23 @@ void
 EFIS::AltitudeLadder::paint_pressure (float x)
 {
 	_painter.save();
+	_painter.translate (-0.65f * x, 0.75f * x);
 
-#if 0
-	QRectF ladder_rect = get_altitude_ladder_rect();
-	QRectF rect (ladder_rect.left(), ladder_rect.bottom(), ladder_rect.width(), 2.f * _font_10_digit_height);
+	QFont font_a = _efis._font_16_bold;
+	QFont font_b = _efis._font_10_bold;
 
-	_painter.setTransform (_center_transform);
-	_painter.setPen (QPen (_navigation_color, pen_width()));
-	_painter.setFont (_font_13_bold);
+	QRectF nn_rect (_ladder_rect.left(), _ladder_rect.bottom(), _ladder_rect.width(), 1.2f * _efis._font_16_digit_height);
+	QRectF zz_rect (nn_rect.right(), nn_rect.top(), nn_rect.width(), nn_rect.height());
+	// Correct position of zz_rect for different destent property:
+	zz_rect.translate (0.f, QFontMetrics (font_b).descent() - QFontMetrics (font_a).descent());
 
-	TextPainter text_painter (_painter, &_text_painter_cache);
-	text_painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, "29.92");
-#endif
+	_painter.setPen (QPen (_efis._navigation_color, _efis.pen_width()));
+
+	_painter.setFont (font_a);
+	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (_pressure, 2) + " ");
+	_painter.setFont (font_b);
+	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, "IN");
+
 	_painter.restore();
 }
 
@@ -591,7 +595,6 @@ EFIS::AttitudeDirectorIndicator::paint()
 }
 
 
-// TODO refactor
 void
 EFIS::AttitudeDirectorIndicator::paint_horizon()
 {
@@ -772,7 +775,7 @@ EFIS::AttitudeDirectorIndicator::paint_heading()
 		// 10° lines:
 		_painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
 		_text_painter.drawText (QRectF (d10 - 2.f * fpxs, 0.05f * fpxs, 4.f * fpxs, fpxs),
-							   Qt::AlignVCenter | Qt::AlignHCenter, text);
+								Qt::AlignVCenter | Qt::AlignHCenter, text);
 		// 5° lines:
 		_painter.drawLine (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 	}
@@ -803,7 +806,7 @@ EFIS::EFIS (QWidget* parent):
 	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (16, 0, 67, 0x60);
 	_autopilot_color = QColor (250, 140, 255);
-	_navigation_color = QColor (0, 255, 0);
+	_navigation_color = QColor (40, 255, 40);
 	_ladder_border_color = QColor (0, 0, 0, 0x70);
 	_font = QApplication::font();
 
@@ -822,6 +825,15 @@ EFIS::EFIS (QWidget* parent):
 	// Default alert timeout:
 	set_input_alert_timeout (0.15f);
 	update_fonts();
+
+	add_speed_bug ("V1", 55.f);
+	add_speed_bug ("VR", 65.f);
+	add_speed_bug ("REF", 75.f);
+	add_speed_bug (AP, 200.f);
+
+	add_altitude_bug (AP, 1200.f);
+	set_pressure (29.69f);
+	set_pressure_visibility (true);
 }
 
 
@@ -948,7 +960,7 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	painter.restore();
 
 	painter.save();
-	AltitudeLadder al (*this, painter, _altitude, _cbr);
+	AltitudeLadder al (*this, painter, _altitude, _cbr, _pressure);
 	painter.translate (+0.4f * wh(), 0.f);
 	al.paint();
 	painter.restore();
