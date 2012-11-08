@@ -40,7 +40,7 @@ class EFIS: public QWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFIS&, QPainter&, Feet altitude);
+		AltitudeLadder (EFIS&, QPainter&, Feet altitude, FeetPerMinute climb_rate);
 
 		void
 		paint();
@@ -55,26 +55,36 @@ class EFIS: public QWidget
 		void
 		paint_bugs (float x);
 
+		void
+		paint_climb_rate (float x);
+
+		void
+		paint_pressure (float x);
+
 		float
 		ft_to_px (Feet ft) const;
 
+		float
+		scale_cbr (Feet climb_rate) const;
+
 	  private:
-		EFIS&		_efis;
-		QPainter&	_painter;
-		TextPainter	_text_painter;
-		Feet		_altitude;
-		Feet		_extent;
-		float		_sgn;
-		Feet		_min_shown;
-		Feet		_max_shown;
-		int			_rounded_altitude;
-		QRectF		_ladder_rect;
-		QPen		_ladder_pen;
-		QRectF		_black_box_rect;
-		QPen		_black_box_pen;
-		QPen		_white_pen;//TODO zamienić, poniższe też
-		QPen		_bold_white_pen;
-		QPen		_negative_altitude_pen;
+		EFIS&			_efis;
+		QPainter&		_painter;
+		TextPainter		_text_painter;
+		Feet			_altitude;
+		FeetPerMinute	_climb_rate;
+		Feet			_extent;
+		float			_sgn;
+		Feet			_min_shown;
+		Feet			_max_shown;
+		int				_rounded_altitude;
+		QRectF			_ladder_rect;
+		QPen			_ladder_pen;
+		QRectF			_black_box_rect;
+		QPen			_black_box_pen;
+		QPen			_scale_pen_1;
+		QPen			_scale_pen_2; // Bold one, each 500 ft
+		QPen			_negative_altitude_pen;
 	};
 
 	class SpeedLadder
@@ -111,7 +121,7 @@ class EFIS: public QWidget
 		QPen		_ladder_pen;
 		QRectF		_black_box_rect;
 		QPen		_black_box_pen;
-		QPen		_white_pen;//TODO zamienić, poniższe też
+		QPen		_scale_pen;
 		QPen		_speed_bug_pen;
 	};
 
@@ -309,12 +319,6 @@ class EFIS: public QWidget
 	paint_center_cross (QPainter&);
 
 	void
-	paint_climb_rate (QPainter&);
-
-	void
-	paint_pressure (QPainter&);
-
-	void
 	paint_input_alert (QPainter&);
 
   private:
@@ -326,9 +330,6 @@ class EFIS: public QWidget
 
 	QPen
 	get_pen (QColor const& color, float width);
-
-	float
-	scale_cbr (Feet climb_rate) const;
 
 	float
 	pen_width (float scale = 1.0f) const;
