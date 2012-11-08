@@ -548,10 +548,13 @@ EFIS::SpeedLadder::paint_speed_limits (float x)
 
 	float max_posy = kt_to_px (_maximum_speed);
 
-	_painter.setPen (max_pen_b);
-	_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
-	_painter.setPen (max_pen_r);
-	_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+	if (_maximum_speed < _max_shown)
+	{
+		_painter.setPen (max_pen_b);
+		_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+		_painter.setPen (max_pen_r);
+		_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+	}
 
 	_painter.restore();
 }
