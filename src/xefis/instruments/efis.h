@@ -86,6 +86,8 @@ class EFIS: public QWidget
 		QPen			_scale_pen_1;
 		QPen			_scale_pen_2; // Bold one, each 500 ft
 		QPen			_negative_altitude_pen;
+		QPen			_altitude_bug_pen;
+		QPen			_ldg_alt_pen;
 	};
 
 	class SpeedLadder
@@ -170,7 +172,12 @@ class EFIS: public QWidget
 	};
 
   public:
+	// Autopilot bug:
 	static const char* AP;
+	// Landing altitude bug:
+	static const char* LDGALT;
+	// Autothrottle bug:
+	static const char* AT;
 
   public:
 	EFIS (QWidget* parent);
@@ -225,8 +232,8 @@ class EFIS: public QWidget
 	speed_bug (QString name) const;
 
 	/**
-	 * Add new speed bug. A special value EFIS::AP ("A/P")
-	 * renders autopilot-style bug instead of a regular one.
+	 * Add new speed bug. A special value EFIS::AT ("A/T")
+	 * renders autothrottle-style bug instead of a regular one.
 	 */
 	void
 	add_speed_bug (QString name, Knots speed);

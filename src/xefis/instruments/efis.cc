@@ -31,6 +31,8 @@
 
 
 const char*	EFIS::AP = "A/P";
+const char*	EFIS::AT = "A/T";
+const char*	EFIS::LDGALT = "LDG";
 const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 const char*	EFIS::MINUS_SIGN = "−";
 
@@ -52,7 +54,9 @@ EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, Feet altitu
 	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_1 (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_2 (_efis.get_pen (QColor (255, 255, 255), 3.f)),
-	_negative_altitude_pen (_efis.get_pen (QColor (255, 128, 128), 1.f))
+	_negative_altitude_pen (_efis.get_pen (QColor (255, 128, 128), 1.f)),
+	_altitude_bug_pen (_efis.get_pen (QColor (0, 255, 0), 1.5f)),
+	_ldg_alt_pen (_efis.get_pen (QColor (255, 220, 0), 1.5f))
 { }
 
 
@@ -223,9 +227,40 @@ EFIS::AltitudeLadder::paint_ladder_scale (float x)
 void
 EFIS::AltitudeLadder::paint_bugs (float x)
 {
-	_painter.save();
+	QFont altitude_bug_font = _efis._font_10_bold;
+	float const altitude_bug_digit_height = _efis._font_10_digit_height;
 
-	// TODO regular bugs
+	_painter.save();
+	_painter.setFont (altitude_bug_font);
+
+	for (auto& bug: _efis._altitude_bugs)
+	{
+		// AP bug should be drawn last, to be on top:
+		if (bug.first == AP)
+			continue;
+
+		if (bug.second > _min_shown && bug.second < _max_shown)
+		{
+			float posy = ft_to_px (bug.second);
+			QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
+							  +2.f * x, altitude_bug_digit_height);
+			_painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
+
+			if (bug.first == LDGALT)
+			{
+				_painter.setPen (_ldg_alt_pen);
+				_painter.drawLine (QPointF (-0.5f * x, posy), QPointF (-2.25f * x, posy));
+			}
+			else
+			{
+				_painter.setPen (_altitude_bug_pen);
+				_painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
+			}
+
+			_painter.setClipping (false);
+			_text_painter.drawText (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first);
+		}
+	}
 
 	// AP bug:
 	auto ap_bug = _efis._altitude_bugs.find (AP);
@@ -504,8 +539,8 @@ EFIS::SpeedLadder::paint_bugs (float x)
 
 	for (auto& bug: _efis._speed_bugs)
 	{
-		// AP bug should be drawn last, to be on top:
-		if (bug.first == AP)
+		// AT bug should be drawn last, to be on top:
+		if (bug.first == AT)
 			continue;
 
 		if (bug.second > _min_shown && bug.second < _max_shown)
@@ -521,8 +556,8 @@ EFIS::SpeedLadder::paint_bugs (float x)
 		}
 	}
 
-	// AP bug:
-	auto ap_bug = _efis._speed_bugs.find (AP);
+	// AT bug:
+	auto ap_bug = _efis._speed_bugs.find (AT);
 	if (ap_bug != _efis._speed_bugs.end())
 	{
 		float posy = bound (kt_to_px (ap_bug->second),
@@ -829,9 +864,11 @@ EFIS::EFIS (QWidget* parent):
 	add_speed_bug ("V1", 55.f);
 	add_speed_bug ("VR", 65.f);
 	add_speed_bug ("REF", 75.f);
-	add_speed_bug (AP, 200.f);
+	add_speed_bug (AT, 200.f);
 
 	add_altitude_bug (AP, 1200.f);
+	add_altitude_bug (LDGALT, -200.f);
+	add_altitude_bug ("ALT", -150.f);
 	set_pressure (29.69f);
 	set_pressure_visibility (true);
 }
