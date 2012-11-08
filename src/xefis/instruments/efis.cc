@@ -37,13 +37,13 @@ const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
 const char*	EFIS::MINUS_SIGN = "−";
 
 
-EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter, Feet altitude, FeetPerMinute climb_rate, InHg pressure):
+EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
-	_altitude (bound (altitude, -9999.f, +99999.f)),
-	_climb_rate (bound (climb_rate, -7000.f, +7000.f)),
-	_pressure (bound (pressure, 0.f, 99.99f)),
+	_altitude (bound (_efis._altitude, -9999.f, +99999.f)),
+	_climb_rate (bound (_efis._climb_rate, -7000.f, +7000.f)),
+	_pressure (bound (_efis._pressure, 0.f, 99.99f)),
 	_extent (825.f),
 	_sgn (_altitude < 0.f ? -1.f : 1.f),
 	_min_shown (_altitude - _extent / 2.f),
@@ -334,8 +334,10 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 		float posy = -2.f * y * scale_cbr (kfpm * 1000.f);
 		_painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
-	_painter.setClipRect (QRectF (0.25f * x, -2.75f * y - x, (1.66f - 0.25f) * x, 5.5f * y + 2.f * x));
-	_painter.setPen (bold_white_pen);
+	_painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
+	QPen indicator_pen = bold_white_pen;
+	indicator_pen.setCapStyle (Qt::FlatCap);
+	_painter.setPen (indicator_pen);
 	_painter.drawLine (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_climb_rate)));
 
 	_painter.restore();
@@ -388,15 +390,18 @@ EFIS::AltitudeLadder::scale_cbr (Feet climb_rate) const
 }
 
 
-EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter, Knots speed):
+EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
-	_speed (bound (speed, 0.f, 9999.9f)),
+	_speed (bound (_efis._speed, 0.f, 9999.9f)),
+	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.9f)),
+	_warning_speed (bound (_efis._warning_speed, 0.f, 9999.9f)),
+	_maximum_speed (bound (_efis._maximum_speed, 0.f, 9999.9f)),
 	_extent (124.f),
 	_min_shown (_speed - _extent / 2.f),
 	_max_shown (_speed + _extent / 2.f),
-	_rounded_speed (static_cast<int> (speed + 0.5f)),
+	_rounded_speed (static_cast<int> (_speed + 0.5f)),
 	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
 	_ladder_pen (_efis._ladder_color, _efis.pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
 	_black_box_pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
@@ -418,6 +423,7 @@ EFIS::SpeedLadder::paint()
 
 	paint_black_box (x, true);
 	paint_ladder_scale (x);
+	paint_speed_limits (x);
 	paint_bugs (x);
 	paint_black_box (x);
 
@@ -529,6 +535,29 @@ EFIS::SpeedLadder::paint_ladder_scale (float x)
 
 
 void
+EFIS::SpeedLadder::paint_speed_limits (float x)
+{
+	QPointF ydif (0.f, _efis.pen_width (0.25f));
+	QPen max_pen_b (QColor (0, 0, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
+	QPen max_pen_r (QColor (255, 0, 0), _efis.pen_width (10.f), Qt::DotLine, Qt::FlatCap);
+	max_pen_r.setDashPattern (QVector<qreal> (2, 0.5f));
+
+	_painter.save();
+	_painter.translate (0.45f * x, 0.f);
+	_painter.setClipRect (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
+
+	float max_posy = kt_to_px (_maximum_speed);
+
+	_painter.setPen (max_pen_b);
+	_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+	_painter.setPen (max_pen_r);
+	_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+
+	_painter.restore();
+}
+
+
+void
 EFIS::SpeedLadder::paint_bugs (float x)
 {
 	QFont speed_bug_font = _efis._font_10_bold;
@@ -581,13 +610,13 @@ EFIS::SpeedLadder::paint_bugs (float x)
 }
 
 
-EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter& painter, Degrees pitch, Degrees roll, Degrees heading):
+EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
-	_pitch (pitch),
-	_roll (roll),
-	_heading (heading)
+	_pitch (_efis._pitch),
+	_roll (_efis._roll),
+	_heading (_efis._heading)
 {
 	float p = floored_mod (_pitch + 180.f, 360.f) - 180.f;
 	float r = floored_mod (_roll + 180.f, 360.f) - 180.f;
@@ -861,6 +890,7 @@ EFIS::EFIS (QWidget* parent):
 	set_input_alert_timeout (0.15f);
 	update_fonts();
 
+	set_maximum_speed (125.f);
 	add_speed_bug ("V1", 55.f);
 	add_speed_bug ("VR", 65.f);
 	add_speed_bug ("REF", 75.f);
@@ -915,7 +945,7 @@ EFIS::read_input()
 			QString value = split_pair[1];
 
 			if (var == "ias")
-				set_ias (value.toFloat());
+				set_speed (value.toFloat());
 			else if (var == "heading")
 				set_heading (value.toFloat());
 			else if (var == "altitude")
@@ -984,20 +1014,20 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 	painter.setTransform (_center_transform);
 
 	painter.save();
-	AttitudeDirectorIndicator adi (*this, painter, _pitch, _roll, _heading);
+	AttitudeDirectorIndicator adi (*this, painter);
 	adi.paint();
 	painter.restore();
 
 	paint_center_cross (painter);
 
 	painter.save();
-	SpeedLadder sl (*this, painter, _ias);
+	SpeedLadder sl (*this, painter);
 	painter.translate (-0.4f * wh(), 0.f);
 	sl.paint();
 	painter.restore();
 
 	painter.save();
-	AltitudeLadder al (*this, painter, _altitude, _cbr, _pressure);
+	AltitudeLadder al (*this, painter);
 	painter.translate (+0.4f * wh(), 0.f);
 	al.paint();
 	painter.restore();

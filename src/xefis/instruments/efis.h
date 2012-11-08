@@ -40,7 +40,7 @@ class EFIS: public QWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFIS&, QPainter&, Feet altitude, FeetPerMinute climb_rate, InHg pressure);
+		AltitudeLadder (EFIS&, QPainter&);
 
 		void
 		paint();
@@ -93,7 +93,7 @@ class EFIS: public QWidget
 	class SpeedLadder
 	{
 	  public:
-		SpeedLadder (EFIS&, QPainter&, Knots speed);
+		SpeedLadder (EFIS&, QPainter&);
 
 		void
 		paint();
@@ -106,6 +106,9 @@ class EFIS: public QWidget
 		paint_ladder_scale (float x);
 
 		void
+		paint_speed_limits (float x);
+
+		void
 		paint_bugs (float x);
 
 		float
@@ -116,6 +119,9 @@ class EFIS: public QWidget
 		QPainter&	_painter;
 		TextPainter	_text_painter;
 		Knots		_speed;
+		Knots		_minimum_speed;
+		Knots		_warning_speed;
+		Knots		_maximum_speed;
 		Knots		_extent;
 		Knots		_min_shown;
 		Knots		_max_shown;
@@ -131,7 +137,7 @@ class EFIS: public QWidget
 	class AttitudeDirectorIndicator
 	{
 	  public:
-		AttitudeDirectorIndicator (EFIS&, QPainter&, Degrees pitch, Degrees roll, Degrees heading);
+		AttitudeDirectorIndicator (EFIS&, QPainter&);
 
 		void
 		paint();
@@ -208,10 +214,10 @@ class EFIS: public QWidget
 	set_heading (Degrees);
 
 	Knots
-	ias() const;
+	speed() const;
 
 	void
-	set_ias (Knots);
+	set_speed (Knots);
 
 	Feet
 	altitude() const;
@@ -266,22 +272,76 @@ class EFIS: public QWidget
 	remove_altitude_bug (QString name);
 
 	/**
-	 * Set pressure indicator (inHg)
-	 */
-	void
-	set_pressure (InHg pressure);
-
-	/**
 	 * Return current pressure indicator value.
 	 */
 	InHg
 	pressure() const;
 
 	/**
+	 * Set pressure indicator (inHg)
+	 */
+	void
+	set_pressure (InHg pressure);
+
+	/**
 	 * Show or hide pressure indicator.
 	 */
 	void
 	set_pressure_visibility (bool visible);
+
+	/**
+	 * Get minimum speed indicator setting.
+	 */
+	Knots
+	minimum_speed() const;
+
+	/**
+	 * Set minimum speed indicator on the speed ladder.
+	 */
+	void
+	set_minimum_speed (Knots);
+
+	/**
+	 * Set minimum speed indicator visibility.
+	 */
+	void
+	set_minimum_speed_visibility (bool visible);
+
+	/**
+	 * Get warning speed indicator setting.
+	 */
+	Knots
+	warning_speed() const;
+
+	/**
+	 * Set warning speed indicator on the speed ladder.
+	 */
+	void
+	set_warning_speed (Knots);
+
+	/**
+	 * Set warning speed indicator visibility.
+	 */
+	void
+	set_warning_speed_visibility (bool visible);
+
+	/**
+	 * Get maximum speed indicator setting.
+	 */
+	Knots
+	maximum_speed() const;
+
+	/**
+	 * Set maximum speed indicator on the speed ladder.
+	 */
+	void
+	set_maximum_speed (Knots);
+
+	/**
+	 * Set maximum speed indicator visibility.
+	 */
+	void
+	set_maximum_speed_visibility (bool visible);
 
 	/**
 	 * Return field of view.
@@ -384,13 +444,19 @@ class EFIS: public QWidget
 	Degrees				_pitch						= 0.f;
 	Degrees				_roll						= 0.f;
 	Degrees				_heading					= 0.f;
-	Knots				_ias						= 0.f;
+	Knots				_speed						= 0.f;
 	Feet				_altitude					= 0.f;
-	Feet				_cbr						= 0.f;
+	Feet				_climb_rate					= 0.f;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 	InHg				_pressure					= 0.f;
 	bool				_pressure_visible			= false;
+	Knots				_minimum_speed				= 0.f;
+	bool				_minimum_speed_visible		= false;
+	Knots				_warning_speed				= 0.f;
+	bool				_warning_speed_visible		= false;
+	Knots				_maximum_speed				= 0.f;
+	bool				_maximum_speed_visible		= false;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
@@ -472,16 +538,16 @@ EFIS::set_heading (Degrees degrees)
 
 
 inline Knots
-EFIS::ias() const
+EFIS::speed() const
 {
-	return _ias;
+	return _speed;
 }
 
 
 inline void
-EFIS::set_ias (Knots ias)
+EFIS::set_speed (Knots speed)
 {
-	_ias = ias;
+	_speed = speed;
 	update();
 }
 
@@ -504,14 +570,14 @@ EFIS::set_altitude (Feet altitude)
 inline Feet
 EFIS::climb_rate() const
 {
-	return _cbr;
+	return _climb_rate;
 }
 
 
 inline void
 EFIS::set_climb_rate (Feet feet_per_minute)
 {
-	_cbr = feet_per_minute;
+	_climb_rate = feet_per_minute;
 	update();
 }
 
@@ -593,6 +659,75 @@ inline void
 EFIS::set_pressure_visibility (bool visible)
 {
 	_pressure_visible = visible;
+	update();
+}
+
+
+inline Knots
+EFIS::minimum_speed() const
+{
+	return _minimum_speed;
+}
+
+
+inline void
+EFIS::set_minimum_speed (Knots minimum_speed)
+{
+	_minimum_speed = minimum_speed;
+	update();
+}
+
+
+inline void
+EFIS::set_minimum_speed_visibility (bool visible)
+{
+	_minimum_speed_visible = visible;
+	update();
+}
+
+
+inline Knots
+EFIS::warning_speed() const
+{
+	return _warning_speed;
+}
+
+
+inline void
+EFIS::set_warning_speed (Knots warning_speed)
+{
+	_warning_speed = warning_speed;
+	update();
+}
+
+
+inline void
+EFIS::set_warning_speed_visibility (bool visible)
+{
+	_warning_speed_visible = visible;
+	update();
+}
+
+
+inline Knots
+EFIS::maximum_speed() const
+{
+	return _maximum_speed;
+}
+
+
+inline void
+EFIS::set_maximum_speed (Knots maximum_speed)
+{
+	_maximum_speed = maximum_speed;
+	update();
+}
+
+
+inline void
+EFIS::set_maximum_speed_visibility (bool visible)
+{
+	_maximum_speed_visible = visible;
 	update();
 }
 
