@@ -280,9 +280,9 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 		_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
 		_painter.translate (-2.f * x, posy);
 		_painter.setBrush (Qt::NoBrush);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.5f));
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f));
 		_painter.drawPolygon (bug_shape);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.5f));
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f));
 		_painter.drawPolygon (bug_shape);
 	}
 
@@ -658,9 +658,9 @@ EFIS::SpeedLadder::paint_bugs (float x)
 		_painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
 		_painter.translate (1.25f * x, posy);
 		_painter.setBrush (Qt::NoBrush);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.5f)),
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f)),
 		_painter.drawPolygon (bug_shape);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.5f)),
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f)),
 		_painter.drawPolygon (bug_shape);
 	}
 
