@@ -61,6 +61,9 @@ class EFIS: public QWidget
 		void
 		paint_pressure (float x);
 
+		void
+		paint_ap_setting (float x);
+
 		float
 		ft_to_px (Feet ft) const;
 
@@ -110,6 +113,9 @@ class EFIS: public QWidget
 
 		void
 		paint_bugs (float x);
+
+		void
+		paint_ap_setting (float x);
 
 		float
 		kt_to_px (Knots ft) const;

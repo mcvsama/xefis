@@ -78,6 +78,7 @@ EFIS::AltitudeLadder::paint()
 	paint_black_box (x);
 	if (_efis._pressure_visible)
 		paint_pressure (x);
+	paint_ap_setting (x);
 
 	_painter.restore();
 }
@@ -361,9 +362,62 @@ EFIS::AltitudeLadder::paint_pressure (float x)
 	_painter.setPen (QPen (_efis._navigation_color, _efis.pen_width()));
 
 	_painter.setFont (font_a);
-	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (_pressure, 2) + " ");
+	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (static_cast<int> (_pressure * 100) / 100.f, 0, 'f', 2) + " ");
 	_painter.setFont (font_b);
 	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, "IN");
+
+	_painter.restore();
+}
+
+
+void
+EFIS::AltitudeLadder::paint_ap_setting (float)
+{
+	auto ap_bug = _efis._altitude_bugs.find (AP);
+	if (ap_bug == _efis._altitude_bugs.end())
+		return;
+
+	QFont b_font = _efis._font_20_bold;
+	float const b_digit_width = _efis._font_20_digit_width;
+	float const b_digit_height = _efis._font_20_digit_height;
+
+	QFont s_font = _efis._font_16_bold;
+	float const s_digit_width = _efis._font_16_digit_width;
+
+	int const b_digits = 2;
+	int const s_digits = 3;
+	float const margin = 0.2f * b_digit_width;
+
+	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 1.3f * b_digit_height);
+	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 1.3f * b_digit_height);
+	QRectF box_rect (_ladder_rect.left(), _ladder_rect.top() - 1.4f * b_digits_box.height(),
+					 b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
+	b_digits_box.translate (box_rect.left(), box_rect.top());
+	s_digits_box.translate (b_digits_box.right(), b_digits_box.top() + 0.f * s_digits_box.height());
+
+	_painter.save();
+
+	_painter.setPen (_efis.get_pen (QColor (0, 0, 0), 0.5f));
+	_painter.setBrush (QBrush (QColor (0, 0, 0)));
+	_painter.drawRect (box_rect);
+
+	_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.f));
+	_painter.setFont (b_font);
+	if (_sgn < 0.f)
+		_painter.setPen (_negative_altitude_pen);
+
+	// 11000 part of the altitude setting:
+	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
+	QString minus_sign_s = ap_bug->second < 0.f ? MINUS_SIGN : "";
+	_text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
+							minus_sign_s + QString::number (std::abs (static_cast<int> (ap_bug->second / 1000))));
+
+	_painter.setFont (s_font);
+
+	// 00111 part of the altitude setting:
+	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
+	_text_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
+							QString ("%1").arg (static_cast<int> (std::abs (ap_bug->second)) % 1000, 3, 'f', 0, '0'));
 
 	_painter.restore();
 }
@@ -426,6 +480,7 @@ EFIS::SpeedLadder::paint()
 	paint_speed_limits (x);
 	paint_bugs (x);
 	paint_black_box (x);
+	paint_ap_setting (x);
 
 	_painter.restore();
 }
@@ -613,6 +668,40 @@ EFIS::SpeedLadder::paint_bugs (float x)
 }
 
 
+void
+EFIS::SpeedLadder::paint_ap_setting (float x)
+{
+	auto ap_bug = _efis._speed_bugs.find (AT);
+	if (ap_bug == _efis._speed_bugs.end())
+		return;
+
+	QFont actual_speed_font = _efis._font_20_bold;
+	float const digit_width = _efis._font_20_digit_width;
+	float const digit_height = _efis._font_20_digit_height;
+
+	int digits = 4;
+	float const margin = 0.2f * digit_width;
+
+	QRectF digits_box (0.f, 0.f, digits * digit_width + 2.f * margin, 1.3f * digit_height);
+	QRectF box_rect (_ladder_rect.right() - digits_box.width(), _ladder_rect.top() - 1.4f * digits_box.height(),
+					 digits_box.width(), digits_box.height());
+
+	_painter.save();
+
+	_painter.setPen (_efis.get_pen (QColor (0, 0, 0), 0.5f));
+	_painter.setBrush (QBrush (QColor (0, 0, 0)));
+	_painter.drawRect (box_rect);
+
+	_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.f));
+	_painter.setFont (actual_speed_font);
+
+	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
+	_text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (ap_bug->second))));
+
+	_painter.restore();
+}
+
+
 EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
@@ -710,8 +799,8 @@ EFIS::AttitudeDirectorIndicator::paint_pitch()
 		int abs_deg = std::abs (deg);
 		QString deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
 		// Text:
-		QRectF lbox = QRectF (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		QRectF rbox = QRectF (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF lbox (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF rbox (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
 		_text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t);
 		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t);
 	}
@@ -738,8 +827,8 @@ EFIS::AttitudeDirectorIndicator::paint_pitch()
 	{
 		float d = pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z * 1.5f, d), QPointF (z * 1.5f, d));
-		QRectF lbox = QRectF (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		QRectF rbox = QRectF (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF lbox (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+		QRectF rbox (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
 		_text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, "90");
 		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, "90");
 	}
@@ -902,8 +991,6 @@ EFIS::EFIS (QWidget* parent):
 	add_altitude_bug (AP, 1200.f);
 	add_altitude_bug (LDGALT, -200.f);
 	add_altitude_bug ("ALT", -150.f);
-	set_pressure (29.69f);
-	set_pressure_visibility (true);
 }
 
 
@@ -927,6 +1014,10 @@ EFIS::set_input_alert_timeout (Seconds timeout)
 void
 EFIS::read_input()
 {
+	remove_altitude_bug (QString::null);
+	remove_speed_bug (QString::null);
+	set_pressure_visibility (false);
+
 	while (_input->hasPendingDatagrams())
 	{
 		QByteArray datagram;
@@ -959,6 +1050,15 @@ EFIS::read_input()
 				set_pitch (value.toFloat());
 			else if (var == "roll")
 				set_roll (value.toFloat());
+			else if (var == "ap-alt-sel")
+				add_altitude_bug (AP, value.toFloat());
+			else if (var == "at-speed-sel")
+				add_speed_bug (AT, value.toFloat());
+			else if (var == "altimeter-inhg")
+			{
+				set_pressure (value.toFloat());
+				set_pressure_visibility (true);
+			}
 			else
 				no_control = true;
 //			else if (var == "latitude")

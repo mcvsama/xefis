@@ -8,17 +8,28 @@
 		<output>
 			<line_separator>newline</line_separator>
 			<var_separator>,</var_separator>
+
+			<!-- EFIS -->
+
+			<!-- Autopilot/autothrottle -->
+			<chunk>
+				<name>ap-alt-sel</name>
+				<type>float</type>
+				<format>ap-alt-sel=%f</format>
+				<node>/autopilot/settings/target-altitude-ft</node>
+			</chunk>
+			<chunk>
+				<name>at-speed-sel</name>
+				<type>float</type>
+				<format>at-speed-sel=%f</format>
+				<node>/autopilot/settings/target-speed-kt</node>
+			</chunk>
+			<!-- Speed -->
 			<chunk>
 				<name>ias</name>
 				<type>float</type>
 				<format>ias=%f</format>
 				<node>/instrumentation/airspeed-indicator/indicated-speed-kt</node>
-			</chunk>
-			<chunk>
-				<name>groundspeed</name>
-				<type>float</type>
-				<format>gs=%f</format>
-				<node>/velocities/groundspeed-kt</node>
 			</chunk>
 			<chunk>
 				<name>tas</name>
@@ -30,20 +41,9 @@
 				<name>mach</name>
 				<type>float</type>
 				<format>mach=%f</format>
-				<node>/velocities/mach</node>
+				<node>/instrumentation/airspeed-indicator/indicated-mach</node>
 			</chunk>
-			<chunk>
-				<name>heading</name>
-				<type>float</type>
-				<format>heading=%f</format>
-				<node>/orientation/heading-deg</node>
-			</chunk>
-			<chunk>
-				<name>heading-mag</name>
-				<type>float</type>
-				<format>heading-mag=%f</format>
-				<node>/orientation/heading-magnetic-deg</node>
-			</chunk>
+			<!-- Altitude -->
 			<chunk>
 				<name>altitude</name>
 				<type>float</type>
@@ -62,36 +62,26 @@
 				<format>cbr=%f</format>
 				<node>/instrumentation/vertical-speed-indicator/indicated-speed-fpm</node>
 			</chunk>
-			<chunk>
-				<name>cbr-2-fps</name>
-				<type>float</type>
-				<format>cbr-2=%f</format>
-				<node>/velocities/vertical-speed-fps</node>
-			</chunk>
+			<!-- Orientation -->
 			<chunk>
 				<name>pitch</name>
 				<type>float</type>
 				<format>pitch=%f</format>
-				<node>/instrumentation/attitude-indicator/indicated-pitch-deg</node>
+				<node>/orientation/pitch-deg</node>
 			</chunk>
 			<chunk>
 				<name>roll</name>
 				<type>float</type>
 				<format>roll=%f</format>
-				<node>/instrumentation/attitude-indicator/indicated-roll-deg</node>
+				<node>/orientation/roll-deg</node>
 			</chunk>
 			<chunk>
-				<name>latitude</name>
+				<name>heading</name>
 				<type>float</type>
-				<format>latitude=%.10f</format>
-				<node>/position/latitude-deg</node>
+				<format>heading=%f</format>
+				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
-			<chunk>
-				<name>longitude</name>
-				<type>float</type>
-				<format>longitude=%.10f</format>
-				<node>/position/longitude-deg</node>
-			</chunk>
+			<!-- Other -->
 			<chunk>
 				<name>time</name>
 				<format>time=%d</format>
@@ -108,6 +98,16 @@
 				<type>float</type>
 				<format>slip-skid=%f</format>
 				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
+			</chunk>
+
+			<!-- EICAS -->
+
+			<!-- Sensors -->
+			<chunk>
+				<name>static-pressure</name>
+				<type>float</type>
+				<format>static=%f</format>
+				<node>/systems/static/pressure-inhg</node>
 			</chunk>
 		</output>
 	</generic>
