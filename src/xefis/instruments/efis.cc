@@ -105,6 +105,8 @@ EFIS::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect
 
 	if (only_compute_black_box_rect)
 		return;
+	if (!_efis._altitude_visible)
+		return;
 
 	b_digits_box.translate (0.f, -0.5f * b_digits_box.height());
 	s_digits_box.translate (b_digits_box.width(), -0.5f * s_digits_box.height());
@@ -159,6 +161,9 @@ EFIS::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect
 void
 EFIS::AltitudeLadder::paint_ladder_scale (float x)
 {
+	if (!_efis._altitude_visible)
+		return;
+
 	int const line_every = 100;
 	int const num_every = 200;
 	int const bold_every = 500;
@@ -227,6 +232,9 @@ EFIS::AltitudeLadder::paint_ladder_scale (float x)
 void
 EFIS::AltitudeLadder::paint_bugs (float x)
 {
+	if (!_efis._altitude_visible)
+		return;
+
 	QFont altitude_bug_font = _efis._font_10_bold;
 	float const altitude_bug_digit_height = _efis._font_10_digit_height;
 
@@ -272,8 +280,8 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (-0.5f * x, -0.5f * x)
 			<< QPointF (-0.5f * x, _black_box_rect.top())
-			<< QPointF (+1.4f * x, _black_box_rect.top())
-			<< QPointF (+1.4f * x, _black_box_rect.bottom())
+			<< QPointF (+1.3f * x, _black_box_rect.top())
+			<< QPointF (+1.3f * x, _black_box_rect.bottom())
 			<< QPointF (-0.5f * x, _black_box_rect.bottom())
 			<< QPointF (-0.5f * x, +0.5f * x);
 		_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
@@ -523,6 +531,8 @@ EFIS::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
 
 	if (only_compute_black_box_rect)
 		return;
+	if (!_efis._speed_visible)
+		return;
 
 	_painter.save();
 	_painter.translate (+0.75f * x, 0.f);
@@ -565,6 +575,9 @@ EFIS::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
 void
 EFIS::SpeedLadder::paint_ladder_scale (float x)
 {
+	if (!_efis._speed_visible)
+		return;
+
 	QFont ladder_font = _efis._font_13_bold;
 	float const ladder_digit_width = _efis._font_13_digit_width;
 	float const ladder_digit_height = _efis._font_13_digit_height;
@@ -612,6 +625,9 @@ EFIS::SpeedLadder::paint_ladder_scale (float x)
 void
 EFIS::SpeedLadder::paint_speed_limits (float x)
 {
+	if (!_efis._speed_visible)
+		return;
+
 	QPointF ydif (0.f, _efis.pen_width (0.25f));
 	QPen pen_b (QColor (0, 0, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
 	QPen pen_r (QColor (255, 0, 0), _efis.pen_width (10.f), Qt::DotLine, Qt::FlatCap);
@@ -656,6 +672,9 @@ EFIS::SpeedLadder::paint_speed_limits (float x)
 void
 EFIS::SpeedLadder::paint_bugs (float x)
 {
+	if (!_efis._speed_visible)
+		return;
+
 	QFont speed_bug_font = _efis._font_10_bold;
 	float const speed_bug_digit_height = _efis._font_10_digit_height;
 
@@ -815,6 +834,7 @@ void
 EFIS::AttitudeDirectorIndicator::paint()
 {
 	paint_horizon();
+	paint_flight_path_marker();
 	paint_pitch();
 	paint_roll();
 	paint_heading();
@@ -825,14 +845,26 @@ void
 EFIS::AttitudeDirectorIndicator::paint_horizon()
 {
 	_painter.save();
-	_painter.setTransform (_horizon_transform * _efis._center_transform);
 
-	float const max = std::max (_efis.width(), _efis.height());
-	float const w_max = 2.f * max;
-	float const h_max = 10.f * max;
-	// Sky and ground:
-	_painter.fillRect (-w_max, -h_max, 2.f * w_max, h_max + 1.f, QBrush (_efis._sky_color, Qt::SolidPattern));
-	_painter.fillRect (-w_max, 0.f, 2.f * w_max, h_max, QBrush (_efis._ground_color, Qt::SolidPattern));
+	if (_efis._pitch_visibility && _efis._roll_visibility)
+	{
+		_painter.setTransform (_horizon_transform * _efis._center_transform);
+
+		float const max = std::max (_efis.width(), _efis.height());
+		float const w_max = 2.f * max;
+		float const h_max = 10.f * max;
+		// Sky and ground:
+		_painter.fillRect (-w_max, -h_max, 2.f * w_max, h_max + 1.f, QBrush (_efis._sky_color, Qt::SolidPattern));
+		_painter.fillRect (-w_max, 0.f, 2.f * w_max, h_max, QBrush (_efis._ground_color, Qt::SolidPattern));
+
+	}
+	else
+	{
+		_painter.resetTransform();
+		_painter.setPen (Qt::NoPen);
+		_painter.setBrush (QBrush (QColor (0, 0, 0)));
+		_painter.drawRect (_efis.rect());
+	}
 
 	_painter.restore();
 }
@@ -842,6 +874,9 @@ EFIS::AttitudeDirectorIndicator::paint_horizon()
 void
 EFIS::AttitudeDirectorIndicator::paint_pitch()
 {
+	if (!_efis._pitch_visibility)
+		return;
+
 	float const w = _efis.wh() * 2.f / 9.f;
 	float const z = 0.5f * w;
 	float const fpxs = _efis._font_10_bold.pixelSize();
@@ -851,7 +886,7 @@ EFIS::AttitudeDirectorIndicator::paint_pitch()
 	_painter.save();
 
 	// Clip rectangle before and after rotation:
-	_painter.setClipPath (get_pitch_scale_clipping_path());
+	_painter.setClipPath (get_pitch_scale_clipping_path() - _flight_path_marker);
 	_painter.setTransform (_roll_transform * _efis._center_transform);
 	_painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	_painter.setTransform (_horizon_transform * _efis._center_transform);
@@ -911,6 +946,9 @@ EFIS::AttitudeDirectorIndicator::paint_pitch()
 void
 EFIS::AttitudeDirectorIndicator::paint_roll()
 {
+	if (!_efis._roll_visibility)
+		return;
+
 	float const w = _efis.wh() * 3.f / 9.f;
 
 	_painter.save();
@@ -970,6 +1008,9 @@ EFIS::AttitudeDirectorIndicator::paint_heading()
 	float const w = _efis.wh() * 2.25f / 9.f;
 	float const fpxs = _efis._font_10_bold.pixelSize();
 
+	if (!_efis._pitch_visibility || !_efis._roll_visibility)
+		return;
+
 	_painter.save();
 	// Clip rectangle before and after rotation:
 	_painter.setTransform (_efis._center_transform);
@@ -983,6 +1024,12 @@ EFIS::AttitudeDirectorIndicator::paint_heading()
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.25f));
 	_painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
+
+	if (!_efis._heading_visibility)
+	{
+		_painter.restore();
+		return;
+	}
 
 	_painter.setTransform (_heading_transform * _horizon_transform * _efis._center_transform);
 	for (int deg = -360; deg < 450; deg += 10)
@@ -1010,6 +1057,43 @@ EFIS::AttitudeDirectorIndicator::paint_heading()
 }
 
 
+void
+EFIS::AttitudeDirectorIndicator::paint_flight_path_marker()
+{
+	if (!_efis._flight_path_visible)
+		return;
+
+	float x = 0.013f * _efis.wh();
+	float w = _efis.pen_width (3.f);
+	float r = 0.5f * w;
+
+	QPointF marker_position (-heading_to_px (_efis._flight_path_beta), -pitch_to_px (_efis._flight_path_alpha));
+	_painter.save();
+
+	_flight_path_marker = QPainterPath();
+	_flight_path_marker.setFillRule (Qt::WindingFill);
+	_flight_path_marker.addEllipse (QRectF (-x - 0.5f * w, -x - 0.5f * w, 2.f * x + w, 2.f * x + w));
+	_flight_path_marker.addRoundedRect (QRectF (-4.f * x - 0.5f * w, -0.5f * w, +3.f * x + w, w), r, r);
+	_flight_path_marker.addRoundedRect (QRectF (+1.f * x - 0.5f * w, -0.5f * w, +3.f * x + w, w), r, r);
+	_flight_path_marker.addRoundedRect (QRectF (-0.5f * w, -2.f * x - 0.5f * w, w, x + w), r, r);
+	_flight_path_marker.translate (marker_position);
+
+	auto draw_marker = [&]() -> void {
+		_painter.drawEllipse (QRectF (-x, -x, 2.f * x, 2.f * x));
+		_painter.drawLine (QPointF (+x, 0.f), QPointF (+4.f * x, 0.f));
+		_painter.drawLine (QPointF (-x, 0.f), QPointF (-4.f * x, 0.f));
+		_painter.drawLine (QPointF (0.f, -x), QPointF (0.f, -2.f * x));
+	};
+
+	_painter.setClipRect (QRectF (-0.325f * _efis.wh(), -0.4f * _efis.wh(), 0.65f * _efis.wh(), 0.8f * _efis.wh()));
+	_painter.translate (marker_position);
+	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.25f));
+	draw_marker();
+
+	_painter.restore();
+}
+
+
 QPainterPath
 EFIS::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 {
@@ -1020,7 +1104,7 @@ EFIS::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
 	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
 
-	return clip_path;
+	return clip_path - _flight_path_marker;
 }
 
 
@@ -1030,8 +1114,8 @@ EFIS::EFIS (QWidget* parent):
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (34, 233, 127);
-	_ladder_color = QColor (16, 0, 67, 0x60);
-	_autopilot_color = QColor (250, 140, 255);
+	_ladder_color = QColor (51, 38, 93, 0x80);
+	_autopilot_color = QColor (250, 120, 255);
 	_navigation_color = QColor (40, 255, 40);
 	_ladder_border_color = QColor (0, 0, 0, 0x70);
 	_font = QApplication::font();
@@ -1090,6 +1174,12 @@ EFIS::read_input()
 	remove_speed_bug (AT);
 	set_pressure_visibility (false);
 	set_mach_visibility (false);
+	set_flight_path_marker_visibility (false);
+	set_speed_visibility (false);
+	set_altitude_visibility (false);
+	set_pitch_visibility (false);
+	set_roll_visibility (false);
+	set_heading_visibility (false);
 
 	while (_input->hasPendingDatagrams())
 	{
@@ -1112,31 +1202,56 @@ EFIS::read_input()
 			QString value = split_pair[1];
 
 			if (var == "ias")
+			{
 				set_speed (value.toFloat());
+				set_speed_visibility (true);
+			}
 			if (var == "mach")
 			{
 				set_mach (value.toFloat());
 				set_mach_visibility (true);
 			}
-			else if (var == "heading")
-				set_heading (value.toFloat());
-			else if (var == "altitude")
-				set_altitude (value.toFloat());
-			else if (var == "cbr")
-				set_climb_rate (value.toFloat());
 			else if (var == "pitch")
+			{
 				set_pitch (value.toFloat());
+				set_pitch_visibility (true);
+			}
 			else if (var == "roll")
+			{
 				set_roll (value.toFloat());
-			else if (var == "ap-alt-sel")
-				add_altitude_bug (AP, value.toFloat());
-			else if (var == "at-speed-sel")
-				add_speed_bug (AT, value.toFloat());
+				set_roll_visibility (true);
+			}
+			else if (var == "heading")
+			{
+				set_heading (value.toFloat());
+				set_heading_visibility (true);
+			}
+			else if (var == "alpha")
+			{
+				set_flight_path_alpha (value.toFloat());
+				set_flight_path_marker_visibility (true);
+			}
+			else if (var == "beta")
+			{
+				set_flight_path_beta (value.toFloat());
+				set_flight_path_marker_visibility (true);
+			}
+			else if (var == "altitude")
+			{
+				set_altitude (value.toFloat());
+				set_altitude_visibility (true);
+			}
 			else if (var == "altimeter-inhg")
 			{
 				set_pressure (value.toFloat());
 				set_pressure_visibility (true);
 			}
+			else if (var == "cbr")
+				set_climb_rate (value.toFloat());
+			else if (var == "ap-alt-sel")
+				add_altitude_bug (AP, value.toFloat());
+			else if (var == "at-speed-sel")
+				add_speed_bug (AT, value.toFloat());
 			else
 				no_control = true;
 //			else if (var == "latitude")

@@ -19,6 +19,7 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtGui/QPixmap>
+#include <QtGui/QPainterPath>
 #include <QtNetwork/QUdpSocket>
 
 // Standard:
@@ -165,6 +166,9 @@ class EFIS: public QWidget
 		void
 		paint_heading();
 
+		void
+		paint_flight_path_marker();
+
 		QPainterPath
 		get_pitch_scale_clipping_path() const;
 
@@ -175,16 +179,17 @@ class EFIS: public QWidget
 		heading_to_px (Degrees degrees) const;
 
 	  private:
-		EFIS&		_efis;
-		QPainter&	_painter;
-		TextPainter	_text_painter;
-		Degrees		_pitch;
-		Degrees		_roll;
-		Degrees		_heading;
-		QTransform	_pitch_transform;
-		QTransform	_roll_transform;
-		QTransform	_heading_transform;
-		QTransform	_horizon_transform;
+		EFIS&			_efis;
+		QPainter&		_painter;
+		TextPainter		_text_painter;
+		Degrees			_pitch;
+		Degrees			_roll;
+		Degrees			_heading;
+		QTransform		_pitch_transform;
+		QTransform		_roll_transform;
+		QTransform		_heading_transform;
+		QTransform		_horizon_transform;
+		QPainterPath	_flight_path_marker;
 	};
 
   public:
@@ -205,23 +210,91 @@ class EFIS: public QWidget
 	void
 	set_input_alert_timeout (Seconds timeout);
 
-	Degrees
-	roll() const;
-
-	void
-	set_roll (Degrees);
-
+	/**
+	 * Return current pitch value.
+	 */
 	Degrees
 	pitch() const;
 
+	/**
+	 * Set pitch value.
+	 */
 	void
 	set_pitch (Degrees);
 
+	/**
+	 * Toggle pitch scale visibility.
+	 * Toggles also artifical horizon.
+	 */
+	void
+	set_pitch_visibility (bool visible);
+
+	/**
+	 * Return current roll value.
+	 */
+	Degrees
+	roll() const;
+
+	/**
+	 * Set roll value.
+	 */
+	void
+	set_roll (Degrees);
+
+	/**
+	 * Toggle roll scale visibility.
+	 * Toggles also artifical horizon.
+	 */
+	void
+	set_roll_visibility (bool visible);
+
+	/**
+	 * Return current heading value.
+	 */
 	Degrees
 	heading() const;
 
+	/**
+	 * Set heading value.
+	 */
 	void
 	set_heading (Degrees);
+
+	/**
+	 * Toggle heading scale visibility.
+	 */
+	void
+	set_heading_visibility (bool visible);
+
+	/**
+	 * Flight path pitch.
+	 */
+	Degrees
+	flight_path_alpha() const;
+
+	/**
+	 * Set flight path pitch.
+	 */
+	void
+	set_flight_path_alpha (Degrees);
+
+	/**
+	 * Flight path heading (track).
+	 */
+	Degrees
+	flight_path_beta() const;
+
+	/**
+	 * Set flight path heading.
+	 */
+	void
+	set_flight_path_beta (Degrees);
+
+	/**
+	 * Set visibility of the Flight Path Marker.
+	 */
+	void
+	set_flight_path_marker_visibility (bool visible);
 
 	/**
 	 * Return current speed.
@@ -235,11 +308,29 @@ class EFIS: public QWidget
 	void
 	set_speed (Knots);
 
+	/**
+	 * Toggle visibility of the speed scale.
+	 */
+	void
+	set_speed_visibility (bool visible);
+
+	/**
+	 * Current altitude value.
+	 */
 	Feet
 	altitude() const;
 
+	/**
+	 * Set altitude value.
+	 */
 	void
 	set_altitude (Feet);
+
+	/**
+	 * Toggle visibility of the altitude scale.
+	 */
+	void
+	set_altitude_visibility (bool visible);
 
 	Feet
 	climb_rate() const;
@@ -476,10 +567,18 @@ class EFIS: public QWidget
 
 	// Parameters:
 	Degrees				_pitch						= 0.f;
+	bool				_pitch_visibility			= false;
 	Degrees				_roll						= 0.f;
+	bool				_roll_visibility			= false;
 	Degrees				_heading					= 0.f;
+	bool				_heading_visibility			= false;
+	Degrees				_flight_path_alpha			= 0.f;
+	Degrees				_flight_path_beta			= 0.f;
+	bool				_flight_path_visible		= false;
 	Knots				_speed						= 0.f;
+	bool				_speed_visible				= false;
 	Feet				_altitude					= 0.f;
+	bool				_altitude_visible			= false;
 	Feet				_climb_rate					= 0.f;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
@@ -529,6 +628,29 @@ EFIS::AttitudeDirectorIndicator::heading_to_px (Degrees degrees) const
 
 
 inline Degrees
+EFIS::pitch() const
+{
+	return _pitch;
+}
+
+
+inline void
+EFIS::set_pitch (Degrees degrees)
+{
+	_pitch = degrees;
+	update();
+}
+
+
+inline void
+EFIS::set_pitch_visibility (bool visible)
+{
+	_pitch_visibility = visible;
+	update();
+}
+
+
+inline Degrees
 EFIS::roll() const
 {
 	return _roll;
@@ -543,17 +665,10 @@ EFIS::set_roll (Degrees degrees)
 }
 
 
-inline Degrees
-EFIS::pitch() const
-{
-	return _pitch;
-}
-
-
 inline void
-EFIS::set_pitch (Degrees degrees)
+EFIS::set_roll_visibility (bool visible)
 {
-	_pitch = degrees;
+	_roll_visibility = visible;
 	update();
 }
 
@@ -573,6 +688,52 @@ EFIS::set_heading (Degrees degrees)
 }
 
 
+inline void
+EFIS::set_heading_visibility (bool visible)
+{
+	_heading_visibility = visible;
+	update();
+}
+
+
+inline Degrees
+EFIS::flight_path_alpha() const
+{
+	return _flight_path_alpha;
+}
+
+
+inline void
+EFIS::set_flight_path_alpha (Degrees pitch)
+{
+	_flight_path_alpha = pitch;
+	update();
+}
+
+
+inline Degrees
+EFIS::flight_path_beta() const
+{
+	return _flight_path_beta;
+}
+
+
+inline void
+EFIS::set_flight_path_beta (Degrees heading)
+{
+	_flight_path_beta = heading;
+	update();
+}
+
+
+inline void
+EFIS::set_flight_path_marker_visibility (bool visible)
+{
+	_flight_path_visible = visible;
+	update();
+}
+
+
 inline Knots
 EFIS::speed() const
 {
@@ -588,6 +749,14 @@ EFIS::set_speed (Knots speed)
 }
 
 
+inline void
+EFIS::set_speed_visibility (bool visible)
+{
+	_speed_visible = visible;
+	update();
+}
+
+
 inline Feet
 EFIS::altitude() const
 {
@@ -599,6 +768,14 @@ inline void
 EFIS::set_altitude (Feet altitude)
 {
 	_altitude = altitude;
+	update();
+}
+
+
+inline void
+EFIS::set_altitude_visibility (bool visible)
+{
+	_altitude_visible = visible;
 	update();
 }
 

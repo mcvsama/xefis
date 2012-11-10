@@ -81,6 +81,19 @@
 				<format>heading=%f</format>
 				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
+			<!-- Flight path -->
+			<chunk>
+				<name>alpha</name>
+				<type>float</type>
+				<format>alpha=%f</format>
+				<node>/orientation/alpha-deg</node>
+			</chunk>
+			<chunk>
+				<name>beta</name>
+				<type>float</type>
+				<format>beta=%f</format>
+				<node>/orientation/side-slip-deg</node>
+			</chunk>
 			<!-- Other -->
 			<chunk>
 				<name>time</name>
