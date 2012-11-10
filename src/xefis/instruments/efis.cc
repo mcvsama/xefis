@@ -417,8 +417,6 @@ EFIS::AltitudeLadder::paint_ap_setting (float)
 
 	_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.f));
 	_painter.setFont (b_font);
-	if (_sgn < 0.f)
-		_painter.setPen (_negative_altitude_pen);
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
