@@ -605,22 +605,39 @@ void
 EFIS::SpeedLadder::paint_speed_limits (float x)
 {
 	QPointF ydif (0.f, _efis.pen_width (0.25f));
-	QPen max_pen_b (QColor (0, 0, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
-	QPen max_pen_r (QColor (255, 0, 0), _efis.pen_width (10.f), Qt::DotLine, Qt::FlatCap);
-	max_pen_r.setDashPattern (QVector<qreal> (2, 0.5f));
+	QPen pen_b (QColor (0, 0, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
+	QPen pen_r (QColor (255, 0, 0), _efis.pen_width (10.f), Qt::DotLine, Qt::FlatCap);
+	QPen pen_y (QColor (255, 140, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
+	pen_r.setDashPattern (QVector<qreal> (2, 0.5f));
 
 	_painter.save();
 	_painter.translate (0.45f * x, 0.f);
 	_painter.setClipRect (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
 	float max_posy = kt_to_px (_maximum_speed);
+	float wrn_posy = kt_to_px (_warning_speed);
+	float min_posy = kt_to_px (_minimum_speed);
 
-	if (_maximum_speed < _max_shown)
+	if (_efis._maximum_speed_visible && _maximum_speed < _max_shown)
 	{
-		_painter.setPen (max_pen_b);
+		_painter.setPen (pen_b);
 		_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
-		_painter.setPen (max_pen_r);
+		_painter.setPen (pen_r);
 		_painter.drawLine (QPointF (_ladder_rect.right(), max_posy), _ladder_rect.topRight() - ydif);
+	}
+
+	if (_efis._warning_speed_visible && _warning_speed > _min_shown)
+	{
+		_painter.setPen (pen_y);
+		_painter.drawLine (QPointF (_ladder_rect.right(), wrn_posy), _ladder_rect.bottomRight() + ydif);
+	}
+
+	if (_efis._minimum_speed_visible && _minimum_speed > _min_shown)
+	{
+		_painter.setPen (pen_b);
+		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), _ladder_rect.bottomRight() + ydif);
+		_painter.setPen (pen_r);
+		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), _ladder_rect.bottomRight() + ydif);
 	}
 
 	_painter.restore();
