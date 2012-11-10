@@ -42,7 +42,7 @@ EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter):
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
 	_altitude (bound (_efis._altitude, -9999.f, +99999.f)),
-	_climb_rate (bound (_efis._climb_rate, -7000.f, +7000.f)),
+	_climb_rate (bound (_efis._climb_rate, -9999.f, +9999.f)),
 	_pressure (bound (_efis._pressure, 0.f, 99.99f)),
 	_extent (825.f),
 	_sgn (_altitude < 0.f ? -1.f : 1.f),
@@ -340,6 +340,20 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 	indicator_pen.setCapStyle (Qt::FlatCap);
 	_painter.setPen (indicator_pen);
 	_painter.drawLine (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_climb_rate)));
+
+	// Numeric indicators:
+
+	int abs_climb_rate = static_cast<int> (std::abs (_climb_rate)) / 100 * 100;
+	if (abs_climb_rate >= 100)
+	{
+		float const fh = _efis._font_13_digit_height;
+		float const sgn = _climb_rate > 0.f ? 1.f : -1.f;
+		_painter.setClipping (false);
+		_painter.setFont (_efis._font_13_bold);
+		_painter.translate (-1.05f * x, sgn * -2.35f * y);
+		_text_painter.drawText (QRectF (0.f, -0.5f * fh, 4.f * fh, fh),
+								Qt::AlignVCenter | Qt::AlignLeft, QString::number (abs_climb_rate));
+	}
 
 	_painter.restore();
 }
