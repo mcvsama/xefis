@@ -45,11 +45,11 @@ TextPainter::TextPainter (QPainter& painter, Cache* cache, float oversampling_fa
 
 
 void
-TextPainter::drawText (QRectF const& target, int flags, QString const& text)
+TextPainter::drawText (QRectF const& target, int flags, QString const& text, bool dont_cache)
 {
 	QRect target_int_rect (0, 0, std::ceil (_oversampling_factor * target.width()), std::ceil (_oversampling_factor * target.height()));
 
-	if (_cache)
+	if (_cache && !dont_cache)
 	{
 		QImage* cached = _cache->load_image (target_int_rect, _painter.pen().color(), text, flags);
 		if (cached)
@@ -78,7 +78,7 @@ TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 	_buffer.fill (fill_color.rgba());
 	ov_painter.drawText (_buffer.rect(), flags, text);
 
-	if (_cache)
+	if (_cache && !dont_cache)
 		_cache->store_image (target_int_rect, _painter.pen().color(), text, flags, _buffer);
 
 	_painter.drawImage (target, _buffer, _buffer.rect());

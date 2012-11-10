@@ -67,7 +67,7 @@ class TextPainter
 	TextPainter (QPainter& painter, Cache* cache = nullptr, float oversampling_factor = 2.0f);
 
 	void
-	drawText (QRectF const& target, int flags, QString const& text);
+	drawText (QRectF const& target, int flags, QString const& text, bool dont_cache = false);
 
   private:
 	Cache*		_cache;

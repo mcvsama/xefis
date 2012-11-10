@@ -376,7 +376,7 @@ EFIS::AltitudeLadder::paint_pressure (float x)
 	_painter.setPen (QPen (_efis._navigation_color, _efis.pen_width()));
 
 	_painter.setFont (font_a);
-	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (static_cast<int> (_pressure * 100) / 100.f, 0, 'f', 2) + " ");
+	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (static_cast<int> (_pressure * 100) / 100.f, 0, 'f', 2) + " ", true);
 	_painter.setFont (font_b);
 	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, "IN");
 
