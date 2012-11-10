@@ -76,8 +76,7 @@ EFIS::AltitudeLadder::paint()
 	paint_bugs (x);
 	paint_climb_rate (x);
 	paint_black_box (x);
-	if (_efis._pressure_visible)
-		paint_pressure (x);
+	paint_pressure (x);
 	paint_ap_setting (x);
 
 	_painter.restore();
@@ -362,23 +361,30 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 void
 EFIS::AltitudeLadder::paint_pressure (float x)
 {
+	if (!_efis._pressure_visible)
+		return;
+
 	_painter.save();
-	_painter.translate (-0.65f * x, 0.75f * x);
+	_painter.translate (0.f, 0.75f * x);
 
 	QFont font_a = _efis._font_16_bold;
 	QFont font_b = _efis._font_10_bold;
 
-	QRectF nn_rect (_ladder_rect.left(), _ladder_rect.bottom(), _ladder_rect.width(), 1.2f * _efis._font_16_digit_height);
-	QRectF zz_rect (nn_rect.right(), nn_rect.top(), nn_rect.width(), nn_rect.height());
-	// Correct position of zz_rect for different destent property:
+	QString in_str = "IN";
+	QString pressure_str = QString ("%1").arg (_pressure, 0, 'f', 2) + " ";
+
+	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetrics (font_a).width (pressure_str), 1.2f * _efis._font_16_digit_height);
+	QRectF zz_rect (0.f, nn_rect.top(), QFontMetrics (font_b).width (in_str), nn_rect.height());
+	nn_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
+	// Correct position of zz_rect to get correct baseline position:
 	zz_rect.translate (0.f, QFontMetrics (font_b).descent() - QFontMetrics (font_a).descent());
+	zz_rect.moveLeft (nn_rect.right());
 
 	_painter.setPen (QPen (_efis._navigation_color, _efis.pen_width()));
-
 	_painter.setFont (font_a);
-	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, QString ("%1").arg (static_cast<int> (_pressure * 100) / 100.f, 0, 'f', 2) + " ", true);
+	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str, true);
 	_painter.setFont (font_b);
-	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, "IN");
+	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, in_str);
 
 	_painter.restore();
 }
@@ -461,6 +467,7 @@ EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter):
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
 	_speed (bound (_efis._speed, 0.f, 9999.9f)),
+	_mach (bound (_efis._mach, 0.f, 9.99f)),
 	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.9f)),
 	_warning_speed (bound (_efis._warning_speed, 0.f, 9999.9f)),
 	_maximum_speed (bound (_efis._maximum_speed, 0.f, 9999.9f)),
@@ -492,6 +499,7 @@ EFIS::SpeedLadder::paint()
 	paint_speed_limits (x);
 	paint_bugs (x);
 	paint_black_box (x);
+	paint_mach_number (x);
 	paint_ap_setting (x);
 
 	_painter.restore();
@@ -617,6 +625,7 @@ EFIS::SpeedLadder::paint_speed_limits (float x)
 	float max_posy = kt_to_px (_maximum_speed);
 	float wrn_posy = kt_to_px (_warning_speed);
 	float min_posy = kt_to_px (_minimum_speed);
+	QPointF zero_point (_ladder_rect.right(), std::min (_ladder_rect.bottom() + ydif.y(), 1.0 * kt_to_px (0.f)));
 
 	if (_efis._maximum_speed_visible && _maximum_speed < _max_shown)
 	{
@@ -629,15 +638,15 @@ EFIS::SpeedLadder::paint_speed_limits (float x)
 	if (_efis._warning_speed_visible && _warning_speed > _min_shown)
 	{
 		_painter.setPen (pen_y);
-		_painter.drawLine (QPointF (_ladder_rect.right(), wrn_posy), _ladder_rect.bottomRight() + ydif);
+		_painter.drawLine (QPointF (_ladder_rect.right(), wrn_posy), zero_point);
 	}
 
 	if (_efis._minimum_speed_visible && _minimum_speed > _min_shown)
 	{
 		_painter.setPen (pen_b);
-		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), _ladder_rect.bottomRight() + ydif);
+		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), zero_point);
 		_painter.setPen (pen_r);
-		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), _ladder_rect.bottomRight() + ydif);
+		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), zero_point);
 	}
 
 	_painter.restore();
@@ -698,7 +707,39 @@ EFIS::SpeedLadder::paint_bugs (float x)
 
 
 void
-EFIS::SpeedLadder::paint_ap_setting (float x)
+EFIS::SpeedLadder::paint_mach_number (float x)
+{
+	if (!_efis._mach_visible)
+		return;
+
+	_painter.save();
+	_painter.translate (0.f, 0.75f * x);
+
+	QFont font_a = _efis._font_16_bold;
+	QFont font_b = _efis._font_10_bold;
+
+	QString m_str = "M";
+	QString mach_str = " " + QString ("%1").arg (_mach, 0, 'f', 3);
+
+	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetrics (font_a).width (mach_str), 1.2f * _efis._font_16_digit_height);
+	QRectF zz_rect (0.f, nn_rect.top(), QFontMetrics (font_b).width (m_str), nn_rect.height());
+	zz_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
+	// Correct position of zz_rect to get correct baseline position:
+	zz_rect.translate (0.f, QFontMetrics (font_b).descent() - QFontMetrics (font_a).descent());
+	nn_rect.moveLeft (zz_rect.right());
+
+	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
+	_painter.setFont (font_a);
+	_text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignLeft, mach_str, true);
+	_painter.setFont (font_b);
+	_text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignRight, m_str);
+
+	_painter.restore();
+}
+
+
+void
+EFIS::SpeedLadder::paint_ap_setting (float)
 {
 	auto ap_bug = _efis._speed_bugs.find (AT);
 	if (ap_bug == _efis._speed_bugs.end())
@@ -1011,15 +1052,17 @@ EFIS::EFIS (QWidget* parent):
 	set_input_alert_timeout (0.15f);
 	update_fonts();
 
-	set_maximum_speed (125.f);
-	add_speed_bug ("V1", 55.f);
-	add_speed_bug ("VR", 65.f);
-	add_speed_bug ("REF", 75.f);
-	add_speed_bug (AT, 200.f);
+	set_maximum_speed (148.f);
+	set_maximum_speed_visibility (true);
+	set_warning_speed (70.f);
+	set_warning_speed_visibility (true);
+	set_minimum_speed (60.f);
+	set_minimum_speed_visibility (true);
 
-	add_altitude_bug (AP, 1200.f);
-	add_altitude_bug (LDGALT, -200.f);
-	add_altitude_bug ("ALT", -150.f);
+	add_speed_bug ("VA", 120.f);
+	add_speed_bug ("VFE", 104.f);
+
+	add_altitude_bug (LDGALT, 0.f);
 }
 
 
@@ -1043,9 +1086,10 @@ EFIS::set_input_alert_timeout (Seconds timeout)
 void
 EFIS::read_input()
 {
-	remove_altitude_bug (QString::null);
-	remove_speed_bug (QString::null);
+	remove_altitude_bug (AP);
+	remove_speed_bug (AT);
 	set_pressure_visibility (false);
+	set_mach_visibility (false);
 
 	while (_input->hasPendingDatagrams())
 	{
@@ -1069,6 +1113,11 @@ EFIS::read_input()
 
 			if (var == "ias")
 				set_speed (value.toFloat());
+			if (var == "mach")
+			{
+				set_mach (value.toFloat());
+				set_mach_visibility (true);
+			}
 			else if (var == "heading")
 				set_heading (value.toFloat());
 			else if (var == "altitude")

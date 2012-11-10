@@ -115,6 +115,9 @@ class EFIS: public QWidget
 		paint_bugs (float x);
 
 		void
+		paint_mach_number (float x);
+
+		void
 		paint_ap_setting (float x);
 
 		float
@@ -125,6 +128,7 @@ class EFIS: public QWidget
 		QPainter&	_painter;
 		TextPainter	_text_painter;
 		Knots		_speed;
+		float		_mach;
 		Knots		_minimum_speed;
 		Knots		_warning_speed;
 		Knots		_maximum_speed;
@@ -219,9 +223,15 @@ class EFIS: public QWidget
 	void
 	set_heading (Degrees);
 
+	/**
+	 * Return current speed.
+	 */
 	Knots
 	speed() const;
 
+	/**
+	 * Set speed shown on speed ladder.
+	 */
 	void
 	set_speed (Knots);
 
@@ -276,6 +286,24 @@ class EFIS: public QWidget
 	 */
 	void
 	remove_altitude_bug (QString name);
+
+	/**
+	 * Return mach number.
+	 */
+	float
+	mach() const;
+
+	/**
+	 * Set mach number indicator.
+	 */
+	void
+	set_mach (float value);
+
+	/**
+	 * Set mach number indicator visibility.
+	 */
+	void
+	set_mach_visibility (bool visible);
 
 	/**
 	 * Return current pressure indicator value.
@@ -455,6 +483,8 @@ class EFIS: public QWidget
 	Feet				_climb_rate					= 0.f;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
+	float				_mach						= 0.f;
+	bool				_mach_visible				= false;
 	InHg				_pressure					= 0.f;
 	bool				_pressure_visible			= false;
 	Knots				_minimum_speed				= 0.f;
@@ -646,10 +676,25 @@ EFIS::remove_altitude_bug (QString name)
 }
 
 
-inline void
-EFIS::set_pressure (InHg pressure)
+inline float
+EFIS::mach() const
 {
-	_pressure = pressure;
+	return _mach;
+}
+
+
+inline void
+EFIS::set_mach (float value)
+{
+	_mach = value;
+	update();
+}
+
+
+inline void
+EFIS::set_mach_visibility (bool visible)
+{
+	_mach_visible = visible;
 	update();
 }
 
@@ -658,6 +703,14 @@ inline InHg
 EFIS::pressure() const
 {
 	return _pressure;
+}
+
+
+inline void
+EFIS::set_pressure (InHg pressure)
+{
+	_pressure = pressure;
+	update();
 }
 
 
