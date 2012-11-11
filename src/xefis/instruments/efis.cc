@@ -353,7 +353,7 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 
 	// Numeric indicators:
 
-	int abs_climb_rate = static_cast<int> (std::abs (_climb_rate)) / 100 * 100;
+	int abs_climb_rate = static_cast<int> (std::abs (_climb_rate)) / 10 * 10;
 	if (abs_climb_rate >= 100)
 	{
 		float const fh = _efis._font_13_digit_height;
