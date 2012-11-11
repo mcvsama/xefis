@@ -300,6 +300,9 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 void
 EFIS::AltitudeLadder::paint_climb_rate (float x)
 {
+	if (!_efis._climb_rate_visible)
+		return;
+
 	QPen bold_white_pen = _efis.get_pen (QColor (255, 255, 255), 1.25f);
 	QPen thin_white_pen = _efis.get_pen (QColor (255, 255, 255), 0.50f);
 	QBrush ladder_brush (_efis._ladder_color);
@@ -450,9 +453,9 @@ EFIS::AltitudeLadder::paint_ap_setting (float)
 
 
 float
-EFIS::AltitudeLadder::scale_cbr (Feet climb_rate) const
+EFIS::AltitudeLadder::scale_cbr (FeetPerMinute climb_rate) const
 {
-	Feet cbr = std::abs (climb_rate);
+	FeetPerMinute cbr = std::abs (climb_rate);
 
 	if (cbr < 1000.f)
 		cbr = cbr / 1000.f * 0.46f;
@@ -1168,7 +1171,7 @@ EFIS::set_input_alert_timeout (Seconds timeout)
 
 
 void
-EFIS::read_input()
+EFIS::hide_all()
 {
 	remove_altitude_bug (AP);
 	remove_speed_bug (AT);
@@ -1177,9 +1180,17 @@ EFIS::read_input()
 	set_flight_path_marker_visibility (false);
 	set_speed_visibility (false);
 	set_altitude_visibility (false);
+	set_climb_rate_visibility (false);
 	set_pitch_visibility (false);
 	set_roll_visibility (false);
 	set_heading_visibility (false);
+}
+
+
+void
+EFIS::read_input()
+{
+	hide_all();
 
 	while (_input->hasPendingDatagrams())
 	{
@@ -1247,7 +1258,10 @@ EFIS::read_input()
 				set_pressure_visibility (true);
 			}
 			else if (var == "cbr")
+			{
 				set_climb_rate (value.toFloat());
+				set_climb_rate_visibility (true);
+			}
 			else if (var == "ap-alt-sel")
 				add_altitude_bug (AP, value.toFloat());
 			else if (var == "at-speed-sel")
@@ -1383,6 +1397,8 @@ EFIS::paint_center_cross (QPainter& painter)
 void
 EFIS::paint_input_alert (QPainter& painter)
 {
+	hide_all();
+
 	painter.save();
 
 	QFont font = _font;
@@ -1396,12 +1412,17 @@ EFIS::paint_input_alert (QPainter& painter)
 
 	QPen pen = get_pen (QColor (255, 255, 255), 2.f);
 
+	painter.resetTransform();
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (QBrush (QColor (0, 0, 0)));
+	painter.drawRect (rect());
+
 	painter.setTransform (_center_transform);
 	painter.setPen (pen);
-	painter.setBrush (QBrush (QColor (0xdd, 0, 0, 0xdd)));
+	painter.setBrush (QBrush (QColor (0xdd, 0, 0)));
 	painter.setFont (font);
 
-	QRectF rect (-0.6f * width, 0.5f * height() - 1.4f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
+	QRectF rect (-0.6f * width, -0.5f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
 
 	painter.drawRect (rect);
 	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);

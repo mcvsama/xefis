@@ -69,7 +69,7 @@ class EFIS: public QWidget
 		ft_to_px (Feet ft) const;
 
 		float
-		scale_cbr (Feet climb_rate) const;
+		scale_cbr (FeetPerMinute climb_rate) const;
 
 	  private:
 		EFIS&			_efis;
@@ -332,11 +332,23 @@ class EFIS: public QWidget
 	void
 	set_altitude_visibility (bool visible);
 
-	Feet
+	/**
+	 * Return current climb rate.
+	 */
+	FeetPerMinute
 	climb_rate() const;
 
+	/**
+	 * Set climb rate.
+	 */
 	void
-	set_climb_rate (Feet feet_per_minute);
+	set_climb_rate (FeetPerMinute feet_per_minute);
+
+	/**
+	 * Set climb rate visibility.
+	 */
+	void
+	set_climb_rate_visibility (bool visible);
 
 	/**
 	 * Return speed bug value or 0.0f if not found.
@@ -481,6 +493,12 @@ class EFIS: public QWidget
 	void
 	set_fov (Degrees);
 
+	/**
+	 * Hide all indicators.
+	 */
+	void
+	hide_all();
+
   public slots:
 	/**
 	 * Read and apply FlightGear datagrams from UDP socket.
@@ -579,7 +597,8 @@ class EFIS: public QWidget
 	bool				_speed_visible				= false;
 	Feet				_altitude					= 0.f;
 	bool				_altitude_visible			= false;
-	Feet				_climb_rate					= 0.f;
+	FeetPerMinute		_climb_rate					= 0.f;
+	bool				_climb_rate_visible			= false;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 	float				_mach						= 0.f;
@@ -780,7 +799,7 @@ EFIS::set_altitude_visibility (bool visible)
 }
 
 
-inline Feet
+inline FeetPerMinute
 EFIS::climb_rate() const
 {
 	return _climb_rate;
@@ -788,9 +807,17 @@ EFIS::climb_rate() const
 
 
 inline void
-EFIS::set_climb_rate (Feet feet_per_minute)
+EFIS::set_climb_rate (FeetPerMinute feet_per_minute)
 {
 	_climb_rate = feet_per_minute;
+	update();
+}
+
+
+inline void
+EFIS::set_climb_rate_visibility (bool visible)
+{
+	_climb_rate_visible = visible;
 	update();
 }
 
