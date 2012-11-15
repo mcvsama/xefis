@@ -28,8 +28,8 @@
 // Xefis:
 #include <xefis/config/version.h>
 #include <xefis/application/services.h>
-#include <xefis/instruments/efis.h>
 #include <xefis/utility/backtrace.h>
+#include <widgets/efis.h>
 
 // Local:
 #include "fail.h"
