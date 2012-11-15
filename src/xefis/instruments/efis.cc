@@ -1323,27 +1323,29 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 
 	painter.setTransform (_center_transform);
 
-	painter.save();
-	AttitudeDirectorIndicator adi (*this, painter);
-	adi.paint();
-	painter.restore();
-
-	paint_center_cross (painter);
-
-	painter.save();
-	SpeedLadder sl (*this, painter);
-	painter.translate (-0.4f * wh(), 0.f);
-	sl.paint();
-	painter.restore();
-
-	painter.save();
-	AltitudeLadder al (*this, painter);
-	painter.translate (+0.4f * wh(), 0.f);
-	al.paint();
-	painter.restore();
-
 	if (_show_input_alert)
 		paint_input_alert (painter);
+	else
+	{
+		painter.save();
+		AttitudeDirectorIndicator adi (*this, painter);
+		adi.paint();
+		painter.restore();
+
+		paint_center_cross (painter);
+
+		painter.save();
+		SpeedLadder sl (*this, painter);
+		painter.translate (-0.4f * wh(), 0.f);
+		sl.paint();
+		painter.restore();
+
+		painter.save();
+		AltitudeLadder al (*this, painter);
+		painter.translate (+0.4f * wh(), 0.f);
+		al.paint();
+		painter.restore();
+	}
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
@@ -1397,8 +1399,6 @@ EFIS::paint_center_cross (QPainter& painter)
 void
 EFIS::paint_input_alert (QPainter& painter)
 {
-	hide_all();
-
 	painter.save();
 
 	QFont font = _font;
