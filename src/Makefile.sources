@@ -62,6 +62,8 @@ SRC_HEADERS += instruments/efis.h
 
 SRC_SOURCES += instruments/efis.cc
 
+SRC_MOCHDRS += instruments/efis.h
+
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h

@@ -204,13 +204,6 @@ class EFISWidget: public QWidget
 	EFISWidget (QWidget* parent);
 
 	/**
-	 * Show input alert when data is not coming for given period of time.
-	 * Pass 0.f to disable. Default is 110 ms.
-	 */
-	void
-	set_input_alert_timeout (Seconds timeout);
-
-	/**
 	 * Return current pitch value.
 	 */
 	Degrees
@@ -494,30 +487,10 @@ class EFISWidget: public QWidget
 	set_fov (Degrees);
 
 	/**
-	 * Hide all indicators.
+	 * Set input alert visibility.
 	 */
 	void
-	hide_all();
-
-  public slots:
-	/**
-	 * Read and apply FlightGear datagrams from UDP socket.
-	 */
-	void
-	read_input();
-
-	/**
-	 * Show input alert (when there's no incoming
-	 * data from external source).
-	 */
-	void
-	input_timeout();
-
-	/**
-	 * Hide input alert.
-	 */
-	void
-	input_ok();
+	set_input_alert_visibility (bool visible);
 
   protected:
 	void
@@ -576,11 +549,7 @@ class EFISWidget: public QWidget
 	QTransform			_center_transform;
 	QFont				_font;
 	Degrees				_fov						= 120.f;
-	QUdpSocket*			_input						= nullptr;
-	Seconds				_input_alert_timeout		= 0.0f;
-	QTimer*				_input_alert_timer			= nullptr;
-	QTimer*				_input_alert_hide_timer		= nullptr;
-	bool				_show_input_alert			= false;
+	bool				_input_alert_visible		= false;
 	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
@@ -1010,6 +979,13 @@ EFISWidget::set_fov (Degrees degrees)
 }
 
 
+inline void
+EFISWidget::set_input_alert_visibility (bool visible)
+{
+	_input_alert_visible = visible;
+}
+
+
 inline float
 EFISWidget::wh() const
 {
@@ -1027,14 +1003,14 @@ EFISWidget::get_pen (QColor const& color, float width)
 inline float
 EFISWidget::pen_width (float scale) const
 {
-	return scale * wh() / 325.f;
+	return std::max (0.f, scale * wh() / 325.f);
 }
 
 
 inline float
 EFISWidget::font_size (float scale) const
 {
-	return scale * wh() / 375.f;
+	return std::max (1.f, scale * wh() / 375.f);
 }
 
 #endif

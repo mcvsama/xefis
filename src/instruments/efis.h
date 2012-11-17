@@ -28,11 +28,52 @@
 
 class EFIS: public QWidget
 {
+	Q_OBJECT
+
   public:
 	EFIS (QWidget* parent);
 
+	/**
+	 * Show input alert when data is not coming for given period of time.
+	 * Pass 0.f to disable. Default is 110 ms.
+	 */
+	void
+	set_input_alert_timeout (Seconds timeout);
+
+  private slots:
+	/**
+	 * Read and apply FlightGear datagrams from UDP socket.
+	 */
+	void
+	read_input();
+
+	/**
+	 * Show input alert (when there's no incoming
+	 * data from external source).
+	 */
+	void
+	input_timeout();
+
+	/**
+	 * Hide input alert.
+	 */
+	void
+	input_ok();
+
   private:
-	EFISWidget*	_efis_widget;
+	/**
+	 * Hide all indicators.
+	 */
+	void
+	hide_all();
+
+  private:
+	EFISWidget*	_efis_widget				= nullptr;
+	Seconds		_input_alert_timeout		= 0.0f;
+	QTimer*		_input_alert_timer			= nullptr;
+	QTimer*		_input_alert_hide_timer		= nullptr;
+	bool		_show_input_alert			= false;
+	QUdpSocket*	_input						= nullptr;
 };
 
 #endif

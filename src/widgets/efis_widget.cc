@@ -1123,20 +1123,6 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_ladder_border_color = QColor (0, 0, 0, 0x70);
 	_font = Xefis::Services::instrument_font();
 
-	_input = new QUdpSocket (this);
-	_input->bind (QHostAddress::LocalHost, 9000, QUdpSocket::ShareAddress);
-	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
-
-	_input_alert_timer = new QTimer (this);
-	_input_alert_timer->setSingleShot (true);
-	QObject::connect (_input_alert_timer, SIGNAL (timeout()), this, SLOT (input_timeout()));
-
-	_input_alert_hide_timer = new QTimer (this);
-	_input_alert_hide_timer->setSingleShot (true);
-	QObject::connect (_input_alert_hide_timer, SIGNAL (timeout()), this, SLOT (input_ok()));
-
-	// Default alert timeout:
-	set_input_alert_timeout (0.15f);
 	update_fonts();
 
 	set_maximum_speed (148.f);
@@ -1150,157 +1136,6 @@ EFISWidget::EFISWidget (QWidget* parent):
 	add_speed_bug ("VFE", 104.f);
 
 	add_altitude_bug (LDGALT, 0.f);
-}
-
-
-void
-EFISWidget::set_input_alert_timeout (Seconds timeout)
-{
-	_input_alert_timeout = timeout;
-
-	if (_input_alert_timeout > 0.f)
-		_input_alert_timer->start (_input_alert_timeout * 1000.f);
-	else
-	{
-		_show_input_alert = false;
-		_input_alert_timer->stop();
-		_input_alert_hide_timer->stop();
-		update();
-	}
-}
-
-
-void
-EFISWidget::hide_all()
-{
-	remove_altitude_bug (AP);
-	remove_speed_bug (AT);
-	set_pressure_visibility (false);
-	set_mach_visibility (false);
-	set_flight_path_marker_visibility (false);
-	set_speed_visibility (false);
-	set_altitude_visibility (false);
-	set_climb_rate_visibility (false);
-	set_pitch_visibility (false);
-	set_roll_visibility (false);
-	set_heading_visibility (false);
-}
-
-
-void
-EFISWidget::read_input()
-{
-	hide_all();
-
-	while (_input->hasPendingDatagrams())
-	{
-		QByteArray datagram;
-		datagram.resize (_input->pendingDatagramSize());
-		QHostAddress sender_host;
-		uint16_t sender_port;
-
-		_input->readDatagram (datagram.data(), datagram.size(), &sender_host, &sender_port);
-
-		QString line (datagram);
-		for (QString pair: QString (datagram).split (',', QString::SkipEmptyParts))
-		{
-			bool no_control = false;
-
-			QStringList split_pair = pair.split ('=');
-			if (split_pair.size() != 2)
-				continue;
-			QString var = split_pair[0];
-			QString value = split_pair[1];
-
-			if (var == "ias")
-			{
-				set_speed (value.toFloat());
-				set_speed_visibility (true);
-			}
-			if (var == "mach")
-			{
-				set_mach (value.toFloat());
-				set_mach_visibility (true);
-			}
-			else if (var == "pitch")
-			{
-				set_pitch (value.toFloat());
-				set_pitch_visibility (true);
-			}
-			else if (var == "roll")
-			{
-				set_roll (value.toFloat());
-				set_roll_visibility (true);
-			}
-			else if (var == "heading")
-			{
-				set_heading (value.toFloat());
-				set_heading_visibility (true);
-			}
-			else if (var == "alpha")
-			{
-				set_flight_path_alpha (value.toFloat());
-				set_flight_path_marker_visibility (true);
-			}
-			else if (var == "beta")
-			{
-				set_flight_path_beta (value.toFloat());
-				set_flight_path_marker_visibility (true);
-			}
-			else if (var == "altitude")
-			{
-				set_altitude (value.toFloat());
-				set_altitude_visibility (true);
-			}
-			else if (var == "altimeter-inhg")
-			{
-				set_pressure (value.toFloat());
-				set_pressure_visibility (true);
-			}
-			else if (var == "cbr")
-			{
-				set_climb_rate (value.toFloat());
-				set_climb_rate_visibility (true);
-			}
-			else if (var == "ap-alt-sel")
-				add_altitude_bug (AP, value.toFloat());
-			else if (var == "at-speed-sel")
-				add_speed_bug (AT, value.toFloat());
-			else
-				no_control = true;
-//			else if (var == "latitude")
-//				set_latitude (value.toFloat());
-//			else if (var == "longitude")
-//				set_longitude (value.toFloat());
-//			else if (var == "time")
-//				set_time (value.toInt());
-
-			if (no_control)
-			{
-				if (_input_alert_timeout > 0.f)
-					_input_alert_timer->start (_input_alert_timeout * 1000.f);
-			}
-			else if (_show_input_alert && !_input_alert_hide_timer->isActive())
-				_input_alert_hide_timer->start (350);
-		}
-	}
-}
-
-
-void
-EFISWidget::input_timeout()
-{
-	_input_alert_hide_timer->stop();
-	_show_input_alert = true;
-	update();
-}
-
-
-void
-EFISWidget::input_ok()
-{
-	_show_input_alert = false;
-	update();
 }
 
 
@@ -1323,7 +1158,7 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 
 	painter.setTransform (_center_transform);
 
-	if (_show_input_alert)
+	if (_input_alert_visible)
 		paint_input_alert (painter);
 	else
 	{
