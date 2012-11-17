@@ -11,34 +11,38 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_H__INCLUDED
-#define XEFIS__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_H__INCLUDED
-
 // Standard:
 #include <cstddef>
 
 // Qt:
-#include <QtGui/QWidget>
-#include <QtGui/QTreeWidget>
+#include <QtGui/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property_node.h>
+
+// Local:
+#include "property_storage_widget.h"
 
 
 namespace Xefis {
 
-class PropertyTree: public QWidget
+PropertyStorageWidget::PropertyStorageWidget (PropertyNode* property_node, QWidget* parent):
+	QWidget (parent)
 {
-	Q_OBJECT
+	_property_tree = new PropertyTreeWidget (property_node, this);
 
-  public:
-	PropertyTree (QWidget* parent);
+	QVBoxLayout* layout = new QVBoxLayout (this);
+	layout->setMargin (0);
+	layout->addWidget (_property_tree);
+}
 
-  private:
-	QTreeWidget*	_tree;
-};
+
+void
+PropertyStorageWidget::read()
+{
+	_property_tree->read();
+}
 
 } // namespace Xefis
-
-#endif
 

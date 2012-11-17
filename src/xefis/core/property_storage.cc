@@ -33,5 +33,12 @@ PropertyStorage::initialize()
 	_root = new PropertyNode ("");
 }
 
+
+PropertyNode*
+PropertyStorage::root()
+{
+	return _root;
+}
+
 } // namespace Xefis
 

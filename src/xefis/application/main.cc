@@ -23,7 +23,6 @@
 
 // Qt:
 #include <QtCore/QTextCodec>
-#include <QtGui/QFontDatabase>
 
 // Xefis:
 #include <xefis/config/version.h>
@@ -31,7 +30,7 @@
 #include <xefis/core/property_storage.h>
 #include <xefis/utility/backtrace.h>
 #include <widgets/efis.h>
-#include <xefis/components/property_tree/property_tree.h>
+#include <xefis/components/property_tree/property_storage_widget.h>
 
 // Local:
 #include "fail.h"
@@ -60,34 +59,31 @@ int main (int argc, char** argv, char**)
 		else
 		{
 			QApplication* app = new QApplication (argc, argv);
-			// Qt preparations:
+			// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
+			// Also encode std::strings and const chars* in UTF-8:
 			QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF-8"));
-			QFontDatabase font_db;
-			// Try to select best font:
-			for (QString font: { "Black", "Bold", "BoldCondensed", "Condensed", "Light", "Medium", "Regular", "Thin" })
-				QFontDatabase::addApplicationFont ("share/fonts/Roboto/Roboto-" + font + ".ttf");
+			// Init services:
+			Xefis::Services::initialize();
 			// Init Xefis modules:
 			Xefis::PropertyStorage::initialize();
 
-			for (auto font_family: { "Roboto", "Bitstream Vera Sans Mono", "Ubuntu Mono", "Droid Sans", "Trebuchet MS", "monospace" })
-			{
-				QFont font (font_family);
-				QFontInfo font_info (font);
-				if (font_info.exactMatch())
-				{
-					QApplication::setFont (font);
-					break;
-				}
-			}
-			// Now casting QString to std::string|const char* will yield UTF-8 encoded strings.
-			// Also std::strings and const chars* are expected to be encoded in UTF-8.
-			Xefis::PropertyTree* property_tree = new Xefis::PropertyTree (0);
-			property_tree->show();
+			Xefis::PropertyNode* n = Xefis::PropertyStorage::root();
+			Xefis::PropertyNode* alt = n->mkpath ("/instrumentation/efis/altimeter");
+			alt->add_child (new Xefis::PropertyNode ("value", 1000.5f));
+			alt->add_child (new Xefis::PropertyNode ("valid", true));
+			alt->add_child (new Xefis::PropertyNode ("message", "altitude valid"));
+
+			Xefis::PropertyStorageWidget* property_storage_widget = new Xefis::PropertyStorageWidget (Xefis::PropertyStorage::root(), nullptr);
+			property_storage_widget->show();
+
 			EFIS* efis = new EFIS (nullptr);
 			efis->show();
 			efis->resize (610, 460);
 			app->exec();
 			delete efis;
+
+			Xefis::Services::deinitialize();
+
 			delete app;
 		}
 	}

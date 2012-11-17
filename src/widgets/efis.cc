@@ -18,11 +18,11 @@
 
 // Qt:
 #include <QtCore/QTimer>
-#include <QtGui/QApplication>
 #include <QtGui/QPainter>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/services.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
 
@@ -1121,7 +1121,7 @@ EFIS::EFIS (QWidget* parent):
 	_autopilot_color = QColor (250, 120, 255);
 	_navigation_color = QColor (40, 255, 40);
 	_ladder_border_color = QColor (0, 0, 0, 0x70);
-	_font = QApplication::font();
+	_font = Xefis::Services::instrument_font();
 
 	_input = new QUdpSocket (this);
 	_input->bind (QHostAddress::LocalHost, 9000, QUdpSocket::ShareAddress);

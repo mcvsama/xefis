@@ -101,6 +101,11 @@ class PropertyNode
 	/**
 	 * Create a string node.
 	 */
+	PropertyNode (std::string const& name, const char* value);
+
+	/**
+	 * Create a string node.
+	 */
 	PropertyNode (std::string const& name, std::string const& value);
 
 	/**
@@ -265,6 +270,14 @@ PropertyNode::PropertyNode (std::string const& name, double value):
 	_type (PropFloat),
 	_name (name),
 	_value_double (value)
+{ }
+
+
+inline
+PropertyNode::PropertyNode (std::string const& name, const char* value):
+	_type (PropString),
+	_name (name),
+	_value_string (value)
 { }
 
 

@@ -18,6 +18,10 @@
 #include <string>
 #include <vector>
 
+// Qt:
+#include <QtGui/QFontDatabase>
+#include <QtGui/QFontInfo>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -29,6 +33,7 @@ namespace Xefis {
 
 signed int			Services::_detected_cores = -1;
 CallOutDispatcher*	Services::_call_out_dispatcher;
+QFont				Services::_instrument_font;
 
 
 void
@@ -47,6 +52,21 @@ void
 Services::initialize()
 {
 	_call_out_dispatcher = new CallOutDispatcher();
+
+	// Try to select best font for instruments:
+	for (QString font: { "Black", "Bold", "BoldCondensed", "Condensed", "Light", "Medium", "Regular", "Thin" })
+		QFontDatabase::addApplicationFont ("share/fonts/Roboto/Roboto-" + font + ".ttf");
+
+	for (auto font_family: { "Roboto", "Bitstream Vera Sans Mono", "Ubuntu Mono", "Droid Sans", "Trebuchet MS", "monospace" })
+	{
+		QFont font (font_family);
+		QFontInfo font_info (font);
+		if (font_info.exactMatch())
+		{
+			_instrument_font = font;
+			break;
+		}
+	}
 }
 
 

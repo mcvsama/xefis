@@ -25,6 +25,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QApplication>
 #include <QtGui/QX11Info>
+#include <QtGui/QFont>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -130,9 +131,22 @@ class Services
 	static float
 	y_pixels_per_point();
 
+	/**
+	 * Return default font size in pixels.
+	 */
+	static float
+	default_font_size();
+
+	/**
+	 * Return font used for rendering instruments.
+	 */
+	static QFont
+	instrument_font();
+
   private:
 	static signed int			_detected_cores;
 	static CallOutDispatcher*	_call_out_dispatcher;
+	static QFont				_instrument_font;
 };
 
 
@@ -170,6 +184,21 @@ inline float
 Services::y_pixels_per_point()
 {
 	return QX11Info::appDpiY() / 72.0f;
+}
+
+
+inline float
+Services::default_font_size()
+{
+	QFont font = QApplication::font();
+	return font.pointSize() * y_pixels_per_point();
+}
+
+
+inline QFont
+Services::instrument_font()
+{
+	return _instrument_font;
 }
 
 } // namespace Xefis
