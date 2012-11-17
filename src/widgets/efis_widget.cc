@@ -27,17 +27,17 @@
 #include <xefis/utility/text_painter.h>
 
 // Local:
-#include "efis.h"
+#include "efis_widget.h"
 
 
-const char*	EFIS::AP = "A/P";
-const char*	EFIS::AT = "A/T";
-const char*	EFIS::LDGALT = "LDG";
-const char	EFIS::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-const char*	EFIS::MINUS_SIGN = "−";
+const char*	EFISWidget::AP = "A/P";
+const char*	EFISWidget::AT = "A/T";
+const char*	EFISWidget::LDGALT = "LDG";
+const char	EFISWidget::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+const char*	EFISWidget::MINUS_SIGN = "−";
 
 
-EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter):
+EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
@@ -61,7 +61,7 @@ EFIS::AltitudeLadder::AltitudeLadder (EFIS& efis, QPainter& painter):
 
 
 void
-EFIS::AltitudeLadder::paint()
+EFISWidget::AltitudeLadder::paint()
 {
 	float const x = _ladder_rect.width() / 4.0f;
 
@@ -84,7 +84,7 @@ EFIS::AltitudeLadder::paint()
 
 
 void
-EFIS::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect)
+EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect)
 {
 	QFont b_font = _efis._font_20_bold;
 	float const b_digit_width = _efis._font_20_digit_width;
@@ -159,7 +159,7 @@ EFIS::AltitudeLadder::paint_black_box (float x, bool only_compute_black_box_rect
 
 
 void
-EFIS::AltitudeLadder::paint_ladder_scale (float x)
+EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 {
 	if (!_efis._altitude_visible)
 		return;
@@ -230,7 +230,7 @@ EFIS::AltitudeLadder::paint_ladder_scale (float x)
 
 
 void
-EFIS::AltitudeLadder::paint_bugs (float x)
+EFISWidget::AltitudeLadder::paint_bugs (float x)
 {
 	if (!_efis._altitude_visible)
 		return;
@@ -298,7 +298,7 @@ EFIS::AltitudeLadder::paint_bugs (float x)
 
 
 void
-EFIS::AltitudeLadder::paint_climb_rate (float x)
+EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 {
 	if (!_efis._climb_rate_visible)
 		return;
@@ -370,7 +370,7 @@ EFIS::AltitudeLadder::paint_climb_rate (float x)
 
 
 void
-EFIS::AltitudeLadder::paint_pressure (float x)
+EFISWidget::AltitudeLadder::paint_pressure (float x)
 {
 	if (!_efis._pressure_visible)
 		return;
@@ -402,7 +402,7 @@ EFIS::AltitudeLadder::paint_pressure (float x)
 
 
 void
-EFIS::AltitudeLadder::paint_ap_setting (float)
+EFISWidget::AltitudeLadder::paint_ap_setting (float)
 {
 	auto ap_bug = _efis._altitude_bugs.find (AP);
 	if (ap_bug == _efis._altitude_bugs.end())
@@ -453,7 +453,7 @@ EFIS::AltitudeLadder::paint_ap_setting (float)
 
 
 float
-EFIS::AltitudeLadder::scale_cbr (FeetPerMinute climb_rate) const
+EFISWidget::AltitudeLadder::scale_cbr (FeetPerMinute climb_rate) const
 {
 	FeetPerMinute cbr = std::abs (climb_rate);
 
@@ -473,7 +473,7 @@ EFIS::AltitudeLadder::scale_cbr (FeetPerMinute climb_rate) const
 }
 
 
-EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter):
+EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
@@ -495,7 +495,7 @@ EFIS::SpeedLadder::SpeedLadder (EFIS& efis, QPainter& painter):
 
 
 void
-EFIS::SpeedLadder::paint()
+EFISWidget::SpeedLadder::paint()
 {
 	float const x = _ladder_rect.width() / 4.0f;
 
@@ -518,7 +518,7 @@ EFIS::SpeedLadder::paint()
 
 
 void
-EFIS::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
+EFISWidget::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
 {
 	QFont actual_speed_font = _efis._font_20_bold;
 	float const digit_width = _efis._font_20_digit_width;
@@ -576,7 +576,7 @@ EFIS::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_rect)
 
 
 void
-EFIS::SpeedLadder::paint_ladder_scale (float x)
+EFISWidget::SpeedLadder::paint_ladder_scale (float x)
 {
 	if (!_efis._speed_visible)
 		return;
@@ -626,7 +626,7 @@ EFIS::SpeedLadder::paint_ladder_scale (float x)
 
 
 void
-EFIS::SpeedLadder::paint_speed_limits (float x)
+EFISWidget::SpeedLadder::paint_speed_limits (float x)
 {
 	if (!_efis._speed_visible)
 		return;
@@ -673,7 +673,7 @@ EFIS::SpeedLadder::paint_speed_limits (float x)
 
 
 void
-EFIS::SpeedLadder::paint_bugs (float x)
+EFISWidget::SpeedLadder::paint_bugs (float x)
 {
 	if (!_efis._speed_visible)
 		return;
@@ -729,7 +729,7 @@ EFIS::SpeedLadder::paint_bugs (float x)
 
 
 void
-EFIS::SpeedLadder::paint_mach_number (float x)
+EFISWidget::SpeedLadder::paint_mach_number (float x)
 {
 	if (!_efis._mach_visible)
 		return;
@@ -761,7 +761,7 @@ EFIS::SpeedLadder::paint_mach_number (float x)
 
 
 void
-EFIS::SpeedLadder::paint_ap_setting (float)
+EFISWidget::SpeedLadder::paint_ap_setting (float)
 {
 	auto ap_bug = _efis._speed_bugs.find (AT);
 	if (ap_bug == _efis._speed_bugs.end())
@@ -794,7 +794,7 @@ EFIS::SpeedLadder::paint_ap_setting (float)
 }
 
 
-EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter& painter):
+EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
@@ -834,7 +834,7 @@ EFIS::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFIS& efis, QPainter
 
 
 void
-EFIS::AttitudeDirectorIndicator::paint()
+EFISWidget::AttitudeDirectorIndicator::paint()
 {
 	paint_horizon();
 	paint_flight_path_marker();
@@ -845,7 +845,7 @@ EFIS::AttitudeDirectorIndicator::paint()
 
 
 void
-EFIS::AttitudeDirectorIndicator::paint_horizon()
+EFISWidget::AttitudeDirectorIndicator::paint_horizon()
 {
 	_painter.save();
 
@@ -875,7 +875,7 @@ EFIS::AttitudeDirectorIndicator::paint_horizon()
 
 // TODO refactor
 void
-EFIS::AttitudeDirectorIndicator::paint_pitch()
+EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 {
 	if (!_efis._pitch_visibility)
 		return;
@@ -947,7 +947,7 @@ EFIS::AttitudeDirectorIndicator::paint_pitch()
 
 // TODO refactor
 void
-EFIS::AttitudeDirectorIndicator::paint_roll()
+EFISWidget::AttitudeDirectorIndicator::paint_roll()
 {
 	if (!_efis._roll_visibility)
 		return;
@@ -1006,7 +1006,7 @@ EFIS::AttitudeDirectorIndicator::paint_roll()
 
 // TODO refactor
 void
-EFIS::AttitudeDirectorIndicator::paint_heading()
+EFISWidget::AttitudeDirectorIndicator::paint_heading()
 {
 	float const w = _efis.wh() * 2.25f / 9.f;
 	float const fpxs = _efis._font_10_bold.pixelSize();
@@ -1061,7 +1061,7 @@ EFIS::AttitudeDirectorIndicator::paint_heading()
 
 
 void
-EFIS::AttitudeDirectorIndicator::paint_flight_path_marker()
+EFISWidget::AttitudeDirectorIndicator::paint_flight_path_marker()
 {
 	if (!_efis._flight_path_visible)
 		return;
@@ -1098,7 +1098,7 @@ EFIS::AttitudeDirectorIndicator::paint_flight_path_marker()
 
 
 QPainterPath
-EFIS::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
+EFISWidget::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 {
 	float const w = _efis.wh() * 2.f / 9.f;
 
@@ -1111,7 +1111,7 @@ EFIS::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 }
 
 
-EFIS::EFIS (QWidget* parent):
+EFISWidget::EFISWidget (QWidget* parent):
 	QWidget (parent, nullptr)
 {
 	setAttribute (Qt::WA_NoBackground);
@@ -1154,7 +1154,7 @@ EFIS::EFIS (QWidget* parent):
 
 
 void
-EFIS::set_input_alert_timeout (Seconds timeout)
+EFISWidget::set_input_alert_timeout (Seconds timeout)
 {
 	_input_alert_timeout = timeout;
 
@@ -1171,7 +1171,7 @@ EFIS::set_input_alert_timeout (Seconds timeout)
 
 
 void
-EFIS::hide_all()
+EFISWidget::hide_all()
 {
 	remove_altitude_bug (AP);
 	remove_speed_bug (AT);
@@ -1188,7 +1188,7 @@ EFIS::hide_all()
 
 
 void
-EFIS::read_input()
+EFISWidget::read_input()
 {
 	hide_all();
 
@@ -1288,7 +1288,7 @@ EFIS::read_input()
 
 
 void
-EFIS::input_timeout()
+EFISWidget::input_timeout()
 {
 	_input_alert_hide_timer->stop();
 	_show_input_alert = true;
@@ -1297,7 +1297,7 @@ EFIS::input_timeout()
 
 
 void
-EFIS::input_ok()
+EFISWidget::input_ok()
 {
 	_show_input_alert = false;
 	update();
@@ -1305,7 +1305,7 @@ EFIS::input_ok()
 
 
 void
-EFIS::paintEvent (QPaintEvent* paint_event)
+EFISWidget::paintEvent (QPaintEvent* paint_event)
 {
 	float const w = width();
 	float const h = height();
@@ -1353,14 +1353,14 @@ EFIS::paintEvent (QPaintEvent* paint_event)
 
 
 void
-EFIS::resizeEvent (QResizeEvent*)
+EFISWidget::resizeEvent (QResizeEvent*)
 {
 	update_fonts();
 }
 
 
 void
-EFIS::paint_center_cross (QPainter& painter)
+EFISWidget::paint_center_cross (QPainter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -1397,7 +1397,7 @@ EFIS::paint_center_cross (QPainter& painter)
 
 
 void
-EFIS::paint_input_alert (QPainter& painter)
+EFISWidget::paint_input_alert (QPainter& painter)
 {
 	painter.save();
 
@@ -1432,7 +1432,7 @@ EFIS::paint_input_alert (QPainter& painter)
 
 
 int
-EFIS::get_digit_width (QFont& font) const
+EFISWidget::get_digit_width (QFont& font) const
 {
 	QFontMetrics font_metrics (font);
 	int digit_width = 0;
@@ -1443,7 +1443,7 @@ EFIS::get_digit_width (QFont& font) const
 
 
 void
-EFIS::update_fonts()
+EFISWidget::update_fonts()
 {
 	float const height_scale_factor = 0.7f;
 

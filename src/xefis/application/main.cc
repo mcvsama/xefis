@@ -29,7 +29,7 @@
 #include <xefis/application/services.h>
 #include <xefis/core/property_storage.h>
 #include <xefis/utility/backtrace.h>
-#include <widgets/efis.h>
+#include <instruments/efis.h>
 #include <xefis/components/property_tree/property_storage_widget.h>
 
 // Local:

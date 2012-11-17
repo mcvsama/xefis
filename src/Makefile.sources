@@ -58,6 +58,10 @@ SRC_SOURCES += xefis/core/property_storage.cc
 
 ######## /xefis/instruments ########
 
+SRC_HEADERS += instruments/efis.h
+
+SRC_SOURCES += instruments/efis.cc
+
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
@@ -69,11 +73,11 @@ SRC_SOURCES += xefis/utility/text_painter.cc
 
 ######## /widgets ########
 
-SRC_HEADERS += widgets/efis.h
+SRC_HEADERS += widgets/efis_widget.h
 
-SRC_SOURCES += widgets/efis.cc
+SRC_SOURCES += widgets/efis_widget.cc
 
-SRC_MOCHDRS += widgets/efis.h
+SRC_MOCHDRS += widgets/efis_widget.h
 
 ################
 

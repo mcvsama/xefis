@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__WIDGETS__EFIS_H__INCLUDED
-#define XEFIS__WIDGETS__EFIS_H__INCLUDED
+#ifndef XEFIS__WIDGETS__EFIS_WIDGET_H__INCLUDED
+#define XEFIS__WIDGETS__EFIS_WIDGET_H__INCLUDED
 
 // Qt:
 #include <QtGui/QWidget>
@@ -31,7 +31,7 @@
 #include <xefis/utility/text_painter.h>
 
 
-class EFIS: public QWidget
+class EFISWidget: public QWidget
 {
 	Q_OBJECT
 
@@ -41,7 +41,7 @@ class EFIS: public QWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFIS&, QPainter&);
+		AltitudeLadder (EFISWidget&, QPainter&);
 
 		void
 		paint();
@@ -72,7 +72,7 @@ class EFIS: public QWidget
 		scale_cbr (FeetPerMinute climb_rate) const;
 
 	  private:
-		EFIS&			_efis;
+		EFISWidget&		_efis;
 		QPainter&		_painter;
 		TextPainter		_text_painter;
 		Feet			_altitude;
@@ -97,7 +97,7 @@ class EFIS: public QWidget
 	class SpeedLadder
 	{
 	  public:
-		SpeedLadder (EFIS&, QPainter&);
+		SpeedLadder (EFISWidget&, QPainter&);
 
 		void
 		paint();
@@ -125,7 +125,7 @@ class EFIS: public QWidget
 		kt_to_px (Knots ft) const;
 
 	  private:
-		EFIS&		_efis;
+		EFISWidget&	_efis;
 		QPainter&	_painter;
 		TextPainter	_text_painter;
 		Knots		_speed;
@@ -148,7 +148,7 @@ class EFIS: public QWidget
 	class AttitudeDirectorIndicator
 	{
 	  public:
-		AttitudeDirectorIndicator (EFIS&, QPainter&);
+		AttitudeDirectorIndicator (EFISWidget&, QPainter&);
 
 		void
 		paint();
@@ -179,7 +179,7 @@ class EFIS: public QWidget
 		heading_to_px (Degrees degrees) const;
 
 	  private:
-		EFIS&			_efis;
+		EFISWidget&		_efis;
 		QPainter&		_painter;
 		TextPainter		_text_painter;
 		Degrees			_pitch;
@@ -201,7 +201,7 @@ class EFIS: public QWidget
 	static const char* AT;
 
   public:
-	EFIS (QWidget* parent);
+	EFISWidget (QWidget* parent);
 
 	/**
 	 * Show input alert when data is not coming for given period of time.
@@ -357,7 +357,7 @@ class EFIS: public QWidget
 	speed_bug (QString name) const;
 
 	/**
-	 * Add new speed bug. A special value EFIS::AT ("A/T")
+	 * Add new speed bug. A special value EFISWidget::AT ("A/T")
 	 * renders autothrottle-style bug instead of a regular one.
 	 */
 	void
@@ -377,7 +377,7 @@ class EFIS: public QWidget
 	altitude_bug (QString name) const;
 
 	/**
-	 * Add new altitude bug. A special value EFIS::AP ("A/P")
+	 * Add new altitude bug. A special value EFISWidget::AP ("A/P")
 	 * renders autopilot-style bug instead of a regular one.
 	 */
 	void
@@ -618,21 +618,21 @@ class EFIS: public QWidget
 
 
 inline float
-EFIS::AltitudeLadder::ft_to_px (Feet ft) const
+EFISWidget::AltitudeLadder::ft_to_px (Feet ft) const
 {
 	return -0.5f * _ladder_rect.height() * (ft - _altitude) / (_extent / 2.f);
 }
 
 
 inline float
-EFIS::SpeedLadder::kt_to_px (Knots kt) const
+EFISWidget::SpeedLadder::kt_to_px (Knots kt) const
 {
 	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
 }
 
 
 inline float
-EFIS::AttitudeDirectorIndicator::pitch_to_px (Degrees degrees) const
+EFISWidget::AttitudeDirectorIndicator::pitch_to_px (Degrees degrees) const
 {
 	float const correction = 0.775f;
 	return -degrees / (_efis._fov * correction) * _efis.wh();
@@ -640,21 +640,21 @@ EFIS::AttitudeDirectorIndicator::pitch_to_px (Degrees degrees) const
 
 
 inline float
-EFIS::AttitudeDirectorIndicator::heading_to_px (Degrees degrees) const
+EFISWidget::AttitudeDirectorIndicator::heading_to_px (Degrees degrees) const
 {
 	return pitch_to_px (-degrees);
 }
 
 
 inline Degrees
-EFIS::pitch() const
+EFISWidget::pitch() const
 {
 	return _pitch;
 }
 
 
 inline void
-EFIS::set_pitch (Degrees degrees)
+EFISWidget::set_pitch (Degrees degrees)
 {
 	_pitch = degrees;
 	update();
@@ -662,7 +662,7 @@ EFIS::set_pitch (Degrees degrees)
 
 
 inline void
-EFIS::set_pitch_visibility (bool visible)
+EFISWidget::set_pitch_visibility (bool visible)
 {
 	_pitch_visibility = visible;
 	update();
@@ -670,14 +670,14 @@ EFIS::set_pitch_visibility (bool visible)
 
 
 inline Degrees
-EFIS::roll() const
+EFISWidget::roll() const
 {
 	return _roll;
 }
 
 
 inline void
-EFIS::set_roll (Degrees degrees)
+EFISWidget::set_roll (Degrees degrees)
 {
 	_roll = degrees;
 	update();
@@ -685,7 +685,7 @@ EFIS::set_roll (Degrees degrees)
 
 
 inline void
-EFIS::set_roll_visibility (bool visible)
+EFISWidget::set_roll_visibility (bool visible)
 {
 	_roll_visibility = visible;
 	update();
@@ -693,14 +693,14 @@ EFIS::set_roll_visibility (bool visible)
 
 
 inline Degrees
-EFIS::heading() const
+EFISWidget::heading() const
 {
 	return _heading;
 }
 
 
 inline void
-EFIS::set_heading (Degrees degrees)
+EFISWidget::set_heading (Degrees degrees)
 {
 	_heading = degrees;
 	update();
@@ -708,7 +708,7 @@ EFIS::set_heading (Degrees degrees)
 
 
 inline void
-EFIS::set_heading_visibility (bool visible)
+EFISWidget::set_heading_visibility (bool visible)
 {
 	_heading_visibility = visible;
 	update();
@@ -716,14 +716,14 @@ EFIS::set_heading_visibility (bool visible)
 
 
 inline Degrees
-EFIS::flight_path_alpha() const
+EFISWidget::flight_path_alpha() const
 {
 	return _flight_path_alpha;
 }
 
 
 inline void
-EFIS::set_flight_path_alpha (Degrees pitch)
+EFISWidget::set_flight_path_alpha (Degrees pitch)
 {
 	_flight_path_alpha = pitch;
 	update();
@@ -731,14 +731,14 @@ EFIS::set_flight_path_alpha (Degrees pitch)
 
 
 inline Degrees
-EFIS::flight_path_beta() const
+EFISWidget::flight_path_beta() const
 {
 	return _flight_path_beta;
 }
 
 
 inline void
-EFIS::set_flight_path_beta (Degrees heading)
+EFISWidget::set_flight_path_beta (Degrees heading)
 {
 	_flight_path_beta = heading;
 	update();
@@ -746,7 +746,7 @@ EFIS::set_flight_path_beta (Degrees heading)
 
 
 inline void
-EFIS::set_flight_path_marker_visibility (bool visible)
+EFISWidget::set_flight_path_marker_visibility (bool visible)
 {
 	_flight_path_visible = visible;
 	update();
@@ -754,14 +754,14 @@ EFIS::set_flight_path_marker_visibility (bool visible)
 
 
 inline Knots
-EFIS::speed() const
+EFISWidget::speed() const
 {
 	return _speed;
 }
 
 
 inline void
-EFIS::set_speed (Knots speed)
+EFISWidget::set_speed (Knots speed)
 {
 	_speed = speed;
 	update();
@@ -769,7 +769,7 @@ EFIS::set_speed (Knots speed)
 
 
 inline void
-EFIS::set_speed_visibility (bool visible)
+EFISWidget::set_speed_visibility (bool visible)
 {
 	_speed_visible = visible;
 	update();
@@ -777,14 +777,14 @@ EFIS::set_speed_visibility (bool visible)
 
 
 inline Feet
-EFIS::altitude() const
+EFISWidget::altitude() const
 {
 	return _altitude;
 }
 
 
 inline void
-EFIS::set_altitude (Feet altitude)
+EFISWidget::set_altitude (Feet altitude)
 {
 	_altitude = altitude;
 	update();
@@ -792,7 +792,7 @@ EFIS::set_altitude (Feet altitude)
 
 
 inline void
-EFIS::set_altitude_visibility (bool visible)
+EFISWidget::set_altitude_visibility (bool visible)
 {
 	_altitude_visible = visible;
 	update();
@@ -800,14 +800,14 @@ EFIS::set_altitude_visibility (bool visible)
 
 
 inline FeetPerMinute
-EFIS::climb_rate() const
+EFISWidget::climb_rate() const
 {
 	return _climb_rate;
 }
 
 
 inline void
-EFIS::set_climb_rate (FeetPerMinute feet_per_minute)
+EFISWidget::set_climb_rate (FeetPerMinute feet_per_minute)
 {
 	_climb_rate = feet_per_minute;
 	update();
@@ -815,7 +815,7 @@ EFIS::set_climb_rate (FeetPerMinute feet_per_minute)
 
 
 inline void
-EFIS::set_climb_rate_visibility (bool visible)
+EFISWidget::set_climb_rate_visibility (bool visible)
 {
 	_climb_rate_visible = visible;
 	update();
@@ -823,7 +823,7 @@ EFIS::set_climb_rate_visibility (bool visible)
 
 
 inline Knots
-EFIS::speed_bug (QString name) const
+EFISWidget::speed_bug (QString name) const
 {
 	auto it = _speed_bugs.find (name);
 	if (it != _speed_bugs.end())
@@ -833,7 +833,7 @@ EFIS::speed_bug (QString name) const
 
 
 inline void
-EFIS::add_speed_bug (QString name, Knots speed)
+EFISWidget::add_speed_bug (QString name, Knots speed)
 {
 	_speed_bugs[name] = speed;
 	update();
@@ -841,7 +841,7 @@ EFIS::add_speed_bug (QString name, Knots speed)
 
 
 inline void
-EFIS::remove_speed_bug (QString name)
+EFISWidget::remove_speed_bug (QString name)
 {
 	if (name.isNull())
 		_speed_bugs.clear();
@@ -852,7 +852,7 @@ EFIS::remove_speed_bug (QString name)
 
 
 inline Feet
-EFIS::altitude_bug (QString name) const
+EFISWidget::altitude_bug (QString name) const
 {
 	auto it = _altitude_bugs.find (name);
 	if (it != _altitude_bugs.end())
@@ -862,7 +862,7 @@ EFIS::altitude_bug (QString name) const
 
 
 inline void
-EFIS::add_altitude_bug (QString name, Feet altitude)
+EFISWidget::add_altitude_bug (QString name, Feet altitude)
 {
 	_altitude_bugs[name] = altitude;
 	update();
@@ -870,7 +870,7 @@ EFIS::add_altitude_bug (QString name, Feet altitude)
 
 
 inline void
-EFIS::remove_altitude_bug (QString name)
+EFISWidget::remove_altitude_bug (QString name)
 {
 	if (name.isNull())
 		_altitude_bugs.clear();
@@ -881,14 +881,14 @@ EFIS::remove_altitude_bug (QString name)
 
 
 inline float
-EFIS::mach() const
+EFISWidget::mach() const
 {
 	return _mach;
 }
 
 
 inline void
-EFIS::set_mach (float value)
+EFISWidget::set_mach (float value)
 {
 	_mach = value;
 	update();
@@ -896,7 +896,7 @@ EFIS::set_mach (float value)
 
 
 inline void
-EFIS::set_mach_visibility (bool visible)
+EFISWidget::set_mach_visibility (bool visible)
 {
 	_mach_visible = visible;
 	update();
@@ -904,14 +904,14 @@ EFIS::set_mach_visibility (bool visible)
 
 
 inline InHg
-EFIS::pressure() const
+EFISWidget::pressure() const
 {
 	return _pressure;
 }
 
 
 inline void
-EFIS::set_pressure (InHg pressure)
+EFISWidget::set_pressure (InHg pressure)
 {
 	_pressure = pressure;
 	update();
@@ -919,7 +919,7 @@ EFIS::set_pressure (InHg pressure)
 
 
 inline void
-EFIS::set_pressure_visibility (bool visible)
+EFISWidget::set_pressure_visibility (bool visible)
 {
 	_pressure_visible = visible;
 	update();
@@ -927,14 +927,14 @@ EFIS::set_pressure_visibility (bool visible)
 
 
 inline Knots
-EFIS::minimum_speed() const
+EFISWidget::minimum_speed() const
 {
 	return _minimum_speed;
 }
 
 
 inline void
-EFIS::set_minimum_speed (Knots minimum_speed)
+EFISWidget::set_minimum_speed (Knots minimum_speed)
 {
 	_minimum_speed = minimum_speed;
 	update();
@@ -942,7 +942,7 @@ EFIS::set_minimum_speed (Knots minimum_speed)
 
 
 inline void
-EFIS::set_minimum_speed_visibility (bool visible)
+EFISWidget::set_minimum_speed_visibility (bool visible)
 {
 	_minimum_speed_visible = visible;
 	update();
@@ -950,14 +950,14 @@ EFIS::set_minimum_speed_visibility (bool visible)
 
 
 inline Knots
-EFIS::warning_speed() const
+EFISWidget::warning_speed() const
 {
 	return _warning_speed;
 }
 
 
 inline void
-EFIS::set_warning_speed (Knots warning_speed)
+EFISWidget::set_warning_speed (Knots warning_speed)
 {
 	_warning_speed = warning_speed;
 	update();
@@ -965,7 +965,7 @@ EFIS::set_warning_speed (Knots warning_speed)
 
 
 inline void
-EFIS::set_warning_speed_visibility (bool visible)
+EFISWidget::set_warning_speed_visibility (bool visible)
 {
 	_warning_speed_visible = visible;
 	update();
@@ -973,14 +973,14 @@ EFIS::set_warning_speed_visibility (bool visible)
 
 
 inline Knots
-EFIS::maximum_speed() const
+EFISWidget::maximum_speed() const
 {
 	return _maximum_speed;
 }
 
 
 inline void
-EFIS::set_maximum_speed (Knots maximum_speed)
+EFISWidget::set_maximum_speed (Knots maximum_speed)
 {
 	_maximum_speed = maximum_speed;
 	update();
@@ -988,7 +988,7 @@ EFIS::set_maximum_speed (Knots maximum_speed)
 
 
 inline void
-EFIS::set_maximum_speed_visibility (bool visible)
+EFISWidget::set_maximum_speed_visibility (bool visible)
 {
 	_maximum_speed_visible = visible;
 	update();
@@ -996,14 +996,14 @@ EFIS::set_maximum_speed_visibility (bool visible)
 
 
 inline Degrees
-EFIS::fov() const
+EFISWidget::fov() const
 {
 	return _fov;
 }
 
 
 inline void
-EFIS::set_fov (Degrees degrees)
+EFISWidget::set_fov (Degrees degrees)
 {
 	_fov = degrees;
 	update();
@@ -1011,28 +1011,28 @@ EFIS::set_fov (Degrees degrees)
 
 
 inline float
-EFIS::wh() const
+EFISWidget::wh() const
 {
 	return std::min (0.8f * width(), 1.f * height());
 }
 
 
 inline QPen
-EFIS::get_pen (QColor const& color, float width)
+EFISWidget::get_pen (QColor const& color, float width)
 {
 	return QPen (color, pen_width (width), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 }
 
 
 inline float
-EFIS::pen_width (float scale) const
+EFISWidget::pen_width (float scale) const
 {
 	return scale * wh() / 325.f;
 }
 
 
 inline float
-EFIS::font_size (float scale) const
+EFISWidget::font_size (float scale) const
 {
 	return scale * wh() / 375.f;
 }
