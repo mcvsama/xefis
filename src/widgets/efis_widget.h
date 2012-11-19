@@ -113,6 +113,9 @@ class EFISWidget: public QWidget
 		paint_speed_limits (float x);
 
 		void
+		paint_speed_tendency (float x);
+
+		void
 		paint_bugs (float x);
 
 		void
@@ -474,6 +477,18 @@ class EFISWidget: public QWidget
 	set_maximum_speed_visibility (bool visible);
 
 	/**
+	 * Set speed tendency value.
+	 */
+	void
+	set_speed_tendency (KnotsPerSecond);
+
+	/**
+	 * Set speed tendency arrow visibility.
+	 */
+	void
+	set_speed_tendency_visibility (bool visible);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -580,6 +595,8 @@ class EFISWidget: public QWidget
 	bool				_warning_speed_visible		= false;
 	Knots				_maximum_speed				= 0.f;
 	bool				_maximum_speed_visible		= false;
+	KnotsPerSecond		_speed_tendency				= 0.f;
+	bool				_speed_tendency_visible		= false;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
@@ -960,6 +977,22 @@ inline void
 EFISWidget::set_maximum_speed_visibility (bool visible)
 {
 	_maximum_speed_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_speed_tendency (KnotsPerSecond kps)
+{
+	_speed_tendency = kps;
+	update();
+}
+
+
+inline void
+EFISWidget::set_speed_tendency_visibility (bool visible)
+{
+	_speed_tendency_visible = visible;
 	update();
 }
 

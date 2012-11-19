@@ -84,6 +84,8 @@ EFIS::set_path (QString const& path)
 
 	_speed_kt = Xefis::Property<float> (_property_path + "/speed/kt");
 	_speed_valid = Xefis::Property<bool> (_property_path + "/speed/valid");
+	_speed_tendency_ktps = Xefis::Property<float> (_property_path + "/speed/lookahead/ktps");
+	_speed_tendency_valid = Xefis::Property<bool> (_property_path + "/speed/lookahead/valid");
 	_mach = Xefis::Property<float> (_property_path + "/mach/value");
 	_mach_valid = Xefis::Property<bool> (_property_path + "/mach/valid");
 	_pitch_deg = Xefis::Property<float> (_property_path + "/pitch/deg");
@@ -114,6 +116,9 @@ EFIS::read()
 {
 	_efis_widget->set_speed (*_speed_kt);;
 	_efis_widget->set_speed_visibility (*_speed_valid);
+
+	_efis_widget->set_speed_tendency (*_speed_tendency_ktps);;
+	_efis_widget->set_speed_tendency_visibility(*_speed_tendency_valid);
 
 	_efis_widget->set_mach (*_mach);
 	_efis_widget->set_mach_visibility (*_mach_valid);
@@ -183,6 +188,11 @@ EFIS::read_input()
 			{
 				_speed_kt.write (value.toFloat());
 				_speed_valid.write (true);
+			}
+			if (var == "ias-tend")
+			{
+				_speed_tendency_ktps.write (value.toFloat());
+				_speed_tendency_valid.write (true);
 			}
 			if (var == "mach")
 			{

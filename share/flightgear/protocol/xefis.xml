@@ -43,6 +43,12 @@
 				<format>mach=%f</format>
 				<node>/instrumentation/airspeed-indicator/indicated-mach</node>
 			</chunk>
+			<chunk>
+				<name>ias-tend</name>
+				<type>float</type>
+				<format>ias-tend=%f</format>
+				<node>/autopilot/internal/lookahead-5-sec-airspeed-kt</node>
+			</chunk>
 			<!-- Altitude -->
 			<chunk>
 				<name>altitude</name>

@@ -92,6 +92,8 @@ class EFIS: public QWidget
 
 	Xefis::Property<float>	_speed_kt;
 	Xefis::Property<bool>	_speed_valid;
+	Xefis::Property<float>	_speed_tendency_ktps;
+	Xefis::Property<bool>	_speed_tendency_valid;
 	Xefis::Property<float>	_mach;
 	Xefis::Property<bool>	_mach_valid;
 	Xefis::Property<float>	_pitch_deg;

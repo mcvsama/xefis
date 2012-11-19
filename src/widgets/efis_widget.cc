@@ -508,6 +508,7 @@ EFISWidget::SpeedLadder::paint()
 	paint_black_box (x, true);
 	paint_ladder_scale (x);
 	paint_speed_limits (x);
+	paint_speed_tendency (x);
 	paint_bugs (x);
 	paint_black_box (x);
 	paint_mach_number (x);
@@ -668,6 +669,34 @@ EFISWidget::SpeedLadder::paint_speed_limits (float x)
 		_painter.drawLine (QPointF (_ladder_rect.right(), min_posy), zero_point);
 	}
 
+	_painter.restore();
+}
+
+
+void
+EFISWidget::SpeedLadder::paint_speed_tendency (float x)
+{
+	if (!_efis._speed_tendency_visible || !_efis._speed_visible)
+		return;
+
+	QPen pen (_efis.get_pen (_efis._navigation_color, 1.25f));
+	pen.setCapStyle (Qt::RoundCap);
+	pen.setJoinStyle (Qt::RoundJoin);
+
+	_painter.save();
+	_painter.setPen (pen);
+	_painter.translate (1.25f * x, 0.f);
+	if (_efis._speed_tendency < _efis._speed)
+		_painter.scale (1.f, -1.f);
+	float length = std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency))) - 0.5f * x;
+	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
+	if (length > 0)
+		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
+	_painter.translate (0.f, -length);
+	_painter.drawPolygon (QPolygonF()
+		<< QPointF (0.f, -0.5f * x)
+		<< QPointF (-0.2f * x, 0.f)
+		<< QPointF (+0.2f * x, 0.f));
 	_painter.restore();
 }
 
