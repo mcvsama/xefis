@@ -33,9 +33,12 @@ class PropertyTreeWidget: public QTreeWidget
 {
 	friend class PropertyTreeWidgetItem;
 
+	Q_OBJECT
+
   public:
 	PropertyTreeWidget (PropertyNode* root_node, QWidget* parent);
 
+  public slots:
 	/**
 	 * Reads the nodes structure and updates
 	 * tree widget.

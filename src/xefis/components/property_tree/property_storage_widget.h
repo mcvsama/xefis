@@ -44,6 +44,7 @@ class PropertyStorageWidget: public QWidget
 
   private:
 	PropertyTreeWidget*	_property_tree;
+	QTimer*				_refresh_timer;
 };
 
 } // namespace Xefis

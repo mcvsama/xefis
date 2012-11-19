@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property.h>
 #include <widgets/efis_widget.h>
 
 
@@ -39,6 +40,19 @@ class EFIS: public QWidget
 	 */
 	void
 	set_input_alert_timeout (Seconds timeout);
+
+	/**
+	 * Set path in the PropertyStorage where input data is stored.
+	 */
+	void
+	set_path (QString const& path);
+
+  public slots:
+	/**
+	 * Force EFIS to read data.
+	 */
+	void
+	read();
 
   private slots:
 	/**
@@ -62,18 +76,44 @@ class EFIS: public QWidget
 
   private:
 	/**
-	 * Hide all indicators.
+	 * Set all input properties as invalid.
 	 */
 	void
-	hide_all();
+	invalidate_all();
 
   private:
-	EFISWidget*	_efis_widget				= nullptr;
-	Seconds		_input_alert_timeout		= 0.0f;
-	QTimer*		_input_alert_timer			= nullptr;
-	QTimer*		_input_alert_hide_timer		= nullptr;
-	bool		_show_input_alert			= false;
-	QUdpSocket*	_input						= nullptr;
+	EFISWidget*				_efis_widget				= nullptr;
+	Seconds					_input_alert_timeout		= 0.0f;
+	QTimer*					_input_alert_timer			= nullptr;
+	QTimer*					_input_alert_hide_timer		= nullptr;
+	bool					_show_input_alert			= false;
+	QUdpSocket*				_input						= nullptr;
+	std::string				_property_path;
+
+	Xefis::Property<float>	_speed_kt;
+	Xefis::Property<bool>	_speed_valid;
+	Xefis::Property<float>	_mach;
+	Xefis::Property<bool>	_mach_valid;
+	Xefis::Property<float>	_pitch_deg;
+	Xefis::Property<bool>	_pitch_valid;
+	Xefis::Property<float>	_roll_deg;
+	Xefis::Property<bool>	_roll_valid;
+	Xefis::Property<float>	_heading_deg;
+	Xefis::Property<bool>	_heading_valid;
+	Xefis::Property<float>	_fpm_alpha_deg;
+	Xefis::Property<bool>	_fpm_alpha_valid;
+	Xefis::Property<float>	_fpm_beta_deg;
+	Xefis::Property<bool>	_fpm_beta_valid;
+	Xefis::Property<float>	_altitude_ft;
+	Xefis::Property<bool>	_altitude_valid;
+	Xefis::Property<float>	_pressure_inhg;
+	Xefis::Property<bool>	_pressure_valid;
+	Xefis::Property<float>	_cbr_fpm;
+	Xefis::Property<bool>	_cbr_valid;
+	Xefis::Property<float>	_autopilot_alt_setting_ft;
+	Xefis::Property<bool>	_autopilot_alt_setting_valid;
+	Xefis::Property<float>	_autopilot_speed_setting_kt;
+	Xefis::Property<bool>	_autopilot_speed_setting_valid;
 };
 
 #endif

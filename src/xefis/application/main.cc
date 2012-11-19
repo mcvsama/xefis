@@ -67,12 +67,6 @@ int main (int argc, char** argv, char**)
 			// Init Xefis modules:
 			Xefis::PropertyStorage::initialize();
 
-			Xefis::PropertyNode* n = Xefis::PropertyStorage::root();
-			Xefis::PropertyNode* alt = n->mkpath ("/instrumentation/efis/altimeter");
-			alt->add_child (new Xefis::PropertyNode ("value", 1000.5f));
-			alt->add_child (new Xefis::PropertyNode ("valid", true));
-			alt->add_child (new Xefis::PropertyNode ("message", "altitude valid"));
-
 			Xefis::PropertyStorageWidget* property_storage_widget = new Xefis::PropertyStorageWidget (Xefis::PropertyStorage::root(), nullptr);
 			property_storage_widget->show();
 

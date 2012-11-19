@@ -143,5 +143,13 @@ PropertyNode::remove_child (PropertyNode* child)
 	}
 }
 
+
+void
+PropertyNode::clear()
+{
+	for (auto c: _children)
+		delete c;
+}
+
 } // namespace Xefis
 

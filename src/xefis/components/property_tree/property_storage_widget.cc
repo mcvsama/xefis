@@ -15,6 +15,7 @@
 #include <cstddef>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtGui/QLayout>
 
 // Xefis:
@@ -35,6 +36,11 @@ PropertyStorageWidget::PropertyStorageWidget (PropertyNode* property_node, QWidg
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->addWidget (_property_tree);
+
+	_refresh_timer = new QTimer (this);
+	_refresh_timer->setInterval (66); // 15 fps
+	QObject::connect (_refresh_timer, SIGNAL (timeout()), _property_tree, SLOT (read()));
+	_refresh_timer->start();
 }
 
 

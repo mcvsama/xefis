@@ -109,6 +109,11 @@ class PropertyNode
 	PropertyNode (std::string const& name, std::string const& value);
 
 	/**
+	 * Deletes child properties.
+	 */
+	~PropertyNode();
+
+	/**
 	 * Return node name.
 	 */
 	std::string
@@ -200,6 +205,12 @@ class PropertyNode
 	void
 	remove_child (PropertyNode*);
 
+	/**
+	 * Removes and deletes child properties.
+	 */
+	void
+	clear();
+
   protected:
 	/**
 	 * Helper function for reading data.
@@ -287,6 +298,13 @@ PropertyNode::PropertyNode (std::string const& name, std::string const& value):
 	_name (name),
 	_value_string (value)
 { }
+
+
+inline
+PropertyNode::~PropertyNode()
+{
+	clear();
+}
 
 
 inline std::string

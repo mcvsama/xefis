@@ -1124,18 +1124,6 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_font = Xefis::Services::instrument_font();
 
 	update_fonts();
-
-	set_maximum_speed (148.f);
-	set_maximum_speed_visibility (true);
-	set_warning_speed (70.f);
-	set_warning_speed_visibility (true);
-	set_minimum_speed (60.f);
-	set_minimum_speed_visibility (true);
-
-	add_speed_bug ("VA", 120.f);
-	add_speed_bug ("VFE", 104.f);
-
-	add_altitude_bug (LDGALT, 0.f);
 }
 
 
