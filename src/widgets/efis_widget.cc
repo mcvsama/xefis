@@ -54,7 +54,6 @@ EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter)
 	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_1 (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_2 (_efis.get_pen (QColor (255, 255, 255), 3.f)),
-	_negative_altitude_pen (_efis.get_pen (QColor (255, 128, 128), 1.f)),
 	_altitude_bug_pen (_efis.get_pen (QColor (0, 255, 0), 1.5f)),
 	_ldg_alt_pen (_efis.get_pen (QColor (255, 220, 0), 1.5f))
 { }
@@ -126,14 +125,22 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 		<< QPointF (0.f, +0.5f * x));
 
 	_painter.setFont (b_font);
-	if (_sgn < 0.f)
-		_painter.setPen (_negative_altitude_pen);
 
 	// 11000 part of the altitude:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = _sgn < 0.f ? MINUS_SIGN : "";
 	_text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-							minus_sign_s + QString::number (std::abs (_rounded_altitude / 1000)));
+							QString::number (std::abs (_rounded_altitude / 1000)));
+	if (-10000.f < _rounded_altitude && _rounded_altitude < 10000.f)
+	{
+		QColor color = _sgn >= 0.f ? QColor (0, 255, 0) : QColor (255, 0, 0);
+		QRectF green_square_box (-0.3f * b_digit_width, -0.4f * b_digit_height, 0.6f * b_digit_width, 0.78f * b_digit_height);
+		green_square_box.translate (0.5f * x + 0.75f * margin, 0.f);
+		_painter.save();
+		_painter.setPen (Qt::NoPen);
+		_painter.setBrush (QBrush (color, Qt::Dense4Pattern));
+		_painter.drawRect (green_square_box);
+		_painter.restore();
+	}
 
 	_painter.setFont (s_font);
 
@@ -438,15 +445,15 @@ EFISWidget::AltitudeLadder::paint_ap_setting (float)
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
 	QString minus_sign_s = ap_bug->second < 0.f ? MINUS_SIGN : "";
-	_text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-							minus_sign_s + QString::number (std::abs (static_cast<int> (ap_bug->second / 1000))));
+	_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
+					   minus_sign_s + QString::number (std::abs (static_cast<int> (ap_bug->second / 1000))));
 
 	_painter.setFont (s_font);
 
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
-	_text_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-							QString ("%1").arg (static_cast<int> (std::abs (ap_bug->second)) % 1000, 3, 'f', 0, '0'));
+	_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
+					   QString ("%1").arg (static_cast<int> (std::abs (ap_bug->second)) % 1000, 3, 'f', 0, '0'));
 
 	_painter.restore();
 }
@@ -685,10 +692,10 @@ EFISWidget::SpeedLadder::paint_speed_tendency (float x)
 
 	_painter.save();
 	_painter.setPen (pen);
-	_painter.translate (1.25f * x, 0.f);
+	_painter.translate (1.2f * x, 0.f);
 	if (_efis._speed_tendency < _efis._speed)
 		_painter.scale (1.f, -1.f);
-	float length = std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency))) - 0.5f * x;
+	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency)))) - 0.5f * x;
 	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
 	if (length > 0)
 		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
@@ -817,7 +824,7 @@ EFISWidget::SpeedLadder::paint_ap_setting (float)
 	_painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	_text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (ap_bug->second))));
+	_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (ap_bug->second))));
 
 	_painter.restore();
 }
@@ -1185,6 +1192,7 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 		painter.restore();
 
 		paint_center_cross (painter);
+		paint_altitude_agl (painter);
 
 		painter.save();
 		SpeedLadder sl (*this, painter);
@@ -1243,6 +1251,41 @@ EFISWidget::paint_center_cross (QPainter& painter)
 	painter.drawPolygon (b);
 	painter.scale (-1.f, 1.f);
 	painter.drawPolygon (b);
+
+	painter.restore();
+}
+
+
+void
+EFISWidget::paint_altitude_agl (QPainter& painter)
+{
+	if (!_altitude_agl_visible)
+		return;
+
+	float aagl = bound (_altitude_agl, -9999.f, +99999.f);
+	QFont radar_altimeter_font = _font_20_bold;
+	float const digit_width = _font_20_digit_width;
+	float const digit_height = _font_20_digit_height;
+
+	int digits = 4;
+	if (_altitude_agl > 9999)
+		digits = 5;
+	float const margin = 0.2f * digit_width;
+
+	QRectF box_rect (0.f, 0.f, digits * digit_width + 2.f * margin, 1.3f * digit_height);
+	box_rect.translate (-box_rect.width() / 2.f, 0.35f * wh());
+
+	painter.save();
+
+	painter.setPen (get_pen (QColor (0, 0, 0), 1.f));
+	painter.setBrush (QBrush (QColor (0, 0, 0)));
+	painter.drawRect (box_rect);
+
+	painter.setPen (get_pen (QColor (255, 255, 255), 1.f));
+	painter.setFont (radar_altimeter_font);
+
+	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
+	painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
 
 	painter.restore();
 }

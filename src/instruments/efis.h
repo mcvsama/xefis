@@ -108,6 +108,8 @@ class EFIS: public QWidget
 	Xefis::Property<bool>	_fpm_beta_valid;
 	Xefis::Property<float>	_altitude_ft;
 	Xefis::Property<bool>	_altitude_valid;
+	Xefis::Property<float>	_altitude_agl_ft;
+	Xefis::Property<bool>	_altitude_agl_valid;
 	Xefis::Property<float>	_pressure_inhg;
 	Xefis::Property<bool>	_pressure_valid;
 	Xefis::Property<float>	_cbr_fpm;

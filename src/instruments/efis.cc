@@ -100,6 +100,8 @@ EFIS::set_path (QString const& path)
 	_fpm_beta_valid = Xefis::Property<bool> (_property_path + "/flight-path-marker/beta/valid");
 	_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/ft");
 	_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/valid");
+	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl/ft");
+	_altitude_agl_valid = Xefis::Property<bool> (_property_path + "/altitude/agl/valid");
 	_pressure_inhg = Xefis::Property<float> (_property_path + "/pressure/inhg");
 	_pressure_valid = Xefis::Property<bool> (_property_path + "/pressure/valid");
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
@@ -140,6 +142,9 @@ EFIS::read()
 
 	_efis_widget->set_altitude (*_altitude_ft);
 	_efis_widget->set_altitude_visibility (*_altitude_valid);
+
+	_efis_widget->set_altitude_agl (*_altitude_agl_ft);
+	_efis_widget->set_altitude_agl_visibility (*_altitude_agl_valid);
 
 	_efis_widget->set_pressure (*_pressure_inhg);
 	_efis_widget->set_pressure_visibility (*_pressure_valid);
@@ -229,6 +234,11 @@ EFIS::read_input()
 				_altitude_ft.write (value.toFloat());
 				_altitude_valid.write (true);
 			}
+			else if (var == "alt-agl")
+			{
+				_altitude_agl_ft.write (value.toFloat());
+				_altitude_agl_valid.write (value.toFloat() < 2500.f);
+			}
 			else if (var == "altimeter-inhg")
 			{
 				_pressure_inhg.write (value.toFloat());
@@ -289,6 +299,7 @@ void
 EFIS::invalidate_all()
 {
 	_speed_valid.write (false);
+	_speed_tendency_valid.write (false);
 	_mach_valid.write (false);
 	_pitch_valid.write (false);
 	_roll_valid.write (false);
@@ -296,6 +307,7 @@ EFIS::invalidate_all()
 	_fpm_alpha_valid.write (false);
 	_fpm_beta_valid.write (false);
 	_altitude_valid.write (false);
+	_altitude_agl_valid.write (false);
 	_pressure_valid.write (false);
 	_cbr_valid.write (false);
 	_autopilot_alt_setting_valid.write (false);

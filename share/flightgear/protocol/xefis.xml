@@ -47,7 +47,7 @@
 				<name>ias-tend</name>
 				<type>float</type>
 				<format>ias-tend=%f</format>
-				<node>/autopilot/internal/lookahead-5-sec-airspeed-kt</node>
+				<node>/autopilot/internal/lookahead-10-sec-airspeed-kt</node>
 			</chunk>
 			<!-- Altitude -->
 			<chunk>
@@ -55,6 +55,12 @@
 				<type>float</type>
 				<format>altitude=%f</format>
 				<node>/instrumentation/altimeter/indicated-altitude-ft</node>
+			</chunk>
+			<chunk>
+				<name>alt-agl</name>
+				<type>float</type>
+				<format>alt-agl=%f</format>
+				<node>/position/gear-agl-ft</node>
 			</chunk>
 			<chunk>
 				<name>altimeter-inhg</name>

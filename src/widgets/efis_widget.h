@@ -311,6 +311,18 @@ class EFISWidget: public QWidget
 	set_speed_visibility (bool visible);
 
 	/**
+	 * Set speed tendency value.
+	 */
+	void
+	set_speed_tendency (KnotsPerSecond);
+
+	/**
+	 * Set speed tendency arrow visibility.
+	 */
+	void
+	set_speed_tendency_visibility (bool visible);
+
+	/**
 	 * Current altitude value.
 	 */
 	Feet
@@ -321,6 +333,18 @@ class EFISWidget: public QWidget
 	 */
 	void
 	set_altitude (Feet);
+
+	/**
+	 * Set speed tendency value.
+	 */
+	void
+	set_altitude_agl (Feet);
+
+	/**
+	 * Set speed tendency arrow visibility.
+	 */
+	void
+	set_altitude_agl_visibility (bool visible);
 
 	/**
 	 * Toggle visibility of the altitude scale.
@@ -477,18 +501,6 @@ class EFISWidget: public QWidget
 	set_maximum_speed_visibility (bool visible);
 
 	/**
-	 * Set speed tendency value.
-	 */
-	void
-	set_speed_tendency (KnotsPerSecond);
-
-	/**
-	 * Set speed tendency arrow visibility.
-	 */
-	void
-	set_speed_tendency_visibility (bool visible);
-
-	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -516,6 +528,9 @@ class EFISWidget: public QWidget
 
 	void
 	paint_center_cross (QPainter&);
+
+	void
+	paint_altitude_agl (QPainter&);
 
 	void
 	paint_input_alert (QPainter&);
@@ -579,8 +594,12 @@ class EFISWidget: public QWidget
 	bool				_flight_path_visible		= false;
 	Knots				_speed						= 0.f;
 	bool				_speed_visible				= false;
+	KnotsPerSecond		_speed_tendency				= 0.f;
+	bool				_speed_tendency_visible		= false;
 	Feet				_altitude					= 0.f;
 	bool				_altitude_visible			= false;
+	Feet				_altitude_agl				= 0.f;
+	bool				_altitude_agl_visible		= false;
 	FeetPerMinute		_climb_rate					= 0.f;
 	bool				_climb_rate_visible			= false;
 	SpeedBugs			_speed_bugs;
@@ -595,8 +614,6 @@ class EFISWidget: public QWidget
 	bool				_warning_speed_visible		= false;
 	Knots				_maximum_speed				= 0.f;
 	bool				_maximum_speed_visible		= false;
-	KnotsPerSecond		_speed_tendency				= 0.f;
-	bool				_speed_tendency_visible		= false;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
@@ -781,6 +798,22 @@ inline void
 EFISWidget::set_altitude_visibility (bool visible)
 {
 	_altitude_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_agl (Feet altitude)
+{
+	_altitude_agl = altitude;
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_agl_visibility (bool visible)
+{
+	_altitude_agl_visible = visible;
 	update();
 }
 
