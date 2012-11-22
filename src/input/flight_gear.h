@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
-#define XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
+#ifndef XEFIS__INPUT__FLIGHT_GEAR_H__INCLUDED
+#define XEFIS__INPUT__FLIGHT_GEAR_H__INCLUDED
 
 // Qt:
 #include <QtGui/QWidget>
@@ -24,31 +24,41 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
-#include <xefis/core/instrument.h>
-#include <widgets/efis_widget.h>
+#include <xefis/core/input.h>
 
 
-class EFIS: public Xefis::Instrument
+class FlightGearInput:
+	public QObject,
+	public Xefis::Input
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	EFIS (QWidget* parent);
+	FlightGearInput();
+
+	// Dtor
+	~FlightGearInput();
 
 	void
 	set_path (QString const& path) override;
 
-  public slots:
+  private slots:
 	/**
-	 * Force EFIS to read data from properties.
+	 * Read and apply FlightGear datagrams from UDP socket.
 	 */
 	void
-	read();
+	read_input();
+
+	/**
+	 * Set all input properties as invalid.
+	 */
+	void
+	invalidate_all();
 
   private:
-	EFISWidget*				_efis_widget	= nullptr;
-	QUdpSocket*				_input			= nullptr;
+	QTimer*					_timeout_timer = nullptr;
+	QUdpSocket*				_input = nullptr;
 	std::string				_property_path;
 
 	Xefis::Property<float>	_speed_kt;

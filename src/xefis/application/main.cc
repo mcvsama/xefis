@@ -29,6 +29,7 @@
 #include <xefis/application/services.h>
 #include <xefis/core/property_storage.h>
 #include <xefis/utility/backtrace.h>
+#include <input/flight_gear.h>
 #include <instruments/efis.h>
 #include <xefis/components/property_tree/property_storage_widget.h>
 
@@ -70,11 +71,16 @@ int main (int argc, char** argv, char**)
 			Xefis::PropertyStorageWidget* property_storage_widget = new Xefis::PropertyStorageWidget (Xefis::PropertyStorage::root(), nullptr);
 			property_storage_widget->show();
 
-			EFIS* efis = new EFIS (nullptr);
-			efis->show();
-			efis->resize (610, 460);
+			Xefis::Input* input = new FlightGearInput();
+
+			Xefis::Instrument* instrument = new EFIS (nullptr);
+			instrument->show();
+			instrument->resize (610, 460);
+
 			app->exec();
-			delete efis;
+
+			delete instrument;
+			delete input;
 
 			Xefis::Services::deinitialize();
 

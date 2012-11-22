@@ -29,24 +29,11 @@
 
 
 EFIS::EFIS (QWidget* parent):
-	QWidget (parent)
+	Instrument (parent)
 {
 	_efis_widget = new EFISWidget (this);
 
-	_input_alert_timer = new QTimer (this);
-	_input_alert_timer->setSingleShot (true);
-	QObject::connect (_input_alert_timer, SIGNAL (timeout()), this, SLOT (input_timeout()));
-
-	_input_alert_hide_timer = new QTimer (this);
-	_input_alert_hide_timer->setSingleShot (true);
-	QObject::connect (_input_alert_hide_timer, SIGNAL (timeout()), this, SLOT (input_ok()));
-
-	_input = new QUdpSocket (this);
-	_input->bind (QHostAddress::LocalHost, 9000, QUdpSocket::ShareAddress);
-	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
-
-	set_input_alert_timeout (0.15f);
-	set_path ("/instrumentation/efis");
+	set_path ("/instrumentation");
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
@@ -56,24 +43,6 @@ EFIS::EFIS (QWidget* parent):
 	t->setInterval (33);
 	QObject::connect (t, SIGNAL (timeout()), this, SLOT (read()));
 	t->start();
-}
-
-
-void
-EFIS::set_input_alert_timeout (Seconds timeout)
-{
-	_input_alert_timeout = timeout;
-
-	if (_input_alert_timeout > 0.f)
-		_input_alert_timer->start (_input_alert_timeout * 1000.f);
-	else
-	{
-		_show_input_alert = false;
-		_input_alert_timer->stop();
-		_input_alert_hide_timer->stop();
-		_efis_widget->set_input_alert_visibility (_show_input_alert);
-		_efis_widget->update();
-	}
 }
 
 
@@ -160,157 +129,6 @@ EFIS::read()
 	if (*_autopilot_speed_setting_valid)
 		_efis_widget->add_speed_bug (EFISWidget::AT, *_autopilot_speed_setting_kt);
 	else
-		_efis_widget->remove_speed_bug (EFISWidget::AP);
-}
-
-
-void
-EFIS::read_input()
-{
-	invalidate_all();
-
-	while (_input->hasPendingDatagrams())
-	{
-		QByteArray datagram;
-		datagram.resize (_input->pendingDatagramSize());
-		QHostAddress sender_host;
-		uint16_t sender_port;
-
-		_input->readDatagram (datagram.data(), datagram.size(), &sender_host, &sender_port);
-
-		QString line (datagram);
-		for (QString pair: QString (datagram).split (',', QString::SkipEmptyParts))
-		{
-			bool no_control = false;
-
-			QStringList split_pair = pair.split ('=');
-			if (split_pair.size() != 2)
-				continue;
-			QString var = split_pair[0];
-			QString value = split_pair[1];
-
-			if (var == "ias")
-			{
-				_speed_kt.write (value.toFloat());
-				_speed_valid.write (true);
-			}
-			if (var == "ias-tend")
-			{
-				_speed_tendency_ktps.write (value.toFloat());
-				_speed_tendency_valid.write (true);
-			}
-			if (var == "mach")
-			{
-				_mach.write (value.toFloat());
-				_mach_valid.write (true);
-			}
-			else if (var == "pitch")
-			{
-				_pitch_deg.write (value.toFloat());
-				_pitch_valid.write (true);
-			}
-			else if (var == "roll")
-			{
-				_roll_deg.write (value.toFloat());
-				_roll_valid.write (true);
-			}
-			else if (var == "heading")
-			{
-				_heading_deg.write (value.toFloat());
-				_heading_valid.write (true);
-			}
-			else if (var == "alpha")
-			{
-				_fpm_alpha_deg.write (value.toFloat());
-				_fpm_alpha_valid.write (true);
-			}
-			else if (var == "beta")
-			{
-				_fpm_beta_deg.write (value.toFloat());
-				_fpm_beta_valid.write (true);
-			}
-			else if (var == "altitude")
-			{
-				_altitude_ft.write (value.toFloat());
-				_altitude_valid.write (true);
-			}
-			else if (var == "alt-agl")
-			{
-				_altitude_agl_ft.write (value.toFloat());
-				_altitude_agl_valid.write (value.toFloat() < 2500.f);
-			}
-			else if (var == "altimeter-inhg")
-			{
-				_pressure_inhg.write (value.toFloat());
-				_pressure_valid.write (true);
-			}
-			else if (var == "cbr")
-			{
-				_cbr_fpm.write (value.toFloat());
-				_cbr_valid.write (true);
-			}
-			else if (var == "ap-alt-sel")
-			{
-				_autopilot_alt_setting_ft.write (value.toFloat());
-				_autopilot_alt_setting_valid.write (true);
-			}
-			else if (var == "at-speed-sel")
-			{
-				_autopilot_speed_setting_kt.write (value.toFloat());
-				_autopilot_speed_setting_valid.write (true);
-			}
-			else
-				no_control = true;
-
-			if (no_control)
-			{
-				if (_input_alert_timeout > 0.f)
-					_input_alert_timer->start (_input_alert_timeout * 1000.f);
-			}
-			else if (_show_input_alert && !_input_alert_hide_timer->isActive())
-				_input_alert_hide_timer->start (350);
-		}
-	}
-}
-
-
-void
-EFIS::input_timeout()
-{
-	invalidate_all();
-
-	_input_alert_hide_timer->stop();
-	_show_input_alert = true;
-	_efis_widget->set_input_alert_visibility (_show_input_alert);
-	_efis_widget->update();
-}
-
-
-void
-EFIS::input_ok()
-{
-	_show_input_alert = false;
-	_efis_widget->set_input_alert_visibility (_show_input_alert);
-	_efis_widget->update();
-}
-
-
-void
-EFIS::invalidate_all()
-{
-	_speed_valid.write (false);
-	_speed_tendency_valid.write (false);
-	_mach_valid.write (false);
-	_pitch_valid.write (false);
-	_roll_valid.write (false);
-	_heading_valid.write (false);
-	_fpm_alpha_valid.write (false);
-	_fpm_beta_valid.write (false);
-	_altitude_valid.write (false);
-	_altitude_agl_valid.write (false);
-	_pressure_valid.write (false);
-	_cbr_valid.write (false);
-	_autopilot_alt_setting_valid.write (false);
-	_autopilot_speed_setting_valid.write (false);
+		_efis_widget->remove_speed_bug (EFISWidget::AT);
 }
 
