@@ -79,6 +79,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::Property<bool>	_autopilot_alt_setting_valid;
 	Xefis::Property<float>	_autopilot_speed_setting_kt;
 	Xefis::Property<bool>	_autopilot_speed_setting_valid;
+	Xefis::Property<float>	_autopilot_ldgalt_setting_ft;
+	Xefis::Property<bool>	_autopilot_ldgalt_setting_valid;
 };
 
 #endif

@@ -79,6 +79,8 @@ EFIS::set_path (QString const& path)
 	_autopilot_alt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/altitude/valid");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
+	_autopilot_ldgalt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/landing-altitude/ft");
+	_autopilot_ldgalt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/landing-altitude/valid");
 }
 
 
@@ -114,6 +116,11 @@ EFIS::read()
 
 	_efis_widget->set_altitude_agl (*_altitude_agl_ft);
 	_efis_widget->set_altitude_agl_visibility (*_altitude_agl_valid);
+
+	if (*_autopilot_ldgalt_setting_valid)
+		_efis_widget->add_altitude_bug (EFISWidget::LDGALT, *_autopilot_ldgalt_setting_ft);
+	else
+		_efis_widget->remove_altitude_bug (EFISWidget::LDGALT);
 
 	_efis_widget->set_pressure (*_pressure_inhg);
 	_efis_widget->set_pressure_visibility (*_pressure_valid);
