@@ -48,6 +48,9 @@ class PropertyTreeWidgetItem: public QTreeWidgetItem
 	PropertyNode*
 	node() const;
 
+	bool
+	operator< (QTreeWidgetItem const& other) const override;
+
   protected:
 	/**
 	 * Dynamically casts item to PropertyTreeWidgetItem.
