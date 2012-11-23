@@ -84,6 +84,8 @@ FlightGearInput::set_path (QString const& path)
 	_autopilot_alt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/altitude/valid");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
+	_autopilot_ldgalt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/landing-altitude/ft");
+	_autopilot_ldgalt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/landing-altitude/valid");
 
 	invalidate_all();
 }
@@ -183,6 +185,12 @@ FlightGearInput::read_input()
 				_autopilot_speed_setting_valid.write (true);
 			}
 		}
+
+		if (*_altitude_agl_valid)
+		{
+			_autopilot_ldgalt_setting_ft.write (*_altitude_ft - *_altitude_agl_ft);
+			_autopilot_ldgalt_setting_valid.write (true);
+		}
 	}
 
 	_timeout_timer->start();
@@ -206,5 +214,6 @@ FlightGearInput::invalidate_all()
 	_cbr_valid.write (false);
 	_autopilot_alt_setting_valid.write (false);
 	_autopilot_speed_setting_valid.write (false);
+	_autopilot_ldgalt_setting_valid.write (false);
 }
 
