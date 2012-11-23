@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <vector>
 #include <stdexcept>
 
 // Qt:
@@ -53,6 +54,20 @@ void
 PropertyTreeWidgetItem::read()
 {
 	static_cast<PropertyTreeWidget*> (treeWidget())->read (this, _node);
+}
+
+
+bool
+PropertyTreeWidgetItem::operator< (QTreeWidgetItem const& other) const
+{
+	if (_node->type() == PropDirectory)
+	{
+		PropertyTreeWidgetItem const* other_p = dynamic_cast<PropertyTreeWidgetItem const*> (&other);
+		if (other_p && other_p->_node->type() != PropDirectory)
+			return true;
+	}
+
+	return QTreeWidgetItem::operator< (other);
 }
 
 
