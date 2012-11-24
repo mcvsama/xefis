@@ -30,10 +30,6 @@
 #include "efis_widget.h"
 
 
-const char	EFISWidget::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-const char*	EFISWidget::MINUS_SIGN = "−";
-
-
 EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
@@ -1155,18 +1151,13 @@ EFISWidget::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 
 
 EFISWidget::EFISWidget (QWidget* parent):
-	QWidget (parent, nullptr)
+	Xefis::InstrumentWidget (parent)
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (34, 233, 127);
 	_ladder_color = QColor (51, 38, 93, 0x80);
-	_autopilot_color = QColor (250, 120, 255);
-	_navigation_color = QColor (40, 255, 40);
 	_ladder_border_color = QColor (0, 0, 0, 0x70);
-	_font = Xefis::Services::instrument_font();
-
-	update_fonts();
 }
 
 
@@ -1216,13 +1207,6 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
-}
-
-
-void
-EFISWidget::resizeEvent (QResizeEvent*)
-{
-	update_fonts();
 }
 
 
@@ -1330,50 +1314,5 @@ EFISWidget::paint_input_alert (QPainter& painter)
 	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
 
 	painter.restore();
-}
-
-
-int
-EFISWidget::get_digit_width (QFont& font) const
-{
-	QFontMetrics font_metrics (font);
-	int digit_width = 0;
-	for (char c: DIGITS)
-		digit_width = std::max (digit_width, font_metrics.width (c));
-	return digit_width;
-}
-
-
-void
-EFISWidget::update_fonts()
-{
-	float const height_scale_factor = 0.7f;
-
-	_font_10_bold = _font;
-	_font_10_bold.setPixelSize (font_size (10.f));
-	_font_10_bold.setBold (true);
-	_font_10_digit_width = get_digit_width (_font_10_bold);
-	_font_10_digit_height = height_scale_factor * QFontMetrics (_font_10_bold).height();
-
-	_font_13_bold = _font;
-	_font_13_bold.setPixelSize (font_size (13.f));
-	_font_13_bold.setBold (true);
-	_font_13_digit_width = get_digit_width (_font_13_bold);
-	_font_13_digit_height = QFontMetrics (_font_13_bold).height();
-	_font_13_digit_height = height_scale_factor * QFontMetrics (_font_13_bold).height();
-
-	_font_16_bold = _font;
-	_font_16_bold.setPixelSize (font_size (16.f));
-	_font_16_bold.setBold (true);
-	_font_16_digit_width = get_digit_width (_font_16_bold);
-	_font_16_digit_height = QFontMetrics (_font_16_bold).height();
-	_font_16_digit_height = height_scale_factor * QFontMetrics (_font_16_bold).height();
-
-	_font_20_bold = _font;
-	_font_20_bold.setPixelSize (font_size (20.f));
-	_font_20_bold.setBold (true);
-	_font_20_digit_width = get_digit_width (_font_20_bold);
-	_font_20_digit_height = QFontMetrics (_font_20_bold).height();
-	_font_20_digit_height = height_scale_factor * QFontMetrics (_font_20_bold).height();
 }
 
