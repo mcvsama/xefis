@@ -604,11 +604,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	// Parameters:
 	Degrees				_pitch						= 0.f;
-	bool				_pitch_visibility			= false;
+	bool				_pitch_visible				= false;
 	Degrees				_roll						= 0.f;
-	bool				_roll_visibility			= false;
+	bool				_roll_visible				= false;
 	Degrees				_heading					= 0.f;
-	bool				_heading_visibility			= false;
+	bool				_heading_visible			= false;
 	Degrees				_flight_path_alpha			= 0.f;
 	Degrees				_flight_path_beta			= 0.f;
 	bool				_flight_path_visible		= false;
@@ -692,7 +692,7 @@ EFISWidget::set_pitch (Degrees degrees)
 inline void
 EFISWidget::set_pitch_visibility (bool visible)
 {
-	_pitch_visibility = visible;
+	_pitch_visible = visible;
 	update();
 }
 
@@ -715,7 +715,7 @@ EFISWidget::set_roll (Degrees degrees)
 inline void
 EFISWidget::set_roll_visibility (bool visible)
 {
-	_roll_visibility = visible;
+	_roll_visible = visible;
 	update();
 }
 
@@ -738,7 +738,7 @@ EFISWidget::set_heading (Degrees degrees)
 inline void
 EFISWidget::set_heading_visibility (bool visible)
 {
-	_heading_visibility = visible;
+	_heading_visible = visible;
 	update();
 }
 

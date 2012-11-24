@@ -38,6 +38,7 @@ EFIS::EFIS (QWidget* parent):
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
+	layout->setSpacing (0);
 	layout->addWidget (_efis_widget, 80);
 	layout->addWidget (_efis_nav_widget, 50);
 
@@ -141,5 +142,11 @@ EFIS::read()
 
 	_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
 	_efis_widget->set_ap_climb_rate_visibility (*_autopilot_cbr_setting_valid);
+
+	_efis_nav_widget->set_heading (*_heading_deg);
+	_efis_nav_widget->set_heading_visibility (*_heading_valid);
+
+	_efis_nav_widget->set_flight_path_beta (*_fpm_beta_deg);
+	_efis_nav_widget->set_flight_path_marker_visibility (*_fpm_beta_valid);
 }
 

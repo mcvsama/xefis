@@ -100,14 +100,14 @@ InstrumentWidget::get_pen (QColor const& color, float width)
 inline float
 InstrumentWidget::pen_width (float scale) const
 {
-	return std::max (0.f, scale * wh() / 325.f);
+	return std::max (0.f, scale * wh() / (_height_for_width / 0.8f * 325.f));
 }
 
 
 inline float
 InstrumentWidget::font_size (float scale) const
 {
-	return std::max (1.f, scale * wh() / 375.f);
+	return std::max (1.f, scale * wh() / (_height_for_width / 0.8f * 375.f));
 }
 
 } // namespace Xefis

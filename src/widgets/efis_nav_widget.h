@@ -130,13 +130,23 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	void
 	paintEvent (QPaintEvent*) override;
 
+	void
+	paint_aircraft (QPainter&, TextPainter&);
+
+	void
+	paint_directions (QPainter&, TextPainter&);
+
+	void
+	paint_flight_path (QPainter&, TextPainter&);
+
   private:
 	QTransform			_aircraft_center_transform;
+	QTransform			_heading_transform;
 	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
 	Degrees				_heading					= 0.f;
-	bool				_heading_visibility			= false;
+	bool				_heading_visible			= false;
 	Degrees				_flight_path_beta			= 0.f;
 	bool				_flight_path_visible		= false;
 	Knots				_ground_speed				= 0.f;
@@ -166,7 +176,7 @@ EFISNavWidget::set_heading (Degrees degrees)
 inline void
 EFISNavWidget::set_heading_visibility (bool visible)
 {
-	_heading_visibility = visible;
+	_heading_visible = visible;
 	update();
 }
 
