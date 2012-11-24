@@ -33,7 +33,7 @@ class InstrumentWidget: public QWidget
 {
   public:
 	// Ctor
-	InstrumentWidget (QWidget* parent);
+	InstrumentWidget (QWidget* parent, float height_fot_width);
 
   protected:
 	void
@@ -76,6 +76,7 @@ class InstrumentWidget: public QWidget
 	float				_font_20_digit_height;
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
+	float				_height_for_width = 1.f;
 
 	static const char	DIGITS[10];
 	static const char*	MINUS_SIGN;
@@ -85,7 +86,7 @@ class InstrumentWidget: public QWidget
 inline float
 InstrumentWidget::wh() const
 {
-	return std::min (0.8f * width(), 1.f * height());
+	return std::min (_height_for_width * width(), 1.f * height());
 }
 
 

@@ -32,12 +32,14 @@ EFIS::EFIS (QWidget* parent):
 	Instrument (parent)
 {
 	_efis_widget = new EFISWidget (this);
+	_efis_nav_widget = new EFISNavWidget (this);
 
 	set_path ("/instrumentation");
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
-	layout->addWidget (_efis_widget);
+	layout->addWidget (_efis_widget, 80);
+	layout->addWidget (_efis_nav_widget, 50);
 
 	QTimer* t = new QTimer (this);
 	t->setInterval (33);
