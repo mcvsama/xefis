@@ -71,6 +71,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::Property<bool>	_altitude_valid;
 	Xefis::Property<float>	_altitude_agl_ft;
 	Xefis::Property<bool>	_altitude_agl_valid;
+	Xefis::Property<float>	_landing_altitude_ft;
+	Xefis::Property<bool>	_landing_altitude_valid;
 	Xefis::Property<float>	_pressure_inhg;
 	Xefis::Property<bool>	_pressure_valid;
 	Xefis::Property<float>	_cbr_fpm;
@@ -79,8 +81,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::Property<bool>	_autopilot_alt_setting_valid;
 	Xefis::Property<float>	_autopilot_speed_setting_kt;
 	Xefis::Property<bool>	_autopilot_speed_setting_valid;
-	Xefis::Property<float>	_autopilot_ldgalt_setting_ft;
-	Xefis::Property<bool>	_autopilot_ldgalt_setting_valid;
+	Xefis::Property<float>	_autopilot_cbr_setting_fpm;
+	Xefis::Property<bool>	_autopilot_cbr_setting_valid;
 };
 
 #endif

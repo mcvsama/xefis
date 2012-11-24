@@ -30,9 +30,6 @@
 #include "efis_widget.h"
 
 
-const char*	EFISWidget::AP = "A/P";
-const char*	EFISWidget::AT = "A/T";
-const char*	EFISWidget::LDGALT = "LDG";
 const char	EFISWidget::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 const char*	EFISWidget::MINUS_SIGN = "−";
 
@@ -72,8 +69,8 @@ EFISWidget::AltitudeLadder::paint()
 
 	paint_black_box (x, true);
 	paint_ladder_scale (x);
-	paint_bugs (x);
 	paint_climb_rate (x);
+	paint_bugs (x);
 	paint_black_box (x);
 	paint_pressure (x);
 	paint_ap_setting (x);
@@ -239,68 +236,85 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 void
 EFISWidget::AltitudeLadder::paint_bugs (float x)
 {
-	if (!_efis._altitude_visible)
-		return;
-
-	QFont altitude_bug_font = _efis._font_10_bold;
-	float const altitude_bug_digit_height = _efis._font_10_digit_height;
-
-	_painter.save();
-	_painter.setFont (altitude_bug_font);
-
-	for (auto& bug: _efis._altitude_bugs)
+	if (_efis._altitude_visible)
 	{
-		// AP bug should be drawn last, to be on top:
-		if (bug.first == AP)
-			continue;
+		QFont altitude_bug_font = _efis._font_10_bold;
+		float const altitude_bug_digit_height = _efis._font_10_digit_height;
 
-		if (bug.second > _min_shown && bug.second < _max_shown)
+		_painter.save();
+		_painter.setFont (altitude_bug_font);
+
+		for (auto& bug: _efis._altitude_bugs)
 		{
-			float posy = ft_to_px (bug.second);
+			if (bug.second > _min_shown && bug.second < _max_shown)
+			{
+				float posy = ft_to_px (bug.second);
+				QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
+								  +2.f * x, altitude_bug_digit_height);
+				_painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
+
+				_painter.setPen (_altitude_bug_pen);
+				_painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
+
+				_painter.setClipping (false);
+				_text_painter.drawText (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first);
+			}
+		}
+
+		// Landing altitude bug:
+		if (_efis._landing_altitude > _min_shown && _efis._landing_altitude < _max_shown)
+		{
+			float posy = ft_to_px (_efis._landing_altitude);
 			QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
 							  +2.f * x, altitude_bug_digit_height);
 			_painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 
-			if (bug.first == LDGALT)
-			{
-				_painter.setPen (_ldg_alt_pen);
-				_painter.drawLine (QPointF (-0.5f * x, posy), QPointF (-2.25f * x, posy));
-			}
-			else
-			{
-				_painter.setPen (_altitude_bug_pen);
-				_painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
-			}
+			_painter.setPen (_ldg_alt_pen);
+			_painter.drawLine (QPointF (-0.5f * x, posy), QPointF (-2.25f * x, posy));
 
 			_painter.setClipping (false);
-			_text_painter.drawText (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first);
+			_text_painter.drawText (text_rect, Qt::AlignVCenter | Qt::AlignRight, "LDG");
 		}
+
+		// AP bug:
+		if (_efis._ap_altitude_visible)
+		{
+			float posy = bound (ft_to_px (_efis._ap_altitude),
+								static_cast<float> (-_ladder_rect.height() / 2), static_cast<float> (_ladder_rect.height() / 2));
+			QPolygonF bug_shape = QPolygonF()
+				<< QPointF (0.f, 0.f)
+				<< QPointF (-0.5f * x, -0.5f * x)
+				<< QPointF (-0.5f * x, _black_box_rect.top())
+				<< QPointF (+1.3f * x, _black_box_rect.top())
+				<< QPointF (+1.3f * x, _black_box_rect.bottom())
+				<< QPointF (-0.5f * x, _black_box_rect.bottom())
+				<< QPointF (-0.5f * x, +0.5f * x);
+			_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
+			_painter.translate (-2.f * x, posy);
+			_painter.setBrush (Qt::NoBrush);
+			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f));
+			_painter.drawPolygon (bug_shape);
+			_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f));
+			_painter.drawPolygon (bug_shape);
+		}
+
+		_painter.restore();
 	}
 
-	// AP bug:
-	auto ap_bug = _efis._altitude_bugs.find (AP);
-	if (ap_bug != _efis._altitude_bugs.end())
+	// Climb rate bug:
+	if (_efis._ap_climb_rate_visible && _efis._climb_rate_visible)
 	{
-		float posy = bound (ft_to_px (ap_bug->second),
-							static_cast<float> (-_ladder_rect.height() / 2), static_cast<float> (_ladder_rect.height() / 2));
-		QPolygonF bug_shape = QPolygonF()
-			<< QPointF (0.f, 0.f)
-			<< QPointF (-0.5f * x, -0.5f * x)
-			<< QPointF (-0.5f * x, _black_box_rect.top())
-			<< QPointF (+1.3f * x, _black_box_rect.top())
-			<< QPointF (+1.3f * x, _black_box_rect.bottom())
-			<< QPointF (-0.5f * x, _black_box_rect.bottom())
-			<< QPointF (-0.5f * x, +0.5f * x);
-		_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
-		_painter.translate (-2.f * x, posy);
-		_painter.setBrush (Qt::NoBrush);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f));
-		_painter.drawPolygon (bug_shape);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f));
-		_painter.drawPolygon (bug_shape);
+		_painter.save();
+		_painter.translate (3.75f * x, 0.f);
+		float posy = -8.f * x * scale_cbr (_efis._ap_climb_rate);
+		for (auto params: { std::make_pair (400, 2.f), std::make_pair (0, 1.2f) })
+		{
+			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (params.first), params.second));
+			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
+				_painter.drawLine (QPointF (-0.25 * x, y), QPointF (0.2f * x, y));
+		}
+		_painter.restore();
 	}
-
-	_painter.restore();
 }
 
 
@@ -334,7 +348,7 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 		<< QPointF (-x, +0.6 * y + x)
 		<< QPointF (0.0f, +0.6 * y));
 
-	float const line_w = 0.2 * x;
+	float const line_w = 0.2f * x;
 
 	_painter.setFont (_efis._font_10_bold);
 	_painter.setPen (bold_white_pen);
@@ -411,8 +425,7 @@ EFISWidget::AltitudeLadder::paint_pressure (float x)
 void
 EFISWidget::AltitudeLadder::paint_ap_setting (float)
 {
-	auto ap_bug = _efis._altitude_bugs.find (AP);
-	if (ap_bug == _efis._altitude_bugs.end())
+	if (!_efis._ap_altitude_visible)
 		return;
 
 	QFont b_font = _efis._font_20_bold;
@@ -444,16 +457,16 @@ EFISWidget::AltitudeLadder::paint_ap_setting (float)
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = ap_bug->second < 0.f ? MINUS_SIGN : "";
+	QString minus_sign_s = _efis._ap_altitude < 0.f ? MINUS_SIGN : "";
 	_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-					   minus_sign_s + QString::number (std::abs (static_cast<int> (ap_bug->second / 1000))));
+					   minus_sign_s + QString::number (std::abs (static_cast<int> (_efis._ap_altitude / 1000))));
 
 	_painter.setFont (s_font);
 
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-					   QString ("%1").arg (static_cast<int> (std::abs (ap_bug->second)) % 1000, 3, 'f', 0, '0'));
+					   QString ("%1").arg (static_cast<int> (std::abs (_efis._ap_altitude)) % 1000, 3, 'f', 0, '0'));
 
 	_painter.restore();
 }
@@ -722,10 +735,6 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 
 	for (auto& bug: _efis._speed_bugs)
 	{
-		// AT bug should be drawn last, to be on top:
-		if (bug.first == AT)
-			continue;
-
 		if (bug.second > _min_shown && bug.second < _max_shown)
 		{
 			float posy = kt_to_px (bug.second);
@@ -740,10 +749,9 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 	}
 
 	// AT bug:
-	auto ap_bug = _efis._speed_bugs.find (AT);
-	if (ap_bug != _efis._speed_bugs.end())
+	if (_efis._at_speed_visible)
 	{
-		float posy = bound (kt_to_px (ap_bug->second),
+		float posy = bound (kt_to_px (_efis._at_speed),
 							static_cast<float> (-_ladder_rect.height() / 2.f), static_cast<float> (_ladder_rect.height() / 2.f));
 		QPolygonF bug_shape = QPolygonF()
 			<< QPointF (0.f, 0.f)
@@ -799,8 +807,7 @@ EFISWidget::SpeedLadder::paint_mach_number (float x)
 void
 EFISWidget::SpeedLadder::paint_ap_setting (float)
 {
-	auto ap_bug = _efis._speed_bugs.find (AT);
-	if (ap_bug == _efis._speed_bugs.end())
+	if (!_efis._at_speed_visible)
 		return;
 
 	QFont actual_speed_font = _efis._font_20_bold;
@@ -824,7 +831,7 @@ EFISWidget::SpeedLadder::paint_ap_setting (float)
 	_painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (ap_bug->second))));
+	_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_efis._at_speed))));
 
 	_painter.restore();
 }
