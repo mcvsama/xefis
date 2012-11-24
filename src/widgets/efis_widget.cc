@@ -651,11 +651,14 @@ EFISWidget::SpeedLadder::paint_speed_limits (float x)
 	QPointF ydif (0.f, _efis.pen_width (0.25f));
 	QPen pen_b (QColor (0, 0, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
 	QPen pen_r (QColor (255, 0, 0), _efis.pen_width (10.f), Qt::DotLine, Qt::FlatCap);
-	QPen pen_y (QColor (255, 140, 0), _efis.pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
+	QPen pen_y (QColor (255, 170, 0), _efis.pen_width (1.2f), Qt::SolidLine, Qt::FlatCap);
 	pen_r.setDashPattern (QVector<qreal> (2, 0.5f));
 
+	float tr_right = 0.45f * x;
+	float p1w = 0.45f * _efis.pen_width (1.2f);
+
 	_painter.save();
-	_painter.translate (0.45f * x, 0.f);
+	_painter.translate (tr_right, 0.f);
 	_painter.setClipRect (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
 	float max_posy = kt_to_px (_maximum_speed);
@@ -674,7 +677,10 @@ EFISWidget::SpeedLadder::paint_speed_limits (float x)
 	if (_efis._warning_speed_visible && _warning_speed > _min_shown)
 	{
 		_painter.setPen (pen_y);
-		_painter.drawLine (QPointF (_ladder_rect.right(), wrn_posy), zero_point);
+		_painter.drawPolyline (QPolygonF()
+			<< QPointF (_ladder_rect.right() - tr_right, wrn_posy)
+			<< QPointF (_ladder_rect.right() - p1w, wrn_posy)
+			<< zero_point - QPointF (p1w, 0.f));
 	}
 
 	if (_efis._minimum_speed_visible && _minimum_speed > _min_shown)
