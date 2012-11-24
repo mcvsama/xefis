@@ -26,6 +26,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
 #include <widgets/efis_widget.h>
+#include <widgets/efis_nav_widget.h>
 
 
 class EFIS: public Xefis::Instrument
@@ -47,8 +48,9 @@ class EFIS: public Xefis::Instrument
 	read();
 
   private:
-	EFISWidget*				_efis_widget	= nullptr;
-	QUdpSocket*				_input			= nullptr;
+	EFISWidget*				_efis_widget		= nullptr;
+	EFISNavWidget*			_efis_nav_widget	= nullptr;
+	QUdpSocket*				_input				= nullptr;
 	std::string				_property_path;
 
 	Xefis::Property<float>	_speed_kt;

@@ -14,15 +14,15 @@
 #ifndef XEFIS__WIDGETS__EFIS_WIDGET_H__INCLUDED
 #define XEFIS__WIDGETS__EFIS_WIDGET_H__INCLUDED
 
+// Standard:
+#include <cstddef>
+#include <map>
+
 // Qt:
 #include <QtGui/QWidget>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtGui/QPainterPath>
-
-// Standard:
-#include <cstddef>
-#include <map>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -32,8 +32,6 @@
 
 class EFISWidget: public Xefis::InstrumentWidget
 {
-	Q_OBJECT
-
 	typedef std::map<QString, Knots> SpeedBugs;
 	typedef std::map<QString, Feet> AltitudeBugs;
 
@@ -195,6 +193,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	};
 
   public:
+	// Ctor
 	EFISWidget (QWidget* parent);
 
 	/**

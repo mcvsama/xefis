@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/services.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
 
@@ -1157,7 +1156,7 @@ EFISWidget::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 
 
 EFISWidget::EFISWidget (QWidget* parent):
-	Xefis::InstrumentWidget (parent)
+	InstrumentWidget (parent, 0.8f)
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);

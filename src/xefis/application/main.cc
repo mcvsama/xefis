@@ -75,7 +75,7 @@ int main (int argc, char** argv, char**)
 
 			Xefis::Instrument* instrument = new EFIS (nullptr);
 			instrument->show();
-			instrument->resize (610, 460);
+			instrument->resize (610, 740);
 
 			app->exec();
 

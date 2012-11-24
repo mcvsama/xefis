@@ -90,10 +90,10 @@ SRC_MOCHDRS += instruments/efis.h
 ######## /widgets ########
 
 SRC_HEADERS += widgets/efis_widget.h
+SRC_HEADERS += widgets/efis_nav_widget.h
 
 SRC_SOURCES += widgets/efis_widget.cc
-
-SRC_MOCHDRS += widgets/efis_widget.h
+SRC_SOURCES += widgets/efis_nav_widget.cc
 
 ################
 
