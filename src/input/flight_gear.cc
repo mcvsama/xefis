@@ -76,6 +76,8 @@ FlightGearInput::set_path (QString const& path)
 	_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/valid");
 	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl/ft");
 	_altitude_agl_valid = Xefis::Property<bool> (_property_path + "/altitude/agl/valid");
+	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude/ft");
+	_landing_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/landing-altitude/valid");
 	_pressure_inhg = Xefis::Property<float> (_property_path + "/pressure/inhg");
 	_pressure_valid = Xefis::Property<bool> (_property_path + "/pressure/valid");
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
@@ -84,8 +86,8 @@ FlightGearInput::set_path (QString const& path)
 	_autopilot_alt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/altitude/valid");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
-	_autopilot_ldgalt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/landing-altitude/ft");
-	_autopilot_ldgalt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/landing-altitude/valid");
+	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
+	_autopilot_cbr_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/climb-rate/valid");
 
 	invalidate_all();
 }
@@ -184,12 +186,17 @@ FlightGearInput::read_input()
 				_autopilot_speed_setting_kt.write (value.toFloat());
 				_autopilot_speed_setting_valid.write (true);
 			}
+			else if (var == "ap-cbr-sel")
+			{
+				_autopilot_cbr_setting_fpm.write (value.toFloat());
+				_autopilot_cbr_setting_valid.write (true);
+			}
 		}
 
 		if (*_altitude_agl_valid)
 		{
-			_autopilot_ldgalt_setting_ft.write (*_altitude_ft - *_altitude_agl_ft);
-			_autopilot_ldgalt_setting_valid.write (true);
+			_landing_altitude_ft.write (*_altitude_ft - *_altitude_agl_ft);
+			_landing_altitude_valid.write (true);
 		}
 	}
 
@@ -210,10 +217,11 @@ FlightGearInput::invalidate_all()
 	_fpm_beta_valid.write (false);
 	_altitude_valid.write (false);
 	_altitude_agl_valid.write (false);
+	_landing_altitude_valid.write (false);
 	_pressure_valid.write (false);
 	_cbr_valid.write (false);
 	_autopilot_alt_setting_valid.write (false);
 	_autopilot_speed_setting_valid.write (false);
-	_autopilot_ldgalt_setting_valid.write (false);
+	_autopilot_cbr_setting_valid.write (false);
 }
 

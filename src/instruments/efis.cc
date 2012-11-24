@@ -71,6 +71,8 @@ EFIS::set_path (QString const& path)
 	_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/valid");
 	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl/ft");
 	_altitude_agl_valid = Xefis::Property<bool> (_property_path + "/altitude/agl/valid");
+	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude/ft");
+	_landing_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/landing-altitude/valid");
 	_pressure_inhg = Xefis::Property<float> (_property_path + "/pressure/inhg");
 	_pressure_valid = Xefis::Property<bool> (_property_path + "/pressure/valid");
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
@@ -79,8 +81,8 @@ EFIS::set_path (QString const& path)
 	_autopilot_alt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/altitude/valid");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
-	_autopilot_ldgalt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/landing-altitude/ft");
-	_autopilot_ldgalt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/landing-altitude/valid");
+	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
+	_autopilot_cbr_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/climb-rate/valid");
 }
 
 
@@ -117,10 +119,8 @@ EFIS::read()
 	_efis_widget->set_altitude_agl (*_altitude_agl_ft);
 	_efis_widget->set_altitude_agl_visibility (*_altitude_agl_valid);
 
-	if (*_autopilot_ldgalt_setting_valid)
-		_efis_widget->add_altitude_bug (EFISWidget::LDGALT, *_autopilot_ldgalt_setting_ft);
-	else
-		_efis_widget->remove_altitude_bug (EFISWidget::LDGALT);
+	_efis_widget->set_landing_altitude (*_landing_altitude_ft);
+	_efis_widget->set_landing_altitude_visibility (*_landing_altitude_valid);
 
 	_efis_widget->set_pressure (*_pressure_inhg);
 	_efis_widget->set_pressure_visibility (*_pressure_valid);
@@ -128,14 +128,16 @@ EFIS::read()
 	_efis_widget->set_climb_rate (*_cbr_fpm);
 	_efis_widget->set_climb_rate_visibility (*_cbr_valid);
 
-	if (*_autopilot_alt_setting_valid)
-		_efis_widget->add_altitude_bug (EFISWidget::AP, *_autopilot_alt_setting_ft);
-	else
-		_efis_widget->remove_altitude_bug (EFISWidget::AP);
+	_efis_widget->set_ap_altitude (*_autopilot_alt_setting_ft);
+	_efis_widget->set_ap_altitude_visibility (*_autopilot_alt_setting_valid);
 
-	if (*_autopilot_speed_setting_valid)
-		_efis_widget->add_speed_bug (EFISWidget::AT, *_autopilot_speed_setting_kt);
-	else
-		_efis_widget->remove_speed_bug (EFISWidget::AT);
+	_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
+	_efis_widget->set_at_speed_visibility (*_autopilot_speed_setting_valid);
+
+	_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
+	_efis_widget->set_at_speed_visibility (*_autopilot_speed_setting_valid);
+
+	_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
+	_efis_widget->set_ap_climb_rate_visibility (*_autopilot_cbr_setting_valid);
 }
 

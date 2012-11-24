@@ -19,6 +19,12 @@
 				<node>/autopilot/settings/target-altitude-ft</node>
 			</chunk>
 			<chunk>
+				<name>ap-cbr-sel</name>
+				<type>float</type>
+				<format>ap-cbr-sel=%f</format>
+				<node>/autopilot/settings/vertical-speed-fpm</node>
+			</chunk>
+			<chunk>
 				<name>at-speed-sel</name>
 				<type>float</type>
 				<format>at-speed-sel=%f</format>

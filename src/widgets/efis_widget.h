@@ -18,9 +18,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
-#include <QtGui/QPixmap>
 #include <QtGui/QPainterPath>
-#include <QtNetwork/QUdpSocket>
 
 // Standard:
 #include <cstddef>
@@ -196,14 +194,6 @@ class EFISWidget: public QWidget
 	};
 
   public:
-	// Autopilot bug:
-	static const char* AP;
-	// Landing altitude bug:
-	static const char* LDGALT;
-	// Autothrottle bug:
-	static const char* AT;
-
-  public:
 	EFISWidget (QWidget* parent);
 
 	/**
@@ -263,25 +253,25 @@ class EFISWidget: public QWidget
 	set_heading_visibility (bool visible);
 
 	/**
-	 * Flight path pitch.
+	 * Flight path vertical deviation.
 	 */
 	Degrees
 	flight_path_alpha() const;
 
 	/**
-	 * Set flight path pitch.
+	 * Set flight path vertical deviation.
 	 */
 	void
 	set_flight_path_alpha (Degrees);
 
 	/**
-	 * Flight path heading (track).
+	 * Flight path horizontal deviation.
 	 */
 	Degrees
 	flight_path_beta() const;
 
 	/**
-	 * Set flight path heading.
+	 * Set flight path horizontal deviation.
 	 */
 	void
 	set_flight_path_beta (Degrees);
@@ -347,6 +337,24 @@ class EFISWidget: public QWidget
 	set_altitude_agl_visibility (bool visible);
 
 	/**
+	 * Return landing altitude.
+	 */
+	Feet
+	landing_altitude() const;
+
+	/**
+	 * Set landing altitude.
+	 */
+	void
+	set_landing_altitude (Feet);
+
+	/**
+	 * Set landing altitude visibility.
+	 */
+	void
+	set_landing_altitude_visibility (bool visible);
+
+	/**
 	 * Toggle visibility of the altitude scale.
 	 */
 	void
@@ -377,8 +385,7 @@ class EFISWidget: public QWidget
 	speed_bug (QString name) const;
 
 	/**
-	 * Add new speed bug. A special value EFISWidget::AT ("A/T")
-	 * renders autothrottle-style bug instead of a regular one.
+	 * Add new speed bug.
 	 */
 	void
 	add_speed_bug (QString name, Knots speed);
@@ -397,8 +404,7 @@ class EFISWidget: public QWidget
 	altitude_bug (QString name) const;
 
 	/**
-	 * Add new altitude bug. A special value EFISWidget::AP ("A/P")
-	 * renders autopilot-style bug instead of a regular one.
+	 * Add new altitude bug.
 	 */
 	void
 	add_altitude_bug (QString name, Feet altitude);
@@ -501,6 +507,60 @@ class EFISWidget: public QWidget
 	set_maximum_speed_visibility (bool visible);
 
 	/**
+	 * Return autopilot altitude.
+	 */
+	Feet
+	ap_altitude() const;
+
+	/**
+	 * Set autopilot altitude.
+	 */
+	void
+	set_ap_altitude (Feet);
+
+	/**
+	 * Set AP altitude setting visibility.
+	 */
+	void
+	set_ap_altitude_visibility (bool visible);
+
+	/**
+	 * Return autopilot climb rate setting.
+	 */
+	FeetPerMinute
+	ap_climb_rate() const;
+
+	/**
+	 * Set autopilot climb rate setting.
+	 */
+	void
+	set_ap_climb_rate (FeetPerMinute);
+
+	/**
+	 * Set AP climb rate visibility.
+	 */
+	void
+	set_ap_climb_rate_visibility (bool visible);
+
+	/**
+	 * Return autothrottle setting.
+	 */
+	Knots
+	at_speed() const;
+
+	/**
+	 * Set autothrottle speed.
+	 */
+	void
+	set_at_speed (Knots);
+
+	/**
+	 * Set AT speed visibility.
+	 */
+	void
+	set_at_speed_visibility (bool visible);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -600,10 +660,10 @@ class EFISWidget: public QWidget
 	bool				_altitude_visible			= false;
 	Feet				_altitude_agl				= 0.f;
 	bool				_altitude_agl_visible		= false;
+	Feet				_landing_altitude			= 0.f;
+	bool				_landing_altitude_visible	= false;
 	FeetPerMinute		_climb_rate					= 0.f;
 	bool				_climb_rate_visible			= false;
-	SpeedBugs			_speed_bugs;
-	AltitudeBugs		_altitude_bugs;
 	float				_mach						= 0.f;
 	bool				_mach_visible				= false;
 	InHg				_pressure					= 0.f;
@@ -614,6 +674,14 @@ class EFISWidget: public QWidget
 	bool				_warning_speed_visible		= false;
 	Knots				_maximum_speed				= 0.f;
 	bool				_maximum_speed_visible		= false;
+	Feet				_ap_altitude				= 0.f;
+	bool				_ap_altitude_visible		= false;
+	FeetPerMinute		_ap_climb_rate				= 0.f;
+	bool				_ap_climb_rate_visible		= false;
+	Knots				_at_speed					= 0.f;
+	bool				_at_speed_visible			= false;
+	SpeedBugs			_speed_bugs;
+	AltitudeBugs		_altitude_bugs;
 
 	static const char	DIGITS[];
 	static const char*	MINUS_SIGN;
@@ -779,6 +847,22 @@ EFISWidget::set_speed_visibility (bool visible)
 }
 
 
+inline void
+EFISWidget::set_speed_tendency (KnotsPerSecond kps)
+{
+	_speed_tendency = kps;
+	update();
+}
+
+
+inline void
+EFISWidget::set_speed_tendency_visibility (bool visible)
+{
+	_speed_tendency_visible = visible;
+	update();
+}
+
+
 inline Feet
 EFISWidget::altitude() const
 {
@@ -814,6 +898,29 @@ inline void
 EFISWidget::set_altitude_agl_visibility (bool visible)
 {
 	_altitude_agl_visible = visible;
+	update();
+}
+
+
+inline Feet
+EFISWidget::landing_altitude() const
+{
+	return _landing_altitude;
+}
+
+
+inline void
+EFISWidget::set_landing_altitude (Feet feet)
+{
+	_landing_altitude = feet;
+	update();
+}
+
+
+inline void
+EFISWidget::set_landing_altitude_visibility (bool visible)
+{
+	_landing_altitude_visible = visible;
 	update();
 }
 
@@ -1014,18 +1121,71 @@ EFISWidget::set_maximum_speed_visibility (bool visible)
 }
 
 
-inline void
-EFISWidget::set_speed_tendency (KnotsPerSecond kps)
+inline Feet
+EFISWidget::ap_altitude() const
 {
-	_speed_tendency = kps;
+	return _ap_altitude;
+}
+
+
+inline void
+EFISWidget::set_ap_altitude (Feet feet)
+{
+	_ap_altitude = feet;
 	update();
 }
 
 
 inline void
-EFISWidget::set_speed_tendency_visibility (bool visible)
+EFISWidget::set_ap_altitude_visibility (bool visible)
 {
-	_speed_tendency_visible = visible;
+	_ap_altitude_visible = visible;
+	update();
+}
+
+
+inline FeetPerMinute
+EFISWidget::ap_climb_rate() const
+{
+	return _ap_climb_rate;
+}
+
+
+inline void
+EFISWidget::set_ap_climb_rate (FeetPerMinute fpm)
+{
+	_ap_climb_rate = fpm;
+	update();
+}
+
+
+inline void
+EFISWidget::set_ap_climb_rate_visibility (bool visible)
+{
+	_ap_climb_rate_visible = visible;
+	update();
+}
+
+
+inline Knots
+EFISWidget::at_speed() const
+{
+	return _at_speed;
+}
+
+
+inline void
+EFISWidget::set_at_speed (Knots knots)
+{
+	_at_speed = knots;
+	update();
+}
+
+
+inline void
+EFISWidget::set_at_speed_visibility (bool visible)
+{
+	_at_speed_visible = visible;;
 	update();
 }
 
