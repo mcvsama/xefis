@@ -893,7 +893,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_horizon()
 {
 	_painter.save();
 
-	if (_efis._pitch_visibility && _efis._roll_visibility)
+	if (_efis._pitch_visible && _efis._roll_visible)
 	{
 		_painter.setTransform (_horizon_transform * _efis._center_transform);
 
@@ -921,7 +921,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_horizon()
 void
 EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 {
-	if (!_efis._pitch_visibility)
+	if (!_efis._pitch_visible)
 		return;
 
 	float const w = _efis.wh() * 2.f / 9.f;
@@ -993,7 +993,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 void
 EFISWidget::AttitudeDirectorIndicator::paint_roll()
 {
-	if (!_efis._roll_visibility)
+	if (!_efis._roll_visible)
 		return;
 
 	float const w = _efis.wh() * 3.f / 9.f;
@@ -1055,7 +1055,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 	float const w = _efis.wh() * 2.25f / 9.f;
 	float const fpxs = _efis._font_10_bold.pixelSize();
 
-	if (!_efis._pitch_visibility || !_efis._roll_visibility)
+	if (!_efis._pitch_visible || !_efis._roll_visible)
 		return;
 
 	_painter.save();
@@ -1072,7 +1072,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 	_painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
 
-	if (!_efis._heading_visibility)
+	if (!_efis._heading_visible)
 	{
 		_painter.restore();
 		return;
@@ -1182,7 +1182,6 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-
 	painter.setTransform (_center_transform);
 
 	if (_input_alert_visible)
