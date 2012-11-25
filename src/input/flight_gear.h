@@ -61,10 +61,14 @@ class FlightGearInput:
 	QUdpSocket*				_input = nullptr;
 	std::string				_property_path;
 
-	Xefis::Property<float>	_speed_kt;
-	Xefis::Property<bool>	_speed_valid;
-	Xefis::Property<float>	_speed_tendency_ktps;
-	Xefis::Property<bool>	_speed_tendency_valid;
+	Xefis::Property<float>	_ias_kt;
+	Xefis::Property<bool>	_ias_valid;
+	Xefis::Property<float>	_ias_tendency_ktps;
+	Xefis::Property<bool>	_ias_tendency_valid;
+	Xefis::Property<float>	_gs_kt;
+	Xefis::Property<bool>	_gs_valid;
+	Xefis::Property<float>	_tas_kt;
+	Xefis::Property<bool>	_tas_valid;
 	Xefis::Property<float>	_mach;
 	Xefis::Property<bool>	_mach_valid;
 	Xefis::Property<float>	_pitch_deg;

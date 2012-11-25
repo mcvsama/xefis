@@ -131,13 +131,16 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	paintEvent (QPaintEvent*) override;
 
 	void
-	paint_aircraft (QPainter&, TextPainter&);
+	paint_aircraft (QPainter&, TextPainter&, float q, float r);
 
 	void
-	paint_directions (QPainter&, TextPainter&);
+	paint_directions (QPainter&, TextPainter&, float q, float r);
 
 	void
-	paint_flight_path (QPainter&, TextPainter&);
+	paint_flight_path (QPainter&, TextPainter&, float q, float r);
+
+	void
+	paint_speeds (QPainter&, TextPainter&, float q, float r);
 
   private:
 	QTransform			_aircraft_center_transform;

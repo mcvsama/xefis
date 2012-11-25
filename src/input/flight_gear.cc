@@ -56,10 +56,14 @@ FlightGearInput::set_path (QString const& path)
 {
 	_property_path = path.toStdString();
 
-	_speed_kt = Xefis::Property<float> (_property_path + "/speed/kt");
-	_speed_valid = Xefis::Property<bool> (_property_path + "/speed/valid");
-	_speed_tendency_ktps = Xefis::Property<float> (_property_path + "/speed/lookahead/ktps");
-	_speed_tendency_valid = Xefis::Property<bool> (_property_path + "/speed/lookahead/valid");
+	_ias_kt = Xefis::Property<float> (_property_path + "/ias/kt");
+	_ias_valid = Xefis::Property<bool> (_property_path + "/ias/valid");
+	_ias_tendency_ktps = Xefis::Property<float> (_property_path + "/ias/lookahead/ktps");
+	_ias_tendency_valid = Xefis::Property<bool> (_property_path + "/ias/lookahead/valid");
+	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
+	_gs_valid = Xefis::Property<bool> (_property_path + "/gs/valid");
+	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
+	_tas_valid = Xefis::Property<bool> (_property_path + "/tas/valid");
 	_mach = Xefis::Property<float> (_property_path + "/mach/value");
 	_mach_valid = Xefis::Property<bool> (_property_path + "/mach/valid");
 	_pitch_deg = Xefis::Property<float> (_property_path + "/pitch/deg");
@@ -118,15 +122,25 @@ FlightGearInput::read_input()
 
 			if (var == "ias")
 			{
-				_speed_kt.write (value.toFloat());
-				_speed_valid.write (true);
+				_ias_kt.write (value.toFloat());
+				_ias_valid.write (true);
 			}
-			if (var == "ias-tend")
+			else if (var == "ias-tend")
 			{
-				_speed_tendency_ktps.write (value.toFloat());
-				_speed_tendency_valid.write (true);
+				_ias_tendency_ktps.write (value.toFloat());
+				_ias_tendency_valid.write (true);
 			}
-			if (var == "mach")
+			else if (var == "gs")
+			{
+				_gs_kt.write (value.toFloat());
+				_gs_valid.write (true);
+			}
+			else if (var == "tas")
+			{
+				_tas_kt.write (value.toFloat());
+				_tas_valid.write (true);
+			}
+			else if (var == "mach")
 			{
 				_mach.write (value.toFloat());
 				_mach_valid.write (true);
@@ -207,8 +221,10 @@ FlightGearInput::read_input()
 void
 FlightGearInput::invalidate_all()
 {
-	_speed_valid.write (false);
-	_speed_tendency_valid.write (false);
+	_ias_valid.write (false);
+	_ias_tendency_valid.write (false);
+	_gs_valid.write (false);
+	_tas_valid.write (false);
 	_mach_valid.write (false);
 	_pitch_valid.write (false);
 	_roll_valid.write (false);
