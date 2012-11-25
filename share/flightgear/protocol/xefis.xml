@@ -44,6 +44,12 @@
 				<node>/instrumentation/airspeed-indicator/true-speed-kt</node>
 			</chunk>
 			<chunk>
+				<name>gs</name>
+				<type>float</type>
+				<format>gs=%f</format>
+				<node>/velocities/groundspeed-kt</node>
+			</chunk>
+			<chunk>
 				<name>mach</name>
 				<type>float</type>
 				<format>mach=%f</format>

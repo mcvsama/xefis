@@ -61,9 +61,13 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 
 	painter.setTransform (_aircraft_center_transform);
 
-	paint_flight_path (painter, text_painter);
-	paint_directions (painter, text_painter);
-	paint_aircraft (painter, text_painter);
+	float q = 0.1f * wh();
+	float r = 6.5f * q;
+
+	paint_flight_path (painter, text_painter, q, r);
+	paint_directions (painter, text_painter, q, r);
+	paint_aircraft (painter, text_painter, q, r);
+	paint_speeds (painter, text_painter, q, r);
 
 	// Copy buffer to screen:
 	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
@@ -71,12 +75,10 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 
 
 void
-EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter&)
+EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter&, float q, float r)
 {
 	QPen pen1 = get_pen (QColor (255, 255, 255), 1.5f);
 	QPen pen2 = get_pen (QColor (255, 255, 255), 2.8f);
-	float q = 0.1f * wh();
-	float r = 6.5f * q;
 
 	painter.save();
 
@@ -102,14 +104,12 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter&)
 
 
 void
-EFISNavWidget::paint_flight_path (QPainter& painter, TextPainter& text_painter)
+EFISNavWidget::paint_flight_path (QPainter& painter, TextPainter&, float, float r)
 {
 	if (!_flight_path_visible)
 		return;
 
 	QPen pen (QColor (255, 255, 0), pen_width (1.5f), Qt::DashLine, Qt::FlatCap);
-	float q = 0.1f * wh();
-	float r = 6.5f * q;
 
 	painter.save();
 
@@ -126,14 +126,12 @@ EFISNavWidget::paint_flight_path (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
+EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	if (!_heading_visible)
 		return;
 
 	QPen pen = get_pen (QColor (255, 255, 255), 1.5f);
-	float q = 0.1f * wh();
-	float r = 6.5f * q;
 
 	painter.save();
 
@@ -153,6 +151,54 @@ EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
 			text_painter.drawText (QRectF (-q, -0.93f * r, 2.f * q, 0.5f * q),
 								   Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
 		}
+	}
+
+	painter.restore();
+}
+
+
+void
+EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
+{
+	QPen pen = get_pen (QColor (255, 255, 255), 1.f);
+	QFont font_a = _font_13_bold;
+	QFont font_b = _font_16_bold;
+	QFontMetricsF metr_a (font_a);
+	QFontMetricsF metr_b (font_b);
+
+	// Return width of painter strings:
+	auto paint_speed = [&](QString str, QString val) -> float
+	{
+		QRectF str_rect (0.f, 0.f, metr_a.width (str) * 1.1f, metr_b.height());
+		QRectF val_rect (0.f, 0.f, metr_b.width (val), metr_b.height());
+		// Correct baseline position:
+		str_rect.translate (0.f, metr_a.descent() - metr_b.descent());
+		val_rect.moveLeft (str_rect.right());
+
+		painter.save();
+		painter.setFont (font_a);
+		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
+		painter.setFont (font_b);
+		text_painter.drawText (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
+		painter.restore();
+
+		return str_rect.width() + val_rect.width();
+	};
+
+	float offset = 0;
+
+	painter.save();
+	painter.resetTransform();
+	painter.translate (0.2f * q, 0.f);
+	painter.setPen (pen);
+
+	if (_ground_speed_visible)
+		offset = paint_speed ("GS", QString::number (static_cast<int> (_ground_speed)));
+
+	if (_true_air_speed_visible)
+	{
+		painter.translate (offset * 1.2f, 0.f);
+		paint_speed ("TAS", QString::number (static_cast<int> (_true_air_speed)));
 	}
 
 	painter.restore();

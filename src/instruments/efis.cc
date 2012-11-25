@@ -54,10 +54,14 @@ EFIS::set_path (QString const& path)
 {
 	_property_path = path.toStdString();
 
-	_speed_kt = Xefis::Property<float> (_property_path + "/speed/kt");
-	_speed_valid = Xefis::Property<bool> (_property_path + "/speed/valid");
-	_speed_tendency_ktps = Xefis::Property<float> (_property_path + "/speed/lookahead/ktps");
-	_speed_tendency_valid = Xefis::Property<bool> (_property_path + "/speed/lookahead/valid");
+	_ias_kt = Xefis::Property<float> (_property_path + "/ias/kt");
+	_ias_valid = Xefis::Property<bool> (_property_path + "/ias/valid");
+	_ias_tendency_ktps = Xefis::Property<float> (_property_path + "/ias/lookahead/ktps");
+	_ias_tendency_valid = Xefis::Property<bool> (_property_path + "/ias/lookahead/valid");
+	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
+	_gs_valid = Xefis::Property<bool> (_property_path + "/gs/valid");
+	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
+	_tas_valid = Xefis::Property<bool> (_property_path + "/tas/valid");
 	_mach = Xefis::Property<float> (_property_path + "/mach/value");
 	_mach_valid = Xefis::Property<bool> (_property_path + "/mach/valid");
 	_pitch_deg = Xefis::Property<float> (_property_path + "/pitch/deg");
@@ -92,11 +96,11 @@ EFIS::set_path (QString const& path)
 void
 EFIS::read()
 {
-	_efis_widget->set_speed (*_speed_kt);;
-	_efis_widget->set_speed_visibility (*_speed_valid);
+	_efis_widget->set_speed (*_ias_kt);;
+	_efis_widget->set_speed_visibility (*_ias_valid);
 
-	_efis_widget->set_speed_tendency (*_speed_tendency_ktps);;
-	_efis_widget->set_speed_tendency_visibility(*_speed_tendency_valid);
+	_efis_widget->set_speed_tendency (*_ias_tendency_ktps);;
+	_efis_widget->set_speed_tendency_visibility(*_ias_tendency_valid);
 
 	_efis_widget->set_mach (*_mach);
 	_efis_widget->set_mach_visibility (*_mach_valid);
@@ -148,5 +152,11 @@ EFIS::read()
 
 	_efis_nav_widget->set_flight_path_beta (*_fpm_beta_deg);
 	_efis_nav_widget->set_flight_path_marker_visibility (*_fpm_beta_valid);
+
+	_efis_nav_widget->set_ground_speed (*_gs_kt);
+	_efis_nav_widget->set_ground_speed_visibility (*_gs_valid);
+
+	_efis_nav_widget->set_true_air_speed (*_tas_kt);
+	_efis_nav_widget->set_true_air_speed_visibility (*_tas_valid);
 }
 
