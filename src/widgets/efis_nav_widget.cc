@@ -170,7 +170,7 @@ EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float
 	auto paint_speed = [&](QString str, QString val) -> float
 	{
 		QRectF str_rect (0.f, 0.f, metr_a.width (str) * 1.1f, metr_b.height());
-		QRectF val_rect (0.f, 0.f, metr_b.width (val), metr_b.height());
+		QRectF val_rect (0.f, 0.f, std::max (metr_b.width ("000"), metr_b.width (val)), metr_b.height());
 		// Correct baseline position:
 		str_rect.translate (0.f, metr_a.descent() - metr_b.descent());
 		val_rect.moveLeft (str_rect.right());
@@ -179,7 +179,7 @@ EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float
 		painter.setFont (font_a);
 		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
 		painter.setFont (font_b);
-		text_painter.drawText (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
+		text_painter.drawText (val_rect, Qt::AlignLeft| Qt::AlignBottom, val);
 		painter.restore();
 
 		return str_rect.width() + val_rect.width();
