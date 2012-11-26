@@ -172,12 +172,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QPainterPath
 		get_pitch_scale_clipping_path() const;
 
-		float
-		pitch_to_px (Degrees degrees) const;
-
-		float
-		heading_to_px (Degrees degrees) const;
-
 	  private:
 		EFISWidget&		_efis;
 		QPainter&		_painter;
@@ -561,6 +555,84 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_at_speed_visibility (bool visible);
 
 	/**
+	 * Return flight director alpha.
+	 */
+	Degrees
+	flight_director_pitch() const;
+
+	/**
+	 * Set flight director pitch.
+	 */
+	void
+	set_flight_director_pitch (Degrees pitch);
+
+	/**
+	 * Set flight director pitch visibility.
+	 */
+	void
+	set_flight_director_pitch_visibility (bool visible);
+
+	/**
+	 * Return flight director roll.
+	 */
+	Degrees
+	flight_director_roll() const;
+
+	/**
+	 * Set flight director roll.
+	 */
+	void
+	set_flight_director_roll (Degrees roll);
+
+	/**
+	 * Set flight director roll visibility.
+	 */
+	void
+	set_flight_director_roll_visibility (bool visible);
+
+	/**
+	 * Set visibility of navigation needles ladders.
+	 */
+	void
+	set_navigation_needles_visibility (bool visible);
+
+	/**
+	 * Return navigation glideslope needle value.
+	 */
+	float
+	nav_glideslope_needle() const;
+
+	/**
+	 * Set navigation glideslope needle. Values: [-1.f, +1.f].
+	 */
+	void
+	set_nav_glideslope_needle (float value);
+
+	/**
+	 * Set navigation glideslope needle visibility.
+	 */
+	void
+	set_nav_glideslope_needle_visibility (bool visible);
+
+	/**
+	 * Return navigation heading needle value.
+	 */
+	float
+	nav_heading_needle() const;
+
+	/**
+	 * Set navigation heading needle. Values: [-1.f, +1.f].
+	 */
+	void
+	set_nav_heading_needle (float value);
+
+	/**
+	 * Set navigation heading needle visibility.
+	 */
+	void
+	set_nav_heading_needle_visibility (bool visible);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -587,10 +659,23 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_center_cross (QPainter&);
 
 	void
+	paint_flight_director (QPainter&);
+
+	void
 	paint_altitude_agl (QPainter&);
 
 	void
+	paint_ils (QPainter&);
+
+	void
 	paint_input_alert (QPainter&);
+
+  private:
+	float
+	pitch_to_px (Degrees degrees) const;
+
+	float
+	heading_to_px (Degrees degrees) const;
 
   private:
 	QColor				_sky_color;
@@ -598,48 +683,57 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QColor				_ladder_color;
 	QColor				_ladder_border_color;
 	QTransform			_center_transform;
-	Degrees				_fov						= 120.f;
-	bool				_input_alert_visible		= false;
+	Degrees				_fov							= 120.f;
+	bool				_input_alert_visible			= false;
 	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
-	Degrees				_pitch						= 0.f;
-	bool				_pitch_visible				= false;
-	Degrees				_roll						= 0.f;
-	bool				_roll_visible				= false;
-	Degrees				_heading					= 0.f;
-	bool				_heading_visible			= false;
-	Degrees				_flight_path_alpha			= 0.f;
-	Degrees				_flight_path_beta			= 0.f;
-	bool				_flight_path_visible		= false;
-	Knots				_speed						= 0.f;
-	bool				_speed_visible				= false;
-	KnotsPerSecond		_speed_tendency				= 0.f;
-	bool				_speed_tendency_visible		= false;
-	Feet				_altitude					= 0.f;
-	bool				_altitude_visible			= false;
-	Feet				_altitude_agl				= 0.f;
-	bool				_altitude_agl_visible		= false;
-	Feet				_landing_altitude			= 0.f;
-	bool				_landing_altitude_visible	= false;
-	FeetPerMinute		_climb_rate					= 0.f;
-	bool				_climb_rate_visible			= false;
-	float				_mach						= 0.f;
-	bool				_mach_visible				= false;
-	InHg				_pressure					= 0.f;
-	bool				_pressure_visible			= false;
-	Knots				_minimum_speed				= 0.f;
-	bool				_minimum_speed_visible		= false;
-	Knots				_warning_speed				= 0.f;
-	bool				_warning_speed_visible		= false;
-	Knots				_maximum_speed				= 0.f;
-	bool				_maximum_speed_visible		= false;
-	Feet				_ap_altitude				= 0.f;
-	bool				_ap_altitude_visible		= false;
-	FeetPerMinute		_ap_climb_rate				= 0.f;
-	bool				_ap_climb_rate_visible		= false;
-	Knots				_at_speed					= 0.f;
-	bool				_at_speed_visible			= false;
+	Degrees				_pitch							= 0.f;
+	bool				_pitch_visible					= false;
+	Degrees				_roll							= 0.f;
+	bool				_roll_visible					= false;
+	Degrees				_heading						= 0.f;
+	bool				_heading_visible				= false;
+	Degrees				_flight_path_alpha				= 0.f;
+	Degrees				_flight_path_beta				= 0.f;
+	bool				_flight_path_visible			= false;
+	Knots				_speed							= 0.f;
+	bool				_speed_visible					= false;
+	KnotsPerSecond		_speed_tendency					= 0.f;
+	bool				_speed_tendency_visible			= false;
+	Feet				_altitude						= 0.f;
+	bool				_altitude_visible				= false;
+	Feet				_altitude_agl					= 0.f;
+	bool				_altitude_agl_visible			= false;
+	Feet				_landing_altitude				= 0.f;
+	bool				_landing_altitude_visible		= false;
+	FeetPerMinute		_climb_rate						= 0.f;
+	bool				_climb_rate_visible				= false;
+	float				_mach							= 0.f;
+	bool				_mach_visible					= false;
+	InHg				_pressure						= 0.f;
+	bool				_pressure_visible				= false;
+	Knots				_minimum_speed					= 0.f;
+	bool				_minimum_speed_visible			= false;
+	Knots				_warning_speed					= 0.f;
+	bool				_warning_speed_visible			= false;
+	Knots				_maximum_speed					= 0.f;
+	bool				_maximum_speed_visible			= false;
+	Feet				_ap_altitude					= 0.f;
+	bool				_ap_altitude_visible			= false;
+	FeetPerMinute		_ap_climb_rate					= 0.f;
+	bool				_ap_climb_rate_visible			= false;
+	Knots				_at_speed						= 0.f;
+	bool				_at_speed_visible				= false;
+	Degrees				_flight_director_pitch			= 0.f;
+	bool				_flight_director_pitch_visible	= false;
+	Degrees				_flight_director_roll			= 0.f;
+	bool				_flight_director_roll_visible	= false;
+	bool				_navigation_needles_visible		= false;
+	float				_navigation_gs_needle			= 0.f;
+	bool				_navigation_gs_needle_visible	= false;
+	float				_navigation_hd_needle			= 0.f;
+	bool				_navigation_hd_needle_visible	= false;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 };
@@ -656,21 +750,6 @@ inline float
 EFISWidget::SpeedLadder::kt_to_px (Knots kt) const
 {
 	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
-}
-
-
-inline float
-EFISWidget::AttitudeDirectorIndicator::pitch_to_px (Degrees degrees) const
-{
-	float const correction = 0.775f;
-	return -degrees / (_efis._fov * correction) * _efis.wh();
-}
-
-
-inline float
-EFISWidget::AttitudeDirectorIndicator::heading_to_px (Degrees degrees) const
-{
-	return pitch_to_px (-degrees);
 }
 
 
@@ -1142,7 +1221,107 @@ EFISWidget::set_at_speed (Knots knots)
 inline void
 EFISWidget::set_at_speed_visibility (bool visible)
 {
-	_at_speed_visible = visible;;
+	_at_speed_visible = visible;
+	update();
+}
+
+
+inline Degrees
+EFISWidget::flight_director_pitch() const
+{
+	return _flight_director_pitch;
+}
+
+
+inline void
+EFISWidget::set_flight_director_pitch (Degrees pitch)
+{
+	_flight_director_pitch = pitch;
+	update();
+}
+
+
+inline void
+EFISWidget::set_flight_director_pitch_visibility (bool visible)
+{
+	_flight_director_pitch_visible = visible;
+	update();
+}
+
+
+inline Degrees
+EFISWidget::flight_director_roll() const
+{
+	return _flight_director_roll;
+}
+
+
+inline void
+EFISWidget::set_flight_director_roll (Degrees roll)
+{
+	_flight_director_roll = roll;
+	update();
+}
+
+
+inline void
+EFISWidget::set_flight_director_roll_visibility (bool visible)
+{
+	_flight_director_roll_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_navigation_needles_visibility (bool visible)
+{
+	_navigation_needles_visible = visible;
+	update();
+}
+
+
+inline float
+EFISWidget::nav_glideslope_needle() const
+{
+	return _navigation_gs_needle;
+}
+
+
+inline void
+EFISWidget::set_nav_glideslope_needle (float value)
+{
+	_navigation_gs_needle = value;
+	update();
+}
+
+
+inline void
+EFISWidget::set_nav_glideslope_needle_visibility (bool visible)
+{
+	_navigation_gs_needle_visible = visible;
+	update();
+}
+
+
+inline float
+EFISWidget::nav_heading_needle() const
+{
+	return _navigation_hd_needle;
+}
+
+
+inline void
+EFISWidget::set_nav_heading_needle (float value)
+{
+	_navigation_hd_needle = value;
+	update();
+}
+
+
+inline void
+EFISWidget::set_nav_heading_needle_visibility (bool visible)
+{
+	_navigation_hd_needle_visible = visible;
 	update();
 }
 
@@ -1166,6 +1345,21 @@ inline void
 EFISWidget::set_input_alert_visibility (bool visible)
 {
 	_input_alert_visible = visible;
+}
+
+
+inline float
+EFISWidget::pitch_to_px (Degrees degrees) const
+{
+	float const correction = 0.775f;
+	return -degrees / (_fov * correction) * wh();
+}
+
+
+inline float
+EFISWidget::heading_to_px (Degrees degrees) const
+{
+	return pitch_to_px (-degrees);
 }
 
 #endif
