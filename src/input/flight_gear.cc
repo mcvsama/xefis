@@ -60,6 +60,10 @@ FlightGearInput::set_path (QString const& path)
 	_ias_valid = Xefis::Property<bool> (_property_path + "/ias/valid");
 	_ias_tendency_ktps = Xefis::Property<float> (_property_path + "/ias/lookahead/ktps");
 	_ias_tendency_valid = Xefis::Property<bool> (_property_path + "/ias/lookahead/valid");
+	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/ias/minimum/kt");
+	_minimum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/minimum/valid");
+	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/ias/maximum/kt");
+	_maximum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/maximum/valid");
 	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
 	_gs_valid = Xefis::Property<bool> (_property_path + "/gs/valid");
 	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
@@ -92,6 +96,15 @@ FlightGearInput::set_path (QString const& path)
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
 	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
 	_autopilot_cbr_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/climb-rate/valid");
+	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch/deg");
+	_flight_director_pitch_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/pitch/valid");
+	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll/deg");
+	_flight_director_roll_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/roll/valid");
+	_navigation_needles_enabled = Xefis::Property<bool> (_property_path + "/navigation/enabled");
+	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope/value");
+	_navigation_gs_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/glide-slope/valid");
+	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
+	_navigation_hd_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/heading/valid");
 
 	invalidate_all();
 }
@@ -127,8 +140,18 @@ FlightGearInput::read_input()
 			}
 			else if (var == "ias-tend")
 			{
-				_ias_tendency_ktps.write (value.toFloat());
+				_ias_tendency_ktps.write (value.toFloat() / 10.f);
 				_ias_tendency_valid.write (true);
+			}
+			else if (var == "ias-min")
+			{
+				_minimum_ias_kt.write (value.toFloat());
+				_minimum_ias_valid.write (true);
+			}
+			else if (var == "ias-max")
+			{
+				_maximum_ias_kt.write (value.toFloat());
+				_maximum_ias_valid.write (true);
 			}
 			else if (var == "gs")
 			{
@@ -205,6 +228,36 @@ FlightGearInput::read_input()
 				_autopilot_cbr_setting_fpm.write (value.toFloat());
 				_autopilot_cbr_setting_valid.write (true);
 			}
+			else if (var == "fd-pitch")
+			{
+				_flight_director_pitch_deg.write (value.toFloat());
+				_flight_director_pitch_valid.write (true);
+			}
+			else if (var == "fd-roll")
+			{
+				_flight_director_roll_deg.write (value.toFloat());
+				_flight_director_roll_valid.write (true);
+			}
+			else if (var == "nav")
+			{
+				_navigation_needles_enabled.write (!!value.toInt());
+			}
+			else if (var == "nav-gs")
+			{
+				_navigation_gs_needle.write (value.toFloat());
+			}
+			else if (var == "nav-gs-ok")
+			{
+				_navigation_gs_needle_valid.write (!!value.toInt());
+			}
+			else if (var == "nav-hd")
+			{
+				_navigation_hd_needle.write (value.toFloat());
+			}
+			else if (var == "nav-hd-ok")
+			{
+				_navigation_hd_needle_valid.write (!!value.toInt());
+			}
 		}
 
 		if (*_altitude_agl_valid)
@@ -223,6 +276,8 @@ FlightGearInput::invalidate_all()
 {
 	_ias_valid.write (false);
 	_ias_tendency_valid.write (false);
+	_minimum_ias_valid.write (false);
+	_maximum_ias_valid.write (false);
 	_gs_valid.write (false);
 	_tas_valid.write (false);
 	_mach_valid.write (false);
@@ -239,5 +294,10 @@ FlightGearInput::invalidate_all()
 	_autopilot_alt_setting_valid.write (false);
 	_autopilot_speed_setting_valid.write (false);
 	_autopilot_cbr_setting_valid.write (false);
+	_flight_director_pitch_valid.write (false);
+	_flight_director_roll_valid.write (false);
+	_navigation_needles_enabled.write (false);
+	_navigation_gs_needle_valid.write (false);
+	_navigation_hd_needle_valid.write (false);
 }
 

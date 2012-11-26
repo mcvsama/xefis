@@ -58,6 +58,10 @@ EFIS::set_path (QString const& path)
 	_ias_valid = Xefis::Property<bool> (_property_path + "/ias/valid");
 	_ias_tendency_ktps = Xefis::Property<float> (_property_path + "/ias/lookahead/ktps");
 	_ias_tendency_valid = Xefis::Property<bool> (_property_path + "/ias/lookahead/valid");
+	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/ias/minimum/kt");
+	_minimum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/minimum/valid");
+	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/ias/maximum/kt");
+	_maximum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/maximum/valid");
 	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
 	_gs_valid = Xefis::Property<bool> (_property_path + "/gs/valid");
 	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
@@ -90,16 +94,31 @@ EFIS::set_path (QString const& path)
 	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
 	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
 	_autopilot_cbr_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/climb-rate/valid");
+	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch/deg");
+	_flight_director_pitch_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/pitch/valid");
+	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll/deg");
+	_flight_director_roll_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/roll/valid");
+	_navigation_needles_enabled = Xefis::Property<bool> (_property_path + "/navigation/enabled");
+	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope/value");
+	_navigation_gs_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/glide-slope/valid");
+	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
+	_navigation_hd_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/heading/valid");
 }
 
 
 void
 EFIS::read()
 {
-	_efis_widget->set_speed (*_ias_kt);;
+	_efis_widget->set_speed (*_ias_kt);
 	_efis_widget->set_speed_visibility (*_ias_valid);
 
-	_efis_widget->set_speed_tendency (*_ias_tendency_ktps);;
+	_efis_widget->set_minimum_speed (*_minimum_ias_kt);
+	_efis_widget->set_minimum_speed_visibility (*_minimum_ias_valid);
+
+	_efis_widget->set_maximum_speed (*_maximum_ias_kt);
+	_efis_widget->set_maximum_speed_visibility (*_maximum_ias_valid);
+
+	_efis_widget->set_speed_tendency (*_ias_tendency_ktps * 10.f);
 	_efis_widget->set_speed_tendency_visibility(*_ias_tendency_valid);
 
 	_efis_widget->set_mach (*_mach);
@@ -146,6 +165,20 @@ EFIS::read()
 
 	_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
 	_efis_widget->set_ap_climb_rate_visibility (*_autopilot_cbr_setting_valid);
+
+	_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
+	_efis_widget->set_flight_director_pitch_visibility (*_flight_director_pitch_valid);
+
+	_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
+	_efis_widget->set_flight_director_roll_visibility (*_flight_director_roll_valid);
+
+	_efis_widget->set_navigation_needles_visibility (*_navigation_needles_enabled);
+
+	_efis_widget->set_nav_glideslope_needle (*_navigation_gs_needle);
+	_efis_widget->set_nav_glideslope_needle_visibility (*_navigation_gs_needle_valid);
+
+	_efis_widget->set_nav_heading_needle (*_navigation_hd_needle);
+	_efis_widget->set_nav_heading_needle_visibility (*_navigation_hd_needle_valid);
 
 	_efis_nav_widget->set_heading (*_heading_deg);
 	_efis_nav_widget->set_heading_visibility (*_heading_valid);

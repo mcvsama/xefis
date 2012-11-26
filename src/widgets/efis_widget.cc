@@ -42,7 +42,7 @@ EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter)
 	_max_shown (_altitude + _extent / 2.f),
 	_rounded_altitude (static_cast<int> (_altitude + _sgn * 10.f) / 20 * 20),
 	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
-	_ladder_pen (_efis.get_pen (_efis._ladder_color, 0.5f)),
+	_ladder_pen (_efis._ladder_border_color, _efis.pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
 	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_1 (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_2 (_efis.get_pen (QColor (255, 255, 255), 3.f)),
@@ -287,9 +287,9 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 			_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
 			_painter.translate (-2.f * x, posy);
 			_painter.setBrush (Qt::NoBrush);
-			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f));
+			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (300), 2.f));
 			_painter.drawPolygon (bug_shape);
-			_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f));
+			_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.33f));
 			_painter.drawPolygon (bug_shape);
 		}
 
@@ -302,7 +302,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 		_painter.save();
 		_painter.translate (3.75f * x, 0.f);
 		float posy = -8.f * x * scale_cbr (_efis._ap_climb_rate);
-		for (auto params: { std::make_pair (400, 2.f), std::make_pair (0, 1.2f) })
+		for (auto params: { std::make_pair (300, 2.f), std::make_pair (0, 1.33f) })
 		{
 			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (params.first), params.second));
 			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
@@ -321,7 +321,6 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 
 	QPen bold_white_pen = _efis.get_pen (QColor (255, 255, 255), 1.25f);
 	QPen thin_white_pen = _efis.get_pen (QColor (255, 255, 255), 0.50f);
-	QBrush ladder_brush (_efis._ladder_color);
 
 	_painter.save();
 
@@ -330,7 +329,7 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 	_painter.translate (3.75f * x, 0.f);
 
 	_painter.setPen (_ladder_pen);
-	_painter.setBrush (ladder_brush);
+	_painter.setBrush (_efis._ladder_color);
 	_painter.drawPolygon (QPolygonF()
 		<< QPointF (0.0f, -0.6 * y)
 		<< QPointF (-x, -0.6 * y - x)
@@ -502,7 +501,7 @@ EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
 	_max_shown (_speed + _extent / 2.f),
 	_rounded_speed (static_cast<int> (_speed + 0.5f)),
 	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
-	_ladder_pen (_efis._ladder_color, _efis.pen_width (0.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+	_ladder_pen (_efis._ladder_border_color, _efis.pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
 	_black_box_pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
 	_scale_pen (QColor (255, 255, 255), _efis.pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
 	_speed_bug_pen (QColor (0, 255, 0), _efis.pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)
@@ -763,9 +762,9 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 		_painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
 		_painter.translate (1.25f * x, posy);
 		_painter.setBrush (Qt::NoBrush);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (400), 2.f)),
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (300), 2.f)),
 		_painter.drawPolygon (bug_shape);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.2f)),
+		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.33f)),
 		_painter.drawPolygon (bug_shape);
 	}
 
@@ -864,13 +863,13 @@ EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& ef
 	}
 
 	_pitch_transform.reset();
-	_pitch_transform.translate (0.f, -pitch_to_px (p));
+	_pitch_transform.translate (0.f, -_efis.pitch_to_px (p));
 
 	_roll_transform.reset();
 	_roll_transform.rotate (-r);
 
 	_heading_transform.reset();
-	_heading_transform.translate (-heading_to_px (hdg), 0.f);
+	_heading_transform.translate (-_efis.heading_to_px (hdg), 0.f);
 
 	// Total transform of horizon (heading is not really necessary here):
 	_horizon_transform = _pitch_transform * _roll_transform;
@@ -945,7 +944,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	{
 		if (deg == -90 || deg == 0 || deg == 90)
 			continue;
-		float d = pitch_to_px (deg);
+		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
 		// Degs number:
 		int abs_deg = std::abs (deg);
@@ -961,7 +960,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	{
 		if (deg % 10 == 0)
 			continue;
-		float d = pitch_to_px (deg);
+		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
 	}
 	// 2.5° lines:
@@ -969,7 +968,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	{
 		if (deg % 50 == 0)
 			continue;
-		float d = pitch_to_px (deg / 10.f);
+		float d = _efis.pitch_to_px (deg / 10.f);
 		_painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
 	}
 
@@ -977,7 +976,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	// -90°, 90° lines:
 	for (float deg: { -90.f, 90.f })
 	{
-		float d = pitch_to_px (deg);
+		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z * 1.5f, d), QPointF (z * 1.5f, d));
 		QRectF lbox (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
 		QRectF rbox (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
@@ -1023,8 +1022,10 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 		else
 		{
 			float length = -0.05f * w;
-			if (std::abs (std::fmod (deg, 30.f)) < 1.f)
-				length *= 2.f;
+			if (std::abs (std::fmod (deg, 60.f)) < 1.f)
+				length *= 1.6f;
+			else if (std::abs (std::fmod (deg, 30.f)) < 1.f)
+				length *= 2.2f;
 			_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
 		}
 	}
@@ -1081,8 +1082,8 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 	_painter.setTransform (_heading_transform * _horizon_transform * _efis._center_transform);
 	for (int deg = -360; deg < 450; deg += 10)
 	{
-		float d10 = heading_to_px (deg);
-		float d05 = heading_to_px (deg + 5);
+		float d10 = _efis.heading_to_px (deg);
+		float d05 = _efis.heading_to_px (deg + 5);
 		QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
 		if (text == "0")
 			text = "N";
@@ -1114,7 +1115,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_flight_path_marker()
 	float w = _efis.pen_width (3.f);
 	float r = 0.5f * w;
 
-	QPointF marker_position (-heading_to_px (_efis._flight_path_beta), -pitch_to_px (_efis._flight_path_alpha));
+	QPointF marker_position (-_efis.heading_to_px (_efis._flight_path_beta), -_efis.pitch_to_px (_efis._flight_path_alpha));
 	_painter.save();
 
 	_flight_path_marker = QPainterPath();
@@ -1161,8 +1162,8 @@ EFISWidget::EFISWidget (QWidget* parent):
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
 	_ground_color.setHsv (34, 233, 127);
-	_ladder_color = QColor (51, 38, 93, 0x80);
-	_ladder_border_color = QColor (0, 0, 0, 0x70);
+	_ladder_color = QColor (64, 51, 108, 0x80);
+	_ladder_border_color = _ladder_color.darker (125);
 }
 
 
@@ -1194,7 +1195,9 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 		painter.restore();
 
 		paint_center_cross (painter);
+		paint_flight_director (painter);
 		paint_altitude_agl (painter);
+		paint_ils (painter);
 
 		painter.save();
 		SpeedLadder sl (*this, painter);
@@ -1235,17 +1238,46 @@ EFISWidget::paint_center_cross (QPainter& painter)
 		<<  x + y
 		<< -x + y;
 	QPolygonF b = QPolygonF()
-		<< -25.f * x - y
+		<< -27.f * x - y
 		<< -11.f * x - y
 		<< -11.f * x + 4.f * y
 		<< -13.f * x + 4.f * y
 		<< -13.f * x + y
-		<< -25.f * x + y;
+		<< -27.f * x + y;
 
 	painter.drawPolygon (a);
 	painter.drawPolygon (b);
 	painter.scale (-1.f, 1.f);
 	painter.drawPolygon (b);
+
+	painter.restore();
+}
+
+
+void
+EFISWidget::paint_flight_director (QPainter& painter)
+{
+	float const w = wh() * 1.4f / 9.f;
+	Degrees range = _fov / 4.f;
+
+	Degrees pitch = bound (_flight_director_pitch - _pitch, -range, +range);
+	Degrees roll = bound (_flight_director_roll - _roll, -range, +range);
+
+	float ypos = pitch_to_px (pitch);
+	float xpos = heading_to_px (roll) / 2.f;
+
+	painter.save();
+	painter.setTransform (_center_transform);
+
+	for (auto pen: { get_pen (_autopilot_color.darker (300), 2.5f),
+					 get_pen (_autopilot_color, 1.66f) })
+	{
+		painter.setPen (pen);
+		if (_flight_director_pitch_visible && _pitch_visible)
+			painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
+		if (_flight_director_roll_visible && _roll_visible)
+			painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
+	}
 
 	painter.restore();
 }
@@ -1281,6 +1313,70 @@ EFISWidget::paint_altitude_agl (QPainter& painter)
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
 	painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
+
+	painter.restore();
+}
+
+
+void
+EFISWidget::paint_ils (QPainter& painter)
+{
+	if (!_navigation_needles_visible)
+		return;
+
+	painter.save();
+
+	QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
+
+	auto paint_ladder = [&](bool needle_visible, float track_deviation) -> void
+	{
+		track_deviation = bound (track_deviation, -1.f, 1.f);
+
+		QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
+		rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
+
+		QRectF elli (0.f, 0.f, 0.015f * wh(), 0.015f * wh());
+		elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
+
+		painter.setPen (ladder_pen);
+		painter.setBrush (_ladder_color);
+		painter.drawRect (rect);
+
+		if (needle_visible)
+		{
+			float w = 0.012f * wh();
+			QPolygonF diamond = QPolygonF()
+				<< QPointF (0.f, -w)
+				<< QPointF (+1.6f * w, 0.f)
+				<< QPointF (0.f, +w)
+				<< QPointF (-1.6f * w, 0.f);
+			diamond.translate (track_deviation * 0.15f * wh(), 0.f);
+			painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+			painter.drawPolygon (diamond);
+			painter.setPen (QPen (_autopilot_color, pen_width (1.33f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+			painter.setBrush (_autopilot_color);
+			painter.drawPolygon (diamond);
+		}
+
+		painter.setPen (white_pen);
+		painter.setBrush (Qt::NoBrush);
+		for (float x: { -1.f, -0.5f, +0.5f, +1.f })
+			painter.drawEllipse (elli.translated (0.15f * wh() * x, 0.f));
+
+		painter.drawLine (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
+	};
+
+	painter.save();
+	painter.translate (0.f, 0.452f * wh());
+	paint_ladder (_navigation_hd_needle_visible, _navigation_hd_needle);
+	painter.restore();
+
+	painter.save();
+	painter.translate (0.28f * wh(), 0.f);
+	painter.rotate (-90);
+	paint_ladder (_navigation_gs_needle_visible, _navigation_gs_needle);
+	painter.restore();
 
 	painter.restore();
 }

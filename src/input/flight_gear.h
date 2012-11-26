@@ -65,6 +65,10 @@ class FlightGearInput:
 	Xefis::Property<bool>	_ias_valid;
 	Xefis::Property<float>	_ias_tendency_ktps;
 	Xefis::Property<bool>	_ias_tendency_valid;
+	Xefis::Property<float>	_minimum_ias_kt;
+	Xefis::Property<bool>	_minimum_ias_valid;
+	Xefis::Property<float>	_maximum_ias_kt;
+	Xefis::Property<bool>	_maximum_ias_valid;
 	Xefis::Property<float>	_gs_kt;
 	Xefis::Property<bool>	_gs_valid;
 	Xefis::Property<float>	_tas_kt;
@@ -97,6 +101,15 @@ class FlightGearInput:
 	Xefis::Property<bool>	_autopilot_speed_setting_valid;
 	Xefis::Property<float>	_autopilot_cbr_setting_fpm;
 	Xefis::Property<bool>	_autopilot_cbr_setting_valid;
+	Xefis::Property<float>	_flight_director_pitch_deg;
+	Xefis::Property<bool>	_flight_director_pitch_valid;
+	Xefis::Property<float>	_flight_director_roll_deg;
+	Xefis::Property<bool>	_flight_director_roll_valid;
+	Xefis::Property<bool>	_navigation_needles_enabled;
+	Xefis::Property<float>	_navigation_gs_needle;
+	Xefis::Property<bool>	_navigation_gs_needle_valid;
+	Xefis::Property<float>	_navigation_hd_needle;
+	Xefis::Property<bool>	_navigation_hd_needle_valid;
 };
 
 #endif

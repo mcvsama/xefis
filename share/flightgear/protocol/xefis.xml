@@ -30,6 +30,18 @@
 				<format>at-speed-sel=%f</format>
 				<node>/autopilot/settings/target-speed-kt</node>
 			</chunk>
+			<chunk>
+				<name>fd-pitch</name>
+				<type>float</type>
+				<format>fd-pitch=%f</format>
+				<node>/autopilot/internal/target-pitch-deg</node>
+			</chunk>
+			<chunk>
+				<name>fd-roll</name>
+				<type>float</type>
+				<format>fd-roll=%f</format>
+				<node>/autopilot/internal/target-roll-deg</node>
+			</chunk>
 			<!-- Speed -->
 			<chunk>
 				<name>ias</name>
@@ -60,6 +72,18 @@
 				<type>float</type>
 				<format>ias-tend=%f</format>
 				<node>/autopilot/internal/lookahead-10-sec-airspeed-kt</node>
+			</chunk>
+			<chunk>
+				<name>ias-max</name>
+				<type>float</type>
+				<format>ias-max=%f</format>
+				<node>/instrumentation/afds/max-airspeed-kts</node>
+			</chunk>
+			<chunk>
+				<name>ias-min</name>
+				<type>float</type>
+				<format>ias-min=%f</format>
+				<node>/instrumentation/weu/state/stall-speed</node>
 			</chunk>
 			<!-- Altitude -->
 			<chunk>
@@ -117,6 +141,37 @@
 				<type>float</type>
 				<format>beta=%f</format>
 				<node>/orientation/side-slip-deg</node>
+			</chunk>
+			<!-- Navigation -->
+			<chunk>
+				<name>nav</name>
+				<type>int</type>
+				<format>nav=%d</format>
+				<node>/instrumentation/nav/data-is-valid</node>
+			</chunk>
+			<chunk>
+				<name>nav-gs-ok</name>
+				<type>int</type>
+				<format>nav-gs-ok=%d</format>
+				<node>/instrumentation/nav/gs-in-range</node>
+			</chunk>
+			<chunk>
+				<name>nav-gs</name>
+				<type>float</type>
+				<format>nav-gs=%f</format>
+				<node>/instrumentation/nav/gs-needle-deflection-norm</node>
+			</chunk>
+			<chunk>
+				<name>nav-hd-ok</name>
+				<type>int</type>
+				<format>nav-hd-ok=%d</format>
+				<node>/instrumentation/nav/in-range</node>
+			</chunk>
+			<chunk>
+				<name>nav-hd</name>
+				<type>float</type>
+				<format>nav-hd=%f</format>
+				<node>/instrumentation/nav/heading-needle-deflection-norm</node>
 			</chunk>
 			<!-- Other -->
 			<chunk>
