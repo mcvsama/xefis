@@ -1179,6 +1179,7 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 	// Draw on buffer:
 	QPixmap buffer (w, h);
 	QPainter painter (&buffer);
+	TextPainter text_painter (painter);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
@@ -1197,7 +1198,7 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 		paint_center_cross (painter);
 		paint_flight_director (painter);
 		paint_altitude_agl (painter);
-		paint_ils (painter);
+		paint_nav (painter, text_painter);
 
 		painter.save();
 		SpeedLadder sl (*this, painter);
@@ -1319,8 +1320,35 @@ EFISWidget::paint_altitude_agl (QPainter& painter)
 
 
 void
-EFISWidget::paint_ils (QPainter& painter)
+EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 {
+	if (_dme_distance_visible)
+	{
+		QString dme_val = QString ("DME %1").arg (_dme_distance, 0, 'f', 1);
+		QFont font = _font_10_bold;
+		font.setBold (false);
+		QFontMetrics font_metrics (font);
+		QRectF rect (-0.24f * wh(), -0.36f * wh(), font_metrics.width (dme_val), font_metrics.height());
+		painter.save();
+		painter.setPen (QColor (255, 255, 255));
+		painter.setFont (font);
+		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, dme_val);
+		painter.restore();
+	}
+
+	if (_navigation_hint != "")
+	{
+		QFont font = _font_16_bold;
+		font.setBold (false);
+		QFontMetrics font_metrics (font);
+		QRectF rect (-0.24f * wh(), -0.32f * wh(), font_metrics.width (_navigation_hint), font_metrics.height());
+		painter.save();
+		painter.setPen (QColor (255, 255, 255));
+		painter.setFont (font);
+		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, _navigation_hint);
+		painter.restore();
+	}
+
 	if (!_navigation_needles_visible)
 		return;
 

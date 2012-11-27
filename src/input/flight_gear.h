@@ -110,6 +110,8 @@ class FlightGearInput:
 	Xefis::Property<bool>	_navigation_gs_needle_valid;
 	Xefis::Property<float>	_navigation_hd_needle;
 	Xefis::Property<bool>	_navigation_hd_needle_valid;
+	Xefis::Property<float>	_dme_distance_nm;
+	Xefis::Property<bool>	_dme_distance_valid;
 };
 
 #endif

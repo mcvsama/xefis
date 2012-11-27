@@ -105,6 +105,8 @@ FlightGearInput::set_path (QString const& path)
 	_navigation_gs_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/glide-slope/valid");
 	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
 	_navigation_hd_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/heading/valid");
+	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme/nm");
+	_dme_distance_valid = Xefis::Property<bool> (_property_path + "/navigation/dme/valid");
 
 	invalidate_all();
 }
@@ -258,6 +260,14 @@ FlightGearInput::read_input()
 			{
 				_navigation_hd_needle_valid.write (!!value.toInt());
 			}
+			else if (var == "dme-ok")
+			{
+				_dme_distance_valid.write (!!value.toInt());
+			}
+			else if (var == "dme")
+			{
+				_dme_distance_nm.write (value.toFloat());
+			}
 		}
 
 		if (*_altitude_agl_valid)
@@ -299,5 +309,6 @@ FlightGearInput::invalidate_all()
 	_navigation_needles_enabled.write (false);
 	_navigation_gs_needle_valid.write (false);
 	_navigation_hd_needle_valid.write (false);
+	_dme_distance_valid.write (false);
 }
 
