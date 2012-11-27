@@ -633,6 +633,37 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_nav_heading_needle_visibility (bool visible);
 
 	/**
+	 * Return nav hint.
+	 */
+	QString
+	nav_hint() const;
+
+	/**
+	 * Set navigation hint, a text shown on the top left corner of the ADI.
+	 * Usually something like "ILS" or "VOR".
+	 */
+	void
+	set_nav_hint (QString hint);
+
+	/**
+	 * Return DME distance.
+	 */
+	Miles
+	dme_distance() const;
+
+	/**
+	 * Set DME distance.
+	 */
+	void
+	set_dme_distance (Miles);
+
+	/**
+	 * Set DME info visibility.
+	 */
+	void
+	set_dme_distance_visibility (bool visible);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -665,7 +696,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_altitude_agl (QPainter&);
 
 	void
-	paint_ils (QPainter&);
+	paint_nav (QPainter&, TextPainter&);
 
 	void
 	paint_input_alert (QPainter&);
@@ -734,6 +765,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_navigation_gs_needle_visible	= false;
 	float				_navigation_hd_needle			= 0.f;
 	bool				_navigation_hd_needle_visible	= false;
+	QString				_navigation_hint;
+	Miles				_dme_distance					= 0.f;
+	bool				_dme_distance_visible			= false;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 };
@@ -1322,6 +1356,44 @@ inline void
 EFISWidget::set_nav_heading_needle_visibility (bool visible)
 {
 	_navigation_hd_needle_visible = visible;
+	update();
+}
+
+
+inline QString
+EFISWidget::nav_hint() const
+{
+	return _navigation_hint;
+}
+
+
+inline void
+EFISWidget::set_nav_hint (QString hint)
+{
+	_navigation_hint = hint;
+	update();
+}
+
+
+inline Miles
+EFISWidget::dme_distance() const
+{
+	return _dme_distance;
+}
+
+
+inline void
+EFISWidget::set_dme_distance (Miles distance)
+{
+	_dme_distance = distance;
+	update();
+}
+
+
+inline void
+EFISWidget::set_dme_distance_visibility (bool visible)
+{
+	_dme_distance_visible = visible;
 	update();
 }
 

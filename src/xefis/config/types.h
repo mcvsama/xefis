@@ -28,6 +28,7 @@ typedef float Feet;
 typedef float FeetPerMinute;
 typedef float Seconds;
 typedef float InHg;
+typedef float Miles;
 
 #endif
 

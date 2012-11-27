@@ -173,6 +173,18 @@
 				<format>nav-hd=%f</format>
 				<node>/instrumentation/nav/heading-needle-deflection-norm</node>
 			</chunk>
+			<chunk>
+				<name>dme-ok</name>
+				<type>int</type>
+				<format>dme-ok=%d</format>
+				<node>/instrumentation/dme/in-range</node>
+			</chunk>
+			<chunk>
+				<name>dme</name>
+				<type>float</type>
+				<format>dme=%f</format>
+				<node>/instrumentation/dme/indicated-distance-nm</node>
+			</chunk>
 			<!-- Other -->
 			<chunk>
 				<name>time</name>

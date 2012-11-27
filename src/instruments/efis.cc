@@ -103,6 +103,8 @@ EFIS::set_path (QString const& path)
 	_navigation_gs_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/glide-slope/valid");
 	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
 	_navigation_hd_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/heading/valid");
+	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme/nm");
+	_dme_distance_valid = Xefis::Property<bool> (_property_path + "/navigation/dme/valid");
 }
 
 
@@ -173,6 +175,10 @@ EFIS::read()
 	_efis_widget->set_flight_director_roll_visibility (*_flight_director_roll_valid);
 
 	_efis_widget->set_navigation_needles_visibility (*_navigation_needles_enabled);
+	_efis_widget->set_nav_hint (*_navigation_needles_enabled ? "ILS" : "");
+
+	_efis_widget->set_dme_distance (*_dme_distance_nm);
+	_efis_widget->set_dme_distance_visibility (*_dme_distance_valid);
 
 	_efis_widget->set_nav_glideslope_needle (*_navigation_gs_needle);
 	_efis_widget->set_nav_glideslope_needle_visibility (*_navigation_gs_needle_valid);
