@@ -91,6 +91,8 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 			default:
 				suffix = "";
 		}
+		if (node->is_nil())
+			suffix += "[nil]";
 		item->setData (1, Qt::DisplayRole, value + suffix);
 	}
 

@@ -87,6 +87,18 @@ template<class tType>
 		operator= (Property const& other);
 
 		/**
+		 * Return true if property is nil.
+		 */
+		bool
+		is_nil() const;
+
+		/**
+		 * Set property to the nil value.
+		 */
+		void
+		set_nil();
+
+		/**
 		 * Read property. If node can't be found, return default value.
 		 */
 		Type
@@ -187,12 +199,37 @@ template<class T>
 
 
 template<class T>
+	inline bool
+	Property<T>::is_nil() const
+	{
+		if (!_root)
+			throw std::logic_error ("can't read the root property");
+		PropertyNode* node = _root->locate (_path);
+		if (!node)
+			return true;
+		return node->is_nil();
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::set_nil()
+	{
+		if (!_root)
+			throw std::logic_error ("can't write to the root property");
+		PropertyNode* node = _root->locate (_path);
+		if (node)
+			node->set_nil();
+	}
+
+
+template<class T>
 	inline typename
 	Property<T>::Type
 	Property<T>::read() const
 	{
 		if (!_root)
-			throw std::logic_error ("can't read a null property");
+			throw std::logic_error ("can't read the root property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			return Type();
@@ -206,7 +243,7 @@ template<class T>
 	Property<T>::read_signalling() const
 	{
 		if (!_root)
-			throw std::logic_error ("can't read a null property");
+			throw std::logic_error ("can't read the root property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");
@@ -228,7 +265,7 @@ template<class T>
 	Property<T>::write (Type value)
 	{
 		if (!_root)
-			throw std::logic_error ("can't write to a null property");
+			throw std::logic_error ("can't write to the root property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 		{
@@ -251,7 +288,7 @@ template<class T>
 	Property<T>::write_signalling (Type value)
 	{
 		if (!_root)
-			throw std::logic_error ("can't write to a null property");
+			throw std::logic_error ("can't write to the root property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");

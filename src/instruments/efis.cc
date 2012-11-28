@@ -55,56 +55,31 @@ EFIS::set_path (QString const& path)
 	_property_path = path.toStdString();
 
 	_ias_kt = Xefis::Property<float> (_property_path + "/ias/kt");
-	_ias_valid = Xefis::Property<bool> (_property_path + "/ias/valid");
-	_ias_tendency_ktps = Xefis::Property<float> (_property_path + "/ias/lookahead/ktps");
-	_ias_tendency_valid = Xefis::Property<bool> (_property_path + "/ias/lookahead/valid");
+	_ias_tendency_kt = Xefis::Property<float> (_property_path + "/ias/lookahead/kt");
 	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/ias/minimum/kt");
-	_minimum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/minimum/valid");
 	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/ias/maximum/kt");
-	_maximum_ias_valid = Xefis::Property<bool> (_property_path + "/ias/maximum/valid");
 	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
-	_gs_valid = Xefis::Property<bool> (_property_path + "/gs/valid");
 	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
-	_tas_valid = Xefis::Property<bool> (_property_path + "/tas/valid");
 	_mach = Xefis::Property<float> (_property_path + "/mach/value");
-	_mach_valid = Xefis::Property<bool> (_property_path + "/mach/valid");
 	_pitch_deg = Xefis::Property<float> (_property_path + "/pitch/deg");
-	_pitch_valid = Xefis::Property<bool> (_property_path + "/pitch/valid");
 	_roll_deg = Xefis::Property<float> (_property_path + "/roll/deg");
-	_roll_valid = Xefis::Property<bool> (_property_path + "/roll/valid");
 	_heading_deg = Xefis::Property<float> (_property_path + "/heading/deg");
-	_heading_valid = Xefis::Property<bool> (_property_path + "/heading/valid");
 	_fpm_alpha_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/alpha/deg");
-	_fpm_alpha_valid = Xefis::Property<bool> (_property_path + "/flight-path-marker/alpha/valid");
 	_fpm_beta_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/beta/deg");
-	_fpm_beta_valid = Xefis::Property<bool> (_property_path + "/flight-path-marker/beta/valid");
 	_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/ft");
-	_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/valid");
 	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl/ft");
-	_altitude_agl_valid = Xefis::Property<bool> (_property_path + "/altitude/agl/valid");
 	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude/ft");
-	_landing_altitude_valid = Xefis::Property<bool> (_property_path + "/altitude/landing-altitude/valid");
 	_pressure_inhg = Xefis::Property<float> (_property_path + "/pressure/inhg");
-	_pressure_valid = Xefis::Property<bool> (_property_path + "/pressure/valid");
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
-	_cbr_valid = Xefis::Property<bool> (_property_path + "/cbr/valid");
 	_autopilot_alt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/altitude/ft");
-	_autopilot_alt_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/altitude/valid");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
-	_autopilot_speed_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/speed/valid");
 	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
-	_autopilot_cbr_setting_valid = Xefis::Property<bool> (_property_path + "/autopilot/setting/climb-rate/valid");
 	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch/deg");
-	_flight_director_pitch_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/pitch/valid");
 	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll/deg");
-	_flight_director_roll_valid = Xefis::Property<bool> (_property_path + "/autopilot/flight-director/roll/valid");
 	_navigation_needles_enabled = Xefis::Property<bool> (_property_path + "/navigation/enabled");
 	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope/value");
-	_navigation_gs_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/glide-slope/valid");
 	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
-	_navigation_hd_needle_valid = Xefis::Property<bool> (_property_path + "/navigation/heading/valid");
 	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme/nm");
-	_dme_distance_valid = Xefis::Property<bool> (_property_path + "/navigation/dme/valid");
 }
 
 
@@ -112,90 +87,90 @@ void
 EFIS::read()
 {
 	_efis_widget->set_speed (*_ias_kt);
-	_efis_widget->set_speed_visibility (*_ias_valid);
+	_efis_widget->set_speed_visibility (!_ias_kt.is_nil());
 
 	_efis_widget->set_minimum_speed (*_minimum_ias_kt);
-	_efis_widget->set_minimum_speed_visibility (*_minimum_ias_valid);
+	_efis_widget->set_minimum_speed_visibility (!_minimum_ias_kt.is_nil());
 
 	_efis_widget->set_maximum_speed (*_maximum_ias_kt);
-	_efis_widget->set_maximum_speed_visibility (*_maximum_ias_valid);
+	_efis_widget->set_maximum_speed_visibility (!_maximum_ias_kt.is_nil());
 
-	_efis_widget->set_speed_tendency (*_ias_tendency_ktps * 10.f);
-	_efis_widget->set_speed_tendency_visibility(*_ias_tendency_valid);
+	_efis_widget->set_speed_tendency (*_ias_tendency_kt);
+	_efis_widget->set_speed_tendency_visibility(!_ias_tendency_kt.is_nil());
 
 	_efis_widget->set_mach (*_mach);
-	_efis_widget->set_mach_visibility (*_mach_valid);
+	_efis_widget->set_mach_visibility (!_mach.is_nil());
 
 	_efis_widget->set_pitch (*_pitch_deg);
-	_efis_widget->set_pitch_visibility (*_pitch_valid);
+	_efis_widget->set_pitch_visibility (!_pitch_deg.is_nil());
 
 	_efis_widget->set_roll (*_roll_deg);
-	_efis_widget->set_roll_visibility (*_roll_valid);
+	_efis_widget->set_roll_visibility (!_roll_deg.is_nil());
 
 	_efis_widget->set_heading (*_heading_deg);
-	_efis_widget->set_heading_visibility (*_heading_valid);
+	_efis_widget->set_heading_visibility (!_heading_deg.is_nil());
 
 	_efis_widget->set_flight_path_alpha (*_fpm_alpha_deg);
-	_efis_widget->set_flight_path_marker_visibility (*_fpm_alpha_valid);
+	_efis_widget->set_flight_path_marker_visibility (!_fpm_alpha_deg.is_nil());
 
 	_efis_widget->set_flight_path_beta (*_fpm_beta_deg);
-	_efis_widget->set_flight_path_marker_visibility (*_fpm_beta_valid);
+	_efis_widget->set_flight_path_marker_visibility (!_fpm_beta_deg.is_nil());
 
 	_efis_widget->set_altitude (*_altitude_ft);
-	_efis_widget->set_altitude_visibility (*_altitude_valid);
+	_efis_widget->set_altitude_visibility (!_altitude_ft.is_nil());
 
 	_efis_widget->set_altitude_agl (*_altitude_agl_ft);
-	_efis_widget->set_altitude_agl_visibility (*_altitude_agl_valid);
+	_efis_widget->set_altitude_agl_visibility (!_altitude_agl_ft.is_nil());
 
 	_efis_widget->set_landing_altitude (*_landing_altitude_ft);
-	_efis_widget->set_landing_altitude_visibility (*_landing_altitude_valid);
+	_efis_widget->set_landing_altitude_visibility (!_landing_altitude_ft.is_nil());
 
 	_efis_widget->set_pressure (*_pressure_inhg);
-	_efis_widget->set_pressure_visibility (*_pressure_valid);
+	_efis_widget->set_pressure_visibility (!_pressure_inhg.is_nil());
 
 	_efis_widget->set_climb_rate (*_cbr_fpm);
-	_efis_widget->set_climb_rate_visibility (*_cbr_valid);
+	_efis_widget->set_climb_rate_visibility (!_cbr_fpm.is_nil());
 
 	_efis_widget->set_ap_altitude (*_autopilot_alt_setting_ft);
-	_efis_widget->set_ap_altitude_visibility (*_autopilot_alt_setting_valid);
+	_efis_widget->set_ap_altitude_visibility (!_autopilot_alt_setting_ft.is_nil());
 
 	_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
-	_efis_widget->set_at_speed_visibility (*_autopilot_speed_setting_valid);
+	_efis_widget->set_at_speed_visibility (!_autopilot_speed_setting_kt.is_nil());
 
 	_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
-	_efis_widget->set_at_speed_visibility (*_autopilot_speed_setting_valid);
+	_efis_widget->set_at_speed_visibility (!_autopilot_speed_setting_kt.is_nil());
 
 	_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
-	_efis_widget->set_ap_climb_rate_visibility (*_autopilot_cbr_setting_valid);
+	_efis_widget->set_ap_climb_rate_visibility (!_autopilot_cbr_setting_fpm.is_nil());
 
 	_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
-	_efis_widget->set_flight_director_pitch_visibility (*_flight_director_pitch_valid);
+	_efis_widget->set_flight_director_pitch_visibility (!_flight_director_pitch_deg.is_nil());
 
 	_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
-	_efis_widget->set_flight_director_roll_visibility (*_flight_director_roll_valid);
+	_efis_widget->set_flight_director_roll_visibility (!_flight_director_roll_deg.is_nil());
 
 	_efis_widget->set_navigation_needles_visibility (*_navigation_needles_enabled);
 	_efis_widget->set_nav_hint (*_navigation_needles_enabled ? "ILS" : "");
 
 	_efis_widget->set_dme_distance (*_dme_distance_nm);
-	_efis_widget->set_dme_distance_visibility (*_dme_distance_valid);
+	_efis_widget->set_dme_distance_visibility (!_dme_distance_nm.is_nil());
 
 	_efis_widget->set_nav_glideslope_needle (*_navigation_gs_needle);
-	_efis_widget->set_nav_glideslope_needle_visibility (*_navigation_gs_needle_valid);
+	_efis_widget->set_nav_glideslope_needle_visibility (!_navigation_gs_needle.is_nil());
 
 	_efis_widget->set_nav_heading_needle (*_navigation_hd_needle);
-	_efis_widget->set_nav_heading_needle_visibility (*_navigation_hd_needle_valid);
+	_efis_widget->set_nav_heading_needle_visibility (!_navigation_hd_needle.is_nil());
 
 	_efis_nav_widget->set_heading (*_heading_deg);
-	_efis_nav_widget->set_heading_visibility (*_heading_valid);
+	_efis_nav_widget->set_heading_visibility (!_heading_deg.is_nil());
 
 	_efis_nav_widget->set_flight_path_beta (*_fpm_beta_deg);
-	_efis_nav_widget->set_flight_path_marker_visibility (*_fpm_beta_valid);
+	_efis_nav_widget->set_flight_path_marker_visibility (!_fpm_beta_deg.is_nil());
 
 	_efis_nav_widget->set_ground_speed (*_gs_kt);
-	_efis_nav_widget->set_ground_speed_visibility (*_gs_valid);
+	_efis_nav_widget->set_ground_speed_visibility (!_gs_kt.is_nil());
 
 	_efis_nav_widget->set_true_air_speed (*_tas_kt);
-	_efis_nav_widget->set_true_air_speed_visibility (*_tas_valid);
+	_efis_nav_widget->set_true_air_speed_visibility (!_tas_kt.is_nil());
 }
 
