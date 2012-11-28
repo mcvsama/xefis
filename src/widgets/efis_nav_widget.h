@@ -150,6 +150,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	// Parameters:
 	Degrees				_heading					= 0.f;
 	bool				_heading_visible			= false;
+	// TODO change to /instr/nav/crosstrack-heading-error-deg
 	Degrees				_flight_path_beta			= 0.f;
 	bool				_flight_path_visible		= false;
 	Knots				_ground_speed				= 0.f;

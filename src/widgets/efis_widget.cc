@@ -66,6 +66,7 @@ EFISWidget::AltitudeLadder::paint()
 	paint_ladder_scale (x);
 	paint_climb_rate (x);
 	paint_bugs (x);
+	paint_altitude_tendency (x);
 	paint_black_box (x);
 	paint_pressure (x);
 	paint_ap_setting (x);
@@ -229,6 +230,34 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 
 
 void
+EFISWidget::AltitudeLadder::paint_altitude_tendency (float x)
+{
+	if (!_efis._altitude_tendency_visible || !_efis._altitude_visible)
+		return;
+
+	QPen pen (_efis.get_pen (_efis._navigation_color, 1.25f));
+	pen.setCapStyle (Qt::RoundCap);
+	pen.setJoinStyle (Qt::RoundJoin);
+
+	_painter.save();
+	_painter.setPen (pen);
+	_painter.translate (-1.2f * x, 0.f);
+	if (_efis._altitude_tendency < _altitude)
+		_painter.scale (1.f, -1.f);
+	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (ft_to_px (std::max (0.f, _efis._altitude_tendency)))) - 0.5f * x;
+	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
+	if (length > 0)
+		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
+	_painter.translate (0.f, -length);
+	_painter.drawPolygon (QPolygonF()
+		<< QPointF (0.f, -0.5f * x)
+		<< QPointF (-0.2f * x, 0.f)
+		<< QPointF (+0.2f * x, 0.f));
+	_painter.restore();
+}
+
+
+void
 EFISWidget::AltitudeLadder::paint_bugs (float x)
 {
 	if (_efis._altitude_visible)
@@ -257,7 +286,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 		}
 
 		// Landing altitude bug:
-		if (_efis._landing_altitude > _min_shown && _efis._landing_altitude < _max_shown)
+		if (_efis._landing_altitude_visible && _efis._landing_altitude > _min_shown && _efis._landing_altitude < _max_shown)
 		{
 			float posy = ft_to_px (_efis._landing_altitude);
 			QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
@@ -522,8 +551,8 @@ EFISWidget::SpeedLadder::paint()
 	paint_black_box (x, true);
 	paint_ladder_scale (x);
 	paint_speed_limits (x);
-	paint_speed_tendency (x);
 	paint_bugs (x);
+	paint_speed_tendency (x);
 	paint_black_box (x);
 	paint_mach_number (x);
 	paint_ap_setting (x);
@@ -706,7 +735,7 @@ EFISWidget::SpeedLadder::paint_speed_tendency (float x)
 	_painter.save();
 	_painter.setPen (pen);
 	_painter.translate (1.2f * x, 0.f);
-	if (_efis._speed_tendency < _efis._speed)
+	if (_efis._speed_tendency < _speed)
 		_painter.scale (1.f, -1.f);
 	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency)))) - 0.5f * x;
 	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));

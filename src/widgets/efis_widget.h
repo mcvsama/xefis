@@ -51,6 +51,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 		paint_ladder_scale (float x);
 
 		void
+		paint_altitude_tendency (float x);
+
+		void
 		paint_bugs (float x);
 
 		void
@@ -298,7 +301,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set speed tendency value.
 	 */
 	void
-	set_speed_tendency (KnotsPerSecond);
+	set_speed_tendency (Knots);
 
 	/**
 	 * Set speed tendency arrow visibility.
@@ -317,6 +320,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_altitude (Feet);
+
+	/**
+	 * Set altitude tendency value.
+	 */
+	void
+	set_altitude_tendency (Feet);
+
+	/**
+	 * Set altitude tendency arrow visibility.
+	 */
+	void
+	set_altitude_tendency_visibility (bool visible);
 
 	/**
 	 * Set speed tendency value.
@@ -730,10 +745,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_flight_path_visible			= false;
 	Knots				_speed							= 0.f;
 	bool				_speed_visible					= false;
-	KnotsPerSecond		_speed_tendency					= 0.f;
+	Knots				_speed_tendency					= 0.f;
 	bool				_speed_tendency_visible			= false;
 	Feet				_altitude						= 0.f;
 	bool				_altitude_visible				= false;
+	Feet				_altitude_tendency				= 0.f;
+	bool				_altitude_tendency_visible		= false;
 	Feet				_altitude_agl					= 0.f;
 	bool				_altitude_agl_visible			= false;
 	Feet				_landing_altitude				= 0.f;
@@ -918,9 +935,9 @@ EFISWidget::set_speed_visibility (bool visible)
 
 
 inline void
-EFISWidget::set_speed_tendency (KnotsPerSecond kps)
+EFISWidget::set_speed_tendency (Knots kt)
 {
-	_speed_tendency = kps;
+	_speed_tendency = kt;
 	update();
 }
 
@@ -952,6 +969,22 @@ inline void
 EFISWidget::set_altitude_visibility (bool visible)
 {
 	_altitude_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_tendency (Feet ft)
+{
+	_altitude_tendency = ft;
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_tendency_visibility (bool visible)
+{
+	_altitude_tendency_visible = visible;
 	update();
 }
 

@@ -109,9 +109,27 @@ class PropertyNode
 	PropertyNode (std::string const& name, std::string const& value);
 
 	/**
+	 * Create a nil node of given type.
+	 */
+	template<class tType>
+		PropertyNode (std::string const& name);
+
+	/**
 	 * Deletes child properties.
 	 */
 	~PropertyNode();
+
+	/**
+	 * Return true if property is nil.
+	 */
+	bool
+	is_nil() const;
+
+	/**
+	 * Write nil value to this property.
+	 */
+	void
+	set_nil();
 
 	/**
 	 * Return node name.
@@ -236,6 +254,7 @@ class PropertyNode
 		double			_value_double;
 	};
 	std::string			_value_string;
+	bool				_is_nil = false;
 	PropertyNodeList	_children;
 	NameLookup			_children_by_name;
 };
@@ -261,18 +280,18 @@ PropertyNode::PropertyNode (std::string const& name):
 
 
 inline
-PropertyNode::PropertyNode (std::string const& name, int value):
-	_type (PropInteger),
-	_name (name),
-	_value_int (value)
-{ }
-
-
-inline
 PropertyNode::PropertyNode (std::string const& name, bool value):
 	_type (PropBoolean),
 	_name (name),
 	_value_bool (value)
+{ }
+
+
+inline
+PropertyNode::PropertyNode (std::string const& name, int value):
+	_type (PropInteger),
+	_name (name),
+	_value_int (value)
 { }
 
 
@@ -300,10 +319,64 @@ PropertyNode::PropertyNode (std::string const& name, std::string const& value):
 { }
 
 
+template<>
+	inline
+	PropertyNode::PropertyNode<bool> (std::string const& name):
+		_type (PropBoolean),
+		_name (name),
+		_value_bool(),
+		_is_nil (true)
+	{ }
+
+
+template<>
+	inline
+	PropertyNode::PropertyNode<int> (std::string const& name):
+		_type (PropInteger),
+		_name (name),
+		_value_int(),
+		_is_nil (true)
+	{ }
+
+
+template<>
+	inline
+	PropertyNode::PropertyNode<double> (std::string const& name):
+		_type (PropFloat),
+		_name (name),
+		_value_double(),
+		_is_nil (true)
+	{ }
+
+
+template<>
+	inline
+	PropertyNode::PropertyNode<std::string> (std::string const& name):
+		_type (PropString),
+		_name (name),
+		_value_string(),
+		_is_nil (true)
+	{ }
+
+
 inline
 PropertyNode::~PropertyNode()
 {
 	clear();
+}
+
+
+inline bool
+PropertyNode::is_nil() const
+{
+	return _is_nil;
+}
+
+
+inline void
+PropertyNode::set_nil()
+{
+	_is_nil = true;
 }
 
 
@@ -380,6 +453,7 @@ template<>
 				_value_string = value;
 				break;
 		}
+		_is_nil = false;
 	}
 
 
@@ -443,6 +517,7 @@ template<class tType>
 				_value_string = boost::lexical_cast<std::string> (value);
 				break;
 		}
+		_is_nil = false;
 	}
 
 } // namespace Xefis
