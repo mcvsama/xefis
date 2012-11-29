@@ -621,13 +621,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set navigation glideslope needle. Values: [-1.f, +1.f].
 	 */
 	void
-	set_nav_glideslope_needle (float value);
+	set_navigation_glideslope_needle (float value);
 
 	/**
 	 * Set navigation glideslope needle visibility.
 	 */
 	void
-	set_nav_glideslope_needle_visibility (bool visible);
+	set_navigation_glideslope_needle_visibility (bool visible);
 
 	/**
 	 * Return navigation heading needle value.
@@ -639,13 +639,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set navigation heading needle. Values: [-1.f, +1.f].
 	 */
 	void
-	set_nav_heading_needle (float value);
+	set_navigation_heading_needle (float value);
 
 	/**
 	 * Set navigation heading needle visibility.
 	 */
 	void
-	set_nav_heading_needle_visibility (bool visible);
+	set_navigation_heading_needle_visibility (bool visible);
 
 	/**
 	 * Return nav hint.
@@ -658,7 +658,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Usually something like "ILS" or "VOR".
 	 */
 	void
-	set_nav_hint (QString hint);
+	set_navigation_hint (QString hint);
 
 	/**
 	 * Return DME distance.
@@ -1355,7 +1355,7 @@ EFISWidget::nav_glideslope_needle() const
 
 
 inline void
-EFISWidget::set_nav_glideslope_needle (float value)
+EFISWidget::set_navigation_glideslope_needle (float value)
 {
 	_navigation_gs_needle = value;
 	update();
@@ -1363,7 +1363,7 @@ EFISWidget::set_nav_glideslope_needle (float value)
 
 
 inline void
-EFISWidget::set_nav_glideslope_needle_visibility (bool visible)
+EFISWidget::set_navigation_glideslope_needle_visibility (bool visible)
 {
 	_navigation_gs_needle_visible = visible;
 	update();
@@ -1378,7 +1378,7 @@ EFISWidget::nav_heading_needle() const
 
 
 inline void
-EFISWidget::set_nav_heading_needle (float value)
+EFISWidget::set_navigation_heading_needle (float value)
 {
 	_navigation_hd_needle = value;
 	update();
@@ -1386,7 +1386,7 @@ EFISWidget::set_nav_heading_needle (float value)
 
 
 inline void
-EFISWidget::set_nav_heading_needle_visibility (bool visible)
+EFISWidget::set_navigation_heading_needle_visibility (bool visible)
 {
 	_navigation_hd_needle_visible = visible;
 	update();
@@ -1401,7 +1401,7 @@ EFISWidget::nav_hint() const
 
 
 inline void
-EFISWidget::set_nav_hint (QString hint)
+EFISWidget::set_navigation_hint (QString hint)
 {
 	_navigation_hint = hint;
 	update();
