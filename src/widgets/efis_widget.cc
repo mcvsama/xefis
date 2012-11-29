@@ -1378,64 +1378,102 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		painter.restore();
 	}
 
-	if (!_navigation_needles_visible)
-		return;
-
-	painter.save();
-
-	QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
-
-	auto paint_ladder = [&](bool needle_visible, float track_deviation) -> void
+	if (_navigation_needles_visible)
 	{
-		track_deviation = bound (track_deviation, -1.f, 1.f);
+		painter.save();
 
-		QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
-		rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
+		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+		QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
 
-		QRectF elli (0.f, 0.f, 0.015f * wh(), 0.015f * wh());
-		elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
-
-		painter.setPen (ladder_pen);
-		painter.setBrush (_ladder_color);
-		painter.drawRect (rect);
-
-		if (needle_visible)
+		auto paint_ladder = [&](bool needle_visible, float track_deviation) -> void
 		{
-			float w = 0.012f * wh();
-			QPolygonF diamond = QPolygonF()
-				<< QPointF (0.f, -w)
-				<< QPointF (+1.6f * w, 0.f)
-				<< QPointF (0.f, +w)
-				<< QPointF (-1.6f * w, 0.f);
-			diamond.translate (track_deviation * 0.15f * wh(), 0.f);
-			painter.setPen (QPen (_autopilot_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-			painter.drawPolygon (diamond);
-			painter.setPen (QPen (_autopilot_color, pen_width (1.33f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-			painter.setBrush (_autopilot_color);
-			painter.drawPolygon (diamond);
+			track_deviation = bound (track_deviation, -1.f, 1.f);
+
+			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
+			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
+
+			QRectF elli (0.f, 0.f, 0.015f * wh(), 0.015f * wh());
+			elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
+
+			painter.setPen (ladder_pen);
+			painter.setBrush (_ladder_color);
+			painter.drawRect (rect);
+
+			if (needle_visible)
+			{
+				float w = 0.012f * wh();
+				QPolygonF diamond = QPolygonF()
+					<< QPointF (0.f, -w)
+					<< QPointF (+1.6f * w, 0.f)
+					<< QPointF (0.f, +w)
+					<< QPointF (-1.6f * w, 0.f);
+				diamond.translate (track_deviation * 0.15f * wh(), 0.f);
+				for (auto pen: { QPen (_autopilot_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
+								 QPen (_autopilot_color, pen_width (1.33f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin) })
+				{
+					painter.setPen (pen);
+					painter.setBrush (pen.color());
+					painter.drawPolygon (diamond);
+					painter.drawPolygon (diamond);
+				}
+			}
+
+			painter.setPen (white_pen);
+			painter.setBrush (Qt::NoBrush);
+			for (float x: { -1.f, -0.5f, +0.5f, +1.f })
+				painter.drawEllipse (elli.translated (0.15f * wh() * x, 0.f));
+
+			painter.drawLine (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
+		};
+
+		painter.save();
+		painter.translate (0.f, 0.452f * wh());
+		paint_ladder (_navigation_hd_needle_visible, _navigation_hd_needle);
+		painter.restore();
+
+		painter.save();
+		painter.translate (0.28f * wh(), 0.f);
+		painter.rotate (-90);
+		paint_ladder (_navigation_gs_needle_visible, _navigation_gs_needle);
+		painter.restore();
+
+		painter.restore();
+	}
+
+	if (_navigation_runway_visible)
+	{
+		float w = 0.10f * wh();
+		float h = 0.05f * wh();
+		float p = 1.3f;
+		float offset = bound (_navigation_hd_needle, -1.f, +1.f);
+
+		painter.save();
+		painter.translate (0.f, 0.28f * wh());
+
+		QPointF tps[] = { QPointF (-w, 0.f), QPointF (0.f, 0.f), QPointF (+w, 0.f) };
+		QPointF bps[] = { QPointF (-w * p, h), QPointF (0.f, h), QPointF (+w * p, h) };
+
+		for (QPointF& point: tps)
+			point += QPointF (2.5f * w * offset, 0);
+		for (QPointF& point: bps)
+			point += QPointF (2.5f * p * w * offset, 0);
+
+		QRectF clip (-2.5f * w, -0.2f * h, 5.f * w, 1.4f * h);
+		painter.setClipRect (clip);
+
+		QPolygonF runway = QPolygonF() << tps[0] << tps[2] << bps[2] << bps[0];
+
+		painter.setBrush (Qt::NoBrush);
+		for (auto pen: { QPen (_navigation_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin),
+						 QPen (_navigation_color, pen_width (1.33f), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin) })
+		{
+			painter.setPen (pen);
+			painter.drawPolygon (runway);
+			painter.drawLine (tps[1], bps[1]);
 		}
 
-		painter.setPen (white_pen);
-		painter.setBrush (Qt::NoBrush);
-		for (float x: { -1.f, -0.5f, +0.5f, +1.f })
-			painter.drawEllipse (elli.translated (0.15f * wh() * x, 0.f));
-
-		painter.drawLine (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
-	};
-
-	painter.save();
-	painter.translate (0.f, 0.452f * wh());
-	paint_ladder (_navigation_hd_needle_visible, _navigation_hd_needle);
-	painter.restore();
-
-	painter.save();
-	painter.translate (0.28f * wh(), 0.f);
-	painter.rotate (-90);
-	paint_ladder (_navigation_gs_needle_visible, _navigation_gs_needle);
-	painter.restore();
-
-	painter.restore();
+		painter.restore();
+	}
 }
 
 
