@@ -58,18 +58,20 @@ PropertyTreeWidgetItem::read()
 
 
 bool
-PropertyTreeWidgetItem::operator< (QTreeWidgetItem const& other) const
+PropertyTreeWidgetItem::operator< (QTreeWidgetItem const& that_item) const
 {
-	// TODO it's not fixed yet:
+	PropertyTreeWidgetItem const* that = dynamic_cast<PropertyTreeWidgetItem const*> (&that_item);
 
-	PropertyTreeWidgetItem const* other_p = dynamic_cast<PropertyTreeWidgetItem const*> (&other);
-	if (!other_p)
-		return QTreeWidgetItem::operator< (other);
+	if (that)
+	{
+		bool const this_is_dir = this->_node->type() == PropDirectory;
+		bool const that_is_dir = that->_node->type() == PropDirectory;
 
-	int a = _node->type() == PropDirectory ? -1 : 0;
-	int b = other_p->type() == PropDirectory ? -1 : 0;
+		if (this_is_dir != that_is_dir)
+			return this_is_dir;
+	}
 
-	return (a < b) || (a == b && QTreeWidgetItem::operator< (other));
+	return QTreeWidgetItem::operator< (that_item);
 }
 
 
