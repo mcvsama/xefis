@@ -648,6 +648,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_navigation_heading_needle_visibility (bool visible);
 
 	/**
+	 * Set navigation runway visibility (aligns with heading needle).
+	 */
+	void
+	set_navigation_runway_visibility (bool visible);
+
+	/**
 	 * Return nav hint.
 	 */
 	QString
@@ -782,6 +788,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_navigation_gs_needle_visible	= false;
 	float				_navigation_hd_needle			= 0.f;
 	bool				_navigation_hd_needle_visible	= false;
+	bool				_navigation_runway_visible		= false;
 	QString				_navigation_hint;
 	Miles				_dme_distance					= 0.f;
 	bool				_dme_distance_visible			= false;
@@ -1389,6 +1396,14 @@ inline void
 EFISWidget::set_navigation_heading_needle_visibility (bool visible)
 {
 	_navigation_hd_needle_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_navigation_runway_visibility (bool visible)
+{
+	_navigation_runway_visible = visible;
 	update();
 }
 

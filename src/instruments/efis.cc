@@ -161,6 +161,9 @@ EFIS::read()
 	_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
 	_efis_widget->set_navigation_heading_needle_visibility (!_navigation_hd_needle.is_nil());
 
+	_efis_widget->set_navigation_runway_visibility (*_navigation_needles_enabled && !_navigation_hd_needle.is_nil() &&
+													!_altitude_agl_ft.is_nil() && *_altitude_agl_ft <= 500.f);
+
 	_efis_nav_widget->set_heading (*_heading_deg);
 	_efis_nav_widget->set_heading_visibility (!_heading_deg.is_nil());
 
