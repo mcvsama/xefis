@@ -150,16 +150,16 @@ EFIS::read()
 	_efis_widget->set_flight_director_roll_visibility (!_flight_director_roll_deg.is_nil());
 
 	_efis_widget->set_navigation_needles_visibility (*_navigation_needles_enabled);
-	_efis_widget->set_nav_hint (*_navigation_needles_enabled ? "ILS" : "");
+	_efis_widget->set_navigation_hint (*_navigation_needles_enabled ? "ILS" : "");
 
 	_efis_widget->set_dme_distance (*_dme_distance_nm);
 	_efis_widget->set_dme_distance_visibility (!_dme_distance_nm.is_nil());
 
-	_efis_widget->set_nav_glideslope_needle (*_navigation_gs_needle);
-	_efis_widget->set_nav_glideslope_needle_visibility (!_navigation_gs_needle.is_nil());
+	_efis_widget->set_navigation_glideslope_needle (*_navigation_gs_needle);
+	_efis_widget->set_navigation_glideslope_needle_visibility (!_navigation_gs_needle.is_nil());
 
-	_efis_widget->set_nav_heading_needle (*_navigation_hd_needle);
-	_efis_widget->set_nav_heading_needle_visibility (!_navigation_hd_needle.is_nil());
+	_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
+	_efis_widget->set_navigation_heading_needle_visibility (!_navigation_hd_needle.is_nil());
 
 	_efis_nav_widget->set_heading (*_heading_deg);
 	_efis_nav_widget->set_heading_visibility (!_heading_deg.is_nil());
