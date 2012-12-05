@@ -73,6 +73,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::Property<float>	_cbr_fpm;
 	Xefis::Property<float>	_autopilot_alt_setting_ft;
 	Xefis::Property<float>	_autopilot_speed_setting_kt;
+	Xefis::Property<float>	_autopilot_heading_setting_deg;
 	Xefis::Property<float>	_autopilot_cbr_setting_fpm;
 	Xefis::Property<float>	_flight_director_pitch_deg;
 	Xefis::Property<float>	_flight_director_roll_deg;

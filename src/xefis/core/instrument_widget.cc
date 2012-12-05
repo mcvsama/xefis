@@ -58,6 +58,13 @@ InstrumentWidget::get_digit_width (QFont& font) const
 }
 
 
+float
+InstrumentWidget::translate_descent (QFontMetricsF& metrics_1, QFontMetricsF& metrics_2)
+{
+	return metrics_2.height() - metrics_2.descent() - metrics_1.height() + metrics_1.descent();
+}
+
+
 void
 InstrumentWidget::update_fonts()
 {
@@ -89,6 +96,9 @@ InstrumentWidget::update_fonts()
 	_font_20_digit_width = get_digit_width (_font_20_bold);
 	_font_20_digit_height = QFontMetrics (_font_20_bold).height();
 	_font_20_digit_height = height_scale_factor * QFontMetrics (_font_20_bold).height();
+
+	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 2.f);
+	_autopilot_pen_2 = get_pen (_autopilot_color, 1.33f);
 }
 
 } // namespace Xefis

@@ -57,6 +57,9 @@ class InstrumentWidget: public QWidget
 	int
 	get_digit_width (QFont&) const;
 
+	float
+	translate_descent (QFontMetricsF& metrics_1, QFontMetricsF& metrics_2);
+
 	void
 	update_fonts();
 
@@ -77,6 +80,8 @@ class InstrumentWidget: public QWidget
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
 	float				_height_for_width = 1.f;
+	QPen				_autopilot_pen_1;
+	QPen				_autopilot_pen_2;
 
 	static const char	DIGITS[10];
 	static const char*	MINUS_SIGN;

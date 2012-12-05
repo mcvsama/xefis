@@ -31,6 +31,12 @@
 				<node>/autopilot/settings/target-speed-kt</node>
 			</chunk>
 			<chunk>
+				<name>ap-hdg-sel</name>
+				<type>float</type>
+				<format>ap-hdg-sel=%f</format>
+				<node>/autopilot/settings/heading-bug-deg</node>
+			</chunk>
+			<chunk>
 				<name>fd-pitch</name>
 				<type>float</type>
 				<format>fd-pitch=%f</format>
