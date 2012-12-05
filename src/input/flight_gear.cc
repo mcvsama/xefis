@@ -56,32 +56,33 @@ FlightGearInput::set_path (QString const& path)
 {
 	_property_path = path.toStdString();
 
-	_ias_kt = Xefis::Property<float> (_property_path + "/ias/kt");
-	_ias_tendency_kt = Xefis::Property<float> (_property_path + "/ias/lookahead/kt");
-	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/ias/minimum/kt");
-	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/ias/maximum/kt");
-	_gs_kt = Xefis::Property<float> (_property_path + "/gs/kt");
-	_tas_kt = Xefis::Property<float> (_property_path + "/tas/kt");
-	_mach = Xefis::Property<float> (_property_path + "/mach/value");
-	_pitch_deg = Xefis::Property<float> (_property_path + "/pitch/deg");
-	_roll_deg = Xefis::Property<float> (_property_path + "/roll/deg");
-	_heading_deg = Xefis::Property<float> (_property_path + "/heading/deg");
-	_fpm_alpha_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/alpha/deg");
-	_fpm_beta_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/beta/deg");
-	_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/ft");
-	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl/ft");
-	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude/ft");
-	_pressure_inhg = Xefis::Property<float> (_property_path + "/pressure/inhg");
+	_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias.kt");
+	_ias_tendency_kt = Xefis::Property<float> (_property_path + "/speed/ias-lookahead.kt");
+	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias-minimum.kt");
+	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias-maximum.kt");
+	_gs_kt = Xefis::Property<float> (_property_path + "/speed/gs.kt");
+	_tas_kt = Xefis::Property<float> (_property_path + "/speed/tas.kt");
+	_mach = Xefis::Property<float> (_property_path + "/speed/mach");
+	_pitch_deg = Xefis::Property<float> (_property_path + "/orientation/pitch.deg");
+	_roll_deg = Xefis::Property<float> (_property_path + "/orientation/roll.deg");
+	_heading_deg = Xefis::Property<float> (_property_path + "/orientation/heading.deg");
+	_fpm_alpha_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/alpha.deg");
+	_fpm_beta_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/beta.deg");
+	_track_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/track.deg");
+	_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/amsl.ft");
+	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl.ft");
+	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude.ft");
+	_pressure_inhg = Xefis::Property<float> (_property_path + "/static/pressure.inhg");
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
-	_autopilot_alt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/altitude/ft");
-	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed/kt");
-	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate/fpm");
-	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch/deg");
-	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll/deg");
+	_autopilot_alt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/altitude.ft");
+	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed.kt");
+	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate.fpm");
+	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch.deg");
+	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll.deg");
 	_navigation_needles_enabled = Xefis::Property<bool> (_property_path + "/navigation/enabled");
-	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope/value");
-	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading/value");
-	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme/nm");
+	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope");
+	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading");
+	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme-distance.nm");
 
 	invalidate_all();
 }
@@ -147,6 +148,8 @@ FlightGearInput::read_input()
 				_fpm_alpha_deg.write (value.toFloat());
 			else if (var == "beta")
 				_fpm_beta_deg.write (value.toFloat());
+			else if (var == "track")
+				_track_deg.write (value.toFloat());
 			else if (var == "altitude")
 				_altitude_ft.write (value.toFloat());
 			else if (var == "alt-agl")
@@ -211,6 +214,7 @@ FlightGearInput::invalidate_all()
 	_heading_deg.set_nil();
 	_fpm_alpha_deg.set_nil();
 	_fpm_beta_deg.set_nil();
+	_track_deg.set_nil();
 	_altitude_ft.set_nil();
 	_altitude_agl_ft.set_nil();
 	_landing_altitude_ft.set_nil();

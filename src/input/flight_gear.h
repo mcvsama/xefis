@@ -73,6 +73,7 @@ class FlightGearInput:
 	Xefis::Property<float>	_heading_deg;
 	Xefis::Property<float>	_fpm_alpha_deg;
 	Xefis::Property<float>	_fpm_beta_deg;
+	Xefis::Property<float>	_track_deg;
 	Xefis::Property<float>	_altitude_ft;
 	Xefis::Property<float>	_altitude_agl_ft;
 	Xefis::Property<float>	_landing_altitude_ft;
