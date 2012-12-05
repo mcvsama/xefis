@@ -76,6 +76,7 @@ FlightGearInput::set_path (QString const& path)
 	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
 	_autopilot_alt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/altitude.ft");
 	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed.kt");
+	_autopilot_heading_setting_deg = Xefis::Property<float> (_property_path + "/autopilot/setting/heading.deg");
 	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate.fpm");
 	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch.deg");
 	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll.deg");
@@ -165,6 +166,8 @@ FlightGearInput::read_input()
 				_autopilot_alt_setting_ft.write (value.toFloat());
 			else if (var == "at-speed-sel")
 				_autopilot_speed_setting_kt.write (value.toFloat());
+			else if (var == "ap-hdg-sel")
+				_autopilot_heading_setting_deg.write (value.toFloat());
 			else if (var == "ap-cbr-sel")
 				_autopilot_cbr_setting_fpm.write (value.toFloat());
 			else if (var == "fd-pitch")
@@ -222,6 +225,7 @@ FlightGearInput::invalidate_all()
 	_cbr_fpm.set_nil();
 	_autopilot_alt_setting_ft.set_nil();
 	_autopilot_speed_setting_kt.set_nil();
+	_autopilot_heading_setting_deg.set_nil();
 	_autopilot_cbr_setting_fpm.set_nil();
 	_flight_director_pitch_deg.set_nil();
 	_flight_director_roll_deg.set_nil();

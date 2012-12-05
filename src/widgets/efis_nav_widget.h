@@ -55,6 +55,24 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	set_heading_visibility (bool visible);
 
 	/**
+	 * Return A/P heading.
+	 */
+	Degrees
+	ap_heading() const;
+
+	/**
+	 * Set A/P heading.
+	 */
+	void
+	set_ap_heading (Degrees);
+
+	/**
+	 * Set A/P heading visibility.
+	 */
+	void
+	set_ap_heading_visibility (bool visible);
+
+	/**
 	 * Flight path heading (track).
 	 */
 	Degrees
@@ -134,6 +152,9 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	paint_aircraft (QPainter&, TextPainter&, float q, float r);
 
 	void
+	paint_ap_settings (QPainter&, TextPainter&, float q, float r);
+
+	void
 	paint_directions (QPainter&, TextPainter&, float q, float r);
 
 	void
@@ -145,11 +166,14 @@ class EFISNavWidget: public Xefis::InstrumentWidget
   private:
 	QTransform			_aircraft_center_transform;
 	QTransform			_heading_transform;
+	QRectF				_map_clip_rect;
 	TextPainter::Cache	_text_painter_cache;
 
 	// Parameters:
 	Degrees				_heading					= 0.f;
 	bool				_heading_visible			= false;
+	Degrees				_ap_heading					= 0.f;
+	bool				_ap_heading_visible			= false;
 	Degrees				_track_deg					= 0.f;
 	bool				_track_visible				= false;
 	Knots				_ground_speed				= 0.f;
@@ -180,6 +204,29 @@ inline void
 EFISNavWidget::set_heading_visibility (bool visible)
 {
 	_heading_visible = visible;
+	update();
+}
+
+
+inline Degrees
+EFISNavWidget::ap_heading() const
+{
+	return _ap_heading;
+}
+
+
+inline void
+EFISNavWidget::set_ap_heading (Degrees heading)
+{
+	_ap_heading = heading;
+	update();
+}
+
+
+inline void
+EFISNavWidget::set_ap_heading_visibility (bool visible)
+{
+	_ap_heading_visible = visible;
 	update();
 }
 

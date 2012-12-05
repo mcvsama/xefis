@@ -316,9 +316,9 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 			_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
 			_painter.translate (-2.f * x, posy);
 			_painter.setBrush (Qt::NoBrush);
-			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (300), 2.f));
+			_painter.setPen (_efis._autopilot_pen_1);
 			_painter.drawPolygon (bug_shape);
-			_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.33f));
+			_painter.setPen (_efis._autopilot_pen_2);
 			_painter.drawPolygon (bug_shape);
 		}
 
@@ -331,9 +331,9 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 		_painter.save();
 		_painter.translate (3.75f * x, 0.f);
 		float posy = -8.f * x * scale_cbr (_efis._ap_climb_rate);
-		for (auto params: { std::make_pair (300, 2.f), std::make_pair (0, 1.33f) })
+		for (auto pen: { _efis._autopilot_pen_1, _efis._autopilot_pen_2 })
 		{
-			_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (params.first), params.second));
+			_painter.setPen (pen);
 			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
 				_painter.drawLine (QPointF (-0.25 * x, y), QPointF (0.2f * x, y));
 		}
@@ -791,9 +791,9 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 		_painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
 		_painter.translate (1.25f * x, posy);
 		_painter.setBrush (Qt::NoBrush);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color.darker (300), 2.f)),
+		_painter.setPen (_efis._autopilot_pen_1);
 		_painter.drawPolygon (bug_shape);
-		_painter.setPen (_efis.get_pen (_efis._autopilot_color, 1.33f)),
+		_painter.setPen (_efis._autopilot_pen_2);
 		_painter.drawPolygon (bug_shape);
 	}
 
@@ -1190,7 +1190,7 @@ EFISWidget::EFISWidget (QWidget* parent):
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);
-	_ground_color.setHsv (34, 233, 127);
+	_ground_color.setHsv (30, 235, 122);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (125);
 }
@@ -1299,8 +1299,8 @@ EFISWidget::paint_flight_director (QPainter& painter)
 	painter.save();
 	painter.setTransform (_center_transform);
 
-	for (auto pen: { get_pen (_autopilot_color.darker (300), 2.5f),
-					 get_pen (_autopilot_color, 1.66f) })
+	for (auto pen: { get_pen (_autopilot_pen_1.color(), 2.5f),
+					 get_pen (_autopilot_pen_2.color(), 1.66f) })
 	{
 		painter.setPen (pen);
 		if (_flight_director_pitch_visible && _pitch_visible)
@@ -1408,8 +1408,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 					<< QPointF (0.f, +w)
 					<< QPointF (-1.6f * w, 0.f);
 				diamond.translate (track_deviation * 0.15f * wh(), 0.f);
-				for (auto pen: { QPen (_autopilot_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
-								 QPen (_autopilot_color, pen_width (1.33f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin) })
+				for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 				{
 					painter.setPen (pen);
 					painter.setBrush (pen.color());

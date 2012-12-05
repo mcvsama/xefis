@@ -63,8 +63,10 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 
 	float q = 0.1f * wh();
 	float r = 6.5f * q;
+	_map_clip_rect = QRectF (-1.1f * r, -1.1f * r, 2.2f * r, 1.3f * r);
 
 	paint_track (painter, text_painter, q, r);
+	paint_ap_settings (painter, text_painter, q, r);
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
 	paint_speeds (painter, text_painter, q, r);
@@ -75,31 +77,61 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 
 
 void
-EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter&, float q, float r)
+EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	QPen pen1 = get_pen (QColor (255, 255, 255), 1.5f);
 	QPen pen2 = get_pen (QColor (255, 255, 255), 2.8f);
 
-	painter.save();
+	// White line
+	{
+		painter.save();
 
-	// Heading line:
-	painter.setPen (pen1);
-	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
+		// Heading line:
+		painter.setPen (pen1);
+		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
 
-	// Big/small triangles:
-	QPolygonF aircraft = QPolygonF()
-		<< QPointF (0.f, 0.f)
-		<< QPointF (+0.45f * q, q)
-		<< QPointF (-0.45f * q, q)
-		<< QPointF (0.f, 0.f);
-	painter.setPen (pen1);
-	painter.drawPolyline (aircraft);
-	painter.translate (0.f, -r);
-	painter.scale (0.5f, -0.5f);
-	painter.setPen (pen2);
-	painter.drawPolyline (aircraft);
+		// Big/small triangles:
+		QPolygonF aircraft = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (+0.45f * q, q)
+			<< QPointF (-0.45f * q, q)
+			<< QPointF (0.f, 0.f);
+		painter.setPen (pen1);
+		painter.drawPolyline (aircraft);
+		painter.translate (0.f, -r);
+		painter.scale (0.5f, -0.5f);
+		painter.setPen (pen2);
+		painter.drawPolyline (aircraft);
 
-	painter.restore();
+		painter.restore();
+	}
+
+	// MAG heading
+	{
+		painter.save();
+
+		QString text_1 = "MAG";
+		QString text_2 = QString::number (std::round (_heading));
+
+		QFont font_1 (_font_13_bold);
+		QFont font_2 (_font_16_bold);
+		QFontMetricsF metrics_1 (font_1);
+		QFontMetricsF metrics_2 (font_2);
+		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
+		QRectF rect_2 (0.f, 0.f, metrics_2.width (text_2), metrics_2.height());
+		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
+		rect_2.moveLeft (rect_1.right() + metrics_1.width ("  "));
+
+		painter.setTransform (_aircraft_center_transform);
+		painter.translate (q, 1.75f * q);
+		painter.setPen (get_pen (_navigation_color, 1.f));
+		painter.setFont (font_1);
+		text_painter.drawText (rect_1, Qt::AlignLeft| Qt::AlignBottom, text_1);
+		painter.setFont (font_2);
+		text_painter.drawText (rect_2, Qt::AlignLeft| Qt::AlignBottom, text_2);
+
+		painter.restore();
+	}
 }
 
 
@@ -112,16 +144,88 @@ EFISNavWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 	QPen pen (QColor (255, 255, 0), pen_width (1.5f), Qt::DashLine, Qt::FlatCap);
 
 	painter.save();
-
-	// Flight path line:
-	QTransform track_transform = _heading_transform;
-	track_transform.rotate (_track_deg);
+	painter.setClipRect (_map_clip_rect);
 
 	painter.setPen (pen);
-	painter.setTransform (track_transform * _aircraft_center_transform);
+	painter.setTransform (_aircraft_center_transform);
+	painter.rotate (_track_deg - _heading);
 	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
 
 	painter.restore();
+}
+
+
+void
+EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, float q, float r)
+{
+	if (!_ap_heading_visible)
+		return;
+
+	// A/P bug
+	{
+		painter.save();
+		painter.setClipRect (_map_clip_rect);
+
+		QPolygonF bug = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (+0.45f * q, q)
+			<< QPointF (+0.85f * q, q)
+			<< QPointF (+0.85f * q, 0.f)
+			<< QPointF (-0.85f * q, 0.f)
+			<< QPointF (-0.85f * q, q)
+			<< QPointF (-0.45f * q, q)
+			<< QPointF (0.f, 0.f);
+
+		for (auto& point: bug)
+		{
+			point.rx() *= +0.5f;
+			point.ry() *= -0.5f;
+		}
+
+		QTransform transform = _aircraft_center_transform;
+		transform.rotate (bound (std::fmod (_ap_heading - _heading + 180.f, 360.f) - 180.f, -102.f, +102.f));
+		transform.translate (0.f, -r);
+
+		QPen pen_1 = _autopilot_pen_1;
+		pen_1.setMiterLimit (0.2f);
+		QPen pen_2 = _autopilot_pen_2;
+		pen_2.setMiterLimit (0.2f);
+
+		painter.setTransform (transform);
+		painter.setPen (pen_1);
+		painter.drawPolyline (bug);
+		painter.setPen (pen_2);
+		painter.drawPolyline (bug);
+
+		painter.restore();
+	}
+
+	// SEL HDG 000
+	{
+		painter.save();
+
+		QString text_1 = "SEL  HDG";
+		QString text_2 = QString::number (static_cast<int> (_ap_heading));
+
+		QFont font_1 (_font_13_bold);
+		QFont font_2 (_font_16_bold);
+		QFontMetricsF metrics_1 (font_1);
+		QFontMetricsF metrics_2 (font_2);
+		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
+		QRectF rect_2 (0.f, 0.f, metrics_2.width (text_2), metrics_2.height());
+		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
+		rect_1.moveLeft (-rect_1.right() - metrics_1.width ("  "));
+
+		painter.setTransform (_aircraft_center_transform);
+		painter.translate (-metrics_2.width ("000") - q, 1.75f * q);
+		painter.setPen (_autopilot_pen_2);
+		painter.setFont (font_1);
+		text_painter.drawText (rect_1, Qt::AlignLeft| Qt::AlignBottom, text_1);
+		painter.setFont (font_2);
+		text_painter.drawText (rect_2, Qt::AlignLeft| Qt::AlignBottom, text_2);
+
+		painter.restore();
+	}
 }
 
 
@@ -134,8 +238,8 @@ EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter, f
 	QPen pen = get_pen (QColor (255, 255, 255), 1.5f);
 
 	painter.save();
+	painter.setClipRect (_map_clip_rect);
 
-	painter.setClipRect (QRectF (-r, -r, 2.f * r, 1.1f * r));
 	painter.setPen (pen);
 	painter.setFont (_font_13_bold);
 	for (int deg = 0; deg < 360; deg += 5)
@@ -169,10 +273,10 @@ EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float
 	// Return width of painter strings:
 	auto paint_speed = [&](QString str, QString val) -> float
 	{
-		QRectF str_rect (0.f, 0.f, metr_a.width (str) * 1.1f, metr_b.height());
+		QRectF str_rect (0.f, 0.f, metr_a.width (str) * 1.1f, metr_a.height());
 		QRectF val_rect (0.f, 0.f, std::max (metr_b.width ("000"), metr_b.width (val)), metr_b.height());
 		// Correct baseline position:
-		str_rect.translate (0.f, metr_a.descent() - metr_b.descent());
+		str_rect.translate (0.f, translate_descent (metr_a, metr_b));
 		val_rect.moveLeft (str_rect.right());
 
 		painter.save();
