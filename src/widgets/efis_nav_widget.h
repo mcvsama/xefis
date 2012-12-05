@@ -58,19 +58,19 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Flight path heading (track).
 	 */
 	Degrees
-	flight_path_beta() const;
+	track() const;
 
 	/**
-	 * Set flight path heading.
+	 * Set track heading.
 	 */
 	void
-	set_flight_path_beta (Degrees);
+	set_track (Degrees);
 
 	/**
-	 * Set visibility of the flight path.
+	 * Set visibility of the track line.
 	 */
 	void
-	set_flight_path_marker_visibility (bool visible);
+	set_track_visibility (bool visible);
 
 	/**
 	 * Return current ground speed.
@@ -137,7 +137,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	paint_directions (QPainter&, TextPainter&, float q, float r);
 
 	void
-	paint_flight_path (QPainter&, TextPainter&, float q, float r);
+	paint_track (QPainter&, TextPainter&, float q, float r);
 
 	void
 	paint_speeds (QPainter&, TextPainter&, float q, float r);
@@ -150,9 +150,8 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	// Parameters:
 	Degrees				_heading					= 0.f;
 	bool				_heading_visible			= false;
-	// TODO change to /instr/nav/crosstrack-heading-error-deg
-	Degrees				_flight_path_beta			= 0.f;
-	bool				_flight_path_visible		= false;
+	Degrees				_track_deg					= 0.f;
+	bool				_track_visible				= false;
 	Knots				_ground_speed				= 0.f;
 	bool				_ground_speed_visible		= false;
 	Knots				_true_air_speed				= 0.f;
@@ -186,24 +185,24 @@ EFISNavWidget::set_heading_visibility (bool visible)
 
 
 inline Degrees
-EFISNavWidget::flight_path_beta() const
+EFISNavWidget::track() const
 {
-	return _flight_path_beta;
+	return _track_deg;
 }
 
 
 inline void
-EFISNavWidget::set_flight_path_beta (Degrees heading)
+EFISNavWidget::set_track (Degrees heading)
 {
-	_flight_path_beta = heading;
+	_track_deg = heading;
 	update();
 }
 
 
 inline void
-EFISNavWidget::set_flight_path_marker_visibility (bool visible)
+EFISNavWidget::set_track_visibility (bool visible)
 {
-	_flight_path_visible = visible;
+	_track_visible = visible;
 	update();
 }
 

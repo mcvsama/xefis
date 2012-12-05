@@ -64,7 +64,7 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 	float q = 0.1f * wh();
 	float r = 6.5f * q;
 
-	paint_flight_path (painter, text_painter, q, r);
+	paint_track (painter, text_painter, q, r);
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
 	paint_speeds (painter, text_painter, q, r);
@@ -104,9 +104,9 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter&, float q, float r
 
 
 void
-EFISNavWidget::paint_flight_path (QPainter& painter, TextPainter&, float, float r)
+EFISNavWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 {
-	if (!_flight_path_visible)
+	if (!_track_visible)
 		return;
 
 	QPen pen (QColor (255, 255, 0), pen_width (1.5f), Qt::DashLine, Qt::FlatCap);
@@ -114,11 +114,11 @@ EFISNavWidget::paint_flight_path (QPainter& painter, TextPainter&, float, float 
 	painter.save();
 
 	// Flight path line:
-	QTransform flight_path_transform;
-	flight_path_transform.rotate (-_flight_path_beta);
+	QTransform track_transform = _heading_transform;
+	track_transform.rotate (_track_deg);
 
 	painter.setPen (pen);
-	painter.setTransform (flight_path_transform * _aircraft_center_transform);
+	painter.setTransform (track_transform * _aircraft_center_transform);
 	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
 
 	painter.restore();

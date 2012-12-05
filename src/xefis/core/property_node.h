@@ -126,6 +126,12 @@ class PropertyNode
 	is_nil() const;
 
 	/**
+	 * Inverse of is_nil().
+	 */
+	bool
+	valid() const;
+
+	/**
 	 * Write nil value to this property.
 	 */
 	void
@@ -370,6 +376,13 @@ inline bool
 PropertyNode::is_nil() const
 {
 	return _is_nil;
+}
+
+
+inline bool
+PropertyNode::valid() const
+{
+	return !_is_nil;
 }
 
 

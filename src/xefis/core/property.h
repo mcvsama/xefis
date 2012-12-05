@@ -93,6 +93,12 @@ template<class tType>
 		is_nil() const;
 
 		/**
+		 * Inverse of is_nil().
+		 */
+		bool
+		valid() const;
+
+		/**
 		 * Set property to the nil value.
 		 */
 		void
@@ -208,6 +214,14 @@ template<class T>
 		if (!node)
 			return true;
 		return node->is_nil();
+	}
+
+
+template<class T>
+	inline bool
+	Property<T>::valid() const
+	{
+		return !is_nil();
 	}
 
 
