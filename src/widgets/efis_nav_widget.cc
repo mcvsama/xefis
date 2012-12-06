@@ -107,6 +107,7 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 	}
 
 	// MAG heading
+	if (_heading_visible)
 	{
 		painter.save();
 
