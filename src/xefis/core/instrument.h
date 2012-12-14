@@ -19,11 +19,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/module.h>
 
 
 namespace Xefis {
 
-class Instrument: public QWidget
+class Instrument:
+	public Module,
+	public QWidget
 {
   public:
 	// Ctor

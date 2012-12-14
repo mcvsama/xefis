@@ -19,11 +19,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/module.h>
 
 
 namespace Xefis {
 
-class Input
+class Input: public Module
 {
   public:
 	// Dtor
