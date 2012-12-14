@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/utility/qdom.h>
 
 // Local:
 #include "config_reader.h"
@@ -54,7 +55,18 @@ ConfigReader::read_config (QString const& path)
 void
 ConfigReader::process()
 {
-	// TODO
+	QDomElement root = _config_document.documentElement();
+
+	if (root != "xefis-config")
+		throw ConfigException (("config process error: unsupported root tag: " + root.tagName()).toStdString());
+
+	for (QDomElement& e: root)
+	{
+		if (e == "")
+		{
+			// TODO
+		}
+	}
 }
 
 } // namespace Xefis
