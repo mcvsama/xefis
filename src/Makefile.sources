@@ -54,11 +54,14 @@ NODEP_SOURCES += $(VERSION_FILE)
 SRC_HEADERS += xefis/core/input.h
 SRC_HEADERS += xefis/core/instrument.h
 SRC_HEADERS += xefis/core/instrument_widget.h
+SRC_HEADERS += xefis/core/module.h
+SRC_HEADERS += xefis/core/module_manager.h
 SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
 
 SRC_SOURCES += xefis/core/instrument_widget.cc
+SRC_SOURCES += xefis/core/module_manager.cc
 SRC_SOURCES += xefis/core/property_node.cc
 SRC_SOURCES += xefis/core/property_storage.cc
 
