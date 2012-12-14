@@ -2,8 +2,8 @@
 
 -include Makefile.conf
 
-PKGCONFIG_LIBS	+= $(shell pkg-config --libs QtCore QtGui QtNetwork)
-PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags QtCore QtGui QtNetwork)
+PKGCONFIG_LIBS	+= $(shell pkg-config --libs QtCore QtGui QtNetwork QtXml)
+PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags QtCore QtGui QtNetwork QtXml)
 
 ifeq ($(PROFILING), 1)
 	PROFILING_CXXFLAGS = -pg -fno-omit-frame-pointer
@@ -51,6 +51,7 @@ NODEP_SOURCES += $(VERSION_FILE)
 
 ######## /xefis/core ########
 
+SRC_HEADERS += xefis/core/config_reader.h
 SRC_HEADERS += xefis/core/input.h
 SRC_HEADERS += xefis/core/instrument.h
 SRC_HEADERS += xefis/core/instrument_widget.h
@@ -60,6 +61,7 @@ SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
 
+SRC_SOURCES += xefis/core/config_reader.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
 SRC_SOURCES += xefis/core/module_manager.cc
 SRC_SOURCES += xefis/core/property_node.cc
