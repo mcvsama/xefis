@@ -14,27 +14,47 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QtCore/QFile>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/module_manager.h>
 
 // Local:
-#include "module_manager.h"
+#include "config_reader.h"
 
 
 namespace Xefis {
 
-ModuleManager::~ModuleManager()
+ConfigReader::ConfigReader (ModuleManager* module_manager):
+	_module_manager (module_manager)
+{ }
+
+
+void
+ConfigReader::read_config (QString const& path)
 {
-	for (Module* m: _modules)
-		delete m;
+	QFile file (path);
+
+	if (!file.exists())
+		throw ConfigException ("file not found");
+
+	if (!file.open (QIODevice::ReadOnly))
+		throw ConfigException ("file access error");
+
+	if (!_config_document.setContent (&file, true))
+		throw ConfigException ("config parse error");
+
+	file.close();
+	process();
 }
 
 
 void
-ModuleManager::add_module (Module* module)
+ConfigReader::process()
 {
-	_modules.insert (module);
+	// TODO
 }
 
 } // namespace Xefis
