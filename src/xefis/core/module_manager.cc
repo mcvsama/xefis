@@ -18,6 +18,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 
+// Modules:
+#include <input/flight_gear.h>
+#include <instruments/efis.h>
+
 // Local:
 #include "module_manager.h"
 
@@ -31,10 +35,25 @@ ModuleManager::~ModuleManager()
 }
 
 
-void
-ModuleManager::add_module (Module* module)
+Module*
+ModuleManager::load_module (QString const& name, QWidget* parent)
 {
-	_modules.insert (module);
+	Module* module;
+
+	if (name == "instruments/efis")
+	{
+		module = new EFIS (parent);
+		_modules.insert (module);
+	}
+	else if (name == "input/flightgear")
+	{
+		module = new FlightGearInput();
+		_modules.insert (module);
+	}
+	else
+		throw ModuleNotFoundException ("module not found: " + name.toStdString());
+
+	return module;
 }
 
 } // namespace Xefis

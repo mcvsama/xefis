@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<modules>
+		<module name='input/flightgear'/>
+		<!--module name='keyboard'>
+			<action key='F1'>
+				<switch-bool>/instrumentation/flight-director/visible</switch-bool>
+			</action>
+		</module-->
+	</modules>
+</xefis-include>
+
