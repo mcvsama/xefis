@@ -25,16 +25,25 @@
 #include <QtCore/QTextCodec>
 
 // Xefis:
-#include <xefis/config/version.h>
+#include <xefis/config/all.h>
 #include <xefis/application/services.h>
 #include <xefis/core/property_storage.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/core/config_reader.h>
 #include <xefis/utility/backtrace.h>
-#include <input/flight_gear.h>
-#include <instruments/efis.h>
 #include <xefis/components/property_tree/property_storage_widget.h>
 
 // Local:
 #include "fail.h"
+
+
+void
+log_exception (Xefis::Exception const& e, std::string prefix = "")
+{
+	std::cerr << prefix << "Error: " << e.what() << std::endl;
+	if (e.inner())
+		log_exception (*e.inner(), " └ " + prefix);
+}
 
 
 int main (int argc, char** argv, char**)
@@ -71,21 +80,22 @@ int main (int argc, char** argv, char**)
 			Xefis::PropertyStorageWidget* property_storage_widget = new Xefis::PropertyStorageWidget (Xefis::PropertyStorage::root(), nullptr);
 			property_storage_widget->show();
 
-			Xefis::Input* input = new FlightGearInput();
-
-			Xefis::Instrument* instrument = new EFIS (nullptr);
-			instrument->show();
-			instrument->resize (610, 740);
+			Xefis::ModuleManager* module_manager = new Xefis::ModuleManager();
+			Xefis::ConfigReader config_reader (module_manager);
+			config_reader.load ("xefis-config.xml");
 
 			app->exec();
 
-			delete instrument;
-			delete input;
+			delete module_manager;
 
 			Xefis::Services::deinitialize();
 
 			delete app;
 		}
+	}
+	catch (Xefis::Exception& e)
+	{
+		log_exception (e);
 	}
 	catch (...)
 	{

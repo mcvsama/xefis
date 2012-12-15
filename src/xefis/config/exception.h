@@ -28,17 +28,35 @@ class Exception: public std::runtime_error
   public:
 	Exception (std::string const& message, Exception* inner = nullptr);
 
+	virtual ~Exception() noexcept;
+
+	Exception*
+	inner() const;
+
   private:
-	std::string	_message;
-	Exception*	_inner;
+	Exception* _inner = nullptr;
 };
 
 
 inline
 Exception::Exception (std::string const& message, Exception* inner):
-	std::runtime_error ((_message = message).c_str()),
+	std::runtime_error (message),
 	_inner (inner)
 { }
+
+
+inline
+Exception::~Exception() noexcept
+{
+	delete _inner;
+}
+
+
+inline Exception*
+Exception::inner() const
+{
+	return _inner;
+}
 
 } // namespace Xefis
 

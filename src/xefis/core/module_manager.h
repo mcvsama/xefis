@@ -18,6 +18,9 @@
 #include <cstddef>
 #include <set>
 
+// Qt:
+#include <QtCore/QString>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -34,14 +37,23 @@ class ModuleManager
 	virtual ~ModuleManager();
 
 	/**
-	 * Add module. The module will be deleted
-	 * when ModuleManager is deleted.
+	 * Add module by name.
+	 * If parent is nullptr, widget will not be shown.
 	 */
-	void
-	add_module (Module*);
+	Module*
+	load_module (QString const& name, QWidget* parent);
 
   private:
 	Modules	_modules;
+};
+
+
+class ModuleNotFoundException: public Exception
+{
+  public:
+	ModuleNotFoundException (std::string const& message):
+		Exception (message)
+	{ }
 };
 
 } // namespace Xefis

@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<windows>
+		<window width='950' height='740' aspect-ratio='1.3' full-screen='false'>
+			<layout type='horizontal'>
+				<item stretch-factor='2'>
+					<module name='instruments/efis'>
+					</module>
+				</item>
+				<separator/>
+				<item stretch-factor='1'/>
+			</layout>
+		</window>
+</xefis-include>
+

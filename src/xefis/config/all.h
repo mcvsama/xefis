@@ -15,4 +15,5 @@
 #include "system.h"
 #include "resources.h"
 #include "version.h"
+#include "exception.h"
 

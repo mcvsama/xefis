@@ -17,6 +17,9 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QtXml/QDomElement>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -28,11 +31,22 @@ class Module
   public:
 	// Dtor
 	virtual ~Module();
+
+	/**
+	 * Load module configuration.
+	 */
+	virtual void
+	load_config (QDomElement const&);
 };
 
 
 inline
 Module::~Module()
+{ }
+
+
+inline void
+Module::load_config (QDomElement const&)
 { }
 
 } // namespace Xefis
