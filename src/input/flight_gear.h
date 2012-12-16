@@ -14,12 +14,14 @@
 #ifndef XEFIS__INPUT__FLIGHT_GEAR_H__INCLUDED
 #define XEFIS__INPUT__FLIGHT_GEAR_H__INCLUDED
 
-// Qt:
-#include <QtGui/QWidget>
-#include <QtNetwork/QUdpSocket>
-
 // Standard:
 #include <cstddef>
+
+// Qt:
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
+#include <QtNetwork/QUdpSocket>
+#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -35,13 +37,14 @@ class FlightGearInput:
 
   public:
 	// Ctor
-	FlightGearInput();
+	FlightGearInput (QDomElement const& config);
 
 	// Dtor
 	~FlightGearInput();
 
+  private:
 	void
-	set_path (QString const& path) override;
+	set_path (QString const& path);
 
   private slots:
 	/**

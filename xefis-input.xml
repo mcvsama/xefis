@@ -2,6 +2,14 @@
 <xefis-include>
 	<modules>
 		<module name='input/flightgear'/>
+		<module name='input/joystick'>
+			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
+			<path>/control/main</path>
+		</module>
+		<module name='input/joystick'>
+			<device>/dev/input/js1</device>
+			<path>/control/rudder</path>
+		</module>
 		<!--module name='keyboard'>
 			<action key='F1'>
 				<switch-bool>/instrumentation/flight-director/visible</switch-bool>

@@ -26,21 +26,7 @@ namespace Xefis {
 
 class Input: public Module
 {
-  public:
-	// Dtor
-	virtual ~Input();
-
-	/**
-	 * Set path in the PropertyStorage where input data is stored.
-	 */
-	virtual void
-	set_path (QString const& path) = 0;
 };
-
-
-inline
-Input::~Input()
-{ }
 
 } // namespace Xefis
 

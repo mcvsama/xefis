@@ -14,10 +14,6 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtCore/QTimer>
-#include <QtGui/QLayout>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/application/services.h>
@@ -28,7 +24,7 @@
 #include "flight_gear.h"
 
 
-FlightGearInput::FlightGearInput()
+FlightGearInput::FlightGearInput (QDomElement const&)
 {
 	_timeout_timer = new QTimer();
 	_timeout_timer->setSingleShot (true);

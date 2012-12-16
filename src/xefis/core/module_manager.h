@@ -20,6 +20,7 @@
 
 // Qt:
 #include <QtCore/QString>
+#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -41,7 +42,7 @@ class ModuleManager
 	 * If parent is nullptr, widget will not be shown.
 	 */
 	Module*
-	load_module (QString const& name, QWidget* parent);
+	load_module (QString const& name, QDomElement const& config, QWidget* parent);
 
   private:
 	Modules	_modules;
