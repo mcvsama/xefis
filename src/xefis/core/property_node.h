@@ -235,7 +235,7 @@ class PropertyNode
 	void
 	clear();
 
-  protected:
+  private:
 	/**
 	 * Helper function for reading data.
 	 */

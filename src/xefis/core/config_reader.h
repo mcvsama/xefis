@@ -43,7 +43,7 @@ class ConfigReader
 	void
 	load (QString const& path);
 
-  protected:
+  private:
 	QDomDocument
 	parse_file (QString const& path);
 

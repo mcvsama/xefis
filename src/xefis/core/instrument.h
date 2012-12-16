@@ -31,26 +31,12 @@ class Instrument:
   public:
 	// Ctor
 	Instrument (QWidget* parent);
-
-	// Dtor
-	virtual ~Instrument();
-
-	/**
-	 * Set path in the PropertyStorage where input data is stored.
-	 */
-	virtual void
-	set_path (QString const& path) = 0;
 };
 
 
 inline
 Instrument::Instrument (QWidget* parent):
 	QWidget (parent)
-{ }
-
-
-inline
-Instrument::~Instrument()
 { }
 
 } // namespace Xefis

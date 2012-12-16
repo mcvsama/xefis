@@ -14,12 +14,13 @@
 #ifndef XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
 #define XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
 
+// Standard:
+#include <cstddef>
+
 // Qt:
 #include <QtGui/QWidget>
 #include <QtNetwork/QUdpSocket>
-
-// Standard:
-#include <cstddef>
+#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -35,10 +36,7 @@ class EFIS: public Xefis::Instrument
 
   public:
 	// Ctor
-	EFIS (QWidget* parent);
-
-	void
-	set_path (QString const& path) override;
+	EFIS (QDomElement const& config, QWidget* parent);
 
   public slots:
 	/**
@@ -46,6 +44,10 @@ class EFIS: public Xefis::Instrument
 	 */
 	void
 	read();
+
+  private:
+	void
+	set_path (QString const& path);
 
   private:
 	EFISWidget*				_efis_widget		= nullptr;

@@ -62,7 +62,7 @@ ConfigReader::parse_file (QString const& path)
 	if (!file.exists())
 		throw ConfigException (("file not found: " + path).toStdString());
 
-	if (!file.open (QIODevice::ReadOnly))
+	if (!file.open (QFile::ReadOnly))
 		throw ConfigException (("file access error: " + path).toStdString());
 
 	if (!doc.setContent (&file, true))
@@ -173,7 +173,7 @@ ConfigReader::process_modules_element (QDomElement const& modules_element)
 
 
 void
-ConfigReader::process_property_element (QDomElement const& property_element)
+ConfigReader::process_property_element (QDomElement const& /*property_element*/)
 {
 	// TODO
 }
@@ -287,8 +287,7 @@ ConfigReader::process_item_element (QDomElement const& item_element, QBoxLayout*
 void
 ConfigReader::process_module_element (QDomElement const& module_element, QBoxLayout* layout, QWidget* window, int stretch)
 {
-	Module* module = _module_manager->load_module (module_element.attribute ("name"), window);
-	module->load_config (module_element);
+	Module* module = _module_manager->load_module (module_element.attribute ("name"), module_element, window);
 
 	if (layout)
 	{

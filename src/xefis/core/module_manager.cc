@@ -20,6 +20,7 @@
 
 // Modules:
 #include <input/flight_gear.h>
+#include <input/joystick.h>
 #include <instruments/efis.h>
 
 // Local:
@@ -36,18 +37,23 @@ ModuleManager::~ModuleManager()
 
 
 Module*
-ModuleManager::load_module (QString const& name, QWidget* parent)
+ModuleManager::load_module (QString const& name, QDomElement const& config, QWidget* parent)
 {
 	Module* module;
 
 	if (name == "instruments/efis")
 	{
-		module = new EFIS (parent);
+		module = new EFIS (config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "input/flightgear")
 	{
-		module = new FlightGearInput();
+		module = new FlightGearInput (config);
+		_modules.insert (module);
+	}
+	else if (name == "input/joystick")
+	{
+		module = new JoystickInput (config);
 		_modules.insert (module);
 	}
 	else

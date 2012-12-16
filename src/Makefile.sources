@@ -80,10 +80,13 @@ SRC_SOURCES += xefis/utility/text_painter.cc
 ######## /input  ########
 
 SRC_HEADERS += input/flight_gear.h
+SRC_HEADERS += input/joystick.h
 
 SRC_SOURCES += input/flight_gear.cc
+SRC_SOURCES += input/joystick.cc
 
 SRC_MOCHDRS += input/flight_gear.h
+SRC_MOCHDRS += input/joystick.h
 
 ######## /instruments ########
 
