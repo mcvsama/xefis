@@ -51,7 +51,7 @@ typedef std::list<PropertyNode*> PropertyNodeList;
  * for example attempt to read int value of a directory-type
  * node.
  */
-class PropertyAccessError: public std::logic_error
+class PropertyAccessError: public Exception
 {
   public:
 	PropertyAccessError (const char* message);
@@ -62,7 +62,7 @@ class PropertyAccessError: public std::logic_error
  * Indicates that there was a path conflict while creating
  * directory path with mkpath().
  */
-class PropertyPathConflict: public std::runtime_error
+class PropertyPathConflict: public Exception
 {
   public:
 	PropertyPathConflict (const char* message);
@@ -268,13 +268,13 @@ class PropertyNode
 
 inline
 PropertyAccessError::PropertyAccessError (const char* message):
-	std::logic_error (message)
+	Exception (message)
 { }
 
 
 inline
 PropertyPathConflict::PropertyPathConflict (const char* message):
-	std::runtime_error (message)
+	Exception (message)
 { }
 
 

@@ -4,11 +4,68 @@
 		<window width='950' height='740' aspect-ratio='1.3' full-screen='false'>
 			<layout type='horizontal'>
 				<item stretch-factor='2'>
-					<module name='instruments/efis'>
-					</module>
+					<module name='instruments/efis'/>
 				</item>
 				<separator/>
-				<item stretch-factor='1'/>
+				<item stretch-factor='1'>
+					<layout type='vertical'>
+						<item stretch-factor='3'>
+							<layout type='horizontal'>
+								<item>
+									<layout type='vertical'>
+										<item>
+											<module name='instruments/power-indicator'>
+												<properties path='/engine'>
+													<property name='value' path='/n1.pct'/>
+													<property name='value-minimum' path='/config/n1-minimum' default='0.0'/>
+													<property name='value-warning' path='/config/n1-warning' default='107.0'/>
+													<property name='value-critical' path='/config/n1-critical' default='110.0'/>
+													<property name='value-maximum' path='/config/n1-maximum' default='110.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/power-indicator'>
+												<properties path='/engine'>
+													<property name='value' path='/n2.pct'/>
+													<property name='value-minimum' path='/config/n2-minimum' default='0.0'/>
+													<property name='value-warning' path='/config/n2-warning' default='107.0'/>
+													<property name='value-critical' path='/config/n2-critical' default='110.0'/>
+													<property name='value-maximum' path='/config/n2-maximum' default='110.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/power-indicator'>
+												<properties path='/engine'>
+													<property name='value' path='/egt.degc'/>
+													<property name='value-minimum' path='/config/egt-minimum' default='0.0'/>
+													<property name='value-maximum' path='/config/egt-maximum' default='850.0'/>
+													<property name='value-warning' path='/config/egt-warning' default='800.0'/>
+													<property name='value-critical' path='/config/egt-critical' default='850.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/power-indicator'>
+												<properties path='/engine'>
+													<property name='value' path='/epr'/>
+													<property name='value-minimum' path='/config/epr-minimum' default='1.0'/>
+													<property name='value-maximum' path='/config/epr-maximum' default='4.0'/>
+													<property name='value-warning' path='/config/epr-warning' default='3.8'/>
+												</properties>
+											</module>
+										</item>
+									</layout>
+								</item>
+								<item>
+								</item>
+							</layout>
+						</item>
+						<item stretch-factor='2'>
+						</item>
+					</layout>
+				</item>
 			</layout>
 		</window>
 	</windows>

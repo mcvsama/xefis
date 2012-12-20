@@ -60,6 +60,7 @@ SRC_HEADERS += xefis/core/module_manager.h
 SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
+SRC_HEADERS += xefis/core/property_union.h
 
 SRC_SOURCES += xefis/core/config_reader.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
@@ -72,6 +73,7 @@ SRC_SOURCES += xefis/core/property_storage.cc
 SRC_HEADERS += xefis/utility/backtrace.h
 SRC_HEADERS += xefis/utility/numeric.h
 SRC_HEADERS += xefis/utility/qdom.h
+SRC_HEADERS += xefis/utility/range.h
 SRC_HEADERS += xefis/utility/text_painter.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc

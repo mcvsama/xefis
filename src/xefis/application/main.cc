@@ -38,11 +38,12 @@
 
 
 void
-log_exception (Xefis::Exception const& e, std::string prefix = "")
+log_exception (Xefis::Exception const& e)
 {
-	std::cerr << prefix << "Error: " << e.what() << std::endl;
+	std::cerr << "Error: " << e.what() << std::endl;
+	std::cerr << e.backtrace() << std::endl;
 	if (e.inner())
-		log_exception (*e.inner(), " └ " + prefix);
+		log_exception (*e.inner());
 }
 
 
