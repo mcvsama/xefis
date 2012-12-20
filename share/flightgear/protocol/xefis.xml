@@ -225,6 +225,36 @@
 				<format>static=%f</format>
 				<node>/systems/static/pressure-inhg</node>
 			</chunk>
+			<chunk>
+				<name>throttle</name>
+				<type>float</type>
+				<format>thr=%f</format>
+				<node>/controls/engines/engine/throttle</node>
+			</chunk>
+			<chunk>
+				<name>epr</name>
+				<type>float</type>
+				<format>epr=%f</format>
+				<node>/engines/engine/epr</node>
+			</chunk>
+			<chunk>
+				<name>n1</name>
+				<type>float</type>
+				<format>n1=%f</format>
+				<node>/engines/engine/n1</node>
+			</chunk>
+			<chunk>
+				<name>n2</name>
+				<type>float</type>
+				<format>n2=%f</format>
+				<node>/engines/engine/n2</node>
+			</chunk>
+			<chunk>
+				<name>egt</name>
+				<type>float</type>
+				<format>egt=%f</format>
+				<node>/engines/engine/egt-degf</node>
+			</chunk>
 		</output>
 	</generic>
 </PropertyList>
