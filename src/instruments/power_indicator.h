@@ -56,6 +56,7 @@ class PowerIndicator: public Xefis::Instrument
 	Xefis::PropertyFloat	_range_maximum;
 	Xefis::PropertyFloat	_warning_value;
 	Xefis::PropertyFloat	_critical_value;
+	Xefis::PropertyFloat	_normal_value;
 };
 
 #endif
