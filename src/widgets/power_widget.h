@@ -101,6 +101,24 @@ class PowerWidget: public Xefis::InstrumentWidget
 	void
 	set_critical_visible (bool visible);
 
+	/**
+	 * Normal/desired value.
+	 */
+	float
+	normal_value() const;
+
+	/**
+	 * Set normal/desired value. This sets the green bug position on the scale.
+	 */
+	void
+	set_normal_value (float);
+
+	/**
+	 * Set visibility of the normal/desired value bug.
+	 */
+	void
+	set_normal_visible (bool visible);
+
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
@@ -120,6 +138,8 @@ class PowerWidget: public Xefis::InstrumentWidget
 	bool			_warning_visible	= false;
 	float			_critical_value		= 1.f;
 	bool			_critical_visible	= false;
+	float			_normal_value		= 1.f;
+	bool			_normal_visible		= false;
 };
 
 
@@ -203,6 +223,29 @@ inline void
 PowerWidget::set_critical_visible (bool visible)
 {
 	_critical_visible = visible;
+	update();
+}
+
+
+inline float
+PowerWidget::normal_value() const
+{
+	return _normal_value;
+}
+
+
+inline void
+PowerWidget::set_normal_value (float normal_value)
+{
+	_normal_value = normal_value;
+	update();
+}
+
+
+inline void
+PowerWidget::set_normal_visible (bool visible)
+{
+	_normal_visible = visible;
 	update();
 }
 

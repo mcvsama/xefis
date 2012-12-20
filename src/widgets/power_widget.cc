@@ -132,6 +132,9 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 	QPen critical_pen = get_pen (red, 1.4f);
 	critical_pen.setCapStyle (Qt::RoundCap);
 
+	QPen green_pen = get_pen (QColor (0x00, 0xff, 0x00), 1.4f);
+	green_pen.setCapStyle (Qt::RoundCap);
+
 	QPen gray_pen = get_pen (QColor (0xb0, 0xb0, 0xb0), 1.4f);
 	gray_pen.setCapStyle (Qt::RoundCap);
 
@@ -142,6 +145,7 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 	float value = bound (_value, _range);
 	float warning = bound (_warning_value, _range);
 	float critical = bound (_critical_value, _range);
+	float normal = bound (_normal_value, _range);
 
 	if (!_warning_visible)
 		warning = _range.max();
@@ -151,6 +155,7 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 	float value_angle = value_span_angle * (value - _range.min()) / _range.extent();
 	float warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
 	float critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
+	float normal_angle = value_span_angle * (normal - _range.min()) / _range.extent();
 
 	painter.save();
 	if (_value_visible)
@@ -166,6 +171,8 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
 		painter.restore();
 	}
+
+	// Warning/critical bugs:
 
 	float gap_degs = 4;
 	struct PointInfo { float angle; QPen pen; float tick_len; };
@@ -192,6 +199,15 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 		painter.rotate (curr.angle);
 		painter.drawLine (QPointF (r, 0.f), QPointF (r + curr.tick_len, 0.f));
 		painter.restore();
+	}
+
+	// Normal value bug:
+	if (_normal_visible)
+	{
+		painter.setPen (green_pen);
+		painter.rotate (normal_angle);
+		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.2f * r, -0.12f * r));
+		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.2f * r, +0.12f * r));
 	}
 
 	painter.restore();

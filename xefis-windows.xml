@@ -52,7 +52,7 @@
 													<property name='value' path='/epr'/>
 													<property name='value-minimum' path='/config/epr-minimum' default='1.0'/>
 													<property name='value-maximum' path='/config/epr-maximum' default='4.0'/>
-													<property name='value-warning' path='/config/epr-warning' default='3.8'/>
+													<property name='value-normal' path='/config/epr-normal' default='3.0'/>
 												</properties>
 											</module>
 										</item>

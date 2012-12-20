@@ -50,7 +50,8 @@ PowerIndicator::PowerIndicator (QDomElement const& config, QWidget* parent):
 				{ "value-minimum", _range_minimum, true },
 				{ "value-maximum", _range_maximum, true },
 				{ "value-warning", _warning_value, false },
-				{ "value-critical", _critical_value, false }
+				{ "value-critical", _critical_value, false },
+				{ "value-normal", _normal_value, false },
 			});
 			found_properties_config = true;
 		}
@@ -84,6 +85,12 @@ PowerIndicator::read()
 	{
 		_power_widget->set_critical_value (*_critical_value);
 		_power_widget->set_critical_visible (_critical_value.valid());
+	}
+
+	if (!_normal_value.is_singular())
+	{
+		_power_widget->set_normal_value (*_normal_value);
+		_power_widget->set_normal_visible (_normal_value.valid());
 	}
 }
 
