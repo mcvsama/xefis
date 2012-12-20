@@ -98,7 +98,7 @@ Module::parse_properties (QDomElement& properties_element, PropertiesList list)
 						it->second->access_float().write (value.toFloat());
 						break;
 					case PropString:
-//FIXME						it->second->access_string().write (value.toStdString());
+						it->second->access_string().write (value.toStdString());
 						break;
 					case PropDirectory:
 						break;
