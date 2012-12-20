@@ -36,8 +36,8 @@ class JoystickInput:
 {
 	Q_OBJECT
 
-	typedef std::vector<Xefis::Property<bool>*>		Buttons;
-	typedef std::vector<Xefis::Property<float>*>	Axes;
+	typedef std::vector<Xefis::PropertyBoolean*>	Buttons;
+	typedef std::vector<Xefis::PropertyFloat*>		Axes;
 
   public:
 	// Ctor

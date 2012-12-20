@@ -33,7 +33,7 @@ class InstrumentWidget: public QWidget
 {
   public:
 	// Ctor
-	InstrumentWidget (QWidget* parent, float height_fot_width);
+	InstrumentWidget (QWidget* parent, float height_fot_width, float master_scale);
 
   protected:
 	void
@@ -79,7 +79,8 @@ class InstrumentWidget: public QWidget
 	float				_font_20_digit_height;
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
-	float				_height_for_width = 1.f;
+	float				_height_for_width		= 1.f;
+	float				_master_scale			= 1.f;
 	QPen				_autopilot_pen_1;
 	QPen				_autopilot_pen_2;
 
@@ -105,14 +106,14 @@ InstrumentWidget::get_pen (QColor const& color, float width)
 inline float
 InstrumentWidget::pen_width (float scale) const
 {
-	return std::max (0.f, scale * wh() / (_height_for_width / 0.8f * 325.f));
+	return std::max (0.f, _master_scale * scale * wh() / (_height_for_width / 0.8f * 325.f));
 }
 
 
 inline float
 InstrumentWidget::font_size (float scale) const
 {
-	return std::max (1.f, scale * wh() / (_height_for_width / 0.8f * 375.f));
+	return std::max (1.f, _master_scale * scale * wh() / (_height_for_width / 0.8f * 375.f));
 }
 
 } // namespace Xefis

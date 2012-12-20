@@ -22,6 +22,7 @@
 #include <input/flight_gear.h>
 #include <input/joystick.h>
 #include <instruments/efis.h>
+#include <instruments/power_indicator.h>
 
 // Local:
 #include "module_manager.h"
@@ -44,6 +45,11 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 	if (name == "instruments/efis")
 	{
 		module = new EFIS (config, parent);
+		_modules.insert (module);
+	}
+	else if (name == "instruments/power-indicator")
+	{
+		module = new PowerIndicator (config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "input/flightgear")

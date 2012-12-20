@@ -1186,7 +1186,7 @@ EFISWidget::AttitudeDirectorIndicator::get_pitch_scale_clipping_path() const
 
 
 EFISWidget::EFISWidget (QWidget* parent):
-	InstrumentWidget (parent, 0.8f)
+	InstrumentWidget (parent, 0.8f, 1.f)
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 217, 255);

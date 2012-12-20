@@ -64,6 +64,7 @@ SRC_HEADERS += xefis/core/property_union.h
 
 SRC_SOURCES += xefis/core/config_reader.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
+SRC_SOURCES += xefis/core/module.cc
 SRC_SOURCES += xefis/core/module_manager.cc
 SRC_SOURCES += xefis/core/property_node.cc
 SRC_SOURCES += xefis/core/property_storage.cc
@@ -93,18 +94,23 @@ SRC_MOCHDRS += input/joystick.h
 ######## /instruments ########
 
 SRC_HEADERS += instruments/efis.h
+SRC_HEADERS += instruments/power_indicator.h
 
 SRC_SOURCES += instruments/efis.cc
+SRC_SOURCES += instruments/power_indicator.cc
 
 SRC_MOCHDRS += instruments/efis.h
+SRC_MOCHDRS += instruments/power_indicator.h
 
 ######## /widgets ########
 
 SRC_HEADERS += widgets/efis_widget.h
 SRC_HEADERS += widgets/efis_nav_widget.h
+SRC_HEADERS += widgets/power_widget.h
 
 SRC_SOURCES += widgets/efis_widget.cc
 SRC_SOURCES += widgets/efis_nav_widget.cc
+SRC_SOURCES += widgets/power_widget.cc
 
 ################
 

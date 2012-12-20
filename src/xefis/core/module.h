@@ -16,12 +16,14 @@
 
 // Standard:
 #include <cstddef>
+#include <initializer_list>
 
 // Qt:
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property_union.h>
 
 
 namespace Xefis {
@@ -29,8 +31,26 @@ namespace Xefis {
 class Module
 {
   public:
+	struct NameAndProperty
+	{
+		QString			name;
+		PropertyUnion	property;
+		bool			required;
+	};
+
+	typedef std::vector<NameAndProperty> PropertiesList;
+
+  public:
 	// Dtor
 	virtual ~Module();
+
+  protected:
+	/**
+	 * Parse the <properties> element and initialize properties
+	 * by their names matching the <properties> children.
+	 */
+	void
+	parse_properties (QDomElement& properties_element, PropertiesList);
 };
 
 

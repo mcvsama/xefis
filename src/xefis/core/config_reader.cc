@@ -262,7 +262,7 @@ void
 ConfigReader::process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* window)
 {
 	bool has_child = false;
-	int stretch = bound (item_element.attribute ("stretch-factor").toInt(), 0, std::numeric_limits<int>::max());
+	int stretch = bound (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
 
 	for (QDomElement& e: item_element)
 	{
