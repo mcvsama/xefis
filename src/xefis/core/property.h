@@ -157,13 +157,13 @@ template<class tType>
 		 * If not possible, throw PropertyPathConflict.
 		 */
 		void
-		write (Type);
+		write (Type const&);
 
 		/**
 		 * Write to a property. If node can't be found, throw PropertyNotFound.
 		 */
 		void
-		write_signalling (Type);
+		write_signalling (Type const&);
 	};
 
 
@@ -303,7 +303,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write (Type value)
+	Property<T>::write (Type const& value)
 	{
 		if (!_root)
 			throw Exception ("can't write to a singular property");
@@ -326,7 +326,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write_signalling (Type value)
+	Property<T>::write_signalling (Type const& value)
 	{
 		if (!_root)
 			throw Exception ("can't write to a singular property");

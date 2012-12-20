@@ -168,7 +168,7 @@ class PropertyNode
 	 */
 	template<class tType>
 		void
-		write (tType value);
+		write (tType const& value);
 
 	/**
 	 * Return parent node.
@@ -439,7 +439,7 @@ template<>
 
 template<class tType>
 	inline void
-	PropertyNode::write (tType value)
+	PropertyNode::write (tType const& value)
 	{
 		write_convertible (value);
 	}
