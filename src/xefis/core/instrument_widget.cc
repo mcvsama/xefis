@@ -28,9 +28,10 @@ const char	InstrumentWidget::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7'
 const char*	InstrumentWidget::MINUS_SIGN = "−";
 
 
-InstrumentWidget::InstrumentWidget (QWidget* parent, float height_for_width):
+InstrumentWidget::InstrumentWidget (QWidget* parent, float height_for_width, float master_scale):
 	QWidget (parent),
-	_height_for_width (height_for_width)
+	_height_for_width (height_for_width),
+	_master_scale (master_scale)
 {
 	_font = Xefis::Services::instrument_font();
 	_autopilot_color = QColor (250, 120, 255);

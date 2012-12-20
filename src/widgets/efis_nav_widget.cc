@@ -30,7 +30,7 @@
 
 
 EFISNavWidget::EFISNavWidget (QWidget* parent):
-  InstrumentWidget (parent, 0.5f)
+  InstrumentWidget (parent, 0.5f, 1.f)
 { }
 
 
@@ -127,9 +127,9 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 		painter.translate (q, 1.75f * q);
 		painter.setPen (get_pen (_navigation_color, 1.f));
 		painter.setFont (font_1);
-		text_painter.drawText (rect_1, Qt::AlignLeft| Qt::AlignBottom, text_1);
+		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignLeft| Qt::AlignBottom, text_2);
+		text_painter.drawText (rect_2, Qt::AlignLeft | Qt::AlignBottom, text_2);
 
 		painter.restore();
 	}
@@ -221,9 +221,9 @@ EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 		painter.translate (-metrics_2.width ("000") - q, 1.75f * q);
 		painter.setPen (_autopilot_pen_2);
 		painter.setFont (font_1);
-		text_painter.drawText (rect_1, Qt::AlignLeft| Qt::AlignBottom, text_1);
+		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignLeft| Qt::AlignBottom, text_2);
+		text_painter.drawText (rect_2, Qt::AlignLeft | Qt::AlignBottom, text_2);
 
 		painter.restore();
 	}
@@ -284,7 +284,7 @@ EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float
 		painter.setFont (font_a);
 		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
 		painter.setFont (font_b);
-		text_painter.drawText (val_rect, Qt::AlignLeft| Qt::AlignBottom, val);
+		text_painter.drawText (val_rect, Qt::AlignLeft | Qt::AlignBottom, val);
 		painter.restore();
 
 		return str_rect.width() + val_rect.width();

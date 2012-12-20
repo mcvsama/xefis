@@ -52,34 +52,39 @@ FlightGearInput::set_path (QString const& path)
 {
 	_property_path = path.toStdString();
 
-	_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias.kt");
-	_ias_tendency_kt = Xefis::Property<float> (_property_path + "/speed/ias-lookahead.kt");
-	_minimum_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias-minimum.kt");
-	_maximum_ias_kt = Xefis::Property<float> (_property_path + "/speed/ias-maximum.kt");
-	_gs_kt = Xefis::Property<float> (_property_path + "/speed/gs.kt");
-	_tas_kt = Xefis::Property<float> (_property_path + "/speed/tas.kt");
-	_mach = Xefis::Property<float> (_property_path + "/speed/mach");
-	_pitch_deg = Xefis::Property<float> (_property_path + "/orientation/pitch.deg");
-	_roll_deg = Xefis::Property<float> (_property_path + "/orientation/roll.deg");
-	_heading_deg = Xefis::Property<float> (_property_path + "/orientation/heading.deg");
-	_fpm_alpha_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/alpha.deg");
-	_fpm_beta_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/beta.deg");
-	_track_deg = Xefis::Property<float> (_property_path + "/flight-path-marker/track.deg");
-	_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/amsl.ft");
-	_altitude_agl_ft = Xefis::Property<float> (_property_path + "/altitude/agl.ft");
-	_landing_altitude_ft = Xefis::Property<float> (_property_path + "/altitude/landing-altitude.ft");
-	_pressure_inhg = Xefis::Property<float> (_property_path + "/static/pressure.inhg");
-	_cbr_fpm = Xefis::Property<float> (_property_path + "/cbr/fpm");
-	_autopilot_alt_setting_ft = Xefis::Property<float> (_property_path + "/autopilot/setting/altitude.ft");
-	_autopilot_speed_setting_kt = Xefis::Property<float> (_property_path + "/autopilot/setting/speed.kt");
-	_autopilot_heading_setting_deg = Xefis::Property<float> (_property_path + "/autopilot/setting/heading.deg");
-	_autopilot_cbr_setting_fpm = Xefis::Property<float> (_property_path + "/autopilot/setting/climb-rate.fpm");
-	_flight_director_pitch_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/pitch.deg");
-	_flight_director_roll_deg = Xefis::Property<float> (_property_path + "/autopilot/flight-director/roll.deg");
-	_navigation_needles_enabled = Xefis::Property<bool> (_property_path + "/navigation/enabled");
-	_navigation_gs_needle = Xefis::Property<float> (_property_path + "/navigation/glide-slope");
-	_navigation_hd_needle = Xefis::Property<float> (_property_path + "/navigation/heading");
-	_dme_distance_nm = Xefis::Property<float> (_property_path + "/navigation/dme-distance.nm");
+	_ias_kt = Xefis::PropertyFloat (_property_path + "/speed/ias.kt");
+	_ias_tendency_kt = Xefis::PropertyFloat (_property_path + "/speed/ias-lookahead.kt");
+	_minimum_ias_kt = Xefis::PropertyFloat (_property_path + "/speed/ias-minimum.kt");
+	_maximum_ias_kt = Xefis::PropertyFloat (_property_path + "/speed/ias-maximum.kt");
+	_gs_kt = Xefis::PropertyFloat (_property_path + "/speed/gs.kt");
+	_tas_kt = Xefis::PropertyFloat (_property_path + "/speed/tas.kt");
+	_mach = Xefis::PropertyFloat (_property_path + "/speed/mach");
+	_pitch_deg = Xefis::PropertyFloat (_property_path + "/orientation/pitch.deg");
+	_roll_deg = Xefis::PropertyFloat (_property_path + "/orientation/roll.deg");
+	_heading_deg = Xefis::PropertyFloat (_property_path + "/orientation/heading.deg");
+	_fpm_alpha_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/alpha.deg");
+	_fpm_beta_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/beta.deg");
+	_track_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/track.deg");
+	_altitude_ft = Xefis::PropertyFloat (_property_path + "/altitude/amsl.ft");
+	_altitude_agl_ft = Xefis::PropertyFloat (_property_path + "/altitude/agl.ft");
+	_landing_altitude_ft = Xefis::PropertyFloat (_property_path + "/altitude/landing-altitude.ft");
+	_pressure_inhg = Xefis::PropertyFloat (_property_path + "/static/pressure.inhg");
+	_cbr_fpm = Xefis::PropertyFloat (_property_path + "/cbr/fpm");
+	_autopilot_alt_setting_ft = Xefis::PropertyFloat (_property_path + "/autopilot/setting/altitude.ft");
+	_autopilot_speed_setting_kt = Xefis::PropertyFloat (_property_path + "/autopilot/setting/speed.kt");
+	_autopilot_heading_setting_deg = Xefis::PropertyFloat (_property_path + "/autopilot/setting/heading.deg");
+	_autopilot_cbr_setting_fpm = Xefis::PropertyFloat (_property_path + "/autopilot/setting/climb-rate.fpm");
+	_flight_director_pitch_deg = Xefis::PropertyFloat (_property_path + "/autopilot/flight-director/pitch.deg");
+	_flight_director_roll_deg = Xefis::PropertyFloat (_property_path + "/autopilot/flight-director/roll.deg");
+	_navigation_needles_enabled = Xefis::PropertyBoolean (_property_path + "/navigation/enabled");
+	_navigation_gs_needle = Xefis::PropertyFloat (_property_path + "/navigation/glide-slope");
+	_navigation_hd_needle = Xefis::PropertyFloat (_property_path + "/navigation/heading");
+	_dme_distance_nm = Xefis::PropertyFloat (_property_path + "/navigation/dme-distance.nm");
+	_engine_throttle_pct = Xefis::PropertyFloat ("/engine/throttle.pct");
+	_engine_epr = Xefis::PropertyFloat ("/engine/epr");
+	_engine_n1_pct = Xefis::PropertyFloat ("/engine/n1.pct");
+	_engine_n2_pct = Xefis::PropertyFloat ("/engine/n2.pct");
+	_engine_egt_degc = Xefis::PropertyFloat ("/engine/egt.degc");
 
 	invalidate_all();
 }
@@ -184,6 +189,16 @@ FlightGearInput::read_input()
 				navigation_dme_ok = !!value.toInt();
 			else if (var == "dme")
 				navigation_dme = value.toFloat();
+			else if (var == "thr")
+				_engine_throttle_pct.write (value.toFloat());
+			else if (var == "epr")
+				_engine_epr.write (value.toFloat());
+			else if (var == "n1")
+				_engine_n1_pct.write (value.toFloat());
+			else if (var == "n2")
+				_engine_n2_pct.write (value.toFloat());
+			else if (var == "egt")
+				_engine_egt_degc.write (5.f / 9.f * (value.toFloat() - 32.f));
 		}
 
 		if (navigation_gs_needle_ok)
@@ -229,5 +244,10 @@ FlightGearInput::invalidate_all()
 	_navigation_gs_needle.set_nil();
 	_navigation_hd_needle.set_nil();
 	_dme_distance_nm.set_nil();
+	_engine_throttle_pct.set_nil();
+	_engine_epr.set_nil();
+	_engine_n1_pct.set_nil();
+	_engine_n2_pct.set_nil();
+	_engine_egt_degc.set_nil();
 }
 
