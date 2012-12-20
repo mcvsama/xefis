@@ -40,12 +40,60 @@ class PropertyNotFound: public std::runtime_error
 };
 
 
+class BaseProperty
+{
+  protected:
+	BaseProperty() = default;
+	BaseProperty (BaseProperty const&) = default;
+	BaseProperty& operator= (BaseProperty const&) = default;
+
+	// Ctor
+	BaseProperty (PropertyNode* root, std::string path);
+
+  public:
+	/**
+	 * Return true if property is nil.
+	 */
+	bool
+	is_nil() const;
+
+	/**
+	 * Set property to the nil value.
+	 */
+	void
+	set_nil();
+
+	/**
+	 * Return true if the property is singular,
+	 * that is uninitialized.
+	 */
+	bool
+	is_singular() const;
+
+	/**
+	 * Valid means not singular and not nil.
+	 */
+	bool
+	valid() const;
+
+	/**
+	 * Return property path.
+	 */
+	std::string
+	path() const;
+
+  protected:
+	PropertyNode*	_root = nullptr;
+	std::string		_path;
+};
+
+
 /**
  * A property reference. Doesn't hold the data, but only the path,
  * and queries property storage whenever needed.
  */
 template<class tType>
-	class Property
+	class Property: public BaseProperty
 	{
 	  public:
 		typedef tType Type;
@@ -54,7 +102,7 @@ template<class tType>
 		/**
 		 * Create a null property, that can't be read or written.
 		 */
-		Property();
+		Property() = default;
 
 		/**
 		 * Copy from other property.
@@ -87,24 +135,6 @@ template<class tType>
 		operator= (Property const& other);
 
 		/**
-		 * Return true if property is nil.
-		 */
-		bool
-		is_nil() const;
-
-		/**
-		 * Inverse of is_nil().
-		 */
-		bool
-		valid() const;
-
-		/**
-		 * Set property to the nil value.
-		 */
-		void
-		set_nil();
-
-		/**
 		 * Read property. If node can't be found, return default value.
 		 */
 		Type
@@ -134,16 +164,6 @@ template<class tType>
 		 */
 		void
 		write_signalling (Type);
-
-		/**
-		 * Return property path.
-		 */
-		std::string
-		path() const;
-
-	  private:
-		PropertyNode*	_root;
-		std::string		_path;
 	};
 
 
@@ -153,18 +173,61 @@ PropertyNotFound::PropertyNotFound (const char* message):
 { }
 
 
-template<class T>
-	inline
-	Property<T>::Property():
-		_root (nullptr)
-	{ }
+inline
+BaseProperty::BaseProperty (PropertyNode* root, std::string path):
+	_root (root),
+	_path (path)
+{ }
+
+
+inline bool
+BaseProperty::is_nil() const
+{
+	if (!_root)
+		throw Exception ("can't read a singular property");
+	PropertyNode* node = _root->locate (_path);
+	if (!node)
+		return true;
+	return node->is_nil();
+}
+
+
+inline void
+BaseProperty::set_nil()
+{
+	if (!_root)
+		throw Exception ("can't write to a singular property");
+	PropertyNode* node = _root->locate (_path);
+	if (node)
+		node->set_nil();
+}
+
+
+inline bool
+BaseProperty::is_singular() const
+{
+	return !_root;
+}
+
+
+inline bool
+BaseProperty::valid() const
+{
+	return !is_singular() && !is_nil();
+}
+
+
+inline std::string
+BaseProperty::path() const
+{
+	return _path;
+}
 
 
 template<class T>
 	inline
 	Property<T>::Property (Property const& other):
-		_root (other._root),
-		_path (other._path)
+		BaseProperty (other)
 	{ }
 
 
@@ -178,19 +241,17 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (std::string const& path):
-		_root (PropertyStorage::root()),
-		_path (path)
+		BaseProperty (PropertyStorage::root(), path)
 	{
 		if (!_root)
-			throw std::logic_error ("PropertyStorage is not initialized, can't construct Property with default storage");
+			throw Exception ("PropertyStorage is not initialized, can't construct Property with default storage");
 	}
 
 
 template<class T>
 	inline
 	Property<T>::Property (PropertyNode* node, std::string const& path):
-		_root (node->root()),
-		_path (path)
+		BaseProperty (node->root(), path)
 	{ }
 
 
@@ -198,42 +259,8 @@ template<class T>
 	inline Property<T>&
 	Property<T>::operator= (Property const& other)
 	{
-		_root = other._root;
-		_path = other._path;
+		BaseProperty::operator= (other);
 		return *this;
-	}
-
-
-template<class T>
-	inline bool
-	Property<T>::is_nil() const
-	{
-		if (!_root)
-			throw std::logic_error ("can't read the root property");
-		PropertyNode* node = _root->locate (_path);
-		if (!node)
-			return true;
-		return node->is_nil();
-	}
-
-
-template<class T>
-	inline bool
-	Property<T>::valid() const
-	{
-		return !is_nil();
-	}
-
-
-template<class T>
-	inline void
-	Property<T>::set_nil()
-	{
-		if (!_root)
-			throw std::logic_error ("can't write to the root property");
-		PropertyNode* node = _root->locate (_path);
-		if (node)
-			node->set_nil();
 	}
 
 
@@ -243,7 +270,7 @@ template<class T>
 	Property<T>::read() const
 	{
 		if (!_root)
-			throw std::logic_error ("can't read the root property");
+			throw Exception ("can't read a singular property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			return Type();
@@ -257,7 +284,7 @@ template<class T>
 	Property<T>::read_signalling() const
 	{
 		if (!_root)
-			throw std::logic_error ("can't read the root property");
+			throw Exception ("can't read a singular property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");
@@ -279,7 +306,7 @@ template<class T>
 	Property<T>::write (Type value)
 	{
 		if (!_root)
-			throw std::logic_error ("can't write to the root property");
+			throw Exception ("can't write to a singular property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 		{
@@ -302,7 +329,7 @@ template<class T>
 	Property<T>::write_signalling (Type value)
 	{
 		if (!_root)
-			throw std::logic_error ("can't write to the root property");
+			throw Exception ("can't write to a singular property");
 		PropertyNode* node = _root->locate (_path);
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");
@@ -310,12 +337,15 @@ template<class T>
 	}
 
 
-template<class T>
-	inline std::string
-	Property<T>::path() const
-	{
-		return _path;
-	}
+/*
+ * Shortcut types
+ */
+
+
+typedef Property<bool>			PropertyBoolean;
+typedef Property<int>			PropertyInteger;
+typedef Property<double>		PropertyFloat;
+typedef Property<std::string>	PropertyString;
 
 } // namespace Xefis
 

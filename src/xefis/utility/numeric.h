@@ -18,9 +18,9 @@
 #include <cstddef>
 #include <cmath>
 
-// Xefisi:
+// Xefis:
 #include <xefis/config/all.h>
-
+#include <xefis/utility/range.h>
 
 /**
  * Return x > 0.0 ? 1.0 : -1.0.
@@ -61,6 +61,16 @@ template<class Value>
 			: value > max
 				? max
 				: value;
+	}
+
+
+template<class Value>
+	inline constexpr Value
+	bound (Value value, Range<Value> range) noexcept
+	{
+		return range.min() <= range.max()
+			? bound (value, range.min(), range.max())
+			: bound (value, range.max(), range.min());
 	}
 
 #endif

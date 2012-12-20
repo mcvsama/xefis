@@ -20,6 +20,9 @@
 #include <cstdio>
 #include <stdexcept>
 
+// Xefis:
+#include <xefis/utility/backtrace.h>
+
 
 namespace Xefis {
 
@@ -33,8 +36,12 @@ class Exception: public std::runtime_error
 	Exception*
 	inner() const;
 
+	Backtrace const&
+	backtrace() const;
+
   private:
-	Exception* _inner = nullptr;
+	Exception*	_inner = nullptr;
+	Backtrace	_backtrace;
 };
 
 
@@ -56,6 +63,13 @@ inline Exception*
 Exception::inner() const
 {
 	return _inner;
+}
+
+
+inline Backtrace const&
+Exception::backtrace() const
+{
+	return _backtrace;
 }
 
 } // namespace Xefis

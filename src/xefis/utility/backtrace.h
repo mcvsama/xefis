@@ -20,9 +20,6 @@
 #include <vector>
 #include <ostream>
 
-// Xefis:
-#include <xefis/config/all.h>
-
 
 #define SANITY_CHECK(x) \
 	if (!x) \
