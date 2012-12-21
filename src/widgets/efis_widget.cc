@@ -969,9 +969,9 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
 	// 10° lines, exclude +/-90°:
-	for (int deg = -180; deg < 180; deg += 10)
+	for (int deg = -90; deg <= 90; deg += 10)
 	{
-		if (deg == -90 || deg == 0 || deg == 90)
+		if (deg == 0)
 			continue;
 		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
@@ -985,7 +985,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t);
 	}
 	// 5° lines:
-	for (int deg = -180; deg < 180; deg += 5)
+	for (int deg = -90; deg <= 90; deg += 5)
 	{
 		if (deg % 10 == 0)
 			continue;
@@ -993,7 +993,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 		_painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
 	}
 	// 2.5° lines:
-	for (int deg = -1800; deg < 1800; deg += 25)
+	for (int deg = -900; deg <= 900; deg += 25)
 	{
 		if (deg % 50 == 0)
 			continue;
@@ -1006,11 +1006,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	for (float deg: { -90.f, 90.f })
 	{
 		float d = _efis.pitch_to_px (deg);
-		_painter.drawLine (QPointF (-z * 1.5f, d), QPointF (z * 1.5f, d));
-		QRectF lbox (-1.5f * z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		QRectF rbox (+1.5f * z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-		_text_painter.drawText (lbox, Qt::AlignVCenter | Qt::AlignRight, "90");
-		_text_painter.drawText (rbox, Qt::AlignVCenter | Qt::AlignLeft, "90");
+		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
 	}
 
 	_painter.restore();
