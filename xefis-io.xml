@@ -1,12 +1,19 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<modules>
-		<module name='input/flightgear'/>
-		<module name='input/joystick'>
+		<module name='io/flightgear'>
+			<!--input>
+				<port>9000</port>
+			</input>
+			<output>
+				<port>9000</port>
+			</output-->
+		</module>
+		<module name='io/joystick'>
 			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
 			<path>/control/main</path>
 		</module>
-		<module name='input/joystick'>
+		<module name='io/joystick'>
 			<device>/dev/input/js1</device>
 			<path>/control/rudder</path>
 		</module>
