@@ -240,20 +240,24 @@ EFISWidget::AltitudeLadder::paint_altitude_tendency (float x)
 	pen.setJoinStyle (Qt::RoundJoin);
 
 	_painter.save();
+
 	_painter.setPen (pen);
 	_painter.translate (-1.2f * x, 0.f);
 	if (_efis._altitude_tendency < _altitude)
 		_painter.scale (1.f, -1.f);
 	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (ft_to_px (std::max (0.f, _efis._altitude_tendency)))) - 0.5f * x;
-	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
-	if (length > 0)
+
+	if (length > 0.2f * x)
+	{
+		_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
 		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
-	_painter.translate (0.f, -length);
-	_painter.drawPolygon (QPolygonF()
-		<< QPointF (0.f, -0.5f * x)
-		<< QPointF (-0.2f * x, 0.f)
-		<< QPointF (+0.2f * x, 0.f));
-	_painter.restore();
+		_painter.translate (0.f, -length);
+		_painter.drawPolygon (QPolygonF()
+			<< QPointF (0.f, -0.5f * x)
+			<< QPointF (-0.2f * x, 0.f)
+			<< QPointF (+0.2f * x, 0.f));
+		_painter.restore();
+	}
 }
 
 
@@ -733,19 +737,24 @@ EFISWidget::SpeedLadder::paint_speed_tendency (float x)
 	pen.setJoinStyle (Qt::RoundJoin);
 
 	_painter.save();
+
 	_painter.setPen (pen);
 	_painter.translate (1.2f * x, 0.f);
 	if (_efis._speed_tendency < _speed)
 		_painter.scale (1.f, -1.f);
 	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency)))) - 0.5f * x;
-	_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
-	if (length > 0)
+
+	if (length > 0.2f * x)
+	{
+		_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
 		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
-	_painter.translate (0.f, -length);
-	_painter.drawPolygon (QPolygonF()
-		<< QPointF (0.f, -0.5f * x)
-		<< QPointF (-0.2f * x, 0.f)
-		<< QPointF (+0.2f * x, 0.f));
+		_painter.translate (0.f, -length);
+		_painter.drawPolygon (QPolygonF()
+			<< QPointF (0.f, -0.5f * x)
+			<< QPointF (-0.2f * x, 0.f)
+			<< QPointF (+0.2f * x, 0.f));
+	}
+
 	_painter.restore();
 }
 
