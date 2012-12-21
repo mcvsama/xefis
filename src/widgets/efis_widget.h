@@ -250,6 +250,24 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_heading_visibility (bool visible);
 
 	/**
+	 * Return slip-skid indicator value.
+	 */
+	float
+	slip_skid() const;
+
+	/**
+	 * Set slip-skid value.
+	 */
+	void
+	set_slip_skid (float value);
+
+	/**
+	 * Set slip-skid indicator visibility.
+	 */
+	void
+	set_slip_skid_visibility (bool visible);
+
+	/**
 	 * Flight path vertical deviation.
 	 */
 	Degrees
@@ -746,6 +764,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_roll_visible					= false;
 	Degrees				_heading						= 0.f;
 	bool				_heading_visible				= false;
+	float				_slip_skid						= 0.f;
+	bool				_slip_skid_visible				= false;
 	Degrees				_flight_path_alpha				= 0.f;
 	Degrees				_flight_path_beta				= 0.f;
 	bool				_flight_path_visible			= false;
@@ -876,6 +896,29 @@ inline void
 EFISWidget::set_heading_visibility (bool visible)
 {
 	_heading_visible = visible;
+	update();
+}
+
+
+inline float
+EFISWidget::slip_skid() const
+{
+	return _slip_skid;
+}
+
+
+inline void
+EFISWidget::set_slip_skid (float value)
+{
+	_slip_skid = value;
+	update();
+}
+
+
+inline void
+EFISWidget::set_slip_skid_visibility (bool visible)
+{
+	_slip_skid_visible = visible;
 	update();
 }
 

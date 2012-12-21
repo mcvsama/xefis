@@ -1021,12 +1021,17 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 		return;
 
 	float const w = _efis.wh() * 3.f / 9.f;
+	bool const bank_angle_warning = std::abs (_efis._roll) > 35.f;
+	bool const slip_skid_warning = std::abs (_efis._slip_skid) > 2.f;
 
 	_painter.save();
 
 	QPen pen = _efis.get_pen (QColor (255, 255, 255), 1.f);
 	_painter.setPen (pen);
 	_painter.setBrush (QBrush (QColor (255, 255, 255)));
+
+	QPen warning_pen = pen;
+	warning_pen.setColor (QColor (255, 220, 100));
 
 	_painter.setTransform (_efis._center_transform);
 	_painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
@@ -1059,16 +1064,51 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 	QPointF a (0, 0.01f * w); // Miter
 	QPointF b (-0.052f * w, 0.1f * w);
 	QPointF c (+0.052f * w, 0.1f * w);
-	QPointF x0 (0.001f * w, 0.f);
+	QPointF x0 (0.002f * w, 0.f);
 	QPointF y0 (0.f, 0.005f * w);
-	QPointF x1 (0.001f * w, 0.f);
 	QPointF y1 (0.f, 1.f * bold_width);
 
 	_painter.setTransform (_roll_transform * _efis._center_transform);
 	_painter.translate (0.f, -0.79f * w);
-	_painter.setBrush (QBrush (QColor (255, 255, 255)));
-	_painter.drawPolyline (QPolygonF() << b << a << c);
-	_painter.drawPolygon (QPolygonF() << b - x0 + y0 << b + x1 + y1 << c - x1 + y1 << c + x0 + y0);
+
+	QPolygonF bank_angle_polygon = QPolygonF() << b << a << c << b;
+
+	if (bank_angle_warning)
+	{
+		_painter.setPen (warning_pen);
+		_painter.setBrush (warning_pen.color());
+		_painter.drawPolygon (bank_angle_polygon);
+	}
+	else
+	{
+		_painter.setPen (pen);
+		_painter.drawPolyline (bank_angle_polygon);
+	}
+
+	if (_efis._slip_skid_visible)
+	{
+		QPolygonF slip_skid_polygon = QPolygonF()
+			<< b - x0 + y0
+			<< b - x0 + y1
+			<< c + x0 + y1
+			<< c + x0 + y0
+			<< b - x0 + y0;
+
+		_painter.translate (-bound (_efis._slip_skid, -5.f, +5.f) * 0.05f * w, 0.f);
+
+		if (bank_angle_warning || slip_skid_warning)
+			_painter.setPen (warning_pen);
+		else
+			_painter.setPen (pen);
+
+		if (slip_skid_warning)
+		{
+			_painter.setBrush (warning_pen.color());
+			_painter.drawPolygon (slip_skid_polygon);
+		}
+		else
+			_painter.drawPolyline (slip_skid_polygon);
+	}
 
 	_painter.restore();
 }

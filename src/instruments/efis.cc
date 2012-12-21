@@ -85,6 +85,9 @@ EFIS::read()
 	_efis_widget->set_heading (*_heading_deg);
 	_efis_widget->set_heading_visibility (_heading_deg.valid());
 
+	_efis_widget->set_slip_skid (*_slip_skid);
+	_efis_widget->set_slip_skid_visibility (_slip_skid.valid());
+
 	_efis_widget->set_flight_path_alpha (fpm_alpha);
 	_efis_widget->set_flight_path_marker_visibility (fpm_ok);
 
@@ -168,6 +171,7 @@ EFIS::set_path (QString const& path)
 	_pitch_deg = Xefis::PropertyFloat (_property_path + "/orientation/pitch.deg");
 	_roll_deg = Xefis::PropertyFloat (_property_path + "/orientation/roll.deg");
 	_heading_deg = Xefis::PropertyFloat (_property_path + "/orientation/heading.deg");
+	_slip_skid = Xefis::PropertyFloat (_property_path + "/slip-skid/slip-skid");
 	_fpm_alpha_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/alpha.deg");
 	_fpm_beta_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/beta.deg");
 	_track_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/track.deg");

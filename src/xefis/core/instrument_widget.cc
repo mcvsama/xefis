@@ -35,7 +35,7 @@ InstrumentWidget::InstrumentWidget (QWidget* parent, float height_for_width, flo
 {
 	_font = Xefis::Services::instrument_font();
 	_autopilot_color = QColor (250, 120, 255);
-	_navigation_color = QColor (40, 255, 40);
+	_navigation_color = QColor (60, 255, 40);
 
 	update_fonts();
 }

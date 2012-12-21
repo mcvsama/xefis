@@ -200,6 +200,12 @@
 				<format>heading=%f</format>
 				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
+			<chunk>
+				<name>slip-skid</name>
+				<type>float</type>
+				<format>ss=%f</format>
+				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
+			</chunk>
 			<!-- Flight path -->
 			<chunk>
 				<name>alpha</name>
