@@ -112,14 +112,14 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 		painter.save();
 
 		QString text_1 = "MAG";
-		QString text_2 = QString::number (std::round (_heading));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_heading + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
 		QFontMetricsF metrics_1 (font_1);
 		QFontMetricsF metrics_2 (font_2);
 		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-		QRectF rect_2 (0.f, 0.f, metrics_2.width (text_2), metrics_2.height());
+		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
 		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
 		rect_2.moveLeft (rect_1.right() + metrics_1.width ("  "));
 
@@ -129,7 +129,7 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 		painter.setFont (font_1);
 		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignLeft | Qt::AlignBottom, text_2);
+		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
 
 		painter.restore();
 	}
@@ -184,7 +184,7 @@ EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 		}
 
 		QTransform transform = _aircraft_center_transform;
-		transform.rotate (bound (std::fmod (_ap_heading - _heading + 180.f, 360.f) - 180.f, -102.f, +102.f));
+		transform.rotate (bound (floored_mod (_ap_heading - _heading + 180.f, 360.f) - 180.f, -102.f, +102.f));
 		transform.translate (0.f, -r);
 
 		QPen pen_1 = _autopilot_pen_1;
@@ -206,14 +206,14 @@ EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 		painter.save();
 
 		QString text_1 = "SEL  HDG";
-		QString text_2 = QString::number (static_cast<int> (_ap_heading));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_heading + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
 		QFontMetricsF metrics_1 (font_1);
 		QFontMetricsF metrics_2 (font_2);
 		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-		QRectF rect_2 (0.f, 0.f, metrics_2.width (text_2), metrics_2.height());
+		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
 		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
 		rect_1.moveLeft (-rect_1.right() - metrics_1.width ("  "));
 
@@ -223,7 +223,7 @@ EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 		painter.setFont (font_1);
 		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignLeft | Qt::AlignBottom, text_2);
+		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
 
 		painter.restore();
 	}
@@ -284,7 +284,7 @@ EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float
 		painter.setFont (font_a);
 		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
 		painter.setFont (font_b);
-		text_painter.drawText (val_rect, Qt::AlignLeft | Qt::AlignBottom, val);
+		text_painter.drawText (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
 		painter.restore();
 
 		return str_rect.width() + val_rect.width();
