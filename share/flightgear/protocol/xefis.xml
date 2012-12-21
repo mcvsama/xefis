@@ -3,13 +3,78 @@
 	<generic>
 		<comment>
 			Copy this file to the 'Protocol' directory of the FlightGear (usually /usr/share/flightgear/data/Protocol/).
-			Run FlightGear with '--generic=socket,out,24,127.0.0.1,9000,udp,xefis' on command line.
+			Run FlightGear with '--generic=socket,bi,40,127.0.0.1,9000,udp,xefis' on command line.
+			Configure the "io/flightgear" module in the Xefis configuration files. Use the same UDP port addresses.
 		</comment>
-		<output>
+		<input>
 			<line_separator>newline</line_separator>
 			<var_separator>,</var_separator>
 
-			<!-- EFIS -->
+			<!-- Surfaces -->
+			<chunk>
+				<name>aileron</name>
+				<node>/controls/flight/aileron</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>elevator</name>
+				<node>/controls/flight/elevator</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>rudder</name>
+				<node>/controls/flight/rudder</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>aileron-trim</name>
+				<node>/controls/flight/aileron-trim</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>elevator-trim</name>
+				<node>/controls/flight/elevator-trim</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>rudder-trim</name>
+				<node>/controls/flight/rudder-trim</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>flaps</name>
+				<node>/controls/flight/flaps</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>slats</name>
+				<node>/controls/flight/slats</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>speedbrake</name>
+				<node>/controls/flight/speedbrake</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+			<chunk>
+				<name>spoilers</name>
+				<node>/controls/flight/spoilers</node>
+				<type>float</type>
+				<format>%f</format>
+			</chunk>
+		</input>
+		<output>
+			<line_separator>newline</line_separator>
+			<var_separator>,</var_separator>
 
 			<!-- Autopilot/autothrottle -->
 			<chunk>

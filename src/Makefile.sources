@@ -80,16 +80,16 @@ SRC_HEADERS += xefis/utility/text_painter.h
 SRC_SOURCES += xefis/utility/backtrace.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
 
-######## /input  ########
+######## /io ########
 
-SRC_HEADERS += input/flight_gear.h
-SRC_HEADERS += input/joystick.h
+SRC_HEADERS += io/flight_gear.h
+SRC_HEADERS += io/joystick.h
 
-SRC_SOURCES += input/flight_gear.cc
-SRC_SOURCES += input/joystick.cc
+SRC_SOURCES += io/flight_gear.cc
+SRC_SOURCES += io/joystick.cc
 
-SRC_MOCHDRS += input/flight_gear.h
-SRC_MOCHDRS += input/joystick.h
+SRC_MOCHDRS += io/flight_gear.h
+SRC_MOCHDRS += io/joystick.h
 
 ######## /instruments ########
 

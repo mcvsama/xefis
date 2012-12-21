@@ -19,8 +19,8 @@
 #include <xefis/core/module.h>
 
 // Modules:
-#include <input/flight_gear.h>
-#include <input/joystick.h>
+#include <io/flight_gear.h>
+#include <io/joystick.h>
 #include <instruments/efis.h>
 #include <instruments/power_indicator.h>
 
@@ -52,12 +52,12 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 		module = new PowerIndicator (config, parent);
 		_modules.insert (module);
 	}
-	else if (name == "input/flightgear")
+	else if (name == "io/flightgear")
 	{
 		module = new FlightGearInput (config);
 		_modules.insert (module);
 	}
-	else if (name == "input/joystick")
+	else if (name == "io/joystick")
 	{
 		module = new JoystickInput (config);
 		_modules.insert (module);
