@@ -127,11 +127,18 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 	{
 		QColor color = _sgn >= 0.f ? QColor (0, 255, 0) : QColor (255, 0, 0);
 		QRectF green_square_box (-0.3f * b_digit_width, -0.4f * b_digit_height, 0.6f * b_digit_width, 0.78f * b_digit_height);
+		QPen pen = _efis.get_pen (color, 1.2f);
+		QPointF difx (green_square_box.width() / 2.5f, 0.f);
+		QPointF dify (0.f, green_square_box.height() / 2.5f);
+		pen.setCapStyle (Qt::RoundCap);
 		green_square_box.translate (0.5f * x + 0.75f * margin, 0.f);
 		_painter.save();
-		_painter.setPen (Qt::NoPen);
-		_painter.setBrush (QBrush (color, Qt::Dense4Pattern));
-		_painter.drawRect (green_square_box);
+		_painter.setPen (pen);
+		_painter.drawLine (green_square_box.topLeft(), green_square_box.bottomRight());
+		_painter.drawLine (green_square_box.topLeft() + difx, green_square_box.bottomRight() - dify);
+		_painter.drawLine (green_square_box.topLeft() + dify, green_square_box.bottomRight() - difx);
+		_painter.drawLine (green_square_box.topLeft() + 2.f * difx, green_square_box.bottomRight() - 2.f * dify);
+		_painter.drawLine (green_square_box.topLeft() + 2.f * dify, green_square_box.bottomRight() - 2.f * difx);
 		_painter.restore();
 	}
 
