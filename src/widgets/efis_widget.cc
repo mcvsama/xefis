@@ -1022,7 +1022,6 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 }
 
 
-// TODO refactor
 void
 EFISWidget::AttitudeDirectorIndicator::paint_roll()
 {
@@ -1030,8 +1029,8 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 		return;
 
 	float const w = _efis.wh() * 3.f / 9.f;
-	bool const bank_angle_warning = std::abs (_efis._roll) > 35.f;
-	bool const slip_skid_warning = std::abs (_efis._slip_skid) > 2.f;
+	bool const bank_angle_warning = _efis._roll_limit > 0.f && std::abs (_efis._roll) > _efis._roll_limit;
+	bool const slip_skid_warning = _efis._slip_skid_limit > 0.f && std::abs (_efis._slip_skid) > _efis._slip_skid_limit;
 
 	_painter.save();
 
@@ -1103,7 +1102,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 			<< c + x0 + y0
 			<< b - x0 + y0;
 
-		_painter.translate (-bound (_efis._slip_skid, -5.f, +5.f) * 0.05f * w, 0.f);
+		_painter.translate (-bound (_efis._slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
 		if (bank_angle_warning || slip_skid_warning)
 			_painter.setPen (warning_pen);

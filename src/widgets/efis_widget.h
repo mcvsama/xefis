@@ -219,10 +219,23 @@ class EFISWidget: public Xefis::InstrumentWidget
 	roll() const;
 
 	/**
+	 * Return roll limit.
+	 */
+	Degrees
+	roll_limit() const;
+
+	/**
 	 * Set roll value.
 	 */
 	void
 	set_roll (Degrees);
+
+	/**
+	 * Set roll limit, where indicator will turn solid amber.
+	 * 0.f disables the limit.
+	 */
+	void
+	set_roll_limit (Degrees limit);
 
 	/**
 	 * Toggle roll scale visibility.
@@ -256,10 +269,23 @@ class EFISWidget: public Xefis::InstrumentWidget
 	slip_skid() const;
 
 	/**
+	 * Return slip-skid limit.
+	 */
+	float
+	slip_skid_limit() const;
+
+	/**
 	 * Set slip-skid value.
 	 */
 	void
 	set_slip_skid (float value);
+
+	/**
+	 * Set slip-skid limit, where indicator will turn solid amber.
+	 * 0.f disables the limit.
+	 */
+	void
+	set_slip_skid_limit (float limit);
 
 	/**
 	 * Set slip-skid indicator visibility.
@@ -761,10 +787,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Degrees				_pitch							= 0.f;
 	bool				_pitch_visible					= false;
 	Degrees				_roll							= 0.f;
+	Degrees				_roll_limit						= 0.f;
 	bool				_roll_visible					= false;
 	Degrees				_heading						= 0.f;
 	bool				_heading_visible				= false;
 	float				_slip_skid						= 0.f;
+	float				_slip_skid_limit				= 0.f;
 	bool				_slip_skid_visible				= false;
 	Degrees				_flight_path_alpha				= 0.f;
 	Degrees				_flight_path_beta				= 0.f;
@@ -861,10 +889,25 @@ EFISWidget::roll() const
 }
 
 
+inline Degrees
+EFISWidget::roll_limit() const
+{
+	return _roll_limit;
+}
+
+
 inline void
 EFISWidget::set_roll (Degrees degrees)
 {
 	_roll = degrees;
+	update();
+}
+
+
+inline void
+EFISWidget::set_roll_limit (Degrees limit)
+{
+	_roll_limit = limit;
 	update();
 }
 
@@ -907,10 +950,25 @@ EFISWidget::slip_skid() const
 }
 
 
+inline float
+EFISWidget::slip_skid_limit() const
+{
+	return _slip_skid_limit;
+}
+
+
 inline void
 EFISWidget::set_slip_skid (float value)
 {
 	_slip_skid = value;
+	update();
+}
+
+
+inline void
+EFISWidget::set_slip_skid_limit (float limit)
+{
+	_slip_skid_limit = limit;
 	update();
 }
 

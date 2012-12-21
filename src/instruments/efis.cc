@@ -82,11 +82,15 @@ EFIS::read()
 	_efis_widget->set_roll (*_roll_deg);
 	_efis_widget->set_roll_visibility (_roll_deg.valid());
 
+	_efis_widget->set_roll_limit (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f);
+
 	_efis_widget->set_heading (*_heading_deg);
 	_efis_widget->set_heading_visibility (_heading_deg.valid());
 
 	_efis_widget->set_slip_skid (*_slip_skid);
 	_efis_widget->set_slip_skid_visibility (_slip_skid.valid());
+
+	_efis_widget->set_slip_skid_limit (_slip_skid_limit.valid() ? *_slip_skid_limit : 0.f);
 
 	_efis_widget->set_flight_path_alpha (fpm_alpha);
 	_efis_widget->set_flight_path_marker_visibility (fpm_ok);
@@ -170,8 +174,10 @@ EFIS::set_path (QString const& path)
 	_mach = Xefis::PropertyFloat (_property_path + "/speed/mach");
 	_pitch_deg = Xefis::PropertyFloat (_property_path + "/orientation/pitch.deg");
 	_roll_deg = Xefis::PropertyFloat (_property_path + "/orientation/roll.deg");
+	_roll_limit_deg = Xefis::PropertyFloat (_property_path + "/configuration/limits/roll.deg");
 	_heading_deg = Xefis::PropertyFloat (_property_path + "/orientation/heading.deg");
 	_slip_skid = Xefis::PropertyFloat (_property_path + "/slip-skid/slip-skid");
+	_slip_skid_limit = Xefis::PropertyFloat (_property_path + "/configuration/limits/slip-skid-limit");
 	_fpm_alpha_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/alpha.deg");
 	_fpm_beta_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/beta.deg");
 	_track_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/track.deg");

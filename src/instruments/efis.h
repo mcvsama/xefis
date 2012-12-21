@@ -62,8 +62,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
+	Xefis::PropertyFloat	_roll_limit_deg;
 	Xefis::PropertyFloat	_heading_deg;
 	Xefis::PropertyFloat	_slip_skid;
+	Xefis::PropertyFloat	_slip_skid_limit;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
