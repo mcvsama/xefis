@@ -62,6 +62,7 @@ FlightGearInput::set_path (QString const& path)
 	_pitch_deg = Xefis::PropertyFloat (_property_path + "/orientation/pitch.deg");
 	_roll_deg = Xefis::PropertyFloat (_property_path + "/orientation/roll.deg");
 	_heading_deg = Xefis::PropertyFloat (_property_path + "/orientation/heading.deg");
+	_slip_skid = Xefis::PropertyFloat (_property_path + "/slip-skid/slip-skid");
 	_fpm_alpha_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/alpha.deg");
 	_fpm_beta_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/beta.deg");
 	_track_deg = Xefis::PropertyFloat (_property_path + "/flight-path-marker/track.deg");
@@ -146,6 +147,8 @@ FlightGearInput::read_input()
 				_roll_deg.write (value.toFloat());
 			else if (var == "heading")
 				_heading_deg.write (value.toFloat());
+			else if (var == "ss")
+				_slip_skid.write (value.toFloat());
 			else if (var == "alpha")
 				_fpm_alpha_deg.write (value.toFloat());
 			else if (var == "beta")
@@ -226,6 +229,7 @@ FlightGearInput::invalidate_all()
 	_pitch_deg.set_nil();
 	_roll_deg.set_nil();
 	_heading_deg.set_nil();
+	_slip_skid.set_nil();
 	_fpm_alpha_deg.set_nil();
 	_fpm_beta_deg.set_nil();
 	_track_deg.set_nil();

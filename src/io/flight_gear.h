@@ -74,6 +74,7 @@ class FlightGearInput:
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
 	Xefis::PropertyFloat	_heading_deg;
+	Xefis::PropertyFloat	_slip_skid;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
