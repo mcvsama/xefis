@@ -206,8 +206,9 @@ PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 	{
 		painter.setPen (green_pen);
 		painter.rotate (normal_angle);
-		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.2f * r, -0.12f * r));
-		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.2f * r, +0.12f * r));
+		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.1f * r, 0.f));
+		painter.drawLine (QPointF (1.1f * r + pen_width (1.4f), 0.f), QPointF (1.3f * r, -0.14f * r));
+		painter.drawLine (QPointF (1.1f * r + pen_width (1.4f), 0.f), QPointF (1.3f * r, +0.14f * r));
 	}
 
 	painter.restore();
