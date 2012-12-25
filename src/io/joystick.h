@@ -22,6 +22,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QFile>
 #include <QtCore/QSocketNotifier>
+#include <QtCore/QTimer>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -48,15 +49,23 @@ class JoystickInput:
 
   private slots:
 	/**
+	 * Try to open input device.
+	 */
+	void
+	open_device();
+
+	/**
 	 * Read event from the device.
 	 */
 	void
 	read();
 
   private:
-	QString				_prop_path	= "/joystick";
-	QFile*				_device		= nullptr;
-	QSocketNotifier*	_notifier	= nullptr;
+	QString				_prop_path		= "/joystick";
+	QString				_device_path;
+	QFile*				_device			= nullptr;
+	QSocketNotifier*	_notifier		= nullptr;
+	QTimer*				_reopen_timer	= nullptr;
 	Buttons				_buttons;
 	Axes				_axes;
 };
