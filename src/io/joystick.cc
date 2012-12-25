@@ -27,7 +27,6 @@
 
 JoystickInput::JoystickInput (QDomElement const& config)
 {
-	QString device_path;
 	bool found_path = false;
 	bool found_device = false;
 
@@ -39,7 +38,7 @@ JoystickInput::JoystickInput (QDomElement const& config)
 				throw Xefis::Exception ("only once <device> supported in configuration for the JoystickInput module");
 			found_device = true;
 
-			device_path = e.text();
+			_device_path = e.text();
 		}
 		else if (e == "path")
 		{
@@ -53,12 +52,12 @@ JoystickInput::JoystickInput (QDomElement const& config)
 			throw Xefis::Exception (QString ("unsupported config element for JoystickInput module: <%1>").arg (e.tagName()).toStdString());
 	}
 
-	_device = new QFile (device_path, this);
-	if (!_device->open (QFile::ReadOnly))
-		throw Xefis::Exception (("could not open device file: " + device_path).toStdString());
-	_notifier = new QSocketNotifier (_device->handle(), QSocketNotifier::Read, this);
-	_notifier->setEnabled (true);
-	QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+	_reopen_timer = new QTimer (this);
+	_reopen_timer->setInterval (1000);
+	_reopen_timer->setSingleShot (true);
+	QObject::connect (_reopen_timer, SIGNAL (timeout()), this, SLOT (open_device()));
+
+	open_device();
 
 	// Support max 256 axes/buttons:
 	_buttons.resize (256, nullptr);
@@ -72,6 +71,24 @@ JoystickInput::~JoystickInput()
 		delete prop;
 	for (auto& prop: _axes)
 		delete prop;
+}
+
+
+void
+JoystickInput::open_device()
+{
+	_device = new QFile (_device_path, this);
+	if (!_device->open (QFile::ReadOnly))
+	{
+		std::clog << "could not open device file: " << _device_path.toStdString() << std::endl;
+		_reopen_timer->start();
+	}
+	else
+	{
+		_notifier = new QSocketNotifier (_device->handle(), QSocketNotifier::Read, this);
+		_notifier->setEnabled (true);
+		QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+	}
 }
 
 
