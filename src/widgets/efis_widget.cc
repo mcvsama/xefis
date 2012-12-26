@@ -43,7 +43,7 @@ EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter)
 	_rounded_altitude (static_cast<int> (_altitude + _sgn * 10.f) / 20 * 20),
 	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
 	_ladder_pen (_efis._ladder_border_color, _efis.pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
-	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.f)),
+	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.2f)),
 	_scale_pen_1 (_efis.get_pen (QColor (255, 255, 255), 1.f)),
 	_scale_pen_2 (_efis.get_pen (QColor (255, 255, 255), 3.f)),
 	_altitude_bug_pen (_efis.get_pen (QColor (0, 255, 0), 1.5f)),
@@ -125,10 +125,10 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 
 	// 11100 part:
 	_painter.setFont (b_font);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_10000, _altitude, 10000, 1.4f * s_digit_height / b_digit_height, 0.00025f, 5.f, true, show_zero_mark);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_01000, _altitude, 1000, 1.4f * s_digit_height / b_digit_height, 0.0025f, 5.f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_10000, _altitude, 10000, 1.4f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, show_zero_mark);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_01000, _altitude, 1000, 1.4f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 	_painter.setFont (s_font);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_00100, _altitude, 100, 1.4f, 0.025f, 5.f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_00100, _altitude, 100, 1.4f, 0.05f, 5.f, false, false);
 
 	// 00011 part:
 	float pos_00011 = (_rounded_altitude - _altitude) / 20.f;
@@ -345,7 +345,7 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 
 	float const y = x * 4.f;
 
-	_painter.translate (3.75f * x, 0.f);
+	_painter.translate (4.f * x, 0.f);
 
 	_painter.setPen (_ladder_pen);
 	_painter.setBrush (_efis._ladder_color);
@@ -520,10 +520,10 @@ EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
 	_max_shown (_speed + _extent / 2.f),
 	_rounded_speed (static_cast<int> (_speed + 0.5f)),
 	_ladder_rect (-0.0675f * _efis.wh(), -0.375 * _efis.wh(), 0.135 * _efis.wh(), 0.75f * _efis.wh()),
-	_ladder_pen (_efis._ladder_border_color, _efis.pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
-	_black_box_pen (QColor (255, 255, 255), _efis.pen_width(), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
-	_scale_pen (QColor (255, 255, 255), _efis.pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin),
-	_speed_bug_pen (QColor (0, 255, 0), _efis.pen_width (1.5f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)
+	_ladder_pen (_efis.get_pen (_efis._ladder_border_color, 0.75f)),
+	_black_box_pen (_efis.get_pen (QColor (255, 255, 255), 1.2f)),
+	_scale_pen (_efis.get_pen (QColor (255, 255, 255), 1.f)),
+	_speed_bug_pen (_efis.get_pen (QColor (0, 255, 0), 1.5f))
 { }
 
 
@@ -574,7 +574,15 @@ EFISWidget::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_r
 	_painter.save();
 	_painter.translate (+0.75f * x, 0.f);
 
-	_painter.setPen (_black_box_pen);
+	QPen border_pen = _black_box_pen;
+	if (_efis._blinking_warning->isActive())
+	{
+		border_pen.setColor (_efis._blink || (_speed < _minimum_speed)
+								? _efis._warning_color_1
+								: Qt::black);
+	}
+
+	_painter.setPen (border_pen);
 	_painter.setBrush (QBrush (QColor (0, 0, 0)));
 	_painter.drawPolygon (QPolygonF()
 		<< QPointF (+0.5f * x, 0.f)
@@ -593,12 +601,12 @@ EFISWidget::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_r
 	QRectF box_0010 = box_0100.adjusted (digit_width, 0.f, 0.f, 0.f);
 	QRectF box_0001 = box_0010.adjusted (digit_width, 0.f, 0.f, 0.f);
 
-	// 110 part:
+	_painter.setPen (_black_box_pen);
 	_painter.setFont (actual_speed_font);
 	if (digits == 4)
-		_efis.paint_rotating_digit (_painter, _text_painter, box_1000, _speed, 1000, 1.4f, 0.00025f, 0.25f, false, false);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_0100, _speed, 100, 1.4f, 0.0025f, 0.25f, false, false);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_0010, _speed, 10, 1.4f, 0.025f, 0.25f, false, false);
+		_efis.paint_rotating_digit (_painter, _text_painter, box_1000, _speed, 1000, 1.4f, 0.0005f, 0.5f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_0100, _speed, 100, 1.4f, 0.005f, 0.5f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_0010, _speed, 10, 1.4f, 0.05f, 0.5f, false, false);
 	float pos_0001 = _rounded_speed - _speed;
 	_efis.paint_rotating_value (_painter, _text_painter, box_0001, pos_0001, 0.7f,
 								QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
@@ -1027,7 +1035,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 	_painter.setBrush (QBrush (QColor (255, 255, 255)));
 
 	QPen warning_pen = pen;
-	warning_pen.setColor (QColor (255, 220, 100));
+	warning_pen.setColor (_efis._warning_color_2);
 
 	_painter.setTransform (_efis._center_transform);
 	_painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
@@ -1225,12 +1233,32 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_ground_color.setHsv (30, 235, 122);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (125);
+	_warning_color_1 = QColor (255, 150, 0);
+	_warning_color_2 = QColor (255, 200, 50);
+
+	_blinking_warning = new QTimer (this);
+	_blinking_warning->setInterval (200);
+	QObject::connect (_blinking_warning, SIGNAL (timeout()), this, SLOT (blink()));
 }
 
 
 void
 EFISWidget::paintEvent (QPaintEvent* paint_event)
 {
+	if (_speed_visible &&
+		((_warning_speed_visible && _speed < _warning_speed) ||
+		 (_minimum_speed_visible && _speed < _minimum_speed) ||
+		 (_maximum_speed_visible && _speed > _maximum_speed)))
+	{
+		if (!_blinking_warning->isActive())
+		{
+			_blinking_warning->start();
+			_blink = true;
+		}
+	}
+	else if (_blinking_warning->isActive())
+		_blinking_warning->stop();
+
 	float const w = width();
 	float const h = height();
 

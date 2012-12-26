@@ -69,6 +69,7 @@ PowerWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, 
 {
 	QColor white (255, 255, 255);
 	QColor yellow (255, 220, 0);
+	QColor orange (255, 150, 0);
 	QColor red (255, 0, 0);
 
 	QString text = QString ("%1").arg (_value, 0, 'f', 1);
@@ -95,7 +96,7 @@ PowerWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, 
 		float critical = sgn * _critical_value;
 
 		if (_warning_visible && value >= warning && value < critical)
-			pen.setColor (yellow);
+			pen.setColor (orange);
 		else if (_critical_visible && value >= critical)
 			pen.setColor (red);
 
