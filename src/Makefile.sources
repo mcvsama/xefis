@@ -112,6 +112,8 @@ SRC_SOURCES += widgets/efis_widget.cc
 SRC_SOURCES += widgets/efis_nav_widget.cc
 SRC_SOURCES += widgets/power_widget.cc
 
+SRC_MOCHDRS += widgets/efis_widget.h
+
 ################
 
 VERSION_FILE := xefis/config/version.cc

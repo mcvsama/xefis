@@ -32,6 +32,8 @@
 
 class EFISWidget: public Xefis::InstrumentWidget
 {
+	Q_OBJECT
+
 	typedef std::map<QString, Knots> SpeedBugs;
 	typedef std::map<QString, Feet> AltitudeBugs;
 
@@ -747,6 +749,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	void
 	set_input_alert_visibility (bool visible);
 
+  protected slots:
+	void
+	blink();
+
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
@@ -809,10 +815,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QColor				_ground_color;
 	QColor				_ladder_color;
 	QColor				_ladder_border_color;
+	QColor				_warning_color_1;
+	QColor				_warning_color_2;
 	QTransform			_center_transform;
 	Degrees				_fov							= 120.f;
 	bool				_input_alert_visible			= false;
 	TextPainter::Cache	_text_painter_cache;
+	QTimer*				_blinking_warning				= nullptr;
+	bool				_blink							= false;
 
 	// Parameters:
 	Degrees				_pitch							= 0.f;
@@ -1597,6 +1607,13 @@ inline void
 EFISWidget::set_input_alert_visibility (bool visible)
 {
 	_input_alert_visible = visible;
+}
+
+
+inline void
+EFISWidget::blink()
+{
+	_blink = !_blink;
 }
 
 
