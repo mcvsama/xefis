@@ -90,18 +90,17 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 	int const s_digits = 3;
 	float const margin = 0.2f * b_digit_width;
 
-	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width + margin, 2.f * b_digit_height);
-	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 2.f * b_digit_height);
-	_black_box_rect = QRectF (0.f, -0.5f * b_digits_box.height(),
-							  b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
+	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width, 2.f * b_digit_height - 2.f * margin);
+	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width, 2.f * b_digit_height - 2.f * margin);
+	_black_box_rect = QRectF (0.f, -0.5f * b_digits_box.height() - margin,
+							  b_digits_box.width() + s_digits_box.width() + 2.f * margin, b_digits_box.height() + 2.f * margin);
 
 	if (only_compute_black_box_rect)
 		return;
 	if (!_efis._altitude_visible)
 		return;
-
-	b_digits_box.translate (0.f, -0.5f * b_digits_box.height());
-	s_digits_box.translate (b_digits_box.width(), -0.5f * s_digits_box.height());
+	b_digits_box.translate (margin, -0.5f * b_digits_box.height());
+	s_digits_box.translate (margin + b_digits_box.width(), -0.5f * s_digits_box.height());
 
 	_painter.save();
 	_painter.translate (-0.75f * x, 0.f);
@@ -117,49 +116,26 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 		<< _black_box_rect.bottomLeft()
 		<< QPointF (0.f, +0.5f * x));
 
+	bool show_zero_mark = -10000.f < _rounded_altitude && _rounded_altitude < 10000.f;
+
+	QRectF box_10000 = QRectF (b_digits_box.topLeft(), QSizeF (b_digit_width, b_digits_box.height()));
+	QRectF box_01000 = box_10000.translated (b_digit_width, 0.f);
+	QRectF box_00100 = QRectF (s_digits_box.topLeft(), QSizeF (s_digit_width, b_digits_box.height()));
+	QRectF box_00011 = box_00100.translated (s_digit_width, 0.f).adjusted (0.f, 0.f, s_digit_width, 0.f);
+
+	// 11100 part:
 	_painter.setFont (b_font);
-
-	// 11000 part of the altitude:
-	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	_text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-							QString::number (std::abs (_rounded_altitude / 1000)));
-	if (-10000.f < _rounded_altitude && _rounded_altitude < 10000.f)
-	{
-		QColor color = _sgn >= 0.f ? QColor (0, 255, 0) : QColor (255, 0, 0);
-		QRectF green_square_box (-0.3f * b_digit_width, -0.4f * b_digit_height, 0.6f * b_digit_width, 0.78f * b_digit_height);
-		QPen pen = _efis.get_pen (color, 1.2f);
-		QPointF difx (green_square_box.width() / 2.5f, 0.f);
-		QPointF dify (0.f, green_square_box.height() / 2.5f);
-		pen.setCapStyle (Qt::RoundCap);
-		green_square_box.translate (0.5f * x + 0.75f * margin, 0.f);
-		_painter.save();
-		_painter.setPen (pen);
-		_painter.drawLine (green_square_box.topLeft(), green_square_box.bottomRight());
-		_painter.drawLine (green_square_box.topLeft() + difx, green_square_box.bottomRight() - dify);
-		_painter.drawLine (green_square_box.topLeft() + dify, green_square_box.bottomRight() - difx);
-		_painter.drawLine (green_square_box.topLeft() + 2.f * difx, green_square_box.bottomRight() - 2.f * dify);
-		_painter.drawLine (green_square_box.topLeft() + 2.f * dify, green_square_box.bottomRight() - 2.f * difx);
-		_painter.restore();
-	}
-
+	_efis.paint_rotating_digit (_painter, _text_painter, box_10000, _altitude, 10000, 1.4f * s_digit_height / b_digit_height, 0.00025f, 5.f, true, show_zero_mark);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_01000, _altitude, 1000, 1.4f * s_digit_height / b_digit_height, 0.0025f, 5.f, false, false);
 	_painter.setFont (s_font);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_00100, _altitude, 100, 1.4f, 0.025f, 5.f, false, false);
 
-	// 00100 part of the altitude:
-	QRectF box_00100 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
-	_text_painter.drawText (box_00100, Qt::AlignVCenter | Qt::AlignLeft, QString::number (std::abs ((_rounded_altitude / 100) % 10)));
-
-	// 00011 part of the altitude:
-	QRectF box_00011 = box_00100.adjusted (s_digit_width, 0.f, 0.f, 0.f);
-	QRectF box_00011_p10 = box_00011.translated (0.f, -s_digit_height);
-	QRectF box_00011_m10 = box_00011.translated (0.f, +s_digit_height);
-	_painter.setClipRect (box_00011);
-	_painter.translate (0.f, -s_digit_height * (_rounded_altitude - _altitude) / 20.f);
-	_text_painter.drawText (box_00011_p10, Qt::AlignVCenter | Qt::AlignLeft,
-							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f + 2.f, 10.f))) + "0");
-	_text_painter.drawText (box_00011, Qt::AlignVCenter | Qt::AlignLeft,
-							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f, 10.f))) + "0");
-	_text_painter.drawText (box_00011_m10, Qt::AlignVCenter | Qt::AlignLeft,
-							QString::number (std::abs (std::fmod (_rounded_altitude / 10.f - 2.f, 10.f))) + "0");
+	// 00011 part:
+	float pos_00011 = (_rounded_altitude - _altitude) / 20.f;
+	_efis.paint_rotating_value (_painter, _text_painter, box_00011, pos_00011, 0.7f,
+								QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
+								QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
+								QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f - 2.f, 10.f)))) + "0");
 
 	_painter.restore();
 }
@@ -199,6 +175,9 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 		 ft <= _max_shown + line_every;
 		 ft += line_every)
 	{
+		if (ft >  100000.f)
+			continue;
+
 		float posy = ft_to_px (ft);
 
 		_painter.setPen (ft % bold_every == 0 ? _scale_pen_2 : _scale_pen_1);
@@ -531,11 +510,11 @@ EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
 	_efis (efis),
 	_painter (painter),
 	_text_painter (_painter, &_efis._text_painter_cache),
-	_speed (bound (_efis._speed, 0.f, 9999.9f)),
+	_speed (bound (_efis._speed, 0.f, 9999.99f)),
 	_mach (bound (_efis._mach, 0.f, 9.99f)),
-	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.9f)),
-	_warning_speed (bound (_efis._warning_speed, 0.f, 9999.9f)),
-	_maximum_speed (bound (_efis._maximum_speed, 0.f, 9999.9f)),
+	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.99f)),
+	_warning_speed (bound (_efis._warning_speed, 0.f, 9999.99f)),
+	_maximum_speed (bound (_efis._maximum_speed, 0.f, 9999.99f)),
 	_extent (124.f),
 	_min_shown (_speed - _extent / 2.f),
 	_max_shown (_speed + _extent / 2.f),
@@ -606,25 +585,27 @@ EFISWidget::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_r
 		<< _black_box_rect.bottomRight()
 		<< QPointF (0.f, +0.5f * x));
 
-	// 110 part of the speed:
-	_painter.setFont (actual_speed_font);
-	QRectF box_10 = _black_box_rect.adjusted (margin, margin, -margin - digit_width, -margin);
-	_text_painter.drawText (box_10, Qt::AlignVCenter | Qt::AlignRight, QString::number (static_cast<int> (_speed + 0.5f) / 10));
+	QRectF box_1000 = _black_box_rect.adjusted (margin, margin, -margin, -margin);
+	QRectF box_0100 =
+		digits == 3
+			? box_1000
+			: box_1000.adjusted (digit_width, 0.f, 0.f, 0.f);
+	QRectF box_0010 = box_0100.adjusted (digit_width, 0.f, 0.f, 0.f);
+	QRectF box_0001 = box_0010.adjusted (digit_width, 0.f, 0.f, 0.f);
 
-	// 001 part of the speed:
-	QRectF box_01 (box_10.right(), box_10.top(), digit_width, box_10.height());
-	QRectF box_01_p1 = box_01.translated (0.f, -digit_height);
-	QRectF box_01_m1 = box_01.translated (0.f, +digit_height);
-	_painter.setClipRect (box_01);
-	_painter.translate (0.f, -digit_height * (_rounded_speed - _speed));
-	_text_painter.drawText (box_01_p1, Qt::AlignVCenter | Qt::AlignLeft,
-							QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed + 1.f, 10.f))));
-	_text_painter.drawText (box_01, Qt::AlignVCenter | Qt::AlignLeft,
-							QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed, 10.f))));
-	// Don't draw negative values:
-	if (_speed > 0.5f)
-		_text_painter.drawText (box_01_m1, Qt::AlignVCenter | Qt::AlignLeft,
-								QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed - 1.f, 10.f))));
+	// 110 part:
+	_painter.setFont (actual_speed_font);
+	if (digits == 4)
+		_efis.paint_rotating_digit (_painter, _text_painter, box_1000, _speed, 1000, 1.4f, 0.00025f, 0.25f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_0100, _speed, 100, 1.4f, 0.0025f, 0.25f, false, false);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_0010, _speed, 10, 1.4f, 0.025f, 0.25f, false, false);
+	float pos_0001 = _rounded_speed - _speed;
+	_efis.paint_rotating_value (_painter, _text_painter, box_0001, pos_0001, 0.7f,
+								QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
+								QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed, 10.f)))),
+								_speed > 0.5f
+									? QString::number (static_cast<int> (floored_mod (1.f * _rounded_speed - 1.f, 10.f)))
+									: " ");
 
 	_painter.restore();
 }
@@ -1559,5 +1540,95 @@ EFISWidget::paint_input_alert (QPainter& painter)
 	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
 
 	painter.restore();
+}
+
+
+void
+EFISWidget::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target)
+{
+	QFontMetrics metrics = painter.font();
+	float w = 0.7f * metrics.width ("0");
+	float h = 0.65f * metrics.height();
+	QPointF center = target.center();
+	QRectF box (center - QPointF (w / 2.f, h / 1.9f), QSizeF (w, h));
+	QPen pen = get_pen (color, 1.2f);
+	QPointF difx (box.width() / 2.5f, 0.f);
+	QPointF dify (0.f, box.height() / 2.5f);
+	pen.setCapStyle (Qt::RoundCap);
+	painter.save();
+	painter.setPen (pen);
+	painter.drawLine (box.topLeft(), box.bottomRight());
+	painter.drawLine (box.topLeft() + difx, box.bottomRight() - dify);
+	painter.drawLine (box.topLeft() + dify, box.bottomRight() - difx);
+	painter.drawLine (box.topLeft() + 2.f * difx, box.bottomRight() - 2.f * dify);
+	painter.drawLine (box.topLeft() + 2.f * dify, box.bottomRight() - 2.f * difx);
+	painter.restore();
+}
+
+
+void
+EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
+								  QRectF const& rect, float position, float height_scale,
+								  QString const& next, QString const& curr, QString const& prev)
+{
+	QColor red (255, 0, 0);
+	QColor green (0, 255, 0);
+
+	QFont font = painter.font();
+	QFontMetrics font_metrics = font;
+	float height = height_scale * font_metrics.height();
+
+	QRectF box_next = rect.translated (0.f, -height);
+	QRectF box_prev = rect.translated (0.f, +height);
+
+	painter.save();
+	painter.setClipRect (rect);
+	painter.translate (0.f, -height * position);
+
+	for (std::pair<QRectF, QString> x: { std::make_pair (box_next, next),
+										 std::make_pair (rect, curr),
+										 std::make_pair (box_prev, prev) })
+	{
+		if (x.second == "G" || x.second == "R")
+			paint_dashed_zone (painter, x.second == "G" ? green : red, x.first);
+		else
+			text_painter.drawText (x.first, Qt::AlignVCenter | Qt::AlignLeft, x.second);
+	}
+
+	painter.restore();
+}
+
+
+void
+EFISWidget::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
+								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
+								  bool two_zeros, bool zero_mark)
+{
+	auto round_to = [] (float value, int to) -> float
+	{
+		float sgn = value >= 0.f ? +1.f : -1.f;
+		return static_cast<int> (value + sgn * to / 2.f) / to * to;
+	};
+
+	float rounded = round_to (value + phase, round_target);
+	float dtr = (value + phase - rounded) / round_target;
+	float pos = 0.f;
+	float epsilon = 0.000001f;
+	float xa = std::fmod ((value + phase) / round_target + 1.f - epsilon, 10.f);
+	float xb = std::fmod ((value + phase) / round_target + 0.f - epsilon, 10.f);
+	float xc = std::fmod ((value + phase) / round_target - 1.f - epsilon, 10.f);
+
+	int a = static_cast<int> (std::abs (xa));
+	int b = static_cast<int> (std::abs (xb));
+	int c = static_cast<int> (std::abs (xc));
+
+	QString sa = zero_mark && a == 0 ? (xa >= 0.f ? "G" : "R") : QString::number (a);
+	QString sb = zero_mark && b == 0 ? (xb >= 0.f ? "G" : "R") : QString::number (b);
+	QString sc = zero_mark && c == 0 ? (xc >= 0.f ? "G" : "R") : QString::number (c);
+
+	if (std::abs (dtr) < delta && (two_zeros || std::abs (value) >= round_target / 2))
+		pos = floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
+
+	paint_rotating_value (painter, text_painter, box, pos, height_scale, sa, sb, sc);
 }
 
