@@ -766,6 +766,37 @@ class EFISWidget: public Xefis::InstrumentWidget
 	void
 	paint_input_alert (QPainter&);
 
+	void
+	paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target);
+
+	/**
+	 * Render 'rotatable' value on speed/altitude black box.
+	 *
+	 * \param	painter
+	 * 			QPainter to use.
+	 * \param	text_painter
+	 * 			TextPainter to use.
+	 * \param	position
+	 * 			Text position, [-0.5, 0.5].
+	 * \param	next, curr, prev
+	 * 			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
+	 */
+	void
+	paint_rotating_value (QPainter& painter, TextPainter& text_painter,
+						  QRectF const& rect, float position, float height_scale,
+						  QString const& next, QString const& curr, QString const& prev);
+
+	/**
+	 * \param	two_zeros
+	 * 			Two separate zeros, for positive and negative values.
+	 * \param	zero_mark
+	 * 			Draw red/green mark instead of zero.
+	 */
+	void
+	paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
+						  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
+						  bool two_zeros, bool zero_mark);
+
   private:
 	float
 	pitch_to_px (Degrees degrees) const;

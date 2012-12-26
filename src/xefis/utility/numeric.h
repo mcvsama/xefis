@@ -22,6 +22,23 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/range.h>
 
+
+inline constexpr float
+renormalize (float value, float a1, float b1, float a2, float b2) noexcept
+{
+	return b1 == a1
+		? a2
+		: (b2 - a2) / (b1 - a1) * value + (-(b2 - a2) / (b1 - a1) * a1 + a2);
+}
+
+
+inline constexpr float
+renormalize (float value, Range<float> range1, Range<float> range2) noexcept
+{
+	return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
+}
+
+
 /**
  * Return x > 0.0 ? 1.0 : -1.0.
  */
