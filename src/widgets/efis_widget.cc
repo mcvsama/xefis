@@ -36,7 +36,7 @@ EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter)
 	_altitude (bound (_efis._altitude, -9999.f, +99999.f)),
 	_climb_rate (bound (_efis._climb_rate, -9999.f, +9999.f)),
 	_pressure (bound (_efis._pressure, 0.f, 99.99f)),
-	_extent (825.f),
+	_extent (_efis._altitude_ladder_extent),
 	_sgn (_altitude < 0.f ? -1.f : 1.f),
 	_min_shown (_altitude - _extent / 2.f),
 	_max_shown (_altitude + _extent / 2.f),
@@ -147,9 +147,9 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 	if (!_efis._altitude_visible)
 		return;
 
-	int const line_every = 100;
-	int const num_every = 200;
-	int const bold_every = 500;
+	int const line_every = _efis._altitude_ladder_line_every;
+	int const num_every = _efis._altitude_ladder_number_every;;
+	int const bold_every = _efis._altitude_ladder_bold_every;;
 
 	QFont b_ladder_font = _efis._font_13_bold;
 	float const b_ladder_digit_width = _efis._font_13_digit_width;
@@ -194,7 +194,7 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 				_text_painter.drawText (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text);
 			}
 
-			QString small_text = QString ("%1").arg (QString::number (ft % 1000), 3, '0');
+			QString small_text = QString ("%1").arg (QString::number (std::abs (ft % 1000)), 3, '0');
 			if (ft == 0)
 				small_text = "0";
 			_painter.setFont (s_ladder_font);
@@ -515,7 +515,7 @@ EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
 	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.99f)),
 	_warning_speed (bound (_efis._warning_speed, 0.f, 9999.99f)),
 	_maximum_speed (bound (_efis._maximum_speed, 0.f, 9999.99f)),
-	_extent (124.f),
+	_extent (_efis._speed_ladder_extent),
 	_min_shown (_speed - _extent / 2.f),
 	_max_shown (_speed + _extent / 2.f),
 	_rounded_speed (static_cast<int> (_speed + 0.5f)),
@@ -631,8 +631,8 @@ EFISWidget::SpeedLadder::paint_ladder_scale (float x)
 
 	_painter.setFont (ladder_font);
 
-	int const line_every = 10;
-	int const num_every = 20;
+	int const line_every = _efis._speed_ladder_line_every;
+	int const num_every = _efis._speed_ladder_number_every;
 
 	if (_min_shown < 0.f)
 		_min_shown = 0.f;

@@ -33,9 +33,9 @@
 					<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
 					<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
 					<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
-					<property name='navigation-needles-visible' path='/navigation/needles-visible' default='false'/>
-					<property name='naigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
-					<property name='naigation-heading-needle' path='/navigation/heading-needle-deflection'/>
+					<property name='navigation-needles-visible' path='/navigation/needles-visible'/>
+					<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
+					<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection'/>
 					<property name='dme-distance' path='/navigation/dme-distance.nm'/>
 				</properties>
 				<properties path='/engine'>

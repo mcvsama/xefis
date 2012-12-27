@@ -196,6 +196,48 @@ class EFISWidget: public Xefis::InstrumentWidget
 	EFISWidget (QWidget* parent);
 
 	/**
+	 * Set how often lines should be drawn on speed ladder.
+	 */
+	void
+	set_speed_ladder_line_every (int knots);
+
+	/**
+	 * Set how often numbers should be drawn on speed ladder.
+	 */
+	void
+	set_speed_ladder_number_every (int knots);
+
+	/**
+	 * Set speed ladder scale extent.
+	 */
+	void
+	set_speed_ladder_extent (int knots);
+
+	/**
+	 * Set how often lines should be drawn on altitude ladder.
+	 */
+	void
+	set_altitude_ladder_line_every (int feet);
+
+	/**
+	 * Set how often numbers should be drawn on altitude ladder.
+	 */
+	void
+	set_altitude_ladder_number_every (int feet);
+
+	/**
+	 * Set how often lines should be drawn bold on altitude ladder.
+	 */
+	void
+	set_altitude_ladder_bold_every (int feet);
+
+	/**
+	 * Set altitude ladder scale extent.
+	 */
+	void
+	set_altitude_ladder_extent (int feet);
+
+	/**
 	 * Return current pitch value.
 	 */
 	Degrees
@@ -823,6 +865,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	TextPainter::Cache	_text_painter_cache;
 	QTimer*				_blinking_warning				= nullptr;
 	bool				_blink							= false;
+	int					_speed_ladder_line_every		= 10;
+	int					_speed_ladder_number_every		= 20;
+	Knots				_speed_ladder_extent			= 124;
+	int					_altitude_ladder_line_every		= 100;
+	int					_altitude_ladder_number_every	= 200;
+	int					_altitude_ladder_bold_every		= 500;
+	Feet				_altitude_ladder_extent			= 825;
 
 	// Parameters:
 	Degrees				_pitch							= 0.f;
@@ -897,6 +946,62 @@ inline float
 EFISWidget::SpeedLadder::kt_to_px (Knots kt) const
 {
 	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
+}
+
+
+inline void
+EFISWidget::set_speed_ladder_line_every (int knots)
+{
+	_speed_ladder_line_every = std::max (1, knots);
+	update();
+}
+
+
+inline void
+EFISWidget::set_speed_ladder_number_every (int knots)
+{
+	_speed_ladder_number_every = std::max (1, knots);
+	update();
+}
+
+
+inline void
+EFISWidget::set_speed_ladder_extent (int knots)
+{
+	_speed_ladder_extent = std::max (1, knots);
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_ladder_line_every (int feet)
+{
+	_altitude_ladder_line_every = std::max (1, feet);
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_ladder_number_every (int feet)
+{
+	_altitude_ladder_number_every = std::max (1, feet);
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_ladder_bold_every (int feet)
+{
+	_altitude_ladder_bold_every = std::max (1, feet);
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_ladder_extent (int feet)
+{
+	_altitude_ladder_extent = std::max (1, feet);
+	update();
 }
 
 

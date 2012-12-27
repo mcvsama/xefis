@@ -52,6 +52,13 @@ class EFIS: public Xefis::Instrument
 	EFISWidget*				_efis_widget		= nullptr;
 	EFISNavWidget*			_efis_nav_widget	= nullptr;
 
+	Xefis::PropertyInteger	_speed_ladder_line_every;
+	Xefis::PropertyInteger	_speed_ladder_number_every;
+	Xefis::PropertyInteger	_speed_ladder_extent;
+	Xefis::PropertyInteger	_altitude_ladder_line_every;
+	Xefis::PropertyInteger	_altitude_ladder_number_every;
+	Xefis::PropertyInteger	_altitude_ladder_bold_every;
+	Xefis::PropertyInteger	_altitude_ladder_extent;
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
@@ -84,6 +91,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;
+	Xefis::PropertyString	_navigation_type_hint;
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
