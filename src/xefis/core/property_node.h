@@ -452,7 +452,7 @@ template<>
 		switch (_type)
 		{
 			case PropDirectory:
-				throw PropertyAccessError ("can't write from a directory property");
+				throw PropertyAccessError ("can't write to a directory property");
 			case PropBoolean:
 				_value_bool = boost::lexical_cast<bool> (value);
 				break;
@@ -516,7 +516,7 @@ template<class tType>
 		switch (_type)
 		{
 			case PropDirectory:
-				throw PropertyAccessError ("can't read from a directory property");
+				throw PropertyAccessError ("can't write to a directory property");
 			case PropBoolean:
 				_value_bool = value;
 				break;

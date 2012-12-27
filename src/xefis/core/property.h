@@ -100,7 +100,7 @@ template<class tType>
 
 	  public:
 		/**
-		 * Create a null property, that can't be read or written.
+		 * Create a singular property, that can't be read or written.
 		 */
 		Property() = default;
 
