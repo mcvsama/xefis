@@ -6,29 +6,29 @@
 				<item stretch-factor='2'>
 					<module name='instruments/efis'>
 						<properties path='/efis'>
-							<property name='ias' path='/speed/ias.kt'/>
+							<property name='ias' path='/speed/ias.kt' default='0'/>
 							<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
 							<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
 							<property name='ias-warning' path='/speed/ias-warning.kt'/>
 							<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
-							<property name='gs' path='/speed/gs.kt'/>
-							<property name='tas' path='/speed/tas.kt'/>
-							<property name='mach' path='/speed/mach.kt'/>
-							<property name='orientation-pitch' path='/orientation/pitch.deg'/>
-							<property name='orientation-roll' path='/orientation/roll.deg'/>
+							<property name='gs' path='/speed/gs.kt' default='0'/>
+							<property name='tas' path='/speed/tas.kt' default='0'/>
+							<property name='mach' path='/speed/mach.kt' default='0'/>
+							<property name='orientation-pitch' path='/orientation/pitch.deg' default='0'/>
+							<property name='orientation-roll' path='/orientation/roll.deg' default='0'/>
 							<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
-							<property name='orientation-heading' path='/orientation/heading.deg'/>
-							<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
+							<property name='orientation-heading' path='/orientation/heading.deg' default='0'/>
+							<property name='slip-skid' path='/slip-skid/slip-skid.g' default='0'/>
 							<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
 							<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
 							<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
 							<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
 							<property name='track' path='/orientation/track.deg'/>
-							<property name='altitude' path='/altitude/amsl.ft'/>
+							<property name='altitude' path='/altitude/amsl.ft' default='0'/>
 							<property name='altitude-agl' path='/altitude/agl.ft'/>
 							<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
-							<property name='cbr' path='/altitude/climb-rate.fpm'/>
-							<property name='pressure' path='/static/pressure.inhg'/>
+							<property name='cbr' path='/altitude/climb-rate.fpm' default='0'/>
+							<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
 							<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
 							<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
 							<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>

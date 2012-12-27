@@ -51,7 +51,7 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "orientation-heading", _heading_deg, false },
 				{ "slip-skid", _slip_skid_g, false },
 				{ "slip-skid-limit", _slip_skid_limit_g, false },
-				{ "flight-path-marker-visible", _fpm_enabled, false },
+				{ "flight-path-marker-visible", _fpm_visible, false },
 				{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 				{ "flight-path-marker-beta", _fpm_beta_deg, false },
 				{ "track", _track_deg, false },
@@ -60,14 +60,15 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "landing-altitude", _landing_altitude_ft, false },
 				{ "pressure", _pressure_inhg, false },
 				{ "cbr", _cbr_fpm, false },
+				{ "autopilot-visible", _autopilot_visible, false },
 				{ "autopilot-setting-altitude", _autopilot_alt_setting_ft, false },
 				{ "autopilot-setting-ias", _autopilot_speed_setting_kt, false },
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "autopilot-setting-cbr", _autopilot_cbr_setting_fpm, false },
-				{ "flight-director-visible", _flight_director_enabled, false },
+				{ "flight-director-visible", _flight_director_visible, false },
 				{ "flight-director-pitch", _flight_director_pitch_deg, false },
 				{ "flight-director-roll", _flight_director_roll_deg, false },
-				{ "navigation-needles-visible", _navigation_needles_enabled, false },
+				{ "navigation-needles-visible", _navigation_needles_visible, false },
 				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
 				{ "navigation-heading-needle", _navigation_hd_needle, false },
 				{ "dme-distance", _dme_distance_nm, false }
@@ -153,14 +154,13 @@ EFIS::read()
 
 	_efis_widget->set_slip_skid_limit (_slip_skid_limit_g.valid() ? *_slip_skid_limit_g : 0.f);
 
-	if (_fpm_enabled.valid())
+	bool fpm_visible = _fpm_visible.valid() && *_fpm_visible;
+
+	_efis_widget->set_flight_path_marker_visibility (fpm_visible && fpm_ok);
+	if (fpm_ok)
 	{
-		_efis_widget->set_flight_path_marker_visibility (*_fpm_enabled && fpm_ok);
-		if (fpm_ok)
-		{
-			_efis_widget->set_flight_path_alpha (fpm_alpha);
-			_efis_widget->set_flight_path_beta (fpm_beta);
-		}
+		_efis_widget->set_flight_path_alpha (fpm_alpha);
+		_efis_widget->set_flight_path_beta (fpm_beta);
 	}
 
 	_efis_widget->set_altitude_visibility (_altitude_ft.valid());
@@ -183,34 +183,35 @@ EFIS::read()
 	if (_cbr_fpm.valid())
 		_efis_widget->set_climb_rate (*_cbr_fpm);
 
-	_efis_widget->set_ap_altitude_visibility (_autopilot_alt_setting_ft.valid());
+	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
+
+	_efis_widget->set_ap_altitude_visibility (autopilot_visible && _autopilot_alt_setting_ft.valid());
 	if (_autopilot_alt_setting_ft.valid())
 		_efis_widget->set_ap_altitude (*_autopilot_alt_setting_ft);
 
-	_efis_widget->set_at_speed_visibility (_autopilot_speed_setting_kt.valid());
+	_efis_widget->set_at_speed_visibility (autopilot_visible && _autopilot_speed_setting_kt.valid());
 	if (_autopilot_speed_setting_kt.valid())
 		_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
 
-	_efis_widget->set_ap_climb_rate_visibility (_autopilot_cbr_setting_fpm.valid());
+	_efis_widget->set_ap_climb_rate_visibility (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
 	if (_autopilot_cbr_setting_fpm.valid())
 		_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
 
-	if (_flight_director_enabled.valid())
-	{
-		_efis_widget->set_flight_director_pitch_visibility (*_flight_director_enabled && _flight_director_pitch_deg.valid());
-		if (_flight_director_pitch_deg.valid())
-			_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
+	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
 
-		_efis_widget->set_flight_director_roll_visibility (*_flight_director_enabled && _flight_director_roll_deg.valid());
-		if (_flight_director_roll_deg.valid())
-			_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
-	}
+	_efis_widget->set_flight_director_pitch_visibility (flight_director_visible && _flight_director_pitch_deg.valid());
+	if (_flight_director_pitch_deg.valid())
+		_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
 
-	if (_navigation_needles_enabled.valid())
+	_efis_widget->set_flight_director_roll_visibility (flight_director_visible && _flight_director_roll_deg.valid());
+	if (_flight_director_roll_deg.valid())
+		_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
+
+	if (_navigation_needles_visible.valid())
 	{
-		_efis_widget->set_navigation_hint (*_navigation_needles_enabled ? "ILS" : "");
-		_efis_widget->set_navigation_needles_visibility (*_navigation_needles_enabled);
-		_efis_widget->set_navigation_runway_visibility (*_navigation_needles_enabled && _navigation_hd_needle.valid() &&
+		_efis_widget->set_navigation_hint (*_navigation_needles_visible ? "ILS" : "");
+		_efis_widget->set_navigation_needles_visibility (*_navigation_needles_visible);
+		_efis_widget->set_navigation_runway_visibility (*_navigation_needles_visible && _navigation_hd_needle.valid() &&
 														_altitude_agl_ft.valid() && *_altitude_agl_ft <= 150.f);
 	}
 	else
