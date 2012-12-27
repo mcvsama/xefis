@@ -99,7 +99,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
-	Xefis::PropertyBoolean	_navigation_needles_enabled;
+	Xefis::PropertyBoolean	_navigation_needles_visible;
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;

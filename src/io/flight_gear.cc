@@ -61,7 +61,7 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 						{ "autopilot-setting-cbr", _autopilot_cbr_setting_fpm, false },
 						{ "flight-director-pitch", _flight_director_pitch_deg, false },
 						{ "flight-director-roll", _flight_director_roll_deg, false },
-						{ "navigation-needles-visible", _navigation_needles_enabled, false },
+						{ "navigation-needles-visible", _navigation_needles_visible, false },
 						{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
 						{ "navigation-heading-needle", _navigation_hd_needle, false },
 						{ "dme-distance", _dme_distance_nm, false },
@@ -178,8 +178,8 @@ FlightGearIO::read_input()
 			}
 			else if (var == "nav")
 			{
-				if (!_navigation_needles_enabled.is_singular())
-					_navigation_needles_enabled.write (!!value.toInt());
+				if (!_navigation_needles_visible.is_singular())
+					_navigation_needles_visible.write (!!value.toInt());
 			}
 			else if (var == "nav-gs-ok")
 				navigation_gs_needle_ok = !!value.toInt();
@@ -260,7 +260,7 @@ FlightGearIO::invalidate_all()
 		&_autopilot_cbr_setting_fpm,
 		&_flight_director_pitch_deg,
 		&_flight_director_roll_deg,
-		&_navigation_needles_enabled,
+		&_navigation_needles_visible,
 		&_navigation_gs_needle,
 		&_navigation_hd_needle,
 		&_dme_distance_nm,

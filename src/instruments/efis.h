@@ -66,7 +66,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_heading_deg;
 	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_slip_skid_limit_g;
-	Xefis::PropertyBoolean	_fpm_enabled;
+	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
@@ -75,14 +75,15 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_landing_altitude_ft;
 	Xefis::PropertyFloat	_pressure_inhg;
 	Xefis::PropertyFloat	_cbr_fpm;
+	Xefis::PropertyBoolean	_autopilot_visible;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
 	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
-	Xefis::PropertyBoolean	_flight_director_enabled;
+	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
-	Xefis::PropertyBoolean	_navigation_needles_enabled;
+	Xefis::PropertyBoolean	_navigation_needles_visible;
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
