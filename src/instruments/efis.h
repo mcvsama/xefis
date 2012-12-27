@@ -51,11 +51,11 @@ class EFIS: public Xefis::Instrument
   private:
 	EFISWidget*				_efis_widget		= nullptr;
 	EFISNavWidget*			_efis_nav_widget	= nullptr;
-	std::string				_property_path;
 
 	Xefis::PropertyFloat	_ias_kt;
-	Xefis::PropertyFloat	_ias_tendency_kt;
+	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
+	Xefis::PropertyFloat	_warning_ias_kt;
 	Xefis::PropertyFloat	_maximum_ias_kt;
 	Xefis::PropertyFloat	_gs_kt;
 	Xefis::PropertyFloat	_tas_kt;
@@ -64,8 +64,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_roll_deg;
 	Xefis::PropertyFloat	_roll_limit_deg;
 	Xefis::PropertyFloat	_heading_deg;
-	Xefis::PropertyFloat	_slip_skid;
-	Xefis::PropertyFloat	_slip_skid_limit;
+	Xefis::PropertyFloat	_slip_skid_g;
+	Xefis::PropertyFloat	_slip_skid_limit_g;
+	Xefis::PropertyBoolean	_fpm_enabled;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
@@ -78,6 +79,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
+	Xefis::PropertyBoolean	_flight_director_enabled;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_enabled;

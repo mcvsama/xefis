@@ -136,8 +136,7 @@ PropertyTreeWidget::convert_item (QTreeWidgetItem* item)
 void
 PropertyTreeWidget::setup_appereance()
 {
-	header()->resizeSection (0, header()->sectionSizeHint (0));
-	header()->resizeSections (QHeaderView::ResizeToContents);
+	header()->resizeSection (0, 20.f * Services::default_font_size());
 }
 
 } // namespace Xefis

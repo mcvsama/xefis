@@ -54,7 +54,7 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 	}
 	else if (name == "io/flightgear")
 	{
-		module = new FlightGearInput (config);
+		module = new FlightGearIO (config);
 		_modules.insert (module);
 	}
 	else if (name == "io/joystick")
