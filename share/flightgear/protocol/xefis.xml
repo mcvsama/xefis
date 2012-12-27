@@ -200,12 +200,6 @@
 				<format>heading=%f</format>
 				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
-			<chunk>
-				<name>slip-skid</name>
-				<type>float</type>
-				<format>ss=%f</format>
-				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
-			</chunk>
 			<!-- Flight path -->
 			<chunk>
 				<name>alpha</name>
@@ -270,32 +264,26 @@
 			</chunk>
 			<!-- Other -->
 			<chunk>
-				<name>time</name>
-				<format>time=%d</format>
-				<node>/instrumentation/clock/indicated-sec</node>
-			</chunk>
-			<chunk>
-				<name>turn-rate</name>
-				<type>float</type>
-				<format>turn-rate=%f</format>
-				<node>/instrumentation/turn-indicator/indicated-turn-rate</node>
-			</chunk>
-			<chunk>
 				<name>slip-skid</name>
 				<type>float</type>
-				<format>slip-skid=%f</format>
+				<format>ss=%f</format>
 				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
 			</chunk>
 
 			<!-- EICAS -->
 
 			<!-- Sensors -->
-			<chunk>
+			<!--chunk>
+				<name>time</name>
+				<format>time=%d</format>
+				<node>/instrumentation/clock/indicated-sec</node>
+			</chunk-->
+			<!--chunk>
 				<name>static-pressure</name>
 				<type>float</type>
 				<format>static=%f</format>
 				<node>/systems/static/pressure-inhg</node>
-			</chunk>
+			</chunk-->
 			<chunk>
 				<name>throttle</name>
 				<type>float</type>

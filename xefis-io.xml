@@ -2,12 +2,52 @@
 <xefis-include>
 	<modules>
 		<module name='io/flightgear'>
-			<!--input>
+			<input>
 				<port>9000</port>
+				<properties path='/efis'>
+					<property name='ias' path='/speed/ias.kt'/>
+					<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
+					<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
+					<property name='ias-warning' path='/speed/ias-warning.kt'/>
+					<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
+					<property name='gs' path='/speed/gs.kt'/>
+					<property name='tas' path='/speed/tas.kt'/>
+					<property name='mach' path='/speed/mach.kt'/>
+					<property name='orientation-pitch' path='/orientation/pitch.deg'/>
+					<property name='orientation-roll' path='/orientation/roll.deg'/>
+					<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
+					<property name='orientation-heading' path='/orientation/heading.deg'/>
+					<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
+					<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
+					<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
+					<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
+					<property name='track' path='/orientation/track.deg'/>
+					<property name='altitude' path='/altitude/amsl.ft'/>
+					<property name='altitude-agl' path='/altitude/agl.ft'/>
+					<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
+					<property name='cbr' path='/altitude/climb-rate.fpm'/>
+					<property name='pressure' path='/static/pressure.inhg'/>
+					<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
+					<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
+					<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
+					<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
+					<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
+					<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
+					<property name='navigation-needles-visible' path='/navigation/needles-visible' default='false'/>
+					<property name='naigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
+					<property name='naigation-heading-needle' path='/navigation/heading-needle-deflection'/>
+					<property name='dme-distance' path='/navigation/dme-distance.nm'/>
+				</properties>
+				<properties path='/engine'>
+					<property name='engine-n1' path='/n1.pct'/>
+					<property name='engine-n2' path='/n2.pct'/>
+					<property name='engine-egt' path='/egt.degc'/>
+					<property name='engine-epr' path='/epr'/>
+				</properties>
 			</input>
 			<output>
 				<port>9000</port>
-			</output-->
+			</output>
 		</module>
 		<module name='io/joystick'>
 			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>

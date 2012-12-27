@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <map>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -29,18 +30,20 @@
 #include <xefis/core/input.h>
 
 
-class FlightGearInput:
+class FlightGearIO:
 	public QObject,
 	public Xefis::Input
 {
 	Q_OBJECT
 
+	typedef std::map<QString, Xefis::PropertyFloat*> FloatVars;
+
   public:
 	// Ctor
-	FlightGearInput (QDomElement const& config);
+	FlightGearIO (QDomElement const& config);
 
 	// Dtor
-	~FlightGearInput();
+	~FlightGearIO();
 
   private:
 	void
@@ -54,6 +57,12 @@ class FlightGearInput:
 	read_input();
 
 	/**
+	 * Handle (=assign) float-type variable coming from FlightGear.
+	 */
+	bool
+	handle_float_variable (QString const& variable, QString const& value);
+
+	/**
 	 * Set all input properties as invalid.
 	 */
 	void
@@ -63,9 +72,10 @@ class FlightGearInput:
 	QTimer*					_timeout_timer = nullptr;
 	QUdpSocket*				_input = nullptr;
 	std::string				_property_path;
+	FloatVars				_float_vars;
 
 	Xefis::PropertyFloat	_ias_kt;
-	Xefis::PropertyFloat	_ias_tendency_kt;
+	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
 	Xefis::PropertyFloat	_maximum_ias_kt;
 	Xefis::PropertyFloat	_gs_kt;
@@ -74,15 +84,15 @@ class FlightGearInput:
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
 	Xefis::PropertyFloat	_heading_deg;
-	Xefis::PropertyFloat	_slip_skid;
+	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;
 	Xefis::PropertyFloat	_landing_altitude_ft;
-	Xefis::PropertyFloat	_pressure_inhg;
 	Xefis::PropertyFloat	_cbr_fpm;
+	Xefis::PropertyFloat	_pressure_inhg;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
 	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;

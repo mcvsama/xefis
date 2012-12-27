@@ -319,7 +319,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 	if (_efis._ap_climb_rate_visible && _efis._climb_rate_visible)
 	{
 		_painter.save();
-		_painter.translate (3.75f * x, 0.f);
+		_painter.translate (4.15f * x, 0.f);
 		float posy = -8.f * x * scale_cbr (_efis._ap_climb_rate);
 		for (auto pen: { _efis._autopilot_pen_1, _efis._autopilot_pen_2 })
 		{
@@ -1066,8 +1066,8 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 
 	float const bold_width = _efis.pen_width (3.f);
 	QPointF a (0, 0.01f * w); // Miter
-	QPointF b (-0.052f * w, 0.1f * w);
-	QPointF c (+0.052f * w, 0.1f * w);
+	QPointF b (-0.062f * w, 0.1f * w);
+	QPointF c (+0.062f * w, 0.1f * w);
 	QPointF x0 (0.002f * w, 0.f);
 	QPointF y0 (0.f, 0.005f * w);
 	QPointF y1 (0.f, 1.f * bold_width);
