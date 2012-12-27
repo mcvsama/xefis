@@ -6,6 +6,13 @@
 				<item stretch-factor='2'>
 					<module name='instruments/efis'>
 						<properties path='/efis'>
+							<property name='speed-ladder-line-every' path='/configuration/speed-ladder/line-every.kt' default='10'/>
+							<property name='speed-ladder-number-every' path='/configuration/speed-ladder/number-every.kt' default='20'/>
+							<property name='speed-ladder-extent' path='/configuration/speed-ladder/extent.kt' default='124'/>
+							<property name='altitude-ladder-line-every' path='/configuration/altitude-ladder/line-every.ft' default='100'/>
+							<property name='altitude-ladder-number-every' path='/configuration/altitude-ladder/number-every.ft' default='200'/>
+							<property name='altitude-ladder-bold-every' path='/configuration/altitude-ladder/bold-every.ft' default='500'/>
+							<property name='altitude-ladder-extent' path='/configuration/altitude-ladder/extent.ft' default='825'/>
 							<property name='ias' path='/speed/ias.kt' default='0'/>
 							<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
 							<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
@@ -29,6 +36,7 @@
 							<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
 							<property name='cbr' path='/altitude/climb-rate.fpm' default='0'/>
 							<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
+							<property name='autopilot-visible' path='/autopilot/visible' default='true'/>
 							<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
 							<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
 							<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
@@ -37,8 +45,9 @@
 							<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
 							<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
 							<property name='navigation-needles-visible' path='/navigation/needles-visible' default='false'/>
-							<property name='naigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
-							<property name='naigation-heading-needle' path='/navigation/heading-needle-deflection'/>
+							<property name='navigation-type-hint' path='/navigation/type-hint' default='ILS'/>
+							<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
+							<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection' default='0'/>
 							<property name='dme-distance' path='/navigation/dme-distance.nm'/>
 						</properties>
 					</module>

@@ -37,6 +37,13 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 		if (e == "properties")
 		{
 			parse_properties (e, {
+				{ "speed-ladder-line-every", _speed_ladder_line_every, false },
+				{ "speed-ladder-number-every", _speed_ladder_number_every, false },
+				{ "speed-ladder-extent", _speed_ladder_extent, false },
+				{ "altitude-ladder-line-every", _altitude_ladder_line_every, false },
+				{ "altitude-ladder-number-every", _altitude_ladder_number_every, false },
+				{ "altitude-ladder-bold-every", _altitude_ladder_bold_every, false },
+				{ "altitude-ladder-extent", _altitude_ladder_extent, false },
 				{ "ias", _ias_kt, false },
 				{ "ias-lookahead", _ias_lookahead_kt, false },
 				{ "ias-minimum", _minimum_ias_kt, false },
@@ -69,6 +76,7 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "flight-director-pitch", _flight_director_pitch_deg, false },
 				{ "flight-director-roll", _flight_director_roll_deg, false },
 				{ "navigation-needles-visible", _navigation_needles_visible, false },
+				{ "navigation-type-hint", _navigation_type_hint, false },
 				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
 				{ "navigation-heading-needle", _navigation_hd_needle, false },
 				{ "dme-distance", _dme_distance_nm, false }
@@ -109,6 +117,15 @@ EFIS::read()
 		fpm_alpha -= std::sin (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_heading_deg);
 		fpm_beta -= std::cos (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_heading_deg);
 	}
+
+	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.valid() ? *_speed_ladder_line_every : 10);
+	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.valid() ? *_speed_ladder_number_every : 20);
+	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.valid() ? *_speed_ladder_extent : 124);
+
+	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every.valid() ? *_altitude_ladder_line_every : 100);
+	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.valid() ? *_altitude_ladder_number_every : 200);
+	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.valid() ? *_altitude_ladder_bold_every : 500);
+	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.valid() ? *_altitude_ladder_extent : 825);
 
 	_efis_widget->set_speed_visibility (_ias_kt.valid());
 	if (_ias_kt.valid())
@@ -207,12 +224,13 @@ EFIS::read()
 	if (_flight_director_roll_deg.valid())
 		_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
 
-	if (_navigation_needles_visible.valid())
+	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
 	{
-		_efis_widget->set_navigation_hint (*_navigation_needles_visible ? "ILS" : "");
-		_efis_widget->set_navigation_needles_visibility (*_navigation_needles_visible);
-		_efis_widget->set_navigation_runway_visibility (*_navigation_needles_visible && _navigation_hd_needle.valid() &&
-														_altitude_agl_ft.valid() && *_altitude_agl_ft <= 150.f);
+		_efis_widget->set_navigation_hint (_navigation_type_hint.valid() ? (*_navigation_type_hint).c_str() : "");
+		_efis_widget->set_navigation_needles_visibility (true);
+		_efis_widget->set_navigation_runway_visibility (_navigation_hd_needle.valid() &&
+														_altitude_agl_ft.valid() &&
+														*_altitude_agl_ft <= 150.f);
 	}
 	else
 	{
@@ -236,7 +254,7 @@ EFIS::read()
 	if (_heading_deg.valid())
 		_efis_nav_widget->set_heading (*_heading_deg);
 
-	_efis_nav_widget->set_ap_heading_visibility (_autopilot_heading_setting_deg.valid());
+	_efis_nav_widget->set_ap_heading_visibility (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
 		_efis_nav_widget->set_ap_heading (*_autopilot_heading_setting_deg);
 
