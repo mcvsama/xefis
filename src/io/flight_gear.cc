@@ -86,33 +86,33 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 
 	_float_vars = {
-		{ "ias",			&_ias_kt },
-		{ "ias-tend",		&_ias_lookahead_kt },
-		{ "gs",				&_gs_kt },
-		{ "tas",			&_tas_kt },
-		{ "mach",			&_mach },
-		{ "pitch",			&_pitch_deg },
-		{ "roll",			&_roll_deg },
-		{ "heading",		&_heading_deg },
-		{ "ss",				&_slip_skid_g },
-		{ "alpha",			&_fpm_alpha_deg },
-		{ "beta",			&_fpm_beta_deg },
-		{ "track",			&_track_deg },
-		{ "altitude",		&_altitude_ft },
-		{ "cbr",			&_cbr_fpm },
-		{ "altimeter-inhg",	&_pressure_inhg },
-		{ "ap-alt-sel",		&_autopilot_alt_setting_ft },
-		{ "at-speed-sel",	&_autopilot_speed_setting_kt },
-		{ "ap-hdg-sel",		&_autopilot_heading_setting_deg },
-		{ "ap-cbr-sel",		&_autopilot_cbr_setting_fpm },
-		{ "fd-pitch",		&_flight_director_pitch_deg },
-		{ "fd-roll",		&_flight_director_roll_deg },
-		{ "nav-gs",			&_navigation_gs_needle },
-		{ "nav-hd",			&_navigation_hd_needle },
-		{ "thr",			&_engine_throttle_pct },
-		{ "epr",			&_engine_epr },
-		{ "n1",				&_engine_n1_pct },
-		{ "n2",				&_engine_n2_pct }
+		{ "ias",	&_ias_kt },
+		{ "iasl",	&_ias_lookahead_kt },
+		{ "gs",		&_gs_kt },
+		{ "tas",	&_tas_kt },
+		{ "ma",		&_mach },
+		{ "p",		&_pitch_deg },
+		{ "r",		&_roll_deg },
+		{ "h",		&_heading_deg },
+		{ "ss",		&_slip_skid_g },
+		{ "fpa",	&_fpm_alpha_deg },
+		{ "fpb",	&_fpm_beta_deg },
+		{ "tr",		&_track_deg },
+		{ "al",		&_altitude_ft },
+		{ "cbr",	&_cbr_fpm },
+		{ "als",	&_pressure_inhg },
+		{ "apa",	&_autopilot_alt_setting_ft },
+		{ "ats",	&_autopilot_speed_setting_kt },
+		{ "aph",	&_autopilot_heading_setting_deg },
+		{ "apc",	&_autopilot_cbr_setting_fpm },
+		{ "fdp",	&_flight_director_pitch_deg },
+		{ "fdr",	&_flight_director_roll_deg },
+		{ "ngs",	&_navigation_gs_needle },
+		{ "nhd",	&_navigation_hd_needle },
+		{ "thr",	&_engine_throttle_pct },
+		{ "epr",	&_engine_epr },
+		{ "n1",		&_engine_n1_pct },
+		{ "n2",		&_engine_n2_pct }
 	};
 
 	invalidate_all();
@@ -156,17 +156,17 @@ FlightGearIO::read_input()
 			QString var = split_pair[0];
 			QString value = split_pair[1];
 
-			if (var == "ias-min")
+			if (var == "iasmi")
 			{
 				if (!_minimum_ias_kt.is_singular() && value.toFloat() > 1.f)
 					_minimum_ias_kt.write (value.toFloat());
 			}
-			else if (var == "ias-max")
+			else if (var == "iasma")
 			{
 				if (!_maximum_ias_kt.is_singular() && value.toFloat() > 1.f)
 					_maximum_ias_kt.write (value.toFloat());
 			}
-			else if (var == "alt-agl")
+			else if (var == "alr")
 			{
 				if (!_altitude_agl_ft.is_singular() && value.toFloat() < 2500.f)
 					_altitude_agl_ft.write (value.toFloat());
@@ -181,15 +181,15 @@ FlightGearIO::read_input()
 				if (!_navigation_needles_visible.is_singular())
 					_navigation_needles_visible.write (!!value.toInt());
 			}
-			else if (var == "nav-gs-ok")
+			else if (var == "ngso")
 				navigation_gs_needle_ok = !!value.toInt();
-			else if (var == "nav-gs")
+			else if (var == "ngs")
 				navigation_gs_needle = value.toFloat();
-			else if (var == "nav-hd-ok")
+			else if (var == "nhdo")
 				navigation_hd_needle_ok = !!value.toInt();
-			else if (var == "nav-hd")
+			else if (var == "nhd")
 				navigation_hd_needle = value.toFloat();
-			else if (var == "dme-ok")
+			else if (var == "dok")
 				navigation_dme_ok = !!value.toInt();
 			else if (var == "dme")
 				navigation_dme = value.toFloat();
