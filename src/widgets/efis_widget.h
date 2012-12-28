@@ -307,6 +307,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_heading_visible (bool visible);
 
 	/**
+	 * Toggle heading scale numbers visibility (only on ADI, not on NAV widget).
+	 */
+	void
+	set_heading_numbers_visible (bool visible);
+
+	/**
 	 * Return slip-skid indicator value.
 	 */
 	float
@@ -881,6 +887,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_roll_visible					= false;
 	Degrees				_heading						= 0.f;
 	bool				_heading_visible				= false;
+	bool				_heading_numbers_visible		= false;
 	float				_slip_skid						= 0.f;
 	float				_slip_skid_limit				= 0.f;
 	bool				_slip_skid_visible				= false;
@@ -1085,6 +1092,14 @@ inline void
 EFISWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_heading_numbers_visible (bool visible)
+{
+	_heading_numbers_visible = visible;
 	update();
 }
 

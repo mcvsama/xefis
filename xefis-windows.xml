@@ -13,6 +13,7 @@
 							<property name='altitude-ladder-number-every' path='/configuration/altitude-ladder/number-every.ft' default='200'/>
 							<property name='altitude-ladder-bold-every' path='/configuration/altitude-ladder/bold-every.ft' default='500'/>
 							<property name='altitude-ladder-extent' path='/configuration/altitude-ladder/extent.ft' default='825'/>
+							<property name='heading-numbers-visible' path='/configuration/adi/heading-numbers-visible' default='true'/>
 							<property name='ias' path='/speed/ias.kt' default='0'/>
 							<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
 							<property name='ias-minimum' path='/speed/ias-minimum.kt'/>

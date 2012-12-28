@@ -59,6 +59,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyInteger	_altitude_ladder_number_every;
 	Xefis::PropertyInteger	_altitude_ladder_bold_every;
 	Xefis::PropertyInteger	_altitude_ladder_extent;
+	Xefis::PropertyBoolean	_heading_numbers_visible;
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
