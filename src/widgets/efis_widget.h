@@ -254,7 +254,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Toggles also artifical horizon.
 	 */
 	void
-	set_pitch_visibility (bool visible);
+	set_pitch_visible (bool visible);
 
 	/**
 	 * Return current roll value.
@@ -286,7 +286,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Toggles also artifical horizon.
 	 */
 	void
-	set_roll_visibility (bool visible);
+	set_roll_visible (bool visible);
 
 	/**
 	 * Return current heading value.
@@ -304,7 +304,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Toggle heading scale visibility.
 	 */
 	void
-	set_heading_visibility (bool visible);
+	set_heading_visible (bool visible);
 
 	/**
 	 * Return slip-skid indicator value.
@@ -335,7 +335,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set slip-skid indicator visibility.
 	 */
 	void
-	set_slip_skid_visibility (bool visible);
+	set_slip_skid_visible (bool visible);
 
 	/**
 	 * Flight path vertical deviation.
@@ -365,7 +365,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set visibility of the Flight Path Marker.
 	 */
 	void
-	set_flight_path_marker_visibility (bool visible);
+	set_flight_path_marker_visible (bool visible);
 
 	/**
 	 * Return current speed.
@@ -383,7 +383,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Toggle visibility of the speed scale.
 	 */
 	void
-	set_speed_visibility (bool visible);
+	set_speed_visible (bool visible);
 
 	/**
 	 * Set speed tendency value.
@@ -395,7 +395,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set speed tendency arrow visibility.
 	 */
 	void
-	set_speed_tendency_visibility (bool visible);
+	set_speed_tendency_visible (bool visible);
 
 	/**
 	 * Current altitude value.
@@ -419,7 +419,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set altitude tendency arrow visibility.
 	 */
 	void
-	set_altitude_tendency_visibility (bool visible);
+	set_altitude_tendency_visible (bool visible);
 
 	/**
 	 * Set speed tendency value.
@@ -431,7 +431,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set speed tendency arrow visibility.
 	 */
 	void
-	set_altitude_agl_visibility (bool visible);
+	set_altitude_agl_visible (bool visible);
 
 	/**
 	 * Return landing altitude.
@@ -449,13 +449,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set landing altitude visibility.
 	 */
 	void
-	set_landing_altitude_visibility (bool visible);
+	set_landing_altitude_visible (bool visible);
 
 	/**
 	 * Toggle visibility of the altitude scale.
 	 */
 	void
-	set_altitude_visibility (bool visible);
+	set_altitude_visible (bool visible);
 
 	/**
 	 * Return current climb rate.
@@ -473,7 +473,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set climb rate visibility.
 	 */
 	void
-	set_climb_rate_visibility (bool visible);
+	set_climb_rate_visible (bool visible);
 
 	/**
 	 * Return speed bug value or 0.0f if not found.
@@ -529,7 +529,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set mach number indicator visibility.
 	 */
 	void
-	set_mach_visibility (bool visible);
+	set_mach_visible (bool visible);
 
 	/**
 	 * Return current pressure indicator value.
@@ -547,7 +547,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Show or hide pressure indicator.
 	 */
 	void
-	set_pressure_visibility (bool visible);
+	set_pressure_visible (bool visible);
 
 	/**
 	 * Get minimum speed indicator setting.
@@ -565,7 +565,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set minimum speed indicator visibility.
 	 */
 	void
-	set_minimum_speed_visibility (bool visible);
+	set_minimum_speed_visible (bool visible);
 
 	/**
 	 * Get warning speed indicator setting.
@@ -583,7 +583,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set warning speed indicator visibility.
 	 */
 	void
-	set_warning_speed_visibility (bool visible);
+	set_warning_speed_visible (bool visible);
 
 	/**
 	 * Get maximum speed indicator setting.
@@ -601,7 +601,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set maximum speed indicator visibility.
 	 */
 	void
-	set_maximum_speed_visibility (bool visible);
+	set_maximum_speed_visible (bool visible);
 
 	/**
 	 * Return autopilot altitude.
@@ -619,7 +619,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set AP altitude setting visibility.
 	 */
 	void
-	set_ap_altitude_visibility (bool visible);
+	set_ap_altitude_visible (bool visible);
 
 	/**
 	 * Return autopilot climb rate setting.
@@ -637,7 +637,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set AP climb rate visibility.
 	 */
 	void
-	set_ap_climb_rate_visibility (bool visible);
+	set_ap_climb_rate_visible (bool visible);
 
 	/**
 	 * Return autothrottle setting.
@@ -655,7 +655,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set AT speed visibility.
 	 */
 	void
-	set_at_speed_visibility (bool visible);
+	set_at_speed_visible (bool visible);
 
 	/**
 	 * Return flight director alpha.
@@ -673,7 +673,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set flight director pitch visibility.
 	 */
 	void
-	set_flight_director_pitch_visibility (bool visible);
+	set_flight_director_pitch_visible (bool visible);
 
 	/**
 	 * Return flight director roll.
@@ -691,13 +691,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set flight director roll visibility.
 	 */
 	void
-	set_flight_director_roll_visibility (bool visible);
+	set_flight_director_roll_visible (bool visible);
 
 	/**
 	 * Set visibility of navigation needles ladders.
 	 */
 	void
-	set_navigation_needles_visibility (bool visible);
+	set_navigation_needles_visible (bool visible);
 
 	/**
 	 * Return navigation glideslope needle value.
@@ -715,7 +715,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set navigation glideslope needle visibility.
 	 */
 	void
-	set_navigation_glideslope_needle_visibility (bool visible);
+	set_navigation_glideslope_needle_visible (bool visible);
 
 	/**
 	 * Return navigation heading needle value.
@@ -733,13 +733,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set navigation heading needle visibility.
 	 */
 	void
-	set_navigation_heading_needle_visibility (bool visible);
+	set_navigation_heading_needle_visible (bool visible);
 
 	/**
 	 * Set navigation runway visibility (aligns with heading needle).
 	 */
 	void
-	set_navigation_runway_visibility (bool visible);
+	set_navigation_runway_visible (bool visible);
 
 	/**
 	 * Return nav hint.
@@ -770,7 +770,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set DME info visibility.
 	 */
 	void
-	set_dme_distance_visibility (bool visible);
+	set_dme_distance_visible (bool visible);
 
 	/**
 	 * Return field of view.
@@ -789,7 +789,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set input alert visibility.
 	 */
 	void
-	set_input_alert_visibility (bool visible);
+	set_input_alert_visible (bool visible);
 
   protected slots:
 	void
@@ -1021,7 +1021,7 @@ EFISWidget::set_pitch (Degrees degrees)
 
 
 inline void
-EFISWidget::set_pitch_visibility (bool visible)
+EFISWidget::set_pitch_visible (bool visible)
 {
 	_pitch_visible = visible;
 	update();
@@ -1059,7 +1059,7 @@ EFISWidget::set_roll_limit (Degrees limit)
 
 
 inline void
-EFISWidget::set_roll_visibility (bool visible)
+EFISWidget::set_roll_visible (bool visible)
 {
 	_roll_visible = visible;
 	update();
@@ -1082,7 +1082,7 @@ EFISWidget::set_heading (Degrees degrees)
 
 
 inline void
-EFISWidget::set_heading_visibility (bool visible)
+EFISWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
 	update();
@@ -1120,7 +1120,7 @@ EFISWidget::set_slip_skid_limit (float limit)
 
 
 inline void
-EFISWidget::set_slip_skid_visibility (bool visible)
+EFISWidget::set_slip_skid_visible (bool visible)
 {
 	_slip_skid_visible = visible;
 	update();
@@ -1158,7 +1158,7 @@ EFISWidget::set_flight_path_beta (Degrees heading)
 
 
 inline void
-EFISWidget::set_flight_path_marker_visibility (bool visible)
+EFISWidget::set_flight_path_marker_visible (bool visible)
 {
 	_flight_path_visible = visible;
 	update();
@@ -1181,7 +1181,7 @@ EFISWidget::set_speed (Knots speed)
 
 
 inline void
-EFISWidget::set_speed_visibility (bool visible)
+EFISWidget::set_speed_visible (bool visible)
 {
 	_speed_visible = visible;
 	update();
@@ -1197,7 +1197,7 @@ EFISWidget::set_speed_tendency (Knots kt)
 
 
 inline void
-EFISWidget::set_speed_tendency_visibility (bool visible)
+EFISWidget::set_speed_tendency_visible (bool visible)
 {
 	_speed_tendency_visible = visible;
 	update();
@@ -1220,7 +1220,7 @@ EFISWidget::set_altitude (Feet altitude)
 
 
 inline void
-EFISWidget::set_altitude_visibility (bool visible)
+EFISWidget::set_altitude_visible (bool visible)
 {
 	_altitude_visible = visible;
 	update();
@@ -1236,7 +1236,7 @@ EFISWidget::set_altitude_tendency (Feet ft)
 
 
 inline void
-EFISWidget::set_altitude_tendency_visibility (bool visible)
+EFISWidget::set_altitude_tendency_visible (bool visible)
 {
 	_altitude_tendency_visible = visible;
 	update();
@@ -1252,7 +1252,7 @@ EFISWidget::set_altitude_agl (Feet altitude)
 
 
 inline void
-EFISWidget::set_altitude_agl_visibility (bool visible)
+EFISWidget::set_altitude_agl_visible (bool visible)
 {
 	_altitude_agl_visible = visible;
 	update();
@@ -1275,7 +1275,7 @@ EFISWidget::set_landing_altitude (Feet feet)
 
 
 inline void
-EFISWidget::set_landing_altitude_visibility (bool visible)
+EFISWidget::set_landing_altitude_visible (bool visible)
 {
 	_landing_altitude_visible = visible;
 	update();
@@ -1298,7 +1298,7 @@ EFISWidget::set_climb_rate (FeetPerMinute feet_per_minute)
 
 
 inline void
-EFISWidget::set_climb_rate_visibility (bool visible)
+EFISWidget::set_climb_rate_visible (bool visible)
 {
 	_climb_rate_visible = visible;
 	update();
@@ -1379,7 +1379,7 @@ EFISWidget::set_mach (float value)
 
 
 inline void
-EFISWidget::set_mach_visibility (bool visible)
+EFISWidget::set_mach_visible (bool visible)
 {
 	_mach_visible = visible;
 	update();
@@ -1402,7 +1402,7 @@ EFISWidget::set_pressure (InHg pressure)
 
 
 inline void
-EFISWidget::set_pressure_visibility (bool visible)
+EFISWidget::set_pressure_visible (bool visible)
 {
 	_pressure_visible = visible;
 	update();
@@ -1425,7 +1425,7 @@ EFISWidget::set_minimum_speed (Knots minimum_speed)
 
 
 inline void
-EFISWidget::set_minimum_speed_visibility (bool visible)
+EFISWidget::set_minimum_speed_visible (bool visible)
 {
 	_minimum_speed_visible = visible;
 	update();
@@ -1448,7 +1448,7 @@ EFISWidget::set_warning_speed (Knots warning_speed)
 
 
 inline void
-EFISWidget::set_warning_speed_visibility (bool visible)
+EFISWidget::set_warning_speed_visible (bool visible)
 {
 	_warning_speed_visible = visible;
 	update();
@@ -1471,7 +1471,7 @@ EFISWidget::set_maximum_speed (Knots maximum_speed)
 
 
 inline void
-EFISWidget::set_maximum_speed_visibility (bool visible)
+EFISWidget::set_maximum_speed_visible (bool visible)
 {
 	_maximum_speed_visible = visible;
 	update();
@@ -1494,7 +1494,7 @@ EFISWidget::set_ap_altitude (Feet feet)
 
 
 inline void
-EFISWidget::set_ap_altitude_visibility (bool visible)
+EFISWidget::set_ap_altitude_visible (bool visible)
 {
 	_ap_altitude_visible = visible;
 	update();
@@ -1517,7 +1517,7 @@ EFISWidget::set_ap_climb_rate (FeetPerMinute fpm)
 
 
 inline void
-EFISWidget::set_ap_climb_rate_visibility (bool visible)
+EFISWidget::set_ap_climb_rate_visible (bool visible)
 {
 	_ap_climb_rate_visible = visible;
 	update();
@@ -1540,7 +1540,7 @@ EFISWidget::set_at_speed (Knots knots)
 
 
 inline void
-EFISWidget::set_at_speed_visibility (bool visible)
+EFISWidget::set_at_speed_visible (bool visible)
 {
 	_at_speed_visible = visible;
 	update();
@@ -1563,7 +1563,7 @@ EFISWidget::set_flight_director_pitch (Degrees pitch)
 
 
 inline void
-EFISWidget::set_flight_director_pitch_visibility (bool visible)
+EFISWidget::set_flight_director_pitch_visible (bool visible)
 {
 	_flight_director_pitch_visible = visible;
 	update();
@@ -1586,7 +1586,7 @@ EFISWidget::set_flight_director_roll (Degrees roll)
 
 
 inline void
-EFISWidget::set_flight_director_roll_visibility (bool visible)
+EFISWidget::set_flight_director_roll_visible (bool visible)
 {
 	_flight_director_roll_visible = visible;
 	update();
@@ -1594,7 +1594,7 @@ EFISWidget::set_flight_director_roll_visibility (bool visible)
 
 
 inline void
-EFISWidget::set_navigation_needles_visibility (bool visible)
+EFISWidget::set_navigation_needles_visible (bool visible)
 {
 	_navigation_needles_visible = visible;
 	update();
@@ -1617,7 +1617,7 @@ EFISWidget::set_navigation_glideslope_needle (float value)
 
 
 inline void
-EFISWidget::set_navigation_glideslope_needle_visibility (bool visible)
+EFISWidget::set_navigation_glideslope_needle_visible (bool visible)
 {
 	_navigation_gs_needle_visible = visible;
 	update();
@@ -1640,7 +1640,7 @@ EFISWidget::set_navigation_heading_needle (float value)
 
 
 inline void
-EFISWidget::set_navigation_heading_needle_visibility (bool visible)
+EFISWidget::set_navigation_heading_needle_visible (bool visible)
 {
 	_navigation_hd_needle_visible = visible;
 	update();
@@ -1648,7 +1648,7 @@ EFISWidget::set_navigation_heading_needle_visibility (bool visible)
 
 
 inline void
-EFISWidget::set_navigation_runway_visibility (bool visible)
+EFISWidget::set_navigation_runway_visible (bool visible)
 {
 	_navigation_runway_visible = visible;
 	update();
@@ -1686,7 +1686,7 @@ EFISWidget::set_dme_distance (Miles distance)
 
 
 inline void
-EFISWidget::set_dme_distance_visibility (bool visible)
+EFISWidget::set_dme_distance_visible (bool visible)
 {
 	_dme_distance_visible = visible;
 	update();
@@ -1709,7 +1709,7 @@ EFISWidget::set_fov (Degrees degrees)
 
 
 inline void
-EFISWidget::set_input_alert_visibility (bool visible)
+EFISWidget::set_input_alert_visible (bool visible)
 {
 	_input_alert_visible = visible;
 }

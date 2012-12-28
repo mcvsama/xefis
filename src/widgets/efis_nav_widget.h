@@ -52,7 +52,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Toggle heading scale visibility.
 	 */
 	void
-	set_heading_visibility (bool visible);
+	set_heading_visible (bool visible);
 
 	/**
 	 * Return A/P heading.
@@ -70,7 +70,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Set A/P heading visibility.
 	 */
 	void
-	set_ap_heading_visibility (bool visible);
+	set_ap_heading_visible (bool visible);
 
 	/**
 	 * Flight path heading (track).
@@ -88,7 +88,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Set visibility of the track line.
 	 */
 	void
-	set_track_visibility (bool visible);
+	set_track_visible (bool visible);
 
 	/**
 	 * Return current ground speed.
@@ -106,7 +106,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Toggle visibility of the ground speed.
 	 */
 	void
-	set_ground_speed_visibility (bool visible);
+	set_ground_speed_visible (bool visible);
 
 	/**
 	 * Return current true air speed.
@@ -124,7 +124,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Toggle visibility of the true air speed.
 	 */
 	void
-	set_true_air_speed_visibility (bool visible);
+	set_true_air_speed_visible (bool visible);
 
 	/**
 	 * Return mach number.
@@ -142,7 +142,7 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 	 * Set mach number indicator visibility.
 	 */
 	void
-	set_mach_visibility (bool visible);
+	set_mach_visible (bool visible);
 
   protected:
 	void
@@ -201,7 +201,7 @@ EFISNavWidget::set_heading (Degrees degrees)
 
 
 inline void
-EFISNavWidget::set_heading_visibility (bool visible)
+EFISNavWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
 	update();
@@ -224,7 +224,7 @@ EFISNavWidget::set_ap_heading (Degrees heading)
 
 
 inline void
-EFISNavWidget::set_ap_heading_visibility (bool visible)
+EFISNavWidget::set_ap_heading_visible (bool visible)
 {
 	_ap_heading_visible = visible;
 	update();
@@ -247,7 +247,7 @@ EFISNavWidget::set_track (Degrees heading)
 
 
 inline void
-EFISNavWidget::set_track_visibility (bool visible)
+EFISNavWidget::set_track_visible (bool visible)
 {
 	_track_visible = visible;
 	update();
@@ -270,7 +270,7 @@ EFISNavWidget::set_ground_speed (Knots ground_speed)
 
 
 inline void
-EFISNavWidget::set_ground_speed_visibility (bool visible)
+EFISNavWidget::set_ground_speed_visible (bool visible)
 {
 	_ground_speed_visible = visible;
 	update();
@@ -293,7 +293,7 @@ EFISNavWidget::set_true_air_speed (Knots true_air_speed)
 
 
 inline void
-EFISNavWidget::set_true_air_speed_visibility (bool visible)
+EFISNavWidget::set_true_air_speed_visible (bool visible)
 {
 	_true_air_speed_visible = visible;
 	update();
@@ -316,7 +316,7 @@ EFISNavWidget::set_mach (float value)
 
 
 inline void
-EFISNavWidget::set_mach_visibility (bool visible)
+EFISNavWidget::set_mach_visible (bool visible)
 {
 	_mach_visible = visible;
 	update();
