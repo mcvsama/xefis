@@ -26,16 +26,16 @@
 #include <xefis/utility/text_painter.h>
 
 // Local:
-#include "efis_nav_widget.h"
+#include "efis_hsi_widget.h"
 
 
-EFISNavWidget::EFISNavWidget (QWidget* parent):
+EFISHSIWidget::EFISHSIWidget (QWidget* parent):
   InstrumentWidget (parent, 0.5f, 1.f)
 { }
 
 
 void
-EFISNavWidget::paintEvent (QPaintEvent* paint_event)
+EFISHSIWidget::paintEvent (QPaintEvent* paint_event)
 {
 	float const w = width();
 	float const h = height();
@@ -77,7 +77,7 @@ EFISNavWidget::paintEvent (QPaintEvent* paint_event)
 
 
 void
-EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
+EFISHSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	QPen pen1 = get_pen (QColor (255, 255, 255), 1.5f);
 	QPen pen2 = get_pen (QColor (255, 255, 255), 2.8f);
@@ -137,7 +137,7 @@ EFISNavWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 
 
 void
-EFISNavWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
+EFISHSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 {
 	if (!_track_visible)
 		return;
@@ -157,7 +157,7 @@ EFISNavWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 
 
 void
-EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, float q, float r)
+EFISHSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	if (!_ap_heading_visible)
 		return;
@@ -231,7 +231,7 @@ EFISNavWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 
 
 void
-EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float q, float r)
+EFISHSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	if (!_heading_visible)
 		return;
@@ -263,7 +263,7 @@ EFISNavWidget::paint_directions (QPainter& painter, TextPainter& text_painter, f
 
 
 void
-EFISNavWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
+EFISHSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
 {
 	QPen pen = get_pen (QColor (255, 255, 255), 1.f);
 	QFont font_a = _font_13_bold;

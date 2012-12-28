@@ -26,18 +26,18 @@
 #include <xefis/utility/qdom.h>
 
 // Local:
-#include "power_indicator.h"
+#include "radial_indicator.h"
 
 
-PowerIndicator::PowerIndicator (QDomElement const& config, QWidget* parent):
+RadialIndicator::RadialIndicator (QDomElement const& config, QWidget* parent):
 	Instrument (parent)
 {
-	_power_widget = new PowerWidget (this);
+	_widget = new RadialIndicatorWidget (this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_power_widget);
+	layout->addWidget (_widget);
 
 	bool found_properties_config = false;
 
@@ -68,29 +68,29 @@ PowerIndicator::PowerIndicator (QDomElement const& config, QWidget* parent):
 
 
 void
-PowerIndicator::read()
+RadialIndicator::read()
 {
-	_power_widget->set_range (Range<double> { *_range_minimum, *_range_maximum });
+	_widget->set_range (Range<double> { *_range_minimum, *_range_maximum });
 
-	_power_widget->set_value (*_value);
-	_power_widget->set_value_visible (_value.valid());
+	_widget->set_value (*_value);
+	_widget->set_value_visible (_value.valid());
 
 	if (!_warning_value.is_singular())
 	{
-		_power_widget->set_warning_value (*_warning_value);
-		_power_widget->set_warning_visible (_warning_value.valid());
+		_widget->set_warning_value (*_warning_value);
+		_widget->set_warning_visible (_warning_value.valid());
 	}
 
 	if (!_critical_value.is_singular())
 	{
-		_power_widget->set_critical_value (*_critical_value);
-		_power_widget->set_critical_visible (_critical_value.valid());
+		_widget->set_critical_value (*_critical_value);
+		_widget->set_critical_visible (_critical_value.valid());
 	}
 
 	if (!_normal_value.is_singular())
 	{
-		_power_widget->set_normal_value (*_normal_value);
-		_power_widget->set_normal_visible (_normal_value.valid());
+		_widget->set_normal_value (*_normal_value);
+		_widget->set_normal_visible (_normal_value.valid());
 	}
 }
 

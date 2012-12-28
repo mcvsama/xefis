@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__WIDGETS__POWER_WIDGET_H__INCLUDED
-#define XEFIS__WIDGETS__POWER_WIDGET_H__INCLUDED
+#ifndef XEFIS__WIDGETS__RADIAL_INDICATOR_WIDGET_H__INCLUDED
+#define XEFIS__WIDGETS__RADIAL_INDICATOR_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,21 +28,21 @@
 #include <xefis/utility/range.h>
 
 
-class PowerWidget: public Xefis::InstrumentWidget
+class RadialIndicatorWidget: public Xefis::InstrumentWidget
 {
   public:
 	// Ctor
-	PowerWidget (QWidget* parent);
+	RadialIndicatorWidget (QWidget* parent);
 
 	/**
-	 * Return current range used for PowerWidget.
+	 * Return current range used for RadialIndicatorWidget.
 	 * By default, the range is [0..1].
 	 */
 	Range<float>
 	range() const;
 
 	/**
-	 * Set new range to be used with PowerWidget.
+	 * Set new range to be used with RadialIndicatorWidget.
 	 */
 	void
 	set_range (Range<float>);
@@ -144,14 +144,14 @@ class PowerWidget: public Xefis::InstrumentWidget
 
 
 inline Range<float>
-PowerWidget::range() const
+RadialIndicatorWidget::range() const
 {
 	return _range;
 }
 
 
 inline void
-PowerWidget::set_range (Range<float> range)
+RadialIndicatorWidget::set_range (Range<float> range)
 {
 	_range = range;
 	update();
@@ -159,14 +159,14 @@ PowerWidget::set_range (Range<float> range)
 
 
 inline float
-PowerWidget::value() const
+RadialIndicatorWidget::value() const
 {
 	return _value;
 }
 
 
 inline void
-PowerWidget::set_value (float value)
+RadialIndicatorWidget::set_value (float value)
 {
 	_value = value;
 	update();
@@ -174,7 +174,7 @@ PowerWidget::set_value (float value)
 
 
 inline void
-PowerWidget::set_value_visible (bool visible)
+RadialIndicatorWidget::set_value_visible (bool visible)
 {
 	_value_visible = visible;
 	update();
@@ -182,14 +182,14 @@ PowerWidget::set_value_visible (bool visible)
 
 
 inline float
-PowerWidget::warning_value() const
+RadialIndicatorWidget::warning_value() const
 {
 	return _warning_value;
 }
 
 
 inline void
-PowerWidget::set_warning_value (float warning_value)
+RadialIndicatorWidget::set_warning_value (float warning_value)
 {
 	_warning_value = warning_value;
 	update();
@@ -197,7 +197,7 @@ PowerWidget::set_warning_value (float warning_value)
 
 
 inline void
-PowerWidget::set_warning_visible (bool visible)
+RadialIndicatorWidget::set_warning_visible (bool visible)
 {
 	_warning_visible = visible;
 	update();
@@ -205,14 +205,14 @@ PowerWidget::set_warning_visible (bool visible)
 
 
 inline float
-PowerWidget::critical_value() const
+RadialIndicatorWidget::critical_value() const
 {
 	return _critical_value;
 }
 
 
 inline void
-PowerWidget::set_critical_value (float critical_value)
+RadialIndicatorWidget::set_critical_value (float critical_value)
 {
 	_critical_value = critical_value;
 	update();
@@ -220,7 +220,7 @@ PowerWidget::set_critical_value (float critical_value)
 
 
 inline void
-PowerWidget::set_critical_visible (bool visible)
+RadialIndicatorWidget::set_critical_visible (bool visible)
 {
 	_critical_visible = visible;
 	update();
@@ -228,14 +228,14 @@ PowerWidget::set_critical_visible (bool visible)
 
 
 inline float
-PowerWidget::normal_value() const
+RadialIndicatorWidget::normal_value() const
 {
 	return _normal_value;
 }
 
 
 inline void
-PowerWidget::set_normal_value (float normal_value)
+RadialIndicatorWidget::set_normal_value (float normal_value)
 {
 	_normal_value = normal_value;
 	update();
@@ -243,7 +243,7 @@ PowerWidget::set_normal_value (float normal_value)
 
 
 inline void
-PowerWidget::set_normal_visible (bool visible)
+RadialIndicatorWidget::set_normal_visible (bool visible)
 {
 	_normal_visible = visible;
 	update();

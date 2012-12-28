@@ -94,23 +94,23 @@ SRC_MOCHDRS += io/joystick.h
 ######## /instruments ########
 
 SRC_HEADERS += instruments/efis.h
-SRC_HEADERS += instruments/power_indicator.h
+SRC_HEADERS += instruments/radial_indicator.h
 
 SRC_SOURCES += instruments/efis.cc
-SRC_SOURCES += instruments/power_indicator.cc
+SRC_SOURCES += instruments/radial_indicator.cc
 
 SRC_MOCHDRS += instruments/efis.h
-SRC_MOCHDRS += instruments/power_indicator.h
+SRC_MOCHDRS += instruments/radial_indicator.h
 
 ######## /widgets ########
 
 SRC_HEADERS += widgets/efis_widget.h
-SRC_HEADERS += widgets/efis_nav_widget.h
-SRC_HEADERS += widgets/power_widget.h
+SRC_HEADERS += widgets/efis_hsi_widget.h
+SRC_HEADERS += widgets/radial_indicator_widget.h
 
 SRC_SOURCES += widgets/efis_widget.cc
-SRC_SOURCES += widgets/efis_nav_widget.cc
-SRC_SOURCES += widgets/power_widget.cc
+SRC_SOURCES += widgets/efis_hsi_widget.cc
+SRC_SOURCES += widgets/radial_indicator_widget.cc
 
 SRC_MOCHDRS += widgets/efis_widget.h
 

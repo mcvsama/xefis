@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__INSTRUMENTS__POWER_INDICATOR_H__INCLUDED
-#define XEFIS__INSTRUMENTS__POWER_INDICATOR_H__INCLUDED
+#ifndef XEFIS__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
+#define XEFIS__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,16 +25,16 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
-#include <widgets/power_widget.h>
+#include <widgets/radial_indicator_widget.h>
 
 
-class PowerIndicator: public Xefis::Instrument
+class RadialIndicator: public Xefis::Instrument
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	PowerIndicator (QDomElement const& config, QWidget* parent);
+	RadialIndicator (QDomElement const& config, QWidget* parent);
 
   public slots:
 	/**
@@ -48,7 +48,7 @@ class PowerIndicator: public Xefis::Instrument
 	set_path (QString const& path);
 
   private:
-	PowerWidget*			_power_widget		= nullptr;
+	RadialIndicatorWidget*	_widget = nullptr;
 	std::string				_property_path;
 
 	Xefis::PropertyFloat	_value;

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__WIDGETS__EFIS_NAV_WIDGET_H__INCLUDED
-#define XEFIS__WIDGETS__EFIS_NAV_WIDGET_H__INCLUDED
+#ifndef XEFIS__WIDGETS__EFIS_HSI_WIDGET_H__INCLUDED
+#define XEFIS__WIDGETS__EFIS_HSI_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,13 +28,13 @@
 #include <xefis/utility/text_painter.h>
 
 
-class EFISNavWidget: public Xefis::InstrumentWidget
+class EFISHSIWidget: public Xefis::InstrumentWidget
 {
 	typedef std::map<QString, Degrees> HeadingBugs;
 
   public:
 	// Ctor
-	EFISNavWidget (QWidget* parent);
+	EFISHSIWidget (QWidget* parent);
 
 	/**
 	 * Return current heading value.
@@ -186,14 +186,14 @@ class EFISNavWidget: public Xefis::InstrumentWidget
 
 
 inline Degrees
-EFISNavWidget::heading() const
+EFISHSIWidget::heading() const
 {
 	return _heading;
 }
 
 
 inline void
-EFISNavWidget::set_heading (Degrees degrees)
+EFISHSIWidget::set_heading (Degrees degrees)
 {
 	_heading = degrees;
 	update();
@@ -201,7 +201,7 @@ EFISNavWidget::set_heading (Degrees degrees)
 
 
 inline void
-EFISNavWidget::set_heading_visible (bool visible)
+EFISHSIWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
 	update();
@@ -209,14 +209,14 @@ EFISNavWidget::set_heading_visible (bool visible)
 
 
 inline Degrees
-EFISNavWidget::ap_heading() const
+EFISHSIWidget::ap_heading() const
 {
 	return _ap_heading;
 }
 
 
 inline void
-EFISNavWidget::set_ap_heading (Degrees heading)
+EFISHSIWidget::set_ap_heading (Degrees heading)
 {
 	_ap_heading = heading;
 	update();
@@ -224,7 +224,7 @@ EFISNavWidget::set_ap_heading (Degrees heading)
 
 
 inline void
-EFISNavWidget::set_ap_heading_visible (bool visible)
+EFISHSIWidget::set_ap_heading_visible (bool visible)
 {
 	_ap_heading_visible = visible;
 	update();
@@ -232,14 +232,14 @@ EFISNavWidget::set_ap_heading_visible (bool visible)
 
 
 inline Degrees
-EFISNavWidget::track() const
+EFISHSIWidget::track() const
 {
 	return _track_deg;
 }
 
 
 inline void
-EFISNavWidget::set_track (Degrees heading)
+EFISHSIWidget::set_track (Degrees heading)
 {
 	_track_deg = heading;
 	update();
@@ -247,7 +247,7 @@ EFISNavWidget::set_track (Degrees heading)
 
 
 inline void
-EFISNavWidget::set_track_visible (bool visible)
+EFISHSIWidget::set_track_visible (bool visible)
 {
 	_track_visible = visible;
 	update();
@@ -255,14 +255,14 @@ EFISNavWidget::set_track_visible (bool visible)
 
 
 inline Knots
-EFISNavWidget::ground_speed() const
+EFISHSIWidget::ground_speed() const
 {
 	return _ground_speed;
 }
 
 
 inline void
-EFISNavWidget::set_ground_speed (Knots ground_speed)
+EFISHSIWidget::set_ground_speed (Knots ground_speed)
 {
 	_ground_speed = ground_speed;
 	update();
@@ -270,7 +270,7 @@ EFISNavWidget::set_ground_speed (Knots ground_speed)
 
 
 inline void
-EFISNavWidget::set_ground_speed_visible (bool visible)
+EFISHSIWidget::set_ground_speed_visible (bool visible)
 {
 	_ground_speed_visible = visible;
 	update();
@@ -278,14 +278,14 @@ EFISNavWidget::set_ground_speed_visible (bool visible)
 
 
 inline Knots
-EFISNavWidget::true_air_speed() const
+EFISHSIWidget::true_air_speed() const
 {
 	return _true_air_speed;
 }
 
 
 inline void
-EFISNavWidget::set_true_air_speed (Knots true_air_speed)
+EFISHSIWidget::set_true_air_speed (Knots true_air_speed)
 {
 	_true_air_speed = true_air_speed;
 	update();
@@ -293,7 +293,7 @@ EFISNavWidget::set_true_air_speed (Knots true_air_speed)
 
 
 inline void
-EFISNavWidget::set_true_air_speed_visible (bool visible)
+EFISHSIWidget::set_true_air_speed_visible (bool visible)
 {
 	_true_air_speed_visible = visible;
 	update();
@@ -301,14 +301,14 @@ EFISNavWidget::set_true_air_speed_visible (bool visible)
 
 
 inline float
-EFISNavWidget::mach() const
+EFISHSIWidget::mach() const
 {
 	return _mach;
 }
 
 
 inline void
-EFISNavWidget::set_mach (float value)
+EFISHSIWidget::set_mach (float value)
 {
 	_mach = value;
 	update();
@@ -316,7 +316,7 @@ EFISNavWidget::set_mach (float value)
 
 
 inline void
-EFISNavWidget::set_mach_visible (bool visible)
+EFISHSIWidget::set_mach_visible (bool visible)
 {
 	_mach_visible = visible;
 	update();

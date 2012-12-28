@@ -21,14 +21,14 @@
 							<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
 							<property name='gs' path='/speed/gs.kt' default='0'/>
 							<property name='tas' path='/speed/tas.kt' default='0'/>
-							<property name='mach' path='/speed/mach.kt' default='0'/>
+							<property name='mach' path='/speed/mach' default='0'/>
 							<property name='orientation-pitch' path='/orientation/pitch.deg' default='0'/>
 							<property name='orientation-roll' path='/orientation/roll.deg' default='0'/>
 							<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
 							<property name='orientation-heading' path='/orientation/heading.deg' default='0'/>
 							<property name='slip-skid' path='/slip-skid/slip-skid.g' default='0'/>
 							<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
-							<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
+							<property name='flight-path-marker-visible' path='/configuration/flight-path-marker/visible' default='true'/>
 							<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
 							<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
 							<property name='track' path='/orientation/track.deg'/>
@@ -37,15 +37,15 @@
 							<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
 							<property name='cbr' path='/altitude/climb-rate.fpm' default='0'/>
 							<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
-							<property name='autopilot-visible' path='/autopilot/visible' default='true'/>
+							<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
 							<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
 							<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
 							<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
 							<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
-							<property name='flight-director-visible' path='/autopilot/flight-director/visible' default='false'/>
+							<property name='flight-director-visible' path='/configuration/autopilot/flight-director/visible' default='false'/>
 							<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
 							<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
-							<property name='navigation-needles-visible' path='/navigation/needles-visible' default='false'/>
+							<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible' default='false'/>
 							<property name='navigation-type-hint' path='/navigation/type-hint' default='ILS'/>
 							<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
 							<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection' default='0'/>
