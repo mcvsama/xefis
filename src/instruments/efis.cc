@@ -44,6 +44,7 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "altitude-ladder-number-every", _altitude_ladder_number_every, false },
 				{ "altitude-ladder-bold-every", _altitude_ladder_bold_every, false },
 				{ "altitude-ladder-extent", _altitude_ladder_extent, false },
+				{ "heading-numbers-visible", _heading_numbers_visible, false },
 				{ "ias", _ias_kt, false },
 				{ "ias-lookahead", _ias_lookahead_kt, false },
 				{ "ias-minimum", _minimum_ias_kt, false },
@@ -126,6 +127,8 @@ EFIS::read()
 	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.valid() ? *_altitude_ladder_number_every : 200);
 	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.valid() ? *_altitude_ladder_bold_every : 500);
 	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.valid() ? *_altitude_ladder_extent : 825);
+
+	_efis_widget->set_heading_numbers_visible (_heading_numbers_visible.valid() ? *_heading_numbers_visible : false);
 
 	_efis_widget->set_speed_visible (_ias_kt.valid());
 	if (_ias_kt.valid())
