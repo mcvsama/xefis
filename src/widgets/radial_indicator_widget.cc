@@ -23,16 +23,16 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "power_widget.h"
+#include "radial_indicator_widget.h"
 
 
-PowerWidget::PowerWidget (QWidget* parent):
+RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
 	InstrumentWidget (parent, 1.f, 4.5f)
 { }
 
 
 void
-PowerWidget::paintEvent (QPaintEvent* paint_event)
+RadialIndicatorWidget::paintEvent (QPaintEvent* paint_event)
 {
 	float const w = width();
 	float const h = height();
@@ -65,7 +65,7 @@ PowerWidget::paintEvent (QPaintEvent* paint_event)
 
 
 void
-PowerWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, float)
+RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, float)
 {
 	QColor white (255, 255, 255);
 	QColor yellow (255, 220, 0);
@@ -115,7 +115,7 @@ PowerWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, 
 
 
 void
-PowerWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
+RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
 {
 	QColor gray (0x7a, 0x7a, 0x7a);
 	QColor yellow (255, 220, 0);

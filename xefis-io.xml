@@ -12,7 +12,7 @@
 					<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
 					<property name='gs' path='/speed/gs.kt'/>
 					<property name='tas' path='/speed/tas.kt'/>
-					<property name='mach' path='/speed/mach.kt'/>
+					<property name='mach' path='/speed/mach'/>
 					<property name='orientation-pitch' path='/orientation/pitch.deg'/>
 					<property name='orientation-roll' path='/orientation/roll.deg'/>
 					<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
@@ -33,7 +33,7 @@
 					<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
 					<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
 					<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
-					<property name='navigation-needles-visible' path='/navigation/needles-visible'/>
+					<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible'/>
 					<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
 					<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection'/>
 					<property name='dme-distance' path='/navigation/dme-distance.nm'/>

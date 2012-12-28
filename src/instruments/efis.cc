@@ -86,13 +86,13 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 	}
 
 	_efis_widget = new EFISWidget (this);
-	_efis_nav_widget = new EFISNavWidget (this);
+	_efis_hsi_widget = new EFISHSIWidget (this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_efis_widget, 80);
-	layout->addWidget (_efis_nav_widget, 50);
+	layout->addWidget (_efis_hsi_widget, 50);
 
 	QTimer* t = new QTimer (this);
 	t->setInterval (33);
@@ -253,24 +253,24 @@ EFIS::read()
 	if (_navigation_hd_needle.valid())
 		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
 
-	_efis_nav_widget->set_heading_visible (_heading_deg.valid());
+	_efis_hsi_widget->set_heading_visible (_heading_deg.valid());
 	if (_heading_deg.valid())
-		_efis_nav_widget->set_heading (*_heading_deg);
+		_efis_hsi_widget->set_heading (*_heading_deg);
 
-	_efis_nav_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
+	_efis_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
-		_efis_nav_widget->set_ap_heading (*_autopilot_heading_setting_deg);
+		_efis_hsi_widget->set_ap_heading (*_autopilot_heading_setting_deg);
 
-	_efis_nav_widget->set_track_visible (_track_deg.valid());
+	_efis_hsi_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
-		_efis_nav_widget->set_track (*_track_deg);
+		_efis_hsi_widget->set_track (*_track_deg);
 
-	_efis_nav_widget->set_ground_speed_visible (_gs_kt.valid());
+	_efis_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
-		_efis_nav_widget->set_ground_speed (*_gs_kt);
+		_efis_hsi_widget->set_ground_speed (*_gs_kt);
 
-	_efis_nav_widget->set_true_air_speed_visible (_tas_kt.valid());
+	_efis_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
 	if (_tas_kt.valid())
-		_efis_nav_widget->set_true_air_speed (*_tas_kt);
+		_efis_hsi_widget->set_true_air_speed (*_tas_kt);
 }
 

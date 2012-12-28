@@ -22,7 +22,7 @@
 #include <io/flight_gear.h>
 #include <io/joystick.h>
 #include <instruments/efis.h>
-#include <instruments/power_indicator.h>
+#include <instruments/radial_indicator.h>
 
 // Local:
 #include "module_manager.h"
@@ -49,7 +49,7 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 	}
 	else if (name == "instruments/power-indicator")
 	{
-		module = new PowerIndicator (config, parent);
+		module = new RadialIndicator (config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "io/flightgear")
