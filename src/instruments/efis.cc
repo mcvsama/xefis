@@ -127,45 +127,45 @@ EFIS::read()
 	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.valid() ? *_altitude_ladder_bold_every : 500);
 	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.valid() ? *_altitude_ladder_extent : 825);
 
-	_efis_widget->set_speed_visibility (_ias_kt.valid());
+	_efis_widget->set_speed_visible (_ias_kt.valid());
 	if (_ias_kt.valid())
 		_efis_widget->set_speed (*_ias_kt);
 
-	_efis_widget->set_minimum_speed_visibility (_minimum_ias_kt.valid());
+	_efis_widget->set_minimum_speed_visible (_minimum_ias_kt.valid());
 	if (_minimum_ias_kt.valid())
 		_efis_widget->set_minimum_speed (*_minimum_ias_kt);
 
-	_efis_widget->set_warning_speed_visibility (_warning_ias_kt.valid());
+	_efis_widget->set_warning_speed_visible (_warning_ias_kt.valid());
 	if (_warning_ias_kt.valid())
 		_efis_widget->set_warning_speed (*_warning_ias_kt);
 
-	_efis_widget->set_maximum_speed_visibility (_maximum_ias_kt.valid());
+	_efis_widget->set_maximum_speed_visible (_maximum_ias_kt.valid());
 	if (_maximum_ias_kt.valid())
 		_efis_widget->set_maximum_speed (*_maximum_ias_kt);
 
-	_efis_widget->set_speed_tendency_visibility(_ias_lookahead_kt.valid());
+	_efis_widget->set_speed_tendency_visible (_ias_lookahead_kt.valid());
 	if (_ias_lookahead_kt.valid())
 		_efis_widget->set_speed_tendency (*_ias_lookahead_kt);
 
-	_efis_widget->set_mach_visibility (_mach.valid());
+	_efis_widget->set_mach_visible (_mach.valid());
 	if (_mach.valid())
 		_efis_widget->set_mach (*_mach);
 
-	_efis_widget->set_pitch_visibility (_pitch_deg.valid());
+	_efis_widget->set_pitch_visible (_pitch_deg.valid());
 	if (_pitch_deg.valid())
 		_efis_widget->set_pitch (*_pitch_deg);
 
-	_efis_widget->set_roll_visibility (_roll_deg.valid());
+	_efis_widget->set_roll_visible (_roll_deg.valid());
 	if (_roll_deg.valid())
 		_efis_widget->set_roll (*_roll_deg);
 
 	_efis_widget->set_roll_limit (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f);
 
-	_efis_widget->set_heading_visibility (_heading_deg.valid());
+	_efis_widget->set_heading_visible (_heading_deg.valid());
 	if (_heading_deg.valid())
 		_efis_widget->set_heading (*_heading_deg);
 
-	_efis_widget->set_slip_skid_visibility (_slip_skid_g.valid());
+	_efis_widget->set_slip_skid_visible (_slip_skid_g.valid());
 	if (_slip_skid_g.valid())
 		_efis_widget->set_slip_skid (*_slip_skid_g);
 
@@ -173,100 +173,100 @@ EFIS::read()
 
 	bool fpm_visible = _fpm_visible.valid() && *_fpm_visible;
 
-	_efis_widget->set_flight_path_marker_visibility (fpm_visible && fpm_ok);
+	_efis_widget->set_flight_path_marker_visible (fpm_visible && fpm_ok);
 	if (fpm_ok)
 	{
 		_efis_widget->set_flight_path_alpha (fpm_alpha);
 		_efis_widget->set_flight_path_beta (fpm_beta);
 	}
 
-	_efis_widget->set_altitude_visibility (_altitude_ft.valid());
+	_efis_widget->set_altitude_visible (_altitude_ft.valid());
 	if (_altitude_ft.valid())
 		_efis_widget->set_altitude (*_altitude_ft);
 
-	_efis_widget->set_altitude_agl_visibility (_altitude_agl_ft.valid());
+	_efis_widget->set_altitude_agl_visible (_altitude_agl_ft.valid());
 	if (_altitude_agl_ft.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl_ft);
 
-	_efis_widget->set_landing_altitude_visibility (_landing_altitude_ft.valid());
+	_efis_widget->set_landing_altitude_visible (_landing_altitude_ft.valid());
 	if (_landing_altitude_ft.valid())
 		_efis_widget->set_landing_altitude (*_landing_altitude_ft);
 
-	_efis_widget->set_pressure_visibility (_pressure_inhg.valid());
+	_efis_widget->set_pressure_visible (_pressure_inhg.valid());
 	if (_pressure_inhg.valid())
 		_efis_widget->set_pressure (*_pressure_inhg);
 
-	_efis_widget->set_climb_rate_visibility (_cbr_fpm.valid());
+	_efis_widget->set_climb_rate_visible (_cbr_fpm.valid());
 	if (_cbr_fpm.valid())
 		_efis_widget->set_climb_rate (*_cbr_fpm);
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
 
-	_efis_widget->set_ap_altitude_visibility (autopilot_visible && _autopilot_alt_setting_ft.valid());
+	_efis_widget->set_ap_altitude_visible (autopilot_visible && _autopilot_alt_setting_ft.valid());
 	if (_autopilot_alt_setting_ft.valid())
 		_efis_widget->set_ap_altitude (*_autopilot_alt_setting_ft);
 
-	_efis_widget->set_at_speed_visibility (autopilot_visible && _autopilot_speed_setting_kt.valid());
+	_efis_widget->set_at_speed_visible (autopilot_visible && _autopilot_speed_setting_kt.valid());
 	if (_autopilot_speed_setting_kt.valid())
 		_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
 
-	_efis_widget->set_ap_climb_rate_visibility (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
+	_efis_widget->set_ap_climb_rate_visible (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
 	if (_autopilot_cbr_setting_fpm.valid())
 		_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
 
 	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
 
-	_efis_widget->set_flight_director_pitch_visibility (flight_director_visible && _flight_director_pitch_deg.valid());
+	_efis_widget->set_flight_director_pitch_visible (flight_director_visible && _flight_director_pitch_deg.valid());
 	if (_flight_director_pitch_deg.valid())
 		_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
 
-	_efis_widget->set_flight_director_roll_visibility (flight_director_visible && _flight_director_roll_deg.valid());
+	_efis_widget->set_flight_director_roll_visible (flight_director_visible && _flight_director_roll_deg.valid());
 	if (_flight_director_roll_deg.valid())
 		_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
 
 	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
 	{
 		_efis_widget->set_navigation_hint (_navigation_type_hint.valid() ? (*_navigation_type_hint).c_str() : "");
-		_efis_widget->set_navigation_needles_visibility (true);
-		_efis_widget->set_navigation_runway_visibility (_navigation_hd_needle.valid() &&
-														_altitude_agl_ft.valid() &&
-														*_altitude_agl_ft <= 150.f);
+		_efis_widget->set_navigation_needles_visible (true);
+		_efis_widget->set_navigation_runway_visible (_navigation_hd_needle.valid() &&
+													 _altitude_agl_ft.valid() &&
+													 *_altitude_agl_ft <= 150.f);
 	}
 	else
 	{
-		_efis_widget->set_navigation_needles_visibility (false);
+		_efis_widget->set_navigation_needles_visible (false);
 		_efis_widget->set_navigation_hint ("");
 	}
 
-	_efis_widget->set_dme_distance_visibility (_dme_distance_nm.valid());
+	_efis_widget->set_dme_distance_visible (_dme_distance_nm.valid());
 	if (_dme_distance_nm.valid())
 		_efis_widget->set_dme_distance (*_dme_distance_nm);
 
-	_efis_widget->set_navigation_glideslope_needle_visibility (_navigation_gs_needle.valid());
+	_efis_widget->set_navigation_glideslope_needle_visible (_navigation_gs_needle.valid());
 	if (_navigation_gs_needle.valid())
 		_efis_widget->set_navigation_glideslope_needle (*_navigation_gs_needle);
 
-	_efis_widget->set_navigation_heading_needle_visibility (_navigation_hd_needle.valid());
+	_efis_widget->set_navigation_heading_needle_visible (_navigation_hd_needle.valid());
 	if (_navigation_hd_needle.valid())
 		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
 
-	_efis_nav_widget->set_heading_visibility (_heading_deg.valid());
+	_efis_nav_widget->set_heading_visible (_heading_deg.valid());
 	if (_heading_deg.valid())
 		_efis_nav_widget->set_heading (*_heading_deg);
 
-	_efis_nav_widget->set_ap_heading_visibility (autopilot_visible && _autopilot_heading_setting_deg.valid());
+	_efis_nav_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
 		_efis_nav_widget->set_ap_heading (*_autopilot_heading_setting_deg);
 
-	_efis_nav_widget->set_track_visibility (_track_deg.valid());
+	_efis_nav_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
 		_efis_nav_widget->set_track (*_track_deg);
 
-	_efis_nav_widget->set_ground_speed_visibility (_gs_kt.valid());
+	_efis_nav_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
 		_efis_nav_widget->set_ground_speed (*_gs_kt);
 
-	_efis_nav_widget->set_true_air_speed_visibility (_tas_kt.valid());
+	_efis_nav_widget->set_true_air_speed_visible (_tas_kt.valid());
 	if (_tas_kt.valid())
 		_efis_nav_widget->set_true_air_speed (*_tas_kt);
 }
