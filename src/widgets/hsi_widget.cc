@@ -26,16 +26,16 @@
 #include <xefis/utility/text_painter.h>
 
 // Local:
-#include "efis_hsi_widget.h"
+#include "hsi_widget.h"
 
 
-EFISHSIWidget::EFISHSIWidget (QWidget* parent):
-  InstrumentWidget (parent, 0.5f, 1.f)
+HSIWidget::HSIWidget (QWidget* parent):
+	InstrumentWidget (parent, 0.5f, 1.f)
 { }
 
 
 void
-EFISHSIWidget::paintEvent (QPaintEvent* paint_event)
+HSIWidget::paintEvent (QPaintEvent* paint_event)
 {
 	float const w = width();
 	float const h = height();
@@ -64,8 +64,10 @@ EFISHSIWidget::paintEvent (QPaintEvent* paint_event)
 	float q = 0.1f * wh();
 	float r = 6.5f * q;
 	_map_clip_rect = QRectF (-1.1f * r, -1.1f * r, 2.2f * r, 1.3f * r);
+	_inside_map_clip_rect = QRectF (-0.9f * r, -0.9f * r, 1.8f * r, 0.9f * r);
 
 	paint_track (painter, text_painter, q, r);
+	paint_track_estimation (painter, text_painter, q, r);
 	paint_ap_settings (painter, text_painter, q, r);
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
@@ -77,18 +79,14 @@ EFISHSIWidget::paintEvent (QPaintEvent* paint_event)
 
 
 void
-EFISHSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
+HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	QPen pen1 = get_pen (QColor (255, 255, 255), 1.5f);
 	QPen pen2 = get_pen (QColor (255, 255, 255), 2.8f);
 
-	// White line
+	// Triangles
 	{
 		painter.save();
-
-		// Heading line:
-		painter.setPen (pen1);
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
 
 		// Big/small triangles:
 		QPolygonF aircraft = QPolygonF()
@@ -137,7 +135,7 @@ EFISHSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, flo
 
 
 void
-EFISHSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
+HSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 {
 	if (!_track_visible)
 		return;
@@ -157,7 +155,37 @@ EFISHSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 
 
 void
-EFISHSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, float q, float r)
+HSIWidget::paint_track_estimation (QPainter& painter, TextPainter&, float, float)
+{
+	QPen est_pen = QPen (Qt::white, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap);
+
+	painter.save();
+	painter.setPen (est_pen);
+	painter.setClipRect (_inside_map_clip_rect);
+
+	if (_track_estimation_visible)
+	{
+		painter.setPen (est_pen);
+		painter.setTransform (_aircraft_center_transform);
+
+		Miles const step = _track_estimation_lookahead / 50.f;
+		Degrees const degrees_per_step = step * _track_deviation;
+
+		for (float pos = 0.f; pos < _track_estimation_lookahead; pos += step)
+		{
+			float px = nm_to_px (step);
+			painter.rotate (degrees_per_step);
+			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -px));
+			painter.translate (0.f, -px);
+		}
+	}
+
+	painter.restore();
+}
+
+
+void
+HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	if (!_ap_heading_visible)
 		return;
@@ -184,7 +212,7 @@ EFISHSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 		}
 
 		QTransform transform = _aircraft_center_transform;
-		transform.rotate (bound (floored_mod (_ap_heading - _heading + 180.f, 360.f) - 180.f, -102.f, +102.f));
+		transform.rotate (bound (floored_mod (_ap_heading - _heading + 180.0, 360.0) - 180.0, -102.0, +102.0));
 		transform.translate (0.f, -r);
 
 		QPen pen_1 = _autopilot_pen_1;
@@ -231,7 +259,7 @@ EFISHSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, 
 
 
 void
-EFISHSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float q, float r)
+HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
 	if (!_heading_visible)
 		return;
@@ -263,7 +291,7 @@ EFISHSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, f
 
 
 void
-EFISHSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
+HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
 {
 	QPen pen = get_pen (QColor (255, 255, 255), 1.f);
 	QFont font_a = _font_13_bold;

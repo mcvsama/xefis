@@ -73,6 +73,10 @@ class FlightGearIO:
 	QUdpSocket*				_input = nullptr;
 	std::string				_property_path;
 	FloatVars				_float_vars;
+	double					_prev_position_lat_deg = 0.f;
+	bool					_prev_position_lat_valid = false;
+	double					_prev_position_lng_deg = 0.f;
+	bool					_prev_position_lng_valid = false;
 
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
@@ -108,6 +112,9 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_engine_n1_pct;
 	Xefis::PropertyFloat	_engine_n2_pct;
 	Xefis::PropertyFloat	_engine_egt_degc;
+	Xefis::PropertyFloat	_position_lat_deg;
+	Xefis::PropertyFloat	_position_lng_deg;
+	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 };
 
 #endif

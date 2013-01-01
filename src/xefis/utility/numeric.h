@@ -16,11 +16,17 @@
 
 // Standard:
 #include <cstddef>
+#include <complex>
 #include <cmath>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/range.h>
+#include <xefis/utility/latlng.h>
+
+
+constexpr double EARTH_MEAN_RADIUS_KM = 6367.46;
+constexpr double EARTH_MEAN_RADIUS_NM = 3438.15;
 
 
 inline constexpr float
@@ -89,6 +95,103 @@ template<class Value>
 			? bound (value, range.min(), range.max())
 			: bound (value, range.max(), range.min());
 	}
+
+
+/**
+ * Convert radians to degrees.
+ */
+template<class Value>
+	inline constexpr Value
+	rad_to_deg (Value radians)
+	{
+		return radians * (180.0 / M_PI);
+	}
+
+
+/**
+ * Convert degrees to radians.
+ */
+template<class Value>
+	inline constexpr Value
+	deg_to_rad (Value degrees)
+	{
+		return degrees * (M_PI / 180.0);
+	}
+
+
+/**
+ * Convert feet to nautical miles.
+ */
+template<class Value>
+	inline constexpr Value
+	ft_to_nm (Value value)
+	{
+		return value / 6076.11549;
+	}
+
+
+/**
+ * Compute distance between two sets of coordinates on Earth.
+ * Result is in sphere radius units.
+ */
+inline double
+haversine (LatLng const& a, LatLng const& b)
+{
+	//TODO check crossing 180.0°
+	double dlat = deg_to_rad (b.lat() - a.lat());
+	double dlng = deg_to_rad (b.lng() - a.lng());
+
+	double latsin = std::sin (dlat / 2.0);
+	double lngsin = std::sin (dlng / 2.0);
+
+	double z = latsin * latsin
+			 + lngsin * lngsin
+			 * std::cos (deg_to_rad (a.lat()))
+			 * std::cos (deg_to_rad (b.lat()));
+
+	return 2.0 * std::atan2 (std::sqrt (z), std::sqrt (1.0 - z));
+}
+
+
+/**
+ * Compute distance between two sets of coordinates on Earth.
+ * Result is in kilometers.
+ */
+inline double
+haversine_km (LatLng const& a, LatLng const& b)
+{
+	return haversine (a, b) * EARTH_MEAN_RADIUS_KM;
+}
+
+
+/**
+ * Compute distance between two sets of coordinates on Earth.
+ * Result is in nautical miles
+ */
+inline double
+haversine_nm (LatLng const& a, LatLng const& b)
+{
+	return haversine (a, b) * EARTH_MEAN_RADIUS_NM;
+}
+
+
+/**
+ * Compute angle between two great arcs on a sphere.
+ * Arcs are given by three points, the second one lies on the intersection.
+ * Result is in degrees.
+ */
+inline Degrees
+great_arcs_angle (LatLng const& a, LatLng const& common, LatLng const& b)
+{
+	LatLng z1 (a.lat() - common.lat(), a.lng() - common.lng());
+	LatLng zero (0.0, 0.0);
+	LatLng z2 (b.lat() - common.lat(), b.lng() - common.lng());
+
+	std::complex<double> x1 (z1.lng(), z1.lat());
+	std::complex<double> x2 (z2.lng(), z2.lat());
+
+	return floored_mod (rad_to_deg (std::arg (x1) - std::arg (x2)), 360.0);
+}
 
 #endif
 

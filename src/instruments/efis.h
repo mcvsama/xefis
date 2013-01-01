@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <array>
 
 // Qt:
 #include <QtGui/QWidget>
@@ -26,7 +27,8 @@
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
 #include <widgets/efis_widget.h>
-#include <widgets/efis_hsi_widget.h>
+#include <widgets/hsi_widget.h>
+#include <xefis/utility/one_pole_smoother.h>
 
 
 class EFIS: public Xefis::Instrument
@@ -46,11 +48,13 @@ class EFIS: public Xefis::Instrument
 
   private:
 	void
-	set_path (QString const& path);
+	estimate_track();
 
   private:
-	EFISWidget*				_efis_widget		= nullptr;
-	EFISHSIWidget*			_efis_hsi_widget	= nullptr;
+	EFISWidget*				_efis_widget	= nullptr;
+	HSIWidget*				_hsi_widget		= nullptr;
+	std::array<LatLng, 3>	_positions;
+	Xefis::OnePoleSmoother	_track_estimation_smoother = 60.0; // TODO make fps independent
 
 	Xefis::PropertyInteger	_speed_ladder_line_every;
 	Xefis::PropertyInteger	_speed_ladder_number_every;
@@ -96,6 +100,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
+	Xefis::PropertyFloat	_position_lat_deg;
+	Xefis::PropertyFloat	_position_lng_deg;
+	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 };
 
 #endif

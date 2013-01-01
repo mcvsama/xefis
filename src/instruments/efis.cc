@@ -80,22 +80,25 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "navigation-type-hint", _navigation_type_hint, false },
 				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
 				{ "navigation-heading-needle", _navigation_hd_needle, false },
-				{ "dme-distance", _dme_distance_nm, false }
+				{ "dme-distance", _dme_distance_nm, false },
+				{ "position-latitude", _position_lat_deg, false },
+				{ "position-longitude", _position_lng_deg, false },
+				{ "position-sea-level-radius", _position_sea_level_radius_ft, false }
 			});
 		}
 	}
 
 	_efis_widget = new EFISWidget (this);
-	_efis_hsi_widget = new EFISHSIWidget (this);
+	_hsi_widget = new HSIWidget (this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_efis_widget, 80);
-	layout->addWidget (_efis_hsi_widget, 50);
+	layout->addWidget (_hsi_widget, 50);
 
 	QTimer* t = new QTimer (this);
-	t->setInterval (33);
+	t->setInterval (20);
 	QObject::connect (t, SIGNAL (timeout()), this, SLOT (read()));
 	t->start();
 }
@@ -104,6 +107,8 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 void
 EFIS::read()
 {
+	estimate_track();
+
 	bool fpm_ok = _fpm_alpha_deg.valid() && _fpm_beta_deg.valid();
 	Degrees fpm_alpha = 0.f;
 	Degrees fpm_beta = 0.f;
@@ -253,24 +258,57 @@ EFIS::read()
 	if (_navigation_hd_needle.valid())
 		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
 
-	_efis_hsi_widget->set_heading_visible (_heading_deg.valid());
+	_hsi_widget->set_heading_visible (_heading_deg.valid());
 	if (_heading_deg.valid())
-		_efis_hsi_widget->set_heading (*_heading_deg);
+		_hsi_widget->set_heading (*_heading_deg);
 
-	_efis_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
+	_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
-		_efis_hsi_widget->set_ap_heading (*_autopilot_heading_setting_deg);
+		_hsi_widget->set_ap_heading (*_autopilot_heading_setting_deg);
 
-	_efis_hsi_widget->set_track_visible (_track_deg.valid());
+	_hsi_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
-		_efis_hsi_widget->set_track (*_track_deg);
+		_hsi_widget->set_track (*_track_deg);
 
-	_efis_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
+	_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
-		_efis_hsi_widget->set_ground_speed (*_gs_kt);
+		_hsi_widget->set_ground_speed (*_gs_kt);
 
-	_efis_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
+	_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
 	if (_tas_kt.valid())
-		_efis_hsi_widget->set_true_air_speed (*_tas_kt);
+		_hsi_widget->set_true_air_speed (*_tas_kt);
+}
+
+
+void
+EFIS::estimate_track()
+{
+	if (_position_lat_deg.is_singular() || _position_lng_deg.is_singular())
+	{
+		_hsi_widget->set_track_estimation_visible (false);
+		return;
+	}
+
+	LatLng current_position (*_position_lat_deg, *_position_lng_deg);
+
+	// Estimate only if the distance between last and current positions is > 0.02nm.
+	if (haversine_nm (_positions[0], current_position) > 0.02) // TODO _nm
+	{
+		// Shift data in _positions:
+		for (unsigned int i = _positions.size() - 1; i > 0; i--)
+			_positions[i] = _positions[i - 1];
+		_positions[0] = current_position;
+	}
+
+	double len10 = haversine_nm (_positions[1], _positions[0]);
+	Degrees alpha = -180.0 + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
+	Degrees beta_per_mile = alpha / len10;
+
+	if (!std::isinf (beta_per_mile) && !std::isnan (beta_per_mile))
+		beta_per_mile = _track_estimation_smoother.process (beta_per_mile);
+
+	_hsi_widget->set_track_estimation_visible (true);
+	_hsi_widget->set_track_estimation_lookahead (1.f);
+	_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
 }
 

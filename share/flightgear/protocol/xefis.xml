@@ -181,6 +181,25 @@
 				<format>cbr=%f</format>
 				<node>/instrumentation/vertical-speed-indicator/indicated-speed-fpm</node>
 			</chunk>
+			<!-- Position -->
+			<chunk>
+				<name>lt</name>
+				<type>string</type>
+				<format>lt=%s</format>
+				<node>/position/latitude-deg</node>
+			</chunk>
+			<chunk>
+				<name>ln</name>
+				<type>string</type>
+				<format>ln=%s</format>
+				<node>/position/longitude-deg</node>
+			</chunk>
+			<chunk>
+				<name>slr</name>
+				<type>float</type>
+				<format>slr=%f</format>
+				<node>/position/sea-level-radius-ft</node>
+			</chunk>
 			<!-- Orientation -->
 			<chunk>
 				<name>p</name>
@@ -273,11 +292,6 @@
 			<!-- EICAS -->
 
 			<!-- Sensors -->
-			<!--chunk>
-				<name>time</name>
-				<format>time=%d</format>
-				<node>/instrumentation/clock/indicated-sec</node>
-			</chunk-->
 			<!--chunk>
 				<name>static-pressure</name>
 				<type>float</type>

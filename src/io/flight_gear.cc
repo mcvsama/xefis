@@ -69,7 +69,10 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 						{ "engine-epr", _engine_epr, false },
 						{ "engine-n1", _engine_n1_pct, false },
 						{ "engine-n2", _engine_n2_pct, false },
-						{ "engine-egt", _engine_egt_degc, false }
+						{ "engine-egt", _engine_egt_degc, false },
+						{ "position-latitude", _position_lat_deg, false },
+						{ "position-longitude", _position_lng_deg, false },
+						{ "position-sea-level-radius", _position_sea_level_radius_ft, false }
 					});
 				}
 			}
@@ -112,7 +115,8 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 		{ "thr",	&_engine_throttle_pct },
 		{ "epr",	&_engine_epr },
 		{ "n1",		&_engine_n1_pct },
-		{ "n2",		&_engine_n2_pct }
+		{ "n2",		&_engine_n2_pct },
+		{ "slr",	&_position_sea_level_radius_ft }
 	};
 
 	invalidate_all();
@@ -158,23 +162,23 @@ FlightGearIO::read_input()
 
 			if (var == "iasmi")
 			{
-				if (!_minimum_ias_kt.is_singular() && value.toFloat() > 1.f)
-					_minimum_ias_kt.write (value.toFloat());
+				if (!_minimum_ias_kt.is_singular() && value.toDouble() > 1.f)
+					_minimum_ias_kt.write (value.toDouble());
 			}
 			else if (var == "iasma")
 			{
-				if (!_maximum_ias_kt.is_singular() && value.toFloat() > 1.f)
-					_maximum_ias_kt.write (value.toFloat());
+				if (!_maximum_ias_kt.is_singular() && value.toDouble() > 1.f)
+					_maximum_ias_kt.write (value.toDouble());
 			}
 			else if (var == "alr")
 			{
-				if (!_altitude_agl_ft.is_singular() && value.toFloat() < 2500.f)
-					_altitude_agl_ft.write (value.toFloat());
+				if (!_altitude_agl_ft.is_singular() && value.toDouble() < 2500.f)
+					_altitude_agl_ft.write (value.toDouble());
 			}
 			else if (var == "egt")
 			{
 				if (!_engine_egt_degc.is_singular())
-					_engine_egt_degc.write (5.f / 9.f * (value.toFloat() - 32.f));
+					_engine_egt_degc.write (5.f / 9.f * (value.toDouble() - 32.f));
 			}
 			else if (var == "nav")
 			{
@@ -184,15 +188,33 @@ FlightGearIO::read_input()
 			else if (var == "ngso")
 				navigation_gs_needle_ok = !!value.toInt();
 			else if (var == "ngs")
-				navigation_gs_needle = value.toFloat();
+				navigation_gs_needle = value.toDouble();
 			else if (var == "nhdo")
 				navigation_hd_needle_ok = !!value.toInt();
 			else if (var == "nhd")
-				navigation_hd_needle = value.toFloat();
+				navigation_hd_needle = value.toDouble();
 			else if (var == "dok")
 				navigation_dme_ok = !!value.toInt();
 			else if (var == "dme")
-				navigation_dme = value.toFloat();
+				navigation_dme = value.toDouble();
+			else if (var == "lt")
+			{
+				if (!_position_lat_deg.is_singular())
+				{
+					_prev_position_lat_valid = true;
+					_prev_position_lat_deg = *_position_lat_deg;
+					_position_lat_deg.write (value.toDouble());
+				}
+			}
+			else if (var == "ln")
+			{
+				if (!_position_lng_deg.is_singular())
+				{
+					_prev_position_lng_valid = true;
+					_prev_position_lng_deg = *_position_lng_deg;
+					_position_lng_deg.write (value.toDouble());
+				}
+			}
 			else if (!handle_float_variable (var, value))
 				std::cerr << "Unknown variable from FlightGear protocol: " << var.toStdString() << std::endl;
 		}
@@ -226,7 +248,7 @@ FlightGearIO::handle_float_variable (QString const& variable, QString const& val
 		return false;
 
 	if (!it->second->is_singular())
-		it->second->write (value.toFloat());
+		it->second->write (value.toDouble());
 	return true;
 }
 
@@ -268,7 +290,10 @@ FlightGearIO::invalidate_all()
 		&_engine_epr,
 		&_engine_n1_pct,
 		&_engine_n2_pct,
-		&_engine_egt_degc
+		&_engine_egt_degc,
+		&_position_lat_deg,
+		&_position_lng_deg,
+		&_position_sea_level_radius_ft
 	};
 
 	for (auto property: properties)
