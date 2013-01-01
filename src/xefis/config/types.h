@@ -21,7 +21,8 @@
 #include <xefis/config/all.h>
 
 
-typedef float Degrees;
+typedef double Degrees;
+typedef double Radians;
 typedef float Knots;
 typedef float KnotsPerSecond;
 typedef float Feet;

@@ -879,9 +879,9 @@ EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& ef
 	_roll (_efis._roll),
 	_heading (_efis._heading)
 {
-	float p = floored_mod (_pitch + 180.f, 360.f) - 180.f;
-	float r = floored_mod (_roll + 180.f, 360.f) - 180.f;
-	float hdg = floored_mod (_heading, 360.f);
+	float p = floored_mod (_pitch + 180.0, 360.0) - 180.0;
+	float r = floored_mod (_roll + 180.0, 360.0) - 180.0;
+	float hdg = floored_mod (_heading, 360.0);
 
 	// Mirroring, eg. -180° pitch is the same
 	// as 0° pitch with roll inverted:

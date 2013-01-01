@@ -37,6 +37,9 @@
 					<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
 					<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection'/>
 					<property name='dme-distance' path='/navigation/dme-distance.nm'/>
+					<property name='position-latitude' path='/position/latitude.deg'/>
+					<property name='position-longitude' path='/position/longitude.deg'/>
+					<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
 				</properties>
 				<properties path='/engine'>
 					<property name='engine-n1' path='/n1.pct'/>

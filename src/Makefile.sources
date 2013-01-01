@@ -72,7 +72,9 @@ SRC_SOURCES += xefis/core/property_storage.cc
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
+SRC_HEADERS += xefis/utility/latlng.h
 SRC_HEADERS += xefis/utility/numeric.h
+SRC_HEADERS += xefis/utility/one_pole_smoother.h
 SRC_HEADERS += xefis/utility/qdom.h
 SRC_HEADERS += xefis/utility/range.h
 SRC_HEADERS += xefis/utility/text_painter.h
@@ -105,11 +107,11 @@ SRC_MOCHDRS += instruments/radial_indicator.h
 ######## /widgets ########
 
 SRC_HEADERS += widgets/efis_widget.h
-SRC_HEADERS += widgets/efis_hsi_widget.h
+SRC_HEADERS += widgets/hsi_widget.h
 SRC_HEADERS += widgets/radial_indicator_widget.h
 
 SRC_SOURCES += widgets/efis_widget.cc
-SRC_SOURCES += widgets/efis_hsi_widget.cc
+SRC_SOURCES += widgets/hsi_widget.cc
 SRC_SOURCES += widgets/radial_indicator_widget.cc
 
 SRC_MOCHDRS += widgets/efis_widget.h
