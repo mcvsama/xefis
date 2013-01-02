@@ -3,6 +3,14 @@ XEFIS
 
 Qt-based EFIS and EICAS
 
+Required depenencies
+====================
+
+uuid-dev
+gcc-4.7
+boost
+qt-4
+
 C++11 compiler required
 =======================
 

@@ -85,7 +85,7 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 	QObject::connect (_timeout_timer, SIGNAL (timeout()), this, SLOT (invalidate_all()));
 
 	_input = new QUdpSocket();
-	_input->bind (QHostAddress::LocalHost, 9000, QUdpSocket::ShareAddress);
+	_input->bind (QHostAddress::Any, 9000, QUdpSocket::ShareAddress);
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 
 	_float_vars = {

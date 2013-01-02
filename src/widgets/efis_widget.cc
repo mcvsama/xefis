@@ -231,7 +231,7 @@ EFISWidget::AltitudeLadder::paint_altitude_tendency (float x)
 	_painter.translate (-1.2f * x, 0.f);
 	if (_efis._altitude_tendency < _altitude)
 		_painter.scale (1.f, -1.f);
-	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (ft_to_px (std::max (0.f, _efis._altitude_tendency)))) - 0.5f * x;
+	float length = std::min<float> (_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (std::max (0.f, _efis._altitude_tendency)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -691,7 +691,7 @@ EFISWidget::SpeedLadder::paint_speed_limits (float x)
 	float max_posy = kt_to_px (_maximum_speed);
 	float wrn_posy = kt_to_px (_warning_speed);
 	float min_posy = kt_to_px (_minimum_speed);
-	QPointF zero_point (_ladder_rect.right(), std::min (_ladder_rect.bottom() + ydif.y(), 1.0 * kt_to_px (0.f)));
+	QPointF zero_point (_ladder_rect.right(), std::min<float> (_ladder_rect.bottom() + ydif.y(), 1.f * kt_to_px (0.f)));
 
 	if (_efis._maximum_speed_visible && _maximum_speed < _max_shown)
 	{
@@ -738,7 +738,7 @@ EFISWidget::SpeedLadder::paint_speed_tendency (float x)
 	_painter.translate (1.2f * x, 0.f);
 	if (_efis._speed_tendency < _speed)
 		_painter.scale (1.f, -1.f);
-	float length = std::min (_ladder_rect.height() / 2.f, 1.0 * std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency)))) - 0.5f * x;
+	float length = std::min<float> (_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (std::max (0.f, _efis._speed_tendency)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
