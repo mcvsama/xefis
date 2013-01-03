@@ -126,6 +126,8 @@ PropertyNode::add_child (PropertyNode* child)
 	_children.push_back (child);
 	_children_by_name[child->name()] = --_children.end();
 
+	child->update_path();
+
 	return child;
 }
 
@@ -141,6 +143,8 @@ PropertyNode::remove_child (PropertyNode* child)
 
 		child->_parent = nullptr;
 	}
+
+	child->update_path();
 }
 
 
@@ -149,6 +153,15 @@ PropertyNode::clear()
 {
 	for (auto c: _children)
 		delete c;
+}
+
+
+void
+PropertyNode::update_path()
+{
+	_path = _parent
+		? _parent->path() + "/" + _name
+		: _name;
 }
 
 } // namespace Xefis

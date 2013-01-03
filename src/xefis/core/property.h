@@ -83,8 +83,18 @@ class BaseProperty
 	path() const;
 
   protected:
-	PropertyNode*	_root = nullptr;
-	std::string		_path;
+	/**
+	 * Return proper node. If cached node's path
+	 * matches this property's path, return it.
+	 * Otherwise, locate it.
+	 */
+	PropertyNode*
+	get_node() const;
+
+  protected:
+	PropertyNode*			_root = nullptr;
+	mutable PropertyNode*	_node = nullptr;
+	std::string				_path;
 };
 
 
@@ -185,7 +195,7 @@ BaseProperty::is_nil() const
 {
 	if (!_root)
 		throw Exception ("can't read a singular property");
-	PropertyNode* node = _root->locate (_path);
+	PropertyNode* node = get_node();
 	if (!node)
 		return true;
 	return node->is_nil();
@@ -197,7 +207,7 @@ BaseProperty::set_nil()
 {
 	if (!_root)
 		throw Exception ("can't write to a singular property");
-	PropertyNode* node = _root->locate (_path);
+	PropertyNode* node = get_node();
 	if (node)
 		node->set_nil();
 }
@@ -221,6 +231,20 @@ inline std::string
 BaseProperty::path() const
 {
 	return _path;
+}
+
+
+inline PropertyNode*
+BaseProperty::get_node() const
+{
+	if (!_root)
+		return nullptr;
+
+	if (_node && _node->path() == _path)
+		return _node;
+
+	// Recache:
+	return _node = _root->locate (_path);
 }
 
 
@@ -271,7 +295,7 @@ template<class T>
 	{
 		if (!_root)
 			throw Exception ("can't read a singular property");
-		PropertyNode* node = _root->locate (_path);
+		PropertyNode* node = get_node();
 		if (!node)
 			return Type();
 		return node->read<T>();
@@ -285,7 +309,7 @@ template<class T>
 	{
 		if (!_root)
 			throw Exception ("can't read a singular property");
-		PropertyNode* node = _root->locate (_path);
+		PropertyNode* node = get_node();
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");
 		return node->read<T>();
@@ -307,7 +331,7 @@ template<class T>
 	{
 		if (!_root)
 			throw Exception ("can't write to a singular property");
-		PropertyNode* node = _root->locate (_path);
+		PropertyNode* node = get_node();
 		if (!node)
 		{
 			std::string::size_type s = _path.find_last_of ('/');
@@ -330,7 +354,7 @@ template<class T>
 	{
 		if (!_root)
 			throw Exception ("can't write to a singular property");
-		PropertyNode* node = _root->locate (_path);
+		PropertyNode* node = get_node();
 		if (!node)
 			throw PropertyNotFound ("could not find property by path");
 		node->write<Type> (value);
