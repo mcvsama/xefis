@@ -98,7 +98,7 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 	layout->addWidget (_hsi_widget, 50);
 
 	QTimer* t = new QTimer (this);
-	t->setInterval (20);
+	t->setInterval (50);
 	QObject::connect (t, SIGNAL (timeout()), this, SLOT (read()));
 	t->start();
 }

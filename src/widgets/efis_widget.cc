@@ -29,10 +29,10 @@
 #include "efis_widget.h"
 
 
-EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter):
+EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter, TextPainter& text_painter):
 	_efis (efis),
 	_painter (painter),
-	_text_painter (_painter, &_efis._text_painter_cache),
+	_text_painter (text_painter),
 	_altitude (bound (_efis._altitude, -9999.f, +99999.f)),
 	_climb_rate (bound (_efis._climb_rate, -9999.f, +9999.f)),
 	_pressure (bound (_efis._pressure, 0.f, 99.99f)),
@@ -506,10 +506,10 @@ EFISWidget::AltitudeLadder::scale_cbr (FeetPerMinute climb_rate) const
 }
 
 
-EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter):
+EFISWidget::SpeedLadder::SpeedLadder (EFISWidget& efis, QPainter& painter, TextPainter& text_painter):
 	_efis (efis),
 	_painter (painter),
-	_text_painter (_painter, &_efis._text_painter_cache),
+	_text_painter (text_painter),
 	_speed (bound (_efis._speed, 0.f, 9999.99f)),
 	_mach (bound (_efis._mach, 0.f, 9.99f)),
 	_minimum_speed (bound (_efis._minimum_speed, 0.f, 9999.99f)),
@@ -871,10 +871,10 @@ EFISWidget::SpeedLadder::paint_ap_setting (float)
 }
 
 
-EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& efis, QPainter& painter):
+EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& efis, QPainter& painter, TextPainter& text_painter):
 	_efis (efis),
 	_painter (painter),
-	_text_painter (_painter, &_efis._text_painter_cache),
+	_text_painter (text_painter),
 	_pitch (_efis._pitch),
 	_roll (_efis._roll),
 	_heading (_efis._heading)
@@ -1283,7 +1283,7 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 	else
 	{
 		painter.save();
-		AttitudeDirectorIndicator adi (*this, painter);
+		AttitudeDirectorIndicator adi (*this, painter, text_painter);
 		adi.paint();
 		painter.restore();
 
@@ -1293,13 +1293,13 @@ EFISWidget::paintEvent (QPaintEvent* paint_event)
 		paint_nav (painter, text_painter);
 
 		painter.save();
-		SpeedLadder sl (*this, painter);
+		SpeedLadder sl (*this, painter, text_painter);
 		painter.translate (-0.4f * wh(), 0.f);
 		sl.paint();
 		painter.restore();
 
 		painter.save();
-		AltitudeLadder al (*this, painter);
+		AltitudeLadder al (*this, painter, text_painter);
 		painter.translate (+0.4f * wh(), 0.f);
 		al.paint();
 		painter.restore();

@@ -40,7 +40,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	class AltitudeLadder
 	{
 	  public:
-		AltitudeLadder (EFISWidget&, QPainter&);
+		AltitudeLadder (EFISWidget&, QPainter&, TextPainter&);
 
 		void
 		paint();
@@ -76,7 +76,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	  private:
 		EFISWidget&		_efis;
 		QPainter&		_painter;
-		TextPainter		_text_painter;
+		TextPainter&	_text_painter;
 		Feet			_altitude;
 		FeetPerMinute	_climb_rate;
 		float			_pressure;
@@ -99,7 +99,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	class SpeedLadder
 	{
 	  public:
-		SpeedLadder (EFISWidget&, QPainter&);
+		SpeedLadder (EFISWidget&, QPainter&, TextPainter&);
 
 		void
 		paint();
@@ -130,30 +130,30 @@ class EFISWidget: public Xefis::InstrumentWidget
 		kt_to_px (Knots ft) const;
 
 	  private:
-		EFISWidget&	_efis;
-		QPainter&	_painter;
-		TextPainter	_text_painter;
-		Knots		_speed;
-		float		_mach;
-		Knots		_minimum_speed;
-		Knots		_warning_speed;
-		Knots		_maximum_speed;
-		Knots		_extent;
-		Knots		_min_shown;
-		Knots		_max_shown;
-		int			_rounded_speed;
-		QRectF		_ladder_rect;
-		QPen		_ladder_pen;
-		QRectF		_black_box_rect;
-		QPen		_black_box_pen;
-		QPen		_scale_pen;
-		QPen		_speed_bug_pen;
+		EFISWidget&		_efis;
+		QPainter&		_painter;
+		TextPainter&	_text_painter;
+		Knots			_speed;
+		float			_mach;
+		Knots			_minimum_speed;
+		Knots			_warning_speed;
+		Knots			_maximum_speed;
+		Knots			_extent;
+		Knots			_min_shown;
+		Knots			_max_shown;
+		int				_rounded_speed;
+		QRectF			_ladder_rect;
+		QPen			_ladder_pen;
+		QRectF			_black_box_rect;
+		QPen			_black_box_pen;
+		QPen			_scale_pen;
+		QPen			_speed_bug_pen;
 	};
 
 	class AttitudeDirectorIndicator
 	{
 	  public:
-		AttitudeDirectorIndicator (EFISWidget&, QPainter&);
+		AttitudeDirectorIndicator (EFISWidget&, QPainter&, TextPainter&);
 
 		void
 		paint();
@@ -180,7 +180,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	  private:
 		EFISWidget&		_efis;
 		QPainter&		_painter;
-		TextPainter		_text_painter;
+		TextPainter&	_text_painter;
 		Degrees			_pitch;
 		Degrees			_roll;
 		Degrees			_heading;
