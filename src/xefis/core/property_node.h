@@ -144,6 +144,12 @@ class PropertyNode
 	name() const;
 
 	/**
+	 * Return node path.
+	 */
+	std::string
+	path() const;
+
+	/**
 	 * Return node type.
 	 */
 	PropertyType
@@ -172,6 +178,7 @@ class PropertyNode
 
 	/**
 	 * Return parent node.
+	 * Root node has no parent.
 	 */
 	PropertyNode*
 	parent() const;
@@ -250,10 +257,17 @@ class PropertyNode
 		void
 		write_convertible (tType);
 
+	/**
+	 * Update self-cached location.
+	 */
+	void
+	update_path();
+
   private:
 	PropertyNode*		_parent = nullptr;
 	PropertyType		_type;
 	std::string			_name;
+	std::string			_path;
 	union {
 		bool			_value_bool;
 		int				_value_int;
@@ -282,7 +296,9 @@ inline
 PropertyNode::PropertyNode (std::string const& name):
 	_type (PropDirectory),
 	_name (name)
-{ }
+{
+	update_path();
+}
 
 
 inline
@@ -290,7 +306,9 @@ PropertyNode::PropertyNode (std::string const& name, bool value):
 	_type (PropBoolean),
 	_name (name),
 	_value_bool (value)
-{ }
+{
+	update_path();
+}
 
 
 inline
@@ -298,7 +316,9 @@ PropertyNode::PropertyNode (std::string const& name, int value):
 	_type (PropInteger),
 	_name (name),
 	_value_int (value)
-{ }
+{
+	update_path();
+}
 
 
 inline
@@ -306,7 +326,9 @@ PropertyNode::PropertyNode (std::string const& name, double value):
 	_type (PropFloat),
 	_name (name),
 	_value_double (value)
-{ }
+{
+	update_path();
+}
 
 
 inline
@@ -314,7 +336,9 @@ PropertyNode::PropertyNode (std::string const& name, const char* value):
 	_type (PropString),
 	_name (name),
 	_value_string (value)
-{ }
+{
+	update_path();
+}
 
 
 inline
@@ -322,7 +346,9 @@ PropertyNode::PropertyNode (std::string const& name, std::string const& value):
 	_type (PropString),
 	_name (name),
 	_value_string (value)
-{ }
+{
+	update_path();
+}
 
 
 template<>
@@ -332,7 +358,9 @@ template<>
 		_name (name),
 		_value_bool(),
 		_is_nil (true)
-	{ }
+	{
+		update_path();
+	}
 
 
 template<>
@@ -342,7 +370,9 @@ template<>
 		_name (name),
 		_value_int(),
 		_is_nil (true)
-	{ }
+	{
+		update_path();
+	}
 
 
 template<>
@@ -352,7 +382,9 @@ template<>
 		_name (name),
 		_value_double(),
 		_is_nil (true)
-	{ }
+	{
+		update_path();
+	}
 
 
 template<>
@@ -362,7 +394,9 @@ template<>
 		_name (name),
 		_value_string(),
 		_is_nil (true)
-	{ }
+	{
+		update_path();
+	}
 
 
 inline
@@ -397,6 +431,13 @@ inline std::string
 PropertyNode::name() const
 {
 	return _name;
+}
+
+
+inline std::string
+PropertyNode::path() const
+{
+	return _path;
 }
 
 
