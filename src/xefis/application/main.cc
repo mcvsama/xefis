@@ -31,7 +31,6 @@
 #include <xefis/core/module_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/utility/backtrace.h>
-#include <xefis/components/property_tree/property_storage_widget.h>
 
 // Local:
 #include "fail.h"
@@ -77,9 +76,6 @@ int main (int argc, char** argv, char**)
 			Xefis::Services::initialize();
 			// Init Xefis modules:
 			Xefis::PropertyStorage::initialize();
-
-			Xefis::PropertyStorageWidget* property_storage_widget = new Xefis::PropertyStorageWidget (Xefis::PropertyStorage::root(), nullptr);
-			property_storage_widget->show();
 
 			Xefis::ModuleManager* module_manager = new Xefis::ModuleManager();
 			Xefis::ConfigReader config_reader (module_manager);

@@ -23,6 +23,7 @@
 #include <io/joystick.h>
 #include <instruments/efis.h>
 #include <instruments/radial_indicator.h>
+#include <generic/property_tree.h>
 
 // Local:
 #include "module_manager.h"
@@ -50,6 +51,11 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 	else if (name == "instruments/power-indicator")
 	{
 		module = new RadialIndicator (config, parent);
+		_modules.insert (module);
+	}
+	else if (name == "generic/property-tree")
+	{
+		module = new PropertyTree (config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "io/flightgear")

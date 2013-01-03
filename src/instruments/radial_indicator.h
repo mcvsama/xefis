@@ -44,10 +44,6 @@ class RadialIndicator: public Xefis::Instrument
 	read();
 
   private:
-	void
-	set_path (QString const& path);
-
-  private:
 	RadialIndicatorWidget*	_widget = nullptr;
 	std::string				_property_path;
 
