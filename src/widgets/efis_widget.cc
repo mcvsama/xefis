@@ -335,9 +335,6 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 void
 EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 {
-	if (!_efis._climb_rate_visible)
-		return;
-
 	QPen bold_white_pen = _efis.get_pen (QColor (255, 255, 255), 1.25f);
 	QPen thin_white_pen = _efis.get_pen (QColor (255, 255, 255), 0.50f);
 
@@ -360,6 +357,12 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 		<< QPointF (-x, +1.9f * y + x)
 		<< QPointF (-x, +0.6 * y + x)
 		<< QPointF (0.0f, +0.6 * y));
+
+	if (!_efis._climb_rate_visible)
+	{
+		_painter.restore();
+		return;
+	}
 
 	float const line_w = 0.2f * x;
 
@@ -1021,9 +1024,6 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 void
 EFISWidget::AttitudeDirectorIndicator::paint_roll()
 {
-	if (!_efis._roll_visible)
-		return;
-
 	float const w = _efis.wh() * 3.f / 9.f;
 	bool const bank_angle_warning = _efis._roll_limit > 0.f && std::abs (_efis._roll) > _efis._roll_limit;
 	bool const slip_skid_warning = _efis._slip_skid_limit > 0.f && std::abs (_efis._slip_skid) > _efis._slip_skid_limit;
@@ -1062,6 +1062,12 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 				length *= 2.2f;
 			_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
 		}
+	}
+
+	if (!_efis._roll_visible)
+	{
+		_painter.restore();
+		return;
 	}
 
 	float const bold_width = _efis.pen_width (3.f);
