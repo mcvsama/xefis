@@ -1,4 +1,8 @@
 #!/bin/sh
 
-make -C src && src/.build/$(uname -m)/xefis.run "$@"
+TARGET="$DIST"
+if [ "$TARGET" = "" ]; then
+	TARGET="$(uname -m)"
+fi
+make -C src && src/.build/"$TARGET"/xefis.run "$@"
 

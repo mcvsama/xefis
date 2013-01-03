@@ -93,6 +93,12 @@ SRC_SOURCES += io/joystick.cc
 SRC_MOCHDRS += io/flight_gear.h
 SRC_MOCHDRS += io/joystick.h
 
+######## /generic ########
+
+SRC_HEADERS += generic/property_tree.h
+
+SRC_SOURCES += generic/property_tree.cc
+
 ######## /instruments ########
 
 SRC_HEADERS += instruments/efis.h
