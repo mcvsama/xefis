@@ -291,8 +291,15 @@ EFIS::estimate_track()
 
 	LatLng current_position (*_position_lat_deg, *_position_lng_deg);
 
+	if (!_positions_valid)
+	{
+		std::fill (_positions.begin(), _positions.end(), current_position);
+		_positions_valid = true;
+	}
+
 	// Estimate only if the distance between last and current positions is > 0.02nm.
-	if (haversine_nm (_positions[0], current_position) > 0.02) // TODO _nm
+	Miles epsilon = 0.02; // TODO _nm
+	if (haversine_nm (_positions[0], current_position) > epsilon)
 	{
 		// Shift data in _positions:
 		for (unsigned int i = _positions.size() - 1; i > 0; i--)
@@ -305,10 +312,15 @@ EFIS::estimate_track()
 	Degrees beta_per_mile = alpha / len10;
 
 	if (!std::isinf (beta_per_mile) && !std::isnan (beta_per_mile))
-		beta_per_mile = _track_estimation_smoother.process (beta_per_mile);
+	{
+		bool visible = haversine_nm (_positions[2], _positions[0]) > 2.f * epsilon;
+		if (visible)
+			beta_per_mile = _track_estimation_smoother.process (beta_per_mile);
 
-	_hsi_widget->set_track_estimation_visible (true);
-	_hsi_widget->set_track_estimation_lookahead (1.f);
-	_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
+		_hsi_widget->set_range (5.f);
+		_hsi_widget->set_track_estimation_visible (visible);
+		_hsi_widget->set_track_estimation_lookahead (2.f);
+		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
+	}
 }
 

@@ -51,10 +51,11 @@ class EFIS: public Xefis::Instrument
 	estimate_track();
 
   private:
-	EFISWidget*				_efis_widget	= nullptr;
-	HSIWidget*				_hsi_widget		= nullptr;
+	EFISWidget*				_efis_widget				= nullptr;
+	HSIWidget*				_hsi_widget					= nullptr;
 	std::array<LatLng, 3>	_positions;
-	Xefis::OnePoleSmoother	_track_estimation_smoother = 60.0; // TODO make fps independent
+	bool					_positions_valid			= false;
+	Xefis::OnePoleSmoother	_track_estimation_smoother	= 60.0; // TODO make fps independent
 
 	Xefis::PropertyInteger	_speed_ladder_line_every;
 	Xefis::PropertyInteger	_speed_ladder_number_every;
