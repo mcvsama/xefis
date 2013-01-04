@@ -17,8 +17,8 @@
 #include <set>
 
 // Qt:
-#include <QtGui/QTreeWidget>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QHeaderView>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -36,9 +36,10 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 	QTreeWidget (parent),
 	_root_node (root_node)
 {
-	header()->setClickable (true);
-	header()->setResizeMode (QHeaderView::Interactive);
-	header()->setMinimumSectionSize (12.f * Services::default_font_size());
+	header()->setSectionsClickable (true);
+	header()->setSectionResizeMode (0, QHeaderView::Interactive);
+	header()->setSectionResizeMode (1, QHeaderView::Interactive);
+	header()->setMinimumSectionSize (12.f * Services::default_font_size (physicalDpiY()));
 	sortByColumn (0, Qt::AscendingOrder);
 	setSortingEnabled (true);
 	setSelectionMode (QTreeWidget::SingleSelection);
@@ -136,7 +137,7 @@ PropertyTreeWidget::convert_item (QTreeWidgetItem* item)
 void
 PropertyTreeWidget::setup_appereance()
 {
-	header()->resizeSection (0, 20.f * Services::default_font_size());
+	header()->resizeSection (0, 20.f * Services::default_font_size (physicalDpiY()));
 }
 
 } // namespace Xefis

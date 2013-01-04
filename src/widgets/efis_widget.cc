@@ -421,11 +421,11 @@ EFISWidget::AltitudeLadder::paint_pressure (float x)
 	QString in_str = "IN";
 	QString pressure_str = QString ("%1").arg (_pressure, 0, 'f', 2) + " ";
 
-	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetrics (font_a).width (pressure_str), 1.2f * _efis._font_16_digit_height);
-	QRectF zz_rect (0.f, nn_rect.top(), QFontMetrics (font_b).width (in_str), nn_rect.height());
+	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetricsF (font_a).width (pressure_str), 1.2f * _efis._font_16_digit_height);
+	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (in_str), nn_rect.height());
 	nn_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
 	// Correct position of zz_rect to get correct baseline position:
-	zz_rect.translate (0.f, QFontMetrics (font_b).descent() - QFontMetrics (font_a).descent());
+	zz_rect.translate (0.f, QFontMetricsF (font_b).descent() - QFontMetricsF (font_a).descent());
 	zz_rect.moveLeft (nn_rect.right());
 
 	_painter.setPen (QPen (_efis._navigation_color, _efis.pen_width()));
@@ -824,11 +824,11 @@ EFISWidget::SpeedLadder::paint_mach_number (float x)
 	QString m_str = "M";
 	QString mach_str = " " + QString ("%1").arg (_mach, 0, 'f', 3);
 
-	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetrics (font_a).width (mach_str), 1.2f * _efis._font_16_digit_height);
-	QRectF zz_rect (0.f, nn_rect.top(), QFontMetrics (font_b).width (m_str), nn_rect.height());
+	QRectF nn_rect (0.f, _ladder_rect.bottom(), QFontMetricsF (font_a).width (mach_str), 1.2f * _efis._font_16_digit_height);
+	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (m_str), nn_rect.height());
 	zz_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
 	// Correct position of zz_rect to get correct baseline position:
-	zz_rect.translate (0.f, QFontMetrics (font_b).descent() - QFontMetrics (font_a).descent());
+	zz_rect.translate (0.f, QFontMetricsF (font_b).descent() - QFontMetricsF (font_a).descent());
 	nn_rect.moveLeft (zz_rect.right());
 
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
@@ -1425,7 +1425,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		QString dme_val = QString ("DME %1").arg (_dme_distance, 0, 'f', 1);
 		QFont font = _font_10_bold;
 		font.setBold (false);
-		QFontMetrics font_metrics (font);
+		QFontMetricsF font_metrics (font);
 		QRectF rect (-0.24f * wh(), -0.36f * wh(), font_metrics.width (dme_val), font_metrics.height());
 		painter.save();
 		painter.setPen (QColor (255, 255, 255));
@@ -1438,7 +1438,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	{
 		QFont font = _font_16_bold;
 		font.setBold (false);
-		QFontMetrics font_metrics (font);
+		QFontMetricsF font_metrics (font);
 		QRectF rect (-0.24f * wh(), -0.32f * wh(), font_metrics.width (_navigation_hint), font_metrics.height());
 		painter.save();
 		painter.setPen (QColor (255, 255, 255));
@@ -1556,7 +1556,7 @@ EFISWidget::paint_input_alert (QPainter& painter)
 
 	QString alert = "NO INPUT";
 
-	QFontMetrics font_metrics (font);
+	QFontMetricsF font_metrics (font);
 	int width = font_metrics.width (alert);
 
 	QPen pen = get_pen (QColor (255, 255, 255), 2.f);
@@ -1583,7 +1583,7 @@ EFISWidget::paint_input_alert (QPainter& painter)
 void
 EFISWidget::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target)
 {
-	QFontMetrics metrics = painter.font();
+	QFontMetricsF metrics (painter.font());
 	float w = 0.7f * metrics.width ("0");
 	float h = 0.65f * metrics.height();
 	QPointF center = target.center();
@@ -1612,7 +1612,7 @@ EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 	QColor green (0, 255, 0);
 
 	QFont font = painter.font();
-	QFontMetrics font_metrics = font;
+	QFontMetricsF font_metrics (font);
 	float height = height_scale * font_metrics.height();
 
 	QRectF box_next = rect.translated (0.f, -height);

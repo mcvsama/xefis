@@ -18,7 +18,7 @@
 #include <cstddef>
 
 // Qt:
-#include <QtGui/QTreeWidget>
+#include <QtWidgets/QTreeWidget>
 
 // Xefis:
 #include <xefis/config/all.h>

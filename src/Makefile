@@ -5,13 +5,13 @@ PKGCONFIG_LIBS	=
 PKGCONFIG_FLAGS	=
 CXX				= g++
 DEPCC			= $(CXX)
-CXXFLAGS		= -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -fstrict-aliasing -Wstrict-aliasing=3 -Wnoexcept -fnothrow-opt $(PKGCONFIG_FLAGS)
+CXXFLAGS		= -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt $(PKGCONFIG_FLAGS)
 SO				= g++ -shared
 SOFLAGS			=
 LD				= g++
 LDFLAGS			= $(foreach lib, $(LIBS), -l$(lib)) $(PKGCONFIG_LIBS)
 AR				= ar
-MOC				= $(QT_PREFIX)/bin/moc
+MOC				= $(QT_PREFIX)/bin/moc-qt5
 
 .PHONY: first all dep help dist clean depclean distclean release releases
 .DEFAULT: all
