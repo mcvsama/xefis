@@ -24,7 +24,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QEvent>
 #include <QtGui/QApplication>
-#include <QtGui/QX11Info>
 #include <QtGui/QFont>
 
 // Xefis:

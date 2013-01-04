@@ -823,6 +823,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	void
 	paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target);
 
+	QPainterPath
+	rect_to_path (QRectF const& rect);
+
 	/**
 	 * Render 'rotatable' value on speed/altitude black box.
 	 *
