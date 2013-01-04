@@ -88,7 +88,7 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 
 	int const b_digits = 2;
 	int const s_digits = 3;
-	float const margin = 0.2f * b_digit_width;
+	float const margin = 0.25f * b_digit_width;
 
 	QRectF b_digits_box (0.f, 0.f, b_digits * b_digit_width, 2.f * b_digit_height - 2.f * margin);
 	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width, 2.f * b_digit_height - 2.f * margin);
@@ -235,7 +235,7 @@ EFISWidget::AltitudeLadder::paint_altitude_tendency (float x)
 
 	if (length > 0.2f * x)
 	{
-		_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
+		_painter.setClipPath (_efis.rect_to_path (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f))));
 		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
 		_painter.translate (0.f, -length);
 		_painter.drawPolygon (QPolygonF()
@@ -265,7 +265,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 				float posy = ft_to_px (bug.second);
 				QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
 								  +2.f * x, altitude_bug_digit_height);
-				_painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
+				_painter.setClipPath (_efis.rect_to_path (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f)));
 
 				_painter.setPen (_altitude_bug_pen);
 				_painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
@@ -281,7 +281,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 			float posy = ft_to_px (_efis._landing_altitude);
 			QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
 							  +2.f * x, altitude_bug_digit_height);
-			_painter.setClipRect (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
+			_painter.setClipPath (_efis.rect_to_path (_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f)));
 
 			_painter.setPen (_ldg_alt_pen);
 			_painter.drawLine (QPointF (-0.5f * x, posy), QPointF (-2.25f * x, posy));
@@ -303,7 +303,7 @@ EFISWidget::AltitudeLadder::paint_bugs (float x)
 				<< QPointF (+1.3f * x, _black_box_rect.bottom())
 				<< QPointF (-0.5f * x, _black_box_rect.bottom())
 				<< QPointF (-0.5f * x, +0.5f * x);
-			_painter.setClipRect (_ladder_rect.translated (-x, 0.f));
+			_painter.setClipPath (_efis.rect_to_path (_ladder_rect.translated (-x, 0.f)));
 			_painter.translate (-2.f * x, posy);
 			_painter.setBrush (Qt::NoBrush);
 			_painter.setPen (_efis._autopilot_pen_1);
@@ -382,7 +382,7 @@ EFISWidget::AltitudeLadder::paint_climb_rate (float x)
 		float posy = -2.f * y * scale_cbr (kfpm * 1000.f);
 		_painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
-	_painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
+	_painter.setClipPath (_efis.rect_to_path (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x)));
 	QPen indicator_pen = bold_white_pen;
 	indicator_pen.setCapStyle (Qt::FlatCap);
 	_painter.setPen (indicator_pen);
@@ -564,7 +564,7 @@ EFISWidget::SpeedLadder::paint_black_box (float x, bool only_compute_black_box_r
 	int digits = 3;
 	if (_speed >= 1000.0f - 0.5f)
 		digits = 4;
-	float const margin = 0.2f * digit_width;
+	float const margin = 0.25f * digit_width;
 
 	_black_box_rect = QRectF (-digits * digit_width - 2.f * margin, -digit_height,
 							  +digits * digit_width + 2.f * margin, 2.f * digit_height);
@@ -689,7 +689,7 @@ EFISWidget::SpeedLadder::paint_speed_limits (float x)
 
 	_painter.save();
 	_painter.translate (tr_right, 0.f);
-	_painter.setClipRect (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
+	_painter.setClipPath (_efis.rect_to_path (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y())));
 
 	float max_posy = kt_to_px (_maximum_speed);
 	float wrn_posy = kt_to_px (_warning_speed);
@@ -745,7 +745,7 @@ EFISWidget::SpeedLadder::paint_speed_tendency (float x)
 
 	if (length > 0.2f * x)
 	{
-		_painter.setClipRect (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f)));
+		_painter.setClipPath (_efis.rect_to_path (QRectF (_ladder_rect.topLeft(), QPointF (_ladder_rect.right(), 0.f))));
 		_painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
 		_painter.translate (0.f, -length);
 		_painter.drawPolygon (QPolygonF()
@@ -776,7 +776,7 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 		{
 			float posy = kt_to_px (bug.second);
 			_painter.setPen (_speed_bug_pen);
-			_painter.setClipRect (_ladder_rect.translated (x, 0.f));
+			_painter.setClipPath (_efis.rect_to_path (_ladder_rect.translated (x, 0.f)));
 			_painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
 			_painter.setClipping (false);
 			_text_painter.drawText (QRectF (2.5f * x, posy - 0.5f * speed_bug_digit_height,
@@ -796,7 +796,7 @@ EFISWidget::SpeedLadder::paint_bugs (float x)
 			<< QPointF (2.f * x, -0.5f * x)
 			<< QPointF (2.f * x, +0.5f * x)
 			<< QPointF (+0.5f * x, +0.5f * x);
-		_painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
+		_painter.setClipPath (_efis.rect_to_path (_ladder_rect.translated (2.5f * x, 0.f)));
 		_painter.translate (1.25f * x, posy);
 		_painter.setBrush (Qt::NoBrush);
 		_painter.setPen (_efis._autopilot_pen_1);
@@ -971,7 +971,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	// Clip rectangle before and after rotation:
 	_painter.setClipPath (get_pitch_scale_clipping_path() - _flight_path_marker);
 	_painter.setTransform (_roll_transform * _efis._center_transform);
-	_painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
+	_painter.setClipPath (_efis.rect_to_path (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w)), Qt::IntersectClip);
 	_painter.setTransform (_horizon_transform * _efis._center_transform);
 	_painter.setFont (_efis._font_10_bold);
 
@@ -1038,7 +1038,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 	warning_pen.setColor (_efis._warning_color_2);
 
 	_painter.setTransform (_efis._center_transform);
-	_painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
+	_painter.setClipPath (_efis.rect_to_path (QRectF (-w, -w, 2.f * w, 2.25f * w)));
 	for (float deg: { -60.f, -45.f, -30.f, -20.f, -10.f, 0.f, +10.f, +20.f, +30.f, +45.f, +60.f })
 	{
 		_painter.setTransform (_efis._center_transform);
@@ -1139,7 +1139,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 	_painter.setTransform (_efis._center_transform);
 	_painter.setClipPath (get_pitch_scale_clipping_path());
 	_painter.setTransform (_roll_transform * _efis._center_transform);
-	_painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
+	_painter.setClipPath (_efis.rect_to_path (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w)), Qt::IntersectClip);
 	_painter.setTransform (_horizon_transform * _efis._center_transform);
 	_painter.setFont (_efis._font_10_bold);
 
@@ -1211,7 +1211,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_flight_path_marker()
 		_painter.drawLine (QPointF (0.f, -x), QPointF (0.f, -2.f * x));
 	};
 
-	_painter.setClipRect (QRectF (-0.325f * _efis.wh(), -0.4f * _efis.wh(), 0.65f * _efis.wh(), 0.8f * _efis.wh()));
+	_painter.setClipPath (_efis.rect_to_path (QRectF (-0.325f * _efis.wh(), -0.4f * _efis.wh(), 0.65f * _efis.wh(), 0.8f * _efis.wh())));
 	_painter.translate (marker_position);
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.25f));
 	draw_marker();
@@ -1527,7 +1527,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			point += QPointF (2.5f * p * w * offset, 0);
 
 		QRectF clip (-2.5f * w, -0.2f * h, 5.f * w, 1.4f * h);
-		painter.setClipRect (clip);
+		painter.setClipPath (rect_to_path (clip));
 
 		QPolygonF runway = QPolygonF() << tps[0] << tps[2] << bps[2] << bps[0];
 
@@ -1603,6 +1603,15 @@ EFISWidget::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF co
 }
 
 
+QPainterPath
+EFISWidget::rect_to_path (QRectF const& rect)
+{
+	QPainterPath path;
+	path.addRect (rect);
+	return path;
+}
+
+
 void
 EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 								  QRectF const& rect, float position, float height_scale,
@@ -1619,7 +1628,7 @@ EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 	QRectF box_prev = rect.translated (0.f, +height);
 
 	painter.save();
-	painter.setClipRect (rect);
+	painter.setClipPath (rect_to_path (rect));
 	painter.translate (0.f, -height * position);
 
 	for (std::pair<QRectF, QString> x: { std::make_pair (box_next, next),
