@@ -18,7 +18,7 @@
 #include <cstddef>
 
 // Qt:
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtXml/QDomElement>
 
 // Xefis:

@@ -71,7 +71,7 @@ int main (int argc, char** argv, char**)
 			QApplication* app = new QApplication (argc, argv);
 			// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
 			// Also encode std::strings and const chars* in UTF-8:
-			QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF-8"));
+			QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 			// Init services:
 			Xefis::Services::initialize();
 			// Init Xefis modules:

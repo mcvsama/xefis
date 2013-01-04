@@ -2,8 +2,8 @@
 
 -include Makefile.conf
 
-PKGCONFIG_LIBS	+= $(shell pkg-config --libs QtCore QtGui QtNetwork QtXml)
-PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags QtCore QtGui QtNetwork QtXml)
+PKGCONFIG_LIBS	+= $(shell pkg-config --libs Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets)
+PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets)
 
 ifeq ($(PROFILING), 1)
 	PROFILING_CXXFLAGS = -pg -fno-omit-frame-pointer
@@ -11,8 +11,8 @@ ifeq ($(PROFILING), 1)
 endif
 
 LDFLAGS			+= -rdynamic $(LDFLAGS_$(DIST)) $(PROFILING_LDFLAGS)
-LIBS			+= m dl pthread uuid boost_system
-CXXFLAGS		+= -pthread -rdynamic -I. -Wall -DQT_NO_DEBUG $(CXXFLAGS_$(DIST)) $(PROFILING_CXXFLAGS) $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
+LIBS			+= m dl pthread uuid boost_system GL
+CXXFLAGS		+= -fPIE -DQT_NO_DEBUG -pthread -rdynamic -I. -Wall -DQT_NO_DEBUG $(CXXFLAGS_$(DIST)) $(PROFILING_CXXFLAGS) $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
 CXXFLAGS_s		:= $(CXXFLAGS)
 CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"'
 

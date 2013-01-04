@@ -122,20 +122,20 @@ class Services
 	 * screen DPI reported by the Qt.
 	 */
 	static float
-	x_pixels_per_point();
+	x_pixels_per_point (float x_dpi);
 
 	/**
 	 * Return number of pixels per point on the screen. Takes into account
 	 * screen DPI reported by the Qt.
 	 */
 	static float
-	y_pixels_per_point();
+	y_pixels_per_point (float y_dpi);
 
 	/**
 	 * Return default font size in pixels.
 	 */
 	static float
-	default_font_size();
+	default_font_size (float y_dpi);
 
 	/**
 	 * Return font used for rendering instruments.
@@ -174,24 +174,24 @@ Services::CallOutEvent::call_out()
 
 
 inline float
-Services::x_pixels_per_point()
+Services::x_pixels_per_point (float dpi)
 {
-	return QX11Info::appDpiX() / 72.0f;
+	return dpi / 72.0f;
 }
 
 
 inline float
-Services::y_pixels_per_point()
+Services::y_pixels_per_point (float dpi)
 {
-	return QX11Info::appDpiY() / 72.0f;
+	return dpi / 72.0f;
 }
 
 
 inline float
-Services::default_font_size()
+Services::default_font_size (float y_dpi)
 {
 	QFont font = QApplication::font();
-	return font.pointSize() * y_pixels_per_point();
+	return font.pointSize() * y_pixels_per_point (y_dpi);
 }
 
 

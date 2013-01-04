@@ -18,8 +18,8 @@
 #include <cstddef>
 
 // Qt:
-#include <QtGui/QWidget>
 #include <QtGui/QPaintEvent>
+#include <QtWidgets/QWidget>
 
 // Xefis:
 #include <xefis/config/all.h>

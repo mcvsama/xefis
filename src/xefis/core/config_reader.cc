@@ -22,10 +22,9 @@
 // Qt:
 #include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtGui/QWidget>
-#include <QtGui/QLayout>
-
 #include <QtCore/QTextStream>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>

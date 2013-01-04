@@ -16,7 +16,7 @@
 
 // Qt:
 #include <QtCore/QTimer>
-#include <QtGui/QLayout>
+#include <QtWidgets/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>

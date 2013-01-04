@@ -33,7 +33,7 @@ namespace Xefis {
 
 signed int			Services::_detected_cores = -1;
 CallOutDispatcher*	Services::_call_out_dispatcher;
-QFont				Services::_instrument_font;
+QFont				Services::_instrument_font ("sans");
 
 
 void
@@ -64,6 +64,7 @@ Services::initialize()
 		if (font_info.exactMatch())
 		{
 			_instrument_font = font;
+			_instrument_font.setHintingPreference (QFont::PreferNoHinting);
 			break;
 		}
 	}

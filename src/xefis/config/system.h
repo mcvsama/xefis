@@ -55,7 +55,7 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 /**
  * Prints debug output.
  */
-#define debug(x...) fprintf (stderr, x)
+#define xdebug(x...) fprintf (stderr, x)
 
 #endif
 
