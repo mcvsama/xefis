@@ -21,7 +21,7 @@
 // Qt:
 #include <QtXml/QDomElement>
 #include <QtXml/QDomDocument>
-#include <QtGui/QLayout>
+#include <QtWidgets/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>
