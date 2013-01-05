@@ -17,7 +17,7 @@
 #include <stdexcept>
 
 // Qt:
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:

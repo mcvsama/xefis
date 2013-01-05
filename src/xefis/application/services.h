@@ -23,8 +23,8 @@
 // Qt:
 #include <QtCore/QObject>
 #include <QtCore/QEvent>
-#include <QtGui/QApplication>
 #include <QtGui/QFont>
+#include <QtWidgets/QApplication>
 
 // Xefis:
 #include <xefis/config/all.h>
