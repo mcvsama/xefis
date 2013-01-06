@@ -897,6 +897,10 @@ EFISWidget::AttitudeDirectorIndicator::AttitudeDirectorIndicator (EFISWidget& ef
 		r = +180.f - r;
 	}
 
+	_pitch = p;
+	_roll = r;
+	_heading = hdg;
+
 	_pitch_transform.reset();
 	_pitch_transform.translate (0.f, -_efis.pitch_to_px (p));
 
@@ -951,7 +955,6 @@ EFISWidget::AttitudeDirectorIndicator::paint_horizon()
 }
 
 
-// TODO refactor
 void
 EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 {
@@ -973,11 +976,16 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	_painter.setTransform (_horizon_transform * _efis._center_transform);
 	_painter.setFont (_efis._font_10_bold);
 
+	// Pitch scale is clipped to small rectangle, so narrow it even more:
+	float clipped_pitch_factor = 0.45f;
+	Range<float> deg_range (_pitch - clipped_pitch_factor * 0.5f * _efis._fov,
+							_pitch + clipped_pitch_factor * 0.5f * _efis._fov);
+
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.f));
 	// 10° lines, exclude +/-90°:
 	for (int deg = -90; deg <= 90; deg += 10)
 	{
-		if (deg == 0)
+		if (!deg_range.includes (deg) || deg == 0)
 			continue;
 		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
@@ -993,7 +1001,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	// 5° lines:
 	for (int deg = -90; deg <= 90; deg += 5)
 	{
-		if (deg % 10 == 0)
+		if (!deg_range.includes (deg) || deg % 10 == 0)
 			continue;
 		float d = _efis.pitch_to_px (deg);
 		_painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
@@ -1001,7 +1009,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 	// 2.5° lines:
 	for (int deg = -900; deg <= 900; deg += 25)
 	{
-		if (deg % 50 == 0)
+		if (!deg_range.includes (deg / 10) || deg % 50 == 0)
 			continue;
 		float d = _efis.pitch_to_px (deg / 10.f);
 		_painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
@@ -1009,10 +1017,13 @@ EFISWidget::AttitudeDirectorIndicator::paint_pitch()
 
 	_painter.setPen (_efis.get_pen (QColor (255, 255, 255), 1.75f));
 	// -90°, 90° lines:
-	for (float deg: { -90.f, 90.f })
+	if (deg_range.includes (-90.f) || deg_range.includes (+90.f))
 	{
-		float d = _efis.pitch_to_px (deg);
-		_painter.drawLine (QPointF (-z, d), QPointF (z, d));
+		for (float deg: { -90.f, 90.f })
+		{
+			float d = _efis.pitch_to_px (deg);
+			_painter.drawLine (QPointF (-z, d), QPointF (z, d));
+		}
 	}
 
 	_painter.restore();
@@ -1122,7 +1133,6 @@ EFISWidget::AttitudeDirectorIndicator::paint_roll()
 }
 
 
-// TODO refactor
 void
 EFISWidget::AttitudeDirectorIndicator::paint_heading()
 {
@@ -1152,9 +1162,16 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 		return;
 	}
 
+	float clipped_pitch_factor = 0.45f;
+	Range<float> deg_range (_heading - clipped_pitch_factor * 0.5f * _efis._fov,
+							_heading + clipped_pitch_factor * 0.5f * _efis._fov);
+
 	_painter.setTransform (_heading_transform * _horizon_transform * _efis._center_transform);
-	for (int deg = -360; deg < 450; deg += 10)
+	for (int deg = -180; deg < 540; deg += 10)
 	{
+		if (!deg_range.includes (deg))
+			continue;
+
 		float d10 = _efis.heading_to_px (deg);
 		float d05 = _efis.heading_to_px (deg + 5);
 		// 10° lines:
