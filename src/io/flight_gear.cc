@@ -151,53 +151,72 @@ FlightGearIO::read_input()
 
 		_input->readDatagram (datagram.data(), datagram.size(), &sender_host, &sender_port);
 
-		QString line (datagram);
-		for (QString pair: QString (datagram).split (',', QString::SkipEmptyParts))
-		{
-			QStringList split_pair = pair.split ('=');
-			if (split_pair.size() != 2)
-				continue;
-			QString var = split_pair[0];
-			QString value = split_pair[1];
+		for (int i = 0; i < datagram.size(); ++i)
+			if (datagram[i] == ',' || datagram[i] == '=')
+				datagram[i] = 0; // NUL character.
 
-			if (var == "iasmi")
+		const char* data = datagram.constData();
+		const char* c_var = nullptr;
+		std::size_t c_var_len = 0;
+		const char* c_value = nullptr;
+		std::size_t c_value_len = 0;
+
+		auto is_var = [&](const char* test) -> bool
+		{
+			return strcmp (c_var, test) == 0;
+		};
+
+		for (int i = 0; i < datagram.size(); i += c_var_len + 1 + c_value_len + 1)
+		{
+			// data is NUL-terminated string.
+			c_var = data + i;
+			c_var_len = strlen (c_var);
+			c_value = c_var + c_var_len + 1;
+			c_value_len = strlen (c_value);
+			// Value is not present, stop parsing:
+			if (c_value >= data + datagram.size())
+				break;
+
+			QString value (c_value);
+
+			if (is_var ("iasmi"))
 			{
 				if (!_minimum_ias_kt.is_singular() && value.toDouble() > 1.f)
 					_minimum_ias_kt.write (value.toDouble());
 			}
-			else if (var == "iasma")
+			else if (is_var ("iasma"))
 			{
 				if (!_maximum_ias_kt.is_singular() && value.toDouble() > 1.f)
 					_maximum_ias_kt.write (value.toDouble());
 			}
-			else if (var == "alr")
+			else if (is_var ("alr"))
 			{
 				if (!_altitude_agl_ft.is_singular() && value.toDouble() < 2500.f)
 					_altitude_agl_ft.write (value.toDouble());
 			}
-			else if (var == "egt")
+			else if (is_var ("egt"))
 			{
 				if (!_engine_egt_degc.is_singular())
 					_engine_egt_degc.write (5.f / 9.f * (value.toDouble() - 32.f));
 			}
-			else if (var == "nav")
+			else if (is_var ("nav"))
 			{
 				if (!_navigation_needles_visible.is_singular())
 					_navigation_needles_visible.write (!!value.toInt());
 			}
-			else if (var == "ngso")
+			else if (is_var ("ngso"))
 				navigation_gs_needle_ok = !!value.toInt();
-			else if (var == "ngs")
+			else if (is_var ("ngs"))
 				navigation_gs_needle = value.toDouble();
-			else if (var == "nhdo")
+			else if (is_var ("nhdo"))
 				navigation_hd_needle_ok = !!value.toInt();
-			else if (var == "nhd")
+			else if (is_var ("nhd"))
 				navigation_hd_needle = value.toDouble();
-			else if (var == "dok")
+			else if (is_var ("dok"))
 				navigation_dme_ok = !!value.toInt();
-			else if (var == "dme")
+			else if (is_var ("dme"))
 				navigation_dme = value.toDouble();
-			else if (var == "lt")
+			else if (is_var ("lt"))
 			{
 				if (!_position_lat_deg.is_singular())
 				{
@@ -206,7 +225,7 @@ FlightGearIO::read_input()
 					_position_lat_deg.write (value.toDouble());
 				}
 			}
-			else if (var == "ln")
+			else if (is_var ("ln"))
 			{
 				if (!_position_lng_deg.is_singular())
 				{
@@ -215,8 +234,8 @@ FlightGearIO::read_input()
 					_position_lng_deg.write (value.toDouble());
 				}
 			}
-			else if (!handle_float_variable (var, value))
-				std::cerr << "Unknown variable from FlightGear protocol: " << var.toStdString() << std::endl;
+			else if (!handle_float_variable (c_var, value))
+				std::cerr << "Unknown variable from FlightGear protocol: " << c_var << std::endl;
 		}
 
 		if (navigation_gs_needle_ok)
