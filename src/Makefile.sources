@@ -11,7 +11,7 @@ ifeq ($(PROFILING), 1)
 endif
 
 LDFLAGS			+= -rdynamic $(LDFLAGS_$(DIST)) $(PROFILING_LDFLAGS)
-LIBS			+= m dl pthread uuid boost_system GL
+LIBS			+= m dl pthread uuid boost_system
 CXXFLAGS		+= -fPIE -DQT_NO_DEBUG -pthread -rdynamic -I. -Wall -DQT_NO_DEBUG $(CXXFLAGS_$(DIST)) $(PROFILING_CXXFLAGS) $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
 CXXFLAGS_s		:= $(CXXFLAGS)
 CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"'
