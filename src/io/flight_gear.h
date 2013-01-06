@@ -43,22 +43,12 @@ class FlightGearIO:
 	// Dtor
 	~FlightGearIO();
 
-  private:
-	void
-	set_path (QString const& path);
-
   private slots:
 	/**
 	 * Read and apply FlightGear datagrams from UDP socket.
 	 */
 	void
 	read_input();
-
-	/**
-	 * Handle (=assign) float-type variable coming from FlightGear.
-	 */
-	bool
-	handle_float_var (const char* var, QString const& value, const char* test, Xefis::PropertyFloat& property);
 
 	/**
 	 * Set all input properties as invalid.
