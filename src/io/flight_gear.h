@@ -36,8 +36,6 @@ class FlightGearIO:
 {
 	Q_OBJECT
 
-	typedef std::map<QString, Xefis::PropertyFloat*> FloatVars;
-
   public:
 	// Ctor
 	FlightGearIO (QDomElement const& config);
@@ -60,7 +58,7 @@ class FlightGearIO:
 	 * Handle (=assign) float-type variable coming from FlightGear.
 	 */
 	bool
-	handle_float_variable (QString const& variable, QString const& value);
+	handle_float_var (const char* var, QString const& value, const char* test, Xefis::PropertyFloat& property);
 
 	/**
 	 * Set all input properties as invalid.
@@ -72,7 +70,6 @@ class FlightGearIO:
 	QTimer*					_timeout_timer = nullptr;
 	QUdpSocket*				_input = nullptr;
 	std::string				_property_path;
-	FloatVars				_float_vars;
 	double					_prev_position_lat_deg = 0.f;
 	bool					_prev_position_lat_valid = false;
 	double					_prev_position_lng_deg = 0.f;

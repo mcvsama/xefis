@@ -88,37 +88,6 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 	_input->bind (QHostAddress::Any, 9000, QUdpSocket::ShareAddress);
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 
-	_float_vars = {
-		{ "ias",	&_ias_kt },
-		{ "iasl",	&_ias_lookahead_kt },
-		{ "gs",		&_gs_kt },
-		{ "tas",	&_tas_kt },
-		{ "ma",		&_mach },
-		{ "p",		&_pitch_deg },
-		{ "r",		&_roll_deg },
-		{ "h",		&_heading_deg },
-		{ "ss",		&_slip_skid_g },
-		{ "fpa",	&_fpm_alpha_deg },
-		{ "fpb",	&_fpm_beta_deg },
-		{ "tr",		&_track_deg },
-		{ "al",		&_altitude_ft },
-		{ "cbr",	&_cbr_fpm },
-		{ "als",	&_pressure_inhg },
-		{ "apa",	&_autopilot_alt_setting_ft },
-		{ "ats",	&_autopilot_speed_setting_kt },
-		{ "aph",	&_autopilot_heading_setting_deg },
-		{ "apc",	&_autopilot_cbr_setting_fpm },
-		{ "fdp",	&_flight_director_pitch_deg },
-		{ "fdr",	&_flight_director_roll_deg },
-		{ "ngs",	&_navigation_gs_needle },
-		{ "nhd",	&_navigation_hd_needle },
-		{ "thr",	&_engine_throttle_pct },
-		{ "epr",	&_engine_epr },
-		{ "n1",		&_engine_n1_pct },
-		{ "n2",		&_engine_n2_pct },
-		{ "slr",	&_position_sea_level_radius_ft }
-	};
-
 	invalidate_all();
 }
 
@@ -234,8 +203,39 @@ FlightGearIO::read_input()
 					_position_lng_deg.write (value.toDouble());
 				}
 			}
-			else if (!handle_float_variable (c_var, value))
-				std::cerr << "Unknown variable from FlightGear protocol: " << c_var << std::endl;
+			else
+			{
+				bool handled = handle_float_var (c_var, value, "ias",  _ias_kt)
+							|| handle_float_var (c_var, value, "iasl", _ias_lookahead_kt)
+							|| handle_float_var (c_var, value, "gs",   _gs_kt)
+							|| handle_float_var (c_var, value, "tas",  _tas_kt)
+							|| handle_float_var (c_var, value, "ma",   _mach)
+							|| handle_float_var (c_var, value, "p",    _pitch_deg)
+							|| handle_float_var (c_var, value, "r",    _roll_deg)
+							|| handle_float_var (c_var, value, "h",    _heading_deg)
+							|| handle_float_var (c_var, value, "ss",   _slip_skid_g)
+							|| handle_float_var (c_var, value, "fpa",  _fpm_alpha_deg)
+							|| handle_float_var (c_var, value, "fpb",  _fpm_beta_deg)
+							|| handle_float_var (c_var, value, "tr",   _track_deg)
+							|| handle_float_var (c_var, value, "al",   _altitude_ft)
+							|| handle_float_var (c_var, value, "cbr",  _cbr_fpm)
+							|| handle_float_var (c_var, value, "als",  _pressure_inhg)
+							|| handle_float_var (c_var, value, "apa",  _autopilot_alt_setting_ft)
+							|| handle_float_var (c_var, value, "ats",  _autopilot_speed_setting_kt)
+							|| handle_float_var (c_var, value, "aph",  _autopilot_heading_setting_deg)
+							|| handle_float_var (c_var, value, "apc",  _autopilot_cbr_setting_fpm)
+							|| handle_float_var (c_var, value, "fdp",  _flight_director_pitch_deg)
+							|| handle_float_var (c_var, value, "fdr",  _flight_director_roll_deg)
+							|| handle_float_var (c_var, value, "ngs",  _navigation_gs_needle)
+							|| handle_float_var (c_var, value, "nhd",  _navigation_hd_needle)
+							|| handle_float_var (c_var, value, "thr",  _engine_throttle_pct)
+							|| handle_float_var (c_var, value, "epr",  _engine_epr)
+							|| handle_float_var (c_var, value, "n1",   _engine_n1_pct)
+							|| handle_float_var (c_var, value, "n2",   _engine_n2_pct)
+							|| handle_float_var (c_var, value, "slr",  _position_sea_level_radius_ft);
+				if (!handled)
+					std::cerr << "Unknown variable from FlightGear protocol: " << c_var << std::endl;
+			}
 		}
 
 		if (navigation_gs_needle_ok)
@@ -259,15 +259,14 @@ FlightGearIO::read_input()
 }
 
 
-bool
-FlightGearIO::handle_float_variable (QString const& variable, QString const& value)
+inline bool
+FlightGearIO::handle_float_var (const char* var, QString const& value, const char* test, Xefis::PropertyFloat& property)
 {
-	auto it = _float_vars.find (variable);
-	if (it == _float_vars.end())
+	if (strcmp (var, test) != 0)
 		return false;
 
-	if (!it->second->is_singular())
-		it->second->write (value.toDouble());
+	if (!property.is_singular())
+		property.write (QString (value).toDouble());
 	return true;
 }
 
