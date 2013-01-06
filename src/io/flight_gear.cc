@@ -102,8 +102,6 @@ FlightGearIO::~FlightGearIO()
 void
 FlightGearIO::read_input()
 {
-	invalidate_all();
-
 	while (_input->hasPendingDatagrams())
 	{
 		QByteArray datagram;
@@ -125,118 +123,88 @@ FlightGearIO::read_input()
 				datagram[i] = 0; // NUL character.
 
 		const char* data = datagram.constData();
-		const char* c_var = nullptr;
-		std::size_t c_var_len = 0;
-		const char* c_value = nullptr;
-		std::size_t c_value_len = 0;
+		std::size_t data_size = datagram.size();
+		const char* c_value = data;
 
-		auto is_var = [&](const char* test) -> bool
+		auto next_value = [&]() -> QString
 		{
-			return strcmp (c_var, test) == 0;
+			if (c_value >= data + data_size)
+				return nullptr;
+
+			const char* x = c_value;
+			c_value += strlen (c_value) + 1;
+			return QString (x);
 		};
 
-		for (int i = 0; i < datagram.size(); i += c_var_len + 1 + c_value_len + 1)
+		auto handle_float_var = [](QString const& value, Xefis::PropertyFloat& property) -> void
 		{
-			// data is NUL-terminated string.
-			c_var = data + i;
-			c_var_len = strlen (c_var);
-			c_value = c_var + c_var_len + 1;
-			c_value_len = strlen (c_value);
-			// Value is not present, stop parsing:
-			if (c_value >= data + datagram.size())
-				break;
+			if (!property.is_singular())
+				property.write (value.toDouble());
+		};
 
-			QString value (c_value);
+		QString value;
 
-			if (is_var ("iasmi"))
-			{
-				if (!_minimum_ias_kt.is_singular() && value.toDouble() > 1.f)
-					_minimum_ias_kt.write (value.toDouble());
-			}
-			else if (is_var ("iasma"))
-			{
-				if (!_maximum_ias_kt.is_singular() && value.toDouble() > 1.f)
-					_maximum_ias_kt.write (value.toDouble());
-			}
-			else if (is_var ("alr"))
-			{
-				if (!_altitude_agl_ft.is_singular() && value.toDouble() < 2500.f)
-					_altitude_agl_ft.write (value.toDouble());
-			}
-			else if (is_var ("egt"))
-			{
-				if (!_engine_egt_degc.is_singular())
-					_engine_egt_degc.write (5.f / 9.f * (value.toDouble() - 32.f));
-			}
-			else if (is_var ("nav"))
-			{
-				if (!_navigation_needles_visible.is_singular())
-					_navigation_needles_visible.write (!!value.toInt());
-			}
-			else if (is_var ("ngso"))
-				navigation_gs_needle_ok = !!value.toInt();
-			else if (is_var ("ngs"))
-				navigation_gs_needle = value.toDouble();
-			else if (is_var ("nhdo"))
-				navigation_hd_needle_ok = !!value.toInt();
-			else if (is_var ("nhd"))
-				navigation_hd_needle = value.toDouble();
-			else if (is_var ("dok"))
-				navigation_dme_ok = !!value.toInt();
-			else if (is_var ("dme"))
-				navigation_dme = value.toDouble();
-			else if (is_var ("lt"))
-			{
-				if (!_position_lat_deg.is_singular())
-				{
-					_prev_position_lat_valid = true;
-					_prev_position_lat_deg = *_position_lat_deg;
-					_position_lat_deg.write (value.toDouble());
-				}
-			}
-			else if (is_var ("ln"))
-			{
-				if (!_position_lng_deg.is_singular())
-				{
-					_prev_position_lng_valid = true;
-					_prev_position_lng_deg = *_position_lng_deg;
-					_position_lng_deg.write (value.toDouble());
-				}
-			}
-			else
-			{
-				bool handled = handle_float_var (c_var, value, "ias",  _ias_kt)
-							|| handle_float_var (c_var, value, "iasl", _ias_lookahead_kt)
-							|| handle_float_var (c_var, value, "gs",   _gs_kt)
-							|| handle_float_var (c_var, value, "tas",  _tas_kt)
-							|| handle_float_var (c_var, value, "ma",   _mach)
-							|| handle_float_var (c_var, value, "p",    _pitch_deg)
-							|| handle_float_var (c_var, value, "r",    _roll_deg)
-							|| handle_float_var (c_var, value, "h",    _heading_deg)
-							|| handle_float_var (c_var, value, "ss",   _slip_skid_g)
-							|| handle_float_var (c_var, value, "fpa",  _fpm_alpha_deg)
-							|| handle_float_var (c_var, value, "fpb",  _fpm_beta_deg)
-							|| handle_float_var (c_var, value, "tr",   _track_deg)
-							|| handle_float_var (c_var, value, "al",   _altitude_ft)
-							|| handle_float_var (c_var, value, "cbr",  _cbr_fpm)
-							|| handle_float_var (c_var, value, "als",  _pressure_inhg)
-							|| handle_float_var (c_var, value, "apa",  _autopilot_alt_setting_ft)
-							|| handle_float_var (c_var, value, "ats",  _autopilot_speed_setting_kt)
-							|| handle_float_var (c_var, value, "aph",  _autopilot_heading_setting_deg)
-							|| handle_float_var (c_var, value, "apc",  _autopilot_cbr_setting_fpm)
-							|| handle_float_var (c_var, value, "fdp",  _flight_director_pitch_deg)
-							|| handle_float_var (c_var, value, "fdr",  _flight_director_roll_deg)
-							|| handle_float_var (c_var, value, "ngs",  _navigation_gs_needle)
-							|| handle_float_var (c_var, value, "nhd",  _navigation_hd_needle)
-							|| handle_float_var (c_var, value, "thr",  _engine_throttle_pct)
-							|| handle_float_var (c_var, value, "epr",  _engine_epr)
-							|| handle_float_var (c_var, value, "n1",   _engine_n1_pct)
-							|| handle_float_var (c_var, value, "n2",   _engine_n2_pct)
-							|| handle_float_var (c_var, value, "slr",  _position_sea_level_radius_ft);
-				if (!handled)
-					std::cerr << "Unknown variable from FlightGear protocol: " << c_var << std::endl;
-			}
-		}
+		/* apa */	handle_float_var (next_value(), _autopilot_alt_setting_ft);
+		/* apc */	handle_float_var (next_value(), _autopilot_cbr_setting_fpm);
+		/* ats */	handle_float_var (next_value(), _autopilot_speed_setting_kt);
+		/* aph */	handle_float_var (next_value(), _autopilot_heading_setting_deg);
+		/* fdp */	handle_float_var (next_value(), _flight_director_pitch_deg);
+		/* fdr */	handle_float_var (next_value(), _flight_director_roll_deg);
+		/* ias */	handle_float_var (next_value(), _ias_kt);
+		/* tas */	handle_float_var (next_value(), _tas_kt);
+		/* gs */	handle_float_var (next_value(), _gs_kt);
+		/* ma */	handle_float_var (next_value(), _mach);
+		/* iasl */	handle_float_var (next_value(), _ias_lookahead_kt);
+		/* iasma */	value = next_value();
+					if (!_maximum_ias_kt.is_singular() && value.toDouble() > 1.f)
+						_maximum_ias_kt.write (value.toDouble());
+		/* iasmi */	value = next_value();
+					if (!_minimum_ias_kt.is_singular() && value.toDouble() > 1.f)
+						_minimum_ias_kt.write (value.toDouble());
+		/* al */	handle_float_var (next_value(), _altitude_ft);
+		/* alr */	value = next_value();
+					if (!_altitude_agl_ft.is_singular() && value.toDouble() < 2500.f)
+						_altitude_agl_ft.write (value.toDouble());
+		/* als */	handle_float_var (next_value(), _pressure_inhg);
+		/* cbr */	handle_float_var (next_value(), _cbr_fpm);
+		/* lt */	value = next_value();
+					if (!_position_lat_deg.is_singular())
+					{
+						_prev_position_lat_valid = true;
+						_prev_position_lat_deg = *_position_lat_deg;
+						_position_lat_deg.write (value.toDouble());
+					}
+		/* ln */	value = next_value();
+					if (!_position_lng_deg.is_singular())
+					{
+						_prev_position_lng_valid = true;
+						_prev_position_lng_deg = *_position_lng_deg;
+						_position_lng_deg.write (value.toDouble());
+					}
+		/* slr */	handle_float_var (next_value(), _position_sea_level_radius_ft);
+		/* p */		handle_float_var (next_value(), _pitch_deg);
+		/* r */		handle_float_var (next_value(), _roll_deg);
+		/* h */		handle_float_var (next_value(), _heading_deg);
+		/* fpa */	handle_float_var (next_value(), _fpm_alpha_deg);
+		/* fpb */	handle_float_var (next_value(), _fpm_beta_deg);
+		/* tr */	handle_float_var (next_value(), _track_deg);
+		/* nav */	value = next_value();
+					if (!_navigation_needles_visible.is_singular())
+						_navigation_needles_visible.write (!!value.toInt());
+		/* ngso */	navigation_gs_needle_ok = !!next_value().toInt();
+		/* ngs */	navigation_gs_needle = next_value().toDouble();
+		/* nhdo */	navigation_hd_needle_ok = !!next_value().toInt();
+		/* nhd */	navigation_hd_needle = next_value().toDouble();
+		/* dok */	navigation_dme_ok = !!next_value().toInt();
+		/* dme */	navigation_dme = next_value().toDouble();
+		/* ss */	handle_float_var (next_value(), _slip_skid_g);
+		/* thr */	handle_float_var (next_value(), _engine_throttle_pct);
+		/* epr */	handle_float_var (next_value(), _engine_epr);
+		/* n1 */	handle_float_var (next_value(), _engine_n1_pct);
+		/* n2 */	handle_float_var (next_value(), _engine_n2_pct);
+		/* egt */	value = next_value();
+					if (!_engine_egt_degc.is_singular())
+						_engine_egt_degc.write (5.f / 9.f * (value.toDouble() - 32.f));
 
 		if (navigation_gs_needle_ok)
 		{
@@ -256,18 +224,6 @@ FlightGearIO::read_input()
 	}
 
 	_timeout_timer->start();
-}
-
-
-inline bool
-FlightGearIO::handle_float_var (const char* var, QString const& value, const char* test, Xefis::PropertyFloat& property)
-{
-	if (strcmp (var, test) != 0)
-		return false;
-
-	if (!property.is_singular())
-		property.write (QString (value).toDouble());
-	return true;
 }
 
 

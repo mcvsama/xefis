@@ -146,8 +146,8 @@ EFISWidget::AltitudeLadder::paint_ladder_scale (float x)
 		return;
 
 	int const line_every = _efis._altitude_ladder_line_every;
-	int const num_every = _efis._altitude_ladder_number_every;;
-	int const bold_every = _efis._altitude_ladder_bold_every;;
+	int const num_every = _efis._altitude_ladder_number_every;
+	int const bold_every = _efis._altitude_ladder_bold_every;
 
 	QFont b_ladder_font = _efis._font_13_bold;
 	float const b_ladder_digit_width = _efis._font_13_digit_width;

@@ -80,212 +80,212 @@
 			<chunk>
 				<name>apa</name>
 				<type>float</type>
-				<format>apa=%f</format>
+				<format>%f</format>
 				<node>/autopilot/settings/target-altitude-ft</node>
 			</chunk>
 			<chunk>
 				<name>apc</name>
 				<type>float</type>
-				<format>apc=%f</format>
+				<format>%f</format>
 				<node>/autopilot/settings/vertical-speed-fpm</node>
 			</chunk>
 			<chunk>
 				<name>ats</name>
 				<type>float</type>
-				<format>ats=%f</format>
+				<format>%f</format>
 				<node>/autopilot/settings/target-speed-kt</node>
 			</chunk>
 			<chunk>
 				<name>aph</name>
 				<type>float</type>
-				<format>aph=%f</format>
+				<format>%f</format>
 				<node>/autopilot/settings/heading-bug-deg</node>
 			</chunk>
 			<chunk>
 				<name>fdp</name>
 				<type>float</type>
-				<format>fdp=%f</format>
+				<format>%f</format>
 				<node>/autopilot/internal/target-pitch-deg</node>
 			</chunk>
 			<chunk>
 				<name>fdr</name>
 				<type>float</type>
-				<format>fdr=%f</format>
+				<format>%f</format>
 				<node>/autopilot/internal/target-roll-deg</node>
 			</chunk>
 			<!-- Speed -->
 			<chunk>
 				<name>ias</name>
 				<type>float</type>
-				<format>ias=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/airspeed-indicator/indicated-speed-kt</node>
 			</chunk>
 			<chunk>
 				<name>tas</name>
 				<type>float</type>
-				<format>tas=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/airspeed-indicator/true-speed-kt</node>
 			</chunk>
 			<chunk>
 				<name>gs</name>
 				<type>float</type>
-				<format>gs=%f</format>
+				<format>%f</format>
 				<node>/velocities/groundspeed-kt</node>
 			</chunk>
 			<chunk>
 				<name>ma</name>
 				<type>float</type>
-				<format>ma=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/airspeed-indicator/indicated-mach</node>
 			</chunk>
 			<chunk>
 				<name>iasl</name>
 				<type>float</type>
-				<format>iasl=%f</format>
+				<format>%f</format>
 				<node>/autopilot/internal/lookahead-10-sec-airspeed-kt</node>
 			</chunk>
 			<chunk>
 				<name>iasma</name>
 				<type>float</type>
-				<format>iasma=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/afds/max-airspeed-kts</node>
 			</chunk>
 			<chunk>
 				<name>iasmi</name>
 				<type>float</type>
-				<format>iasmi=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/weu/state/stall-speed</node>
 			</chunk>
 			<!-- Altitude -->
 			<chunk>
 				<name>al</name>
 				<type>float</type>
-				<format>al=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/altimeter/indicated-altitude-ft</node>
 			</chunk>
 			<chunk>
 				<name>alr</name>
 				<type>float</type>
-				<format>alr=%f</format>
+				<format>%f</format>
 				<node>/position/gear-agl-ft</node>
 			</chunk>
 			<chunk>
 				<name>als</name>
 				<type>float</type>
-				<format>als=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/altimeter/setting-inhg</node>
 			</chunk>
 			<chunk>
 				<name>cbr</name>
 				<type>float</type>
-				<format>cbr=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/vertical-speed-indicator/indicated-speed-fpm</node>
 			</chunk>
 			<!-- Position -->
 			<chunk>
 				<name>lt</name>
 				<type>string</type>
-				<format>lt=%s</format>
+				<format>%s</format>
 				<node>/position/latitude-deg</node>
 			</chunk>
 			<chunk>
 				<name>ln</name>
 				<type>string</type>
-				<format>ln=%s</format>
+				<format>%s</format>
 				<node>/position/longitude-deg</node>
 			</chunk>
 			<chunk>
 				<name>slr</name>
 				<type>float</type>
-				<format>slr=%f</format>
+				<format>%f</format>
 				<node>/position/sea-level-radius-ft</node>
 			</chunk>
 			<!-- Orientation -->
 			<chunk>
 				<name>p</name>
 				<type>float</type>
-				<format>p=%f</format>
+				<format>%f</format>
 				<node>/orientation/pitch-deg</node>
 			</chunk>
 			<chunk>
 				<name>r</name>
 				<type>float</type>
-				<format>r=%f</format>
+				<format>%f</format>
 				<node>/orientation/roll-deg</node>
 			</chunk>
 			<chunk>
 				<name>h</name>
 				<type>float</type>
-				<format>h=%f</format>
+				<format>%f</format>
 				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
 			<!-- Flight path -->
 			<chunk>
 				<name>fpa</name>
 				<type>float</type>
-				<format>fpa=%f</format>
+				<format>%f</format>
 				<node>/orientation/alpha-deg</node>
 			</chunk>
 			<chunk>
 				<name>fpb</name>
 				<type>float</type>
-				<format>fpb=%f</format>
+				<format>%f</format>
 				<node>/orientation/side-slip-deg</node>
 			</chunk>
 			<chunk>
 				<name>tr</name>
 				<type>float</type>
-				<format>tr=%f</format>
+				<format>%f</format>
 				<node>/orientation/track-magnetic-deg</node>
 			</chunk>
 			<!-- Navigation -->
 			<chunk>
 				<name>nav</name>
 				<type>int</type>
-				<format>nav=%d</format>
+				<format>%d</format>
 				<node>/instrumentation/nav/data-is-valid</node>
 			</chunk>
 			<chunk>
 				<name>ngso</name>
 				<type>int</type>
-				<format>ngso=%d</format>
+				<format>%d</format>
 				<node>/instrumentation/nav/gs-in-range</node>
 			</chunk>
 			<chunk>
 				<name>ngs</name>
 				<type>float</type>
-				<format>ngs=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/nav/gs-needle-deflection-norm</node>
 			</chunk>
 			<chunk>
 				<name>nhdo</name>
 				<type>int</type>
-				<format>nhdo=%d</format>
+				<format>%d</format>
 				<node>/instrumentation/nav/in-range</node>
 			</chunk>
 			<chunk>
 				<name>nhd</name>
 				<type>float</type>
-				<format>nhd=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/nav/heading-needle-deflection-norm</node>
 			</chunk>
 			<chunk>
 				<name>dok</name>
 				<type>int</type>
-				<format>dok=%d</format>
+				<format>%d</format>
 				<node>/instrumentation/dme/in-range</node>
 			</chunk>
 			<chunk>
 				<name>dme</name>
 				<type>float</type>
-				<format>dme=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/dme/indicated-distance-nm</node>
 			</chunk>
 			<!-- Other -->
 			<chunk>
 				<name>ss</name>
 				<type>float</type>
-				<format>ss=%f</format>
+				<format>%f</format>
 				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
 			</chunk>
 
@@ -301,31 +301,31 @@
 			<chunk>
 				<name>thr</name>
 				<type>float</type>
-				<format>thr=%f</format>
+				<format>%f</format>
 				<node>/controls/engines/engine/throttle</node>
 			</chunk>
 			<chunk>
 				<name>epr</name>
 				<type>float</type>
-				<format>epr=%f</format>
+				<format>%f</format>
 				<node>/engines/engine/epr</node>
 			</chunk>
 			<chunk>
 				<name>n1</name>
 				<type>float</type>
-				<format>n1=%f</format>
+				<format>%f</format>
 				<node>/engines/engine/n1</node>
 			</chunk>
 			<chunk>
 				<name>n2</name>
 				<type>float</type>
-				<format>n2=%f</format>
+				<format>%f</format>
 				<node>/engines/engine/n2</node>
 			</chunk>
 			<chunk>
 				<name>egt</name>
 				<type>float</type>
-				<format>egt=%f</format>
+				<format>%f</format>
 				<node>/engines/engine/egt-degf</node>
 			</chunk>
 		</output>
