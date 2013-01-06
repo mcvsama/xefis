@@ -33,7 +33,7 @@ EFISWidget::AltitudeLadder::AltitudeLadder (EFISWidget& efis, QPainter& painter,
 	_efis (efis),
 	_painter (painter),
 	_text_painter (text_painter),
-	_altitude (bound (_efis._altitude, -9999.f, +99999.f)),
+	_altitude (bound (_efis._altitude, -99999.f, +99999.f)),
 	_climb_rate (bound (_efis._climb_rate, -9999.f, +9999.f)),
 	_pressure (bound (_efis._pressure, 0.f, 99.99f)),
 	_extent (_efis._altitude_ladder_extent),
@@ -116,8 +116,6 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 		<< _black_box_rect.bottomLeft()
 		<< QPointF (0.f, +0.5f * x));
 
-	bool show_zero_mark = -10000.f < _rounded_altitude && _rounded_altitude < 10000.f;
-
 	QRectF box_10000 = QRectF (b_digits_box.topLeft(), QSizeF (b_digit_width, b_digits_box.height()));
 	QRectF box_01000 = box_10000.translated (b_digit_width, 0.f);
 	QRectF box_00100 = QRectF (s_digits_box.topLeft(), QSizeF (s_digit_width, b_digits_box.height()));
@@ -125,7 +123,7 @@ EFISWidget::AltitudeLadder::paint_black_box (float x, bool only_compute_black_bo
 
 	// 11100 part:
 	_painter.setFont (b_font);
-	_efis.paint_rotating_digit (_painter, _text_painter, box_10000, _altitude, 10000, 1.4f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, show_zero_mark);
+	_efis.paint_rotating_digit (_painter, _text_painter, box_10000, _altitude, 10000, 1.4f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
 	_efis.paint_rotating_digit (_painter, _text_painter, box_01000, _altitude, 1000, 1.4f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 	_painter.setFont (s_font);
 	_efis.paint_rotating_digit (_painter, _text_painter, box_00100, _altitude, 100, 1.4f, 0.05f, 5.f, false, false);
