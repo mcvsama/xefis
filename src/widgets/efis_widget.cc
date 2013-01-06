@@ -1162,7 +1162,7 @@ EFISWidget::AttitudeDirectorIndicator::paint_heading()
 		return;
 	}
 
-	float clipped_pitch_factor = 0.45f;
+	float clipped_pitch_factor = 0.5f;
 	Range<float> deg_range (_heading - clipped_pitch_factor * 0.5f * _efis._fov,
 							_heading + clipped_pitch_factor * 0.5f * _efis._fov);
 
