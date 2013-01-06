@@ -175,16 +175,26 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 
 	// Warning/critical bugs:
 
-	float gap_degs = 4;
-	struct PointInfo { float angle; QPen pen; float tick_len; };
-	std::vector<PointInfo> points;
+	struct PointInfo
+	{
+		PointInfo (float angle, QPen const& pen, float tick_len):
+			angle (angle), pen (pen), tick_len (tick_len)
+		{ }
 
-	points.push_back ({ 0.f, pen, 0.f });
+		float angle; QPen pen; float tick_len;
+	};
+
+	std::vector<PointInfo> points;
+	points.reserve (4);
+
+	float gap_degs = 4;
+
+	points.emplace_back (0.f, pen, 0.f);
 	if (_warning_visible)
-		points.push_back ({ warning_angle, warning_pen, 0.1f * r });
+		points.emplace_back (warning_angle, warning_pen, 0.1f * r);
 	if (_critical_visible)
-		points.push_back ({ critical_angle, critical_pen, 0.2f * r });
-	points.push_back ({ value_span_angle, critical_pen, 0.f });
+		points.emplace_back (critical_angle, critical_pen, 0.2f * r);
+	points.emplace_back (value_span_angle, critical_pen, 0.f);
 
 	for (auto i = 0u; i < points.size() - 1; ++i)
 	{
