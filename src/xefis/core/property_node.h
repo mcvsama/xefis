@@ -140,13 +140,13 @@ class PropertyNode
 	/**
 	 * Return node name.
 	 */
-	std::string
+	std::string const&
 	name() const;
 
 	/**
 	 * Return node path.
 	 */
-	std::string
+	std::string const&
 	path() const;
 
 	/**
@@ -427,14 +427,14 @@ PropertyNode::set_nil()
 }
 
 
-inline std::string
+inline std::string const&
 PropertyNode::name() const
 {
 	return _name;
 }
 
 
-inline std::string
+inline std::string const&
 PropertyNode::path() const
 {
 	return _path;
