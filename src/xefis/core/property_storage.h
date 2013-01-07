@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
 #include <map>
 
 // Xefis:
@@ -32,21 +33,59 @@ namespace Xefis {
  */
 class PropertyStorage
 {
+	friend class PropertyNode;
+
+	typedef std::map<std::string, PropertyNode*> PropertiesByPath;
+
   public:
 	/**
-	 * Initialize storage.
+	 * Initialize storage - create default storage.
 	 */
 	static void
 	initialize();
 
 	/**
+	 * Create a storage object.
+	 */
+	PropertyStorage();
+
+	/**
 	 * Return top-level PropertyNode of this storage.
 	 */
-	static PropertyNode*
-	root();
+	PropertyNode*
+	root() const noexcept;
+
+	/**
+	 * Return pointer to the default storage.
+	 */
+	static PropertyStorage*
+	default_storage();
+
+	/**
+	 * Try to find registered property by its path.
+	 * Return nullptr if not found.
+	 */
+	PropertyNode*
+	locate (std::string const& path) const;
 
   private:
-	static PropertyNode* _root;
+	/**
+	 * Cache a path for the node for quicker locate().
+	 * Path will be read from the node itself.
+	 */
+	void
+	cache_path (PropertyNode* node);
+
+	/**
+	 * Remove previously cached path.
+	 */
+	void
+	uncache_path (std::string const& old_path);
+
+  private:
+	static PropertyStorage*	_default_storage;
+	PropertyNode*			_root;
+	PropertiesByPath		_properties_by_path;
 };
 
 } // namespace Xefis

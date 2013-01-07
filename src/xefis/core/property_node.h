@@ -42,6 +42,7 @@ enum PropertyType
 };
 
 class PropertyNode;
+class PropertyStorage;
 
 typedef std::list<PropertyNode*> PropertyNodeList;
 
@@ -76,6 +77,14 @@ class PropertyPathConflict: public Exception
 class PropertyNode
 {
 	typedef std::map<std::string, PropertyNodeList::iterator> NameLookup;
+
+	friend class PropertyStorage;
+
+  private:
+	/**
+	 * Create a root node.
+	 */
+	PropertyNode (PropertyStorage*);
 
   public:
 	/**
@@ -123,37 +132,37 @@ class PropertyNode
 	 * Return true if property is nil.
 	 */
 	bool
-	is_nil() const;
+	is_nil() const noexcept;
 
 	/**
 	 * Inverse of is_nil().
 	 */
 	bool
-	valid() const;
+	valid() const noexcept;
 
 	/**
 	 * Write nil value to this property.
 	 */
 	void
-	set_nil();
+	set_nil() noexcept;
 
 	/**
 	 * Return node name.
 	 */
 	std::string const&
-	name() const;
+	name() const noexcept;
 
 	/**
 	 * Return node path.
 	 */
 	std::string const&
-	path() const;
+	path() const noexcept;
 
 	/**
 	 * Return node type.
 	 */
 	PropertyType
-	type() const;
+	type() const noexcept;
 
 	/**
 	 * Return current value converted to the type tType,
@@ -181,14 +190,14 @@ class PropertyNode
 	 * Root node has no parent.
 	 */
 	PropertyNode*
-	parent() const;
+	parent() const noexcept;
 
 	/**
 	 * Return root node. Traverse parents until root node.
 	 * Return self if this node is the root node.
 	 */
 	PropertyNode*
-	root();
+	root() noexcept;
 
 	/**
 	 * Return list of child nodes.
@@ -242,6 +251,15 @@ class PropertyNode
 	void
 	clear();
 
+	/**
+	 * Return pointer to the PropertyStorage object.
+	 * If called on non-root property, it will take
+	 * additional time to traverse to the root node
+	 * to return its storage().
+	 */
+	PropertyStorage*
+	storage() noexcept;
+
   private:
 	/**
 	 * Helper function for reading data.
@@ -264,7 +282,8 @@ class PropertyNode
 	update_path();
 
   private:
-	PropertyNode*		_parent = nullptr;
+	PropertyNode*		_parent			= nullptr;
+	PropertyStorage*	_storage		= nullptr;
 	PropertyType		_type;
 	std::string			_name;
 	std::string			_path;
@@ -274,7 +293,7 @@ class PropertyNode
 		double			_value_double;
 	};
 	std::string			_value_string;
-	bool				_is_nil = false;
+	bool				_is_nil			= false;
 	PropertyNodeList	_children;
 	NameLookup			_children_by_name;
 };
@@ -290,6 +309,14 @@ inline
 PropertyPathConflict::PropertyPathConflict (const char* message):
 	Exception (message)
 { }
+
+
+inline
+PropertyNode::PropertyNode (PropertyStorage* storage):
+	PropertyNode ("") // It's a directory
+{
+	_storage = storage;
+}
 
 
 inline
@@ -407,42 +434,42 @@ PropertyNode::~PropertyNode()
 
 
 inline bool
-PropertyNode::is_nil() const
+PropertyNode::is_nil() const noexcept
 {
 	return _is_nil;
 }
 
 
 inline bool
-PropertyNode::valid() const
+PropertyNode::valid() const noexcept
 {
 	return !_is_nil;
 }
 
 
 inline void
-PropertyNode::set_nil()
+PropertyNode::set_nil() noexcept
 {
 	_is_nil = true;
 }
 
 
 inline std::string const&
-PropertyNode::name() const
+PropertyNode::name() const noexcept
 {
 	return _name;
 }
 
 
 inline std::string const&
-PropertyNode::path() const
+PropertyNode::path() const noexcept
 {
 	return _path;
 }
 
 
 inline PropertyType
-PropertyNode::type() const
+PropertyNode::type() const noexcept
 {
 	return _type;
 }
@@ -512,19 +539,26 @@ template<>
 
 
 inline PropertyNode*
-PropertyNode::parent() const
+PropertyNode::parent() const noexcept
 {
 	return _parent;
 }
 
 
 inline PropertyNode*
-PropertyNode::root()
+PropertyNode::root() noexcept
 {
 	PropertyNode* p = this;
 	while (p->_parent)
 		p = p->_parent;
 	return p;
+}
+
+
+inline PropertyStorage*
+PropertyNode::storage() noexcept
+{
+	return _storage ? _storage : root()->_storage;
 }
 
 

@@ -24,20 +24,56 @@
 
 namespace Xefis {
 
-PropertyNode* PropertyStorage::_root = nullptr;
+PropertyStorage* PropertyStorage::_default_storage = nullptr;
 
 
 void
 PropertyStorage::initialize()
 {
-	_root = new PropertyNode ("");
+	_default_storage = new PropertyStorage();
+}
+
+
+PropertyStorage::PropertyStorage():
+	_root (new PropertyNode (this))
+{ }
+
+
+PropertyNode*
+PropertyStorage::root() const noexcept
+{
+	return _root;
+}
+
+
+PropertyStorage*
+PropertyStorage::default_storage()
+{
+	return _default_storage;
 }
 
 
 PropertyNode*
-PropertyStorage::root()
+PropertyStorage::locate (std::string const& path) const
 {
-	return _root;
+	auto it = _properties_by_path.find (path);
+	if (it == _properties_by_path.end())
+		return nullptr;
+	return it->second;
+}
+
+
+void
+PropertyStorage::cache_path (PropertyNode* node)
+{
+	_properties_by_path[node->path()] = node;
+}
+
+
+void
+PropertyStorage::uncache_path (std::string const& old_path)
+{
+	_properties_by_path.erase (old_path);
 }
 
 } // namespace Xefis

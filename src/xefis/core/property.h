@@ -265,7 +265,7 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (std::string const& path):
-		BaseProperty (PropertyStorage::root(), path)
+		BaseProperty (PropertyStorage::default_storage()->root(), path)
 	{
 		if (!_root)
 			throw Exception ("PropertyStorage is not initialized, can't construct Property with default storage");
