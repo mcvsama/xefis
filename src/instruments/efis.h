@@ -28,7 +28,6 @@
 #include <xefis/core/instrument.h>
 #include <widgets/efis_widget.h>
 #include <widgets/hsi_widget.h>
-#include <xefis/utility/one_pole_smoother.h>
 
 
 class EFIS: public Xefis::Instrument
@@ -47,15 +46,7 @@ class EFIS: public Xefis::Instrument
 	read();
 
   private:
-	void
-	estimate_track();
-
-  private:
-	EFISWidget*				_efis_widget				= nullptr;
-	HSIWidget*				_hsi_widget					= nullptr;
-	std::array<LatLng, 3>	_positions;
-	bool					_positions_valid			= false;
-	Xefis::OnePoleSmoother	_track_estimation_smoother	= 60.0; // TODO make fps independent
+	EFISWidget*				_efis_widget = nullptr;
 
 	Xefis::PropertyInteger	_speed_ladder_line_every;
 	Xefis::PropertyInteger	_speed_ladder_number_every;
@@ -70,8 +61,6 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_minimum_ias_kt;
 	Xefis::PropertyFloat	_warning_ias_kt;
 	Xefis::PropertyFloat	_maximum_ias_kt;
-	Xefis::PropertyFloat	_gs_kt;
-	Xefis::PropertyFloat	_tas_kt;
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
@@ -91,7 +80,6 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_autopilot_visible;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
 	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
-	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
 	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
@@ -101,9 +89,6 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
-	Xefis::PropertyFloat	_position_lat_deg;
-	Xefis::PropertyFloat	_position_lng_deg;
-	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 };
 
 #endif

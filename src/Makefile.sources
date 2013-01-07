@@ -102,12 +102,15 @@ SRC_SOURCES += generic/property_tree.cc
 ######## /instruments ########
 
 SRC_HEADERS += instruments/efis.h
+SRC_HEADERS += instruments/hsi.h
 SRC_HEADERS += instruments/radial_indicator.h
 
 SRC_SOURCES += instruments/efis.cc
+SRC_SOURCES += instruments/hsi.cc
 SRC_SOURCES += instruments/radial_indicator.cc
 
 SRC_MOCHDRS += instruments/efis.h
+SRC_MOCHDRS += instruments/hsi.h
 SRC_MOCHDRS += instruments/radial_indicator.h
 
 ######## /widgets ########
