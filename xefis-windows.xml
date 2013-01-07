@@ -4,57 +4,69 @@
 		<window width='950' height='740' aspect-ratio='1.3' full-screen='false'>
 			<layout type='horizontal'>
 				<item stretch-factor='2'>
-					<module name='instruments/efis'>
-						<properties path='/efis'>
-							<property name='speed-ladder-line-every' path='/configuration/speed-ladder/line-every.kt' default='10'/>
-							<property name='speed-ladder-number-every' path='/configuration/speed-ladder/number-every.kt' default='20'/>
-							<property name='speed-ladder-extent' path='/configuration/speed-ladder/extent.kt' default='124'/>
-							<property name='altitude-ladder-line-every' path='/configuration/altitude-ladder/line-every.ft' default='100'/>
-							<property name='altitude-ladder-number-every' path='/configuration/altitude-ladder/number-every.ft' default='200'/>
-							<property name='altitude-ladder-bold-every' path='/configuration/altitude-ladder/bold-every.ft' default='500'/>
-							<property name='altitude-ladder-extent' path='/configuration/altitude-ladder/extent.ft' default='825'/>
-							<property name='heading-numbers-visible' path='/configuration/adi/heading-numbers-visible' default='true'/>
-							<property name='ias' path='/speed/ias.kt'/>
-							<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
-							<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
-							<property name='ias-warning' path='/speed/ias-warning.kt'/>
-							<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
-							<property name='gs' path='/speed/gs.kt' default='0'/>
-							<property name='tas' path='/speed/tas.kt' default='0'/>
-							<property name='mach' path='/speed/mach' default='0'/>
-							<property name='orientation-pitch' path='/orientation/pitch.deg'/>
-							<property name='orientation-roll' path='/orientation/roll.deg'/>
-							<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
-							<property name='orientation-heading' path='/orientation/heading.deg'/>
-							<property name='slip-skid' path='/slip-skid/slip-skid.g' default='0'/>
-							<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
-							<property name='flight-path-marker-visible' path='/configuration/flight-path-marker/visible' default='true'/>
-							<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
-							<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
-							<property name='track' path='/orientation/track.deg'/>
-							<property name='altitude' path='/altitude/amsl.ft'/>
-							<property name='altitude-agl' path='/altitude/agl.ft'/>
-							<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
-							<property name='cbr' path='/altitude/climb-rate.fpm'/>
-							<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
-							<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
-							<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
-							<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
-							<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
-							<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
-							<property name='flight-director-visible' path='/configuration/autopilot/flight-director/visible' default='false'/>
-							<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
-							<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
-							<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible' default='false'/>
-							<property name='navigation-type-hint' path='/navigation/type-hint' default='ILS'/>
-							<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
-							<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection' default='0'/>
-							<property name='dme-distance' path='/navigation/dme-distance.nm'/>
-							<property name='position-latitude' path='/position/latitude.deg'/>
-							<property name='position-longitude' path='/position/longitude.deg'/>
-							<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
-						</properties>
-					</module>
+					<layout type='vertical'>
+						<item stretch-factor='8'>
+							<module name='instruments/efis'>
+								<properties path='/instrumentation'>
+									<property name='speed-ladder-line-every' path='/configuration/speed-ladder/line-every.kt' default='10'/>
+									<property name='speed-ladder-number-every' path='/configuration/speed-ladder/number-every.kt' default='20'/>
+									<property name='speed-ladder-extent' path='/configuration/speed-ladder/extent.kt' default='124'/>
+									<property name='altitude-ladder-line-every' path='/configuration/altitude-ladder/line-every.ft' default='100'/>
+									<property name='altitude-ladder-number-every' path='/configuration/altitude-ladder/number-every.ft' default='200'/>
+									<property name='altitude-ladder-bold-every' path='/configuration/altitude-ladder/bold-every.ft' default='500'/>
+									<property name='altitude-ladder-extent' path='/configuration/altitude-ladder/extent.ft' default='825'/>
+									<property name='heading-numbers-visible' path='/configuration/adi/heading-numbers-visible' default='true'/>
+									<property name='ias' path='/speed/ias.kt'/>
+									<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
+									<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
+									<property name='ias-warning' path='/speed/ias-warning.kt'/>
+									<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
+									<property name='mach' path='/speed/mach' default='0'/>
+									<property name='orientation-pitch' path='/orientation/pitch.deg'/>
+									<property name='orientation-roll' path='/orientation/roll.deg'/>
+									<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
+									<property name='orientation-heading' path='/orientation/heading.deg'/>
+									<property name='slip-skid' path='/slip-skid/slip-skid.g' default='0'/>
+									<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
+									<property name='flight-path-marker-visible' path='/configuration/flight-path-marker/visible' default='true'/>
+									<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
+									<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
+									<property name='track' path='/orientation/track.deg'/>
+									<property name='altitude' path='/altitude/amsl.ft'/>
+									<property name='altitude-agl' path='/altitude/agl.ft'/>
+									<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
+									<property name='cbr' path='/altitude/climb-rate.fpm'/>
+									<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
+									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
+									<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
+									<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
+									<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
+									<property name='flight-director-visible' path='/configuration/autopilot/flight-director/visible' default='false'/>
+									<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
+									<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
+									<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible' default='false'/>
+									<property name='navigation-type-hint' path='/navigation/type-hint' default='ILS'/>
+									<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
+									<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection' default='0'/>
+									<property name='dme-distance' path='/navigation/dme-distance.nm'/>
+								</properties>
+							</module>
+						</item>
+						<item stretch-factor='5'>
+							<module name='instruments/hsi'>
+								<properties path='/instrumentation'>
+									<property name='gs' path='/speed/gs.kt' default='0'/>
+									<property name='tas' path='/speed/tas.kt' default='0'/>
+									<property name='orientation-heading' path='/orientation/heading.deg'/>
+									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
+									<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
+									<property name='position-latitude' path='/position/latitude.deg'/>
+									<property name='position-longitude' path='/position/longitude.deg'/>
+									<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
+								</properties>
+							</module>
+						</item>
+					</layout>
 				</item>
 				<separator/>
 				<item stretch-factor='1'>
