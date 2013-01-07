@@ -57,6 +57,7 @@
 								<properties path='/instrumentation'>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
+									<property name='track' path='/orientation/track.deg'/>
 									<property name='orientation-heading' path='/orientation/heading.deg'/>
 									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
 									<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
