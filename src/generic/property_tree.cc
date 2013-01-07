@@ -29,7 +29,7 @@
 PropertyTree::PropertyTree (QDomElement const&, QWidget* parent):
 	Instrument (parent)
 {
-	_widget = new Xefis::PropertyTreeWidget (Xefis::PropertyStorage::root(), this);
+	_widget = new Xefis::PropertyTreeWidget (Xefis::PropertyStorage::default_storage()->root(), this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

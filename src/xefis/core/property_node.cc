@@ -20,6 +20,7 @@
 
 // Local:
 #include "property_node.h"
+#include "property_storage.h"
 
 
 namespace Xefis {
@@ -47,6 +48,14 @@ PropertyNode::child (std::string const& name)
 PropertyNode*
 PropertyNode::locate (std::string const& path)
 {
+	// If we are root node, try searching PropertyStorage cache first:
+	if (!_parent && _storage)
+	{
+		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
+		if (node)
+			return node;
+	}
+
 	if (path.empty())
 		return this;
 
@@ -159,9 +168,17 @@ PropertyNode::clear()
 void
 PropertyNode::update_path()
 {
+	PropertyStorage* storage = this->storage();
+
+	if (storage)
+		storage->uncache_path (_path);
+
 	_path = _parent
 		? _parent->path() + "/" + _name
 		: _name;
+
+	if (storage)
+		storage->cache_path (this);
 }
 
 } // namespace Xefis
