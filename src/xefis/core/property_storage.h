@@ -22,11 +22,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 
-// Local:
-#include "property_node.h"
-
 
 namespace Xefis {
+
+class PropertyNode;
 
 /**
  * Storage class for properties.
