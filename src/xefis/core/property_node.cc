@@ -20,7 +20,6 @@
 
 // Local:
 #include "property_node.h"
-#include "property_storage.h"
 
 
 namespace Xefis {

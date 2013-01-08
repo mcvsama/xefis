@@ -28,6 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include "property_storage.h"
 
 
 namespace Xefis {
@@ -555,7 +556,7 @@ PropertyNode::root() noexcept
 }
 
 
-PropertyNode*
+inline PropertyNode*
 PropertyNode::locate (std::string const& path)
 {
 	// If we are root node, try searching PropertyStorage cache first:
