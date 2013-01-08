@@ -79,7 +79,7 @@ class BaseProperty
 	/**
 	 * Return property path.
 	 */
-	std::string
+	std::string const&
 	path() const;
 
   protected:
@@ -193,23 +193,29 @@ BaseProperty::BaseProperty (PropertyNode* root, std::string path):
 inline bool
 BaseProperty::is_nil() const
 {
-	if (!_root)
-		throw Exception ("can't read a singular property");
-	PropertyNode* node = get_node();
-	if (!node)
+	if (_root)
+	{
+		PropertyNode* node = get_node();
+		if (node)
+			return node->is_nil();
 		return true;
-	return node->is_nil();
+	}
+	else
+		throw Exception ("can't read from a singular property");
 }
 
 
 inline void
 BaseProperty::set_nil()
 {
-	if (!_root)
+	if (_root)
+	{
+		PropertyNode* node = get_node();
+		if (node)
+			node->set_nil();
+	}
+	else
 		throw Exception ("can't write to a singular property");
-	PropertyNode* node = get_node();
-	if (node)
-		node->set_nil();
 }
 
 
@@ -227,7 +233,7 @@ BaseProperty::valid() const
 }
 
 
-inline std::string
+inline std::string const&
 BaseProperty::path() const
 {
 	return _path;
@@ -237,14 +243,16 @@ BaseProperty::path() const
 inline PropertyNode*
 BaseProperty::get_node() const
 {
-	if (!_root)
+	if (_root)
+	{
+		if (_node && _node->path() == _path)
+			return _node;
+
+		// Recache:
+		return _node = _root->locate (_path);
+	}
+	else
 		return nullptr;
-
-	if (_node && _node->path() == _path)
-		return _node;
-
-	// Recache:
-	return _node = _root->locate (_path);
 }
 
 
@@ -293,12 +301,14 @@ template<class T>
 	Property<T>::Type
 	Property<T>::read() const
 	{
-		if (!_root)
-			throw Exception ("can't read a singular property");
-		PropertyNode* node = get_node();
-		if (!node)
+		if (_root)
+		{
+			PropertyNode* node = get_node();
+			if (node)
+				return node->read<T>();
 			return Type();
-		return node->read<T>();
+		}
+		throw Exception ("can't read from a singular property");
 	}
 
 
@@ -307,12 +317,15 @@ template<class T>
 	Property<T>::Type
 	Property<T>::read_signalling() const
 	{
-		if (!_root)
-			throw Exception ("can't read a singular property");
-		PropertyNode* node = get_node();
-		if (!node)
+		if (_root)
+		{
+			PropertyNode* node = get_node();
+			if (node)
+				return node->read<T>();
 			throw PropertyNotFound ("could not find property by path");
-		return node->read<T>();
+		}
+		else
+			throw Exception ("can't read from a singular property");
 	}
 
 
@@ -329,22 +342,25 @@ template<class T>
 	inline void
 	Property<T>::write (Type const& value)
 	{
-		if (!_root)
-			throw Exception ("can't write to a singular property");
-		PropertyNode* node = get_node();
-		if (!node)
+		if (_root)
 		{
-			std::string::size_type s = _path.find_last_of ('/');
-			std::string dir = _path.substr (0, s);
-			std::string pro = _path.substr (s + 1);
+			PropertyNode* node = get_node();
+			if (node)
+				node->write<Type> (value);
+			else
+			{
+				std::string::size_type s = _path.find_last_of ('/');
+				std::string dir = _path.substr (0, s);
+				std::string pro = _path.substr (s + 1);
 
-			PropertyNode* parent = _root;
-			if (s != std::string::npos)
-				parent = _root->mkpath (dir);
-			node = parent->add_child (new PropertyNode (pro, value));
+				PropertyNode* parent = _root;
+				if (s != std::string::npos)
+					parent = _root->mkpath (dir);
+				node = parent->add_child (new PropertyNode (pro, value));
+			}
 		}
 		else
-			node->write<Type> (value);
+			throw Exception ("can't write to a singular property");
 	}
 
 
@@ -352,12 +368,16 @@ template<class T>
 	inline void
 	Property<T>::write_signalling (Type const& value)
 	{
-		if (!_root)
+		if (_root)
+		{
+			PropertyNode* node = get_node();
+			if (node)
+				node->write<Type> (value);
+			else
+				throw PropertyNotFound ("could not find property by path");
+		}
+		else
 			throw Exception ("can't write to a singular property");
-		PropertyNode* node = get_node();
-		if (!node)
-			throw PropertyNotFound ("could not find property by path");
-		node->write<Type> (value);
 	}
 
 
