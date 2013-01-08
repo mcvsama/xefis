@@ -45,6 +45,10 @@ class HSI: public Xefis::Instrument
 	void
 	read();
 
+  protected:
+	void
+	data_update() override;
+
   private:
 	void
 	estimate_track();
@@ -65,5 +69,12 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_position_lng_deg;
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 };
+
+
+inline void
+HSI::data_update()
+{
+	read();
+}
 
 #endif

@@ -45,6 +45,10 @@ class EFIS: public Xefis::Instrument
 	void
 	read();
 
+  protected:
+	void
+	data_update() override;
+
   private:
 	EFISWidget*				_efis_widget = nullptr;
 
@@ -90,5 +94,12 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
 };
+
+
+inline void
+EFIS::data_update()
+{
+	read();
+}
 
 #endif

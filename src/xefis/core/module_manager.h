@@ -44,6 +44,13 @@ class ModuleManager
 	Module*
 	load_module (QString const& name, QDomElement const& config, QWidget* parent);
 
+	/**
+	 * Signal that the data in property tree has been updated.
+	 * Forward call to all loaded modules.
+	 */
+	void
+	data_update();
+
   private:
 	Modules	_modules;
 };

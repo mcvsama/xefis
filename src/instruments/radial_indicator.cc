@@ -15,7 +15,6 @@
 #include <cstddef>
 
 // Qt:
-#include <QtCore/QTimer>
 #include <QtWidgets/QLayout>
 
 // Xefis:
@@ -59,11 +58,6 @@ RadialIndicator::RadialIndicator (QDomElement const& config, QWidget* parent):
 
 	if (!found_properties_config)
 		throw Xefis::Exception ("module configuration missing");
-
-	QTimer* t = new QTimer (this);
-	t->setInterval (33);
-	QObject::connect (t, SIGNAL (timeout()), this, SLOT (read()));
-	t->start();
 }
 
 
