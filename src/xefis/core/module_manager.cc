@@ -80,5 +80,13 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 	return module;
 }
 
+
+void
+ModuleManager::data_update()
+{
+	for (Module* mod: _modules)
+		mod->data_update();
+}
+
 } // namespace Xefis
 

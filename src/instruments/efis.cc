@@ -15,7 +15,6 @@
 #include <cstddef>
 
 // Qt:
-#include <QtCore/QTimer>
 #include <QtWidgets/QLayout>
 
 // Xefis:
@@ -88,11 +87,6 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_efis_widget);
-
-	QTimer* t = new QTimer (this);
-	t->setInterval (50);
-	QObject::connect (t, SIGNAL (timeout()), this, SLOT (read()));
-	t->start();
 }
 
 

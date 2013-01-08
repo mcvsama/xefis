@@ -59,6 +59,7 @@ class FlightGearIO:
   private:
 	QTimer*					_timeout_timer = nullptr;
 	QUdpSocket*				_input = nullptr;
+	QByteArray				_datagram;
 	std::string				_property_path;
 	double					_prev_position_lat_deg = 0.f;
 	bool					_prev_position_lat_valid = false;

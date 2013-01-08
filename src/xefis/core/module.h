@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/application.h>
 #include <xefis/core/property_union.h>
 
 
@@ -44,6 +45,13 @@ class Module
 	// Dtor
 	virtual ~Module();
 
+	/**
+	 * Signal that the data in property tree has been updated.
+	 * Default implementation does nothing.
+	 */
+	virtual void
+	data_update();
+
   protected:
 	/**
 	 * Parse the <properties> element and initialize properties
@@ -51,12 +59,30 @@ class Module
 	 */
 	void
 	parse_properties (QDomElement& properties_element, PropertiesList);
+
+	/**
+	 * Signal that this module has updated property tree.
+	 */
+	void
+	data_updated();
 };
 
 
 inline
 Module::~Module()
 { }
+
+
+inline void
+Module::data_update()
+{ }
+
+
+inline void
+Module::data_updated()
+{
+	xefis()->data_update();
+}
 
 } // namespace Xefis
 

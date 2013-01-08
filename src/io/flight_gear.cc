@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/application.h>
 #include <xefis/application/services.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
@@ -104,10 +105,9 @@ FlightGearIO::read_input()
 {
 	while (_input->hasPendingDatagrams())
 	{
-		QByteArray datagram;
-		datagram.resize (_input->pendingDatagramSize());
-		QHostAddress sender_host;
-		uint16_t sender_port;
+		int datagram_size = _input->pendingDatagramSize();
+		if (_datagram.size() < datagram_size)
+			_datagram.resize (datagram_size);
 
 		bool navigation_gs_needle_ok = false;
 		bool navigation_hd_needle_ok = false;
@@ -116,24 +116,25 @@ FlightGearIO::read_input()
 		float navigation_hd_needle = 0.f;
 		float navigation_dme = 0.f;
 
-		_input->readDatagram (datagram.data(), datagram.size(), &sender_host, &sender_port);
+		_input->readDatagram (_datagram.data(), datagram_size, nullptr, nullptr);
 
-		for (int i = 0; i < datagram.size(); ++i)
-			if (datagram[i] == ',' || datagram[i] == '=')
-				datagram[i] = 0; // NUL character.
+		for (int i = 0; i < datagram_size; ++i)
+			if (_datagram[i] == ',' || _datagram[i] == '=')
+				_datagram[i] = 0; // NUL character.
 
-		const char* data = datagram.constData();
-		std::size_t data_size = datagram.size();
+		const char* data = _datagram.constData();
 		const char* c_value = data;
 
 		auto next_value = [&]() -> QString
 		{
-			if (c_value >= data + data_size)
+			if (c_value < data + datagram_size)
+			{
+				const char* x = c_value;
+				c_value += strlen (c_value) + 1;
+				return QString (x);
+			}
+			else
 				return nullptr;
-
-			const char* x = c_value;
-			c_value += strlen (c_value) + 1;
-			return QString (x);
 		};
 
 		auto handle_float_var = [](QString const& value, Xefis::PropertyFloat& property) -> void
@@ -222,6 +223,8 @@ FlightGearIO::read_input()
 				_dme_distance_nm.write (navigation_dme);
 		}
 	}
+
+	data_updated();
 
 	_timeout_timer->start();
 }

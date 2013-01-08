@@ -26,10 +26,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/application.h>
 #include <xefis/application/services.h>
-#include <xefis/core/property_storage.h>
-#include <xefis/core/module_manager.h>
-#include <xefis/core/config_reader.h>
 #include <xefis/utility/backtrace.h>
 
 // Local:
@@ -49,7 +47,7 @@ log_exception (Xefis::Exception const& e)
 void quit (int)
 {
 	std::clog << "HUP received, exiting." << std::endl;
-	QApplication::closeAllWindows();
+	Xefis::xefis()->quit();
 }
 
 
@@ -76,26 +74,9 @@ int main (int argc, char** argv, char**)
 		}
 		else
 		{
-			QApplication* app = new QApplication (argc, argv);
-			// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
-			// Also encode std::strings and const chars* in UTF-8:
-			QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
-			// Init services:
-			Xefis::Services::initialize();
-			// Init Xefis modules:
-			Xefis::PropertyStorage::initialize();
-
-			Xefis::ModuleManager* module_manager = new Xefis::ModuleManager();
-			Xefis::ConfigReader config_reader (module_manager);
-			config_reader.load ("xefis-config.xml");
-
+			Xefis::Application* app = Xefis::Application::create (argc, argv);
 			app->exec();
-
-			delete module_manager;
-
-			Xefis::Services::deinitialize();
-
-			delete app;
+			Xefis::Application::destroy();
 		}
 	}
 	catch (Xefis::Exception& e)

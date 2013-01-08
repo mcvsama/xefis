@@ -43,6 +43,10 @@ class RadialIndicator: public Xefis::Instrument
 	void
 	read();
 
+  protected:
+	void
+	data_update() override;
+
   private:
 	RadialIndicatorWidget*	_widget = nullptr;
 	std::string				_property_path;
@@ -54,5 +58,12 @@ class RadialIndicator: public Xefis::Instrument
 	Xefis::PropertyFloat	_critical_value;
 	Xefis::PropertyFloat	_normal_value;
 };
+
+
+inline void
+RadialIndicator::data_update()
+{
+	read();
+}
 
 #endif

@@ -18,10 +18,12 @@ CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"'
 
 ######## /xefis/application ########
 
+SRC_HEADERS += xefis/application/application.h
 SRC_HEADERS += xefis/application/fail.h
 SRC_HEADERS += xefis/application/services.h
 SRC_HEADERS += xefis/application/xefis.h
 
+SRC_SOURCES += xefis/application/application.cc
 SRC_SOURCES += xefis/application/fail.cc
 SRC_SOURCES += xefis/application/main.cc
 SRC_SOURCES += xefis/application/services.cc
