@@ -278,5 +278,7 @@ FlightGearIO::invalidate_all()
 		if (property->valid())
 			property->set_nil();
 	}
+
+	data_updated();
 }
 
