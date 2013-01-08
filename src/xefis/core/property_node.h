@@ -559,16 +559,19 @@ PropertyNode::root() noexcept
 inline PropertyNode*
 PropertyNode::locate (std::string const& path)
 {
+	if (path.empty())
+		return this;
+
 	// If we are root node, try searching PropertyStorage cache first:
 	if (!_parent && _storage)
 	{
 		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
 		if (node)
 			return node;
+		else
+			// If not found by absolute path in Storage, then it doesn't exist:
+			return nullptr;
 	}
-
-	if (path.empty())
-		return this;
 
 	if (path[0] == '/')
 		return root()->locate (path.substr (1));
