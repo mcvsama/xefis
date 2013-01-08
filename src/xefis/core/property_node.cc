@@ -72,16 +72,16 @@ PropertyNode::locate (std::string const& path)
 		return locate (rest);
 	else if (segment == "..")
 	{
-		if (!_parent)
-			return nullptr;
-		return _parent->locate (rest);
+		if (_parent)
+			return _parent->locate (rest);
+		return nullptr;
 	}
 	else
 	{
 		PropertyNode* c = child (segment);
-		if (!c)
-			return nullptr;
-		return c->locate (rest);
+		if (c)
+			return c->locate (rest);
+		return nullptr;
 	}
 }
 
