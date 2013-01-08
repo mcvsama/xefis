@@ -555,6 +555,47 @@ PropertyNode::root() noexcept
 }
 
 
+PropertyNode*
+PropertyNode::locate (std::string const& path)
+{
+	// If we are root node, try searching PropertyStorage cache first:
+	if (!_parent && _storage)
+	{
+		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
+		if (node)
+			return node;
+	}
+
+	if (path.empty())
+		return this;
+
+	if (path[0] == '/')
+		return root()->locate (path.substr (1));
+
+	std::string::size_type slash = path.find ('/');
+	std::string segment = path.substr (0, slash);
+	std::string rest;
+	if (slash != std::string::npos)
+		rest = path.substr (slash + 1);
+
+	if (segment == ".")
+		return locate (rest);
+	else if (segment == "..")
+	{
+		if (_parent)
+			return _parent->locate (rest);
+		return nullptr;
+	}
+	else
+	{
+		PropertyNode* c = child (segment);
+		if (c)
+			return c->locate (rest);
+		return nullptr;
+	}
+}
+
+
 inline PropertyStorage*
 PropertyNode::storage() noexcept
 {
