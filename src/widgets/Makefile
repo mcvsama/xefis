@@ -1,1 +1,1 @@
-/home/mcv/git/xefis/src/Makefile.up
+../Makefile.up
