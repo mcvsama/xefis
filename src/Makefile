@@ -1,21 +1,56 @@
 # vim:ts=4
 
-LIBS			=
-PKGCONFIG_LIBS	=
-PKGCONFIG_FLAGS	=
-CXX				= g++
-DEPCC			= $(CXX)
-CXXFLAGS		= -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt $(PKGCONFIG_FLAGS)
-SO				= g++ -shared
-SOFLAGS			=
-LD				= g++
-LDFLAGS			= $(foreach lib, $(LIBS), -l$(lib)) $(PKGCONFIG_LIBS)
-AR				= ar
-MOC				= $(QT_PREFIX)/bin/moc-qt5
+# Override these variables in Makefile.local.
 
-.PHONY: first all dep help dist clean depclean distclean release releases
-.DEFAULT: all
-MAKEFLAGS = --silent
+# Show verbose compilation commands?
+VERBOSE			:= 0
+# How many threads use for compilation?
+THREADS			:= $(shell grep processor /proc/cpuinfo|wc -l)
+# Architecture:
+ARCH			:= $(shell uname -m)
+# Enable profiling?
+PROFILING		:= 0
+# Debugging enabled?
+DEBUG			:= 0
+# Where Qt is installed?
+QT_PREFIX		:= /usr
+# Profile name:
+PROFILE			:=
+# Version:
+VERSION			:= alpha0.1dev
+
+# Predefined profiles:
+ifeq ($(PROFILE),rpi)
+CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
+endif
+
+CXX				:= g++
+DEPCC			:= $(CXX)
+CXXFLAGS		+= -fPIE -O4 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt
+CXXFLAGS		+= -pthread -rdynamic -I.
+CXXFLAGS		+= -finline -march=native -mtune=native -falign-functions=4 -mpreferred-stack-boundary=4 -funroll-loops -mfpmath=sse,387 -msse4.1 -fomit-frame-pointer
+SO				:= $(CXX) -shared
+SOFLAGS			:=
+LD				:= $(CXX)
+LDFLAGS			:= -rdynamic
+AR				:= ar
+MOC				:= $(QT_PREFIX)/bin/moc-qt5
+LIBS			+= m boost_system
+PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets
+CXXFLAGS_s		:= $(CXXFLAGS)
+ifeq ($(OPTIMIZE),debug)
+XEFIS_FEATURES	+= XEFIS_ASSERTS
+XEFIS_FEATURES	+= XEFIS_ASSERTS_FATAL
+CXXFLAGS		+= -O2 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
+else
+CXXFLAGS		+= -DQT_NO_DEBUG
+endif
+CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"' $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
+LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
+LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
+CXXFLAGS		+= $(shell pkg-config --cflags $(PKGCONFIGS))
+
+.PHONY: all dep help clean distclean release
 
 HEADERS =
 SOURCES =
@@ -26,14 +61,6 @@ TARGETS =
 
 #### Helpers ####
 
-distdir		= .build/$(DIST)
-reldir		= release/$(DIST)
-reldir_pkg	= $(reldir)/xefix-$(XEFIS_VERSION)-$(DIST)
-prepdir		= $(shell mkdir -p "$$(dirname "$(strip $(1))")")
-mkmocs		= $(foreach file, $(1), $(dir $(file))$(shell basename '$(file)' $(suffix $(file))).moc.cc)
-mkobjs		= $(foreach file, $(1), $(distdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).o)
-mkdeps		= $(foreach file, $(1), $(distdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).dep)
-
 ifeq ($(shell tput colors), -1)
 	_s = ""
 	_l = ""
@@ -43,6 +70,53 @@ else
 endif
 
 #### Makefiles ####
+
+-include Makefile.local
+
+ifneq ($(VERBOSE),1)
+MAKEFLAGS += --silent
+endif
+
+ifneq ($(THREADS),)
+MAKEFLAGS += -j$(THREADS)
+endif
+
+ifeq ($(PROFILING),1)
+CXXFLAGS += -pg -fno-omit-frame-pointer
+LDFLAGS += -pg
+endif
+
+ifeq ($(PROFILING),1)
+PROFILING_s = -profiling
+else
+PROFILING_s =
+endif
+
+ifeq ($(DEBUG),1)
+DEBUG_s = -debug
+else
+DEBUG_s =
+endif
+
+ifneq ($(PROFILE),)
+PROFILE_s = -$(PROFILE)
+else
+PROFILE_s =
+endif
+
+dist			= $(ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
+distdir			:= build/$(dist)
+depsdir			= $(distdir)/deps
+objsdir			= $(distdir)/objects
+mocsdir			= $(distdir)/mocs
+reldir			= release/$(dist)
+relname			= xefis-$(VERSION)-$(dist)
+reldir_pkg		= $(reldir)/$(relname)
+prepdir			= $(shell mkdir -p "$$(dirname "$(strip $(1))")")
+mkmocs			= $(foreach file, $(1), $(mocsdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).moc.cc)
+mkdeps			= $(foreach file, $(1), $(depsdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).dep)
+mkobjs			= $(foreach file, $(1), $(objsdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).o)
+mkmocobjs		= $(foreach file, $(1), $(dir $(file))$(shell basename '$(file)' $(suffix $(file))).o)
 
 include Makefile.sources
 
@@ -88,7 +162,7 @@ $(VERSION_FILE): $(COMMIT_FILE) $(BRANCH_FILE)
 	@echo "namespace Xefis { namespace Version {" >>$@
 	@echo "	const char* commit = \"$(COMMIT_REAL)\";" >>$@
 	@echo "	const char* branch = \"$(BRANCH_REAL)\";" >>$@
-	@echo "	const char* version = \"$(XEFIS_VERSION)\";" >>$@
+	@echo "	const char* version = \"$(VERSION)\";" >>$@
 	@echo "} }" >>$@
 
 $(call mkobjs, $(VERSION_FILE)): $(VERSION_FILE)
@@ -98,8 +172,9 @@ endif # VERSION_FILE != ""
 #### Rules ####
 
 DEPFILES := $(call mkdeps, $(subst $(VERSION_FILE),,$(SOURCES)))
+MAINDEPFILE := $(depsdir)/Makefile.dep
 
-all: $(distdir)/Makefile.dep $(DEPFILES) $(TARGETS)
+all: $(MAINDEPFILE) $(DEPFILES) $(TARGETS)
 
 dep: $(DEPFILES)
 
@@ -108,40 +183,24 @@ help:
 	@echo '  all        Compiles program.'
 	@echo '  dep        Generates dependencies.'
 	@echo '  clean      Cleans source tree and dep files'
-	@echo '  distclean  Cleans dist directory.'
+	@echo '  distclean  Cleans build directory.'
 	@echo '  release    Creates release.'
-	@echo '  releases   Creates all configured releases.'
 	@echo '  help       Shows this help.'
 
 clean:
 	@rm -f $(MOCSRCS)
+	@rm -f $(OBJECTS)
+	@rm -f $(MOCOBJS)
 	@rm -f $(DEPFILES)
+	@rm -f $(MAINDEPFILE)
 
 distclean:
-	@rm -f $(DEPFILES) $(MOCOBJS) $(OBJECTS) $(NODEP_OBJECTS)
+	@rm -rf build
 
 release:
-	@echo Making release: $(DIST)
-	@make clean distclean all
-	@rm -rf $(reldir)
-	@mkdir -p $(reldir_pkg)
-	@mkdir -p $(reldir_pkg)/share
-	@cp -Ra ../share/config $(reldir_pkg)/share/
-	@mkdir -p $(reldir_pkg)/share/images/16
-	@mkdir -p $(reldir_pkg)/share/images/22
-	@cp -Ra ../share/images/16/*.png $(reldir_pkg)/share/images/16/
-	@cp -Ra ../share/images/22/*.png $(reldir_pkg)/share/images/22/
-	@cp -Ra ../share/images/*.png $(reldir_pkg)/share/images/
-	@cp $(distdir)/xefis.run $(reldir_pkg)/xefis
-ifneq ($(DIST),debug)
-	@strip $(reldir_pkg)/xefis
-endif
-	@cd $(reldir) && tar zcf xefis-$(XEFIS_VERSION)-$(DIST).tar.gz xefis-$(XEFIS_VERSION)-$(DIST) && cd -
+	@echo Unimplemented
 
-releases:
-	@for r in $(DISTS); do DIST="$$r" make release; done
-
-$(distdir)/Makefile.dep: Makefile Makefile.sources $(DEPFILES)
+$(MAINDEPFILE): Makefile.sources $(DEPFILES)
 	$(call prepdir, $@)
 	@echo $(_s) "DEP     " $(_l) $@
 	@rm -f $@
@@ -151,23 +210,28 @@ $(distdir)/Makefile.dep: Makefile Makefile.sources $(DEPFILES)
 		cat "$$file" >> $@; \
 	 done;
 	@for file in $(MOCSRCS); do \
-		echo "$(distdir)/$$(dirname "$$file")/$$(basename "$$file" .cc).o: $$file" >> $@; \
+		echo "$$(dirname "$$file")/$$(basename "$$file" .cc).o: $$file" >> $@; \
 	 done;
 
-$(distdir)/%.dep: %.cc %.h
+$(depsdir)/%.dep: %.cc %.h
 	$(call prepdir, $@)
 	@echo $(_s) "DEP     " $(_l) $@
-	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(distdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
+	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(objsdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
 
-$(distdir)/%.dep: %.cc
+$(depsdir)/%.dep: %.cc
 	$(call prepdir, $@)
 	@echo $(_s) "DEP     " $(_l) $@
-	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(distdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
+	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(objsdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
 
-$(distdir)/%.dep: %.h
+$(depsdir)/%.dep: %.h
 	$(call prepdir, $@)
 	@echo $(_s) "DEP     " $(_l) $@
-	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(distdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
+	$(DEPCC) $(CXXFLAGS) -MM -MQ "$(objsdir)/$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
+
+$(depsdir)/%.moc.dep: %.moc.cc
+	$(call prepdir, $@)
+	@echo $(_s) "DEP     " $(_l) $@
+	$(DEPCC) $(CXXFLAGS) -MM -MQ "$$(dirname "$<")/$$(basename "$<" $$(expr "$<" : '.*\(\..*\)$$')).o" $< > $@
 
 %.o:
 	$(call prepdir, $@)
@@ -185,7 +249,8 @@ $(distdir)/%.dep: %.h
 	@echo $(_s) "LD [M]  " $(_l) $@
 	$(SO) $(SOFLAGS) $^ -o $@
 
-%.moc.cc: %.h
+$(mocsdir)/%.moc.cc: %.h
+	$(call prepdir, $@)
 	@echo $(_s) "MOC     " $(_l) $@
 	$(MOC) $< -o $@
 
@@ -194,5 +259,5 @@ $(LINKEDS):
 	@echo $(_s) "LD      " $(_l) $@
 	$(LD) -o $@ $(NODEP_OBJECTS) $(OBJECTS) $(MOCOBJS) $(LDFLAGS)
 
--include $(distdir)/Makefile.dep
+-include $(MAINDEPFILE)
 
