@@ -1,21 +1,5 @@
 # vim:ts=4
 
--include Makefile.conf
-
-PKGCONFIG_LIBS	+= $(shell pkg-config --libs Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets)
-PKGCONFIG_FLAGS	+= $(shell pkg-config --cflags Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets)
-
-ifeq ($(PROFILING), 1)
-	PROFILING_CXXFLAGS = -pg -fno-omit-frame-pointer
-	PROFILING_LDFLAGS = -pg
-endif
-
-LDFLAGS			+= -rdynamic $(LDFLAGS_$(DIST)) $(PROFILING_LDFLAGS)
-LIBS			+= m dl pthread uuid boost_system
-CXXFLAGS		+= -fPIE -DQT_NO_DEBUG -pthread -rdynamic -I. -Wall -DQT_NO_DEBUG $(CXXFLAGS_$(DIST)) $(PROFILING_CXXFLAGS) $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
-CXXFLAGS_s		:= $(CXXFLAGS)
-CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"'
-
 ######## /xefis/application ########
 
 SRC_HEADERS += xefis/application/application.h
@@ -135,9 +119,9 @@ SOURCES += $(SRC_SOURCES)
 MOCSRCS += $(call mkmocs, $(foreach file, $(SRC_MOCHDRS), $(file)))
 OBJECTS += $(call mkobjs, $(SOURCES))
 OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
-MOCOBJS += $(call mkobjs, $(MOCSRCS))
-TARGETS += $(distdir)/xefis.run
-LINKEDS += $(distdir)/xefis.run
+MOCOBJS += $(call mkmocobjs, $(MOCSRCS))
+TARGETS += $(distdir)/xefis
+LINKEDS += $(distdir)/xefis
 
-$(distdir)/xefis.run: $(OBJECTS) $(MOCOBJS)
+$(distdir)/xefis: $(OBJECTS) $(MOCOBJS)
 
