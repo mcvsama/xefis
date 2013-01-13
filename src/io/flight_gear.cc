@@ -164,8 +164,13 @@ FlightGearIO::read_input()
 						_minimum_ias_kt.write (value.toDouble());
 		/* al */	handle_float_var (next_value(), _altitude_ft);
 		/* alr */	value = next_value();
-					if (!_altitude_agl_ft.is_singular() && value.toDouble() < 2500.f)
-						_altitude_agl_ft.write (value.toDouble());
+					if (!_altitude_agl_ft.is_singular())
+					{
+						if (value == "" || value.toDouble() > 2500.f)
+							_altitude_agl_ft.set_nil();
+						else
+							_altitude_agl_ft.write (value.toDouble());
+					}
 		/* als */	handle_float_var (next_value(), _pressure_inhg);
 		/* cbr */	handle_float_var (next_value(), _cbr_fpm);
 		/* lt */	value = next_value();
@@ -205,7 +210,7 @@ FlightGearIO::read_input()
 		/* n2 */	handle_float_var (next_value(), _engine_n2_pct);
 		/* egt */	value = next_value();
 					if (!_engine_egt_degc.is_singular())
-						_engine_egt_degc.write (5.f / 9.f * (value.toDouble() - 32.f));
+						_engine_egt_degc.write (5.f / 9.f * (value.left (9).toDouble() - 32.f));
 
 		if (navigation_gs_needle_ok)
 		{
