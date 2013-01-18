@@ -37,160 +37,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	typedef std::map<QString, Knots> SpeedBugs;
 	typedef std::map<QString, Feet> AltitudeBugs;
 
-	class AltitudeLadder
-	{
-	  public:
-		AltitudeLadder (EFISWidget&, QPainter&, TextPainter&);
-
-		void
-		paint();
-
-	  private:
-		void
-		paint_black_box (float x, bool only_compute_black_box_rect = false);
-
-		void
-		paint_ladder_scale (float x);
-
-		void
-		paint_altitude_tendency (float x);
-
-		void
-		paint_bugs (float x);
-
-		void
-		paint_climb_rate (float x);
-
-		void
-		paint_pressure (float x);
-
-		void
-		paint_ap_setting (float x);
-
-		float
-		ft_to_px (Feet ft) const;
-
-		float
-		scale_cbr (FeetPerMinute climb_rate) const;
-
-	  private:
-		EFISWidget&		_efis;
-		QPainter&		_painter;
-		TextPainter&	_text_painter;
-		Feet			_altitude;
-		FeetPerMinute	_climb_rate;
-		float			_pressure;
-		Feet			_extent;
-		float			_sgn;
-		Feet			_min_shown;
-		Feet			_max_shown;
-		int				_rounded_altitude;
-		QRectF			_ladder_rect;
-		QPen			_ladder_pen;
-		QRectF			_black_box_rect;
-		QPen			_black_box_pen;
-		QPen			_scale_pen_1;
-		QPen			_scale_pen_2; // Bold one, each 500 ft
-		QPen			_negative_altitude_pen;
-		QPen			_altitude_bug_pen;
-		QPen			_ldg_alt_pen;
-	};
-
-	class SpeedLadder
-	{
-	  public:
-		SpeedLadder (EFISWidget&, QPainter&, TextPainter&);
-
-		void
-		paint();
-
-	  private:
-		void
-		paint_black_box (float x, bool only_compute_black_box_rect = false);
-
-		void
-		paint_ladder_scale (float x);
-
-		void
-		paint_speed_limits (float x);
-
-		void
-		paint_speed_tendency (float x);
-
-		void
-		paint_bugs (float x);
-
-		void
-		paint_mach_number (float x);
-
-		void
-		paint_ap_setting (float x);
-
-		float
-		kt_to_px (Knots ft) const;
-
-	  private:
-		EFISWidget&		_efis;
-		QPainter&		_painter;
-		TextPainter&	_text_painter;
-		Knots			_speed;
-		float			_mach;
-		Knots			_minimum_speed;
-		Knots			_warning_speed;
-		Knots			_maximum_speed;
-		Knots			_extent;
-		Knots			_min_shown;
-		Knots			_max_shown;
-		int				_rounded_speed;
-		QRectF			_ladder_rect;
-		QPen			_ladder_pen;
-		QRectF			_black_box_rect;
-		QPen			_black_box_pen;
-		QPen			_scale_pen;
-		QPen			_speed_bug_pen;
-	};
-
-	class AttitudeDirectorIndicator
-	{
-	  public:
-		AttitudeDirectorIndicator (EFISWidget&, QPainter&, TextPainter&);
-
-		void
-		paint();
-
-	  private:
-		void
-		paint_horizon();
-
-		void
-		paint_pitch();
-
-		void
-		paint_roll();
-
-		void
-		paint_heading();
-
-		void
-		paint_flight_path_marker();
-
-		QPainterPath
-		get_pitch_scale_clipping_path() const;
-
-	  private:
-		EFISWidget&		_efis;
-		QPainter&		_painter;
-		TextPainter&	_text_painter;
-		Degrees			_pitch;
-		Degrees			_roll;
-		Degrees			_heading;
-		QTransform		_pitch_transform;
-		QTransform		_roll_transform;
-		QTransform		_heading_transform;
-		QTransform		_horizon_transform;
-		QPainterPath	_flight_path_marker;
-	};
-
   public:
 	// Ctor
 	EFISWidget (QWidget* parent);
@@ -803,7 +649,119 @@ class EFISWidget: public Xefis::InstrumentWidget
 
   protected:
 	void
+	resizeEvent (QResizeEvent*) override;
+
+	void
 	paintEvent (QPaintEvent*) override;
+
+	/*
+	 * ADI
+	 */
+
+	void
+	adi_post_resize();
+
+	void
+	adi_pre_paint();
+
+	void
+	adi_paint (QPainter&, TextPainter&);
+
+	void
+	adi_paint_horizon (QPainter&);
+
+	void
+	adi_paint_pitch (QPainter&, TextPainter&);
+
+	void
+	adi_paint_roll (QPainter&);
+
+	void
+	adi_paint_heading (QPainter&, TextPainter&);
+
+	void
+	adi_paint_flight_path_marker (QPainter&);
+
+	/*
+	 * Speed ladder
+	 */
+
+	void
+	sl_post_resize();
+
+	void
+	sl_pre_paint();
+
+	void
+	sl_paint (QPainter&, TextPainter&);
+
+	void
+	sl_paint_black_box (QPainter& painter, TextPainter&, float x);
+
+	void
+	sl_paint_ladder_scale (QPainter& painter, TextPainter&, float x);
+
+	void
+	sl_paint_speed_limits (QPainter& painter, float x);
+
+	void
+	sl_paint_speed_tendency (QPainter& painter, float x);
+
+	void
+	sl_paint_bugs (QPainter& painter, TextPainter&, float x);
+
+	void
+	sl_paint_mach_number (QPainter& painter, TextPainter&, float x);
+
+	void
+	sl_paint_ap_setting (QPainter& painter, TextPainter&);
+
+	float
+	kt_to_px (Knots ft) const;
+
+	/*
+	 * Altitude ladder
+	 */
+
+	void
+	al_post_resize();
+
+	void
+	al_pre_paint();
+
+	void
+	al_paint (QPainter&, TextPainter&);
+
+	void
+	al_paint_black_box (QPainter& painter, TextPainter& text_painter, float x);
+
+	void
+	al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x);
+
+	void
+	al_paint_altitude_tendency (QPainter& painter, float x);
+
+	void
+	al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x);
+
+	void
+	al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, float x);
+
+	void
+	al_paint_pressure (QPainter& painter, TextPainter& text_painter, float x);
+
+	void
+	al_paint_ap_setting (QPainter& painter, TextPainter& text_painter);
+
+	float
+	ft_to_px (Feet ft) const;
+
+	float
+	scale_cbr (FeetPerMinute climb_rate) const;
+
+	/*
+	 * Other
+	 */
 
 	void
 	paint_center_cross (QPainter&);
@@ -858,6 +816,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	float
 	heading_to_px (Degrees degrees) const;
 
+	QPainterPath
+	get_pitch_scale_clipping_path() const;
+
   private:
 	QColor				_sky_color;
 	QColor				_ground_color;
@@ -866,20 +827,76 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QColor				_warning_color_1;
 	QColor				_warning_color_2;
 	QTransform			_center_transform;
+	QTransform			_pitch_transform;
+	QTransform			_roll_transform;
+	QTransform			_heading_transform;
+	QTransform			_horizon_transform;
 	Degrees				_fov							= 120.f;
 	bool				_input_alert_visible			= false;
 	TextPainter::Cache	_text_painter_cache;
 	QTimer*				_blinking_warning				= nullptr;
 	bool				_blink							= false;
-	int					_speed_ladder_line_every		= 10;
-	int					_speed_ladder_number_every		= 20;
-	Knots				_speed_ladder_extent			= 124;
-	int					_altitude_ladder_line_every		= 100;
-	int					_altitude_ladder_number_every	= 200;
-	int					_altitude_ladder_bold_every		= 500;
-	Feet				_altitude_ladder_extent			= 825;
 
-	// Parameters:
+	float				_w;
+	float				_h;
+	float				_max_w_h;
+
+	/*
+	 * ADI
+	 */
+
+	QRectF				_adi_sky_rect;
+	QRectF				_adi_gnd_rect;
+	QPainterPath		_flight_path_marker_clip;
+	QPointF				_flight_path_marker_position;
+
+	/*
+	 * Speed ladder
+	 */
+
+	Knots				_sl_extent						= 124;
+	int					_sl_line_every					= 10;
+	int					_sl_number_every				= 20;
+	Knots				_sl_min_shown;
+	Knots				_sl_max_shown;
+	int					_sl_rounded_speed;
+	QRectF				_sl_ladder_rect;
+	QPen				_sl_ladder_pen;
+	QRectF				_sl_black_box_rect;
+	QPen				_sl_black_box_pen;
+	QPen				_sl_scale_pen;
+	QPen				_sl_speed_bug_pen;
+	float				_sl_margin;
+	int					_sl_digits;
+
+	/*
+	 * Altitude ladder
+	 */
+
+	int					_al_line_every					= 100;
+	int					_al_number_every				= 200;
+	int					_al_bold_every					= 500;
+	Feet				_al_extent						= 825;
+	Feet				_al_min_shown;
+	Feet				_al_max_shown;
+	int					_al_rounded_altitude;
+	QRectF				_al_ladder_rect;
+	QPen				_al_ladder_pen;
+	QRectF				_al_black_box_rect;
+	QPen				_al_black_box_pen;
+	QPen				_al_scale_pen_1;
+	QPen				_al_scale_pen_2; // Bold one, each 500 ft
+	QPen				_al_negative_altitude_pen;
+	QPen				_al_altitude_bug_pen;
+	QPen				_al_ldg_alt_pen;
+	QRectF				_al_b_digits_box;
+	QRectF				_al_s_digits_box;
+	float				_al_margin;
+
+	/*
+	 * Parameters
+	 */
+
 	Degrees				_pitch							= 0.f;
 	bool				_pitch_visible					= false;
 	Degrees				_roll							= 0.f;
@@ -942,24 +959,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 };
 
 
-inline float
-EFISWidget::AltitudeLadder::ft_to_px (Feet ft) const
-{
-	return -0.5f * _ladder_rect.height() * (ft - _altitude) / (_extent / 2.f);
-}
-
-
-inline float
-EFISWidget::SpeedLadder::kt_to_px (Knots kt) const
-{
-	return -0.5f * _ladder_rect.height() * (kt - _speed) / (_extent / 2.f);
-}
-
-
 inline void
 EFISWidget::set_speed_ladder_line_every (int knots)
 {
-	_speed_ladder_line_every = std::max (1, knots);
+	_sl_line_every = std::max (1, knots);
 	update();
 }
 
@@ -967,7 +970,7 @@ EFISWidget::set_speed_ladder_line_every (int knots)
 inline void
 EFISWidget::set_speed_ladder_number_every (int knots)
 {
-	_speed_ladder_number_every = std::max (1, knots);
+	_sl_number_every = std::max (1, knots);
 	update();
 }
 
@@ -975,7 +978,7 @@ EFISWidget::set_speed_ladder_number_every (int knots)
 inline void
 EFISWidget::set_speed_ladder_extent (int knots)
 {
-	_speed_ladder_extent = std::max (1, knots);
+	_sl_extent = std::max (1, knots);
 	update();
 }
 
@@ -983,7 +986,7 @@ EFISWidget::set_speed_ladder_extent (int knots)
 inline void
 EFISWidget::set_altitude_ladder_line_every (int feet)
 {
-	_altitude_ladder_line_every = std::max (1, feet);
+	_al_line_every = std::max (1, feet);
 	update();
 }
 
@@ -991,7 +994,7 @@ EFISWidget::set_altitude_ladder_line_every (int feet)
 inline void
 EFISWidget::set_altitude_ladder_number_every (int feet)
 {
-	_altitude_ladder_number_every = std::max (1, feet);
+	_al_number_every = std::max (1, feet);
 	update();
 }
 
@@ -999,7 +1002,7 @@ EFISWidget::set_altitude_ladder_number_every (int feet)
 inline void
 EFISWidget::set_altitude_ladder_bold_every (int feet)
 {
-	_altitude_ladder_bold_every = std::max (1, feet);
+	_al_bold_every = std::max (1, feet);
 	update();
 }
 
@@ -1007,7 +1010,7 @@ EFISWidget::set_altitude_ladder_bold_every (int feet)
 inline void
 EFISWidget::set_altitude_ladder_extent (int feet)
 {
-	_altitude_ladder_extent = std::max (1, feet);
+	_al_extent = std::max (1, feet);
 	update();
 }
 
@@ -1727,6 +1730,20 @@ inline void
 EFISWidget::set_input_alert_visible (bool visible)
 {
 	_input_alert_visible = visible;
+}
+
+
+inline float
+EFISWidget::kt_to_px (Knots kt) const
+{
+	return -0.5f * _sl_ladder_rect.height() * (kt - _speed) / (0.5f * _sl_extent);
+}
+
+
+inline float
+EFISWidget::ft_to_px (Feet ft) const
+{
+	return -0.5f * _al_ladder_rect.height() * (ft - _altitude) / (0.5f * _al_extent);
 }
 
 

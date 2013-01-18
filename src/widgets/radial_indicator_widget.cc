@@ -37,9 +37,7 @@ RadialIndicatorWidget::paintEvent (QPaintEvent* paint_event)
 	float const w = width();
 	float const h = height();
 
-	// Draw on buffer:
-	QPixmap buffer (w, h);
-	QPainter painter (&buffer);
+	QPainter painter (this);
 	TextPainter text_painter (painter);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
@@ -58,9 +56,6 @@ RadialIndicatorWidget::paintEvent (QPaintEvent* paint_event)
 
 	paint_text (painter, text_painter, q, r);
 	paint_indicator (painter, text_painter, q, r);
-
-	// Copy buffer to screen:
-	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
 }
 
 
