@@ -45,9 +45,7 @@ HSIWidget::paintEvent (QPaintEvent* paint_event)
 	_heading_transform.reset();
 	_heading_transform.rotate (-_heading);
 
-	// Draw on buffer:
-	QPixmap buffer (w, h);
-	QPainter painter (&buffer);
+	QPainter painter (this);
 	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
@@ -72,9 +70,6 @@ HSIWidget::paintEvent (QPaintEvent* paint_event)
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
 	paint_speeds (painter, text_painter, q, r);
-
-	// Copy buffer to screen:
-	QPainter (this).drawPixmap (paint_event->rect().topLeft(), buffer, paint_event->rect());
 }
 
 

@@ -57,6 +57,8 @@ Services::initialize()
 	for (QString font: { "Black", "Bold", "BoldCondensed", "Condensed", "Light", "Medium", "Regular", "Thin" })
 		QFontDatabase::addApplicationFont ("share/fonts/Roboto/Roboto-" + font + ".ttf");
 
+	bool found = false;
+
 	for (auto font_family: { "Roboto", "Bitstream Vera Sans Mono", "Ubuntu Mono", "Droid Sans", "Trebuchet MS", "monospace" })
 	{
 		QFont font (font_family);
@@ -64,10 +66,16 @@ Services::initialize()
 		if (font_info.exactMatch())
 		{
 			_instrument_font = font;
-			_instrument_font.setHintingPreference (QFont::PreferNoHinting);
+			found = true;
 			break;
 		}
 	}
+
+	// Failsafe: Roboto
+	if (!found)
+		_instrument_font = QFont ("Roboto");
+
+	_instrument_font.setHintingPreference (QFont::PreferNoHinting);
 }
 
 
