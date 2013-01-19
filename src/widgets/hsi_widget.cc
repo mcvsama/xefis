@@ -67,7 +67,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_dotted_earth (painter, q, r);
 	paint_navaids (painter, text_painter, q, r);
 	paint_track (painter, text_painter, q, r);
-	paint_track_estimation (painter, text_painter, q, r);
+	paint_trend_vector (painter, text_painter, q, r);
 	paint_ap_settings (painter, text_painter, q, r);
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
@@ -172,7 +172,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 
 
 void
-HSIWidget::paint_track_estimation (QPainter& painter, TextPainter&, float, float)
+HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap);
 
@@ -180,15 +180,15 @@ HSIWidget::paint_track_estimation (QPainter& painter, TextPainter&, float, float
 	painter.setPen (est_pen);
 	painter.setClipRect (_inside_map_clip_rect);
 
-	if (_track_estimation_visible)
+	if (_trend_vector_visible)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
 
-		Miles const step = _track_estimation_lookahead / 50.f;
+		Miles const step = _trend_vector_lookahead / 50.f;
 		Degrees const degrees_per_step = step * _track_deviation;
 
-		for (float pos = 0.f; pos < _track_estimation_lookahead; pos += step)
+		for (float pos = 0.f; pos < _trend_vector_lookahead; pos += step)
 		{
 			float px = nm_to_px (step);
 			painter.rotate (degrees_per_step);
