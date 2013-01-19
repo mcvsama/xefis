@@ -32,7 +32,7 @@ RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
 
 
 void
-RadialIndicatorWidget::paintEvent (QPaintEvent* paint_event)
+RadialIndicatorWidget::paintEvent (QPaintEvent*)
 {
 	float const w = width();
 	float const h = height();

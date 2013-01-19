@@ -219,6 +219,12 @@
 				<format>%f</format>
 				<node>/orientation/heading-magnetic-deg</node>
 			</chunk>
+			<chunk>
+				<name>th</name>
+				<type>float</type>
+				<format>%f</format>
+				<node>/orientation/heading-deg</node>
+			</chunk>
 			<!-- Flight path -->
 			<chunk>
 				<name>fpa</name>

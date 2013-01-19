@@ -17,6 +17,9 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QtCore/QPointF>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -42,6 +45,15 @@ class LatLng
 
 	Degrees const&
 	lng() const;
+
+	LatLng&
+	rotate (LatLng const& rotation);
+
+	LatLng
+	rotated (LatLng const& rotation) const;
+
+	QPointF
+	project_flat() const;
 
   private:
 	Degrees	_lat;

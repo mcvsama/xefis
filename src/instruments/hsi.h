@@ -38,6 +38,9 @@ class HSI: public Xefis::Instrument
 	// Ctor
 	HSI (QDomElement const& config, QWidget* parent);
 
+	// Dtor
+	~HSI();
+
   public slots:
 	/**
 	 * Force HSI to read data from properties.
@@ -58,10 +61,12 @@ class HSI: public Xefis::Instrument
 	std::array<LatLng, 3>	_positions;
 	bool					_positions_valid			= false;
 	Xefis::OnePoleSmoother	_track_estimation_smoother	= 60.0; // TODO make fps independent
+	NavaidStorage			_navaid_storage;
 
 	Xefis::PropertyFloat	_gs_kt;
 	Xefis::PropertyFloat	_tas_kt;
-	Xefis::PropertyFloat	_heading_deg;
+	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyBoolean	_autopilot_visible;
 	Xefis::PropertyFloat	_track_deg;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;

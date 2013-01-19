@@ -46,7 +46,8 @@ FlightGearIO::FlightGearIO (QDomElement const& config)
 						{ "mach", _mach, false },
 						{ "orientation-pitch", _pitch_deg, false },
 						{ "orientation-roll", _roll_deg, false },
-						{ "orientation-heading", _heading_deg, false },
+						{ "orientation-magnetic-heading", _mag_heading_deg, false },
+						{ "orientation-true-heading", _true_heading_deg, false },
 						{ "slip-skid", _slip_skid_g, false },
 						{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 						{ "flight-path-marker-beta", _fpm_beta_deg, false },
@@ -190,7 +191,8 @@ FlightGearIO::read_input()
 		/* slr */	handle_float_var (next_value(), _position_sea_level_radius_ft);
 		/* p */		handle_float_var (next_value(), _pitch_deg);
 		/* r */		handle_float_var (next_value(), _roll_deg);
-		/* h */		handle_float_var (next_value(), _heading_deg);
+		/* h */		handle_float_var (next_value(), _mag_heading_deg);
+		/* th */	handle_float_var (next_value(), _true_heading_deg);
 		/* fpa */	handle_float_var (next_value(), _fpm_alpha_deg);
 		/* fpb */	handle_float_var (next_value(), _fpm_beta_deg);
 		/* tr */	handle_float_var (next_value(), _track_deg);
@@ -248,7 +250,8 @@ FlightGearIO::invalidate_all()
 		&_mach,
 		&_pitch_deg,
 		&_roll_deg,
-		&_heading_deg,
+		&_mag_heading_deg,
+		&_true_heading_deg,
 		&_slip_skid_g,
 		&_fpm_alpha_deg,
 		&_fpm_beta_deg,

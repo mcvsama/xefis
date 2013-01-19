@@ -25,7 +25,8 @@
 									<property name='orientation-pitch' path='/orientation/pitch.deg'/>
 									<property name='orientation-roll' path='/orientation/roll.deg'/>
 									<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
-									<property name='orientation-heading' path='/orientation/heading.deg'/>
+									<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
+									<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>
 									<property name='slip-skid' path='/slip-skid/slip-skid.g' default='0'/>
 									<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
 									<property name='flight-path-marker-visible' path='/configuration/flight-path-marker/visible' default='true'/>
@@ -58,7 +59,8 @@
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>
-									<property name='orientation-heading' path='/orientation/heading.deg'/>
+									<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
+									<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>
 									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
 									<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
 									<property name='position-latitude' path='/position/latitude.deg'/>
