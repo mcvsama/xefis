@@ -39,6 +39,7 @@ class Navaid
 		IM		= 9,	// ILS inner marker
 		DMESF	= 12,	// Standalone DME or a component of NDB-DME (suppressed frequency)
 		DME		= 13,	// Like DMESF, but frequency is displayed
+		Fix		= 50,	// Fix
 	};
 
   public:

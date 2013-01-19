@@ -28,7 +28,29 @@
 
 NavaidStorage::NavaidStorage()
 {
-	QFile file ("share/nav/nav.dat");
+	parse_nav_dat();
+	parse_fix_dat();
+	parse_awy_dat();
+}
+
+
+NavaidStorage::Navaids
+NavaidStorage::get_navs (LatLng const& position, Miles radius) const
+{
+	Navaids set;
+
+	for (Navaid const& navaid: _navaids)
+		if (haversine_nm (navaid.position(), position) <= radius)
+			set.insert (navaid);
+
+	return set;
+}
+
+
+void
+NavaidStorage::parse_nav_dat()
+{
+	QFile file (_nav_dat_file);
 	file.open (QFile::ReadOnly);
 	QTextStream ts (&file);
 
@@ -97,30 +119,55 @@ NavaidStorage::NavaidStorage()
 			}
 
 			case Navaid::GS:
+				// TODO
 				break;
 
 			case Navaid::OM:
 			case Navaid::MM:
 			case Navaid::IM:
+				// TODO
 				break;
 
 			case Navaid::DMESF:		// Suppress frequency
 			case Navaid::DME:		// Display frequency
+				// TODO
+				break;
+
+			case Navaid::Fix:
+				// Not in this file.
 				break;
 		}
 	}
 }
 
 
-NavaidStorage::Navaids
-NavaidStorage::get_navs (LatLng const& position, Miles radius) const
+void
+NavaidStorage::parse_fix_dat()
 {
-	Navaids set;
+	QFile file (_fix_dat_file);
+	file.open (QFile::ReadOnly);
+	QTextStream ts (&file);
 
-	for (Navaid const& navaid: _navaids)
-		if (haversine_nm (navaid.position(), position) <= radius)
-			set.insert (navaid);
+	while (!ts.atEnd())
+	{
+		QString line = ts.readLine();
+		QTextStream line_ts (&line);
 
-	return set;
+		LatLng pos;
+		QString identifier;
+
+		line_ts >> pos.lat() >> pos.lng() >> identifier;
+
+		if (pos.lat() == 99.0) // EOF sentinel
+			break;
+
+		_navaids.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0.f));
+	}
+}
+
+
+void
+NavaidStorage::parse_awy_dat()
+{
 }
 
