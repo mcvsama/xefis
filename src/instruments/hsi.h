@@ -57,10 +57,10 @@ class HSI: public Xefis::Instrument
 	estimate_track();
 
   private:
-	HSIWidget*				_hsi_widget					= nullptr;
+	HSIWidget*				_hsi_widget				= nullptr;
 	std::array<LatLng, 3>	_positions;
-	bool					_positions_valid			= false;
-	Xefis::OnePoleSmoother	_track_estimation_smoother	= 60.0; // TODO make fps independent
+	bool					_positions_valid		= false;
+	Xefis::OnePoleSmoother	_trend_vector_smoother	= 60.0; // TODO make fps independent
 	NavaidStorage			_navaid_storage;
 
 	Xefis::PropertyFloat	_gs_kt;

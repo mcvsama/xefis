@@ -199,13 +199,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Set track estimation visibility.
 	 */
 	void
-	set_track_estimation_visible (bool visible);
+	set_trend_vector_visible (bool visible);
 
 	/**
 	 * Set track estimation lookahead in nautical miles.
 	 */
 	void
-	set_track_estimation_lookahead (Miles lookahead);
+	set_trend_vector_lookahead (Miles lookahead);
 
 	/**
 	 * Set dotted Earth visibility.
@@ -239,7 +239,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_track (QPainter&, TextPainter&, float q, float r);
 
 	void
-	paint_track_estimation (QPainter&, TextPainter&, float q, float r);
+	paint_trend_vector (QPainter&, TextPainter&, float q, float r);
 
 	void
 	paint_speeds (QPainter&, TextPainter&, float q, float r);
@@ -280,8 +280,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 	float				_mach						= 0.f;
 	bool				_mach_visible				= false;
 	Degrees				_track_deviation			= 0.f;
-	bool				_track_estimation_visible	= false;
-	Miles				_track_estimation_lookahead	= 5.f;
+	bool				_trend_vector_visible		= false;
+	Miles				_trend_vector_lookahead		= 5.f;
 	LatLng				_position					= { 0.f, 0.f };
 	bool				_dotted_earth_visible		= false;
 	bool				_navaids_visible			= false;
@@ -481,17 +481,17 @@ HSIWidget::set_track_deviation (Degrees degrees_per_mile)
 
 
 inline void
-HSIWidget::set_track_estimation_visible (bool visible)
+HSIWidget::set_trend_vector_visible (bool visible)
 {
-	_track_estimation_visible = visible;
+	_trend_vector_visible = visible;
 	update();
 }
 
 
 inline void
-HSIWidget::set_track_estimation_lookahead (Miles lookahead)
+HSIWidget::set_trend_vector_lookahead (Miles lookahead)
 {
-	_track_estimation_lookahead = lookahead;
+	_trend_vector_lookahead = lookahead;
 	update();
 }
 

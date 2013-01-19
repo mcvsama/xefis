@@ -108,7 +108,7 @@ HSI::estimate_track()
 {
 	if (_position_lat_deg.is_singular() || _position_lng_deg.is_singular())
 	{
-		_hsi_widget->set_track_estimation_visible (false);
+		_hsi_widget->set_trend_vector_visible (false);
 		return;
 	}
 
@@ -138,10 +138,10 @@ HSI::estimate_track()
 	{
 		bool visible = haversine_nm (_positions[2], _positions[0]) > 2.f * epsilon;
 		if (visible)
-			beta_per_mile = _track_estimation_smoother.process (beta_per_mile);
+			beta_per_mile = _trend_vector_smoother.process (beta_per_mile);
 
-		_hsi_widget->set_track_estimation_visible (visible);
-		_hsi_widget->set_track_estimation_lookahead (2.f);
+		_hsi_widget->set_trend_vector_visible (visible);
+		_hsi_widget->set_trend_vector_lookahead (2.f);
 		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
 	}
 }
