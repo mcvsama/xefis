@@ -38,7 +38,8 @@ HSI::HSI (QDomElement const& config, QWidget* parent):
 			parse_properties (e, {
 				{ "gs", _gs_kt, false },
 				{ "tas", _tas_kt, false },
-				{ "orientation-heading", _heading_deg, false },
+				{ "orientation-magnetic-heading", _mag_heading_deg, false },
+				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "autopilot-visible", _autopilot_visible, false },
 				{ "track", _track_deg, false },
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
@@ -50,11 +51,19 @@ HSI::HSI (QDomElement const& config, QWidget* parent):
 	}
 
 	_hsi_widget = new HSIWidget (this);
+	_hsi_widget->set_range (5.f);
+	_hsi_widget->set_navaid_storage (&_navaid_storage);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_hsi_widget);
+}
+
+
+HSI::~HSI()
+{
+	delete _hsi_widget;
 }
 
 
@@ -65,13 +74,17 @@ HSI::read()
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
 
-	_hsi_widget->set_heading_visible (_heading_deg.valid());
-	if (_heading_deg.valid())
-		_hsi_widget->set_heading (*_heading_deg);
+	_hsi_widget->set_heading_visible (_mag_heading_deg.valid());
+	if (_mag_heading_deg.valid())
+		_hsi_widget->set_magnetic_heading (*_mag_heading_deg);
+
+	_hsi_widget->set_navaids_visible (_true_heading_deg.valid());
+	if (_true_heading_deg.valid())
+		_hsi_widget->set_true_heading (*_true_heading_deg);
 
 	_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
-		_hsi_widget->set_ap_heading (*_autopilot_heading_setting_deg);
+		_hsi_widget->set_ap_magnetic_heading (*_autopilot_heading_setting_deg);
 
 	_hsi_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
@@ -84,6 +97,9 @@ HSI::read()
 	_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
 	if (_tas_kt.valid())
 		_hsi_widget->set_true_air_speed (*_tas_kt);
+
+	if (_position_lat_deg.valid() && _position_lng_deg.valid())
+		_hsi_widget->set_position (LatLng (*_position_lat_deg, *_position_lng_deg));
 }
 
 
@@ -124,7 +140,6 @@ HSI::estimate_track()
 		if (visible)
 			beta_per_mile = _track_estimation_smoother.process (beta_per_mile);
 
-		_hsi_widget->set_range (5.f);
 		_hsi_widget->set_track_estimation_visible (visible);
 		_hsi_widget->set_track_estimation_lookahead (2.f);
 		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));

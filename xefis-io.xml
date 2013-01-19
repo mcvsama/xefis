@@ -16,7 +16,8 @@
 					<property name='orientation-pitch' path='/orientation/pitch.deg'/>
 					<property name='orientation-roll' path='/orientation/roll.deg'/>
 					<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
-					<property name='orientation-heading' path='/orientation/heading.deg'/>
+					<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
+					<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>
 					<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
 					<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
 					<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>

@@ -34,8 +34,8 @@ EFISWidget::EFISWidget (QWidget* parent):
 	InstrumentWidget (parent, 0.8f, 1.f)
 {
 	setAttribute (Qt::WA_NoBackground);
-	_sky_color.setHsv (213, 217, 255);
-	_ground_color.setHsv (30, 235, 122);
+	_sky_color.setHsv (213, 245, 255);
+	_ground_color.setHsv (30, 255, 122);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (125);
 	_warning_color_1 = QColor (255, 150, 0);
@@ -229,7 +229,7 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 	float const fpxs = _font_10_bold.pixelSize();
 
 	// Clip rectangle before and after rotation:
-	painter.setClipPath (get_pitch_scale_clipping_path(), Qt::IntersectClip);
+	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform);
@@ -394,7 +394,7 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipPath (get_pitch_scale_clipping_path(), Qt::IntersectClip);
+	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
 

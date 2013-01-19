@@ -53,7 +53,7 @@ EFIS::EFIS (QDomElement const& config, QWidget* parent):
 				{ "orientation-pitch", _pitch_deg, false },
 				{ "orientation-roll", _roll_deg, false },
 				{ "orientation-roll-limit", _roll_limit_deg, false },
-				{ "orientation-heading", _heading_deg, false },
+				{ "orientation-magnetic-heading", _mag_heading_deg, false },
 				{ "slip-skid", _slip_skid_g, false },
 				{ "slip-skid-limit", _slip_skid_limit_g, false },
 				{ "flight-path-marker-visible", _fpm_visible, false },
@@ -102,10 +102,10 @@ EFIS::read()
 		fpm_beta = *_fpm_beta_deg;
 	}
 
-	if (_track_deg.valid() && _roll_deg.valid() && _heading_deg.valid())
+	if (_track_deg.valid() && _roll_deg.valid() && _mag_heading_deg.valid())
 	{
-		fpm_alpha -= std::sin (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_heading_deg);
-		fpm_beta -= std::cos (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_heading_deg);
+		fpm_alpha -= std::sin (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_mag_heading_deg);
+		fpm_beta -= std::cos (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_mag_heading_deg);
 	}
 
 	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.valid() ? *_speed_ladder_line_every : 10);
@@ -153,9 +153,9 @@ EFIS::read()
 
 	_efis_widget->set_roll_limit (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f);
 
-	_efis_widget->set_heading_visible (_heading_deg.valid());
-	if (_heading_deg.valid())
-		_efis_widget->set_heading (*_heading_deg);
+	_efis_widget->set_heading_visible (_mag_heading_deg.valid());
+	if (_mag_heading_deg.valid())
+		_efis_widget->set_heading (*_mag_heading_deg);
 
 	_efis_widget->set_slip_skid_visible (_slip_skid_g.valid());
 	if (_slip_skid_g.valid())

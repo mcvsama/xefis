@@ -35,15 +35,17 @@ HSIWidget::HSIWidget (QWidget* parent):
 
 
 void
-HSIWidget::paintEvent (QPaintEvent* paint_event)
+HSIWidget::paintEvent (QPaintEvent*)
 {
 	float const w = width();
 	float const h = height();
 
 	_aircraft_center_transform.reset();
 	_aircraft_center_transform.translate (w / 2.f, 0.705f * h);
-	_heading_transform.reset();
-	_heading_transform.rotate (-_heading);
+	_mag_heading_transform.reset();
+	_mag_heading_transform.rotate (-_mag_heading);
+	_true_heading_transform.reset();
+	_true_heading_transform.rotate (-_true_heading);
 
 	QPainter painter (this);
 	TextPainter text_painter (painter, &_text_painter_cache);
@@ -61,15 +63,35 @@ HSIWidget::paintEvent (QPaintEvent* paint_event)
 
 	float q = 0.1f * wh();
 	float r = 6.5f * q;
-	_map_clip_rect = QRectF (-1.1f * r, -1.1f * r, 2.2f * r, 1.3f * r);
-	_inside_map_clip_rect = QRectF (-0.9f * r, -0.9f * r, 1.8f * r, 0.9f * r);
 
+	paint_dotted_earth (painter, q, r);
+	paint_navaids (painter, text_painter, q, r);
 	paint_track (painter, text_painter, q, r);
 	paint_track_estimation (painter, text_painter, q, r);
 	paint_ap_settings (painter, text_painter, q, r);
 	paint_directions (painter, text_painter, q, r);
 	paint_aircraft (painter, text_painter, q, r);
 	paint_speeds (painter, text_painter, q, r);
+}
+
+
+void
+HSIWidget::resizeEvent (QResizeEvent* event)
+{
+	InstrumentWidget::resizeEvent (event);
+
+	float q = 0.1f * wh();
+	float r = 6.5f * q;
+
+	_map_clip_rect = QRectF (-1.1f * r, -1.1f * r, 2.2f * r, 1.3f * r);
+	_inside_map_clip_rect = QRectF (-0.9f * r, -0.9f * r, 1.8f * r, 0.9f * r);
+
+	QPainterPath clip1;
+	clip1.addEllipse (QRectF (-0.85f * r, -0.85f * r, 1.7f * r, 1.7f * r));
+	QPainterPath clip2;
+	clip2.addRect (QRectF (-0.9f * r, -0.9f * r, 1.8f * r, 1.13f * r));
+
+	_map_clip = clip1 & clip2;
 }
 
 
@@ -105,7 +127,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q
 		painter.save();
 
 		QString text_1 = "MAG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_heading + 0.5f));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_mag_heading + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
@@ -142,7 +164,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 
 	painter.setPen (pen);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate (_track_deg - _heading);
+	painter.rotate (_track_deg - _mag_heading);
 	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
 
 	painter.restore();
@@ -207,7 +229,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, floa
 		}
 
 		QTransform transform = _aircraft_center_transform;
-		transform.rotate (bound (floored_mod (_ap_heading - _heading + 180.0, 360.0) - 180.0, -102.0, +102.0));
+		transform.rotate (bound (floored_mod (_ap_mag_heading - _mag_heading + 180.0, 360.0) - 180.0, -102.0, +102.0));
 		transform.translate (0.f, -r);
 
 		QPen pen_1 = _autopilot_pen_1;
@@ -229,7 +251,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, floa
 		painter.save();
 
 		QString text_1 = "SEL  HDG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_heading + 0.5f));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
@@ -268,7 +290,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float
 	painter.setFont (_font_13_bold);
 	for (int deg = 0; deg < 360; deg += 5)
 	{
-		painter.setTransform (_heading_transform * _aircraft_center_transform);
+		painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
 		painter.rotate (deg);
 		painter.drawLine (QPointF (0.f, -r),
 						  deg % 10 == 0
@@ -327,6 +349,176 @@ HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, 
 	{
 		painter.translate (offset * 1.2f, 0.f);
 		paint_speed ("TAS", QString::number (static_cast<int> (_true_air_speed)));
+	}
+
+	painter.restore();
+}
+
+
+void
+HSIWidget::paint_dotted_earth (QPainter& painter, float q, float r)
+{
+	if (!_dotted_earth_visible)
+		return;
+
+	float const scale = 0.8f;
+	QRectF dot (0.f, 0.f, 0.05f * q, 0.05f * q);
+	dot.translate (-0.5f * dot.width(), -0.5f * dot.height());
+
+	painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
+	painter.setBrush (Qt::white);
+	painter.setPen (Qt::NoPen);
+
+	for (float lat = -180; lat < 180; lat += 10)
+	{
+		for (float lng = -180; lng < 180; lng += 10)
+		{
+			LatLng point_on_earth (lat, lng);
+
+			if (haversine (point_on_earth, _position) >= 1.7)
+				continue;
+
+			QPointF p = point_on_earth.rotate (_position).project_flat();
+			painter.drawEllipse (dot.translated (p.x() * scale * r, p.y() * scale * r));
+		}
+	}
+}
+
+
+void
+HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q, float)
+{
+	if (!_navaids_visible)
+		return;
+
+	painter.save();
+
+	painter.setClipPath (_map_clip);
+	painter.setFont (_font_10_bold);
+
+	QPen green_pen (Qt::green, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen white_pen (Qt::white, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen loc_pen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen pen = white_pen;
+
+	// TODO cache in object
+	QPolygonF hexpoly = QPolygonF()
+		<< QPointF (-0.5f, 0.f)
+		<< QPointF (-0.25f, -0.44f)
+		<< QPointF (+0.25f, -0.44f)
+		<< QPointF (+0.5f, 0.f)
+		<< QPointF (+0.25f, +0.44f)
+		<< QPointF (-0.25f, +0.44f)
+		<< QPointF (-0.5f, 0.f);
+
+	// A bit bigger range to allow drawing objects currently positioned outside clipping path:
+	NavaidStorage::Navaids navaids = _navaid_storage->get_navs (_position, std::max (_range + 100.f, 2.f * _range));
+	// Sort navaids by type, draw LOCs first.
+	NavaidStorage::Navaids loc_navaids;
+	NavaidStorage::Navaids other_navaids;
+	for (auto& navaid: navaids)
+	{
+		switch (navaid.type())
+		{
+			case Navaid::LOC:
+			case Navaid::LOCSA:
+				loc_navaids.insert (navaid);
+				break;
+
+			default:
+				other_navaids.insert (navaid);
+				break;
+		}
+	}
+
+	for (auto& navaid: loc_navaids)
+	{
+		QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * navaid.position().rotated (_position).project_flat();
+		QPointF mapped_pos = _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
+
+		QTransform centered_transform = _aircraft_center_transform;
+		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
+
+		QTransform scaled_transform = centered_transform;
+		scaled_transform.scale (0.7f * q, 0.7f * q);
+
+		switch (navaid.type())
+		{
+			case Navaid::LOC:
+			case Navaid::LOCSA:
+			{
+				float const line_1 = nm_to_px (navaid.range());
+				float const line_2 = 1.03f * line_1;
+
+				QTransform transform = _true_heading_transform * centered_transform;
+				transform.rotate (navaid.true_bearing());
+				QTransform rot_1; rot_1.rotate (-2.f);
+				QTransform rot_2; rot_2.rotate (+2.f);
+				QPointF pt_0 (0.f, line_1);
+				QPointF pt_1 (rot_1.map (QPointF (0.f, line_2)));
+				QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
+
+				painter.setTransform (transform);
+				painter.setPen (loc_pen);
+				painter.setBrush (Qt::NoBrush);
+				if (_range < 16.f)
+					painter.drawLine (QPointF (0.f, 0.f), pt_0);
+				painter.drawLine (QPointF (0.f, 0.f), pt_1);
+				painter.drawLine (QPointF (0.f, 0.f), pt_2);
+				painter.drawLine (pt_0, pt_1);
+				painter.drawLine (pt_0, pt_2);
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
+
+	for (auto& navaid: other_navaids)
+	{
+		QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * navaid.position().rotated (_position).project_flat();
+		QPointF mapped_pos = _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
+
+		QTransform centered_transform = _aircraft_center_transform;
+		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
+
+		QTransform scaled_transform = centered_transform;
+		scaled_transform.scale (0.7f * q, 0.7f * q);
+
+		switch (navaid.type())
+		{
+			case Navaid::NDB:
+				painter.setTransform (scaled_transform);
+				pen.setColor (Qt::cyan);
+				painter.setPen (pen);
+				painter.setBrush (Qt::NoBrush);
+				painter.drawEllipse (QRectF (-0.45f, -0.45f, 0.9f, 0.9f));
+				painter.setBrush (Qt::cyan);
+				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+				painter.setTransform (centered_transform);
+				text_painter.drawText (QPointF (0.35 * q, 0.55f * q), navaid.identifier());
+				break;
+
+			case Navaid::VOR:
+				painter.setTransform (scaled_transform);
+				painter.setPen (green_pen);
+				painter.drawPolyline (hexpoly);
+				painter.setBrush (Qt::green);
+				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+				painter.setTransform (centered_transform);
+				text_painter.drawText (QPointF (0.35 * q, 0.55f * q), navaid.identifier());
+				break;
+
+			case Navaid::DME:
+				painter.setTransform (scaled_transform);
+				painter.setPen (green_pen);
+				painter.drawRect (QRectF (-0.5f, -0.5f, 1.f, 1.f));
+				break;
+
+			default:
+				break;
+		}
 	}
 
 	painter.restore();

@@ -75,7 +75,8 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
-	Xefis::PropertyFloat	_heading_deg;
+	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
