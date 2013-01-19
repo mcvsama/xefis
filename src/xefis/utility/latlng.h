@@ -27,6 +27,9 @@
 class LatLng
 {
   public:
+	typedef Degrees ValueType;
+
+  public:
 	// Ctor
 	LatLng();
 

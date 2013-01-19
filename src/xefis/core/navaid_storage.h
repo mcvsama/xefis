@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <kdtree++/kdtree.hpp>
 
 // Local:
 #include "navaid.h"
@@ -29,6 +30,12 @@ class NavaidStorage
 {
   public:
 	typedef std::set<Navaid> Navaids;
+
+  private:
+	static LatLng::ValueType
+	access_latlng (Navaid const& navaid, std::size_t const dimension);
+
+	typedef KDTree::KDTree<2, Navaid, std::function<LatLng::ValueType (Navaid const&, std::size_t)>> NavaidsTree;
 
   public:
 	NavaidStorage();
@@ -47,11 +54,18 @@ class NavaidStorage
 	parse_awy_dat();
 
   private:
-	Navaids		_navaids;
+	NavaidsTree	_navaids_tree;
 	const char*	_nav_dat_file	= "share/nav/nav.dat";
 	const char*	_fix_dat_file	= "share/nav/fix.dat";
 	const char*	_awy_dat_file	= "share/nav/awy.dat";
 };
+
+
+inline LatLng::ValueType
+NavaidStorage::access_latlng (Navaid const& navaid, std::size_t const dimension)
+{
+	return dimension == 0 ? navaid.position().lat() : navaid.position().lng();
+}
 
 #endif
 

@@ -27,7 +27,7 @@ endif
 CXX				:= g++
 DEPCC			:= $(CXX)
 CXXFLAGS		+= -fPIE -O4 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt
-CXXFLAGS		+= -pthread -rdynamic -I.
+CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
 SO				:= $(CXX) -shared
 SOFLAGS			:=
