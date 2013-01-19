@@ -53,6 +53,13 @@ HSI::HSI (QDomElement const& config, QWidget* parent):
 	_hsi_widget = new HSIWidget (this);
 	_hsi_widget->set_range (5.f);
 	_hsi_widget->set_navaid_storage (&_navaid_storage);
+	_hsi_widget->set_ndb_visible (true);
+	_hsi_widget->set_vor_visible (true);
+	_hsi_widget->set_dme_visible (true);
+	_hsi_widget->set_loc_visible (true);
+	_hsi_widget->set_fix_visible (true);
+	// TODO when A/P engaged: _hsi_widget->set_ap_track_visible (true);
+	// TODO when radio tuned: _hsi_widget->set_highlighted_loc (identifier);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

@@ -111,6 +111,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_ap_heading_visible (bool visible);
 
 	/**
+	 * Set A/P heading track visibility.
+	 * Nominally turned on, when A/P is active.
+	 */
+	void
+	set_ap_track_visible (bool visible);
+
+	/**
 	 * Flight path heading (track).
 	 */
 	Degrees
@@ -219,6 +226,53 @@ class HSIWidget: public Xefis::InstrumentWidget
 	void
 	set_navaids_visible (bool visible);
 
+	/**
+	 * Set visibility of VORs.
+	 * They will be visible only if also general navaids visibility
+	 * is turned on with set_navaids_visible().
+	 */
+	void
+	set_vor_visible (bool visible);
+
+	/**
+	 * Set visibility of DMEs.
+	 * They will be visible only if also general navaids visibility
+	 * is turned on with set_navaids_visible().
+	 */
+	void
+	set_dme_visible (bool visible);
+
+	/**
+	 * Set visibility of NDBs.
+	 * They will be visible only if also general navaids visibility
+	 * is turned on with set_navaids_visible().
+	 */
+	void
+	set_ndb_visible (bool visible);
+
+	/**
+	 * Set visibility of localisers.
+	 * They will be visible only if also general navaids visibility
+	 * is turned on with set_navaids_visible().
+	 */
+	void
+	set_loc_visible (bool visible);
+
+	/**
+	 * Set visibility of the Fixes.
+	 * They will be visible only if also general navaids visibility
+	 * is turned on with set_navaids_visible().
+	 */
+	void
+	set_fix_visible (bool visible);
+
+	/**
+	 * Select LOC to highlight by its identifier string.
+	 * Highlighted LOC will be shown in different color.
+	 */
+	void
+	set_highlighted_loc (QString const& identifier);
+
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
@@ -260,7 +314,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QTransform			_true_heading_transform;
 	QRectF				_map_clip_rect;
 	QRectF				_inside_map_clip_rect;
-	QPainterPath		_map_clip;
+	QPainterPath		_inner_map_clip;
+	QPainterPath		_outer_map_clip;
 	TextPainter::Cache	_text_painter_cache;
 	NavaidStorage*		_navaid_storage				= nullptr;
 
@@ -271,6 +326,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	bool				_heading_visible			= false;
 	Degrees				_ap_mag_heading				= 0.f;
 	bool				_ap_heading_visible			= false;
+	bool				_ap_track_visible			= false;
 	Degrees				_track_deg					= 0.f;
 	bool				_track_visible				= false;
 	Knots				_ground_speed				= 0.f;
@@ -285,6 +341,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	LatLng				_position					= { 0.f, 0.f };
 	bool				_dotted_earth_visible		= false;
 	bool				_navaids_visible			= false;
+	bool				_vor_visible				= false;
+	bool				_dme_visible				= false;
+	bool				_ndb_visible				= false;
+	bool				_loc_visible				= false;
+	bool				_fix_visible				= false;
+	QString				_highlighted_loc;
 };
 
 
@@ -368,6 +430,14 @@ inline void
 HSIWidget::set_ap_heading_visible (bool visible)
 {
 	_ap_heading_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_ap_track_visible (bool visible)
+{
+	_ap_track_visible = visible;
 	update();
 }
 
@@ -509,6 +579,53 @@ HSIWidget::set_navaids_visible (bool visible)
 {
 	_navaids_visible = visible;
 	update();
+}
+
+
+inline void
+HSIWidget::set_vor_visible (bool visible)
+{
+	_vor_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_dme_visible (bool visible)
+{
+	_dme_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_ndb_visible (bool visible)
+{
+	_ndb_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_loc_visible (bool visible)
+{
+	_loc_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_fix_visible (bool visible)
+{
+	_fix_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_highlighted_loc (QString const& identifier)
+{
+	_highlighted_loc = identifier;
 }
 
 

@@ -37,7 +37,20 @@ class NavaidStorage
 	get_navs (LatLng const& position, Miles radius) const;
 
   private:
-	Navaids _navaids;
+	void
+	parse_nav_dat();
+
+	void
+	parse_fix_dat();
+
+	void
+	parse_awy_dat();
+
+  private:
+	Navaids		_navaids;
+	const char*	_nav_dat_file	= "share/nav/nav.dat";
+	const char*	_fix_dat_file	= "share/nav/fix.dat";
+	const char*	_awy_dat_file	= "share/nav/awy.dat";
 };
 
 #endif
