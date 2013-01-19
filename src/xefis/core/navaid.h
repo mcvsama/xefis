@@ -29,6 +29,7 @@ class Navaid
 {
   public:
 	enum Type {
+		OTHER	= 0,
 		NDB		= 2,	// NDB
 		VOR		= 3,	// VOR, VOR-DME, VORTAC
 		LOC		= 4,	// ILS localizer component

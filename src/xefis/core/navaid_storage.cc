@@ -26,11 +26,14 @@
 #include "navaid_storage.h"
 
 
-NavaidStorage::NavaidStorage()
+NavaidStorage::NavaidStorage():
+	_navaids_tree (access_latlng)
 {
 	parse_nav_dat();
 	parse_fix_dat();
 	parse_awy_dat();
+
+	_navaids_tree.optimize();
 }
 
 
@@ -39,9 +42,18 @@ NavaidStorage::get_navs (LatLng const& position, Miles radius) const
 {
 	Navaids set;
 
-	for (Navaid const& navaid: _navaids)
-		if (haversine_nm (navaid.position(), position) <= radius)
+	auto inserter_and_predicate = [&] (Navaid const& navaid) -> bool
+	{
+		if (haversine_nm (position, navaid.position()) <= radius)
+		{
 			set.insert (navaid);
+			return false;
+		}
+		return true;
+	};
+
+	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0.f);
+	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Miles>::max(), inserter_and_predicate);
 
 	return set;
 }
@@ -82,7 +94,7 @@ NavaidStorage::parse_nav_dat()
 		{
 			case Navaid::NDB:
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier >> name;
-				_navaids.insert (Navaid (type, pos, identifier, name, range));
+				_navaids_tree.insert (Navaid (type, pos, identifier, name, range));
 				break;
 
 			case Navaid::VOR:
@@ -95,7 +107,7 @@ NavaidStorage::parse_nav_dat()
 				navaid.set_frequency (khz * 10.f);
 				navaid.set_slaved_variation (slaved_variation);
 				navaid.set_amsl (amsl);
-				_navaids.insert (navaid);
+				_navaids_tree.insert (navaid);
 				break;
 			}
 
@@ -114,7 +126,7 @@ NavaidStorage::parse_nav_dat()
 				navaid.set_amsl (amsl);
 				navaid.set_icao (icao);
 				navaid.set_runway (runway);
-				_navaids.insert (navaid);
+				_navaids_tree.insert (navaid);
 				break;
 			}
 
@@ -135,6 +147,9 @@ NavaidStorage::parse_nav_dat()
 
 			case Navaid::Fix:
 				// Not in this file.
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -161,7 +176,7 @@ NavaidStorage::parse_fix_dat()
 		if (pos.lat() == 99.0) // EOF sentinel
 			break;
 
-		_navaids.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0.f));
+		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0.f));
 	}
 }
 
