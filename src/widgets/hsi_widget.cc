@@ -415,10 +415,12 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 	painter.setFont (_font_10_bold);
 	QFontMetrics font_metrics (painter.font());
 
-	QPen ndb_pen (Qt::darkCyan, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen vor_pen (Qt::green, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen dme_pen (Qt::green, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen fix_pen (Qt::darkGreen, pen_width (0.05f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	// Unscaled pens - painter will be scaled:
+	QPen ndb_pen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen vor_pen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen dme_pen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen fix_pen (Qt::darkGreen, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	// Scaled pens:
 	QPen loc_pen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	QPen hi_loc_pen (Qt::cyan, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
@@ -466,9 +468,6 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 
 		QTransform centered_transform = _aircraft_center_transform;
 		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
-
-		QTransform scaled_transform = centered_transform;
-		scaled_transform.scale (0.7f * q, 0.7f * q);
 
 		switch (navaid.type())
 		{
