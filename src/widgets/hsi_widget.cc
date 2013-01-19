@@ -181,17 +181,18 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 
 	painter.save();
 	painter.setPen (est_pen);
-	painter.setClipRect (_inside_map_clip_rect);
+	painter.setClipPath (_inner_map_clip);
 
 	if (_trend_vector_visible)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
 
-		Miles const step = _trend_vector_lookahead / 50.f;
+		Miles const trend_range = std::min (_trend_vector_lookahead, _range);
+		Miles const step = trend_range / 50.f;
 		Degrees const degrees_per_step = step * _track_deviation;
 
-		for (float pos = 0.f; pos < _trend_vector_lookahead; pos += step)
+		for (float pos = 0.f; pos < trend_range; pos += step)
 		{
 			float px = nm_to_px (step);
 			painter.rotate (degrees_per_step);
