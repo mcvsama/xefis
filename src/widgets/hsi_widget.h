@@ -276,10 +276,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   private:
 	void
-	paintEvent (QPaintEvent*) override;
+	resizeEvent (QResizeEvent*) override;
 
 	void
-	resizeEvent (QResizeEvent*) override;
+	paintEvent (QPaintEvent*) override;
 
 	void
 	paint_aircraft (QPainter&, TextPainter&, float q, float r);
@@ -349,6 +349,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	NavaidStorage::Navaids	_vor_navs;
 	NavaidStorage::Navaids	_dme_navs;
 	NavaidStorage::Navaids	_fix_navs;
+	QPolygonF				_aircraft_shape;
+	QPolygonF				_ap_bug_shape;
+	Degrees					_limited_rotation;
 
 	// Parameters:
 	Miles					_range						= 1.f;

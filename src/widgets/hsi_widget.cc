@@ -36,47 +36,6 @@ HSIWidget::HSIWidget (QWidget* parent):
 
 
 void
-HSIWidget::paintEvent (QPaintEvent*)
-{
-	float const w = width();
-	float const h = height();
-
-	_aircraft_center_transform.reset();
-	_aircraft_center_transform.translate (w / 2.f, 0.705f * h);
-	_mag_heading_transform.reset();
-	_mag_heading_transform.rotate (-_mag_heading);
-	_true_heading_transform.reset();
-	_true_heading_transform.rotate (-_true_heading);
-
-	QPainter painter (this);
-	TextPainter text_painter (painter, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-
-	// Clear with black background:
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
-	painter.drawRect (rect());
-
-	painter.setTransform (_aircraft_center_transform);
-
-	float q = 0.1f * wh();
-	float r = 6.5f * q;
-
-	paint_dotted_earth (painter, q, r);
-	paint_navaids (painter, text_painter, q, r);
-	paint_track (painter, text_painter, q, r);
-	paint_trend_vector (painter, text_painter, q, r);
-	paint_ap_settings (painter, text_painter, q, r);
-	paint_directions (painter, text_painter, q, r);
-	paint_aircraft (painter, text_painter, q, r);
-	paint_speeds (painter, text_painter, q, r);
-}
-
-
-void
 HSIWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
@@ -84,6 +43,10 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	float q = 0.1f * wh();
 	float r = 6.5f * q;
 
+	_aircraft_center_transform.reset();
+	_aircraft_center_transform.translate (width() / 2.f, 0.705f * height());
+
+	// Clips:
 	_map_clip_rect = QRectF (-1.1f * r, -1.1f * r, 2.2f * r, 1.3f * r);
 	_inside_map_clip_rect = QRectF (-0.9f * r, -0.9f * r, 1.8f * r, 0.9f * r);
 
@@ -100,6 +63,7 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	// Navaids pens:
 	_lo_loc_pen = QPen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_hi_loc_pen = QPen (Qt::cyan, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+
 	// Unscaled pens:
 	_ndb_pen = QPen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_vor_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
@@ -115,40 +79,89 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 		<< QPointF (+0.25f, +0.44f)
 		<< QPointF (-0.25f, +0.44f)
 		<< QPointF (-0.5f, 0.f);
+
+	_aircraft_shape = QPolygonF()
+		<< QPointF (0.f, 0.f)
+		<< QPointF (+0.45f * q, q)
+		<< QPointF (-0.45f * q, q)
+		<< QPointF (0.f, 0.f);
+
+	_ap_bug_shape = QPolygonF()
+		<< QPointF (0.f, 0.f)
+		<< QPointF (+0.45f * q, q)
+		<< QPointF (+0.85f * q, q)
+		<< QPointF (+0.85f * q, 0.f)
+		<< QPointF (-0.85f * q, 0.f)
+		<< QPointF (-0.85f * q, q)
+		<< QPointF (-0.45f * q, q)
+		<< QPointF (0.f, 0.f);
+	for (auto& point: _ap_bug_shape)
+	{
+		point.rx() *= +0.5f;
+		point.ry() *= -0.5f;
+	}
+}
+
+
+void
+HSIWidget::paintEvent (QPaintEvent*)
+{
+	float const w = width();
+	float const h = height();
+
+	float const q = 0.1f * wh();
+	float const r = 6.5f * q;
+
+	_mag_heading_transform.reset();
+	_mag_heading_transform.rotate (-_mag_heading);
+	_true_heading_transform.reset();
+	_true_heading_transform.rotate (-_true_heading);
+
+	_limited_rotation = bound (floored_mod (_ap_mag_heading - _mag_heading + 180.0, 360.0) - 180.0, -102.0, +102.0);
+
+	QPainter painter (this);
+	TextPainter text_painter (painter, &_text_painter_cache);
+	painter.setRenderHint (QPainter::Antialiasing, true);
+	painter.setRenderHint (QPainter::TextAntialiasing, true);
+	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
+	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
+
+	// Clear with black background:
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
+	painter.drawRect (rect());
+
+	paint_dotted_earth (painter, q, r);
+	paint_navaids (painter, text_painter, q, r);
+	paint_track (painter, text_painter, q, r);
+	paint_trend_vector (painter, text_painter, q, r);
+	paint_ap_settings (painter, text_painter, q, r);
+	paint_directions (painter, text_painter, q, r);
+	paint_aircraft (painter, text_painter, q, r);
+	paint_speeds (painter, text_painter, q, r);
 }
 
 
 void
 HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
-	QPen pen1 = get_pen (QColor (255, 255, 255), 1.5f);
-	QPen pen2 = get_pen (QColor (255, 255, 255), 2.8f);
+	QPen pen1 = get_pen (Qt::white, 1.5f);
+	QPen pen2 = get_pen (Qt::white, 2.8f);
 
-	// Triangles
-	{
-		painter.save();
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipping (false);
 
-		// Big/small triangles:
-		QPolygonF aircraft = QPolygonF()
-			<< QPointF (0.f, 0.f)
-			<< QPointF (+0.45f * q, q)
-			<< QPointF (-0.45f * q, q)
-			<< QPointF (0.f, 0.f);
-		painter.setPen (pen1);
-		painter.drawPolyline (aircraft);
-		painter.translate (0.f, -r);
-		painter.scale (0.5f, -0.5f);
-		painter.setPen (pen2);
-		painter.drawPolyline (aircraft);
-
-		painter.restore();
-	}
+	// Big/small triangles:
+	painter.setPen (pen1);
+	painter.drawPolyline (_aircraft_shape);
+	painter.translate (0.f, -r);
+	painter.scale (0.5f, -0.5f);
+	painter.setPen (pen2);
+	painter.drawPolyline (_aircraft_shape);
 
 	// MAG heading
 	if (_heading_visible)
 	{
-		painter.save();
-
 		QString text_1 = "MAG";
 		QString text_2 = QString ("%1").arg (static_cast<int> (_mag_heading + 0.5f));
 
@@ -168,8 +181,6 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q
 		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
 		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
-
-		painter.restore();
 	}
 }
 
@@ -182,15 +193,13 @@ HSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
 
 	QPen pen (QColor (255, 255, 0), pen_width (1.f), Qt::DashLine, Qt::FlatCap);
 
-	painter.save();
+	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 
 	painter.setPen (pen);
 	painter.setTransform (_aircraft_center_transform);
 	painter.rotate (_track_deg - _mag_heading);
 	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
-
-	painter.restore();
 }
 
 
@@ -199,9 +208,9 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap);
 
-	painter.save();
-	painter.setPen (est_pen);
+	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_inner_map_clip);
+	painter.setPen (est_pen);
 
 	if (_trend_vector_visible)
 	{
@@ -220,8 +229,6 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 			painter.translate (0.f, -px);
 		}
 	}
-
-	painter.restore();
 }
 
 
@@ -231,85 +238,59 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, floa
 	if (!_ap_heading_visible)
 		return;
 
-	float limited_rotation = bound (floored_mod (_ap_mag_heading - _mag_heading + 180.0, 360.0) - 180.0, -102.0, +102.0);
-
 	// A/P bug
-	{
-		painter.save();
-		painter.setClipRect (_map_clip_rect);
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipRect (_map_clip_rect);
 
-		QPolygonF bug = QPolygonF()
-			<< QPointF (0.f, 0.f)
-			<< QPointF (+0.45f * q, q)
-			<< QPointF (+0.85f * q, q)
-			<< QPointF (+0.85f * q, 0.f)
-			<< QPointF (-0.85f * q, 0.f)
-			<< QPointF (-0.85f * q, q)
-			<< QPointF (-0.45f * q, q)
-			<< QPointF (0.f, 0.f);
+	QTransform transform = _aircraft_center_transform;
+	transform.rotate (_limited_rotation);
+	transform.translate (0.f, -r);
 
-		for (auto& point: bug)
-		{
-			point.rx() *= +0.5f;
-			point.ry() *= -0.5f;
-		}
+	QPen pen_1 = _autopilot_pen_1;
+	pen_1.setMiterLimit (0.2f);
+	QPen pen_2 = _autopilot_pen_2;
+	pen_2.setMiterLimit (0.2f);
 
-		QTransform transform = _aircraft_center_transform;
-		transform.rotate (limited_rotation);
-		transform.translate (0.f, -r);
-
-		QPen pen_1 = _autopilot_pen_1;
-		pen_1.setMiterLimit (0.2f);
-		QPen pen_2 = _autopilot_pen_2;
-		pen_2.setMiterLimit (0.2f);
-
-		painter.setTransform (transform);
-		painter.setPen (pen_1);
-		painter.drawPolyline (bug);
-		painter.setPen (pen_2);
-		painter.drawPolyline (bug);
-
-		painter.restore();
-	}
+	painter.setTransform (transform);
+	painter.setPen (pen_1);
+	painter.drawPolyline (_ap_bug_shape);
+	painter.setPen (pen_2);
+	painter.drawPolyline (_ap_bug_shape);
 
 	// SEL HDG 000
-	{
-		painter.save();
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipping (false);
 
-		QString text_1 = "SEL  HDG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading + 0.5f));
+	QString text_1 = "SEL  HDG";
+	QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading + 0.5f));
 
-		QFont font_1 (_font_13_bold);
-		QFont font_2 (_font_16_bold);
-		QFontMetricsF metrics_1 (font_1);
-		QFontMetricsF metrics_2 (font_2);
-		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
-		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
-		rect_1.moveLeft (-rect_1.right() - metrics_1.width ("  "));
+	QFont font_1 (_font_13_bold);
+	QFont font_2 (_font_16_bold);
+	QFontMetricsF metrics_1 (font_1);
+	QFontMetricsF metrics_2 (font_2);
+	QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
+	QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
+	rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
+	rect_1.moveLeft (-rect_1.right() - metrics_1.width ("  "));
 
-		painter.setTransform (_aircraft_center_transform);
-		painter.translate (-metrics_2.width ("000") - q, 1.75f * q);
-		painter.setPen (_autopilot_pen_2);
-		painter.setFont (font_1);
-		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
-		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
-
-		painter.restore();
-	}
+	painter.setTransform (_aircraft_center_transform);
+	painter.translate (-metrics_2.width ("000") - q, 1.75f * q);
+	painter.setPen (_autopilot_pen_2);
+	painter.setFont (font_1);
+	text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
+	painter.setFont (font_2);
+	text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
 
 	if (_ap_track_visible)
 	{
 		QPen pen (_autopilot_pen_2.color(), pen_width (1.5f), Qt::DashLine, Qt::FlatCap);
 
-		painter.save();
+		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
 		painter.setPen (pen);
 		painter.setTransform (_aircraft_center_transform);
 		painter.rotate (_ap_mag_heading - _mag_heading);
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
-		painter.restore();
 	}
 }
 
@@ -322,11 +303,11 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float
 
 	QPen pen = get_pen (QColor (255, 255, 255), 1.5f);
 
-	painter.save();
+	painter.setTransform (_aircraft_center_transform);
 	painter.setClipRect (_map_clip_rect);
-
 	painter.setPen (pen);
 	painter.setFont (_font_13_bold);
+
 	for (int deg = 0; deg < 360; deg += 5)
 	{
 		painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
@@ -341,8 +322,6 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float
 								   Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
 		}
 	}
-
-	painter.restore();
 }
 
 
@@ -364,21 +343,19 @@ HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, 
 		str_rect.translate (0.f, translate_descent (metr_a, metr_b));
 		val_rect.moveLeft (str_rect.right());
 
-		painter.save();
 		painter.setFont (font_a);
 		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
 		painter.setFont (font_b);
 		text_painter.drawText (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
-		painter.restore();
 
 		return str_rect.width() + val_rect.width();
 	};
 
 	float offset = 0;
 
-	painter.save();
 	painter.resetTransform();
 	painter.translate (0.2f * q, 0.f);
+	painter.setClipping (false);
 	painter.setPen (pen);
 
 	if (_ground_speed_visible)
@@ -389,8 +366,6 @@ HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, 
 		painter.translate (offset * 1.2f, 0.f);
 		paint_speed ("TAS", QString::number (static_cast<int> (_true_air_speed)));
 	}
-
-	painter.restore();
 }
 
 
@@ -405,6 +380,7 @@ HSIWidget::paint_dotted_earth (QPainter& painter, float q, float r)
 	dot.translate (-0.5f * dot.width(), -0.5f * dot.height());
 
 	painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
+	painter.setClipping (false);
 	painter.setBrush (Qt::white);
 	painter.setPen (Qt::NoPen);
 
@@ -430,8 +406,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 	if (!_navaids_visible)
 		return;
 
-	painter.save();
-
+	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_inner_map_clip);
 	painter.setFont (_font_10_bold);
 
@@ -519,8 +494,6 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 
 	for (auto& navaid: _vor_navs)
 		paint_navaid (navaid);
-
-	painter.restore();
 }
 
 
@@ -568,7 +541,7 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter, float q)
 		painter.drawLine (pt_0, pt_2);
 
 		QPointF text_offset (0.5f * font_metrics.width (navaid.identifier()), -0.35f * font_metrics.height());
-		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.5f * q)) - text_offset, navaid.identifier());
+		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.6f * q)) - text_offset, navaid.identifier());
 	};
 
 	// Paint localizers:

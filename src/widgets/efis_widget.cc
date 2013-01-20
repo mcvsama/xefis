@@ -91,30 +91,20 @@ EFISWidget::paintEvent (QPaintEvent*)
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-	painter.setTransform (_center_transform);
 
 	if (_input_alert_visible)
 		paint_input_alert (painter, text_painter);
 	else
 	{
-		painter.save();
 		adi_paint (painter, text_painter);
-		painter.restore();
 
 		paint_center_cross (painter);
 		paint_flight_director (painter);
 		paint_altitude_agl (painter, text_painter);
 		paint_nav (painter, text_painter);
 
-		painter.save();
-		painter.translate (-0.4f * wh(), 0.f);
 		sl_paint (painter, text_painter);
-		painter.restore();
-
-		painter.save();
-		painter.translate (+0.4f * wh(), 0.f);
 		al_paint (painter, text_painter);
-		painter.restore();
 	}
 }
 
@@ -138,6 +128,15 @@ EFISWidget::adi_post_resize()
 		_flight_path_marker_clip.addRoundedRect (QRectF (-4.f * x - 0.5f * w, -0.5f * w, +3.f * x + w, w), r, r);
 		_flight_path_marker_clip.addRoundedRect (QRectF (+1.f * x - 0.5f * w, -0.5f * w, +3.f * x + w, w), r, r);
 		_flight_path_marker_clip.addRoundedRect (QRectF (-0.5f * w, -2.f * x - 0.5f * w, w, x + w), r, r);
+
+		_flight_path_marker_shape = QPainterPath();
+		_flight_path_marker_shape.addEllipse (QRectF (-x, -x, 2.f * x, 2.f * x));
+		_flight_path_marker_shape.moveTo (QPointF (+x, 0.f));
+		_flight_path_marker_shape.lineTo (QPointF (+4.f * x, 0.f));
+		_flight_path_marker_shape.moveTo (QPointF (-x, 0.f));
+		_flight_path_marker_shape.lineTo (QPointF (-4.f * x, 0.f));
+		_flight_path_marker_shape.moveTo (QPointF (0.f, -x));
+		_flight_path_marker_shape.lineTo (QPointF (0.f, -2.f * x));
 	}
 }
 
@@ -198,23 +197,21 @@ EFISWidget::adi_paint (QPainter& painter, TextPainter& text_painter)
 void
 EFISWidget::adi_paint_horizon (QPainter& painter)
 {
-	painter.save();
-
 	if (_pitch_visible && _roll_visible)
 	{
+		painter.setClipping (false);
 		painter.setTransform (_horizon_transform);
 		painter.fillRect (_adi_sky_rect, QBrush (_sky_color, Qt::SolidPattern));
 		painter.fillRect (_adi_gnd_rect, QBrush (_ground_color, Qt::SolidPattern));
 	}
 	else
 	{
+		painter.setClipping (false);
 		painter.resetTransform();
 		painter.setPen (Qt::NoPen);
 		painter.setBrush (Qt::black);
 		painter.drawRect (rect());
 	}
-
-	painter.restore();
 }
 
 
@@ -229,6 +226,7 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 	float const fpxs = _font_10_bold.pixelSize();
 
 	// Clip rectangle before and after rotation:
+	painter.setTransform (_center_transform);
 	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
@@ -448,20 +446,11 @@ EFISWidget::adi_paint_flight_path_marker (QPainter& painter)
 	if (!_flight_path_visible)
 		return;
 
-	float x = 0.013f * wh();
-
-	painter.save();
-
+	painter.setTransform (_center_transform);
 	painter.setClipRect (QRectF (-0.325f * wh(), -0.4f * wh(), 0.65f * wh(), 0.8f * wh()));
 	painter.translate (_flight_path_marker_position);
 	painter.setPen (get_pen (QColor (255, 255, 255), 1.25f));
-
-	painter.drawEllipse (QRectF (-x, -x, 2.f * x, 2.f * x));
-	painter.drawLine (QPointF (+x, 0.f), QPointF (+4.f * x, 0.f));
-	painter.drawLine (QPointF (-x, 0.f), QPointF (-4.f * x, 0.f));
-	painter.drawLine (QPointF (0.f, -x), QPointF (0.f, -2.f * x));
-
-	painter.restore();
+	painter.drawPath (_flight_path_marker_shape);
 }
 
 
@@ -490,6 +479,9 @@ EFISWidget::sl_post_resize()
 
 	_sl_black_box_rect = QRectF (-_sl_digits * digit_width - 2.f * _sl_margin, -digit_height,
 								 +_sl_digits * digit_width + 2.f * _sl_margin, 2.f * digit_height);
+
+	_sl_transform = _center_transform;
+	_sl_transform.translate (-0.4f * wh, 0.f);
 }
 
 
@@ -509,6 +501,8 @@ EFISWidget::sl_paint (QPainter& painter, TextPainter& text_painter)
 
 	float const x = _sl_ladder_rect.width() / 4.0f;
 
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
 	painter.setPen (_sl_ladder_pen);
 	painter.setBrush (_ladder_color);
 	painter.drawRect (_sl_ladder_rect);
@@ -532,7 +526,8 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	QFont actual_speed_font = _font_20_bold;
 	float const digit_width = _font_20_digit_width;
 
-	painter.save();
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = get_pen (Qt::white, 1.2f);
@@ -575,8 +570,6 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 							 _speed > 0.5f
 								? QString::number (static_cast<int> (floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
 								: " ");
-
-	painter.restore();
 }
 
 
@@ -602,7 +595,7 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 	clip_path.addRect (_sl_ladder_rect);
 	clip_path -= clip_path_m;
 
-	painter.save();
+	painter.setTransform (_sl_transform);
 	painter.setClipPath (clip_path, Qt::IntersectClip);
 	painter.translate (2.f * x, 0.f);
 
@@ -622,8 +615,6 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 										   +4.f * ladder_digit_width, ladder_digit_height),
 								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
 	}
-
-	painter.restore();
 }
 
 
@@ -642,7 +633,7 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 	float tr_right = 0.45f * x;
 	float p1w = 0.45f * pen_width (1.2f);
 
-	painter.save();
+	painter.setTransform (_sl_transform);
 	painter.translate (tr_right, 0.f);
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
@@ -675,8 +666,6 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 		painter.setPen (pen_r);
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), zero_point);
 	}
-
-	painter.restore();
 }
 
 
@@ -690,8 +679,7 @@ EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
 	pen.setCapStyle (Qt::RoundCap);
 	pen.setJoinStyle (Qt::RoundJoin);
 
-	painter.save();
-
+	painter.setTransform (_sl_transform);
 	painter.setPen (pen);
 	painter.translate (1.2f * x, 0.f);
 	if (_speed_tendency < _speed)
@@ -708,8 +696,6 @@ EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
 			<< QPointF (-0.2f * x, 0.f)
 			<< QPointF (+0.2f * x, 0.f));
 	}
-
-	painter.restore();
 }
 
 
@@ -722,7 +708,8 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	QFont speed_bug_font = _font_10_bold;
 	float const speed_bug_digit_height = _font_10_digit_height;
 
-	painter.save();
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
 	painter.setFont (speed_bug_font);
 
 	for (auto& bug: _speed_bugs)
@@ -759,8 +746,6 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		painter.setPen (_autopilot_pen_2);
 		painter.drawPolygon (bug_shape);
 	}
-
-	painter.restore();
 }
 
 
@@ -770,7 +755,8 @@ EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, 
 	if (!_mach_visible)
 		return;
 
-	painter.save();
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
 	painter.translate (0.f, 0.75f * x);
 
 	QFont font_a = _font_16_bold;
@@ -791,8 +777,6 @@ EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, 
 	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignLeft, mach_str);
 	painter.setFont (font_b);
 	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignRight, m_str);
-
-	painter.restore();
 }
 
 
@@ -813,8 +797,8 @@ EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 	QRectF box_rect (_sl_ladder_rect.right() - digits_box.width(), _sl_ladder_rect.top() - 1.4f * digits_box.height(),
 					 digits_box.width(), digits_box.height());
 
-	painter.save();
-
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
 	painter.setPen (get_pen (QColor (0, 0, 0), 0.5f));
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
 	painter.drawRect (box_rect);
@@ -824,8 +808,6 @@ EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
 	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_at_speed))));
-
-	painter.restore();
 }
 
 
@@ -869,6 +851,9 @@ EFISWidget::al_pre_paint()
 	_al_min_shown = _altitude - 0.5f * _al_extent;
 	_al_max_shown = _altitude + 0.5f * _al_extent;
 	_al_rounded_altitude = static_cast<int> (_altitude + sgn * 10.f) / 20 * 20;
+
+	_al_transform = _center_transform;
+	_al_transform.translate (+0.4f * wh(), 0.f);
 }
 
 
@@ -879,8 +864,8 @@ EFISWidget::al_paint (QPainter& painter, TextPainter& text_painter)
 
 	float const x = _al_ladder_rect.width() / 4.0f;
 
-	painter.save();
-
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
 	painter.setPen (_al_ladder_pen);
 	painter.setBrush (_ladder_color);
 	painter.drawRect (_al_ladder_rect);
@@ -892,8 +877,6 @@ EFISWidget::al_paint (QPainter& painter, TextPainter& text_painter)
 	al_paint_black_box (painter, text_painter, x);
 	al_paint_pressure (painter, text_painter, x);
 	al_paint_ap_setting (painter, text_painter);
-
-	painter.restore();
 }
 
 
@@ -911,11 +894,12 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	if (!_altitude_visible)
 		return;
 
-	painter.save();
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
 	painter.translate (-0.75f * x, 0.f);
 
 	painter.setPen (_al_black_box_pen);
-	painter.setBrush (QBrush (QColor (0, 0, 0)));
+	painter.setBrush (Qt::black);
 	painter.drawPolygon (QPolygonF()
 		<< QPointF (-0.5f * x, 0.f)
 		<< QPointF (0.f, -0.5f * x)
@@ -943,8 +927,6 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f - 2.f, 10.f)))) + "0");
-
-	painter.restore();
 }
 
 
@@ -969,7 +951,7 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 	clip_path.addRect (_al_ladder_rect);
 	clip_path -= clip_path_m;
 
-	painter.save();
+	painter.setTransform (_al_transform);
 	painter.setClipPath (clip_path, Qt::IntersectClip);
 	painter.translate (-2.f * x, 0.f);
 
@@ -1013,8 +995,6 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 			}
 		}
 	}
-
-	painter.restore();
 }
 
 
@@ -1028,10 +1008,9 @@ EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
 	pen.setCapStyle (Qt::RoundCap);
 	pen.setJoinStyle (Qt::RoundJoin);
 
-	painter.save();
-
-	painter.setPen (pen);
+	painter.setTransform (_al_transform);
 	painter.translate (-1.2f * x, 0.f);
+	painter.setPen (pen);
 	if (_altitude_tendency < _altitude)
 		painter.scale (1.f, -1.f);
 	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (std::max (0.f, _altitude_tendency)))) - 0.5f * x;
@@ -1046,8 +1025,6 @@ EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
 			<< QPointF (-0.2f * x, 0.f)
 			<< QPointF (+0.2f * x, 0.f));
 	}
-
-	painter.restore();
 }
 
 
@@ -1059,7 +1036,8 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		QFont altitude_bug_font = _font_10_bold;
 		float const altitude_bug_digit_height = _font_10_digit_height;
 
-		painter.save();
+		painter.setClipping (false);
+		painter.setTransform (_al_transform);
 		painter.setFont (altitude_bug_font);
 
 		for (auto& bug: _altitude_bugs)
@@ -1115,14 +1093,13 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 			painter.setPen (_autopilot_pen_2);
 			painter.drawPolygon (bug_shape);
 		}
-
-		painter.restore();
 	}
 
 	// Climb rate bug:
 	if (_ap_climb_rate_visible && _climb_rate_visible)
 	{
-		painter.save();
+		painter.setClipping (false);
+		painter.setTransform (_al_transform);
 		painter.translate (4.15f * x, 0.f);
 		float posy = -8.f * x * scale_cbr (_ap_climb_rate);
 		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
@@ -1131,7 +1108,6 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
 				painter.drawLine (QPointF (-0.25 * x, y), QPointF (0.2f * x, y));
 		}
-		painter.restore();
 	}
 }
 
@@ -1142,10 +1118,10 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 	QPen bold_white_pen = get_pen (QColor (255, 255, 255), 1.25f);
 	QPen thin_white_pen = get_pen (QColor (255, 255, 255), 0.50f);
 
-	painter.save();
-
 	float const y = x * 4.f;
 
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
 	painter.translate (4.f * x, 0.f);
 
 	painter.setPen (_al_ladder_pen);
@@ -1163,10 +1139,7 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 		<< QPointF (0.0f, +0.6 * y));
 
 	if (!_climb_rate_visible)
-	{
-		painter.restore();
 		return;
-	}
 
 	float const line_w = 0.2f * x;
 
@@ -1205,8 +1178,6 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 		text_painter.drawText (QRectF (0.f, -0.5f * fh, 4.f * fh, fh),
 							   Qt::AlignVCenter | Qt::AlignLeft, QString::number (abs_climb_rate));
 	}
-
-	painter.restore();
 }
 
 
@@ -1216,7 +1187,8 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	if (!_pressure_visible)
 		return;
 
-	painter.save();
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
 	painter.translate (0.f, 0.75f * x);
 
 	QFont font_a = _font_16_bold;
@@ -1237,8 +1209,6 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str);
 	painter.setFont (font_b);
 	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, in_str);
-
-	painter.restore();
 }
 
 
@@ -1266,8 +1236,8 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 	b_digits_box.translate (box_rect.left(), box_rect.top());
 	s_digits_box.translate (b_digits_box.right(), b_digits_box.top() + 0.f * s_digits_box.height());
 
-	painter.save();
-
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
 	painter.setPen (get_pen (QColor (0, 0, 0), 0.5f));
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
 	painter.drawRect (box_rect);
@@ -1287,8 +1257,6 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	text_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
 						   QString ("%1").arg (static_cast<int> (std::abs (_ap_altitude)) % 1000, 3, 'f', 0, '0'));
-
-	painter.restore();
 }
 
 
@@ -1320,8 +1288,7 @@ EFISWidget::paint_center_cross (QPainter& painter)
 
 	QPen white_pen = get_pen (QColor (255, 255, 255), 1.5f);
 
-	painter.save();
-
+	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 	painter.setPen (white_pen);
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
@@ -1345,8 +1312,6 @@ EFISWidget::paint_center_cross (QPainter& painter)
 	painter.drawPolygon (b);
 	painter.scale (-1.f, 1.f);
 	painter.drawPolygon (b);
-
-	painter.restore();
 }
 
 
@@ -1362,7 +1327,7 @@ EFISWidget::paint_flight_director (QPainter& painter)
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
 
-	painter.save();
+	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
 	for (auto pen: { get_pen (_autopilot_pen_1.color(), 2.5f),
@@ -1374,8 +1339,6 @@ EFISWidget::paint_flight_director (QPainter& painter)
 		if (_flight_director_roll_visible && _roll_visible)
 			painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
 	}
-
-	painter.restore();
 }
 
 
@@ -1398,8 +1361,8 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 	QRectF box_rect (0.f, 0.f, digits * digit_width + 2.f * margin, 1.3f * digit_height);
 	box_rect.translate (-box_rect.width() / 2.f, 0.35f * wh());
 
-	painter.save();
-
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
 	painter.setPen (get_pen (QColor (0, 0, 0), 1.f));
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
 	painter.drawRect (box_rect);
@@ -1409,14 +1372,15 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
 	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
-
-	painter.restore();
 }
 
 
 void
 EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 {
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+
 	if (_dme_distance_visible)
 	{
 		QString dme_val = QString ("DME %1").arg (_dme_distance, 0, 'f', 1);
@@ -1424,11 +1388,10 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		font.setBold (false);
 		QFontMetricsF font_metrics (font);
 		QRectF rect (-0.24f * wh(), -0.36f * wh(), font_metrics.width (dme_val), font_metrics.height());
-		painter.save();
+
 		painter.setPen (QColor (255, 255, 255));
 		painter.setFont (font);
 		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, dme_val);
-		painter.restore();
 	}
 
 	if (_navigation_hint != "")
@@ -1437,17 +1400,14 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		font.setBold (false);
 		QFontMetricsF font_metrics (font);
 		QRectF rect (-0.24f * wh(), -0.32f * wh(), font_metrics.width (_navigation_hint), font_metrics.height());
-		painter.save();
+
 		painter.setPen (QColor (255, 255, 255));
 		painter.setFont (font);
 		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, _navigation_hint);
-		painter.restore();
 	}
 
 	if (_navigation_needles_visible)
 	{
-		painter.save();
-
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 		QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
 
@@ -1491,18 +1451,14 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			painter.drawLine (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
 		};
 
-		painter.save();
+		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.452f * wh());
 		paint_ladder (_navigation_hd_needle_visible, _navigation_hd_needle);
-		painter.restore();
 
-		painter.save();
+		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
 		painter.rotate (-90);
 		paint_ladder (_navigation_gs_needle_visible, _navigation_gs_needle);
-		painter.restore();
-
-		painter.restore();
 	}
 
 	if (_navigation_runway_visible)
@@ -1512,7 +1468,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		float p = 1.3f;
 		float offset = bound (_navigation_hd_needle, -1.f, +1.f);
 
-		painter.save();
+		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.28f * wh());
 
 		QPointF tps[] = { QPointF (-w, 0.f), QPointF (0.f, 0.f), QPointF (+w, 0.f) };
@@ -1535,8 +1491,6 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			painter.drawPolygon (runway);
 			painter.drawLine (tps[1], bps[1]);
 		}
-
-		painter.restore();
 	}
 }
 
@@ -1544,8 +1498,6 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 void
 EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 {
-	painter.save();
-
 	QFont font = _font;
 	font.setPixelSize (font_size (30.f));
 	font.setBold (true);
@@ -1557,7 +1509,9 @@ EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 
 	QPen pen = get_pen (QColor (255, 255, 255), 2.f);
 
-	painter.resetTransform();
+	painter.setClipping (false);
+
+	painter.setTransform (_center_transform);
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
 	painter.drawRect (rect());
@@ -1571,8 +1525,6 @@ EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 
 	painter.drawRect (rect);
 	text_painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
-
-	painter.restore();
 }
 
 
