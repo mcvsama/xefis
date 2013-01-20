@@ -788,7 +788,7 @@ EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, 
 
 	painter.setPen (get_pen (QColor (255, 255, 255), 1.f));
 	painter.setFont (font_a);
-	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignLeft, mach_str, true);
+	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignLeft, mach_str);
 	painter.setFont (font_b);
 	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignRight, m_str);
 
@@ -1234,7 +1234,7 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 
 	painter.setPen (QPen (_navigation_color, pen_width()));
 	painter.setFont (font_a);
-	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str, true);
+	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str);
 	painter.setFont (font_b);
 	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, in_str);
 
