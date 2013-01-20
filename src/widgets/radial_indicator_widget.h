@@ -130,16 +130,17 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	paint_indicator (QPainter&, TextPainter&, float q, float r);
 
   private:
+	TextPainter::Cache	_text_painter_cache;
 	// Parameters:
-	Range<float>	_range				= { 0.f, 1.f };
-	float			_value				= 0.f;
-	bool			_value_visible		= false;
-	float			_warning_value		= 1.f;
-	bool			_warning_visible	= false;
-	float			_critical_value		= 1.f;
-	bool			_critical_visible	= false;
-	float			_normal_value		= 1.f;
-	bool			_normal_visible		= false;
+	Range<float>		_range				= { 0.f, 1.f };
+	float				_value				= 0.f;
+	bool				_value_visible		= false;
+	float				_warning_value		= 1.f;
+	bool				_warning_visible	= false;
+	float				_critical_value		= 1.f;
+	bool				_critical_visible	= false;
+	float				_normal_value		= 1.f;
+	bool				_normal_visible		= false;
 };
 
 

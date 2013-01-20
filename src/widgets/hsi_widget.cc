@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <utility>
+#include <vector>
 #include <cmath>
 
 // Qt:
@@ -95,6 +96,25 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 
 	_inner_map_clip = clip1 & clip3;
 	_outer_map_clip = clip2 & clip3;
+
+	// Navaids pens:
+	_lo_loc_pen = QPen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_hi_loc_pen = QPen (Qt::cyan, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	// Unscaled pens:
+	_ndb_pen = QPen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_vor_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_dme_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_fix_pen = QPen (Qt::darkGreen, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+
+	// Shapes:
+	_vor_shape = QPolygonF()
+		<< QPointF (-0.5f, 0.f)
+		<< QPointF (-0.25f, -0.44f)
+		<< QPointF (+0.25f, -0.44f)
+		<< QPointF (+0.5f, 0.f)
+		<< QPointF (+0.25f, +0.44f)
+		<< QPointF (-0.25f, +0.44f)
+		<< QPointF (-0.5f, 0.f);
 }
 
 
@@ -414,104 +434,16 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 
 	painter.setClipPath (_inner_map_clip);
 	painter.setFont (_font_10_bold);
-	QFontMetrics font_metrics (painter.font());
-
-	// Unscaled pens - painter will be scaled:
-	QPen ndb_pen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen vor_pen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen dme_pen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen fix_pen (Qt::darkGreen, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	// Scaled pens:
-	QPen loc_pen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	QPen hi_loc_pen (Qt::cyan, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-
-	// TODO cache in object
-	QPolygonF hexpoly = QPolygonF()
-		<< QPointF (-0.5f, 0.f)
-		<< QPointF (-0.25f, -0.44f)
-		<< QPointF (+0.25f, -0.44f)
-		<< QPointF (+0.5f, 0.f)
-		<< QPointF (+0.25f, +0.44f)
-		<< QPointF (-0.25f, +0.44f)
-		<< QPointF (-0.5f, 0.f);
 
 	// A bit bigger range to allow drawing objects currently positioned outside clipping path:
-	NavaidStorage::Navaids navaids = _navaid_storage->get_navs (_position, std::max (_range + 20.f, 2.f * _range));
-	// Sort navaids by type, draw LOCs first.
-	NavaidStorage::Navaids loc_navaids;
-	NavaidStorage::Navaids fix_navaids;
-	NavaidStorage::Navaids other_navaids;
-	for (auto& navaid: navaids)
-	{
-		switch (navaid.type())
-		{
-			case Navaid::LOC:
-			case Navaid::LOCSA:
-				if (_loc_visible)
-					loc_navaids.insert (navaid);
-				break;
+	// TODO cache, and retrieve after position change of at least 0.5 mile
+	retrieve_navaids();
 
-			case Navaid::Fix:
-				if (_fix_visible)
-					fix_navaids.insert (navaid);
-				break;
-
-			default:
-				other_navaids.insert (navaid);
-				break;
-		}
-	}
-
-	auto paint_loc = [&](Navaid const& navaid)
-	{
-		QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * navaid.position().rotated (_position).project_flat();
-		QPointF mapped_pos = _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
-
-		QTransform centered_transform = _aircraft_center_transform;
-		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
-
-		switch (navaid.type())
-		{
-			case Navaid::LOC:
-			case Navaid::LOCSA:
-			{
-				float const line_1 = nm_to_px (navaid.range());
-				float const line_2 = 1.03f * line_1;
-
-				QTransform transform = _true_heading_transform * centered_transform;
-				transform.rotate (navaid.true_bearing());
-				QTransform rot_1; rot_1.rotate (-2.f);
-				QTransform rot_2; rot_2.rotate (+2.f);
-				QPointF pt_0 (0.f, line_1);
-				QPointF pt_1 (rot_1.map (QPointF (0.f, line_2)));
-				QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
-
-				painter.setTransform (transform);
-				painter.setPen (navaid.identifier() == _highlighted_loc ? hi_loc_pen : loc_pen);
-				painter.setBrush (Qt::NoBrush);
-				if (_range < 16.f)
-					painter.drawLine (QPointF (0.f, 0.f), pt_0);
-				painter.drawLine (QPointF (0.f, 0.f), pt_1);
-				painter.drawLine (QPointF (0.f, 0.f), pt_2);
-				painter.drawLine (pt_0, pt_1);
-				painter.drawLine (pt_0, pt_2);
-
-				painter.resetTransform();
-				QPointF text_offset (0.5f * font_metrics.width (navaid.identifier()), -0.35f * font_metrics.height());
-				text_painter.drawText (transform.map (pt_0 + QPointF (0.f, 0.5f * q)) - text_offset, navaid.identifier());
-				break;
-			}
-
-			default:
-				break;
-		}
-	};
+	paint_locs (painter, text_painter, q);
 
 	auto paint_navaid = [&](Navaid const& navaid)
 	{
-		QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * navaid.position().rotated (_position).project_flat();
-		QPointF mapped_pos = _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
-
+		QPointF mapped_pos = get_navaid_xy (navaid.position());
 		QTransform centered_transform = _aircraft_center_transform;
 		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
 
@@ -524,7 +456,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				if (!_ndb_visible)
 					break;
 				painter.setTransform (scaled_transform);
-				painter.setPen (ndb_pen);
+				painter.setPen (_ndb_pen);
 				painter.setBrush (Qt::NoBrush);
 				painter.drawEllipse (QRectF (-0.45f, -0.45f, 0.9f, 0.9f));
 				painter.setBrush (Qt::cyan);
@@ -537,8 +469,8 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				if (!_vor_visible)
 					break;
 				painter.setTransform (scaled_transform);
-				painter.setPen (vor_pen);
-				painter.drawPolyline (hexpoly);
+				painter.setPen (_vor_pen);
+				painter.drawPolyline (_vor_shape);
 				painter.setBrush (Qt::green);
 				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
 				painter.setTransform (centered_transform);
@@ -549,7 +481,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				if (!_dme_visible)
 					break;
 				painter.setTransform (scaled_transform);
-				painter.setPen (dme_pen);
+				painter.setPen (_dme_pen);
 				painter.drawRect (QRectF (-0.5f, -0.5f, 1.f, 1.f));
 				break;
 
@@ -563,9 +495,10 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				QPointF c (-0.5f * h, +0.33f * h);
 				QPointF points[] = { a, b, c, a };
 				painter.setTransform (scaled_transform);
-				painter.setPen (fix_pen);
+				painter.setPen (_fix_pen);
 				painter.drawPolyline (points, sizeof (points) / sizeof (*points));
 				painter.setTransform (centered_transform);
+				painter.translate (0.5f, 0.5f);
 				text_painter.drawText (QPointF (0.f, 0.55f * q), navaid.identifier());
 				break;
 			}
@@ -575,9 +508,74 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 		}
 	};
 
-	// Paint localisers:
+	for (auto& navaid: _fix_navs)
+		paint_navaid (navaid);
+
+	for (auto& navaid: _ndb_navs)
+		paint_navaid (navaid);
+
+	for (auto& navaid: _dme_navs)
+		paint_navaid (navaid);
+
+	for (auto& navaid: _vor_navs)
+		paint_navaid (navaid);
+
+	painter.restore();
+}
+
+
+void
+HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter, float q)
+{
+	QFontMetrics font_metrics (painter.font());
+	QTransform rot_1; rot_1.rotate (-2.f);
+	QTransform rot_2; rot_2.rotate (+2.f);
+	QPointF zero (0.f, 0.f);
+
+	// Group painting lines and texts as separate tasks. For this,
+	// cache texts that need to be drawn later along with their positions.
+	std::vector<std::pair<QPointF, QString>> texts_to_paint;
+	texts_to_paint.reserve (128);
+
+	auto paint_texts_to_paint = [&]() -> void
+	{
+		for (auto const& text_and_xy: texts_to_paint)
+			text_painter.drawText (text_and_xy.first, text_and_xy.second);
+		texts_to_paint.clear();
+	};
+
+	auto paint_loc = [&] (Navaid const& navaid) -> void
+	{
+		QPointF navaid_pos = get_navaid_xy (navaid.position());
+		QTransform transform = _aircraft_center_transform;
+		transform.translate (navaid_pos.x(), navaid_pos.y());
+		transform = _true_heading_transform * transform;
+		transform.rotate (navaid.true_bearing());
+
+		float const line_1 = nm_to_px (navaid.range());
+		float const line_2 = 1.03f * line_1;
+
+		QPointF pt_0 (0.f, line_1);
+		QPointF pt_1 (rot_1.map (QPointF (0.f, line_2)));
+		QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
+
+		painter.setTransform (transform);
+		if (_range < 16.f)
+			painter.drawLine (zero, pt_0);
+		painter.drawLine (zero, pt_1);
+		painter.drawLine (zero, pt_2);
+		painter.drawLine (pt_0, pt_1);
+		painter.drawLine (pt_0, pt_2);
+
+		QPointF text_offset (0.5f * font_metrics.width (navaid.identifier()), -0.35f * font_metrics.height());
+		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.5f * q)) - text_offset, navaid.identifier());
+	};
+
+	// Paint localizers:
+	painter.setBrush (Qt::NoBrush);
+	painter.setPen (_lo_loc_pen);
 	Navaid const* hi_loc = nullptr;
-	for (auto& navaid: loc_navaids)
+	for (auto& navaid: _loc_navs)
 	{
 		// Paint highlighted LOC at the end, so it's on top:
 		if (navaid.identifier() == _highlighted_loc)
@@ -585,19 +583,62 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 			hi_loc = &navaid;
 			continue;
 		}
-		paint_loc (navaid);
+		else
+			paint_loc (navaid);
 	}
+
+	// Paint identifiers:
+	painter.resetTransform();
+	paint_texts_to_paint();
+
+	// Highlighted localizer with text:
 	if (hi_loc)
+	{
+		painter.setPen (_hi_loc_pen);
 		paint_loc (*hi_loc);
+		paint_texts_to_paint();
+	}
+}
 
-	// Paint Fixes:
-	for (auto& navaid: fix_navaids)
-		paint_navaid (navaid);
 
-	// Other navaids:
-	for (auto& navaid: other_navaids)
-		paint_navaid (navaid);
+void
+HSIWidget::retrieve_navaids()
+{
+	if (!_navaid_storage)
+		return;
 
-	painter.restore();
+	_loc_navs.clear();
+	_ndb_navs.clear();
+	_vor_navs.clear();
+	_dme_navs.clear();
+	_fix_navs.clear();
+
+	for (Navaid const& navaid: _navaid_storage->get_navs (_position, std::max (_range + 20.f /* TODO _nm */, 2.f * _range)))
+	{
+		switch (navaid.type())
+		{
+			case Navaid::LOC:
+			case Navaid::LOCSA:
+				_loc_navs.insert (navaid);
+				break;
+
+			case Navaid::NDB:
+				_ndb_navs.insert (navaid);
+				break;
+
+			case Navaid::VOR:
+				_vor_navs.insert (navaid);
+				break;
+
+			case Navaid::DME:
+			case Navaid::DMESF:
+				_dme_navs.insert (navaid);
+				break;
+
+			case Navaid::Fix:
+				_fix_navs.insert (navaid);
+				break;
+		}
+	}
 }
 

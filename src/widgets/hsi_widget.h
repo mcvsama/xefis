@@ -28,6 +28,7 @@
 #include <xefis/core/navaid_storage.h>
 #include <xefis/utility/text_painter.h>
 #include <xefis/utility/latlng.h>
+#include <xefis/utility/numeric.h>
 
 
 class HSIWidget: public Xefis::InstrumentWidget
@@ -273,7 +274,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	void
 	set_highlighted_loc (QString const& identifier);
 
-  protected:
+  private:
 	void
 	paintEvent (QPaintEvent*) override;
 
@@ -302,51 +303,81 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_dotted_earth (QPainter&, float q, float r);
 
 	void
-	paint_navaids (QPainter&, TextPainter& text_painter, float q, float r);
+	paint_navaids (QPainter&, TextPainter&, float q, float r);
 
-  private:
+	void
+	paint_locs (QPainter&, TextPainter&, float q);
+
+	/**
+	 * Retrieve navaids from navaid storage for current aircraft
+	 * position and populate _*_navs variables.
+	 */
+	void
+	retrieve_navaids();
+
+	/**
+	 * Compute position where navaid should be drawn on map
+	 * relative to the aircraft (assumes usage with aircraft-centered transform).
+	 */
+	QPointF
+	get_navaid_xy (LatLng const& position);
+
 	float
 	nm_to_px (Miles miles);
 
   private:
-	QTransform			_aircraft_center_transform;
-	QTransform			_mag_heading_transform;
-	QTransform			_true_heading_transform;
-	QRectF				_map_clip_rect;
-	QRectF				_inside_map_clip_rect;
-	QPainterPath		_inner_map_clip;
-	QPainterPath		_outer_map_clip;
-	TextPainter::Cache	_text_painter_cache;
-	NavaidStorage*		_navaid_storage				= nullptr;
+	NavaidStorage*			_navaid_storage				= nullptr;
+
+	// Cache:
+	TextPainter::Cache		_text_painter_cache;
+	QTransform				_aircraft_center_transform;
+	QTransform				_mag_heading_transform;
+	QTransform				_true_heading_transform;
+	QRectF					_map_clip_rect;
+	QRectF					_inside_map_clip_rect;
+	QPainterPath			_inner_map_clip;
+	QPainterPath			_outer_map_clip;
+	QPen					_ndb_pen;
+	QPen					_vor_pen;
+	QPen					_dme_pen;
+	QPen					_fix_pen;
+	QPen					_lo_loc_pen;
+	QPen					_hi_loc_pen;
+	QPolygonF				_vor_shape;
+	NavaidStorage::Navaids	_loc_navs;
+	NavaidStorage::Navaids	_ndb_navs;
+	NavaidStorage::Navaids	_vor_navs;
+	NavaidStorage::Navaids	_dme_navs;
+	NavaidStorage::Navaids	_fix_navs;
 
 	// Parameters:
-	Miles				_range						= 1.f;
-	Degrees				_mag_heading				= 0.f;
-	Degrees				_true_heading				= 0.f;
-	bool				_heading_visible			= false;
-	Degrees				_ap_mag_heading				= 0.f;
-	bool				_ap_heading_visible			= false;
-	bool				_ap_track_visible			= false;
-	Degrees				_track_deg					= 0.f;
-	bool				_track_visible				= false;
-	Knots				_ground_speed				= 0.f;
-	bool				_ground_speed_visible		= false;
-	Knots				_true_air_speed				= 0.f;
-	bool				_true_air_speed_visible		= false;
-	float				_mach						= 0.f;
-	bool				_mach_visible				= false;
-	Degrees				_track_deviation			= 0.f;
-	bool				_trend_vector_visible		= false;
-	Miles				_trend_vector_lookahead		= 5.f;
-	LatLng				_position					= { 0.f, 0.f };
-	bool				_dotted_earth_visible		= false;
-	bool				_navaids_visible			= false;
-	bool				_vor_visible				= false;
-	bool				_dme_visible				= false;
-	bool				_ndb_visible				= false;
-	bool				_loc_visible				= false;
-	bool				_fix_visible				= false;
-	QString				_highlighted_loc;
+	Miles					_range						= 1.f;
+	Degrees					_mag_heading				= 0.f;
+	Degrees					_true_heading				= 0.f;
+	bool					_heading_visible			= false;
+	Degrees					_ap_mag_heading				= 0.f;
+	bool					_ap_heading_visible			= false;
+	bool					_ap_track_visible			= false;
+	Degrees					_track_deg					= 0.f;
+	bool					_track_visible				= false;
+	Knots					_ground_speed				= 0.f;
+	bool					_ground_speed_visible		= false;
+	Knots					_true_air_speed				= 0.f;
+	bool					_true_air_speed_visible		= false;
+	float					_mach						= 0.f;
+	bool					_mach_visible				= false;
+	Degrees					_track_deviation			= 0.f;
+	bool					_trend_vector_visible		= false;
+	Miles					_trend_vector_lookahead		= 5.f;
+	LatLng					_position					= { 0.f, 0.f };
+	bool					_dotted_earth_visible		= false;
+	bool					_navaids_visible			= false;
+	bool					_vor_visible				= false;
+	bool					_dme_visible				= false;
+	bool					_ndb_visible				= false;
+	bool					_loc_visible				= false;
+	bool					_fix_visible				= false;
+	QString					_highlighted_loc;
 };
 
 
@@ -626,6 +657,14 @@ inline void
 HSIWidget::set_highlighted_loc (QString const& identifier)
 {
 	_highlighted_loc = identifier;
+}
+
+
+inline QPointF
+HSIWidget::get_navaid_xy (LatLng const& position)
+{
+	QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * position.rotated (_position).project_flat();
+	return _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
 }
 
 
