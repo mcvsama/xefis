@@ -13,83 +13,126 @@
 
 // Standard:
 #include <cstddef>
+#include <cmath>
+
+// Xefis:
+#include <xefis/utility/numeric.h>
 
 // Local:
 #include "text_painter.h"
 
 
-QImage*
-TextPainter::Cache::load_image (QRect const& size, QColor const& color, QString const& text, int flags)
+TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar const& character):
+	data (new Data())
 {
-	CacheMap::iterator img = _cache.find (Key { size, color, text, flags });
-	if (img == _cache.end())
-		return nullptr;
-	return &img->second;
+	QFontMetricsF metrics (font);
+	QSize size (std::ceil (metrics.width (character)) + 1, std::ceil (metrics.height()) + 1);
+	QImage image (size, QImage::Format_ARGB32_Premultiplied);
+	QColor alpha (color.red(), color.green(), color.blue(), 0);
+	QPainter painter (&image);
+	painter.setRenderHint (QPainter::Antialiasing, true);
+	painter.setRenderHint (QPainter::TextAntialiasing, true);
+	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (color);
+
+	for (int x = 0; x < Rank; ++x)
+	{
+		float const fx = 1.f * x / Rank;
+
+		for (int y = 0; y < Rank; ++y)
+		{
+			float const fy = 1.f * y / Rank;
+
+			QPointF position (fx, fy + metrics.ascent());
+			QPainterPath glyph_path;
+			glyph_path.addText (position, font, character);
+
+			image.fill (alpha);
+			//image.fill (Qt::red /*alpha*/);
+			painter.drawPath (glyph_path);
+
+			data->positions[x][y] = image;
+		}
+	}
 }
 
 
-void
-TextPainter::Cache::store_image (QRect const& size, QColor const& color, QString const& text, int flags, QImage& image)
-{
-	_cache[Key { size, color, text, flags }] = image;
-}
-
-
-TextPainter::TextPainter (QPainter& painter, Cache* cache, float oversampling_factor):
+TextPainter::TextPainter (QPainter& painter, Cache* cache):
 	_cache (cache),
-	_painter (painter),
-	_buffer (1, 1, QImage::Format_ARGB32),
-	_oversampling_factor (oversampling_factor)
+	_painter (painter)
 {
+	if (!_cache)
+		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
 }
 
 
 void
-TextPainter::drawText (QPointF const& position, QString const& text, bool dont_cache)
+TextPainter::drawText (QPointF const& position, QString const& text)
 {
 	QFontMetricsF metrics (_painter.font());
 	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
-	drawText (target, 0, text, dont_cache);
+	drawText (target, 0, text);
 }
 
 
 void
-TextPainter::drawText (QRectF const& target, int flags, QString const& text, bool dont_cache)
+TextPainter::drawText (QRectF const& target, int flags, QString const& text)
 {
-	QRect target_int_rect (0, 0, std::ceil (_oversampling_factor * target.width()), std::ceil (_oversampling_factor * target.height()));
+	QFontMetricsF metrics (_painter.font());
+	QPointF target_center = target.center();
+	QPointF offset;
 
-	if (_cache && !dont_cache)
+	if (flags & Qt::AlignHCenter)
+		offset.setX (target_center.x() - 0.5f * metrics.width (text));
+	else if (flags & Qt::AlignRight)
+		offset.setX (target.right() - metrics.width (text));
+	else // default: AlignLeft
+		offset.setX (target.left());
+
+	if (flags & Qt::AlignVCenter)
+		offset.setY (target_center.y() - 0.5f * metrics.height());
+	else if (flags & Qt::AlignBottom)
+		offset.setY (target.bottom() - metrics.height());
+	else // default: AlignTop
+		offset.setY (target.top());
+
+	// Check if we need to take into account painter transform:
+	QTransform painter_transform = _painter.transform();
+	bool saved_transform = false;
+	if (painter_transform.isAffine() && !painter_transform.isRotating() && !painter_transform.isScaling() && painter_transform.isTranslating())
 	{
-		QImage* cached = _cache->load_image (target_int_rect, _painter.pen().color(), text, flags);
-		if (cached)
-		{
-			_painter.drawImage (target, *cached, cached->rect());
-			return;
-		}
+		qreal x, y;
+		painter_transform.map (0.f, 0.f, &x, &y);
+		_painter.resetTransform();
+		offset.rx() += x;
+		offset.ry() += y;
+		saved_transform = true;
 	}
 
-	if (_buffer.rect() != target_int_rect)
-		_buffer = QImage (target_int_rect.width(), target_int_rect.height(), QImage::Format_ARGB32);
+	QColor color = _painter.pen().color();
 
-	QFont font = _painter.font();
-	font.setPixelSize (_oversampling_factor * font.pixelSize());
+	// TODO cache previous painting info { font, color }, and if the same, use cached glyphs_cache iterator.
+	// Find font cache:
+	Cache::Fonts::iterator glyphs_cache_it = _cache->fonts.find (Cache::Font { _painter.font(), color });
+	if (glyphs_cache_it == _cache->fonts.end())
+		glyphs_cache_it = _cache->fonts.insert ({ Cache::Font { _painter.font(), color }, Cache::Glyphs() }).first;
+	Cache::Glyphs* glyphs_cache = &glyphs_cache_it->second;
 
-	QPainter ov_painter (&_buffer);
-	ov_painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	ov_painter.setRenderHint (QPainter::TextAntialiasing, true);
-	ov_painter.setPen (_painter.pen());
-	ov_painter.setFont (font);
+	for (QString::ConstIterator c = text.begin(); c != text.end(); ++c)
+	{
+		auto glyph = glyphs_cache->find (*c);
+		if (glyph == glyphs_cache->end())
+			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (_painter.font(), color, *c) }).first;
+		float fx = floored_mod<float> (offset.x(), 1.f);
+		float fy = floored_mod<float> (offset.y(), 1.f);
+		int dx = bound<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		int dy = bound<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		_painter.drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
+		offset.rx() += metrics.width (*c);
+	}
 
-	// We don't know target background color, so fill the buffer
-	// with the desired text color (pen color) with 0 alpha.
-	QColor fill_color = _painter.pen().color();
-	fill_color.setAlpha (0);
-	_buffer.fill (fill_color.rgba());
-	ov_painter.drawText (_buffer.rect(), flags, text);
-
-	if (_cache && !dont_cache)
-		_cache->store_image (target_int_rect, _painter.pen().color(), text, flags, _buffer);
-
-	_painter.drawImage (target, _buffer, _buffer.rect());
+	if (saved_transform)
+		_painter.setTransform (painter_transform);
 }
 
