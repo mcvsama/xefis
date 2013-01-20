@@ -106,9 +106,6 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 void
 HSIWidget::paintEvent (QPaintEvent*)
 {
-	float const w = width();
-	float const h = height();
-
 	float const q = 0.1f * wh();
 	float const r = 6.5f * q;
 
@@ -186,25 +183,26 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q
 
 
 void
-HSIWidget::paint_track (QPainter& painter, TextPainter&, float, float r)
+HSIWidget::paint_track (QPainter& painter, TextPainter&, float q, float r)
 {
 	if (!_track_visible)
 		return;
 
-	QPen pen (QColor (255, 255, 0), pen_width (1.f), Qt::DashLine, Qt::FlatCap);
+	Miles const trend_range = std::min (_trend_vector_lookahead, 0.5f * _range);
+	float start_point = _trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 
-	painter.setPen (pen);
 	painter.setTransform (_aircraft_center_transform);
 	painter.rotate (_track_deg - _mag_heading);
-	painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -r));
+	painter.setPen (QPen (Qt::white, pen_width (1.5f)));
+	painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -r));
 }
 
 
 void
-HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
+HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float r)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap);
 
@@ -212,12 +210,13 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 	painter.setClipPath (_inner_map_clip);
 	painter.setPen (est_pen);
 
+	Miles const trend_range = std::min (_trend_vector_lookahead, 0.5f * _range);
+
 	if (_trend_vector_visible)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
 
-		Miles const trend_range = std::min (_trend_vector_lookahead, _range);
 		Miles const step = trend_range / 50.f;
 		Degrees const degrees_per_step = step * _track_deviation;
 
