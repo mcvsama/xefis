@@ -86,7 +86,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 		_blinking_warning->stop();
 
 	QPainter painter (this);
-	TextPainter text_painter (painter);
+	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
