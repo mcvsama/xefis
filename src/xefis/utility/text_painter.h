@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <tuple>
 #include <map>
+#include <memory>
 
 // Qt:
 #include <QtGui/QPainter>
@@ -35,60 +36,86 @@ class TextPainter
 {
   public:
 	/**
-	 * Stores drawn images.
+	 * Stores drawn glyphs.
 	 */
 	class Cache
 	{
-		struct Key
-		{
-			QRect	size;
-			QColor	color;
-			QString	text;
-			int		flags;
+		friend class TextPainter;
 
-			bool
-			operator< (Key const& other) const;
+		class Glyph
+		{
+		  public:
+			static constexpr int Rank = 8;
+
+		  private:
+			struct Data
+			{
+				QImage positions[Rank][Rank];
+			};
+
+		  public:
+			/**
+			 * Generate all images for given character and font.
+			 */
+			Glyph (QFont const&, QColor const&, QChar const&);
+
+			Glyph (Glyph const& other);
+
+			Glyph&
+			operator= (Glyph const& other);
+
+		  public:
+			std::shared_ptr<Data> data;
 		};
 
-		typedef std::map<Key, QImage> CacheMap;
+		struct Font
+		{
+			QFont	font;
+			QColor	color;
 
-	  public:
-		QImage*
-		load_image (QRect const& size, QColor const& color, QString const& text, int flags);
+			bool
+			operator< (Font const& other) const;
+		};
 
-		void
-		store_image (QRect const& size, QColor const& color, QString const& text, int flags, QImage& image);
+		typedef std::map<QChar, Glyph>	Glyphs;
+		typedef std::map<Font, Glyphs>	Fonts;
 
-	  private:
-		CacheMap _cache;
+		Fonts fonts;
 	};
 
   public:
-	TextPainter (QPainter& painter, Cache* cache = nullptr, float oversampling_factor = 2.0f);
+	TextPainter (QPainter& painter, Cache* cache);
 
 	void
-	drawText (QPointF const& position, QString const& text, bool dont_cache = false);
+	drawText (QPointF const& position, QString const& text);
 
 	void
-	drawText (QRectF const& target, int flags, QString const& text, bool dont_cache = false);
+	drawText (QRectF const& target, int flags, QString const& text);
 
   private:
 	Cache*		_cache;
 	QPainter&	_painter;
-	QImage		_buffer;
-	float		_oversampling_factor;
 };
 
 
-inline bool
-TextPainter::Cache::Key::operator< (Key const& other) const
-{
-	Key const& a = *this;
-	Key const& b = other;
+inline
+TextPainter::Cache::Glyph::Glyph (Glyph const& other):
+	data (other.data)
+{ }
 
-	return
-		std::make_tuple (a.size.top(), a.size.left(), a.size.bottom(), a.size.right(), a.color.rgba(), a.text, a.flags) <
-		std::make_tuple (b.size.top(), b.size.left(), b.size.bottom(), b.size.right(), b.color.rgba(), b.text, b.flags);
+
+inline TextPainter::Cache::Glyph&
+TextPainter::Cache::Glyph::operator= (Glyph const& other)
+{
+	data = other.data;
+	return *this;
+}
+
+
+inline bool
+TextPainter::Cache::Font::operator< (Font const& other) const
+{
+	return std::make_pair (font, color.rgba()) < std::make_pair (other.font, other.color.rgba());
 }
 
 #endif
