@@ -125,7 +125,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	track() const;
 
 	/**
-	 * Set track heading.
+	 * Set track magnetic heading.
 	 */
 	void
 	set_track (Degrees);
