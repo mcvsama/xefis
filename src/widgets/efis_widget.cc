@@ -94,7 +94,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 	painter.setTransform (_center_transform);
 
 	if (_input_alert_visible)
-		paint_input_alert (painter);
+		paint_input_alert (painter, text_painter);
 	else
 	{
 		painter.save();
@@ -103,7 +103,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 
 		paint_center_cross (painter);
 		paint_flight_director (painter);
-		paint_altitude_agl (painter);
+		paint_altitude_agl (painter, text_painter);
 		paint_nav (painter, text_painter);
 
 		painter.save();
@@ -1380,7 +1380,7 @@ EFISWidget::paint_flight_director (QPainter& painter)
 
 
 void
-EFISWidget::paint_altitude_agl (QPainter& painter)
+EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 {
 	if (!_altitude_agl_visible)
 		return;
@@ -1408,7 +1408,7 @@ EFISWidget::paint_altitude_agl (QPainter& painter)
 	painter.setFont (radar_altimeter_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
+	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
 
 	painter.restore();
 }
@@ -1542,7 +1542,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::paint_input_alert (QPainter& painter)
+EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 {
 	painter.save();
 
@@ -1570,7 +1570,7 @@ EFISWidget::paint_input_alert (QPainter& painter)
 	QRectF rect (-0.6f * width, -0.5f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
 
 	painter.drawRect (rect);
-	painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
+	text_painter.drawText (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
 
 	painter.restore();
 }

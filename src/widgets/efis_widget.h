@@ -770,13 +770,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_flight_director (QPainter&);
 
 	void
-	paint_altitude_agl (QPainter&);
+	paint_altitude_agl (QPainter&, TextPainter&);
 
 	void
 	paint_nav (QPainter&, TextPainter&);
 
 	void
-	paint_input_alert (QPainter&);
+	paint_input_alert (QPainter&, TextPainter&);
 
 	void
 	paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target);
