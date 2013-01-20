@@ -638,6 +638,10 @@ HSIWidget::retrieve_navaids()
 			case Navaid::Fix:
 				_fix_navs.insert (navaid);
 				break;
+
+			default:
+				// Other types not drawn.
+				break;
 		}
 	}
 }
