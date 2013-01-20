@@ -847,6 +847,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	QRectF				_adi_sky_rect;
 	QRectF				_adi_gnd_rect;
+	QPainterPath		_flight_path_marker_shape;
 	QPainterPath		_flight_path_marker_clip;
 	QPointF				_flight_path_marker_position;
 
@@ -854,6 +855,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Speed ladder
 	 */
 
+	QTransform			_sl_transform;
 	Knots				_sl_extent						= 124;
 	int					_sl_line_every					= 10;
 	int					_sl_number_every				= 20;
@@ -873,6 +875,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Altitude ladder
 	 */
 
+	QTransform			_al_transform;
 	int					_al_line_every					= 100;
 	int					_al_number_every				= 200;
 	int					_al_bold_every					= 500;
