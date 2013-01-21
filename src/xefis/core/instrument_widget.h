@@ -33,17 +33,25 @@ class InstrumentWidget: public QWidget
 {
   public:
 	// Ctor
-	InstrumentWidget (QWidget* parent, float height_fot_width, float master_scale);
+	InstrumentWidget (QWidget* parent, float height_fot_width, float master_pen_scale, float master_font_scale);
 
   protected:
 	void
 	resizeEvent (QResizeEvent*) override;
 
 	/**
-	 * Return min (width(), height());
+	 * Return lesser dimension corrected by height-for-width.
+	 * Useful for computing feature sizes, but for line widths
+	 * you should rather use win_wh() or pen_width().
 	 */
 	float
 	wh() const;
+
+	/**
+	 * Return lesser dimension of the top-level window.
+	 */
+	float
+	win_wh() const;
 
 	QPen
 	get_pen (QColor const& color, float width);
@@ -61,7 +69,7 @@ class InstrumentWidget: public QWidget
 	translate_descent (QFontMetricsF& metrics_1, QFontMetricsF& metrics_2);
 
 	void
-	update_fonts();
+	update_sizes();
 
   protected:
 	QFont				_font;
@@ -80,9 +88,14 @@ class InstrumentWidget: public QWidget
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
 	float				_height_for_width		= 1.f;
-	float				_master_scale			= 1.f;
+	float				_master_pen_scale		= 1.f;
+	float				_master_font_scale		= 1.f;
 	QPen				_autopilot_pen_1;
 	QPen				_autopilot_pen_2;
+	float				_w;
+	float				_h;
+	float				_window_w;
+	float				_window_h;
 
 	static const char	DIGITS[10];
 	static const char*	MINUS_SIGN;
@@ -92,7 +105,14 @@ class InstrumentWidget: public QWidget
 inline float
 InstrumentWidget::wh() const
 {
-	return std::min (_height_for_width * width(), 1.f * height());
+	return std::min (_height_for_width * _w, _h);
+}
+
+
+inline float
+InstrumentWidget::win_wh() const
+{
+	return std::min (_window_w, _window_h);
 }
 
 
@@ -106,14 +126,14 @@ InstrumentWidget::get_pen (QColor const& color, float width)
 inline float
 InstrumentWidget::pen_width (float scale) const
 {
-	return std::max (0.f, _master_scale * scale * wh() / (_height_for_width / 0.8f * 325.f));
+	return std::max (0.f, _master_pen_scale * scale * win_wh() / 460.f);
 }
 
 
 inline float
 InstrumentWidget::font_size (float scale) const
 {
-	return std::max (1.f, _master_scale * scale * wh() / (_height_for_width / 0.8f * 375.f));
+	return std::max (1.f, _master_font_scale * scale * win_wh() / 610.f);
 }
 
 } // namespace Xefis

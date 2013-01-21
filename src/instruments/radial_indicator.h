@@ -34,7 +34,7 @@ class RadialIndicator: public Xefis::Instrument
 
   public:
 	// Ctor
-	RadialIndicator (QDomElement const& config, QWidget* parent);
+	RadialIndicator (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
 
   public slots:
 	/**

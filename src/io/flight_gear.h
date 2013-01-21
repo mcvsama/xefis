@@ -38,7 +38,7 @@ class FlightGearIO:
 
   public:
 	// Ctor
-	FlightGearIO (QDomElement const& config);
+	FlightGearIO (Xefis::ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	~FlightGearIO();

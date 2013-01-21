@@ -36,7 +36,7 @@ class HSI: public Xefis::Instrument
 
   public:
 	// Ctor
-	HSI (QDomElement const& config, QWidget* parent);
+	HSI (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
 
 	// Dtor
 	~HSI();

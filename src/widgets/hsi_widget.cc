@@ -31,7 +31,7 @@
 
 
 HSIWidget::HSIWidget (QWidget* parent):
-	InstrumentWidget (parent, 0.5f, 1.f)
+	InstrumentWidget (parent, 0.5f, 1.1f, 1.f)
 { }
 
 
@@ -61,14 +61,14 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	_outer_map_clip = clip2 & clip3;
 
 	// Navaids pens:
-	_lo_loc_pen = QPen (Qt::blue, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_hi_loc_pen = QPen (Qt::cyan, pen_width (1.f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_lo_loc_pen = QPen (Qt::blue, pen_width (0.6f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.6f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Unscaled pens:
 	_ndb_pen = QPen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_vor_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_dme_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_fix_pen = QPen (Qt::darkGreen, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_fix_pen = QPen (QColor (0, 132, 255), 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Shapes:
 	_vor_shape = QPolygonF()
@@ -142,8 +142,8 @@ HSIWidget::paintEvent (QPaintEvent*)
 void
 HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q, float r)
 {
-	QPen pen1 = get_pen (Qt::white, 1.5f);
-	QPen pen2 = get_pen (Qt::white, 2.8f);
+	QPen pen1 = get_pen (Qt::white, 1.2f);
+	QPen pen2 = get_pen (Qt::white, 2.f);
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
@@ -173,7 +173,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter, float q
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.translate (q, 1.75f * q);
-		painter.setPen (get_pen (_navigation_color, 1.f));
+		painter.setPen (get_pen (_navigation_color, 0.6f));
 		painter.setFont (font_1);
 		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
@@ -196,15 +196,15 @@ HSIWidget::paint_track (QPainter& painter, TextPainter&, float q, float r)
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.rotate (_track_deg - _mag_heading);
-	painter.setPen (QPen (Qt::white, pen_width (1.5f)));
+	painter.setPen (QPen (Qt::white, pen_width (1.f)));
 	painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -r));
 }
 
 
 void
-HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float r)
+HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&, float, float)
 {
-	QPen est_pen = QPen (Qt::white, pen_width (1.5f), Qt::SolidLine, Qt::SquareCap);
+	QPen est_pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::SquareCap);
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_inner_map_clip);
@@ -282,7 +282,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter, floa
 
 	if (_ap_track_visible)
 	{
-		QPen pen (_autopilot_pen_2.color(), pen_width (1.5f), Qt::DashLine, Qt::FlatCap);
+		QPen pen (_autopilot_pen_2.color(), pen_width (1.f), Qt::DashLine, Qt::FlatCap);
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
@@ -300,7 +300,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float
 	if (!_heading_visible)
 		return;
 
-	QPen pen = get_pen (QColor (255, 255, 255), 1.5f);
+	QPen pen = get_pen (QColor (255, 255, 255), 1.f);
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipRect (_map_clip_rect);
@@ -327,7 +327,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter, float
 void
 HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter, float q, float)
 {
-	QPen pen = get_pen (QColor (255, 255, 255), 1.f);
+	QPen pen = get_pen (QColor (255, 255, 255), 0.6f);
 	QFont font_a = _font_13_bold;
 	QFont font_b = _font_16_bold;
 	QFontMetricsF metr_a (font_a);
@@ -473,7 +473,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				painter.drawPolyline (points, sizeof (points) / sizeof (*points));
 				painter.setTransform (centered_transform);
 				painter.translate (0.5f, 0.5f);
-				text_painter.drawText (QPointF (0.f, 0.55f * q), navaid.identifier());
+				text_painter.drawText (QPointF (0.25f * q, 0.45f * q), navaid.identifier());
 				break;
 			}
 

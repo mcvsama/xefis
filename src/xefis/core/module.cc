@@ -22,9 +22,15 @@
 
 // Local:
 #include "module.h"
+#include "module_manager.h"
 
 
 namespace Xefis {
+
+Module::Module (ModuleManager* module_manager):
+	_module_manager (module_manager)
+{ }
+
 
 void
 Module::parse_properties (QDomElement& properties_element, PropertiesList list)
@@ -114,6 +120,13 @@ Module::parse_properties (QDomElement& properties_element, PropertiesList list)
 			list << s;
 		throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")).toStdString());
 	}
+}
+
+
+void
+Module::data_updated()
+{
+	_module_manager->application()->data_update();
 }
 
 } // namespace Xefis

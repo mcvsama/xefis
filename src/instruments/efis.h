@@ -36,7 +36,7 @@ class EFIS: public Xefis::Instrument
 
   public:
 	// Ctor
-	EFIS (QDomElement const& config, QWidget* parent);
+	EFIS (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
 
   public slots:
 	/**

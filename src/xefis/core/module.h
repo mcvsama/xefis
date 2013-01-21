@@ -29,6 +29,8 @@
 
 namespace Xefis {
 
+class ModuleManager;
+
 class Module
 {
   public:
@@ -42,6 +44,9 @@ class Module
 	typedef std::vector<NameAndProperty> PropertiesList;
 
   public:
+	// Ctor
+	Module (ModuleManager*);
+
 	// Dtor
 	virtual ~Module();
 
@@ -65,6 +70,9 @@ class Module
 	 */
 	void
 	data_updated();
+
+  private:
+	ModuleManager*	_module_manager = nullptr;
 };
 
 
@@ -76,13 +84,6 @@ Module::~Module()
 inline void
 Module::data_update()
 { }
-
-
-inline void
-Module::data_updated()
-{
-	xefis()->data_update();
-}
 
 } // namespace Xefis
 

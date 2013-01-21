@@ -18,6 +18,9 @@
 #include <string>
 #include <vector>
 
+// System:
+#include <signal.h>
+
 // Qt:
 #include <QtCore/QTextCodec>
 
@@ -40,6 +43,10 @@ Application* Application::_application = nullptr;
 Application::Application (int argc, char** argv):
 	QApplication (argc, argv)
 {
+	if (_application)
+		throw std::runtime_error ("can create only one Application object");
+	_application = this;
+
 	// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
 	// Also encode std::strings and const chars* in UTF-8:
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
@@ -48,9 +55,11 @@ Application::Application (int argc, char** argv):
 	// Init Xefis modules:
 	Xefis::PropertyStorage::initialize();
 
-	_module_manager = new Xefis::ModuleManager();
-	_config_reader = new Xefis::ConfigReader (_module_manager);
+	_module_manager = new Xefis::ModuleManager (this);
+	_config_reader = new Xefis::ConfigReader (this, _module_manager);
 	_config_reader->load ("xefis-config.xml");
+
+	signal (SIGHUP, s_quit);
 }
 
 
@@ -59,6 +68,7 @@ Application::~Application()
 	delete _config_reader;
 	delete _module_manager;
 	Xefis::Services::deinitialize();
+	_application = nullptr;
 }
 
 
@@ -86,6 +96,15 @@ Application::event (QEvent* event)
 	}
 	else
 		return QApplication::event (event);
+}
+
+
+void
+Application::s_quit (int)
+{
+	std::clog << "HUP received, exiting." << std::endl;
+	if (_application)
+		_application->quit();
 }
 
 } // namespace Xefis

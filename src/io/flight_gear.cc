@@ -26,7 +26,8 @@
 #include "flight_gear.h"
 
 
-FlightGearIO::FlightGearIO (QDomElement const& config)
+FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Input (module_manager)
 {
 	for (QDomElement& e: config)
 	{

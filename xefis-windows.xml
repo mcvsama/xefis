@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<window width='950' height='740' aspect-ratio='1.3' full-screen='false'>
+		<window width='1200' height='675' full-screen='false' scale='1.0'>
 			<layout type='horizontal'>
-				<item stretch-factor='2'>
+				<item stretch-factor='4'>
 					<layout type='vertical'>
 						<item stretch-factor='8'>
 							<module name='instruments/efis'>
@@ -72,14 +72,31 @@
 					</layout>
 				</item>
 				<separator/>
-				<item stretch-factor='1'>
+				<item stretch-factor='4'>
 					<layout type='vertical'>
-						<item stretch-factor='3'>
+						<item stretch-factor='6'>
+							<module name='instruments/hsi'>
+								<properties path='/instrumentation'>
+									<property name='gs' path='/speed/gs.kt' default='0'/>
+									<property name='tas' path='/speed/tas.kt' default='0'/>
+									<property name='track' path='/orientation/track.deg'/>
+									<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
+									<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>
+									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
+									<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
+									<property name='position-latitude' path='/position/latitude.deg'/>
+									<property name='position-longitude' path='/position/longitude.deg'/>
+									<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
+								</properties>
+							</module>
+						</item>
+						<separator/>
+						<item stretch-factor='1'>
 							<layout type='horizontal'>
-								<item>
-									<layout type='vertical'>
+								<item stretch-factor='13'>
+									<layout type='horizontal'>
 										<item>
-											<module name='instruments/power-indicator'>
+											<module name='instruments/radial-indicator'>
 												<properties path='/engine'>
 													<property name='value' path='/n1.pct'/>
 													<property name='value-minimum' path='/config/n1-minimum' default='0.0'/>
@@ -90,7 +107,7 @@
 											</module>
 										</item>
 										<item>
-											<module name='instruments/power-indicator'>
+											<module name='instruments/radial-indicator'>
 												<properties path='/engine'>
 													<property name='value' path='/n2.pct'/>
 													<property name='value-minimum' path='/config/n2-minimum' default='0.0'/>
@@ -101,7 +118,7 @@
 											</module>
 										</item>
 										<item>
-											<module name='instruments/power-indicator'>
+											<module name='instruments/radial-indicator'>
 												<properties path='/engine'>
 													<property name='value' path='/egt.degc'/>
 													<property name='value-minimum' path='/config/egt-minimum' default='0.0'/>
@@ -112,7 +129,7 @@
 											</module>
 										</item>
 										<item>
-											<module name='instruments/power-indicator'>
+											<module name='instruments/radial-indicator'>
 												<properties path='/engine'>
 													<property name='value' path='/epr'/>
 													<property name='value-minimum' path='/config/epr-minimum' default='1.0'/>
@@ -123,11 +140,9 @@
 										</item>
 									</layout>
 								</item>
-								<item>
+								<item stretch-factor='5'>
 								</item>
 							</layout>
-						</item>
-						<item stretch-factor='2'>
 						</item>
 					</layout>
 				</item>

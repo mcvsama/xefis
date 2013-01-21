@@ -27,7 +27,7 @@
 
 
 RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
-	InstrumentWidget (parent, 1.f, 4.5f)
+	InstrumentWidget (parent, 1.f, 1.f, 1.f)
 { }
 
 
@@ -72,7 +72,7 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 	QFont font (_font_20_bold);
 	QFontMetricsF metrics (font);
 
-	QPen pen = get_pen (white, 1.4f);
+	QPen pen = get_pen (white, 1.f);
 	pen.setCapStyle (Qt::RoundCap);
 
 	float margin = 0.4f * q;
@@ -116,22 +116,22 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	QColor yellow (255, 220, 0);
 	QColor red (255, 0, 0);
 
-	QPen pen = get_pen (QColor (255, 255, 255), 1.4f);
+	QPen pen = get_pen (QColor (255, 255, 255), 1.0f);
 	pen.setCapStyle (Qt::RoundCap);
 
-	QPen pointer_pen = get_pen (QColor (255, 255, 255), 1.6f);
+	QPen pointer_pen = get_pen (QColor (255, 255, 255), 1.1f);
 	pointer_pen.setCapStyle (Qt::RoundCap);
 
-	QPen warning_pen = get_pen (yellow, 1.4f);
+	QPen warning_pen = get_pen (yellow, 1.f);
 	warning_pen.setCapStyle (Qt::RoundCap);
 
-	QPen critical_pen = get_pen (red, 1.4f);
+	QPen critical_pen = get_pen (red, 1.f);
 	critical_pen.setCapStyle (Qt::RoundCap);
 
-	QPen green_pen = get_pen (QColor (0x00, 0xff, 0x00), 1.4f);
+	QPen green_pen = get_pen (QColor (0x00, 0xff, 0x00), 1.f);
 	green_pen.setCapStyle (Qt::RoundCap);
 
-	QPen gray_pen = get_pen (QColor (0xb0, 0xb0, 0xb0), 1.4f);
+	QPen gray_pen = get_pen (QColor (0xb0, 0xb0, 0xb0), 1.f);
 	gray_pen.setCapStyle (Qt::RoundCap);
 
 	QBrush brush (gray, Qt::SolidPattern);
@@ -212,9 +212,9 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	{
 		painter.setPen (green_pen);
 		painter.rotate (normal_angle);
-		painter.drawLine (QPointF (r + pen_width (1.4f), 0.f), QPointF (1.1f * r, 0.f));
-		painter.drawLine (QPointF (1.1f * r + pen_width (1.4f), 0.f), QPointF (1.3f * r, -0.14f * r));
-		painter.drawLine (QPointF (1.1f * r + pen_width (1.4f), 0.f), QPointF (1.3f * r, +0.14f * r));
+		painter.drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.1f * r, 0.f));
+		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, -0.14f * r));
+		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, +0.14f * r));
 	}
 
 	painter.restore();

@@ -31,7 +31,7 @@
 
 
 EFISWidget::EFISWidget (QWidget* parent):
-	InstrumentWidget (parent, 0.8f, 1.f)
+	InstrumentWidget (parent, 0.8f, 1.f, 1.f)
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 245, 255);
