@@ -71,10 +71,10 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.6f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Unscaled pens:
-	_ndb_pen = QPen (Qt::darkCyan, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_vor_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_dme_pen = QPen (Qt::green, 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_fix_pen = QPen (QColor (0, 132, 255), 0.08f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_ndb_pen = QPen (Qt::cyan, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_vor_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_dme_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_fix_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Shapes:
 	_vor_shape = QPolygonF()
@@ -428,7 +428,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
 
 		QTransform scaled_transform = centered_transform;
-		scaled_transform.scale (0.7f * q, 0.7f * q);
+		scaled_transform.scale (0.55f * q, 0.55f * q);
 
 		switch (navaid.type())
 		{
@@ -439,7 +439,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter, float q,
 				painter.setPen (_ndb_pen);
 				painter.setBrush (Qt::NoBrush);
 				painter.drawEllipse (QRectF (-0.45f, -0.45f, 0.9f, 0.9f));
-				painter.setBrush (Qt::cyan);
+				painter.setBrush (_ndb_pen.color());
 				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
 				painter.setTransform (centered_transform);
 				text_painter.drawText (QPointF (0.35 * q, 0.55f * q), navaid.identifier());
