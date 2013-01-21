@@ -31,6 +31,8 @@
 #include <xefis/utility/numeric.h>
 
 
+using Xefis::NavaidStorage;
+
 class HSIWidget: public Xefis::InstrumentWidget
 {
 	typedef std::map<QString, Degrees> HeadingBugs;

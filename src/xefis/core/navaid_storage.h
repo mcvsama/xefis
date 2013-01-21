@@ -26,6 +26,8 @@
 #include "navaid.h"
 
 
+namespace Xefis {
+
 class NavaidStorage
 {
   public:
@@ -66,6 +68,8 @@ NavaidStorage::access_latlng (Navaid const& navaid, std::size_t const dimension)
 {
 	return dimension == 0 ? navaid.position().lat() : navaid.position().lng();
 }
+
+} // namespace Xefis
 
 #endif
 

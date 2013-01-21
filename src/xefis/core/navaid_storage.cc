@@ -26,6 +26,8 @@
 #include "navaid_storage.h"
 
 
+namespace Xefis {
+
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_latlng)
 {
@@ -185,4 +187,6 @@ void
 NavaidStorage::parse_awy_dat()
 {
 }
+
+} // namespace Xefis
 

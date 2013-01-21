@@ -26,6 +26,7 @@
 
 namespace Xefis {
 
+class NavaidStorage;
 class ModuleManager;
 class ConfigReader;
 
@@ -58,6 +59,12 @@ class Application: public QApplication
 	void
 	data_update();
 
+	/**
+	 * Return pointer to navaid storage.
+	 */
+	NavaidStorage*
+	navaid_storage() const;
+
   protected:
 	bool
 	event (QEvent*) override;
@@ -72,6 +79,7 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
+	NavaidStorage*		_navaid_storage	= nullptr;
 	ModuleManager*		_module_manager	= nullptr;
 	ConfigReader*		_config_reader	= nullptr;
 };
@@ -81,6 +89,13 @@ inline
 Application::DataUpdateEvent::DataUpdateEvent():
 	QEvent (QEvent::User)
 { }
+
+
+inline NavaidStorage*
+Application::navaid_storage() const
+{
+	return _navaid_storage;
+}
 
 } // namespace Xefis
 
