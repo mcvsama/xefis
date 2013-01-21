@@ -26,8 +26,8 @@
 #include "property_tree.h"
 
 
-PropertyTree::PropertyTree (QDomElement const&, QWidget* parent):
-	Instrument (parent)
+PropertyTree::PropertyTree (Xefis::ModuleManager* module_manager, QDomElement const&, QWidget* parent):
+	Instrument (module_manager, parent)
 {
 	_widget = new Xefis::PropertyTreeWidget (Xefis::PropertyStorage::default_storage()->root(), this);
 

@@ -32,6 +32,11 @@
 
 namespace Xefis {
 
+ModuleManager::ModuleManager (Application* application):
+	_application (application)
+{ }
+
+
 ModuleManager::~ModuleManager()
 {
 	for (Module* m: _modules)
@@ -46,32 +51,32 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 
 	if (name == "instruments/efis")
 	{
-		module = new EFIS (config, parent);
+		module = new EFIS (this, config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "instruments/hsi")
 	{
-		module = new HSI (config, parent);
+		module = new HSI (this, config, parent);
 		_modules.insert (module);
 	}
-	else if (name == "instruments/power-indicator")
+	else if (name == "instruments/radial-indicator")
 	{
-		module = new RadialIndicator (config, parent);
+		module = new RadialIndicator (this, config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "generic/property-tree")
 	{
-		module = new PropertyTree (config, parent);
+		module = new PropertyTree (this, config, parent);
 		_modules.insert (module);
 	}
 	else if (name == "io/flightgear")
 	{
-		module = new FlightGearIO (config);
+		module = new FlightGearIO (this, config);
 		_modules.insert (module);
 	}
 	else if (name == "io/joystick")
 	{
-		module = new JoystickInput (config);
+		module = new JoystickInput (this, config);
 		_modules.insert (module);
 	}
 	else

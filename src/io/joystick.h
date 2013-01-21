@@ -42,7 +42,7 @@ class JoystickInput:
 
   public:
 	// Ctor
-	JoystickInput (QDomElement const& config);
+	JoystickInput (Xefis::ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	~JoystickInput();

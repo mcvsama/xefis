@@ -39,21 +39,10 @@ class Application: public QApplication
 	};
 
   public:
-	static Application*
-	create (int argc, char** argv);
-
-	static void
-	destroy();
-
-	static Application*
-	get();
-
-  private:
-	// Ctor:
+	// Ctor
 	Application (int argc, char** argv);
 
-  public:
-	// Dtor:
+	// Dtor
 	~Application();
 
 	/**
@@ -74,7 +63,15 @@ class Application: public QApplication
 	event (QEvent*) override;
 
   private:
+	/**
+	 * UNIX signal handler. Calls quit() on Application instance.
+	 */
+	static void
+	s_quit (int);
+
+  private:
 	static Application*	_application;
+
 	ModuleManager*		_module_manager	= nullptr;
 	ConfigReader*		_config_reader	= nullptr;
 };
@@ -84,40 +81,6 @@ inline
 Application::DataUpdateEvent::DataUpdateEvent():
 	QEvent (QEvent::User)
 { }
-
-
-inline Application*
-Application::create (int argc, char** argv)
-{
-	return _application = new Application (argc, argv);
-}
-
-
-inline void
-Application::destroy()
-{
-	delete _application;
-	_application = nullptr;
-}
-
-
-inline Application*
-Application::get()
-{
-	return _application;
-}
-
-
-/*
- * Global functions
- */
-
-
-inline Application*
-xefis()
-{
-	return Application::get();
-}
 
 } // namespace Xefis
 

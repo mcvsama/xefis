@@ -28,8 +28,8 @@
 #include "hsi.h"
 
 
-HSI::HSI (QDomElement const& config, QWidget* parent):
-	Instrument (parent)
+HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidget* parent):
+	Instrument (module_manager, parent)
 {
 	for (QDomElement& e: config)
 	{

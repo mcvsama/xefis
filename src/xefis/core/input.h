@@ -24,9 +24,20 @@
 
 namespace Xefis {
 
+class ModuleManager;
+
 class Input: public Module
 {
+  public:
+	// Ctor
+	Input (ModuleManager*);
 };
+
+
+inline
+Input::Input (ModuleManager* module_manager):
+	Module (module_manager)
+{ }
 
 } // namespace Xefis
 

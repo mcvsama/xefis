@@ -25,7 +25,8 @@
 #include "joystick.h"
 
 
-JoystickInput::JoystickInput (QDomElement const& config)
+JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Xefis::Input (module_manager)
 {
 	bool found_path = false;
 	bool found_device = false;

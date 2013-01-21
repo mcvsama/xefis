@@ -28,8 +28,8 @@
 #include "efis.h"
 
 
-EFIS::EFIS (QDomElement const& config, QWidget* parent):
-	Instrument (parent)
+EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidget* parent):
+	Instrument (module_manager, parent)
 {
 	for (QDomElement& e: config)
 	{

@@ -28,6 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/application.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/module.h>
 #include <xefis/utility/qdom.h>
@@ -39,7 +40,8 @@
 
 namespace Xefis {
 
-ConfigReader::ConfigReader (ModuleManager* module_manager):
+ConfigReader::ConfigReader (Application* application, ModuleManager* module_manager):
+	_application (application),
 	_module_manager (module_manager)
 { }
 

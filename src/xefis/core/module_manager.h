@@ -29,13 +29,24 @@
 namespace Xefis {
 
 class Module;
+class Application;
 
 class ModuleManager
 {
 	typedef std::set<Module*> Modules;
 
   public:
+	// Ctor
+	ModuleManager (Application*);
+
+	// Dtor
 	virtual ~ModuleManager();
+
+	/**
+	 * Access Application object.
+	 */
+	Application*
+	application() const;
 
 	/**
 	 * Add module by name.
@@ -52,7 +63,8 @@ class ModuleManager
 	data_update();
 
   private:
-	Modules	_modules;
+	Application*	_application = nullptr;
+	Modules			_modules;
 };
 
 
@@ -63,6 +75,13 @@ class ModuleNotFoundException: public Exception
 		Exception (message)
 	{ }
 };
+
+
+inline Application*
+ModuleManager::application() const
+{
+	return _application;
+}
 
 } // namespace Xefis
 

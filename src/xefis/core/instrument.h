@@ -24,18 +24,21 @@
 
 namespace Xefis {
 
+class ModuleManager;
+
 class Instrument:
 	public Module,
 	public QWidget
 {
   public:
 	// Ctor
-	Instrument (QWidget* parent);
+	Instrument (ModuleManager*, QWidget* parent);
 };
 
 
 inline
-Instrument::Instrument (QWidget* parent):
+Instrument::Instrument (ModuleManager* module_manager, QWidget* parent):
+	Module (module_manager),
 	QWidget (parent)
 { }
 

@@ -44,19 +44,11 @@ log_exception (Xefis::Exception const& e)
 }
 
 
-void quit (int)
-{
-	std::clog << "HUP received, exiting." << std::endl;
-	Xefis::xefis()->quit();
-}
-
-
 int main (int argc, char** argv, char**)
 {
 	signal (SIGILL, Xefis::fail);
 	signal (SIGFPE, Xefis::fail);
 	signal (SIGSEGV, Xefis::fail);
-	signal (SIGHUP, quit);
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");
@@ -74,9 +66,9 @@ int main (int argc, char** argv, char**)
 		}
 		else
 		{
-			Xefis::Application* app = Xefis::Application::create (argc, argv);
+			Xefis::Application* app = new Xefis::Application (argc, argv);
 			app->exec();
-			Xefis::Application::destroy();
+			delete app;
 		}
 	}
 	catch (Xefis::Exception& e)

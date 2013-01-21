@@ -30,12 +30,13 @@
 
 namespace Xefis {
 
+class Application;
 class ModuleManager;
 
 class ConfigReader
 {
   public:
-	ConfigReader (ModuleManager*);
+	ConfigReader (Application*, ModuleManager*);
 
 	/**
 	 * Read config, create windows and loads modules.
@@ -78,8 +79,9 @@ class ConfigReader
 	process_module_element (QDomElement const& module_element, QBoxLayout* layout = nullptr, QWidget* window = nullptr, int stretch = 0);
 
   private:
-	QDomDocument	_config_document;
+	Application*	_application		= nullptr;
 	ModuleManager*	_module_manager		= nullptr;
+	QDomDocument	_config_document;
 };
 
 

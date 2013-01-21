@@ -31,7 +31,7 @@ class PropertyTree: public Xefis::Instrument
 {
   public:
 	// Ctor
-	PropertyTree (QDomElement const& config, QWidget* parent);
+	PropertyTree (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
 
   private:
 	Xefis::PropertyTreeWidget* _widget = nullptr;
