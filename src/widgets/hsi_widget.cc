@@ -23,11 +23,17 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/navaid.h>
+#include <xefis/core/navaid_storage.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
 
 // Local:
 #include "hsi_widget.h"
+
+
+using Xefis::Navaid;
+using Xefis::NavaidStorage;
 
 
 HSIWidget::HSIWidget (QWidget* parent):

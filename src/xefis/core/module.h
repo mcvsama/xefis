@@ -25,6 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/application/application.h>
 #include <xefis/core/property_union.h>
+#include <xefis/core/navaid_storage.h>
 
 
 namespace Xefis {
@@ -70,6 +71,12 @@ class Module
 	 */
 	void
 	data_updated();
+
+	/**
+	 * Access NavaidStorage.
+	 */
+	NavaidStorage*
+	navaid_storage() const;
 
   private:
 	ModuleManager*	_module_manager = nullptr;

@@ -129,5 +129,12 @@ Module::data_updated()
 	_module_manager->application()->data_update();
 }
 
+
+NavaidStorage*
+Module::navaid_storage() const
+{
+	return _module_manager->application()->navaid_storage();
+}
+
 } // namespace Xefis
 

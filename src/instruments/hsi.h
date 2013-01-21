@@ -61,7 +61,6 @@ class HSI: public Xefis::Instrument
 	std::array<LatLng, 3>	_positions;
 	bool					_positions_valid		= false;
 	Xefis::OnePoleSmoother	_trend_vector_smoother	= 60.0; // TODO make fps independent
-	NavaidStorage			_navaid_storage;
 
 	Xefis::PropertyFloat	_gs_kt;
 	Xefis::PropertyFloat	_tas_kt;

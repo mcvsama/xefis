@@ -25,6 +25,8 @@
 #include <xefis/utility/latlng.h>
 
 
+namespace Xefis {
+
 class Navaid
 {
   public:
@@ -267,6 +269,8 @@ Navaid::identifier_for_hsi()
 		return icao();
 	return identifier();
 }
+
+} // namespace Xefis
 
 #endif
 

@@ -30,6 +30,7 @@
 #include <xefis/core/property_storage.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/config_reader.h>
+#include <xefis/core/navaid_storage.h>
 
 // Local:
 #include "application.h"
@@ -51,12 +52,13 @@ Application::Application (int argc, char** argv):
 	// Also encode std::strings and const chars* in UTF-8:
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 	// Init services:
-	Xefis::Services::initialize();
-	// Init Xefis modules:
-	Xefis::PropertyStorage::initialize();
+	Services::initialize();
+	// Init property storage:
+	PropertyStorage::initialize();
 
-	_module_manager = new Xefis::ModuleManager (this);
-	_config_reader = new Xefis::ConfigReader (this, _module_manager);
+	_navaid_storage = new NavaidStorage();
+	_module_manager = new ModuleManager (this);
+	_config_reader = new ConfigReader (this, _module_manager);
 	_config_reader->load ("xefis-config.xml");
 
 	signal (SIGHUP, s_quit);
@@ -67,7 +69,8 @@ Application::~Application()
 {
 	delete _config_reader;
 	delete _module_manager;
-	Xefis::Services::deinitialize();
+	delete _navaid_storage;
+	Services::deinitialize();
 	_application = nullptr;
 }
 
