@@ -3,6 +3,7 @@
 	<modules>
 		<module name='io/flightgear'>
 			<input>
+				<host>0.0.0.0</host>
 				<port>9000</port>
 				<properties path='/instrumentation'>
 					<property name='ias' path='/speed/ias.kt'/>
@@ -50,6 +51,7 @@
 				</properties>
 			</input>
 			<output>
+				<host>localhost</host>
 				<port>9000</port>
 			</output>
 		</module>

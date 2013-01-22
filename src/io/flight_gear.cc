@@ -35,7 +35,11 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		{
 			for (QDomElement& e2: e)
 			{
-				if (e2 == "properties")
+				if (e2 == "host")
+					_host = e2.text();
+				else if (e2 == "port")
+					_port = e2.text().toInt();
+				else if (e2 == "properties")
 				{
 					parse_properties (e2, {
 						{ "ias", _ias_kt, false },
@@ -88,7 +92,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 	QObject::connect (_timeout_timer, SIGNAL (timeout()), this, SLOT (invalidate_all()));
 
 	_input = new QUdpSocket();
-	_input->bind (QHostAddress::Any, 9000, QUdpSocket::ShareAddress);
+	_input->bind (QHostAddress (_host), _port, QUdpSocket::ShareAddress);
 	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_input()));
 
 	invalidate_all();
