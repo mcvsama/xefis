@@ -57,14 +57,16 @@ class FlightGearIO:
 	invalidate_all();
 
   private:
-	QTimer*					_timeout_timer = nullptr;
-	QUdpSocket*				_input = nullptr;
+	QTimer*					_timeout_timer				= nullptr;
+	QString					_host;
+	int						_port;
+	QUdpSocket*				_input						= nullptr;
 	QByteArray				_datagram;
 	std::string				_property_path;
-	double					_prev_position_lat_deg = 0.f;
-	bool					_prev_position_lat_valid = false;
-	double					_prev_position_lng_deg = 0.f;
-	bool					_prev_position_lng_valid = false;
+	double					_prev_position_lat_deg		= 0.f;
+	bool					_prev_position_lat_valid	= false;
+	double					_prev_position_lng_deg		= 0.f;
+	bool					_prev_position_lng_valid	= false;
 
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
