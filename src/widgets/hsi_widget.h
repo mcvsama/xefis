@@ -38,16 +38,45 @@ class HSIWidget: public Xefis::InstrumentWidget
 	typedef std::map<QString, Degrees> HeadingBugs;
 
   public:
+	enum class DisplayMode
+	{
+		/**
+		 * Map is expanded on the front of the aircraft.
+		 */
+		Expanded,
+
+		/**
+		 * Aircraft is shown in the center of the widget. Map covers all directions
+		 * of the aircraft. This is useful mode to use with VOR/ILS navigation.
+		 */
+		Centered,
+
+		/**
+		 * Similar to the Expanded mode, but less information is displayed.
+		 * This is useful mode to be displayed under the EFIS widget.
+		 */
+		Auxiliary
+	};
+
+  public:
 	// Ctor
 	HSIWidget (QWidget* parent);
 
 	/**
-	 * Set reference to the nav storage.
+	 * Set reference to the nav storage, if you want navaids
+	 * displayed on the HSI.
 	 * Object must be live as long as HSIWidget is live.
 	 * Pass nullptr to deassign.
 	 */
 	void
 	set_navaid_storage (NavaidStorage*);
+
+	/**
+	 * Set HSI display mode.
+	 * Default is Expanded.
+	 */
+	void
+	set_display_mode (DisplayMode);
 
 	/**
 	 * Return navigation range.
@@ -278,37 +307,40 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   private:
 	void
+	update_more();
+
+	void
 	resizeEvent (QResizeEvent*) override;
 
 	void
 	paintEvent (QPaintEvent*) override;
 
 	void
-	paint_aircraft (QPainter&, TextPainter&, float q, float r);
+	paint_aircraft (QPainter&, TextPainter&);
 
 	void
-	paint_ap_settings (QPainter&, TextPainter&, float q, float r);
+	paint_ap_settings (QPainter&, TextPainter&);
 
 	void
-	paint_directions (QPainter&, TextPainter&, float q, float r);
+	paint_directions (QPainter&, TextPainter&);
 
 	void
-	paint_track (QPainter&, TextPainter&, float q, float r);
+	paint_track (QPainter&, TextPainter&);
 
 	void
-	paint_trend_vector (QPainter&, TextPainter&, float q, float r);
+	paint_trend_vector (QPainter&, TextPainter&);
 
 	void
-	paint_speeds (QPainter&, TextPainter&, float q, float r);
+	paint_speeds (QPainter&, TextPainter&);
 
 	void
-	paint_dotted_earth (QPainter&, float q, float r);
+	paint_dotted_earth (QPainter&);
 
 	void
-	paint_navaids (QPainter&, TextPainter&, float q, float r);
+	paint_navaids (QPainter&, TextPainter&);
 
 	void
-	paint_locs (QPainter&, TextPainter&, float q);
+	paint_locs (QPainter&, TextPainter&);
 
 	/**
 	 * Retrieve navaids from navaid storage for current aircraft
@@ -336,7 +368,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QTransform				_mag_heading_transform;
 	QTransform				_true_heading_transform;
 	QRectF					_map_clip_rect;
-	QRectF					_inside_map_clip_rect;
 	QPainterPath			_inner_map_clip;
 	QPainterPath			_outer_map_clip;
 	QPen					_ndb_pen;
@@ -345,6 +376,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPen					_fix_pen;
 	QPen					_lo_loc_pen;
 	QPen					_hi_loc_pen;
+	QFont					_radials_font;
 	QPolygonF				_vor_shape;
 	NavaidStorage::Navaids	_loc_navs;
 	NavaidStorage::Navaids	_ndb_navs;
@@ -354,8 +386,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPolygonF				_aircraft_shape;
 	QPolygonF				_ap_bug_shape;
 	Degrees					_limited_rotation;
+	float					_r;
+	float					_q;
 
 	// Parameters:
+	DisplayMode				_display_mode				= DisplayMode::Expanded;
 	Miles					_range						= 1.f;
 	Degrees					_mag_heading				= 0.f;
 	Degrees					_true_heading				= 0.f;
@@ -391,6 +426,14 @@ HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 {
 	_navaid_storage = navaid_storage;
 	update();
+}
+
+
+inline void
+HSIWidget::set_display_mode (DisplayMode display_mode)
+{
+	_display_mode = display_mode;
+	update_more();
 }
 
 

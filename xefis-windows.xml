@@ -1,7 +1,14 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<window width='1200' height='675' full-screen='false' scale='1.0'>
+		<!--window width='500' height='800'>
+			<layout type='horizontal'>
+				<item>
+					<module name='generic/property-tree'/>
+				</item>
+			</layout>
+		</window-->
+		<window width='1150' height='675' full-screen='false' scale='1.0'>
 			<layout type='horizontal'>
 				<item stretch-factor='4'>
 					<layout type='vertical'>
@@ -56,6 +63,7 @@
 						<item stretch-factor='5'>
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
+									<property name='display-mode' path='//config/hsi-aux/display-mode' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>
@@ -77,6 +85,7 @@
 						<item stretch-factor='6'>
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
+									<property name='display-mode' path='//config/hsi-nav/display-mode' default='1'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>
@@ -93,7 +102,7 @@
 						<separator/>
 						<item stretch-factor='1'>
 							<layout type='horizontal'>
-								<item stretch-factor='13'>
+								<item stretch-factor='15'>
 									<layout type='horizontal'>
 										<item>
 											<module name='instruments/radial-indicator'>
