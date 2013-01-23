@@ -37,6 +37,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 		{
 			parse_properties (e, {
 				{ "display-mode", _display_mode, true },
+				{ "range", _range, true },
+				{ "trend-vector-range", _trend_vector_range, false },
 				{ "gs", _gs_kt, false },
 				{ "tas", _tas_kt, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
@@ -52,7 +54,6 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 	}
 
 	_hsi_widget = new HSIWidget (this);
-	_hsi_widget->set_range (5.f);
 	_hsi_widget->set_navaid_storage (navaid_storage());
 	_hsi_widget->set_ndb_visible (true);
 	_hsi_widget->set_vor_visible (true);
@@ -81,6 +82,8 @@ HSI::read()
 	estimate_track();
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
+
+	_hsi_widget->set_range (_range.valid() ? *_range : 5.f);
 
 	if (_display_mode.valid())
 	{
@@ -124,7 +127,7 @@ HSI::read()
 void
 HSI::estimate_track()
 {
-	if (_position_lat_deg.is_singular() || _position_lng_deg.is_singular())
+	if (_position_lat_deg.is_singular() || _position_lng_deg.is_singular() || _trend_vector_range.is_singular())
 	{
 		_hsi_widget->set_trend_vector_visible (false);
 		return;
@@ -159,7 +162,7 @@ HSI::estimate_track()
 			beta_per_mile = _trend_vector_smoother.process (beta_per_mile);
 
 		_hsi_widget->set_trend_vector_visible (visible);
-		_hsi_widget->set_trend_vector_lookahead (2.f);
+		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
 		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
 	}
 }
