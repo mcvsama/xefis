@@ -16,11 +16,9 @@ SRC_MOCHDRS += xefis/application/services.h
 
 ######## /xefis/components ########
 
-SRC_HEADERS += xefis/components/property_tree/property_storage_widget.h
 SRC_HEADERS += xefis/components/property_tree/property_tree_widget.h
 SRC_HEADERS += xefis/components/property_tree/property_tree_widget_item.h
 
-SRC_SOURCES += xefis/components/property_tree/property_storage_widget.cc
 SRC_SOURCES += xefis/components/property_tree/property_tree_widget.cc
 SRC_SOURCES += xefis/components/property_tree/property_tree_widget_item.cc
 
