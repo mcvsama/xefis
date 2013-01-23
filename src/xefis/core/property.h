@@ -91,6 +91,13 @@ class BaseProperty
 	PropertyNode*
 	get_node() const;
 
+	/**
+	 * Normalize path so if there's "//" in it,
+	 * it will be replaced by leading "/".
+	 */
+	static std::string
+	normalized_path (std::string path);
+
   protected:
 	PropertyNode*			_root = nullptr;
 	mutable PropertyNode*	_node = nullptr;
@@ -186,8 +193,18 @@ PropertyNotFound::PropertyNotFound (const char* message):
 inline
 BaseProperty::BaseProperty (PropertyNode* root, std::string path):
 	_root (root),
-	_path (path)
+	_path (normalized_path (path))
 { }
+
+
+inline std::string
+BaseProperty::normalized_path (std::string path)
+{
+	std::size_t p = path.rfind ("//");
+	if (p != std::string::npos)
+		return path.substr (p + 1);
+	return path;
+}
 
 
 inline bool
