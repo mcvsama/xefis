@@ -64,6 +64,8 @@
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
 									<property name='display-mode' path='//config/hsi-aux/display-mode' default='2'/>
+									<property name='range' path='//config/hsi-aux/range' default='2'/>
+									<property name='trend-vector-range' path='//config/hsi-aux/trend-vector-range' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>
@@ -86,6 +88,8 @@
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
 									<property name='display-mode' path='//config/hsi-nav/display-mode' default='1'/>
+									<property name='range' path='//config/hsi-nav/range' default='10'/>
+									<property name='trend-vector-range' path='//config/hsi-nav/trend-vector-range' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>

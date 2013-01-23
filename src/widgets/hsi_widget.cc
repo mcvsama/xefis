@@ -45,7 +45,6 @@ void
 HSIWidget::update_more()
 {
 	_q = 0.1f * wh();
-	_r = 6.5f * _q;
 
 	// Clips:
 	switch (_display_mode)
@@ -53,16 +52,18 @@ HSIWidget::update_more()
 		case DisplayMode::Expanded:
 		{
 			_r = 11.f * _q;
+			float const rx = nm_to_px (_range);
 
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * width(), 0.705 * height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
+			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
 
 			_inner_map_clip = QPainterPath();
 			_inner_map_clip.addEllipse (QRectF (-0.85f * _r, -0.85f * _r, 1.7f * _r, 1.7f * _r));
 			_outer_map_clip = QPainterPath();
-			_outer_map_clip.addEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+			_outer_map_clip.addEllipse (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 
 			_radials_font = _font;
 			_radials_font.setPixelSize (font_size (14.f));
@@ -73,16 +74,18 @@ HSIWidget::update_more()
 		case DisplayMode::Centered:
 		{
 			_r = 7.5f * _q;
+			float const rx = nm_to_px (_range);
 
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * width(), 0.5 * height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
+			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
 
 			_inner_map_clip = QPainterPath();
 			_inner_map_clip.addEllipse (QRectF (-0.85f * _r, -0.85f * _r, 1.7f * _r, 1.7f * _r));
 			_outer_map_clip = QPainterPath();
-			_outer_map_clip.addEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+			_outer_map_clip.addEllipse (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 
 			_radials_font = _font;
 			_radials_font.setPixelSize (font_size (14.f));
@@ -92,17 +95,21 @@ HSIWidget::update_more()
 
 		case DisplayMode::Auxiliary:
 		{
+			_r = 6.5f * _q;
+			float const rx = nm_to_px (_range);
+
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * width(), 0.705f * height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 1.2f * _r);
+			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
 
 			QPainterPath clip1;
 			clip1.addEllipse (QRectF (-0.85f * _r, -0.85f * _r, 1.7f * _r, 1.7f * _r));
 			QPainterPath clip2;
-			clip2.addEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+			clip2.addEllipse (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 			QPainterPath clip3;
-			clip3.addRect (QRectF (-_r, -_r, 2.f * _r, 1.23f * _r));
+			clip3.addRect (QRectF (-rx, -rx, 2.f * rx, 1.23f * rx));
 
 			_inner_map_clip = clip1 & clip3;
 			_outer_map_clip = clip2 & clip3;
@@ -124,8 +131,8 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	update_more();
 
 	// Navaids pens:
-	_lo_loc_pen = QPen (Qt::blue, pen_width (0.6f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.6f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_lo_loc_pen = QPen (Qt::blue, pen_width (0.8f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.8f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Unscaled pens:
 	_ndb_pen = QPen (Qt::cyan, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
@@ -293,18 +300,48 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 
 
 void
-HSIWidget::paint_track (QPainter& painter, TextPainter&)
+HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 {
-	Miles const trend_range = std::min (_trend_vector_lookahead, 0.5f * _range);
+	Miles const trend_range = actual_trend_range();
 	float start_point = _trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 
-	// Scale line:
-	painter.setPen (QPen (Qt::white, pen_width (1.3f)));
-	painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -_r));
-	// TODO ptyczki
+	QFont font = _font_10_bold;
+	QFontMetricsF metrics (font);
+
+	if (_heading_visible)
+	{
+		// Scale line:
+		painter.setPen (QPen (Qt::white, pen_width (1.3f)));
+		painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -_r));
+
+		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
+		{
+			float range = static_cast<int> (10.f * ratio * _range) / 10.f;
+			float range_tick_vpx = nm_to_px (range);
+			float range_tick_hpx = 0.1f * _q;
+			QString half_range_str = QString ("%1").arg (range, 0, 'f', 0);
+			painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
+
+			if (draw_text)
+			{
+				QRectF half_range_rect (0.f, 0.f, metrics.width (half_range_str), metrics.height());
+				centrify (half_range_rect);
+				half_range_rect.moveRight (-2.f * range_tick_hpx);
+				half_range_rect.translate (0.f, -range_tick_vpx);
+				text_painter.drawText (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
+			}
+		};
+
+		paint_range_tick (0.5, true);
+		if (_display_mode != DisplayMode::Auxiliary)
+		{
+			paint_range_tick (0.25, false);
+			paint_range_tick (0.75, false);
+		}
+	}
 
 	if (!_track_visible)
 		return;
@@ -330,12 +367,13 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 	painter.setClipPath (_inner_map_clip);
 	painter.setPen (est_pen);
 
-	Miles const trend_range = std::min (_trend_vector_lookahead, 0.5f * _range);
+	Miles const trend_range = actual_trend_range();
 
 	if (_trend_vector_visible)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
+		painter.setClipRect (_trend_vector_clip_rect);
 
 		Miles const step = trend_range / 50.f;
 		Degrees const degrees_per_step = step * _track_deviation;
@@ -553,7 +591,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 		return;
 
 	painter.setTransform (_aircraft_center_transform);
-	painter.setClipPath (_inner_map_clip);
+	painter.setClipPath (_outer_map_clip);
 	painter.setFont (_font_10_bold);
 
 	// A bit bigger range to allow drawing objects currently positioned outside clipping path:
@@ -646,7 +684,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 void
 HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 {
-	QFontMetrics font_metrics (painter.font());
+	QFontMetricsF font_metrics (painter.font());
 	QTransform rot_1; rot_1.rotate (-2.f);
 	QTransform rot_2; rot_2.rotate (+2.f);
 	QPointF zero (0.f, 0.f);
