@@ -94,7 +94,7 @@ PropertyTreeWidgetItem::setup_appereance()
 		setIcon (0, Resources::Icons16::property_value());
 	setFirstColumnSpanned (_node->type() == PropDirectory);
 	QSize s = sizeHint (0);
-	s.setHeight (1.8f * Services::default_font_size (treeWidget()->physicalDpiY()));
+	s.setHeight (Services::default_font_size (treeWidget()->physicalDpiY()));
 	setSizeHint (0, s);
 }
 
