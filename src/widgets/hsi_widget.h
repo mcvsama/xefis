@@ -356,6 +356,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPointF
 	get_navaid_xy (LatLng const& position);
 
+	Miles
+	actual_trend_range() const;
+
 	float
 	nm_to_px (Miles miles);
 
@@ -368,6 +371,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QTransform				_mag_heading_transform;
 	QTransform				_true_heading_transform;
 	QRectF					_map_clip_rect;
+	QRectF					_trend_vector_clip_rect;
 	QPainterPath			_inner_map_clip;
 	QPainterPath			_outer_map_clip;
 	QPen					_ndb_pen;
@@ -716,10 +720,18 @@ HSIWidget::get_navaid_xy (LatLng const& position)
 }
 
 
+inline Miles
+HSIWidget::actual_trend_range() const
+{
+	float limit = _display_mode == DisplayMode::Auxiliary ? 0.36f : 0.18f;
+	return std::min (_trend_vector_lookahead, limit * _range);
+}
+
+
 inline float
 HSIWidget::nm_to_px (Miles miles)
 {
-	return 0.55f * wh() * miles / _range;
+	return miles / _range * _r;
 }
 
 #endif
