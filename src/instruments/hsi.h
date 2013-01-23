@@ -62,6 +62,7 @@ class HSI: public Xefis::Instrument
 	bool					_positions_valid		= false;
 	Xefis::OnePoleSmoother	_trend_vector_smoother	= 60.0; // TODO make fps independent
 
+	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyFloat	_gs_kt;
 	Xefis::PropertyFloat	_tas_kt;
 	Xefis::PropertyFloat	_mag_heading_deg;

@@ -36,6 +36,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 		if (e == "properties")
 		{
 			parse_properties (e, {
+				{ "display-mode", _display_mode, true },
 				{ "gs", _gs_kt, false },
 				{ "tas", _tas_kt, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
@@ -80,6 +81,16 @@ HSI::read()
 	estimate_track();
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
+
+	if (_display_mode.valid())
+	{
+		if (*_display_mode == 0)
+			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Expanded);
+		else if (*_display_mode == 1)
+			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Centered);
+		else
+			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Auxiliary);
+	}
 
 	_hsi_widget->set_heading_visible (_mag_heading_deg.valid());
 	if (_mag_heading_deg.valid())

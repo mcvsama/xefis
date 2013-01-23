@@ -71,6 +71,9 @@ class InstrumentWidget: public QWidget
 	void
 	update_sizes();
 
+	void
+	centrify (QRectF& rectf);
+
   protected:
 	QFont				_font;
 	QFont				_font_10_bold;
@@ -134,6 +137,13 @@ inline float
 InstrumentWidget::font_size (float scale) const
 {
 	return std::max (1.f, _master_font_scale * scale * win_wh() / 610.f);
+}
+
+
+inline void
+InstrumentWidget::centrify (QRectF& rectf)
+{
+	rectf.translate (-0.5f * rectf.width(), -0.5f * rectf.height());
 }
 
 } // namespace Xefis
