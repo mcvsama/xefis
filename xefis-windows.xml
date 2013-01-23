@@ -92,6 +92,9 @@
 									<property name='trend-vector-range' path='//config/hsi-nav/trend-vector-range' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
+									<property name='cbr' path='/altitude/climb-rate.fpm'/>
+									<property name='altitude' path='/altitude/amsl.ft'/>
+									<property name='target-altitude' path='/autopilot/settings/altitude.ft'/>
 									<property name='track' path='/orientation/track.deg'/>
 									<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
 									<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>

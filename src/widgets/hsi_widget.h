@@ -247,6 +247,18 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_trend_vector_lookahead (Miles lookahead);
 
 	/**
+	 * Set position of desired-altitude-reach-point.
+	 */
+	void
+	set_altitude_reach_distance (Miles);
+
+	/**
+	 * Set visibility of the desired-altitude-reach-point curve.
+	 */
+	void
+	set_altitude_reach_visible (bool visible);
+
+	/**
 	 * Set dotted Earth visibility.
 	 */
 	void
@@ -326,6 +338,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	void
 	paint_track (QPainter&, TextPainter&);
+
+	void
+	paint_altitude_reach (QPainter&);
 
 	void
 	paint_trend_vector (QPainter&, TextPainter&);
@@ -413,6 +428,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Degrees					_track_deviation			= 0.f;
 	bool					_trend_vector_visible		= false;
 	Miles					_trend_vector_lookahead		= 5.f;
+	Miles					_altitude_reach_distance	= 0.f;
+	bool					_altitude_reach_visible		= false;
 	LatLng					_position					= { 0.f, 0.f };
 	bool					_dotted_earth_visible		= false;
 	bool					_navaids_visible			= false;
@@ -645,6 +662,22 @@ inline void
 HSIWidget::set_trend_vector_lookahead (Miles lookahead)
 {
 	_trend_vector_lookahead = lookahead;
+	update();
+}
+
+
+inline void
+HSIWidget::set_altitude_reach_distance (Miles distance)
+{
+	_altitude_reach_distance = distance;
+	update();
+}
+
+
+inline void
+HSIWidget::set_altitude_reach_visible (bool visible)
+{
+	_altitude_reach_visible = visible;
 	update();
 }
 

@@ -41,6 +41,9 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "trend-vector-range", _trend_vector_range, false },
 				{ "gs", _gs_kt, false },
 				{ "tas", _tas_kt, false },
+				{ "cbr", _cbr_fpm, false },
+				{ "altitude", _altitude_ft, false },
+				{ "target-altitude", _target_altitude_ft, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "autopilot-visible", _autopilot_visible, false },
@@ -80,6 +83,7 @@ void
 HSI::read()
 {
 	estimate_track();
+	estimate_altitude_reach_distance();
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
 
@@ -165,5 +169,28 @@ HSI::estimate_track()
 		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
 		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
 	}
+}
+
+
+void
+HSI::estimate_altitude_reach_distance()
+{
+	if (_gs_kt.is_singular() || _cbr_fpm.is_singular() ||
+		_altitude_ft.is_singular() || _target_altitude_ft.is_singular())
+	{
+		_hsi_widget->set_altitude_reach_visible (false);
+		return;
+	}
+
+	float const gs = *_gs_kt;
+	float const cbr = *_cbr_fpm;
+	float const alt_diff = *_target_altitude_ft - *_altitude_ft;
+
+	float const cbr_s = cbr / 60.f;
+	float const t = alt_diff / cbr_s;
+	float const s = gs * (t / 3600.f);
+
+	_hsi_widget->set_altitude_reach_distance (s);
+	_hsi_widget->set_altitude_reach_visible (true);
 }
 

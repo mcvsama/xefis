@@ -72,7 +72,13 @@ class InstrumentWidget: public QWidget
 	update_sizes();
 
 	void
-	centrify (QRectF& rectf);
+	centrify (QRectF& rectf) const;
+
+	float
+	arc_degs (float deg) const;
+
+	float
+	arc_span (float deg) const;
 
   protected:
 	QFont				_font;
@@ -141,9 +147,23 @@ InstrumentWidget::font_size (float scale) const
 
 
 inline void
-InstrumentWidget::centrify (QRectF& rectf)
+InstrumentWidget::centrify (QRectF& rectf) const
 {
 	rectf.translate (-0.5f * rectf.width(), -0.5f * rectf.height());
+}
+
+
+inline float
+InstrumentWidget::arc_degs (float deg) const
+{
+	return -16.f * (deg - 90.f);
+}
+
+
+inline float
+InstrumentWidget::arc_span (float deg) const
+{
+	return -16.f * deg;
 }
 
 } // namespace Xefis
