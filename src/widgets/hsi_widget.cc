@@ -207,6 +207,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_dotted_earth (painter);
 	paint_navaids (painter, text_painter);
 	paint_track (painter, text_painter);
+	paint_altitude_reach (painter);
 	paint_trend_vector (painter, text_painter);
 	paint_ap_settings (painter, text_painter);
 	paint_directions (painter, text_painter);
@@ -355,6 +356,25 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	painter.translate (0.f, -_r);
 	painter.scale (0.5f, -0.5f);
 	painter.drawPolyline (_aircraft_shape);
+}
+
+
+void
+HSIWidget::paint_altitude_reach (QPainter& painter)
+{
+	if (!_altitude_reach_visible || (_altitude_reach_distance < 0.1f * _range) || (0.8f * _range < _altitude_reach_distance))
+		return;
+
+	float len = nm_to_px (6.f);
+	float pos = nm_to_px (_altitude_reach_distance);
+	QRectF rect (0.f, 0.f, len, len);
+	centrify (rect);
+	rect.moveTop (-pos);
+
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipping (false);
+	painter.setPen (get_pen (_navigation_color, 1.f));
+	painter.drawArc (rect, arc_degs (40.f), arc_span (-80.f));
 }
 
 

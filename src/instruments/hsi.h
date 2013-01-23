@@ -56,6 +56,9 @@ class HSI: public Xefis::Instrument
 	void
 	estimate_track();
 
+	void
+	estimate_altitude_reach_distance();
+
   private:
 	HSIWidget*				_hsi_widget				= nullptr;
 	std::array<LatLng, 3>	_positions;
@@ -67,6 +70,9 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_trend_vector_range;
 	Xefis::PropertyFloat	_gs_kt;
 	Xefis::PropertyFloat	_tas_kt;
+	Xefis::PropertyFloat	_cbr_fpm;
+	Xefis::PropertyFloat	_altitude_ft;
+	Xefis::PropertyFloat	_target_altitude_ft;
 	Xefis::PropertyFloat	_mag_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyBoolean	_autopilot_visible;
