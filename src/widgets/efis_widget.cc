@@ -560,8 +560,8 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	painter.setPen (border_pen);
 	painter.setFont (actual_speed_font);
 	if (_sl_digits == 4)
-		paint_rotating_digit (painter, text_painter, box_1000, _speed, 1000, 1.25f, 0.0005f, 0.5f, false, false);
-	paint_rotating_digit (painter, text_painter, box_0100, _speed, 100, 1.25f, 0.005f, 0.5f, false, false);
+		paint_rotating_digit (painter, text_painter, box_1000, _speed, 1000, 1.25f, 0.0005f, 0.5f, false, true);
+	paint_rotating_digit (painter, text_painter, box_0100, _speed, 100, 1.25f, 0.005f, 0.5f, false, true, true);
 	paint_rotating_digit (painter, text_painter, box_0010, _speed, 10, 1.25f, 0.05f, 0.5f, false, false);
 	float pos_0001 = _sl_rounded_speed - _speed;
 	paint_rotating_value (painter, text_painter, box_0001, pos_0001, 0.7f,
@@ -1576,6 +1576,8 @@ EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 	{
 		if (x.second == "G" || x.second == "R")
 			paint_dashed_zone (painter, x.second == "G" ? green : red, x.first);
+		else if (x.second == "-")
+			; // Paint nothing.
 		else
 			text_painter.drawText (x.first, Qt::AlignVCenter | Qt::AlignLeft, x.second);
 	}
@@ -1587,7 +1589,7 @@ EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 void
 EFISWidget::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
 								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
-								  bool two_zeros, bool zero_mark)
+								  bool two_zeros, bool zero_mark, bool black_zero)
 {
 	auto round_to = [] (float value, int to) -> float
 	{
@@ -1607,9 +1609,9 @@ EFISWidget::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
 	int b = static_cast<int> (std::abs (xb));
 	int c = static_cast<int> (std::abs (xc));
 
-	QString sa = zero_mark && a == 0 ? (xa >= 0.f ? "G" : "R") : QString::number (a);
-	QString sb = zero_mark && b == 0 ? (xb >= 0.f ? "G" : "R") : QString::number (b);
-	QString sc = zero_mark && c == 0 ? (xc >= 0.f ? "G" : "R") : QString::number (c);
+	QString sa = zero_mark && a == 0 ? (black_zero ? "-" : (xa >= 0.f ? "G" : "R")) : QString::number (a);
+	QString sb = zero_mark && b == 0 ? (black_zero ? "-" : (xb >= 0.f ? "G" : "R")) : QString::number (b);
+	QString sc = zero_mark && c == 0 ? (black_zero ? "-" : (xc >= 0.f ? "G" : "R")) : QString::number (c);
 
 	if (std::abs (dtr) < delta && (two_zeros || std::abs (value) >= round_target / 2))
 		pos = floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;

@@ -802,12 +802,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * \param	two_zeros
 	 * 			Two separate zeros, for positive and negative values.
 	 * \param	zero_mark
-	 * 			Draw red/green mark instead of zero.
+	 * 			Draw red/green/blank mark instead of zero.
 	 */
 	void
 	paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
 						  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
-						  bool two_zeros, bool zero_mark);
+						  bool two_zeros, bool zero_mark, bool black_zero = false);
 
   private:
 	float
