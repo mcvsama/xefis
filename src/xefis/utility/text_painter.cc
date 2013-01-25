@@ -77,6 +77,26 @@ TextPainter::drawText (QPointF const& position, QString const& text)
 
 
 void
+TextPainter::drawText (QPointF const& position, Qt::Alignment flags, QString const& text)
+{
+	QFontMetricsF metrics (_painter.font());
+	QRectF target (position.x(), position.y(), metrics.width (text), metrics.height());
+
+	if (flags & Qt::AlignHCenter)
+		target.translate (-0.5f * target.width(), 0.f);
+	else if (flags & Qt::AlignRight)
+		target.translate (-target.width(), 0.f);
+
+	if (flags & Qt::AlignVCenter)
+		target.translate (0.f, -0.5f * target.height());
+	else if (flags & Qt::AlignBottom)
+		target.translate (0.f, -target.height());
+
+	drawText (target, 0, text);
+}
+
+
+void
 TextPainter::drawText (QRectF const& target, Qt::Alignment flags, QString const& text)
 {
 	QFontMetricsF metrics (_painter.font());
