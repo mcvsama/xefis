@@ -45,6 +45,12 @@ class Navaid
 		Fix		= 50,	// Fix
 	};
 
+	enum VorType {
+		VOROnly	= 1,	// Just VOR
+		VOR_DME	= 2,	// VOR and DME
+		VORTAC	= 3,	// VOR/TACAN
+	};
+
   public:
 	Navaid (Type, LatLng const&, QString const& identifier, QString const& name, Miles range);
 
@@ -110,6 +116,16 @@ class Navaid
 	QString const&
 	identifier_for_hsi();
 
+	/**
+	 * Return VOR subtype, if this navaid is VOR.
+	 * Undefined foro non-VOR navaids.
+	 */
+	VorType
+	vor_type() const;
+
+	void
+	set_vor_type (VorType);
+
   private:
 	Type	_type;
 	LatLng	_position;
@@ -122,6 +138,7 @@ class Navaid
 	Degrees	_true_bearing		= 0.f; // LOC* only
 	QString	_icao;
 	QString	_runway;
+	VorType	_vor_type;
 };
 
 
@@ -268,6 +285,20 @@ Navaid::identifier_for_hsi()
 	if (_type == LOC || _type == LOCSA)
 		return icao();
 	return identifier();
+}
+
+
+inline Navaid::VorType
+Navaid::vor_type() const
+{
+	return _vor_type;
+}
+
+
+inline void
+Navaid::set_vor_type (VorType vor_type)
+{
+	_vor_type = vor_type;
 }
 
 } // namespace Xefis

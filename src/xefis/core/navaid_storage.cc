@@ -95,20 +95,30 @@ NavaidStorage::parse_nav_dat()
 		switch (type)
 		{
 			case Navaid::NDB:
-				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier >> name;
+				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
+				// Rest of the line is the name:
+				name = line_ts.readLine();
 				_navaids_tree.insert (Navaid (type, pos, identifier, name, range));
 				break;
 
 			case Navaid::VOR:
 			{
 				Degrees slaved_variation;
-				line_ts >> amsl >> khz >> range >> slaved_variation >> identifier >> name;
+				line_ts >> amsl >> khz >> range >> slaved_variation >> identifier;
+				// Rest of the line is the name:
+				name = line_ts.readLine();
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, range);
 				navaid.set_frequency (khz * 10.f);
 				navaid.set_slaved_variation (slaved_variation);
 				navaid.set_amsl (amsl);
+				if (name.endsWith ("VOR-DME"))
+					navaid.set_vor_type (Navaid::VOR_DME);
+				else if (name.endsWith ("VORTAC"))
+					navaid.set_vor_type (Navaid::VORTAC);
+				else
+					navaid.set_vor_type (Navaid::VOROnly);
 				_navaids_tree.insert (navaid);
 				break;
 			}
@@ -119,7 +129,9 @@ NavaidStorage::parse_nav_dat()
 				Degrees true_bearing;
 				QString icao;
 				QString runway;
-				line_ts >> amsl >> khz >> range >> true_bearing >> identifier >> icao >> runway >> name;
+				line_ts >> amsl >> khz >> range >> true_bearing >> identifier >> icao >> runway;
+				// Rest of the line is the name:
+				name = line_ts.readLine();
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, range);
