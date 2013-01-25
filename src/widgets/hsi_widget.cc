@@ -362,7 +362,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 void
 HSIWidget::paint_altitude_reach (QPainter& painter)
 {
-	if (!_altitude_reach_visible || (_altitude_reach_distance < 0.1f * _range) || (0.8f * _range < _altitude_reach_distance))
+	if (!_altitude_reach_visible || (_altitude_reach_distance < 0.05f * _range) || (0.8f * _range < _altitude_reach_distance))
 		return;
 
 	float len = nm_to_px (6.f);

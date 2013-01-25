@@ -79,7 +79,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;
 	Xefis::PropertyFloat	_landing_altitude_ft;
+	Xefis::PropertyFloat	_transition_altitude_ft;
 	Xefis::PropertyFloat	_pressure_inhg;
+	Xefis::PropertyBoolean	_standard_pressure;
 	Xefis::PropertyFloat	_cbr_fpm;
 	Xefis::PropertyBoolean	_autopilot_visible;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;

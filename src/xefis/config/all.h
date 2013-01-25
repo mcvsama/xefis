@@ -16,4 +16,5 @@
 #include "resources.h"
 #include "version.h"
 #include "exception.h"
+#include "constants.h"
 
