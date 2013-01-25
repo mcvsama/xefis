@@ -137,10 +137,18 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	// Unscaled pens:
 	_ndb_pen = QPen (Qt::cyan, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_vor_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_vortac_pen = QPen (_navigation_color, 0.4f, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	_dme_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Shapes:
+	_dme_for_vor_shape = QPolygonF()
+		<< QPointF (-0.5f, -0.5f)
+		<< QPointF (-0.5f, +0.5f)
+		<< QPointF (+0.5f, +0.5f)
+		<< QPointF (+0.5f, -0.5f)
+		<< QPointF (-0.5f, -0.5f);
+
 	_vor_shape = QPolygonF()
 		<< QPointF (-0.5f, 0.f)
 		<< QPointF (-0.25f, -0.44f)
@@ -652,6 +660,19 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 				painter.drawPolyline (_vor_shape);
 				painter.setBrush (_navigation_color);
 				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+				if (navaid.vor_type() == Navaid::VOR_DME)
+					painter.drawPolyline (_dme_for_vor_shape);
+				else if (navaid.vor_type() == Navaid::VORTAC)
+				{
+					float x = 0.28f;
+					float y = 0.64f;
+					painter.setPen (_vortac_pen);
+					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
+					painter.rotate (120.f);
+					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
+					painter.rotate (120.f);
+					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
+				}
 				painter.setTransform (centered_transform);
 				text_painter.drawText (QPointF (0.35f * _q, 0.55f * _q), navaid.identifier());
 				break;
