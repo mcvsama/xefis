@@ -43,8 +43,10 @@
 									<property name='altitude' path='/altitude/amsl.ft'/>
 									<property name='altitude-agl' path='/altitude/agl.ft'/>
 									<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
+									<property name='transition-altitude' path='//config/transition-altitude.ft' default='14000'/>
 									<property name='cbr' path='/altitude/climb-rate.fpm'/>
 									<property name='pressure' path='/static/pressure.inhg' default='29.92'/>
+									<property name='standard-pressure' path='/configuration/pressure/standard-pressure' default='false'/>
 									<property name='autopilot-visible' path='/configuration/autopilot/visible' default='true'/>
 									<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
 									<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
@@ -64,8 +66,8 @@
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
 									<property name='display-mode' path='//config/hsi-aux/display-mode' default='2'/>
-									<property name='range' path='//config/hsi-aux/range' default='2'/>
-									<property name='trend-vector-range' path='//config/hsi-aux/trend-vector-range' default='2'/>
+									<property name='range' path='//config/hsi-aux/range.kt' default='2'/>
+									<property name='trend-vector-range' path='//config/hsi-aux/trend-vector-range.kt' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='track' path='/orientation/track.deg'/>
@@ -88,8 +90,8 @@
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
 									<property name='display-mode' path='//config/hsi-nav/display-mode' default='1'/>
-									<property name='range' path='//config/hsi-nav/range' default='10'/>
-									<property name='trend-vector-range' path='//config/hsi-nav/trend-vector-range' default='2'/>
+									<property name='range' path='//config/hsi-nav/range.kt' default='10'/>
+									<property name='trend-vector-range' path='//config/hsi-nav/trend-vector-range.kt' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>
 									<property name='cbr' path='/altitude/climb-rate.fpm'/>

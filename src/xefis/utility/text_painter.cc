@@ -77,7 +77,7 @@ TextPainter::drawText (QPointF const& position, QString const& text)
 
 
 void
-TextPainter::drawText (QRectF const& target, int flags, QString const& text)
+TextPainter::drawText (QRectF const& target, Qt::Alignment flags, QString const& text)
 {
 	QFontMetricsF metrics (_painter.font());
 	QPointF target_center = target.center();

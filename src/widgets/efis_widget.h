@@ -19,6 +19,8 @@
 #include <map>
 
 // Qt:
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtGui/QPainterPath>
@@ -262,6 +264,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude (Feet);
 
 	/**
+	 * Toggle visibility of the altitude scale.
+	 */
+	void
+	set_altitude_visible (bool visible);
+
+	/**
 	 * Set altitude tendency value.
 	 */
 	void
@@ -304,10 +312,22 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_landing_altitude_visible (bool visible);
 
 	/**
-	 * Toggle visibility of the altitude scale.
+	 * Return transition altitude.
+	 */
+	Feet
+	transition_altitude() const;
+
+	/**
+	 * Set transition altitude.
 	 */
 	void
-	set_altitude_visible (bool visible);
+	set_transition_altitude (Feet);
+
+	/**
+	 * Set transition altitude visibility.
+	 */
+	void
+	set_transition_altitude_visible (bool visible);
 
 	/**
 	 * Return current climb rate.
@@ -400,6 +420,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_pressure_visible (bool visible);
+
+	/**
+	 * Enable/disable standard pressure.
+	 */
+	void
+	set_standard_pressure (bool standard);
 
 	/**
 	 * Get minimum speed indicator setting.
@@ -643,11 +669,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	void
 	set_input_alert_visible (bool visible);
 
-  protected slots:
+  private slots:
 	void
-	blink();
+	blink_speed();
 
-  protected:
+	void
+	blink_baro();
+
+  private:
 	void
 	resizeEvent (QResizeEvent*) override;
 
@@ -733,25 +762,25 @@ class EFISWidget: public Xefis::InstrumentWidget
 	al_paint (QPainter&, TextPainter&);
 
 	void
-	al_paint_black_box (QPainter& painter, TextPainter& text_painter, float x);
+	al_paint_black_box (QPainter&, TextPainter&, float x);
 
 	void
-	al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x);
+	al_paint_ladder_scale (QPainter&, TextPainter&, float x);
 
 	void
-	al_paint_altitude_tendency (QPainter& painter, float x);
+	al_paint_altitude_tendency (QPainter&, float x);
 
 	void
-	al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x);
+	al_paint_bugs (QPainter&, TextPainter&, float x);
 
 	void
-	al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, float x);
+	al_paint_climb_rate (QPainter&, TextPainter&, float x);
 
 	void
-	al_paint_pressure (QPainter& painter, TextPainter& text_painter, float x);
+	al_paint_pressure (QPainter&, TextPainter&, float x);
 
 	void
-	al_paint_ap_setting (QPainter& painter, TextPainter& text_painter);
+	al_paint_ap_setting (QPainter&, TextPainter&);
 
 	float
 	ft_to_px (Feet ft) const;
@@ -773,13 +802,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_altitude_agl (QPainter&, TextPainter&);
 
 	void
+	paint_baro_setting (QPainter&, TextPainter&);
+
+	void
 	paint_nav (QPainter&, TextPainter&);
 
 	void
 	paint_input_alert (QPainter&, TextPainter&);
 
 	void
-	paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target);
+	paint_dashed_zone (QPainter&, QColor const&, QRectF const& target);
 
 	/**
 	 * Render 'rotatable' value on speed/altitude black box.
@@ -809,7 +841,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 						  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 						  bool two_zeros, bool zero_mark, bool black_zero = false);
 
-  private:
+	/**
+	 * Start or stop blinking warning timer on given condition.
+	 */
+	void
+	update_blinker (QTimer* warning_timer, bool condition, bool* blink_state);
+
 	float
 	pitch_to_px (Degrees degrees) const;
 
@@ -819,7 +856,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QPainterPath
 	get_pitch_scale_clipping_path() const;
 
+	QColor
+	get_baro_color() const;
+
   private:
+	QTime				_last_paint_time;
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;
@@ -834,8 +875,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Degrees				_fov							= 120.f;
 	bool				_input_alert_visible			= false;
 	TextPainter::Cache	_text_painter_cache;
-	QTimer*				_blinking_warning				= nullptr;
-	bool				_blink							= false;
+	QTimer*				_speed_blinking_warning			= nullptr;
+	bool				_speed_blink					= false;
+	QTimer*				_baro_blinking_warning			= nullptr;
+	bool				_baro_blink						= false;
 
 	float				_w;
 	float				_h;
@@ -926,12 +969,15 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_altitude_agl_visible			= false;
 	Feet				_landing_altitude				= 0.f;
 	bool				_landing_altitude_visible		= false;
+	Feet				_transition_altitude			= 0.f;
+	bool				_transition_altitude_visible	= false;
 	FeetPerMinute		_climb_rate						= 0.f;
 	bool				_climb_rate_visible				= false;
 	float				_mach							= 0.f;
 	bool				_mach_visible					= false;
 	InHg				_pressure						= 0.f;
 	bool				_pressure_visible				= false;
+	bool				_standard_pressure				= false;
 	Knots				_minimum_speed					= 0.f;
 	bool				_minimum_speed_visible			= false;
 	Knots				_warning_speed					= 0.f;
@@ -1303,6 +1349,29 @@ EFISWidget::set_landing_altitude_visible (bool visible)
 }
 
 
+inline Feet
+EFISWidget::transition_altitude() const
+{
+	return _transition_altitude;
+}
+
+
+inline void
+EFISWidget::set_transition_altitude (Feet transition_altitude)
+{
+	_transition_altitude = transition_altitude;
+	update();
+}
+
+
+inline void
+EFISWidget::set_transition_altitude_visible (bool visible)
+{
+	_transition_altitude_visible = visible;
+	update();
+}
+
+
 inline FeetPerMinute
 EFISWidget::climb_rate() const
 {
@@ -1426,6 +1495,14 @@ inline void
 EFISWidget::set_pressure_visible (bool visible)
 {
 	_pressure_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_standard_pressure (bool standard)
+{
+	_standard_pressure = standard;
 	update();
 }
 
@@ -1751,9 +1828,16 @@ EFISWidget::ft_to_px (Feet ft) const
 
 
 inline void
-EFISWidget::blink()
+EFISWidget::blink_speed()
 {
-	_blink = !_blink;
+	_speed_blink = !_speed_blink;
+}
+
+
+inline void
+EFISWidget::blink_baro()
+{
+	_baro_blink = !_baro_blink;
 }
 
 
@@ -1769,6 +1853,15 @@ inline float
 EFISWidget::heading_to_px (Degrees degrees) const
 {
 	return pitch_to_px (-degrees);
+}
+
+
+inline QColor
+EFISWidget::get_baro_color() const
+{
+	if (_baro_blinking_warning->isActive())
+		return _warning_color_2;
+	return _navigation_color;
 }
 
 #endif

@@ -17,9 +17,6 @@
 // Standard:
 #include <stdint.h>
 
-// Xefis:
-#include <xefis/config/all.h>
-
 
 typedef double Degrees;
 typedef double Radians;

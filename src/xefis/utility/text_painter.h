@@ -90,7 +90,7 @@ class TextPainter
 	drawText (QPointF const& position, QString const& text);
 
 	void
-	drawText (QRectF const& target, int flags, QString const& text);
+	drawText (QRectF const& target, Qt::Alignment flags, QString const& text);
 
   private:
 	Cache*		_cache;

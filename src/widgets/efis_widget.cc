@@ -41,9 +41,13 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_warning_color_1 = QColor (255, 150, 0);
 	_warning_color_2 = QColor (255, 200, 50);
 
-	_blinking_warning = new QTimer (this);
-	_blinking_warning->setInterval (200);
-	QObject::connect (_blinking_warning, SIGNAL (timeout()), this, SLOT (blink()));
+	_speed_blinking_warning = new QTimer (this);
+	_speed_blinking_warning->setInterval (200);
+	QObject::connect (_speed_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_speed()));
+
+	_baro_blinking_warning = new QTimer (this);
+	_baro_blinking_warning->setInterval (200);
+	QObject::connect (_baro_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_baro()));
 
 	_last_paint_time.start();
 }
@@ -70,20 +74,18 @@ EFISWidget::resizeEvent (QResizeEvent* resize_event)
 void
 EFISWidget::paintEvent (QPaintEvent*)
 {
+	update_blinker (_speed_blinking_warning,
+					_speed_visible &&
+					((_warning_speed_visible && _speed < _warning_speed) ||
+					 (_minimum_speed_visible && _speed < _minimum_speed) ||
+					 (_maximum_speed_visible && _speed > _maximum_speed)),
+				    &_speed_blink);
 
-	if (_speed_visible &&
-		((_warning_speed_visible && _speed < _warning_speed) ||
-		 (_minimum_speed_visible && _speed < _minimum_speed) ||
-		 (_maximum_speed_visible && _speed > _maximum_speed)))
-	{
-		if (!_blinking_warning->isActive())
-		{
-			_blinking_warning->start();
-			_blink = true;
-		}
-	}
-	else if (_blinking_warning->isActive())
-		_blinking_warning->stop();
+	update_blinker (_baro_blinking_warning,
+					_transition_altitude_visible &&
+					((_transition_altitude > _altitude && _standard_pressure) ||
+					 (_transition_altitude <= _altitude && !_standard_pressure)),
+					&_baro_blink);
 
 	QPainter painter (this);
 	TextPainter text_painter (painter, &_text_painter_cache);
@@ -531,9 +533,9 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = get_pen (Qt::white, 1.2f);
-	if (_blinking_warning->isActive())
+	if (_speed_blinking_warning->isActive())
 	{
-		border_pen.setColor (_blink || (_speed < _minimum_speed)
+		border_pen.setColor (_speed_blink || (_speed < _minimum_speed)
 								? _warning_color_1
 								: Qt::black);
 	}
@@ -1093,6 +1095,28 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 			painter.setPen (_autopilot_pen_2);
 			painter.drawPolygon (bug_shape);
 		}
+
+		// Baro bug:
+		if (_transition_altitude_visible)
+		{
+			if (_transition_altitude > _al_min_shown && _transition_altitude < _al_max_shown)
+			{
+				if (!(_baro_blinking_warning->isActive() && !_baro_blink))
+				{
+					float posy = ft_to_px (_transition_altitude);
+					painter.setTransform (_al_transform);
+					painter.setClipRect (_al_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
+					painter.setPen (get_pen (get_baro_color(), 1.f));
+					painter.setBrush (Qt::NoBrush);
+					QPointF a (_al_ladder_rect.left(), posy);
+					QPointF b (_al_ladder_rect.left() - 0.65f * x, posy - 0.8f * x);
+					QPointF c (_al_ladder_rect.left() - 0.65f * x, posy + 0.8f * x);
+					QPolygonF poly = QPolygonF() << a << b << c;
+					painter.drawLine (a, QPointF (_al_ladder_rect.right(), posy));
+					painter.drawPolygon (poly);
+				}
+			}
+		}
 	}
 
 	// Climb rate bug:
@@ -1196,6 +1220,12 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 
 	QString in_str = "IN";
 	QString pressure_str = QString ("%1").arg (_pressure, 0, 'f', 2) + " ";
+
+	if (_standard_pressure)
+	{
+		in_str = "";
+		pressure_str = "STD";
+	}
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), QFontMetricsF (font_a).width (pressure_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (in_str), nn_rect.height());
@@ -1372,6 +1402,40 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
 	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl)));
+}
+
+
+void
+EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
+{
+	if (!_transition_altitude_visible)
+		return;
+
+	float x = 0.18f * wh();
+
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+
+	QFont font_a = _font_10_bold;
+	QFont font_b = _font_16_bold;
+	QFontMetricsF metrics_a (font_a);
+	QFontMetricsF metrics_b (font_b);
+
+	QString baro_str = "BARO";
+	QString alt_str = QString ("%1").arg (_transition_altitude, 0, 'f', 0);
+
+	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
+	QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
+	alt_rect.moveTopRight (baro_rect.bottomRight());
+
+	if (!(_baro_blinking_warning->isActive() && !_baro_blink))
+	{
+		painter.setPen (get_pen (get_baro_color(), 1.f));
+		painter.setFont (font_a);
+		text_painter.drawText (baro_rect, Qt::AlignVCenter | Qt::AlignRight, baro_str);
+		painter.setFont (font_b);
+		text_painter.drawText (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
+	}
 }
 
 
@@ -1631,5 +1695,21 @@ EFISWidget::get_pitch_scale_clipping_path() const
 	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
 
 	return clip_path - _flight_path_marker_clip.translated (_flight_path_marker_position);
+}
+
+
+void
+EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_state)
+{
+	if (condition)
+	{
+		if (!warning_timer->isActive())
+		{
+			warning_timer->start();
+			*blink_state = true;
+		}
+	}
+	else if (warning_timer->isActive())
+		warning_timer->stop();
 }
 

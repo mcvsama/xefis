@@ -25,10 +25,6 @@
 #include <xefis/utility/latlng.h>
 
 
-constexpr double EARTH_MEAN_RADIUS_KM = 6367.46;
-constexpr double EARTH_MEAN_RADIUS_NM = 3438.15;
-
-
 inline constexpr float
 renormalize (float value, float a1, float b1, float a2, float b2) noexcept
 {
