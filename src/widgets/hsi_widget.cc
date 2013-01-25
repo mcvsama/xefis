@@ -139,7 +139,7 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	_vor_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_vortac_pen = QPen (_navigation_color, 0.4f, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	_dme_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_fix_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Shapes:
 	_dme_for_vor_shape = QPolygonF()
@@ -640,17 +640,35 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 		switch (navaid.type())
 		{
 			case Navaid::NDB:
+			{
 				if (!_ndb_visible)
 					break;
+				QPainterPath b_point;
+				b_point.addEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+				QPainterPath s_point;
+				s_point.addEllipse (QRectF (-0.035f, -0.035f, 0.07f, 0.07f));
+				QPainterPath point_1 = s_point.translated (0.f, -0.35f);
+				QPainterPath point_2 = s_point.translated (0.f, -0.55f);
+
 				painter.setTransform (scaled_transform);
 				painter.setPen (_ndb_pen);
-				painter.setBrush (Qt::NoBrush);
-				painter.drawEllipse (QRectF (-0.45f, -0.45f, 0.9f, 0.9f));
 				painter.setBrush (_ndb_pen.color());
-				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+				painter.drawPath (b_point);
+				for (int i = 0; i < 12; ++i)
+				{
+					painter.rotate (30.f);
+					painter.drawPath (point_1);
+				}
+				painter.rotate (15.f);
+				for (int i = 0; i < 18; ++i)
+				{
+					painter.rotate (20.f);
+					painter.drawPath (point_2);
+				}
 				painter.setTransform (centered_transform);
 				text_painter.drawText (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
 				break;
+			}
 
 			case Navaid::VOR:
 				if (!_vor_visible)
@@ -689,7 +707,7 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 			{
 				if (!_fix_visible)
 					break;
-				float const h = 0.5f;
+				float const h = 0.75f;
 				QPointF a (0.f, -0.66f * h);
 				QPointF b (+0.5f * h, +0.33f * h);
 				QPointF c (-0.5f * h, +0.33f * h);
