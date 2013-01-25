@@ -1106,11 +1106,13 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 					float posy = ft_to_px (_transition_altitude);
 					painter.setTransform (_al_transform);
 					painter.setClipRect (_al_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
-					painter.setPen (get_pen (get_baro_color(), 1.f));
+					QPen pen = get_pen (get_baro_color(), 1.25f);
+					pen.setMiterLimit (0.35f);
+					painter.setPen (pen);
 					painter.setBrush (Qt::NoBrush);
 					QPointF a (_al_ladder_rect.left(), posy);
-					QPointF b (_al_ladder_rect.left() - 0.65f * x, posy - 0.8f * x);
-					QPointF c (_al_ladder_rect.left() - 0.65f * x, posy + 0.8f * x);
+					QPointF b (_al_ladder_rect.left() - 0.65f * x, posy - 0.65f * x);
+					QPointF c (_al_ladder_rect.left() - 0.65f * x, posy + 0.65f * x);
 					QPolygonF poly = QPolygonF() << a << b << c;
 					painter.drawLine (a, QPointF (_al_ladder_rect.right(), posy));
 					painter.drawPolygon (poly);
