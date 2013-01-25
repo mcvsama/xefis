@@ -391,11 +391,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPainterPath			_outer_map_clip;
 	QPen					_ndb_pen;
 	QPen					_vor_pen;
+	QPen					_vortac_pen;
 	QPen					_dme_pen;
 	QPen					_fix_pen;
 	QPen					_lo_loc_pen;
 	QPen					_hi_loc_pen;
 	QFont					_radials_font;
+	QPolygonF				_dme_for_vor_shape;
 	QPolygonF				_vor_shape;
 	NavaidStorage::Navaids	_loc_navs;
 	NavaidStorage::Navaids	_ndb_navs;
