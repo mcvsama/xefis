@@ -103,6 +103,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 		paint_center_cross (painter);
 		paint_flight_director (painter);
 		paint_altitude_agl (painter, text_painter);
+		paint_baro_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
 
 		sl_paint (painter, text_painter);
