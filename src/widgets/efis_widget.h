@@ -282,13 +282,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude_tendency_visible (bool visible);
 
 	/**
-	 * Set speed tendency value.
+	 * Set radar altitude.
 	 */
 	void
 	set_altitude_agl (Feet);
 
 	/**
-	 * Set speed tendency arrow visibility.
+	 * Set radar altitude visibility.
 	 */
 	void
 	set_altitude_agl_visible (bool visible);

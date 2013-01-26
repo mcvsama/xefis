@@ -26,11 +26,10 @@
 #include <xefis/application/application.h>
 #include <xefis/core/property_union.h>
 #include <xefis/core/navaid_storage.h>
+#include <xefis/core/module_manager.h>
 
 
 namespace Xefis {
-
-class ModuleManager;
 
 class Module
 {
@@ -57,6 +56,18 @@ class Module
 	 */
 	virtual void
 	data_update();
+
+	/**
+	 * Return last update timestamp.
+	 */
+	Timestamp
+	update_timestamp() const;
+
+	/**
+	 * Return time difference between last and previous update.
+	 */
+	Timestamp
+	update_dt() const;
 
   protected:
 	/**
@@ -91,6 +102,20 @@ Module::~Module()
 inline void
 Module::data_update()
 { }
+
+
+inline Timestamp
+Module::update_timestamp() const
+{
+	return _module_manager->update_timestamp();
+}
+
+
+inline Timestamp
+Module::update_dt() const
+{
+	return _module_manager->update_dt();
+}
 
 } // namespace Xefis
 

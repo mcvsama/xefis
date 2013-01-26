@@ -1016,7 +1016,7 @@ EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
 	painter.setPen (pen);
 	if (_altitude_tendency < _altitude)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (std::max (0.f, _altitude_tendency)))) - 0.5f * x;
+	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (_altitude_tendency))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{

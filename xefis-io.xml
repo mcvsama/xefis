@@ -68,6 +68,14 @@
 				<switch-bool>/instrumentation/flight-director/visible</switch-bool>
 			</action>
 		</module-->
+		<module name='computers/lookahead'>
+			<input>/instrumentation/altitude/amsl.ft</input>
+			<output>/instrumentation/altitude/amsl-lookahead.ft</output>
+			<smoothing>50</smoothing>
+			<properties>
+				<property name='lookahead-time' path='/instrumentation/altitude/amsl-lookahead-time.s' default='10'/>
+			</properties>
+		</module>
 	</modules>
 </xefis-include>
 

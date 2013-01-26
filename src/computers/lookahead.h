@@ -11,41 +11,40 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__GENERIC__PROPERTY_TREE_H__INCLUDED
-#define XEFIS__GENERIC__PROPERTY_TREE_H__INCLUDED
+#ifndef XEFIS__COMPUTERS__LOOKAHEAD_H__INCLUDED
+#define XEFIS__COMPUTERS__LOOKAHEAD_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
 // Qt:
-#include <QtWidgets/QWidget>
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
-#include <xefis/components/property_tree/property_tree_widget.h>
+#include <xefis/core/module.h>
+#include <xefis/utility/one_pole_smoother.h>
+#include <xefis/utility/timestamp.h>
 
 
-class PropertyTree: public Xefis::Instrument
+class Lookahead: public Xefis::Module
 {
   public:
 	// Ctor
-	PropertyTree (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
+	Lookahead (Xefis::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
 	data_update() override;
 
   private:
-	Xefis::PropertyTreeWidget* _widget = nullptr;
+	Xefis::Timestamp		_last_update_time;
+	float					_last_value = 0.f;
+	Xefis::OnePoleSmoother	_output_smoother;
+
+	Xefis::PropertyFloat	_lookahead_time;
+	Xefis::PropertyFloat	_input;
+	Xefis::PropertyFloat	_output;
 };
-
-
-inline void
-PropertyTree::data_update()
-{
-	_widget->read();
-}
 
 #endif

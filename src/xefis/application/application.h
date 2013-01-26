@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/timestamp.h>
 
 
 namespace Xefis {
@@ -36,7 +37,13 @@ class Application: public QApplication
 	class DataUpdateEvent: public QEvent
 	{
 	  public:
-		DataUpdateEvent();
+		DataUpdateEvent (Timestamp);
+
+		Timestamp
+		timestamp() const;
+
+	  private:
+		Timestamp _timestamp;
 	};
 
   public:
@@ -86,9 +93,17 @@ class Application: public QApplication
 
 
 inline
-Application::DataUpdateEvent::DataUpdateEvent():
-	QEvent (QEvent::User)
+Application::DataUpdateEvent::DataUpdateEvent (Timestamp timestamp):
+	QEvent (QEvent::User),
+	_timestamp (timestamp)
 { }
+
+
+inline Timestamp
+Application::DataUpdateEvent::timestamp() const
+{
+	return _timestamp;
+}
 
 
 inline NavaidStorage*
