@@ -30,7 +30,7 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 {
 	QString input_property_path;
 	QString output_property_path;
-	float smoothing = 1.f;
+	double smoothing = 1.f;
 
 	for (QDomElement& e: config)
 	{
@@ -74,9 +74,9 @@ Lookahead::data_update()
 		Xefis::Timestamp dt = update_dt();
 		if (dt.microseconds() > 0)
 		{
-			float value = *_input;
-			float lookahead_time = *_lookahead_time;
-			float estimated_value = _last_value + lookahead_time / dt.seconds() * (value - _last_value);
+			double value = *_input;
+			double lookahead_time = *_lookahead_time;
+			double estimated_value = _last_value + lookahead_time / dt.seconds() * (value - _last_value);
 			_output.write (_output_smoother.process (estimated_value));
 			_last_value = value;
 		}

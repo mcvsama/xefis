@@ -37,7 +37,7 @@ great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b)
 	std::complex<LonLat::ValueType::ValueType> x1 (z1.lon().deg(), z1.lat().deg());
 	std::complex<LonLat::ValueType::ValueType> x2 (z2.lon().deg(), z2.lat().deg());
 
-	return 1_deg * floored_mod<double> ((1_rad * (std::arg (x1) - std::arg (x2))).deg(), 360.f);
+	return 1_deg * floored_mod<double> ((1_rad * (std::arg (x1) - std::arg (x2))).deg(), 360.0);
 }
 
 #endif

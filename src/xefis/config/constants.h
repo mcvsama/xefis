@@ -23,8 +23,8 @@
 #include "types.h"
 
 
-constexpr double EARTH_MEAN_RADIUS_KM	= 6367.46;
-constexpr double EARTH_MEAN_RADIUS_NM	= 3438.15;
+constexpr float EARTH_MEAN_RADIUS_KM	= 6367.46f;
+constexpr float EARTH_MEAN_RADIUS_NM	= 3438.15f;
 constexpr float STD_PRESSURE			= 29.92f;
 
 inline bool
