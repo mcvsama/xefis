@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
-#define XEFIS__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,7 +25,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
-#include <widgets/radial_indicator_widget.h>
+
+// Local:
+#include "radial_indicator_widget.h"
 
 
 class RadialIndicator: public Xefis::Instrument

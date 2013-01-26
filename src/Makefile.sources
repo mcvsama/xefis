@@ -73,54 +73,54 @@ SRC_SOURCES += xefis/utility/backtrace.cc
 SRC_SOURCES += xefis/utility/latlng.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
 
-######## /computers ########
+######## /modules/computers ########
 
-SRC_HEADERS += computers/lookahead.h
+SRC_HEADERS += modules/computers/lookahead.h
 
-SRC_SOURCES += computers/lookahead.cc
+SRC_SOURCES += modules/computers/lookahead.cc
 
-######## /generic ########
+######## /modules/generic ########
 
-SRC_HEADERS += generic/property_tree.h
+SRC_HEADERS += modules/generic/property_tree.h
 
-SRC_SOURCES += generic/property_tree.cc
+SRC_SOURCES += modules/generic/property_tree.cc
 
-######## /io ########
+######## /modules/io ########
 
-SRC_HEADERS += io/flight_gear.h
-SRC_HEADERS += io/joystick.h
+SRC_HEADERS += modules/io/flight_gear.h
+SRC_HEADERS += modules/io/joystick.h
 
-SRC_SOURCES += io/flight_gear.cc
-SRC_SOURCES += io/joystick.cc
+SRC_SOURCES += modules/io/flight_gear.cc
+SRC_SOURCES += modules/io/joystick.cc
 
-SRC_MOCHDRS += io/flight_gear.h
-SRC_MOCHDRS += io/joystick.h
+SRC_MOCHDRS += modules/io/flight_gear.h
+SRC_MOCHDRS += modules/io/joystick.h
 
-######## /instruments ########
+######## /modules/instruments ########
 
-SRC_HEADERS += instruments/efis.h
-SRC_HEADERS += instruments/hsi.h
-SRC_HEADERS += instruments/radial_indicator.h
+SRC_HEADERS += modules/instruments/efis.h
+SRC_HEADERS += modules/instruments/hsi.h
+SRC_HEADERS += modules/instruments/radial_indicator.h
 
-SRC_SOURCES += instruments/efis.cc
-SRC_SOURCES += instruments/hsi.cc
-SRC_SOURCES += instruments/radial_indicator.cc
+SRC_SOURCES += modules/instruments/efis.cc
+SRC_SOURCES += modules/instruments/hsi.cc
+SRC_SOURCES += modules/instruments/radial_indicator.cc
 
-SRC_MOCHDRS += instruments/efis.h
-SRC_MOCHDRS += instruments/hsi.h
-SRC_MOCHDRS += instruments/radial_indicator.h
+SRC_MOCHDRS += modules/instruments/efis.h
+SRC_MOCHDRS += modules/instruments/hsi.h
+SRC_MOCHDRS += modules/instruments/radial_indicator.h
 
-######## /widgets ########
+######## /modules/instruments/widgets ########
 
-SRC_HEADERS += widgets/efis_widget.h
-SRC_HEADERS += widgets/hsi_widget.h
-SRC_HEADERS += widgets/radial_indicator_widget.h
+SRC_HEADERS += modules/instruments/efis_widget.h
+SRC_HEADERS += modules/instruments/hsi_widget.h
+SRC_HEADERS += modules/instruments/radial_indicator_widget.h
 
-SRC_SOURCES += widgets/efis_widget.cc
-SRC_SOURCES += widgets/hsi_widget.cc
-SRC_SOURCES += widgets/radial_indicator_widget.cc
+SRC_SOURCES += modules/instruments/efis_widget.cc
+SRC_SOURCES += modules/instruments/hsi_widget.cc
+SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
 
-SRC_MOCHDRS += widgets/efis_widget.h
+SRC_MOCHDRS += modules/instruments/efis_widget.h
 
 ################
 

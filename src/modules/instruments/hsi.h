@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__INSTRUMENTS__HSI_H__INCLUDED
-#define XEFIS__INSTRUMENTS__HSI_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__HSI_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__HSI_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -26,8 +26,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
-#include <widgets/hsi_widget.h>
 #include <xefis/utility/one_pole_smoother.h>
+
+// Local:
+#include "hsi_widget.h"
 
 
 class HSI: public Xefis::Instrument

@@ -19,13 +19,13 @@
 #include <xefis/core/module.h>
 
 // Modules:
-#include <computers/lookahead.h>
-#include <generic/property_tree.h>
-#include <io/flight_gear.h>
-#include <io/joystick.h>
-#include <instruments/efis.h>
-#include <instruments/hsi.h>
-#include <instruments/radial_indicator.h>
+#include <modules/computers/lookahead.h>
+#include <modules/generic/property_tree.h>
+#include <modules/io/flight_gear.h>
+#include <modules/io/joystick.h>
+#include <modules/instruments/efis.h>
+#include <modules/instruments/hsi.h>
+#include <modules/instruments/radial_indicator.h>
 
 // Local:
 #include "module_manager.h"
