@@ -51,7 +51,9 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
 				{ "position-longitude", _position_lng_deg, false },
-				{ "position-sea-level-radius", _position_sea_level_radius_ft, false }
+				{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
+				{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
+				{ "wind-tas", _wind_tas_kt, false }
 			});
 		}
 	}
@@ -125,6 +127,14 @@ HSI::read()
 
 	if (_position_lat_deg.valid() && _position_lng_deg.valid())
 		_hsi_widget->set_position (LatLng (*_position_lat_deg, *_position_lng_deg));
+
+	if (_wind_from_mag_heading_deg.valid() && _wind_tas_kt.valid())
+	{
+		_hsi_widget->set_wind_information_visible (true);
+		_hsi_widget->set_wind_information (*_wind_from_mag_heading_deg, *_wind_tas_kt);
+	}
+	else
+		_hsi_widget->set_wind_information_visible (false);
 }
 
 

@@ -259,6 +259,19 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_altitude_reach_visible (bool visible);
 
 	/**
+	 * Set wind information.
+	 * \param	wind_mag_heading Direction from which wind comes.
+	 */
+	void
+	set_wind_information (Degrees wind_from_mag_heading, Knots wind_tas_speed);
+
+	/**
+	 * Set wind information visibility.
+	 */
+	void
+	set_wind_information_visible (bool visible);
+
+	/**
 	 * Set dotted Earth visibility.
 	 */
 	void
@@ -346,7 +359,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_trend_vector (QPainter&, TextPainter&);
 
 	void
-	paint_speeds (QPainter&, TextPainter&);
+	paint_speeds_and_wind (QPainter&, TextPainter&);
 
 	void
 	paint_dotted_earth (QPainter&);
@@ -432,6 +445,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Miles					_trend_vector_lookahead		= 5.f;
 	Miles					_altitude_reach_distance	= 0.f;
 	bool					_altitude_reach_visible		= false;
+	Degrees					_wind_from_mag_heading		= 0.f;
+	Knots					_wind_tas_speed				= 0.f;
+	bool					_wind_information_visible	= false;
 	LatLng					_position					= { 0.f, 0.f };
 	bool					_dotted_earth_visible		= false;
 	bool					_navaids_visible			= false;
@@ -680,6 +696,23 @@ inline void
 HSIWidget::set_altitude_reach_visible (bool visible)
 {
 	_altitude_reach_visible = visible;
+	update();
+}
+
+
+inline void
+HSIWidget::set_wind_information (Degrees wind_from_mag_heading, Knots wind_tas_speed)
+{
+	_wind_from_mag_heading = wind_from_mag_heading;
+	_wind_tas_speed = wind_tas_speed;
+	update();
+}
+
+
+inline void
+HSIWidget::set_wind_information_visible (bool visible)
+{
+	_wind_information_visible = visible;
 	update();
 }
 

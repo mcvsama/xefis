@@ -106,6 +106,8 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lng_deg;
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
+	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
+	Xefis::PropertyFloat	_wind_tas_kt;
 };
 
 #endif
