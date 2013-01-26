@@ -26,7 +26,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
-#include <xefis/utility/one_pole_smoother.h>
+#include <xefis/utility/smoother.h>
 
 // Local:
 #include "hsi_widget.h"
@@ -65,7 +65,7 @@ class HSI: public Xefis::Instrument
 	HSIWidget*				_hsi_widget				= nullptr;
 	std::array<LonLat, 3>	_positions;
 	bool					_positions_valid		= false;
-	Xefis::OnePoleSmoother	_trend_vector_smoother	= 60.0; // TODO make fps independent
+	Xefis::Smoother<float>	_trend_vector_smoother	= 60.0; // TODO make fps independent
 
 	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyFloat	_range;
