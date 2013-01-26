@@ -220,7 +220,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_ap_settings (painter, text_painter);
 	paint_directions (painter, text_painter);
 	paint_aircraft (painter, text_painter);
-	paint_speeds (painter, text_painter);
+	paint_speeds_and_wind (painter, text_painter);
 }
 
 
@@ -538,7 +538,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
 
 
 void
-HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter)
+HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 {
 	QPen pen = get_pen (QColor (255, 255, 255), 0.6f);
 	QFont font_a = _font_13_bold;
@@ -577,6 +577,24 @@ HSIWidget::paint_speeds (QPainter& painter, TextPainter& text_painter)
 	{
 		painter.translate (offset * 1.2f, 0.f);
 		paint_speed ("TAS", QString::number (static_cast<int> (_true_air_speed)));
+	}
+
+	if (_wind_information_visible)
+	{
+		QString wind_str = QString ("%1°/%2")
+			.arg (static_cast<long> (_wind_from_mag_heading), 3, 10, QChar ('0'))
+			.arg (static_cast<long> (_wind_tas_speed), 3, 10, QChar (L'\u2007'));
+		painter.resetTransform();
+		painter.translate (0.2f * _q, metr_b.height());
+		painter.setPen (get_pen (Qt::white, 1.2f));
+		text_painter.drawText (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
+		painter.translate (0.9f * _q, 0.9f * _q + metr_b.height());
+		painter.rotate (_wind_from_mag_heading - _mag_heading + 180.f);
+		QPointF a = QPointF (0.f, -0.7f * _q);
+		QPointF b = QPointF (0.f, +0.7f * _q);
+		painter.drawLine (a, b);
+		painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
+		painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
 	}
 }
 

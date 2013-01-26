@@ -42,6 +42,8 @@
 					<property name='position-latitude' path='/position/latitude.deg'/>
 					<property name='position-longitude' path='/position/longitude.deg'/>
 					<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
+					<property name='wind-from-mag-heading' path='/wind/from-mag-heading.deg'/>
+					<property name='wind-tas' path='/wind/tas.kt'/>
 				</properties>
 				<properties path='/engine'>
 					<property name='engine-n1' path='/n1.pct'/>

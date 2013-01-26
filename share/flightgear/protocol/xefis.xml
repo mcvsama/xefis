@@ -334,6 +334,19 @@
 				<format>%f</format>
 				<node>/engines/engine/egt-degf</node>
 			</chunk>
+			<!-- Wind -->
+			<chunk>
+				<name>wfh</name>
+				<type>float</type>
+				<format>%f</format>
+				<node>/environment/wind-from-heading-deg</node>
+			</chunk>
+			<chunk>
+				<name>ws</name>
+				<type>float</type>
+				<format>%f</format>
+				<node>/environment/wind-speed-kt</node>
+			</chunk>
 		</output>
 	</generic>
 </PropertyList>

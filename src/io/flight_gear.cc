@@ -79,7 +79,9 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "engine-egt", _engine_egt_degc, false },
 						{ "position-latitude", _position_lat_deg, false },
 						{ "position-longitude", _position_lng_deg, false },
-						{ "position-sea-level-radius", _position_sea_level_radius_ft, false }
+						{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
+						{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
+						{ "wind-tas", _wind_tas_kt, false }
 					});
 				}
 			}
@@ -218,6 +220,8 @@ FlightGearIO::read_input()
 		/* egt */	value = next_value();
 					if (!_engine_egt_degc.is_singular())
 						_engine_egt_degc.write (5.f / 9.f * (value.left (9).toDouble() - 32.f));
+		/* wfh */	handle_float_var (next_value(), _wind_from_mag_heading_deg);
+		/* ws */	handle_float_var (next_value(), _wind_tas_kt);
 
 		if (navigation_gs_needle_ok)
 		{
@@ -283,7 +287,9 @@ FlightGearIO::invalidate_all()
 		&_engine_egt_degc,
 		&_position_lat_deg,
 		&_position_lng_deg,
-		&_position_sea_level_radius_ft
+		&_position_sea_level_radius_ft,
+		&_wind_from_mag_heading_deg,
+		&_wind_tas_kt
 	};
 
 	for (auto property: properties)
