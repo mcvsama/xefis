@@ -155,21 +155,21 @@ EFISWidget::adi_post_resize()
 void
 EFISWidget::adi_pre_paint()
 {
-	float p = floored_mod (_pitch + 180.0, 360.0) - 180.0;
-	float r = floored_mod (_roll + 180.0, 360.0) - 180.0;
-	float hdg = floored_mod (_heading, 360.0);
+	Angle p = floored_mod (_pitch + 180_deg, 360_deg) - 180_deg;
+	Angle r = floored_mod (_roll + 180_deg, 360_deg) - 180_deg;
+	Angle hdg = floored_mod (_heading, 360_deg);
 
 	// Mirroring, eg. -180° pitch is the same
 	// as 0° pitch with roll inverted:
-	if (p < -90.f)
+	if (p < -90_deg)
 	{
-		p = -180.f - p;
-		r = +180.f - r;
+		p = -180_deg - p;
+		r = +180_deg - r;
 	}
-	else if (p > 90.f)
+	else if (p > 90_deg)
 	{
-		p = +180.f - p;
-		r = +180.f - r;
+		p = +180_deg - p;
+		r = +180_deg - r;
 	}
 
 	_pitch = p;
@@ -180,7 +180,7 @@ EFISWidget::adi_pre_paint()
 	_pitch_transform.translate (0.f, -pitch_to_px (p));
 
 	_roll_transform.reset();
-	_roll_transform.rotate (-r);
+	_roll_transform.rotate (-r.deg());
 
 	_heading_transform.reset();
 	_heading_transform.translate (-heading_to_px (hdg), 0.f);
@@ -246,16 +246,16 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 
 	// Pitch scale is clipped to small rectangle, so narrow it even more:
 	float clipped_pitch_factor = 0.45f;
-	Range<float> deg_range (_pitch - clipped_pitch_factor * 0.5f * _fov,
+	Range<Angle> deg_range (_pitch - clipped_pitch_factor * 0.5f * _fov,
 							_pitch + clipped_pitch_factor * 0.5f * _fov);
 
 	painter.setPen (get_pen (QColor (255, 255, 255), 1.f));
 	// 10° lines, exclude +/-90°:
 	for (int deg = -90; deg <= 90; deg += 10)
 	{
-		if (!deg_range.includes (deg) || deg == 0)
+		if (!deg_range.includes (1_deg * deg) || deg == 0)
 			continue;
-		float d = pitch_to_px (deg);
+		float d = pitch_to_px (1_deg * deg);
 		painter.drawLine (QPointF (-z, d), QPointF (z, d));
 		// Degs number:
 		int abs_deg = std::abs (deg);
@@ -269,27 +269,27 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 	// 5° lines:
 	for (int deg = -90; deg <= 90; deg += 5)
 	{
-		if (!deg_range.includes (deg) || deg % 10 == 0)
+		if (!deg_range.includes (1_deg * deg) || deg % 10 == 0)
 			continue;
-		float d = pitch_to_px (deg);
+		float d = pitch_to_px (1_deg * deg);
 		painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
 	}
 	// 2.5° lines:
 	for (int deg = -900; deg <= 900; deg += 25)
 	{
-		if (!deg_range.includes (deg / 10) || deg % 50 == 0)
+		if (!deg_range.includes (1_deg * deg / 10) || deg % 50 == 0)
 			continue;
-		float d = pitch_to_px (deg / 10.f);
+		float d = pitch_to_px (1_deg * deg / 10.f);
 		painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
 	}
 
 	painter.setPen (get_pen (QColor (255, 255, 255), 1.75f));
 	// -90°, 90° lines:
-	if (deg_range.includes (-90.f) || deg_range.includes (+90.f))
+	if (deg_range.includes (-90_deg) || deg_range.includes (+90_deg))
 	{
 		for (float deg: { -90.f, 90.f })
 		{
-			float d = pitch_to_px (deg);
+			float d = pitch_to_px (1_deg * deg);
 			painter.drawLine (QPointF (-z, d), QPointF (z, d));
 		}
 	}
@@ -300,7 +300,7 @@ void
 EFISWidget::adi_paint_roll (QPainter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
-	bool const bank_angle_warning = _roll_limit > 0.f && std::abs (_roll) > _roll_limit;
+	bool const bank_angle_warning = _roll_limit > 0_deg && std::abs (_roll.deg()) > _roll_limit.deg();
 	bool const slip_skid_warning = _slip_skid_limit > 0.f && std::abs (_slip_skid) > _slip_skid_limit;
 
 	QPen pen = get_pen (Qt::white, 1.f);
@@ -418,17 +418,17 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 		return;
 
 	float clipped_pitch_factor = 0.5f;
-	Range<float> deg_range (_heading - clipped_pitch_factor * 0.5f * _fov,
+	Range<Angle> deg_range (_heading - clipped_pitch_factor * 0.5f * _fov,
 							_heading + clipped_pitch_factor * 0.5f * _fov);
 
 	painter.setTransform (_heading_transform * _horizon_transform);
 	for (int deg = -180; deg < 540; deg += 10)
 	{
-		if (!deg_range.includes (deg))
+		if (!deg_range.includes (1_deg * deg))
 			continue;
 
-		float d10 = heading_to_px (deg);
-		float d05 = heading_to_px (deg + 5);
+		float d10 = heading_to_px (1_deg * deg);
+		float d05 = heading_to_px (1_deg * deg + 5_deg);
 		// 10° lines:
 		painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
 		if (_heading_numbers_visible)
@@ -1364,10 +1364,10 @@ void
 EFISWidget::paint_flight_director (QPainter& painter)
 {
 	float const w = wh() * 1.4f / 9.f;
-	Degrees range = _fov / 4.f;
+	Angle range = _fov / 4.f;
 
-	Degrees pitch = bound (_flight_director_pitch - _pitch, -range, +range);
-	Degrees roll = bound (_flight_director_roll - _roll, -range, +range);
+	Angle pitch = bound (_flight_director_pitch - _pitch, -range, +range);
+	Angle roll = bound (_flight_director_roll - _roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;

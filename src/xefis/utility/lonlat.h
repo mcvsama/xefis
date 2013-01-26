@@ -27,26 +27,26 @@
 class LonLat
 {
   public:
-	typedef Degrees ValueType;
+	typedef Angle ValueType;
 
   public:
 	// Ctor
 	LonLat();
 
 	// Ctor
-	LonLat (Degrees longitude, Degrees latitude);
+	LonLat (Angle longitude, Angle latitude);
 
   public:
-	Degrees&
+	Angle&
 	lat();
 
-	Degrees const&
+	Angle const&
 	lat() const;
 
-	Degrees&
+	Angle&
 	lon();
 
-	Degrees const&
+	Angle const&
 	lon() const;
 
 	LonLat&
@@ -62,66 +62,58 @@ class LonLat
 	 * Compute distance between two sets of coordinates on Earth.
 	 * Result is in sphere radius units.
 	 */
-	ValueType
+	ValueType::ValueType
 	haversine (LonLat const& other) const;
-
-	/**
-	 * Convenience function.
-	 * Compute distance between two sets of coordinates on Earth.
-	 * Result is in kilometers.
-	 */
-	ValueType
-	haversine_km (LonLat const& other) const;
 
 	/**
 	 * Convenience function.
 	 * Compute distance between two sets of coordinates on Earth.
 	 * Result is in nautical miles.
 	 */
-	ValueType
+	Miles
 	haversine_nm (LonLat const& other) const;
 
   private:
-	Degrees	_lon;
-	Degrees	_lat;
+	Angle	_lon;
+	Angle	_lat;
 };
 
 
 inline
 LonLat::LonLat():
-	LonLat (0.f, 0.f)
+	LonLat (0_deg, 0_deg)
 { }
 
 
 inline
-LonLat::LonLat (Degrees longitude, Degrees latitude):
+LonLat::LonLat (Angle longitude, Angle latitude):
 	_lon (longitude),
 	_lat (latitude)
 { }
 
 
-inline Degrees&
+inline Angle&
 LonLat::lon()
 {
 	return _lon;
 }
 
 
-inline Degrees const&
+inline Angle const&
 LonLat::lon() const
 {
 	return _lon;
 }
 
 
-inline Degrees&
+inline Angle&
 LonLat::lat()
 {
 	return _lat;
 }
 
 
-inline Degrees const&
+inline Angle const&
 LonLat::lat() const
 {
 	return _lat;
@@ -131,21 +123,9 @@ LonLat::lat() const
 /**
  * Convenience function.
  * Compute distance between two sets of coordinates on Earth.
- * Result is in kilometers.
- */
-inline LonLat::ValueType
-LonLat::haversine_km (LonLat const& other) const
-{
-	return haversine (other) * EARTH_MEAN_RADIUS_KM;
-}
-
-
-/**
- * Convenience function.
- * Compute distance between two sets of coordinates on Earth.
  * Result is in nautical miles.
  */
-inline LonLat::ValueType
+inline Miles
 LonLat::haversine_nm (LonLat const& other) const
 {
 	return haversine (other) * EARTH_MEAN_RADIUS_NM;
