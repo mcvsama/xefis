@@ -11,98 +11,103 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
-#define XEFIS__INSTRUMENTS__EFIS_H__INCLUDED
+#ifndef XEFIS__MODULES__IO__FLIGHT_GEAR_H__INCLUDED
+#define XEFIS__MODULES__IO__FLIGHT_GEAR_H__INCLUDED
 
 // Standard:
 #include <cstddef>
-#include <array>
+#include <map>
 
 // Qt:
-#include <QtWidgets/QWidget>
+#include <QtCore/QTimer>
+#include <QtCore/QObject>
+#include <QtNetwork/QUdpSocket>
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
-#include <xefis/core/instrument.h>
-#include <widgets/efis_widget.h>
-#include <widgets/hsi_widget.h>
+#include <xefis/core/input.h>
 
 
-class EFIS: public Xefis::Instrument
+class FlightGearIO:
+	public QObject,
+	public Xefis::Input
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	EFIS (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
+	FlightGearIO (Xefis::ModuleManager*, QDomElement const& config);
 
-  public slots:
+	// Dtor
+	~FlightGearIO();
+
+  private slots:
 	/**
-	 * Force EFIS to read data from properties.
+	 * Read and apply FlightGear datagrams from UDP socket.
 	 */
 	void
-	read();
+	read_input();
 
-  protected:
+	/**
+	 * Set all input properties as invalid.
+	 */
 	void
-	data_update() override;
+	invalidate_all();
 
   private:
-	EFISWidget*				_efis_widget = nullptr;
+	QTimer*					_timeout_timer				= nullptr;
+	QString					_host;
+	int						_port;
+	QUdpSocket*				_input						= nullptr;
+	QByteArray				_datagram;
+	std::string				_property_path;
+	double					_prev_position_lat_deg		= 0.f;
+	bool					_prev_position_lat_valid	= false;
+	double					_prev_position_lng_deg		= 0.f;
+	bool					_prev_position_lng_valid	= false;
 
-	Xefis::PropertyInteger	_speed_ladder_line_every;
-	Xefis::PropertyInteger	_speed_ladder_number_every;
-	Xefis::PropertyInteger	_speed_ladder_extent;
-	Xefis::PropertyInteger	_altitude_ladder_line_every;
-	Xefis::PropertyInteger	_altitude_ladder_number_every;
-	Xefis::PropertyInteger	_altitude_ladder_bold_every;
-	Xefis::PropertyInteger	_altitude_ladder_extent;
-	Xefis::PropertyBoolean	_heading_numbers_visible;
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
-	Xefis::PropertyFloat	_warning_ias_kt;
 	Xefis::PropertyFloat	_maximum_ias_kt;
+	Xefis::PropertyFloat	_gs_kt;
+	Xefis::PropertyFloat	_tas_kt;
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
-	Xefis::PropertyFloat	_roll_limit_deg;
 	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyFloat	_slip_skid_g;
-	Xefis::PropertyFloat	_slip_skid_limit_g;
-	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
 	Xefis::PropertyFloat	_altitude_ft;
-	Xefis::PropertyFloat	_altitude_lookahead_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;
 	Xefis::PropertyFloat	_landing_altitude_ft;
-	Xefis::PropertyFloat	_transition_altitude_ft;
-	Xefis::PropertyFloat	_pressure_inhg;
-	Xefis::PropertyBoolean	_standard_pressure;
 	Xefis::PropertyFloat	_cbr_fpm;
-	Xefis::PropertyBoolean	_autopilot_visible;
+	Xefis::PropertyFloat	_pressure_inhg;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
 	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
+	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
-	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;
-	Xefis::PropertyString	_navigation_type_hint;
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
+	Xefis::PropertyFloat	_engine_throttle_pct;
+	Xefis::PropertyFloat	_engine_epr;
+	Xefis::PropertyFloat	_engine_n1_pct;
+	Xefis::PropertyFloat	_engine_n2_pct;
+	Xefis::PropertyFloat	_engine_egt_degc;
+	Xefis::PropertyFloat	_position_lat_deg;
+	Xefis::PropertyFloat	_position_lng_deg;
+	Xefis::PropertyFloat	_position_sea_level_radius_ft;
+	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
+	Xefis::PropertyFloat	_wind_tas_kt;
 };
-
-
-inline void
-EFIS::data_update()
-{
-	read();
-}
 
 #endif

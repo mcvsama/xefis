@@ -29,6 +29,11 @@
 #include "efis_widget.h"
 
 
+// TODO check where save/restore calls are really needed.
+// TODO zakeszuj _wszystkie_ peny i obliczaj w post_resize()
+// TODO zakeszuj _wszystkie_ kolory i obliczaj w post_resize() albo i wcześniej.
+// TODO Use QPainterPaths even when there’s a QPainter convenience function. E.g. Rounded rects and elipses.
+// TODO zamień QColor (liczby) na Qt::stała, jeśli jest.
 
 EFISWidget::EFISWidget (QWidget* parent):
 	InstrumentWidget (parent, 0.8f, 1.f, 1.f)
@@ -74,6 +79,9 @@ EFISWidget::resizeEvent (QResizeEvent* resize_event)
 void
 EFISWidget::paintEvent (QPaintEvent*)
 {
+	int ms = _last_paint_time.restart();
+	fprintf (stderr, "FPS %.2f     \r", 1000.f / ms);
+
 	update_blinker (_speed_blinking_warning,
 					_speed_visible &&
 					((_warning_speed_visible && _speed < _warning_speed) ||
@@ -735,6 +743,7 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	{
 		float posy = bound (kt_to_px (_at_speed),
 							static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
+		// TODO extract bug_shape to sl_post_resize()
 		QPolygonF bug_shape = QPolygonF()
 			<< QPointF (0.f, 0.f)
 			<< QPointF (+0.5f * x, -0.5f * x)
@@ -903,6 +912,7 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 
 	painter.setPen (_al_black_box_pen);
 	painter.setBrush (Qt::black);
+	// TODO extract this polygon
 	painter.drawPolygon (QPolygonF()
 		<< QPointF (-0.5f * x, 0.f)
 		<< QPointF (0.f, -0.5f * x)
@@ -948,6 +958,7 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 	float const s_ladder_digit_height = _font_10_digit_height;
 
 	// Special clipping that leaves some margin around black indicator:
+	// TODO extract this path
 	QPainterPath clip_path_m;
 	clip_path_m.addRect (_al_black_box_rect.translated (-x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
 	QPainterPath clip_path;
@@ -971,6 +982,7 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 		painter.setPen (ft % _al_bold_every == 0 ? _al_scale_pen_2 : _al_scale_pen_1);
 		painter.drawLine (QPointF (0.f, posy), QPointF (0.8f * x, posy));
 
+		// TODO extract painting text to separate loop
 		if (ft % _al_number_every == 0)
 		{
 			QRectF big_text_box (1.1f * x, -0.5f * b_ladder_digit_height + posy,
@@ -1692,7 +1704,7 @@ EFISWidget::get_pitch_scale_clipping_path() const
 {
 	float const w = wh() * 2.f / 9.f;
 
-	QPainterPath clip_path;
+	QPainterPath clip_path; // TODO cache this
 	clip_path.setFillRule (Qt::WindingFill);
 	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
 	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
