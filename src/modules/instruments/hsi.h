@@ -63,7 +63,7 @@ class HSI: public Xefis::Instrument
 
   private:
 	HSIWidget*				_hsi_widget				= nullptr;
-	std::array<LatLng, 3>	_positions;
+	std::array<LonLat, 3>	_positions;
 	bool					_positions_valid		= false;
 	Xefis::OnePoleSmoother	_trend_vector_smoother	= 60.0; // TODO make fps independent
 
@@ -81,7 +81,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_track_deg;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_position_lat_deg;
-	Xefis::PropertyFloat	_position_lng_deg;
+	Xefis::PropertyFloat	_position_lon_deg;
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
