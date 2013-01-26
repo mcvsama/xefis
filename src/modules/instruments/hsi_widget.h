@@ -27,7 +27,7 @@
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/utility/text_painter.h>
-#include <xefis/utility/latlng.h>
+#include <xefis/utility/lonlat.h>
 #include <xefis/utility/numeric.h>
 
 
@@ -225,7 +225,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Set current position coordinates.
 	 */
 	void
-	set_position (LatLng const&);
+	set_position (LonLat const&);
 
 	/**
 	 * Set track estimation in degrees per mile flown.
@@ -382,7 +382,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * relative to the aircraft (assumes usage with aircraft-centered transform).
 	 */
 	QPointF
-	get_navaid_xy (LatLng const& position);
+	get_navaid_xy (LonLat const& position);
 
 	Miles
 	actual_trend_range() const;
@@ -448,7 +448,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Degrees					_wind_from_mag_heading		= 0.f;
 	Knots					_wind_tas_speed				= 0.f;
 	bool					_wind_information_visible	= false;
-	LatLng					_position					= { 0.f, 0.f };
+	LonLat					_position					= { 0.f, 0.f };
 	bool					_dotted_earth_visible		= false;
 	bool					_navaids_visible			= false;
 	bool					_vor_visible				= false;
@@ -653,7 +653,7 @@ HSIWidget::set_mach_visible (bool visible)
 
 
 inline void
-HSIWidget::set_position (LatLng const& position)
+HSIWidget::set_position (LonLat const& position)
 {
 	_position = position;
 	update();
@@ -781,7 +781,7 @@ HSIWidget::set_highlighted_loc (QString const& identifier)
 
 
 inline QPointF
-HSIWidget::get_navaid_xy (LatLng const& position)
+HSIWidget::get_navaid_xy (LonLat const& position)
 {
 	QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * position.rotated (_position).project_flat();
 	return _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));

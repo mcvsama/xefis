@@ -616,11 +616,11 @@ HSIWidget::paint_dotted_earth (QPainter& painter)
 
 	for (float lat = -180; lat < 180; lat += 10)
 	{
-		for (float lng = -180; lng < 180; lng += 10)
+		for (float lon = -180; lon < 180; lon += 10)
 		{
-			LatLng point_on_earth (lat, lng);
+			LonLat point_on_earth (lon, lat);
 
-			if (haversine (point_on_earth, _position) >= 1.7)
+			if (point_on_earth.haversine (_position) >= 1.7)
 				continue;
 
 			QPointF p = point_on_earth.rotate (_position).project_flat();

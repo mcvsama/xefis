@@ -23,6 +23,7 @@
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/text_painter.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/navigation.h>
 
 // Local:
 #include "hsi.h"
@@ -50,7 +51,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "track", _track_deg, false },
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
-				{ "position-longitude", _position_lng_deg, false },
+				{ "position-longitude", _position_lon_deg, false },
 				{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
 				{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
 				{ "wind-tas", _wind_tas_kt, false }
@@ -125,8 +126,8 @@ HSI::read()
 	if (_tas_kt.valid())
 		_hsi_widget->set_true_air_speed (*_tas_kt);
 
-	if (_position_lat_deg.valid() && _position_lng_deg.valid())
-		_hsi_widget->set_position (LatLng (*_position_lat_deg, *_position_lng_deg));
+	if (_position_lat_deg.valid() && _position_lon_deg.valid())
+		_hsi_widget->set_position (LonLat (*_position_lon_deg, *_position_lat_deg));
 
 	if (_wind_from_mag_heading_deg.valid() && _wind_tas_kt.valid())
 	{
@@ -141,13 +142,13 @@ HSI::read()
 void
 HSI::estimate_track()
 {
-	if (_position_lat_deg.is_singular() || _position_lng_deg.is_singular() || _trend_vector_range.is_singular())
+	if (_position_lat_deg.is_singular() || _position_lon_deg.is_singular() || _trend_vector_range.is_singular())
 	{
 		_hsi_widget->set_trend_vector_visible (false);
 		return;
 	}
 
-	LatLng current_position (*_position_lat_deg, *_position_lng_deg);
+	LonLat current_position (*_position_lon_deg, *_position_lat_deg);
 
 	if (!_positions_valid)
 	{
@@ -157,7 +158,7 @@ HSI::estimate_track()
 
 	// Estimate only if the distance between last and current positions is > 0.02nm.
 	Miles epsilon = 0.02; // TODO _nm
-	if (haversine_nm (_positions[0], current_position) > epsilon)
+	if (_positions[0].haversine_nm (current_position) > epsilon)
 	{
 		// Shift data in _positions:
 		for (unsigned int i = _positions.size() - 1; i > 0; i--)
@@ -165,13 +166,13 @@ HSI::estimate_track()
 		_positions[0] = current_position;
 	}
 
-	double len10 = haversine_nm (_positions[1], _positions[0]);
+	double len10 = _positions[1].haversine_nm (_positions[0]);
 	Degrees alpha = -180.0 + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
 	Degrees beta_per_mile = alpha / len10;
 
 	if (!std::isinf (beta_per_mile) && !std::isnan (beta_per_mile))
 	{
-		bool visible = haversine_nm (_positions[2], _positions[0]) > 2.f * epsilon;
+		bool visible = _positions[2].haversine_nm (_positions[0]) > 2.f * epsilon;
 		if (visible)
 			beta_per_mile = _trend_vector_smoother.process (beta_per_mile);
 

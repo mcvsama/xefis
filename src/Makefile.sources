@@ -61,7 +61,7 @@ SRC_SOURCES += xefis/core/property_storage.cc
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
-SRC_HEADERS += xefis/utility/latlng.h
+SRC_HEADERS += xefis/utility/lonlat.h
 SRC_HEADERS += xefis/utility/numeric.h
 SRC_HEADERS += xefis/utility/one_pole_smoother.h
 SRC_HEADERS += xefis/utility/qdom.h
@@ -70,7 +70,7 @@ SRC_HEADERS += xefis/utility/text_painter.h
 SRC_HEADERS += xefis/utility/timestamp.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
-SRC_SOURCES += xefis/utility/latlng.cc
+SRC_SOURCES += xefis/utility/lonlat.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
 
 ######## /modules/computers ########

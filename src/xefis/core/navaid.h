@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/latlng.h>
+#include <xefis/utility/lonlat.h>
 
 
 namespace Xefis {
@@ -52,7 +52,7 @@ class Navaid
 	};
 
   public:
-	Navaid (Type, LatLng const&, QString const& identifier, QString const& name, Miles range);
+	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Miles range);
 
 	bool
 	operator< (Navaid const& other) const;
@@ -60,7 +60,7 @@ class Navaid
 	Type
 	type() const;
 
-	LatLng const&
+	LonLat const&
 	position() const;
 
 	QString const&
@@ -128,7 +128,7 @@ class Navaid
 
   private:
 	Type	_type;
-	LatLng	_position;
+	LonLat	_position;
 	QString	_identifier;
 	QString	_name;
 	Miles	_range;
@@ -143,7 +143,7 @@ class Navaid
 
 
 inline
-Navaid::Navaid (Type type, LatLng const& position, QString const& identifier, QString const& name, Miles range):
+Navaid::Navaid (Type type, LonLat const& position, QString const& identifier, QString const& name, Miles range):
 	_type (type),
 	_position (position),
 	_identifier (identifier),
@@ -155,8 +155,8 @@ Navaid::Navaid (Type type, LatLng const& position, QString const& identifier, QS
 inline bool
 Navaid::operator< (Navaid const& other) const
 {
-	return std::make_tuple (_position.lat(), _position.lng())
-		 < std::make_tuple (other._position.lat(), other._position.lng());
+	return std::make_tuple (_position.lat(), _position.lon())
+		 < std::make_tuple (other._position.lat(), other._position.lon());
 }
 
 
@@ -167,7 +167,7 @@ Navaid::type() const
 }
 
 
-inline LatLng const&
+inline LonLat const&
 Navaid::position() const
 {
 	return _position;

@@ -29,7 +29,7 @@
 namespace Xefis {
 
 NavaidStorage::NavaidStorage():
-	_navaids_tree (access_latlng)
+	_navaids_tree (access_position)
 {
 	parse_nav_dat();
 	parse_fix_dat();
@@ -40,13 +40,13 @@ NavaidStorage::NavaidStorage():
 
 
 NavaidStorage::Navaids
-NavaidStorage::get_navs (LatLng const& position, Miles radius) const
+NavaidStorage::get_navs (LonLat const& position, Miles radius) const
 {
 	Navaids set;
 
 	auto inserter_and_predicate = [&] (Navaid const& navaid) -> bool
 	{
-		if (haversine_nm (position, navaid.position()) <= radius)
+		if (position.haversine_nm (navaid.position()) <= radius)
 		{
 			set.insert (navaid);
 			return false;
@@ -78,14 +78,14 @@ NavaidStorage::parse_nav_dat()
 
 		int type_int;
 		Navaid::Type type;
-		LatLng pos;
+		LonLat pos;
 		Feet amsl;
 		float khz;
 		QString identifier;
 		Miles range;
 		QString name;
 
-		line_ts >> type_int >> pos.lat() >> pos.lng();
+		line_ts >> type_int >> pos.lat() >> pos.lon();
 
 		if (type_int == 99) // EOF sentinel
 			break;
@@ -182,10 +182,10 @@ NavaidStorage::parse_fix_dat()
 		QString line = ts.readLine();
 		QTextStream line_ts (&line);
 
-		LatLng pos;
+		LonLat pos;
 		QString identifier;
 
-		line_ts >> pos.lat() >> pos.lng() >> identifier;
+		line_ts >> pos.lat() >> pos.lon() >> identifier;
 
 		if (pos.lat() == 99.0) // EOF sentinel
 			break;

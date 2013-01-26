@@ -34,16 +34,16 @@ class NavaidStorage
 	typedef std::set<Navaid> Navaids;
 
   private:
-	static LatLng::ValueType
-	access_latlng (Navaid const& navaid, std::size_t const dimension);
+	static LonLat::ValueType
+	access_position (Navaid const& navaid, std::size_t const dimension);
 
-	typedef KDTree::KDTree<2, Navaid, std::function<LatLng::ValueType (Navaid const&, std::size_t)>> NavaidsTree;
+	typedef KDTree::KDTree<2, Navaid, std::function<LonLat::ValueType (Navaid const&, std::size_t)>> NavaidsTree;
 
   public:
 	NavaidStorage();
 
 	Navaids
-	get_navs (LatLng const& position, Miles radius) const;
+	get_navs (LonLat const& position, Miles radius) const;
 
   private:
 	void
@@ -63,10 +63,10 @@ class NavaidStorage
 };
 
 
-inline LatLng::ValueType
-NavaidStorage::access_latlng (Navaid const& navaid, std::size_t const dimension)
+inline LonLat::ValueType
+NavaidStorage::access_position (Navaid const& navaid, std::size_t const dimension)
 {
-	return dimension == 0 ? navaid.position().lat() : navaid.position().lng();
+	return dimension == 0 ? navaid.position().lat() : navaid.position().lon();
 }
 
 } // namespace Xefis
