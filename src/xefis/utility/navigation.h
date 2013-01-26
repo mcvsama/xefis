@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>// XXX needed for deg_to_rad
 #include <xefis/utility/lonlat.h>
 
 
@@ -28,17 +27,17 @@
  * Arcs are given by three points, the second one lies on the intersection.
  * Result is in degrees.
  */
-inline Degrees
+inline Angle
 great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b)
 {
 	LonLat z1 (a.lon() - common.lon(), a.lat() - common.lat());
-	LonLat zero (0.0, 0.0);
+	LonLat zero (0_deg, 0_deg);
 	LonLat z2 (b.lon() - common.lon(), b.lat() - common.lat());
 
-	std::complex<LonLat::ValueType> x1 (z1.lon(), z1.lat());
-	std::complex<LonLat::ValueType> x2 (z2.lon(), z2.lat());
+	std::complex<LonLat::ValueType::ValueType> x1 (z1.lon().deg(), z1.lat().deg());
+	std::complex<LonLat::ValueType::ValueType> x2 (z2.lon().deg(), z2.lat().deg());
 
-	return floored_mod (rad_to_deg (std::arg (x1) - std::arg (x2)), 360.0);
+	return 1_deg * floored_mod<double> ((1_rad * (std::arg (x1) - std::arg (x2))).deg(), 360.f);
 }
 
 #endif

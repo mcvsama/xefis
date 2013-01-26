@@ -97,18 +97,18 @@ void
 EFIS::read()
 {
 	bool fpm_ok = _fpm_alpha_deg.valid() && _fpm_beta_deg.valid();
-	Degrees fpm_alpha = 0.f;
-	Degrees fpm_beta = 0.f;
+	Angle fpm_alpha = 0_deg;
+	Angle fpm_beta = 0_deg;
 	if (fpm_ok)
 	{
-		fpm_alpha = *_fpm_alpha_deg;
-		fpm_beta = *_fpm_beta_deg;
+		fpm_alpha = 1_deg * *_fpm_alpha_deg;
+		fpm_beta = 1_deg * *_fpm_beta_deg;
 	}
 
 	if (_track_deg.valid() && _roll_deg.valid() && _mag_heading_deg.valid())
 	{
-		fpm_alpha -= std::sin (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_mag_heading_deg);
-		fpm_beta -= std::cos (*_roll_deg / 180.f * M_PI) * (*_track_deg - *_mag_heading_deg);
+		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * (*_track_deg - *_mag_heading_deg);
+		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * (*_track_deg - *_mag_heading_deg);
 	}
 
 	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.valid() ? *_speed_ladder_line_every : 10);
@@ -148,17 +148,17 @@ EFIS::read()
 
 	_efis_widget->set_pitch_visible (_pitch_deg.valid());
 	if (_pitch_deg.valid())
-		_efis_widget->set_pitch (*_pitch_deg);
+		_efis_widget->set_pitch (1_deg * *_pitch_deg);
 
 	_efis_widget->set_roll_visible (_roll_deg.valid());
 	if (_roll_deg.valid())
-		_efis_widget->set_roll (*_roll_deg);
+		_efis_widget->set_roll (1_deg * *_roll_deg);
 
-	_efis_widget->set_roll_limit (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f);
+	_efis_widget->set_roll_limit (1_deg * (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f));
 
 	_efis_widget->set_heading_visible (_mag_heading_deg.valid());
 	if (_mag_heading_deg.valid())
-		_efis_widget->set_heading (*_mag_heading_deg);
+		_efis_widget->set_heading (1_deg * *_mag_heading_deg);
 
 	_efis_widget->set_slip_skid_visible (_slip_skid_g.valid());
 	if (_slip_skid_g.valid())
@@ -229,11 +229,11 @@ EFIS::read()
 
 	_efis_widget->set_flight_director_pitch_visible (flight_director_visible && _flight_director_pitch_deg.valid());
 	if (_flight_director_pitch_deg.valid())
-		_efis_widget->set_flight_director_pitch (*_flight_director_pitch_deg);
+		_efis_widget->set_flight_director_pitch (1_deg * *_flight_director_pitch_deg);
 
 	_efis_widget->set_flight_director_roll_visible (flight_director_visible && _flight_director_roll_deg.valid());
 	if (_flight_director_roll_deg.valid())
-		_efis_widget->set_flight_director_roll (*_flight_director_roll_deg);
+		_efis_widget->set_flight_director_roll (1_deg * *_flight_director_roll_deg);
 
 	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
 	{

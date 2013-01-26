@@ -19,8 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-// XXX needed for conversions:
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "lonlat.h"
@@ -30,10 +28,10 @@ LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
 	// Convert to radians:
-	float const lat_rad = deg_to_rad (lat());
-	float const lon_rad = deg_to_rad (lon());
-	float const rot_lat_rad = deg_to_rad (rotation.lat());
-	float const rot_lon_rad = deg_to_rad (rotation.lon());
+	float const lat_rad = lat().rad();
+	float const lon_rad = lon().rad();
+	float const rot_lat_rad = rotation.lat().rad();
+	float const rot_lon_rad = rotation.lon().rad();
 	// Get cartesian from polar coords:
 	float const x = -std::cos (lat_rad) * std::cos (lon_rad);
 	float const y = +std::cos (lat_rad) * std::sin (lon_rad);
@@ -64,8 +62,8 @@ LonLat::rotate (LonLat const& rotation)
 
 	// Back to LonLat:
 	float mag = std::sqrt (nx * nx + ny * ny);
-	_lat = rad_to_deg (std::atan2 (nz, mag));
-	_lon = rad_to_deg (std::atan2 (ny, nx));
+	_lat = 1_rad * std::atan2 (nz, mag);
+	_lon = 1_rad * std::atan2 (ny, nx);
 
 	return *this;
 }
@@ -81,8 +79,8 @@ LonLat::rotated (LonLat const& rotation) const
 QPointF
 LonLat::project_flat() const
 {
-	float const lat_rad = deg_to_rad (lat());
-	float const lon_rad = deg_to_rad (lon());
+	float const lat_rad = lat().rad();
+	float const lon_rad = lon().rad();
 
 	return {
 		+std::tan (lon_rad) / (1.f + std::tan (lon_rad) * std::tan (0.5f * lon_rad)) * std::cos (lat_rad),
@@ -91,22 +89,22 @@ LonLat::project_flat() const
 }
 
 
-LonLat::ValueType
+LonLat::ValueType::ValueType
 LonLat::haversine (LonLat const& other) const
 {
 	LonLat const& a = *this;
 	LonLat const& b = other;
 
-	ValueType dlat = deg_to_rad (b.lat() - a.lat());
-	ValueType dlon = deg_to_rad (b.lon() - a.lon());
+	ValueType::ValueType dlat = (b.lat() - a.lat()).rad();
+	ValueType::ValueType dlon = (b.lon() - a.lon()).rad();
 
-	ValueType latsin = std::sin (dlat / 2.0);
-	ValueType lonsin = std::sin (dlon / 2.0);
+	ValueType::ValueType latsin = std::sin (dlat / 2.0);
+	ValueType::ValueType lonsin = std::sin (dlon / 2.0);
 
-	ValueType z = latsin * latsin
-				+ lonsin * lonsin
-				* std::cos (deg_to_rad (a.lat()))
-				* std::cos (deg_to_rad (b.lat()));
+	ValueType::ValueType z = latsin * latsin
+						 + lonsin * lonsin
+						 * std::cos (a.lat().rad())
+						 * std::cos (b.lat().rad());
 
 	return 2.0 * std::atan2 (std::sqrt (z), std::sqrt (1.0 - z));
 }

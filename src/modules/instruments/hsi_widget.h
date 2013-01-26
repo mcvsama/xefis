@@ -35,7 +35,7 @@ using Xefis::NavaidStorage;
 
 class HSIWidget: public Xefis::InstrumentWidget
 {
-	typedef std::map<QString, Degrees> HeadingBugs;
+	typedef std::map<QString, Angle> HeadingBugs;
 
   public:
 	enum class DisplayMode
@@ -93,7 +93,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return current ture heading value.
 	 */
-	Degrees
+	Angle
 	true_heading() const;
 
 	/**
@@ -102,12 +102,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * correctly for HSI to display navaids and scales properly.
 	 */
 	void
-	set_true_heading (Degrees);
+	set_true_heading (Angle);
 
 	/**
 	 * Return current magnetic heading value.
 	 */
-	Degrees
+	Angle
 	magnetic_heading() const;
 
 	/**
@@ -116,7 +116,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * correctly for HSI to display navaids and scales properly.
 	 */
 	void
-	set_magnetic_heading (Degrees);
+	set_magnetic_heading (Angle);
 
 	/**
 	 * Toggle heading scale visibility.
@@ -127,14 +127,14 @@ class HSIWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return A/P magnetic heading.
 	 */
-	Degrees
+	Angle
 	ap_magnetic_heading() const;
 
 	/**
 	 * Set A/P magnetic heading.
 	 */
 	void
-	set_ap_magnetic_heading (Degrees);
+	set_ap_magnetic_heading (Angle);
 
 	/**
 	 * Set A/P heading visibility.
@@ -152,14 +152,14 @@ class HSIWidget: public Xefis::InstrumentWidget
 	/**
 	 * Flight path heading (track).
 	 */
-	Degrees
+	Angle
 	track() const;
 
 	/**
 	 * Set track magnetic heading.
 	 */
 	void
-	set_track (Degrees);
+	set_track (Angle);
 
 	/**
 	 * Set visibility of the track line.
@@ -232,7 +232,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Positive degrees means turning to the right, negative - to the left.
 	 */
 	void
-	set_track_deviation (Degrees degrees_per_mile);
+	set_track_deviation (Angle degrees_per_mile);
 
 	/**
 	 * Set track estimation visibility.
@@ -263,7 +263,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * \param	wind_mag_heading Direction from which wind comes.
 	 */
 	void
-	set_wind_information (Degrees wind_from_mag_heading, Knots wind_tas_speed);
+	set_wind_information (Angle wind_from_mag_heading, Knots wind_tas_speed);
 
 	/**
 	 * Set wind information visibility.
@@ -419,20 +419,20 @@ class HSIWidget: public Xefis::InstrumentWidget
 	NavaidStorage::Navaids	_fix_navs;
 	QPolygonF				_aircraft_shape;
 	QPolygonF				_ap_bug_shape;
-	Degrees					_limited_rotation;
+	Angle					_limited_rotation;
 	float					_r;
 	float					_q;
 
 	// Parameters:
 	DisplayMode				_display_mode				= DisplayMode::Expanded;
 	Miles					_range						= 1.f;
-	Degrees					_mag_heading				= 0.f;
-	Degrees					_true_heading				= 0.f;
+	Angle					_mag_heading				= 0_deg;
+	Angle					_true_heading				= 0_deg;
 	bool					_heading_visible			= false;
-	Degrees					_ap_mag_heading				= 0.f;
+	Angle					_ap_mag_heading				= 0_deg;
 	bool					_ap_heading_visible			= false;
 	bool					_ap_track_visible			= false;
-	Degrees					_track_deg					= 0.f;
+	Angle					_track_deg					= 0_deg;
 	bool					_track_visible				= false;
 	Knots					_ground_speed				= 0.f;
 	bool					_ground_speed_visible		= false;
@@ -440,15 +440,15 @@ class HSIWidget: public Xefis::InstrumentWidget
 	bool					_true_air_speed_visible		= false;
 	float					_mach						= 0.f;
 	bool					_mach_visible				= false;
-	Degrees					_track_deviation			= 0.f;
+	Angle					_track_deviation			= 0_deg;
 	bool					_trend_vector_visible		= false;
 	Miles					_trend_vector_lookahead		= 5.f;
 	Miles					_altitude_reach_distance	= 0.f;
 	bool					_altitude_reach_visible		= false;
-	Degrees					_wind_from_mag_heading		= 0.f;
+	Angle					_wind_from_mag_heading		= 0_deg;
 	Knots					_wind_tas_speed				= 0.f;
 	bool					_wind_information_visible	= false;
-	LonLat					_position					= { 0.f, 0.f };
+	LonLat					_position					= { 0_deg, 0_deg };
 	bool					_dotted_earth_visible		= false;
 	bool					_navaids_visible			= false;
 	bool					_vor_visible				= false;
@@ -491,7 +491,7 @@ HSIWidget::set_range (Miles miles)
 }
 
 
-inline Degrees
+inline Angle
 HSIWidget::true_heading() const
 {
 	return _true_heading;
@@ -499,14 +499,14 @@ HSIWidget::true_heading() const
 
 
 inline void
-HSIWidget::set_true_heading (Degrees degrees)
+HSIWidget::set_true_heading (Angle degrees)
 {
 	_true_heading = degrees;
 	update();
 }
 
 
-inline Degrees
+inline Angle
 HSIWidget::magnetic_heading() const
 {
 	return _mag_heading;
@@ -514,7 +514,7 @@ HSIWidget::magnetic_heading() const
 
 
 inline void
-HSIWidget::set_magnetic_heading (Degrees degrees)
+HSIWidget::set_magnetic_heading (Angle degrees)
 {
 	_mag_heading = degrees;
 	update();
@@ -529,7 +529,7 @@ HSIWidget::set_heading_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 HSIWidget::ap_magnetic_heading() const
 {
 	return _ap_mag_heading;
@@ -537,7 +537,7 @@ HSIWidget::ap_magnetic_heading() const
 
 
 inline void
-HSIWidget::set_ap_magnetic_heading (Degrees heading)
+HSIWidget::set_ap_magnetic_heading (Angle heading)
 {
 	_ap_mag_heading = heading;
 	update();
@@ -560,7 +560,7 @@ HSIWidget::set_ap_track_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 HSIWidget::track() const
 {
 	return _track_deg;
@@ -568,7 +568,7 @@ HSIWidget::track() const
 
 
 inline void
-HSIWidget::set_track (Degrees heading)
+HSIWidget::set_track (Angle heading)
 {
 	_track_deg = heading;
 	update();
@@ -661,7 +661,7 @@ HSIWidget::set_position (LonLat const& position)
 
 
 inline void
-HSIWidget::set_track_deviation (Degrees degrees_per_mile)
+HSIWidget::set_track_deviation (Angle degrees_per_mile)
 {
 	_track_deviation = degrees_per_mile;
 	update();
@@ -701,7 +701,7 @@ HSIWidget::set_altitude_reach_visible (bool visible)
 
 
 inline void
-HSIWidget::set_wind_information (Degrees wind_from_mag_heading, Knots wind_tas_speed)
+HSIWidget::set_wind_information (Angle wind_from_mag_heading, Knots wind_tas_speed)
 {
 	_wind_from_mag_heading = wind_from_mag_heading;
 	_wind_tas_speed = wind_tas_speed;

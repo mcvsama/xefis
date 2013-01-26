@@ -104,19 +104,19 @@ HSI::read()
 
 	_hsi_widget->set_heading_visible (_mag_heading_deg.valid());
 	if (_mag_heading_deg.valid())
-		_hsi_widget->set_magnetic_heading (*_mag_heading_deg);
+		_hsi_widget->set_magnetic_heading (1_deg * *_mag_heading_deg);
 
 	_hsi_widget->set_navaids_visible (_true_heading_deg.valid());
 	if (_true_heading_deg.valid())
-		_hsi_widget->set_true_heading (*_true_heading_deg);
+		_hsi_widget->set_true_heading (1_deg * *_true_heading_deg);
 
 	_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
-		_hsi_widget->set_ap_magnetic_heading (*_autopilot_heading_setting_deg);
+		_hsi_widget->set_ap_magnetic_heading (1_deg * *_autopilot_heading_setting_deg);
 
 	_hsi_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
-		_hsi_widget->set_track (*_track_deg);
+		_hsi_widget->set_track (1_deg * *_track_deg);
 
 	_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
@@ -127,12 +127,12 @@ HSI::read()
 		_hsi_widget->set_true_air_speed (*_tas_kt);
 
 	if (_position_lat_deg.valid() && _position_lon_deg.valid())
-		_hsi_widget->set_position (LonLat (*_position_lon_deg, *_position_lat_deg));
+		_hsi_widget->set_position (LonLat (1_deg * *_position_lon_deg, 1_deg * *_position_lat_deg));
 
 	if (_wind_from_mag_heading_deg.valid() && _wind_tas_kt.valid())
 	{
 		_hsi_widget->set_wind_information_visible (true);
-		_hsi_widget->set_wind_information (*_wind_from_mag_heading_deg, *_wind_tas_kt);
+		_hsi_widget->set_wind_information (1_deg * *_wind_from_mag_heading_deg, *_wind_tas_kt);
 	}
 	else
 		_hsi_widget->set_wind_information_visible (false);
@@ -148,7 +148,7 @@ HSI::estimate_track()
 		return;
 	}
 
-	LonLat current_position (*_position_lon_deg, *_position_lat_deg);
+	LonLat current_position (1_deg * *_position_lon_deg, 1_deg * *_position_lat_deg);
 
 	if (!_positions_valid)
 	{
@@ -167,18 +167,18 @@ HSI::estimate_track()
 	}
 
 	double len10 = _positions[1].haversine_nm (_positions[0]);
-	Degrees alpha = -180.0 + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
-	Degrees beta_per_mile = alpha / len10;
+	Angle alpha = -180.0_deg + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
+	Angle beta_per_mile = alpha / len10;
 
-	if (!std::isinf (beta_per_mile) && !std::isnan (beta_per_mile))
+	if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
 	{
 		bool visible = _positions[2].haversine_nm (_positions[0]) > 2.f * epsilon;
 		if (visible)
-			beta_per_mile = _trend_vector_smoother.process (beta_per_mile);
+			beta_per_mile = 1_deg * _trend_vector_smoother.process (beta_per_mile.deg());
 
 		_hsi_widget->set_trend_vector_visible (visible);
 		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
-		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0, +180.0));
+		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0_deg, +180.0_deg));
 	}
 }
 

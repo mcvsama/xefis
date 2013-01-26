@@ -84,12 +84,15 @@ NavaidStorage::parse_nav_dat()
 		QString identifier;
 		Miles range;
 		QString name;
+		float pos_lon;
+		float pos_lat;
 
-		line_ts >> type_int >> pos.lat() >> pos.lon();
+		line_ts >> type_int >> pos_lat >> pos_lon;
 
 		if (type_int == 99) // EOF sentinel
 			break;
 
+		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 		type = static_cast<Navaid::Type> (type_int);
 
 		switch (type)
@@ -103,15 +106,15 @@ NavaidStorage::parse_nav_dat()
 
 			case Navaid::VOR:
 			{
-				Degrees slaved_variation;
-				line_ts >> amsl >> khz >> range >> slaved_variation >> identifier;
+				float slaved_variation_deg;
+				line_ts >> amsl >> khz >> range >> slaved_variation_deg >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, range);
 				navaid.set_frequency (khz * 10.f);
-				navaid.set_slaved_variation (slaved_variation);
+				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
 				navaid.set_amsl (amsl);
 				if (name.endsWith ("VOR-DME"))
 					navaid.set_vor_type (Navaid::VOR_DME);
@@ -126,17 +129,17 @@ NavaidStorage::parse_nav_dat()
 			case Navaid::LOC:		// ILS localizer
 			case Navaid::LOCSA:		// Stand-alone localizer
 			{
-				Degrees true_bearing;
+				float true_bearing_deg;
 				QString icao;
 				QString runway;
-				line_ts >> amsl >> khz >> range >> true_bearing >> identifier >> icao >> runway;
+				line_ts >> amsl >> khz >> range >> true_bearing_deg >> identifier >> icao >> runway;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, range);
 				navaid.set_frequency (khz * 10.f);
-				navaid.set_true_bearing (true_bearing);
+				navaid.set_true_bearing (1_deg * true_bearing_deg);
 				navaid.set_amsl (amsl);
 				navaid.set_icao (icao);
 				navaid.set_runway (runway);
@@ -184,11 +187,15 @@ NavaidStorage::parse_fix_dat()
 
 		LonLat pos;
 		QString identifier;
+		float pos_lon;
+		float pos_lat;
 
-		line_ts >> pos.lat() >> pos.lon() >> identifier;
+		line_ts >> pos_lat >> pos_lon >> identifier;
 
-		if (pos.lat() == 99.0) // EOF sentinel
+		if (pos_lat == 99.0) // EOF sentinel
 			break;
+
+		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 
 		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0.f));
 	}

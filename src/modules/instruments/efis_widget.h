@@ -88,14 +88,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return current pitch value.
 	 */
-	Degrees
+	Angle
 	pitch() const;
 
 	/**
 	 * Set pitch value.
 	 */
 	void
-	set_pitch (Degrees);
+	set_pitch (Angle);
 
 	/**
 	 * Toggle pitch scale visibility.
@@ -107,27 +107,27 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return current roll value.
 	 */
-	Degrees
+	Angle
 	roll() const;
 
 	/**
 	 * Return roll limit.
 	 */
-	Degrees
+	Angle
 	roll_limit() const;
 
 	/**
 	 * Set roll value.
 	 */
 	void
-	set_roll (Degrees);
+	set_roll (Angle);
 
 	/**
 	 * Set roll limit, where indicator will turn solid amber.
 	 * 0.f disables the limit.
 	 */
 	void
-	set_roll_limit (Degrees limit);
+	set_roll_limit (Angle limit);
 
 	/**
 	 * Toggle roll scale visibility.
@@ -139,14 +139,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return current heading value.
 	 */
-	Degrees
+	Angle
 	heading() const;
 
 	/**
 	 * Set heading value.
 	 */
 	void
-	set_heading (Degrees);
+	set_heading (Angle);
 
 	/**
 	 * Toggle heading scale visibility.
@@ -194,26 +194,26 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Flight path vertical deviation.
 	 */
-	Degrees
+	Angle
 	flight_path_alpha() const;
 
 	/**
 	 * Set flight path vertical deviation.
 	 */
 	void
-	set_flight_path_alpha (Degrees);
+	set_flight_path_alpha (Angle);
 
 	/**
 	 * Flight path horizontal deviation.
 	 */
-	Degrees
+	Angle
 	flight_path_beta() const;
 
 	/**
 	 * Set flight path horizontal deviation.
 	 */
 	void
-	set_flight_path_beta (Degrees);
+	set_flight_path_beta (Angle);
 
 	/**
 	 * Set visibility of the Flight Path Marker.
@@ -538,14 +538,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return flight director alpha.
 	 */
-	Degrees
+	Angle
 	flight_director_pitch() const;
 
 	/**
 	 * Set flight director pitch.
 	 */
 	void
-	set_flight_director_pitch (Degrees pitch);
+	set_flight_director_pitch (Angle pitch);
 
 	/**
 	 * Set flight director pitch visibility.
@@ -556,14 +556,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return flight director roll.
 	 */
-	Degrees
+	Angle
 	flight_director_roll() const;
 
 	/**
 	 * Set flight director roll.
 	 */
 	void
-	set_flight_director_roll (Degrees roll);
+	set_flight_director_roll (Angle roll);
 
 	/**
 	 * Set flight director roll visibility.
@@ -654,14 +654,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
-	Degrees
+	Angle
 	fov() const;
 
 	/**
 	 * Set field of view.
 	 */
 	void
-	set_fov (Degrees);
+	set_fov (Angle);
 
 	/**
 	 * Set input alert visibility.
@@ -848,10 +848,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	update_blinker (QTimer* warning_timer, bool condition, bool* blink_state);
 
 	float
-	pitch_to_px (Degrees degrees) const;
+	pitch_to_px (Angle degrees) const;
 
 	float
-	heading_to_px (Degrees degrees) const;
+	heading_to_px (Angle degrees) const;
 
 	QPainterPath
 	get_pitch_scale_clipping_path() const;
@@ -872,7 +872,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QTransform			_roll_transform;
 	QTransform			_heading_transform;
 	QTransform			_horizon_transform;
-	Degrees				_fov							= 120.f;
+	Angle				_fov							= 120_deg;
 	bool				_input_alert_visible			= false;
 	TextPainter::Cache	_text_painter_cache;
 	QTimer*				_speed_blinking_warning			= nullptr;
@@ -943,19 +943,19 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Parameters
 	 */
 
-	Degrees				_pitch							= 0.f;
+	Angle				_pitch							= 0_deg;
 	bool				_pitch_visible					= false;
-	Degrees				_roll							= 0.f;
-	Degrees				_roll_limit						= 0.f;
+	Angle				_roll							= 0_deg;
+	Angle				_roll_limit						= 0_deg;
 	bool				_roll_visible					= false;
-	Degrees				_heading						= 0.f;
+	Angle				_heading						= 0_deg;
 	bool				_heading_visible				= false;
 	bool				_heading_numbers_visible		= false;
 	float				_slip_skid						= 0.f;
 	float				_slip_skid_limit				= 0.f;
 	bool				_slip_skid_visible				= false;
-	Degrees				_flight_path_alpha				= 0.f;
-	Degrees				_flight_path_beta				= 0.f;
+	Angle				_flight_path_alpha				= 0_deg;
+	Angle				_flight_path_beta				= 0_deg;
 	bool				_flight_path_visible			= false;
 	Knots				_speed							= 0.f;
 	bool				_speed_visible					= false;
@@ -990,9 +990,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_ap_climb_rate_visible			= false;
 	Knots				_at_speed						= 0.f;
 	bool				_at_speed_visible				= false;
-	Degrees				_flight_director_pitch			= 0.f;
+	Angle				_flight_director_pitch			= 0_deg;
 	bool				_flight_director_pitch_visible	= false;
-	Degrees				_flight_director_roll			= 0.f;
+	Angle				_flight_director_roll			= 0_deg;
 	bool				_flight_director_roll_visible	= false;
 	bool				_navigation_needles_visible		= false;
 	float				_navigation_gs_needle			= 0.f;
@@ -1064,7 +1064,7 @@ EFISWidget::set_altitude_ladder_extent (int feet)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::pitch() const
 {
 	return _pitch;
@@ -1072,7 +1072,7 @@ EFISWidget::pitch() const
 
 
 inline void
-EFISWidget::set_pitch (Degrees degrees)
+EFISWidget::set_pitch (Angle degrees)
 {
 	_pitch = degrees;
 	update();
@@ -1087,14 +1087,14 @@ EFISWidget::set_pitch_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::roll() const
 {
 	return _roll;
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::roll_limit() const
 {
 	return _roll_limit;
@@ -1102,7 +1102,7 @@ EFISWidget::roll_limit() const
 
 
 inline void
-EFISWidget::set_roll (Degrees degrees)
+EFISWidget::set_roll (Angle degrees)
 {
 	_roll = degrees;
 	update();
@@ -1110,7 +1110,7 @@ EFISWidget::set_roll (Degrees degrees)
 
 
 inline void
-EFISWidget::set_roll_limit (Degrees limit)
+EFISWidget::set_roll_limit (Angle limit)
 {
 	_roll_limit = limit;
 	update();
@@ -1125,7 +1125,7 @@ EFISWidget::set_roll_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::heading() const
 {
 	return _heading;
@@ -1133,7 +1133,7 @@ EFISWidget::heading() const
 
 
 inline void
-EFISWidget::set_heading (Degrees degrees)
+EFISWidget::set_heading (Angle degrees)
 {
 	_heading = degrees;
 	update();
@@ -1194,7 +1194,7 @@ EFISWidget::set_slip_skid_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::flight_path_alpha() const
 {
 	return _flight_path_alpha;
@@ -1202,14 +1202,14 @@ EFISWidget::flight_path_alpha() const
 
 
 inline void
-EFISWidget::set_flight_path_alpha (Degrees pitch)
+EFISWidget::set_flight_path_alpha (Angle pitch)
 {
 	_flight_path_alpha = pitch;
 	update();
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::flight_path_beta() const
 {
 	return _flight_path_beta;
@@ -1217,7 +1217,7 @@ EFISWidget::flight_path_beta() const
 
 
 inline void
-EFISWidget::set_flight_path_beta (Degrees heading)
+EFISWidget::set_flight_path_beta (Angle heading)
 {
 	_flight_path_beta = heading;
 	update();
@@ -1645,7 +1645,7 @@ EFISWidget::set_at_speed_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::flight_director_pitch() const
 {
 	return _flight_director_pitch;
@@ -1653,7 +1653,7 @@ EFISWidget::flight_director_pitch() const
 
 
 inline void
-EFISWidget::set_flight_director_pitch (Degrees pitch)
+EFISWidget::set_flight_director_pitch (Angle pitch)
 {
 	_flight_director_pitch = pitch;
 	update();
@@ -1668,7 +1668,7 @@ EFISWidget::set_flight_director_pitch_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::flight_director_roll() const
 {
 	return _flight_director_roll;
@@ -1676,7 +1676,7 @@ EFISWidget::flight_director_roll() const
 
 
 inline void
-EFISWidget::set_flight_director_roll (Degrees roll)
+EFISWidget::set_flight_director_roll (Angle roll)
 {
 	_flight_director_roll = roll;
 	update();
@@ -1791,7 +1791,7 @@ EFISWidget::set_dme_distance_visible (bool visible)
 }
 
 
-inline Degrees
+inline Angle
 EFISWidget::fov() const
 {
 	return _fov;
@@ -1799,7 +1799,7 @@ EFISWidget::fov() const
 
 
 inline void
-EFISWidget::set_fov (Degrees degrees)
+EFISWidget::set_fov (Angle degrees)
 {
 	_fov = degrees;
 	update();
@@ -1842,7 +1842,7 @@ EFISWidget::blink_baro()
 
 
 inline float
-EFISWidget::pitch_to_px (Degrees degrees) const
+EFISWidget::pitch_to_px (Angle degrees) const
 {
 	float const correction = 0.775f;
 	return -degrees / (_fov * correction) * wh();
@@ -1850,7 +1850,7 @@ EFISWidget::pitch_to_px (Degrees degrees) const
 
 
 inline float
-EFISWidget::heading_to_px (Degrees degrees) const
+EFISWidget::heading_to_px (Angle degrees) const
 {
 	return pitch_to_px (-degrees);
 }

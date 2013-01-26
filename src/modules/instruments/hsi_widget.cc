@@ -185,14 +185,14 @@ void
 HSIWidget::paintEvent (QPaintEvent*)
 {
 	_mag_heading_transform.reset();
-	_mag_heading_transform.rotate (-_mag_heading);
+	_mag_heading_transform.rotate (-_mag_heading.deg());
 	_true_heading_transform.reset();
-	_true_heading_transform.rotate (-_true_heading);
+	_true_heading_transform.rotate (-_true_heading.deg());
 
 	switch (_display_mode)
 	{
 		case DisplayMode::Auxiliary:
-			_limited_rotation = bound (floored_mod (_ap_mag_heading - _mag_heading + 180.0, 360.0) - 180.0, -96.0, +96.0);
+			_limited_rotation = bound (floored_mod (_ap_mag_heading - _mag_heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
 			break;
 
 		default:
@@ -238,7 +238,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 	// MAG heading
 	if (_heading_visible)
 	{
-		int hdg = static_cast<int> (_mag_heading + 0.5f) % 360;
+		int hdg = static_cast<int> (_mag_heading.deg() + 0.5f) % 360;
 
 		switch (_display_mode)
 		{
@@ -358,7 +358,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	// Track triangle:
 	painter.setClipRect (_map_clip_rect);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate (_track_deg - _mag_heading);
+	painter.rotate ((_track_deg - _mag_heading).deg());
 
 	painter.setPen (get_pen (Qt::white, 2.f));
 	painter.translate (0.f, -_r);
@@ -404,12 +404,12 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 		painter.setClipRect (_trend_vector_clip_rect);
 
 		Miles const step = trend_range / 50.f;
-		Degrees const degrees_per_step = step * _track_deviation;
+		Angle const angle_per_step = step * _track_deviation;
 
 		for (float pos = 0.f; pos < trend_range; pos += step)
 		{
 			float px = nm_to_px (step);
-			painter.rotate (degrees_per_step);
+			painter.rotate (angle_per_step.deg());
 			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -px));
 			painter.translate (0.f, -px);
 		}
@@ -428,7 +428,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 	painter.setClipRect (_map_clip_rect);
 
 	QTransform transform = _aircraft_center_transform;
-	transform.rotate (_limited_rotation);
+	transform.rotate (_limited_rotation.deg());
 	transform.translate (0.f, -_r);
 
 	QPen pen_1 = _autopilot_pen_1;
@@ -449,7 +449,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 		painter.setClipping (false);
 
 		QString text_1 = "SEL  HDG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading + 0.5f));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading.deg() + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
@@ -477,7 +477,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 			painter.setClipPath (_outer_map_clip);
 			painter.setPen (pen);
 			painter.setTransform (_aircraft_center_transform);
-			painter.rotate (_ap_mag_heading - _mag_heading);
+			painter.rotate ((_ap_mag_heading - _mag_heading).deg());
 			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
 		}
 	}
@@ -582,14 +582,14 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 	if (_wind_information_visible)
 	{
 		QString wind_str = QString ("%1°/%2")
-			.arg (static_cast<long> (_wind_from_mag_heading), 3, 10, QChar ('0'))
+			.arg (static_cast<long> (_wind_from_mag_heading.deg()), 3, 10, QChar ('0'))
 			.arg (static_cast<long> (_wind_tas_speed), 3, 10, QChar (L'\u2007'));
 		painter.resetTransform();
 		painter.translate (0.2f * _q, metr_b.height());
 		painter.setPen (get_pen (Qt::white, 1.2f));
 		text_painter.drawText (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
-		painter.translate (0.9f * _q, 0.9f * _q + metr_b.height());
-		painter.rotate (_wind_from_mag_heading - _mag_heading + 180.f);
+		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
+		painter.rotate ((_wind_from_mag_heading - _mag_heading + 180_deg).deg());
 		QPointF a = QPointF (0.f, -0.7f * _q);
 		QPointF b = QPointF (0.f, +0.7f * _q);
 		painter.drawLine (a, b);
@@ -618,7 +618,7 @@ HSIWidget::paint_dotted_earth (QPainter& painter)
 	{
 		for (float lon = -180; lon < 180; lon += 10)
 		{
-			LonLat point_on_earth (lon, lat);
+			LonLat point_on_earth (1_deg * lon, 1_deg * lat);
 
 			if (point_on_earth.haversine (_position) >= 1.7)
 				continue;
@@ -784,7 +784,7 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 		QTransform transform = _aircraft_center_transform;
 		transform.translate (navaid_pos.x(), navaid_pos.y());
 		transform = _true_heading_transform * transform;
-		transform.rotate (navaid.true_bearing());
+		transform.rotate (navaid.true_bearing().deg());
 
 		float const line_1 = nm_to_px (navaid.range());
 		float const line_2 = 1.03f * line_1;

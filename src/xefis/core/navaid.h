@@ -79,9 +79,9 @@ class Navaid
 	frequency() const;
 
 	void
-	set_slaved_variation (Degrees);
+	set_slaved_variation (Angle);
 
-	Degrees
+	Angle
 	slaved_variation() const;
 
 	void
@@ -91,9 +91,9 @@ class Navaid
 	amsl() const;
 
 	void
-	set_true_bearing (Degrees);
+	set_true_bearing (Angle);
 
-	Degrees
+	Angle
 	true_bearing() const;
 
 	void
@@ -133,9 +133,9 @@ class Navaid
 	QString	_name;
 	Miles	_range;
 	float	_frequency			= 0.f;
-	Degrees	_slaved_variation	= 0.f; // VOR only
+	Angle	_slaved_variation	= 0_deg; // VOR only
 	Feet	_amsl				= 0.f;
-	Degrees	_true_bearing		= 0.f; // LOC* only
+	Angle	_true_bearing		= 0_deg; // LOC* only
 	QString	_icao;
 	QString	_runway;
 	VorType	_vor_type;
@@ -210,13 +210,13 @@ Navaid::frequency() const
 
 
 inline void
-Navaid::set_slaved_variation (Degrees degrees)
+Navaid::set_slaved_variation (Angle degrees)
 {
 	_slaved_variation = degrees;
 }
 
 
-inline Degrees
+inline Angle
 Navaid::slaved_variation() const
 {
 	return _slaved_variation;
@@ -238,13 +238,13 @@ Navaid::amsl() const
 
 
 inline void
-Navaid::set_true_bearing (Degrees bearing)
+Navaid::set_true_bearing (Angle bearing)
 {
 	_true_bearing = bearing;
 }
 
 
-inline Degrees
+inline Angle
 Navaid::true_bearing() const
 {
 	return _true_bearing;
