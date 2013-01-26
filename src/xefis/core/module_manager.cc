@@ -19,12 +19,13 @@
 #include <xefis/core/module.h>
 
 // Modules:
+#include <computers/lookahead.h>
+#include <generic/property_tree.h>
 #include <io/flight_gear.h>
 #include <io/joystick.h>
 #include <instruments/efis.h>
 #include <instruments/hsi.h>
 #include <instruments/radial_indicator.h>
-#include <generic/property_tree.h>
 
 // Local:
 #include "module_manager.h"
@@ -64,6 +65,11 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 		module = new RadialIndicator (this, config, parent);
 		_modules.insert (module);
 	}
+	else if (name == "computers/lookahead")
+	{
+		module = new Lookahead (this, config);
+		_modules.insert (module);
+	}
 	else if (name == "generic/property-tree")
 	{
 		module = new PropertyTree (this, config, parent);
@@ -87,8 +93,11 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 
 
 void
-ModuleManager::data_update()
+ModuleManager::data_update (Timestamp timestamp)
 {
+	_update_dt = timestamp - _update_timestamp;
+	_update_timestamp = timestamp;
+
 	for (Module* mod: _modules)
 		mod->data_update();
 }

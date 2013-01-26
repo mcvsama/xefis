@@ -41,6 +41,7 @@
 									<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
 									<property name='track' path='/orientation/track.deg'/>
 									<property name='altitude' path='/altitude/amsl.ft'/>
+									<property name='altitude-lookahead' path='/altitude/amsl-lookahead.ft'/>
 									<property name='altitude-agl' path='/altitude/agl.ft'/>
 									<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
 									<property name='transition-altitude' path='//config/transition-altitude.ft' default='14000'/>

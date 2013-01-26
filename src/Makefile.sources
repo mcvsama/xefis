@@ -67,10 +67,23 @@ SRC_HEADERS += xefis/utility/one_pole_smoother.h
 SRC_HEADERS += xefis/utility/qdom.h
 SRC_HEADERS += xefis/utility/range.h
 SRC_HEADERS += xefis/utility/text_painter.h
+SRC_HEADERS += xefis/utility/timestamp.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
 SRC_SOURCES += xefis/utility/latlng.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
+
+######## /computers ########
+
+SRC_HEADERS += computers/lookahead.h
+
+SRC_SOURCES += computers/lookahead.cc
+
+######## /generic ########
+
+SRC_HEADERS += generic/property_tree.h
+
+SRC_SOURCES += generic/property_tree.cc
 
 ######## /io ########
 
@@ -82,12 +95,6 @@ SRC_SOURCES += io/joystick.cc
 
 SRC_MOCHDRS += io/flight_gear.h
 SRC_MOCHDRS += io/joystick.h
-
-######## /generic ########
-
-SRC_HEADERS += generic/property_tree.h
-
-SRC_SOURCES += generic/property_tree.cc
 
 ######## /instruments ########
 

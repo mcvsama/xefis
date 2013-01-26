@@ -61,6 +61,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "flight-path-marker-beta", _fpm_beta_deg, false },
 				{ "track", _track_deg, false },
 				{ "altitude", _altitude_ft, false },
+				{ "altitude-lookahead", _altitude_lookahead_ft, false },
 				{ "altitude-agl", _altitude_agl_ft, false },
 				{ "landing-altitude", _landing_altitude_ft, false },
 				{ "transition-altitude", _transition_altitude_ft, false },
@@ -177,6 +178,10 @@ EFIS::read()
 	_efis_widget->set_altitude_visible (_altitude_ft.valid());
 	if (_altitude_ft.valid())
 		_efis_widget->set_altitude (*_altitude_ft);
+
+	_efis_widget->set_altitude_tendency_visible (_altitude_lookahead_ft.valid());
+	if (_altitude_lookahead_ft.valid())
+		_efis_widget->set_altitude_tendency (*_altitude_lookahead_ft);
 
 	_efis_widget->set_altitude_agl_visible (_altitude_agl_ft.valid());
 	if (_altitude_agl_ft.valid())
