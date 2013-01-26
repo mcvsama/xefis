@@ -36,13 +36,13 @@ namespace Xefis {
 class PropertyUnion
 {
   public:
-	PropertyUnion (Property<bool>&);
+	PropertyUnion (PropertyBoolean&);
 
-	PropertyUnion (Property<int>&);
+	PropertyUnion (PropertyInteger&);
 
-	PropertyUnion (Property<double>&);
+	PropertyUnion (PropertyFloat&);
 
-	PropertyUnion (Property<std::string>&);
+	PropertyUnion (PropertyString&);
 
 	/**
 	 * Return property type.
@@ -60,42 +60,42 @@ class PropertyUnion
 	 * Return property reference.
 	 * Throw Exception if the real type is different.
 	 */
-	Property<bool>&
+	PropertyBoolean&
 	access_bool();
 
 	/**
 	 * Return property reference.
 	 * Throw Exception if the real type is different.
 	 */
-	Property<int>&
+	PropertyInteger&
 	access_int();
 
 	/**
 	 * Return property reference.
 	 * Throw Exception if the real type is different.
 	 */
-	Property<double>&
+	PropertyFloat&
 	access_float();
 
 	/**
 	 * Return property reference.
 	 * Throw Exception if the real type is different.
 	 */
-	Property<std::string>&
+	PropertyString&
 	access_string();
 
   private:
-	PropertyType			_type;
-	BaseProperty*			_property			= nullptr;
-	Property<bool>*			_property_bool		= nullptr;
-	Property<int>*			_property_int		= nullptr;
-	Property<double>*		_property_float		= nullptr;
-	Property<std::string>*	_property_string	= nullptr;
+	PropertyType		_type;
+	BaseProperty*		_property			= nullptr;
+	PropertyBoolean*	_property_bool		= nullptr;
+	PropertyInteger*	_property_int		= nullptr;
+	PropertyFloat*		_property_float		= nullptr;
+	PropertyString*		_property_string	= nullptr;
 };
 
 
 inline
-PropertyUnion::PropertyUnion (Property<bool>& property):
+PropertyUnion::PropertyUnion (PropertyBoolean& property):
 	_type (PropBoolean),
 	_property (&property),
 	_property_bool (&property)
@@ -103,7 +103,7 @@ PropertyUnion::PropertyUnion (Property<bool>& property):
 
 
 inline
-PropertyUnion::PropertyUnion (Property<int>& property):
+PropertyUnion::PropertyUnion (PropertyInteger& property):
 	_type (PropInteger),
 	_property (&property),
 	_property_int (&property)
@@ -111,7 +111,7 @@ PropertyUnion::PropertyUnion (Property<int>& property):
 
 
 inline
-PropertyUnion::PropertyUnion (Property<double>& property):
+PropertyUnion::PropertyUnion (PropertyFloat& property):
 	_type (PropFloat),
 	_property (&property),
 	_property_float (&property)
@@ -119,7 +119,7 @@ PropertyUnion::PropertyUnion (Property<double>& property):
 
 
 inline
-PropertyUnion::PropertyUnion (Property<std::string>& property):
+PropertyUnion::PropertyUnion (PropertyString& property):
 	_type (PropString),
 	_property (&property),
 	_property_string (&property)
@@ -140,28 +140,28 @@ PropertyUnion::access()
 }
 
 
-inline Property<bool>&
+inline PropertyBoolean&
 PropertyUnion::access_bool()
 {
 	return *_property_bool;
 }
 
 
-inline Property<int>&
+inline PropertyInteger&
 PropertyUnion::access_int()
 {
 	return *_property_int;
 }
 
 
-inline Property<double>&
+inline PropertyFloat&
 PropertyUnion::access_float()
 {
 	return *_property_float;
 }
 
 
-inline Property<std::string>&
+inline PropertyString&
 PropertyUnion::access_string()
 {
 	return *_property_string;

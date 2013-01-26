@@ -68,6 +68,10 @@ NavaidStorage::parse_nav_dat()
 	file.open (QFile::ReadOnly);
 	QTextStream ts (&file);
 
+	// Skip two first lines (file origin and Copyrights):
+	ts.readLine();
+	ts.readLine();
+
 	while (!ts.atEnd())
 	{
 		QString line = ts.readLine();
@@ -179,6 +183,10 @@ NavaidStorage::parse_fix_dat()
 	QFile file (_fix_dat_file);
 	file.open (QFile::ReadOnly);
 	QTextStream ts (&file);
+
+	// Skip two first lines (file origin and Copyrights):
+	ts.readLine();
+	ts.readLine();
 
 	while (!ts.atEnd())
 	{

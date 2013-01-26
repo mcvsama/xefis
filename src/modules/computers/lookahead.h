@@ -39,8 +39,8 @@ class Lookahead: public Xefis::Module
 
   private:
 	Xefis::Timestamp		_last_update_time;
-	float					_last_value = 0.f;
-	Xefis::Smoother<float>	_output_smoother;
+	double					_last_value = 0.f;
+	Xefis::Smoother<double>	_output_smoother;
 
 	Xefis::PropertyFloat	_lookahead_time;
 	Xefis::PropertyFloat	_input;
