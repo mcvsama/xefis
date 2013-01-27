@@ -568,7 +568,7 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	QRectF box_0010 = box_0100.adjusted (digit_width, 0.f, 0.f, 0.f);
 	QRectF box_0001 = box_0010.adjusted (digit_width, 0.f, 0.f, 0.f);
 
-	painter.setPen (border_pen);
+	painter.setPen (QPen (Qt::white, 1.f));
 	painter.setFont (actual_speed_font);
 	if (_sl_digits == 4)
 		paint_rotating_digit (painter, text_painter, box_1000, _speed, 1000, 1.25f, 0.0005f, 0.5f, false, true);
