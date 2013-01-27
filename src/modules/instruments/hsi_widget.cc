@@ -44,18 +44,17 @@ HSIWidget::HSIWidget (QWidget* parent):
 void
 HSIWidget::update_more()
 {
-	_q = 0.1f * wh();
-
 	// Clips:
 	switch (_display_mode)
 	{
 		case DisplayMode::Expanded:
 		{
-			_r = 11.f * _q;
+			_q = 0.05f * height();
+			_r = 0.80f * height();
 			float const rx = nm_to_px (_range);
 
 			_aircraft_center_transform.reset();
-			_aircraft_center_transform.translate (0.5f * width(), 0.705 * height());
+			_aircraft_center_transform.translate (0.5f * width(), 0.9f * height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
@@ -71,8 +70,9 @@ HSIWidget::update_more()
 			break;
 		}
 
-		case DisplayMode::Centered:
+		case DisplayMode::Rose:
 		{
+			_q = 0.1f * wh();
 			_r = 7.5f * _q;
 			float const rx = nm_to_px (_range);
 
@@ -95,6 +95,7 @@ HSIWidget::update_more()
 
 		case DisplayMode::Auxiliary:
 		{
+			_q = 0.1f * wh();
 			_r = 6.5f * _q;
 			float const rx = nm_to_px (_range);
 
@@ -120,15 +121,6 @@ HSIWidget::update_more()
 			break;
 		}
 	}
-}
-
-
-void
-HSIWidget::resizeEvent (QResizeEvent* event)
-{
-	InstrumentWidget::resizeEvent (event);
-
-	update_more();
 
 	// Navaids pens:
 	_lo_loc_pen = QPen (Qt::blue, pen_width (0.8f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
@@ -178,6 +170,14 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 		point.rx() *= +0.5f;
 		point.ry() *= -0.5f;
 	}
+}
+
+
+void
+HSIWidget::resizeEvent (QResizeEvent* event)
+{
+	InstrumentWidget::resizeEvent (event);
+	update_more();
 }
 
 
@@ -289,7 +289,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 				rect_2.moveLeft (rect_v.right() + 0.2f * _q);
 
 				painter.setTransform (_aircraft_center_transform);
-				painter.translate (0.f, -1.135f * _r);
+				painter.translate (0.f, -_r - 1.05f * _q);
 				painter.setPen (get_pen (Qt::white, 1.f));
 				painter.setBrush (Qt::NoBrush);
 				painter.setFont (font_2);
@@ -520,7 +520,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
 			painter.drawEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
 			break;
 
-		case DisplayMode::Centered:
+		case DisplayMode::Rose:
 			painter.setClipping (false);
 			painter.setTransform (_aircraft_center_transform);
 			// 8 lines around the circle:

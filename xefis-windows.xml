@@ -92,8 +92,8 @@
 						<item stretch-factor='6'>
 							<module name='instruments/hsi'>
 								<properties path='/instrumentation'>
-									<property name='display-mode' path='//config/hsi-nav/display-mode' default='1'/>
-									<property name='range' path='//config/hsi-nav/range.kt' default='10'/>
+									<property name='display-mode' path='//config/hsi-nav/display-mode' default='0'/>
+									<property name='range' path='//config/hsi-nav/range.kt' default='80'/>
 									<property name='trend-vector-range' path='//config/hsi-nav/trend-vector-range.kt' default='2'/>
 									<property name='gs' path='/speed/gs.kt' default='0'/>
 									<property name='tas' path='/speed/tas.kt' default='0'/>

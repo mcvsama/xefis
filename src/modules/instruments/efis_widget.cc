@@ -1230,26 +1230,28 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	painter.setTransform (_al_transform);
 	painter.translate (0.f, 0.75f * x);
 
-	QFont font_a = _font_16_bold;
+	QFont font_a = _standard_pressure ? _font_13_bold : _font_16_bold;
 	QFont font_b = _font_10_bold;
+	QFontMetricsF metrics_a (font_a);
+	QFontMetricsF metrics_b (font_b);
 
 	QString in_str = "IN";
 	QString pressure_str = QString ("%1").arg (_pressure, 0, 'f', 2) + " ";
 
-	if (_standard_pressure)
-	{
-		in_str = "";
-		pressure_str = "STD";
-	}
-
-	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), QFontMetricsF (font_a).width (pressure_str), 1.2f * _font_16_digit_height);
-	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (in_str), nn_rect.height());
+	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
+	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (in_str), nn_rect.height());
 	nn_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
 	// Correct position of zz_rect to get correct baseline position:
-	zz_rect.translate (0.f, QFontMetricsF (font_b).descent() - QFontMetricsF (font_a).descent());
+	zz_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
 	zz_rect.moveLeft (nn_rect.right());
 
 	painter.setPen (QPen (_navigation_color, pen_width()));
+	if (_standard_pressure)
+	{
+		text_painter.drawText (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD");
+		painter.translate (0.f, 0.9f * metrics_a.height());
+		painter.setPen (QPen (Qt::white, 1.f));
+	}
 	painter.setFont (font_a);
 	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str);
 	painter.setFont (font_b);

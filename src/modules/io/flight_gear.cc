@@ -46,6 +46,7 @@ struct FGData
 	FGDouble	ias_lookahead_kt;				// iasl
 	FGDouble	maximum_ias_kt;					// iasma
 	FGDouble	minimum_ias_kt;					// iasmi
+	FGBool		standard_pressure;				// std
 	FGDouble	altitude_ft;					// al
 	FGDouble	altitude_agl_ft;				// alr
 	FGDouble	pressure_inhg;					// als
@@ -109,6 +110,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 						{ "flight-path-marker-beta", _fpm_beta_deg, false },
 						{ "track", _track_deg, false },
+						{ "standard-pressure", _standard_pressure, false },
 						{ "altitude", _altitude_ft, false },
 						{ "altitude-agl", _altitude_agl_ft, false },
 						{ "landing-altitude", _landing_altitude_ft, false },
@@ -189,6 +191,7 @@ FlightGearIO::read_binary_input()
 		ASSIGN (ias_lookahead_kt);
 		ASSIGN (maximum_ias_kt);
 		ASSIGN (minimum_ias_kt);
+		ASSIGN (standard_pressure);
 		ASSIGN (altitude_ft);
 		ASSIGN (altitude_agl_ft);
 		ASSIGN (pressure_inhg);
@@ -261,6 +264,7 @@ FlightGearIO::invalidate_all()
 		&_fpm_alpha_deg,
 		&_fpm_beta_deg,
 		&_track_deg,
+		&_standard_pressure,
 		&_altitude_ft,
 		&_altitude_agl_ft,
 		&_landing_altitude_ft,
