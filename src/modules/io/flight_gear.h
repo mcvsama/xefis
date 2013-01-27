@@ -45,10 +45,10 @@ class FlightGearIO:
 
   private slots:
 	/**
-	 * Read and apply FlightGear datagrams from UDP socket.
+	 * Read and apply FlightGear datagrams in binary mode from UDP socket.
 	 */
 	void
-	read_input();
+	read_binary_input();
 
 	/**
 	 * Set all input properties as invalid.
@@ -63,10 +63,6 @@ class FlightGearIO:
 	QUdpSocket*				_input						= nullptr;
 	QByteArray				_datagram;
 	std::string				_property_path;
-	double					_prev_position_lat_deg		= 0.f;
-	bool					_prev_position_lat_valid	= false;
-	double					_prev_position_lng_deg		= 0.f;
-	bool					_prev_position_lng_valid	= false;
 
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
