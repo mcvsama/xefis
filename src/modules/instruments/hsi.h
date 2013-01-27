@@ -65,7 +65,7 @@ class HSI: public Xefis::Instrument
 	HSIWidget*				_hsi_widget				= nullptr;
 	std::array<LonLat, 3>	_positions;
 	bool					_positions_valid		= false;
-	Xefis::Smoother<float>	_trend_vector_smoother	= 60.0; // TODO make fps independent
+	Xefis::Smoother<double>	_trend_vector_smoother	= 50.0; // TODO make fps independent
 
 	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyFloat	_range;

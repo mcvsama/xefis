@@ -157,7 +157,7 @@ HSI::estimate_track()
 	}
 
 	// Estimate only if the distance between last and current positions is > 0.02nm.
-	Miles epsilon = 0.02; // TODO _nm
+	Miles epsilon = 0.005; // TODO _nm
 	if (_positions[0].haversine_nm (current_position) > epsilon)
 	{
 		// Shift data in _positions:
@@ -166,7 +166,8 @@ HSI::estimate_track()
 		_positions[0] = current_position;
 	}
 
-	float len10 = _positions[1].haversine_nm (_positions[0]);
+	double len10 = _positions[1].haversine_nm (_positions[0]);
+
 	Angle alpha = -180.0_deg + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
 	Angle beta_per_mile = alpha / len10;
 
