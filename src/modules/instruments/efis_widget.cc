@@ -1548,7 +1548,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		float offset = bound (_navigation_hd_needle, -1.f, +1.f);
 
 		painter.setTransform (_center_transform);
-		painter.translate (0.f, 0.28f * wh());
+		painter.translate (0.f, 0.26f * wh());
 
 		QPointF tps[] = { QPointF (-w, 0.f), QPointF (0.f, 0.f), QPointF (+w, 0.f) };
 		QPointF bps[] = { QPointF (-w * p, h), QPointF (0.f, h), QPointF (+w * p, h) };
