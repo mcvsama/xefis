@@ -5,6 +5,8 @@ Qt-based EFIS and EICAS that can work on Raspberry-Pi, but utterly slowly.
 
 Right now it can be used with FlightGear.
 
+![XEFIS](http://mcv.mulabs.org/app/xefis/screenshot-001.png)
+
 Required depenencies
 ====================
 
