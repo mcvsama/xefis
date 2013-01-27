@@ -79,6 +79,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
 	Xefis::PropertyFloat	_track_deg;
+	Xefis::PropertyFloat	_standard_pressure;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;
 	Xefis::PropertyFloat	_landing_altitude_ft;

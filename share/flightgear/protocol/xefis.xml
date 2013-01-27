@@ -144,6 +144,11 @@
 			</chunk>
 			<!-- Altitude -->
 			<chunk>
+				<name>std</name>
+				<type>bool</type>
+				<node>/instrumentation/inputs/setting-std</node>
+			</chunk>
+			<chunk>
 				<name>al</name>
 				<type>double</type>
 				<node>/instrumentation/altimeter/indicated-altitude-ft</node>

@@ -49,7 +49,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		 * Aircraft is shown in the center of the widget. Map covers all directions
 		 * of the aircraft. This is useful mode to use with VOR/ILS navigation.
 		 */
-		Centered,
+		Rose,
 
 		/**
 		 * Similar to the Expanded mode, but less information is displayed.

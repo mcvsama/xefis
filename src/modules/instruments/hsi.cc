@@ -97,7 +97,7 @@ HSI::read()
 		if (*_display_mode == 0)
 			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Expanded);
 		else if (*_display_mode == 1)
-			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Centered);
+			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Rose);
 		else
 			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Auxiliary);
 	}

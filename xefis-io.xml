@@ -24,6 +24,7 @@
 					<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
 					<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
 					<property name='track' path='/orientation/track.deg'/>
+					<property name='standard-pressure' path='/configuration/pressure/standard-pressure'/>
 					<property name='altitude' path='/altitude/amsl.ft'/>
 					<property name='altitude-agl' path='/altitude/agl.ft'/>
 					<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
