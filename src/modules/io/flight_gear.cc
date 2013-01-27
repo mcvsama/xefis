@@ -169,10 +169,6 @@ FlightGearIO::read_binary_input()
 		if (_datagram.size() < datagram_size)
 			_datagram.resize (datagram_size);
 
-		bool navigation_dme_ok = false;
-		bool navigation_gs_needle_ok = false;
-		bool navigation_hd_needle_ok = false;
-
 		_input->readDatagram (_datagram.data(), datagram_size, nullptr, nullptr);
 		FGData* fg_data = reinterpret_cast<FGData*> (_datagram.data());
 
@@ -222,11 +218,11 @@ FlightGearIO::read_binary_input()
 
 #undef ASSIGN
 
-		if (!navigation_gs_needle_ok && !_navigation_gs_needle.is_singular())
+		if (!fg_data->navigation_gs_needle_ok && !_navigation_gs_needle.is_singular())
 			_navigation_gs_needle.set_nil();
-		if (!navigation_hd_needle_ok && !_navigation_hd_needle.is_singular())
+		if (!fg_data->navigation_hd_needle_ok && !_navigation_hd_needle.is_singular())
 			_navigation_hd_needle.set_nil();
-		if (!navigation_dme_ok && !_dme_distance_nm.is_singular())
+		if (!fg_data->navigation_dme_ok && !_dme_distance_nm.is_singular())
 			_dme_distance_nm.set_nil();
 	}
 
