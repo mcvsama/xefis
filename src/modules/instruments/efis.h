@@ -48,7 +48,7 @@ class EFIS: public Xefis::Instrument
 
   protected:
 	void
-	data_update() override;
+	data_updated() override;
 
   private:
 	EFISWidget*				_efis_widget = nullptr;
@@ -101,7 +101,7 @@ class EFIS: public Xefis::Instrument
 
 
 inline void
-EFIS::data_update()
+EFIS::data_updated()
 {
 	read();
 }

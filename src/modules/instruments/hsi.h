@@ -52,7 +52,7 @@ class HSI: public Xefis::Instrument
 
   protected:
 	void
-	data_update() override;
+	data_updated() override;
 
   private:
 	void
@@ -89,7 +89,7 @@ class HSI: public Xefis::Instrument
 
 
 inline void
-HSI::data_update()
+HSI::data_updated()
 {
 	read();
 }

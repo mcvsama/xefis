@@ -83,20 +83,20 @@ Application::quit()
 
 
 void
-Application::data_update()
+Application::data_updated()
 {
-	postEvent (this, new DataUpdateEvent (Timestamp::now()));
+	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
 }
 
 
 bool
 Application::event (QEvent* event)
 {
-	DataUpdateEvent* data_update_event = dynamic_cast<DataUpdateEvent*> (event);
+	DataUpdatedEvent* data_update_event = dynamic_cast<DataUpdatedEvent*> (event);
 
 	if (data_update_event)
 	{
-		_module_manager->data_update (data_update_event->timestamp());
+		_module_manager->data_updated (data_update_event->timestamp());
 		return true;
 	}
 	else

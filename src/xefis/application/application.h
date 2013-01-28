@@ -34,10 +34,10 @@ class ConfigReader;
 
 class Application: public QApplication
 {
-	class DataUpdateEvent: public QEvent
+	class DataUpdatedEvent: public QEvent
 	{
 	  public:
-		DataUpdateEvent (Timestamp);
+		DataUpdatedEvent (Timestamp);
 
 		Timestamp
 		timestamp() const;
@@ -64,7 +64,7 @@ class Application: public QApplication
 	 * from an IO module.
 	 */
 	void
-	data_update();
+	data_updated();
 
 	/**
 	 * Return pointer to navaid storage.
@@ -93,14 +93,14 @@ class Application: public QApplication
 
 
 inline
-Application::DataUpdateEvent::DataUpdateEvent (Timestamp timestamp):
+Application::DataUpdatedEvent::DataUpdatedEvent (Timestamp timestamp):
 	QEvent (QEvent::User),
 	_timestamp (timestamp)
 { }
 
 
 inline Timestamp
-Application::DataUpdateEvent::timestamp() const
+Application::DataUpdatedEvent::timestamp() const
 {
 	return _timestamp;
 }
