@@ -47,7 +47,7 @@ class RadialIndicator: public Xefis::Instrument
 
   protected:
 	void
-	data_update() override;
+	data_updated() override;
 
   private:
 	RadialIndicatorWidget*	_widget = nullptr;
@@ -63,7 +63,7 @@ class RadialIndicator: public Xefis::Instrument
 
 
 inline void
-RadialIndicator::data_update()
+RadialIndicator::data_updated()
 {
 	read();
 }

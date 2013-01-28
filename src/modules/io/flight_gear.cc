@@ -239,7 +239,7 @@ FlightGearIO::read_binary_input()
 	if (_engine_egt_degc.valid())
 		_engine_egt_degc.write (5.f / 9.f * (*_engine_egt_degc - 32.f));
 
-	data_updated();
+	signal_data_updated();
 
 	_timeout_timer->start();
 }
@@ -298,6 +298,6 @@ FlightGearIO::invalidate_all()
 			property->set_nil();
 	}
 
-	data_updated();
+	signal_data_updated();
 }
 

@@ -35,7 +35,7 @@ class Lookahead: public Xefis::Module
 
   protected:
 	void
-	data_update() override;
+	data_updated() override;
 
   private:
 	Xefis::Timestamp		_last_update_time;

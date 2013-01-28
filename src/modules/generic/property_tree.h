@@ -35,7 +35,7 @@ class PropertyTree: public Xefis::Instrument
 
   protected:
 	void
-	data_update() override;
+	data_updated() override;
 
   private:
 	Xefis::PropertyTreeWidget* _widget = nullptr;
@@ -43,7 +43,7 @@ class PropertyTree: public Xefis::Instrument
 
 
 inline void
-PropertyTree::data_update()
+PropertyTree::data_updated()
 {
 	_widget->read();
 }

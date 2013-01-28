@@ -55,7 +55,7 @@ class Module
 	 * Default implementation does nothing.
 	 */
 	virtual void
-	data_update();
+	data_updated();
 
 	/**
 	 * Return last update timestamp.
@@ -81,7 +81,7 @@ class Module
 	 * Signal that this module has updated property tree.
 	 */
 	void
-	data_updated();
+	signal_data_updated();
 
 	/**
 	 * Access NavaidStorage.
@@ -100,7 +100,7 @@ Module::~Module()
 
 
 inline void
-Module::data_update()
+Module::data_updated()
 { }
 
 

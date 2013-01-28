@@ -124,9 +124,9 @@ Module::parse_properties (QDomElement& properties_element, PropertiesList list)
 
 
 void
-Module::data_updated()
+Module::signal_data_updated()
 {
-	_module_manager->application()->data_update();
+	_module_manager->application()->data_updated();
 }
 
 

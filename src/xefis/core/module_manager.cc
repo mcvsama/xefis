@@ -93,13 +93,13 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 
 
 void
-ModuleManager::data_update (Timestamp timestamp)
+ModuleManager::data_updated (Timestamp timestamp)
 {
 	_update_dt = timestamp - _update_timestamp;
 	_update_timestamp = timestamp;
 
 	for (Module* mod: _modules)
-		mod->data_update();
+		mod->data_updated();
 }
 
 } // namespace Xefis

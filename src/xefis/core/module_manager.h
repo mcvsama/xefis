@@ -61,7 +61,7 @@ class ModuleManager
 	 * Forward call to all loaded modules.
 	 */
 	void
-	data_update (Timestamp timestamp);
+	data_updated (Timestamp timestamp);
 
 	/**
 	 * Return last update timestamp.
