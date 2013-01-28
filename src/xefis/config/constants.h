@@ -23,14 +23,13 @@
 #include "types.h"
 
 
-constexpr float EARTH_MEAN_RADIUS_KM	= 6367.46f;
-constexpr float EARTH_MEAN_RADIUS_NM	= 3438.15f;
-constexpr float STD_PRESSURE			= 29.92f;
+constexpr Length	EARTH_MEAN_RADIUS	= 6367.46_km;
+constexpr Pressure	STD_PRESSURE		= 29.92_inhg;
 
 inline bool
-is_std_pressure (InHg pressure)
+is_std_pressure (Pressure pressure)
 {
-	return std::abs (STD_PRESSURE - pressure) < 0.01f;
+	return 1_inhg * std::abs ((STD_PRESSURE - pressure).inhg()) < 0.01_inhg;
 }
 
 #endif

@@ -251,7 +251,7 @@ EFIS::read()
 
 	_efis_widget->set_dme_distance_visible (_dme_distance_nm.valid());
 	if (_dme_distance_nm.valid())
-		_efis_widget->set_dme_distance (*_dme_distance_nm);
+		_efis_widget->set_dme_distance (1_nm * *_dme_distance_nm);
 
 	_efis_widget->set_navigation_glideslope_needle_visible (_navigation_gs_needle.valid());
 	if (_navigation_gs_needle.valid())

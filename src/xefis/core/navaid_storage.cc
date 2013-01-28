@@ -40,7 +40,7 @@ NavaidStorage::NavaidStorage():
 
 
 NavaidStorage::Navaids
-NavaidStorage::get_navs (LonLat const& position, Miles radius) const
+NavaidStorage::get_navs (LonLat const& position, Length radius) const
 {
 	Navaids set;
 
@@ -54,8 +54,8 @@ NavaidStorage::get_navs (LonLat const& position, Miles radius) const
 		return true;
 	};
 
-	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0.f);
-	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Miles>::max(), inserter_and_predicate);
+	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0_nm);
+	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::ValueType>::max(), inserter_and_predicate);
 
 	return set;
 }
@@ -86,7 +86,7 @@ NavaidStorage::parse_nav_dat()
 		Feet amsl;
 		float khz;
 		QString identifier;
-		Miles range;
+		float range;
 		QString name;
 		float pos_lon;
 		float pos_lat;
@@ -105,7 +105,7 @@ NavaidStorage::parse_nav_dat()
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
-				_navaids_tree.insert (Navaid (type, pos, identifier, name, range));
+				_navaids_tree.insert (Navaid (type, pos, identifier, name, 1_nm * range));
 				break;
 
 			case Navaid::VOR:
@@ -116,7 +116,7 @@ NavaidStorage::parse_nav_dat()
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (type, pos, identifier, name, range);
+				Navaid navaid (type, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10.f);
 				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
 				navaid.set_amsl (amsl);
@@ -141,7 +141,7 @@ NavaidStorage::parse_nav_dat()
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (type, pos, identifier, name, range);
+				Navaid navaid (type, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10.f);
 				navaid.set_true_bearing (1_deg * true_bearing_deg);
 				navaid.set_amsl (amsl);
@@ -205,7 +205,7 @@ NavaidStorage::parse_fix_dat()
 
 		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 
-		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0.f));
+		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0_nm));
 	}
 }
 

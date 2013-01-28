@@ -74,11 +74,11 @@ class InstrumentWidget: public QWidget
 	void
 	centrify (QRectF& rectf) const;
 
-	float
-	arc_degs (float deg) const;
+	Angle
+	arc_degs (Angle deg) const;
 
-	float
-	arc_span (float deg) const;
+	Angle
+	arc_span (Angle deg) const;
 
   protected:
 	QFont				_font;
@@ -153,15 +153,15 @@ InstrumentWidget::centrify (QRectF& rectf) const
 }
 
 
-inline float
-InstrumentWidget::arc_degs (float deg) const
+inline Angle
+InstrumentWidget::arc_degs (Angle deg) const
 {
-	return -16.f * (deg - 90.f);
+	return -16.f * (deg - 90_deg);
 }
 
 
-inline float
-InstrumentWidget::arc_span (float deg) const
+inline Angle
+InstrumentWidget::arc_span (Angle deg) const
 {
 	return -16.f * deg;
 }

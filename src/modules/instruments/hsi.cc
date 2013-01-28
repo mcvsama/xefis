@@ -90,7 +90,7 @@ HSI::read()
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
 
-	_hsi_widget->set_range (_range.valid() ? *_range : 5.f);
+	_hsi_widget->set_range (_range.valid() ? 1_nm * *_range : 5_nm);
 
 	if (_display_mode.valid())
 	{
@@ -157,7 +157,7 @@ HSI::estimate_track()
 	}
 
 	// Estimate only if the distance between last and current positions is > 0.02nm.
-	Miles epsilon = 0.005; // TODO _nm
+	Length epsilon = 10_m;
 	if (_positions[0].haversine_nm (current_position) > epsilon)
 	{
 		// Shift data in _positions:
@@ -166,10 +166,10 @@ HSI::estimate_track()
 		_positions[0] = current_position;
 	}
 
-	double len10 = _positions[1].haversine_nm (_positions[0]);
+	Length len10 = _positions[1].haversine_nm (_positions[0]);
 
 	Angle alpha = -180.0_deg + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
-	Angle beta_per_mile = alpha / len10;
+	Angle beta_per_mile = alpha / len10.nm();
 
 	if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
 	{
@@ -178,7 +178,7 @@ HSI::estimate_track()
 			beta_per_mile = 1_deg * _trend_vector_smoother.process (beta_per_mile.deg());
 
 		_hsi_widget->set_trend_vector_visible (visible);
-		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
+		_hsi_widget->set_trend_vector_lookahead (1_nm * *_trend_vector_range);
 		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0_deg, +180.0_deg));
 	}
 }
@@ -202,7 +202,7 @@ HSI::estimate_altitude_reach_distance()
 	float const t = alt_diff / cbr_s;
 	float const s = gs * (t / 3600.f);
 
-	_hsi_widget->set_altitude_reach_distance (s);
+	_hsi_widget->set_altitude_reach_distance (1_nm * s);
 	_hsi_widget->set_altitude_reach_visible (true);
 }
 

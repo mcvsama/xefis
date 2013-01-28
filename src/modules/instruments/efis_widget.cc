@@ -1464,7 +1464,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 	if (_dme_distance_visible)
 	{
-		QString dme_val = QString ("DME %1").arg (_dme_distance, 0, 'f', 1);
+		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);
 		QFont font = _font_10_bold;
 		font.setBold (false);
 		QFontMetricsF font_metrics (font);

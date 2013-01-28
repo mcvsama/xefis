@@ -43,7 +43,7 @@ class NavaidStorage
 	NavaidStorage();
 
 	Navaids
-	get_navs (LonLat const& position, Miles radius) const;
+	get_navs (LonLat const& position, Length radius) const;
 
   private:
 	void
