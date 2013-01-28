@@ -16,6 +16,8 @@
 
 // Local:
 #include "angle.h"
+#include "pressure.h"
+#include "length.h"
 
 #endif
 

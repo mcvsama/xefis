@@ -635,14 +635,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return DME distance.
 	 */
-	Miles
+	Length
 	dme_distance() const;
 
 	/**
 	 * Set DME distance.
 	 */
 	void
-	set_dme_distance (Miles);
+	set_dme_distance (Length);
 
 	/**
 	 * Set DME info visibility.
@@ -1001,7 +1001,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_navigation_hd_needle_visible	= false;
 	bool				_navigation_runway_visible		= false;
 	QString				_navigation_hint;
-	Miles				_dme_distance					= 0.f;
+	Length				_dme_distance					= 0_nm;
 	bool				_dme_distance_visible			= false;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
@@ -1768,7 +1768,7 @@ EFISWidget::set_navigation_hint (QString hint)
 }
 
 
-inline Miles
+inline Length
 EFISWidget::dme_distance() const
 {
 	return _dme_distance;
@@ -1776,7 +1776,7 @@ EFISWidget::dme_distance() const
 
 
 inline void
-EFISWidget::set_dme_distance (Miles distance)
+EFISWidget::set_dme_distance (Length distance)
 {
 	_dme_distance = distance;
 	update();

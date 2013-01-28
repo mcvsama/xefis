@@ -52,7 +52,7 @@ class Navaid
 	};
 
   public:
-	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Miles range);
+	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Length range);
 
 	bool
 	operator< (Navaid const& other) const;
@@ -69,7 +69,7 @@ class Navaid
 	QString const&
 	name() const;
 
-	Miles
+	Length
 	range() const;
 
 	void
@@ -131,7 +131,7 @@ class Navaid
 	LonLat	_position;
 	QString	_identifier;
 	QString	_name;
-	Miles	_range;
+	Length	_range;
 	float	_frequency			= 0.f;
 	Angle	_slaved_variation	= 0_deg; // VOR only
 	Feet	_amsl				= 0.f;
@@ -143,7 +143,7 @@ class Navaid
 
 
 inline
-Navaid::Navaid (Type type, LonLat const& position, QString const& identifier, QString const& name, Miles range):
+Navaid::Navaid (Type type, LonLat const& position, QString const& identifier, QString const& name, Length range):
 	_type (type),
 	_position (position),
 	_identifier (identifier),
@@ -188,7 +188,7 @@ Navaid::name() const
 }
 
 
-inline Miles
+inline Length
 Navaid::range() const
 {
 	return _range;

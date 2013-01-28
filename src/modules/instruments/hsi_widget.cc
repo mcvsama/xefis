@@ -311,7 +311,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 void
 HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 {
-	Miles const trend_range = actual_trend_range();
+	Length const trend_range = actual_trend_range();
 	float start_point = _trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
@@ -328,10 +328,10 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
-			float range = static_cast<int> (10.f * ratio * _range) / 10.f;
+			Length range = 1_nm * static_cast<int> (((10.f * ratio * _range) / 10.f).nm());
 			float range_tick_vpx = nm_to_px (range);
 			float range_tick_hpx = 0.1f * _q;
-			QString half_range_str = QString ("%1").arg (range, 0, 'f', 0);
+			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', 0);
 			painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
 
 			if (draw_text)
@@ -373,7 +373,7 @@ HSIWidget::paint_altitude_reach (QPainter& painter)
 	if (!_altitude_reach_visible || (_altitude_reach_distance < 0.05f * _range) || (0.8f * _range < _altitude_reach_distance))
 		return;
 
-	float len = nm_to_px (6.f);
+	float len = nm_to_px (6_nm);
 	float pos = nm_to_px (_altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
@@ -382,7 +382,7 @@ HSIWidget::paint_altitude_reach (QPainter& painter)
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
 	painter.setPen (get_pen (_navigation_color, 1.f));
-	painter.drawArc (rect, arc_degs (40.f), arc_span (-80.f));
+	painter.drawArc (rect, arc_degs (40_deg).deg(), arc_span (-80_deg).deg());
 }
 
 
@@ -395,7 +395,7 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 	painter.setClipPath (_inner_map_clip);
 	painter.setPen (est_pen);
 
-	Miles const trend_range = actual_trend_range();
+	Length const trend_range = actual_trend_range();
 
 	if (_trend_vector_visible)
 	{
@@ -403,10 +403,10 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipRect (_trend_vector_clip_rect);
 
-		Miles const step = trend_range / 50.f;
-		Angle const angle_per_step = step * _track_deviation;
+		Length const step = trend_range / 50.f;
+		Angle const angle_per_step = step.nm() * _track_deviation;
 
-		for (float pos = 0.f; pos < trend_range; pos += step)
+		for (Length pos = 0_nm; pos < trend_range; pos += step)
 		{
 			float px = nm_to_px (step);
 			painter.rotate (angle_per_step.deg());
@@ -794,7 +794,7 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 		QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
 
 		painter.setTransform (transform);
-		if (_range < 16.f)
+		if (_range < 16_nm)
 			painter.drawLine (zero, pt_0);
 		painter.drawLine (zero, pt_1);
 		painter.drawLine (zero, pt_2);
@@ -847,7 +847,7 @@ HSIWidget::retrieve_navaids()
 	_dme_navs.clear();
 	_fix_navs.clear();
 
-	for (Navaid const& navaid: _navaid_storage->get_navs (_position, std::max (_range + 20.f /* TODO _nm */, 2.f * _range)))
+	for (Navaid const& navaid: _navaid_storage->get_navs (_position, std::max (_range + 20_nm, 2.f * _range)))
 	{
 		switch (navaid.type())
 		{

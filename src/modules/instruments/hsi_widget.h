@@ -81,14 +81,14 @@ class HSIWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return navigation range.
 	 */
-	Miles
+	Length
 	range() const;
 
 	/**
 	 * Set navigation range.
 	 */
 	void
-	set_range (Miles miles);
+	set_range (Length miles);
 
 	/**
 	 * Return current ture heading value.
@@ -244,13 +244,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Set track estimation lookahead in nautical miles.
 	 */
 	void
-	set_trend_vector_lookahead (Miles lookahead);
+	set_trend_vector_lookahead (Length lookahead);
 
 	/**
 	 * Set position of desired-altitude-reach-point.
 	 */
 	void
-	set_altitude_reach_distance (Miles);
+	set_altitude_reach_distance (Length);
 
 	/**
 	 * Set visibility of the desired-altitude-reach-point curve.
@@ -384,11 +384,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPointF
 	get_navaid_xy (LonLat const& position);
 
-	Miles
+	Length
 	actual_trend_range() const;
 
 	float
-	nm_to_px (Miles miles);
+	nm_to_px (Length miles);
 
   private:
 	NavaidStorage*			_navaid_storage				= nullptr;
@@ -425,7 +425,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	// Parameters:
 	DisplayMode				_display_mode				= DisplayMode::Expanded;
-	Miles					_range						= 1.f;
+	Length					_range						= 1_nm;
 	Angle					_mag_heading				= 0_deg;
 	Angle					_true_heading				= 0_deg;
 	bool					_heading_visible			= false;
@@ -442,8 +442,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 	bool					_mach_visible				= false;
 	Angle					_track_deviation			= 0_deg;
 	bool					_trend_vector_visible		= false;
-	Miles					_trend_vector_lookahead		= 5.f;
-	Miles					_altitude_reach_distance	= 0.f;
+	Length					_trend_vector_lookahead		= 5_nm;
+	Length					_altitude_reach_distance	= 0_nm;
 	bool					_altitude_reach_visible		= false;
 	Angle					_wind_from_mag_heading		= 0_deg;
 	Knots					_wind_tas_speed				= 0.f;
@@ -476,7 +476,7 @@ HSIWidget::set_display_mode (DisplayMode display_mode)
 }
 
 
-inline Miles
+inline Length
 HSIWidget::range() const
 {
 	return _range;
@@ -484,7 +484,7 @@ HSIWidget::range() const
 
 
 inline void
-HSIWidget::set_range (Miles miles)
+HSIWidget::set_range (Length miles)
 {
 	_range = miles;
 	update();
@@ -677,7 +677,7 @@ HSIWidget::set_trend_vector_visible (bool visible)
 
 
 inline void
-HSIWidget::set_trend_vector_lookahead (Miles lookahead)
+HSIWidget::set_trend_vector_lookahead (Length lookahead)
 {
 	_trend_vector_lookahead = lookahead;
 	update();
@@ -685,7 +685,7 @@ HSIWidget::set_trend_vector_lookahead (Miles lookahead)
 
 
 inline void
-HSIWidget::set_altitude_reach_distance (Miles distance)
+HSIWidget::set_altitude_reach_distance (Length distance)
 {
 	_altitude_reach_distance = distance;
 	update();
@@ -783,12 +783,12 @@ HSIWidget::set_highlighted_loc (QString const& identifier)
 inline QPointF
 HSIWidget::get_navaid_xy (LonLat const& position)
 {
-	QPointF navaid_pos = EARTH_MEAN_RADIUS_NM * position.rotated (_position).project_flat();
-	return _true_heading_transform.map (QPointF (nm_to_px (navaid_pos.x()), nm_to_px (navaid_pos.y())));
+	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (_position).project_flat();
+	return _true_heading_transform.map (QPointF (nm_to_px (1_nm * navaid_pos.x()), nm_to_px (1_nm * navaid_pos.y())));
 }
 
 
-inline Miles
+inline Length
 HSIWidget::actual_trend_range() const
 {
 	float limit = _display_mode == DisplayMode::Auxiliary ? 0.36f : 0.18f;
@@ -797,7 +797,7 @@ HSIWidget::actual_trend_range() const
 
 
 inline float
-HSIWidget::nm_to_px (Miles miles)
+HSIWidget::nm_to_px (Length miles)
 {
 	return miles / _range * _r;
 }
