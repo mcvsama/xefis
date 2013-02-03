@@ -105,6 +105,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 
 		paint_center_cross (painter);
 		paint_flight_director (painter);
+		paint_control_stick (painter);
 		paint_altitude_agl (painter, text_painter);
 		paint_baro_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
@@ -1380,6 +1381,37 @@ EFISWidget::paint_flight_director (QPainter& painter)
 			painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
 		if (_flight_director_roll_visible && _roll_visible)
 			painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
+	}
+}
+
+
+void
+EFISWidget::paint_control_stick (QPainter& painter)
+{
+	if (!_control_stick_visible)
+		return;
+
+	float const w = wh() * 0.2f / 9.f;
+	float const z = w * 0.3f;
+	Angle range = _fov / 4.f;
+
+	Angle pitch = bound (_control_stick_pitch, -range, +range);
+	Angle roll = bound (_control_stick_roll, -range, +range);
+
+	float ypos = pitch_to_px (pitch);
+	float xpos = heading_to_px (roll) / 2.f;
+
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+
+	for (auto pen: { get_pen (_navigation_color.darker (300), 2.0f),
+					 get_pen (_navigation_color, 1.3f) })
+	{
+		painter.setPen (pen);
+		painter.drawPolyline (QPolygonF() << QPointF (xpos - w - z, ypos - z) << QPointF (xpos - z, ypos - z) << QPointF (xpos - z, ypos - w - z));
+		painter.drawPolyline (QPolygonF() << QPointF (xpos - w - z, ypos + z) << QPointF (xpos - z, ypos + z) << QPointF (xpos - z, ypos + w + z));
+		painter.drawPolyline (QPolygonF() << QPointF (xpos + w + z, ypos + z) << QPointF (xpos + z, ypos + z) << QPointF (xpos + z, ypos + w + z));
+		painter.drawPolyline (QPolygonF() << QPointF (xpos + w + z, ypos - z) << QPointF (xpos + z, ypos - z) << QPointF (xpos + z, ypos - w - z));
 	}
 }
 

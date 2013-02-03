@@ -92,6 +92,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
+	Xefis::PropertyBoolean	_control_stick_visible;
+	Xefis::PropertyFloat	_control_stick_pitch_deg;
+	Xefis::PropertyFloat	_control_stick_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;
 	Xefis::PropertyString	_navigation_type_hint;
 	Xefis::PropertyFloat	_navigation_gs_needle;
