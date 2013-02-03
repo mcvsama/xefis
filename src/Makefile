@@ -50,7 +50,7 @@ LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
 LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
 CXXFLAGS		+= $(shell pkg-config --cflags $(PKGCONFIGS))
 
-.PHONY: all dep help clean distclean release
+.PHONY: all dep help clean distclean release doc
 
 HEADERS =
 SOURCES =
@@ -199,6 +199,9 @@ distclean:
 
 release:
 	@echo Unimplemented
+
+doc:
+	@cd doc && doxygen doxygen.conf
 
 $(MAINDEPFILE): Makefile.sources $(DEPFILES)
 	$(call prepdir, $@)
