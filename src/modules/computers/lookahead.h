@@ -38,8 +38,9 @@ class Lookahead: public Xefis::Module
 	data_updated() override;
 
   private:
-	Xefis::Timestamp		_last_update_time;
-	double					_last_value = 0.f;
+	Xefis::Timestamp		_dt;
+	double					_last_value					= 0.0;
+	double					_minimum_integration_time	= 0.0;
 	Xefis::Smoother<double>	_output_smoother;
 
 	Xefis::PropertyFloat	_lookahead_time;

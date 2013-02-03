@@ -39,7 +39,9 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 		else if (e == "output")
 			output_property_path = e.text();
 		else if (e == "smoothing")
-			smoothing = e.text().toFloat();
+			smoothing = e.text().toDouble();
+		else if (e == "minimum-integration-time")
+			_minimum_integration_time = e.text().toDouble();
 		else if (e == "properties")
 		{
 			parse_properties (e, {
@@ -56,8 +58,6 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 	_input = Xefis::PropertyFloat (input_property_path.toStdString());
 	_output = Xefis::PropertyFloat (output_property_path.toStdString());
 	_output_smoother.set_samples (smoothing);
-
-	_last_update_time.touch();
 }
 
 
@@ -72,16 +72,16 @@ Lookahead::data_updated()
 	else
 	{
 		Xefis::Timestamp dt = update_dt();
-		if (dt.microseconds() > 0)
+		_dt += dt;
+
+		if (_dt.seconds() > _minimum_integration_time)
 		{
 			double value = *_input;
-			double lookahead_time = *_lookahead_time;
-			double estimated_value = _last_value + lookahead_time / dt.seconds() * (value - _last_value);
+			double estimated_value = _last_value + *_lookahead_time / dt.seconds() * (value - _last_value);
 			_output.write (_output_smoother.process (estimated_value));
 			_last_value = value;
+			_dt = Xefis::Timestamp::from_epoch (0);
 		}
-		else
-			_output.set_nil();
 	}
 }
 
