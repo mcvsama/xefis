@@ -571,6 +571,36 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_flight_director_roll_visible (bool visible);
 
 	/**
+	 * Return control stick indicator pitch.
+	 */
+	Angle
+	control_stick_pitch() const;
+
+	/**
+	 * Set control stick indicator pitch.
+	 */
+	void
+	set_control_stick_pitch (Angle pitch);
+
+	/**
+	 * Return control stick indicator roll.
+	 */
+	Angle
+	control_stick_roll() const;
+
+	/**
+	 * Set control stick indicator roll.
+	 */
+	void
+	set_control_stick_roll (Angle roll);
+
+	/**
+	 * Set visibility of the control stick indicator.
+	 */
+	void
+	set_control_stick_visible (bool visible);
+
+	/**
 	 * Set visibility of navigation needles ladders.
 	 */
 	void
@@ -798,6 +828,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_flight_director (QPainter&);
 
 	void
+	paint_control_stick (QPainter&);
+
+	void
 	paint_altitude_agl (QPainter&, TextPainter&);
 
 	void
@@ -992,6 +1025,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_flight_director_pitch_visible	= false;
 	Angle				_flight_director_roll			= 0_deg;
 	bool				_flight_director_roll_visible	= false;
+	Angle				_control_stick_pitch			= 0_deg;
+	Angle				_control_stick_roll				= 0_deg;
+	bool				_control_stick_visible			= false;
 	bool				_navigation_needles_visible		= false;
 	float				_navigation_gs_needle			= 0.f;
 	bool				_navigation_gs_needle_visible	= false;
@@ -1685,6 +1721,44 @@ inline void
 EFISWidget::set_flight_director_roll_visible (bool visible)
 {
 	_flight_director_roll_visible = visible;
+	update();
+}
+
+
+inline Angle
+EFISWidget::control_stick_pitch() const
+{
+	return _control_stick_pitch;
+}
+
+
+inline void
+EFISWidget::set_control_stick_pitch (Angle pitch)
+{
+	_control_stick_pitch = pitch;
+	update();
+}
+
+
+inline Angle
+EFISWidget::control_stick_roll() const
+{
+	return _control_stick_roll;
+}
+
+
+inline void
+EFISWidget::set_control_stick_roll (Angle roll)
+{
+	_control_stick_roll = roll;
+	update();
+}
+
+
+inline void
+EFISWidget::set_control_stick_visible (bool visible)
+{
+	_control_stick_visible = visible;
 	update();
 }
 

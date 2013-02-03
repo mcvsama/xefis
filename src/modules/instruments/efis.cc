@@ -75,6 +75,9 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "flight-director-visible", _flight_director_visible, false },
 				{ "flight-director-pitch", _flight_director_pitch_deg, false },
 				{ "flight-director-roll", _flight_director_roll_deg, false },
+				{ "control-stick-visible", _control_stick_visible, false },
+				{ "control-stick-pitch", _control_stick_pitch_deg, false },
+				{ "control-stick-roll", _control_stick_roll_deg, false },
 				{ "navigation-needles-visible", _navigation_needles_visible, false },
 				{ "navigation-type-hint", _navigation_type_hint, false },
 				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
@@ -234,6 +237,16 @@ EFIS::read()
 	_efis_widget->set_flight_director_roll_visible (flight_director_visible && _flight_director_roll_deg.valid());
 	if (_flight_director_roll_deg.valid())
 		_efis_widget->set_flight_director_roll (1_deg * *_flight_director_roll_deg);
+
+	bool control_stick_visible = _control_stick_visible.valid() && *_control_stick_visible;
+
+	_efis_widget->set_control_stick_visible (control_stick_visible && _control_stick_pitch_deg.valid() && _control_stick_roll_deg.valid());
+
+	if (_control_stick_pitch_deg.valid())
+		_efis_widget->set_control_stick_pitch (1_deg * *_control_stick_pitch_deg);
+
+	if (_control_stick_roll_deg.valid())
+		_efis_widget->set_control_stick_roll (1_deg * *_control_stick_roll_deg);
 
 	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
 	{
