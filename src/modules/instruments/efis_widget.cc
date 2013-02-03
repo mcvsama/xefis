@@ -53,8 +53,6 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_baro_blinking_warning = new QTimer (this);
 	_baro_blinking_warning->setInterval (200);
 	QObject::connect (_baro_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_baro()));
-
-	_last_paint_time.start();
 }
 
 
@@ -79,9 +77,6 @@ EFISWidget::resizeEvent (QResizeEvent* resize_event)
 void
 EFISWidget::paintEvent (QPaintEvent*)
 {
-	int ms = _last_paint_time.restart();
-	fprintf (stderr, "FPS %.2f     \r", 1000.f / ms);
-
 	update_blinker (_speed_blinking_warning,
 					_speed_visible &&
 					((_warning_speed_visible && _speed < _warning_speed) ||
@@ -212,8 +207,8 @@ EFISWidget::adi_paint_horizon (QPainter& painter)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_horizon_transform);
-		painter.fillRect (_adi_sky_rect, QBrush (_sky_color, Qt::SolidPattern));
-		painter.fillRect (_adi_gnd_rect, QBrush (_ground_color, Qt::SolidPattern));
+		painter.fillRect (_adi_sky_rect, _sky_color);
+		painter.fillRect (_adi_gnd_rect, _ground_color);
 	}
 	else
 	{

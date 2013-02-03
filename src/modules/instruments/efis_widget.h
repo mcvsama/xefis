@@ -19,7 +19,6 @@
 #include <map>
 
 // Qt:
-#include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
@@ -860,7 +859,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	get_baro_color() const;
 
   private:
-	QTime				_last_paint_time;
 	QColor				_sky_color;
 	QColor				_ground_color;
 	QColor				_ladder_color;
