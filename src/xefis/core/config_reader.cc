@@ -288,6 +288,9 @@ ConfigReader::process_item_element (QDomElement const& item_element, QBoxLayout*
 void
 ConfigReader::process_module_element (QDomElement const& module_element, QBoxLayout* layout, QWidget* window, int stretch)
 {
+	if (module_element.attribute ("disabled") == "true")
+		return;
+
 	Module* module = _module_manager->load_module (module_element.attribute ("name"), module_element, window);
 
 	if (layout)
