@@ -45,10 +45,10 @@ class FlightGearIO:
 
   private slots:
 	/**
-	 * Read and apply FlightGear datagrams in binary mode from UDP socket.
+	 * Called whenever there's data ready to be read from socket.
 	 */
 	void
-	read_binary_input();
+	got_packet();
 
 	/**
 	 * Set all input properties as invalid.
@@ -57,13 +57,31 @@ class FlightGearIO:
 	invalidate_all();
 
   private:
-	QTimer*					_timeout_timer				= nullptr;
-	QString					_host;
-	int						_port;
-	QUdpSocket*				_input						= nullptr;
-	QByteArray				_datagram;
-	std::string				_property_path;
+	/**
+	 * Read and apply FlightGear datagrams in binary mode from UDP socket.
+	 */
+	void
+	read_input();
 
+	/**
+	 * Write data to configured UDP port.
+	 */
+	void
+	write_output();
+
+  private:
+	QTimer*					_timeout_timer				= nullptr;
+	QString					_input_host;
+	int						_input_port;
+	QUdpSocket*				_input						= nullptr;
+	QByteArray				_input_datagram;
+	QString					_output_host;
+	int						_output_port;
+	QUdpSocket*				_output						= nullptr;
+	std::string				_property_path;
+	bool					_input_enabled				= false;
+	bool					_output_enabled				= false;
+	// Input:
 	Xefis::PropertyFloat	_ias_kt;
 	Xefis::PropertyFloat	_ias_lookahead_kt;
 	Xefis::PropertyFloat	_minimum_ias_kt;
@@ -105,6 +123,13 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
+	// Output:
+	Xefis::PropertyFloat	_ailerons;
+	Xefis::PropertyFloat	_ailerons_trim;
+	Xefis::PropertyFloat	_elevator;
+	Xefis::PropertyFloat	_elevator_trim;
+	Xefis::PropertyFloat	_rudder;
+	Xefis::PropertyFloat	_rudder_trim;
 };
 
 #endif

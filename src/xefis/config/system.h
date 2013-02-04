@@ -61,6 +61,11 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 
 
 /**
+ * Packed structs.
+ */
+#define BEGIN_PACKED_STRUCT
+#define END_PACKED_STRUCT __attribute__((packed));
+/**
  * Since most of standard headers override our assert, ensure
  * that it's redefined every possible time, when this
  * header is included.

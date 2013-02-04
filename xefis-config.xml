@@ -3,5 +3,6 @@
 	<include name='xefis-properties.xml'/>
 	<include name='xefis-io.xml'/>
 	<include name='xefis-windows.xml'/>
+	<include name='xefis-systems.xml'/>
 </xefis-config>
 

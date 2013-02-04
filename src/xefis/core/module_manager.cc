@@ -19,7 +19,10 @@
 #include <xefis/core/module.h>
 
 // Modules:
+#include <modules/computers/ap_multiplexer.h>
 #include <modules/computers/lookahead.h>
+#include <modules/computers/stabilizer.h>
+#include <modules/generic/fps.h>
 #include <modules/generic/property_tree.h>
 #include <modules/io/flight_gear.h>
 #include <modules/io/joystick.h>
@@ -48,45 +51,14 @@ ModuleManager::~ModuleManager()
 Module*
 ModuleManager::load_module (QString const& name, QDomElement const& config, QWidget* parent)
 {
-	Module* module;
+	Module* module = create_module_by_name (name, config, parent);
+	_modules.insert (module);
 
-	if (name == "instruments/efis")
-	{
-		module = new EFIS (this, config, parent);
-		_modules.insert (module);
-	}
-	else if (name == "instruments/hsi")
-	{
-		module = new HSI (this, config, parent);
-		_modules.insert (module);
-	}
-	else if (name == "instruments/radial-indicator")
-	{
-		module = new RadialIndicator (this, config, parent);
-		_modules.insert (module);
-	}
-	else if (name == "computers/lookahead")
-	{
-		module = new Lookahead (this, config);
-		_modules.insert (module);
-	}
-	else if (name == "generic/property-tree")
-	{
-		module = new PropertyTree (this, config, parent);
-		_modules.insert (module);
-	}
-	else if (name == "io/flightgear")
-	{
-		module = new FlightGearIO (this, config);
-		_modules.insert (module);
-	}
-	else if (name == "io/joystick")
-	{
-		module = new JoystickInput (this, config);
-		_modules.insert (module);
-	}
+	Instrument* instrument = dynamic_cast<Instrument*> (module);
+	if (instrument)
+		_instrument_modules.insert (instrument);
 	else
-		throw ModuleNotFoundException ("module not found: " + name.toStdString());
+		_non_instrument_modules.insert (module);
 
 	return module;
 }
@@ -96,10 +68,50 @@ void
 ModuleManager::data_updated (Timestamp timestamp)
 {
 	_update_dt = timestamp - _update_timestamp;
+	if (_update_dt.seconds() > 1.0)
+		_update_dt = Timestamp::from_epoch (1);
+
 	_update_timestamp = timestamp;
 
-	for (Module* mod: _modules)
+	for (Module* mod: _non_instrument_modules)
 		mod->data_updated();
+	// Let instruments display data already computed by all other modules.
+	// Also limit FPS of the instrument modules.
+	if ((timestamp - _instrument_update_timestamp).seconds() > 1.f / 30.f)
+	{
+		for (Module* mod: _instrument_modules)
+			mod->data_updated();
+		_instrument_update_timestamp = timestamp;
+	}
+}
+
+
+Module*
+ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
+{
+	if (name == "instruments/efis")
+		return new EFIS (this, config, parent);
+	else if (name == "instruments/hsi")
+		return new HSI (this, config, parent);
+	else if (name == "instruments/radial-indicator")
+		return new RadialIndicator (this, config, parent);
+	else if (name == "computers/lookahead")
+		return new Lookahead (this, config);
+	else if (name == "computers/stabilizer")
+		return new Stabilizer (this, config);
+	else if (name == "computers/ap-multiplexer")
+		return new APMultiplexer (this, config);
+	else if (name == "generic/property-tree")
+		return new PropertyTree (this, config, parent);
+	else if (name == "generic/fps")
+		return new FPS (this, config);
+	else if (name == "io/flightgear")
+		return new FlightGearIO (this, config);
+	else if (name == "io/joystick")
+		return new JoystickInput (this, config);
+	else
+		throw ModuleNotFoundException ("module not found: " + name.toStdString());
+
 }
 
 } // namespace Xefis
