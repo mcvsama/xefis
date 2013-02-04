@@ -64,6 +64,7 @@ SRC_HEADERS += xefis/utility/backtrace.h
 SRC_HEADERS += xefis/utility/lonlat.h
 SRC_HEADERS += xefis/utility/numeric.h
 SRC_HEADERS += xefis/utility/smoother.h
+SRC_HEADERS += xefis/utility/pid.h
 SRC_HEADERS += xefis/utility/qdom.h
 SRC_HEADERS += xefis/utility/range.h
 SRC_HEADERS += xefis/utility/text_painter.h
@@ -75,14 +76,20 @@ SRC_SOURCES += xefis/utility/text_painter.cc
 
 ######## /modules/computers ########
 
+SRC_HEADERS += modules/computers/ap_multiplexer.h
 SRC_HEADERS += modules/computers/lookahead.h
+SRC_HEADERS += modules/computers/stabilizer.h
 
+SRC_SOURCES += modules/computers/ap_multiplexer.cc
 SRC_SOURCES += modules/computers/lookahead.cc
+SRC_SOURCES += modules/computers/stabilizer.cc
 
 ######## /modules/generic ########
 
+SRC_HEADERS += modules/generic/fps.h
 SRC_HEADERS += modules/generic/property_tree.h
 
+SRC_SOURCES += modules/generic/fps.cc
 SRC_SOURCES += modules/generic/property_tree.cc
 
 ######## /modules/io ########

@@ -2,7 +2,7 @@
 <xefis-include>
 	<modules>
 		<module name='io/flightgear'>
-			<input>
+			<input disabled='false'>
 				<host>0.0.0.0</host>
 				<port>9000</port>
 				<properties path='/instrumentation'>
@@ -53,32 +53,32 @@
 					<property name='engine-epr' path='/epr'/>
 				</properties>
 			</input>
-			<output>
-				<host>localhost</host>
-				<port>9000</port>
+			<output disabled='false'>
+				<host>127.0.0.1</host>
+				<port>9001</port>
+				<properties path='/controls'>
+					<property name='ailerons' path='/ailerons' default='0.0'/>
+					<property name='elevator' path='/elevator' default='0.0'/>
+					<property name='rudder' path='/rudder' default='0.0'/>
+					<property name='ailerons-trim' path='/ailerons-trim' default='0.0'/>
+					<property name='elevator-trim' path='/elevator-trim' default='0.0'/>
+					<property name='rudder-trim' path='/rudder-trim' default='0.0'/>
+				</properties>
 			</output>
 		</module>
 		<module name='io/joystick'>
 			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
-			<path>/control/main</path>
+			<path>/input/main</path>
 		</module>
 		<module name='io/joystick'>
 			<device>/dev/input/js1</device>
-			<path>/control/rudder</path>
+			<path>/input/rudder</path>
 		</module>
 		<!--module name='keyboard'>
 			<action key='F1'>
 				<switch-bool>/instrumentation/flight-director/visible</switch-bool>
 			</action>
 		</module-->
-		<module name='computers/lookahead'>
-			<input>/instrumentation/altitude/amsl.ft</input>
-			<output>/instrumentation/altitude/amsl-lookahead.ft</output>
-			<smoothing>50</smoothing>
-			<properties>
-				<property name='lookahead-time' path='/instrumentation/altitude/amsl-lookahead-time.s' default='10'/>
-			</properties>
-		</module>
 	</modules>
 </xefis-include>
 

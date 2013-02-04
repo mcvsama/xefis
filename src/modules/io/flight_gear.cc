@@ -26,13 +26,15 @@
 #include "flight_gear.h"
 
 
-struct FGData
-{
-	typedef float		FGFloat;
-	typedef double		FGDouble;
-	typedef uint8_t		FGBool;
-	typedef uint32_t	FGInt;
+typedef float		FGFloat;
+typedef double		FGDouble;
+typedef uint8_t		FGBool;
+typedef uint32_t	FGInt;
 
+
+BEGIN_PACKED_STRUCT
+struct FGInputData
+{
 	FGDouble	autopilot_alt_setting_ft;		// apa
 	FGDouble	autopilot_cbr_setting_fpm;		// apc
 	FGDouble	autopilot_speed_setting_kt;		// ats
@@ -76,7 +78,21 @@ struct FGData
 	FGDouble	engine_egt_degc;				// egt
 	FGDouble	wind_from_mag_heading_deg;		// wfh
 	FGDouble	wind_tas_kt;					// ws
-} __attribute__((packed));
+}
+END_PACKED_STRUCT
+
+
+BEGIN_PACKED_STRUCT
+struct FGOutputData
+{
+	FGFloat	ailerons;						// a
+	FGFloat	ailerons_trim;					// at
+	FGFloat	elevator;						// e
+	FGFloat	elevator_trim;					// et
+	FGFloat	rudder;							// r
+	FGFloat	rudder_trim;					// rt
+}
+END_PACKED_STRUCT
 
 
 FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement const& config):
@@ -86,12 +102,14 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 	{
 		if (e == "input")
 		{
+			_input_enabled = e.attribute ("disabled") != "true";
+
 			for (QDomElement& e2: e)
 			{
 				if (e2 == "host")
-					_host = e2.text();
+					_input_host = e2.text();
 				else if (e2 == "port")
-					_port = e2.text().toInt();
+					_input_port = e2.text().toInt();
 				else if (e2 == "properties")
 				{
 					parse_properties (e2, {
@@ -135,7 +153,30 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "position-longitude", _position_lng_deg, false },
 						{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
 						{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
-						{ "wind-tas", _wind_tas_kt, false }
+						{ "wind-tas", _wind_tas_kt, false },
+					});
+				}
+			}
+		}
+		else if (e == "output")
+		{
+			_output_enabled = e.attribute ("disabled") != "true";
+
+			for (QDomElement& e2: e)
+			{
+				if (e2 == "host")
+					_output_host = e2.text();
+				else if (e2 == "port")
+					_output_port = e2.text().toInt();
+				else if (e2 == "properties")
+				{
+					parse_properties (e2, {
+						{ "ailerons", _ailerons, false },
+						{ "ailerons-trim", _ailerons_trim, false },
+						{ "elevator", _elevator, false },
+						{ "elevator-trim", _elevator_trim, false },
+						{ "rudder", _rudder, false },
+						{ "rudder-trim", _rudder_trim, false }
 					});
 				}
 			}
@@ -148,8 +189,10 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 	QObject::connect (_timeout_timer, SIGNAL (timeout()), this, SLOT (invalidate_all()));
 
 	_input = new QUdpSocket();
-	_input->bind (QHostAddress (_host), _port, QUdpSocket::ShareAddress);
-	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (read_binary_input()));
+	_input->bind (QHostAddress (_input_host), _input_port, QUdpSocket::ShareAddress);
+	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (got_packet()));
+
+	_output = new QUdpSocket();
 
 	invalidate_all();
 }
@@ -158,21 +201,91 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 FlightGearIO::~FlightGearIO()
 {
 	delete _input;
+	delete _output;
 	delete _timeout_timer;
 }
 
 
 void
-FlightGearIO::read_binary_input()
+FlightGearIO::got_packet()
+{
+	read_input();
+	write_output();
+}
+
+
+void
+FlightGearIO::invalidate_all()
+{
+	Xefis::BaseProperty* properties[] = {
+		&_ias_kt,
+		&_ias_lookahead_kt,
+		&_minimum_ias_kt,
+		&_maximum_ias_kt,
+		&_gs_kt,
+		&_tas_kt,
+		&_mach,
+		&_pitch_deg,
+		&_roll_deg,
+		&_mag_heading_deg,
+		&_true_heading_deg,
+		&_slip_skid_g,
+		&_fpm_alpha_deg,
+		&_fpm_beta_deg,
+		&_track_deg,
+		&_standard_pressure,
+		&_altitude_ft,
+		&_altitude_agl_ft,
+		&_landing_altitude_ft,
+		&_cbr_fpm,
+		&_pressure_inhg,
+		&_autopilot_alt_setting_ft,
+		&_autopilot_speed_setting_kt,
+		&_autopilot_heading_setting_deg,
+		&_autopilot_cbr_setting_fpm,
+		&_flight_director_pitch_deg,
+		&_flight_director_roll_deg,
+		&_navigation_needles_visible,
+		&_navigation_gs_needle,
+		&_navigation_hd_needle,
+		&_dme_distance_nm,
+		&_engine_throttle_pct,
+		&_engine_epr,
+		&_engine_n1_pct,
+		&_engine_n2_pct,
+		&_engine_egt_degc,
+		&_position_lat_deg,
+		&_position_lng_deg,
+		&_position_sea_level_radius_ft,
+		&_wind_from_mag_heading_deg,
+		&_wind_tas_kt
+	};
+
+	for (auto property: properties)
+	{
+		if (property->valid())
+			property->set_nil();
+	}
+
+	signal_data_updated();
+}
+
+
+void
+FlightGearIO::read_input()
 {
 	while (_input->hasPendingDatagrams())
 	{
 		int datagram_size = _input->pendingDatagramSize();
-		if (_datagram.size() < datagram_size)
-			_datagram.resize (datagram_size);
+		if (_input_datagram.size() < datagram_size)
+			_input_datagram.resize (datagram_size);
 
-		_input->readDatagram (_datagram.data(), datagram_size, nullptr, nullptr);
-		FGData* fg_data = reinterpret_cast<FGData*> (_datagram.data());
+		_input->readDatagram (_input_datagram.data(), datagram_size, nullptr, nullptr);
+
+		if (!_input_enabled)
+			continue;
+
+		FGInputData* fg_data = reinterpret_cast<FGInputData*> (_input_datagram.data());
 
 #define ASSIGN(x) \
 		if (!_##x.is_singular()) \
@@ -246,58 +359,26 @@ FlightGearIO::read_binary_input()
 
 
 void
-FlightGearIO::invalidate_all()
+FlightGearIO::write_output()
 {
-	Xefis::BaseProperty* properties[] = {
-		&_ias_kt,
-		&_ias_lookahead_kt,
-		&_minimum_ias_kt,
-		&_maximum_ias_kt,
-		&_gs_kt,
-		&_tas_kt,
-		&_mach,
-		&_pitch_deg,
-		&_roll_deg,
-		&_mag_heading_deg,
-		&_true_heading_deg,
-		&_slip_skid_g,
-		&_fpm_alpha_deg,
-		&_fpm_beta_deg,
-		&_track_deg,
-		&_standard_pressure,
-		&_altitude_ft,
-		&_altitude_agl_ft,
-		&_landing_altitude_ft,
-		&_cbr_fpm,
-		&_pressure_inhg,
-		&_autopilot_alt_setting_ft,
-		&_autopilot_speed_setting_kt,
-		&_autopilot_heading_setting_deg,
-		&_autopilot_cbr_setting_fpm,
-		&_flight_director_pitch_deg,
-		&_flight_director_roll_deg,
-		&_navigation_needles_visible,
-		&_navigation_gs_needle,
-		&_navigation_hd_needle,
-		&_dme_distance_nm,
-		&_engine_throttle_pct,
-		&_engine_epr,
-		&_engine_n1_pct,
-		&_engine_n2_pct,
-		&_engine_egt_degc,
-		&_position_lat_deg,
-		&_position_lng_deg,
-		&_position_sea_level_radius_ft,
-		&_wind_from_mag_heading_deg,
-		&_wind_tas_kt
-	};
+	if (!_output_enabled)
+		return;
 
-	for (auto property: properties)
-	{
-		if (property->valid())
-			property->set_nil();
-	}
+	FGOutputData fg_data;
 
-	signal_data_updated();
+#define ASSIGN(x) \
+		if (!_##x.is_singular()) \
+			fg_data.x = *_##x;
+
+	ASSIGN (ailerons);
+	ASSIGN (ailerons_trim);
+	ASSIGN (elevator);
+	ASSIGN (elevator_trim);
+	ASSIGN (rudder);
+	ASSIGN (rudder_trim);
+
+#undef ASSIGN
+
+	_output->writeDatagram (reinterpret_cast<const char*> (&fg_data), sizeof (fg_data), QHostAddress (_output_host), _output_port);
 }
 

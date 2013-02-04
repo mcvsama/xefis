@@ -1,0 +1,67 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<modules>
+		<module disabled='true' name='generic/fps'/>
+		<module name='computers/lookahead'>
+			<input>/instrumentation/altitude/amsl.ft</input>
+			<output>/instrumentation/altitude/amsl-lookahead.ft</output>
+			<smoothing>500</smoothing>
+			<minimum-integration-time>0.01</minimum-integration-time>
+			<properties>
+				<property name='lookahead-time' path='/instrumentation/altitude/amsl-lookahead-time.s' default='10'/>
+			</properties>
+		</module>
+		<module name='computers/ap-multiplexer'>
+			<properties path='/fbw/ap-multiplexer'>
+				<property name='input-pitch-axis' path='//input/main/axis/1'/>
+				<property name='input-roll-axis' path='//input/main/axis/0'/>
+				<property name='pitch-axis-dead-zone' path='//input/main/dead-zone/1' default='0.05'/>
+				<property name='roll-axis-dead-zone' path='//input/main/dead-zone/0' default='0.05'/>
+				<property name='max-pitch-angle' path='/max-pitch-angle.deg' default='15'/>
+				<property name='max-roll-angle' path='/max-roll-angle.deg' default='25'/>
+				<property name='orientation-pitch' path='//instrumentation/orientation/pitch.deg'/>
+				<property name='orientation-roll' path='//instrumentation/orientation/roll.deg'/>
+				<property name='output-control-stick-pitch' path='/control-stick/pitch.deg'/>
+				<property name='output-control-stick-roll' path='/control-stick/roll.deg'/>
+				<property name='output-pitch' path='/pitch.deg'/>
+				<property name='output-roll' path='/roll.deg'/>
+			</properties>
+		</module>
+		<module name='computers/stabilizer'>
+			<properties path='/fbw/stabilizer'>
+				<property name='stabilization-gain' path='/config/gain' default='1.0'/>
+				<property name='pitch-gain' path='/config/pitch/gain' default='1.0'/>
+				<property name='pitch-p' path='/config/pitch/p' default='10.0'/>
+				<property name='pitch-i' path='/config/pitch/i' default='1.5'/>
+				<property name='pitch-d' path='/config/pitch/d' default='0.5'/>
+				<property name='pitch-error-power' path='/config/pitch/error-power' default='1.0'/>
+				<property name='roll-gain' path='/config/roll/gain' default='1.0'/>
+				<property name='roll-p' path='/config/roll/p' default='10.0'/>
+				<property name='roll-i' path='/config/roll/i' default='1.5'/>
+				<property name='roll-d' path='/config/roll/d' default='0.5'/>
+				<property name='roll-error-power' path='/config/roll/error-power' default='1.0'/>
+				<property name='yaw-gain' path='/config/yaw/gain' default='1.0'/>
+				<property name='yaw-p' path='/config/yaw/p' default='0.1'/>
+				<property name='yaw-i' path='/config/yaw/i' default='0.05'/>
+				<property name='yaw-d' path='/config/yaw/d' default='0.01'/>
+				<property name='yaw-error-power' path='/config/yaw/error-power' default='0.5'/>
+				<property name='input-pitch' path='//fbw/ap-multiplexer/pitch.deg' default='0'/>
+				<property name='input-roll' path='//fbw/ap-multiplexer/roll.deg' default='0'/>
+				<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
+				<property name='orientation-pitch' path='//instrumentation/orientation/pitch.deg'/>
+				<property name='orientation-roll' path='//instrumentation/orientation/roll.deg'/>
+				<property name='slip-skid' path='//instrumentation/slip-skid/slip-skid.g'/>
+				<property name='elevator-minimum' path='/config/elevator/minimum' default='-0.75'/>
+				<property name='elevator-maximum' path='/config/elevator/maximum' default='+0.75'/>
+				<property name='ailerons-minimum' path='/config/ailerons/minimum' default='-0.5'/>
+				<property name='ailerons-maximum' path='/config/ailerons/maximum' default='+0.5'/>
+				<property name='rudder-minimum' path='/config/rudder/minimum' default='-1.0'/>
+				<property name='rudder-maximum' path='/config/rudder/maximum' default='+1.0'/>
+				<property name='output-elevator' path='//controls/elevator' default='0'/>
+				<property name='output-ailerons' path='//controls/ailerons' default='0'/>
+				<property name='output-rudder' path='//controls/rudder' default='0'/>
+			</properties>
+		</module>
+	</modules>
+</xefis-include>
+

@@ -76,10 +76,17 @@ class ModuleManager
 	update_dt() const;
 
   private:
+	Module*
+	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
+
+  private:
 	Application*	_application = nullptr;
 	Modules			_modules;
+	Modules			_instrument_modules;
+	Modules			_non_instrument_modules;
 	Timestamp		_update_timestamp;
 	Timestamp		_update_dt;
+	Timestamp		_instrument_update_timestamp;
 };
 
 
