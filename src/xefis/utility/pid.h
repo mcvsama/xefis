@@ -30,7 +30,6 @@ namespace Xefis {
  * Proportional-Integral-Derivative controller.
  * TODO safety functions: limit derivative or something so it's not 0/nan/inf and the result is limited to certain range.
  * TODO protect from infs and nans
- * TODO add output limiter
  */
 template<class tValueType>
 	class PID
@@ -44,6 +43,8 @@ template<class tValueType>
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
+		 * When using winding, the measured value is expected to
+		 * be winded up, too.
 		 */
 		void
 		set_winding (bool winding);
@@ -326,13 +327,18 @@ template<class T>
 	inline typename PID<T>::ValueType
 	PID<T>::process (ValueType measured_value, TimeType dt) noexcept
 	{
-		ValueType error = bound<ValueType> (_target - measured_value, -1.0, +1.0);
+		ValueType error = bound<ValueType> (_target - measured_value, -2.0, +2.0);
+		if (_winding && std::abs (error) > 1.0)
+			error = error - sgn (error) * 2.0;
 		_integral += error * dt;
 		_integral = bound<ParamType> (_integral, _i_limit);
 		_derivative = (error - _previous_error) / dt;
-		// TODO Ensure that _derivative is finite:
-//		_output = bound<double> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) + _i * _integral + _d * _derivative), _output_limit);
-		_output = bound<double> (_gain * (_p * error + _i * _integral + _d * _derivative), _output_limit);
+		if (!std::isfinite (_derivative))
+			_derivative = 0.0;
+		_output = bound<double> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +
+										  _i * _integral +
+										  _d * _derivative),
+								 _output_limit);
 		_previous_error = error;
 		return _output;
 	}

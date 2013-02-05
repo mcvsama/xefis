@@ -1364,8 +1364,13 @@ EFISWidget::paint_flight_director (QPainter& painter)
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _fov / 4.f;
 
-	Angle pitch = bound (_flight_director_pitch - _pitch, -range, +range);
-	Angle roll = bound (_flight_director_roll - _roll, -range, +range);
+	Angle pitch = std::cos (_roll.rad()) * (_flight_director_pitch - _pitch);
+	pitch = bound (pitch, -range, +range);
+
+	Angle roll = _flight_director_roll - _roll;
+	if (std::abs (roll.deg()) > 180.0)
+		roll = roll - sgn (roll.deg()) * 360_deg;
+	roll = bound (roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;

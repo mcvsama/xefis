@@ -40,7 +40,7 @@
 				<property name='roll-i' path='/config/roll/i' default='1.5'/>
 				<property name='roll-d' path='/config/roll/d' default='0.5'/>
 				<property name='roll-error-power' path='/config/roll/error-power' default='1.0'/>
-				<property name='yaw-gain' path='/config/yaw/gain' default='1.0'/>
+				<property name='yaw-gain' path='/config/yaw/gain' default='0.1'/>
 				<property name='yaw-p' path='/config/yaw/p' default='0.1'/>
 				<property name='yaw-i' path='/config/yaw/i' default='0.05'/>
 				<property name='yaw-d' path='/config/yaw/d' default='0.01'/>

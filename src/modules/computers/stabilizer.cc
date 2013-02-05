@@ -114,7 +114,7 @@ Stabilizer::data_updated()
 	_rudder_pid.set_target (0.0);
 	_rudder_pid.process (*_slip_skid_g, _dt.seconds());
 
-	_output_elevator.write (-_elevator_pid.output());
+	_output_elevator.write (-std::cos ((*_orientation_roll_deg * 1_deg).rad()) * _elevator_pid.output());
 	_output_ailerons.write (_ailerons_pid.output());
 
 	float yaw_axis = *_input_yaw_axis;
