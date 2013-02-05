@@ -71,6 +71,14 @@ template<class Number>
 	}
 
 
+template<class Number>
+	Number
+	floored_mod (Number n, Number min, Number max)
+	{
+		return floored_mod (n - min, max - min) + min;
+	}
+
+
 template<class Value>
 	inline constexpr Value
 	bound (Value value, Value min, Value max) noexcept

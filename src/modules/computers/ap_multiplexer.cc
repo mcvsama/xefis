@@ -75,16 +75,20 @@ APMultiplexer::data_updated()
 	Angle orientation_pitch = *_orientation_pitch_deg * 1_deg;
 	Angle orientation_roll = *_orientation_roll_deg * 1_deg;
 	// Target attitude - computed from current orientation and joystick deflection:
-	Angle target_pitch = orientation_pitch + axis_pitch * target_pitch_limit;
+	Angle target_pitch = orientation_pitch + std::cos (orientation_roll.rad()) * axis_pitch * target_pitch_limit;
 	Angle target_roll = orientation_roll + axis_roll * target_roll_limit;
+	target_pitch = floored_mod<float> (target_pitch.deg(), -180.0, +180.0) * 1_deg;
+	target_roll = floored_mod<float> (target_roll.deg(), -180.0, +180.0) * 1_deg;
 
 	// Update output attitude:
-	_output_pitch_pid.set_target (target_pitch.deg() / 360.f);
-	_output_roll_pid.set_target (target_roll.deg() / 360.f);
-	_output_pitch_pid.process (_output_pitch.deg() / 360.f, _dt.seconds());
-	_output_roll_pid.process (_output_roll.deg() / 360.f, _dt.seconds());
+	_output_pitch_pid.set_target (target_pitch.deg() / 180.f);
+	_output_roll_pid.set_target (target_roll.deg() / 180.f);
+	_output_pitch_pid.process (_output_pitch.deg() / 180.f, _dt.seconds());
+	_output_roll_pid.process (_output_roll.deg() / 180.f, _dt.seconds());
 	_output_pitch += std::abs (axis_pitch) * _output_pitch_pid.output() * 360_deg;
 	_output_roll += std::abs (axis_roll) * _output_roll_pid.output() * 360_deg;
+	_output_pitch = floored_mod<float> (_output_pitch.deg(), -180.0, +180.0) * 1_deg;
+	_output_roll = floored_mod<float> (_output_roll.deg(), -180.0, +180.0) * 1_deg;
 
 	_output_pitch_deg.write (_output_pitch.deg());
 	_output_roll_deg.write (_output_roll.deg());
