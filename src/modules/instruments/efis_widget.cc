@@ -370,7 +370,7 @@ EFISWidget::adi_paint_roll (QPainter& painter)
 			<< c + x0 + y0
 			<< b - x0 + y0;
 
-		painter.translate (-bound (_slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
+		painter.translate (-limit (_slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
 		if (bank_angle_warning || slip_skid_warning)
 			painter.setPen (warning_pen);
@@ -466,11 +466,11 @@ EFISWidget::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_speed = bound (_speed, 0.f, 9999.99f);
-	_mach = bound (_mach, 0.f, 9.99f);
-	_minimum_speed = bound (_minimum_speed, 0.f, 9999.99f);
-	_warning_speed = bound (_warning_speed, 0.f, 9999.99f);
-	_maximum_speed = bound (_maximum_speed, 0.f, 9999.99f);
+	_speed = limit (_speed, 0.f, 9999.99f);
+	_mach = limit (_mach, 0.f, 9.99f);
+	_minimum_speed = limit (_minimum_speed, 0.f, 9999.99f);
+	_warning_speed = limit (_warning_speed, 0.f, 9999.99f);
+	_maximum_speed = limit (_maximum_speed, 0.f, 9999.99f);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
@@ -737,7 +737,7 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	// AT bug:
 	if (_at_speed_visible)
 	{
-		float posy = bound (kt_to_px (_at_speed),
+		float posy = limit (kt_to_px (_at_speed),
 							static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
 		// TODO extract bug_shape to sl_post_resize()
 		QPolygonF bug_shape = QPolygonF()
@@ -851,9 +851,9 @@ EFISWidget::al_post_resize()
 void
 EFISWidget::al_pre_paint()
 {
-	_altitude = bound (_altitude, -99999.f, +99999.f);
-	_climb_rate = bound (_climb_rate, -9999.f, +9999.f);
-	_pressure = bound (_pressure, 0.f, 99.99f);
+	_altitude = limit (_altitude, -99999.f, +99999.f);
+	_climb_rate = limit (_climb_rate, -9999.f, +9999.f);
+	_pressure = limit (_pressure, 0.f, 99.99f);
 
 	float sgn = _altitude < 0.f ? -1.f : 1.f;
 	_al_min_shown = _altitude - 0.5f * _al_extent;
@@ -1086,7 +1086,7 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		// AP bug:
 		if (_ap_altitude_visible)
 		{
-			float posy = bound (ft_to_px (_ap_altitude),
+			float posy = limit (ft_to_px (_ap_altitude),
 								static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
 				<< QPointF (0.f, 0.f)
@@ -1365,12 +1365,12 @@ EFISWidget::paint_flight_director (QPainter& painter)
 	Angle range = _fov / 4.f;
 
 	Angle pitch = std::cos (_roll.rad()) * (_flight_director_pitch - _pitch);
-	pitch = bound (pitch, -range, +range);
+	pitch = limit (pitch, -range, +range);
 
 	Angle roll = _flight_director_roll - _roll;
 	if (std::abs (roll.deg()) > 180.0)
 		roll = roll - sgn (roll.deg()) * 360_deg;
-	roll = bound (roll, -range, +range);
+	roll = limit (roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1400,8 +1400,8 @@ EFISWidget::paint_control_stick (QPainter& painter)
 	float const z = w * 0.3f;
 	Angle range = _fov / 4.f;
 
-	Angle pitch = bound (_control_stick_pitch, -range, +range);
-	Angle roll = bound (_control_stick_roll, -range, +range);
+	Angle pitch = limit (_control_stick_pitch, -range, +range);
+	Angle roll = limit (_control_stick_roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1427,7 +1427,7 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 	if (!_altitude_agl_visible)
 		return;
 
-	float aagl = bound (_altitude_agl, -9999.f, +99999.f);
+	float aagl = limit (_altitude_agl, -9999.f, +99999.f);
 	QFont radar_altimeter_font = _font_20_bold;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
@@ -1526,7 +1526,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 		auto paint_ladder = [&](bool needle_visible, float track_deviation) -> void
 		{
-			track_deviation = bound (track_deviation, -1.f, 1.f);
+			track_deviation = limit (track_deviation, -1.f, 1.f);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -1579,7 +1579,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = bound (_navigation_hd_needle, -1.f, +1.f);
+		float offset = limit (_navigation_hd_needle, -1.f, +1.f);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.26f * wh());

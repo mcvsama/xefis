@@ -146,8 +146,8 @@ TextPainter::drawText (QRectF const& target, Qt::Alignment flags, QString const&
 			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (_painter.font(), color, *c) }).first;
 		float fx = floored_mod<float> (offset.x(), 1.f);
 		float fy = floored_mod<float> (offset.y(), 1.f);
-		int dx = bound<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
-		int dy = bound<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		int dx = limit<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		int dy = limit<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		_painter.drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
 		offset.rx() += metrics.width (*c);
 	}

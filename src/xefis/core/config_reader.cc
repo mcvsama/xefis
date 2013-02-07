@@ -187,8 +187,8 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 	window->setBackgroundRole (QPalette::Shadow);
 	window->setAutoFillBackground (true);
 	window->setWindowTitle ("XEFIS");
-	window->resize (bound (window_element.attribute ("width").toInt(), 40, 10000),
-					bound (window_element.attribute ("height").toInt(), 30, 10000));
+	window->resize (limit (window_element.attribute ("width").toInt(), 40, 10000),
+					limit (window_element.attribute ("height").toInt(), 30, 10000));
 	if (window_element.attribute ("full-screen") == "true")
 		window->setWindowState (window->windowState() | Qt::WindowFullScreen);
 
@@ -263,7 +263,7 @@ void
 ConfigReader::process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* window)
 {
 	bool has_child = false;
-	int stretch = bound (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
+	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
 
 	for (QDomElement& e: item_element)
 	{

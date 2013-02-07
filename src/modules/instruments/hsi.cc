@@ -179,7 +179,7 @@ HSI::estimate_track()
 
 		_hsi_widget->set_trend_vector_visible (visible);
 		_hsi_widget->set_trend_vector_lookahead (1_nm * *_trend_vector_range);
-		_hsi_widget->set_track_deviation (bound (beta_per_mile, -180.0_deg, +180.0_deg));
+		_hsi_widget->set_track_deviation (limit (beta_per_mile, -180.0_deg, +180.0_deg));
 	}
 }
 
