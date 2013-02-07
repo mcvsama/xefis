@@ -74,16 +74,6 @@ SRC_SOURCES += xefis/utility/backtrace.cc
 SRC_SOURCES += xefis/utility/lonlat.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
 
-######## /modules/computers ########
-
-SRC_HEADERS += modules/computers/ap_multiplexer.h
-SRC_HEADERS += modules/computers/lookahead.h
-SRC_HEADERS += modules/computers/stabilizer.h
-
-SRC_SOURCES += modules/computers/ap_multiplexer.cc
-SRC_SOURCES += modules/computers/lookahead.cc
-SRC_SOURCES += modules/computers/stabilizer.cc
-
 ######## /modules/generic ########
 
 SRC_HEADERS += modules/generic/fps.h
@@ -91,6 +81,27 @@ SRC_HEADERS += modules/generic/property_tree.h
 
 SRC_SOURCES += modules/generic/fps.cc
 SRC_SOURCES += modules/generic/property_tree.cc
+
+######## /modules/instruments ########
+
+SRC_HEADERS += modules/instruments/efis.h
+SRC_HEADERS += modules/instruments/efis_widget.h
+SRC_HEADERS += modules/instruments/hsi.h
+SRC_HEADERS += modules/instruments/hsi_widget.h
+SRC_HEADERS += modules/instruments/radial_indicator.h
+SRC_HEADERS += modules/instruments/radial_indicator_widget.h
+
+SRC_SOURCES += modules/instruments/efis.cc
+SRC_SOURCES += modules/instruments/efis_widget.cc
+SRC_SOURCES += modules/instruments/hsi.cc
+SRC_SOURCES += modules/instruments/hsi_widget.cc
+SRC_SOURCES += modules/instruments/radial_indicator.cc
+SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
+
+SRC_MOCHDRS += modules/instruments/efis.h
+SRC_MOCHDRS += modules/instruments/efis_widget.h
+SRC_MOCHDRS += modules/instruments/hsi.h
+SRC_MOCHDRS += modules/instruments/radial_indicator.h
 
 ######## /modules/io ########
 
@@ -103,31 +114,15 @@ SRC_SOURCES += modules/io/joystick.cc
 SRC_MOCHDRS += modules/io/flight_gear.h
 SRC_MOCHDRS += modules/io/joystick.h
 
-######## /modules/instruments ########
+######## /modules/systems ########
 
-SRC_HEADERS += modules/instruments/efis.h
-SRC_HEADERS += modules/instruments/hsi.h
-SRC_HEADERS += modules/instruments/radial_indicator.h
+SRC_HEADERS += modules/systems/ap.h
+SRC_HEADERS += modules/systems/lookahead.h
+SRC_HEADERS += modules/systems/stabilizer.h
 
-SRC_SOURCES += modules/instruments/efis.cc
-SRC_SOURCES += modules/instruments/hsi.cc
-SRC_SOURCES += modules/instruments/radial_indicator.cc
-
-SRC_MOCHDRS += modules/instruments/efis.h
-SRC_MOCHDRS += modules/instruments/hsi.h
-SRC_MOCHDRS += modules/instruments/radial_indicator.h
-
-######## /modules/instruments/widgets ########
-
-SRC_HEADERS += modules/instruments/efis_widget.h
-SRC_HEADERS += modules/instruments/hsi_widget.h
-SRC_HEADERS += modules/instruments/radial_indicator_widget.h
-
-SRC_SOURCES += modules/instruments/efis_widget.cc
-SRC_SOURCES += modules/instruments/hsi_widget.cc
-SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
-
-SRC_MOCHDRS += modules/instruments/efis_widget.h
+SRC_SOURCES += modules/systems/ap.cc
+SRC_SOURCES += modules/systems/lookahead.cc
+SRC_SOURCES += modules/systems/stabilizer.cc
 
 ################
 
