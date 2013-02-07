@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__LONLAT_H__INCLUDED
-#define XEFIS__UTILITY__LONLAT_H__INCLUDED
+#ifndef SI__LONLAT_H__INCLUDED
+#define SI__LONLAT_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -20,9 +20,12 @@
 // Qt:
 #include <QtCore/QPointF>
 
-// Xefis:
-#include <xefis/config/all.h>
+// Local:
+#include "constants.h"
+#include "angle.h"
 
+
+namespace SI {
 
 class LonLat
 {
@@ -130,6 +133,8 @@ LonLat::haversine_nm (LonLat const& other) const
 {
 	return haversine (other) * EARTH_MEAN_RADIUS;
 }
+
+} // namespace SI
 
 #endif
 
