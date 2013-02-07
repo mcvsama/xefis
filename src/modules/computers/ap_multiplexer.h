@@ -30,6 +30,13 @@
 class APMultiplexer: public Xefis::Module
 {
   public:
+	enum VerticalMode
+	{
+		AltitudeSet		= 0,
+		ClimbRateSet	= 1
+	};
+
+  public:
 	// Ctor
 	APMultiplexer (Xefis::ModuleManager*, QDomElement const& config);
 
@@ -37,16 +44,39 @@ class APMultiplexer: public Xefis::Module
 	void
 	data_updated() override;
 
+  private:
+	void
+	compute_ap_settings();
+
+	void
+	compute_joystick_input();
+
 	float
 	remove_dead_zone (float input, float dead_deflection);
 
   private:
+	Xefis::PID<float>		_heading_pid;
+	Xefis::PID<float>		_altitude_pid;
+	Xefis::PID<float>		_cbr_pid;
 	Xefis::PID<float>		_output_pitch_pid;
 	Xefis::PID<float>		_output_roll_pid;
-	Angle					_output_pitch;
-	Angle					_output_roll;
+	Angle					_manual_output_pitch;
+	Angle					_manual_output_roll;
+	Angle					_auto_output_pitch;
+	Angle					_auto_output_roll;
 	Xefis::Timestamp		_dt;
 	// Input:
+	// TODO PIDs parameters
+	Xefis::PropertyBoolean	_ap_enabled;
+	Xefis::PropertyFloat	_bank_limit_deg;
+	Xefis::PropertyFloat	_yank_limit_deg;
+	Xefis::PropertyFloat	_selected_mag_heading_deg;
+	Xefis::PropertyFloat	_selected_altitude_ft;
+	Xefis::PropertyFloat	_selected_cbr_fpm;
+	Xefis::PropertyInteger	_vertical_mode;
+	Xefis::PropertyFloat	_measured_mag_heading_deg;
+	Xefis::PropertyFloat	_measured_altitude_ft;
+	Xefis::PropertyFloat	_measured_cbr_fpm;
 	Xefis::PropertyFloat	_input_pitch_axis;
 	Xefis::PropertyFloat	_input_roll_axis;
 	Xefis::PropertyFloat	_pitch_axis_dead_zone;

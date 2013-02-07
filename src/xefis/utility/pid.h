@@ -327,9 +327,15 @@ template<class T>
 	inline typename PID<T>::ValueType
 	PID<T>::process (ValueType measured_value, TimeType dt) noexcept
 	{
-		ValueType error = bound<ValueType> (_target - measured_value, -2.0, +2.0);
-		if (_winding && std::abs (error) > 1.0)
-			error = error - sgn (error) * 2.0;
+		ValueType error;
+		if (_winding)
+		{
+			error = bound<ValueType> (_target - measured_value, -2.0, +2.0);
+			if (std::abs (error) > 1.0)
+				error = error - sgn (error) * 2.0;
+		}
+		else
+			error = _target - measured_value;
 		_integral += error * dt;
 		_integral = bound<ParamType> (_integral, _i_limit);
 		_derivative = (error - _previous_error) / dt;

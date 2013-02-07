@@ -61,9 +61,9 @@ class Stabilizer: public Xefis::Module
 	Xefis::PropertyFloat	_input_pitch_deg;
 	Xefis::PropertyFloat	_input_roll_deg;
 	Xefis::PropertyFloat	_input_yaw_axis;
-	Xefis::PropertyFloat	_orientation_pitch_deg;
-	Xefis::PropertyFloat	_orientation_roll_deg;
-	Xefis::PropertyFloat	_slip_skid_g;
+	Xefis::PropertyFloat	_measured_pitch_deg;
+	Xefis::PropertyFloat	_measured_roll_deg;
+	Xefis::PropertyFloat	_measured_slip_skid_g;
 	Xefis::PropertyFloat	_elevator_minimum;
 	Xefis::PropertyFloat	_elevator_maximum;
 	Xefis::PropertyFloat	_ailerons_minimum;

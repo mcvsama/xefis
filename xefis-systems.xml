@@ -13,14 +13,24 @@
 		</module>
 		<module name='computers/ap-multiplexer'>
 			<properties path='/fbw/ap-multiplexer'>
+				<property name='ap-enabled' path='//input/main/button/28'/>
+				<property name='bank-limit' path='/config/bank-limit.deg' default='15'/>
+				<property name='yank-limit' path='/config/yank-limit.deg' default='7'/>
+				<property name='selected-mag-heading' path='//instrumentation/autopilot/settings/heading.deg'/>
+				<property name='selected-altitude' path='//instrumentation/autopilot/settings/altitude.ft'/>
+				<property name='selected-climb-rate' path='//instrumentation/autopilot/settings/cbr.fpm'/>
+				<property name='vertical-mode' path='/vertical-mode' default='1'/>
+				<property name='measured-mag-heading' path='//instrumentation/orientation/heading-magnetic.deg'/>
+				<property name='measured-altitude' path='//instrumentation/altitude/amsl.ft'/>
+				<property name='measured-climb-rate' path='//instrumentation/altitude/climb-rate.fpm'/>
+				<property name='measured-pitch' path='//instrumentation/orientation/pitch.deg'/>
+				<property name='measured-roll' path='//instrumentation/orientation/roll.deg'/>
 				<property name='input-pitch-axis' path='//input/main/axis/1'/>
 				<property name='input-roll-axis' path='//input/main/axis/0'/>
 				<property name='pitch-axis-dead-zone' path='//input/main/dead-zone/1' default='0.05'/>
 				<property name='roll-axis-dead-zone' path='//input/main/dead-zone/0' default='0.05'/>
 				<property name='max-pitch-angle' path='/max-pitch-angle.deg' default='15'/>
 				<property name='max-roll-angle' path='/max-roll-angle.deg' default='25'/>
-				<property name='orientation-pitch' path='//instrumentation/orientation/pitch.deg'/>
-				<property name='orientation-roll' path='//instrumentation/orientation/roll.deg'/>
 				<property name='output-control-stick-pitch' path='/control-stick/pitch.deg'/>
 				<property name='output-control-stick-roll' path='/control-stick/roll.deg'/>
 				<property name='output-pitch' path='/pitch.deg'/>
@@ -48,9 +58,9 @@
 				<property name='input-pitch' path='//fbw/ap-multiplexer/pitch.deg' default='0'/>
 				<property name='input-roll' path='//fbw/ap-multiplexer/roll.deg' default='0'/>
 				<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
-				<property name='orientation-pitch' path='//instrumentation/orientation/pitch.deg'/>
-				<property name='orientation-roll' path='//instrumentation/orientation/roll.deg'/>
-				<property name='slip-skid' path='//instrumentation/slip-skid/slip-skid.g'/>
+				<property name='measured-pitch' path='//instrumentation/orientation/pitch.deg'/>
+				<property name='measured-roll' path='//instrumentation/orientation/roll.deg'/>
+				<property name='measured-slip-skid' path='//instrumentation/slip-skid/slip-skid.g'/>
 				<property name='elevator-minimum' path='/config/elevator/minimum' default='-0.75'/>
 				<property name='elevator-maximum' path='/config/elevator/maximum' default='+0.75'/>
 				<property name='ailerons-minimum' path='/config/ailerons/minimum' default='-0.5'/>
