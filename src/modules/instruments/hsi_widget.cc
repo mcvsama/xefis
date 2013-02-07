@@ -192,7 +192,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	switch (_display_mode)
 	{
 		case DisplayMode::Auxiliary:
-			_limited_rotation = bound (floored_mod (_ap_mag_heading - _mag_heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+			_limited_rotation = limit (floored_mod (_ap_mag_heading - _mag_heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
 			break;
 
 		default:

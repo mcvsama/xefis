@@ -138,10 +138,10 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	QRectF rect (-r, -r, 2.f * r, 2.f * r);
 
 	float value_span_angle = 210.f;
-	float value = bound (_value, _range);
-	float warning = bound (_warning_value, _range);
-	float critical = bound (_critical_value, _range);
-	float normal = bound (_normal_value, _range);
+	float value = limit (_value, _range);
+	float warning = limit (_warning_value, _range);
+	float critical = limit (_critical_value, _range);
+	float normal = limit (_normal_value, _range);
 
 	if (!_warning_visible)
 		warning = _range.max();

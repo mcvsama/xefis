@@ -63,7 +63,7 @@ sgn (float const& v) noexcept
  * \param	d - divisor
  */
 template<class Number>
-	Number
+	constexpr Number
 	floored_mod (Number n, Number d)
 	{
 		return n - (d * std::floor (n / d));
@@ -71,7 +71,7 @@ template<class Number>
 
 
 template<class Number>
-	Number
+	constexpr Number
 	floored_mod (Number n, Number min, Number max)
 	{
 		return floored_mod (n - min, max - min) + min;
@@ -80,7 +80,7 @@ template<class Number>
 
 template<class Value>
 	inline constexpr Value
-	bound (Value value, Value min, Value max) noexcept
+	limit (Value value, Value min, Value max) noexcept
 	{
 		return value < min
 			? min
@@ -92,11 +92,11 @@ template<class Value>
 
 template<class Value>
 	inline constexpr Value
-	bound (Value value, Range<Value> range) noexcept
+	limit (Value value, Range<Value> range) noexcept
 	{
 		return range.min() <= range.max()
-			? bound (value, range.min(), range.max())
-			: bound (value, range.max(), range.min());
+			? limit (value, range.min(), range.max())
+			: limit (value, range.max(), range.min());
 	}
 
 

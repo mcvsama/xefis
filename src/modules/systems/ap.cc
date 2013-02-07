@@ -115,7 +115,7 @@ AP::compute_ap_settings()
 
 	_heading_pid.set_target (renormalize (*_selected_mag_heading_deg, 0.0f, 360.f, -1.f, +1.f));
 	_heading_pid.process (renormalize (*_measured_mag_heading_deg, 0.0f, 360.f, -1.f, +1.f), _dt.seconds());
-	_auto_output_roll = bound<float> (_heading_pid.output() * 180.0, -bank_limit, +bank_limit) * 1_deg;
+	_auto_output_roll = limit<float> (_heading_pid.output() * 180.0, -bank_limit, +bank_limit) * 1_deg;
 
 	_altitude_pid.set_target (*_selected_altitude_ft);
 	_altitude_pid.process (*_measured_altitude_ft, _dt.seconds());
@@ -126,11 +126,11 @@ AP::compute_ap_settings()
 	switch (static_cast<VerticalMode> (*_vertical_mode))
 	{
 		case AltitudeSet:
-			_auto_output_pitch = bound<float> (alt_output_scale * _altitude_pid.output(), -yank_limit, +yank_limit) * 1_deg;
+			_auto_output_pitch = limit<float> (alt_output_scale * _altitude_pid.output(), -yank_limit, +yank_limit) * 1_deg;
 			break;
 
 		case ClimbRateSet:
-			_auto_output_pitch = bound<float> (cbr_output_scale * _cbr_pid.output(), -yank_limit, +yank_limit) * 1_deg;
+			_auto_output_pitch = limit<float> (cbr_output_scale * _cbr_pid.output(), -yank_limit, +yank_limit) * 1_deg;
 			break;
 	}
 }
