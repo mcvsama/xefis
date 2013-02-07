@@ -23,10 +23,10 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "ap_multiplexer.h"
+#include "ap.h"
 
 
-APMultiplexer::APMultiplexer (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AP::AP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager),
 	_heading_pid (1.0, 0.1, 0.0, 0.0),
 	_altitude_pid (1.0, 0.1, 0.0, 0.0),
@@ -77,7 +77,7 @@ APMultiplexer::APMultiplexer (Xefis::ModuleManager* module_manager, QDomElement 
 
 
 void
-APMultiplexer::data_updated()
+AP::data_updated()
 {
 	// Don't process if dt is too small:
 	_dt += update_dt();
@@ -105,7 +105,7 @@ APMultiplexer::data_updated()
 
 
 void
-APMultiplexer::compute_ap_settings()
+AP::compute_ap_settings()
 {
 	double const alt_output_scale = 0.1;
 	double const cbr_output_scale = 0.01;
@@ -137,7 +137,7 @@ APMultiplexer::compute_ap_settings()
 
 
 void
-APMultiplexer::compute_joystick_input()
+AP::compute_joystick_input()
 {
 	// Shortcuts:
 	Angle target_pitch_limit = *_max_pitch_angle_deg * 1_deg;
@@ -171,7 +171,7 @@ APMultiplexer::compute_joystick_input()
 
 
 inline float
-APMultiplexer::remove_dead_zone (float input, float dead_deflection)
+AP::remove_dead_zone (float input, float dead_deflection)
 {
 	if (std::abs (input) < dead_deflection)
 		return 0.0;

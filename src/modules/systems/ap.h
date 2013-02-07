@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__COMPUTERS__AP_MULTIPLEXER_H__INCLUDED
-#define XEFIS__MODULES__COMPUTERS__AP_MULTIPLEXER_H__INCLUDED
+#ifndef XEFIS__MODULES__COMPUTERS__AP_H__INCLUDED
+#define XEFIS__MODULES__COMPUTERS__AP_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -27,7 +27,7 @@
 #include <xefis/utility/pid.h>
 
 
-class APMultiplexer: public Xefis::Module
+class AP: public Xefis::Module
 {
   public:
 	enum VerticalMode
@@ -38,7 +38,7 @@ class APMultiplexer: public Xefis::Module
 
   public:
 	// Ctor
-	APMultiplexer (Xefis::ModuleManager*, QDomElement const& config);
+	AP (Xefis::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

@@ -19,16 +19,16 @@
 #include <xefis/core/module.h>
 
 // Modules:
-#include <modules/computers/ap_multiplexer.h>
-#include <modules/computers/lookahead.h>
-#include <modules/computers/stabilizer.h>
 #include <modules/generic/fps.h>
 #include <modules/generic/property_tree.h>
-#include <modules/io/flight_gear.h>
-#include <modules/io/joystick.h>
 #include <modules/instruments/efis.h>
 #include <modules/instruments/hsi.h>
 #include <modules/instruments/radial_indicator.h>
+#include <modules/io/flight_gear.h>
+#include <modules/io/joystick.h>
+#include <modules/systems/ap.h>
+#include <modules/systems/lookahead.h>
+#include <modules/systems/stabilizer.h>
 
 // Local:
 #include "module_manager.h"
@@ -95,12 +95,12 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		return new HSI (this, config, parent);
 	else if (name == "instruments/radial-indicator")
 		return new RadialIndicator (this, config, parent);
-	else if (name == "computers/lookahead")
+	else if (name == "systems/lookahead")
 		return new Lookahead (this, config);
-	else if (name == "computers/stabilizer")
+	else if (name == "systems/stabilizer")
 		return new Stabilizer (this, config);
-	else if (name == "computers/ap-multiplexer")
-		return new APMultiplexer (this, config);
+	else if (name == "systems/ap")
+		return new AP (this, config);
 	else if (name == "generic/property-tree")
 		return new PropertyTree (this, config, parent);
 	else if (name == "generic/fps")

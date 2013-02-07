@@ -2,7 +2,7 @@
 <xefis-include>
 	<modules>
 		<module disabled='true' name='generic/fps'/>
-		<module name='computers/lookahead'>
+		<module name='systems/lookahead'>
 			<input>/instrumentation/altitude/amsl.ft</input>
 			<output>/instrumentation/altitude/amsl-lookahead.ft</output>
 			<smoothing>500</smoothing>
@@ -11,7 +11,7 @@
 				<property name='lookahead-time' path='/instrumentation/altitude/amsl-lookahead-time.s' default='10'/>
 			</properties>
 		</module>
-		<module name='computers/ap-multiplexer'>
+		<module name='systems/ap-multiplexer'>
 			<properties path='/fbw/ap-multiplexer'>
 				<property name='ap-enabled' path='//input/main/button/28'/>
 				<property name='bank-limit' path='/config/bank-limit.deg' default='15'/>
@@ -37,7 +37,7 @@
 				<property name='output-roll' path='/roll.deg'/>
 			</properties>
 		</module>
-		<module name='computers/stabilizer'>
+		<module name='systems/stabilizer'>
 			<properties path='/fbw/stabilizer'>
 				<property name='stabilization-gain' path='/config/gain' default='1.0'/>
 				<property name='pitch-gain' path='/config/pitch/gain' default='1.0'/>
