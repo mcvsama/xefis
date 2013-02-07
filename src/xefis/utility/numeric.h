@@ -22,7 +22,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/range.h>
-#include <xefis/utility/lonlat.h>
 
 
 inline constexpr float

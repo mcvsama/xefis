@@ -27,7 +27,6 @@
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/utility/text_painter.h>
-#include <xefis/utility/lonlat.h>
 #include <xefis/utility/numeric.h>
 
 

@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/lonlat.h>
 
 
 namespace Xefis {

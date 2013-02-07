@@ -17,12 +17,11 @@
 // Qt:
 #include <QtGui/QTransform>
 
-// Xefis:
-#include <xefis/config/all.h>
-
 // Local:
 #include "lonlat.h"
 
+
+namespace SI {
 
 LonLat&
 LonLat::rotate (LonLat const& rotation)
@@ -108,4 +107,6 @@ LonLat::haversine (LonLat const& other) const
 
 	return 2.0 * std::atan2 (std::sqrt (z), std::sqrt (1.0 - z));
 }
+
+} // namespace SI
 

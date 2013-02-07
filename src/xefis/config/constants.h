@@ -23,8 +23,7 @@
 #include "types.h"
 
 
-constexpr Length	EARTH_MEAN_RADIUS	= 6367.46_km;
-constexpr Pressure	STD_PRESSURE		= 29.92_inhg;
+constexpr Pressure STD_PRESSURE = 29.92_inhg;
 
 inline bool
 is_std_pressure (Pressure pressure)
