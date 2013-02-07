@@ -56,9 +56,9 @@ Stabilizer::Stabilizer (Xefis::ModuleManager* module_manager, QDomElement const&
 				{ "input-pitch", _input_pitch_deg, true },
 				{ "input-roll", _input_roll_deg, true },
 				{ "input-yaw-axis", _input_yaw_axis, true },
-				{ "orientation-pitch", _orientation_pitch_deg, true },
-				{ "orientation-roll", _orientation_roll_deg, true },
-				{ "slip-skid", _slip_skid_g, true },
+				{ "measured-pitch", _measured_pitch_deg, true },
+				{ "measured-roll", _measured_roll_deg, true },
+				{ "measured-slip-skid", _measured_slip_skid_g, true },
 				{ "elevator-minimum", _elevator_minimum, true },
 				{ "elevator-maximum", _elevator_maximum, true },
 				{ "ailerons-minimum", _ailerons_minimum, true },
@@ -106,15 +106,15 @@ Stabilizer::data_updated()
 	_rudder_pid.set_output_limit (Range<float> (*_rudder_minimum, *_rudder_maximum));
 
 	_elevator_pid.set_target (*_input_pitch_deg / 180.f);
-	_elevator_pid.process (*_orientation_pitch_deg / 180.f, _dt.seconds());
+	_elevator_pid.process (*_measured_pitch_deg / 180.f, _dt.seconds());
 
 	_ailerons_pid.set_target (*_input_roll_deg / 180.f);
-	_ailerons_pid.process (*_orientation_roll_deg / 180.f, _dt.seconds());
+	_ailerons_pid.process (*_measured_roll_deg / 180.f, _dt.seconds());
 
 	_rudder_pid.set_target (0.0);
-	_rudder_pid.process (*_slip_skid_g, _dt.seconds());
+	_rudder_pid.process (*_measured_slip_skid_g, _dt.seconds());
 
-	_output_elevator.write (-std::cos ((*_orientation_roll_deg * 1_deg).rad()) * _elevator_pid.output());
+	_output_elevator.write (-std::cos ((*_measured_roll_deg * 1_deg).rad()) * _elevator_pid.output());
 	_output_ailerons.write (_ailerons_pid.output());
 
 	float yaw_axis = *_input_yaw_axis;

@@ -28,6 +28,9 @@
 
 APMultiplexer::APMultiplexer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager),
+	_heading_pid (1.0, 0.1, 0.0, 0.0),
+	_altitude_pid (1.0, 0.1, 0.0, 0.0),
+	_cbr_pid (1.0, 0.1, 0.0, 0.0),
 	_output_pitch_pid (1.0, 0.1, 0.0, 0.0),
 	_output_roll_pid (1.0, 0.1, 0.0, 0.0)
 {
@@ -36,14 +39,24 @@ APMultiplexer::APMultiplexer (Xefis::ModuleManager* module_manager, QDomElement 
 		if (e == "properties")
 		{
 			parse_properties (e, {
+				{ "ap-enabled", _ap_enabled, true },
+				{ "bank-limit", _bank_limit_deg, true },
+				{ "yank-limit", _yank_limit_deg, true },
+				{ "selected-mag-heading", _selected_mag_heading_deg, true },
+				{ "selected-altitude", _selected_altitude_ft, true },
+				{ "selected-climb-rate", _selected_cbr_fpm, true },
+				{ "vertical-mode", _vertical_mode, true },
+				{ "measured-mag-heading", _measured_mag_heading_deg, true },
+				{ "measured-altitude", _measured_altitude_ft, true },
+				{ "measured-climb-rate", _measured_cbr_fpm, true },
+				{ "measured-pitch", _orientation_pitch_deg, true },
+				{ "measured-roll", _orientation_roll_deg, true },
 				{ "input-pitch-axis", _input_pitch_axis, true },
 				{ "input-roll-axis", _input_roll_axis, true },
 				{ "pitch-axis-dead-zone", _pitch_axis_dead_zone, false },
 				{ "roll-axis-dead-zone", _roll_axis_dead_zone, false },
 				{ "max-pitch-angle", _max_pitch_angle_deg, true },
 				{ "max-roll-angle", _max_roll_angle_deg, true },
-				{ "orientation-pitch", _orientation_pitch_deg, true },
-				{ "orientation-roll", _orientation_roll_deg, true },
 				{ "output-control-stick-pitch", _output_control_stick_pitch, false },
 				{ "output-control-stick-roll", _output_control_stick_roll, false },
 				{ "output-pitch", _output_pitch_deg, true },
@@ -52,10 +65,14 @@ APMultiplexer::APMultiplexer (Xefis::ModuleManager* module_manager, QDomElement 
 		}
 	}
 
-	_output_pitch_pid.set_i_limit ({ -0.05f, +0.05f });
-	_output_pitch_pid.set_winding (true);
-	_output_roll_pid.set_i_limit ({ -0.05f, +0.05f });
-	_output_roll_pid.set_winding (true);
+	for (auto pid: { &_heading_pid, &_output_pitch_pid, &_output_roll_pid })
+	{
+		pid->set_i_limit ({ -0.05f, +0.05f });
+		pid->set_winding (true);
+	}
+
+	for (auto* pid: { &_altitude_pid, &_cbr_pid })
+		pid->set_i_limit ({ -0.05f, +0.05f });
 }
 
 
@@ -67,6 +84,61 @@ APMultiplexer::data_updated()
 	if (_dt.seconds() < 0.005)
 		return;
 
+	compute_ap_settings();
+	compute_joystick_input();
+
+	if (*_ap_enabled)
+	{
+		_output_pitch_deg.write (_auto_output_pitch.deg());
+		_output_roll_deg.write (_auto_output_roll.deg());
+		_manual_output_pitch = _auto_output_pitch;
+		_manual_output_roll = _auto_output_roll;
+	}
+	else
+	{
+		_output_pitch_deg.write (_manual_output_pitch.deg());
+		_output_roll_deg.write (_manual_output_roll.deg());
+	}
+
+	_dt = Xefis::Timestamp::from_epoch (0);
+}
+
+
+void
+APMultiplexer::compute_ap_settings()
+{
+	double const alt_output_scale = 0.1;
+	double const cbr_output_scale = 0.01;
+
+	float bank_limit = *_bank_limit_deg;
+	float yank_limit = *_yank_limit_deg;
+
+	_heading_pid.set_target (renormalize (*_selected_mag_heading_deg, 0.0f, 360.f, -1.f, +1.f));
+	_heading_pid.process (renormalize (*_measured_mag_heading_deg, 0.0f, 360.f, -1.f, +1.f), _dt.seconds());
+	_auto_output_roll = bound<float> (_heading_pid.output() * 180.0, -bank_limit, +bank_limit) * 1_deg;
+
+	_altitude_pid.set_target (*_selected_altitude_ft);
+	_altitude_pid.process (*_measured_altitude_ft, _dt.seconds());
+
+	_cbr_pid.set_target (*_selected_cbr_fpm);
+	_cbr_pid.process (*_measured_cbr_fpm, _dt.seconds());
+
+	switch (static_cast<VerticalMode> (*_vertical_mode))
+	{
+		case AltitudeSet:
+			_auto_output_pitch = bound<float> (alt_output_scale * _altitude_pid.output(), -yank_limit, +yank_limit) * 1_deg;
+			break;
+
+		case ClimbRateSet:
+			_auto_output_pitch = bound<float> (cbr_output_scale * _cbr_pid.output(), -yank_limit, +yank_limit) * 1_deg;
+			break;
+	}
+}
+
+
+void
+APMultiplexer::compute_joystick_input()
+{
 	// Shortcuts:
 	Angle target_pitch_limit = *_max_pitch_angle_deg * 1_deg;
 	Angle target_roll_limit = *_max_roll_angle_deg * 1_deg;
@@ -83,22 +155,18 @@ APMultiplexer::data_updated()
 	// Update output attitude:
 	_output_pitch_pid.set_target (target_pitch.deg() / 180.f);
 	_output_roll_pid.set_target (target_roll.deg() / 180.f);
-	_output_pitch_pid.process (_output_pitch.deg() / 180.f, _dt.seconds());
-	_output_roll_pid.process (_output_roll.deg() / 180.f, _dt.seconds());
-	_output_pitch += std::abs (axis_pitch) * _output_pitch_pid.output() * 360_deg;
-	_output_roll += std::abs (axis_roll) * _output_roll_pid.output() * 360_deg;
-	_output_pitch = floored_mod<float> (_output_pitch.deg(), -180.0, +180.0) * 1_deg;
-	_output_roll = floored_mod<float> (_output_roll.deg(), -180.0, +180.0) * 1_deg;
+	_output_pitch_pid.process (_manual_output_pitch.deg() / 180.f, _dt.seconds());
+	_output_roll_pid.process (_manual_output_roll.deg() / 180.f, _dt.seconds());
+	_manual_output_pitch += std::abs (axis_pitch) * _output_pitch_pid.output() * 360_deg;
+	_manual_output_roll += std::abs (axis_roll) * _output_roll_pid.output() * 360_deg;
+	_manual_output_pitch = floored_mod<float> (_manual_output_pitch.deg(), -180.0, +180.0) * 1_deg;
+	_manual_output_roll = floored_mod<float> (_manual_output_roll.deg(), -180.0, +180.0) * 1_deg;
 
-	_output_pitch_deg.write (_output_pitch.deg());
-	_output_roll_deg.write (_output_roll.deg());
-
+	// Joystick visualisation on EFIS:
 	if (!_output_control_stick_pitch.is_singular())
 		_output_control_stick_pitch.write ((axis_pitch * target_pitch_limit).deg());
 	if (!_output_control_stick_roll.is_singular())
 		_output_control_stick_roll.write ((axis_roll * target_roll_limit).deg());
-
-	_dt = Xefis::Timestamp::from_epoch (0);
 }
 
 
