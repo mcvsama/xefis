@@ -72,8 +72,10 @@ HSIWidget::update_more()
 
 		case DisplayMode::Rose:
 		{
-			_q = 0.1f * wh();
-			_r = 7.5f * _q;
+			_q = 0.05f * height();
+			_r = 0.40f * height();
+			if (_r > 0.85f * wh())
+				_r = 0.85f * wh();
 			float const rx = nm_to_px (_range);
 
 			_aircraft_center_transform.reset();
@@ -317,7 +319,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 
-	QFont font = _font_10_bold;
+	QFont font = _font_13_bold;
 	QFontMetricsF metrics (font);
 
 	if (_heading_visible)
@@ -340,6 +342,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 				centrify (half_range_rect);
 				half_range_rect.moveRight (-2.f * range_tick_hpx);
 				half_range_rect.translate (0.f, -range_tick_vpx);
+				painter.setFont (font);
 				text_painter.drawText (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
 			}
 		};
@@ -643,8 +646,6 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 	painter.setClipPath (_outer_map_clip);
 	painter.setFont (_font_10_bold);
 
-	// A bit bigger range to allow drawing objects currently positioned outside clipping path:
-	// TODO cache, and retrieve after position change of at least 0.5 mile
 	retrieve_navaids();
 
 	paint_locs (painter, text_painter);
@@ -844,6 +845,9 @@ HSIWidget::retrieve_navaids()
 	if (!_navaid_storage)
 		return;
 
+	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (_position) < 0.1f * _range && _range == _navs_retrieve_range)
+		return;
+
 	_loc_navs.clear();
 	_ndb_navs.clear();
 	_vor_navs.clear();
@@ -881,5 +885,9 @@ HSIWidget::retrieve_navaids()
 				break;
 		}
 	}
+
+	_navs_retrieved = true;
+	_navs_retrieve_position = _position;
+	_navs_retrieve_range = _range;
 }
 
