@@ -30,6 +30,7 @@
 #include <modules/systems/ap.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/stabilizer.h>
+#include <modules/systems/state.h>
 
 // Local:
 #include "module_manager.h"
@@ -112,6 +113,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		return new Stabilizer (this, config);
 	else if (name == "systems/ap")
 		return new AP (this, config);
+	else if (name == "systems/state")
+		return new State (this, config);
 	else if (name == "generic/property-tree")
 		return new PropertyTree (this, config, parent);
 	else if (name == "generic/fps")

@@ -52,12 +52,12 @@
 									<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
 									<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
 									<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
-									<property name='flight-director-visible' path='/configuration/autopilot/flight-director/visible' default='false'/>
-									<property name='flight-director-pitch' path='//fbw/ap-multiplexer/pitch.deg'/>
-									<property name='flight-director-roll' path='//fbw/ap-multiplexer/roll.deg'/>
+									<property name='flight-director-visible' path='/configuration/autopilot/flight-director/visible' default='true'/>
+									<property name='flight-director-pitch' path='//fbw/ap/pitch.deg'/>
+									<property name='flight-director-roll' path='//fbw/ap/roll.deg'/>
 									<property name='control-stick-visible' path='/configuration/autopilot/control-stick/visible' default='true'/>
-									<property name='control-stick-pitch' path='//fbw/ap-multiplexer/control-stick/pitch.deg'/>
-									<property name='control-stick-roll' path='//fbw/ap-multiplexer/control-stick/roll.deg'/>
+									<property name='control-stick-pitch' path='//fbw/ap/control-stick/pitch.deg'/>
+									<property name='control-stick-roll' path='//fbw/ap/control-stick/roll.deg'/>
 									<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible' default='false'/>
 									<property name='navigation-type-hint' path='/navigation/type-hint' default='ILS'/>
 									<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
