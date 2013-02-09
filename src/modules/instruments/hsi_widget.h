@@ -421,6 +421,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Angle					_limited_rotation;
 	float					_r;
 	float					_q;
+	bool					_navs_retrieved				= false;
+	LonLat					_navs_retrieve_position		= { 0_deg, 0_deg };
+	Length					_navs_retrieve_range		= 0_nm;
 
 	// Parameters:
 	DisplayMode				_display_mode				= DisplayMode::Expanded;

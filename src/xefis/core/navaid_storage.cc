@@ -46,7 +46,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 
 	auto inserter_and_predicate = [&] (Navaid const& navaid) -> bool
 	{
-		if (position.haversine_nm (navaid.position()) <= radius)
+		if (position.haversine_earth (navaid.position()) <= radius)
 		{
 			set.insert (navaid);
 			return false;

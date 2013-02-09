@@ -74,7 +74,7 @@ class LonLat
 	 * Result is in nautical miles.
 	 */
 	Length
-	haversine_nm (LonLat const& other) const;
+	haversine_earth (LonLat const& other) const;
 
   private:
 	Angle	_lon;
@@ -126,10 +126,9 @@ LonLat::lat() const
 /**
  * Convenience function.
  * Compute distance between two sets of coordinates on Earth.
- * Result is in nautical miles.
  */
 inline Length
-LonLat::haversine_nm (LonLat const& other) const
+LonLat::haversine_earth (LonLat const& other) const
 {
 	return haversine (other) * EARTH_MEAN_RADIUS;
 }

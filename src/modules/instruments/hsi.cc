@@ -158,7 +158,7 @@ HSI::estimate_track()
 
 	// Estimate only if the distance between last and current positions is > 0.02nm.
 	Length epsilon = 10_m;
-	if (_positions[0].haversine_nm (current_position) > epsilon)
+	if (_positions[0].haversine_earth (current_position) > epsilon)
 	{
 		// Shift data in _positions:
 		for (unsigned int i = _positions.size() - 1; i > 0; i--)
@@ -166,14 +166,14 @@ HSI::estimate_track()
 		_positions[0] = current_position;
 	}
 
-	Length len10 = _positions[1].haversine_nm (_positions[0]);
+	Length len10 = _positions[1].haversine_earth (_positions[0]);
 
 	Angle alpha = -180.0_deg + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
 	Angle beta_per_mile = alpha / len10.nm();
 
 	if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
 	{
-		bool visible = _positions[2].haversine_nm (_positions[0]) > 2.f * epsilon;
+		bool visible = _positions[2].haversine_earth (_positions[0]) > 2.f * epsilon;
 		if (visible)
 			beta_per_mile = 1_deg * _trend_vector_smoother.process (beta_per_mile.deg());
 
