@@ -70,6 +70,14 @@ template<class Number>
 	}
 
 
+template<>
+	constexpr int
+	floored_mod<int> (int n, int d)
+	{
+		return (n % d) >= 0 ? (n % d) : (n % d) + std::abs (d);
+	}
+
+
 template<class Number>
 	constexpr Number
 	floored_mod (Number n, Number min, Number max)
