@@ -293,9 +293,13 @@ void
 State::ModifyInstruction::process()
 {
 	std::string spath = _path.toStdString();
-	Xefis::PropertyType prop_type = Xefis::PropertyBoolean (spath).real_type();
+	Xefis::PropertyBoolean prop_boolean (spath);
+
+	if (prop_boolean.is_nil())
+		return;
+
+	Xefis::PropertyType prop_type = prop_boolean.real_type();
 	int sgn = 1;
-	// TODO handle nonexisting/nil props when writing
 
 	switch (_type)
 	{
@@ -371,7 +375,7 @@ State::ModifyInstruction::process()
 				}
 
 				default:
-				throw Xefis::Exception ("'set' action can be only used on boolean, integer, float or string properties");
+					throw Xefis::Exception ("'set' action can be only used on boolean, integer, float or string properties");
 			}
 			break;
 	}

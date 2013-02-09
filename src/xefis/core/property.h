@@ -271,7 +271,7 @@ BaseProperty::real_type() const noexcept
 		PropertyNode* node = get_node();
 		if (node)
 			return node->type();
-		return PropDirectory;
+		throw Exception ("can't check real type of nonexistent property");
 	}
 	else
 		throw Exception ("can't check type of a singular property");
