@@ -14,7 +14,7 @@
 				<max>1</max>
 			</property>
 			<property path='/config/hsi-nav/range.kt' type='integer'>
-				<min>20</min>
+				<min>2</min>
 				<max>200</max>
 			</property>
 			<include name='xefis-x52pro.xml'/>
@@ -32,12 +32,38 @@
 			</observe>
 			<observe var='mfdselect-up'>
 				<if var='mfdselect-up' equals='true'>
-					<sub path='/config/hsi-nav/range.kt' value='20'/>
+					<choose>
+						<when path='/config/hsi-nav/range.kt' less-or-equals='20'>
+							<sub path='/config/hsi-nav/range.kt' value='2'/>
+						</when>
+						<when path='/config/hsi-nav/range.kt' less-or-equals='60'>
+							<sub path='/config/hsi-nav/range.kt' value='10'/>
+						</when>
+						<when path='/config/hsi-nav/range.kt' less-or-equals='100'>
+							<sub path='/config/hsi-nav/range.kt' value='20'/>
+						</when>
+						<otherwise>
+							<sub path='/config/hsi-nav/range.kt' value='50'/>
+						</otherwise>
+					</choose>
 				</if>
 			</observe>
 			<observe var='mfdselect-down'>
 				<if var='mfdselect-down' equals='true'>
-					<add path='/config/hsi-nav/range.kt' value='20'/>
+					<choose>
+						<when path='/config/hsi-nav/range.kt' less-than='20'>
+							<add path='/config/hsi-nav/range.kt' value='2'/>
+						</when>
+						<when path='/config/hsi-nav/range.kt' less-than='60'>
+							<add path='/config/hsi-nav/range.kt' value='10'/>
+						</when>
+						<when path='/config/hsi-nav/range.kt' less-than='100'>
+							<add path='/config/hsi-nav/range.kt' value='20'/>
+						</when>
+						<otherwise>
+							<add path='/config/hsi-nav/range.kt' value='50'/>
+						</otherwise>
+					</choose>
 				</if>
 			</observe>
 			<observe var='mfdstartstop'>

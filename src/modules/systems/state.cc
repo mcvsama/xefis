@@ -171,7 +171,36 @@ State::IfInstruction::IfInstruction (State* state, QDomElement const& element):
 	else
 		throw Xefis::Exception ("<observe> element needs @path or @var attribute");
 
-	_equals = element.attribute ("equals");
+	if (element.hasAttribute ("equals"))
+	{
+		_comparison = Equals;
+		_value = element.attribute ("equals");
+	}
+	else if (element.hasAttribute ("greater-than"))
+	{
+		_comparison = GreaterThan;
+		_value = element.attribute ("greater-than");
+	}
+	else if (element.hasAttribute ("greater-or-equals"))
+	{
+		_comparison = GreaterOrEquals;
+		_value = element.attribute ("greater-or-equals");
+	}
+	else if (element.hasAttribute ("less-than"))
+	{
+		_comparison = LessThan;
+		_value = element.attribute ("less-than");
+	}
+	else if (element.hasAttribute ("less-or-equals"))
+	{
+		_comparison = LessOrEquals;
+		_value = element.attribute ("less-or-equals");
+	}
+	else
+		throw Xefis::Exception (
+			QString ("<%1> instructions needs one of attributes: equals, greater-than, greater-or-equals, less-than, less-or-equals")
+				.arg (element.tagName()).toStdString()
+		);
 
 	std::string spath (_path.toStdString());
 	_prop_boolean = Xefis::PropertyBoolean (spath);
@@ -199,19 +228,19 @@ State::IfInstruction::process()
 	switch (_prop_boolean.real_type())
 	{
 		case Xefis::PropBoolean:
-			_result = (*_prop_boolean && _equals == "true") || (!*_prop_boolean && _equals != "true");
+			_result = evaluate_operator (static_cast<int> (*_prop_integer), static_cast<int> (_value == "true"));
 			break;
 
 		case Xefis::PropInteger:
-			_result = *_prop_integer == _equals.toInt();
+			_result = evaluate_operator (*_prop_integer, _value.toInt());
 			break;
 
 		case Xefis::PropFloat:
-			_result = *_prop_float == _equals.toDouble();
+			_result = evaluate_operator (*_prop_float, _value.toDouble());
 			break;
 
 		case Xefis::PropString:
-			_result = *_prop_string == _equals.toStdString();
+			_result = evaluate_operator (*_prop_string, _value.toStdString());
 			break;
 
 		case Xefis::PropDirectory:
@@ -224,6 +253,28 @@ State::IfInstruction::process()
 			i->process();
 	}
 }
+
+
+template<class Type>
+	bool
+	State::IfInstruction::evaluate_operator (Type value, Type test) const
+	{
+		switch (_comparison)
+		{
+			case Equals:
+				return value == test;
+			case GreaterThan:
+				return value > test;
+			case GreaterOrEquals:
+				return value >= test;
+			case LessThan:
+				return value < test;
+			case LessOrEquals:
+				return value <= test;
+		}
+
+		return false;
+	}
 
 
 State::ChooseInstruction::ChooseInstruction (State* state, QDomElement const& element):

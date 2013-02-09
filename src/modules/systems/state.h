@@ -124,6 +124,9 @@ class State: public Xefis::Module
 	class IfInstruction: public Instruction
 	{
 	  public:
+		enum Comparison { Equals, GreaterThan, GreaterOrEquals, LessThan, LessOrEquals };
+
+	  public:
 		// Ctor
 		IfInstruction (State*, QDomElement const&);
 
@@ -142,9 +145,18 @@ class State: public Xefis::Module
 		result() const;
 
 	  private:
+		/**
+		 * Compare values using operator defined by _type.
+		 */
+		template<class Type>
+			bool
+			evaluate_operator (Type value, Type test) const;
+
+	  private:
 		State*					_state;
 		QString					_path;
-		QString					_equals;
+		Comparison				_comparison;
+		QString					_value;
 		Instructions			_instructions;
 		bool					_result = false;
 		Xefis::PropertyBoolean	_prop_boolean;
