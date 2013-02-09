@@ -127,6 +127,8 @@ ConfigReader::process_includes (QDomElement parent)
 
 			::chdir (cwd.absolutePath().toStdString().c_str());
 		}
+		else
+			process_includes (e);
 	}
 
 	for (QDomElement& e: to_remove)
