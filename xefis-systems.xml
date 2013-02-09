@@ -3,21 +3,33 @@
 	<modules>
 		<module disabled='true' name='generic/fps'/>
 		<module name='systems/state'>
-			<property path='/settings/autopilot/enabled' type='integer'>
-				<min>0</min>
-				<max>1</max>
-				<default>0</default>
-				<winding>true</winding>
+			<property path='/settings/autopilot/enabled' type='boolean'>
+				<default>false</default>
 			</property>
 			<property path='/config/hsi-nav/display-mode' type='integer'>
 				<min>0</min>
 				<max>1</max>
+				<winding>true</winding>
+			</property>
+			<property path='/config/hsi-aux/range.kt' type='integer'>
+				<min>2</min>
+				<max>50</max>
 			</property>
 			<property path='/config/hsi-nav/range.kt' type='integer'>
 				<min>2</min>
-				<max>200</max>
+				<max>100</max>
 			</property>
 			<include name='xefis-x52pro.xml'/>
+			<observe var='t5'>
+				<if var='t5' equals='true'>
+					<toggle path='/instrumentation/configuration/autopilot/control-stick/visible'/>
+				</if>
+			</observe>
+			<observe var='t6'>
+				<if var='t6' equals='true'>
+					<toggle path='/instrumentation/configuration/autopilot/flight-director/visible'/>
+				</if>
+			</observe>
 			<observe var='button-b'>
 				<if var='button-b' equals='true'>
 					<choose>
@@ -26,6 +38,42 @@
 						</when>
 						<otherwise>
 							<set path='/settings/autopilot/enabled' value='false'/>
+						</otherwise>
+					</choose>
+				</if>
+			</observe>
+			<observe var='function-up'>
+				<if var='function-up' equals='true'>
+					<choose>
+						<when path='/config/hsi-aux/range.kt' less-or-equals='20'>
+							<sub path='/config/hsi-aux/range.kt' value='2'/>
+						</when>
+						<when path='/config/hsi-aux/range.kt' less-or-equals='60'>
+							<sub path='/config/hsi-aux/range.kt' value='10'/>
+						</when>
+						<when path='/config/hsi-aux/range.kt' less-or-equals='100'>
+							<sub path='/config/hsi-aux/range.kt' value='20'/>
+						</when>
+						<otherwise>
+							<sub path='/config/hsi-aux/range.kt' value='50'/>
+						</otherwise>
+					</choose>
+				</if>
+			</observe>
+			<observe var='function-down'>
+				<if var='function-down' equals='true'>
+					<choose>
+						<when path='/config/hsi-aux/range.kt' less-than='20'>
+							<add path='/config/hsi-aux/range.kt' value='2'/>
+						</when>
+						<when path='/config/hsi-aux/range.kt' less-than='60'>
+							<add path='/config/hsi-aux/range.kt' value='10'/>
+						</when>
+						<when path='/config/hsi-aux/range.kt' less-than='100'>
+							<add path='/config/hsi-aux/range.kt' value='20'/>
+						</when>
+						<otherwise>
+							<add path='/config/hsi-aux/range.kt' value='50'/>
 						</otherwise>
 					</choose>
 				</if>

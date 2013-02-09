@@ -59,6 +59,22 @@ class State: public Xefis::Module
 		process() = 0;
 	};
 
+	class ManagedBoolean: public ManagedProperty
+	{
+	  public:
+		// Ctor
+		ManagedBoolean (QDomElement const& element);
+
+		// From ManagedProperty
+		void
+		process() override;
+
+	  private:
+		QString					_path;
+		bool					_default = false;
+		Xefis::PropertyBoolean	_property;
+	};
+
 	class ManagedInteger: public ManagedProperty
 	{
 	  public:

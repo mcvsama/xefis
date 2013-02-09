@@ -1,5 +1,11 @@
 <?xml version='1.0'?>
 <xefis-include>
+	<var name='t1' path='/input/main/button/8'/>
+	<var name='t2' path='/input/main/button/9'/>
+	<var name='t3' path='/input/main/button/10'/>
+	<var name='t4' path='/input/main/button/11'/>
+	<var name='t5' path='/input/main/button/12'/>
+	<var name='t6' path='/input/main/button/13'/>
 	<var name='shift' path='/input/main/button/5'/>
 	<var name='button-b' path='/input/main/button/3'/>
 	<var name='mfdstartstop' path='/input/main/button/32'/>

@@ -28,6 +28,38 @@
 #include "state.h"
 
 
+State::ManagedBoolean::ManagedBoolean (QDomElement const& element)
+{
+	if (!element.hasAttribute ("path"))
+		throw Xefis::Exception ("property element needs @path attribute");
+
+	_path = element.attribute ("path");
+	_property = Xefis::PropertyBoolean (_path.toStdString());
+
+	for (QDomElement const& e: element)
+	{
+		if (e == "default")
+		{
+			_default = e.text().toInt();
+			_property.write (_default);
+		}
+	}
+
+	process();
+}
+
+
+void
+State::ManagedBoolean::process()
+{
+	if (_property.is_singular())
+		return;
+
+	if (_property.is_nil())
+		_property.write (_default);
+}
+
+
 State::ManagedInteger::ManagedInteger (QDomElement const& element)
 {
 	if (!element.hasAttribute ("path"))
@@ -70,7 +102,7 @@ State::ManagedInteger::process()
 	Xefis::PropertyInteger::Type value = _property.read();
 
 	if (_winding)
-		value = (value - _min) % (_max - _min) + _min;
+		value = floored_mod (value - _min, _max - _min + 1) + _min;
 	else
 		value = limit (value, _min, _max);
 
@@ -355,7 +387,6 @@ State::ModifyInstruction::process()
 	switch (_type)
 	{
 		case Toggle:
-		{
 			switch (prop_type)
 			{
 				case Xefis::PropBoolean:
@@ -368,7 +399,7 @@ State::ModifyInstruction::process()
 				default:
 					throw Xefis::Exception ("'toggle' action can be only used on boolean properties");
 			}
-		}
+			break;
 
 		case Sub:
 			sgn = -1;
@@ -442,6 +473,8 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{
 			if (e.attribute ("type") == "integer")
 				_managed_properties.insert (new ManagedInteger (e));
+			else if (e.attribute ("type") == "boolean")
+				_managed_properties.insert (new ManagedBoolean (e));
 		}
 		else if (e == "var")
 			_vars[e.attribute ("name")] = e.attribute ("path");
