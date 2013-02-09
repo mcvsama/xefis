@@ -30,7 +30,7 @@ namespace Xefis {
 
 /**
  * Holds one of the basic Property types.
- * Kind of union which tells you which one
+ * Kind of union which tells you which
  * component is valid.
  */
 class PropertyUnion

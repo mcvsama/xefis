@@ -2,6 +2,55 @@
 <xefis-include>
 	<modules>
 		<module disabled='true' name='generic/fps'/>
+		<module name='systems/state'>
+			<property path='/settings/autopilot/enabled' type='integer'>
+				<min>0</min>
+				<max>1</max>
+				<default>0</default>
+				<winding>true</winding>
+			</property>
+			<property path='/config/hsi-nav/display-mode' type='integer'>
+				<min>0</min>
+				<max>1</max>
+			</property>
+			<property path='/config/hsi-nav/range.kt' type='integer'>
+				<min>20</min>
+				<max>200</max>
+			</property>
+			<include name='xefis-x52pro.xml'/>
+			<observe var='button-b'>
+				<if var='button-b' equals='true'>
+					<choose>
+						<when var='shift' equals='true'>
+							<set path='/settings/autopilot/enabled' value='true'/>
+						</when>
+						<otherwise>
+							<set path='/settings/autopilot/enabled' value='false'/>
+						</otherwise>
+					</choose>
+				</if>
+			</observe>
+			<observe var='mfdselect-up'>
+				<if var='mfdselect-up' equals='true'>
+					<sub path='/config/hsi-nav/range.kt' value='20'/>
+				</if>
+			</observe>
+			<observe var='mfdselect-down'>
+				<if var='mfdselect-down' equals='true'>
+					<add path='/config/hsi-nav/range.kt' value='20'/>
+				</if>
+			</observe>
+			<observe var='mfdstartstop'>
+				<if var='mfdstartstop' equals='true'>
+					<sub path='/config/hsi-nav/display-mode' value='1'/>
+				</if>
+			</observe>
+			<observe var='mfdreset'>
+				<if var='mfdreset' equals='true'>
+					<add path='/config/hsi-nav/display-mode' value='1'/>
+				</if>
+			</observe>
+		</module>
 		<module name='systems/lookahead'>
 			<input>/instrumentation/altitude/amsl.ft</input>
 			<output>/instrumentation/altitude/amsl-lookahead.ft</output>
@@ -11,15 +60,15 @@
 				<property name='lookahead-time' path='/instrumentation/altitude/amsl-lookahead-time.s' default='10'/>
 			</properties>
 		</module>
-		<module name='systems/ap-multiplexer'>
-			<properties path='/fbw/ap-multiplexer'>
+		<module name='systems/ap'>
+			<properties path='/fbw/ap'>
 				<property name='ap-enabled' path='//input/main/button/28'/>
 				<property name='bank-limit' path='/config/bank-limit.deg' default='15'/>
 				<property name='yank-limit' path='/config/yank-limit.deg' default='7'/>
 				<property name='selected-mag-heading' path='//instrumentation/autopilot/settings/heading.deg'/>
 				<property name='selected-altitude' path='//instrumentation/autopilot/settings/altitude.ft'/>
 				<property name='selected-climb-rate' path='//instrumentation/autopilot/settings/cbr.fpm'/>
-				<property name='vertical-mode' path='/vertical-mode' default='1'/>
+				<property name='vertical-mode' path='/vertical-mode' default='0'/>
 				<property name='measured-mag-heading' path='//instrumentation/orientation/heading-magnetic.deg'/>
 				<property name='measured-altitude' path='//instrumentation/altitude/amsl.ft'/>
 				<property name='measured-climb-rate' path='//instrumentation/altitude/climb-rate.fpm'/>
@@ -55,8 +104,8 @@
 				<property name='yaw-i' path='/config/yaw/i' default='0.05'/>
 				<property name='yaw-d' path='/config/yaw/d' default='0.01'/>
 				<property name='yaw-error-power' path='/config/yaw/error-power' default='0.5'/>
-				<property name='input-pitch' path='//fbw/ap-multiplexer/pitch.deg' default='0'/>
-				<property name='input-roll' path='//fbw/ap-multiplexer/roll.deg' default='0'/>
+				<property name='input-pitch' path='//fbw/ap/pitch.deg' default='0'/>
+				<property name='input-roll' path='//fbw/ap/roll.deg' default='0'/>
 				<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
 				<property name='measured-pitch' path='//instrumentation/orientation/pitch.deg'/>
 				<property name='measured-roll' path='//instrumentation/orientation/roll.deg'/>

@@ -68,19 +68,25 @@ class BaseProperty
 	 * that is uninitialized.
 	 */
 	bool
-	is_singular() const;
+	is_singular() const noexcept;
 
 	/**
 	 * Valid means not singular and not nil.
 	 */
 	bool
-	valid() const;
+	valid() const noexcept;
 
 	/**
 	 * Return property path.
 	 */
 	std::string const&
-	path() const;
+	path() const noexcept;
+
+	/**
+	 * Return actual property type.
+	 */
+	PropertyType
+	real_type() const noexcept;
 
   protected:
 	/**
@@ -237,23 +243,38 @@ BaseProperty::set_nil()
 
 
 inline bool
-BaseProperty::is_singular() const
+BaseProperty::is_singular() const noexcept
 {
 	return !_root;
 }
 
 
 inline bool
-BaseProperty::valid() const
+BaseProperty::valid() const noexcept
 {
 	return !is_singular() && !is_nil();
 }
 
 
 inline std::string const&
-BaseProperty::path() const
+BaseProperty::path() const noexcept
 {
 	return _path;
+}
+
+
+inline PropertyType
+BaseProperty::real_type() const noexcept
+{
+	if (_root)
+	{
+		PropertyNode* node = get_node();
+		if (node)
+			return node->type();
+		return PropDirectory;
+	}
+	else
+		throw Exception ("can't check type of a singular property");
 }
 
 
