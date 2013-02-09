@@ -330,7 +330,11 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
-			Length range = 1_nm * std::round (((10.f * ratio * _range) / 10.f).nm());
+			Length range;
+			if (ratio == 0.5)
+				range = 1_nm * std::round (((10.f * ratio * _range) / 10.f).nm());
+			else
+				range = ratio * _range;
 			float range_tick_vpx = nm_to_px (range);
 			float range_tick_hpx = 0.1f * _q;
 			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', 0);
