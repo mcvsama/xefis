@@ -72,6 +72,17 @@ Exception::backtrace() const
 	return _backtrace;
 }
 
+
+inline std::ostream&
+operator<< (std::ostream& os, Exception const& e)
+{
+	os << "Error: " << e.what() << std::endl;
+	os << e.backtrace() << std::endl;
+	if (e.inner())
+		os << *e.inner();
+	return os;
+}
+
 } // namespace Xefis
 
 #endif

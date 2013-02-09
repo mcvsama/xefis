@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <typeinfo>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -74,7 +75,17 @@ ModuleManager::data_updated (Timestamp timestamp)
 	_update_timestamp = timestamp;
 
 	for (Module* mod: _non_instrument_modules)
-		mod->data_updated();
+	{
+		try {
+			mod->data_updated();
+		}
+		catch (Xefis::Exception const& e)
+		{
+			std::cerr << "Exception when processing update from module '" << typeid (*mod).name() << "'" << std::endl;
+			std::cerr << e << std::endl;
+		}
+	}
+
 	// Let instruments display data already computed by all other modules.
 	// Also limit FPS of the instrument modules.
 	if ((timestamp - _instrument_update_timestamp).seconds() > 1.f / 30.f)

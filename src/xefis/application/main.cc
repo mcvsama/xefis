@@ -34,16 +34,6 @@
 #include "fail.h"
 
 
-void
-log_exception (Xefis::Exception const& e)
-{
-	std::cerr << "Error: " << e.what() << std::endl;
-	std::cerr << e.backtrace() << std::endl;
-	if (e.inner())
-		log_exception (*e.inner());
-}
-
-
 int main (int argc, char** argv, char**)
 {
 	signal (SIGILL, Xefis::fail);
@@ -73,7 +63,7 @@ int main (int argc, char** argv, char**)
 	}
 	catch (Xefis::Exception& e)
 	{
-		log_exception (e);
+		std::cerr << e << std::endl;
 	}
 	catch (...)
 	{
