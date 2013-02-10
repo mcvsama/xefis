@@ -367,6 +367,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_speeds_and_wind (QPainter&, TextPainter&);
 
 	void
+	paint_range (QPainter&, TextPainter&);
+
+	void
 	paint_dotted_earth (QPainter&);
 
 	void
