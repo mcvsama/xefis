@@ -608,6 +608,8 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 			.arg (static_cast<long> (_wind_tas_speed), 3, 10, QChar (L'\u2007'));
 		painter.resetTransform();
 		painter.translate (0.2f * _q, metr_b.height());
+		if (_display_mode == DisplayMode::Expanded || _display_mode == DisplayMode::Rose)
+			painter.translate (0.f, 0.15f * _q);
 		painter.setPen (get_pen (Qt::white, 1.2f));
 		text_painter.drawText (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
 		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
