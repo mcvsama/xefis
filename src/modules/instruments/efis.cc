@@ -82,7 +82,9 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "navigation-type-hint", _navigation_type_hint, false },
 				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
 				{ "navigation-heading-needle", _navigation_hd_needle, false },
-				{ "dme-distance", _dme_distance_nm, false }
+				{ "dme-distance", _dme_distance_nm, false },
+				{ "control-hint-visible", _control_hint_visible, false },
+				{ "control-hint", _control_hint, false }
 			});
 		}
 	}
@@ -273,5 +275,8 @@ EFIS::read()
 	_efis_widget->set_navigation_heading_needle_visible (_navigation_hd_needle.valid());
 	if (_navigation_hd_needle.valid())
 		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
+
+	_efis_widget->set_control_hint_visible (_control_hint_visible.valid() && *_control_hint_visible);
+	_efis_widget->set_control_hint (_control_hint.valid() ? (*_control_hint).c_str() : "");
 }
 

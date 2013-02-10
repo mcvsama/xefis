@@ -652,7 +652,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return nav hint.
 	 */
 	QString
-	nav_hint() const;
+	navigation_hint() const;
 
 	/**
 	 * Set navigation hint, a text shown on the top left corner of the ADI.
@@ -678,6 +678,24 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_dme_distance_visible (bool visible);
+
+	/**
+	 * Return control hint.
+	 */
+	QString
+	control_hint() const;
+
+	/**
+	 * Set control hint - the text displayed right above roll scale.
+	 */
+	void
+	set_control_hint (QString const&);
+
+	/**
+	 * Set visibility of the control hint.
+	 */
+	void
+	set_control_hint_visible (bool visible);
 
 	/**
 	 * Return field of view.
@@ -838,6 +856,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	void
 	paint_nav (QPainter&, TextPainter&);
+
+	void
+	paint_hints (QPainter&, TextPainter&);
 
 	void
 	paint_input_alert (QPainter&, TextPainter&);
@@ -1037,6 +1058,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QString				_navigation_hint;
 	Length				_dme_distance					= 0_nm;
 	bool				_dme_distance_visible			= false;
+	QString				_control_hint;
+	bool				_control_hint_visible			= false;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 };
@@ -1826,7 +1849,7 @@ EFISWidget::set_navigation_runway_visible (bool visible)
 
 
 inline QString
-EFISWidget::nav_hint() const
+EFISWidget::navigation_hint() const
 {
 	return _navigation_hint;
 }
@@ -1859,6 +1882,29 @@ inline void
 EFISWidget::set_dme_distance_visible (bool visible)
 {
 	_dme_distance_visible = visible;
+	update();
+}
+
+
+inline QString
+EFISWidget::control_hint() const
+{
+	return _control_hint;
+}
+
+
+inline void
+EFISWidget::set_control_hint (QString const& hint)
+{
+	_control_hint = hint;
+	update();
+}
+
+
+inline void
+EFISWidget::set_control_hint_visible (bool visible)
+{
+	_control_hint_visible = visible;
 	update();
 }
 

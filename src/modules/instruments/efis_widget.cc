@@ -109,6 +109,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 		paint_altitude_agl (painter, text_painter);
 		paint_baro_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
+		paint_hints (painter, text_painter);
 
 		sl_paint (painter, text_painter);
 		al_paint (painter, text_painter);
@@ -1604,6 +1605,23 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			painter.drawPolygon (runway);
 			painter.drawLine (tps[1], bps[1]);
 		}
+	}
+}
+
+
+void
+EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
+{
+	float const q = 0.1f * wh();
+
+	if (_control_hint_visible)
+	{
+		QFont control_hint_font = _font_20_bold;
+		painter.setClipping (false);
+		painter.setTransform (_center_transform);
+		painter.setFont (control_hint_font);
+		painter.setPen (get_pen (_navigation_color, 1.0));
+		text_painter.drawText (QPointF (0.f, -2.85f * q), Qt::AlignBottom | Qt::AlignHCenter, _control_hint);
 	}
 }
 
