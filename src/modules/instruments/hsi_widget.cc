@@ -223,6 +223,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_directions (painter, text_painter);
 	paint_aircraft (painter, text_painter);
 	paint_speeds_and_wind (painter, text_painter);
+	paint_range (painter, text_painter);
 }
 
 
@@ -586,6 +587,8 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 
 	painter.resetTransform();
 	painter.translate (0.2f * _q, 0.f);
+	if (_display_mode == DisplayMode::Expanded || _display_mode == DisplayMode::Rose)
+		painter.translate (0.f, 0.15f * _q);
 	painter.setClipping (false);
 	painter.setPen (pen);
 
@@ -614,6 +617,34 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 		painter.drawLine (a + QPointF (0.f, 0.03f * _q), b);
 		painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
 		painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
+	}
+}
+
+
+void
+HSIWidget::paint_range (QPainter& painter, TextPainter& text_painter)
+{
+	if (_display_mode == DisplayMode::Expanded || _display_mode == DisplayMode::Rose)
+	{
+		QFont font_a = _font_10_bold;
+		font_a.setPixelSize (font_size (11.f));
+		QFont font_b = _font_16_bold;
+		QFontMetricsF metr_a (font_a);
+		QFontMetricsF metr_b (font_b);
+		QString s ("RANGE");
+		QString r (QString ("%1").arg (_range.nm(), 0, 'f', 0));
+
+		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _q, metr_a.height() + metr_b.height());
+
+		painter.setClipping (false);
+		painter.resetTransform();
+		painter.translate (4.5f * _q, 0.15f * _q);
+		painter.setPen (get_pen (Qt::white, 1.0f));
+		painter.drawRect (rect);
+		painter.setFont (font_a);
+		text_painter.drawText (rect.center() - QPointF (0.f, 0.05f * _q), Qt::AlignBottom | Qt::AlignHCenter, s);
+		painter.setFont (font_b);
+		text_painter.drawText (rect.center() - QPointF (0.f, 0.135f * _q), Qt::AlignTop | Qt::AlignHCenter, r);
 	}
 }
 
