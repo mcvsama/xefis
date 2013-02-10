@@ -608,7 +608,7 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 		painter.rotate ((_wind_from_mag_heading - _mag_heading + 180_deg).deg());
 		QPointF a = QPointF (0.f, -0.7f * _q);
 		QPointF b = QPointF (0.f, +0.7f * _q);
-		painter.drawLine (a, b);
+		painter.drawLine (a + QPointF (0.f, 0.03f * _q), b);
 		painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
 		painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
 	}
