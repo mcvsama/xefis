@@ -102,6 +102,13 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_dme_distance_nm;
 	Xefis::PropertyBoolean	_control_hint_visible;
 	Xefis::PropertyString	_control_hint;
+	Xefis::PropertyBoolean	_ap_hints_visible;
+	Xefis::PropertyString	_ap_speed_hint;
+	Xefis::PropertyString	_ap_speed_small_hint;
+	Xefis::PropertyString	_ap_lateral_hint;
+	Xefis::PropertyString	_ap_lateral_small_hint;
+	Xefis::PropertyString	_ap_vertical_hint;
+	Xefis::PropertyString	_ap_vertical_small_hint;
 };
 
 

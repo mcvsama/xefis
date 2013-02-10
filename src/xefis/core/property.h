@@ -161,7 +161,7 @@ template<class tType>
 		 * Read property. If node can't be found, return default value.
 		 */
 		Type
-		read() const;
+		read (Type default_value = Type()) const;
 
 		/**
 		 * Read property. If node can't be found, throw PropertyNotFound.
@@ -337,16 +337,15 @@ template<class T>
 template<class T>
 	inline typename
 	Property<T>::Type
-	Property<T>::read() const
+	Property<T>::read (Type default_value) const
 	{
 		if (_root)
 		{
 			PropertyNode* node = get_node();
 			if (node)
-				return node->read<T>();
-			return Type();
+				return node->read<T> (default_value);
 		}
-		throw Exception ("can't read from a singular property");
+		return default_value;
 	}
 
 

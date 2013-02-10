@@ -84,7 +84,14 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "navigation-heading-needle", _navigation_hd_needle, false },
 				{ "dme-distance", _dme_distance_nm, false },
 				{ "control-hint-visible", _control_hint_visible, false },
-				{ "control-hint", _control_hint, false }
+				{ "control-hint", _control_hint, false },
+				{ "autopilot-hints-visible", _ap_hints_visible, false },
+				{ "autopilot-speed-hint", _ap_speed_hint, false },
+				{ "autopilot-speed-small-hint", _ap_speed_small_hint, false },
+				{ "autopilot-lateral-hint", _ap_lateral_hint, false },
+				{ "autopilot-lateral-small-hint", _ap_lateral_small_hint, false },
+				{ "autopilot-vertical-hint", _ap_vertical_hint, false },
+				{ "autopilot-vertical-small-hint", _ap_vertical_small_hint, false }
 			});
 		}
 	}
@@ -252,7 +259,7 @@ EFIS::read()
 
 	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
 	{
-		_efis_widget->set_navigation_hint (_navigation_type_hint.valid() ? (*_navigation_type_hint).c_str() : "");
+		_efis_widget->set_navigation_hint (_navigation_type_hint.read ("").c_str());
 		_efis_widget->set_navigation_needles_visible (true);
 		_efis_widget->set_navigation_runway_visible (_navigation_hd_needle.valid() &&
 													 _altitude_agl_ft.valid() &&
@@ -276,7 +283,15 @@ EFIS::read()
 	if (_navigation_hd_needle.valid())
 		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
 
-	_efis_widget->set_control_hint_visible (_control_hint_visible.valid() && *_control_hint_visible);
-	_efis_widget->set_control_hint (_control_hint.valid() ? (*_control_hint).c_str() : "");
+	_efis_widget->set_control_hint_visible (_control_hint_visible.read (false));
+	_efis_widget->set_control_hint (_control_hint.read ("").c_str());
+
+	_efis_widget->set_ap_hints_visible (_ap_hints_visible.read (false));
+	_efis_widget->set_ap_speed_hint (_ap_speed_hint.read ("").c_str());
+	_efis_widget->set_ap_speed_small_hint (_ap_speed_small_hint.read ("").c_str());
+	_efis_widget->set_ap_lateral_hint (_ap_lateral_hint.read ("").c_str());
+	_efis_widget->set_ap_lateral_small_hint (_ap_lateral_small_hint.read ("").c_str());
+	_efis_widget->set_ap_vertical_hint (_ap_vertical_hint.read ("").c_str());
+	_efis_widget->set_ap_vertical_small_hint (_ap_vertical_small_hint.read ("").c_str());
 }
 

@@ -42,7 +42,7 @@ EFISWidget::EFISWidget (QWidget* parent):
 	_sky_color.setHsv (213, 245, 255);
 	_ground_color.setHsv (30, 255, 122);
 	_ladder_color = QColor (64, 51, 108, 0x80);
-	_ladder_border_color = _ladder_color.darker (125);
+	_ladder_border_color = _ladder_color.darker (120);
 	_warning_color_1 = QColor (255, 150, 0);
 	_warning_color_2 = QColor (255, 200, 50);
 
@@ -1616,12 +1616,44 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 
 	if (_control_hint_visible)
 	{
-		QFont control_hint_font = _font_20_bold;
 		painter.setClipping (false);
 		painter.setTransform (_center_transform);
-		painter.setFont (control_hint_font);
+		painter.setFont (_font_20_bold);
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		text_painter.drawText (QPointF (0.f, -2.85f * q), Qt::AlignBottom | Qt::AlignHCenter, _control_hint);
+	}
+
+	if (_ap_hints_visible)
+	{
+		QRectF rect (0.f, 0.f, 6.3f * q, 0.65f * q);
+		centrify (rect);
+
+		float x16 = rect.left() + 1.f / 6.f * rect.width();
+		float x26 = rect.left() + 2.f / 6.f * rect.width();
+		float x36 = rect.left() + 3.f / 6.f * rect.width();
+		float x46 = rect.left() + 4.f / 6.f * rect.width();
+		float x56 = rect.left() + 5.f / 6.f * rect.width();
+		float y13 = rect.top() + 8.5f / 30.f * rect.height();
+		float y23 = rect.top() + 23.5f / 30.f * rect.height();
+
+		painter.setClipping (false);
+		painter.setTransform (_center_transform);
+		painter.translate (0.f, -4.575f * q);
+		painter.setPen (QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+		painter.setBrush (_ladder_color);
+		painter.drawRect (rect);
+		painter.setPen (get_pen (Qt::white, 1.2f));
+		painter.drawLine (QPointF (x26, rect.top()), QPointF (x26, rect.bottom()));
+		painter.drawLine (QPointF (x46, rect.top()), QPointF (x46, rect.bottom()));
+		painter.setPen (get_pen (_navigation_color, 1.0));
+		painter.setFont (_font_13_bold);
+		text_painter.drawText (QPointF (x16, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_speed_hint);
+		text_painter.drawText (QPointF (x36, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_lateral_hint);
+		text_painter.drawText (QPointF (x56, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_vertical_hint);
+		painter.setFont (_font_10_bold);
+		text_painter.drawText (QPointF (x16, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_speed_small_hint);
+		text_painter.drawText (QPointF (x36, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_lateral_small_hint);
+		text_painter.drawText (QPointF (x56, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_vertical_small_hint);
 	}
 }
 
