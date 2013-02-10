@@ -313,7 +313,11 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 void
 HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 {
-	Length const trend_range = actual_trend_range();
+	Length trend_range = actual_trend_range();
+	Length trend_start = actual_trend_start();
+	if (trend_start > trend_range)
+		trend_range = 0_nm;
+
 	float start_point = _trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
@@ -406,6 +410,7 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 	painter.setPen (est_pen);
 
 	Length const trend_range = actual_trend_range();
+	Length const trend_start = actual_trend_start();
 
 	if (_trend_vector_visible)
 	{
@@ -420,7 +425,8 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 		{
 			float px = nm_to_px (step);
 			painter.rotate (angle_per_step.deg());
-			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -px));
+			if (pos > trend_start)
+				painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -px));
 			painter.translate (0.f, -px);
 		}
 	}
