@@ -386,6 +386,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Length
 	actual_trend_range() const;
 
+	Length
+	actual_trend_start() const;
+
 	float
 	nm_to_px (Length miles);
 
@@ -793,8 +796,36 @@ HSIWidget::get_navaid_xy (LonLat const& position)
 inline Length
 HSIWidget::actual_trend_range() const
 {
-	float limit = _display_mode == DisplayMode::Auxiliary ? 0.36f : 0.18f;
+	float limit = 0;
+	switch (_display_mode)
+	{
+		case DisplayMode::Expanded:
+			limit = 0.13f;
+			break;
+		case DisplayMode::Rose:
+			limit = 0.18f;
+			break;
+		case DisplayMode::Auxiliary:
+			limit = 0.36f;
+			break;
+	}
 	return std::min (_trend_vector_lookahead, limit * _range);
+}
+
+
+inline Length
+HSIWidget::actual_trend_start() const
+{
+	switch (_display_mode)
+	{
+		case DisplayMode::Expanded:
+			return 0.015f * _range;
+		case DisplayMode::Rose:
+			return 0.030f * _range;
+		case DisplayMode::Auxiliary:
+			return 0.0375f * _range;
+	}
+	return 0_nm;
 }
 
 
