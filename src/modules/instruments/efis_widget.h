@@ -698,6 +698,84 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_control_hint_visible (bool visible);
 
 	/**
+	 * Set AP hints visibility (three boxes on the top).
+	 */
+	void
+	set_ap_hints_visible (bool visible);
+
+	/**
+	 * Return AP speed hint text.
+	 */
+	QString
+	ap_speed_hint() const;
+
+	/**
+	 * Set AP speed hint text.
+	 */
+	void
+	set_ap_speed_hint (QString const&);
+
+	/**
+	 * Return additional AP speed hint text.
+	 */
+	QString
+	ap_speed_small_hint() const;
+
+	/**
+	 * Set additional AP speed hint text.
+	 */
+	void
+	set_ap_speed_small_hint (QString const&);
+
+	/**
+	 * Return AP lateral hint text.
+	 */
+	QString
+	ap_lateral_hint() const;
+
+	/**
+	 * Set AP lateral hint text.
+	 */
+	void
+	set_ap_lateral_hint (QString const&);
+
+	/**
+	 * Return additional AP lateral hint text.
+	 */
+	QString
+	ap_lateral_small_hint() const;
+
+	/**
+	 * Set additional AP lateral hint text.
+	 */
+	void
+	set_ap_lateral_small_hint (QString const&);
+
+	/**
+	 * Return AP altitude hint text.
+	 */
+	QString
+	ap_vertical_hint() const;
+
+	/**
+	 * Set AP altitude hint text.
+	 */
+	void
+	set_ap_vertical_hint (QString const&);
+
+	/**
+	 * Return additional AP altitude hint text.
+	 */
+	QString
+	ap_vertical_small_hint() const;
+
+	/**
+	 * Set additional AP altitude hint text.
+	 */
+	void
+	set_ap_vertical_small_hint (QString const&);
+
+	/**
 	 * Return field of view.
 	 * Default is 120°. Usable maximum: 180°.
 	 */
@@ -1060,6 +1138,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_dme_distance_visible			= false;
 	QString				_control_hint;
 	bool				_control_hint_visible			= false;
+	bool				_ap_hints_visible				= false;
+	QString				_ap_speed_hint;
+	QString				_ap_speed_small_hint;
+	QString				_ap_lateral_hint;
+	QString				_ap_lateral_small_hint;
+	QString				_ap_vertical_hint;
+	QString				_ap_vertical_small_hint;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 };
@@ -1905,6 +1990,104 @@ inline void
 EFISWidget::set_control_hint_visible (bool visible)
 {
 	_control_hint_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_ap_hints_visible (bool visible)
+{
+	_ap_hints_visible = visible;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_speed_hint() const
+{
+	return _ap_speed_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_speed_hint (QString const& hint)
+{
+	_ap_speed_hint = hint;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_speed_small_hint() const
+{
+	return _ap_speed_small_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_speed_small_hint (QString const& hint)
+{
+	_ap_speed_small_hint = hint;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_lateral_hint() const
+{
+	return _ap_lateral_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_lateral_hint (QString const& hint)
+{
+	_ap_lateral_hint = hint;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_lateral_small_hint() const
+{
+	return _ap_lateral_small_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_lateral_small_hint (QString const& hint)
+{
+	_ap_lateral_small_hint = hint;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_vertical_hint() const
+{
+	return _ap_vertical_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_vertical_hint (QString const& hint)
+{
+	_ap_vertical_hint = hint;
+	update();
+}
+
+
+inline QString
+EFISWidget::ap_vertical_small_hint() const
+{
+	return _ap_vertical_small_hint;
+}
+
+
+inline void
+EFISWidget::set_ap_vertical_small_hint (QString const& hint)
+{
+	_ap_vertical_small_hint = hint;
 	update();
 }
 

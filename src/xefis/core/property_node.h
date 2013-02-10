@@ -174,7 +174,7 @@ class PropertyNode
 	 */
 	template<class tType>
 		tType
-		read() const;
+		read (tType default_value = tType()) const;
 
 	/**
 	 * Write new value to the node. The value will be converted
@@ -478,30 +478,38 @@ PropertyNode::type() const noexcept
 
 template<class tType>
 	inline tType
-	PropertyNode::read() const
+	PropertyNode::read (tType default_value) const
 	{
-		return read_convertible<tType>();
+		if (_is_nil)
+			return default_value;
+		else
+			return read_convertible<tType>();
 	}
 
 
 template<>
 	inline std::string
-	PropertyNode::read() const
+	PropertyNode::read (std::string default_value) const
 	{
-		switch (_type)
+		if (_is_nil)
+			return default_value;
+		else
 		{
-			case PropDirectory:
-				throw PropertyAccessError ("can't read from a directory property");
-			case PropBoolean:
-				return boost::lexical_cast<std::string> (_value_bool);
-			case PropInteger:
-				return boost::lexical_cast<std::string> (_value_int);
-			case PropFloat:
-				return boost::lexical_cast<std::string> (_value_double);
-			case PropString:
-				return _value_string;
-			default:
-				return std::string();
+			switch (_type)
+			{
+				case PropDirectory:
+					throw PropertyAccessError ("can't read from a directory property");
+				case PropBoolean:
+					return boost::lexical_cast<std::string> (_value_bool);
+				case PropInteger:
+					return boost::lexical_cast<std::string> (_value_int);
+				case PropFloat:
+					return boost::lexical_cast<std::string> (_value_double);
+				case PropString:
+					return _value_string;
+				default:
+					return std::string();
+			}
 		}
 	}
 
