@@ -65,6 +65,14 @@
 									<property name='dme-distance' path='/navigation/dme-distance.nm'/>
 									<property name='control-hint-visible' path='/control/control-hint-visible' default='false'/>
 									<property name='control-hint' path='/control/control-hint' default=''/>
+									<property name='autopilot-hints-visible' path='/autopilot/hints/visible' default='true'/>
+									<property name='autopilot-speed-hint' path='/autopilot/hints/speed-hint' default='SPD'/>
+									<property name='autopilot-speed-small-hint' path='/autopilot/hints/speed-small-hint' default=''/>
+									<property name='autopilot-lateral-hint' path='/autopilot/hints/lateral-hint' default='HDG HOLD'/>
+									<property name='autopilot-lateral-small-hint' path='/autopilot/hints/lateral-small-hint' default='LOC'/>
+									<property name='autopilot-vertical-hint' path='/autopilot/hints/vertical-hint' default='V/S'/>
+									<property name='autopilot-vertical-small-hint' path='/autopilot/hints/vertical-small-hint' default='G/S'/>
+									<property name='localizer-id' path='/localizer-id' default='WRO'/>
 								</properties>
 							</module>
 						</item>
@@ -86,6 +94,7 @@
 									<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
 									<property name='wind-from-mag-heading' path='/wind/from-mag-heading.deg'/>
 									<property name='wind-tas' path='/wind/tas.kt'/>
+									<property name='localizer-id' path='/localizer-id'/>
 								</properties>
 							</module>
 						</item>
@@ -115,6 +124,7 @@
 									<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
 									<property name='wind-from-mag-heading' path='/wind/from-mag-heading.deg'/>
 									<property name='wind-tas' path='/wind/tas.kt'/>
+									<property name='localizer-id' path='/localizer-id'/>
 								</properties>
 							</module>
 						</item>

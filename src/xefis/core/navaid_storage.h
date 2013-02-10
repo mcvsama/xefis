@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <set>
+#include <map>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -32,6 +33,7 @@ class NavaidStorage
 {
   public:
 	typedef std::set<Navaid> Navaids;
+	typedef std::map<Navaid::Type, std::map<QString, Navaid const*>> NavaidsByIdentifier;
 
   private:
 	static LonLat::ValueType::ValueType
@@ -45,6 +47,9 @@ class NavaidStorage
 	Navaids
 	get_navs (LonLat const& position, Length radius) const;
 
+	Navaid const*
+	find_by_id (Navaid::Type, QString const& identifier) const;
+
   private:
 	void
 	parse_nav_dat();
@@ -56,10 +61,11 @@ class NavaidStorage
 	parse_awy_dat();
 
   private:
-	NavaidsTree	_navaids_tree;
-	const char*	_nav_dat_file	= "share/nav/nav.dat";
-	const char*	_fix_dat_file	= "share/nav/fix.dat";
-	const char*	_awy_dat_file	= "share/nav/awy.dat";
+	NavaidsTree			_navaids_tree;
+	const char*			_nav_dat_file	= "share/nav/nav.dat";
+	const char*			_fix_dat_file	= "share/nav/fix.dat";
+	const char*			_awy_dat_file	= "share/nav/awy.dat";
+	NavaidsByIdentifier	_navaids_by_identifier;
 };
 
 

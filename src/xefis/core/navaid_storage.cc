@@ -36,6 +36,9 @@ NavaidStorage::NavaidStorage():
 	parse_awy_dat();
 
 	_navaids_tree.optimize();
+
+	for (Navaid const& navaid: _navaids_tree)
+		_navaids_by_identifier[navaid.type()][navaid.identifier()] = &navaid;
 }
 
 
@@ -58,6 +61,20 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::ValueType>::max(), inserter_and_predicate);
 
 	return set;
+}
+
+
+Navaid const*
+NavaidStorage::find_by_id (Navaid::Type type, QString const& identifier) const
+{
+	auto by_id = _navaids_by_identifier.find (type);
+	if (by_id != _navaids_by_identifier.end())
+	{
+		auto navaid = by_id->second.find (identifier);
+		if (navaid != by_id->second.end())
+			return navaid->second;
+	}
+	return nullptr;
 }
 
 

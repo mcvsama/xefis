@@ -54,6 +54,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "orientation-roll", _roll_deg, false },
 				{ "orientation-roll-limit", _roll_limit_deg, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
+				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "slip-skid", _slip_skid_g, false },
 				{ "slip-skid-limit", _slip_skid_limit_g, false },
 				{ "flight-path-marker-visible", _fpm_visible, false },
@@ -91,7 +92,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "autopilot-lateral-hint", _ap_lateral_hint, false },
 				{ "autopilot-lateral-small-hint", _ap_lateral_small_hint, false },
 				{ "autopilot-vertical-hint", _ap_vertical_hint, false },
-				{ "autopilot-vertical-small-hint", _ap_vertical_small_hint, false }
+				{ "autopilot-vertical-small-hint", _ap_vertical_small_hint, false },
+				{ "localizer-id", _localizer_id, false }
 			});
 		}
 	}
@@ -274,6 +276,19 @@ EFIS::read()
 	_efis_widget->set_dme_distance_visible (_dme_distance_nm.valid());
 	if (_dme_distance_nm.valid())
 		_efis_widget->set_dme_distance (1_nm * *_dme_distance_nm);
+
+	if (_localizer_id.valid() && _true_heading_deg.valid() && _mag_heading_deg.valid())
+	{
+		Xefis::Navaid const* navaid = navaid_storage()->find_by_id (Xefis::Navaid::LOC, (*_localizer_id).c_str());
+		if (navaid)
+		{
+			_efis_widget->set_localizer_id ((*_localizer_id).c_str());
+			_efis_widget->set_localizer_mag_bearing (1_deg * (*_mag_heading_deg - *_true_heading_deg) + navaid->true_bearing());
+			_efis_widget->set_localizer_info_visible (true);
+		}
+	}
+	else
+		_efis_widget->set_localizer_info_visible (false);
 
 	_efis_widget->set_navigation_glideslope_needle_visible (_navigation_gs_needle.valid());
 	if (_navigation_gs_needle.valid())

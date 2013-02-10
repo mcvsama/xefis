@@ -54,7 +54,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "position-longitude", _position_lon_deg, false },
 				{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
 				{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
-				{ "wind-tas", _wind_tas_kt, false }
+				{ "wind-tas", _wind_tas_kt, false },
+				{ "localizer-id", _localizer_id, false }
 			});
 		}
 	}
@@ -136,6 +137,11 @@ HSI::read()
 	}
 	else
 		_hsi_widget->set_wind_information_visible (false);
+
+	if (_localizer_id.valid())
+		_hsi_widget->set_highlighted_loc ((*_localizer_id).c_str());
+	else
+		_hsi_widget->reset_highlighted_loc();
 }
 
 

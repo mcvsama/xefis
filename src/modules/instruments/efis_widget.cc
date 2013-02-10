@@ -1398,7 +1398,6 @@ EFISWidget::paint_control_stick (QPainter& painter)
 		return;
 
 	float const w = wh() * 0.2f / 9.f;
-	float const z = w * 0.3f;
 	Angle range = _fov / 4.f;
 
 	Angle pitch = limit (_control_stick_pitch, -range, +range);
@@ -1503,29 +1502,38 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	if (_dme_distance_visible)
+	if (_localizer_info_visible)
 	{
-		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);
+		QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (_localizer_mag_bearing.deg()));
 		QFont font = _font_10_bold;
 		font.setBold (false);
-		QFontMetricsF font_metrics (font);
-		QRectF rect (-0.24f * wh(), -0.36f * wh(), font_metrics.width (dme_val), font_metrics.height());
 
-		painter.setPen (QColor (255, 255, 255));
+		painter.setPen (Qt::white);
 		painter.setFont (font);
-		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, dme_val);
+		text_painter.drawText (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
+	}
+
+	if (_dme_distance_visible || _navigation_hint != "")
+	{
+		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);
+		if (!_dme_distance_visible)
+			dme_val = "DME –––";
+		QFont font = _font_10_bold;
+		font.setBold (false);
+
+		painter.setPen (Qt::white);
+		painter.setFont (font);
+		text_painter.drawText (QPointF (-0.24f * wh(), -0.36f * wh()), Qt::AlignTop | Qt::AlignLeft, dme_val);
 	}
 
 	if (_navigation_hint != "")
 	{
 		QFont font = _font_16_bold;
 		font.setBold (false);
-		QFontMetricsF font_metrics (font);
-		QRectF rect (-0.24f * wh(), -0.32f * wh(), font_metrics.width (_navigation_hint), font_metrics.height());
 
-		painter.setPen (QColor (255, 255, 255));
+		painter.setPen (Qt::white);
 		painter.setFont (font);
-		text_painter.drawText (rect, Qt::AlignLeft | Qt::AlignVCenter, _navigation_hint);
+		text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _navigation_hint);
 	}
 
 	if (_navigation_needles_visible)
