@@ -257,10 +257,17 @@ class State: public Xefis::Module
 	void
 	process_managed_properties();
 
+	/**
+	 * Signal that at least one property has been changed.
+	 */
+	void
+	state_changed();
+
   private:
 	Vars				_vars;
 	ManagedProperties	_managed_properties;
 	ObservedProperties	_observed_properties;
+	bool				_state_changed;
 };
 
 

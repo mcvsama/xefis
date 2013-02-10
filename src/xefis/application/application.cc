@@ -61,6 +61,11 @@ Application::Application (int argc, char** argv):
 	_config_reader = new ConfigReader (this, _module_manager);
 	_config_reader->load ("xefis-config.xml");
 
+	_postponed_update = new QTimer (this);
+	_postponed_update->setSingleShot (true);
+	_postponed_update->setInterval (1000.f / 30.f);
+	QObject::connect (_postponed_update, SIGNAL (timeout()), this, SLOT (data_updated()));
+
 	signal (SIGHUP, s_quit);
 }
 
@@ -86,6 +91,14 @@ void
 Application::data_updated()
 {
 	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
+}
+
+
+void
+Application::postponed_data_updated()
+{
+	if (!_postponed_update->isActive())
+		_postponed_update->start();
 }
 
 

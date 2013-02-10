@@ -461,6 +461,8 @@ State::ModifyInstruction::process()
 			}
 			break;
 	}
+
+	_state->state_changed();
 }
 
 
@@ -496,8 +498,11 @@ State::~State()
 void
 State::data_updated()
 {
+	_state_changed = false;
 	process_observed_properties();
 	process_managed_properties();
+	if (_state_changed)
+		signal_data_updated();
 }
 
 
@@ -541,5 +546,12 @@ State::process_managed_properties()
 {
 	for (ManagedProperty* mp: _managed_properties)
 		mp->process();
+}
+
+
+void
+State::state_changed()
+{
+	_state_changed = true;
 }
 

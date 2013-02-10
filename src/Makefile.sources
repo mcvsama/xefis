@@ -12,6 +12,7 @@ SRC_SOURCES += xefis/application/fail.cc
 SRC_SOURCES += xefis/application/main.cc
 SRC_SOURCES += xefis/application/services.cc
 
+SRC_MOCHDRS += xefis/application/application.h
 SRC_MOCHDRS += xefis/application/services.h
 
 ######## /xefis/components ########
