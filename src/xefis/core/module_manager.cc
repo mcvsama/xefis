@@ -95,6 +95,11 @@ ModuleManager::data_updated (Timestamp timestamp)
 			mod->data_updated();
 		_instrument_update_timestamp = timestamp;
 	}
+	else
+	{
+		// In case of inhibited instruments update, postpone update a bit:
+		application()->postponed_data_updated();
+	}
 }
 
 

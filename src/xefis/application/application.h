@@ -18,6 +18,7 @@
 #include <cstddef>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
 // Xefis:
@@ -34,6 +35,8 @@ class ConfigReader;
 
 class Application: public QApplication
 {
+	Q_OBJECT
+
 	class DataUpdatedEvent: public QEvent
 	{
 	  public:
@@ -60,6 +63,13 @@ class Application: public QApplication
 	quit();
 
 	/**
+	 * Return pointer to navaid storage.
+	 */
+	NavaidStorage*
+	navaid_storage() const;
+
+  public slots:
+	/**
 	 * Indicate that the data in property tree has been updated
 	 * from an IO module.
 	 */
@@ -67,10 +77,11 @@ class Application: public QApplication
 	data_updated();
 
 	/**
-	 * Return pointer to navaid storage.
+	 * Indicate that the data was updated, but the update signal
+	 * can be send later.
 	 */
-	NavaidStorage*
-	navaid_storage() const;
+	void
+	postponed_data_updated();
 
   protected:
 	bool
@@ -89,6 +100,7 @@ class Application: public QApplication
 	NavaidStorage*		_navaid_storage	= nullptr;
 	ModuleManager*		_module_manager	= nullptr;
 	ConfigReader*		_config_reader	= nullptr;
+	QTimer*				_postponed_update;
 };
 
 
