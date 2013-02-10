@@ -315,7 +315,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 {
 	Length trend_range = actual_trend_range();
 	Length trend_start = actual_trend_start();
-	if (trend_start > trend_range)
+	if (2.f * trend_start > trend_range)
 		trend_range = 0_nm;
 
 	float start_point = _trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
