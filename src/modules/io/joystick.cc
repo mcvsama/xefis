@@ -112,6 +112,7 @@ JoystickInput::read()
 				if (ev.type == JS_EVENT_BUTTON + JS_EVENT_INIT)
 				{
 					QString path = QString ("%1/button/%2").arg (_prop_path).arg (ev.number);
+					delete _buttons[ev.number];
 					prop = _buttons[ev.number] = new Xefis::Property<bool> (path.toStdString());
 				}
 				else
@@ -133,6 +134,7 @@ JoystickInput::read()
 				if (ev.type == JS_EVENT_AXIS + JS_EVENT_INIT)
 				{
 					QString path = QString ("%1/axis/%2").arg (_prop_path).arg (ev.number);
+					delete _axes[ev.number];
 					prop = _axes[ev.number] = new Xefis::PropertyFloat (path.toStdString());
 				}
 				else
