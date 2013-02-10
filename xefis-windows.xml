@@ -1,13 +1,13 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<window width='500' height='800'>
+		<!--window width='500' height='800'>
 			<layout type='horizontal'>
 				<item>
 					<module name='generic/property-tree'/>
 				</item>
 			</layout>
-		</window>
+		</window-->
 		<window width='1150' height='675' full-screen='false' scale='1.0'>
 			<layout type='horizontal'>
 				<item stretch-factor='4'>
@@ -63,6 +63,8 @@
 									<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
 									<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection' default='0'/>
 									<property name='dme-distance' path='/navigation/dme-distance.nm'/>
+									<property name='control-hint-visible' path='/control/control-hint-visible' default='false'/>
+									<property name='control-hint' path='/control/control-hint' default=''/>
 								</properties>
 							</module>
 						</item>

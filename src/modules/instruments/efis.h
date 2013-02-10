@@ -100,6 +100,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_navigation_gs_needle;
 	Xefis::PropertyFloat	_navigation_hd_needle;
 	Xefis::PropertyFloat	_dme_distance_nm;
+	Xefis::PropertyBoolean	_control_hint_visible;
+	Xefis::PropertyString	_control_hint;
 };
 
 
