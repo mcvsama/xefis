@@ -335,13 +335,16 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
 			Length range;
-			if (ratio == 0.5)
+			if (ratio == 0.5 && _range >= 2_nm)
 				range = 1_nm * std::round (((10.f * ratio * _range) / 10.f).nm());
 			else
 				range = ratio * _range;
 			float range_tick_vpx = nm_to_px (range);
 			float range_tick_hpx = 0.1f * _q;
-			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', 0);
+			int precision = 0;
+			if (range < 1_nm)
+				precision = 1;
+			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', precision);
 			painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
 
 			if (draw_text)
@@ -787,6 +790,7 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 
 	auto paint_texts_to_paint = [&]() -> void
 	{
+		painter.resetTransform();
 		for (auto const& text_and_xy: texts_to_paint)
 			text_painter.drawText (text_and_xy.first, text_and_xy.second);
 		texts_to_paint.clear();
@@ -827,16 +831,12 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 	{
 		// Paint highlighted LOC at the end, so it's on top:
 		if (navaid.identifier() == _highlighted_loc)
-		{
 			hi_loc = &navaid;
-			continue;
-		}
 		else
 			paint_loc (navaid);
 	}
 
 	// Paint identifiers:
-	painter.resetTransform();
 	paint_texts_to_paint();
 
 	// Highlighted localizer with text:

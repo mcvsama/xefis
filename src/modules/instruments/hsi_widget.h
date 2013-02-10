@@ -329,6 +329,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	void
 	set_highlighted_loc (QString const& identifier);
 
+	/**
+	 * Reset highlighted localizer.
+	 */
+	void
+	reset_highlighted_loc();
+
   private:
 	void
 	update_more();
@@ -782,6 +788,13 @@ inline void
 HSIWidget::set_highlighted_loc (QString const& identifier)
 {
 	_highlighted_loc = identifier;
+}
+
+
+inline void
+HSIWidget::reset_highlighted_loc()
+{
+	_highlighted_loc = "";
 }
 
 
