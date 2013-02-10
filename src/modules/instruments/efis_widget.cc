@@ -1410,14 +1410,22 @@ EFISWidget::paint_control_stick (QPainter& painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	for (auto pen: { get_pen (_navigation_color.darker (300), 2.0f),
-					 get_pen (_navigation_color, 1.3f) })
+	for (auto pen: { get_pen (_navigation_color.darker (300), 2.5f),
+					 get_pen (_navigation_color, 1.5f) })
 	{
 		painter.setPen (pen);
-		painter.drawPolyline (QPolygonF() << QPointF (xpos - w - z, ypos - z) << QPointF (xpos - z, ypos - z) << QPointF (xpos - z, ypos - w - z));
-		painter.drawPolyline (QPolygonF() << QPointF (xpos - w - z, ypos + z) << QPointF (xpos - z, ypos + z) << QPointF (xpos - z, ypos + w + z));
-		painter.drawPolyline (QPolygonF() << QPointF (xpos + w + z, ypos + z) << QPointF (xpos + z, ypos + z) << QPointF (xpos + z, ypos + w + z));
-		painter.drawPolyline (QPolygonF() << QPointF (xpos + w + z, ypos - z) << QPointF (xpos + z, ypos - z) << QPointF (xpos + z, ypos - w - z));
+		if (_flight_director_roll_visible || _flight_director_pitch_visible)
+		{
+			// X cross, if flight director visible:
+			painter.drawLine (QPointF (xpos - w, ypos - w), QPointF (xpos + w, ypos + w));
+			painter.drawLine (QPointF (xpos - w, ypos + w), QPointF (xpos + w, ypos - w));
+		}
+		else
+		{
+			// + cross, if alone:
+			painter.drawLine (QPointF (xpos, ypos - w), QPointF (xpos, ypos + w));
+			painter.drawLine (QPointF (xpos - w, ypos), QPointF (xpos + w, ypos));
+		}
 	}
 }
 
