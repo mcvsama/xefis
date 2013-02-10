@@ -8,10 +8,15 @@
 	<var name='t6' path='/input/main/button/13'/>
 	<var name='shift' path='/input/main/button/5'/>
 	<var name='button-b' path='/input/main/button/3'/>
+	<var name='mode-1' path='/input/main/button/27'/>
+	<var name='mode-2' path='/input/main/button/28'/>
+	<var name='mode-3' path='/input/main/button/29'/>
 	<var name='mfdstartstop' path='/input/main/button/32'/>
 	<var name='mfdreset' path='/input/main/button/33'/>
 	<var name='function-up' path='/input/main/button/34'/>
 	<var name='function-down' path='/input/main/button/35'/>
+	<var name='function-press' path='/input/main/button/31'/>
 	<var name='mfdselect-up' path='/input/main/button/36'/>
 	<var name='mfdselect-down' path='/input/main/button/37'/>
+	<var name='mfdselect-press' path='/input/main/button/38'/>
 </xefis-include>

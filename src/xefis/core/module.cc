@@ -88,7 +88,11 @@ Module::parse_properties (QDomElement& properties_element, PropertiesList list)
 				throw Exception (QString ("missing parameter @path for property: %1").arg (name).toStdString());
 
 			if (!e.hasAttribute ("default"))
-				it->second->access().set_nil();
+			{
+				// Ensure property exists:
+				if (it->second->access().is_nil())
+					it->second->access().set_nil();
+			}
 			else
 			{
 				QString value = e.attribute ("default");

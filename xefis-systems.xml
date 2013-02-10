@@ -12,11 +12,11 @@
 				<winding>true</winding>
 			</property>
 			<property path='/config/hsi-aux/range.kt' type='integer'>
-				<min>2</min>
+				<min>1</min>
 				<max>50</max>
 			</property>
 			<property path='/config/hsi-nav/range.kt' type='integer'>
-				<min>2</min>
+				<min>1</min>
 				<max>100</max>
 			</property>
 			<include name='xefis-x52pro.xml'/>
@@ -44,6 +44,9 @@
 			<observe var='function-up'>
 				<if var='function-up' equals='true'>
 					<choose>
+						<when path='/config/hsi-aux/range.kt' less-or-equals='2'>
+							<sub path='/config/hsi-aux/range.kt' value='1'/>
+						</when>
 						<when path='/config/hsi-aux/range.kt' less-or-equals='20'>
 							<sub path='/config/hsi-aux/range.kt' value='2'/>
 						</when>
@@ -62,6 +65,9 @@
 			<observe var='function-down'>
 				<if var='function-down' equals='true'>
 					<choose>
+						<when path='/config/hsi-aux/range.kt' less-than='2'>
+							<add path='/config/hsi-aux/range.kt' value='1'/>
+						</when>
 						<when path='/config/hsi-aux/range.kt' less-than='20'>
 							<add path='/config/hsi-aux/range.kt' value='2'/>
 						</when>
@@ -80,6 +86,9 @@
 			<observe var='mfdselect-up'>
 				<if var='mfdselect-up' equals='true'>
 					<choose>
+						<when path='/config/hsi-nav/range.kt' less-or-equals='2'>
+							<sub path='/config/hsi-nav/range.kt' value='1'/>
+						</when>
 						<when path='/config/hsi-nav/range.kt' less-or-equals='20'>
 							<sub path='/config/hsi-nav/range.kt' value='2'/>
 						</when>
@@ -98,6 +107,9 @@
 			<observe var='mfdselect-down'>
 				<if var='mfdselect-down' equals='true'>
 					<choose>
+						<when path='/config/hsi-nav/range.kt' less-than='2'>
+							<add path='/config/hsi-nav/range.kt' value='1'/>
+						</when>
 						<when path='/config/hsi-nav/range.kt' less-than='20'>
 							<add path='/config/hsi-nav/range.kt' value='2'/>
 						</when>
@@ -113,13 +125,8 @@
 					</choose>
 				</if>
 			</observe>
-			<observe var='mfdstartstop'>
-				<if var='mfdstartstop' equals='true'>
-					<sub path='/config/hsi-nav/display-mode' value='1'/>
-				</if>
-			</observe>
-			<observe var='mfdreset'>
-				<if var='mfdreset' equals='true'>
+			<observe var='mfdselect-press'>
+				<if var='mfdselect-press' equals='true'>
 					<add path='/config/hsi-nav/display-mode' value='1'/>
 				</if>
 			</observe>
