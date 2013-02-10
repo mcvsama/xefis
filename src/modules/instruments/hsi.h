@@ -85,6 +85,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
+	Xefis::PropertyString	_localizer_id;
 };
 
 

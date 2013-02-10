@@ -30,17 +30,16 @@
 					<toggle path='/instrumentation/configuration/autopilot/flight-director/visible'/>
 				</if>
 			</observe>
-			<observe var='button-b'>
-				<if var='button-b' equals='true'>
-					<choose>
-						<when var='shift' equals='true'>
-							<set path='/settings/autopilot/enabled' value='true'/>
-						</when>
-						<otherwise>
-							<set path='/settings/autopilot/enabled' value='false'/>
-						</otherwise>
-					</choose>
-				</if>
+			<observe var='mode-2'>
+				<choose>
+					<when var='mode-2' equals='true'>
+						<set path='/instrumentation/control/control-hint-visible' value='true'/>
+						<set path='/instrumentation/control/control-hint' value='A/P'/>
+					</when>
+					<otherwise>
+						<set path='/instrumentation/control/control-hint-visible' value='false'/>
+					</otherwise>
+				</choose>
 			</observe>
 			<observe var='function-up'>
 				<if var='function-up' equals='true'>
