@@ -40,7 +40,7 @@ State::ManagedBoolean::ManagedBoolean (QDomElement const& element)
 	{
 		if (e == "default")
 		{
-			_default = e.text().toInt();
+			_default = e.text() == "true";
 			_property.write (_default);
 		}
 	}
