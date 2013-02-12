@@ -989,7 +989,7 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 			if (ft == 0)
 				small_text = "0";
 			painter.setFont (s_ladder_font);
-			QRectF small_text_box (1.1f * x + 2.1f * b_ladder_digit_width, -0.5f * s_ladder_digit_height + posy,
+			QRectF small_text_box (1.1f * x + 2.1f * b_ladder_digit_width, -0.4f * s_ladder_digit_height + posy,
 								   3.f * s_ladder_digit_width, s_ladder_digit_height);
 			text_painter.drawText (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text);
 			// Minus sign?
