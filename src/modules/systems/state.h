@@ -94,6 +94,22 @@ class State: public Xefis::Module
 		Xefis::PropertyInteger	_property;
 	};
 
+	class ManagedString: public ManagedProperty
+	{
+	  public:
+		// Ctor
+		ManagedString (QDomElement const& element);
+
+		// From ManagedProperty
+		void
+		process() override;
+
+	  private:
+		QString					_path;
+		QString					_default;
+		Xefis::PropertyString	_property;
+	};
+
 	class ObservedProperty
 	{
 	  public:

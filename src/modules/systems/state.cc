@@ -111,6 +111,38 @@ State::ManagedInteger::process()
 }
 
 
+State::ManagedString::ManagedString (QDomElement const& element)
+{
+	if (!element.hasAttribute ("path"))
+		throw Xefis::Exception ("property element needs @path attribute");
+
+	_path = element.attribute ("path");
+	_property = Xefis::PropertyString (_path.toStdString());
+
+	for (QDomElement const& e: element)
+	{
+		if (e == "default")
+		{
+			_default = e.text();
+			_property.write (_default.toStdString());
+		}
+	}
+
+	process();
+}
+
+
+void
+State::ManagedString::process()
+{
+	if (_property.is_singular())
+		return;
+
+	if (_property.is_nil())
+		_property.write (_default.toStdString());
+}
+
+
 State::ObservedProperty::ObservedProperty (State* state, QDomElement const& element):
 	_state (state),
 	_path (element.attribute ("path"))
@@ -473,10 +505,12 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	{
 		if (e == "property")
 		{
-			if (e.attribute ("type") == "integer")
-				_managed_properties.insert (new ManagedInteger (e));
-			else if (e.attribute ("type") == "boolean")
+			if (e.attribute ("type") == "boolean")
 				_managed_properties.insert (new ManagedBoolean (e));
+			else if (e.attribute ("type") == "integer")
+				_managed_properties.insert (new ManagedInteger (e));
+			else if (e.attribute ("type") == "string")
+				_managed_properties.insert (new ManagedString (e));
 		}
 		else if (e == "var")
 			_vars[e.attribute ("name")] = e.attribute ("path");
