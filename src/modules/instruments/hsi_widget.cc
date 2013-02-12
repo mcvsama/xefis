@@ -375,9 +375,9 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	painter.setTransform (_aircraft_center_transform);
 	painter.rotate ((_track_deg - _mag_heading).deg());
 
-	painter.setPen (get_pen (Qt::white, 2.f));
-	painter.translate (0.f, -_r);
-	painter.scale (0.5f, -0.5f);
+	painter.setPen (get_pen (Qt::white, 2.2f));
+	painter.translate (0.f, -1.003f * _r);
+	painter.scale (0.465f, -0.465f);
 	painter.drawPolyline (_aircraft_shape);
 }
 
@@ -413,8 +413,10 @@ HSIWidget::paint_trend_vector (QPainter& painter, TextPainter&)
 	painter.setClipPath (_inner_map_clip);
 	painter.setPen (est_pen);
 
-	Length const trend_range = actual_trend_range();
-	Length const trend_start = actual_trend_start();
+	Length trend_range = actual_trend_range();
+	Length trend_start = actual_trend_start();
+	if (2.f * trend_start > trend_range)
+		trend_range = 0_nm;
 
 	if (_trend_vector_visible)
 	{
@@ -640,7 +642,7 @@ HSIWidget::paint_range (QPainter& painter, TextPainter& text_painter)
 
 		painter.setClipping (false);
 		painter.resetTransform();
-		painter.translate (4.5f * _q, 0.15f * _q);
+		painter.translate (4.5f * _q, 0.25f * _q);
 		painter.setPen (get_pen (Qt::white, 1.0f));
 		painter.drawRect (rect);
 		painter.setFont (font_a);
