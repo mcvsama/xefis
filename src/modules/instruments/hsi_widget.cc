@@ -903,24 +903,24 @@ HSIWidget::retrieve_navaids()
 		{
 			case Navaid::LOC:
 			case Navaid::LOCSA:
-				_loc_navs.insert (navaid);
+				_loc_navs.push_back (navaid);
 				break;
 
 			case Navaid::NDB:
-				_ndb_navs.insert (navaid);
+				_ndb_navs.push_back (navaid);
 				break;
 
 			case Navaid::VOR:
-				_vor_navs.insert (navaid);
+				_vor_navs.push_back (navaid);
 				break;
 
 			case Navaid::DME:
 			case Navaid::DMESF:
-				_dme_navs.insert (navaid);
+				_dme_navs.push_back (navaid);
 				break;
 
 			case Navaid::Fix:
-				_fix_navs.insert (navaid);
+				_fix_navs.push_back (navaid);
 				break;
 
 			default:

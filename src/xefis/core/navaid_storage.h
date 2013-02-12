@@ -31,9 +31,16 @@ namespace Xefis {
 
 class NavaidStorage
 {
+	struct Group
+	{
+		std::map<QString, Navaid const*>		by_identifier;
+		std::multimap<Frequency, Navaid const*>	by_frequency;
+	};
+
+	typedef std::map<Navaid::Type, Group> NavaidsByType;
+
   public:
-	typedef std::set<Navaid> Navaids;
-	typedef std::map<Navaid::Type, std::map<QString, Navaid const*>> NavaidsByIdentifier;
+	typedef std::vector<Navaid> Navaids;
 
   private:
 	static LonLat::ValueType::ValueType
@@ -44,11 +51,26 @@ class NavaidStorage
   public:
 	NavaidStorage();
 
+	/**
+	 * Return set of navaids withing the given @radius
+	 * from a @position.
+	 */
 	Navaids
 	get_navs (LonLat const& position, Length radius) const;
 
+	/**
+	 * Find navaid of given type by its @identifier.
+	 * Return nullptr if not found.
+	 */
 	Navaid const*
 	find_by_id (Navaid::Type, QString const& identifier) const;
+
+	/**
+	 * Return set of navaids, sorted by proximity to the @position
+	 * (first is the nearest).
+	 */
+	Navaids
+	find_by_frequency (LonLat const& position, Navaid::Type, Frequency frequency) const;
 
   private:
 	void
@@ -61,11 +83,11 @@ class NavaidStorage
 	parse_awy_dat();
 
   private:
-	NavaidsTree			_navaids_tree;
-	const char*			_nav_dat_file	= "share/nav/nav.dat";
-	const char*			_fix_dat_file	= "share/nav/fix.dat";
-	const char*			_awy_dat_file	= "share/nav/awy.dat";
-	NavaidsByIdentifier	_navaids_by_identifier;
+	NavaidsTree		_navaids_tree;
+	const char*		_nav_dat_file	= "share/nav/nav.dat";
+	const char*		_fix_dat_file	= "share/nav/fix.dat";
+	const char*		_awy_dat_file	= "share/nav/awy.dat";
+	NavaidsByType	_navaids_by_type;
 };
 
 

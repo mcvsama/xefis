@@ -38,7 +38,11 @@ NavaidStorage::NavaidStorage():
 	_navaids_tree.optimize();
 
 	for (Navaid const& navaid: _navaids_tree)
-		_navaids_by_identifier[navaid.type()][navaid.identifier()] = &navaid;
+	{
+		auto g = _navaids_by_type.insert (std::make_pair (navaid.type(), Group())).first;
+		g->second.by_identifier[navaid.identifier()] = &navaid;
+		g->second.by_frequency.insert (std::make_pair (navaid.frequency(), &navaid));
+	}
 }
 
 
@@ -51,7 +55,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 	{
 		if (position.haversine_earth (navaid.position()) <= radius)
 		{
-			set.insert (navaid);
+			set.push_back (navaid);
 			return false;
 		}
 		return true;
@@ -67,14 +71,36 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 Navaid const*
 NavaidStorage::find_by_id (Navaid::Type type, QString const& identifier) const
 {
-	auto by_id = _navaids_by_identifier.find (type);
-	if (by_id != _navaids_by_identifier.end())
+	auto g = _navaids_by_type.find (type);
+	if (g != _navaids_by_type.end())
 	{
-		auto navaid = by_id->second.find (identifier);
-		if (navaid != by_id->second.end())
+		auto navaid = g->second.by_identifier.find (identifier);
+		if (navaid != g->second.by_identifier.end())
 			return navaid->second;
 	}
 	return nullptr;
+}
+
+
+NavaidStorage::Navaids
+NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Frequency frequency) const
+{
+	Navaids result;
+
+	auto g = _navaids_by_type.find (type);
+	if (g != _navaids_by_type.end())
+	{
+		auto r0 = g->second.by_frequency.lower_bound (frequency - 5_kHz);
+		auto r1 = g->second.by_frequency.lower_bound (frequency + 5_kHz);
+		for (auto r = r0; r != r1; ++r)
+			result.push_back (*r->second);
+	}
+
+	std::sort (result.begin(), result.end(), [&](Navaid const& a, Navaid const& b) -> bool {
+		return position.haversine (a.position()) < position.haversine (b.position());
+	});
+
+	return result;
 }
 
 
@@ -119,11 +145,15 @@ NavaidStorage::parse_nav_dat()
 		switch (type)
 		{
 			case Navaid::NDB:
+			{
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
-				_navaids_tree.insert (Navaid (type, pos, identifier, name, 1_nm * range));
+				Navaid navaid (type, pos, identifier, name, 1_nm * range);
+				navaid.set_frequency (khz * 10_kHz);
+				_navaids_tree.insert (navaid);
 				break;
+			}
 
 			case Navaid::VOR:
 			{
@@ -134,7 +164,7 @@ NavaidStorage::parse_nav_dat()
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, 1_nm * range);
-				navaid.set_frequency (khz * 10.f);
+				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
 				navaid.set_amsl (amsl);
 				if (name.endsWith ("VOR-DME"))
@@ -159,7 +189,7 @@ NavaidStorage::parse_nav_dat()
 				khz *= 10.f;
 
 				Navaid navaid (type, pos, identifier, name, 1_nm * range);
-				navaid.set_frequency (khz * 10.f);
+				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_true_bearing (1_deg * true_bearing_deg);
 				navaid.set_amsl (amsl);
 				navaid.set_icao (icao);
@@ -169,18 +199,15 @@ NavaidStorage::parse_nav_dat()
 			}
 
 			case Navaid::GS:
-				// TODO
 				break;
 
 			case Navaid::OM:
 			case Navaid::MM:
 			case Navaid::IM:
-				// TODO
 				break;
 
 			case Navaid::DMESF:		// Suppress frequency
 			case Navaid::DME:		// Display frequency
-				// TODO
 				break;
 
 			case Navaid::Fix:

@@ -17,6 +17,7 @@
 // Local:
 #include "angle.h"
 #include "pressure.h"
+#include "frequency.h"
 #include "length.h"
 #include "lonlat.h"
 #include "constants.h"
