@@ -1803,7 +1803,10 @@ EFISWidget::get_pitch_scale_clipping_path() const
 	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
 	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
 
-	return clip_path - _flight_path_marker_clip.translated (_flight_path_marker_position);
+	if (_flight_path_visible)
+		return clip_path - _flight_path_marker_clip.translated (_flight_path_marker_position);
+	else
+		return clip_path;
 }
 
 
