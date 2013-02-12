@@ -71,11 +71,15 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 
 	QFont font (_font_20_bold);
 	QFontMetricsF metrics (font);
+	QFont small_font (_font_16_bold);
+	QFontMetricsF small_metrics (small_font);
 
 	QPen pen = get_pen (white, 1.f);
 	pen.setCapStyle (Qt::RoundCap);
 
 	float margin = 0.4f * q;
+	float zero_width = metrics.width ('0');
+	float small_zero_width = small_metrics.width ('0');
 
 	QRectF text_rect (0.5f * pen.width(), -0.6f * q, metrics.width ("000.0"), 0.9f * metrics.height());
 	text_rect.translate (margin, -text_rect.height());
@@ -103,6 +107,15 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 	{
 		painter.setPen (pen);
 		painter.drawRect (rect);
+	}
+
+	if (_normal_visible)
+	{
+		painter.setFont (small_font);
+		painter.setPen (get_pen (Qt::green, 1.0f));
+		text_painter.drawText (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
+							   Qt::AlignBottom | Qt::AlignRight,
+							   QString ("%1").arg (_normal_value, 0, 'f', 1));
 	}
 
 	painter.restore();
