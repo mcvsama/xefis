@@ -72,9 +72,9 @@ class Navaid
 	range() const;
 
 	void
-	set_frequency (float khz);
+	set_frequency (Frequency);
 
-	float
+	Frequency
 	frequency() const;
 
 	void
@@ -126,18 +126,18 @@ class Navaid
 	set_vor_type (VorType);
 
   private:
-	Type	_type;
-	LonLat	_position;
-	QString	_identifier;
-	QString	_name;
-	Length	_range;
-	float	_frequency			= 0.f;
-	Angle	_slaved_variation	= 0_deg; // VOR only
-	Feet	_amsl				= 0.f;
-	Angle	_true_bearing		= 0_deg; // LOC* only
-	QString	_icao;
-	QString	_runway;
-	VorType	_vor_type;
+	Type		_type;
+	LonLat		_position;
+	QString		_identifier;
+	QString		_name;
+	Length		_range;
+	Frequency	_frequency			= 0_Hz;
+	Angle		_slaved_variation	= 0_deg; // VOR only
+	Feet		_amsl				= 0.f;
+	Angle		_true_bearing		= 0_deg; // LOC* only
+	QString		_icao;
+	QString		_runway;
+	VorType		_vor_type;
 };
 
 
@@ -195,13 +195,13 @@ Navaid::range() const
 
 
 inline void
-Navaid::set_frequency (float khz)
+Navaid::set_frequency (Frequency frequency)
 {
-	_frequency = khz;
+	_frequency = frequency;
 }
 
 
-inline float
+inline Frequency
 Navaid::frequency() const
 {
 	return _frequency;
