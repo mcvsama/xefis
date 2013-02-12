@@ -67,7 +67,7 @@ class AP: public Xefis::Module
 	Xefis::Timestamp		_dt;
 	// Input:
 	// TODO PIDs parameters
-	Xefis::PropertyBoolean	_ap_enabled;
+	Xefis::PropertyBoolean	_autopilot_enabled;
 	Xefis::PropertyFloat	_bank_limit_deg;
 	Xefis::PropertyFloat	_yank_limit_deg;
 	Xefis::PropertyFloat	_selected_mag_heading_deg;

@@ -79,7 +79,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "control-stick-visible", _control_stick_visible, false },
 				{ "control-stick-pitch", _control_stick_pitch_deg, false },
 				{ "control-stick-roll", _control_stick_roll_deg, false },
-				{ "navigation-needles-visible", _navigation_needles_visible, false },
+				{ "navigation-info-visible", _navigation_info_visible, false },
 				{ "navigation-type-hint", _navigation_type_hint, false },
 				{ "vertical-deviation", _vertical_deviation_deg, false },
 				{ "lateral-deviation", _lateral_deviation_deg, false },
@@ -259,17 +259,17 @@ EFIS::read()
 	if (_control_stick_roll_deg.valid())
 		_efis_widget->set_control_stick_roll (1_deg * *_control_stick_roll_deg);
 
-	if (_navigation_needles_visible.valid() && *_navigation_needles_visible)
+	if (_navigation_info_visible.valid() && *_navigation_info_visible)
 	{
 		_efis_widget->set_navigation_hint (_navigation_type_hint.read ("").c_str());
-		_efis_widget->set_navigation_needles_visible (true);
-		_efis_widget->set_navigation_runway_visible (_lateral_deviation_deg.valid() &&
-													 _altitude_agl_ft.valid() &&
-													 *_altitude_agl_ft <= 150.f);
+		_efis_widget->set_navigation_info_visible (true);
+		_efis_widget->set_runway_visible (_lateral_deviation_deg.valid() &&
+										  _altitude_agl_ft.valid() &&
+										  *_altitude_agl_ft <= 150.f);
 	}
 	else
 	{
-		_efis_widget->set_navigation_needles_visible (false);
+		_efis_widget->set_navigation_info_visible (false);
 		_efis_widget->set_navigation_hint ("");
 	}
 

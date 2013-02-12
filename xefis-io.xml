@@ -5,58 +5,72 @@
 			<input disabled='false'>
 				<host>0.0.0.0</host>
 				<port>9000</port>
-				<properties path='/instrumentation'>
-					<property name='ias' path='/speed/ias.kt'/>
-					<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
-					<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
-					<property name='ias-warning' path='/speed/ias-warning.kt'/>
-					<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
-					<property name='gs' path='/speed/gs.kt'/>
-					<property name='tas' path='/speed/tas.kt'/>
-					<property name='mach' path='/speed/mach'/>
-					<property name='orientation-pitch' path='/orientation/pitch.deg'/>
-					<property name='orientation-roll' path='/orientation/roll.deg'/>
-					<property name='orientation-roll-limit' path='/orientation/limits/roll.deg' default='35.0'/>
-					<property name='orientation-magnetic-heading' path='/orientation/heading-magnetic.deg'/>
-					<property name='orientation-true-heading' path='/orientation/heading-true.deg'/>
-					<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
-					<property name='slip-skid-limit' path='/slip-skid/limits/slip-skid.g' default='1.5'/>
-					<property name='flight-path-marker-alpha' path='/flight-path-marker/alpha.deg'/>
-					<property name='flight-path-marker-beta' path='/flight-path-marker/beta.deg'/>
-					<property name='track' path='/orientation/track.deg'/>
-					<property name='standard-pressure' path='/configuration/pressure/standard-pressure'/>
-					<property name='altitude' path='/altitude/amsl.ft'/>
-					<property name='altitude-agl' path='/altitude/agl.ft'/>
-					<property name='landing-altitude' path='/altitude/landing-altitude.ft'/>
-					<property name='cbr' path='/altitude/climb-rate.fpm'/>
-					<property name='pressure' path='/static/pressure.inhg'/>
-					<property name='autopilot-setting-altitude' path='/autopilot/settings/altitude.ft'/>
-					<property name='autopilot-setting-ias' path='/autopilot/settings/ias.kt'/>
-					<property name='autopilot-setting-heading' path='/autopilot/settings/heading.deg'/>
-					<property name='autopilot-setting-cbr' path='/autopilot/settings/cbr.fpm'/>
-					<property name='flight-director-pitch' path='/autopilot/flight-director/pitch.deg'/>
-					<property name='flight-director-roll' path='/autopilot/flight-director/roll.deg'/>
-					<property name='navigation-needles-visible' path='/configuration/navigation/needles-visible'/>
-					<property name='navigation-glide-slope-needle' path='/navigation/glide-slope-needle-deflection'/>
-					<property name='navigation-heading-needle' path='/navigation/heading-needle-deflection'/>
-					<property name='dme-distance' path='/navigation/dme-distance.nm'/>
-					<property name='position-latitude' path='/position/latitude.deg'/>
-					<property name='position-longitude' path='/position/longitude.deg'/>
-					<property name='position-sea-level-radius' path='/position/sea-level-radius.ft'/>
-					<property name='wind-from-mag-heading' path='/wind/from-mag-heading.deg'/>
-					<property name='wind-tas' path='/wind/tas.kt'/>
-				</properties>
-				<properties path='/engine'>
-					<property name='engine-n1' path='/n1.pct'/>
-					<property name='engine-n2' path='/n2.pct'/>
-					<property name='engine-egt' path='/egt.degc'/>
-					<property name='engine-epr' path='/epr'/>
+				<properties>
+					<directory path='/sensors'>
+						<!-- radar altimeter -->
+						<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
+						<!-- /gps -->
+						<property name='position-longitude' path='/gps/longitude.deg'/>
+						<property name='position-latitude' path='/gps/latitude.deg'/>
+						<property name='position-sea-level-radius' path='/gps/amsl.ft'/>
+						<property name='position-update-timestamp' path='/gps/update-timestamp.s'/>
+						<!-- airspeed -->
+						<property name='ias' path='/speed/ias.kt'/>
+						<property name='ias-update-timestamp' path='/speed/update-timestamp.s'/>
+						<!-- pressure -->
+						<property name='pressure' path='/pressure/pressure.inhg'/>
+						<property name='pressure-update-timestamp' path='/pressure/update-timestamp.s'/>
+						<!-- compass -->
+						<pressure name='magnetic-heading' path='/compass/magnetic-heading.deg'/>
+						<property name='compass-update-timestamp' path='/compass/update-timestamp.s'/>
+						<!-- slip-skid -->
+						<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
+						<property name='slip-skid-limit' path='/slip-skid/limit.g'/>
+						<property name='slip-skid-update-timestamp' path='/slip-skid/update-timestamp.s'/>
+						<!-- imu -->
+						<property name='orientation-pitch' path='/imu/pitch.deg'/>
+						<property name='orientation-roll' path='/imu/roll.deg'/>
+						<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
+						<!-- engine -->
+						<property name='engine-n1' path='/engine/n1.pct'/>
+						<property name='engine-n2' path='/engine/n2.pct'/>
+						<property name='engine-egt' path='/engine/egt.degc'/>
+						<property name='engine-epr' path='/engine/epr'/>
+					</directory>
+					<directory path='/systems/fms'>
+						<!-- Emulate some of the FMS output -->
+						<property name='ias-minimum' path='/output/speed/ias-minimum.kt'/>
+						<property name='ias-warning' path='/output/speed/ias-warning.kt'/>
+						<property name='ias-maximum' path='/output/speed/ias-maximum.kt'/>
+						<property name='ias-lookahead' path='/output/speed/ias-lookahead.kt'/>
+						<property name='gs' path='/output/speed/ground-speed.kt'/>
+						<property name='tas' path='/output/speed/true-air-speed.kt'/>
+						<property name='mach' path='/output/speed/mach'/>
+						<property name='wind-from-mag-heading' path='/output/wind/magnetic-orientation.deg'/>
+						<property name='wind-tas' path='/output/wind/speed.kt'/>
+						<property name='dme-distance' path='/output/localizer/distance.nm'/>
+						<property name='vertical-deviation' path='/output/localizer/vertical-deviation.deg'/>
+						<property name='lateral-deviation' path='/output/localizer/lateral-deviation.deg'/>
+						<property name='flight-path-marker-alpha' path='/output/flight-path/alpha.deg'/>
+						<property name='flight-path-marker-beta' path='/output/flight-path/beta.deg'/>
+						<property name='track' path='/output/flight-path/track.deg'/>
+						<property name='orientation-true-heading' path='/output/orientation/true-heading.deg'/>
+						<property name='cbr' path='/output/altitude/climb-rate.fpm'/>
+						<property name='altitude' path='/output/altitude/amsl.ft'/>
+					</directory>
+					<directory path='/systems/autopilot'>
+						<!-- Emulate some of the AP settings -->
+						<property name='autopilot-setting-altitude' path='/settings/altitude.ft'/>
+						<property name='autopilot-setting-ias' path='/settings/ias.kt'/>
+						<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
+						<property name='autopilot-setting-cbr' path='/settings/cbr.fpm'/>
+					</directory>
 				</properties>
 			</input>
 			<output disabled='false'>
 				<host>127.0.0.1</host>
 				<port>9001</port>
-				<properties path='/controls'>
+				<properties path='/systems/stabilizer/output'>
 					<property name='ailerons' path='/ailerons' default='0.0'/>
 					<property name='elevator' path='/elevator' default='0.0'/>
 					<property name='rudder' path='/rudder' default='0.0'/>
@@ -74,11 +88,6 @@
 			<device>/dev/input/js1</device>
 			<path>/input/rudder</path>
 		</module>
-		<!--module name='keyboard'>
-			<action key='F1'>
-				<switch-bool>/instrumentation/flight-director/visible</switch-bool>
-			</action>
-		</module-->
 	</modules>
 </xefis-include>
 
