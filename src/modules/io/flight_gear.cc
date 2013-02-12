@@ -64,10 +64,10 @@ struct FGInputData
 	FGDouble	fpm_beta_deg;					// fpb
 	FGDouble	track_deg;						// tr
 	FGBool		navigation_needles_visible;		// nav
-	FGBool		navigation_gs_needle_ok;		// ngso
-	FGDouble	navigation_gs_needle;			// ngs
-	FGBool		navigation_hd_needle_ok;		// nhdo
-	FGDouble	navigation_hd_needle;			// nhd
+	FGBool		vertical_deviation_ok;			// ngso
+	FGDouble	vertical_deviation_val;			// ngs
+	FGBool		lateral_deviation_ok;			// nhdo
+	FGDouble	lateral_deviation_val;			// nhd
 	FGBool		navigation_dme_ok;				// dok
 	FGDouble	dme_distance_nm;				// dme
 	FGDouble	slip_skid_g;					// ss
@@ -141,8 +141,8 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "flight-director-pitch", _flight_director_pitch_deg, false },
 						{ "flight-director-roll", _flight_director_roll_deg, false },
 						{ "navigation-needles-visible", _navigation_needles_visible, false },
-						{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
-						{ "navigation-heading-needle", _navigation_hd_needle, false },
+						{ "lateral-deviation", _lateral_deviation_deg, false },
+						{ "vertical-deviation", _vertical_deviation_deg, false },
 						{ "dme-distance", _dme_distance_nm, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
 						{ "engine-epr", _engine_epr, false },
@@ -246,8 +246,8 @@ FlightGearIO::invalidate_all()
 		&_flight_director_pitch_deg,
 		&_flight_director_roll_deg,
 		&_navigation_needles_visible,
-		&_navigation_gs_needle,
-		&_navigation_hd_needle,
+		&_lateral_deviation_deg,
+		&_vertical_deviation_deg,
 		&_dme_distance_nm,
 		&_engine_throttle_pct,
 		&_engine_epr,
@@ -320,8 +320,6 @@ FlightGearIO::read_input()
 		ASSIGN (fpm_beta_deg);
 		ASSIGN (track_deg);
 		ASSIGN (navigation_needles_visible);
-		ASSIGN (navigation_gs_needle);
-		ASSIGN (navigation_hd_needle);
 		ASSIGN (dme_distance_nm);
 		ASSIGN (slip_skid_g);
 		ASSIGN (engine_throttle_pct);
@@ -334,10 +332,15 @@ FlightGearIO::read_input()
 
 #undef ASSIGN
 
-		if (!fg_data->navigation_gs_needle_ok && !_navigation_gs_needle.is_singular())
-			_navigation_gs_needle.set_nil();
-		if (!fg_data->navigation_hd_needle_ok && !_navigation_hd_needle.is_singular())
-			_navigation_hd_needle.set_nil();
+		if (!_vertical_deviation_deg.is_singular())
+			_vertical_deviation_deg.write (2.f * fg_data->vertical_deviation_val);
+		if (!_lateral_deviation_deg.is_singular())
+			_lateral_deviation_deg.write (2.f * fg_data->lateral_deviation_val);
+
+		if (!fg_data->vertical_deviation_ok && !_vertical_deviation_deg.is_singular())
+			_vertical_deviation_deg.set_nil();
+		if (!fg_data->lateral_deviation_ok && !_lateral_deviation_deg.is_singular())
+			_lateral_deviation_deg.set_nil();
 		if (!fg_data->navigation_dme_ok && !_dme_distance_nm.is_singular())
 			_dme_distance_nm.set_nil();
 	}

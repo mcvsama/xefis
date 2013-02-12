@@ -98,8 +98,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_control_stick_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;
 	Xefis::PropertyString	_navigation_type_hint;
-	Xefis::PropertyFloat	_navigation_gs_needle;
-	Xefis::PropertyFloat	_navigation_hd_needle;
+	Xefis::PropertyFloat	_lateral_deviation_deg;
+	Xefis::PropertyFloat	_vertical_deviation_deg;
 	Xefis::PropertyFloat	_dme_distance_nm;
 	Xefis::PropertyBoolean	_control_hint_visible;
 	Xefis::PropertyString	_control_hint;

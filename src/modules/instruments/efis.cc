@@ -81,8 +81,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "control-stick-roll", _control_stick_roll_deg, false },
 				{ "navigation-needles-visible", _navigation_needles_visible, false },
 				{ "navigation-type-hint", _navigation_type_hint, false },
-				{ "navigation-glide-slope-needle", _navigation_gs_needle, false },
-				{ "navigation-heading-needle", _navigation_hd_needle, false },
+				{ "vertical-deviation", _vertical_deviation_deg, false },
+				{ "lateral-deviation", _lateral_deviation_deg, false },
 				{ "dme-distance", _dme_distance_nm, false },
 				{ "control-hint-visible", _control_hint_visible, false },
 				{ "control-hint", _control_hint, false },
@@ -263,7 +263,7 @@ EFIS::read()
 	{
 		_efis_widget->set_navigation_hint (_navigation_type_hint.read ("").c_str());
 		_efis_widget->set_navigation_needles_visible (true);
-		_efis_widget->set_navigation_runway_visible (_navigation_hd_needle.valid() &&
+		_efis_widget->set_navigation_runway_visible (_lateral_deviation_deg.valid() &&
 													 _altitude_agl_ft.valid() &&
 													 *_altitude_agl_ft <= 150.f);
 	}
@@ -290,13 +290,13 @@ EFIS::read()
 	else
 		_efis_widget->set_localizer_info_visible (false);
 
-	_efis_widget->set_navigation_glideslope_needle_visible (_navigation_gs_needle.valid());
-	if (_navigation_gs_needle.valid())
-		_efis_widget->set_navigation_glideslope_needle (*_navigation_gs_needle);
+	_efis_widget->set_vertical_deviation_visible (_vertical_deviation_deg.valid());
+	if (_vertical_deviation_deg.valid())
+		_efis_widget->set_vertical_deviation (*_vertical_deviation_deg * 1_deg);
 
-	_efis_widget->set_navigation_heading_needle_visible (_navigation_hd_needle.valid());
-	if (_navigation_hd_needle.valid())
-		_efis_widget->set_navigation_heading_needle (*_navigation_hd_needle);
+	_efis_widget->set_lateral_deviation_visible (_lateral_deviation_deg.valid());
+	if (_lateral_deviation_deg.valid())
+		_efis_widget->set_lateral_deviation (*_lateral_deviation_deg * 1_deg);
 
 	_efis_widget->set_control_hint_visible (_control_hint_visible.read (false));
 	_efis_widget->set_control_hint (_control_hint.read ("").c_str());
