@@ -29,12 +29,6 @@
 #include "efis_widget.h"
 
 
-// TODO check where save/restore calls are really needed.
-// TODO zakeszuj _wszystkie_ peny i obliczaj w post_resize()
-// TODO zakeszuj _wszystkie_ kolory i obliczaj w post_resize() albo i wcześniej.
-// TODO Use QPainterPaths even when there’s a QPainter convenience function. E.g. Rounded rects and elipses.
-// TODO zamień QColor (liczby) na Qt::stała, jeśli jest.
-
 EFISWidget::EFISWidget (QWidget* parent):
 	InstrumentWidget (parent, 0.8f, 1.f, 1.f)
 {
@@ -1541,9 +1535,9 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 		QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
 
-		auto paint_ladder = [&](bool needle_visible, float track_deviation) -> void
+		auto paint_ladder = [&](bool needle_visible, Angle track_deviation) -> void
 		{
-			track_deviation = limit (track_deviation, -1.f, 1.f);
+			track_deviation = limit (track_deviation, -2_deg, +2_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -1563,7 +1557,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 					<< QPointF (+1.6f * w, 0.f)
 					<< QPointF (0.f, +w)
 					<< QPointF (-1.6f * w, 0.f);
-				diamond.translate (track_deviation * 0.15f * wh(), 0.f);
+				diamond.translate (track_deviation.deg() * 0.075f * wh(), 0.f);
 				for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 				{
 					painter.setPen (pen);
@@ -1583,12 +1577,12 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.452f * wh());
-		paint_ladder (_navigation_hd_needle_visible, _navigation_hd_needle);
+		paint_ladder (_lateral_deviation_visible, _lateral_deviation_deg);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
 		painter.rotate (-90);
-		paint_ladder (_navigation_gs_needle_visible, _navigation_gs_needle);
+		paint_ladder (_vertical_deviation_visible, _vertical_deviation_deg);
 	}
 
 	if (_navigation_runway_visible)
@@ -1596,7 +1590,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = limit (_navigation_hd_needle, -1.f, +1.f);
+		float offset = 0.5f * limit (_lateral_deviation_deg, -2_deg, +2_deg).deg();
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.26f * wh());

@@ -110,8 +110,8 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;
-	Xefis::PropertyFloat	_navigation_gs_needle;
-	Xefis::PropertyFloat	_navigation_hd_needle;
+	Xefis::PropertyFloat	_lateral_deviation_deg;
+	Xefis::PropertyFloat	_vertical_deviation_deg;
 	Xefis::PropertyFloat	_dme_distance_nm;
 	Xefis::PropertyFloat	_engine_throttle_pct;
 	Xefis::PropertyFloat	_engine_epr;

@@ -601,46 +601,46 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_control_stick_visible (bool visible);
 
 	/**
-	 * Set visibility of navigation needles ladders.
+	 * Set visibility of localizer/glideslope needles.
 	 */
 	void
 	set_navigation_needles_visible (bool visible);
 
 	/**
-	 * Return navigation glideslope needle value.
+	 * Return vertical deviation value.
 	 */
-	float
-	nav_glideslope_needle() const;
+	Angle
+	vertical_deviation() const;
 
 	/**
-	 * Set navigation glideslope needle. Values: [-1.f, +1.f].
+	 * Set vertical deviation.
 	 */
 	void
-	set_navigation_glideslope_needle (float value);
+	set_vertical_deviation (Angle deviation);
 
 	/**
-	 * Set navigation glideslope needle visibility.
+	 * Set navigation vertical needle visibility.
 	 */
 	void
-	set_navigation_glideslope_needle_visible (bool visible);
+	set_vertical_deviation_visible (bool visible);
 
 	/**
 	 * Return navigation heading needle value.
 	 */
-	float
-	nav_heading_needle() const;
+	Angle
+	lateral_deviation() const;
 
 	/**
-	 * Set navigation heading needle. Values: [-1.f, +1.f].
+	 * Set localizer deviation needle.
 	 */
 	void
-	set_navigation_heading_needle (float value);
+	set_lateral_deviation (Angle value);
 
 	/**
 	 * Set navigation heading needle visibility.
 	 */
 	void
-	set_navigation_heading_needle_visible (bool visible);
+	set_lateral_deviation_visible (bool visible);
 
 	/**
 	 * Set navigation runway visibility (aligns with heading needle).
@@ -1158,10 +1158,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Angle				_control_stick_roll				= 0_deg;
 	bool				_control_stick_visible			= false;
 	bool				_navigation_needles_visible		= false;
-	float				_navigation_gs_needle			= 0.f;
-	bool				_navigation_gs_needle_visible	= false;
-	float				_navigation_hd_needle			= 0.f;
-	bool				_navigation_hd_needle_visible	= false;
+	Angle				_vertical_deviation_deg			= 0_deg;
+	bool				_vertical_deviation_visible		= false;
+	Angle				_lateral_deviation_deg			= 0_deg;
+	bool				_lateral_deviation_visible		= false;
 	bool				_navigation_runway_visible		= false;
 	QString				_navigation_hint;
 	Length				_dme_distance					= 0_nm;
@@ -1912,48 +1912,48 @@ EFISWidget::set_navigation_needles_visible (bool visible)
 }
 
 
-inline float
-EFISWidget::nav_glideslope_needle() const
+inline Angle
+EFISWidget::vertical_deviation() const
 {
-	return _navigation_gs_needle;
+	return _vertical_deviation_deg;
 }
 
 
 inline void
-EFISWidget::set_navigation_glideslope_needle (float value)
+EFISWidget::set_vertical_deviation (Angle deviation)
 {
-	_navigation_gs_needle = value;
+	_vertical_deviation_deg = deviation;
 	update();
 }
 
 
 inline void
-EFISWidget::set_navigation_glideslope_needle_visible (bool visible)
+EFISWidget::set_vertical_deviation_visible (bool visible)
 {
-	_navigation_gs_needle_visible = visible;
+	_vertical_deviation_visible = visible;
 	update();
 }
 
 
-inline float
-EFISWidget::nav_heading_needle() const
+inline Angle
+EFISWidget::lateral_deviation() const
 {
-	return _navigation_hd_needle;
+	return _lateral_deviation_deg;
 }
 
 
 inline void
-EFISWidget::set_navigation_heading_needle (float value)
+EFISWidget::set_lateral_deviation (Angle deviation)
 {
-	_navigation_hd_needle = value;
+	_lateral_deviation_deg = deviation;
 	update();
 }
 
 
 inline void
-EFISWidget::set_navigation_heading_needle_visible (bool visible)
+EFISWidget::set_lateral_deviation_visible (bool visible)
 {
-	_navigation_hd_needle_visible = visible;
+	_lateral_deviation_visible = visible;
 	update();
 }
 
