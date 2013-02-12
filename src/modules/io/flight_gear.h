@@ -100,7 +100,6 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_standard_pressure;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;
-	Xefis::PropertyFloat	_landing_altitude_ft;
 	Xefis::PropertyFloat	_cbr_fpm;
 	Xefis::PropertyFloat	_pressure_inhg;
 	Xefis::PropertyFloat	_autopilot_alt_setting_ft;

@@ -1496,19 +1496,29 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	if (_localizer_info_visible)
+	if (_navigation_info_visible)
 	{
-		QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (_localizer_mag_bearing.deg()));
-		QFont font = _font_10_bold;
-		font.setBold (false);
+		if (_localizer_info_visible)
+		{
+			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (_localizer_mag_bearing.deg()));
+			QFont font = _font_10_bold;
+			font.setBold (false);
 
-		painter.setPen (Qt::white);
-		painter.setFont (font);
-		text_painter.drawText (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
-	}
+			painter.setPen (Qt::white);
+			painter.setFont (font);
+			text_painter.drawText (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
+		}
 
-	if (_dme_distance_visible || _navigation_hint != "")
-	{
+		if (_navigation_hint != "")
+		{
+			QFont font = _font_16_bold;
+			font.setBold (false);
+
+			painter.setPen (Qt::white);
+			painter.setFont (font);
+			text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _navigation_hint);
+		}
+
 		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);
 		if (!_dme_distance_visible)
 			dme_val = "DME –––";
@@ -1518,20 +1528,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		painter.setPen (Qt::white);
 		painter.setFont (font);
 		text_painter.drawText (QPointF (-0.24f * wh(), -0.36f * wh()), Qt::AlignTop | Qt::AlignLeft, dme_val);
-	}
 
-	if (_navigation_hint != "")
-	{
-		QFont font = _font_16_bold;
-		font.setBold (false);
-
-		painter.setPen (Qt::white);
-		painter.setFont (font);
-		text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _navigation_hint);
-	}
-
-	if (_navigation_needles_visible)
-	{
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 		QPen white_pen = get_pen (QColor (255, 255, 255), 1.8f);
 
@@ -1585,7 +1582,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		paint_ladder (_vertical_deviation_visible, _vertical_deviation_deg);
 	}
 
-	if (_navigation_runway_visible)
+	if (_runway_visible)
 	{
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();

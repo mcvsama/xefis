@@ -39,7 +39,7 @@ AP::AP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		if (e == "properties")
 		{
 			parse_properties (e, {
-				{ "ap-enabled", _ap_enabled, true },
+				{ "autopilot-enabled", _autopilot_enabled, true },
 				{ "bank-limit", _bank_limit_deg, true },
 				{ "yank-limit", _yank_limit_deg, true },
 				{ "selected-mag-heading", _selected_mag_heading_deg, true },
@@ -87,7 +87,7 @@ AP::data_updated()
 	compute_ap_settings();
 	compute_joystick_input();
 
-	if (*_ap_enabled)
+	if (*_autopilot_enabled)
 	{
 		_output_pitch_deg.write (_auto_output_pitch.deg());
 		_output_roll_deg.write (_auto_output_roll.deg());
