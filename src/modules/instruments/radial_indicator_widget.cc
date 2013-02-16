@@ -155,6 +155,7 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	float warning = limit (_warning_value, _range);
 	float critical = limit (_critical_value, _range);
 	float normal = limit (_normal_value, _range);
+	float target = limit (_target_value, _range);
 
 	if (!_warning_visible)
 		warning = _range.max();
@@ -165,6 +166,7 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	float warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
 	float critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
 	float normal_angle = value_span_angle * (normal - _range.min()) / _range.extent();
+	float target_angle = value_span_angle * (target - _range.min()) / _range.extent();
 
 	painter.save();
 	if (_value_visible)
@@ -177,7 +179,17 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
 		painter.rotate (value_angle);
 		painter.setPen (pointer_pen);
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
+		if (_target_visible)
+		{
+			float ext = 0.15f * r;
+			float extr = 1.15f * r;
+			painter.drawLine (QPointF (0.f, 0.f), QPointF (extr, 0.f));
+			painter.rotate (target_angle - value_angle);
+			painter.drawLine (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
+			painter.drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
+		}
+		else
+			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
 		painter.restore();
 	}
 

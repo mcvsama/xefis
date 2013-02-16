@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<window width='500' height='800' disabled='false'>
+		<window width='500' height='800' disabled='true'>
 			<layout type='horizontal'>
 				<item>
 					<module name='generic/property-tree'/>
@@ -165,6 +165,7 @@
 											<module name='instruments/radial-indicator'>
 												<properties path='/sensors/engine'>
 													<property name='value' path='/n1.pct'/>
+													<property name='target' path='/config/n1-target' default='18.7'/>
 													<property name='value-minimum' path='/config/n1-minimum' default='0.0'/>
 													<property name='value-warning' path='/config/n1-warning' default='107.0'/>
 													<property name='value-critical' path='/config/n1-critical' default='110.0'/>

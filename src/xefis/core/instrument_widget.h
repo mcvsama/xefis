@@ -74,10 +74,10 @@ class InstrumentWidget: public QWidget
 	void
 	centrify (QRectF& rectf) const;
 
-	Angle
+	float
 	arc_degs (Angle deg) const;
 
-	Angle
+	float
 	arc_span (Angle deg) const;
 
   protected:
@@ -153,17 +153,17 @@ InstrumentWidget::centrify (QRectF& rectf) const
 }
 
 
-inline Angle
+inline float
 InstrumentWidget::arc_degs (Angle deg) const
 {
-	return -16.f * (deg - 90_deg);
+	return (-16.f * (deg - 90_deg)).deg();
 }
 
 
-inline Angle
+inline float
 InstrumentWidget::arc_span (Angle deg) const
 {
-	return -16.f * deg;
+	return (-16.f * deg).deg();
 }
 
 } // namespace Xefis

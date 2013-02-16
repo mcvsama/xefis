@@ -54,6 +54,7 @@ class RadialIndicator: public Xefis::Instrument
 	std::string				_property_path;
 
 	Xefis::PropertyFloat	_value;
+	Xefis::PropertyFloat	_target;
 	Xefis::PropertyFloat	_range_minimum;
 	Xefis::PropertyFloat	_range_maximum;
 	Xefis::PropertyFloat	_warning_value;
