@@ -1239,6 +1239,7 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	painter.setPen (QPen (_navigation_color, pen_width()));
 	if (_standard_pressure)
 	{
+		painter.setFont (_font_16_bold);
 		text_painter.drawText (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD");
 		painter.translate (0.f, 0.9f * metrics_a.height());
 		painter.setPen (QPen (Qt::white, 1.f));
