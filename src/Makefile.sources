@@ -128,13 +128,17 @@ SRC_MOCHDRS += modules/io/joystick.h
 
 SRC_HEADERS += modules/systems/ap.h
 SRC_HEADERS += modules/systems/lookahead.h
+SRC_HEADERS += modules/systems/mouse.h
 SRC_HEADERS += modules/systems/stabilizer.h
 SRC_HEADERS += modules/systems/state.h
 
 SRC_SOURCES += modules/systems/ap.cc
 SRC_SOURCES += modules/systems/lookahead.cc
+SRC_SOURCES += modules/systems/mouse.cc
 SRC_SOURCES += modules/systems/stabilizer.cc
 SRC_SOURCES += modules/systems/state.cc
+
+SRC_MOCHDRS += modules/systems/mouse.h
 
 ################
 

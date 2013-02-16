@@ -33,7 +33,7 @@ Module::Module (ModuleManager* module_manager):
 
 
 void
-Module::parse_properties (QDomElement& properties_element, PropertiesList list)
+Module::parse_properties (QDomElement const& properties_element, PropertiesList list)
 {
 	std::map<QString, PropertyUnion*> map;
 	std::set<QString> unconfigured_values;

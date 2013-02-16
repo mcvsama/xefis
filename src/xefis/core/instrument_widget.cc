@@ -34,6 +34,8 @@ InstrumentWidget::InstrumentWidget (QWidget* parent, float height_for_width, flo
 	_master_pen_scale (master_pen_scale),
 	_master_font_scale (master_font_scale)
 {
+	setCursor (QCursor (QPixmap (XEFIS_SHARED_DIRECTORY "/images/cursors/crosshair.png")));
+
 	_font = Xefis::Services::instrument_font();
 	_autopilot_color = QColor (250, 120, 255);
 	_navigation_color = QColor (60, 255, 40);
