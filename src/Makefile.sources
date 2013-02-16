@@ -49,6 +49,7 @@ SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
 SRC_HEADERS += xefis/core/property_union.h
+SRC_HEADERS += xefis/core/window.h
 
 SRC_SOURCES += xefis/core/config_reader.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
@@ -58,6 +59,7 @@ SRC_SOURCES += xefis/core/navaid.cc
 SRC_SOURCES += xefis/core/navaid_storage.cc
 SRC_SOURCES += xefis/core/property_node.cc
 SRC_SOURCES += xefis/core/property_storage.cc
+SRC_SOURCES += xefis/core/window.cc
 
 ######## /xefis/utility ########
 

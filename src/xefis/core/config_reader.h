@@ -35,6 +35,8 @@ class ModuleManager;
 
 class ConfigReader
 {
+	friend class Window;
+
   public:
 	ConfigReader (Application*, ModuleManager*);
 
@@ -64,16 +66,10 @@ class ConfigReader
 	process_windows_element (QDomElement const& windows_element);
 
 	void
-	process_modules_element (QDomElement const& modules_element);
-
-	void
 	process_window_element (QDomElement const& window_element);
 
 	void
-	process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* window, int stretch = 0);
-
-	void
-	process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* window);
+	process_modules_element (QDomElement const& modules_element);
 
 	void
 	process_module_element (QDomElement const& module_element, QBoxLayout* layout = nullptr, QWidget* window = nullptr, int stretch = 0);

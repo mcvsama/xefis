@@ -1,13 +1,13 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<!--window width='500' height='800'>
+		<window width='500' height='800' disabled='false'>
 			<layout type='horizontal'>
 				<item>
 					<module name='generic/property-tree'/>
 				</item>
 			</layout>
-		</window-->
+		</window>
 		<window width='1150' height='675' full-screen='false' scale='1.0'>
 			<layout type='horizontal'>
 				<item stretch-factor='4'>
