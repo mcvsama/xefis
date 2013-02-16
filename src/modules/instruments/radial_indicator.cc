@@ -46,6 +46,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 		{
 			parse_properties (e, {
 				{ "value", _value, true },
+				{ "target", _target, false },
 				{ "value-minimum", _range_minimum, true },
 				{ "value-maximum", _range_maximum, true },
 				{ "value-warning", _warning_value, false },
@@ -68,6 +69,12 @@ RadialIndicator::read()
 
 	_widget->set_value (*_value);
 	_widget->set_value_visible (_value.valid());
+
+	if (!_target.is_singular())
+	{
+		_widget->set_target_value (*_target);
+		_widget->set_target_visible (_target.valid());
+	}
 
 	if (!_warning_value.is_singular())
 	{

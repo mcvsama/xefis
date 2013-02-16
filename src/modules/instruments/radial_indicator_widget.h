@@ -119,6 +119,24 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	void
 	set_normal_visible (bool visible);
 
+	/**
+	 * Target value (setting bug).
+	 */
+	float
+	target_value() const;
+
+	/**
+	 * Set target value (setting bug).
+	 */
+	void
+	set_target_value (float);
+
+	/**
+	 * Set target value visibility.
+	 */
+	void
+	set_target_visible (bool visible);
+
   protected:
 	void
 	paintEvent (QPaintEvent*) override;
@@ -141,6 +159,8 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	bool				_critical_visible	= false;
 	float				_normal_value		= 1.f;
 	bool				_normal_visible		= false;
+	float				_target_value		= 0.f;
+	bool				_target_visible		= false;
 };
 
 
@@ -247,6 +267,29 @@ inline void
 RadialIndicatorWidget::set_normal_visible (bool visible)
 {
 	_normal_visible = visible;
+	update();
+}
+
+
+inline float
+RadialIndicatorWidget::target_value() const
+{
+	return _target_value;
+}
+
+
+inline void
+RadialIndicatorWidget::set_target_value (float target_value)
+{
+	_target_value = target_value;
+	update();
+}
+
+
+inline void
+RadialIndicatorWidget::set_target_visible (bool visible)
+{
+	_target_visible = visible;
 	update();
 }
 
