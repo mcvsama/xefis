@@ -101,6 +101,7 @@ class Application: public QApplication
 	ModuleManager*		_module_manager	= nullptr;
 	ConfigReader*		_config_reader	= nullptr;
 	QTimer*				_postponed_update;
+	QTimer*				_offline_updater;
 };
 
 
