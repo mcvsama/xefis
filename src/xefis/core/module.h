@@ -75,7 +75,7 @@ class Module
 	 * by their names matching the <properties> children.
 	 */
 	void
-	parse_properties (QDomElement& properties_element, PropertiesList);
+	parse_properties (QDomElement const& properties_element, PropertiesList);
 
 	/**
 	 * Signal that this module has updated property tree.

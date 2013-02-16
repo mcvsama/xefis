@@ -29,6 +29,7 @@
 #include <modules/io/joystick.h>
 #include <modules/systems/ap.h>
 #include <modules/systems/lookahead.h>
+#include <modules/systems/mouse.h>
 #include <modules/systems/stabilizer.h>
 #include <modules/systems/state.h>
 
@@ -114,6 +115,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		return new RadialIndicator (this, config, parent);
 	else if (name == "systems/lookahead")
 		return new Lookahead (this, config);
+	else if (name == "systems/mouse")
+		return new Mouse (this, config);
 	else if (name == "systems/stabilizer")
 		return new Stabilizer (this, config);
 	else if (name == "systems/ap")
