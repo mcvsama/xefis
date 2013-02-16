@@ -67,6 +67,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "landing-altitude", _landing_altitude_ft, false },
 				{ "transition-altitude", _transition_altitude_ft, false },
 				{ "pressure", _pressure_inhg, false },
+				{ "pressure-display-hpa", _pressure_display_hpa, false },
 				{ "standard-pressure", _standard_pressure, false },
 				{ "cbr", _cbr_fpm, false },
 				{ "autopilot-visible", _autopilot_visible, false },
@@ -219,7 +220,10 @@ EFIS::read()
 
 	_efis_widget->set_pressure_visible (_pressure_inhg.valid());
 	if (_pressure_inhg.valid())
-		_efis_widget->set_pressure (*_pressure_inhg);
+		_efis_widget->set_pressure (1_inhg * *_pressure_inhg);
+
+	if (_pressure_display_hpa.valid())
+		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
 
 	_efis_widget->set_climb_rate_visible (_cbr_fpm.valid());
 	if (_cbr_fpm.valid())
