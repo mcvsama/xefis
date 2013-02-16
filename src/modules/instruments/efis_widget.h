@@ -405,14 +405,20 @@ class EFISWidget: public Xefis::InstrumentWidget
 	/**
 	 * Return current pressure indicator value.
 	 */
-	InHg
+	Pressure
 	pressure() const;
 
 	/**
-	 * Set pressure indicator (inHg)
+	 * Set pressure indicator.
 	 */
 	void
-	set_pressure (InHg pressure);
+	set_pressure (Pressure pressure);
+
+	/**
+	 * Set pressure unit to be hPa instead of inHg.
+	 */
+	void
+	set_pressure_display_hpa (bool hpa);
 
 	/**
 	 * Show or hide pressure indicator.
@@ -1136,7 +1142,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_climb_rate_visible				= false;
 	float				_mach							= 0.f;
 	bool				_mach_visible					= false;
-	InHg				_pressure						= 0.f;
+	Pressure			_pressure						= 0_inhg;
+	bool				_pressure_display_hpa			= false;
 	bool				_pressure_visible				= false;
 	bool				_standard_pressure				= false;
 	Knots				_minimum_speed					= 0.f;
@@ -1652,7 +1659,7 @@ EFISWidget::set_mach_visible (bool visible)
 }
 
 
-inline InHg
+inline Pressure
 EFISWidget::pressure() const
 {
 	return _pressure;
@@ -1660,9 +1667,17 @@ EFISWidget::pressure() const
 
 
 inline void
-EFISWidget::set_pressure (InHg pressure)
+EFISWidget::set_pressure (Pressure pressure)
 {
 	_pressure = pressure;
+	update();
+}
+
+
+inline void
+EFISWidget::set_pressure_display_hpa (bool hpa)
+{
+	_pressure_display_hpa = hpa;
 	update();
 }
 

@@ -29,6 +29,7 @@
 										<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
 										<property name='transition-altitude' path='/transition-altitude.ft' default='14000'/>
 										<property name='pressure' path='/pressure/pressure-setting.inhg' default='29.92'/>
+										<property name='pressure-display-hpa' path='//systems/fms/settings/pressure-display-hpa'/>
 										<property name='standard-pressure' path='//systems/fms/settings/standard-pressure-on'/>
 										<property name='autopilot-visible' path='/autopilot/visible' default='true'/>
 										<property name='autopilot-hints-visible' path='/autopilot/hints-visible' default='true'/>

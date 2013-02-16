@@ -848,7 +848,6 @@ EFISWidget::al_pre_paint()
 {
 	_altitude = limit (_altitude, -99999.f, +99999.f);
 	_climb_rate = limit (_climb_rate, -9999.f, +9999.f);
-	_pressure = limit (_pressure, 0.f, 99.99f);
 
 	float sgn = _altitude < 0.f ? -1.f : 1.f;
 	_al_min_shown = _altitude - 0.5f * _al_extent;
@@ -1226,11 +1225,12 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	QFontMetricsF metrics_a (font_a);
 	QFontMetricsF metrics_b (font_b);
 
-	QString in_str = "IN";
-	QString pressure_str = QString ("%1").arg (_pressure, 0, 'f', 2) + " ";
+	QString unit_str = _pressure_display_hpa? "HPA" : "IN";
+	int precision = _pressure_display_hpa ? 1 : 2;
+	QString pressure_str = QString ("%1").arg (_pressure_display_hpa? _pressure.hpa() : _pressure.inhg(), 0, 'f', precision) + " ";
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
-	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (in_str), nn_rect.height());
+	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
 	nn_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
 	// Correct position of zz_rect to get correct baseline position:
 	zz_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
@@ -1247,7 +1247,7 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	painter.setFont (font_a);
 	text_painter.drawText (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str);
 	painter.setFont (font_b);
-	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, in_str);
+	text_painter.drawText (zz_rect, Qt::AlignBottom | Qt::AlignLeft, unit_str);
 }
 
 

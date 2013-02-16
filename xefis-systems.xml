@@ -9,6 +9,12 @@
 			<property path='/systems/fms/output/localizer/identifier' type='string'>
 				<default>ILOD</default>
 			</property>
+			<property path='/systems/fms/settings/standard-pressure-on' type='boolean'>
+				<default>false</default>
+			</property>
+			<property path='/systems/fms/settings/pressure-display-hpa' type='boolean'>
+				<default>false</default>
+			</property>
 			<property path='/sensors/engine/n1-setting.pct' type='integer'>
 				<default>0</default>
 			</property>
@@ -34,10 +40,12 @@
 				<min>1</min>
 				<max>100</max>
 			</property>
-			<property path='/systems/fms/settings/standard-pressure-on' type='boolean'>
-				<default>false</default>
-			</property>
 			<include name='xefis-x52pro.xml'/>
+			<observe var='t1'>
+				<if var='t1' equals='true'>
+					<toggle path='/systems/fms/settings/pressure-display-hpa'/>
+				</if>
+			</observe>
 			<observe var='t2'>
 				<if var='t2' equals='true'>
 					<toggle path='/systems/fms/settings/standard-pressure-on'/>
