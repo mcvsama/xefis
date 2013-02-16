@@ -31,6 +31,7 @@
 #include <xefis/application/application.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/module.h>
+#include <xefis/core/window.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -89,8 +90,6 @@ ConfigReader::process()
 			process_windows_element (e);
 		else if (e == "modules")
 			process_modules_element (e);
-		else if (e == "properties")
-			process_properties_element (e);
 		else
 			throw ConfigException (QString ("unsupported child of <xefis-config>: <%1>").arg (e.tagName()).toStdString());
 	}
@@ -137,19 +136,6 @@ ConfigReader::process_includes (QDomElement parent)
 
 
 void
-ConfigReader::process_properties_element (QDomElement const& properties_element)
-{
-	for (QDomElement& e: properties_element)
-	{
-		if (e == "property")
-			process_property_element (e);
-		else
-			throw ConfigException (QString ("unsupported child of <properties>: <%1>").arg (e.tagName()).toStdString());
-	}
-}
-
-
-void
 ConfigReader::process_windows_element (QDomElement const& windows_element)
 {
 	for (QDomElement& e: windows_element)
@@ -163,6 +149,19 @@ ConfigReader::process_windows_element (QDomElement const& windows_element)
 
 
 void
+ConfigReader::process_window_element (QDomElement const& window_element)
+{
+	if (window_element.attribute ("disabled") == "true")
+		return;
+
+	// Auto delete if Window throws an exception:
+	std::unique_ptr<Window> window (new Window (this, window_element));
+	window->show();
+	window.release();
+}
+
+
+void
 ConfigReader::process_modules_element (QDomElement const& modules_element)
 {
 	for (QDomElement& e: modules_element)
@@ -172,118 +171,6 @@ ConfigReader::process_modules_element (QDomElement const& modules_element)
 		else
 			throw ConfigException (QString ("unsupported child of <modules>: <%1>").arg (e.tagName()).toStdString());
 	}
-}
-
-
-void
-ConfigReader::process_property_element (QDomElement const& /*property_element*/)
-{
-	// TODO
-}
-
-
-void
-ConfigReader::process_window_element (QDomElement const& window_element)
-{
-	std::unique_ptr<QWidget> window (new QWidget (nullptr));
-	window->setBackgroundRole (QPalette::Shadow);
-	window->setAutoFillBackground (true);
-	window->setWindowTitle ("XEFIS");
-	window->resize (limit (window_element.attribute ("width").toInt(), 40, 10000),
-					limit (window_element.attribute ("height").toInt(), 30, 10000));
-	if (window_element.attribute ("full-screen") == "true")
-		window->setWindowState (window->windowState() | Qt::WindowFullScreen);
-
-	// Black background:
-	QPalette palette = window->palette();
-	palette.setColor (QPalette::Shadow, Qt::black);
-	window->setPalette (palette);
-
-	for (QDomElement& e: window_element)
-	{
-		if (e == "layout")
-			process_layout_element (e, nullptr, window.get());
-		else
-			throw ConfigException (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
-	}
-
-	window->show();
-	window.release();
-}
-
-
-void
-ConfigReader::process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* window, int stretch)
-{
-	QBoxLayout* new_layout = nullptr;
-
-	if (layout_element.attribute ("type") == "horizontal")
-		new_layout = new QHBoxLayout();
-	else if (layout_element.attribute ("type") == "vertical")
-		new_layout = new QVBoxLayout();
-	else
-		throw ConfigException ("layout type must be 'vertical' or 'horizontal'");
-
-	new_layout->setSpacing (0);
-	new_layout->setMargin (0);
-
-	// If adding layout to window:
-	if (!layout)
-	{
-		if (window->layout())
-			throw ConfigException ("a window can only have one layout");
-
-		window->setLayout (new_layout);
-	}
-	// Adding layout to parent layout:
-	else
-	{
-		layout->addLayout (new_layout);
-		layout->setStretchFactor (new_layout, stretch);
-	}
-
-	for (QDomElement& e: layout_element)
-	{
-		if (e == "item")
-			process_item_element (e, new_layout, window);
-		else if (e == "separator")
-		{
-			QWidget* separator = new QWidget (window);
-			separator->setMinimumSize (2, 2);
-			separator->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-			separator->setBackgroundRole (QPalette::Dark);
-			separator->setAutoFillBackground (true);
-			new_layout->addWidget (separator);
-		}
-		else
-			throw ConfigException (QString ("unsupported child of <layout>: <%1>").arg (e.tagName()).toStdString());
-	}
-}
-
-
-void
-ConfigReader::process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* window)
-{
-	bool has_child = false;
-	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
-
-	for (QDomElement& e: item_element)
-	{
-		if (has_child)
-			throw ConfigException ("only one child element per <item> allowed");
-
-		has_child = true;
-
-		if (e == "layout")
-			process_layout_element (e, layout, window, stretch);
-		else if (e == "module")
-			process_module_element (e, layout, window, stretch);
-		else
-			throw ConfigException (QString ("unsupported child of <item>: <%1>").arg (e.tagName()).toStdString());
-	}
-
-	if (!has_child)
-		layout->addStretch (stretch);
 }
 
 
