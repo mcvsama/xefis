@@ -66,6 +66,11 @@ Application::Application (int argc, char** argv):
 	_postponed_update->setInterval (1000.f / 30.f);
 	QObject::connect (_postponed_update, SIGNAL (timeout()), this, SLOT (data_updated()));
 
+	_offline_updater = new QTimer (this);
+	_offline_updater->setInterval (100.f);
+	QObject::connect (_offline_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
+	_offline_updater->start();
+
 	signal (SIGHUP, s_quit);
 }
 
