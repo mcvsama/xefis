@@ -224,6 +224,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_aircraft (painter, text_painter);
 	paint_speeds_and_wind (painter, text_painter);
 	paint_range (painter, text_painter);
+	paint_hints (painter, text_painter);
 }
 
 
@@ -261,7 +262,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 
 				painter.resetTransform();
 				painter.translate (0.5f * _w + _q, _h - 1.125f * _q);
-				painter.setPen (get_pen (_navigation_color, 0.6f));
+				painter.setPen (get_pen (_navigation_color, 1.f));
 				painter.setFont (font_1);
 				text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 				painter.setFont (font_2);
@@ -308,6 +309,22 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 			}
 		}
 	}
+}
+
+
+void
+HSIWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
+{
+	if (!_positioning_hint_visible)
+		return;
+
+	float vplus = translate_descent (QFontMetricsF (_font_13_bold), QFontMetricsF (_font_16_bold));
+	float hplus = _display_mode == DisplayMode::Auxiliary ? 0.785f * _w : 0.75f * _w;
+	painter.setFont (_font_13_bold);
+	painter.setClipping (false);
+	painter.resetTransform();
+	painter.setPen (get_pen (_navigation_color, 1.f));
+	text_painter.drawText (QPointF (hplus, _h - 1.125f * _q + vplus), Qt::AlignTop | Qt::AlignHCenter, _positioning_hint);
 }
 
 

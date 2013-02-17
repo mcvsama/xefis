@@ -9,6 +9,9 @@
 			<property path='/systems/fms/output/localizer/identifier' type='string'>
 				<default>ILOD</default>
 			</property>
+			<property path='/systems/fms/output/position/source' type='string'>
+				<default>GPS</default>
+			</property>
 			<property path='/systems/fms/settings/standard-pressure-on' type='boolean'>
 				<default>false</default>
 			</property>

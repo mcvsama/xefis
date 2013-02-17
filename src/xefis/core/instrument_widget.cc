@@ -64,7 +64,7 @@ InstrumentWidget::get_digit_width (QFont& font) const
 
 
 float
-InstrumentWidget::translate_descent (QFontMetricsF& metrics_1, QFontMetricsF& metrics_2)
+InstrumentWidget::translate_descent (QFontMetricsF const& metrics_1, QFontMetricsF const& metrics_2)
 {
 	return metrics_2.height() - metrics_2.descent() - metrics_1.height() + metrics_1.descent();
 }

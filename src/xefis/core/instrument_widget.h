@@ -66,7 +66,7 @@ class InstrumentWidget: public QWidget
 	get_digit_width (QFont&) const;
 
 	float
-	translate_descent (QFontMetricsF& metrics_1, QFontMetricsF& metrics_2);
+	translate_descent (QFontMetricsF const& metrics_1, QFontMetricsF const& metrics_2);
 
 	void
 	update_sizes();
