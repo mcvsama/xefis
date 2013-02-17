@@ -126,6 +126,9 @@ EFIS::read()
 		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * (*_track_deg - *_mag_heading_deg);
 	}
 
+	fpm_alpha = 1_deg * floored_mod (fpm_alpha.deg(), -180.0, +180.0);
+	fpm_beta = 1_deg * floored_mod (fpm_beta.deg(), -180.0, +180.0);
+
 	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.valid() ? *_speed_ladder_line_every : 10);
 	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.valid() ? *_speed_ladder_number_every : 20);
 	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.valid() ? *_speed_ladder_extent : 124);
