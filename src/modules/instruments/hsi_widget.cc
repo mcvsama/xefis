@@ -44,17 +44,6 @@ HSIWidget::HSIWidget (QWidget* parent):
 void
 HSIWidget::update_more()
 {
-	// Current heading modes (HDG/TRK and MAG/TRUE):
-	_heading = _heading_mode == HeadingMode::Magnetic ? _mag_heading : _true_heading;
-
-	_ap_heading = _ap_mag_heading;
-	if (_heading_mode == HeadingMode::True)
-		_ap_heading += _true_heading - _mag_heading;
-	_ap_heading = floored_mod (_ap_heading, 360_deg);
-
-	_true_track = floored_mod (_mag_track + (_true_heading - _mag_heading), 360_deg);
-	_track = _heading_mode == HeadingMode::Magnetic ? _mag_track : _true_track;
-
 	// Clips:
 	switch (_display_mode)
 	{
@@ -197,11 +186,37 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 void
 HSIWidget::paintEvent (QPaintEvent*)
 {
-	_mag_heading_transform.reset();
-	_mag_heading_transform.rotate (-_mag_heading.deg());
-	_true_heading_transform.reset();
-	_true_heading_transform.rotate (-_true_heading.deg());
-	_heading_transform = _heading_mode == HeadingMode::Magnetic ? _mag_heading_transform : _true_heading_transform;
+	_true_track = floored_mod (_mag_track + (_true_heading - _mag_heading), 360_deg);
+
+	_track =
+		_heading_mode == HeadingMode::Magnetic
+			? _mag_track
+			: _true_track;
+
+	_heading = _heading_mode == HeadingMode::Magnetic
+		? _mag_heading
+		: _true_heading;
+
+	_rotation = _display_track ? _track : _heading;
+
+	_heading_transform.reset();
+	_heading_transform.rotate (-_heading.deg());
+
+	_track_transform.reset();
+	_track_transform.rotate (-_track.deg());
+
+	_rotation_transform =
+		_display_track
+			? _track_transform
+			: _heading_transform;
+
+	_features_transform = _rotation_transform;
+	_features_transform.rotate ((_mag_heading - _true_heading).deg());
+
+	_ap_heading = _ap_mag_heading;
+	if (_heading_mode == HeadingMode::True)
+		_ap_heading += _true_heading - _mag_heading;
+	_ap_heading = floored_mod (_ap_heading, 360_deg);
 
 	switch (_display_mode)
 	{
@@ -226,7 +241,6 @@ HSIWidget::paintEvent (QPaintEvent*)
 	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
 	painter.drawRect (rect());
 
-	paint_dotted_earth (painter);
 	paint_navaids (painter, text_painter);
 	paint_altitude_reach (painter);
 	paint_ap_settings (painter, text_painter);
@@ -358,10 +372,11 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	QFont font = _font_13_bold;
 	QFontMetricsF metrics (font);
 
-	if (_heading_visible)
+	if (_track_visible)
 	{
-		// Scale line:
+		// Scale and track line:
 		painter.setPen (QPen (Qt::white, pen_width (1.3f)));
+		painter.rotate ((_track - _rotation).deg());
 		painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -_r));
 
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
@@ -398,13 +413,10 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 		}
 	}
 
-	if (!_track_visible)
-		return;
-
-	// Track triangle:
+	// Heading triangle:
 	painter.setClipRect (_map_clip_rect);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate ((_track - _heading).deg());
+	painter.rotate ((_heading - _rotation).deg());
 
 	painter.setPen (get_pen (Qt::white, 2.2f));
 	painter.translate (0.f, -1.003f * _r);
@@ -551,9 +563,11 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
 	painter.setPen (pen);
 	painter.setFont (_radials_font);
 
+	QTransform t = _rotation_transform * _aircraft_center_transform;
+
 	for (int deg = 0; deg < 360; deg += 5)
 	{
-		painter.setTransform (_heading_transform * _aircraft_center_transform);
+		painter.setTransform (t);
 		painter.rotate (deg);
 		painter.drawLine (QPointF (0.f, -_r),
 						  deg % 10 == 0
@@ -681,37 +695,6 @@ HSIWidget::paint_range (QPainter& painter, TextPainter& text_painter)
 		text_painter.drawText (rect.center() - QPointF (0.f, 0.05f * _q), Qt::AlignBottom | Qt::AlignHCenter, s);
 		painter.setFont (font_b);
 		text_painter.drawText (rect.center() - QPointF (0.f, 0.135f * _q), Qt::AlignTop | Qt::AlignHCenter, r);
-	}
-}
-
-
-void
-HSIWidget::paint_dotted_earth (QPainter& painter)
-{
-	if (!_dotted_earth_visible)
-		return;
-
-	float const scale = 0.8f;
-	QRectF dot (0.f, 0.f, 0.05f * _q, 0.05f * _q);
-	dot.translate (-0.5f * dot.width(), -0.5f * dot.height());
-
-	painter.setTransform (_heading_transform * _aircraft_center_transform);
-	painter.setClipping (false);
-	painter.setBrush (Qt::white);
-	painter.setPen (Qt::NoPen);
-
-	for (float lat = -180; lat < 180; lat += 10)
-	{
-		for (float lon = -180; lon < 180; lon += 10)
-		{
-			LonLat point_on_earth (1_deg * lon, 1_deg * lat);
-
-			if (point_on_earth.haversine (_position) >= 1.7)
-				continue;
-
-			QPointF p = point_on_earth.rotate (_position).project_flat();
-			painter.drawEllipse (dot.translated (p.x() * scale * _r, p.y() * scale * _r));
-		}
 	}
 }
 
@@ -868,7 +851,7 @@ HSIWidget::paint_locs (QPainter& painter, TextPainter& text_painter)
 		QPointF navaid_pos = get_navaid_xy (navaid.position());
 		QTransform transform = _aircraft_center_transform;
 		transform.translate (navaid_pos.x(), navaid_pos.y());
-		transform = _true_heading_transform * transform;
+		transform = _features_transform * transform;
 		transform.rotate (navaid.true_bearing().deg());
 
 		float const line_1 = nm_to_px (navaid.range());
