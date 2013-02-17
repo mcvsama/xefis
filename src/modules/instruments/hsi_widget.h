@@ -481,7 +481,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	NavaidStorage::Navaids	_fix_navs;
 	QPolygonF				_aircraft_shape;
 	QPolygonF				_ap_bug_shape;
-	Angle					_limited_rotation;
 	float					_r;
 	float					_q;
 	bool					_navs_retrieved				= false;

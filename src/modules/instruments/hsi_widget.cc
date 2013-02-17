@@ -219,17 +219,6 @@ HSIWidget::paintEvent (QPaintEvent*)
 		_ap_heading += _true_heading - _mag_heading;
 	_ap_heading = floored_mod (_ap_heading, 360_deg);
 
-	switch (_display_mode)
-	{
-		case DisplayMode::Auxiliary:
-			_limited_rotation = limit (floored_mod (_ap_heading - _heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
-			break;
-
-		default:
-			_limited_rotation = _ap_heading - _heading;
-			break;
-	}
-
 	QPainter painter (this);
 	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
@@ -499,8 +488,20 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipRect (_map_clip_rect);
 
+	Angle limited_rotation;
+	switch (_display_mode)
+	{
+		case DisplayMode::Auxiliary:
+			limited_rotation = limit (floored_mod (_ap_heading - _rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+			break;
+
+		default:
+			limited_rotation = _ap_heading - _rotation;
+			break;
+	}
+
 	QTransform transform = _aircraft_center_transform;
-	transform.rotate (_limited_rotation.deg());
+	transform.rotate (limited_rotation.deg());
 	transform.translate (0.f, -_r);
 
 	QPen pen_1 = _autopilot_pen_1;
@@ -551,7 +552,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 		painter.setClipPath (_outer_map_clip);
 		painter.setPen (pen);
 		painter.setTransform (_aircraft_center_transform);
-		painter.rotate ((_ap_heading - _heading).deg());
+		painter.rotate ((_ap_heading - _rotation).deg());
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
 	}
 }
