@@ -55,7 +55,6 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
 				{ "position-longitude", _position_lon_deg, false },
-				{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
 				{ "position-source", _positioning_hint, false },
 				{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
 				{ "wind-tas", _wind_tas_kt, false },

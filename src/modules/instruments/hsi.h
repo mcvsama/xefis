@@ -85,7 +85,6 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lon_deg;
-	Xefis::PropertyFloat	_position_sea_level_radius_ft;
 	Xefis::PropertyString	_positioning_hint;
 	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
