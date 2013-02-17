@@ -77,7 +77,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
-	Xefis::PropertyFloat	_track_deg;
+	Xefis::PropertyFloat	_mag_track_deg;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_lookahead_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;

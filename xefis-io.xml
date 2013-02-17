@@ -53,7 +53,7 @@
 						<property name='lateral-deviation' path='/output/localizer/lateral-deviation.deg'/>
 						<property name='flight-path-marker-alpha' path='/output/flight-path/alpha.deg'/>
 						<property name='flight-path-marker-beta' path='/output/flight-path/beta.deg'/>
-						<property name='track' path='/output/flight-path/track.deg'/>
+						<property name='magnetic-track' path='/output/flight-path/magnetic-track.deg'/>
 						<property name='orientation-true-heading' path='/output/orientation/true-heading.deg'/>
 						<property name='cbr' path='/output/altitude/climb-rate.fpm'/>
 						<property name='altitude' path='/output/altitude/amsl.ft'/>

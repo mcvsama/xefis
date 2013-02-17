@@ -60,7 +60,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "flight-path-marker-visible", _fpm_visible, false },
 				{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 				{ "flight-path-marker-beta", _fpm_beta_deg, false },
-				{ "track", _track_deg, false },
+				{ "magnetic-track", _mag_track_deg, false },
 				{ "altitude", _altitude_ft, false },
 				{ "altitude-lookahead", _altitude_lookahead_ft, false },
 				{ "altitude-agl", _altitude_agl_ft, false },
@@ -120,10 +120,10 @@ EFIS::read()
 		fpm_beta = 1_deg * *_fpm_beta_deg;
 	}
 
-	if (_track_deg.valid() && _roll_deg.valid() && _mag_heading_deg.valid())
+	if (_mag_track_deg.valid() && _roll_deg.valid() && _mag_heading_deg.valid())
 	{
-		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * (*_track_deg - *_mag_heading_deg);
-		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * (*_track_deg - *_mag_heading_deg);
+		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * floored_mod (*_mag_track_deg - *_mag_heading_deg, -180.0, +180.0);
+		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * floored_mod (*_mag_track_deg - *_mag_heading_deg, -180.0, +180.0);
 	}
 
 	fpm_alpha = 1_deg * floored_mod (fpm_alpha.deg(), -180.0, +180.0);

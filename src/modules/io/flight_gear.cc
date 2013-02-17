@@ -62,7 +62,7 @@ struct FGInputData
 	FGDouble	true_heading_deg;				// th
 	FGDouble	fpm_alpha_deg;					// fpa
 	FGDouble	fpm_beta_deg;					// fpb
-	FGDouble	track_deg;						// tr
+	FGDouble	magnetic_track_deg;				// tr
 	FGBool		navigation_needles_visible;		// nav
 	FGBool		vertical_deviation_ok;			// ngso
 	FGDouble	vertical_deviation_val;			// ngs
@@ -127,7 +127,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "slip-skid", _slip_skid_g, false },
 						{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 						{ "flight-path-marker-beta", _fpm_beta_deg, false },
-						{ "track", _track_deg, false },
+						{ "magnetic-track", _magnetic_track_deg, false },
 						{ "standard-pressure", _standard_pressure, false },
 						{ "altitude", _altitude_ft, false },
 						{ "altitude-agl", _altitude_agl_ft, false },
@@ -231,7 +231,7 @@ FlightGearIO::invalidate_all()
 		&_slip_skid_g,
 		&_fpm_alpha_deg,
 		&_fpm_beta_deg,
-		&_track_deg,
+		&_magnetic_track_deg,
 		&_standard_pressure,
 		&_altitude_ft,
 		&_altitude_agl_ft,
@@ -316,7 +316,7 @@ FlightGearIO::read_input()
 		ASSIGN (true_heading_deg);
 		ASSIGN (fpm_alpha_deg);
 		ASSIGN (fpm_beta_deg);
-		ASSIGN (track_deg);
+		ASSIGN (magnetic_track_deg);
 		ASSIGN (navigation_needles_visible);
 		ASSIGN (dme_distance_nm);
 		ASSIGN (slip_skid_g);
