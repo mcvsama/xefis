@@ -156,6 +156,8 @@
 						<separator/>
 						<item stretch-factor='1'>
 							<layout type='horizontal'>
+								<item stretch-factor='1'>
+								</item>
 								<item stretch-factor='15'>
 									<layout type='horizontal'>
 										<item>
@@ -205,7 +207,7 @@
 										</item>
 									</layout>
 								</item>
-								<item stretch-factor='5'>
+								<item stretch-factor='1'>
 								</item>
 							</layout>
 						</item>
