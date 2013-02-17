@@ -335,6 +335,24 @@ class HSIWidget: public Xefis::InstrumentWidget
 	void
 	reset_highlighted_loc();
 
+	/**
+	 * Return positioning hint.
+	 */
+	QString
+	positioning_hint() const;
+
+	/**
+	 * Set positioning hint.
+	 */
+	void
+	set_positioning_hint (QString const& hint);
+
+	/**
+	 * Set positioning hint visibility.
+	 */
+	void
+	set_positioning_hint_visible (bool visible);
+
   private:
 	void
 	update_more();
@@ -347,6 +365,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	void
 	paint_aircraft (QPainter&, TextPainter&);
+
+	void
+	paint_hints (QPainter&, TextPainter&);
 
 	void
 	paint_ap_settings (QPainter&, TextPainter&);
@@ -471,6 +492,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 	bool					_loc_visible				= false;
 	bool					_fix_visible				= false;
 	QString					_highlighted_loc;
+	QString					_positioning_hint;
+	bool					_positioning_hint_visible	= false;
 };
 
 
@@ -798,6 +821,28 @@ inline void
 HSIWidget::reset_highlighted_loc()
 {
 	_highlighted_loc = "";
+}
+
+
+inline QString
+HSIWidget::positioning_hint() const
+{
+	return _positioning_hint;
+}
+
+
+inline void
+HSIWidget::set_positioning_hint (QString const& hint)
+{
+	_positioning_hint = hint;
+	update();
+}
+
+
+inline void
+HSIWidget::set_positioning_hint_visible (bool visible)
+{
+	_positioning_hint_visible = visible;
 }
 
 

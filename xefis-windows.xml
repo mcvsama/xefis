@@ -100,12 +100,9 @@
 										<property name='tas' path='/speed/true-air-speed.kt'/>
 										<property name='track' path='/flight-path/track.deg'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
-										<!-- TODO -->
-										<!--property name='position-latitude' path='/position/latitude.deg'/>
-										<property name='position-longitude' path='/position/longitude.deg'/-->
+										<property name='position-source' path='/position/source'/>
 										<property name='position-latitude' path='//sensors/gps/latitude.deg'/>
 										<property name='position-longitude' path='//sensors/gps/longitude.deg'/>
-										<!-- END TODO -->
 										<property name='wind-from-mag-heading' path='/wind/magnetic-orientation.deg'/>
 										<property name='wind-tas' path='/wind/speed.kt'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
@@ -139,12 +136,9 @@
 										<property name='tas' path='/speed/true-air-speed.kt'/>
 										<property name='track' path='/flight-path/track.deg'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
-										<!-- TODO -->
-										<!--property name='position-latitude' path='/position/latitude.deg'/>
-										<property name='position-longitude' path='/position/longitude.deg'/-->
+										<property name='position-source' path='/position/source'/>
 										<property name='position-latitude' path='//sensors/gps/latitude.deg'/>
 										<property name='position-longitude' path='//sensors/gps/longitude.deg'/>
-										<!-- END TODO -->
 										<property name='wind-from-mag-heading' path='/wind/magnetic-orientation.deg'/>
 										<property name='wind-tas' path='/wind/speed.kt'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
