@@ -104,6 +104,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 		paint_baro_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
 		paint_hints (painter, text_painter);
+		paint_pitch_limit (painter);
 
 		sl_paint (painter, text_painter);
 		al_paint (painter, text_painter);
@@ -1663,6 +1664,45 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		text_painter.drawText (QPointF (x36, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_lateral_small_hint);
 		text_painter.drawText (QPointF (x56, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_vertical_small_hint);
 	}
+}
+
+
+void
+EFISWidget::paint_pitch_limit (QPainter& painter)
+{
+	if (!_pitch_limit_visible || !_pitch_visible)
+		return;
+
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	painter.translate (0.f, pitch_to_px (limit (_pitch_limit - _pitch, -20_deg, +20_deg)));
+
+	float const w = wh() * 3.f / 9.f;
+
+	QPointF x (0.025f * w, 0.f);
+	QPointF y (0.f, 0.025f * w);
+
+	auto paint = [&](QColor color, float pen_width_scale) -> void
+	{
+		painter.setPen (get_pen (color, pen_width_scale * 2.f));
+		painter.drawPolyline (QPolygonF()
+			<< -11.f * x + y
+			<< -11.f * x - y
+			<< -17.f * x - y
+		);
+		QPen pen = get_pen (color, pen_width_scale * 1.5f);
+		pen.setCapStyle (Qt::FlatCap);
+		painter.setPen (pen);
+		painter.drawLine (-12.5f * x - y, -14.f * x - 3.65f * y);
+		painter.drawLine (-14.f * x - y, -15.5f * x - 3.65f * y);
+		painter.drawLine (-15.5f * x - y, -17.f * x - 3.65f * y);
+	};
+
+	paint (_warning_color_2.darker (160), 1.0f);
+	paint (_warning_color_2, 0.65f);
+	painter.scale (-1.f, 1.f);
+	paint (_warning_color_2.darker (160), 1.0f);
+	paint (_warning_color_2, 0.65f);
 }
 
 

@@ -69,6 +69,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
+	Xefis::PropertyFloat	_pitch_limit_deg;
 	Xefis::PropertyFloat	_roll_limit_deg;
 	Xefis::PropertyFloat	_mag_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
