@@ -53,6 +53,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "orientation-pitch", _pitch_deg, false },
 				{ "orientation-roll", _roll_deg, false },
 				{ "orientation-roll-limit", _roll_limit_deg, false },
+				{ "orientation-pitch-limit", _pitch_limit_deg, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "slip-skid", _slip_skid_g, false },
@@ -173,6 +174,14 @@ EFIS::read()
 		_efis_widget->set_roll (1_deg * *_roll_deg);
 
 	_efis_widget->set_roll_limit (1_deg * (_roll_limit_deg.valid() ? *_roll_limit_deg : 0.f));
+
+	if (_pitch_limit_deg.valid())
+	{
+		_efis_widget->set_pitch_limit (1_deg * *_pitch_limit_deg);
+		_efis_widget->set_pitch_limit_visible (true);
+	}
+	else
+		_efis_widget->set_pitch_limit_visible (false);
 
 	_efis_widget->set_heading_visible (_mag_heading_deg.valid());
 	if (_mag_heading_deg.valid())

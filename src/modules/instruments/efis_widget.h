@@ -104,22 +104,40 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_pitch_visible (bool visible);
 
 	/**
+	 * Pitch limit.
+	 */
+	Angle
+	pitch_limit() const;
+
+	/**
+	 * Set pitch limit (absolute value).
+	 */
+	void
+	set_pitch_limit (Angle pitch_limit);
+
+	/**
+	 * Set pitch limit indicator visibility.
+	 */
+	void
+	set_pitch_limit_visible (bool visible);
+
+	/**
 	 * Return current roll value.
 	 */
 	Angle
 	roll() const;
 
 	/**
-	 * Return roll limit.
-	 */
-	Angle
-	roll_limit() const;
-
-	/**
 	 * Set roll value.
 	 */
 	void
 	set_roll (Angle);
+
+	/**
+	 * Return roll limit.
+	 */
+	Angle
+	roll_limit() const;
 
 	/**
 	 * Set roll limit, where indicator will turn solid amber.
@@ -976,6 +994,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	paint_hints (QPainter&, TextPainter&);
 
 	void
+	paint_pitch_limit (QPainter&);
+
+	void
 	paint_input_alert (QPainter&, TextPainter&);
 
 	void
@@ -1111,7 +1132,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 
 	Angle				_pitch							= 0_deg;
+	Angle				_pitch_limit					= 0_deg;
 	bool				_pitch_visible					= false;
+	bool				_pitch_limit_visible			= false;
 	Angle				_roll							= 0_deg;
 	Angle				_roll_limit						= 0_deg;
 	bool				_roll_visible					= false;
@@ -1266,6 +1289,29 @@ inline void
 EFISWidget::set_pitch_visible (bool visible)
 {
 	_pitch_visible = visible;
+	update();
+}
+
+
+inline Angle
+EFISWidget::pitch_limit() const
+{
+	return _pitch_limit;
+}
+
+
+inline void
+EFISWidget::set_pitch_limit (Angle pitch_limit)
+{
+	_pitch_limit = pitch_limit;
+	update();
+}
+
+
+inline void
+EFISWidget::set_pitch_limit_visible (bool visible)
+{
+	_pitch_limit_visible = visible;
 	update();
 }
 
