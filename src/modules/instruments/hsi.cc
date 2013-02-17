@@ -48,6 +48,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "autopilot-visible", _autopilot_visible, false },
+				{ "autopilot-track-visible", _autopilot_track_visible, false },
 				{ "track", _track_deg, false },
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
@@ -67,8 +68,6 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 	_hsi_widget->set_dme_visible (true);
 	_hsi_widget->set_loc_visible (true);
 	_hsi_widget->set_fix_visible (true);
-	// TODO when A/P engaged: _hsi_widget->set_ap_track_visible (true);
-	// TODO when radio tuned: _hsi_widget->set_highlighted_loc (identifier);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
@@ -114,6 +113,8 @@ HSI::read()
 	_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
 		_hsi_widget->set_ap_magnetic_heading (1_deg * *_autopilot_heading_setting_deg);
+
+	_hsi_widget->set_ap_track_visible (_autopilot_track_visible.read (false));
 
 	_hsi_widget->set_track_visible (_track_deg.valid());
 	if (_track_deg.valid())
