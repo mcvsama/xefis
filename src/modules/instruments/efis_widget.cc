@@ -79,7 +79,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 				    &_speed_blink);
 
 	update_blinker (_baro_blinking_warning,
-					_transition_altitude_visible &&
+					_altitude_visible && _transition_altitude_visible &&
 					((_transition_altitude > _altitude && _standard_pressure) ||
 					 (_transition_altitude <= _altitude && !_standard_pressure)),
 					&_baro_blink);
