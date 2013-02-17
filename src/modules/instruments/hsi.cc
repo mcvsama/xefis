@@ -47,9 +47,10 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "target-altitude", _target_altitude_ft, false },
 				{ "orientation-magnetic-heading", _mag_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
+				{ "use-true-heading", _use_true_heading, false },
 				{ "autopilot-visible", _autopilot_visible, false },
 				{ "autopilot-track-visible", _autopilot_track_visible, false },
-				{ "track", _track_deg, false },
+				{ "magnetic-track", _magnetic_track_deg, false },
 				{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
 				{ "position-longitude", _position_lon_deg, false },
@@ -111,15 +112,20 @@ HSI::read()
 	if (_true_heading_deg.valid())
 		_hsi_widget->set_true_heading (1_deg * *_true_heading_deg);
 
+	if (_use_true_heading.valid() && *_use_true_heading)
+		_hsi_widget->set_heading_mode (HSIWidget::HeadingMode::True);
+	else
+		_hsi_widget->set_heading_mode (HSIWidget::HeadingMode::Magnetic);
+
 	_hsi_widget->set_ap_heading_visible (autopilot_visible && _autopilot_heading_setting_deg.valid());
 	if (_autopilot_heading_setting_deg.valid())
 		_hsi_widget->set_ap_magnetic_heading (1_deg * *_autopilot_heading_setting_deg);
 
 	_hsi_widget->set_ap_track_visible (_autopilot_track_visible.read (false));
 
-	_hsi_widget->set_track_visible (_track_deg.valid());
-	if (_track_deg.valid())
-		_hsi_widget->set_track (1_deg * *_track_deg);
+	_hsi_widget->set_track_visible (_magnetic_track_deg.valid());
+	if (_magnetic_track_deg.valid())
+		_hsi_widget->set_magnetic_track (1_deg * *_magnetic_track_deg);
 
 	_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
