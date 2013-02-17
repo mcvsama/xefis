@@ -489,19 +489,19 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
 		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+	}
 
-		if (_ap_track_visible)
-		{
-			QPen pen (_autopilot_pen_2.color(), pen_width (1.f), Qt::DashLine, Qt::FlatCap);
-			pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
+	if (_ap_track_visible)
+	{
+		QPen pen (_autopilot_pen_2.color(), pen_width (1.f), Qt::DashLine, Qt::FlatCap);
+		pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
 
-			painter.setTransform (_aircraft_center_transform);
-			painter.setClipPath (_outer_map_clip);
-			painter.setPen (pen);
-			painter.setTransform (_aircraft_center_transform);
-			painter.rotate ((_ap_mag_heading - _mag_heading).deg());
-			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
-		}
+		painter.setTransform (_aircraft_center_transform);
+		painter.setClipPath (_outer_map_clip);
+		painter.setPen (pen);
+		painter.setTransform (_aircraft_center_transform);
+		painter.rotate ((_ap_mag_heading - _mag_heading).deg());
+		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
 	}
 }
 

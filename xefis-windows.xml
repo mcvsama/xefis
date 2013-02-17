@@ -114,6 +114,7 @@
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
 									<directory path='/systems/autopilot'>
+										<property name='autopilot-track-visible' path='/settings/enabled'/>
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
 								</properties>
@@ -152,6 +153,7 @@
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
 									<directory path='/systems/autopilot'>
+										<property name='autopilot-track-visible' path='/settings/enabled'/>
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
 								</properties>
