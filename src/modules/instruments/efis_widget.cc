@@ -1498,7 +1498,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	if (_navigation_info_visible)
+	if (_approach_reference_visible)
 	{
 		if (_localizer_info_visible)
 		{
@@ -1511,14 +1511,14 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			text_painter.drawText (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
 		}
 
-		if (_navigation_hint != "")
+		if (_approach_hint != "")
 		{
 			QFont font = _font_16_bold;
 			font.setBold (false);
 
 			painter.setPen (Qt::white);
 			painter.setFont (font);
-			text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _navigation_hint);
+			text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _approach_hint);
 		}
 
 		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);

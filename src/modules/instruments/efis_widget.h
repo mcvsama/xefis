@@ -625,11 +625,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_control_stick_visible (bool visible);
 
 	/**
-	 * Set visibility of localizer/glideslope needles
-	 * and other info (navigation hint, dme distance, localizer info).
+	 * Set visibility of approach reference info (localizer/glideslope needles,
+	 * localizer ID/bearing, DME, etc).
 	 */
 	void
-	set_navigation_info_visible (bool visible);
+	set_approach_reference_visible (bool visible);
 
 	/**
 	 * Return vertical deviation value.
@@ -677,14 +677,14 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return nav hint.
 	 */
 	QString
-	navigation_hint() const;
+	approach_hint() const;
 
 	/**
 	 * Set navigation hint, a text shown on the top left corner of the ADI.
 	 * Usually something like "ILS" or "VOR".
 	 */
 	void
-	set_navigation_hint (QString hint);
+	set_approach_hint (QString hint);
 
 	/**
 	 * Return DME distance.
@@ -1188,13 +1188,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Angle				_control_stick_pitch			= 0_deg;
 	Angle				_control_stick_roll				= 0_deg;
 	bool				_control_stick_visible			= false;
-	bool				_navigation_info_visible		= false;
+	bool				_approach_reference_visible		= false;
 	Angle				_vertical_deviation_deg			= 0_deg;
 	bool				_vertical_deviation_visible		= false;
 	Angle				_lateral_deviation_deg			= 0_deg;
 	bool				_lateral_deviation_visible		= false;
 	bool				_runway_visible					= false;
-	QString				_navigation_hint;
+	QString				_approach_hint;
 	Length				_dme_distance					= 0_nm;
 	bool				_dme_distance_visible			= false;
 	QString				_localizer_id;
@@ -1967,9 +1967,9 @@ EFISWidget::set_control_stick_visible (bool visible)
 
 
 inline void
-EFISWidget::set_navigation_info_visible (bool visible)
+EFISWidget::set_approach_reference_visible (bool visible)
 {
-	_navigation_info_visible = visible;
+	_approach_reference_visible = visible;
 	update();
 }
 
@@ -2029,16 +2029,16 @@ EFISWidget::set_runway_visible (bool visible)
 
 
 inline QString
-EFISWidget::navigation_hint() const
+EFISWidget::approach_hint() const
 {
-	return _navigation_hint;
+	return _approach_hint;
 }
 
 
 inline void
-EFISWidget::set_navigation_hint (QString hint)
+EFISWidget::set_approach_hint (QString hint)
 {
-	_navigation_hint = hint;
+	_approach_hint = hint;
 	update();
 }
 

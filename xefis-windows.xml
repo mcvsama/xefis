@@ -35,7 +35,7 @@
 										<property name='autopilot-hints-visible' path='/autopilot/hints-visible' default='true'/>
 										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
 										<property name='control-stick-visible' path='/control-stick/visible' default='true'/>
-										<property name='navigation-info-visible' path='/navinfo/visible' default='true'/>
+										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
 										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
 										<property name='control-hint' path='/control/hint' default=''/>
 									</directory>
@@ -56,7 +56,7 @@
 										<property name='lateral-deviation' path='/localizer/lateral-deviation.deg'/>
 										<property name='dme-distance' path='/localizer/distance.nm'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
-										<property name='navigation-type-hint' path='/localizer/type'/>
+										<property name='approach-type-hint' path='/localizer/type'/>
 									</directory>
 									<directory path='/sensors'>
 										<property name='ias' path='/speed/ias.kt'/>
