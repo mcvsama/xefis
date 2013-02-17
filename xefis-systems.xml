@@ -62,7 +62,7 @@
 			</observe>
 			<observe var='t3'>
 				<if var='t3' equals='true'>
-					<toggle path='/systems/fms/settings/use-true-heading'/>
+					<toggle path='/systems/fms/settings/follow-track'/>
 				</if>
 			</observe>
 			<observe var='t4'>

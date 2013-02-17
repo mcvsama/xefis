@@ -192,6 +192,18 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_track_visible (bool visible);
 
 	/**
+	 * Return true, if track is shown instead of heading.
+	 */
+	bool
+	display_track() const;
+
+	/**
+	 * Set display of track istead of heading.
+	 */
+	void
+	set_display_track (bool track);
+
+	/**
 	 * Return current ground speed.
 	 */
 	Knots
@@ -496,8 +508,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Angle					_ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_ap_heading_visible			= false;
 	bool					_ap_track_visible			= false;
-	Angle					_mag_track_deg				= 0_deg;
+	Angle					_mag_track					= 0_deg;
+	Angle					_true_track					= 0_deg; // Computed.
+	Angle					_track						= 0_deg; // Mag or true, depending on heading mode.
 	bool					_track_visible				= false;
+	bool					_display_track				= false;
 	Knots					_ground_speed				= 0.f;
 	bool					_ground_speed_visible		= false;
 	Knots					_true_air_speed				= 0.f;
@@ -644,14 +659,14 @@ HSIWidget::set_ap_track_visible (bool visible)
 inline Angle
 HSIWidget::magnetic_track() const
 {
-	return _mag_track_deg;
+	return _mag_track;
 }
 
 
 inline void
-HSIWidget::set_magnetic_track (Angle heading)
+HSIWidget::set_magnetic_track (Angle track)
 {
-	_mag_track_deg = heading;
+	_mag_track = track;
 	update();
 }
 
@@ -660,6 +675,21 @@ inline void
 HSIWidget::set_track_visible (bool visible)
 {
 	_track_visible = visible;
+	update();
+}
+
+
+inline bool
+HSIWidget::display_track() const
+{
+	return _display_track;
+}
+
+
+inline void
+HSIWidget::set_display_track (bool track)
+{
+	_display_track = track;
 	update();
 }
 

@@ -48,7 +48,7 @@
 										<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
 										<property name='flight-path-marker-alpha' path='/flight-path/alpha.deg'/>
 										<property name='flight-path-marker-beta' path='/flight-path/beta.deg'/>
-										<property name='track' path='/flight-path/track.deg'/>
+										<property name='magnetic-track' path='/flight-path/magnetic-track.deg'/>
 										<property name='altitude' path='/altitude/amsl.ft'/>
 										<property name='altitude-lookahead' path='/altitude/amsl-lookahead.ft'/>
 										<property name='cbr' path='/altitude/climb-rate.fpm'/>
@@ -98,7 +98,7 @@
 									<directory path='/systems/fms/output'>
 										<property name='gs' path='/speed/ground-speed.kt'/>
 										<property name='tas' path='/speed/true-air-speed.kt'/>
-										<property name='track' path='/flight-path/track.deg'/>
+										<property name='magnetic-track' path='/flight-path/magnetic-track.deg'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
 										<property name='position-source' path='/position/source'/>
 										<property name='position-latitude' path='//sensors/gps/latitude.deg'/>
@@ -115,6 +115,7 @@
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
+									<property name='display-track' path='//systems/fms/settings/follow-track'/>
 								</properties>
 							</module>
 						</item>
@@ -135,7 +136,7 @@
 									<directory path='/systems/fms/output'>
 										<property name='gs' path='/speed/ground-speed.kt'/>
 										<property name='tas' path='/speed/true-air-speed.kt'/>
-										<property name='track' path='/flight-path/track.deg'/>
+										<property name='magnetic-track' path='/flight-path/magnetic-track.deg'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
 										<property name='position-source' path='/position/source'/>
 										<property name='position-latitude' path='//sensors/gps/latitude.deg'/>
@@ -152,6 +153,7 @@
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
+									<property name='display-track' path='//systems/fms/settings/follow-track'/>
 								</properties>
 							</module>
 						</item>

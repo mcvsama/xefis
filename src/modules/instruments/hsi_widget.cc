@@ -44,12 +44,16 @@ HSIWidget::HSIWidget (QWidget* parent):
 void
 HSIWidget::update_more()
 {
-	// Current heading mode:
+	// Current heading modes (HDG/TRK and MAG/TRUE):
 	_heading = _heading_mode == HeadingMode::Magnetic ? _mag_heading : _true_heading;
+
 	_ap_heading = _ap_mag_heading;
 	if (_heading_mode == HeadingMode::True)
 		_ap_heading += _true_heading - _mag_heading;
 	_ap_heading = floored_mod (_ap_heading, 360_deg);
+
+	_true_track = floored_mod (_mag_track + (_true_heading - _mag_heading), 360_deg);
+	_track = _heading_mode == HeadingMode::Magnetic ? _mag_track : _true_track;
 
 	// Clips:
 	switch (_display_mode)
@@ -225,7 +229,6 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_dotted_earth (painter);
 	paint_navaids (painter, text_painter);
 	paint_altitude_reach (painter);
-	paint_trend_vector (painter, text_painter);
 	paint_ap_settings (painter, text_painter);
 	paint_track (painter, text_painter);
 	paint_directions (painter, text_painter);
@@ -233,6 +236,7 @@ HSIWidget::paintEvent (QPaintEvent*)
 	paint_speeds_and_wind (painter, text_painter);
 	paint_range (painter, text_painter);
 	paint_hints (painter, text_painter);
+	paint_trend_vector (painter, text_painter);
 }
 
 
@@ -250,13 +254,15 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 	// MAG/TRUE heading
 	if (_heading_visible)
 	{
-		int hdg = static_cast<int> (_heading.deg() + 0.5f) % 360;
+		int hdg = static_cast<int> ((_display_track ? _track : _heading).deg() + 0.5f) % 360;
 
 		switch (_display_mode)
 		{
 			case DisplayMode::Auxiliary:
 			{
-				QString text_1 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE";
+				QString text_1 =
+					QString (_heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE") +
+					QString (_display_track ? "  TRK" : "");
 				QString text_2 = QString ("%1").arg (hdg);
 
 				QFont font_1 (_font_13_bold);
@@ -280,7 +286,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 
 			default:
 			{
-				QString text_1 = "TRK";
+				QString text_1 = _display_track ? "TRK" : "HDG";
 				QString text_2 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE";
 				QString text_v = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
@@ -327,7 +333,7 @@ HSIWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		return;
 
 	float vplus = translate_descent (QFontMetricsF (_font_13_bold), QFontMetricsF (_font_16_bold));
-	float hplus = _display_mode == DisplayMode::Auxiliary ? 0.785f * _w : 0.75f * _w;
+	float hplus = _display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
 	painter.setFont (_font_13_bold);
 	painter.setClipping (false);
 	painter.resetTransform();
@@ -398,7 +404,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	// Track triangle:
 	painter.setClipRect (_map_clip_rect);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate ((_mag_track_deg - _mag_heading).deg());
+	painter.rotate ((_track - _heading).deg());
 
 	painter.setPen (get_pen (Qt::white, 2.2f));
 	painter.translate (0.f, -1.003f * _r);
