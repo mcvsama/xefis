@@ -308,12 +308,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_wind_information_visible (bool visible);
 
 	/**
-	 * Set dotted Earth visibility.
-	 */
-	void
-	set_dotted_earth_visible (bool visible);
-
-	/**
 	 * Set navaids visibility.
 	 */
 	void
@@ -428,9 +422,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_range (QPainter&, TextPainter&);
 
 	void
-	paint_dotted_earth (QPainter&);
-
-	void
 	paint_navaids (QPainter&, TextPainter&);
 
 	void
@@ -465,9 +456,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 	// Cache:
 	TextPainter::Cache		_text_painter_cache;
 	QTransform				_aircraft_center_transform;
-	QTransform				_mag_heading_transform;
-	QTransform				_true_heading_transform;
-	QTransform				_heading_transform; // Mag or true, depending on heading mode.
+	QTransform				_heading_transform;
+	QTransform				_track_transform;
+	QTransform				_rotation_transform;
+	QTransform				_features_transform;
 	QRectF					_map_clip_rect;
 	QRectF					_trend_vector_clip_rect;
 	QPainterPath			_inner_map_clip;
@@ -498,12 +490,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	// Parameters:
 	DisplayMode				_display_mode				= DisplayMode::Expanded;
+	HeadingMode				_heading_mode				= HeadingMode::Magnetic;
 	Length					_range						= 1_nm;
 	Angle					_mag_heading				= 0_deg;
 	Angle					_true_heading				= 0_deg;
-	HeadingMode				_heading_mode				= HeadingMode::Magnetic;
 	Angle					_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_heading_visible			= false;
+	Angle					_rotation					= 0_deg;
 	Angle					_ap_mag_heading				= 0_deg;
 	Angle					_ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_ap_heading_visible			= false;
@@ -528,7 +521,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Knots					_wind_tas_speed				= 0.f;
 	bool					_wind_information_visible	= false;
 	LonLat					_position					= { 0_deg, 0_deg };
-	bool					_dotted_earth_visible		= false;
 	bool					_navaids_visible			= false;
 	bool					_vor_visible				= false;
 	bool					_dme_visible				= false;
@@ -829,14 +821,6 @@ HSIWidget::set_wind_information_visible (bool visible)
 
 
 inline void
-HSIWidget::set_dotted_earth_visible (bool visible)
-{
-	_dotted_earth_visible = visible;
-	update();
-}
-
-
-inline void
 HSIWidget::set_navaids_visible (bool visible)
 {
 	_navaids_visible = visible;
@@ -924,7 +908,7 @@ inline QPointF
 HSIWidget::get_navaid_xy (LonLat const& position)
 {
 	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (_position).project_flat();
-	return _true_heading_transform.map (QPointF (nm_to_px (1_nm * navaid_pos.x()), nm_to_px (1_nm * navaid_pos.y())));
+	return _features_transform.map (QPointF (nm_to_px (1_nm * navaid_pos.x()), nm_to_px (1_nm * navaid_pos.y())));
 }
 
 
