@@ -67,7 +67,7 @@
 			</observe>
 			<observe var='t4'>
 				<if var='t4' equals='true'>
-					<toggle path='/instruments/efis/navinfo/visible'/>
+					<toggle path='/instruments/efis/approach/visible'/>
 				</if>
 			</observe>
 			<observe var='t5'>
