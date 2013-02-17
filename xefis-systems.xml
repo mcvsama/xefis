@@ -13,7 +13,7 @@
 				<default>GPS</default>
 			</property>
 			<property path='/systems/fms/settings/follow-track' type='boolean'>
-				<default>false</default>
+				<default>true</default>
 			</property>
 			<property path='/systems/fms/settings/use-true-heading' type='boolean'>
 				<default>false</default>
