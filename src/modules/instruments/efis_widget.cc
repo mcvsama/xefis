@@ -1501,7 +1501,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	{
 		if (_localizer_info_visible)
 		{
-			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (_localizer_mag_bearing.deg()));
+			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (floored_mod (_localizer_mag_bearing.deg(), 360.0)));
 			QFont font = _font_10_bold;
 			font.setBold (false);
 
