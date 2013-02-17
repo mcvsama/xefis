@@ -211,7 +211,8 @@ HSIWidget::paintEvent (QPaintEvent*)
 			: _heading_transform;
 
 	_features_transform = _rotation_transform;
-	_features_transform.rotate ((_mag_heading - _true_heading).deg());
+	if (_heading_mode == HeadingMode::Magnetic)
+		_features_transform.rotate ((_mag_heading - _true_heading).deg());
 
 	_ap_heading = _ap_mag_heading;
 	if (_heading_mode == HeadingMode::True)
@@ -275,7 +276,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 			case DisplayMode::Auxiliary:
 			{
 				QString text_1 =
-					QString (_heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE") +
+					QString (_heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU") +
 					QString (_display_track ? "  TRK" : "");
 				QString text_2 = QString ("%1").arg (hdg);
 
@@ -295,13 +296,19 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 				text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 				painter.setFont (font_2);
 				text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+				// True heading is boxed for emphasis:
+				if (_heading_mode == HeadingMode::True)
+				{
+					painter.setBrush (Qt::NoBrush);
+					painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f));
+				}
 				break;
 			}
 
 			default:
 			{
 				QString text_1 = _display_track ? "TRK" : "HDG";
-				QString text_2 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE";
+				QString text_2 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU";
 				QString text_v = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
 				float margin = 0.2f * _q;
