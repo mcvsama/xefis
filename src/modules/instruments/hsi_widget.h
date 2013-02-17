@@ -37,6 +37,19 @@ class HSIWidget: public Xefis::InstrumentWidget
 	typedef std::map<QString, Angle> HeadingBugs;
 
   public:
+	enum class HeadingMode
+	{
+		/**
+		 * Display magnetic heading on scale.
+		 */
+		Magnetic,
+
+		/**
+		 * Display true heading on scale.
+		 */
+		True
+	};
+
 	enum class DisplayMode
 	{
 		/**
@@ -118,6 +131,18 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_magnetic_heading (Angle);
 
 	/**
+	 * Return current heading mode.
+	 */
+	HeadingMode
+	heading_mode() const;
+
+	/**
+	 * Select magnetic or true heading to display.
+	 */
+	void
+	set_heading_mode (HeadingMode);
+
+	/**
 	 * Toggle heading scale visibility.
 	 */
 	void
@@ -152,13 +177,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Flight path heading (track).
 	 */
 	Angle
-	track() const;
+	magnetic_track() const;
 
 	/**
 	 * Set track magnetic heading.
 	 */
 	void
-	set_track (Angle);
+	set_magnetic_track (Angle);
 
 	/**
 	 * Set visibility of the track line.
@@ -430,6 +455,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QTransform				_aircraft_center_transform;
 	QTransform				_mag_heading_transform;
 	QTransform				_true_heading_transform;
+	QTransform				_heading_transform; // Mag or true, depending on heading mode.
 	QRectF					_map_clip_rect;
 	QRectF					_trend_vector_clip_rect;
 	QPainterPath			_inner_map_clip;
@@ -463,11 +489,14 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Length					_range						= 1_nm;
 	Angle					_mag_heading				= 0_deg;
 	Angle					_true_heading				= 0_deg;
+	HeadingMode				_heading_mode				= HeadingMode::Magnetic;
+	Angle					_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_heading_visible			= false;
 	Angle					_ap_mag_heading				= 0_deg;
+	Angle					_ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_ap_heading_visible			= false;
 	bool					_ap_track_visible			= false;
-	Angle					_track_deg					= 0_deg;
+	Angle					_mag_track_deg				= 0_deg;
 	bool					_track_visible				= false;
 	Knots					_ground_speed				= 0.f;
 	bool					_ground_speed_visible		= false;
@@ -558,6 +587,21 @@ HSIWidget::set_magnetic_heading (Angle degrees)
 }
 
 
+inline HSIWidget::HeadingMode
+HSIWidget::heading_mode() const
+{
+	return _heading_mode;
+}
+
+
+inline void
+HSIWidget::set_heading_mode (HeadingMode mode)
+{
+	_heading_mode = mode;
+	update();
+}
+
+
 inline void
 HSIWidget::set_heading_visible (bool visible)
 {
@@ -598,16 +642,16 @@ HSIWidget::set_ap_track_visible (bool visible)
 
 
 inline Angle
-HSIWidget::track() const
+HSIWidget::magnetic_track() const
 {
-	return _track_deg;
+	return _mag_track_deg;
 }
 
 
 inline void
-HSIWidget::set_track (Angle heading)
+HSIWidget::set_magnetic_track (Angle heading)
 {
-	_track_deg = heading;
+	_mag_track_deg = heading;
 	update();
 }
 

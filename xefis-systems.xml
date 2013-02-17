@@ -12,6 +12,12 @@
 			<property path='/systems/fms/output/position/source' type='string'>
 				<default>GPS</default>
 			</property>
+			<property path='/systems/fms/settings/follow-track' type='boolean'>
+				<default>false</default>
+			</property>
+			<property path='/systems/fms/settings/use-true-heading' type='boolean'>
+				<default>false</default>
+			</property>
 			<property path='/systems/fms/settings/standard-pressure-on' type='boolean'>
 				<default>false</default>
 			</property>
@@ -56,7 +62,7 @@
 			</observe>
 			<observe var='t3'>
 				<if var='t3' equals='true'>
-					<toggle path='/instruments/efis/flight-path-marker/visible'/>
+					<toggle path='/systems/fms/settings/use-true-heading'/>
 				</if>
 			</observe>
 			<observe var='t4'>

@@ -44,6 +44,13 @@ HSIWidget::HSIWidget (QWidget* parent):
 void
 HSIWidget::update_more()
 {
+	// Current heading mode:
+	_heading = _heading_mode == HeadingMode::Magnetic ? _mag_heading : _true_heading;
+	_ap_heading = _ap_mag_heading;
+	if (_heading_mode == HeadingMode::True)
+		_ap_heading += _true_heading - _mag_heading;
+	_ap_heading = floored_mod (_ap_heading, 360_deg);
+
 	// Clips:
 	switch (_display_mode)
 	{
@@ -190,15 +197,16 @@ HSIWidget::paintEvent (QPaintEvent*)
 	_mag_heading_transform.rotate (-_mag_heading.deg());
 	_true_heading_transform.reset();
 	_true_heading_transform.rotate (-_true_heading.deg());
+	_heading_transform = _heading_mode == HeadingMode::Magnetic ? _mag_heading_transform : _true_heading_transform;
 
 	switch (_display_mode)
 	{
 		case DisplayMode::Auxiliary:
-			_limited_rotation = limit (floored_mod (_ap_mag_heading - _mag_heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+			_limited_rotation = limit (floored_mod (_ap_heading - _heading + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
 			break;
 
 		default:
-			_limited_rotation = _ap_mag_heading - _mag_heading;
+			_limited_rotation = _ap_heading - _heading;
 			break;
 	}
 
@@ -239,16 +247,16 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 	painter.drawPolyline (_aircraft_shape);
 	painter.translate (0.f, -_r);
 
-	// MAG heading
+	// MAG/TRUE heading
 	if (_heading_visible)
 	{
-		int hdg = static_cast<int> (_mag_heading.deg() + 0.5f) % 360;
+		int hdg = static_cast<int> (_heading.deg() + 0.5f) % 360;
 
 		switch (_display_mode)
 		{
 			case DisplayMode::Auxiliary:
 			{
-				QString text_1 = "MAG";
+				QString text_1 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE";
 				QString text_2 = QString ("%1").arg (hdg);
 
 				QFont font_1 (_font_13_bold);
@@ -273,7 +281,7 @@ HSIWidget::paint_aircraft (QPainter& painter, TextPainter& text_painter)
 			default:
 			{
 				QString text_1 = "TRK";
-				QString text_2 = "MAG";
+				QString text_2 = _heading_mode == HeadingMode::Magnetic ? "MAG" : "TRUE";
 				QString text_v = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
 				float margin = 0.2f * _q;
@@ -390,7 +398,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	// Track triangle:
 	painter.setClipRect (_map_clip_rect);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate ((_track_deg - _mag_heading).deg());
+	painter.rotate ((_mag_track_deg - _mag_heading).deg());
 
 	painter.setPen (get_pen (Qt::white, 2.2f));
 	painter.translate (0.f, -1.003f * _r);
@@ -487,8 +495,9 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipping (false);
 
+		// AP heading always set as magnetic, but can be displayed as true:
 		QString text_1 = "SEL  HDG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_mag_heading.deg() + 0.5f));
+		QString text_2 = QString ("%1").arg (static_cast<int> (_ap_heading.deg() + 0.5f));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
@@ -517,7 +526,7 @@ HSIWidget::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
 		painter.setClipPath (_outer_map_clip);
 		painter.setPen (pen);
 		painter.setTransform (_aircraft_center_transform);
-		painter.rotate ((_ap_mag_heading - _mag_heading).deg());
+		painter.rotate ((_ap_heading - _heading).deg());
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
 	}
 }
@@ -538,7 +547,7 @@ HSIWidget::paint_directions (QPainter& painter, TextPainter& text_painter)
 
 	for (int deg = 0; deg < 360; deg += 5)
 	{
-		painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
+		painter.setTransform (_heading_transform * _aircraft_center_transform);
 		painter.rotate (deg);
 		painter.drawLine (QPointF (0.f, -_r),
 						  deg % 10 == 0
@@ -680,7 +689,7 @@ HSIWidget::paint_dotted_earth (QPainter& painter)
 	QRectF dot (0.f, 0.f, 0.05f * _q, 0.05f * _q);
 	dot.translate (-0.5f * dot.width(), -0.5f * dot.height());
 
-	painter.setTransform (_mag_heading_transform * _aircraft_center_transform);
+	painter.setTransform (_heading_transform * _aircraft_center_transform);
 	painter.setClipping (false);
 	painter.setBrush (Qt::white);
 	painter.setPen (Qt::NoPen);

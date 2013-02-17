@@ -114,6 +114,7 @@
 										<property name='autopilot-track-visible' path='/settings/enabled'/>
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
+									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 								</properties>
 							</module>
 						</item>
@@ -150,6 +151,7 @@
 										<property name='autopilot-track-visible' path='/settings/enabled'/>
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
+									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 								</properties>
 							</module>
 						</item>

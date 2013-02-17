@@ -77,9 +77,10 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_target_altitude_ft;
 	Xefis::PropertyFloat	_mag_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
+	Xefis::PropertyBoolean	_use_true_heading;
 	Xefis::PropertyBoolean	_autopilot_visible;
 	Xefis::PropertyBoolean	_autopilot_track_visible;
-	Xefis::PropertyFloat	_track_deg;
+	Xefis::PropertyFloat	_magnetic_track_deg;
 	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lon_deg;
