@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/numeric.h>
 
 // Local:
 #include "joystick.h"
@@ -28,6 +29,10 @@
 JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Xefis::Input (module_manager)
 {
+	// Support max 256 axes/buttons:
+	_buttons.resize (256, nullptr);
+	_axes.resize (256, nullptr);
+
 	bool found_path = false;
 	bool found_device = false;
 
@@ -49,6 +54,32 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 
 			_prop_path = e.text();
 		}
+		else if (e == "axis")
+		{
+			unsigned int id = e.attribute ("id").toUInt();
+			if (id < _axes.size())
+			{
+				float center = 0.f;
+				float dead_zone = 0.f;
+				float reverse = 1.f;
+
+				for (QDomElement& v: e)
+				{
+					if (v == "center")
+						center = v.text().toFloat();
+					else if (v == "dead-zone")
+						dead_zone = v.text().toFloat();
+					else if (v == "reverse")
+						reverse = -1.f;
+				}
+
+				Axis* axis = new Axis();
+				axis->center = center;
+				axis->dead_zone = dead_zone;
+				axis->reverse = reverse;
+				_axes[id] = axis;
+			}
+		}
 		else
 			throw Xefis::Exception (QString ("unsupported config element for JoystickInput module: <%1>").arg (e.tagName()).toStdString());
 	}
@@ -59,19 +90,15 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 	QObject::connect (_reopen_timer, SIGNAL (timeout()), this, SLOT (open_device()));
 
 	open_device();
-
-	// Support max 256 axes/buttons:
-	_buttons.resize (256, nullptr);
-	_axes.resize (256, nullptr);
 }
 
 
 JoystickInput::~JoystickInput()
 {
-	for (auto& prop: _buttons)
-		delete prop;
-	for (auto& prop: _axes)
-		delete prop;
+	for (auto& x: _buttons)
+		delete x;
+	for (auto& x: _axes)
+		delete x;
 }
 
 
@@ -108,20 +135,22 @@ JoystickInput::read()
 				if (ev.number >= _buttons.size())
 					break;
 
-				Buttons::value_type prop;
+				Buttons::value_type button;
 				if (ev.type == JS_EVENT_BUTTON + JS_EVENT_INIT)
 				{
+					button = _buttons[ev.number];
+					if (!button)
+						button = _buttons[ev.number] = new Button();
 					QString path = QString ("%1/button/%2").arg (_prop_path).arg (ev.number);
-					delete _buttons[ev.number];
-					prop = _buttons[ev.number] = new Xefis::Property<bool> (path.toStdString());
+					_buttons[ev.number]->set_path (path.toStdString());
 				}
 				else
 				{
-					prop = _buttons[ev.number];
-					if (!prop)
+					button = _buttons[ev.number];
+					if (!button)
 						break;
 				}
-				prop->write (ev.value);
+				button->set_value (ev.value);
 				break;
 			}
 
@@ -130,25 +159,65 @@ JoystickInput::read()
 			{
 				if (ev.number >= _axes.size())
 					break;
-				Axes::value_type prop;
+				Axes::value_type axis;
 				if (ev.type == JS_EVENT_AXIS + JS_EVENT_INIT)
 				{
+					axis = _axes[ev.number];
+					if (!axis)
+						axis = _axes[ev.number] = new Axis();
 					QString path = QString ("%1/axis/%2").arg (_prop_path).arg (ev.number);
-					delete _axes[ev.number];
-					prop = _axes[ev.number] = new Xefis::PropertyFloat (path.toStdString());
+					_axes[ev.number]->set_path (path.toStdString());
 				}
 				else
 				{
-					prop = _axes[ev.number];
-					if (!prop)
+					axis = _axes[ev.number];
+					if (!axis)
 						break;
 				}
-				prop->write (ev.value / 32767.0);
+				axis->set_value (ev.value / 32767.0);
 				break;
 			}
 		}
 	}
 
 	signal_data_updated();
+}
+
+
+inline void
+JoystickInput::Button::set_path (std::string const& path)
+{
+	prop = Xefis::PropertyBoolean (path);
+}
+
+
+inline void
+JoystickInput::Button::set_value (float value)
+{
+	prop.write (value);
+}
+
+
+inline void
+JoystickInput::Axis::set_path (std::string const& path)
+{
+	prop = Xefis::PropertyFloat (path);
+}
+
+
+inline void
+JoystickInput::Axis::set_value (float value)
+{
+	// Center:
+	value -= center;
+	// Remove dead zone:
+	if (std::abs (value) < dead_zone)
+		value = 0.f;
+	else
+		value = value - sgn (value) * dead_zone;
+	// Reverse:
+	value *= reverse;
+
+	prop.write (value);
 }
 
