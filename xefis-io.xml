@@ -83,6 +83,14 @@
 		<module name='io/joystick'>
 			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
 			<path>/input/main</path>
+			<axis id='0'>
+				<center>0.00259</center>
+				<dead-zone>0.006</dead-zone>
+			</axis>
+			<axis id='1'>
+				<center>0.00259</center>
+				<dead-zone>0.006</dead-zone>
+			</axis>
 		</module>
 		<module name='io/joystick'>
 			<device>/dev/input/js1</device>
