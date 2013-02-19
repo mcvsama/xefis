@@ -58,7 +58,7 @@
 						<property name='cbr' path='/output/altitude/climb-rate.fpm'/>
 						<property name='altitude' path='/output/altitude/amsl.ft'/>
 					</directory>
-					<directory path='/systems/autopilot'>
+					<directory path='/systems/flight-director'>
 						<!-- Emulate some of the AP settings -->
 						<property name='autopilot-setting-altitude' path='/settings/altitude.ft'/>
 						<property name='autopilot-setting-ias' path='/settings/ias.kt'/>
@@ -70,7 +70,7 @@
 			<output disabled='false'>
 				<host>127.0.0.1</host>
 				<port>9001</port>
-				<properties path='/systems/stabilizer/output'>
+				<properties path='/systems/fly-by-wire'>
 					<property name='ailerons' path='/ailerons' default='0.0'/>
 					<property name='elevator' path='/elevator' default='0.0'/>
 					<property name='rudder' path='/rudder' default='0.0'/>

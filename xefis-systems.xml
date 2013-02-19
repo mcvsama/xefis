@@ -72,7 +72,6 @@
 			</observe>
 			<observe var='t5'>
 				<if var='t5' equals='true'>
-					<toggle path='/instruments/efis/control-stick/visible'/>
 				</if>
 			</observe>
 			<observe var='t6'>
@@ -80,18 +79,31 @@
 					<toggle path='/instruments/efis/flight-director/visible'/>
 				</if>
 			</observe>
+			<observe var='mode-1'>
+				<if var='mode-1' equals='true'>
+					<set path='/instruments/efis/control/hint-visible' value='true'/>
+					<set path='/instruments/efis/control/hint' value='CMD'/>
+					<set path='/instruments/efis/control-stick/visible' value='false'/>
+					<set path='/systems/flight-director/settings/enabled' value='false'/>
+					<set path='/systems/fly-by-wire/config/mode' value='0'/>
+				</if>
+			</observe>
 			<observe var='mode-2'>
-				<choose>
-					<when var='mode-2' equals='true'>
-						<set path='/instruments/efis/control/hint-visible' value='true'/>
-						<set path='/instruments/efis/control/hint' value='A/P'/>
-						<set path='/systems/autopilot/settings/enabled' value='true'/>
-					</when>
-					<otherwise>
-						<set path='/instruments/efis/control/hint-visible' value='false'/>
-						<set path='/systems/autopilot/settings/enabled' value='false'/>
-					</otherwise>
-				</choose>
+				<if var='mode-2' equals='true'>
+					<set path='/instruments/efis/control/hint-visible' value='false'/>
+					<set path='/instruments/efis/control-stick/visible' value='true'/>
+					<set path='/systems/flight-director/settings/enabled' value='false'/>
+					<set path='/systems/fly-by-wire/config/mode' value='1'/>
+				</if>
+			</observe>
+			<observe var='mode-3'>
+				<if var='mode-3' equals='true'>
+					<set path='/instruments/efis/control/hint-visible' value='true'/>
+					<set path='/instruments/efis/control/hint' value='FLT DIR'/>
+					<set path='/systems/flight-director/settings/enabled' value='true'/>
+					<set path='/instruments/efis/control-stick/visible' value='false'/>
+					<set path='/systems/fly-by-wire/config/mode' value='2'/>
+				</if>
 			</observe>
 			<observe var='function-up'>
 				<if var='function-up' equals='true'>
@@ -205,12 +217,12 @@
 				<property name='button' path='/input/main/button/15'/>
 			</properties>
 		</module>
-		<module name='systems/ap'>
+		<module name='systems/flight-director'>
 			<properties>
-				<directory path='/systems/autopilot/settings'>
-					<property name='autopilot-enabled' path='/enabled' default='false'/>
-					<property name='bank-limit' path='/bank-limit.deg' default='15'/>
-					<property name='yank-limit' path='/yank-limit.deg' default='7'/>
+				<directory path='/systems/flight-director/settings'>
+					<property name='enabled' path='/enabled' default='false'/>
+					<property name='pitch-limit' path='/pitch-limit.deg' default='7'/>
+					<property name='roll-limit' path='/roll-limit.deg' default='25'/>
 					<property name='vertical-mode' path='/vertical-mode' default='0'/>
 					<property name='pitch-axis-dead-zone' path='/input/main/dead-zone/1' default='0.05'/>
 					<property name='roll-axis-dead-zone' path='/input/main/dead-zone/0' default='0.05'/>
@@ -232,17 +244,16 @@
 					<property name='input-pitch-axis' path='//input/main/axis/1'/>
 					<property name='input-roll-axis' path='//input/main/axis/0'/>
 				</directory>
-				<directory path='/systems/autopilot/output'>
+				<directory path='/systems/flight-director'>
 					<property name='output-pitch' path='/pitch.deg'/>
 					<property name='output-roll' path='/roll.deg'/>
-					<property name='output-control-stick-pitch' path='/control-stick/pitch.deg'/>
-					<property name='output-control-stick-roll' path='/control-stick/roll.deg'/>
 				</directory>
 			</properties>
 		</module>
-		<module name='systems/stabilizer'>
+		<module name='systems/fly-by-wire'>
 			<properties>
-				<directory path='/systems/stabilizer/config'>
+				<directory path='/systems/fly-by-wire/config'>
+					<property name='mode' path='/mode' default='0'/>
 					<property name='stabilization-gain' path='/gain' default='1.0'/>
 					<property name='pitch-gain' path='/pitch/gain' default='1.0'/>
 					<property name='pitch-p' path='/pitch/p' default='10.0'/>
@@ -265,18 +276,28 @@
 					<property name='ailerons-maximum' path='/ailerons/maximum' default='+0.5'/>
 					<property name='rudder-minimum' path='/rudder/minimum' default='-1.0'/>
 					<property name='rudder-maximum' path='/rudder/maximum' default='+1.0'/>
+					<property name='pitch-extent' path='/pitch-extent.deg' default='20'/>
+					<property name='roll-extent' path='/roll-extent.deg' default='25'/>
 				</directory>
-				<directory path='/systems/autopilot/output'>
+				<directory path='/input'>
+					<property name='input-pitch-axis' path='//input/main/axis/1'/>
+					<property name='input-roll-axis' path='//input/main/axis/0'/>
+					<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
+				</directory>
+				<directory path='/systems/flight-director'>
 					<property name='input-pitch' path='/pitch.deg'/>
 					<property name='input-roll' path='/roll.deg'/>
-					<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
 				</directory>
 				<directory path='/sensors'>
 					<property name='measured-pitch' path='/imu/pitch.deg'/>
 					<property name='measured-roll' path='/imu/roll.deg'/>
 					<property name='measured-slip-skid' path='/slip-skid/slip-skid.g'/>
 				</directory>
-				<directory path='/systems/stabilizer/output'>
+				<directory path='/systems/fly-by-wire'>
+					<property name='output-pitch' path='/pitch.deg'/>
+					<property name='output-roll' path='/roll.deg'/>
+					<property name='output-control-stick-pitch' path='/control-stick/pitch.deg'/>
+					<property name='output-control-stick-roll' path='/control-stick/roll.deg'/>
 					<property name='output-elevator' path='/elevator'/>
 					<property name='output-ailerons' path='/ailerons'/>
 					<property name='output-rudder' path='/rudder'/>

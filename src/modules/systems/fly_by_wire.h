@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__STABILIZER_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__STABILIZER_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__FLY_BY_WIRE_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__FLY_BY_WIRE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -26,22 +26,42 @@
 #include <xefis/utility/pid.h>
 
 
-class Stabilizer: public Xefis::Module
+class FlyByWire: public Xefis::Module
 {
+	enum Mode
+	{
+		CommandMode			= 0,
+		StabilizedMode		= 1,
+		FlightDirectorMode	= 2
+	};
+
   public:
 	// Ctor
-	Stabilizer (Xefis::ModuleManager*, QDomElement const& config);
+	FlyByWire (Xefis::ModuleManager*, QDomElement const& config);
 
-  protected:
+  private:
 	void
 	data_updated() override;
 
+	void
+	integrate_manual_input();
+
   private:
+	// Used with joystick input:
+	Xefis::PID<float>		_manual_pitch_pid;
+	Xefis::PID<float>		_manual_roll_pid;
+	Angle					_output_pitch		= 0_deg;
+	Angle					_output_roll		= 0_deg;
+	// Stabilizer PIDs:
 	Xefis::PID<float>		_elevator_pid;
 	Xefis::PID<float>		_ailerons_pid;
 	Xefis::PID<float>		_rudder_pid;
 	Xefis::Timestamp		_dt;
 	// Input:
+	// TODO different stabilization parameters for joystick input and for F/D input.
+	Xefis::PropertyInteger	_mode;
+	Xefis::PropertyFloat	_pitch_extent_deg;
+	Xefis::PropertyFloat	_roll_extent_deg;
 	Xefis::PropertyFloat	_stabilization_gain;
 	Xefis::PropertyFloat	_pitch_gain;
 	Xefis::PropertyFloat	_pitch_p;
@@ -58,9 +78,11 @@ class Stabilizer: public Xefis::Module
 	Xefis::PropertyFloat	_yaw_i;
 	Xefis::PropertyFloat	_yaw_d;
 	Xefis::PropertyFloat	_yaw_error_power;
+	Xefis::PropertyFloat	_input_pitch_axis;
+	Xefis::PropertyFloat	_input_roll_axis;
+	Xefis::PropertyFloat	_input_yaw_axis;
 	Xefis::PropertyFloat	_input_pitch_deg;
 	Xefis::PropertyFloat	_input_roll_deg;
-	Xefis::PropertyFloat	_input_yaw_axis;
 	Xefis::PropertyFloat	_measured_pitch_deg;
 	Xefis::PropertyFloat	_measured_roll_deg;
 	Xefis::PropertyFloat	_measured_slip_skid_g;
@@ -71,6 +93,10 @@ class Stabilizer: public Xefis::Module
 	Xefis::PropertyFloat	_rudder_minimum;
 	Xefis::PropertyFloat	_rudder_maximum;
 	// Output:
+	Xefis::PropertyFloat	_output_control_stick_pitch;
+	Xefis::PropertyFloat	_output_control_stick_roll;
+	Xefis::PropertyFloat	_output_pitch_deg;
+	Xefis::PropertyFloat	_output_roll_deg;
 	Xefis::PropertyFloat	_output_elevator;
 	Xefis::PropertyFloat	_output_ailerons;
 	Xefis::PropertyFloat	_output_rudder;

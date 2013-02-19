@@ -27,10 +27,10 @@
 #include <modules/instruments/radial_indicator.h>
 #include <modules/io/flight_gear.h>
 #include <modules/io/joystick.h>
-#include <modules/systems/ap.h>
+#include <modules/systems/flight_director.h>
+#include <modules/systems/fly_by_wire.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
-#include <modules/systems/stabilizer.h>
 #include <modules/systems/state.h>
 
 // Local:
@@ -117,10 +117,10 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		return new Lookahead (this, config);
 	else if (name == "systems/mouse")
 		return new Mouse (this, config);
-	else if (name == "systems/stabilizer")
-		return new Stabilizer (this, config);
-	else if (name == "systems/ap")
-		return new AP (this, config);
+	else if (name == "systems/flight-director")
+		return new FlightDirector (this, config);
+	else if (name == "systems/fly-by-wire")
+		return new FlyByWire (this, config);
 	else if (name == "systems/state")
 		return new State (this, config);
 	else if (name == "generic/property-tree")
