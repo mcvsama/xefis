@@ -71,7 +71,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 {
 	if (node->type() != PropDirectory)
 	{
-		QString value = node->read<std::string>().c_str();
+		QString value;
 		QString suffix;
 		switch (node->type())
 		{
@@ -80,9 +80,11 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 				suffix = " [bool]";
 				break;
 			case PropInteger:
+				value = QString ("%1").arg (node->read<int>());
 				suffix = " [integer]";
 				break;
 			case PropFloat:
+				value = QString ("%1").arg (node->read<float>(), 0, 'f', 15);
 				suffix = " [float]";
 				break;
 			case PropString:
