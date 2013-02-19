@@ -66,22 +66,24 @@
 										<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
 										<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
 									</directory>
-									<directory path='/systems/autopilot/settings'>
+									<directory path='/systems/flight-director/settings'>
 										<property name='autopilot-setting-ias' path='/ias.kt'/>
 										<property name='autopilot-setting-altitude' path='/altitude.ft'/>
 										<property name='autopilot-setting-cbr' path='/cbr.fpm'/>
 									</directory>
-									<directory path='/systems/autopilot'>
+									<directory path='/systems/flight-director'>
 										<property name='autopilot-speed-hint' path='/hints/speed-hint' default='SPD'/>
 										<property name='autopilot-speed-small-hint' path='/hints/speed-small-hint' default=''/>
 										<property name='autopilot-lateral-hint' path='/hints/lateral-hint' default='HDG HOLD'/>
 										<property name='autopilot-lateral-small-hint' path='/hints/lateral-small-hint' default='LOC'/>
 										<property name='autopilot-vertical-hint' path='/hints/vertical-hint' default='V/S'/>
 										<property name='autopilot-vertical-small-hint' path='/hints/vertical-small-hint' default='G/S'/>
-										<property name='flight-director-pitch' path='/output/pitch.deg'/>
-										<property name='flight-director-roll' path='/output/roll.deg'/>
-										<property name='control-stick-pitch' path='/output/control-stick/pitch.deg'/>
-										<property name='control-stick-roll' path='/output/control-stick/roll.deg'/>
+										<property name='flight-director-pitch' path='/pitch.deg'/>
+										<property name='flight-director-roll' path='/roll.deg'/>
+									</directory>
+									<directory path='/systems/fly-by-wire'>
+										<property name='control-stick-pitch' path='/control-stick/pitch.deg'/>
+										<property name='control-stick-roll' path='/control-stick/roll.deg'/>
 									</directory>
 								</properties>
 							</module>
@@ -110,7 +112,7 @@
 									<directory path='/sensors'>
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
-									<directory path='/systems/autopilot'>
+									<directory path='/systems/flight-director'>
 										<property name='autopilot-track-visible' path='/settings/enabled'/>
 										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
 									</directory>
