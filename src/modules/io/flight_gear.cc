@@ -58,7 +58,7 @@ struct FGInputData
 	FGDouble	position_sea_level_radius_ft;	// slr
 	FGDouble	pitch_deg;						// p
 	FGDouble	roll_deg;						// r
-	FGDouble	mag_heading_deg;				// h
+	FGDouble	magnetic_heading_deg;			// h
 	FGDouble	true_heading_deg;				// th
 	FGDouble	fpm_alpha_deg;					// fpa
 	FGDouble	fpm_beta_deg;					// fpb
@@ -76,7 +76,7 @@ struct FGInputData
 	FGDouble	engine_n1_pct;					// n1
 	FGDouble	engine_n2_pct;					// n2
 	FGDouble	engine_egt_degc;				// egt
-	FGDouble	wind_from_mag_heading_deg;		// wfh
+	FGDouble	wind_from_magnetic_heading_deg;	// wfh
 	FGDouble	wind_tas_kt;					// ws
 }
 END_PACKED_STRUCT
@@ -122,7 +122,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "mach", _mach, false },
 						{ "orientation-pitch", _pitch_deg, false },
 						{ "orientation-roll", _roll_deg, false },
-						{ "orientation-magnetic-heading", _mag_heading_deg, false },
+						{ "orientation-magnetic-heading", _magnetic_heading_deg, false },
 						{ "orientation-true-heading", _true_heading_deg, false },
 						{ "slip-skid", _slip_skid_g, false },
 						{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
@@ -151,7 +151,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "position-latitude", _position_lat_deg, false },
 						{ "position-longitude", _position_lng_deg, false },
 						{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
-						{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
+						{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
 						{ "wind-tas", _wind_tas_kt, false },
 					});
 				}
@@ -226,7 +226,7 @@ FlightGearIO::invalidate_all()
 		&_mach,
 		&_pitch_deg,
 		&_roll_deg,
-		&_mag_heading_deg,
+		&_magnetic_heading_deg,
 		&_true_heading_deg,
 		&_slip_skid_g,
 		&_fpm_alpha_deg,
@@ -255,7 +255,7 @@ FlightGearIO::invalidate_all()
 		&_position_lat_deg,
 		&_position_lng_deg,
 		&_position_sea_level_radius_ft,
-		&_wind_from_mag_heading_deg,
+		&_wind_from_magnetic_heading_deg,
 		&_wind_tas_kt
 	};
 
@@ -312,7 +312,7 @@ FlightGearIO::read_input()
 		ASSIGN (position_sea_level_radius_ft);
 		ASSIGN (pitch_deg);
 		ASSIGN (roll_deg);
-		ASSIGN (mag_heading_deg);
+		ASSIGN (magnetic_heading_deg);
 		ASSIGN (true_heading_deg);
 		ASSIGN (fpm_alpha_deg);
 		ASSIGN (fpm_beta_deg);
@@ -325,7 +325,7 @@ FlightGearIO::read_input()
 		ASSIGN (engine_n1_pct);
 		ASSIGN (engine_n2_pct);
 		ASSIGN (engine_egt_degc);
-		ASSIGN (wind_from_mag_heading_deg);
+		ASSIGN (wind_from_magnetic_heading_deg);
 		ASSIGN (wind_tas_kt);
 
 #undef ASSIGN

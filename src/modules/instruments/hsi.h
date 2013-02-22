@@ -75,7 +75,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_cbr_fpm;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_target_altitude_ft;
-	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_magnetic_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyBoolean	_use_true_heading;
 	Xefis::PropertyBoolean	_display_track;
@@ -86,7 +86,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lon_deg;
 	Xefis::PropertyString	_positioning_hint;
-	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
+	Xefis::PropertyFloat	_wind_from_magnetic_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
 	Xefis::PropertyString	_localizer_id;
 };

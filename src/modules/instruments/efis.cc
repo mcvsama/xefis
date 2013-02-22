@@ -54,14 +54,14 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "orientation-roll", _roll_deg, false },
 				{ "orientation-roll-limit", _roll_limit_deg, false },
 				{ "orientation-pitch-limit", _pitch_limit_deg, false },
-				{ "orientation-magnetic-heading", _mag_heading_deg, false },
+				{ "orientation-magnetic-heading", _magnetic_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "slip-skid", _slip_skid_g, false },
 				{ "slip-skid-limit", _slip_skid_limit_g, false },
 				{ "flight-path-marker-visible", _fpm_visible, false },
 				{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 				{ "flight-path-marker-beta", _fpm_beta_deg, false },
-				{ "magnetic-track", _mag_track_deg, false },
+				{ "magnetic-track", _magnetic_track_deg, false },
 				{ "altitude", _altitude_ft, false },
 				{ "altitude-lookahead", _altitude_lookahead_ft, false },
 				{ "altitude-agl", _altitude_agl_ft, false },
@@ -121,10 +121,10 @@ EFIS::read()
 		fpm_beta = 1_deg * *_fpm_beta_deg;
 	}
 
-	if (_mag_track_deg.valid() && _roll_deg.valid() && _mag_heading_deg.valid())
+	if (_magnetic_track_deg.valid() && _roll_deg.valid() && _magnetic_heading_deg.valid())
 	{
-		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * floored_mod (*_mag_track_deg - *_mag_heading_deg, -180.0, +180.0);
-		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * floored_mod (*_mag_track_deg - *_mag_heading_deg, -180.0, +180.0);
+		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * floored_mod (*_magnetic_track_deg - *_magnetic_heading_deg, -180.0, +180.0);
+		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * floored_mod (*_magnetic_track_deg - *_magnetic_heading_deg, -180.0, +180.0);
 	}
 
 	fpm_alpha = 1_deg * floored_mod (fpm_alpha.deg(), -180.0, +180.0);
@@ -183,9 +183,9 @@ EFIS::read()
 	else
 		_efis_widget->set_pitch_limit_visible (false);
 
-	_efis_widget->set_heading_visible (_mag_heading_deg.valid());
-	if (_mag_heading_deg.valid())
-		_efis_widget->set_heading (1_deg * *_mag_heading_deg);
+	_efis_widget->set_heading_visible (_magnetic_heading_deg.valid());
+	if (_magnetic_heading_deg.valid())
+		_efis_widget->set_heading (1_deg * *_magnetic_heading_deg);
 
 	_efis_widget->set_slip_skid_visible (_slip_skid_g.valid());
 	if (_slip_skid_g.valid())
@@ -293,13 +293,13 @@ EFIS::read()
 	if (_dme_distance_nm.valid())
 		_efis_widget->set_dme_distance (1_nm * *_dme_distance_nm);
 
-	if (_localizer_id.valid() && _true_heading_deg.valid() && _mag_heading_deg.valid())
+	if (_localizer_id.valid() && _true_heading_deg.valid() && _magnetic_heading_deg.valid())
 	{
 		Xefis::Navaid const* navaid = navaid_storage()->find_by_id (Xefis::Navaid::LOC, (*_localizer_id).c_str());
 		if (navaid)
 		{
 			_efis_widget->set_localizer_id ((*_localizer_id).c_str());
-			_efis_widget->set_localizer_mag_bearing (1_deg * (*_mag_heading_deg - *_true_heading_deg) + navaid->true_bearing());
+			_efis_widget->set_localizer_magnetic_bearing (1_deg * (*_magnetic_heading_deg - *_true_heading_deg) + navaid->true_bearing());
 			_efis_widget->set_localizer_info_visible (true);
 		}
 	}

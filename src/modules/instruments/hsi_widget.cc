@@ -186,15 +186,15 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 void
 HSIWidget::paintEvent (QPaintEvent*)
 {
-	_true_track = floored_mod (_mag_track + (_true_heading - _mag_heading), 360_deg);
+	_true_track = floored_mod (_magnetic_track + (_true_heading - _magnetic_heading), 360_deg);
 
 	_track =
 		_heading_mode == HeadingMode::Magnetic
-			? _mag_track
+			? _magnetic_track
 			: _true_track;
 
 	_heading = _heading_mode == HeadingMode::Magnetic
-		? _mag_heading
+		? _magnetic_heading
 		: _true_heading;
 
 	_rotation = _display_track ? _track : _heading;
@@ -212,11 +212,11 @@ HSIWidget::paintEvent (QPaintEvent*)
 
 	_features_transform = _rotation_transform;
 	if (_heading_mode == HeadingMode::Magnetic)
-		_features_transform.rotate ((_mag_heading - _true_heading).deg());
+		_features_transform.rotate ((_magnetic_heading - _true_heading).deg());
 
-	_ap_heading = _ap_mag_heading;
+	_ap_heading = _ap_magnetic_heading;
 	if (_heading_mode == HeadingMode::True)
-		_ap_heading += _true_heading - _mag_heading;
+		_ap_heading += _true_heading - _magnetic_heading;
 	_ap_heading = floored_mod (_ap_heading, 360_deg);
 
 	QPainter painter (this);
@@ -660,7 +660,7 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 	if (_wind_information_visible)
 	{
 		QString wind_str = QString ("%1°/%2")
-			.arg (static_cast<long> (_wind_from_mag_heading.deg()), 3, 10, QChar ('0'))
+			.arg (static_cast<long> (_wind_from_magnetic_heading.deg()), 3, 10, QChar ('0'))
 			.arg (static_cast<long> (_wind_tas_speed), 3, 10, QChar (L'\u2007'));
 		painter.resetTransform();
 		painter.translate (0.2f * _q, metr_b.height());
@@ -669,7 +669,7 @@ HSIWidget::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 		painter.setPen (get_pen (Qt::white, 1.2f));
 		text_painter.drawText (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
 		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
-		painter.rotate ((_wind_from_mag_heading - _mag_heading + 180_deg).deg());
+		painter.rotate ((_wind_from_magnetic_heading - _magnetic_heading + 180_deg).deg());
 		QPointF a = QPointF (0.f, -0.7f * _q);
 		QPointF b = QPointF (0.f, +0.7f * _q);
 		painter.drawLine (a + QPointF (0.f, 0.03f * _q), b);

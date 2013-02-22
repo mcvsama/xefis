@@ -720,13 +720,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return localizer mag bearing.
 	 */
 	Angle
-	localizer_mag_bearing() const;
+	localizer_magnetic_bearing() const;
 
 	/**
 	 * Set localizer magnetic bearing.
 	 */
 	void
-	set_localizer_mag_bearing (Angle mag_bearing);
+	set_localizer_magnetic_bearing (Angle mag_bearing);
 
 	/**
 	 * Set visibility of localizer ID and its bearing.
@@ -1198,7 +1198,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Length				_dme_distance					= 0_nm;
 	bool				_dme_distance_visible			= false;
 	QString				_localizer_id;
-	Angle				_localizer_mag_bearing			= 0_deg;
+	Angle				_localizer_magnetic_bearing		= 0_deg;
 	bool				_localizer_info_visible			= false;
 	QString				_control_hint;
 	bool				_control_hint_visible			= false;
@@ -2082,16 +2082,16 @@ EFISWidget::set_localizer_id (QString const& loc_id)
 
 
 inline Angle
-EFISWidget::localizer_mag_bearing() const
+EFISWidget::localizer_magnetic_bearing() const
 {
-	return _localizer_mag_bearing;
+	return _localizer_magnetic_bearing;
 }
 
 
 inline void
-EFISWidget::set_localizer_mag_bearing (Angle mag_bearing)
+EFISWidget::set_localizer_magnetic_bearing (Angle mag_bearing)
 {
-	_localizer_mag_bearing = mag_bearing;
+	_localizer_magnetic_bearing = mag_bearing;
 	update();
 }
 

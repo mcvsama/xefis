@@ -1081,7 +1081,8 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		// AP bug:
 		if (_ap_altitude_visible)
 		{
-			float posy = limit (ft_to_px (_ap_altitude),
+			float ap_altitude = limit (_ap_altitude, -99999.f, +99999.f);
+			float posy = limit (ft_to_px (ap_altitude),
 								static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
 				<< QPointF (0.f, 0.f)
@@ -1227,7 +1228,7 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	QFontMetricsF metrics_b (font_b);
 
 	QString unit_str = _pressure_display_hpa? "HPA" : "IN";
-	int precision = _pressure_display_hpa ? 1 : 2;
+	int precision = _pressure_display_hpa ? 0 : 2;
 	QString pressure_str = QString ("%1").arg (_pressure_display_hpa? _pressure.hpa() : _pressure.inhg(), 0, 'f', precision) + " ";
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
@@ -1258,6 +1259,8 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 	if (!_ap_altitude_visible)
 		return;
 
+	float ap_altitude = limit (_ap_altitude, -99999.f, +99999.f);
+
 	QFont b_font = _font_20_bold;
 	float const b_digit_width = _font_20_digit_width;
 	float const b_digit_height = _font_20_digit_height;
@@ -1287,16 +1290,16 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = _ap_altitude < 0.f ? MINUS_SIGN : "";
+	QString minus_sign_s = ap_altitude < 0.f ? MINUS_SIGN : "";
 	text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-						   minus_sign_s + QString::number (std::abs (static_cast<int> (_ap_altitude / 1000))));
+						   minus_sign_s + QString::number (std::abs (static_cast<int> (ap_altitude / 1000))));
 
 	painter.setFont (s_font);
 
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	text_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-						   QString ("%1").arg (static_cast<int> (std::abs (_ap_altitude)) % 1000, 3, 'f', 0, '0'));
+						   QString ("%1").arg (static_cast<int> (std::abs (ap_altitude)) % 1000, 3, 'f', 0, '0'));
 }
 
 
@@ -1502,7 +1505,7 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 	{
 		if (_localizer_info_visible)
 		{
-			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (floored_mod (_localizer_mag_bearing.deg(), 360.0)));
+			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (floored_mod (_localizer_magnetic_bearing.deg(), 360.0)));
 			QFont font = _font_10_bold;
 			font.setBold (false);
 
