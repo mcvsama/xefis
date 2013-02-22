@@ -3,6 +3,8 @@
 	<modules>
 		<module disabled='true' name='generic/fps'/>
 		<module name='systems/state'>
+			<var name='fd-lateral-mode' path='/systems/flight-director/settings/lateral-mode'/>
+			<var name='fd-vertical-mode' path='/systems/flight-director/settings/vertical-mode'/>
 			<property path='/systems/fms/output/localizer/type' type='string'>
 				<default>ILS</default>
 			</property>
@@ -35,6 +37,16 @@
 			</property>
 			<property path='/sensors/gps/vertical-accuracy.ft' type='integer'>
 				<default>0</default>
+			</property>
+			<property path='/systems/flight-director/settings/lateral-mode' type='integer'>
+				<min>0</min>
+				<max>2</max>
+				<winding>true</winding>
+			</property>
+			<property path='/systems/flight-director/settings/vertical-mode' type='integer'>
+				<min>0</min>
+				<max>3</max>
+				<winding>true</winding>
 			</property>
 			<property path='/instruments/hsi-nav/display-mode' type='integer'>
 				<min>0</min>
@@ -103,6 +115,16 @@
 					<set path='/systems/flight-director/settings/enabled' value='true'/>
 					<set path='/instruments/efis/control-stick/visible' value='false'/>
 					<set path='/systems/fly-by-wire/config/mode' value='2'/>
+				</if>
+			</observe>
+			<observe var='mfdstartstop'>
+				<if var='mfdstartstop' equals='true'>
+					<add path='/systems/flight-director/settings/vertical-mode' value='1'/>
+				</if>
+			</observe>
+			<observe var='mfdreset'>
+				<if var='mfdreset' equals='true'>
+					<add path='/systems/flight-director/settings/lateral-mode' value='1'/>
 				</if>
 			</observe>
 			<observe var='function-up'>
@@ -194,12 +216,41 @@
 					<add path='/instruments/hsi-nav/display-mode' value='1'/>
 				</if>
 			</observe>
+			<observe var='fd-lateral-mode'>
+				<choose>
+					<when var='fd-lateral-mode' equals='1'>
+						<set path='/systems/flight-director/hints/lateral-hint' value='HDG HOLD'/>
+					</when>
+					<when var='fd-lateral-mode' equals='2'>
+						<set path='/systems/flight-director/hints/lateral-hint' value='TRK HOLD'/>
+					</when>
+					<otherwise>
+						<set path='/systems/flight-director/hints/lateral-hint' value=''/>
+					</otherwise>
+				</choose>
+			</observe>
+			<observe var='fd-vertical-mode'>
+				<choose>
+					<when var='fd-vertical-mode' equals='1'>
+						<set path='/systems/flight-director/hints/vertical-hint' value='ALT HOLD'/>
+					</when>
+					<when var='fd-vertical-mode' equals='2'>
+						<set path='/systems/flight-director/hints/vertical-hint' value='V/SPD'/>
+					</when>
+					<when var='fd-vertical-mode' equals='3'>
+						<set path='/systems/flight-director/hints/vertical-hint' value='FPA'/>
+					</when>
+					<otherwise>
+						<set path='/systems/flight-director/hints/vertical-hint' value=''/>
+					</otherwise>
+				</choose>
+			</observe>
 		</module>
 		<module name='systems/lookahead'>
 			<input>/systems/fms/output/altitude/amsl.ft</input>
 			<output>/systems/fms/output/altitude/amsl-lookahead.ft</output>
 			<smoothing>500</smoothing>
-			<minimum-integration-time>0.01</minimum-integration-time>
+			<minimum-integration-time>0.03</minimum-integration-time>
 			<properties>
 				<property name='lookahead-time' path='/systems/fms/settings/altitude/amsl-lookahead-duration.s' default='10'/>
 			</properties>
@@ -221,28 +272,26 @@
 			<properties>
 				<directory path='/systems/flight-director/settings'>
 					<property name='enabled' path='/enabled' default='false'/>
+					<property name='lateral-mode' path='/lateral-mode' default='0'/>
+					<property name='vertical-mode' path='/vertical-mode' default='0'/>
+					<property name='selected-magnetic-heading' path='/magnetic-heading-and-track.deg' default='0'/>
+					<property name='selected-magnetic-track' path='/magnetic-heading-and-track.deg' default='0'/>
+					<property name='selected-altitude' path='/altitude.ft' default='0'/>
+					<property name='selected-vertical-speed' path='/vertical-speed.fpm' default='0'/>
+					<property name='selected-fpa' path='/fpa.deg' default='-3'/>
+				</directory>
+				<directory path='/systems/flight-director/configuration'>
 					<property name='pitch-limit' path='/pitch-limit.deg' default='7'/>
 					<property name='roll-limit' path='/roll-limit.deg' default='25'/>
-					<property name='vertical-mode' path='/vertical-mode' default='0'/>
-					<property name='pitch-axis-dead-zone' path='/input/main/dead-zone/1' default='0.05'/>
-					<property name='roll-axis-dead-zone' path='/input/main/dead-zone/0' default='0.05'/>
-					<property name='max-pitch-angle' path='/max-pitch-angle.deg' default='15'/>
-					<property name='max-roll-angle' path='/max-roll-angle.deg' default='25'/>
-					<property name='selected-ias' path='/ias.kt'/>
-					<property name='selected-altitude' path='/altitude.ft'/>
-					<property name='selected-climb-rate' path='/cbr.fpm'/>
-					<property name='selected-mag-heading' path='/heading.deg'/>
 				</directory>
 				<directory path='/'>
-					<property name='measured-mag-heading' path='/sensors/compass/magnetic-heading.deg'/>
-					<property name='measured-altitude' path='/systems/fms/altitude/amsl.ft'/>
-					<property name='measured-climb-rate' path='/systems/fms/altitude/climb-rate.fpm'/>
+					<property name='measured-magnetic-heading' path='/sensors/compass/magnetic-heading.deg'/>
+					<property name='measured-magnetic-track' path='/systems/fms/output/flight-path/magnetic-track.deg'/>
+					<property name='measured-altitude' path='/systems/fms/output/altitude/amsl.ft'/>
+					<property name='measured-vertical-speed' path='/systems/fms/output/altitude/vertical-speed.fpm'/>
+					<property name='measured-fpa' path='/systems/fms/output/flight-path/alpha.deg'/>
 					<property name='measured-pitch' path='/sensors/imu/pitch.deg'/>
 					<property name='measured-roll' path='/sensors/imu/roll.deg'/>
-				</directory>
-				<directory path='/input'>
-					<property name='input-pitch-axis' path='//input/main/axis/1'/>
-					<property name='input-roll-axis' path='//input/main/axis/0'/>
 				</directory>
 				<directory path='/systems/flight-director'>
 					<property name='output-pitch' path='/pitch.deg'/>

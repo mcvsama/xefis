@@ -51,7 +51,7 @@
 										<property name='magnetic-track' path='/flight-path/magnetic-track.deg'/>
 										<property name='altitude' path='/altitude/amsl.ft'/>
 										<property name='altitude-lookahead' path='/altitude/amsl-lookahead.ft'/>
-										<property name='cbr' path='/altitude/climb-rate.fpm'/>
+										<property name='cbr' path='/altitude/vertical-speed.fpm'/>
 										<property name='vertical-deviation' path='/localizer/vertical-deviation.deg'/>
 										<property name='lateral-deviation' path='/localizer/lateral-deviation.deg'/>
 										<property name='dme-distance' path='/localizer/distance.nm'/>
@@ -67,17 +67,17 @@
 										<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
 									</directory>
 									<directory path='/systems/flight-director/settings'>
-										<property name='autopilot-setting-ias' path='/ias.kt'/>
+										<property name='autopilot-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
 										<property name='autopilot-setting-altitude' path='/altitude.ft'/>
-										<property name='autopilot-setting-cbr' path='/cbr.fpm'/>
+										<property name='autopilot-setting-cbr' path='/vertical-speed.fpm'/>
 									</directory>
 									<directory path='/systems/flight-director'>
-										<property name='autopilot-speed-hint' path='/hints/speed-hint' default='SPD'/>
+										<property name='autopilot-speed-hint' path='/hints/speed-hint' default=''/>
 										<property name='autopilot-speed-small-hint' path='/hints/speed-small-hint' default=''/>
-										<property name='autopilot-lateral-hint' path='/hints/lateral-hint' default='HDG HOLD'/>
-										<property name='autopilot-lateral-small-hint' path='/hints/lateral-small-hint' default='LOC'/>
-										<property name='autopilot-vertical-hint' path='/hints/vertical-hint' default='V/S'/>
-										<property name='autopilot-vertical-small-hint' path='/hints/vertical-small-hint' default='G/S'/>
+										<property name='autopilot-lateral-hint' path='/hints/lateral-hint' default=''/>
+										<property name='autopilot-lateral-small-hint' path='/hints/lateral-small-hint' default=''/>
+										<property name='autopilot-vertical-hint' path='/hints/vertical-hint' default=''/>
+										<property name='autopilot-vertical-small-hint' path='/hints/vertical-small-hint' default=''/>
 										<property name='flight-director-pitch' path='/pitch.deg'/>
 										<property name='flight-director-roll' path='/roll.deg'/>
 									</directory>
@@ -114,7 +114,7 @@
 									</directory>
 									<directory path='/systems/flight-director'>
 										<property name='autopilot-track-visible' path='/settings/enabled'/>
-										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
+										<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 									<property name='display-track' path='//systems/fms/settings/follow-track'/>
@@ -150,9 +150,9 @@
 									<directory path='/sensors'>
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
-									<directory path='/systems/autopilot'>
+									<directory path='/systems/flight-director'>
 										<property name='autopilot-track-visible' path='/settings/enabled'/>
-										<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
+										<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 									<property name='display-track' path='//systems/fms/settings/follow-track'/>

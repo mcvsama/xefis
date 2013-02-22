@@ -55,15 +55,15 @@
 						<property name='flight-path-marker-beta' path='/output/flight-path/beta.deg'/>
 						<property name='magnetic-track' path='/output/flight-path/magnetic-track.deg'/>
 						<property name='orientation-true-heading' path='/output/orientation/true-heading.deg'/>
-						<property name='cbr' path='/output/altitude/climb-rate.fpm'/>
+						<property name='cbr' path='/output/altitude/vertical-speed.fpm'/>
 						<property name='altitude' path='/output/altitude/amsl.ft'/>
 					</directory>
 					<directory path='/systems/flight-director'>
 						<!-- Emulate some of the AP settings -->
 						<property name='autopilot-setting-altitude' path='/settings/altitude.ft'/>
-						<property name='autopilot-setting-ias' path='/settings/ias.kt'/>
-						<property name='autopilot-setting-heading' path='/settings/heading.deg'/>
-						<property name='autopilot-setting-cbr' path='/settings/cbr.fpm'/>
+						<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
+						<property name='autopilot-setting-cbr' path='/settings/vertical-speed.fpm'/>
+						<property name='autopilot-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
 					</directory>
 				</properties>
 			</input>
