@@ -30,10 +30,19 @@
 class FlightDirector: public Xefis::Module
 {
   public:
+	enum LateralMode
+	{
+		LateralDisabled		= 0,
+		FollowHeading		= 1,
+		FollowTrack			= 2
+	};
+
 	enum VerticalMode
 	{
-		AltitudeSet		= 0,
-		ClimbRateSet	= 1
+		VerticalDisabled	= 0,
+		AltitudeHold		= 1,
+		VerticalSpeed		= 2,
+		FlightPathAngle		= 3
 	};
 
   public:
@@ -45,22 +54,29 @@ class FlightDirector: public Xefis::Module
 	data_updated() override;
 
   private:
-	Xefis::PID<float>		_heading_pid;
+	Xefis::PID<float>		_magnetic_heading_pid;
+	Xefis::PID<float>		_magnetic_track_pid;
 	Xefis::PID<float>		_altitude_pid;
-	Xefis::PID<float>		_cbr_pid;
+	Xefis::PID<float>		_vertical_speed_pid;
+	Xefis::PID<float>		_fpa_pid;
 	Xefis::Timestamp		_dt;
 	// Input:
 	// TODO PID params as settings:
 	Xefis::PropertyBoolean	_enabled;
+	Xefis::PropertyInteger	_lateral_mode;
+	Xefis::PropertyInteger	_vertical_mode;
 	Xefis::PropertyFloat	_pitch_limit_deg;
 	Xefis::PropertyFloat	_roll_limit_deg;
-	Xefis::PropertyFloat	_selected_mag_heading_deg;
+	Xefis::PropertyFloat	_selected_magnetic_heading_deg;
+	Xefis::PropertyFloat	_selected_magnetic_track_deg;
 	Xefis::PropertyFloat	_selected_altitude_ft;
-	Xefis::PropertyFloat	_selected_cbr_fpm;
-	Xefis::PropertyInteger	_vertical_mode;
-	Xefis::PropertyFloat	_measured_mag_heading_deg;
+	Xefis::PropertyFloat	_selected_vertical_speed_fpm;
+	Xefis::PropertyFloat	_selected_fpa_deg;
+	Xefis::PropertyFloat	_measured_magnetic_heading_deg;
+	Xefis::PropertyFloat	_measured_magnetic_track_deg;
 	Xefis::PropertyFloat	_measured_altitude_ft;
-	Xefis::PropertyFloat	_measured_cbr_fpm;
+	Xefis::PropertyFloat	_measured_vertical_speed_fpm;
+	Xefis::PropertyFloat	_measured_fpa_deg;
 	// Output:
 	Xefis::PropertyFloat	_output_pitch_deg;
 	Xefis::PropertyFloat	_output_roll_deg;
