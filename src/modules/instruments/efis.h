@@ -71,14 +71,14 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat	_roll_deg;
 	Xefis::PropertyFloat	_pitch_limit_deg;
 	Xefis::PropertyFloat	_roll_limit_deg;
-	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_magnetic_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_slip_skid_limit_g;
 	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
 	Xefis::PropertyFloat	_fpm_beta_deg;
-	Xefis::PropertyFloat	_mag_track_deg;
+	Xefis::PropertyFloat	_magnetic_track_deg;
 	Xefis::PropertyFloat	_altitude_ft;
 	Xefis::PropertyFloat	_altitude_lookahead_ft;
 	Xefis::PropertyFloat	_altitude_agl_ft;

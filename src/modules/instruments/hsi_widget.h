@@ -296,10 +296,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	/**
 	 * Set wind information.
-	 * \param	wind_mag_heading Direction from which wind comes.
+	 * \param	wind_magnetic_heading Direction from which wind comes.
 	 */
 	void
-	set_wind_information (Angle wind_from_mag_heading, Knots wind_tas_speed);
+	set_wind_information (Angle wind_from_magnetic_heading, Knots wind_tas_speed);
 
 	/**
 	 * Set wind information visibility.
@@ -491,16 +491,16 @@ class HSIWidget: public Xefis::InstrumentWidget
 	DisplayMode				_display_mode				= DisplayMode::Expanded;
 	HeadingMode				_heading_mode				= HeadingMode::Magnetic;
 	Length					_range						= 1_nm;
-	Angle					_mag_heading				= 0_deg;
+	Angle					_magnetic_heading			= 0_deg;
 	Angle					_true_heading				= 0_deg;
 	Angle					_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_heading_visible			= false;
 	Angle					_rotation					= 0_deg;
-	Angle					_ap_mag_heading				= 0_deg;
+	Angle					_ap_magnetic_heading		= 0_deg;
 	Angle					_ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
 	bool					_ap_heading_visible			= false;
 	bool					_ap_track_visible			= false;
-	Angle					_mag_track					= 0_deg;
+	Angle					_magnetic_track				= 0_deg;
 	Angle					_true_track					= 0_deg; // Computed.
 	Angle					_track						= 0_deg; // Mag or true, depending on heading mode.
 	bool					_track_visible				= false;
@@ -516,7 +516,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	Length					_trend_vector_lookahead		= 5_nm;
 	Length					_altitude_reach_distance	= 0_nm;
 	bool					_altitude_reach_visible		= false;
-	Angle					_wind_from_mag_heading		= 0_deg;
+	Angle					_wind_from_magnetic_heading	= 0_deg;
 	Knots					_wind_tas_speed				= 0.f;
 	bool					_wind_information_visible	= false;
 	LonLat					_position					= { 0_deg, 0_deg };
@@ -581,14 +581,14 @@ HSIWidget::set_true_heading (Angle degrees)
 inline Angle
 HSIWidget::magnetic_heading() const
 {
-	return _mag_heading;
+	return _magnetic_heading;
 }
 
 
 inline void
 HSIWidget::set_magnetic_heading (Angle degrees)
 {
-	_mag_heading = degrees;
+	_magnetic_heading = degrees;
 	update();
 }
 
@@ -619,14 +619,14 @@ HSIWidget::set_heading_visible (bool visible)
 inline Angle
 HSIWidget::ap_magnetic_heading() const
 {
-	return _ap_mag_heading;
+	return _ap_magnetic_heading;
 }
 
 
 inline void
 HSIWidget::set_ap_magnetic_heading (Angle heading)
 {
-	_ap_mag_heading = heading;
+	_ap_magnetic_heading = heading;
 	update();
 }
 
@@ -650,14 +650,14 @@ HSIWidget::set_ap_track_visible (bool visible)
 inline Angle
 HSIWidget::magnetic_track() const
 {
-	return _mag_track;
+	return _magnetic_track;
 }
 
 
 inline void
 HSIWidget::set_magnetic_track (Angle track)
 {
-	_mag_track = track;
+	_magnetic_track = track;
 	update();
 }
 
@@ -803,9 +803,9 @@ HSIWidget::set_altitude_reach_visible (bool visible)
 
 
 inline void
-HSIWidget::set_wind_information (Angle wind_from_mag_heading, Knots wind_tas_speed)
+HSIWidget::set_wind_information (Angle wind_from_magnetic_heading, Knots wind_tas_speed)
 {
-	_wind_from_mag_heading = wind_from_mag_heading;
+	_wind_from_magnetic_heading = wind_from_magnetic_heading;
 	_wind_tas_speed = wind_tas_speed;
 	update();
 }

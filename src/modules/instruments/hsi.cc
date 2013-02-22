@@ -45,7 +45,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "cbr", _cbr_fpm, false },
 				{ "altitude", _altitude_ft, false },
 				{ "target-altitude", _target_altitude_ft, false },
-				{ "orientation-magnetic-heading", _mag_heading_deg, false },
+				{ "orientation-magnetic-heading", _magnetic_heading_deg, false },
 				{ "orientation-true-heading", _true_heading_deg, false },
 				{ "use-true-heading", _use_true_heading, false },
 				{ "display-track", _display_track, false },
@@ -56,7 +56,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "position-latitude", _position_lat_deg, false },
 				{ "position-longitude", _position_lon_deg, false },
 				{ "position-source", _positioning_hint, false },
-				{ "wind-from-mag-heading", _wind_from_mag_heading_deg, false },
+				{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
 				{ "wind-tas", _wind_tas_kt, false },
 				{ "localizer-id", _localizer_id, false }
 			});
@@ -104,9 +104,9 @@ HSI::read()
 			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Auxiliary);
 	}
 
-	_hsi_widget->set_heading_visible (_mag_heading_deg.valid());
-	if (_mag_heading_deg.valid())
-		_hsi_widget->set_magnetic_heading (1_deg * *_mag_heading_deg);
+	_hsi_widget->set_heading_visible (_magnetic_heading_deg.valid());
+	if (_magnetic_heading_deg.valid())
+		_hsi_widget->set_magnetic_heading (1_deg * *_magnetic_heading_deg);
 
 	_hsi_widget->set_navaids_visible (_true_heading_deg.valid());
 	if (_true_heading_deg.valid())
@@ -144,10 +144,10 @@ HSI::read()
 	if (_positioning_hint.valid())
 		_hsi_widget->set_positioning_hint ((*_positioning_hint).c_str());
 
-	if (_wind_from_mag_heading_deg.valid() && _wind_tas_kt.valid())
+	if (_wind_from_magnetic_heading_deg.valid() && _wind_tas_kt.valid())
 	{
 		_hsi_widget->set_wind_information_visible (true);
-		_hsi_widget->set_wind_information (1_deg * *_wind_from_mag_heading_deg, *_wind_tas_kt);
+		_hsi_widget->set_wind_information (1_deg * *_wind_from_magnetic_heading_deg, *_wind_tas_kt);
 	}
 	else
 		_hsi_widget->set_wind_information_visible (false);

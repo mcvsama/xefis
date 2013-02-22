@@ -91,7 +91,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_mach;
 	Xefis::PropertyFloat	_pitch_deg;
 	Xefis::PropertyFloat	_roll_deg;
-	Xefis::PropertyFloat	_mag_heading_deg;
+	Xefis::PropertyFloat	_magnetic_heading_deg;
 	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_fpm_alpha_deg;
@@ -120,7 +120,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lng_deg;
 	Xefis::PropertyFloat	_position_sea_level_radius_ft;
-	Xefis::PropertyFloat	_wind_from_mag_heading_deg;
+	Xefis::PropertyFloat	_wind_from_magnetic_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
 	// Output:
 	Xefis::PropertyFloat	_ailerons;
