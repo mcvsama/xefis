@@ -1603,9 +1603,10 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 		float h = 0.05f * wh();
 		float p = 1.3f;
 		float offset = 0.5f * limit (_lateral_deviation_deg, -2_deg, +2_deg).deg();
+		float ypos = -pitch_to_px (limit (_pitch + _runway_position, 0_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
-		painter.translate (0.f, 0.26f * wh());
+		painter.translate (0.f, ypos);
 
 		QPointF tps[] = { QPointF (-w, 0.f), QPointF (0.f, 0.f), QPointF (+w, 0.f) };
 		QPointF bps[] = { QPointF (-w * p, h), QPointF (0.f, h), QPointF (+w * p, h) };
