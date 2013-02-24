@@ -66,6 +66,7 @@ Services::initialize()
 		if (font_info.exactMatch())
 		{
 			_instrument_font = font;
+			_instrument_font.setBold (true);
 			found = true;
 			break;
 		}
@@ -73,7 +74,10 @@ Services::initialize()
 
 	// Failsafe: Roboto
 	if (!found)
+	{
 		_instrument_font = QFont ("Roboto");
+		_instrument_font.setBold (true);
+	}
 
 	_instrument_font.setHintingPreference (QFont::PreferNoHinting);
 }

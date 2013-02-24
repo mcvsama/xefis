@@ -82,27 +82,23 @@ InstrumentWidget::update_sizes()
 
 	_font_10_bold = _font;
 	_font_10_bold.setPixelSize (font_size (10.f));
-	_font_10_bold.setBold (true);
 	_font_10_digit_width = get_digit_width (_font_10_bold);
 	_font_10_digit_height = font_height_scale_factor * QFontMetrics (_font_10_bold).height();
 
 	_font_13_bold = _font;
 	_font_13_bold.setPixelSize (font_size (13.f));
-	_font_13_bold.setBold (true);
 	_font_13_digit_width = get_digit_width (_font_13_bold);
 	_font_13_digit_height = QFontMetrics (_font_13_bold).height();
 	_font_13_digit_height = font_height_scale_factor * QFontMetrics (_font_13_bold).height();
 
 	_font_16_bold = _font;
 	_font_16_bold.setPixelSize (font_size (16.f));
-	_font_16_bold.setBold (true);
 	_font_16_digit_width = get_digit_width (_font_16_bold);
 	_font_16_digit_height = QFontMetrics (_font_16_bold).height();
 	_font_16_digit_height = font_height_scale_factor * QFontMetrics (_font_16_bold).height();
 
 	_font_20_bold = _font;
 	_font_20_bold.setPixelSize (font_size (20.f));
-	_font_20_bold.setBold (true);
 	_font_20_digit_width = get_digit_width (_font_20_bold);
 	_font_20_digit_height = QFontMetrics (_font_20_bold).height();
 	_font_20_digit_height = font_height_scale_factor * QFontMetrics (_font_20_bold).height();
