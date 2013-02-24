@@ -97,9 +97,10 @@ EFISWidget::paintEvent (QPaintEvent*)
 	{
 		adi_paint (painter, text_painter);
 
-		paint_center_cross (painter);
+		paint_center_cross (painter, false, true);
 		paint_flight_director (painter);
 		paint_control_stick (painter);
+		paint_center_cross (painter, true, false);
 		paint_altitude_agl (painter, text_painter);
 		paint_baro_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
@@ -1325,16 +1326,9 @@ EFISWidget::scale_cbr (FeetPerMinute climb_rate) const
 
 
 void
-EFISWidget::paint_center_cross (QPainter& painter)
+EFISWidget::paint_center_cross (QPainter& painter, bool center_box, bool rest)
 {
 	float const w = wh() * 3.f / 9.f;
-
-	QPen white_pen = get_pen (QColor (255, 255, 255), 1.5f);
-
-	painter.setClipping (false);
-	painter.setTransform (_center_transform);
-	painter.setPen (white_pen);
-	painter.setBrush (QBrush (QColor (0, 0, 0)));
 
 	QPointF x (0.025f * w, 0.f);
 	QPointF y (0.f, 0.025f * w);
@@ -1351,10 +1345,26 @@ EFISWidget::paint_center_cross (QPainter& painter)
 		<< -13.f * x + y
 		<< -27.f * x + y;
 
-	painter.drawPolygon (a);
-	painter.drawPolygon (b);
-	painter.scale (-1.f, 1.f);
-	painter.drawPolygon (b);
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+
+	if (rest)
+	{
+		painter.setBrush (QBrush (QColor (0, 0, 0)));
+		painter.setPen (Qt::NoPen);
+		painter.drawPolygon (a);
+		painter.setPen (get_pen (Qt::white, 1.5f));
+		painter.drawPolygon (b);
+		painter.scale (-1.f, 1.f);
+		painter.drawPolygon (b);
+	}
+
+	if (center_box)
+	{
+		painter.setPen (get_pen (Qt::white, 1.5f));
+		painter.setBrush (Qt::NoBrush);
+		painter.drawPolygon (a);
+	}
 }
 
 

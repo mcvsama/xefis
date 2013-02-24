@@ -973,7 +973,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 
 	void
-	paint_center_cross (QPainter&);
+	paint_center_cross (QPainter&, bool center_box, bool rest);
 
 	void
 	paint_flight_director (QPainter&);
