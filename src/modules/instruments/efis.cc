@@ -279,9 +279,12 @@ EFIS::read()
 	{
 		_efis_widget->set_approach_hint (_approach_type_hint.read ("").c_str());
 		_efis_widget->set_approach_reference_visible (true);
-		_efis_widget->set_runway_visible (_lateral_deviation_deg.valid() &&
-										  _altitude_agl_ft.valid() &&
-										  *_altitude_agl_ft <= 150.f);
+		if (_altitude_agl_ft.valid())
+		{
+			_efis_widget->set_runway_visible (_lateral_deviation_deg.valid() &&
+											  *_altitude_agl_ft <= 1000.f);
+			_efis_widget->set_runway_position (limit<float> (*_altitude_agl_ft, 0.f, 250.f) / 250.f * 25_deg);
+		}
 	}
 	else
 	{

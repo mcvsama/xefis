@@ -674,6 +674,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_runway_visible (bool visible);
 
 	/**
+	 * Set runway position relative to the horizon.
+	 */
+	void
+	set_runway_position (Angle position);
+
+	/**
 	 * Return nav hint.
 	 */
 	QString
@@ -1194,6 +1200,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	Angle				_lateral_deviation_deg			= 0_deg;
 	bool				_lateral_deviation_visible		= false;
 	bool				_runway_visible					= false;
+	Angle				_runway_position				= 0_deg;
 	QString				_approach_hint;
 	Length				_dme_distance					= 0_nm;
 	bool				_dme_distance_visible			= false;
@@ -2024,6 +2031,14 @@ inline void
 EFISWidget::set_runway_visible (bool visible)
 {
 	_runway_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_runway_position (Angle position)
+{
+	_runway_position = position;
 	update();
 }
 
