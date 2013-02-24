@@ -94,7 +94,7 @@
 			<observe var='mode-1'>
 				<if var='mode-1' equals='true'>
 					<set path='/instruments/efis/control/hint-visible' value='true'/>
-					<set path='/instruments/efis/control/hint' value='CMD'/>
+					<set path='/instruments/efis/control/hint' value='DIRECT'/>
 					<set path='/instruments/efis/control-stick/visible' value='false'/>
 					<set path='/systems/flight-director/settings/enabled' value='false'/>
 					<set path='/systems/fly-by-wire/config/mode' value='0'/>
@@ -111,7 +111,7 @@
 			<observe var='mode-3'>
 				<if var='mode-3' equals='true'>
 					<set path='/instruments/efis/control/hint-visible' value='true'/>
-					<set path='/instruments/efis/control/hint' value='FLT DIR'/>
+					<set path='/instruments/efis/control/hint' value='CMD'/>
 					<set path='/systems/flight-director/settings/enabled' value='true'/>
 					<set path='/instruments/efis/control-stick/visible' value='false'/>
 					<set path='/systems/fly-by-wire/config/mode' value='2'/>

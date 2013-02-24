@@ -88,13 +88,13 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "dme-distance", _dme_distance_nm, false },
 				{ "control-hint-visible", _control_hint_visible, false },
 				{ "control-hint", _control_hint, false },
-				{ "autopilot-hints-visible", _ap_hints_visible, false },
-				{ "autopilot-speed-hint", _ap_speed_hint, false },
-				{ "autopilot-speed-small-hint", _ap_speed_small_hint, false },
-				{ "autopilot-lateral-hint", _ap_lateral_hint, false },
-				{ "autopilot-lateral-small-hint", _ap_lateral_small_hint, false },
-				{ "autopilot-vertical-hint", _ap_vertical_hint, false },
-				{ "autopilot-vertical-small-hint", _ap_vertical_small_hint, false },
+				{ "fma-visible", _fma_visible, false },
+				{ "fma-speed-hint", _fma_speed_hint, false },
+				{ "fma-speed-small-hint", _fma_speed_small_hint, false },
+				{ "fma-lateral-hint", _fma_lateral_hint, false },
+				{ "fma-lateral-small-hint", _fma_lateral_small_hint, false },
+				{ "fma-vertical-hint", _fma_vertical_hint, false },
+				{ "fma-vertical-small-hint", _fma_vertical_small_hint, false },
 				{ "localizer-id", _localizer_id, false }
 			});
 		}
@@ -320,12 +320,12 @@ EFIS::read()
 	_efis_widget->set_control_hint_visible (_control_hint_visible.read (false));
 	_efis_widget->set_control_hint (_control_hint.read ("").c_str());
 
-	_efis_widget->set_ap_hints_visible (_ap_hints_visible.read (false));
-	_efis_widget->set_ap_speed_hint (_ap_speed_hint.read ("").c_str());
-	_efis_widget->set_ap_speed_small_hint (_ap_speed_small_hint.read ("").c_str());
-	_efis_widget->set_ap_lateral_hint (_ap_lateral_hint.read ("").c_str());
-	_efis_widget->set_ap_lateral_small_hint (_ap_lateral_small_hint.read ("").c_str());
-	_efis_widget->set_ap_vertical_hint (_ap_vertical_hint.read ("").c_str());
-	_efis_widget->set_ap_vertical_small_hint (_ap_vertical_small_hint.read ("").c_str());
+	_efis_widget->set_fma_visible (_fma_visible.read (false));
+	_efis_widget->set_fma_speed_hint (_fma_speed_hint.read ("").c_str());
+	_efis_widget->set_fma_speed_small_hint (_fma_speed_small_hint.read ("").c_str());
+	_efis_widget->set_fma_lateral_hint (_fma_lateral_hint.read ("").c_str());
+	_efis_widget->set_fma_lateral_small_hint (_fma_lateral_small_hint.read ("").c_str());
+	_efis_widget->set_fma_vertical_hint (_fma_vertical_hint.read ("").c_str());
+	_efis_widget->set_fma_vertical_small_hint (_fma_vertical_small_hint.read ("").c_str());
 }
 
