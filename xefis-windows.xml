@@ -32,7 +32,7 @@
 										<property name='pressure-display-hpa' path='//systems/fms/settings/pressure-display-hpa'/>
 										<property name='standard-pressure' path='//systems/fms/settings/standard-pressure-on'/>
 										<property name='autopilot-visible' path='/autopilot/visible' default='true'/>
-										<property name='autopilot-hints-visible' path='/autopilot/hints-visible' default='true'/>
+										<property name='fma-visible' path='/autopilot/fma-visible' default='true'/>
 										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
 										<property name='control-stick-visible' path='/control-stick/visible' default='true'/>
 										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
@@ -72,12 +72,12 @@
 										<property name='autopilot-setting-cbr' path='/vertical-speed.fpm'/>
 									</directory>
 									<directory path='/systems/flight-director'>
-										<property name='autopilot-speed-hint' path='/hints/speed-hint' default=''/>
-										<property name='autopilot-speed-small-hint' path='/hints/speed-small-hint' default=''/>
-										<property name='autopilot-lateral-hint' path='/hints/lateral-hint' default=''/>
-										<property name='autopilot-lateral-small-hint' path='/hints/lateral-small-hint' default=''/>
-										<property name='autopilot-vertical-hint' path='/hints/vertical-hint' default=''/>
-										<property name='autopilot-vertical-small-hint' path='/hints/vertical-small-hint' default=''/>
+										<property name='fma-speed-hint' path='/hints/speed-hint' default=''/>
+										<property name='fma-speed-small-hint' path='/hints/speed-small-hint' default=''/>
+										<property name='fma-lateral-hint' path='/hints/lateral-hint' default=''/>
+										<property name='fma-lateral-small-hint' path='/hints/lateral-small-hint' default=''/>
+										<property name='fma-vertical-hint' path='/hints/vertical-hint' default=''/>
+										<property name='fma-vertical-small-hint' path='/hints/vertical-small-hint' default=''/>
 										<property name='flight-director-pitch' path='/pitch.deg'/>
 										<property name='flight-director-roll' path='/roll.deg'/>
 									</directory>

@@ -1646,7 +1646,7 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		text_painter.drawText (QPointF (0.f, -2.85f * q), Qt::AlignBottom | Qt::AlignHCenter, _control_hint);
 	}
 
-	if (_ap_hints_visible)
+	if (_fma_visible)
 	{
 		QRectF rect (0.f, 0.f, 6.3f * q, 0.65f * q);
 		centrify (rect);
@@ -1670,13 +1670,13 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		painter.drawLine (QPointF (x46, rect.top()), QPointF (x46, rect.bottom()));
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		painter.setFont (_font_13_bold);
-		text_painter.drawText (QPointF (x16, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_speed_hint);
-		text_painter.drawText (QPointF (x36, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_lateral_hint);
-		text_painter.drawText (QPointF (x56, y13), Qt::AlignVCenter | Qt::AlignHCenter, _ap_vertical_hint);
+		text_painter.drawText (QPointF (x16, y13), Qt::AlignVCenter | Qt::AlignHCenter, _fma_speed_hint);
+		text_painter.drawText (QPointF (x36, y13), Qt::AlignVCenter | Qt::AlignHCenter, _fma_lateral_hint);
+		text_painter.drawText (QPointF (x56, y13), Qt::AlignVCenter | Qt::AlignHCenter, _fma_vertical_hint);
 		painter.setFont (_font_10_bold);
-		text_painter.drawText (QPointF (x16, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_speed_small_hint);
-		text_painter.drawText (QPointF (x36, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_lateral_small_hint);
-		text_painter.drawText (QPointF (x56, y23), Qt::AlignVCenter | Qt::AlignHCenter, _ap_vertical_small_hint);
+		text_painter.drawText (QPointF (x16, y23), Qt::AlignVCenter | Qt::AlignHCenter, _fma_speed_small_hint);
+		text_painter.drawText (QPointF (x36, y23), Qt::AlignVCenter | Qt::AlignHCenter, _fma_lateral_small_hint);
+		text_painter.drawText (QPointF (x56, y23), Qt::AlignVCenter | Qt::AlignHCenter, _fma_vertical_small_hint);
 	}
 }
 
