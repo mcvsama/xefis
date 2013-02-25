@@ -1080,10 +1080,10 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		}
 
 		// AP bug:
-		if (_ap_altitude_visible)
+		if (_cmd_altitude_visible)
 		{
-			float ap_altitude = limit (_ap_altitude, -99999.f, +99999.f);
-			float posy = limit (ft_to_px (ap_altitude),
+			float cmd_altitude = limit (_cmd_altitude, -99999.f, +99999.f);
+			float posy = limit (ft_to_px (cmd_altitude),
 								static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
 				<< QPointF (0.f, 0.f)
@@ -1128,12 +1128,12 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	}
 
 	// Climb rate bug:
-	if (_ap_climb_rate_visible && _climb_rate_visible)
+	if (_cmd_climb_rate_visible && _climb_rate_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_al_transform);
 		painter.translate (4.15f * x, 0.f);
-		float posy = -8.f * x * scale_cbr (_ap_climb_rate);
+		float posy = -8.f * x * scale_cbr (_cmd_climb_rate);
 		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 		{
 			painter.setPen (pen);
@@ -1257,10 +1257,10 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 void
 EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_ap_altitude_visible)
+	if (!_cmd_altitude_visible)
 		return;
 
-	float ap_altitude = limit (_ap_altitude, -99999.f, +99999.f);
+	float cmd_altitude = limit (_cmd_altitude, -99999.f, +99999.f);
 
 	QFont b_font = _font_20_bold;
 	float const b_digit_width = _font_20_digit_width;
@@ -1291,16 +1291,16 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = ap_altitude < 0.f ? MINUS_SIGN : "";
+	QString minus_sign_s = cmd_altitude < 0.f ? MINUS_SIGN : "";
 	text_painter.drawText (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-						   minus_sign_s + QString::number (std::abs (static_cast<int> (ap_altitude / 1000))));
+						   minus_sign_s + QString::number (std::abs (static_cast<int> (cmd_altitude / 1000))));
 
 	painter.setFont (s_font);
 
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	text_painter.drawText (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-						   QString ("%1").arg (static_cast<int> (std::abs (ap_altitude)) % 1000, 3, 'f', 0, '0'));
+						   QString ("%1").arg (static_cast<int> (std::abs (cmd_altitude)) % 1000, 3, 'f', 0, '0'));
 }
 
 

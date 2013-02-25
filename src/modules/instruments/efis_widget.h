@@ -508,37 +508,37 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return autopilot altitude.
 	 */
 	Feet
-	ap_altitude() const;
+	cmd_altitude() const;
 
 	/**
 	 * Set autopilot altitude.
 	 */
 	void
-	set_ap_altitude (Feet);
+	set_cmd_altitude (Feet);
 
 	/**
 	 * Set AP altitude setting visibility.
 	 */
 	void
-	set_ap_altitude_visible (bool visible);
+	set_cmd_altitude_visible (bool visible);
 
 	/**
 	 * Return autopilot climb rate setting.
 	 */
 	FeetPerMinute
-	ap_climb_rate() const;
+	cmd_climb_rate() const;
 
 	/**
 	 * Set autopilot climb rate setting.
 	 */
 	void
-	set_ap_climb_rate (FeetPerMinute);
+	set_cmd_climb_rate (FeetPerMinute);
 
 	/**
 	 * Set AP climb rate visibility.
 	 */
 	void
-	set_ap_climb_rate_visible (bool visible);
+	set_cmd_climb_rate_visible (bool visible);
 
 	/**
 	 * Return autothrottle setting.
@@ -1181,10 +1181,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_warning_speed_visible			= false;
 	Knots				_maximum_speed					= 0.f;
 	bool				_maximum_speed_visible			= false;
-	Feet				_ap_altitude					= 0.f;
-	bool				_ap_altitude_visible			= false;
-	FeetPerMinute		_ap_climb_rate					= 0.f;
-	bool				_ap_climb_rate_visible			= false;
+	Feet				_cmd_altitude					= 0.f;
+	bool				_cmd_altitude_visible			= false;
+	FeetPerMinute		_cmd_climb_rate					= 0.f;
+	bool				_cmd_climb_rate_visible			= false;
 	Knots				_at_speed						= 0.f;
 	bool				_at_speed_visible				= false;
 	Angle				_flight_director_pitch			= 0_deg;
@@ -1821,47 +1821,47 @@ EFISWidget::set_maximum_speed_visible (bool visible)
 
 
 inline Feet
-EFISWidget::ap_altitude() const
+EFISWidget::cmd_altitude() const
 {
-	return _ap_altitude;
+	return _cmd_altitude;
 }
 
 
 inline void
-EFISWidget::set_ap_altitude (Feet feet)
+EFISWidget::set_cmd_altitude (Feet feet)
 {
-	_ap_altitude = feet;
+	_cmd_altitude = feet;
 	update();
 }
 
 
 inline void
-EFISWidget::set_ap_altitude_visible (bool visible)
+EFISWidget::set_cmd_altitude_visible (bool visible)
 {
-	_ap_altitude_visible = visible;
+	_cmd_altitude_visible = visible;
 	update();
 }
 
 
 inline FeetPerMinute
-EFISWidget::ap_climb_rate() const
+EFISWidget::cmd_climb_rate() const
 {
-	return _ap_climb_rate;
+	return _cmd_climb_rate;
 }
 
 
 inline void
-EFISWidget::set_ap_climb_rate (FeetPerMinute fpm)
+EFISWidget::set_cmd_climb_rate (FeetPerMinute fpm)
 {
-	_ap_climb_rate = fpm;
+	_cmd_climb_rate = fpm;
 	update();
 }
 
 
 inline void
-EFISWidget::set_ap_climb_rate_visible (bool visible)
+EFISWidget::set_cmd_climb_rate_visible (bool visible)
 {
-	_ap_climb_rate_visible = visible;
+	_cmd_climb_rate_visible = visible;
 	update();
 }
 
