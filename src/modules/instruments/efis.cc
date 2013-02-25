@@ -247,9 +247,9 @@ EFIS::read()
 	if (_autopilot_alt_setting_ft.valid())
 		_efis_widget->set_cmd_altitude (*_autopilot_alt_setting_ft);
 
-	_efis_widget->set_at_speed_visible (autopilot_visible && _autopilot_speed_setting_kt.valid());
+	_efis_widget->set_cmd_speed_visible (autopilot_visible && _autopilot_speed_setting_kt.valid());
 	if (_autopilot_speed_setting_kt.valid())
-		_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
+		_efis_widget->set_cmd_speed (*_autopilot_speed_setting_kt);
 
 	_efis_widget->set_cmd_climb_rate_visible (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
 	if (_autopilot_cbr_setting_fpm.valid())

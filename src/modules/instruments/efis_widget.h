@@ -20,6 +20,7 @@
 
 // Qt:
 #include <QtCore/QTimer>
+#include <QtCore/QDateTime>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtGui/QPainterPath>
@@ -544,19 +545,19 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Return autothrottle setting.
 	 */
 	Knots
-	at_speed() const;
+	cmd_speed() const;
 
 	/**
 	 * Set autothrottle speed.
 	 */
 	void
-	set_at_speed (Knots);
+	set_cmd_speed (Knots);
 
 	/**
 	 * Set AT speed visibility.
 	 */
 	void
-	set_at_speed_visible (bool visible);
+	set_cmd_speed_visible (bool visible);
 
 	/**
 	 * Return flight director alpha.
@@ -1054,6 +1055,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QColor
 	get_baro_color() const;
 
+	bool
+	is_newly_set (QDateTime const& timestamp) const;
+
   private:
 	QColor				_sky_color;
 	QColor				_ground_color;
@@ -1073,10 +1077,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_speed_blink					= false;
 	QTimer*				_baro_blinking_warning			= nullptr;
 	bool				_baro_blink						= false;
+	QDateTime			_current_datetime;
 
 	float				_w;
 	float				_h;
 	float				_max_w_h;
+	float				_q;
 
 	/*
 	 * ADI
@@ -1163,10 +1169,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_altitude_tendency_visible		= false;
 	Feet				_altitude_agl					= 0.f;
 	bool				_altitude_agl_visible			= false;
+	QDateTime			_altitude_agl_ts;
 	Feet				_landing_altitude				= 0.f;
 	bool				_landing_altitude_visible		= false;
 	Feet				_transition_altitude			= 0.f;
 	bool				_transition_altitude_visible	= false;
+	QDateTime			_transition_altitude_ts;
 	FeetPerMinute		_climb_rate						= 0.f;
 	bool				_climb_rate_visible				= false;
 	float				_mach							= 0.f;
@@ -1185,8 +1193,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_cmd_altitude_visible			= false;
 	FeetPerMinute		_cmd_climb_rate					= 0.f;
 	bool				_cmd_climb_rate_visible			= false;
-	Knots				_at_speed						= 0.f;
-	bool				_at_speed_visible				= false;
+	Knots				_cmd_speed						= 0.f;
+	bool				_cmd_speed_visible				= false;
 	Angle				_flight_director_pitch			= 0_deg;
 	bool				_flight_director_pitch_visible	= false;
 	Angle				_flight_director_roll			= 0_deg;
@@ -1209,13 +1217,20 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_localizer_info_visible			= false;
 	QString				_control_hint;
 	bool				_control_hint_visible			= false;
+	QDateTime			_control_hint_ts;
 	bool				_fma_visible					= false;
 	QString				_fma_speed_hint;
+	QDateTime			_fma_speed_ts;
 	QString				_fma_speed_small_hint;
+	QDateTime			_fma_speed_small_ts;
 	QString				_fma_lateral_hint;
+	QDateTime			_fma_lateral_ts;
 	QString				_fma_lateral_small_hint;
+	QDateTime			_fma_lateral_small_ts;
 	QString				_fma_vertical_hint;
+	QDateTime			_fma_vertical_ts;
 	QString				_fma_vertical_small_hint;
+	QDateTime			_fma_vertical_small_ts;
 	SpeedBugs			_speed_bugs;
 	AltitudeBugs		_altitude_bugs;
 };
@@ -1557,6 +1572,8 @@ EFISWidget::set_altitude_agl (Feet altitude)
 inline void
 EFISWidget::set_altitude_agl_visible (bool visible)
 {
+	if (!_altitude_agl_visible && visible)
+		_altitude_agl_ts = QDateTime::currentDateTime();
 	_altitude_agl_visible = visible;
 	update();
 }
@@ -1595,6 +1612,8 @@ EFISWidget::transition_altitude() const
 inline void
 EFISWidget::set_transition_altitude (Feet transition_altitude)
 {
+	if (_transition_altitude != transition_altitude)
+		_transition_altitude_ts = QDateTime::currentDateTime();
 	_transition_altitude = transition_altitude;
 	update();
 }
@@ -1603,6 +1622,8 @@ EFISWidget::set_transition_altitude (Feet transition_altitude)
 inline void
 EFISWidget::set_transition_altitude_visible (bool visible)
 {
+	if (_transition_altitude_visible != visible)
+		_transition_altitude_ts = QDateTime::currentDateTime();
 	_transition_altitude_visible = visible;
 	update();
 }
@@ -1867,24 +1888,24 @@ EFISWidget::set_cmd_climb_rate_visible (bool visible)
 
 
 inline Knots
-EFISWidget::at_speed() const
+EFISWidget::cmd_speed() const
 {
-	return _at_speed;
+	return _cmd_speed;
 }
 
 
 inline void
-EFISWidget::set_at_speed (Knots knots)
+EFISWidget::set_cmd_speed (Knots knots)
 {
-	_at_speed = knots;
+	_cmd_speed = knots;
 	update();
 }
 
 
 inline void
-EFISWidget::set_at_speed_visible (bool visible)
+EFISWidget::set_cmd_speed_visible (bool visible)
 {
-	_at_speed_visible = visible;
+	_cmd_speed_visible = visible;
 	update();
 }
 
@@ -2129,6 +2150,8 @@ EFISWidget::control_hint() const
 inline void
 EFISWidget::set_control_hint (QString const& hint)
 {
+	if (_control_hint != hint)
+		_control_hint_ts = QDateTime::currentDateTime();
 	_control_hint = hint;
 	update();
 }
@@ -2137,6 +2160,8 @@ EFISWidget::set_control_hint (QString const& hint)
 inline void
 EFISWidget::set_control_hint_visible (bool visible)
 {
+	if (_control_hint_visible != visible)
+		_control_hint_ts = QDateTime::currentDateTime();
 	_control_hint_visible = visible;
 	update();
 }
@@ -2160,6 +2185,8 @@ EFISWidget::fma_speed_hint() const
 inline void
 EFISWidget::set_fma_speed_hint (QString const& hint)
 {
+	if (_fma_speed_hint != hint)
+		_fma_speed_ts = QDateTime::currentDateTime();
 	_fma_speed_hint = hint;
 	update();
 }
@@ -2175,6 +2202,8 @@ EFISWidget::fma_speed_small_hint() const
 inline void
 EFISWidget::set_fma_speed_small_hint (QString const& hint)
 {
+	if (_fma_speed_small_hint != hint)
+		_fma_speed_small_ts = QDateTime::currentDateTime();
 	_fma_speed_small_hint = hint;
 	update();
 }
@@ -2190,6 +2219,8 @@ EFISWidget::fma_lateral_hint() const
 inline void
 EFISWidget::set_fma_lateral_hint (QString const& hint)
 {
+	if (_fma_lateral_hint != hint)
+		_fma_lateral_ts = QDateTime::currentDateTime();
 	_fma_lateral_hint = hint;
 	update();
 }
@@ -2205,6 +2236,8 @@ EFISWidget::fma_lateral_small_hint() const
 inline void
 EFISWidget::set_fma_lateral_small_hint (QString const& hint)
 {
+	if (_fma_lateral_small_hint != hint)
+		_fma_lateral_small_ts = QDateTime::currentDateTime();
 	_fma_lateral_small_hint = hint;
 	update();
 }
@@ -2220,6 +2253,8 @@ EFISWidget::fma_vertical_hint() const
 inline void
 EFISWidget::set_fma_vertical_hint (QString const& hint)
 {
+	if (_fma_vertical_hint != hint)
+		_fma_vertical_ts = QDateTime::currentDateTime();
 	_fma_vertical_hint = hint;
 	update();
 }
@@ -2235,6 +2270,8 @@ EFISWidget::fma_vertical_small_hint() const
 inline void
 EFISWidget::set_fma_vertical_small_hint (QString const& hint)
 {
+	if (_fma_vertical_small_hint != hint)
+		_fma_vertical_small_ts = QDateTime::currentDateTime();
 	_fma_vertical_small_hint = hint;
 	update();
 }
@@ -2311,6 +2348,13 @@ EFISWidget::get_baro_color() const
 	if (_baro_blinking_warning->isActive())
 		return _warning_color_2;
 	return _navigation_color;
+}
+
+
+inline bool
+EFISWidget::is_newly_set (QDateTime const& timestamp) const
+{
+	return timestamp.secsTo (_current_datetime) < 10.0;
 }
 
 #endif

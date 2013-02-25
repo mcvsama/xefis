@@ -233,9 +233,9 @@ HSIWidget::paintEvent (QPaintEvent*)
 
 	paint_navaids (painter, text_painter);
 	paint_altitude_reach (painter);
-	paint_ap_settings (painter, text_painter);
 	paint_track (painter, text_painter);
 	paint_directions (painter, text_painter);
+	paint_ap_settings (painter, text_painter);
 	paint_aircraft (painter, text_painter);
 	paint_speeds_and_wind (painter, text_painter);
 	paint_range (painter, text_painter);
