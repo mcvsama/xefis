@@ -243,17 +243,17 @@ EFIS::read()
 
 	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
 
-	_efis_widget->set_ap_altitude_visible (autopilot_visible && _autopilot_alt_setting_ft.valid());
+	_efis_widget->set_cmd_altitude_visible (autopilot_visible && _autopilot_alt_setting_ft.valid());
 	if (_autopilot_alt_setting_ft.valid())
-		_efis_widget->set_ap_altitude (*_autopilot_alt_setting_ft);
+		_efis_widget->set_cmd_altitude (*_autopilot_alt_setting_ft);
 
 	_efis_widget->set_at_speed_visible (autopilot_visible && _autopilot_speed_setting_kt.valid());
 	if (_autopilot_speed_setting_kt.valid())
 		_efis_widget->set_at_speed (*_autopilot_speed_setting_kt);
 
-	_efis_widget->set_ap_climb_rate_visible (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
+	_efis_widget->set_cmd_climb_rate_visible (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
 	if (_autopilot_cbr_setting_fpm.valid())
-		_efis_widget->set_ap_climb_rate (*_autopilot_cbr_setting_fpm);
+		_efis_widget->set_cmd_climb_rate (*_autopilot_cbr_setting_fpm);
 
 	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
 
