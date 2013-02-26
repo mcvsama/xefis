@@ -86,12 +86,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude_ladder_extent (int feet);
 
 	/**
-	 * Return current pitch value.
-	 */
-	Angle
-	pitch() const;
-
-	/**
 	 * Set pitch value.
 	 */
 	void
@@ -103,12 +97,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_pitch_visible (bool visible);
-
-	/**
-	 * Pitch limit.
-	 */
-	Angle
-	pitch_limit() const;
 
 	/**
 	 * Set pitch limit (absolute value).
@@ -123,22 +111,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_pitch_limit_visible (bool visible);
 
 	/**
-	 * Return current roll value.
-	 */
-	Angle
-	roll() const;
-
-	/**
 	 * Set roll value.
 	 */
 	void
 	set_roll (Angle);
-
-	/**
-	 * Return roll limit.
-	 */
-	Angle
-	roll_limit() const;
 
 	/**
 	 * Set roll limit, where indicator will turn solid amber.
@@ -153,12 +129,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_roll_visible (bool visible);
-
-	/**
-	 * Return current heading value.
-	 */
-	Angle
-	heading() const;
 
 	/**
 	 * Set heading value.
@@ -177,18 +147,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_heading_numbers_visible (bool visible);
-
-	/**
-	 * Return slip-skid indicator value.
-	 */
-	float
-	slip_skid() const;
-
-	/**
-	 * Return slip-skid limit.
-	 */
-	float
-	slip_skid_limit() const;
 
 	/**
 	 * Set slip-skid value.
@@ -210,22 +168,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_slip_skid_visible (bool visible);
 
 	/**
-	 * Flight path vertical deviation.
-	 */
-	Angle
-	flight_path_alpha() const;
-
-	/**
 	 * Set flight path vertical deviation.
 	 */
 	void
 	set_flight_path_alpha (Angle);
-
-	/**
-	 * Flight path horizontal deviation.
-	 */
-	Angle
-	flight_path_beta() const;
 
 	/**
 	 * Set flight path horizontal deviation.
@@ -238,12 +184,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_flight_path_marker_visible (bool visible);
-
-	/**
-	 * Return current speed.
-	 */
-	Knots
-	speed() const;
 
 	/**
 	 * Set speed shown on speed ladder.
@@ -268,12 +208,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_speed_tendency_visible (bool visible);
-
-	/**
-	 * Current altitude value.
-	 */
-	Feet
-	altitude() const;
 
 	/**
 	 * Set altitude value.
@@ -312,12 +246,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude_agl_visible (bool visible);
 
 	/**
-	 * Return landing altitude.
-	 */
-	Feet
-	landing_altitude() const;
-
-	/**
 	 * Set landing altitude.
 	 */
 	void
@@ -328,12 +256,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_landing_altitude_visible (bool visible);
-
-	/**
-	 * Return transition altitude.
-	 */
-	Feet
-	transition_altitude() const;
 
 	/**
 	 * Set transition altitude.
@@ -348,12 +270,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_transition_altitude_visible (bool visible);
 
 	/**
-	 * Return current climb rate.
-	 */
-	FeetPerMinute
-	climb_rate() const;
-
-	/**
 	 * Set climb rate.
 	 */
 	void
@@ -364,12 +280,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_climb_rate_visible (bool visible);
-
-	/**
-	 * Return speed bug value or 0.0f if not found.
-	 */
-	Knots
-	speed_bug (QString name) const;
 
 	/**
 	 * Add new speed bug.
@@ -385,12 +295,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	remove_speed_bug (QString name);
 
 	/**
-	 * Return altitude bug value of 0.0f if not found.
-	 */
-	Feet
-	altitude_bug (QString name) const;
-
-	/**
 	 * Add new altitude bug.
 	 */
 	void
@@ -404,12 +308,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	remove_altitude_bug (QString name);
 
 	/**
-	 * Return mach number.
-	 */
-	float
-	mach() const;
-
-	/**
 	 * Set mach number indicator.
 	 */
 	void
@@ -420,12 +318,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_mach_visible (bool visible);
-
-	/**
-	 * Return current pressure indicator value.
-	 */
-	Pressure
-	pressure() const;
 
 	/**
 	 * Set pressure indicator.
@@ -452,12 +344,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_standard_pressure (bool standard);
 
 	/**
-	 * Get minimum speed indicator setting.
-	 */
-	Knots
-	minimum_speed() const;
-
-	/**
 	 * Set minimum speed indicator on the speed ladder.
 	 */
 	void
@@ -468,12 +354,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_minimum_speed_visible (bool visible);
-
-	/**
-	 * Get warning speed indicator setting.
-	 */
-	Knots
-	warning_speed() const;
 
 	/**
 	 * Set warning speed indicator on the speed ladder.
@@ -488,12 +368,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_warning_speed_visible (bool visible);
 
 	/**
-	 * Get maximum speed indicator setting.
-	 */
-	Knots
-	maximum_speed() const;
-
-	/**
 	 * Set maximum speed indicator on the speed ladder.
 	 */
 	void
@@ -504,12 +378,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_maximum_speed_visible (bool visible);
-
-	/**
-	 * Return autopilot altitude.
-	 */
-	Feet
-	cmd_altitude() const;
 
 	/**
 	 * Set autopilot altitude.
@@ -524,12 +392,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_cmd_altitude_visible (bool visible);
 
 	/**
-	 * Return autopilot climb rate setting.
-	 */
-	FeetPerMinute
-	cmd_climb_rate() const;
-
-	/**
 	 * Set autopilot climb rate setting.
 	 */
 	void
@@ -540,12 +402,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_cmd_climb_rate_visible (bool visible);
-
-	/**
-	 * Return autothrottle setting.
-	 */
-	Knots
-	cmd_speed() const;
 
 	/**
 	 * Set autothrottle speed.
@@ -560,12 +416,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_cmd_speed_visible (bool visible);
 
 	/**
-	 * Return flight director alpha.
-	 */
-	Angle
-	flight_director_pitch() const;
-
-	/**
 	 * Set flight director pitch.
 	 */
 	void
@@ -576,12 +426,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_flight_director_pitch_visible (bool visible);
-
-	/**
-	 * Return flight director roll.
-	 */
-	Angle
-	flight_director_roll() const;
 
 	/**
 	 * Set flight director roll.
@@ -596,22 +440,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_flight_director_roll_visible (bool visible);
 
 	/**
-	 * Return control stick indicator pitch.
-	 */
-	Angle
-	control_stick_pitch() const;
-
-	/**
 	 * Set control stick indicator pitch.
 	 */
 	void
 	set_control_stick_pitch (Angle pitch);
-
-	/**
-	 * Return control stick indicator roll.
-	 */
-	Angle
-	control_stick_roll() const;
 
 	/**
 	 * Set control stick indicator roll.
@@ -633,12 +465,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_approach_reference_visible (bool visible);
 
 	/**
-	 * Return vertical deviation value.
-	 */
-	Angle
-	vertical_deviation() const;
-
-	/**
 	 * Set vertical deviation.
 	 */
 	void
@@ -649,12 +475,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_vertical_deviation_visible (bool visible);
-
-	/**
-	 * Return navigation heading needle value.
-	 */
-	Angle
-	lateral_deviation() const;
 
 	/**
 	 * Set localizer deviation needle.
@@ -681,23 +501,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_runway_position (Angle position);
 
 	/**
-	 * Return nav hint.
-	 */
-	QString
-	approach_hint() const;
-
-	/**
 	 * Set navigation hint, a text shown on the top left corner of the ADI.
 	 * Usually something like "ILS" or "VOR".
 	 */
 	void
 	set_approach_hint (QString hint);
-
-	/**
-	 * Return DME distance.
-	 */
-	Length
-	dme_distance() const;
 
 	/**
 	 * Set DME distance.
@@ -712,22 +520,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_dme_distance_visible (bool visible);
 
 	/**
-	 * Return localizer ID.
-	 */
-	QString
-	localizer_id() const;
-
-	/**
 	 * Set localizer ID.
 	 */
 	void
 	set_localizer_id (QString const& loc_id);
-
-	/**
-	 * Return localizer mag bearing.
-	 */
-	Angle
-	localizer_magnetic_bearing() const;
 
 	/**
 	 * Set localizer magnetic bearing.
@@ -740,12 +536,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_localizer_info_visible (bool visible);
-
-	/**
-	 * Return control hint.
-	 */
-	QString
-	control_hint() const;
 
 	/**
 	 * Set control hint - the text displayed right above roll scale.
@@ -766,22 +556,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_fma_visible (bool visible);
 
 	/**
-	 * Return AP speed hint text.
-	 */
-	QString
-	fma_speed_hint() const;
-
-	/**
 	 * Set AP speed hint text.
 	 */
 	void
 	set_fma_speed_hint (QString const&);
-
-	/**
-	 * Return additional AP speed hint text.
-	 */
-	QString
-	fma_speed_small_hint() const;
 
 	/**
 	 * Set additional AP speed hint text.
@@ -790,22 +568,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_fma_speed_small_hint (QString const&);
 
 	/**
-	 * Return AP lateral hint text.
-	 */
-	QString
-	fma_lateral_hint() const;
-
-	/**
 	 * Set AP lateral hint text.
 	 */
 	void
 	set_fma_lateral_hint (QString const&);
-
-	/**
-	 * Return additional AP lateral hint text.
-	 */
-	QString
-	fma_lateral_small_hint() const;
 
 	/**
 	 * Set additional AP lateral hint text.
@@ -814,35 +580,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_fma_lateral_small_hint (QString const&);
 
 	/**
-	 * Return AP altitude hint text.
-	 */
-	QString
-	fma_vertical_hint() const;
-
-	/**
 	 * Set AP altitude hint text.
 	 */
 	void
 	set_fma_vertical_hint (QString const&);
 
 	/**
-	 * Return additional AP altitude hint text.
-	 */
-	QString
-	fma_vertical_small_hint() const;
-
-	/**
 	 * Set additional AP altitude hint text.
 	 */
 	void
 	set_fma_vertical_small_hint (QString const&);
-
-	/**
-	 * Return field of view.
-	 * Default is 120°. Usable maximum: 180°.
-	 */
-	Angle
-	fov() const;
 
 	/**
 	 * Set field of view.
@@ -1292,13 +1039,6 @@ EFISWidget::set_altitude_ladder_extent (int feet)
 }
 
 
-inline Angle
-EFISWidget::pitch() const
-{
-	return _pitch;
-}
-
-
 inline void
 EFISWidget::set_pitch (Angle degrees)
 {
@@ -1315,13 +1055,6 @@ EFISWidget::set_pitch_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::pitch_limit() const
-{
-	return _pitch_limit;
-}
-
-
 inline void
 EFISWidget::set_pitch_limit (Angle pitch_limit)
 {
@@ -1335,20 +1068,6 @@ EFISWidget::set_pitch_limit_visible (bool visible)
 {
 	_pitch_limit_visible = visible;
 	update();
-}
-
-
-inline Angle
-EFISWidget::roll() const
-{
-	return _roll;
-}
-
-
-inline Angle
-EFISWidget::roll_limit() const
-{
-	return _roll_limit;
 }
 
 
@@ -1376,13 +1095,6 @@ EFISWidget::set_roll_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::heading() const
-{
-	return _heading;
-}
-
-
 inline void
 EFISWidget::set_heading (Angle degrees)
 {
@@ -1404,20 +1116,6 @@ EFISWidget::set_heading_numbers_visible (bool visible)
 {
 	_heading_numbers_visible = visible;
 	update();
-}
-
-
-inline float
-EFISWidget::slip_skid() const
-{
-	return _slip_skid;
-}
-
-
-inline float
-EFISWidget::slip_skid_limit() const
-{
-	return _slip_skid_limit;
 }
 
 
@@ -1445,25 +1143,11 @@ EFISWidget::set_slip_skid_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::flight_path_alpha() const
-{
-	return _flight_path_alpha;
-}
-
-
 inline void
 EFISWidget::set_flight_path_alpha (Angle pitch)
 {
 	_flight_path_alpha = pitch;
 	update();
-}
-
-
-inline Angle
-EFISWidget::flight_path_beta() const
-{
-	return _flight_path_beta;
 }
 
 
@@ -1480,13 +1164,6 @@ EFISWidget::set_flight_path_marker_visible (bool visible)
 {
 	_flight_path_visible = visible;
 	update();
-}
-
-
-inline Knots
-EFISWidget::speed() const
-{
-	return _speed;
 }
 
 
@@ -1519,13 +1196,6 @@ EFISWidget::set_speed_tendency_visible (bool visible)
 {
 	_speed_tendency_visible = visible;
 	update();
-}
-
-
-inline Feet
-EFISWidget::altitude() const
-{
-	return _altitude;
 }
 
 
@@ -1579,13 +1249,6 @@ EFISWidget::set_altitude_agl_visible (bool visible)
 }
 
 
-inline Feet
-EFISWidget::landing_altitude() const
-{
-	return _landing_altitude;
-}
-
-
 inline void
 EFISWidget::set_landing_altitude (Feet feet)
 {
@@ -1599,13 +1262,6 @@ EFISWidget::set_landing_altitude_visible (bool visible)
 {
 	_landing_altitude_visible = visible;
 	update();
-}
-
-
-inline Feet
-EFISWidget::transition_altitude() const
-{
-	return _transition_altitude;
 }
 
 
@@ -1629,13 +1285,6 @@ EFISWidget::set_transition_altitude_visible (bool visible)
 }
 
 
-inline FeetPerMinute
-EFISWidget::climb_rate() const
-{
-	return _climb_rate;
-}
-
-
 inline void
 EFISWidget::set_climb_rate (FeetPerMinute feet_per_minute)
 {
@@ -1649,16 +1298,6 @@ EFISWidget::set_climb_rate_visible (bool visible)
 {
 	_climb_rate_visible = visible;
 	update();
-}
-
-
-inline Knots
-EFISWidget::speed_bug (QString name) const
-{
-	auto it = _speed_bugs.find (name);
-	if (it != _speed_bugs.end())
-		return it->second;
-	return 0.f;
 }
 
 
@@ -1681,16 +1320,6 @@ EFISWidget::remove_speed_bug (QString name)
 }
 
 
-inline Feet
-EFISWidget::altitude_bug (QString name) const
-{
-	auto it = _altitude_bugs.find (name);
-	if (it != _altitude_bugs.end())
-		return it->second;
-	return 0.f;
-}
-
-
 inline void
 EFISWidget::add_altitude_bug (QString name, Feet altitude)
 {
@@ -1710,13 +1339,6 @@ EFISWidget::remove_altitude_bug (QString name)
 }
 
 
-inline float
-EFISWidget::mach() const
-{
-	return _mach;
-}
-
-
 inline void
 EFISWidget::set_mach (float value)
 {
@@ -1730,13 +1352,6 @@ EFISWidget::set_mach_visible (bool visible)
 {
 	_mach_visible = visible;
 	update();
-}
-
-
-inline Pressure
-EFISWidget::pressure() const
-{
-	return _pressure;
 }
 
 
@@ -1772,13 +1387,6 @@ EFISWidget::set_standard_pressure (bool standard)
 }
 
 
-inline Knots
-EFISWidget::minimum_speed() const
-{
-	return _minimum_speed;
-}
-
-
 inline void
 EFISWidget::set_minimum_speed (Knots minimum_speed)
 {
@@ -1792,13 +1400,6 @@ EFISWidget::set_minimum_speed_visible (bool visible)
 {
 	_minimum_speed_visible = visible;
 	update();
-}
-
-
-inline Knots
-EFISWidget::warning_speed() const
-{
-	return _warning_speed;
 }
 
 
@@ -1818,13 +1419,6 @@ EFISWidget::set_warning_speed_visible (bool visible)
 }
 
 
-inline Knots
-EFISWidget::maximum_speed() const
-{
-	return _maximum_speed;
-}
-
-
 inline void
 EFISWidget::set_maximum_speed (Knots maximum_speed)
 {
@@ -1838,13 +1432,6 @@ EFISWidget::set_maximum_speed_visible (bool visible)
 {
 	_maximum_speed_visible = visible;
 	update();
-}
-
-
-inline Feet
-EFISWidget::cmd_altitude() const
-{
-	return _cmd_altitude;
 }
 
 
@@ -1864,13 +1451,6 @@ EFISWidget::set_cmd_altitude_visible (bool visible)
 }
 
 
-inline FeetPerMinute
-EFISWidget::cmd_climb_rate() const
-{
-	return _cmd_climb_rate;
-}
-
-
 inline void
 EFISWidget::set_cmd_climb_rate (FeetPerMinute fpm)
 {
@@ -1884,13 +1464,6 @@ EFISWidget::set_cmd_climb_rate_visible (bool visible)
 {
 	_cmd_climb_rate_visible = visible;
 	update();
-}
-
-
-inline Knots
-EFISWidget::cmd_speed() const
-{
-	return _cmd_speed;
 }
 
 
@@ -1910,13 +1483,6 @@ EFISWidget::set_cmd_speed_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::flight_director_pitch() const
-{
-	return _flight_director_pitch;
-}
-
-
 inline void
 EFISWidget::set_flight_director_pitch (Angle pitch)
 {
@@ -1930,13 +1496,6 @@ EFISWidget::set_flight_director_pitch_visible (bool visible)
 {
 	_flight_director_pitch_visible = visible;
 	update();
-}
-
-
-inline Angle
-EFISWidget::flight_director_roll() const
-{
-	return _flight_director_roll;
 }
 
 
@@ -1956,25 +1515,11 @@ EFISWidget::set_flight_director_roll_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::control_stick_pitch() const
-{
-	return _control_stick_pitch;
-}
-
-
 inline void
 EFISWidget::set_control_stick_pitch (Angle pitch)
 {
 	_control_stick_pitch = pitch;
 	update();
-}
-
-
-inline Angle
-EFISWidget::control_stick_roll() const
-{
-	return _control_stick_roll;
 }
 
 
@@ -2002,13 +1547,6 @@ EFISWidget::set_approach_reference_visible (bool visible)
 }
 
 
-inline Angle
-EFISWidget::vertical_deviation() const
-{
-	return _vertical_deviation_deg;
-}
-
-
 inline void
 EFISWidget::set_vertical_deviation (Angle deviation)
 {
@@ -2022,13 +1560,6 @@ EFISWidget::set_vertical_deviation_visible (bool visible)
 {
 	_vertical_deviation_visible = visible;
 	update();
-}
-
-
-inline Angle
-EFISWidget::lateral_deviation() const
-{
-	return _lateral_deviation_deg;
 }
 
 
@@ -2064,25 +1595,11 @@ EFISWidget::set_runway_position (Angle position)
 }
 
 
-inline QString
-EFISWidget::approach_hint() const
-{
-	return _approach_hint;
-}
-
-
 inline void
 EFISWidget::set_approach_hint (QString hint)
 {
 	_approach_hint = hint;
 	update();
-}
-
-
-inline Length
-EFISWidget::dme_distance() const
-{
-	return _dme_distance;
 }
 
 
@@ -2102,25 +1619,11 @@ EFISWidget::set_dme_distance_visible (bool visible)
 }
 
 
-inline QString
-EFISWidget::localizer_id() const
-{
-	return _localizer_id;
-}
-
-
 inline void
 EFISWidget::set_localizer_id (QString const& loc_id)
 {
 	_localizer_id = loc_id;
 	update();
-}
-
-
-inline Angle
-EFISWidget::localizer_magnetic_bearing() const
-{
-	return _localizer_magnetic_bearing;
 }
 
 
@@ -2137,13 +1640,6 @@ EFISWidget::set_localizer_info_visible (bool visible)
 {
 	_localizer_info_visible = visible;
 	update();
-}
-
-
-inline QString
-EFISWidget::control_hint() const
-{
-	return _control_hint;
 }
 
 
@@ -2175,13 +1671,6 @@ EFISWidget::set_fma_visible (bool visible)
 }
 
 
-inline QString
-EFISWidget::fma_speed_hint() const
-{
-	return _fma_speed_hint;
-}
-
-
 inline void
 EFISWidget::set_fma_speed_hint (QString const& hint)
 {
@@ -2189,13 +1678,6 @@ EFISWidget::set_fma_speed_hint (QString const& hint)
 		_fma_speed_ts = QDateTime::currentDateTime();
 	_fma_speed_hint = hint;
 	update();
-}
-
-
-inline QString
-EFISWidget::fma_speed_small_hint() const
-{
-	return _fma_speed_small_hint;
 }
 
 
@@ -2209,13 +1691,6 @@ EFISWidget::set_fma_speed_small_hint (QString const& hint)
 }
 
 
-inline QString
-EFISWidget::fma_lateral_hint() const
-{
-	return _fma_lateral_hint;
-}
-
-
 inline void
 EFISWidget::set_fma_lateral_hint (QString const& hint)
 {
@@ -2223,13 +1698,6 @@ EFISWidget::set_fma_lateral_hint (QString const& hint)
 		_fma_lateral_ts = QDateTime::currentDateTime();
 	_fma_lateral_hint = hint;
 	update();
-}
-
-
-inline QString
-EFISWidget::fma_lateral_small_hint() const
-{
-	return _fma_lateral_small_hint;
 }
 
 
@@ -2243,13 +1711,6 @@ EFISWidget::set_fma_lateral_small_hint (QString const& hint)
 }
 
 
-inline QString
-EFISWidget::fma_vertical_hint() const
-{
-	return _fma_vertical_hint;
-}
-
-
 inline void
 EFISWidget::set_fma_vertical_hint (QString const& hint)
 {
@@ -2260,13 +1721,6 @@ EFISWidget::set_fma_vertical_hint (QString const& hint)
 }
 
 
-inline QString
-EFISWidget::fma_vertical_small_hint() const
-{
-	return _fma_vertical_small_hint;
-}
-
-
 inline void
 EFISWidget::set_fma_vertical_small_hint (QString const& hint)
 {
@@ -2274,13 +1728,6 @@ EFISWidget::set_fma_vertical_small_hint (QString const& hint)
 		_fma_vertical_small_ts = QDateTime::currentDateTime();
 	_fma_vertical_small_hint = hint;
 	update();
-}
-
-
-inline Angle
-EFISWidget::fov() const
-{
-	return _fov;
 }
 
 

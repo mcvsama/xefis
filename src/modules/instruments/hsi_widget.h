@@ -91,22 +91,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_display_mode (DisplayMode);
 
 	/**
-	 * Return navigation range.
-	 */
-	Length
-	range() const;
-
-	/**
 	 * Set navigation range.
 	 */
 	void
 	set_range (Length miles);
-
-	/**
-	 * Return current ture heading value.
-	 */
-	Angle
-	true_heading() const;
 
 	/**
 	 * Set true heading value.
@@ -117,24 +105,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_true_heading (Angle);
 
 	/**
-	 * Return current magnetic heading value.
-	 */
-	Angle
-	magnetic_heading() const;
-
-	/**
 	 * Set magnetic heading value.
 	 * Note that both magnetic and true heading must be set
 	 * correctly for HSI to display navaids and scales properly.
 	 */
 	void
 	set_magnetic_heading (Angle);
-
-	/**
-	 * Return current heading mode.
-	 */
-	HeadingMode
-	heading_mode() const;
 
 	/**
 	 * Select magnetic or true heading to display.
@@ -147,12 +123,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_heading_visible (bool visible);
-
-	/**
-	 * Return A/P magnetic heading.
-	 */
-	Angle
-	ap_magnetic_heading() const;
 
 	/**
 	 * Set A/P magnetic heading.
@@ -174,12 +144,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_ap_track_visible (bool visible);
 
 	/**
-	 * Flight path heading (track).
-	 */
-	Angle
-	magnetic_track() const;
-
-	/**
 	 * Set track magnetic heading.
 	 */
 	void
@@ -192,22 +156,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_track_visible (bool visible);
 
 	/**
-	 * Return true, if track is shown instead of heading.
-	 */
-	bool
-	display_track() const;
-
-	/**
 	 * Set display of track istead of heading.
 	 */
 	void
 	set_display_track (bool track);
-
-	/**
-	 * Return current ground speed.
-	 */
-	Knots
-	ground_speed() const;
 
 	/**
 	 * Set ground speed.
@@ -222,12 +174,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_ground_speed_visible (bool visible);
 
 	/**
-	 * Return current true air speed.
-	 */
-	Knots
-	true_air_speed() const;
-
-	/**
 	 * Set true air speed.
 	 */
 	void
@@ -238,12 +184,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_true_air_speed_visible (bool visible);
-
-	/**
-	 * Return mach number.
-	 */
-	float
-	mach() const;
 
 	/**
 	 * Set mach number indicator.
@@ -365,12 +305,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	reset_highlighted_loc();
-
-	/**
-	 * Return positioning hint.
-	 */
-	QString
-	positioning_hint() const;
 
 	/**
 	 * Set positioning hint.
@@ -548,25 +482,11 @@ HSIWidget::set_display_mode (DisplayMode display_mode)
 }
 
 
-inline Length
-HSIWidget::range() const
-{
-	return _range;
-}
-
-
 inline void
 HSIWidget::set_range (Length miles)
 {
 	_range = miles;
 	update();
-}
-
-
-inline Angle
-HSIWidget::true_heading() const
-{
-	return _true_heading;
 }
 
 
@@ -578,25 +498,11 @@ HSIWidget::set_true_heading (Angle degrees)
 }
 
 
-inline Angle
-HSIWidget::magnetic_heading() const
-{
-	return _magnetic_heading;
-}
-
-
 inline void
 HSIWidget::set_magnetic_heading (Angle degrees)
 {
 	_magnetic_heading = degrees;
 	update();
-}
-
-
-inline HSIWidget::HeadingMode
-HSIWidget::heading_mode() const
-{
-	return _heading_mode;
 }
 
 
@@ -613,13 +519,6 @@ HSIWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
 	update();
-}
-
-
-inline Angle
-HSIWidget::ap_magnetic_heading() const
-{
-	return _ap_magnetic_heading;
 }
 
 
@@ -647,13 +546,6 @@ HSIWidget::set_ap_track_visible (bool visible)
 }
 
 
-inline Angle
-HSIWidget::magnetic_track() const
-{
-	return _magnetic_track;
-}
-
-
 inline void
 HSIWidget::set_magnetic_track (Angle track)
 {
@@ -670,25 +562,11 @@ HSIWidget::set_track_visible (bool visible)
 }
 
 
-inline bool
-HSIWidget::display_track() const
-{
-	return _display_track;
-}
-
-
 inline void
 HSIWidget::set_display_track (bool track)
 {
 	_display_track = track;
 	update();
-}
-
-
-inline Knots
-HSIWidget::ground_speed() const
-{
-	return _ground_speed;
 }
 
 
@@ -708,13 +586,6 @@ HSIWidget::set_ground_speed_visible (bool visible)
 }
 
 
-inline Knots
-HSIWidget::true_air_speed() const
-{
-	return _true_air_speed;
-}
-
-
 inline void
 HSIWidget::set_true_air_speed (Knots true_air_speed)
 {
@@ -728,13 +599,6 @@ HSIWidget::set_true_air_speed_visible (bool visible)
 {
 	_true_air_speed_visible = visible;
 	update();
-}
-
-
-inline float
-HSIWidget::mach() const
-{
-	return _mach;
 }
 
 
@@ -878,13 +742,6 @@ inline void
 HSIWidget::reset_highlighted_loc()
 {
 	_highlighted_loc = "";
-}
-
-
-inline QString
-HSIWidget::positioning_hint() const
-{
-	return _positioning_hint;
 }
 
 
