@@ -270,6 +270,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_landing_altitude_visible (bool visible);
 
 	/**
+	 * Set visibility of the altitude warnings (500 and 1000 ft) above
+	 * max of AGL altitude and LDG altitude or 0.
+	 */
+	void
+	set_altitude_warnings_visible (bool visible);
+
+	/**
 	 * Set transition altitude.
 	 */
 	void
@@ -933,6 +940,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QDateTime			_altitude_agl_ts;
 	Feet				_landing_altitude				= 0.f;
 	bool				_landing_altitude_visible		= false;
+	bool				_altitude_warnings_visible		= false;
 	Feet				_transition_altitude			= 0.f;
 	bool				_transition_altitude_visible	= false;
 	QDateTime			_transition_altitude_ts;
@@ -1289,6 +1297,14 @@ inline void
 EFISWidget::set_landing_altitude_visible (bool visible)
 {
 	_landing_altitude_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_altitude_warnings_visible (bool visible)
+{
+	_altitude_warnings_visible = visible;
 	update();
 }
 

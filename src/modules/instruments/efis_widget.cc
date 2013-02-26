@@ -618,7 +618,7 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 		 kt <= _sl_max_shown + _sl_line_every;
 		 kt += _sl_line_every)
 	{
-		if (kt < _sl_min_shown || kt > _sl_max_shown)
+		if (kt < _sl_minimum || kt > _sl_maximum)
 			continue;
 		float posy = kt_to_px (kt);
 		painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
@@ -837,6 +837,7 @@ EFISWidget::al_post_resize()
 	_al_scale_pen_2 = get_pen (Qt::white, 3.f);
 	_al_altitude_bug_pen = get_pen (QColor (0, 255, 0), 1.5f);
 	_al_ldg_alt_pen = get_pen (QColor (255, 220, 0), 1.5f);
+	_al_ldg_alt_pen.setCapStyle (Qt::RoundCap);
 
 	float const b_digit_width = _font_20_digit_width;
 	float const b_digit_height = _font_20_digit_height;
@@ -1073,19 +1074,52 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 			}
 		}
 
+		// Altitude warning:
+		if (_altitude_warnings_visible)
+		{
+			Length base = -99999_ft;
+			if (_landing_altitude_visible)
+				base = std::max (base, 1_ft * _landing_altitude);
+			if (_altitude_agl_visible)
+				base = std::max (base, 1_ft * _altitude_agl);
+
+			QPointF p1 (-2.05f * x, ft_to_px ((base + 500_ft).ft()));
+			QPointF p2 (-2.05f * x, ft_to_px ((base + 1000_ft).ft()));
+
+			if (_landing_altitude_visible)
+				base = std::min (base, 1_ft * _landing_altitude);
+
+			QPointF p0 (-2.05f * x, ft_to_px (base.ft()));
+
+			QPen w = _al_ldg_alt_pen;
+			w.setColor (Qt::white);
+			w.setCapStyle (Qt::SquareCap);
+
+			painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
+			painter.setPen (_al_ldg_alt_pen);
+			painter.drawLine (p0, p1);
+			painter.setPen (w);
+			painter.drawPolyline (QPolygonF() << p1 << p2 << p2 + QPointF (0.25f * x, 0.f));
+		}
+
 		// Landing altitude bug:
 		if (_landing_altitude_visible && _landing_altitude > _al_min_shown && _landing_altitude < _al_max_shown)
 		{
+			painter.setClipRect (_al_ladder_rect);
 			float posy = ft_to_px (_landing_altitude);
-			QRectF text_rect (-4.5f * x, posy - 0.5f * altitude_bug_digit_height,
-							  +2.f * x, altitude_bug_digit_height);
-			painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 
 			painter.setPen (_al_ldg_alt_pen);
-			painter.drawLine (QPointF (-0.5f * x, posy), QPointF (-2.25f * x, posy));
+			painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
+			for (int i = -8; i <= 4; ++i)
+			{
+				QPointF p (0.4f * i * x + 0.125f * x, posy + 0.1f * x);
+				painter.drawLine (p, p + QPointF (x, x));
+			}
 
 			painter.setClipping (false);
-			text_painter.drawText (text_rect, Qt::AlignVCenter | Qt::AlignRight, "LDG");
+			QPointF tp (_al_ladder_rect.bottomRight() + QPointF (0.25f * x, -x));
+			text_painter.drawText (tp, Qt::AlignLeft | Qt::AlignVCenter, "LDG");
+			text_painter.drawText (tp + QPointF (0.f, 1.5f * _font_10_digit_height), Qt::AlignLeft | Qt::AlignVCenter, "ALT");
 		}
 
 		// AP bug:
@@ -1471,7 +1505,7 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 	if (is_newly_set (_altitude_agl_ts))
-		painter.setPen (get_pen (Qt::white, 1.f));
+		painter.setPen (get_pen (Qt::white, 1.25f));
 	else
 		painter.setPen (Qt::NoPen);
 	painter.setBrush (QBrush (Qt::black));

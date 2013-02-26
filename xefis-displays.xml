@@ -40,6 +40,7 @@
 										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
 										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
 										<property name='control-hint' path='/control/hint' default=''/>
+										<property name='landing-altitude' path='/altitude/landing-altitude.ft' default='0'/>
 									</directory>
 									<directory path='/systems/fms/output'>
 										<property name='ias-minimum' path='/speed/ias-minimum.kt'/>

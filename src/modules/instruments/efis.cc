@@ -222,6 +222,8 @@ EFIS::read()
 	if (_landing_altitude_ft.valid())
 		_efis_widget->set_landing_altitude (*_landing_altitude_ft);
 
+	_efis_widget->set_altitude_warnings_visible (true);
+
 	if (_standard_pressure.valid() && _transition_altitude_ft.valid())
 	{
 		_efis_widget->set_transition_altitude_visible (true);
