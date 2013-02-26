@@ -35,23 +35,10 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	RadialIndicatorWidget (QWidget* parent);
 
 	/**
-	 * Return current range used for RadialIndicatorWidget.
-	 * By default, the range is [0..1].
-	 */
-	Range<float>
-	range() const;
-
-	/**
 	 * Set new range to be used with RadialIndicatorWidget.
 	 */
 	void
 	set_range (Range<float>);
-
-	/**
-	 * Return current indicated power value.
-	 */
-	float
-	value() const;
 
 	/**
 	 * Set indicated power value.
@@ -66,12 +53,6 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	set_value_visible (bool visible);
 
 	/**
-	 * Warning value.
-	 */
-	float
-	warning_value() const;
-
-	/**
 	 * Set warning value. This starts the section that is drawn in yellow.
 	 */
 	void
@@ -82,12 +63,6 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_warning_visible (bool visible);
-
-	/**
-	 * Critical value. This starts the section that is drawn in red.
-	 */
-	float
-	critical_value() const;
 
 	/**
 	 * Set critical value.
@@ -102,12 +77,6 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	set_critical_visible (bool visible);
 
 	/**
-	 * Normal/desired value.
-	 */
-	float
-	normal_value() const;
-
-	/**
 	 * Set normal/desired value. This sets the green bug position on the scale.
 	 */
 	void
@@ -118,12 +87,6 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_normal_visible (bool visible);
-
-	/**
-	 * Target value (setting bug).
-	 */
-	float
-	target_value() const;
 
 	/**
 	 * Set target value (setting bug).
@@ -164,25 +127,11 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 };
 
 
-inline Range<float>
-RadialIndicatorWidget::range() const
-{
-	return _range;
-}
-
-
 inline void
 RadialIndicatorWidget::set_range (Range<float> range)
 {
 	_range = range;
 	update();
-}
-
-
-inline float
-RadialIndicatorWidget::value() const
-{
-	return _value;
 }
 
 
@@ -202,13 +151,6 @@ RadialIndicatorWidget::set_value_visible (bool visible)
 }
 
 
-inline float
-RadialIndicatorWidget::warning_value() const
-{
-	return _warning_value;
-}
-
-
 inline void
 RadialIndicatorWidget::set_warning_value (float warning_value)
 {
@@ -222,13 +164,6 @@ RadialIndicatorWidget::set_warning_visible (bool visible)
 {
 	_warning_visible = visible;
 	update();
-}
-
-
-inline float
-RadialIndicatorWidget::critical_value() const
-{
-	return _critical_value;
 }
 
 
@@ -248,13 +183,6 @@ RadialIndicatorWidget::set_critical_visible (bool visible)
 }
 
 
-inline float
-RadialIndicatorWidget::normal_value() const
-{
-	return _normal_value;
-}
-
-
 inline void
 RadialIndicatorWidget::set_normal_value (float normal_value)
 {
@@ -268,13 +196,6 @@ RadialIndicatorWidget::set_normal_visible (bool visible)
 {
 	_normal_visible = visible;
 	update();
-}
-
-
-inline float
-RadialIndicatorWidget::target_value() const
-{
-	return _target_value;
 }
 
 
