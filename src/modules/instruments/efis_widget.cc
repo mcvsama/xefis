@@ -1699,7 +1699,7 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		auto paint_big_rect = [&](QPointF point) -> void
 		{
 			float v = 0.03f * _q;
-			QRectF frame (point, QSizeF (1.75f * _q, _font_13_digit_height));
+			QRectF frame (point, QSizeF (1.9f * _q, _font_13_digit_height));
 			centrify (frame);
 			frame.adjust (0.f, -v, 0.f, +v);
 			painter.drawRect (frame);
@@ -1708,7 +1708,7 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		auto paint_small_rect = [&](QPointF point) -> void
 		{
 			float v = 0.025f * _q;
-			QRectF frame (point, QSizeF (1.75f * _q, _font_10_digit_height));
+			QRectF frame (point, QSizeF (1.9f * _q, _font_10_digit_height));
 			centrify (frame);
 			frame.adjust (0.f, -v, 0.f, +v);
 			painter.drawRect (frame);
