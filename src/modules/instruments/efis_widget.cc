@@ -1738,6 +1738,7 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		painter.setClipping (false);
 		painter.setTransform (_center_transform);
 		painter.setFont (_font_20_bold);
+		painter.setBrush (Qt::NoBrush);
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		QPointF text_hook = QPointF (0.f, -3.1f * q);
 		text_painter.drawText (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, _control_hint);
