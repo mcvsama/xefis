@@ -39,6 +39,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "speed-ladder-line-every", _speed_ladder_line_every, false },
 				{ "speed-ladder-number-every", _speed_ladder_number_every, false },
 				{ "speed-ladder-extent", _speed_ladder_extent, false },
+				{ "speed-ladder-minimum", _speed_ladder_minimum, false },
+				{ "speed-ladder-maximum", _speed_ladder_maximum, false },
 				{ "altitude-ladder-line-every", _altitude_ladder_line_every, false },
 				{ "altitude-ladder-number-every", _altitude_ladder_number_every, false },
 				{ "altitude-ladder-bold-every", _altitude_ladder_bold_every, false },
@@ -130,9 +132,11 @@ EFIS::read()
 	fpm_alpha = 1_deg * floored_mod (fpm_alpha.deg(), -180.0, +180.0);
 	fpm_beta = 1_deg * floored_mod (fpm_beta.deg(), -180.0, +180.0);
 
-	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.valid() ? *_speed_ladder_line_every : 10);
-	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.valid() ? *_speed_ladder_number_every : 20);
-	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.valid() ? *_speed_ladder_extent : 124);
+	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.read (10));
+	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.read (20));
+	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.read (124));
+	_efis_widget->set_speed_ladder_minimum (_speed_ladder_minimum.read (0));
+	_efis_widget->set_speed_ladder_maximum (_speed_ladder_maximum.read (9999));
 
 	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every.valid() ? *_altitude_ladder_line_every : 100);
 	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.valid() ? *_altitude_ladder_number_every : 200);
