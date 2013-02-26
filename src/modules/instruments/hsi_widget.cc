@@ -233,9 +233,10 @@ HSIWidget::paintEvent (QPaintEvent*)
 
 	paint_navaids (painter, text_painter);
 	paint_altitude_reach (painter);
-	paint_track (painter, text_painter);
+	paint_track (painter, text_painter, false);
 	paint_directions (painter, text_painter);
 	paint_ap_settings (painter, text_painter);
+	paint_track (painter, text_painter, true);
 	paint_aircraft (painter, text_painter);
 	paint_speeds_and_wind (painter, text_painter);
 	paint_range (painter, text_painter);
@@ -353,7 +354,7 @@ HSIWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 
 
 void
-HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
+HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter, bool paint_heading_triangle)
 {
 	Length trend_range = actual_trend_range();
 	Length trend_start = actual_trend_start();
@@ -368,7 +369,7 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 	QFont font = _font_13_bold;
 	QFontMetricsF metrics (font);
 
-	if (_track_visible)
+	if (!paint_heading_triangle && _track_visible)
 	{
 		// Scale and track line:
 		painter.setPen (QPen (Qt::white, pen_width (1.3f)));
@@ -409,15 +410,18 @@ HSIWidget::paint_track (QPainter& painter, TextPainter& text_painter)
 		}
 	}
 
-	// Heading triangle:
-	painter.setClipRect (_map_clip_rect);
-	painter.setTransform (_aircraft_center_transform);
-	painter.rotate ((_heading - _rotation).deg());
+	if (paint_heading_triangle)
+	{
+		// Heading triangle:
+		painter.setClipRect (_map_clip_rect);
+		painter.setTransform (_aircraft_center_transform);
+		painter.rotate ((_heading - _rotation).deg());
 
-	painter.setPen (get_pen (Qt::white, 2.2f));
-	painter.translate (0.f, -1.003f * _r);
-	painter.scale (0.465f, -0.465f);
-	painter.drawPolyline (_aircraft_shape);
+		painter.setPen (get_pen (Qt::white, 2.2f));
+		painter.translate (0.f, -1.003f * _r);
+		painter.scale (0.465f, -0.465f);
+		painter.drawPolyline (_aircraft_shape);
+	}
 }
 
 

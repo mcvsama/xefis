@@ -407,7 +407,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	paint_directions (QPainter&, TextPainter&);
 
 	void
-	paint_track (QPainter&, TextPainter&);
+	paint_track (QPainter&, TextPainter&, bool paint_heading_triangle);
 
 	void
 	paint_altitude_reach (QPainter&);
