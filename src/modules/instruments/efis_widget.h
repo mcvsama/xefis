@@ -678,25 +678,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 	sl_paint (QPainter&, TextPainter&);
 
 	void
-	sl_paint_black_box (QPainter& painter, TextPainter&, float x);
+	sl_paint_black_box (QPainter&, TextPainter&, float x);
 
 	void
-	sl_paint_ladder_scale (QPainter& painter, TextPainter&, float x);
+	sl_paint_ladder_scale (QPainter&, TextPainter&, float x);
 
 	void
-	sl_paint_speed_limits (QPainter& painter, float x);
+	sl_paint_speed_limits (QPainter&, float x);
 
 	void
-	sl_paint_speed_tendency (QPainter& painter, float x);
+	sl_paint_speed_tendency (QPainter&, float x);
 
 	void
-	sl_paint_bugs (QPainter& painter, TextPainter&, float x);
+	sl_paint_bugs (QPainter&, TextPainter&, float x);
 
 	void
-	sl_paint_mach_number (QPainter& painter, TextPainter&, float x);
+	sl_paint_mach_number (QPainter&, TextPainter&, float x);
 
 	void
-	sl_paint_ap_setting (QPainter& painter, TextPainter&);
+	sl_paint_ap_setting (QPainter&, TextPainter&);
+
+	void
+	sl_paint_novspd (QPainter&, TextPainter&);
 
 	float
 	kt_to_px (Knots ft) const;
@@ -881,6 +884,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QPen				_sl_speed_bug_pen;
 	float				_sl_margin;
 	int					_sl_digits;
+	bool				_sl_novspd;
 
 	/*
 	 * Altitude ladder

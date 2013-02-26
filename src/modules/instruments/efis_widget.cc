@@ -499,6 +499,7 @@ EFISWidget::sl_post_resize()
 void
 EFISWidget::sl_pre_paint()
 {
+	_sl_novspd = _speed < _sl_minimum;
 	_speed = limit<float> (_speed, _sl_minimum, _sl_maximum);
 	_sl_min_shown = _speed - 0.5f * _sl_extent;
 	_sl_max_shown = _speed + 0.5f * _sl_extent;
@@ -529,6 +530,7 @@ EFISWidget::sl_paint (QPainter& painter, TextPainter& text_painter)
 	sl_paint_speed_tendency (painter, x);
 	sl_paint_black_box (painter, text_painter, x);
 	sl_paint_mach_number (painter, text_painter, x);
+	sl_paint_novspd (painter, text_painter);
 	sl_paint_ap_setting (painter, text_painter);
 }
 
@@ -822,6 +824,41 @@ EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
 	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_cmd_speed))));
+}
+
+
+void
+EFISWidget::sl_paint_novspd (QPainter& painter, TextPainter& text_painter)
+{
+	if (_sl_novspd)
+	{
+		float margin = 0.025f * _q;
+		QString sa = "NO";
+		QString sb = "VSPD";
+		QFont font = _font;
+		font.setPixelSize (font_size (15.f));
+		QFontMetricsF metrics (font);
+		float font_height = 0.9f * metrics.height();
+
+		QRectF rect (0.f, 0.f, metrics.width (sa), font_height * (sb.size() + 1));
+		rect.moveLeft (0.9f * _q);
+		rect.moveBottom (-0.4f * _q);
+
+		painter.setClipping (false);
+		painter.setTransform (_sl_transform);
+		painter.setPen (Qt::NoPen);
+		painter.setBrush (Qt::black);
+		painter.drawRect (rect.adjusted (-margin, 0.f, +margin, 0.f));
+		painter.setPen (get_pen (_warning_color_2, 1.f));
+		painter.setFont (font);
+
+		QPointF c (rect.center().x(), rect.top());
+		QPointF h (0.f, font_height);
+
+		text_painter.drawText (c + 0.5f * h, Qt::AlignHCenter | Qt::AlignVCenter, sa);
+		for (int i = 0; i < sb.size(); ++i)
+			text_painter.drawText (c + 1.5f * h + i * h, Qt::AlignHCenter | Qt::AlignVCenter, sb.mid (i, 1));
+	}
 }
 
 
