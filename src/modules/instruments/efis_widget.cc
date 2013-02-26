@@ -406,8 +406,10 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 	painter.setTransform (_horizon_transform);
 	painter.setPen (get_pen (Qt::white, 1.25f));
 	painter.drawLine (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
-	painter.setPen (get_pen (Qt::white, 1.f));
 
+	QPen p = get_pen (Qt::white, 1.f);
+	p.setCapStyle (Qt::FlatCap);
+	painter.setPen (p);
 	painter.setFont (_font_10_bold);
 
 	if (!_heading_visible)
@@ -495,8 +497,13 @@ EFISWidget::sl_post_resize()
 void
 EFISWidget::sl_pre_paint()
 {
+	_speed = limit<float> (_speed, _sl_minimum, _sl_maximum);
 	_sl_min_shown = _speed - 0.5f * _sl_extent;
 	_sl_max_shown = _speed + 0.5f * _sl_extent;
+	_sl_min_shown = std::max<float> (_sl_min_shown, _sl_minimum);
+	_sl_max_shown = std::min<float> (_sl_max_shown, _sl_maximum);
+	if (_sl_min_shown < 0.f)
+		_sl_min_shown = 0.f;
 	_sl_rounded_speed = static_cast<int> (_speed + 0.5f);
 }
 
@@ -592,9 +599,6 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 
 	painter.setFont (ladder_font);
 
-	if (_sl_min_shown < 0.f)
-		_sl_min_shown = 0.f;
-
 	// Special clipping that leaves some margin around black indicator:
 	QPainterPath clip_path_m;
 	clip_path_m.addRect (_sl_black_box_rect.translated (x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
@@ -612,12 +616,12 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 		 kt <= _sl_max_shown + _sl_line_every;
 		 kt += _sl_line_every)
 	{
-		if (kt < 0)
+		if (kt < _sl_min_shown || kt > _sl_max_shown)
 			continue;
 		float posy = kt_to_px (kt);
 		painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
 
-		if (kt % _sl_number_every == 0)
+		if ((kt - _sl_minimum) % _sl_number_every == 0)
 			text_painter.drawText (QRectF (-4.f * ladder_digit_width - 1.25f * x, -0.5f * ladder_digit_height + posy,
 										   +4.f * ladder_digit_width, ladder_digit_height),
 								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
@@ -647,7 +651,7 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 	float max_posy = kt_to_px (_maximum_speed);
 	float wrn_posy = kt_to_px (_warning_speed);
 	float min_posy = kt_to_px (_minimum_speed);
-	QPointF zero_point (_sl_ladder_rect.right(), std::min<float> (_sl_ladder_rect.bottom() + ydif.y(), 1.f * kt_to_px (0.f)));
+	QPointF zero_point (_sl_ladder_rect.right(), _sl_ladder_rect.bottom() + ydif.y());
 
 	if (_maximum_speed_visible && _maximum_speed < _sl_max_shown)
 	{
@@ -691,7 +695,7 @@ EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
 	painter.translate (1.2f * x, 0.f);
 	if (_speed_tendency < _speed)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_sl_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (std::max (0.f, _speed_tendency)))) - 0.5f * x;
+	float length = std::min<float> (_sl_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (limit<float> (_speed_tendency, _sl_minimum, _sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -737,7 +741,7 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	// AT bug:
 	if (_cmd_speed_visible)
 	{
-		float posy = limit (kt_to_px (_cmd_speed),
+		float posy = limit (kt_to_px (limit<float> (_cmd_speed, _sl_minimum, _sl_maximum)),
 							static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
 		// TODO extract bug_shape to sl_post_resize()
 		QPolygonF bug_shape = QPolygonF()

@@ -62,6 +62,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_speed_ladder_extent (int knots);
 
 	/**
+	 * Set speed ladder lowest value.
+	 */
+	void
+	set_speed_ladder_minimum (int knots);
+
+	/**
+	 * Set speed ladder highest value.
+	 */
+	void
+	set_speed_ladder_maximum (int knots);
+
+	/**
 	 * Set how often lines should be drawn on altitude ladder.
 	 */
 	void
@@ -847,6 +859,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	QTransform			_sl_transform;
 	Knots				_sl_extent						= 124;
+	int					_sl_minimum						= 0;
+	int					_sl_maximum						= 9999;
 	int					_sl_line_every					= 10;
 	int					_sl_number_every				= 20;
 	Knots				_sl_min_shown;
@@ -1004,6 +1018,20 @@ EFISWidget::set_speed_ladder_extent (int knots)
 {
 	_sl_extent = std::max (1, knots);
 	update();
+}
+
+
+inline void
+EFISWidget::set_speed_ladder_minimum (int knots)
+{
+	_sl_minimum = std::max (0, knots);
+}
+
+
+inline void
+EFISWidget::set_speed_ladder_maximum (int knots)
+{
+	_sl_maximum = std::min (9999, knots);
 }
 
 

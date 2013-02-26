@@ -56,6 +56,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyInteger	_speed_ladder_line_every;
 	Xefis::PropertyInteger	_speed_ladder_number_every;
 	Xefis::PropertyInteger	_speed_ladder_extent;
+	Xefis::PropertyInteger	_speed_ladder_minimum;
+	Xefis::PropertyInteger	_speed_ladder_maximum;
 	Xefis::PropertyInteger	_altitude_ladder_line_every;
 	Xefis::PropertyInteger	_altitude_ladder_number_every;
 	Xefis::PropertyInteger	_altitude_ladder_bold_every;
