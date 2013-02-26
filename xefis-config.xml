@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
 	<include name='xefis-io.xml'/>
-	<include name='xefis-windows.xml'/>
+	<include name='xefis-displays.xml'/>
 	<include name='xefis-systems.xml'/>
 </xefis-config>
 
