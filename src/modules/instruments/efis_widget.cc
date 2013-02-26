@@ -183,6 +183,8 @@ EFISWidget::adi_pre_paint()
 
 	// Total transform of horizon (heading is not really necessary here):
 	_horizon_transform = _pitch_transform * _roll_transform * _center_transform;
+	// Without the following, Qt did something weird sometimes, like aligning drawn points to display pixels (?).
+	_horizon_transform.shear (0.0001f, 0.f);
 
 	_flight_path_marker_position = QPointF (-heading_to_px (_flight_path_beta), -pitch_to_px (_flight_path_alpha));
 }
