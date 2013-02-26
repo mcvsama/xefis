@@ -33,8 +33,8 @@ EFISWidget::EFISWidget (QWidget* parent):
 	InstrumentWidget (parent, 0.8f, 1.f, 1.f)
 {
 	setAttribute (Qt::WA_NoBackground);
-	_sky_color.setHsv (213, 245, 255);
-	_ground_color.setHsv (30, 255, 122);
+	_sky_color.setHsv (213, 230, 255);
+	_ground_color.setHsv (34, 255, 125);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (120);
 	_warning_color_1 = QColor (255, 150, 0);
