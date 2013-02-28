@@ -97,7 +97,11 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "fma-lateral-small-hint", _fma_lateral_small_hint, false },
 				{ "fma-vertical-hint", _fma_vertical_hint, false },
 				{ "fma-vertical-small-hint", _fma_vertical_small_hint, false },
-				{ "localizer-id", _localizer_id, false }
+				{ "localizer-id", _localizer_id, false },
+				{ "novspd-flag", _novspd_flag, false },
+				{ "speed-v1", _speed_v1_kt, false },
+				{ "speed-vr", _speed_vr_kt, false },
+				{ "speed-ref", _speed_ref_kt, false }
 			});
 		}
 	}
@@ -314,6 +318,23 @@ EFIS::read()
 	}
 	else
 		_efis_widget->set_localizer_info_visible (false);
+
+	_efis_widget->set_novspd_flag (_novspd_flag.read (false));
+
+	if (_speed_v1_kt.valid())
+		_efis_widget->add_speed_bug ("V1", *_speed_v1_kt);
+	else
+		_efis_widget->remove_speed_bug ("V1");
+
+	if (_speed_vr_kt.valid())
+		_efis_widget->add_speed_bug ("VR", *_speed_vr_kt);
+	else
+		_efis_widget->remove_speed_bug ("VR");
+
+	if (_speed_ref_kt.valid())
+		_efis_widget->add_speed_bug ("REF", *_speed_ref_kt);
+	else
+		_efis_widget->remove_speed_bug ("REF");
 
 	_efis_widget->set_vertical_deviation_visible (_vertical_deviation_deg.valid());
 	if (_vertical_deviation_deg.valid())

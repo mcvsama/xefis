@@ -41,6 +41,7 @@
 										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
 										<property name='control-hint' path='/control/hint' default=''/>
 										<property name='landing-altitude' path='/altitude/landing-altitude.ft' default='0'/>
+										<property name='novspd-flag' path='/novspd-flag' default='false'/>
 									</directory>
 									<directory path='/systems/fms/output'>
 										<property name='ias-minimum' path='/speed/ias-minimum.kt'/>

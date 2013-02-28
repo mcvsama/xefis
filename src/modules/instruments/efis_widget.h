@@ -222,6 +222,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_speed_tendency_visible (bool visible);
 
 	/**
+	 * Set visibility of the NO VSPD (no V-speeds)
+	 * flag.
+	 */
+	void
+	set_novspd_flag (bool visible);
+
+	/**
 	 * Set altitude value.
 	 */
 	void
@@ -884,7 +891,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	QPen				_sl_speed_bug_pen;
 	float				_sl_margin;
 	int					_sl_digits;
-	bool				_sl_novspd;
 
 	/*
 	 * Altitude ladder
@@ -935,6 +941,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	bool				_speed_visible					= false;
 	Knots				_speed_tendency					= 0.f;
 	bool				_speed_tendency_visible			= false;
+	bool				_novspd_flag					= false;
 	Feet				_altitude						= 0.f;
 	bool				_altitude_visible				= false;
 	Feet				_altitude_tendency				= 0.f;
@@ -1235,6 +1242,14 @@ inline void
 EFISWidget::set_speed_tendency_visible (bool visible)
 {
 	_speed_tendency_visible = visible;
+	update();
+}
+
+
+inline void
+EFISWidget::set_novspd_flag (bool visible)
+{
+	_novspd_flag = visible;
 	update();
 }
 

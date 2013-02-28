@@ -115,6 +115,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyString	_fma_vertical_hint;
 	Xefis::PropertyString	_fma_vertical_small_hint;
 	Xefis::PropertyString	_localizer_id;
+	Xefis::PropertyBoolean	_novspd_flag;
+	Xefis::PropertyFloat	_speed_v1_kt;
+	Xefis::PropertyFloat	_speed_vr_kt;
+	Xefis::PropertyFloat	_speed_ref_kt;
 };
 
 
