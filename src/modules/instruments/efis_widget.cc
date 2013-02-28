@@ -499,7 +499,6 @@ EFISWidget::sl_post_resize()
 void
 EFISWidget::sl_pre_paint()
 {
-	_sl_novspd = _speed < _sl_minimum;
 	_speed = limit<float> (_speed, _sl_minimum, _sl_maximum);
 	_sl_min_shown = _speed - 0.5f * _sl_extent;
 	_sl_max_shown = _speed + 0.5f * _sl_extent;
@@ -830,7 +829,7 @@ EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 void
 EFISWidget::sl_paint_novspd (QPainter& painter, TextPainter& text_painter)
 {
-	if (_sl_novspd)
+	if (_novspd_flag)
 	{
 		float margin = 0.025f * _q;
 		QString sa = "NO";
