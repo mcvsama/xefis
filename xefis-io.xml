@@ -9,7 +9,7 @@
 					<directory path='/sensors'>
 						<!-- radar altimeter -->
 						<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
-						<!-- /gps -->
+						<!-- gps -->
 						<property name='position-longitude' path='/gps/longitude.deg'/>
 						<property name='position-latitude' path='/gps/latitude.deg'/>
 						<property name='position-sea-level-radius' path='/gps/amsl.ft'/>
