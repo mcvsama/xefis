@@ -79,10 +79,10 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_true_heading_deg;
 	Xefis::PropertyBoolean	_use_true_heading;
 	Xefis::PropertyBoolean	_display_track;
-	Xefis::PropertyBoolean	_autopilot_visible;
-	Xefis::PropertyBoolean	_autopilot_track_visible;
+	Xefis::PropertyBoolean	_cmd_settings_visible;
+	Xefis::PropertyBoolean	_cmd_track_visible;
 	Xefis::PropertyFloat	_magnetic_track_deg;
-	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
+	Xefis::PropertyFloat	_cmd_heading_setting_deg;
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lon_deg;
 	Xefis::PropertyString	_positioning_hint;

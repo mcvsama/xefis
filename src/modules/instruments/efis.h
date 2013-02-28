@@ -90,10 +90,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_pressure_display_hpa;
 	Xefis::PropertyBoolean	_standard_pressure;
 	Xefis::PropertyFloat	_cbr_fpm;
-	Xefis::PropertyBoolean	_autopilot_visible;
-	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
-	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
-	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
+	Xefis::PropertyBoolean	_cmd_settings_visible;
+	Xefis::PropertyFloat	_cmd_alt_setting_ft;
+	Xefis::PropertyFloat	_cmd_speed_setting_kt;
+	Xefis::PropertyFloat	_cmd_cbr_setting_fpm;
 	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;

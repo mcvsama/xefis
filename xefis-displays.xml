@@ -33,8 +33,8 @@
 										<property name='pressure' path='/pressure/pressure-setting.inhg' default='29.92'/>
 										<property name='pressure-display-hpa' path='//systems/fms/settings/pressure-display-hpa'/>
 										<property name='standard-pressure' path='//systems/fms/settings/standard-pressure-on'/>
-										<property name='autopilot-visible' path='/autopilot/visible' default='true'/>
-										<property name='fma-visible' path='/autopilot/fma-visible' default='true'/>
+										<property name='commanded-settings-visible' path='/command/visible' default='true'/>
+										<property name='fma-visible' path='/fma/visible' default='true'/>
 										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
 										<property name='control-stick-visible' path='/control-stick/visible' default='true'/>
 										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
@@ -71,9 +71,9 @@
 										<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
 									</directory>
 									<directory path='/systems/flight-director/settings'>
-										<property name='autopilot-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
-										<property name='autopilot-setting-altitude' path='/altitude.ft'/>
-										<property name='autopilot-setting-cbr' path='/vertical-speed.fpm'/>
+										<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
+										<property name='cmd-setting-altitude' path='/altitude.ft'/>
+										<property name='cmd-setting-cbr' path='/vertical-speed.fpm'/>
 									</directory>
 									<directory path='/systems/flight-director'>
 										<property name='fma-speed-hint' path='/hints/speed-hint' default=''/>
@@ -99,7 +99,7 @@
 										<property name='display-mode' path='/display-mode' default='2'/>
 										<property name='range' path='/range.kt' default='2'/>
 										<property name='trend-vector-range' path='/trend-vector-range.kt' default='2'/>
-										<property name='autopilot-visible' path='/autopilot-visible' default='true'/>
+										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
 									<directory path='/systems/fms/output'>
 										<property name='gs' path='/speed/ground-speed.kt'/>
@@ -117,8 +117,8 @@
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
 									<directory path='/systems/flight-director'>
-										<property name='autopilot-track-visible' path='/settings/enabled'/>
-										<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
+										<property name='cmd-track-visible' path='/settings/enabled'/>
+										<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 									<property name='display-track' path='//systems/fms/settings/follow-track'/>
@@ -137,7 +137,7 @@
 										<property name='display-mode' path='/display-mode' default='0'/>
 										<property name='range' path='/range.kt' default='20'/>
 										<property name='trend-vector-range' path='/trend-vector-range.kt' default='2'/>
-										<property name='autopilot-visible' path='/autopilot-visible' default='true'/>
+										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
 									<directory path='/systems/fms/output'>
 										<property name='gs' path='/speed/ground-speed.kt'/>
@@ -155,8 +155,8 @@
 										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
 									</directory>
 									<directory path='/systems/flight-director'>
-										<property name='autopilot-track-visible' path='/settings/enabled'/>
-										<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
+										<property name='cmd-track-visible' path='/settings/enabled'/>
+										<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
 									</directory>
 									<property name='use-true-heading' path='//systems/fms/settings/use-true-heading'/>
 									<property name='display-track' path='//systems/fms/settings/follow-track'/>

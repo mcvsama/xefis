@@ -73,10 +73,10 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "pressure-display-hpa", _pressure_display_hpa, false },
 				{ "standard-pressure", _standard_pressure, false },
 				{ "cbr", _cbr_fpm, false },
-				{ "autopilot-visible", _autopilot_visible, false },
-				{ "autopilot-setting-altitude", _autopilot_alt_setting_ft, false },
-				{ "autopilot-setting-ias", _autopilot_speed_setting_kt, false },
-				{ "autopilot-setting-cbr", _autopilot_cbr_setting_fpm, false },
+				{ "cmd-settings-visible", _cmd_settings_visible, false },
+				{ "cmd-setting-altitude", _cmd_alt_setting_ft, false },
+				{ "cmd-setting-ias", _cmd_speed_setting_kt, false },
+				{ "cmd-setting-cbr", _cmd_cbr_setting_fpm, false },
 				{ "flight-director-visible", _flight_director_visible, false },
 				{ "flight-director-pitch", _flight_director_pitch_deg, false },
 				{ "flight-director-roll", _flight_director_roll_deg, false },
@@ -251,19 +251,19 @@ EFIS::read()
 	if (_cbr_fpm.valid())
 		_efis_widget->set_climb_rate (*_cbr_fpm);
 
-	bool autopilot_visible = _autopilot_visible.valid() && *_autopilot_visible;
+	bool cmd_visible = _cmd_settings_visible.read (false);
 
-	_efis_widget->set_cmd_altitude_visible (autopilot_visible && _autopilot_alt_setting_ft.valid());
-	if (_autopilot_alt_setting_ft.valid())
-		_efis_widget->set_cmd_altitude (*_autopilot_alt_setting_ft);
+	_efis_widget->set_cmd_altitude_visible (cmd_visible && _cmd_alt_setting_ft.valid());
+	if (_cmd_alt_setting_ft.valid())
+		_efis_widget->set_cmd_altitude (*_cmd_alt_setting_ft);
 
-	_efis_widget->set_cmd_speed_visible (autopilot_visible && _autopilot_speed_setting_kt.valid());
-	if (_autopilot_speed_setting_kt.valid())
-		_efis_widget->set_cmd_speed (*_autopilot_speed_setting_kt);
+	_efis_widget->set_cmd_speed_visible (cmd_visible && _cmd_speed_setting_kt.valid());
+	if (_cmd_speed_setting_kt.valid())
+		_efis_widget->set_cmd_speed (*_cmd_speed_setting_kt);
 
-	_efis_widget->set_cmd_climb_rate_visible (autopilot_visible && _autopilot_cbr_setting_fpm.valid());
-	if (_autopilot_cbr_setting_fpm.valid())
-		_efis_widget->set_cmd_climb_rate (*_autopilot_cbr_setting_fpm);
+	_efis_widget->set_cmd_climb_rate_visible (cmd_visible && _cmd_cbr_setting_fpm.valid());
+	if (_cmd_cbr_setting_fpm.valid())
+		_efis_widget->set_cmd_climb_rate (*_cmd_cbr_setting_fpm);
 
 	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
 
