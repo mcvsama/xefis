@@ -102,10 +102,10 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_altitude_agl_ft;
 	Xefis::PropertyFloat	_cbr_fpm;
 	Xefis::PropertyFloat	_pressure_inhg;
-	Xefis::PropertyFloat	_autopilot_alt_setting_ft;
-	Xefis::PropertyFloat	_autopilot_speed_setting_kt;
-	Xefis::PropertyFloat	_autopilot_heading_setting_deg;
-	Xefis::PropertyFloat	_autopilot_cbr_setting_fpm;
+	Xefis::PropertyFloat	_cmd_alt_setting_ft;
+	Xefis::PropertyFloat	_cmd_speed_setting_kt;
+	Xefis::PropertyFloat	_cmd_heading_setting_deg;
+	Xefis::PropertyFloat	_cmd_cbr_setting_fpm;
 	Xefis::PropertyFloat	_flight_director_pitch_deg;
 	Xefis::PropertyFloat	_flight_director_roll_deg;
 	Xefis::PropertyBoolean	_navigation_needles_visible;

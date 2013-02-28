@@ -35,10 +35,10 @@ typedef uint32_t	FGInt;
 BEGIN_PACKED_STRUCT
 struct FGInputData
 {
-	FGDouble	autopilot_alt_setting_ft;		// apa
-	FGDouble	autopilot_cbr_setting_fpm;		// apc
-	FGDouble	autopilot_speed_setting_kt;		// ats
-	FGDouble	autopilot_heading_setting_deg;	// aph
+	FGDouble	cmd_alt_setting_ft;		// apa
+	FGDouble	cmd_cbr_setting_fpm;		// apc
+	FGDouble	cmd_speed_setting_kt;		// ats
+	FGDouble	cmd_heading_setting_deg;	// aph
 	FGDouble	flight_director_pitch_deg;		// fdp
 	FGDouble	flight_director_roll_deg;		// fdr
 	FGDouble	ias_kt;							// ias
@@ -133,10 +133,10 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "altitude-agl", _altitude_agl_ft, false },
 						{ "cbr", _cbr_fpm, false },
 						{ "pressure", _pressure_inhg, false },
-						{ "autopilot-setting-altitude", _autopilot_alt_setting_ft, false },
-						{ "autopilot-setting-ias", _autopilot_speed_setting_kt, false },
-						{ "autopilot-setting-heading", _autopilot_heading_setting_deg, false },
-						{ "autopilot-setting-cbr", _autopilot_cbr_setting_fpm, false },
+						{ "cmd-setting-altitude", _cmd_alt_setting_ft, false },
+						{ "cmd-setting-ias", _cmd_speed_setting_kt, false },
+						{ "cmd-setting-heading", _cmd_heading_setting_deg, false },
+						{ "cmd-setting-cbr", _cmd_cbr_setting_fpm, false },
 						{ "flight-director-pitch", _flight_director_pitch_deg, false },
 						{ "flight-director-roll", _flight_director_roll_deg, false },
 						{ "navigation-needles-visible", _navigation_needles_visible, false },
@@ -237,10 +237,10 @@ FlightGearIO::invalidate_all()
 		&_altitude_agl_ft,
 		&_cbr_fpm,
 		&_pressure_inhg,
-		&_autopilot_alt_setting_ft,
-		&_autopilot_speed_setting_kt,
-		&_autopilot_heading_setting_deg,
-		&_autopilot_cbr_setting_fpm,
+		&_cmd_alt_setting_ft,
+		&_cmd_speed_setting_kt,
+		&_cmd_heading_setting_deg,
+		&_cmd_cbr_setting_fpm,
 		&_flight_director_pitch_deg,
 		&_flight_director_roll_deg,
 		&_navigation_needles_visible,
@@ -289,10 +289,10 @@ FlightGearIO::read_input()
 		if (!_##x.is_singular()) \
 			_##x.write (fg_data->x);
 
-		ASSIGN (autopilot_alt_setting_ft);
-		ASSIGN (autopilot_cbr_setting_fpm);
-		ASSIGN (autopilot_speed_setting_kt);
-		ASSIGN (autopilot_heading_setting_deg);
+		ASSIGN (cmd_alt_setting_ft);
+		ASSIGN (cmd_cbr_setting_fpm);
+		ASSIGN (cmd_speed_setting_kt);
+		ASSIGN (cmd_heading_setting_deg);
 		ASSIGN (flight_director_pitch_deg);
 		ASSIGN (flight_director_roll_deg);
 		ASSIGN (ias_kt);

@@ -60,10 +60,10 @@
 					</directory>
 					<directory path='/systems/flight-director'>
 						<!-- Emulate some of the AP settings -->
-						<property name='autopilot-setting-altitude' path='/settings/altitude.ft'/>
-						<property name='autopilot-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
-						<property name='autopilot-setting-cbr' path='/settings/vertical-speed.fpm'/>
-						<property name='autopilot-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
+						<property name='cmd-setting-altitude' path='/settings/altitude.ft'/>
+						<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track.deg'/>
+						<property name='cmd-setting-cbr' path='/settings/vertical-speed.fpm'/>
+						<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias.kt'/>
 					</directory>
 				</properties>
 			</input>

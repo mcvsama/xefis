@@ -406,7 +406,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_maximum_speed_visible (bool visible);
 
 	/**
-	 * Set autopilot altitude.
+	 * Set commanded altitude.
 	 */
 	void
 	set_cmd_altitude (Feet);
@@ -418,7 +418,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_cmd_altitude_visible (bool visible);
 
 	/**
-	 * Set autopilot climb rate setting.
+	 * Set commanded climb rate setting.
 	 */
 	void
 	set_cmd_climb_rate (FeetPerMinute);
