@@ -77,6 +77,13 @@ class Application: public QApplication
 	data_updated();
 
 	/**
+	 * Called by offline data updater. Similar to data updated,
+	 * but will not restart offline timer.
+	 */
+	void
+	offline_data_updated();
+
+	/**
 	 * Indicate that the data was updated, but the update signal
 	 * can be send later.
 	 */
@@ -97,11 +104,11 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
-	NavaidStorage*		_navaid_storage	= nullptr;
-	ModuleManager*		_module_manager	= nullptr;
-	ConfigReader*		_config_reader	= nullptr;
-	QTimer*				_postponed_update;
-	QTimer*				_offline_updater;
+	NavaidStorage*		_navaid_storage		= nullptr;
+	ModuleManager*		_module_manager		= nullptr;
+	ConfigReader*		_config_reader		= nullptr;
+	QTimer*				_postponed_update	= nullptr;
+	QTimer*				_offline_updater	= nullptr;
 };
 
 

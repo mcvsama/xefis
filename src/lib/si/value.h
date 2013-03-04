@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 
 namespace SI {
@@ -43,6 +44,24 @@ template<class tValueType, class tDerived>
 
 		constexpr
 		Value (Value const&) noexcept = default;
+
+		/**
+		 * Equivalent of std::numeric_limits<ValueType>::min();
+		 */
+		constexpr ValueType
+		min() const noexcept;
+
+		/**
+		 * Equivalent of std::numeric_limits<ValueType>::max();
+		 */
+		constexpr ValueType
+		max() const noexcept;
+
+		/**
+		 * Equivalent of std::numeric_limits<ValueType>::lowest();
+		 */
+		constexpr ValueType
+		lowest() const noexcept;
 
 		/**
 		 * Access internal representation.
@@ -140,6 +159,30 @@ template<class V, class T>
 	Value<V, T>::internal() noexcept
 	{
 		return _value;
+	}
+
+
+template<class V, class T>
+	inline constexpr typename Value<V, T>::ValueType
+	Value<V, T>::min() const noexcept
+	{
+		return std::numeric_limits<ValueType>::min();
+	}
+
+
+template<class V, class T>
+	inline constexpr typename Value<V, T>::ValueType
+	Value<V, T>::max() const noexcept
+	{
+		return std::numeric_limits<ValueType>::max();
+	}
+
+
+template<class V, class T>
+	inline constexpr typename Value<V, T>::ValueType
+	Value<V, T>::lowest() const noexcept
+	{
+		return std::numeric_limits<ValueType>::lowest();
 	}
 
 

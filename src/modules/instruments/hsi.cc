@@ -69,7 +69,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 	_hsi_widget->set_vor_visible (true);
 	_hsi_widget->set_dme_visible (true);
 	_hsi_widget->set_loc_visible (true);
-	_hsi_widget->set_fix_visible (true);
+	_hsi_widget->set_fix_visible (false);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

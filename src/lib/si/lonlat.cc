@@ -27,20 +27,20 @@ LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
 	// Convert to radians:
-	float const lat_rad = lat().rad();
-	float const lon_rad = lon().rad();
-	float const rot_lat_rad = rotation.lat().rad();
-	float const rot_lon_rad = rotation.lon().rad();
+	double const lat_rad = lat().rad();
+	double const lon_rad = lon().rad();
+	double const rot_lat_rad = rotation.lat().rad();
+	double const rot_lon_rad = rotation.lon().rad();
 	// Get cartesian from polar coords:
-	float const x = -std::cos (lat_rad) * std::cos (lon_rad);
-	float const y = +std::cos (lat_rad) * std::sin (lon_rad);
-	float const z = +std::sin (lat_rad);
+	double const x = -std::cos (lat_rad) * std::cos (lon_rad);
+	double const y = +std::cos (lat_rad) * std::sin (lon_rad);
+	double const z = +std::sin (lat_rad);
 	// Lat rotation:
-	float const sin_y = std::sin (-rot_lat_rad);
-	float const cos_y = std::cos (-rot_lat_rad);
+	double const sin_y = std::sin (-rot_lat_rad);
+	double const cos_y = std::cos (-rot_lat_rad);
 	// Lng rotation:
-	float const sin_z = std::sin (rot_lon_rad);
-	float const cos_z = std::cos (rot_lon_rad);
+	double const sin_z = std::sin (rot_lon_rad);
+	double const cos_z = std::cos (rot_lon_rad);
 
 	QTransform rz = {
 		+cos_z, -sin_z, 0.f,
@@ -55,12 +55,12 @@ LonLat::rotate (LonLat const& rotation)
 	QTransform r = ry * rz;
 
 	// Matrix * vector:
-	float const nx = x * r.m11() + y * r.m12() + z * r.m13();
-	float const ny = x * r.m21() + y * r.m22() + z * r.m23();
-	float const nz = x * r.m31() + y * r.m32() + z * r.m33();
+	double const nx = x * r.m11() + y * r.m12() + z * r.m13();
+	double const ny = x * r.m21() + y * r.m22() + z * r.m23();
+	double const nz = x * r.m31() + y * r.m32() + z * r.m33();
 
 	// Back to LonLat:
-	float mag = std::sqrt (nx * nx + ny * ny);
+	double mag = std::sqrt (nx * nx + ny * ny);
 	_lat = 1_rad * std::atan2 (nz, mag);
 	_lon = 1_rad * std::atan2 (ny, nx);
 
