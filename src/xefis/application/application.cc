@@ -59,7 +59,6 @@ Application::Application (int argc, char** argv):
 	_navaid_storage = new NavaidStorage();
 	_module_manager = new ModuleManager (this);
 	_config_reader = new ConfigReader (this, _module_manager);
-	_config_reader->load ("xefis-config.xml");
 
 	_postponed_update = new QTimer (this);
 	_postponed_update->setSingleShot (true);
@@ -68,10 +67,12 @@ Application::Application (int argc, char** argv):
 
 	_offline_updater = new QTimer (this);
 	_offline_updater->setInterval (100.f);
-	QObject::connect (_offline_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
+	QObject::connect (_offline_updater, SIGNAL (timeout()), this, SLOT (offline_data_updated()));
 	_offline_updater->start();
 
 	signal (SIGHUP, s_quit);
+
+	_config_reader->load ("xefis-config.xml");
 }
 
 
@@ -94,6 +95,15 @@ Application::quit()
 
 void
 Application::data_updated()
+{
+	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
+	// Restart offline timer:
+	_offline_updater->start();
+}
+
+
+void
+Application::offline_data_updated()
 {
 	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
 }

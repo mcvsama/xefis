@@ -400,19 +400,15 @@ class HSIWidget: public Xefis::InstrumentWidget
 	QPainterPath			_outer_map_clip;
 	QPen					_ndb_pen;
 	QPen					_vor_pen;
-	QPen					_vortac_pen;
 	QPen					_dme_pen;
 	QPen					_fix_pen;
 	QPen					_lo_loc_pen;
 	QPen					_hi_loc_pen;
 	QFont					_radials_font;
+	QPainterPath			_ndb_shape;
 	QPolygonF				_dme_for_vor_shape;
 	QPolygonF				_vor_shape;
-	NavaidStorage::Navaids	_loc_navs;
-	NavaidStorage::Navaids	_ndb_navs;
-	NavaidStorage::Navaids	_vor_navs;
-	NavaidStorage::Navaids	_dme_navs;
-	NavaidStorage::Navaids	_fix_navs;
+	QPolygonF				_vortac_shape;
 	QPolygonF				_aircraft_shape;
 	QPolygonF				_ap_bug_shape;
 	float					_r;
@@ -420,6 +416,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 	bool					_navs_retrieved				= false;
 	LonLat					_navs_retrieve_position		= { 0_deg, 0_deg };
 	Length					_navs_retrieve_range		= 0_nm;
+	NavaidStorage::Navaids	_loc_navs;
+	NavaidStorage::Navaids	_ndb_navs;
+	NavaidStorage::Navaids	_vor_navs;
+	NavaidStorage::Navaids	_dme_navs;
+	NavaidStorage::Navaids	_fix_navs;
 
 	// Parameters:
 	DisplayMode				_display_mode				= DisplayMode::Expanded;

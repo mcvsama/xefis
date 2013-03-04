@@ -129,19 +129,57 @@ HSIWidget::update_more()
 	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.8f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Unscaled pens:
-	_ndb_pen = QPen (Qt::cyan, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	_ndb_pen = QPen (QColor (25, 128, 255), 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_vor_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-	_vortac_pen = QPen (_navigation_color, 0.4f, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	_dme_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
 
 	// Shapes:
+	_ndb_shape = QPainterPath();
+	{
+		QPainterPath s_point;
+		s_point.addEllipse (QRectF (-0.035f, -0.035f, 0.07f, 0.07f));
+		QPainterPath point_1 = s_point.translated (0.f, -0.35f);
+		QPainterPath point_2 = s_point.translated (0.f, -0.55f);
+		QTransform t;
+
+		_ndb_shape.addEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+		for (int i = 0; i < 12; ++i)
+		{
+			t.rotate (30.f);
+			_ndb_shape.addPath (t.map (point_1));
+		}
+		t.rotate (15.f);
+		for (int i = 0; i < 18; ++i)
+		{
+			t.rotate (20.f);
+			_ndb_shape.addPath (t.map (point_2));
+		}
+	}
+
 	_dme_for_vor_shape = QPolygonF()
 		<< QPointF (-0.5f, -0.5f)
 		<< QPointF (-0.5f, +0.5f)
 		<< QPointF (+0.5f, +0.5f)
 		<< QPointF (+0.5f, -0.5f)
 		<< QPointF (-0.5f, -0.5f);
+
+	QTransform t;
+	_vortac_shape = QPolygonF();
+	t.rotate (60.f);
+	for (int i = 0; i < 4; ++i)
+	{
+		float const x = 0.18f;
+		float const y1 = 0.28f;
+		float const y2 = 0.48f;
+		_vortac_shape << t.map (QPointF (-x, -y1));
+		if (i == 3)
+			break;
+		_vortac_shape << t.map (QPointF (-x, -y2));
+		_vortac_shape << t.map (QPointF (+x, -y2));
+		_vortac_shape << t.map (QPointF (+x, -y1));
+		t.rotate (120.f);
+	}
 
 	_vor_shape = QPolygonF()
 		<< QPointF (-0.5f, 0.f)
@@ -738,63 +776,37 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 		{
 			case Navaid::NDB:
 			{
-				if (!_ndb_visible)
-					break;
-				QPainterPath b_point;
-				b_point.addEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
-				QPainterPath s_point;
-				s_point.addEllipse (QRectF (-0.035f, -0.035f, 0.07f, 0.07f));
-				QPainterPath point_1 = s_point.translated (0.f, -0.35f);
-				QPainterPath point_2 = s_point.translated (0.f, -0.55f);
-
 				painter.setTransform (scaled_transform);
 				painter.setPen (_ndb_pen);
 				painter.setBrush (_ndb_pen.color());
-				painter.drawPath (b_point);
-				for (int i = 0; i < 12; ++i)
-				{
-					painter.rotate (30.f);
-					painter.drawPath (point_1);
-				}
-				painter.rotate (15.f);
-				for (int i = 0; i < 18; ++i)
-				{
-					painter.rotate (20.f);
-					painter.drawPath (point_2);
-				}
+				painter.drawPath (_ndb_shape);
 				painter.setTransform (centered_transform);
 				text_painter.drawText (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
 				break;
 			}
 
 			case Navaid::VOR:
-				if (!_vor_visible)
-					break;
 				painter.setTransform (scaled_transform);
 				painter.setPen (_vor_pen);
-				painter.drawPolyline (_vor_shape);
 				painter.setBrush (_navigation_color);
-				painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
-				if (navaid.vor_type() == Navaid::VOR_DME)
-					painter.drawPolyline (_dme_for_vor_shape);
-				else if (navaid.vor_type() == Navaid::VORTAC)
+				if (navaid.vor_type() == Navaid::VOROnly)
 				{
-					float x = 0.28f;
-					float y = 0.64f;
-					painter.setPen (_vortac_pen);
-					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
-					painter.rotate (120.f);
-					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
-					painter.rotate (120.f);
-					painter.drawLine (QPointF (-x, y), QPointF (+x, y));
+					painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+					painter.drawPolyline (_vor_shape);
 				}
+				else if (navaid.vor_type() == Navaid::VOR_DME)
+				{
+					painter.drawEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
+					painter.drawPolyline (_vor_shape);
+					painter.drawPolyline (_dme_for_vor_shape);
+				}
+				else if (navaid.vor_type() == Navaid::VORTAC)
+					painter.drawPolyline (_vortac_shape);
 				painter.setTransform (centered_transform);
 				text_painter.drawText (QPointF (0.35f * _q, 0.55f * _q), navaid.identifier());
 				break;
 
 			case Navaid::DME:
-				if (!_dme_visible)
-					break;
 				painter.setTransform (scaled_transform);
 				painter.setPen (_dme_pen);
 				painter.drawRect (QRectF (-0.5f, -0.5f, 1.f, 1.f));
@@ -802,8 +814,6 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 
 			case Navaid::Fix:
 			{
-				if (!_fix_visible)
-					break;
 				float const h = 0.75f;
 				QPointF a (0.f, -0.66f * h);
 				QPointF b (+0.5f * h, +0.33f * h);
@@ -823,17 +833,21 @@ HSIWidget::paint_navaids (QPainter& painter, TextPainter& text_painter)
 		}
 	};
 
-	for (auto& navaid: _fix_navs)
-		paint_navaid (navaid);
+	if (_fix_visible)
+		for (auto& navaid: _fix_navs)
+			paint_navaid (navaid);
 
-	for (auto& navaid: _ndb_navs)
-		paint_navaid (navaid);
+	if (_ndb_visible)
+		for (auto& navaid: _ndb_navs)
+			paint_navaid (navaid);
 
-	for (auto& navaid: _dme_navs)
-		paint_navaid (navaid);
+	if (_dme_visible)
+		for (auto& navaid: _dme_navs)
+			paint_navaid (navaid);
 
-	for (auto& navaid: _vor_navs)
-		paint_navaid (navaid);
+	if (_vor_visible)
+		for (auto& navaid: _vor_navs)
+			paint_navaid (navaid);
 }
 
 
