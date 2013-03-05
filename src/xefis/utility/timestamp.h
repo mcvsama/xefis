@@ -20,7 +20,7 @@
 // System:
 #include <sys/time.h>
 
-// Haruhi:
+// Xefis:
 #include <xefis/config/all.h>
 
 

@@ -31,6 +31,7 @@
 #include <xefis/core/module_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
+#include <xefis/core/work_performer.h>
 
 // Local:
 #include "application.h"
@@ -59,6 +60,7 @@ Application::Application (int argc, char** argv):
 	_navaid_storage = new NavaidStorage();
 	_module_manager = new ModuleManager (this);
 	_config_reader = new ConfigReader (this, _module_manager);
+	_work_performer = new WorkPerformer (Services::detected_cores());
 
 	_postponed_update = new QTimer (this);
 	_postponed_update->setSingleShot (true);
@@ -78,6 +80,7 @@ Application::Application (int argc, char** argv):
 
 Application::~Application()
 {
+	delete _work_performer;
 	delete _config_reader;
 	delete _module_manager;
 	delete _navaid_storage;
