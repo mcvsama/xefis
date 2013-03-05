@@ -31,6 +31,7 @@ namespace Xefis {
 class NavaidStorage;
 class ModuleManager;
 class ConfigReader;
+class WorkPerformer;
 
 
 class Application: public QApplication
@@ -67,6 +68,12 @@ class Application: public QApplication
 	 */
 	NavaidStorage*
 	navaid_storage() const;
+
+	/**
+	 * Return WorkPerformer.
+	 */
+	WorkPerformer*
+	work_performer() const;
 
   public slots:
 	/**
@@ -109,6 +116,7 @@ class Application: public QApplication
 	ConfigReader*		_config_reader		= nullptr;
 	QTimer*				_postponed_update	= nullptr;
 	QTimer*				_offline_updater	= nullptr;
+	WorkPerformer*		_work_performer		= nullptr;
 };
 
 
@@ -130,6 +138,13 @@ inline NavaidStorage*
 Application::navaid_storage() const
 {
 	return _navaid_storage;
+}
+
+
+inline WorkPerformer*
+Application::work_performer() const
+{
+	return _work_performer;
 }
 
 } // namespace Xefis

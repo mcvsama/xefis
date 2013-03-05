@@ -16,6 +16,10 @@
 
 // Standard:
 #include <stdint.h>
+#include <string>
+
+// Qt:
+#include <QtCore/QString>
 
 // Lib:
 #include <lib/si/all.h>
@@ -29,6 +33,20 @@ typedef float Feet;
 typedef float FeetPerMinute;
 typedef float Seconds;
 typedef float InHg;
+
+
+inline std::string
+operator"" _str (const char* string, size_t)
+{
+    return std::string (string);
+}
+
+
+inline QString
+operator"" _qstr (const char* string, size_t)
+{
+    return QString (string);
+}
 
 #endif
 
