@@ -151,5 +151,12 @@ Module::navaid_storage() const
 	return _module_manager->application()->navaid_storage();
 }
 
+
+WorkPerformer*
+Module::work_performer() const
+{
+	return _module_manager->application()->work_performer();
+}
+
 } // namespace Xefis
 

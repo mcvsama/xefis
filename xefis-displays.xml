@@ -8,7 +8,7 @@
 				</item>
 			</layout>
 		</window>
-		<window width='1366' height='768' full-screen='false' scale='1.0'>
+		<window width='1366' height='768' full-screen='false'>
 			<layout type='horizontal'>
 				<item stretch-factor='4'>
 					<layout type='vertical'>
