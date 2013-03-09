@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 // Local:
 #include "value.h"
@@ -185,6 +186,19 @@ operator"" _mil (unsigned long long mil)
 }
 
 } // namespace SI
+
+
+namespace std {
+
+/**
+ * Numeric limits for class Length.
+ * Forwards Length::ValueType as parameter to std::numeric_limits.
+ */
+template<>
+	class numeric_limits<SI::Length>: public numeric_limits<SI::Length::ValueType>
+	{ };
+
+} // namespace std
 
 #endif
 

@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 // Local:
 #include "value.h"
@@ -129,6 +130,19 @@ operator"" _MHz (unsigned long long MHz)
 }
 
 } // namespace SI
+
+
+namespace std {
+
+/**
+ * Numeric limits for class Frequency.
+ * Forwards Frequency::ValueType as parameter to std::numeric_limits.
+ */
+template<>
+	class numeric_limits<SI::Frequency>: public numeric_limits<SI::Frequency::ValueType>
+	{ };
+
+} // namespace std
 
 #endif
 
