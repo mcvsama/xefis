@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 // Local:
 #include "value.h"
@@ -133,6 +134,19 @@ operator"" _inhg (unsigned long long inhg)
 }
 
 } // namespace SI
+
+
+namespace std {
+
+/**
+ * Numeric limits for class Pressure.
+ * Forwards Pressure::ValueType as parameter to std::numeric_limits.
+ */
+template<>
+	class numeric_limits<SI::Pressure>: public numeric_limits<SI::Pressure::ValueType>
+	{ };
+
+} // namespace std
 
 #endif
 

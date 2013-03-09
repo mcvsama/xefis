@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <cmath>
+#include <limits>
 
 // Local:
 #include "value.h"
@@ -108,6 +109,19 @@ operator"" _deg (unsigned long long degrees)
 }
 
 } // namespace SI
+
+
+namespace std {
+
+/**
+ * Numeric limits for class Angle.
+ * Forwards Angle::ValueType as parameter to std::numeric_limits.
+ */
+template<>
+	class numeric_limits<SI::Angle>: public numeric_limits<SI::Angle::ValueType>
+	{ };
+
+} // namespace std
 
 #endif
 
