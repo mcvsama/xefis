@@ -63,7 +63,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 		}
 	}
 
-	_hsi_widget = new HSIWidget (this);
+	_hsi_widget = new HSIWidget (this, work_performer());
 	_hsi_widget->set_navaid_storage (navaid_storage());
 	_hsi_widget->set_ndb_visible (true);
 	_hsi_widget->set_vor_visible (true);

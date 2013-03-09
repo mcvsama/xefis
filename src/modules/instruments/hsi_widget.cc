@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtCore/QTimer>
+#include <QtGui/QApplication>
 #include <QtGui/QPainter>
 
 // Xefis:
@@ -36,9 +37,68 @@ using Xefis::Navaid;
 using Xefis::NavaidStorage;
 
 
-HSIWidget::HSIWidget (QWidget* parent):
-	InstrumentWidget (parent, 0.5f, 1.1f, 1.f)
+void
+HSIWidget::PaintWorkUnit::execute()
+{
+	bool repaint_again = false;
+	RecursiveMutex& m = _hsi_widget->_repaint_mutex;
+
+	for (;;)
+	{
+		m.synchronize ([&]() {
+			QSize pbs = _hsi_widget->_safe_size;
+			if (_image.size() != pbs || _hsi_widget->_update_more_needed)
+			{
+				resize (pbs);
+				_hsi_widget->update_more();
+				_hsi_widget->_update_more_needed = false;
+			}
+		});
+
+		repaint_again = false;
+
+		QPainter painter (&_image);
+		_hsi_widget->paint (painter);
+
+		m.synchronize ([&]() {
+			_hsi_widget->_paint_buffer = _image;
+			_hsi_widget->update_later();
+			repaint_again = _hsi_widget->_queue_repaint;
+			_hsi_widget->_queue_repaint = false;
+			if (!repaint_again)
+				_hsi_widget->_worker_added = false;
+		});
+
+		if (!repaint_again)
+			break;
+	}
+}
+
+
+HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
+	InstrumentWidget (parent, 0.5f, 1.1f, 1.f),
+	_paint_buffer (size(), QImage::Format_ARGB32_Premultiplied),
+	_paint_work_unit (this, size()),
+	_work_performer (work_performer)
 { }
+
+
+void
+HSIWidget::update_later()
+{
+	QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (UpdateEvent)));
+}
+
+
+void
+HSIWidget::request_repaint()
+{
+	if (!_repaint_requested)
+	{
+		_repaint_requested = true;
+		QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (RequestRepaintEvent)));
+	}
+}
 
 
 void
@@ -217,12 +277,55 @@ void
 HSIWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
-	update_more();
+	_repaint_mutex.synchronize ([&]() {
+		_safe_size = size();
+		_paint_buffer = QImage (size(), QImage::Format_ARGB32_Premultiplied);
+		_paint_buffer.fill (Qt::black);
+		request_repaint();
+	});
 }
 
 
 void
 HSIWidget::paintEvent (QPaintEvent*)
+{
+	QPainter painter (this);
+	_repaint_mutex.synchronize ([&]() {
+		painter.drawImage (QPoint (0, 0), _paint_buffer);
+	});
+}
+
+
+void
+HSIWidget::customEvent (QEvent* event)
+{
+	switch (static_cast<int> (event->type()))
+	{
+		case UpdateEvent:
+			update();
+			break;
+
+		case RequestRepaintEvent:
+			_repaint_requested = false;
+			_repaint_mutex.synchronize ([&]() {
+				if (_worker_added)
+					_queue_repaint = true;
+				else
+				{
+					_worker_added = true;
+					_work_performer->add (&_paint_work_unit);
+				}
+			});
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+void
+HSIWidget::paint (QPainter& painter)
 {
 	_true_track = floored_mod (_magnetic_track + (_true_heading - _magnetic_heading), 360_deg);
 
@@ -257,7 +360,6 @@ HSIWidget::paintEvent (QPaintEvent*)
 		_ap_heading += _true_heading - _magnetic_heading;
 	_ap_heading = floored_mod (_ap_heading, 360_deg);
 
-	QPainter painter (this);
 	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);

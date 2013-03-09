@@ -89,6 +89,12 @@ class Module
 	NavaidStorage*
 	navaid_storage() const;
 
+	/**
+	 * Access work performer.
+	 */
+	WorkPerformer*
+	work_performer() const;
+
   private:
 	ModuleManager*	_module_manager = nullptr;
 };

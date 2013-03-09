@@ -26,8 +26,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/navaid_storage.h>
+#include <xefis/core/work_performer.h>
 #include <xefis/utility/text_painter.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/mutex.h>
 
 
 using Xefis::NavaidStorage;
@@ -35,6 +37,28 @@ using Xefis::NavaidStorage;
 class HSIWidget: public Xefis::InstrumentWidget
 {
 	typedef std::map<QString, Angle> HeadingBugs;
+
+  private:
+	class PaintWorkUnit: public Xefis::WorkPerformer::Unit
+	{
+	  public:
+		PaintWorkUnit (HSIWidget*, QSize size);
+
+		~PaintWorkUnit() noexcept { }
+
+		void
+		resize (QSize size);
+
+		void
+		execute() override;
+
+	  private:
+		QImage		_image;
+		HSIWidget*	_hsi_widget;
+	};
+
+	constexpr static int UpdateEvent			= QEvent::User + 0;
+	constexpr static int RequestRepaintEvent	= QEvent::User + 1;
 
   public:
 	enum class HeadingMode
@@ -72,7 +96,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   public:
 	// Ctor
-	HSIWidget (QWidget* parent);
+	HSIWidget (QWidget* parent, Xefis::WorkPerformer*);
 
 	/**
 	 * Set reference to the nav storage, if you want navaids
@@ -320,6 +344,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   private:
 	void
+	update_later();
+
+	void
+	request_repaint();
+
+	void
 	update_more();
 
 	void
@@ -327,6 +357,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	void
 	paintEvent (QPaintEvent*) override;
+
+	void
+	customEvent (QEvent*) override;
+
+	void
+	paint (QPainter&);
 
 	void
 	paint_aircraft (QPainter&, TextPainter&);
@@ -386,6 +422,15 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   private:
 	NavaidStorage*			_navaid_storage				= nullptr;
+	RecursiveMutex			_repaint_mutex;
+	bool					_update_more_needed			= false;
+	bool					_repaint_requested			= false;
+	bool					_worker_added				= false;
+	bool					_queue_repaint				= false;
+	QImage					_paint_buffer;
+	PaintWorkUnit			_paint_work_unit;
+	Xefis::WorkPerformer*	_work_performer				= nullptr;
+	QSize					_safe_size;
 
 	// Cache:
 	TextPainter::Cache		_text_painter_cache;
@@ -467,11 +512,25 @@ class HSIWidget: public Xefis::InstrumentWidget
 };
 
 
+inline
+HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget, QSize size):
+	_image (size, QImage::Format_ARGB32_Premultiplied),
+	_hsi_widget (hsi_widget)
+{ }
+
+
+inline void
+HSIWidget::PaintWorkUnit::resize (QSize size)
+{
+	_image = QImage (size, QImage::Format_ARGB32_Premultiplied);
+}
+
+
 inline void
 HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 {
 	_navaid_storage = navaid_storage;
-	update();
+	request_repaint();
 }
 
 
@@ -479,7 +538,8 @@ inline void
 HSIWidget::set_display_mode (DisplayMode display_mode)
 {
 	_display_mode = display_mode;
-	update_more();
+	_update_more_needed = true;
+	request_repaint();
 }
 
 
@@ -487,7 +547,7 @@ inline void
 HSIWidget::set_range (Length miles)
 {
 	_range = miles;
-	update();
+	request_repaint();
 }
 
 
@@ -495,7 +555,7 @@ inline void
 HSIWidget::set_true_heading (Angle degrees)
 {
 	_true_heading = degrees;
-	update();
+	request_repaint();
 }
 
 
@@ -503,7 +563,7 @@ inline void
 HSIWidget::set_magnetic_heading (Angle degrees)
 {
 	_magnetic_heading = degrees;
-	update();
+	request_repaint();
 }
 
 
@@ -511,7 +571,7 @@ inline void
 HSIWidget::set_heading_mode (HeadingMode mode)
 {
 	_heading_mode = mode;
-	update();
+	request_repaint();
 }
 
 
@@ -519,7 +579,7 @@ inline void
 HSIWidget::set_heading_visible (bool visible)
 {
 	_heading_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -527,7 +587,7 @@ inline void
 HSIWidget::set_ap_magnetic_heading (Angle heading)
 {
 	_ap_magnetic_heading = heading;
-	update();
+	request_repaint();
 }
 
 
@@ -535,7 +595,7 @@ inline void
 HSIWidget::set_ap_heading_visible (bool visible)
 {
 	_ap_heading_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -543,7 +603,7 @@ inline void
 HSIWidget::set_ap_track_visible (bool visible)
 {
 	_ap_track_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -551,7 +611,7 @@ inline void
 HSIWidget::set_magnetic_track (Angle track)
 {
 	_magnetic_track = track;
-	update();
+	request_repaint();
 }
 
 
@@ -559,7 +619,7 @@ inline void
 HSIWidget::set_track_visible (bool visible)
 {
 	_track_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -567,7 +627,7 @@ inline void
 HSIWidget::set_display_track (bool track)
 {
 	_display_track = track;
-	update();
+	request_repaint();
 }
 
 
@@ -575,7 +635,7 @@ inline void
 HSIWidget::set_ground_speed (Knots ground_speed)
 {
 	_ground_speed = ground_speed;
-	update();
+	request_repaint();
 }
 
 
@@ -583,7 +643,7 @@ inline void
 HSIWidget::set_ground_speed_visible (bool visible)
 {
 	_ground_speed_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -591,7 +651,7 @@ inline void
 HSIWidget::set_true_air_speed (Knots true_air_speed)
 {
 	_true_air_speed = true_air_speed;
-	update();
+	request_repaint();
 }
 
 
@@ -599,7 +659,7 @@ inline void
 HSIWidget::set_true_air_speed_visible (bool visible)
 {
 	_true_air_speed_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -607,7 +667,7 @@ inline void
 HSIWidget::set_mach (float value)
 {
 	_mach = value;
-	update();
+	request_repaint();
 }
 
 
@@ -615,7 +675,7 @@ inline void
 HSIWidget::set_mach_visible (bool visible)
 {
 	_mach_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -623,7 +683,7 @@ inline void
 HSIWidget::set_position (LonLat const& position)
 {
 	_position = position;
-	update();
+	request_repaint();
 }
 
 
@@ -631,7 +691,7 @@ inline void
 HSIWidget::set_track_deviation (Angle degrees_per_mile)
 {
 	_track_deviation = degrees_per_mile;
-	update();
+	request_repaint();
 }
 
 
@@ -639,7 +699,7 @@ inline void
 HSIWidget::set_trend_vector_visible (bool visible)
 {
 	_trend_vector_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -647,7 +707,7 @@ inline void
 HSIWidget::set_trend_vector_lookahead (Length lookahead)
 {
 	_trend_vector_lookahead = lookahead;
-	update();
+	request_repaint();
 }
 
 
@@ -655,7 +715,7 @@ inline void
 HSIWidget::set_altitude_reach_distance (Length distance)
 {
 	_altitude_reach_distance = distance;
-	update();
+	request_repaint();
 }
 
 
@@ -663,7 +723,7 @@ inline void
 HSIWidget::set_altitude_reach_visible (bool visible)
 {
 	_altitude_reach_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -672,7 +732,7 @@ HSIWidget::set_wind_information (Angle wind_from_magnetic_heading, Knots wind_ta
 {
 	_wind_from_magnetic_heading = wind_from_magnetic_heading;
 	_wind_tas_speed = wind_tas_speed;
-	update();
+	request_repaint();
 }
 
 
@@ -680,7 +740,7 @@ inline void
 HSIWidget::set_wind_information_visible (bool visible)
 {
 	_wind_information_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -688,7 +748,7 @@ inline void
 HSIWidget::set_navaids_visible (bool visible)
 {
 	_navaids_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -696,7 +756,7 @@ inline void
 HSIWidget::set_vor_visible (bool visible)
 {
 	_vor_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -704,7 +764,7 @@ inline void
 HSIWidget::set_dme_visible (bool visible)
 {
 	_dme_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -712,7 +772,7 @@ inline void
 HSIWidget::set_ndb_visible (bool visible)
 {
 	_ndb_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -720,7 +780,7 @@ inline void
 HSIWidget::set_loc_visible (bool visible)
 {
 	_loc_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -728,7 +788,7 @@ inline void
 HSIWidget::set_fix_visible (bool visible)
 {
 	_fix_visible = visible;
-	update();
+	request_repaint();
 }
 
 
@@ -750,7 +810,7 @@ inline void
 HSIWidget::set_positioning_hint (QString const& hint)
 {
 	_positioning_hint = hint;
-	update();
+	request_repaint();
 }
 
 
