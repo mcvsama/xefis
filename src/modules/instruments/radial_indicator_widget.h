@@ -24,11 +24,14 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
+#include <xefis/core/instrument_aids.h>
 #include <xefis/utility/text_painter.h>
 #include <xefis/utility/range.h>
 
 
-class RadialIndicatorWidget: public Xefis::InstrumentWidget
+class RadialIndicatorWidget:
+	public Xefis::InstrumentWidget,
+	public Xefis::InstrumentAids
 {
   public:
 	// Ctor
@@ -101,6 +104,9 @@ class RadialIndicatorWidget: public Xefis::InstrumentWidget
 	set_target_visible (bool visible);
 
   protected:
+	void
+	resizeEvent (QResizeEvent*) override;
+
 	void
 	paintEvent (QPaintEvent*) override;
 

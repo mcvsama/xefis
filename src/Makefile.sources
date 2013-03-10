@@ -40,6 +40,7 @@ NODEP_SOURCES += $(VERSION_FILE)
 SRC_HEADERS += xefis/core/config_reader.h
 SRC_HEADERS += xefis/core/input.h
 SRC_HEADERS += xefis/core/instrument.h
+SRC_HEADERS += xefis/core/instrument_aids.h
 SRC_HEADERS += xefis/core/instrument_widget.h
 SRC_HEADERS += xefis/core/module.h
 SRC_HEADERS += xefis/core/module_manager.h
@@ -53,6 +54,7 @@ SRC_HEADERS += xefis/core/window.h
 SRC_HEADERS += xefis/core/work_performer.h
 
 SRC_SOURCES += xefis/core/config_reader.cc
+SRC_SOURCES += xefis/core/instrument_aids.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
 SRC_SOURCES += xefis/core/module.cc
 SRC_SOURCES += xefis/core/module_manager.cc

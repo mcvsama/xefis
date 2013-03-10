@@ -29,10 +29,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
+#include <xefis/core/instrument_aids.h>
 #include <xefis/utility/text_painter.h>
 
 
-class EFISWidget: public Xefis::InstrumentWidget
+class EFISWidget:
+	public Xefis::InstrumentWidget,
+	public Xefis::InstrumentAids
 {
 	Q_OBJECT
 
