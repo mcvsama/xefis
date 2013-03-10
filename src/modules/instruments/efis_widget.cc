@@ -30,7 +30,8 @@
 
 
 EFISWidget::EFISWidget (QWidget* parent):
-	InstrumentWidget (parent, 0.8f, 1.f, 1.f)
+	InstrumentWidget (parent),
+	InstrumentAids (0.8f, 1.f, 1.f)
 {
 	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 230, 255);
@@ -51,9 +52,9 @@ EFISWidget::EFISWidget (QWidget* parent):
 
 
 void
-EFISWidget::resizeEvent (QResizeEvent* resize_event)
+EFISWidget::resizeEvent (QResizeEvent*)
 {
-	InstrumentWidget::resizeEvent (resize_event);
+	InstrumentAids::update_sizes (size(), window()->size());
 
 	_w = width();
 	_h = height();

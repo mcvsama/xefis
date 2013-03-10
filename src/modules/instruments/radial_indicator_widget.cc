@@ -27,8 +27,16 @@
 
 
 RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
-	InstrumentWidget (parent, 1.f, 1.f, 1.f)
+	InstrumentWidget (parent),
+	InstrumentAids (1.f, 1.f, 1.f)
 { }
+
+
+void
+RadialIndicatorWidget::resizeEvent (QResizeEvent*)
+{
+	InstrumentAids::update_sizes (size(), window()->size());
+}
 
 
 void
