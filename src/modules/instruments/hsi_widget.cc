@@ -19,7 +19,6 @@
 
 // Qt:
 #include <QtCore/QTimer>
-#include <QtGui/QApplication>
 #include <QtGui/QPainter>
 
 // Xefis:
@@ -38,58 +37,28 @@ using Xefis::NavaidStorage;
 
 
 void
-HSIWidget::PaintWorkUnit::execute()
+HSIWidget::PaintWorkUnit::pop_params()
 {
-	bool repaint_again = false;
-	RecursiveMutex& m = _hsi->_repaint_mutex;
-
-	for (;;)
-	{
-		m.synchronize ([&]() {
-			QSize pbs = _hsi->_safe_size;
-			if (_image.size() != pbs || _hsi->_recalculation_needed)
-			{
-				resize (pbs);
-				recalculate();
-				_hsi->_recalculation_needed = false;
-			}
-			_params = _params_next;
-		});
-
-		repaint_again = false;
-
-		QPainter painter (&_image);
-		paint (painter);
-
-		m.synchronize ([&]() {
-			_hsi->_paint_buffer = _image;
-			_hsi->update_later();
-			repaint_again = _hsi->_queue_repaint;
-			_hsi->_queue_repaint = false;
-			if (!repaint_again)
-				_hsi->_worker_added = false;
-		});
-
-		if (!repaint_again)
-			break;
-	}
+	_params = _params_next;
 }
 
 
 void
-HSIWidget::PaintWorkUnit::recalculate()
+HSIWidget::PaintWorkUnit::resized()
 {
+	InstrumentAids::update_sizes (size(), window_size());
+
 	// Clips:
 	switch (_params.display_mode)
 	{
 		case DisplayMode::Expanded:
 		{
-			_q = 0.05f * _image.height();
-			_r = 0.80f * _image.height();
+			_q = 0.05f * size().height();
+			_r = 0.80f * size().height();
 			float const rx = nm_to_px (_params.range);
 
 			_aircraft_center_transform.reset();
-			_aircraft_center_transform.translate (0.5f * _image.width(), 0.9f * _image.height());
+			_aircraft_center_transform.translate (0.5f * size().width(), 0.9f * size().height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
@@ -107,14 +76,14 @@ HSIWidget::PaintWorkUnit::recalculate()
 
 		case DisplayMode::Rose:
 		{
-			_q = 0.05f * _image.height();
-			_r = 0.40f * _image.height();
+			_q = 0.05f * size().height();
+			_r = 0.40f * size().height();
 			if (_r > 0.85f * wh())
 				_r = 0.85f * wh();
 			float const rx = nm_to_px (_params.range);
 
 			_aircraft_center_transform.reset();
-			_aircraft_center_transform.translate (0.5f * _image.width(), 0.5 * _image.height());
+			_aircraft_center_transform.translate (0.5f * size().width(), 0.5 * size().height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
@@ -137,7 +106,7 @@ HSIWidget::PaintWorkUnit::recalculate()
 			float const rx = nm_to_px (_params.range);
 
 			_aircraft_center_transform.reset();
-			_aircraft_center_transform.translate (0.5f * _image.width(), 0.705f * _image.height());
+			_aircraft_center_transform.translate (0.5f * size().width(), 0.705f * size().height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 1.2f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
@@ -249,8 +218,16 @@ HSIWidget::PaintWorkUnit::recalculate()
 
 
 void
-HSIWidget::PaintWorkUnit::paint (QPainter& painter)
+HSIWidget::PaintWorkUnit::paint (QImage& image)
 {
+	if (_recalculation_needed)
+	{
+		_recalculation_needed = false;
+		resized();
+	}
+
+	QPainter painter (&image);
+
 	_params.true_track = floored_mod (_params.magnetic_track + (_params.true_heading - _params.magnetic_heading), 360_deg);
 
 	_params.track =
@@ -293,7 +270,7 @@ HSIWidget::PaintWorkUnit::paint (QPainter& painter)
 	// Clear with black background:
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
-	painter.drawRect (_image.rect());
+	painter.drawRect (QRect (QPoint (0, 0), size()));
 
 	paint_navaids (painter, text_painter);
 	paint_altitude_reach (painter);
@@ -954,7 +931,7 @@ HSIWidget::PaintWorkUnit::paint_locs (QPainter& painter, TextPainter& text_paint
 void
 HSIWidget::PaintWorkUnit::retrieve_navaids()
 {
-	if (!_hsi->_navaid_storage)
+	if (!_navaid_storage)
 		return;
 
 	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
@@ -966,7 +943,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	_dme_navs.clear();
 	_fix_navs.clear();
 
-	for (Navaid const& navaid: _hsi->_navaid_storage->get_navs (_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
+	for (Navaid const& navaid: _navaid_storage->get_navs (_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
 	{
 		switch (navaid.type())
 		{
@@ -1005,85 +982,15 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 
 
 HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
-	InstrumentWidget (parent),
-	_work_performer (work_performer),
-	_paint_buffer (size(), QImage::Format_ARGB32_Premultiplied),
-	_paint_work_unit (this, size())
-{ }
+	InstrumentWidget (parent, work_performer),
+	_paint_work_unit (this)
+{
+	set_painter (&_paint_work_unit);
+}
 
 
 HSIWidget::~HSIWidget()
 {
-	// TODO wait for work units to finish.
-}
-
-
-void
-HSIWidget::update_later()
-{
-	QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (UpdateEvent)));
-}
-
-
-void
-HSIWidget::request_repaint()
-{
-	if (!_repaint_requested)
-	{
-		_repaint_requested = true;
-		QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (RequestRepaintEvent)));
-	}
-}
-
-
-void
-HSIWidget::resizeEvent (QResizeEvent* event)
-{
-	InstrumentWidget::resizeEvent (event);
-	_repaint_mutex.synchronize ([&]() {
-		_safe_size = size();
-		_paint_buffer = QImage (size(), QImage::Format_ARGB32_Premultiplied);
-		_paint_buffer.fill (Qt::black);
-		request_repaint();
-	});
-}
-
-
-void
-HSIWidget::paintEvent (QPaintEvent*)
-{
-	QPainter painter (this);
-	_repaint_mutex.synchronize ([&]() {
-		painter.drawImage (QPoint (0, 0), _paint_buffer);
-	});
-}
-
-
-void
-HSIWidget::customEvent (QEvent* event)
-{
-	switch (static_cast<int> (event->type()))
-	{
-		case UpdateEvent:
-			update();
-			break;
-
-		case RequestRepaintEvent:
-			_repaint_requested = false;
-			_repaint_mutex.synchronize ([&]() {
-				_paint_work_unit.set_params (_params);
-				if (_worker_added)
-					_queue_repaint = true;
-				else
-				{
-					_worker_added = true;
-					_work_performer->add (&_paint_work_unit);
-				}
-			});
-			break;
-
-		default:
-			break;
-	}
+	wait_for_painter();
 }
 
