@@ -74,9 +74,6 @@ class HSIWidget: public Xefis::InstrumentWidget
   private:
 	typedef std::map<QString, Angle> HeadingBugs;
 
-	constexpr static int UpdateEvent			= QEvent::User + 0;
-	constexpr static int RequestRepaintEvent	= QEvent::User + 1;
-
 	class Parameters
 	{
 	  public:
@@ -124,29 +121,28 @@ class HSIWidget: public Xefis::InstrumentWidget
 	};
 
 	class PaintWorkUnit:
-		public Xefis::WorkPerformer::Unit,
+		public InstrumentWidget::Painter,
 		public Xefis::InstrumentAids
 	{
+		friend class HSIWidget;
+
 	  public:
-		PaintWorkUnit (HSIWidget*, QSize size);
+		PaintWorkUnit (HSIWidget*);
 
 		~PaintWorkUnit() noexcept { }
 
 		void
-		set_params (Parameters const& params);
-
-		void
-		execute() override;
+		set_navaid_storage (NavaidStorage*);
 
 	  private:
 		void
-		resize (QSize size);
+		pop_params() override;
 
 		void
-		recalculate();
+		resized() override;
 
 		void
-		paint (QPainter&);
+		paint (QImage&) override;
 
 		void
 		paint_aircraft (QPainter&, TextPainter&);
@@ -205,8 +201,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		nm_to_px (Length miles);
 
 	  private:
-		QImage					_image;
-		HSIWidget*				_hsi;
+		NavaidStorage*			_navaid_storage				= nullptr;
+		bool					_recalculation_needed		= false;
 		float					_r;
 		float					_q;
 		TextPainter::Cache		_text_painter_cache;
@@ -496,58 +492,27 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_positioning_hint_visible (bool visible);
 
   private:
+	// InstrumentWidget API
 	void
-	update_later();
-
-	void
-	request_repaint();
-
-	void
-	resizeEvent (QResizeEvent*) override;
-
-	void
-	paintEvent (QPaintEvent*) override;
-
-	void
-	customEvent (QEvent*) override;
+	push_params() override;
 
   private:
-	NavaidStorage*			_navaid_storage				= nullptr;
-	Xefis::WorkPerformer*	_work_performer				= nullptr;
-	RecursiveMutex			_repaint_mutex;
-	bool					_recalculation_needed		= false;
-	bool					_repaint_requested			= false;
-	bool					_worker_added				= false;
-	bool					_queue_repaint				= false;
-	QImage					_paint_buffer;
-	PaintWorkUnit			_paint_work_unit;
-	QSize					_safe_size;
-	Parameters				_params;
+	PaintWorkUnit	_paint_work_unit;
+	Parameters		_params;
 };
 
 
 inline
-HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget, QSize size):
-	InstrumentAids (0.5f, 1.1f, 1.f),
-	_image (size, QImage::Format_ARGB32_Premultiplied),
-	_hsi (hsi_widget)
+HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
+	Painter (hsi_widget),
+	InstrumentAids (0.5f, 1.1f, 1.f)
 { }
 
 
 inline void
-HSIWidget::PaintWorkUnit::set_params (Parameters const& params)
+HSIWidget::PaintWorkUnit::set_navaid_storage (NavaidStorage* navaid_storage)
 {
-	_hsi->_repaint_mutex.synchronize ([&]() {
-		_params_next = params;
-	});
-}
-
-
-inline void
-HSIWidget::PaintWorkUnit::resize (QSize size)
-{
-	InstrumentAids::update_sizes (size, _hsi->window()->size());
-	_image = QImage (size, QImage::Format_ARGB32_Premultiplied);
+	_navaid_storage = navaid_storage;
 }
 
 
@@ -602,11 +567,10 @@ HSIWidget::PaintWorkUnit::nm_to_px (Length miles)
 }
 
 
-// TODO set this in constructor only
 inline void
 HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 {
-	_navaid_storage = navaid_storage;
+	_paint_work_unit.set_navaid_storage (navaid_storage);
 	request_repaint();
 }
 
@@ -615,7 +579,7 @@ inline void
 HSIWidget::set_display_mode (DisplayMode display_mode)
 {
 	_params.display_mode = display_mode;
-	_recalculation_needed = true;
+	_paint_work_unit._recalculation_needed = true;
 	request_repaint();
 }
 
@@ -897,6 +861,13 @@ inline void
 HSIWidget::set_positioning_hint_visible (bool visible)
 {
 	_params.positioning_hint_visible = visible;
+}
+
+
+inline void
+HSIWidget::push_params()
+{
+	_paint_work_unit._params_next = _params;
 }
 
 #endif
