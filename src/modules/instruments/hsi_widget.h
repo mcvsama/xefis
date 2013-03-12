@@ -18,7 +18,6 @@
 #include <cstddef>
 
 // Qt:
-#include <QtGui/QPaintEvent>
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
 
@@ -72,8 +71,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	};
 
   private:
-	typedef std::map<QString, Angle> HeadingBugs;
-
 	class Parameters
 	{
 	  public:
@@ -500,13 +497,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 	PaintWorkUnit	_paint_work_unit;
 	Parameters		_params;
 };
-
-
-inline
-HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
-	Painter (hsi_widget),
-	InstrumentAids (0.5f, 1.1f, 1.f)
-{ }
 
 
 inline void

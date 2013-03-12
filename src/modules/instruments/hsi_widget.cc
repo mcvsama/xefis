@@ -36,6 +36,12 @@ using Xefis::Navaid;
 using Xefis::NavaidStorage;
 
 
+HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
+	Painter (hsi_widget),
+	InstrumentAids (0.5f, 1.1f, 1.f)
+{ }
+
+
 void
 HSIWidget::PaintWorkUnit::pop_params()
 {

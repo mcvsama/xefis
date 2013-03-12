@@ -127,7 +127,7 @@ class InstrumentWidget: public QWidget
 	/**
 	 * Request repaint when parameter value changes.
 	 */
-	void
+	virtual void
 	request_repaint();
 
 	/**
