@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <atomic>
 #include <map>
 
 // Qt:
@@ -33,18 +34,417 @@
 #include <xefis/utility/text_painter.h>
 
 
-class EFISWidget:
-	public Xefis::InstrumentWidget,
-	public Xefis::InstrumentAids
+class EFISWidget: public Xefis::InstrumentWidget
 {
 	Q_OBJECT
 
 	typedef std::map<QString, Knots> SpeedBugs;
 	typedef std::map<QString, Feet> AltitudeBugs;
 
+	class Parameters
+	{
+	  public:
+		Angle				fov								= 120_deg;
+		bool				input_alert_visible				= false;
+		Angle				pitch							= 0_deg;
+		Angle				pitch_limit						= 0_deg;
+		bool				pitch_visible					= false;
+		bool				pitch_limit_visible				= false;
+		Angle				roll							= 0_deg;
+		Angle				roll_limit						= 0_deg;
+		bool				roll_visible					= false;
+		Angle				heading							= 0_deg;
+		bool				heading_visible					= false;
+		bool				heading_numbers_visible			= false;
+		float				slip_skid						= 0.f;
+		float				slip_skid_limit					= 0.f;
+		bool				slip_skid_visible				= false;
+		Angle				flight_path_alpha				= 0_deg;
+		Angle				flight_path_beta				= 0_deg;
+		bool				flight_path_visible				= false;
+		Knots				speed							= 0.f;
+		bool				speed_visible					= false;
+		Knots				speed_tendency					= 0.f;
+		bool				speed_tendency_visible			= false;
+		bool				novspd_flag						= false;
+		Feet				altitude						= 0.f;
+		bool				altitude_visible				= false;
+		Feet				altitude_tendency				= 0.f;
+		bool				altitude_tendency_visible		= false;
+		Feet				altitude_agl					= 0.f;
+		bool				altitude_agl_visible			= false;
+		QDateTime			altitude_agl_ts;
+		Feet				landing_altitude				= 0.f;
+		bool				landing_altitude_visible		= false;
+		bool				altitude_warnings_visible		= false;
+		Feet				transition_altitude				= 0.f;
+		bool				transition_altitude_visible		= false;
+		QDateTime			transition_altitude_ts;
+		FeetPerMinute		climb_rate						= 0.f;
+		bool				climb_rate_visible				= false;
+		float				mach							= 0.f;
+		bool				mach_visible					= false;
+		Pressure			pressure						= 0_inhg;
+		bool				pressure_display_hpa			= false;
+		bool				pressure_visible				= false;
+		bool				standard_pressure				= false;
+		Knots				minimum_speed					= 0.f;
+		bool				minimum_speed_visible			= false;
+		Knots				warning_speed					= 0.f;
+		bool				warning_speed_visible			= false;
+		Knots				maximum_speed					= 0.f;
+		bool				maximum_speed_visible			= false;
+		Feet				cmd_altitude					= 0.f;
+		bool				cmd_altitude_visible			= false;
+		FeetPerMinute		cmd_climb_rate					= 0.f;
+		bool				cmd_climb_rate_visible			= false;
+		Knots				cmd_speed						= 0.f;
+		bool				cmd_speed_visible				= false;
+		Angle				flight_director_pitch			= 0_deg;
+		bool				flight_director_pitch_visible	= false;
+		Angle				flight_director_roll			= 0_deg;
+		bool				flight_director_roll_visible	= false;
+		Angle				control_stick_pitch				= 0_deg;
+		Angle				control_stick_roll				= 0_deg;
+		bool				control_stick_visible			= false;
+		bool				approach_reference_visible		= false;
+		Angle				vertical_deviation_deg			= 0_deg;
+		bool				vertical_deviation_visible		= false;
+		Angle				lateral_deviation_deg			= 0_deg;
+		bool				lateral_deviation_visible		= false;
+		bool				runway_visible					= false;
+		Angle				runway_position					= 0_deg;
+		QString				approach_hint;
+		Length				dme_distance					= 0_nm;
+		bool				dme_distance_visible			= false;
+		QString				localizer_id;
+		Angle				localizer_magnetic_bearing		= 0_deg;
+		bool				localizer_info_visible			= false;
+		QString				control_hint;
+		bool				control_hint_visible			= false;
+		QDateTime			control_hint_ts;
+		bool				fma_visible						= false;
+		QString				fma_speed_hint;
+		QDateTime			fma_speed_ts;
+		QString				fma_speed_small_hint;
+		QDateTime			fma_speed_small_ts;
+		QString				fma_lateral_hint;
+		QDateTime			fma_lateral_ts;
+		QString				fma_lateral_small_hint;
+		QDateTime			fma_lateral_small_ts;
+		QString				fma_vertical_hint;
+		QDateTime			fma_vertical_ts;
+		QString				fma_vertical_small_hint;
+		QDateTime			fma_vertical_small_ts;
+		SpeedBugs			speed_bugs;
+		AltitudeBugs		altitude_bugs;
+		bool				speed_blink						= false;
+		bool				speed_blinking_active			= false;
+		bool				baro_blink						= false;
+		bool				baro_blinking_active			= false;
+
+		/*
+		 * Speed ladder
+		 */
+
+		Knots				sl_extent						= 124;
+		int					sl_minimum						= 0;
+		int					sl_maximum						= 9999;
+		int					sl_line_every					= 10;
+		int					sl_number_every					= 20;
+
+		/*
+		 * Altitude ladder
+		 */
+
+		int					al_line_every					= 100;
+		int					al_number_every					= 200;
+		int					al_bold_every					= 500;
+		Feet				al_extent						= 825;
+	};
+
+	class PaintWorkUnit:
+		public InstrumentWidget::Painter,
+		public Xefis::InstrumentAids
+	{
+		friend class EFISWidget;
+
+	  public:
+		PaintWorkUnit (EFISWidget*);
+
+		~PaintWorkUnit() noexcept { }
+
+	  private:
+		void
+		pop_params() override;
+
+		void
+		resized() override;
+
+		void
+		paint (QImage&) override;
+
+		/*
+		 * ADI
+		 */
+
+		void
+		adi_post_resize();
+
+		void
+		adi_pre_paint();
+
+		void
+		adi_paint (QPainter&, TextPainter&);
+
+		void
+		adi_paint_horizon (QPainter&);
+
+		void
+		adi_paint_pitch (QPainter&, TextPainter&);
+
+		void
+		adi_paint_roll (QPainter&);
+
+		void
+		adi_paint_heading (QPainter&, TextPainter&);
+
+		void
+		adi_paint_flight_path_marker (QPainter&);
+
+		/*
+		 * Speed ladder
+		 */
+
+		void
+		sl_post_resize();
+
+		void
+		sl_pre_paint();
+
+		void
+		sl_paint (QPainter&, TextPainter&);
+
+		void
+		sl_paint_black_box (QPainter&, TextPainter&, float x);
+
+		void
+		sl_paint_ladder_scale (QPainter&, TextPainter&, float x);
+
+		void
+		sl_paint_speed_limits (QPainter&, float x);
+
+		void
+		sl_paint_speed_tendency (QPainter&, float x);
+
+		void
+		sl_paint_bugs (QPainter&, TextPainter&, float x);
+
+		void
+		sl_paint_mach_number (QPainter&, TextPainter&, float x);
+
+		void
+		sl_paint_ap_setting (QPainter&, TextPainter&);
+
+		void
+		sl_paint_novspd (QPainter&, TextPainter&);
+
+		float
+		kt_to_px (Knots ft) const;
+
+		/*
+		 * Altitude ladder
+		 */
+
+		void
+		al_post_resize();
+
+		void
+		al_pre_paint();
+
+		void
+		al_paint (QPainter&, TextPainter&);
+
+		void
+		al_paint_black_box (QPainter&, TextPainter&, float x);
+
+		void
+		al_paint_ladder_scale (QPainter&, TextPainter&, float x);
+
+		void
+		al_paint_altitude_tendency (QPainter&, float x);
+
+		void
+		al_paint_bugs (QPainter&, TextPainter&, float x);
+
+		void
+		al_paint_climb_rate (QPainter&, TextPainter&, float x);
+
+		void
+		al_paint_pressure (QPainter&, TextPainter&, float x);
+
+		void
+		al_paint_ap_setting (QPainter&, TextPainter&);
+
+		float
+		ft_to_px (Feet ft) const;
+
+		float
+		scale_cbr (FeetPerMinute climb_rate) const;
+
+		/*
+		 * Other
+		 */
+
+		void
+		paint_center_cross (QPainter&, bool center_box, bool rest);
+
+		void
+		paint_flight_director (QPainter&);
+
+		void
+		paint_control_stick (QPainter&);
+
+		void
+		paint_altitude_agl (QPainter&, TextPainter&);
+
+		void
+		paint_baro_setting (QPainter&, TextPainter&);
+
+		void
+		paint_nav (QPainter&, TextPainter&);
+
+		void
+		paint_hints (QPainter&, TextPainter&);
+
+		void
+		paint_pitch_limit (QPainter&);
+
+		void
+		paint_input_alert (QPainter&, TextPainter&);
+
+		void
+		paint_dashed_zone (QPainter&, QColor const&, QRectF const& target);
+
+		/**
+		 * Render 'rotatable' value on speed/altitude black box.
+		 *
+		 * \param	painter
+		 *			QPainter to use.
+		 * \param	text_painter
+		 *			TextPainter to use.
+		 * \param	position
+		 *			Text position, [-0.5, 0.5].
+		 * \param	next, curr, prev
+		 *			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
+		 */
+		void
+		paint_rotating_value (QPainter& painter, TextPainter& text_painter,
+							  QRectF const& rect, float position, float height_scale,
+							  QString const& next, QString const& curr, QString const& prev);
+
+		/**
+		 * \param	two_zeros
+		 *			Two separate zeros, for positive and negative values.
+		 * \param	zero_mark
+		 *			Draw red/green/blank mark instead of zero.
+		 */
+		void
+		paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
+							  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
+							  bool two_zeros, bool zero_mark, bool black_zero = false);
+
+		float
+		pitch_to_px (Angle degrees) const;
+
+		float
+		heading_to_px (Angle degrees) const;
+
+		QPainterPath
+		get_pitch_scale_clipping_path() const;
+
+		QColor
+		get_baro_color() const;
+
+		bool
+		is_newly_set (QDateTime const& timestamp) const;
+
+	  private:
+		Parameters			_params;
+		Parameters			_params_next;
+		float				_w;
+		float				_h;
+		float				_max_w_h;
+		float				_q;
+		QColor				_sky_color;
+		QColor				_ground_color;
+		QColor				_ladder_color;
+		QColor				_ladder_border_color;
+		QColor				_warning_color_1;
+		QColor				_warning_color_2;
+		QTransform			_center_transform;
+		QTransform			_pitch_transform;
+		QTransform			_roll_transform;
+		QTransform			_heading_transform;
+		QTransform			_horizon_transform;
+		TextPainter::Cache	_text_painter_cache;
+		QDateTime			_current_datetime;
+
+		/*
+		 * ADI
+		 */
+
+		QRectF				_adi_sky_rect;
+		QRectF				_adi_gnd_rect;
+		QPainterPath		_flight_path_marker_shape;
+		QPainterPath		_flight_path_marker_clip;
+		QPointF				_flight_path_marker_position;
+
+		/*
+		 * Speed ladder
+		 */
+
+		QTransform			_sl_transform;
+		Knots				_sl_min_shown;
+		Knots				_sl_max_shown;
+		int					_sl_rounded_speed;
+		QRectF				_sl_ladder_rect;
+		QPen				_sl_ladder_pen;
+		QRectF				_sl_black_box_rect;
+		QPen				_sl_black_box_pen;
+		QPen				_sl_scale_pen;
+		QPen				_sl_speed_bug_pen;
+		float				_sl_margin;
+		int					_sl_digits;
+
+		/*
+		 * Altitude ladder
+		 */
+
+		QTransform			_al_transform;
+		Feet				_al_min_shown;
+		Feet				_al_max_shown;
+		int					_al_rounded_altitude;
+		QRectF				_al_ladder_rect;
+		QPen				_al_ladder_pen;
+		QRectF				_al_black_box_rect;
+		QPen				_al_black_box_pen;
+		QPen				_al_scale_pen_1;
+		QPen				_al_scale_pen_2; // Bold one, each 500 ft
+		QPen				_al_negative_altitude_pen;
+		QPen				_al_altitude_bug_pen;
+		QPen				_al_ldg_alt_pen;
+		QRectF				_al_b_digits_box;
+		QRectF				_al_s_digits_box;
+		float				_al_margin;
+	};
+
   public:
 	// Ctor
-	EFISWidget (QWidget* parent);
+	EFISWidget (QWidget* parent, Xefis::WorkPerformer*);
+
+	// Dtor
+	~EFISWidget();
 
 	/**
 	 * Set how often lines should be drawn on speed ladder.
@@ -632,6 +1032,22 @@ class EFISWidget:
 	void
 	set_input_alert_visible (bool visible);
 
+  protected:
+	// API of InstrumentWidget
+	void
+	request_repaint() override;
+
+	// API of InstrumentWidget
+	void
+	push_params() override;
+
+  private:
+	/**
+	 * Start or stop blinking warning timer on given condition.
+	 */
+	void
+	update_blinker (QTimer* warning_timer, bool condition, bool* blink_state);
+
   private slots:
 	void
 	blink_speed();
@@ -640,738 +1056,411 @@ class EFISWidget:
 	blink_baro();
 
   private:
-	void
-	resizeEvent (QResizeEvent*) override;
-
-	void
-	paintEvent (QPaintEvent*) override;
-
-	/*
-	 * ADI
-	 */
-
-	void
-	adi_post_resize();
-
-	void
-	adi_pre_paint();
-
-	void
-	adi_paint (QPainter&, TextPainter&);
-
-	void
-	adi_paint_horizon (QPainter&);
-
-	void
-	adi_paint_pitch (QPainter&, TextPainter&);
-
-	void
-	adi_paint_roll (QPainter&);
-
-	void
-	adi_paint_heading (QPainter&, TextPainter&);
-
-	void
-	adi_paint_flight_path_marker (QPainter&);
-
-	/*
-	 * Speed ladder
-	 */
-
-	void
-	sl_post_resize();
-
-	void
-	sl_pre_paint();
-
-	void
-	sl_paint (QPainter&, TextPainter&);
-
-	void
-	sl_paint_black_box (QPainter&, TextPainter&, float x);
-
-	void
-	sl_paint_ladder_scale (QPainter&, TextPainter&, float x);
-
-	void
-	sl_paint_speed_limits (QPainter&, float x);
-
-	void
-	sl_paint_speed_tendency (QPainter&, float x);
-
-	void
-	sl_paint_bugs (QPainter&, TextPainter&, float x);
-
-	void
-	sl_paint_mach_number (QPainter&, TextPainter&, float x);
-
-	void
-	sl_paint_ap_setting (QPainter&, TextPainter&);
-
-	void
-	sl_paint_novspd (QPainter&, TextPainter&);
-
-	float
-	kt_to_px (Knots ft) const;
-
-	/*
-	 * Altitude ladder
-	 */
-
-	void
-	al_post_resize();
-
-	void
-	al_pre_paint();
-
-	void
-	al_paint (QPainter&, TextPainter&);
-
-	void
-	al_paint_black_box (QPainter&, TextPainter&, float x);
-
-	void
-	al_paint_ladder_scale (QPainter&, TextPainter&, float x);
-
-	void
-	al_paint_altitude_tendency (QPainter&, float x);
-
-	void
-	al_paint_bugs (QPainter&, TextPainter&, float x);
-
-	void
-	al_paint_climb_rate (QPainter&, TextPainter&, float x);
-
-	void
-	al_paint_pressure (QPainter&, TextPainter&, float x);
-
-	void
-	al_paint_ap_setting (QPainter&, TextPainter&);
-
-	float
-	ft_to_px (Feet ft) const;
-
-	float
-	scale_cbr (FeetPerMinute climb_rate) const;
-
-	/*
-	 * Other
-	 */
-
-	void
-	paint_center_cross (QPainter&, bool center_box, bool rest);
-
-	void
-	paint_flight_director (QPainter&);
-
-	void
-	paint_control_stick (QPainter&);
-
-	void
-	paint_altitude_agl (QPainter&, TextPainter&);
-
-	void
-	paint_baro_setting (QPainter&, TextPainter&);
-
-	void
-	paint_nav (QPainter&, TextPainter&);
-
-	void
-	paint_hints (QPainter&, TextPainter&);
-
-	void
-	paint_pitch_limit (QPainter&);
-
-	void
-	paint_input_alert (QPainter&, TextPainter&);
-
-	void
-	paint_dashed_zone (QPainter&, QColor const&, QRectF const& target);
-
-	/**
-	 * Render 'rotatable' value on speed/altitude black box.
-	 *
-	 * \param	painter
-	 * 			QPainter to use.
-	 * \param	text_painter
-	 * 			TextPainter to use.
-	 * \param	position
-	 * 			Text position, [-0.5, 0.5].
-	 * \param	next, curr, prev
-	 * 			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
-	 */
-	void
-	paint_rotating_value (QPainter& painter, TextPainter& text_painter,
-						  QRectF const& rect, float position, float height_scale,
-						  QString const& next, QString const& curr, QString const& prev);
-
-	/**
-	 * \param	two_zeros
-	 * 			Two separate zeros, for positive and negative values.
-	 * \param	zero_mark
-	 * 			Draw red/green/blank mark instead of zero.
-	 */
-	void
-	paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
-						  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
-						  bool two_zeros, bool zero_mark, bool black_zero = false);
-
-	/**
-	 * Start or stop blinking warning timer on given condition.
-	 */
-	void
-	update_blinker (QTimer* warning_timer, bool condition, bool* blink_state);
-
-	float
-	pitch_to_px (Angle degrees) const;
-
-	float
-	heading_to_px (Angle degrees) const;
-
-	QPainterPath
-	get_pitch_scale_clipping_path() const;
-
-	QColor
-	get_baro_color() const;
-
-	bool
-	is_newly_set (QDateTime const& timestamp) const;
-
-  private:
-	QColor				_sky_color;
-	QColor				_ground_color;
-	QColor				_ladder_color;
-	QColor				_ladder_border_color;
-	QColor				_warning_color_1;
-	QColor				_warning_color_2;
-	QTransform			_center_transform;
-	QTransform			_pitch_transform;
-	QTransform			_roll_transform;
-	QTransform			_heading_transform;
-	QTransform			_horizon_transform;
-	Angle				_fov							= 120_deg;
-	bool				_input_alert_visible			= false;
-	TextPainter::Cache	_text_painter_cache;
-	QTimer*				_speed_blinking_warning			= nullptr;
-	bool				_speed_blink					= false;
-	QTimer*				_baro_blinking_warning			= nullptr;
-	bool				_baro_blink						= false;
-	QDateTime			_current_datetime;
-
-	float				_w;
-	float				_h;
-	float				_max_w_h;
-	float				_q;
-
-	/*
-	 * ADI
-	 */
-
-	QRectF				_adi_sky_rect;
-	QRectF				_adi_gnd_rect;
-	QPainterPath		_flight_path_marker_shape;
-	QPainterPath		_flight_path_marker_clip;
-	QPointF				_flight_path_marker_position;
-
-	/*
-	 * Speed ladder
-	 */
-
-	QTransform			_sl_transform;
-	Knots				_sl_extent						= 124;
-	int					_sl_minimum						= 0;
-	int					_sl_maximum						= 9999;
-	int					_sl_line_every					= 10;
-	int					_sl_number_every				= 20;
-	Knots				_sl_min_shown;
-	Knots				_sl_max_shown;
-	int					_sl_rounded_speed;
-	QRectF				_sl_ladder_rect;
-	QPen				_sl_ladder_pen;
-	QRectF				_sl_black_box_rect;
-	QPen				_sl_black_box_pen;
-	QPen				_sl_scale_pen;
-	QPen				_sl_speed_bug_pen;
-	float				_sl_margin;
-	int					_sl_digits;
-
-	/*
-	 * Altitude ladder
-	 */
-
-	QTransform			_al_transform;
-	int					_al_line_every					= 100;
-	int					_al_number_every				= 200;
-	int					_al_bold_every					= 500;
-	Feet				_al_extent						= 825;
-	Feet				_al_min_shown;
-	Feet				_al_max_shown;
-	int					_al_rounded_altitude;
-	QRectF				_al_ladder_rect;
-	QPen				_al_ladder_pen;
-	QRectF				_al_black_box_rect;
-	QPen				_al_black_box_pen;
-	QPen				_al_scale_pen_1;
-	QPen				_al_scale_pen_2; // Bold one, each 500 ft
-	QPen				_al_negative_altitude_pen;
-	QPen				_al_altitude_bug_pen;
-	QPen				_al_ldg_alt_pen;
-	QRectF				_al_b_digits_box;
-	QRectF				_al_s_digits_box;
-	float				_al_margin;
-
-	/*
-	 * Parameters
-	 */
-
-	Angle				_pitch							= 0_deg;
-	Angle				_pitch_limit					= 0_deg;
-	bool				_pitch_visible					= false;
-	bool				_pitch_limit_visible			= false;
-	Angle				_roll							= 0_deg;
-	Angle				_roll_limit						= 0_deg;
-	bool				_roll_visible					= false;
-	Angle				_heading						= 0_deg;
-	bool				_heading_visible				= false;
-	bool				_heading_numbers_visible		= false;
-	float				_slip_skid						= 0.f;
-	float				_slip_skid_limit				= 0.f;
-	bool				_slip_skid_visible				= false;
-	Angle				_flight_path_alpha				= 0_deg;
-	Angle				_flight_path_beta				= 0_deg;
-	bool				_flight_path_visible			= false;
-	Knots				_speed							= 0.f;
-	bool				_speed_visible					= false;
-	Knots				_speed_tendency					= 0.f;
-	bool				_speed_tendency_visible			= false;
-	bool				_novspd_flag					= false;
-	Feet				_altitude						= 0.f;
-	bool				_altitude_visible				= false;
-	Feet				_altitude_tendency				= 0.f;
-	bool				_altitude_tendency_visible		= false;
-	Feet				_altitude_agl					= 0.f;
-	bool				_altitude_agl_visible			= false;
-	QDateTime			_altitude_agl_ts;
-	Feet				_landing_altitude				= 0.f;
-	bool				_landing_altitude_visible		= false;
-	bool				_altitude_warnings_visible		= false;
-	Feet				_transition_altitude			= 0.f;
-	bool				_transition_altitude_visible	= false;
-	QDateTime			_transition_altitude_ts;
-	FeetPerMinute		_climb_rate						= 0.f;
-	bool				_climb_rate_visible				= false;
-	float				_mach							= 0.f;
-	bool				_mach_visible					= false;
-	Pressure			_pressure						= 0_inhg;
-	bool				_pressure_display_hpa			= false;
-	bool				_pressure_visible				= false;
-	bool				_standard_pressure				= false;
-	Knots				_minimum_speed					= 0.f;
-	bool				_minimum_speed_visible			= false;
-	Knots				_warning_speed					= 0.f;
-	bool				_warning_speed_visible			= false;
-	Knots				_maximum_speed					= 0.f;
-	bool				_maximum_speed_visible			= false;
-	Feet				_cmd_altitude					= 0.f;
-	bool				_cmd_altitude_visible			= false;
-	FeetPerMinute		_cmd_climb_rate					= 0.f;
-	bool				_cmd_climb_rate_visible			= false;
-	Knots				_cmd_speed						= 0.f;
-	bool				_cmd_speed_visible				= false;
-	Angle				_flight_director_pitch			= 0_deg;
-	bool				_flight_director_pitch_visible	= false;
-	Angle				_flight_director_roll			= 0_deg;
-	bool				_flight_director_roll_visible	= false;
-	Angle				_control_stick_pitch			= 0_deg;
-	Angle				_control_stick_roll				= 0_deg;
-	bool				_control_stick_visible			= false;
-	bool				_approach_reference_visible		= false;
-	Angle				_vertical_deviation_deg			= 0_deg;
-	bool				_vertical_deviation_visible		= false;
-	Angle				_lateral_deviation_deg			= 0_deg;
-	bool				_lateral_deviation_visible		= false;
-	bool				_runway_visible					= false;
-	Angle				_runway_position				= 0_deg;
-	QString				_approach_hint;
-	Length				_dme_distance					= 0_nm;
-	bool				_dme_distance_visible			= false;
-	QString				_localizer_id;
-	Angle				_localizer_magnetic_bearing		= 0_deg;
-	bool				_localizer_info_visible			= false;
-	QString				_control_hint;
-	bool				_control_hint_visible			= false;
-	QDateTime			_control_hint_ts;
-	bool				_fma_visible					= false;
-	QString				_fma_speed_hint;
-	QDateTime			_fma_speed_ts;
-	QString				_fma_speed_small_hint;
-	QDateTime			_fma_speed_small_ts;
-	QString				_fma_lateral_hint;
-	QDateTime			_fma_lateral_ts;
-	QString				_fma_lateral_small_hint;
-	QDateTime			_fma_lateral_small_ts;
-	QString				_fma_vertical_hint;
-	QDateTime			_fma_vertical_ts;
-	QString				_fma_vertical_small_hint;
-	QDateTime			_fma_vertical_small_ts;
-	SpeedBugs			_speed_bugs;
-	AltitudeBugs		_altitude_bugs;
+	PaintWorkUnit		_paint_work_unit;
+	Parameters			_params;
+	QTimer*				_speed_blinking_warning	= nullptr;
+	QTimer*				_baro_blinking_warning	= nullptr;
 };
+
+
+inline float
+EFISWidget::PaintWorkUnit::kt_to_px (Knots kt) const
+{
+	return -0.5f * _sl_ladder_rect.height() * (kt - _params.speed) / (0.5f * _params.sl_extent);
+}
+
+
+inline float
+EFISWidget::PaintWorkUnit::ft_to_px (Feet ft) const
+{
+	return -0.5f * _al_ladder_rect.height() * (ft - _params.altitude) / (0.5f * _params.al_extent);
+}
+
+
+inline float
+EFISWidget::PaintWorkUnit::pitch_to_px (Angle degrees) const
+{
+	float const correction = 0.775f;
+	return -degrees / (_params.fov * correction) * wh();
+}
+
+
+inline float
+EFISWidget::PaintWorkUnit::heading_to_px (Angle degrees) const
+{
+	return pitch_to_px (-degrees);
+}
+
+
+inline QColor
+EFISWidget::PaintWorkUnit::get_baro_color() const
+{
+	if (_params.baro_blinking_active)
+		return _warning_color_2;
+	return _navigation_color;
+}
+
+
+inline bool
+EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp) const
+{
+	return timestamp.secsTo (_current_datetime) < 10.0;
+}
 
 
 inline void
 EFISWidget::set_speed_ladder_line_every (int knots)
 {
-	_sl_line_every = std::max (1, knots);
-	update();
+	_params.sl_line_every = std::max (1, knots);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_ladder_number_every (int knots)
 {
-	_sl_number_every = std::max (1, knots);
-	update();
+	_params.sl_number_every = std::max (1, knots);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_ladder_extent (int knots)
 {
-	_sl_extent = std::max (1, knots);
-	update();
+	_params.sl_extent = std::max (1, knots);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_ladder_minimum (int knots)
 {
-	_sl_minimum = std::max (0, knots);
+	_params.sl_minimum = std::max (0, knots);
 }
 
 
 inline void
 EFISWidget::set_speed_ladder_maximum (int knots)
 {
-	_sl_maximum = std::min (9999, knots);
+	_params.sl_maximum = std::min (9999, knots);
 }
 
 
 inline void
 EFISWidget::set_altitude_ladder_line_every (int feet)
 {
-	_al_line_every = std::max (1, feet);
-	update();
+	_params.al_line_every = std::max (1, feet);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_ladder_number_every (int feet)
 {
-	_al_number_every = std::max (1, feet);
-	update();
+	_params.al_number_every = std::max (1, feet);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_ladder_bold_every (int feet)
 {
-	_al_bold_every = std::max (1, feet);
-	update();
+	_params.al_bold_every = std::max (1, feet);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_ladder_extent (int feet)
 {
-	_al_extent = std::max (1, feet);
-	update();
+	_params.al_extent = std::max (1, feet);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pitch (Angle degrees)
 {
-	_pitch = degrees;
-	update();
+	_params.pitch = degrees;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pitch_visible (bool visible)
 {
-	_pitch_visible = visible;
-	update();
+	_params.pitch_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pitch_limit (Angle pitch_limit)
 {
-	_pitch_limit = pitch_limit;
-	update();
+	_params.pitch_limit = pitch_limit;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pitch_limit_visible (bool visible)
 {
-	_pitch_limit_visible = visible;
-	update();
+	_params.pitch_limit_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_roll (Angle degrees)
 {
-	_roll = degrees;
-	update();
+	_params.roll = degrees;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_roll_limit (Angle limit)
 {
-	_roll_limit = limit;
-	update();
+	_params.roll_limit = limit;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_roll_visible (bool visible)
 {
-	_roll_visible = visible;
-	update();
+	_params.roll_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_heading (Angle degrees)
 {
-	_heading = degrees;
-	update();
+	_params.heading = degrees;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_heading_visible (bool visible)
 {
-	_heading_visible = visible;
-	update();
+	_params.heading_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_heading_numbers_visible (bool visible)
 {
-	_heading_numbers_visible = visible;
-	update();
+	_params.heading_numbers_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_slip_skid (float value)
 {
-	_slip_skid = value;
-	update();
+	_params.slip_skid = value;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_slip_skid_limit (float limit)
 {
-	_slip_skid_limit = limit;
-	update();
+	_params.slip_skid_limit = limit;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_slip_skid_visible (bool visible)
 {
-	_slip_skid_visible = visible;
-	update();
+	_params.slip_skid_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_path_alpha (Angle pitch)
 {
-	_flight_path_alpha = pitch;
-	update();
+	_params.flight_path_alpha = pitch;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_path_beta (Angle heading)
 {
-	_flight_path_beta = heading;
-	update();
+	_params.flight_path_beta = heading;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_path_marker_visible (bool visible)
 {
-	_flight_path_visible = visible;
-	update();
+	_params.flight_path_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed (Knots speed)
 {
-	_speed = speed;
-	update();
+	_params.speed = speed;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_visible (bool visible)
 {
-	_speed_visible = visible;
-	update();
+	_params.speed_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_tendency (Knots kt)
 {
-	_speed_tendency = kt;
-	update();
+	_params.speed_tendency = kt;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_speed_tendency_visible (bool visible)
 {
-	_speed_tendency_visible = visible;
-	update();
+	_params.speed_tendency_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_novspd_flag (bool visible)
 {
-	_novspd_flag = visible;
-	update();
+	_params.novspd_flag = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude (Feet altitude)
 {
-	_altitude = altitude;
-	update();
+	_params.altitude = altitude;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_visible (bool visible)
 {
-	_altitude_visible = visible;
-	update();
+	_params.altitude_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_tendency (Feet ft)
 {
-	_altitude_tendency = ft;
-	update();
+	_params.altitude_tendency = ft;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_tendency_visible (bool visible)
 {
-	_altitude_tendency_visible = visible;
-	update();
+	_params.altitude_tendency_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_agl (Feet altitude)
 {
-	_altitude_agl = altitude;
-	update();
+	_params.altitude_agl = altitude;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_agl_visible (bool visible)
 {
-	if (!_altitude_agl_visible && visible)
-		_altitude_agl_ts = QDateTime::currentDateTime();
-	_altitude_agl_visible = visible;
-	update();
+	if (!_params.altitude_agl_visible && visible)
+		_params.altitude_agl_ts = QDateTime::currentDateTime();
+	_params.altitude_agl_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_landing_altitude (Feet feet)
 {
-	_landing_altitude = feet;
-	update();
+	_params.landing_altitude = feet;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_landing_altitude_visible (bool visible)
 {
-	_landing_altitude_visible = visible;
-	update();
+	_params.landing_altitude_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_altitude_warnings_visible (bool visible)
 {
-	_altitude_warnings_visible = visible;
-	update();
+	_params.altitude_warnings_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_transition_altitude (Feet transition_altitude)
 {
-	if (_transition_altitude != transition_altitude)
-		_transition_altitude_ts = QDateTime::currentDateTime();
-	_transition_altitude = transition_altitude;
-	update();
+	if (_params.transition_altitude != transition_altitude)
+		_params.transition_altitude_ts = QDateTime::currentDateTime();
+	_params.transition_altitude = transition_altitude;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_transition_altitude_visible (bool visible)
 {
-	if (_transition_altitude_visible != visible)
-		_transition_altitude_ts = QDateTime::currentDateTime();
-	_transition_altitude_visible = visible;
-	update();
+	if (_params.transition_altitude_visible != visible)
+		_params.transition_altitude_ts = QDateTime::currentDateTime();
+	_params.transition_altitude_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_climb_rate (FeetPerMinute feet_per_minute)
 {
-	_climb_rate = feet_per_minute;
-	update();
+	_params.climb_rate = feet_per_minute;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_climb_rate_visible (bool visible)
 {
-	_climb_rate_visible = visible;
-	update();
+	_params.climb_rate_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::add_speed_bug (QString name, Knots speed)
 {
-	_speed_bugs[name] = speed;
-	update();
+	_params.speed_bugs[name] = speed;
+	request_repaint();
 }
 
 
@@ -1379,18 +1468,18 @@ inline void
 EFISWidget::remove_speed_bug (QString name)
 {
 	if (name.isNull())
-		_speed_bugs.clear();
+		_params.speed_bugs.clear();
 	else
-		_speed_bugs.erase (name);
-	update();
+		_params.speed_bugs.erase (name);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::add_altitude_bug (QString name, Feet altitude)
 {
-	_altitude_bugs[name] = altitude;
-	update();
+	_params.altitude_bugs[name] = altitude;
+	request_repaint();
 }
 
 
@@ -1398,476 +1487,417 @@ inline void
 EFISWidget::remove_altitude_bug (QString name)
 {
 	if (name.isNull())
-		_altitude_bugs.clear();
+		_params.altitude_bugs.clear();
 	else
-		_altitude_bugs.erase (name);
-	update();
+		_params.altitude_bugs.erase (name);
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_mach (float value)
 {
-	_mach = value;
-	update();
+	_params.mach = value;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_mach_visible (bool visible)
 {
-	_mach_visible = visible;
-	update();
+	_params.mach_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pressure (Pressure pressure)
 {
-	_pressure = pressure;
-	update();
+	_params.pressure = pressure;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pressure_display_hpa (bool hpa)
 {
-	_pressure_display_hpa = hpa;
-	update();
+	_params.pressure_display_hpa = hpa;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_pressure_visible (bool visible)
 {
-	_pressure_visible = visible;
-	update();
+	_params.pressure_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_standard_pressure (bool standard)
 {
-	_standard_pressure = standard;
-	update();
+	_params.standard_pressure = standard;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_minimum_speed (Knots minimum_speed)
 {
-	_minimum_speed = minimum_speed;
-	update();
+	_params.minimum_speed = minimum_speed;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_minimum_speed_visible (bool visible)
 {
-	_minimum_speed_visible = visible;
-	update();
+	_params.minimum_speed_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_warning_speed (Knots warning_speed)
 {
-	_warning_speed = warning_speed;
-	update();
+	_params.warning_speed = warning_speed;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_warning_speed_visible (bool visible)
 {
-	_warning_speed_visible = visible;
-	update();
+	_params.warning_speed_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_maximum_speed (Knots maximum_speed)
 {
-	_maximum_speed = maximum_speed;
-	update();
+	_params.maximum_speed = maximum_speed;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_maximum_speed_visible (bool visible)
 {
-	_maximum_speed_visible = visible;
-	update();
+	_params.maximum_speed_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_altitude (Feet feet)
 {
-	_cmd_altitude = feet;
-	update();
+	_params.cmd_altitude = feet;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_altitude_visible (bool visible)
 {
-	_cmd_altitude_visible = visible;
-	update();
+	_params.cmd_altitude_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_climb_rate (FeetPerMinute fpm)
 {
-	_cmd_climb_rate = fpm;
-	update();
+	_params.cmd_climb_rate = fpm;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_climb_rate_visible (bool visible)
 {
-	_cmd_climb_rate_visible = visible;
-	update();
+	_params.cmd_climb_rate_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_speed (Knots knots)
 {
-	_cmd_speed = knots;
-	update();
+	_params.cmd_speed = knots;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_cmd_speed_visible (bool visible)
 {
-	_cmd_speed_visible = visible;
-	update();
+	_params.cmd_speed_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_director_pitch (Angle pitch)
 {
-	_flight_director_pitch = pitch;
-	update();
+	_params.flight_director_pitch = pitch;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_director_pitch_visible (bool visible)
 {
-	_flight_director_pitch_visible = visible;
-	update();
+	_params.flight_director_pitch_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_director_roll (Angle roll)
 {
-	_flight_director_roll = roll;
-	update();
+	_params.flight_director_roll = roll;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_flight_director_roll_visible (bool visible)
 {
-	_flight_director_roll_visible = visible;
-	update();
+	_params.flight_director_roll_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_control_stick_pitch (Angle pitch)
 {
-	_control_stick_pitch = pitch;
-	update();
+	_params.control_stick_pitch = pitch;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_control_stick_roll (Angle roll)
 {
-	_control_stick_roll = roll;
-	update();
+	_params.control_stick_roll = roll;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_control_stick_visible (bool visible)
 {
-	_control_stick_visible = visible;
-	update();
+	_params.control_stick_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_approach_reference_visible (bool visible)
 {
-	_approach_reference_visible = visible;
-	update();
+	_params.approach_reference_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_vertical_deviation (Angle deviation)
 {
-	_vertical_deviation_deg = deviation;
-	update();
+	_params.vertical_deviation_deg = deviation;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_vertical_deviation_visible (bool visible)
 {
-	_vertical_deviation_visible = visible;
-	update();
+	_params.vertical_deviation_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_lateral_deviation (Angle deviation)
 {
-	_lateral_deviation_deg = deviation;
-	update();
+	_params.lateral_deviation_deg = deviation;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_lateral_deviation_visible (bool visible)
 {
-	_lateral_deviation_visible = visible;
-	update();
+	_params.lateral_deviation_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_runway_visible (bool visible)
 {
-	_runway_visible = visible;
-	update();
+	_params.runway_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_runway_position (Angle position)
 {
-	_runway_position = position;
-	update();
+	_params.runway_position = position;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_approach_hint (QString hint)
 {
-	_approach_hint = hint;
-	update();
+	_params.approach_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_dme_distance (Length distance)
 {
-	_dme_distance = distance;
-	update();
+	_params.dme_distance = distance;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_dme_distance_visible (bool visible)
 {
-	_dme_distance_visible = visible;
-	update();
+	_params.dme_distance_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_localizer_id (QString const& loc_id)
 {
-	_localizer_id = loc_id;
-	update();
+	_params.localizer_id = loc_id;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_localizer_magnetic_bearing (Angle mag_bearing)
 {
-	_localizer_magnetic_bearing = mag_bearing;
-	update();
+	_params.localizer_magnetic_bearing = mag_bearing;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_localizer_info_visible (bool visible)
 {
-	_localizer_info_visible = visible;
-	update();
+	_params.localizer_info_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_control_hint (QString const& hint)
 {
-	if (_control_hint != hint)
-		_control_hint_ts = QDateTime::currentDateTime();
-	_control_hint = hint;
-	update();
+	if (_params.control_hint != hint)
+		_params.control_hint_ts = QDateTime::currentDateTime();
+	_params.control_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_control_hint_visible (bool visible)
 {
-	if (_control_hint_visible != visible)
-		_control_hint_ts = QDateTime::currentDateTime();
-	_control_hint_visible = visible;
-	update();
+	if (_params.control_hint_visible != visible)
+		_params.control_hint_ts = QDateTime::currentDateTime();
+	_params.control_hint_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_visible (bool visible)
 {
-	_fma_visible = visible;
-	update();
+	_params.fma_visible = visible;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_speed_hint (QString const& hint)
 {
-	if (_fma_speed_hint != hint)
-		_fma_speed_ts = QDateTime::currentDateTime();
-	_fma_speed_hint = hint;
-	update();
+	if (_params.fma_speed_hint != hint)
+		_params.fma_speed_ts = QDateTime::currentDateTime();
+	_params.fma_speed_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_speed_small_hint (QString const& hint)
 {
-	if (_fma_speed_small_hint != hint)
-		_fma_speed_small_ts = QDateTime::currentDateTime();
-	_fma_speed_small_hint = hint;
-	update();
+	if (_params.fma_speed_small_hint != hint)
+		_params.fma_speed_small_ts = QDateTime::currentDateTime();
+	_params.fma_speed_small_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_lateral_hint (QString const& hint)
 {
-	if (_fma_lateral_hint != hint)
-		_fma_lateral_ts = QDateTime::currentDateTime();
-	_fma_lateral_hint = hint;
-	update();
+	if (_params.fma_lateral_hint != hint)
+		_params.fma_lateral_ts = QDateTime::currentDateTime();
+	_params.fma_lateral_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_lateral_small_hint (QString const& hint)
 {
-	if (_fma_lateral_small_hint != hint)
-		_fma_lateral_small_ts = QDateTime::currentDateTime();
-	_fma_lateral_small_hint = hint;
-	update();
+	if (_params.fma_lateral_small_hint != hint)
+		_params.fma_lateral_small_ts = QDateTime::currentDateTime();
+	_params.fma_lateral_small_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_vertical_hint (QString const& hint)
 {
-	if (_fma_vertical_hint != hint)
-		_fma_vertical_ts = QDateTime::currentDateTime();
-	_fma_vertical_hint = hint;
-	update();
+	if (_params.fma_vertical_hint != hint)
+		_params.fma_vertical_ts = QDateTime::currentDateTime();
+	_params.fma_vertical_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fma_vertical_small_hint (QString const& hint)
 {
-	if (_fma_vertical_small_hint != hint)
-		_fma_vertical_small_ts = QDateTime::currentDateTime();
-	_fma_vertical_small_hint = hint;
-	update();
+	if (_params.fma_vertical_small_hint != hint)
+		_params.fma_vertical_small_ts = QDateTime::currentDateTime();
+	_params.fma_vertical_small_hint = hint;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_fov (Angle degrees)
 {
-	_fov = degrees;
-	update();
+	_params.fov = degrees;
+	request_repaint();
 }
 
 
 inline void
 EFISWidget::set_input_alert_visible (bool visible)
 {
-	_input_alert_visible = visible;
-}
-
-
-inline float
-EFISWidget::kt_to_px (Knots kt) const
-{
-	return -0.5f * _sl_ladder_rect.height() * (kt - _speed) / (0.5f * _sl_extent);
-}
-
-
-inline float
-EFISWidget::ft_to_px (Feet ft) const
-{
-	return -0.5f * _al_ladder_rect.height() * (ft - _altitude) / (0.5f * _al_extent);
-}
-
-
-inline void
-EFISWidget::blink_speed()
-{
-	_speed_blink = !_speed_blink;
-}
-
-
-inline void
-EFISWidget::blink_baro()
-{
-	_baro_blink = !_baro_blink;
-}
-
-
-inline float
-EFISWidget::pitch_to_px (Angle degrees) const
-{
-	float const correction = 0.775f;
-	return -degrees / (_fov * correction) * wh();
-}
-
-
-inline float
-EFISWidget::heading_to_px (Angle degrees) const
-{
-	return pitch_to_px (-degrees);
-}
-
-
-inline QColor
-EFISWidget::get_baro_color() const
-{
-	if (_baro_blinking_warning->isActive())
-		return _warning_color_2;
-	return _navigation_color;
-}
-
-
-inline bool
-EFISWidget::is_newly_set (QDateTime const& timestamp) const
-{
-	return timestamp.secsTo (_current_datetime) < 10.0;
+	_params.input_alert_visible = visible;
 }
 
 #endif

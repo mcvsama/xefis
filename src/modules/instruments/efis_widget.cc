@@ -29,35 +29,33 @@
 #include "efis_widget.h"
 
 
-EFISWidget::EFISWidget (QWidget* parent):
-	InstrumentWidget (parent),
+EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
+	Painter (efis_widget),
 	InstrumentAids (0.8f, 1.f, 1.f)
 {
-	setAttribute (Qt::WA_NoBackground);
 	_sky_color.setHsv (213, 230, 255);
 	_ground_color.setHsv (34, 255, 125);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (120);
 	_warning_color_1 = QColor (255, 150, 0);
 	_warning_color_2 = QColor (255, 200, 50);
-
-	_speed_blinking_warning = new QTimer (this);
-	_speed_blinking_warning->setInterval (200);
-	QObject::connect (_speed_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_speed()));
-
-	_baro_blinking_warning = new QTimer (this);
-	_baro_blinking_warning->setInterval (200);
-	QObject::connect (_baro_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_baro()));
 }
 
 
 void
-EFISWidget::resizeEvent (QResizeEvent*)
+EFISWidget::PaintWorkUnit::pop_params()
 {
-	InstrumentAids::update_sizes (size(), window()->size());
+	_params = _params_next;
+}
 
-	_w = width();
-	_h = height();
+
+void
+EFISWidget::PaintWorkUnit::resized()
+{
+	InstrumentAids::update_sizes (size(), window_size());
+
+	_w = size().width();
+	_h = size().height();
 	_max_w_h = std::max (_w, _h);
 	_q = 0.1f * wh();
 
@@ -71,31 +69,18 @@ EFISWidget::resizeEvent (QResizeEvent*)
 
 
 void
-EFISWidget::paintEvent (QPaintEvent*)
+EFISWidget::PaintWorkUnit::paint (QImage& image)
 {
 	_current_datetime = QDateTime::currentDateTime();
 
-	update_blinker (_speed_blinking_warning,
-					_speed_visible &&
-					((_warning_speed_visible && _speed < _warning_speed) ||
-					 (_minimum_speed_visible && _speed < _minimum_speed) ||
-					 (_maximum_speed_visible && _speed > _maximum_speed)),
-				    &_speed_blink);
-
-	update_blinker (_baro_blinking_warning,
-					_altitude_visible && _transition_altitude_visible &&
-					((_transition_altitude > _altitude && _standard_pressure) ||
-					 (_transition_altitude <= _altitude && !_standard_pressure)),
-					&_baro_blink);
-
-	QPainter painter (this);
+	QPainter painter (&image);
 	TextPainter text_painter (painter, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
-	if (_input_alert_visible)
+	if (_params.input_alert_visible)
 		paint_input_alert (painter, text_painter);
 	else
 	{
@@ -118,7 +103,7 @@ EFISWidget::paintEvent (QPaintEvent*)
 
 
 void
-EFISWidget::adi_post_resize()
+EFISWidget::PaintWorkUnit::adi_post_resize()
 {
 	float const w_max = 2.f * _max_w_h;
 	float const h_max = 10.f * _max_w_h;
@@ -150,11 +135,11 @@ EFISWidget::adi_post_resize()
 
 
 void
-EFISWidget::adi_pre_paint()
+EFISWidget::PaintWorkUnit::adi_pre_paint()
 {
-	Angle p = floored_mod (_pitch + 180_deg, 360_deg) - 180_deg;
-	Angle r = floored_mod (_roll + 180_deg, 360_deg) - 180_deg;
-	Angle hdg = floored_mod (_heading, 360_deg);
+	Angle p = floored_mod (_params.pitch + 180_deg, 360_deg) - 180_deg;
+	Angle r = floored_mod (_params.roll + 180_deg, 360_deg) - 180_deg;
+	Angle hdg = floored_mod (_params.heading, 360_deg);
 
 	// Mirroring, eg. -180° pitch is the same
 	// as 0° pitch with roll inverted:
@@ -169,9 +154,9 @@ EFISWidget::adi_pre_paint()
 		r = +180_deg - r;
 	}
 
-	_pitch = p;
-	_roll = r;
-	_heading = hdg;
+	_params.pitch = p;
+	_params.roll = r;
+	_params.heading = hdg;
 
 	_pitch_transform.reset();
 	_pitch_transform.translate (0.f, -pitch_to_px (p));
@@ -187,12 +172,12 @@ EFISWidget::adi_pre_paint()
 	// Without the following, Qt did something weird sometimes, like aligning drawn points to display pixels (?).
 	_horizon_transform.shear (0.0001f, 0.f);
 
-	_flight_path_marker_position = QPointF (-heading_to_px (_flight_path_beta), -pitch_to_px (_flight_path_alpha));
+	_flight_path_marker_position = QPointF (-heading_to_px (_params.flight_path_beta), -pitch_to_px (_params.flight_path_alpha));
 }
 
 
 void
-EFISWidget::adi_paint (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::adi_paint (QPainter& painter, TextPainter& text_painter)
 {
 	adi_pre_paint();
 
@@ -205,9 +190,9 @@ EFISWidget::adi_paint (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::adi_paint_horizon (QPainter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_horizon (QPainter& painter)
 {
-	if (_pitch_visible && _roll_visible)
+	if (_params.pitch_visible && _params.roll_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_horizon_transform);
@@ -220,15 +205,15 @@ EFISWidget::adi_paint_horizon (QPainter& painter)
 		painter.resetTransform();
 		painter.setPen (Qt::NoPen);
 		painter.setBrush (Qt::black);
-		painter.drawRect (rect());
+		painter.drawRect (QRect (QPoint (0, 0), size()));
 	}
 }
 
 
 void
-EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_pitch_visible)
+	if (!_params.pitch_visible)
 		return;
 
 	float const w = wh() * 0.22222f; // 0.(2) == 2/9
@@ -245,8 +230,8 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 
 	// Pitch scale is clipped to small rectangle, so narrow it even more:
 	float clipped_pitch_factor = 0.45f;
-	Range<Angle> deg_range (_pitch - clipped_pitch_factor * 0.5f * _fov,
-							_pitch + clipped_pitch_factor * 0.5f * _fov);
+	Range<Angle> deg_range (_params.pitch - clipped_pitch_factor * 0.5f * _params.fov,
+							_params.pitch + clipped_pitch_factor * 0.5f * _params.fov);
 
 	painter.setPen (get_pen (Qt::white, 1.f));
 	// 10° lines, exclude +/-90°:
@@ -296,11 +281,11 @@ EFISWidget::adi_paint_pitch (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::adi_paint_roll (QPainter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_roll (QPainter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
-	bool const bank_angle_warning = _roll_limit > 0_deg && std::abs (_roll.deg()) > _roll_limit.deg();
-	bool const slip_skid_warning = _slip_skid_limit > 0.f && std::abs (_slip_skid) > _slip_skid_limit;
+	bool const bank_angle_warning = _params.roll_limit > 0_deg && std::abs (_params.roll.deg()) > _params.roll_limit.deg();
+	bool const slip_skid_warning = _params.slip_skid_limit > 0.f && std::abs (_params.slip_skid) > _params.slip_skid_limit;
 
 	QPen pen = get_pen (Qt::white, 1.f);
 	painter.setPen (pen);
@@ -336,7 +321,7 @@ EFISWidget::adi_paint_roll (QPainter& painter)
 		}
 	}
 
-	if (!_roll_visible)
+	if (!_params.roll_visible)
 		return;
 
 	float const bold_width = pen_width (3.f);
@@ -364,7 +349,7 @@ EFISWidget::adi_paint_roll (QPainter& painter)
 		painter.drawPolyline (bank_angle_polygon);
 	}
 
-	if (_slip_skid_visible)
+	if (_params.slip_skid_visible)
 	{
 		QPolygonF slip_skid_polygon = QPolygonF()
 			<< b - x0 + y0
@@ -373,7 +358,7 @@ EFISWidget::adi_paint_roll (QPainter& painter)
 			<< c + x0 + y0
 			<< b - x0 + y0;
 
-		painter.translate (-limit (_slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
+		painter.translate (-limit (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
 		if (bank_angle_warning || slip_skid_warning)
 			painter.setPen (warning_pen);
@@ -392,12 +377,12 @@ EFISWidget::adi_paint_roll (QPainter& painter)
 
 
 void
-EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 {
 	float const w = wh() * 2.25f / 9.f;
 	float const fpxs = _font_10_bold.pixelSize();
 
-	if (!_pitch_visible || !_roll_visible)
+	if (!_params.pitch_visible || !_params.roll_visible)
 		return;
 
 	// Clip rectangle before and after rotation:
@@ -415,12 +400,12 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 	painter.setPen (p);
 	painter.setFont (_font_10_bold);
 
-	if (!_heading_visible)
+	if (!_params.heading_visible)
 		return;
 
 	float clipped_pitch_factor = 0.5f;
-	Range<Angle> deg_range (_heading - clipped_pitch_factor * 0.5f * _fov,
-							_heading + clipped_pitch_factor * 0.5f * _fov);
+	Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.5f * _params.fov,
+							_params.heading + clipped_pitch_factor * 0.5f * _params.fov);
 
 	painter.setTransform (_heading_transform * _horizon_transform);
 	for (int deg = -180; deg < 540; deg += 10)
@@ -432,7 +417,7 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 		float d05 = heading_to_px (1_deg * deg + 5_deg);
 		// 10° lines:
 		painter.drawLine (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
-		if (_heading_numbers_visible)
+		if (_params.heading_numbers_visible)
 		{
 			QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
 			if (text == "0")
@@ -453,9 +438,9 @@ EFISWidget::adi_paint_heading (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::adi_paint_flight_path_marker (QPainter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (QPainter& painter)
 {
-	if (!_flight_path_visible)
+	if (!_params.flight_path_visible)
 		return;
 
 	painter.setTransform (_center_transform);
@@ -467,15 +452,15 @@ EFISWidget::adi_paint_flight_path_marker (QPainter& painter)
 
 
 void
-EFISWidget::sl_post_resize()
+EFISWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_speed = limit (_speed, 0.f, 9999.99f);
-	_mach = limit (_mach, 0.f, 9.99f);
-	_minimum_speed = limit (_minimum_speed, 0.f, 9999.99f);
-	_warning_speed = limit (_warning_speed, 0.f, 9999.99f);
-	_maximum_speed = limit (_maximum_speed, 0.f, 9999.99f);
+	_params.speed = limit (_params.speed, 0.f, 9999.99f);
+	_params.mach = limit (_params.mach, 0.f, 9.99f);
+	_params.minimum_speed = limit (_params.minimum_speed, 0.f, 9999.99f);
+	_params.warning_speed = limit (_params.warning_speed, 0.f, 9999.99f);
+	_params.maximum_speed = limit (_params.maximum_speed, 0.f, 9999.99f);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
@@ -487,7 +472,7 @@ EFISWidget::sl_post_resize()
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
 	_sl_margin = 0.25f * digit_width;
-	_sl_digits = _speed >= 1000.0f - 0.5f ? 4 : 3;
+	_sl_digits = _params.speed >= 1000.0f - 0.5f ? 4 : 3;
 
 	_sl_black_box_rect = QRectF (-_sl_digits * digit_width - 2.f * _sl_margin, -digit_height,
 								 +_sl_digits * digit_width + 2.f * _sl_margin, 2.f * digit_height);
@@ -498,21 +483,21 @@ EFISWidget::sl_post_resize()
 
 
 void
-EFISWidget::sl_pre_paint()
+EFISWidget::PaintWorkUnit::sl_pre_paint()
 {
-	_speed = limit<float> (_speed, _sl_minimum, _sl_maximum);
-	_sl_min_shown = _speed - 0.5f * _sl_extent;
-	_sl_max_shown = _speed + 0.5f * _sl_extent;
-	_sl_min_shown = std::max<float> (_sl_min_shown, _sl_minimum);
-	_sl_max_shown = std::min<float> (_sl_max_shown, _sl_maximum);
+	_params.speed = limit<float> (_params.speed, _params.sl_minimum, _params.sl_maximum);
+	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
+	_sl_max_shown = _params.speed + 0.5f * _params.sl_extent;
+	_sl_min_shown = std::max<float> (_sl_min_shown, _params.sl_minimum);
+	_sl_max_shown = std::min<float> (_sl_max_shown, _params.sl_maximum);
 	if (_sl_min_shown < 0.f)
 		_sl_min_shown = 0.f;
-	_sl_rounded_speed = static_cast<int> (_speed + 0.5f);
+	_sl_rounded_speed = static_cast<int> (_params.speed + 0.5f);
 }
 
 
 void
-EFISWidget::sl_paint (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::sl_paint (QPainter& painter, TextPainter& text_painter)
 {
 	sl_pre_paint();
 
@@ -536,9 +521,9 @@ EFISWidget::sl_paint (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_speed_visible)
+	if (!_params.speed_visible)
 		return;
 
 	QFont actual_speed_font = _font_20_bold;
@@ -549,9 +534,9 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = get_pen (Qt::white, 1.2f);
-	if (_speed_blinking_warning->isActive())
+	if (_params.speed_blinking_active)
 	{
-		border_pen.setColor (_speed_blink || (_speed < _minimum_speed)
+		border_pen.setColor (_params.speed_blink || (_params.speed < _params.minimum_speed)
 								? _warning_color_1
 								: Qt::black);
 	}
@@ -578,23 +563,23 @@ EFISWidget::sl_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	painter.setPen (QPen (Qt::white, 1.f));
 	painter.setFont (actual_speed_font);
 	if (_sl_digits == 4)
-		paint_rotating_digit (painter, text_painter, box_1000, _speed, 1000, 1.25f, 0.0005f, 0.5f, false, true);
-	paint_rotating_digit (painter, text_painter, box_0100, _speed, 100, 1.25f, 0.005f, 0.5f, false, true, true);
-	paint_rotating_digit (painter, text_painter, box_0010, _speed, 10, 1.25f, 0.05f, 0.5f, false, false);
-	float pos_0001 = _sl_rounded_speed - _speed;
+		paint_rotating_digit (painter, text_painter, box_1000, _params.speed, 1000, 1.25f, 0.0005f, 0.5f, false, true);
+	paint_rotating_digit (painter, text_painter, box_0100, _params.speed, 100, 1.25f, 0.005f, 0.5f, false, true, true);
+	paint_rotating_digit (painter, text_painter, box_0010, _params.speed, 10, 1.25f, 0.05f, 0.5f, false, false);
+	float pos_0001 = _sl_rounded_speed - _params.speed;
 	paint_rotating_value (painter, text_painter, box_0001, pos_0001, 0.7f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed + 1.f, 10.f)))),
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed, 10.f)))),
-							 _speed > 0.5f
+							 _params.speed > 0.5f
 								? QString::number (static_cast<int> (floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
 								: " ");
 }
 
 
 void
-EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_speed_visible)
+	if (!_params.speed_visible)
 		return;
 
 	QFont ladder_font = _font_13_bold;
@@ -616,16 +601,16 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 
 	painter.setPen (_sl_scale_pen);
 	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int kt = (static_cast<int> (_sl_min_shown) / _sl_line_every) * _sl_line_every - _sl_line_every;
-		 kt <= _sl_max_shown + _sl_line_every;
-		 kt += _sl_line_every)
+	for (int kt = (static_cast<int> (_sl_min_shown) / _params.sl_line_every) * _params.sl_line_every - _params.sl_line_every;
+		 kt <= _sl_max_shown + _params.sl_line_every;
+		 kt += _params.sl_line_every)
 	{
-		if (kt < _sl_minimum || kt > _sl_maximum)
+		if (kt < _params.sl_minimum || kt > _params.sl_maximum)
 			continue;
 		float posy = kt_to_px (kt);
 		painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
 
-		if ((kt - _sl_minimum) % _sl_number_every == 0)
+		if ((kt - _params.sl_minimum) % _params.sl_number_every == 0)
 			text_painter.drawText (QRectF (-4.f * ladder_digit_width - 1.25f * x, -0.5f * ladder_digit_height + posy,
 										   +4.f * ladder_digit_width, ladder_digit_height),
 								   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
@@ -634,9 +619,9 @@ EFISWidget::sl_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 
 
 void
-EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_speed_limits (QPainter& painter, float x)
 {
-	if (!_speed_visible)
+	if (!_params.speed_visible)
 		return;
 
 	QPointF ydif (0.f, pen_width (0.25f));
@@ -652,12 +637,12 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 	painter.translate (tr_right, 0.f);
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
-	float max_posy = kt_to_px (_maximum_speed);
-	float wrn_posy = kt_to_px (_warning_speed);
-	float min_posy = kt_to_px (_minimum_speed);
+	float max_posy = kt_to_px (_params.maximum_speed);
+	float wrn_posy = kt_to_px (_params.warning_speed);
+	float min_posy = kt_to_px (_params.minimum_speed);
 	QPointF zero_point (_sl_ladder_rect.right(), _sl_ladder_rect.bottom() + ydif.y());
 
-	if (_maximum_speed_visible && _maximum_speed < _sl_max_shown)
+	if (_params.maximum_speed_visible && _params.maximum_speed < _sl_max_shown)
 	{
 		painter.setPen (pen_b);
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), _sl_ladder_rect.topRight() - ydif);
@@ -665,7 +650,7 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), _sl_ladder_rect.topRight() - ydif);
 	}
 
-	if (_warning_speed_visible && _warning_speed > _sl_min_shown)
+	if (_params.warning_speed_visible && _params.warning_speed > _sl_min_shown)
 	{
 		painter.setPen (pen_y);
 		painter.drawPolyline (QPolygonF()
@@ -674,7 +659,7 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 			<< zero_point - QPointF (p1w, 0.f));
 	}
 
-	if (_minimum_speed_visible && _minimum_speed > _sl_min_shown)
+	if (_params.minimum_speed_visible && _params.minimum_speed > _sl_min_shown)
 	{
 		painter.setPen (pen_b);
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), zero_point);
@@ -685,9 +670,9 @@ EFISWidget::sl_paint_speed_limits (QPainter& painter, float x)
 
 
 void
-EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (QPainter& painter, float x)
 {
-	if (!_speed_tendency_visible || !_speed_visible)
+	if (!_params.speed_tendency_visible || !_params.speed_visible)
 		return;
 
 	QPen pen (get_pen (_navigation_color, 1.25f));
@@ -697,9 +682,9 @@ EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
 	painter.setTransform (_sl_transform);
 	painter.setPen (pen);
 	painter.translate (1.2f * x, 0.f);
-	if (_speed_tendency < _speed)
+	if (_params.speed_tendency < _params.speed)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_sl_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (limit<float> (_speed_tendency, _sl_minimum, _sl_maximum)))) - 0.5f * x;
+	float length = std::min<float> (_sl_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (limit<float> (_params.speed_tendency, _params.sl_minimum, _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -715,9 +700,9 @@ EFISWidget::sl_paint_speed_tendency (QPainter& painter, float x)
 
 
 void
-EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_speed_visible)
+	if (!_params.speed_visible)
 		return;
 
 	QFont speed_bug_font = _font_10_bold;
@@ -727,7 +712,7 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	painter.setTransform (_sl_transform);
 	painter.setFont (speed_bug_font);
 
-	for (auto& bug: _speed_bugs)
+	for (auto& bug: _params.speed_bugs)
 	{
 		if (bug.second > _sl_min_shown && bug.second < _sl_max_shown)
 		{
@@ -743,9 +728,9 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	}
 
 	// AT bug:
-	if (_cmd_speed_visible)
+	if (_params.cmd_speed_visible)
 	{
-		float posy = limit (kt_to_px (limit<float> (_cmd_speed, _sl_minimum, _sl_maximum)),
+		float posy = limit (kt_to_px (limit<float> (_params.cmd_speed, _params.sl_minimum, _params.sl_maximum)),
 							static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
 		// TODO extract bug_shape to sl_post_resize()
 		QPolygonF bug_shape = QPolygonF()
@@ -766,9 +751,9 @@ EFISWidget::sl_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 
 
 void
-EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_mach_visible)
+	if (!_params.mach_visible)
 		return;
 
 	painter.setClipping (false);
@@ -779,7 +764,7 @@ EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, 
 	QFont font_b = _font_10_bold;
 
 	QString m_str = "M";
-	QString mach_str = " " + QString ("%1").arg (_mach, 0, 'f', 3);
+	QString mach_str = " " + QString ("%1").arg (_params.mach, 0, 'f', 3);
 
 	QRectF nn_rect (0.f, _sl_ladder_rect.bottom(), QFontMetricsF (font_a).width (mach_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (m_str), nn_rect.height());
@@ -797,9 +782,9 @@ EFISWidget::sl_paint_mach_number (QPainter& painter, TextPainter& text_painter, 
 
 
 void
-EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_cmd_speed_visible)
+	if (!_params.cmd_speed_visible)
 		return;
 
 	QFont actual_speed_font = _font_20_bold;
@@ -823,14 +808,14 @@ EFISWidget::sl_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 	painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_cmd_speed))));
+	text_painter.drawText (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_params.cmd_speed))));
 }
 
 
 void
-EFISWidget::sl_paint_novspd (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::sl_paint_novspd (QPainter& painter, TextPainter& text_painter)
 {
-	if (_novspd_flag)
+	if (_params.novspd_flag)
 	{
 		float margin = 0.025f * _q;
 		QString sa = "NO";
@@ -863,7 +848,7 @@ EFISWidget::sl_paint_novspd (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::al_post_resize()
+EFISWidget::PaintWorkUnit::al_post_resize()
 {
 	float const wh = this->wh();
 
@@ -893,15 +878,15 @@ EFISWidget::al_post_resize()
 
 
 void
-EFISWidget::al_pre_paint()
+EFISWidget::PaintWorkUnit::al_pre_paint()
 {
-	_altitude = limit (_altitude, -99999.f, +99999.f);
-	_climb_rate = limit (_climb_rate, -9999.f, +9999.f);
+	_params.altitude = limit (_params.altitude, -99999.f, +99999.f);
+	_params.climb_rate = limit (_params.climb_rate, -9999.f, +9999.f);
 
-	float sgn = _altitude < 0.f ? -1.f : 1.f;
-	_al_min_shown = _altitude - 0.5f * _al_extent;
-	_al_max_shown = _altitude + 0.5f * _al_extent;
-	_al_rounded_altitude = static_cast<int> (_altitude + sgn * 10.f) / 20 * 20;
+	float sgn = _params.altitude < 0.f ? -1.f : 1.f;
+	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
+	_al_max_shown = _params.altitude + 0.5f * _params.al_extent;
+	_al_rounded_altitude = static_cast<int> (_params.altitude + sgn * 10.f) / 20 * 20;
 
 	_al_transform = _center_transform;
 	_al_transform.translate (+0.4f * wh(), 0.f);
@@ -909,7 +894,7 @@ EFISWidget::al_pre_paint()
 
 
 void
-EFISWidget::al_paint (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::al_paint (QPainter& painter, TextPainter& text_painter)
 {
 	al_pre_paint();
 
@@ -932,7 +917,7 @@ EFISWidget::al_paint (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_black_box (QPainter& painter, TextPainter& text_painter, float x)
 {
 	QFont b_font = _font_20_bold;
 	float const b_digit_width = _font_20_digit_width;
@@ -942,7 +927,7 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 	float const s_digit_width = _font_16_digit_width;
 	float const s_digit_height = _font_16_digit_height;
 
-	if (!_altitude_visible)
+	if (!_params.altitude_visible)
 		return;
 
 	painter.setClipping (false);
@@ -968,13 +953,13 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 
 	// 11100 part:
 	painter.setFont (b_font);
-	paint_rotating_digit (painter, text_painter, box_10000, _altitude, 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
-	paint_rotating_digit (painter, text_painter, box_01000, _altitude, 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
+	paint_rotating_digit (painter, text_painter, box_10000, _params.altitude, 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
+	paint_rotating_digit (painter, text_painter, box_01000, _params.altitude, 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 	painter.setFont (s_font);
-	paint_rotating_digit (painter, text_painter, box_00100, _altitude, 100, 1.25f, 0.05f, 5.f, false, false);
+	paint_rotating_digit (painter, text_painter, box_00100, _params.altitude, 100, 1.25f, 0.05f, 5.f, false, false);
 
 	// 00011 part:
-	float pos_00011 = (_al_rounded_altitude - _altitude) / 20.f;
+	float pos_00011 = (_al_rounded_altitude - _params.altitude) / 20.f;
 	paint_rotating_value (painter, text_painter, box_00011, pos_00011, 0.7f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
@@ -983,9 +968,9 @@ EFISWidget::al_paint_black_box (QPainter& painter, TextPainter& text_painter, fl
 
 
 void
-EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_altitude_visible)
+	if (!_params.altitude_visible)
 		return;
 
 	QFont b_ladder_font = _font_13_bold;
@@ -1009,20 +994,20 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 	painter.translate (-2.f * x, 0.f);
 
 	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int ft = (static_cast<int> (_al_min_shown) / _al_line_every) * _al_line_every - _al_line_every;
-		 ft <= _al_max_shown + _al_line_every;
-		 ft += _al_line_every)
+	for (int ft = (static_cast<int> (_al_min_shown) / _params.al_line_every) * _params.al_line_every - _params.al_line_every;
+		 ft <= _al_max_shown + _params.al_line_every;
+		 ft += _params.al_line_every)
 	{
 		if (ft >  100000.f)
 			continue;
 
 		float posy = ft_to_px (ft);
 
-		painter.setPen (ft % _al_bold_every == 0 ? _al_scale_pen_2 : _al_scale_pen_1);
+		painter.setPen (ft % _params.al_bold_every == 0 ? _al_scale_pen_2 : _al_scale_pen_1);
 		painter.drawLine (QPointF (0.f, posy), QPointF (0.8f * x, posy));
 
 		// TODO extract painting text to separate loop
-		if (ft % _al_number_every == 0)
+		if (ft % _params.al_number_every == 0)
 		{
 			QRectF big_text_box (1.1f * x, -0.5f * b_ladder_digit_height + posy,
 								 2.f * b_ladder_digit_width, b_ladder_digit_height);
@@ -1053,9 +1038,9 @@ EFISWidget::al_paint_ladder_scale (QPainter& painter, TextPainter& text_painter,
 
 
 void
-EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (QPainter& painter, float x)
 {
-	if (!_altitude_tendency_visible || !_altitude_visible)
+	if (!_params.altitude_tendency_visible || !_params.altitude_visible)
 		return;
 
 	QPen pen (get_pen (_navigation_color, 1.25f));
@@ -1065,9 +1050,9 @@ EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
 	painter.setTransform (_al_transform);
 	painter.translate (-1.2f * x, 0.f);
 	painter.setPen (pen);
-	if (_altitude_tendency < _altitude)
+	if (_params.altitude_tendency < _params.altitude)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (_altitude_tendency))) - 0.5f * x;
+	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (_params.altitude_tendency))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -1083,9 +1068,9 @@ EFISWidget::al_paint_altitude_tendency (QPainter& painter, float x)
 
 
 void
-EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (_altitude_visible)
+	if (_params.altitude_visible)
 	{
 		QFont altitude_bug_font = _font_10_bold;
 		float const altitude_bug_digit_height = _font_10_digit_height;
@@ -1094,7 +1079,7 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		painter.setTransform (_al_transform);
 		painter.setFont (altitude_bug_font);
 
-		for (auto& bug: _altitude_bugs)
+		for (auto& bug: _params.altitude_bugs)
 		{
 			if (bug.second > _al_min_shown && bug.second < _al_max_shown)
 			{
@@ -1112,19 +1097,19 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		}
 
 		// Altitude warning:
-		if (_altitude_warnings_visible)
+		if (_params.altitude_warnings_visible)
 		{
 			Length base = -99999_ft;
-			if (_landing_altitude_visible)
-				base = std::max (base, 1_ft * _landing_altitude);
-			if (_altitude_agl_visible)
-				base = std::max (base, 1_ft * _altitude_agl);
+			if (_params.landing_altitude_visible)
+				base = std::max (base, 1_ft * _params.landing_altitude);
+			if (_params.altitude_agl_visible)
+				base = std::max (base, 1_ft * _params.altitude_agl);
 
 			QPointF p1 (-2.05f * x, ft_to_px ((base + 500_ft).ft()));
 			QPointF p2 (-2.05f * x, ft_to_px ((base + 1000_ft).ft()));
 
-			if (_landing_altitude_visible)
-				base = std::min (base, 1_ft * _landing_altitude);
+			if (_params.landing_altitude_visible)
+				base = std::min (base, 1_ft * _params.landing_altitude);
 
 			QPointF p0 (-2.05f * x, ft_to_px (base.ft()));
 
@@ -1140,10 +1125,10 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		}
 
 		// Landing altitude bug:
-		if (_landing_altitude_visible && _landing_altitude > _al_min_shown && _landing_altitude < _al_max_shown)
+		if (_params.landing_altitude_visible && _params.landing_altitude > _al_min_shown && _params.landing_altitude < _al_max_shown)
 		{
 			painter.setClipRect (_al_ladder_rect);
-			float posy = ft_to_px (_landing_altitude);
+			float posy = ft_to_px (_params.landing_altitude);
 
 			painter.setPen (_al_ldg_alt_pen);
 			painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
@@ -1160,9 +1145,9 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		}
 
 		// AP bug:
-		if (_cmd_altitude_visible)
+		if (_params.cmd_altitude_visible)
 		{
-			float cmd_altitude = limit (_cmd_altitude, -99999.f, +99999.f);
+			float cmd_altitude = limit (_params.cmd_altitude, -99999.f, +99999.f);
 			float posy = limit (ft_to_px (cmd_altitude),
 								static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
@@ -1183,13 +1168,13 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 		}
 
 		// Baro bug:
-		if (_transition_altitude_visible)
+		if (_params.transition_altitude_visible)
 		{
-			if (_transition_altitude > _al_min_shown && _transition_altitude < _al_max_shown)
+			if (_params.transition_altitude > _al_min_shown && _params.transition_altitude < _al_max_shown)
 			{
-				if (!(_baro_blinking_warning->isActive() && !_baro_blink))
+				if (!(_params.baro_blinking_active && !_params.baro_blink))
 				{
-					float posy = ft_to_px (_transition_altitude);
+					float posy = ft_to_px (_params.transition_altitude);
 					painter.setTransform (_al_transform);
 					painter.setClipRect (_al_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
 					QPen pen = get_pen (get_baro_color(), 1.25f);
@@ -1208,12 +1193,12 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 	}
 
 	// Climb rate bug:
-	if (_cmd_climb_rate_visible && _climb_rate_visible)
+	if (_params.cmd_climb_rate_visible && _params.climb_rate_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_al_transform);
 		painter.translate (4.15f * x, 0.f);
-		float posy = -8.f * x * scale_cbr (_cmd_climb_rate);
+		float posy = -8.f * x * scale_cbr (_params.cmd_climb_rate);
 		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 		{
 			painter.setPen (pen);
@@ -1225,7 +1210,7 @@ EFISWidget::al_paint_bugs (QPainter& painter, TextPainter& text_painter, float x
 
 
 void
-EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, float x)
 {
 	QPen bold_white_pen = get_pen (Qt::white, 1.25f);
 	QPen thin_white_pen = get_pen (Qt::white, 0.50f);
@@ -1250,7 +1235,7 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 		<< QPointF (-x, +0.6 * y + x)
 		<< QPointF (0.0f, +0.6 * y));
 
-	if (!_climb_rate_visible)
+	if (!_params.climb_rate_visible)
 		return;
 
 	float const line_w = 0.2f * x;
@@ -1275,15 +1260,15 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 	QPen indicator_pen = bold_white_pen;
 	indicator_pen.setCapStyle (Qt::FlatCap);
 	painter.setPen (indicator_pen);
-	painter.drawLine (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_climb_rate)));
+	painter.drawLine (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
 
 	// Numeric indicators:
 
-	int abs_climb_rate = static_cast<int> (std::abs (_climb_rate)) / 10 * 10;
+	int abs_climb_rate = static_cast<int> (std::abs (_params.climb_rate)) / 10 * 10;
 	if (abs_climb_rate >= 100)
 	{
 		float const fh = _font_13_digit_height;
-		float const sgn = _climb_rate > 0.f ? 1.f : -1.f;
+		float const sgn = _params.climb_rate > 0.f ? 1.f : -1.f;
 		painter.setClipping (false);
 		painter.setFont (_font_13_bold);
 		painter.translate (-1.05f * x, sgn * -2.35f * y);
@@ -1294,23 +1279,23 @@ EFISWidget::al_paint_climb_rate (QPainter& painter, TextPainter& text_painter, f
 
 
 void
-EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_pressure (QPainter& painter, TextPainter& text_painter, float x)
 {
-	if (!_pressure_visible)
+	if (!_params.pressure_visible)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
 	painter.translate (0.f, 0.75f * x);
 
-	QFont font_a = _standard_pressure ? _font_13_bold : _font_16_bold;
+	QFont font_a = _params.standard_pressure ? _font_13_bold : _font_16_bold;
 	QFont font_b = _font_10_bold;
 	QFontMetricsF metrics_a (font_a);
 	QFontMetricsF metrics_b (font_b);
 
-	QString unit_str = _pressure_display_hpa? "HPA" : "IN";
-	int precision = _pressure_display_hpa ? 0 : 2;
-	QString pressure_str = QString ("%1").arg (_pressure_display_hpa? _pressure.hpa() : _pressure.inhg(), 0, 'f', precision) + " ";
+	QString unit_str = _params.pressure_display_hpa? "HPA" : "IN";
+	int precision = _params.pressure_display_hpa ? 0 : 2;
+	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure.hpa() : _params.pressure.inhg(), 0, 'f', precision) + " ";
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
@@ -1320,7 +1305,7 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 	zz_rect.moveLeft (nn_rect.right());
 
 	painter.setPen (QPen (_navigation_color, pen_width()));
-	if (_standard_pressure)
+	if (_params.standard_pressure)
 	{
 		painter.setFont (_font_16_bold);
 		text_painter.drawText (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD");
@@ -1335,12 +1320,12 @@ EFISWidget::al_paint_pressure (QPainter& painter, TextPainter& text_painter, flo
 
 
 void
-EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_cmd_altitude_visible)
+	if (!_params.cmd_altitude_visible)
 		return;
 
-	float cmd_altitude = limit (_cmd_altitude, -99999.f, +99999.f);
+	float cmd_altitude = limit (_params.cmd_altitude, -99999.f, +99999.f);
 
 	QFont b_font = _font_20_bold;
 	float const b_digit_width = _font_20_digit_width;
@@ -1385,7 +1370,7 @@ EFISWidget::al_paint_ap_setting (QPainter& painter, TextPainter& text_painter)
 
 
 float
-EFISWidget::scale_cbr (FeetPerMinute climb_rate) const
+EFISWidget::PaintWorkUnit::scale_cbr (FeetPerMinute climb_rate) const
 {
 	FeetPerMinute cbr = std::abs (climb_rate);
 
@@ -1406,7 +1391,7 @@ EFISWidget::scale_cbr (FeetPerMinute climb_rate) const
 
 
 void
-EFISWidget::paint_center_cross (QPainter& painter, bool center_box, bool rest)
+EFISWidget::PaintWorkUnit::paint_center_cross (QPainter& painter, bool center_box, bool rest)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -1449,15 +1434,15 @@ EFISWidget::paint_center_cross (QPainter& painter, bool center_box, bool rest)
 
 
 void
-EFISWidget::paint_flight_director (QPainter& painter)
+EFISWidget::PaintWorkUnit::paint_flight_director (QPainter& painter)
 {
 	float const w = wh() * 1.4f / 9.f;
-	Angle range = _fov / 4.f;
+	Angle range = _params.fov / 4.f;
 
-	Angle pitch = std::cos (_roll.rad()) * (_flight_director_pitch - _pitch);
+	Angle pitch = std::cos (_params.roll.rad()) * (_params.flight_director_pitch - _params.pitch);
 	pitch = limit (pitch, -range, +range);
 
-	Angle roll = _flight_director_roll - _roll;
+	Angle roll = _params.flight_director_roll - _params.roll;
 	if (std::abs (roll.deg()) > 180.0)
 		roll = roll - sgn (roll.deg()) * 360_deg;
 	roll = limit (roll, -range, +range);
@@ -1472,25 +1457,25 @@ EFISWidget::paint_flight_director (QPainter& painter)
 					 get_pen (_autopilot_pen_2.color(), 1.66f) })
 	{
 		painter.setPen (pen);
-		if (_flight_director_pitch_visible && _pitch_visible)
+		if (_params.flight_director_pitch_visible && _params.pitch_visible)
 			painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
-		if (_flight_director_roll_visible && _roll_visible)
+		if (_params.flight_director_roll_visible && _params.roll_visible)
 			painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
 	}
 }
 
 
 void
-EFISWidget::paint_control_stick (QPainter& painter)
+EFISWidget::PaintWorkUnit::paint_control_stick (QPainter& painter)
 {
-	if (!_control_stick_visible)
+	if (!_params.control_stick_visible)
 		return;
 
 	float const w = wh() * 0.2f / 9.f;
-	Angle range = _fov / 4.f;
+	Angle range = _params.fov / 4.f;
 
-	Angle pitch = limit (_control_stick_pitch, -range, +range);
-	Angle roll = limit (_control_stick_roll, -range, +range);
+	Angle pitch = limit (_params.control_stick_pitch, -range, +range);
+	Angle roll = limit (_params.control_stick_roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1502,7 +1487,7 @@ EFISWidget::paint_control_stick (QPainter& painter)
 					 get_pen (_navigation_color, 1.5f) })
 	{
 		painter.setPen (pen);
-		if (_flight_director_roll_visible || _flight_director_pitch_visible)
+		if (_params.flight_director_roll_visible || _params.flight_director_pitch_visible)
 		{
 			// X cross, if flight director visible:
 			painter.drawLine (QPointF (xpos - w, ypos - w), QPointF (xpos + w, ypos + w));
@@ -1519,19 +1504,19 @@ EFISWidget::paint_control_stick (QPainter& painter)
 
 
 void
-EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_altitude_agl_visible)
+	if (!_params.altitude_agl_visible)
 		return;
 
-	float aagl = limit (_altitude_agl, -9999.f, +99999.f);
+	float aagl = limit (_params.altitude_agl, -9999.f, +99999.f);
 	QFont radar_altimeter_font = _font_20_bold;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
 	float const v = 0.03f * _q;
 
 	int digits = 4;
-	if (_altitude_agl > 9999)
+	if (_params.altitude_agl > 9999)
 		digits = 5;
 	float const margin = 0.2f * digit_width;
 
@@ -1541,7 +1526,7 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	if (is_newly_set (_altitude_agl_ts))
+	if (is_newly_set (_params.altitude_agl_ts))
 		painter.setPen (get_pen (Qt::white, 1.25f));
 	else
 		painter.setPen (Qt::NoPen);
@@ -1557,9 +1542,9 @@ EFISWidget::paint_altitude_agl (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_transition_altitude_visible)
+	if (!_params.transition_altitude_visible)
 		return;
 
 	float x = 0.18f * wh();
@@ -1573,7 +1558,7 @@ EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
 	QFontMetricsF metrics_b (font_b);
 
 	QString baro_str = "BARO";
-	QString alt_str = QString ("%1").arg (_transition_altitude, 0, 'f', 0);
+	QString alt_str = QString ("%1").arg (_params.transition_altitude, 0, 'f', 0);
 
 	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
 	QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
@@ -1581,7 +1566,7 @@ EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
 
 	QPen baro_pen = get_pen (get_baro_color(), 1.f);
 
-	if (!(_baro_blinking_warning->isActive() && !_baro_blink))
+	if (!(_params.baro_blinking_active && !_params.baro_blink))
 	{
 		painter.setPen (baro_pen);
 		painter.setFont (font_a);
@@ -1590,7 +1575,7 @@ EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
 		text_painter.drawText (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
 	}
 
-	if (is_newly_set (_transition_altitude_ts))
+	if (is_newly_set (_params.transition_altitude_ts))
 	{
 		float v = 0.06f * _q;
 		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
@@ -1602,16 +1587,16 @@ EFISWidget::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_nav (QPainter& painter, TextPainter& text_painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	if (_approach_reference_visible)
+	if (_params.approach_reference_visible)
 	{
-		if (_localizer_info_visible)
+		if (_params.localizer_info_visible)
 		{
-			QString loc_str = QString ("%1/%2°").arg (_localizer_id).arg (std::round (floored_mod (_localizer_magnetic_bearing.deg(), 360.0)));
+			QString loc_str = QString ("%1/%2°").arg (_params.localizer_id).arg (std::round (floored_mod (_params.localizer_magnetic_bearing.deg(), 360.0)));
 			QFont font = _font_10_bold;
 			font.setBold (false);
 
@@ -1620,18 +1605,18 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 			text_painter.drawText (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
 		}
 
-		if (_approach_hint != "")
+		if (_params.approach_hint != "")
 		{
 			QFont font = _font_16_bold;
 			font.setBold (false);
 
 			painter.setPen (Qt::white);
 			painter.setFont (font);
-			text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _approach_hint);
+			text_painter.drawText (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _params.approach_hint);
 		}
 
-		QString dme_val = QString ("DME %1").arg (_dme_distance.nm(), 0, 'f', 1);
-		if (!_dme_distance_visible)
+		QString dme_val = QString ("DME %1").arg (_params.dme_distance.nm(), 0, 'f', 1);
+		if (!_params.dme_distance_visible)
 			dme_val = "DME –––";
 		QFont font = _font_10_bold;
 		font.setBold (false);
@@ -1685,21 +1670,21 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.452f * wh());
-		paint_ladder (_lateral_deviation_visible, _lateral_deviation_deg);
+		paint_ladder (_params.lateral_deviation_visible, _params.lateral_deviation_deg);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
 		painter.rotate (-90);
-		paint_ladder (_vertical_deviation_visible, _vertical_deviation_deg);
+		paint_ladder (_params.vertical_deviation_visible, _params.vertical_deviation_deg);
 	}
 
-	if (_runway_visible)
+	if (_params.runway_visible)
 	{
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * limit (_lateral_deviation_deg, -2_deg, +2_deg).deg();
-		float ypos = -pitch_to_px (limit (_pitch + _runway_position, 0_deg, 25_deg));
+		float offset = 0.5f * limit (_params.lateral_deviation_deg, -2_deg, +2_deg).deg();
+		float ypos = -pitch_to_px (limit (_params.pitch + _params.runway_position, 0_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, ypos);
@@ -1729,11 +1714,11 @@ EFISWidget::paint_nav (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_painter)
 {
 	float const q = 0.1f * wh();
 
-	if (_control_hint_visible)
+	if (_params.control_hint_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_center_transform);
@@ -1741,9 +1726,9 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		painter.setBrush (Qt::NoBrush);
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		QPointF text_hook = QPointF (0.f, -3.1f * q);
-		text_painter.drawText (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, _control_hint);
+		text_painter.drawText (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, _params.control_hint);
 
-		if (is_newly_set (_control_hint_ts))
+		if (is_newly_set (_params.control_hint_ts))
 		{
 			float v = 0.055f * _q;
 			QRectF frame (text_hook, QSizeF (2.f * _q, _font_20_digit_height));
@@ -1753,7 +1738,7 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		}
 	}
 
-	if (_fma_visible)
+	if (_params.fma_visible)
 	{
 		QRectF rect (0.f, 0.f, 6.3f * q, 0.65f * q);
 		centrify (rect);
@@ -1805,41 +1790,41 @@ EFISWidget::paint_hints (QPainter& painter, TextPainter& text_painter)
 		painter.setBrush (Qt::NoBrush);
 
 		painter.setFont (_font_13_bold);
-		text_painter.drawText (b1, Qt::AlignVCenter | Qt::AlignHCenter, _fma_speed_hint);
-		text_painter.drawText (b2, Qt::AlignVCenter | Qt::AlignHCenter, _fma_lateral_hint);
-		text_painter.drawText (b3, Qt::AlignVCenter | Qt::AlignHCenter, _fma_vertical_hint);
+		text_painter.drawText (b1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
+		text_painter.drawText (b2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
+		text_painter.drawText (b3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
 
 		painter.setFont (_font_10_bold);
-		text_painter.drawText (s1, Qt::AlignVCenter | Qt::AlignHCenter, _fma_speed_small_hint);
-		text_painter.drawText (s2, Qt::AlignVCenter | Qt::AlignHCenter, _fma_lateral_small_hint);
-		text_painter.drawText (s3, Qt::AlignVCenter | Qt::AlignHCenter, _fma_vertical_small_hint);
+		text_painter.drawText (s1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
+		text_painter.drawText (s2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
+		text_painter.drawText (s3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
 
-		if (_fma_speed_hint != "" && is_newly_set (_fma_speed_ts))
+		if (_params.fma_speed_hint != "" && is_newly_set (_params.fma_speed_ts))
 			paint_big_rect (b1);
-		if (_fma_lateral_hint != "" && is_newly_set (_fma_lateral_ts))
+		if (_params.fma_lateral_hint != "" && is_newly_set (_params.fma_lateral_ts))
 			paint_big_rect (b2);
-		if (_fma_vertical_hint != "" && is_newly_set (_fma_vertical_ts))
+		if (_params.fma_vertical_hint != "" && is_newly_set (_params.fma_vertical_ts))
 			paint_big_rect (b3);
 
-		if (_fma_speed_small_hint != "" && is_newly_set (_fma_speed_small_ts))
+		if (_params.fma_speed_small_hint != "" && is_newly_set (_params.fma_speed_small_ts))
 			paint_small_rect (s1);
-		if (_fma_lateral_small_hint != "" && is_newly_set (_fma_lateral_small_ts))
+		if (_params.fma_lateral_small_hint != "" && is_newly_set (_params.fma_lateral_small_ts))
 			paint_small_rect (s2);
-		if (_fma_vertical_small_hint != "" && is_newly_set (_fma_vertical_small_ts))
+		if (_params.fma_vertical_small_hint != "" && is_newly_set (_params.fma_vertical_small_ts))
 			paint_small_rect (s3);
 	}
 }
 
 
 void
-EFISWidget::paint_pitch_limit (QPainter& painter)
+EFISWidget::PaintWorkUnit::paint_pitch_limit (QPainter& painter)
 {
-	if (!_pitch_limit_visible || !_pitch_visible)
+	if (!_params.pitch_limit_visible || !_params.pitch_visible)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (limit (_pitch_limit - _pitch, -20_deg, +20_deg)));
+	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit - _params.pitch, -20_deg, +20_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 
@@ -1871,7 +1856,7 @@ EFISWidget::paint_pitch_limit (QPainter& painter)
 
 
 void
-EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 {
 	QFont font = _font;
 	font.setPixelSize (font_size (30.f));
@@ -1888,8 +1873,8 @@ EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 
 	painter.setTransform (_center_transform);
 	painter.setPen (Qt::NoPen);
-	painter.setBrush (QBrush (QColor (0, 0, 0)));
-	painter.drawRect (rect());
+	painter.setBrush (Qt::black);
+	painter.drawRect (QRect (QPoint (0, 0), size()));
 
 	painter.setTransform (_center_transform);
 	painter.setPen (pen);
@@ -1904,7 +1889,7 @@ EFISWidget::paint_input_alert (QPainter& painter, TextPainter& text_painter)
 
 
 void
-EFISWidget::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target)
+EFISWidget::PaintWorkUnit::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF const& target)
 {
 	QFontMetricsF metrics (painter.font());
 	float w = 0.7f * metrics.width ("0");
@@ -1927,7 +1912,7 @@ EFISWidget::paint_dashed_zone (QPainter& painter, QColor const& color, QRectF co
 
 
 void
-EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
+EFISWidget::PaintWorkUnit::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 								  QRectF const& rect, float position, float height_scale,
 								  QString const& next, QString const& curr, QString const& prev)
 {
@@ -1962,7 +1947,7 @@ EFISWidget::paint_rotating_value (QPainter& painter, TextPainter& text_painter,
 
 
 void
-EFISWidget::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
+EFISWidget::PaintWorkUnit::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
 								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 								  bool two_zeros, bool zero_mark, bool black_zero)
 {
@@ -1996,7 +1981,7 @@ EFISWidget::paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
 
 
 QPainterPath
-EFISWidget::get_pitch_scale_clipping_path() const
+EFISWidget::PaintWorkUnit::get_pitch_scale_clipping_path() const
 {
 	float const w = wh() * 2.f / 9.f;
 
@@ -2005,10 +1990,63 @@ EFISWidget::get_pitch_scale_clipping_path() const
 	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
 	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
 
-	if (_flight_path_visible)
+	if (_params.flight_path_visible)
 		return clip_path - _flight_path_marker_clip.translated (_flight_path_marker_position);
 	else
 		return clip_path;
+}
+
+
+EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
+	InstrumentWidget (parent, work_performer),
+	_paint_work_unit (this)
+{
+	setAttribute (Qt::WA_NoBackground);
+
+	_speed_blinking_warning = new QTimer (this);
+	_speed_blinking_warning->setInterval (200);
+	QObject::connect (_speed_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_speed()));
+
+	_baro_blinking_warning = new QTimer (this);
+	_baro_blinking_warning->setInterval (200);
+	QObject::connect (_baro_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_baro()));
+
+	set_painter (&_paint_work_unit);
+}
+
+
+EFISWidget::~EFISWidget()
+{
+	wait_for_painter();
+}
+
+
+void
+EFISWidget::request_repaint()
+{
+	update_blinker (_speed_blinking_warning,
+					_params.speed_visible &&
+					((_params.warning_speed_visible && _params.speed < _params.warning_speed) ||
+					 (_params.minimum_speed_visible && _params.speed < _params.minimum_speed) ||
+					 (_params.maximum_speed_visible && _params.speed > _params.maximum_speed)),
+				    &_params.speed_blink);
+
+	update_blinker (_baro_blinking_warning,
+					_params.altitude_visible && _params.transition_altitude_visible &&
+					((_params.transition_altitude > _params.altitude && _params.standard_pressure) ||
+					 (_params.transition_altitude <= _params.altitude && !_params.standard_pressure)),
+					&_params.baro_blink);
+
+	InstrumentWidget::request_repaint();
+}
+
+
+void
+EFISWidget::push_params()
+{
+	_params.speed_blinking_active = _speed_blinking_warning->isActive();
+	_params.baro_blinking_active = _baro_blinking_warning->isActive();
+	_paint_work_unit._params_next = _params;
 }
 
 
@@ -2025,5 +2063,19 @@ EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_s
 	}
 	else if (warning_timer->isActive())
 		warning_timer->stop();
+}
+
+
+void
+EFISWidget::blink_speed()
+{
+	_params.speed_blink = !_params.speed_blink;
+}
+
+
+void
+EFISWidget::blink_baro()
+{
+	_params.baro_blink = !_params.baro_blink;
 }
 

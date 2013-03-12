@@ -106,7 +106,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 		}
 	}
 
-	_efis_widget = new EFISWidget (this);
+	_efis_widget = new EFISWidget (this, work_performer());
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
