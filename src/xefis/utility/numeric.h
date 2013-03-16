@@ -107,38 +107,5 @@ template<class Value>
 			: limit (value, range.max(), range.min());
 	}
 
-
-/**
- * Convert radians to degrees.
- */
-template<class Value>
-	inline constexpr Value
-	rad_to_deg (Value radians)
-	{
-		return radians * (180.0 / M_PI);
-	}
-
-
-/**
- * Convert degrees to radians.
- */
-template<class Value>
-	inline constexpr Value
-	deg_to_rad (Value degrees)
-	{
-		return degrees * (M_PI / 180.0);
-	}
-
-
-/**
- * Convert feet to nautical miles.
- */
-template<class Value>
-	inline constexpr Value
-	ft_to_nm (Value value)
-	{
-		return value / 6076.11549;
-	}
-
 #endif
 
