@@ -112,6 +112,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_lateral_deviation_deg;
 	Xefis::PropertyFloat	_vertical_deviation_deg;
 	Xefis::PropertyFloat	_dme_distance_nm;
+	Xefis::PropertyFloat	_outside_air_temperature_k;
 	Xefis::PropertyFloat	_engine_throttle_pct;
 	Xefis::PropertyFloat	_engine_epr;
 	Xefis::PropertyFloat	_engine_n1_pct;
@@ -119,7 +120,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat	_engine_egt_degc;
 	Xefis::PropertyFloat	_position_lat_deg;
 	Xefis::PropertyFloat	_position_lng_deg;
-	Xefis::PropertyFloat	_position_sea_level_radius_ft;
+	Xefis::PropertyFloat	_position_amsl_ft;
 	Xefis::PropertyFloat	_wind_from_magnetic_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
 	// Output:

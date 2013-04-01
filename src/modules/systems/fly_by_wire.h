@@ -56,7 +56,7 @@ class FlyByWire: public Xefis::Module
 	Xefis::PID<float>		_elevator_pid;
 	Xefis::PID<float>		_ailerons_pid;
 	Xefis::PID<float>		_rudder_pid;
-	Xefis::Timestamp		_dt;
+	Time					_dt					= 0_s;
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
 	Xefis::PropertyInteger	_mode;

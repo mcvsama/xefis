@@ -29,6 +29,7 @@
 #include <modules/io/joystick.h>
 #include <modules/systems/flight_director.h>
 #include <modules/systems/fly_by_wire.h>
+#include <modules/systems/fms.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
 #include <modules/systems/state.h>
@@ -70,9 +71,9 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 void
 ModuleManager::data_updated (Timestamp timestamp)
 {
-	_update_dt = timestamp - _update_timestamp;
-	if (_update_dt.seconds() > 1.0)
-		_update_dt = Timestamp::from_epoch (1);
+	_update_dt = 1_s * (timestamp.seconds() - _update_timestamp.seconds());
+	if (_update_dt > 1.0_s)
+		_update_dt = Time::epoch() + 1_s;
 
 	_update_timestamp = timestamp;
 
@@ -121,6 +122,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		return new FlightDirector (this, config);
 	else if (name == "systems/fly-by-wire")
 		return new FlyByWire (this, config);
+	else if (name == "systems/fms")
+		return new FlightManagementSystem (this, config);
 	else if (name == "systems/state")
 		return new State (this, config);
 	else if (name == "generic/property-tree")

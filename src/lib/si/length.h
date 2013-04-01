@@ -43,7 +43,7 @@ class Length: public Value<double, Length>
 	 * Used by the _inhg, _hpa, _psi and similar suffix operators.
 	 * To create an Length use these operators directly.
 	 */
-	constexpr
+	explicit constexpr
 	Length (ValueType psi);
 
   public:

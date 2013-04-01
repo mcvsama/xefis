@@ -75,7 +75,7 @@ FlightDirector::data_updated()
 {
 	// Don't process if dt is too small:
 	_dt += update_dt();
-	if (_dt.seconds() < 0.005)
+	if (_dt < 0.005_s)
 		return;
 
 	if (*_enabled)
@@ -88,19 +88,19 @@ FlightDirector::data_updated()
 		Range<float> pitch_limit (-pl, +pl);
 
 		_magnetic_heading_pid.set_target (renormalize (*_selected_magnetic_heading_deg, 0.f, 360.f, -1.f, +1.f));
-		_magnetic_heading_pid.process (renormalize (*_measured_magnetic_heading_deg, 0.f, 360.f, -1.f, +1.f), _dt.seconds());
+		_magnetic_heading_pid.process (renormalize (*_measured_magnetic_heading_deg, 0.f, 360.f, -1.f, +1.f), _dt.s());
 
 		_magnetic_track_pid.set_target (renormalize (*_selected_magnetic_track_deg, 0.f, 360.f, -1.f, +1.f));
-		_magnetic_track_pid.process (renormalize (*_measured_magnetic_track_deg, 0.f, 360.f, -1.f, +1.f), _dt.seconds());
+		_magnetic_track_pid.process (renormalize (*_measured_magnetic_track_deg, 0.f, 360.f, -1.f, +1.f), _dt.s());
 
 		_altitude_pid.set_target (*_selected_altitude_ft);
-		_altitude_pid.process (*_measured_altitude_ft, _dt.seconds());
+		_altitude_pid.process (*_measured_altitude_ft, _dt.s());
 
 		_vertical_speed_pid.set_target (*_selected_vertical_speed_fpm);
-		_vertical_speed_pid.process (*_measured_vertical_speed_fpm, _dt.seconds());
+		_vertical_speed_pid.process (*_measured_vertical_speed_fpm, _dt.s());
 
 		_fpa_pid.set_target (*_selected_fpa_deg);
-		_fpa_pid.process (*_measured_fpa_deg, _dt.seconds());
+		_fpa_pid.process (*_measured_fpa_deg, _dt.s());
 
 		switch (static_cast<VerticalMode> (*_vertical_mode))
 		{
@@ -142,6 +142,6 @@ FlightDirector::data_updated()
 		_output_roll_deg.write (0.f);
 	}
 
-	_dt = Xefis::Timestamp::from_epoch (0);
+	_dt = Time::epoch();
 }
 

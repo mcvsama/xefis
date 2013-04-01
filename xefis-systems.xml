@@ -5,13 +5,13 @@
 		<module name='systems/state'>
 			<var name='fd-lateral-mode' path='/systems/flight-director/settings/lateral-mode'/>
 			<var name='fd-vertical-mode' path='/systems/flight-director/settings/vertical-mode'/>
-			<property path='/systems/fms/output/localizer/type' type='string'>
+			<property path='/systems/fms/localizer/type' type='string'>
 				<default>ILS</default>
 			</property>
-			<property path='/systems/fms/output/localizer/identifier' type='string'>
+			<property path='/systems/fms/localizer/identifier' type='string'>
 				<default>ILOD</default>
 			</property>
-			<property path='/systems/fms/output/position/source' type='string'>
+			<property path='/systems/fms/position/source' type='string'>
 				<default>GPS</default>
 			</property>
 			<property path='/systems/fms/settings/follow-track' type='boolean'>
@@ -247,8 +247,8 @@
 			</observe>
 		</module>
 		<module name='systems/lookahead'>
-			<input>/systems/fms/output/altitude/amsl.ft</input>
-			<output>/systems/fms/output/altitude/amsl-lookahead.ft</output>
+			<input>/systems/fms/altitude/amsl.ft</input>
+			<output>/systems/fms/altitude/amsl-lookahead.ft</output>
 			<smoothing>500</smoothing>
 			<minimum-integration-time>0.03</minimum-integration-time>
 			<properties>
@@ -286,10 +286,10 @@
 				</directory>
 				<directory path='/'>
 					<property name='measured-magnetic-heading' path='/sensors/compass/magnetic-heading.deg'/>
-					<property name='measured-magnetic-track' path='/systems/fms/output/flight-path/magnetic-track.deg'/>
-					<property name='measured-altitude' path='/systems/fms/output/altitude/amsl.ft'/>
-					<property name='measured-vertical-speed' path='/systems/fms/output/altitude/vertical-speed.fpm'/>
-					<property name='measured-fpa' path='/systems/fms/output/flight-path/alpha.deg'/>
+					<property name='measured-magnetic-track' path='/systems/fms/flight-path/magnetic-track.deg'/>
+					<property name='measured-altitude' path='/systems/fms/altitude/amsl.ft'/>
+					<property name='measured-vertical-speed' path='/systems/fms/altitude/vertical-speed.fpm'/>
+					<property name='measured-fpa' path='/systems/fms/flight-path/alpha.deg'/>
 					<property name='measured-pitch' path='/sensors/imu/pitch.deg'/>
 					<property name='measured-roll' path='/sensors/imu/roll.deg'/>
 				</directory>
@@ -350,6 +350,119 @@
 					<property name='output-elevator' path='/elevator'/>
 					<property name='output-ailerons' path='/ailerons'/>
 					<property name='output-rudder' path='/rudder'/>
+				</directory>
+			</properties>
+		</module>
+		<module name='systems/fms'>
+			<properties path='/systems/fms'>
+				<directory path='/settings'>
+					<property name='settings.default-airplane-weight' path='/default-airplane-weight.kg' default='2.0'/>
+					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.kg' default='2.0'/>
+					<property name='settings.low-speed-roll-angle' path='/low-speed-roll-angle.deg' default='15'/>
+					<property name='settings.speed.v-a-default' path='/speeds/v-a-default.kt' default='90'/>
+					<property name='settings.speed.v-no-default' path='/speeds/v-no-default.kt' default='100'/>
+					<property name='settings.speed.v-ne' path='/speeds/v-ne.kt' default='140'/>
+					<property name='settings.speed.v-s' path='/speeds/v-s.kt' default='60'/>
+					<property name='settings.speed.v-s0' path='/speeds/v-s0.kt' default='53'/>
+					<property name='settings.speed.v-at' path='/speeds/v-at.kt' default='69'/>
+					<property name='settings.speed.v-fe' path='/speeds/v-fe.kt' default='90'/>
+					<property name='settings.speed.v-le' path='/speeds/v-le.kt' default='80'/>
+					<property name='settings.speed.v-o' path='/speeds/v-o.kt' default='130'/>
+					<property name='settings.speed.v-be' path='/speeds/v-be.kt' default='65'/>
+					<property name='settings.speed.v-bg' path='/speeds/v-bg.kt' default='65'/>
+					<property name='settings.speed.v-br' path='/speeds/v-br.kt' default='75'/>
+					<property name='settings.flaps-configuration-properties-path' path='/speeds/flaps-configuration-properties-path' default=''/>
+				</directory>
+				<directory path='//sensors'>
+					<property name='imu.pitch' path='/imu/pitch.deg'/>
+					<property name='imu.roll' path='/imu/roll.deg'/>
+					<property name='imu.magnetic-heading' path='/compass/magnetic-heading.deg'/>
+					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy.deg' default='5'/>
+					<property name='gps.longitude' path='/gps/longitude.deg'/>
+					<property name='gps.latitude' path='/gps/latitude.deg'/>
+					<property name='gps.altitude-amsl' path='/gps/altitude-amsl.ft'/>
+					<property name='gps.accuracy' path='/gps/accuracy.nm' default='0.001'/>
+					<property name='gps.timestamp' path='/gps/update-timestamp.s'/>
+					<property name='ins.longitude' path='/ins/'/>
+					<property name='ins.latitude' path='/ins/'/>
+					<property name='ins.altitude-amsl' path='/ins/'/>
+					<property name='ins.accuracy' path='/ins/'/>
+					<property name='ins.timestamp' path='/ins/'/>
+					<property name='pressure.static' path='/pressure/pressure.inhg'/>
+					<property name='pressure.qnh' path='/pressure/pressure-qnh.inhg' default='29.92'/>
+					<property name='ias' path='/speed/ias.kt'/>
+					<property name='backup-amsl' path='/backup-amsl.ft' default='0'/>
+					<property name='gear-down' path='/gear-down' default='false'/>
+					<property name='outside-air-temperature' path='/temperature/outside.k'/>
+				</directory>
+
+				<directory path='/position'>
+					<property name='position.longitude' path='/longitude.deg'/>
+					<property name='position.latitude' path='/latitude.deg'/>
+					<property name='position.altitude-amsl' path='/altitude-amsl.ft'/>
+					<property name='position.accuracy' path='/accuracy.nm'/>
+					<property name='position.source' path='/source'/>
+				</directory>
+				<directory path='/track'>
+					<property name='track.vertical' path='/vertical.deg'/>
+					<property name='track.true-heading' path='/true-heading.deg'/>
+					<property name='track.magnetic-heading' path='/magnetic-heading.deg'/>
+					<property name='track.vertical-delta' path='/vertical-delta.deg'/>
+					<property name='track.heading-delta' path='/heading-delta.deg'/>
+				</directory>
+				<directory path='/orientation'>
+					<property name='orientation.pitch' path='/pitch.deg'/>
+					<property name='orientation.roll' path='/roll.deg'/>
+					<property name='orientation.true-heading' path='/true-heading.deg'/>
+					<property name='orientation.magnetic-heading' path='/magnetic-heading.deg'/>
+				</directory>
+				<directory path='/pressure-altitude'>
+					<property name='pressure-altitude.amsl' path='/amsl.ft'/>
+					<property name='pressure-altitude.amsl-lookahead' path='/amsl-lookahead.ft'/>
+					<property name='pressure-altitude.amsl-lookahead-time' path='/amsl-lookahead-time.s'/>
+					<property name='pressure-altitude.climb-rate' path='/climb-rate.fpm'/>
+				</directory>
+				<directory path='/speed'>
+					<property name='speed.v-r' path='/v-r.kt'/>
+					<property name='speed.v-ref' path='/v-ref.kt'/>
+					<property name='speed.v-a' path='/v-a.kt'/>
+					<property name='speed.v-no' path='/v-no.kt'/>
+					<property name='speed.minimum-ias' path='/minimum-ias.kt'/>
+					<property name='speed.minimum-maneuver-ias' path='/minimum-maneuver-ias.kt'/>
+					<property name='speed.maximum-ias' path='/maximum-ias.kt'/>
+					<property name='speed.maximum-maneuver-ias' path='/maximum-maneuver-ias.kt'/>
+					<property name='speed.ias-lookahead' path='/ias-lookahead.kt'/>
+					<property name='speed.ias-lookahead-time' path='/ias-lookahead-time.s'/>
+					<property name='speed.true-airspeed' path='/true-airspeed.kt'/>
+					<property name='speed.ground-speed' path='/ground-speed.kt'/>
+					<property name='speed.mach' path='/mach'/>
+					<property name='speed.sound' path='/sound.kt'/>
+				</directory>
+				<directory path='/aoa'>
+					<property name='aoa.relative-pitch-limit' path='/relative-pitch-limit.deg'/>
+					<property name='aoa.alpha' path='/alpha.deg'/>
+					<property name='aoa.beta' path='/beta.deg'/>
+				</directory>
+				<directory path='/wind'>
+					<property name='wind.true-heading' path='/true-orientation-from.deg'/>
+					<property name='wind.magnetic-heading' path='/magnetic-orientation-from.deg'/>
+					<property name='wind.true-airspeed' path='/true-airspeed.kt'/>
+				</directory>
+				<directory path='/localizer'>
+					<property name='localizer.vertical-deviation' path='/vertical-deviation.deg'/>
+					<property name='localizer.lateral-deviation' path='/lateral-deviation.deg'/>
+					<property name='localizer.identifier' path='/identifier'/>
+					<property name='localizer.source' path='/source'/>
+					<property name='localizer.distance' path='/distance.nm'/>
+					<property name='localizer.frequency' path='/frequency.hz'/>
+				</directory>
+				<directory path='/performance'>
+					<property name='performance.climb-glide-ratio' path='/climb-glide-ratio'/>
+					<property name='density-altitude' path='/density-altitude.ft'/>
+				</directory>
+				<directory path='/magnetic'>
+					<property name='magnetic-declination' path='/magnetic-declination.deg'/>
+					<property name='magnetic-inclination' path='/magnetic-inclination.deg'/>
 				</directory>
 			</properties>
 		</module>

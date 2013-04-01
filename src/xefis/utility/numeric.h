@@ -107,5 +107,35 @@ template<class Value>
 			: limit (value, range.max(), range.min());
 	}
 
+
+template<class Value>
+	inline constexpr Value
+	magnetic_to_true (Value mag, Value declination)
+	{
+		return floored_mod (mag + declination, 360.0);
+	}
+
+
+inline constexpr Angle
+magnetic_to_true (Angle mag, Angle declination)
+{
+	return floored_mod (mag + declination, 360.0_deg);
+}
+
+
+template<class Value>
+	inline constexpr Value
+	true_to_magnetic (Value tru, Value declination)
+	{
+		return floored_mod (tru - declination, 360.0);
+	}
+
+
+inline constexpr Angle
+true_to_magnetic (Angle tru, Angle declination)
+{
+	return floored_mod (tru - declination, 360.0_deg);
+}
+
 #endif
 

@@ -71,16 +71,16 @@ Lookahead::data_updated()
 		_output.set_nil();
 	else
 	{
-		Xefis::Timestamp dt = update_dt();
+		Time dt = update_dt();
 		_dt += dt;
 
-		if (_dt.seconds() > _minimum_integration_time)
+		if (_dt.s() > _minimum_integration_time)
 		{
 			double value = *_input;
-			double estimated_value = _last_value + *_lookahead_time / dt.seconds() * (value - _last_value);
+			double estimated_value = _last_value + *_lookahead_time / dt.s() * (value - _last_value);
 			_output.write (_output_smoother.process (estimated_value));
 			_last_value = value;
-			_dt = Xefis::Timestamp::from_epoch (0);
+			_dt = Time::epoch();
 		}
 	}
 }

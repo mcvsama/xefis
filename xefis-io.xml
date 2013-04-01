@@ -7,56 +7,50 @@
 				<port>9000</port>
 				<properties>
 					<directory path='/sensors'>
-						<!-- radar altimeter -->
-						<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
 						<!-- gps -->
 						<property name='position-longitude' path='/gps/longitude.deg'/>
 						<property name='position-latitude' path='/gps/latitude.deg'/>
-						<property name='position-sea-level-radius' path='/gps/amsl.ft'/>
-						<property name='position-update-timestamp' path='/gps/update-timestamp.s'/>
-						<!-- airspeed -->
-						<property name='ias' path='/speed/ias.kt'/>
-						<property name='ias-update-timestamp' path='/speed/update-timestamp.s'/>
-						<!-- pressure -->
-						<property name='pressure' path='/pressure/pressure.inhg'/>
-						<property name='pressure-update-timestamp' path='/pressure/update-timestamp.s'/>
-						<!-- compass -->
-						<pressure name='magnetic-heading' path='/compass/magnetic-heading.deg'/>
-						<property name='compass-update-timestamp' path='/compass/update-timestamp.s'/>
-						<!-- slip-skid -->
-						<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
-						<property name='slip-skid-limit' path='/slip-skid/limit.g'/>
-						<property name='slip-skid-update-timestamp' path='/slip-skid/update-timestamp.s'/>
+						<property name='position-amsl' path='/gps/altitude-amsl.ft'/>
 						<!-- imu -->
 						<property name='orientation-pitch' path='/imu/pitch.deg'/>
 						<property name='orientation-roll' path='/imu/roll.deg'/>
 						<property name='orientation-magnetic-heading' path='/compass/magnetic-heading.deg'/>
+						<!-- airspeed -->
+						<property name='ias' path='/speed/ias.kt'/>
+						<!-- pressure -->
+						<property name='pressure' path='/pressure/pressure.inhg'/>
+						<!-- temperature -->
+						<property name='outside-air-temperature' path='/temperature/outside.k'/>
+						<!-- radar altimeter -->
+						<property name='altitude-agl' path='/radar-altimeter/agl.ft'/>
+						<!-- slip-skid -->
+						<property name='slip-skid' path='/slip-skid/slip-skid.g'/>
+						<property name='slip-skid-limit' path='/slip-skid/limit.g'/>
 						<!-- engine -->
 						<property name='engine-n1' path='/engine/n1.pct'/>
 						<property name='engine-n2' path='/engine/n2.pct'/>
 						<property name='engine-egt' path='/engine/egt.degc'/>
 						<property name='engine-epr' path='/engine/epr'/>
 					</directory>
-					<directory path='/systems/fms'>
-						<!-- Emulate some of the FMS output -->
-						<property name='ias-minimum' path='/output/speed/ias-minimum.kt'/>
-						<property name='ias-warning' path='/output/speed/ias-warning.kt'/>
-						<property name='ias-maximum' path='/output/speed/ias-maximum.kt'/>
-						<property name='ias-lookahead' path='/output/speed/ias-lookahead.kt'/>
-						<property name='gs' path='/output/speed/ground-speed.kt'/>
-						<property name='tas' path='/output/speed/true-air-speed.kt'/>
-						<property name='mach' path='/output/speed/mach'/>
-						<property name='wind-from-mag-heading' path='/output/wind/magnetic-orientation.deg'/>
-						<property name='wind-tas' path='/output/wind/speed.kt'/>
-						<property name='dme-distance' path='/output/localizer/distance.nm'/>
-						<property name='vertical-deviation' path='/output/localizer/vertical-deviation.deg'/>
-						<property name='lateral-deviation' path='/output/localizer/lateral-deviation.deg'/>
-						<property name='flight-path-marker-alpha' path='/output/flight-path/alpha.deg'/>
-						<property name='flight-path-marker-beta' path='/output/flight-path/beta.deg'/>
-						<property name='magnetic-track' path='/output/flight-path/magnetic-track.deg'/>
-						<property name='orientation-true-heading' path='/output/orientation/true-heading.deg'/>
-						<property name='cbr' path='/output/altitude/vertical-speed.fpm'/>
-						<property name='altitude' path='/output/altitude/amsl.ft'/>
+					<directory path='/systems/fgdata'>
+						<property name='gs' path='/speed/ground-speed.kt'/>
+						<property name='tas' path='/speed/true-airspeed.kt'/>
+						<property name='mach' path='/speed/mach'/>
+						<property name='wind-from-mag-heading' path='/wind/magnetic-orientation.deg'/>
+						<property name='wind-tas' path='/wind/speed.kt'/>
+						<property name='flight-path-marker-alpha' path='/flight-path/alpha.deg'/>
+						<property name='flight-path-marker-beta' path='/flight-path/beta.deg'/>
+						<property name='magnetic-track' path='/flight-path/magnetic-track.deg'/>
+						<property name='cbr' path='/altitude/vertical-speed.fpm'/>
+						<property name='altitude' path='/altitude/amsl.ft'/>
+						<property name='orientation-true-heading' path='/orientation/true-heading.deg'/>
+						<property name='ias-minimum' path='/speed/ias-minimum.kt'/>
+						<property name='ias-warning' path='/speed/ias-warning.kt'/>
+						<property name='ias-maximum' path='/speed/ias-maximum.kt'/>
+						<property name='ias-lookahead' path='/speed/ias-lookahead.kt'/>
+						<property name='dme-distance' path='/localizer/distance.nm'/>
+						<property name='vertical-deviation' path='/localizer/vertical-deviation.deg'/>
+						<property name='lateral-deviation' path='/localizer/lateral-deviation.deg'/>
 					</directory>
 					<directory path='/systems/flight-director'>
 						<!-- Emulate some of the AP settings -->
@@ -85,15 +79,15 @@
 			<path>/input/main</path>
 			<axis id='0'>
 				<center>0.00259</center>
-				<dead-zone>0.006</dead-zone>
+				<dead-zone>0.016</dead-zone>
 			</axis>
 			<axis id='1'>
 				<center>0.00259</center>
-				<dead-zone>0.006</dead-zone>
+				<dead-zone>0.016</dead-zone>
 			</axis>
 		</module>
 		<module name='io/joystick'>
-			<device>/dev/input/js1</device>
+			<device>/dev/input/js0</device>
 			<path>/input/rudder</path>
 		</module>
 	</modules>

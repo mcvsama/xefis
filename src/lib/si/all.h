@@ -19,6 +19,8 @@
 #include "pressure.h"
 #include "frequency.h"
 #include "length.h"
+#include "time.h"
+#include "speed.h"
 #include "lonlat.h"
 #include "constants.h"
 

@@ -95,7 +95,7 @@
 			<chunk>
 				<name>als</name>
 				<type>double</type>
-				<node>/instrumentation/altimeter/setting-inhg</node>
+				<node>/environment/pressure-inhg</node>
 			</chunk>
 			<chunk>
 				<name>cbr</name>
@@ -114,9 +114,9 @@
 				<node>/position/longitude-deg</node>
 			</chunk>
 			<chunk>
-				<name>slr</name>
+				<name>alg</name>
 				<type>double</type>
-				<node>/position/sea-level-radius-ft</node>
+				<node>/position/altitude-ft</node>
 			</chunk>
 			<!-- Orientation -->
 			<chunk>
@@ -196,6 +196,11 @@
 				<name>ss</name>
 				<type>double</type>
 				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
+			</chunk>
+			<chunk>
+				<name>tmp</name>
+				<type>double</type>
+				<node>/environment/temperature-degc</node>
 			</chunk>
 			<!-- EICAS -->
 			<chunk>

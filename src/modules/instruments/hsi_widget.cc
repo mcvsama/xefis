@@ -275,7 +275,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 
 	// Clear with black background:
 	painter.setPen (Qt::NoPen);
-	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
+	painter.setBrush (QBrush (Qt::black, Qt::SolidPattern));
 	painter.drawRect (QRect (QPoint (0, 0), size()));
 
 	paint_navaids (painter, text_painter);
@@ -286,6 +286,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_track (painter, text_painter, true);
 	paint_aircraft (painter, text_painter);
 	paint_speeds_and_wind (painter, text_painter);
+	paint_climb_glide_ratio (painter, text_painter);
 	paint_range (painter, text_painter);
 	paint_hints (painter, text_painter);
 	paint_trend_vector (painter, text_painter);
@@ -315,7 +316,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 				QString text_1 =
 					QString (_params.heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU") +
 					QString (_params.display_track ? "  TRK" : "");
-				QString text_2 = QString ("%1").arg (hdg);
+				QString text_2 = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
 				QFont font_1 (_font_13_bold);
 				QFont font_2 (_font_16_bold);
@@ -387,7 +388,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 void
 HSIWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_params.positioning_hint_visible)
+	if (!_params.positioning_hint_visible || !_params.position_valid)
 		return;
 
 	float vplus = translate_descent (QFontMetricsF (_font_13_bold), QFontMetricsF (_font_16_bold));
@@ -572,9 +573,11 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (QPainter& painter, TextPainter& tex
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipping (false);
 
+		int sel_hdg = static_cast<int> (_params.ap_heading.deg() + 0.5f) % 360;
+
 		// AP heading always set as magnetic, but can be displayed as true:
 		QString text_1 = "SEL  HDG";
-		QString text_2 = QString ("%1").arg (static_cast<int> (_params.ap_heading.deg() + 0.5f));
+		QString text_2 = QString ("%1").arg (sel_hdg, 3, 10, QChar ('0'));
 
 		QFont font_1 (_font_13_bold);
 		QFont font_2 (_font_16_bold);
@@ -615,7 +618,7 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 	if (!_params.heading_visible)
 		return;
 
-	QPen pen = QPen (QColor (255, 255, 255), pen_width (1.f), Qt::SolidLine, Qt::FlatCap);
+	QPen pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::FlatCap);
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipRect (_map_clip_rect);
@@ -667,7 +670,7 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 void
 HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
 {
-	QPen pen = get_pen (QColor (255, 255, 255), 0.6f);
+	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13_bold;
 	QFont font_b = _font_16_bold;
 	QFontMetricsF metr_a (font_a);
@@ -731,6 +734,58 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter&
 
 
 void
+HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (QPainter& painter, TextPainter& text_painter)
+{
+	if (!_params.climb_glide_ratio_visible)
+		return;
+
+	_params.climb_glide_ratio = limit<float> (_params.climb_glide_ratio, -99, 99);
+
+	QPen pen = get_pen (Qt::white, 0.6f);
+	QFont font_a = _font_13_bold;
+	QFont font_b = _font_16_bold;
+	QFontMetricsF metr_a (font_a);
+	QFontMetricsF metr_b (font_b);
+
+	painter.resetTransform();
+	painter.translate (-0.2f * _q, 0.f);
+	painter.setClipping (false);
+	painter.setPen (pen);
+
+	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
+		painter.translate (0.f, 0.15f * _q);
+
+	QString str, arr, val;
+
+	if (_params.climb_glide_ratio > 0.0)
+	{
+		str = "CR";
+		arr = "↑";
+	}
+	else if (_params.climb_glide_ratio < -0.0)
+	{
+		str = "GR";
+		arr = "↓";
+	}
+	else
+	{
+		str = "CGR";
+		arr = "";
+	}
+
+	if (std::abs (_params.climb_glide_ratio) > 0.0)
+		val = arr + "\u2009" + QString ("%1\u2009˸1").arg (std::abs (static_cast<int> (_params.climb_glide_ratio)), 2, 10, QChar (L'\u2007'));
+	else
+		val = "––";
+
+	painter.setFont (font_a);
+	text_painter.drawText (QPointF (_w - metr_b.width ("\u20090000:1"), translate_descent (metr_a, metr_b)), Qt::AlignTop | Qt::AlignRight, str);
+	painter.setFont (font_b);
+	text_painter.drawText (QPointF (_w, metr_b.height()), Qt::AlignBottom | Qt::AlignRight, val);
+}
+
+
+void
 HSIWidget::PaintWorkUnit::paint_range (QPainter& painter, TextPainter& text_painter)
 {
 	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
@@ -747,8 +802,9 @@ HSIWidget::PaintWorkUnit::paint_range (QPainter& painter, TextPainter& text_pain
 
 		painter.setClipping (false);
 		painter.resetTransform();
-		painter.translate (4.5f * _q, 0.25f * _q);
+		painter.translate (5.5f * _q, 0.25f * _q);
 		painter.setPen (get_pen (Qt::white, 1.0f));
+		painter.setBrush (Qt::black);
 		painter.drawRect (rect);
 		painter.setFont (font_a);
 		text_painter.drawText (rect.center() - QPointF (0.f, 0.05f * _q), Qt::AlignBottom | Qt::AlignHCenter, s);
@@ -761,7 +817,7 @@ HSIWidget::PaintWorkUnit::paint_range (QPainter& painter, TextPainter& text_pain
 void
 HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_params.navaids_visible)
+	if (!_params.navaids_visible || !_params.position_valid)
 		return;
 
 	painter.setTransform (_aircraft_center_transform);

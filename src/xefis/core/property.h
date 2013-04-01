@@ -187,6 +187,19 @@ template<class tType>
 		 */
 		void
 		write_signalling (Type const&);
+
+		/**
+		 * Copy other node. Call PropertyNode::copy().
+		 */
+		void
+		copy (Property const& other);
+
+	  private:
+		/**
+		 * Ensure that the property exists in the tree.
+		 */
+		PropertyNode*
+		ensure_path (std::string const& path, Type const& value);
 	};
 
 
@@ -385,16 +398,7 @@ template<class T>
 			if (node)
 				node->write<Type> (value);
 			else
-			{
-				std::string::size_type s = _path.find_last_of ('/');
-				std::string dir = _path.substr (0, s);
-				std::string pro = _path.substr (s + 1);
-
-				PropertyNode* parent = _root;
-				if (s != std::string::npos)
-					parent = _root->mkpath (dir);
-				node = parent->add_child (new PropertyNode (pro, value));
-			}
+				ensure_path (_path, value);
 		}
 		else
 			throw Exception ("can't write to a singular property");
@@ -415,6 +419,44 @@ template<class T>
 		}
 		else
 			throw Exception ("can't write to a singular property");
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::copy (Property<T> const& other)
+	{
+		write (other.read());
+		if (other.is_nil())
+			set_nil();
+		if (_root)
+		{
+			// Write the value to ensure that proper tree path
+			// is created.
+			PropertyNode* node = get_node();
+			if (!node)
+				node = ensure_path (_path, Type());
+			PropertyNode* source = other.get_node();
+			if (node && source)
+				node->copy (*source);
+		}
+		else
+			throw Exception ("can't copy to a singular property");
+	}
+
+
+template<class T>
+	inline PropertyNode*
+	Property<T>::ensure_path (std::string const& path, Type const& value)
+	{
+		std::string::size_type s = path.find_last_of ('/');
+		std::string dir = path.substr (0, s);
+		std::string pro = path.substr (s + 1);
+
+		PropertyNode* parent = _root;
+		if (s != std::string::npos)
+			parent = _root->mkpath (dir);
+		return parent->add_child (new PropertyNode (pro, value));
 	}
 
 

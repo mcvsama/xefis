@@ -24,7 +24,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/utility/smoother.h>
-#include <xefis/utility/timestamp.h>
 
 
 class Lookahead: public Xefis::Module
@@ -38,7 +37,7 @@ class Lookahead: public Xefis::Module
 	data_updated() override;
 
   private:
-	Xefis::Timestamp		_dt;
+	Time					_dt							= 0_s;
 	double					_last_value					= 0.0;
 	double					_minimum_integration_time	= 0.0;
 	Xefis::Smoother<double>	_output_smoother;

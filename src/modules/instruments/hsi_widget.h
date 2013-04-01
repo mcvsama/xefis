@@ -106,6 +106,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Knots					wind_tas_speed				= 0.f;
 		bool					wind_information_visible	= false;
 		LonLat					position					= { 0_deg, 0_deg };
+		bool					position_valid				= false;
 		bool					navaids_visible				= false;
 		bool					vor_visible					= false;
 		bool					dme_visible					= false;
@@ -115,6 +116,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString					highlighted_loc;
 		QString					positioning_hint;
 		bool					positioning_hint_visible	= false;
+		float					climb_glide_ratio			= 0.0;
+		bool					climb_glide_ratio_visible	= false;
 	};
 
 	class PaintWorkUnit:
@@ -164,6 +167,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 		void
 		paint_speeds_and_wind (QPainter&, TextPainter&);
+
+		void
+		paint_climb_glide_ratio (QPainter&, TextPainter&);
 
 		void
 		paint_range (QPainter&, TextPainter&);
@@ -374,6 +380,24 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_position (LonLat const&);
 
 	/**
+	 * Set position-valid flag.
+	 */
+	void
+	set_position_valid (bool valid);
+
+	/**
+	 * Set positioning hint.
+	 */
+	void
+	set_positioning_hint (QString const& hint);
+
+	/**
+	 * Set positioning hint visibility.
+	 */
+	void
+	set_positioning_hint_visible (bool visible);
+
+	/**
 	 * Set track estimation in degrees per mile flown.
 	 * Positive degrees means turning to the right, negative - to the left.
 	 */
@@ -477,16 +501,16 @@ class HSIWidget: public Xefis::InstrumentWidget
 	reset_highlighted_loc();
 
 	/**
-	 * Set positioning hint.
+	 * Set climb-glide ratio value.
 	 */
 	void
-	set_positioning_hint (QString const& hint);
+	set_climb_glide_ratio (float ratio);
 
 	/**
-	 * Set positioning hint visibility.
+	 * Set climb-glide indicator visibility.
 	 */
 	void
-	set_positioning_hint_visible (bool visible);
+	set_climb_glide_ratio_visible (bool visible);
 
   private:
 	// InstrumentWidget API
@@ -719,6 +743,29 @@ HSIWidget::set_position (LonLat const& position)
 
 
 inline void
+HSIWidget::set_position_valid (bool valid)
+{
+	_params.position_valid = valid;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_positioning_hint (QString const& hint)
+{
+	_params.positioning_hint = hint;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_positioning_hint_visible (bool visible)
+{
+	_params.positioning_hint_visible = visible;
+}
+
+
+inline void
 HSIWidget::set_track_deviation (Angle degrees_per_mile)
 {
 	_params.track_deviation = degrees_per_mile;
@@ -840,17 +887,18 @@ HSIWidget::reset_highlighted_loc()
 
 
 inline void
-HSIWidget::set_positioning_hint (QString const& hint)
+HSIWidget::set_climb_glide_ratio (float ratio)
 {
-	_params.positioning_hint = hint;
+	_params.climb_glide_ratio = ratio;
 	request_repaint();
 }
 
 
 inline void
-HSIWidget::set_positioning_hint_visible (bool visible)
+HSIWidget::set_climb_glide_ratio_visible (bool visible)
 {
-	_params.positioning_hint_visible = visible;
+	_params.climb_glide_ratio_visible = visible;
+	request_repaint();
 }
 
 

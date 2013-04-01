@@ -172,6 +172,9 @@ EFISWidget::PaintWorkUnit::adi_pre_paint()
 	// Without the following, Qt did something weird sometimes, like aligning drawn points to display pixels (?).
 	_horizon_transform.shear (0.0001f, 0.f);
 
+	// Limit FPM position:
+	_params.flight_path_alpha = limit (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
+	_params.flight_path_beta = limit (_params.flight_path_beta, -25.0_deg, +25.0_deg);
 	_flight_path_marker_position = QPointF (-heading_to_px (_params.flight_path_beta), -pitch_to_px (_params.flight_path_alpha));
 }
 
@@ -1439,7 +1442,7 @@ EFISWidget::PaintWorkUnit::paint_flight_director (QPainter& painter)
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _params.fov / 4.f;
 
-	Angle pitch = std::cos (_params.roll.rad()) * (_params.flight_director_pitch - _params.pitch);
+	Angle pitch = std::cos (_params.roll) * (_params.flight_director_pitch - _params.pitch);
 	pitch = limit (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.roll;
@@ -1847,11 +1850,9 @@ EFISWidget::PaintWorkUnit::paint_pitch_limit (QPainter& painter)
 		painter.drawLine (-15.5f * x - y, -17.f * x - 3.65f * y);
 	};
 
-	paint (_warning_color_2.darker (160), 1.0f);
-	paint (_warning_color_2, 0.65f);
+	paint (_warning_color_2, 0.9f);
 	painter.scale (-1.f, 1.f);
-	paint (_warning_color_2.darker (160), 1.0f);
-	paint (_warning_color_2, 0.65f);
+	paint (_warning_color_2, 0.9f);
 }
 
 

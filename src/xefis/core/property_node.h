@@ -130,6 +130,13 @@ class PropertyNode
 	~PropertyNode();
 
 	/**
+	 * Copies value and nil-flag from other property node.
+	 * Can not be used on PropDirectory nodes.
+	 */
+	void
+	copy (PropertyNode const& other);
+
+	/**
 	 * Return true if property is nil.
 	 */
 	bool
@@ -431,6 +438,20 @@ inline
 PropertyNode::~PropertyNode()
 {
 	clear();
+}
+
+
+inline void
+PropertyNode::copy (PropertyNode const& other)
+{
+	if (other._type == PropDirectory)
+		throw Exception ("can't copy directory");
+	_type = other._type;
+	_value_bool = other._value_bool;
+	_value_int = other._value_int;
+	_value_double = other._value_double;
+	_value_string = other._value_string;
+	_is_nil = other._is_nil;
 }
 
 
