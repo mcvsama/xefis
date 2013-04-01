@@ -23,7 +23,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/utility/timestamp.h>
 #include <xefis/utility/pid.h>
 
 
@@ -59,7 +58,7 @@ class FlightDirector: public Xefis::Module
 	Xefis::PID<float>		_altitude_pid;
 	Xefis::PID<float>		_vertical_speed_pid;
 	Xefis::PID<float>		_fpa_pid;
-	Xefis::Timestamp		_dt;
+	Time					_dt = 0_s;
 	// Input:
 	// TODO PID params as settings:
 	Xefis::PropertyBoolean	_enabled;

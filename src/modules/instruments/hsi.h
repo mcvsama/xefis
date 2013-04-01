@@ -89,6 +89,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyFloat	_wind_from_magnetic_heading_deg;
 	Xefis::PropertyFloat	_wind_tas_kt;
 	Xefis::PropertyString	_localizer_id;
+	Xefis::PropertyFloat	_climb_glide_ratio;
 };
 
 

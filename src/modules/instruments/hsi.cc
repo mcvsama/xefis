@@ -50,7 +50,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "use-true-heading", _use_true_heading, false },
 				{ "display-track", _display_track, false },
 				{ "cmd-settings-visible", _cmd_settings_visible, false },
-				{ "cmw-track-visible", _cmd_track_visible, false },
+				{ "cmd-track-visible", _cmd_track_visible, false },
 				{ "magnetic-track", _magnetic_track_deg, false },
 				{ "cmd-setting-heading", _cmd_heading_setting_deg, false },
 				{ "position-latitude", _position_lat_deg, false },
@@ -58,7 +58,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "position-source", _positioning_hint, false },
 				{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
 				{ "wind-tas", _wind_tas_kt, false },
-				{ "localizer-id", _localizer_id, false }
+				{ "localizer-id", _localizer_id, false },
+				{ "climb-glide-ratio", _climb_glide_ratio, false }
 			});
 		}
 	}
@@ -121,9 +122,16 @@ HSI::read()
 
 	_hsi_widget->set_ap_track_visible (_cmd_track_visible.read (false));
 
-	_hsi_widget->set_track_visible (_magnetic_track_deg.valid());
 	if (_magnetic_track_deg.valid())
+	{
+		_hsi_widget->set_track_visible (true);
 		_hsi_widget->set_magnetic_track (1_deg * *_magnetic_track_deg);
+	}
+	else
+	{
+		_hsi_widget->set_track_visible (false);
+		_hsi_widget->set_magnetic_track (1_deg * *_magnetic_heading_deg);
+	}
 
 	_hsi_widget->set_display_track (_display_track.read (false));
 
@@ -136,7 +144,12 @@ HSI::read()
 		_hsi_widget->set_true_air_speed (*_tas_kt);
 
 	if (_position_lat_deg.valid() && _position_lon_deg.valid())
+	{
 		_hsi_widget->set_position (LonLat (1_deg * *_position_lon_deg, 1_deg * *_position_lat_deg));
+		_hsi_widget->set_position_valid (true);
+	}
+	else
+		_hsi_widget->set_position_valid (false);
 
 	_hsi_widget->set_positioning_hint_visible (_positioning_hint.valid());
 	if (_positioning_hint.valid())
@@ -154,6 +167,9 @@ HSI::read()
 		_hsi_widget->set_highlighted_loc ((*_localizer_id).c_str());
 	else
 		_hsi_widget->reset_highlighted_loc();
+
+	_hsi_widget->set_climb_glide_ratio_visible (_climb_glide_ratio.valid());
+	_hsi_widget->set_climb_glide_ratio (*_climb_glide_ratio);
 }
 
 

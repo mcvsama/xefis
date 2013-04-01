@@ -27,20 +27,18 @@ LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
 	// Convert to radians:
-	double const lat_rad = lat().rad();
-	double const lon_rad = lon().rad();
-	double const rot_lat_rad = rotation.lat().rad();
-	double const rot_lon_rad = rotation.lon().rad();
+	Angle const rot_lat = rotation.lat();
+	Angle const rot_lon = rotation.lon();
 	// Get cartesian from polar coords:
-	double const x = -std::cos (lat_rad) * std::cos (lon_rad);
-	double const y = +std::cos (lat_rad) * std::sin (lon_rad);
-	double const z = +std::sin (lat_rad);
+	double const x = -std::cos (lat()) * std::cos (lon());
+	double const y = +std::cos (lat()) * std::sin (lon());
+	double const z = +std::sin (lat());
 	// Lat rotation:
-	double const sin_y = std::sin (-rot_lat_rad);
-	double const cos_y = std::cos (-rot_lat_rad);
+	double const sin_y = std::sin (-rot_lat);
+	double const cos_y = std::cos (-rot_lat);
 	// Lng rotation:
-	double const sin_z = std::sin (rot_lon_rad);
-	double const cos_z = std::cos (rot_lon_rad);
+	double const sin_z = std::sin (rot_lon);
+	double const cos_z = std::cos (rot_lon);
 
 	QTransform rz = {
 		+cos_z, -sin_z, 0.f,
@@ -78,12 +76,9 @@ LonLat::rotated (LonLat const& rotation) const
 QPointF
 LonLat::project_flat() const
 {
-	float const lat_rad = lat().rad();
-	float const lon_rad = lon().rad();
-
 	return {
-		+std::tan (lon_rad) / (1.f + std::tan (lon_rad) * std::tan (0.5f * lon_rad)) * std::cos (lat_rad),
-		-std::tan (lat_rad) / (1.f + std::tan (lat_rad) * std::tan (0.5f * lat_rad)),
+		+std::tan (lon()) / (1.f + std::tan (lon()) * std::tan (0.5f * lon())) * std::cos (lat()),
+		-std::tan (lat()) / (1.f + std::tan (lat()) * std::tan (0.5f * lat())),
 	};
 }
 
@@ -94,18 +89,33 @@ LonLat::haversine (LonLat const& other) const
 	LonLat const& a = *this;
 	LonLat const& b = other;
 
-	ValueType::ValueType dlat = (b.lat() - a.lat()).rad();
-	ValueType::ValueType dlon = (b.lon() - a.lon()).rad();
+	Angle dlat = b.lat() - a.lat();
+	Angle dlon = b.lon() - a.lon();
 
 	ValueType::ValueType latsin = std::sin (dlat / 2.0);
 	ValueType::ValueType lonsin = std::sin (dlon / 2.0);
 
 	ValueType::ValueType z = latsin * latsin
 						 + lonsin * lonsin
-						 * std::cos (a.lat().rad())
-						 * std::cos (b.lat().rad());
+						 * std::cos (a.lat())
+						 * std::cos (b.lat());
 
 	return 2.0 * std::atan2 (std::sqrt (z), std::sqrt (1.0 - z));
+}
+
+
+Angle
+LonLat::initial_bearing (LonLat const& other) const
+{
+	Angle dlon = other.lon() - this->lon();
+	Angle lat1 = this->lat();
+	Angle lat2 = other.lat();
+
+	double y = std::sin (dlon) * std::cos (lat2);
+	double x = std::cos (lat1) * std::sin (lat2)
+			 - std::sin (lat1) * std::cos (lat2) * std::cos (dlon);
+
+	return 1_rad * std::atan2 (y, x);
 }
 
 } // namespace SI

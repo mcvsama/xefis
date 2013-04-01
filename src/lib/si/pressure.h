@@ -39,7 +39,7 @@ class Pressure: public Value<float, Pressure>
 	 * Used by the _inhg, _hpa, _psi and similar suffix operators.
 	 * To create an Pressure use these operators directly.
 	 */
-	constexpr
+	explicit constexpr
 	Pressure (ValueType psi);
 
   public:

@@ -21,6 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/range.h>
 
 
 namespace Xefis {
@@ -50,6 +51,12 @@ template<class tValueType>
 		 */
 		void
 		reset (float value = 0.0f) noexcept;
+
+		/**
+		 * Enable winding and set valid values range.
+		 */
+		void
+		set_winding (Range<ValueType> range);
 
 		/**
 		 * Return smoothed sample from given input sample.
@@ -89,8 +96,10 @@ template<class tValueType>
 		process_single_sample (ValueType s) noexcept;
 
 	  private:
-		ValueType _time;
-		ValueType _z;
+		ValueType			_time;
+		ValueType			_z = 0.0;
+		Range<ValueType>	_winding;
+		bool				_winding_enabled = false;
 	};
 
 
@@ -116,6 +125,15 @@ template<class V>
 	Smoother<V>::reset (float value) noexcept
 	{
 		_z = value;
+	}
+
+
+template<class V>
+	inline void
+	Smoother<V>::set_winding (Range<ValueType> range)
+	{
+		_winding = range;
+		_winding_enabled = true;
 	}
 
 
@@ -163,7 +181,22 @@ template<class V>
 	inline typename Smoother<V>::ValueType
 	Smoother<V>::process_single_sample (ValueType s) noexcept
 	{
-		return _z = _time * (_z - s) + s;
+		// Protect from NaNs and infs:
+		if (!std::isfinite (_z))
+			_z = s;
+
+		if (_winding_enabled)
+		{
+			ValueType c = (_winding.min() + _winding.max()) / 2.0;
+			ValueType h = _winding.extent() / 2.0;
+			if (s < _z - c)
+				s = s + _winding.extent();
+			else if (s > _z + c)
+				s = s - _winding.extent();
+			return _z = floored_mod (_time * (_z - s) + s, _winding.min(), _winding.max());
+		}
+		else
+			return _z = _time * (_z - s) + s;
 	}
 
 } // namespace Xefis

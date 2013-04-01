@@ -63,7 +63,6 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "flight-path-marker-visible", _fpm_visible, false },
 				{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
 				{ "flight-path-marker-beta", _fpm_beta_deg, false },
-				{ "magnetic-track", _magnetic_track_deg, false },
 				{ "altitude", _altitude_ft, false },
 				{ "altitude-lookahead", _altitude_lookahead_ft, false },
 				{ "altitude-agl", _altitude_agl_ft, false },
@@ -118,24 +117,6 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 void
 EFIS::read()
 {
-	bool fpm_ok = _fpm_alpha_deg.valid() && _fpm_beta_deg.valid();
-	Angle fpm_alpha = 0_deg;
-	Angle fpm_beta = 0_deg;
-	if (fpm_ok)
-	{
-		fpm_alpha = 1_deg * *_fpm_alpha_deg;
-		fpm_beta = 1_deg * *_fpm_beta_deg;
-	}
-
-	if (_magnetic_track_deg.valid() && _roll_deg.valid() && _magnetic_heading_deg.valid())
-	{
-		fpm_alpha -= 1_deg * std::sin ((1_deg * *_roll_deg).rad()) * floored_mod (*_magnetic_track_deg - *_magnetic_heading_deg, -180.0, +180.0);
-		fpm_beta -= 1_deg * std::cos ((1_deg * *_roll_deg).rad()) * floored_mod (*_magnetic_track_deg - *_magnetic_heading_deg, -180.0, +180.0);
-	}
-
-	fpm_alpha = 1_deg * floored_mod (fpm_alpha.deg(), -180.0, +180.0);
-	fpm_beta = 1_deg * floored_mod (fpm_beta.deg(), -180.0, +180.0);
-
 	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.read (10));
 	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.read (20));
 	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.read (124));
@@ -203,12 +184,14 @@ EFIS::read()
 
 	bool fpm_visible = _fpm_visible.valid() && *_fpm_visible;
 
-	_efis_widget->set_flight_path_marker_visible (fpm_visible && fpm_ok);
-	if (fpm_ok)
+	if (_fpm_alpha_deg.valid() && _fpm_beta_deg.valid())
 	{
-		_efis_widget->set_flight_path_alpha (fpm_alpha);
-		_efis_widget->set_flight_path_beta (fpm_beta);
+		_efis_widget->set_flight_path_alpha (1_deg * *_fpm_alpha_deg);
+		_efis_widget->set_flight_path_beta (1_deg * *_fpm_beta_deg);
+		_efis_widget->set_flight_path_marker_visible (fpm_visible);
 	}
+	else
+		_efis_widget->set_flight_path_marker_visible (false);
 
 	_efis_widget->set_altitude_visible (_altitude_ft.valid());
 	if (_altitude_ft.valid())

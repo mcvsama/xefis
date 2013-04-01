@@ -20,7 +20,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/timestamp.h>
 
 // Local:
 #include "fly_by_wire.h"
@@ -102,7 +101,7 @@ FlyByWire::data_updated()
 {
 	// Don't process if dt is too small:
 	_dt += update_dt();
-	if (_dt.seconds() < 0.005)
+	if (_dt < 0.005_s)
 		return;
 
 	float input_pitch_deg;
@@ -151,15 +150,15 @@ FlyByWire::data_updated()
 			_rudder_pid.set_output_limit (Range<float> (*_rudder_minimum, *_rudder_maximum));
 
 			_elevator_pid.set_target (input_pitch_deg / 180.f);
-			_elevator_pid.process (*_measured_pitch_deg / 180.f, _dt.seconds());
+			_elevator_pid.process (*_measured_pitch_deg / 180.f, _dt.s());
 
 			_ailerons_pid.set_target (input_roll_deg / 180.f);
-			_ailerons_pid.process (*_measured_roll_deg / 180.f, _dt.seconds());
+			_ailerons_pid.process (*_measured_roll_deg / 180.f, _dt.s());
 
 			_rudder_pid.set_target (0.0);
-			_rudder_pid.process (*_measured_slip_skid_g, _dt.seconds());
+			_rudder_pid.process (*_measured_slip_skid_g, _dt.s());
 
-			_output_elevator.write (-std::cos ((*_measured_roll_deg * 1_deg).rad()) * _elevator_pid.output());
+			_output_elevator.write (-std::cos (*_measured_roll_deg * 1_deg) * _elevator_pid.output());
 			_output_ailerons.write (_ailerons_pid.output());
 
 			float yaw_axis = *_input_yaw_axis;
@@ -178,7 +177,7 @@ FlyByWire::data_updated()
 	if (_output_roll_deg.valid())
 		_output_roll_deg.write (_output_roll.deg());
 
-	_dt = Xefis::Timestamp::from_epoch (0);
+	_dt = Time::epoch();
 }
 
 
@@ -196,7 +195,7 @@ FlyByWire::integrate_manual_input()
 
 	// Target attitude - computed from current orientation and joystick deflection:
 
-	Angle target_pitch = measured_pitch + std::cos (measured_roll.rad()) * axis_pitch * target_pitch_extent;
+	Angle target_pitch = measured_pitch + std::cos (measured_roll) * axis_pitch * target_pitch_extent;
 	Angle target_roll = measured_roll + axis_roll * target_roll_extent;
 	target_pitch = floored_mod<float> (target_pitch.deg(), -180.0, +180.0) * 1_deg;
 	target_roll = floored_mod<float> (target_roll.deg(), -180.0, +180.0) * 1_deg;
@@ -204,12 +203,12 @@ FlyByWire::integrate_manual_input()
 	// Update output attitude:
 
 	_manual_pitch_pid.set_target (target_pitch.deg() / 180.f);
-	_manual_pitch_pid.process (_output_pitch.deg() / 180.f, _dt.seconds());
+	_manual_pitch_pid.process (_output_pitch.deg() / 180.f, _dt.s());
 	_output_pitch += std::abs (axis_pitch) * _manual_pitch_pid.output() * 360_deg;
 	_output_pitch = floored_mod<float> (_output_pitch.deg(), -180.0, +180.0) * 1_deg;
 
 	_manual_roll_pid.set_target (target_roll.deg() / 180.f);
-	_manual_roll_pid.process (_output_roll.deg() / 180.f, _dt.seconds());
+	_manual_roll_pid.process (_output_roll.deg() / 180.f, _dt.s());
 	_output_roll += std::abs (axis_roll) * _manual_roll_pid.output() * 360_deg;
 	_output_roll = floored_mod<float> (_output_roll.deg(), -180.0, +180.0) * 1_deg;
 

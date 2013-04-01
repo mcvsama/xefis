@@ -66,7 +66,7 @@ class Module
 	/**
 	 * Return time difference between last and previous update.
 	 */
-	Timestamp
+	Time
 	update_dt() const;
 
   protected:
@@ -117,7 +117,7 @@ Module::update_timestamp() const
 }
 
 
-inline Timestamp
+inline Time
 Module::update_dt() const
 {
 	return _module_manager->update_dt();

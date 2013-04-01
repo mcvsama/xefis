@@ -35,7 +35,7 @@ class Frequency: public Value<double, Frequency>
 	friend constexpr Frequency operator"" _MHz (unsigned long long);
 
   protected:
-	constexpr
+	explicit constexpr
 	Frequency (ValueType Hz);
 
   public:

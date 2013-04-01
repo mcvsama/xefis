@@ -35,10 +35,10 @@ typedef uint32_t	FGInt;
 BEGIN_PACKED_STRUCT
 struct FGInputData
 {
-	FGDouble	cmd_alt_setting_ft;		// apa
-	FGDouble	cmd_cbr_setting_fpm;		// apc
-	FGDouble	cmd_speed_setting_kt;		// ats
-	FGDouble	cmd_heading_setting_deg;	// aph
+	FGDouble	cmd_alt_setting_ft;				// apa
+	FGDouble	cmd_cbr_setting_fpm;			// apc
+	FGDouble	cmd_speed_setting_kt;			// ats
+	FGDouble	cmd_heading_setting_deg;		// aph
 	FGDouble	flight_director_pitch_deg;		// fdp
 	FGDouble	flight_director_roll_deg;		// fdr
 	FGDouble	ias_kt;							// ias
@@ -55,7 +55,7 @@ struct FGInputData
 	FGDouble	cbr_fpm;						// cbr
 	FGDouble	position_lat_deg;				// lt
 	FGDouble	position_lng_deg;				// ln
-	FGDouble	position_sea_level_radius_ft;	// slr
+	FGDouble	position_amsl_ft;				// alg
 	FGDouble	pitch_deg;						// p
 	FGDouble	roll_deg;						// r
 	FGDouble	magnetic_heading_deg;			// h
@@ -71,6 +71,7 @@ struct FGInputData
 	FGBool		navigation_dme_ok;				// dok
 	FGDouble	dme_distance_nm;				// dme
 	FGDouble	slip_skid_g;					// ss
+	FGDouble	outside_air_temperature_k;		// tmp
 	FGDouble	engine_throttle_pct;			// thr
 	FGDouble	engine_epr;						// epr
 	FGDouble	engine_n1_pct;					// n1
@@ -143,6 +144,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "lateral-deviation", _lateral_deviation_deg, false },
 						{ "vertical-deviation", _vertical_deviation_deg, false },
 						{ "dme-distance", _dme_distance_nm, false },
+						{ "outside-air-temperature", _outside_air_temperature_k, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
 						{ "engine-epr", _engine_epr, false },
 						{ "engine-n1", _engine_n1_pct, false },
@@ -150,7 +152,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "engine-egt", _engine_egt_degc, false },
 						{ "position-latitude", _position_lat_deg, false },
 						{ "position-longitude", _position_lng_deg, false },
-						{ "position-sea-level-radius", _position_sea_level_radius_ft, false },
+						{ "position-amsl", _position_amsl_ft, false },
 						{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
 						{ "wind-tas", _wind_tas_kt, false },
 					});
@@ -247,6 +249,7 @@ FlightGearIO::invalidate_all()
 		&_lateral_deviation_deg,
 		&_vertical_deviation_deg,
 		&_dme_distance_nm,
+		&_outside_air_temperature_k,
 		&_engine_throttle_pct,
 		&_engine_epr,
 		&_engine_n1_pct,
@@ -254,7 +257,7 @@ FlightGearIO::invalidate_all()
 		&_engine_egt_degc,
 		&_position_lat_deg,
 		&_position_lng_deg,
-		&_position_sea_level_radius_ft,
+		&_position_amsl_ft,
 		&_wind_from_magnetic_heading_deg,
 		&_wind_tas_kt
 	};
@@ -309,7 +312,7 @@ FlightGearIO::read_input()
 		ASSIGN (cbr_fpm);
 		ASSIGN (position_lat_deg);
 		ASSIGN (position_lng_deg);
-		ASSIGN (position_sea_level_radius_ft);
+		ASSIGN (position_amsl_ft);
 		ASSIGN (pitch_deg);
 		ASSIGN (roll_deg);
 		ASSIGN (magnetic_heading_deg);
@@ -320,6 +323,7 @@ FlightGearIO::read_input()
 		ASSIGN (navigation_needles_visible);
 		ASSIGN (dme_distance_nm);
 		ASSIGN (slip_skid_g);
+		ASSIGN (outside_air_temperature_k);
 		ASSIGN (engine_throttle_pct);
 		ASSIGN (engine_epr);
 		ASSIGN (engine_n1_pct);
@@ -341,6 +345,9 @@ FlightGearIO::read_input()
 			_lateral_deviation_deg.set_nil();
 		if (!fg_data->navigation_dme_ok && !_dme_distance_nm.is_singular())
 			_dme_distance_nm.set_nil();
+
+		if (_outside_air_temperature_k.valid())
+			_outside_air_temperature_k.write (*_outside_air_temperature_k + 273.15);
 	}
 
 	if (_maximum_ias_kt.valid() && *_maximum_ias_kt < 1.f)

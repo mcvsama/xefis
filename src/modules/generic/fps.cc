@@ -30,6 +30,6 @@ FPS::FPS (Xefis::ModuleManager* module_manager, QDomElement const&):
 void
 FPS::data_updated()
 {
-	fprintf (stderr, "FPS: %.2f\n", _smoother.process (1.f / update_dt().seconds()));
+	fprintf (stderr, "FPS: %.2f\n", _smoother.process (1.f / update_dt().s()));
 }
 

@@ -72,7 +72,7 @@ class ModuleManager
 	/**
 	 * Return time difference between last and previous update.
 	 */
-	Timestamp
+	Time
 	update_dt() const;
 
   private:
@@ -85,7 +85,7 @@ class ModuleManager
 	Modules			_instrument_modules;
 	Modules			_non_instrument_modules;
 	Timestamp		_update_timestamp;
-	Timestamp		_update_dt;
+	Time			_update_dt;
 	Timestamp		_instrument_update_timestamp;
 };
 
@@ -113,7 +113,7 @@ ModuleManager::update_timestamp() const
 }
 
 
-inline Timestamp
+inline Time
 ModuleManager::update_dt() const
 {
 	return _update_dt;

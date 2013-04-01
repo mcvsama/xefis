@@ -76,6 +76,13 @@ class LonLat
 	Length
 	haversine_earth (LonLat const& other) const;
 
+	/**
+	 * Initial bearing when flying orthodrome (great circle path)
+	 * to another point. Final bearing will be: (result + 180_deg) % 360_deg.
+	 */
+	Angle
+	initial_bearing (LonLat const& other) const;
+
   private:
 	Angle	_lon;
 	Angle	_lat;

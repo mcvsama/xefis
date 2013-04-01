@@ -38,7 +38,7 @@ class Angle: public Value<double, Angle>
 	 * Used by the _rad and _deg suffix operators.
 	 * To create an Angle use these operators directly.
 	 */
-	constexpr
+	explicit constexpr
 	Angle (ValueType radians);
 
   public:
@@ -120,6 +120,31 @@ namespace std {
 template<>
 	class numeric_limits<SI::Angle>: public numeric_limits<SI::Angle::ValueType>
 	{ };
+
+
+#define FORWARD_ANGLE_TO_STD_FUNCTION1(function_name)				\
+	inline SI::Angle::ValueType function_name (SI::Angle const& a)	\
+	{																\
+		return function_name (a.rad());								\
+	}
+
+
+#define FORWARD_ANGLE_TO_STD_FUNCTION2(function_name)									\
+	inline SI::Angle::ValueType function_name (SI::Angle const& a, SI::Angle const& b)	\
+	{																					\
+		return function_name (a.rad(), b.rad());										\
+	}
+
+FORWARD_ANGLE_TO_STD_FUNCTION1 (sin)
+FORWARD_ANGLE_TO_STD_FUNCTION1 (cos)
+FORWARD_ANGLE_TO_STD_FUNCTION1 (tan)
+FORWARD_ANGLE_TO_STD_FUNCTION1 (asin)
+FORWARD_ANGLE_TO_STD_FUNCTION1 (acos)
+FORWARD_ANGLE_TO_STD_FUNCTION1 (atan)
+FORWARD_ANGLE_TO_STD_FUNCTION2 (atan2)
+
+#undef FORWARD_ANGLE_TO_STD_FUNCTION1
+#undef FORWARD_ANGLE_TO_STD_FUNCTION2
 
 } // namespace std
 
