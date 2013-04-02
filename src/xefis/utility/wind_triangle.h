@@ -31,7 +31,7 @@ class WindTriangle
 	 * Set aircraft's true airspeed.
 	 */
 	void
-	set_aircraft_tas (Knots);
+	set_aircraft_tas (Speed);
 
 	/**
 	 * Set aircraft's track (course).
@@ -43,7 +43,7 @@ class WindTriangle
 	 * Set aircraft's ground speed.
 	 */
 	void
-	set_aircraft_ground_speed (Knots);
+	set_aircraft_ground_speed (Speed);
 
 	/**
 	 * Set aircraft's heading.
@@ -60,7 +60,7 @@ class WindTriangle
 	/**
 	 * Return resulting wind speed.
 	 */
-	Knots
+	Speed
 	wind_speed() const;
 
 	/**
@@ -71,17 +71,17 @@ class WindTriangle
 	wind_direction() const;
 
   private:
-	Knots	_a_tas;
+	Speed	_a_tas;
 	Angle	_a_track;
-	Knots	_a_gs;
+	Speed	_a_gs;
 	Angle	_a_heading;
-	Knots	_w_speed;
+	Speed	_w_speed;
 	Angle	_w_direction;
 };
 
 
 inline void
-WindTriangle::set_aircraft_tas (Knots tas)
+WindTriangle::set_aircraft_tas (Speed tas)
 {
 	_a_tas = tas;
 }
@@ -95,7 +95,7 @@ WindTriangle::set_aircraft_track (Angle track)
 
 
 inline void
-WindTriangle::set_aircraft_ground_speed (Knots gs)
+WindTriangle::set_aircraft_ground_speed (Speed gs)
 {
 	_a_gs = gs;
 }
@@ -111,17 +111,17 @@ WindTriangle::set_aircraft_heading (Angle heading)
 inline void
 WindTriangle::update()
 {
-	_w_speed = std::pow (_a_tas - _a_gs, 2.0)
-			 + 4.0 * _a_tas * _a_gs * std::pow (std::sin ((_a_heading - _a_track) / 2.0), 2.0);
-	_w_speed = std::sqrt (_w_speed);
+	_w_speed = 1.0_kt * std::pow ((_a_tas - _a_gs).kt(), 2.0)
+			 + 4.0_kt * _a_tas.kt() * _a_gs.kt() * std::pow (std::sin ((_a_heading - _a_track) / 2.0), 2.0);
+	_w_speed = 1_kt * std::sqrt (_w_speed.kt());
 
-	_w_direction = 1_rad * (_a_track.rad() + std::atan2 (_a_tas * std::sin (_a_heading - _a_track),
-														 _a_tas * std::cos (_a_heading - _a_track) - _a_gs));
+	_w_direction = 1_rad * (_a_track.rad() + std::atan2 ((_a_tas * std::sin (_a_heading - _a_track)).kt(),
+														 (_a_tas * std::cos (_a_heading - _a_track) - _a_gs).kt()));
 	_w_direction = floored_mod (_w_direction, 360_deg);
 }
 
 
-inline Knots
+inline Speed
 WindTriangle::wind_speed() const
 {
 	return _w_speed;

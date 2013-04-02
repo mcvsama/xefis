@@ -703,19 +703,19 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter&
 	painter.setPen (pen);
 
 	if (_params.ground_speed_visible)
-		offset = paint_speed ("GS", QString::number (static_cast<int> (_params.ground_speed)));
+		offset = paint_speed ("GS", QString::number (static_cast<int> (_params.ground_speed.kt())));
 
 	if (_params.true_air_speed_visible)
 	{
 		painter.translate (offset * 1.2f, 0.f);
-		paint_speed ("TAS", QString::number (static_cast<int> (_params.true_air_speed)));
+		paint_speed ("TAS", QString::number (static_cast<int> (_params.true_air_speed.kt())));
 	}
 
 	if (_params.wind_information_visible)
 	{
 		QString wind_str = QString ("%1°/%2")
 			.arg (static_cast<long> (_params.wind_from_magnetic_heading.deg()), 3, 10, QChar ('0'))
-			.arg (static_cast<long> (_params.wind_tas_speed), 3, 10, QChar (L'\u2007'));
+			.arg (static_cast<long> (_params.wind_tas_speed.kt()), 3, 10, QChar (L'\u2007'));
 		painter.resetTransform();
 		painter.translate (0.2f * _q, metr_b.height());
 		if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)

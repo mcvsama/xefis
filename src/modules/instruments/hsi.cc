@@ -137,11 +137,11 @@ HSI::read()
 
 	_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
 	if (_gs_kt.valid())
-		_hsi_widget->set_ground_speed (*_gs_kt);
+		_hsi_widget->set_ground_speed (1_kt * *_gs_kt);
 
 	_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
 	if (_tas_kt.valid())
-		_hsi_widget->set_true_air_speed (*_tas_kt);
+		_hsi_widget->set_true_air_speed (1_kt * *_tas_kt);
 
 	if (_position_lat_deg.valid() && _position_lon_deg.valid())
 	{
@@ -158,7 +158,7 @@ HSI::read()
 	if (_wind_from_magnetic_heading_deg.valid() && _wind_tas_kt.valid())
 	{
 		_hsi_widget->set_wind_information_visible (true);
-		_hsi_widget->set_wind_information (1_deg * *_wind_from_magnetic_heading_deg, *_wind_tas_kt);
+		_hsi_widget->set_wind_information (1_deg * *_wind_from_magnetic_heading_deg, 1_kt * *_wind_tas_kt);
 	}
 	else
 		_hsi_widget->set_wind_information_visible (false);

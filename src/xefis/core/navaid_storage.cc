@@ -126,7 +126,7 @@ NavaidStorage::parse_nav_dat()
 		int type_int;
 		Navaid::Type type;
 		LonLat pos;
-		Feet amsl;
+		float amsl;
 		float khz;
 		QString identifier;
 		float range;
@@ -166,7 +166,7 @@ NavaidStorage::parse_nav_dat()
 				Navaid navaid (type, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
-				navaid.set_amsl (amsl);
+				navaid.set_amsl (1_ft * amsl);
 				if (name.endsWith ("VOR-DME"))
 					navaid.set_vor_type (Navaid::VOR_DME);
 				else if (name.endsWith ("VORTAC"))
@@ -191,7 +191,7 @@ NavaidStorage::parse_nav_dat()
 				Navaid navaid (type, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_true_bearing (1_deg * true_bearing_deg);
-				navaid.set_amsl (amsl);
+				navaid.set_amsl (1_ft * amsl);
 				navaid.set_icao (icao);
 				navaid.set_runway (runway);
 				_navaids_tree.insert (navaid);

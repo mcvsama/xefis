@@ -91,9 +91,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle					track						= 0_deg; // Mag or true, depending on heading mode.
 		bool					track_visible				= false;
 		bool					display_track				= false;
-		Knots					ground_speed				= 0.f;
+		Speed					ground_speed				= 0_kt;
 		bool					ground_speed_visible		= false;
-		Knots					true_air_speed				= 0.f;
+		Speed					true_air_speed				= 0_kt;
 		bool					true_air_speed_visible		= false;
 		float					mach						= 0.f;
 		bool					mach_visible				= false;
@@ -103,7 +103,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Length					altitude_reach_distance		= 0_nm;
 		bool					altitude_reach_visible		= false;
 		Angle					wind_from_magnetic_heading	= 0_deg;
-		Knots					wind_tas_speed				= 0.f;
+		Speed					wind_tas_speed				= 0_kt;
 		bool					wind_information_visible	= false;
 		LonLat					position					= { 0_deg, 0_deg };
 		bool					position_valid				= false;
@@ -341,7 +341,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Set ground speed.
 	 */
 	void
-	set_ground_speed (Knots);
+	set_ground_speed (Speed);
 
 	/**
 	 * Toggle visibility of the ground speed.
@@ -353,7 +353,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Set true air speed.
 	 */
 	void
-	set_true_air_speed (Knots);
+	set_true_air_speed (Speed);
 
 	/**
 	 * Toggle visibility of the true air speed.
@@ -433,7 +433,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * \param	wind_magnetic_heading Direction from which wind comes.
 	 */
 	void
-	set_wind_information (Angle wind_from_magnetic_heading, Knots wind_tas_speed);
+	set_wind_information (Angle wind_from_magnetic_heading, Speed wind_tas_speed);
 
 	/**
 	 * Set wind information visibility.
@@ -687,7 +687,7 @@ HSIWidget::set_display_track (bool track)
 
 
 inline void
-HSIWidget::set_ground_speed (Knots ground_speed)
+HSIWidget::set_ground_speed (Speed ground_speed)
 {
 	_params.ground_speed = ground_speed;
 	request_repaint();
@@ -703,7 +703,7 @@ HSIWidget::set_ground_speed_visible (bool visible)
 
 
 inline void
-HSIWidget::set_true_air_speed (Knots true_air_speed)
+HSIWidget::set_true_air_speed (Speed true_air_speed)
 {
 	_params.true_air_speed = true_air_speed;
 	request_repaint();
@@ -806,7 +806,7 @@ HSIWidget::set_altitude_reach_visible (bool visible)
 
 
 inline void
-HSIWidget::set_wind_information (Angle wind_from_magnetic_heading, Knots wind_tas_speed)
+HSIWidget::set_wind_information (Angle wind_from_magnetic_heading, Speed wind_tas_speed)
 {
 	_params.wind_from_magnetic_heading = wind_from_magnetic_heading;
 	_params.wind_tas_speed = wind_tas_speed;

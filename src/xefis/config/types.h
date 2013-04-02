@@ -27,13 +27,6 @@
 
 using namespace SI;
 
-typedef float Knots;
-typedef float KnotsPerSecond;
-typedef float Feet;
-typedef float FeetPerMinute;
-typedef float Seconds;
-typedef float InHg;
-
 
 inline std::string
 operator"" _str (const char* string, size_t)

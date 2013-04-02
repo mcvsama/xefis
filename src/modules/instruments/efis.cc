@@ -132,23 +132,23 @@ EFIS::read()
 
 	_efis_widget->set_speed_visible (_ias_kt.valid());
 	if (_ias_kt.valid())
-		_efis_widget->set_speed (*_ias_kt);
+		_efis_widget->set_speed (1_kt * *_ias_kt);
 
 	_efis_widget->set_minimum_speed_visible (_minimum_ias_kt.valid());
 	if (_minimum_ias_kt.valid())
-		_efis_widget->set_minimum_speed (*_minimum_ias_kt);
+		_efis_widget->set_minimum_speed (1_kt * *_minimum_ias_kt);
 
 	_efis_widget->set_warning_speed_visible (_warning_ias_kt.valid());
 	if (_warning_ias_kt.valid())
-		_efis_widget->set_warning_speed (*_warning_ias_kt);
+		_efis_widget->set_warning_speed (1_kt * *_warning_ias_kt);
 
 	_efis_widget->set_maximum_speed_visible (_maximum_ias_kt.valid());
 	if (_maximum_ias_kt.valid())
-		_efis_widget->set_maximum_speed (*_maximum_ias_kt);
+		_efis_widget->set_maximum_speed (1_kt * *_maximum_ias_kt);
 
 	_efis_widget->set_speed_tendency_visible (_ias_lookahead_kt.valid());
 	if (_ias_lookahead_kt.valid())
-		_efis_widget->set_speed_tendency (*_ias_lookahead_kt);
+		_efis_widget->set_speed_tendency (1_kt * *_ias_lookahead_kt);
 
 	_efis_widget->set_mach_visible (_mach.valid());
 	if (_mach.valid())
@@ -195,19 +195,19 @@ EFIS::read()
 
 	_efis_widget->set_altitude_visible (_altitude_ft.valid());
 	if (_altitude_ft.valid())
-		_efis_widget->set_altitude (*_altitude_ft);
+		_efis_widget->set_altitude (1_ft * *_altitude_ft);
 
 	_efis_widget->set_altitude_tendency_visible (_altitude_lookahead_ft.valid());
 	if (_altitude_lookahead_ft.valid())
-		_efis_widget->set_altitude_tendency (*_altitude_lookahead_ft);
+		_efis_widget->set_altitude_tendency (1_ft * *_altitude_lookahead_ft);
 
 	_efis_widget->set_altitude_agl_visible (_altitude_agl_ft.valid());
 	if (_altitude_agl_ft.valid())
-		_efis_widget->set_altitude_agl (*_altitude_agl_ft);
+		_efis_widget->set_altitude_agl (1_ft * *_altitude_agl_ft);
 
 	_efis_widget->set_landing_altitude_visible (_landing_altitude_ft.valid());
 	if (_landing_altitude_ft.valid())
-		_efis_widget->set_landing_altitude (*_landing_altitude_ft);
+		_efis_widget->set_landing_altitude (1_ft * *_landing_altitude_ft);
 
 	_efis_widget->set_altitude_warnings_visible (true);
 
@@ -215,7 +215,7 @@ EFIS::read()
 	{
 		_efis_widget->set_transition_altitude_visible (true);
 		_efis_widget->set_standard_pressure (*_standard_pressure);
-		_efis_widget->set_transition_altitude (*_transition_altitude_ft);
+		_efis_widget->set_transition_altitude (1_ft * *_transition_altitude_ft);
 	}
 	else
 	{
@@ -232,21 +232,21 @@ EFIS::read()
 
 	_efis_widget->set_climb_rate_visible (_cbr_fpm.valid());
 	if (_cbr_fpm.valid())
-		_efis_widget->set_climb_rate (*_cbr_fpm);
+		_efis_widget->set_climb_rate (1_fpm * *_cbr_fpm);
 
 	bool cmd_visible = _cmd_settings_visible.read (false);
 
 	_efis_widget->set_cmd_altitude_visible (cmd_visible && _cmd_alt_setting_ft.valid());
 	if (_cmd_alt_setting_ft.valid())
-		_efis_widget->set_cmd_altitude (*_cmd_alt_setting_ft);
+		_efis_widget->set_cmd_altitude (1_ft * *_cmd_alt_setting_ft);
 
 	_efis_widget->set_cmd_speed_visible (cmd_visible && _cmd_speed_setting_kt.valid());
 	if (_cmd_speed_setting_kt.valid())
-		_efis_widget->set_cmd_speed (*_cmd_speed_setting_kt);
+		_efis_widget->set_cmd_speed (1_kt * *_cmd_speed_setting_kt);
 
 	_efis_widget->set_cmd_climb_rate_visible (cmd_visible && _cmd_cbr_setting_fpm.valid());
 	if (_cmd_cbr_setting_fpm.valid())
-		_efis_widget->set_cmd_climb_rate (*_cmd_cbr_setting_fpm);
+		_efis_widget->set_cmd_climb_rate (1_fpm * *_cmd_cbr_setting_fpm);
 
 	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
 
@@ -305,17 +305,17 @@ EFIS::read()
 	_efis_widget->set_novspd_flag (_novspd_flag.read (false));
 
 	if (_speed_v1_kt.valid())
-		_efis_widget->add_speed_bug ("V1", *_speed_v1_kt);
+		_efis_widget->add_speed_bug ("V1", 1_kt * *_speed_v1_kt);
 	else
 		_efis_widget->remove_speed_bug ("V1");
 
 	if (_speed_vr_kt.valid())
-		_efis_widget->add_speed_bug ("VR", *_speed_vr_kt);
+		_efis_widget->add_speed_bug ("VR", 1_kt * *_speed_vr_kt);
 	else
 		_efis_widget->remove_speed_bug ("VR");
 
 	if (_speed_ref_kt.valid())
-		_efis_widget->add_speed_bug ("REF", *_speed_ref_kt);
+		_efis_widget->add_speed_bug ("REF", 1_kt * *_speed_ref_kt);
 	else
 		_efis_widget->remove_speed_bug ("REF");
 
