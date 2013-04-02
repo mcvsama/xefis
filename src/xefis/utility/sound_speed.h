@@ -42,12 +42,12 @@ class SoundSpeed
 	/**
 	 * Return resulting speed of sound.
 	 */
-	Knots
+	Speed
 	sound_speed() const;
 
   private:
 	float	_outside_air_temperature_k;
-	Knots	_sound_speed;
+	Speed	_sound_speed;
 };
 
 
@@ -61,11 +61,11 @@ SoundSpeed::set_outside_air_temperature (float kelvins)
 inline void
 SoundSpeed::update()
 {
-	_sound_speed = 38.967854 * std::sqrt (_outside_air_temperature_k);
+	_sound_speed = 38.967854_kt * std::sqrt (_outside_air_temperature_k);
 }
 
 
-inline Knots
+inline Speed
 SoundSpeed::sound_speed() const
 {
 	return _sound_speed;

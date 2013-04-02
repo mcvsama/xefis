@@ -364,7 +364,7 @@ FlightManagementSystem::compute_speeds()
 		Xefis::SoundSpeed ss;
 		ss.set_outside_air_temperature (*_outside_air_temperature_k);
 		ss.update();
-		_sound_speed_kt.write (ss.sound_speed());
+		_sound_speed_kt.write (ss.sound_speed().kt());
 	}
 
 	if (_ias_kt.valid() && _pressure_altitude_amsl_ft.valid())
@@ -454,14 +454,14 @@ FlightManagementSystem::compute_wind()
 		_orientation_true_heading_deg.valid())
 	{
 		Xefis::WindTriangle wt;
-		wt.set_aircraft_tas (*_true_airspeed_kt);
+		wt.set_aircraft_tas (1_kt * *_true_airspeed_kt);
 		wt.set_aircraft_track (1_deg * *_track_true_heading_deg);
-		wt.set_aircraft_ground_speed (*_ground_speed_kt);
+		wt.set_aircraft_ground_speed (1_kt * *_ground_speed_kt);
 		wt.set_aircraft_heading (1_deg * *_orientation_true_heading_deg);
 		wt.update();
 		_wind_true_orientation_from_deg.write (floored_mod (_wind_direction_smoother.process (wt.wind_direction().deg()), 360.0));
 		_wind_magnetic_orientation_from_deg.write (true_to_magnetic (*_wind_true_orientation_from_deg, *_magnetic_declination_deg));
-		_wind_tas_kt.write (wt.wind_speed());
+		_wind_tas_kt.write (wt.wind_speed().kt());
 	}
 	else
 	{

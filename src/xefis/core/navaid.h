@@ -84,9 +84,9 @@ class Navaid
 	slaved_variation() const;
 
 	void
-	set_amsl (Feet);
+	set_amsl (Length);
 
-	Feet
+	Length
 	amsl() const;
 
 	void
@@ -133,7 +133,7 @@ class Navaid
 	Length		_range;
 	Frequency	_frequency			= 0_Hz;
 	Angle		_slaved_variation	= 0_deg; // VOR only
-	Feet		_amsl				= 0.f;
+	Length		_amsl				= 0_ft;
 	Angle		_true_bearing		= 0_deg; // LOC* only
 	QString		_icao;
 	QString		_runway;
@@ -223,13 +223,13 @@ Navaid::slaved_variation() const
 
 
 inline void
-Navaid::set_amsl (Feet amsl)
+Navaid::set_amsl (Length amsl)
 {
 	_amsl = amsl;
 }
 
 
-inline Feet
+inline Length
 Navaid::amsl() const
 {
 	return _amsl;

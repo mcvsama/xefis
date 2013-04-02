@@ -38,8 +38,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 {
 	Q_OBJECT
 
-	typedef std::map<QString, Knots> SpeedBugs;
-	typedef std::map<QString, Feet> AltitudeBugs;
+	typedef std::map<QString, Speed> SpeedBugs;
+	typedef std::map<QString, Length> AltitudeBugs;
 
 	class Parameters
 	{
@@ -62,25 +62,25 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Angle				flight_path_alpha				= 0_deg;
 		Angle				flight_path_beta				= 0_deg;
 		bool				flight_path_visible				= false;
-		Knots				speed							= 0.f;
+		Speed				speed							= 0_kt;
 		bool				speed_visible					= false;
-		Knots				speed_tendency					= 0.f;
+		Speed				speed_tendency					= 0_kt;
 		bool				speed_tendency_visible			= false;
 		bool				novspd_flag						= false;
-		Feet				altitude						= 0.f;
+		Length				altitude						= 0_ft;
 		bool				altitude_visible				= false;
-		Feet				altitude_tendency				= 0.f;
+		Length				altitude_tendency				= 0_ft;
 		bool				altitude_tendency_visible		= false;
-		Feet				altitude_agl					= 0.f;
+		Length				altitude_agl					= 0_ft;
 		bool				altitude_agl_visible			= false;
 		QDateTime			altitude_agl_ts;
-		Feet				landing_altitude				= 0.f;
+		Length				landing_altitude				= 0_ft;
 		bool				landing_altitude_visible		= false;
 		bool				altitude_warnings_visible		= false;
-		Feet				transition_altitude				= 0.f;
+		Length				transition_altitude				= 0_ft;
 		bool				transition_altitude_visible		= false;
 		QDateTime			transition_altitude_ts;
-		FeetPerMinute		climb_rate						= 0.f;
+		Speed				climb_rate						= 0_fpm;
 		bool				climb_rate_visible				= false;
 		float				mach							= 0.f;
 		bool				mach_visible					= false;
@@ -88,17 +88,17 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				pressure_display_hpa			= false;
 		bool				pressure_visible				= false;
 		bool				standard_pressure				= false;
-		Knots				minimum_speed					= 0.f;
+		Speed				minimum_speed					= 0_kt;
 		bool				minimum_speed_visible			= false;
-		Knots				warning_speed					= 0.f;
+		Speed				warning_speed					= 0_kt;
 		bool				warning_speed_visible			= false;
-		Knots				maximum_speed					= 0.f;
+		Speed				maximum_speed					= 0_kt;
 		bool				maximum_speed_visible			= false;
-		Feet				cmd_altitude					= 0.f;
+		Length				cmd_altitude					= 0_ft;
 		bool				cmd_altitude_visible			= false;
-		FeetPerMinute		cmd_climb_rate					= 0.f;
+		Speed				cmd_climb_rate					= 0_fpm;
 		bool				cmd_climb_rate_visible			= false;
-		Knots				cmd_speed						= 0.f;
+		Speed				cmd_speed						= 0_kt;
 		bool				cmd_speed_visible				= false;
 		Angle				flight_director_pitch			= 0_deg;
 		bool				flight_director_pitch_visible	= false;
@@ -147,7 +147,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 * Speed ladder
 		 */
 
-		Knots				sl_extent						= 124;
+		Speed				sl_extent						= 124_kt;
 		int					sl_minimum						= 0;
 		int					sl_maximum						= 9999;
 		int					sl_line_every					= 10;
@@ -160,7 +160,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		int					al_line_every					= 100;
 		int					al_number_every					= 200;
 		int					al_bold_every					= 500;
-		Feet				al_extent						= 825;
+		Length				al_extent						= 825_ft;
 	};
 
 	class PaintWorkUnit:
@@ -250,7 +250,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_paint_novspd (QPainter&, TextPainter&);
 
 		float
-		kt_to_px (Knots ft) const;
+		kt_to_px (Speed) const;
 
 		/*
 		 * Altitude ladder
@@ -287,10 +287,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 		al_paint_ap_setting (QPainter&, TextPainter&);
 
 		float
-		ft_to_px (Feet ft) const;
+		ft_to_px (Length) const;
 
 		float
-		scale_cbr (FeetPerMinute climb_rate) const;
+		scale_cbr (Speed climb_rate) const;
 
 		/*
 		 * Other
@@ -405,8 +405,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 */
 
 		QTransform			_sl_transform;
-		Knots				_sl_min_shown;
-		Knots				_sl_max_shown;
+		Speed				_sl_min_shown;
+		Speed				_sl_max_shown;
 		int					_sl_rounded_speed;
 		QRectF				_sl_ladder_rect;
 		QPen				_sl_ladder_pen;
@@ -422,8 +422,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 */
 
 		QTransform			_al_transform;
-		Feet				_al_min_shown;
-		Feet				_al_max_shown;
+		Length				_al_min_shown;
+		Length				_al_max_shown;
 		int					_al_rounded_altitude;
 		QRectF				_al_ladder_rect;
 		QPen				_al_ladder_pen;
@@ -604,7 +604,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set speed shown on speed ladder.
 	 */
 	void
-	set_speed (Knots);
+	set_speed (Speed);
 
 	/**
 	 * Toggle visibility of the speed scale.
@@ -616,7 +616,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set speed tendency value.
 	 */
 	void
-	set_speed_tendency (Knots);
+	set_speed_tendency (Speed);
 
 	/**
 	 * Set speed tendency arrow visibility.
@@ -635,7 +635,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set altitude value.
 	 */
 	void
-	set_altitude (Feet);
+	set_altitude (Length);
 
 	/**
 	 * Toggle visibility of the altitude scale.
@@ -647,7 +647,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set altitude tendency value.
 	 */
 	void
-	set_altitude_tendency (Feet);
+	set_altitude_tendency (Length);
 
 	/**
 	 * Set altitude tendency arrow visibility.
@@ -659,7 +659,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set radar altitude.
 	 */
 	void
-	set_altitude_agl (Feet);
+	set_altitude_agl (Length);
 
 	/**
 	 * Set radar altitude visibility.
@@ -671,7 +671,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set landing altitude.
 	 */
 	void
-	set_landing_altitude (Feet);
+	set_landing_altitude (Length);
 
 	/**
 	 * Set landing altitude visibility.
@@ -690,7 +690,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set transition altitude.
 	 */
 	void
-	set_transition_altitude (Feet);
+	set_transition_altitude (Length);
 
 	/**
 	 * Set transition altitude visibility.
@@ -702,7 +702,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set climb rate.
 	 */
 	void
-	set_climb_rate (FeetPerMinute feet_per_minute);
+	set_climb_rate (Speed);
 
 	/**
 	 * Set climb rate visibility.
@@ -714,7 +714,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Add new speed bug.
 	 */
 	void
-	add_speed_bug (QString name, Knots speed);
+	add_speed_bug (QString name, Speed);
 
 	/**
 	 * Remove a speed bug.
@@ -727,7 +727,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Add new altitude bug.
 	 */
 	void
-	add_altitude_bug (QString name, Feet altitude);
+	add_altitude_bug (QString name, Length altitude);
 
 	/**
 	 * Remove an altitude bug.
@@ -776,7 +776,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set minimum speed indicator on the speed ladder.
 	 */
 	void
-	set_minimum_speed (Knots);
+	set_minimum_speed (Speed);
 
 	/**
 	 * Set minimum speed indicator visibility.
@@ -788,7 +788,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set warning speed indicator on the speed ladder.
 	 */
 	void
-	set_warning_speed (Knots);
+	set_warning_speed (Speed);
 
 	/**
 	 * Set warning speed indicator visibility.
@@ -800,7 +800,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set maximum speed indicator on the speed ladder.
 	 */
 	void
-	set_maximum_speed (Knots);
+	set_maximum_speed (Speed);
 
 	/**
 	 * Set maximum speed indicator visibility.
@@ -812,7 +812,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set commanded altitude.
 	 */
 	void
-	set_cmd_altitude (Feet);
+	set_cmd_altitude (Length);
 
 	/**
 	 * Set AP altitude setting visibility.
@@ -824,7 +824,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set commanded climb rate setting.
 	 */
 	void
-	set_cmd_climb_rate (FeetPerMinute);
+	set_cmd_climb_rate (Speed);
 
 	/**
 	 * Set AP climb rate visibility.
@@ -836,7 +836,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * Set autothrottle speed.
 	 */
 	void
-	set_cmd_speed (Knots);
+	set_cmd_speed (Speed);
 
 	/**
 	 * Set AT speed visibility.
@@ -1064,16 +1064,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 
 inline float
-EFISWidget::PaintWorkUnit::kt_to_px (Knots kt) const
+EFISWidget::PaintWorkUnit::kt_to_px (Speed speed) const
 {
-	return -0.5f * _sl_ladder_rect.height() * (kt - _params.speed) / (0.5f * _params.sl_extent);
+	return -0.5f * _sl_ladder_rect.height() * (speed - _params.speed) / (0.5 * _params.sl_extent);
 }
 
 
 inline float
-EFISWidget::PaintWorkUnit::ft_to_px (Feet ft) const
+EFISWidget::PaintWorkUnit::ft_to_px (Length length) const
 {
-	return -0.5f * _al_ladder_rect.height() * (ft - _params.altitude) / (0.5f * _params.al_extent);
+	return -0.5f * _al_ladder_rect.height() * (length - _params.altitude) / (0.5 * _params.al_extent);
 }
 
 
@@ -1127,7 +1127,7 @@ EFISWidget::set_speed_ladder_number_every (int knots)
 inline void
 EFISWidget::set_speed_ladder_extent (int knots)
 {
-	_params.sl_extent = std::max (1, knots);
+	_params.sl_extent = 1_kt * std::max (1, knots);
 	request_repaint();
 }
 
@@ -1173,7 +1173,7 @@ EFISWidget::set_altitude_ladder_bold_every (int feet)
 inline void
 EFISWidget::set_altitude_ladder_extent (int feet)
 {
-	_params.al_extent = std::max (1, feet);
+	_params.al_extent = 1_ft * std::max (1, feet);
 	request_repaint();
 }
 
@@ -1307,7 +1307,7 @@ EFISWidget::set_flight_path_marker_visible (bool visible)
 
 
 inline void
-EFISWidget::set_speed (Knots speed)
+EFISWidget::set_speed (Speed speed)
 {
 	_params.speed = speed;
 	request_repaint();
@@ -1323,9 +1323,9 @@ EFISWidget::set_speed_visible (bool visible)
 
 
 inline void
-EFISWidget::set_speed_tendency (Knots kt)
+EFISWidget::set_speed_tendency (Speed speed)
 {
-	_params.speed_tendency = kt;
+	_params.speed_tendency = speed;
 	request_repaint();
 }
 
@@ -1347,7 +1347,7 @@ EFISWidget::set_novspd_flag (bool visible)
 
 
 inline void
-EFISWidget::set_altitude (Feet altitude)
+EFISWidget::set_altitude (Length altitude)
 {
 	_params.altitude = altitude;
 	request_repaint();
@@ -1363,9 +1363,9 @@ EFISWidget::set_altitude_visible (bool visible)
 
 
 inline void
-EFISWidget::set_altitude_tendency (Feet ft)
+EFISWidget::set_altitude_tendency (Length altitude)
 {
-	_params.altitude_tendency = ft;
+	_params.altitude_tendency = altitude;
 	request_repaint();
 }
 
@@ -1379,7 +1379,7 @@ EFISWidget::set_altitude_tendency_visible (bool visible)
 
 
 inline void
-EFISWidget::set_altitude_agl (Feet altitude)
+EFISWidget::set_altitude_agl (Length altitude)
 {
 	_params.altitude_agl = altitude;
 	request_repaint();
@@ -1397,9 +1397,9 @@ EFISWidget::set_altitude_agl_visible (bool visible)
 
 
 inline void
-EFISWidget::set_landing_altitude (Feet feet)
+EFISWidget::set_landing_altitude (Length altitude)
 {
-	_params.landing_altitude = feet;
+	_params.landing_altitude = altitude;
 	request_repaint();
 }
 
@@ -1421,7 +1421,7 @@ EFISWidget::set_altitude_warnings_visible (bool visible)
 
 
 inline void
-EFISWidget::set_transition_altitude (Feet transition_altitude)
+EFISWidget::set_transition_altitude (Length transition_altitude)
 {
 	if (_params.transition_altitude != transition_altitude)
 		_params.transition_altitude_ts = QDateTime::currentDateTime();
@@ -1441,7 +1441,7 @@ EFISWidget::set_transition_altitude_visible (bool visible)
 
 
 inline void
-EFISWidget::set_climb_rate (FeetPerMinute feet_per_minute)
+EFISWidget::set_climb_rate (Speed feet_per_minute)
 {
 	_params.climb_rate = feet_per_minute;
 	request_repaint();
@@ -1457,7 +1457,7 @@ EFISWidget::set_climb_rate_visible (bool visible)
 
 
 inline void
-EFISWidget::add_speed_bug (QString name, Knots speed)
+EFISWidget::add_speed_bug (QString name, Speed speed)
 {
 	_params.speed_bugs[name] = speed;
 	request_repaint();
@@ -1476,7 +1476,7 @@ EFISWidget::remove_speed_bug (QString name)
 
 
 inline void
-EFISWidget::add_altitude_bug (QString name, Feet altitude)
+EFISWidget::add_altitude_bug (QString name, Length altitude)
 {
 	_params.altitude_bugs[name] = altitude;
 	request_repaint();
@@ -1543,7 +1543,7 @@ EFISWidget::set_standard_pressure (bool standard)
 
 
 inline void
-EFISWidget::set_minimum_speed (Knots minimum_speed)
+EFISWidget::set_minimum_speed (Speed minimum_speed)
 {
 	_params.minimum_speed = minimum_speed;
 	request_repaint();
@@ -1559,7 +1559,7 @@ EFISWidget::set_minimum_speed_visible (bool visible)
 
 
 inline void
-EFISWidget::set_warning_speed (Knots warning_speed)
+EFISWidget::set_warning_speed (Speed warning_speed)
 {
 	_params.warning_speed = warning_speed;
 	request_repaint();
@@ -1575,7 +1575,7 @@ EFISWidget::set_warning_speed_visible (bool visible)
 
 
 inline void
-EFISWidget::set_maximum_speed (Knots maximum_speed)
+EFISWidget::set_maximum_speed (Speed maximum_speed)
 {
 	_params.maximum_speed = maximum_speed;
 	request_repaint();
@@ -1591,9 +1591,9 @@ EFISWidget::set_maximum_speed_visible (bool visible)
 
 
 inline void
-EFISWidget::set_cmd_altitude (Feet feet)
+EFISWidget::set_cmd_altitude (Length altitude)
 {
-	_params.cmd_altitude = feet;
+	_params.cmd_altitude = altitude;
 	request_repaint();
 }
 
@@ -1607,9 +1607,9 @@ EFISWidget::set_cmd_altitude_visible (bool visible)
 
 
 inline void
-EFISWidget::set_cmd_climb_rate (FeetPerMinute fpm)
+EFISWidget::set_cmd_climb_rate (Speed speed)
 {
-	_params.cmd_climb_rate = fpm;
+	_params.cmd_climb_rate = speed;
 	request_repaint();
 }
 
@@ -1623,9 +1623,9 @@ EFISWidget::set_cmd_climb_rate_visible (bool visible)
 
 
 inline void
-EFISWidget::set_cmd_speed (Knots knots)
+EFISWidget::set_cmd_speed (Speed speed)
 {
-	_params.cmd_speed = knots;
+	_params.cmd_speed = speed;
 	request_repaint();
 }
 

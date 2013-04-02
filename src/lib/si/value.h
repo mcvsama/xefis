@@ -86,6 +86,9 @@ template<class tValueType, class tDerived>
 		constexpr bool
 		operator== (Derived) const noexcept;
 
+		constexpr bool
+		operator!= (Derived) const noexcept;
+
 		constexpr Derived
 		operator+ (Derived) const noexcept;
 
@@ -205,6 +208,14 @@ template<class V, class T>
 	Value<V, T>::operator== (Derived other) const noexcept
 	{
 		return value() == other.value();
+	}
+
+
+template<class V, class T>
+	inline constexpr bool
+	Value<V, T>::operator!= (Derived other) const noexcept
+	{
+		return value() != other.value();
 	}
 
 
