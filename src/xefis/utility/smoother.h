@@ -35,22 +35,23 @@ template<class tValueType>
 	{
 	  public:
 		typedef tValueType ValueType;
+		typedef float SamplesType;
 
 	  public:
-		Smoother (ValueType samples = 1.f) noexcept;
+		Smoother (SamplesType samples = 1.f) noexcept;
 
 		/**
 		 * \param	samples is number of samples after which returned value reaches
-		 * 			99.99% of target value.
+		 *			99.99% of target value.
 		 */
 		void
-		set_samples (ValueType samples) noexcept;
+		set_samples (SamplesType samples) noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
 		 */
 		void
-		reset (float value = 0.0f) noexcept;
+		reset (ValueType value = ValueType()) noexcept;
 
 		/**
 		 * Enable winding and set valid values range.
@@ -75,7 +76,7 @@ template<class tValueType>
 		 * Fill sequence with smoothed samples, where input sample is @value.
 		 * \param	begin,end Sequence to be filled.
 		 * \param	value Input data that is to be smoothed. It's used for each
-		 * 			sample in [begin, end) sequence.
+		 *			sample in [begin, end) sequence.
 		 */
 		template<class ForwardIterator>
 			void
@@ -96,8 +97,8 @@ template<class tValueType>
 		process_single_sample (ValueType s) noexcept;
 
 	  private:
-		ValueType			_time;
-		ValueType			_z = 0.0;
+		SamplesType			_time;
+		ValueType			_z;
 		Range<ValueType>	_winding;
 		bool				_winding_enabled = false;
 	};
@@ -105,16 +106,34 @@ template<class tValueType>
 
 template<class V>
 	inline
-	Smoother<V>::Smoother (ValueType samples) noexcept
+	Smoother<V>::Smoother (SamplesType samples) noexcept
 	{
 		set_samples (samples);
 		reset();
 	}
 
 
+template<>
+	inline
+	Smoother<float>::Smoother (SamplesType samples) noexcept
+	{
+		set_samples (samples);
+		reset (0.0f);
+	}
+
+
+template<>
+	inline
+	Smoother<double>::Smoother (SamplesType samples) noexcept
+	{
+		set_samples (samples);
+		reset (0.0);
+	}
+
+
 template<class V>
 	inline void
-	Smoother<V>::set_samples (ValueType samples) noexcept
+	Smoother<V>::set_samples (SamplesType samples) noexcept
 	{
 		_time = std::pow (0.01f, 2.0f / samples);
 	}
@@ -122,7 +141,7 @@ template<class V>
 
 template<class V>
 	inline void
-	Smoother<V>::reset (float value) noexcept
+	Smoother<V>::reset (ValueType value) noexcept
 	{
 		_z = value;
 	}

@@ -122,29 +122,17 @@ template<>
 	{ };
 
 
-#define FORWARD_ANGLE_TO_STD_FUNCTION1(function_name)				\
+#define FORWARD_ANGLE_TO_STD_FUNCTION_1(function_name)				\
 	inline SI::Angle::ValueType function_name (SI::Angle const& a)	\
 	{																\
 		return function_name (a.rad());								\
 	}
 
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (sin)
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (cos)
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (tan)
 
-#define FORWARD_ANGLE_TO_STD_FUNCTION2(function_name)									\
-	inline SI::Angle::ValueType function_name (SI::Angle const& a, SI::Angle const& b)	\
-	{																					\
-		return function_name (a.rad(), b.rad());										\
-	}
-
-FORWARD_ANGLE_TO_STD_FUNCTION1 (sin)
-FORWARD_ANGLE_TO_STD_FUNCTION1 (cos)
-FORWARD_ANGLE_TO_STD_FUNCTION1 (tan)
-FORWARD_ANGLE_TO_STD_FUNCTION1 (asin)
-FORWARD_ANGLE_TO_STD_FUNCTION1 (acos)
-FORWARD_ANGLE_TO_STD_FUNCTION1 (atan)
-FORWARD_ANGLE_TO_STD_FUNCTION2 (atan2)
-
-#undef FORWARD_ANGLE_TO_STD_FUNCTION1
-#undef FORWARD_ANGLE_TO_STD_FUNCTION2
+#undef FORWARD_ANGLE_TO_STD_FUNCTION_1
 
 } // namespace std
 
