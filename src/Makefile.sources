@@ -50,6 +50,7 @@ SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
 SRC_HEADERS += xefis/core/property_union.h
+SRC_HEADERS += xefis/core/si_property.h
 SRC_HEADERS += xefis/core/window.h
 SRC_HEADERS += xefis/core/work_performer.h
 

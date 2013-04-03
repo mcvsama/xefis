@@ -194,12 +194,13 @@ template<class tType>
 		void
 		copy (Property const& other);
 
-	  private:
+	  protected:
 		/**
 		 * Ensure that the property exists in the tree.
 		 */
-		PropertyNode*
-		ensure_path (std::string const& path, Type const& value);
+		template<class V>
+			PropertyNode*
+			ensure_path (std::string const& path, V value);
 	};
 
 
@@ -446,18 +447,19 @@ template<class T>
 
 
 template<class T>
-	inline PropertyNode*
-	Property<T>::ensure_path (std::string const& path, Type const& value)
-	{
-		std::string::size_type s = path.find_last_of ('/');
-		std::string dir = path.substr (0, s);
-		std::string pro = path.substr (s + 1);
+	template<class V>
+		inline PropertyNode*
+		Property<T>::ensure_path (std::string const& path, V value)
+		{
+			std::string::size_type s = path.find_last_of ('/');
+			std::string dir = path.substr (0, s);
+			std::string pro = path.substr (s + 1);
 
-		PropertyNode* parent = _root;
-		if (s != std::string::npos)
-			parent = _root->mkpath (dir);
-		return parent->add_child (new PropertyNode (pro, value));
-	}
+			PropertyNode* parent = _root;
+			if (s != std::string::npos)
+				parent = _root->mkpath (dir);
+			return parent->add_child (new PropertyNode (pro, value));
+		}
 
 
 /*
@@ -471,6 +473,8 @@ typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
 
 } // namespace Xefis
+
+#include "si_property.h"
 
 #endif
 
