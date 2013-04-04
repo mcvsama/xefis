@@ -1100,21 +1100,11 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (QPainter& painter, TextPainter& text_p
 		}
 
 		// Altitude warning:
-		if (_params.altitude_warnings_visible)
+		if (_params.altitude_warnings_visible && _params.altitude_agl_visible)
 		{
-			Length base = -99999_ft;
-			if (_params.landing_altitude_visible)
-				base = std::max (base, _params.landing_altitude);
-			if (_params.altitude_agl_visible)
-				base = std::max (base, _params.altitude_agl);
-
-			QPointF p1 (-2.05f * x, ft_to_px (base + 500_ft));
-			QPointF p2 (-2.05f * x, ft_to_px (base + 1000_ft));
-
-			if (_params.landing_altitude_visible)
-				base = std::min (base, _params.landing_altitude);
-
-			QPointF p0 (-2.05f * x, ft_to_px (base));
+			QPointF p1 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl + 500_ft));
+			QPointF p2 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl + 1000_ft));
+			QPointF p0 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl));
 
 			QPen w = _al_ldg_alt_pen;
 			w.setColor (Qt::white);
@@ -1125,26 +1115,21 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (QPainter& painter, TextPainter& text_p
 			painter.drawLine (p0, p1);
 			painter.setPen (w);
 			painter.drawPolyline (QPolygonF() << p1 << p2 << p2 + QPointF (0.25f * x, 0.f));
-		}
 
-		// Landing altitude bug:
-		if (_params.landing_altitude_visible && _params.landing_altitude > _al_min_shown && _params.landing_altitude < _al_max_shown)
-		{
-			painter.setClipRect (_al_ladder_rect);
-			float posy = ft_to_px (_params.landing_altitude);
-
-			painter.setPen (_al_ldg_alt_pen);
-			painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
-			for (int i = -8; i <= 4; ++i)
+			// Landing altitude bug:
+			if (_params.altitude - _params.altitude_agl > _al_min_shown && _params.altitude - _params.altitude_agl < _al_max_shown)
 			{
-				QPointF p (0.4f * i * x + 0.125f * x, posy + 0.1f * x);
-				painter.drawLine (p, p + QPointF (x, x));
-			}
+				painter.setClipRect (_al_ladder_rect);
+				float posy = ft_to_px (_params.altitude - _params.altitude_agl);
 
-			painter.setClipping (false);
-			QPointF tp (_al_ladder_rect.bottomRight() + QPointF (0.25f * x, -x));
-			text_painter.drawText (tp, Qt::AlignLeft | Qt::AlignVCenter, "LDG");
-			text_painter.drawText (tp + QPointF (0.f, 1.5f * _font_10_digit_height), Qt::AlignLeft | Qt::AlignVCenter, "ALT");
+				painter.setPen (_al_ldg_alt_pen);
+				painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
+				for (int i = -8; i <= 4; ++i)
+				{
+					QPointF p (0.4f * i * x + 0.125f * x, posy + 0.1f * x);
+					painter.drawLine (p, p + QPointF (x, x));
+				}
+			}
 		}
 
 		// AP bug:
