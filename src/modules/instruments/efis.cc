@@ -66,7 +66,6 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "altitude", _altitude_ft, false },
 				{ "altitude-lookahead", _altitude_lookahead_ft, false },
 				{ "altitude-agl", _altitude_agl_ft, false },
-				{ "landing-altitude", _landing_altitude_ft, false },
 				{ "transition-altitude", _transition_altitude_ft, false },
 				{ "pressure", _pressure_inhg, false },
 				{ "pressure-display-hpa", _pressure_display_hpa, false },
@@ -204,10 +203,6 @@ EFIS::read()
 	_efis_widget->set_altitude_agl_visible (_altitude_agl_ft.valid());
 	if (_altitude_agl_ft.valid())
 		_efis_widget->set_altitude_agl (1_ft * *_altitude_agl_ft);
-
-	_efis_widget->set_landing_altitude_visible (_landing_altitude_ft.valid());
-	if (_landing_altitude_ft.valid())
-		_efis_widget->set_landing_altitude (1_ft * *_landing_altitude_ft);
 
 	_efis_widget->set_altitude_warnings_visible (true);
 

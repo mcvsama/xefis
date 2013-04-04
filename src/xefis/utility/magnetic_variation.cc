@@ -22,7 +22,7 @@
 
 
 // Forward:
-uint64_t
+unsigned long int
 yymmdd_to_julian_days (int yy, int mm, int dd);
 
 // Forward:

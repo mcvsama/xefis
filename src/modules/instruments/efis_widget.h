@@ -74,8 +74,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Length				altitude_agl					= 0_ft;
 		bool				altitude_agl_visible			= false;
 		QDateTime			altitude_agl_ts;
-		Length				landing_altitude				= 0_ft;
-		bool				landing_altitude_visible		= false;
 		bool				altitude_warnings_visible		= false;
 		Length				transition_altitude				= 0_ft;
 		bool				transition_altitude_visible		= false;
@@ -666,18 +664,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_altitude_agl_visible (bool visible);
-
-	/**
-	 * Set landing altitude.
-	 */
-	void
-	set_landing_altitude (Length);
-
-	/**
-	 * Set landing altitude visibility.
-	 */
-	void
-	set_landing_altitude_visible (bool visible);
 
 	/**
 	 * Set visibility of the altitude warnings (500 and 1000 ft) above
@@ -1392,22 +1378,6 @@ EFISWidget::set_altitude_agl_visible (bool visible)
 	if (!_params.altitude_agl_visible && visible)
 		_params.altitude_agl_ts = QDateTime::currentDateTime();
 	_params.altitude_agl_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude (Length altitude)
-{
-	_params.landing_altitude = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude_visible (bool visible)
-{
-	_params.landing_altitude_visible = visible;
 	request_repaint();
 }
 
