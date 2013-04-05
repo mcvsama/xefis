@@ -33,10 +33,21 @@ namespace Xefis {
  * Indicates that property tried to be read
  * could not be found in the node tree.
  */
-class PropertyNotFound: public std::runtime_error
+class PropertyNotFound: public Exception
 {
   public:
 	PropertyNotFound (const char* message);
+};
+
+
+/**
+ * Indicates that the property is singular (not attached to any tree)
+ * and can't be written or read.
+ */
+class SingularProperty: public Exception
+{
+  public:
+	SingularProperty (const char* message);
 };
 
 
@@ -151,6 +162,9 @@ template<class tType>
 		 */
 		Property (PropertyNode* root, std::string const& path);
 
+		// Dtor
+		virtual ~Property() { }
+
 		/**
 		 * Copy from other property.
 		 */
@@ -194,6 +208,27 @@ template<class tType>
 		void
 		copy (Property const& other);
 
+		/**
+		 * Return true if property holds specialized value, and should be
+		 * interfaced by stringify() to humans.
+		 */
+		virtual bool
+		is_specialized() const noexcept;
+
+		/**
+		 * Return humanized value (eg. value with unit).
+		 * Default implementation uses read<string>().
+		 */
+		virtual std::string
+		stringify() const;
+
+		/**
+		 * Set value from humanized string (eg. "10 kt").
+		 * Default implementation uses write().
+		 */
+		virtual void
+		parse (std::string const&);
+
 	  protected:
 		/**
 		 * Ensure that the property exists in the tree.
@@ -206,7 +241,13 @@ template<class tType>
 
 inline
 PropertyNotFound::PropertyNotFound (const char* message):
-	std::runtime_error (message)
+	Exception (message)
+{ }
+
+
+inline
+SingularProperty::SingularProperty (const char* message):
+	Exception (message)
 { }
 
 
@@ -238,7 +279,7 @@ BaseProperty::is_nil() const
 		return true;
 	}
 	else
-		throw Exception ("can't read from a singular property");
+		throw SingularProperty ("can't read from a singular property");
 }
 
 
@@ -252,7 +293,7 @@ BaseProperty::set_nil()
 			node->set_nil();
 	}
 	else
-		throw Exception ("can't write to a singular property");
+		throw SingularProperty ("can't write to a singular property");
 }
 
 
@@ -285,10 +326,10 @@ BaseProperty::real_type() const noexcept
 		PropertyNode* node = get_node();
 		if (node)
 			return node->type();
-		throw Exception ("can't check real type of nonexistent property");
+		throw PropertyNotFound ("can't check real type of nonexistent property");
 	}
 	else
-		throw Exception ("can't check type of a singular property");
+		throw SingularProperty ("can't check type of a singular property");
 }
 
 
@@ -328,7 +369,7 @@ template<class T>
 		BaseProperty (PropertyStorage::default_storage()->root(), path)
 	{
 		if (!_root)
-			throw Exception ("PropertyStorage is not initialized, can't construct Property with default storage");
+			throw SingularProperty ("PropertyStorage is not initialized, can't construct Property with default storage");
 	}
 
 
@@ -376,7 +417,7 @@ template<class T>
 			throw PropertyNotFound ("could not find property by path");
 		}
 		else
-			throw Exception ("can't read from a singular property");
+			throw SingularProperty ("can't read from a singular property");
 	}
 
 
@@ -402,7 +443,7 @@ template<class T>
 				ensure_path (_path, value);
 		}
 		else
-			throw Exception ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property");
 	}
 
 
@@ -419,7 +460,7 @@ template<class T>
 				throw PropertyNotFound ("could not find property by path");
 		}
 		else
-			throw Exception ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property");
 	}
 
 
@@ -442,7 +483,46 @@ template<class T>
 				node->copy (*source);
 		}
 		else
-			throw Exception ("can't copy to a singular property");
+			throw SingularProperty ("can't copy to a singular property");
+	}
+
+
+template<class T>
+	inline bool
+	Property<T>::is_specialized() const noexcept
+	{
+		return false;
+	}
+
+
+template<class T>
+	inline std::string
+	Property<T>::stringify() const
+	{
+		if (_root)
+		{
+			PropertyNode* node = get_node();
+			if (node)
+				return node->read<std::string> ("");
+		}
+		return "";
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::parse (std::string const& value)
+	{
+		if (_root)
+		{
+			PropertyNode* node = get_node();
+			if (node)
+				node->write<std::string> (value);
+			else
+				ensure_path (_path, value);
+		}
+		else
+			throw SingularProperty ("can't write to a singular property");
 	}
 
 

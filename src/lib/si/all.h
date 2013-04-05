@@ -23,6 +23,7 @@
 #include "speed.h"
 #include "lonlat.h"
 #include "constants.h"
+#include "operators.h"
 
 #endif
 

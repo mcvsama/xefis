@@ -39,10 +39,10 @@ class Lookahead: public Xefis::Module
   private:
 	Time					_dt							= 0_s;
 	double					_last_value					= 0.0;
-	double					_minimum_integration_time	= 0.0;
+	Time					_minimum_integration_time	= 0_s;
 	Xefis::Smoother<double>	_output_smoother;
 
-	Xefis::PropertyFloat	_lookahead_time;
+	Xefis::PropertyTime		_lookahead_time;
 	Xefis::PropertyFloat	_input;
 	Xefis::PropertyFloat	_output;
 };

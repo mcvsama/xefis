@@ -23,12 +23,12 @@
 #include "types.h"
 
 
-constexpr Pressure STD_PRESSURE = 29.92_inhg;
+constexpr Pressure STD_PRESSURE = 29.92_inHg;
 
 inline bool
 is_std_pressure (Pressure pressure)
 {
-	return 1_inhg * std::abs ((STD_PRESSURE - pressure).inhg()) < 0.01_inhg;
+	return 1_inHg * std::abs ((STD_PRESSURE - pressure).inHg()) < 0.01_inHg;
 }
 
 #endif

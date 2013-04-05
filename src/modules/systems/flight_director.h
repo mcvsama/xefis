@@ -64,21 +64,21 @@ class FlightDirector: public Xefis::Module
 	Xefis::PropertyBoolean	_enabled;
 	Xefis::PropertyInteger	_lateral_mode;
 	Xefis::PropertyInteger	_vertical_mode;
-	Xefis::PropertyFloat	_pitch_limit_deg;
-	Xefis::PropertyFloat	_roll_limit_deg;
-	Xefis::PropertyFloat	_selected_magnetic_heading_deg;
-	Xefis::PropertyFloat	_selected_magnetic_track_deg;
-	Xefis::PropertyFloat	_selected_altitude_ft;
-	Xefis::PropertyFloat	_selected_vertical_speed_fpm;
-	Xefis::PropertyFloat	_selected_fpa_deg;
-	Xefis::PropertyFloat	_measured_magnetic_heading_deg;
-	Xefis::PropertyFloat	_measured_magnetic_track_deg;
-	Xefis::PropertyFloat	_measured_altitude_ft;
-	Xefis::PropertyFloat	_measured_vertical_speed_fpm;
-	Xefis::PropertyFloat	_measured_fpa_deg;
+	Xefis::PropertyAngle	_pitch_limit;
+	Xefis::PropertyAngle	_roll_limit;
+	Xefis::PropertyAngle	_selected_magnetic_heading;
+	Xefis::PropertyAngle	_selected_magnetic_track;
+	Xefis::PropertyLength	_selected_altitude;
+	Xefis::PropertySpeed	_selected_vertical_speed;
+	Xefis::PropertyAngle	_selected_fpa;
+	Xefis::PropertyAngle	_measured_magnetic_heading;
+	Xefis::PropertyAngle	_measured_magnetic_track;
+	Xefis::PropertyLength	_measured_altitude;
+	Xefis::PropertySpeed	_measured_vertical_speed;
+	Xefis::PropertyAngle	_measured_fpa;
 	// Output:
-	Xefis::PropertyFloat	_output_pitch_deg;
-	Xefis::PropertyFloat	_output_roll_deg;
+	Xefis::PropertyAngle	_output_pitch;
+	Xefis::PropertyAngle	_output_roll;
 };
 
 #endif

@@ -82,7 +82,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				climb_rate_visible				= false;
 		float				mach							= 0.f;
 		bool				mach_visible					= false;
-		Pressure			pressure						= 0_inhg;
+		Pressure			pressure						= 0_inHg;
 		bool				pressure_display_hpa			= false;
 		bool				pressure_visible				= false;
 		bool				standard_pressure				= false;

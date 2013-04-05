@@ -53,6 +53,10 @@ template<class siType>
 		void
 		write_signalling (SIType const&);
 
+		// Overridden from PropertyFloat
+		bool
+		is_specialized() const;
+
 	  private:
 		/*
 		 * Make some methods from PropertyFloat private, so user can't use them.
@@ -105,7 +109,7 @@ template<class T>
 			throw PropertyNotFound ("could not find property by path");
 		}
 		else
-			throw Exception ("can't read from a singular property");
+			throw SingularProperty ("can't read from a singular property");
 	}
 
 
@@ -131,7 +135,7 @@ template<class T>
 				ensure_path (_path, value.internal());
 		}
 		else
-			throw Exception ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property");
 	}
 
 
@@ -148,7 +152,31 @@ template<class T>
 				throw PropertyNotFound ("could not find property by path");
 		}
 		else
-			throw Exception ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property");
+	}
+
+
+template<class T>
+	inline bool
+	SIProperty<T>::is_specialized() const
+	{
+		return true;
+	}
+
+
+template<class T>
+	inline std::string
+	stringify() const
+	{
+		...
+	}
+
+
+template<class T>
+	inline void
+	parse (std::string const&)
+	{
+		...
 	}
 
 

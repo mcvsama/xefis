@@ -51,7 +51,7 @@ struct FGInputData
 	FGBool		standard_pressure;				// std
 	FGDouble	altitude_ft;					// al
 	FGDouble	altitude_agl_ft;				// alr
-	FGDouble	pressure_inhg;					// als
+	FGDouble	pressure_inHg;					// als
 	FGDouble	cbr_fpm;						// cbr
 	FGDouble	position_lat_deg;				// lt
 	FGDouble	position_lng_deg;				// ln
@@ -65,9 +65,9 @@ struct FGInputData
 	FGDouble	magnetic_track_deg;				// tr
 	FGBool		navigation_needles_visible;		// nav
 	FGBool		vertical_deviation_ok;			// ngso
-	FGDouble	vertical_deviation_val;			// ngs
+	FGDouble	vertical_deviation_deg;			// ngs
 	FGBool		lateral_deviation_ok;			// nhdo
-	FGDouble	lateral_deviation_val;			// nhd
+	FGDouble	lateral_deviation_deg;			// nhd
 	FGBool		navigation_dme_ok;				// dok
 	FGDouble	dme_distance_nm;				// dme
 	FGDouble	slip_skid_g;					// ss
@@ -114,47 +114,47 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 				else if (e2 == "properties")
 				{
 					parse_properties (e2, {
-						{ "ias", _ias_kt, false },
-						{ "ias-lookahead", _ias_lookahead_kt, false },
-						{ "ias-minimum", _minimum_ias_kt, false },
-						{ "ias-maximum", _maximum_ias_kt, false },
-						{ "gs", _gs_kt, false },
-						{ "tas", _tas_kt, false },
+						{ "ias", _ias, false },
+						{ "ias-lookahead", _ias_lookahead, false },
+						{ "ias-minimum", _minimum_ias, false },
+						{ "ias-maximum", _maximum_ias, false },
+						{ "gs", _gs, false },
+						{ "tas", _tas, false },
 						{ "mach", _mach, false },
-						{ "orientation-pitch", _pitch_deg, false },
-						{ "orientation-roll", _roll_deg, false },
-						{ "orientation-magnetic-heading", _magnetic_heading_deg, false },
-						{ "orientation-true-heading", _true_heading_deg, false },
+						{ "orientation-pitch", _pitch, false },
+						{ "orientation-roll", _roll, false },
+						{ "orientation-magnetic-heading", _magnetic_heading, false },
+						{ "orientation-true-heading", _true_heading, false },
 						{ "slip-skid", _slip_skid_g, false },
-						{ "flight-path-marker-alpha", _fpm_alpha_deg, false },
-						{ "flight-path-marker-beta", _fpm_beta_deg, false },
-						{ "magnetic-track", _magnetic_track_deg, false },
+						{ "flight-path-marker-alpha", _fpm_alpha, false },
+						{ "flight-path-marker-beta", _fpm_beta, false },
+						{ "magnetic-track", _magnetic_track, false },
 						{ "standard-pressure", _standard_pressure, false },
-						{ "altitude", _altitude_ft, false },
-						{ "altitude-agl", _altitude_agl_ft, false },
-						{ "cbr", _cbr_fpm, false },
-						{ "pressure", _pressure_inhg, false },
-						{ "cmd-setting-altitude", _cmd_alt_setting_ft, false },
-						{ "cmd-setting-ias", _cmd_speed_setting_kt, false },
-						{ "cmd-setting-heading", _cmd_heading_setting_deg, false },
-						{ "cmd-setting-cbr", _cmd_cbr_setting_fpm, false },
-						{ "flight-director-pitch", _flight_director_pitch_deg, false },
-						{ "flight-director-roll", _flight_director_roll_deg, false },
+						{ "altitude", _altitude, false },
+						{ "altitude-agl", _altitude_agl, false },
+						{ "cbr", _cbr, false },
+						{ "pressure", _pressure, false },
+						{ "cmd-setting-altitude", _cmd_alt_setting, false },
+						{ "cmd-setting-ias", _cmd_speed_setting, false },
+						{ "cmd-setting-heading", _cmd_heading_setting, false },
+						{ "cmd-setting-cbr", _cmd_cbr_setting, false },
+						{ "flight-director-pitch", _flight_director_pitch, false },
+						{ "flight-director-roll", _flight_director_roll, false },
 						{ "navigation-needles-visible", _navigation_needles_visible, false },
-						{ "lateral-deviation", _lateral_deviation_deg, false },
-						{ "vertical-deviation", _vertical_deviation_deg, false },
-						{ "dme-distance", _dme_distance_nm, false },
+						{ "lateral-deviation", _lateral_deviation, false },
+						{ "vertical-deviation", _vertical_deviation, false },
+						{ "dme-distance", _dme_distance, false },
 						{ "outside-air-temperature", _outside_air_temperature_k, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
 						{ "engine-epr", _engine_epr, false },
 						{ "engine-n1", _engine_n1_pct, false },
 						{ "engine-n2", _engine_n2_pct, false },
 						{ "engine-egt", _engine_egt_degc, false },
-						{ "position-latitude", _position_lat_deg, false },
-						{ "position-longitude", _position_lng_deg, false },
-						{ "position-amsl", _position_amsl_ft, false },
-						{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
-						{ "wind-tas", _wind_tas_kt, false },
+						{ "position-latitude", _position_lat, false },
+						{ "position-longitude", _position_lng, false },
+						{ "position-amsl", _position_amsl, false },
+						{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
+						{ "wind-tas", _wind_tas, false },
 					});
 				}
 			}
@@ -173,11 +173,8 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 				{
 					parse_properties (e2, {
 						{ "ailerons", _ailerons, false },
-						{ "ailerons-trim", _ailerons_trim, false },
 						{ "elevator", _elevator, false },
-						{ "elevator-trim", _elevator_trim, false },
 						{ "rudder", _rudder, false },
-						{ "rudder-trim", _rudder_trim, false }
 					});
 				}
 			}
@@ -219,47 +216,47 @@ void
 FlightGearIO::invalidate_all()
 {
 	Xefis::BaseProperty* properties[] = {
-		&_ias_kt,
-		&_ias_lookahead_kt,
-		&_minimum_ias_kt,
-		&_maximum_ias_kt,
-		&_gs_kt,
-		&_tas_kt,
+		&_ias,
+		&_ias_lookahead,
+		&_minimum_ias,
+		&_maximum_ias,
+		&_gs,
+		&_tas,
 		&_mach,
-		&_pitch_deg,
-		&_roll_deg,
-		&_magnetic_heading_deg,
-		&_true_heading_deg,
+		&_pitch,
+		&_roll,
+		&_magnetic_heading,
+		&_true_heading,
 		&_slip_skid_g,
-		&_fpm_alpha_deg,
-		&_fpm_beta_deg,
-		&_magnetic_track_deg,
+		&_fpm_alpha,
+		&_fpm_beta,
+		&_magnetic_track,
 		&_standard_pressure,
-		&_altitude_ft,
-		&_altitude_agl_ft,
-		&_cbr_fpm,
-		&_pressure_inhg,
-		&_cmd_alt_setting_ft,
-		&_cmd_speed_setting_kt,
-		&_cmd_heading_setting_deg,
-		&_cmd_cbr_setting_fpm,
-		&_flight_director_pitch_deg,
-		&_flight_director_roll_deg,
+		&_altitude,
+		&_altitude_agl,
+		&_cbr,
+		&_pressure,
+		&_cmd_alt_setting,
+		&_cmd_speed_setting,
+		&_cmd_heading_setting,
+		&_cmd_cbr_setting,
+		&_flight_director_pitch,
+		&_flight_director_roll,
 		&_navigation_needles_visible,
-		&_lateral_deviation_deg,
-		&_vertical_deviation_deg,
-		&_dme_distance_nm,
+		&_lateral_deviation,
+		&_vertical_deviation,
+		&_dme_distance,
 		&_outside_air_temperature_k,
 		&_engine_throttle_pct,
 		&_engine_epr,
 		&_engine_n1_pct,
 		&_engine_n2_pct,
 		&_engine_egt_degc,
-		&_position_lat_deg,
-		&_position_lng_deg,
-		&_position_amsl_ft,
-		&_wind_from_magnetic_heading_deg,
-		&_wind_tas_kt
+		&_position_lat,
+		&_position_lng,
+		&_position_amsl,
+		&_wind_from_magnetic_heading,
+		&_wind_tas
 	};
 
 	for (auto property: properties)
@@ -288,74 +285,79 @@ FlightGearIO::read_input()
 
 		FGInputData* fg_data = reinterpret_cast<FGInputData*> (_input_datagram.data());
 
-#define ASSIGN(x) \
+#define ASSIGN(unit, x) \
+		if (!_##x.is_singular()) \
+			_##x.write (1_##unit * fg_data->x##_##unit);
+
+#define ASSIGN_UNITLESS(x) \
 		if (!_##x.is_singular()) \
 			_##x.write (fg_data->x);
 
-		ASSIGN (cmd_alt_setting_ft);
-		ASSIGN (cmd_cbr_setting_fpm);
-		ASSIGN (cmd_speed_setting_kt);
-		ASSIGN (cmd_heading_setting_deg);
-		ASSIGN (flight_director_pitch_deg);
-		ASSIGN (flight_director_roll_deg);
-		ASSIGN (ias_kt);
-		ASSIGN (tas_kt);
-		ASSIGN (gs_kt);
-		ASSIGN (mach);
-		ASSIGN (ias_lookahead_kt);
-		ASSIGN (maximum_ias_kt);
-		ASSIGN (minimum_ias_kt);
-		ASSIGN (standard_pressure);
-		ASSIGN (altitude_ft);
-		ASSIGN (altitude_agl_ft);
-		ASSIGN (pressure_inhg);
-		ASSIGN (cbr_fpm);
-		ASSIGN (position_lat_deg);
-		ASSIGN (position_lng_deg);
-		ASSIGN (position_amsl_ft);
-		ASSIGN (pitch_deg);
-		ASSIGN (roll_deg);
-		ASSIGN (magnetic_heading_deg);
-		ASSIGN (true_heading_deg);
-		ASSIGN (fpm_alpha_deg);
-		ASSIGN (fpm_beta_deg);
-		ASSIGN (magnetic_track_deg);
-		ASSIGN (navigation_needles_visible);
-		ASSIGN (dme_distance_nm);
-		ASSIGN (slip_skid_g);
-		ASSIGN (outside_air_temperature_k);
-		ASSIGN (engine_throttle_pct);
-		ASSIGN (engine_epr);
-		ASSIGN (engine_n1_pct);
-		ASSIGN (engine_n2_pct);
-		ASSIGN (engine_egt_degc);
-		ASSIGN (wind_from_magnetic_heading_deg);
-		ASSIGN (wind_tas_kt);
+		ASSIGN (ft,   cmd_alt_setting);
+		ASSIGN (fpm,  cmd_cbr_setting);
+		ASSIGN (kt,   cmd_speed_setting);
+		ASSIGN (deg,  cmd_heading_setting);
+		ASSIGN (deg,  flight_director_pitch);
+		ASSIGN (deg,  flight_director_roll);
+		ASSIGN (kt,   ias);
+		ASSIGN (kt,   tas);
+		ASSIGN (kt,   gs);
+		ASSIGN_UNITLESS (mach);
+		ASSIGN (kt,   ias_lookahead);
+		ASSIGN (kt,   maximum_ias);
+		ASSIGN (kt,   minimum_ias);
+		ASSIGN_UNITLESS (standard_pressure);
+		ASSIGN (ft,   altitude);
+		ASSIGN (ft,   altitude_agl);
+		ASSIGN (inHg, pressure);
+		ASSIGN (fpm,  cbr);
+		ASSIGN (deg,  position_lat);
+		ASSIGN (deg,  position_lng);
+		ASSIGN (ft,   position_amsl);
+		ASSIGN (deg,  pitch);
+		ASSIGN (deg,  roll);
+		ASSIGN (deg,  magnetic_heading);
+		ASSIGN (deg,  true_heading);
+		ASSIGN (deg,  fpm_alpha);
+		ASSIGN (deg,  fpm_beta);
+		ASSIGN (deg,  magnetic_track);
+		ASSIGN_UNITLESS (navigation_needles_visible);
+		ASSIGN (nm,   dme_distance);
+		ASSIGN_UNITLESS (slip_skid_g);
+		ASSIGN_UNITLESS (outside_air_temperature_k);
+		ASSIGN_UNITLESS (engine_throttle_pct);
+		ASSIGN_UNITLESS (engine_epr);
+		ASSIGN_UNITLESS (engine_n1_pct);
+		ASSIGN_UNITLESS (engine_n2_pct);
+		ASSIGN_UNITLESS (engine_egt_degc);
+		ASSIGN (deg,  wind_from_magnetic_heading);
+		ASSIGN (kt,   wind_tas);
 
+#undef ASSIGN_UNITLESS
 #undef ASSIGN
 
-		if (!_vertical_deviation_deg.is_singular())
-			_vertical_deviation_deg.write (2.f * fg_data->vertical_deviation_val);
-		if (!_lateral_deviation_deg.is_singular())
-			_lateral_deviation_deg.write (2.f * fg_data->lateral_deviation_val);
+		if (!_vertical_deviation.is_singular())
+			_vertical_deviation.write (2_deg * fg_data->vertical_deviation_deg);
+		if (!_lateral_deviation.is_singular())
+			_lateral_deviation.write (2_deg * fg_data->lateral_deviation_deg);
 
-		if (!fg_data->vertical_deviation_ok && !_vertical_deviation_deg.is_singular())
-			_vertical_deviation_deg.set_nil();
-		if (!fg_data->lateral_deviation_ok && !_lateral_deviation_deg.is_singular())
-			_lateral_deviation_deg.set_nil();
-		if (!fg_data->navigation_dme_ok && !_dme_distance_nm.is_singular())
-			_dme_distance_nm.set_nil();
+		if (!fg_data->vertical_deviation_ok && !_vertical_deviation.is_singular())
+			_vertical_deviation.set_nil();
+		if (!fg_data->lateral_deviation_ok && !_lateral_deviation.is_singular())
+			_lateral_deviation.set_nil();
+		if (!fg_data->navigation_dme_ok && !_dme_distance.is_singular())
+			_dme_distance.set_nil();
 
 		if (_outside_air_temperature_k.valid())
 			_outside_air_temperature_k.write (*_outside_air_temperature_k + 273.15);
 	}
 
-	if (_maximum_ias_kt.valid() && *_maximum_ias_kt < 1.f)
-		_maximum_ias_kt.set_nil();
-	if (_minimum_ias_kt.valid() && *_minimum_ias_kt < 1.f)
-		_minimum_ias_kt.set_nil();
-	if (_altitude_agl_ft.valid() && *_altitude_agl_ft > 2500.f)
-		_altitude_agl_ft.set_nil();
+	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)
+		_maximum_ias.set_nil();
+	if (_minimum_ias.valid() && *_minimum_ias < 1_kt)
+		_minimum_ias.set_nil();
+	if (_altitude_agl.valid() && *_altitude_agl > 2500_ft)
+		_altitude_agl.set_nil();
 	// Convert EGT from °F to °C:
 	if (_engine_egt_degc.valid())
 		_engine_egt_degc.write (5.f / 9.f * (*_engine_egt_degc - 32.f));
@@ -379,11 +381,8 @@ FlightGearIO::write_output()
 			fg_data.x = *_##x;
 
 	ASSIGN (ailerons);
-	ASSIGN (ailerons_trim);
 	ASSIGN (elevator);
-	ASSIGN (elevator_trim);
 	ASSIGN (rudder);
-	ASSIGN (rudder_trim);
 
 #undef ASSIGN
 
