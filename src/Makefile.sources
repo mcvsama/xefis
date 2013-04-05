@@ -84,6 +84,7 @@ SRC_HEADERS += xefis/utility/sound_speed.h
 SRC_HEADERS += xefis/utility/text_painter.h
 SRC_HEADERS += xefis/utility/thread.h
 SRC_HEADERS += xefis/utility/timestamp.h
+SRC_HEADERS += xefis/utility/unit_parser.h
 SRC_HEADERS += xefis/utility/wind_triangle.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
@@ -97,9 +98,14 @@ SRC_SOURCES += xefis/utility/thread.cc
 
 SRC_HEADERS += lib/si/all.h
 SRC_HEADERS += lib/si/angle.h
+SRC_HEADERS += lib/si/constants.h
+SRC_HEADERS += lib/si/frequency.h
 SRC_HEADERS += lib/si/length.h
 SRC_HEADERS += lib/si/lonlat.h
+SRC_HEADERS += lib/si/operators.h
 SRC_HEADERS += lib/si/pressure.h
+SRC_HEADERS += lib/si/speed.h
+SRC_HEADERS += lib/si/time.h
 SRC_HEADERS += lib/si/value.h
 
 SRC_SOURCES += lib/si/lonlat.cc

@@ -1283,7 +1283,7 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (QPainter& painter, TextPainter& te
 
 	QString unit_str = _params.pressure_display_hpa? "HPA" : "IN";
 	int precision = _params.pressure_display_hpa ? 0 : 2;
-	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure.hpa() : _params.pressure.inhg(), 0, 'f', precision) + " ";
+	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure.hPa() : _params.pressure.inHg(), 0, 'f', precision) + " ";
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());

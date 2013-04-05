@@ -134,13 +134,6 @@ operator"" _fpm (unsigned long long fpm)
 	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
 }
 
-
-inline constexpr Speed
-operator/ (Length const& length, Time const& time)
-{
-	return 1_kt * (length.nm() / time.h());
-}
-
 } // namespace SI
 
 

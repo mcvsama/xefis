@@ -41,7 +41,7 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 		else if (e == "smoothing")
 			smoothing = e.text().toDouble();
 		else if (e == "minimum-integration-time")
-			_minimum_integration_time = e.text().toDouble();
+			_minimum_integration_time = 1_s * e.text().toDouble();
 		else if (e == "properties")
 		{
 			parse_properties (e, {
@@ -74,10 +74,10 @@ Lookahead::data_updated()
 		Time dt = update_dt();
 		_dt += dt;
 
-		if (_dt.s() > _minimum_integration_time)
+		if (_dt > _minimum_integration_time)
 		{
 			double value = *_input;
-			double estimated_value = _last_value + *_lookahead_time / dt.s() * (value - _last_value);
+			double estimated_value = _last_value + *_lookahead_time / dt * (value - _last_value);
 			_output.write (_output_smoother.process (estimated_value));
 			_last_value = value;
 			_dt = Time::epoch();

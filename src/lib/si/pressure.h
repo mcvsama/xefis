@@ -29,10 +29,10 @@ class Pressure: public Value<float, Pressure>
 	friend class Value<float, Pressure>;
 	friend constexpr Pressure operator"" _psi (long double);
 	friend constexpr Pressure operator"" _psi (unsigned long long);
-	friend constexpr Pressure operator"" _hpa (long double);
-	friend constexpr Pressure operator"" _hpa (unsigned long long);
-	friend constexpr Pressure operator"" _inhg (long double);
-	friend constexpr Pressure operator"" _inhg (unsigned long long);
+	friend constexpr Pressure operator"" _hPa (long double);
+	friend constexpr Pressure operator"" _hPa (unsigned long long);
+	friend constexpr Pressure operator"" _inHg (long double);
+	friend constexpr Pressure operator"" _inHg (unsigned long long);
 
   protected:
 	/**
@@ -53,10 +53,10 @@ class Pressure: public Value<float, Pressure>
 	psi() const noexcept;
 
 	constexpr ValueType
-	hpa() const noexcept;
+	hPa() const noexcept;
 
 	constexpr ValueType
-	inhg() const noexcept;
+	inHg() const noexcept;
 };
 
 
@@ -74,14 +74,14 @@ Pressure::psi() const noexcept
 
 
 inline constexpr Pressure::ValueType
-Pressure::hpa() const noexcept
+Pressure::hPa() const noexcept
 {
 	return value() * 68.9554630643f;
 }
 
 
 inline constexpr Pressure::ValueType
-Pressure::inhg() const noexcept
+Pressure::inHg() const noexcept
 {
 	return value() * 2.036254f;
 }
@@ -107,30 +107,30 @@ operator"" _psi (unsigned long long psi)
 
 
 inline constexpr Pressure
-operator"" _hpa (long double hpa)
+operator"" _hPa (long double hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hpa) * 0.0145021141);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
 }
 
 
 inline constexpr Pressure
-operator"" _hpa (unsigned long long hpa)
+operator"" _hPa (unsigned long long hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hpa) * 0.0145021141);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
 }
 
 
 inline constexpr Pressure
-operator"" _inhg (long double inhg)
+operator"" _inHg (long double inHg)
 {
-	return Pressure (static_cast<Pressure::ValueType> (inhg) * 0.491098f);
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
 }
 
 
 inline constexpr Pressure
-operator"" _inhg (unsigned long long inhg)
+operator"" _inHg (unsigned long long inHg)
 {
-	return Pressure (static_cast<Pressure::ValueType> (inhg) * 0.491098f);
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
 }
 
 } // namespace SI

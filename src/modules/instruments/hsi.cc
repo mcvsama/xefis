@@ -40,24 +40,24 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "display-mode", _display_mode, true },
 				{ "range", _range, true },
 				{ "trend-vector-range", _trend_vector_range, false },
-				{ "gs", _gs_kt, false },
-				{ "tas", _tas_kt, false },
-				{ "cbr", _cbr_fpm, false },
-				{ "altitude", _altitude_ft, false },
-				{ "target-altitude", _target_altitude_ft, false },
-				{ "orientation-magnetic-heading", _magnetic_heading_deg, false },
-				{ "orientation-true-heading", _true_heading_deg, false },
+				{ "gs", _gs, false },
+				{ "tas", _tas, false },
+				{ "cbr", _cbr, false },
+				{ "altitude", _altitude, false },
+				{ "target-altitude", _target_altitude, false },
+				{ "orientation-magnetic-heading", _magnetic_heading, false },
+				{ "orientation-true-heading", _true_heading, false },
 				{ "use-true-heading", _use_true_heading, false },
 				{ "display-track", _display_track, false },
 				{ "cmd-settings-visible", _cmd_settings_visible, false },
 				{ "cmd-track-visible", _cmd_track_visible, false },
-				{ "magnetic-track", _magnetic_track_deg, false },
-				{ "cmd-setting-heading", _cmd_heading_setting_deg, false },
-				{ "position-latitude", _position_lat_deg, false },
-				{ "position-longitude", _position_lon_deg, false },
+				{ "magnetic-track", _magnetic_track, false },
+				{ "cmd-setting-heading", _cmd_heading_setting, false },
+				{ "position-latitude", _position_lat, false },
+				{ "position-longitude", _position_lon, false },
 				{ "position-source", _positioning_hint, false },
-				{ "wind-from-mag-heading", _wind_from_magnetic_heading_deg, false },
-				{ "wind-tas", _wind_tas_kt, false },
+				{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
+				{ "wind-tas", _wind_tas, false },
 				{ "localizer-id", _localizer_id, false },
 				{ "climb-glide-ratio", _climb_glide_ratio, false }
 			});
@@ -91,7 +91,7 @@ HSI::read()
 	estimate_track();
 	estimate_altitude_reach_distance();
 
-	_hsi_widget->set_range (_range.valid() ? 1_nm * *_range : 5_nm);
+	_hsi_widget->set_range (_range.valid() ? *_range : 5_nm);
 
 	if (_display_mode.valid())
 	{
@@ -103,49 +103,49 @@ HSI::read()
 			_hsi_widget->set_display_mode (HSIWidget::DisplayMode::Auxiliary);
 	}
 
-	_hsi_widget->set_heading_visible (_magnetic_heading_deg.valid());
-	if (_magnetic_heading_deg.valid())
-		_hsi_widget->set_magnetic_heading (1_deg * *_magnetic_heading_deg);
+	_hsi_widget->set_heading_visible (_magnetic_heading.valid());
+	if (_magnetic_heading.valid())
+		_hsi_widget->set_magnetic_heading (*_magnetic_heading);
 
-	_hsi_widget->set_navaids_visible (_true_heading_deg.valid());
-	if (_true_heading_deg.valid())
-		_hsi_widget->set_true_heading (1_deg * *_true_heading_deg);
+	_hsi_widget->set_navaids_visible (_true_heading.valid());
+	if (_true_heading.valid())
+		_hsi_widget->set_true_heading (*_true_heading);
 
 	if (_use_true_heading.valid() && *_use_true_heading)
 		_hsi_widget->set_heading_mode (HSIWidget::HeadingMode::True);
 	else
 		_hsi_widget->set_heading_mode (HSIWidget::HeadingMode::Magnetic);
 
-	_hsi_widget->set_ap_heading_visible (_cmd_settings_visible.read (false) && _cmd_heading_setting_deg.valid());
-	if (_cmd_heading_setting_deg.valid())
-		_hsi_widget->set_ap_magnetic_heading (1_deg * *_cmd_heading_setting_deg);
+	_hsi_widget->set_ap_heading_visible (_cmd_settings_visible.read (false) && _cmd_heading_setting.valid());
+	if (_cmd_heading_setting.valid())
+		_hsi_widget->set_ap_magnetic_heading (*_cmd_heading_setting);
 
 	_hsi_widget->set_ap_track_visible (_cmd_track_visible.read (false));
 
-	if (_magnetic_track_deg.valid())
+	if (_magnetic_track.valid())
 	{
 		_hsi_widget->set_track_visible (true);
-		_hsi_widget->set_magnetic_track (1_deg * *_magnetic_track_deg);
+		_hsi_widget->set_magnetic_track (*_magnetic_track);
 	}
 	else
 	{
 		_hsi_widget->set_track_visible (false);
-		_hsi_widget->set_magnetic_track (1_deg * *_magnetic_heading_deg);
+		_hsi_widget->set_magnetic_track (*_magnetic_heading);
 	}
 
 	_hsi_widget->set_display_track (_display_track.read (false));
 
-	_hsi_widget->set_ground_speed_visible (_gs_kt.valid());
-	if (_gs_kt.valid())
-		_hsi_widget->set_ground_speed (1_kt * *_gs_kt);
+	_hsi_widget->set_ground_speed_visible (_gs.valid());
+	if (_gs.valid())
+		_hsi_widget->set_ground_speed (*_gs);
 
-	_hsi_widget->set_true_air_speed_visible (_tas_kt.valid());
-	if (_tas_kt.valid())
-		_hsi_widget->set_true_air_speed (1_kt * *_tas_kt);
+	_hsi_widget->set_true_air_speed_visible (_tas.valid());
+	if (_tas.valid())
+		_hsi_widget->set_true_air_speed (*_tas);
 
-	if (_position_lat_deg.valid() && _position_lon_deg.valid())
+	if (_position_lat.valid() && _position_lon.valid())
 	{
-		_hsi_widget->set_position (LonLat (1_deg * *_position_lon_deg, 1_deg * *_position_lat_deg));
+		_hsi_widget->set_position (LonLat (*_position_lon, *_position_lat));
 		_hsi_widget->set_position_valid (true);
 	}
 	else
@@ -155,10 +155,10 @@ HSI::read()
 	if (_positioning_hint.valid())
 		_hsi_widget->set_positioning_hint ((*_positioning_hint).c_str());
 
-	if (_wind_from_magnetic_heading_deg.valid() && _wind_tas_kt.valid())
+	if (_wind_from_magnetic_heading.valid() && _wind_tas.valid())
 	{
 		_hsi_widget->set_wind_information_visible (true);
-		_hsi_widget->set_wind_information (1_deg * *_wind_from_magnetic_heading_deg, 1_kt * *_wind_tas_kt);
+		_hsi_widget->set_wind_information (*_wind_from_magnetic_heading, *_wind_tas);
 	}
 	else
 		_hsi_widget->set_wind_information_visible (false);
@@ -176,13 +176,13 @@ HSI::read()
 void
 HSI::estimate_track()
 {
-	if (_position_lat_deg.is_singular() || _position_lon_deg.is_singular() || _trend_vector_range.is_singular())
+	if (_position_lat.is_singular() || _position_lon.is_singular() || _trend_vector_range.is_singular())
 	{
 		_hsi_widget->set_trend_vector_visible (false);
 		return;
 	}
 
-	LonLat current_position (1_deg * *_position_lon_deg, 1_deg * *_position_lat_deg);
+	LonLat current_position (*_position_lon, *_position_lat);
 
 	if (!_positions_valid)
 	{
@@ -212,7 +212,7 @@ HSI::estimate_track()
 			beta_per_mile = 1_deg * _trend_vector_smoother.process (beta_per_mile.deg());
 
 		_hsi_widget->set_trend_vector_visible (visible);
-		_hsi_widget->set_trend_vector_lookahead (1_nm * *_trend_vector_range);
+		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
 		_hsi_widget->set_track_deviation (limit (beta_per_mile, -180.0_deg, +180.0_deg));
 	}
 }
@@ -221,22 +221,15 @@ HSI::estimate_track()
 void
 HSI::estimate_altitude_reach_distance()
 {
-	if (_gs_kt.is_singular() || _cbr_fpm.is_singular() ||
-		_altitude_ft.is_singular() || _target_altitude_ft.is_singular())
+	if (_gs.is_singular() || _cbr.is_singular() ||
+		_altitude.is_singular() || _target_altitude.is_singular())
 	{
 		_hsi_widget->set_altitude_reach_visible (false);
 		return;
 	}
 
-	float const gs = *_gs_kt;
-	float const cbr = *_cbr_fpm;
-	float const alt_diff = *_target_altitude_ft - *_altitude_ft;
-
-	float const cbr_s = cbr / 60.f;
-	float const t = alt_diff / cbr_s;
-	float const s = gs * (t / 3600.f);
-
-	_hsi_widget->set_altitude_reach_distance (1_nm * s);
+	Length const alt_diff = *_target_altitude - *_altitude;
+	_hsi_widget->set_altitude_reach_distance (*_gs * (alt_diff / *_cbr));
 	_hsi_widget->set_altitude_reach_visible (true);
 }
 

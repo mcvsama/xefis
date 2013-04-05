@@ -240,11 +240,11 @@ FlightManagementSystem::compute_position()
 	{
 		double a = 6.8755856e-6;
 		double b = 5.2558797;
-		double p = (*_static_pressure).inhg();
+		double p = (*_static_pressure).inHg();
 		double p0 = 29.92126;
 		// Good for heights below tropopause (36 kft):
 		double h = (1.0 - std::pow (p / p0, 1 / b)) / a;
-		double alt_set = (*_qnh_pressure).inhg();
+		double alt_set = (*_qnh_pressure).inHg();
 		double p_alt_corr = 145442.2 * (1.0 - std::pow (alt_set / p0, 0.190261));
 		double p_alt = h + p_alt_corr;
 

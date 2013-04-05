@@ -42,20 +42,20 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 				{ "enabled", _enabled, true },
 				{ "lateral-mode", _lateral_mode, true },
 				{ "vertical-mode", _vertical_mode, true },
-				{ "pitch-limit", _pitch_limit_deg, true },
-				{ "roll-limit", _roll_limit_deg, true },
-				{ "selected-magnetic-heading", _selected_magnetic_heading_deg, true },
-				{ "selected-magnetic-track", _selected_magnetic_track_deg, true },
-				{ "selected-altitude", _selected_altitude_ft, true },
-				{ "selected-vertical-speed", _selected_vertical_speed_fpm, true },
-				{ "selected-fpa", _selected_fpa_deg, true },
-				{ "measured-magnetic-heading", _measured_magnetic_heading_deg, true },
-				{ "measured-magnetic-track", _measured_magnetic_track_deg, true },
-				{ "measured-altitude", _measured_altitude_ft, true },
-				{ "measured-vertical-speed", _measured_vertical_speed_fpm, true },
-				{ "measured-fpa", _measured_fpa_deg, true },
-				{ "output-pitch", _output_pitch_deg, true },
-				{ "output-roll", _output_roll_deg, true },
+				{ "pitch-limit", _pitch_limit, true },
+				{ "roll-limit", _roll_limit, true },
+				{ "selected-magnetic-heading", _selected_magnetic_heading, true },
+				{ "selected-magnetic-track", _selected_magnetic_track, true },
+				{ "selected-altitude", _selected_altitude, true },
+				{ "selected-vertical-speed", _selected_vertical_speed, true },
+				{ "selected-fpa", _selected_fpa, true },
+				{ "measured-magnetic-heading", _measured_magnetic_heading, true },
+				{ "measured-magnetic-track", _measured_magnetic_track, true },
+				{ "measured-altitude", _measured_altitude, true },
+				{ "measured-vertical-speed", _measured_vertical_speed, true },
+				{ "measured-fpa", _measured_fpa, true },
+				{ "output-pitch", _output_pitch, true },
+				{ "output-roll", _output_roll, true },
 			});
 		}
 	}
@@ -82,64 +82,64 @@ FlightDirector::data_updated()
 	{
 		double const altitude_output_scale = 0.10;
 		double const vertical_speed_output_scale = 0.01;
-		double const rl = *_roll_limit_deg;
-		double const pl = *_pitch_limit_deg;
+		double const rl = (*_roll_limit).deg();
+		double const pl = (*_pitch_limit).deg();
 		Range<float> roll_limit (-rl, +rl);
 		Range<float> pitch_limit (-pl, +pl);
 
-		_magnetic_heading_pid.set_target (renormalize (*_selected_magnetic_heading_deg, 0.f, 360.f, -1.f, +1.f));
-		_magnetic_heading_pid.process (renormalize (*_measured_magnetic_heading_deg, 0.f, 360.f, -1.f, +1.f), _dt.s());
+		_magnetic_heading_pid.set_target (renormalize ((*_selected_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
+		_magnetic_heading_pid.process (renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
 
-		_magnetic_track_pid.set_target (renormalize (*_selected_magnetic_track_deg, 0.f, 360.f, -1.f, +1.f));
-		_magnetic_track_pid.process (renormalize (*_measured_magnetic_track_deg, 0.f, 360.f, -1.f, +1.f), _dt.s());
+		_magnetic_track_pid.set_target (renormalize ((*_selected_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
+		_magnetic_track_pid.process (renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
 
-		_altitude_pid.set_target (*_selected_altitude_ft);
-		_altitude_pid.process (*_measured_altitude_ft, _dt.s());
+		_altitude_pid.set_target ((*_selected_altitude).ft());
+		_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
 
-		_vertical_speed_pid.set_target (*_selected_vertical_speed_fpm);
-		_vertical_speed_pid.process (*_measured_vertical_speed_fpm, _dt.s());
+		_vertical_speed_pid.set_target ((*_selected_vertical_speed).fpm());
+		_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
 
-		_fpa_pid.set_target (*_selected_fpa_deg);
-		_fpa_pid.process (*_measured_fpa_deg, _dt.s());
+		_fpa_pid.set_target ((*_selected_fpa).deg());
+		_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
 
 		switch (static_cast<VerticalMode> (*_vertical_mode))
 		{
 			case VerticalDisabled:
-				_output_pitch_deg.write (0.f);
+				_output_pitch.write (0_deg);
 				break;
 
 			case AltitudeHold:
-				_output_pitch_deg.write (limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit));
+				_output_pitch.write (1_deg * limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit));
 				break;
 
 			case VerticalSpeed:
-				_output_pitch_deg.write (limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit));
+				_output_pitch.write (1_deg * limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit));
 				break;
 
 			case FlightPathAngle:
-				_output_pitch_deg.write (limit<float> (_fpa_pid.output(), pitch_limit));
+				_output_pitch.write (1_deg * limit<float> (_fpa_pid.output(), pitch_limit));
 				break;
 		}
 
 		switch (static_cast<LateralMode> (*_lateral_mode))
 		{
 			case LateralDisabled:
-				_output_roll_deg.write (0.f);
+				_output_roll.write (0_deg);
 				break;
 
 			case FollowHeading:
-				_output_roll_deg.write (limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit));
+				_output_roll.write (1_deg * limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit));
 				break;
 
 			case FollowTrack:
-				_output_roll_deg.write (limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit));
+				_output_roll.write (1_deg * limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit));
 				break;
 		}
 	}
 	else
 	{
-		_output_pitch_deg.write (0.f);
-		_output_roll_deg.write (0.f);
+		_output_pitch.write (0_deg);
+		_output_roll.write (0_deg);
 	}
 
 	_dt = Time::epoch();

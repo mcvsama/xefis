@@ -50,8 +50,10 @@ class FlyByWire: public Xefis::Module
 	// Used with joystick input:
 	Xefis::PID<float>		_manual_pitch_pid;
 	Xefis::PID<float>		_manual_roll_pid;
-	Angle					_output_pitch		= 0_deg;
-	Angle					_output_roll		= 0_deg;
+	Angle					_pre_input_pitch	= 0_deg;
+	Angle					_pre_input_roll		= 0_deg;
+	Angle					_pre_output_pitch	= 0_deg;
+	Angle					_pre_output_roll	= 0_deg;
 	// Stabilizer PIDs:
 	Xefis::PID<float>		_elevator_pid;
 	Xefis::PID<float>		_ailerons_pid;
@@ -60,8 +62,8 @@ class FlyByWire: public Xefis::Module
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
 	Xefis::PropertyInteger	_mode;
-	Xefis::PropertyFloat	_pitch_extent_deg;
-	Xefis::PropertyFloat	_roll_extent_deg;
+	Xefis::PropertyAngle	_pitch_extent;
+	Xefis::PropertyAngle	_roll_extent;
 	Xefis::PropertyFloat	_stabilization_gain;
 	Xefis::PropertyFloat	_pitch_gain;
 	Xefis::PropertyFloat	_pitch_p;
@@ -81,10 +83,10 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat	_input_pitch_axis;
 	Xefis::PropertyFloat	_input_roll_axis;
 	Xefis::PropertyFloat	_input_yaw_axis;
-	Xefis::PropertyFloat	_input_pitch_deg;
-	Xefis::PropertyFloat	_input_roll_deg;
-	Xefis::PropertyFloat	_measured_pitch_deg;
-	Xefis::PropertyFloat	_measured_roll_deg;
+	Xefis::PropertyAngle	_input_pitch;
+	Xefis::PropertyAngle	_input_roll;
+	Xefis::PropertyAngle	_measured_pitch;
+	Xefis::PropertyAngle	_measured_roll;
 	Xefis::PropertyFloat	_measured_slip_skid_g;
 	Xefis::PropertyFloat	_elevator_minimum;
 	Xefis::PropertyFloat	_elevator_maximum;
@@ -95,8 +97,8 @@ class FlyByWire: public Xefis::Module
 	// Output:
 	Xefis::PropertyFloat	_output_control_stick_pitch;
 	Xefis::PropertyFloat	_output_control_stick_roll;
-	Xefis::PropertyFloat	_output_pitch_deg;
-	Xefis::PropertyFloat	_output_roll_deg;
+	Xefis::PropertyAngle	_output_pitch;
+	Xefis::PropertyAngle	_output_roll;
 	Xefis::PropertyFloat	_output_elevator;
 	Xefis::PropertyFloat	_output_ailerons;
 	Xefis::PropertyFloat	_output_rudder;
