@@ -35,105 +35,111 @@ Module::Module (ModuleManager* module_manager):
 void
 Module::parse_properties (QDomElement const& properties_element, PropertiesList list)
 {
-	std::map<QString, PropertyUnion*> map;
-	std::set<QString> unconfigured_values;
+	try {
+		std::map<QString, PropertyUnion*> map;
+		std::set<QString> unconfigured_values;
 
-	for (NameAndProperty& pair: list)
-	{
-		map[pair.name] = &pair.property;
-		if (pair.required)
-			unconfigured_values.insert (pair.name);
-	}
-
-	QString root = properties_element.attribute ("path");
-	QString root_2;
-
-	auto parse_property = [&] (QDomElement& e) -> void
-	{
-		if (!e.hasAttribute ("name"))
-			throw Exception ("missing attribute @name for property");
-
-		QString name = e.attribute ("name");
-
-		unconfigured_values.erase (name);
-
-		auto it = map.find (name);
-		// Found config for nonexistent property:
-		if (it == map.end())
-			return;
-
-		if (e.hasAttribute ("path"))
+		for (NameAndProperty& pair: list)
 		{
-			std::string path = (root + root_2 + e.attribute ("path")).toStdString();
-			switch (it->second->type())
+			map[pair.name] = &pair.property;
+			if (pair.required)
+				unconfigured_values.insert (pair.name);
+		}
+
+		QString root = properties_element.attribute ("path");
+		QString root_2;
+
+		auto parse_property = [&] (QDomElement& e) -> void
+		{
+			if (!e.hasAttribute ("name"))
+				throw Exception ("missing attribute @name for property");
+
+			QString name = e.attribute ("name");
+
+			unconfigured_values.erase (name);
+
+			auto it = map.find (name);
+			// Found config for nonexistent property:
+			if (it == map.end())
+				return;
+
+			if (e.hasAttribute ("path"))
 			{
-				case PropBoolean:
-					it->second->access_bool() = Xefis::PropertyBoolean (path);
-					break;
-				case PropInteger:
-					it->second->access_int() = Xefis::PropertyInteger (path);
-					break;
-				case PropFloat:
-					it->second->access_float() = Xefis::PropertyFloat (path);
-					break;
-				case PropString:
-					it->second->access_string() = Xefis::PropertyString (path);
-					break;
-				case PropDirectory:
-					break;
+				std::string path = (root + root_2 + e.attribute ("path")).toStdString();
+				switch (it->second->type())
+				{
+					case PropBoolean:
+						it->second->access_bool() = Xefis::PropertyBoolean (path);
+						break;
+					case PropInteger:
+						it->second->access_int() = Xefis::PropertyInteger (path);
+						break;
+					case PropFloat:
+						it->second->access_float() = Xefis::PropertyFloat (path);
+						break;
+					case PropString:
+						it->second->access_string() = Xefis::PropertyString (path);
+						break;
+					case PropDirectory:
+						break;
+				}
+			}
+			else
+				throw Exception (QString ("missing parameter @path for property: %1").arg (name).toStdString());
+
+			if (!e.hasAttribute ("default"))
+			{
+				// Ensure property exists:
+				if (it->second->access().is_nil())
+					it->second->access().set_nil();
+			}
+			else
+			{
+				QString value = e.attribute ("default");
+				switch (it->second->type())
+				{
+					case PropBoolean:
+						it->second->access_bool().write (value == "true");
+						break;
+					case PropInteger:
+						it->second->access_int().write (value.toInt());
+						break;
+					case PropFloat:
+						it->second->access_float().parse (value.toStdString());
+						break;
+					case PropString:
+						it->second->access_string().write (value.toStdString());
+						break;
+					case PropDirectory:
+						break;
+				}
+			}
+		};
+
+		for (QDomElement& d: properties_element)
+		{
+			if (d == "property")
+				parse_property (d);
+			else if (d == "directory")
+			{
+				root_2 = d.attribute ("path");
+				for (QDomElement& e: d)
+					if (e == "property")
+						parse_property (e);
 			}
 		}
-		else
-			throw Exception (QString ("missing parameter @path for property: %1").arg (name).toStdString());
 
-		if (!e.hasAttribute ("default"))
+		if (!unconfigured_values.empty())
 		{
-			// Ensure property exists:
-			if (it->second->access().is_nil())
-				it->second->access().set_nil();
-		}
-		else
-		{
-			QString value = e.attribute ("default");
-			switch (it->second->type())
-			{
-				case PropBoolean:
-					it->second->access_bool().write (value == "true");
-					break;
-				case PropInteger:
-					it->second->access_int().write (value.toInt());
-					break;
-				case PropFloat:
-					it->second->access_float().write (value.toFloat());
-					break;
-				case PropString:
-					it->second->access_string().write (value.toStdString());
-					break;
-				case PropDirectory:
-					break;
-			}
-		}
-	};
-
-	for (QDomElement& d: properties_element)
-	{
-		if (d == "property")
-			parse_property (d);
-		else if (d == "directory")
-		{
-			root_2 = d.attribute ("path");
-			for (QDomElement& e: d)
-				if (e == "property")
-					parse_property (e);
+			QStringList list;
+			for (auto s: unconfigured_values)
+				list << s;
+			throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")).toStdString());
 		}
 	}
-
-	if (!unconfigured_values.empty())
+	catch (Exception& e)
 	{
-		QStringList list;
-		for (auto s: unconfigured_values)
-			list << s;
-		throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")).toStdString());
+		throw Exception ("error when parsing <properties>", &e);
 	}
 }
 

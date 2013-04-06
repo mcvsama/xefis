@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<windows>
-		<window width='500' height='800' disabled='true'>
+		<window width='500' height='800' disabled='false'>
 			<layout type='horizontal'>
 				<item>
 					<module name='generic/property-tree'/>
@@ -26,10 +26,10 @@
 										<property name='altitude-ladder-bold-every' path='/altitude-ladder/bold-every.ft' default='500'/>
 										<property name='altitude-ladder-extent' path='/altitude-ladder/extent.ft' default='825'/>
 										<property name='heading-numbers-visible' path='/adi/heading-numbers-visible' default='true'/>
-										<property name='orientation-roll-limit' path='/orientation/roll-warning.deg' default='35.0'/>
+										<property name='orientation-roll-limit' path='/orientation/roll-warning.deg' default='35 deg'/>
 										<property name='slip-skid-limit' path='/slip-skid/slip-skid-warning.g' default='1.5'/>
 										<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
-										<property name='transition-altitude' path='/transition-altitude.ft' default='14000'/>
+										<property name='transition-altitude' path='/transition-altitude.ft' default='14000 ft'/>
 										<property name='pressure' path='//sensors/pressure/pressure-qnh.inhg'/>
 										<property name='pressure-display-hpa' path='//systems/fms/settings/pressure-display-hpa'/>
 										<property name='standard-pressure' path='//systems/fms/settings/standard-pressure-on'/>
@@ -40,7 +40,6 @@
 										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
 										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
 										<property name='control-hint' path='/control/hint' default=''/>
-										<property name='landing-altitude' path='/altitude/landing-altitude.ft' default='0'/>
 										<property name='novspd-flag' path='/novspd-flag' default='false'/>
 									</directory>
 									<directory path='/systems/fms'>
@@ -98,8 +97,8 @@
 								<properties>
 									<directory path='/instruments/hsi-aux'>
 										<property name='display-mode' path='/display-mode' default='2'/>
-										<property name='range' path='/range.kt' default='2'/>
-										<property name='trend-vector-range' path='/trend-vector-range.kt' default='2'/>
+										<property name='range' path='/range.nm' default='2 nm'/>
+										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
 										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
 									<directory path='/systems/fms'>
@@ -135,8 +134,8 @@
 								<properties>
 									<directory path='/instruments/hsi-nav'>
 										<property name='display-mode' path='/display-mode' default='0'/>
-										<property name='range' path='/range.kt' default='20'/>
-										<property name='trend-vector-range' path='/trend-vector-range.kt' default='2'/>
+										<property name='range' path='/range.nm' default='20 nm'/>
+										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
 										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
 									<directory path='/systems/fms'>

@@ -94,6 +94,24 @@ class State: public Xefis::Module
 		Xefis::PropertyInteger	_property;
 	};
 
+	class ManagedFloat: public ManagedProperty
+	{
+	  public:
+		// Ctor
+		ManagedFloat (QDomElement const& element);
+
+		// From ManagedProperty
+		void
+		process() override;
+
+	  private:
+		QString					_path;
+		double					_min		= 0;
+		double					_max		= 0;
+		double					_default	= 0;
+		Xefis::PropertyFloat	_property;
+	};
+
 	class ManagedString: public ManagedProperty
 	{
 	  public:

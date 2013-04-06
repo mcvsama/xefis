@@ -19,6 +19,9 @@
 #include <cmath>
 #include <limits>
 
+// Boost:
+#include <boost/algorithm/string.hpp>
+
 // Local:
 #include "value.h"
 
@@ -48,11 +51,20 @@ class Angle: public Value<double, Angle>
 	constexpr
 	Angle (Angle const&) = default;
 
+	std::vector<std::string> const&
+	supported_units() const override;
+
 	constexpr ValueType
 	rad() const noexcept;
 
 	constexpr ValueType
 	deg() const noexcept;
+
+	Angle&
+	parse (std::string const&);
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
@@ -60,6 +72,13 @@ inline constexpr
 Angle::Angle (ValueType radians):
 	Value (radians)
 { }
+
+
+inline std::vector<std::string> const&
+Angle::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Angle::ValueType
@@ -73,6 +92,20 @@ inline constexpr Angle::ValueType
 Angle::deg() const noexcept
 {
 	return value() * 180.0 / M_PI;
+}
+
+
+inline Angle&
+Angle::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "deg")
+		*this = p.first * 1_deg;
+	else if (p.second == "rad")
+		*this = p.first * 1_rad;
+
+	return *this;
 }
 
 

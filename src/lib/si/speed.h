@@ -41,7 +41,7 @@ class Speed: public Value<double, Speed>
 	 * To create an Speed use these operators directly.
 	 */
 	explicit constexpr
-	Speed (ValueType radians);
+	Speed (ValueType kt);
 
   public:
 	constexpr
@@ -49,6 +49,9 @@ class Speed: public Value<double, Speed>
 
 	constexpr
 	Speed (Speed const&) = default;
+
+	std::vector<std::string> const&
+	supported_units() const override;
 
 	constexpr ValueType
 	kt() const noexcept;
@@ -58,13 +61,26 @@ class Speed: public Value<double, Speed>
 
 	constexpr ValueType
 	fpm() const noexcept;
+
+	Speed&
+	parse (std::string const&);
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
 inline constexpr
-Speed::Speed (ValueType radians):
-	Value (radians)
+Speed::Speed (ValueType kt):
+	Value (kt)
 { }
+
+
+inline std::vector<std::string> const&
+Speed::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Speed::ValueType
@@ -88,6 +104,20 @@ Speed::fpm() const noexcept
 }
 
 
+inline Speed&
+Speed::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "kt")
+		*this = p.first * 1_kt;
+	else if (p.second == "kph")
+		*this = p.first * 1_kph;
+	else if (p.second == "fpm")
+		*this = p.first * 1_fpm;
+
+	return *this;
+}
 /*
  * Global functions
  */

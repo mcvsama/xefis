@@ -17,9 +17,31 @@
 // Standard:
 #include <cstddef>
 #include <limits>
+#include <string>
+
+// Boost:
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
+// Xefis:
+#include <xefis/config/exception.h>
 
 
 namespace SI {
+
+class UnparsableValue: public Xefis::Exception
+{
+  public:
+	UnparsableValue (std::string const& message);
+};
+
+
+class UnsupportedUnit: public Xefis::Exception
+{
+  public:
+	UnsupportedUnit (std::string const& message);
+};
+
 
 /**
  * Implementer should add constructors from specific value types,
@@ -46,6 +68,12 @@ template<class tValueType, class tDerived>
 		Value (Value const&) noexcept = default;
 
 		/**
+		 * List supported units.
+		 */
+		virtual std::vector<std::string> const&
+		supported_units() const = 0;
+
+		/**
 		 * Access internal representation.
 		 */
 		ValueType&
@@ -56,6 +84,13 @@ template<class tValueType, class tDerived>
 		 */
 		constexpr ValueType const&
 		internal() const noexcept;
+
+		/**
+		 * Parse value from string (eg. 1.0 kt).
+		 * Return *this.
+		 */
+		virtual Derived&
+		parse (std::string const&) = 0;
 
 		/*
 		 * Unary operators
@@ -127,9 +162,25 @@ template<class tValueType, class tDerived>
 		constexpr ValueType
 		value() const noexcept;
 
+	  protected:
+		std::pair<ValueType, std::string>
+		generic_parse (std::string const&) const;
+
 	  private:
 		ValueType _value = ValueType();
 	};
+
+
+inline
+UnparsableValue::UnparsableValue (std::string const& message):
+	Exception (message)
+{ }
+
+
+inline
+UnsupportedUnit::UnsupportedUnit (std::string const& message):
+	Exception (message)
+{ }
 
 
 template<class V, class T>
@@ -308,6 +359,33 @@ template<class V, class T>
 	Value<V, T>::value() const noexcept
 	{
 		return _value;
+	}
+
+
+template<class V, class T>
+	inline std::pair<typename Value<V, T>::ValueType, std::string>
+	Value<V, T>::generic_parse (std::string const& str) const
+	{
+		ValueType result = 0.0;
+		std::string unit;
+
+		int p = str.find_first_of (' ');
+		if (p == -1)
+			throw UnparsableValue (std::string ("error while parsing: ") + str);
+
+		try {
+			result = boost::lexical_cast<ValueType> (str.substr (0, p));
+			unit = boost::to_lower_copy (str.substr (p + 1));
+		}
+		catch (...)
+		{
+			throw UnparsableValue (std::string ("error while parsing: ") + str);
+		}
+
+		if (std::find (supported_units().begin(), supported_units().end(), unit) == supported_units().end())
+			throw UnsupportedUnit (std::string ("error while parsing: ") + str);
+
+		return { result, unit };
 	}
 
 
