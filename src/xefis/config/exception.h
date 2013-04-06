@@ -29,40 +29,67 @@ namespace Xefis {
 class Exception: public std::runtime_error
 {
   public:
-	Exception (std::string const& message, Exception* inner = nullptr);
+	Exception (std::string const& message, Exception const* inner = nullptr);
 
 	virtual ~Exception() noexcept;
 
-	Exception*
-	inner() const;
+	bool
+	has_inner() const noexcept;
+
+	std::string const&
+	message() const;
+
+	std::string const&
+	inner_message() const;
 
 	Backtrace const&
 	backtrace() const;
 
   private:
-	Exception*	_inner = nullptr;
+	bool		_has_inner = false;
+	std::string	_message;
+	std::string	_inner_message;
 	Backtrace	_backtrace;
 };
 
 
 inline
-Exception::Exception (std::string const& message, Exception* inner):
+Exception::Exception (std::string const& message, Exception const* inner):
 	std::runtime_error (message),
-	_inner (inner)
-{ }
+	_message ("Error: " + message)
+{
+	if (inner)
+	{
+		_message += "\n" + inner->message();
+		_inner_message = inner->message();
+		_backtrace = inner->backtrace();
+	}
+}
 
 
 inline
 Exception::~Exception() noexcept
+{ }
+
+
+inline bool
+Exception::has_inner() const noexcept
 {
-	delete _inner;
+	return _has_inner;
 }
 
 
-inline Exception*
-Exception::inner() const
+inline std::string const&
+Exception::message() const
 {
-	return _inner;
+	return _message;
+}
+
+
+inline std::string const&
+Exception::inner_message() const
+{
+	return _inner_message;
 }
 
 
@@ -76,10 +103,8 @@ Exception::backtrace() const
 inline std::ostream&
 operator<< (std::ostream& os, Exception const& e)
 {
-	os << "Error: " << e.what() << std::endl;
+	os << e.message() << std::endl;
 	os << e.backtrace() << std::endl;
-	if (e.inner())
-		os << *e.inner();
 	return os;
 }
 

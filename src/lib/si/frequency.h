@@ -45,6 +45,9 @@ class Frequency: public Value<double, Frequency>
 	constexpr
 	Frequency (Frequency const&) = default;
 
+	std::vector<std::string> const&
+	supported_units() const override;
+
 	constexpr ValueType
 	Hz() const noexcept;
 
@@ -53,6 +56,12 @@ class Frequency: public Value<double, Frequency>
 
 	constexpr ValueType
 	MHz() const noexcept;
+
+	Frequency&
+	parse (std::string const&);
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
@@ -60,6 +69,13 @@ inline constexpr
 Frequency::Frequency (ValueType Hz):
 	Value (Hz)
 { }
+
+
+inline std::vector<std::string> const&
+Frequency::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Frequency::ValueType
@@ -80,6 +96,22 @@ inline constexpr Frequency::ValueType
 Frequency::MHz() const noexcept
 {
 	return value() * 0.000001;
+}
+
+
+inline Frequency&
+Frequency::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "hz")
+		*this = p.first * 1_Hz;
+	else if (p.second == "khz")
+		*this = p.first * 1_kHz;
+	else if (p.second == "MHz")
+		*this = p.first * 1_MHz;
+
+	return *this;
 }
 
 

@@ -56,6 +56,9 @@ class Time: public Value<double, Time>
 	constexpr
 	Time(Time const&) = default;
 
+	std::vector<std::string> const&
+	supported_units() const override;
+
 	constexpr ValueType
 	us() const noexcept;
 
@@ -71,12 +74,18 @@ class Time: public Value<double, Time>
 	constexpr ValueType
 	h() const noexcept;
 
+	Time&
+	parse (std::string const&);
+
   public:
 	static Time
 	now() noexcept;
 
 	static Time
 	epoch() noexcept;
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
@@ -84,6 +93,13 @@ inline constexpr
 Time::Time (ValueType seconds):
 	Value (seconds)
 { }
+
+
+inline std::vector<std::string> const&
+Time::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Time::ValueType
@@ -118,6 +134,26 @@ inline constexpr Time::ValueType
 Time::h() const noexcept
 {
 	return value() / 3600.0;
+}
+
+
+inline Time&
+Time::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "us")
+		*this = p.first * 1_us;
+	else if (p.second == "ms")
+		*this = p.first * 1_ms;
+	else if (p.second == "s")
+		*this = p.first * 1_s;
+	else if (p.second == "min")
+		*this = p.first * 1_min;
+	else if (p.second == "h")
+		*this = p.first * 1_h;
+
+	return *this;
 }
 
 

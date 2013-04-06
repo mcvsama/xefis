@@ -49,6 +49,9 @@ class Pressure: public Value<float, Pressure>
 	constexpr
 	Pressure (Pressure const&) = default;
 
+	std::vector<std::string> const&
+	supported_units() const override;
+
 	constexpr ValueType
 	psi() const noexcept;
 
@@ -57,6 +60,12 @@ class Pressure: public Value<float, Pressure>
 
 	constexpr ValueType
 	inHg() const noexcept;
+
+	Pressure&
+	parse (std::string const&);
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
@@ -64,6 +73,13 @@ inline constexpr
 Pressure::Pressure (ValueType psi):
 	Value (psi)
 { }
+
+
+inline std::vector<std::string> const&
+Pressure::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Pressure::ValueType
@@ -84,6 +100,22 @@ inline constexpr Pressure::ValueType
 Pressure::inHg() const noexcept
 {
 	return value() * 2.036254f;
+}
+
+
+inline Pressure&
+Pressure::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "psi")
+		*this = p.first * 1_psi;
+	else if (p.second == "hpa")
+		*this = p.first * 1_hPa;
+	else if (p.second == "inhg")
+		*this = p.first * 1_inHg;
+
+	return *this;
 }
 
 

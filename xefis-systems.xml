@@ -26,16 +26,16 @@
 			<property path='/systems/fms/settings/pressure-display-hpa' type='boolean'>
 				<default>false</default>
 			</property>
-			<property path='/sensors/engine/n1-setting.pct' type='integer'>
+			<property path='/sensors/engine/n1-setting.pct' type='float'>
 				<default>0</default>
 			</property>
-			<property path='/sensors/engine/n2-setting.pct' type='integer'>
+			<property path='/sensors/engine/n2-setting.pct' type='float'>
 				<default>0</default>
 			</property>
-			<property path='/sensors/gps/lateral-accuracy.nm' type='integer'>
+			<property path='/sensors/gps/lateral-accuracy.nm' type='float'>
 				<default>0</default>
 			</property>
-			<property path='/sensors/gps/vertical-accuracy.ft' type='integer'>
+			<property path='/sensors/gps/vertical-accuracy.ft' type='float'>
 				<default>0</default>
 			</property>
 			<property path='/systems/flight-director/settings/lateral-mode' type='integer'>
@@ -53,11 +53,11 @@
 				<max>1</max>
 				<winding>true</winding>
 			</property>
-			<property path='/instruments/hsi-aux/range.kt' type='integer'>
-				<min>1</min>
-				<max>50</max>
+			<property path='/instruments/hsi-aux/range.nm' type='float'>
+				<min>1 kt</min>
+				<max>50 kt</max>
 			</property>
-			<property path='/instruments/hsi-nav/range.kt' type='integer'>
+			<property path='/instruments/hsi-nav/range.nm' type='float'>
 				<min>1</min>
 				<max>100</max>
 			</property>
@@ -130,20 +130,20 @@
 			<observe var='function-up'>
 				<if var='function-up' equals='true'>
 					<choose>
-						<when path='/instruments/hsi-aux/range.kt' less-or-equals='2'>
-							<sub path='/instruments/hsi-aux/range.kt' value='1'/>
+						<when path='/instruments/hsi-aux/range.nm' less-or-equals='2 nm'>
+							<sub path='/instruments/hsi-aux/range.nm' value='1 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-or-equals='20'>
-							<sub path='/instruments/hsi-aux/range.kt' value='2'/>
+						<when path='/instruments/hsi-aux/range.nm' less-or-equals='20 nm'>
+							<sub path='/instruments/hsi-aux/range.nm' value='2 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-or-equals='60'>
-							<sub path='/instruments/hsi-aux/range.kt' value='10'/>
+						<when path='/instruments/hsi-aux/range.nm' less-or-equals='60 nm'>
+							<sub path='/instruments/hsi-aux/range.nm' value='10 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-or-equals='100'>
-							<sub path='/instruments/hsi-aux/range.kt' value='20'/>
+						<when path='/instruments/hsi-aux/range.nm' less-or-equals='100 nm'>
+							<sub path='/instruments/hsi-aux/range.nm' value='20 nm'/>
 						</when>
 						<otherwise>
-							<sub path='/instruments/hsi-aux/range.kt' value='50'/>
+							<sub path='/instruments/hsi-aux/range.nm' value='50 nm'/>
 						</otherwise>
 					</choose>
 				</if>
@@ -151,20 +151,20 @@
 			<observe var='function-down'>
 				<if var='function-down' equals='true'>
 					<choose>
-						<when path='/instruments/hsi-aux/range.kt' less-than='2'>
-							<add path='/instruments/hsi-aux/range.kt' value='1'/>
+						<when path='/instruments/hsi-aux/range.nm' less-than='2 nm'>
+							<add path='/instruments/hsi-aux/range.nm' value='1 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-than='20'>
-							<add path='/instruments/hsi-aux/range.kt' value='2'/>
+						<when path='/instruments/hsi-aux/range.nm' less-than='20 nm'>
+							<add path='/instruments/hsi-aux/range.nm' value='2 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-than='60'>
-							<add path='/instruments/hsi-aux/range.kt' value='10'/>
+						<when path='/instruments/hsi-aux/range.nm' less-than='60 nm'>
+							<add path='/instruments/hsi-aux/range.nm' value='10 nm'/>
 						</when>
-						<when path='/instruments/hsi-aux/range.kt' less-than='100'>
-							<add path='/instruments/hsi-aux/range.kt' value='20'/>
+						<when path='/instruments/hsi-aux/range.nm' less-than='100 nm'>
+							<add path='/instruments/hsi-aux/range.nm' value='20 nm'/>
 						</when>
 						<otherwise>
-							<add path='/instruments/hsi-aux/range.kt' value='50'/>
+							<add path='/instruments/hsi-aux/range.nm' value='50 nm'/>
 						</otherwise>
 					</choose>
 				</if>
@@ -172,20 +172,20 @@
 			<observe var='mfdselect-up'>
 				<if var='mfdselect-up' equals='true'>
 					<choose>
-						<when path='/instruments/hsi-nav/range.kt' less-or-equals='2'>
-							<sub path='/instruments/hsi-nav/range.kt' value='1'/>
+						<when path='/instruments/hsi-nav/range.nm' less-or-equals='2 nm'>
+							<sub path='/instruments/hsi-nav/range.nm' value='1 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-or-equals='20'>
-							<sub path='/instruments/hsi-nav/range.kt' value='2'/>
+						<when path='/instruments/hsi-nav/range.nm' less-or-equals='20 nm'>
+							<sub path='/instruments/hsi-nav/range.nm' value='2 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-or-equals='60'>
-							<sub path='/instruments/hsi-nav/range.kt' value='10'/>
+						<when path='/instruments/hsi-nav/range.nm' less-or-equals='60 nm'>
+							<sub path='/instruments/hsi-nav/range.nm' value='10 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-or-equals='100'>
-							<sub path='/instruments/hsi-nav/range.kt' value='20'/>
+						<when path='/instruments/hsi-nav/range.nm' less-or-equals='100 nm'>
+							<sub path='/instruments/hsi-nav/range.nm' value='20 nm'/>
 						</when>
 						<otherwise>
-							<sub path='/instruments/hsi-nav/range.kt' value='50'/>
+							<sub path='/instruments/hsi-nav/range.nm' value='50 nm'/>
 						</otherwise>
 					</choose>
 				</if>
@@ -193,27 +193,27 @@
 			<observe var='mfdselect-down'>
 				<if var='mfdselect-down' equals='true'>
 					<choose>
-						<when path='/instruments/hsi-nav/range.kt' less-than='2'>
-							<add path='/instruments/hsi-nav/range.kt' value='1'/>
+						<when path='/instruments/hsi-nav/range.nm' less-than='2 nm'>
+							<add path='/instruments/hsi-nav/range.nm' value='1 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-than='20'>
-							<add path='/instruments/hsi-nav/range.kt' value='2'/>
+						<when path='/instruments/hsi-nav/range.nm' less-than='20 nm'>
+							<add path='/instruments/hsi-nav/range.nm' value='2 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-than='60'>
-							<add path='/instruments/hsi-nav/range.kt' value='10'/>
+						<when path='/instruments/hsi-nav/range.nm' less-than='60 nm'>
+							<add path='/instruments/hsi-nav/range.nm' value='10 nm'/>
 						</when>
-						<when path='/instruments/hsi-nav/range.kt' less-than='100'>
-							<add path='/instruments/hsi-nav/range.kt' value='20'/>
+						<when path='/instruments/hsi-nav/range.nm' less-than='100 nm'>
+							<add path='/instruments/hsi-nav/range.nm' value='20 nm'/>
 						</when>
 						<otherwise>
-							<add path='/instruments/hsi-nav/range.kt' value='50'/>
+							<add path='/instruments/hsi-nav/range.nm' value='50 nm'/>
 						</otherwise>
 					</choose>
 				</if>
 			</observe>
 			<observe var='mfdselect-press'>
 				<if var='mfdselect-press' equals='true'>
-					<add path='/instruments/hsi-nav/display-mode' value='1'/>
+					<add path='/instruments/hsi-nav/display-mode' value='1 nm'/>
 				</if>
 			</observe>
 			<observe var='fd-lateral-mode'>
@@ -252,7 +252,7 @@
 			<smoothing>500</smoothing>
 			<minimum-integration-time>0.03</minimum-integration-time>
 			<properties>
-				<property name='lookahead-time' path='/systems/fms/settings/altitude/amsl-lookahead-duration.s' default='10'/>
+				<property name='lookahead-time' path='/systems/fms/settings/altitude/amsl-lookahead-duration.s' default='10 s'/>
 			</properties>
 		</module>
 		<module name='systems/mouse'>
@@ -274,15 +274,15 @@
 					<property name='enabled' path='/enabled' default='false'/>
 					<property name='lateral-mode' path='/lateral-mode' default='0'/>
 					<property name='vertical-mode' path='/vertical-mode' default='0'/>
-					<property name='selected-magnetic-heading' path='/magnetic-heading-and-track.deg' default='0'/>
-					<property name='selected-magnetic-track' path='/magnetic-heading-and-track.deg' default='0'/>
-					<property name='selected-altitude' path='/altitude.ft' default='0'/>
-					<property name='selected-vertical-speed' path='/vertical-speed.fpm' default='0'/>
-					<property name='selected-fpa' path='/fpa.deg' default='-3'/>
+					<property name='selected-magnetic-heading' path='/magnetic-heading-and-track.deg' default='0 deg'/>
+					<property name='selected-magnetic-track' path='/magnetic-heading-and-track.deg' default='0 deg'/>
+					<property name='selected-altitude' path='/altitude.ft' default='0 ft'/>
+					<property name='selected-vertical-speed' path='/vertical-speed.fpm' default='0 fpm'/>
+					<property name='selected-fpa' path='/fpa.deg' default='-3 deg'/>
 				</directory>
 				<directory path='/systems/flight-director/configuration'>
-					<property name='pitch-limit' path='/pitch-limit.deg' default='7'/>
-					<property name='roll-limit' path='/roll-limit.deg' default='25'/>
+					<property name='pitch-limit' path='/pitch-limit.deg' default='7 deg'/>
+					<property name='roll-limit' path='/roll-limit.deg' default='25 deg'/>
 				</directory>
 				<directory path='/'>
 					<property name='measured-magnetic-heading' path='/sensors/compass/magnetic-heading.deg'/>
@@ -325,8 +325,8 @@
 					<property name='ailerons-maximum' path='/ailerons/maximum' default='+0.5'/>
 					<property name='rudder-minimum' path='/rudder/minimum' default='-1.0'/>
 					<property name='rudder-maximum' path='/rudder/maximum' default='+1.0'/>
-					<property name='pitch-extent' path='/pitch-extent.deg' default='20'/>
-					<property name='roll-extent' path='/roll-extent.deg' default='25'/>
+					<property name='pitch-extent' path='/pitch-extent.deg' default='20 deg'/>
+					<property name='roll-extent' path='/roll-extent.deg' default='25 deg'/>
 				</directory>
 				<directory path='/input'>
 					<property name='input-pitch-axis' path='//input/main/axis/1'/>
@@ -358,30 +358,30 @@
 				<directory path='/settings'>
 					<property name='settings.default-airplane-weight' path='/default-airplane-weight.kg' default='2.0'/>
 					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.kg' default='2.0'/>
-					<property name='settings.low-speed-roll-angle' path='/low-speed-roll-angle.deg' default='15'/>
-					<property name='settings.speed.v-a-default' path='/speeds/v-a-default.kt' default='90'/>
-					<property name='settings.speed.v-no-default' path='/speeds/v-no-default.kt' default='100'/>
-					<property name='settings.speed.v-ne' path='/speeds/v-ne.kt' default='140'/>
-					<property name='settings.speed.v-s' path='/speeds/v-s.kt' default='60'/>
-					<property name='settings.speed.v-s0' path='/speeds/v-s0.kt' default='53'/>
-					<property name='settings.speed.v-at' path='/speeds/v-at.kt' default='69'/>
-					<property name='settings.speed.v-fe' path='/speeds/v-fe.kt' default='90'/>
-					<property name='settings.speed.v-le' path='/speeds/v-le.kt' default='80'/>
-					<property name='settings.speed.v-o' path='/speeds/v-o.kt' default='130'/>
-					<property name='settings.speed.v-be' path='/speeds/v-be.kt' default='65'/>
-					<property name='settings.speed.v-bg' path='/speeds/v-bg.kt' default='65'/>
-					<property name='settings.speed.v-br' path='/speeds/v-br.kt' default='75'/>
+					<property name='settings.low-speed-roll-angle' path='/low-speed-roll-angle.deg' default='15 deg'/>
+					<property name='settings.speed.v-a-default' path='/speeds/v-a-default.kt' default='90 kt'/>
+					<property name='settings.speed.v-no-default' path='/speeds/v-no-default.kt' default='100 kt'/>
+					<property name='settings.speed.v-ne' path='/speeds/v-ne.kt' default='140 kt'/>
+					<property name='settings.speed.v-s' path='/speeds/v-s.kt' default='60 kt'/>
+					<property name='settings.speed.v-s0' path='/speeds/v-s0.kt' default='53 kt'/>
+					<property name='settings.speed.v-at' path='/speeds/v-at.kt' default='69 kt'/>
+					<property name='settings.speed.v-fe' path='/speeds/v-fe.kt' default='90 kt'/>
+					<property name='settings.speed.v-le' path='/speeds/v-le.kt' default='80 kt'/>
+					<property name='settings.speed.v-o' path='/speeds/v-o.kt' default='130 kt'/>
+					<property name='settings.speed.v-be' path='/speeds/v-be.kt' default='65 kt'/>
+					<property name='settings.speed.v-bg' path='/speeds/v-bg.kt' default='65 kt'/>
+					<property name='settings.speed.v-br' path='/speeds/v-br.kt' default='75 kt'/>
 					<property name='settings.flaps-configuration-properties-path' path='/speeds/flaps-configuration-properties-path' default=''/>
 				</directory>
 				<directory path='//sensors'>
 					<property name='imu.pitch' path='/imu/pitch.deg'/>
 					<property name='imu.roll' path='/imu/roll.deg'/>
 					<property name='imu.magnetic-heading' path='/compass/magnetic-heading.deg'/>
-					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy.deg' default='5'/>
+					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy.deg' default='5 deg'/>
 					<property name='gps.longitude' path='/gps/longitude.deg'/>
 					<property name='gps.latitude' path='/gps/latitude.deg'/>
 					<property name='gps.altitude-amsl' path='/gps/altitude-amsl.ft'/>
-					<property name='gps.accuracy' path='/gps/accuracy.nm' default='0.001'/>
+					<property name='gps.accuracy' path='/gps/accuracy.nm' default='0.001 nm'/>
 					<property name='gps.timestamp' path='/gps/update-timestamp.s'/>
 					<property name='ins.longitude' path='/ins/'/>
 					<property name='ins.latitude' path='/ins/'/>
@@ -389,9 +389,9 @@
 					<property name='ins.accuracy' path='/ins/'/>
 					<property name='ins.timestamp' path='/ins/'/>
 					<property name='pressure.static' path='/pressure/pressure.inhg'/>
-					<property name='pressure.qnh' path='/pressure/pressure-qnh.inhg' default='29.92'/>
+					<property name='pressure.qnh' path='/pressure/pressure-qnh.inhg' default='29.92 inhg'/>
 					<property name='ias' path='/speed/ias.kt'/>
-					<property name='backup-amsl' path='/backup-amsl.ft' default='0'/>
+					<property name='backup-amsl' path='/backup-amsl.ft' default='0 ft'/>
 					<property name='gear-down' path='/gear-down' default='false'/>
 					<property name='outside-air-temperature' path='/temperature/outside.k'/>
 				</directory>

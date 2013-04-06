@@ -53,6 +53,9 @@ class Length: public Value<double, Length>
 	constexpr
 	Length (Length const&) = default;
 
+	std::vector<std::string> const&
+	supported_units() const override;
+
 	constexpr ValueType
 	m() const noexcept;
 
@@ -67,6 +70,12 @@ class Length: public Value<double, Length>
 
 	constexpr ValueType
 	mil() const noexcept;
+
+	Length&
+	parse (std::string const&);
+
+  private:
+	static std::vector<std::string> _supported_units;
 };
 
 
@@ -74,6 +83,13 @@ inline constexpr
 Length::Length (ValueType m):
 	Value (m)
 { }
+
+
+inline std::vector<std::string> const&
+Length::supported_units() const
+{
+	return _supported_units;
+}
 
 
 inline constexpr Length::ValueType
@@ -108,6 +124,26 @@ inline constexpr Length::ValueType
 Length::mil() const noexcept
 {
 	return value() * 0.0006213711;
+}
+
+
+inline Length&
+Length::parse (std::string const& str)
+{
+	auto p = generic_parse (str);
+
+	if (p.second == "m")
+		*this = p.first * 1_m;
+	else if (p.second == "km")
+		*this = p.first * 1_km;
+	else if (p.second == "ft")
+		*this = p.first * 1_ft;
+	else if (p.second == "nm")
+		*this = p.first * 1_nm;
+	else if (p.second == "mil")
+		*this = p.first * 1_mil;
+
+	return *this;
 }
 
 

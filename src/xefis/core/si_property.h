@@ -54,8 +54,16 @@ template<class siType>
 		write_signalling (SIType const&);
 
 		// Overridden from PropertyFloat
-		bool
-		is_specialized() const;
+		virtual bool
+		is_specialized() const noexcept override;
+
+		// Overridden from PropertyFloat
+		virtual std::string
+		stringify() const override;
+
+		// Overridden from PropertyFloat
+		virtual void
+		parse (std::string const&) override;
 
 	  private:
 		/*
@@ -158,25 +166,105 @@ template<class T>
 
 template<class T>
 	inline bool
-	SIProperty<T>::is_specialized() const
+	SIProperty<T>::is_specialized() const noexcept
 	{
 		return true;
 	}
 
 
-template<class T>
+template<>
 	inline std::string
-	stringify() const
+	SIProperty<Angle>::stringify() const
 	{
-		...
+		return boost::lexical_cast<std::string> (read (Angle()).deg()) + " deg";
 	}
 
 
-template<class T>
-	inline void
-	parse (std::string const&)
+template<>
+	inline std::string
+	SIProperty<Frequency>::stringify() const
 	{
-		...
+		return boost::lexical_cast<std::string> (read (Frequency()).Hz()) + " Hz";
+	}
+
+
+template<>
+	inline std::string
+	SIProperty<Length>::stringify() const
+	{
+		return boost::lexical_cast<std::string> (read (Length()).ft()) + " ft";
+	}
+
+
+template<>
+	inline std::string
+	SIProperty<Pressure>::stringify() const
+	{
+		return boost::lexical_cast<std::string> (read (Pressure()).inHg()) + " inHg";
+	}
+
+
+template<>
+	inline std::string
+	SIProperty<Speed>::stringify() const
+	{
+		return boost::lexical_cast<std::string> (read (Speed()).kt()) + " kt";
+	}
+
+
+template<>
+	inline std::string
+	SIProperty<Time>::stringify() const
+	{
+		return boost::lexical_cast<std::string> (read (Time()).s()) + " s";
+	}
+
+
+template<>
+	inline void
+	SIProperty<Angle>::parse (std::string const& str)
+	{
+		write (Angle().parse (str));
+	}
+
+
+template<>
+	inline void
+	SIProperty<Frequency>::parse (std::string const& str)
+	{
+		write (Frequency().parse (str));
+	}
+
+
+template<>
+	inline void
+	SIProperty<Length>::parse (std::string const& str)
+	{
+		write (Length().parse (str));
+	}
+
+
+template<>
+	inline void
+	SIProperty<Pressure>::parse (std::string const& str)
+	{
+		write (Pressure().parse (str));
+	}
+
+
+template<>
+	inline void
+	SIProperty<Speed>::parse (std::string const& str)
+	{
+		write (Speed().parse (str));
+	}
+
+
+template<>
+	inline void
+	SIProperty<Time>::parse (std::string const& str)
+	{
+		write (Time().parse (str));
 	}
 
 

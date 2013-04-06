@@ -108,35 +108,40 @@ ModuleManager::data_updated (Timestamp timestamp)
 Module*
 ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
 {
-	if (name == "instruments/efis")
-		return new EFIS (this, config, parent);
-	else if (name == "instruments/hsi")
-		return new HSI (this, config, parent);
-	else if (name == "instruments/radial-indicator")
-		return new RadialIndicator (this, config, parent);
-	else if (name == "systems/lookahead")
-		return new Lookahead (this, config);
-	else if (name == "systems/mouse")
-		return new Mouse (this, config);
-	else if (name == "systems/flight-director")
-		return new FlightDirector (this, config);
-	else if (name == "systems/fly-by-wire")
-		return new FlyByWire (this, config);
-	else if (name == "systems/fms")
-		return new FlightManagementSystem (this, config);
-	else if (name == "systems/state")
-		return new State (this, config);
-	else if (name == "generic/property-tree")
-		return new PropertyTree (this, config, parent);
-	else if (name == "generic/fps")
-		return new FPS (this, config);
-	else if (name == "io/flightgear")
-		return new FlightGearIO (this, config);
-	else if (name == "io/joystick")
-		return new JoystickInput (this, config);
-	else
-		throw ModuleNotFoundException ("module not found: " + name.toStdString());
-
+	try {
+		if (name == "instruments/efis")
+			return new EFIS (this, config, parent);
+		else if (name == "instruments/hsi")
+			return new HSI (this, config, parent);
+		else if (name == "instruments/radial-indicator")
+			return new RadialIndicator (this, config, parent);
+		else if (name == "systems/lookahead")
+			return new Lookahead (this, config);
+		else if (name == "systems/mouse")
+			return new Mouse (this, config);
+		else if (name == "systems/flight-director")
+			return new FlightDirector (this, config);
+		else if (name == "systems/fly-by-wire")
+			return new FlyByWire (this, config);
+		else if (name == "systems/fms")
+			return new FlightManagementSystem (this, config);
+		else if (name == "systems/state")
+			return new State (this, config);
+		else if (name == "generic/property-tree")
+			return new PropertyTree (this, config, parent);
+		else if (name == "generic/fps")
+			return new FPS (this, config);
+		else if (name == "io/flightgear")
+			return new FlightGearIO (this, config);
+		else if (name == "io/joystick")
+			return new JoystickInput (this, config);
+		else
+			throw ModuleNotFoundException ("module not found: " + name.toStdString());
+	}
+	catch (Exception& e)
+	{
+		throw Exception ("error when loading module "_str + name.toStdString(), &e);
+	}
 }
 
 } // namespace Xefis

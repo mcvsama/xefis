@@ -43,6 +43,8 @@ State::ManagedBoolean::ManagedBoolean (QDomElement const& element)
 			_default = e.text() == "true";
 			_property.write (_default);
 		}
+		else
+			throw Xefis::Exception (QString ("property '%1': unsupported element <%2>").arg (_path).arg (e.tagName()).toStdString());
 	}
 
 	process();
@@ -81,6 +83,8 @@ State::ManagedInteger::ManagedInteger (QDomElement const& element)
 		}
 		else if (e == "winding")
 			_winding = e.text() == "true";
+		else
+			throw Xefis::Exception (QString ("property '%1': unsupported element <%2>").arg (_path).arg (e.tagName()).toStdString());
 	}
 
 	if (_min > _max)
@@ -111,6 +115,54 @@ State::ManagedInteger::process()
 }
 
 
+State::ManagedFloat::ManagedFloat (QDomElement const& element)
+{
+	if (!element.hasAttribute ("path"))
+		throw Xefis::Exception ("property element needs @path attribute");
+
+	_path = element.attribute ("path");
+	_property = Xefis::PropertyFloat (_path.toStdString());
+
+	for (QDomElement const& e: element)
+	{
+		if (e == "min")
+			_min = e.text().toInt();
+		else if (e == "max")
+			_max = e.text().toInt();
+		else if (e == "default")
+		{
+			_default = e.text().toInt();
+			_property.write (_default);
+		}
+		else
+			throw Xefis::Exception (QString ("property '%1': unsupported element <%2>").arg (_path).arg (e.tagName()).toStdString());
+	}
+
+	if (_min > _max)
+		throw Xefis::Exception (QString ("property '%1' min (%2) is greated than max (%3)").arg (_path).arg (_max).arg (_min).toStdString());
+
+	process();
+}
+
+
+void
+State::ManagedFloat::process()
+{
+	if (_property.is_singular())
+		return;
+
+	if (_property.is_nil())
+		_property.write (_default);
+
+	Xefis::PropertyFloat::Type value = _property.read();
+
+	value = limit (value, _min, _max);
+
+	if (value != _property.read())
+		_property.write (value);
+}
+
+
 State::ManagedString::ManagedString (QDomElement const& element)
 {
 	if (!element.hasAttribute ("path"))
@@ -126,6 +178,8 @@ State::ManagedString::ManagedString (QDomElement const& element)
 			_default = e.text();
 			_property.write (_default.toStdString());
 		}
+		else
+			throw Xefis::Exception (QString ("property '%1': unsupported element <%2>").arg (_path).arg (e.tagName()).toStdString());
 	}
 
 	process();
@@ -509,6 +563,8 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				_managed_properties.insert (new ManagedBoolean (e));
 			else if (e.attribute ("type") == "integer")
 				_managed_properties.insert (new ManagedInteger (e));
+			else if (e.attribute ("type") == "float")
+				_managed_properties.insert (new ManagedFloat (e));
 			else if (e.attribute ("type") == "string")
 				_managed_properties.insert (new ManagedString (e));
 		}
