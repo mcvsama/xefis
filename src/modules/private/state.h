@@ -86,12 +86,12 @@ class State: public Xefis::Module
 		process() override;
 
 	  private:
-		QString					_path;
-		int						_min		= 0;
-		int						_max		= 0;
-		int						_default	= 0;
-		bool					_winding	= false;
-		Xefis::PropertyInteger	_property;
+		QString							_path;
+		Xefis::PropertyInteger::Type	_min		= 0;
+		Xefis::PropertyInteger::Type	_max		= 0;
+		Xefis::PropertyInteger::Type	_default	= 0;
+		bool							_winding	= false;
+		Xefis::PropertyInteger			_property;
 	};
 
 	class ManagedFloat: public ManagedProperty
@@ -105,12 +105,33 @@ class State: public Xefis::Module
 		process() override;
 
 	  private:
-		QString					_path;
-		double					_min		= 0;
-		double					_max		= 0;
-		double					_default	= 0;
-		Xefis::PropertyFloat	_property;
+		QString						_path;
+		Xefis::PropertyFloat::Type	_min		= 0;
+		Xefis::PropertyFloat::Type	_max		= 0;
+		Xefis::PropertyFloat::Type	_default	= 0;
+		Xefis::PropertyFloat		_property;
 	};
+
+	template<class tSIProperty>
+		class ManagedSIProperty: public ManagedProperty
+		{
+			typedef tSIProperty SIProperty;
+
+		  public:
+			// Ctor
+			ManagedSIProperty (QDomElement const& element);
+
+			// From ManagedProperty
+			void
+			process() override;
+
+		  private:
+			QString						_path;
+			typename SIProperty::Type	_min;
+			typename SIProperty::Type	_max;
+			typename SIProperty::Type	_default;
+			SIProperty					_property;
+		};
 
 	class ManagedString: public ManagedProperty
 	{

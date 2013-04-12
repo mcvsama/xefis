@@ -69,59 +69,36 @@ PropertyTreeWidget::read()
 void
 PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 {
-	if (node->type() != PropDirectory)
+	BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+
+	if (val_node)
+		item->setData (1, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (val_node->stringify()));
+	else
 	{
-		QString value;
-		QString suffix;
-		switch (node->type())
+		PropertyDirectoryNode* dir_node = dynamic_cast<PropertyDirectoryNode*> (node);
+
+		if (dir_node)
 		{
-			case PropBoolean:
-				value = node->read<bool>() ? "true" : "false";
-				suffix = " [bool]";
-				break;
-			case PropInteger:
-				value = QString ("%1").arg (node->read<int>());
-				suffix = " [integer]";
-				break;
-			case PropFloat:
-				value = QString ("%1").arg (node->read<float>(), 0, 'f', 15);
-				suffix = " [float]";
-				break;
-			case PropString:
-				value = "\"" + value + "\"";
-				suffix = " [string]";
-				break;
-			default:
-				suffix = "";
-		}
-		if (node->is_nil())
-			suffix += "[nil]";
-		item->setData (1, Qt::DisplayRole, value + suffix);
-	}
+			PropertyNodeList subnodes_list = dir_node->children();
+			std::set<PropertyNode*> subnodes (subnodes_list.begin(), subnodes_list.end());
 
-	// Now recurse into descendants.
-
-	if (node->type() == PropDirectory)
-	{
-		PropertyNodeList subnodes_list = node->children();
-		std::set<PropertyNode*> subnodes (subnodes_list.begin(), subnodes_list.end());
-
-		for (int ci = 0; ci < item->childCount(); ++ci)
-		{
-			PropertyTreeWidgetItem* c = convert_item (item->child (ci));
-			auto s = subnodes.find (c->node());
-
-			if (s != subnodes.end())
+			for (int ci = 0; ci < item->childCount(); ++ci)
 			{
-				c->read();
-				subnodes.erase (s);
-			}
-			else
-				delete item->takeChild (ci--);
-		}
+				PropertyTreeWidgetItem* c = convert_item (item->child (ci));
+				auto s = subnodes.find (c->node());
 
-		for (auto s: subnodes)
-			item->addChild (new PropertyTreeWidgetItem (s, item));
+				if (s != subnodes.end())
+				{
+					c->read();
+					subnodes.erase (s);
+				}
+				else
+					delete item->takeChild (ci--);
+			}
+
+			for (auto s: subnodes)
+				item->addChild (new PropertyTreeWidgetItem (s, item));
+		}
 	}
 }
 

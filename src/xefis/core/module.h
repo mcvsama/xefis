@@ -24,9 +24,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/application/application.h>
-#include <xefis/core/property_union.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/property.h>
 
 
 namespace Xefis {
@@ -37,7 +37,7 @@ class Module
 	struct NameAndProperty
 	{
 		QString			name;
-		PropertyUnion	property;
+		BaseProperty&	property;
 		bool			required;
 	};
 
@@ -58,10 +58,10 @@ class Module
 	data_updated();
 
 	/**
-	 * Return last update timestamp.
+	 * Return last update time.
 	 */
-	Timestamp
-	update_timestamp() const;
+	Time
+	update_time() const;
 
 	/**
 	 * Return time difference between last and previous update.
@@ -110,10 +110,10 @@ Module::data_updated()
 { }
 
 
-inline Timestamp
-Module::update_timestamp() const
+inline Time
+Module::update_time() const
 {
-	return _module_manager->update_timestamp();
+	return _module_manager->update_time();
 }
 
 

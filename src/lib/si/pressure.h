@@ -64,6 +64,9 @@ class Pressure: public Value<float, Pressure>
 	Pressure&
 	parse (std::string const&);
 
+	std::string
+	stringify() const;
+
   private:
 	static std::vector<std::string> _supported_units;
 };
@@ -116,6 +119,13 @@ Pressure::parse (std::string const& str)
 		*this = p.first * 1_inHg;
 
 	return *this;
+}
+
+
+inline std::string
+Pressure::stringify() const
+{
+	return boost::lexical_cast<std::string> (inHg()) + " inHg";
 }
 
 

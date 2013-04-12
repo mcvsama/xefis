@@ -65,6 +65,9 @@ class Speed: public Value<double, Speed>
 	Speed&
 	parse (std::string const&);
 
+	std::string
+	stringify() const;
+
   private:
 	static std::vector<std::string> _supported_units;
 };
@@ -118,6 +121,15 @@ Speed::parse (std::string const& str)
 
 	return *this;
 }
+
+
+inline std::string
+Speed::stringify() const
+{
+	return boost::lexical_cast<std::string> (kt()) + " kt";
+}
+
+
 /*
  * Global functions
  */

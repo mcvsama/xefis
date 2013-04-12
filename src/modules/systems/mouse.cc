@@ -68,15 +68,22 @@ Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 Mouse::check()
 {
-	// Mouse move:
-	float const dx = remove_dead_zone (_axis_x.read (0), _dead_zone_x);
-	float const dy = remove_dead_zone (_axis_y.read (0), _dead_zone_y);
-	QPoint pos (QCursor::pos());
-	QCursor::setPos (pos.x() + _speed_x * sgn (dx) * std::pow (dx, _acceleration_x),
-					 pos.y() + _speed_y * sgn (dy) * std::pow (dy, _acceleration_y));
+	try {
+		// Mouse move:
+		float const dx = remove_dead_zone (_axis_x.read (0), _dead_zone_x);
+		float const dy = remove_dead_zone (_axis_y.read (0), _dead_zone_y);
+		QPoint pos (QCursor::pos());
+		QCursor::setPos (pos.x() + _speed_x * sgn (dx) * std::pow (dx, _acceleration_x),
+						 pos.y() + _speed_y * sgn (dy) * std::pow (dy, _acceleration_y));
 
-	// Mouse press:
-	// Unimplementable as QApplication::widgetAt() is broken now in Qt 5.0.
+		// Mouse press:
+		// Unimplementable as QApplication::widgetAt() is broken now in Qt 5.0.
+	}
+	catch (Xefis::Exception const& e)
+	{
+		std::cerr << "Exception when processing mouse position update." << std::endl;
+		std::cerr << e << std::endl;
+	}
 }
 
 

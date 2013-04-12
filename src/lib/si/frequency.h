@@ -60,6 +60,9 @@ class Frequency: public Value<double, Frequency>
 	Frequency&
 	parse (std::string const&);
 
+	std::string
+	stringify() const;
+
   private:
 	static std::vector<std::string> _supported_units;
 };
@@ -112,6 +115,13 @@ Frequency::parse (std::string const& str)
 		*this = p.first * 1_MHz;
 
 	return *this;
+}
+
+
+inline std::string
+Frequency::stringify() const
+{
+	return boost::lexical_cast<std::string> (kHz()) + " kHz";
 }
 
 

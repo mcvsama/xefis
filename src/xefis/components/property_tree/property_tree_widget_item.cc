@@ -64,8 +64,8 @@ PropertyTreeWidgetItem::operator< (QTreeWidgetItem const& that_item) const
 
 	if (that)
 	{
-		bool const this_is_dir = this->_node->type() == PropDirectory;
-		bool const that_is_dir = that->_node->type() == PropDirectory;
+		bool const this_is_dir = !!dynamic_cast<PropertyDirectoryNode*> (this->_node);
+		bool const that_is_dir = !!dynamic_cast<PropertyDirectoryNode*> (that->_node);
 
 		if (this_is_dir != that_is_dir)
 			return this_is_dir;
@@ -88,11 +88,11 @@ PropertyTreeWidgetItem::convert_item (QTreeWidgetItem* item)
 void
 PropertyTreeWidgetItem::setup_appereance()
 {
-	if (_node->type() == PropDirectory)
+	if (dynamic_cast<PropertyDirectoryNode*> (_node))
 		setIcon (0, Resources::Icons16::property_dir());
 	else
 		setIcon (0, Resources::Icons16::property_value());
-	setFirstColumnSpanned (_node->type() == PropDirectory);
+	setFirstColumnSpanned (!!dynamic_cast<PropertyDirectoryNode*> (_node));
 	QSize s = sizeHint (0);
 	s.setHeight (Services::default_font_size (treeWidget()->physicalDpiY()));
 	setSizeHint (0, s);

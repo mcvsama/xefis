@@ -36,7 +36,7 @@ void
 Module::parse_properties (QDomElement const& properties_element, PropertiesList list)
 {
 	try {
-		std::map<QString, PropertyUnion*> map;
+		std::map<QString, BaseProperty*> map;
 		std::set<QString> unconfigured_values;
 
 		for (NameAndProperty& pair: list)
@@ -66,53 +66,17 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 			if (e.hasAttribute ("path"))
 			{
 				std::string path = (root + root_2 + e.attribute ("path")).toStdString();
-				switch (it->second->type())
-				{
-					case PropBoolean:
-						it->second->access_bool() = Xefis::PropertyBoolean (path);
-						break;
-					case PropInteger:
-						it->second->access_int() = Xefis::PropertyInteger (path);
-						break;
-					case PropFloat:
-						it->second->access_float() = Xefis::PropertyFloat (path);
-						break;
-					case PropString:
-						it->second->access_string() = Xefis::PropertyString (path);
-						break;
-					case PropDirectory:
-						break;
-				}
+				it->second->set_path (path);
 			}
 			else
 				throw Exception (QString ("missing parameter @path for property: %1").arg (name).toStdString());
 
 			if (!e.hasAttribute ("default"))
-			{
-				// Ensure property exists:
-				if (it->second->access().is_nil())
-					it->second->access().set_nil();
-			}
+				it->second->ensure_existence();
 			else
 			{
 				QString value = e.attribute ("default");
-				switch (it->second->type())
-				{
-					case PropBoolean:
-						it->second->access_bool().write (value == "true");
-						break;
-					case PropInteger:
-						it->second->access_int().write (value.toInt());
-						break;
-					case PropFloat:
-						it->second->access_float().parse (value.toStdString());
-						break;
-					case PropString:
-						it->second->access_string().write (value.toStdString());
-						break;
-					case PropDirectory:
-						break;
-				}
+				it->second->parse (value.toStdString());
 			}
 		};
 

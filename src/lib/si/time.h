@@ -77,6 +77,9 @@ class Time: public Value<double, Time>
 	Time&
 	parse (std::string const&);
 
+	std::string
+	stringify() const;
+
   public:
 	static Time
 	now() noexcept;
@@ -154,6 +157,13 @@ Time::parse (std::string const& str)
 		*this = p.first * 1_h;
 
 	return *this;
+}
+
+
+inline std::string
+Time::stringify() const
+{
+	return boost::lexical_cast<std::string> (s()) + " s";
 }
 
 

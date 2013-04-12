@@ -36,7 +36,7 @@ namespace Xefis {
 class PropertyNotFound: public Exception
 {
   public:
-	PropertyNotFound (const char* message);
+	PropertyNotFound (std::string const& message);
 };
 
 
@@ -47,7 +47,18 @@ class PropertyNotFound: public Exception
 class SingularProperty: public Exception
 {
   public:
-	SingularProperty (const char* message);
+	SingularProperty (std::string const& message);
+};
+
+
+/**
+ * Indicates that the operation is invalid on certain
+ * node type.
+ */
+class InvalidOperation: public Exception
+{
+  public:
+	InvalidOperation (std::string const& message);
 };
 
 
@@ -59,7 +70,10 @@ class BaseProperty
 	BaseProperty& operator= (BaseProperty const&) = default;
 
 	// Ctor
-	BaseProperty (PropertyNode* root, std::string path);
+	BaseProperty (PropertyDirectoryNode* root, std::string path);
+
+	// Dtor
+	virtual ~BaseProperty();
 
   public:
 	/**
@@ -94,10 +108,30 @@ class BaseProperty
 	path() const noexcept;
 
 	/**
-	 * Return actual property type.
+	 * Point this property to another PropertyNode.
 	 */
-	PropertyType
-	real_type() const noexcept;
+	void
+	set_path (std::string const&);
+
+	/**
+	 * Ensures that this property exists.
+	 */
+	void
+	ensure_existence();
+
+	/**
+	 * Return humanized value (eg. value with unit).
+	 * Default implementation uses read<string>().
+	 */
+	virtual std::string
+	stringify() const = 0;
+
+	/**
+	 * Set value from humanized string (eg. "10 kt").
+	 * Default implementation uses write().
+	 */
+	virtual void
+	parse (std::string const&) = 0;
 
   protected:
 	/**
@@ -116,7 +150,7 @@ class BaseProperty
 	normalized_path (std::string path);
 
   protected:
-	PropertyNode*			_root = nullptr;
+	PropertyDirectoryNode*	_root = nullptr;
 	mutable PropertyNode*	_node = nullptr;
 	std::string				_path;
 };
@@ -130,13 +164,14 @@ template<class tType>
 	class Property: public BaseProperty
 	{
 	  public:
-		typedef tType Type;
+		typedef tType					Type;
+		typedef PropertyValueNode<Type>	ValueNodeType;
 
 	  public:
 		/**
-		 * Create a singular property, that can't be read or written.
+		 * Create a property with singular path.
 		 */
-		Property() = default;
+		Property();
 
 		/**
 		 * Copy from other property.
@@ -160,10 +195,7 @@ template<class tType>
 		 * Create a Property that belongs to a PropertyStorage
 		 * bound to given path.
 		 */
-		Property (PropertyNode* root, std::string const& path);
-
-		// Dtor
-		virtual ~Property() { }
+		Property (PropertyDirectoryNode* root, std::string const& path);
 
 		/**
 		 * Copy from other property.
@@ -208,53 +240,67 @@ template<class tType>
 		void
 		copy (Property const& other);
 
-		/**
-		 * Return true if property holds specialized value, and should be
-		 * interfaced by stringify() to humans.
-		 */
-		virtual bool
-		is_specialized() const noexcept;
+		// BaseProperty API
+		std::string
+		stringify() const override;
+
+		// BaseProperty API
+		void
+		parse (std::string const&) override;
 
 		/**
-		 * Return humanized value (eg. value with unit).
-		 * Default implementation uses read<string>().
+		 * Return node casted to PropertyValueNode.
+		 * If unable to cast, throw InvalidOperation.
+		 * If property node doesn't exist, return nullptr.
 		 */
-		virtual std::string
-		stringify() const;
+		ValueNodeType*
+		get_value_node() const;
 
 		/**
-		 * Set value from humanized string (eg. "10 kt").
-		 * Default implementation uses write().
+		 * Return node casted to PropertyValueNode.
+		 * If unable to cast, throw InvalidOperation.
+		 * If property node doesn't exist, throw PropertyNotFound.
 		 */
-		virtual void
-		parse (std::string const&);
+		ValueNodeType*
+		get_value_node_signalling() const;
 
-	  protected:
+	  private:
 		/**
 		 * Ensure that the property exists in the tree.
 		 */
 		template<class V>
-			PropertyNode*
+			ValueNodeType*
 			ensure_path (std::string const& path, V value);
 	};
 
 
 inline
-PropertyNotFound::PropertyNotFound (const char* message):
+PropertyNotFound::PropertyNotFound (std::string const& message):
 	Exception (message)
 { }
 
 
 inline
-SingularProperty::SingularProperty (const char* message):
+SingularProperty::SingularProperty (std::string const& message):
 	Exception (message)
 { }
 
 
 inline
-BaseProperty::BaseProperty (PropertyNode* root, std::string path):
+InvalidOperation::InvalidOperation (std::string const& message):
+	Exception (message)
+{ }
+
+
+inline
+BaseProperty::BaseProperty (PropertyDirectoryNode* root, std::string path):
 	_root (root),
 	_path (normalized_path (path))
+{ }
+
+
+inline
+BaseProperty::~BaseProperty()
 { }
 
 
@@ -275,11 +321,18 @@ BaseProperty::is_nil() const
 	{
 		PropertyNode* node = get_node();
 		if (node)
-			return node->is_nil();
-		return true;
+		{
+			BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+			if (val_node)
+				return val_node->is_nil();
+			else
+				throw InvalidOperation ("can't check if directory node is nil: " + _path);
+		}
+		else
+			return true;
 	}
 	else
-		throw SingularProperty ("can't read from a singular property");
+		throw SingularProperty ("can't read from a singular property: " + _path);
 }
 
 
@@ -290,10 +343,16 @@ BaseProperty::set_nil()
 	{
 		PropertyNode* node = get_node();
 		if (node)
-			node->set_nil();
+		{
+			BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+			if (val_node)
+				val_node->set_nil();
+			else
+				throw InvalidOperation ("can't set directory node to nil: " + _path);
+		}
 	}
 	else
-		throw SingularProperty ("can't write to a singular property");
+		throw SingularProperty ("can't write to a singular property: " + _path);
 }
 
 
@@ -318,25 +377,27 @@ BaseProperty::path() const noexcept
 }
 
 
-inline PropertyType
-BaseProperty::real_type() const noexcept
+inline void
+BaseProperty::set_path (std::string const& new_path)
 {
-	if (_root)
-	{
-		PropertyNode* node = get_node();
-		if (node)
-			return node->type();
-		throw PropertyNotFound ("can't check real type of nonexistent property");
-	}
-	else
-		throw SingularProperty ("can't check type of a singular property");
+	_path = normalized_path (new_path);
+	// The node will be localized again, when it's needed:
+	_node = nullptr;
+}
+
+
+inline void
+BaseProperty::ensure_existence()
+{
+	if (is_nil())
+		set_nil();
 }
 
 
 inline PropertyNode*
 BaseProperty::get_node() const
 {
-	if (_root)
+	if (_root && !_path.empty())
 	{
 		if (_node && _node->path() == _path)
 			return _node;
@@ -347,6 +408,13 @@ BaseProperty::get_node() const
 	else
 		return nullptr;
 }
+
+
+template<class T>
+	inline
+	Property<T>::Property():
+		Property ("")
+	{ }
 
 
 template<class T>
@@ -366,16 +434,16 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (std::string const& path):
-		BaseProperty (PropertyStorage::default_storage()->root(), path)
+		Property (PropertyStorage::default_storage()->root(), path)
 	{
 		if (!_root)
-			throw SingularProperty ("PropertyStorage is not initialized, can't construct Property with default storage");
+			throw SingularProperty ("PropertyStorage is not initialized, can't construct Property with default storage: " + _path);
 	}
 
 
 template<class T>
 	inline
-	Property<T>::Property (PropertyNode* node, std::string const& path):
+	Property<T>::Property (PropertyDirectoryNode* node, std::string const& path):
 		BaseProperty (node->root(), path)
 	{ }
 
@@ -396,9 +464,11 @@ template<class T>
 	{
 		if (_root)
 		{
-			PropertyNode* node = get_node();
-			if (node)
-				return node->read<T> (default_value);
+			ValueNodeType* node = get_value_node();
+			if (!node)
+				return default_value;
+			else
+				return node->read (default_value);
 		}
 		return default_value;
 	}
@@ -410,14 +480,9 @@ template<class T>
 	Property<T>::read_signalling() const
 	{
 		if (_root)
-		{
-			PropertyNode* node = get_node();
-			if (node)
-				return node->read<T>();
-			throw PropertyNotFound ("could not find property by path");
-		}
+			get_value_node_signalling()->read();
 		else
-			throw SingularProperty ("can't read from a singular property");
+			throw SingularProperty ("can't read from a singular property: " + _path);
 	}
 
 
@@ -436,14 +501,19 @@ template<class T>
 	{
 		if (_root)
 		{
-			PropertyNode* node = get_node();
-			if (node)
-				node->write<Type> (value);
-			else
-				ensure_path (_path, value);
+			if (!_path.empty())
+			{
+				try {
+					get_value_node_signalling()->write (value);
+				}
+				catch (PropertyNotFound)
+				{
+					ensure_path (_path, value);
+				}
+			}
 		}
 		else
-			throw SingularProperty ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property: " + _path);
 	}
 
 
@@ -452,15 +522,9 @@ template<class T>
 	Property<T>::write_signalling (Type const& value)
 	{
 		if (_root)
-		{
-			PropertyNode* node = get_node();
-			if (node)
-				node->write<Type> (value);
-			else
-				throw PropertyNotFound ("could not find property by path");
-		}
+			get_value_node_signalling()->write (value);
 		else
-			throw SingularProperty ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property: " + _path);
 	}
 
 
@@ -471,27 +535,6 @@ template<class T>
 		write (other.read());
 		if (other.is_nil())
 			set_nil();
-		if (_root)
-		{
-			// Write the value to ensure that proper tree path
-			// is created.
-			PropertyNode* node = get_node();
-			if (!node)
-				node = ensure_path (_path, Type());
-			PropertyNode* source = other.get_node();
-			if (node && source)
-				node->copy (*source);
-		}
-		else
-			throw SingularProperty ("can't copy to a singular property");
-	}
-
-
-template<class T>
-	inline bool
-	Property<T>::is_specialized() const noexcept
-	{
-		return false;
 	}
 
 
@@ -500,11 +543,7 @@ template<class T>
 	Property<T>::stringify() const
 	{
 		if (_root)
-		{
-			PropertyNode* node = get_node();
-			if (node)
-				return node->read<std::string> ("");
-		}
+			return get_value_node_signalling()->stringify();
 		return "";
 	}
 
@@ -515,30 +554,68 @@ template<class T>
 	{
 		if (_root)
 		{
-			PropertyNode* node = get_node();
-			if (node)
-				node->write<std::string> (value);
-			else
-				ensure_path (_path, value);
+			if (!_path.empty())
+			{
+				try {
+					get_value_node_signalling()->parse (value);
+				}
+				catch (PropertyNotFound)
+				{
+					ValueNodeType* val_node = ensure_path (_path, Type());
+					val_node->parse (value);
+				}
+			}
 		}
 		else
-			throw SingularProperty ("can't write to a singular property");
+			throw SingularProperty ("can't write to a singular property: " + _path);
+	}
+
+
+template<class T>
+	inline typename Property<T>::ValueNodeType*
+	Property<T>::get_value_node() const
+	{
+		PropertyNode* node = get_node();
+		if (node)
+		{
+			ValueNodeType* val_node = dynamic_cast<ValueNodeType*> (node);
+			if (val_node)
+				return val_node;
+			else
+				throw InvalidOperation ("incompatible type: " + _path);
+		}
+		else
+			return nullptr;
+	}
+
+
+template<class T>
+	inline typename Property<T>::ValueNodeType*
+	Property<T>::get_value_node_signalling() const
+	{
+		ValueNodeType* val_node = get_value_node();
+		if (val_node)
+			return val_node;
+		else
+			throw PropertyNotFound ("could not find property by path: " + _path);
 	}
 
 
 template<class T>
 	template<class V>
-		inline PropertyNode*
+		inline typename Property<T>::ValueNodeType*
 		Property<T>::ensure_path (std::string const& path, V value)
 		{
 			std::string::size_type s = path.find_last_of ('/');
 			std::string dir = path.substr (0, s);
 			std::string pro = path.substr (s + 1);
 
-			PropertyNode* parent = _root;
+			PropertyDirectoryNode* parent = _root;
 			if (s != std::string::npos)
 				parent = _root->mkpath (dir);
-			return parent->add_child (new PropertyNode (pro, value));
+			ValueNodeType* child = new ValueNodeType (pro, value);
+			parent->add_child (child);
+			return child;
 		}
 
 
@@ -548,13 +625,17 @@ template<class T>
 
 
 typedef Property<bool>			PropertyBoolean;
-typedef Property<int>			PropertyInteger;
+typedef Property<int64_t>		PropertyInteger;
 typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
+typedef Property<Angle>			PropertyAngle;
+typedef Property<Pressure>		PropertyPressure;
+typedef Property<Frequency>		PropertyFrequency;
+typedef Property<Length>		PropertyLength;
+typedef Property<Time>			PropertyTime;
+typedef Property<Speed>			PropertySpeed;
 
 } // namespace Xefis
-
-#include "si_property.h"
 
 #endif
 

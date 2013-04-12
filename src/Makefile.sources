@@ -49,8 +49,6 @@ SRC_HEADERS += xefis/core/navaid_storage.h
 SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_storage.h
-SRC_HEADERS += xefis/core/property_union.h
-SRC_HEADERS += xefis/core/si_property.h
 SRC_HEADERS += xefis/core/window.h
 SRC_HEADERS += xefis/core/work_performer.h
 
@@ -83,7 +81,6 @@ SRC_HEADERS += xefis/utility/smoother.h
 SRC_HEADERS += xefis/utility/sound_speed.h
 SRC_HEADERS += xefis/utility/text_painter.h
 SRC_HEADERS += xefis/utility/thread.h
-SRC_HEADERS += xefis/utility/timestamp.h
 SRC_HEADERS += xefis/utility/wind_triangle.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
@@ -162,14 +159,12 @@ SRC_HEADERS += modules/systems/fly_by_wire.h
 SRC_HEADERS += modules/systems/fms.h
 SRC_HEADERS += modules/systems/lookahead.h
 SRC_HEADERS += modules/systems/mouse.h
-SRC_HEADERS += modules/systems/state.h
 
 SRC_SOURCES += modules/systems/flight_director.cc
 SRC_SOURCES += modules/systems/fly_by_wire.cc
 SRC_SOURCES += modules/systems/fms.cc
 SRC_SOURCES += modules/systems/lookahead.cc
 SRC_SOURCES += modules/systems/mouse.cc
-SRC_SOURCES += modules/systems/state.cc
 
 SRC_MOCHDRS += modules/systems/mouse.h
 

@@ -24,17 +24,32 @@
 
 namespace Xefis {
 
-PropertyNodeList
-PropertyNode::children() const
+void
+PropertyNode::update_path()
 {
-	if (_type != PropDirectory)
-		throw PropertyAccessError ("only directory properties have children");
+	PropertyStorage* storage = this->storage();
+
+	if (storage)
+		storage->uncache_path (_path);
+
+	_path = _parent
+		? _parent->path() + "/" + _name
+		: _name;
+
+	if (storage)
+		storage->cache_path (this);
+}
+
+
+PropertyNodeList
+PropertyDirectoryNode::children() const
+{
 	return _children;
 }
 
 
 PropertyNode*
-PropertyNode::child (std::string const& name)
+PropertyDirectoryNode::child (std::string const& name)
 {
 	auto it = _children_by_name.find (name);
 	if (it == _children_by_name.end())
@@ -45,7 +60,59 @@ PropertyNode::child (std::string const& name)
 
 
 PropertyNode*
-PropertyNode::mkpath (std::string const& path)
+PropertyDirectoryNode::locate (std::string const& path)
+{
+	if (path.empty())
+		return this;
+
+	// If we are root node, try searching PropertyStorage cache first.
+	// Normalize path before searching:
+	if (!_parent && _storage)
+	{
+		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
+		if (node)
+			return node;
+		else
+			// If not found by absolute path in Storage, then it doesn't exist:
+			return nullptr;
+	}
+
+	if (path[0] == '/')
+		return root()->locate (path.substr (1));
+
+	std::string::size_type slash = path.find ('/');
+	std::string segment = path.substr (0, slash);
+	std::string rest;
+	if (slash != std::string::npos)
+		rest = path.substr (slash + 1);
+
+	if (segment == ".")
+		return locate (rest);
+	else if (segment == "..")
+	{
+		if (_parent)
+			return _parent->locate (rest);
+		return nullptr;
+	}
+	else
+	{
+		PropertyNode* c = child (segment);
+		if (c)
+		{
+			PropertyDirectoryNode* dir = dynamic_cast<PropertyDirectoryNode*> (c);
+			if (dir)
+				return dir->locate (rest);
+			else
+				return nullptr;
+		}
+		else
+			return nullptr;
+	}
+}
+
+
+PropertyDirectoryNode*
+PropertyDirectoryNode::mkpath (std::string const& path)
 {
 	if (path.empty())
 		return this;
@@ -71,23 +138,28 @@ PropertyNode::mkpath (std::string const& path)
 	{
 		PropertyNode* c = child (segment);
 		if (!c)
-			return add_child (new PropertyNode (segment))->mkpath (rest);
+		{
+			PropertyDirectoryNode* dir = new PropertyDirectoryNode (segment);
+			add_child (dir);
+			return dir->mkpath (rest);
+		}
 		else
 		{
-			if (c->type() == PropDirectory)
-				return c->mkpath (rest);
+			PropertyDirectoryNode* dir = dynamic_cast<PropertyDirectoryNode*> (c);
+			if (dir)
+				return dir->mkpath (rest);
 			else
-				throw PropertyPathConflict ("can't create directory path, would conflict with intermediate node");
+				throw PropertyPathConflict ("can't create directory path, would conflict with intermediate node: "_str + path);
 		}
 	}
 }
 
 
 PropertyNode*
-PropertyNode::add_child (PropertyNode* child)
+PropertyDirectoryNode::add_child (PropertyNode* child)
 {
-	if (child->_parent)
-		child->_parent->remove_child (child);
+	if (child->parent())
+		child->parent()->remove_child (child);
 	child->_parent = this;
 
 	_children.push_back (child);
@@ -100,7 +172,7 @@ PropertyNode::add_child (PropertyNode* child)
 
 
 void
-PropertyNode::remove_child (PropertyNode* child)
+PropertyDirectoryNode::remove_child (PropertyNode* child)
 {
 	auto it = std::find (_children.begin(), _children.end(), child);
 	if (it != _children.end())
@@ -116,27 +188,13 @@ PropertyNode::remove_child (PropertyNode* child)
 
 
 void
-PropertyNode::clear()
+PropertyDirectoryNode::clear()
 {
 	for (auto c: _children)
 		delete c;
-}
 
-
-void
-PropertyNode::update_path()
-{
-	PropertyStorage* storage = this->storage();
-
-	if (storage)
-		storage->uncache_path (_path);
-
-	_path = _parent
-		? _parent->path() + "/" + _name
-		: _name;
-
-	if (storage)
-		storage->cache_path (this);
+	_children.clear();
+	_children_by_name.clear();
 }
 
 } // namespace Xefis

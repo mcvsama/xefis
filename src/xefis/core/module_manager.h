@@ -24,7 +24,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/timestamp.h>
 
 
 namespace Xefis {
@@ -61,13 +60,13 @@ class ModuleManager
 	 * Forward call to all loaded modules.
 	 */
 	void
-	data_updated (Timestamp timestamp);
+	data_updated (Time time);
 
 	/**
-	 * Return last update timestamp.
+	 * Return last update time.
 	 */
-	Timestamp
-	update_timestamp() const;
+	Time
+	update_time() const;
 
 	/**
 	 * Return time difference between last and previous update.
@@ -79,14 +78,17 @@ class ModuleManager
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
 
+	void
+	module_data_updated (Module*);
+
   private:
 	Application*	_application = nullptr;
 	Modules			_modules;
 	Modules			_instrument_modules;
 	Modules			_non_instrument_modules;
-	Timestamp		_update_timestamp;
+	Time			_update_time;
 	Time			_update_dt;
-	Timestamp		_instrument_update_timestamp;
+	Time			_instrument_update_time;
 };
 
 
@@ -106,10 +108,10 @@ ModuleManager::application() const
 }
 
 
-inline Timestamp
-ModuleManager::update_timestamp() const
+inline Time
+ModuleManager::update_time() const
 {
-	return _update_timestamp;
+	return _update_time;
 }
 
 

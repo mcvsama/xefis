@@ -32,7 +32,6 @@
 #include <modules/systems/fms.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
-#include <modules/systems/state.h>
 
 // Local:
 #include "module_manager.h"
@@ -69,37 +68,28 @@ ModuleManager::load_module (QString const& name, QDomElement const& config, QWid
 
 
 void
-ModuleManager::data_updated (Timestamp timestamp)
+ModuleManager::data_updated (Time time)
 {
-	_update_dt = 1_s * (timestamp.seconds() - _update_timestamp.seconds());
+	_update_dt = 1_s * (time.s() - _update_time.s());
 	if (_update_dt > 1.0_s)
 		_update_dt = Time::epoch() + 1_s;
 
-	_update_timestamp = timestamp;
+	_update_time = time;
 
 	for (Module* mod: _non_instrument_modules)
-	{
-		try {
-			mod->data_updated();
-		}
-		catch (Xefis::Exception const& e)
-		{
-			std::cerr << "Exception when processing update from module '" << typeid (*mod).name() << "'" << std::endl;
-			std::cerr << e << std::endl;
-		}
-	}
+		module_data_updated (mod);
 
 	// Let instruments display data already computed by all other modules.
 	// Also limit FPS of the instrument modules.
-	if ((timestamp - _instrument_update_timestamp).seconds() > 1.f / 30.f)
+	if (time - _instrument_update_time > 1_s / 30.f)
 	{
 		for (Module* mod: _instrument_modules)
-			mod->data_updated();
-		_instrument_update_timestamp = timestamp;
+			module_data_updated (mod);
+		_instrument_update_time = time;
 	}
 	else
 	{
-		// In case of inhibited instruments update, postpone update a bit:
+		// In case of inhibited instruments update, postpone the update a bit:
 		application()->postponed_data_updated();
 	}
 }
@@ -125,8 +115,6 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlyByWire (this, config);
 		else if (name == "systems/fms")
 			return new FlightManagementSystem (this, config);
-		else if (name == "systems/state")
-			return new State (this, config);
 		else if (name == "generic/property-tree")
 			return new PropertyTree (this, config, parent);
 		else if (name == "generic/fps")
@@ -141,6 +129,20 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 	catch (Exception& e)
 	{
 		throw Exception ("error when loading module "_str + name.toStdString(), &e);
+	}
+}
+
+
+void
+ModuleManager::module_data_updated (Module* module)
+{
+	try {
+		module->data_updated();
+	}
+	catch (Xefis::Exception const& e)
+	{
+		std::cerr << "Exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
+		std::cerr << e << std::endl;
 	}
 }
 

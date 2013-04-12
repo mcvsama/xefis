@@ -99,7 +99,7 @@ Application::quit()
 void
 Application::data_updated()
 {
-	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
+	postEvent (this, new DataUpdatedEvent (Time::now()));
 	// Restart offline timer:
 	_offline_updater->start();
 }
@@ -108,7 +108,7 @@ Application::data_updated()
 void
 Application::offline_data_updated()
 {
-	postEvent (this, new DataUpdatedEvent (Timestamp::now()));
+	postEvent (this, new DataUpdatedEvent (Time::now()));
 }
 
 
@@ -127,7 +127,7 @@ Application::event (QEvent* event)
 
 	if (data_update_event)
 	{
-		_module_manager->data_updated (data_update_event->timestamp());
+		_module_manager->data_updated (data_update_event->time());
 		return true;
 	}
 	else

@@ -74,6 +74,9 @@ class Length: public Value<double, Length>
 	Length&
 	parse (std::string const&);
 
+	std::string
+	stringify() const;
+
   private:
 	static std::vector<std::string> _supported_units;
 };
@@ -144,6 +147,13 @@ Length::parse (std::string const& str)
 		*this = p.first * 1_mil;
 
 	return *this;
+}
+
+
+inline std::string
+Length::stringify() const
+{
+	return boost::lexical_cast<std::string> (nm()) + " nm";
 }
 
 
