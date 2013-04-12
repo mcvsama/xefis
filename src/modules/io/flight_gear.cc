@@ -87,11 +87,8 @@ BEGIN_PACKED_STRUCT
 struct FGOutputData
 {
 	FGFloat	ailerons;						// a
-	FGFloat	ailerons_trim;					// at
 	FGFloat	elevator;						// e
-	FGFloat	elevator_trim;					// et
 	FGFloat	rudder;							// r
-	FGFloat	rudder_trim;					// rt
 }
 END_PACKED_STRUCT
 

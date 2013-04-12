@@ -28,22 +28,17 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+
 #include "property_storage.h"
 
 
 namespace Xefis {
 
-enum PropertyType
-{
-	PropDirectory,
-	PropBoolean,
-	PropInteger,
-	PropFloat,
-	PropString
-};
-
-class PropertyNode;
+// Forward declarations:
+class PropertyDirectoryNode;
 class PropertyStorage;
+template<class T>
+	class PropertyValueNode;
 
 typedef std::list<PropertyNode*> PropertyNodeList;
 
@@ -56,7 +51,7 @@ typedef std::list<PropertyNode*> PropertyNodeList;
 class PropertyAccessError: public Exception
 {
   public:
-	PropertyAccessError (const char* message);
+	PropertyAccessError (std::string const& message);
 };
 
 
@@ -67,92 +62,30 @@ class PropertyAccessError: public Exception
 class PropertyPathConflict: public Exception
 {
   public:
-	PropertyPathConflict (const char* message);
+	PropertyPathConflict (std::string const& message);
 };
 
 
 /**
- * A private API class.
- * The struct that holds property's data.
+ * Property tree node.
  */
 class PropertyNode
 {
-	typedef std::map<std::string, PropertyNodeList::iterator> NameLookup;
-
 	friend class PropertyStorage;
+	friend class PropertyDirectoryNode;
 
-  private:
+  protected:
 	/**
 	 * Create a root node.
 	 */
 	PropertyNode (PropertyStorage*);
 
-  public:
-	/**
-	 * Create a directory node.
-	 */
+	// Ctor
 	PropertyNode (std::string const& name);
 
-	/**
-	 * Create a bool node.
-	 */
-	PropertyNode (std::string const& name, bool value);
-
-	/**
-	 * Create an int node.
-	 */
-	PropertyNode (std::string const& name, int value);
-
-	/**
-	 * Create a double-precision float node.
-	 */
-	PropertyNode (std::string const& name, double value);
-
-	/**
-	 * Create a string node.
-	 */
-	PropertyNode (std::string const& name, const char* value);
-
-	/**
-	 * Create a string node.
-	 */
-	PropertyNode (std::string const& name, std::string const& value);
-
-	/**
-	 * Create a nil node of given type.
-	 */
-	template<class tType>
-		PropertyNode (std::string const& name);
-
-	/**
-	 * Deletes child properties.
-	 */
-	~PropertyNode();
-
-	/**
-	 * Copies value and nil-flag from other property node.
-	 * Can not be used on PropDirectory nodes.
-	 */
-	void
-	copy (PropertyNode const& other);
-
-	/**
-	 * Return true if property is nil.
-	 */
-	bool
-	is_nil() const noexcept;
-
-	/**
-	 * Inverse of is_nil().
-	 */
-	bool
-	valid() const noexcept;
-
-	/**
-	 * Write nil value to this property.
-	 */
-	void
-	set_nil() noexcept;
+  public:
+	// Dtor
+	virtual ~PropertyNode();
 
 	/**
 	 * Return node name.
@@ -167,45 +100,65 @@ class PropertyNode
 	path() const noexcept;
 
 	/**
-	 * Return node type.
-	 */
-	PropertyType
-	type() const noexcept;
-
-	/**
-	 * Return current value converted to the type tType,
-	 * where tType can be bool, int, double, std::string (otherwise
-	 * a compilation error occurs).
-	 * If the node is a directory-type node or a null node,
-	 * throw PropertyAccessError.
-	 */
-	template<class tType>
-		tType
-		read (tType default_value = tType()) const;
-
-	/**
-	 * Write new value to the node. The value will be converted
-	 * to the node type.
-	 * If the node is a directory-type node or a null node,
-	 * throw PropertyAccessError.
-	 */
-	template<class tType>
-		void
-		write (tType const& value);
-
-	/**
 	 * Return parent node.
 	 * Root node has no parent.
 	 */
-	PropertyNode*
+	PropertyDirectoryNode*
 	parent() const noexcept;
 
 	/**
 	 * Return root node. Traverse parents until root node.
 	 * Return self if this node is the root node.
 	 */
-	PropertyNode*
+	PropertyDirectoryNode*
 	root() noexcept;
+
+	/**
+	 * Return pointer to the PropertyStorage object.
+	 * If called on non-root property, it will take
+	 * additional time to traverse to the root node
+	 * to return its storage().
+	 */
+	PropertyStorage*
+	storage() noexcept;
+
+  private:
+	/**
+	 * Update self-cached location.
+	 */
+	void
+	update_path();
+
+  protected:
+	PropertyDirectoryNode*	_parent		= nullptr;
+	PropertyStorage*		_storage	= nullptr;
+	std::string				_name;
+	std::string				_path;
+};
+
+
+/**
+ * PropertyNode that is a directory and can
+ * have children nodes.
+ */
+class PropertyDirectoryNode: public PropertyNode
+{
+	friend class PropertyStorage;
+
+	typedef std::map<std::string, PropertyNodeList::iterator> NameLookup;
+
+  private:
+	// Ctor
+	PropertyDirectoryNode (PropertyStorage*);
+
+  public:
+	// Ctor
+	PropertyDirectoryNode (std::string const& name);
+
+	/**
+	 * Deletes child properties.
+	 */
+	~PropertyDirectoryNode();
 
 	/**
 	 * Return list of child nodes.
@@ -237,7 +190,7 @@ class PropertyNode
 	 * and it's not a directory-type node, throw PropertyPathConflict.
 	 * The part already created will remain in there.
 	 */
-	PropertyNode*
+	PropertyDirectoryNode*
 	mkpath (std::string const& path);
 
 	/**
@@ -259,69 +212,121 @@ class PropertyNode
 	void
 	clear();
 
-	/**
-	 * Return pointer to the PropertyStorage object.
-	 * If called on non-root property, it will take
-	 * additional time to traverse to the root node
-	 * to return its storage().
-	 */
-	PropertyStorage*
-	storage() noexcept;
-
   private:
-	/**
-	 * Helper function for reading data.
-	 */
-	template<class tType>
-		tType
-		read_convertible() const;
-
-	/**
-	 * Helper function for writing data.
-	 */
-	template<class tType>
-		void
-		write_convertible (tType);
-
-	/**
-	 * Update self-cached location.
-	 */
-	void
-	update_path();
-
-  private:
-	PropertyNode*		_parent			= nullptr;
-	PropertyStorage*	_storage		= nullptr;
-	PropertyType		_type;
-	std::string			_name;
-	std::string			_path;
-	union {
-		bool			_value_bool;
-		int				_value_int;
-		double			_value_double;
-	};
-	std::string			_value_string;
-	bool				_is_nil			= false;
 	PropertyNodeList	_children;
 	NameLookup			_children_by_name;
 };
 
 
+/**
+ * Non-template base for PropertyValueNode.
+ */
+class BasePropertyValueNode: public PropertyNode
+{
+	template<class T>
+		friend class PropertyValueNode;
+
+  public:
+	BasePropertyValueNode (std::string const& name);
+
+	/**
+	 * Return true if property is nil.
+	 */
+	bool
+	is_nil() const noexcept;
+
+	/**
+	 * Inverse of is_nil().
+	 */
+	bool
+	valid() const noexcept;
+
+	/**
+	 * Write nil value to this property.
+	 */
+	void
+	set_nil() noexcept;
+
+	/**
+	 * Return human-readable value for UI.
+	 */
+	virtual std::string
+	stringify() const = 0;
+
+	/**
+	 * Parse value and unit.
+	 */
+	virtual void
+	parse (std::string const&) = 0;
+
+  private:
+	bool _is_nil = false;
+};
+
+
+/**
+ * PropertyNode that holds a value.
+ */
+template<class tType>
+	class PropertyValueNode: public BasePropertyValueNode
+	{
+	  public:
+		typedef tType Type;
+
+	  public:
+		// Ctor
+		PropertyValueNode (std::string const& name, Type value);
+
+		/**
+		 * Copies value and nil-flag from other property node.
+		 * Can not be used on PropDirectory nodes.
+		 */
+		void
+		copy (PropertyValueNode const& other);
+
+		/**
+		 * Return stored value.
+		 */
+		Type
+		read (Type default_value = Type()) const;
+
+		/**
+		 * Write value to this node.
+		 */
+		void
+		write (Type const& value);
+
+		/**
+		 * Return human-readable value for UI.
+		 */
+		std::string
+		stringify() const override;
+
+		/**
+		 * Parse value and unit.
+		 */
+		void
+		parse (std::string const&) override;
+
+	  private:
+		Type _value;
+	};
+
+
 inline
-PropertyAccessError::PropertyAccessError (const char* message):
+PropertyAccessError::PropertyAccessError (std::string const& message):
 	Exception (message)
 { }
 
 
 inline
-PropertyPathConflict::PropertyPathConflict (const char* message):
+PropertyPathConflict::PropertyPathConflict (std::string const& message):
 	Exception (message)
 { }
 
 
 inline
-PropertyNode::PropertyNode (PropertyStorage* storage):
-	PropertyNode ("") // It's a directory
+PropertyNode::PropertyNode (PropertyStorage* storage)
 {
 	_storage = storage;
 }
@@ -329,151 +334,13 @@ PropertyNode::PropertyNode (PropertyStorage* storage):
 
 inline
 PropertyNode::PropertyNode (std::string const& name):
-	_type (PropDirectory),
 	_name (name)
-{
-	update_path();
-}
-
-
-inline
-PropertyNode::PropertyNode (std::string const& name, bool value):
-	_type (PropBoolean),
-	_name (name),
-	_value_bool (value)
-{
-	update_path();
-}
-
-
-inline
-PropertyNode::PropertyNode (std::string const& name, int value):
-	_type (PropInteger),
-	_name (name),
-	_value_int (value)
-{
-	update_path();
-}
-
-
-inline
-PropertyNode::PropertyNode (std::string const& name, double value):
-	_type (PropFloat),
-	_name (name),
-	_value_double (value)
-{
-	update_path();
-}
-
-
-inline
-PropertyNode::PropertyNode (std::string const& name, const char* value):
-	_type (PropString),
-	_name (name),
-	_value_string (value)
-{
-	update_path();
-}
-
-
-inline
-PropertyNode::PropertyNode (std::string const& name, std::string const& value):
-	_type (PropString),
-	_name (name),
-	_value_string (value)
-{
-	update_path();
-}
-
-
-template<>
-	inline
-	PropertyNode::PropertyNode<bool> (std::string const& name):
-		_type (PropBoolean),
-		_name (name),
-		_value_bool(),
-		_is_nil (true)
-	{
-		update_path();
-	}
-
-
-template<>
-	inline
-	PropertyNode::PropertyNode<int> (std::string const& name):
-		_type (PropInteger),
-		_name (name),
-		_value_int(),
-		_is_nil (true)
-	{
-		update_path();
-	}
-
-
-template<>
-	inline
-	PropertyNode::PropertyNode<double> (std::string const& name):
-		_type (PropFloat),
-		_name (name),
-		_value_double(),
-		_is_nil (true)
-	{
-		update_path();
-	}
-
-
-template<>
-	inline
-	PropertyNode::PropertyNode<std::string> (std::string const& name):
-		_type (PropString),
-		_name (name),
-		_value_string(),
-		_is_nil (true)
-	{
-		update_path();
-	}
+{ }
 
 
 inline
 PropertyNode::~PropertyNode()
-{
-	clear();
-}
-
-
-inline void
-PropertyNode::copy (PropertyNode const& other)
-{
-	if (other._type == PropDirectory)
-		throw Exception ("can't copy directory");
-	_type = other._type;
-	_value_bool = other._value_bool;
-	_value_int = other._value_int;
-	_value_double = other._value_double;
-	_value_string = other._value_string;
-	_is_nil = other._is_nil;
-}
-
-
-inline bool
-PropertyNode::is_nil() const noexcept
-{
-	return _is_nil;
-}
-
-
-inline bool
-PropertyNode::valid() const noexcept
-{
-	return !_is_nil;
-}
-
-
-inline void
-PropertyNode::set_nil() noexcept
-{
-	_is_nil = true;
-}
+{ }
 
 
 inline std::string const&
@@ -490,142 +357,20 @@ PropertyNode::path() const noexcept
 }
 
 
-inline PropertyType
-PropertyNode::type() const noexcept
-{
-	return _type;
-}
-
-
-template<class tType>
-	inline tType
-	PropertyNode::read (tType default_value) const
-	{
-		if (_is_nil)
-			return default_value;
-		else
-			return read_convertible<tType>();
-	}
-
-
-template<>
-	inline std::string
-	PropertyNode::read (std::string default_value) const
-	{
-		if (_is_nil)
-			return default_value;
-		else
-		{
-			switch (_type)
-			{
-				case PropDirectory:
-					throw PropertyAccessError ("can't read from a directory property");
-				case PropBoolean:
-					return boost::lexical_cast<std::string> (_value_bool);
-				case PropInteger:
-					return boost::lexical_cast<std::string> (_value_int);
-				case PropFloat:
-					return boost::lexical_cast<std::string> (_value_double);
-				case PropString:
-					return _value_string;
-				default:
-					return std::string();
-			}
-		}
-	}
-
-
-template<class tType>
-	inline void
-	PropertyNode::write (tType const& value)
-	{
-		write_convertible (value);
-	}
-
-
-template<>
-	inline void
-	PropertyNode::write (std::string const& value)
-	{
-		switch (_type)
-		{
-			case PropDirectory:
-				throw PropertyAccessError ("can't write to a directory property");
-			case PropBoolean:
-				_value_bool = boost::lexical_cast<bool> (value);
-				break;
-			case PropInteger:
-				_value_int = boost::lexical_cast<int> (value);
-				break;
-			case PropFloat:
-				_value_double = boost::lexical_cast<double> (value);
-				break;
-			case PropString:
-				_value_string = value;
-				break;
-		}
-		_is_nil = false;
-	}
-
-
-inline PropertyNode*
+inline PropertyDirectoryNode*
 PropertyNode::parent() const noexcept
 {
 	return _parent;
 }
 
 
-inline PropertyNode*
+inline PropertyDirectoryNode*
 PropertyNode::root() noexcept
 {
 	PropertyNode* p = this;
 	while (p->_parent)
 		p = p->_parent;
-	return p;
-}
-
-
-inline PropertyNode*
-PropertyNode::locate (std::string const& path)
-{
-	if (path.empty())
-		return this;
-
-	// If we are root node, try searching PropertyStorage cache first:
-	if (!_parent && _storage)
-	{
-		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
-		if (node)
-			return node;
-		else
-			// If not found by absolute path in Storage, then it doesn't exist:
-			return nullptr;
-	}
-
-	if (path[0] == '/')
-		return root()->locate (path.substr (1));
-
-	std::string::size_type slash = path.find ('/');
-	std::string segment = path.substr (0, slash);
-	std::string rest;
-	if (slash != std::string::npos)
-		rest = path.substr (slash + 1);
-
-	if (segment == ".")
-		return locate (rest);
-	else if (segment == "..")
-	{
-		if (_parent)
-			return _parent->locate (rest);
-		return nullptr;
-	}
-	else
-	{
-		PropertyNode* c = child (segment);
-		if (c)
-			return c->locate (rest);
-		return nullptr;
-	}
+	return dynamic_cast<PropertyDirectoryNode*> (p);
 }
 
 
@@ -636,50 +381,142 @@ PropertyNode::storage() noexcept
 }
 
 
-template<class tType>
-	inline tType
-	PropertyNode::read_convertible() const
+inline
+PropertyDirectoryNode::PropertyDirectoryNode (PropertyStorage* storage):
+	PropertyNode (storage)
+{ }
+
+
+inline
+PropertyDirectoryNode::PropertyDirectoryNode (std::string const& name):
+	PropertyNode (name)
+{ }
+
+
+inline
+PropertyDirectoryNode::~PropertyDirectoryNode()
+{
+	clear();
+}
+
+
+inline
+BasePropertyValueNode::BasePropertyValueNode (std::string const& name):
+	PropertyNode (name)
+{ }
+
+
+inline bool
+BasePropertyValueNode::is_nil() const noexcept
+{
+	return _is_nil;
+}
+
+
+inline bool
+BasePropertyValueNode::valid() const noexcept
+{
+	return !_is_nil;
+}
+
+
+inline void
+BasePropertyValueNode::set_nil() noexcept
+{
+	_is_nil = true;
+}
+
+
+template<class T>
+	inline
+	PropertyValueNode<T>::PropertyValueNode (std::string const& name, Type value):
+		BasePropertyValueNode (name),
+		_value (value)
+	{ }
+
+
+template<class T>
+	inline void
+	PropertyValueNode<T>::copy (PropertyValueNode const& other)
 	{
-		switch (_type)
-		{
-			case PropDirectory:
-				throw PropertyAccessError ("property is a directory and doesn't have any value");
-			case PropBoolean:
-				return _value_bool;
-			case PropInteger:
-				return _value_int;
-			case PropFloat:
-				return _value_double;
-			case PropString:
-				return boost::lexical_cast<tType> (_value_string);
-			default:
-				return tType();
-		}
+		_value = other._value;
+		_is_nil = other._is_nil;
 	}
 
 
-template<class tType>
-	inline void
-	PropertyNode::write_convertible (tType value)
+template<class T>
+	inline typename PropertyValueNode<T>::Type
+	PropertyValueNode<T>::read (Type default_value) const
 	{
-		switch (_type)
-		{
-			case PropDirectory:
-				throw PropertyAccessError ("can't write to a directory property");
-			case PropBoolean:
-				_value_bool = value;
-				break;
-			case PropInteger:
-				_value_int = value;
-				break;
-			case PropFloat:
-				_value_double = value;
-				break;
-			case PropString:
-				_value_string = boost::lexical_cast<std::string> (value);
-				break;
-		}
+		if (_is_nil)
+			return default_value;
+		else
+			return _value;
+	}
+
+
+template<class T>
+	inline void
+	PropertyValueNode<T>::write (Type const& value)
+	{
 		_is_nil = false;
+		_value = value;
+	}
+
+
+template<class T>
+	inline std::string
+	PropertyValueNode<T>::stringify() const
+	{
+		return std::to_string (_value);
+	}
+
+
+template<>
+	inline std::string
+	PropertyValueNode<std::string>::stringify() const
+	{
+		return _value;
+	}
+
+
+template<class T>
+	inline void
+	PropertyValueNode<T>::parse (std::string const& str)
+	{
+		_value.parse (str);
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<bool>::parse (std::string const& str)
+	{
+		_value = (str == "true");
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<int64_t>::parse (std::string const& str)
+	{
+		_value = boost::lexical_cast<int64_t> (str);
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<double>::parse (std::string const& str)
+	{
+		_value = boost::lexical_cast<double> (str);
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<std::string>::parse (std::string const& str)
+	{
+		_value = str;
 	}
 
 } // namespace Xefis

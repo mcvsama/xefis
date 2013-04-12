@@ -26,6 +26,7 @@
 namespace Xefis {
 
 class PropertyNode;
+class PropertyDirectoryNode;
 
 /**
  * Storage class for properties.
@@ -51,7 +52,7 @@ class PropertyStorage
 	/**
 	 * Return top-level PropertyNode of this storage.
 	 */
-	PropertyNode*
+	PropertyDirectoryNode*
 	root() const noexcept;
 
 	/**
@@ -83,7 +84,7 @@ class PropertyStorage
 
   private:
 	static PropertyStorage*	_default_storage;
-	PropertyNode*			_root;
+	PropertyDirectoryNode*	_root;
 	PropertiesByPath		_properties_by_path;
 };
 

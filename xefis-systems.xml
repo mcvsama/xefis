@@ -2,7 +2,7 @@
 <xefis-include>
 	<modules>
 		<module disabled='true' name='generic/fps'/>
-		<module name='systems/state'>
+		<!--module name='systems/state'>
 			<var name='fd-lateral-mode' path='/systems/flight-director/settings/lateral-mode'/>
 			<var name='fd-vertical-mode' path='/systems/flight-director/settings/vertical-mode'/>
 			<property path='/systems/fms/localizer/type' type='string'>
@@ -245,7 +245,7 @@
 					</otherwise>
 				</choose>
 			</observe>
-		</module>
+		</module-->
 		<module name='systems/lookahead'>
 			<input>/systems/fms/altitude/amsl.ft</input>
 			<output>/systems/fms/altitude/amsl-lookahead.ft</output>

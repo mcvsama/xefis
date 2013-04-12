@@ -21,6 +21,7 @@
 
 // Boost:
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 // Local:
 #include "value.h"
@@ -62,6 +63,9 @@ class Angle: public Value<double, Angle>
 
 	Angle&
 	parse (std::string const&);
+
+	std::string
+	stringify() const;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -106,6 +110,13 @@ Angle::parse (std::string const& str)
 		*this = p.first * 1_rad;
 
 	return *this;
+}
+
+
+inline std::string
+Angle::stringify() const
+{
+	return boost::lexical_cast<std::string> (deg()) + "°";
 }
 
 

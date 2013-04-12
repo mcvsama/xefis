@@ -15,29 +15,14 @@
 				<node>/controls/flight/aileron</node>
 			</chunk>
 			<chunk>
-				<name>at</name>
-				<type>float</type>
-				<node>/controls/flight/aileron-trim</node>
-			</chunk>
-			<chunk>
 				<name>e</name>
 				<type>float</type>
 				<node>/controls/flight/elevator</node>
 			</chunk>
 			<chunk>
-				<name>et</name>
-				<type>float</type>
-				<node>/controls/flight/elevator-trim</node>
-			</chunk>
-			<chunk>
 				<name>r</name>
 				<type>float</type>
 				<node>/controls/flight/rudder</node>
-			</chunk>
-			<chunk>
-				<name>rt</name>
-				<type>float</type>
-				<node>/controls/flight/rudder-trim</node>
 			</chunk>
 			<!--chunk>
 				<name>f</name>

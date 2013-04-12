@@ -35,11 +35,11 @@ PropertyStorage::initialize()
 
 
 PropertyStorage::PropertyStorage():
-	_root (new PropertyNode (this))
+	_root (new PropertyDirectoryNode (this))
 { }
 
 
-PropertyNode*
+PropertyDirectoryNode*
 PropertyStorage::root() const noexcept
 {
 	return _root;

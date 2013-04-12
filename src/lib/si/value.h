@@ -92,6 +92,12 @@ template<class tValueType, class tDerived>
 		virtual Derived&
 		parse (std::string const&) = 0;
 
+		/**
+		 * Output string with value and unit.
+		 */
+		virtual std::string
+		stringify() const = 0;
+
 		/*
 		 * Unary operators
 		 */
@@ -402,6 +408,17 @@ template<class V, class T>
 	}
 
 } // namespace SI
+
+
+namespace std {
+
+template<class V, class T>
+	std::string to_string (SI::Value<V, T> const& value)
+	{
+		return value.stringify();
+	}
+
+} // namespace std
 
 #endif
 

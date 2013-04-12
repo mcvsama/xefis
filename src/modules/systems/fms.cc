@@ -303,7 +303,7 @@ FlightManagementSystem::compute_track()
 		if (distance > 2.0 * _ac1_positions[0].accuracy)
 		{
 			Length altitude_diff = _ac1_positions[0].altitude - _ac1_positions[1].altitude;
-			_track_vertical.write (1_deg * _track_vertical_smoother.process (std::asin (altitude_diff / distance)));
+			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::asin (altitude_diff / distance)));
 
 			Angle initial_true_heading = _ac1_positions[0].lateral_position.initial_bearing (_ac1_positions[1].lateral_position);
 			Angle true_heading = floored_mod (initial_true_heading + 180_deg, 360_deg);
