@@ -573,7 +573,7 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (QPainter& painter, TextPainter& t
 	paint_rotating_value (painter, text_painter, box_0001, pos_0001, 0.7f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed + 1.f, 10.f)))),
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed, 10.f)))),
-							 _params.speed > 0.5_kt
+							 _params.speed > (1_kt * _params.sl_minimum + 0.5_kt)
 								? QString::number (static_cast<int> (floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
 								: " ");
 }
