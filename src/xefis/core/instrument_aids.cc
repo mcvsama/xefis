@@ -49,31 +49,31 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 
 	float const font_height_scale_factor = 0.7f;
 
-	_font_10_bold = _font;
-	_font_10_bold.setPixelSize (font_size (10.f));
-	_font_10_digit_width = get_digit_width (_font_10_bold);
-	_font_10_digit_height = font_height_scale_factor * QFontMetrics (_font_10_bold).height();
+	_font_10 = _font;
+	_font_10.setPixelSize (font_size (11.f));
+	_font_10_digit_width = get_digit_width (_font_10);
+	_font_10_digit_height = font_height_scale_factor * QFontMetrics (_font_10).height();
 
-	_font_13_bold = _font;
-	_font_13_bold.setPixelSize (font_size (13.f));
-	_font_13_digit_width = get_digit_width (_font_13_bold);
-	_font_13_digit_height = QFontMetrics (_font_13_bold).height();
-	_font_13_digit_height = font_height_scale_factor * QFontMetrics (_font_13_bold).height();
+	_font_13 = _font;
+	_font_13.setPixelSize (font_size (13.f));
+	_font_13_digit_width = get_digit_width (_font_13);
+	_font_13_digit_height = QFontMetrics (_font_13).height();
+	_font_13_digit_height = font_height_scale_factor * QFontMetrics (_font_13).height();
 
-	_font_16_bold = _font;
-	_font_16_bold.setPixelSize (font_size (16.f));
-	_font_16_digit_width = get_digit_width (_font_16_bold);
-	_font_16_digit_height = QFontMetrics (_font_16_bold).height();
-	_font_16_digit_height = font_height_scale_factor * QFontMetrics (_font_16_bold).height();
+	_font_16 = _font;
+	_font_16.setPixelSize (font_size (16.f));
+	_font_16_digit_width = get_digit_width (_font_16);
+	_font_16_digit_height = QFontMetrics (_font_16).height();
+	_font_16_digit_height = font_height_scale_factor * QFontMetrics (_font_16).height();
 
-	_font_20_bold = _font;
-	_font_20_bold.setPixelSize (font_size (20.f));
-	_font_20_digit_width = get_digit_width (_font_20_bold);
-	_font_20_digit_height = QFontMetrics (_font_20_bold).height();
-	_font_20_digit_height = font_height_scale_factor * QFontMetrics (_font_20_bold).height();
+	_font_20 = _font;
+	_font_20.setPixelSize (font_size (20.f));
+	_font_20_digit_width = get_digit_width (_font_20);
+	_font_20_digit_height = QFontMetrics (_font_20).height();
+	_font_20_digit_height = font_height_scale_factor * QFontMetrics (_font_20).height();
 
-	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 2.f);
-	_autopilot_pen_2 = get_pen (_autopilot_color, 1.33f);
+	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 1.5f);
+	_autopilot_pen_2 = get_pen (_autopilot_color, 1.0f);
 }
 
 

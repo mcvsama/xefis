@@ -21,6 +21,7 @@
 // Qt:
 #include <QtGui/QFontDatabase>
 #include <QtGui/QFontInfo>
+#include <QtCore/QDir>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -53,33 +54,19 @@ Services::initialize()
 {
 	_call_out_dispatcher = new CallOutDispatcher();
 
+	auto add_fonts_from = [](QString dirname) -> void {
+		for (QString entry: QDir (dirname).entryList ({ "*.ttf", "*.otf" }))
+			QFontDatabase::addApplicationFont (dirname + "/" + entry);
+	};
+
 	// Try to select best font for instruments:
-	for (QString font: { "Black", "Bold", "BoldCondensed", "Condensed", "Light", "Medium", "Regular", "Thin" })
-		QFontDatabase::addApplicationFont ("share/fonts/Roboto/Roboto-" + font + ".ttf");
+	add_fonts_from ("share/fonts");
 
-	bool found = false;
+	_instrument_font = QFont ("Crystal");
+	_instrument_font.setBold (false);
+	_instrument_font.setStretch (110);
 
-	for (auto font_family: { "Roboto", "Bitstream Vera Sans Mono", "Ubuntu Mono", "Droid Sans", "Trebuchet MS", "monospace" })
-	{
-		QFont font (font_family);
-		QFontInfo font_info (font);
-		if (font_info.exactMatch())
-		{
-			_instrument_font = font;
-			_instrument_font.setBold (true);
-			found = true;
-			break;
-		}
-	}
-
-	// Failsafe: Roboto
-	if (!found)
-	{
-		_instrument_font = QFont ("Roboto");
-		_instrument_font.setBold (true);
-	}
-
-	_instrument_font.setHintingPreference (QFont::PreferNoHinting);
+	_instrument_font.setHintingPreference (QFont::PreferFullHinting);
 }
 
 

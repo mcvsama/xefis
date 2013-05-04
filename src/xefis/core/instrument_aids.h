@@ -57,7 +57,7 @@ class InstrumentAids
 	win_wh() const;
 
 	QPen
-	get_pen (QColor const& color, float width);
+	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin);
 
 	float
 	pen_width (float scale = 1.0f) const;
@@ -82,10 +82,10 @@ class InstrumentAids
 
   protected:
 	QFont				_font;
-	QFont				_font_10_bold;
-	QFont				_font_13_bold;
-	QFont				_font_16_bold;
-	QFont				_font_20_bold;
+	QFont				_font_10;
+	QFont				_font_13;
+	QFont				_font_16;
+	QFont				_font_20;
 	float				_font_10_digit_width;
 	float				_font_13_digit_width;
 	float				_font_16_digit_width;
@@ -96,6 +96,7 @@ class InstrumentAids
 	float				_font_20_digit_height;
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
+	QColor				_silver					= { 0xcc, 0xca, 0xc2 };
 	float				_height_for_width		= 1.f;
 	float				_master_pen_scale		= 1.f;
 	float				_master_font_scale		= 1.f;
@@ -126,9 +127,11 @@ InstrumentAids::win_wh() const
 
 
 inline QPen
-InstrumentAids::get_pen (QColor const& color, float width)
+InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Qt::PenCapStyle cap, Qt::PenJoinStyle join)
 {
-	return QPen (color, pen_width (width), Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+	QPen pen (color, pen_width (width), style, cap, join);
+	pen.setMiterLimit (0.25);
+	return pen;
 }
 
 

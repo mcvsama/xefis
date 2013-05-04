@@ -20,7 +20,7 @@
 										<property name='speed-ladder-number-every' path='/speed-ladder/number-every.kt' default='20'/>
 										<property name='speed-ladder-extent' path='/speed-ladder/extent.kt' default='124'/>
 										<property name='speed-ladder-minimum' path='/speed-ladder/minimum.kt' default='20'/>
-										<property name='speed-ladder-maximum' path='/speed-ladder/maximum.kt' default='450'/>
+										<property name='speed-ladder-maximum' path='/speed-ladder/maximum.kt' default='900'/>
 										<property name='altitude-ladder-line-every' path='/altitude-ladder/line-every.ft' default='100'/>
 										<property name='altitude-ladder-number-every' path='/altitude-ladder/number-every.ft' default='200'/>
 										<property name='altitude-ladder-bold-every' path='/altitude-ladder/bold-every.ft' default='500'/>

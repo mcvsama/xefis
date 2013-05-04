@@ -118,6 +118,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					positioning_hint_visible	= false;
 		float					climb_glide_ratio			= 0.0;
 		bool					climb_glide_ratio_visible	= false;
+		bool					round_clip					= false;
 	};
 
 	class PaintWorkUnit:
@@ -512,6 +513,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	void
 	set_climb_glide_ratio_visible (bool visible);
 
+	/**
+	 * Set ground features clipping to the directions circle.
+	 */
+	void
+	set_rounded_clipping (bool enabled);
+
   private:
 	// InstrumentWidget API
 	void
@@ -898,6 +905,14 @@ inline void
 HSIWidget::set_climb_glide_ratio_visible (bool visible)
 {
 	_params.climb_glide_ratio_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_rounded_clipping (bool enabled)
+{
+	_params.round_clip = enabled;
 	request_repaint();
 }
 
