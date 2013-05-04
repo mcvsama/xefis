@@ -376,7 +376,7 @@ FlightManagementSystem::compute_speeds()
 			_true_airspeed.write (cas / std::pow (1 - 6.8755856 * 1e-6 * (*_density_altitude).ft(), 2.127940));
 		}
 		else
-			// Very simple equation for TAS, fix it to use air temperature:
+			// Very simple equation for TAS, fix it to use air temperature someday:
 			_true_airspeed.write (cas + 0.02 * cas * (*_pressure_altitude_amsl / 1000_ft));
 	}
 	else
