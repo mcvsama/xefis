@@ -66,10 +66,10 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "altitude", _altitude, false },
 				{ "altitude-lookahead", _altitude_lookahead, false },
 				{ "altitude-agl", _altitude_agl, false },
-				{ "transition-altitude", _transition_altitude, false },
-				{ "pressure", _pressure, false },
+				{ "minimums-altitude", _minimums_altitude, false },
+				{ "pressure-qnh", _pressure_qnh, false },
 				{ "pressure-display-hpa", _pressure_display_hpa, false },
-				{ "standard-pressure", _standard_pressure, false },
+				{ "use-standard-pressure", _use_standard_pressure, false },
 				{ "cbr", _cbr, false },
 				{ "cmd-settings-visible", _cmd_settings_visible, false },
 				{ "cmd-setting-altitude", _cmd_alt_setting, false },
@@ -206,21 +206,21 @@ EFIS::read()
 
 	_efis_widget->set_altitude_warnings_visible (true);
 
-	if (_standard_pressure.valid() && _transition_altitude.valid())
+	if (_use_standard_pressure.valid() && _minimums_altitude.valid())
 	{
-		_efis_widget->set_transition_altitude_visible (true);
-		_efis_widget->set_standard_pressure (*_standard_pressure);
-		_efis_widget->set_transition_altitude (*_transition_altitude);
+		_efis_widget->set_minimums_altitude_visible (true);
+		_efis_widget->set_standard_pressure (*_use_standard_pressure);
+		_efis_widget->set_minimums_altitude (*_minimums_altitude);
 	}
 	else
 	{
-		_efis_widget->set_transition_altitude_visible (false);
+		_efis_widget->set_minimums_altitude_visible (false);
 		_efis_widget->set_standard_pressure (false);
 	}
 
-	_efis_widget->set_pressure_visible (_pressure.valid());
-	if (_pressure.valid())
-		_efis_widget->set_pressure (*_pressure);
+	_efis_widget->set_pressure_visible (_pressure_qnh.valid());
+	if (_pressure_qnh.valid())
+		_efis_widget->set_pressure (*_pressure_qnh);
 
 	if (_pressure_display_hpa.valid())
 		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);

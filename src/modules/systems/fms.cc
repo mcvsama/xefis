@@ -59,6 +59,8 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "settings.speed.v-bg", _v_bg, true },
 				{ "settings.speed.v-br", _v_br, true },
 				{ "settings.flaps-configuration-properties-path", _flaps_configuration_properties_path, true },
+				{ "settings.use-standard-pressure", _use_standard_pressure, true },
+				{ "settings.pressure.qnh", _qnh_pressure, true },
 				{ "imu.pitch", _imu_pitch, true },
 				{ "imu.roll", _imu_roll, true },
 				{ "imu.magnetic-heading", _imu_magnetic_heading, true },
@@ -74,7 +76,6 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "ins.accuracy", _ins_accuracy, true },
 				{ "ins.timestamp", _ins_timestamp, true },
 				{ "pressure.static", _static_pressure, true },
-				{ "pressure.qnh", _qnh_pressure, true },
 				{ "backup-amsl", _backup_amsl, true },
 				{ "gear-down", _gear_down, true },
 				{ "ias", _ias, true },
@@ -236,19 +237,19 @@ FlightManagementSystem::compute_position()
 		_ac2_positions[0].valid = false;
 	}
 
-	if (_static_pressure.valid() && _qnh_pressure.valid())
+	if (_static_pressure.valid() &&
+		((_use_standard_pressure.valid() && *_use_standard_pressure) || _qnh_pressure.valid()))
 	{
+		Pressure pressure_setting = _use_standard_pressure.valid() && *_use_standard_pressure
+			? 29.92_inHg
+			: *_qnh_pressure;
+		// Good for heights below tropopause (36 kft):
 		double a = 6.8755856e-6;
 		double b = 5.2558797;
 		double p = (*_static_pressure).inHg();
-		double p0 = 29.92126;
-		// Good for heights below tropopause (36 kft):
-		double h = (1.0 - std::pow (p / p0, 1 / b)) / a;
-		double alt_set = (*_qnh_pressure).inHg();
-		double p_alt_corr = 145442.2 * (1.0 - std::pow (alt_set / p0, 0.190261));
-		double p_alt = h + p_alt_corr;
-
-		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (p_alt));
+		double p0 = pressure_setting.inHg();
+		double h = -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
+		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (h));
 	}
 	else
 		_pressure_altitude_amsl.copy (_position_altitude_amsl);

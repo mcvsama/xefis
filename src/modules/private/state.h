@@ -11,11 +11,12 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__STATE_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__STATE_H__INCLUDED
+#ifndef XEFIS__MODULES__PRIVATE__STATE_H__INCLUDED
+#define XEFIS__MODULES__PRIVATE__STATE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
+#include <functional>
 
 // Qt:
 #include <QtCore/QString>
@@ -29,317 +30,219 @@
 
 class State: public Xefis::Module
 {
-  private:
-	class ManagedProperty;
-	class ObservedProperty;
-	class Instruction;
-
-	typedef std::map<QString, QString>	Vars;
-	typedef std::set<ManagedProperty*>	ManagedProperties;
-	typedef std::set<ObservedProperty*>	ObservedProperties;
-	typedef std::list<Instruction*>		Instructions;
-
-	class ManagedProperty
+	/**
+	 * Common base for Observable classes.
+	 */
+	class ObservableBase
 	{
 	  public:
 		// Dtor
-		virtual ~ManagedProperty();
+		virtual ~ObservableBase();
 
 		/**
-		 * Return path to the property.
-		 */
-		QString const&
-		path() const noexcept;
-
-		/**
-		 * Process the property (like limit its value,
-		 * etc.
+		 * Check if the observed value has changed.
 		 */
 		virtual void
 		process() = 0;
 	};
 
-	class ManagedBoolean: public ManagedProperty
-	{
-	  public:
-		// Ctor
-		ManagedBoolean (QDomElement const& element);
-
-		// From ManagedProperty
-		void
-		process() override;
-
-	  private:
-		QString					_path;
-		bool					_default = false;
-		Xefis::PropertyBoolean	_property;
-	};
-
-	class ManagedInteger: public ManagedProperty
-	{
-	  public:
-		// Ctor
-		ManagedInteger (QDomElement const& element);
-
-		// From ManagedProperty
-		void
-		process() override;
-
-	  private:
-		QString							_path;
-		Xefis::PropertyInteger::Type	_min		= 0;
-		Xefis::PropertyInteger::Type	_max		= 0;
-		Xefis::PropertyInteger::Type	_default	= 0;
-		bool							_winding	= false;
-		Xefis::PropertyInteger			_property;
-	};
-
-	class ManagedFloat: public ManagedProperty
-	{
-	  public:
-		// Ctor
-		ManagedFloat (QDomElement const& element);
-
-		// From ManagedProperty
-		void
-		process() override;
-
-	  private:
-		QString						_path;
-		Xefis::PropertyFloat::Type	_min		= 0;
-		Xefis::PropertyFloat::Type	_max		= 0;
-		Xefis::PropertyFloat::Type	_default	= 0;
-		Xefis::PropertyFloat		_property;
-	};
-
-	template<class tSIProperty>
-		class ManagedSIProperty: public ManagedProperty
+	/**
+	 * Observable property with callback issued
+	 * when value of the property changes.
+	 * Encapsulates its own Property object.
+	 */
+	template<class tProperty>
+		class Observable: public ObservableBase
 		{
-			typedef tSIProperty SIProperty;
+		  public:
+			typedef tProperty							PropertyType;
+			typedef std::function<void(PropertyType&)>	Callback;
 
 		  public:
 			// Ctor
-			ManagedSIProperty (QDomElement const& element);
+			Observable();
 
-			// From ManagedProperty
+			// Ctor
+			Observable (std::string const& path);
+
+			// Ctor
+			Observable (std::string const& path, Callback callback);
+
+			/**
+			 * Access internal property object.
+			 */
+			PropertyType&
+			property();
+
+			/**
+			 * Access internal property object.
+			 */
+			PropertyType const&
+			property() const;
+
+			/**
+			 * Set property's path and reset.
+			 */
+			void
+			set_path (std::string const& path);
+
+			/**
+			 * Set callback.
+			 */
+			void
+			set_callback (Callback callback);
+
+			/**
+			 * Set property's path and callback.
+			 */
+			void
+			observe (std::string const& path, Callback callback);
+
+			// ObservableBase API
 			void
 			process() override;
 
+			/**
+			 * Forget about the change.
+			 */
+			void
+			reset();
+
 		  private:
-			QString						_path;
-			typename SIProperty::Type	_min;
-			typename SIProperty::Type	_max;
-			typename SIProperty::Type	_default;
-			SIProperty					_property;
+			PropertyType 				_property;
+			typename PropertyType::Type	_prev_value;
+			Callback					_callback;
 		};
 
-	class ManagedString: public ManagedProperty
-	{
-	  public:
-		// Ctor
-		ManagedString (QDomElement const& element);
-
-		// From ManagedProperty
-		void
-		process() override;
-
-	  private:
-		QString					_path;
-		QString					_default;
-		Xefis::PropertyString	_property;
-	};
-
-	class ObservedProperty
-	{
-	  public:
-		// Ctor
-		ObservedProperty (State*, QDomElement const&);
-
-		// Dtor
-		~ObservedProperty();
-
-		/**
-		 * Check if property has changed and process conditions.
-		 */
-		void
-		process();
-
-	  private:
-		State*							_state;
-		QString							_path;
-		Instructions					_instructions;
-		Xefis::PropertyBoolean			_prop_boolean;
-		Xefis::PropertyInteger			_prop_integer;
-		Xefis::PropertyFloat			_prop_float;
-		Xefis::PropertyString			_prop_string;
-		Xefis::PropertyBoolean::Type	_prev_boolean;
-		Xefis::PropertyInteger::Type	_prev_integer;
-		Xefis::PropertyFloat::Type		_prev_float;
-		Xefis::PropertyString::Type		_prev_string;
-	};
-
-	class Instruction
-	{
-	  public:
-		// Dtor
-		virtual ~Instruction();
-
-		/**
-		 * Check for condition and process actions.
-		 * \param	observed_property_path Path to the examined property.
-		 */
-		virtual void
-		process() = 0;
-	};
-
-	class IfInstruction: public Instruction
-	{
-	  public:
-		enum Comparison { Equals, GreaterThan, GreaterOrEquals, LessThan, LessOrEquals };
-
-	  public:
-		// Ctor
-		IfInstruction (State*, QDomElement const&);
-
-		// Dtor
-		~IfInstruction();
-
-		// From Instruction
-		void
-		process() override;
-
-		/**
-		 * Return if the condition was true after most recent
-		 * call of process().
-		 */
-		bool
-		result() const;
-
-	  private:
-		/**
-		 * Compare values using operator defined by _type.
-		 */
-		template<class Type>
-			bool
-			evaluate_operator (Type value, Type test) const;
-
-	  private:
-		State*					_state;
-		QString					_path;
-		Comparison				_comparison;
-		QString					_value;
-		Instructions			_instructions;
-		bool					_result = false;
-		Xefis::PropertyBoolean	_prop_boolean;
-		Xefis::PropertyInteger	_prop_integer;
-		Xefis::PropertyFloat	_prop_float;
-		Xefis::PropertyString	_prop_string;
-	};
-
-	class ChooseInstruction: public Instruction
-	{
-	  public:
-		// Ctor
-		ChooseInstruction (State*, QDomElement const&);
-
-		// Dtor
-		~ChooseInstruction();
-
-		// From Instruction
-		void
-		process() override;
-
-	  private:
-		State*						_state;
-		std::list<IfInstruction*>	_whens;
-		Instructions				_otherwise;
-	};
-
-	class ModifyInstruction: public Instruction
-	{
-	  public:
-		enum Type { Toggle, Set, Add, Sub };
-
-	  public:
-		// Ctor
-		ModifyInstruction (State*, QDomElement const&);
-
-		// From Instruction
-		void
-		process() override;
-
-	  private:
-		State*	_state;
-		Type	_type;
-		QString	_path;
-		QString	_value;
-	};
-
   public:
-	// Ctor
-	State (Xefis::ModuleManager*, QDomElement const& config);
+	State (Xefis::ModuleManager* module_manager, QDomElement const& config);
 
-	// Dtor
-	~State();
-
-  protected:
 	void
 	data_updated() override;
 
   private:
-	/**
-	 * Get property path for given var name.
-	 * Throw Xefis::Exception if no such var was defined.
-	 */
-	QString
-	get_path_for_var (QString const& var_name) const;
+	Xefis::PropertyBoolean				_pressure_display_hpa;
+	Xefis::PropertyBoolean				_use_standard_pressure;
+	Xefis::PropertyBoolean				_follow_track;
+	Xefis::PropertyBoolean				_use_true_heading;
+	Xefis::PropertyBoolean				_approach_mode;
+	Xefis::PropertyBoolean				_flight_director_visible;
+	Xefis::PropertyBoolean				_flight_director_enabled;
+	Xefis::PropertyInteger				_flight_director_vertical_mode;
+	Xefis::PropertyInteger				_flight_director_lateral_mode;
+	Xefis::PropertyBoolean				_control_hint_visible;
+	Xefis::PropertyString				_control_hint_text;
+	Xefis::PropertyBoolean				_control_stick_visible;
+	Xefis::PropertyInteger				_fly_by_wire_mode;
+	Xefis::PropertyLength				_hsi_aux_range;
+	Xefis::PropertyLength				_hsi_nav_range;
+	Xefis::PropertyInteger				_hsi_nav_mode;
 
-	/**
-	 * Parse instructions and put them to the output @instructions list.
-	 */
-	void
-	parse_instructions (QDomElement const& element, Instructions& instructions);
+	Observable<Xefis::PropertyBoolean>	_saitek_a;
+	Observable<Xefis::PropertyBoolean>	_saitek_b;
+	Observable<Xefis::PropertyBoolean>	_saitek_c;
+	Observable<Xefis::PropertyBoolean>	_saitek_d;
+	Observable<Xefis::PropertyBoolean>	_saitek_shift;
+	Observable<Xefis::PropertyBoolean>	_saitek_t1;
+	Observable<Xefis::PropertyBoolean>	_saitek_t2;
+	Observable<Xefis::PropertyBoolean>	_saitek_t3;
+	Observable<Xefis::PropertyBoolean>	_saitek_t4;
+	Observable<Xefis::PropertyBoolean>	_saitek_t5;
+	Observable<Xefis::PropertyBoolean>	_saitek_t6;
+	Observable<Xefis::PropertyBoolean>	_saitek_mode_1;
+	Observable<Xefis::PropertyBoolean>	_saitek_mode_2;
+	Observable<Xefis::PropertyBoolean>	_saitek_mode_3;
+	Observable<Xefis::PropertyBoolean>	_saitek_mfd_startstop;
+	Observable<Xefis::PropertyBoolean>	_saitek_mfd_reset;
+	Observable<Xefis::PropertyBoolean>	_saitek_function_up;
+	Observable<Xefis::PropertyBoolean>	_saitek_function_down;
+	Observable<Xefis::PropertyBoolean>	_saitek_function_press;
+	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_up;
+	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_down;
+	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_press;
 
-	/**
-	 * Process all observed properties and execute actions.
-	 */
-	void
-	process_observed_properties();
-
-	/**
-	 * Process all properties to have a well-defined state.
-	 */
-	void
-	process_managed_properties();
-
-	/**
-	 * Signal that at least one property has been changed.
-	 */
-	void
-	state_changed();
-
-  private:
-	Vars				_vars;
-	ManagedProperties	_managed_properties;
-	ObservedProperties	_observed_properties;
-	bool				_state_changed;
+	std::vector<ObservableBase*>		_observables;
 };
 
 
 inline
-State::ManagedProperty::~ManagedProperty()
+State::ObservableBase::~ObservableBase()
 { }
 
 
-inline
-State::Instruction::~Instruction()
-{ }
+template<class P>
+	inline
+	State::Observable<P>::Observable()
+	{ }
 
 
-inline bool
-State::IfInstruction::result() const
-{
-	return _result;
-}
+template<class P>
+	inline
+	State::Observable<P>::Observable (std::string const& path):
+		_property (path)
+	{
+		reset();
+	}
+
+
+template<class P>
+	inline
+	State::Observable<P>::Observable (std::string const& path, Callback callback):
+		_property (path),
+		_callback (callback)
+	{
+		reset();
+	}
+
+
+template<class P>
+	inline typename State::Observable<P>::PropertyType&
+	State::Observable<P>::property()
+	{
+		return _property;
+	}
+
+
+template<class P>
+	inline typename State::Observable<P>::PropertyType const&
+	State::Observable<P>::property() const
+	{
+		return _property;
+	}
+
+
+template<class P>
+	inline void
+	State::Observable<P>::set_path (std::string const& path)
+	{
+		_property.set_path (path);
+		reset();
+	}
+
+
+template<class P>
+	inline void
+	State::Observable<P>::set_callback (Callback callback)
+	{
+		_callback = callback;
+	}
+
+
+template<class P>
+	inline void
+	State::Observable<P>::observe (std::string const& path, Callback callback)
+	{
+		set_path (path);
+		set_callback (callback);
+	}
+
+
+template<class P>
+	inline void
+	State::Observable<P>::reset()
+	{
+		_prev_value = *_property;
+	}
 
 #endif
+

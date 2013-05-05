@@ -32,6 +32,7 @@
 #include <modules/systems/fms.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
+#include <modules/private/state.h>
 
 // Local:
 #include "module_manager.h"
@@ -115,6 +116,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlyByWire (this, config);
 		else if (name == "systems/fms")
 			return new FlightManagementSystem (this, config);
+		else if (name == "private/state")
+			return new State (this, config);
 		else if (name == "generic/property-tree")
 			return new PropertyTree (this, config, parent);
 		else if (name == "generic/fps")

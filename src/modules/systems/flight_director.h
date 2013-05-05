@@ -79,6 +79,8 @@ class FlightDirector: public Xefis::Module
 	// Output:
 	Xefis::PropertyAngle	_output_pitch;
 	Xefis::PropertyAngle	_output_roll;
+	Xefis::PropertyString	_vertical_mode_hint;
+	Xefis::PropertyString	_lateral_mode_hint;
 };
 
 #endif

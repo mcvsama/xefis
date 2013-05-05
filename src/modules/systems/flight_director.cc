@@ -56,6 +56,8 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 				{ "measured-fpa", _measured_fpa, true },
 				{ "output-pitch", _output_pitch, true },
 				{ "output-roll", _output_roll, true },
+				{ "vertical-mode-hint", _vertical_mode_hint, false },
+				{ "lateral-mode-hint", _lateral_mode_hint, false }
 			});
 		}
 	}
@@ -140,6 +142,47 @@ FlightDirector::data_updated()
 	{
 		_output_pitch.write (0_deg);
 		_output_roll.write (0_deg);
+	}
+
+	// Mode hints:
+	if (!_vertical_mode_hint.is_singular())
+	{
+		switch (static_cast<VerticalMode> (*_vertical_mode))
+		{
+			case VerticalDisabled:
+				_vertical_mode_hint.write ("");
+				break;
+
+			case AltitudeHold:
+				_vertical_mode_hint.write ("ALT HOLD");
+				break;
+
+			case VerticalSpeed:
+				_vertical_mode_hint.write ("V/SPD");
+				break;
+
+			case FlightPathAngle:
+				_vertical_mode_hint.write ("FPA");
+				break;
+		}
+	}
+
+	if (!_lateral_mode_hint.is_singular())
+	{
+		switch (static_cast<LateralMode> (*_lateral_mode))
+		{
+			case LateralDisabled:
+				_lateral_mode_hint.write ("");
+				break;
+
+			case FollowHeading:
+				_lateral_mode_hint.write ("HDG HOLD");
+				break;
+
+			case FollowTrack:
+				_lateral_mode_hint.write ("TRK HOLD");
+				break;
+		}
 	}
 
 	_dt = Time::epoch();

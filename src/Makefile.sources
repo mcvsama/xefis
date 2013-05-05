@@ -168,6 +168,12 @@ SRC_SOURCES += modules/systems/mouse.cc
 
 SRC_MOCHDRS += modules/systems/mouse.h
 
+######## /modules/private ########
+
+SRC_HEADERS += modules/private/state.h
+
+SRC_SOURCES += modules/private/state.cc
+
 ################
 
 VERSION_FILE := xefis/config/version.cc

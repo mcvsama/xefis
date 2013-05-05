@@ -108,6 +108,7 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertySpeed		_v_bg;
 	Xefis::PropertySpeed		_v_br;
 	Xefis::PropertyString		_flaps_configuration_properties_path;
+	Xefis::PropertyBoolean		_use_standard_pressure;
 	Xefis::PropertyBoolean		_gear_down;
 	Xefis::PropertyPressure		_static_pressure;
 	Xefis::PropertyPressure		_qnh_pressure;
