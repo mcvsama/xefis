@@ -84,10 +84,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyLength	_altitude;
 	Xefis::PropertyLength	_altitude_lookahead;
 	Xefis::PropertyLength	_altitude_agl;
-	Xefis::PropertyLength	_transition_altitude;
-	Xefis::PropertyPressure	_pressure;
+	Xefis::PropertyLength	_minimums_altitude;
+	Xefis::PropertyPressure	_pressure_qnh;
 	Xefis::PropertyBoolean	_pressure_display_hpa;
-	Xefis::PropertyBoolean	_standard_pressure;
+	Xefis::PropertyBoolean	_use_standard_pressure;
 	Xefis::PropertySpeed	_cbr;
 	Xefis::PropertyBoolean	_cmd_settings_visible;
 	Xefis::PropertyLength	_cmd_alt_setting;

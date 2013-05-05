@@ -95,8 +95,8 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat	_rudder_minimum;
 	Xefis::PropertyFloat	_rudder_maximum;
 	// Output:
-	Xefis::PropertyFloat	_output_control_stick_pitch;
-	Xefis::PropertyFloat	_output_control_stick_roll;
+	Xefis::PropertyAngle	_output_control_stick_pitch;
+	Xefis::PropertyAngle	_output_control_stick_roll;
 	Xefis::PropertyAngle	_output_pitch;
 	Xefis::PropertyAngle	_output_roll;
 	Xefis::PropertyFloat	_output_elevator;

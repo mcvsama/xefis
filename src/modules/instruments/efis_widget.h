@@ -75,9 +75,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				altitude_agl_visible			= false;
 		QDateTime			altitude_agl_ts;
 		bool				altitude_warnings_visible		= false;
-		Length				transition_altitude				= 0_ft;
-		bool				transition_altitude_visible		= false;
-		QDateTime			transition_altitude_ts;
+		Length				minimums_altitude				= 0_ft;
+		bool				minimums_altitude_visible		= false;
+		QDateTime			minimums_altitude_ts;
 		Speed				climb_rate						= 0_fpm;
 		bool				climb_rate_visible				= false;
 		float				mach							= 0.f;
@@ -85,7 +85,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Pressure			pressure						= 0_inHg;
 		bool				pressure_display_hpa			= false;
 		bool				pressure_visible				= false;
-		bool				standard_pressure				= false;
+		bool				use_standard_pressure			= false;
 		Speed				minimum_speed					= 0_kt;
 		bool				minimum_speed_visible			= false;
 		Speed				warning_speed					= 0_kt;
@@ -138,8 +138,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		AltitudeBugs		altitude_bugs;
 		bool				speed_blink						= false;
 		bool				speed_blinking_active			= false;
-		bool				baro_blink						= false;
-		bool				baro_blinking_active			= false;
+		bool				minimums_blink					= false;
+		bool				minimums_blinking_active		= false;
 
 		/*
 		 * Speed ladder
@@ -307,7 +307,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		paint_altitude_agl (QPainter&, TextPainter&);
 
 		void
-		paint_baro_setting (QPainter&, TextPainter&);
+		paint_minimums_setting (QPainter&, TextPainter&);
 
 		void
 		paint_nav (QPainter&, TextPainter&);
@@ -362,10 +362,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 		get_pitch_scale_clipping_path() const;
 
 		QColor
-		get_baro_color() const;
+		get_minimums_color() const;
 
 		bool
-		is_newly_set (QDateTime const& timestamp) const;
+		is_newly_set (QDateTime const& timestamp, Time time = 10_s) const;
 
 	  private:
 		Parameters			_params;
@@ -673,16 +673,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude_warnings_visible (bool visible);
 
 	/**
-	 * Set transition altitude.
+	 * Set minimums altitude.
 	 */
 	void
-	set_transition_altitude (Length);
+	set_minimums_altitude (Length);
 
 	/**
-	 * Set transition altitude visibility.
+	 * Set minimums altitude visibility.
 	 */
 	void
-	set_transition_altitude_visible (bool visible);
+	set_minimums_altitude_visible (bool visible);
 
 	/**
 	 * Set climb rate.
@@ -1039,13 +1039,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	blink_speed();
 
 	void
-	blink_baro();
+	blink_minimums();
 
   private:
 	PaintWorkUnit		_paint_work_unit;
 	Parameters			_params;
-	QTimer*				_speed_blinking_warning	= nullptr;
-	QTimer*				_baro_blinking_warning	= nullptr;
+	QTimer*				_speed_blinking_warning		= nullptr;
+	QTimer*				_minimums_blinking_warning	= nullptr;
 };
 
 
@@ -1079,18 +1079,18 @@ EFISWidget::PaintWorkUnit::heading_to_px (Angle degrees) const
 
 
 inline QColor
-EFISWidget::PaintWorkUnit::get_baro_color() const
+EFISWidget::PaintWorkUnit::get_minimums_color() const
 {
-	if (_params.baro_blinking_active)
+	if (_params.altitude < _params.minimums_altitude)
 		return _warning_color_2;
 	return _navigation_color;
 }
 
 
 inline bool
-EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp) const
+EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
 {
-	return timestamp.secsTo (_current_datetime) < 10.0;
+	return timestamp.secsTo (_current_datetime) < time.s();
 }
 
 
@@ -1335,7 +1335,12 @@ EFISWidget::set_novspd_flag (bool visible)
 inline void
 EFISWidget::set_altitude (Length altitude)
 {
+	Length previous_altitude = _params.altitude;
 	_params.altitude = altitude;
+
+	if (previous_altitude > _params.minimums_altitude && altitude < _params.minimums_altitude)
+		_params.minimums_altitude_ts = QDateTime::currentDateTime();
+
 	request_repaint();
 }
 
@@ -1391,21 +1396,19 @@ EFISWidget::set_altitude_warnings_visible (bool visible)
 
 
 inline void
-EFISWidget::set_transition_altitude (Length transition_altitude)
+EFISWidget::set_minimums_altitude (Length minimums_altitude)
 {
-	if (_params.transition_altitude != transition_altitude)
-		_params.transition_altitude_ts = QDateTime::currentDateTime();
-	_params.transition_altitude = transition_altitude;
+	_params.minimums_altitude = minimums_altitude;
 	request_repaint();
 }
 
 
 inline void
-EFISWidget::set_transition_altitude_visible (bool visible)
+EFISWidget::set_minimums_altitude_visible (bool visible)
 {
-	if (_params.transition_altitude_visible != visible)
-		_params.transition_altitude_ts = QDateTime::currentDateTime();
-	_params.transition_altitude_visible = visible;
+	if (_params.minimums_altitude_visible != visible)
+		_params.minimums_altitude_ts = QDateTime::currentDateTime();
+	_params.minimums_altitude_visible = visible;
 	request_repaint();
 }
 
@@ -1507,7 +1510,7 @@ EFISWidget::set_pressure_visible (bool visible)
 inline void
 EFISWidget::set_standard_pressure (bool standard)
 {
-	_params.standard_pressure = standard;
+	_params.use_standard_pressure = standard;
 	request_repaint();
 }
 

@@ -208,9 +208,9 @@ FlyByWire::integrate_manual_input()
 
 	// Joystick visualisation on EFIS:
 	if (!_output_control_stick_pitch.is_singular())
-		_output_control_stick_pitch.write ((axis_pitch * target_pitch_extent).deg());
+		_output_control_stick_pitch.write (axis_pitch * target_pitch_extent);
 
 	if (!_output_control_stick_roll.is_singular())
-		_output_control_stick_roll.write ((axis_roll * target_roll_extent).deg());
+		_output_control_stick_roll.write (axis_roll * target_roll_extent);
 }
 

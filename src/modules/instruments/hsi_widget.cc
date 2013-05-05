@@ -323,7 +323,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 			{
 				QString text_1 =
 					QString (_params.heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU") +
-					QString (_params.display_track ? "  TRK" : "");
+					QString (_params.display_track ? " TRK" : "");
 				QString text_2 = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
 				QFont font_1 (_font_13);
@@ -333,7 +333,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 				QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
 				QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
 				rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
-				rect_2.moveLeft (rect_1.right() + metrics_1.width ("  "));
+				rect_2.moveLeft (rect_1.right() + metrics_1.width (" "));
 
 				painter.resetTransform();
 				painter.translate (0.5f * _w + _q, _h - 1.125f * _q);

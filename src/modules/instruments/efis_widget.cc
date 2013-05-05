@@ -91,7 +91,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 		paint_control_stick (painter);
 		paint_center_cross (painter, true, false);
 		paint_altitude_agl (painter, text_painter);
-		paint_baro_setting (painter, text_painter);
+		paint_minimums_setting (painter, text_painter);
 		paint_nav (painter, text_painter);
 		paint_hints (painter, text_painter);
 		paint_pitch_limit (painter);
@@ -1156,16 +1156,16 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (QPainter& painter, TextPainter& text_p
 		}
 
 		// Baro bug:
-		if (_params.transition_altitude_visible)
+		if (_params.minimums_altitude_visible)
 		{
-			if (_params.transition_altitude > _al_min_shown && _params.transition_altitude < _al_max_shown)
+			if (_params.minimums_altitude > _al_min_shown && _params.minimums_altitude < _al_max_shown)
 			{
-				if (!(_params.baro_blinking_active && !_params.baro_blink))
+				if (!(_params.minimums_blinking_active && !_params.minimums_blink))
 				{
-					float posy = ft_to_px (_params.transition_altitude);
+					float posy = ft_to_px (_params.minimums_altitude);
 					painter.setTransform (_al_transform);
 					painter.setClipRect (_al_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
-					QPen pen = get_pen (get_baro_color(), 1.25f);
+					QPen pen = get_pen (get_minimums_color(), 1.25f);
 					pen.setMiterLimit (0.35f);
 					painter.setPen (pen);
 					painter.setBrush (Qt::NoBrush);
@@ -1276,7 +1276,7 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (QPainter& painter, TextPainter& te
 	painter.setTransform (_al_transform);
 	painter.translate (0.f, 0.75f * x);
 
-	QFont font_a = _params.standard_pressure ? _font_13 : _font_16;
+	QFont font_a = _params.use_standard_pressure ? _font_13 : _font_16;
 	QFont font_b = _font_13;
 	QFontMetricsF metrics_a (font_a);
 	QFontMetricsF metrics_b (font_b);
@@ -1293,7 +1293,7 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (QPainter& painter, TextPainter& te
 	zz_rect.moveLeft (nn_rect.right());
 
 	painter.setPen (QPen (_navigation_color, pen_width(), Qt::SolidLine, Qt::RoundCap));
-	if (_params.standard_pressure)
+	if (_params.use_standard_pressure)
 	{
 		painter.setFont (_font_16);
 		text_painter.drawText (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD");
@@ -1441,8 +1441,8 @@ EFISWidget::PaintWorkUnit::paint_flight_director (QPainter& painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	for (auto pen: { get_pen (_autopilot_pen_1.color(), 2.5f),
-					 get_pen (_autopilot_pen_2.color(), 1.66f) })
+	for (auto pen: { get_pen (_autopilot_pen_1.color(), 1.95f),
+					 get_pen (_autopilot_pen_2.color(), 1.35f) })
 	{
 		painter.setPen (pen);
 		if (_params.flight_director_pitch_visible && _params.pitch_visible)
@@ -1475,18 +1475,8 @@ EFISWidget::PaintWorkUnit::paint_control_stick (QPainter& painter)
 					 get_pen (_navigation_color, 1.5f) })
 	{
 		painter.setPen (pen);
-		if (_params.flight_director_roll_visible || _params.flight_director_pitch_visible)
-		{
-			// X cross, if flight director visible:
-			painter.drawLine (QPointF (xpos - w, ypos - w), QPointF (xpos + w, ypos + w));
-			painter.drawLine (QPointF (xpos - w, ypos + w), QPointF (xpos + w, ypos - w));
-		}
-		else
-		{
-			// + cross, if alone:
-			painter.drawLine (QPointF (xpos, ypos - w), QPointF (xpos, ypos + w));
-			painter.drawLine (QPointF (xpos - w, ypos), QPointF (xpos + w, ypos));
-		}
+		painter.drawLine (QPointF (xpos, ypos - w), QPointF (xpos, ypos + w));
+		painter.drawLine (QPointF (xpos - w, ypos), QPointF (xpos + w, ypos));
 	}
 }
 
@@ -1530,9 +1520,9 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (QPainter& painter, TextPainter& t
 
 
 void
-EFISWidget::PaintWorkUnit::paint_baro_setting (QPainter& painter, TextPainter& text_painter)
+EFISWidget::PaintWorkUnit::paint_minimums_setting (QPainter& painter, TextPainter& text_painter)
 {
-	if (!_params.transition_altitude_visible)
+	if (!_params.minimums_altitude_visible)
 		return;
 
 	float x = 0.18f * wh();
@@ -1546,28 +1536,28 @@ EFISWidget::PaintWorkUnit::paint_baro_setting (QPainter& painter, TextPainter& t
 	QFontMetricsF metrics_b (font_b);
 
 	QString baro_str = "BARO";
-	QString alt_str = QString ("%1").arg (_params.transition_altitude.ft(), 0, 'f', 0);
+	QString alt_str = QString ("%1").arg (_params.minimums_altitude.ft(), 0, 'f', 0);
 
 	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
 	QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
 	alt_rect.moveTopRight (baro_rect.bottomRight());
 
-	QPen baro_pen = get_pen (get_baro_color(), 1.f);
+	QPen minimums_pen = get_pen (get_minimums_color(), 1.f);
 
-	if (!(_params.baro_blinking_active && !_params.baro_blink))
+	if (!(_params.minimums_blinking_active && !_params.minimums_blink))
 	{
-		painter.setPen (baro_pen);
+		painter.setPen (minimums_pen);
 		painter.setFont (font_a);
 		text_painter.drawText (baro_rect, Qt::AlignVCenter | Qt::AlignRight, baro_str);
 		painter.setFont (font_b);
 		text_painter.drawText (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
 	}
 
-	if (is_newly_set (_params.transition_altitude_ts))
+	if (is_newly_set (_params.minimums_altitude_ts))
 	{
 		float v = 0.06f * _q;
 		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
-		painter.setPen (baro_pen);
+		painter.setPen (minimums_pen);
 		painter.setBrush (Qt::NoBrush);
 		painter.drawRect (frame);
 	}
@@ -1715,10 +1705,12 @@ EFISWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_pai
 
 		if (is_newly_set (_params.control_hint_ts))
 		{
-			float v = 0.055f * _q;
-			QRectF frame (text_hook, QSizeF (2.f * _q, _font_20_digit_height));
+			float a = 0.055f * _q;
+			float v = -0.02f * _q;
+			QRectF frame (text_hook, QSizeF (2.25f * _q, _font_20_digit_height));
 			centrify (frame);
-			frame.adjust (0.f, -v, 0.f, +v);
+			frame.adjust (0.f, -a, 0.f, +a);
+			frame.translate (0.f, v);
 			painter.drawRect (frame);
 		}
 	}
@@ -1774,15 +1766,18 @@ EFISWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_pai
 		painter.setPen (get_pen (_navigation_color, 1.0f));
 		painter.setBrush (Qt::NoBrush);
 
+		QPointF a_big (0.f, 0.015f * _q);
+		QPointF a_small (0.f, 0.01f * _q);
+
 		painter.setFont (_font_13);
-		text_painter.drawText (b1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
-		text_painter.drawText (b2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
-		text_painter.drawText (b3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
+		text_painter.drawText (b1 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
+		text_painter.drawText (b2 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
+		text_painter.drawText (b3 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
 
 		painter.setFont (_font_10);
-		text_painter.drawText (s1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
-		text_painter.drawText (s2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
-		text_painter.drawText (s3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
+		text_painter.drawText (s1 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
+		text_painter.drawText (s2 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
+		text_painter.drawText (s3 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
 
 		if (_params.fma_speed_hint != "" && is_newly_set (_params.fma_speed_ts))
 			paint_big_rect (b1);
@@ -1989,9 +1984,11 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	_speed_blinking_warning->setInterval (200);
 	QObject::connect (_speed_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_speed()));
 
-	_baro_blinking_warning = new QTimer (this);
-	_baro_blinking_warning->setInterval (200);
-	QObject::connect (_baro_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_baro()));
+	_minimums_blinking_warning = new QTimer (this);
+	_minimums_blinking_warning->setInterval (200);
+	QObject::connect (_minimums_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_minimums()));
+
+	_params.minimums_altitude_ts = QDateTime::currentDateTime();
 
 	set_painter (&_paint_work_unit);
 }
@@ -2013,11 +2010,11 @@ EFISWidget::request_repaint()
 					 (_params.maximum_speed_visible && _params.speed > _params.maximum_speed)),
 				    &_params.speed_blink);
 
-	update_blinker (_baro_blinking_warning,
-					_params.altitude_visible && _params.transition_altitude_visible &&
-					((_params.transition_altitude > _params.altitude && _params.standard_pressure) ||
-					 (_params.transition_altitude <= _params.altitude && !_params.standard_pressure)),
-					&_params.baro_blink);
+	update_blinker (_minimums_blinking_warning,
+					_params.altitude_visible && _params.minimums_altitude_visible &&
+					_params.altitude < _params.minimums_altitude &&
+					_paint_work_unit.is_newly_set (_params.minimums_altitude_ts, 5_s),
+					&_params.minimums_blink);
 
 	InstrumentWidget::request_repaint();
 }
@@ -2027,7 +2024,7 @@ void
 EFISWidget::push_params()
 {
 	_params.speed_blinking_active = _speed_blinking_warning->isActive();
-	_params.baro_blinking_active = _baro_blinking_warning->isActive();
+	_params.minimums_blinking_active = _minimums_blinking_warning->isActive();
 	_paint_work_unit._params_next = _params;
 }
 
@@ -2056,8 +2053,8 @@ EFISWidget::blink_speed()
 
 
 void
-EFISWidget::blink_baro()
+EFISWidget::blink_minimums()
 {
-	_params.baro_blink = !_params.baro_blink;
+	_params.minimums_blink = !_params.minimums_blink;
 }
 
