@@ -112,6 +112,7 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertyBoolean		_gear_down;
 	Xefis::PropertyPressure		_static_pressure;
 	Xefis::PropertyPressure		_qnh_pressure;
+	Xefis::PropertyAngle		_critical_aoa;
 	Xefis::PropertyLength		_backup_amsl;
 	Xefis::PropertySpeed		_ias;
 	Xefis::PropertyFloat		_outside_air_temperature_k;
@@ -171,7 +172,7 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertyFloat		_mach;
 	Xefis::PropertySpeed		_sound_speed;
 	// Output AOA:
-	Xefis::PropertyAngle		_relative_pitch_limit;
+	Xefis::PropertyAngle		_pitch_limit;
 	Xefis::PropertyAngle		_aoa_alpha;
 	Xefis::PropertyAngle		_aoa_beta;
 	// Output wind:

@@ -61,6 +61,7 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "settings.flaps-configuration-properties-path", _flaps_configuration_properties_path, true },
 				{ "settings.use-standard-pressure", _use_standard_pressure, true },
 				{ "settings.pressure.qnh", _qnh_pressure, true },
+				{ "settings.critical-aoa", _critical_aoa, true },
 				{ "imu.pitch", _imu_pitch, true },
 				{ "imu.roll", _imu_roll, true },
 				{ "imu.magnetic-heading", _imu_magnetic_heading, true },
@@ -113,7 +114,7 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "speed.ground-speed", _ground_speed, true },
 				{ "speed.mach", _mach, true },
 				{ "speed.sound", _sound_speed, true },
-				{ "aoa.relative-pitch-limit", _relative_pitch_limit, true },
+				{ "aoa.pitch-limit", _pitch_limit, true },
 				{ "aoa.alpha", _aoa_alpha, true },
 				{ "aoa.beta", _aoa_beta, true },
 				{ "wind.true-heading", _wind_true_orientation_from, true },
@@ -438,6 +439,11 @@ FlightManagementSystem::compute_aoa()
 		_aoa_alpha.set_nil();
 		_aoa_beta.set_nil();
 	}
+
+	if (_aoa_alpha.valid() && _critical_aoa.valid())
+		_pitch_limit.write (-*_aoa_alpha + *_critical_aoa);
+	else
+		_pitch_limit.set_nil();
 }
 
 
