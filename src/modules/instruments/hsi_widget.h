@@ -27,7 +27,7 @@
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
-#include <xefis/utility/text_painter.h>
+#include <xefis/utility/painter.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/mutex.h>
 
@@ -122,7 +122,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	};
 
 	class PaintWorkUnit:
-		public InstrumentWidget::Painter,
+		public InstrumentWidget::PaintWorkUnit,
 		public Xefis::InstrumentAids
 	{
 		friend class HSIWidget;
@@ -146,40 +146,40 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint (QImage&) override;
 
 		void
-		paint_aircraft (QPainter&, TextPainter&);
+		paint_aircraft (Painter&);
 
 		void
-		paint_hints (QPainter&, TextPainter&);
+		paint_hints (Painter&);
 
 		void
-		paint_ap_settings (QPainter&, TextPainter&);
+		paint_ap_settings (Painter&);
 
 		void
-		paint_directions (QPainter&, TextPainter&);
+		paint_directions (Painter&);
 
 		void
-		paint_track (QPainter&, TextPainter&, bool paint_heading_triangle);
+		paint_track (Painter&, bool paint_heading_triangle);
 
 		void
-		paint_altitude_reach (QPainter&);
+		paint_altitude_reach (Painter&);
 
 		void
-		paint_trend_vector (QPainter&, TextPainter&);
+		paint_trend_vector (Painter&);
 
 		void
-		paint_speeds_and_wind (QPainter&, TextPainter&);
+		paint_speeds_and_wind (Painter&);
 
 		void
-		paint_climb_glide_ratio (QPainter&, TextPainter&);
+		paint_climb_glide_ratio (Painter&);
 
 		void
-		paint_range (QPainter&, TextPainter&);
+		paint_range (Painter&);
 
 		void
-		paint_navaids (QPainter&, TextPainter&);
+		paint_navaids (Painter&);
 
 		void
-		paint_locs (QPainter&, TextPainter&);
+		paint_locs (Painter&);
 
 		/**
 		 * Retrieve navaids from navaid storage for current aircraft

@@ -27,28 +27,28 @@
 
 namespace Xefis {
 
-InstrumentWidget::Painter::Painter (InstrumentWidget* widget):
+InstrumentWidget::PaintWorkUnit::PaintWorkUnit (InstrumentWidget* widget):
 	_widget (widget),
 	_image (QSize (1, 1), QImage::Format_ARGB32_Premultiplied)
 { }
 
 
 void
-InstrumentWidget::Painter::pop_params()
+InstrumentWidget::PaintWorkUnit::pop_params()
 {
 	// Default implementation does nothing.
 }
 
 
 void
-InstrumentWidget::Painter::resized()
+InstrumentWidget::PaintWorkUnit::resized()
 {
 	// Default implementation does nothing.
 }
 
 
 void
-InstrumentWidget::Painter::execute()
+InstrumentWidget::PaintWorkUnit::execute()
 {
 	bool paint_again = false;
 	RecursiveMutex& m = _widget->_paint_mutex;

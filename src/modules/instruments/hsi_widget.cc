@@ -26,7 +26,7 @@
 #include <xefis/core/navaid.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/text_painter.h>
+#include <xefis/utility/painter.h>
 
 // Local:
 #include "hsi_widget.h"
@@ -37,7 +37,7 @@ using Xefis::NavaidStorage;
 
 
 HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
-	Painter (hsi_widget),
+	InstrumentWidget::PaintWorkUnit (hsi_widget),
 	InstrumentAids (0.5f, 1.1f, 1.f)
 { }
 
@@ -238,8 +238,6 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		resized();
 	}
 
-	QPainter painter (&image);
-
 	_params.true_track = floored_mod (_params.magnetic_track + (_params.true_heading - _params.magnetic_heading), 360_deg);
 
 	_params.track =
@@ -273,43 +271,45 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		_params.ap_heading += _params.true_heading - _params.magnetic_heading;
 	_params.ap_heading = floored_mod (_params.ap_heading, 360_deg);
 
-	TextPainter text_painter (painter, &_text_painter_cache);
+	Painter painter (&image, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
+	painter.set_shadow_color (Qt::black);
 
 	// Clear with black background:
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (QBrush (Qt::black, Qt::SolidPattern));
 	painter.drawRect (QRect (QPoint (0, 0), size()));
 
-	paint_navaids (painter, text_painter);
+	paint_navaids (painter);
 	paint_altitude_reach (painter);
-	paint_track (painter, text_painter, false);
-	paint_directions (painter, text_painter);
-	paint_ap_settings (painter, text_painter);
-	paint_track (painter, text_painter, true);
-	paint_aircraft (painter, text_painter);
-	paint_speeds_and_wind (painter, text_painter);
-	paint_climb_glide_ratio (painter, text_painter);
-	paint_range (painter, text_painter);
-	paint_hints (painter, text_painter);
-	paint_trend_vector (painter, text_painter);
+	paint_track (painter, false);
+	paint_directions (painter);
+	paint_ap_settings (painter);
+	paint_track (painter, true);
+	paint_aircraft (painter);
+	paint_speeds_and_wind (painter);
+	paint_climb_glide_ratio (painter);
+	paint_range (painter);
+	paint_hints (painter);
+	paint_trend_vector (painter);
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_aircraft (Painter& painter)
 {
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
 
 	// Aircraft triangle - shadow and triangle:
-	painter.setPen (get_pen (Qt::black, 1.75f));
-	painter.drawPolyline (_aircraft_shape);
 	painter.setPen (get_pen (Qt::white, 1.f));
-	painter.drawPolyline (_aircraft_shape);
+	painter.add_shadow ([&]() {
+		painter.drawPolyline (_aircraft_shape);
+	});
+
 	painter.translate (0.f, -_r);
 
 	// MAG/TRUE heading
@@ -339,9 +339,9 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 				painter.translate (0.5f * _w + _q, _h - 1.125f * _q);
 				painter.setPen (get_pen (_navigation_color, 1.f));
 				painter.setFont (font_1);
-				text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
+				painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 				painter.setFont (font_2);
-				text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+				painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
 				// True heading is boxed for emphasis:
 				if (_params.heading_mode == HeadingMode::True)
 				{
@@ -381,11 +381,11 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 				painter.drawLine (rect_v.topLeft(), rect_v.bottomLeft());
 				painter.drawLine (rect_v.topRight(), rect_v.bottomRight());
 				painter.drawLine (rect_v.bottomLeft(), rect_v.bottomRight());
-				text_painter.drawText (rect_v, Qt::AlignVCenter | Qt::AlignHCenter, text_v);
+				painter.fast_draw_text (rect_v, Qt::AlignVCenter | Qt::AlignHCenter, text_v);
 				painter.setPen (get_pen (_navigation_color, 1.f));
 				painter.setFont (font_1);
-				text_painter.drawText (rect_1, Qt::AlignVCenter | Qt::AlignHCenter, text_1);
-				text_painter.drawText (rect_2, Qt::AlignVCenter | Qt::AlignHCenter, text_2);
+				painter.fast_draw_text (rect_1, Qt::AlignVCenter | Qt::AlignHCenter, text_1);
+				painter.fast_draw_text (rect_2, Qt::AlignVCenter | Qt::AlignHCenter, text_2);
 				break;
 			}
 		}
@@ -394,7 +394,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (QPainter& painter, TextPainter& text_p
 
 
 void
-HSIWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_hints (Painter& painter)
 {
 	if (!_params.positioning_hint_visible || !_params.position_valid)
 		return;
@@ -405,12 +405,12 @@ HSIWidget::PaintWorkUnit::paint_hints (QPainter& painter, TextPainter& text_pain
 	painter.setClipping (false);
 	painter.resetTransform();
 	painter.setPen (get_pen (_navigation_color, 1.f));
-	text_painter.drawText (QPointF (hplus, _h - 1.125f * _q + vplus), Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
+	painter.fast_draw_text (QPointF (hplus, _h - 1.125f * _q + vplus), Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_painter, bool paint_heading_triangle)
+HSIWidget::PaintWorkUnit::paint_track (Painter& painter, bool paint_heading_triangle)
 {
 	Length trend_range = actual_trend_range();
 	Length trend_start = actual_trend_start();
@@ -420,7 +420,7 @@ HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_pain
 	float start_point = _params.trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
-	painter.setClipPath (_outer_map_clip);
+	painter.setClipping (false);
 
 	QFont font = _font_13;
 	QFontMetricsF metrics (font);
@@ -430,9 +430,13 @@ HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_pain
 		// Scale and track line:
 		painter.setPen (QPen (_silver, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
 		painter.rotate ((_params.track - _params.rotation).deg());
-		painter.drawLine (QPointF (0.f, start_point), QPointF (0.f, -_r));
+		float extension = 0.0;
+		if (_params.display_mode != DisplayMode::Auxiliary && _params.display_track)
+			extension = 0.6 * _q;
+		painter.draw_outlined_line (QPointF (0.f, start_point), QPointF (0.f, -_r - extension));
 		painter.setPen (QPen (Qt::white, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
 
+		//painter.setClipPath (_outer_map_clip);
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
 			Length range;
@@ -446,7 +450,7 @@ HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_pain
 			if (range < 1_nm)
 				precision = 1;
 			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', precision);
-			painter.drawLine (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
+			painter.draw_outlined_line (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
 
 			if (draw_text)
 			{
@@ -455,7 +459,7 @@ HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_pain
 				half_range_rect.moveRight (-2.f * range_tick_hpx);
 				half_range_rect.translate (0.f, -range_tick_vpx);
 				painter.setFont (font);
-				text_painter.drawText (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
+				painter.fast_draw_text (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
 			}
 		};
 
@@ -477,13 +481,15 @@ HSIWidget::PaintWorkUnit::paint_track (QPainter& painter, TextPainter& text_pain
 		painter.setPen (get_pen (Qt::white, 2.2f));
 		painter.translate (0.f, -1.003f * _r);
 		painter.scale (0.465f, -0.465f);
-		painter.drawPolyline (_aircraft_shape);
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (_aircraft_shape);
+		});
 	}
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_altitude_reach (QPainter& painter)
+HSIWidget::PaintWorkUnit::paint_altitude_reach (Painter& painter)
 {
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.05f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
@@ -505,7 +511,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (QPainter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_trend_vector (QPainter& painter, TextPainter&)
+HSIWidget::PaintWorkUnit::paint_trend_vector (Painter& painter)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::RoundCap);
 
@@ -524,23 +530,33 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (QPainter& painter, TextPainter&)
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipRect (_trend_vector_clip_rect);
 
-		Length const step = trend_range / 50.f;
+		Length initial_step = trend_range / 150.f;
+		Length normal_step = trend_range / 10.f;
+		Length step = initial_step;
 		Angle const angle_per_step = step.nm() * _params.track_deviation;
+
+		QTransform transform;
+		QPolygonF polygon;
 
 		for (Length pos = 0_nm; pos < trend_range; pos += step)
 		{
+			step = pos > trend_range ? normal_step : initial_step;
 			float px = nm_to_px (step);
-			painter.rotate (angle_per_step.deg());
+			transform.rotate (angle_per_step.deg());
 			if (pos > trend_start)
-				painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -px));
-			painter.translate (0.f, -px);
+				polygon << transform.map (QPointF (0.f, -px));
+			transform.translate (0.f, -px);
 		}
+
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (polygon);
+		});
 	}
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_ap_settings (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 {
 	if (!_params.ap_heading_visible)
 		return;
@@ -601,28 +617,37 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (QPainter& painter, TextPainter& tex
 		painter.translate (0.5f * _w - metrics_2.width ("000") - _q, _h - 1.125f * _q);
 		painter.setPen (_autopilot_pen_2);
 		painter.setFont (font_1);
-		text_painter.drawText (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
+		painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
 		painter.setFont (font_2);
-		text_painter.drawText (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+		painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
 	}
 
 	if (_params.ap_track_visible)
 	{
+		float const shadow_scale = 2.0;
+
 		QPen pen (_autopilot_pen_2.color(), pen_width (1.f), Qt::DashLine, Qt::RoundCap);
 		pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
 
+		QPen shadow_pen (painter.shadow_color(), pen_width (2.f), Qt::DashLine, Qt::RoundCap);
+		shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
+
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
-		painter.setPen (pen);
 		painter.setTransform (_aircraft_center_transform);
 		painter.rotate ((_params.ap_heading - _params.rotation).deg());
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
+
+		for (auto p: { shadow_pen, pen })
+		{
+			painter.setPen (p);
+			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
+		}
 	}
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_directions (Painter& painter)
 {
 	if (!_params.heading_visible)
 		return;
@@ -638,17 +663,16 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 
 	for (int deg = 0; deg < 360; deg += 5)
 	{
+		QPointF sp = deg % 10 == 0
+			? QPointF (0.f, -0.935f * _r)
+			: QPointF (0.f, -0.965f * _r);
 		painter.setTransform (t);
 		painter.rotate (deg);
-		painter.drawLine (QPointF (0.f, -_r),
-						  deg % 10 == 0
-							? QPointF (0.f, -0.935f * _r)
-							: QPointF (0.f, -0.965f * _r));
+		painter.draw_outlined_line (QPointF (0.f, -_r), sp);
+
 		if (deg % 30 == 0)
-		{
-			text_painter.drawText (QRectF (-_q, -0.93f * _r, 2.f * _q, 0.5f * _q),
-								   Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
-		}
+			painter.fast_draw_text (QRectF (-_q, -0.93f * _r, 2.f * _q, 0.5f * _q),
+									Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
 	}
 
 	switch (_params.display_mode)
@@ -656,7 +680,9 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 		case DisplayMode::Expanded:
 			// Circle around radials:
 			painter.setBrush (Qt::NoBrush);
-			painter.drawEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+			painter.add_shadow ([&]() {
+				painter.drawEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+			});
 			break;
 
 		case DisplayMode::Rose:
@@ -666,7 +692,7 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 			for (int deg = 45; deg < 360; deg += 45)
 			{
 				painter.rotate (45);
-				painter.drawLine (QPointF (0.f, -1.025f * _r), QPointF (0.f, -1.125f * _r));
+				painter.draw_outlined_line (QPointF (0.f, -1.025f * _r), QPointF (0.f, -1.125f * _r));
 			}
 			break;
 
@@ -677,7 +703,7 @@ HSIWidget::PaintWorkUnit::paint_directions (QPainter& painter, TextPainter& text
 
 
 void
-HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Painter& painter)
 {
 	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
@@ -695,9 +721,9 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter&
 		val_rect.moveLeft (str_rect.right());
 
 		painter.setFont (font_a);
-		text_painter.drawText (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
+		painter.fast_draw_text (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
 		painter.setFont (font_b);
-		text_painter.drawText (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
+		painter.fast_draw_text (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
 
 		return str_rect.width() + val_rect.width();
 	};
@@ -730,25 +756,24 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (QPainter& painter, TextPainter&
 		if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
 			painter.translate (0.f, 0.15f * _q);
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		text_painter.drawText (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
+		painter.fast_draw_text (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
 
 		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
 		painter.rotate ((_params.wind_from_magnetic_heading - _params.magnetic_heading + 180_deg).deg());
-		for (auto pen: { get_pen (Qt::black, 1.75), get_pen (Qt::white, 1.0) })
-		{
-			painter.setPen (pen);
+		painter.setPen (get_pen (Qt::white, 1.0));
+		painter.add_shadow ([&]() {
 			QPointF a = QPointF (0.f, -0.7f * _q);
 			QPointF b = QPointF (0.f, +0.7f * _q);
 			painter.drawLine (a + QPointF (0.f, 0.05f * _q), b);
 			painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
 			painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
-		}
+		});
 	}
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Painter& painter)
 {
 	if (!_params.climb_glide_ratio_visible)
 		return;
@@ -793,14 +818,14 @@ HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (QPainter& painter, TextPainte
 		val = "––";
 
 	painter.setFont (font_a);
-	text_painter.drawText (QPointF (_w - metr_b.width ("\u20090000:1"), translate_descent (metr_a, metr_b)), Qt::AlignTop | Qt::AlignRight, str);
+	painter.fast_draw_text (QPointF (_w - metr_b.width ("\u20090000:1"), translate_descent (metr_a, metr_b)), Qt::AlignTop | Qt::AlignRight, str);
 	painter.setFont (font_b);
-	text_painter.drawText (QPointF (_w, metr_b.height()), Qt::AlignBottom | Qt::AlignRight, val);
+	painter.fast_draw_text (QPointF (_w, metr_b.height()), Qt::AlignBottom | Qt::AlignRight, val);
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_range (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_range (Painter& painter)
 {
 	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
 	{
@@ -821,15 +846,15 @@ HSIWidget::PaintWorkUnit::paint_range (QPainter& painter, TextPainter& text_pain
 		painter.setBrush (Qt::black);
 		painter.drawRect (rect);
 		painter.setFont (font_a);
-		text_painter.drawText (rect.center() - QPointF (0.f, 0.05f * _q), Qt::AlignBottom | Qt::AlignHCenter, s);
+		painter.fast_draw_text (rect.center() - QPointF (0.f, 0.05f * _q), Qt::AlignBottom | Qt::AlignHCenter, s);
 		painter.setFont (font_b);
-		text_painter.drawText (rect.center() - QPointF (0.f, 0.135f * _q), Qt::AlignTop | Qt::AlignHCenter, r);
+		painter.fast_draw_text (rect.center() - QPointF (0.f, 0.135f * _q), Qt::AlignTop | Qt::AlignHCenter, r);
 	}
 }
 
 
 void
-HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_navaids (Painter& painter)
 {
 	if (!_params.navaids_visible || !_params.position_valid)
 		return;
@@ -840,7 +865,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_pa
 
 	retrieve_navaids();
 
-	paint_locs (painter, text_painter);
+	paint_locs (painter);
 
 	auto paint_navaid = [&](Navaid const& navaid)
 	{
@@ -860,7 +885,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_pa
 				painter.setBrush (_ndb_pen.color());
 				painter.drawPath (_ndb_shape);
 				painter.setTransform (centered_transform);
-				text_painter.drawText (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
+				painter.fast_draw_text (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
 				break;
 			}
 
@@ -882,7 +907,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_pa
 				else if (navaid.vor_type() == Navaid::VORTAC)
 					painter.drawPolyline (_vortac_shape);
 				painter.setTransform (centered_transform);
-				text_painter.drawText (QPointF (0.35f * _q, 0.55f * _q), navaid.identifier());
+				painter.fast_draw_text (QPointF (0.35f * _q, 0.55f * _q), navaid.identifier());
 				break;
 
 			case Navaid::DME:
@@ -903,7 +928,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_pa
 				painter.drawPolyline (points, sizeof (points) / sizeof (*points));
 				painter.setTransform (centered_transform);
 				painter.translate (0.5f, 0.5f);
-				text_painter.drawText (QPointF (0.25f * _q, 0.45f * _q), navaid.identifier());
+				painter.fast_draw_text (QPointF (0.25f * _q, 0.45f * _q), navaid.identifier());
 				break;
 			}
 
@@ -931,7 +956,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (QPainter& painter, TextPainter& text_pa
 
 
 void
-HSIWidget::PaintWorkUnit::paint_locs (QPainter& painter, TextPainter& text_painter)
+HSIWidget::PaintWorkUnit::paint_locs (Painter& painter)
 {
 	QFontMetricsF font_metrics (painter.font());
 	QTransform rot_1; rot_1.rotate (-2.f);
@@ -947,7 +972,7 @@ HSIWidget::PaintWorkUnit::paint_locs (QPainter& painter, TextPainter& text_paint
 	{
 		painter.resetTransform();
 		for (auto const& text_and_xy: texts_to_paint)
-			text_painter.drawText (text_and_xy.first, text_and_xy.second);
+			painter.fast_draw_text (text_and_xy.first, text_and_xy.second);
 		texts_to_paint.clear();
 	};
 

@@ -45,8 +45,7 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 	float const w = width();
 	float const h = height();
 
-	QPainter painter (this);
-	TextPainter text_painter (painter, &_text_painter_cache);
+	Painter painter (this, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
@@ -62,15 +61,14 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 	float q = 0.06f * wh();
 	float r = 6.5f * q;
 
-	paint_text (painter, text_painter, q, r);
-	paint_indicator (painter, text_painter, q, r);
+	paint_text (painter, q, r);
+	paint_indicator (painter, q, r);
 }
 
 
 void
-RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter, float q, float)
+RadialIndicatorWidget::paint_text (Painter& painter, float q, float)
 {
-	QColor white (255, 255, 255);
 	QColor yellow (255, 220, 0);
 	QColor orange (255, 150, 0);
 	QColor red (255, 0, 0);
@@ -82,7 +80,7 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 	QFont small_font (_font_16);
 	QFontMetricsF small_metrics (small_font);
 
-	QPen pen = get_pen (white, 1.f);
+	QPen pen = get_pen (Qt::white, 1.f);
 	pen.setCapStyle (Qt::RoundCap);
 
 	float margin = 0.4f * q;
@@ -110,7 +108,7 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 		painter.setPen (pen);
 		painter.drawRect (rect);
 		float const bit_lower = 0.13f * q;
-		text_painter.drawText (text_rect.translated (0.f, bit_lower), Qt::AlignRight | Qt::AlignVCenter, text);
+		painter.fast_draw_text (text_rect.translated (0.f, bit_lower), Qt::AlignRight | Qt::AlignVCenter, text);
 	}
 	else
 	{
@@ -122,9 +120,9 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 	{
 		painter.setFont (small_font);
 		painter.setPen (get_pen (Qt::green, 1.0f));
-		text_painter.drawText (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
-							   Qt::AlignBottom | Qt::AlignRight,
-							   QString ("%1").arg (_normal_value, 0, 'f', 1));
+		painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
+								Qt::AlignBottom | Qt::AlignRight,
+								QString ("%1").arg (_normal_value, 0, 'f', 1));
 	}
 
 	painter.restore();
@@ -132,16 +130,20 @@ RadialIndicatorWidget::paint_text (QPainter& painter, TextPainter& text_painter,
 
 
 void
-RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, float r)
+RadialIndicatorWidget::paint_indicator (Painter& painter, float, float r)
 {
+	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);
 	QColor yellow (255, 220, 0);
 	QColor red (255, 0, 0);
 
-	QPen pen = get_pen (QColor (255, 255, 255), 1.0f);
+	QPen silver_pen = get_pen (silver, 1.0f);
+	silver_pen.setCapStyle (Qt::RoundCap);
+
+	QPen pen = get_pen (Qt::white, 1.0f);
 	pen.setCapStyle (Qt::RoundCap);
 
-	QPen pointer_pen = get_pen (QColor (255, 255, 255), 1.1f);
+	QPen pointer_pen = get_pen (Qt::white, 1.1f);
 	pointer_pen.setCapStyle (Qt::RoundCap);
 
 	QPen warning_pen = get_pen (yellow, 1.f);
@@ -178,6 +180,7 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 	float target_angle = value_span_angle * (target - _range.min()) / _range.extent();
 
 	painter.save();
+
 	if (_value_visible)
 	{
 		painter.save();
@@ -186,23 +189,12 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 		painter.drawPie (rect, -16.f * 0.f, -16.f * value_angle);
 		painter.setPen (gray_pen);
 		painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
-		painter.rotate (value_angle);
-		painter.setPen (pointer_pen);
-		if (_target_visible)
-		{
-			float ext = 0.15f * r;
-			float extr = 1.15f * r;
-			painter.drawLine (QPointF (0.f, 0.f), QPointF (extr, 0.f));
-			painter.rotate (target_angle - value_angle);
-			painter.drawLine (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
-			painter.drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
-		}
-		else
-			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
 		painter.restore();
 	}
 
 	// Warning/critical bugs:
+
+	painter.save();
 
 	struct PointInfo
 	{
@@ -218,7 +210,7 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 
 	float gap_degs = 4;
 
-	points.emplace_back (0.f, pen, 0.f);
+	points.emplace_back (0.f, silver_pen, 0.f);
 	if (_warning_visible)
 		points.emplace_back (warning_angle, warning_pen, 0.1f * r);
 	if (_critical_visible)
@@ -249,6 +241,29 @@ RadialIndicatorWidget::paint_indicator (QPainter& painter, TextPainter&, float, 
 		painter.drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.1f * r, 0.f));
 		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, -0.14f * r));
 		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, +0.14f * r));
+	}
+
+	painter.restore();
+
+	// Needle:
+	if (_value_visible)
+	{
+		painter.rotate (value_angle);
+		painter.setPen (pointer_pen);
+		painter.set_shadow_color (Qt::black);
+		painter.set_shadow_width (1.8f);
+
+		if (_target_visible)
+		{
+			float ext = 0.15f * r;
+			float extr = 1.15f * r;
+			painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (extr, 0.f));
+			painter.rotate (target_angle - value_angle);
+			painter.draw_outlined_line (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
+			painter.drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
+		}
+		else
+			painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
 	}
 
 	painter.restore();
