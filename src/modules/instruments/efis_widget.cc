@@ -1851,7 +1851,7 @@ EFISWidget::PaintWorkUnit::paint_pitch_limit (Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit - _params.pitch, -20_deg, +20_deg)));
+	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit, -20_deg, +20_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 

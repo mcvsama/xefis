@@ -60,7 +60,7 @@
 										<property name='dme-distance' path='/localizer/distance'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
 										<property name='approach-type-hint' path='/localizer/type'/>
-										<property name='orientation-pitch-limit' path='/aoa/relative-pitch-limit'/>
+										<property name='orientation-pitch-limit' path='/aoa/pitch-limit'/>
 									</directory>
 									<directory path='/sensors'>
 										<property name='ias' path='/speed/ias'/>

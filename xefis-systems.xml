@@ -133,6 +133,7 @@
 					<property name='settings.flaps-configuration-properties-path' path='/speeds/flaps-configuration-properties-path' default=''/>
 					<property name='settings.use-standard-pressure' path='/use-standard-pressure' default='false'/>
 					<property name='settings.pressure.qnh' path='/pressure/qnh' default='29.52 inhg'/>
+					<property name='settings.critical-aoa' path='/aoa/critical' default='15 deg'/>
 				</directory>
 				<directory path='//sensors'>
 					<property name='imu.pitch' path='/imu/pitch'/>
@@ -198,7 +199,7 @@
 					<property name='speed.sound' path='/sound'/>
 				</directory>
 				<directory path='/aoa'>
-					<property name='aoa.relative-pitch-limit' path='/relative-pitch-limit'/>
+					<property name='aoa.pitch-limit' path='/pitch-limit'/>
 					<property name='aoa.alpha' path='/alpha'/>
 					<property name='aoa.beta' path='/beta'/>
 				</directory>

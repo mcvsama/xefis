@@ -21,6 +21,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 #include <QtGui/QPen>
+#include <QtGui/QPainter>
 #include <QtWidgets/QWidget>
 
 // Xefis:
