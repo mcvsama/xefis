@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__SCALED_TEXT_H__INCLUDED
-#define XEFIS__UTILITY__SCALED_TEXT_H__INCLUDED
+#ifndef XEFIS__UTILITY__TEXT_PAINTER_H__INCLUDED
+#define XEFIS__UTILITY__TEXT_PAINTER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -32,7 +32,7 @@
  * Draws bigger text and then scales it down to the destination area
  * for better quality fonts.
  */
-class TextPainter
+class TextPainter: public QPainter
 {
   public:
 	/**
@@ -84,20 +84,19 @@ class TextPainter
 	};
 
   public:
-	TextPainter (QPainter& painter, Cache* cache);
+	TextPainter (QPaintDevice* device, Cache* cache);
 
 	void
-	drawText (QPointF const& position, QString const& text);
+	fast_draw_text (QPointF const& position, QString const& text);
 
 	void
-	drawText (QPointF const& position, Qt::Alignment flags, QString const& text);
+	fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text);
 
 	void
-	drawText (QRectF const& target, Qt::Alignment flags, QString const& text);
+	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text);
 
   private:
-	Cache*		_cache;
-	QPainter&	_painter;
+	Cache*	_cache;
 };
 
 

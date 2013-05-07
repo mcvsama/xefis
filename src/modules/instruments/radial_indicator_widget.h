@@ -25,7 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/utility/text_painter.h>
+#include <xefis/utility/painter.h>
 #include <xefis/utility/range.h>
 
 
@@ -111,10 +111,10 @@ class RadialIndicatorWidget:
 	paintEvent (QPaintEvent*) override;
 
 	void
-	paint_text (QPainter&, TextPainter&, float q, float r);
+	paint_text (Painter&, float q, float r);
 
 	void
-	paint_indicator (QPainter&, TextPainter&, float q, float r);
+	paint_indicator (Painter&, float q, float r);
 
   private:
 	TextPainter::Cache	_text_painter_cache;

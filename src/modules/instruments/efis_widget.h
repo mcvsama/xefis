@@ -31,7 +31,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/utility/text_painter.h>
+#include <xefis/utility/painter.h>
 
 
 class EFISWidget: public Xefis::InstrumentWidget
@@ -162,7 +162,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	};
 
 	class PaintWorkUnit:
-		public InstrumentWidget::Painter,
+		public InstrumentWidget::PaintWorkUnit,
 		public Xefis::InstrumentAids
 	{
 		friend class EFISWidget;
@@ -193,22 +193,22 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_pre_paint();
 
 		void
-		adi_paint (QPainter&, TextPainter&);
+		adi_paint (Painter&);
 
 		void
-		adi_paint_horizon (QPainter&);
+		adi_paint_horizon (Painter&);
 
 		void
-		adi_paint_pitch (QPainter&, TextPainter&);
+		adi_paint_pitch (Painter&);
 
 		void
-		adi_paint_roll (QPainter&);
+		adi_paint_roll (Painter&);
 
 		void
-		adi_paint_heading (QPainter&, TextPainter&);
+		adi_paint_heading (Painter&);
 
 		void
-		adi_paint_flight_path_marker (QPainter&);
+		adi_paint_flight_path_marker (Painter&);
 
 		/*
 		 * Speed ladder
@@ -221,31 +221,31 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_pre_paint();
 
 		void
-		sl_paint (QPainter&, TextPainter&);
+		sl_paint (Painter&);
 
 		void
-		sl_paint_black_box (QPainter&, TextPainter&, float x);
+		sl_paint_black_box (Painter&, float x);
 
 		void
-		sl_paint_ladder_scale (QPainter&, TextPainter&, float x);
+		sl_paint_ladder_scale (Painter&, float x);
 
 		void
-		sl_paint_speed_limits (QPainter&, float x);
+		sl_paint_speed_limits (Painter&, float x);
 
 		void
-		sl_paint_speed_tendency (QPainter&, float x);
+		sl_paint_speed_tendency (Painter&, float x);
 
 		void
-		sl_paint_bugs (QPainter&, TextPainter&, float x);
+		sl_paint_bugs (Painter&, float x);
 
 		void
-		sl_paint_mach_number (QPainter&, TextPainter&, float x);
+		sl_paint_mach_number (Painter&, float x);
 
 		void
-		sl_paint_ap_setting (QPainter&, TextPainter&);
+		sl_paint_ap_setting (Painter&);
 
 		void
-		sl_paint_novspd (QPainter&, TextPainter&);
+		sl_paint_novspd (Painter&);
 
 		float
 		kt_to_px (Speed) const;
@@ -261,28 +261,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 		al_pre_paint();
 
 		void
-		al_paint (QPainter&, TextPainter&);
+		al_paint (Painter&);
 
 		void
-		al_paint_black_box (QPainter&, TextPainter&, float x);
+		al_paint_black_box (Painter&, float x);
 
 		void
-		al_paint_ladder_scale (QPainter&, TextPainter&, float x);
+		al_paint_ladder_scale (Painter&, float x);
 
 		void
-		al_paint_altitude_tendency (QPainter&, float x);
+		al_paint_altitude_tendency (Painter&, float x);
 
 		void
-		al_paint_bugs (QPainter&, TextPainter&, float x);
+		al_paint_bugs (Painter&, float x);
 
 		void
-		al_paint_climb_rate (QPainter&, TextPainter&, float x);
+		al_paint_climb_rate (Painter&, float x);
 
 		void
-		al_paint_pressure (QPainter&, TextPainter&, float x);
+		al_paint_pressure (Painter&, float x);
 
 		void
-		al_paint_ap_setting (QPainter&, TextPainter&);
+		al_paint_ap_setting (Painter&);
 
 		float
 		ft_to_px (Length) const;
@@ -295,49 +295,47 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 */
 
 		void
-		paint_center_cross (QPainter&, bool center_box, bool rest);
+		paint_center_cross (Painter&, bool center_box, bool rest);
 
 		void
-		paint_flight_director (QPainter&);
+		paint_flight_director (Painter&);
 
 		void
-		paint_control_stick (QPainter&);
+		paint_control_stick (Painter&);
 
 		void
-		paint_altitude_agl (QPainter&, TextPainter&);
+		paint_altitude_agl (Painter&);
 
 		void
-		paint_minimums_setting (QPainter&, TextPainter&);
+		paint_minimums_setting (Painter&);
 
 		void
-		paint_nav (QPainter&, TextPainter&);
+		paint_nav (Painter&);
 
 		void
-		paint_hints (QPainter&, TextPainter&);
+		paint_hints (Painter&);
 
 		void
-		paint_pitch_limit (QPainter&);
+		paint_pitch_limit (Painter&);
 
 		void
-		paint_input_alert (QPainter&, TextPainter&);
+		paint_input_alert (Painter&);
 
 		void
-		paint_dashed_zone (QPainter&, QColor const&, QRectF const& target);
+		paint_dashed_zone (Painter&, QColor const&, QRectF const& target);
 
 		/**
 		 * Render 'rotatable' value on speed/altitude black box.
 		 *
 		 * \param	painter
-		 *			QPainter to use.
-		 * \param	text_painter
-		 *			TextPainter to use.
+		 *			Painter to use.
 		 * \param	position
 		 *			Text position, [-0.5, 0.5].
 		 * \param	next, curr, prev
 		 *			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
 		 */
 		void
-		paint_rotating_value (QPainter& painter, TextPainter& text_painter,
+		paint_rotating_value (Painter& painter,
 							  QRectF const& rect, float position, float height_scale,
 							  QString const& next, QString const& curr, QString const& prev);
 
@@ -348,7 +346,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 *			Draw red/green/blank mark instead of zero.
 		 */
 		void
-		paint_rotating_digit (QPainter& painter, TextPainter& text_painter,
+		paint_rotating_digit (Painter& painter,
 							  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 							  bool two_zeros, bool zero_mark, bool black_zero = false);
 
@@ -395,7 +393,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QRectF				_adi_sky_rect;
 		QRectF				_adi_gnd_rect;
 		QPainterPath		_flight_path_marker_shape;
-		QPainterPath		_flight_path_marker_clip;
 		QPointF				_flight_path_marker_position;
 
 		/*

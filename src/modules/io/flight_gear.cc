@@ -19,7 +19,7 @@
 #include <xefis/application/application.h>
 #include <xefis/application/services.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/text_painter.h>
+#include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
 
 // Local:

@@ -58,9 +58,9 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar 
 }
 
 
-TextPainter::TextPainter (QPainter& painter, Cache* cache):
-	_cache (cache),
-	_painter (painter)
+TextPainter::TextPainter (QPaintDevice* device, Cache* cache):
+	QPainter (device),
+	_cache (cache)
 {
 	if (!_cache)
 		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
@@ -68,18 +68,18 @@ TextPainter::TextPainter (QPainter& painter, Cache* cache):
 
 
 void
-TextPainter::drawText (QPointF const& position, QString const& text)
+TextPainter::fast_draw_text (QPointF const& position, QString const& text)
 {
-	QFontMetricsF metrics (_painter.font());
+	QFontMetricsF metrics (font());
 	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
-	drawText (target, 0, text);
+	fast_draw_text (target, 0, text);
 }
 
 
 void
-TextPainter::drawText (QPointF const& position, Qt::Alignment flags, QString const& text)
+TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text)
 {
-	QFontMetricsF metrics (_painter.font());
+	QFontMetricsF metrics (font());
 	QRectF target (position.x(), position.y(), metrics.width (text), metrics.height());
 
 	if (flags & Qt::AlignHCenter)
@@ -92,14 +92,14 @@ TextPainter::drawText (QPointF const& position, Qt::Alignment flags, QString con
 	else if (flags & Qt::AlignBottom)
 		target.translate (0.f, -target.height());
 
-	drawText (target, 0, text);
+	fast_draw_text (target, 0, text);
 }
 
 
 void
-TextPainter::drawText (QRectF const& target, Qt::Alignment flags, QString const& text)
+TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text)
 {
-	QFontMetricsF metrics (_painter.font());
+	QFontMetricsF metrics (font());
 	QPointF target_center = target.center();
 	QPointF offset;
 
@@ -118,41 +118,41 @@ TextPainter::drawText (QRectF const& target, Qt::Alignment flags, QString const&
 		offset.setY (target.top());
 
 	// Check if we need to take into account painter transform:
-	QTransform painter_transform = _painter.transform();
+	QTransform painter_transform = transform();
 	bool saved_transform = false;
 	if (painter_transform.isAffine() && !painter_transform.isRotating() && !painter_transform.isScaling() && painter_transform.isTranslating())
 	{
 		qreal x, y;
 		painter_transform.map (0.f, 0.f, &x, &y);
-		_painter.resetTransform();
+		resetTransform();
 		offset.rx() += x;
 		offset.ry() += y;
 		saved_transform = true;
 	}
 
-	QColor color = _painter.pen().color();
+	QColor color = pen().color();
 
 	// TODO cache previous painting info { font, color }, and if the same, use cached glyphs_cache iterator.
 	// Find font cache:
-	Cache::Fonts::iterator glyphs_cache_it = _cache->fonts.find (Cache::Font { _painter.font(), color });
+	Cache::Fonts::iterator glyphs_cache_it = _cache->fonts.find (Cache::Font { font(), color });
 	if (glyphs_cache_it == _cache->fonts.end())
-		glyphs_cache_it = _cache->fonts.insert ({ Cache::Font { _painter.font(), color }, Cache::Glyphs() }).first;
+		glyphs_cache_it = _cache->fonts.insert ({ Cache::Font { font(), color }, Cache::Glyphs() }).first;
 	Cache::Glyphs* glyphs_cache = &glyphs_cache_it->second;
 
 	for (QString::ConstIterator c = text.begin(); c != text.end(); ++c)
 	{
 		auto glyph = glyphs_cache->find (*c);
 		if (glyph == glyphs_cache->end())
-			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (_painter.font(), color, *c) }).first;
+			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c) }).first;
 		float fx = floored_mod<float> (offset.x(), 1.f);
 		float fy = floored_mod<float> (offset.y(), 1.f);
 		int dx = limit<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		int dy = limit<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
-		_painter.drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
+		drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
 		offset.rx() += metrics.width (*c);
 	}
 
 	if (saved_transform)
-		_painter.setTransform (painter_transform);
+		setTransform (painter_transform);
 }
 

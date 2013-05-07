@@ -33,14 +33,14 @@ namespace Xefis {
 class InstrumentWidget: public QWidget
 {
   public:
-	class Painter: public WorkPerformer::Unit
+	class PaintWorkUnit: public WorkPerformer::Unit
 	{
 	  public:
 		// Ctor
-		Painter (InstrumentWidget*);
+		PaintWorkUnit (InstrumentWidget*);
 
 		// Dtor
-		~Painter() noexcept { }
+		~PaintWorkUnit() noexcept { }
 
 		/**
 		 * Prepare params from the queue to be processed.
@@ -101,7 +101,7 @@ class InstrumentWidget: public QWidget
 	 * Must have valid WorkPerformer passed in constructor for this.
 	 */
 	void
-	set_painter (Painter* painter);
+	set_painter (PaintWorkUnit* painter);
 
 	/**
 	 * Safely wait for painting thread to finish.
@@ -153,7 +153,7 @@ class InstrumentWidget: public QWidget
 
   private:
 	WorkPerformer*			_work_performer				= nullptr;
-	Painter*				_paint_work_unit			= nullptr;
+	PaintWorkUnit*			_paint_work_unit			= nullptr;
 	mutable RecursiveMutex	_paint_mutex;
 	Semaphore				_paint_sem;
 	QImage					_paint_buffer;
@@ -166,21 +166,21 @@ class InstrumentWidget: public QWidget
 
 
 inline QSize const&
-InstrumentWidget::Painter::size() const
+InstrumentWidget::PaintWorkUnit::size() const
 {
 	return _size;
 }
 
 
 inline QSize const&
-InstrumentWidget::Painter::window_size() const
+InstrumentWidget::PaintWorkUnit::window_size() const
 {
 	return _window_size;
 }
 
 
 inline void
-InstrumentWidget::set_painter (Painter* painter)
+InstrumentWidget::set_painter (PaintWorkUnit* painter)
 {
 	_paint_work_unit = painter;
 }
