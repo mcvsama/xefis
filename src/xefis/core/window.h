@@ -20,10 +20,12 @@
 // Qt:
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLayout>
+#include <QtWidgets/QStackedWidget>
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/application/application.h>
 
 
 namespace Xefis {
@@ -32,18 +34,31 @@ class ConfigReader;
 
 class Window: public QWidget
 {
+	Q_OBJECT
+
   public:
 	// Ctor
-	Window (ConfigReader*, QDomElement const&);
+	Window (Application*, ConfigReader*, QDomElement const&);
 
   private:
 	void
-	process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* window, int stretch = 0);
+	process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* instruments_panel, int stretch = 0);
 
 	void
-	process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* window);
+	process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* instruments_panel);
+
+	void
+	configurator_taken();
+
+  private slots:
+	void
+	show_configurator();
 
   private:
+	Application*	_application;
+	QStackedWidget*	_stack;
+	QWidget*		_instruments_panel;
+	QWidget*		_configurator_panel;
 	ConfigReader*	_config_reader;
 	QPoint			_mouse_pos;
 };

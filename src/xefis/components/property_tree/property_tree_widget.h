@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property_node.h>
 
 
 namespace Xefis {

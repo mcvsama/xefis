@@ -21,7 +21,6 @@
 
 // Modules:
 #include <modules/generic/fps.h>
-#include <modules/generic/property_tree.h>
 #include <modules/instruments/efis.h>
 #include <modules/instruments/hsi.h>
 #include <modules/instruments/radial_indicator.h>
@@ -118,8 +117,6 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlightManagementSystem (this, config);
 		else if (name == "private/state")
 			return new State (this, config);
-		else if (name == "generic/property-tree")
-			return new PropertyTree (this, config, parent);
 		else if (name == "generic/fps")
 			return new FPS (this, config);
 		else if (name == "io/flightgear")

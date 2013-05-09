@@ -19,11 +19,14 @@ SRC_MOCHDRS += xefis/application/services.h
 
 SRC_HEADERS += xefis/components/property_tree/property_tree_widget.h
 SRC_HEADERS += xefis/components/property_tree/property_tree_widget_item.h
+SRC_HEADERS += xefis/components/configurator/configurator_widget.h
 
 SRC_SOURCES += xefis/components/property_tree/property_tree_widget.cc
 SRC_SOURCES += xefis/components/property_tree/property_tree_widget_item.cc
+SRC_SOURCES += xefis/components/configurator/configurator_widget.cc
 
 SRC_MOCHDRS += xefis/components/property_tree/property_tree_widget.h
+SRC_MOCHDRS += xefis/components/configurator/configurator_widget.h
 
 ######## /xefis/config ########
 
@@ -63,6 +66,8 @@ SRC_SOURCES += xefis/core/property_node.cc
 SRC_SOURCES += xefis/core/property_storage.cc
 SRC_SOURCES += xefis/core/window.cc
 SRC_SOURCES += xefis/core/work_performer.cc
+
+SRC_MOCHDRS += xefis/core/window.h
 
 ######## /xefis/utility ########
 
@@ -117,10 +122,8 @@ SRC_SOURCES += lib/si/time.cc
 ######## /modules/generic ########
 
 SRC_HEADERS += modules/generic/fps.h
-SRC_HEADERS += modules/generic/property_tree.h
 
 SRC_SOURCES += modules/generic/fps.cc
-SRC_SOURCES += modules/generic/property_tree.cc
 
 ######## /modules/instruments ########
 
