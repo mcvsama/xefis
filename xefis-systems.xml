@@ -119,7 +119,6 @@
 					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.kg' default='2.0'/>
 					<property name='settings.low-speed-roll-angle' path='/low-speed-roll-angle' default='15 deg'/>
 					<property name='settings.speed.v-a-default' path='/speeds/v-a-default' default='90 kt'/>
-					<property name='settings.speed.v-no-default' path='/speeds/v-no-default' default='100 kt'/>
 					<property name='settings.speed.v-ne' path='/speeds/v-ne' default='140 kt'/>
 					<property name='settings.speed.v-s' path='/speeds/v-s' default='60 kt'/>
 					<property name='settings.speed.v-s0' path='/speeds/v-s0' default='53 kt'/>
@@ -128,8 +127,8 @@
 					<property name='settings.speed.v-le' path='/speeds/v-le' default='80 kt'/>
 					<property name='settings.speed.v-o' path='/speeds/v-o' default='130 kt'/>
 					<property name='settings.speed.v-be' path='/speeds/v-be' default='65 kt'/>
-					<property name='settings.speed.v-bg' path='/speeds/v-bg' default='65 kt'/>
 					<property name='settings.speed.v-br' path='/speeds/v-br' default='75 kt'/>
+					<property name='settings.speed.v-bg' path='/speeds/v-bg' default='65 kt'/>
 					<property name='settings.flaps-configuration-properties-path' path='/speeds/flaps-configuration-properties-path' default=''/>
 					<property name='settings.use-standard-pressure' path='/use-standard-pressure' default='false'/>
 					<property name='settings.pressure.qnh' path='/pressure/qnh' default='29.52 inhg'/>
@@ -183,10 +182,7 @@
 					<property name='pressure-altitude.climb-rate' path='/climb-rate'/>
 				</directory>
 				<directory path='/speed'>
-					<property name='speed.v-r' path='/v-r'/>
-					<property name='speed.v-ref' path='/v-ref'/>
 					<property name='speed.v-a' path='/v-a'/>
-					<property name='speed.v-no' path='/v-no'/>
 					<property name='speed.minimum-ias' path='/ias-minimum'/>
 					<property name='speed.minimum-maneuver-ias' path='/ias-minimum-maneuver'/>
 					<property name='speed.maximum-ias' path='/ias-maximum'/>
