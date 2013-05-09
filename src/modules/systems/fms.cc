@@ -47,7 +47,6 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "settings.actual-airplane-weight", _actual_airplane_weight_kg, true },
 				{ "settings.low-speed-roll-angle", _low_speed_roll_angle, true },
 				{ "settings.speed.v-a-default", _v_a_default, true },
-				{ "settings.speed.v-no-default", _v_no_default, true },
 				{ "settings.speed.v-ne", _v_ne, true },
 				{ "settings.speed.v-s", _v_s, true },
 				{ "settings.speed.v-s0", _v_s0, true },
@@ -56,8 +55,8 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "settings.speed.v-le", _v_le, true },
 				{ "settings.speed.v-o", _v_o, true },
 				{ "settings.speed.v-be", _v_be, true },
-				{ "settings.speed.v-bg", _v_bg, true },
 				{ "settings.speed.v-br", _v_br, true },
+				{ "settings.speed.v-bg", _v_bg, true },
 				{ "settings.flaps-configuration-properties-path", _flaps_configuration_properties_path, true },
 				{ "settings.use-standard-pressure", _use_standard_pressure, true },
 				{ "settings.pressure.qnh", _qnh_pressure, true },
@@ -100,10 +99,7 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "pressure-altitude.amsl-lookahead", _pressure_altitude_amsl_lookahead, true },
 				{ "pressure-altitude.amsl-lookahead-time", _pressure_altitude_amsl_time, true },
 				{ "pressure-altitude.climb-rate", _pressure_altitude_climb_rate, true },
-				{ "speed.v-r", _v_r, true },
-				{ "speed.v-ref", _v_ref, true },
 				{ "speed.v-a", _v_a, true },
-				{ "speed.v-no", _v_no, true },
 				{ "speed.minimum-ias", _minimum_ias, true },
 				{ "speed.minimum-maneuver-ias", _minimum_maneuver_ias, true },
 				{ "speed.maximum-ias", _maximum_ias, true },
@@ -451,17 +447,46 @@ FlightManagementSystem::compute_aoa()
 void
 FlightManagementSystem::compute_speed_limits()
 {
-	if (_v_s.valid())
+	// TODO zamiast flaps-extended i prędkości z tym związanych zrób tabelaryczne prędkości
+	// w zależności od kąta klap.
+	bool flaps_extended = false;//TODO input properties
+	bool gear_lowered = _gear_down.read (false);
+
+	// Maximum IAS:
+
+	Speed const magic = 99999_kt;
+	_maximum_ias.write (magic);
+
+	if (_v_ne.valid())
+		_maximum_ias.write (*_v_ne);
+	if (_v_fe.valid() && flaps_extended)
+		_maximum_ias.write (std::min (*_maximum_ias, *_v_fe));
+	if (_v_le.valid() && gear_lowered)
+		_maximum_ias.write (std::min (*_maximum_ias, *_v_le));
+
+	if (_maximum_ias.valid() && *_maximum_ias == magic)
+		_maximum_ias.set_nil();
+
+	if (_v_o.valid() && !flaps_extended && !gear_lowered)
+		_maximum_maneuver_ias.write (*_v_o);
+	else
+		_maximum_maneuver_ias.set_nil();
+
+	// Minimum IAS:
+
+	if (_v_s0.valid() && flaps_extended && gear_lowered)
+		_minimum_ias.write (*_v_s0);
+	else if (_v_s.valid())
 		_minimum_ias.write (*_v_s);
 	else
 		_minimum_ias.set_nil();
 
-	if (_v_at.valid())
-		_minimum_maneuver_ias.write (*_v_at);
-	else
-		_minimum_maneuver_ias.set_nil();
+	if (_minimum_ias.valid())
+		_minimum_maneuver_ias.write (1.15 * *_minimum_ias);
 
-	// TODO compute max speeds
+	// TODO BUGS for V-be, V-bg, V-br if "speed bugs" switch is on.
+	// TODO BUG for _v_at if mode is APP
+	// TODO BUG for _v_a_default if mode is not APP (cruise mode)
 }
 
 

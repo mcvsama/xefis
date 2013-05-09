@@ -99,7 +99,6 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertyFloat		_actual_airplane_weight_kg;
 	Xefis::PropertyAngle		_low_speed_roll_angle;
 	Xefis::PropertySpeed		_v_a_default;
-	Xefis::PropertySpeed		_v_no_default;
 	Xefis::PropertySpeed		_v_ne;
 	Xefis::PropertySpeed		_v_s;
 	Xefis::PropertySpeed		_v_s0;
@@ -108,8 +107,8 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertySpeed		_v_le;
 	Xefis::PropertySpeed		_v_o;
 	Xefis::PropertySpeed		_v_be;
-	Xefis::PropertySpeed		_v_bg;
 	Xefis::PropertySpeed		_v_br;
+	Xefis::PropertySpeed		_v_bg;
 	Xefis::PropertyString		_flaps_configuration_properties_path;
 	Xefis::PropertyBoolean		_use_standard_pressure;
 	Xefis::PropertyBoolean		_gear_down;
@@ -160,10 +159,7 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertyTime			_pressure_altitude_amsl_time;
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
-	Xefis::PropertySpeed		_v_r;
-	Xefis::PropertySpeed		_v_ref;
 	Xefis::PropertySpeed		_v_a;
-	Xefis::PropertySpeed		_v_no;
 	Xefis::PropertySpeed		_minimum_ias;
 	Xefis::PropertySpeed		_minimum_maneuver_ias;
 	Xefis::PropertySpeed		_maximum_ias;
