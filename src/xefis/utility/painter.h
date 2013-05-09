@@ -42,6 +42,9 @@ class Painter: public TextPainter
 	void
 	draw_outlined_polygon (QPolygonF const& polygon);
 
+	bool
+	painting_shadow() const;
+
 	QColor
 	shadow_color() const;
 
@@ -66,11 +69,22 @@ class Painter: public TextPainter
 	void
 	add_shadow (float width, std::function<void()> paint_function);
 
+	void
+	add_shadow (QColor color, std::function<void()> paint_function);
+
   private:
 	float	_shadow_width			= DefaultShadowWidth;
 	QColor	_shadow_color			= { 0x10, 0x20, 0x30, 127 };
 	QPen	_saved_pen;
+	bool	_painting_shadow		= false;
 };
+
+
+inline bool
+Painter::painting_shadow() const
+{
+	return _painting_shadow;
+}
 
 
 inline QColor
@@ -104,6 +118,7 @@ Painter::reset_shadow_width()
 inline void
 Painter::configure_for_shadow()
 {
+	_painting_shadow = true;
 	_saved_pen = pen();
 	QPen s = _saved_pen;
 	s.setColor (_shadow_color);
@@ -115,6 +130,7 @@ Painter::configure_for_shadow()
 inline void
 Painter::configure_normal()
 {
+	_painting_shadow = false;
 	setPen (_saved_pen);
 }
 
@@ -138,6 +154,16 @@ Painter::add_shadow (float width, std::function<void()> paint_function)
 	paint_function();
 
 	_shadow_width = prev;
+}
+
+
+inline void
+Painter::add_shadow (QColor color, std::function<void()> paint_function)
+{
+	QColor s = _shadow_color;
+	_shadow_color = color;
+	add_shadow (paint_function);
+	_shadow_color = s;
 }
 
 #endif

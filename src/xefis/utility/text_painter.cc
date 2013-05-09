@@ -28,13 +28,15 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar 
 	QFontMetricsF metrics (font);
 	QSize size (std::ceil (metrics.width (character)) + 1, std::ceil (metrics.height()) + 1);
 	QImage image (size, QImage::Format_ARGB32_Premultiplied);
-	QColor alpha (color.red(), color.green(), color.blue(), 0);
+	QColor alpha = color;
+	alpha.setAlpha (0);
 	QPainter painter (&image);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (color);
+	QColor shadow_color = color.darker (800);
+	shadow_color.setAlpha (100);
+	QPen shadow_pen (shadow_color, 1.5);// TODO make width relative
 
 	for (int x = 0; x < Rank; ++x)
 	{
@@ -48,8 +50,18 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar 
 			QPainterPath glyph_path;
 			glyph_path.addText (position, font, character);
 
+			QPainterPath clip_path;
+			clip_path.addRect (image.rect());
+			clip_path -= glyph_path;
+
 			image.fill (alpha);
-			//image.fill (Qt::red /*alpha*/);
+			painter.setClipPath (clip_path);
+			painter.setPen (shadow_pen);
+			painter.setBrush (Qt::NoBrush);
+			painter.drawPath (glyph_path);
+			painter.setClipping (false);
+			painter.setPen (Qt::NoPen);
+			painter.setBrush (color);
 			painter.drawPath (glyph_path);
 
 			data->positions[x][y] = image;

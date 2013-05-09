@@ -25,7 +25,7 @@
 										<property name='altitude-ladder-number-every' path='/altitude-ladder/number-every' default='200'/>
 										<property name='altitude-ladder-bold-every' path='/altitude-ladder/bold-every' default='500'/>
 										<property name='altitude-ladder-extent' path='/altitude-ladder/extent' default='825'/>
-										<property name='heading-numbers-visible' path='/adi/heading-numbers-visible' default='true'/>
+										<property name='heading-numbers-visible' path='/adi/heading-numbers-visible' default='false'/>
 										<property name='orientation-roll-limit' path='/orientation/roll-warning' default='35 deg'/>
 										<property name='slip-skid-limit' path='/slip-skid/slip-skid-warning' default='1.5'/>
 										<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
@@ -44,7 +44,7 @@
 									</directory>
 									<directory path='/systems/fms'>
 										<property name='ias-minimum' path='/speed/ias-minimum'/>
-										<property name='ias-warning' path='/speed/ias-warning'/>
+										<property name='ias-warning' path='/speed/ias-minimum-maneuver'/>
 										<property name='ias-maximum' path='/speed/ias-maximum'/>
 										<property name='ias-lookahead' path='/speed/ias-lookahead'/>
 										<property name='mach' path='/speed/mach'/>

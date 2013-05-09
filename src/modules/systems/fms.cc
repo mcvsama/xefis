@@ -147,6 +147,7 @@ FlightManagementSystem::data_updated()
 	compute_da();
 	compute_speeds();
 	compute_aoa();
+	compute_speed_limits();
 	compute_wind();
 	compute_performance();
 }
@@ -444,6 +445,23 @@ FlightManagementSystem::compute_aoa()
 		_pitch_limit.write (-*_aoa_alpha + *_critical_aoa);
 	else
 		_pitch_limit.set_nil();
+}
+
+
+void
+FlightManagementSystem::compute_speed_limits()
+{
+	if (_v_s.valid())
+		_minimum_ias.write (*_v_s);
+	else
+		_minimum_ias.set_nil();
+
+	if (_v_at.valid())
+		_minimum_maneuver_ias.write (*_v_at);
+	else
+		_minimum_maneuver_ias.set_nil();
+
+	// TODO compute max speeds
 }
 
 

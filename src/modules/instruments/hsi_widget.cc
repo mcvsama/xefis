@@ -658,46 +658,45 @@ HSIWidget::PaintWorkUnit::paint_directions (Painter& painter)
 	painter.setClipRect (_map_clip_rect);
 	painter.setPen (pen);
 	painter.setFont (_radials_font);
+	painter.setBrush (Qt::NoBrush);
 
 	QTransform t = _rotation_transform * _aircraft_center_transform;
 
-	for (int deg = 0; deg < 360; deg += 5)
-	{
-		QPointF sp = deg % 10 == 0
-			? QPointF (0.f, -0.935f * _r)
-			: QPointF (0.f, -0.965f * _r);
-		painter.setTransform (t);
-		painter.rotate (deg);
-		painter.draw_outlined_line (QPointF (0.f, -_r), sp);
+	painter.add_shadow ([&]() {
+		painter.setTransform (_aircraft_center_transform);
 
-		if (deg % 30 == 0)
-			painter.fast_draw_text (QRectF (-_q, -0.93f * _r, 2.f * _q, 0.5f * _q),
-									Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
-	}
+		for (int deg = 0; deg < 360; deg += 5)
+		{
+			QPointF sp = deg % 10 == 0
+				? QPointF (0.f, -0.935f * _r)
+				: QPointF (0.f, -0.965f * _r);
+			painter.setTransform (t);
+			painter.rotate (deg);
+			painter.drawLine (QPointF (0.f, -_r + 0.025 * _q), sp);
 
-	switch (_params.display_mode)
-	{
-		case DisplayMode::Expanded:
-			// Circle around radials:
-			painter.setBrush (Qt::NoBrush);
-			painter.add_shadow ([&]() {
-				painter.drawEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
-			});
-			break;
-
-		case DisplayMode::Rose:
-			painter.setClipping (false);
-			painter.setTransform (_aircraft_center_transform);
-			// 8 lines around the circle:
-			for (int deg = 45; deg < 360; deg += 45)
+			if (!painter.painting_shadow())
 			{
-				painter.rotate (45);
-				painter.draw_outlined_line (QPointF (0.f, -1.025f * _r), QPointF (0.f, -1.125f * _r));
+				if (deg % 30 == 0)
+					painter.fast_draw_text (QRectF (-_q, -0.93f * _r, 2.f * _q, 0.5f * _q),
+											Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
 			}
-			break;
+		}
 
-		case DisplayMode::Auxiliary:
-			break;
+		// Circle around radials:
+		if (_params.display_mode == DisplayMode::Expanded)
+			painter.drawEllipse (QRectF (-_r, -_r, 2.f * _r, 2.f * _r));
+	});
+
+	if (_params.display_mode == DisplayMode::Rose)
+	{
+		painter.setClipping (false);
+		painter.setTransform (_aircraft_center_transform);
+		// 8 lines around the circle:
+		for (int deg = 45; deg < 360; deg += 45)
+		{
+			painter.rotate (45);
+			painter.draw_outlined_line (QPointF (0.f, -1.025f * _r), QPointF (0.f, -1.125f * _r));
+		}
 	}
 }
 

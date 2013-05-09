@@ -251,7 +251,7 @@ RadialIndicatorWidget::paint_indicator (Painter& painter, float, float r)
 		painter.rotate (value_angle);
 		painter.setPen (pointer_pen);
 		painter.set_shadow_color (Qt::black);
-		painter.set_shadow_width (1.8f);
+		painter.set_shadow_width (1.9f);
 
 		if (_target_visible)
 		{

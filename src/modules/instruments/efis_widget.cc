@@ -34,7 +34,11 @@ EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 	InstrumentAids (0.8f, 1.f, 1.f)
 {
 	_sky_color.setHsv (213, 230, 255);
+	_sky_shadow = _sky_color.darker (400);
+	_sky_shadow.setAlpha (127);
 	_ground_color.setHsv (34, 255, 125);
+	_ground_shadow = _ground_color.darker (400);
+	_ground_shadow.setAlpha (127);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (120);
 	_warning_color_1 = QColor (255, 150, 0);
@@ -219,7 +223,7 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
 	painter.setTransform (_center_transform);
 	painter.setClipPath (get_pitch_scale_clipping_path());
 	painter.setTransform (_roll_transform * _center_transform);
-	painter.setClipRect (QRectF (-w, -0.9f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
+	painter.setClipRect (QRectF (-w, -1.f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform);
 	QFont font = _font_13;
 	font.setPixelSize (font_size (12.f));
@@ -228,16 +232,19 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
 	// Pitch scale is clipped to small rectangle, so narrow it even more:
 	float clipped_pitch_factor = 0.45f;
 	Range<Angle> deg_range (_params.pitch - clipped_pitch_factor * 0.485f * _params.fov,
-							_params.pitch + clipped_pitch_factor * 0.330f * _params.fov);
+							_params.pitch + clipped_pitch_factor * 0.365f * _params.fov);
 
 	painter.setPen (get_pen (Qt::white, 1.f));
 	// 10° lines, exclude +/-90°:
 	for (int deg = -90; deg <= 90; deg += 10)
 	{
+		QColor shadow_color = deg > 0 ? _sky_shadow : _ground_shadow;
 		if (!deg_range.includes (1_deg * deg) || deg == 0)
 			continue;
 		float d = pitch_to_px (1_deg * deg);
-		painter.draw_outlined_line (QPointF (-z, d), QPointF (z, d));
+		painter.add_shadow (shadow_color, [&]() {
+			painter.drawLine (QPointF (-z, d), QPointF (z, d));
+		});
 		// Degs number:
 		int abs_deg = std::abs (deg);
 		QString deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
@@ -250,28 +257,36 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
 	// 5° lines:
 	for (int deg = -90; deg <= 90; deg += 5)
 	{
+		QColor shadow_color = deg > 0 ? _sky_shadow : _ground_shadow;
 		if (!deg_range.includes (1_deg * deg) || deg % 10 == 0)
 			continue;
 		float d = pitch_to_px (1_deg * deg);
-		painter.draw_outlined_line (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
+		painter.add_shadow (shadow_color, [&]() {
+			painter.drawLine (QPointF (-z / 2.f, d), QPointF (z / 2.f, d));
+		});
 	}
 	// 2.5° lines:
 	for (int deg = -900; deg <= 900; deg += 25)
 	{
+		QColor shadow_color = deg > 0 ? _sky_shadow : _ground_shadow;
 		if (!deg_range.includes (1_deg * deg / 10) || deg % 50 == 0)
 			continue;
 		float d = pitch_to_px (1_deg * deg / 10.f);
-		painter.draw_outlined_line (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
+		painter.add_shadow (shadow_color, [&]() {
+			painter.drawLine (QPointF (-z / 4.f, d), QPointF (z / 4.f, d));
+		});
 	}
-
 	// -90°, 90° lines:
 	if (deg_range.includes (-90_deg) || deg_range.includes (+90_deg))
 	{
 		for (float deg: { -90.f, 90.f })
 		{
+			QColor shadow_color = deg > 0 ? _sky_shadow : _ground_shadow;
 			float d = pitch_to_px (1_deg * deg);
 			painter.setPen (get_pen (Qt::white, 1.75f));
-			painter.draw_outlined_line (QPointF (-z, d), QPointF (z, d));
+			painter.add_shadow (shadow_color, [&]() {
+				painter.drawLine (QPointF (-z, d), QPointF (z, d));
+			});
 		}
 	}
 }
@@ -295,6 +310,8 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Painter& painter)
 	painter.setClipRect (QRectF (-w, -w, 2.f * w, 2.25f * w));
 	for (float deg: { -60.f, -45.f, -30.f, -20.f, -10.f, 0.f, +10.f, +20.f, +30.f, +45.f, +60.f })
 	{
+		QColor shadow_color = deg > 0 ? _sky_shadow : _ground_shadow;
+
 		painter.setTransform (_center_transform);
 		painter.rotate (1.f * deg);
 		painter.translate (0.f, -0.795f * w);
@@ -316,7 +333,9 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Painter& painter)
 				length *= 1.6f;
 			else if (std::abs (std::fmod (deg, 30.f)) < 1.f)
 				length *= 2.2f;
-			painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.f, length));
+			painter.add_shadow (shadow_color, [&]() {
+				painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, length));
+			});
 		}
 	}
 
@@ -418,21 +437,24 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
 	if (_params.heading_visible)
 	{
 		float clipped_pitch_factor = 0.5f;
-		Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.5f * _params.fov,
-								_params.heading + clipped_pitch_factor * 0.5f * _params.fov);
+		Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.485f * _params.fov,
+								_params.heading + clipped_pitch_factor * 0.350f * _params.fov);
 
 		painter.setTransform (_heading_transform * _horizon_transform);
-		for (int deg = -180; deg < 540; deg += 10)
+		if (_params.heading_numbers_visible)
 		{
-			if (!deg_range.includes (1_deg * deg))
-				continue;
-
-			float d10 = heading_to_px (1_deg * deg);
-			float d05 = heading_to_px (1_deg * deg + 5_deg);
-			// 10° lines:
-			painter.draw_outlined_line (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
-			if (_params.heading_numbers_visible)
+			for (int deg = -180; deg < 540; deg += 10)
 			{
+				if (!deg_range.includes (1_deg * deg))
+					continue;
+
+				float d10 = heading_to_px (1_deg * deg);
+				float d05 = heading_to_px (1_deg * deg + 5_deg);
+				// 10° lines:
+				painter.draw_outlined_line (QPointF (d10, -w / 18.f), QPointF (d10, 0.f));
+				// 5° lines:
+				painter.draw_outlined_line (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
+
 				QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
 				if (text == "0")
 					text = "N";
@@ -445,8 +467,6 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
 				painter.fast_draw_text (QRectF (d10 - 2.f * fpxs, 0.05f * fpxs, 4.f * fpxs, fpxs),
 										Qt::AlignVCenter | Qt::AlignHCenter, text);
 			}
-			// 5° lines:
-			painter.draw_outlined_line (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 		}
 	}
 
@@ -557,11 +577,13 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Painter& painter, float x)
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = _sl_black_box_pen;
-	if (_params.speed_blinking_active)
+	bool speed_is_in_warning_area = (_params.minimum_speed < _params.speed && _params.speed < _params.warning_speed);
+	if (_params.speed_blinking_active || speed_is_in_warning_area)
 	{
-		border_pen.setColor (_params.speed_blink || (_params.speed < _params.minimum_speed)
-								? _warning_color_1
-								: Qt::black);
+		if (_params.speed_blink || speed_is_in_warning_area)
+			border_pen.setColor (_warning_color_2);
+		else
+			border_pen.setColor (Qt::black);
 	}
 
 	painter.setPen (border_pen);
@@ -576,9 +598,12 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Painter& painter, float x)
 		<< _sl_black_box_rect.bottomRight()
 		<< QPointF (0.f, +0.5f * x);
 
-	painter.add_shadow (2.75, [&]() {
+	QColor ps = painter.shadow_color();
+	painter.set_shadow_color (Qt::black);
+	painter.add_shadow (1.95f, [&]() {
 		painter.drawPolygon (black_box_polygon);
 	});
+	painter.set_shadow_color (ps);
 
 	QRectF box_1000 = _sl_black_box_rect.adjusted (_sl_margin, _sl_margin, -_sl_margin, -_sl_margin);
 	QRectF box_0100 =
@@ -653,10 +678,10 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Painter& painter, float x)
 		return;
 
 	QPointF ydif (0.f, pen_width (0.25f));
-	QPen pen_b (QColor (0, 0, 0), pen_width (10.f), Qt::SolidLine, Qt::FlatCap);
-	QPen pen_r (QColor (255, 0, 0), pen_width (10.f), Qt::DotLine, Qt::FlatCap);
-	QPen pen_y (QColor (255, 170, 0), pen_width (1.2f), Qt::SolidLine, Qt::FlatCap);
-	pen_r.setDashPattern (QVector<qreal> (2, 0.5f));
+	QPen pen_b (QColor (0, 0, 0), pen_width (8.f), Qt::SolidLine, Qt::FlatCap);
+	QPen pen_r (QColor (255, 0, 0), pen_width (8.f), Qt::DashLine, Qt::FlatCap);
+	pen_r.setDashPattern (QVector<qreal> { 0.5f, 0.75f });
+	QPen pen_y (_warning_color_2, pen_width (1.2f), Qt::SolidLine, Qt::FlatCap);
 
 	float tr_right = 0.45f * x;
 	float p1w = 0.45f * pen_width (1.2f);
@@ -680,11 +705,14 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Painter& painter, float x)
 
 	if (_params.warning_speed_visible && _params.warning_speed > _sl_min_shown)
 	{
-		painter.setPen (pen_y);
-		painter.drawPolyline (QPolygonF()
+		QPolygonF poly = QPolygonF()
 			<< QPointF (_sl_ladder_rect.right() - tr_right, wrn_posy)
 			<< QPointF (_sl_ladder_rect.right() - p1w, wrn_posy)
-			<< zero_point - QPointF (p1w, 0.f));
+			<< zero_point - QPointF (p1w, 0.f);
+		painter.setPen (pen_y);
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (poly);
+		});
 	}
 
 	if (_params.minimum_speed_visible && _params.minimum_speed > _sl_min_shown)
@@ -717,12 +745,15 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Painter& painter, float x)
 	if (length > 0.2f * x)
 	{
 		painter.setClipRect (QRectF (_sl_ladder_rect.topLeft(), QPointF (_sl_ladder_rect.right(), 0.f)));
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
-		painter.translate (0.f, -length);
-		painter.drawPolygon (QPolygonF()
-			<< QPointF (0.f, -0.5f * x)
-			<< QPointF (-0.2f * x, 0.f)
-			<< QPointF (+0.2f * x, 0.f));
+		painter.add_shadow ([&]() {
+			painter.drawPolygon (QPolygonF()
+				<< QPointF (0.f, 0.f)
+				<< QPointF (0.f, -length)
+				<< QPointF (-0.2f * x, 0.f - length)
+				<< QPointF (0.f, -0.5f * x - length)
+				<< QPointF (+0.2f * x, 0.f - length)
+				<< QPointF (0.f, -length));
+		});
 	}
 }
 
@@ -747,7 +778,9 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Painter& painter, float x)
 			float posy = kt_to_px (bug.second);
 			painter.setPen (_sl_speed_bug_pen);
 			painter.setClipRect (_sl_ladder_rect.translated (x, 0.f));
-			painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
+			painter.add_shadow ([&]() {
+				painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
+			});
 			painter.setClipping (false);
 			painter.fast_draw_text (QRectF (2.5f * x, posy - 0.5f * speed_bug_digit_height,
 											2.f * x, speed_bug_digit_height),
@@ -974,9 +1007,12 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Painter& painter, float x)
 		<< _al_black_box_rect.bottomLeft()
 		<< QPointF (0.f, +0.5f * x);
 
-	painter.add_shadow (2.75, [&]() {
+	QColor ps = painter.shadow_color();
+	painter.set_shadow_color (Qt::black);
+	painter.add_shadow (1.95f, [&]() {
 		painter.drawPolygon (black_box_polygon);
 	});
+	painter.set_shadow_color (ps);
 
 	QRectF box_10000 = QRectF (_al_b_digits_box.topLeft(), QSizeF (b_digit_width, _al_b_digits_box.height()));
 	QRectF box_01000 = box_10000.translated (b_digit_width, 0.f);
@@ -1103,12 +1139,15 @@ EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Painter& painter, float x
 	if (length > 0.2f * x)
 	{
 		painter.setClipRect (QRectF (_al_ladder_rect.topLeft(), QPointF (_al_ladder_rect.right(), 0.f)));
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -length));
-		painter.translate (0.f, -length);
-		painter.drawPolygon (QPolygonF()
-			<< QPointF (0.f, -0.5f * x)
-			<< QPointF (-0.2f * x, 0.f)
-			<< QPointF (+0.2f * x, 0.f));
+		painter.add_shadow ([&]() {
+			painter.drawPolygon (QPolygonF()
+				<< QPointF (0.f, 0.f)
+				<< QPointF (0.f, -length)
+				<< QPointF (-0.2f * x, 0.f - length)
+				<< QPointF (0.f, -0.5f * x - length)
+				<< QPointF (+0.2f * x, 0.f - length)
+				<< QPointF (0.f, -length));
+		});
 	}
 }
 
@@ -1135,7 +1174,9 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
 				painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 
 				painter.setPen (_al_altitude_bug_pen);
-				painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
+				painter.add_shadow ([&]() {
+					painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
+				});
 
 				painter.setClipping (false);
 				painter.fast_draw_text (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first);
@@ -1154,12 +1195,16 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
 			w.setCapStyle (Qt::SquareCap);
 
 			painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
-			painter.setPen (_al_ldg_alt_pen);
-			painter.drawLine (p0, p1);
 			painter.setPen (w);
-			painter.drawPolyline (QPolygonF() << p1 << p2 << p2 + QPointF (0.25f * x, 0.f));
+			painter.add_shadow ([&]() {
+				painter.drawPolyline (QPolygonF() << p1 << p2 << p2 + QPointF (0.25f * x, 0.f));
+			});
+			painter.setPen (_al_ldg_alt_pen);
+			painter.add_shadow ([&]() {
+				painter.drawLine (p0, p1);
+			});
 
-			// Landing altitude bug:
+			// Landing altitude bug (ground indicator):
 			if (_params.altitude - _params.altitude_agl > _al_min_shown && _params.altitude - _params.altitude_agl < _al_max_shown)
 			{
 				painter.setClipRect (_al_ladder_rect);
@@ -1216,8 +1261,10 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
 					QPointF b (_al_ladder_rect.left() - 0.65f * x, posy - 0.65f * x);
 					QPointF c (_al_ladder_rect.left() - 0.65f * x, posy + 0.65f * x);
 					QPolygonF poly = QPolygonF() << a << b << c;
-					painter.drawLine (a, QPointF (_al_ladder_rect.right(), posy));
-					painter.drawPolygon (poly);
+					painter.add_shadow ([&]() {
+						painter.drawLine (a, QPointF (_al_ladder_rect.right(), posy));
+						painter.drawPolygon (poly);
+					});
 				}
 			}
 		}
@@ -1298,13 +1345,18 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
 	int abs_climb_rate = static_cast<int> (std::abs (_params.climb_rate.fpm())) / 10 * 10;
 	if (abs_climb_rate >= 100)
 	{
+		QString str = QString::number (abs_climb_rate);
+		if (str.size() == 2)
+			str = "  " + str;
+		else if (str.size() == 3)
+			str = " " + str;
+
 		float const fh = _font_13_digit_height;
 		float const sgn = _params.climb_rate > 0_fpm ? 1.f : -1.f;
 		painter.setClipping (false);
 		painter.setFont (_font_13);
 		painter.translate (-1.05f * x, sgn * -2.35f * y);
-		painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh),
-								Qt::AlignVCenter | Qt::AlignLeft, QString::number (abs_climb_rate));
+		painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str);
 	}
 }
 
@@ -1447,7 +1499,7 @@ EFISWidget::PaintWorkUnit::paint_center_cross (Painter& painter, bool center_box
 	if (rest)
 	{
 		painter.setBrush (QBrush (QColor (0, 0, 0)));
-		painter.setPen (get_pen (_ladder_color, 2.75f));
+		painter.setPen (Qt::NoPen);
 		painter.drawPolygon (a);
 		painter.setPen (get_pen (Qt::white, 1.5f));
 		painter.add_shadow ([&]() {
@@ -1562,6 +1614,7 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (Painter& painter)
 	painter.setFont (radar_altimeter_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
+	box.translate (0.0, 0.25f * margin);
 	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.ft())));
 }
 
@@ -1606,7 +1659,9 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Painter& painter)
 		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
 		painter.setPen (minimums_pen);
 		painter.setBrush (Qt::NoBrush);
-		painter.drawRect (frame);
+		painter.add_shadow ([&]() {
+			painter.drawRect (frame);
+		});
 	}
 }
 
@@ -1758,7 +1813,9 @@ EFISWidget::PaintWorkUnit::paint_hints (Painter& painter)
 			centrify (frame);
 			frame.adjust (0.f, -a, 0.f, +a);
 			frame.translate (0.f, v);
-			painter.drawRect (frame);
+			painter.add_shadow ([&]() {
+				painter.drawRect (frame);
+			});
 		}
 	}
 
@@ -1851,7 +1908,7 @@ EFISWidget::PaintWorkUnit::paint_pitch_limit (Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit, -20_deg, +20_deg)));
+	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit, -20_deg, +16_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 
@@ -2013,8 +2070,8 @@ EFISWidget::PaintWorkUnit::get_pitch_scale_clipping_path() const
 
 	QPainterPath clip_path; // TODO cache this
 	clip_path.setFillRule (Qt::WindingFill);
-	clip_path.addEllipse (QRectF (-1.15f * w, -1.175f * w, 2.30f * w, 2.35f * w));
-	clip_path.addRect (QRectF (-1.15f * w, 0.f, 2.30f * w, 1.375f * w));
+	clip_path.addEllipse (QRectF (-1.f * w, -1.f * w, 2.f * w, 2.f * w));
+	clip_path.addRect (QRectF (-1.f * w, 0.f, 2.f * w, 1.375f * w));
 
 	return clip_path;
 }
@@ -2051,8 +2108,7 @@ EFISWidget::request_repaint()
 {
 	update_blinker (_speed_blinking_warning,
 					_params.speed_visible &&
-					((_params.warning_speed_visible && _params.speed < _params.warning_speed) ||
-					 (_params.minimum_speed_visible && _params.speed < _params.minimum_speed) ||
+					((_params.minimum_speed_visible && _params.speed < _params.minimum_speed) ||
 					 (_params.maximum_speed_visible && _params.speed > _params.maximum_speed)),
 				    &_params.speed_blink);
 
