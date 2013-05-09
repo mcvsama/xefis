@@ -373,7 +373,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 		float				_max_w_h;
 		float				_q;
 		QColor				_sky_color;
+		QColor				_sky_shadow;
 		QColor				_ground_color;
+		QColor				_ground_shadow;
 		QColor				_ladder_color;
 		QColor				_ladder_border_color;
 		QColor				_warning_color_1;

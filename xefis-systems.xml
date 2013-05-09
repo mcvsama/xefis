@@ -187,10 +187,10 @@
 					<property name='speed.v-ref' path='/v-ref'/>
 					<property name='speed.v-a' path='/v-a'/>
 					<property name='speed.v-no' path='/v-no'/>
-					<property name='speed.minimum-ias' path='/minimum-ias'/>
-					<property name='speed.minimum-maneuver-ias' path='/minimum-maneuver-ias'/>
-					<property name='speed.maximum-ias' path='/maximum-ias'/>
-					<property name='speed.maximum-maneuver-ias' path='/maximum-maneuver-ias'/>
+					<property name='speed.minimum-ias' path='/ias-minimum'/>
+					<property name='speed.minimum-maneuver-ias' path='/ias-minimum-maneuver'/>
+					<property name='speed.maximum-ias' path='/ias-maximum'/>
+					<property name='speed.maximum-maneuver-ias' path='/ias-maximum-maneuver'/>
 					<property name='speed.ias-lookahead' path='/ias-lookahead'/>
 					<property name='speed.ias-lookahead-time' path='/ias-lookahead-time'/>
 					<property name='speed.true-airspeed' path='/true-airspeed'/>

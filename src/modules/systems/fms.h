@@ -69,6 +69,9 @@ class FlightManagementSystem: public Xefis::Module
 	compute_aoa();
 
 	void
+	compute_speed_limits();
+
+	void
 	compute_wind();
 
 	void
