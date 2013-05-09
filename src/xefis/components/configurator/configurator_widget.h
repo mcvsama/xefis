@@ -11,41 +11,61 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__GENERIC__PROPERTY_TREE_H__INCLUDED
-#define XEFIS__MODULES__GENERIC__PROPERTY_TREE_H__INCLUDED
+#ifndef XEFIS__COMPONENTS__CONFIGURATOR__CONFIGURATOR_WIDGET_H__INCLUDED
+#define XEFIS__COMPONENTS__CONFIGURATOR__CONFIGURATOR_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
 // Qt:
 #include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
 #include <xefis/components/property_tree/property_tree_widget.h>
+#include <xefis/core/window.h>
 
 
-class PropertyTree: public Xefis::Instrument
+namespace Xefis {
+
+class ConfiguratorWidget: public QWidget
 {
+	Q_OBJECT
+
   public:
 	// Ctor
-	PropertyTree (Xefis::ModuleManager*, QDomElement const& config, QWidget* parent);
+	ConfiguratorWidget (QWidget* parent);
 
-  protected:
+	Window*
+	owning_window() const;
+
 	void
-	data_updated() override;
+	set_owning_window (Window*);
+
+  private slots:
+	void
+	read_properties();
 
   private:
-	Xefis::PropertyTreeWidget* _widget = nullptr;
+	Xefis::PropertyTreeWidget*	_property_tree_widget	= nullptr;
+	Window*						_owning_window			= nullptr;
 };
 
 
-inline void
-PropertyTree::data_updated()
+inline Window*
+ConfiguratorWidget::owning_window() const
 {
-	_widget->read();
+	return _owning_window;
 }
 
+
+inline void
+ConfiguratorWidget::set_owning_window (Window* window)
+{
+	_owning_window = window;
+}
+
+} // namespace Xefis
+
 #endif
+

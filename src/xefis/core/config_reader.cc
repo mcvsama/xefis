@@ -155,7 +155,7 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 		return;
 
 	// Auto delete if Window throws an exception:
-	std::unique_ptr<Window> window (new Window (this, window_element));
+	std::unique_ptr<Window> window (new Window (_application, this, window_element));
 	window->show();
 	window.release();
 }

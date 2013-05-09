@@ -31,6 +31,7 @@ class NavaidStorage;
 class ModuleManager;
 class ConfigReader;
 class WorkPerformer;
+class ConfiguratorWidget;
 
 
 class Application: public QApplication
@@ -74,6 +75,12 @@ class Application: public QApplication
 	WorkPerformer*
 	work_performer() const;
 
+	/**
+	 * Return configurator widget.
+	 */
+	ConfiguratorWidget*
+	configurator_widget() const;
+
   public slots:
 	/**
 	 * Indicate that the data in property tree has been updated
@@ -110,12 +117,13 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
-	NavaidStorage*		_navaid_storage		= nullptr;
-	ModuleManager*		_module_manager		= nullptr;
-	ConfigReader*		_config_reader		= nullptr;
-	QTimer*				_postponed_update	= nullptr;
-	QTimer*				_offline_updater	= nullptr;
-	WorkPerformer*		_work_performer		= nullptr;
+	NavaidStorage*		_navaid_storage			= nullptr;
+	ModuleManager*		_module_manager			= nullptr;
+	ConfigReader*		_config_reader			= nullptr;
+	ConfiguratorWidget*	_configurator_widget	= nullptr;
+	QTimer*				_postponed_update		= nullptr;
+	QTimer*				_offline_updater		= nullptr;
+	WorkPerformer*		_work_performer			= nullptr;
 };
 
 
@@ -144,6 +152,13 @@ inline WorkPerformer*
 Application::work_performer() const
 {
 	return _work_performer;
+}
+
+
+inline ConfiguratorWidget*
+Application::configurator_widget() const
+{
+	return _configurator_widget;
 }
 
 } // namespace Xefis

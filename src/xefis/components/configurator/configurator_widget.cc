@@ -20,20 +20,36 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
+#include <xefis/core/property_storage.h>
 
 // Local:
-#include "property_tree.h"
+#include "configurator_widget.h"
 
 
-PropertyTree::PropertyTree (Xefis::ModuleManager* module_manager, QDomElement const&, QWidget* parent):
-	Instrument (module_manager, parent)
+namespace Xefis {
+
+ConfiguratorWidget::ConfiguratorWidget (QWidget* parent):
+	QWidget (parent)
 {
-	_widget = new Xefis::PropertyTreeWidget (Xefis::PropertyStorage::default_storage()->root(), this);
+	_property_tree_widget = new PropertyTreeWidget (PropertyStorage::default_storage()->root(), this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_widget);
+	layout->addWidget (_property_tree_widget);
+
+	QTimer* timer = new QTimer (this);
+	timer->setInterval (1000.0 / 15.0);
+	QObject::connect (timer, SIGNAL (timeout()), this, SLOT (read_properties()));
+	timer->start();
 }
+
+
+void
+ConfiguratorWidget::read_properties()
+{
+	_property_tree_widget->read();
+}
+
+} // namespace Xefis
 
