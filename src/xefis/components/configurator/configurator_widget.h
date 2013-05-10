@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/components/property_tree/property_tree_widget.h>
+#include <xefis/components/property_editor/property_editor.h>
 #include <xefis/core/window.h>
 
 
@@ -42,13 +42,9 @@ class ConfiguratorWidget: public QWidget
 	void
 	set_owning_window (Window*);
 
-  private slots:
-	void
-	read_properties();
-
   private:
-	Xefis::PropertyTreeWidget*	_property_tree_widget	= nullptr;
-	Window*						_owning_window			= nullptr;
+	Xefis::PropertyEditor*	_property_editor	= nullptr;
+	Window*					_owning_window		= nullptr;
 };
 
 

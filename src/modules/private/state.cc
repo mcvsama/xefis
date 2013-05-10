@@ -58,8 +58,8 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
 	_control_hint_text.set_path ("/instruments/efis/control/hint");
 	_control_stick_visible.set_path ("/instruments/efis/control-stick/visible");
 	_fly_by_wire_mode.set_path ("/systems/fly-by-wire/config/mode");
-	_hsi_aux_range.set_path ("/instruments/hsi-aux/range.nm");
-	_hsi_nav_range.set_path ("/instruments/hsi-nav/range.nm");
+	_hsi_aux_range.set_path ("/instruments/hsi-aux/range");
+	_hsi_nav_range.set_path ("/instruments/hsi-nav/range");
 	_hsi_nav_mode.set_path ("/instruments/hsi-nav/display-mode");
 
 	_saitek_a.set_path ("/input/main/button/2");

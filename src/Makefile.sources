@@ -17,15 +17,18 @@ SRC_MOCHDRS += xefis/application/services.h
 
 ######## /xefis/components ########
 
-SRC_HEADERS += xefis/components/property_tree/property_tree_widget.h
-SRC_HEADERS += xefis/components/property_tree/property_tree_widget_item.h
+SRC_HEADERS += xefis/components/property_editor/property_editor.h
+SRC_HEADERS += xefis/components/property_editor/property_tree_widget.h
+SRC_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
 SRC_HEADERS += xefis/components/configurator/configurator_widget.h
 
-SRC_SOURCES += xefis/components/property_tree/property_tree_widget.cc
-SRC_SOURCES += xefis/components/property_tree/property_tree_widget_item.cc
+SRC_SOURCES += xefis/components/property_editor/property_editor.cc
+SRC_SOURCES += xefis/components/property_editor/property_tree_widget.cc
+SRC_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
 SRC_SOURCES += xefis/components/configurator/configurator_widget.cc
 
-SRC_MOCHDRS += xefis/components/property_tree/property_tree_widget.h
+SRC_MOCHDRS += xefis/components/property_editor/property_editor.h
+SRC_MOCHDRS += xefis/components/property_editor/property_tree_widget.h
 SRC_MOCHDRS += xefis/components/configurator/configurator_widget.h
 
 ######## /xefis/config ########

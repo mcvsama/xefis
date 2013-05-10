@@ -29,6 +29,7 @@
 										<property name='commanded-settings-visible' path='/command/visible' default='true'/>
 										<property name='fma-visible' path='/fma/visible' default='true'/>
 										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
+										<property name='cmd-settings-visible' path='/flight-director/cmd-settings-visible' default='true'/>
 										<property name='control-stick-visible' path='/control-stick/visible' default='true'/>
 										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
 										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
@@ -64,9 +65,9 @@
 										<property name='altitude-agl' path='/radar-altimeter/agl'/>
 									</directory>
 									<directory path='/systems/flight-director/settings'>
-										<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias'/>
-										<property name='cmd-setting-altitude' path='/altitude'/>
-										<property name='cmd-setting-cbr' path='/vertical-speed'/>
+										<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias' default='100 kt'/>
+										<property name='cmd-setting-altitude' path='/altitude' default='999 ft'/>
+										<property name='cmd-setting-cbr' path='/vertical-speed' default='300 fpm'/>
 									</directory>
 									<directory path='/systems/flight-director'>
 										<property name='fma-speed-hint' path='/hints/speed-hint' default='TEST'/>

@@ -474,6 +474,14 @@ template<class T>
 
 template<>
 	inline std::string
+	PropertyValueNode<bool>::stringify() const
+	{
+		return _value ? "true" : "false";
+	}
+
+
+template<>
+	inline std::string
 	PropertyValueNode<std::string>::stringify() const
 	{
 		return _value;
@@ -492,7 +500,7 @@ template<>
 	inline void
 	PropertyValueNode<bool>::parse (std::string const& str)
 	{
-		_value = (str == "true");
+		_value = (str == "true") || (str == "1");
 	}
 
 
@@ -500,7 +508,13 @@ template<>
 	inline void
 	PropertyValueNode<int64_t>::parse (std::string const& str)
 	{
-		_value = boost::lexical_cast<int64_t> (str);
+		try {
+			_value = boost::lexical_cast<int64_t> (str);
+		}
+		catch (boost::bad_lexical_cast&)
+		{
+			throw SI::UnparsableValue ("error while parsing: " + str);
+		}
 	}
 
 
@@ -508,7 +522,13 @@ template<>
 	inline void
 	PropertyValueNode<double>::parse (std::string const& str)
 	{
-		_value = boost::lexical_cast<double> (str);
+		try {
+			_value = boost::lexical_cast<double> (str);
+		}
+		catch (boost::bad_lexical_cast&)
+		{
+			throw SI::UnparsableValue ("error while parsing: " + str);
+		}
 	}
 
 

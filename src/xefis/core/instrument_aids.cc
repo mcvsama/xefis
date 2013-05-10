@@ -72,7 +72,7 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 	_font_20_digit_height = QFontMetrics (_font_20).height();
 	_font_20_digit_height = font_height_scale_factor * QFontMetrics (_font_20).height();
 
-	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 1.5f);
+	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 1.65f);
 	_autopilot_pen_2 = get_pen (_autopilot_color, 1.0f);
 }
 

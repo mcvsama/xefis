@@ -57,7 +57,7 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	_configurator_panel = new QWidget (this);
 
 	QLayout* configurator_layout = new QVBoxLayout (_configurator_panel);
-	configurator_layout->setMargin (0);
+	configurator_layout->setMargin (WidgetMargin);
 	configurator_layout->setSpacing (0);
 
 	QLayout* layout = new QVBoxLayout (this);

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_WIDGET_H__INCLUDED
-#define XEFIS__COMPONENTS__PROPERTY_TREE__PROPERTY_TREE_WIDGET_H__INCLUDED
+#ifndef XEFIS__COMPONENTS__PROPERTY_EDITOR__PROPERTY_TREE_WIDGET_H__INCLUDED
+#define XEFIS__COMPONENTS__PROPERTY_EDITOR__PROPERTY_TREE_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -37,7 +37,18 @@ class PropertyTreeWidget: public QTreeWidget
 	Q_OBJECT
 
   public:
+	constexpr static int NameColumn		= 0;
+	constexpr static int ValueColumn	= 1;
+
+  public:
 	PropertyTreeWidget (PropertyNode* root_node, QWidget* parent);
+
+	/**
+	 * Return PropertyNode for the selected item.
+	 * May return nullptr, if nothing is selected.
+	 */
+	PropertyNode*
+	selected_property_node() const;
 
   public slots:
 	/**
