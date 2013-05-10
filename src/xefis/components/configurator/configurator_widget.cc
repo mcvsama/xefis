@@ -15,7 +15,6 @@
 #include <cstddef>
 
 // Qt:
-#include <QtCore/QTimer>
 #include <QtWidgets/QLayout>
 
 // Xefis:
@@ -31,24 +30,12 @@ namespace Xefis {
 ConfiguratorWidget::ConfiguratorWidget (QWidget* parent):
 	QWidget (parent)
 {
-	_property_tree_widget = new PropertyTreeWidget (PropertyStorage::default_storage()->root(), this);
+	_property_editor = new PropertyEditor (PropertyStorage::default_storage()->root(), this);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_property_tree_widget);
-
-	QTimer* timer = new QTimer (this);
-	timer->setInterval (1000.0 / 15.0);
-	QObject::connect (timer, SIGNAL (timeout()), this, SLOT (read_properties()));
-	timer->start();
-}
-
-
-void
-ConfiguratorWidget::read_properties()
-{
-	_property_tree_widget->read();
+	layout->addWidget (_property_editor);
 }
 
 } // namespace Xefis

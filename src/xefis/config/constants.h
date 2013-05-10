@@ -31,5 +31,10 @@ is_std_pressure (Pressure pressure)
 	return 1_inHg * std::abs ((STD_PRESSURE - pressure).inHg()) < 0.01_inHg;
 }
 
+// UI constants:
+
+constexpr int WidgetSpacing	= 4;
+constexpr int WidgetMargin	= 4;
+
 #endif
 

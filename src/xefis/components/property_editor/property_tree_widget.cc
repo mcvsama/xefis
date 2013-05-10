@@ -17,6 +17,7 @@
 #include <set>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QHeaderView>
 
@@ -37,10 +38,10 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 	_root_node (root_node)
 {
 	header()->setSectionsClickable (true);
-	header()->setSectionResizeMode (0, QHeaderView::Interactive);
-	header()->setSectionResizeMode (1, QHeaderView::Interactive);
+	header()->setSectionResizeMode (NameColumn, QHeaderView::Interactive);
+	header()->setSectionResizeMode (ValueColumn, QHeaderView::Interactive);
 	header()->setMinimumSectionSize (12.f * Services::default_font_size (physicalDpiY()));
-	sortByColumn (0, Qt::AscendingOrder);
+	sortByColumn (NameColumn, Qt::AscendingOrder);
 	setSortingEnabled (true);
 	setSelectionMode (QTreeWidget::SingleSelection);
 	setRootIsDecorated (true);
@@ -56,6 +57,24 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 
 	read();
 	setup_appereance();
+
+	QTimer* timer = new QTimer (this);
+	timer->setInterval (1000.0 / 15.0);
+	QObject::connect (timer, SIGNAL (timeout()), this, SLOT (read()));
+	timer->start();
+}
+
+
+PropertyNode*
+PropertyTreeWidget::selected_property_node() const
+{
+	QList<QTreeWidgetItem*> list = selectedItems();
+	if (list.empty())
+		return nullptr;
+	PropertyTreeWidgetItem* item = dynamic_cast<PropertyTreeWidgetItem*> (list.front());
+	if (!item)
+		return nullptr;
+	return item->node();
 }
 
 
@@ -72,7 +91,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 	BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
 
 	if (val_node)
-		item->setData (1, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (val_node->stringify()));
+		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (val_node->stringify()));
 	else
 	{
 		PropertyDirectoryNode* dir_node = dynamic_cast<PropertyDirectoryNode*> (node);
@@ -116,7 +135,7 @@ PropertyTreeWidget::convert_item (QTreeWidgetItem* item)
 void
 PropertyTreeWidget::setup_appereance()
 {
-	header()->resizeSection (0, 20.f * Services::default_font_size (physicalDpiY()));
+	header()->resizeSection (NameColumn, 20.f * Services::default_font_size (physicalDpiY()));
 }
 
 } // namespace Xefis

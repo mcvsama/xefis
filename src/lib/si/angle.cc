@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Angle::_supported_units = { "deg", "rad" };
+std::vector<std::string> Angle::_supported_units = { "°", "deg", "rad" };
 
 } // namespace SI
 

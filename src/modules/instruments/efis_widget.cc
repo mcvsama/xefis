@@ -882,7 +882,7 @@ EFISWidget::PaintWorkUnit::sl_paint_novspd (Painter& painter)
 		QString sa = "NO";
 		QString sb = "VSPD";
 		QFont font = _font;
-		font.setPixelSize (font_size (15.f));
+		font.setPixelSize (font_size (18.f));
 		QFontMetricsF metrics (font);
 		float font_height = 0.9f * metrics.height();
 

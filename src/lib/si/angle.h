@@ -104,7 +104,7 @@ Angle::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
 
-	if (p.second == "deg")
+	if (p.second == "deg" || p.second == "°")
 		*this = p.first * 1_deg;
 	else if (p.second == "rad")
 		*this = p.first * 1_rad;
@@ -116,7 +116,7 @@ Angle::parse (std::string const& str)
 inline std::string
 Angle::stringify() const
 {
-	return boost::lexical_cast<std::string> (deg()) + "°";
+	return boost::lexical_cast<std::string> (deg()) + " °";
 }
 
 

@@ -54,6 +54,19 @@ void
 PropertyTreeWidgetItem::read()
 {
 	static_cast<PropertyTreeWidget*> (treeWidget())->read (this, _node);
+
+	// TODO http://qt-project.org/doc/qt-5.0/qtcore/qt.html#ItemFlag-enum
+	if (!_node)
+		return;
+
+	PropertyValueNode<bool>* node_bool = dynamic_cast<PropertyValueNode<bool>*> (_node);
+	if (node_bool)
+	{
+		setFlags (flags() | Qt::ItemIsUserCheckable);
+		setCheckState (1, node_bool->read() ? Qt::Checked : Qt::Unchecked);
+	}
+	else
+		setFlags (flags() & ~Qt::ItemIsUserCheckable);
 }
 
 
