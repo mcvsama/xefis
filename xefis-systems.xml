@@ -194,6 +194,10 @@
 					<property name='speed.mach' path='/mach'/>
 					<property name='speed.sound' path='/sound'/>
 				</directory>
+				<directory path='/fpm'>
+					<property name='fpm.alpha' path='/alpha'/>
+					<property name='fpm.beta' path='/beta'/>
+				</directory>
 				<directory path='/aoa'>
 					<property name='aoa.pitch-limit' path='/pitch-limit'/>
 					<property name='aoa.alpha' path='/alpha'/>

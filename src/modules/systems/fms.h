@@ -69,6 +69,9 @@ class FlightManagementSystem: public Xefis::Module
 	compute_aoa();
 
 	void
+	compute_fpm();
+
+	void
 	compute_speed_limits();
 
 	void
@@ -170,6 +173,9 @@ class FlightManagementSystem: public Xefis::Module
 	Xefis::PropertySpeed		_ground_speed;
 	Xefis::PropertyFloat		_mach;
 	Xefis::PropertySpeed		_sound_speed;
+	// Output FPM:
+	Xefis::PropertyAngle		_fpm_alpha;
+	Xefis::PropertyAngle		_fpm_beta;
 	// Output AOA:
 	Xefis::PropertyAngle		_pitch_limit;
 	Xefis::PropertyAngle		_aoa_alpha;
