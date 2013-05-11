@@ -113,6 +113,8 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 				{ "aoa.pitch-limit", _pitch_limit, true },
 				{ "aoa.alpha", _aoa_alpha, true },
 				{ "aoa.beta", _aoa_beta, true },
+				{ "fpm.alpha", _fpm_alpha, true },
+				{ "fpm.beta", _fpm_beta, true },
 				{ "wind.true-heading", _wind_true_orientation_from, true },
 				{ "wind.magnetic-heading", _wind_magnetic_orientation_from, true },
 				{ "wind.true-airspeed", _wind_tas, true },
@@ -142,6 +144,7 @@ FlightManagementSystem::data_updated()
 	compute_track();
 	compute_da();
 	compute_speeds();
+	compute_fpm();
 	compute_aoa();
 	compute_speed_limits();
 	compute_wind();
@@ -416,7 +419,7 @@ FlightManagementSystem::compute_speeds()
 
 
 void
-FlightManagementSystem::compute_aoa()
+FlightManagementSystem::compute_fpm()
 {
 	if (_imu_pitch.valid() && _imu_roll.valid() && _imu_magnetic_heading.valid() &&
 		_track_vertical.valid() && _track_magnetic_heading.valid())
@@ -428,14 +431,26 @@ FlightManagementSystem::compute_aoa()
 		Angle alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
 		Angle beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
 
-		_aoa_alpha.write (floored_mod (alpha, -180_deg, +180_deg));
-		_aoa_beta.write (floored_mod (beta, -180_deg, +180_deg));
+		_fpm_alpha.write (floored_mod (alpha, -180_deg, +180_deg));
+		_fpm_beta.write (floored_mod (beta, -180_deg, +180_deg));
 	}
 	else
 	{
-		_aoa_alpha.set_nil();
-		_aoa_beta.set_nil();
+		_fpm_alpha.set_nil();
+		_fpm_beta.set_nil();
 	}
+}
+
+
+void
+FlightManagementSystem::compute_aoa()
+{
+	// This is not valid since AOA is relative to the air,
+	// and FPM to the ground. But we don't have any better
+	// AOA indicator now.
+
+	_aoa_alpha.copy (_fpm_alpha);
+	_aoa_beta.copy (_fpm_beta);
 
 	if (_aoa_alpha.valid() && _critical_aoa.valid())
 		_pitch_limit.write (-*_aoa_alpha + *_critical_aoa);

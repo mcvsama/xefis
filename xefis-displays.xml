@@ -43,8 +43,8 @@
 										<property name='ias-lookahead' path='/speed/ias-lookahead'/>
 										<property name='mach' path='/speed/mach'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading'/>
-										<property name='flight-path-marker-alpha' path='/aoa/alpha'/>
-										<property name='flight-path-marker-beta' path='/aoa/beta'/>
+										<property name='flight-path-marker-alpha' path='/fpm/alpha'/>
+										<property name='flight-path-marker-beta' path='/fpm/beta'/>
 										<property name='magnetic-track' path='/flight-path/magnetic-track'/>
 										<property name='altitude' path='/pressure-altitude/amsl'/>
 										<property name='altitude-lookahead' path='/pressure-altitude/amsl-lookahead'/>
