@@ -91,41 +91,39 @@ class FlightDataComputer: public Xefis::Module
 	Speed						_computed_climb_rate				= 0_fpm;
 	int							_positions_valid					= 0;
 	Xefis::Smoother<double>		_track_vertical_smoother			= 50.0; // TODO make fps independent
-	Xefis::Smoother<double>		_track_true_heading_smoother		= 100.0; // TODO make fps independent
+	Xefis::Smoother<double>		_track_lateral_true_smoother		= 100.0; // TODO make fps independent
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2000.0; // TODO make fps independent
 	Xefis::Smoother<double>		_ground_speed_smoother				= 200.0; // TODO make fps independent
 	Xefis::Smoother<double>		_climb_rate_smoother				= 400.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 100.0; // TODO make fps independent
 
 	// Input parameters:
-	Xefis::PropertyFloat		_default_airplane_weight_kg;
-	Xefis::PropertyFloat		_actual_airplane_weight_kg;
-	Xefis::PropertyAngle		_low_speed_roll_angle;
-	Xefis::PropertySpeed		_v_a_default;
+	Xefis::PropertyFloat		_default_airplane_weight_kg; // TODO
+	Xefis::PropertyFloat		_actual_airplane_weight_kg; // TODO
+	Xefis::PropertyAngle		_low_speed_roll_angle; // TODO
+	Xefis::PropertySpeed		_v_a_default; // TODO
 	Xefis::PropertySpeed		_v_ne;
 	Xefis::PropertySpeed		_v_s;
 	Xefis::PropertySpeed		_v_s0;
-	Xefis::PropertySpeed		_v_at;
-	Xefis::PropertySpeed		_v_fe;
-	Xefis::PropertySpeed		_v_le;
+	Xefis::PropertySpeed		_v_at; // TODO
+	Xefis::PropertySpeed		_v_fe; // TODO //settings/flaps/angle
+	Xefis::PropertySpeed		_v_le; // TODO //settings/gear/lowered
 	Xefis::PropertySpeed		_v_o;
-	Xefis::PropertySpeed		_v_be;
-	Xefis::PropertySpeed		_v_br;
-	Xefis::PropertySpeed		_v_bg;
-	Xefis::PropertyString		_flaps_configuration_properties_path;
+	Xefis::PropertySpeed		_v_be; // TODO
+	Xefis::PropertySpeed		_v_br; // TODO
+	Xefis::PropertySpeed		_v_bg; // TODO
 	Xefis::PropertyBoolean		_use_standard_pressure;
-	Xefis::PropertyBoolean		_gear_down;
+	Xefis::PropertyBoolean		_gear_down; // TODO
 	Xefis::PropertyPressure		_static_pressure;
 	Xefis::PropertyPressure		_qnh_pressure;
 	Xefis::PropertyAngle		_critical_aoa;
-	Xefis::PropertyLength		_backup_amsl;
 	Xefis::PropertySpeed		_ias;
 	Xefis::PropertyFloat		_outside_air_temperature_k;
 	// Input IMU:
 	Xefis::PropertyAngle		_imu_pitch;
 	Xefis::PropertyAngle		_imu_roll;
 	Xefis::PropertyAngle		_imu_magnetic_heading;
-	Xefis::PropertyAngle		_imu_magnetic_heading_accuracy;
+	Xefis::PropertyAngle		_imu_magnetic_heading_accuracy; // TODO
 	// Input GPS:
 	Xefis::PropertyAngle		_gps_longitude;
 	Xefis::PropertyAngle		_gps_latitude;
@@ -147,10 +145,10 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyString		_position_source;
 	// Output track (flight path):
 	Xefis::PropertyAngle		_track_vertical;
-	Xefis::PropertyAngle		_track_true_heading;
-	Xefis::PropertyAngle		_track_magnetic_heading;
-	Xefis::PropertyFloat		_track_vertical_delta_dpf;
-	Xefis::PropertyFloat		_track_heading_delta_dpf;
+	Xefis::PropertyAngle		_track_lateral_true;
+	Xefis::PropertyAngle		_track_lateral_magnetic;
+	Xefis::PropertyFloat		_track_vertical_delta_dpf; // TODO
+	Xefis::PropertyFloat		_track_heading_delta_dpf; // TODO
 	// Output orientation:
 	Xefis::PropertyAngle		_orientation_pitch;
 	Xefis::PropertyAngle		_orientation_roll;
@@ -158,17 +156,17 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_orientation_magnetic_heading;
 	// Output altitude:
 	Xefis::PropertyLength		_pressure_altitude_amsl;
-	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead;
-	Xefis::PropertyTime			_pressure_altitude_amsl_time;
+	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead; // TODO
+	Xefis::PropertyTime			_pressure_altitude_amsl_time; // TODO
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
-	Xefis::PropertySpeed		_v_a;
+	Xefis::PropertySpeed		_v_a; // TODO
 	Xefis::PropertySpeed		_minimum_ias;
 	Xefis::PropertySpeed		_minimum_maneuver_ias;
 	Xefis::PropertySpeed		_maximum_ias;
 	Xefis::PropertySpeed		_maximum_maneuver_ias;
-	Xefis::PropertySpeed		_ias_lookahead;
-	Xefis::PropertyTime			_ias_lookahead_time;
+	Xefis::PropertySpeed		_ias_lookahead; // TODO
+	Xefis::PropertyTime			_ias_lookahead_time; // TODO
 	Xefis::PropertySpeed		_true_airspeed;
 	Xefis::PropertySpeed		_ground_speed;
 	Xefis::PropertyFloat		_mach;
@@ -185,12 +183,12 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_wind_magnetic_orientation_from;
 	Xefis::PropertySpeed		_wind_tas;
 	// Output approach:
-	Xefis::PropertyAngle		_localizer_vertical_deviation;
-	Xefis::PropertyAngle		_localizer_lateral_deviation;
-	Xefis::PropertyString		_localizer_identifier;
-	Xefis::PropertyString		_localizer_source;
-	Xefis::PropertyLength		_localizer_distance;
-	Xefis::PropertyFrequency	_localizer_frequency;
+	Xefis::PropertyAngle		_localizer_vertical_deviation; // TODO
+	Xefis::PropertyAngle		_localizer_lateral_deviation; // TODO
+	Xefis::PropertyString		_localizer_identifier; // TODO
+	Xefis::PropertyString		_localizer_source; // TODO
+	Xefis::PropertyLength		_localizer_distance; // TODO
+	Xefis::PropertyFrequency	_localizer_frequency; // TODO
 	// Output other:
 	Xefis::PropertyFloat		_climb_glide_ratio;
 	Xefis::PropertyAngle		_magnetic_declination;

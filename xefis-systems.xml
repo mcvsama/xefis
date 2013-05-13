@@ -3,102 +3,6 @@
 	<modules>
 		<module disabled='true' name='generic/fps'/>
 		<module name='private/state'/>
-		<module name='systems/lookahead'>
-			<input>/systems/fdc/altitude/amsl</input>
-			<output>/systems/fdc/altitude/amsl-lookahead</output>
-			<smoothing>500</smoothing>
-			<minimum-integration-time>0.03</minimum-integration-time>
-			<properties>
-				<property name='lookahead-time' path='/systems/fdc/settings/altitude/amsl-lookahead-duration' default='10 s'/>
-			</properties>
-		</module>
-		<module name='systems/flight-director'>
-			<properties>
-				<directory path='/systems/flight-director/settings'>
-					<property name='enabled' path='/enabled' default='false'/>
-					<property name='lateral-mode' path='/lateral-mode' default='0'/>
-					<property name='vertical-mode' path='/vertical-mode' default='0'/>
-					<property name='selected-magnetic-heading' path='/magnetic-heading-and-track' default='0 deg'/>
-					<property name='selected-magnetic-track' path='/magnetic-heading-and-track' default='0 deg'/>
-					<property name='selected-altitude' path='/altitude' default='0 ft'/>
-					<property name='selected-vertical-speed' path='/vertical-speed' default='0 fpm'/>
-					<property name='selected-fpa' path='/fpa' default='-3 deg'/>
-				</directory>
-				<directory path='/systems/flight-director/configuration'>
-					<property name='pitch-limit' path='/pitch-limit' default='7 deg'/>
-					<property name='roll-limit' path='/roll-limit' default='25 deg'/>
-				</directory>
-				<directory path='/'>
-					<property name='measured-magnetic-heading' path='/sensors/compass/magnetic-heading'/>
-					<property name='measured-magnetic-track' path='/systems/fdc/flight-path/magnetic-track'/>
-					<property name='measured-altitude' path='/systems/fdc/altitude/amsl'/>
-					<property name='measured-vertical-speed' path='/systems/fdc/altitude/vertical-speed'/>
-					<property name='measured-fpa' path='/systems/fdc/flight-path/alpha'/>
-					<property name='measured-pitch' path='/sensors/imu/pitch'/>
-					<property name='measured-roll' path='/sensors/imu/roll'/>
-				</directory>
-				<directory path='/systems/flight-director'>
-					<property name='output-pitch' path='/pitch'/>
-					<property name='output-roll' path='/roll'/>
-					<property name='vertical-mode-hint' path='/hints/vertical-hint'/>
-					<property name='lateral-mode-hint' path='/hints/lateral-hint'/>
-				</directory>
-			</properties>
-		</module>
-		<module name='systems/fly-by-wire'>
-			<properties>
-				<directory path='/systems/fly-by-wire/config'>
-					<property name='mode' path='/mode' default='0'/>
-					<property name='stabilization-gain' path='/gain' default='1.0'/>
-					<property name='pitch-gain' path='/pitch/gain' default='1.0'/>
-					<property name='pitch-p' path='/pitch/p' default='10.0'/>
-					<property name='pitch-i' path='/pitch/i' default='1.5'/>
-					<property name='pitch-d' path='/pitch/d' default='0.5'/>
-					<property name='pitch-error-power' path='/pitch/error-power' default='1.0'/>
-					<property name='roll-gain' path='/roll/gain' default='1.0'/>
-					<property name='roll-p' path='/roll/p' default='10.0'/>
-					<property name='roll-i' path='/roll/i' default='1.5'/>
-					<property name='roll-d' path='/roll/d' default='0.5'/>
-					<property name='roll-error-power' path='/roll/error-power' default='1.0'/>
-					<property name='yaw-gain' path='/yaw/gain' default='0.1'/>
-					<property name='yaw-p' path='/yaw/p' default='0.1'/>
-					<property name='yaw-i' path='/yaw/i' default='0.05'/>
-					<property name='yaw-d' path='/yaw/d' default='0.01'/>
-					<property name='yaw-error-power' path='/yaw/error-power' default='0.5'/>
-					<property name='elevator-minimum' path='/elevator/minimum' default='-0.75'/>
-					<property name='elevator-maximum' path='/elevator/maximum' default='+0.75'/>
-					<property name='ailerons-minimum' path='/ailerons/minimum' default='-0.5'/>
-					<property name='ailerons-maximum' path='/ailerons/maximum' default='+0.5'/>
-					<property name='rudder-minimum' path='/rudder/minimum' default='-1.0'/>
-					<property name='rudder-maximum' path='/rudder/maximum' default='+1.0'/>
-					<property name='pitch-extent' path='/pitch-extent' default='20 deg'/>
-					<property name='roll-extent' path='/roll-extent' default='25 deg'/>
-				</directory>
-				<directory path='/input'>
-					<property name='input-pitch-axis' path='//input/main/axis/1'/>
-					<property name='input-roll-axis' path='//input/main/axis/0'/>
-					<property name='input-yaw-axis' path='//input/rudder/axis/2'/>
-				</directory>
-				<directory path='/systems/flight-director'>
-					<property name='input-pitch' path='/pitch'/>
-					<property name='input-roll' path='/roll'/>
-				</directory>
-				<directory path='/sensors'>
-					<property name='measured-pitch' path='/imu/pitch'/>
-					<property name='measured-roll' path='/imu/roll'/>
-					<property name='measured-slip-skid' path='/slip-skid/slip-skid'/>
-				</directory>
-				<directory path='/systems/fly-by-wire'>
-					<property name='output-pitch' path='/pitch'/>
-					<property name='output-roll' path='/roll'/>
-					<property name='output-control-stick-pitch' path='/control-stick/pitch'/>
-					<property name='output-control-stick-roll' path='/control-stick/roll'/>
-					<property name='output-elevator' path='/elevator'/>
-					<property name='output-ailerons' path='/ailerons'/>
-					<property name='output-rudder' path='/rudder'/>
-				</directory>
-			</properties>
-		</module>
 		<module name='systems/fdc'>
 			<properties path='/systems/fdc'>
 				<directory path='/settings'>
@@ -116,30 +20,28 @@
 					<property name='settings.speed.v-be' path='/speeds/v-be' default='65 kt'/>
 					<property name='settings.speed.v-br' path='/speeds/v-br' default='75 kt'/>
 					<property name='settings.speed.v-bg' path='/speeds/v-bg' default='65 kt'/>
-					<property name='settings.flaps-configuration-properties-path' path='/speeds/flaps-configuration-properties-path' default=''/>
-					<property name='settings.use-standard-pressure' path='/use-standard-pressure' default='false'/>
-					<property name='settings.pressure.qnh' path='/pressure/qnh' default='29.52 inhg'/>
+					<property name='settings.use-standard-pressure' path='//settings/altimeter/use-std-pressure' default='false'/>
+					<property name='settings.pressure.qnh' path='//settings/altimeter/pressure-qnh' default='29.82 inhg'/>
 					<property name='settings.critical-aoa' path='/aoa/critical' default='15 deg'/>
 				</directory>
 				<directory path='//sensors'>
 					<property name='imu.pitch' path='/imu/pitch'/>
 					<property name='imu.roll' path='/imu/roll'/>
 					<property name='imu.magnetic-heading' path='/compass/magnetic-heading'/>
-					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy' default='5 deg'/>
+					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy'/>
 					<property name='gps.longitude' path='/gps/longitude'/>
 					<property name='gps.latitude' path='/gps/latitude'/>
 					<property name='gps.altitude-amsl' path='/gps/altitude-amsl'/>
-					<property name='gps.accuracy' path='/gps/accuracy' default='0.001 nm'/>
+					<property name='gps.accuracy' path='/gps/accuracy'/>
 					<property name='gps.timestamp' path='/gps/update-timestamp'/>
-					<property name='ins.longitude' path='/ins/'/>
-					<property name='ins.latitude' path='/ins/'/>
-					<property name='ins.altitude-amsl' path='/ins/'/>
-					<property name='ins.accuracy' path='/ins/'/>
-					<property name='ins.timestamp' path='/ins/'/>
+					<property name='ins.longitude' path='/ins/longitude'/>
+					<property name='ins.latitude' path='/ins/latitude'/>
+					<property name='ins.altitude-amsl' path='/ins/altitude-amsl'/>
+					<property name='ins.accuracy' path='/ins/accuracy'/>
+					<property name='ins.timestamp' path='/ins/timestamp'/>
 					<property name='pressure.static' path='/pressure/pressure'/>
 					<property name='ias' path='/speed/ias'/>
-					<property name='backup-amsl' path='/backup-amsl' default='0 ft'/>
-					<property name='gear-down' path='/gear-down' default='false'/>
+					<property name='gear-down' path='/gear/lowered'/>
 					<property name='outside-air-temperature' path='/temperature/outside.k'/>
 				</directory>
 				<directory path='/position'>
@@ -151,8 +53,8 @@
 				</directory>
 				<directory path='/track'>
 					<property name='track.vertical' path='/vertical'/>
-					<property name='track.true-heading' path='/true-heading'/>
-					<property name='track.magnetic-heading' path='/magnetic-heading'/>
+					<property name='track.lateral-true' path='/lateral-true'/>
+					<property name='track.lateral-magnetic' path='/lateral-magnetic'/>
 					<property name='track.vertical-delta' path='/vertical-delta'/>
 					<property name='track.heading-delta' path='/heading-delta'/>
 				</directory>
@@ -213,12 +115,93 @@
 				</directory>
 			</properties>
 		</module>
+		<module name='systems/flight-director'>
+			<properties>
+				<directory path='/systems/flight-director'>
+					<property name='pitch-limit' path='/limits/pitch-limit' default='7 deg'/>
+					<property name='roll-limit' path='/limits/roll-limit' default='25 deg'/>
+					<property name='output-pitch' path='/pitch'/>
+					<property name='output-roll' path='/roll'/>
+					<property name='vertical-mode-hint' path='/hints/vertical-hint'/>
+					<property name='lateral-mode-hint' path='/hints/lateral-hint'/>
+				</directory>
+				<directory path='/settings/flight-director'>
+					<property name='enabled' path='/enabled'/>
+					<property name='lateral-mode' path='/lateral-mode'/>
+					<property name='vertical-mode' path='/vertical-mode'/>
+					<property name='selected-magnetic-heading' path='/cmd-magnetic-heading-and-track'/>
+					<property name='selected-magnetic-track' path='/cmd-magnetic-heading-and-track'/>
+					<property name='selected-altitude' path='/cmd-altitude'/>
+					<property name='selected-vertical-speed' path='/cmd-vertical-speed'/>
+					<property name='selected-fpa' path='/cmd-fpa'/>
+				</directory>
+				<directory path='/systems/fdc'>
+					<property name='measured-magnetic-heading' path='/orientation/magnetic-heading'/>
+					<property name='measured-magnetic-track' path='/track/lateral-magnetic'/>
+					<property name='measured-altitude' path='/position/altitude-amsl'/>
+					<property name='measured-vertical-speed' path='/pressure-altitude/climb-rate'/>
+					<property name='measured-fpa' path='/fpm/alpha'/>
+				</directory>
+			</properties>
+		</module>
+		<module name='systems/fly-by-wire'>
+			<properties>
+				<directory path='/settings/fly-by-wire'>
+					<property name='mode' path='/mode'/>
+				</directory>
+				<directory path='/systems/fly-by-wire/config'>
+					<property name='stabilization-gain' path='/gain' default='1.0'/>
+					<property name='pitch-gain' path='/pitch/gain' default='1.0'/>
+					<property name='pitch-p' path='/pitch/p' default='10.0'/>
+					<property name='pitch-i' path='/pitch/i' default='1.5'/>
+					<property name='pitch-d' path='/pitch/d' default='0.5'/>
+					<property name='pitch-error-power' path='/pitch/error-power' default='1.0'/>
+					<property name='roll-gain' path='/roll/gain' default='1.0'/>
+					<property name='roll-p' path='/roll/p' default='10.0'/>
+					<property name='roll-i' path='/roll/i' default='1.5'/>
+					<property name='roll-d' path='/roll/d' default='0.5'/>
+					<property name='roll-error-power' path='/roll/error-power' default='1.0'/>
+					<property name='yaw-gain' path='/yaw/gain' default='0.1'/>
+					<property name='yaw-p' path='/yaw/p' default='0.1'/>
+					<property name='yaw-i' path='/yaw/i' default='0.05'/>
+					<property name='yaw-d' path='/yaw/d' default='0.01'/>
+					<property name='yaw-error-power' path='/yaw/error-power' default='0.5'/>
+					<property name='elevator-minimum' path='/elevator/minimum' default='-0.75'/>
+					<property name='elevator-maximum' path='/elevator/maximum' default='+0.75'/>
+					<property name='ailerons-minimum' path='/ailerons/minimum' default='-0.5'/>
+					<property name='ailerons-maximum' path='/ailerons/maximum' default='+0.5'/>
+					<property name='rudder-minimum' path='/rudder/minimum' default='-1.0'/>
+					<property name='rudder-maximum' path='/rudder/maximum' default='+1.0'/>
+					<property name='pitch-extent' path='/pitch-extent' default='20 deg'/>
+					<property name='roll-extent' path='/roll-extent' default='25 deg'/>
+				</directory>
+				<directory path='/systems/fly-by-wire'>
+					<property name='output-control-stick-pitch' path='/control-stick/pitch'/>
+					<property name='output-control-stick-roll' path='/control-stick/roll'/>
+					<property name='output-pitch' path='/pitch'/>
+					<property name='output-roll' path='/roll'/>
+					<property name='output-elevator' path='/elevator'/>
+					<property name='output-ailerons' path='/ailerons'/>
+					<property name='output-rudder' path='/rudder'/>
+				</directory>
+				<directory path='/input'>
+					<property name='input-pitch-axis' path='/main/axis/1'/>
+					<property name='input-roll-axis' path='/main/axis/0'/>
+					<property name='input-yaw-axis' path='/rudder/axis/2'/>
+				</directory>
+				<directory path='/systems/flight-director'>
+					<property name='input-pitch' path='/pitch'/>
+					<property name='input-roll' path='/roll'/>
+				</directory>
+				<directory path='/systems/fdc'>
+					<property name='measured-pitch' path='/orientation/pitch'/>
+					<property name='measured-roll' path='/orientation/roll'/>
+					<property name='measured-slip-skid' path='//sensors/slip-skid/slip-skid'/>
+				</directory>
+			</properties>
+		</module>
 		<module name='systems/rcms'>
 			<properties path='/systems/rcms'>
-				<directory path='/settings'>
-					<property name='settings.vlos.caution-distance' path='/vlos-caution-distance' default='0.75 nm'/>
-					<property name='settings.vlos.warning-distance' path='/vlos-warning-distance' default='1 nm'/>
-				</directory>
 				<directory path='/home'>
 					<property name='home.longitude' path='/longitude'/>
 					<property name='home.latitude' path='/latitude'/>

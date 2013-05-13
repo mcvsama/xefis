@@ -127,6 +127,7 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_use_true_heading;
 	Xefis::PropertyBoolean				_approach_mode;
 	Xefis::PropertyBoolean				_flight_director_visible;
+	Xefis::PropertyBoolean				_flight_director_guidance_visible;
 	Xefis::PropertyBoolean				_flight_director_enabled;
 	Xefis::PropertyInteger				_flight_director_vertical_mode;
 	Xefis::PropertyInteger				_flight_director_lateral_mode;

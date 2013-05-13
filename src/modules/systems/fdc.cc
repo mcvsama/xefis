@@ -34,7 +34,7 @@
 FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager)
 {
-	_track_true_heading_smoother.set_winding ({ 0.0, 360.0 });
+	_track_lateral_true_smoother.set_winding ({ 0.0, 360.0 });
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
 
 	for (QDomElement& e: config)
@@ -57,7 +57,6 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "settings.speed.v-be", _v_be, true },
 				{ "settings.speed.v-br", _v_br, true },
 				{ "settings.speed.v-bg", _v_bg, true },
-				{ "settings.flaps-configuration-properties-path", _flaps_configuration_properties_path, true },
 				{ "settings.use-standard-pressure", _use_standard_pressure, true },
 				{ "settings.pressure.qnh", _qnh_pressure, true },
 				{ "settings.critical-aoa", _critical_aoa, true },
@@ -76,7 +75,6 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "ins.accuracy", _ins_accuracy, true },
 				{ "ins.timestamp", _ins_timestamp, true },
 				{ "pressure.static", _static_pressure, true },
-				{ "backup-amsl", _backup_amsl, true },
 				{ "gear-down", _gear_down, true },
 				{ "ias", _ias, true },
 				{ "outside-air-temperature", _outside_air_temperature_k, true },
@@ -87,8 +85,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "position.accuracy", _position_accuracy, true },
 				{ "position.source", _position_source, true },
 				{ "track.vertical", _track_vertical, true },
-				{ "track.true-heading", _track_true_heading, true },
-				{ "track.magnetic-heading", _track_magnetic_heading, true },
+				{ "track.lateral-true", _track_lateral_true, true },
+				{ "track.lateral-magnetic", _track_lateral_magnetic, true },
 				{ "track.vertical-delta", _track_vertical_delta_dpf, true },
 				{ "track.heading-delta", _track_heading_delta_dpf, true },
 				{ "orientation.pitch", _orientation_pitch, true },
@@ -293,6 +291,9 @@ FlightDataComputer::compute_headings()
 		_orientation_magnetic_heading.set_nil();
 		_orientation_true_heading.set_nil();
 	}
+
+	_orientation_pitch.copy (_imu_pitch);
+	_orientation_roll.copy (_imu_roll);
 }
 
 
@@ -309,23 +310,26 @@ FlightDataComputer::compute_track()
 
 			Angle initial_true_heading = _ac1_positions[0].lateral_position.initial_bearing (_ac1_positions[1].lateral_position);
 			Angle true_heading = floored_mod (initial_true_heading + 180_deg, 360_deg);
-			_track_true_heading.write (1_deg * _track_true_heading_smoother.process (true_heading.deg()));
+			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg()));
 
 			if (_magnetic_declination.valid())
-				_track_magnetic_heading.write (true_to_magnetic (*_track_true_heading, *_magnetic_declination));
+				_track_lateral_magnetic.write (true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
+			else
+				_track_lateral_magnetic.set_nil();
 		}
 		else
 		{
 			_track_vertical.set_nil();
-			_track_true_heading.set_nil();
-			_track_magnetic_heading.set_nil();
+			_track_lateral_true.set_nil();
+			_track_lateral_magnetic.set_nil();
 		}
 	}
 	else
 	{
-		_track_true_heading_smoother.reset ((*_orientation_magnetic_heading).deg());
+		_track_lateral_true_smoother.reset ((*_orientation_true_heading).deg());
 		_track_vertical.set_nil();
-		_track_true_heading.set_nil();
+		_track_lateral_true.set_nil();
+		_track_lateral_magnetic.set_nil();
 	}
 
 	if (_ac1_positions[0].valid && _ac1_positions[1].valid && _ac1_positions[2].valid)
@@ -422,10 +426,10 @@ void
 FlightDataComputer::compute_fpm()
 {
 	if (_imu_pitch.valid() && _imu_roll.valid() && _imu_magnetic_heading.valid() &&
-		_track_vertical.valid() && _track_magnetic_heading.valid())
+		_track_vertical.valid() && _track_lateral_magnetic.valid())
 	{
 		Angle vdiff = floored_mod (*_imu_pitch - *_track_vertical, -180_deg, +180_deg);
-		Angle hdiff = floored_mod (*_imu_magnetic_heading - *_track_magnetic_heading, -180_deg, +180_deg);
+		Angle hdiff = floored_mod (*_imu_magnetic_heading - *_track_lateral_magnetic, -180_deg, +180_deg);
 		Angle roll = *_imu_roll;
 
 		Angle alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
@@ -448,6 +452,7 @@ FlightDataComputer::compute_aoa()
 	// This is not valid since AOA is relative to the air,
 	// and FPM to the ground. But we don't have any better
 	// AOA indicator now.
+	// Therefore: TODO
 
 	_aoa_alpha.copy (_fpm_alpha);
 	_aoa_beta.copy (_fpm_beta);
@@ -510,12 +515,12 @@ FlightDataComputer::compute_wind()
 {
 	if (_true_airspeed.valid() &&
 		_ground_speed.valid() &&
-		_track_true_heading.valid() &&
+		_track_lateral_true.valid() &&
 		_orientation_true_heading.valid())
 	{
 		Xefis::WindTriangle wt;
 		wt.set_aircraft_tas (*_true_airspeed);
-		wt.set_aircraft_track (*_track_true_heading);
+		wt.set_aircraft_track (*_track_lateral_true);
 		wt.set_aircraft_ground_speed (*_ground_speed);
 		wt.set_aircraft_heading (*_orientation_true_heading);
 		wt.update();

@@ -25,7 +25,6 @@
 						<property name='altitude-agl' path='/radar-altimeter/agl'/>
 						<!-- slip-skid -->
 						<property name='slip-skid' path='/slip-skid/slip-skid'/>
-						<property name='slip-skid-limit' path='/slip-skid/limit'/>
 						<!-- engine -->
 						<property name='engine-n1' path='/engine/n1'/>
 						<property name='engine-n2' path='/engine/n2'/>
@@ -45,19 +44,16 @@
 						<property name='altitude' path='/altitude/amsl'/>
 						<property name='orientation-true-heading' path='/orientation/true-heading'/>
 						<property name='ias-minimum' path='/speed/ias-minimum'/>
-						<property name='ias-warning' path='/speed/ias-warning'/>
 						<property name='ias-maximum' path='/speed/ias-maximum'/>
 						<property name='ias-lookahead' path='/speed/ias-lookahead'/>
 						<property name='dme-distance' path='/localizer/distance'/>
 						<property name='vertical-deviation' path='/localizer/vertical-deviation'/>
 						<property name='lateral-deviation' path='/localizer/lateral-deviation'/>
-					</directory>
-					<directory path='/systems/flight-director'>
 						<!-- Emulate some of the AP settings -->
-						<property name='cmd-setting-altitude' path='/settings/altitude'/>
-						<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track'/>
-						<property name='cmd-setting-cbr' path='/settings/vertical-speed'/>
-						<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias'/>
+						<property name='cmd-setting-altitude' path='/cmd-altitude'/>
+						<property name='cmd-setting-heading' path='/cmd-magnetic-heading-and-track'/>
+						<property name='cmd-setting-cbr' path='/cmd-vertical-speed'/>
+						<property name='cmd-setting-ias' path='/cmd-ias'/>
 					</directory>
 				</properties>
 			</input>
@@ -65,12 +61,9 @@
 				<host>127.0.0.1</host>
 				<port>9001</port>
 				<properties path='/systems/fly-by-wire'>
-					<property name='ailerons' path='/ailerons' default='0.0'/>
-					<property name='elevator' path='/elevator' default='0.0'/>
-					<property name='rudder' path='/rudder' default='0.0'/>
-					<property name='ailerons-trim' path='/ailerons-trim' default='0.0'/>
-					<property name='elevator-trim' path='/elevator-trim' default='0.0'/>
-					<property name='rudder-trim' path='/rudder-trim' default='0.0'/>
+					<property name='ailerons' path='/ailerons'/>
+					<property name='elevator' path='/elevator'/>
+					<property name='rudder' path='/rudder'/>
 				</properties>
 			</output>
 		</module>

@@ -45,23 +45,64 @@ template<class P>
 State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
 	Module (module_manager)
 {
-	_pressure_display_hpa.set_path ("/systems/fdc/settings/pressure-display-hpa");
-	_use_standard_pressure.set_path ("/systems/fdc/settings/use-standard-pressure");
-	_follow_track.set_path ("/systems/fdc/settings/follow-track");
-	_use_true_heading.set_path ("/systems/fdc/settings/use-true-heading");
-	_approach_mode.set_path ("/instruments/efis/approach/visible");
-	_flight_director_visible.set_path ("/instruments/efis/flight-director/visible");
-	_flight_director_enabled.set_path ("/systems/flight-director/settings/enabled");
-	_flight_director_vertical_mode.set_path ("/systems/flight-director/settings/vertical-mode");
-	_flight_director_lateral_mode.set_path ("/systems/flight-director/settings/lateral-mode");
-	_control_hint_visible.set_path ("/instruments/efis/control/hint-visible");
-	_control_hint_text.set_path ("/instruments/efis/control/hint");
-	_control_stick_visible.set_path ("/instruments/efis/control-stick/visible");
-	_fly_by_wire_mode.set_path ("/systems/fly-by-wire/config/mode");
-	_hsi_aux_range.set_path ("/instruments/hsi-aux/range");
-	_hsi_nav_range.set_path ("/instruments/hsi-nav/range");
-	_hsi_nav_mode.set_path ("/instruments/hsi-nav/display-mode");
+	// adi:
+	Xefis::PropertyBoolean ("//settings/adi/flight-path-marker-visible").write (true);
+	Xefis::PropertyBoolean ("//settings/adi/pitch-limit-visible").write (true);
+	Xefis::PropertyAngle ("//settings/adi/roll-warning").write (35_deg);
+	Xefis::PropertyFloat ("//settings/adi/slip-skid-warning").write (1.5);
+	_approach_mode.set_path ("//settings/adi/approach-reference-visible");
+	_control_hint_visible.set_path ("//settings/adi/control-hint-visible");
+	_control_hint_text.set_path ("//settings/adi/control-hint");
+	_control_stick_visible.set_path ("//settings/adi/control-stick-visible");
 
+	// altimeter:
+	_pressure_display_hpa.set_path ("//settings/altimeter/pressure-in-hpa");
+	_use_standard_pressure.set_path ("//settings/altimeter/use-std-pressure");
+
+	// flight-director:
+	Xefis::PropertyAngle ("//settings/flight-director/cmd-magnetic-heading-and-track").write (0_deg);
+	Xefis::PropertySpeed ("//settings/flight-director/cmd-ias").write (0_kt);
+	Xefis::PropertySpeed ("//settings/flight-director/cmd-vertical-speed").write (0_fpm);
+	Xefis::PropertyLength ("//settings/flight-director/cmd-altitude").write (0_ft);
+	Xefis::PropertyAngle ("//settings/flight-director/cmd-fpa").write (0_deg);
+	Xefis::PropertyInteger ("//settings/flight-director/vertical-mode").write (0);
+	Xefis::PropertyInteger ("//settings/flight-director/lateral-mode").write (0);
+	_flight_director_visible.set_path ("//settings/flight-director/visible");
+	_flight_director_visible.write (true);
+	_flight_director_guidance_visible.set_path ("//settings/flight-director/guidance-visible");
+	_flight_director_guidance_visible.write (false);
+	_flight_director_enabled.set_path ("//settings/flight-director/enabled");
+	_flight_director_vertical_mode.set_path ("//settings/flight-director/vertical-mode");
+	_flight_director_lateral_mode.set_path ("//settings/flight-director/lateral-mode");
+
+	// fly-by-wire:
+	_fly_by_wire_mode.set_path ("//settings/fly-by-wire/mode");
+	_fly_by_wire_mode.write (0);
+
+	// hsi:
+	Xefis::PropertyInteger ("//settings/hsi-aux/mode").write (2);
+	Xefis::PropertyLength ("//settings/hsi-aux/trend-vector-range").write (2_nm);
+	Xefis::PropertyLength ("//settings/hsi-nav/trend-vector-range").write (2_nm);
+	_follow_track.set_path ("//settings/hsi/follow-track");
+	_use_true_heading.set_path ("//settings/hsi/use-true-heading");
+	_hsi_aux_range.set_path ("//settings/hsi-aux/range");
+	_hsi_aux_range.write (2_nm);
+	_hsi_nav_range.set_path ("//settings/hsi-nav/range");
+	_hsi_nav_range.write (20_nm);
+	_hsi_nav_mode.set_path ("//settings/hsi-nav/mode");
+	_hsi_nav_mode.write (0);
+
+	// gear:
+	Xefis::PropertyBoolean ("//settings/gear/lowered").write (false);
+	Xefis::PropertyBoolean ("//sensors/gear/lowered").write (false);
+
+	// flaps:
+	Xefis::PropertyAngle ("//settings/flaps/angle").write (0_deg);
+
+	// minimums:
+	Xefis::PropertyLength ("//settings/minimums/baro-altitude").write (3000_ft);
+
+	// Input controls:
 	_saitek_a.set_path ("/input/main/button/2");
 	_saitek_b.set_path ("/input/main/button/3");
 	_saitek_c.set_path ("/input/main/button/4");
@@ -132,7 +173,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
 
 	_saitek_t6.set_callback ([this](Xefis::PropertyBoolean& prop) {
 		if (*prop)
-			_flight_director_visible.write (!*_flight_director_visible);
+			_flight_director_guidance_visible.write (!*_flight_director_guidance_visible);
 	});
 
 	_saitek_mode_1.set_callback ([this](Xefis::PropertyBoolean& prop) {
