@@ -26,11 +26,11 @@
 #include <modules/instruments/radial_indicator.h>
 #include <modules/io/flight_gear.h>
 #include <modules/io/joystick.h>
+#include <modules/io/mouse.h>
 #include <modules/systems/flight_director.h>
 #include <modules/systems/fly_by_wire.h>
 #include <modules/systems/fdc.h>
 #include <modules/systems/lookahead.h>
-#include <modules/systems/mouse.h>
 #include <modules/systems/rcms.h>
 #include <modules/private/state.h>
 
@@ -108,8 +108,6 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new RadialIndicator (this, config, parent);
 		else if (name == "systems/lookahead")
 			return new Lookahead (this, config);
-		else if (name == "systems/mouse")
-			return new Mouse (this, config);
 		else if (name == "systems/flight-director")
 			return new FlightDirector (this, config);
 		else if (name == "systems/fly-by-wire")
@@ -126,6 +124,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlightGearIO (this, config);
 		else if (name == "io/joystick")
 			return new JoystickInput (this, config);
+		else if (name == "io/mouse")
+			return new Mouse (this, config);
 		else
 			throw ModuleNotFoundException ("module not found: " + name.toStdString());
 	}
