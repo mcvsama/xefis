@@ -167,12 +167,14 @@ SRC_HEADERS += modules/systems/fly_by_wire.h
 SRC_HEADERS += modules/systems/fms.h
 SRC_HEADERS += modules/systems/lookahead.h
 SRC_HEADERS += modules/systems/mouse.h
+SRC_HEADERS += modules/systems/rcms.h
 
 SRC_SOURCES += modules/systems/flight_director.cc
 SRC_SOURCES += modules/systems/fly_by_wire.cc
 SRC_SOURCES += modules/systems/fms.cc
 SRC_SOURCES += modules/systems/lookahead.cc
 SRC_SOURCES += modules/systems/mouse.cc
+SRC_SOURCES += modules/systems/rcms.cc
 
 SRC_MOCHDRS += modules/systems/mouse.h
 

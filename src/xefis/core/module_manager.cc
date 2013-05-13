@@ -31,6 +31,7 @@
 #include <modules/systems/fms.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
+#include <modules/systems/rcms.h>
 #include <modules/private/state.h>
 
 // Local:
@@ -115,6 +116,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlyByWire (this, config);
 		else if (name == "systems/fms")
 			return new FlightManagementSystem (this, config);
+		else if (name == "systems/rcms")
+			return new RemoteControlManagementSystem (this, config);
 		else if (name == "private/state")
 			return new State (this, config);
 		else if (name == "generic/fps")

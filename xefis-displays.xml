@@ -115,6 +115,11 @@
 										<property name='cmd-track-visible' path='/settings/enabled'/>
 										<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track'/>
 									</directory>
+									<directory path='/systems/rcms'>
+										<property name='home.distance.vlos' path='/home/vlos-distance'/>
+										<property name='home.distance.ground' path='/home/ground-distance'/>
+										<property name='home.true-direction' path='/home/true-direction'/>
+									</directory>
 								</properties>
 							</module>
 						</item>

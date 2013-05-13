@@ -18,6 +18,7 @@
 #include <cstddef>
 
 // Qt:
+#include <QtCore/QDateTime>
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
 
@@ -91,6 +92,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle					track						= 0_deg; // Mag or true, depending on heading mode.
 		bool					track_visible				= false;
 		bool					display_track				= false;
+		Angle					true_home_direction			= 0_deg;
+		bool					home_direction_visible		= false;
+		Length					distance_to_home_ground		= 0_nm;
+		bool					dist_to_home_ground_visible	= false;
+		Length					distance_to_home_vlos		= 0_nm;
+		bool					dist_to_home_vlos_visible	= false;
 		Speed					ground_speed				= 0_kt;
 		bool					ground_speed_visible		= false;
 		Speed					true_air_speed				= 0_kt;
@@ -116,6 +123,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString					highlighted_loc;
 		QString					positioning_hint;
 		bool					positioning_hint_visible	= false;
+		QDateTime				positioning_hint_ts;
 		float					climb_glide_ratio			= 0.0;
 		bool					climb_glide_ratio_visible	= false;
 		bool					round_clip					= false;
@@ -170,6 +178,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_speeds_and_wind (Painter&);
 
 		void
+		paint_home_direction (Painter&);
+
+		void
 		paint_climb_glide_ratio (Painter&);
 
 		void
@@ -204,7 +215,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 		float
 		nm_to_px (Length miles);
 
+		bool
+		is_newly_set (QDateTime const& timestamp, Time time = 10_s) const;
+
 	  private:
+		QDateTime				_current_datetime;
 		NavaidStorage*			_navaid_storage				= nullptr;
 		bool					_recalculation_needed		= false;
 		float					_r;
@@ -337,6 +352,42 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_display_track (bool track);
+
+	/**
+	 * Set true home (start position) direction.
+	 */
+	void
+	set_true_home_direction (Angle direction);
+
+	/**
+	 * Set visibility of the home aids (direction, distance).
+	 */
+	void
+	set_home_direction_visible (bool visible);
+
+	/**
+	 * Set ground distance to home.
+	 */
+	void
+	set_ground_distance_to_home (Length ground_distance);
+
+	/**
+	 * Set visibility of ground distance to home.
+	 */
+	void
+	set_ground_distance_to_home_visible (bool visible);
+
+	/**
+	 * Set VLOS (visual line of sight) distance to home.
+	 */
+	void
+	set_vlos_distance_to_home (Length vlos_distance);
+
+	/**
+	 * Set visibility of VLOS distance to home.
+	 */
+	void
+	set_vlos_distance_to_home_visible (bool visible);
 
 	/**
 	 * Set ground speed.
@@ -588,6 +639,13 @@ HSIWidget::PaintWorkUnit::nm_to_px (Length miles)
 }
 
 
+inline bool
+HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
+{
+	return timestamp.secsTo (_current_datetime) < time.s();
+}
+
+
 inline void
 HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 {
@@ -694,6 +752,54 @@ HSIWidget::set_display_track (bool track)
 
 
 inline void
+HSIWidget::set_true_home_direction (Angle direction)
+{
+	_params.true_home_direction = direction;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_home_direction_visible (bool visible)
+{
+	_params.home_direction_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_ground_distance_to_home (Length ground_distance)
+{
+	_params.distance_to_home_ground = ground_distance;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_ground_distance_to_home_visible (bool visible)
+{
+	_params.dist_to_home_ground_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_vlos_distance_to_home (Length vlos_distance)
+{
+	_params.distance_to_home_vlos = vlos_distance;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_vlos_distance_to_home_visible (bool visible)
+{
+	_params.dist_to_home_vlos_visible = visible;
+	request_repaint();
+}
+
+
+inline void
 HSIWidget::set_ground_speed (Speed ground_speed)
 {
 	_params.ground_speed = ground_speed;
@@ -760,6 +866,8 @@ HSIWidget::set_position_valid (bool valid)
 inline void
 HSIWidget::set_positioning_hint (QString const& hint)
 {
+	if (_params.positioning_hint != hint)
+		_params.positioning_hint_ts = QDateTime::currentDateTime();
 	_params.positioning_hint = hint;
 	request_repaint();
 }
@@ -768,6 +876,8 @@ HSIWidget::set_positioning_hint (QString const& hint)
 inline void
 HSIWidget::set_positioning_hint_visible (bool visible)
 {
+	if (_params.positioning_hint_visible != visible)
+		_params.positioning_hint_ts = QDateTime::currentDateTime();
 	_params.positioning_hint_visible = visible;
 }
 

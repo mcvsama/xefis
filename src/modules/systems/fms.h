@@ -81,7 +81,7 @@ class FlightManagementSystem: public Xefis::Module
 	compute_performance();
 
   private:
-	Time					_now;
+	Time						_now;
 	// [0] - new, [2] - old
 	std::array<Position, 3>		_positions;
 	std::array<Position, 3>		_ac1_positions;
