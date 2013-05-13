@@ -1448,7 +1448,7 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Painter& painter)
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-							QString ("%1").arg (static_cast<int> (std::abs (cmd_altitude.ft())) % 1000, 3, 'f', 0, '0'));
+							QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.ft()))) % 1000, 3, 'f', 0, '0'));
 }
 
 
