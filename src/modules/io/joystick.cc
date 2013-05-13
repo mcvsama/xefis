@@ -62,6 +62,8 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 				float center = 0.f;
 				float dead_zone = 0.f;
 				float reverse = 1.f;
+				float scale = 1.f;
+				float power = 1.f;
 
 				for (QDomElement& v: e)
 				{
@@ -71,12 +73,18 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 						dead_zone = v.text().toFloat();
 					else if (v == "reverse")
 						reverse = -1.f;
+					else if (v == "scale")
+						scale = v.text().toFloat();
+					else if (v == "power")
+						power = v.text().toFloat();
 				}
 
 				Axis* axis = new Axis();
 				axis->center = center;
 				axis->dead_zone = dead_zone;
 				axis->reverse = reverse;
+				axis->scale = scale;
+				axis->power = power;
 				_axes[id] = axis;
 			}
 		}
@@ -217,6 +225,13 @@ JoystickInput::Axis::set_value (float value)
 		value = value - sgn (value) * dead_zone;
 	// Reverse:
 	value *= reverse;
+	// Scale:
+	value *= scale;
+	// Power:
+	float o = value;
+	value = std::pow (value, power);
+	if (value > 0.f && o < 0.f)
+		value = -value;
 
 	prop.write (value);
 }
