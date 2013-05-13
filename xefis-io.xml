@@ -93,6 +93,19 @@
 				<power>3</power>
 			</axis>
 		</module>
+		<module name='io/mouse' disabled='true'>
+			<dead-zone-x>0.05</dead-zone-x>
+			<dead-zone-y>0.05</dead-zone-y>
+			<acceleration-x>2.0</acceleration-x>
+			<acceleration-y>2.0</acceleration-y>
+			<speed-x>1.0</speed-x>
+			<speed-y>1.0</speed-y>
+			<properties>
+				<property name='axis-x' path='/input/main/axis/9'/>
+				<property name='axis-y' path='/input/main/axis/10'/>
+				<property name='button' path='/input/main/button/15'/>
+			</properties>
+		</module>
 	</modules>
 </xefis-include>
 
