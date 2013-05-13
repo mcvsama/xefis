@@ -106,7 +106,7 @@ FlyByWire::data_updated()
 
 	switch (static_cast<Mode> (*_mode))
 	{
-		case CommandMode:
+		case ManualMode:
 			_output_elevator.write (-*_input_pitch_axis);
 			_output_ailerons.write (*_input_roll_axis);
 			_output_rudder.write (*_input_yaw_axis);
@@ -118,6 +118,7 @@ FlyByWire::data_updated()
 		case StabilizedMode:
 		case FlightDirectorMode:
 		{
+			// Should always be computed:
 			integrate_manual_input();
 
 			if (static_cast<Mode> (*_mode) == FlightDirectorMode)
@@ -143,10 +144,10 @@ FlyByWire::data_updated()
 			_rudder_pid.set_error_power (*_yaw_error_power);
 			_rudder_pid.set_output_limit (Range<float> (*_rudder_minimum, *_rudder_maximum));
 
-			_elevator_pid.set_target (_pre_input_pitch / 180_deg);
+			_elevator_pid.set_target (_pre_output_pitch / 180_deg);
 			_elevator_pid.process (*_measured_pitch / 180_deg, _dt.s());
 
-			_ailerons_pid.set_target (_pre_input_roll / 180_deg);
+			_ailerons_pid.set_target (_pre_output_roll / 180_deg);
 			_ailerons_pid.process (*_measured_roll / 180_deg, _dt.s());
 
 			_rudder_pid.set_target (0.0);
@@ -166,9 +167,9 @@ FlyByWire::data_updated()
 	}
 
 	// Output:
-	if (_output_pitch.valid())
+	if (!_output_pitch.is_singular())
 		_output_pitch.write (_pre_output_pitch);
-	if (_output_roll.valid())
+	if (!_output_roll.is_singular())
 		_output_roll.write (_pre_output_roll);
 
 	_dt = Time::epoch();
