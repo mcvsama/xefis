@@ -38,12 +38,14 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 	try {
 		std::map<QString, BaseProperty*> map;
 		std::set<QString> unconfigured_values;
+		std::set<QString> known_values;
 
 		for (NameAndProperty& pair: list)
 		{
 			map[pair.name] = &pair.property;
 			if (pair.required)
 				unconfigured_values.insert (pair.name);
+			known_values.insert (pair.name);
 		}
 
 		QString root = properties_element.attribute ("path");
@@ -55,6 +57,9 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 				throw Exception ("missing attribute @name for property");
 
 			QString name = e.attribute ("name");
+
+			if (known_values.find (name) == known_values.end())
+				throw Exception (QString ("configuration for unknown property: %1").arg (name).toStdString());
 
 			unconfigured_values.erase (name);
 
