@@ -4,12 +4,12 @@
 		<module disabled='true' name='generic/fps'/>
 		<module name='private/state'/>
 		<module name='systems/lookahead'>
-			<input>/systems/fms/altitude/amsl</input>
-			<output>/systems/fms/altitude/amsl-lookahead</output>
+			<input>/systems/fdc/altitude/amsl</input>
+			<output>/systems/fdc/altitude/amsl-lookahead</output>
 			<smoothing>500</smoothing>
 			<minimum-integration-time>0.03</minimum-integration-time>
 			<properties>
-				<property name='lookahead-time' path='/systems/fms/settings/altitude/amsl-lookahead-duration' default='10 s'/>
+				<property name='lookahead-time' path='/systems/fdc/settings/altitude/amsl-lookahead-duration' default='10 s'/>
 			</properties>
 		</module>
 		<module name='systems/mouse'>
@@ -43,10 +43,10 @@
 				</directory>
 				<directory path='/'>
 					<property name='measured-magnetic-heading' path='/sensors/compass/magnetic-heading'/>
-					<property name='measured-magnetic-track' path='/systems/fms/flight-path/magnetic-track'/>
-					<property name='measured-altitude' path='/systems/fms/altitude/amsl'/>
-					<property name='measured-vertical-speed' path='/systems/fms/altitude/vertical-speed'/>
-					<property name='measured-fpa' path='/systems/fms/flight-path/alpha'/>
+					<property name='measured-magnetic-track' path='/systems/fdc/flight-path/magnetic-track'/>
+					<property name='measured-altitude' path='/systems/fdc/altitude/amsl'/>
+					<property name='measured-vertical-speed' path='/systems/fdc/altitude/vertical-speed'/>
+					<property name='measured-fpa' path='/systems/fdc/flight-path/alpha'/>
 					<property name='measured-pitch' path='/sensors/imu/pitch'/>
 					<property name='measured-roll' path='/sensors/imu/roll'/>
 				</directory>
@@ -112,8 +112,8 @@
 				</directory>
 			</properties>
 		</module>
-		<module name='systems/fms'>
-			<properties path='/systems/fms'>
+		<module name='systems/fdc'>
+			<properties path='/systems/fdc'>
 				<directory path='/settings'>
 					<property name='settings.default-airplane-weight' path='/default-airplane-weight.kg' default='2.0'/>
 					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.kg' default='2.0'/>
@@ -240,7 +240,7 @@
 					<property name='home.distance-ground' path='/ground-distance'/>
 					<property name='home.true-direction' path='/true-direction'/>
 				</directory>
-				<directory path='//systems/fms/position'>
+				<directory path='//systems/fdc/position'>
 					<property name='position.longitude' path='/longitude'/>
 					<property name='position.latitude' path='/latitude'/>
 					<property name='position.altitude-amsl' path='/altitude-amsl'/>

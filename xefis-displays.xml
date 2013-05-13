@@ -23,9 +23,9 @@
 										<property name='slip-skid-limit' path='/slip-skid/slip-skid-warning' default='1.5'/>
 										<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
 										<property name='minimums-altitude' path='/minimums-altitude' default='3000 ft'/>
-										<property name='pressure-qnh' path='//systems/fms/settings/pressure/qnh'/>
-										<property name='pressure-display-hpa' path='//systems/fms/settings/pressure-display-hpa'/>
-										<property name='use-standard-pressure' path='//systems/fms/settings/use-standard-pressure'/>
+										<property name='pressure-qnh' path='//systems/fdc/settings/pressure/qnh'/>
+										<property name='pressure-display-hpa' path='//systems/fdc/settings/pressure-display-hpa'/>
+										<property name='use-standard-pressure' path='//systems/fdc/settings/use-standard-pressure'/>
 										<property name='commanded-settings-visible' path='/command/visible' default='true'/>
 										<property name='fma-visible' path='/fma/visible' default='true'/>
 										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
@@ -36,7 +36,7 @@
 										<property name='control-hint' path='/control/hint' default=''/>
 										<property name='novspd-flag' path='/novspd-flag' default='false'/>
 									</directory>
-									<directory path='/systems/fms'>
+									<directory path='/systems/fdc'>
 										<property name='ias-minimum' path='/speed/ias-minimum'/>
 										<property name='ias-warning' path='/speed/ias-minimum-maneuver'/>
 										<property name='ias-maximum' path='/speed/ias-maximum'/>
@@ -95,7 +95,7 @@
 										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
 										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
-									<directory path='/systems/fms'>
+									<directory path='/systems/fdc'>
 										<property name='gs' path='/speed/ground-speed'/>
 										<property name='tas' path='/speed/true-airspeed'/>
 										<property name='magnetic-track' path='/track/magnetic-heading'/>
@@ -137,7 +137,7 @@
 										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
 										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
 									</directory>
-									<directory path='/systems/fms'>
+									<directory path='/systems/fdc'>
 										<property name='gs' path='/speed/ground-speed'/>
 										<property name='tas' path='/speed/true-airspeed'/>
 										<property name='magnetic-track' path='/track/magnetic-heading'/>

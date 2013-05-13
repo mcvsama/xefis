@@ -28,10 +28,10 @@
 #include <xefis/utility/magnetic_variation.h>
 
 // Local:
-#include "fms.h"
+#include "fdc.h"
 
 
-FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_manager, QDomElement const& config):
+FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager)
 {
 	_track_true_heading_smoother.set_winding ({ 0.0, 360.0 });
@@ -135,7 +135,7 @@ FlightManagementSystem::FlightManagementSystem (Xefis::ModuleManager* module_man
 
 
 void
-FlightManagementSystem::data_updated()
+FlightDataComputer::data_updated()
 {
 	_now = Time::now();
 
@@ -153,7 +153,7 @@ FlightManagementSystem::data_updated()
 
 
 void
-FlightManagementSystem::compute_position()
+FlightDataComputer::compute_position()
 {
 	enum PositionSource { GPS, INS };
 
@@ -258,7 +258,7 @@ FlightManagementSystem::compute_position()
 
 
 void
-FlightManagementSystem::compute_headings()
+FlightDataComputer::compute_headings()
 {
 	if (_position_longitude.valid() && _position_latitude.valid())
 	{
@@ -297,7 +297,7 @@ FlightManagementSystem::compute_headings()
 
 
 void
-FlightManagementSystem::compute_track()
+FlightDataComputer::compute_track()
 {
 	if (_ac1_positions[0].valid && _ac1_positions[1].valid)
 	{
@@ -341,7 +341,7 @@ FlightManagementSystem::compute_track()
 
 
 void
-FlightManagementSystem::compute_da()
+FlightDataComputer::compute_da()
 {
 	if (_outside_air_temperature_k.valid() && _pressure_altitude_amsl.valid())
 	{
@@ -357,7 +357,7 @@ FlightManagementSystem::compute_da()
 
 
 void
-FlightManagementSystem::compute_speeds()
+FlightDataComputer::compute_speeds()
 {
 	if (_outside_air_temperature_k.valid())
 	{
@@ -419,7 +419,7 @@ FlightManagementSystem::compute_speeds()
 
 
 void
-FlightManagementSystem::compute_fpm()
+FlightDataComputer::compute_fpm()
 {
 	if (_imu_pitch.valid() && _imu_roll.valid() && _imu_magnetic_heading.valid() &&
 		_track_vertical.valid() && _track_magnetic_heading.valid())
@@ -443,7 +443,7 @@ FlightManagementSystem::compute_fpm()
 
 
 void
-FlightManagementSystem::compute_aoa()
+FlightDataComputer::compute_aoa()
 {
 	// This is not valid since AOA is relative to the air,
 	// and FPM to the ground. But we don't have any better
@@ -460,7 +460,7 @@ FlightManagementSystem::compute_aoa()
 
 
 void
-FlightManagementSystem::compute_speed_limits()
+FlightDataComputer::compute_speed_limits()
 {
 	// TODO zamiast flaps-extended i prędkości z tym związanych zrób tabelaryczne prędkości
 	// w zależności od kąta klap.
@@ -506,7 +506,7 @@ FlightManagementSystem::compute_speed_limits()
 
 
 void
-FlightManagementSystem::compute_wind()
+FlightDataComputer::compute_wind()
 {
 	if (_true_airspeed.valid() &&
 		_ground_speed.valid() &&
@@ -533,7 +533,7 @@ FlightManagementSystem::compute_wind()
 
 
 void
-FlightManagementSystem::compute_performance()
+FlightDataComputer::compute_performance()
 {
 	if (_true_airspeed.valid() && _pressure_altitude_climb_rate.valid())
 	{
