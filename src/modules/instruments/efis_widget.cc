@@ -1867,22 +1867,12 @@ EFISWidget::PaintWorkUnit::paint_hints (Painter& painter)
 		painter.setPen (get_pen (Qt::white, 1.2f));
 		painter.drawLine (QPointF (x26, rect.top()), QPointF (x26, rect.bottom()));
 		painter.drawLine (QPointF (x46, rect.top()), QPointF (x46, rect.bottom()));
-		painter.setPen (get_pen (_navigation_color, 1.0f));
 		painter.setBrush (Qt::NoBrush);
 
 		QPointF a_big (0.f, 0.015f * _q);
 		QPointF a_small (0.f, 0.01f * _q);
 
-		painter.setFont (_font_13);
-		painter.fast_draw_text (b1 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
-		painter.fast_draw_text (b2 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
-		painter.fast_draw_text (b3 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
-
-		painter.setFont (_font_10);
-		painter.fast_draw_text (s1 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
-		painter.fast_draw_text (s2 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
-		painter.fast_draw_text (s3 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
-
+		painter.setPen (get_pen (_navigation_color, 1.0f));
 		if (_params.fma_speed_hint != "" && is_newly_set (_params.fma_speed_ts))
 			paint_big_rect (b1);
 		if (_params.fma_lateral_hint != "" && is_newly_set (_params.fma_lateral_ts))
@@ -1890,12 +1880,25 @@ EFISWidget::PaintWorkUnit::paint_hints (Painter& painter)
 		if (_params.fma_vertical_hint != "" && is_newly_set (_params.fma_vertical_ts))
 			paint_big_rect (b3);
 
+		painter.setPen (get_pen (Qt::white, 1.0f));
 		if (_params.fma_speed_small_hint != "" && is_newly_set (_params.fma_speed_small_ts))
 			paint_small_rect (s1);
 		if (_params.fma_lateral_small_hint != "" && is_newly_set (_params.fma_lateral_small_ts))
 			paint_small_rect (s2);
 		if (_params.fma_vertical_small_hint != "" && is_newly_set (_params.fma_vertical_small_ts))
 			paint_small_rect (s3);
+
+		painter.setPen (get_pen (_navigation_color, 1.0f));
+		painter.setFont (_font_13);
+		painter.fast_draw_text (b1 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
+		painter.fast_draw_text (b2 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
+		painter.fast_draw_text (b3 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
+
+		painter.setPen (get_pen (Qt::white, 1.0f));
+		painter.setFont (_font_10);
+		painter.fast_draw_text (s1 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
+		painter.fast_draw_text (s2 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
+		painter.fast_draw_text (s3 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
 	}
 }
 

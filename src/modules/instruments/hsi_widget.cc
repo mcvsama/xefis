@@ -145,9 +145,9 @@ HSIWidget::PaintWorkUnit::resized()
 	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.8f), Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 
 	// Unscaled pens:
-	_ndb_pen = QPen (QColor (25, 128, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-	_vor_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-	_dme_pen = QPen (_navigation_color, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_ndb_pen = QPen (QColor (88, 88, 88), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_vor_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_dme_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 
 	// Shapes:
@@ -232,6 +232,8 @@ HSIWidget::PaintWorkUnit::resized()
 void
 HSIWidget::PaintWorkUnit::paint (QImage& image)
 {
+	_current_datetime = QDateTime::currentDateTime();
+
 	if (_recalculation_needed)
 	{
 		_recalculation_needed = false;
@@ -291,6 +293,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_track (painter, true);
 	paint_aircraft (painter);
 	paint_speeds_and_wind (painter);
+	paint_home_direction (painter);
 	paint_climb_glide_ratio (painter);
 	paint_range (painter);
 	paint_hints (painter);
@@ -346,7 +349,9 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Painter& painter)
 				if (_params.heading_mode == HeadingMode::True)
 				{
 					painter.setBrush (Qt::NoBrush);
-					painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f));
+					painter.add_shadow ([&]() {
+						painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f).translated (0.f, -0.02f * _q));
+					});
 				}
 				break;
 			}
@@ -402,10 +407,26 @@ HSIWidget::PaintWorkUnit::paint_hints (Painter& painter)
 	float vplus = translate_descent (QFontMetricsF (_font_13), QFontMetricsF (_font_16));
 	float hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
 	painter.setFont (_font_13);
+	QFontMetricsF metrics (painter.font());
 	painter.setClipping (false);
 	painter.resetTransform();
 	painter.setPen (get_pen (_navigation_color, 1.f));
-	painter.fast_draw_text (QPointF (hplus, _h - 1.125f * _q + vplus), Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
+	QPointF text_hook = QPointF (hplus, _h - 1.125f * _q + vplus);
+	painter.fast_draw_text (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
+	// Box for emphasis:
+	if (_params.positioning_hint != "" && is_newly_set (_params.positioning_hint_ts))
+	{
+		float v = 0.03f * _q;
+		QRectF frame (0.f, 0.f, metrics.width (_params.positioning_hint), metrics.height());
+		frame.moveTo (text_hook + QPointF (0.f, 0.5f * metrics.height()));
+		centrify (frame);
+		frame.adjust (-0.1f * _q, -v, +0.1f * _q, +v);
+		frame.translate (0.f, -0.02f * _q);
+		painter.setBrush (Qt::NoBrush);
+		painter.add_shadow ([&]() {
+			painter.drawRect (frame);
+		});
+	}
 }
 
 
@@ -561,37 +582,6 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 	if (!_params.ap_heading_visible)
 		return;
 
-	// A/P bug
-	painter.setTransform (_aircraft_center_transform);
-	painter.setClipRect (_map_clip_rect);
-
-	Angle limited_rotation;
-	switch (_params.display_mode)
-	{
-		case DisplayMode::Auxiliary:
-			limited_rotation = limit (floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
-			break;
-
-		default:
-			limited_rotation = _params.ap_heading - _params.rotation;
-			break;
-	}
-
-	QTransform transform = _aircraft_center_transform;
-	transform.rotate (limited_rotation.deg());
-	transform.translate (0.f, -_r);
-
-	QPen pen_1 = _autopilot_pen_1;
-	pen_1.setMiterLimit (0.2f);
-	QPen pen_2 = _autopilot_pen_2;
-	pen_2.setMiterLimit (0.2f);
-
-	painter.setTransform (transform);
-	painter.setPen (pen_1);
-	painter.drawPolyline (_ap_bug_shape);
-	painter.setPen (pen_2);
-	painter.drawPolyline (_ap_bug_shape);
-
 	// SEL HDG 000
 	if (_params.display_mode == DisplayMode::Auxiliary)
 	{
@@ -634,7 +624,6 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
-		painter.setTransform (_aircraft_center_transform);
 		painter.rotate ((_params.ap_heading - _params.rotation).deg());
 
 		for (auto p: { shadow_pen, pen })
@@ -643,6 +632,36 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
 		}
 	}
+
+	// A/P bug
+	Angle limited_rotation;
+	switch (_params.display_mode)
+	{
+		case DisplayMode::Auxiliary:
+			limited_rotation = limit (floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+			break;
+
+		default:
+			limited_rotation = _params.ap_heading - _params.rotation;
+			break;
+	}
+
+	QTransform transform = _aircraft_center_transform;
+	transform.rotate (limited_rotation.deg());
+	transform.translate (0.f, -_r);
+
+	QPen pen_1 = _autopilot_pen_1;
+	pen_1.setMiterLimit (0.2f);
+	QPen pen_2 = _autopilot_pen_2;
+	pen_2.setMiterLimit (0.2f);
+
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipRect (_map_clip_rect);
+	painter.setTransform (transform);
+	painter.setPen (pen_1);
+	painter.drawPolyline (_ap_bug_shape);
+	painter.setPen (pen_2);
+	painter.drawPolyline (_ap_bug_shape);
 }
 
 
@@ -766,6 +785,73 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Painter& painter)
 			painter.drawLine (a + QPointF (0.f, 0.05f * _q), b);
 			painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
 			painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
+		});
+	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_home_direction (Painter& painter)
+{
+	if (_params.display_mode != DisplayMode::Auxiliary)
+		return;
+
+	QTransform base_transform;
+	base_transform.translate (_w - 0.2 * _q, 0.5f * _h);
+
+	painter.resetTransform();
+	painter.setClipping (false);
+
+	if (_params.home_direction_visible)
+	{
+		float z = 0.75f * _q;
+		QPolygonF home_arrow = QPolygonF()
+			<< QPointF (0.f, z)
+			<< QPointF (0.f, 0.2f * -z)
+			<< QPointF (-0.2f * z, 0.6f * -z)
+			<< QPointF (0.f, -z)
+			<< QPointF (+0.2f * z, 0.6f * -z)
+			<< QPointF (0.f, 0.2f * -z);
+
+		painter.setTransform (base_transform);
+		painter.translate (-z - 0.1f * _q, _q);
+		painter.rotate ((_params.true_home_direction - _params.true_heading).deg());
+		painter.setPen (get_pen (_navigation_color, 1.0));
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (home_arrow);
+		});
+	}
+
+	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible)
+	{
+		float z = 2.f * _q;
+		QPolygonF distance_triangle = QPolygonF()
+			<< QPointF (z, 0.f)
+			<< QPointF (0.f, 0.f)
+			<< QPointF (z, -0.3f * z);
+
+		painter.setPen (get_pen (Qt::white, 1.0));
+		painter.setFont (_font_13);
+		painter.setTransform (base_transform);
+		if (_params.dist_to_home_vlos_visible)
+		{
+			QString s = QString ("%1").arg (_params.distance_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
+			// Cut out the "0.":
+			if (s.left (2) == "0.")
+				s = s.mid (1);
+			painter.fast_draw_text (QPointF (0.f, -1.75f * _q), Qt::AlignRight | Qt::AlignBottom, s);
+		}
+		if (_params.dist_to_home_ground_visible)
+		{
+			QString s = QString ("%1").arg (_params.distance_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
+			// Cut out the "0.":
+			if (s.left (2) == "0.")
+				s = s.mid (1);
+			painter.fast_draw_text (QPointF (0.f, -0.75f * _q), Qt::AlignRight | Qt::AlignTop, s);
+		}
+		painter.translate (-z - 0.1f * _q, -_q);
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (distance_triangle);
 		});
 	}
 }

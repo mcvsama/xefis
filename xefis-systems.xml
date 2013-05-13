@@ -226,6 +226,27 @@
 				</directory>
 			</properties>
 		</module>
+		<module name='systems/rcms'>
+			<properties path='/systems/rcms'>
+				<directory path='/settings'>
+					<property name='settings.vlos.caution-distance' path='/vlos-caution-distance' default='0.75 nm'/>
+					<property name='settings.vlos.warning-distance' path='/vlos-warning-distance' default='1 nm'/>
+				</directory>
+				<directory path='/home'>
+					<property name='home.longitude' path='/longitude'/>
+					<property name='home.latitude' path='/latitude'/>
+					<property name='home.altitude-amsl' path='/altitude-amsl'/>
+					<property name='home.distance-vlos' path='/vlos-distance'/>
+					<property name='home.distance-ground' path='/ground-distance'/>
+					<property name='home.true-direction' path='/true-direction'/>
+				</directory>
+				<directory path='//systems/fms/position'>
+					<property name='position.longitude' path='/longitude'/>
+					<property name='position.latitude' path='/latitude'/>
+					<property name='position.altitude-amsl' path='/altitude-amsl'/>
+				</directory>
+			</properties>
+		</module>
 	</modules>
 </xefis-include>
 

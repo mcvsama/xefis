@@ -77,7 +77,7 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 			throw Exception (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
 	}
 
-	new QShortcut (Qt::Key_F1, this, SLOT (show_configurator()));
+	new QShortcut (Qt::Key_Escape, this, SLOT (show_configurator()));
 }
 
 

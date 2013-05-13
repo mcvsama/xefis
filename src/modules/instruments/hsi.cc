@@ -49,6 +49,9 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "orientation-true-heading", _true_heading, false },
 				{ "use-true-heading", _use_true_heading, false },
 				{ "display-track", _display_track, false },
+				{ "home.true-direction", _true_home_direction, false },
+				{ "home.distance.vlos", _home_dist_vlos, false },
+				{ "home.distance.ground", _home_dist_ground, false },
 				{ "cmd-settings-visible", _cmd_settings_visible, false },
 				{ "cmd-track-visible", _cmd_track_visible, false },
 				{ "magnetic-track", _magnetic_track, false },
@@ -134,6 +137,30 @@ HSI::read()
 	}
 
 	_hsi_widget->set_display_track (_display_track.read (false));
+
+	if (_true_home_direction.valid())
+	{
+		_hsi_widget->set_true_home_direction (*_true_home_direction);
+		_hsi_widget->set_home_direction_visible (true);
+	}
+	else
+		_hsi_widget->set_home_direction_visible (false);
+
+	if (_home_dist_vlos.valid())
+	{
+		_hsi_widget->set_vlos_distance_to_home (*_home_dist_vlos);
+		_hsi_widget->set_vlos_distance_to_home_visible (true);
+	}
+	else
+		_hsi_widget->set_vlos_distance_to_home_visible (false);
+
+	if (_home_dist_ground.valid())
+	{
+		_hsi_widget->set_ground_distance_to_home (*_home_dist_ground);
+		_hsi_widget->set_ground_distance_to_home_visible (true);
+	}
+	else
+		_hsi_widget->set_ground_distance_to_home_visible (false);
 
 	_hsi_widget->set_ground_speed_visible (_gs.valid());
 	if (_gs.valid())
