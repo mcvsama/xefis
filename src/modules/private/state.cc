@@ -45,10 +45,10 @@ template<class P>
 State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
 	Module (module_manager)
 {
-	_pressure_display_hpa.set_path ("/systems/fms/settings/pressure-display-hpa");
-	_use_standard_pressure.set_path ("/systems/fms/settings/use-standard-pressure");
-	_follow_track.set_path ("/systems/fms/settings/follow-track");
-	_use_true_heading.set_path ("/systems/fms/settings/use-true-heading");
+	_pressure_display_hpa.set_path ("/systems/fdc/settings/pressure-display-hpa");
+	_use_standard_pressure.set_path ("/systems/fdc/settings/use-standard-pressure");
+	_follow_track.set_path ("/systems/fdc/settings/follow-track");
+	_use_true_heading.set_path ("/systems/fdc/settings/use-true-heading");
 	_approach_mode.set_path ("/instruments/efis/approach/visible");
 	_flight_director_visible.set_path ("/instruments/efis/flight-director/visible");
 	_flight_director_enabled.set_path ("/systems/flight-director/settings/enabled");

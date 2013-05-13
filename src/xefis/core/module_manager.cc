@@ -28,7 +28,7 @@
 #include <modules/io/joystick.h>
 #include <modules/systems/flight_director.h>
 #include <modules/systems/fly_by_wire.h>
-#include <modules/systems/fms.h>
+#include <modules/systems/fdc.h>
 #include <modules/systems/lookahead.h>
 #include <modules/systems/mouse.h>
 #include <modules/systems/rcms.h>
@@ -114,8 +114,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlightDirector (this, config);
 		else if (name == "systems/fly-by-wire")
 			return new FlyByWire (this, config);
-		else if (name == "systems/fms")
-			return new FlightManagementSystem (this, config);
+		else if (name == "systems/fdc")
+			return new FlightDataComputer (this, config);
 		else if (name == "systems/rcms")
 			return new RemoteControlManagementSystem (this, config);
 		else if (name == "private/state")

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__FMS_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__FMS_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__FDC_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__FDC_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -31,7 +31,7 @@
 /**
  * Computations are reliable up to 36,000 ft.
  */
-class FlightManagementSystem: public Xefis::Module
+class FlightDataComputer: public Xefis::Module
 {
 	struct Position
 	{
@@ -44,7 +44,7 @@ class FlightManagementSystem: public Xefis::Module
 
   public:
 	// Ctor
-	FlightManagementSystem (Xefis::ModuleManager*, QDomElement const& config);
+	FlightDataComputer (Xefis::ModuleManager*, QDomElement const& config);
 
   private:
 	void
