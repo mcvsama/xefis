@@ -30,7 +30,7 @@ class FlyByWire: public Xefis::Module
 {
 	enum Mode
 	{
-		CommandMode			= 0,
+		ManualMode			= 0,
 		StabilizedMode		= 1,
 		FlightDirectorMode	= 2
 	};
@@ -50,8 +50,6 @@ class FlyByWire: public Xefis::Module
 	// Used with joystick input:
 	Xefis::PID<float>		_manual_pitch_pid;
 	Xefis::PID<float>		_manual_roll_pid;
-	Angle					_pre_input_pitch	= 0_deg;
-	Angle					_pre_input_roll		= 0_deg;
 	Angle					_pre_output_pitch	= 0_deg;
 	Angle					_pre_output_roll	= 0_deg;
 	// Stabilizer PIDs:
