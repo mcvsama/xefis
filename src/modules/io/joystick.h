@@ -60,6 +60,8 @@ class JoystickInput:
 		float					center		= 0.f;
 		float					dead_zone	= 0.f;
 		float					reverse		= 1.f;
+		float					scale		= 1.f;
+		float					power		= 1.f;
 	};
 
 	typedef std::vector<Button*>	Buttons;

@@ -89,6 +89,9 @@
 		<module name='io/joystick'>
 			<device>/dev/input/js0</device>
 			<path>/input/rudder</path>
+			<axis id='2'>
+				<power>3</power>
+			</axis>
 		</module>
 	</modules>
 </xefis-include>
