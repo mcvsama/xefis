@@ -72,6 +72,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle	_pitch;
 	Xefis::PropertyAngle	_roll;
 	Xefis::PropertyAngle	_pitch_limit;
+	Xefis::PropertyBoolean	_pitch_limit_visible;
 	Xefis::PropertyAngle	_roll_limit;
 	Xefis::PropertyAngle	_magnetic_heading;
 	Xefis::PropertyAngle	_true_heading;

@@ -18,23 +18,39 @@
 										<property name='altitude-ladder-number-every' path='/altitude-ladder/number-every' default='200'/>
 										<property name='altitude-ladder-bold-every' path='/altitude-ladder/bold-every' default='500'/>
 										<property name='altitude-ladder-extent' path='/altitude-ladder/extent' default='825'/>
-										<property name='heading-numbers-visible' path='/adi/heading-numbers-visible' default='false'/>
-										<property name='orientation-roll-limit' path='/orientation/roll-warning' default='35 deg'/>
-										<property name='slip-skid-limit' path='/slip-skid/slip-skid-warning' default='1.5'/>
-										<property name='flight-path-marker-visible' path='/flight-path-marker/visible' default='true'/>
-										<property name='minimums-altitude' path='/minimums-altitude' default='3000 ft'/>
-										<property name='pressure-qnh' path='//systems/fdc/settings/pressure/qnh'/>
-										<property name='pressure-display-hpa' path='//systems/fdc/settings/pressure-display-hpa'/>
-										<property name='use-standard-pressure' path='//systems/fdc/settings/use-standard-pressure'/>
-										<property name='commanded-settings-visible' path='/command/visible' default='true'/>
-										<property name='fma-visible' path='/fma/visible' default='true'/>
-										<property name='flight-director-visible' path='/flight-director/visible' default='false'/>
-										<property name='cmd-settings-visible' path='/flight-director/cmd-settings-visible' default='true'/>
-										<property name='control-stick-visible' path='/control-stick/visible' default='true'/>
-										<property name='approach-reference-visible' path='/approach/visible' default='true'/>
-										<property name='control-hint-visible' path='/control/hint-visible' default='false'/>
-										<property name='control-hint' path='/control/hint' default=''/>
+										<property name='heading-numbers-visible' path='/heading-numbers-visible' default='false'/>
 										<property name='novspd-flag' path='/novspd-flag' default='false'/>
+									</directory>
+									<directory path='/settings/adi'>
+										<property name='orientation-roll-limit' path='/roll-warning'/>
+										<property name='slip-skid-limit' path='/slip-skid/slip-skid-warning'/>
+										<property name='orientation-pitch-limit-visible' path='/pitch-limit-visible'/>
+										<property name='flight-path-marker-visible' path='/flight-path-marker-visible'/>
+										<property name='control-stick-visible' path='/control-stick-visible'/>
+										<property name='approach-reference-visible' path='/approach-reference-visible'/>
+										<property name='control-hint-visible' path='/control-hint-visible'/>
+										<property name='control-hint' path='/control-hint'/>
+									</directory>
+									<directory path='/settings/minimums'>
+										<property name='minimums-altitude' path='/baro-altitude'/>
+									</directory>
+									<directory path='/settings/altimeter'>
+										<property name='pressure-qnh' path='/pressure-qnh'/>
+										<property name='pressure-display-hpa' path='/pressure-in-hpa'/>
+										<property name='use-standard-pressure' path='/use-std-pressure'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='fma-visible' path='/visible'/>
+										<property name='cmd-settings-visible' path='/visible'/>
+										<property name='cmd-setting-ias' path='/cmd-ias'/>
+										<property name='cmd-setting-altitude' path='/cmd-altitude'/>
+										<property name='cmd-setting-cbr' path='/cmd-vertical-speed'/>
+										<property name='flight-director-visible' path='/guidance-visible'/>
+									</directory>
+									<directory path='/sensors'>
+										<property name='ias' path='/speed/ias'/>
+										<property name='slip-skid' path='/slip-skid/slip-skid'/>
+										<property name='altitude-agl' path='/radar-altimeter/agl'/>
 									</directory>
 									<directory path='/systems/fdc'>
 										<property name='ias-minimum' path='/speed/ias-minimum'/>
@@ -42,10 +58,12 @@
 										<property name='ias-maximum' path='/speed/ias-maximum'/>
 										<property name='ias-lookahead' path='/speed/ias-lookahead'/>
 										<property name='mach' path='/speed/mach'/>
+										<property name='orientation-pitch' path='/orientation/pitch'/>
+										<property name='orientation-roll' path='/orientation/roll'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading'/>
+										<property name='orientation-magnetic-heading' path='/orientation/magnetic-heading'/>
 										<property name='flight-path-marker-alpha' path='/fpm/alpha'/>
 										<property name='flight-path-marker-beta' path='/fpm/beta'/>
-										<property name='magnetic-track' path='/flight-path/magnetic-track'/>
 										<property name='altitude' path='/pressure-altitude/amsl'/>
 										<property name='altitude-lookahead' path='/pressure-altitude/amsl-lookahead'/>
 										<property name='cbr' path='/pressure-altitude/climb-rate'/>
@@ -56,22 +74,9 @@
 										<property name='approach-type-hint' path='/localizer/type'/>
 										<property name='orientation-pitch-limit' path='/aoa/pitch-limit'/>
 									</directory>
-									<directory path='/sensors'>
-										<property name='ias' path='/speed/ias'/>
-										<property name='orientation-pitch' path='/imu/pitch'/>
-										<property name='orientation-roll' path='/imu/roll'/>
-										<property name='orientation-magnetic-heading' path='/compass/magnetic-heading'/>
-										<property name='slip-skid' path='/slip-skid/slip-skid'/>
-										<property name='altitude-agl' path='/radar-altimeter/agl'/>
-									</directory>
-									<directory path='/systems/flight-director/settings'>
-										<property name='cmd-setting-ias' path='//systems/autothrottle/settings/ias' default='100 kt'/>
-										<property name='cmd-setting-altitude' path='/altitude' default='999 ft'/>
-										<property name='cmd-setting-cbr' path='/vertical-speed' default='300 fpm'/>
-									</directory>
 									<directory path='/systems/flight-director'>
-										<property name='fma-speed-hint' path='/hints/speed-hint' default='TEST'/>
-										<property name='fma-speed-small-hint' path='/hints/speed-small-hint' default='TEST'/>
+										<property name='fma-speed-hint' path='/hints/speed-hint'/>
+										<property name='fma-speed-small-hint' path='/hints/speed-small-hint'/>
 										<property name='fma-lateral-hint' path='/hints/lateral-hint'/>
 										<property name='fma-lateral-small-hint' path='/hints/lateral-small-hint'/>
 										<property name='fma-vertical-hint' path='/hints/vertical-hint'/>
@@ -79,9 +84,9 @@
 										<property name='flight-director-pitch' path='/pitch'/>
 										<property name='flight-director-roll' path='/roll'/>
 									</directory>
-									<directory path='/systems/fly-by-wire'>
-										<property name='control-stick-pitch' path='/control-stick/pitch'/>
-										<property name='control-stick-roll' path='/control-stick/roll'/>
+									<directory path='/systems/fly-by-wire/control-stick'>
+										<property name='control-stick-pitch' path='/pitch'/>
+										<property name='control-stick-roll' path='/roll'/>
 									</directory>
 								</properties>
 							</module>
@@ -89,31 +94,33 @@
 						<item stretch-factor='5'>
 							<module name='instruments/hsi'>
 								<properties>
-									<directory path='/instruments/hsi-aux'>
-										<property name='display-mode' path='/display-mode' default='2'/>
-										<property name='range' path='/range' default='2 nm'/>
-										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
-										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
+									<directory path='/settings/hsi'>
+										<property name='display-track' path='/follow-track'/>
+										<property name='use-true-heading' path='/use-true-heading'/>
+									</directory>
+									<directory path='/settings/hsi-aux'>
+										<property name='display-mode' path='/mode'/>
+										<property name='range' path='/range'/>
+										<property name='trend-vector-range' path='/trend-vector-range'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='cmd-settings-visible' path='/visible'/>
+										<property name='cmd-track-visible' path='/enabled'/>
+										<property name='cmd-setting-heading' path='/cmd-magnetic-heading-and-track'/>
 									</directory>
 									<directory path='/systems/fdc'>
 										<property name='gs' path='/speed/ground-speed'/>
 										<property name='tas' path='/speed/true-airspeed'/>
-										<property name='magnetic-track' path='/track/magnetic-heading'/>
+										<property name='magnetic-track' path='/track/lateral-magnetic'/>
 										<property name='orientation-magnetic-heading' path='/orientation/magnetic-heading'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading'/>
 										<property name='position-source' path='/position/source'/>
-										<property name='position-latitude' path='//sensors/gps/latitude'/>
-										<property name='position-longitude' path='//sensors/gps/longitude'/>
+										<property name='position-latitude' path='/position/latitude'/>
+										<property name='position-longitude' path='/position/longitude'/>
 										<property name='wind-from-mag-heading' path='/wind/magnetic-orientation-from'/>
 										<property name='wind-tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
-										<property name='use-true-heading' path='/settings/use-true-heading'/>
-										<property name='display-track' path='/settings/follow-track'/>
 										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
-									</directory>
-									<directory path='/systems/flight-director'>
-										<property name='cmd-track-visible' path='/settings/enabled'/>
-										<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track'/>
 									</directory>
 									<directory path='/systems/rcms'>
 										<property name='home.distance.vlos' path='/home/vlos-distance'/>
@@ -131,31 +138,33 @@
 						<item stretch-factor='6'>
 							<module name='instruments/hsi'>
 								<properties>
-									<directory path='/instruments/hsi-nav'>
-										<property name='display-mode' path='/display-mode' default='0'/>
-										<property name='range' path='/range' default='20 nm'/>
-										<property name='trend-vector-range' path='/trend-vector-range' default='2 nm'/>
-										<property name='cmd-settings-visible' path='/cmd-settings-visible' default='true'/>
+									<directory path='/settings/hsi'>
+										<property name='display-track' path='/follow-track'/>
+										<property name='use-true-heading' path='/use-true-heading'/>
+									</directory>
+									<directory path='/settings/hsi-nav'>
+										<property name='display-mode' path='/mode'/>
+										<property name='range' path='/range'/>
+										<property name='trend-vector-range' path='/trend-vector-range'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='cmd-settings-visible' path='/visible'/>
+										<property name='cmd-track-visible' path='/enabled'/>
+										<property name='cmd-setting-heading' path='/cmd-magnetic-heading-and-track'/>
 									</directory>
 									<directory path='/systems/fdc'>
 										<property name='gs' path='/speed/ground-speed'/>
 										<property name='tas' path='/speed/true-airspeed'/>
-										<property name='magnetic-track' path='/track/magnetic-heading'/>
+										<property name='magnetic-track' path='/track/lateral-magnetic'/>
 										<property name='orientation-magnetic-heading' path='/orientation/magnetic-heading'/>
 										<property name='orientation-true-heading' path='/orientation/true-heading'/>
 										<property name='position-source' path='/position/source'/>
-										<property name='position-latitude' path='//sensors/gps/latitude'/>
-										<property name='position-longitude' path='//sensors/gps/longitude'/>
+										<property name='position-latitude' path='/position/latitude'/>
+										<property name='position-longitude' path='/position/longitude'/>
 										<property name='wind-from-mag-heading' path='/wind/magnetic-orientation-from'/>
 										<property name='wind-tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
-										<property name='use-true-heading' path='/settings/use-true-heading'/>
-										<property name='display-track' path='/settings/follow-track'/>
 										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
-									</directory>
-									<directory path='/systems/flight-director'>
-										<property name='cmd-track-visible' path='/settings/enabled'/>
-										<property name='cmd-setting-heading' path='/settings/magnetic-heading-and-track'/>
 									</directory>
 								</properties>
 							</module>
