@@ -67,7 +67,6 @@
 				<directory path='/pressure-altitude'>
 					<property name='pressure-altitude.amsl' path='/amsl'/>
 					<property name='pressure-altitude.amsl-lookahead' path='/amsl-lookahead'/>
-					<property name='pressure-altitude.amsl-lookahead-time' path='/amsl-lookahead-time'/>
 					<property name='pressure-altitude.climb-rate' path='/climb-rate'/>
 				</directory>
 				<directory path='/speed'>
@@ -77,7 +76,6 @@
 					<property name='speed.maximum-ias' path='/ias-maximum'/>
 					<property name='speed.maximum-maneuver-ias' path='/ias-maximum-maneuver'/>
 					<property name='speed.ias-lookahead' path='/ias-lookahead'/>
-					<property name='speed.ias-lookahead-time' path='/ias-lookahead-time'/>
 					<property name='speed.true-airspeed' path='/true-airspeed'/>
 					<property name='speed.ground-speed' path='/ground-speed'/>
 					<property name='speed.mach' path='/mach'/>
@@ -118,8 +116,6 @@
 		<module name='systems/flight-director'>
 			<properties>
 				<directory path='/systems/flight-director'>
-					<property name='pitch-limit' path='/limits/pitch-limit' default='7 deg'/>
-					<property name='roll-limit' path='/limits/roll-limit' default='25 deg'/>
 					<property name='output-pitch' path='/pitch'/>
 					<property name='output-roll' path='/roll'/>
 					<property name='vertical-mode-hint' path='/hints/vertical-hint'/>
@@ -129,6 +125,8 @@
 					<property name='enabled' path='/enabled'/>
 					<property name='lateral-mode' path='/lateral-mode'/>
 					<property name='vertical-mode' path='/vertical-mode'/>
+					<property name='pitch-limit' path='/limits/pitch'/>
+					<property name='roll-limit' path='/limits/roll'/>
 					<property name='selected-magnetic-heading' path='/cmd-magnetic-heading-and-track'/>
 					<property name='selected-magnetic-track' path='/cmd-magnetic-heading-and-track'/>
 					<property name='selected-altitude' path='/cmd-altitude'/>
@@ -138,7 +136,7 @@
 				<directory path='/systems/fdc'>
 					<property name='measured-magnetic-heading' path='/orientation/magnetic-heading'/>
 					<property name='measured-magnetic-track' path='/track/lateral-magnetic'/>
-					<property name='measured-altitude' path='/position/altitude-amsl'/>
+					<property name='measured-altitude' path='/pressure-altitude/amsl'/>
 					<property name='measured-vertical-speed' path='/pressure-altitude/climb-rate'/>
 					<property name='measured-fpa' path='/fpm/alpha'/>
 				</directory>
