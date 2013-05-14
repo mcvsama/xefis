@@ -26,6 +26,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/smoother.h>
+#include <xefis/utility/lookahead.h>
 
 
 /**
@@ -96,6 +97,10 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_ground_speed_smoother				= 200.0; // TODO make fps independent
 	Xefis::Smoother<double>		_climb_rate_smoother				= 400.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 100.0; // TODO make fps independent
+	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
+	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
+	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 1000.0; // TODO make fps independent
+	Xefis::Smoother<double>		_ias_lookahead_smoother				= 1000.0; // TODO make fps independent
 
 	// Input parameters:
 	Xefis::PropertyFloat		_default_airplane_weight_kg; // TODO
@@ -156,8 +161,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_orientation_magnetic_heading;
 	// Output altitude:
 	Xefis::PropertyLength		_pressure_altitude_amsl;
-	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead; // TODO
-	Xefis::PropertyTime			_pressure_altitude_amsl_time; // TODO
+	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead;
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
 	Xefis::PropertySpeed		_v_a; // TODO
@@ -165,8 +169,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertySpeed		_minimum_maneuver_ias;
 	Xefis::PropertySpeed		_maximum_ias;
 	Xefis::PropertySpeed		_maximum_maneuver_ias;
-	Xefis::PropertySpeed		_ias_lookahead; // TODO
-	Xefis::PropertyTime			_ias_lookahead_time; // TODO
+	Xefis::PropertySpeed		_ias_lookahead;
 	Xefis::PropertySpeed		_true_airspeed;
 	Xefis::PropertySpeed		_ground_speed;
 	Xefis::PropertyFloat		_mach;

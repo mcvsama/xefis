@@ -95,7 +95,6 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "orientation.magnetic-heading", _orientation_magnetic_heading, true },
 				{ "pressure-altitude.amsl", _pressure_altitude_amsl, true },
 				{ "pressure-altitude.amsl-lookahead", _pressure_altitude_amsl_lookahead, true },
-				{ "pressure-altitude.amsl-lookahead-time", _pressure_altitude_amsl_time, true },
 				{ "pressure-altitude.climb-rate", _pressure_altitude_climb_rate, true },
 				{ "speed.v-a", _v_a, true },
 				{ "speed.minimum-ias", _minimum_ias, true },
@@ -103,7 +102,6 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "speed.maximum-ias", _maximum_ias, true },
 				{ "speed.maximum-maneuver-ias", _maximum_maneuver_ias, true },
 				{ "speed.ias-lookahead", _ias_lookahead, true },
-				{ "speed.ias-lookahead-time", _ias_lookahead_time, true },
 				{ "speed.true-airspeed", _true_airspeed, true },
 				{ "speed.ground-speed", _ground_speed, true },
 				{ "speed.mach", _mach, true },
@@ -129,6 +127,9 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 			});
 		}
 	}
+
+	_pressure_alt_estimator.set_minimum_integration_time (0.5_s);
+	_ias_estimator.set_minimum_integration_time (0.5_s);
 }
 
 
@@ -252,6 +253,15 @@ FlightDataComputer::compute_position()
 	}
 	else
 		_pressure_altitude_amsl.copy (_position_altitude_amsl);
+
+	if (_pressure_altitude_amsl.valid())
+	{
+		double est = _pressure_alt_estimator.process ((*_pressure_altitude_amsl).ft(), update_dt());
+		est = _pressure_alt_lookahead_smoother.process (est);
+		_pressure_altitude_amsl_lookahead.write (1_ft * est);
+	}
+	else
+		_pressure_altitude_amsl_lookahead.set_nil();
 }
 
 
@@ -419,6 +429,15 @@ FlightDataComputer::compute_speeds()
 	}
 	else
 		_pressure_altitude_climb_rate.set_nil();
+
+	if (_ias.valid())
+	{
+		double est = _ias_estimator.process ((*_ias).kt(), update_dt());
+		est = _ias_lookahead_smoother.process (est);
+		_ias_lookahead.write (1_kt * est);
+	}
+	else
+		_ias_lookahead.set_nil();
 }
 
 

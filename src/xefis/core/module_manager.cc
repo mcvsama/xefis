@@ -107,7 +107,7 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 		else if (name == "instruments/radial-indicator")
 			return new RadialIndicator (this, config, parent);
 		else if (name == "systems/lookahead")
-			return new Lookahead (this, config);
+			return new ::Lookahead (this, config);
 		else if (name == "systems/flight-director")
 			return new FlightDirector (this, config);
 		else if (name == "systems/fly-by-wire")
@@ -116,8 +116,6 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new FlightDataComputer (this, config);
 		else if (name == "systems/rcms")
 			return new RemoteControlManagementSystem (this, config);
-		else if (name == "private/state")
-			return new State (this, config);
 		else if (name == "generic/fps")
 			return new FPS (this, config);
 		else if (name == "io/flightgear")
@@ -126,6 +124,8 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 			return new JoystickInput (this, config);
 		else if (name == "io/mouse")
 			return new Mouse (this, config);
+		else if (name == "private/state")
+			return new State (this, config);
 		else
 			throw ModuleNotFoundException ("module not found: " + name.toStdString());
 	}
