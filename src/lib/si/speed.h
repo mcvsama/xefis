@@ -34,6 +34,8 @@ class Speed: public Value<double, Speed>
 	friend constexpr Speed operator"" _kph (unsigned long long);
 	friend constexpr Speed operator"" _fpm (long double);
 	friend constexpr Speed operator"" _fpm (unsigned long long);
+	friend constexpr Speed operator"" _mps (long double);
+	friend constexpr Speed operator"" _mps (unsigned long long);
 
   protected:
 	/**
@@ -61,6 +63,9 @@ class Speed: public Value<double, Speed>
 
 	constexpr ValueType
 	fpm() const noexcept;
+
+	constexpr ValueType
+	mps() const noexcept;
 
 	Speed&
 	parse (std::string const&);
@@ -104,6 +109,13 @@ inline constexpr Speed::ValueType
 Speed::fpm() const noexcept
 {
 	return value() * 101.268591426;
+}
+
+
+inline constexpr Speed::ValueType
+Speed::mps() const noexcept
+{
+	return value() / 1.9438612860586;
 }
 
 
@@ -174,6 +186,20 @@ inline constexpr Speed
 operator"" _fpm (unsigned long long fpm)
 {
 	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
+}
+
+
+inline constexpr Speed
+operator"" _mps (long double mps)
+{
+	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
+}
+
+
+inline constexpr Speed
+operator"" _mps (unsigned long long mps)
+{
+	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
 }
 
 } // namespace SI

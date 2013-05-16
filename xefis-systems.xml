@@ -6,8 +6,8 @@
 		<module name='systems/fdc'>
 			<properties path='/systems/fdc'>
 				<directory path='/settings'>
-					<property name='settings.default-airplane-weight' path='/default-airplane-weight.kg' default='2.0'/>
-					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.kg' default='2.0'/>
+					<property name='settings.default-airplane-weight' path='/default-airplane-weight.g' default='2000.0'/>
+					<property name='settings.actual-airplane-weight' path='/actual-airplane-weight.g' default='2000.0'/>
 					<property name='settings.low-speed-roll-angle' path='/low-speed-roll-angle' default='15 deg'/>
 					<property name='settings.speed.v-a-default' path='/speeds/v-a-default' default='90 kt'/>
 					<property name='settings.speed.v-ne' path='/speeds/v-ne' default='140 kt'/>
@@ -70,6 +70,7 @@
 					<property name='pressure-altitude.amsl-lookahead' path='/amsl-lookahead'/>
 					<property name='pressure-altitude-std.amsl' path='/std-amsl'/>
 					<property name='pressure-altitude.climb-rate' path='/climb-rate'/>
+					<property name='pressure-altitude.total-energy-variometer' path='/total-energy-variometer'/>
 				</directory>
 				<directory path='/speed'>
 					<property name='speed.v-a' path='/v-a'/>

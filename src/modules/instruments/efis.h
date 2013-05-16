@@ -92,6 +92,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_pressure_display_hpa;
 	Xefis::PropertyBoolean	_use_standard_pressure;
 	Xefis::PropertySpeed	_cbr;
+	Xefis::PropertySpeed	_variometer;
 	Xefis::PropertyBoolean	_cmd_settings_visible;
 	Xefis::PropertyLength	_cmd_alt_setting;
 	Xefis::PropertySpeed	_cmd_speed_setting;

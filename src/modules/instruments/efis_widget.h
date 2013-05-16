@@ -80,6 +80,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QDateTime			minimums_altitude_ts;
 		Speed				climb_rate						= 0_fpm;
 		bool				climb_rate_visible				= false;
+		Speed				variometer_rate					= 0_fpm;
+		bool				variometer_visible				= false;
 		float				mach							= 0.f;
 		bool				mach_visible					= false;
 		Pressure			pressure						= 0_inHg;
@@ -694,6 +696,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_climb_rate_visible (bool visible);
+
+	/**
+	 * Set vario rate.
+	 */
+	void
+	set_variometer_rate (Speed);
+
+	/**
+	 * Set variometer visibility.
+	 */
+	void
+	set_variometer_visible (bool visible);
 
 	/**
 	 * Add new speed bug.
@@ -1424,6 +1438,22 @@ inline void
 EFISWidget::set_climb_rate_visible (bool visible)
 {
 	_params.climb_rate_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_variometer_rate (Speed feet_per_minute)
+{
+	_params.variometer_rate = feet_per_minute;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_variometer_visible (bool visible)
+{
+	_params.variometer_visible = visible;
 	request_repaint();
 }
 

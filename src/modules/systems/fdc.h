@@ -98,14 +98,21 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_climb_rate_smoother				= 400.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 100.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 100.0; // TODO make fps independent
-	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
-	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
 	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 1000.0; // TODO make fps independent
 	Xefis::Smoother<double>		_ias_lookahead_smoother				= 1000.0; // TODO make fps independent
+	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
+	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
+	// Total-energy variometer stuff:
+	Xefis::Smoother<double>		_variometer_smoother				= 500.0;  // TODO make fps independent
+	bool						_prev_total_energy_valid			= false;
+	double						_prev_total_energy					= 0.0;
+	double						_total_energy						= 0.0;
+	Time						_total_energy_time					= 0_s;
+	Speed						_tev								= 0_fpm;
 
 	// Input parameters:
-	Xefis::PropertyFloat		_default_airplane_weight_kg; // TODO
-	Xefis::PropertyFloat		_actual_airplane_weight_kg; // TODO
+	Xefis::PropertyFloat		_default_airplane_weight_g; // TODO
+	Xefis::PropertyFloat		_actual_airplane_weight_g; // TODO
 	Xefis::PropertyAngle		_low_speed_roll_angle; // TODO
 	Xefis::PropertySpeed		_v_a_default; // TODO
 	Xefis::PropertySpeed		_v_ne;
@@ -200,6 +207,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_magnetic_declination;
 	Xefis::PropertyAngle		_magnetic_inclination;
 	Xefis::PropertyLength		_density_altitude;
+	Xefis::PropertySpeed		_total_energy_variometer;
 	Xefis::PropertyLength		_target_altitude_reach_distance;
 };
 
