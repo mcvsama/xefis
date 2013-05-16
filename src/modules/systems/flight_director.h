@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/utility/pid.h>
+#include <xefis/utility/smoother.h>
 
 
 class FlightDirector: public Xefis::Module
@@ -58,7 +59,12 @@ class FlightDirector: public Xefis::Module
 	Xefis::PID<float>		_altitude_pid;
 	Xefis::PID<float>		_vertical_speed_pid;
 	Xefis::PID<float>		_fpa_pid;
+	Xefis::Smoother<double>	_output_pitch_smoother		= 500.0; // TODO make fps independent
+	Xefis::Smoother<double>	_output_roll_smoother		= 500.0; // TODO make fps independent
+	Angle					_computed_output_pitch;
+	Angle					_computed_output_roll;
 	Time					_dt = 0_s;
+
 	// Input:
 	// TODO PID params as settings:
 	Xefis::PropertyBoolean	_enabled;
@@ -76,6 +82,7 @@ class FlightDirector: public Xefis::Module
 	Xefis::PropertyLength	_measured_altitude;
 	Xefis::PropertySpeed	_measured_vertical_speed;
 	Xefis::PropertyAngle	_measured_fpa;
+
 	// Output:
 	Xefis::PropertyAngle	_output_pitch;
 	Xefis::PropertyAngle	_output_roll;
