@@ -869,6 +869,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Painter& painter)
 	painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
+	box.translate (0.f, 0.3f * margin);
 	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_params.cmd_speed.kt()))));
 }
 
@@ -1436,6 +1437,7 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Painter& painter)
 
 	painter.setPen (get_pen (_autopilot_color, 1.f));
 	painter.setFont (b_font);
+	painter.translate (0.f, 0.3f * margin);
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
