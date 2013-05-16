@@ -122,6 +122,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyPressure		_static_pressure;
 	Xefis::PropertyPressure		_qnh_pressure;
 	Xefis::PropertyAngle		_critical_aoa;
+	Xefis::PropertyLength		_target_pressure_altitude_amsl;
 	Xefis::PropertySpeed		_ias;
 	Xefis::PropertyFloat		_outside_air_temperature_k;
 	// Input IMU:
@@ -197,6 +198,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_magnetic_declination;
 	Xefis::PropertyAngle		_magnetic_inclination;
 	Xefis::PropertyLength		_density_altitude;
+	Xefis::PropertyLength		_target_altitude_reach_distance;
 };
 
 #endif
