@@ -62,7 +62,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
 				{ "wind-tas", _wind_tas, false },
 				{ "localizer-id", _localizer_id, false },
-				{ "climb-glide-ratio", _climb_glide_ratio, false }
+				{ "climb-glide-ratio", _climb_glide_ratio, false },
+				{ "target-altitude-reach-distance", _target_altitude_reach_distance, false },
 			});
 		}
 	}
@@ -92,7 +93,14 @@ void
 HSI::read()
 {
 	estimate_track();
-	estimate_altitude_reach_distance();
+
+	if (_target_altitude_reach_distance.valid())
+	{
+		_hsi_widget->set_altitude_reach_distance (*_target_altitude_reach_distance);
+		_hsi_widget->set_altitude_reach_visible (true);
+	}
+	else
+		_hsi_widget->set_altitude_reach_visible (false);
 
 	_hsi_widget->set_range (_range.valid() ? *_range : 5_nm);
 
@@ -242,21 +250,5 @@ HSI::estimate_track()
 		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
 		_hsi_widget->set_track_deviation (limit (beta_per_mile, -180.0_deg, +180.0_deg));
 	}
-}
-
-
-void
-HSI::estimate_altitude_reach_distance()
-{
-	if (_gs.is_singular() || _cbr.is_singular() ||
-		_altitude.is_singular() || _target_altitude.is_singular())
-	{
-		_hsi_widget->set_altitude_reach_visible (false);
-		return;
-	}
-
-	Length const alt_diff = *_target_altitude - *_altitude;
-	_hsi_widget->set_altitude_reach_distance (*_gs * (alt_diff / *_cbr));
-	_hsi_widget->set_altitude_reach_visible (true);
 }
 

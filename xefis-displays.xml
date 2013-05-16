@@ -165,6 +165,7 @@
 										<property name='wind-tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
 										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
+										<property name='target-altitude-reach-distance' path='/performance/target-altitude-reach-distance'/>
 									</directory>
 								</properties>
 							</module>

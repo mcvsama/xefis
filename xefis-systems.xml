@@ -23,6 +23,7 @@
 					<property name='settings.use-standard-pressure' path='//settings/altimeter/use-std-pressure' default='false'/>
 					<property name='settings.pressure.qnh' path='//settings/altimeter/pressure-qnh' default='29.82 inhg'/>
 					<property name='settings.critical-aoa' path='/aoa/critical' default='15 deg'/>
+					<property name='settings.target-pressure-altitude-amsl' path='//settings/flight-director/cmd-altitude'/>
 				</directory>
 				<directory path='//sensors'>
 					<property name='imu.pitch' path='/imu/pitch'/>
@@ -67,6 +68,7 @@
 				<directory path='/pressure-altitude'>
 					<property name='pressure-altitude.amsl' path='/amsl'/>
 					<property name='pressure-altitude.amsl-lookahead' path='/amsl-lookahead'/>
+					<property name='pressure-altitude-std.amsl' path='/std-amsl'/>
 					<property name='pressure-altitude.climb-rate' path='/climb-rate'/>
 				</directory>
 				<directory path='/speed'>
@@ -106,6 +108,7 @@
 				<directory path='/performance'>
 					<property name='performance.climb-glide-ratio' path='/climb-glide-ratio'/>
 					<property name='density-altitude' path='/density-altitude'/>
+					<property name='target-altitude-reach-distance' path='/target-altitude-reach-distance'/>
 				</directory>
 				<directory path='/magnetic'>
 					<property name='magnetic-declination' path='/magnetic-declination'/>

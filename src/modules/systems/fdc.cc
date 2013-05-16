@@ -60,6 +60,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "settings.use-standard-pressure", _use_standard_pressure, true },
 				{ "settings.pressure.qnh", _qnh_pressure, true },
 				{ "settings.critical-aoa", _critical_aoa, true },
+				{ "settings.target-pressure-altitude-amsl", _target_pressure_altitude_amsl, false },
 				{ "imu.pitch", _imu_pitch, true },
 				{ "imu.roll", _imu_roll, true },
 				{ "imu.magnetic-heading", _imu_magnetic_heading, true },
@@ -123,7 +124,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "performance.climb-glide-ratio", _climb_glide_ratio, true },
 				{ "magnetic-declination", _magnetic_declination, true },
 				{ "magnetic-inclination", _magnetic_inclination, true },
-				{ "density-altitude", _density_altitude, true }
+				{ "density-altitude", _density_altitude, true },
+				{ "target-altitude-reach-distance", _target_altitude_reach_distance, false },
 			});
 		}
 	}
@@ -567,5 +569,17 @@ FlightDataComputer::compute_performance()
 			: 0;
 		_climb_glide_ratio.write (ratio);
 	}
+
+	if (_target_pressure_altitude_amsl.valid() &&
+		_ground_speed.valid() &&
+		_pressure_altitude_climb_rate.valid() &&
+		_pressure_altitude_amsl.valid())
+	{
+		Length const alt_diff = *_target_pressure_altitude_amsl - *_pressure_altitude_amsl;
+		Length const distance = *_ground_speed * (alt_diff / *_pressure_altitude_climb_rate);
+		_target_altitude_reach_distance.write (distance);
+	}
+	else
+		_target_altitude_reach_distance.set_nil();
 }
 
