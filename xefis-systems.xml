@@ -28,8 +28,8 @@
 				<directory path='//sensors'>
 					<property name='imu.pitch' path='/imu/pitch'/>
 					<property name='imu.roll' path='/imu/roll'/>
-					<property name='imu.magnetic-heading' path='/compass/magnetic-heading'/>
-					<property name='imu.magnetic-heading-accuracy' path='/compass/magnetic-heading-accuracy'/>
+					<property name='imu.heading.magnetic' path='/compass/magnetic-heading'/>
+					<property name='imu.heading.magnetic.accuracy' path='/compass/magnetic-heading-accuracy'/>
 					<property name='gps.longitude' path='/gps/longitude'/>
 					<property name='gps.latitude' path='/gps/latitude'/>
 					<property name='gps.altitude-amsl' path='/gps/altitude-amsl'/>
@@ -54,10 +54,10 @@
 				</directory>
 				<directory path='/track'>
 					<property name='track.vertical' path='/vertical'/>
-					<property name='track.lateral-true' path='/lateral-true'/>
-					<property name='track.lateral-magnetic' path='/lateral-magnetic'/>
-					<property name='track.vertical-delta' path='/vertical-delta'/>
-					<property name='track.heading-delta' path='/heading-delta'/>
+					<property name='track.lateral.true' path='/lateral-true'/>
+					<property name='track.lateral.magnetic' path='/lateral-magnetic'/>
+					<property name='track.delta.vertical' path='/vertical-delta'/>
+					<property name='track.delta.lateral' path='/heading-delta'/>
 				</directory>
 				<directory path='/orientation'>
 					<property name='orientation.pitch' path='/pitch'/>
@@ -93,13 +93,13 @@
 					<property name='aoa.beta' path='/beta'/>
 				</directory>
 				<directory path='/wind'>
-					<property name='wind.true-heading' path='/true-orientation-from'/>
-					<property name='wind.magnetic-heading' path='/magnetic-orientation-from'/>
+					<property name='wind.heading.true' path='/true-orientation-from'/>
+					<property name='wind.heading.magnetic' path='/magnetic-orientation-from'/>
 					<property name='wind.true-airspeed' path='/true-airspeed'/>
 				</directory>
 				<directory path='/localizer'>
-					<property name='localizer.vertical-deviation' path='/vertical-deviation'/>
-					<property name='localizer.lateral-deviation' path='/lateral-deviation'/>
+					<property name='localizer.deviation.vertical' path='/vertical-deviation'/>
+					<property name='localizer.deviation.lateral' path='/lateral-deviation'/>
 					<property name='localizer.identifier' path='/identifier'/>
 					<property name='localizer.source' path='/source'/>
 					<property name='localizer.distance' path='/distance'/>
@@ -111,37 +111,37 @@
 					<property name='target-altitude-reach-distance' path='/target-altitude-reach-distance'/>
 				</directory>
 				<directory path='/magnetic'>
-					<property name='magnetic-declination' path='/magnetic-declination'/>
-					<property name='magnetic-inclination' path='/magnetic-inclination'/>
+					<property name='magnetic.declination' path='/magnetic-declination'/>
+					<property name='magnetic.inclination' path='/magnetic-inclination'/>
 				</directory>
 			</properties>
 		</module>
 		<module name='systems/flight-director'>
 			<properties>
 				<directory path='/systems/flight-director'>
-					<property name='output-pitch' path='/pitch'/>
-					<property name='output-roll' path='/roll'/>
-					<property name='vertical-mode-hint' path='/hints/vertical-hint'/>
-					<property name='lateral-mode-hint' path='/hints/lateral-hint'/>
+					<property name='output.pitch' path='/pitch'/>
+					<property name='output.roll' path='/roll'/>
+					<property name='mode.vertical.hint' path='/hints/vertical-hint'/>
+					<property name='mode.lateral.hint' path='/hints/lateral-hint'/>
 				</directory>
 				<directory path='/settings/flight-director'>
 					<property name='enabled' path='/enabled'/>
-					<property name='lateral-mode' path='/lateral-mode'/>
-					<property name='vertical-mode' path='/vertical-mode'/>
-					<property name='pitch-limit' path='/limits/pitch'/>
-					<property name='roll-limit' path='/limits/roll'/>
-					<property name='selected-magnetic-heading' path='/cmd-magnetic-heading-and-track'/>
-					<property name='selected-magnetic-track' path='/cmd-magnetic-heading-and-track'/>
-					<property name='selected-altitude' path='/cmd-altitude'/>
-					<property name='selected-vertical-speed' path='/cmd-vertical-speed'/>
-					<property name='selected-fpa' path='/cmd-fpa'/>
+					<property name='mode.lateral' path='/lateral-mode'/>
+					<property name='mode.vertical' path='/vertical-mode'/>
+					<property name='orientation.pitch-limit' path='/limits/pitch'/>
+					<property name='orientation.roll-limit' path='/limits/roll'/>
+					<property name='cmd.heading.magnetic' path='/cmd-magnetic-heading-and-track'/>
+					<property name='cmd.track.magnetic' path='/cmd-magnetic-heading-and-track'/>
+					<property name='cmd.altitude' path='/cmd-altitude'/>
+					<property name='cmd.vertical-speed' path='/cmd-vertical-speed'/>
+					<property name='cmd.fpa' path='/cmd-fpa'/>
 				</directory>
 				<directory path='/systems/fdc'>
-					<property name='measured-magnetic-heading' path='/orientation/magnetic-heading'/>
-					<property name='measured-magnetic-track' path='/track/lateral-magnetic'/>
-					<property name='measured-altitude' path='/pressure-altitude/amsl'/>
-					<property name='measured-vertical-speed' path='/pressure-altitude/climb-rate'/>
-					<property name='measured-fpa' path='/fpm/alpha'/>
+					<property name='measured.heading.magnetic' path='/orientation/magnetic-heading'/>
+					<property name='measured.track.magnetic' path='/track/lateral-magnetic'/>
+					<property name='measured.altitude' path='/pressure-altitude/amsl'/>
+					<property name='measured.vertical-speed' path='/pressure-altitude/climb-rate'/>
+					<property name='measured.fpa' path='/fpm/alpha'/>
 				</directory>
 			</properties>
 		</module>

@@ -40,24 +40,24 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 		{
 			parse_properties (e, {
 				{ "enabled", _enabled, true },
-				{ "lateral-mode", _lateral_mode, true },
-				{ "vertical-mode", _vertical_mode, true },
-				{ "pitch-limit", _pitch_limit, true },
-				{ "roll-limit", _roll_limit, true },
-				{ "selected-magnetic-heading", _selected_magnetic_heading, true },
-				{ "selected-magnetic-track", _selected_magnetic_track, true },
-				{ "selected-altitude", _selected_altitude, true },
-				{ "selected-vertical-speed", _selected_vertical_speed, true },
-				{ "selected-fpa", _selected_fpa, true },
-				{ "measured-magnetic-heading", _measured_magnetic_heading, true },
-				{ "measured-magnetic-track", _measured_magnetic_track, true },
-				{ "measured-altitude", _measured_altitude, true },
-				{ "measured-vertical-speed", _measured_vertical_speed, true },
-				{ "measured-fpa", _measured_fpa, true },
-				{ "output-pitch", _output_pitch, true },
-				{ "output-roll", _output_roll, true },
-				{ "vertical-mode-hint", _vertical_mode_hint, false },
-				{ "lateral-mode-hint", _lateral_mode_hint, false }
+				{ "mode.lateral", _lateral_mode, true },
+				{ "mode.vertical", _vertical_mode, true },
+				{ "orientation.pitch-limit", _pitch_limit, true },
+				{ "orientation.roll-limit", _roll_limit, true },
+				{ "cmd.heading.magnetic", _selected_magnetic_heading, true },
+				{ "cmd.track.magnetic", _selected_magnetic_track, true },
+				{ "cmd.altitude", _selected_altitude, true },
+				{ "cmd.vertical-speed", _selected_vertical_speed, true },
+				{ "cmd.fpa", _selected_fpa, true },
+				{ "measured.heading.magnetic", _measured_magnetic_heading, true },
+				{ "measured.track.magnetic", _measured_magnetic_track, true },
+				{ "measured.altitude", _measured_altitude, true },
+				{ "measured.vertical-speed", _measured_vertical_speed, true },
+				{ "measured.fpa", _measured_fpa, true },
+				{ "output.pitch", _output_pitch, true },
+				{ "output.roll", _output_roll, true },
+				{ "mode.vertical.hint", _vertical_mode_hint, false },
+				{ "mode.lateral.hint", _lateral_mode_hint, false }
 			});
 		}
 	}
