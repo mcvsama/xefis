@@ -96,6 +96,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "orientation.magnetic-heading", _orientation_magnetic_heading, true },
 				{ "pressure-altitude.amsl", _pressure_altitude_amsl, true },
 				{ "pressure-altitude.amsl-lookahead", _pressure_altitude_amsl_lookahead, true },
+				{ "pressure-altitude-std.amsl", _pressure_altitude_std_amsl, true },
 				{ "pressure-altitude.climb-rate", _pressure_altitude_climb_rate, true },
 				{ "speed.v-a", _v_a, true },
 				{ "speed.minimum-ias", _minimum_ias, true },
@@ -242,16 +243,23 @@ FlightDataComputer::compute_position()
 	if (_static_pressure.valid() &&
 		((_use_standard_pressure.valid() && *_use_standard_pressure) || _qnh_pressure.valid()))
 	{
+		auto compute_pressure_altitude = [&](Pressure pressure_setting) -> Length {
+			// Good for heights below tropopause (36 kft):
+			double a = 6.8755856e-6;
+			double b = 5.2558797;
+			double p = (*_static_pressure).inHg();
+			double p0 = pressure_setting.inHg();
+			return 1_ft * -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
+		};
+
 		Pressure pressure_setting = _use_standard_pressure.valid() && *_use_standard_pressure
 			? 29.92_inHg
 			: *_qnh_pressure;
-		// Good for heights below tropopause (36 kft):
-		double a = 6.8755856e-6;
-		double b = 5.2558797;
-		double p = (*_static_pressure).inHg();
-		double p0 = pressure_setting.inHg();
-		double h = -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
-		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (h));
+		Length height = compute_pressure_altitude (pressure_setting);
+		Length std_height = compute_pressure_altitude (29.92_inHg);
+
+		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft()));
+		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft()));
 	}
 	else
 		_pressure_altitude_amsl.copy (_position_altitude_amsl);
@@ -421,10 +429,10 @@ FlightDataComputer::compute_speeds()
 		_alt_amsl_time += update_dt();
 		if (_alt_amsl_time > 0.05_s)
 		{
-			Length alt_diff = *_pressure_altitude_amsl - _alt_amsl_prev;
+			Length alt_diff = *_pressure_altitude_std_amsl - _alt_amsl_prev;
 			_computed_climb_rate = alt_diff / _alt_amsl_time;
 			_alt_amsl_time = 0_s;
-			_alt_amsl_prev = *_pressure_altitude_amsl;
+			_alt_amsl_prev = *_pressure_altitude_std_amsl;
 		}
 
 		_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm()));

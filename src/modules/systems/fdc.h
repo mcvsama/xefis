@@ -97,6 +97,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_ground_speed_smoother				= 200.0; // TODO make fps independent
 	Xefis::Smoother<double>		_climb_rate_smoother				= 400.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 100.0; // TODO make fps independent
+	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 100.0; // TODO make fps independent
 	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
 	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
 	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 1000.0; // TODO make fps independent
@@ -163,6 +164,7 @@ class FlightDataComputer: public Xefis::Module
 	// Output altitude:
 	Xefis::PropertyLength		_pressure_altitude_amsl;
 	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead;
+	Xefis::PropertyLength		_pressure_altitude_std_amsl;
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
 	Xefis::PropertySpeed		_v_a; // TODO
