@@ -81,6 +81,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyAngle	_fpm_alpha;
 	Xefis::PropertyAngle	_fpm_beta;
+	Xefis::PropertyAngle	_aoa_alpha;
+	Xefis::PropertyAngle	_aoa_warning_threshold;
 	Xefis::PropertyAngle	_magnetic_track;
 	Xefis::PropertyLength	_altitude;
 	Xefis::PropertyLength	_altitude_lookahead;

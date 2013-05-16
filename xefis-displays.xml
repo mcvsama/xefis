@@ -20,6 +20,7 @@
 										<property name='altitude-ladder-extent' path='/altitude-ladder/extent' default='825'/>
 										<property name='heading-numbers-visible' path='/heading-numbers-visible' default='false'/>
 										<property name='novspd-flag' path='/novspd-flag' default='false'/>
+										<property name='aoa.warning-threshold' path='/aoa-warning-threshold' default='5 deg'/>
 									</directory>
 									<directory path='/settings/adi'>
 										<property name='orientation-roll-limit' path='/roll-warning'/>
@@ -64,6 +65,7 @@
 										<property name='orientation-magnetic-heading' path='/orientation/magnetic-heading'/>
 										<property name='flight-path-marker-alpha' path='/fpm/alpha'/>
 										<property name='flight-path-marker-beta' path='/fpm/beta'/>
+										<property name='aoa.alpha' path='/aoa/alpha'/>
 										<property name='altitude' path='/pressure-altitude/amsl'/>
 										<property name='altitude-lookahead' path='/pressure-altitude/amsl-lookahead'/>
 										<property name='cbr' path='/pressure-altitude/climb-rate'/>

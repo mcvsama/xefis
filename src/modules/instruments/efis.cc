@@ -64,6 +64,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "flight-path-marker-visible", _fpm_visible, false },
 				{ "flight-path-marker-alpha", _fpm_alpha, false },
 				{ "flight-path-marker-beta", _fpm_beta, false },
+				{ "aoa.alpha", _aoa_alpha, false },
+				{ "aoa.warning-threshold", _aoa_warning_threshold, false },
 				{ "altitude", _altitude, false },
 				{ "altitude-lookahead", _altitude_lookahead, false },
 				{ "altitude-agl", _altitude_agl, false },
@@ -167,7 +169,12 @@ EFIS::read()
 	if (_pitch_limit.valid() && _pitch_limit_visible.valid())
 	{
 		_efis_widget->set_pitch_limit (*_pitch_limit);
-		_efis_widget->set_pitch_limit_visible (*_pitch_limit_visible);
+		bool visible = false;
+		if (_aoa_warning_threshold.valid() && _aoa_alpha.valid() && _pitch.valid())
+			visible = *_aoa_alpha > *_aoa_warning_threshold;
+		else
+			visible = *_pitch_limit_visible;
+		_efis_widget->set_pitch_limit_visible (visible);
 	}
 	else
 		_efis_widget->set_pitch_limit_visible (false);
