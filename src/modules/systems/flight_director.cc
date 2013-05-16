@@ -107,41 +107,41 @@ FlightDirector::data_updated()
 		switch (static_cast<VerticalMode> (*_vertical_mode))
 		{
 			case VerticalDisabled:
-				_output_pitch.write (0_deg);
+				_computed_output_pitch = 0_deg;
 				break;
 
 			case AltitudeHold:
-				_output_pitch.write (1_deg * limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit));
+				_computed_output_pitch = 1_deg * limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
 				break;
 
 			case VerticalSpeed:
-				_output_pitch.write (1_deg * limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit));
+				_computed_output_pitch = 1_deg * limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
 				break;
 
 			case FlightPathAngle:
-				_output_pitch.write (1_deg * limit<float> (_fpa_pid.output(), pitch_limit));
+				_computed_output_pitch = 1_deg * limit<float> (_fpa_pid.output(), pitch_limit);
 				break;
 		}
 
 		switch (static_cast<LateralMode> (*_lateral_mode))
 		{
 			case LateralDisabled:
-				_output_roll.write (0_deg);
+				_computed_output_roll = 0_deg;
 				break;
 
 			case FollowHeading:
-				_output_roll.write (1_deg * limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit));
+				_computed_output_roll = 1_deg * limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
 				break;
 
 			case FollowTrack:
-				_output_roll.write (1_deg * limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit));
+				_computed_output_roll = 1_deg * limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
 				break;
 		}
 	}
 	else
 	{
-		_output_pitch.write (0_deg);
-		_output_roll.write (0_deg);
+		_computed_output_pitch = 0_deg;
+		_computed_output_roll = 0_deg;
 	}
 
 	// Mode hints:
@@ -184,6 +184,9 @@ FlightDirector::data_updated()
 				break;
 		}
 	}
+
+	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg()));
+	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg()));
 
 	_dt = Time::epoch();
 }
