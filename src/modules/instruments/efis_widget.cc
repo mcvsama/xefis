@@ -1295,6 +1295,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
 	QPen thin_white_pen = get_pen (Qt::white, 0.50f);
 
 	float const y = x * 4.f;
+	float const line_w = 0.2f * x;
 
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
@@ -1314,11 +1315,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
 		<< QPointF (-x, +0.6 * y + x)
 		<< QPointF (0.0f, +0.6 * y));
 
-	if (!_params.climb_rate_visible)
-		return;
-
-	float const line_w = 0.2f * x;
-
+	// Scale:
 	painter.setFont (_font_10);
 	painter.setPen (bold_white_pen);
 	painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.5f * x, 0.f));
@@ -1335,14 +1332,38 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
 		float posy = -2.f * y * scale_cbr (kfpm * 1000_fpm);
 		painter.draw_outlined_line (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
-	painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
-	QPen indicator_pen = bold_white_pen;
-	indicator_pen.setCapStyle (Qt::FlatCap);
-	painter.setPen (indicator_pen);
-	painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
 
-	// Numeric indicators:
+	// Pointer:
+	if (_params.climb_rate_visible)
+	{
+		painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
+		QPen indicator_pen = bold_white_pen;
+		indicator_pen.setCapStyle (Qt::FlatCap);
+		painter.setPen (indicator_pen);
+		painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
+	}
 
+	// Variometer:
+	if (_params.variometer_visible)
+	{
+		painter.setClipping (false);
+		float posy = -2.f * y * scale_cbr (_params.variometer_rate);
+		float x = pen_width (2.0);
+		painter.setPen (QPen (_navigation_color, pen_width (1.0)));
+		painter.setBrush (_navigation_color);
+		QPolygonF rhomb = QPolygonF()
+			<< QPointF (0.f, +1.5f * x)
+			<< QPointF (-x, 0.f)
+			<< QPointF (0.f, -1.5f * x)
+			<< QPointF (+x, 0.f)
+			<< QPointF (0.f, +1.5f * x);
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (rhomb.translated (1.25f * x, posy));
+		});
+	}
+
+	// Numeric indicators above and below:
+	painter.setPen (bold_white_pen);
 	int abs_climb_rate = static_cast<int> (std::abs (_params.climb_rate.fpm())) / 10 * 10;
 	if (abs_climb_rate >= 100)
 	{

@@ -43,8 +43,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 		{
 			parse_properties (e, {
 				// Input:
-				{ "settings.default-airplane-weight", _default_airplane_weight_kg, true },
-				{ "settings.actual-airplane-weight", _actual_airplane_weight_kg, true },
+				{ "settings.default-airplane-weight", _default_airplane_weight_g, true },
+				{ "settings.actual-airplane-weight", _actual_airplane_weight_g, true },
 				{ "settings.low-speed-roll-angle", _low_speed_roll_angle, true },
 				{ "settings.speed.v-a-default", _v_a_default, true },
 				{ "settings.speed.v-ne", _v_ne, true },
@@ -98,6 +98,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "pressure-altitude.amsl-lookahead", _pressure_altitude_amsl_lookahead, true },
 				{ "pressure-altitude-std.amsl", _pressure_altitude_std_amsl, true },
 				{ "pressure-altitude.climb-rate", _pressure_altitude_climb_rate, true },
+				{ "pressure-altitude.total-energy-variometer", _total_energy_variometer, false },
 				{ "speed.v-a", _v_a, true },
 				{ "speed.minimum-ias", _minimum_ias, true },
 				{ "speed.minimum-maneuver-ias", _minimum_maneuver_ias, true },
@@ -578,16 +579,52 @@ FlightDataComputer::compute_performance()
 		_climb_glide_ratio.write (ratio);
 	}
 
-	if (_target_pressure_altitude_amsl.valid() &&
-		_ground_speed.valid() &&
-		_pressure_altitude_climb_rate.valid() &&
-		_pressure_altitude_amsl.valid())
+	if (!_total_energy_variometer.is_singular())
 	{
-		Length const alt_diff = *_target_pressure_altitude_amsl - *_pressure_altitude_amsl;
-		Length const distance = *_ground_speed * (alt_diff / *_pressure_altitude_climb_rate);
-		_target_altitude_reach_distance.write (distance);
+		if (_actual_airplane_weight_g.valid() &&
+			_pressure_altitude_std_amsl.valid() &&
+			_ias.valid())
+		{
+			double const m = *_actual_airplane_weight_g;
+			double const g = 9.81;
+
+			if ((_total_energy_time += update_dt()) > 0.1_s)
+			{
+				double const v = (*_ias).mps();
+				double const Ep = m * g * (*_pressure_altitude_std_amsl).m();
+				double const Ek = m * v * v * 0.5;
+				_prev_total_energy = _total_energy;
+				_total_energy = Ep + Ek;
+				double const energy_diff = _total_energy - _prev_total_energy;
+				_tev = (1_m * energy_diff / (m * g)) / _total_energy_time;
+				_total_energy_time = 0_s;
+			}
+
+			if (!_prev_total_energy_valid)
+			{
+				_variometer_smoother.reset (_tev.fpm());
+				_prev_total_energy_valid = true;
+			}
+
+			_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm()));
+		}
+		else
+			_total_energy_variometer.set_nil();
 	}
-	else
-		_target_altitude_reach_distance.set_nil();
+
+	if (!_target_altitude_reach_distance.is_singular())
+	{
+		if (_target_pressure_altitude_amsl.valid() &&
+			_ground_speed.valid() &&
+			_pressure_altitude_climb_rate.valid() &&
+			_pressure_altitude_amsl.valid())
+		{
+			Length const alt_diff = *_target_pressure_altitude_amsl - *_pressure_altitude_amsl;
+			Length const distance = *_ground_speed * (alt_diff / *_pressure_altitude_climb_rate);
+			_target_altitude_reach_distance.write (distance);
+		}
+		else
+			_target_altitude_reach_distance.set_nil();
+	}
 }
 

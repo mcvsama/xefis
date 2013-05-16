@@ -74,6 +74,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config, QWi
 				{ "altitude.lookahead", _altitude_lookahead, false },
 				{ "altitude.agl", _altitude_agl, false },
 				{ "altitude.cbr", _cbr, false },
+				{ "altitude.variometer", _variometer, false },
 				{ "altitude.minimums", _minimums_altitude, false },
 				{ "pressure.qnh", _pressure_qnh, false },
 				{ "pressure.display-hpa", _pressure_display_hpa, false },
@@ -236,6 +237,10 @@ EFIS::read()
 	_efis_widget->set_climb_rate_visible (_cbr.valid());
 	if (_cbr.valid())
 		_efis_widget->set_climb_rate (*_cbr);
+
+	_efis_widget->set_variometer_visible (_variometer.valid());
+	if (_variometer.valid())
+		_efis_widget->set_variometer_rate (*_variometer);
 
 	bool cmd_visible = _cmd_settings_visible.read (false);
 

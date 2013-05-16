@@ -70,6 +70,7 @@
 										<property name='altitude' path='/pressure-altitude/amsl'/>
 										<property name='altitude.lookahead' path='/pressure-altitude/amsl-lookahead'/>
 										<property name='altitude.cbr' path='/pressure-altitude/climb-rate'/>
+										<property name='altitude.variometer' path='/pressure-altitude/total-energy-variometer'/>
 										<property name='approach.type-hint' path='/localizer/type'/>
 										<property name='approach.localizer-id' path='/localizer/identifier'/>
 										<property name='approach.deviation.vertical' path='/localizer/vertical-deviation'/>
