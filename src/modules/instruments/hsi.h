@@ -69,7 +69,6 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyLength	_trend_vector_range;
 	Xefis::PropertySpeed	_gs;
 	Xefis::PropertySpeed	_tas;
-	Xefis::PropertySpeed	_cbr;
 	Xefis::PropertyLength	_altitude;
 	Xefis::PropertyLength	_target_altitude;
 	Xefis::PropertyAngle	_magnetic_heading;
