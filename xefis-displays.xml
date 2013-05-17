@@ -115,6 +115,7 @@
 										<property name='speed.gs' path='/speed/ground-speed'/>
 										<property name='speed.tas' path='/speed/true-airspeed'/>
 										<property name='track.lateral-magnetic' path='/track/lateral-magnetic'/>
+										<property name='track.delta.lateral' path='/track/lateral-delta'/>
 										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
 										<property name='orientation.heading.true' path='/orientation/true-heading'/>
 										<property name='position.source' path='/position/source'/>
@@ -159,6 +160,7 @@
 										<property name='speed.gs' path='/speed/ground-speed'/>
 										<property name='speed.tas' path='/speed/true-airspeed'/>
 										<property name='track.lateral-magnetic' path='/track/lateral-magnetic'/>
+										<property name='track.delta.lateral' path='/track/lateral-delta'/>
 										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
 										<property name='orientation.heading.true' path='/orientation/true-heading'/>
 										<property name='position.source' path='/position/source'/>

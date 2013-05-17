@@ -31,7 +31,7 @@
 						<property name='engine-egt' path='/engine/egt'/>
 						<property name='engine-epr' path='/engine/epr'/>
 					</directory>
-					<directory path='/systems/fgdata'>
+					<directory path='/other/fgdata'>
 						<property name='gs' path='/speed/ground-speed'/>
 						<property name='tas' path='/speed/true-airspeed'/>
 						<property name='mach' path='/speed/mach'/>
@@ -49,7 +49,6 @@
 						<property name='dme-distance' path='/localizer/distance'/>
 						<property name='vertical-deviation' path='/localizer/vertical-deviation'/>
 						<property name='lateral-deviation' path='/localizer/lateral-deviation'/>
-						<!-- Emulate some of the AP settings -->
 						<property name='cmd-setting-altitude' path='/cmd-altitude'/>
 						<property name='cmd-setting-heading' path='/cmd-magnetic-heading-and-track'/>
 						<property name='cmd-setting-cbr' path='/cmd-vertical-speed'/>
@@ -80,7 +79,7 @@
 			</axis>
 		</module>
 		<module name='io/joystick'>
-			<device>/dev/input/js0</device>
+			<device>/dev/input/js1</device>
 			<path>/input/rudder</path>
 			<axis id='2'>
 				<power>3</power>

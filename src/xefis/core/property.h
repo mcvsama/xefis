@@ -222,17 +222,34 @@ template<class tType>
 		operator*() const;
 
 		/**
-		 * Write to a property. If node can't be found, create it.
+		 * Write to the property.
+		 * If node can't be found, create it.
 		 * If not possible, throw PropertyPathConflict.
 		 */
 		void
 		write (Type const&);
 
 		/**
-		 * Write to a property. If node can't be found, throw PropertyNotFound.
+		 * Write to the property.
+		 * If boost::optional doesn't hold a value, set the property to nil.
+		 */
+		void
+		write (boost::optional<Type> const&);
+
+		/**
+		 * Write to the property.
+		 * If node can't be found, throw PropertyNotFound.
 		 */
 		void
 		write_signalling (Type const&);
+
+		/**
+		 * Write to the property.
+		 * If boost::optional doesn't hold a value, set the property to nil.
+		 * If node can't be found, throw PropertyNotFound.
+		 */
+		void
+		write_signalling (boost::optional<Type> const&);
 
 		/**
 		 * Copy other node. Call PropertyNode::copy().
@@ -519,12 +536,34 @@ template<class T>
 
 template<class T>
 	inline void
+	Property<T>::write (boost::optional<Type> const& value)
+	{
+		if (value)
+			write (*value);
+		else
+			set_nil();
+	}
+
+
+template<class T>
+	inline void
 	Property<T>::write_signalling (Type const& value)
 	{
 		if (_root)
 			get_value_node_signalling()->write (value);
 		else
 			throw SingularProperty ("can't write to a singular property: " + _path);
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::write_signalling (boost::optional<Type> const& value)
+	{
+		if (value)
+			write_signalling (*value);
+		else
+			set_nil();
 	}
 
 

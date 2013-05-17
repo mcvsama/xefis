@@ -59,6 +59,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidg
 				{ "position.source", _positioning_hint, false },
 				{ "track.visible", _display_track, false },
 				{ "track.lateral-magnetic", _magnetic_track, false },
+				{ "track.delta.lateral", _track_lateral_delta_dpm, false },
 				{ "wind.from-mag-heading", _wind_from_magnetic_heading, false },
 				{ "wind.tas", _wind_tas, false },
 				{ "localizer-id", _localizer_id, false },
@@ -91,8 +92,6 @@ HSI::~HSI()
 void
 HSI::read()
 {
-	estimate_track();
-
 	if (_target_altitude_reach_distance.valid())
 	{
 		_hsi_widget->set_altitude_reach_distance (*_target_altitude_reach_distance);
@@ -142,6 +141,15 @@ HSI::read()
 		_hsi_widget->set_track_visible (false);
 		_hsi_widget->set_magnetic_track (*_magnetic_heading);
 	}
+
+	if (_track_lateral_delta_dpm.valid())
+	{
+		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
+		_hsi_widget->set_track_trend (limit (*_track_lateral_delta_dpm, -180.0_deg, +180.0_deg));
+		_hsi_widget->set_trend_vector_visible (true);
+	}
+	else
+		_hsi_widget->set_trend_vector_visible (false);
 
 	_hsi_widget->set_display_track (_display_track.read (false));
 
@@ -204,50 +212,5 @@ HSI::read()
 
 	_hsi_widget->set_climb_glide_ratio_visible (_climb_glide_ratio.valid());
 	_hsi_widget->set_climb_glide_ratio (*_climb_glide_ratio);
-}
-
-
-void
-HSI::estimate_track()
-{
-	if (_position_lat.is_singular() || _position_lon.is_singular() || _trend_vector_range.is_singular())
-	{
-		_hsi_widget->set_trend_vector_visible (false);
-		return;
-	}
-
-	LonLat current_position (*_position_lon, *_position_lat);
-
-	if (!_positions_valid)
-	{
-		std::fill (_positions.begin(), _positions.end(), current_position);
-		_positions_valid = true;
-	}
-
-	// Estimate only if the distance between last and current positions is > 0.02nm.
-	Length epsilon = 10_m;
-	if (_positions[0].haversine_earth (current_position) > epsilon)
-	{
-		// Shift data in _positions:
-		for (unsigned int i = _positions.size() - 1; i > 0; i--)
-			_positions[i] = _positions[i - 1];
-		_positions[0] = current_position;
-	}
-
-	Length len10 = _positions[1].haversine_earth (_positions[0]);
-
-	Angle alpha = -180.0_deg + great_arcs_angle (_positions[2], _positions[1], _positions[0]);
-	Angle beta_per_mile = alpha / len10.nm();
-
-	if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
-	{
-		bool visible = _positions[2].haversine_earth (_positions[0]) > 2.f * epsilon;
-		if (visible)
-			beta_per_mile = 1_deg * _trend_vector_smoother.process (beta_per_mile.deg());
-
-		_hsi_widget->set_trend_vector_visible (visible);
-		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
-		_hsi_widget->set_track_deviation (limit (beta_per_mile, -180.0_deg, +180.0_deg));
-	}
 }
 

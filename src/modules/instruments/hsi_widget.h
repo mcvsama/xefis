@@ -104,7 +104,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					true_air_speed_visible		= false;
 		float					mach						= 0.f;
 		bool					mach_visible				= false;
-		Angle					track_deviation				= 0_deg;
+		Angle					track_lateral_delta			= 0_deg;
 		bool					trend_vector_visible		= false;
 		Length					trend_vector_lookahead		= 5_nm;
 		Length					altitude_reach_distance		= 0_nm;
@@ -454,7 +454,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 * Positive degrees means turning to the right, negative - to the left.
 	 */
 	void
-	set_track_deviation (Angle degrees_per_mile);
+	set_track_trend (Angle degrees_per_mile);
 
 	/**
 	 * Set track estimation visibility.
@@ -883,9 +883,9 @@ HSIWidget::set_positioning_hint_visible (bool visible)
 
 
 inline void
-HSIWidget::set_track_deviation (Angle degrees_per_mile)
+HSIWidget::set_track_trend (Angle degrees_per_mile)
 {
-	_params.track_deviation = degrees_per_mile;
+	_params.track_lateral_delta = degrees_per_mile;
 	request_repaint();
 }
 

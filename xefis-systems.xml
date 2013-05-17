@@ -56,8 +56,7 @@
 					<property name='track.vertical' path='/vertical'/>
 					<property name='track.lateral.true' path='/lateral-true'/>
 					<property name='track.lateral.magnetic' path='/lateral-magnetic'/>
-					<property name='track.delta.vertical' path='/vertical-delta'/>
-					<property name='track.delta.lateral' path='/heading-delta'/>
+					<property name='track.delta.lateral' path='/lateral-delta'/>
 				</directory>
 				<directory path='/orientation'>
 					<property name='orientation.pitch' path='/pitch'/>
