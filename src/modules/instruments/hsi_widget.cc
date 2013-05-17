@@ -554,7 +554,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Painter& painter)
 		Length initial_step = trend_range / 150.f;
 		Length normal_step = trend_range / 10.f;
 		Length step = initial_step;
-		Angle const angle_per_step = step.nm() * _params.track_deviation;
+		Angle const angle_per_step = step.nm() * _params.track_lateral_delta;
 
 		QTransform transform;
 		QPolygonF polygon;

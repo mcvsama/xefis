@@ -55,14 +55,9 @@ class HSI: public Xefis::Instrument
 	data_updated() override;
 
   private:
-	void
-	estimate_track();
-
-  private:
 	HSIWidget*				_hsi_widget				= nullptr;
 	std::array<LonLat, 3>	_positions;
 	bool					_positions_valid		= false;
-	Xefis::Smoother<double>	_trend_vector_smoother	= 50.0; // TODO make fps independent
 
 	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyLength	_range;
@@ -81,6 +76,7 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyBoolean	_cmd_settings_visible;
 	Xefis::PropertyBoolean	_cmd_track_visible;
 	Xefis::PropertyAngle	_magnetic_track;
+	Xefis::PropertyAngle	_track_lateral_delta_dpm;
 	Xefis::PropertyAngle	_cmd_heading_setting;
 	Xefis::PropertyAngle	_position_lat;
 	Xefis::PropertyAngle	_position_lon;

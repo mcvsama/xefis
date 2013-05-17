@@ -17,11 +17,15 @@
 // Qt:
 #include <QtXml/QDomElement>
 
+// Boost:
+#include <boost/optional.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/navigation.h>
 #include <xefis/utility/density_altitude.h>
 #include <xefis/utility/sound_speed.h>
 #include <xefis/utility/wind_triangle.h>
@@ -88,8 +92,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "track.vertical", _track_vertical, true },
 				{ "track.lateral.true", _track_lateral_true, true },
 				{ "track.lateral.magnetic", _track_lateral_magnetic, true },
-				{ "track.delta.vertical", _track_vertical_delta_dpf, true },
-				{ "track.delta.lateral", _track_heading_delta_dpf, true },
+				{ "track.delta.lateral", _track_lateral_delta_dpm, true },
 				{ "orientation.pitch", _orientation_pitch, true },
 				{ "orientation.roll", _orientation_roll, true },
 				{ "orientation.true-heading", _orientation_true_heading, true },
@@ -353,15 +356,26 @@ FlightDataComputer::compute_track()
 		_track_lateral_magnetic.set_nil();
 	}
 
+	boost::optional<Angle> result_delta;
 	if (_ac1_positions[0].valid && _ac1_positions[1].valid && _ac1_positions[2].valid)
 	{
-		// TODO deltas for trend vector
+		Length len10 = _ac1_positions[1].lateral_position.haversine_earth (_ac1_positions[0].lateral_position);
+
+		if (len10 >= *_position_accuracy)
+		{
+			Angle alpha = -180.0_deg + great_arcs_angle (_ac1_positions[2].lateral_position,
+														 _ac1_positions[1].lateral_position,
+														 _ac1_positions[0].lateral_position);
+			Angle beta_per_mile = alpha / len10.nm();
+
+			if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
+			{
+				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg());
+				result_delta = limit (beta_per_mile, -180.0_deg, +180.0_deg);
+			}
+		}
 	}
-	else
-	{
-		_track_vertical_delta_dpf.set_nil();
-		_track_heading_delta_dpf.set_nil();
-	}
+	_track_lateral_delta_dpm.write (result_delta);
 }
 
 

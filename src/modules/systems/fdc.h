@@ -100,6 +100,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 100.0; // TODO make fps independent
 	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 1000.0; // TODO make fps independent
 	Xefis::Smoother<double>		_ias_lookahead_smoother				= 1000.0; // TODO make fps independent
+	Xefis::Smoother<double>		_track_heading_delta_smoother		= 50.0; // TODO make fps independent
 	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
 	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
 	// Total-energy variometer stuff:
@@ -161,8 +162,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_track_vertical;
 	Xefis::PropertyAngle		_track_lateral_true;
 	Xefis::PropertyAngle		_track_lateral_magnetic;
-	Xefis::PropertyFloat		_track_vertical_delta_dpf; // TODO
-	Xefis::PropertyFloat		_track_heading_delta_dpf; // TODO
+	Xefis::PropertyAngle		_track_lateral_delta_dpm;
 	// Output orientation:
 	Xefis::PropertyAngle		_orientation_pitch;
 	Xefis::PropertyAngle		_orientation_roll;
