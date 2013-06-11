@@ -25,6 +25,9 @@
 #include "lookahead.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("systems/lookahead", Lookahead);
+
+
 Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager)
 {

@@ -133,5 +133,30 @@ Module::work_performer() const
 	return _module_manager->application()->work_performer();
 }
 
+
+void
+Module::register_factory (std::string const& name, FactoryFunction factory_function)
+{
+	factories()[name] = factory_function;
+}
+
+
+Module::FactoryFunction
+Module::find_factory (std::string const& name)
+{
+	FactoriesMap::iterator f = factories().find (name);
+	if (f == factories().end())
+		return FactoryFunction();
+	return f->second;
+}
+
+
+inline Module::FactoriesMap&
+Module::factories()
+{
+	static FactoriesMap factories;
+	return factories;
+}
+
 } // namespace Xefis
 

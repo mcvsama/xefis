@@ -29,8 +29,11 @@
 #include "hsi.h"
 
 
-HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidget* parent):
-	Instrument (module_manager, parent)
+XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI);
+
+
+HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager)
 {
 	for (QDomElement& e: config)
 	{

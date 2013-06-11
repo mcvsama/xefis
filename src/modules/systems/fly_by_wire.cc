@@ -25,6 +25,9 @@
 #include "fly_by_wire.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("systems/fly-by-wire", FlyByWire);
+
+
 FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager),
 	_manual_pitch_pid (1.0, 0.1, 0.0, 0.0),
