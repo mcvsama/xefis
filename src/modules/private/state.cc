@@ -27,6 +27,9 @@
 #include "state.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("private/state", State);
+
+
 template<class P>
 	void
 	State::Observable<P>::process()

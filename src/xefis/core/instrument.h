@@ -17,6 +17,9 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QtWidgets/QWidget>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -32,14 +35,14 @@ class Instrument:
 {
   public:
 	// Ctor
-	Instrument (ModuleManager*, QWidget* parent);
+	Instrument (ModuleManager*);
 };
 
 
 inline
-Instrument::Instrument (ModuleManager* module_manager, QWidget* parent):
+Instrument::Instrument (ModuleManager* module_manager):
 	Module (module_manager),
-	QWidget (parent)
+	QWidget (nullptr)
 { }
 
 } // namespace Xefis

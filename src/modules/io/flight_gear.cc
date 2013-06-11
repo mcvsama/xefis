@@ -26,6 +26,9 @@
 #include "flight_gear.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("io/flightgear", FlightGearIO);
+
+
 typedef float		FGFloat;
 typedef double		FGDouble;
 typedef uint8_t		FGBool;

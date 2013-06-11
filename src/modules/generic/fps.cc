@@ -21,6 +21,9 @@
 #include "fps.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("generic/fps", FPS);
+
+
 FPS::FPS (Xefis::ModuleManager* module_manager, QDomElement const&):
 	Module (module_manager),
 	_smoother (5)

@@ -26,6 +26,9 @@
 #include "joystick.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput);
+
+
 JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Xefis::Input (module_manager)
 {

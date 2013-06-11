@@ -28,8 +28,11 @@
 #include "radial_indicator.h"
 
 
-RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElement const& config, QWidget* parent):
-	Instrument (module_manager, parent)
+XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator);
+
+
+RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager)
 {
 	_widget = new RadialIndicatorWidget (this);
 

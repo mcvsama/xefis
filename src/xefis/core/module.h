@@ -16,7 +16,7 @@
 
 // Standard:
 #include <cstddef>
-#include <initializer_list>
+#include <functional>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -27,6 +27,12 @@
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/property.h>
+
+
+#define XEFIS_REGISTER_MODULE_CLASS(module_name, klass) \
+	static Xefis::Module::Registrator module_registrator (module_name, [](Xefis::ModuleManager* module_manager, QDomElement const& config) -> Xefis::Module* { \
+		return new klass (module_manager, config); \
+	});
 
 
 namespace Xefis {
@@ -41,7 +47,14 @@ class Module
 		bool			required;
 	};
 
-	typedef std::vector<NameAndProperty> PropertiesList;
+	typedef std::vector<NameAndProperty>								PropertiesList;
+	typedef std::function<Module* (ModuleManager*, QDomElement const&)>	FactoryFunction;
+	typedef std::map<std::string, FactoryFunction>						FactoriesMap;
+
+	struct Registrator
+	{
+		Registrator (std::string const& module_name, FactoryFunction);
+	};
 
   public:
 	// Ctor
@@ -68,6 +81,18 @@ class Module
 	 */
 	Time
 	update_dt() const;
+
+	/**
+	 * Register module factory.
+	 */
+	static void
+	register_factory (std::string const& module_name, FactoryFunction);
+
+	/**
+	 * Return factory function by name.
+	 */
+	static FactoryFunction
+	find_factory (std::string const& name);
 
   protected:
 	/**
@@ -96,8 +121,22 @@ class Module
 	work_performer() const;
 
   private:
+	/**
+	 * Return list of factories.
+	 */
+	static FactoriesMap&
+	factories();
+
+  private:
 	ModuleManager*	_module_manager = nullptr;
 };
+
+
+inline
+Module::Registrator::Registrator (std::string const& module_name, FactoryFunction ff)
+{
+	Module::register_factory (module_name, ff);
+}
 
 
 inline

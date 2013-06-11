@@ -19,23 +19,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 
-// Modules:
-#include <modules/generic/fps.h>
-#include <modules/instruments/efis.h>
-#include <modules/instruments/hsi.h>
-#include <modules/instruments/radial_indicator.h>
-#include <modules/io/flight_gear.h>
-#include <modules/io/joystick.h>
-#include <modules/io/mouse.h>
-#include <modules/systems/flight_director.h>
-#include <modules/systems/fly_by_wire.h>
-#include <modules/systems/fdc.h>
-#include <modules/systems/lookahead.h>
-#include <modules/systems/rcms.h>
-#include <modules/private/state.h>
-
 // Local:
 #include "module_manager.h"
+#include "module.h"
+#include "instrument.h"
 
 
 namespace Xefis {
@@ -100,32 +87,15 @@ Module*
 ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
 {
 	try {
-		if (name == "instruments/efis")
-			return new EFIS (this, config, parent);
-		else if (name == "instruments/hsi")
-			return new HSI (this, config, parent);
-		else if (name == "instruments/radial-indicator")
-			return new RadialIndicator (this, config, parent);
-		else if (name == "systems/lookahead")
-			return new ::Lookahead (this, config);
-		else if (name == "systems/flight-director")
-			return new FlightDirector (this, config);
-		else if (name == "systems/fly-by-wire")
-			return new FlyByWire (this, config);
-		else if (name == "systems/fdc")
-			return new FlightDataComputer (this, config);
-		else if (name == "systems/rcms")
-			return new RemoteControlManagementSystem (this, config);
-		else if (name == "generic/fps")
-			return new FPS (this, config);
-		else if (name == "io/flightgear")
-			return new FlightGearIO (this, config);
-		else if (name == "io/joystick")
-			return new JoystickInput (this, config);
-		else if (name == "io/mouse")
-			return new Mouse (this, config);
-		else if (name == "private/state")
-			return new State (this, config);
+		Module::FactoryFunction ff = Module::find_factory (name.toStdString());
+		if (ff)
+		{
+			Module* module = ff (this, config);
+			QWidget* widget = dynamic_cast<QWidget*> (module);
+			if (widget)
+				widget->setParent (parent);
+			return module;
+		}
 		else
 			throw ModuleNotFoundException ("module not found: " + name.toStdString());
 	}

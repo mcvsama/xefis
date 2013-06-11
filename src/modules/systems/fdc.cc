@@ -35,6 +35,9 @@
 #include "fdc.h"
 
 
+XEFIS_REGISTER_MODULE_CLASS ("systems/fdc", FlightDataComputer);
+
+
 FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager)
 {
