@@ -98,6 +98,44 @@
 				<property name='button' path='/input/main/button/15'/>
 			</properties>
 		</module>
+		<module name='io/link'>
+			<properties>
+				<property name='link-valid' path='/link/valid'/>
+				<property name='errors' path='/link/errors'/>
+				<property name='valid-packets' path='/link/valid-packets'/>
+				<property name='failsafe.count' path='/link/failsafe-count'/>
+				<property name='failsafe.lost-time' path='/link/failsafe-lost-time' default='500 ms'/>
+				<property name='failsafe.acquired-time' path='/link/failsafe-acquired-time' default='100 ms'/>
+			</properties>
+			<output>
+				<udp>
+					<host>127.0.0.1</host>
+					<port>9951</port>
+				</udp>
+			</output>
+			<input>
+				<udp>
+					<host>0.0.0.0</host>
+					<port>9951</port>
+				</udp>
+			</input>
+			<protocol>
+				<packet magic='ca:fe'>
+					<signature random-bytes='2' signature-bytes='4' key='00:11:22:33'>
+						<property type='float16' path='/input/main/axis/1'/>
+						<!--bitfield>
+							<boolean path='/input/...'/>
+							<int bits='2' path='/...'/>
+						</bitfield-->
+					</signature>
+				</packet>
+				<packet magic='be:ef'>
+					<signature random-bytes='2' signature-bytes='4' key='44:55:66:77'>
+						.
+					</signature>
+				</packet>
+			</protocol>
+		</module>
 	</modules>
 </xefis-include>
 
