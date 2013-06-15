@@ -35,7 +35,7 @@ LD				:= $(CXX)
 LDFLAGS			:= -rdynamic
 AR				:= ar
 MOC				:= $(QT_PREFIX)/bin/moc-qt5
-LIBS			+= m boost_system pthread
+LIBS			+= m boost_system pthread mhash
 PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets
 CXXFLAGS_s		:= $(CXXFLAGS)
 ifeq ($(OPTIMIZE),debug)

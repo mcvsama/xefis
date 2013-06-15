@@ -14,6 +14,7 @@ uuid-dev
 gcc-4.7
 boost
 qt-5
+mhash-0.9.9.9
 
 C++11 compiler required
 =======================

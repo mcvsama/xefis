@@ -252,6 +252,13 @@ template<class tType>
 		write_signalling (boost::optional<Type> const&);
 
 		/**
+		 * Sets value (like write) if property is not singular
+		 * and if it's nil. Otherwise it's a no-op.
+		 */
+		void
+		set_default (Type const&);
+
+		/**
 		 * Copy other node. Call PropertyNode::copy().
 		 */
 		void
@@ -564,6 +571,15 @@ template<class T>
 			write_signalling (*value);
 		else
 			set_nil();
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::set_default (Type const& value)
+	{
+		if (!is_singular() && is_nil())
+			write (value);
 	}
 
 
