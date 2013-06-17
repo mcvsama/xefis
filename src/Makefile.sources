@@ -77,6 +77,7 @@ SRC_MOCHDRS += xefis/core/window.h
 SRC_HEADERS += xefis/utility/backtrace.h
 SRC_HEADERS += xefis/utility/density_altitude.h
 SRC_HEADERS += xefis/utility/hash.h
+SRC_HEADERS += xefis/utility/i2c.h
 SRC_HEADERS += xefis/utility/lookahead.h
 SRC_HEADERS += xefis/utility/magnetic_variation.h
 SRC_HEADERS += xefis/utility/mutex.h
@@ -95,6 +96,7 @@ SRC_HEADERS += xefis/utility/thread.h
 SRC_HEADERS += xefis/utility/wind_triangle.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
+SRC_SOURCES += xefis/utility/i2c.cc
 SRC_SOURCES += xefis/utility/magnetic_variation.cc
 SRC_SOURCES += xefis/utility/mutex.cc
 SRC_SOURCES += xefis/utility/painter.cc
