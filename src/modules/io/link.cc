@@ -168,7 +168,7 @@ Link::PropertyItem::produce (Blob& blob)
 			double f64 = *_property;
 			uint64_t* i64 = reinterpret_cast<uint64_t*> (&f64);
 			native_to_little (*i64);
-			for (int shift = 56; shift >= 0; shift -= 8)
+			for (int shift = 0; shift < 64; shift += 8)
 				blob.push_back ((*i64 >> shift) & 0xff);
 			break;
 		}
@@ -178,7 +178,7 @@ Link::PropertyItem::produce (Blob& blob)
 			float f32 = *_property;
 			uint32_t* i32 = reinterpret_cast<uint32_t*> (&f32);
 			native_to_little (*i32);
-			for (int shift = 24; shift >= 0; shift -= 8)
+			for (int shift = 0; shift < 32; shift += 8)
 				blob.push_back ((*i32 >> shift) & 0xff);
 			break;
 		}
@@ -188,7 +188,7 @@ Link::PropertyItem::produce (Blob& blob)
 			half_float::half f16 (*_property);
 			uint16_t* i16 = reinterpret_cast<uint16_t*> (&f16);
 			native_to_little (*i16);
-			for (int shift = 8; shift >= 0; shift -= 8)
+			for (int shift = 0; shift < 16; shift += 8)
 				blob.push_back ((*i16 >> shift) & 0xff);
 			break;
 		}
