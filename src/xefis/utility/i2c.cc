@@ -50,23 +50,45 @@ Message::generate_i2c_msg() const noexcept
 		msg.flags |= I2C_M_RD;
 	msg.len = std::distance (_begin, _end);
 	msg.buf = _begin;
-xdebug ("MSG addr 0x%x flags 0x%x len %d\n", (int)msg.addr, (int)msg.flags, (int)msg.len);
 	return msg;
 }
 
 
-Bus::Bus (uint8_t bus_number) noexcept:
-	_bus_number (bus_number)
+Bus::Bus() noexcept
+{ }
+
+
+Bus::Bus (uint8_t bus_number) noexcept
 {
+	open (bus_number);
+}
+
+
+Bus::~Bus()
+{
+	close();
+}
+
+
+void
+Bus::open (uint8_t bus_number)
+{
+	close();
+	_bus_number = bus_number;
 	_device = ::open ((boost::format ("/dev/i2c-%1%") % static_cast<int> (_bus_number)).str().c_str(), O_RDWR);
 	if (_device < 0)
 		throw Xefis::Exception ((boost::format ("could not open I²C bus %1%: %2%") % static_cast<int> (_bus_number) % strerror (errno)).str());
 }
 
 
-Bus::~Bus()
+void
+Bus::close()
 {
-	::close (_device);
+	if (_open)
+	{
+		::close (_device);
+		_open = false;
+	}
 }
 
 

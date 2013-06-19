@@ -38,6 +38,11 @@ class Address
 {
   public:
 	/**
+	 * Create address 0x00.
+	 */
+	Address() noexcept;
+
+	/**
 	 * Create I2C address.
 	 * \param	address 7- or 10-bit I2C address.
 	 * \param	ten_bit Tells whether address is 10-bit.
@@ -102,6 +107,11 @@ class Bus: public Noncopyable
 {
   public:
 	/**
+	 * Create not opened bus.
+	 */
+	Bus() noexcept;
+
+	/**
 	 * Open Linux I2C device.
 	 * \param	bus_number I2C bus number.
 	 */
@@ -118,15 +128,35 @@ class Bus: public Noncopyable
 	bus_number() const noexcept;
 
 	/**
+	 * Open bus.
+	 */
+	void
+	open (uint8_t bus_number);
+
+	/**
+	 * Close bus.
+	 */
+	void
+	close();
+
+	/**
 	 * Execute I2C transaction.
 	 */
 	void
 	execute (Transaction const&);
 
   private:
-	uint8_t		_bus_number;
-	int			_device;
+	bool		_open			= false;
+	uint8_t		_bus_number		= 0;
+	int			_device			= 0;
 };
+
+
+inline
+Address::Address() noexcept:
+	_address (0x00),
+	_ten_bit (0)
+{ }
 
 
 inline

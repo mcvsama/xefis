@@ -113,12 +113,12 @@
 					<port>9951</port>
 				</udp>
 			</output>
-			<input>
+			<!--input>
 				<udp>
 					<host>0.0.0.0</host>
 					<port>9951</port>
 				</udp>
-			</input>
+			</input-->
 			<protocol>
 				<packet magic='ca:fe'>
 					<signature random-bytes='2' signature-bytes='4' key='00:11:22:33'>
