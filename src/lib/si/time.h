@@ -31,6 +31,8 @@ namespace SI {
 class Time: public Value<double, Time>
 {
 	friend class Value<double, Time>;
+	friend constexpr Time operator"" _ns (long double);
+	friend constexpr Time operator"" _ns (unsigned long long);
 	friend constexpr Time operator"" _us (long double);
 	friend constexpr Time operator"" _us (unsigned long long);
 	friend constexpr Time operator"" _ms (long double);
@@ -58,6 +60,9 @@ class Time: public Value<double, Time>
 
 	std::vector<std::string> const&
 	supported_units() const override;
+
+	constexpr ValueType
+	ns() const noexcept;
 
 	constexpr ValueType
 	us() const noexcept;
@@ -106,6 +111,13 @@ Time::supported_units() const
 
 
 inline constexpr Time::ValueType
+Time::ns() const noexcept
+{
+	return value() * 1e9;
+}
+
+
+inline constexpr Time::ValueType
 Time::us() const noexcept
 {
 	return value() * 1e6;
@@ -145,7 +157,9 @@ Time::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
 
-	if (p.second == "us")
+	if (p.second == "ns")
+		*this = p.first * 1_ns;
+	else if (p.second == "us")
 		*this = p.first * 1_us;
 	else if (p.second == "ms")
 		*this = p.first * 1_ms;
@@ -188,6 +202,20 @@ Time::epoch() noexcept
 /*
  * Global functions
  */
+
+
+inline constexpr Time
+operator"" _ns (long double ns)
+{
+	return Time (static_cast<Time::ValueType> (ns / 1e9));
+}
+
+
+inline constexpr Time
+operator"" _ns (unsigned long long ns)
+{
+	return Time (static_cast<Time::ValueType> (ns / 1e9));
+}
 
 
 inline constexpr Time
