@@ -28,6 +28,10 @@
 #include <xefis/core/property.h>
 
 
+// Will print sent data on std::clog if 1:
+#define XEFIS_LINK_DEBUG_SEND 0
+
+
 class Link:
 	public QObject,
 	public Xefis::Module
@@ -244,6 +248,9 @@ class Link:
 	void
 	parse_protocol (QDomElement const& protocol);
 
+	void
+	interfere (Blob& blob);
+
 	static Blob
 	parse_binary_string (QString const& string);
 
@@ -273,6 +280,8 @@ class Link:
 	Blob					_input_blob;
 	Blob					_tmp_input_magic;
 	bool					_last_parse_was_valid	= false;
+	bool					_input_interference		= false;
+	bool					_output_interference	= false;
 };
 
 
