@@ -114,6 +114,37 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 
 
 void
+Module::parse_i2c (QDomElement const& i2c_element, I2C::Bus& bus, I2C::Address& address)
+{
+	bool has_bus = false;
+	bool has_address = false;
+
+	for (QDomElement& e: i2c_element)
+	{
+		if (e == "bus")
+		{
+			bus.open (e.text().trimmed().toUInt());
+			has_bus = true;
+		}
+		else if (e == "address")
+		{
+			QString addr = e.text().trimmed();
+			if (addr.startsWith ("0x"))
+				address = I2C::Address (addr.mid (2).toUInt (nullptr, 16));
+			else
+				address = I2C::Address (addr.toUInt());
+			has_address = true;
+		}
+	}
+
+	if (!has_bus)
+		throw Xefis::Exception ("configure I2C bus number <i2c>/<bus>");
+	if (!has_address)
+		throw Xefis::Exception ("configure I2C BMP085 address <i2c>/<address>");
+}
+
+
+void
 Module::signal_data_updated()
 {
 	_module_manager->application()->data_updated();
