@@ -44,12 +44,11 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 				{ "pressure.read-interval", _pressure_interval, true },
 			});
 		}
+		else if (e == "i2c")
+			parse_i2c (e, _i2c_bus, _i2c_address);
 	}
 
 	_oversampling = Oversampling3;
-
-	_i2c_address = I2C::Address (0x77); // TODO config
-	_i2c_bus.open (1); // TODO config
 
 	_ac1 = read_s16 (AC1_REG);
 	_ac2 = read_s16 (AC2_REG);

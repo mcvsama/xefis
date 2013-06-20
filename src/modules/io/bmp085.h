@@ -93,6 +93,7 @@ class BMP085:
 	Xefis::PropertyTime			_temperature_interval;
 	Xefis::PropertyPressure		_pressure;
 	Xefis::PropertyTime			_pressure_interval;
+	uint8_t						_i2c_bus_number;
 	I2C::Bus					_i2c_bus;
 	I2C::Address				_i2c_address;
 	Oversampling				_oversampling				= Oversampling3;

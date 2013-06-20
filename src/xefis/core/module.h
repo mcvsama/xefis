@@ -27,6 +27,7 @@
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/i2c.h>
 
 
 #define XEFIS_REGISTER_MODULE_CLASS(module_name, klass) \
@@ -98,9 +99,18 @@ class Module
 	/**
 	 * Parse the <properties> element and initialize properties
 	 * by their names matching the <properties> children.
+	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
 	parse_properties (QDomElement const& properties_element, PropertiesList);
+
+	/**
+	 * Parse the <i2c> element containing I2C bus number and device
+	 * address.
+	 * \throw	Xefis::Exception if something's wrong.
+	 */
+	void
+	parse_i2c (QDomElement const& i2c_element, I2C::Bus&, I2C::Address&);
 
 	/**
 	 * Signal that this module has updated property tree.
