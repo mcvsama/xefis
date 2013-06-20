@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -76,7 +77,13 @@ Application::Application (int argc, char** argv):
 
 	signal (SIGHUP, s_quit);
 
-	_config_reader->load ("xefis-config.xml");
+	const char* config_file = getenv ("XEFIS_CONFIG");
+	if (!config_file)
+	{
+		std::clog << "XEFIS_CONFIG not set, trying to read default ./xefis-config.xml" << std::endl;
+		config_file = "xefis-config.xml";
+	}
+	_config_reader->load (config_file);
 }
 
 

@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/tables'>
+		<table name='flaps:critical-aoa-flaps-factor'>
+			<map input='0' ouptut='1.0'/>
+			<map input='5' output='0.9'/>
+			<map input='35' output='0.5'/>
+		</table>
+		<table name='flaps:stall-speed-flaps-factor'>
+			<map input='0' outout='1.0'/>
+			<map input='5' output='0.9'/>
+			<map input='35' output='0.7'/>
+		</table>
+		<table name='weight:critical-aoa-weight-factor'>
+			<map input='1' output='1.0'/>
+			<map input='2' output='0.7'/>
+		</table>
+	</module>
+</xefis-include>
+

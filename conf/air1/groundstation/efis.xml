@@ -1,0 +1,242 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<windows>
+		<window width='1366' height='768' full-screen='false'>
+			<layout type='horizontal'>
+				<item stretch-factor='4'>
+					<layout type='vertical'>
+						<item stretch-factor='8'>
+							<module name='instruments/efis'>
+								<properties>
+									<directory path='/instruments/efis'>
+										<property name='speed-ladder.line-every' path='/speed-ladder/line-every' default='10'/>
+										<property name='speed-ladder.number-every' path='/speed-ladder/number-every' default='20'/>
+										<property name='speed-ladder.extent' path='/speed-ladder/extent' default='124'/>
+										<property name='speed-ladder.minimum' path='/speed-ladder/minimum' default='20'/>
+										<property name='speed-ladder.maximum' path='/speed-ladder/maximum' default='900'/>
+										<property name='speed-ladder.novspd-flag' path='/novspd-flag' default='false'/>
+										<property name='altitude-ladder.line-every' path='/altitude-ladder/line-every' default='100'/>
+										<property name='altitude-ladder.number-every' path='/altitude-ladder/number-every' default='200'/>
+										<property name='altitude-ladder.bold-every' path='/altitude-ladder/bold-every' default='500'/>
+										<property name='altitude-ladder.extent' path='/altitude-ladder/extent' default='825'/>
+										<property name='orientation.heading.numbers-visible' path='/heading-numbers-visible' default='false'/>
+										<property name='aoa.warning-threshold' path='/aoa-warning-threshold' default='5 deg'/>
+									</directory>
+									<directory path='/settings/adi'>
+										<property name='orientation.roll.limit' path='/roll-warning'/>
+										<property name='slip-skid.limit' path='/slip-skid/slip-skid-warning'/>
+										<property name='aoa.pitch-limit.visible' path='/pitch-limit-visible'/>
+										<property name='fpm.visible' path='/flight-path-marker-visible'/>
+										<property name='control-stick.visible' path='/control-stick-visible'/>
+										<property name='approach.reference-visible' path='/approach-reference-visible'/>
+										<property name='control-hint.visible' path='/control-hint-visible'/>
+										<property name='control-hint' path='/control-hint'/>
+									</directory>
+									<directory path='/settings/minimums'>
+										<property name='altitude.minimums' path='/baro-altitude'/>
+									</directory>
+									<directory path='/settings/altimeter'>
+										<property name='pressure.qnh' path='/pressure-qnh'/>
+										<property name='pressure.display-hpa' path='/pressure-in-hpa'/>
+										<property name='pressure.use-std' path='/use-std-pressure'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='fma.visible' path='/visible'/>
+										<property name='cmd.visible' path='/visible'/>
+										<property name='cmd.ias' path='/cmd-ias'/>
+										<property name='cmd.altitude' path='/cmd-altitude'/>
+										<property name='cmd.cbr' path='/cmd-vertical-speed'/>
+										<property name='flight-director.visible' path='/guidance-visible'/>
+									</directory>
+									<directory path='/sensors'>
+										<property name='speed.ias' path='/speed/ias'/>
+										<property name='slip-skid' path='/slip-skid/slip-skid'/>
+										<property name='altitude.agl' path='/radar-altimeter/agl'/>
+									</directory>
+									<directory path='/systems/fdc'>
+										<property name='speed.ias.minimum' path='/speed/ias-minimum'/>
+										<property name='speed.ias.warning' path='/speed/ias-minimum-maneuver'/>
+										<property name='speed.ias.maximum' path='/speed/ias-maximum'/>
+										<property name='speed.ias.lookahead' path='/speed/ias-lookahead'/>
+										<property name='speed.mach' path='/speed/mach'/>
+										<property name='orientation.pitch' path='/orientation/pitch'/>
+										<property name='orientation.roll' path='/orientation/roll'/>
+										<property name='orientation.heading.true' path='/orientation/true-heading'/>
+										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
+										<property name='fpm.alpha' path='/fpm/alpha'/>
+										<property name='fpm.beta' path='/fpm/beta'/>
+										<property name='aoa.alpha' path='/aoa/alpha'/>
+										<property name='aoa.pitch-limit' path='/aoa/pitch-limit'/>
+										<property name='altitude' path='/pressure-altitude/amsl'/>
+										<property name='altitude.lookahead' path='/pressure-altitude/amsl-lookahead'/>
+										<property name='altitude.cbr' path='/pressure-altitude/climb-rate'/>
+										<property name='altitude.variometer' path='/pressure-altitude/total-energy-variometer'/>
+										<property name='approach.type-hint' path='/localizer/type'/>
+										<property name='approach.localizer-id' path='/localizer/identifier'/>
+										<property name='approach.deviation.vertical' path='/localizer/vertical-deviation'/>
+										<property name='approach.deviation.lateral' path='/localizer/lateral-deviation'/>
+										<property name='approach.dme-distance' path='/localizer/distance'/>
+									</directory>
+									<directory path='/systems/flight-director'>
+										<property name='fma.speed-hint' path='/hints/speed-hint'/>
+										<property name='fma.speed-small-hint' path='/hints/speed-small-hint'/>
+										<property name='fma.lateral-hint' path='/hints/lateral-hint'/>
+										<property name='fma.lateral-small-hint' path='/hints/lateral-small-hint'/>
+										<property name='fma.vertical-hint' path='/hints/vertical-hint'/>
+										<property name='fma.vertical-small-hint' path='/hints/vertical-small-hint'/>
+										<property name='flight-director.pitch' path='/pitch'/>
+										<property name='flight-director.roll' path='/roll'/>
+									</directory>
+									<directory path='/systems/fly-by-wire/control-stick'>
+										<property name='control-stick.pitch' path='/pitch'/>
+										<property name='control-stick.roll' path='/roll'/>
+									</directory>
+								</properties>
+							</module>
+						</item>
+						<item stretch-factor='5'>
+							<module name='instruments/hsi'>
+								<properties>
+									<directory path='/settings/hsi'>
+										<property name='track.visible' path='/follow-track'/>
+										<property name='orientation.display-true-heading' path='/use-true-heading'/>
+									</directory>
+									<directory path='/settings/hsi-aux'>
+										<property name='display-mode' path='/mode'/>
+										<property name='range' path='/range'/>
+										<property name='trend-vector-range' path='/trend-vector-range'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='cmd.visible' path='/visible'/>
+										<property name='cmd.track-visible' path='/enabled'/>
+										<property name='cmd.heading' path='/cmd-magnetic-heading-and-track'/>
+									</directory>
+									<directory path='/systems/fdc'>
+										<property name='speed.gs' path='/speed/ground-speed'/>
+										<property name='speed.tas' path='/speed/true-airspeed'/>
+										<property name='track.lateral-magnetic' path='/track/lateral-magnetic'/>
+										<property name='track.delta.lateral' path='/track/lateral-delta'/>
+										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
+										<property name='orientation.heading.true' path='/orientation/true-heading'/>
+										<property name='position.source' path='/position/source'/>
+										<property name='position.latitude' path='/position/latitude'/>
+										<property name='position.longitude' path='/position/longitude'/>
+										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
+										<property name='wind.tas' path='/wind/true-airspeed'/>
+										<property name='localizer-id' path='/localizer/identifier'/>
+										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
+									</directory>
+									<directory path='/systems/rcms'>
+										<property name='home.distance.vlos' path='/home/vlos-distance'/>
+										<property name='home.distance.ground' path='/home/ground-distance'/>
+										<property name='home.true-direction' path='/home/true-direction'/>
+									</directory>
+								</properties>
+							</module>
+						</item>
+					</layout>
+				</item>
+				<separator/>
+				<item stretch-factor='4'>
+					<layout type='vertical'>
+						<item stretch-factor='6'>
+							<module name='instruments/hsi'>
+								<properties>
+									<directory path='/settings/hsi'>
+										<property name='track.visible' path='/follow-track'/>
+										<property name='orientation.display-true-heading' path='/use-true-heading'/>
+									</directory>
+									<directory path='/settings/hsi-nav'>
+										<property name='display-mode' path='/mode'/>
+										<property name='range' path='/range'/>
+										<property name='trend-vector-range' path='/trend-vector-range'/>
+									</directory>
+									<directory path='/settings/flight-director'>
+										<property name='cmd.visible' path='/visible'/>
+										<property name='cmd.track-visible' path='/enabled'/>
+										<property name='cmd.heading' path='/cmd-magnetic-heading-and-track'/>
+									</directory>
+									<directory path='/systems/fdc'>
+										<property name='speed.gs' path='/speed/ground-speed'/>
+										<property name='speed.tas' path='/speed/true-airspeed'/>
+										<property name='track.lateral-magnetic' path='/track/lateral-magnetic'/>
+										<property name='track.delta.lateral' path='/track/lateral-delta'/>
+										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
+										<property name='orientation.heading.true' path='/orientation/true-heading'/>
+										<property name='position.source' path='/position/source'/>
+										<property name='position.latitude' path='/position/latitude'/>
+										<property name='position.longitude' path='/position/longitude'/>
+										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
+										<property name='wind.tas' path='/wind/true-airspeed'/>
+										<property name='localizer-id' path='/localizer/identifier'/>
+										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
+										<property name='altitude.target.reach-distance' path='/performance/target-altitude-reach-distance'/>
+									</directory>
+								</properties>
+							</module>
+						</item>
+						<separator/>
+						<item stretch-factor='1'>
+							<layout type='horizontal'>
+								<item stretch-factor='1'>
+								</item>
+								<item stretch-factor='15'>
+									<layout type='horizontal'>
+										<item>
+											<module name='instruments/radial-indicator'>
+												<properties path='/sensors/engine'>
+													<property name='value' path='/n1'/>
+													<property name='target' path='/config/n1-target' default='18.7'/>
+													<property name='value-minimum' path='/config/n1-minimum' default='0.0'/>
+													<property name='value-warning' path='/config/n1-warning' default='107.0'/>
+													<property name='value-critical' path='/config/n1-critical' default='110.0'/>
+													<property name='value-maximum' path='/config/n1-maximum' default='110.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/radial-indicator'>
+												<properties path='/sensors/engine'>
+													<property name='value' path='/n2'/>
+													<property name='value-minimum' path='/config/n2-minimum' default='0.0'/>
+													<property name='value-warning' path='/config/n2-warning' default='107.0'/>
+													<property name='value-critical' path='/config/n2-critical' default='110.0'/>
+													<property name='value-maximum' path='/config/n2-maximum' default='110.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/radial-indicator'>
+												<properties path='/sensors/engine'>
+													<property name='value' path='/egt'/>
+													<property name='value-minimum' path='/config/egt-minimum' default='0.0'/>
+													<property name='value-maximum' path='/config/egt-maximum' default='850.0'/>
+													<property name='value-warning' path='/config/egt-warning' default='800.0'/>
+													<property name='value-critical' path='/config/egt-critical' default='850.0'/>
+													<property name='value-normal' path='/config/egt-normal' default='715.0'/>
+												</properties>
+											</module>
+										</item>
+										<item>
+											<module name='instruments/radial-indicator'>
+												<properties path='/sensors/engine'>
+													<property name='value' path='/epr'/>
+													<property name='value-minimum' path='/config/epr-minimum' default='1.0'/>
+													<property name='value-maximum' path='/config/epr-maximum' default='4.0'/>
+													<property name='value-normal' path='/config/epr-normal' default='3.0'/>
+												</properties>
+											</module>
+										</item>
+									</layout>
+								</item>
+								<item stretch-factor='1'>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</item>
+			</layout>
+		</window>
+	</windows>
+</xefis-include>
+

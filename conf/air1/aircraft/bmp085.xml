@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/bmp085'>
+		<i2c>
+			<bus>1</bus>
+			<address>0x77</address>
+		</i2c>
+		<properties>
+			<directory path='/sensors'>
+				<property name='pressure' path='/pressure/pressure'/>
+				<property name='pressure.read-interval' path='/pressure/read-interval' default='500 ms'/>
+				<property name='temperature' path='/temperature/outside.k'/>
+				<property name='temperature.read-interval' path='/temperature/read-interval' default='30 ms'/>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+

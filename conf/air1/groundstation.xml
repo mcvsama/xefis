@@ -1,0 +1,11 @@
+<?xml version='1.0'?>
+<xefis-config version='1.0'>
+	<modules>
+		<include name='groundstation/flightgear.xml'/>
+		<include name='groundstation/joystick.xml'/>
+		<include name='groundstation/mouse.xml'/>
+		<include name='groundstation/link.xml'/>
+	</modules>
+	<include name='groundstation/efis.xml'/>
+</xefis-config>
+

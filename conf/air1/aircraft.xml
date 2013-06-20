@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<xefis-config version='1.0'>
+	<modules>
+		<include name='aircraft/bmp085.xml'/>
+		<include name='aircraft/fdc.xml'/>
+		<include name='aircraft/fbw.xml'/>
+		<include name='aircraft/fd.xml'/>
+		<include name='aircraft/rcms.xml'/>
+		<include name='aircraft/link.xml'/>
+	</modules>
+</xefis-config>
+
