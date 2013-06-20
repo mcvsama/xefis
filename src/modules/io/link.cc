@@ -486,6 +486,7 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 			parse_protocol (e);
 		else if (e == "input")
 		{
+			_input_interference = e.hasAttribute ("interference");
 			parse_input_output_config (e, _udp_input_host, _udp_input_port);
 			_udp_input = new QUdpSocket();
 			_udp_input_enabled = true;
@@ -494,6 +495,7 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 		else if (e == "output")
 		{
+			_output_interference = e.hasAttribute ("interference");
 			parse_input_output_config (e, _udp_output_host, _udp_output_port);
 			_udp_output = new QUdpSocket();
 			_udp_output_enabled = true;
@@ -523,15 +525,9 @@ Link::data_updated()
 
 	if (_udp_output_enabled)
 	{
-//XXX
-auto d = [](const char* s, Blob& _output_blob) -> void {
-	fprintf(stderr, "%s: ", s);
-	for (auto i: _output_blob)
-		fprintf (stderr, "%.2x:", i);
-	fprintf(stderr, "\n");
-};
-d ("signed", _output_blob);
-
+#if XEFIS_LINK_SEND_DEBUG
+		std::clog << "io/link:send: " << to_string (_output_blob) << std::endl;
+#endif
 		_udp_output->writeDatagram (reinterpret_cast<const char*> (&_output_blob[0]), _output_blob.size(), QHostAddress (_udp_output_host), _udp_output_port);
 	}
 }
@@ -549,6 +545,9 @@ Link::got_udp_packet()
 		_udp_input->readDatagram (_input_datagram.data(), datagram_size, nullptr, nullptr);
 		_input_blob.insert (_input_blob.end(), _input_datagram.data(), _input_datagram.data() + _input_datagram.size());
 	}
+
+	if (_input_interference)
+		interfere (_input_blob);
 
 	eat (_input_blob);
 }
@@ -569,6 +568,9 @@ Link::produce (Blob& blob)
 {
 	for (Packet* p: _packets)
 		p->produce (blob);
+
+	if (_output_interference)
+		interfere (blob);
 }
 
 
@@ -643,6 +645,18 @@ Link::parse_protocol (QDomElement const& protocol)
 			throw Xefis::Exception ("all magic values have to have equal number of bytes");
 		if (!_packet_magics.insert ({ p->magic(), p }).second)
 			throw Xefis::Exception ("magic " + to_string (p->magic()) + " used for two or more packets");
+	}
+}
+
+
+void
+Link::interfere (Blob& blob)
+{
+	if (rand() % 3 == 0)
+	{
+		// Erase random byte from the input sequence:
+		Blob::iterator i = blob.begin() + (rand() % blob.size());
+		blob.erase (i, i + 1);
 	}
 }
 
