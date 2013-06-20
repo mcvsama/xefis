@@ -1,7 +1,11 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<modules>
-		<module name='io/bmp085' disabled='true'>
+		<module name='io/bmp085'>
+			<i2c>
+				<bus>1</bus>
+				<address>0x77</address>
+			</i2c>
 			<properties>
 				<directory path='/sensors'>
 					<property name='pressure' path='/pressure/pressure'/>

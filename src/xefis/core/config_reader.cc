@@ -21,7 +21,6 @@
 
 // Qt:
 #include <QtCore/QFile>
-#include <QtCore/QDir>
 #include <QtCore/QTextStream>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLayout>
@@ -50,15 +49,24 @@ ConfigReader::ConfigReader (Application* application, ModuleManager* module_mana
 void
 ConfigReader::load (QString const& path)
 {
-	_config_document = parse_file (path);
+	int last_slash = path.lastIndexOf ('/');
+	QString dirname = path.left (last_slash + 1);
+	QString basename = path.mid (last_slash + 1);
+
+	QDir cwd;
+	_current_dir = cwd.absolutePath() + '/' + dirname;
+
+	_config_document = parse_file (basename);
 	process();
+
+	_current_dir = cwd;
 }
 
 
 QDomDocument
 ConfigReader::parse_file (QString const& path)
 {
-	QFile file (path);
+	QFile file (_current_dir.absolutePath() + '/' + path);
 	QDomDocument doc;
 
 	if (!file.exists())
@@ -112,8 +120,8 @@ ConfigReader::process_includes (QDomElement parent)
 			QString dirname = filename.left (last_slash + 1);
 			QString basename = filename.mid (last_slash + 1);
 
-			QDir cwd;
-			::chdir (dirname.toStdString().c_str());
+			QDir cwd = _current_dir;
+			_current_dir = _current_dir.absolutePath() + '/' + dirname;
 
 			QDomDocument sub_doc = parse_file (basename);
 			process_includes (sub_doc.documentElement());
@@ -124,7 +132,7 @@ ConfigReader::process_includes (QDomElement parent)
 				parent.insertBefore (node, e);
 			}
 
-			::chdir (cwd.absolutePath().toStdString().c_str());
+			_current_dir = cwd;
 		}
 		else
 			process_includes (e);

@@ -19,6 +19,7 @@
 #include <stdexcept>
 
 // Qt:
+#include <QtCore/QDir>
 #include <QtXml/QDomElement>
 #include <QtXml/QDomDocument>
 #include <QtWidgets/QLayout>
@@ -78,6 +79,7 @@ class ConfigReader
 	Application*	_application		= nullptr;
 	ModuleManager*	_module_manager		= nullptr;
 	QDomDocument	_config_document;
+	QDir			_current_dir;
 };
 
 
