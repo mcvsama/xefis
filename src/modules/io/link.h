@@ -20,6 +20,7 @@
 #include <vector>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
 
 // Xefis:
@@ -281,6 +282,12 @@ class Link:
 	void
 	got_udp_packet();
 
+	/**
+	 * Called by output timer.
+	 */
+	void
+	send_output();
+
   private:
 	Blob::size_type
 	size() const;
@@ -307,6 +314,7 @@ class Link:
 	to_string (Blob const&);
 
   private:
+	QTimer*					_output_timer			= nullptr;
 	Xefis::PropertyBoolean	_link_valid;
 	Xefis::PropertyInteger	_reacquires;
 	Xefis::PropertyInteger	_error_bytes;
