@@ -655,7 +655,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 	if (ItemStream::eat (begin, begin + data_size) != begin + data_size)
 		throw ParseError();
 
-	return end;
+	return begin + whole_size;
 }
 
 
@@ -717,16 +717,16 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 	};
 
-	Frequency output_frequency;
-	Time failsafe_after;
-	Time reacquire_after;
+	Frequency output_frequency = 1_Hz;
+	Time failsafe_after = 1_ms;
+	Time reacquire_after = 1_ms;
 
 	for (QDomElement& e: config)
 	{
 		if (e == "properties")
 		{
 			parse_properties (e, {
-				{ "link-valid", _link_valid, true },
+				{ "link-valid", _link_valid_prop, false },
 				{ "failsafes", _failsafes, false },
 				{ "reacquires", _reacquires, false },
 				{ "error-bytes", _error_bytes, false },
@@ -770,7 +770,7 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_input_blob.reserve (2 * size());
 	_output_blob.reserve (2 * size());
 
-	_link_valid.set_default (false);
+	_link_valid_prop.set_default (false);
 	_failsafes.set_default (0);
 	_reacquires.set_default (0);
 	_error_bytes.set_default (0);
@@ -780,7 +780,6 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_failsafe_timer->setSingleShot (true);
 	_failsafe_timer->setInterval (failsafe_after.ms());
 	QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
-	_failsafe_timer->start();
 
 	_reacquire_timer = new QTimer (this);
 	_reacquire_timer->setSingleShot (true);
@@ -845,7 +844,9 @@ Link::send_output()
 void
 Link::failsafe()
 {
-	_link_valid.write (false);
+	if (_link_valid_prop.valid())
+		_link_valid_prop.write (false);
+	_link_valid = false;
 	_failsafes.write (*_failsafes + 1);
 	for (Packet* p: _packets)
 		p->failsafe();
@@ -855,7 +856,9 @@ Link::failsafe()
 void
 Link::reacquire()
 {
-	_link_valid.write (true);
+	if (_link_valid_prop.valid())
+		_link_valid_prop.write (true);
+	_link_valid = true;
 	_reacquires.write (*_reacquires + 1);
 }
 
@@ -887,6 +890,7 @@ Link::eat (Blob& blob)
 	Blob _tmp_input_magic;
 	_tmp_input_magic.resize (_magic_size);
 
+	bool applied = false;
 	while (blob.size() > _magic_size + 1)
 	{
 		try {
@@ -906,7 +910,8 @@ Link::eat (Blob& blob)
 
 			Blob::iterator e = packet->eat (blob.begin() + _magic_size, blob.end());
 			blob.erase (blob.begin(), e);
-			apply();
+			packet->apply();
+			applied = true;
 
 			if (_valid_packets.valid())
 				_valid_packets.write (*_valid_packets + 1);
@@ -916,7 +921,7 @@ Link::eat (Blob& blob)
 
 			// If link is not valid, and we got valid packet,
 			// start reacquire timer:
-			if (!*_link_valid && !_reacquire_timer->isActive())
+			if (!_link_valid && !_reacquire_timer->isActive())
 				_reacquire_timer->start();
 		}
 		catch (...)
@@ -931,16 +936,9 @@ Link::eat (Blob& blob)
 			_reacquire_timer->stop();
 		}
 	}
-}
 
-
-void
-Link::apply()
-{
-	for (Packet* p: _packets)
-		p->apply();
-
-	signal_data_updated();
+	if (applied)
+		signal_data_updated();
 }
 
 
@@ -964,6 +962,9 @@ Link::parse_protocol (QDomElement const& protocol)
 		if (!_packet_magics.insert ({ p->magic(), p }).second)
 			throw Xefis::Exception ("magic " + to_string (p->magic()) + " used for two or more packets");
 	}
+
+	if (_packets.empty())
+		throw Xefis::Exception ("protocol must not be empty");
 }
 
 
