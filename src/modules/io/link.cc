@@ -364,38 +364,134 @@ template<class SIType>
 	}
 
 
-Link::BitfieldItem::BitfieldItem (Link*, QDomElement&)
+Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 {
-	// TODO
+	for (QDomElement& e: element)
+	{
+		if (e == "property")
+		{
+			if (!e.hasAttribute ("type"))
+				throw Xefis::Exception ("<property> needs attribute 'type'");
+			if (!e.hasAttribute ("path"))
+				throw Xefis::Exception ("<property> needs attribute 'path'");
+
+			BitSource bs;
+
+			QString s_type = e.attribute ("type");
+			QString s_path = e.attribute ("path");
+
+			if (s_type == "boolean")
+			{
+				bs.is_boolean = true;
+				bs.bits = 1;
+				bs.property_boolean.set_path (e.attribute ("path").toStdString());
+			}
+			else if (s_type == "integer")
+			{
+				if (!e.hasAttribute ("bits"))
+					throw Xefis::Exception ("<property> of type 'integer' needs attribute 'bits'");
+
+				bs.is_boolean = false;
+				bs.property_integer.set_path (e.attribute ("path").toStdString());
+				bs.bits = e.attribute ("bits").toUInt();
+			}
+			else
+				throw Xefis::Exception ("attribute 'type' of <property> must be 'boolean' or 'integer'");
+
+			_bit_sources.push_back (bs);
+		}
+	}
+
+	Blob::size_type total_bits = 0;
+	for (BitSource const& bs: _bit_sources)
+		total_bits += bs.bits;
+
+	_size = (total_bits + 7) / 8;
 }
 
 
 Link::Blob::size_type
 Link::BitfieldItem::size() const
 {
-	// TODO
-	return 0;
+	return _size;
 }
 
 
 void
-Link::BitfieldItem::produce (Blob&)
+Link::BitfieldItem::produce (Blob& blob)
 {
-	// TODO
+	std::vector<bool> bits;
+	bits.reserve (8 * size());
+
+	for (BitSource const& bs: _bit_sources)
+	{
+		if (bs.is_boolean)
+			bits.push_back (*bs.property_boolean);
+		else
+		{
+			Xefis::PropertyInteger::Type value = *bs.property_integer;
+			for (uint8_t b = 0; b < bs.bits; ++b)
+				bits.push_back ((value >> b) & 1);
+		}
+	}
+
+	bits.resize (8 * size(), 0);
+
+	for (std::vector<bool>::size_type b = 0; b < bits.size(); b += 8)
+	{
+		uint8_t byte = 0;
+		for (std::vector<bool>::size_type k = 0; k < 8; ++k)
+			if (bits[k + b])
+				byte |= 1 << k;
+		blob.push_back (byte);
+	}
 }
 
 
 Link::Blob::iterator
-Link::BitfieldItem::eat (Blob::iterator begin, Blob::iterator)
+Link::BitfieldItem::eat (Blob::iterator begin, Blob::iterator end)
 {
-	return begin;
+	if (std::distance (begin, end) < static_cast<Blob::difference_type> (size()))
+		throw ParseError();
+
+	std::vector<bool> bits;
+	bits.reserve (8 * size());
+
+	for (Blob::iterator cur = begin; cur < begin + size(); ++cur)
+		for (uint8_t b = 0; b < 8; ++b)
+			bits.push_back ((*cur >> b) & 1);
+
+	std::vector<bool>::iterator bit = bits.begin();
+	for (BitSource& bs: _bit_sources)
+	{
+		if (bs.is_boolean)
+			bs.boolean_value = *bit;
+		else
+		{
+			Xefis::PropertyInteger::Type value = 0;
+			for (uint8_t b = 0; b < bs.bits; ++b)
+				if (*(bit + b))
+					value |= 1 << b;
+			bs.integer_value = value;
+		}
+
+		std::advance (bit, bs.bits);
+	}
+
+	return begin + size();
 }
 
 
 void
 Link::BitfieldItem::apply()
 {
-	// TODO
+	for (BitSource& bs: _bit_sources)
+	{
+		if (bs.is_boolean)
+			bs.property_boolean.write (bs.boolean_value);
+		else
+			bs.property_integer.write (bs.integer_value);
+	}
 }
 
 
@@ -560,7 +656,8 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{
 			parse_properties (e, {
 				{ "link-valid", _link_valid, true },
-				{ "errors", _errors, false },
+				{ "reacquires", _reacquires, false },
+				{ "error-bytes", _error_bytes, false },
 				{ "valid-packets", _valid_packets, false },
 				{ "failsafe.count", _failsafe_count, false },
 				{ "failsafe.lost-time", _failsafe_lost_time, false },
@@ -590,7 +687,8 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_input_blob.reserve (2 * size());
 	_output_blob.reserve (2 * size());
 
-	_errors.set_default (0);
+	_reacquires.set_default (0);
+	_error_bytes.set_default (0);
 	_valid_packets.set_default (0);
 }
 
@@ -695,8 +793,10 @@ Link::eat (Blob& blob)
 			// Skip one byte and try again:
 			if (blob.size() >= 1)
 				blob.erase (blob.begin(), blob.begin() + 1);
-			if (_last_parse_was_valid && _errors.valid())
-				_errors.write (*_errors + 1);
+			if (_last_parse_was_valid && _reacquires.valid())
+				_reacquires.write (*_reacquires + 1);
+			if (_error_bytes.valid())
+				_error_bytes.write (*_error_bytes + 1);
 			_last_parse_was_valid = false;
 		}
 	}
