@@ -20,7 +20,6 @@
 #include <QtXml/QDomElement>
 
 // Lib:
-#include <half/half.hpp>
 #include <boost/endian/conversion.hpp>
 
 // Xefis:
@@ -90,111 +89,148 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		throw Xefis::Exception ("<property> needs attribute 'type'");
 
 	QString type_attr = element.attribute ("type");
-	if (type_attr == "float16")
-		_type = Type::Float16;
-	else if (type_attr == "float32")
-		_type = Type::Float32;
-	else if (type_attr == "float64")
-		_type = Type::Float64;
-	else if (type_attr == "int8")
-		_type = Type::Int8;
-	else if (type_attr == "int16")
-		_type = Type::Int16;
-	else if (type_attr == "int32")
-		_type = Type::Int32;
-	else if (type_attr == "int64")
-		_type = Type::Int64;
+
+	if (type_attr == "integer")
+		_type = Type::Integer;
+	else if (type_attr == "float")
+		_type = Type::Float;
+	else if (type_attr == "angle")
+		_type = Type::Angle;
+	else if (type_attr == "frequency")
+		_type = Type::Frequency;
+	else if (type_attr == "length")
+		_type = Type::Length;
+	else if (type_attr == "pressure")
+		_type = Type::Pressure;
+	else if (type_attr == "speed")
+		_type = Type::Speed;
+	else if (type_attr == "time")
+		_type = Type::Time;
 
 	if (_type == Type::Unknown)
 		throw Xefis::Exception ("unknown type: " + type_attr.toStdString());
 
+	switch (_type)
+	{
+		case Type::Integer:
+		case Type::Float:
+		case Type::Angle:
+		case Type::Frequency:
+		case Type::Length:
+		case Type::Pressure:
+		case Type::Speed:
+		case Type::Time:
+			if (!element.hasAttribute ("bytes"))
+				throw Xefis::Exception (QString ("<property> of type %1 needs attribute 'bytes'").arg (element.attribute ("type")).toStdString());
+		default:
+			;
+	}
+
+	if (element.hasAttribute ("bytes"))
+	{
+		_bytes = element.attribute ("bytes").toUInt();
+		switch (_type)
+		{
+			case Type::Integer:
+				if (_bytes != 1 && _bytes != 2 && _bytes != 4 && _bytes != 8)
+					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 1, 2, 4 or 8").arg (_bytes).toStdString());
+			case Type::Float:
+			case Type::Angle:
+			case Type::Frequency:
+			case Type::Length:
+			case Type::Pressure:
+			case Type::Speed:
+			case Type::Time:
+				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
+					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 2, 4 or 8").arg (_bytes).toStdString());
+			case Type::Unknown:
+				// Impossible.
+				;
+		}
+	}
+
 	if (!element.hasAttribute ("path"))
 		throw Xefis::Exception ("<property> needs attribute 'path'");
 
-	_property.set_path (element.attribute ("path").toStdString());
+	std::string path = element.attribute ("path").toStdString();
+	_property_integer.set_path (path);
+	_property_float.set_path (path);
+	_property_angle.set_path (path);
+	_property_frequency.set_path (path);
+	_property_pressure.set_path (path);
+	_property_speed.set_path (path);
+	_property_time.set_path (path);
 }
 
 
 inline Link::Blob::size_type
 Link::PropertyItem::size() const
 {
-	switch (_type)
-	{
-		case Type::Int64:
-		case Type::Float64:
-			return 8;
-
-		case Type::Int32:
-		case Type::Float32:
-			return 4;
-
-		case Type::Int16:
-		case Type::Float16:
-			return 2;
-
-		case Type::Int8:
-			return 1;
-
-		case Type::Unknown:
-			// Impossible.
-			break;
-	}
-
-	return 0;
+	return _bytes;
 }
 
 
 void
 Link::PropertyItem::produce (Blob& blob)
 {
-	using namespace boost::endian;
+	enum class Kind { Integer, Float };
+
+	Kind kind = Kind::Integer;
+	Xefis::PropertyInteger::Type integer_value = 0;
+	Xefis::PropertyFloat::Type float_value = 0.f;
+
+#define XEFIS_CASE_FLOAT(type, property) \
+	case Type::type: \
+		kind = Kind::Float; \
+		float_value = _property_##property.read().internal(); \
+		break;
 
 	switch (_type)
 	{
-		case Type::Int64:
+		case Type::Integer:
+			kind = Kind::Integer;
+			integer_value = *_property_integer;
 			break;
 
-		case Type::Int32:
+		case Type::Float:
+			kind = Kind::Float;
+			float_value = *_property_float;
 			break;
 
-		case Type::Int16:
-			break;
-
-		case Type::Int8:
-			break;
-
-		case Type::Float64:
-		{
-			double f64 = *_property;
-			uint64_t* i64 = reinterpret_cast<uint64_t*> (&f64);
-			native_to_little (*i64);
-			for (int shift = 0; shift < 64; shift += 8)
-				blob.push_back ((*i64 >> shift) & 0xff);
-			break;
-		}
-
-		case Type::Float32:
-		{
-			float f32 = *_property;
-			uint32_t* i32 = reinterpret_cast<uint32_t*> (&f32);
-			native_to_little (*i32);
-			for (int shift = 0; shift < 32; shift += 8)
-				blob.push_back ((*i32 >> shift) & 0xff);
-			break;
-		}
-
-		case Type::Float16:
-		{
-			half_float::half f16 (*_property);
-			uint16_t* i16 = reinterpret_cast<uint16_t*> (&f16);
-			native_to_little (*i16);
-			for (int shift = 0; shift < 16; shift += 8)
-				blob.push_back ((*i16 >> shift) & 0xff);
-			break;
-		}
+		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Frequency, frequency);
+		XEFIS_CASE_FLOAT (Length, length);
+		XEFIS_CASE_FLOAT (Pressure, pressure);
+		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Time, time);
 
 		case Type::Unknown:
 			// Impossible.
+			break;
+	}
+
+#undef XEFIS_CASE_FLOAT
+
+	switch (kind)
+	{
+		case Kind::Integer:
+			if (_bytes == 1)
+				serialize<int8_t> (blob, integer_value);
+			else if (_bytes == 2)
+				serialize<int16_t> (blob, integer_value);
+			else if (_bytes == 4)
+				serialize<int32_t> (blob, integer_value);
+			else if (_bytes == 8)
+				serialize<int64_t> (blob, integer_value);
+			break;
+
+		case Kind::Float:
+			if (_bytes == 2)
+				serialize<float16_t> (blob, float_value);
+			else if (_bytes == 4)
+				serialize<float32_t> (blob, float_value);
+			else if (_bytes == 8)
+				serialize<float64_t> (blob, float_value);
 			break;
 	}
 }
@@ -203,68 +239,52 @@ Link::PropertyItem::produce (Blob& blob)
 Link::Blob::iterator
 Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 {
-	using namespace boost::endian;
-
 	Blob::iterator result = begin;
+
+	enum class Kind { Integer, Float };
+
+	Kind kind = Kind::Integer;
 
 	switch (_type)
 	{
-		case Type::Int64:
+		case Type::Integer:
+			kind = Kind::Integer;
 			break;
 
-		case Type::Int32:
+		case Type::Float:
+		case Type::Angle:
+		case Type::Frequency:
+		case Type::Length:
+		case Type::Pressure:
+		case Type::Speed:
+		case Type::Time:
+			kind = Kind::Float;
 			break;
-
-		case Type::Int16:
-			break;
-
-		case Type::Int8:
-			break;
-
-		case Type::Float64:
-		{
-			if (std::distance (begin, end) < 8)
-				throw ParseError();
-
-			double f64 = 0;
-			uint64_t* i64 = reinterpret_cast<uint64_t*> (&f64);
-			std::copy (begin, begin + 8, reinterpret_cast<uint8_t*> (i64));
-			little_to_native (*i64);
-			_value = f64;
-			result = begin + 8;
-			break;
-		}
-
-		case Type::Float32:
-		{
-			if (std::distance (begin, end) < 4)
-				throw ParseError();
-
-			float f32 = 0;
-			uint32_t* i32 = reinterpret_cast<uint32_t*> (&f32);
-			std::copy (begin, begin + 4, reinterpret_cast<uint8_t*> (i32));
-			little_to_native (*i32);
-			_value = f32;
-			result = begin + 4;
-			break;
-		}
-
-		case Type::Float16:
-		{
-			if (std::distance (begin, end) < 2)
-				throw ParseError();
-
-			half_float::half f16;
-			uint16_t* i16 = reinterpret_cast<uint16_t*> (&f16);
-			std::copy (begin, begin + 2, reinterpret_cast<uint8_t*> (i16));
-			little_to_native (*i16);
-			_value = f16;
-			result = begin + 2;
-			break;
-		}
 
 		case Type::Unknown:
-			// Impossible.
+			throw std::logic_error ("impossible (1)");
+	}
+
+	switch (kind)
+	{
+		case Kind::Integer:
+			if (_bytes == 1)
+				result = unserialize<int8_t> (begin, end, _integer_value);
+			else if (_bytes == 2)
+				result = unserialize<int16_t> (begin, end, _integer_value);
+			else if (_bytes == 4)
+				result = unserialize<int32_t> (begin, end, _integer_value);
+			else if (_bytes == 8)
+				result = unserialize<int64_t> (begin, end, _integer_value);
+			break;
+
+		case Kind::Float:
+			if (_bytes == 2)
+				result = unserialize<float16_t> (begin, end, _float_value);
+			else if (_bytes == 4)
+				result = unserialize<float32_t> (begin, end, _float_value);
+			else if (_bytes == 8)
+				result = unserialize<float64_t> (begin, end, _float_value);
 			break;
 	}
 
@@ -275,8 +295,73 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 void
 Link::PropertyItem::apply()
 {
-	_property.write (_value);
+#define XEFIS_CASE_FLOAT(type, property) \
+	case Type::type: \
+		_property_##property.write (si_from_internal<type> (_float_value)); \
+		break;
+
+	switch (_type)
+	{
+		case Type::Integer:
+			_property_integer.write (_integer_value);
+			break;
+
+		case Type::Float:
+			_property_float.write (_float_value);
+			break;
+
+		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Frequency, frequency);
+		XEFIS_CASE_FLOAT (Length, length);
+		XEFIS_CASE_FLOAT (Pressure, pressure);
+		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Time, time);
+
+		case Type::Unknown:
+			// Impossible.
+			;
+	}
+
+#undef XEFIS_CASE_FLOAT
 }
+
+
+template<class CastType, class SourceType>
+	inline void
+	Link::PropertyItem::serialize (Blob& blob, SourceType src)
+	{
+		std::size_t size = sizeof (CastType);
+		CastType casted (src);
+		boost::endian::native_to_little (casted);
+		uint8_t* ptr = reinterpret_cast<uint8_t*> (&casted);
+		blob.resize (blob.size() + size);
+		std::copy (ptr, ptr + size, &blob[blob.size() - size]);
+	}
+
+
+template<class CastType, class SourceType>
+	inline Link::Blob::iterator
+	Link::PropertyItem::unserialize (Blob::iterator begin, Blob::iterator end, SourceType& src)
+	{
+		if (static_cast<std::size_t> (std::distance (begin, end)) < sizeof (CastType))
+			throw ParseError();
+		std::size_t size = sizeof (CastType);
+		CastType casted;
+		std::copy (begin, begin + size, reinterpret_cast<uint8_t*> (&casted));
+		boost::endian::little_to_native (casted);
+		src = casted;
+		return begin + size;
+	}
+
+
+template<class SIType>
+	inline SIType
+	Link::PropertyItem::si_from_internal (Xefis::PropertyFloat::Type float_value)
+	{
+		SIType t;
+		t.internal() = float_value;
+		return t;
+	}
 
 
 Link::BitfieldItem::BitfieldItem (Link*, QDomElement&)

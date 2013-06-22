@@ -20,14 +20,14 @@
 #include <limits>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Speed: public Value<double, Speed>
+class Speed: public LinearValue<double, Speed>
 {
-	friend class Value<double, Speed>;
+	friend class LinearValue<double, Speed>;
 	friend constexpr Speed operator"" _kt (long double);
 	friend constexpr Speed operator"" _kt (unsigned long long);
 	friend constexpr Speed operator"" _kph (long double);
@@ -80,7 +80,7 @@ class Speed: public Value<double, Speed>
 
 inline constexpr
 Speed::Speed (ValueType kt):
-	Value (kt)
+	LinearValue (kt)
 { }
 
 

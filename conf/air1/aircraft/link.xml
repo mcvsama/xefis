@@ -9,27 +9,17 @@
 			<property name='failsafe.lost-time' path='/link/failsafe-lost-time' default='500 ms'/>
 			<property name='failsafe.acquired-time' path='/link/failsafe-acquired-time' default='100 ms'/>
 		</properties>
-		<!--output>
-			<udp>
-				<host>127.0.0.1</host>
-				<port>9951</port>
-			</udp>
-		</output-->
-		<input>
+		<output>
 			<udp>
 				<host>192.168.0.1</host>
 				<port>9951</port>
 			</udp>
-		</input>
+		</output>
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='2' signature-bytes='4' key='00:11:22:33'>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
 					<property type='float' bytes='4' path='/sensors/temperature/outside.k'/>
-					<!--bitfield>
-						<boolean path='/input/...'/>
-						<int bits='2' path='/...'/>
-					</bitfield-->
 				</signature>
 			</packet>
 		</protocol>

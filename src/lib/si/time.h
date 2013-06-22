@@ -23,14 +23,14 @@
 #include <sys/time.h>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Time: public Value<double, Time>
+class Time: public LinearValue<double, Time>
 {
-	friend class Value<double, Time>;
+	friend class LinearValue<double, Time>;
 	friend constexpr Time operator"" _ns (long double);
 	friend constexpr Time operator"" _ns (unsigned long long);
 	friend constexpr Time operator"" _us (long double);
@@ -99,7 +99,7 @@ class Time: public Value<double, Time>
 
 inline constexpr
 Time::Time (ValueType seconds):
-	Value (seconds)
+	LinearValue (seconds)
 { }
 
 

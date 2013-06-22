@@ -28,10 +28,6 @@
 #include <xefis/core/property.h>
 
 
-// Will print sent data on std::clog if 1:
-#define XEFIS_LINK_DEBUG_SEND 0
-
-
 class Link:
 	public QObject,
 	public Xefis::Module
@@ -122,13 +118,14 @@ class Link:
 		enum class Type
 		{
 			Unknown,
-			Float16,
-			Float32,
-			Float64,
-			Int8,
-			Int16,
-			Int32,
-			Int64,
+			Integer,
+			Float,
+			Angle,
+			Pressure,
+			Frequency,
+			Length,
+			Time,
+			Speed,
 		};
 
 	  public:
@@ -147,9 +144,40 @@ class Link:
 		apply() override;
 
 	  private:
-		Type						_type;
-		Xefis::PropertyFloat		_property;
-		Xefis::PropertyFloat::Type	_value;
+		/**
+		 * Serialize SourceType and add to Blob.
+		 */
+		template<class CastType, class SourceType>
+			void
+			serialize (Blob&, SourceType);
+
+		/**
+		 * Unserialize data from Blob and put it to src.
+		 */
+		template<class CastType, class SourceType>
+			Blob::iterator
+			unserialize (Blob::iterator begin, Blob::iterator end, SourceType&);
+
+		/**
+		 * Set SI property by SI's value internal representation.
+		 */
+		template<class SIType>
+			SIType
+			si_from_internal (Xefis::PropertyFloat::Type float_value);
+
+	  private:
+		Type							_type				= Type::Unknown;
+		uint8_t							_bytes				= 0;
+		Xefis::PropertyInteger			_property_integer;
+		Xefis::PropertyFloat			_property_float;
+		Xefis::PropertyAngle			_property_angle;
+		Xefis::PropertyPressure			_property_pressure;
+		Xefis::PropertyFrequency		_property_frequency;
+		Xefis::PropertyLength			_property_length;
+		Xefis::PropertyTime				_property_time;
+		Xefis::PropertySpeed			_property_speed;
+		Xefis::PropertyInteger::Type	_integer_value;
+		Xefis::PropertyFloat::Type		_float_value;
 	};
 
 	class BitfieldItem: public Item
