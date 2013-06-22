@@ -3,14 +3,12 @@
 	<module name='io/link'>
 		<properties>
 			<property name='link-valid' path='/link/valid'/>
+			<property name='failsafes' path='/link/failsafes'/>
 			<property name='reacquires' path='/link/reacquires'/>
 			<property name='error-bytes' path='/link/error-bytes'/>
 			<property name='valid-packets' path='/link/valid-packets'/>
-			<property name='failsafe.count' path='/link/failsafe-count'/>
-			<property name='failsafe.lost-time' path='/link/failsafe-lost-time' default='500 ms'/>
-			<property name='failsafe.acquired-time' path='/link/failsafe-acquired-time' default='100 ms'/>
 		</properties>
-		<output>
+		<output frequency='30 Hz'>
 			<udp>
 				<host>192.168.0.1</host>
 				<port>9951</port>
