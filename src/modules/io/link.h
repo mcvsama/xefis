@@ -28,6 +28,10 @@
 #include <xefis/core/property.h>
 
 
+#define XEFIS_LINK_SEND_DEBUG 0
+#define XEFIS_LINK_RECV_DEBUG 0
+
+
 class Link:
 	public QObject,
 	public Xefis::Module
