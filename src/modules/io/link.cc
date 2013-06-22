@@ -83,6 +83,14 @@ Link::ItemStream::apply()
 }
 
 
+void
+Link::ItemStream::failsafe()
+{
+	for (Item* item: _items)
+		item->failsafe();
+}
+
+
 Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 {
 	if (!element.hasAttribute ("type"))
@@ -338,6 +346,40 @@ Link::PropertyItem::apply()
 }
 
 
+void
+Link::PropertyItem::failsafe()
+{
+#define XEFIS_CASE_FLOAT(type, property) \
+	case Type::type: \
+		_property_##property.set_nil(); \
+		break;
+
+	switch (_type)
+	{
+		case Type::Integer:
+			_property_integer.set_nil();
+			break;
+
+		case Type::Float:
+			_property_float.set_nil();
+			break;
+
+		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Frequency, frequency);
+		XEFIS_CASE_FLOAT (Length, length);
+		XEFIS_CASE_FLOAT (Pressure, pressure);
+		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Time, time);
+
+		case Type::Unknown:
+			// Impossible.
+			;
+	}
+
+#undef XEFIS_CASE_FLOAT
+}
+
+
 template<class CastType, class SourceType>
 	inline void
 	Link::PropertyItem::serialize (Blob& blob, SourceType src)
@@ -507,6 +549,19 @@ Link::BitfieldItem::apply()
 }
 
 
+void
+Link::BitfieldItem::failsafe()
+{
+	for (BitSource& bs: _bit_sources)
+	{
+		if (bs.is_boolean)
+			bs.property_boolean.set_nil();
+		else
+			bs.property_integer.set_nil();
+	}
+}
+
+
 Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 	ItemStream (link, element),
 	_rd(),
@@ -663,6 +718,8 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	};
 
 	Frequency output_frequency;
+	Time failsafe_after;
+	Time reacquire_after;
 
 	for (QDomElement& e: config)
 	{
@@ -670,19 +727,26 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{
 			parse_properties (e, {
 				{ "link-valid", _link_valid, true },
+				{ "failsafes", _failsafes, false },
 				{ "reacquires", _reacquires, false },
 				{ "error-bytes", _error_bytes, false },
 				{ "valid-packets", _valid_packets, false },
-				{ "failsafe.count", _failsafe_count, false },
-				{ "failsafe.lost-time", _failsafe_lost_time, false },
-				{ "failsafe.acquired-time", _failsafe_acquired_time, false },
 			});
 		}
 		else if (e == "protocol")
 			parse_protocol (e);
 		else if (e == "input")
 		{
+			if (!e.hasAttribute ("failsafe-after"))
+				throw Xefis::Exception ("<input> needs attribute 'failsafe-after'");
+			failsafe_after.parse (e.attribute ("failsafe-after").toStdString());
+
+			if (!e.hasAttribute ("reacquire-after"))
+				throw Xefis::Exception ("<input> needs attribute 'reacquire-after'");
+			reacquire_after.parse (e.attribute ("reacquire-after").toStdString());
+
 			_input_interference = e.hasAttribute ("interference");
+
 			parse_input_output_config (e, _udp_input_host, _udp_input_port);
 			_udp_input = new QUdpSocket();
 			_udp_input_enabled = true;
@@ -693,20 +757,35 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{
 			if (!e.hasAttribute ("frequency"))
 				throw Xefis::Exception ("<output> needs attribute 'frequency'");
+			output_frequency.parse (e.attribute ("frequency").toStdString());
+
 			_output_interference = e.hasAttribute ("interference");
+
 			parse_input_output_config (e, _udp_output_host, _udp_output_port);
 			_udp_output = new QUdpSocket();
 			_udp_output_enabled = true;
-			output_frequency.parse (e.attribute ("frequency").toStdString());
 		}
 	}
 
 	_input_blob.reserve (2 * size());
 	_output_blob.reserve (2 * size());
 
+	_link_valid.set_default (false);
+	_failsafes.set_default (0);
 	_reacquires.set_default (0);
 	_error_bytes.set_default (0);
 	_valid_packets.set_default (0);
+
+	_failsafe_timer = new QTimer (this);
+	_failsafe_timer->setSingleShot (true);
+	_failsafe_timer->setInterval (failsafe_after.ms());
+	QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
+	_failsafe_timer->start();
+
+	_reacquire_timer = new QTimer (this);
+	_reacquire_timer->setSingleShot (true);
+	_reacquire_timer->setInterval (reacquire_after.ms());
+	QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
 
 	_output_timer = new QTimer (this);
 	_output_timer->setSingleShot (false);
@@ -763,6 +842,24 @@ Link::send_output()
 }
 
 
+void
+Link::failsafe()
+{
+	_link_valid.write (false);
+	_failsafes.write (*_failsafes + 1);
+	for (Packet* p: _packets)
+		p->failsafe();
+}
+
+
+void
+Link::reacquire()
+{
+	_link_valid.write (true);
+	_reacquires.write (*_reacquires + 1);
+}
+
+
 inline Link::Blob::size_type
 Link::size() const
 {
@@ -811,20 +908,27 @@ Link::eat (Blob& blob)
 			blob.erase (blob.begin(), e);
 			apply();
 
-			_last_parse_was_valid = true;
 			if (_valid_packets.valid())
 				_valid_packets.write (*_valid_packets + 1);
+
+			// Restart failsafe timer:
+			_failsafe_timer->start();
+
+			// If link is not valid, and we got valid packet,
+			// start reacquire timer:
+			if (!*_link_valid && !_reacquire_timer->isActive())
+				_reacquire_timer->start();
 		}
 		catch (...)
 		{
 			// Skip one byte and try again:
 			if (blob.size() >= 1)
 				blob.erase (blob.begin(), blob.begin() + 1);
-			if (_last_parse_was_valid && _reacquires.valid())
-				_reacquires.write (*_reacquires + 1);
 			if (_error_bytes.valid())
 				_error_bytes.write (*_error_bytes + 1);
-			_last_parse_was_valid = false;
+
+			// Since there was an error, stop reacquire timer:
+			_reacquire_timer->stop();
 		}
 	}
 }

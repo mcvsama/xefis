@@ -88,6 +88,12 @@ class Link:
 		 */
 		virtual void
 		apply() = 0;
+
+		/**
+		 * Set all managed properties to nil.
+		 */
+		virtual void
+		failsafe() = 0;
 	};
 
 	class ItemStream: public Item
@@ -113,6 +119,9 @@ class Link:
 
 		void
 		apply() override;
+
+		void
+		failsafe() override;
 
 	  private:
 		Items	_items;
@@ -147,6 +156,9 @@ class Link:
 
 		void
 		apply() override;
+
+		void
+		failsafe() override;
 
 	  private:
 		/**
@@ -214,6 +226,9 @@ class Link:
 
 		void
 		apply() override;
+
+		void
+		failsafe() override;
 
 	  private:
 		BitSources		_bit_sources;
@@ -285,6 +300,18 @@ class Link:
 	void
 	send_output();
 
+	/**
+	 * Called by failsafe timer.
+	 */
+	void
+	failsafe();
+
+	/**
+	 * Called by reacquire timer.
+	 */
+	void
+	reacquire();
+
   private:
 	Blob::size_type
 	size() const;
@@ -311,14 +338,14 @@ class Link:
 	to_string (Blob const&);
 
   private:
-	QTimer*					_output_timer			= nullptr;
+	QTimer*					_failsafe_timer;
+	QTimer*					_reacquire_timer;
+	QTimer*					_output_timer;
 	Xefis::PropertyBoolean	_link_valid;
+	Xefis::PropertyInteger	_failsafes;
 	Xefis::PropertyInteger	_reacquires;
 	Xefis::PropertyInteger	_error_bytes;
 	Xefis::PropertyInteger	_valid_packets;
-	Xefis::PropertyInteger	_failsafe_count;
-	Xefis::PropertyTime		_failsafe_lost_time;
-	Xefis::PropertyTime		_failsafe_acquired_time;
 	bool					_udp_output_enabled		= false;
 	QUdpSocket*				_udp_output				= nullptr;
 	QString					_udp_output_host;
@@ -334,7 +361,6 @@ class Link:
 	Blob					_output_blob;
 	Blob					_input_blob;
 	Blob					_tmp_input_magic;
-	bool					_last_parse_was_valid	= false;
 	bool					_input_interference		= false;
 	bool					_output_interference	= false;
 };
