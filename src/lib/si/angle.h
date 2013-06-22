@@ -24,14 +24,14 @@
 #include <boost/lexical_cast.hpp>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Angle: public Value<double, Angle>
+class Angle: public LinearValue<double, Angle>
 {
-	friend class Value<double, Angle>;
+	friend class LinearValue<double, Angle>;
 	friend constexpr Angle operator"" _rad (long double);
 	friend constexpr Angle operator"" _rad (unsigned long long);
 	friend constexpr Angle operator"" _deg (long double);
@@ -74,7 +74,7 @@ class Angle: public Value<double, Angle>
 
 inline constexpr
 Angle::Angle (ValueType radians):
-	Value (radians)
+	LinearValue (radians)
 { }
 
 

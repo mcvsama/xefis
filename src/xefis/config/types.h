@@ -23,6 +23,7 @@
 
 // Lib:
 #include <lib/si/all.h>
+#include <lib/half/half.hpp>
 
 
 using namespace SI;
@@ -40,6 +41,11 @@ operator"" _qstr (const char* string, size_t)
 {
     return QString (string);
 }
+
+
+typedef half_float::half	float16_t;
+typedef float				float32_t;
+typedef double				float64_t;
 
 #endif
 

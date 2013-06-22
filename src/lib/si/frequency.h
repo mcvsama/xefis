@@ -19,14 +19,14 @@
 #include <limits>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Frequency: public Value<double, Frequency>
+class Frequency: public LinearValue<double, Frequency>
 {
-	friend class Value<double, Frequency>;
+	friend class LinearValue<double, Frequency>;
 	friend constexpr Frequency operator"" _Hz (long double);
 	friend constexpr Frequency operator"" _Hz (unsigned long long);
 	friend constexpr Frequency operator"" _kHz (long double);
@@ -70,7 +70,7 @@ class Frequency: public Value<double, Frequency>
 
 inline constexpr
 Frequency::Frequency (ValueType Hz):
-	Value (Hz)
+	LinearValue (Hz)
 { }
 
 

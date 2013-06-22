@@ -19,14 +19,14 @@
 #include <limits>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Length: public Value<double, Length>
+class Length: public LinearValue<double, Length>
 {
-	friend class Value<double, Length>;
+	friend class LinearValue<double, Length>;
 	friend constexpr Length operator"" _m (long double);
 	friend constexpr Length operator"" _m (unsigned long long);
 	friend constexpr Length operator"" _km (long double);
@@ -84,7 +84,7 @@ class Length: public Value<double, Length>
 
 inline constexpr
 Length::Length (ValueType m):
-	Value (m)
+	LinearValue (m)
 { }
 
 

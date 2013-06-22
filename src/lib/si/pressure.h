@@ -19,14 +19,14 @@
 #include <limits>
 
 // Local:
-#include "value.h"
+#include "linear_value.h"
 
 
 namespace SI {
 
-class Pressure: public Value<float, Pressure>
+class Pressure: public LinearValue<float, Pressure>
 {
-	friend class Value<float, Pressure>;
+	friend class LinearValue<float, Pressure>;
 	friend constexpr Pressure operator"" _psi (long double);
 	friend constexpr Pressure operator"" _psi (unsigned long long);
 	friend constexpr Pressure operator"" _hPa (long double);
@@ -74,7 +74,7 @@ class Pressure: public Value<float, Pressure>
 
 inline constexpr
 Pressure::Pressure (ValueType psi):
-	Value (psi)
+	LinearValue (psi)
 { }
 
 
