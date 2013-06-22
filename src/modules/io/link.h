@@ -272,9 +272,6 @@ class Link:
 	// Dtor
 	~Link();
 
-	void
-	data_updated() override;
-
   private slots:
 	/**
 	 * Called whenever there's data ready to be read from socket.

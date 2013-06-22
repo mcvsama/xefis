@@ -662,7 +662,6 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 	};
 
-	bool has_output_frequency = false;
 	Frequency output_frequency;
 
 	for (QDomElement& e: config)
@@ -692,15 +691,13 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 		else if (e == "output")
 		{
+			if (!e.hasAttribute ("frequency"))
+				throw Xefis::Exception ("<output> needs attribute 'frequency'");
 			_output_interference = e.hasAttribute ("interference");
 			parse_input_output_config (e, _udp_output_host, _udp_output_port);
 			_udp_output = new QUdpSocket();
 			_udp_output_enabled = true;
-			if (e.hasAttribute ("frequency"))
-			{
-				has_output_frequency = true;
-				output_frequency.parse (e.attribute ("frequency").toStdString());
-			}
+			output_frequency.parse (e.attribute ("frequency").toStdString());
 		}
 	}
 
@@ -711,14 +708,11 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_error_bytes.set_default (0);
 	_valid_packets.set_default (0);
 
-	if (has_output_frequency)
-	{
-		_output_timer = new QTimer (this);
-		_output_timer->setSingleShot (false);
-		_output_timer->setInterval (1000 / output_frequency.Hz());
-		QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
-		_output_timer->start();
-	}
+	_output_timer = new QTimer (this);
+	_output_timer->setSingleShot (false);
+	_output_timer->setInterval (1000 / output_frequency.Hz());
+	QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
+	_output_timer->start();
 }
 
 
@@ -726,17 +720,6 @@ Link::~Link()
 {
 	delete _udp_input;
 	delete _udp_output;
-}
-
-
-void
-Link::data_updated()
-{
-	// If using output frequency, don't react on data_updated signal:
-	if (_output_timer)
-		return;
-
-	send_output();
 }
 
 
@@ -852,6 +835,8 @@ Link::apply()
 {
 	for (Packet* p: _packets)
 		p->apply();
+
+	signal_data_updated();
 }
 
 
