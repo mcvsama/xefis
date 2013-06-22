@@ -182,7 +182,10 @@ Link::PropertyItem::produce (Blob& blob)
 #define XEFIS_CASE_FLOAT(type, property) \
 	case Type::type: \
 		kind = Kind::Float; \
-		float_value = _property_##property.read().internal(); \
+		if (_property_##property.is_nil()) \
+			float_value = std::numeric_limits<decltype (float_value)>::quiet_NaN(); \
+		else \
+			float_value = _property_##property.read().internal(); \
 		break;
 
 	switch (_type)
@@ -194,7 +197,10 @@ Link::PropertyItem::produce (Blob& blob)
 
 		case Type::Float:
 			kind = Kind::Float;
-			float_value = *_property_float;
+			if (_property_float.is_nil())
+				float_value = std::numeric_limits<decltype (float_value)>::quiet_NaN();
+			else
+				float_value = *_property_float;
 			break;
 
 		XEFIS_CASE_FLOAT (Angle, angle);
@@ -297,7 +303,10 @@ Link::PropertyItem::apply()
 {
 #define XEFIS_CASE_FLOAT(type, property) \
 	case Type::type: \
-		_property_##property.write (si_from_internal<type> (_float_value)); \
+		if (std::isnan (_float_value)) \
+			_property_##property.set_nil(); \
+		else \
+			_property_##property.write (si_from_internal<type> (_float_value)); \
 		break;
 
 	switch (_type)
@@ -307,7 +316,10 @@ Link::PropertyItem::apply()
 			break;
 
 		case Type::Float:
-			_property_float.write (_float_value);
+			if (std::isnan (_float_value))
+				_property_float.set_nil();
+			else
+				_property_float.write (_float_value);
 			break;
 
 		XEFIS_CASE_FLOAT (Angle, angle);
