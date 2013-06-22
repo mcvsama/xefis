@@ -422,7 +422,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 }
 
 
-Link::Blob::size_type
+inline Link::Blob::size_type
 Link::BitfieldItem::size() const
 {
 	return _size;
@@ -662,6 +662,9 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 	};
 
+	bool has_output_frequency = false;
+	Frequency output_frequency;
+
 	for (QDomElement& e: config)
 	{
 		if (e == "properties")
@@ -693,6 +696,11 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 			parse_input_output_config (e, _udp_output_host, _udp_output_port);
 			_udp_output = new QUdpSocket();
 			_udp_output_enabled = true;
+			if (e.hasAttribute ("frequency"))
+			{
+				has_output_frequency = true;
+				output_frequency.parse (e.attribute ("frequency").toStdString());
+			}
 		}
 	}
 
@@ -702,6 +710,15 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_reacquires.set_default (0);
 	_error_bytes.set_default (0);
 	_valid_packets.set_default (0);
+
+	if (has_output_frequency)
+	{
+		_output_timer = new QTimer (this);
+		_output_timer->setSingleShot (false);
+		_output_timer->setInterval (1000 / output_frequency.Hz());
+		QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
+		_output_timer->start();
+	}
 }
 
 
@@ -715,16 +732,11 @@ Link::~Link()
 void
 Link::data_updated()
 {
-	_output_blob.clear();
-	produce (_output_blob);
+	// If using output frequency, don't react on data_updated signal:
+	if (_output_timer)
+		return;
 
-	if (_udp_output_enabled)
-	{
-#if XEFIS_LINK_SEND_DEBUG
-		std::clog << "io/link:send: " << to_string (_output_blob) << std::endl;
-#endif
-		_udp_output->writeDatagram (reinterpret_cast<const char*> (&_output_blob[0]), _output_blob.size(), QHostAddress (_udp_output_host), _udp_output_port);
-	}
+	send_output();
 }
 
 
@@ -749,6 +761,22 @@ Link::got_udp_packet()
 #endif
 
 	eat (_input_blob);
+}
+
+
+void
+Link::send_output()
+{
+	_output_blob.clear();
+	produce (_output_blob);
+
+	if (_udp_output_enabled)
+	{
+#if XEFIS_LINK_SEND_DEBUG
+		std::clog << "io/link:send: " << to_string (_output_blob) << std::endl;
+#endif
+		_udp_output->writeDatagram (reinterpret_cast<const char*> (&_output_blob[0]), _output_blob.size(), QHostAddress (_udp_output_host), _udp_output_port);
+	}
 }
 
 
