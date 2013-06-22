@@ -3,7 +3,8 @@
 	<module name='io/link'>
 		<properties>
 			<property name='link-valid' path='/link/valid'/>
-			<property name='errors' path='/link/errors'/>
+			<property name='reacquires' path='/link/reacquires'/>
+			<property name='error-bytes' path='/link/error-bytes'/>
 			<property name='valid-packets' path='/link/valid-packets'/>
 			<property name='failsafe.count' path='/link/failsafe-count'/>
 			<property name='failsafe.lost-time' path='/link/failsafe-lost-time' default='500 ms'/>
@@ -15,11 +16,21 @@
 				<port>9951</port>
 			</udp>
 		</input>
+		<output>
+			<udp>
+				<host>192.168.0.1</host>
+				<port>9952</port>
+			</udp>
+		</output>
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='2' signature-bytes='4' key='00:11:22:33'>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
-					<property type='float' bytes='4' path='/sensors/temperature/outside.k'/>
+					<property type='float' bytes='2' path='/sensors/temperature/outside.k'/>
+					<bitfield>
+						<property type='boolean' path='/settings/altimeter/use-std-pressure'/>
+						<property type='integer' bits='2' path='/link/error-bytes'/>
+					</bitfield>
 				</signature>
 			</packet>
 		</protocol>

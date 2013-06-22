@@ -183,6 +183,19 @@ class Link:
 	class BitfieldItem: public Item
 	{
 	  public:
+		struct BitSource
+		{
+			bool							is_boolean			= false;
+			uint8_t							bits				= 0;
+			Xefis::PropertyBoolean			property_boolean;
+			Xefis::PropertyInteger			property_integer;
+			Xefis::PropertyBoolean::Type	boolean_value;
+			Xefis::PropertyInteger::Type	integer_value;
+		};
+
+		typedef std::vector<BitSource> BitSources;
+
+	  public:
 		BitfieldItem (Link*, QDomElement&);
 
 		Blob::size_type
@@ -196,6 +209,10 @@ class Link:
 
 		void
 		apply() override;
+
+	  private:
+		BitSources		_bit_sources;
+		Blob::size_type	_size = 0;
 	};
 
 	class SignatureItem: public ItemStream
@@ -287,7 +304,8 @@ class Link:
 
   private:
 	Xefis::PropertyBoolean	_link_valid;
-	Xefis::PropertyInteger	_errors;
+	Xefis::PropertyInteger	_reacquires;
+	Xefis::PropertyInteger	_error_bytes;
 	Xefis::PropertyInteger	_valid_packets;
 	Xefis::PropertyInteger	_failsafe_count;
 	Xefis::PropertyTime		_failsafe_lost_time;
