@@ -732,6 +732,10 @@ Link::got_udp_packet()
 	if (_input_interference)
 		interfere (_input_blob);
 
+#if XEFIS_LINK_RECV_DEBUG
+		std::clog << "io/link:recv: " << to_string (_input_blob) << std::endl;
+#endif
+
 	eat (_input_blob);
 }
 
