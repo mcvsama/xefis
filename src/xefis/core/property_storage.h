@@ -68,6 +68,12 @@ class PropertyStorage
 	PropertyNode*
 	locate (std::string const& path) const;
 
+	/**
+	 * Get map of all registered properties.
+	 */
+	PropertiesByPath const&
+	properties_map() const;
+
   private:
 	/**
 	 * Cache a path for the node for quicker locate().
@@ -87,6 +93,14 @@ class PropertyStorage
 	PropertyDirectoryNode*	_root;
 	PropertiesByPath		_properties_by_path;
 };
+
+
+inline
+PropertyStorage::PropertiesByPath const&
+PropertyStorage::properties_map() const
+{
+	return _properties_by_path;
+}
 
 } // namespace Xefis
 
