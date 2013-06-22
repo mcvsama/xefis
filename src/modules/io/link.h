@@ -323,9 +323,6 @@ class Link:
 	eat (Blob& blob);
 
 	void
-	apply();
-
-	void
 	parse_protocol (QDomElement const& protocol);
 
 	void
@@ -341,7 +338,8 @@ class Link:
 	QTimer*					_failsafe_timer;
 	QTimer*					_reacquire_timer;
 	QTimer*					_output_timer;
-	Xefis::PropertyBoolean	_link_valid;
+	bool					_link_valid				= false;
+	Xefis::PropertyBoolean	_link_valid_prop;
 	Xefis::PropertyInteger	_failsafes;
 	Xefis::PropertyInteger	_reacquires;
 	Xefis::PropertyInteger	_error_bytes;
