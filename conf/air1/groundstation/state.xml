@@ -1,0 +1,5 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='private/state'/>
+</xefis-include>
+
