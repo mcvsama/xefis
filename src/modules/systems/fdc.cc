@@ -459,8 +459,11 @@ FlightDataComputer::compute_speeds()
 		_mach.set_nil();
 
 	// Climb rate:
-	if (_pressure_altitude_amsl.valid())
+	if (_pressure_altitude_std_amsl.valid())
 	{
+		if (_pressure_altitude_climb_rate.is_nil())
+			_alt_amsl_prev = *_pressure_altitude_std_amsl;
+
 		_alt_amsl_time += update_dt();
 		if (_alt_amsl_time > 0.05_s)
 		{
@@ -468,9 +471,8 @@ FlightDataComputer::compute_speeds()
 			_computed_climb_rate = alt_diff / _alt_amsl_time;
 			_alt_amsl_time = 0_s;
 			_alt_amsl_prev = *_pressure_altitude_std_amsl;
+			_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm(), update_dt()));
 		}
-
-		_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm(), update_dt()));
 	}
 	else
 	{
@@ -637,21 +639,23 @@ FlightDataComputer::compute_performance()
 				double const Ek = m * v * v * 0.5;
 				_prev_total_energy = _total_energy;
 				_total_energy = Ep + Ek;
+
+				// If total energy was nil (invalid), reset _prev_total_energy
+				// value to the current _total_energy:
+				if (_total_energy_variometer.is_nil())
+					_prev_total_energy = _total_energy;
+
 				double const energy_diff = _total_energy - _prev_total_energy;
 				_tev = (1_m * energy_diff / (m * g)) / _total_energy_time;
 				_total_energy_time = 0_s;
+				_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm(), update_dt()));
 			}
-
-			if (!_prev_total_energy_valid)
-			{
-				_variometer_smoother.reset (_tev.fpm());
-				_prev_total_energy_valid = true;
-			}
-
-			_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm(), update_dt()));
 		}
 		else
+		{
 			_total_energy_variometer.set_nil();
+			_variometer_smoother.invalidate();
+		}
 	}
 
 	if (!_target_altitude_reach_distance.is_singular())

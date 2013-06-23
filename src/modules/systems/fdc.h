@@ -90,7 +90,6 @@ class FlightDataComputer: public Xefis::Module
 	Length						_alt_amsl_prev						= 0_ft;
 	Time						_alt_amsl_time						= 0_s;
 	Speed						_computed_climb_rate				= 0_fpm;
-	int							_positions_valid					= 0;
 	Xefis::Smoother<double>		_track_vertical_smoother			= 250_ms;
 	Xefis::Smoother<double>		_track_lateral_true_smoother		= 250_ms;
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2_s;
@@ -105,7 +104,6 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
 	// Total-energy variometer stuff:
 	Xefis::Smoother<double>		_variometer_smoother				= 1000_ms;
-	bool						_prev_total_energy_valid			= false;
 	double						_prev_total_energy					= 0.0;
 	double						_total_energy						= 0.0;
 	Time						_total_energy_time					= 0_s;
