@@ -6,6 +6,7 @@
 		<include name='groundstation/joystick.xml'/>
 		<include name='groundstation/mouse.xml'/>
 		<include name='groundstation/link.xml'/>
+		<include name='groundstation/state.xml'/>
 	</modules>
 	<include name='groundstation/efis.xml'/>
 </xefis-config>
