@@ -8,9 +8,9 @@
 		<properties>
 			<directory path='/sensors'>
 				<property name='pressure' path='/pressure/pressure'/>
-				<property name='pressure.read-interval' path='/pressure/read-interval' default='500 ms'/>
+				<property name='pressure.read-interval' path='/pressure/read-interval' default='50 ms'/>
 				<property name='temperature' path='/temperature/outside.k'/>
-				<property name='temperature.read-interval' path='/temperature/read-interval' default='30 ms'/>
+				<property name='temperature.read-interval' path='/temperature/read-interval' default='500 ms'/>
 			</directory>
 		</properties>
 	</module>
