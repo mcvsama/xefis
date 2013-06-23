@@ -62,7 +62,6 @@ Application::Application (int argc, char** argv):
 	_navaid_storage = new NavaidStorage();
 	_module_manager = new ModuleManager (this);
 	_config_reader = new ConfigReader (this, _module_manager);
-	_configurator_widget = new ConfiguratorWidget (nullptr);
 	_work_performer = new WorkPerformer (Services::detected_cores());
 
 	_postponed_update = new QTimer (this);
@@ -84,6 +83,9 @@ Application::Application (int argc, char** argv):
 		config_file = "xefis-config.xml";
 	}
 	_config_reader->load (config_file);
+
+	if (_config_reader->has_windows())
+		_configurator_widget = new ConfiguratorWidget (nullptr);
 }
 
 
@@ -103,6 +105,7 @@ void
 Application::quit()
 {
 	closeAllWindows();
+	QApplication::quit();
 }
 
 

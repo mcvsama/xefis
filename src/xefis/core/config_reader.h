@@ -47,6 +47,13 @@ class ConfigReader
 	void
 	load (QString const& path);
 
+	/**
+	 * Determines if there are any windows (and instruments)
+	 * configured.
+	 */
+	bool
+	has_windows() const;
+
   private:
 	QDomDocument
 	parse_file (QString const& path);
@@ -80,7 +87,15 @@ class ConfigReader
 	ModuleManager*	_module_manager		= nullptr;
 	QDomDocument	_config_document;
 	QDir			_current_dir;
+	bool			_has_windows		= false;
 };
+
+
+inline bool
+ConfigReader::has_windows() const
+{
+	return _has_windows;
+}
 
 
 class ConfigException: public Exception

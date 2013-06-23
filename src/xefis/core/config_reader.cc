@@ -166,6 +166,7 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 	std::unique_ptr<Window> window (new Window (_application, this, window_element));
 	window->show();
 	window.release();
+	_has_windows = true;
 }
 
 
