@@ -276,7 +276,7 @@ class Link:
 	  private:
 		Blob		_magic;
 		uint64_t	_send_every		= 1;
-		uint64_t	_send_offset	= 1;
+		uint64_t	_send_offset	= 0;
 		uint64_t	_send_pos		= 0;
 	};
 

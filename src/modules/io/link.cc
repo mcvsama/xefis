@@ -821,14 +821,14 @@ Link::got_udp_packet()
 			_input_datagram.resize (datagram_size);
 
 		_udp_input->readDatagram (_input_datagram.data(), datagram_size, nullptr, nullptr);
-		_input_blob.insert (_input_blob.end(), _input_datagram.data(), _input_datagram.data() + _input_datagram.size());
+		_input_blob.insert (_input_blob.end(), _input_datagram.data(), _input_datagram.data() + datagram_size);
 	}
 
 	if (_input_interference)
 		interfere (_input_blob);
 
 #if XEFIS_LINK_RECV_DEBUG
-		std::clog << "io/link:recv: " << to_string (_input_blob) << std::endl;
+	std::clog << "io/link:recv: " << to_string (_input_blob) << std::endl;
 #endif
 
 	eat (_input_blob);
@@ -1043,6 +1043,8 @@ Link::parse_binary_string (QString const& string)
 std::string
 Link::to_string (Blob const& blob)
 {
+	if (blob.empty())
+		return "";
 	std::string s;
 	for (auto v: blob)
 		s += QString ("%1").arg (v, 2, 16, QChar ('0')).toStdString() + ":";
