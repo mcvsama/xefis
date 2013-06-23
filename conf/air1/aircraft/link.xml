@@ -14,7 +14,7 @@
 					<property type='float' bytes='2' path='/sensors/temperature/outside.k'/>
 				</signature>
 			</packet>
-			<packet magic='e4:40'>
+			<packet magic='e4:40' send-every='10' send-offset='0'>
 				<signature random-bytes='2' signature-bytes='2' key='44:55:66:77'>
 					<property type='integer' bytes='2' path='/link/local/failsafes'/>
 					<bitfield>

@@ -274,7 +274,10 @@ class Link:
 		produce (Blob& blob) override;
 
 	  private:
-		Blob	_magic;
+		Blob		_magic;
+		uint64_t	_send_every		= 1;
+		uint64_t	_send_offset	= 1;
+		uint64_t	_send_pos		= 0;
 	};
 
 	typedef std::vector<Packet*> Packets;
