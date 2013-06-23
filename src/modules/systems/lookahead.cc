@@ -29,11 +29,12 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/lookahead", Lookahead);
 
 
 Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager),
+	_output_estimator (1_s)
 {
 	QString input_property_path;
 	QString output_property_path;
-	double smoothing = 1.f;
+	Time smoothing = 1_ms;
 
 	for (QDomElement& e: config)
 	{
@@ -42,9 +43,13 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 		else if (e == "output")
 			output_property_path = e.text();
 		else if (e == "smoothing")
-			smoothing = e.text().toDouble();
+			smoothing.parse (e.text().toStdString());
 		else if (e == "minimum-integration-time")
-			_minimum_integration_time = 1_s * e.text().toDouble();
+		{
+			Time t;
+			t.parse (e.text().toStdString());
+			_output_estimator.set_minimum_integration_time (t);
+		}
 		else if (e == "properties")
 		{
 			parse_properties (e, {
@@ -60,7 +65,7 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 
 	_input = Xefis::PropertyFloat (input_property_path.toStdString());
 	_output = Xefis::PropertyFloat (output_property_path.toStdString());
-	_output_smoother.set_samples (smoothing);
+	_output_smoother.set_smooth_time (smoothing);
 }
 
 
@@ -68,23 +73,19 @@ void
 Lookahead::data_updated()
 {
 	if (_output.is_singular() || !_lookahead_time.valid())
+	{
+		_output_smoother.invalidate();
+		_output_estimator.invalidate();
 		return;
+	}
 
 	if (!_input.valid())
-		_output.set_nil();
-	else
 	{
-		Time dt = update_dt();
-		_dt += dt;
-
-		if (_dt > _minimum_integration_time)
-		{
-			double value = *_input;
-			double estimated_value = _last_value + *_lookahead_time / dt * (value - _last_value);
-			_output.write (_output_smoother.process (estimated_value));
-			_last_value = value;
-			_dt = Time::epoch();
-		}
+		_output_smoother.invalidate();
+		_output_estimator.invalidate();
+		_output.set_nil();
 	}
+	else
+		_output.write (_output_estimator.process (_output_smoother.process (*_input, update_dt()), update_dt()));
 }
 
