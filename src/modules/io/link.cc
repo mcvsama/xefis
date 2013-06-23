@@ -668,6 +668,12 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 	_magic = parse_binary_string (element.attribute ("magic"));
 	if (_magic.empty())
 		throw Xefis::Exception ("magic value must have at least one byte length");
+
+	if (element.hasAttribute ("send-every"))
+		_send_every = element.attribute ("send-every").toUInt();
+
+	if (element.hasAttribute ("send-offset"))
+		_send_offset = element.attribute ("send-offset").toUInt();
 }
 
 
@@ -688,8 +694,12 @@ Link::Packet::size() const
 void
 Link::Packet::produce (Blob& blob)
 {
-	blob.insert (blob.end(), _magic.begin(), _magic.end());
-	ItemStream::produce (blob);
+	if (_send_pos % _send_every == _send_offset)
+	{
+		blob.insert (blob.end(), _magic.begin(), _magic.end());
+		ItemStream::produce (blob);
+	}
+	++_send_pos;
 }
 
 
