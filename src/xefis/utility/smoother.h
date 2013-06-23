@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <cmath>
+#include <algorithm>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -38,14 +39,10 @@ template<class tValueType>
 		typedef float SamplesType;
 
 	  public:
-		Smoother (SamplesType samples = 1.f) noexcept;
+		Smoother (Time smooth_time = 1_ms) noexcept;
 
-		/**
-		 * \param	samples is number of samples after which returned value reaches
-		 *			99.99% of target value.
-		 */
 		void
-		set_samples (SamplesType samples) noexcept;
+		set_smooth_time (Time smooth_time) noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
@@ -54,88 +51,64 @@ template<class tValueType>
 		reset (ValueType value = ValueType()) noexcept;
 
 		/**
+		 * Resets the smoother when next process() is called,
+		 * to the value given in process() call.
+		 */
+		void
+		invalidate() noexcept;
+
+		/**
 		 * Enable winding and set valid values range.
 		 */
 		void
 		set_winding (Range<ValueType> range);
 
 		/**
-		 * Return smoothed sample from given input sample.
+		 * Return smoothed sample from given input sample
+		 * and time from last update.
 		 */
 		ValueType
-		process (ValueType s, unsigned int iterations = 1) noexcept;
+		process (ValueType s, Time dt) noexcept;
 
 		/**
-		 * Smooth (low-pass) given sequence.
+		 * Return last processed value.
 		 */
-		template<class ForwardIterator>
-			void
-			process (ForwardIterator begin, ForwardIterator end) noexcept;
-
-		/**
-		 * Fill sequence with smoothed samples, where input sample is @value.
-		 * \param	begin,end Sequence to be filled.
-		 * \param	value Input data that is to be smoothed. It's used for each
-		 *			sample in [begin, end) sequence.
-		 */
-		template<class ForwardIterator>
-			void
-			fill (ForwardIterator begin, ForwardIterator end, ValueType value) noexcept;
-
-
-		/**
-		 * Multiply sequence samples by given value in a smooth-way.
-		 * \param	begin,end Sequence to modify.
-		 * \param	value Multiplying value.
-		 */
-		template<class ForwardIterator>
-			void
-			multiply (ForwardIterator begin, ForwardIterator end, ValueType value) noexcept;
+		ValueType
+		value() const noexcept;
 
 	  private:
 		ValueType
 		process_single_sample (ValueType s) noexcept;
 
 	  private:
-		SamplesType			_time;
-		ValueType			_z;
-		Range<ValueType>	_winding;
-		bool				_winding_enabled = false;
+		SamplesType				_time;// DEPREACTED TODO
+		ValueType				_z;
+		Range<ValueType>		_winding;
+		bool					_winding_enabled	= false;
+		bool					_invalidate			= false;
+		std::vector<ValueType>	_history;
 	};
 
 
 template<class V>
 	inline
-	Smoother<V>::Smoother (SamplesType samples) noexcept
+	Smoother<V>::Smoother (Time smooth_time) noexcept
 	{
-		set_samples (samples);
-		reset();
-	}
-
-
-template<>
-	inline
-	Smoother<float>::Smoother (SamplesType samples) noexcept
-	{
-		set_samples (samples);
-		reset (0.0f);
-	}
-
-
-template<>
-	inline
-	Smoother<double>::Smoother (SamplesType samples) noexcept
-	{
-		set_samples (samples);
-		reset (0.0);
+		set_smooth_time (smooth_time);
+		invalidate();
 	}
 
 
 template<class V>
 	inline void
-	Smoother<V>::set_samples (SamplesType samples) noexcept
+	Smoother<V>::set_smooth_time (Time smooth_time) noexcept
 	{
-		_time = std::pow (0.01f, 2.0f / samples);
+		int millis = smooth_time.ms();
+		if (millis < 1)
+			millis = 1;
+		_time = std::pow (0.01f, 2.0f / millis);
+		_history.resize (millis);
+		invalidate();
 	}
 
 
@@ -143,7 +116,16 @@ template<class V>
 	inline void
 	Smoother<V>::reset (ValueType value) noexcept
 	{
+		std::fill (_history.begin(), _history.end(), value);
 		_z = value;
+	}
+
+
+template<class V>
+	inline void
+	Smoother<V>::invalidate() noexcept
+	{
+		_invalidate = true;
 	}
 
 
@@ -158,42 +140,21 @@ template<class V>
 
 template<class V>
 	inline typename Smoother<V>::ValueType
-	Smoother<V>::process (ValueType s, unsigned int iterations) noexcept
+	Smoother<V>::process (ValueType s, Time dt) noexcept
 	{
-		for (unsigned int i = 0; i < iterations; ++i)
-			process_single_sample (s);
+		if (_invalidate)
+		{
+			_invalidate = false;
+			reset (s);
+		}
+
+		int iterations = dt.ms();
+		ValueType z = _z;
+		if (iterations > 1)
+			for (int i = 0; i < iterations; ++i)
+				process_single_sample (z + (static_cast<ValueType> (i + 1) / iterations) * (s - z));
 		return _z;
 	}
-
-
-template<class V>
-	template<class ForwardIterator>
-		inline void
-		Smoother<V>::process (ForwardIterator begin, ForwardIterator end) noexcept
-		{
-			for (ForwardIterator c = begin; c != end; ++c)
-				*c = process_single_sample (*c);
-		}
-
-
-template<class V>
-	template<class ForwardIterator>
-		inline void
-		Smoother<V>::fill (ForwardIterator begin, ForwardIterator end, ValueType value) noexcept
-		{
-			for (ForwardIterator c = begin; c != end; ++c)
-				*c = process_single_sample (value);
-		}
-
-
-template<class V>
-	template<class ForwardIterator>
-		inline void
-		Smoother<V>::multiply (ForwardIterator begin, ForwardIterator end, ValueType value) noexcept
-		{
-			for (ForwardIterator c = begin; c != end; ++c)
-				*c *= process_single_sample (value);
-		}
 
 
 template<class V>
@@ -202,7 +163,7 @@ template<class V>
 	{
 		// Protect from NaNs and infs:
 		if (!std::isfinite (_z))
-			_z = s;
+			reset (s);
 
 		if (_winding_enabled)
 		{
@@ -215,7 +176,25 @@ template<class V>
 			return _z = floored_mod (_time * (_z - s) + s, _winding.min(), _winding.max());
 		}
 		else
-			return _z = _time * (_z - s) + s;
+		{
+			std::rotate (_history.begin(), _history.begin() + _history.size() - 1, _history.end());
+			_history[0] = s;
+
+			_z = 0.0;
+			for (ValueType const& v: _history)
+				_z += v;
+			_z /= _history.size();
+
+			return _z;
+		}
+	}
+
+
+template<class V>
+	inline typename Smoother<V>::ValueType
+	Smoother<V>::value() const noexcept
+	{
+		return _z;
 	}
 
 } // namespace Xefis

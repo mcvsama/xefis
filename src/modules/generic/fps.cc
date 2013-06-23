@@ -26,13 +26,13 @@ XEFIS_REGISTER_MODULE_CLASS ("generic/fps", FPS);
 
 FPS::FPS (Xefis::ModuleManager* module_manager, QDomElement const&):
 	Module (module_manager),
-	_smoother (5)
+	_smoother (5_ms)
 { }
 
 
 void
 FPS::data_updated()
 {
-	fprintf (stderr, "FPS: %.2f\n", _smoother.process (1.f / update_dt().s()));
+	fprintf (stderr, "FPS: %.2f\n", _smoother.process (1.f / update_dt().s(), update_dt()));
 }
 

@@ -188,8 +188,8 @@ FlightDirector::data_updated()
 		}
 	}
 
-	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg()));
-	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg()));
+	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt()));
+	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt()));
 
 	_dt = Time::epoch();
 }
