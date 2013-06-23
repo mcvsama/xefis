@@ -847,7 +847,8 @@ Link::failsafe()
 	if (_link_valid_prop.valid())
 		_link_valid_prop.write (false);
 	_link_valid = false;
-	_failsafes.write (*_failsafes + 1);
+	if (_failsafes.valid())
+		_failsafes.write (*_failsafes + 1);
 	for (Packet* p: _packets)
 		p->failsafe();
 }
@@ -859,7 +860,8 @@ Link::reacquire()
 	if (_link_valid_prop.valid())
 		_link_valid_prop.write (true);
 	_link_valid = true;
-	_reacquires.write (*_reacquires + 1);
+	if (_reacquires.valid())
+		_reacquires.write (*_reacquires + 1);
 }
 
 
