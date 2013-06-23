@@ -38,8 +38,6 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 	_root_node (root_node)
 {
 	header()->setSectionsClickable (true);
-	header()->setSectionResizeMode (NameColumn, QHeaderView::Interactive);
-	header()->setSectionResizeMode (ValueColumn, QHeaderView::Interactive);
 	header()->setMinimumSectionSize (12.f * Services::default_font_size (physicalDpiY()));
 	sortByColumn (NameColumn, Qt::AscendingOrder);
 	setSortingEnabled (true);
