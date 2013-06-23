@@ -77,6 +77,8 @@ class Application: public QApplication
 
 	/**
 	 * Return configurator widget.
+	 * May return nullptr, if configurator widget is disabled
+	 * (eg. for instrument-less configurations of XEFIS).
 	 */
 	ConfiguratorWidget*
 	configurator_widget() const;

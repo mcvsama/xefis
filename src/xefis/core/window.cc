@@ -168,6 +168,8 @@ Window::show_configurator()
 	if (_stack->currentWidget() == _instruments_panel)
 	{
 		ConfiguratorWidget* configurator_widget = _application->configurator_widget();
+		if (!configurator_widget)
+			return;
 		if (configurator_widget->owning_window())
 			configurator_widget->owning_window()->configurator_taken();
 		_configurator_panel->layout()->addWidget (configurator_widget);
