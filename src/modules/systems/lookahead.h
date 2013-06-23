@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/utility/smoother.h>
+#include <xefis/utility/lookahead.h>
 
 
 class Lookahead: public Xefis::Module
@@ -37,14 +38,11 @@ class Lookahead: public Xefis::Module
 	data_updated() override;
 
   private:
-	Time					_dt							= 0_s;
-	double					_last_value					= 0.0;
-	Time					_minimum_integration_time	= 0_s;
-	Xefis::Smoother<double>	_output_smoother;
-
-	Xefis::PropertyTime		_lookahead_time;
-	Xefis::PropertyFloat	_input;
-	Xefis::PropertyFloat	_output;
+	Xefis::PropertyFloat		_input;
+	Xefis::PropertyFloat		_output;
+	Xefis::PropertyTime			_lookahead_time;
+	Xefis::Smoother<double>		_output_smoother;
+	Xefis::Lookahead<double>	_output_estimator;
 };
 
 #endif
