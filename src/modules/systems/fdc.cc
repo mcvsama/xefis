@@ -138,8 +138,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 		}
 	}
 
-	_pressure_alt_estimator.set_minimum_integration_time (0.5_s);
-	_ias_estimator.set_minimum_integration_time (0.5_s);
+	_pressure_alt_estimator.set_minimum_integration_time (0.2_s);
+	_ias_estimator.set_minimum_integration_time (0.2_s);
 }
 
 
@@ -265,20 +265,28 @@ FlightDataComputer::compute_position()
 		Length height = compute_pressure_altitude (pressure_setting);
 		Length std_height = compute_pressure_altitude (29.92_inHg);
 
-		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft()));
-		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft()));
+		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft(), update_dt()));
+		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft(), update_dt()));
 	}
 	else
+	{
 		_pressure_altitude_amsl.copy (_position_altitude_amsl);
+		_pressure_alt_smoother.invalidate();
+		_pressure_alt_std_smoother.invalidate();
+	}
 
 	if (_pressure_altitude_amsl.valid())
 	{
 		double est = _pressure_alt_estimator.process ((*_pressure_altitude_amsl).ft(), update_dt());
-		est = _pressure_alt_lookahead_smoother.process (est);
+		est = _pressure_alt_lookahead_smoother.process (est, update_dt());
 		_pressure_altitude_amsl_lookahead.write (1_ft * est);
 	}
 	else
+	{
 		_pressure_altitude_amsl_lookahead.set_nil();
+		_pressure_alt_estimator.invalidate();
+		_pressure_alt_lookahead_smoother.invalidate();
+	}
 }
 
 
@@ -333,11 +341,11 @@ FlightDataComputer::compute_track()
 		if (distance > 2.0 * _ac1_positions[0].accuracy)
 		{
 			Length altitude_diff = _ac1_positions[0].altitude - _ac1_positions[1].altitude;
-			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance)));
+			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt()));
 
 			Angle initial_true_heading = _ac1_positions[0].lateral_position.initial_bearing (_ac1_positions[1].lateral_position);
 			Angle true_heading = floored_mod (initial_true_heading + 180_deg, 360_deg);
-			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg()));
+			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt()));
 
 			if (_magnetic_declination.valid())
 				_track_lateral_magnetic.write (true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
@@ -349,6 +357,8 @@ FlightDataComputer::compute_track()
 			_track_vertical.set_nil();
 			_track_lateral_true.set_nil();
 			_track_lateral_magnetic.set_nil();
+			_track_vertical_smoother.invalidate();
+			_track_lateral_true_smoother.invalidate();
 		}
 	}
 	else
@@ -373,11 +383,15 @@ FlightDataComputer::compute_track()
 
 			if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
 			{
-				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg());
+				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg(), update_dt());
 				result_delta = limit (beta_per_mile, -180.0_deg, +180.0_deg);
 			}
+			else
+				_track_heading_delta_smoother.invalidate();
 		}
 	}
+	else
+		_track_heading_delta_smoother.invalidate();
 	_track_lateral_delta_dpm.write (result_delta);
 }
 
@@ -430,10 +444,13 @@ FlightDataComputer::compute_speeds()
 	{
 		Time dt = _ac2_positions[0].time - _ac2_positions[1].time;
 		Length dl = _ac2_positions[0].lateral_position.haversine_earth (_ac2_positions[1].lateral_position);
-		_ground_speed.write (1_kt * _ground_speed_smoother.process ((dl / dt).kt()));
+		_ground_speed.write (1_kt * _ground_speed_smoother.process ((dl / dt).kt(), update_dt()));
 	}
 	else
+	{
 		_ground_speed.set_nil();
+		_ground_speed_smoother.invalidate();
+	}
 
 	// The approximate speed of sound in dry (0% humidity) air:
 	if (_true_airspeed.valid() && _sound_speed.valid())
@@ -453,19 +470,26 @@ FlightDataComputer::compute_speeds()
 			_alt_amsl_prev = *_pressure_altitude_std_amsl;
 		}
 
-		_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm()));
+		_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm(), update_dt()));
 	}
 	else
+	{
 		_pressure_altitude_climb_rate.set_nil();
+		_climb_rate_smoother.invalidate();
+	}
 
 	if (_ias.valid())
 	{
 		double est = _ias_estimator.process ((*_ias).kt(), update_dt());
-		est = _ias_lookahead_smoother.process (est);
+		est = _ias_lookahead_smoother.process (est, update_dt());
 		_ias_lookahead.write (1_kt * est);
 	}
 	else
+	{
 		_ias_lookahead.set_nil();
+		_ias_estimator.invalidate();
+		_ias_lookahead_smoother.invalidate();
+	}
 }
 
 
@@ -571,7 +595,7 @@ FlightDataComputer::compute_wind()
 		wt.set_aircraft_ground_speed (*_ground_speed);
 		wt.set_aircraft_heading (*_orientation_true_heading);
 		wt.update();
-		_wind_true_orientation_from.write (floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg()), 360_deg));
+		_wind_true_orientation_from.write (floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt()), 360_deg));
 		_wind_magnetic_orientation_from.write (true_to_magnetic (*_wind_true_orientation_from, *_magnetic_declination));
 		_wind_tas.write (wt.wind_speed());
 	}
@@ -580,6 +604,7 @@ FlightDataComputer::compute_wind()
 		_wind_true_orientation_from.set_nil();
 		_wind_magnetic_orientation_from.set_nil();
 		_wind_tas.set_nil();
+		_wind_direction_smoother.invalidate();
 	}
 }
 
@@ -623,7 +648,7 @@ FlightDataComputer::compute_performance()
 				_prev_total_energy_valid = true;
 			}
 
-			_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm()));
+			_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm(), update_dt()));
 		}
 		else
 			_total_energy_variometer.set_nil();

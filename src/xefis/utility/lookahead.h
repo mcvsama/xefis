@@ -31,46 +31,91 @@ template<class tType>
 
 	  public:
 		// Ctor:
-		explicit Lookahead (Time lookahead_time);
+		explicit Lookahead (Time lookahead_time) noexcept;
 
+		/**
+		 * Set lookahead time.
+		 */
 		void
-		set_minimum_integration_time (Time);
+		set_lookahead_time (Time) noexcept;
 
+		/**
+		 * Don't compute new result until given time
+		 * has passed.
+		 */
+		void
+		set_minimum_integration_time (Time) noexcept;
+
+		/**
+		 * Mark value as invalid and reset computations
+		 * until next process() call.
+		 */
+		void
+		invalidate() noexcept;
+
+		/**
+		 * Process new input sample, taken after dt time.
+		 */
 		Type
-		process (Type input, Time dt);
+		process (Type input, Time dt) noexcept;
 
 	  private:
 		Time	_lookahead_time;
-		Time	_time = 0_s;
-		Time	_minimum_integration_time = 0_s;
+		Time	_time						= 0_s;
+		Time	_minimum_integration_time	= 0_s;
 		Type	_last_input;
 		Type	_last_output;
+		bool	_invalidate					= false;
 	};
 
 
 template<class T>
-	Lookahead<T>::Lookahead (Time lookahead_time):
+	inline
+	Lookahead<T>::Lookahead (Time lookahead_time) noexcept:
 		_lookahead_time (lookahead_time)
 	{ }
 
 
 template<class T>
-	void
-	Lookahead<T>::set_minimum_integration_time (Time time)
+	inline void
+	Lookahead<T>::set_lookahead_time (Time lookahead_time) noexcept
+	{
+		_lookahead_time = lookahead_time;
+		invalidate();
+	}
+
+
+template<class T>
+	inline void
+	Lookahead<T>::set_minimum_integration_time (Time time) noexcept
 	{
 		_minimum_integration_time = time;
 	}
 
 
 template<class T>
-	typename Lookahead<T>::Type
-	Lookahead<T>::process (Type input, Time dt)
+	inline void
+	Lookahead<T>::invalidate() noexcept
+	{
+		_invalidate = true;
+	}
+
+
+template<class T>
+	inline typename Lookahead<T>::Type
+	Lookahead<T>::process (Type input, Time dt) noexcept
 	{
 		_time += dt;
 
 		if (_time > _minimum_integration_time)
 		{
-			_last_output = _last_input + _lookahead_time / _time * (input - _last_input);
+			if (_invalidate)
+			{
+				_last_output = input;
+				_invalidate = false;
+			}
+			else
+				_last_output = (_lookahead_time * (input - _last_input)) / _time + input;
 			_last_input = input;
 			_time = 0_s;
 		}
