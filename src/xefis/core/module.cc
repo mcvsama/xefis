@@ -123,7 +123,7 @@ Module::parse_i2c (QDomElement const& i2c_element, I2C::Bus& bus, I2C::Address& 
 	{
 		if (e == "bus")
 		{
-			bus.open (e.text().trimmed().toUInt());
+			bus.set_bus_number (e.text().trimmed().toUInt());
 			has_bus = true;
 		}
 		else if (e == "address")

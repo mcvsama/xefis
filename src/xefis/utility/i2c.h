@@ -128,6 +128,18 @@ class Bus: public Noncopyable
 	bus_number() const noexcept;
 
 	/**
+	 * Set bus number.
+	 */
+	void
+	set_bus_number (uint8_t bus_number) noexcept;
+
+	/**
+	 * Reopen bus.
+	 */
+	void
+	open();
+
+	/**
 	 * Open bus.
 	 */
 	void
@@ -194,6 +206,13 @@ inline uint8_t
 Bus::bus_number() const noexcept
 {
 	return _bus_number;
+}
+
+
+inline void
+Bus::set_bus_number (uint8_t bus_number) noexcept
+{
+	_bus_number = bus_number;
 }
 
 } // namespace I2C

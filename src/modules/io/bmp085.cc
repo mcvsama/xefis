@@ -50,40 +50,77 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 
 	_oversampling = Oversampling3;
 
-	_ac1 = read_s16 (AC1_REG);
-	_ac2 = read_s16 (AC2_REG);
-	_ac3 = read_s16 (AC3_REG);
-	_ac4 = read_u16 (AC4_REG);
-	_ac5 = read_u16 (AC5_REG);
-	_ac6 = read_u16 (AC6_REG);
-	_b1 = read_s16 (B1_REG);
-	_b2 = read_s16 (B2_REG);
-	_mb = read_s16 (MB_REG);
-	_mc = read_s16 (MC_REG);
-	_md = read_s16 (MD_REG);
+	_reinitialize_timer = new QTimer (this);
+	_reinitialize_timer->setInterval (250);
+	_reinitialize_timer->setSingleShot (true);
+	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 
-	_temperature_timer = new QTimer (this);
-	_temperature_timer->setInterval ((*_temperature_interval).ms());
-	_temperature_timer->setSingleShot (false);
-	QObject::connect (_temperature_timer, SIGNAL (timeout()), this, SLOT (request_temperature()));
+	initialize();
+}
 
-	_temperature_ready_timer = new QTimer (this);
-	_temperature_ready_timer->setInterval (4.5);
-	_temperature_ready_timer->setSingleShot (true);
-	QObject::connect (_temperature_ready_timer, SIGNAL (timeout()), this, SLOT (read_temperature()));
 
-	_pressure_timer = new QTimer (this);
-	_pressure_timer->setInterval ((*_pressure_interval).ms());
-	_pressure_timer->setSingleShot (false);
-	QObject::connect (_pressure_timer, SIGNAL (timeout()), this, SLOT (request_pressure()));
+void
+BMP085::initialize()
+{
+	guard ([&]() {
+		_i2c_bus.open();
 
-	_pressure_ready_timer = new QTimer (this);
-	_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].ms());
-	_pressure_ready_timer->setSingleShot (true);
-	QObject::connect (_pressure_ready_timer, SIGNAL (timeout()), this, SLOT (read_pressure()));
+		_ac1 = read_s16 (AC1_REG);
+		_ac2 = read_s16 (AC2_REG);
+		_ac3 = read_s16 (AC3_REG);
+		_ac4 = read_u16 (AC4_REG);
+		_ac5 = read_u16 (AC5_REG);
+		_ac6 = read_u16 (AC6_REG);
+		_b1 = read_s16 (B1_REG);
+		_b2 = read_s16 (B2_REG);
+		_mb = read_s16 (MB_REG);
+		_mc = read_s16 (MC_REG);
+		_md = read_s16 (MD_REG);
 
-	_temperature_timer->start();
-	_pressure_timer->start();
+		_temperature_timer = new QTimer (this);
+		_temperature_timer->setInterval ((*_temperature_interval).ms());
+		_temperature_timer->setSingleShot (false);
+		QObject::connect (_temperature_timer, SIGNAL (timeout()), this, SLOT (request_temperature()));
+
+		_temperature_ready_timer = new QTimer (this);
+		_temperature_ready_timer->setInterval (4.5);
+		_temperature_ready_timer->setSingleShot (true);
+		QObject::connect (_temperature_ready_timer, SIGNAL (timeout()), this, SLOT (read_temperature()));
+
+		_pressure_timer = new QTimer (this);
+		_pressure_timer->setInterval ((*_pressure_interval).ms());
+		_pressure_timer->setSingleShot (false);
+		QObject::connect (_pressure_timer, SIGNAL (timeout()), this, SLOT (request_pressure()));
+
+		_pressure_ready_timer = new QTimer (this);
+		_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].ms());
+		_pressure_ready_timer->setSingleShot (true);
+		QObject::connect (_pressure_ready_timer, SIGNAL (timeout()), this, SLOT (read_pressure()));
+
+		_temperature_timer->start();
+		_pressure_timer->start();
+	});
+}
+
+
+void
+BMP085::reinitialize()
+{
+	_initialized = false;
+	_middle_of_request = false;
+	_request_other = false;
+
+	delete _temperature_timer;
+	delete _temperature_ready_timer;
+	delete _pressure_timer;
+	delete _pressure_ready_timer;
+
+	_temperature_timer = nullptr;
+	_temperature_ready_timer = nullptr;
+	_pressure_timer = nullptr;
+	_pressure_ready_timer = nullptr;
+
+	_reinitialize_timer->start();
 }
 
 
@@ -94,9 +131,11 @@ BMP085::request_temperature()
 		_request_other = true;
 	else
 	{
-		_middle_of_request = true;
-		write (0xf4, 0x2e);
-		_temperature_ready_timer->start();
+		guard ([&]() {
+			_middle_of_request = true;
+			write (0xf4, 0x2e);
+			_temperature_ready_timer->start();
+		});
 	}
 }
 
@@ -108,10 +147,12 @@ BMP085::request_pressure()
 		_request_other = true;
 	else
 	{
-		_middle_of_request = true;
-		int os = static_cast<int> (_oversampling);
-		write (0xf4, 0x34 + (os << 6));
-		_pressure_ready_timer->start();
+		guard ([&]() {
+			_middle_of_request = true;
+			int os = static_cast<int> (_oversampling);
+			write (0xf4, 0x34 + (os << 6));
+			_pressure_ready_timer->start();
+		});
 	}
 }
 
@@ -121,14 +162,16 @@ BMP085::read_temperature()
 {
 	_middle_of_request = false;
 
-	_ut = read_u16 (0xf6);
-	int32_t x1 = ((_ut - _ac6) * _ac5) >> 15;
-	int32_t x2 = (_mc << 11) / (x1 + _md);
-	_b5 = x1 + x2;
-	_ct = (_b5 + 8) >> 4;
-	_temperature.write (274.15 + _ct / 10.0);
+	guard ([&]() {
+		_ut = read_u16 (0xf6);
+		int32_t x1 = ((_ut - _ac6) * _ac5) >> 15;
+		int32_t x2 = (_mc << 11) / (x1 + _md);
+		_b5 = x1 + x2;
+		_ct = (_b5 + 8) >> 4;
+		_temperature.write (274.15 + _ct / 10.0);
 
-	handle_other (&BMP085::request_pressure);
+		handle_other (&BMP085::request_pressure);
+	});
 }
 
 
@@ -137,29 +180,53 @@ BMP085::read_pressure()
 {
 	_middle_of_request = false;
 
-	int os = static_cast<int> (_oversampling);
-	_up = read_u24 (0xf6) >> (8 - os);
-	_b6 = _b5 - 4000;
-	int32_t x1 = (_b2 * (_b6 * _b6 >> 12)) >> 11;
-	int32_t x2 = _ac2 * _b6 >> 11;
-	int32_t x3 = x1 + x2;
-	_b3 = (((_ac1 * 4 + x3) << os) + 2) >> 2;
-	x1 = _ac3 * _b6 >> 13;
-	x2 = (_b1 * (_b6 * _b6 >> 12)) >> 16;
-	x3 = ((x1 + x2) + 2) >> 2;
-	_b4 = (_ac4 * static_cast<uint32_t> (x3 + 32768)) >> 15;
-	_b7 = static_cast<uint32_t> (_up - _b3) * (50000 >> os);
-	if (_b7 < 0x80000000)
-		_cp = (_b7 * 2) / _b4;
-	else
-		_cp = (_b7 / _b4) * 2;
-	x1 = (_cp >> 8) * (_cp >> 8);
-	x1 = (x1 * 3038) >> 16;
-	x2 = (-7357 * _cp) >> 16;
-	_cp = _cp + ((x1 + x2 + 3791) >> 4);
-	_pressure.write (0.01_hPa * _cp);
+	guard ([&]() {
+		int os = static_cast<int> (_oversampling);
+		_up = read_u24 (0xf6) >> (8 - os);
+		_b6 = _b5 - 4000;
+		int32_t x1 = (_b2 * (_b6 * _b6 >> 12)) >> 11;
+		int32_t x2 = _ac2 * _b6 >> 11;
+		int32_t x3 = x1 + x2;
+		_b3 = (((_ac1 * 4 + x3) << os) + 2) >> 2;
+		x1 = _ac3 * _b6 >> 13;
+		x2 = (_b1 * (_b6 * _b6 >> 12)) >> 16;
+		x3 = ((x1 + x2) + 2) >> 2;
+		_b4 = (_ac4 * static_cast<uint32_t> (x3 + 32768)) >> 15;
+		_b7 = static_cast<uint32_t> (_up - _b3) * (50000 >> os);
+		if (_b7 < 0x80000000)
+			_cp = (_b7 * 2) / _b4;
+		else
+			_cp = (_b7 / _b4) * 2;
+		x1 = (_cp >> 8) * (_cp >> 8);
+		x1 = (x1 * 3038) >> 16;
+		x2 = (-7357 * _cp) >> 16;
+		_cp = _cp + ((x1 + x2 + 3791) >> 4);
+		_pressure.write (0.01_hPa * _cp);
 
-	handle_other (&BMP085::request_temperature);
+		handle_other (&BMP085::request_temperature);
+	});
+}
+
+
+void
+BMP085::guard (std::function<void()> guarded_code)
+{
+	try {
+		guarded_code();
+	}
+	catch (Xefis::Exception const& e)
+	{
+		xdebug ("Caught Xefis::Exception\n");
+		std::clog << e << std::endl;
+		// TODO log exception
+		reinitialize();
+	}
+	catch (...)
+	{
+		xdebug ("Caught generic exception\n");
+		// TODO log generic exception
+		reinitialize();
+	}
 }
 
 

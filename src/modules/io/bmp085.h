@@ -48,6 +48,12 @@ class BMP085:
 
   private slots:
 	void
+	initialize();
+
+	void
+	reinitialize();
+
+	void
 	request_temperature();
 
 	void
@@ -60,6 +66,9 @@ class BMP085:
 	read_pressure();
 
   private:
+	void
+	guard (std::function<void()> guarded_code);
+
 	void
 	handle_other (void (BMP085::*request_function)());
 
@@ -89,6 +98,7 @@ class BMP085:
 	static constexpr uint8_t	MC_REG	= 0xbc;
 	static constexpr uint8_t	MD_REG	= 0xbe;
 	// Data:
+	bool						_initialized				= false;
 	Xefis::PropertyFloat		_temperature;
 	Xefis::PropertyTime			_temperature_interval;
 	Xefis::PropertyPressure		_pressure;
@@ -98,10 +108,11 @@ class BMP085:
 	I2C::Address				_i2c_address;
 	Oversampling				_oversampling				= Oversampling3;
 	Time						_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
-	QTimer*						_temperature_timer;
-	QTimer*						_temperature_ready_timer;
-	QTimer*						_pressure_timer;
-	QTimer*						_pressure_ready_timer;
+	QTimer*						_reinitialize_timer			= nullptr;
+	QTimer*						_temperature_timer			= nullptr;
+	QTimer*						_temperature_ready_timer	= nullptr;
+	QTimer*						_pressure_timer				= nullptr;
+	QTimer*						_pressure_ready_timer		= nullptr;
 	// Set to true, between request_ and read_ functions.
 	bool						_middle_of_request			= false;
 	bool						_request_other				= false;

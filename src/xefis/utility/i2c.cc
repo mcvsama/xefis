@@ -71,6 +71,13 @@ Bus::~Bus()
 
 
 void
+Bus::open()
+{
+	open (_bus_number);
+}
+
+
+void
 Bus::open (uint8_t bus_number)
 {
 	close();
