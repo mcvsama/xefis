@@ -58,6 +58,12 @@ class Application: public QApplication
 	~Application();
 
 	/**
+	 * Override and catch exceptions.
+	 */
+	bool
+	notify (QObject* receiver, QEvent* event) override;
+
+	/**
 	 * Tell application to quit main event loop.
 	 */
 	void

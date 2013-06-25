@@ -18,7 +18,9 @@
 
 // Standard:
 #include <cstdio>
+#include <iostream>
 #include <stdexcept>
+#include <functional>
 
 // Xefis:
 #include <xefis/utility/backtrace.h>
@@ -45,12 +47,27 @@ class Exception: public std::runtime_error
 	Backtrace const&
 	backtrace() const;
 
+	static void
+	guard (std::function<void()> guarded_code);
+
+	static void
+	guard_and_rethrow (std::function<void()> guarded_code);
+
   private:
 	bool		_has_inner = false;
 	std::string	_message;
 	std::string	_inner_message;
 	Backtrace	_backtrace;
 };
+
+
+inline std::ostream&
+operator<< (std::ostream& os, Exception const& e)
+{
+	os << e.message() << std::endl;
+	os << e.backtrace() << std::endl;
+	return os;
+}
 
 
 inline
@@ -100,12 +117,43 @@ Exception::backtrace() const
 }
 
 
-inline std::ostream&
-operator<< (std::ostream& os, Exception const& e)
+inline void
+Exception::guard (std::function<void()> guarded_code)
 {
-	os << e.message() << std::endl;
-	os << e.backtrace() << std::endl;
-	return os;
+	try {
+		guard_and_rethrow (guarded_code);
+	}
+	catch (...)
+	{ }
+}
+
+
+inline void
+Exception::guard_and_rethrow (std::function<void()> guarded_code)
+{
+	try {
+		guarded_code();
+	}
+	catch (Exception const& e)
+	{
+		std::clog << e << std::endl;
+		throw;
+	}
+	catch (boost::exception const& e)
+	{
+		std::clog << "boost::exception " << typeid (e).name() << std::endl;
+		throw;
+	}
+	catch (std::exception const& e)
+	{
+		std::clog << "std::exception " << typeid (e).name() << std::endl;
+		throw;
+	}
+	catch (...)
+	{
+		std::clog << "unknown exception" << std::endl;
+		throw;
+	}
 }
 
 } // namespace Xefis

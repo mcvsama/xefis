@@ -101,6 +101,33 @@ Application::~Application()
 }
 
 
+bool
+Application::notify (QObject* receiver, QEvent* event)
+{
+	try {
+		return QApplication::notify (receiver, event);
+	}
+	catch (Exception const& e)
+	{
+		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded Xefis::Exception:" << std::endl << e << std::endl;
+	}
+	catch (boost::exception const& e)
+	{
+		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded boost::exception " << typeid (e).name() << std::endl;
+	}
+	catch (std::exception const& e)
+	{
+		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded std::exception " << typeid (e).name() << std::endl;
+	}
+	catch (...)
+	{
+		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded unknown exception" << std::endl;
+	}
+
+	return false;
+}
+
+
 void
 Application::quit()
 {
