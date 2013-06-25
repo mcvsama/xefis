@@ -55,7 +55,13 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_reinitialize_timer->setSingleShot (true);
 	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 
-	initialize();
+	try {
+		Xefis::Exception::guard_and_rethrow (std::bind (&BMP085::initialize, this));
+	}
+	catch (...)
+	{
+		reinitialize();
+	}
 }
 
 
@@ -106,6 +112,9 @@ BMP085::initialize()
 void
 BMP085::reinitialize()
 {
+	_temperature.set_nil();
+	_pressure.set_nil();
+
 	_initialized = false;
 	_middle_of_request = false;
 	_request_other = false;
@@ -214,18 +223,10 @@ BMP085::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::Exception const& e)
-	{
-		xdebug ("Caught Xefis::Exception\n");
-		std::clog << e << std::endl;
-		// TODO log exception
-		reinitialize();
-	}
 	catch (...)
 	{
-		xdebug ("Caught generic exception\n");
-		// TODO log generic exception
 		reinitialize();
+		throw;
 	}
 }
 
