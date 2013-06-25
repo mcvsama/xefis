@@ -67,7 +67,7 @@ int main (int argc, char** argv, char**)
 	}
 	catch (...)
 	{
-		Backtrace::clog();
+		Xefis::Backtrace::clog();
 		throw;
 	}
 

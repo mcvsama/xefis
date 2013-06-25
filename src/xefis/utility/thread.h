@@ -27,6 +27,8 @@
 #include <xefis/utility/noncopyable.h>
 
 
+namespace Xefis {
+
 /**
  * Thread is created in "detached" state, that means it will
  * automatically free its resources after exit.
@@ -124,6 +126,8 @@ class Thread: private Noncopyable
 	std::atomic<bool>	_finished;
 	Mutex				_wait;
 };
+
+} // namespace Xefis
 
 #endif
 

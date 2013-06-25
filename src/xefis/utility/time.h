@@ -24,6 +24,8 @@
 #include <xefis/config/all.h>
 
 
+namespace Xefis {
+
 void
 sleep (Time time)
 {
@@ -37,6 +39,8 @@ sleep (Time time)
 				continue;
 	} while (false);
 }
+
+} // namespace Xefis
 
 #endif
 

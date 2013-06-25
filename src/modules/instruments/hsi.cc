@@ -23,7 +23,6 @@
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/navigation.h>
 
 // Local:
 #include "hsi.h"
@@ -148,7 +147,7 @@ HSI::read()
 	if (_track_lateral_delta_dpm.valid())
 	{
 		_hsi_widget->set_trend_vector_lookahead (*_trend_vector_range);
-		_hsi_widget->set_track_trend (limit (*_track_lateral_delta_dpm, -180.0_deg, +180.0_deg));
+		_hsi_widget->set_track_trend (Xefis::limit (*_track_lateral_delta_dpm, -180.0_deg, +180.0_deg));
 		_hsi_widget->set_trend_vector_visible (true);
 	}
 	else

@@ -48,6 +48,8 @@ template<class P>
 State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
 	Module (module_manager)
 {
+	using Xefis::limit;
+
 	// adi:
 	Xefis::PropertyBoolean ("/settings/adi/flight-path-marker-visible").write (true);
 	Xefis::PropertyBoolean ("/settings/adi/pitch-limit-visible").write (true);

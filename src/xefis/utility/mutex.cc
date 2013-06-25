@@ -23,6 +23,8 @@
 #include "mutex.h"
 
 
+namespace Xefis {
+
 Mutex::Mutex (MutexType kind) noexcept
 {
 	static ::pthread_mutex_t initializer = PTHREAD_MUTEX_INITIALIZER;
@@ -50,4 +52,6 @@ Mutex::~Mutex() noexcept
 RecursiveMutex::RecursiveMutex() noexcept:
 	Mutex (Mutex::Recursive)
 { }
+
+} // namespace Xefis
 

@@ -28,6 +28,7 @@
 #include "i2c.h"
 
 
+namespace Xefis {
 namespace I2C {
 
 Message::Message (Operation operation, Address const& address, uint8_t* begin, uint8_t* end):
@@ -115,4 +116,5 @@ Bus::execute (Transaction const& transaction)
 }
 
 } // namespace I2C
+} // namespace Xefis
 

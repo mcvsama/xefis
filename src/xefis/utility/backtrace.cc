@@ -25,6 +25,8 @@
 #include "backtrace.h"
 
 
+namespace Xefis {
+
 Backtrace::Backtrace()
 {
 	const int MAX = 256;
@@ -65,4 +67,6 @@ operator<< (std::ostream& os, Backtrace const& backtrace)
 		os << "  " << std::setw (4) << i << ". " << backtrace.symbols()[i].location << ": " << backtrace.symbols()[i].name << std::endl;
 	return os;
 }
+
+} // namespace Xefis
 

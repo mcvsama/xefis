@@ -21,6 +21,8 @@
 #include <xefis/config/all.h>
 
 
+namespace Xefis {
+
 template<class tValueType>
 	class Range
 	{
@@ -170,6 +172,8 @@ template<class T>
 			? (_min <= value && value <= _max)
 			: (_max <= value && value <= _min);
 	}
+
+} // namespace Xefis
 
 #endif
 

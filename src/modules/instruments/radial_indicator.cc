@@ -68,7 +68,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 void
 RadialIndicator::read()
 {
-	_widget->set_range (Range<double> { *_range_minimum, *_range_maximum });
+	_widget->set_range (Xefis::Range<double> { *_range_minimum, *_range_maximum });
 
 	_widget->set_value (*_value);
 	_widget->set_value_visible (_value.valid());

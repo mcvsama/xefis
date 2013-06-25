@@ -225,7 +225,7 @@ JoystickInput::Axis::set_value (float value)
 	if (std::abs (value) < dead_zone)
 		value = 0.f;
 	else
-		value = value - sgn (value) * dead_zone;
+		value = value - Xefis::sgn (value) * dead_zone;
 	// Reverse:
 	value *= reverse;
 	// Scale:

@@ -45,7 +45,7 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 	float const w = width();
 	float const h = height();
 
-	Painter painter (this, &_text_painter_cache);
+	Xefis::Painter painter (this, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
@@ -67,7 +67,7 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 
 
 void
-RadialIndicatorWidget::paint_text (Painter& painter, float q, float)
+RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 {
 	QColor yellow (255, 220, 0);
 	QColor orange (255, 150, 0);
@@ -130,7 +130,7 @@ RadialIndicatorWidget::paint_text (Painter& painter, float q, float)
 
 
 void
-RadialIndicatorWidget::paint_indicator (Painter& painter, float, float r)
+RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 {
 	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);

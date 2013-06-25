@@ -22,6 +22,8 @@
 #include "painter.h"
 
 
+namespace Xefis {
+
 Painter::Painter (QPaintDevice* device, TextPainter::Cache* cache):
 	TextPainter (device, cache)
 { }
@@ -45,4 +47,6 @@ Painter::draw_outlined_polygon (QPolygonF const& polygon)
 	configure_normal();
 	drawPolygon (polygon);
 }
+
+} // namespace Xefis
 

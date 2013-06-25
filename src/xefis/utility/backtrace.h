@@ -29,6 +29,8 @@
 	}
 
 
+namespace Xefis {
+
 class Backtrace
 {
   public:
@@ -60,6 +62,8 @@ class Backtrace
 
 std::ostream&
 operator<< (std::ostream& os, Backtrace const& backtrace);
+
+} // namespace Xefis
 
 #endif
 

@@ -26,6 +26,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
+namespace Xefis {
 namespace I2C {
 
 enum Operation {
@@ -216,6 +217,7 @@ Bus::set_bus_number (uint8_t bus_number) noexcept
 }
 
 } // namespace I2C
+} // namespace Xefis
 
 #endif
 

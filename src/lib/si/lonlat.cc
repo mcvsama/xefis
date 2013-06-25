@@ -17,6 +17,9 @@
 // Qt:
 #include <QtGui/QTransform>
 
+// Xefis:
+#include <xefis/utility/numeric.h>
+
 // Local:
 #include "lonlat.h"
 
@@ -116,6 +119,20 @@ LonLat::initial_bearing (LonLat const& other) const
 			 - std::sin (lat1) * std::cos (lat2) * std::cos (dlon);
 
 	return 1_rad * std::atan2 (y, x);
+}
+
+
+Angle
+LonLat::great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b)
+{
+	LonLat z1 (a.lon() - common.lon(), a.lat() - common.lat());
+	LonLat zero (0_deg, 0_deg);
+	LonLat z2 (b.lon() - common.lon(), b.lat() - common.lat());
+
+	std::complex<ValueType::ValueType> x1 (z1.lon().deg(), z1.lat().deg());
+	std::complex<ValueType::ValueType> x2 (z2.lon().deg(), z2.lat().deg());
+
+	return 1_deg * Xefis::floored_mod<double> ((1_rad * (std::arg (x1) - std::arg (x2))).deg(), 360.0);
 }
 
 } // namespace SI

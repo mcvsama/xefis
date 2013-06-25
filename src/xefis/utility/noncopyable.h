@@ -18,6 +18,8 @@
 #include <xefis/config/all.h>
 
 
+namespace Xefis {
+
 class Noncopyable
 {
 	Noncopyable (Noncopyable const&) = delete;
@@ -26,6 +28,8 @@ class Noncopyable
   protected:
 	Noncopyable() noexcept { }
 };
+
+} // namespace Xefis
 
 #endif
 

@@ -251,8 +251,8 @@ BMP085::read_s16 (uint8_t base_register)
 {
 	int16_t value;
 	uint8_t* c = reinterpret_cast<uint8_t*> (&value);
-	_i2c_bus.execute ({ I2C::Message (I2C::Write, _i2c_address, &base_register),
-						I2C::Message (I2C::Read, _i2c_address, c, c + 2) });
+	_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, &base_register),
+						Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, c, c + 2) });
 	boost::endian::big_to_native (value);
 	return value;
 }
@@ -263,8 +263,8 @@ BMP085::read_u16 (uint8_t base_register)
 {
 	uint16_t value;
 	uint8_t* c = reinterpret_cast<uint8_t*> (&value);
-	_i2c_bus.execute ({ I2C::Message (I2C::Write, _i2c_address, &base_register),
-						I2C::Message (I2C::Read, _i2c_address, c, c + 2) });
+	_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, &base_register),
+						Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, c, c + 2) });
 	boost::endian::big_to_native (value);
 	return value;
 }
@@ -275,8 +275,8 @@ BMP085::read_u24 (uint8_t base_register)
 {
 	uint32_t value = 0;
 	uint8_t* c = reinterpret_cast<uint8_t*> (&value);
-	_i2c_bus.execute ({ I2C::Message (I2C::Write, _i2c_address, &base_register),
-						I2C::Message (I2C::Read, _i2c_address, c + 1, c + 4) });
+	_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, &base_register),
+						Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, c + 1, c + 4) });
 	boost::endian::big_to_native (value);
 	return value;
 }
@@ -286,6 +286,6 @@ void
 BMP085::write (uint8_t base_register, uint8_t value)
 {
 	uint8_t bytes[] = { base_register, value };
-	_i2c_bus.execute ({ I2C::Message (I2C::Write, _i2c_address, bytes, bytes + 2) });
+	_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, bytes, bytes + 2) });
 }
 

@@ -78,6 +78,8 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 void
 FlightDirector::data_updated()
 {
+	using Xefis::limit;
+
 	// Don't process if dt is too small:
 	_dt += update_dt();
 	if (_dt < 0.005_s)
@@ -89,14 +91,14 @@ FlightDirector::data_updated()
 		double const vertical_speed_output_scale = 0.01;
 		double const rl = (*_roll_limit).deg();
 		double const pl = (*_pitch_limit).deg();
-		Range<float> roll_limit (-rl, +rl);
-		Range<float> pitch_limit (-pl, +pl);
+		Xefis::Range<float> roll_limit (-rl, +rl);
+		Xefis::Range<float> pitch_limit (-pl, +pl);
 
-		_magnetic_heading_pid.set_target (renormalize ((*_selected_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
-		_magnetic_heading_pid.process (renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+		_magnetic_heading_pid.set_target (Xefis::renormalize ((*_selected_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
+		_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
 
-		_magnetic_track_pid.set_target (renormalize ((*_selected_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
-		_magnetic_track_pid.process (renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+		_magnetic_track_pid.set_target (Xefis::renormalize ((*_selected_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
+		_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
 
 		_altitude_pid.set_target ((*_selected_altitude).ft());
 		_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());

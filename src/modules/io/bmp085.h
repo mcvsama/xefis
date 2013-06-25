@@ -104,8 +104,8 @@ class BMP085:
 	Xefis::PropertyPressure		_pressure;
 	Xefis::PropertyTime			_pressure_interval;
 	uint8_t						_i2c_bus_number;
-	I2C::Bus					_i2c_bus;
-	I2C::Address				_i2c_address;
+	Xefis::I2C::Bus				_i2c_bus;
+	Xefis::I2C::Address			_i2c_address;
 	Oversampling				_oversampling				= Oversampling3;
 	Time						_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
 	QTimer*						_reinitialize_timer			= nullptr;

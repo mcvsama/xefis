@@ -27,6 +27,8 @@
 #include <xefis/utility/noncopyable.h>
 
 
+namespace Xefis {
+
 /**
  * MutexPermissionException
  */
@@ -341,6 +343,8 @@ template<class Type>
 		unlock();
 		throw value;
 	}
+
+} // namespace Xefis
 
 #endif
 
