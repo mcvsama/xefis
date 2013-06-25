@@ -195,22 +195,22 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_pre_paint();
 
 		void
-		adi_paint (Painter&);
+		adi_paint (Xefis::Painter&);
 
 		void
-		adi_paint_horizon (Painter&);
+		adi_paint_horizon (Xefis::Painter&);
 
 		void
-		adi_paint_pitch (Painter&);
+		adi_paint_pitch (Xefis::Painter&);
 
 		void
-		adi_paint_roll (Painter&);
+		adi_paint_roll (Xefis::Painter&);
 
 		void
-		adi_paint_heading (Painter&);
+		adi_paint_heading (Xefis::Painter&);
 
 		void
-		adi_paint_flight_path_marker (Painter&);
+		adi_paint_flight_path_marker (Xefis::Painter&);
 
 		/*
 		 * Speed ladder
@@ -223,31 +223,31 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_pre_paint();
 
 		void
-		sl_paint (Painter&);
+		sl_paint (Xefis::Painter&);
 
 		void
-		sl_paint_black_box (Painter&, float x);
+		sl_paint_black_box (Xefis::Painter&, float x);
 
 		void
-		sl_paint_ladder_scale (Painter&, float x);
+		sl_paint_ladder_scale (Xefis::Painter&, float x);
 
 		void
-		sl_paint_speed_limits (Painter&, float x);
+		sl_paint_speed_limits (Xefis::Painter&, float x);
 
 		void
-		sl_paint_speed_tendency (Painter&, float x);
+		sl_paint_speed_tendency (Xefis::Painter&, float x);
 
 		void
-		sl_paint_bugs (Painter&, float x);
+		sl_paint_bugs (Xefis::Painter&, float x);
 
 		void
-		sl_paint_mach_number (Painter&, float x);
+		sl_paint_mach_number (Xefis::Painter&, float x);
 
 		void
-		sl_paint_ap_setting (Painter&);
+		sl_paint_ap_setting (Xefis::Painter&);
 
 		void
-		sl_paint_novspd (Painter&);
+		sl_paint_novspd (Xefis::Painter&);
 
 		float
 		kt_to_px (Speed) const;
@@ -263,28 +263,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 		al_pre_paint();
 
 		void
-		al_paint (Painter&);
+		al_paint (Xefis::Painter&);
 
 		void
-		al_paint_black_box (Painter&, float x);
+		al_paint_black_box (Xefis::Painter&, float x);
 
 		void
-		al_paint_ladder_scale (Painter&, float x);
+		al_paint_ladder_scale (Xefis::Painter&, float x);
 
 		void
-		al_paint_altitude_tendency (Painter&, float x);
+		al_paint_altitude_tendency (Xefis::Painter&, float x);
 
 		void
-		al_paint_bugs (Painter&, float x);
+		al_paint_bugs (Xefis::Painter&, float x);
 
 		void
-		al_paint_climb_rate (Painter&, float x);
+		al_paint_climb_rate (Xefis::Painter&, float x);
 
 		void
-		al_paint_pressure (Painter&, float x);
+		al_paint_pressure (Xefis::Painter&, float x);
 
 		void
-		al_paint_ap_setting (Painter&);
+		al_paint_ap_setting (Xefis::Painter&);
 
 		float
 		ft_to_px (Length) const;
@@ -297,34 +297,34 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 */
 
 		void
-		paint_center_cross (Painter&, bool center_box, bool rest);
+		paint_center_cross (Xefis::Painter&, bool center_box, bool rest);
 
 		void
-		paint_flight_director (Painter&);
+		paint_flight_director (Xefis::Painter&);
 
 		void
-		paint_control_stick (Painter&);
+		paint_control_stick (Xefis::Painter&);
 
 		void
-		paint_altitude_agl (Painter&);
+		paint_altitude_agl (Xefis::Painter&);
 
 		void
-		paint_minimums_setting (Painter&);
+		paint_minimums_setting (Xefis::Painter&);
 
 		void
-		paint_nav (Painter&);
+		paint_nav (Xefis::Painter&);
 
 		void
-		paint_hints (Painter&);
+		paint_hints (Xefis::Painter&);
 
 		void
-		paint_pitch_limit (Painter&);
+		paint_pitch_limit (Xefis::Painter&);
 
 		void
-		paint_input_alert (Painter&);
+		paint_input_alert (Xefis::Painter&);
 
 		void
-		paint_dashed_zone (Painter&, QColor const&, QRectF const& target);
+		paint_dashed_zone (Xefis::Painter&, QColor const&, QRectF const& target);
 
 		/**
 		 * Render 'rotatable' value on speed/altitude black box.
@@ -337,7 +337,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 *			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
 		 */
 		void
-		paint_rotating_value (Painter& painter,
+		paint_rotating_value (Xefis::Painter& painter,
 							  QRectF const& rect, float position, float height_scale,
 							  QString const& next, QString const& curr, QString const& prev);
 
@@ -348,7 +348,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 *			Draw red/green/blank mark instead of zero.
 		 */
 		void
-		paint_rotating_digit (Painter& painter,
+		paint_rotating_digit (Xefis::Painter& painter,
 							  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 							  bool two_zeros, bool zero_mark, bool black_zero = false);
 
@@ -387,7 +387,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QTransform			_roll_transform;
 		QTransform			_heading_transform;
 		QTransform			_horizon_transform;
-		TextPainter::Cache	_text_painter_cache;
+		Xefis::TextPainter::Cache
+							_text_painter_cache;
 		QDateTime			_current_datetime;
 
 		/*

@@ -77,7 +77,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 {
 	_current_datetime = QDateTime::currentDateTime();
 
-	Painter painter (&image, &_text_painter_cache);
+	Xefis::Painter painter (&image, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
@@ -133,9 +133,9 @@ EFISWidget::PaintWorkUnit::adi_post_resize()
 void
 EFISWidget::PaintWorkUnit::adi_pre_paint()
 {
-	Angle p = floored_mod (_params.pitch + 180_deg, 360_deg) - 180_deg;
-	Angle r = floored_mod (_params.roll + 180_deg, 360_deg) - 180_deg;
-	Angle hdg = floored_mod (_params.heading, 360_deg);
+	Angle p = Xefis::floored_mod (_params.pitch + 180_deg, 360_deg) - 180_deg;
+	Angle r = Xefis::floored_mod (_params.roll + 180_deg, 360_deg) - 180_deg;
+	Angle hdg = Xefis::floored_mod (_params.heading, 360_deg);
 
 	// Mirroring, eg. -180° pitch is the same
 	// as 0° pitch with roll inverted:
@@ -169,14 +169,14 @@ EFISWidget::PaintWorkUnit::adi_pre_paint()
 	_horizon_transform.shear (0.0001f, 0.f);
 
 	// Limit FPM position:
-	_params.flight_path_alpha = limit (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
-	_params.flight_path_beta = limit (_params.flight_path_beta, -25.0_deg, +25.0_deg);
+	_params.flight_path_alpha = Xefis::limit (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
+	_params.flight_path_beta = Xefis::limit (_params.flight_path_beta, -25.0_deg, +25.0_deg);
 	_flight_path_marker_position = QPointF (-heading_to_px (_params.flight_path_beta), -pitch_to_px (_params.flight_path_alpha));
 }
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint (Xefis::Painter& painter)
 {
 	adi_pre_paint();
 
@@ -189,7 +189,7 @@ EFISWidget::PaintWorkUnit::adi_paint (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_horizon (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 {
 	if (_params.pitch_visible && _params.roll_visible)
 	{
@@ -210,7 +210,7 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
 {
 	if (!_params.pitch_visible)
 		return;
@@ -231,8 +231,8 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
 
 	// Pitch scale is clipped to small rectangle, so narrow it even more:
 	float clipped_pitch_factor = 0.45f;
-	Range<Angle> deg_range (_params.pitch - clipped_pitch_factor * 0.485f * _params.fov,
-							_params.pitch + clipped_pitch_factor * 0.365f * _params.fov);
+	Xefis::Range<Angle> deg_range (_params.pitch - clipped_pitch_factor * 0.485f * _params.fov,
+								   _params.pitch + clipped_pitch_factor * 0.365f * _params.fov);
 
 	painter.setPen (get_pen (Qt::white, 1.f));
 	// 10° lines, exclude +/-90°:
@@ -293,7 +293,7 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_roll (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
 	bool const bank_angle_warning = _params.roll_limit > 0_deg && std::abs (_params.roll.deg()) > _params.roll_limit.deg();
@@ -385,7 +385,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Painter& painter)
 
 		if (_params.slip_skid_visible)
 		{
-			painter.translate (-limit (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
+			painter.translate (-Xefis::limit (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
 			if (bank_angle_warning || slip_skid_warning)
 				painter.setPen (warning_pen);
@@ -415,7 +415,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 {
 	float const w = wh() * 2.25f / 9.f;
 	float const fpxs = _font_10.pixelSize();
@@ -437,8 +437,8 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
 	if (_params.heading_visible)
 	{
 		float clipped_pitch_factor = 0.5f;
-		Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.485f * _params.fov,
-								_params.heading + clipped_pitch_factor * 0.350f * _params.fov);
+		Xefis::Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.485f * _params.fov,
+									   _params.heading + clipped_pitch_factor * 0.350f * _params.fov);
 
 		painter.setTransform (_heading_transform * _horizon_transform);
 		if (_params.heading_numbers_visible)
@@ -455,7 +455,7 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
 				// 5° lines:
 				painter.draw_outlined_line (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 
-				QString text = QString::number (floored_mod (1.f * deg, 360.f) / 10);
+				QString text = QString::number (Xefis::floored_mod (1.f * deg, 360.f) / 10);
 				if (text == "0")
 					text = "N";
 				else if (text == "9")
@@ -478,7 +478,7 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (Xefis::Painter& painter)
 {
 	if (!_params.flight_path_visible)
 		return;
@@ -499,11 +499,11 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_params.speed = limit (_params.speed, 0_kt, 9999.99_kt);
-	_params.mach = limit (_params.mach, 0.f, 9.99f);
-	_params.minimum_speed = limit (_params.minimum_speed, 0.0_kt, 9999.99_kt);
-	_params.warning_speed = limit (_params.warning_speed, 0.0_kt, 9999.99_kt);
-	_params.maximum_speed = limit (_params.maximum_speed, 0.0_kt, 9999.99_kt);
+	_params.speed = Xefis::limit (_params.speed, 0_kt, 9999.99_kt);
+	_params.mach = Xefis::limit (_params.mach, 0.f, 9.99f);
+	_params.minimum_speed = Xefis::limit (_params.minimum_speed, 0.0_kt, 9999.99_kt);
+	_params.warning_speed = Xefis::limit (_params.warning_speed, 0.0_kt, 9999.99_kt);
+	_params.maximum_speed = Xefis::limit (_params.maximum_speed, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -528,7 +528,7 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 void
 EFISWidget::PaintWorkUnit::sl_pre_paint()
 {
-	_params.speed = limit (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
+	_params.speed = Xefis::limit (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
 	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
 	_sl_max_shown = _params.speed + 0.5f * _params.sl_extent;
 	_sl_min_shown = std::max (_sl_min_shown, 1_kt * _params.sl_minimum);
@@ -540,7 +540,7 @@ EFISWidget::PaintWorkUnit::sl_pre_paint()
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint (Painter& painter)
+EFISWidget::PaintWorkUnit::sl_paint (Xefis::Painter& painter)
 {
 	sl_pre_paint();
 
@@ -564,7 +564,7 @@ EFISWidget::PaintWorkUnit::sl_paint (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_black_box (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -624,13 +624,13 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Painter& painter, float x)
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed + 1.f, 10.f)))),
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed, 10.f)))),
 							 _params.speed > (1_kt * _params.sl_minimum + 0.5_kt)
-								? QString::number (static_cast<int> (floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
+								? QString::number (static_cast<int> (Xefis::floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
 								: " ");
 }
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (Xefis::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -672,7 +672,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -726,7 +726,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Xefis::Painter& painter, float x)
 {
 	if (!_params.speed_tendency_visible || !_params.speed_visible)
 		return;
@@ -740,7 +740,8 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Painter& painter, float x)
 	painter.translate (1.2f * x, 0.f);
 	if (_params.speed_tendency < _params.speed)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_sl_ladder_rect.height() / 2.f, 1.f * std::abs (kt_to_px (limit (_params.speed_tendency, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
+	float length = std::min<float> (_sl_ladder_rect.height() / 2.f,
+									1.f * std::abs (kt_to_px (Xefis::limit (_params.speed_tendency, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -759,7 +760,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_bugs (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -791,8 +792,8 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Painter& painter, float x)
 	// AT bug:
 	if (_params.cmd_speed_visible)
 	{
-		float posy = limit (kt_to_px (limit (_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
-							static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
+		float posy = Xefis::limit (kt_to_px (Xefis::limit (_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
+								   static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
 		// TODO extract bug_shape to sl_post_resize()
 		QPolygonF bug_shape = QPolygonF()
 			<< QPointF (0.f, 0.f)
@@ -812,7 +813,7 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_mach_number (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float x)
 {
 	if (!_params.mach_visible)
 		return;
@@ -843,7 +844,7 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_number (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Painter& painter)
+EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 {
 	if (!_params.cmd_speed_visible)
 		return;
@@ -875,7 +876,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_novspd (Painter& painter)
+EFISWidget::PaintWorkUnit::sl_paint_novspd (Xefis::Painter& painter)
 {
 	if (_params.novspd_flag)
 	{
@@ -942,8 +943,8 @@ EFISWidget::PaintWorkUnit::al_post_resize()
 void
 EFISWidget::PaintWorkUnit::al_pre_paint()
 {
-	_params.altitude = limit (_params.altitude, -99999_ft, +99999_ft);
-	_params.climb_rate = limit (_params.climb_rate, -9999_fpm, +9999_fpm);
+	_params.altitude = Xefis::limit (_params.altitude, -99999_ft, +99999_ft);
+	_params.climb_rate = Xefis::limit (_params.climb_rate, -9999_fpm, +9999_fpm);
 
 	float sgn = _params.altitude < 0_ft ? -1.f : 1.f;
 	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
@@ -956,7 +957,7 @@ EFISWidget::PaintWorkUnit::al_pre_paint()
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint (Painter& painter)
+EFISWidget::PaintWorkUnit::al_paint (Xefis::Painter& painter)
 {
 	al_pre_paint();
 
@@ -979,7 +980,7 @@ EFISWidget::PaintWorkUnit::al_paint (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_black_box (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 {
 	QFont b_font = _font_20;
 	float const b_digit_width = _font_20_digit_width;
@@ -1037,7 +1038,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Xefis::Painter& painter, float x)
 {
 	if (!_params.altitude_visible)
 		return;
@@ -1121,7 +1122,7 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Xefis::Painter& painter, float x)
 {
 	if (!_params.altitude_tendency_visible || !_params.altitude_visible)
 		return;
@@ -1154,7 +1155,7 @@ EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Painter& painter, float x
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 {
 	if (_params.altitude_visible)
 	{
@@ -1224,9 +1225,9 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
 		// AP bug:
 		if (_params.cmd_altitude_visible)
 		{
-			Length cmd_altitude = limit (_params.cmd_altitude, -99999_ft, +99999_ft);
-			float posy = limit (ft_to_px (cmd_altitude),
-								static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
+			Length cmd_altitude = Xefis::limit (_params.cmd_altitude, -99999_ft, +99999_ft);
+			float posy = Xefis::limit (ft_to_px (cmd_altitude),
+									   static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
 				<< QPointF (0.f, 0.f)
 				<< QPointF (-0.5f * x, -0.5f * x)
@@ -1289,7 +1290,7 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x)
 {
 	QPen bold_white_pen = get_pen (Qt::white, 1.25f);
 	QPen thin_white_pen = get_pen (Qt::white, 0.50f);
@@ -1384,7 +1385,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_pressure (Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_pressure (Xefis::Painter& painter, float x)
 {
 	if (!_params.pressure_visible)
 		return;
@@ -1425,12 +1426,12 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_ap_setting (Painter& painter)
+EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 {
 	if (!_params.cmd_altitude_visible)
 		return;
 
-	Length cmd_altitude = limit (_params.cmd_altitude, -99999_ft, +99999_ft);
+	Length cmd_altitude = Xefis::limit (_params.cmd_altitude, -99999_ft, +99999_ft);
 
 	QFont b_font = _font_20;
 	float const b_digit_width = _font_20_digit_width;
@@ -1497,7 +1498,7 @@ EFISWidget::PaintWorkUnit::scale_cbr (Speed climb_rate) const
 
 
 void
-EFISWidget::PaintWorkUnit::paint_center_cross (Painter& painter, bool center_box, bool rest)
+EFISWidget::PaintWorkUnit::paint_center_cross (Xefis::Painter& painter, bool center_box, bool rest)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -1544,18 +1545,20 @@ EFISWidget::PaintWorkUnit::paint_center_cross (Painter& painter, bool center_box
 
 
 void
-EFISWidget::PaintWorkUnit::paint_flight_director (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_flight_director (Xefis::Painter& painter)
 {
+	using Xefis::sgn;
+
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _params.fov / 4.f;
 
 	Angle pitch = std::cos (_params.roll) * (_params.flight_director_pitch - _params.pitch);
-	pitch = limit (pitch, -range, +range);
+	pitch = Xefis::limit (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.roll;
 	if (std::abs (roll.deg()) > 180.0)
 		roll = roll - sgn (roll.deg()) * 360_deg;
-	roll = limit (roll, -range, +range);
+	roll = Xefis::limit (roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1576,7 +1579,7 @@ EFISWidget::PaintWorkUnit::paint_flight_director (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_control_stick (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_control_stick (Xefis::Painter& painter)
 {
 	if (!_params.control_stick_visible)
 		return;
@@ -1584,8 +1587,8 @@ EFISWidget::PaintWorkUnit::paint_control_stick (Painter& painter)
 	float const w = wh() * 0.2f / 9.f;
 	Angle range = _params.fov / 4.f;
 
-	Angle pitch = limit (_params.control_stick_pitch, -range, +range);
-	Angle roll = limit (_params.control_stick_roll, -range, +range);
+	Angle pitch = Xefis::limit (_params.control_stick_pitch, -range, +range);
+	Angle roll = Xefis::limit (_params.control_stick_roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1604,12 +1607,12 @@ EFISWidget::PaintWorkUnit::paint_control_stick (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_altitude_agl (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_altitude_agl (Xefis::Painter& painter)
 {
 	if (!_params.altitude_agl_visible)
 		return;
 
-	Length aagl = limit (_params.altitude_agl, -9999_ft, +99999_ft);
+	Length aagl = Xefis::limit (_params.altitude_agl, -9999_ft, +99999_ft);
 	QFont radar_altimeter_font = _font_20;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
@@ -1643,7 +1646,7 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_minimums_setting (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 {
 	if (!_params.minimums_altitude_visible)
 		return;
@@ -1690,7 +1693,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_nav (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
@@ -1699,7 +1702,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Painter& painter)
 	{
 		if (_params.localizer_info_visible)
 		{
-			QString loc_str = QString ("%1/%2°").arg (_params.localizer_id).arg (std::round (floored_mod (_params.localizer_magnetic_bearing.deg(), 360.0)));
+			QString loc_str = QString ("%1/%2°").arg (_params.localizer_id).arg (std::round (Xefis::floored_mod (_params.localizer_magnetic_bearing.deg(), 360.0)));
 			QFont font = _font_10;
 
 			painter.setPen (Qt::white);
@@ -1730,7 +1733,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Painter& painter)
 
 		auto paint_ladder = [&](bool needle_visible, Angle track_deviation) -> void
 		{
-			track_deviation = limit (track_deviation, -2_deg, +2_deg);
+			track_deviation = Xefis::limit (track_deviation, -2_deg, +2_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -1783,8 +1786,8 @@ EFISWidget::PaintWorkUnit::paint_nav (Painter& painter)
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * limit (_params.lateral_deviation_deg, -2_deg, +2_deg).deg();
-		float ypos = -pitch_to_px (limit (_params.pitch + _params.runway_position, 0_deg, 25_deg));
+		float offset = 0.5f * Xefis::limit (_params.lateral_deviation_deg, -2_deg, +2_deg).deg();
+		float ypos = -pitch_to_px (Xefis::limit (_params.pitch + _params.runway_position, 0_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, ypos);
@@ -1814,7 +1817,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_hints (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 {
 	float const q = 0.1f * wh();
 
@@ -1927,14 +1930,14 @@ EFISWidget::PaintWorkUnit::paint_hints (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_pitch_limit (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_pitch_limit (Xefis::Painter& painter)
 {
 	if (!_params.pitch_limit_visible || !_params.pitch_visible)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (limit (_params.pitch_limit, -20_deg, +16_deg)));
+	painter.translate (0.f, pitch_to_px (Xefis::limit (_params.pitch_limit, -20_deg, +16_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 
@@ -1966,7 +1969,7 @@ EFISWidget::PaintWorkUnit::paint_pitch_limit (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_input_alert (Painter& painter)
+EFISWidget::PaintWorkUnit::paint_input_alert (Xefis::Painter& painter)
 {
 	QFont font = _font;
 	font.setPixelSize (font_size (30.f));
@@ -1998,7 +2001,7 @@ EFISWidget::PaintWorkUnit::paint_input_alert (Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_dashed_zone (Painter& painter, QColor const& color, QRectF const& target)
+EFISWidget::PaintWorkUnit::paint_dashed_zone (Xefis::Painter& painter, QColor const& color, QRectF const& target)
 {
 	QFontMetricsF metrics (painter.font());
 	float w = 0.7f * metrics.width ("0");
@@ -2021,7 +2024,7 @@ EFISWidget::PaintWorkUnit::paint_dashed_zone (Painter& painter, QColor const& co
 
 
 void
-EFISWidget::PaintWorkUnit::paint_rotating_value (Painter& painter,
+EFISWidget::PaintWorkUnit::paint_rotating_value (Xefis::Painter& painter,
 								  QRectF const& rect, float position, float height_scale,
 								  QString const& next, QString const& curr, QString const& prev)
 {
@@ -2056,7 +2059,7 @@ EFISWidget::PaintWorkUnit::paint_rotating_value (Painter& painter,
 
 
 void
-EFISWidget::PaintWorkUnit::paint_rotating_digit (Painter& painter,
+EFISWidget::PaintWorkUnit::paint_rotating_digit (Xefis::Painter& painter,
 								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 								  bool two_zeros, bool zero_mark, bool black_zero)
 {
@@ -2083,7 +2086,7 @@ EFISWidget::PaintWorkUnit::paint_rotating_digit (Painter& painter,
 	QString sc = zero_mark && c == 0 ? (black_zero ? "-" : (xc >= 0.f ? "G" : "R")) : QString::number (c);
 
 	if (std::abs (dtr) < delta && (two_zeros || std::abs (value) >= round_target / 2))
-		pos = floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
+		pos = Xefis::floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
 
 	paint_rotating_value (painter, box, pos, height_scale, sa, sb, sc);
 }

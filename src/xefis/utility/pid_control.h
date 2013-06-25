@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__PID_H__INCLUDED
-#define XEFIS__UTILITY__PID_H__INCLUDED
+#ifndef XEFIS__UTILITY__PIDCONTROL_H__INCLUDED
+#define XEFIS__UTILITY__PIDCONTROL_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -32,14 +32,14 @@ namespace Xefis {
  * TODO protect from infs and nans
  */
 template<class tValueType>
-	class PID
+	class PIDControl
 	{
 		typedef tValueType ValueType;
 		typedef double ParamType;
 		typedef double TimeType;
 
 	  public:
-		PID (ParamType p, ParamType i, ParamType d, ValueType target);
+		PIDControl (ParamType p, ParamType i, ParamType d, ValueType target);
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
@@ -177,7 +177,7 @@ template<class tValueType>
 
 template<class T>
 	inline
-	PID<T>::PID (ParamType p, ParamType i, ParamType d, ValueType target):
+	PIDControl<T>::PIDControl (ParamType p, ParamType i, ParamType d, ValueType target):
 		_target (target),
 		_p (p),
 		_i (i),
@@ -187,15 +187,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_winding (bool winding)
+	PIDControl<T>::set_winding (bool winding)
 	{
 		_winding = winding;
 	}
 
 
 template<class T>
-	inline typename PID<T>::ParamType
-	PID<T>::p() const noexcept
+	inline typename PIDControl<T>::ParamType
+	PIDControl<T>::p() const noexcept
 	{
 		return _p;
 	}
@@ -203,15 +203,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_p (ParamType p) noexcept
+	PIDControl<T>::set_p (ParamType p) noexcept
 	{
 		_p = p;
 	}
 
 
 template<class T>
-	inline typename PID<T>::ParamType
-	PID<T>::i() const noexcept
+	inline typename PIDControl<T>::ParamType
+	PIDControl<T>::i() const noexcept
 	{
 		return _i;
 	}
@@ -219,15 +219,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_i (ParamType i) noexcept
+	PIDControl<T>::set_i (ParamType i) noexcept
 	{
 		_i = i;
 	}
 
 
 template<class T>
-	inline typename PID<T>::ParamType
-	PID<T>::d() const noexcept
+	inline typename PIDControl<T>::ParamType
+	PIDControl<T>::d() const noexcept
 	{
 		return _d;
 	}
@@ -235,7 +235,7 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_d (ParamType d) noexcept
+	PIDControl<T>::set_d (ParamType d) noexcept
 	{
 		_d = d;
 	}
@@ -243,7 +243,7 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_pid (ParamType p, ParamType i, ParamType d) noexcept
+	PIDControl<T>::set_pid (ParamType p, ParamType i, ParamType d) noexcept
 	{
 		_p = p;
 		_i = i;
@@ -252,8 +252,8 @@ template<class T>
 
 
 template<class T>
-	inline typename PID<T>::ParamType
-	PID<T>::gain() const noexcept
+	inline typename PIDControl<T>::ParamType
+	PIDControl<T>::gain() const noexcept
 	{
 		return _gain;
 	}
@@ -261,15 +261,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_gain (ParamType gain) noexcept
+	PIDControl<T>::set_gain (ParamType gain) noexcept
 	{
 		_gain = gain;
 	}
 
 
 template<class T>
-	inline typename PID<T>::ParamType
-	PID<T>::error_power() const noexcept
+	inline typename PIDControl<T>::ParamType
+	PIDControl<T>::error_power() const noexcept
 	{
 		return _error_power;
 	}
@@ -277,15 +277,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_error_power (ParamType power) noexcept
+	PIDControl<T>::set_error_power (ParamType power) noexcept
 	{
 		_error_power = power;
 	}
 
 
 template<class T>
-	inline Range<typename PID<T>::ValueType>
-	PID<T>::i_limit() const noexcept
+	inline Range<typename PIDControl<T>::ValueType>
+	PIDControl<T>::i_limit() const noexcept
 	{
 		return _i_limit;
 	}
@@ -293,15 +293,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_i_limit (Range<ValueType> limit) noexcept
+	PIDControl<T>::set_i_limit (Range<ValueType> limit) noexcept
 	{
 		_i_limit = limit;
 	}
 
 
 template<class T>
-	inline Range<typename PID<T>::ValueType>
-	PID<T>::output_limit() const noexcept
+	inline Range<typename PIDControl<T>::ValueType>
+	PIDControl<T>::output_limit() const noexcept
 	{
 		return _output_limit;
 	}
@@ -309,7 +309,7 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_output_limit (Range<ValueType> limit) noexcept
+	PIDControl<T>::set_output_limit (Range<ValueType> limit) noexcept
 	{
 		_output_limit = limit;
 	}
@@ -317,15 +317,15 @@ template<class T>
 
 template<class T>
 	inline void
-	PID<T>::set_target (ValueType target) noexcept
+	PIDControl<T>::set_target (ValueType target) noexcept
 	{
 		_target = target;
 	}
 
 
 template<class T>
-	inline typename PID<T>::ValueType
-	PID<T>::process (ValueType measured_value, TimeType dt) noexcept
+	inline typename PIDControl<T>::ValueType
+	PIDControl<T>::process (ValueType measured_value, TimeType dt) noexcept
 	{
 		ValueType error;
 		if (_winding)
@@ -351,8 +351,8 @@ template<class T>
 
 
 template<class T>
-	inline typename PID<T>::ValueType
-	PID<T>::output() const noexcept
+	inline typename PIDControl<T>::ValueType
+	PIDControl<T>::output() const noexcept
 	{
 		return _output;
 	}

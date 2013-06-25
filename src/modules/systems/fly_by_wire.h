@@ -23,7 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/utility/pid.h>
+#include <xefis/utility/pid_control.h>
 
 
 class FlyByWire: public Xefis::Module
@@ -48,58 +48,58 @@ class FlyByWire: public Xefis::Module
 
   private:
 	// Used with joystick input:
-	Xefis::PID<float>		_manual_pitch_pid;
-	Xefis::PID<float>		_manual_roll_pid;
-	Angle					_pre_output_pitch	= 0_deg;
-	Angle					_pre_output_roll	= 0_deg;
+	Xefis::PIDControl<float>	_manual_pitch_pid;
+	Xefis::PIDControl<float>	_manual_roll_pid;
+	Angle						_pre_output_pitch	= 0_deg;
+	Angle						_pre_output_roll	= 0_deg;
 	// Stabilizer PIDs:
-	Xefis::PID<float>		_elevator_pid;
-	Xefis::PID<float>		_ailerons_pid;
-	Xefis::PID<float>		_rudder_pid;
-	Time					_dt					= 0_s;
+	Xefis::PIDControl<float>	_elevator_pid;
+	Xefis::PIDControl<float>	_ailerons_pid;
+	Xefis::PIDControl<float>	_rudder_pid;
+	Time						_dt					= 0_s;
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
-	Xefis::PropertyInteger	_mode;
-	Xefis::PropertyAngle	_pitch_extent;
-	Xefis::PropertyAngle	_roll_extent;
-	Xefis::PropertyFloat	_stabilization_gain;
-	Xefis::PropertyFloat	_pitch_gain;
-	Xefis::PropertyFloat	_pitch_p;
-	Xefis::PropertyFloat	_pitch_i;
-	Xefis::PropertyFloat	_pitch_d;
-	Xefis::PropertyFloat	_pitch_error_power;
-	Xefis::PropertyFloat	_roll_gain;
-	Xefis::PropertyFloat	_roll_p;
-	Xefis::PropertyFloat	_roll_i;
-	Xefis::PropertyFloat	_roll_d;
-	Xefis::PropertyFloat	_roll_error_power;
-	Xefis::PropertyFloat	_yaw_gain;
-	Xefis::PropertyFloat	_yaw_p;
-	Xefis::PropertyFloat	_yaw_i;
-	Xefis::PropertyFloat	_yaw_d;
-	Xefis::PropertyFloat	_yaw_error_power;
-	Xefis::PropertyFloat	_input_pitch_axis;
-	Xefis::PropertyFloat	_input_roll_axis;
-	Xefis::PropertyFloat	_input_yaw_axis;
-	Xefis::PropertyAngle	_input_pitch;
-	Xefis::PropertyAngle	_input_roll;
-	Xefis::PropertyAngle	_measured_pitch;
-	Xefis::PropertyAngle	_measured_roll;
-	Xefis::PropertyFloat	_measured_slip_skid_g;
-	Xefis::PropertyFloat	_elevator_minimum;
-	Xefis::PropertyFloat	_elevator_maximum;
-	Xefis::PropertyFloat	_ailerons_minimum;
-	Xefis::PropertyFloat	_ailerons_maximum;
-	Xefis::PropertyFloat	_rudder_minimum;
-	Xefis::PropertyFloat	_rudder_maximum;
+	Xefis::PropertyInteger		_mode;
+	Xefis::PropertyAngle		_pitch_extent;
+	Xefis::PropertyAngle		_roll_extent;
+	Xefis::PropertyFloat		_stabilization_gain;
+	Xefis::PropertyFloat		_pitch_gain;
+	Xefis::PropertyFloat		_pitch_p;
+	Xefis::PropertyFloat		_pitch_i;
+	Xefis::PropertyFloat		_pitch_d;
+	Xefis::PropertyFloat		_pitch_error_power;
+	Xefis::PropertyFloat		_roll_gain;
+	Xefis::PropertyFloat		_roll_p;
+	Xefis::PropertyFloat		_roll_i;
+	Xefis::PropertyFloat		_roll_d;
+	Xefis::PropertyFloat		_roll_error_power;
+	Xefis::PropertyFloat		_yaw_gain;
+	Xefis::PropertyFloat		_yaw_p;
+	Xefis::PropertyFloat		_yaw_i;
+	Xefis::PropertyFloat		_yaw_d;
+	Xefis::PropertyFloat		_yaw_error_power;
+	Xefis::PropertyFloat		_input_pitch_axis;
+	Xefis::PropertyFloat		_input_roll_axis;
+	Xefis::PropertyFloat		_input_yaw_axis;
+	Xefis::PropertyAngle		_input_pitch;
+	Xefis::PropertyAngle		_input_roll;
+	Xefis::PropertyAngle		_measured_pitch;
+	Xefis::PropertyAngle		_measured_roll;
+	Xefis::PropertyFloat		_measured_slip_skid_g;
+	Xefis::PropertyFloat		_elevator_minimum;
+	Xefis::PropertyFloat		_elevator_maximum;
+	Xefis::PropertyFloat		_ailerons_minimum;
+	Xefis::PropertyFloat		_ailerons_maximum;
+	Xefis::PropertyFloat		_rudder_minimum;
+	Xefis::PropertyFloat		_rudder_maximum;
 	// Output:
-	Xefis::PropertyAngle	_output_control_stick_pitch;
-	Xefis::PropertyAngle	_output_control_stick_roll;
-	Xefis::PropertyAngle	_output_pitch;
-	Xefis::PropertyAngle	_output_roll;
-	Xefis::PropertyFloat	_output_elevator;
-	Xefis::PropertyFloat	_output_ailerons;
-	Xefis::PropertyFloat	_output_rudder;
+	Xefis::PropertyAngle		_output_control_stick_pitch;
+	Xefis::PropertyAngle		_output_control_stick_roll;
+	Xefis::PropertyAngle		_output_pitch;
+	Xefis::PropertyAngle		_output_roll;
+	Xefis::PropertyFloat		_output_elevator;
+	Xefis::PropertyFloat		_output_ailerons;
+	Xefis::PropertyFloat		_output_rudder;
 };
 
 #endif

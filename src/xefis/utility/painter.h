@@ -29,6 +29,8 @@
 #include <xefis/utility/text_painter.h>
 
 
+namespace Xefis {
+
 class Painter: public TextPainter
 {
 	constexpr static float DefaultShadowWidth = 1.9f;
@@ -165,6 +167,8 @@ Painter::add_shadow (QColor color, std::function<void()> paint_function)
 	add_shadow (paint_function);
 	_shadow_color = s;
 }
+
+} // namespace Xefis
 
 #endif
 

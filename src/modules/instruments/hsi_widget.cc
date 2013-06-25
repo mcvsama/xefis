@@ -240,7 +240,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		resized();
 	}
 
-	_params.true_track = floored_mod (_params.magnetic_track + (_params.true_heading - _params.magnetic_heading), 360_deg);
+	_params.true_track = Xefis::floored_mod (_params.magnetic_track + (_params.true_heading - _params.magnetic_heading), 360_deg);
 
 	_params.track =
 		_params.heading_mode == HeadingMode::Magnetic
@@ -271,9 +271,9 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	_params.ap_heading = _params.ap_magnetic_heading;
 	if (_params.heading_mode == HeadingMode::True)
 		_params.ap_heading += _params.true_heading - _params.magnetic_heading;
-	_params.ap_heading = floored_mod (_params.ap_heading, 360_deg);
+	_params.ap_heading = Xefis::floored_mod (_params.ap_heading, 360_deg);
 
-	Painter painter (&image, &_text_painter_cache);
+	Xefis::Painter painter (&image, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
@@ -302,7 +302,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_aircraft (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 {
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
@@ -399,7 +399,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_hints (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 {
 	if (!_params.positioning_hint_visible || !_params.position_valid)
 		return;
@@ -431,7 +431,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_track (Painter& painter, bool paint_heading_triangle)
+HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_heading_triangle)
 {
 	Length trend_range = actual_trend_range();
 	Length trend_start = actual_trend_start();
@@ -510,7 +510,7 @@ HSIWidget::PaintWorkUnit::paint_track (Painter& painter, bool paint_heading_tria
 
 
 void
-HSIWidget::PaintWorkUnit::paint_altitude_reach (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 {
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.05f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
@@ -532,7 +532,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_trend_vector (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::RoundCap);
 
@@ -577,7 +577,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 {
 	if (!_params.ap_heading_visible)
 		return;
@@ -638,7 +638,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 	switch (_params.display_mode)
 	{
 		case DisplayMode::Auxiliary:
-			limited_rotation = limit (floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+			limited_rotation = Xefis::limit (Xefis::floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
 			break;
 
 		default:
@@ -666,7 +666,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_directions (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 {
 	if (!_params.heading_visible)
 		return;
@@ -721,7 +721,7 @@ HSIWidget::PaintWorkUnit::paint_directions (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 {
 	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
@@ -791,7 +791,7 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_home_direction (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 {
 	if (_params.display_mode != DisplayMode::Auxiliary)
 		return;
@@ -858,12 +858,12 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Xefis::Painter& painter)
 {
 	if (!_params.climb_glide_ratio_visible)
 		return;
 
-	_params.climb_glide_ratio = limit<float> (_params.climb_glide_ratio, -99, 99);
+	_params.climb_glide_ratio = Xefis::limit<float> (_params.climb_glide_ratio, -99, 99);
 
 	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
@@ -910,7 +910,7 @@ HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_range (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
 {
 	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
 	{
@@ -939,7 +939,7 @@ HSIWidget::PaintWorkUnit::paint_range (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_navaids (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 {
 	if (!_params.navaids_visible || !_params.position_valid)
 		return;
@@ -1041,7 +1041,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_locs (Painter& painter)
+HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 {
 	QFontMetricsF font_metrics (painter.font());
 	QTransform rot_1; rot_1.rotate (-2.f);

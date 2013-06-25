@@ -24,6 +24,8 @@
 #include <xefis/utility/range.h>
 
 
+namespace Xefis {
+
 inline constexpr float
 renormalize (float value, float a1, float b1, float a2, float b2) noexcept
 {
@@ -40,21 +42,31 @@ renormalize (float value, Range<float> range1, Range<float> range2) noexcept
 }
 
 
+template<class T>
+	inline constexpr int
+	sgn (T x, std::false_type) noexcept
+	{
+		return T (0) < x;
+	}
+
+
+template<class T>
+	inline constexpr int
+	sgn (T x, std::true_type) noexcept
+	{
+		return (T (0) < x) - (x < T (0));
+	}
+
+
 /**
- * Return x > 0.0 ? 1.0 : -1.0.
+ * Return signum (x) (-1, 0 or 1).
  */
-inline float
-sgn (float const& v) noexcept
-{
-	union {
-		float f;
-		uint32_t i;
-	} u = {v};
-	const uint32_t s = u.i & (1 << 31);
-	u.f = 1.0f;
-	u.i |= s;
-	return u.f;
-}
+template<class T>
+	inline constexpr int
+	sgn (T x) noexcept
+	{
+		return sgn (x, std::is_signed<T>());
+	}
 
 
 /**
@@ -136,6 +148,8 @@ true_to_magnetic (Angle tru, Angle declination)
 {
 	return floored_mod (tru - declination, 360.0_deg);
 }
+
+} // namespace Xefis
 
 #endif
 

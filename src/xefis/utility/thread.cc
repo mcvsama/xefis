@@ -27,6 +27,8 @@
 #include "thread.h"
 
 
+namespace Xefis {
+
 Thread::Thread() noexcept:
 	_sched_type (SchedOther),
 	_priority (50),
@@ -147,4 +149,6 @@ Thread::callback (void* arg)
 	k->_finished.store (true);
 	return 0;
 }
+
+} // namespace Xefis
 

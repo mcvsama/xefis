@@ -24,7 +24,11 @@
 #include <xefis/config/all.h>
 
 
-// Interface to mhash library.
+namespace Xefis {
+
+/**
+ * Interface to mhash library.
+ */
 class Hash
 {
   public:
@@ -183,6 +187,8 @@ Hash::end() const
 {
 	return static_cast<uint8_t*> (_result) + mhash_get_block_size (_algorithm);
 }
+
+} // namespace Xefis
 
 #endif
 

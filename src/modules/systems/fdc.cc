@@ -25,17 +25,20 @@
 #include <xefis/config/exception.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/navigation.h>
-#include <xefis/utility/density_altitude.h>
-#include <xefis/utility/sound_speed.h>
-#include <xefis/utility/wind_triangle.h>
-#include <xefis/utility/magnetic_variation.h>
+#include <xefis/airnav/density_altitude.h>
+#include <xefis/airnav/sound_speed.h>
+#include <xefis/airnav/wind_triangle.h>
+#include <xefis/airnav/magnetic_variation.h>
 
 // Local:
 #include "fdc.h"
 
 
 XEFIS_REGISTER_MODULE_CLASS ("systems/fdc", FlightDataComputer);
+
+
+using Xefis::floored_mod;
+using Xefis::limit;
 
 
 FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
@@ -317,7 +320,7 @@ FlightDataComputer::compute_headings()
 		_orientation_magnetic_heading.copy (_imu_magnetic_heading);
 
 		if (_magnetic_declination.valid())
-			_orientation_true_heading.write (magnetic_to_true (*_imu_magnetic_heading, *_magnetic_declination));
+			_orientation_true_heading.write (Xefis::magnetic_to_true (*_imu_magnetic_heading, *_magnetic_declination));
 		else
 			_orientation_true_heading.set_nil();
 	}
@@ -348,7 +351,7 @@ FlightDataComputer::compute_track()
 			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt()));
 
 			if (_magnetic_declination.valid())
-				_track_lateral_magnetic.write (true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
+				_track_lateral_magnetic.write (Xefis::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
 			else
 				_track_lateral_magnetic.set_nil();
 		}
@@ -376,9 +379,9 @@ FlightDataComputer::compute_track()
 
 		if (len10 >= *_position_accuracy)
 		{
-			Angle alpha = -180.0_deg + great_arcs_angle (_ac1_positions[2].lateral_position,
-														 _ac1_positions[1].lateral_position,
-														 _ac1_positions[0].lateral_position);
+			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (_ac1_positions[2].lateral_position,
+																 _ac1_positions[1].lateral_position,
+																 _ac1_positions[0].lateral_position);
 			Angle beta_per_mile = alpha / len10.nm();
 
 			if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
@@ -598,7 +601,7 @@ FlightDataComputer::compute_wind()
 		wt.set_aircraft_heading (*_orientation_true_heading);
 		wt.update();
 		_wind_true_orientation_from.write (floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt()), 360_deg));
-		_wind_magnetic_orientation_from.write (true_to_magnetic (*_wind_true_orientation_from, *_magnetic_declination));
+		_wind_magnetic_orientation_from.write (Xefis::true_to_magnetic (*_wind_true_orientation_from, *_magnetic_declination));
 		_wind_tas.write (wt.wind_speed());
 	}
 	else

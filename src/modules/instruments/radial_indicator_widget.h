@@ -41,7 +41,7 @@ class RadialIndicatorWidget:
 	 * Set new range to be used with RadialIndicatorWidget.
 	 */
 	void
-	set_range (Range<float>);
+	set_range (Xefis::Range<float>);
 
 	/**
 	 * Set indicated power value.
@@ -111,15 +111,16 @@ class RadialIndicatorWidget:
 	paintEvent (QPaintEvent*) override;
 
 	void
-	paint_text (Painter&, float q, float r);
+	paint_text (Xefis::Painter&, float q, float r);
 
 	void
-	paint_indicator (Painter&, float q, float r);
+	paint_indicator (Xefis::Painter&, float q, float r);
 
   private:
-	TextPainter::Cache	_text_painter_cache;
+	Xefis::TextPainter::Cache
+						_text_painter_cache;
 	// Parameters:
-	Range<float>		_range				= { 0.f, 1.f };
+	Xefis::Range<float>	_range				= { 0.f, 1.f };
 	float				_value				= 0.f;
 	bool				_value_visible		= false;
 	float				_warning_value		= 1.f;
@@ -134,7 +135,7 @@ class RadialIndicatorWidget:
 
 
 inline void
-RadialIndicatorWidget::set_range (Range<float> range)
+RadialIndicatorWidget::set_range (Xefis::Range<float> range)
 {
 	_range = range;
 	update();

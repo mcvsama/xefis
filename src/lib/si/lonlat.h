@@ -83,6 +83,14 @@ class LonLat
 	Angle
 	initial_bearing (LonLat const& other) const;
 
+	/**
+	 * Compute angle between two great arcs on a sphere.
+	 * Arcs are given by three points, the second one lies on the intersection.
+	 * Result is in degrees.
+	 */
+	static Angle
+	great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b);
+
   private:
 	Angle	_lon;
 	Angle	_lat;

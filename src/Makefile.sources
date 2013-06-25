@@ -1,5 +1,14 @@
 # vim:ts=4
 
+######## /xefis/airnav ########
+
+SRC_HEADERS += xefis/airnav/density_altitude.h
+SRC_HEADERS += xefis/airnav/magnetic_variation.h
+SRC_HEADERS += xefis/airnav/sound_speed.h
+SRC_HEADERS += xefis/airnav/wind_triangle.h
+
+SRC_SOURCES += xefis/airnav/magnetic_variation.cc
+
 ######## /xefis/application ########
 
 SRC_HEADERS += xefis/application/application.h
@@ -75,30 +84,25 @@ SRC_MOCHDRS += xefis/core/window.h
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
-SRC_HEADERS += xefis/utility/density_altitude.h
 SRC_HEADERS += xefis/utility/hash.h
 SRC_HEADERS += xefis/utility/i2c.h
 SRC_HEADERS += xefis/utility/lookahead.h
-SRC_HEADERS += xefis/utility/magnetic_variation.h
 SRC_HEADERS += xefis/utility/mutex.h
 SRC_HEADERS += xefis/utility/navigation.h
 SRC_HEADERS += xefis/utility/noncopyable.h
 SRC_HEADERS += xefis/utility/numeric.h
-SRC_HEADERS += xefis/utility/pid.h
+SRC_HEADERS += xefis/utility/pid_control.h
 SRC_HEADERS += xefis/utility/qdom.h
 SRC_HEADERS += xefis/utility/painter.h
 SRC_HEADERS += xefis/utility/range.h
 SRC_HEADERS += xefis/utility/semaphore.h
 SRC_HEADERS += xefis/utility/smoother.h
-SRC_HEADERS += xefis/utility/sound_speed.h
 SRC_HEADERS += xefis/utility/text_painter.h
 SRC_HEADERS += xefis/utility/time.h
 SRC_HEADERS += xefis/utility/thread.h
-SRC_HEADERS += xefis/utility/wind_triangle.h
 
 SRC_SOURCES += xefis/utility/backtrace.cc
 SRC_SOURCES += xefis/utility/i2c.cc
-SRC_SOURCES += xefis/utility/magnetic_variation.cc
 SRC_SOURCES += xefis/utility/mutex.cc
 SRC_SOURCES += xefis/utility/painter.cc
 SRC_SOURCES += xefis/utility/semaphore.cc

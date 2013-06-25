@@ -71,6 +71,8 @@ Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 Mouse::check()
 {
+	using Xefis::sgn;
+
 	try {
 		// Mouse move:
 		float const dx = remove_dead_zone (_axis_x.read (0), _dead_zone_x);
@@ -95,6 +97,6 @@ Mouse::remove_dead_zone (float input, float dead_deflection)
 {
 	if (std::abs (input) < dead_deflection)
 		return 0.0;
-	return input - sgn (input) * dead_deflection;
+	return input - Xefis::sgn (input) * dead_deflection;
 }
 

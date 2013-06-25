@@ -121,6 +121,8 @@ FlyByWire::data_updated()
 		case StabilizedMode:
 		case FlightDirectorMode:
 		{
+			using Xefis::Range;
+
 			// Should always be computed:
 			integrate_manual_input();
 
@@ -182,6 +184,8 @@ FlyByWire::data_updated()
 void
 FlyByWire::integrate_manual_input()
 {
+	using Xefis::floored_mod;
+
 	// Shortcuts:
 
 	Angle target_pitch_extent = *_pitch_extent;

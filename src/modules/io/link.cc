@@ -614,7 +614,7 @@ Link::SignatureItem::produce (Blob& blob)
 		_temp.push_back (dist (_rng));
 	// Append the key, compute signature:
 	_temp.insert (_temp.end(), _key.begin(), _key.end());
-	Hash hash (_temp);
+	Xefis::Hash hash (_temp);
 	// Erase appended key:
 	_temp.erase (_temp.end() - std::distance (_key.begin(), _key.end()), _temp.end());
 	// Add signature:
@@ -647,7 +647,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 	std::copy (begin, sign_begin, _temp.begin());
 	// Append the key, compute signature:
 	_temp.insert (_temp.end(), _key.begin(), _key.end());
-	Hash hash (_temp);
+	Xefis::Hash hash (_temp);
 	// If hashes mismatch, that's parsing error:
 	if (!std::equal (sign_begin, sign_end, hash.begin()))
 		throw ParseError();

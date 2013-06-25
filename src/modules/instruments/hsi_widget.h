@@ -154,43 +154,43 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint (QImage&) override;
 
 		void
-		paint_aircraft (Painter&);
+		paint_aircraft (Xefis::Painter&);
 
 		void
-		paint_hints (Painter&);
+		paint_hints (Xefis::Painter&);
 
 		void
-		paint_ap_settings (Painter&);
+		paint_ap_settings (Xefis::Painter&);
 
 		void
-		paint_directions (Painter&);
+		paint_directions (Xefis::Painter&);
 
 		void
-		paint_track (Painter&, bool paint_heading_triangle);
+		paint_track (Xefis::Painter&, bool paint_heading_triangle);
 
 		void
-		paint_altitude_reach (Painter&);
+		paint_altitude_reach (Xefis::Painter&);
 
 		void
-		paint_trend_vector (Painter&);
+		paint_trend_vector (Xefis::Painter&);
 
 		void
-		paint_speeds_and_wind (Painter&);
+		paint_speeds_and_wind (Xefis::Painter&);
 
 		void
-		paint_home_direction (Painter&);
+		paint_home_direction (Xefis::Painter&);
 
 		void
-		paint_climb_glide_ratio (Painter&);
+		paint_climb_glide_ratio (Xefis::Painter&);
 
 		void
-		paint_range (Painter&);
+		paint_range (Xefis::Painter&);
 
 		void
-		paint_navaids (Painter&);
+		paint_navaids (Xefis::Painter&);
 
 		void
-		paint_locs (Painter&);
+		paint_locs (Xefis::Painter&);
 
 		/**
 		 * Retrieve navaids from navaid storage for current aircraft
@@ -224,7 +224,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					_recalculation_needed		= false;
 		float					_r;
 		float					_q;
-		TextPainter::Cache		_text_painter_cache;
+		Xefis::TextPainter::Cache
+								_text_painter_cache;
 		QTransform				_aircraft_center_transform;
 		QTransform				_heading_transform;
 		QTransform				_track_transform;

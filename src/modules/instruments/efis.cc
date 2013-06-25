@@ -286,7 +286,7 @@ EFIS::read()
 		if (_altitude_agl.valid())
 		{
 			_efis_widget->set_runway_visible (_lateral_deviation.valid() && *_altitude_agl <= 1000_ft);
-			_efis_widget->set_runway_position (limit<Length> (*_altitude_agl, 0_ft, 250_ft) / 250_ft * 25_deg);
+			_efis_widget->set_runway_position (Xefis::limit<Length> (*_altitude_agl, 0_ft, 250_ft) / 250_ft * 25_deg);
 		}
 	}
 	else
