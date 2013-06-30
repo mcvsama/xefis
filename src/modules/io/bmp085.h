@@ -98,7 +98,6 @@ class BMP085:
 	static constexpr uint8_t	MC_REG	= 0xbc;
 	static constexpr uint8_t	MD_REG	= 0xbe;
 	// Data:
-	bool						_initialized				= false;
 	Xefis::PropertyFloat		_temperature;
 	Xefis::PropertyTime			_temperature_interval;
 	Xefis::PropertyPressure		_pressure;

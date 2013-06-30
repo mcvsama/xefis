@@ -39,6 +39,13 @@ Message::Message (Operation operation, Address const& address, uint8_t* begin, u
 { }
 
 
+Message::Message (Address const& address, uint8_t data):
+	_operation (Write),
+	_address (address),
+	_data (data)
+{ }
+
+
 struct ::i2c_msg
 Message::generate_i2c_msg() const noexcept
 {
@@ -49,8 +56,16 @@ Message::generate_i2c_msg() const noexcept
 		msg.flags |= I2C_M_TEN;
 	if (_operation == Read)
 		msg.flags |= I2C_M_RD;
-	msg.len = std::distance (_begin, _end);
-	msg.buf = _begin;
+	if (_begin && _end)
+	{
+		msg.len = std::distance (_begin, _end);
+		msg.buf = _begin;
+	}
+	else
+	{
+		msg.len = 1;
+		msg.buf = const_cast<uint8_t*> (&_data);
+	}
 	return msg;
 }
 
@@ -85,7 +100,14 @@ Bus::open (uint8_t bus_number)
 	_bus_number = bus_number;
 	_device = ::open ((boost::format ("/dev/i2c-%1%") % static_cast<int> (_bus_number)).str().c_str(), O_RDWR);
 	if (_device < 0)
-		throw Xefis::Exception ((boost::format ("could not open I²C bus %1%: %2%") % static_cast<int> (_bus_number) % strerror (errno)).str());
+		throw IOError ((boost::format ("could not open I²C bus %1%: %2%") % static_cast<int> (_bus_number) % strerror (errno)).str());
+}
+
+
+bool
+Bus::good() const
+{
+	return !!_open;
 }
 
 
@@ -112,7 +134,7 @@ Bus::execute (Transaction const& transaction)
 	msgset.nmsgs = transaction.size();
 
 	if (ioctl (_device, I2C_RDWR, &msgset) < 0)
-		throw Xefis::Exception ((boost::format ("could not execute I²C transaction: %1%") % strerror (errno)).str());
+		throw IOError ((boost::format ("could not execute I²C transaction: %1%") % strerror (errno)).str());
 }
 
 } // namespace I2C

@@ -88,19 +88,6 @@ template<class tValueType, class tDerived>
 		constexpr ValueType const&
 		internal() const noexcept;
 
-		/**
-		 * Parse value from string (eg. 1.0 kt).
-		 * Return *this.
-		 */
-		virtual Derived&
-		parse (std::string const&) = 0;
-
-		/**
-		 * Output string with value and unit.
-		 */
-		virtual std::string
-		stringify() const = 0;
-
 		/*
 		 * Unary operators
 		 */
@@ -416,7 +403,8 @@ template<class V, class T>
 namespace std {
 
 template<class V, class T>
-	std::string to_string (SI::LinearValue<V, T> const& value)
+	std::string
+	to_string (SI::LinearValue<V, T> const& value)
 	{
 		return value.stringify();
 	}

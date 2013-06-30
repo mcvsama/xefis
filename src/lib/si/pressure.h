@@ -61,11 +61,14 @@ class Pressure: public LinearValue<float, Pressure>
 	constexpr ValueType
 	inHg() const noexcept;
 
-	Pressure&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -106,7 +109,7 @@ Pressure::inHg() const noexcept
 }
 
 
-inline Pressure&
+inline void
 Pressure::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -117,8 +120,6 @@ Pressure::parse (std::string const& str)
 		*this = p.first * 1_hPa;
 	else if (p.second == "inhg")
 		*this = p.first * 1_inHg;
-
-	return *this;
 }
 
 
@@ -126,6 +127,22 @@ inline std::string
 Pressure::stringify() const
 {
 	return boost::lexical_cast<std::string> (inHg()) + " inHg";
+}
+
+
+inline double
+Pressure::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "psi")
+		return psi();
+	else if (unit == "hPa")
+		return hPa();
+	else if (unit == "inhg")
+		return inHg();
+	else
+		throw UnsupportedUnit ("can't convert Pressure to " + unit);
 }
 
 

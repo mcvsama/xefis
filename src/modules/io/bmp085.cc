@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <iostream>
 
 // Lib:
 #include <boost/endian/conversion.hpp>
@@ -55,13 +56,9 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_reinitialize_timer->setSingleShot (true);
 	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 
-	try {
-		Xefis::Exception::guard_and_rethrow (std::bind (&BMP085::initialize, this));
-	}
-	catch (...)
-	{
-		reinitialize();
-	}
+	guard ([&]() {
+		initialize();
+	});
 }
 
 
@@ -115,7 +112,6 @@ BMP085::reinitialize()
 	_temperature.set_nil();
 	_pressure.set_nil();
 
-	_initialized = false;
 	_middle_of_request = false;
 	_request_other = false;
 
@@ -223,10 +219,14 @@ BMP085::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
+	catch (Xefis::I2C::IOError& e)
+	{
+		std::cerr << "BMP085: I2C error: " << e.message() << std::endl;
+		reinitialize();
+	}
 	catch (...)
 	{
 		reinitialize();
-		throw;
 	}
 }
 

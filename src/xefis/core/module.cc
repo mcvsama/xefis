@@ -36,7 +36,7 @@ void
 Module::parse_properties (QDomElement const& properties_element, PropertiesList list)
 {
 	try {
-		std::map<QString, BaseProperty*> map;
+		std::map<QString, TypedProperty*> map;
 		std::set<QString> unconfigured_values;
 		std::set<QString> known_values;
 

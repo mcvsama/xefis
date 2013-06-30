@@ -67,11 +67,14 @@ class Speed: public LinearValue<double, Speed>
 	constexpr ValueType
 	mps() const noexcept;
 
-	Speed&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -119,7 +122,7 @@ Speed::mps() const noexcept
 }
 
 
-inline Speed&
+inline void
 Speed::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -130,8 +133,6 @@ Speed::parse (std::string const& str)
 		*this = p.first * 1_kph;
 	else if (p.second == "fpm")
 		*this = p.first * 1_fpm;
-
-	return *this;
 }
 
 
@@ -139,6 +140,22 @@ inline std::string
 Speed::stringify() const
 {
 	return boost::lexical_cast<std::string> (kt()) + " kt";
+}
+
+
+inline double
+Speed::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "kt")
+		return kt();
+	else if (unit == "kph")
+		return kph();
+	else if (unit == "fpm")
+		return fpm();
+	else
+		throw UnsupportedUnit ("can't convert Speed to " + unit);
 }
 
 

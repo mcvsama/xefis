@@ -21,6 +21,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <type_traits>
 #include <stdint.h>
 
 // Boost:
@@ -222,13 +223,13 @@ class PropertyDirectoryNode: public PropertyNode
 /**
  * Non-template base for PropertyValueNode.
  */
-class BasePropertyValueNode: public PropertyNode
+class TypedPropertyValueNode: public PropertyNode
 {
 	template<class T>
 		friend class PropertyValueNode;
 
   public:
-	BasePropertyValueNode (std::string const& name);
+	TypedPropertyValueNode (std::string const& name);
 
 	/**
 	 * Return true if property is nil.
@@ -255,6 +256,12 @@ class BasePropertyValueNode: public PropertyNode
 	stringify() const = 0;
 
 	/**
+	 * Return float-like value for the property.
+	 */
+	virtual double
+	floatize (std::string unit) const = 0;
+
+	/**
 	 * Parse value and unit.
 	 */
 	virtual void
@@ -269,7 +276,7 @@ class BasePropertyValueNode: public PropertyNode
  * PropertyNode that holds a value.
  */
 template<class tType>
-	class PropertyValueNode: public BasePropertyValueNode
+	class PropertyValueNode: public TypedPropertyValueNode
 	{
 	  public:
 		typedef tType Type;
@@ -311,10 +318,29 @@ template<class tType>
 		stringify() const override;
 
 		/**
+		 * Return float-like value.
+		 */
+		double
+		floatize (std::string unit) const override;
+
+		/**
 		 * Parse value and unit.
 		 */
 		void
 		parse (std::string const&) override;
+
+	  private:
+		/**
+		 * Default floatize that returns _value.
+		 */
+		double
+		specialized_floatize (std::string, std::false_type) const;
+
+		/**
+		 * Specialized floatize for SI types that returns _value->floatize().
+		 */
+		double
+		specialized_floatize (std::string unit, std::true_type) const;
 
 	  private:
 		Type _value;
@@ -409,27 +435,27 @@ PropertyDirectoryNode::~PropertyDirectoryNode()
 
 
 inline
-BasePropertyValueNode::BasePropertyValueNode (std::string const& name):
+TypedPropertyValueNode::TypedPropertyValueNode (std::string const& name):
 	PropertyNode (name)
 { }
 
 
 inline bool
-BasePropertyValueNode::is_nil() const noexcept
+TypedPropertyValueNode::is_nil() const noexcept
 {
 	return _is_nil;
 }
 
 
 inline bool
-BasePropertyValueNode::valid() const noexcept
+TypedPropertyValueNode::valid() const noexcept
 {
 	return !_is_nil;
 }
 
 
 inline void
-BasePropertyValueNode::set_nil() noexcept
+TypedPropertyValueNode::set_nil() noexcept
 {
 	_is_nil = true;
 }
@@ -438,7 +464,7 @@ BasePropertyValueNode::set_nil() noexcept
 template<class T>
 	inline
 	PropertyValueNode<T>::PropertyValueNode (std::string const& name, Type value):
-		BasePropertyValueNode (name),
+		TypedPropertyValueNode (name),
 		_value (value)
 	{ }
 
@@ -508,10 +534,42 @@ template<>
 
 
 template<class T>
+	inline double
+	PropertyValueNode<T>::floatize (std::string unit) const
+	{
+		return specialized_floatize (unit, typename std::is_base_of<SI::Value, T>::type());
+	}
+
+
+template<>
+	inline double
+	PropertyValueNode<std::string>::floatize (std::string) const
+	{
+		return 0.0;
+	}
+
+
+template<class T>
 	inline void
 	PropertyValueNode<T>::parse (std::string const& str)
 	{
 		_value.parse (str);
+	}
+
+
+template<class T>
+	inline double
+	PropertyValueNode<T>::specialized_floatize (std::string, std::false_type) const
+	{
+		return _value;
+	}
+
+
+template<class T>
+	inline double
+	PropertyValueNode<T>::specialized_floatize (std::string unit, std::true_type) const
+	{
+		return _value.floatize (unit);
 	}
 
 

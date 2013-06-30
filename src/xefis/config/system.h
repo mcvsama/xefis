@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <iostream>
 
+
 /**
  * Return size (number of elements) of an array.
  */

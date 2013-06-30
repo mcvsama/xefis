@@ -71,11 +71,14 @@ class Length: public LinearValue<double, Length>
 	constexpr ValueType
 	mil() const noexcept;
 
-	Length&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -130,7 +133,7 @@ Length::mil() const noexcept
 }
 
 
-inline Length&
+inline void
 Length::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -145,8 +148,6 @@ Length::parse (std::string const& str)
 		*this = p.first * 1_nm;
 	else if (p.second == "mil")
 		*this = p.first * 1_mil;
-
-	return *this;
 }
 
 
@@ -154,6 +155,26 @@ inline std::string
 Length::stringify() const
 {
 	return boost::lexical_cast<std::string> (nm()) + " nm";
+}
+
+
+inline double
+Length::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "m")
+		return m();
+	else if (unit == "km")
+		return km();
+	else if (unit == "ft")
+		return ft();
+	else if (unit == "nm")
+		return nm();
+	else if (unit == "mil")
+		return mil();
+	else
+		throw UnsupportedUnit ("can't convert Length to " + unit);
 }
 
 

@@ -61,11 +61,14 @@ class Angle: public LinearValue<double, Angle>
 	constexpr ValueType
 	deg() const noexcept;
 
-	Angle&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -99,7 +102,7 @@ Angle::deg() const noexcept
 }
 
 
-inline Angle&
+inline void
 Angle::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -108,8 +111,6 @@ Angle::parse (std::string const& str)
 		*this = p.first * 1_deg;
 	else if (p.second == "rad")
 		*this = p.first * 1_rad;
-
-	return *this;
 }
 
 
@@ -117,6 +118,20 @@ inline std::string
 Angle::stringify() const
 {
 	return boost::lexical_cast<std::string> (deg()) + " °";
+}
+
+
+inline double
+Angle::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "deg" || unit == "°")
+		return deg();
+	else if (unit == "rad")
+		return rad();
+	else
+		throw UnsupportedUnit ("can't convert Angle to " + unit);
 }
 
 

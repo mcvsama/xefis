@@ -86,7 +86,7 @@ PropertyTreeWidget::read()
 void
 PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 {
-	BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 
 	if (val_node)
 		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (val_node->stringify()));

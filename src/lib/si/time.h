@@ -79,11 +79,14 @@ class Time: public LinearValue<double, Time>
 	constexpr ValueType
 	h() const noexcept;
 
-	Time&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   public:
 	static Time
@@ -152,7 +155,7 @@ Time::h() const noexcept
 }
 
 
-inline Time&
+inline void
 Time::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -169,8 +172,6 @@ Time::parse (std::string const& str)
 		*this = p.first * 1_min;
 	else if (p.second == "h")
 		*this = p.first * 1_h;
-
-	return *this;
 }
 
 
@@ -178,6 +179,28 @@ inline std::string
 Time::stringify() const
 {
 	return boost::lexical_cast<std::string> (s()) + " s";
+}
+
+
+inline double
+Time::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "ns")
+		return ns();
+	else if (unit == "us")
+		return us();
+	else if (unit == "ms")
+		return ms();
+	else if (unit == "s")
+		return s();
+	else if (unit == "min")
+		return min();
+	else if (unit == "h")
+		return h();
+	else
+		throw UnsupportedUnit ("can't convert Time to " + unit);
 }
 
 

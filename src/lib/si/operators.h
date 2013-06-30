@@ -47,6 +47,13 @@ operator* (Time const& time, Speed const& speed)
 	return speed * time;
 }
 
+
+inline constexpr Time
+operator/ (double value, Frequency const& frequency)
+{
+	return 1_s * (value / frequency.Hz());
+}
+
 } // namespace SI
 
 #endif
