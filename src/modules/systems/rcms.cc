@@ -50,6 +50,10 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 			});
 		}
 	}
+
+	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));
+	_distance_computer.observe ({ &_home_longitude, &_home_latitude, &_home_altitude_amsl,
+								  &_position_longitude, &_position_latitude, &_position_altitude_amsl });
 }
 
 
@@ -89,15 +93,14 @@ RemoteControlManagementSystem::data_updated()
 	if (!home_is_valid())
 		acquire_home();
 
-	compute_distances_to_home();
+	_distance_computer.data_updated();
 }
 
 
 void
 RemoteControlManagementSystem::compute_distances_to_home()
 {
-	if (home_is_valid() &&
-		_position_longitude.valid() && _position_latitude.valid() && _position_altitude_amsl.valid())
+	if (home_is_valid() && position_is_valid())
 	{
 		LonLat home (*_home_longitude, *_home_latitude);
 		LonLat curr (*_position_longitude, *_position_latitude);

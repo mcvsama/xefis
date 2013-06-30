@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 
 
 class RemoteControlManagementSystem: public Xefis::Module
@@ -54,6 +55,7 @@ class RemoteControlManagementSystem: public Xefis::Module
   private:
 	Time					_now;
 	bool					_home_acquired = false;
+	Xefis::PropertyObserver	_distance_computer;
 	// Input:
 	Xefis::PropertyLength	_vlos_caution_distance;
 	Xefis::PropertyLength	_vlos_warning_distance;

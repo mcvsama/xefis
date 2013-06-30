@@ -23,6 +23,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -54,6 +56,13 @@ class FlightDirector: public Xefis::Module
 	data_updated() override;
 
   private:
+	void
+	update_lateral_hint();
+
+	void
+	update_vertical_hint();
+
+  private:
 	Xefis::PIDControl<float>	_magnetic_heading_pid;
 	Xefis::PIDControl<float>	_magnetic_track_pid;
 	Xefis::PIDControl<float>	_altitude_pid;
@@ -64,6 +73,8 @@ class FlightDirector: public Xefis::Module
 	Angle						_computed_output_pitch;
 	Angle						_computed_output_roll;
 	Time						_dt = 0_s;
+	Xefis::PropertyObserver		_lateral_hint_computer;
+	Xefis::PropertyObserver		_vertical_hint_computer;
 
 	// Input:
 	// TODO PID params as settings:

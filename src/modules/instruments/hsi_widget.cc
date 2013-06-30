@@ -512,7 +512,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 void
 HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 {
-	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.05f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
+	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
 	float len = nm_to_px (6_nm);
