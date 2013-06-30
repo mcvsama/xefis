@@ -21,7 +21,26 @@
 namespace SI {
 
 class Value
-{ };
+{
+  public:
+	/**
+	 * Parse value from string (eg. 1.0 kt).
+	 */
+	virtual void
+	parse (std::string const&) = 0;
+
+	/**
+	 * Output string with value and unit.
+	 */
+	virtual std::string
+	stringify() const = 0;
+
+	/**
+	 * Return float value in given units.
+	 */
+	virtual double
+	floatize (std::string unit) const = 0;
+};
 
 } // namespace std
 

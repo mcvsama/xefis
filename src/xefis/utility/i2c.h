@@ -35,6 +35,15 @@ enum Operation {
 };
 
 
+class IOError: public Exception
+{
+  public:
+	explicit IOError (std::string const& message, Exception const* inner = nullptr):
+		Exception (message, inner)
+	{ }
+};
+
+
 class Address
 {
   public:
@@ -88,6 +97,12 @@ class Message
 		Message (Operation, Address const&, DataType* data_type);
 
 	/**
+	 * Create I2C Write Message.
+	 * Data is immediate 8 bits.
+	 */
+	Message (Address const&, uint8_t data);
+
+	/**
 	 * Generate struct for use with Linux I2C API.
 	 */
 	struct ::i2c_msg
@@ -96,8 +111,9 @@ class Message
   private:
 	Operation	_operation;
 	Address		_address;
-	uint8_t*	_begin;
-	uint8_t*	_end;
+	uint8_t*	_begin	= nullptr;
+	uint8_t*	_end	= nullptr;
+	uint8_t		_data	= 0; // Used if _begin or _end is nullptr.
 };
 
 
@@ -145,6 +161,13 @@ class Bus: public Noncopyable
 	 */
 	void
 	open (uint8_t bus_number);
+
+	/**
+	 * Return true if bus was correctly open
+	 * and is in good state.
+	 */
+	bool
+	good() const;
 
 	/**
 	 * Close bus.

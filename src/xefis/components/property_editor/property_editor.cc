@@ -86,7 +86,7 @@ PropertyEditor::item_selected()
 	{
 		QWidget* widgets[] = { _editable_value, _update_button };
 
-		BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 		if (!val_node)
 		{
 			_editable_value->setText ("");
@@ -135,7 +135,7 @@ PropertyEditor::update_item()
 	PropertyNode* node = _property_tree_widget->selected_property_node();
 	if (!node)
 		return;
-	BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 	if (!val_node)
 		return;
 

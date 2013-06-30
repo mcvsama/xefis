@@ -57,11 +57,14 @@ class Frequency: public LinearValue<double, Frequency>
 	constexpr ValueType
 	MHz() const noexcept;
 
-	Frequency&
-	parse (std::string const&);
+	void
+	parse (std::string const&) override;
 
 	std::string
-	stringify() const;
+	stringify() const override;
+
+	double
+	floatize (std::string unit) const override;
 
   private:
 	static std::vector<std::string> _supported_units;
@@ -102,7 +105,7 @@ Frequency::MHz() const noexcept
 }
 
 
-inline Frequency&
+inline void
 Frequency::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
@@ -111,10 +114,8 @@ Frequency::parse (std::string const& str)
 		*this = p.first * 1_Hz;
 	else if (p.second == "khz")
 		*this = p.first * 1_kHz;
-	else if (p.second == "MHz")
+	else if (p.second == "mhz")
 		*this = p.first * 1_MHz;
-
-	return *this;
 }
 
 
@@ -122,6 +123,22 @@ inline std::string
 Frequency::stringify() const
 {
 	return boost::lexical_cast<std::string> (kHz()) + " kHz";
+}
+
+
+inline double
+Frequency::floatize (std::string unit) const
+{
+	boost::to_lower (unit);
+
+	if (unit == "hz")
+		return Hz();
+	else if (unit == "khz")
+		return kHz();
+	else if (unit == "mhz")
+		return MHz();
+	else
+		throw UnsupportedUnit ("can't convert Frequency to " + unit);
 }
 
 

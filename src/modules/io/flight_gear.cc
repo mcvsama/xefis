@@ -215,7 +215,7 @@ FlightGearIO::got_packet()
 void
 FlightGearIO::invalidate_all()
 {
-	Xefis::BaseProperty* properties[] = {
+	Xefis::GenericProperty* properties[] = {
 		&_ias,
 		&_ias_lookahead,
 		&_minimum_ias,

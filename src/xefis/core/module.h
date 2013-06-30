@@ -44,7 +44,7 @@ class Module
 	struct NameAndProperty
 	{
 		QString			name;
-		BaseProperty&	property;
+		TypedProperty&	property;
 		bool			required;
 	};
 

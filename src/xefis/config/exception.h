@@ -136,22 +136,22 @@ Exception::guard_and_rethrow (std::function<void()> guarded_code)
 	}
 	catch (Exception const& e)
 	{
-		std::clog << e << std::endl;
+		std::cerr << e << std::endl;
 		throw;
 	}
 	catch (boost::exception const& e)
 	{
-		std::clog << "boost::exception " << typeid (e).name() << std::endl;
+		std::cerr << "boost::exception " << typeid (e).name() << std::endl;
 		throw;
 	}
 	catch (std::exception const& e)
 	{
-		std::clog << "std::exception " << typeid (e).name() << std::endl;
+		std::cerr << "std::exception " << typeid (e).name() << std::endl;
 		throw;
 	}
 	catch (...)
 	{
-		std::clog << "unknown exception" << std::endl;
+		std::cerr << "unknown exception" << std::endl;
 		throw;
 	}
 }

@@ -62,20 +62,28 @@ class InvalidOperation: public Exception
 };
 
 
-class BaseProperty
+class GenericProperty
 {
-  protected:
-	BaseProperty() = default;
-	BaseProperty (BaseProperty const&) = default;
-	BaseProperty& operator= (BaseProperty const&) = default;
+  public:
+	// Ctor
+	GenericProperty();
 
 	// Ctor
-	BaseProperty (PropertyDirectoryNode* root, std::string path);
+	GenericProperty (GenericProperty const&) = default;
+
+	// Assignment
+	GenericProperty&
+	operator= (GenericProperty const&) = default;
+
+	// Ctor
+	GenericProperty (std::string path);
+
+	// Ctor
+	GenericProperty (PropertyDirectoryNode* root, std::string path);
 
 	// Dtor
-	virtual ~BaseProperty();
+	virtual ~GenericProperty();
 
-  public:
 	/**
 	 * Return true if property is nil.
 	 */
@@ -120,20 +128,13 @@ class BaseProperty
 	ensure_existence();
 
 	/**
-	 * Return humanized value (eg. value with unit).
-	 * Default implementation uses read<string>().
+	 * Check whether this property is TypedProperty
+	 * instantiated over given type Target.
 	 */
-	virtual std::string
-	stringify() const = 0;
+	template<class Target>
+		bool
+		is_type() const;
 
-	/**
-	 * Set value from humanized string (eg. "10 kt").
-	 * Default implementation uses write().
-	 */
-	virtual void
-	parse (std::string const&) = 0;
-
-  protected:
 	/**
 	 * Return proper node. If cached node's path
 	 * matches this property's path, return it.
@@ -142,6 +143,19 @@ class BaseProperty
 	PropertyNode*
 	get_node() const;
 
+	/**
+	 * Return humanized value (eg. value with unit).
+	 */
+	virtual std::string
+	stringify() const;
+
+	/**
+	 * Return float-like value of the property.
+	 */
+	virtual double
+	floatize (std::string unit) const;
+
+  protected:
 	/**
 	 * Normalize path so if there's "//" in it,
 	 * it will be replaced by leading "/".
@@ -156,12 +170,45 @@ class BaseProperty
 };
 
 
+class TypedProperty: public GenericProperty
+{
+  protected:
+	TypedProperty() = default;
+	TypedProperty (TypedProperty const&) = default;
+	TypedProperty& operator= (TypedProperty const&) = default;
+
+// TODO
+#if 0
+	// Inherit other constructors:
+	using GenericProperty::GenericProperty;
+#else
+	// Ctor
+	TypedProperty (std::string path):
+		GenericProperty (path)
+	{ }
+
+	// Ctor
+	TypedProperty (PropertyDirectoryNode* root, std::string path):
+		GenericProperty (root, path)
+	{ }
+#endif
+
+
+  public:
+	/**
+	 * Set value from humanized string (eg. "10 kt").
+	 */
+	virtual void
+	parse (std::string const&) = 0;
+};
+
+
 /**
  * A property reference. Doesn't hold the data, but only the path,
  * and queries property storage whenever needed.
  */
 template<class tType>
-	class Property: public BaseProperty
+	class Property: public TypedProperty
 	{
 	  public:
 		typedef tType					Type;
@@ -184,15 +231,10 @@ template<class tType>
 		 * NOTE: The PropertyStorage must be initialized before attempting
 		 * to use this constructor.
 		 */
-		Property (const char* path);
-
-		/**
-		 * Same as Property (const char*).
-		 */
 		Property (std::string const& path);
 
 		/**
-		 * Create a Property that belongs to a PropertyStorage
+		 * Create a Property that belongs to a PropertyStorage,
 		 * bound to given path.
 		 */
 		Property (PropertyDirectoryNode* root, std::string const& path);
@@ -264,11 +306,7 @@ template<class tType>
 		void
 		copy (Property const& other);
 
-		// BaseProperty API
-		std::string
-		stringify() const override;
-
-		// BaseProperty API
+		// TypedProperty API
 		void
 		parse (std::string const&) override;
 
@@ -317,19 +355,32 @@ InvalidOperation::InvalidOperation (std::string const& message):
 
 
 inline
-BaseProperty::BaseProperty (PropertyDirectoryNode* root, std::string path):
+GenericProperty::GenericProperty():
+	_root (PropertyStorage::default_storage()->root())
+{ }
+
+
+inline
+GenericProperty::GenericProperty (std::string path):
+	_root (PropertyStorage::default_storage()->root()),
+	_path (normalized_path (path))
+{ }
+
+
+inline
+GenericProperty::GenericProperty (PropertyDirectoryNode* root, std::string path):
 	_root (root),
 	_path (normalized_path (path))
 { }
 
 
 inline
-BaseProperty::~BaseProperty()
+GenericProperty::~GenericProperty()
 { }
 
 
 inline std::string
-BaseProperty::normalized_path (std::string path)
+GenericProperty::normalized_path (std::string path)
 {
 	std::size_t p = path.rfind ("//");
 	if (p != std::string::npos)
@@ -339,14 +390,14 @@ BaseProperty::normalized_path (std::string path)
 
 
 inline bool
-BaseProperty::is_nil() const
+GenericProperty::is_nil() const
 {
 	if (_root)
 	{
 		PropertyNode* node = get_node();
 		if (node)
 		{
-			BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+			TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 			if (val_node)
 				return val_node->is_nil();
 			else
@@ -361,14 +412,14 @@ BaseProperty::is_nil() const
 
 
 inline void
-BaseProperty::set_nil()
+GenericProperty::set_nil()
 {
 	if (_root)
 	{
 		PropertyNode* node = get_node();
 		if (node)
 		{
-			BasePropertyValueNode* val_node = dynamic_cast<BasePropertyValueNode*> (node);
+			TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 			if (val_node)
 				val_node->set_nil();
 			else
@@ -381,28 +432,28 @@ BaseProperty::set_nil()
 
 
 inline bool
-BaseProperty::is_singular() const noexcept
+GenericProperty::is_singular() const noexcept
 {
 	return !_root;
 }
 
 
 inline bool
-BaseProperty::valid() const noexcept
+GenericProperty::valid() const noexcept
 {
 	return !is_singular() && !is_nil();
 }
 
 
 inline std::string const&
-BaseProperty::path() const noexcept
+GenericProperty::path() const noexcept
 {
 	return _path;
 }
 
 
 inline void
-BaseProperty::set_path (std::string const& new_path)
+GenericProperty::set_path (std::string const& new_path)
 {
 	_path = normalized_path (new_path);
 	// The node will be localized again, when it's needed:
@@ -411,15 +462,24 @@ BaseProperty::set_path (std::string const& new_path)
 
 
 inline void
-BaseProperty::ensure_existence()
+GenericProperty::ensure_existence()
 {
 	if (is_nil())
 		set_nil();
 }
 
 
+template<class Target>
+	inline bool
+	GenericProperty::is_type() const
+	{
+		Property<Target>* tp = dynamic_cast<Property<Target>*> (this);
+		return !!tp;
+	}
+
+
 inline PropertyNode*
-BaseProperty::get_node() const
+GenericProperty::get_node() const
 {
 	if (_root && !_path.empty())
 	{
@@ -434,6 +494,26 @@ BaseProperty::get_node() const
 }
 
 
+inline std::string
+GenericProperty::stringify() const
+{
+	TypedPropertyValueNode* node = dynamic_cast<TypedPropertyValueNode*> (get_node());
+	if (node)
+		return node->stringify();
+	return "";
+}
+
+
+inline double
+GenericProperty::floatize (std::string unit) const
+{
+	TypedPropertyValueNode* node = dynamic_cast<TypedPropertyValueNode*> (get_node());
+	if (node)
+		return node->floatize (unit);
+	return 0.0;
+}
+
+
 template<class T>
 	inline
 	Property<T>::Property():
@@ -444,14 +524,7 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (Property const& other):
-		BaseProperty (other)
-	{ }
-
-
-template<class T>
-	inline
-	Property<T>::Property (const char* path):
-		Property (std::string (path))
+		TypedProperty (other)
 	{ }
 
 
@@ -468,7 +541,7 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (PropertyDirectoryNode* node, std::string const& path):
-		BaseProperty (node->root(), path)
+		TypedProperty (node->root(), path)
 	{ }
 
 
@@ -476,7 +549,7 @@ template<class T>
 	inline Property<T>&
 	Property<T>::operator= (Property const& other)
 	{
-		BaseProperty::operator= (other);
+		TypedProperty::operator= (other);
 		return *this;
 	}
 
@@ -590,16 +663,6 @@ template<class T>
 		write (other.read());
 		if (other.is_nil())
 			set_nil();
-	}
-
-
-template<class T>
-	inline std::string
-	Property<T>::stringify() const
-	{
-		if (_root)
-			return get_value_node_signalling()->stringify();
-		return "";
 	}
 
 
