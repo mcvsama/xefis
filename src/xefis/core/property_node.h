@@ -76,6 +76,10 @@ class PropertyNode
 	friend class PropertyStorage;
 	friend class PropertyDirectoryNode;
 
+  public:
+	// Used to tell if node value has changed:
+	typedef uint64_t Serial;
+
   protected:
 	/**
 	 * Create a root node.
@@ -124,6 +128,21 @@ class PropertyNode
 	PropertyStorage*
 	storage() noexcept;
 
+	/**
+	 * Return node serial value.
+	 * It's incremented every time node value
+	 * is changed.
+	 */
+	Serial
+	serial() const noexcept;
+
+  protected:
+	/**
+	 * Increment the serial value.
+	 */
+	void
+	bump_serial() noexcept;
+
   private:
 	/**
 	 * Update self-cached location.
@@ -136,6 +155,7 @@ class PropertyNode
 	PropertyStorage*		_storage	= nullptr;
 	std::string				_name;
 	std::string				_path;
+	Serial					_serial		= 0;
 };
 
 
@@ -415,6 +435,20 @@ PropertyNode::storage() noexcept
 }
 
 
+inline PropertyNode::Serial
+PropertyNode::serial() const noexcept
+{
+	return _serial;
+}
+
+
+inline void
+PropertyNode::bump_serial() noexcept
+{
+	++_serial;
+}
+
+
 inline
 PropertyDirectoryNode::PropertyDirectoryNode (PropertyStorage* storage):
 	PropertyNode (storage)
@@ -458,6 +492,7 @@ inline void
 TypedPropertyValueNode::set_nil() noexcept
 {
 	_is_nil = true;
+	bump_serial();
 }
 
 
@@ -475,6 +510,7 @@ template<class T>
 	{
 		_value = other._value;
 		_is_nil = other._is_nil;
+		bump_serial();
 	}
 
 
@@ -493,8 +529,9 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::write (Type const& value)
 	{
-		_is_nil = false;
 		_value = value;
+		_is_nil = false;
+		bump_serial();
 	}
 
 
@@ -554,6 +591,8 @@ template<class T>
 	PropertyValueNode<T>::parse (std::string const& str)
 	{
 		_value.parse (str);
+		_is_nil = false;
+		bump_serial();
 	}
 
 
@@ -578,6 +617,8 @@ template<>
 	PropertyValueNode<bool>::parse (std::string const& str)
 	{
 		_value = (str == "true") || (str == "1");
+		_is_nil = false;
+		bump_serial();
 	}
 
 
@@ -587,6 +628,8 @@ template<>
 	{
 		try {
 			_value = boost::lexical_cast<int64_t> (str);
+			_is_nil = false;
+			bump_serial();
 		}
 		catch (boost::bad_lexical_cast&)
 		{
@@ -601,6 +644,8 @@ template<>
 	{
 		try {
 			_value = boost::lexical_cast<double> (str);
+			_is_nil = false;
+			bump_serial();
 		}
 		catch (boost::bad_lexical_cast&)
 		{
@@ -614,6 +659,8 @@ template<>
 	PropertyValueNode<std::string>::parse (std::string const& str)
 	{
 		_value = str;
+		_is_nil = false;
+		bump_serial();
 	}
 
 } // namespace Xefis

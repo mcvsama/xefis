@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <stdexcept>
 #include <string>
+#include <limits>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -120,6 +121,12 @@ class GenericProperty
 	 */
 	void
 	set_path (std::string const&);
+
+	/**
+	 * Return the serial value of the property.
+	 */
+	PropertyNode::Serial
+	serial() const;
 
 	/**
 	 * Ensures that this property exists.
@@ -458,6 +465,18 @@ GenericProperty::set_path (std::string const& new_path)
 	_path = normalized_path (new_path);
 	// The node will be localized again, when it's needed:
 	_node = nullptr;
+}
+
+
+inline PropertyNode::Serial
+GenericProperty::serial() const
+{
+	PropertyNode* node = get_node();
+	if (node)
+		return node->serial();
+	// If node becomes unavailable (not valid, singular or so),
+	// return -1u.
+	return std::numeric_limits<PropertyNode::Serial>::max();
 }
 
 

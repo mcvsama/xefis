@@ -25,6 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/lookahead.h>
 
@@ -55,6 +56,9 @@ class FlightDataComputer: public Xefis::Module
 	compute_position();
 
 	void
+	compute_magnetic_variation();
+
+	void
 	compute_headings();
 
 	void
@@ -64,7 +68,22 @@ class FlightDataComputer: public Xefis::Module
 	compute_da();
 
 	void
-	compute_speeds();
+	compute_sound_speed();
+
+	void
+	compute_true_airspeed();
+
+	void
+	compute_ground_speed();
+
+	void
+	compute_mach();
+
+	void
+	compute_climb_rate();
+
+	void
+	compute_ias_lookahead();
 
 	void
 	compute_aoa();
@@ -79,7 +98,13 @@ class FlightDataComputer: public Xefis::Module
 	compute_wind();
 
 	void
-	compute_performance();
+	compute_cgratio();
+
+	void
+	compute_tev();
+
+	void
+	compute_alt_reach_distance();
 
   private:
 	Time						_now;
@@ -94,12 +119,13 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_track_lateral_true_smoother		= 250_ms;
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2_s;
 	Xefis::Smoother<double>		_ground_speed_smoother				= 500_ms;
-	Xefis::Smoother<double>		_climb_rate_smoother				= 500_ms;
+	Xefis::Smoother<double>		_climb_rate_smoother				= 1000_ms;
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 500_ms;
 	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 500_ms;
 	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 500_ms;
 	Xefis::Smoother<double>		_ias_lookahead_smoother				= 500_ms;
 	Xefis::Smoother<double>		_track_heading_delta_smoother		= 500_ms;
+	Xefis::Smoother<double>		_alt_reach_distance_smoother		= 1000_ms;
 	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
 	Xefis::Lookahead<double>	_ias_estimator						= Xefis::Lookahead<double> (10_s);
 	// Total-energy variometer stuff:
@@ -108,6 +134,25 @@ class FlightDataComputer: public Xefis::Module
 	double						_total_energy						= 0.0;
 	Time						_total_energy_time					= 0_s;
 	Speed						_tev								= 0_fpm;
+	// Property observers:
+	Xefis::PropertyObserver		_position_computer;
+	Xefis::PropertyObserver		_magnetic_variation_computer;
+	Xefis::PropertyObserver		_headings_computer;
+	Xefis::PropertyObserver		_track_computer;
+	Xefis::PropertyObserver		_da_computer;
+	Xefis::PropertyObserver		_sound_speed_computer;
+	Xefis::PropertyObserver		_true_airspeed_computer;
+	Xefis::PropertyObserver		_ground_speed_computer;
+	Xefis::PropertyObserver		_mach_computer;
+	Xefis::PropertyObserver		_climb_rate_computer;
+	Xefis::PropertyObserver		_ias_lookahead_computer;
+	Xefis::PropertyObserver		_fpm_computer;
+	Xefis::PropertyObserver		_aoa_computer;
+	Xefis::PropertyObserver		_speed_limits_computer;
+	Xefis::PropertyObserver		_wind_computer;
+	Xefis::PropertyObserver		_cgratio_computer;
+	Xefis::PropertyObserver		_tev_computer;
+	Xefis::PropertyObserver		_alt_reach_distance_computer;
 
 	// Input parameters:
 	Xefis::PropertyFloat		_default_airplane_weight_g; // TODO

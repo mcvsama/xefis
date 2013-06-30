@@ -72,6 +72,12 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 	}
 	for (auto* pid: { &_altitude_pid, &_vertical_speed_pid, &_fpa_pid })
 		pid->set_i_limit ({ -0.05f, +0.05f });
+
+	_lateral_hint_computer.set_callback (std::bind (&FlightDirector::update_lateral_hint, this));
+	_lateral_hint_computer.observe (_lateral_mode);
+
+	_vertical_hint_computer.set_callback (std::bind (&FlightDirector::update_vertical_hint, this));
+	_vertical_hint_computer.observe (_vertical_mode);
 }
 
 
@@ -79,6 +85,9 @@ void
 FlightDirector::data_updated()
 {
 	using Xefis::limit;
+
+	_lateral_hint_computer.data_updated();
+	_vertical_hint_computer.data_updated();
 
 	// Don't process if dt is too small:
 	_dt += update_dt();
@@ -149,7 +158,39 @@ FlightDirector::data_updated()
 		_computed_output_roll = 0_deg;
 	}
 
-	// Mode hints:
+	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt()));
+	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt()));
+
+	_dt = Time::epoch();
+}
+
+
+void
+FlightDirector::update_lateral_hint()
+{
+	if (!_lateral_mode_hint.is_singular())
+	{
+		switch (static_cast<LateralMode> (*_lateral_mode))
+		{
+			case LateralDisabled:
+				_lateral_mode_hint.write ("");
+				break;
+
+			case FollowHeading:
+				_lateral_mode_hint.write ("HDG HOLD");
+				break;
+
+			case FollowTrack:
+				_lateral_mode_hint.write ("TRK HOLD");
+				break;
+		}
+	}
+}
+
+
+void
+FlightDirector::update_vertical_hint()
+{
 	if (!_vertical_mode_hint.is_singular())
 	{
 		switch (static_cast<VerticalMode> (*_vertical_mode))
@@ -171,28 +212,5 @@ FlightDirector::data_updated()
 				break;
 		}
 	}
-
-	if (!_lateral_mode_hint.is_singular())
-	{
-		switch (static_cast<LateralMode> (*_lateral_mode))
-		{
-			case LateralDisabled:
-				_lateral_mode_hint.write ("");
-				break;
-
-			case FollowHeading:
-				_lateral_mode_hint.write ("HDG HOLD");
-				break;
-
-			case FollowTrack:
-				_lateral_mode_hint.write ("TRK HOLD");
-				break;
-		}
-	}
-
-	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt()));
-	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt()));
-
-	_dt = Time::epoch();
 }
 

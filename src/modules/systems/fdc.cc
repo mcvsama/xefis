@@ -143,6 +143,64 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 
 	_pressure_alt_estimator.set_minimum_integration_time (0.2_s);
 	_ias_estimator.set_minimum_integration_time (0.2_s);
+
+	_position_computer.set_callback (std::bind (&FlightDataComputer::compute_position, this));
+	_position_computer.observe ({ &_gps_accuracy, &_gps_longitude, &_gps_latitude, &_gps_altitude_amsl,
+								  &_ins_accuracy, &_ins_longitude, &_ins_latitude, &_ins_altitude_amsl,
+								  &_static_pressure, &_use_standard_pressure, &_use_standard_pressure, &_qnh_pressure });
+
+	_magnetic_variation_computer.set_callback (std::bind (&FlightDataComputer::compute_magnetic_variation, this));
+	_magnetic_variation_computer.observe ({ &_position_longitude, &_position_latitude, &_position_altitude_amsl });
+
+	_headings_computer.set_callback (std::bind (&FlightDataComputer::compute_headings, this));
+	_headings_computer.observe ({ &_imu_magnetic_heading, &_magnetic_declination });
+
+	_track_computer.set_callback (std::bind (&FlightDataComputer::compute_track, this));
+	_track_computer.observe ({ &_position_computer, &_magnetic_declination });
+
+	_da_computer.set_callback (std::bind (&FlightDataComputer::compute_da, this));
+	_da_computer.observe ({ &_outside_air_temperature_k, &_pressure_altitude_amsl });
+
+	_sound_speed_computer.set_callback (std::bind (&FlightDataComputer::compute_sound_speed, this));
+	_sound_speed_computer.observe ({ &_outside_air_temperature_k });
+
+	_true_airspeed_computer.set_callback (std::bind (&FlightDataComputer::compute_true_airspeed, this));
+	_true_airspeed_computer.observe ({ &_ias, &_pressure_altitude_amsl, &_density_altitude });
+
+	_ground_speed_computer.set_callback (std::bind (&FlightDataComputer::compute_ground_speed, this));
+	_ground_speed_computer.observe ({ &_position_computer });
+
+	_mach_computer.set_callback (std::bind (&FlightDataComputer::compute_mach, this));
+	_mach_computer.observe ({ &_true_airspeed, &_sound_speed });
+
+	_climb_rate_computer.set_callback (std::bind (&FlightDataComputer::compute_climb_rate, this));
+	_climb_rate_computer.observe ({ &_pressure_altitude_std_amsl });
+
+	_ias_lookahead_computer.set_callback (std::bind (&FlightDataComputer::compute_ias_lookahead, this));
+	_ias_lookahead_computer.observe ({ &_ias });
+
+	_fpm_computer.set_callback (std::bind (&FlightDataComputer::compute_fpm, this));
+	_fpm_computer.observe ({ &_imu_pitch, &_imu_roll, &_imu_magnetic_heading, &_track_vertical, &_track_lateral_magnetic });
+
+	_aoa_computer.set_callback (std::bind (&FlightDataComputer::compute_aoa, this));
+	_aoa_computer.observe ({ &_fpm_alpha, &_fpm_beta, &_aoa_alpha, &_critical_aoa });
+
+	_speed_limits_computer.set_callback (std::bind (&FlightDataComputer::compute_speed_limits, this));
+	_speed_limits_computer.observe ({ &_v_ne, &_v_fe, &_v_le, &_v_o, &_v_s0, &_v_s });
+
+	_wind_computer.set_callback (std::bind (&FlightDataComputer::compute_wind, this));
+	_wind_computer.observe ({ &_true_airspeed, &_ground_speed, &_track_lateral_true,
+							  &_orientation_true_heading, &_magnetic_declination });
+
+	_cgratio_computer.set_callback (std::bind (&FlightDataComputer::compute_cgratio, this));
+	_cgratio_computer.observe ({ &_true_airspeed, &_pressure_altitude_climb_rate });
+
+	_tev_computer.set_callback (std::bind (&FlightDataComputer::compute_tev, this));
+	_tev_computer.observe ({ &_actual_airplane_weight_g, &_pressure_altitude_std_amsl, &_ias });
+
+	_alt_reach_distance_computer.set_callback (std::bind (&FlightDataComputer::compute_alt_reach_distance, this));
+	_alt_reach_distance_computer.observe ({ &_target_pressure_altitude_amsl, &_ground_speed,
+											&_pressure_altitude_climb_rate, &_pressure_altitude_amsl });
 }
 
 
@@ -151,16 +209,30 @@ FlightDataComputer::data_updated()
 {
 	_now = Time::now();
 
-	compute_position();
-	compute_headings();
-	compute_track();
-	compute_da();
-	compute_speeds();
-	compute_fpm();
-	compute_aoa();
-	compute_speed_limits();
-	compute_wind();
-	compute_performance();
+	Xefis::PropertyObserver* computers[] = {
+		// Order is important:
+		&_position_computer,
+		&_magnetic_variation_computer,
+		&_headings_computer,
+		&_track_computer,
+		&_da_computer,
+		&_sound_speed_computer,
+		&_true_airspeed_computer,
+		&_ground_speed_computer,
+		&_mach_computer,
+		&_climb_rate_computer,
+		&_ias_lookahead_computer,
+		&_fpm_computer,
+		&_aoa_computer,
+		&_speed_limits_computer,
+		&_wind_computer,
+		&_cgratio_computer,
+		&_tev_computer,
+		&_alt_reach_distance_computer
+	};
+
+	for (Xefis::PropertyObserver* o: computers)
+		o->data_updated();
 }
 
 
@@ -294,7 +366,7 @@ FlightDataComputer::compute_position()
 
 
 void
-FlightDataComputer::compute_headings()
+FlightDataComputer::compute_magnetic_variation()
 {
 	if (_position_longitude.valid() && _position_latitude.valid())
 	{
@@ -304,7 +376,7 @@ FlightDataComputer::compute_headings()
 			mv.set_altitude_amsl (*_position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
-		mv.set_date (2013, 1, 1);
+		mv.set_date (2013, 1, 1); // TODO get date from system or default to 2013-01-01
 		mv.update();
 		_magnetic_declination.write (mv.magnetic_declination());
 		_magnetic_inclination.write (mv.magnetic_inclination());
@@ -314,7 +386,12 @@ FlightDataComputer::compute_headings()
 		_magnetic_declination.set_nil();
 		_magnetic_inclination.set_nil();
 	}
+}
 
+
+void
+FlightDataComputer::compute_headings()
+{
 	if (_imu_magnetic_heading.valid())
 	{
 		_orientation_magnetic_heading.copy (_imu_magnetic_heading);
@@ -416,7 +493,7 @@ FlightDataComputer::compute_da()
 
 
 void
-FlightDataComputer::compute_speeds()
+FlightDataComputer::compute_sound_speed()
 {
 	if (_outside_air_temperature_k.valid())
 	{
@@ -425,7 +502,14 @@ FlightDataComputer::compute_speeds()
 		ss.update();
 		_sound_speed.write (ss.sound_speed());
 	}
+	else
+		_sound_speed.set_nil();
+}
 
+
+void
+FlightDataComputer::compute_true_airspeed()
+{
 	if (_ias.valid() && _pressure_altitude_amsl.valid())
 	{
 		Speed cas = *_ias;
@@ -442,7 +526,12 @@ FlightDataComputer::compute_speeds()
 	}
 	else
 		_true_airspeed.set_nil();
+}
 
+
+void
+FlightDataComputer::compute_ground_speed()
+{
 	if (_ac2_positions[0].valid && _ac2_positions[1].valid)
 	{
 		Time dt = _ac2_positions[0].time - _ac2_positions[1].time;
@@ -454,16 +543,28 @@ FlightDataComputer::compute_speeds()
 		_ground_speed.set_nil();
 		_ground_speed_smoother.invalidate();
 	}
+}
 
+
+void
+FlightDataComputer::compute_mach()
+{
 	// The approximate speed of sound in dry (0% humidity) air:
 	if (_true_airspeed.valid() && _sound_speed.valid())
 		_mach.write (*_true_airspeed / *_sound_speed);
 	else
 		_mach.set_nil();
+}
 
+
+void
+FlightDataComputer::compute_climb_rate()
+{
 	// Climb rate:
 	if (_pressure_altitude_std_amsl.valid())
 	{
+		// If previous climb-rate was invalid, use current STD pressure
+		// as source for 'previous altitude' value:
 		if (_pressure_altitude_climb_rate.is_nil())
 			_alt_amsl_prev = *_pressure_altitude_std_amsl;
 
@@ -482,7 +583,12 @@ FlightDataComputer::compute_speeds()
 		_pressure_altitude_climb_rate.set_nil();
 		_climb_rate_smoother.invalidate();
 	}
+}
 
+
+void
+FlightDataComputer::compute_ias_lookahead()
+{
 	if (_ias.valid())
 	{
 		double est = _ias_estimator.process ((*_ias).kt(), update_dt());
@@ -592,7 +698,8 @@ FlightDataComputer::compute_wind()
 	if (_true_airspeed.valid() &&
 		_ground_speed.valid() &&
 		_track_lateral_true.valid() &&
-		_orientation_true_heading.valid())
+		_orientation_true_heading.valid() &&
+		_magnetic_declination.valid())
 	{
 		Xefis::WindTriangle wt;
 		wt.set_aircraft_tas (*_true_airspeed);
@@ -615,7 +722,7 @@ FlightDataComputer::compute_wind()
 
 
 void
-FlightDataComputer::compute_performance()
+FlightDataComputer::compute_cgratio()
 {
 	if (_true_airspeed.valid() && _pressure_altitude_climb_rate.valid())
 	{
@@ -625,7 +732,14 @@ FlightDataComputer::compute_performance()
 			: 0;
 		_climb_glide_ratio.write (ratio);
 	}
+	else
+		_climb_glide_ratio.set_nil();
+}
 
+
+void
+FlightDataComputer::compute_tev()
+{
 	if (!_total_energy_variometer.is_singular())
 	{
 		if (_actual_airplane_weight_g.valid() &&
@@ -660,7 +774,12 @@ FlightDataComputer::compute_performance()
 			_variometer_smoother.invalidate();
 		}
 	}
+}
 
+
+void
+FlightDataComputer::compute_alt_reach_distance()
+{
 	if (!_target_altitude_reach_distance.is_singular())
 	{
 		if (_target_pressure_altitude_amsl.valid() &&
@@ -670,10 +789,13 @@ FlightDataComputer::compute_performance()
 		{
 			Length const alt_diff = *_target_pressure_altitude_amsl - *_pressure_altitude_amsl;
 			Length const distance = *_ground_speed * (alt_diff / *_pressure_altitude_climb_rate);
-			_target_altitude_reach_distance.write (distance);
+			_target_altitude_reach_distance.write (1_m * _alt_reach_distance_smoother.process (distance.m(), update_dt()));
 		}
 		else
+		{
 			_target_altitude_reach_distance.set_nil();
+			_alt_reach_distance_smoother.invalidate();
+		}
 	}
 }
 
