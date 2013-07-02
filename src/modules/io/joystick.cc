@@ -231,10 +231,7 @@ JoystickInput::Axis::set_value (float value)
 	// Scale:
 	value *= scale;
 	// Power:
-	float o = value;
-	value = std::pow (value, power);
-	if (value > 0.f && o < 0.f)
-		value = -value;
+	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
 
 	prop.write (value);
 }
