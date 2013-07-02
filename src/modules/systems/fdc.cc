@@ -334,33 +334,56 @@ FlightDataComputer::compute_position()
 			return 1_ft * -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
 		};
 
-		Pressure pressure_setting = _use_standard_pressure.valid() && *_use_standard_pressure
-			? 29.92_inHg
-			: *_qnh_pressure;
+		bool hide_alt_lookahead = false;
+		Pressure pressure_setting;
+		if (_use_standard_pressure.valid() && *_use_standard_pressure)
+		{
+			pressure_setting = 29.92_inHg;
+			if (!_prev_use_standard_pressure)
+				hide_alt_lookahead = true;
+			_prev_use_standard_pressure = true;
+		}
+		else
+		{
+			pressure_setting = *_qnh_pressure;
+			if (_prev_use_standard_pressure)
+				hide_alt_lookahead = true;
+			_prev_use_standard_pressure = false;
+		}
+
+		if (hide_alt_lookahead)
+			_hide_alt_lookahead_until = update_time() + _alt_lookahead_output_smoother.smoothing_time() + _alt_lookahead_input_smoother.smoothing_time();
+
 		Length height = compute_pressure_altitude (pressure_setting);
+		Length qnh_height = compute_pressure_altitude (*_qnh_pressure);
 		Length std_height = compute_pressure_altitude (29.92_inHg);
 
 		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft(), update_dt()));
+		_pressure_altitude_qnh_amsl.write (1_ft * _pressure_alt_qnh_smoother.process (qnh_height.ft(), update_dt()));
 		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft(), update_dt()));
 	}
 	else
 	{
-		_pressure_altitude_amsl.copy (_position_altitude_amsl);
+		_pressure_altitude_amsl.set_nil();
+		_pressure_altitude_qnh_amsl.set_nil();
+		_pressure_altitude_std_amsl.set_nil();
 		_pressure_alt_smoother.invalidate();
+		_pressure_alt_qnh_smoother.invalidate();
 		_pressure_alt_std_smoother.invalidate();
 	}
 
-	if (_pressure_altitude_amsl.valid())
+	if (_pressure_altitude_amsl.valid() && update_time() > _hide_alt_lookahead_until)
 	{
-		double est = _pressure_alt_estimator.process ((*_pressure_altitude_amsl).ft(), update_dt());
-		est = _pressure_alt_lookahead_smoother.process (est, update_dt());
+		double est = _pressure_alt_estimator.process (_alt_lookahead_input_smoother.process ((*_pressure_altitude_amsl).ft(), update_dt()), update_dt());
+		est = _alt_lookahead_output_smoother.process (est, update_dt());
 		_pressure_altitude_amsl_lookahead.write (1_ft * est);
 	}
 	else
 	{
 		_pressure_altitude_amsl_lookahead.set_nil();
 		_pressure_alt_estimator.invalidate();
-		_pressure_alt_lookahead_smoother.invalidate();
+		_alt_lookahead_input_smoother.invalidate();
+		_alt_lookahead_output_smoother.invalidate();
 	}
 }
 
@@ -591,15 +614,16 @@ FlightDataComputer::compute_ias_lookahead()
 {
 	if (_ias.valid())
 	{
-		double est = _ias_estimator.process ((*_ias).kt(), update_dt());
-		est = _ias_lookahead_smoother.process (est, update_dt());
+		double est = _ias_estimator.process (_ias_lookahead_input_smoother.process ((*_ias).kt(), update_dt()), update_dt());
+		est = _ias_lookahead_output_smoother.process (est, update_dt());
 		_ias_lookahead.write (1_kt * est);
 	}
 	else
 	{
 		_ias_lookahead.set_nil();
 		_ias_estimator.invalidate();
-		_ias_lookahead_smoother.invalidate();
+		_ias_lookahead_input_smoother.invalidate();
+		_ias_lookahead_output_smoother.invalidate();
 	}
 }
 

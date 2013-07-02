@@ -39,10 +39,19 @@ template<class tValueType>
 		typedef float SamplesType;
 
 	  public:
-		Smoother (Time smooth_time = 1_ms) noexcept;
+		Smoother (Time smoothing_time = 1_ms) noexcept;
 
+		/**
+		 * Set new smoothing time.
+		 */
 		void
-		set_smooth_time (Time smooth_time) noexcept;
+		set_smoothing_time (Time smoothing_time) noexcept;
+
+		/**
+		 * Return smoothing time.
+		 */
+		Time
+		smoothing_time() const noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
@@ -78,37 +87,55 @@ template<class tValueType>
 
 	  private:
 		ValueType
-		process_single_sample (ValueType s) noexcept;
+		encircle (ValueType s) const noexcept;
+
+		ValueType
+		decircle (ValueType s) const noexcept;
+
+		static void
+		shift (std::vector<ValueType>& vector, ValueType new_first) noexcept;
 
 	  private:
-		SamplesType				_time;// DEPREACTED TODO
+		Time					_smoothing_time;
 		ValueType				_z;
 		Range<ValueType>		_winding;
 		bool					_winding_enabled	= false;
 		bool					_invalidate			= false;
 		std::vector<ValueType>	_history;
+		std::vector<ValueType>	_history_cos;
+		std::vector<ValueType>	_history_sin;
 	};
 
 
 template<class V>
 	inline
-	Smoother<V>::Smoother (Time smooth_time) noexcept
+	Smoother<V>::Smoother (Time smoothing_time) noexcept
 	{
-		set_smooth_time (smooth_time);
+		set_smoothing_time (smoothing_time);
 		invalidate();
 	}
 
 
 template<class V>
 	inline void
-	Smoother<V>::set_smooth_time (Time smooth_time) noexcept
+	Smoother<V>::set_smoothing_time (Time smoothing_time) noexcept
 	{
-		int millis = smooth_time.ms();
+		_smoothing_time = smoothing_time;
+		int millis = _smoothing_time.ms();
 		if (millis < 1)
 			millis = 1;
-		_time = std::pow (0.01f, 2.0f / millis);
 		_history.resize (millis);
+		_history_cos.resize (millis);
+		_history_sin.resize (millis);
 		invalidate();
+	}
+
+
+template<class V>
+	inline Time
+	Smoother<V>::smoothing_time() const noexcept
+	{
+		return _smoothing_time;
 	}
 
 
@@ -117,7 +144,14 @@ template<class V>
 	Smoother<V>::reset (ValueType value) noexcept
 	{
 		std::fill (_history.begin(), _history.end(), value);
-		_z = value;
+		if (_winding_enabled)
+		{
+			std::fill (_history_cos.begin(), _history_cos.end(), std::cos (encircle (value)));
+			std::fill (_history_sin.begin(), _history_sin.end(), std::sin (encircle (value)));
+			_z = floored_mod<ValueType> (_z, _winding.min(), _winding.max());
+		}
+		else
+			_z = value;
 	}
 
 
@@ -135,6 +169,7 @@ template<class V>
 	{
 		_winding = range;
 		_winding_enabled = true;
+		reset (range.min());
 	}
 
 
@@ -149,44 +184,52 @@ template<class V>
 		}
 
 		int iterations = dt.ms();
-		ValueType z = _z;
 		if (iterations > 1)
-			for (int i = 0; i < iterations; ++i)
-				process_single_sample (z + (static_cast<ValueType> (i + 1) / iterations) * (s - z));
+		{
+			// Protect from NaNs and infs:
+			if (!std::isfinite (s))
+				reset (s);
+
+			if (_winding_enabled)
+			{
+				ValueType p = _history[0];
+				ValueType cos_p = _history_cos[0];
+				ValueType sin_p = _history_sin[0];
+				ValueType rad_s = encircle (s);
+				ValueType cos_s = std::cos (rad_s);
+				ValueType sin_s = std::sin (rad_s);
+
+				for (int i = 0; i < iterations; ++i)
+				{
+					ValueType d = static_cast<ValueType> (i + 1) / iterations;
+					shift (_history, p + d * (s - p));
+					shift (_history_cos, cos_p + d * (cos_s - cos_p));
+					shift (_history_sin, sin_p + d * (sin_s - sin_p));
+				}
+
+				ValueType x = 0.0;
+				ValueType y = 0.0;
+				for (typename std::vector<ValueType>::size_type i = 0; i < _history.size(); ++i)
+				{
+					x += _history_cos[i];
+					y += _history_sin[i];
+				}
+				_z = floored_mod<ValueType> (decircle (std::atan2 (y, x)), _winding.min(), _winding.max());
+			}
+			else
+			{
+				ValueType p = _history[0];
+				for (int i = 0; i < iterations; ++i)
+					shift (_history, p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
+
+				_z = 0.0;
+				for (ValueType v: _history)
+					_z += v;
+				_z /= _history.size();
+			}
+		}
+
 		return _z;
-	}
-
-
-template<class V>
-	inline typename Smoother<V>::ValueType
-	Smoother<V>::process_single_sample (ValueType s) noexcept
-	{
-		// Protect from NaNs and infs:
-		if (!std::isfinite (_z))
-			reset (s);
-
-		if (_winding_enabled)
-		{
-			ValueType c = (_winding.min() + _winding.max()) / 2.0;
-			ValueType h = _winding.extent() / 2.0;
-			if (s < _z - c)
-				s = s + _winding.extent();
-			else if (s > _z + c)
-				s = s - _winding.extent();
-			return _z = floored_mod (_time * (_z - s) + s, _winding.min(), _winding.max());
-		}
-		else
-		{
-			std::rotate (_history.begin(), _history.begin() + _history.size() - 1, _history.end());
-			_history[0] = s;
-
-			_z = 0.0;
-			for (ValueType const& v: _history)
-				_z += v;
-			_z /= _history.size();
-
-			return _z;
-		}
 	}
 
 
@@ -195,6 +238,31 @@ template<class V>
 	Smoother<V>::value() const noexcept
 	{
 		return _z;
+	}
+
+
+template<class V>
+	inline typename Smoother<V>::ValueType
+	Smoother<V>::encircle (ValueType s) const noexcept
+	{
+		return renormalize (s, _winding, Range<ValueType> (0.0, 2.0 * M_PI));
+	}
+
+
+template<class V>
+	inline typename Smoother<V>::ValueType
+	Smoother<V>::decircle (ValueType s) const noexcept
+	{
+		return renormalize (s, Range<ValueType> (0.0, 2.0 * M_PI), _winding);
+	}
+
+
+template<class V>
+	inline void
+	Smoother<V>::shift (std::vector<ValueType>& vector, ValueType new_first) noexcept
+	{
+		std::rotate (vector.begin(), vector.begin() + vector.size() - 1, vector.end());
+		vector[0] = new_first;
 	}
 
 } // namespace Xefis

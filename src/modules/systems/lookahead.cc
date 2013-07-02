@@ -65,7 +65,7 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 
 	_input = Xefis::PropertyFloat (input_property_path.toStdString());
 	_output = Xefis::PropertyFloat (output_property_path.toStdString());
-	_output_smoother.set_smooth_time (smoothing);
+	_output_smoother.set_smoothing_time (smoothing);
 }
 
 
