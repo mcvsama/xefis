@@ -107,15 +107,16 @@ template<class T>
 	{
 		_time += dt;
 
+		if (_invalidate)
+		{
+			_last_input = input;
+			_last_output = input;
+			_invalidate = false;
+		}
+
 		if (_time > _minimum_integration_time)
 		{
-			if (_invalidate)
-			{
-				_last_output = input;
-				_invalidate = false;
-			}
-			else
-				_last_output = (_lookahead_time * (input - _last_input)) / _time + input;
+			_last_output = (_lookahead_time * (input - _last_input)) / _time + input;
 			_last_input = input;
 			_time = 0_s;
 		}

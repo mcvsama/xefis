@@ -121,9 +121,12 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_ground_speed_smoother				= 500_ms;
 	Xefis::Smoother<double>		_climb_rate_smoother				= 1000_ms;
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 500_ms;
+	Xefis::Smoother<double>		_pressure_alt_qnh_smoother			= 500_ms;
 	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 500_ms;
-	Xefis::Smoother<double>		_pressure_alt_lookahead_smoother	= 500_ms;
-	Xefis::Smoother<double>		_ias_lookahead_smoother				= 500_ms;
+	Xefis::Smoother<double>		_alt_lookahead_input_smoother		= 100_ms;
+	Xefis::Smoother<double>		_alt_lookahead_output_smoother		= 500_ms;
+	Xefis::Smoother<double>		_ias_lookahead_input_smoother		= 100_ms;
+	Xefis::Smoother<double>		_ias_lookahead_output_smoother		= 1000_ms;
 	Xefis::Smoother<double>		_track_heading_delta_smoother		= 500_ms;
 	Xefis::Smoother<double>		_alt_reach_distance_smoother		= 1000_ms;
 	Xefis::Lookahead<double>	_pressure_alt_estimator				= Xefis::Lookahead<double> (10_s);
@@ -134,6 +137,8 @@ class FlightDataComputer: public Xefis::Module
 	double						_total_energy						= 0.0;
 	Time						_total_energy_time					= 0_s;
 	Speed						_tev								= 0_fpm;
+	bool						_prev_use_standard_pressure			= false;
+	Time						_hide_alt_lookahead_until			= 0_s;
 	// Property observers:
 	Xefis::PropertyObserver		_position_computer;
 	Xefis::PropertyObserver		_magnetic_variation_computer;
@@ -214,6 +219,7 @@ class FlightDataComputer: public Xefis::Module
 	// Output altitude:
 	Xefis::PropertyLength		_pressure_altitude_amsl;
 	Xefis::PropertyLength		_pressure_altitude_amsl_lookahead;
+	Xefis::PropertyLength		_pressure_altitude_qnh_amsl;
 	Xefis::PropertyLength		_pressure_altitude_std_amsl;
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
