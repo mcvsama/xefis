@@ -49,7 +49,14 @@ class NavaidStorage
 	typedef KDTree::KDTree<2, Navaid, std::function<LonLat::ValueType::ValueType (Navaid const&, std::size_t)>> NavaidsTree;
 
   public:
+	// Ctor
 	NavaidStorage();
+
+	/**
+	 * Load navaids and fixes.
+	 */
+	void
+	load();
 
 	/**
 	 * Return set of navaids withing the given @radius

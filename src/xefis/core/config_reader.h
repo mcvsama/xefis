@@ -54,6 +54,12 @@ class ConfigReader
 	bool
 	has_windows() const;
 
+	/**
+	 * Return true if navaids are supposed to be loaded.
+	 */
+	bool
+	load_navaids() const;
+
   private:
 	QDomDocument
 	parse_file (QString const& path);
@@ -65,10 +71,7 @@ class ConfigReader
 	process_includes (QDomElement parent);
 
 	void
-	process_properties_element (QDomElement const& properties_element);
-
-	void
-	process_property_element (QDomElement const& property_element);
+	process_system_element (QDomElement const& system_element);
 
 	void
 	process_windows_element (QDomElement const& windows_element);
@@ -88,6 +91,16 @@ class ConfigReader
 	QDomDocument	_config_document;
 	QDir			_current_dir;
 	bool			_has_windows		= false;
+	bool			_load_navaids		= true;
+};
+
+
+class ConfigException: public Exception
+{
+  public:
+	ConfigException (std::string const& message):
+		Exception (message)
+	{ }
 };
 
 
@@ -98,13 +111,11 @@ ConfigReader::has_windows() const
 }
 
 
-class ConfigException: public Exception
+inline bool
+ConfigReader::load_navaids() const
 {
-  public:
-	ConfigException (std::string const& message):
-		Exception (message)
-	{ }
-};
+	return _load_navaids;
+}
 
 } // namespace Xefis
 
