@@ -94,7 +94,9 @@ ConfigReader::process()
 
 	for (QDomElement& e: root)
 	{
-		if (e == "windows")
+		if (e == "system")
+			process_system_element (e);
+		else if (e == "windows")
 			process_windows_element (e);
 		else if (e == "modules")
 			process_modules_element (e);
@@ -140,6 +142,19 @@ ConfigReader::process_includes (QDomElement parent)
 
 	for (QDomElement& e: to_remove)
 		parent.removeChild (e);
+}
+
+
+void
+ConfigReader::process_system_element (QDomElement const& system_element)
+{
+	for (QDomElement& e: system_element)
+	{
+		if (e == "disable-navaids")
+			_load_navaids = false;
+		else
+			throw ConfigException (QString ("unsupported child of <system>: <%1>").arg (e.tagName()).toStdString());
+	}
 }
 
 

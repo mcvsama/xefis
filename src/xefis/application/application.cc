@@ -86,6 +86,8 @@ Application::Application (int argc, char** argv):
 
 	if (_config_reader->has_windows())
 		_configurator_widget = new ConfiguratorWidget (nullptr);
+	if (_config_reader->load_navaids())
+		_navaid_storage->load();
 }
 
 

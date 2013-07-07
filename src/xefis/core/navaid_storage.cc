@@ -30,6 +30,11 @@ namespace Xefis {
 
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_position)
+{ }
+
+
+void
+NavaidStorage::load()
 {
 	parse_nav_dat();
 	parse_fix_dat();
@@ -257,6 +262,7 @@ NavaidStorage::parse_fix_dat()
 void
 NavaidStorage::parse_awy_dat()
 {
+	// TODO
 }
 
 } // namespace Xefis

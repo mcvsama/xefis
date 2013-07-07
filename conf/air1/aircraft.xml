@@ -1,5 +1,8 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
+	<system>
+		<disable-navaids/>
+	</system>
 	<modules>
 		<include name='aircraft/bmp085.xml'/>
 		<include name='aircraft/fdc.xml'/>
