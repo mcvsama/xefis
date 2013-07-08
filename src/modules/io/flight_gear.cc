@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/application.h>
-#include <xefis/application/services.h>
+#include <xefis/core/application.h>
+#include <xefis/core/services.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>

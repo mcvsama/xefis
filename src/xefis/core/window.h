@@ -25,7 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/application.h>
+#include <xefis/core/application.h>
 
 
 namespace Xefis {

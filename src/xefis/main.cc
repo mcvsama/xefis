@@ -26,12 +26,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/application.h>
-#include <xefis/application/services.h>
+#include <xefis/core/application.h>
+#include <xefis/core/fail.h>
+#include <xefis/core/services.h>
 #include <xefis/utility/backtrace.h>
-
-// Local:
-#include "fail.h"
 
 
 int main (int argc, char** argv, char**)

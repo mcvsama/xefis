@@ -1,5 +1,9 @@
 # vim:ts=4
 
+######## /xefis ########
+
+SRC_SOURCES += xefis/main.cc
+
 ######## /xefis/airnav ########
 
 SRC_HEADERS += xefis/airnav/density_altitude.h
@@ -8,21 +12,6 @@ SRC_HEADERS += xefis/airnav/sound_speed.h
 SRC_HEADERS += xefis/airnav/wind_triangle.h
 
 SRC_SOURCES += xefis/airnav/magnetic_variation.cc
-
-######## /xefis/application ########
-
-SRC_HEADERS += xefis/application/application.h
-SRC_HEADERS += xefis/application/fail.h
-SRC_HEADERS += xefis/application/services.h
-SRC_HEADERS += xefis/application/xefis.h
-
-SRC_SOURCES += xefis/application/application.cc
-SRC_SOURCES += xefis/application/fail.cc
-SRC_SOURCES += xefis/application/main.cc
-SRC_SOURCES += xefis/application/services.cc
-
-SRC_MOCHDRS += xefis/application/application.h
-SRC_MOCHDRS += xefis/application/services.h
 
 ######## /xefis/components ########
 
@@ -53,7 +42,9 @@ NODEP_SOURCES += $(VERSION_FILE)
 ######## /xefis/core ########
 
 SRC_HEADERS += xefis/core/accounting.h
+SRC_HEADERS += xefis/core/application.h
 SRC_HEADERS += xefis/core/config_reader.h
+SRC_HEADERS += xefis/core/fail.h
 SRC_HEADERS += xefis/core/input.h
 SRC_HEADERS += xefis/core/instrument.h
 SRC_HEADERS += xefis/core/instrument_aids.h
@@ -66,11 +57,14 @@ SRC_HEADERS += xefis/core/property.h
 SRC_HEADERS += xefis/core/property_node.h
 SRC_HEADERS += xefis/core/property_observer.h
 SRC_HEADERS += xefis/core/property_storage.h
+SRC_HEADERS += xefis/core/services.h
 SRC_HEADERS += xefis/core/window.h
 SRC_HEADERS += xefis/core/work_performer.h
 
 SRC_SOURCES += xefis/core/accounting.cc
+SRC_SOURCES += xefis/core/application.cc
 SRC_SOURCES += xefis/core/config_reader.cc
+SRC_SOURCES += xefis/core/fail.cc
 SRC_SOURCES += xefis/core/instrument_aids.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
 SRC_SOURCES += xefis/core/module.cc
@@ -80,10 +74,13 @@ SRC_SOURCES += xefis/core/navaid_storage.cc
 SRC_SOURCES += xefis/core/property_node.cc
 SRC_SOURCES += xefis/core/property_observer.cc
 SRC_SOURCES += xefis/core/property_storage.cc
+SRC_SOURCES += xefis/core/services.cc
 SRC_SOURCES += xefis/core/window.cc
 SRC_SOURCES += xefis/core/work_performer.cc
 
 SRC_MOCHDRS += xefis/core/accounting.h
+SRC_MOCHDRS += xefis/core/application.h
+SRC_MOCHDRS += xefis/core/services.h
 SRC_MOCHDRS += xefis/core/window.h
 
 ######## /xefis/utility ########
