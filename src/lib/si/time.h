@@ -95,6 +95,9 @@ class Time: public LinearValue<double, Time>
 	static Time
 	epoch() noexcept;
 
+	static Time
+	measure (std::function<void()> callback) noexcept;
+
   private:
 	static std::vector<std::string> _supported_units;
 };
@@ -219,6 +222,15 @@ Time::epoch() noexcept
 	Time t;
 	t.value() = 0.0;
 	return t;
+}
+
+
+inline Time
+Time::measure (std::function<void()> callback) noexcept
+{
+	Time t = now();
+	callback();
+	return now() - t;
 }
 
 

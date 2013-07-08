@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='io/link'>
+	<module name='io/link' instance='input'>
 		<properties>
 			<property name='link-valid' path='/link/local/valid'/>
 			<property name='failsafes' path='/link/local/failsafes'/>
@@ -31,7 +31,7 @@
 			</packet>
 		</protocol>
 	</module>
-	<module name='io/link'>
+	<module name='io/link' instance='output'>
 		<output frequency='30 Hz'>
 			<udp>
 				<host>192.168.0.10</host>

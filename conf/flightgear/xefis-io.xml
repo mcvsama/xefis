@@ -66,7 +66,7 @@
 				</properties>
 			</output>
 		</module>
-		<module name='io/joystick'>
+		<module name='io/joystick' instance='main'>
 			<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
 			<path>/input/main</path>
 			<axis id='0'>
@@ -78,8 +78,8 @@
 				<dead-zone>0.016</dead-zone>
 			</axis>
 		</module>
-		<module name='io/joystick'>
-			<device>/dev/input/js1</device>
+		<module name='io/joystick' instance='pedals'>
+			<device>/dev/input/js0</device>
 			<path>/input/rudder</path>
 			<axis id='2'>
 				<power>3</power>

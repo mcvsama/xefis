@@ -18,6 +18,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/accounting.h>
 
 // Local:
 #include "module_manager.h"
@@ -40,10 +41,16 @@ ModuleManager::~ModuleManager()
 
 
 Module*
-ModuleManager::load_module (QString const& name, QDomElement const& config, QWidget* parent)
+ModuleManager::load_module (QString const& name, QString const& instance, QDomElement const& config, QWidget* parent)
 {
+	Module::Pointer pointer (name.toStdString(), instance.toStdString());
+	if (_pointer_to_module_map.find (pointer) != _pointer_to_module_map.end())
+		throw Xefis::Exception (QString ("module '%1' with instance name '%2' already loaded").arg (name).arg (instance).toStdString());
+
 	Module* module = create_module_by_name (name, config, parent);
 	_modules.insert (module);
+	_module_to_pointer_map[module] = pointer;
+	_pointer_to_module_map[pointer] = module;
 
 	Instrument* instrument = dynamic_cast<Instrument*> (module);
 	if (instrument)
@@ -83,6 +90,26 @@ ModuleManager::data_updated (Time time)
 }
 
 
+Module::Pointer
+ModuleManager::find (Module* module) const
+{
+	ModuleToPointerMap::const_iterator m = _module_to_pointer_map.find (module);
+	if (m != _module_to_pointer_map.end())
+		return m->second;
+	throw ModuleNotFoundException ("module specified by pointer (Module*) can't be found");
+}
+
+
+Module*
+ModuleManager::find (Module::Pointer const& modptr) const
+{
+	PointerToModuleMap::const_iterator m = _pointer_to_module_map.find (modptr);
+	if (m != _pointer_to_module_map.end())
+		return m->second;
+	return nullptr;
+}
+
+
 Module*
 ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
 {
@@ -109,14 +136,18 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 void
 ModuleManager::module_data_updated (Module* module)
 {
-	try {
-		module->data_updated();
-	}
-	catch (Xefis::Exception const& e)
-	{
-		std::cerr << "Exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
-		std::cerr << e << std::endl;
-	}
+	Module::Pointer modptr = find (module);
+	Time dt = Time::measure ([&]() {
+		try {
+			module->data_updated();
+		}
+		catch (Xefis::Exception const& e)
+		{
+			std::cerr << "Exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
+			std::cerr << e << std::endl;
+		}
+	});
+	_application->accounting()->add_module_stats (modptr, dt);
 }
 
 } // namespace Xefis
