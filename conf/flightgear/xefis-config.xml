@@ -3,5 +3,8 @@
 	<include name='xefis-io.xml'/>
 	<include name='xefis-displays.xml'/>
 	<include name='xefis-systems.xml'/>
+	<modules>
+		<module name='log/latency'/>
+	</modules>
 </xefis-config>
 

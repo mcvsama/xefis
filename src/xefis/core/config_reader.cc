@@ -204,7 +204,10 @@ ConfigReader::process_module_element (QDomElement const& module_element, QBoxLay
 	if (module_element.attribute ("disabled") == "true")
 		return;
 
-	Module* module = _module_manager->load_module (module_element.attribute ("name"), module_element, window);
+	QString name = module_element.attribute ("name");
+	QString instance = module_element.attribute ("instance");
+
+	Module* module = _module_manager->load_module (name, instance, module_element, window);
 
 	if (layout)
 	{

@@ -30,6 +30,7 @@
 #include <xefis/application/services.h>
 #include <xefis/components/configurator/configurator_widget.h>
 #include <xefis/core/property_storage.h>
+#include <xefis/core/accounting.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
@@ -59,6 +60,7 @@ Application::Application (int argc, char** argv):
 	// Init property storage:
 	PropertyStorage::initialize();
 
+	_accounting = new Accounting();
 	_navaid_storage = new NavaidStorage();
 	_module_manager = new ModuleManager (this);
 	_config_reader = new ConfigReader (this, _module_manager);
@@ -98,6 +100,7 @@ Application::~Application()
 	delete _config_reader;
 	delete _module_manager;
 	delete _navaid_storage;
+	delete _accounting;
 	Services::deinitialize();
 	_application = nullptr;
 }

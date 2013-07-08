@@ -25,7 +25,6 @@
 #include <xefis/config/all.h>
 #include <xefis/application/application.h>
 #include <xefis/core/navaid_storage.h>
-#include <xefis/core/module_manager.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/i2c.h>
 
@@ -37,6 +36,8 @@
 
 
 namespace Xefis {
+
+class ModuleManager;
 
 class Module
 {
@@ -52,9 +53,42 @@ class Module
 	typedef std::function<Module* (ModuleManager*, QDomElement const&)>	FactoryFunction;
 	typedef std::map<std::string, FactoryFunction>						FactoriesMap;
 
-	struct Registrator
+	class Registrator
 	{
+	  public:
 		Registrator (std::string const& module_name, FactoryFunction);
+	};
+
+	class Pointer
+	{
+	  public:
+		// Ctor
+		Pointer() = default;
+
+		// Ctor
+		Pointer (std::string const& name, std::string const& instance);
+
+		/**
+		 * Comparison operator: first by name, then by instance.
+		 */
+		bool
+		operator< (Pointer const& other) const;
+
+		/**
+		 * Return module name (class).
+		 */
+		std::string const&
+		name() const noexcept;
+
+		/**
+		 * Return module instance.
+		 */
+		std::string const&
+		instance() const noexcept;
+
+	  private:
+		std::string	_name;
+		std::string	_instance;
 	};
 
   public:
@@ -130,6 +164,12 @@ class Module
 	WorkPerformer*
 	work_performer() const;
 
+	/**
+	 * Access accounting information.
+	 */
+	Accounting*
+	accounting() const;
+
   private:
 	/**
 	 * Return list of factories.
@@ -150,6 +190,38 @@ Module::Registrator::Registrator (std::string const& module_name, FactoryFunctio
 
 
 inline
+Module::Pointer::Pointer (std::string const& name, std::string const& instance):
+	_name (name),
+	_instance (instance)
+{ }
+
+
+inline bool
+Module::Pointer::operator< (Pointer const& other) const
+{
+	if (_name != other._name)
+		return _name < other._name;
+	if (_instance != other._instance)
+		return _instance < other._instance;
+	return false;
+}
+
+
+inline std::string const&
+Module::Pointer::name() const noexcept
+{
+	return _name;
+}
+
+
+inline std::string const&
+Module::Pointer::instance() const noexcept
+{
+	return _instance;
+}
+
+
+inline
 Module::~Module()
 { }
 
@@ -157,20 +229,6 @@ Module::~Module()
 inline void
 Module::data_updated()
 { }
-
-
-inline Time
-Module::update_time() const
-{
-	return _module_manager->update_time();
-}
-
-
-inline Time
-Module::update_dt() const
-{
-	return _module_manager->update_dt();
-}
 
 } // namespace Xefis
 

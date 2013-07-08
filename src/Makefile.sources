@@ -52,6 +52,7 @@ NODEP_SOURCES += $(VERSION_FILE)
 
 ######## /xefis/core ########
 
+SRC_HEADERS += xefis/core/accounting.h
 SRC_HEADERS += xefis/core/config_reader.h
 SRC_HEADERS += xefis/core/input.h
 SRC_HEADERS += xefis/core/instrument.h
@@ -68,6 +69,7 @@ SRC_HEADERS += xefis/core/property_storage.h
 SRC_HEADERS += xefis/core/window.h
 SRC_HEADERS += xefis/core/work_performer.h
 
+SRC_SOURCES += xefis/core/accounting.cc
 SRC_SOURCES += xefis/core/config_reader.cc
 SRC_SOURCES += xefis/core/instrument_aids.cc
 SRC_SOURCES += xefis/core/instrument_widget.cc
@@ -81,6 +83,7 @@ SRC_SOURCES += xefis/core/property_storage.cc
 SRC_SOURCES += xefis/core/window.cc
 SRC_SOURCES += xefis/core/work_performer.cc
 
+SRC_MOCHDRS += xefis/core/accounting.h
 SRC_MOCHDRS += xefis/core/window.h
 
 ######## /xefis/utility ########
@@ -184,6 +187,14 @@ SRC_MOCHDRS += modules/io/ht16k33.h
 SRC_MOCHDRS += modules/io/joystick.h
 SRC_MOCHDRS += modules/io/mouse.h
 SRC_MOCHDRS += modules/io/link.h
+
+######## /modules/log ########
+
+SRC_HEADERS += modules/log/latency.h
+
+SRC_SOURCES += modules/log/latency.cc
+
+SRC_MOCHDRS += modules/log/latency.h
 
 ######## /modules/systems ########
 

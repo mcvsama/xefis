@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/module.h>
 
 
 namespace Xefis {
@@ -34,6 +35,10 @@ class Application;
 class ModuleManager
 {
 	typedef std::set<Module*> Modules;
+
+  public:
+	typedef std::map<Module*, Module::Pointer>	ModuleToPointerMap;
+	typedef std::map<Module::Pointer, Module*>	PointerToModuleMap;
 
   public:
 	// Ctor
@@ -53,7 +58,7 @@ class ModuleManager
 	 * If parent is nullptr, widget will not be shown.
 	 */
 	Module*
-	load_module (QString const& name, QDomElement const& config, QWidget* parent);
+	load_module (QString const& name, QString const& instnace, QDomElement const& config, QWidget* parent);
 
 	/**
 	 * Signal that the data in property tree has been updated.
@@ -74,6 +79,19 @@ class ModuleManager
 	Time
 	update_dt() const;
 
+	/**
+	 * Return Module::Pointer from Module*.
+	 * \throw	ModuleNotFoundException if module can't be found.
+	 */
+	Module::Pointer
+	find (Module*) const;
+
+	/**
+	 * Return Module* by Module::Pointer.
+	 */
+	Module*
+	find (Module::Pointer const&) const;
+
   private:
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
@@ -82,13 +100,15 @@ class ModuleManager
 	module_data_updated (Module*);
 
   private:
-	Application*	_application = nullptr;
-	Modules			_modules;
-	Modules			_instrument_modules;
-	Modules			_non_instrument_modules;
-	Time			_update_time;
-	Time			_update_dt;
-	Time			_instrument_update_time;
+	Application*		_application = nullptr;
+	Modules				_modules;
+	Modules				_instrument_modules;
+	Modules				_non_instrument_modules;
+	Time				_update_time;
+	Time				_update_dt;
+	Time				_instrument_update_time;
+	ModuleToPointerMap	_module_to_pointer_map;
+	PointerToModuleMap	_pointer_to_module_map;
 };
 
 

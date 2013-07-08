@@ -151,6 +151,20 @@ Module::signal_data_updated()
 }
 
 
+Time
+Module::update_time() const
+{
+	return _module_manager->update_time();
+}
+
+
+Time
+Module::update_dt() const
+{
+	return _module_manager->update_dt();
+}
+
+
 NavaidStorage*
 Module::navaid_storage() const
 {
@@ -162,6 +176,13 @@ WorkPerformer*
 Module::work_performer() const
 {
 	return _module_manager->application()->work_performer();
+}
+
+
+Accounting*
+Module::accounting() const
+{
+	return _module_manager->application()->accounting();
 }
 
 

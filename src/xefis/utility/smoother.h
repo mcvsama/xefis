@@ -39,13 +39,19 @@ template<class tValueType>
 		typedef float SamplesType;
 
 	  public:
-		Smoother (Time smoothing_time = 1_ms) noexcept;
+		Smoother (Time smoothing_time = 1_ms, Time precision = 1_ms) noexcept;
 
 		/**
 		 * Set new smoothing time.
 		 */
 		void
 		set_smoothing_time (Time smoothing_time) noexcept;
+
+		/**
+		 * Set sampling precision.
+		 */
+		void
+		set_precision (Time precision) noexcept;
 
 		/**
 		 * Return smoothing time.
@@ -85,6 +91,12 @@ template<class tValueType>
 		ValueType
 		value() const noexcept;
 
+		/**
+		 * Return most recently pushed sample.
+		 */
+		ValueType
+		last_sample() const noexcept;
+
 	  private:
 		ValueType
 		encircle (ValueType s) const noexcept;
@@ -97,6 +109,7 @@ template<class tValueType>
 
 	  private:
 		Time					_smoothing_time;
+		Time					_precision;
 		ValueType				_z;
 		Range<ValueType>		_winding;
 		bool					_winding_enabled	= false;
@@ -109,9 +122,10 @@ template<class tValueType>
 
 template<class V>
 	inline
-	Smoother<V>::Smoother (Time smoothing_time) noexcept
+	Smoother<V>::Smoother (Time smoothing_time, Time precision) noexcept
 	{
 		set_smoothing_time (smoothing_time);
+		set_precision (precision);
 		invalidate();
 	}
 
@@ -127,6 +141,15 @@ template<class V>
 		_history.resize (millis);
 		_history_cos.resize (millis);
 		_history_sin.resize (millis);
+		invalidate();
+	}
+
+
+template<class V>
+	inline void
+	Smoother<V>::set_precision (Time precision) noexcept
+	{
+		_precision = precision;
 		invalidate();
 	}
 
@@ -183,7 +206,7 @@ template<class V>
 			reset (s);
 		}
 
-		int iterations = dt.ms();
+		int iterations = std::round (dt / _precision);
 		if (iterations > 1)
 		{
 			// Protect from NaNs and infs:
@@ -238,6 +261,14 @@ template<class V>
 	Smoother<V>::value() const noexcept
 	{
 		return _z;
+	}
+
+
+template<class V>
+	inline typename Smoother<V>::ValueType
+	Smoother<V>::last_sample() const noexcept
+	{
+		return _history[0];
 	}
 
 

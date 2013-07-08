@@ -32,6 +32,7 @@ class ModuleManager;
 class ConfigReader;
 class WorkPerformer;
 class ConfiguratorWidget;
+class Accounting;
 
 
 class Application: public QApplication
@@ -68,6 +69,13 @@ class Application: public QApplication
 	 */
 	void
 	quit();
+
+	/**
+	 * Return Accounting object.
+	 * Used to track timings and overall response times.
+	 */
+	Accounting*
+	accounting() const;
 
 	/**
 	 * Return pointer to navaid storage.
@@ -125,6 +133,7 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
+	Accounting*			_accounting				= nullptr;
 	NavaidStorage*		_navaid_storage			= nullptr;
 	ModuleManager*		_module_manager			= nullptr;
 	ConfigReader*		_config_reader			= nullptr;
@@ -146,6 +155,13 @@ inline Time
 Application::DataUpdatedEvent::time() const
 {
 	return _time;
+}
+
+
+inline Accounting*
+Application::accounting() const
+{
+	return _accounting;
 }
 
 
