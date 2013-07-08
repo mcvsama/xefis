@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/services.h>
+#include <xefis/core/services.h>
 #include <xefis/core/property_node.h>
 
 // Local:

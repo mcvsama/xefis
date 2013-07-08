@@ -27,14 +27,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/services.h>
-#include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/core/services.h>
 #include <xefis/core/property_storage.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
+#include <xefis/components/configurator/configurator_widget.h>
 
 // Local:
 #include "application.h"

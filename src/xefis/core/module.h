@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/application.h>
+#include <xefis/core/application.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/i2c.h>

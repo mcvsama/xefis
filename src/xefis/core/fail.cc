@@ -25,7 +25,7 @@
 // Local:
 #include <xefis/config/version.h>
 #include <xefis/utility/backtrace.h>
-#include <xefis/application/services.h>
+#include <xefis/core/services.h>
 
 #include "fail.h"
 

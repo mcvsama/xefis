@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/services.h>
+#include <xefis/core/services.h>
 
 // Local:
 #include "instrument_widget.h"

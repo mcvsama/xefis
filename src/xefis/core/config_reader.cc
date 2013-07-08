@@ -27,7 +27,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/application/application.h>
+#include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/module.h>
 #include <xefis/core/window.h>
