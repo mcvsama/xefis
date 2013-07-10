@@ -115,8 +115,8 @@ class FlightDataComputer: public Xefis::Module
 	Length						_alt_amsl_prev						= 0_ft;
 	Time						_alt_amsl_time						= 0_s;
 	Speed						_computed_climb_rate				= 0_fpm;
-	Xefis::Smoother<double>		_track_vertical_smoother			= 250_ms;
-	Xefis::Smoother<double>		_track_lateral_true_smoother		= 250_ms;
+	Xefis::Smoother<double>		_track_vertical_smoother			= 500_ms;
+	Xefis::Smoother<double>		_track_lateral_true_smoother		= 500_ms;
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2_s;
 	Xefis::Smoother<double>		_ground_speed_smoother				= 500_ms;
 	Xefis::Smoother<double>		_climb_rate_smoother				= 1000_ms;

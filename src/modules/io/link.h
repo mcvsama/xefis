@@ -43,21 +43,6 @@ class Link:
 
 	class ParseError { };
 
-	/**
-	 * This is a helper for decoding hex-encoded values.
-	 * It assumes UTF-8/ASCII encoding.
-	 */
-	class HexTable
-	{
-	  public:
-		HexTable();
-
-		int operator[] (char c) const;
-
-	  private:
-		int _table[256];
-	};
-
 	class Item
 	{
 	  public:
@@ -365,26 +350,5 @@ class Link:
 	bool					_input_interference		= false;
 	bool					_output_interference	= false;
 };
-
-
-inline
-Link::HexTable::HexTable()
-{
-	std::fill (std::begin (_table), std::end (_table), 0);
-
-	for (char c = '0'; c <= '9'; ++c)
-		_table[static_cast<uint8_t> (c)] = c - '0';
-	for (char c = 'a'; c <= 'f'; ++c)
-		_table[static_cast<uint8_t> (c)] = 10 + c - 'a';
-	for (char c = 'A'; c <= 'F'; ++c)
-		_table[static_cast<uint8_t> (c)] = 10 + c - 'A';
-}
-
-
-inline int
-Link::HexTable::operator[] (char c) const
-{
-	return _table[static_cast<uint8_t> (c)];
-}
 
 #endif

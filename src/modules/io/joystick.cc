@@ -44,7 +44,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		if (e == "device")
 		{
 			if (found_device)
-				throw Xefis::Exception ("only once <device> supported in configuration for the JoystickInput module");
+				throw Xefis::Exception ("only one <device> supported in configuration for the io/joystick module");
 			found_device = true;
 
 			_device_path = e.text();
@@ -52,7 +52,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		else if (e == "path")
 		{
 			if (found_path)
-				throw Xefis::Exception ("only once <path> supported in configuration for the JoystickInput module");
+				throw Xefis::Exception ("only one <path> supported in configuration for the io/joystick module");
 			found_path = true;
 
 			_prop_path = e.text();
@@ -92,8 +92,13 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 			}
 		}
 		else
-			throw Xefis::Exception (QString ("unsupported config element for JoystickInput module: <%1>").arg (e.tagName()).toStdString());
+			throw Xefis::Exception (QString ("unsupported config element for io/joystick module: <%1>").arg (e.tagName()).toStdString());
 	}
+
+	if (!found_path)
+		throw Xefis::Exception ("config for the io/joystick module needs <path> element");
+	if (!found_device)
+		throw Xefis::Exception ("config for the io/joystick module needs <device> element");
 
 	_reopen_timer = new QTimer (this);
 	_reopen_timer->setInterval (1000);

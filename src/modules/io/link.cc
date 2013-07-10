@@ -26,6 +26,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hash.h>
+#include <xefis/utility/hextable.h>
 
 // Local:
 #include "link.h"
@@ -130,6 +131,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Time:
 			if (!element.hasAttribute ("bytes"))
 				throw Xefis::Exception (QString ("<property> of type %1 needs attribute 'bytes'").arg (element.attribute ("type")).toStdString());
+			break;
 		default:
 			;
 	}
@@ -142,6 +144,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Integer:
 				if (_bytes != 1 && _bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 1, 2, 4 or 8").arg (_bytes).toStdString());
+				break;
 			case Type::Float:
 			case Type::Angle:
 			case Type::Frequency:
@@ -151,6 +154,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Time:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 2, 4 or 8").arg (_bytes).toStdString());
+				break;
 			case Type::Unknown:
 				// Impossible.
 				;
@@ -165,6 +169,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	_property_float.set_path (path);
 	_property_angle.set_path (path);
 	_property_frequency.set_path (path);
+	_property_length.set_path (path);
 	_property_pressure.set_path (path);
 	_property_speed.set_path (path);
 	_property_time.set_path (path);
@@ -999,7 +1004,7 @@ Link::parse_binary_string (QString const& string)
 
 	auto from_xdigit = [&string](QChar& c) -> uint8_t
 	{
-		static HexTable hextable;
+		static Xefis::HexTable hextable;
 
 		char a = c.toLatin1();
 		if (!std::isxdigit (a))

@@ -87,6 +87,7 @@ SRC_MOCHDRS += xefis/core/window.h
 
 SRC_HEADERS += xefis/utility/backtrace.h
 SRC_HEADERS += xefis/utility/hash.h
+SRC_HEADERS += xefis/utility/hextable.h
 SRC_HEADERS += xefis/utility/i2c.h
 SRC_HEADERS += xefis/utility/lookahead.h
 SRC_HEADERS += xefis/utility/mutex.h
