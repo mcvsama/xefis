@@ -36,7 +36,10 @@ class LonLat
 	// Ctor
 	LonLat();
 
-	// Ctor
+	/**
+	 * \param	longitude Angle between -180_deg and 180_deg.
+	 * \param	latitude Angle between -90_deg and 90_deg.
+	 */
 	LonLat (Angle longitude, Angle latitude);
 
   public:

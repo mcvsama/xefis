@@ -244,9 +244,6 @@ FlightDataComputer::compute_position()
 	PositionSource source;
 	Length accuracy = 100_nm;
 
-	// XXX remove when GPS module is done.
-	_gps_accuracy.write (0.001_nm);
-
 	if (_gps_longitude.valid() && _gps_latitude.valid() && _gps_altitude_amsl.valid() && _gps_accuracy.valid())
 	{
 		if (*_gps_accuracy < accuracy)
