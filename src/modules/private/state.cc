@@ -45,8 +45,8 @@ template<class P>
 	}
 
 
-State::State (Xefis::ModuleManager* module_manager, QDomElement const&):
-	Module (module_manager)
+State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Module (module_manager, config)
 {
 	using Xefis::limit;
 

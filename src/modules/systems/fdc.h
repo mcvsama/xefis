@@ -39,7 +39,8 @@ class FlightDataComputer: public Xefis::Module
 	{
 		LonLat		lateral_position;
 		Length		altitude;
-		Length		accuracy;
+		Length		lateral_accuracy;
+		Length		vertical_accuracy;
 		bool		valid = false;
 		Time		time;
 	};
@@ -191,20 +192,23 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_gps_longitude;
 	Xefis::PropertyAngle		_gps_latitude;
 	Xefis::PropertyLength		_gps_altitude_amsl;
-	Xefis::PropertyLength		_gps_accuracy;
+	Xefis::PropertyLength		_gps_lateral_accuracy;
+	Xefis::PropertyLength		_gps_vertical_accuracy;
 	Xefis::PropertyTime			_gps_timestamp;
 	// Input INS (Inertial Navigation System):
 	Xefis::PropertyAngle		_ins_longitude;
 	Xefis::PropertyAngle		_ins_latitude;
 	Xefis::PropertyLength		_ins_altitude_amsl;
-	Xefis::PropertyLength		_ins_accuracy;
+	Xefis::PropertyLength		_ins_lateral_accuracy;
+	Xefis::PropertyLength		_ins_vertical_accuracy;
 	Xefis::PropertyTime			_ins_timestamp;
 
 	// Output position:
 	Xefis::PropertyAngle		_position_longitude;
 	Xefis::PropertyAngle		_position_latitude;
 	Xefis::PropertyLength		_position_altitude_amsl;
-	Xefis::PropertyLength		_position_accuracy;
+	Xefis::PropertyLength		_position_lateral_accuracy;
+	Xefis::PropertyLength		_position_vertical_accuracy;
 	Xefis::PropertyString		_position_source;
 	// Output track (flight path):
 	Xefis::PropertyAngle		_track_vertical;

@@ -32,7 +32,7 @@ XEFIS_REGISTER_MODULE_CLASS ("instruments/efis", EFIS);
 
 
 EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager)
+	Instrument (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{

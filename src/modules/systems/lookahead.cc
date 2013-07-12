@@ -29,7 +29,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/lookahead", Lookahead);
 
 
 Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager),
+	Module (module_manager, config),
 	_output_estimator (1_s)
 {
 	QString input_property_path;

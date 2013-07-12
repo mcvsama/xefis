@@ -97,7 +97,7 @@ END_PACKED_STRUCT
 
 
 FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Input (module_manager)
+	Module (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{

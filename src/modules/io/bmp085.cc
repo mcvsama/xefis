@@ -32,7 +32,7 @@ XEFIS_REGISTER_MODULE_CLASS ("io/bmp085", BMP085);
 
 
 BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{
@@ -221,7 +221,7 @@ BMP085::guard (std::function<void()> guarded_code)
 	}
 	catch (Xefis::I2C::IOError& e)
 	{
-		std::cerr << "BMP085: I2C error: " << e.message() << std::endl;
+		log() << "I2C error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

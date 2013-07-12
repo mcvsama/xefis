@@ -19,6 +19,25 @@
 				<signature random-bytes='1' signature-bytes='2' key='00:11:22:33'>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
 					<property type='float' bytes='2' path='/sensors/temperature/outside.k'/>
+					<property type='integer' bytes='4' path='/sensors/gps/read-errors'/>
+					<property type='integer' bytes='1' path='/sensors/gps/fix-quality'/>
+					<property type='integer' bytes='1' path='/sensors/gps/type-of-fix'/>
+					<property type='angle' bytes='8' path='/sensors/gps/latitude'/>
+					<property type='angle' bytes='8' path='/sensors/gps/longitude'/>
+					<property type='length' bytes='4' path='/sensors/gps/altitude-amsl'/>
+					<property type='length' bytes='4' path='/sensors/gps/altitude-above-wgs84'/>
+					<property type='speed' bytes='4' path='/sensors/gps/groundspeed'/>
+					<property type='angle' bytes='4' path='/sensors/gps/track'/>
+					<property type='integer' bytes='1' path='/sensors/gps/tracked-satellites'/>
+					<property type='float' bytes='2' path='/sensors/gps/hdop'/>
+					<property type='float' bytes='2' path='/sensors/gps/vdop'/>
+					<property type='length' bytes='4' path='/sensors/gps/lateral-accuracy'/>
+					<property type='length' bytes='4' path='/sensors/gps/vertical-accuracy'/>
+					<property type='time' bytes='8' path='/sensors/gps/update-timestamp'/>
+					<property type='time' bytes='8' path='/sensors/gps/epoch-time'/>
+					<bitfield>
+						<property type='boolean' path='/sensors/gps/serviceable'/>
+					</bitfield>
 				</signature>
 			</packet>
 			<packet magic='e4:40'>

@@ -154,7 +154,7 @@ Length::parse (std::string const& str)
 inline std::string
 Length::stringify() const
 {
-	return boost::lexical_cast<std::string> (nm()) + " nm";
+	return boost::lexical_cast<std::string> (m()) + " m";
 }
 
 

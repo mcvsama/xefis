@@ -29,7 +29,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/fly-by-wire", FlyByWire);
 
 
 FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager),
+	Module (module_manager, config),
 	_manual_pitch_pid (1.0, 0.1, 0.0, 0.0),
 	_manual_roll_pid (1.0, 0.1, 0.0, 0.0),
 	_elevator_pid (0.0, 0.0, 0.0, 0.0),
@@ -167,7 +167,7 @@ FlyByWire::data_updated()
 		}
 
 		default:
-			std::cerr << "stabilizer: unknown mode: " << *_mode << std::endl;
+			log() << "stabilizer: unknown mode: " << *_mode << std::endl;
 			break;
 	}
 

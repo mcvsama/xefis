@@ -30,7 +30,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/flight-director", FlightDirector);
 
 
 FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager),
+	Module (module_manager, config),
 	_magnetic_heading_pid (1.0, 0.1, 0.0, 0.0),
 	_magnetic_track_pid (1.0, 0.1, 0.0, 0.0),
 	_altitude_pid (1.0, 0.1, 0.0, 0.0),

@@ -25,17 +25,19 @@
 			<directory path='//sensors'>
 				<property name='imu.pitch' path='/imu/pitch'/>
 				<property name='imu.roll' path='/imu/roll'/>
-				<property name='imu.heading.magnetic' path='/compass/magnetic-heading'/>
-				<property name='imu.heading.magnetic.accuracy' path='/compass/magnetic-heading-accuracy'/>
+				<property name='imu.heading.magnetic' path='/compass/magnetic-heading' default='0 deg'/>
+				<property name='imu.heading.magnetic.accuracy' path='/compass/magnetic-heading-accuracy' default='0.1 deg'/>
 				<property name='gps.longitude' path='/gps/longitude'/>
 				<property name='gps.latitude' path='/gps/latitude'/>
 				<property name='gps.altitude-amsl' path='/gps/altitude-amsl'/>
-				<property name='gps.accuracy' path='/gps/accuracy'/>
+				<property name='gps.accuracy.lateral' path='/gps/lateral-accuracy'/>
+				<property name='gps.accuracy.vertical' path='/gps/vertical-accuracy'/>
 				<property name='gps.timestamp' path='/gps/update-timestamp'/>
 				<property name='ins.longitude' path='/ins/longitude'/>
 				<property name='ins.latitude' path='/ins/latitude'/>
 				<property name='ins.altitude-amsl' path='/ins/altitude-amsl'/>
-				<property name='ins.accuracy' path='/ins/accuracy'/>
+				<property name='ins.accuracy.lateral' path='/ins/lateral-accuracy'/>
+				<property name='ins.accuracy.vertical' path='/ins/vertical-accuracy'/>
 				<property name='ins.timestamp' path='/ins/timestamp'/>
 				<property name='pressure.static' path='/pressure/pressure'/>
 				<property name='ias' path='/speed/ias'/>
@@ -46,7 +48,8 @@
 				<property name='position.longitude' path='/longitude'/>
 				<property name='position.latitude' path='/latitude'/>
 				<property name='position.altitude-amsl' path='/altitude-amsl'/>
-				<property name='position.accuracy' path='/accuracy'/>
+				<property name='position.accuracy.lateral' path='/lateral-accuracy'/>
+				<property name='position.accuracy.vertical' path='/vertical-accuracy'/>
 				<property name='position.source' path='/source'/>
 			</directory>
 			<directory path='/track'>

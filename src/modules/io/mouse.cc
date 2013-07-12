@@ -35,7 +35,7 @@ XEFIS_REGISTER_MODULE_CLASS ("io/mouse", Mouse);
 
 
 Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{
@@ -86,8 +86,8 @@ Mouse::check()
 	}
 	catch (Xefis::Exception const& e)
 	{
-		std::cerr << "Exception when processing mouse position update." << std::endl;
-		std::cerr << e << std::endl;
+		log() << "exception when processing mouse position update." << std::endl;
+		log() << e << std::endl;
 	}
 }
 
