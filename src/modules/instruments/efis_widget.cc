@@ -1334,16 +1334,6 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 		painter.draw_outlined_line (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
 
-	// Pointer:
-	if (_params.climb_rate_visible)
-	{
-		painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
-		QPen indicator_pen = bold_white_pen;
-		indicator_pen.setCapStyle (Qt::FlatCap);
-		painter.setPen (indicator_pen);
-		painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
-	}
-
 	// Variometer:
 	if (_params.variometer_visible)
 	{
@@ -1361,6 +1351,16 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 		painter.add_shadow ([&]() {
 			painter.drawPolyline (rhomb.translated (1.25f * x, posy));
 		});
+	}
+
+	// Pointer:
+	if (_params.climb_rate_visible)
+	{
+		painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
+		QPen indicator_pen = bold_white_pen;
+		indicator_pen.setCapStyle (Qt::FlatCap);
+		painter.setPen (indicator_pen);
+		painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
 	}
 
 	// Numeric indicators above and below:
