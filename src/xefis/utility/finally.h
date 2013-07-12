@@ -11,33 +11,50 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__INPUT_H__INCLUDED
-#define XEFIS__CORE__INPUT_H__INCLUDED
+#ifndef XEFIS__UTILITY__FINALLY_H__INCLUDED
+#define XEFIS__UTILITY__FINALLY_H__INCLUDED
 
 // Standard:
 #include <cstddef>
+#include <functional>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
 
 
 namespace Xefis {
 
-class ModuleManager;
-
-class Input: public Module
+/**
+ * Define an object which executes given function upon destruction.
+ * Useful substitude for "finally" construct, nonexistent in C++.
+ */
+class Finally
 {
   public:
-	// Ctor
-	Input (ModuleManager*);
+	typedef std::function<void()> Callback;
+
+  public:
+	Finally (Callback callback) noexcept;
+
+	~Finally();
+
+  private:
+	Callback _callback;
 };
 
 
 inline
-Input::Input (ModuleManager* module_manager):
-	Module (module_manager)
+Finally::Finally (Callback callback) noexcept:
+	_callback (callback)
 { }
+
+
+inline
+Finally::~Finally()
+{
+	if (_callback)
+		_callback();
+}
 
 } // namespace Xefis
 

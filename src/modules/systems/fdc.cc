@@ -42,7 +42,7 @@ using Xefis::limit;
 
 
 FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	_track_lateral_true_smoother.set_winding ({ 0.0, 360.0 });
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
@@ -78,12 +78,14 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "gps.longitude", _gps_longitude, true },
 				{ "gps.latitude", _gps_latitude, true },
 				{ "gps.altitude-amsl", _gps_altitude_amsl, true },
-				{ "gps.accuracy", _gps_accuracy, true },
+				{ "gps.accuracy.lateral", _gps_lateral_accuracy, true },
+				{ "gps.accuracy.vertical", _gps_vertical_accuracy, true },
 				{ "gps.timestamp", _gps_timestamp, true },
 				{ "ins.longitude", _ins_longitude, true },
 				{ "ins.latitude", _ins_latitude, true },
 				{ "ins.altitude-amsl", _ins_altitude_amsl, true },
-				{ "ins.accuracy", _ins_accuracy, true },
+				{ "ins.accuracy.lateral", _ins_lateral_accuracy, true },
+				{ "ins.accuracy.vertical", _ins_vertical_accuracy, true },
 				{ "ins.timestamp", _ins_timestamp, true },
 				{ "pressure.static", _static_pressure, true },
 				{ "gear-down", _gear_down, true },
@@ -93,7 +95,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "position.longitude", _position_longitude, true },
 				{ "position.latitude", _position_latitude, true },
 				{ "position.altitude-amsl", _position_altitude_amsl, true },
-				{ "position.accuracy", _position_accuracy, true },
+				{ "position.accuracy.lateral", _position_lateral_accuracy, true },
+				{ "position.accuracy.vertical", _position_vertical_accuracy, true },
 				{ "position.source", _position_source, true },
 				{ "track.vertical", _track_vertical, true },
 				{ "track.lateral.true", _track_lateral_true, true },
@@ -145,8 +148,8 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 	_ias_estimator.set_minimum_integration_time (0.2_s);
 
 	_position_computer.set_callback (std::bind (&FlightDataComputer::compute_position, this));
-	_position_computer.observe ({ &_gps_accuracy, &_gps_longitude, &_gps_latitude, &_gps_altitude_amsl,
-								  &_ins_accuracy, &_ins_longitude, &_ins_latitude, &_ins_altitude_amsl,
+	_position_computer.observe ({ &_gps_lateral_accuracy, &_gps_vertical_accuracy, &_gps_longitude, &_gps_latitude, &_gps_altitude_amsl,
+								  &_ins_lateral_accuracy, &_ins_vertical_accuracy, &_ins_longitude, &_ins_latitude, &_ins_altitude_amsl,
 								  &_static_pressure, &_use_standard_pressure, &_use_standard_pressure, &_qnh_pressure });
 
 	_magnetic_variation_computer.set_callback (std::bind (&FlightDataComputer::compute_magnetic_variation, this));
@@ -242,23 +245,24 @@ FlightDataComputer::compute_position()
 	enum PositionSource { GPS, INS };
 
 	PositionSource source;
-	Length accuracy = 100_nm;
+	Length constexpr failed_accuracy = 100_nm;
+	Length accuracy = failed_accuracy;
 
-	if (_gps_longitude.valid() && _gps_latitude.valid() && _gps_altitude_amsl.valid() && _gps_accuracy.valid())
+	if (_gps_longitude.valid() && _gps_latitude.valid() && _gps_altitude_amsl.valid() && _gps_lateral_accuracy.valid())
 	{
-		if (*_gps_accuracy < accuracy)
+		if (*_gps_lateral_accuracy < accuracy)
 		{
 			source = GPS;
-			accuracy = *_gps_accuracy;
+			accuracy = *_gps_lateral_accuracy;
 		}
 	}
 
-	if (_ins_longitude.valid() && _ins_latitude.valid() && _ins_altitude_amsl.valid() && _ins_accuracy.valid())
+	if (_ins_longitude.valid() && _ins_latitude.valid() && _ins_altitude_amsl.valid() && _ins_lateral_accuracy.valid())
 	{
-		if (*_ins_accuracy < accuracy)
+		if (*_ins_lateral_accuracy < accuracy)
 		{
 			source = INS;
-			accuracy = *_ins_accuracy;
+			accuracy = *_ins_lateral_accuracy;
 		}
 	}
 
@@ -268,7 +272,8 @@ FlightDataComputer::compute_position()
 			_position_longitude.copy (_gps_longitude);
 			_position_latitude.copy (_gps_latitude);
 			_position_altitude_amsl.copy (_gps_altitude_amsl);
-			_position_accuracy.copy (_gps_accuracy);
+			_position_lateral_accuracy.copy (_gps_lateral_accuracy);
+			_position_vertical_accuracy.copy (_gps_vertical_accuracy);
 			_position_source.write ("GPS");
 			break;
 
@@ -276,7 +281,8 @@ FlightDataComputer::compute_position()
 			_position_longitude.copy (_ins_longitude);
 			_position_latitude.copy (_ins_latitude);
 			_position_altitude_amsl.copy (_ins_altitude_amsl);
-			_position_accuracy.copy (_ins_accuracy);
+			_position_lateral_accuracy.copy (_ins_lateral_accuracy);
+			_position_vertical_accuracy.copy (_ins_vertical_accuracy);
 			_position_source.write ("INERTIAL");
 			break;
 	}
@@ -285,15 +291,16 @@ FlightDataComputer::compute_position()
 	_positions[1] = _positions[0];
 	_positions[0].lateral_position = LonLat (*_position_longitude, *_position_latitude);
 	_positions[0].altitude = _position_altitude_amsl.read (0.0_ft);
-	_positions[0].accuracy = _position_accuracy.read (0.0_nm);
+	_positions[0].lateral_accuracy = _position_lateral_accuracy.read (failed_accuracy);
+	_positions[0].vertical_accuracy = _position_vertical_accuracy.read (failed_accuracy);
 	_positions[0].valid = _position_longitude.valid() && _position_latitude.valid() &&
-						  _position_altitude_amsl.valid() && _position_accuracy.valid();
+						  _position_altitude_amsl.valid() && _position_lateral_accuracy.valid() && _position_vertical_accuracy.valid();
 	_positions[0].time = _now;
 
 	// Delayed positioning:
 	if (_positions[0].valid)
 	{
-		Length accuracy1 = std::max (_positions[0].accuracy, _ac1_positions[0].accuracy);
+		Length accuracy1 = std::max (_positions[0].lateral_accuracy, _ac1_positions[0].lateral_accuracy);
 		if (!_ac1_positions[0].valid ||
 			_positions[0].lateral_position.haversine_earth (_ac1_positions[0].lateral_position) > 2.0 * accuracy1 ||
 			_positions[0].time - _ac1_positions[0].time > 1_s)
@@ -303,7 +310,7 @@ FlightDataComputer::compute_position()
 			_ac1_positions[0] = _positions[0];
 		}
 
-		Length accuracy2 = std::max (_positions[0].accuracy, _ac2_positions[0].accuracy);
+		Length accuracy2 = std::max (_positions[0].lateral_accuracy, _ac2_positions[0].lateral_accuracy);
 		if (!_ac2_positions[0].valid ||
 			_positions[0].lateral_position.haversine_earth (_ac2_positions[0].lateral_position) > 20.0 * accuracy2 ||
 			_positions[0].time - _ac2_positions[0].time > 10_s)
@@ -438,7 +445,7 @@ FlightDataComputer::compute_track()
 	if (_ac1_positions[0].valid && _ac1_positions[1].valid)
 	{
 		Length distance = _ac1_positions[0].lateral_position.haversine_earth (_ac1_positions[1].lateral_position);
-		if (distance > 2.0 * _ac1_positions[0].accuracy)
+		if (distance > 2.0 * _ac1_positions[0].lateral_accuracy)
 		{
 			Length altitude_diff = _ac1_positions[0].altitude - _ac1_positions[1].altitude;
 			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt()));
@@ -474,7 +481,7 @@ FlightDataComputer::compute_track()
 	{
 		Length len10 = _ac1_positions[1].lateral_position.haversine_earth (_ac1_positions[0].lateral_position);
 
-		if (len10 >= *_position_accuracy)
+		if (len10 >= *_position_lateral_accuracy)
 		{
 			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (_ac1_positions[2].lateral_position,
 																 _ac1_positions[1].lateral_position,

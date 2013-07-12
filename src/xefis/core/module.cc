@@ -16,6 +16,12 @@
 #include <map>
 #include <set>
 
+// Lib:
+#include <boost/format.hpp>
+
+// Qt:
+#include <QtXml/QDomElement>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
@@ -27,8 +33,10 @@
 
 namespace Xefis {
 
-Module::Module (ModuleManager* module_manager):
-	_module_manager (module_manager)
+Module::Module (ModuleManager* module_manager, QDomElement const& config):
+	_module_manager (module_manager),
+	_name (config.attribute ("name").toStdString()),
+	_instance (config.attribute ("instance", "").toStdString())
 { }
 
 
@@ -183,6 +191,14 @@ Accounting*
 Module::accounting() const
 {
 	return _module_manager->application()->accounting();
+}
+
+
+std::ostream&
+Module::log() const
+{
+	std::clog << boost::format ("%08.4lf [%-30s#%-20s] ") % Time::now().s() % _name % _instance;
+	return std::clog;
 }
 
 

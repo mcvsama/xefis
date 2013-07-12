@@ -25,8 +25,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("log/latency", Latency);
 
 
-Latency::Latency (Xefis::ModuleManager* module_manager, QDomElement const&):
-	Module (module_manager)
+Latency::Latency (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Module (module_manager, config)
 {
 	_log_timer = new QTimer (this);
 	_log_timer->setInterval (1000);

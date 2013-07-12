@@ -27,12 +27,12 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
-#include <xefis/core/input.h>
+#include <xefis/core/module.h>
 
 
 class FlightGearIO:
 	public QObject,
-	public Xefis::Input
+	public Xefis::Module
 {
 	Q_OBJECT
 

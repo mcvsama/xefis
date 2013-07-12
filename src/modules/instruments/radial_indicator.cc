@@ -32,7 +32,7 @@ XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator);
 
 
 RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager)
+	Xefis::Instrument (module_manager, config)
 {
 	_widget = new RadialIndicatorWidget (this);
 

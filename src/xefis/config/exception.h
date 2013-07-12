@@ -22,6 +22,9 @@
 #include <stdexcept>
 #include <functional>
 
+// Qt:
+#include <QtCore/QString>
+
 // Xefis:
 #include <xefis/utility/backtrace.h>
 
@@ -31,7 +34,11 @@ namespace Xefis {
 class Exception: public std::runtime_error
 {
   public:
+	Exception (const char* message, Exception const* inner = nullptr);
+
 	Exception (std::string const& message, Exception const* inner = nullptr);
+
+	Exception (QString const& message, Exception const* inner = nullptr);
 
 	virtual ~Exception() noexcept;
 
@@ -47,7 +54,7 @@ class Exception: public std::runtime_error
 	Backtrace const&
 	backtrace() const;
 
-	static void
+	static bool
 	guard (std::function<void()> guarded_code);
 
 	static void
@@ -71,6 +78,12 @@ operator<< (std::ostream& os, Exception const& e)
 
 
 inline
+Exception::Exception (const char* message, Exception const* inner):
+	Exception (std::string (message), inner)
+{ }
+
+
+inline
 Exception::Exception (std::string const& message, Exception const* inner):
 	std::runtime_error (message),
 	_message ("Error: " + message)
@@ -82,6 +95,12 @@ Exception::Exception (std::string const& message, Exception const* inner):
 		_backtrace = inner->backtrace();
 	}
 }
+
+
+inline
+Exception::Exception (QString const& message, Exception const* inner):
+	Exception (message.toStdString(), inner)
+{ }
 
 
 inline
@@ -117,14 +136,17 @@ Exception::backtrace() const
 }
 
 
-inline void
+inline bool
 Exception::guard (std::function<void()> guarded_code)
 {
 	try {
 		guard_and_rethrow (guarded_code);
 	}
 	catch (...)
-	{ }
+	{
+		return true;
+	}
+	return false;
 }
 
 

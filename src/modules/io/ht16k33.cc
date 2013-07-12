@@ -268,7 +268,7 @@ HT16K33::SingleSwitch::invalidate()
 
 
 HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{
@@ -396,7 +396,7 @@ HT16K33::guard (std::function<void()> guarded_code)
 	}
 	catch (Xefis::I2C::IOError& e)
 	{
-		std::cerr << "HT16K33: I2C error: " << e.message() << std::endl;
+		log() << "I2C error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

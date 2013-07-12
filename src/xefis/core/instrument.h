@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtWidgets/QWidget>
+#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -35,13 +36,13 @@ class Instrument:
 {
   public:
 	// Ctor
-	Instrument (ModuleManager*);
+	Instrument (ModuleManager*, QDomElement const& config);
 };
 
 
 inline
-Instrument::Instrument (ModuleManager* module_manager):
-	Module (module_manager),
+Instrument::Instrument (ModuleManager* module_manager, QDomElement const& config):
+	Module (module_manager, config),
 	QWidget (nullptr)
 { }
 

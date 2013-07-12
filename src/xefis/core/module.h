@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <ostream>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -93,7 +94,7 @@ class Module
 
   public:
 	// Ctor
-	Module (ModuleManager*);
+	Module (ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	virtual ~Module();
@@ -170,6 +171,13 @@ class Module
 	Accounting*
 	accounting() const;
 
+	/**
+	 * Add header with module name to the log stream and
+	 * return the stream.
+	 */
+	std::ostream&
+	log() const;
+
   private:
 	/**
 	 * Return list of factories.
@@ -179,6 +187,8 @@ class Module
 
   private:
 	ModuleManager*	_module_manager = nullptr;
+	std::string		_name;
+	std::string		_instance;
 };
 
 

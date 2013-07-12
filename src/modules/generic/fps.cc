@@ -24,8 +24,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("generic/fps", FPS);
 
 
-FPS::FPS (Xefis::ModuleManager* module_manager, QDomElement const&):
-	Module (module_manager),
+FPS::FPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
+	Module (module_manager, config),
 	_smoother (5_ms)
 { }
 

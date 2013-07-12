@@ -29,7 +29,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/rcms", RemoteControlManagementSystem);
 
 
 RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	for (QDomElement& e: config)
 	{

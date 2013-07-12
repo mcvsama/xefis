@@ -30,7 +30,7 @@ XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput);
 
 
 JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Input (module_manager)
+	Module (module_manager, config)
 {
 	// Support max 256 axes/buttons:
 	_buttons.resize (256, nullptr);
@@ -124,7 +124,7 @@ JoystickInput::open_device()
 	_device = new QFile (_device_path, this);
 	if (!_device->open (QFile::ReadOnly))
 	{
-		std::clog << "could not open device file: " << _device_path.toStdString() << std::endl;
+		log() << "could not open device file: " << _device_path.toStdString() << std::endl;
 		_reopen_timer->start();
 	}
 	else

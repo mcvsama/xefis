@@ -709,7 +709,7 @@ Link::Packet::produce (Blob& blob)
 
 
 Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager)
+	Module (module_manager, config)
 {
 	auto parse_input_output_config = [](QDomElement& input_output, QString& o_host, int& o_port) -> void
 	{
@@ -833,7 +833,7 @@ Link::got_udp_packet()
 		interfere (_input_blob);
 
 #if XEFIS_LINK_RECV_DEBUG
-	std::clog << "io/link:recv: " << to_string (_input_blob) << std::endl;
+	log() << "recv: " << to_string (_input_blob) << std::endl;
 #endif
 
 	eat (_input_blob);
@@ -849,7 +849,7 @@ Link::send_output()
 	if (_udp_output_enabled)
 	{
 #if XEFIS_LINK_SEND_DEBUG
-		std::clog << "io/link:send: " << to_string (_output_blob) << std::endl;
+		log() << "send: " << to_string (_output_blob) << std::endl;
 #endif
 		_udp_output->writeDatagram (reinterpret_cast<const char*> (&_output_blob[0]), _output_blob.size(), QHostAddress (_udp_output_host), _udp_output_port);
 	}
