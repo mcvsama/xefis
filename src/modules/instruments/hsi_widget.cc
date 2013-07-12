@@ -78,7 +78,7 @@ HSIWidget::PaintWorkUnit::resized()
 				_outer_map_clip.addRect (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 
 			_radials_font = _font;
-			_radials_font.setPixelSize (font_size (14.f));
+			_radials_font.setPixelSize (font_size (16.f));
 			break;
 		}
 
@@ -105,7 +105,7 @@ HSIWidget::PaintWorkUnit::resized()
 				_outer_map_clip.addRect (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 
 			_radials_font = _font;
-			_radials_font.setPixelSize (font_size (14.f));
+			_radials_font.setPixelSize (font_size (16.f));
 			break;
 		}
 
@@ -684,11 +684,26 @@ HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 	painter.add_shadow ([&]() {
 		painter.setTransform (_aircraft_center_transform);
 
-		for (int deg = 0; deg < 360; deg += 5)
+		QPointF line_long;
+		QPointF line_short;
+		float radial_ypos;
+
+		if (_params.display_mode == DisplayMode::Auxiliary)
 		{
-			QPointF sp = deg % 10 == 0
-				? QPointF (0.f, -0.935f * _r)
-				: QPointF (0.f, -0.965f * _r);
+			line_long = QPointF (0.f, -0.935f * _r);
+			line_short = QPointF (0.f, -0.965f * _r);
+			radial_ypos = -0.925f * _r;
+		}
+		else
+		{
+			line_long = QPointF (0.f, -0.955f * _r);
+			line_short = QPointF (0.f, -0.980f * _r);
+			radial_ypos = -0.945f * _r;
+		}
+
+		for (int deg = 5; deg <= 360; deg += 5)
+		{
+			QPointF sp = deg % 10 == 0 ? line_long : line_short;
 			painter.setTransform (t);
 			painter.rotate (deg);
 			painter.drawLine (QPointF (0.f, -_r + 0.025 * _q), sp);
@@ -696,7 +711,7 @@ HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 			if (!painter.painting_shadow())
 			{
 				if (deg % 30 == 0)
-					painter.fast_draw_text (QRectF (-_q, -0.93f * _r, 2.f * _q, 0.5f * _q),
+					painter.fast_draw_text (QRectF (-_q, radial_ypos, 2.f * _q, 0.5f * _q),
 											Qt::AlignVCenter | Qt::AlignHCenter, QString::number (deg / 10));
 			}
 		}
