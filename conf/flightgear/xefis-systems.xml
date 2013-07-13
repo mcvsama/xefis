@@ -33,12 +33,14 @@
 					<property name='gps.longitude' path='/gps/longitude'/>
 					<property name='gps.latitude' path='/gps/latitude'/>
 					<property name='gps.altitude-amsl' path='/gps/altitude-amsl'/>
-					<property name='gps.accuracy' path='/gps/accuracy'/>
+					<property name='gps.accuracy.lateral' path='/gps/lateral-accuracy' default='1 m'/>
+					<property name='gps.accuracy.vertical' path='/gps/vertical-accuracy' default='1 m'/>
 					<property name='gps.timestamp' path='/gps/update-timestamp'/>
 					<property name='ins.longitude' path='/ins/longitude'/>
 					<property name='ins.latitude' path='/ins/latitude'/>
 					<property name='ins.altitude-amsl' path='/ins/altitude-amsl'/>
-					<property name='ins.accuracy' path='/ins/accuracy'/>
+					<property name='ins.accuracy.lateral' path='/ins/lateral-accuracy' default='1 m'/>
+					<property name='ins.accuracy.vertical' path='/ins/vertical-accuracy' default='1 m'/>
 					<property name='ins.timestamp' path='/ins/timestamp'/>
 					<property name='pressure.static' path='/pressure/pressure'/>
 					<property name='ias' path='/speed/ias'/>
@@ -49,7 +51,8 @@
 					<property name='position.longitude' path='/longitude'/>
 					<property name='position.latitude' path='/latitude'/>
 					<property name='position.altitude-amsl' path='/altitude-amsl'/>
-					<property name='position.accuracy' path='/accuracy'/>
+					<property name='position.accuracy.lateral' path='/lateral-accuracy'/>
+					<property name='position.accuracy.vertical' path='/vertical-accuracy'/>
 					<property name='position.source' path='/source'/>
 				</directory>
 				<directory path='/track'>
