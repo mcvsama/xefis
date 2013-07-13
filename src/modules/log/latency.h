@@ -34,7 +34,7 @@ class Latency:
 
   private slots:
 	/**
-	 * Log latencies on std::clog.
+	 * Log latencies on module log.
 	 */
 	void
 	log_latency();
