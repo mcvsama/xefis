@@ -634,34 +634,37 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 	}
 
 	// A/P bug
-	Angle limited_rotation;
-	switch (_params.display_mode)
+	if (_params.heading_visible)
 	{
-		case DisplayMode::Auxiliary:
-			limited_rotation = Xefis::limit (Xefis::floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
-			break;
+		Angle limited_rotation;
+		switch (_params.display_mode)
+		{
+			case DisplayMode::Auxiliary:
+				limited_rotation = Xefis::limit (Xefis::floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+				break;
 
-		default:
-			limited_rotation = _params.ap_heading - _params.rotation;
-			break;
+			default:
+				limited_rotation = _params.ap_heading - _params.rotation;
+				break;
+		}
+
+		QTransform transform = _aircraft_center_transform;
+		transform.rotate (limited_rotation.deg());
+		transform.translate (0.f, -_r);
+
+		QPen pen_1 = _autopilot_pen_1;
+		pen_1.setMiterLimit (0.2f);
+		QPen pen_2 = _autopilot_pen_2;
+		pen_2.setMiterLimit (0.2f);
+
+		painter.setTransform (_aircraft_center_transform);
+		painter.setClipRect (_map_clip_rect);
+		painter.setTransform (transform);
+		painter.setPen (pen_1);
+		painter.drawPolyline (_ap_bug_shape);
+		painter.setPen (pen_2);
+		painter.drawPolyline (_ap_bug_shape);
 	}
-
-	QTransform transform = _aircraft_center_transform;
-	transform.rotate (limited_rotation.deg());
-	transform.translate (0.f, -_r);
-
-	QPen pen_1 = _autopilot_pen_1;
-	pen_1.setMiterLimit (0.2f);
-	QPen pen_2 = _autopilot_pen_2;
-	pen_2.setMiterLimit (0.2f);
-
-	painter.setTransform (_aircraft_center_transform);
-	painter.setClipRect (_map_clip_rect);
-	painter.setTransform (transform);
-	painter.setPen (pen_1);
-	painter.drawPolyline (_ap_bug_shape);
-	painter.setPen (pen_2);
-	painter.drawPolyline (_ap_bug_shape);
 }
 
 
