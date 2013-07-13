@@ -68,6 +68,7 @@ class RemoteControlManagementSystem: public Xefis::Module
 	// Output:
 	Xefis::PropertyLength	_distance_vlos;
 	Xefis::PropertyLength	_distance_ground;
+	Xefis::PropertyLength	_distance_vertical;
 	Xefis::PropertyAngle	_true_home_direction;
 };
 

@@ -53,6 +53,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "home.true-direction", _true_home_direction, false },
 				{ "home.distance.vlos", _home_dist_vlos, false },
 				{ "home.distance.ground", _home_dist_ground, false },
+				{ "home.distance.vertical", _home_dist_vertical, false },
 				{ "cmd.visible", _cmd_settings_visible, false },
 				{ "cmd.heading", _cmd_heading_setting, false },
 				{ "cmd.track-visible", _cmd_track_visible, false },
@@ -178,6 +179,14 @@ HSI::read()
 	}
 	else
 		_hsi_widget->set_ground_distance_to_home_visible (false);
+
+	if (_home_dist_vertical.valid())
+	{
+		_hsi_widget->set_vert_distance_to_home (*_home_dist_vertical);
+		_hsi_widget->set_vert_distance_to_home_visible (true);
+	}
+	else
+		_hsi_widget->set_vert_distance_to_home_visible (false);
 
 	_hsi_widget->set_ground_speed_visible (_gs.valid());
 	if (_gs.valid())

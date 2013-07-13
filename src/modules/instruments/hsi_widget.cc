@@ -837,7 +837,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		});
 	}
 
-	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible)
+	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible || _params.dist_to_home_vert_visible)
 	{
 		float z = 2.f * _q;
 		QPolygonF distance_triangle = QPolygonF()
@@ -850,7 +850,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		painter.setTransform (base_transform);
 		if (_params.dist_to_home_vlos_visible)
 		{
-			QString s = QString ("%1").arg (_params.distance_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
+			QString s = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
 			// Cut out the "0.":
 			if (s.left (2) == "0.")
 				s = s.mid (1);
@@ -858,11 +858,16 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		}
 		if (_params.dist_to_home_ground_visible)
 		{
-			QString s = QString ("%1").arg (_params.distance_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
+			QString s = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
 			// Cut out the "0.":
 			if (s.left (2) == "0.")
 				s = s.mid (1);
 			painter.fast_draw_text (QPointF (0.f, -0.75f * _q), Qt::AlignRight | Qt::AlignTop, s);
+		}
+		if (_params.dist_to_home_vert_visible)
+		{
+			QString s = QString ("%1\u2008↑").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
+			painter.fast_draw_text (QPointF (0.f, -2.4 * _q), Qt::AlignRight | Qt::AlignBottom, s);
 		}
 		painter.translate (-z - 0.1f * _q, -_q);
 		painter.add_shadow ([&]() {

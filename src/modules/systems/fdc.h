@@ -119,8 +119,8 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_track_vertical_smoother			= 500_ms;
 	Xefis::Smoother<double>		_track_lateral_true_smoother		= 500_ms;
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2_s;
-	Xefis::Smoother<double>		_ground_speed_smoother				= 500_ms;
-	Xefis::Smoother<double>		_climb_rate_smoother				= 1000_ms;
+	Xefis::Smoother<double>		_ground_speed_smoother				= 1_s;
+	Xefis::Smoother<double>		_climb_rate_smoother				= 1_s;
 	Xefis::Smoother<double>		_pressure_alt_smoother				= 500_ms;
 	Xefis::Smoother<double>		_pressure_alt_qnh_smoother			= 500_ms;
 	Xefis::Smoother<double>		_pressure_alt_std_smoother			= 500_ms;

@@ -129,6 +129,7 @@
 									<directory path='/systems/rcms'>
 										<property name='home.distance.vlos' path='/home/vlos-distance'/>
 										<property name='home.distance.ground' path='/home/ground-distance'/>
+										<property name='home.distance.vertical' path='/home/vertical-distance'/>
 										<property name='home.true-direction' path='/home/true-direction'/>
 									</directory>
 								</properties>

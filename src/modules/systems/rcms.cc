@@ -44,8 +44,9 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 				{ "position.latitude", _position_latitude, true },
 				{ "position.altitude-amsl", _position_altitude_amsl, true },
 				// Output:
-				{ "home.distance-vlos", _distance_vlos, false },
-				{ "home.distance-ground", _distance_ground, false },
+				{ "home.distance.vlos", _distance_vlos, false },
+				{ "home.distance.ground", _distance_ground, false },
+				{ "home.distance.vertical", _distance_vertical, false },
 				{ "home.true-direction", _true_home_direction, false },
 			});
 		}
@@ -107,6 +108,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 		Length ground_dist = curr.haversine_earth (home);
 		Length alt_diff = *_position_altitude_amsl - *_home_altitude_amsl;
 
+		_distance_vertical.write (alt_diff);
 		_distance_ground.write (ground_dist);
 		_distance_vlos.write (1_nm * std::sqrt (ground_dist.nm() * ground_dist.nm() + alt_diff.nm() * alt_diff.nm()));
 		_true_home_direction.write (curr.initial_bearing (home));
@@ -115,6 +117,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 	{
 		_distance_vlos.set_nil();
 		_distance_ground.set_nil();
+		_distance_vertical.set_nil();
 		_true_home_direction.set_nil();
 	}
 }
