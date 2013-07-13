@@ -69,10 +69,6 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 void
 RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 {
-	QColor yellow (255, 220, 0);
-	QColor orange (255, 150, 0);
-	QColor red (255, 0, 0);
-
 	QString text = QString ("%1").arg (_value, 0, 'f', 1);
 
 	QFont font (_font_20);
@@ -95,16 +91,6 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 	painter.setFont (font);
 	if (_value_visible)
 	{
-		float sgn = _range.min() <= _range.max() ? +1.f : -1.f;
-		float value = sgn * _value;
-		float warning = sgn * _warning_value;
-		float critical = sgn * _critical_value;
-
-		if (_warning_visible && value >= warning && value < critical)
-			pen.setColor (orange);
-		else if (_critical_visible && value >= critical)
-			pen.setColor (red);
-
 		painter.setPen (pen);
 		painter.drawRect (rect);
 		float const bit_lower = 0.13f * q;
@@ -135,6 +121,7 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);
 	QColor yellow (255, 220, 0);
+	QColor orange (255, 150, 0);
 	QColor red (255, 0, 0);
 
 	QPen silver_pen = get_pen (silver, 1.0f);
@@ -172,6 +159,11 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 		warning = _range.max();
 	if (!_critical_visible)
 		critical = _range.max();
+	// Fill colors:
+	if (_warning_visible && value >= warning)
+		brush.setColor (orange.darker (100));
+	if (_critical_visible && value >= critical)
+		brush.setColor (red);
 
 	float value_angle = value_span_angle * (value - _range.min()) / _range.extent();
 	float warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
