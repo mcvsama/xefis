@@ -94,10 +94,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					display_track				= false;
 		Angle					true_home_direction			= 0_deg;
 		bool					home_direction_visible		= false;
-		Length					distance_to_home_ground		= 0_nm;
+		Length					dist_to_home_ground			= 0_nm;
 		bool					dist_to_home_ground_visible	= false;
-		Length					distance_to_home_vlos		= 0_nm;
+		Length					dist_to_home_vlos			= 0_nm;
 		bool					dist_to_home_vlos_visible	= false;
+		Length					dist_to_home_vert			= 0_nm;
+		bool					dist_to_home_vert_visible	= false;
 		Speed					ground_speed				= 0_kt;
 		bool					ground_speed_visible		= false;
 		Speed					true_air_speed				= 0_kt;
@@ -389,6 +391,18 @@ class HSIWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_vlos_distance_to_home_visible (bool visible);
+
+	/**
+	 * Set height from home position to current position.
+	 */
+	void
+	set_vert_distance_to_home (Length height);
+
+	/*
+	 * Set visibility of height from home number.
+	 */
+	void
+	set_vert_distance_to_home_visible (bool visible);
 
 	/**
 	 * Set ground speed.
@@ -771,7 +785,7 @@ HSIWidget::set_home_direction_visible (bool visible)
 inline void
 HSIWidget::set_ground_distance_to_home (Length ground_distance)
 {
-	_params.distance_to_home_ground = ground_distance;
+	_params.dist_to_home_ground = ground_distance;
 	request_repaint();
 }
 
@@ -787,7 +801,7 @@ HSIWidget::set_ground_distance_to_home_visible (bool visible)
 inline void
 HSIWidget::set_vlos_distance_to_home (Length vlos_distance)
 {
-	_params.distance_to_home_vlos = vlos_distance;
+	_params.dist_to_home_vlos = vlos_distance;
 	request_repaint();
 }
 
@@ -796,6 +810,22 @@ inline void
 HSIWidget::set_vlos_distance_to_home_visible (bool visible)
 {
 	_params.dist_to_home_vlos_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_vert_distance_to_home (Length height)
+{
+	_params.dist_to_home_vert = height;
+	request_repaint();
+}
+
+
+inline void
+HSIWidget::set_vert_distance_to_home_visible (bool visible)
+{
+	_params.dist_to_home_vert_visible = visible;
 	request_repaint();
 }
 
