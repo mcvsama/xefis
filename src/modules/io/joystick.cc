@@ -17,6 +17,9 @@
 
 // System:
 #include <linux/joystick.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -27,6 +30,48 @@
 
 
 XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput);
+
+
+inline void
+JoystickInput::Button::set_path (std::string const& path)
+{
+	prop = Xefis::PropertyBoolean (path);
+}
+
+
+inline void
+JoystickInput::Button::set_value (float value)
+{
+	prop.write (value);
+}
+
+
+inline void
+JoystickInput::Axis::set_path (std::string const& path)
+{
+	prop = Xefis::PropertyFloat (path);
+}
+
+
+inline void
+JoystickInput::Axis::set_value (float value)
+{
+	// Center:
+	value -= center;
+	// Remove dead zone:
+	if (std::abs (value) < dead_zone)
+		value = 0.f;
+	else
+		value = value - Xefis::sgn (value) * dead_zone;
+	// Reverse:
+	value *= reverse;
+	// Scale:
+	value *= scale;
+	// Power:
+	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
+
+	prop.write (value);
+}
 
 
 JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
@@ -101,7 +146,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		throw Xefis::Exception ("config for the io/joystick module needs <device> element");
 
 	_reopen_timer = new QTimer (this);
-	_reopen_timer->setInterval (1000);
+	_reopen_timer->setInterval (500);
 	_reopen_timer->setSingleShot (true);
 	QObject::connect (_reopen_timer, SIGNAL (timeout()), this, SLOT (open_device()));
 
@@ -121,18 +166,51 @@ JoystickInput::~JoystickInput()
 void
 JoystickInput::open_device()
 {
-	_device = new QFile (_device_path, this);
-	if (!_device->open (QFile::ReadOnly))
-	{
-		log() << "could not open device file: " << _device_path.toStdString() << std::endl;
-		_reopen_timer->start();
+	try {
+		log() << "opening device " << _device_path.toStdString() << std::endl;
+
+		_device = ::open (_device_path.toStdString().c_str(), O_RDONLY | O_NDELAY);
+
+		if (_device < 0)
+		{
+			log() << "could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+			restart();
+		}
+		else
+		{
+			_failure_count = 0;
+			delete _notifier;
+			_notifier = new QSocketNotifier (_device, QSocketNotifier::Read, this);
+			_notifier->setEnabled (true);
+			QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+		}
 	}
-	else
+	catch (...)
 	{
-		_notifier = new QSocketNotifier (_device->handle(), QSocketNotifier::Read, this);
-		_notifier->setEnabled (true);
-		QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+		failure();
 	}
+}
+
+
+void
+JoystickInput::failure()
+{
+	if (_failure_count <= 1)
+		log() << "failure detected, closing device " << _device_path.toStdString() << std::endl;
+
+	_failure_count += 1;
+	delete _notifier;
+	_notifier = nullptr;
+	::close (_device);
+
+	restart();
+}
+
+
+void
+JoystickInput::restart()
+{
+	_reopen_timer->start();
 }
 
 
@@ -140,8 +218,10 @@ void
 JoystickInput::read()
 {
 	::js_event ev;
-	ssize_t n = ::read (_device->handle(), &ev, sizeof (ev));
-	if (n == sizeof (ev))
+	ssize_t n = ::read (_device, &ev, sizeof (ev));
+	if (n < 0)
+		failure();
+	else if (n == sizeof (ev))
 	{
 		switch (ev.type)
 		{
@@ -200,44 +280,14 @@ JoystickInput::read()
 }
 
 
-inline void
-JoystickInput::Button::set_path (std::string const& path)
+void
+JoystickInput::reset_properties()
 {
-	prop = Xefis::PropertyBoolean (path);
-}
-
-
-inline void
-JoystickInput::Button::set_value (float value)
-{
-	prop.write (value);
-}
-
-
-inline void
-JoystickInput::Axis::set_path (std::string const& path)
-{
-	prop = Xefis::PropertyFloat (path);
-}
-
-
-inline void
-JoystickInput::Axis::set_value (float value)
-{
-	// Center:
-	value -= center;
-	// Remove dead zone:
-	if (std::abs (value) < dead_zone)
-		value = 0.f;
-	else
-		value = value - Xefis::sgn (value) * dead_zone;
-	// Reverse:
-	value *= reverse;
-	// Scale:
-	value *= scale;
-	// Power:
-	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
-
-	prop.write (value);
+	for (Button* b: _buttons)
+		if (b)
+			b->prop.set_nil();
+	for (Axis* a: _axes)
+		if (a)
+			a->prop.set_nil();
 }
 
