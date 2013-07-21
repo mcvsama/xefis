@@ -260,7 +260,7 @@ GPS::open_device()
 	try {
 		_alive_check_timer->start();
 
-		log() << "opening device" << std::endl;
+		log() << "opening device " << _device_path.toStdString() << std::endl;
 
 		reset();
 
@@ -268,7 +268,7 @@ GPS::open_device()
 
 		if (_device < 0)
 		{
-			log() << "could not open device file: " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+			log() << "could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -294,7 +294,7 @@ GPS::open_device()
 void
 GPS::failure()
 {
-	log() << "failure detected, closing device" << std::endl;
+	log() << "failure detected, closing device " << _device_path.toStdString() << std::endl;
 
 	_alive_check_timer->stop();
 

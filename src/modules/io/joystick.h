@@ -82,19 +82,39 @@ class JoystickInput:
 	open_device();
 
 	/**
+	 * Close device after failure is detected.
+	 */
+	void
+	failure();
+
+	/**
+	 * Start reopen timer.
+	 */
+	void
+	restart();
+
+	/**
 	 * Read event from the device.
 	 */
 	void
 	read();
 
   private:
+	/**
+	 * Set all properties to nil.
+	 */
+	void
+	reset_properties();
+
+  private:
 	QString				_prop_path		= "/joystick";
 	QString				_device_path;
-	QFile*				_device			= nullptr;
+	int					_device			= 0;
 	QSocketNotifier*	_notifier		= nullptr;
 	QTimer*				_reopen_timer	= nullptr;
 	Buttons				_buttons;
 	Axes				_axes;
+	unsigned int		_failure_count	= 0;
 };
 
 #endif
