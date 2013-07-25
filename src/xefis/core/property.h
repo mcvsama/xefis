@@ -129,6 +129,13 @@ class GenericProperty
 	serial() const;
 
 	/**
+	 * Return true if the PropertyNode value has changed
+	 * since last read().
+	 */
+	bool
+	fresh() const;
+
+	/**
 	 * Ensures that this property exists.
 	 */
 	void
@@ -164,6 +171,12 @@ class GenericProperty
 
   protected:
 	/**
+	 * Reset flag that the property is fresh().
+	 */
+	void
+	unfresh() const;
+
+	/**
 	 * Normalize path so if there's "//" in it,
 	 * it will be replaced by leading "/".
 	 */
@@ -171,9 +184,10 @@ class GenericProperty
 	normalized_path (std::string path);
 
   protected:
-	PropertyDirectoryNode*	_root = nullptr;
-	mutable PropertyNode*	_node = nullptr;
-	std::string				_path;
+	PropertyDirectoryNode*			_root = nullptr;
+	mutable PropertyNode*			_node = nullptr;
+	std::string						_path;
+	mutable PropertyNode::Serial	_last_read_serial = -1u;
 };
 
 
@@ -386,16 +400,6 @@ GenericProperty::~GenericProperty()
 { }
 
 
-inline std::string
-GenericProperty::normalized_path (std::string path)
-{
-	std::size_t p = path.rfind ("//");
-	if (p != std::string::npos)
-		return path.substr (p + 1);
-	return path;
-}
-
-
 inline bool
 GenericProperty::is_nil() const
 {
@@ -480,6 +484,13 @@ GenericProperty::serial() const
 }
 
 
+inline bool
+GenericProperty::fresh() const
+{
+	return serial() > _last_read_serial;
+}
+
+
 inline void
 GenericProperty::ensure_existence()
 {
@@ -530,6 +541,23 @@ GenericProperty::floatize (std::string unit) const
 	if (node)
 		return node->floatize (unit);
 	return 0.0;
+}
+
+
+inline void
+GenericProperty::unfresh() const
+{
+	_last_read_serial = serial();
+}
+
+
+inline std::string
+GenericProperty::normalized_path (std::string path)
+{
+	std::size_t p = path.rfind ("//");
+	if (p != std::string::npos)
+		return path.substr (p + 1);
+	return path;
 }
 
 
@@ -584,7 +612,10 @@ template<class T>
 			if (!node)
 				return default_value;
 			else
+			{
+				unfresh();
 				return node->read (default_value);
+			}
 		}
 		return default_value;
 	}
@@ -596,7 +627,7 @@ template<class T>
 	Property<T>::read_signalling() const
 	{
 		if (_root)
-			get_value_node_signalling()->read();
+			return get_value_node_signalling()->read();
 		else
 			throw SingularProperty ("can't read from a singular property: " + _path);
 	}
