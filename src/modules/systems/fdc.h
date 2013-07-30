@@ -31,7 +31,8 @@
 
 
 /**
- * Computations are reliable up to 36,000 ft.
+ * Computations are reliable up to 36,000 ft altitude
+ * and about 0.3 mach speed.
  */
 class FlightDataComputer: public Xefis::Module
 {
