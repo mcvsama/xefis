@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Lib:
+#include <boost/format.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/accounting.h>
@@ -40,12 +43,13 @@ void
 Latency::log_latency()
 {
 	Xefis::Accounting::StatsSet const& event_latency = accounting()->event_latency_stats();
-	xdebug ("%-53s min      avg      max\n", "--- Latency information ---");
-	xdebug ("<%-51s> %0.6lf %.06lf %.06lf\n",
-			"event handling latency",
-			(double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s(),
-			(double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).average().s(),
-			(double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s());
+	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
+	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
+		% "event handling latency"
+		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s()
+		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).average().s()
+		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s()
+		<< std::endl;
 
 	// Get module stats, sort by average latency and log.
 
@@ -68,11 +72,13 @@ Latency::log_latency()
 
 	for (auto m: ordered_modules)
 	{
-		xdebug ("[%-30s#%-20s] %.06lf %.06lf %.06lf\n",
-				m->first.name().c_str(), m->first.instance().c_str(),
-				static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s()),
-				static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).average().s()),
-				static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s()));
+		log() << boost::format ("[%-30s#%-20s] %.06lf %.06lf %.06lf")
+			% m->first.name().c_str()
+			% m->first.instance().c_str()
+			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s())
+			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).average().s())
+			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s())
+			<< std::endl;
 	}
 }
 
