@@ -136,12 +136,6 @@ SRC_SOURCES += lib/si/pressure.cc
 SRC_SOURCES += lib/si/speed.cc
 SRC_SOURCES += lib/si/time.cc
 
-######## /modules/generic ########
-
-SRC_HEADERS += modules/generic/fps.h
-
-SRC_SOURCES += modules/generic/fps.cc
-
 ######## /modules/instruments ########
 
 SRC_HEADERS += modules/instruments/efis.h
