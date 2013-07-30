@@ -187,7 +187,7 @@ class GenericProperty
 	PropertyDirectoryNode*			_root = nullptr;
 	mutable PropertyNode*			_node = nullptr;
 	std::string						_path;
-	mutable PropertyNode::Serial	_last_read_serial = -1u;
+	mutable PropertyNode::Serial	_last_read_serial = 0;
 };
 
 
@@ -487,7 +487,7 @@ GenericProperty::serial() const
 inline bool
 GenericProperty::fresh() const
 {
-	return serial() > _last_read_serial;
+	return serial() + 1 > _last_read_serial;
 }
 
 
@@ -547,7 +547,7 @@ GenericProperty::floatize (std::string unit) const
 inline void
 GenericProperty::unfresh() const
 {
-	_last_read_serial = serial();
+	_last_read_serial = serial() + 1;
 }
 
 

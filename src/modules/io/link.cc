@@ -711,27 +711,6 @@ Link::Packet::produce (Blob& blob)
 Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	auto parse_input_output_config = [](QDomElement& input_output, QString& o_host, int& o_port) -> void
-	{
-		for (QDomElement& e: input_output)
-		{
-			if (e == "udp")
-			{
-				for (QDomElement& z: e)
-				{
-					if (z == "host")
-						o_host = z.text();
-					else if (z == "port")
-						o_port = z.text().toInt();
-					else
-						throw Xefis::Exception (("invalid <output>/<udp> child: <" + z.tagName() + ">").toStdString());
-				}
-			}
-			else
-				throw Xefis::Exception (("invalid <output> child: <" + e.tagName() + ">").toStdString());
-		}
-	};
-
 	Frequency output_frequency = 1_Hz;
 	Time failsafe_after = 1_ms;
 	Time reacquire_after = 1_ms;
@@ -741,6 +720,8 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		if (e == "properties")
 		{
 			parse_properties (e, {
+				{ "input", _input, false },
+				{ "output", _output, false 	},
 				{ "link-valid", _link_valid_prop, false },
 				{ "failsafes", _failsafes, false },
 				{ "reacquires", _reacquires, false },
@@ -750,35 +731,13 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 		else if (e == "protocol")
 			parse_protocol (e);
-		else if (e == "input")
+		else if (e == "settings")
 		{
-			if (!e.hasAttribute ("failsafe-after"))
-				throw Xefis::Exception ("<input> needs attribute 'failsafe-after'");
-			failsafe_after.parse (e.attribute ("failsafe-after").toStdString());
-
-			if (!e.hasAttribute ("reacquire-after"))
-				throw Xefis::Exception ("<input> needs attribute 'reacquire-after'");
-			reacquire_after.parse (e.attribute ("reacquire-after").toStdString());
-
-			_input_interference = e.hasAttribute ("interference");
-
-			parse_input_output_config (e, _udp_input_host, _udp_input_port);
-			_udp_input = new QUdpSocket();
-			_udp_input_enabled = true;
-			_udp_input->bind (QHostAddress (_udp_input_host), _udp_input_port, QUdpSocket::ShareAddress);
-			QObject::connect (_udp_input, SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
-		}
-		else if (e == "output")
-		{
-			if (!e.hasAttribute ("frequency"))
-				throw Xefis::Exception ("<output> needs attribute 'frequency'");
-			output_frequency.parse (e.attribute ("frequency").toStdString());
-
-			_output_interference = e.hasAttribute ("interference");
-
-			parse_input_output_config (e, _udp_output_host, _udp_output_port);
-			_udp_output = new QUdpSocket();
-			_udp_output_enabled = true;
+			parse_settings (e, {
+				{ "failsafe-after", failsafe_after, false },
+				{ "reacquire-after", reacquire_after, false },
+				{ "frequency", output_frequency, false },
+			});
 		}
 	}
 
@@ -809,34 +768,15 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 }
 
 
-Link::~Link()
-{
-	delete _udp_input;
-	delete _udp_output;
-}
-
-
 void
-Link::got_udp_packet()
+Link::data_updated()
 {
-	while (_udp_input->hasPendingDatagrams())
+	if (_input.valid() && _input.fresh())
 	{
-		int datagram_size = _udp_input->pendingDatagramSize();
-		if (_input_datagram.size() < datagram_size)
-			_input_datagram.resize (datagram_size);
-
-		_udp_input->readDatagram (_input_datagram.data(), datagram_size, nullptr, nullptr);
-		_input_blob.insert (_input_blob.end(), _input_datagram.data(), _input_datagram.data() + datagram_size);
+		std::string data = *_input;
+		_input_blob.insert (_input_blob.end(), data.begin(), data.end());
+		eat (_input_blob);
 	}
-
-	if (_input_interference)
-		interfere (_input_blob);
-
-#if XEFIS_LINK_RECV_DEBUG
-	log() << "recv: " << to_string (_input_blob) << std::endl;
-#endif
-
-	eat (_input_blob);
 }
 
 
@@ -846,12 +786,12 @@ Link::send_output()
 	_output_blob.clear();
 	produce (_output_blob);
 
-	if (_udp_output_enabled)
+	if (!_output.is_singular())
 	{
-#if XEFIS_LINK_SEND_DEBUG
-		log() << "send: " << to_string (_output_blob) << std::endl;
-#endif
-		_udp_output->writeDatagram (reinterpret_cast<const char*> (&_output_blob[0]), _output_blob.size(), QHostAddress (_udp_output_host), _udp_output_port);
+		std::string s;
+		s.insert (s.end(), _output_blob.begin(), _output_blob.end());
+		_output.write (s);
+		signal_data_updated();
 	}
 }
 
@@ -896,14 +836,19 @@ Link::produce (Blob& blob)
 	for (Packet* p: _packets)
 		p->produce (blob);
 
-	if (_output_interference)
-		interfere (blob);
+#if XEFIS_LINK_SEND_DEBUG
+	log() << "send: " << to_string (_output_blob) << std::endl;
+#endif
 }
 
 
 void
 Link::eat (Blob& blob)
 {
+#if XEFIS_LINK_RECV_DEBUG
+	log() << "recv: " << to_string (blob) << std::endl;
+#endif
+
 	Blob _tmp_input_magic;
 	_tmp_input_magic.resize (_magic_size);
 
@@ -982,18 +927,6 @@ Link::parse_protocol (QDomElement const& protocol)
 
 	if (_packets.empty())
 		throw Xefis::Exception ("protocol must not be empty");
-}
-
-
-void
-Link::interfere (Blob& blob)
-{
-	if (rand() % 3 == 0)
-	{
-		// Erase random byte from the input sequence:
-		Blob::iterator i = blob.begin() + (rand() % blob.size());
-		blob.erase (i, i + 1);
-	}
 }
 
 

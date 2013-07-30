@@ -21,7 +21,6 @@
 
 // Qt:
 #include <QtCore/QTimer>
-#include <QtNetwork/QUdpSocket>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -272,16 +271,11 @@ class Link:
 	// Ctor
 	Link (Xefis::ModuleManager*, QDomElement const& config);
 
-	// Dtor
-	~Link();
+  protected:
+	void
+	data_updated() override;
 
   private slots:
-	/**
-	 * Called whenever there's data ready to be read from socket.
-	 */
-	void
-	got_udp_packet();
-
 	/**
 	 * Called by output timer.
 	 */
@@ -313,9 +307,6 @@ class Link:
 	void
 	parse_protocol (QDomElement const& protocol);
 
-	void
-	interfere (Blob& blob);
-
 	static Blob
 	parse_binary_string (QString const& string);
 
@@ -327,28 +318,19 @@ class Link:
 	QTimer*					_reacquire_timer;
 	QTimer*					_output_timer;
 	bool					_link_valid				= false;
+	Xefis::PropertyString	_input;
+	Xefis::PropertyString	_output;
 	Xefis::PropertyBoolean	_link_valid_prop;
 	Xefis::PropertyInteger	_failsafes;
 	Xefis::PropertyInteger	_reacquires;
 	Xefis::PropertyInteger	_error_bytes;
 	Xefis::PropertyInteger	_valid_packets;
-	bool					_udp_output_enabled		= false;
-	QUdpSocket*				_udp_output				= nullptr;
-	QString					_udp_output_host;
-	int						_udp_output_port		= 0;
-	bool					_udp_input_enabled		= false;
-	QUdpSocket*				_udp_input				= nullptr;
-	QString					_udp_input_host;
-	int						_udp_input_port			= 0;
 	Packets					_packets;
 	PacketMagics			_packet_magics;
 	Blob::size_type			_magic_size				= 0;
-	QByteArray				_input_datagram;
 	Blob					_output_blob;
 	Blob					_input_blob;
 	Blob					_tmp_input_magic;
-	bool					_input_interference		= false;
-	bool					_output_interference	= false;
 };
 
 #endif

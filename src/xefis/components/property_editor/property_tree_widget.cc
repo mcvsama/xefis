@@ -89,7 +89,14 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 
 	if (val_node)
-		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (val_node->stringify()));
+	{
+		std::string data = val_node->stringify();
+		// If it's a string and contains binary data, display as binary string:
+		PropertyValueNode<std::string>* string_node = dynamic_cast<PropertyValueNode<std::string>*> (val_node);
+		if (string_node && std::any_of (data.begin(), data.end(), [](unsigned char c) -> bool { return c < 0x20 || 0x7f < c; }))
+			data = "binary " + to_binary_form (data);
+		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (data));
+	}
 	else
 	{
 		PropertyDirectoryNode* dir_node = dynamic_cast<PropertyDirectoryNode*> (node);
@@ -134,6 +141,19 @@ void
 PropertyTreeWidget::setup_appereance()
 {
 	header()->resizeSection (NameColumn, 20.f * Services::default_font_size (physicalDpiY()));
+}
+
+
+std::string
+PropertyTreeWidget::to_binary_form (std::string const& blob)
+{
+	if (blob.empty())
+		return "";
+	std::string s;
+	for (unsigned char v: blob)
+		s += QString ("%1").arg (v, 2, 16, QChar ('0')).toStdString() + ":";
+	s.pop_back();
+	return s;
 }
 
 } // namespace Xefis

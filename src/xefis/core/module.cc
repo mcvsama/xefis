@@ -48,12 +48,12 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 		std::set<QString> unconfigured_values;
 		std::set<QString> known_values;
 
-		for (NameAndProperty& pair: list)
+		for (NameAndProperty& element: list)
 		{
-			map[pair.name] = &pair.property;
-			if (pair.required)
-				unconfigured_values.insert (pair.name);
-			known_values.insert (pair.name);
+			map[element.name] = &element.property;
+			if (element.required)
+				unconfigured_values.insert (element.name);
+			known_values.insert (element.name);
 		}
 
 		QString root = properties_element.attribute ("path");
@@ -67,7 +67,7 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 			QString name = e.attribute ("name");
 
 			if (known_values.find (name) == known_values.end())
-				throw Exception (QString ("configuration for unknown property: %1").arg (name).toStdString());
+				throw Exception (QString ("configuration for unknown property: %1").arg (name));
 
 			unconfigured_values.erase (name);
 
@@ -82,7 +82,7 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 				it->second->set_path (path);
 			}
 			else
-				throw Exception (QString ("missing parameter @path for property: %1").arg (name).toStdString());
+				throw Exception (QString ("missing parameter @path for property: %1").arg (name));
 
 			if (!e.hasAttribute ("default"))
 				it->second->ensure_existence();
@@ -111,13 +111,91 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 			QStringList list;
 			for (auto s: unconfigured_values)
 				list << s;
-			throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")).toStdString());
+			throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")));
 		}
 	}
 	catch (Exception& e)
 	{
 		throw Exception ("error when parsing <properties>", &e);
 	}
+}
+
+
+void
+Module::parse_settings (QDomElement const& settings_element, SettingsList list)
+{
+	try {
+		std::map<QString, NameAndSetting*> map;
+		std::set<QString> unconfigured_values;
+		std::set<QString> known_values;
+
+		for (NameAndSetting& element: list)
+		{
+			map[element.name] = &element;
+			if (element.required)
+				unconfigured_values.insert (element.name);
+			known_values.insert (element.name);
+		}
+
+		for (QDomElement& d: settings_element)
+		{
+			if (d == "setting")
+			{
+				if (!d.hasAttribute ("name"))
+					throw Exception ("missing attribute @name for setting");
+
+				QString name = d.attribute ("name");
+
+				if (known_values.find (name) == known_values.end())
+					throw Exception (QString ("configuration for unknown setting: %1").arg (name));
+
+				if (!d.hasAttribute ("value"))
+					throw Exception (QString ("missing attribute @value for setting: %1").arg (name));
+
+				QString value = d.attribute ("value");
+
+				unconfigured_values.erase (name);
+
+				auto it = map.find (name);
+				if (it == map.end())
+					return;
+
+				NameAndSetting* nas = it->second;
+				if (nas->value_bool)
+					*nas->value_bool = value == "true";
+				else if (nas->value_int)
+					*nas->value_int = boost::lexical_cast<int> (value.toStdString());
+				else if (nas->value_string)
+					*nas->value_string = value.toStdString();
+				else if (nas->value_qstring)
+					*nas->value_qstring = value;
+				else if (nas->value_si_value)
+					nas->value_si_value->parse (value.toStdString());
+
+				_settings_set.insert (name);
+			}
+		}
+
+		if (!unconfigured_values.empty())
+		{
+			QStringList list;
+			for (auto s: unconfigured_values)
+				list << s;
+			throw Exception (QString ("missing configuration for the following settings: %1").arg (list.join (", ")));
+		}
+	}
+	catch (Exception& e)
+	{
+		throw Exception ("error when parsing <settings>", &e);
+	}
+}
+
+
+bool
+Module::has_setting (QString const& name)
+{
+	SettingsSet::iterator s = _settings_set.find (name);
+	return s != _settings_set.end();
 }
 
 

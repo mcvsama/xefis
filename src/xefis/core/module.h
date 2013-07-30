@@ -50,7 +50,30 @@ class Module
 		bool			required;
 	};
 
+	struct NameAndSetting
+	{
+		QString			name;
+		bool			required;
+		bool*			value_bool		= nullptr;
+		int*			value_int		= nullptr;
+		std::string*	value_string	= nullptr;
+		QString*		value_qstring	= nullptr;
+		SI::Value*		value_si_value	= nullptr;
+
+		NameAndSetting (QString const& name, bool& value, bool required);
+
+		NameAndSetting (QString const& name, int& value, bool required);
+
+		NameAndSetting (QString const& name, std::string& value, bool required);
+
+		NameAndSetting (QString const& name, QString& value, bool required);
+
+		NameAndSetting (QString const& name, SI::Value& value, bool required);
+	};
+
 	typedef std::vector<NameAndProperty>								PropertiesList;
+	typedef std::vector<NameAndSetting>									SettingsList;
+	typedef std::set<QString>											SettingsSet;
 	typedef std::function<Module* (ModuleManager*, QDomElement const&)>	FactoryFunction;
 	typedef std::map<std::string, FactoryFunction>						FactoriesMap;
 
@@ -140,6 +163,19 @@ class Module
 	parse_properties (QDomElement const& properties_element, PropertiesList);
 
 	/**
+	 * Parse the <settings> element and initialize variables.
+	 * \throw	Xefis::Exception if something's wrong.
+	 */
+	void
+	parse_settings (QDomElement const& settings_element, SettingsList);
+
+	/**
+	 * Return true if given setting has been found in configuration.
+	 */
+	bool
+	has_setting (QString const& name);
+
+	/**
 	 * Parse the <i2c> element containing I2C bus number and device
 	 * address.
 	 * \throw	Xefis::Exception if something's wrong.
@@ -189,7 +225,48 @@ class Module
 	ModuleManager*	_module_manager = nullptr;
 	std::string		_name;
 	std::string		_instance;
+	SettingsSet		_settings_set;
 };
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, bool& value, bool required):
+	name (name),
+	required (required),
+	value_bool (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, int& value, bool required):
+	name (name),
+	required (required),
+	value_int (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, std::string& value, bool required):
+	name (name),
+	required (required),
+	value_string (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, QString& value, bool required):
+	name (name),
+	required (required),
+	value_qstring (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, SI::Value& value, bool required):
+	name (name),
+	required (required),
+	value_si_value (&value)
+{ }
 
 
 inline

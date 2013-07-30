@@ -81,6 +81,12 @@ class PropertyTreeWidget: public QTreeWidget
 	void
 	setup_appereance();
 
+	/**
+	 * Convert string to colon-delimited hexadecimal form.
+	 */
+	std::string
+	to_binary_form (std::string const& blob);
+
   private:
 	PropertyNode* _root_node;
 };

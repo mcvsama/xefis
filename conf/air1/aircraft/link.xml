@@ -1,12 +1,12 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='io/link' instance='output'>
-		<output frequency='30 Hz'>
-			<udp>
-				<host>192.168.0.1</host>
-				<port>9951</port>
-			</udp>
-		</output>
+		<settings>
+			<setting name='frequency' value='30 Hz'/>
+		</settings>
+		<properties>
+			<property name='output' path='/link/udp/to-groundstation'/>
+		</properties>
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='1' signature-bytes='2' key='00:11:22:33'>
@@ -44,25 +44,36 @@
 		</protocol>
 	</module>
 	<module name='io/link' instance='input'>
+		<settings>
+			<setting name='failsafe-after' value='500 ms'/>
+			<setting name='reacquire-after' value='150 ms'/>
+		</settings>
 		<properties>
+			<property name='input' path='/link/udp/from-groundstation'/>
 			<property name='link-valid' path='/link/local/valid'/>
 			<property name='failsafes' path='/link/local/failsafes'/>
 			<property name='reacquires' path='/link/local/reacquires'/>
 			<property name='error-bytes' path='/link/local/error-bytes'/>
 			<property name='valid-packets' path='/link/local/valid-packets'/>
 		</properties>
-		<input failsafe-after='500 ms' reacquire-after='150 ms'>
-			<udp>
-				<host>192.168.0.10</host>
-				<port>9952</port>
-			</udp>
-		</input>
 		<protocol>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
 				</signature>
 			</packet>
 		</protocol>
+	</module>
+	<module name='io/udp'>
+		<settings>
+			<setting name='send.host' value='192.168.0.1'/>
+			<setting name='send.port' value='9951'/>
+			<setting name='receive.host' value='192.168.0.1'/>
+			<setting name='receive.port' value='9952'/>
+		</settings>
+		<properties>
+			<property name='send' path='/link/udp/to-groundstation'/>
+			<property name='receive' path='/link/udp/from-groundstation'/>
+		</properties>
 	</module>
 </xefis-include>
 
