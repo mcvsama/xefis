@@ -172,6 +172,7 @@ SRC_HEADERS += modules/io/ht16k33.h
 SRC_HEADERS += modules/io/joystick.h
 SRC_HEADERS += modules/io/mouse.h
 SRC_HEADERS += modules/io/link.h
+SRC_HEADERS += modules/io/udp.h
 
 SRC_SOURCES += modules/io/bmp085.cc
 SRC_SOURCES += modules/io/flight_gear.cc
@@ -180,6 +181,7 @@ SRC_SOURCES += modules/io/ht16k33.cc
 SRC_SOURCES += modules/io/joystick.cc
 SRC_SOURCES += modules/io/mouse.cc
 SRC_SOURCES += modules/io/link.cc
+SRC_SOURCES += modules/io/udp.cc
 
 SRC_MOCHDRS += modules/io/bmp085.h
 SRC_MOCHDRS += modules/io/flight_gear.h
@@ -188,6 +190,7 @@ SRC_MOCHDRS += modules/io/ht16k33.h
 SRC_MOCHDRS += modules/io/joystick.h
 SRC_MOCHDRS += modules/io/mouse.h
 SRC_MOCHDRS += modules/io/link.h
+SRC_MOCHDRS += modules/io/udp.h
 
 ######## /modules/log ########
 
