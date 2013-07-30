@@ -13,7 +13,6 @@
 
 // Standard:
 #include <cstddef>
-#include <memory>
 #include <random>
 
 // Qt:
@@ -25,8 +24,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/hash.h>
-#include <xefis/utility/hextable.h>
 
 // Local:
 #include "udp.h"
