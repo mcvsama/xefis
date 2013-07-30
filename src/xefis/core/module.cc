@@ -46,11 +46,13 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 	try {
 		std::map<QString, TypedProperty*> map;
 		std::set<QString> unconfigured_values;
+		std::set<QString> configured_values;
 		std::set<QString> known_values;
 
 		for (NameAndProperty& element: list)
 		{
-			map[element.name] = &element.property;
+			if (map.insert ({ element.name, &element.property }).second == false)
+				throw Exception ("duplicated entry name in property list");
 			if (element.required)
 				unconfigured_values.insert (element.name);
 			known_values.insert (element.name);
@@ -69,7 +71,11 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 			if (known_values.find (name) == known_values.end())
 				throw Exception (QString ("configuration for unknown property: %1").arg (name));
 
+			if (configured_values.find (name) != configured_values.end())
+				throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
+
 			unconfigured_values.erase (name);
+			configured_values.insert (name);
 
 			auto it = map.find (name);
 			// Found config for nonexistent property:
@@ -127,11 +133,13 @@ Module::parse_settings (QDomElement const& settings_element, SettingsList list)
 	try {
 		std::map<QString, NameAndSetting*> map;
 		std::set<QString> unconfigured_values;
+		std::set<QString> configured_values;
 		std::set<QString> known_values;
 
 		for (NameAndSetting& element: list)
 		{
-			map[element.name] = &element;
+			if (map.insert ({ element.name, &element }).second == false)
+				throw Exception ("duplicated entry name in settings list");
 			if (element.required)
 				unconfigured_values.insert (element.name);
 			known_values.insert (element.name);
@@ -149,12 +157,16 @@ Module::parse_settings (QDomElement const& settings_element, SettingsList list)
 				if (known_values.find (name) == known_values.end())
 					throw Exception (QString ("configuration for unknown setting: %1").arg (name));
 
+			if (configured_values.find (name) != configured_values.end())
+				throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
+
 				if (!d.hasAttribute ("value"))
 					throw Exception (QString ("missing attribute @value for setting: %1").arg (name));
 
 				QString value = d.attribute ("value");
 
 				unconfigured_values.erase (name);
+				configured_values.insert (name);
 
 				auto it = map.find (name);
 				if (it == map.end())
