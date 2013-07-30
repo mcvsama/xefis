@@ -25,8 +25,7 @@
 
 
 /**
- * This module interfaces Adafruit's BMP085 presure and temperature
- * sensor.
+ * This module interfaces Bochs' BMP085 presure and temperature sensor.
  */
 class BMP085:
 	public QObject,
