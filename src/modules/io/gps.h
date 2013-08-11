@@ -44,6 +44,9 @@ class GPS:
 	// Ctor
 	GPS (Xefis::ModuleManager* module_manager, QDomElement const& config);
 
+	// Dtor
+	~GPS();
+
 	/**
 	 * Return string for given fix quality code.
 	 */
@@ -184,7 +187,7 @@ class GPS:
 	synchronize_system_clock (std::string const& date_string, std::string const& time_string);
 
 	/**
-	 * Initialize map of baud-rates, used by baud_rate_from_integer.
+	 * Initialize map of baud-rates, used by termios_baud_rate_from_integer.
 	 */
 	void
 	initialize_baud_rates();
@@ -193,7 +196,7 @@ class GPS:
 	 * Return termios baudrate constant from given baudrate integer.
 	 */
 	int
-	baud_rate_from_integer (int baud_rate) const;
+	termios_baud_rate_from_integer (int baud_rate) const;
 
 	/**
 	 * Create PMTK message. Data must include message name: PMTKnnn,
@@ -220,7 +223,6 @@ class GPS:
 	std::string					_default_baud_rate			= "9600";
 	std::string					_current_baud_rate			= "9600";
 	std::string					_target_baud_rate			= "9600";
-	std::string					_baud_rate;
 	std::vector<std::string>	_pmtk_commands;
 	bool						_debug_mode					= false;
 	QString						_device_path;

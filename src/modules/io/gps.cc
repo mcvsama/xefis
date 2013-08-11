@@ -152,6 +152,12 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 }
 
 
+GPS::~GPS()
+{
+	::close (_device);
+}
+
+
 std::string
 GPS::describe_fix_quality (int code)
 {
@@ -373,8 +379,8 @@ GPS::set_device_options (bool use_target_baud_rate)
 	}
 
 	int baud_rate_const = use_target_baud_rate
-		? baud_rate_from_integer (boost::lexical_cast<unsigned int> (_target_baud_rate))
-		: baud_rate_from_integer (boost::lexical_cast<unsigned int> (_current_baud_rate));
+		? termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_target_baud_rate))
+		: termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_current_baud_rate));
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 	options.c_cflag |= (CLOCAL | CREAD);
@@ -966,7 +972,7 @@ GPS::initialize_baud_rates()
 
 
 int
-GPS::baud_rate_from_integer (int baud_rate) const
+GPS::termios_baud_rate_from_integer (int baud_rate) const
 {
 	auto c = _baud_rates_map.find (baud_rate);
 	if (c == _baud_rates_map.end())
