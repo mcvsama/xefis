@@ -68,7 +68,7 @@ UDP::UDP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		_udp_receive_enabled = true;
 		_udp_receive = new QUdpSocket();
 		if (!_udp_receive->bind (QHostAddress (_udp_receive_host), _udp_receive_port, QUdpSocket::ShareAddress))
-			log() << "failed to bind to address " << _udp_receive_host.toStdString() << ":" << _udp_receive_port << std::endl;
+			log() << "Failed to bind to address " << _udp_receive_host.toStdString() << ":" << _udp_receive_port << std::endl;
 		QObject::connect (_udp_receive, SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
 	}
 }
