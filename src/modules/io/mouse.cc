@@ -86,7 +86,7 @@ Mouse::check()
 	}
 	catch (Xefis::Exception const& e)
 	{
-		log() << "exception when processing mouse position update." << std::endl;
+		log() << "Exception when processing mouse position update." << std::endl;
 		log() << e << std::endl;
 	}
 }

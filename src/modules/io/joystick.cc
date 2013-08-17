@@ -167,13 +167,13 @@ void
 JoystickInput::open_device()
 {
 	try {
-		log() << "opening device " << _device_path.toStdString() << std::endl;
+		log() << "Opening device " << _device_path.toStdString() << std::endl;
 
 		_device = ::open (_device_path.toStdString().c_str(), O_RDONLY | O_NDELAY);
 
 		if (_device < 0)
 		{
-			log() << "could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+			log() << "Could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -196,7 +196,7 @@ void
 JoystickInput::failure()
 {
 	if (_failure_count <= 1)
-		log() << "failure detected, closing device " << _device_path.toStdString() << std::endl;
+		log() << "Failure detected, closing device " << _device_path.toStdString() << std::endl;
 
 	_failure_count += 1;
 	delete _notifier;

@@ -266,7 +266,7 @@ GPS::open_device()
 	try {
 		_alive_check_timer->start();
 
-		log() << "opening device " << _device_path.toStdString() << std::endl;
+		log() << "Opening device " << _device_path.toStdString() << std::endl;
 
 		reset();
 
@@ -274,7 +274,7 @@ GPS::open_device()
 
 		if (_device < 0)
 		{
-			log() << "could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+			log() << "Could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -298,9 +298,9 @@ GPS::open_device()
 
 
 void
-GPS::failure()
+GPS::failure (std::string const& reason)
 {
-	log() << "failure detected, closing device " << _device_path.toStdString() << std::endl;
+	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _device_path.toStdString() << std::endl;
 
 	_alive_check_timer->stop();
 
@@ -328,7 +328,6 @@ void
 GPS::restart()
 {
 	_restart_timer->start();
-
 }
 
 
@@ -366,7 +365,7 @@ GPS::reset_properties()
 bool
 GPS::set_device_options (bool use_target_baud_rate)
 {
-	log() << "setting baud rate to " << (use_target_baud_rate ? _target_baud_rate : _current_baud_rate) << std::endl;
+	log() << "Setting baud rate to " << (use_target_baud_rate ? _target_baud_rate : _current_baud_rate) << std::endl;
 
 	reset();
 
@@ -374,7 +373,7 @@ GPS::set_device_options (bool use_target_baud_rate)
 
 	if (tcgetattr (_device, &options) != 0)
 	{
-		log() << "failed to read serial port configuration" << std::endl;
+		log() << "Failed to read serial port configuration" << std::endl;
 		return false;
 	}
 
@@ -383,7 +382,7 @@ GPS::set_device_options (bool use_target_baud_rate)
 		: termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_current_baud_rate));
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
-	options.c_cflag |= (CLOCAL | CREAD);
+	options.c_cflag |= CLOCAL | CREAD;
 	// Disable parity bit:
 	options.c_cflag &= ~PARENB;
 	options.c_cflag &= ~CSTOPB;
@@ -404,7 +403,7 @@ GPS::set_device_options (bool use_target_baud_rate)
 
 	if (tcsetattr (_device, TCSANOW, &options) != 0)
 	{
-		log() << "could not setup serial port: " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+		log() << "Could not setup serial port: " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
@@ -415,7 +414,7 @@ GPS::set_device_options (bool use_target_baud_rate)
 void
 GPS::synchronized()
 {
-	log() << "stream synchronized" << std::endl;
+	log() << "Stream synchronized" << std::endl;
 	if (_current_baud_rate != _target_baud_rate)
 		switch_baud_rate_request();
 	else if (_initialization_commands)
@@ -426,7 +425,7 @@ GPS::synchronized()
 void
 GPS::switch_baud_rate_request()
 {
-	log() << "switching baud rate from " << _current_baud_rate << " to " << _target_baud_rate << std::endl;
+	log() << "Switching baud rate from " << _current_baud_rate << " to " << _target_baud_rate << std::endl;
 	std::string set_baud_rate_message = make_pmtk (SET_NMEA_BAUDRATE + ","_str + _target_baud_rate);
 	::write (_device, set_baud_rate_message.data(), set_baud_rate_message.size());
 	::fsync (_device);
@@ -439,7 +438,7 @@ GPS::switch_baud_rate_request()
 void
 GPS::initialization_commands()
 {
-	log() << "sending initialization commands" << std::endl;
+	log() << "Sending initialization commands" << std::endl;
 	for (auto s: _pmtk_commands)
 	{
 		std::string pmtk = make_pmtk (s);
@@ -495,21 +494,21 @@ GPS::process_message (std::string message)
 	// Must be at least 5 bytes long to calculate checksum:
 	if (message.size() < 5)
 	{
-		log() << "read error: packet too short: " << message.size() << " characters" << std::endl;
+		log() << "Read error: packet too short: " << message.size() << " characters" << std::endl;
 		return false;
 	}
 
 	// Prologue:
 	if (message[0] != '$')
 	{
-		log() << "read error: packet does not start with '$'" << std::endl;
+		log() << "Read error: packet does not start with '$'" << std::endl;
 		return false;
 	}
 
 	// Checksum:
 	if (message[message.size() - 3] != '*')
 	{
-		log() << "read error: missing '*' at the end of packet" << std::endl;
+		log() << "Read error: missing '*' at the end of packet" << std::endl;
 		return false;
 	}
 
@@ -518,7 +517,7 @@ GPS::process_message (std::string message)
 	char c2 = message[message.size() - 1];
 	if (!std::isxdigit (c1) || !std::isxdigit (c2))
 	{
-		log() << "read error: checksum characters not valid hexadecimal values" << std::endl;
+		log() << "Read error: checksum characters not valid hexadecimal values" << std::endl;
 		return false;
 	}
 	uint8_t checksum = hextable[c1] * 16 + hextable[c2];
@@ -530,7 +529,7 @@ GPS::process_message (std::string message)
 
 	if (sum != checksum)
 	{
-		log() << "read error: checksum invalid" << std::endl;
+		log() << "Read error: checksum invalid" << std::endl;
 		return false;
 	}
 
@@ -539,7 +538,7 @@ GPS::process_message (std::string message)
 	std::string type = contents.substr (0, contents.find (','));
 
 	if (_debug_mode)
-		log() << "read: " << contents << std::endl;
+		log() << "Read: " << contents << std::endl;
 
 	bool result = true;
 
@@ -563,7 +562,7 @@ GPS::process_message (std::string message)
 	});
 
 	if (!result)
-		log() << "failed to process message: " << contents << std::endl;
+		log() << "Failed to process message: " << contents << std::endl;
 
 	return result;
 }
@@ -842,13 +841,13 @@ GPS::process_pmtk_ack (std::string message_contents)
 	std::string result = _value;
 
 	if (result == "0")
-		log() << "invalid command/packet: " << command_hint << std::endl;
+		log() << "Invalid command/packet: " << command_hint << std::endl;
 	else if (result == "1")
-		log() << "unsupported command/packet: " << command_hint << std::endl;
+		log() << "Unsupported command/packet: " << command_hint << std::endl;
 	else if (result == "2")
-		log() << "valid command, but action failed: " << command_hint << std::endl;
+		log() << "Valid command, but action failed: " << command_hint << std::endl;
 	else if (result == "3")
-		log() << "command OK: " << command_hint << std::endl;
+		log() << "Command OK: " << command_hint << std::endl;
 
 	return true;
 }
@@ -880,7 +879,7 @@ GPS::synchronize_system_clock (std::string const& date_string, std::string const
 
 	if (time_string.size() < 6 || date_string.size() != 6)
 	{
-		log() << "could not parse time value from GPS message" << std::endl;
+		log() << "Could not parse time value from GPS message" << std::endl;
 		return;
 	}
 
@@ -915,18 +914,18 @@ GPS::synchronize_system_clock (std::string const& date_string, std::string const
 				::timeval tv = { now, 0 };
 				if (::settimeofday (&tv, nullptr) < 0)
 				{
-					log() << "could not setup system time: settimeofday() failed with error '" << strerror (errno) << "'; "
+					log() << "Could not setup system time: settimeofday() failed with error '" << strerror (errno) << "'; "
 							 "ensure that Xefis executable has cap_sys_time capability set with 'setcap cap_sys_time+ep path-to-xefis-executable'" << std::endl;
 				}
 				else
-					log() << "system clock synchronization OK" << std::endl;
+					log() << "System clock synchronization OK" << std::endl;
 
 				_synchronize_system_clock = false;
 			}
 		}
 		else
 		{
-			log() << "could not convert time information from GPS to system time" << std::endl;
+			log() << "Could not convert time information from GPS to system time" << std::endl;
 			_epoch_time.set_nil();
 		}
 	}
