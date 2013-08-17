@@ -232,7 +232,7 @@ class GPS:
 	std::vector<std::string>	_pmtk_commands;
 	bool						_debug_mode					= false;
 	QString						_device_path;
-	int							_device;
+	int							_device						= 0;
 	bool						_synchronize_input			= true;
 	bool						_initialization_commands	= true;
 	bool						_synchronize_system_clock	= false;
