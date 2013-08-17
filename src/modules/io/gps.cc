@@ -224,9 +224,18 @@ GPS::read()
 
 			if (n < 0)
 			{
-				log() << "error while reading from serial port: " << strerror (errno) << std::endl;
-				err = true;
-				break;
+				if (errno == EAGAIN || errno == EWOULDBLOCK)
+				{
+					// Nothing to read (read would block)
+					_buffer.resize (prev_size);
+					break;
+				}
+				else
+				{
+					log() << "Error while reading from serial port: " << strerror (errno) << std::endl;
+					err = true;
+					break;
+				}
 			}
 			else
 			{
@@ -256,7 +265,7 @@ GPS::read()
 	});
 
 	if (exc || err)
-		failure();
+		failure ("read()");
 }
 
 
@@ -280,7 +289,7 @@ GPS::open_device()
 		else
 		{
 			if (!set_device_options (_current_baud_rate == _target_baud_rate))
-				failure();
+				failure ("set_device_options()");
 			else
 			{
 				delete _notifier;
@@ -292,7 +301,7 @@ GPS::open_device()
 	}
 	catch (...)
 	{
-		failure();
+		failure ("exception in open_device()");
 	}
 }
 
@@ -398,6 +407,9 @@ GPS::set_device_options (bool use_target_baud_rate)
 	options.c_cc[VMIN] = 0;
 	// Time to wait for data (tenths of seconds):
 	options.c_cc[VTIME] = 0;
+	// Set output and local modes to defaults:
+	options.c_oflag = 0;
+	options.c_lflag = 0;
 
 	tcflush (_device, TCIFLUSH);
 

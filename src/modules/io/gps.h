@@ -78,6 +78,12 @@ class GPS:
 	 * with other baud-rate setting.
 	 */
 	void
+	failure (std::string const& reason);
+
+	/**
+	 * Overloaded failure to work as slot.
+	 */
+	void
 	failure();
 
 	/**
@@ -255,6 +261,13 @@ class GPS:
 	Xefis::PropertyTime			_update_timestamp;
 	Xefis::PropertyTime			_epoch_time;
 };
+
+
+inline void
+GPS::failure()
+{
+	failure ("");
+}
 
 
 inline int
