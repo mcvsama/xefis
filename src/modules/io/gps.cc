@@ -154,7 +154,8 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 GPS::~GPS()
 {
-	::close (_device);
+	if (_device)
+		::close (_device);
 }
 
 
