@@ -307,9 +307,6 @@ class Link:
 	void
 	parse_protocol (QDomElement const& protocol);
 
-	static Blob
-	parse_binary_string (QString const& string);
-
 	static std::string
 	to_string (Blob const&);
 
@@ -324,6 +321,7 @@ class Link:
 	Xefis::PropertyInteger	_failsafes;
 	Xefis::PropertyInteger	_reacquires;
 	Xefis::PropertyInteger	_error_bytes;
+	Xefis::PropertyInteger	_valid_bytes;
 	Xefis::PropertyInteger	_valid_packets;
 	Packets					_packets;
 	PacketMagics			_packet_magics;

@@ -8,6 +8,7 @@
 		<include name='groundstation/link.xml'/>
 		<include name='groundstation/ht16k33.xml'/>
 		<include name='groundstation/state.xml'/>
+		<include name='groundstation/xbee.xml'/>
 	</modules>
 	<include name='groundstation/efis.xml'/>
 </xefis-config>
