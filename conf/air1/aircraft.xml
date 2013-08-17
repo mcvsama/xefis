@@ -11,6 +11,7 @@
 		<include name='aircraft/fd.xml'/>
 		<include name='aircraft/rcms.xml'/>
 		<include name='aircraft/link.xml'/>
+		<include name='aircraft/xbee.xml'/>
 	</modules>
 </xefis-config>
 

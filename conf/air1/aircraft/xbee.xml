@@ -1,0 +1,24 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/xbee'>
+		<settings>
+			<setting name='device' value='/dev/ttyUSB1'/>
+			<setting name='baud-rate' value='57600'/>
+			<setting name='channel' value='12'/>
+			<setting name='pan-id' value='31:37'/>
+			<setting name='local-address' value='00:01'/>
+			<setting name='remote-address' value='00:02'/>
+			<setting name='power-level' value='0'/>
+		</settings>
+		<properties>
+			<property name='serviceable' path='/link/xbee/serviceable'/>
+			<property name='input-errors' path='/link/xbee/input-errors'/>
+			<property name='rssi-dbm' path='/link/xbee/rssi.dbm'/>
+			<property name='failures' path='/link/xbee/failures'/>
+			<property name='cca-failures' path='/link/xbee/clear-channel-assessment-failuires'/>
+			<property name='send' path='/link/data/to-groundstation'/>
+			<property name='receive' path='/link/data/from-groundstation'/>
+		</properties>
+	</module>
+</xefis-include>
+

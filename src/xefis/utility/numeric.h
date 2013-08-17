@@ -75,7 +75,7 @@ template<class T>
  * \param	d - divisor
  */
 template<class Number>
-	constexpr Number
+	inline constexpr Number
 	floored_mod (Number n, Number d)
 	{
 		return n - (d * std::floor (n / d));
@@ -83,7 +83,7 @@ template<class Number>
 
 
 template<>
-	constexpr int
+	inline constexpr int
 	floored_mod<int> (int n, int d)
 	{
 		return (n % d) >= 0 ? (n % d) : (n % d) + std::abs (d);
@@ -91,7 +91,7 @@ template<>
 
 
 template<class Number>
-	constexpr Number
+	inline constexpr Number
 	floored_mod (Number n, Number min, Number max)
 	{
 		return floored_mod (n - min, max - min) + min;

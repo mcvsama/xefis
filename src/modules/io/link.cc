@@ -27,6 +27,7 @@
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hash.h>
 #include <xefis/utility/hextable.h>
+#include <xefis/utility/string.h>
 
 // Local:
 #include "link.h"
@@ -591,7 +592,7 @@ Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 	}
 
 	if (element.hasAttribute ("key"))
-		_key = parse_binary_string (element.attribute ("key"));
+		_key = Xefis::parse_binary_string (element.attribute ("key"));
 	else
 		_key = { 0 };
 
@@ -670,7 +671,7 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 	if (!element.hasAttribute ("magic"))
 		throw Xefis::Exception ("<packet> needs 'magic' attribute");
 
-	_magic = parse_binary_string (element.attribute ("magic"));
+	_magic = Xefis::parse_binary_string (element.attribute ("magic"));
 	if (_magic.empty())
 		throw Xefis::Exception ("magic value must have at least one byte length");
 
@@ -726,6 +727,7 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "failsafes", _failsafes, false },
 				{ "reacquires", _reacquires, false },
 				{ "error-bytes", _error_bytes, false },
+				{ "valid-bytes", _valid_bytes, false },
 				{ "valid-packets", _valid_packets, false },
 			});
 		}
@@ -748,6 +750,7 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_failsafes.set_default (0);
 	_reacquires.set_default (0);
 	_error_bytes.set_default (0);
+	_valid_bytes.set_default (0);
 	_valid_packets.set_default (0);
 
 	_failsafe_timer = new QTimer (this);
@@ -837,7 +840,7 @@ Link::produce (Blob& blob)
 		p->produce (blob);
 
 #if XEFIS_LINK_SEND_DEBUG
-	log() << "send: " << to_string (_output_blob) << std::endl;
+	log() << "Send: " << to_string (_output_blob) << std::endl;
 #endif
 }
 
@@ -846,7 +849,7 @@ void
 Link::eat (Blob& blob)
 {
 #if XEFIS_LINK_RECV_DEBUG
-	log() << "recv: " << to_string (blob) << std::endl;
+	log() << "Recv: " << to_string (blob) << std::endl;
 #endif
 
 	Blob _tmp_input_magic;
@@ -871,12 +874,16 @@ Link::eat (Blob& blob)
 				return;
 
 			Blob::iterator e = packet->eat (blob.begin() + _magic_size, blob.end());
+			Blob::size_type valid_bytes = std::distance (blob.begin(), e);
 			blob.erase (blob.begin(), e);
 			packet->apply();
 			applied = true;
 
 			if (_valid_packets.valid())
 				_valid_packets.write (*_valid_packets + 1);
+
+			if (_valid_bytes.valid())
+				_valid_bytes.write (*_valid_bytes + valid_bytes);
 
 			// Restart failsafe timer:
 			_failsafe_timer->start();
@@ -927,54 +934,6 @@ Link::parse_protocol (QDomElement const& protocol)
 
 	if (_packets.empty())
 		throw Xefis::Exception ("protocol must not be empty");
-}
-
-
-Link::Blob
-Link::parse_binary_string (QString const& string)
-{
-	enum State { MSB, LSB, Colon };
-
-	auto from_xdigit = [&string](QChar& c) -> uint8_t
-	{
-		static Xefis::HexTable hextable;
-
-		char a = c.toLatin1();
-		if (!std::isxdigit (a))
-			throw Xefis::Exception ("invalid binary string: " + string.toStdString());
-		return hextable[a];
-	};
-
-	Blob blob;
-	blob.reserve ((string.size() + 1) / 3);
-	State state = MSB;
-	Blob::value_type val = 0;
-
-	for (QChar c: string)
-	{
-		switch (state)
-		{
-			case MSB:
-				val = 16 * from_xdigit (c);
-				state = LSB;
-				break;
-			case LSB:
-				val += from_xdigit (c);
-				blob.push_back (val);
-				state = Colon;
-				break;
-			case Colon:
-				// Skip it:
-				if (c != ':')
-					throw Xefis::Exception ("invalid binary string: " + string.toStdString());
-				state = MSB;
-				break;
-		}
-	}
-	// Must end with state Colon:
-	if (state != Colon)
-		throw Xefis::Exception ("invalid binary string: " + string.toStdString());
-	return blob;
 }
 
 
