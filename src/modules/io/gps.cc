@@ -65,12 +65,20 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	// 18 - CHN
 	_pmtk_commands.push_back ("PMTK314,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
 
-	bool found_device = false;
-	bool found_receiver_accuracy = false;
-
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "settings")
+		{
+			parse_settings (e, {
+				{ "debug", _debug_mode, false },
+				{ "device", _device_path, true },
+				{ "receiver-accuracy", _receiver_accuracy, true },
+				{ "synchronize-system-clock", _synchronize_system_clock, false },
+				{ "default-baud-rate", _default_baud_rate, true },
+				{ "baud-rate", _target_baud_rate, true },
+			});
+		}
+		else if (e == "properties")
 		{
 			parse_properties (e, {
 				{ "serviceable", _serviceable, true },
@@ -93,36 +101,6 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "epoch-time", _epoch_time, true },
 			});
 		}
-		else if (e == "device")
-		{
-			if (found_device)
-				throw Xefis::Exception ("only one <device> supported in configuration for the GPS module");
-			found_device = true;
-
-			_device_path = e.text();
-		}
-		else if (e == "receiver-accuracy")
-		{
-			if (found_receiver_accuracy)
-				throw Xefis::Exception ("only one <receiver-accuracy> supported in configuration for the GPS module");
-			found_receiver_accuracy = true;
-
-			_receiver_accuracy.parse (e.text().toStdString());
-		}
-		else if (e == "synchronize-system-clock")
-		{
-			// This requires that Xefis executable has SYS_CAP_TIME capability/
-			_synchronize_system_clock = true;
-		}
-		else if (e == "default-baud-rate")
-		{
-			_default_baud_rate = e.text().toStdString();
-			_current_baud_rate = e.text().toStdString();
-		}
-		else if (e == "baud-rate")
-			_target_baud_rate = e.text().toStdString();
-		else if (e == "debug-mode")
-			_debug_mode = true;
 		else if (e == "initialization")
 		{
 			for (QDomElement& pmtk: e)
@@ -135,8 +113,7 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 	}
 
-	if (!found_device)
-		throw Xefis::Exception ("config for the io/gps module needs <device> element");
+	_current_baud_rate = _default_baud_rate;
 
 	_restart_timer = new QTimer (this);
 	_restart_timer->setInterval (500);
