@@ -54,6 +54,7 @@ class XBee:
 	static constexpr Time PeriodicAliveCheckTimeout	= 500_ms;
 	static constexpr Time ClearChannelCheck			= 2_s;
 	static constexpr Time AfterRestartGraceTime		= 500_ms;
+	static constexpr Time RSSITimeout				= 1_s;
 
 	static constexpr char EscapeChar				= '-';
 
@@ -203,6 +204,13 @@ class XBee:
 	 */
 	void
 	continue_after_reset();
+
+	/**
+	 * Called when RSSI value times out and becomes invalid.
+	 * Sets RSSI indicator to nil.
+	 */
+	void
+	rssi_timeout();
 
   private:
 	/**
@@ -405,6 +413,7 @@ class XBee:
 	QTimer*					_periodic_pong_timer	= nullptr;
 	QTimer*					_clear_channel_timer	= nullptr;
 	QTimer*					_after_reset_timer		= nullptr;
+	QTimer*					_rssi_timer				= nullptr;
 	std::map<int, int>		_baud_rates_map;
 	std::string				_baud_rate				= "9600";
 	std::string				_serial_number_bin;

@@ -109,6 +109,12 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_after_reset_timer->setSingleShot (true);
 	QObject::connect (_after_reset_timer, SIGNAL (timeout()), this, SLOT (continue_after_reset()));
 
+	_rssi_timer = new QTimer (this);
+	_rssi_timer->setInterval (RSSITimeout.ms());
+	_rssi_timer->setSingleShot (true);
+	QObject::connect (_rssi_timer, SIGNAL (timeout()), this, SLOT (rssi_timeout()));
+	_rssi_timer->start();
+
 	if (!vector_to_uint16 (Xefis::parse_binary_string (_local_address_string), _local_address))
 	{
 		log() << "Error: local address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
@@ -419,6 +425,13 @@ void
 XBee::continue_after_reset()
 {
 	configure_modem (static_cast<uint8_t> (_configuration_step), ATResponseStatus::OK, "");
+}
+
+
+void
+XBee::rssi_timeout()
+{
+	_rssi_dbm.set_nil();
 }
 
 
@@ -1089,6 +1102,9 @@ XBee::write_output_property (std::string const& data)
 void
 XBee::report_rssi (int dbm)
 {
+	// Restart timer:
+	_rssi_timer->start();
+
 	if (!_rssi_dbm.is_singular())
 	{
 		Time now = Time::now();
