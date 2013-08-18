@@ -1,17 +1,14 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='io/gps'>
-		<device>/dev/ttyAMA0</device>
-		<receiver-accuracy>1.8 m</receiver-accuracy>
-		<synchronize-system-clock/>
-		<default-baud-rate>9600</default-baud-rate>
-		<baud-rate>38400</baud-rate>
-		<!--debug-mode/-->
-		<initialization>
-			<pmtk comment='update rate'>PMTK220,100</pmtk>
-			<pmtk comment='enable SBAS'>PMTK313,1</pmtk>
-			<pmtk comment='integrity SBAS mode'>PMTK319,1</pmtk>
-		</initialization>
+		<settings>
+			<setting name='device' value='/dev/ttyAMA0'/>
+			<setting name='receiver-accuracy' value='1.8 m'/>
+			<setting name='synchronize-system-clock' value='true'/>
+			<setting name='default-baud-rate' value='9600'/>
+			<setting name='baud-rate' value='38400'/>
+			<setting name='debug' value='false'/>
+		</settings>
 		<properties>
 			<directory path='/sensors'>
 				<property name='serviceable' path='/gps/serviceable'/>
@@ -34,6 +31,11 @@
 				<property name='epoch-time' path='/gps/epoch-time'/>
 			</directory>
 		</properties>
+		<initialization>
+			<pmtk comment='update rate'>PMTK220,100</pmtk>
+			<pmtk comment='enable SBAS'>PMTK313,1</pmtk>
+			<pmtk comment='integrity SBAS mode'>PMTK319,1</pmtk>
+		</initialization>
 	</module>
 </xefis-include>
 

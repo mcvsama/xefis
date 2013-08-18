@@ -9,6 +9,7 @@
 			<setting name='local-address' value='00:01'/>
 			<setting name='remote-address' value='00:02'/>
 			<setting name='power-level' value='0'/>
+			<setting name='debug' value='false'/>
 		</settings>
 		<properties>
 			<property name='serviceable' path='/link/xbee/serviceable'/>
