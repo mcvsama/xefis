@@ -26,7 +26,7 @@
 namespace Xefis {
 
 Accounting::Stats::Stats (LatencySamples::size_type samples):
-	_samples (samples)
+	_samples (samples, 0_s)
 { }
 
 
@@ -36,8 +36,7 @@ Accounting::Stats::new_sample (Time sample)
 	_outdated_minimum = true;
 	_outdated_maximum = true;
 	_outdated_average = true;
-	std::rotate (_samples.begin(), _samples.begin() + _samples.size() - 1, _samples.end());
-	_samples[0] = sample;
+	_samples.push_back (sample);
 }
 
 
