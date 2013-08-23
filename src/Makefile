@@ -18,6 +18,8 @@ QT_PREFIX		:= /usr
 PROFILE			:=
 # Version:
 VERSION			:= alpha0.1dev
+# Release version? (no asserts, etc).
+RELEASE			:= 0
 
 # Predefined profiles:
 ifeq ($(PROFILE),rpi)
@@ -38,9 +40,9 @@ MOC				:= $(QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system pthread mhash
 PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets
 CXXFLAGS_s		:= $(CXXFLAGS)
-ifeq ($(OPTIMIZE),debug)
-XEFIS_FEATURES	+= XEFIS_ASSERTS
-XEFIS_FEATURES	+= XEFIS_ASSERTS_FATAL
+ifeq ($(DEBUG),1)
+XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
+XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
 CXXFLAGS		+= -O2 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
 else
 CXXFLAGS		+= -DQT_NO_DEBUG
@@ -96,6 +98,12 @@ ifeq ($(DEBUG),1)
 DEBUG_s = -debug
 else
 DEBUG_s =
+endif
+
+ifeq ($(RELEASE),1)
+CXXFLAGS += -DBOOST_DISABLE_ASSERTS
+else
+CXXFLAGS += -DXEFIS_ENABLE_ASSERT
 endif
 
 ifneq ($(PROFILE),)
