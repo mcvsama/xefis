@@ -16,7 +16,9 @@
 
 // Standard:
 #include <cstddef>
-#include <vector>
+
+// Boost:
+#include <boost/circular_buffer.hpp>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -34,7 +36,7 @@ class Accounting: public QObject
 {
 	Q_OBJECT
 
-	typedef std::vector<Time> LatencySamples;
+	typedef boost::circular_buffer<Time> LatencySamples;
 
   private:
 	class LatencyCheckEvent: public QEvent
