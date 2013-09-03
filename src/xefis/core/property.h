@@ -105,6 +105,12 @@ class GenericProperty
 	is_singular() const noexcept;
 
 	/**
+	 * Configured means not singular and having path != "".
+	 */
+	bool
+	configured() const noexcept;
+
+	/**
 	 * Valid means not singular and not nil.
 	 */
 	bool
@@ -446,6 +452,13 @@ inline bool
 GenericProperty::is_singular() const noexcept
 {
 	return !_root;
+}
+
+
+inline bool
+GenericProperty::configured() const noexcept
+{
+	return !is_singular() && !path().empty();
 }
 
 

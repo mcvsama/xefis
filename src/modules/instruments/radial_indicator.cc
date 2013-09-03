@@ -73,28 +73,16 @@ RadialIndicator::read()
 	_widget->set_value (*_value);
 	_widget->set_value_visible (_value.valid());
 
-	if (!_target.is_singular())
-	{
-		_widget->set_target_value (*_target);
-		_widget->set_target_visible (_target.valid());
-	}
+	_widget->set_target_value (*_target);
+	_widget->set_target_visible (_target.valid());
 
-	if (!_warning_value.is_singular())
-	{
-		_widget->set_warning_value (*_warning_value);
-		_widget->set_warning_visible (_warning_value.valid());
-	}
+	_widget->set_warning_value (*_warning_value);
+	_widget->set_warning_visible (_warning_value.valid());
 
-	if (!_critical_value.is_singular())
-	{
-		_widget->set_critical_value (*_critical_value);
-		_widget->set_critical_visible (_critical_value.valid());
-	}
+	_widget->set_critical_value (*_critical_value);
+	_widget->set_critical_visible (_critical_value.valid());
 
-	if (!_normal_value.is_singular())
-	{
-		_widget->set_normal_value (*_normal_value);
-		_widget->set_normal_visible (_normal_value.valid());
-	}
+	_widget->set_normal_value (*_normal_value);
+	_widget->set_normal_visible (_normal_value.valid());
 }
 

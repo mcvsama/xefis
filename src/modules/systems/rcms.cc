@@ -76,7 +76,7 @@ void
 RemoteControlManagementSystem::acquire_home()
 {
 	if (_position_longitude.valid() && _position_latitude.valid() && _position_altitude_amsl.valid() &&
-		!_home_longitude.is_singular() && !_home_latitude.is_singular() && !_home_altitude_amsl.is_singular())
+		_home_longitude.configured() && _home_latitude.configured() && _home_altitude_amsl.configured())
 	{
 		_home_longitude.copy (_position_longitude);
 		_home_latitude.copy (_position_latitude);

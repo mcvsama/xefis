@@ -286,11 +286,11 @@ FlightGearIO::read_input()
 		FGInputData* fg_data = reinterpret_cast<FGInputData*> (_input_datagram.data());
 
 #define ASSIGN(unit, x) \
-		if (!_##x.is_singular()) \
+		if (_##x.configured()) \
 			_##x.write (1_##unit * fg_data->x##_##unit);
 
 #define ASSIGN_UNITLESS(x) \
-		if (!_##x.is_singular()) \
+		if (_##x.configured()) \
 			_##x.write (fg_data->x);
 
 		ASSIGN (ft,   cmd_alt_setting);
@@ -336,16 +336,16 @@ FlightGearIO::read_input()
 #undef ASSIGN_UNITLESS
 #undef ASSIGN
 
-		if (!_vertical_deviation.is_singular())
+		if (_vertical_deviation.configured())
 			_vertical_deviation.write (2_deg * fg_data->vertical_deviation_deg);
-		if (!_lateral_deviation.is_singular())
+		if (_lateral_deviation.configured())
 			_lateral_deviation.write (2_deg * fg_data->lateral_deviation_deg);
 
-		if (!fg_data->vertical_deviation_ok && !_vertical_deviation.is_singular())
+		if (!fg_data->vertical_deviation_ok && _vertical_deviation.configured())
 			_vertical_deviation.set_nil();
-		if (!fg_data->lateral_deviation_ok && !_lateral_deviation.is_singular())
+		if (!fg_data->lateral_deviation_ok && _lateral_deviation.configured())
 			_lateral_deviation.set_nil();
-		if (!fg_data->navigation_dme_ok && !_dme_distance.is_singular())
+		if (!fg_data->navigation_dme_ok && _dme_distance.configured())
 			_dme_distance.set_nil();
 
 		if (_outside_air_temperature_k.valid())
@@ -377,7 +377,7 @@ FlightGearIO::write_output()
 	FGOutputData fg_data;
 
 #define ASSIGN(x) \
-		if (!_##x.is_singular()) \
+		if (_##x.valid()) \
 			fg_data.x = *_##x;
 
 	ASSIGN (ailerons);

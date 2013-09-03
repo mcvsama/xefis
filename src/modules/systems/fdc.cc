@@ -768,7 +768,7 @@ FlightDataComputer::compute_cgratio()
 void
 FlightDataComputer::compute_tev()
 {
-	if (!_total_energy_variometer.is_singular())
+	if (_total_energy_variometer.configured())
 	{
 		if (_actual_airplane_weight_g.valid() &&
 			_pressure_altitude_std_amsl.valid() &&
@@ -808,7 +808,7 @@ FlightDataComputer::compute_tev()
 void
 FlightDataComputer::compute_alt_reach_distance()
 {
-	if (!_target_altitude_reach_distance.is_singular())
+	if (_target_altitude_reach_distance.configured())
 	{
 		if (_target_pressure_altitude_amsl.valid() &&
 			_ground_speed.valid() &&

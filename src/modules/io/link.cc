@@ -786,11 +786,11 @@ Link::data_updated()
 void
 Link::send_output()
 {
-	_output_blob.clear();
-	produce (_output_blob);
-
-	if (!_output.is_singular())
+	if (_output.configured())
 	{
+		_output_blob.clear();
+		produce (_output_blob);
+
 		std::string s;
 		s.insert (s.end(), _output_blob.begin(), _output_blob.end());
 		_output.write (s);
@@ -802,10 +802,10 @@ Link::send_output()
 void
 Link::failsafe()
 {
-	if (_link_valid_prop.valid())
+	if (_link_valid_prop.configured())
 		_link_valid_prop.write (false);
 	_link_valid = false;
-	if (_failsafes.valid())
+	if (_failsafes.configured())
 		_failsafes.write (*_failsafes + 1);
 	for (Packet* p: _packets)
 		p->failsafe();
@@ -815,10 +815,10 @@ Link::failsafe()
 void
 Link::reacquire()
 {
-	if (_link_valid_prop.valid())
+	if (_link_valid_prop.configured())
 		_link_valid_prop.write (true);
 	_link_valid = true;
-	if (_reacquires.valid())
+	if (_reacquires.configured())
 		_reacquires.write (*_reacquires + 1);
 }
 
@@ -879,10 +879,10 @@ Link::eat (Blob& blob)
 			packet->apply();
 			applied = true;
 
-			if (_valid_packets.valid())
+			if (_valid_packets.configured())
 				_valid_packets.write (*_valid_packets + 1);
 
-			if (_valid_bytes.valid())
+			if (_valid_bytes.configured())
 				_valid_bytes.write (*_valid_bytes + valid_bytes);
 
 			// Restart failsafe timer:
@@ -898,7 +898,7 @@ Link::eat (Blob& blob)
 			// Skip one byte and try again:
 			if (blob.size() >= 1)
 				blob.erase (blob.begin(), blob.begin() + 1);
-			if (_error_bytes.valid())
+			if (_error_bytes.configured())
 				_error_bytes.write (*_error_bytes + 1);
 
 			// Since there was an error, stop reacquire timer:

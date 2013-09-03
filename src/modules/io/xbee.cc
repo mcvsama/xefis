@@ -167,7 +167,7 @@ XBee::data_updated()
 	if (!_notifier)
 		return;
 
-	if (!_send.is_singular() && _send.fresh() && configured())
+	if (_send.valid() && _send.fresh() && configured())
 	{
 		std::string data = _output_buffer + *_send;
 		std::vector<std::string> packets = packetize (data, 100); // Max 100 bytes per packet according to XBee docs.
@@ -321,7 +321,7 @@ XBee::failure (std::string const& reason)
 	_notifier = nullptr;
 	::close (_device);
 
-	if (!_failures.is_singular())
+	if (_failures.configured())
 		_failures.write (*_failures + 1);
 
 	restart();
@@ -872,7 +872,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 		// Discard non-parseable data:
 		input.erase (input.begin(), input.begin() + p);
 
-		if (!_input_errors.is_singular())
+		if (_input_errors.configured())
 			_input_errors.write (*_input_errors + p);
 
 		// Delimiter (1B) + packet size (2B) + data (1B) + checksum (1B) gives
@@ -1091,7 +1091,7 @@ XBee::process_at_response_frame (std::string const& frame)
 void
 XBee::write_output_property (std::string const& data)
 {
-	if (!_receive.is_singular() && configured())
+	if (_receive.configured() && configured())
 	{
 		_receive.write (data);
 		signal_data_updated();
@@ -1105,7 +1105,7 @@ XBee::report_rssi (int dbm)
 	// Restart timer:
 	_rssi_timer->start();
 
-	if (!_rssi_dbm.is_singular())
+	if (_rssi_dbm.configured())
 	{
 		Time now = Time::now();
 		_rssi_dbm.write (_rssi_smoother.process (static_cast<double> (dbm), now - _last_rssi_time));
@@ -1159,7 +1159,7 @@ XBee::clear_channel_result (ATResponseStatus status, std::string const& result)
 {
 	if (status == ATResponseStatus::OK && result.size() >= 2)
 	{
-		if (!_cca_failures.is_singular())
+		if (_cca_failures.configured())
 		{
 			uint16_t failures = (static_cast<uint16_t> (result[0]) >> 8) | result[1];
 			_cca_failures.write (*_cca_failures + failures);
