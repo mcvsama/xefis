@@ -38,11 +38,13 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	{
 		if (e == "properties")
 		{
+			parse_settings (e, {
+				{ "temperature.read-interval", _temperature_interval, true },
+				{ "pressure.read-interval", _pressure_interval, true },
+			});
 			parse_properties (e, {
 				{ "temperature", _temperature, true },
-				{ "temperature.read-interval", _temperature_interval, true },
 				{ "pressure", _pressure, true },
-				{ "pressure.read-interval", _pressure_interval, true },
 			});
 		}
 		else if (e == "i2c")
@@ -81,17 +83,17 @@ BMP085::initialize()
 		_md = read_s16 (MD_REG);
 
 		_temperature_timer = new QTimer (this);
-		_temperature_timer->setInterval ((*_temperature_interval).ms());
+		_temperature_timer->setInterval (_temperature_interval.ms());
 		_temperature_timer->setSingleShot (false);
 		QObject::connect (_temperature_timer, SIGNAL (timeout()), this, SLOT (request_temperature()));
 
 		_temperature_ready_timer = new QTimer (this);
-		_temperature_ready_timer->setInterval (4.5);
+		_temperature_ready_timer->setInterval (5);
 		_temperature_ready_timer->setSingleShot (true);
 		QObject::connect (_temperature_ready_timer, SIGNAL (timeout()), this, SLOT (read_temperature()));
 
 		_pressure_timer = new QTimer (this);
-		_pressure_timer->setInterval ((*_pressure_interval).ms());
+		_pressure_timer->setInterval (_pressure_interval.ms());
 		_pressure_timer->setSingleShot (false);
 		QObject::connect (_pressure_timer, SIGNAL (timeout()), this, SLOT (request_pressure()));
 

@@ -98,9 +98,9 @@ class BMP085:
 	static constexpr uint8_t	MD_REG	= 0xbe;
 	// Data:
 	Xefis::PropertyFloat		_temperature;
-	Xefis::PropertyTime			_temperature_interval;
+	Time						_temperature_interval		= 500_ms;
 	Xefis::PropertyPressure		_pressure;
-	Xefis::PropertyTime			_pressure_interval;
+	Time						_pressure_interval			= 50_ms;
 	uint8_t						_i2c_bus_number;
 	Xefis::I2C::Bus				_i2c_bus;
 	Xefis::I2C::Address			_i2c_address;
