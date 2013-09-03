@@ -26,7 +26,7 @@
 #include "ets_airspeed.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/et-airspeed", ETSAirspeed);
+XEFIS_REGISTER_MODULE_CLASS ("io/ets-airspeed", ETSAirspeed);
 
 
 ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement const& config):

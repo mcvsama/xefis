@@ -9,11 +9,11 @@
 							<module name='instruments/efis'>
 								<properties>
 									<directory path='/instruments/efis'>
-										<property name='speed-ladder.line-every' path='/speed-ladder/line-every' default='10'/>
-										<property name='speed-ladder.number-every' path='/speed-ladder/number-every' default='20'/>
-										<property name='speed-ladder.extent' path='/speed-ladder/extent' default='124'/>
+										<property name='speed-ladder.line-every' path='/speed-ladder/line-every' default='5'/>
+										<property name='speed-ladder.number-every' path='/speed-ladder/number-every' default='10'/>
+										<property name='speed-ladder.extent' path='/speed-ladder/extent' default='62'/>
 										<property name='speed-ladder.minimum' path='/speed-ladder/minimum' default='20'/>
-										<property name='speed-ladder.maximum' path='/speed-ladder/maximum' default='900'/>
+										<property name='speed-ladder.maximum' path='/speed-ladder/maximum' default='350'/>
 										<property name='speed-ladder.novspd-flag' path='/novspd-flag' default='false'/>
 										<property name='altitude-ladder.line-every' path='/altitude-ladder/line-every' default='100'/>
 										<property name='altitude-ladder.number-every' path='/altitude-ladder/number-every' default='200'/>
