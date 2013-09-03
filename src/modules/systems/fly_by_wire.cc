@@ -172,9 +172,9 @@ FlyByWire::data_updated()
 	}
 
 	// Output:
-	if (!_output_pitch.is_singular())
+	if (_output_pitch.configured())
 		_output_pitch.write (_pre_output_pitch);
-	if (!_output_roll.is_singular())
+	if (_output_roll.configured())
 		_output_roll.write (_pre_output_roll);
 
 	_dt = Time::epoch();
@@ -215,10 +215,10 @@ FlyByWire::integrate_manual_input()
 	_pre_output_roll = floored_mod<float> (_pre_output_roll.deg(), -180.0, +180.0) * 1_deg;
 
 	// Joystick visualisation on EFIS:
-	if (!_output_control_stick_pitch.is_singular())
+	if (_output_control_stick_pitch.configured())
 		_output_control_stick_pitch.write (axis_pitch * target_pitch_extent);
 
-	if (!_output_control_stick_roll.is_singular())
+	if (_output_control_stick_roll.configured())
 		_output_control_stick_roll.write (axis_roll * target_roll_extent);
 }
 

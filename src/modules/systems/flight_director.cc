@@ -168,7 +168,7 @@ FlightDirector::data_updated()
 void
 FlightDirector::update_lateral_hint()
 {
-	if (!_lateral_mode_hint.is_singular())
+	if (_lateral_mode_hint.configured())
 	{
 		switch (static_cast<LateralMode> (*_lateral_mode))
 		{
@@ -191,7 +191,7 @@ FlightDirector::update_lateral_hint()
 void
 FlightDirector::update_vertical_hint()
 {
-	if (!_vertical_mode_hint.is_singular())
+	if (_vertical_mode_hint.configured())
 	{
 		switch (static_cast<VerticalMode> (*_vertical_mode))
 		{

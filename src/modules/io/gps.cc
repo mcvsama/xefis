@@ -466,7 +466,7 @@ GPS::process()
 			}
 			else
 			{
-				if (!_read_errors.is_singular())
+				if (_read_errors.configured())
 					_read_errors.write (*_read_errors + 1);
 			}
 		});

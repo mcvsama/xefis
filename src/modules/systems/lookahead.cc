@@ -72,7 +72,7 @@ Lookahead::Lookahead (Xefis::ModuleManager* module_manager, QDomElement const& c
 void
 Lookahead::data_updated()
 {
-	if (_output.is_singular() || !_lookahead_time.valid())
+	if (!_output.configured() || !_lookahead_time.valid())
 	{
 		_output_smoother.invalidate();
 		_output_estimator.invalidate();

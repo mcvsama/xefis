@@ -84,7 +84,7 @@ UDP::~UDP()
 void
 UDP::data_updated()
 {
-	if (!_send.is_singular() && _send.fresh())
+	if (_send.valid() && _send.fresh())
 	{
 		std::string data = *_send;
 		QByteArray blob (data.data(), data.size());
@@ -112,7 +112,7 @@ UDP::got_udp_packet()
 	if (_receive_interference)
 		interfere (_receive_datagram);
 
-	if (!_receive.is_singular())
+	if (_receive.configured())
 	{
 		_receive.write (std::string (_receive_datagram.data(), _receive_datagram.size()));
 		signal_data_updated();
