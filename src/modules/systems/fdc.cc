@@ -49,7 +49,14 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "settings")
+		{
+			parse_settings (e, {
+				{ "airspeed.valid-minimum", _airspeed_valid_minimum, true },
+				{ "airspeed.valid-maximum", _airspeed_valid_maximum, true },
+			});
+		}
+		else if (e == "properties")
 		{
 			parse_properties (e, {
 				// Input:
@@ -89,7 +96,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "ins.timestamp", _ins_timestamp, true },
 				{ "pressure.static", _static_pressure, true },
 				{ "gear-down", _gear_down, true },
-				{ "ias", _ias, true },
+				{ "airspeed", _ias_input, true },
 				{ "outside-air-temperature", _outside_air_temperature_k, true },
 				// Output:
 				{ "position.longitude", _position_longitude, true },
@@ -112,6 +119,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "pressure-altitude.climb-rate", _pressure_altitude_climb_rate, true },
 				{ "pressure-altitude.total-energy-variometer", _total_energy_variometer, false },
 				{ "speed.v-a", _v_a, true },
+				{ "speed.ias", _ias, true },
 				{ "speed.minimum-ias", _minimum_ias, true },
 				{ "speed.minimum-maneuver-ias", _minimum_maneuver_ias, true },
 				{ "speed.maximum-ias", _maximum_ias, true },
@@ -160,6 +168,9 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 
 	_track_computer.set_callback (std::bind (&FlightDataComputer::compute_track, this));
 	_track_computer.observe ({ &_position_computer, &_magnetic_declination });
+
+	_ias_computer.set_callback (std::bind (&FlightDataComputer::compute_ias, this));
+	_ias_computer.observe ({ &_ias_input });
 
 	_da_computer.set_callback (std::bind (&FlightDataComputer::compute_da, this));
 	_da_computer.observe ({ &_outside_air_temperature_k, &_pressure_altitude_amsl });
@@ -216,6 +227,7 @@ FlightDataComputer::data_updated()
 		&_magnetic_variation_computer,
 		&_headings_computer,
 		&_track_computer,
+		&_ias_computer,
 		&_da_computer,
 		&_sound_speed_computer,
 		&_true_airspeed_computer,
@@ -507,6 +519,24 @@ FlightDataComputer::compute_track()
 
 
 void
+FlightDataComputer::compute_ias()
+{
+	Time update_dt = _ias_computer.update_dt();
+
+	if (_ias_input.valid() && _airspeed_valid_maximum >= *_ias_input)
+	{
+		_airspeed_reached_minimum = _airspeed_valid_minimum <= *_ias_input;
+		_ias.write (1_kt * _ias_smoother.process ((*_ias_input).kt(), update_dt));
+	}
+	else
+	{
+		_ias.set_nil();
+		_ias_smoother.invalidate();
+	}
+}
+
+
+void
 FlightDataComputer::compute_da()
 {
 	if (_outside_air_temperature_k.valid() && _pressure_altitude_amsl.valid())
@@ -540,7 +570,7 @@ FlightDataComputer::compute_sound_speed()
 void
 FlightDataComputer::compute_true_airspeed()
 {
-	if (_ias.valid() && _pressure_altitude_amsl.valid())
+	if (_ias.valid() && _airspeed_reached_minimum && _pressure_altitude_amsl.valid())
 	{
 		Speed cas = *_ias;
 
@@ -785,7 +815,8 @@ FlightDataComputer::compute_tev()
 
 		if (_actual_airplane_weight_g.valid() &&
 			_pressure_altitude_std_amsl.valid() &&
-			_ias.valid())
+			_ias.valid() &&
+			_airspeed_reached_minimum)
 		{
 			double const m = *_actual_airplane_weight_g;
 			double const g = 9.81;

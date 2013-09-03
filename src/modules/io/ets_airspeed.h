@@ -86,11 +86,11 @@ class ETSAirspeed:
 
   private:
 	Xefis::PropertyBoolean	_serviceable;
-	Xefis::PropertySpeed	_ias;
-	Xefis::PropertySpeed	_ias_minimum;
-	Xefis::PropertySpeed	_ias_maximum;
-	Time					_ias_read_interval			= 100_ms;
-	Time					_ias_smoothing_time			= 100_ms;
+	Xefis::PropertySpeed	_airspeed;
+	Xefis::PropertySpeed	_airspeed_minimum;
+	Xefis::PropertySpeed	_airspeed_maximum;
+	Time					_airspeed_read_interval		= 100_ms;
+	Time					_airspeed_smoothing_time	= 100_ms;
 	Xefis::I2C::Bus			_i2c_bus;
 	Xefis::I2C::Address		_i2c_address;
 	Stage					_stage						= Stage::Calibrating;
@@ -98,7 +98,7 @@ class ETSAirspeed:
 	QTimer*					_periodic_read_timer;
 	std::vector<uint16_t>	_calibration_data;
 	uint16_t				_offset						= 0;
-	Xefis::Smoother<double>	_ias_smoother				= 100_ms;
+	Xefis::Smoother<double>	_airspeed_smoother			= 100_ms;
 };
 
 #endif

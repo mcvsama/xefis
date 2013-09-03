@@ -67,6 +67,9 @@ class FlightDataComputer: public Xefis::Module
 	compute_track();
 
 	void
+	compute_ias();
+
+	void
 	compute_da();
 
 	void
@@ -118,6 +121,7 @@ class FlightDataComputer: public Xefis::Module
 	Speed						_computed_climb_rate				= 0_fpm;
 	Xefis::Smoother<double>		_track_vertical_smoother			= 500_ms;
 	Xefis::Smoother<double>		_track_lateral_true_smoother		= 500_ms;
+	Xefis::Smoother<double>		_ias_smoother						= 100_ms;
 	Xefis::Smoother<double>		_wind_direction_smoother			= 2_s;
 	Xefis::Smoother<double>		_ground_speed_smoother				= 1_s;
 	Xefis::Smoother<double>		_climb_rate_smoother				= 1_s;
@@ -145,6 +149,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyObserver		_magnetic_variation_computer;
 	Xefis::PropertyObserver		_headings_computer;
 	Xefis::PropertyObserver		_track_computer;
+	Xefis::PropertyObserver		_ias_computer;
 	Xefis::PropertyObserver		_da_computer;
 	Xefis::PropertyObserver		_sound_speed_computer;
 	Xefis::PropertyObserver		_true_airspeed_computer;
@@ -161,6 +166,9 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyObserver		_alt_reach_distance_computer;
 
 	// Input parameters:
+	Speed						_airspeed_valid_minimum;
+	Speed						_airspeed_valid_maximum;
+	bool						_airspeed_reached_minimum;
 	Xefis::PropertyFloat		_default_airplane_weight_g; // TODO
 	Xefis::PropertyFloat		_actual_airplane_weight_g; // TODO
 	Xefis::PropertyAngle		_low_speed_roll_angle; // TODO
@@ -181,7 +189,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyPressure		_qnh_pressure;
 	Xefis::PropertyAngle		_critical_aoa;
 	Xefis::PropertyLength		_target_pressure_altitude_amsl;
-	Xefis::PropertySpeed		_ias;
+	Xefis::PropertySpeed		_ias_input;
 	Xefis::PropertyFloat		_outside_air_temperature_k;
 	// Input IMU:
 	Xefis::PropertyAngle		_imu_pitch;
@@ -228,6 +236,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertySpeed		_pressure_altitude_climb_rate;
 	// Output speeds:
 	Xefis::PropertySpeed		_v_a; // TODO
+	Xefis::PropertySpeed		_ias;
 	Xefis::PropertySpeed		_minimum_ias;
 	Xefis::PropertySpeed		_minimum_maneuver_ias;
 	Xefis::PropertySpeed		_maximum_ias;

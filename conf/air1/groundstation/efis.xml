@@ -49,11 +49,11 @@
 										<property name='flight-director.visible' path='/guidance-visible'/>
 									</directory>
 									<directory path='/sensors'>
-										<property name='speed.ias' path='/speed/ias'/>
 										<property name='slip-skid' path='/slip-skid/slip-skid'/>
 										<property name='altitude.agl' path='/radar-altimeter/agl'/>
 									</directory>
 									<directory path='/systems/fdc'>
+										<property name='speed.ias' path='/speed/ias'/>
 										<property name='speed.ias.minimum' path='/speed/ias-minimum'/>
 										<property name='speed.ias.warning' path='/speed/ias-minimum-maneuver'/>
 										<property name='speed.ias.maximum' path='/speed/ias-maximum'/>
