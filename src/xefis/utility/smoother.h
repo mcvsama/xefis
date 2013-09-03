@@ -19,6 +19,9 @@
 #include <cmath>
 #include <algorithm>
 
+// Boost:
+#include <boost/circular_buffer.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
@@ -104,19 +107,16 @@ template<class tValueType>
 		ValueType
 		decircle (ValueType s) const noexcept;
 
-		static void
-		shift (std::vector<ValueType>& vector, ValueType new_first) noexcept;
-
 	  private:
-		Time					_smoothing_time;
-		Time					_precision;
-		ValueType				_z;
-		Range<ValueType>		_winding;
-		bool					_winding_enabled	= false;
-		bool					_invalidate			= false;
-		std::vector<ValueType>	_history;
-		std::vector<ValueType>	_history_cos;
-		std::vector<ValueType>	_history_sin;
+		Time								_smoothing_time;
+		Time								_precision;
+		ValueType							_z;
+		Range<ValueType>					_winding;
+		bool								_winding_enabled	= false;
+		bool								_invalidate			= false;
+		boost::circular_buffer<ValueType>	_history;
+		boost::circular_buffer<ValueType>	_history_cos;
+		boost::circular_buffer<ValueType>	_history_sin;
 	};
 
 
@@ -225,14 +225,14 @@ template<class V>
 				for (int i = 0; i < iterations; ++i)
 				{
 					ValueType d = static_cast<ValueType> (i + 1) / iterations;
-					shift (_history, p + d * (s - p));
-					shift (_history_cos, cos_p + d * (cos_s - cos_p));
-					shift (_history_sin, sin_p + d * (sin_s - sin_p));
+					_history.push_back (p + d * (s - p));
+					_history_cos.push_back (cos_p + d * (cos_s - cos_p));
+					_history_sin.push_back (sin_p + d * (sin_s - sin_p));
 				}
 
 				ValueType x = 0.0;
 				ValueType y = 0.0;
-				for (typename std::vector<ValueType>::size_type i = 0; i < _history.size(); ++i)
+				for (typename boost::circular_buffer<ValueType>::size_type i = 0; i < _history.size(); ++i)
 				{
 					x += _history_cos[i];
 					y += _history_sin[i];
@@ -243,7 +243,7 @@ template<class V>
 			{
 				ValueType p = _history[0];
 				for (int i = 0; i < iterations; ++i)
-					shift (_history, p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
+					_history.push_back (p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
 
 				_z = 0.0;
 				for (ValueType v: _history)
@@ -285,15 +285,6 @@ template<class V>
 	Smoother<V>::decircle (ValueType s) const noexcept
 	{
 		return renormalize (s, Range<ValueType> (0.0, 2.0 * M_PI), _winding);
-	}
-
-
-template<class V>
-	inline void
-	Smoother<V>::shift (std::vector<ValueType>& vector, ValueType new_first) noexcept
-	{
-		std::rotate (vector.begin(), vector.begin() + vector.size() - 1, vector.end());
-		vector[0] = new_first;
 	}
 
 } // namespace Xefis
