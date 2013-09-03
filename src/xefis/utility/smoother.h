@@ -206,6 +206,9 @@ template<class V>
 			reset (s);
 		}
 
+		if (dt > _smoothing_time)
+			dt = _smoothing_time;
+
 		int iterations = std::round (dt / _precision);
 		if (iterations > 1)
 		{
