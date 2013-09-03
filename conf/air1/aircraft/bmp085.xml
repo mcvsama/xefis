@@ -5,12 +5,14 @@
 			<bus>1</bus>
 			<address>0x77</address>
 		</i2c>
+		<settings>
+			<setting name='pressure.read-interval' value='50 ms'/>
+			<setting name='temperature.read-interval' value='500 ms'/>
+		</settings>
 		<properties>
 			<directory path='/sensors'>
 				<property name='pressure' path='/pressure/pressure'/>
-				<property name='pressure.read-interval' path='/pressure/read-interval' default='50 ms'/>
 				<property name='temperature' path='/temperature/outside.k'/>
-				<property name='temperature.read-interval' path='/temperature/read-interval' default='500 ms'/>
 			</directory>
 		</properties>
 	</module>
