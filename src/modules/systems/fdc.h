@@ -109,7 +109,6 @@ class FlightDataComputer: public Xefis::Module
 	compute_alt_reach_distance();
 
   private:
-	Time						_now;
 	// [0] - new, [2] - old
 	std::array<Position, 3>		_positions;
 	std::array<Position, 3>		_ac1_positions;

@@ -53,7 +53,6 @@ class RemoteControlManagementSystem: public Xefis::Module
 	compute_true_home_direction();
 
   private:
-	Time					_now;
 	bool					_home_acquired = false;
 	Xefis::PropertyObserver	_distance_computer;
 	// Input:

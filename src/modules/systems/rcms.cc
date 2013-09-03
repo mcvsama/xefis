@@ -89,12 +89,10 @@ RemoteControlManagementSystem::acquire_home()
 void
 RemoteControlManagementSystem::data_updated()
 {
-	_now = Time::now();
-
 	if (!home_is_valid())
 		acquire_home();
 
-	_distance_computer.data_updated();
+	_distance_computer.data_updated (update_time());
 }
 
 
