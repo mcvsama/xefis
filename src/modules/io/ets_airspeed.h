@@ -1,0 +1,105 @@
+/* vim:ts=4
+ *
+ * Copyleft 2012…2013  Michał Gawron
+ * Marduk Unix Labs, http://mulabs.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ *
+ * This module was based on Paparazzi AirspeedETS module.
+ */
+
+#ifndef XEFIS__MODULES__IO__ETAIRSPEED_H__INCLUDED
+#define XEFIS__MODULES__IO__ETAIRSPEED_H__INCLUDED
+
+// Standard:
+#include <cstddef>
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/property.h>
+#include <xefis/utility/i2c.h>
+#include <xefis/utility/smoother.h>
+
+
+/**
+ * Handles EagleTree Airspeed V3 sensor.
+ * The sensor must be in default mode, not in 3-rd party mode.
+ */
+class ETSAirspeed:
+	public QObject,
+	public Xefis::Module
+{
+	Q_OBJECT
+
+	static constexpr uint8_t ValueRegister					= 0xea;
+	static constexpr float ValueScale						= 1.8f;
+	static constexpr Time InitializationDelay				= 0.2_s;
+	static constexpr unsigned int OffsetCalculationSamples	= 100;
+	static constexpr uint16_t RawValueMinimum				= 1450;
+	static constexpr uint16_t RawValueMaximum				= 1750;
+
+	enum class Stage {
+		Calibrating,
+		Running,
+	};
+
+  public:
+	// Ctor:
+	ETSAirspeed (Xefis::ModuleManager*, QDomElement const& config);
+
+  private slots:
+	/**
+	 * Starts module calibration.
+	 */
+	void
+	initialize();
+
+	/**
+	 * Reinitialize module after failure.
+	 * Don't recalibrate.
+	 */
+	void
+	reinitialize();
+
+	/**
+	 * Read data from the sensor and update properties.
+	 */
+	void
+	read();
+
+  private:
+	/**
+	 * Called when enough initial samples are collected to get
+	 * offset value.
+	 */
+	void
+	offset_collected();
+
+	void
+	guard (std::function<void()> guarded_code);
+
+  private:
+	Xefis::PropertyBoolean	_serviceable;
+	Xefis::PropertySpeed	_ias;
+	Xefis::PropertySpeed	_ias_minimum;
+	Xefis::PropertySpeed	_ias_maximum;
+	Time					_ias_read_interval			= 100_ms;
+	Time					_ias_smoothing_time			= 100_ms;
+	Xefis::I2C::Bus			_i2c_bus;
+	Xefis::I2C::Address		_i2c_address;
+	Stage					_stage						= Stage::Calibrating;
+	QTimer*					_initialization_timer;
+	QTimer*					_periodic_read_timer;
+	std::vector<uint16_t>	_calibration_data;
+	uint16_t				_offset						= 0;
+	Xefis::Smoother<double>	_ias_smoother				= 100_ms;
+};
+
+#endif
+
