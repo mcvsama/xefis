@@ -52,7 +52,7 @@ PropertyObserver::set_callback (Callback callback)
 
 
 void
-PropertyObserver::data_updated()
+PropertyObserver::data_updated (Time update_time)
 {
 	bool updated = false;
 
@@ -68,6 +68,8 @@ PropertyObserver::data_updated()
 
 	if (updated)
 	{
+		_update_dt = update_time - _update_time;
+		_update_time = update_time;
 		++_serial;
 		_callback();
 	}

@@ -86,8 +86,8 @@ FlightDirector::data_updated()
 {
 	using Xefis::limit;
 
-	_lateral_hint_computer.data_updated();
-	_vertical_hint_computer.data_updated();
+	_lateral_hint_computer.data_updated (update_time());
+	_vertical_hint_computer.data_updated (update_time());
 
 	// Don't process if dt is too small:
 	_dt += update_dt();

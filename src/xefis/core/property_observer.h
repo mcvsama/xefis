@@ -93,7 +93,7 @@ class PropertyObserver
 	 * its checks.
 	 */
 	void
-	data_updated();
+	data_updated (Time update_time);
 
 	/**
 	 * Return serial value.
@@ -103,10 +103,25 @@ class PropertyObserver
 	Serial
 	serial() const noexcept;
 
+	/**
+	 * Return last update time.
+	 */
+	Time
+	update_time() const noexcept;
+
+	/**
+	 * Return time delta since last update and
+	 * call to the callback function.
+	 */
+	Time
+	update_dt() const noexcept;
+
   private:
 	ObjectsList		_objects;
 	Callback		_callback;
-	Serial			_serial = 0;
+	Serial			_serial			= 0;
+	Time			_update_time	= 0_s;
+	Time			_update_dt		= 0_s;
 };
 
 
@@ -135,6 +150,20 @@ inline PropertyObserver::Serial
 PropertyObserver::serial() const noexcept
 {
 	return _serial;
+}
+
+
+inline Time
+PropertyObserver::update_time() const noexcept
+{
+	return _update_time;
+}
+
+
+inline Time
+PropertyObserver::update_dt() const noexcept
+{
+	return _update_dt;
 }
 
 } // namespace Xefis

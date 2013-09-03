@@ -210,8 +210,6 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 void
 FlightDataComputer::data_updated()
 {
-	_now = Time::now();
-
 	Xefis::PropertyObserver* computers[] = {
 		// Order is important:
 		&_position_computer,
@@ -235,13 +233,16 @@ FlightDataComputer::data_updated()
 	};
 
 	for (Xefis::PropertyObserver* o: computers)
-		o->data_updated();
+		o->data_updated (update_time());
 }
 
 
 void
 FlightDataComputer::compute_position()
 {
+	Time update_time = _position_computer.update_time();
+	Time update_dt = _position_computer.update_dt();
+
 	enum PositionSource { GPS, INS };
 
 	PositionSource source;
@@ -295,7 +296,7 @@ FlightDataComputer::compute_position()
 	_positions[0].vertical_accuracy = _position_vertical_accuracy.read (failed_accuracy);
 	_positions[0].valid = _position_longitude.valid() && _position_latitude.valid() &&
 						  _position_altitude_amsl.valid() && _position_lateral_accuracy.valid() && _position_vertical_accuracy.valid();
-	_positions[0].time = _now;
+	_positions[0].time = update_time;
 
 	// Delayed positioning:
 	if (_positions[0].valid)
@@ -356,15 +357,15 @@ FlightDataComputer::compute_position()
 		}
 
 		if (hide_alt_lookahead)
-			_hide_alt_lookahead_until = update_time() + _alt_lookahead_output_smoother.smoothing_time() + _alt_lookahead_input_smoother.smoothing_time();
+			_hide_alt_lookahead_until = update_time + _alt_lookahead_output_smoother.smoothing_time() + _alt_lookahead_input_smoother.smoothing_time();
 
 		Length height = compute_pressure_altitude (pressure_setting);
 		Length qnh_height = compute_pressure_altitude (*_qnh_pressure);
 		Length std_height = compute_pressure_altitude (29.92_inHg);
 
-		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft(), update_dt()));
-		_pressure_altitude_qnh_amsl.write (1_ft * _pressure_alt_qnh_smoother.process (qnh_height.ft(), update_dt()));
-		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft(), update_dt()));
+		_pressure_altitude_amsl.write (1_ft * _pressure_alt_smoother.process (height.ft(), update_dt));
+		_pressure_altitude_qnh_amsl.write (1_ft * _pressure_alt_qnh_smoother.process (qnh_height.ft(), update_dt));
+		_pressure_altitude_std_amsl.write (1_ft * _pressure_alt_std_smoother.process (std_height.ft(), update_dt));
 	}
 	else
 	{
@@ -376,10 +377,10 @@ FlightDataComputer::compute_position()
 		_pressure_alt_std_smoother.invalidate();
 	}
 
-	if (_pressure_altitude_amsl.valid() && update_time() > _hide_alt_lookahead_until)
+	if (_pressure_altitude_amsl.valid() && update_time > _hide_alt_lookahead_until)
 	{
-		double est = _pressure_alt_estimator.process (_alt_lookahead_input_smoother.process ((*_pressure_altitude_amsl).ft(), update_dt()), update_dt());
-		est = _alt_lookahead_output_smoother.process (est, update_dt());
+		double est = _pressure_alt_estimator.process (_alt_lookahead_input_smoother.process ((*_pressure_altitude_amsl).ft(), update_dt), update_dt);
+		est = _alt_lookahead_output_smoother.process (est, update_dt);
 		_pressure_altitude_amsl_lookahead.write (1_ft * est);
 	}
 	else
@@ -442,17 +443,19 @@ FlightDataComputer::compute_headings()
 void
 FlightDataComputer::compute_track()
 {
+	Time update_dt = _track_computer.update_dt();
+
 	if (_ac1_positions[0].valid && _ac1_positions[1].valid)
 	{
 		Length distance = _ac1_positions[0].lateral_position.haversine_earth (_ac1_positions[1].lateral_position);
 		if (distance > 2.0 * _ac1_positions[0].lateral_accuracy)
 		{
 			Length altitude_diff = _ac1_positions[0].altitude - _ac1_positions[1].altitude;
-			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt()));
+			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt));
 
 			Angle initial_true_heading = _ac1_positions[0].lateral_position.initial_bearing (_ac1_positions[1].lateral_position);
 			Angle true_heading = floored_mod (initial_true_heading + 180_deg, 360_deg);
-			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt()));
+			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt));
 
 			if (_magnetic_declination.valid())
 				_track_lateral_magnetic.write (Xefis::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
@@ -490,7 +493,7 @@ FlightDataComputer::compute_track()
 
 			if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
 			{
-				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg(), update_dt());
+				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg(), update_dt);
 				result_delta = limit (beta_per_mile, -180.0_deg, +180.0_deg);
 			}
 			else
@@ -561,9 +564,11 @@ FlightDataComputer::compute_ground_speed()
 {
 	if (_ac2_positions[0].valid && _ac2_positions[1].valid)
 	{
+		Time update_dt = _ground_speed_computer.update_dt();
+
 		Time dt = _ac2_positions[0].time - _ac2_positions[1].time;
 		Length dl = _ac2_positions[0].lateral_position.haversine_earth (_ac2_positions[1].lateral_position);
-		_ground_speed.write (1_kt * _ground_speed_smoother.process ((dl / dt).kt(), update_dt()));
+		_ground_speed.write (1_kt * _ground_speed_smoother.process ((dl / dt).kt(), update_dt));
 	}
 	else
 	{
@@ -590,19 +595,21 @@ FlightDataComputer::compute_climb_rate()
 	// Climb rate:
 	if (_pressure_altitude_std_amsl.valid())
 	{
+		Time update_dt = _climb_rate_computer.update_dt();
+
 		// If previous climb-rate was invalid, use current STD pressure
 		// as source for 'previous altitude' value:
 		if (_pressure_altitude_climb_rate.is_nil())
 			_alt_amsl_prev = *_pressure_altitude_std_amsl;
 
-		_alt_amsl_time += update_dt();
+		_alt_amsl_time += update_dt;
 		if (_alt_amsl_time > 0.05_s)
 		{
 			Length alt_diff = *_pressure_altitude_std_amsl - _alt_amsl_prev;
 			_computed_climb_rate = alt_diff / _alt_amsl_time;
 			_alt_amsl_time = 0_s;
 			_alt_amsl_prev = *_pressure_altitude_std_amsl;
-			_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm(), update_dt()));
+			_pressure_altitude_climb_rate.write (1_fpm * _climb_rate_smoother.process (_computed_climb_rate.fpm(), update_dt));
 		}
 	}
 	else
@@ -618,8 +625,10 @@ FlightDataComputer::compute_ias_lookahead()
 {
 	if (_ias.valid())
 	{
-		double est = _ias_estimator.process (_ias_lookahead_input_smoother.process ((*_ias).kt(), update_dt()), update_dt());
-		est = _ias_lookahead_output_smoother.process (est, update_dt());
+		Time update_dt = _ias_lookahead_computer.update_dt();
+
+		double est = _ias_estimator.process (_ias_lookahead_input_smoother.process ((*_ias).kt(), update_dt), update_dt);
+		est = _ias_lookahead_output_smoother.process (est, update_dt);
 		_ias_lookahead.write (1_kt * est);
 	}
 	else
@@ -729,13 +738,15 @@ FlightDataComputer::compute_wind()
 		_orientation_true_heading.valid() &&
 		_magnetic_declination.valid())
 	{
+		Time update_dt = _wind_computer.update_dt();
+
 		Xefis::WindTriangle wt;
 		wt.set_aircraft_tas (*_true_airspeed);
 		wt.set_aircraft_track (*_track_lateral_true);
 		wt.set_aircraft_ground_speed (*_ground_speed);
 		wt.set_aircraft_heading (*_orientation_true_heading);
 		wt.update();
-		_wind_true_orientation_from.write (floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt()), 360_deg));
+		_wind_true_orientation_from.write (floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt), 360_deg));
 		_wind_magnetic_orientation_from.write (Xefis::true_to_magnetic (*_wind_true_orientation_from, *_magnetic_declination));
 		_wind_tas.write (wt.wind_speed());
 	}
@@ -770,6 +781,8 @@ FlightDataComputer::compute_tev()
 {
 	if (_total_energy_variometer.configured())
 	{
+		Time update_dt = _tev_computer.update_dt();
+
 		if (_actual_airplane_weight_g.valid() &&
 			_pressure_altitude_std_amsl.valid() &&
 			_ias.valid())
@@ -777,7 +790,7 @@ FlightDataComputer::compute_tev()
 			double const m = *_actual_airplane_weight_g;
 			double const g = 9.81;
 
-			if ((_total_energy_time += update_dt()) > 0.1_s)
+			if ((_total_energy_time += update_dt) > 0.1_s)
 			{
 				double const v = (*_ias).mps();
 				double const Ep = m * g * (*_pressure_altitude_std_amsl).m();
@@ -793,7 +806,7 @@ FlightDataComputer::compute_tev()
 				double const energy_diff = _total_energy - _prev_total_energy;
 				_tev = (1_m * energy_diff / (m * g)) / _total_energy_time;
 				_total_energy_time = 0_s;
-				_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm(), update_dt()));
+				_total_energy_variometer.write (1_fpm * _variometer_smoother.process (_tev.fpm(), update_dt));
 			}
 		}
 		else
@@ -810,6 +823,8 @@ FlightDataComputer::compute_alt_reach_distance()
 {
 	if (_target_altitude_reach_distance.configured())
 	{
+		Time update_dt = _alt_reach_distance_computer.update_dt();
+
 		if (_target_pressure_altitude_amsl.valid() &&
 			_ground_speed.valid() &&
 			_pressure_altitude_climb_rate.valid() &&
@@ -817,7 +832,7 @@ FlightDataComputer::compute_alt_reach_distance()
 		{
 			Length const alt_diff = *_target_pressure_altitude_amsl - *_pressure_altitude_amsl;
 			Length const distance = *_ground_speed * (alt_diff / *_pressure_altitude_climb_rate);
-			_target_altitude_reach_distance.write (1_m * _alt_reach_distance_smoother.process (distance.m(), update_dt()));
+			_target_altitude_reach_distance.write (1_m * _alt_reach_distance_smoother.process (distance.m(), update_dt));
 		}
 		else
 		{
