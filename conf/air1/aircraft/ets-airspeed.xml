@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/et-airspeed'>
+		<i2c>
+			<bus>1</bus>
+			<address>0x75</address>
+		</i2c>
+		<settings>
+			<setting name='ias.read-interval' value='100 ms'/>
+			<setting name='ias.smoothing-time' value='100 ms'/>
+		</settings>
+		<properties>
+			<directory path='/sensors'>
+				<property name='serviceable' path='/ias/serviceable'/>
+				<property name='ias.minimum' path='/ias/minimum'/>
+				<property name='ias.maximum' path='/ias/maximum'/>
+				<property name='ias' path='/speed/ias'/>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+
