@@ -36,12 +36,15 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 {
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "setting")
 		{
 			parse_settings (e, {
 				{ "temperature.read-interval", _temperature_interval, true },
 				{ "pressure.read-interval", _pressure_interval, true },
 			});
+		}
+		else if (e == "properties")
+		{
 			parse_properties (e, {
 				{ "temperature", _temperature, true },
 				{ "pressure", _pressure, true },
