@@ -1,6 +1,10 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/fdc'>
+		<settings>
+			<setting name='airspeed.valid-minimum' value='20 kt'/>
+			<setting name='airspeed.valid-maximum' value='350 kt'/>
+		</settings>
 		<properties path='/systems/fdc'>
 			<directory path='/settings'>
 				<property name='settings.default-airplane-weight' path='/default-airplane-weight.g' default='2000.0'/>
@@ -40,7 +44,7 @@
 				<property name='ins.accuracy.vertical' path='/ins/vertical-accuracy'/>
 				<property name='ins.timestamp' path='/ins/timestamp'/>
 				<property name='pressure.static' path='/pressure/pressure'/>
-				<property name='ias' path='/speed/ias'/>
+				<property name='airspeed' path='/speed/airspeed'/>
 				<property name='gear-down' path='/gear/lowered'/>
 				<property name='outside-air-temperature' path='/temperature/outside.k'/>
 			</directory>
@@ -73,6 +77,7 @@
 			</directory>
 			<directory path='/speed'>
 				<property name='speed.v-a' path='/v-a'/>
+				<property name='speed.ias' path='/ias'/>
 				<property name='speed.minimum-ias' path='/ias-minimum'/>
 				<property name='speed.minimum-maneuver-ias' path='/ias-minimum-maneuver'/>
 				<property name='speed.maximum-ias' path='/ias-maximum'/>

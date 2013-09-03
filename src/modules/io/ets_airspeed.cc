@@ -37,31 +37,31 @@ ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement cons
 		if (e == "settings")
 		{
 			parse_settings (e, {
-				{ "ias.read-interval", _ias_read_interval, true },
-				{ "ias.smoothing-time", _ias_smoothing_time, true },
+				{ "airspeed.read-interval", _airspeed_read_interval, true },
+				{ "airspeed.smoothing-time", _airspeed_smoothing_time, true },
 			});
 		}
 		if (e == "properties")
 		{
 			parse_properties (e, {
 				{ "serviceable", _serviceable, true },
-				{ "ias", _ias, true },
-				{ "ias.minimum", _ias_minimum, false },
-				{ "ias.maximum", _ias_maximum, false },
+				{ "airspeed", _airspeed, true },
+				{ "airspeed.minimum", _airspeed_minimum, false },
+				{ "airspeed.maximum", _airspeed_maximum, false },
 			});
 		}
 		else if (e == "i2c")
 			parse_i2c (e, _i2c_bus, _i2c_address);
 	}
 
-	if (_ias_read_interval < 100_ms)
+	if (_airspeed_read_interval < 100_ms)
 	{
-		log() << "The setting ias.read-invterval is too low, setting it to 100 ms." << std::endl;
-		_ias_read_interval = 100_ms;
+		log() << "The setting airspeed.read-invterval is too low, setting it to 100 ms." << std::endl;
+		_airspeed_read_interval = 100_ms;
 	}
 
 	_calibration_data.reserve (OffsetCalculationSamples);
-	_ias_smoother.set_smoothing_time (_ias_smoothing_time);
+	_airspeed_smoother.set_smoothing_time (_airspeed_smoothing_time);
 
 	_initialization_timer = new QTimer (this);
 	_initialization_timer->setInterval (InitializationDelay.ms());
@@ -70,13 +70,13 @@ ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement cons
 	_initialization_timer->start();
 
 	_periodic_read_timer = new QTimer (this);
-	_periodic_read_timer->setInterval (_ias_read_interval.ms());
+	_periodic_read_timer->setInterval (_airspeed_read_interval.ms());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));
 
 	_serviceable.set_default (false);
-	_ias_minimum.set_default (10_kt);
-	_ias_maximum.set_default (290_kt);
+	_airspeed_minimum.set_default (10_kt);
+	_airspeed_maximum.set_default (290_kt);
 }
 
 
@@ -95,7 +95,7 @@ void
 ETSAirspeed::reinitialize()
 {
 	_serviceable.write (false);
-	_ias.set_nil();
+	_airspeed.set_nil();
 	_i2c_bus.close();
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.
@@ -141,7 +141,7 @@ ETSAirspeed::read()
 				Speed speed = 0_kt;
 				if (raw_value >= _offset)
 					speed = 1_mps * (ValueScale * std::sqrt (1.0f * (raw_value - _offset)));
-				_ias.write (1_kt * _ias_smoother.process (speed.kt(), update_dt()));
+				_airspeed.write (1_kt * _airspeed_smoother.process (speed.kt(), update_dt()));
 				updated = true;
 				break;
 		}
