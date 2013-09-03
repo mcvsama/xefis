@@ -42,7 +42,7 @@ class XBee:
 
 	static constexpr int MaxReadFailureCount		= 10;
 	static constexpr int MaxWriteFailureCount		= 10;
-	static constexpr int MaxOutputBufferSize		= 256;
+	static constexpr size_t MaxOutputBufferSize		= 256;
 
 	static constexpr uint8_t PacketDelimiter		= 0x7e;
 	static constexpr uint8_t PeriodicPingFrameID	= 0xfd;

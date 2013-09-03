@@ -1,7 +1,6 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
 	<modules>
-		<include name='groundstation/flightgear.xml'/>
 		<include name='groundstation/fdc.xml'/>
 		<include name='groundstation/joystick.xml'/>
 		<include name='groundstation/mouse.xml'/>
@@ -9,6 +8,7 @@
 		<include name='groundstation/ht16k33.xml'/>
 		<include name='groundstation/state.xml'/>
 		<include name='groundstation/xbee.xml'/>
+		<module name='log/latency' disabled='true'/>
 	</modules>
 	<include name='groundstation/efis.xml'/>
 </xefis-config>

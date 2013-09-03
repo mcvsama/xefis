@@ -90,7 +90,8 @@
 			<chunk>
 				<name>alr</name>
 				<type>double</type>
-				<node>/position/gear-agl-ft</node>
+				<node>/instrumentation/altimeter/indicated-altitude-ft</node>
+				<!--node>/position/gear-agl-ft</node-->
 			</chunk>
 			<chunk>
 				<name>als</name>
