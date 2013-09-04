@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='io/et-airspeed'>
+	<module name='io/ets-airspeed'>
 		<i2c>
 			<bus>1</bus>
 			<address>0x75</address>
