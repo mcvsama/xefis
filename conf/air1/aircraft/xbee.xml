@@ -2,7 +2,7 @@
 <xefis-include>
 	<module name='io/xbee'>
 		<settings>
-			<setting name='device' value='/dev/ttyUSB1'/>
+			<setting name='device' value='/dev/ttyUSB0'/>
 			<setting name='baud-rate' value='57600'/>
 			<setting name='channel' value='12'/>
 			<setting name='pan-id' value='31:37'/>
