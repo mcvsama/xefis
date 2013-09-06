@@ -214,12 +214,6 @@ class XBee:
 
   private:
 	/**
-	 * Set all properties to nil.
-	 */
-	void
-	reset_properties();
-
-	/**
 	 * Set serial port device options, eg. baud-rate.
 	 */
 	bool
@@ -435,9 +429,9 @@ class XBee:
 	Time					_last_rssi_time;
 	uint8_t					_at_frame_id			= 0x00;
 
+	Xefis::PropertyBoolean	_serviceable;
 	Xefis::PropertyString	_send;
 	Xefis::PropertyString	_receive;
-	Xefis::PropertyBoolean	_serviceable;
 	Xefis::PropertyInteger	_input_errors;
 	Xefis::PropertyFloat	_rssi_dbm;
 	Xefis::PropertyInteger	_failures;

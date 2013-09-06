@@ -27,6 +27,7 @@
 #include <xefis/core/application.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/noncopyable.h>
 #include <xefis/utility/i2c.h>
 
 
@@ -40,7 +41,7 @@ namespace Xefis {
 
 class ModuleManager;
 
-class Module
+class Module: private Noncopyable
 {
   public:
 	struct NameAndProperty

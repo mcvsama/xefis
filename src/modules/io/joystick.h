@@ -20,7 +20,6 @@
 
 // Qt:
 #include <QtCore/QObject>
-#include <QtCore/QFile>
 #include <QtCore/QSocketNotifier>
 #include <QtCore/QTimer>
 

@@ -20,7 +20,6 @@
 #include <map>
 
 // Qt:
-#include <QtCore/QFile>
 #include <QtCore/QSocketNotifier>
 
 // Xefis:
@@ -87,7 +86,7 @@ class GPS:
 	failure();
 
 	/**
-	 * Try to restart operation after failure is detected.
+	 * Try to restart operation after failure was detected.
 	 */
 	void
 	restart();
