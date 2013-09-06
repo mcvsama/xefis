@@ -338,7 +338,8 @@ XBee::reset()
 	_output_buffer.clear();
 	_restart_timer->stop();
 	_after_reset_timer->stop();
-	reset_properties();
+	_send.set_nil();
+	_receive.set_nil();
 }
 
 
@@ -432,14 +433,6 @@ void
 XBee::rssi_timeout()
 {
 	_rssi_dbm.set_nil();
-}
-
-
-void
-XBee::reset_properties()
-{
-	_send.set_nil();
-	_receive.set_nil();
 }
 
 
