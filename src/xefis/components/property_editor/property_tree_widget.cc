@@ -17,7 +17,6 @@
 #include <set>
 
 // Qt:
-#include <QtCore/QTimer>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QHeaderView>
 
@@ -56,10 +55,9 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 	read();
 	setup_appereance();
 
-	QTimer* timer = new QTimer (this);
-	timer->setInterval (1000.0 / 15.0);
-	QObject::connect (timer, SIGNAL (timeout()), this, SLOT (read()));
-	timer->start();
+	_refresh_timer = new QTimer (this);
+	_refresh_timer->setInterval (1000.0 / 15.0);
+	QObject::connect (_refresh_timer, SIGNAL (timeout()), this, SLOT (read()));
 }
 
 
@@ -154,6 +152,20 @@ PropertyTreeWidget::to_binary_form (std::string const& blob)
 		s += QString ("%1").arg (v, 2, 16, QChar ('0')).toStdString() + ":";
 	s.pop_back();
 	return s;
+}
+
+
+void
+PropertyTreeWidget::showEvent (QShowEvent*)
+{
+	_refresh_timer->start();
+}
+
+
+void
+PropertyTreeWidget::hideEvent (QHideEvent*)
+{
+	_refresh_timer->stop();
 }
 
 } // namespace Xefis

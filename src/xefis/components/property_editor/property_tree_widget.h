@@ -18,6 +18,7 @@
 #include <cstddef>
 
 // Qt:
+#include <QtCore/QTimer>
 #include <QtWidgets/QTreeWidget>
 
 // Xefis:
@@ -87,8 +88,17 @@ class PropertyTreeWidget: public QTreeWidget
 	std::string
 	to_binary_form (std::string const& blob);
 
+	// QWidget
+	void
+	showEvent (QShowEvent*) override;
+
+	// QWidget
+	void
+	hideEvent (QHideEvent*) override;
+
   private:
-	PropertyNode* _root_node;
+	QTimer*			_refresh_timer;
+	PropertyNode*	_root_node;
 };
 
 } // namespace Xefis
