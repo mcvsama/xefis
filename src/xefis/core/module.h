@@ -29,6 +29,7 @@
 #include <xefis/core/property.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/i2c.h>
+#include <xefis/utility/logger.h>
 
 
 #define XEFIS_REGISTER_MODULE_CLASS(module_name, klass) \
@@ -57,6 +58,8 @@ class Module: private Noncopyable
 		bool			required;
 		bool*			value_bool		= nullptr;
 		int*			value_int		= nullptr;
+		float*			value_float		= nullptr;
+		double*			value_double	= nullptr;
 		std::string*	value_string	= nullptr;
 		QString*		value_qstring	= nullptr;
 		SI::Value*		value_si_value	= nullptr;
@@ -64,6 +67,10 @@ class Module: private Noncopyable
 		NameAndSetting (QString const& name, bool& value, bool required);
 
 		NameAndSetting (QString const& name, int& value, bool required);
+
+		NameAndSetting (QString const& name, float& value, bool required);
+
+		NameAndSetting (QString const& name, double& value, bool required);
 
 		NameAndSetting (QString const& name, std::string& value, bool required);
 
@@ -212,7 +219,7 @@ class Module: private Noncopyable
 	 * Add header with module name to the log stream and
 	 * return the stream.
 	 */
-	std::ostream&
+	Xefis::Logger const&
 	log() const;
 
   private:
@@ -227,6 +234,7 @@ class Module: private Noncopyable
 	std::string		_name;
 	std::string		_instance;
 	SettingsSet		_settings_set;
+	Xefis::Logger	_logger;
 };
 
 
@@ -243,6 +251,22 @@ Module::NameAndSetting::NameAndSetting (QString const& name, int& value, bool re
 	name (name),
 	required (required),
 	value_int (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, float& value, bool required):
+	name (name),
+	required (required),
+	value_float (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, double& value, bool required):
+	name (name),
+	required (required),
+	value_double (&value)
 { }
 
 

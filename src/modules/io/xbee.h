@@ -234,18 +234,6 @@ class XBee:
 	configured() const noexcept;
 
 	/**
-	 * Initialize map of baud-rates, used by termios_baud_rate_from_integer.
-	 */
-	void
-	initialize_baud_rates();
-
-	/**
-	 * Return termios baudrate constant from given baudrate integer.
-	 */
-	int
-	termios_baud_rate_from_integer (int baud_rate) const;
-
-	/**
 	 * Return XBee protocol code for setting up baud rate.
 	 */
 	int
@@ -408,7 +396,6 @@ class XBee:
 	QTimer*					_clear_channel_timer	= nullptr;
 	QTimer*					_after_reset_timer		= nullptr;
 	QTimer*					_rssi_timer				= nullptr;
-	std::map<int, int>		_baud_rates_map;
 	std::string				_baud_rate				= "9600";
 	std::string				_serial_number_bin;
 	int						_channel				= 0;

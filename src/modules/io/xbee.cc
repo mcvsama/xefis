@@ -35,6 +35,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
+#include <xefis/utility/serial_port.h>
 
 // Local:
 #include "xbee.h"
@@ -46,8 +47,6 @@ XEFIS_REGISTER_MODULE_CLASS ("io/xbee", XBee);
 XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	initialize_baud_rates();
-
 	for (QDomElement& e: config)
 	{
 		if (e == "settings")
@@ -454,7 +453,7 @@ XBee::set_device_options()
 	options.c_oflag = 0;
 	options.c_lflag = 0;
 
-	int baud_rate_const = termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_baud_rate));
+	int baud_rate_const = Xefis::SerialPort::termios_baud_rate (_baud_rate);
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 
@@ -627,32 +626,6 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 }
 
 
-void
-XBee::initialize_baud_rates()
-{
-	_baud_rates_map[1200] = B1200;
-	_baud_rates_map[2400] = B2400;
-	_baud_rates_map[4800] = B4800;
-	_baud_rates_map[9600] = B9600;
-	_baud_rates_map[19200] = B19200;
-	_baud_rates_map[38400] = B38400;
-	_baud_rates_map[57600] = B57600;
-	_baud_rates_map[115200] = B115200;
-}
-
-
-int
-XBee::termios_baud_rate_from_integer (int baud_rate) const
-{
-	auto c = _baud_rates_map.find (baud_rate);
-	if (c == _baud_rates_map.end())
-		c = _baud_rates_map.upper_bound (baud_rate);
-	if (c == _baud_rates_map.end())
-		return 0;
-	return c->second;
-}
-
-
 int
 XBee::baud_rate_to_xbee_code (int baud_rate) const
 {
@@ -765,7 +738,7 @@ XBee::send_frame (std::string const& frame, int& written)
 		log() << "Write error " << strerror (errno) << std::endl;
 
 		written = 0;
-		if (errno == EAGAIN)
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
 			return SendResult::Retry;
 		else
 			return SendResult::Failure;
