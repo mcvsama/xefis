@@ -214,11 +214,13 @@ SRC_HEADERS += modules/systems/flight_director.h
 SRC_HEADERS += modules/systems/fly_by_wire.h
 SRC_HEADERS += modules/systems/fdc.h
 SRC_HEADERS += modules/systems/rcms.h
+SRC_HEADERS += modules/systems/slip_skid.h
 
 SRC_SOURCES += modules/systems/flight_director.cc
 SRC_SOURCES += modules/systems/fly_by_wire.cc
 SRC_SOURCES += modules/systems/fdc.cc
 SRC_SOURCES += modules/systems/rcms.cc
+SRC_SOURCES += modules/systems/slip_skid.cc
 
 ######## /modules/private ########
 

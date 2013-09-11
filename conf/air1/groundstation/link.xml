@@ -17,6 +17,7 @@
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='1' signature-bytes='2' key='00:11:22:33'>
+					<property type='float' bytes='2' path='/sensors/slip-skid/slip-skid'/>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
 					<property type='speed' bytes='4' path='/sensors/speed/airspeed'/>
 					<property type='float' bytes='2' path='/sensors/temperature/outside.k'/>
