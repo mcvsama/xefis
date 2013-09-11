@@ -24,7 +24,7 @@
 									</directory>
 									<directory path='/settings/adi'>
 										<property name='orientation.roll.limit' path='/roll-warning'/>
-										<property name='slip-skid.limit' path='/slip-skid/slip-skid-warning'/>
+										<property name='slip-skid.limit' path='/slip-skid-warning'/>
 										<property name='aoa.pitch-limit.visible' path='/pitch-limit-visible'/>
 										<property name='fpm.visible' path='/flight-path-marker-visible'/>
 										<property name='control-stick.visible' path='/control-stick-visible'/>

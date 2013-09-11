@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/slip-skid'>
+		<properties>
+			<property name='acceleration.x' path='/sensors/ahrs/acceleration/x'/>
+			<property name='acceleration.y' path='/sensors/ahrs/acceleration/y'/>
+			<property name='acceleration.z' path='/sensors/ahrs/acceleration/z'/>
+			<property name='slip-skid' path='/sensors/slip-skid/slip-skid'/>
+		</properties>
+	</module>
+</xefis-include>
+
