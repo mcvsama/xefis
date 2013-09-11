@@ -16,11 +16,11 @@
 #include <map>
 #include <set>
 
-// Lib:
-#include <boost/format.hpp>
-
 // Qt:
 #include <QtXml/QDomElement>
+
+// Lib:
+#include <boost/format.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -37,7 +37,9 @@ Module::Module (ModuleManager* module_manager, QDomElement const& config):
 	_module_manager (module_manager),
 	_name (config.attribute ("name").toStdString()),
 	_instance (config.attribute ("instance", "").toStdString())
-{ }
+{
+	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % _name % _instance).str());
+}
 
 
 void
@@ -177,6 +179,10 @@ Module::parse_settings (QDomElement const& settings_element, SettingsList list)
 					*nas->value_bool = value == "true";
 				else if (nas->value_int)
 					*nas->value_int = boost::lexical_cast<int> (value.toStdString());
+				else if (nas->value_float)
+					*nas->value_float = boost::lexical_cast<float> (value.toStdString());
+				else if (nas->value_double)
+					*nas->value_double = boost::lexical_cast<double> (value.toStdString());
 				else if (nas->value_string)
 					*nas->value_string = value.toStdString();
 				else if (nas->value_qstring)
@@ -284,11 +290,10 @@ Module::accounting() const
 }
 
 
-std::ostream&
+Xefis::Logger const&
 Module::log() const
 {
-	std::clog << boost::format ("%08.4lf [%-30s#%-20s] ") % Time::now().s() % _name % _instance;
-	return std::clog;
+	return _logger;
 }
 
 

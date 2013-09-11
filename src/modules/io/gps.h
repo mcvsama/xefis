@@ -192,18 +192,6 @@ class GPS:
 	synchronize_system_clock (std::string const& date_string, std::string const& time_string);
 
 	/**
-	 * Initialize map of baud-rates, used by termios_baud_rate_from_integer.
-	 */
-	void
-	initialize_baud_rates();
-
-	/**
-	 * Return termios baudrate constant from given baudrate integer.
-	 */
-	int
-	termios_baud_rate_from_integer (int baud_rate) const;
-
-	/**
 	 * Create PMTK message. Data must include message name: PMTKnnn,
 	 * where nnn is message ID.
 	 */

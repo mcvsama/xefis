@@ -33,6 +33,7 @@
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hextable.h>
 #include <xefis/utility/finally.h>
+#include <xefis/utility/serial_port.h>
 
 // Local:
 #include "gps.h"
@@ -51,8 +52,6 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	_buffer.reserve (256);
-
-	initialize_baud_rates();
 
 	// Set NMEA packet frequencies:
 	// 0 - GLL		0 - disabled
@@ -365,8 +364,8 @@ GPS::set_device_options (bool use_target_baud_rate)
 	}
 
 	int baud_rate_const = use_target_baud_rate
-		? termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_target_baud_rate))
-		: termios_baud_rate_from_integer (boost::lexical_cast<unsigned int> (_current_baud_rate));
+		? Xefis::SerialPort::termios_baud_rate (_target_baud_rate)
+		: Xefis::SerialPort::termios_baud_rate (_current_baud_rate);
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 	options.c_cflag |= CLOCAL | CREAD;
@@ -921,54 +920,6 @@ GPS::synchronize_system_clock (std::string const& date_string, std::string const
 	}
 	catch (boost::bad_lexical_cast&)
 	{ }
-}
-
-
-void
-GPS::initialize_baud_rates()
-{
-	_baud_rates_map[50] = B50;
-	_baud_rates_map[75] = B75;
-	_baud_rates_map[110] = B110;
-	_baud_rates_map[134] = B134;
-	_baud_rates_map[150] = B150;
-	_baud_rates_map[200] = B200;
-	_baud_rates_map[300] = B300;
-	_baud_rates_map[600] = B600;
-	_baud_rates_map[1200] = B1200;
-	_baud_rates_map[1800] = B1800;
-	_baud_rates_map[2400] = B2400;
-	_baud_rates_map[4800] = B4800;
-	_baud_rates_map[9600] = B9600;
-	_baud_rates_map[19200] = B19200;
-	_baud_rates_map[38400] = B38400;
-	_baud_rates_map[57600] = B57600;
-	_baud_rates_map[115200] = B115200;
-	_baud_rates_map[230400] = B230400;
-	_baud_rates_map[460800] = B460800;
-	_baud_rates_map[500000] = B500000;
-	_baud_rates_map[576000] = B576000;
-	_baud_rates_map[921600] = B921600;
-	_baud_rates_map[1000000] = B1000000;
-	_baud_rates_map[1152000] = B1152000;
-	_baud_rates_map[1500000] = B1500000;
-	_baud_rates_map[2000000] = B2000000;
-	_baud_rates_map[2500000] = B2500000;
-	_baud_rates_map[3000000] = B3000000;
-	_baud_rates_map[3500000] = B3500000;
-	_baud_rates_map[4000000] = B4000000;
-}
-
-
-int
-GPS::termios_baud_rate_from_integer (int baud_rate) const
-{
-	auto c = _baud_rates_map.find (baud_rate);
-	if (c == _baud_rates_map.end())
-		c = _baud_rates_map.upper_bound (baud_rate);
-	if (c == _baud_rates_map.end())
-		return 0;
-	return c->second;
 }
 
 
