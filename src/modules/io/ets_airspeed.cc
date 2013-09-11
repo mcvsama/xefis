@@ -141,7 +141,7 @@ ETSAirspeed::read()
 				Speed speed = 0_kt;
 				if (raw_value >= _offset)
 					speed = 1_mps * (ValueScale * std::sqrt (1.0f * (raw_value - _offset)));
-				_airspeed.write (1_kt * _airspeed_smoother.process (speed.kt(), update_dt()));
+				_airspeed.write (1_kt * _airspeed_smoother.process (speed.kt(), _airspeed_read_interval));
 				updated = true;
 				break;
 		}
