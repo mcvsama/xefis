@@ -39,7 +39,7 @@ class RotaryEncoder
 
   public:
 	// Ctor:
-	RotaryEncoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback = nullptr);
+	RotaryEncoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback);
 
 	/**
 	 * Signals that properties have been
