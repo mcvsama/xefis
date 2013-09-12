@@ -114,6 +114,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Pressure;
 	else if (type_attr == "speed")
 		_type = Type::Speed;
+	else if (type_attr == "temperature")
+		_type = Type::Temperature;
 	else if (type_attr == "time")
 		_type = Type::Time;
 
@@ -129,6 +131,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Length:
 		case Type::Pressure:
 		case Type::Speed:
+		case Type::Temperature:
 		case Type::Time:
 			if (!element.hasAttribute ("bytes"))
 				throw Xefis::Exception (QString ("<property> of type %1 needs attribute 'bytes'").arg (element.attribute ("type")).toStdString());
@@ -152,6 +155,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Length:
 			case Type::Pressure:
 			case Type::Speed:
+			case Type::Temperature:
 			case Type::Time:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 2, 4 or 8").arg (_bytes).toStdString());
@@ -173,6 +177,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	_property_length.set_path (path);
 	_property_pressure.set_path (path);
 	_property_speed.set_path (path);
+	_property_temperature.set_path (path);
 	_property_time.set_path (path);
 }
 
@@ -222,6 +227,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
 
 		case Type::Unknown:
@@ -277,6 +283,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Length:
 		case Type::Pressure:
 		case Type::Speed:
+		case Type::Temperature:
 		case Type::Time:
 			kind = Kind::Float;
 			break;
@@ -341,6 +348,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
 
 		case Type::Unknown:
@@ -375,6 +383,7 @@ Link::PropertyItem::failsafe()
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
+		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
 
 		case Type::Unknown:

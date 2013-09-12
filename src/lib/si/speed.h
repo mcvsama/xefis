@@ -97,28 +97,28 @@ Speed::supported_units() const
 inline constexpr Speed::ValueType
 Speed::kt() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Speed::ValueType
 Speed::kph() const noexcept
 {
-	return value() * 1.852;
+	return internal() * 1.852;
 }
 
 
 inline constexpr Speed::ValueType
 Speed::fpm() const noexcept
 {
-	return value() * 101.268591426;
+	return internal() * 101.268591426;
 }
 
 
 inline constexpr Speed::ValueType
 Speed::mps() const noexcept
 {
-	return value() / 1.9438612860586;
+	return internal() / 1.9438612860586;
 }
 
 

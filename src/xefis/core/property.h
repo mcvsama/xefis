@@ -813,8 +813,9 @@ typedef Property<Angle>			PropertyAngle;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
 typedef Property<Length>		PropertyLength;
-typedef Property<Time>			PropertyTime;
 typedef Property<Speed>			PropertySpeed;
+typedef Property<Temperature>	PropertyTemperature;
+typedef Property<Time>			PropertyTime;
 
 } // namespace Xefis
 

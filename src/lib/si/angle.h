@@ -91,14 +91,14 @@ Angle::supported_units() const
 inline constexpr Angle::ValueType
 Angle::rad() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Angle::ValueType
 Angle::deg() const noexcept
 {
-	return value() * 180.0 / M_PI;
+	return internal() * 180.0 / M_PI;
 }
 
 

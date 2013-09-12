@@ -22,6 +22,7 @@
 #include "time.h"
 #include "speed.h"
 #include "lonlat.h"
+#include "temperature.h"
 #include "constants.h"
 #include "operators.h"
 

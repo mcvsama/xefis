@@ -56,7 +56,7 @@ class Time: public LinearValue<double, Time>
 	Time() = default;
 
 	constexpr
-	Time(Time const&) = default;
+	Time (Time const&) = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -119,42 +119,42 @@ Time::supported_units() const
 inline constexpr Time::ValueType
 Time::ns() const noexcept
 {
-	return value() * 1e9;
+	return internal() * 1e9;
 }
 
 
 inline constexpr Time::ValueType
 Time::us() const noexcept
 {
-	return value() * 1e6;
+	return internal() * 1e6;
 }
 
 
 inline constexpr Time::ValueType
 Time::ms() const noexcept
 {
-	return value() * 1e3;
+	return internal() * 1e3;
 }
 
 
 inline constexpr Time::ValueType
 Time::s() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Time::ValueType
 Time::min() const noexcept
 {
-	return value() / 60.0;
+	return internal() / 60.0;
 }
 
 
 inline constexpr Time::ValueType
 Time::h() const noexcept
 {
-	return value() / 3600.0;
+	return internal() / 3600.0;
 }
 
 
@@ -220,7 +220,7 @@ inline Time
 Time::epoch() noexcept
 {
 	Time t;
-	t.value() = 0.0;
+	t.internal() = 0.0;
 	return t;
 }
 

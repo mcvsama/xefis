@@ -133,6 +133,7 @@ SRC_HEADERS += lib/si/lonlat.h
 SRC_HEADERS += lib/si/operators.h
 SRC_HEADERS += lib/si/pressure.h
 SRC_HEADERS += lib/si/speed.h
+SRC_HEADERS += lib/si/temperature.h
 SRC_HEADERS += lib/si/time.h
 SRC_HEADERS += lib/si/value.h
 
@@ -142,6 +143,7 @@ SRC_SOURCES += lib/si/length.cc
 SRC_SOURCES += lib/si/lonlat.cc
 SRC_SOURCES += lib/si/pressure.cc
 SRC_SOURCES += lib/si/speed.cc
+SRC_SOURCES += lib/si/temperature.cc
 SRC_SOURCES += lib/si/time.cc
 
 ######## /modules/instruments ########
