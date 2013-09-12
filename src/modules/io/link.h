@@ -122,6 +122,7 @@ class Link:
 			Pressure,
 			Frequency,
 			Length,
+			Temperature,
 			Time,
 			Speed,
 		};
@@ -175,6 +176,7 @@ class Link:
 		Xefis::PropertyPressure			_property_pressure;
 		Xefis::PropertyFrequency		_property_frequency;
 		Xefis::PropertyLength			_property_length;
+		Xefis::PropertyTemperature		_property_temperature;
 		Xefis::PropertyTime				_property_time;
 		Xefis::PropertySpeed			_property_speed;
 		Xefis::PropertyInteger::Type	_integer_value;

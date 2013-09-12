@@ -101,35 +101,35 @@ Length::supported_units() const
 inline constexpr Length::ValueType
 Length::m() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Length::ValueType
 Length::km() const noexcept
 {
-	return value() * 0.001;
+	return internal() * 0.001;
 }
 
 
 inline constexpr Length::ValueType
 Length::ft() const noexcept
 {
-	return value() * 3.280839895;
+	return internal() * 3.280839895;
 }
 
 
 inline constexpr Length::ValueType
 Length::nm() const noexcept
 {
-	return value() * 0.0005399568;
+	return internal() * 0.0005399568;
 }
 
 
 inline constexpr Length::ValueType
 Length::mil() const noexcept
 {
-	return value() * 0.0006213711;
+	return internal() * 0.0006213711;
 }
 
 

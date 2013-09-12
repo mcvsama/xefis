@@ -87,21 +87,21 @@ Frequency::supported_units() const
 inline constexpr Frequency::ValueType
 Frequency::Hz() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Frequency::ValueType
 Frequency::kHz() const noexcept
 {
-	return value() * 0.001;
+	return internal() * 0.001;
 }
 
 
 inline constexpr Frequency::ValueType
 Frequency::MHz() const noexcept
 {
-	return value() * 0.000001;
+	return internal() * 0.000001;
 }
 
 

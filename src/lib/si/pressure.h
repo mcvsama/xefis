@@ -91,21 +91,21 @@ Pressure::supported_units() const
 inline constexpr Pressure::ValueType
 Pressure::psi() const noexcept
 {
-	return value();
+	return internal();
 }
 
 
 inline constexpr Pressure::ValueType
 Pressure::hPa() const noexcept
 {
-	return value() * 68.9554630643f;
+	return internal() * 68.9554630643f;
 }
 
 
 inline constexpr Pressure::ValueType
 Pressure::inHg() const noexcept
 {
-	return value() * 2.036254f;
+	return internal() * 2.036254f;
 }
 
 
