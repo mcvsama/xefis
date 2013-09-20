@@ -51,7 +51,7 @@ ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement cons
 			});
 		}
 		else if (e == "i2c")
-			parse_i2c (e, _i2c_bus, _i2c_address);
+			parse_i2c (e, _i2c_device);
 	}
 
 	if (_airspeed_read_interval < 100_ms)
@@ -84,7 +84,7 @@ void
 ETSAirspeed::initialize()
 {
 	guard ([&]() {
-		_i2c_bus.open();
+		_i2c_device.open();
 		// Start gathering samples for computation of an offset:
 		_periodic_read_timer->start();
 	});
@@ -96,7 +96,7 @@ ETSAirspeed::reinitialize()
 {
 	_serviceable.write (false);
 	_airspeed.set_nil();
-	_i2c_bus.close();
+	_i2c_device.close();
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.
 	_initialization_timer->start();
@@ -111,11 +111,7 @@ ETSAirspeed::read()
 	bool updated = false;
 
 	guard ([&]() {
-		uint8_t reg = ValueRegister;
-		uint16_t raw_value;
-		uint8_t* c = reinterpret_cast<uint8_t*> (&raw_value);
-		_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, &reg),
-							Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, c, c + 2) });
+		uint16_t raw_value = _i2c_device.read_register<uint16_t> (ValueRegister);
 		boost::endian::little_to_native (raw_value);
 
 		if (!_serviceable.read (false))

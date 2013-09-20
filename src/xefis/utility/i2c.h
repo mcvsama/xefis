@@ -16,6 +16,8 @@
 
 // Standard:
 #include <cstddef>
+#include <vector>
+#include <array>
 
 // System:
 #include <linux/i2c-dev.h>
@@ -29,6 +31,14 @@
 namespace Xefis {
 namespace I2C {
 
+class Bus;
+class Address;
+class Message;
+class Device;
+
+typedef std::vector<Message> Transaction;
+
+
 enum Operation {
 	Write,	// Message will be sent to slave
 	Read	// Message will be read from slave
@@ -41,6 +51,77 @@ class IOError: public Exception
 	explicit IOError (std::string const& message, Exception const* inner = nullptr):
 		Exception (message, inner)
 	{ }
+};
+
+
+class Bus: public Noncopyable
+{
+  public:
+	typedef uint8_t ID;
+
+  public:
+	/**
+	 * Create not opened bus.
+	 */
+	Bus() noexcept;
+
+	/**
+	 * Open Linux I2C device.
+	 * \param	bus_number I2C bus number.
+	 */
+	explicit
+	Bus (ID bus_number) noexcept;
+
+	// Dtor
+	~Bus();
+
+	/**
+	 * Return bus number.
+	 */
+	uint8_t
+	bus_number() const noexcept;
+
+	/**
+	 * Set bus number.
+	 */
+	void
+	set_bus_number (ID bus_number) noexcept;
+
+	/**
+	 * Reopen bus.
+	 */
+	void
+	open();
+
+	/**
+	 * Open bus.
+	 */
+	void
+	open (ID bus_number);
+
+	/**
+	 * Return true if bus was correctly open
+	 * and is in good state.
+	 */
+	bool
+	good() const;
+
+	/**
+	 * Close bus.
+	 */
+	void
+	close();
+
+	/**
+	 * Execute I2C transaction.
+	 */
+	void
+	execute (Transaction const&);
+
+  private:
+	bool	_open			= false;
+	ID		_bus_number		= 0;
+	int		_device			= 0;
 };
 
 
@@ -83,24 +164,23 @@ class Message
   public:
 	/**
 	 * Create I2C Message.
-	 * Data is represented by range [begin, end). Message does not
+	 * Data is represented by range [data, data + size). Message does not
 	 * make a copy of the data.
 	 */
-	Message (Operation, Address const&, uint8_t* begin, uint8_t* end);
+	Message (Operation, Address const&, uint8_t* data, std::size_t size);
 
 	/**
 	 * Create I2C Message.
-	 * Data is represented by data structure. Type size is determined
-	 * automatically.
+	 * Data is read from given vector.
 	 */
-	template<class DataType>
-		Message (Operation, Address const&, DataType* data_type);
+	Message (Operation, Address const&, std::vector<uint8_t>& vector);
 
 	/**
-	 * Create I2C Write Message.
-	 * Data is immediate 8 bits.
+	 * Create I2C Message.
+	 * Data is read from given array.
 	 */
-	Message (Address const&, uint8_t data);
+	template<std::size_t SequenceSize>
+		Message (Operation, Address const&, std::array<uint8_t, SequenceSize>& array);
 
 	/**
 	 * Generate struct for use with Linux I2C API.
@@ -111,81 +191,159 @@ class Message
   private:
 	Operation	_operation;
 	Address		_address;
-	uint8_t*	_begin	= nullptr;
-	uint8_t*	_end	= nullptr;
-	uint8_t		_data	= 0; // Used if _begin or _end is nullptr.
+	uint8_t*	_data	= nullptr;
+	std::size_t	_size	= 0;
 };
 
 
-typedef std::vector<Message> Transaction;
-
-
-class Bus: public Noncopyable
+class Device
 {
   public:
-	/**
-	 * Create not opened bus.
-	 */
-	Bus() noexcept;
+	typedef uint8_t Register;
+
+  public:
+	// Ctor
+	Device() = default;
+
+	// Ctor
+	Device (Bus::ID bus_id, Address const&);
 
 	/**
-	 * Open Linux I2C device.
-	 * \param	bus_number I2C bus number.
-	 */
-	explicit
-	Bus (uint8_t bus_number) noexcept;
-
-	// Dtor
-	~Bus();
-
-	/**
-	 * Return bus number.
-	 */
-	uint8_t
-	bus_number() const noexcept;
-
-	/**
-	 * Set bus number.
-	 */
-	void
-	set_bus_number (uint8_t bus_number) noexcept;
-
-	/**
-	 * Reopen bus.
+	 * Open the device.
 	 */
 	void
 	open();
 
 	/**
-	 * Open bus.
-	 */
-	void
-	open (uint8_t bus_number);
-
-	/**
-	 * Return true if bus was correctly open
-	 * and is in good state.
-	 */
-	bool
-	good() const;
-
-	/**
-	 * Close bus.
+	 * Close the device.
 	 */
 	void
 	close();
 
 	/**
-	 * Execute I2C transaction.
+	 * Return bus.
+	 */
+	Bus&
+	bus();
+
+	/**
+	 * Return bus.
+	 */
+	Bus const&
+	bus() const;
+
+	/**
+	 * Return used address.
+	 */
+	Address const&
+	address() const;
+
+	/**
+	 * Set address.
 	 */
 	void
-	execute (Transaction const&);
+	set_address (Address const&);
+
+	/**
+	 * Read value from the device.
+	 */
+	template<class Type = uint8_t>
+		Type
+		read();
+
+	/**
+	 * Read register value from the device.
+	 */
+	template<class Type = uint8_t>
+		Type
+		read_register (Register reg);
+
+	/**
+	 * Read register value from the device.
+	 */
+	void
+	read_register (Register reg, uint8_t* data, std::size_t size);
+
+	/**
+	 * Read series of bytes from the device.
+	 */
+	void
+	read_register (Register reg, std::vector<uint8_t> const& data);
+
+	/**
+	 * Read series of bytes from the device.
+	 */
+	template<std::size_t Size>
+		void
+		read_register (Register reg, std::array<uint8_t, Size> const& data);
+
+	/**
+	 * Write value to the device.
+	 */
+	template<class Type>
+		void
+		write (Type value);
+
+	/**
+	 * Write given value to a register.
+	 */
+	template<class Type>
+		void
+		write_register (Register reg, Type value);
+
+	/**
+	 * Write series of bytes to the device.
+	 */
+	void
+	write_register (Register reg, uint8_t* data, std::size_t size);
+
+	/**
+	 * Write series of bytes to the device.
+	 */
+	void
+	write_register (Register reg, std::vector<uint8_t> const& data);
+
+	/**
+	 * Write series of bytes to the device.
+	 */
+	template<std::size_t Size>
+		void
+		write_register (Register reg, std::array<uint8_t, Size> const& data);
 
   private:
-	bool		_open			= false;
-	uint8_t		_bus_number		= 0;
-	int			_device			= 0;
+	/**
+	 * Try to open bus if not open yet.
+	 */
+	void
+	ensure_open();
+
+  private:
+	Bus		_bus;
+	Address	_address;
 };
+
+
+template<std::size_t SequenceSize>
+	Message::Message (Operation operation, Address const& address, std::array<uint8_t, SequenceSize>& sequence):
+		_operation (operation),
+		_address (address),
+		_data (sequence.data()),
+		_size (sequence.size())
+	{ }
+
+
+inline uint8_t
+Bus::bus_number() const noexcept
+{
+	return _bus_number;
+}
+
+
+inline void
+Bus::set_bus_number (uint8_t bus_number) noexcept
+{
+	_bus_number = bus_number;
+}
 
 
 inline
@@ -216,28 +374,99 @@ Address::is_ten_bit() const noexcept
 }
 
 
-template<class DataType>
-	inline
-	Message::Message (Operation operation, Address const& address, DataType* data_type):
-		_operation (operation),
-		_address (address),
-		_begin (reinterpret_cast<uint8_t*> (data_type)),
-		_end (_begin + sizeof (DataType))
-	{ }
-
-
-inline uint8_t
-Bus::bus_number() const noexcept
+inline Bus&
+Device::bus()
 {
-	return _bus_number;
+	return _bus;
+}
+
+
+inline Bus const&
+Device::bus() const
+{
+	return _bus;
+}
+
+
+inline Address const&
+Device::address() const
+{
+	return _address;
 }
 
 
 inline void
-Bus::set_bus_number (uint8_t bus_number) noexcept
+Device::set_address (Address const& address)
 {
-	_bus_number = bus_number;
+	_address = address;
 }
+
+
+template<class Type>
+	Type
+	Device::read()
+	{
+		ensure_open();
+		Type result;
+		_bus.execute ({ Message (Read, _address, reinterpret_cast<uint8_t*> (&result), sizeof (result)) });
+		return result;
+	}
+
+
+template<class Type>
+	Type
+	Device::read_register (Register reg)
+	{
+		ensure_open();
+		Type result;
+		_bus.execute ({ Message (Write, _address, &reg, sizeof (reg)),
+						Message (Read, _address, reinterpret_cast<uint8_t*> (&result), sizeof (result)) });
+		return result;
+	}
+
+
+template<std::size_t Size>
+	void
+	Device::read_register (Register reg, std::array<uint8_t, Size> const& data)
+	{
+		ensure_open();
+		_bus.execute ({ Message (Write, _address, &reg, sizeof (reg)),
+						Message (Read, _address, const_cast<uint8_t*> (data.data()), data.size()) });
+	}
+
+
+template<class Type>
+	void
+	Device::write (Type value)
+	{
+		ensure_open();
+		_bus.execute ({ Message (Write, _address, reinterpret_cast<uint8_t*> (&value), sizeof (value)) });
+	}
+
+
+template<class Type>
+	void
+	Device::write_register (Register reg, Type value)
+	{
+		ensure_open();
+		std::array<uint8_t, sizeof (value) + 1> data;
+		data[0] = reg;
+		for (std::size_t b = 0; b < sizeof (value); ++b)
+			data[b + 1] = (value >> (8 * (sizeof (value) - b - 1))) & 0xff;
+		_bus.execute ({ Message (Write, _address, data) });
+	}
+
+
+template<std::size_t Size>
+	void
+	Device::write_register (Register reg, std::array<uint8_t, Size> const& data)
+	{
+		ensure_open();
+		std::array<uint8_t, Size + 1> data_to_write;
+		std::copy (data.begin(), data.end(), data_to_write.begin() + 1);
+		data_to_write[0] = reg;
+		_bus.execute ({ Message (Write, _address, data_to_write) });
+	}
 
 } // namespace I2C
 } // namespace Xefis

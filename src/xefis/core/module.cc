@@ -218,7 +218,7 @@ Module::has_setting (QString const& name)
 
 
 void
-Module::parse_i2c (QDomElement const& i2c_element, I2C::Bus& bus, I2C::Address& address)
+Module::parse_i2c (QDomElement const& i2c_element, I2C::Device& device)
 {
 	bool has_bus = false;
 	bool has_address = false;
@@ -227,16 +227,16 @@ Module::parse_i2c (QDomElement const& i2c_element, I2C::Bus& bus, I2C::Address& 
 	{
 		if (e == "bus")
 		{
-			bus.set_bus_number (e.text().trimmed().toUInt());
+			device.bus().set_bus_number (e.text().trimmed().toUInt());
 			has_bus = true;
 		}
 		else if (e == "address")
 		{
 			QString addr = e.text().trimmed();
 			if (addr.startsWith ("0x"))
-				address = I2C::Address (addr.mid (2).toUInt (nullptr, 16));
+				device.set_address (I2C::Address (addr.mid (2).toUInt (nullptr, 16)));
 			else
-				address = I2C::Address (addr.toUInt());
+				device.set_address (I2C::Address (addr.toUInt()));
 			has_address = true;
 		}
 	}

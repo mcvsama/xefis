@@ -55,7 +55,6 @@ inline void
 HT16K33::LedMatrix::clear()
 {
 	_data_array.fill (0);
-	_data_array[0] = LedMatrixRegister;
 }
 
 
@@ -65,9 +64,9 @@ HT16K33::LedMatrix::set (Row row, Column column, bool value) noexcept
 	uint8_t byte = 2 * column + (row < 8 ? 0 : 1);
 	uint8_t bit = row % 8;
 	if (value)
-		_data_array[byte + 1] |= 1 << bit;
+		_data_array[byte] |= 1 << bit;
 	else
-		_data_array[byte + 1] &= ~(1 << bit);
+		_data_array[byte] &= ~(1 << bit);
 }
 
 
@@ -282,7 +281,7 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 			});
 		}
 		else if (e == "i2c")
-			parse_i2c (e, _i2c_bus, _i2c_address);
+			parse_i2c (e, _i2c_device);
 		else if (e == "input")
 		{
 			_reliable_mode = e.attribute ("reliable-mode") == "true";
@@ -340,9 +339,8 @@ void
 HT16K33::initialize()
 {
 	guard ([&]() {
-		_i2c_bus.open();
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, SetupRegister | SetupOn) });
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, RowIntRegister | RowIntRow) });
+		_i2c_device.write (SetupRegister | SetupOn);
+		_i2c_device.write (RowIntRegister | RowIntRow);
 	});
 }
 
@@ -362,9 +360,7 @@ HT16K33::pool_keys()
 {
 	guard ([&]() {
 		// Check for interrupt flag:
-		uint8_t interrupt_flag = 0;
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, InterruptRegister),
-							Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, &interrupt_flag) });
+		uint8_t interrupt_flag = _i2c_device.read_register (InterruptRegister);
 
 		if (_reliable_mode && !interrupt_flag)
 		{
@@ -376,8 +372,7 @@ HT16K33::pool_keys()
 
 		// Read key RAM:
 		KeyMatrix::DataArray& key_array = _key_matrix.array();
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, KeyMatrixRegister),
-							Xefis::I2C::Message (Xefis::I2C::Read, _i2c_address, key_array.data(), key_array.data() + key_array.size()) });
+		_i2c_device.read_register (KeyMatrixRegister, key_array);
 
 		bool generated_change = false;
 		for (auto sw: _switches)
@@ -433,8 +428,8 @@ HT16K33::data_updated()
 
 		brightness = Xefis::limit<int> (_brightness.read (15), 0, 15) & 0xf;
 
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, DisplayRegister | display) });
-		_i2c_bus.execute ({ Xefis::I2C::Message (_i2c_address, BrightnessRegister | brightness) });
+		_i2c_device.write (DisplayRegister | display);
+		_i2c_device.write (BrightnessRegister | brightness);
 
 		_led_matrix.clear();
 		for (auto display: _displays)
@@ -442,7 +437,7 @@ HT16K33::data_updated()
 
 		// Write LED configuration:
 		LedMatrix::DataArray& led_array = _led_matrix.array();
-		_i2c_bus.execute ({ Xefis::I2C::Message (Xefis::I2C::Write, _i2c_address, led_array.data(), led_array.data() + led_array.size()) });
+		_i2c_device.write_register (LedMatrixRegister, led_array);
 	});
 }
 
