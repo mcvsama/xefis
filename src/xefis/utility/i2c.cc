@@ -31,18 +31,19 @@
 namespace Xefis {
 namespace I2C {
 
-Message::Message (Operation operation, Address const& address, uint8_t* begin, uint8_t* end):
+Message::Message (Operation operation, Address const& address, uint8_t* data, std::size_t size):
 	_operation (operation),
 	_address (address),
-	_begin (begin),
-	_end (end)
+	_data (data),
+	_size (size)
 { }
 
 
-Message::Message (Address const& address, uint8_t data):
-	_operation (Write),
+Message::Message (Operation operation, Address const& address, std::vector<uint8_t>& sequence):
+	_operation (operation),
 	_address (address),
-	_data (data)
+	_data (&sequence[0]),
+	_size (sequence.size())
 { }
 
 
@@ -56,16 +57,8 @@ Message::generate_i2c_msg() const noexcept
 		msg.flags |= I2C_M_TEN;
 	if (_operation == Read)
 		msg.flags |= I2C_M_RD;
-	if (_begin && _end)
-	{
-		msg.len = std::distance (_begin, _end);
-		msg.buf = _begin;
-	}
-	else
-	{
-		msg.len = 1;
-		msg.buf = const_cast<uint8_t*> (&_data);
-	}
+	msg.buf = _data;
+	msg.len = _size;
 	return msg;
 }
 
@@ -101,6 +94,7 @@ Bus::open (uint8_t bus_number)
 	_device = ::open ((boost::format ("/dev/i2c-%1%") % static_cast<int> (_bus_number)).str().c_str(), O_RDWR);
 	if (_device < 0)
 		throw IOError ((boost::format ("could not open I²C bus %1%: %2%") % static_cast<int> (_bus_number) % strerror (errno)).str());
+	_open = true;
 }
 
 
@@ -135,6 +129,63 @@ Bus::execute (Transaction const& transaction)
 
 	if (ioctl (_device, I2C_RDWR, &msgset) < 0)
 		throw IOError ((boost::format ("could not execute I²C transaction: %1%") % strerror (errno)).str());
+}
+
+
+void
+Device::open()
+{
+	ensure_open();
+}
+
+
+void
+Device::close()
+{
+	_bus.close();
+}
+
+
+Device::Device (Bus::ID bus_id, Address const& address):
+	_bus (bus_id),
+	_address (address)
+{ }
+
+
+void
+Device::read_register (Register reg, uint8_t* data, std::size_t size)
+{
+	ensure_open();
+	_bus.execute ({ Message (Write, _address, &reg, sizeof (reg)),
+					Message (Read, _address, data, size) });
+}
+
+
+void
+Device::read_register (Register reg, std::vector<uint8_t> const& data)
+{
+	ensure_open();
+	_bus.execute ({ Message (Write, _address, &reg, sizeof (reg)),
+					Message (Read, _address, const_cast<uint8_t*> (data.data()), data.size()) });
+}
+
+
+void
+Device::write_register (Register reg, std::vector<uint8_t> const& data)
+{
+	ensure_open();
+	std::vector<uint8_t> data_to_write;
+	std::copy (data.begin(), data.end(), data_to_write.begin() + 1);
+	data_to_write[0] = reg;
+	_bus.execute ({ Message (Write, _address, data_to_write) });
+}
+
+
+void
+Device::ensure_open()
+{
+	if (!_bus.good())
+		_bus.open();
 }
 
 } // namespace I2C

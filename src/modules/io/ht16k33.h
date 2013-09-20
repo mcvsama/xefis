@@ -79,7 +79,7 @@ class HT16K33:
 	{
 	  public:
 		// First byte is a command byte (display address pointer):
-		typedef std::array<uint8_t, 17> DataArray;
+		typedef std::array<uint8_t, 16> DataArray;
 
 	  public:
 		// Ctor:
@@ -107,9 +107,7 @@ class HT16K33:
 		set_column (Row row, uint8_t column_bits) noexcept;
 
 		/**
-		 * Return data to be sent over I²C. First
-		 * byte is command byte ("address pointer")
-		 * and is always set to LedMatrixRegister.
+		 * Return data to be sent over I²C.
 		 */
 		DataArray&
 		array();
@@ -292,8 +290,7 @@ class HT16K33:
 	Xefis::PropertyInteger	_brightness;
 	Xefis::PropertyBoolean	_blinking;
 	Xefis::PropertyInteger	_blinking_mode;
-	Xefis::I2C::Bus			_i2c_bus;
-	Xefis::I2C::Address		_i2c_address;
+	Xefis::I2C::Device		_i2c_device;
 	LedMatrix				_led_matrix;
 	KeyMatrix				_key_matrix;
 	Displays				_displays;

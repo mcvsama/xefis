@@ -81,6 +81,9 @@ class ETSAirspeed:
 	void
 	offset_collected();
 
+	/**
+	 * Guard and reinitialize on I2C error.
+	 */
 	void
 	guard (std::function<void()> guarded_code);
 
@@ -91,8 +94,7 @@ class ETSAirspeed:
 	Xefis::PropertySpeed	_airspeed_maximum;
 	Time					_airspeed_read_interval		= 100_ms;
 	Time					_airspeed_smoothing_time	= 100_ms;
-	Xefis::I2C::Bus			_i2c_bus;
-	Xefis::I2C::Address		_i2c_address;
+	Xefis::I2C::Device		_i2c_device;
 	Stage					_stage						= Stage::Calibrating;
 	QTimer*					_initialization_timer;
 	QTimer*					_periodic_read_timer;

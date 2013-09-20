@@ -184,12 +184,11 @@ class Module: private Noncopyable
 	has_setting (QString const& name);
 
 	/**
-	 * Parse the <i2c> element containing I2C bus number and device
-	 * address.
+	 * Parse the <i2c> element and setup an I2C::Device object.
 	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
-	parse_i2c (QDomElement const& i2c_element, I2C::Bus&, I2C::Address&);
+	parse_i2c (QDomElement const& i2c_element, I2C::Device&);
 
 	/**
 	 * Signal that this module has updated property tree.
