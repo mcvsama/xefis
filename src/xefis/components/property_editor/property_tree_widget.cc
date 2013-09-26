@@ -74,6 +74,15 @@ PropertyTreeWidget::selected_property_node() const
 }
 
 
+bool
+PropertyTreeWidget::contains_binary_data (TypedPropertyValueNode const* node)
+{
+	std::string data = node->stringify();
+	PropertyValueNode<std::string> const* string_node = dynamic_cast<PropertyValueNode<std::string> const*> (node);
+	return string_node && std::any_of (data.begin(), data.end(), [](unsigned char c) -> bool { return c < 0x20 || 0x7f < c; });
+}
+
+
 void
 PropertyTreeWidget::read()
 {
@@ -90,8 +99,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 	{
 		std::string data = val_node->stringify();
 		// If it's a string and contains binary data, display as binary string:
-		PropertyValueNode<std::string>* string_node = dynamic_cast<PropertyValueNode<std::string>*> (val_node);
-		if (string_node && std::any_of (data.begin(), data.end(), [](unsigned char c) -> bool { return c < 0x20 || 0x7f < c; }))
+		if (contains_binary_data (val_node))
 			data = "binary " + to_binary_form (data);
 		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (data));
 	}

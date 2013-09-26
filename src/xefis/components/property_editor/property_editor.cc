@@ -87,7 +87,7 @@ PropertyEditor::item_selected()
 		QWidget* widgets[] = { _editable_value, _update_button };
 
 		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
-		if (!val_node)
+		if (!val_node || PropertyTreeWidget::contains_binary_data (val_node))
 		{
 			_editable_value->setText ("");
 			for (QWidget* w: widgets)
