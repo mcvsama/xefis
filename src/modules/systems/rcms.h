@@ -37,9 +37,6 @@ class RemoteControlManagementSystem:
 	// Ctor
 	RemoteControlManagementSystem (Xefis::ModuleManager*, QDomElement const& config);
 
-	// Dtor
-	~RemoteControlManagementSystem();
-
 	// Xefis::Module API.
 	QWidget*
 	configurator_widget() const override;
