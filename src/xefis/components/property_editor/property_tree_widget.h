@@ -51,6 +51,12 @@ class PropertyTreeWidget: public QTreeWidget
 	PropertyNode*
 	selected_property_node() const;
 
+	/**
+	 * Return true if given string contains "binary data".
+	 */
+	static bool
+	contains_binary_data (TypedPropertyValueNode const*);
+
   public slots:
 	/**
 	 * Reads the nodes structure and updates
