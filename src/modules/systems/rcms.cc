@@ -62,12 +62,6 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 }
 
 
-RemoteControlManagementSystem::~RemoteControlManagementSystem()
-{
-	delete _configurator_widget;
-}
-
-
 QWidget*
 RemoteControlManagementSystem::configurator_widget() const
 {
