@@ -48,6 +48,13 @@ operator* (Time const& time, Speed const& speed)
 }
 
 
+inline constexpr Frequency
+operator/ (double value, Time const& time)
+{
+	return 1_Hz * (value / time.s());
+}
+
+
 inline constexpr Time
 operator/ (double value, Frequency const& frequency)
 {
