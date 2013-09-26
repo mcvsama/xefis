@@ -92,6 +92,12 @@ class ModuleManager
 	Module*
 	find (Module::Pointer const&) const;
 
+	/**
+	 * Return list of loaded modules.
+	 */
+	PointerToModuleMap const&
+	modules() const;
+
   private:
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);

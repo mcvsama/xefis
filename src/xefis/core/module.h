@@ -47,6 +47,10 @@ class Module: private Noncopyable
   public:
 	struct NameAndProperty
 	{
+		NameAndProperty (QString const& name, TypedProperty& property, bool required):
+			name (name), property (property), required (required)
+		{ }
+
 		QString			name;
 		TypedProperty&	property;
 		bool			required;
@@ -148,6 +152,14 @@ class Module: private Noncopyable
 	 */
 	Time
 	update_dt() const;
+
+	/**
+	 * Return configurator widget.
+	 * If module doesn't have one, return nullptr.
+	 * Default implementation returns nullptr.
+	 */
+	virtual QWidget*
+	configurator_widget() const;
 
 	/**
 	 * Register module factory.

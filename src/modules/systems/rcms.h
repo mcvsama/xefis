@@ -27,13 +27,31 @@
 #include <xefis/core/property_observer.h>
 
 
-class RemoteControlManagementSystem: public Xefis::Module
+class RemoteControlManagementSystem:
+	public QObject,
+	public Xefis::Module
 {
+	Q_OBJECT
+
   public:
 	// Ctor
 	RemoteControlManagementSystem (Xefis::ModuleManager*, QDomElement const& config);
 
+	// Dtor
+	~RemoteControlManagementSystem();
+
+	// Xefis::Module API.
+	QWidget*
+	configurator_widget() const override;
+
+  private slots:
+	void
+	acquire_home();
+
   private:
+	void
+	create_configurator_widget();
+
 	void
 	data_updated() override;
 
@@ -44,16 +62,14 @@ class RemoteControlManagementSystem: public Xefis::Module
 	position_is_valid() const;
 
 	void
-	acquire_home();
-
-	void
 	compute_distances_to_home();
 
 	void
 	compute_true_home_direction();
 
   private:
-	bool					_home_acquired = false;
+	QWidget*				_configurator_widget	= nullptr;
+	bool					_home_acquired			= false;
 	Xefis::PropertyObserver	_distance_computer;
 	// Input:
 	Xefis::PropertyLength	_vlos_caution_distance;

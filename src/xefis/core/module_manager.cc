@@ -110,6 +110,13 @@ ModuleManager::find (Module::Pointer const& modptr) const
 }
 
 
+ModuleManager::PointerToModuleMap const&
+ModuleManager::modules() const
+{
+	return _pointer_to_module_map;
+}
+
+
 Module*
 ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
 {

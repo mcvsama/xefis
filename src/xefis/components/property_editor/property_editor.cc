@@ -55,7 +55,7 @@ PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
 	value_layout->addWidget (_update_button);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
+	layout->setMargin (WidgetMargin);
 	layout->setSpacing (WidgetSpacing);
 	layout->addLayout (value_layout);
 	layout->addWidget (_property_tree_widget);

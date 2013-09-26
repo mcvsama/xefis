@@ -19,15 +19,20 @@ SRC_HEADERS += xefis/components/property_editor/property_editor.h
 SRC_HEADERS += xefis/components/property_editor/property_tree_widget.h
 SRC_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
 SRC_HEADERS += xefis/components/configurator/configurator_widget.h
+SRC_HEADERS += xefis/components/configurator/modules_list.h
+SRC_HEADERS += xefis/components/configurator/modules_list_item.h
 
 SRC_SOURCES += xefis/components/property_editor/property_editor.cc
 SRC_SOURCES += xefis/components/property_editor/property_tree_widget.cc
 SRC_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
 SRC_SOURCES += xefis/components/configurator/configurator_widget.cc
+SRC_SOURCES += xefis/components/configurator/modules_list.cc
+SRC_SOURCES += xefis/components/configurator/modules_list_item.cc
 
 SRC_MOCHDRS += xefis/components/property_editor/property_editor.h
 SRC_MOCHDRS += xefis/components/property_editor/property_tree_widget.h
 SRC_MOCHDRS += xefis/components/configurator/configurator_widget.h
+SRC_MOCHDRS += xefis/components/configurator/modules_list.h
 
 ######## /xefis/config ########
 
@@ -223,6 +228,8 @@ SRC_SOURCES += modules/systems/fly_by_wire.cc
 SRC_SOURCES += modules/systems/fdc.cc
 SRC_SOURCES += modules/systems/rcms.cc
 SRC_SOURCES += modules/systems/slip_skid.cc
+
+SRC_MOCHDRS += modules/systems/rcms.h
 
 ######## /modules/private ########
 
