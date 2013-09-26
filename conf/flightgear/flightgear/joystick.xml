@@ -1,0 +1,25 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/joystick' instance='main'>
+		<device>/dev/input/by-id/usb-Saitek_Saitek_X52_Pro_Flight_Control_System-joystick</device>
+		<path>/input/main</path>
+		<axis id='0'>
+			<center>0.00259</center>
+			<dead-zone>0.016</dead-zone>
+			<power>1.4</power>
+		</axis>
+		<axis id='1'>
+			<center>0.00259</center>
+			<dead-zone>0.016</dead-zone>
+			<power>1.4</power>
+		</axis>
+	</module>
+	<module name='io/joystick' instance='pedals'>
+		<device>/dev/input/js0</device>
+		<path>/input/rudder</path>
+		<axis id='2'>
+			<power>3</power>
+		</axis>
+	</module>
+</xefis-include>
+
