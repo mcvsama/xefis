@@ -867,42 +867,7 @@ Link::eat (Blob& blob)
 	bool applied = false;
 	while (blob.size() > _magic_size + 1)
 	{
-		try {
-			// Find the right magic and packet:
-			std::copy (blob.begin(), blob.begin() + _magic_size, _tmp_input_magic.begin());
-			PacketMagics::iterator packet_and_magic = _packet_magics.find (_tmp_input_magic);
-
-			// If not found, retry starting with next byte:
-			if (packet_and_magic == _packet_magics.end())
-				throw ParseError();
-
-			Packet* packet = packet_and_magic->second;
-			// Now see if we have enough data in input buffer for this packet type.
-			// If not, return and retry when enough data is read.
-			if (blob.size() - _magic_size < packet->size())
-				return;
-
-			Blob::iterator e = packet->eat (blob.begin() + _magic_size, blob.end());
-			Blob::size_type valid_bytes = std::distance (blob.begin(), e);
-			blob.erase (blob.begin(), e);
-			packet->apply();
-			applied = true;
-
-			if (_valid_packets.configured())
-				_valid_packets.write (*_valid_packets + 1);
-
-			if (_valid_bytes.configured())
-				_valid_bytes.write (*_valid_bytes + valid_bytes);
-
-			// Restart failsafe timer:
-			_failsafe_timer->start();
-
-			// If link is not valid, and we got valid packet,
-			// start reacquire timer:
-			if (!_link_valid && !_reacquire_timer->isActive())
-				_reacquire_timer->start();
-		}
-		catch (...)
+		auto skip_byte_and_retry = [&]() -> void
 		{
 			// Skip one byte and try again:
 			if (blob.size() >= 1)
@@ -912,7 +877,54 @@ Link::eat (Blob& blob)
 
 			// Since there was an error, stop reacquire timer:
 			_reacquire_timer->stop();
-		}
+		};
+
+		Xefis::Exception::guard ([&] {
+			try {
+				// Find the right magic and packet:
+				std::copy (blob.begin(), blob.begin() + _magic_size, _tmp_input_magic.begin());
+				PacketMagics::iterator packet_and_magic = _packet_magics.find (_tmp_input_magic);
+
+				// If not found, retry starting with next byte:
+				if (packet_and_magic == _packet_magics.end())
+					throw ParseError();
+
+				Packet* packet = packet_and_magic->second;
+				// Now see if we have enough data in input buffer for this packet type.
+				// If not, return and retry when enough data is read.
+				if (blob.size() - _magic_size < packet->size())
+					return;
+
+				Blob::iterator e = packet->eat (blob.begin() + _magic_size, blob.end());
+				Blob::size_type valid_bytes = std::distance (blob.begin(), e);
+				blob.erase (blob.begin(), e);
+				packet->apply();
+				applied = true;
+
+				if (_valid_packets.configured())
+					_valid_packets.write (*_valid_packets + 1);
+
+				if (_valid_bytes.configured())
+					_valid_bytes.write (*_valid_bytes + valid_bytes);
+
+				// Restart failsafe timer:
+				_failsafe_timer->start();
+
+				// If link is not valid, and we got valid packet,
+				// start reacquire timer:
+				if (!_link_valid && !_reacquire_timer->isActive())
+					_reacquire_timer->start();
+			}
+			catch (ParseError&)
+			{
+				skip_byte_and_retry();
+			}
+			catch (...)
+			{
+				skip_byte_and_retry();
+				throw;
+			}
+		});
 	}
 
 	if (applied)

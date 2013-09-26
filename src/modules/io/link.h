@@ -40,7 +40,13 @@ class Link:
 
 	typedef std::vector<uint8_t> Blob;
 
-	class ParseError { };
+	class ParseError: public Xefis::Exception
+	{
+	  public:
+		ParseError():
+			Exception ("ParseError")
+		{ }
+	};
 
 	class Item
 	{
