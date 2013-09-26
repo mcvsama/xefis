@@ -16,6 +16,8 @@
 
 // Qt:
 #include <QtXml/QDomElement>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -31,6 +33,8 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/rcms", RemoteControlManagementSystem);
 RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	create_configurator_widget();
+
 	for (QDomElement& e: config)
 	{
 		if (e == "properties")
@@ -58,17 +62,16 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 }
 
 
-bool
-RemoteControlManagementSystem::home_is_valid() const
+RemoteControlManagementSystem::~RemoteControlManagementSystem()
 {
-	return _home_longitude.valid() && _home_latitude.valid() && _home_altitude_amsl.valid();
+	delete _configurator_widget;
 }
 
 
-bool
-RemoteControlManagementSystem::position_is_valid() const
+QWidget*
+RemoteControlManagementSystem::configurator_widget() const
 {
-	return _position_longitude.valid() && _position_latitude.valid() && _position_altitude_amsl.valid();
+	return _configurator_widget;
 }
 
 
@@ -83,6 +86,36 @@ RemoteControlManagementSystem::acquire_home()
 		_home_altitude_amsl.copy (_position_altitude_amsl);
 		_home_acquired = true;
 	}
+}
+
+
+void
+RemoteControlManagementSystem::create_configurator_widget()
+{
+	_configurator_widget = new QWidget();
+	_configurator_widget->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Maximum);
+
+	QPushButton* acquire_home_button = new QPushButton ("Acquire HOME position", _configurator_widget);
+	QObject::connect (acquire_home_button, SIGNAL (clicked (bool)), this, SLOT (acquire_home()));
+
+	QHBoxLayout* layout = new QHBoxLayout (_configurator_widget);
+	layout->setMargin (0);
+	layout->setSpacing (WidgetSpacing);
+	layout->addWidget (acquire_home_button);
+}
+
+
+bool
+RemoteControlManagementSystem::home_is_valid() const
+{
+	return _home_longitude.valid() && _home_latitude.valid() && _home_altitude_amsl.valid();
+}
+
+
+bool
+RemoteControlManagementSystem::position_is_valid() const
+{
+	return _position_longitude.valid() && _position_latitude.valid() && _position_altitude_amsl.valid();
 }
 
 

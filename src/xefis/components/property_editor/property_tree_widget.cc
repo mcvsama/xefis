@@ -112,6 +112,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 			PropertyNodeList subnodes_list = dir_node->children();
 			std::set<PropertyNode*> subnodes (subnodes_list.begin(), subnodes_list.end());
 
+			// Find items that are no longer in @subnodes:
 			for (int ci = 0; ci < item->childCount(); ++ci)
 			{
 				PropertyTreeWidgetItem* c = convert_item (item->child (ci));
@@ -119,6 +120,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 
 				if (s != subnodes.end())
 				{
+					// Update item and remove from @subnodes:
 					c->read();
 					subnodes.erase (s);
 				}
@@ -126,6 +128,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 					delete item->takeChild (ci--);
 			}
 
+			// Add items for all nodes left in @subnodes:
 			for (auto s: subnodes)
 				item->addChild (new PropertyTreeWidgetItem (s, item));
 		}

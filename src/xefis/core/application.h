@@ -78,6 +78,12 @@ class Application: public QApplication
 	accounting() const;
 
 	/**
+	 * Return ModuleManager object.
+	 */
+	ModuleManager*
+	module_manager() const;
+
+	/**
 	 * Return pointer to navaid storage.
 	 */
 	NavaidStorage*
@@ -162,6 +168,13 @@ inline Accounting*
 Application::accounting() const
 {
 	return _accounting;
+}
+
+
+inline ModuleManager*
+Application::module_manager() const
+{
+	return _module_manager;
 }
 
 

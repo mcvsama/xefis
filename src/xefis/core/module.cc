@@ -269,6 +269,13 @@ Module::update_dt() const
 }
 
 
+QWidget*
+Module::configurator_widget() const
+{
+	return nullptr;
+}
+
+
 NavaidStorage*
 Module::navaid_storage() const
 {

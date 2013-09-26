@@ -19,11 +19,17 @@
 
 // Qt:
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QLabel>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/property_editor/property_editor.h>
 #include <xefis/core/window.h>
+
+// Local:
+#include "modules_list.h"
 
 
 namespace Xefis {
@@ -34,7 +40,7 @@ class ConfiguratorWidget: public QWidget
 
   public:
 	// Ctor
-	ConfiguratorWidget (QWidget* parent);
+	ConfiguratorWidget (ModuleManager* module_manager, QWidget* parent);
 
 	Window*
 	owning_window() const;
@@ -42,9 +48,26 @@ class ConfiguratorWidget: public QWidget
 	void
 	set_owning_window (Window*);
 
+  private slots:
+	void
+	module_selected (Module::Pointer const&);
+
   private:
-	Xefis::PropertyEditor*	_property_editor	= nullptr;
-	Window*					_owning_window		= nullptr;
+	/**
+	 * Create a decorator for given widget.
+	 */
+	void
+	decorate_widget (QWidget* configurator_widget);
+
+  private:
+	ModuleManager*					_module_manager			= nullptr;
+	PropertyEditor*					_property_editor		= nullptr;
+	ModulesList*					_modules_list			= nullptr;
+	QStackedWidget*					_modules_stack			= nullptr;
+	QTabWidget*						_tabs					= nullptr;
+	Window*							_owning_window			= nullptr;
+	QLabel*							_no_config_placeholder	= nullptr;
+	std::map<QWidget*, QWidget*>	_config_decorators;
 };
 
 
