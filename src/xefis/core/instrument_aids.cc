@@ -49,6 +49,11 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 
 	float const font_height_scale_factor = 0.7f;
 
+	_font_8 = _font;
+	_font_8.setPixelSize (font_size (10.f));
+	_font_8_digit_width = get_digit_width (_font_8);
+	_font_8_digit_height = font_height_scale_factor * QFontMetrics (_font_8).height();
+
 	_font_10 = _font;
 	_font_10.setPixelSize (font_size (11.f));
 	_font_10_digit_width = get_digit_width (_font_10);

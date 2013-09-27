@@ -83,14 +83,17 @@ class InstrumentAids
 
   protected:
 	QFont				_font;
+	QFont				_font_8;
 	QFont				_font_10;
 	QFont				_font_13;
 	QFont				_font_16;
 	QFont				_font_20;
+	float				_font_8_digit_width;
 	float				_font_10_digit_width;
 	float				_font_13_digit_width;
 	float				_font_16_digit_width;
 	float				_font_20_digit_width;
+	float				_font_8_digit_height;
 	float				_font_10_digit_height;
 	float				_font_13_digit_height;
 	float				_font_16_digit_height;

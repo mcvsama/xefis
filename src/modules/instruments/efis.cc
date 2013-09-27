@@ -49,6 +49,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "altitude-ladder.number-every", _altitude_ladder_number_every, false },
 				{ "altitude-ladder.bold-every", _altitude_ladder_bold_every, false },
 				{ "altitude-ladder.extent", _altitude_ladder_extent, false },
+				{ "speed.ias.serviceable", _ias_serviceable, false },
 				{ "speed.ias", _ias, false },
 				{ "speed.ias.lookahead", _ias_lookahead, false },
 				{ "speed.ias.minimum", _minimum_ias, false },
@@ -58,6 +59,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "speed.v1", _speed_v1, false },
 				{ "speed.vr", _speed_vr, false },
 				{ "speed.ref", _speed_ref, false },
+				{ "orientation.serviceable", _attitude_serviceable, false },
 				{ "orientation.pitch", _pitch, false },
 				{ "orientation.roll", _roll, false },
 				{ "orientation.roll.limit", _roll_limit, false },
@@ -66,6 +68,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "orientation.heading.numbers-visible", _heading_numbers_visible, false },
 				{ "slip-skid", _slip_skid_g, false },
 				{ "slip-skid.limit", _slip_skid_limit_g, false },
+				{ "fpm.serviceable", _fpm_serviceable, false },
 				{ "fpm.visible", _fpm_visible, false },
 				{ "fpm.alpha", _fpm_alpha, false },
 				{ "fpm.beta", _fpm_beta, false },
@@ -73,9 +76,12 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "aoa.warning-threshold", _aoa_warning_threshold, false },
 				{ "aoa.pitch-limit", _pitch_limit, false },
 				{ "aoa.pitch-limit.visible", _pitch_limit_visible, false },
+				{ "altitude.serviceable", _altitude_serviceable, false },
 				{ "altitude", _altitude, false },
 				{ "altitude.lookahead", _altitude_lookahead, false },
+				{ "altitude.agl.serviceable", _altitude_agl_serviceable, false },
 				{ "altitude.agl", _altitude_agl, false },
+				{ "altitude.cbr.serviceable", _cbr_serviceable, false },
 				{ "altitude.cbr", _cbr, false },
 				{ "altitude.variometer", _variometer, false },
 				{ "altitude.minimums", _minimums_altitude, false },
@@ -86,6 +92,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "cmd.altitude", _cmd_alt_setting, false },
 				{ "cmd.ias", _cmd_speed_setting, false },
 				{ "cmd.cbr", _cmd_cbr_setting, false },
+				{ "flight-director.serviceable", _flight_director_serviceable, false },
 				{ "flight-director.visible", _flight_director_visible, false },
 				{ "flight-director.pitch", _flight_director_pitch, false },
 				{ "flight-director.roll", _flight_director_roll, false },
@@ -107,6 +114,10 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "fma.lateral-small-hint", _fma_lateral_small_hint, false },
 				{ "fma.vertical-hint", _fma_vertical_hint, false },
 				{ "fma.vertical-small-hint", _fma_vertical_small_hint, false },
+				{ "warning.pitch-disagree", _pitch_disagree, false },
+				{ "warning.roll-disagree", _roll_disagree, false },
+				{ "warning.ias-disagree", _ias_disagree, false },
+				{ "warning.altitude-disagree", _altitude_disagree, false },
 			});
 		}
 	}
@@ -129,14 +140,15 @@ EFIS::read()
 	_efis_widget->set_speed_ladder_minimum (_speed_ladder_minimum.read (0));
 	_efis_widget->set_speed_ladder_maximum (_speed_ladder_maximum.read (9999));
 
-	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every.valid() ? *_altitude_ladder_line_every : 100);
-	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.valid() ? *_altitude_ladder_number_every : 200);
-	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.valid() ? *_altitude_ladder_bold_every : 500);
-	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.valid() ? *_altitude_ladder_extent : 825);
+	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every.read (100));
+	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.read (200));
+	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.read (500));
+	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.read (825));
 
-	_efis_widget->set_heading_numbers_visible (_heading_numbers_visible.valid() ? *_heading_numbers_visible : false);
+	_efis_widget->set_heading_numbers_visible (_heading_numbers_visible.read (false));
 
 	_efis_widget->set_speed_visible (_ias.valid());
+	_efis_widget->set_speed_failure (_ias_serviceable.configured() && !_ias_serviceable.read (false));
 	if (_ias.valid())
 		_efis_widget->set_speed (*_ias);
 
@@ -168,7 +180,9 @@ EFIS::read()
 	if (_roll.valid())
 		_efis_widget->set_roll (*_roll);
 
-	_efis_widget->set_roll_limit (_roll_limit.valid() ? *_roll_limit : 0_deg);
+	_efis_widget->set_attitude_failure (_attitude_serviceable.configured() && !_attitude_serviceable.read (false));
+
+	_efis_widget->set_roll_limit (_roll_limit.read (0_deg));
 
 	if (_pitch_limit.valid() && _pitch_limit_visible.valid())
 	{
@@ -195,6 +209,9 @@ EFIS::read()
 
 	bool fpm_visible = _fpm_visible.valid() && *_fpm_visible;
 
+	_efis_widget->set_flight_path_marker_failure (_fpm_visible.configured() && _fpm_visible.read (false) &&
+												  _fpm_serviceable.configured() && !_fpm_serviceable.read (false));
+
 	if (_fpm_alpha.valid() && _fpm_beta.valid())
 	{
 		_efis_widget->set_flight_path_alpha (*_fpm_alpha);
@@ -205,6 +222,7 @@ EFIS::read()
 		_efis_widget->set_flight_path_marker_visible (false);
 
 	_efis_widget->set_altitude_visible (_altitude.valid());
+	_efis_widget->set_altitude_failure (_altitude_serviceable.configured() && !_altitude_serviceable.read (false));
 	if (_altitude.valid())
 		_efis_widget->set_altitude (*_altitude);
 
@@ -213,6 +231,7 @@ EFIS::read()
 		_efis_widget->set_altitude_tendency (*_altitude_lookahead);
 
 	_efis_widget->set_altitude_agl_visible (_altitude_agl.valid());
+	_efis_widget->set_radar_altimeter_failure (_altitude_agl_serviceable.configured() && !_altitude_agl_serviceable.read (false));
 	if (_altitude_agl.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl);
 
@@ -238,6 +257,7 @@ EFIS::read()
 		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
 
 	_efis_widget->set_climb_rate_visible (_cbr.valid());
+	_efis_widget->set_climb_rate_failure (_cbr_serviceable.configured() && !_cbr_serviceable.read (false));
 	if (_cbr.valid())
 		_efis_widget->set_climb_rate (*_cbr);
 
@@ -259,7 +279,9 @@ EFIS::read()
 	if (_cmd_cbr_setting.valid())
 		_efis_widget->set_cmd_climb_rate (*_cmd_cbr_setting);
 
-	bool flight_director_visible = _flight_director_visible.valid() && *_flight_director_visible;
+	bool flight_director_visible = _flight_director_visible.read (false);
+
+	_efis_widget->set_flight_director_failure (_flight_director_serviceable.configured() && !_flight_director_serviceable.read (false));
 
 	_efis_widget->set_flight_director_pitch_visible (flight_director_visible && _flight_director_pitch.valid());
 	if (_flight_director_pitch.valid())
@@ -347,5 +369,10 @@ EFIS::read()
 	_efis_widget->set_fma_lateral_small_hint (_fma_lateral_small_hint.read ("").c_str());
 	_efis_widget->set_fma_vertical_hint (_fma_vertical_hint.read ("").c_str());
 	_efis_widget->set_fma_vertical_small_hint (_fma_vertical_small_hint.read ("").c_str());
+
+	_efis_widget->set_pitch_disagree (_pitch_disagree.read (false));
+	_efis_widget->set_roll_disagree (_roll_disagree.read (false));
+	_efis_widget->set_ias_disagree (_ias_disagree.read (false));
+	_efis_widget->set_altitude_disagree (_altitude_disagree.read (false));
 }
 

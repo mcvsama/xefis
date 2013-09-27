@@ -142,6 +142,17 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				speed_blinking_active			= false;
 		bool				minimums_blink					= false;
 		bool				minimums_blinking_active		= false;
+		bool				attitude_failure				= false;
+		bool				ias_failure						= false;
+		bool				altitude_failure				= false;
+		bool				climb_rate_failure				= false;
+		bool				flight_path_marker_failure		= false;
+		bool				radar_altimeter_failure			= false;
+		bool				flight_director_failure			= false;
+		bool				pitch_disagree					= false;
+		bool				roll_disagree					= false;
+		bool				ias_disagree					= false;
+		bool				altitude_disagree				= false;
 
 		/*
 		 * Speed ladder
@@ -198,6 +209,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_paint (Xefis::Painter&);
 
 		void
+		adi_clear (Xefis::Painter&);
+
+		void
 		adi_paint_horizon (Xefis::Painter&);
 
 		void
@@ -208,6 +222,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 		void
 		adi_paint_heading (Xefis::Painter&);
+
+		void
+		adi_paint_pitch_disagree (Xefis::Painter&);
+
+		void
+		adi_paint_roll_disagree (Xefis::Painter&);
 
 		void
 		adi_paint_flight_path_marker (Xefis::Painter&);
@@ -227,6 +247,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 		void
 		sl_paint_black_box (Xefis::Painter&, float x);
+
+		void
+		sl_paint_ias_disagree (Xefis::Painter&, float x);
 
 		void
 		sl_paint_ladder_scale (Xefis::Painter&, float x);
@@ -267,6 +290,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 		void
 		al_paint_black_box (Xefis::Painter&, float x);
+
+		void
+		al_paint_altitude_disagree (Xefis::Painter&, float x);
 
 		void
 		al_paint_ladder_scale (Xefis::Painter&, float x);
@@ -327,6 +353,31 @@ class EFISWidget: public Xefis::InstrumentWidget
 		paint_dashed_zone (Xefis::Painter&, QColor const&, QRectF const& target);
 
 		/**
+		 * Various failure flags.
+		 */
+
+		void
+		adi_paint_attitude_failure (Xefis::Painter& painter);
+
+		void
+		adi_paint_flight_path_marker_failure (Xefis::Painter&);
+
+		void
+		adi_paint_flight_director_falure (Xefis::Painter&);
+
+		void
+		sl_paint_failure (Xefis::Painter&);
+
+		void
+		al_paint_climb_rate_failure (Xefis::Painter&, float x);
+
+		void
+		al_paint_failure (Xefis::Painter&);
+
+		void
+		paint_radar_altimeter_failure (Xefis::Painter&);
+
+		/**
 		 * Render 'rotatable' value on speed/altitude black box.
 		 *
 		 * \param	painter
@@ -351,6 +402,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 		paint_rotating_digit (Xefis::Painter& painter,
 							  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 							  bool two_zeros, bool zero_mark, bool black_zero = false);
+
+		/**
+		 * Paint horizontal failure flag.
+		 */
+		void
+		paint_horizontal_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
+
+		/**
+		 * Paint vertical failure flag.
+		 */
+		void
+		paint_vertical_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
 
 		float
 		pitch_to_px (Angle degrees) const;
@@ -1031,6 +1094,72 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_input_alert_visible (bool visible);
+
+	/**
+	 * Set attitude failure flag.
+	 */
+	void
+	set_attitude_failure (bool);
+
+	/**
+	 * Set speed failure flag.
+	 */
+	void
+	set_speed_failure (bool);
+
+	/**
+	 * Set altitude failure flag.
+	 */
+	void
+	set_altitude_failure (bool);
+
+	/**
+	 * Set climb rate failure flag.
+	 */
+	void
+	set_climb_rate_failure (bool);
+
+	/**
+	 * Set FPM failure flag.
+	 */
+	void
+	set_flight_path_marker_failure (bool);
+
+	/**
+	 * Set radar altimeter (AGL) failure flag.
+	 */
+	void
+	set_radar_altimeter_failure (bool);
+
+	/**
+	 * Set FD failure flag.
+	 */
+	void
+	set_flight_director_failure (bool);
+
+	/**
+	 * Set pitch disagree flag.
+	 */
+	void
+	set_pitch_disagree (bool disagree);
+
+	/**
+	 * Set roll disagree flag.
+	 */
+	void
+	set_roll_disagree (bool disagree);
+
+	/**
+	 * Set ias disagree flag.
+	 */
+	void
+	set_ias_disagree (bool disagree);
+
+	/**
+	 * Set altitude disagree flag.
+	 */
+	void
+	set_altitude_disagree (bool disagree);
 
   protected:
 	// API of InstrumentWidget
@@ -1901,6 +2030,94 @@ inline void
 EFISWidget::set_input_alert_visible (bool visible)
 {
 	_params.input_alert_visible = visible;
+}
+
+
+inline void
+EFISWidget::set_attitude_failure (bool set)
+{
+	_params.attitude_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_speed_failure (bool set)
+{
+	_params.ias_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_altitude_failure (bool set)
+{
+	_params.altitude_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_climb_rate_failure (bool set)
+{
+	_params.climb_rate_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_flight_path_marker_failure (bool set)
+{
+	_params.flight_path_marker_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_radar_altimeter_failure (bool set)
+{
+	_params.radar_altimeter_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_flight_director_failure (bool set)
+{
+	_params.flight_director_failure = set;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_pitch_disagree (bool disagree)
+{
+	_params.pitch_disagree = disagree;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_roll_disagree (bool disagree)
+{
+	_params.roll_disagree = disagree;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_ias_disagree (bool disagree)
+{
+	_params.ias_disagree = disagree;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_altitude_disagree (bool disagree)
+{
+	_params.altitude_disagree = disagree;
+	request_repaint();
 }
 
 #endif

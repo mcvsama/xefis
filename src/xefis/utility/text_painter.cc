@@ -81,17 +81,8 @@ TextPainter::TextPainter (QPaintDevice* device, Cache* cache):
 }
 
 
-void
-TextPainter::fast_draw_text (QPointF const& position, QString const& text)
-{
-	QFontMetricsF metrics (font());
-	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
-	fast_draw_text (target, 0, text);
-}
-
-
-void
-TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text)
+QRectF
+TextPainter::get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const
 {
 	QFontMetricsF metrics (font());
 	QRectF target (position.x(), position.y(), metrics.width (text), metrics.height());
@@ -106,7 +97,23 @@ TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QStri
 	else if (flags & Qt::AlignBottom)
 		target.translate (0.f, -target.height());
 
+	return target;
+}
+
+
+void
+TextPainter::fast_draw_text (QPointF const& position, QString const& text)
+{
+	QFontMetricsF metrics (font());
+	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
 	fast_draw_text (target, 0, text);
+}
+
+
+void
+TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text)
+{
+	fast_draw_text (get_text_box (position, flags, text), 0, text);
 }
 
 

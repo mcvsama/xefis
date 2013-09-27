@@ -88,6 +88,9 @@ class TextPainter: public QPainter
   public:
 	TextPainter (QPaintDevice* device, Cache* cache);
 
+	QRectF
+	get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
+
 	void
 	fast_draw_text (QPointF const& position, QString const& text);
 
