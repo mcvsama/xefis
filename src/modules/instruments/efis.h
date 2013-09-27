@@ -63,12 +63,14 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyInteger	_altitude_ladder_bold_every;
 	Xefis::PropertyInteger	_altitude_ladder_extent;
 	Xefis::PropertyBoolean	_heading_numbers_visible;
+	Xefis::PropertyBoolean	_ias_serviceable;
 	Xefis::PropertySpeed	_ias;
 	Xefis::PropertySpeed	_ias_lookahead;
 	Xefis::PropertySpeed	_minimum_ias;
 	Xefis::PropertySpeed	_warning_ias;
 	Xefis::PropertySpeed	_maximum_ias;
 	Xefis::PropertyFloat	_mach;
+	Xefis::PropertyBoolean	_attitude_serviceable;
 	Xefis::PropertyAngle	_pitch;
 	Xefis::PropertyAngle	_roll;
 	Xefis::PropertyAngle	_pitch_limit;
@@ -78,25 +80,30 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle	_true_heading;
 	Xefis::PropertyFloat	_slip_skid_g;
 	Xefis::PropertyFloat	_slip_skid_limit_g;
+	Xefis::PropertyBoolean	_fpm_serviceable;
 	Xefis::PropertyBoolean	_fpm_visible;
 	Xefis::PropertyAngle	_fpm_alpha;
 	Xefis::PropertyAngle	_fpm_beta;
 	Xefis::PropertyAngle	_aoa_alpha;
 	Xefis::PropertyAngle	_aoa_warning_threshold;
 	Xefis::PropertyAngle	_magnetic_track;
+	Xefis::PropertyBoolean	_altitude_serviceable;
 	Xefis::PropertyLength	_altitude;
 	Xefis::PropertyLength	_altitude_lookahead;
+	Xefis::PropertyBoolean	_altitude_agl_serviceable;
 	Xefis::PropertyLength	_altitude_agl;
 	Xefis::PropertyLength	_minimums_altitude;
 	Xefis::PropertyPressure	_pressure_qnh;
 	Xefis::PropertyBoolean	_pressure_display_hpa;
 	Xefis::PropertyBoolean	_use_standard_pressure;
+	Xefis::PropertyBoolean	_cbr_serviceable;
 	Xefis::PropertySpeed	_cbr;
 	Xefis::PropertySpeed	_variometer;
 	Xefis::PropertyBoolean	_cmd_settings_visible;
 	Xefis::PropertyLength	_cmd_alt_setting;
 	Xefis::PropertySpeed	_cmd_speed_setting;
 	Xefis::PropertySpeed	_cmd_cbr_setting;
+	Xefis::PropertyBoolean	_flight_director_serviceable;
 	Xefis::PropertyBoolean	_flight_director_visible;
 	Xefis::PropertyAngle	_flight_director_pitch;
 	Xefis::PropertyAngle	_flight_director_roll;
@@ -122,6 +129,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertySpeed	_speed_v1;
 	Xefis::PropertySpeed	_speed_vr;
 	Xefis::PropertySpeed	_speed_ref;
+	Xefis::PropertyBoolean	_pitch_disagree;
+	Xefis::PropertyBoolean	_roll_disagree;
+	Xefis::PropertyBoolean	_ias_disagree;
+	Xefis::PropertyBoolean	_altitude_disagree;
 };
 
 

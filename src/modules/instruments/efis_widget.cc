@@ -41,7 +41,7 @@ EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 	_ground_shadow.setAlpha (127);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (120);
-	_warning_color_1 = QColor (255, 150, 0);
+	_warning_color_1 = QColor (255, 40, 40);
 	_warning_color_2 = QColor (255, 200, 50);
 }
 
@@ -93,7 +93,12 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 		paint_flight_director (painter);
 		paint_control_stick (painter);
 		paint_center_cross (painter, true, false);
-		paint_altitude_agl (painter);
+
+		if (_params.radar_altimeter_failure)
+			paint_radar_altimeter_failure (painter);
+		else
+			paint_altitude_agl (painter);
+
 		paint_minimums_setting (painter);
 		paint_nav (painter);
 		paint_hints (painter);
@@ -180,11 +185,39 @@ EFISWidget::PaintWorkUnit::adi_paint (Xefis::Painter& painter)
 {
 	adi_pre_paint();
 
-	adi_paint_horizon (painter);
-	adi_paint_pitch (painter);
-	adi_paint_roll (painter);
-	adi_paint_heading (painter);
-	adi_paint_flight_path_marker (painter);
+	if (_params.attitude_failure)
+	{
+		adi_clear (painter);
+		adi_paint_attitude_failure (painter);
+	}
+	else
+	{
+		adi_paint_horizon (painter);
+		adi_paint_pitch (painter);
+		adi_paint_roll (painter);
+		adi_paint_heading (painter);
+		adi_paint_pitch_disagree (painter);
+		adi_paint_roll_disagree (painter);
+	}
+
+	if (_params.flight_path_marker_failure)
+		adi_paint_flight_path_marker_failure (painter);
+	else
+		adi_paint_flight_path_marker (painter);
+
+	if (_params.flight_director_failure)
+		adi_paint_flight_director_falure (painter);
+}
+
+
+void
+EFISWidget::PaintWorkUnit::adi_clear (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.resetTransform();
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (Qt::black);
+	painter.drawRect (QRect (QPoint (0, 0), size()));
 }
 
 
@@ -199,13 +232,7 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 		painter.fillRect (_adi_gnd_rect, _ground_color);
 	}
 	else
-	{
-		painter.setClipping (false);
-		painter.resetTransform();
-		painter.setPen (Qt::NoPen);
-		painter.setBrush (Qt::black);
-		painter.drawRect (QRect (QPoint (0, 0), size()));
-	}
+		adi_clear (painter);
 }
 
 
@@ -478,6 +505,38 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 
 
 void
+EFISWidget::PaintWorkUnit::adi_paint_pitch_disagree (Xefis::Painter& painter)
+{
+	if (!_params.pitch_disagree)
+		return;
+
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	painter.setPen (get_pen (_warning_color_1, 1.f));
+	painter.setFont (_font_16);
+	painter.add_shadow ([&]() {
+		painter.fast_draw_text (QPointF (-0.225f * wh(), 0.285f * wh()), Qt::AlignVCenter | Qt::AlignLeft, "PITCH");
+	});
+}
+
+
+void
+EFISWidget::PaintWorkUnit::adi_paint_roll_disagree (Xefis::Painter& painter)
+{
+	if (!_params.roll_disagree)
+		return;
+
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	painter.setPen (get_pen (_warning_color_1, 1.f));
+	painter.setFont (_font_16);
+	painter.add_shadow ([&]() {
+		painter.fast_draw_text (QPointF (+0.225f * wh(), 0.285f * wh()), Qt::AlignVCenter | Qt::AlignRight, "ROLL");
+	});
+}
+
+
+void
 EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (Xefis::Painter& painter)
 {
 	if (!_params.flight_path_visible)
@@ -548,15 +607,23 @@ EFISWidget::PaintWorkUnit::sl_paint (Xefis::Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_sl_transform);
-	painter.setPen (_sl_ladder_pen);
-	painter.setBrush (_ladder_color);
-	painter.drawRect (_sl_ladder_rect);
 
-	sl_paint_ladder_scale (painter, x);
-	sl_paint_speed_limits (painter, x);
-	sl_paint_bugs (painter, x);
-	sl_paint_speed_tendency (painter, x);
-	sl_paint_black_box (painter, x);
+	if (_params.ias_failure)
+		sl_paint_failure (painter);
+	else
+	{
+		painter.setPen (_sl_ladder_pen);
+		painter.setBrush (_ladder_color);
+		painter.drawRect (_sl_ladder_rect);
+
+		sl_paint_ladder_scale (painter, x);
+		sl_paint_speed_limits (painter, x);
+		sl_paint_bugs (painter, x);
+		sl_paint_speed_tendency (painter, x);
+		sl_paint_black_box (painter, x);
+		sl_paint_ias_disagree (painter, x);
+	}
+
 	sl_paint_mach_number (painter, x);
 	sl_paint_novspd (painter);
 	sl_paint_ap_setting (painter);
@@ -626,6 +693,24 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 							 _params.speed > (1_kt * _params.sl_minimum + 0.5_kt)
 								? QString::number (static_cast<int> (Xefis::floored_mod (1.f * _sl_rounded_speed - 1.f, 10.f)))
 								: " ");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::sl_paint_ias_disagree (Xefis::Painter& painter, float x)
+{
+	if (!_params.ias_disagree)
+		return;
+
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
+	painter.setFont (_font_8);
+	painter.setPen (get_pen (_warning_color_2, 1.f));
+	QPointF position (-1.75f * x, 9.5f * x);
+	painter.add_shadow ([&]() {
+		painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS");
+		painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
+	});
 }
 
 
@@ -963,17 +1048,37 @@ EFISWidget::PaintWorkUnit::al_paint (Xefis::Painter& painter)
 
 	float const x = _al_ladder_rect.width() / 4.0f;
 
+	if (_params.climb_rate_failure)
+		al_paint_climb_rate_failure (painter, x);
+	else
+	{
+		painter.setClipping (false);
+		painter.setTransform (_al_transform);
+
+		al_paint_climb_rate (painter, x);
+	}
+
+	if (_params.altitude_failure)
+		al_paint_failure (painter);
+	else
+	{
+		painter.setClipping (false);
+		painter.setTransform (_al_transform);
+
+		painter.setPen (_al_ladder_pen);
+		painter.setBrush (_ladder_color);
+		painter.drawRect (_al_ladder_rect);
+
+		al_paint_ladder_scale (painter, x);
+		al_paint_bugs (painter, x);
+		al_paint_altitude_tendency (painter, x);
+		al_paint_black_box (painter, x);
+		al_paint_altitude_disagree (painter, x);
+	}
+
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
-	painter.setPen (_al_ladder_pen);
-	painter.setBrush (_ladder_color);
-	painter.drawRect (_al_ladder_rect);
 
-	al_paint_ladder_scale (painter, x);
-	al_paint_climb_rate (painter, x);
-	al_paint_bugs (painter, x);
-	al_paint_altitude_tendency (painter, x);
-	al_paint_black_box (painter, x);
 	al_paint_pressure (painter, x);
 	al_paint_ap_setting (painter);
 }
@@ -1034,6 +1139,24 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f - 2.f, 10.f)))) + "0");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::al_paint_altitude_disagree (Xefis::Painter& painter, float x)
+{
+	if (!_params.altitude_disagree)
+		return;
+
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
+	painter.setFont (_font_8);
+	painter.setPen (get_pen (_warning_color_2, 1.f));
+	QPointF position (-1.75f * x, 9.5f * x);
+	painter.add_shadow ([&]() {
+		painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT");
+		painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
+	});
 }
 
 
@@ -2024,6 +2147,71 @@ EFISWidget::PaintWorkUnit::paint_dashed_zone (Xefis::Painter& painter, QColor co
 
 
 void
+EFISWidget::PaintWorkUnit::adi_paint_attitude_failure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	paint_horizontal_failure_flag (painter, QPointF (0.f, -0.055f * wh()), font_size (20.f), "ATT");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker_failure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	// On Boeing EFIS FPM is called FPV - Flight Path Vector:
+	paint_horizontal_failure_flag (painter, QPointF (-0.175f * wh(), -0.075f * wh()), font_size (18.f), "FPV");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::adi_paint_flight_director_falure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	paint_horizontal_failure_flag (painter, QPointF (+0.2f * wh(), -0.075f * wh()), font_size (18.f), "FD");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::sl_paint_failure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_sl_transform);
+	paint_vertical_failure_flag (painter, QPointF (0.f, 0.f), font_size (20.f), "SPD");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::al_paint_climb_rate_failure (Xefis::Painter& painter, float x)
+{
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
+	painter.translate (4.f * x, 0.f);
+	paint_vertical_failure_flag (painter, QPointF (0.f, 0.f), font_size (20.f), "VERT");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::al_paint_failure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_al_transform);
+	paint_vertical_failure_flag (painter, QPointF (0.f, 0.f), font_size (20.f), "ALT");
+}
+
+
+void
+EFISWidget::PaintWorkUnit::paint_radar_altimeter_failure (Xefis::Painter& painter)
+{
+	painter.setClipping (false);
+	painter.setTransform (_center_transform);
+	paint_horizontal_failure_flag (painter, QPointF (0.f, 0.35f * wh()), font_size (20.f), " RA ");
+}
+
+
+void
 EFISWidget::PaintWorkUnit::paint_rotating_value (Xefis::Painter& painter,
 								  QRectF const& rect, float position, float height_scale,
 								  QString const& next, QString const& curr, QString const& prev)
@@ -2089,6 +2277,54 @@ EFISWidget::PaintWorkUnit::paint_rotating_digit (Xefis::Painter& painter,
 		pos = Xefis::floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
 
 	paint_rotating_value (painter, box, pos, height_scale, sa, sb, sc);
+}
+
+
+void
+EFISWidget::PaintWorkUnit::paint_horizontal_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
+{
+	QFont font = _font_10;
+	font.setPixelSize (pixel_font_size);
+	QFontMetricsF metrics (font);
+
+	QRectF box (0.f, 0.f, metrics.width (message) + 0.65f * metrics.width ("0"), metrics.height());
+	centrify (box);
+	box.translate (center);
+
+	painter.setPen (get_pen (_warning_color_2, 1.f));
+	painter.setFont (font);
+	painter.setBrush (Qt::black);
+
+	painter.add_shadow ([&]() {
+		painter.drawRect (box);
+	});
+	painter.fast_draw_text (center + QPointF (0.f, 0.02f * metrics.height()), Qt::AlignHCenter | Qt::AlignVCenter, message);
+}
+
+
+void
+EFISWidget::PaintWorkUnit::paint_vertical_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
+{
+	QFont font = _font_10;
+	font.setPixelSize (pixel_font_size);
+
+	float const digit_width = 1.6f * get_digit_width (font);
+	float const digit_height = 1.f * QFontMetricsF (font).height();
+
+	QRectF box (0.f, 0.f, 1.f * digit_width, message.size() * digit_height);
+	centrify (box);
+	box.translate (center);
+
+	painter.setPen (get_pen (_warning_color_2, 1.f));
+	painter.setFont (font);
+	painter.setBrush (Qt::black);
+
+	painter.add_shadow ([&]() {
+		painter.drawRect (box);
+	});
+	QPointF top_letter = center + QPointF (0.f, -0.5f * digit_height * (message.size() - 1));
+	for (int i = 0; i < message.size(); ++i)
+		painter.fast_draw_text (top_letter + QPointF (0.f, i * digit_height), Qt::AlignHCenter | Qt::AlignVCenter, message[i]);
 }
 
 

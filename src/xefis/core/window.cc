@@ -52,6 +52,7 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	// Black background:
 	QPalette p = palette();
 	p.setColor (QPalette::Shadow, Qt::black);
+	p.setColor (QPalette::Dark, Qt::gray);
 	_instruments_panel->setPalette (p);
 
 	_configurator_panel = new QWidget (this);

@@ -149,6 +149,8 @@ class Module: private Noncopyable
 
 	/**
 	 * Return time difference between last and previous update.
+	 * Be sure not to use it if you're skipping some of the updates,
+	 * because you're watching just one property or something.
 	 */
 	Time
 	update_dt() const;
