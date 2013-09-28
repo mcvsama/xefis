@@ -1,6 +1,10 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/fdc'>
+		<settings>
+			<setting name='airspeed.valid-minimum' value='20 kt'/>
+			<setting name='airspeed.valid-maximum' value='350 kt'/>
+		</settings>
 		<properties path='/systems/fdc'>
 			<directory path='/settings'>
 				<property name='settings.default-airplane-weight' path='/default-airplane-weight.g' default='2000.0'/>
