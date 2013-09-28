@@ -653,7 +653,7 @@ FlightDataComputer::compute_climb_rate()
 void
 FlightDataComputer::compute_ias_lookahead()
 {
-	if (_ias.valid())
+	if (_ias.valid() && _airspeed_reached_minimum)
 	{
 		Time update_dt = _ias_lookahead_computer.update_dt();
 
