@@ -46,6 +46,7 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 		else if (e == "properties")
 		{
 			parse_properties (e, {
+				{ "serviceable", _serviceable, true },
 				{ "temperature", _temperature, true },
 				{ "pressure", _pressure, true },
 			});
@@ -60,6 +61,8 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_reinitialize_timer->setInterval (250);
 	_reinitialize_timer->setSingleShot (true);
 	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
+
+	_serviceable.set_default (false);
 
 	guard ([&]() {
 		initialize();
@@ -114,6 +117,7 @@ BMP085::initialize()
 void
 BMP085::reinitialize()
 {
+	_serviceable.write (false);
 	_temperature.set_nil();
 	_pressure.set_nil();
 
@@ -214,6 +218,8 @@ BMP085::read_pressure()
 		_pressure.write (0.01_hPa * _cp);
 
 		handle_other (&BMP085::request_temperature);
+
+		_serviceable.write (true);
 	});
 }
 
