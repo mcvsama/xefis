@@ -26,6 +26,10 @@ ifeq ($(PROFILE),rpi)
 CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
 endif
 
+ifeq ($(PROFILE),bbb)
+CXXFLAGS += -finline -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
+endif
+
 CXX				:= g++
 DEPCC			:= $(CXX)
 CXXFLAGS		+= -fPIE -O4 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt
