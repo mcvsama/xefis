@@ -492,7 +492,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 		}
 	}
 
-	if (paint_heading_triangle)
+	if (_params.heading_visible && paint_heading_triangle)
 	{
 		// Heading triangle:
 		painter.setClipRect (_map_clip_rect);
