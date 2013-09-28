@@ -123,7 +123,7 @@ Window::process_layout_element (QDomElement const& layout_element, QBoxLayout* l
 			separator->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 			separator->setBackgroundRole (QPalette::Dark);
 			separator->setAutoFillBackground (true);
-			separator->setCursor (QCursor (QPixmap (XEFIS_SHARED_DIRECTORY "/images/cursors/crosshair.png")));
+			separator->setCursor (QCursor (Qt::CrossCursor));
 			new_layout->addWidget (separator);
 		}
 		else
@@ -158,7 +158,7 @@ Window::process_item_element (QDomElement const& item_element, QBoxLayout* layou
 		layout->addStretch (stretch);
 		QWidget* p = layout->parentWidget();
 		if (p)
-			p->setCursor (QCursor (QPixmap (XEFIS_SHARED_DIRECTORY "/images/cursors/crosshair.png")));
+			p->setCursor (QCursor (Qt::CrossCursor));
 	}
 }
 

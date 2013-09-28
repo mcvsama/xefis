@@ -93,7 +93,7 @@ InstrumentWidget::InstrumentWidget (QWidget* parent, WorkPerformer* work_perform
 	_paint_sem (1),
 	_paint_buffer (size(), QImage::Format_ARGB32_Premultiplied)
 {
-	setCursor (QCursor (QPixmap (XEFIS_SHARED_DIRECTORY "/images/cursors/crosshair.png")));
+	setCursor (QCursor (Qt::CrossCursor));
 }
 
 
