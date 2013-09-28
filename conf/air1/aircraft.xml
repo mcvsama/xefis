@@ -5,6 +5,7 @@
 	</system>
 	<modules>
 		<include name='aircraft/bmp085.xml'/>
+		<include name='aircraft/ahrs.xml'/>
 		<include name='aircraft/gps.xml'/>
 		<include name='aircraft/ets-airspeed.xml'/>
 		<include name='aircraft/fdc.xml'/>

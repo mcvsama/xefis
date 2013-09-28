@@ -4,7 +4,7 @@
 		<settings>
 			<setting name='device' value='/dev/ttyUSB0'/>
 			<setting name='baud-rate' value='57600'/>
-			<setting name='channel' value='12'/>
+			<setting name='channel' value='15'/>
 			<setting name='pan-id' value='31:37'/>
 			<setting name='local-address' value='00:01'/>
 			<setting name='remote-address' value='00:02'/>

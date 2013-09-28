@@ -9,9 +9,9 @@
 							<module name='instruments/efis'>
 								<properties>
 									<directory path='/instruments/efis'>
-										<property name='speed-ladder.line-every' path='/speed-ladder/line-every' default='5'/>
-										<property name='speed-ladder.number-every' path='/speed-ladder/number-every' default='10'/>
-										<property name='speed-ladder.extent' path='/speed-ladder/extent' default='62'/>
+										<property name='speed-ladder.line-every' path='/speed-ladder/line-every' default='1'/>
+										<property name='speed-ladder.number-every' path='/speed-ladder/number-every' default='2'/>
+										<property name='speed-ladder.extent' path='/speed-ladder/extent' default='13'/>
 										<property name='speed-ladder.minimum' path='/speed-ladder/minimum' default='20'/>
 										<property name='speed-ladder.maximum' path='/speed-ladder/maximum' default='350'/>
 										<property name='speed-ladder.novspd-flag' path='/novspd-flag' default='false'/>
@@ -51,6 +51,11 @@
 									<directory path='/sensors'>
 										<property name='slip-skid' path='/slip-skid/slip-skid'/>
 										<property name='altitude.agl' path='/radar-altimeter/agl'/>
+										<property name='speed.ias.serviceable' path='/airspeed/serviceable'/>
+										<property name='orientation.serviceable' path='/ahrs/serviceable'/>
+										<property name='fpm.serviceable' path='/gps/serviceable'/>
+										<property name='altitude.serviceable' path='/pressure/serviceable'/>
+										<property name='altitude.cbr.serviceable' path='/pressure/serviceable'/>
 									</directory>
 									<directory path='/systems/fdc'>
 										<property name='speed.ias' path='/speed/ias'/>

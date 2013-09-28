@@ -17,6 +17,10 @@
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='1' signature-bytes='2' key='00:11:22:33'>
+					<property type='angle' bytes='2' path='/sensors/ahrs/orientation/pitch'/>
+					<property type='angle' bytes='2' path='/sensors/ahrs/orientation/roll'/>
+					<property type='angle' bytes='2' path='/sensors/ahrs/orientation/magnetic-heading'/>
+					<property type='temperature' bytes='2' path='/sensors/ahrs/internal-temperature'/>
 					<property type='float' bytes='2' path='/sensors/slip-skid/slip-skid'/>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
 					<property type='speed' bytes='4' path='/sensors/speed/airspeed'/>
@@ -31,19 +35,23 @@
 					<property type='speed' bytes='4' path='/sensors/gps/groundspeed'/>
 					<property type='angle' bytes='4' path='/sensors/gps/track'/>
 					<property type='integer' bytes='1' path='/sensors/gps/tracked-satellites'/>
-					<property type='float' bytes='2' path='/sensors/gps/hdop'/>
-					<property type='float' bytes='2' path='/sensors/gps/vdop'/>
-					<property type='length' bytes='4' path='/sensors/gps/lateral-accuracy'/>
-					<property type='length' bytes='4' path='/sensors/gps/vertical-accuracy'/>
-					<property type='time' bytes='8' path='/sensors/gps/update-timestamp'/>
-					<property type='time' bytes='8' path='/sensors/gps/epoch-time'/>
 					<bitfield>
 						<property type='boolean' path='/sensors/gps/serviceable'/>
+						<property type='boolean' path='/sensors/airspeed/serviceable'/>
+						<property type='boolean' path='/sensors/pressure/serviceable'/>
+						<property type='boolean' path='/sensors/ahrs/serviceable'/>
+						<property type='boolean' path='/sensors/pwm/serviceable'/>
 					</bitfield>
 				</signature>
 			</packet>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='2' key='44:55:66:77'>
+					<property type='float' bytes='2' path='/sensors/gps/hdop'/>
+					<property type='float' bytes='2' path='/sensors/gps/vdop'/>
+					<property type='length' bytes='2' path='/sensors/gps/lateral-accuracy'/>
+					<property type='length' bytes='2' path='/sensors/gps/vertical-accuracy'/>
+					<property type='time' bytes='4' path='/sensors/gps/update-timestamp'/>
+					<property type='time' bytes='4' path='/sensors/gps/epoch-time'/>
 					<property type='integer' bytes='2' path='/link/remote/failsafes'/>
 					<bitfield>
 						<property type='boolean' path='/link/remote/valid'/>
@@ -54,7 +62,7 @@
 	</module>
 	<module name='io/link' instance='output'>
 		<settings>
-			<setting name='frequency' value='20 Hz'/>
+			<setting name='frequency' value='0.001 Hz'/>
 		</settings>
 		<properties>
 			<property name='output' path='/link/data/to-aircraft'/>
@@ -62,6 +70,7 @@
 		<protocol>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
+					<property type='float' bytes='2' path='/input/main/axis/4'/>
 				</signature>
 			</packet>
 		</protocol>

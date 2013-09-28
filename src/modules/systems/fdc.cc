@@ -59,6 +59,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 		else if (e == "properties")
 		{
 			parse_properties (e, {
+				// TODO most of these props should be changed to settings
 				// Input:
 				{ "settings.default-airplane-weight", _default_airplane_weight_g, true },
 				{ "settings.actual-airplane-weight", _actual_airplane_weight_g, true },
@@ -78,10 +79,10 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "settings.pressure.qnh", _qnh_pressure, true },
 				{ "settings.critical-aoa", _critical_aoa, true },
 				{ "settings.target-pressure-altitude-amsl", _target_pressure_altitude_amsl, false },
-				{ "imu.pitch", _imu_pitch, true },
-				{ "imu.roll", _imu_roll, true },
-				{ "imu.heading.magnetic", _imu_magnetic_heading, true },
-				{ "imu.heading.magnetic.accuracy", _imu_magnetic_heading_accuracy, true },
+				{ "ahrs.pitch", _ahrs_pitch, true },
+				{ "ahrs.roll", _ahrs_roll, true },
+				{ "ahrs.heading.magnetic", _ahrs_magnetic_heading, true },
+				{ "ahrs.heading.magnetic.accuracy", _ahrs_magnetic_heading_accuracy, true },
 				{ "gps.longitude", _gps_longitude, true },
 				{ "gps.latitude", _gps_latitude, true },
 				{ "gps.altitude-amsl", _gps_altitude_amsl, true },
@@ -164,7 +165,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 	_magnetic_variation_computer.observe ({ &_position_longitude, &_position_latitude, &_position_altitude_amsl });
 
 	_headings_computer.set_callback (std::bind (&FlightDataComputer::compute_headings, this));
-	_headings_computer.observe ({ &_imu_magnetic_heading, &_magnetic_declination });
+	_headings_computer.observe ({ &_ahrs_magnetic_heading, &_magnetic_declination });
 
 	_track_computer.set_callback (std::bind (&FlightDataComputer::compute_track, this));
 	_track_computer.observe ({ &_position_computer, &_magnetic_declination });
@@ -194,7 +195,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 	_ias_lookahead_computer.observe ({ &_ias });
 
 	_fpm_computer.set_callback (std::bind (&FlightDataComputer::compute_fpm, this));
-	_fpm_computer.observe ({ &_imu_pitch, &_imu_roll, &_imu_magnetic_heading, &_track_vertical, &_track_lateral_magnetic });
+	_fpm_computer.observe ({ &_ahrs_pitch, &_ahrs_roll, &_ahrs_magnetic_heading, &_track_vertical, &_track_lateral_magnetic });
 
 	_aoa_computer.set_callback (std::bind (&FlightDataComputer::compute_aoa, this));
 	_aoa_computer.observe ({ &_fpm_alpha, &_fpm_beta, &_aoa_alpha, &_critical_aoa });
@@ -432,12 +433,12 @@ FlightDataComputer::compute_magnetic_variation()
 void
 FlightDataComputer::compute_headings()
 {
-	if (_imu_magnetic_heading.valid())
+	if (_ahrs_magnetic_heading.valid())
 	{
-		_orientation_magnetic_heading.copy (_imu_magnetic_heading);
+		_orientation_magnetic_heading.copy (_ahrs_magnetic_heading);
 
 		if (_magnetic_declination.valid())
-			_orientation_true_heading.write (Xefis::magnetic_to_true (*_imu_magnetic_heading, *_magnetic_declination));
+			_orientation_true_heading.write (Xefis::magnetic_to_true (*_ahrs_magnetic_heading, *_magnetic_declination));
 		else
 			_orientation_true_heading.set_nil();
 	}
@@ -447,8 +448,9 @@ FlightDataComputer::compute_headings()
 		_orientation_true_heading.set_nil();
 	}
 
-	_orientation_pitch.copy (_imu_pitch);
-	_orientation_roll.copy (_imu_roll);
+	// TODO smoothing, remember about .winding (0, 360)
+	_orientation_pitch.copy (_ahrs_pitch);
+	_orientation_roll.copy (_ahrs_roll);
 }
 
 
@@ -574,6 +576,7 @@ FlightDataComputer::compute_true_airspeed()
 	{
 		Speed cas = *_ias;
 
+		// TODO don't display TAS < _tas_valid_minimum
 		if (_density_altitude.valid())
 		{
 			// This does not take into account air compressibility factor, so it's valid
@@ -674,12 +677,12 @@ FlightDataComputer::compute_ias_lookahead()
 void
 FlightDataComputer::compute_fpm()
 {
-	if (_imu_pitch.valid() && _imu_roll.valid() && _imu_magnetic_heading.valid() &&
+	if (_ahrs_pitch.valid() && _ahrs_roll.valid() && _ahrs_magnetic_heading.valid() &&
 		_track_vertical.valid() && _track_lateral_magnetic.valid())
 	{
-		Angle vdiff = floored_mod (*_imu_pitch - *_track_vertical, -180_deg, +180_deg);
-		Angle hdiff = floored_mod (*_imu_magnetic_heading - *_track_lateral_magnetic, -180_deg, +180_deg);
-		Angle roll = *_imu_roll;
+		Angle vdiff = floored_mod (*_ahrs_pitch - *_track_vertical, -180_deg, +180_deg);
+		Angle hdiff = floored_mod (*_ahrs_magnetic_heading - *_track_lateral_magnetic, -180_deg, +180_deg);
+		Angle roll = *_ahrs_roll;
 
 		Angle alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
 		Angle beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
@@ -795,7 +798,7 @@ FlightDataComputer::compute_cgratio()
 {
 	if (_true_airspeed.valid() && _pressure_altitude_climb_rate.valid())
 	{
-		Speed forward_speed = *_true_airspeed * std::cos (*_imu_pitch);
+		Speed forward_speed = *_true_airspeed * std::cos (*_ahrs_pitch);
 		int ratio = (forward_speed > 1_kt)
 			? limit<int> (forward_speed / *_pressure_altitude_climb_rate, -99, +99)
 			: 0;
