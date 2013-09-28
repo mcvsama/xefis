@@ -27,10 +27,10 @@
 				<property name='settings.target-pressure-altitude-amsl' path='//settings/flight-director/cmd-altitude'/>
 			</directory>
 			<directory path='//sensors'>
-				<property name='imu.pitch' path='/imu/pitch'/>
-				<property name='imu.roll' path='/imu/roll'/>
-				<property name='imu.heading.magnetic' path='/compass/magnetic-heading' default='0 deg'/>
-				<property name='imu.heading.magnetic.accuracy' path='/compass/magnetic-heading-accuracy' default='0.1 deg'/>
+				<property name='ahrs.pitch' path='/ahrs/orientation/pitch'/>
+				<property name='ahrs.roll' path='/ahrs/orientation/roll'/>
+				<property name='ahrs.heading.magnetic' path='/ahrs/orientation/magnetic-heading'/>
+				<property name='ahrs.heading.magnetic.accuracy' path='/ahrs/orientation/magnetic-heading-accuracy'/>
 				<property name='gps.longitude' path='/gps/longitude'/>
 				<property name='gps.latitude' path='/gps/latitude'/>
 				<property name='gps.altitude-amsl' path='/gps/altitude-amsl'/>

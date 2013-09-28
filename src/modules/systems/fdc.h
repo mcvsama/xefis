@@ -192,10 +192,10 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertySpeed		_ias_input;
 	Xefis::PropertyFloat		_outside_air_temperature_k;
 	// Input IMU:
-	Xefis::PropertyAngle		_imu_pitch;
-	Xefis::PropertyAngle		_imu_roll;
-	Xefis::PropertyAngle		_imu_magnetic_heading;
-	Xefis::PropertyAngle		_imu_magnetic_heading_accuracy; // TODO
+	Xefis::PropertyAngle		_ahrs_pitch;
+	Xefis::PropertyAngle		_ahrs_roll;
+	Xefis::PropertyAngle		_ahrs_magnetic_heading;
+	Xefis::PropertyAngle		_ahrs_magnetic_heading_accuracy; // TODO
 	// Input GPS:
 	Xefis::PropertyAngle		_gps_longitude;
 	Xefis::PropertyAngle		_gps_latitude;

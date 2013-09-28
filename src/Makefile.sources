@@ -175,6 +175,7 @@ SRC_MOCHDRS += modules/instruments/radial_indicator.h
 ######## /modules/io ########
 
 SRC_HEADERS += modules/io/bmp085.h
+SRC_HEADERS += modules/io/chr_um6.h
 SRC_HEADERS += modules/io/ets_airspeed.h
 SRC_HEADERS += modules/io/flight_gear.h
 SRC_HEADERS += modules/io/gps.h
@@ -186,6 +187,7 @@ SRC_HEADERS += modules/io/udp.h
 SRC_HEADERS += modules/io/xbee.h
 
 SRC_SOURCES += modules/io/bmp085.cc
+SRC_SOURCES += modules/io/chr_um6.cc
 SRC_SOURCES += modules/io/ets_airspeed.cc
 SRC_SOURCES += modules/io/flight_gear.cc
 SRC_SOURCES += modules/io/gps.cc
@@ -197,6 +199,7 @@ SRC_SOURCES += modules/io/udp.cc
 SRC_SOURCES += modules/io/xbee.cc
 
 SRC_MOCHDRS += modules/io/bmp085.h
+SRC_MOCHDRS += modules/io/chr_um6.h
 SRC_MOCHDRS += modules/io/ets_airspeed.h
 SRC_MOCHDRS += modules/io/flight_gear.h
 SRC_MOCHDRS += modules/io/gps.h
