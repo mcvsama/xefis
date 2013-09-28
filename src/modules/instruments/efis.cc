@@ -148,7 +148,7 @@ EFIS::read()
 	_efis_widget->set_heading_numbers_visible (_heading_numbers_visible.read (false));
 
 	_efis_widget->set_speed_visible (_ias.valid());
-	_efis_widget->set_speed_failure (_ias_serviceable.configured() && !_ias_serviceable.read (false));
+	_efis_widget->set_speed_failure (_ias_serviceable.configured() && !_ias_serviceable.read (true));
 	if (_ias.valid())
 		_efis_widget->set_speed (*_ias);
 
@@ -180,7 +180,7 @@ EFIS::read()
 	if (_roll.valid())
 		_efis_widget->set_roll (*_roll);
 
-	_efis_widget->set_attitude_failure (_attitude_serviceable.configured() && !_attitude_serviceable.read (false));
+	_efis_widget->set_attitude_failure (_attitude_serviceable.configured() && !_attitude_serviceable.read (true));
 
 	_efis_widget->set_roll_limit (_roll_limit.read (0_deg));
 
@@ -210,7 +210,7 @@ EFIS::read()
 	bool fpm_visible = _fpm_visible.valid() && *_fpm_visible;
 
 	_efis_widget->set_flight_path_marker_failure (_fpm_visible.configured() && _fpm_visible.read (false) &&
-												  _fpm_serviceable.configured() && !_fpm_serviceable.read (false));
+												  _fpm_serviceable.configured() && !_fpm_serviceable.read (true));
 
 	if (_fpm_alpha.valid() && _fpm_beta.valid())
 	{
@@ -222,7 +222,7 @@ EFIS::read()
 		_efis_widget->set_flight_path_marker_visible (false);
 
 	_efis_widget->set_altitude_visible (_altitude.valid());
-	_efis_widget->set_altitude_failure (_altitude_serviceable.configured() && !_altitude_serviceable.read (false));
+	_efis_widget->set_altitude_failure (_altitude_serviceable.configured() && !_altitude_serviceable.read (true));
 	if (_altitude.valid())
 		_efis_widget->set_altitude (*_altitude);
 
@@ -231,7 +231,7 @@ EFIS::read()
 		_efis_widget->set_altitude_tendency (*_altitude_lookahead);
 
 	_efis_widget->set_altitude_agl_visible (_altitude_agl.valid());
-	_efis_widget->set_radar_altimeter_failure (_altitude_agl_serviceable.configured() && !_altitude_agl_serviceable.read (false));
+	_efis_widget->set_radar_altimeter_failure (_altitude_agl_serviceable.configured() && !_altitude_agl_serviceable.read (true));
 	if (_altitude_agl.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl);
 
@@ -257,7 +257,7 @@ EFIS::read()
 		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
 
 	_efis_widget->set_climb_rate_visible (_cbr.valid());
-	_efis_widget->set_climb_rate_failure (_cbr_serviceable.configured() && !_cbr_serviceable.read (false));
+	_efis_widget->set_climb_rate_failure (_cbr_serviceable.configured() && !_cbr_serviceable.read (true));
 	if (_cbr.valid())
 		_efis_widget->set_climb_rate (*_cbr);
 
@@ -281,7 +281,7 @@ EFIS::read()
 
 	bool flight_director_visible = _flight_director_visible.read (false);
 
-	_efis_widget->set_flight_director_failure (_flight_director_serviceable.configured() && !_flight_director_serviceable.read (false));
+	_efis_widget->set_flight_director_failure (_flight_director_serviceable.configured() && !_flight_director_serviceable.read (true));
 
 	_efis_widget->set_flight_director_pitch_visible (flight_director_visible && _flight_director_pitch.valid());
 	if (_flight_director_pitch.valid())
