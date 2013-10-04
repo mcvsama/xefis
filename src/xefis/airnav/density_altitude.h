@@ -37,7 +37,7 @@ class DensityAltitude
 	 * Set actual temperature.
 	 */
 	void
-	set_outside_air_temperature (float kelvins);
+	set_static_air_temperature (Temperature temperature);
 
 	/**
 	 * Calculate result.
@@ -52,9 +52,9 @@ class DensityAltitude
 	density_altitude() const;
 
   private:
-	Length	_pressure_altitude;
-	float	_outside_air_temperature_k;
-	Length	_density_altitude;
+	Length		_pressure_altitude;
+	Temperature	_static_air_temperature;
+	Length		_density_altitude;
 };
 
 
@@ -66,9 +66,9 @@ DensityAltitude::set_pressure_altitude (Length altitude)
 
 
 inline void
-DensityAltitude::set_outside_air_temperature (float kelvins)
+DensityAltitude::set_static_air_temperature (Temperature temperature)
 {
-	_outside_air_temperature_k = kelvins;
+	_static_air_temperature = temperature;
 }
 
 
@@ -76,7 +76,7 @@ inline void
 DensityAltitude::update()
 {
 	float t_s = 273.15 + (15.0 - (0.0019812 * _pressure_altitude.ft()));
-	_density_altitude = _pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / _outside_air_temperature_k, 0.2349690));
+	_density_altitude = _pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / _static_air_temperature.K(), 0.2349690));
 }
 
 

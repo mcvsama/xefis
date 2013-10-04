@@ -98,7 +98,7 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 				{ "pressure.static", _static_pressure, true },
 				{ "gear-down", _gear_down, true },
 				{ "airspeed", _ias_input, true },
-				{ "outside-air-temperature", _outside_air_temperature_k, true },
+				{ "static-air-temperature", _static_air_temperature, true },
 				// Output:
 				{ "position.longitude", _position_longitude, true },
 				{ "position.latitude", _position_latitude, true },
@@ -174,10 +174,10 @@ FlightDataComputer::FlightDataComputer (Xefis::ModuleManager* module_manager, QD
 	_ias_computer.observe ({ &_ias_input });
 
 	_da_computer.set_callback (std::bind (&FlightDataComputer::compute_da, this));
-	_da_computer.observe ({ &_outside_air_temperature_k, &_pressure_altitude_amsl });
+	_da_computer.observe ({ &_static_air_temperature, &_pressure_altitude_amsl });
 
 	_sound_speed_computer.set_callback (std::bind (&FlightDataComputer::compute_sound_speed, this));
-	_sound_speed_computer.observe ({ &_outside_air_temperature_k });
+	_sound_speed_computer.observe ({ &_static_air_temperature });
 
 	_true_airspeed_computer.set_callback (std::bind (&FlightDataComputer::compute_true_airspeed, this));
 	_true_airspeed_computer.observe ({ &_ias, &_pressure_altitude_amsl, &_density_altitude });
@@ -541,11 +541,11 @@ FlightDataComputer::compute_ias()
 void
 FlightDataComputer::compute_da()
 {
-	if (_outside_air_temperature_k.valid() && _pressure_altitude_amsl.valid())
+	if (_static_air_temperature.valid() && _pressure_altitude_amsl.valid())
 	{
 		Xefis::DensityAltitude da;
 		da.set_pressure_altitude (*_pressure_altitude_amsl);
-		da.set_outside_air_temperature (*_outside_air_temperature_k);
+		da.set_static_air_temperature (*_static_air_temperature);
 		da.update();
 		_density_altitude.write (da.density_altitude());
 	}
@@ -557,10 +557,10 @@ FlightDataComputer::compute_da()
 void
 FlightDataComputer::compute_sound_speed()
 {
-	if (_outside_air_temperature_k.valid())
+	if (_static_air_temperature.valid())
 	{
 		Xefis::SoundSpeed ss;
-		ss.set_outside_air_temperature (*_outside_air_temperature_k);
+		ss.set_static_air_temperature (*_static_air_temperature);
 		ss.update();
 		_sound_speed.write (ss.sound_speed());
 	}

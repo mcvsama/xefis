@@ -190,7 +190,7 @@ class FlightDataComputer: public Xefis::Module
 	Xefis::PropertyAngle		_critical_aoa;
 	Xefis::PropertyLength		_target_pressure_altitude_amsl;
 	Xefis::PropertySpeed		_ias_input;
-	Xefis::PropertyFloat		_outside_air_temperature_k;
+	Xefis::PropertyTemperature	_static_air_temperature;
 	// Input IMU:
 	Xefis::PropertyAngle		_ahrs_pitch;
 	Xefis::PropertyAngle		_ahrs_roll;

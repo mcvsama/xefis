@@ -19,7 +19,7 @@
 					<!-- pressure -->
 					<property name='pressure' path='/pressure/pressure'/>
 					<!-- temperature -->
-					<property name='outside-air-temperature' path='/temperature/outside.k'/>
+					<property name='static-air-temperature' path='/temperature/static'/>
 					<!-- radar altimeter -->
 					<property name='altitude-agl' path='/radar-altimeter/agl'/>
 					<!-- slip-skid -->

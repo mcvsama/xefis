@@ -42,7 +42,7 @@
 				<property name='pressure.static' path='/pressure/pressure'/>
 				<property name='airspeed' path='/speed/ias'/>
 				<property name='gear-down' path='/gear/lowered'/>
-				<property name='outside-air-temperature' path='/temperature/outside.k'/>
+				<property name='static-air-temperature' path='/temperature/static'/>
 			</directory>
 			<directory path='/position'>
 				<property name='position.longitude' path='/longitude'/>
