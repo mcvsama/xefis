@@ -37,7 +37,6 @@ SlipSkid::SlipSkid (Xefis::ModuleManager* module_manager, QDomElement const& con
 		{
 			parse_properties (e, {
 				// Input:
-				{ "acceleration.x", _x_acceleration, true },
 				{ "acceleration.y", _y_acceleration, true },
 				{ "acceleration.z", _z_acceleration, true },
 				// Output:
@@ -47,7 +46,7 @@ SlipSkid::SlipSkid (Xefis::ModuleManager* module_manager, QDomElement const& con
 	}
 
 	_slip_skid_computer.set_callback (std::bind (&SlipSkid::compute_slip_skid, this));
-	_slip_skid_computer.observe ({ &_x_acceleration, &_y_acceleration, &_z_acceleration });
+	_slip_skid_computer.observe ({ &_y_acceleration, &_z_acceleration });
 }
 
 
@@ -61,7 +60,7 @@ SlipSkid::data_updated()
 void
 SlipSkid::compute_slip_skid()
 {
-	if (_x_acceleration.valid() && _y_acceleration.valid() && _z_acceleration.valid())
+	if (_y_acceleration.valid() && _z_acceleration.valid())
 	{
 		float const scale = 10.f;
 		_slip_skid.write (scale * std::atan2 (*_y_acceleration, -*_z_acceleration) / (2.f * M_PI));

@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/pca9685' disabled='true'>
+		<i2c>
+			<bus>1</bus>
+			<address>0x40</address>
+		</i2c>
+		<settings>
+			<setting name='output-period' value='6 ms'/>
+			<setting name='channel.15.input.default' value='0.0'/>
+			<setting name='channel.15.input.minimum' value='-1.0'/>
+			<setting name='channel.15.input.maximum' value='1.0'/>
+			<setting name='channel.15.output.minimum' value='0.6 ms'/>
+			<setting name='channel.15.output.maximum' value='2.4 ms'/>
+			<setting name='channel.15.smoothing' value='100 ms'/>
+		</settings>
+		<properties>
+			<property name='channel.15' path='/input/main/axis/2'/>
+		</properties>
+	</module>
+</xefis-include>
+

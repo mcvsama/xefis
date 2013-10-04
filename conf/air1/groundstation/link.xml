@@ -24,7 +24,7 @@
 					<property type='float' bytes='2' path='/sensors/slip-skid/slip-skid'/>
 					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
 					<property type='speed' bytes='4' path='/sensors/speed/airspeed'/>
-					<property type='float' bytes='2' path='/sensors/temperature/outside.k'/>
+					<property type='float' bytes='2' path='/sensors/temperature/static'/>
 					<property type='integer' bytes='4' path='/sensors/gps/read-errors'/>
 					<property type='integer' bytes='1' path='/sensors/gps/fix-quality'/>
 					<property type='integer' bytes='1' path='/sensors/gps/type-of-fix'/>

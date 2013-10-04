@@ -11,8 +11,9 @@
 		</settings>
 		<properties>
 			<directory path='/sensors'>
+				<property name='serviceable' path='/pressure/serviceable'/>
 				<property name='pressure' path='/pressure/pressure'/>
-				<property name='temperature' path='/temperature/outside.k'/>
+				<property name='temperature' path='/temperature/static'/>
 			</directory>
 		</properties>
 	</module>

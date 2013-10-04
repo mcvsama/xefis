@@ -28,10 +28,10 @@ class SoundSpeed
 {
   public:
 	/**
-	 * Set outside air temperature.
+	 * Set static air temperature.
 	 */
 	void
-	set_outside_air_temperature (float kelvins);
+	set_static_air_temperature (Temperature temperature);
 
 	/**
 	 * Calculate result.
@@ -46,22 +46,22 @@ class SoundSpeed
 	sound_speed() const;
 
   private:
-	float	_outside_air_temperature_k;
-	Speed	_sound_speed;
+	Temperature	_static_air_temperature;
+	Speed		_sound_speed;
 };
 
 
 inline void
-SoundSpeed::set_outside_air_temperature (float kelvins)
+SoundSpeed::set_static_air_temperature (Temperature temperature)
 {
-	_outside_air_temperature_k = kelvins;
+	_static_air_temperature = temperature;
 }
 
 
 inline void
 SoundSpeed::update()
 {
-	_sound_speed = 38.967854_kt * std::sqrt (_outside_air_temperature_k);
+	_sound_speed = 38.967854_kt * std::sqrt (_static_air_temperature.K());
 }
 
 
