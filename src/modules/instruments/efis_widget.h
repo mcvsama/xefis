@@ -78,8 +78,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Length				minimums_altitude				= 0_ft;
 		bool				minimums_altitude_visible		= false;
 		QDateTime			minimums_altitude_ts;
-		Speed				climb_rate						= 0_fpm;
-		bool				climb_rate_visible				= false;
+		Speed				vertical_speed					= 0_fpm;
+		bool				vertical_speed_visible			= false;
 		Speed				variometer_rate					= 0_fpm;
 		bool				variometer_visible				= false;
 		float				mach							= 0.f;
@@ -90,14 +90,17 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				use_standard_pressure			= false;
 		Speed				minimum_speed					= 0_kt;
 		bool				minimum_speed_visible			= false;
-		Speed				warning_speed					= 0_kt;
-		bool				warning_speed_visible			= false;
+		Speed				minimum_maneuver_speed			= 0_kt;
+		bool				minimum_maneuver_speed_visible	= false;
+		Speed				maximum_maneuver_speed			= 0_kt;
+		bool				maximum_maneuver_speed_visible	= false;
 		Speed				maximum_speed					= 0_kt;
 		bool				maximum_speed_visible			= false;
 		Length				cmd_altitude					= 0_ft;
+		bool				cmd_altitude_acquired			= false;
 		bool				cmd_altitude_visible			= false;
-		Speed				cmd_climb_rate					= 0_fpm;
-		bool				cmd_climb_rate_visible			= false;
+		Speed				cmd_vertical_speed				= 0_fpm;
+		bool				cmd_vertical_speed_visible		= false;
 		Speed				cmd_speed						= 0_kt;
 		bool				cmd_speed_visible				= false;
 		Angle				flight_director_pitch			= 0_deg;
@@ -145,7 +148,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				attitude_failure				= false;
 		bool				ias_failure						= false;
 		bool				altitude_failure				= false;
-		bool				climb_rate_failure				= false;
+		bool				vertical_speed_failure			= false;
 		bool				flight_path_marker_failure		= false;
 		bool				radar_altimeter_failure			= false;
 		bool				flight_director_failure			= false;
@@ -170,6 +173,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 		int					al_line_every					= 100;
 		int					al_number_every					= 200;
+		int					al_emphasis_every				= 1000;
 		int					al_bold_every					= 500;
 		Length				al_extent						= 825_ft;
 	};
@@ -304,7 +308,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		al_paint_bugs (Xefis::Painter&, float x);
 
 		void
-		al_paint_climb_rate (Xefis::Painter&, float x);
+		al_paint_vertical_speed (Xefis::Painter&, float x);
 
 		void
 		al_paint_pressure (Xefis::Painter&, float x);
@@ -316,7 +320,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		ft_to_px (Length) const;
 
 		float
-		scale_cbr (Speed climb_rate) const;
+		scale_vertical_speed (Speed vertical_speed) const;
 
 		/*
 		 * Other
@@ -369,7 +373,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_paint_failure (Xefis::Painter&);
 
 		void
-		al_paint_climb_rate_failure (Xefis::Painter&, float x);
+		al_paint_vertical_speed_failure (Xefis::Painter&, float x);
 
 		void
 		al_paint_failure (Xefis::Painter&);
@@ -550,6 +554,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_altitude_ladder_number_every (int feet);
+
+	/**
+	 * Set how often emphasis lines (top and bottom)
+	 * should be drawn around number on altitude ladder.
+	 */
+	void
+	set_altitude_ladder_emphasis_every (int feet);
 
 	/**
 	 * Set how often lines should be drawn bold on altitude ladder.
@@ -750,16 +761,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_minimums_altitude_visible (bool visible);
 
 	/**
-	 * Set climb rate.
+	 * Set vertical speed.
 	 */
 	void
-	set_climb_rate (Speed);
+	set_vertical_speed (Speed);
 
 	/**
-	 * Set climb rate visibility.
+	 * Set vertical speed visibility.
 	 */
 	void
-	set_climb_rate_visible (bool visible);
+	set_vertical_speed_visible (bool visible);
 
 	/**
 	 * Set vario rate.
@@ -848,16 +859,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_minimum_speed_visible (bool visible);
 
 	/**
-	 * Set warning speed indicator on the speed ladder.
+	 * Set minimum maneuver speed indicator on the speed ladder.
 	 */
 	void
-	set_warning_speed (Speed);
+	set_minimum_maneuver_speed (Speed);
 
 	/**
-	 * Set warning speed indicator visibility.
+	 * Set maximum maneuver speed indicator visibility.
 	 */
 	void
-	set_warning_speed_visible (bool visible);
+	set_maximum_maneuver_speed_visible (bool visible);
+
+	/**
+	 * Set maximum maneuver speed indicator on the speed ladder.
+	 */
+	void
+	set_maximum_maneuver_speed (Speed);
+
+	/**
+	 * Set minimum maneuver speed indicator visibility.
+	 */
+	void
+	set_minimum_maneuver_speed_visible (bool visible);
 
 	/**
 	 * Set maximum speed indicator on the speed ladder.
@@ -878,22 +901,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_cmd_altitude (Length);
 
 	/**
+	 * Set commanded altitude emphasis.
+	 */
+	void
+	set_cmd_altitude_acquired (bool acquired);
+
+	/**
 	 * Set AP altitude setting visibility.
 	 */
 	void
 	set_cmd_altitude_visible (bool visible);
 
 	/**
-	 * Set commanded climb rate setting.
+	 * Set commanded vertical speed setting.
 	 */
 	void
-	set_cmd_climb_rate (Speed);
+	set_cmd_vertical_speed (Speed);
 
 	/**
-	 * Set AP climb rate visibility.
+	 * Set AP vertical speed visibility.
 	 */
 	void
-	set_cmd_climb_rate_visible (bool visible);
+	set_cmd_vertical_speed_visible (bool visible);
 
 	/**
 	 * Set autothrottle speed.
@@ -1114,10 +1143,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_altitude_failure (bool);
 
 	/**
-	 * Set climb rate failure flag.
+	 * Set vertical speed failure flag.
 	 */
 	void
-	set_climb_rate_failure (bool);
+	set_vertical_speed_failure (bool);
 
 	/**
 	 * Set FPM failure flag.
@@ -1287,6 +1316,14 @@ inline void
 EFISWidget::set_altitude_ladder_number_every (int feet)
 {
 	_params.al_number_every = std::max (1, feet);
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_altitude_ladder_emphasis_every (int feet)
+{
+	_params.al_emphasis_every = std::max (1, feet);
 	request_repaint();
 }
 
@@ -1557,17 +1594,17 @@ EFISWidget::set_minimums_altitude_visible (bool visible)
 
 
 inline void
-EFISWidget::set_climb_rate (Speed feet_per_minute)
+EFISWidget::set_vertical_speed (Speed feet_per_minute)
 {
-	_params.climb_rate = feet_per_minute;
+	_params.vertical_speed = feet_per_minute;
 	request_repaint();
 }
 
 
 inline void
-EFISWidget::set_climb_rate_visible (bool visible)
+EFISWidget::set_vertical_speed_visible (bool visible)
 {
-	_params.climb_rate_visible = visible;
+	_params.vertical_speed_visible = visible;
 	request_repaint();
 }
 
@@ -1691,17 +1728,33 @@ EFISWidget::set_minimum_speed_visible (bool visible)
 
 
 inline void
-EFISWidget::set_warning_speed (Speed warning_speed)
+EFISWidget::set_minimum_maneuver_speed (Speed speed)
 {
-	_params.warning_speed = warning_speed;
+	_params.minimum_maneuver_speed = speed;
 	request_repaint();
 }
 
 
 inline void
-EFISWidget::set_warning_speed_visible (bool visible)
+EFISWidget::set_minimum_maneuver_speed_visible (bool visible)
 {
-	_params.warning_speed_visible = visible;
+	_params.minimum_maneuver_speed_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_maximum_maneuver_speed (Speed speed)
+{
+	_params.maximum_maneuver_speed = speed;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_maximum_maneuver_speed_visible (bool visible)
+{
+	_params.maximum_maneuver_speed_visible = visible;
 	request_repaint();
 }
 
@@ -1731,6 +1784,14 @@ EFISWidget::set_cmd_altitude (Length altitude)
 
 
 inline void
+EFISWidget::set_cmd_altitude_acquired (bool acquired)
+{
+	_params.cmd_altitude_acquired = acquired;
+	request_repaint();
+}
+
+
+inline void
 EFISWidget::set_cmd_altitude_visible (bool visible)
 {
 	_params.cmd_altitude_visible = visible;
@@ -1739,17 +1800,17 @@ EFISWidget::set_cmd_altitude_visible (bool visible)
 
 
 inline void
-EFISWidget::set_cmd_climb_rate (Speed speed)
+EFISWidget::set_cmd_vertical_speed (Speed speed)
 {
-	_params.cmd_climb_rate = speed;
+	_params.cmd_vertical_speed = speed;
 	request_repaint();
 }
 
 
 inline void
-EFISWidget::set_cmd_climb_rate_visible (bool visible)
+EFISWidget::set_cmd_vertical_speed_visible (bool visible)
 {
-	_params.cmd_climb_rate_visible = visible;
+	_params.cmd_vertical_speed_visible = visible;
 	request_repaint();
 }
 
@@ -2058,9 +2119,9 @@ EFISWidget::set_altitude_failure (bool set)
 
 
 inline void
-EFISWidget::set_climb_rate_failure (bool set)
+EFISWidget::set_vertical_speed_failure (bool set)
 {
-	_params.climb_rate_failure = set;
+	_params.vertical_speed_failure = set;
 	request_repaint();
 }
 

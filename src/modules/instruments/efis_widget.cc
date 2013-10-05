@@ -561,7 +561,8 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 	_params.speed = Xefis::limit (_params.speed, 0_kt, 9999.99_kt);
 	_params.mach = Xefis::limit (_params.mach, 0.f, 9.99f);
 	_params.minimum_speed = Xefis::limit (_params.minimum_speed, 0.0_kt, 9999.99_kt);
-	_params.warning_speed = Xefis::limit (_params.warning_speed, 0.0_kt, 9999.99_kt);
+	_params.minimum_maneuver_speed = Xefis::limit (_params.minimum_maneuver_speed, 0.0_kt, 9999.99_kt);
+	_params.maximum_maneuver_speed = Xefis::limit (_params.maximum_maneuver_speed, 0.0_kt, 9999.99_kt);
 	_params.maximum_speed = Xefis::limit (_params.maximum_speed, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
@@ -644,7 +645,8 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = _sl_black_box_pen;
-	bool speed_is_in_warning_area = (_params.minimum_speed < _params.speed && _params.speed < _params.warning_speed);
+	bool speed_is_in_warning_area = (_params.minimum_speed < _params.speed && _params.speed < _params.minimum_maneuver_speed) ||
+									(_params.maximum_speed > _params.speed && _params.speed > _params.maximum_maneuver_speed);
 	if (_params.speed_blinking_active || speed_is_in_warning_area)
 	{
 		if (_params.speed_blink || speed_is_in_warning_area)
@@ -775,37 +777,51 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 	painter.translate (tr_right, 0.f);
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
-	float max_posy = kt_to_px (_params.maximum_speed);
-	float wrn_posy = kt_to_px (_params.warning_speed);
 	float min_posy = kt_to_px (_params.minimum_speed);
-	QPointF zero_point (_sl_ladder_rect.right(), _sl_ladder_rect.bottom() + ydif.y());
+	float min_man_posy = kt_to_px (_params.minimum_maneuver_speed);
+	float max_man_posy = kt_to_px (_params.maximum_maneuver_speed);
+	float max_posy = kt_to_px (_params.maximum_speed);
+	QPointF min_point = _sl_ladder_rect.bottomRight() + ydif;
+	QPointF max_point = _sl_ladder_rect.topRight() - ydif;
 
-	if (_params.maximum_speed_visible && _params.maximum_speed < _sl_max_shown)
-	{
-		painter.setPen (pen_b);
-		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), _sl_ladder_rect.topRight() - ydif);
-		painter.setPen (pen_r);
-		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), _sl_ladder_rect.topRight() - ydif);
-	}
-
-	if (_params.warning_speed_visible && _params.warning_speed > _sl_min_shown)
+	if (_params.minimum_maneuver_speed_visible && _params.minimum_maneuver_speed > _sl_min_shown)
 	{
 		QPolygonF poly = QPolygonF()
-			<< QPointF (_sl_ladder_rect.right() - tr_right, wrn_posy)
-			<< QPointF (_sl_ladder_rect.right() - p1w, wrn_posy)
-			<< zero_point - QPointF (p1w, 0.f);
+			<< QPointF (_sl_ladder_rect.right() - tr_right, min_man_posy)
+			<< QPointF (_sl_ladder_rect.right() - p1w, min_man_posy)
+			<< min_point - QPointF (p1w, 0.f);
 		painter.setPen (pen_y);
 		painter.add_shadow ([&]() {
 			painter.drawPolyline (poly);
 		});
 	}
 
+	if (_params.maximum_maneuver_speed_visible && _params.maximum_maneuver_speed < _sl_max_shown)
+	{
+		QPolygonF poly = QPolygonF()
+			<< QPointF (_sl_ladder_rect.right() - tr_right, max_man_posy)
+			<< QPointF (_sl_ladder_rect.right() - p1w, max_man_posy)
+			<< max_point - QPointF (p1w, 0.f);
+		painter.setPen (pen_y);
+		painter.add_shadow ([&]() {
+			painter.drawPolyline (poly);
+		});
+	}
+
+	if (_params.maximum_speed_visible && _params.maximum_speed < _sl_max_shown)
+	{
+		painter.setPen (pen_b);
+		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), max_point);
+		painter.setPen (pen_r);
+		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), max_point);
+	}
+
 	if (_params.minimum_speed_visible && _params.minimum_speed > _sl_min_shown)
 	{
 		painter.setPen (pen_b);
-		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), zero_point);
+		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), min_point);
 		painter.setPen (pen_r);
-		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), zero_point);
+		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), min_point);
 	}
 }
 
@@ -1029,7 +1045,7 @@ void
 EFISWidget::PaintWorkUnit::al_pre_paint()
 {
 	_params.altitude = Xefis::limit (_params.altitude, -99999_ft, +99999_ft);
-	_params.climb_rate = Xefis::limit (_params.climb_rate, -9999_fpm, +9999_fpm);
+	_params.vertical_speed = Xefis::limit (_params.vertical_speed, -9999_fpm, +9999_fpm);
 
 	float sgn = _params.altitude < 0_ft ? -1.f : 1.f;
 	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
@@ -1048,14 +1064,14 @@ EFISWidget::PaintWorkUnit::al_paint (Xefis::Painter& painter)
 
 	float const x = _al_ladder_rect.width() / 4.0f;
 
-	if (_params.climb_rate_failure)
-		al_paint_climb_rate_failure (painter, x);
+	if (_params.vertical_speed_failure)
+		al_paint_vertical_speed_failure (painter, x);
 	else
 	{
 		painter.setClipping (false);
 		painter.setTransform (_al_transform);
 
-		al_paint_climb_rate (painter, x);
+		al_paint_vertical_speed (painter, x);
 	}
 
 	if (_params.altitude_failure)
@@ -1227,7 +1243,7 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Xefis::Painter& painter, float
 			}
 
 			// Additional lines above/below every 1000 ft:
-			if (ft % 1000 == 0)
+			if (ft % _params.al_emphasis_every == 0)
 			{
 				painter.setPen (get_pen (Qt::white, 1.0));
 				float r, y;
@@ -1395,13 +1411,13 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		}
 	}
 
-	// Climb rate bug:
-	if (_params.cmd_climb_rate_visible && _params.climb_rate_visible)
+	// Vertical speed bug:
+	if (_params.cmd_vertical_speed_visible && _params.vertical_speed_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_al_transform);
 		painter.translate (4.15f * x, 0.f);
-		float posy = -8.f * x * scale_cbr (_params.cmd_climb_rate);
+		float posy = -8.f * x * scale_vertical_speed (_params.cmd_vertical_speed);
 		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 		{
 			painter.setPen (pen);
@@ -1413,7 +1429,7 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_vertical_speed (Xefis::Painter& painter, float x)
 {
 	QPen bold_white_pen = get_pen (Qt::white, 1.25f);
 	QPen thin_white_pen = get_pen (Qt::white, 0.50f);
@@ -1445,7 +1461,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 	painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.5f * x, 0.f));
 	for (float kfpm: { -6.f, -2.f, -1.f, +1.f, +2.f, +6.f })
 	{
-		float posy = -2.f * y * scale_cbr (kfpm * 1000_fpm);
+		float posy = -2.f * y * scale_vertical_speed (kfpm * 1000_fpm);
 		QRectF num_rect (-1.55f * x, posy - x, 1.3f * x, 2.f * x);
 		painter.draw_outlined_line (QPointF (0.f, posy), QPointF (line_w, posy));
 		painter.fast_draw_text (num_rect, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (kfpm))));
@@ -1453,7 +1469,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 	painter.setPen (thin_white_pen);
 	for (float kfpm: { -4.f, -1.5f, -0.5f, +0.5f, +1.5f, +4.f })
 	{
-		float posy = -2.f * y * scale_cbr (kfpm * 1000_fpm);
+		float posy = -2.f * y * scale_vertical_speed (kfpm * 1000_fpm);
 		painter.draw_outlined_line (QPointF (0.f, posy), QPointF (line_w, posy));
 	}
 
@@ -1461,7 +1477,7 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 	if (_params.variometer_visible)
 	{
 		painter.setClipping (false);
-		float posy = -2.f * y * scale_cbr (_params.variometer_rate);
+		float posy = -2.f * y * scale_vertical_speed (_params.variometer_rate);
 		float x = pen_width (2.0);
 		painter.setPen (QPen (_navigation_color, pen_width (1.0)));
 		painter.setBrush (_navigation_color);
@@ -1477,28 +1493,28 @@ EFISWidget::PaintWorkUnit::al_paint_climb_rate (Xefis::Painter& painter, float x
 	}
 
 	// Pointer:
-	if (_params.climb_rate_visible)
+	if (_params.vertical_speed_visible)
 	{
 		painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
 		QPen indicator_pen = bold_white_pen;
 		indicator_pen.setCapStyle (Qt::FlatCap);
 		painter.setPen (indicator_pen);
-		painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_cbr (_params.climb_rate)));
+		painter.draw_outlined_line (QPointF (3.f * x, 0.f), QPointF (line_w, -2.f * y * scale_vertical_speed (_params.vertical_speed)));
 	}
 
 	// Numeric indicators above and below:
 	painter.setPen (bold_white_pen);
-	int abs_climb_rate = static_cast<int> (std::abs (_params.climb_rate.fpm())) / 10 * 10;
-	if (abs_climb_rate >= 100)
+	int abs_vertical_speed = static_cast<int> (std::abs (_params.vertical_speed.fpm())) / 10 * 10;
+	if (abs_vertical_speed >= 100)
 	{
-		QString str = QString::number (abs_climb_rate);
+		QString str = QString::number (abs_vertical_speed);
 		if (str.size() == 2)
 			str = "  " + str;
 		else if (str.size() == 3)
 			str = " " + str;
 
 		float const fh = _font_13_digit_height;
-		float const sgn = _params.climb_rate > 0_fpm ? 1.f : -1.f;
+		float const sgn = _params.vertical_speed > 0_fpm ? 1.f : -1.f;
 		painter.setClipping (false);
 		painter.setFont (_font_13);
 		painter.translate (-1.05f * x, sgn * -2.35f * y);
@@ -1580,6 +1596,19 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 	painter.setBrush (QBrush (QColor (0, 0, 0)));
 	painter.drawRect (box_rect);
 
+	if (_params.cmd_altitude_acquired)
+	{
+		float const z = 0.5f * margin;
+		QRectF em_box_rect = box_rect.adjusted (-z, -z, z, z);
+
+		painter.setBrush (Qt::NoBrush);
+		for (QPen pen: { get_pen (Qt::black, 1.8f), get_pen (Qt::white, 1.4f) })
+		{
+			painter.setPen (pen);
+			painter.drawRect (em_box_rect);
+		}
+	}
+
 	painter.setPen (get_pen (_autopilot_color, 1.f));
 	painter.setFont (b_font);
 	painter.translate (0.f, 0.3f * margin);
@@ -1600,23 +1629,23 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 
 
 float
-EFISWidget::PaintWorkUnit::scale_cbr (Speed climb_rate) const
+EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed) const
 {
-	float cbr = std::abs (climb_rate.fpm());
+	float vspd = std::abs (vertical_speed.fpm());
 
-	if (cbr < 1000.f)
-		cbr = cbr / 1000.f * 0.46f;
-	else if (cbr < 2000)
-		cbr = 0.46f + 0.32f * (cbr - 1000.f) / 1000.f;
-	else if (cbr < 6000)
-		cbr = 0.78f + 0.22f * (cbr - 2000.f) / 4000.f;
+	if (vspd < 1000.f)
+		vspd = vspd / 1000.f * 0.46f;
+	else if (vspd < 2000)
+		vspd = 0.46f + 0.32f * (vspd - 1000.f) / 1000.f;
+	else if (vspd < 6000)
+		vspd = 0.78f + 0.22f * (vspd - 2000.f) / 4000.f;
 	else
-		cbr = 1.f;
+		vspd = 1.f;
 
-	if (climb_rate < 0_fpm)
-		cbr *= -1.f;
+	if (vertical_speed < 0_fpm)
+		vspd *= -1.f;
 
-	return cbr;
+	return vspd;
 }
 
 
@@ -1854,9 +1883,9 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 		QPen white_pen = get_pen (Qt::white, 1.8f);
 
-		auto paint_ladder = [&](bool needle_visible, Angle track_deviation) -> void
+		auto paint_ladder = [&](bool needle_visible, Angle original_track_deviation) -> void
 		{
-			track_deviation = Xefis::limit (track_deviation, -2_deg, +2_deg);
+			Angle track_deviation = Xefis::limit (original_track_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -1877,11 +1906,13 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 					<< QPointF (0.f, +w)
 					<< QPointF (-1.6f * w, 0.f);
 				diamond.translate (track_deviation.deg() * 0.075f * wh(), 0.f);
-				for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
+				for (QColor color: { _autopilot_pen_1.color(), _autopilot_pen_2.color() })
 				{
-					painter.setPen (pen);
-					painter.setBrush (pen.color());
-					painter.drawPolygon (diamond);
+					painter.setPen (get_pen (color, 1.f));
+					if (std::abs (original_track_deviation.deg()) > std::abs (track_deviation.deg()))
+						painter.setBrush (Qt::NoBrush);
+					else
+						painter.setBrush (color);
 					painter.drawPolygon (diamond);
 				}
 			}
@@ -2184,7 +2215,7 @@ EFISWidget::PaintWorkUnit::sl_paint_failure (Xefis::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_climb_rate_failure (Xefis::Painter& painter, float x)
+EFISWidget::PaintWorkUnit::al_paint_vertical_speed_failure (Xefis::Painter& painter, float x)
 {
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
