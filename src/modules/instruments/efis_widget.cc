@@ -928,6 +928,8 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float 
 
 	QString m_str = "M ";
 	QString mach_str = QString ("%1").arg (_params.mach, 0, 'f', 3);
+	if (mach_str.left (2) == "0.")
+		mach_str = mach_str.mid (1);
 
 	QRectF nn_rect (0.f, _sl_ladder_rect.bottom(), QFontMetricsF (font_a).width (mach_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (m_str), nn_rect.height());
