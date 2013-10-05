@@ -2069,13 +2069,13 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 			paint_small_rect (s3);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
-		painter.setFont (_font_13);
+		painter.setFont (_font_16);
 		painter.fast_draw_text (b1 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
 		painter.fast_draw_text (b2 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
 		painter.fast_draw_text (b3 + a_big, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		painter.setFont (_font_10);
+		painter.setFont (_font_13);
 		painter.fast_draw_text (s1 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
 		painter.fast_draw_text (s2 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
 		painter.fast_draw_text (s3 + a_small, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
