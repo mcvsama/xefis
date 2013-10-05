@@ -36,9 +36,9 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 {
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "settings")
 		{
-			parse_properties (e, {
+			parse_settings (e, {
 				{ "speed-ladder.line-every", _speed_ladder_line_every, false },
 				{ "speed-ladder.number-every", _speed_ladder_number_every, false },
 				{ "speed-ladder.extent", _speed_ladder_extent, false },
@@ -46,13 +46,20 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "speed-ladder.maximum", _speed_ladder_maximum, false },
 				{ "altitude-ladder.line-every", _altitude_ladder_line_every, false },
 				{ "altitude-ladder.number-every", _altitude_ladder_number_every, false },
+				{ "altitude-ladder.emphasis-every", _altitude_ladder_emphasis_every, false },
 				{ "altitude-ladder.bold-every", _altitude_ladder_bold_every, false },
 				{ "altitude-ladder.extent", _altitude_ladder_extent, false },
+			});
+		}
+		else if (e == "properties")
+		{
+			parse_properties (e, {
 				{ "speed.ias.serviceable", _ias_serviceable, false },
 				{ "speed.ias", _ias, false },
 				{ "speed.ias.lookahead", _ias_lookahead, false },
 				{ "speed.ias.minimum", _minimum_ias, false },
-				{ "speed.ias.warning", _warning_ias, false },
+				{ "speed.ias.minimum-maneuver", _minimum_maneuver_ias, false },
+				{ "speed.ias.maximum-maneuver", _maximum_maneuver_ias, false },
 				{ "speed.ias.maximum", _maximum_ias, false },
 				{ "speed.mach", _mach, false },
 				{ "speed.v1", _speed_v1, false },
@@ -76,25 +83,26 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "aoa.pitch-limit", _pitch_limit, false },
 				{ "aoa.pitch-limit.visible", _pitch_limit_visible, false },
 				{ "altitude.serviceable", _altitude_serviceable, false },
-				{ "altitude", _altitude, false },
+				{ "altitude.amsl", _altitude_amsl, false },
 				{ "altitude.lookahead", _altitude_lookahead, false },
 				{ "altitude.agl.serviceable", _altitude_agl_serviceable, false },
 				{ "altitude.agl", _altitude_agl, false },
-				{ "altitude.cbr.serviceable", _cbr_serviceable, false },
-				{ "altitude.cbr", _cbr, false },
+				{ "altitude.vertical-speed.serviceable", _vertical_speed_serviceable, false },
+				{ "altitude.vertical-speed", _vertical_speed, false },
 				{ "altitude.variometer", _variometer, false },
 				{ "altitude.minimums", _minimums_altitude, false },
 				{ "pressure.qnh", _pressure_qnh, false },
 				{ "pressure.display-hpa", _pressure_display_hpa, false },
 				{ "pressure.use-std", _use_standard_pressure, false },
-				{ "cmd.visible", _cmd_settings_visible, false },
-				{ "cmd.altitude", _cmd_alt_setting, false },
-				{ "cmd.ias", _cmd_speed_setting, false },
-				{ "cmd.cbr", _cmd_cbr_setting, false },
 				{ "flight-director.serviceable", _flight_director_serviceable, false },
-				{ "flight-director.visible", _flight_director_visible, false },
-				{ "flight-director.pitch", _flight_director_pitch, false },
-				{ "flight-director.roll", _flight_director_roll, false },
+				{ "flight-director.cmd.visible", _flight_director_cmd_settings_visible, false },
+				{ "flight-director.cmd.altitude", _flight_director_cmd_alt_setting, false },
+				{ "flight-director.cmd.altitude.acquired", _flight_director_cmd_alt_setting_acquired, false },
+				{ "flight-director.cmd.ias", _flight_director_cmd_speed_setting, false },
+				{ "flight-director.cmd.vertical-speed", _flight_director_cmd_vertical_speed_setting, false },
+				{ "flight-director.guidance.visible", _flight_director_guidance_visible, false },
+				{ "flight-director.guidance.pitch", _flight_director_guidance_pitch, false },
+				{ "flight-director.guidance.roll", _flight_director_guidance_roll, false },
 				{ "control-stick.visible", _control_stick_visible, false },
 				{ "control-stick.pitch", _control_stick_pitch, false },
 				{ "control-stick.roll", _control_stick_roll, false },
@@ -134,16 +142,17 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 EFIS::read()
 {
-	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every.read (10));
-	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every.read (20));
-	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent.read (124));
-	_efis_widget->set_speed_ladder_minimum (_speed_ladder_minimum.read (0));
-	_efis_widget->set_speed_ladder_maximum (_speed_ladder_maximum.read (9999));
+	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every);
+	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every);
+	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent);
+	_efis_widget->set_speed_ladder_minimum (_speed_ladder_minimum);
+	_efis_widget->set_speed_ladder_maximum (_speed_ladder_maximum);
 
-	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every.read (100));
-	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every.read (200));
-	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every.read (500));
-	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent.read (825));
+	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every);
+	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every);
+	_efis_widget->set_altitude_ladder_emphasis_every (_altitude_ladder_emphasis_every);
+	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every);
+	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent);
 
 	_efis_widget->set_heading_numbers_visible (_heading_numbers_visible.read (false));
 
@@ -156,9 +165,13 @@ EFIS::read()
 	if (_minimum_ias.valid())
 		_efis_widget->set_minimum_speed (*_minimum_ias);
 
-	_efis_widget->set_warning_speed_visible (_warning_ias.valid());
-	if (_warning_ias.valid())
-		_efis_widget->set_warning_speed (*_warning_ias);
+	_efis_widget->set_minimum_maneuver_speed_visible (_minimum_maneuver_ias.valid());
+	if (_minimum_maneuver_ias.valid())
+		_efis_widget->set_minimum_maneuver_speed (*_minimum_maneuver_ias);
+
+	_efis_widget->set_maximum_maneuver_speed_visible (_maximum_maneuver_ias.valid());
+	if (_maximum_maneuver_ias.valid())
+		_efis_widget->set_maximum_maneuver_speed (*_maximum_maneuver_ias);
 
 	_efis_widget->set_maximum_speed_visible (_maximum_ias.valid());
 	if (_maximum_ias.valid())
@@ -221,10 +234,10 @@ EFIS::read()
 	else
 		_efis_widget->set_flight_path_marker_visible (false);
 
-	_efis_widget->set_altitude_visible (_altitude.valid());
+	_efis_widget->set_altitude_visible (_altitude_amsl.valid());
 	_efis_widget->set_altitude_failure (_altitude_serviceable.configured() && !_altitude_serviceable.read (true));
-	if (_altitude.valid())
-		_efis_widget->set_altitude (*_altitude);
+	if (_altitude_amsl.valid())
+		_efis_widget->set_altitude (*_altitude_amsl);
 
 	_efis_widget->set_altitude_tendency_visible (_altitude_lookahead.valid());
 	if (_altitude_lookahead.valid())
@@ -256,40 +269,41 @@ EFIS::read()
 	if (_pressure_display_hpa.valid())
 		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
 
-	_efis_widget->set_climb_rate_visible (_cbr.valid());
-	_efis_widget->set_climb_rate_failure (_cbr_serviceable.configured() && !_cbr_serviceable.read (true));
-	if (_cbr.valid())
-		_efis_widget->set_climb_rate (*_cbr);
+	_efis_widget->set_vertical_speed_visible (_vertical_speed.valid());
+	_efis_widget->set_vertical_speed_failure (_vertical_speed_serviceable.configured() && !_vertical_speed_serviceable.read (true));
+	if (_vertical_speed.valid())
+		_efis_widget->set_vertical_speed (*_vertical_speed);
 
 	_efis_widget->set_variometer_visible (_variometer.valid());
 	if (_variometer.valid())
 		_efis_widget->set_variometer_rate (*_variometer);
 
-	bool cmd_visible = _cmd_settings_visible.read (false);
+	bool cmd_visible = _flight_director_cmd_settings_visible.read (false);
 
-	_efis_widget->set_cmd_altitude_visible (cmd_visible && _cmd_alt_setting.valid());
-	if (_cmd_alt_setting.valid())
-		_efis_widget->set_cmd_altitude (*_cmd_alt_setting);
+	_efis_widget->set_cmd_altitude_visible (cmd_visible && _flight_director_cmd_alt_setting.valid());
+	if (_flight_director_cmd_alt_setting.valid())
+		_efis_widget->set_cmd_altitude (*_flight_director_cmd_alt_setting);
+	_efis_widget->set_cmd_altitude_acquired (_flight_director_cmd_alt_setting_acquired.valid() && *_flight_director_cmd_alt_setting_acquired);
 
-	_efis_widget->set_cmd_speed_visible (cmd_visible && _cmd_speed_setting.valid());
-	if (_cmd_speed_setting.valid())
-		_efis_widget->set_cmd_speed (*_cmd_speed_setting);
+	_efis_widget->set_cmd_speed_visible (cmd_visible && _flight_director_cmd_speed_setting.valid());
+	if (_flight_director_cmd_speed_setting.valid())
+		_efis_widget->set_cmd_speed (*_flight_director_cmd_speed_setting);
 
-	_efis_widget->set_cmd_climb_rate_visible (cmd_visible && _cmd_cbr_setting.valid());
-	if (_cmd_cbr_setting.valid())
-		_efis_widget->set_cmd_climb_rate (*_cmd_cbr_setting);
+	_efis_widget->set_cmd_vertical_speed_visible (cmd_visible && _flight_director_cmd_vertical_speed_setting.valid());
+	if (_flight_director_cmd_vertical_speed_setting.valid())
+		_efis_widget->set_cmd_vertical_speed (*_flight_director_cmd_vertical_speed_setting);
 
-	bool flight_director_visible = _flight_director_visible.read (false);
+	bool flight_director_guidance_visible = _flight_director_guidance_visible.read (false);
 
 	_efis_widget->set_flight_director_failure (_flight_director_serviceable.configured() && !_flight_director_serviceable.read (true));
 
-	_efis_widget->set_flight_director_pitch_visible (flight_director_visible && _flight_director_pitch.valid());
-	if (_flight_director_pitch.valid())
-		_efis_widget->set_flight_director_pitch (*_flight_director_pitch);
+	_efis_widget->set_flight_director_pitch_visible (flight_director_guidance_visible && _flight_director_guidance_pitch.valid());
+	if (_flight_director_guidance_pitch.valid())
+		_efis_widget->set_flight_director_pitch (*_flight_director_guidance_pitch);
 
-	_efis_widget->set_flight_director_roll_visible (flight_director_visible && _flight_director_roll.valid());
-	if (_flight_director_roll.valid())
-		_efis_widget->set_flight_director_roll (*_flight_director_roll);
+	_efis_widget->set_flight_director_roll_visible (flight_director_guidance_visible && _flight_director_guidance_roll.valid());
+	if (_flight_director_guidance_roll.valid())
+		_efis_widget->set_flight_director_roll (*_flight_director_guidance_roll);
 
 	bool control_stick_visible = _control_stick_visible.valid() && *_control_stick_visible;
 
@@ -328,8 +342,13 @@ EFIS::read()
 		{
 			_efis_widget->set_localizer_id ((*_localizer_id).c_str());
 			_efis_widget->set_localizer_magnetic_bearing (*_magnetic_heading - *_true_heading + navaid->true_bearing());
-			_efis_widget->set_localizer_info_visible (true);
 		}
+		else
+		{
+			_efis_widget->set_localizer_id ((*_localizer_id).c_str());
+			_efis_widget->set_localizer_magnetic_bearing (0_deg);
+		}
+		_efis_widget->set_localizer_info_visible (true);
 	}
 	else
 		_efis_widget->set_localizer_info_visible (false);

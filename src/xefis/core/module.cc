@@ -179,6 +179,8 @@ Module::parse_settings (QDomElement const& settings_element, SettingsList list)
 					*nas->value_bool = value == "true";
 				else if (nas->value_int)
 					*nas->value_int = boost::lexical_cast<int> (value.toStdString());
+				else if (nas->value_int64)
+					*nas->value_int64 = boost::lexical_cast<int64_t> (value.toStdString());
 				else if (nas->value_float)
 					*nas->value_float = boost::lexical_cast<float> (value.toStdString());
 				else if (nas->value_double)

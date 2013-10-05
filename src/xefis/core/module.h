@@ -62,6 +62,7 @@ class Module: private Noncopyable
 		bool			required;
 		bool*			value_bool		= nullptr;
 		int*			value_int		= nullptr;
+		int64_t*		value_int64		= nullptr;
 		float*			value_float		= nullptr;
 		double*			value_double	= nullptr;
 		std::string*	value_string	= nullptr;
@@ -71,6 +72,8 @@ class Module: private Noncopyable
 		NameAndSetting (QString const& name, bool& value, bool required);
 
 		NameAndSetting (QString const& name, int& value, bool required);
+
+		NameAndSetting (QString const& name, int64_t& value, bool required);
 
 		NameAndSetting (QString const& name, float& value, bool required);
 
@@ -264,6 +267,14 @@ Module::NameAndSetting::NameAndSetting (QString const& name, int& value, bool re
 	name (name),
 	required (required),
 	value_int (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, int64_t& value, bool required):
+	name (name),
+	required (required),
+	value_int64 (&value)
 { }
 
 
