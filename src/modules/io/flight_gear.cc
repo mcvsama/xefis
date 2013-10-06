@@ -74,7 +74,7 @@ struct FGInputData
 	FGBool		navigation_dme_ok;				// dok
 	FGDouble	dme_distance_nm;				// dme
 	FGDouble	slip_skid_g;					// ss
-	FGDouble	outside_air_temperature_k;		// tmp
+	FGDouble	static_air_temperature_K;		// tmp
 	FGDouble	engine_throttle_pct;			// thr
 	FGDouble	engine_epr;						// epr
 	FGDouble	engine_n1_pct;					// n1
@@ -144,7 +144,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "lateral-deviation", _lateral_deviation, false },
 						{ "vertical-deviation", _vertical_deviation, false },
 						{ "dme-distance", _dme_distance, false },
-						{ "outside-air-temperature", _outside_air_temperature_k, false },
+						{ "static-air-temperature", _static_air_temperature, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
 						{ "engine-epr", _engine_epr, false },
 						{ "engine-n1", _engine_n1_pct, false },
@@ -246,7 +246,7 @@ FlightGearIO::invalidate_all()
 		&_lateral_deviation,
 		&_vertical_deviation,
 		&_dme_distance,
-		&_outside_air_temperature_k,
+		&_static_air_temperature,
 		&_engine_throttle_pct,
 		&_engine_epr,
 		&_engine_n1_pct,
@@ -324,7 +324,7 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (navigation_needles_visible);
 		ASSIGN (nm,   dme_distance);
 		ASSIGN_UNITLESS (slip_skid_g);
-		ASSIGN_UNITLESS (outside_air_temperature_k);
+		ASSIGN (K,    static_air_temperature);
 		ASSIGN_UNITLESS (engine_throttle_pct);
 		ASSIGN_UNITLESS (engine_epr);
 		ASSIGN_UNITLESS (engine_n1_pct);
@@ -348,8 +348,8 @@ FlightGearIO::read_input()
 		if (!fg_data->navigation_dme_ok && _dme_distance.configured())
 			_dme_distance.set_nil();
 
-		if (_outside_air_temperature_k.valid())
-			_outside_air_temperature_k.write (*_outside_air_temperature_k + 273.15);
+		if (_static_air_temperature.valid())
+			_static_air_temperature.write (*_static_air_temperature + 273.15_K);
 	}
 
 	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)
