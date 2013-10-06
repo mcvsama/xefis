@@ -44,6 +44,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	class Parameters
 	{
 	  public:
+		bool				old_style						= false;
 		Angle				fov								= 120_deg;
 		bool				input_alert_visible				= false;
 		Angle				pitch							= 0_deg;
@@ -466,6 +467,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QRectF				_adi_gnd_rect;
 		QPainterPath		_flight_path_marker_shape;
 		QPointF				_flight_path_marker_position;
+		QPainterPath		_old_horizon_clip;
 
 		/*
 		 * Speed ladder
@@ -512,6 +514,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	// Dtor
 	~EFISWidget();
+
+	/**
+	 * Set old-style EFIS (pre-787).
+	 */
+	void
+	set_old_style (bool enabled);
 
 	/**
 	 * Set how often lines should be drawn on speed ladder.
@@ -1263,6 +1271,14 @@ inline bool
 EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
 {
 	return timestamp.secsTo (_current_datetime) < time.s();
+}
+
+
+inline void
+EFISWidget::set_old_style (bool enabled)
+{
+	_params.old_style = enabled;
+	request_repaint();
 }
 
 

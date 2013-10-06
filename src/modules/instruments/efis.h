@@ -98,7 +98,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle			_aoa_pitch_limit;
 	Xefis::PropertyBoolean			_aoa_pitch_limit_visible;
 	// Pressure and radio altitude
-	Xefis::PropertyBoolean			_altitude_serviceable;
+	Xefis::PropertyBoolean			_altitude_amsl_serviceable;
 	Xefis::PropertyLength			_altitude_amsl;
 	Xefis::PropertyLength			_altitude_amsl_lookahead;
 	Xefis::PropertyBoolean			_altitude_agl_serviceable;
@@ -151,6 +151,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_warning_roll_disagree;
 	Xefis::PropertyBoolean			_warning_ias_disagree;
 	Xefis::PropertyBoolean			_warning_altitude_disagree;
+	// Style
+	Xefis::PropertyBoolean			_style_old;
 };
 
 

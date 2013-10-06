@@ -132,6 +132,16 @@ EFISWidget::PaintWorkUnit::adi_post_resize()
 		_flight_path_marker_shape.moveTo (QPointF (0.f, -r));
 		_flight_path_marker_shape.lineTo (QPointF (0.f, -2.f * x));
 	}
+
+	// Old style clip:
+	{
+		float h = 0.2835f * wh();
+		float w = 0.255f * wh();
+		float r = 0.2f * h;
+
+		_old_horizon_clip = QPainterPath();
+		_old_horizon_clip.addRoundedRect (-w, -h, 2.f * w, 2.f * h, r, r);
+	}
 }
 
 
@@ -227,6 +237,12 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 	if (_params.pitch_visible && _params.roll_visible)
 	{
 		painter.setClipping (false);
+		if (_params.old_style)
+		{
+			adi_clear (painter);
+			painter.setTransform (_center_transform);
+			painter.setClipPath (_old_horizon_clip);
+		}
 		painter.setTransform (_horizon_transform);
 		painter.fillRect (_adi_sky_rect, _sky_color);
 		painter.fillRect (_adi_gnd_rect, _ground_color);
@@ -1895,9 +1911,12 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			QRectF elli (0.f, 0.f, 0.015f * wh(), 0.015f * wh());
 			elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
 
-			painter.setPen (ladder_pen);
-			painter.setBrush (_ladder_color);
-			painter.drawRect (rect);
+			if (!_params.old_style)
+			{
+				painter.setPen (ladder_pen);
+				painter.setBrush (_ladder_color);
+				painter.drawRect (rect);
+			}
 
 			if (needle_visible)
 			{
