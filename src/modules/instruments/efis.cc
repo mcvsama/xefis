@@ -82,7 +82,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "aoa.warning-threshold", _aoa_warning_threshold, false },
 				{ "aoa.pitch-limit", _aoa_pitch_limit, false },
 				{ "aoa.pitch-limit.visible", _aoa_pitch_limit_visible, false },
-				{ "altitude.serviceable", _altitude_serviceable, false },
+				{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, false },
 				{ "altitude.amsl", _altitude_amsl, false },
 				{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, false },
 				{ "altitude.agl.serviceable", _altitude_agl_serviceable, false },
@@ -122,11 +122,12 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "flight-mode.fma.lateral-small-hint", _flight_mode_fma_lateral_small_hint, false },
 				{ "flight-mode.fma.vertical-hint", _flight_mode_fma_vertical_hint, false },
 				{ "flight-mode.fma.vertical-small-hint", _flight_mode_fma_vertical_small_hint, false },
-				{ "warning.novspd", _warning_novspd_flag, false },
+				{ "warning.novspd-flag", _warning_novspd_flag, false },
 				{ "warning.pitch-disagree", _warning_pitch_disagree, false },
 				{ "warning.roll-disagree", _warning_roll_disagree, false },
 				{ "warning.ias-disagree", _warning_ias_disagree, false },
 				{ "warning.altitude-disagree", _warning_altitude_disagree, false },
+				{ "style.old", _style_old, false },
 			});
 		}
 	}
@@ -198,7 +199,7 @@ EFIS::read()
 
 	_efis_widget->set_roll_limit (_orientation_roll_limit.read (0_deg));
 
-	if (_aoa_pitch_limit.valid() && _aoa_pitch_limit_visible.valid())
+	if (_aoa_pitch_limit.valid() && _aoa_pitch_limit_visible.read (false))
 	{
 		_efis_widget->set_pitch_limit (*_aoa_pitch_limit);
 		bool visible = false;
@@ -236,7 +237,7 @@ EFIS::read()
 		_efis_widget->set_flight_path_marker_visible (false);
 
 	_efis_widget->set_altitude_visible (_altitude_amsl.valid());
-	_efis_widget->set_altitude_failure (_altitude_serviceable.configured() && !_altitude_serviceable.read (true));
+	_efis_widget->set_altitude_failure (_altitude_amsl_serviceable.configured() && !_altitude_amsl_serviceable.read (true));
 	if (_altitude_amsl.valid())
 		_efis_widget->set_altitude (*_altitude_amsl);
 
@@ -394,5 +395,7 @@ EFIS::read()
 	_efis_widget->set_roll_disagree (_warning_roll_disagree.read (false));
 	_efis_widget->set_ias_disagree (_warning_ias_disagree.read (false));
 	_efis_widget->set_altitude_disagree (_warning_altitude_disagree.read (false));
+
+	_efis_widget->set_old_style (_style_old.valid() && *_style_old);
 }
 
