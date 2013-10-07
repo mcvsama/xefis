@@ -55,7 +55,6 @@
 										<property name='altitude.agl' path='/radar-altimeter/agl'/>
 										<property name='speed.ias.serviceable' path='/airspeed/serviceable'/>
 										<property name='orientation.serviceable' path='/ahrs/serviceable'/>
-										<property name='fpv.serviceable' path='/gps/serviceable'/>
 										<property name='altitude.serviceable' path='/pressure/serviceable'/>
 										<property name='altitude.vertical-speed.serviceable' path='/pressure/serviceable'/>
 									</directory>
@@ -71,8 +70,6 @@
 										<property name='orientation.roll' path='/orientation/roll'/>
 										<property name='orientation.heading.true' path='/orientation/true-heading'/>
 										<property name='orientation.heading.magnetic' path='/orientation/magnetic-heading'/>
-										<property name='fpv.alpha' path='/fpv/alpha'/>
-										<property name='fpv.beta' path='/fpv/beta'/>
 										<property name='aoa.alpha' path='/aoa/alpha'/>
 										<property name='aoa.pitch-limit' path='/aoa/pitch-limit'/>
 										<property name='altitude.amsl' path='/pressure-altitude/amsl'/>
