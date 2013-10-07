@@ -25,6 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/core/instrument.h>
 
 // Local:
@@ -50,8 +51,12 @@ class EFIS: public Xefis::Instrument
 	void
 	data_updated() override;
 
+	void
+	compute_fpv();
+
   private:
 	EFISWidget*						_efis_widget					= nullptr;
+	Xefis::PropertyObserver			_fpv_computer;
 	// Setting
 	Xefis::PropertyInteger::Type	_speed_ladder_line_every		= 10;
 	Xefis::PropertyInteger::Type	_speed_ladder_number_every		= 20;
@@ -84,14 +89,15 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle			_orientation_heading_magnetic;
 	Xefis::PropertyAngle			_orientation_heading_true;
 	Xefis::PropertyBoolean			_orientation_heading_numbers_visible;
+	// Track
+	Xefis::PropertyAngle			_track_lateral_magnetic;
+	Xefis::PropertyAngle			_track_lateral_true;
+	Xefis::PropertyAngle			_track_vertical;
 	// Slip-skid indicator
 	Xefis::PropertyFloat			_slip_skid;
 	Xefis::PropertyFloat			_slip_skid_limit;
 	// Flight Path Vector
-	Xefis::PropertyBoolean			_fpv_serviceable;
 	Xefis::PropertyBoolean			_fpv_visible;
-	Xefis::PropertyAngle			_fpv_alpha;
-	Xefis::PropertyAngle			_fpv_beta;
 	// Angle of Attack
 	Xefis::PropertyAngle			_aoa_alpha;
 	Xefis::PropertyAngle			_aoa_warning_threshold;

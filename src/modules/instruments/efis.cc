@@ -72,12 +72,12 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
 				{ "orientation.heading.true", _orientation_heading_true, false },
 				{ "orientation.heading.numbers-visible", _orientation_heading_numbers_visible, false },
+				{ "track.lateral.magnetic", _track_lateral_magnetic, false },
+				{ "track.lateral.true", _track_lateral_true, false },
+				{ "track.vertical", _track_vertical, false },
 				{ "slip-skid", _slip_skid, false },
 				{ "slip-skid.limit", _slip_skid_limit, false },
-				{ "fpv.serviceable", _fpv_serviceable, false },
 				{ "fpv.visible", _fpv_visible, false },
-				{ "fpv.alpha", _fpv_alpha, false },
-				{ "fpv.beta", _fpv_beta, false },
 				{ "aoa.alpha", _aoa_alpha, false },
 				{ "aoa.warning-threshold", _aoa_warning_threshold, false },
 				{ "aoa.pitch-limit", _aoa_pitch_limit, false },
@@ -138,12 +138,26 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_efis_widget);
+
+	_fpv_computer.set_callback (std::bind (&EFIS::compute_fpv, this));
+	_fpv_computer.observe ({
+		&_orientation_heading_magnetic,
+		&_orientation_heading_true,
+		&_orientation_pitch,
+		&_orientation_roll,
+		&_track_lateral_magnetic,
+		&_track_lateral_true,
+		&_track_vertical,
+		&_fpv_visible,
+	});
 }
 
 
 void
 EFIS::read()
 {
+	_fpv_computer.data_updated (update_time());
+
 	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every);
 	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every);
 	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent);
@@ -159,7 +173,7 @@ EFIS::read()
 	_efis_widget->set_heading_numbers_visible (_orientation_heading_numbers_visible.read (false));
 
 	_efis_widget->set_speed_visible (_speed_ias.valid());
-	_efis_widget->set_speed_failure (_speed_ias_serviceable.configured() && !_speed_ias_serviceable.read (true));
+	_efis_widget->set_speed_failure (!_speed_ias_serviceable.read (true));
 	if (_speed_ias.valid())
 		_efis_widget->set_speed (*_speed_ias);
 
@@ -195,7 +209,7 @@ EFIS::read()
 	if (_orientation_roll.valid())
 		_efis_widget->set_roll (*_orientation_roll);
 
-	_efis_widget->set_attitude_failure (_orientation_serviceable.configured() && !_orientation_serviceable.read (true));
+	_efis_widget->set_attitude_failure (!_orientation_serviceable.read (true));
 
 	_efis_widget->set_roll_limit (_orientation_roll_limit.read (0_deg));
 
@@ -222,22 +236,8 @@ EFIS::read()
 
 	_efis_widget->set_slip_skid_limit (_slip_skid_limit.valid() ? *_slip_skid_limit : 0.f);
 
-	bool fpv_visible = _fpv_visible.valid() && *_fpv_visible;
-
-	_efis_widget->set_flight_path_marker_failure (_fpv_visible.configured() && _fpv_visible.read (false) &&
-												  _fpv_serviceable.configured() && !_fpv_serviceable.read (true));
-
-	if (_fpv_alpha.valid() && _fpv_beta.valid())
-	{
-		_efis_widget->set_flight_path_alpha (*_fpv_alpha);
-		_efis_widget->set_flight_path_beta (*_fpv_beta);
-		_efis_widget->set_flight_path_marker_visible (fpv_visible);
-	}
-	else
-		_efis_widget->set_flight_path_marker_visible (false);
-
 	_efis_widget->set_altitude_visible (_altitude_amsl.valid());
-	_efis_widget->set_altitude_failure (_altitude_amsl_serviceable.configured() && !_altitude_amsl_serviceable.read (true));
+	_efis_widget->set_altitude_failure (!_altitude_amsl_serviceable.read (true));
 	if (_altitude_amsl.valid())
 		_efis_widget->set_altitude (*_altitude_amsl);
 
@@ -246,7 +246,7 @@ EFIS::read()
 		_efis_widget->set_altitude_tendency (*_altitude_amsl_lookahead);
 
 	_efis_widget->set_altitude_agl_visible (_altitude_agl.valid());
-	_efis_widget->set_radar_altimeter_failure (_altitude_agl_serviceable.configured() && !_altitude_agl_serviceable.read (true));
+	_efis_widget->set_radar_altimeter_failure (!_altitude_agl_serviceable.read (true));
 	if (_altitude_agl.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl);
 
@@ -272,7 +272,7 @@ EFIS::read()
 		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
 
 	_efis_widget->set_vertical_speed_visible (_vertical_speed.valid());
-	_efis_widget->set_vertical_speed_failure (_vertical_speed_serviceable.configured() && !_vertical_speed_serviceable.read (true));
+	_efis_widget->set_vertical_speed_failure (!_vertical_speed_serviceable.read (true));
 	if (_vertical_speed.valid())
 		_efis_widget->set_vertical_speed (*_vertical_speed);
 
@@ -297,7 +297,7 @@ EFIS::read()
 
 	bool flight_director_guidance_visible = _flight_director_guidance_visible.read (false);
 
-	_efis_widget->set_flight_director_failure (_flight_director_serviceable.configured() && !_flight_director_serviceable.read (true));
+	_efis_widget->set_flight_director_failure (!_flight_director_serviceable.read (true));
 
 	_efis_widget->set_flight_director_pitch_visible (flight_director_guidance_visible && _flight_director_guidance_pitch.valid());
 	if (_flight_director_guidance_pitch.valid())
@@ -397,5 +397,42 @@ EFIS::read()
 	_efis_widget->set_altitude_disagree (_warning_altitude_disagree.read (false));
 
 	_efis_widget->set_old_style (_style_old.valid() && *_style_old);
+}
+
+
+void
+EFIS::compute_fpv()
+{
+	Xefis::PropertyAngle* heading = nullptr;
+	Xefis::PropertyAngle* track_lateral = nullptr;
+	if (_orientation_heading_magnetic.valid() && _track_lateral_magnetic.valid())
+	{
+		heading = &_orientation_heading_magnetic;
+		track_lateral = &_track_lateral_magnetic;
+	}
+	else if (_orientation_heading_true.valid() && _track_lateral_true.valid())
+	{
+		heading = &_orientation_heading_true;
+		track_lateral = &_track_lateral_true;
+	}
+
+	if (_orientation_pitch.valid() && _orientation_roll.valid() && _track_vertical.valid() && heading && track_lateral)
+	{
+		Angle vdiff = Xefis::floored_mod (*_orientation_pitch - *_track_vertical, -180_deg, +180_deg);
+		Angle hdiff = Xefis::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
+		Angle roll = *_orientation_roll;
+
+		Angle alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
+		Angle beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
+
+		_efis_widget->set_flight_path_alpha (alpha);
+		_efis_widget->set_flight_path_beta (beta);
+		_efis_widget->set_flight_path_marker_visible (_fpv_visible.read (false));
+	}
+	else
+	{
+		_efis_widget->set_flight_path_marker_visible (false);
+		_efis_widget->set_flight_path_marker_failure (_fpv_visible.read (false));
+	}
 }
 
