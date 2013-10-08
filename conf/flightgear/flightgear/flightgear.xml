@@ -7,17 +7,21 @@
 			<properties>
 				<directory path='/sensors'>
 					<!-- gps -->
-					<property name='position-longitude' path='/gps/longitude'/>
-					<property name='position-latitude' path='/gps/latitude'/>
-					<property name='position-amsl' path='/gps/altitude-amsl'/>
-					<!-- imu -->
-					<property name='orientation-pitch' path='/imu/pitch'/>
-					<property name='orientation-roll' path='/imu/roll'/>
-					<property name='orientation-magnetic-heading' path='/compass/magnetic-heading'/>
+					<directory path='/gps'>
+						<property name='position-longitude' path='/longitude'/>
+						<property name='position-latitude' path='/latitude'/>
+						<property name='position-amsl' path='/altitude-amsl'/>
+					</directory>
+					<!-- ahrs -->
+					<directory path='/ahrs'>
+						<property name='orientation-pitch' path='/pitch'/>
+						<property name='orientation-roll' path='/roll'/>
+						<property name='orientation-magnetic-heading' path='/magnetic-heading'/>
+					</directory>
 					<!-- airspeed -->
 					<property name='ias' path='/speed/ias'/>
 					<!-- pressure -->
-					<property name='pressure' path='/pressure/pressure'/>
+					<property name='pressure' path='/pressure/static'/>
 					<!-- temperature -->
 					<property name='static-air-temperature' path='/temperature/static'/>
 					<!-- radar altimeter -->

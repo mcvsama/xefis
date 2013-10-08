@@ -1,0 +1,50 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/nc'>
+		<properties>
+			<!-- Input -->
+			<directory path='//sensors/gps'>
+				<property name='position.input.longitude' path='/longitude'/>
+				<property name='position.input.latitude' path='/latitude'/>
+				<property name='position.input.altitude.amsl' path='/altitude-amsl'/>
+				<property name='position.input.accuracy.lateral' path='/lateral-accuracy' default='1 m'/>
+				<property name='position.input.accuracy.vertical' path='/vertical-accuracy' default='1 m'/>
+				<property name='position.input.source' path='//systems/nc/internal/position.source' default='GPS'/>
+			</directory>
+			<directory path='//sensors/ahrs'>
+				<property name='orientation.input.pitch' path='/pitch'/>
+				<property name='orientation.input.roll' path='/roll'/>
+				<property name='orientation.input.heading.magnetic' path='/magnetic-heading'/>
+			</directory>
+			<!-- Output -->
+			<directory path='//systems/nc'>
+				<directory path='/position'>
+					<property name='position.longitude' path='/longitude'/>
+					<property name='position.latitude' path='/latitude'/>
+					<property name='position.altitude.amsl' path='/altitude.amsl'/>
+					<property name='position.accuracy.lateral' path='/accuracy.lateral'/>
+					<property name='position.accuracy.vertical' path='/accuracy.vertical'/>
+					<property name='position.source' path='/source'/>
+				</directory>
+				<directory path='/orientation'>
+					<property name='orientation.pitch' path='/pitch'/>
+					<property name='orientation.roll' path='/roll'/>
+					<property name='orientation.heading.magnetic' path='/heading.magnetic'/>
+					<property name='orientation.heading.true' path='/heading.true'/>
+				</directory>
+				<directory path='/track'>
+					<property name='track.vertical' path='/vertical'/>
+					<property name='track.lateral.magnetic' path='/lateral.magnetic'/>
+					<property name='track.lateral.true' path='/lateral.true'/>
+					<property name='track.lateral.delta' path='/lateral.delta'/>
+					<property name='track.ground-speed' path='/ground-speed'/>
+				</directory>
+				<directory path='/magnetic'>
+					<property name='magnetic.declination' path='/declination'/>
+					<property name='magnetic.inclination' path='/inclination'/>
+				</directory>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+

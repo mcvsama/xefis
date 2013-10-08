@@ -17,7 +17,6 @@
 				<property name='settings.speed.v-be' path='/speeds/v-be' default='65 kt'/>
 				<property name='settings.speed.v-br' path='/speeds/v-br' default='75 kt'/>
 				<property name='settings.speed.v-bg' path='/speeds/v-bg' default='65 kt'/>
-				<property name='settings.use-standard-pressure' path='//settings/altimeter/use-std-pressure' default='false'/>
 				<property name='settings.pressure.qnh' path='//settings/altimeter/pressure-qnh' default='29.82 inhg'/>
 				<property name='settings.critical-aoa' path='/aoa/critical' default='15 deg'/>
 				<property name='settings.target-pressure-altitude-amsl' path='//settings/flight-director/cmd-altitude'/>
@@ -39,7 +38,7 @@
 				<property name='ins.accuracy.lateral' path='/ins/lateral-accuracy' default='1 m'/>
 				<property name='ins.accuracy.vertical' path='/ins/vertical-accuracy' default='1 m'/>
 				<property name='ins.timestamp' path='/ins/timestamp'/>
-				<property name='pressure.static' path='/pressure/pressure'/>
+				<property name='pressure.static' path='/pressure/static'/>
 				<property name='airspeed' path='/speed/ias'/>
 				<property name='gear-down' path='/gear/lowered'/>
 				<property name='static-air-temperature' path='/temperature/static'/>

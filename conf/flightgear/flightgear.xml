@@ -2,8 +2,9 @@
 <xefis-config version='1.0'>
 	<modules>
 		<module name='private/state'/>
+		<include name='flightgear/adc.xml'/>
+		<include name='flightgear/nc.xml'/>
 		<include name='flightgear/fbw.xml'/>
-		<include name='flightgear/fdc.xml'/>
 		<include name='flightgear/fd.xml'/>
 		<include name='flightgear/flightgear.xml'/>
 		<include name='flightgear/joystick.xml'/>
