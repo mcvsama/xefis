@@ -252,17 +252,14 @@ EFIS::read()
 
 	_efis_widget->set_altitude_warnings_visible (true);
 
-	if (_pressure_use_std.valid() && _altitude_minimums.valid())
-	{
-		_efis_widget->set_minimums_altitude_visible (true);
+	if (_pressure_use_std.valid())
 		_efis_widget->set_standard_pressure (*_pressure_use_std);
-		_efis_widget->set_minimums_altitude (*_altitude_minimums);
-	}
 	else
-	{
-		_efis_widget->set_minimums_altitude_visible (false);
 		_efis_widget->set_standard_pressure (false);
-	}
+
+	if (_altitude_minimums.valid())
+		_efis_widget->set_minimums_altitude (*_altitude_minimums);
+	_efis_widget->set_minimums_altitude_visible (_altitude_minimums.valid());
 
 	_efis_widget->set_pressure_visible (_pressure_qnh.valid());
 	if (_pressure_qnh.valid())
@@ -428,6 +425,7 @@ EFIS::compute_fpv()
 		_efis_widget->set_flight_path_alpha (alpha);
 		_efis_widget->set_flight_path_beta (beta);
 		_efis_widget->set_flight_path_marker_visible (_fpv_visible.read (false));
+		_efis_widget->set_flight_path_marker_failure (false);
 	}
 	else
 	{
