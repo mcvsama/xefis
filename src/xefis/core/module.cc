@@ -61,9 +61,8 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 		}
 
 		QString root = properties_element.attribute ("path");
-		QString root_2;
 
-		auto parse_property = [&] (QDomElement& e) -> void
+		auto parse_property = [&] (QDomElement const& e) -> void
 		{
 			if (!e.hasAttribute ("name"))
 				throw Exception ("missing attribute @name for property");
@@ -86,7 +85,7 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 
 			if (e.hasAttribute ("path"))
 			{
-				std::string path = (root + root_2 + e.attribute ("path")).toStdString();
+				std::string path = (root + e.attribute ("path")).toStdString();
 				it->second->set_path (path);
 			}
 			else
@@ -101,18 +100,28 @@ Module::parse_properties (QDomElement const& properties_element, PropertiesList 
 			}
 		};
 
-		for (QDomElement& d: properties_element)
+		std::function<void (QDomElement const& e)> parse_element;
+
+		auto parse_directory = [&] (QDomElement const& e) -> void
 		{
-			if (d == "property")
-				parse_property (d);
-			else if (d == "directory")
-			{
-				root_2 = d.attribute ("path");
-				for (QDomElement& e: d)
-					if (e == "property")
-						parse_property (e);
-			}
-		}
+			QString orig_root = root;
+			QString subdir = e.attribute ("path");
+			root += subdir;
+			for (QDomElement const& sub: e)
+				parse_element (sub);
+			root = orig_root;
+		};
+
+		parse_element = [&] (QDomElement const& e) -> void
+		{
+			if (e == "property")
+				parse_property (e);
+			else if (e == "directory")
+				parse_directory (e);
+		};
+
+		for (QDomElement& d: properties_element)
+			parse_element (d);
 
 		if (!unconfigured_values.empty())
 		{
