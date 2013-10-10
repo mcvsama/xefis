@@ -939,26 +939,15 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float 
 	painter.setTransform (_sl_transform);
 	painter.translate (0.f, 0.75f * x);
 
-	QFont font_a = _font_16;
-	QFont font_b = _font_13;
+	QFont font = _font_20;
 
-	QString m_str = "M ";
 	QString mach_str = QString ("%1").arg (_params.mach, 0, 'f', 3);
 	if (mach_str.left (2) == "0.")
 		mach_str = mach_str.mid (1);
 
-	QRectF nn_rect (0.f, _sl_ladder_rect.bottom(), QFontMetricsF (font_a).width (mach_str), 1.2f * _font_16_digit_height);
-	QRectF zz_rect (0.f, nn_rect.top(), QFontMetricsF (font_b).width (m_str), nn_rect.height());
-	zz_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
-	// Correct position of zz_rect to get correct baseline position:
-	zz_rect.translate (0.f, QFontMetricsF (font_b).descent() - QFontMetricsF (font_a).descent());
-	nn_rect.moveLeft (zz_rect.right());
-
 	painter.setPen (get_pen (Qt::white, 1.f));
-	painter.setFont (font_a);
-	painter.fast_draw_text (nn_rect, Qt::AlignBottom | Qt::AlignLeft, mach_str);
-	painter.setFont (font_b);
-	painter.fast_draw_text (zz_rect, Qt::AlignBottom | Qt::AlignRight, m_str);
+	painter.setFont (font);
+	painter.fast_draw_text (QPointF (0.f, _sl_ladder_rect.bottom() + 0.5f * _font_20_digit_height), Qt::AlignHCenter | Qt::AlignCenter, mach_str);
 }
 
 
