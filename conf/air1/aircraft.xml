@@ -8,11 +8,11 @@
 		<include name='aircraft/ahrs.xml'/>
 		<include name='aircraft/gps.xml'/>
 		<include name='aircraft/ets-airspeed.xml'/>
-		<include name='aircraft/fdc.xml'/>
 		<include name='aircraft/fbw.xml'/>
 		<include name='aircraft/fd.xml'/>
 		<include name='aircraft/rcms.xml'/>
 		<include name='aircraft/slip-skid.xml'/>
+		<include name='aircraft/pwm.xml'/>
 		<include name='aircraft/link.xml'/>
 		<include name='aircraft/xbee.xml'/>
 	</modules>

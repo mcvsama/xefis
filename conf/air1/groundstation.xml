@@ -1,7 +1,6 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
 	<modules>
-		<include name='groundstation/fdc.xml'/>
 		<include name='groundstation/joystick.xml'/>
 		<include name='groundstation/mouse.xml'/>
 		<include name='groundstation/link.xml'/>
