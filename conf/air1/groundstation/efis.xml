@@ -96,9 +96,9 @@
 										<property name='control-stick.pitch' path='/pitch'/>
 										<property name='control-stick.roll' path='/roll'/>
 									</directory>
-									<directory path='/systems/fdc/track'>
-										<property name='track.lateral.magnetic' path='/lateral-magnetic'/>
-										<property name='track.lateral.true' path='/lateral-true'/>
+									<directory path='/systems/nc/track'>
+										<property name='track.lateral.magnetic' path='/lateral.magnetic'/>
+										<property name='track.lateral.true' path='/lateral.true'/>
 										<property name='track.vertical' path='/vertical'/>
 									</directory>
 								</properties>

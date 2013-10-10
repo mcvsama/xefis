@@ -91,7 +91,7 @@
 									<property name='speed.tas' path='//systems/adc/speed/tas'/>
 									<property name='track.lateral-magnetic' path='//systems/nc/track/lateral.magnetic'/>
 									<property name='track.delta.lateral' path='//systems/nc/track/lateral.delta'/>
-									<directory path='/systems/fdc'>
+									<directory path='/systems/pc'>
 										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
 										<property name='wind.tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
@@ -138,7 +138,7 @@
 									<property name='speed.tas' path='//systems/adc/speed/tas'/>
 									<property name='track.lateral-magnetic' path='//systems/nc/track/lateral.magnetic'/>
 									<property name='track.delta.lateral' path='//systems/nc/track/lateral.delta'/>
-									<directory path='/systems/fdc'>
+									<directory path='/systems/pc'>
 										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
 										<property name='wind.tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>

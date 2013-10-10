@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/rcms'>
-		<properties path='/systems/rcms'>
-			<directory path='/home'>
+		<properties>
+			<directory path='/systems/rcms/home'>
 				<property name='home.longitude' path='/longitude'/>
 				<property name='home.latitude' path='/latitude'/>
 				<property name='home.altitude-amsl' path='/altitude-amsl'/>
@@ -11,10 +11,10 @@
 				<property name='home.distance.vertical' path='/vertical-distance'/>
 				<property name='home.true-direction' path='/true-direction'/>
 			</directory>
-			<directory path='//systems/fdc/position'>
+			<directory path='//systems/nc/position'>
 				<property name='position.longitude' path='/longitude'/>
 				<property name='position.latitude' path='/latitude'/>
-				<property name='position.altitude-amsl' path='/altitude-amsl'/>
+				<property name='position.altitude-amsl' path='/altitude.amsl'/>
 			</directory>
 		</properties>
 	</module>

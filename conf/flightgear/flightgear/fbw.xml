@@ -49,7 +49,7 @@
 				<property name='input-pitch' path='/pitch'/>
 				<property name='input-roll' path='/roll'/>
 			</directory>
-			<directory path='/systems/fdc'>
+			<directory path='/systems/nc'>
 				<property name='measured-pitch' path='/orientation/pitch'/>
 				<property name='measured-roll' path='/orientation/roll'/>
 				<property name='measured-slip-skid' path='//sensors/slip-skid/slip-skid'/>
