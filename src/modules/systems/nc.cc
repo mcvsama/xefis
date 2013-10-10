@@ -101,21 +101,21 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 		&_position_altitude_amsl
 	});
 
+	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
+	_headings_computer.observe ({
+		&_orientation_input_heading_magnetic,
+		&_magnetic_declination,
+	});
+
 	_track_computer.set_callback (std::bind (&NavigationComputer::compute_track, this));
 	_track_computer.observe ({
 		&_position_computer,
-		&_magnetic_declination
+		&_magnetic_declination,
 	});
 
 	_ground_speed_computer.set_callback (std::bind (&NavigationComputer::compute_ground_speed, this));
 	_ground_speed_computer.observe ({
 		&_position_computer
-	});
-
-	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
-	_headings_computer.observe ({
-		&_orientation_input_heading_magnetic,
-		&_magnetic_declination,
 	});
 }
 
