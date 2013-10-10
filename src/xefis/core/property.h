@@ -20,6 +20,9 @@
 #include <string>
 #include <limits>
 
+// Boost:
+#include <boost/optional.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -220,7 +223,6 @@ class TypedProperty: public GenericProperty
 	{ }
 #endif
 
-
   public:
 	/**
 	 * Set value from humanized string (eg. "10 kt").
@@ -271,6 +273,12 @@ template<class tType>
 		 */
 		Property&
 		operator= (Property const& other);
+
+		/**
+		 * Get boost::optional value. Takes 'nil' value into account.
+		 */
+		boost::optional<Type>
+		get_optional() const;
 
 		/**
 		 * Read property. If node can't be found, return default value.
@@ -611,6 +619,16 @@ template<class T>
 	{
 		TypedProperty::operator= (other);
 		return *this;
+	}
+
+
+template<class T>
+	inline boost::optional<T>
+	Property<T>::get_optional() const
+	{
+		if (is_nil())
+			return boost::optional<T>();
+		return boost::optional<T> (**this);
 	}
 
 
