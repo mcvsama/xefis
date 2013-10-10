@@ -377,6 +377,8 @@ EFIS::read()
 	if (_flight_path_deviation_lateral.valid())
 		_efis_widget->set_lateral_deviation (*_flight_path_deviation_lateral);
 
+	_efis_widget->set_deviation_uses_ils_style (_flight_path_deviation_use_ils_style.read (false));
+
 	_efis_widget->set_control_hint_visible (_flight_mode_hint_visible.read (false));
 	_efis_widget->set_control_hint (_flight_mode_hint.read ("").c_str());
 

@@ -1899,7 +1899,6 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		painter.fast_draw_text (QPointF (-0.24f * wh(), -0.36f * wh()), Qt::AlignTop | Qt::AlignLeft, dme_val);
 
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
-		QPen white_pen = get_pen (Qt::white, 1.8f);
 
 		auto paint_ladder = [&](bool needle_visible, Angle original_track_deviation) -> void
 		{
@@ -1920,13 +1919,25 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 			if (needle_visible)
 			{
-				float w = 0.012f * wh();
-				QPolygonF diamond = QPolygonF()
-					<< QPointF (0.f, -w)
-					<< QPointF (+1.6f * w, 0.f)
-					<< QPointF (0.f, +w)
-					<< QPointF (-1.6f * w, 0.f);
-				diamond.translate (track_deviation.deg() * 0.075f * wh(), 0.f);
+				QPolygonF pointer;
+				if (_params.deviation_uses_ils_style)
+				{
+					float w = 0.012f * wh();
+					pointer = QPolygonF()
+						<< QPointF (0.f, -w)
+						<< QPointF (+1.6f * w, 0.f)
+						<< QPointF (0.f, +w)
+						<< QPointF (-1.6f * w, 0.f);
+				}
+				else
+				{
+					float w = 0.012f * wh();
+					pointer = QPolygonF()
+						<< QPointF (0.f, -0.2f * w)
+						<< QPointF (+1.0f * w, 2.0f * w)
+						<< QPointF (-1.0f * w, 2.0f * w);
+				}
+				pointer.translate (track_deviation.deg() * 0.075f * wh(), 0.f);
 				for (QColor color: { _autopilot_pen_1.color(), _autopilot_pen_2.color() })
 				{
 					painter.setPen (get_pen (color, 1.f));
@@ -1934,16 +1945,29 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 						painter.setBrush (Qt::NoBrush);
 					else
 						painter.setBrush (color);
-					painter.drawPolygon (diamond);
+					painter.drawPolygon (pointer);
 				}
 			}
 
-			painter.setPen (white_pen);
-			painter.setBrush (Qt::NoBrush);
-			for (float x: { -1.f, -0.5f, +0.5f, +1.f })
-				painter.drawEllipse (elli.translated (0.15f * wh() * x, 0.f));
-
-			painter.draw_outlined_line (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
+			if (_params.deviation_uses_ils_style)
+			{
+				painter.setPen (get_pen (Qt::white, 1.5f));
+				painter.setBrush (Qt::NoBrush);
+				for (float x: { -1.f, -0.5f, +0.5f, +1.f })
+					painter.drawEllipse (elli.translated (0.15f * wh() * x, 0.f));
+				painter.draw_outlined_line (QPointF (0.f, -rect.height() / 3.f), QPointF (0.f, +rect.height() / 3.f));
+			}
+			else
+			{
+				painter.setPen (get_pen (Qt::white, 1.2f));
+				painter.setBrush (Qt::NoBrush);
+				for (float x: { -1.f, +1.f })
+				{
+					float sx = 0.15f * wh() * x;
+					painter.draw_outlined_line (QPointF (sx, -rect.height() / 2.75f), QPointF (sx, +rect.height() / 8.f));
+				}
+				painter.draw_outlined_line (QPointF (0.f, -rect.height() / 2.1f), QPointF (0.f, +rect.height() / 6.f));
+			}
 		};
 
 		painter.setTransform (_center_transform);
