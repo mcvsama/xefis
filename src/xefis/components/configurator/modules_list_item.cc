@@ -52,9 +52,16 @@ ModulesListItem::read()
 	Module* module = _module_manager->find (_module_pointer);
 	if (module)
 	{
-		Accounting::Stats const& ms = _module_manager->application()->accounting()->module_stats (_module_pointer, Accounting::Timespan::Last100Samples);
-		setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg (ms.average().s(), 0, 'f', 6));
-		setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg (ms.maximum().s(), 0, 'f', 6));
+		try {
+			Accounting::Stats const& ms = _module_manager->application()->accounting()->module_stats (_module_pointer, Accounting::Timespan::Last100Samples);
+			setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg (ms.average().s(), 0, 'f', 6));
+			setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg (ms.maximum().s(), 0, 'f', 6));
+		}
+		catch (...)
+		{
+			setText (ModulesList::StatsAvgColumn, "?");
+			setText (ModulesList::StatsMaxColumn, "?");
+		}
 	}
 }
 
