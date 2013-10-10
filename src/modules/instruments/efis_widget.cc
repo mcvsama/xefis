@@ -102,7 +102,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 		paint_minimums_setting (painter);
 		paint_nav (painter);
 		paint_hints (painter);
-		paint_pitch_limit (painter);
+		paint_critical_aoa (painter);
 
 		sl_paint (painter);
 		al_paint (painter);
@@ -339,8 +339,6 @@ void
 EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
-	bool const bank_angle_warning = _params.roll_limit > 0_deg && std::abs (_params.roll.deg()) > _params.roll_limit.deg();
-	bool const slip_skid_warning = _params.slip_skid_limit > 0.f && std::abs (_params.slip_skid) > _params.slip_skid_limit;
 
 	QPen pen = get_pen (Qt::white, 1.f);
 	painter.setPen (pen);
@@ -406,7 +404,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
 		painter.setTransform (_roll_transform * _center_transform);
 		painter.translate (0.f, -0.79f * w);
 
-		if (bank_angle_warning)
+		if (_params.roll_warning)
 		{
 			painter.setPen (warning_pen);
 			painter.setBrush (warning_pen.color());
@@ -430,12 +428,12 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
 		{
 			painter.translate (-Xefis::limit (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
-			if (bank_angle_warning || slip_skid_warning)
+			if (_params.roll_warning || _params.slip_skid_warning)
 				painter.setPen (warning_pen);
 			else
 				painter.setPen (pen);
 
-			if (slip_skid_warning)
+			if (_params.slip_skid_warning)
 			{
 				painter.setBrush (warning_pen.color());
 				if (is_shadow)
@@ -1820,7 +1818,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 	QFontMetricsF metrics_a (font_a);
 	QFontMetricsF metrics_b (font_b);
 
-	QString baro_str = "BARO";
+	QString baro_str = _params.minimums_type;
 	QString alt_str = QString ("%1").arg (_params.minimums_altitude.ft(), 0, 'f', 0);
 
 	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
@@ -1961,15 +1959,23 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.452f * wh());
-		paint_ladder (_params.lateral_deviation_visible, _params.lateral_deviation_deg);
+		if (_params.lateral_deviation_failure)
+			paint_horizontal_failure_flag (painter, QPointF (0.f, 0.f), font_size (18.f), "LOC");
+		else
+			paint_ladder (_params.lateral_deviation_visible, _params.lateral_deviation_deg);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
-		painter.rotate (-90);
-		paint_ladder (_params.vertical_deviation_visible, _params.vertical_deviation_deg);
+		if (_params.vertical_deviation_failure)
+			paint_vertical_failure_flag (painter, QPointF (0.f, 0.f), font_size (18.f), "G/S");
+		else
+		{
+			painter.rotate (-90);
+			paint_ladder (_params.vertical_deviation_visible, _params.vertical_deviation_deg);
+		}
 	}
 
-	if (_params.runway_visible)
+	if (_params.runway_visible && !_params.lateral_deviation_failure)
 	{
 		float w = 0.10f * wh();
 		float h = 0.05f * wh();
@@ -2118,14 +2124,14 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_pitch_limit (Xefis::Painter& painter)
+EFISWidget::PaintWorkUnit::paint_critical_aoa (Xefis::Painter& painter)
 {
-	if (!_params.pitch_limit_visible || !_params.pitch_visible)
+	if (!_params.critical_aoa_visible || !_params.pitch_visible)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (Xefis::limit (_params.pitch_limit, -20_deg, +16_deg)));
+	painter.translate (0.f, pitch_to_px (Xefis::limit (_params.critical_aoa - _params.aoa_alpha, -20_deg, +16_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 

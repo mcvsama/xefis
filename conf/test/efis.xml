@@ -34,7 +34,6 @@
 								<property name='orientation.serviceable' path='/serviceable' default='true'/>
 								<property name='orientation.pitch' path='/pitch' default='2.1 deg'/>
 								<property name='orientation.roll' path='/roll' default='-7 deg'/>
-								<property name='orientation.roll.limit' path='/roll.limit' default='30 deg'/>
 								<property name='orientation.heading.magnetic' path='/heading.magnetic' default='25 deg'/>
 								<property name='orientation.heading.true' path='/heading.true' default='22 deg'/>
 								<property name='orientation.heading.numbers-visible' path='/heading.numbers-visible' default='false'/>
@@ -46,7 +45,6 @@
 							</directory>
 							<directory path='/slip-skid'>
 								<property name='slip-skid' path='/slip-skid' default='-0.1'/>
-								<property name='slip-skid.limit' path='/slip-skid.limit' default='0.5'/>
 							</directory>
 							<directory path='/fpv'>
 								<property name='fpv.visible' path='/visible' default='true'/>
@@ -54,8 +52,8 @@
 							<directory path='/aoa'>
 								<property name='aoa.alpha' path='/alpha' default='6 deg'/>
 								<property name='aoa.warning-threshold' path='/warning-threshold' default='5 deg'/>
-								<property name='aoa.pitch-limit' path='/pitch-limit' default='10 deg'/>
-								<property name='aoa.pitch-limit.visible' path='/pitch-limit.visible' default='true'/>
+								<property name='aoa.critical' path='/critical' default='10 deg'/>
+								<property name='aoa.critical.visible' path='/critical.visible' default='true'/>
 							</directory>
 							<directory path='/altitude'>
 								<property name='altitude.amsl.serviceable' path='/amsl.serviceable' default='true'/>
@@ -63,6 +61,7 @@
 								<property name='altitude.amsl.lookahead' path='/amsl.lookahead' default='2450 ft'/>
 								<property name='altitude.agl.serviceable' path='/agl.serviceable' default='true'/>
 								<property name='altitude.agl' path='/agl' default='1344 ft'/>
+								<property name='altitude.minimums.type' path='/minimums.type' default='RADIO'/>
 								<property name='altitude.minimums' path='/minimums' default='300 ft'/>
 							</directory>
 							<directory path='/vertical-speed'>
@@ -103,7 +102,9 @@
 							</directory>
 							<directory path='/flight-path'>
 								<directory path='/deviation'>
+									<property name='flight-path.deviation.vertical.serviceable' path='/vertical.serviceable' default='true'/>
 									<property name='flight-path.deviation.vertical' path='/vertical' default='-0.3 deg'/>
+									<property name='flight-path.deviation.lateral.serviceable' path='/lateral.serviceable' default='true'/>
 									<property name='flight-path.deviation.lateral' path='/lateral' default='2.26 deg'/>
 									<property name='flight-path.deviation.use-ils-style' path='/use-ils-style' default='false'/>
 								</directory>
@@ -127,6 +128,8 @@
 								<property name='warning.roll-disagree' path='/roll-disagree' default='false'/>
 								<property name='warning.ias-disagree' path='/ias-disagree' default='false'/>
 								<property name='warning.altitude-disagree' path='/altitude-disagree' default='false'/>
+								<property name='warning.roll' path='/roll' default='false'/>
+								<property name='warning.slip-skid' path='/slip-skid' default='false'/>
 							</directory>
 							<directory path='/style'>
 								<property name='style.old' path='/old' default='false'/>

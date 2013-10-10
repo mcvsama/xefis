@@ -85,7 +85,6 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_orientation_serviceable;
 	Xefis::PropertyAngle			_orientation_pitch;
 	Xefis::PropertyAngle			_orientation_roll;
-	Xefis::PropertyAngle			_orientation_roll_limit;
 	Xefis::PropertyAngle			_orientation_heading_magnetic;
 	Xefis::PropertyAngle			_orientation_heading_true;
 	Xefis::PropertyBoolean			_orientation_heading_numbers_visible;
@@ -95,20 +94,20 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle			_track_vertical;
 	// Slip-skid indicator
 	Xefis::PropertyFloat			_slip_skid;
-	Xefis::PropertyFloat			_slip_skid_limit;
 	// Flight Path Vector
 	Xefis::PropertyBoolean			_fpv_visible;
 	// Angle of Attack
 	Xefis::PropertyAngle			_aoa_alpha;
 	Xefis::PropertyAngle			_aoa_warning_threshold;
-	Xefis::PropertyAngle			_aoa_pitch_limit;
-	Xefis::PropertyBoolean			_aoa_pitch_limit_visible;
+	Xefis::PropertyAngle			_aoa_critical;
+	Xefis::PropertyBoolean			_aoa_critical_visible;
 	// Pressure and radio altitude
 	Xefis::PropertyBoolean			_altitude_amsl_serviceable;
 	Xefis::PropertyLength			_altitude_amsl;
 	Xefis::PropertyLength			_altitude_amsl_lookahead;
 	Xefis::PropertyBoolean			_altitude_agl_serviceable;
 	Xefis::PropertyLength			_altitude_agl;
+	Xefis::PropertyString			_altitude_minimums_type;
 	Xefis::PropertyLength			_altitude_minimums;
 	// Vertical speed
 	Xefis::PropertyBoolean			_vertical_speed_serviceable;
@@ -138,7 +137,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyString			_approach_localizer_id;
 	Xefis::PropertyLength			_approach_dme_distance;
 	// Flight path deviation
+	Xefis::PropertyBoolean			_flight_path_deviation_lateral_serviceable;
 	Xefis::PropertyAngle			_flight_path_deviation_lateral;
+	Xefis::PropertyBoolean			_flight_path_deviation_vertical_serviceable;
 	Xefis::PropertyAngle			_flight_path_deviation_vertical;
 	Xefis::PropertyBoolean			_flight_path_deviation_use_ils_style;
 	// Flight mode information
@@ -157,6 +158,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_warning_roll_disagree;
 	Xefis::PropertyBoolean			_warning_ias_disagree;
 	Xefis::PropertyBoolean			_warning_altitude_disagree;
+	Xefis::PropertyBoolean			_warning_roll;
+	Xefis::PropertyBoolean			_warning_slip_skid;
 	// Style
 	Xefis::PropertyBoolean			_style_old;
 };
