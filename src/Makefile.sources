@@ -222,6 +222,7 @@ SRC_MOCHDRS += modules/log/latency.h
 
 SRC_HEADERS += modules/systems/adc.h
 SRC_HEADERS += modules/systems/fdc.h
+SRC_HEADERS += modules/systems/altacq.h
 SRC_HEADERS += modules/systems/flight_director.h
 SRC_HEADERS += modules/systems/fly_by_wire.h
 SRC_HEADERS += modules/systems/nc.h
@@ -231,6 +232,7 @@ SRC_HEADERS += modules/systems/slip_skid.h
 
 SRC_SOURCES += modules/systems/adc.cc
 SRC_SOURCES += modules/systems/fdc.cc
+SRC_SOURCES += modules/systems/altacq.cc
 SRC_SOURCES += modules/systems/flight_director.cc
 SRC_SOURCES += modules/systems/fly_by_wire.cc
 SRC_SOURCES += modules/systems/nc.cc
