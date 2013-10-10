@@ -68,7 +68,6 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "orientation.serviceable", _orientation_serviceable, false },
 				{ "orientation.pitch", _orientation_pitch, false },
 				{ "orientation.roll", _orientation_roll, false },
-				{ "orientation.roll.limit", _orientation_roll_limit, false },
 				{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
 				{ "orientation.heading.true", _orientation_heading_true, false },
 				{ "orientation.heading.numbers-visible", _orientation_heading_numbers_visible, false },
@@ -76,17 +75,17 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "track.lateral.true", _track_lateral_true, false },
 				{ "track.vertical", _track_vertical, false },
 				{ "slip-skid", _slip_skid, false },
-				{ "slip-skid.limit", _slip_skid_limit, false },
 				{ "fpv.visible", _fpv_visible, false },
 				{ "aoa.alpha", _aoa_alpha, false },
 				{ "aoa.warning-threshold", _aoa_warning_threshold, false },
-				{ "aoa.pitch-limit", _aoa_pitch_limit, false },
-				{ "aoa.pitch-limit.visible", _aoa_pitch_limit_visible, false },
+				{ "aoa.critical", _aoa_critical, false },
+				{ "aoa.critical.visible", _aoa_critical_visible, false },
 				{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, false },
 				{ "altitude.amsl", _altitude_amsl, false },
 				{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, false },
 				{ "altitude.agl.serviceable", _altitude_agl_serviceable, false },
 				{ "altitude.agl", _altitude_agl, false },
+				{ "altitude.minimums.type", _altitude_minimums_type, false },
 				{ "altitude.minimums", _altitude_minimums, false },
 				{ "vertical-speed.serviceable", _vertical_speed_serviceable, false },
 				{ "vertical-speed", _vertical_speed, false },
@@ -110,7 +109,9 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "approach.type-hint", _approach_type_hint, false },
 				{ "approach.localizer-id", _approach_localizer_id, false },
 				{ "approach.dme-distance", _approach_dme_distance, false },
+				{ "flight-path.deviation.vertical.serviceable", _flight_path_deviation_vertical_serviceable, false },
 				{ "flight-path.deviation.vertical", _flight_path_deviation_vertical, false },
+				{ "flight-path.deviation.lateral.serviceable", _flight_path_deviation_lateral_serviceable, false },
 				{ "flight-path.deviation.lateral", _flight_path_deviation_lateral, false },
 				{ "flight-path.deviation.use-ils-style", _flight_path_deviation_use_ils_style, false },
 				{ "flight-mode.hint.visible", _flight_mode_hint_visible, false },
@@ -127,6 +128,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "warning.roll-disagree", _warning_roll_disagree, false },
 				{ "warning.ias-disagree", _warning_ias_disagree, false },
 				{ "warning.altitude-disagree", _warning_altitude_disagree, false },
+				{ "warning.roll", _warning_roll, false },
+				{ "warning.slip-skid", _warning_slip_skid, false },
 				{ "style.old", _style_old, false },
 			});
 		}
@@ -211,20 +214,17 @@ EFIS::read()
 
 	_efis_widget->set_attitude_failure (!_orientation_serviceable.read (true));
 
-	_efis_widget->set_roll_limit (_orientation_roll_limit.read (0_deg));
-
-	if (_aoa_pitch_limit.valid() && _aoa_pitch_limit_visible.read (false))
+	if (_aoa_alpha.valid() && _aoa_critical.valid() && _aoa_critical_visible.read (false))
 	{
-		_efis_widget->set_pitch_limit (*_aoa_pitch_limit);
-		bool visible = false;
-		if (_aoa_warning_threshold.valid() && _aoa_alpha.valid() && _orientation_pitch.valid())
-			visible = *_aoa_alpha > *_aoa_warning_threshold;
+		_efis_widget->set_aoa_alpha (*_aoa_alpha);
+		_efis_widget->set_critical_aoa (*_aoa_critical);
+		if (_aoa_warning_threshold.valid() && _aoa_alpha.valid() && _aoa_critical.valid())
+			_efis_widget->set_critical_aoa_visible (*_aoa_critical - *_aoa_alpha <= *_aoa_warning_threshold);
 		else
-			visible = *_aoa_pitch_limit_visible;
-		_efis_widget->set_pitch_limit_visible (visible);
+			_efis_widget->set_critical_aoa_visible (false);
 	}
 	else
-		_efis_widget->set_pitch_limit_visible (false);
+		_efis_widget->set_critical_aoa_visible (false);
 
 	_efis_widget->set_heading_visible (_orientation_heading_magnetic.valid());
 	if (_orientation_heading_magnetic.valid())
@@ -233,8 +233,6 @@ EFIS::read()
 	_efis_widget->set_slip_skid_visible (_slip_skid.valid());
 	if (_slip_skid.valid())
 		_efis_widget->set_slip_skid (*_slip_skid);
-
-	_efis_widget->set_slip_skid_limit (_slip_skid_limit.valid() ? *_slip_skid_limit : 0.f);
 
 	_efis_widget->set_altitude_visible (_altitude_amsl.valid());
 	_efis_widget->set_altitude_failure (!_altitude_amsl_serviceable.read (true));
@@ -256,6 +254,8 @@ EFIS::read()
 		_efis_widget->set_standard_pressure (*_pressure_use_std);
 	else
 		_efis_widget->set_standard_pressure (false);
+
+	_efis_widget->set_minimums_type (QString::fromStdString (_altitude_minimums_type.read ("")));
 
 	if (_altitude_minimums.valid())
 		_efis_widget->set_minimums_altitude (*_altitude_minimums);
@@ -373,9 +373,13 @@ EFIS::read()
 	if (_flight_path_deviation_vertical.valid())
 		_efis_widget->set_vertical_deviation (*_flight_path_deviation_vertical);
 
+	_efis_widget->set_vertical_deviation_failure (!_flight_path_deviation_vertical_serviceable.read (true));
+
 	_efis_widget->set_lateral_deviation_visible (_flight_path_deviation_lateral.valid());
 	if (_flight_path_deviation_lateral.valid())
 		_efis_widget->set_lateral_deviation (*_flight_path_deviation_lateral);
+
+	_efis_widget->set_lateral_deviation_failure (!_flight_path_deviation_lateral_serviceable.read (true));
 
 	_efis_widget->set_deviation_uses_ils_style (_flight_path_deviation_use_ils_style.read (false));
 
@@ -394,6 +398,8 @@ EFIS::read()
 	_efis_widget->set_roll_disagree (_warning_roll_disagree.read (false));
 	_efis_widget->set_ias_disagree (_warning_ias_disagree.read (false));
 	_efis_widget->set_altitude_disagree (_warning_altitude_disagree.read (false));
+	_efis_widget->set_roll_warning (_warning_roll.read (false));
+	_efis_widget->set_slip_skid_warning (_warning_slip_skid.read (false));
 
 	_efis_widget->set_old_style (_style_old.valid() && *_style_old);
 }

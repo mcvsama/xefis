@@ -48,17 +48,16 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Angle				fov								= 120_deg;
 		bool				input_alert_visible				= false;
 		Angle				pitch							= 0_deg;
-		Angle				pitch_limit						= 0_deg;
 		bool				pitch_visible					= false;
-		bool				pitch_limit_visible				= false;
+		Angle				aoa_alpha						= 0_deg;
+		Angle				critical_aoa					= 0_deg;
+		bool				critical_aoa_visible			= false;
 		Angle				roll							= 0_deg;
-		Angle				roll_limit						= 0_deg;
 		bool				roll_visible					= false;
 		Angle				heading							= 0_deg;
 		bool				heading_visible					= false;
 		bool				heading_numbers_visible			= false;
 		float				slip_skid						= 0.f;
-		float				slip_skid_limit					= 0.f;
 		bool				slip_skid_visible				= false;
 		Angle				flight_path_alpha				= 0_deg;
 		Angle				flight_path_beta				= 0_deg;
@@ -76,6 +75,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				altitude_agl_visible			= false;
 		QDateTime			altitude_agl_ts;
 		bool				altitude_warnings_visible		= false;
+		QString				minimums_type;
 		Length				minimums_altitude				= 0_ft;
 		bool				minimums_altitude_visible		= false;
 		QDateTime			minimums_altitude_ts;
@@ -113,8 +113,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				control_stick_visible			= false;
 		bool				approach_reference_visible		= false;
 		Angle				vertical_deviation_deg			= 0_deg;
+		bool				vertical_deviation_failure		= false;
 		bool				vertical_deviation_visible		= false;
 		Angle				lateral_deviation_deg			= 0_deg;
+		bool				lateral_deviation_failure		= false;
 		bool				lateral_deviation_visible		= false;
 		bool				deviation_uses_ils_style		= false;
 		bool				runway_visible					= false;
@@ -158,6 +160,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				roll_disagree					= false;
 		bool				ias_disagree					= false;
 		bool				altitude_disagree				= false;
+		bool				roll_warning					= false;
+		bool				slip_skid_warning				= false;
 
 		/*
 		 * Speed ladder
@@ -350,7 +354,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		paint_hints (Xefis::Painter&);
 
 		void
-		paint_pitch_limit (Xefis::Painter&);
+		paint_critical_aoa (Xefis::Painter&);
 
 		void
 		paint_input_alert (Xefis::Painter&);
@@ -597,29 +601,28 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_pitch_visible (bool visible);
 
 	/**
+	 * Set current AOA.
+	 */
+	void
+	set_aoa_alpha (Angle aoa_alpha);
+
+	/**
 	 * Set pitch limit (absolute value).
 	 */
 	void
-	set_pitch_limit (Angle pitch_limit);
+	set_critical_aoa (Angle critical_aoa);
 
 	/**
 	 * Set pitch limit indicator visibility.
 	 */
 	void
-	set_pitch_limit_visible (bool visible);
+	set_critical_aoa_visible (bool visible);
 
 	/**
 	 * Set roll value.
 	 */
 	void
 	set_roll (Angle);
-
-	/**
-	 * Set roll limit, where indicator will turn solid amber.
-	 * 0.f disables the limit.
-	 */
-	void
-	set_roll_limit (Angle limit);
 
 	/**
 	 * Toggle roll scale visibility.
@@ -651,13 +654,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_slip_skid (float value);
-
-	/**
-	 * Set slip-skid limit, where indicator will turn solid amber.
-	 * 0.f disables the limit.
-	 */
-	void
-	set_slip_skid_limit (float limit);
 
 	/**
 	 * Set slip-skid indicator visibility.
@@ -756,6 +752,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_altitude_warnings_visible (bool visible);
+
+	/**
+	 * Set minimums type ("BARO", "RADIO")
+	 */
+	void
+	set_minimums_type (QString const& type);
 
 	/**
 	 * Set minimums altitude.
@@ -1001,6 +1003,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_vertical_deviation (Angle deviation);
 
 	/**
+	 * Show vertical deviation failure flag.
+	 */
+	void
+	set_vertical_deviation_failure (bool failure);
+
+	/**
 	 * Set navigation vertical needle visibility.
 	 */
 	void
@@ -1011,6 +1019,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_lateral_deviation (Angle value);
+
+	/**
+	 * Show lateral deviation failure flag.
+	 */
+	void
+	set_lateral_deviation_failure (bool failure);
 
 	/**
 	 * Set navigation heading needle visibility.
@@ -1205,6 +1219,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 	void
 	set_altitude_disagree (bool disagree);
 
+	/**
+	 * Set roll warning (amber roll indicator).
+	 */
+	void
+	set_roll_warning (bool enabled);
+
+	/**
+	 * Set slip-skid warning (amber slip-skid indicator).
+	 */
+	void
+	set_slip_skid_warning (bool enabled);
+
   protected:
 	// API of InstrumentWidget
 	void
@@ -1384,17 +1410,25 @@ EFISWidget::set_pitch_visible (bool visible)
 
 
 inline void
-EFISWidget::set_pitch_limit (Angle pitch_limit)
+EFISWidget::set_aoa_alpha (Angle aoa_alpha)
 {
-	_params.pitch_limit = pitch_limit;
+	_params.aoa_alpha = aoa_alpha;
 	request_repaint();
 }
 
 
 inline void
-EFISWidget::set_pitch_limit_visible (bool visible)
+EFISWidget::set_critical_aoa (Angle critical_aoa)
 {
-	_params.pitch_limit_visible = visible;
+	_params.critical_aoa = critical_aoa;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_critical_aoa_visible (bool visible)
+{
+	_params.critical_aoa_visible = visible;
 	request_repaint();
 }
 
@@ -1403,14 +1437,6 @@ inline void
 EFISWidget::set_roll (Angle degrees)
 {
 	_params.roll = degrees;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_roll_limit (Angle limit)
-{
-	_params.roll_limit = limit;
 	request_repaint();
 }
 
@@ -1451,14 +1477,6 @@ inline void
 EFISWidget::set_slip_skid (float value)
 {
 	_params.slip_skid = value;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_slip_skid_limit (float limit)
-{
-	_params.slip_skid_limit = limit;
 	request_repaint();
 }
 
@@ -1594,6 +1612,14 @@ inline void
 EFISWidget::set_altitude_warnings_visible (bool visible)
 {
 	_params.altitude_warnings_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_minimums_type (QString const& type)
+{
+	_params.minimums_type = type;
 	request_repaint();
 }
 
@@ -1927,6 +1953,14 @@ EFISWidget::set_vertical_deviation (Angle deviation)
 
 
 inline void
+EFISWidget::set_vertical_deviation_failure (bool failure)
+{
+	_params.vertical_deviation_failure = failure;
+	request_repaint();
+}
+
+
+inline void
 EFISWidget::set_vertical_deviation_visible (bool visible)
 {
 	_params.vertical_deviation_visible = visible;
@@ -1938,6 +1972,14 @@ inline void
 EFISWidget::set_lateral_deviation (Angle deviation)
 {
 	_params.lateral_deviation_deg = deviation;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_lateral_deviation_failure (bool failure)
+{
+	_params.lateral_deviation_failure = failure;
 	request_repaint();
 }
 
@@ -2209,6 +2251,22 @@ inline void
 EFISWidget::set_altitude_disagree (bool disagree)
 {
 	_params.altitude_disagree = disagree;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_roll_warning (bool enabled)
+{
+	_params.roll_warning = enabled;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_slip_skid_warning (bool enabled)
+{
+	_params.slip_skid_warning = enabled;
 	request_repaint();
 }
 
