@@ -116,6 +116,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				vertical_deviation_visible		= false;
 		Angle				lateral_deviation_deg			= 0_deg;
 		bool				lateral_deviation_visible		= false;
+		bool				deviation_uses_ils_style		= false;
 		bool				runway_visible					= false;
 		Angle				runway_position					= 0_deg;
 		QString				approach_hint;
@@ -1016,6 +1017,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_lateral_deviation_visible (bool visible);
+
+	/**
+	 * Set deviation needles style.
+	 */
+	void
+	set_deviation_uses_ils_style (bool ils);
 
 	/**
 	 * Set runway visibility (aligns with lateral deviation needle).
@@ -1939,6 +1946,14 @@ inline void
 EFISWidget::set_lateral_deviation_visible (bool visible)
 {
 	_params.lateral_deviation_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_deviation_uses_ils_style (bool ils)
+{
+	_params.deviation_uses_ils_style = ils;
 	request_repaint();
 }
 
