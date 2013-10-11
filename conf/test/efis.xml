@@ -118,8 +118,16 @@
 									<property name='flight-mode.fma.speed-small-hint' path='/speed-small-hint' default='RETARD'/>
 									<property name='flight-mode.fma.lateral-hint' path='/lateral-hint' default='LNAV'/>
 									<property name='flight-mode.fma.lateral-small-hint' path='/lateral-small-hint'/>
-									<property name='flight-mode.fma.vertical-hint' path='/vertical-hint' default='VNAV'/>
+									<property name='flight-mode.fma.vertical-hint' path='/vertical-hint' default='VNAV PTH'/>
 									<property name='flight-mode.fma.vertical-small-hint' path='/vertical-small-hint'/>
+								</directory>
+							</directory>
+							<directory path='/tcas'>
+								<directory path='/resolution-advisory'>
+									<property name='tcas.resolution-advisory.pitch.minimum' path='/pitch.minimum' default='6 deg'/>
+									<property name='tcas.resolution-advisory.pitch.maximum' path='/pitch.maximum'/>
+									<property name='tcas.resolution-advisory.vertical-speed.minimum' path='/vertical-speed.minimum' default='800 fpm'/>
+									<property name='tcas.resolution-advisory.vertical-speed.maximum' path='/vertical-speed.maximum'/>
 								</directory>
 							</directory>
 							<directory path='/warning'>

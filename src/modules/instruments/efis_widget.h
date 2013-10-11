@@ -19,6 +19,9 @@
 #include <atomic>
 #include <map>
 
+// Boost:
+#include <boost/optional.hpp>
+
 // Qt:
 #include <QtCore/QTimer>
 #include <QtCore/QDateTime>
@@ -44,124 +47,128 @@ class EFISWidget: public Xefis::InstrumentWidget
 	class Parameters
 	{
 	  public:
-		bool				old_style						= false;
-		Angle				fov								= 120_deg;
-		bool				input_alert_visible				= false;
-		Angle				pitch							= 0_deg;
-		bool				pitch_visible					= false;
-		Angle				aoa_alpha						= 0_deg;
-		Angle				critical_aoa					= 0_deg;
-		bool				critical_aoa_visible			= false;
-		Angle				roll							= 0_deg;
-		bool				roll_visible					= false;
-		Angle				heading							= 0_deg;
-		bool				heading_visible					= false;
-		bool				heading_numbers_visible			= false;
-		float				slip_skid						= 0.f;
-		bool				slip_skid_visible				= false;
-		Angle				flight_path_alpha				= 0_deg;
-		Angle				flight_path_beta				= 0_deg;
-		bool				flight_path_visible				= false;
-		Speed				speed							= 0_kt;
-		bool				speed_visible					= false;
-		Speed				speed_tendency					= 0_kt;
-		bool				speed_tendency_visible			= false;
-		bool				novspd_flag						= false;
-		Length				altitude						= 0_ft;
-		bool				altitude_visible				= false;
-		Length				altitude_tendency				= 0_ft;
-		bool				altitude_tendency_visible		= false;
-		Length				altitude_agl					= 0_ft;
-		bool				altitude_agl_visible			= false;
-		QDateTime			altitude_agl_ts;
-		bool				altitude_warnings_visible		= false;
-		QString				minimums_type;
-		Length				minimums_altitude				= 0_ft;
-		bool				minimums_altitude_visible		= false;
-		QDateTime			minimums_altitude_ts;
-		Speed				vertical_speed					= 0_fpm;
-		bool				vertical_speed_visible			= false;
-		Speed				variometer_rate					= 0_fpm;
-		bool				variometer_visible				= false;
-		float				mach							= 0.f;
-		bool				mach_visible					= false;
-		Pressure			pressure						= 0_inHg;
-		bool				pressure_display_hpa			= false;
-		bool				pressure_visible				= false;
-		bool				use_standard_pressure			= false;
-		Speed				minimum_speed					= 0_kt;
-		bool				minimum_speed_visible			= false;
-		Speed				minimum_maneuver_speed			= 0_kt;
-		bool				minimum_maneuver_speed_visible	= false;
-		Speed				maximum_maneuver_speed			= 0_kt;
-		bool				maximum_maneuver_speed_visible	= false;
-		Speed				maximum_speed					= 0_kt;
-		bool				maximum_speed_visible			= false;
-		Length				cmd_altitude					= 0_ft;
-		bool				cmd_altitude_acquired			= false;
-		bool				cmd_altitude_visible			= false;
-		Speed				cmd_vertical_speed				= 0_fpm;
-		bool				cmd_vertical_speed_visible		= false;
-		Speed				cmd_speed						= 0_kt;
-		bool				cmd_speed_visible				= false;
-		Angle				flight_director_pitch			= 0_deg;
-		bool				flight_director_pitch_visible	= false;
-		Angle				flight_director_roll			= 0_deg;
-		bool				flight_director_roll_visible	= false;
-		Angle				control_stick_pitch				= 0_deg;
-		Angle				control_stick_roll				= 0_deg;
-		bool				control_stick_visible			= false;
-		bool				approach_reference_visible		= false;
-		Angle				vertical_deviation_deg			= 0_deg;
-		bool				vertical_deviation_failure		= false;
-		bool				vertical_deviation_visible		= false;
-		Angle				lateral_deviation_deg			= 0_deg;
-		bool				lateral_deviation_failure		= false;
-		bool				lateral_deviation_visible		= false;
-		bool				deviation_uses_ils_style		= false;
-		bool				runway_visible					= false;
-		Angle				runway_position					= 0_deg;
-		QString				approach_hint;
-		Length				dme_distance					= 0_nm;
-		bool				dme_distance_visible			= false;
-		QString				localizer_id;
-		Angle				localizer_magnetic_bearing		= 0_deg;
-		bool				localizer_info_visible			= false;
-		QString				control_hint;
-		bool				control_hint_visible			= false;
-		QDateTime			control_hint_ts;
-		bool				fma_visible						= false;
-		QString				fma_speed_hint;
-		QDateTime			fma_speed_ts;
-		QString				fma_speed_small_hint;
-		QDateTime			fma_speed_small_ts;
-		QString				fma_lateral_hint;
-		QDateTime			fma_lateral_ts;
-		QString				fma_lateral_small_hint;
-		QDateTime			fma_lateral_small_ts;
-		QString				fma_vertical_hint;
-		QDateTime			fma_vertical_ts;
-		QString				fma_vertical_small_hint;
-		QDateTime			fma_vertical_small_ts;
-		SpeedBugs			speed_bugs;
-		AltitudeBugs		altitude_bugs;
-		bool				speed_blink						= false;
-		bool				speed_blinking_active			= false;
-		bool				minimums_blink					= false;
-		bool				minimums_blinking_active		= false;
-		bool				attitude_failure				= false;
-		bool				ias_failure						= false;
-		bool				altitude_failure				= false;
-		bool				vertical_speed_failure			= false;
-		bool				flight_path_marker_failure		= false;
-		bool				radar_altimeter_failure			= false;
-		bool				flight_director_failure			= false;
-		bool				pitch_disagree					= false;
-		bool				roll_disagree					= false;
-		bool				ias_disagree					= false;
-		bool				altitude_disagree				= false;
-		bool				roll_warning					= false;
-		bool				slip_skid_warning				= false;
+		bool					old_style						= false;
+		Angle					fov								= 120_deg;
+		bool					input_alert_visible				= false;
+		Angle					pitch							= 0_deg;
+		bool					pitch_visible					= false;
+		Angle					aoa_alpha						= 0_deg;
+		Angle					critical_aoa					= 0_deg;
+		bool					critical_aoa_visible			= false;
+		Angle					roll							= 0_deg;
+		bool					roll_visible					= false;
+		Angle					heading							= 0_deg;
+		bool					heading_visible					= false;
+		bool					heading_numbers_visible			= false;
+		float					slip_skid						= 0.f;
+		bool					slip_skid_visible				= false;
+		Angle					flight_path_alpha				= 0_deg;
+		Angle					flight_path_beta				= 0_deg;
+		bool					flight_path_visible				= false;
+		Speed					speed							= 0_kt;
+		bool					speed_visible					= false;
+		Speed					speed_tendency					= 0_kt;
+		bool					speed_tendency_visible			= false;
+		bool					novspd_flag						= false;
+		Length					altitude						= 0_ft;
+		bool					altitude_visible				= false;
+		Length					altitude_tendency				= 0_ft;
+		bool					altitude_tendency_visible		= false;
+		Length					altitude_agl					= 0_ft;
+		bool					altitude_agl_visible			= false;
+		QDateTime				altitude_agl_ts;
+		bool					altitude_warnings_visible		= false;
+		QString					minimums_type;
+		Length					minimums_altitude				= 0_ft;
+		bool					minimums_altitude_visible		= false;
+		QDateTime				minimums_altitude_ts;
+		Speed					vertical_speed					= 0_fpm;
+		bool					vertical_speed_visible			= false;
+		Speed					variometer_rate					= 0_fpm;
+		bool					variometer_visible				= false;
+		float					mach							= 0.f;
+		bool					mach_visible					= false;
+		Pressure				pressure						= 0_inHg;
+		bool					pressure_display_hpa			= false;
+		bool					pressure_visible				= false;
+		bool					use_standard_pressure			= false;
+		Speed					minimum_speed					= 0_kt;
+		bool					minimum_speed_visible			= false;
+		Speed					minimum_maneuver_speed			= 0_kt;
+		bool					minimum_maneuver_speed_visible	= false;
+		Speed					maximum_maneuver_speed			= 0_kt;
+		bool					maximum_maneuver_speed_visible	= false;
+		Speed					maximum_speed					= 0_kt;
+		bool					maximum_speed_visible			= false;
+		Length					cmd_altitude					= 0_ft;
+		bool					cmd_altitude_acquired			= false;
+		bool					cmd_altitude_visible			= false;
+		Speed					cmd_vertical_speed				= 0_fpm;
+		bool					cmd_vertical_speed_visible		= false;
+		Speed					cmd_speed						= 0_kt;
+		bool					cmd_speed_visible				= false;
+		Angle					flight_director_pitch			= 0_deg;
+		bool					flight_director_pitch_visible	= false;
+		Angle					flight_director_roll			= 0_deg;
+		bool					flight_director_roll_visible	= false;
+		Angle					control_stick_pitch				= 0_deg;
+		Angle					control_stick_roll				= 0_deg;
+		bool					control_stick_visible			= false;
+		bool					approach_reference_visible		= false;
+		Angle					vertical_deviation_deg			= 0_deg;
+		bool					vertical_deviation_failure		= false;
+		bool					vertical_deviation_visible		= false;
+		Angle					lateral_deviation_deg			= 0_deg;
+		bool					lateral_deviation_failure		= false;
+		bool					lateral_deviation_visible		= false;
+		bool					deviation_uses_ils_style		= false;
+		bool					runway_visible					= false;
+		Angle					runway_position					= 0_deg;
+		QString					approach_hint;
+		Length					dme_distance					= 0_nm;
+		bool					dme_distance_visible			= false;
+		QString					localizer_id;
+		Angle					localizer_magnetic_bearing		= 0_deg;
+		bool					localizer_info_visible			= false;
+		QString					control_hint;
+		bool					control_hint_visible			= false;
+		QDateTime				control_hint_ts;
+		bool					fma_visible						= false;
+		QString					fma_speed_hint;
+		QDateTime				fma_speed_ts;
+		QString					fma_speed_small_hint;
+		QDateTime				fma_speed_small_ts;
+		QString					fma_lateral_hint;
+		QDateTime				fma_lateral_ts;
+		QString					fma_lateral_small_hint;
+		QDateTime				fma_lateral_small_ts;
+		QString					fma_vertical_hint;
+		QDateTime				fma_vertical_ts;
+		QString					fma_vertical_small_hint;
+		boost::optional<Angle>	tcas_ra_pitch_minimum;
+		boost::optional<Angle>	tcas_ra_pitch_maximum;
+		boost::optional<Speed>	tcas_ra_vertical_speed_minimum;
+		boost::optional<Speed>	tcas_ra_vertical_speed_maximum;
+		QDateTime				fma_vertical_small_ts;
+		SpeedBugs				speed_bugs;
+		AltitudeBugs			altitude_bugs;
+		bool					speed_blink						= false;
+		bool					speed_blinking_active			= false;
+		bool					minimums_blink					= false;
+		bool					minimums_blinking_active		= false;
+		bool					attitude_failure				= false;
+		bool					ias_failure						= false;
+		bool					altitude_failure				= false;
+		bool					vertical_speed_failure			= false;
+		bool					flight_path_marker_failure		= false;
+		bool					radar_altimeter_failure			= false;
+		bool					flight_director_failure			= false;
+		bool					pitch_disagree					= false;
+		bool					roll_disagree					= false;
+		bool					ias_disagree					= false;
+		bool					altitude_disagree				= false;
+		bool					roll_warning					= false;
+		bool					slip_skid_warning				= false;
 
 		/*
 		 * Speed ladder
@@ -228,10 +235,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_paint_pitch (Xefis::Painter&);
 
 		void
-		adi_paint_roll (Xefis::Painter&);
+		adi_paint_heading (Xefis::Painter&);
 
 		void
-		adi_paint_heading (Xefis::Painter&);
+		adi_paint_tcas_ra (Xefis::Painter&);
+
+		void
+		adi_paint_roll (Xefis::Painter&);
 
 		void
 		adi_paint_pitch_disagree (Xefis::Painter&);
@@ -326,7 +336,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		ft_to_px (Length) const;
 
 		float
-		scale_vertical_speed (Speed vertical_speed) const;
+		scale_vertical_speed (Speed vertical_speed, float max_value = 1.f) const;
 
 		/*
 		 * Other
@@ -1140,6 +1150,30 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_fma_vertical_small_hint (QString const&);
+
+	/**
+	 * Set TCAS RA minimum pitch.
+	 */
+	void
+	set_tcas_ra_pitch_minimum (boost::optional<Angle> pitch);
+
+	/**
+	 * Set TCAS RA maximum pitch.
+	 */
+	void
+	set_tcas_ra_pitch_maximum (boost::optional<Angle> pitch);
+
+	/**
+	 * Set TCAS RA minimum vertical speed.
+	 */
+	void
+	set_tcas_ra_vertical_speed_minimum (boost::optional<Speed> speed);
+
+	/**
+	 * Set TCAS RA maximum vertical speed.
+	 */
+	void
+	set_tcas_ra_vertical_speed_maximum (boost::optional<Speed> speed);
 
 	/**
 	 * Set field of view.
@@ -2148,6 +2182,38 @@ EFISWidget::set_fma_vertical_small_hint (QString const& hint)
 	if (_params.fma_vertical_small_hint != hint)
 		_params.fma_vertical_small_ts = QDateTime::currentDateTime();
 	_params.fma_vertical_small_hint = hint;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_tcas_ra_pitch_minimum (boost::optional<Angle> pitch)
+{
+	_params.tcas_ra_pitch_minimum = pitch;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_tcas_ra_pitch_maximum (boost::optional<Angle> pitch)
+{
+	_params.tcas_ra_pitch_maximum = pitch;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_tcas_ra_vertical_speed_minimum (boost::optional<Speed> speed)
+{
+	_params.tcas_ra_vertical_speed_minimum = speed;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_tcas_ra_vertical_speed_maximum (boost::optional<Speed> speed)
+{
+	_params.tcas_ra_vertical_speed_maximum = speed;
 	request_repaint();
 }
 

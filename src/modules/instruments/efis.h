@@ -152,6 +152,11 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyString			_flight_mode_fma_lateral_small_hint;
 	Xefis::PropertyString			_flight_mode_fma_vertical_hint;
 	Xefis::PropertyString			_flight_mode_fma_vertical_small_hint;
+	// TCAS
+	Xefis::PropertyAngle			_tcas_resolution_advisory_pitch_minimum;
+	Xefis::PropertyAngle			_tcas_resolution_advisory_pitch_maximum;
+	Xefis::PropertySpeed			_tcas_resolution_advisory_vertical_speed_minimum;
+	Xefis::PropertySpeed			_tcas_resolution_advisory_vertical_speed_maximum;
 	// General warning/failure flags
 	Xefis::PropertyBoolean			_warning_novspd_flag;
 	Xefis::PropertyBoolean			_warning_pitch_disagree;

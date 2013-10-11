@@ -123,6 +123,10 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "flight-mode.fma.lateral-small-hint", _flight_mode_fma_lateral_small_hint, false },
 				{ "flight-mode.fma.vertical-hint", _flight_mode_fma_vertical_hint, false },
 				{ "flight-mode.fma.vertical-small-hint", _flight_mode_fma_vertical_small_hint, false },
+				{ "tcas.resolution-advisory.pitch.minimum", _tcas_resolution_advisory_pitch_minimum, false },
+				{ "tcas.resolution-advisory.pitch.maximum", _tcas_resolution_advisory_pitch_maximum, false },
+				{ "tcas.resolution-advisory.vertical-speed.minimum", _tcas_resolution_advisory_vertical_speed_minimum, false },
+				{ "tcas.resolution-advisory.vertical-speed.maximum", _tcas_resolution_advisory_vertical_speed_maximum, false },
 				{ "warning.novspd-flag", _warning_novspd_flag, false },
 				{ "warning.pitch-disagree", _warning_pitch_disagree, false },
 				{ "warning.roll-disagree", _warning_roll_disagree, false },
@@ -393,6 +397,11 @@ EFIS::read()
 	_efis_widget->set_fma_lateral_small_hint (_flight_mode_fma_lateral_small_hint.read ("").c_str());
 	_efis_widget->set_fma_vertical_hint (_flight_mode_fma_vertical_hint.read ("").c_str());
 	_efis_widget->set_fma_vertical_small_hint (_flight_mode_fma_vertical_small_hint.read ("").c_str());
+
+	_efis_widget->set_tcas_ra_pitch_minimum (_tcas_resolution_advisory_pitch_minimum.get_optional());
+	_efis_widget->set_tcas_ra_pitch_maximum (_tcas_resolution_advisory_pitch_maximum.get_optional());
+	_efis_widget->set_tcas_ra_vertical_speed_minimum (_tcas_resolution_advisory_vertical_speed_minimum.get_optional());
+	_efis_widget->set_tcas_ra_vertical_speed_maximum (_tcas_resolution_advisory_vertical_speed_maximum.get_optional());
 
 	_efis_widget->set_pitch_disagree (_warning_pitch_disagree.read (false));
 	_efis_widget->set_roll_disagree (_warning_roll_disagree.read (false));

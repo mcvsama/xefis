@@ -204,8 +204,9 @@ EFISWidget::PaintWorkUnit::adi_paint (Xefis::Painter& painter)
 	{
 		adi_paint_horizon (painter);
 		adi_paint_pitch (painter);
-		adi_paint_roll (painter);
 		adi_paint_heading (painter);
+		adi_paint_tcas_ra (painter);
+		adi_paint_roll (painter);
 		adi_paint_pitch_disagree (painter);
 		adi_paint_roll_disagree (painter);
 	}
@@ -515,6 +516,44 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 	painter.setTransform (_horizon_transform);
 	painter.setPen (get_pen (Qt::white, 1.25f));
 	painter.draw_outlined_line (QPointF (-1.25 * w, 0.f), QPointF (1.25f * w, 0.f));
+}
+
+
+void
+EFISWidget::PaintWorkUnit::adi_paint_tcas_ra (Xefis::Painter& painter)
+{
+	if (_params.tcas_ra_pitch_minimum || _params.tcas_ra_pitch_maximum)
+	{
+		painter.setPen (get_pen (Qt::red, 3.f));
+
+		if (_params.old_style)
+		{
+			painter.setTransform (_center_transform);
+			painter.setClipPath (_old_horizon_clip);
+		}
+		else
+			painter.setClipping (false);
+
+		auto paint_red_lines = [&] (Angle pitch1, Angle pitch2)
+		{
+			painter.setTransform (_horizon_transform);
+			painter.translate (0.f, pitch_to_px (pitch1));
+			float const h1 = heading_to_px (6_deg);
+			float const h2 = heading_to_px (30_deg);
+			float const p2 = pitch_to_px (pitch2);
+			painter.add_shadow ([&]() {
+				painter.drawLine (-h1, 0.f, +h1, 0.f);
+				painter.drawLine (-h1, 0.f, -h2, p2);
+				painter.drawLine (+h1, 0.f, +h2, p2);
+			});
+		};
+
+		if (_params.tcas_ra_pitch_minimum)
+			paint_red_lines (*_params.tcas_ra_pitch_minimum, *_params.tcas_ra_pitch_minimum - 90_deg);
+
+		if (_params.tcas_ra_pitch_maximum)
+			paint_red_lines (*_params.tcas_ra_pitch_maximum, *_params.tcas_ra_pitch_maximum + 90_deg);
+	}
 }
 
 
@@ -1497,6 +1536,36 @@ EFISWidget::PaintWorkUnit::al_paint_vertical_speed (Xefis::Painter& painter, flo
 		});
 	}
 
+	// TCAS
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (Qt::red);
+
+	auto paint_red_lines = [&] (Speed speed1, Speed speed2)
+	{
+		painter.setTransform (_al_transform);
+		painter.translate (4.f * x, 0.f);
+		float const s1 = -2.f * y * scale_vertical_speed (speed1, 1.015f);
+		float const s2 = -2.f * y * scale_vertical_speed (speed2, 1.015f);
+		float const ys = 0.875f;
+		painter.add_shadow ([&]() {
+			painter.drawPolygon (QPolygonF()
+				<< QPointF (0.35f * x, s1)
+				<< QPointF (0.75f * x, ys * s1)
+				<< QPointF (0.75f * x, ys * s2)
+				<< QPointF (0.35f * x, s2));
+		});
+	};
+
+	Speed min_vspd = 5500_fpm;
+
+	if (_params.tcas_ra_vertical_speed_minimum)
+		paint_red_lines (*_params.tcas_ra_vertical_speed_minimum - 20000_fpm,
+						 std::max (*_params.tcas_ra_vertical_speed_minimum, -min_vspd));
+
+	if (_params.tcas_ra_vertical_speed_maximum)
+		paint_red_lines (*_params.tcas_ra_vertical_speed_maximum + 20000_fpm,
+						 std::min (*_params.tcas_ra_vertical_speed_maximum, +min_vspd));
+
 	// Pointer:
 	if (_params.vertical_speed_visible)
 	{
@@ -1634,7 +1703,7 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 
 
 float
-EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed) const
+EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_value) const
 {
 	float vspd = std::abs (vertical_speed.fpm());
 
@@ -1644,8 +1713,8 @@ EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed) const
 		vspd = 0.46f + 0.32f * (vspd - 1000.f) / 1000.f;
 	else if (vspd < 6000)
 		vspd = 0.78f + 0.22f * (vspd - 2000.f) / 4000.f;
-	else
-		vspd = 1.f;
+
+	vspd = std::min (vspd, max_value);
 
 	if (vertical_speed < 0_fpm)
 		vspd *= -1.f;
