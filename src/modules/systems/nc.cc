@@ -41,6 +41,7 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	_track_lateral_true_smoother.set_winding ({ 0.0, 360.0 });
 	_orientation_pitch_smoother.set_winding ({ 0.0, 360.0 });
 	_orientation_roll_smoother.set_winding ({ 0.0, 360.0 });
+	_orientation_heading_magnetic_smoother.set_winding ({ 0.0, 360.0 });
 
 	// Initialize _positions* with invalid vals, to get them non-empty:
 	for (Positions* positions: { &_positions, &_positions_accurate_2_times, &_positions_accurate_9_times })
@@ -223,10 +224,10 @@ NavigationComputer::compute_headings()
 
 	if (_orientation_input_heading_magnetic.valid())
 	{
-		_orientation_heading_magnetic.copy (_orientation_input_heading_magnetic);
+		_orientation_heading_magnetic.write (1_deg * _orientation_heading_magnetic_smoother.process ((*_orientation_input_heading_magnetic).deg(), update_dt));
 
 		if (_magnetic_declination.valid())
-			_orientation_heading_true.write (Xefis::magnetic_to_true (*_orientation_input_heading_magnetic, *_magnetic_declination));
+			_orientation_heading_true.write (Xefis::magnetic_to_true (*_orientation_heading_magnetic, *_magnetic_declination));
 		else
 			_orientation_heading_true.set_nil();
 	}
@@ -234,6 +235,7 @@ NavigationComputer::compute_headings()
 	{
 		_orientation_heading_magnetic.set_nil();
 		_orientation_heading_true.set_nil();
+		_orientation_heading_magnetic_smoother.invalidate();
 	}
 
 	// Smoothed pitch:
