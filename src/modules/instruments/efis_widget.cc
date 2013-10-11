@@ -679,7 +679,7 @@ EFISWidget::PaintWorkUnit::sl_paint (Xefis::Painter& painter)
 	}
 
 	sl_paint_mach_number (painter, x);
-	sl_paint_novspd (painter);
+	sl_paint_novspd_flag (painter);
 	sl_paint_ap_setting (painter);
 }
 
@@ -1021,7 +1021,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_novspd (Xefis::Painter& painter)
+EFISWidget::PaintWorkUnit::sl_paint_novspd_flag (Xefis::Painter& painter)
 {
 	if (_params.novspd_flag)
 	{
@@ -1141,6 +1141,7 @@ EFISWidget::PaintWorkUnit::al_paint (Xefis::Painter& painter)
 
 	al_paint_pressure (painter, x);
 	al_paint_ap_setting (painter);
+	al_paint_ldgalt_flag (painter, x);
 }
 
 
@@ -1369,11 +1370,11 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		}
 
 		// Altitude warning:
-		if (_params.altitude_warnings_visible && _params.altitude_agl_visible)
+		if (_params.altitude_landing_visible)
 		{
-			QPointF p1 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl + 500_ft));
-			QPointF p2 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl + 1000_ft));
-			QPointF p0 (-2.05f * x, ft_to_px (_params.altitude - _params.altitude_agl));
+			QPointF p1 (-2.05f * x, ft_to_px (_params.altitude_landing_amsl + _params.altitude_landing_warning_lo));
+			QPointF p2 (-2.05f * x, ft_to_px (_params.altitude_landing_amsl + _params.altitude_landing_warning_hi));
+			QPointF p0 (-2.05f * x, ft_to_px (_params.altitude_landing_amsl));
 
 			QPen w = _al_ldg_alt_pen;
 			w.setColor (Qt::white);
@@ -1390,10 +1391,10 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 			});
 
 			// Landing altitude bug (ground indicator):
-			if (_params.altitude - _params.altitude_agl > _al_min_shown && _params.altitude - _params.altitude_agl < _al_max_shown)
+			if (_params.altitude_landing_amsl > _al_min_shown && _params.altitude_landing_amsl < _al_max_shown)
 			{
 				painter.setClipRect (_al_ladder_rect);
-				float posy = ft_to_px (_params.altitude - _params.altitude_agl);
+				float posy = ft_to_px (_params.altitude_landing_amsl);
 
 				painter.setPen (_al_ldg_alt_pen);
 				painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
@@ -1699,6 +1700,21 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
 							QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.ft()))) % 1000, 3, 'f', 0, '0'));
+}
+
+
+void
+EFISWidget::PaintWorkUnit::al_paint_ldgalt_flag (Xefis::Painter& painter, float x)
+{
+	if (_params.ldgalt_flag)
+	{
+		painter.setClipping (false);
+		painter.setTransform (_al_transform);
+		painter.setPen (_warning_color_2);
+		painter.setFont (_font_10);
+		painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x), Qt::AlignVCenter | Qt::AlignLeft, "LDG");
+		painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x + 1.1f * _font_13_digit_height), Qt::AlignVCenter | Qt::AlignLeft, "ALT");
+	}
 }
 
 

@@ -68,6 +68,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyInteger::Type	_altitude_ladder_emphasis_every	= 1000;
 	Xefis::PropertyInteger::Type	_altitude_ladder_bold_every		= 500;
 	Xefis::PropertyInteger::Type	_altitude_ladder_extent			= 825;
+	Xefis::PropertyLength::Type		_altitude_landing_warning_hi	= 1000_ft;
+	Xefis::PropertyLength::Type		_altitude_landing_warning_lo	= 500_ft;
 	// Speed
 	Xefis::PropertyBoolean			_speed_ias_serviceable;
 	Xefis::PropertySpeed			_speed_ias;
@@ -109,6 +111,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyLength			_altitude_agl;
 	Xefis::PropertyString			_altitude_minimums_type;
 	Xefis::PropertyLength			_altitude_minimums;
+	Xefis::PropertyLength			_altitude_landing_amsl;
 	// Vertical speed
 	Xefis::PropertyBoolean			_vertical_speed_serviceable;
 	Xefis::PropertySpeed			_vertical_speed;
@@ -159,6 +162,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertySpeed			_tcas_resolution_advisory_vertical_speed_maximum;
 	// General warning/failure flags
 	Xefis::PropertyBoolean			_warning_novspd_flag;
+	Xefis::PropertyBoolean			_warning_ldgalt_flag;
 	Xefis::PropertyBoolean			_warning_pitch_disagree;
 	Xefis::PropertyBoolean			_warning_roll_disagree;
 	Xefis::PropertyBoolean			_warning_ias_disagree;

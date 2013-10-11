@@ -69,7 +69,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool					speed_visible					= false;
 		Speed					speed_tendency					= 0_kt;
 		bool					speed_tendency_visible			= false;
-		bool					novspd_flag						= false;
 		Length					altitude						= 0_ft;
 		bool					altitude_visible				= false;
 		Length					altitude_tendency				= 0_ft;
@@ -77,7 +76,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Length					altitude_agl					= 0_ft;
 		bool					altitude_agl_visible			= false;
 		QDateTime				altitude_agl_ts;
-		bool					altitude_warnings_visible		= false;
+		bool					altitude_landing_visible		= false;
+		Length					altitude_landing_amsl			= 0_ft;
+		Length					altitude_landing_warning_hi		= 0_ft;
+		Length					altitude_landing_warning_lo		= 0_ft;
 		QString					minimums_type;
 		Length					minimums_altitude				= 0_ft;
 		bool					minimums_altitude_visible		= false;
@@ -163,6 +165,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool					flight_path_marker_failure		= false;
 		bool					radar_altimeter_failure			= false;
 		bool					flight_director_failure			= false;
+		bool					novspd_flag						= false;
+		bool					ldgalt_flag						= false;
 		bool					pitch_disagree					= false;
 		bool					roll_disagree					= false;
 		bool					ias_disagree					= false;
@@ -290,7 +294,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_paint_ap_setting (Xefis::Painter&);
 
 		void
-		sl_paint_novspd (Xefis::Painter&);
+		sl_paint_novspd_flag (Xefis::Painter&);
 
 		float
 		kt_to_px (Speed) const;
@@ -331,6 +335,9 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 		void
 		al_paint_ap_setting (Xefis::Painter&);
+
+		void
+		al_paint_ldgalt_flag (Xefis::Painter&, float x);
 
 		float
 		ft_to_px (Length) const;
@@ -721,6 +728,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_novspd_flag (bool visible);
 
 	/**
+	 * Set visibility of the LDG ALT flag.
+	 */
+	void
+	set_ldgalt_flag (bool visible);
+
+	/**
 	 * Set altitude value.
 	 */
 	void
@@ -761,7 +774,25 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 * max of AGL altitude and LDG altitude or 0.
 	 */
 	void
-	set_altitude_warnings_visible (bool visible);
+	set_landing_altitude_visible (bool visible);
+
+	/**
+	 * Set landing altitude.
+	 */
+	void
+	set_landing_altitude_amsl (Length altitude);
+
+	/**
+	 * Set top level warning about approaching landing altitude.
+	 */
+	void
+	set_landing_altitude_warning_hi (Length altitude);
+
+	/**
+	 * Set middle level warning about approaching landing altitude.
+	 */
+	void
+	set_landing_altitude_warning_lo (Length altitude);
 
 	/**
 	 * Set minimums type ("BARO", "RADIO")
@@ -1588,6 +1619,14 @@ EFISWidget::set_novspd_flag (bool visible)
 
 
 inline void
+EFISWidget::set_ldgalt_flag (bool visible)
+{
+	_params.ldgalt_flag = visible;
+	request_repaint();
+}
+
+
+inline void
 EFISWidget::set_altitude (Length altitude)
 {
 	Length previous_altitude = _params.altitude;
@@ -1643,9 +1682,33 @@ EFISWidget::set_altitude_agl_visible (bool visible)
 
 
 inline void
-EFISWidget::set_altitude_warnings_visible (bool visible)
+EFISWidget::set_landing_altitude_visible (bool visible)
 {
-	_params.altitude_warnings_visible = visible;
+	_params.altitude_landing_visible = visible;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_landing_altitude_amsl (Length altitude)
+{
+	_params.altitude_landing_amsl = altitude;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_landing_altitude_warning_hi (Length altitude)
+{
+	_params.altitude_landing_warning_hi = altitude;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_landing_altitude_warning_lo (Length altitude)
+{
+	_params.altitude_landing_warning_lo = altitude;
 	request_repaint();
 }
 
