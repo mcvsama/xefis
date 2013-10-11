@@ -1432,11 +1432,11 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		// Baro bug:
 		if (_params.minimums_altitude_visible)
 		{
-			if (_params.minimums_altitude > _al_min_shown && _params.minimums_altitude < _al_max_shown)
+			if (_params.minimums_amsl > _al_min_shown && _params.minimums_amsl < _al_max_shown)
 			{
 				if (!(_params.minimums_blinking_active && !_params.minimums_blink))
 				{
-					float posy = ft_to_px (_params.minimums_altitude);
+					float posy = ft_to_px (_params.minimums_amsl);
 					painter.setTransform (_al_transform);
 					painter.setClipRect (_al_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
 					QPen pen = get_pen (get_minimums_color(), 1.25f);
@@ -1904,7 +1904,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 	QFontMetricsF metrics_b (font_b);
 
 	QString baro_str = _params.minimums_type;
-	QString alt_str = QString ("%1").arg (_params.minimums_altitude.ft(), 0, 'f', 0);
+	QString alt_str = QString ("%1").arg (_params.minimums_setting.ft(), 0, 'f', 0);
 
 	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
 	QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
@@ -2535,7 +2535,7 @@ EFISWidget::request_repaint()
 
 	update_blinker (_minimums_blinking_warning,
 					_params.altitude_visible && _params.minimums_altitude_visible &&
-					_params.altitude < _params.minimums_altitude &&
+					_params.altitude < _params.minimums_amsl &&
 					_paint_work_unit.is_newly_set (_params.minimums_altitude_ts, 5_s),
 					&_params.minimums_blink);
 

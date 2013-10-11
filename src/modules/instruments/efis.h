@@ -110,7 +110,8 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_altitude_agl_serviceable;
 	Xefis::PropertyLength			_altitude_agl;
 	Xefis::PropertyString			_altitude_minimums_type;
-	Xefis::PropertyLength			_altitude_minimums;
+	Xefis::PropertyLength			_altitude_minimums_setting;
+	Xefis::PropertyLength			_altitude_minimums_amsl;
 	Xefis::PropertyLength			_altitude_landing_amsl;
 	// Vertical speed
 	Xefis::PropertyBoolean			_vertical_speed_serviceable;

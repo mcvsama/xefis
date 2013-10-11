@@ -88,7 +88,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "altitude.agl.serviceable", _altitude_agl_serviceable, false },
 				{ "altitude.agl", _altitude_agl, false },
 				{ "altitude.minimums.type", _altitude_minimums_type, false },
-				{ "altitude.minimums", _altitude_minimums, false },
+				{ "altitude.minimums.setting", _altitude_minimums_setting, false },
+				{ "altitude.minimums.amsl", _altitude_minimums_amsl, false },
 				{ "altitude.landing.amsl", _altitude_landing_amsl, false },
 				{ "vertical-speed.serviceable", _vertical_speed_serviceable, false },
 				{ "vertical-speed", _vertical_speed, false },
@@ -259,6 +260,12 @@ EFIS::read()
 	if (_altitude_agl.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl);
 
+	if (_altitude_minimums_setting.valid())
+		_efis_widget->set_altitude_minimums_setting (*_altitude_minimums_setting);
+	if (_altitude_minimums_amsl.valid())
+		_efis_widget->set_altitude_minimums_amsl (*_altitude_minimums_amsl);
+	_efis_widget->set_minimums_altitude_visible (_altitude_minimums_setting.valid() && _altitude_minimums_amsl.valid());
+
 	if (_altitude_landing_amsl.valid())
 		_efis_widget->set_landing_altitude_amsl (*_altitude_landing_amsl);
 	_efis_widget->set_landing_altitude_visible (_altitude_landing_amsl.valid());
@@ -269,10 +276,6 @@ EFIS::read()
 		_efis_widget->set_standard_pressure (false);
 
 	_efis_widget->set_minimums_type (QString::fromStdString (_altitude_minimums_type.read ("")));
-
-	if (_altitude_minimums.valid())
-		_efis_widget->set_minimums_altitude (*_altitude_minimums);
-	_efis_widget->set_minimums_altitude_visible (_altitude_minimums.valid());
 
 	_efis_widget->set_pressure_visible (_pressure_qnh.valid());
 	if (_pressure_qnh.valid())

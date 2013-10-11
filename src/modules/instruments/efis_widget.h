@@ -81,7 +81,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Length					altitude_landing_warning_hi		= 0_ft;
 		Length					altitude_landing_warning_lo		= 0_ft;
 		QString					minimums_type;
-		Length					minimums_altitude				= 0_ft;
+		Length					minimums_amsl					= 0_ft;
+		Length					minimums_setting				= 0_ft;
 		bool					minimums_altitude_visible		= false;
 		QDateTime				minimums_altitude_ts;
 		Speed					vertical_speed					= 0_fpm;
@@ -801,10 +802,18 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_minimums_type (QString const& type);
 
 	/**
-	 * Set minimums altitude.
+	 * Set minimums setting. This is what's displayed on the EFIS,
+	 * it may not necessarily correspond to AMSL minimums, eg. in
+	 * case of radar-altimeter minimums.
 	 */
 	void
-	set_minimums_altitude (Length);
+	set_altitude_minimums_setting (Length);
+
+	/**
+	 * Set minimums indicator position at altitude ladder.
+	 */
+	void
+	set_altitude_minimums_amsl (Length);
 
 	/**
 	 * Set minimums altitude visibility.
@@ -1359,7 +1368,7 @@ EFISWidget::PaintWorkUnit::heading_to_px (Angle degrees) const
 inline QColor
 EFISWidget::PaintWorkUnit::get_minimums_color() const
 {
-	if (_params.altitude < _params.minimums_altitude)
+	if (_params.altitude < _params.minimums_amsl)
 		return _warning_color_2;
 	return _navigation_color;
 }
@@ -1632,7 +1641,7 @@ EFISWidget::set_altitude (Length altitude)
 	Length previous_altitude = _params.altitude;
 	_params.altitude = altitude;
 
-	if (previous_altitude > _params.minimums_altitude && altitude < _params.minimums_altitude)
+	if (previous_altitude > _params.minimums_amsl && altitude < _params.minimums_amsl)
 		_params.minimums_altitude_ts = QDateTime::currentDateTime();
 
 	request_repaint();
@@ -1722,9 +1731,17 @@ EFISWidget::set_minimums_type (QString const& type)
 
 
 inline void
-EFISWidget::set_minimums_altitude (Length minimums_altitude)
+EFISWidget::set_altitude_minimums_setting (Length minimums_setting)
 {
-	_params.minimums_altitude = minimums_altitude;
+	_params.minimums_setting = minimums_setting;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_altitude_minimums_amsl (Length minimums_amsl)
+{
+	_params.minimums_amsl = minimums_amsl;
 	request_repaint();
 }
 
