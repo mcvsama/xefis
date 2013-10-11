@@ -128,9 +128,9 @@
 							</directory>
 							<directory path='/tcas'>
 								<directory path='/resolution-advisory'>
-									<property name='tcas.resolution-advisory.pitch.minimum' path='/pitch.minimum' default='6 deg'/>
+									<property name='tcas.resolution-advisory.pitch.minimum' path='/pitch.minimum'/>
 									<property name='tcas.resolution-advisory.pitch.maximum' path='/pitch.maximum'/>
-									<property name='tcas.resolution-advisory.vertical-speed.minimum' path='/vertical-speed.minimum' default='800 fpm'/>
+									<property name='tcas.resolution-advisory.vertical-speed.minimum' path='/vertical-speed.minimum'/>
 									<property name='tcas.resolution-advisory.vertical-speed.maximum' path='/vertical-speed.maximum'/>
 								</directory>
 							</directory>

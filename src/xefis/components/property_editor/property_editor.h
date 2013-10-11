@@ -60,6 +60,9 @@ class PropertyEditor: public QWidget
 	update_item();
 
 	void
+	reset_item();
+
+	void
 	reset_error();
 
   private:
@@ -69,6 +72,7 @@ class PropertyEditor: public QWidget
 	PropertyTreeWidget*	_property_tree_widget;
 	QLineEdit*			_editable_value;
 	QPushButton*		_update_button;
+	QPushButton*		_set_nil_button;
 	QTimer*				_accepted_blink_timer;
 };
 
