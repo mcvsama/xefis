@@ -15,6 +15,8 @@
 							<setting name='altitude-ladder.number-every' value='200'/>
 							<setting name='altitude-ladder.bold-every' value='500'/>
 							<setting name='altitude-ladder.extent' value='825'/>
+							<setting name='altitude.landing.warning.hi' value='1000 ft'/>
+							<setting name='altitude.landing.warning.lo' value='500 ft'/>
 						</settings>
 						<properties>
 							<directory path='/speed'>
@@ -63,6 +65,7 @@
 								<property name='altitude.agl' path='/agl' default='1344 ft'/>
 								<property name='altitude.minimums.type' path='/minimums.type' default='RADIO'/>
 								<property name='altitude.minimums' path='/minimums' default='300 ft'/>
+								<property name='altitude.landing.amsl' path='/landing.amsl' default='720 ft'/>
 							</directory>
 							<directory path='/vertical-speed'>
 								<property name='vertical-speed.serviceable' path='/serviceable' default='true'/>
@@ -132,6 +135,7 @@
 							</directory>
 							<directory path='/warning'>
 								<property name='warning.novspd-flag' path='/novspd-flag' default='false'/>
+								<property name='warning.ldgalt-flag' path='/ldgalt-flag' default='false'/>
 								<property name='warning.pitch-disagree' path='/pitch-disagree' default='false'/>
 								<property name='warning.roll-disagree' path='/roll-disagree' default='false'/>
 								<property name='warning.ias-disagree' path='/ias-disagree' default='false'/>

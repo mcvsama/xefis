@@ -49,6 +49,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "altitude-ladder.emphasis-every", _altitude_ladder_emphasis_every, false },
 				{ "altitude-ladder.bold-every", _altitude_ladder_bold_every, false },
 				{ "altitude-ladder.extent", _altitude_ladder_extent, false },
+				{ "altitude.landing.warning.hi", _altitude_landing_warning_hi, false },
+				{ "altitude.landing.warning.lo", _altitude_landing_warning_lo, false },
 			});
 		}
 		else if (e == "properties")
@@ -87,6 +89,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "altitude.agl", _altitude_agl, false },
 				{ "altitude.minimums.type", _altitude_minimums_type, false },
 				{ "altitude.minimums", _altitude_minimums, false },
+				{ "altitude.landing.amsl", _altitude_landing_amsl, false },
 				{ "vertical-speed.serviceable", _vertical_speed_serviceable, false },
 				{ "vertical-speed", _vertical_speed, false },
 				{ "vertical-speed.variometer", _vertical_speed_variometer, false },
@@ -128,6 +131,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "tcas.resolution-advisory.vertical-speed.minimum", _tcas_resolution_advisory_vertical_speed_minimum, false },
 				{ "tcas.resolution-advisory.vertical-speed.maximum", _tcas_resolution_advisory_vertical_speed_maximum, false },
 				{ "warning.novspd-flag", _warning_novspd_flag, false },
+				{ "warning.ldgalt-flag", _warning_ldgalt_flag, false },
 				{ "warning.pitch-disagree", _warning_pitch_disagree, false },
 				{ "warning.roll-disagree", _warning_roll_disagree, false },
 				{ "warning.ias-disagree", _warning_ias_disagree, false },
@@ -176,6 +180,9 @@ EFIS::read()
 	_efis_widget->set_altitude_ladder_emphasis_every (_altitude_ladder_emphasis_every);
 	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every);
 	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent);
+
+	_efis_widget->set_landing_altitude_warning_hi (_altitude_landing_warning_hi);
+	_efis_widget->set_landing_altitude_warning_lo (_altitude_landing_warning_lo);
 
 	_efis_widget->set_heading_numbers_visible (_orientation_heading_numbers_visible.read (false));
 
@@ -252,7 +259,9 @@ EFIS::read()
 	if (_altitude_agl.valid())
 		_efis_widget->set_altitude_agl (*_altitude_agl);
 
-	_efis_widget->set_altitude_warnings_visible (true);
+	if (_altitude_landing_amsl.valid())
+		_efis_widget->set_landing_altitude_amsl (*_altitude_landing_amsl);
+	_efis_widget->set_landing_altitude_visible (_altitude_landing_amsl.valid());
 
 	if (_pressure_use_std.valid())
 		_efis_widget->set_standard_pressure (*_pressure_use_std);
@@ -357,6 +366,7 @@ EFIS::read()
 		_efis_widget->set_localizer_info_visible (false);
 
 	_efis_widget->set_novspd_flag (_warning_novspd_flag.read (false));
+	_efis_widget->set_ldgalt_flag (_warning_ldgalt_flag.read (false));
 
 	if (_speed_v1.valid())
 		_efis_widget->add_speed_bug ("V1", *_speed_v1);
