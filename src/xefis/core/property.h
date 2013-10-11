@@ -145,12 +145,6 @@ class GenericProperty
 	fresh() const;
 
 	/**
-	 * Ensures that this property exists.
-	 */
-	void
-	ensure_existence();
-
-	/**
 	 * Check whether this property is TypedProperty
 	 * instantiated over given type Target.
 	 */
@@ -224,6 +218,12 @@ class TypedProperty: public GenericProperty
 #endif
 
   public:
+	/**
+	 * Ensures that this property exists.
+	 */
+	virtual void
+	ensure_existence() = 0;
+
 	/**
 	 * Set value from humanized string (eg. "10 kt").
 	 */
@@ -340,6 +340,10 @@ template<class tType>
 		 */
 		void
 		copy (Property const& other);
+
+		// TypedProperty API
+		void
+		ensure_existence() override;
 
 		// TypedProperty API
 		void
@@ -512,14 +516,6 @@ GenericProperty::fresh() const
 }
 
 
-inline void
-GenericProperty::ensure_existence()
-{
-	if (is_nil())
-		set_nil();
-}
-
-
 template<class Target>
 	inline bool
 	GenericProperty::is_type() const
@@ -619,6 +615,18 @@ template<class T>
 	{
 		TypedProperty::operator= (other);
 		return *this;
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::ensure_existence()
+	{
+		if (is_nil())
+		{
+			ensure_path (path(), Type());
+			set_nil();
+		}
 	}
 
 

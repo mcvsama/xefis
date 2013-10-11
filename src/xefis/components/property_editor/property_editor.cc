@@ -48,11 +48,16 @@ PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
 	_update_button->setFixedHeight (_editable_value->height());;
 	QObject::connect (_update_button, SIGNAL (clicked()), this, SLOT (update_item()));
 
+	_set_nil_button = new QPushButton ("Set <nil>", this);
+	_set_nil_button->setFixedHeight (_editable_value->height());
+	QObject::connect (_set_nil_button, SIGNAL (clicked()), this, SLOT (reset_item()));
+
 	QLayout* value_layout = new QHBoxLayout();
 	value_layout->setMargin (0);
 	value_layout->setSpacing (WidgetSpacing);
 	value_layout->addWidget (_editable_value);
 	value_layout->addWidget (_update_button);
+	value_layout->addWidget (_set_nil_button);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (WidgetMargin);
@@ -152,6 +157,22 @@ PropertyEditor::update_item()
 	{
 		set_line_edit_color (_error_color);
 	}
+}
+
+
+void
+PropertyEditor::reset_item()
+{
+	PropertyNode* node = _property_tree_widget->selected_property_node();
+	if (!node)
+		return;
+	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+	if (!val_node)
+		return;
+
+	val_node->set_nil();
+	set_line_edit_color (_accepted_color);
+	_accepted_blink_timer->start();
 }
 
 
