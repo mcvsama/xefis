@@ -64,7 +64,8 @@
 								<property name='altitude.agl.serviceable' path='/agl.serviceable' default='true'/>
 								<property name='altitude.agl' path='/agl' default='1344 ft'/>
 								<property name='altitude.minimums.type' path='/minimums.type' default='RADIO'/>
-								<property name='altitude.minimums' path='/minimums' default='300 ft'/>
+								<property name='altitude.minimums.setting' path='/minimums.setting' default='300 ft'/>
+								<property name='altitude.minimums.amsl' path='/minimums.amsl' default='300 ft'/>
 								<property name='altitude.landing.amsl' path='/landing.amsl' default='720 ft'/>
 							</directory>
 							<directory path='/vertical-speed'>
