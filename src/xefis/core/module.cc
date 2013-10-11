@@ -186,10 +186,22 @@ Module::parse_settings (QDomElement const& settings_element, SettingsList list)
 				NameAndSetting* nas = it->second;
 				if (nas->value_bool)
 					*nas->value_bool = value == "true";
-				else if (nas->value_int)
-					*nas->value_int = boost::lexical_cast<int> (value.toStdString());
+				else if (nas->value_int8)
+					*nas->value_int8 = parse_int<int8_t> (value);
+				else if (nas->value_int16)
+					*nas->value_int16 = parse_int<int16_t> (value);
+				else if (nas->value_int32)
+					*nas->value_int32 = parse_int<int32_t> (value);
 				else if (nas->value_int64)
-					*nas->value_int64 = boost::lexical_cast<int64_t> (value.toStdString());
+					*nas->value_int64 = parse_int<int64_t> (value);
+				else if (nas->value_uint8)
+					*nas->value_uint8 = parse_int<uint8_t> (value);
+				else if (nas->value_uint16)
+					*nas->value_uint16 = parse_int<uint16_t> (value);
+				else if (nas->value_uint32)
+					*nas->value_uint32 = parse_int<uint32_t> (value);
+				else if (nas->value_uint64)
+					*nas->value_uint64 = parse_int<uint64_t> (value);
 				else if (nas->value_float)
 					*nas->value_float = boost::lexical_cast<float> (value.toStdString());
 				else if (nas->value_double)
@@ -225,37 +237,6 @@ Module::has_setting (QString const& name)
 {
 	SettingsSet::iterator s = _settings_set.find (name);
 	return s != _settings_set.end();
-}
-
-
-void
-Module::parse_i2c (QDomElement const& i2c_element, I2C::Device& device)
-{
-	bool has_bus = false;
-	bool has_address = false;
-
-	for (QDomElement& e: i2c_element)
-	{
-		if (e == "bus")
-		{
-			device.bus().set_bus_number (e.text().trimmed().toUInt());
-			has_bus = true;
-		}
-		else if (e == "address")
-		{
-			QString addr = e.text().trimmed();
-			if (addr.startsWith ("0x"))
-				device.set_address (I2C::Address (addr.mid (2).toUInt (nullptr, 16)));
-			else
-				device.set_address (I2C::Address (addr.toUInt()));
-			has_address = true;
-		}
-	}
-
-	if (!has_bus)
-		throw Xefis::Exception ("configure I2C bus number <i2c>/<bus>");
-	if (!has_address)
-		throw Xefis::Exception ("configure I2C BMP085 address <i2c>/<address>");
 }
 
 
@@ -338,6 +319,27 @@ Module::factories()
 	static FactoriesMap factories;
 	return factories;
 }
+
+
+template<class TargetInt>
+	TargetInt
+	Module::parse_int (QString const& s)
+	{
+		static_assert (std::numeric_limits<TargetInt>::is_integer, "TargetInt must be integer type");
+
+		if (std::numeric_limits<TargetInt>::is_signed)
+		{
+			if (s.startsWith ("0x"))
+				return s.mid (2).toInt (nullptr, 16);
+			return s.toInt();
+		}
+		else
+		{
+			if (s.startsWith ("0x"))
+				return s.mid (2).toInt (nullptr, 16);
+			return s.toInt();
+		}
+	}
 
 } // namespace Xefis
 

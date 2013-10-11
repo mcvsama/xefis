@@ -34,11 +34,16 @@ XEFIS_REGISTER_MODULE_CLASS ("io/bmp085", BMP085);
 BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	Xefis::I2C::Bus::ID i2c_bus;
+	Xefis::I2C::Address::ID i2c_address;
+
 	for (QDomElement& e: config)
 	{
 		if (e == "setting")
 		{
 			parse_settings (e, {
+				{ "i2c.bus", i2c_bus, true },
+				{ "i2c.address", i2c_address, true },
 				{ "temperature.read-interval", _temperature_interval, true },
 				{ "pressure.read-interval", _pressure_interval, true },
 			});
@@ -51,9 +56,10 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 				{ "pressure", _pressure, true },
 			});
 		}
-		else if (e == "i2c")
-			parse_i2c (e, _i2c_device);
 	}
+
+	_i2c_device.bus().set_bus_number (i2c_bus);
+	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));
 
 	_oversampling = Oversampling3;
 

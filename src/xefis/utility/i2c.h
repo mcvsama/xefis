@@ -128,6 +128,9 @@ class Bus: public Noncopyable
 class Address
 {
   public:
+	typedef uint16_t ID;
+
+  public:
 	/**
 	 * Create address 0x00.
 	 */
@@ -139,12 +142,12 @@ class Address
 	 * \param	ten_bit Tells whether address is 10-bit.
 	 */
 	explicit
-	Address (uint16_t address, bool ten_bit = false) noexcept;
+	Address (ID address, bool ten_bit = false) noexcept;
 
 	/**
 	 * Return address.
 	 */
-	uint16_t
+	ID
 	address() const noexcept;
 
 	/**
@@ -154,8 +157,8 @@ class Address
 	is_ten_bit() const noexcept;
 
   private:
-	uint16_t	_address;
-	bool		_ten_bit;
+	ID		_address;
+	bool	_ten_bit;
 };
 
 
@@ -354,13 +357,13 @@ Address::Address() noexcept:
 
 
 inline
-Address::Address (uint16_t address, bool ten_bit) noexcept:
+Address::Address (ID address, bool ten_bit) noexcept:
 	_address (address),
 	_ten_bit (ten_bit)
 { }
 
 
-inline uint16_t
+inline Address::ID
 Address::address() const noexcept
 {
 	return _address;

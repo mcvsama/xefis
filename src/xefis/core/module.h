@@ -61,8 +61,14 @@ class Module: private Noncopyable
 		QString			name;
 		bool			required;
 		bool*			value_bool		= nullptr;
-		int*			value_int		= nullptr;
+		int8_t*			value_int8		= nullptr;
+		int16_t*		value_int16		= nullptr;
+		int32_t*		value_int32		= nullptr;
 		int64_t*		value_int64		= nullptr;
+		uint8_t*		value_uint8		= nullptr;
+		uint16_t*		value_uint16	= nullptr;
+		uint32_t*		value_uint32	= nullptr;
+		uint64_t*		value_uint64	= nullptr;
 		float*			value_float		= nullptr;
 		double*			value_double	= nullptr;
 		std::string*	value_string	= nullptr;
@@ -71,9 +77,21 @@ class Module: private Noncopyable
 
 		NameAndSetting (QString const& name, bool& value, bool required);
 
-		NameAndSetting (QString const& name, int& value, bool required);
+		NameAndSetting (QString const& name, int8_t& value, bool required);
+
+		NameAndSetting (QString const& name, int16_t& value, bool required);
+
+		NameAndSetting (QString const& name, int32_t& value, bool required);
 
 		NameAndSetting (QString const& name, int64_t& value, bool required);
+
+		NameAndSetting (QString const& name, uint8_t& value, bool required);
+
+		NameAndSetting (QString const& name, uint16_t& value, bool required);
+
+		NameAndSetting (QString const& name, uint32_t& value, bool required);
+
+		NameAndSetting (QString const& name, uint64_t& value, bool required);
 
 		NameAndSetting (QString const& name, float& value, bool required);
 
@@ -201,13 +219,6 @@ class Module: private Noncopyable
 	has_setting (QString const& name);
 
 	/**
-	 * Parse the <i2c> element and setup an I2C::Device object.
-	 * \throw	Xefis::Exception if something's wrong.
-	 */
-	void
-	parse_i2c (QDomElement const& i2c_element, I2C::Device&);
-
-	/**
 	 * Signal that this module has updated property tree.
 	 */
 	void
@@ -245,6 +256,13 @@ class Module: private Noncopyable
 	static FactoriesMap&
 	factories();
 
+	/**
+	 * Parse int. Support 0x prefix for hexadecimal values.
+	 */
+	template<class TargetInt>
+		TargetInt
+		parse_int (QString const&);
+
   private:
 	ModuleManager*	_module_manager = nullptr;
 	std::string		_name;
@@ -263,10 +281,26 @@ Module::NameAndSetting::NameAndSetting (QString const& name, bool& value, bool r
 
 
 inline
-Module::NameAndSetting::NameAndSetting (QString const& name, int& value, bool required):
+Module::NameAndSetting::NameAndSetting (QString const& name, int8_t& value, bool required):
 	name (name),
 	required (required),
-	value_int (&value)
+	value_int8 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, int16_t& value, bool required):
+	name (name),
+	required (required),
+	value_int16 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, int32_t& value, bool required):
+	name (name),
+	required (required),
+	value_int32 (&value)
 { }
 
 
@@ -275,6 +309,38 @@ Module::NameAndSetting::NameAndSetting (QString const& name, int64_t& value, boo
 	name (name),
 	required (required),
 	value_int64 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, uint8_t& value, bool required):
+	name (name),
+	required (required),
+	value_uint8 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, uint16_t& value, bool required):
+	name (name),
+	required (required),
+	value_uint16 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, uint32_t& value, bool required):
+	name (name),
+	required (required),
+	value_uint32 (&value)
+{ }
+
+
+inline
+Module::NameAndSetting::NameAndSetting (QString const& name, uint64_t& value, bool required):
+	name (name),
+	required (required),
+	value_uint64 (&value)
 { }
 
 
