@@ -213,10 +213,13 @@ SRC_MOCHDRS += modules/io/xbee.h
 ######## /modules/log ########
 
 SRC_HEADERS += modules/log/latency.h
+SRC_HEADERS += modules/log/klog.h
 
 SRC_SOURCES += modules/log/latency.cc
+SRC_SOURCES += modules/log/klog.cc
 
 SRC_MOCHDRS += modules/log/latency.h
+SRC_MOCHDRS += modules/log/klog.h
 
 ######## /modules/systems ########
 
