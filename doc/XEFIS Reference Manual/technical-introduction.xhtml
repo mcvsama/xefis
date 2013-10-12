@@ -1,0 +1,105 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:page xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:meta>
+		<doc:title>Technical introduction</doc:title>
+	</doc:meta>
+	<section>
+		<h1>Value types and units</h1>
+		<p>
+			There are various value types used throughout the program and its configuration. In most cases (or maybe even all), where a certain value type is expected
+			in a configuration file, a value can be given with a unit, so that XEFIS knows what are we talking about. So instead of writing <code>15</code> where an altitude
+			is expected, you need to write <code>15 ft</code> or <code>15 nm</code>.
+		</p>
+		<p>
+			Here's a list of various types used in XEFIS and possible units. Unit names are case insensitive.
+			All of the following use 64-bit floating point number for internal representation.
+		</p>
+		<table>
+			<tr>
+				<th scope='col'>Value type</th>
+				<th scope='col'>Possible units</th>
+				<th scope='col'>Example</th>
+			</tr>
+			<tr>
+				<td>angle</td>
+				<td><code>°</code> <code>deg</code> <code>rad</code></td>
+				<td>15 °, 15.0 deg</td>
+			</tr>
+			<tr>
+				<td>frequency</td>
+				<td><code>Hz</code> <code>kHz</code> <code>mHz</code></td>
+				<td>100.20 MHz</td>
+			</tr>
+			<tr>
+				<td>length</td>
+				<td><code>m</code> <code>km</code> <code>ft</code> <code>nm</code> <code>mil</code></td>
+				<td>10000 ft, 3.1 nm</td>
+			</tr>
+			<tr>
+				<td>pressure</td>
+				<td><code>psi</code> <code>hPa</code> <code>inHg</code></td>
+				<td>29.95 inHg, 1013 hPa</td>
+			</tr>
+			<tr>
+				<td>speed</td>
+				<td><code>kt</code> <code>kph</code> <code>fpm</code></td>
+				<td>60 kt, -1500 fpm</td>
+			</tr>
+			<tr>
+				<td>temperature</td>
+				<td><code>K</code> <code>degC</code> <code>degF</code></td>
+				<td>273.15 K, 100 degC</td>
+			</tr>
+			<tr>
+				<td>time</td>
+				<td><code>us</code> <code>ms</code> <code>s</code> <code>min</code> <code>h</code></td>
+				<td>1 us (1 µs), 3.5 h (3 hours 30 minutes)</td>
+			</tr>
+		</table>
+		<p>
+			In addition to those, there are also four basic types: boolean, integer (64-bit), float (64-bit IEEE 754) and string. Those are unitless, so no need to add units
+			after them.
+		</p>
+		<table>
+			<tr>
+				<th scope='col'>Value type</th>
+				<th scope='col'>Possible values</th>
+			</tr>
+			<tr>
+				<td>boolean</td>
+				<td><code>true</code> <code>false</code></td>
+			</tr>
+			<tr>
+				<td>integer</td>
+				<td>Any 64-bit signed integer value</td>
+			</tr>
+			<tr>
+				<td>float</td>
+				<td>Any 64-bit floating point number</td>
+			</tr>
+			<tr>
+				<td>string</td>
+				<td><code>Just a string, without any quotes</code></td>
+			</tr>
+		</table>
+		<p>
+			For all floating point values, a dot is used as a decimal separator.
+		</p>
+	</section>
+	<section id='property-database'>
+		<h1>Property database</h1>
+	</section>
+	<section id='standard-configuration-format'>
+		<h1>Standard configuration format</h1>
+		<p>This is standarized XML format for configuring most of the modules.</p>
+		<section id='settings'>
+			<h1>Settings</h1>
+			<p>Settings are hard-configured values, which cannot be changed during program operation.</p>
+		</section>
+		<section id='properties'>
+			<h1>Properties</h1>
+			<p>Properties</p>
+		</section>
+	</section>
+</doc:page>

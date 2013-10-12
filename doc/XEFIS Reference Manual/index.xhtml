@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:index xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:noxslt><p style='color: red; font-size: 200%;'>This document requires browser that supports XSLT transformations - yours doesn't.</p></doc:noxslt>
+	<doc:meta>
+		<doc:title>XEFIS Reference Manual</doc:title>
+	</doc:meta>
+	<section class='frontpage'>
+		<h1>XEFIS RC model avionics</h1>
+		<figure><img src='images/introduction.png'/></figure>
+		<p class='warning'>Warning: Do not read during flight!</p>
+	</section>
+	<section>
+		<h1>Table of Contents</h1>
+		<ol>
+			<li><a href='#introduction'>Introduction</a></li>
+			<li><a href='technical-introduction.xhtml'>Technical introduction</a></li>
+			<li><a href='modules.xhtml'>Modules</a></li>
+		</ol>
+	</section>
+	<section id='introduction'>
+		<h1>Introduction</h1>
+		<p>XEFIS is modular avionics software designed for remote controlled airplanes. It can work in a flight computer (performing stabilization, flight-envelope protection, autoflight, etc)
+		and in a ground control station, mainly as an interface for you input controls and showing flight instruments.</p>
+		<section>
+			<h1>Hardware</h1>
+			<p>You'll need at least two computers: one for the aircraft and one for the ground control station.</p>
+			<p>For the aircraft, something ARM-based should be OK. It should have a lot of useful
+			interfaces (several serial ports, I²C, analog inputs, etc.) for external sensors. It doesn't need to be very powerful, something like Raspberry Pi or Beagle Bone Black should work perfectly.</p>
+			<p>On a ground control station you'll need something more powerful, maybe dual-core Atom mini ITX motherboard.
+			Or you can just use a notebook PC.</p>
+		</section>
+	</section>
+</doc:index>
