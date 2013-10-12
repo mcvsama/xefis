@@ -1,0 +1,28 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:module xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:meta>
+		<doc:title>Slip-skid</doc:title>
+		<doc:name>systems/slip-skid</doc:name>
+	</doc:meta>
+	<p>Slip-skid module computes slip-skid indicator basing on Y- and Z-acceleration vectors.</p>
+	<section>
+		<h1>Input</h1>
+		<doc:properties>
+			<doc:item name='acceleration.y' type='float'>
+				<p>Y axis acceleration. Y is left-right axis.</p>
+			</doc:item>
+			<doc:item name='acceleration.z' type='float'>
+				<p>Z axis acceleration. Z is top-bottom axis.</p>
+			</doc:item>
+		</doc:properties>
+	</section>
+	<section>
+		<h1>Output</h1>
+		<doc:properties>
+			<doc:item name='slip-skid' type='float'>
+				<p>Indicated slip-skid. If either of input values is <var>nil</var>, this property will also be <var>nil</var>.</p>
+			</doc:item>
+		</doc:properties>
+	</section>
+</doc:module>

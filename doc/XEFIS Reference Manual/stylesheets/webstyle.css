@@ -1,0 +1,351 @@
+@charset "UTF-8";
+
+html {
+	color: #000;
+	background: #fff;
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 0;
+	font-family: 'Droid Sans', sans-serif;
+	font-size: 11pt;
+	line-height: 140%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+header {
+	background: #000;
+	color: #fff;
+	padding: 0.5em 1em;
+	border-radius: 0 0 0.5em 0.5em;
+}
+
+header h1 {
+	margin: 0;
+	padding: 0.25em 0;
+	font-size: 180%;
+	line-height: 150%;
+}
+
+header a:link,
+header a:visited,
+header a:hover,
+header a:active {
+	color: #fff;
+	text-decoration: none;
+}
+
+footer {
+	border-top: 4px solid #000;
+	margin-top: 4em;
+}
+
+footer a:link,
+footer a:visited,
+footer a:hover,
+footer a:active {
+	color: #000;
+}
+
+h1, h2, h3, h4 {
+	line-height: 150%;
+}
+
+h1 {
+	font-size: 200%;
+	line-height: 120%;
+	margin: 1em 0;
+}
+
+section section h1,
+h2 {
+	font-size: 160%;
+	margin: 1em 0;
+}
+
+section section section h1,
+h3 {
+	font-size: 120%;
+	margin: 1em 0;
+}
+
+section section section section h1,
+h4 {
+	font-size: 100%;
+	margin: 1em 0;
+}
+
+p {
+	text-align: justify;
+}
+
+tt, pre, code {
+	font-family: 'Droid Sans Mono', sans-serif;
+}
+
+code {
+	box-shadow: 0px 1px 2px #888;
+	padding: 0 0.2em;
+	border-radius: 0.15em;
+}
+
+var {
+	color: #367534;
+}
+
+figure {
+	margin: 2em auto;
+}
+
+figure img {
+	display: block;
+	margin: 0 auto;
+	box-shadow: 0px 1px 3px #555;
+	border-radius: 0.3em;
+}
+
+figcaption {
+	margin: 0.5em 0 1em;
+	text-align: center;
+}
+
+table {
+	border: 1px solid #000;
+	border-collapse: collapse;
+	outline: 1px solid #000;
+	margin: 1.5em auto;
+	min-width: 70%;
+}
+
+table.items {
+	width: 100%;
+	border: 1px solid #000;
+	border-collapse: collapse;
+	outline: 1px solid #000;
+	margin: 1.5em auto;
+}
+
+table.items td.setting,
+table.items td.property {
+	font-family: 'Droid Sans Mono', sans-serif;
+	white-space: nowrap;
+}
+
+table.items th.group {
+	background: #eee;
+	text-align: left;
+}
+
+th,
+td {
+	border: 1px solid #000;
+	padding: 0.25em 0.5em;
+}
+
+th {
+	text-align: center;
+	background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.3) 100%);
+	color: #000;
+}
+
+td {
+	text-align: left;
+	vertical-align: top;
+}
+
+tr.main th {
+	padding: 0.5em 0.5em;
+}
+
+td p {
+	margin: 0;
+}
+
+td > p + p {
+	margin-top: 0.5em;
+}
+
+a {
+	text-decoration: none;
+	padding: 0.1em 0;
+}
+
+a:link {
+	color: blue;
+}
+
+a:hover {
+	color: red;
+}
+
+a:visited {
+	color: #5100C2;
+}
+
+:focus {
+	outline: 2px solid blue;
+}
+
+:focus:active {
+	outline: 2px solid red;
+}
+
+:lang(en-us) q {
+	quotes: "\201c" "\201d" "\2018" "\2019";
+}
+
+li {
+	margin: 0;
+	padding: 0;
+}
+
+li p {
+	margin: 0;
+	padding: 0;
+}
+
+li p + p {
+	margin-top: 1em;
+}
+
+.frontpage {
+	margin: 3em 0;
+}
+
+.frontpage h1 {
+	font-size: 350%;
+	text-align: center;
+}
+
+.frontpage img {
+	border-radius: 0.5em;
+}
+
+.frontpage p {
+	margin: 3em 0;
+}
+
+.frontpage .warning {
+	border: 2px solid #000;
+	border-radius: 0.25em;
+	text-align: center;
+	margin: 3em auto;
+	padding: 0.5em 0;
+	font-size: 150%;
+	font-weight: bold;
+	width: 896px;
+}
+
+ol.toc,
+ol.toc ol {
+	list-style-type: none;
+}
+
+ol.toc {
+	counter-reset: toc1;
+	list-style-type: none;
+}
+
+ol.toc li:before {
+	float: left;
+	display: block;
+	text-align: right;
+	padding-right: 1.2ex;
+}
+
+ol.toc {
+	padding-left: 1ex;
+}
+
+ol.toc ol {
+	padding-left: 4ex;
+}
+
+ol.toc ol ol {
+	padding-left: 5.5ex;
+}
+
+ol.toc > li {
+	counter-increment: toc1;
+	counter-reset: toc2;
+}
+
+ol.toc ol > li {
+	counter-increment: toc2;
+	counter-reset: toc3;
+}
+
+ol.toc ol ol > li {
+	counter-increment: toc3;
+	counter-reset: none;
+}
+
+ol.toc > li:before {
+	content: counter(toc1, decimal) ".";
+	width: 2.5ex;
+}
+
+ol.toc ol > li:before {
+	content: counter(toc1, decimal) "." counter(toc2, decimal) ".";
+	width: 4ex;
+}
+
+ol.toc ol ol > li:before {
+	content: counter(toc1, decimal) "." counter(toc2, decimal) "." counter(toc3, decimal) ".";
+	width: 5.5ex;
+}
+
+ul.files {
+	padding: 0;
+}
+
+ul.files li {
+	display: block;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+ul.files li a {
+	display: block;
+	margin: 0;
+	padding: 0.5em 1em;
+	text-decoration: none;
+	border: 1px solid transparent;
+}
+
+ul.files li a:hover {
+	background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.2) 100%);
+	border-radius: 0.25em;
+	border: 1px solid #ccc;
+	border-color: #ddd #bbb #aaa #bbb
+}
+
+ul.files p {
+	margin: 0;
+}
+
+ul.files .title {
+	color: #000;
+}
+
+ul.files .module-name {
+	background: none;
+	padding: 0;
+	margin: 0;
+}
+
+.module-name {
+	font-family: 'Droid Sans Mono', sans-serif;
+	font-size: 100%;
+	background: #ddd;
+	padding-left: 0.25ex;
+	padding-right: 0.25ex;
+	border-radius: 0.15em;
+	margin-left: 1em;
+	font-weight: normal;
+}
+

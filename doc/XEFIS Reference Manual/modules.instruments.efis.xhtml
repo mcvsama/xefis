@@ -1,0 +1,450 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:module xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:meta>
+		<doc:title>EFIS - Electronic Flight Instrument System</doc:title>
+		<doc:name>instruments/efis</doc:name>
+	</doc:meta>
+	<p>Speed, altitude, attitude indicators and more in one instrument.</p>
+	<doc:toc/>
+	<section id='features'>
+		<h1>Features description</h1>
+		<section id='styles'>
+			<h1>Styles</h1>
+			<p>One of two styles can be selected using a <code>style.old</code> property. The <q>old</q> style
+			isn't as accurately made as the normal style, but still gives quite good feel of pre-787 EFIS.</p>
+			<figure>
+				<img src='images/modules.instruments.efis.png' height='473'/>
+				<figcaption>Modern style: property <code>style.old</code> is <var>false</var></figcaption>
+			</figure>
+			<figure>
+				<img src='images/modules.instruments.efis.old-style.png' height='473'/>
+				<figcaption>Old style: property <code>style.old</code> is <var>true</var></figcaption>
+			</figure>
+		</section>
+		<section id='raising-runway'>
+			<h1>Raising runway</h1>
+			<p>A raising runway will be drawn on EFIS, showing deviation from the runway position, if following points are met:</p>
+			<ul>
+				<li>approach reference is set to visible,</li>
+				<li>radio altimeter input is valid,</li>
+				<li>radio altitude is below 1000 ft AGL,</li>
+				<li>lateral flight path deviation input is valid.</li>
+			</ul>
+			<p>Raising runway is a green runway symbol, changing its position from bottom to the horizon line as the aircraft descend (radio altitude input is decreasing).</p>
+		</section>
+	</section>
+	<section id='configuration'>
+		<h1>Configuration</h1>
+		<p>Settings and properties XML format follow <a href='technical-introduction.xhtml#standard-configuration-format'>standard configuration format</a>.</p>
+		<section id='settings'>
+			<h1>Settings</h1>
+			<doc:settings>
+				<doc:item name='speed-ladder.line-every' type='integer'>
+					Draw line on the speed ladder every <var>n</var> knots. Default: 10.
+				</doc:item>
+				<doc:item name='speed-ladder.number-every' type='integer'>
+					Draw number on the speed ladder every <var>n</var> knots. Default: 20.
+				</doc:item>
+				<doc:item name='speed-ladder.extent' type='integer'>
+					How many knots should fit on the speed ladder? On Boeing 787 it's about 124. For RC models a good value would be between 12…15. Default: 124.
+				</doc:item>
+				<doc:item name='speed-ladder.minimum' type='integer'>
+					Minimum speed value displayed on the speed ladder. Default: 20.
+				</doc:item>
+				<doc:item name='speed-ladder.maximum' type='integer'>
+					Maximum speed value displayed on the speed ladder. Default: 450.
+				</doc:item>
+				<doc:item name='altitude-ladder.line-every' type='integer'>
+					Draw line on altitude ladder every <var>n</var> feet. Default: 100.
+				</doc:item>
+				<doc:item name='altitude-ladder.number-every' type='integer'>
+					Draw number on the speed ladder every <var>n</var> feet. Default: 200.
+				</doc:item>
+				<doc:item name='altitude-ladder.emphasis-every' type='integer'>
+					Draw emphasis (top and bottom lines) on the number every <var>n</var> feet. Default: 1000.
+				</doc:item>
+				<doc:item name='altitude-ladder.bold-every' type='integer'>
+					Draw bold line on altitude ladder every <var>n</var> feet.
+				</doc:item>
+				<doc:item name='altitude-ladder.extent' type='integer'>
+					How many feet should fit on the altitude ladder.
+				</doc:item>
+				<doc:item name='altitude.landing.warning.hi' type='length'>
+					Langing altitude approach indicator. This indicates position of its top.
+				</doc:item>
+				<doc:item name='altitude.landing.warning.lo' type='length'>
+					Langing altitude approach indicator. This indicates position of the top of amber color strip.
+				</doc:item>
+			</doc:settings>
+		</section>
+		<section id='input'>
+			<h1>Input</h1>
+			<section id='speed-indication'>
+				<h1>Speed indication</h1>
+				<p>Speed is displayed on left vertical ladder. Speed is always shown in knots (nautical miles per hour).</p>
+				<doc:properties>
+					<doc:group title='Airspeed information'>
+						<doc:item name='speed.ias.serviceable' type='boolean'>
+							IAS serviceable flag. If <var>false</var>, <q>SPD</q> flag will be shown instead of speed ladder.
+							Used to indicate hardware problem with the IAS sensor.
+						</doc:item>
+						<doc:item name='speed.ias' type='speed'>
+							IAS for speed ladder.
+							If <var>nil</var> scale will disappear, but the ladder will be present.
+						</doc:item>
+						<doc:item name='speed.ias.lookahead' type='speed'>
+							Estimated IAS in 10 seconds from now. Shown as green arrow on the speed ladder.
+						</doc:item>
+						<doc:item name='speed.ias.minimum' type='speed'>
+							If not <var>nil</var>, a black-red danger zone will be drawn on the speed ladder from the bottom to the given value.
+						</doc:item>
+						<doc:item name='speed.ias.minimum-maneuver' type='speed'>
+							If not <var>nil</var>, tells the minimum maneuvering speed. The indicator is drawn as yellow line beside the speed ladder.
+						</doc:item>
+						<doc:item name='speed.ias.maximum-maneuver' type='speed'>
+							If not <var>nil</var>, tells the maximum maneuvering speed. The indicator is drawn as yellow line beside the speed ladder.
+						</doc:item>
+						<doc:item name='speed.ias.maximum' type='speed'>
+							If not <var>nil</var>, a black-red danger zone will be drawn on the speed ladder from the top to the given value.
+						</doc:item>
+						<doc:item name='speed.mach' type='float'>
+							Mach index to be drawn under the speed ladder.
+						</doc:item>
+					</doc:group>
+					<doc:group title='Speed bugs'>
+						<doc:item name='speed.v1' type='speed'>
+							V1 speed bug to be drawn on the speed ladder.
+						</doc:item>
+						<doc:item name='speed.vr' type='speed'>
+							Vr (rotation speed) bug to be drawn on the speed ladder.
+						</doc:item>
+						<doc:item name='speed.vref' type='speed'>
+							Vref (refusal speed) bug to be drawn on the speed ladder.
+						</doc:item>
+					</doc:group>
+				</doc:properties>
+			</section>
+			<section id='attitude-and-heading'>
+				<h1>Attitude and heading</h1>
+				<p>Optional heading information can be set with <code>orientation.heading.numbers-visible</code>.</p>
+				<doc:properties>
+					<doc:item name='orientation.serviceable' type='boolean'>
+						Attitude serviceable flag. If <var>false</var>, <q>ATT</q> flag will be shown in the center of EFIS.
+						Used to indicate hardware problem with the AHRS sensor.
+					</doc:item>
+					<doc:item name='orientation.pitch' type='angle'>
+						Pitch information from the AHRS sensor.
+					</doc:item>
+					<doc:item name='orientation.roll' type='angle'>
+						Roll information from the AHRS sensor.
+					</doc:item>
+					<doc:item name='orientation.heading.magnetic' type='angle'>
+						Current magnetic heading information from the AHRS sensor.
+					</doc:item>
+					<doc:item name='orientation.heading.true' type='angle'>
+						Current true heading information from the AHRS sensor.
+					</doc:item>
+					<doc:item name='orientation.heading.numbers-visible' type='boolean'>
+						If <var>true</var>, heading scale will be drawn over the horizon line.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section id='track'>
+				<h1>Track</h1>
+				<doc:properties>
+					<doc:item name='track.lateral.magnetic' type='angle'>
+					</doc:item>
+					<doc:item name='track.lateral.true' type='angle'>
+					</doc:item>
+					<doc:item name='track.vertical' type='angle'>
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section id='slip-skid-indicator'>
+				<h1>Slip-skid indicator</h1>
+				<p>The slip-skid indicator has form of rectangle located under triangular roll bug.</p>
+				<doc:properties>
+					<doc:item name='slip-skid' type='float'>
+						Current slip-skid value.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section id='flight-path-vector'>
+				<h1>Flight Path Vector</h1>
+				<p>Sometimes called Flight Path Marker. Shows actual flight path in relation to the ground (the horizon line).
+				It is computed from <code>track.*</code> properties.</p>
+				<doc:properties>
+					<doc:item name='fpv.visible' type='boolean'>
+						If <var>true</var>, flight path marker is drawn on EFIS.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section id='angle-of-attack'>
+				<h1>Angle of Attack</h1>
+			</section>
+			<doc:properties>
+				<doc:item name='aoa.alpha' type='angle'>
+					Angle of attack alpha value (often called just <q>angle of attack</q>).
+				</doc:item>
+				<doc:item name='aoa.warning-threshold' type='angle'>
+					Minimum angle of attack for which pitch limit will be drawn on EFIS.
+				</doc:item>
+				<doc:item name='aoa.critical' type='angle'>
+					Current critical AOA.
+				</doc:item>
+				<doc:item name='aoa.critical.visible' type='boolean'>
+					If <var>true</var> and if <code>aoa.critical - aoa.alpha</code> is less than <code>aoa.warning-threshold</code>,
+					pitch limit indicator will be drawn.
+				</doc:item>
+			</doc:properties>
+			<section>
+				<h1>Pressure and radio altitude</h1>
+				<p>Current pressure altitude is displayed on the right vertical ladder. Altitude is always displayed in feet.
+				Vertical speed and variometer diamond are shown on the right of the altitude ladder.</p>
+				<doc:properties>
+					<doc:item name='altitude.amsl.serviceable' type='boolean'>
+						Altitude failure flag. When <var>false</var>, an <q>ALT</q> flag will be drawn
+						instead of the altitude ladder. Used to indicate hardware problem with the static pressure sensor.
+					</doc:item>
+					<doc:item name='altitude.amsl' type='length'>
+						Current AMSL pressure altitude. If <var>nil</var>, scale will not be drawn on the ladder, but the ladder will remain visible.
+					</doc:item>
+					<doc:item name='altitude.amsl.lookahead' type='length'>
+						Estimated altitude in 10 seconds from now. Shown as green arrow on the altitude ladder.
+					</doc:item>
+					<doc:item name='altitude.agl.serviceable' type='boolean'>
+						Radar altitude serviceable flag. If <var>false</var>, <q>RA</q> flag will be displayed
+						instead of indicated altitude AGL. Used to indicate hardware problem with radar altimeter sensor.
+					</doc:item>
+					<doc:item name='altitude.agl' type='length'>
+						Current radar altitude (altitude AGL). Hidden above 2500 feet AGL.
+					</doc:item>
+					<doc:item name='altitude.minimums.type' type='string'>
+						Minimums type (eg. "BARO", "RADIO").
+					</doc:item>
+					<doc:item name='altitude.minimums.setting' type='length'>
+						Minimums setting, displayed under the ADI.
+					</doc:item>
+					<doc:item name='altitude.minimums.amsl' type='length'>
+						Minimums indicator position on the altitude ladder.
+					</doc:item>
+					<doc:item name='altitude.landing.amsl' type='length'>
+						Landing altitude. If not <var>nil</var>, landing/ground altitude indicator will be shown on altitude ladder.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Vertical speed</h1>
+				<doc:properties>
+					<doc:item name='vertical-speed.serviceable' type='boolean'>
+						Climb rate serviceable flag. If <var>false</var>, a <q>VERT</q> flag will be displayed instead
+						of vertical speed scale. Used to indicate hardware problem with vertical speed sensor (or static
+						pressure sensor).
+					</doc:item>
+					<doc:item name='vertical-speed' type='speed'>
+						Current vertical speed. If <var>nil</var>, no scale will be displayed on the vertical speed ladder, but the ladder will remain visible.
+					</doc:item>
+					<doc:item name='vertical-speed.variometer' type='speed'>
+						Variometer indicator to be shown on the vertical speed ladder, if not <var>nil</var>.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Air pressure settings</h1>
+				<doc:properties>
+					<doc:item name='pressure.qnh' type='pressure'>
+						QNH pressure setting. Drawn under the altitude ladder.
+					</doc:item>
+					<doc:item name='pressure.display-hpa' type='boolean'>
+						Display QNH pressure setting in hPa instead of inHg.
+					</doc:item>
+					<doc:item name='pressure.use-std' type='boolean'>
+						Draw STD pressure setting flag.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Flight director</h1>
+				<doc:properties>
+					<doc:item name='flight-director.serviceable' type='boolean'>
+						FD serviceable flag. If <var>false</var>, <q>FD</q> flag will be drawn.
+					</doc:item>
+				</doc:properties>
+				<section>
+					<h1>Command settings</h1>
+					<p>Command settings are displayed on top of speed and altitude ladders, and also
+					as bugs on speed, altitude and vertical speed ladders.</p>
+					<doc:properties>
+						<doc:item name='flight-director.cmd.visible' type='boolean'>
+							Display flight director settings and bugs.
+						</doc:item>
+						<doc:item name='flight-director.cmd.altitude' type='length'>
+							Altitude setting.
+						</doc:item>
+						<doc:item name='flight-director.cmd.altitude.acquired' type='boolean'>
+							Draw emphasis around altitude setting. Used when aircraft is approaching
+							configured altitude.
+						</doc:item>
+						<doc:item name='flight-director.cmd.ias' type='speed'>
+							IAS setting.
+						</doc:item>
+						<doc:item name='flight-director.cmd.vertical-speed' type='speed'>
+							Vertical speed setting. Not displayed numerically, but only as a bug on vertical speed ladder.
+						</doc:item>
+					</doc:properties>
+				</section>
+				<section>
+					<h1>Guidance</h1>
+					<p>FD guidance lines form a pink cross on the EFIS telling the pilot how to follow FDs flight path.
+					If just one source is available (vertical or lateral) the other one being <var>nil</var>, only one line will be drawn.</p>
+					<doc:properties>
+						<doc:item name='flight-director.guidance.visible' type='boolean'>
+							Draw flight director guidance cross.
+						</doc:item>
+						<doc:item name='flight-director.guidance.pitch' type='angle'>
+							Flight director pitch guide.
+						</doc:item>
+						<doc:item name='flight-director.guidance.roll' type='angle'>
+							Flight director roll guide.
+						</doc:item>
+					</doc:properties>
+				</section>
+			</section>
+			<section>
+				<h1>Stick position indicator</h1>
+				<p>Stick position indicator is a small, green cross drawn in the center, if the stick is not moved.
+				It might be useful for fly-by-wire systems, to indicate the attitude pilot wants to acquire.</p>
+				<doc:properties>
+					<doc:item name='control-stick.visible' type='boolean'>
+						Display stick position indicator.
+					</doc:item>
+					<doc:item name='control-stick.pitch' type='angle'>
+						Stick position pitch.
+					</doc:item>
+					<doc:item name='control-stick.roll' type='angle'>
+						Stick position roll.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Approach information</h1>
+				<doc:properties>
+					<doc:item name='approach.reference-visible' type='boolean'>
+					</doc:item>
+					<doc:item name='approach.type-hint' type='string'>
+					</doc:item>
+					<doc:item name='approach.localizer-id' type='string'>
+					</doc:item>
+					<doc:item name='approach.dme-distance' type='length'>
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Flight path deviation</h1>
+				<p>Two ladders can be displayed, on the right of the center point and on the bottom of the instrument.</p>
+				<p>Two styles are available - ILS type and flight path deviation type ladders.</p>
+				<doc:properties>
+					<doc:item name='flight-path.deviation.vertical.serviceable' type='boolean'>
+					</doc:item>
+					<doc:item name='flight-path.deviation.vertical' type='angle'>
+					</doc:item>
+					<doc:item name='flight-path.deviation.lateral.serviceable' type='boolean'>
+					</doc:item>
+					<doc:item name='flight-path.deviation.lateral' type='angle'>
+					</doc:item>
+					<doc:item name='flight-path.deviation.use-ils-style' type='boolean'>
+						Use ILS-style indicators for flight path deviation.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Flight mode information</h1>
+				<section>
+					<h1>Flight mode hint</h1>
+					<doc:properties>
+						<doc:item name='flight-mode.hint.visible' type='boolean'>
+						</doc:item>
+						<doc:item name='flight-mode.hint' type='string'>
+						</doc:item>
+					</doc:properties>
+				</section>
+				<section>
+					<h1>Flight Mode Annunciator</h1>
+					<doc:properties>
+						<doc:item name='flight-mode.fma.visible' type='boolean'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.speed-hint' type='string'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.speed-small-hint' type='string'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.lateral-hint' type='string'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.lateral-small-hint' type='string'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.vertical-hint' type='string'>
+						</doc:item>
+						<doc:item name='flight-mode.fma.vertical-small-hint' type='string'>
+						</doc:item>
+					</doc:properties>
+				</section>
+			</section>
+			<section>
+				<h1>TCAS Resolution Advisory</h1>
+				<doc:properties>
+					<doc:item name='tcas.resolution-advisory.pitch.minimum' type='angle'>
+					</doc:item>
+					<doc:item name='tcas.resolution-advisory.pitch.maximum' type='angle'>
+					</doc:item>
+					<doc:item name='tcas.resolution-advisory.vertical-speed.minimum' type='speed'>
+					</doc:item>
+					<doc:item name='tcas.resolution-advisory.vertical-speed.maximum' type='speed'>
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>General warning/failure flags</h1>
+				<p>These flags indicate that required data was not entered into the system, or a hardware problem with sensors.</p>
+				<p>If their value is <var>false</var> or <var>nil</var>, they're not displayed.</p>
+				<doc:properties>
+					<doc:item name='warning.novspd-flag' type='boolean'>
+						Display <q>NO VSPD</q> flag. Used when no V1 and Vr speeds are entered to the flight plan computer.
+					</doc:item>
+					<doc:item name='warning.ldgalt-flag' type='boolean'>
+						Display <q>LDG ALT</q> flag. Used when no landing altitude has been set.
+					</doc:item>
+					<doc:item name='warning.pitch-disagree' type='boolean'>
+						Display <q>PITCH</q> flag. Tells that pitch on main and backup AHRS sensors are different (usually by more
+						than 5 degrees).
+					</doc:item>
+					<doc:item name='warning.roll-disagree' type='boolean'>
+						Display <q>ROLL</q> flag. Tells that roll on main and backup AHRS sensors are different (usually by more
+						than 5 degrees).
+					</doc:item>
+					<doc:item name='warning.ias-disagree' type='boolean'>
+						Display <q>IAS DISAGREE</q> flag on speed ladder. Tells that IAS from main and backup sensors are different.
+					</doc:item>
+					<doc:item name='warning.altitude-disagree' type='boolean'>
+						Display <q>ALT DISAGREE</q> flag on altitude ladder. Tells that altitude from main and backup sensors are different.
+					</doc:item>
+					<doc:item name='warning.roll' type='boolean'>
+						Display filled roll indicator, as a warning about bank angle.
+					</doc:item>
+					<doc:item name='warning.slip-skid' type='boolean'>
+						Display filled with amber color slip-skid indicator, as a warning about too much slip-skid.
+					</doc:item>
+				</doc:properties>
+			</section>
+			<section>
+				<h1>Style</h1>
+				<doc:properties>
+					<doc:item name='style.old' type='boolean'>
+						Draw EFIS in pre-787 style (black background, artificial horizon in the center only).
+						It's a property instead of a setting so that user can switch the style in real time eg. for
+						night flying.
+					</doc:item>
+				</doc:properties>
+			</section>
+		</section>
+	</section>
+</doc:module>
