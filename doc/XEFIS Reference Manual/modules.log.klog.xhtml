@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:module xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:meta>
+		<doc:title>KLog - Kernel Ring Buffer health check</doc:title>
+		<doc:name>log/klog</doc:name>
+	</doc:meta>
+	<p>This module searches in Linux kernel ring buffer for problem indicators, then sets appropriate boolean flags,
+	which can be forwarded to the ground station for pilot information. The search is done in case-insensitive manner.</p>
+	<section>
+		<h1>Output</h1>
+		<doc:properties>
+			<doc:item name='flag.oom' type='boolean'>
+				<p>Set to true once <q>oom-killer</q> string is found in kernel ring buffer.</p>
+			</doc:item>
+			<doc:item name='flag.io' type='boolean'>
+				<p>Set to true once <q>i/o error</q> string is found in kernel ring buffer.</p>
+			</doc:item>
+			<doc:item name='flag.oops' type='boolean'>
+				<p>Set to true once <q>oops</q> string is found in kernel ring buffer.</p>
+			</doc:item>
+			<doc:item name='flag.bug' type='boolean'>
+				<p>Set to true once <q>bug</q> string is found in kernel ring buffer.</p>
+			</doc:item>
+		</doc:properties>
+	</section>
+</doc:module>
