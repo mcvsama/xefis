@@ -89,6 +89,13 @@
 	</section>
 	<section id='property-database'>
 		<h1>Property database</h1>
+		<p>Everything in XEFIS happens around the property database. It's a tree structure, much like a filesystem, with directories and
+		properties on its leaves. Every property is a place to store a value of one of types mentioned earlier.</p>
+		<p>Modules read and write data to properties, it's their main interface to other modules. A speed sensor module will typically read
+		data from the hardware (by using mechanisms like RS-232 port, I2C bus, etc.), and write computed IAS speed to a configured property.
+		Then, other modules can read that information for their purposes.</p>
+		<p>As a user, you have to tell all the loaded modules, where to store the data. This is done in module's XML configuration.
+		The format is described in next section.</p>
 	</section>
 	<section id='standard-configuration-format'>
 		<h1>Standard configuration format</h1>
