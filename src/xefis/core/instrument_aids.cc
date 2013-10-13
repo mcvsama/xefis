@@ -94,9 +94,9 @@ InstrumentAids::get_digit_width (QFont& font) const
 
 
 float
-InstrumentAids::translate_descent (QFontMetricsF const& metrics_1, QFontMetricsF const& metrics_2)
+InstrumentAids::translate_descent (QFontMetricsF const& smaller_metrics, QFontMetricsF const& bigger_metrics)
 {
-	return metrics_2.height() - metrics_2.descent() - metrics_1.height() + metrics_1.descent();
+	return bigger_metrics.height() - bigger_metrics.descent() - smaller_metrics.height() + smaller_metrics.descent();
 }
 
 } // namespace Xefis

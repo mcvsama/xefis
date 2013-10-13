@@ -146,6 +146,7 @@
 							</directory>
 							<directory path='/style'>
 								<property name='style.old' path='/old' default='false'/>
+								<property name='style.show-metric' path='/show-metric' default='true'/>
 							</directory>
 						</properties>
 					</module>

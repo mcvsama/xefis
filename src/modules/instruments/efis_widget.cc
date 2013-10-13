@@ -1080,6 +1080,7 @@ EFISWidget::PaintWorkUnit::al_post_resize()
 	_al_s_digits_box = QRectF (0.f, 0.f, s_digits * s_digit_width, 2.f * b_digit_height - 2.f * _al_margin);
 	_al_black_box_rect = QRectF (0.f, -0.5f * _al_b_digits_box.height() - _al_margin,
 								 _al_b_digits_box.width() + _al_s_digits_box.width() + 2.f * _al_margin, _al_b_digits_box.height() + 2.f * _al_margin);
+	_al_metric_box_rect = QRectF (_al_black_box_rect.topLeft() - QPointF (0.f, 1.25f * _font_16_digit_height), _al_black_box_rect.topRight());
 	_al_b_digits_box.translate (_al_margin, -0.5f * _al_b_digits_box.height());
 	_al_s_digits_box.translate (_al_margin + _al_b_digits_box.width(), -0.5f * _al_s_digits_box.height());
 }
@@ -1156,15 +1157,17 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 	float const s_digit_width = _font_16_digit_width;
 	float const s_digit_height = _font_16_digit_height;
 
+	QFont m_font = _font_13;
+
+	QFontMetricsF s_metrics (s_font);
+	QFontMetricsF m_metrics (m_font);
+
 	if (!_params.altitude_visible)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
 	painter.translate (-0.75f * x, 0.f);
-
-	painter.setPen (_al_black_box_pen);
-	painter.setBrush (Qt::black);
 
 	QPolygonF black_box_polygon = QPolygonF()
 		<< QPointF (-0.5f * x, 0.f)
@@ -1175,6 +1178,35 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 		<< _al_black_box_rect.bottomLeft()
 		<< QPointF (0.f, +0.5f * x);
 
+	if (_params.show_metric)
+	{
+		painter.setPen (_al_black_box_pen);
+		painter.setBrush (Qt::black);
+
+		// Metric box:
+		QColor ps = painter.shadow_color();
+		painter.set_shadow_color (Qt::black);
+		painter.add_shadow (1.95f, [&]() {
+			painter.drawRect (_al_metric_box_rect);
+		});
+		painter.set_shadow_color (ps);
+
+		// Metric value:
+		float ycorr = 0.035f * m_metrics.height();
+		float xcorr = 0.25f * m_metrics.width (" ");
+		QPointF m_pos (_al_metric_box_rect.right() - 1.5f * m_metrics.width ("M"), _al_metric_box_rect.center().y() + ycorr);
+		painter.setPen (get_pen (QColor (0x00, 0xee, 0xff), 1.f));
+		painter.setFont (m_font);
+		painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
+		painter.setPen (get_pen (Qt::white, 1.f));
+		painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
+								QString ("%1").arg (std::round (_params.altitude.m()), 0, 'f', 0));
+	}
+
+	painter.setPen (_al_black_box_pen);
+	painter.setBrush (Qt::black);
+
+	// Feet box:
 	QColor ps = painter.shadow_color();
 	painter.set_shadow_color (Qt::black);
 	painter.add_shadow (1.95f, [&]() {
@@ -1182,6 +1214,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 	});
 	painter.set_shadow_color (ps);
 
+	// Feet value:
 	QRectF box_10000 = QRectF (_al_b_digits_box.topLeft(), QSizeF (b_digit_width, _al_b_digits_box.height()));
 	QRectF box_01000 = box_10000.translated (b_digit_width, 0.f);
 	QRectF box_00100 = QRectF (_al_s_digits_box.topLeft(), QSizeF (s_digit_width, _al_b_digits_box.height()));
@@ -1648,11 +1681,16 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 	Length cmd_altitude = Xefis::limit (_params.cmd_altitude, -99999_ft, +99999_ft);
 
 	QFont b_font = _font_20;
+	QFontMetricsF b_metrics (b_font);
 	float const b_digit_width = _font_20_digit_width;
 	float const b_digit_height = _font_20_digit_height;
 
 	QFont s_font = _font_16;
+	QFontMetricsF s_metrics (s_font);
 	float const s_digit_width = _font_16_digit_width;
+
+	QFont m_font = _font_13;
+	QFontMetricsF m_metrics (m_font);
 
 	int const b_digits = 2;
 	int const s_digits = 3;
@@ -1662,13 +1700,35 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 	QRectF s_digits_box (0.f, 0.f, s_digits * s_digit_width + margin, 1.3f * b_digit_height);
 	QRectF box_rect (_al_ladder_rect.left(), _al_ladder_rect.top() - 1.4f * b_digits_box.height(),
 					 b_digits_box.width() + s_digits_box.width(), b_digits_box.height());
+	QRectF metric_rect (box_rect.topLeft() - QPointF (0.f, 1.25f * m_metrics.height()), box_rect.topRight());
 	b_digits_box.translate (box_rect.left(), box_rect.top());
 	s_digits_box.translate (b_digits_box.right(), b_digits_box.top() + 0.f * s_digits_box.height());
 
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
-	painter.setPen (get_pen (QColor (0, 0, 0), 0.5f));
-	painter.setBrush (QBrush (QColor (0, 0, 0)));
+
+	if (_params.show_metric)
+	{
+		painter.setPen (get_pen (Qt::black, 0.5f));
+		painter.setBrush (QBrush (Qt::black));
+
+		// Metric box:
+		painter.drawRect (metric_rect);
+
+		// Metric value:
+		float ycorr = 0.f * m_metrics.height();
+		float xcorr = 0.25f * m_metrics.width (" ");
+		QPointF m_pos (metric_rect.right() - 1.4f * m_metrics.width ("M"), metric_rect.center().y() + ycorr);
+		painter.setPen (get_pen (QColor (0x00, 0xee, 0xff), 1.f));
+		painter.setFont (m_font);
+		painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
+		painter.setPen (get_pen (_autopilot_color, 1.f));
+		painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
+								QString ("%1").arg (std::round (cmd_altitude.m()), 0, 'f', 0));
+	}
+
+	painter.setPen (get_pen (Qt::black, 0.5f));
+	painter.setBrush (QBrush (Qt::black));
 	painter.drawRect (box_rect);
 
 	if (_params.cmd_altitude_acquired)

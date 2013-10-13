@@ -140,6 +140,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "warning.roll", _warning_roll, false },
 				{ "warning.slip-skid", _warning_slip_skid, false },
 				{ "style.old", _style_old, false },
+				{ "style.show-metric", _style_show_metric, false },
 			});
 		}
 	}
@@ -423,7 +424,8 @@ EFIS::read()
 	_efis_widget->set_roll_warning (_warning_roll.read (false));
 	_efis_widget->set_slip_skid_warning (_warning_slip_skid.read (false));
 
-	_efis_widget->set_old_style (_style_old.valid() && *_style_old);
+	_efis_widget->set_old_style (_style_old.read (false));
+	_efis_widget->set_show_metric (_style_show_metric.read (false));
 }
 
 
