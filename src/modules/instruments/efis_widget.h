@@ -48,6 +48,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	{
 	  public:
 		bool					old_style						= false;
+		bool					show_metric						= false;
 		Angle					fov								= 120_deg;
 		bool					input_alert_visible				= false;
 		Angle					pitch							= 0_deg;
@@ -520,6 +521,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QRectF				_al_ladder_rect;
 		QPen				_al_ladder_pen;
 		QRectF				_al_black_box_rect;
+		QRectF				_al_metric_box_rect;
 		QPen				_al_black_box_pen;
 		QPen				_al_scale_pen_1;
 		QPen				_al_scale_pen_2; // Bold one, each 500 ft
@@ -543,6 +545,12 @@ class EFISWidget: public Xefis::InstrumentWidget
 	 */
 	void
 	set_old_style (bool enabled);
+
+	/**
+	 * Enable metric values.
+	 */
+	void
+	set_show_metric (bool enabled);
 
 	/**
 	 * Set how often lines should be drawn on speed ladder.
@@ -1385,6 +1393,14 @@ inline void
 EFISWidget::set_old_style (bool enabled)
 {
 	_params.old_style = enabled;
+	request_repaint();
+}
+
+
+inline void
+EFISWidget::set_show_metric (bool enabled)
+{
+	_params.show_metric = enabled;
 	request_repaint();
 }
 

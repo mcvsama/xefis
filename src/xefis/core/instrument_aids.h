@@ -70,7 +70,7 @@ class InstrumentAids
 	get_digit_width (QFont&) const;
 
 	float
-	translate_descent (QFontMetricsF const& metrics_1, QFontMetricsF const& metrics_2);
+	translate_descent (QFontMetricsF const& smaller_metrics, QFontMetricsF const& bigger_metrics);
 
 	void
 	centrify (QRectF& rectf) const;

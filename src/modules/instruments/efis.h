@@ -172,6 +172,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_warning_slip_skid;
 	// Style
 	Xefis::PropertyBoolean			_style_old;
+	Xefis::PropertyBoolean			_style_show_metric;
 };
 
 
