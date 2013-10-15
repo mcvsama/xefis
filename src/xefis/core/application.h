@@ -91,6 +91,12 @@ class Application: public QApplication
 	window_manager() const;
 
 	/**
+	 * Return ConfigReader object.
+	 */
+	ConfigReader*
+	config_reader() const;
+
+	/**
 	 * Return pointer to navaid storage.
 	 */
 	NavaidStorage*
@@ -190,6 +196,13 @@ inline WindowManager*
 Application::window_manager() const
 {
 	return _window_manager;
+}
+
+
+inline ConfigReader*
+Application::config_reader() const
+{
+	return _config_reader;
 }
 
 

@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/window.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 
@@ -31,7 +32,7 @@
 
 EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 	InstrumentWidget::PaintWorkUnit (efis_widget),
-	InstrumentAids (0.8f, 1.f, 1.f)
+	InstrumentAids (0.8f)
 {
 	_sky_color.setHsv (213, 230, 255);
 	_sky_shadow = _sky_color.darker (400);
@@ -2562,6 +2563,10 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
 	_paint_work_unit (this)
 {
+	auto xw = dynamic_cast<Xefis::Window*> (window());
+	if (xw)
+		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
+
 	setAttribute (Qt::WA_NoBackground);
 
 	_speed_blinking_warning = new QTimer (this);

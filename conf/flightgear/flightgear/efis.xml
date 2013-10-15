@@ -33,7 +33,6 @@
 										<property name='orientation.serviceable' path='/serviceable'/>
 										<property name='orientation.pitch' path='/pitch'/>
 										<property name='orientation.roll' path='/roll'/>
-										<property name='orientation.roll.limit' path='/roll.limit'/>
 										<property name='orientation.heading.magnetic' path='/heading.magnetic'/>
 										<property name='orientation.heading.true' path='/heading.true'/>
 										<property name='orientation.heading.numbers-visible' path='/heading.numbers-visible'/>

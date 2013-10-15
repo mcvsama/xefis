@@ -27,6 +27,7 @@
 #include <xefis/core/application.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/property.h>
+#include <xefis/core/config_reader.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/i2c.h>
 #include <xefis/utility/logger.h>
@@ -45,68 +46,6 @@ class ModuleManager;
 class Module: private Noncopyable
 {
   public:
-	struct NameAndProperty
-	{
-		NameAndProperty (QString const& name, TypedProperty& property, bool required):
-			name (name), property (property), required (required)
-		{ }
-
-		QString			name;
-		TypedProperty&	property;
-		bool			required;
-	};
-
-	struct NameAndSetting
-	{
-		QString			name;
-		bool			required;
-		bool*			value_bool		= nullptr;
-		int8_t*			value_int8		= nullptr;
-		int16_t*		value_int16		= nullptr;
-		int32_t*		value_int32		= nullptr;
-		int64_t*		value_int64		= nullptr;
-		uint8_t*		value_uint8		= nullptr;
-		uint16_t*		value_uint16	= nullptr;
-		uint32_t*		value_uint32	= nullptr;
-		uint64_t*		value_uint64	= nullptr;
-		float*			value_float		= nullptr;
-		double*			value_double	= nullptr;
-		std::string*	value_string	= nullptr;
-		QString*		value_qstring	= nullptr;
-		SI::Value*		value_si_value	= nullptr;
-
-		NameAndSetting (QString const& name, bool& value, bool required);
-
-		NameAndSetting (QString const& name, int8_t& value, bool required);
-
-		NameAndSetting (QString const& name, int16_t& value, bool required);
-
-		NameAndSetting (QString const& name, int32_t& value, bool required);
-
-		NameAndSetting (QString const& name, int64_t& value, bool required);
-
-		NameAndSetting (QString const& name, uint8_t& value, bool required);
-
-		NameAndSetting (QString const& name, uint16_t& value, bool required);
-
-		NameAndSetting (QString const& name, uint32_t& value, bool required);
-
-		NameAndSetting (QString const& name, uint64_t& value, bool required);
-
-		NameAndSetting (QString const& name, float& value, bool required);
-
-		NameAndSetting (QString const& name, double& value, bool required);
-
-		NameAndSetting (QString const& name, std::string& value, bool required);
-
-		NameAndSetting (QString const& name, QString& value, bool required);
-
-		NameAndSetting (QString const& name, SI::Value& value, bool required);
-	};
-
-	typedef std::vector<NameAndProperty>								PropertiesList;
-	typedef std::vector<NameAndSetting>									SettingsList;
-	typedef std::set<QString>											SettingsSet;
 	typedef std::function<Module* (ModuleManager*, QDomElement const&)>	FactoryFunction;
 	typedef std::map<std::string, FactoryFunction>						FactoriesMap;
 
@@ -203,14 +142,14 @@ class Module: private Noncopyable
 	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
-	parse_properties (QDomElement const& properties_element, PropertiesList);
+	parse_properties (QDomElement const& properties_element, ConfigReader::PropertiesParser::PropertiesList);
 
 	/**
 	 * Parse the <settings> element and initialize variables.
 	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
-	parse_settings (QDomElement const& settings_element, SettingsList);
+	parse_settings (QDomElement const& settings_element, ConfigReader::SettingsParser::SettingsList);
 
 	/**
 	 * Return true if given setting has been found in configuration.
@@ -256,132 +195,14 @@ class Module: private Noncopyable
 	static FactoriesMap&
 	factories();
 
-	/**
-	 * Parse int. Support 0x prefix for hexadecimal values.
-	 */
-	template<class TargetInt>
-		TargetInt
-		parse_int (QString const&);
-
   private:
-	ModuleManager*	_module_manager = nullptr;
-	std::string		_name;
-	std::string		_instance;
-	SettingsSet		_settings_set;
-	Xefis::Logger	_logger;
+	ModuleManager*					_module_manager = nullptr;
+	ConfigReader::SettingsParser	_settings_parser;
+	ConfigReader::PropertiesParser	_properties_parser;
+	std::string						_name;
+	std::string						_instance;
+	Xefis::Logger					_logger;
 };
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, bool& value, bool required):
-	name (name),
-	required (required),
-	value_bool (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, int8_t& value, bool required):
-	name (name),
-	required (required),
-	value_int8 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, int16_t& value, bool required):
-	name (name),
-	required (required),
-	value_int16 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, int32_t& value, bool required):
-	name (name),
-	required (required),
-	value_int32 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, int64_t& value, bool required):
-	name (name),
-	required (required),
-	value_int64 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, uint8_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint8 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, uint16_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint16 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, uint32_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint32 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, uint64_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint64 (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, float& value, bool required):
-	name (name),
-	required (required),
-	value_float (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, double& value, bool required):
-	name (name),
-	required (required),
-	value_double (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, std::string& value, bool required):
-	name (name),
-	required (required),
-	value_string (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, QString& value, bool required):
-	name (name),
-	required (required),
-	value_qstring (&value)
-{ }
-
-
-inline
-Module::NameAndSetting::NameAndSetting (QString const& name, SI::Value& value, bool required):
-	name (name),
-	required (required),
-	value_si_value (&value)
-{ }
 
 
 inline
