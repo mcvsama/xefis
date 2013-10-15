@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/window.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -28,8 +29,12 @@
 
 RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
 	InstrumentWidget (parent),
-	InstrumentAids (1.f, 1.f, 1.f)
-{ }
+	InstrumentAids (1.f)
+{
+	auto xw = dynamic_cast<Xefis::Window*> (window());
+	if (xw)
+		InstrumentAids::set_scaling (xw->pen_scale(), xw->font_scale());
+}
 
 
 void

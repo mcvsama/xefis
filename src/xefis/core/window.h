@@ -60,6 +60,18 @@ class Window: public QWidget
 	void
 	data_updated (Time const& update_time);
 
+	/**
+	 * Get pen scaling factor configured for this window.
+	 */
+	float
+	pen_scale() const;
+
+	/**
+	 * Get font scaling factor configured for this window.
+	 */
+	float
+	font_scale() const;
+
   private:
 	QLayout*
 	process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel);

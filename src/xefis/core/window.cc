@@ -106,6 +106,20 @@ Window::data_updated (Time const&)
 }
 
 
+float
+Window::pen_scale() const
+{
+	return _application->config_reader()->pen_scale();
+}
+
+
+float
+Window::font_scale() const
+{
+	return _application->config_reader()->font_scale();
+}
+
+
 QLayout*
 Window::process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel)
 {

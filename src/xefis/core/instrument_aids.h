@@ -34,7 +34,13 @@ class InstrumentAids
 {
   public:
 	// Ctor
-	InstrumentAids (float height_for_width, float master_pen_scale, float master_font_scale);
+	InstrumentAids (float height_for_width);
+
+	/**
+	 * Set master pen and font scaling.
+	 */
+	void
+	set_scaling (float pen_scale, float font_scale);
 
   protected:
 	/**
@@ -142,14 +148,14 @@ InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Q
 inline float
 InstrumentAids::pen_width (float scale) const
 {
-	return std::max (0.f, _master_pen_scale * scale * win_wh() / 460.f);
+	return std::max (0.f, 1.66f * _master_pen_scale * scale);
 }
 
 
 inline float
 InstrumentAids::font_size (float scale) const
 {
-	return std::max (1.f, _master_font_scale * scale * win_wh() / 610.f);
+	return std::max (1.f, 1.26f * _master_font_scale * scale);
 }
 
 

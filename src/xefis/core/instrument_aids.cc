@@ -28,14 +28,20 @@ const char	InstrumentAids::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', 
 const char*	InstrumentAids::MINUS_SIGN = "−";
 
 
-InstrumentAids::InstrumentAids (float height_for_width, float master_pen_scale, float master_font_scale):
-	_height_for_width (height_for_width),
-	_master_pen_scale (master_pen_scale),
-	_master_font_scale (master_font_scale)
+InstrumentAids::InstrumentAids (float height_for_width):
+	_height_for_width (height_for_width)
 {
 	_font = Xefis::Services::instrument_font();
 	_autopilot_color = QColor (250, 70, 255);
 	_navigation_color = QColor (60, 255, 40);
+}
+
+
+void
+InstrumentAids::set_scaling (float pen_scale, float font_scale)
+{
+	_master_pen_scale = pen_scale;
+	_master_font_scale = font_scale;
 }
 
 
