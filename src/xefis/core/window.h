@@ -16,16 +16,19 @@
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 // Qt:
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QStackedLayout>
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/application.h>
+#include <xefis/core/property.h>
 
 
 namespace Xefis {
@@ -36,16 +39,33 @@ class Window: public QWidget
 {
 	Q_OBJECT
 
+	struct Stack
+	{
+		PropertyInteger	property;
+		QStackedLayout*	layout;
+	};
+
+	typedef std::set<Stack*> Stacks;
+
   public:
 	// Ctor
 	Window (Application*, ConfigReader*, QDomElement const&);
 
-  private:
+	// Dtor
+	~Window();
+
+	/**
+	 * Needed for layouts to update visible widgets, etc.
+	 */
 	void
-	process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* instruments_panel, int stretch = 0);
+	data_updated (Time const& update_time);
+
+  private:
+	QLayout*
+	process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel);
 
 	void
-	process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* instruments_panel);
+	process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Stack* stack);
 
 	void
 	configurator_taken();
@@ -61,6 +81,7 @@ class Window: public QWidget
 	QWidget*		_configurator_panel;
 	ConfigReader*	_config_reader;
 	QPoint			_mouse_pos;
+	Stacks			_stacks;
 };
 
 } // namespace Xefis

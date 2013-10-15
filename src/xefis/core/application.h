@@ -29,6 +29,7 @@ namespace Xefis {
 
 class NavaidStorage;
 class ModuleManager;
+class WindowManager;
 class ConfigReader;
 class WorkPerformer;
 class ConfiguratorWidget;
@@ -82,6 +83,12 @@ class Application: public QApplication
 	 */
 	ModuleManager*
 	module_manager() const;
+
+	/**
+	 * Return WindowManager object.
+	 */
+	WindowManager*
+	window_manager() const;
 
 	/**
 	 * Return pointer to navaid storage.
@@ -142,6 +149,7 @@ class Application: public QApplication
 	Accounting*			_accounting				= nullptr;
 	NavaidStorage*		_navaid_storage			= nullptr;
 	ModuleManager*		_module_manager			= nullptr;
+	WindowManager*		_window_manager			= nullptr;
 	ConfigReader*		_config_reader			= nullptr;
 	ConfiguratorWidget*	_configurator_widget	= nullptr;
 	QTimer*				_postponed_update		= nullptr;
@@ -175,6 +183,13 @@ inline ModuleManager*
 Application::module_manager() const
 {
 	return _module_manager;
+}
+
+
+inline WindowManager*
+Application::window_manager() const
+{
+	return _window_manager;
 }
 
 

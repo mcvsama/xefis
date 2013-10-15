@@ -29,6 +29,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/window_manager.h>
 #include <xefis/core/module.h>
 #include <xefis/core/window.h>
 #include <xefis/utility/qdom.h>
@@ -180,6 +181,7 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 	// Auto delete if Window throws an exception:
 	std::unique_ptr<Window> window (new Window (_application, this, window_element));
 	window->show();
+	_application->window_manager()->add_window (window.get());
 	window.release();
 	_has_windows = true;
 }
@@ -198,26 +200,16 @@ ConfigReader::process_modules_element (QDomElement const& modules_element)
 }
 
 
-void
-ConfigReader::process_module_element (QDomElement const& module_element, QBoxLayout* layout, QWidget* window, int stretch)
+Module*
+ConfigReader::process_module_element (QDomElement const& module_element, QWidget* window)
 {
 	if (module_element.attribute ("disabled") == "true")
-		return;
+		return nullptr;
 
 	QString name = module_element.attribute ("name");
 	QString instance = module_element.attribute ("instance");
 
-	Module* module = _module_manager->load_module (name, instance, module_element, window);
-
-	if (layout)
-	{
-		QWidget* widget = dynamic_cast<QWidget*> (module);
-		if (widget)
-		{
-			layout->addWidget (widget);
-			layout->setStretchFactor (widget, stretch);
-		}
-	}
+	return _module_manager->load_module (name, instance, module_element, window);
 }
 
 } // namespace Xefis
