@@ -31,6 +31,7 @@
 #include <xefis/core/property_storage.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/window_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
@@ -63,6 +64,7 @@ Application::Application (int argc, char** argv):
 	_accounting = new Accounting();
 	_navaid_storage = new NavaidStorage();
 	_module_manager = new ModuleManager (this);
+	_window_manager = new WindowManager (this);
 	_config_reader = new ConfigReader (this, _module_manager);
 	_work_performer = new WorkPerformer (Services::detected_cores());
 
@@ -99,6 +101,7 @@ Application::~Application()
 	delete _configurator_widget;
 	delete _config_reader;
 	delete _module_manager;
+	delete _window_manager;
 	delete _navaid_storage;
 	delete _accounting;
 	Services::deinitialize();
@@ -173,6 +176,7 @@ Application::event (QEvent* event)
 	if (data_update_event)
 	{
 		_module_manager->data_updated (data_update_event->time());
+		_window_manager->data_updated (data_update_event->time());
 		return true;
 	}
 	else

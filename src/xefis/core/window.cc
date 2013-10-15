@@ -16,6 +16,7 @@
 
 // Qt:
 #include <QtWidgets/QShortcut>
+#include <QtWidgets/QStackedLayout>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -73,7 +74,12 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	for (QDomElement& e: element)
 	{
 		if (e == "layout")
-			process_layout_element (e, nullptr, _instruments_panel);
+		{
+			QLayout* layout = process_layout_element (e, _instruments_panel);
+			if (_instruments_panel->layout())
+				throw Exception ("a window can only have one layout");
+			_instruments_panel->setLayout (layout);
+		}
 		else
 			throw Exception (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
 	}
@@ -82,42 +88,62 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 }
 
 
-void
-Window::process_layout_element (QDomElement const& layout_element, QBoxLayout* layout, QWidget* instruments_panel, int stretch)
+Window::~Window()
 {
-	QBoxLayout* new_layout = nullptr;
+	for (Stack* stack: _stacks)
+		delete stack;
+}
 
-	if (layout_element.attribute ("type") == "horizontal")
+
+void
+Window::data_updated (Time const&)
+{
+	for (Stack* stack: _stacks)
+	{
+		if (stack->property.fresh() && stack->property.valid())
+			stack->layout->setCurrentIndex (*stack->property);
+	}
+}
+
+
+QLayout*
+Window::process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel)
+{
+	QLayout* new_layout = nullptr;
+	Stack* stack = nullptr;
+
+	QString type = layout_element.attribute ("type");
+
+	if (type == "horizontal")
 		new_layout = new QHBoxLayout();
-	else if (layout_element.attribute ("type") == "vertical")
+	else if (type == "vertical")
 		new_layout = new QVBoxLayout();
+	else if (type == "stack")
+	{
+		if (!layout_element.hasAttribute ("path"))
+			throw Exception ("missing @path attribute on <layout type='stack'>");
+
+		stack = new Stack();
+		stack->property.set_path (layout_element.attribute ("path").toStdString());
+		stack->property.set_default (0);
+		new_layout = stack->layout = new QStackedLayout();
+		_stacks.insert (stack);
+	}
 	else
-		throw Exception ("layout type must be 'vertical' or 'horizontal'");
+		throw Exception ("layout type must be 'vertical', 'horizontal' or 'stack'");
 
 	new_layout->setSpacing (0);
 	new_layout->setMargin (0);
 
-	// If adding layout to instruments_panel:
-	if (!layout)
-	{
-		if (instruments_panel->layout())
-			throw Exception ("an window can only have one layout");
-
-		instruments_panel->setLayout (new_layout);
-	}
-	// Adding layout to parent layout:
-	else
-	{
-		layout->addLayout (new_layout);
-		layout->setStretchFactor (new_layout, stretch);
-	}
-
 	for (QDomElement& e: layout_element)
 	{
 		if (e == "item")
-			process_item_element (e, new_layout, instruments_panel);
+			process_item_element (e, new_layout, instruments_panel, stack);
 		else if (e == "separator")
 		{
+			if (type == "stack")
+				throw Exception ("<separator> not allowed in stack-type layout");
+
 			QWidget* separator = new QWidget (instruments_panel);
 			separator->setMinimumSize (2, 2);
 			separator->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -127,17 +153,31 @@ Window::process_layout_element (QDomElement const& layout_element, QBoxLayout* l
 			new_layout->addWidget (separator);
 		}
 		else
-			throw Exception (QString ("unsupported child of <layout>: <%1>").arg (e.tagName()).toStdString());
+			throw Exception (QString ("unsupported child of <layout>: <%1>").arg (e.tagName()));
 	}
+
+	return new_layout;
 }
 
 
 void
-Window::process_item_element (QDomElement const& item_element, QBoxLayout* layout, QWidget* instruments_panel)
+Window::process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Stack* stack)
 {
+	QBoxLayout* box_layout = dynamic_cast<QBoxLayout*> (layout);
+	QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*> (layout);
+
+	assert (stacked_layout && stack);
+
+	if (stacked_layout && item_element.hasAttribute ("stretch-factor"))
+		throw Exception ("attribute @stretch-factor not allowed on <item> of stack-type layout");
+
+	if (box_layout && item_element.hasAttribute ("id"))
+		throw Exception ("attribute @id not allowed on <item> of non-stack-type layout");
+
 	bool has_child = false;
 	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
 
+	// <item>'s children:
 	for (QDomElement& e: item_element)
 	{
 		if (has_child)
@@ -146,19 +186,65 @@ Window::process_item_element (QDomElement const& item_element, QBoxLayout* layou
 		has_child = true;
 
 		if (e == "layout")
-			process_layout_element (e, layout, instruments_panel, stretch);
+		{
+			if (box_layout)
+			{
+				QLayout* sub_layout = process_layout_element (e, instruments_panel);
+				box_layout->addLayout (sub_layout);
+				box_layout->setStretchFactor (sub_layout, stretch);
+			}
+			else if (stacked_layout)
+			{
+				QLayout* sub_layout = process_layout_element (e, instruments_panel);
+				QWidget* proxy_widget = new QWidget (instruments_panel);
+				proxy_widget->setLayout (sub_layout);
+				stacked_layout->addWidget (proxy_widget);
+				stacked_layout->setCurrentWidget (proxy_widget);
+			}
+		}
 		else if (e == "module")
-			_config_reader->process_module_element (e, layout, instruments_panel, stretch);
+		{
+			Module* module = _config_reader->process_module_element (e, instruments_panel);
+			if (module)
+			{
+				QWidget* module_widget = dynamic_cast<QWidget*> (module);
+
+				if (module_widget)
+				{
+					if (box_layout)
+					{
+						box_layout->addWidget (module_widget);
+						box_layout->setStretchFactor (module_widget, stretch);
+					}
+					else if (stacked_layout)
+					{
+						stacked_layout->addWidget (module_widget);
+						stacked_layout->setCurrentWidget (module_widget);
+					}
+				}
+			}
+		}
 		else
 			throw Exception (QString ("unsupported child of <item>: <%1>").arg (e.tagName()).toStdString());
 	}
 
 	if (!has_child)
 	{
-		layout->addStretch (stretch);
-		QWidget* p = layout->parentWidget();
-		if (p)
-			p->setCursor (QCursor (Qt::CrossCursor));
+		if (box_layout)
+		{
+			box_layout->addStretch (stretch);
+			QWidget* p = box_layout->parentWidget();
+			if (p)
+				p->setCursor (QCursor (Qt::CrossCursor));
+		}
+		else if (stacked_layout)
+		{
+			// Empty widget:
+			QWidget* empty_widget = new QWidget (instruments_panel);
+			empty_widget->setCursor (QCursor (Qt::CrossCursor));
+			stacked_layout->addWidget (empty_widget);
+			stacked_layout->setCurrentWidget (empty_widget);
+		}
 	}
 }
 

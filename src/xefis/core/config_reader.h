@@ -82,8 +82,8 @@ class ConfigReader
 	void
 	process_modules_element (QDomElement const& modules_element);
 
-	void
-	process_module_element (QDomElement const& module_element, QBoxLayout* layout = nullptr, QWidget* window = nullptr, int stretch = 0);
+	Module*
+	process_module_element (QDomElement const& module_element, QWidget* window = nullptr);
 
   private:
 	Application*	_application		= nullptr;
