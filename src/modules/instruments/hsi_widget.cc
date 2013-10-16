@@ -1195,10 +1195,6 @@ HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
 	_paint_work_unit (this)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
-	if (xw)
-		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
-
 	set_painter (&_paint_work_unit);
 }
 
@@ -1206,5 +1202,16 @@ HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 HSIWidget::~HSIWidget()
 {
 	wait_for_painter();
+}
+
+
+void
+HSIWidget::resizeEvent (QResizeEvent* event)
+{
+	InstrumentWidget::resizeEvent (event);
+
+	auto xw = dynamic_cast<Xefis::Window*> (window());
+	if (xw)
+		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
 }
 

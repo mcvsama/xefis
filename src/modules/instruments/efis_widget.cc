@@ -2563,10 +2563,6 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
 	_paint_work_unit (this)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
-	if (xw)
-		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
-
 	setAttribute (Qt::WA_NoBackground);
 
 	_speed_blinking_warning = new QTimer (this);
@@ -2590,13 +2586,24 @@ EFISWidget::~EFISWidget()
 
 
 void
+EFISWidget::resizeEvent (QResizeEvent* event)
+{
+	InstrumentWidget::resizeEvent (event);
+
+	auto xw = dynamic_cast<Xefis::Window*> (window());
+	if (xw)
+		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
+}
+
+
+void
 EFISWidget::request_repaint()
 {
 	update_blinker (_speed_blinking_warning,
 					_params.speed_visible &&
 					((_params.minimum_speed_visible && _params.speed < _params.minimum_speed) ||
 					 (_params.maximum_speed_visible && _params.speed > _params.maximum_speed)),
-				    &_params.speed_blink);
+					&_params.speed_blink);
 
 	update_blinker (_minimums_blinking_warning,
 					_params.altitude_visible && _params.minimums_altitude_visible &&

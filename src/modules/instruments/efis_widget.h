@@ -1314,6 +1314,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	set_slip_skid_warning (bool enabled);
 
   protected:
+	// API of QWidget
+	void
+	resizeEvent (QResizeEvent*) override;
+
 	// API of InstrumentWidget
 	void
 	request_repaint() override;
