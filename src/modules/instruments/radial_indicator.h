@@ -50,16 +50,19 @@ class RadialIndicator: public Xefis::Instrument
 	data_updated() override;
 
   private:
-	RadialIndicatorWidget*	_widget = nullptr;
-	std::string				_property_path;
-
-	Xefis::PropertyFloat	_value;
-	Xefis::PropertyFloat	_target;
-	Xefis::PropertyFloat	_range_minimum;
-	Xefis::PropertyFloat	_range_maximum;
-	Xefis::PropertyFloat	_warning_value;
-	Xefis::PropertyFloat	_critical_value;
-	Xefis::PropertyFloat	_normal_value;
+	RadialIndicatorWidget*		_widget = nullptr;
+	std::string					_property_path;
+	// Settings:
+	int							_value_precision			= 0;
+	unsigned int				_value_modulo				= 0;
+	Xefis::PropertyFloat::Type	_value_minimum;
+	Xefis::PropertyFloat::Type	_value_maximum;
+	Xefis::PropertyFloat::Type	_value_maximum_warning		= 0.f;
+	Xefis::PropertyFloat::Type	_value_maximum_critical		= 0.f;
+	// Properties:
+	Xefis::PropertyFloat		_value;
+	Xefis::PropertyFloat		_value_bug;
+	Xefis::PropertyFloat		_value_normal;
 };
 
 

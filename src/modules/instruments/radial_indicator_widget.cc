@@ -29,17 +29,19 @@
 
 RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
 	InstrumentWidget (parent),
-	InstrumentAids (1.f)
-{
-	auto xw = dynamic_cast<Xefis::Window*> (window());
-	if (xw)
-		InstrumentAids::set_scaling (xw->pen_scale(), xw->font_scale());
-}
+	InstrumentAids (0.8f)
+{ }
 
 
 void
-RadialIndicatorWidget::resizeEvent (QResizeEvent*)
+RadialIndicatorWidget::resizeEvent (QResizeEvent* event)
 {
+	InstrumentWidget::resizeEvent (event);
+
+	auto xw = dynamic_cast<Xefis::Window*> (window());
+	if (xw)
+		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
+
 	InstrumentAids::update_sizes (size(), window()->size());
 }
 
@@ -71,10 +73,22 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 }
 
 
+QString
+RadialIndicatorWidget::stringify_value (float value) const
+{
+	float numeric_value = value;
+	if (_precision < 0)
+		numeric_value /= std::pow (10.0, -_precision);
+	if (_modulo > 0)
+		numeric_value = static_cast<int> (numeric_value) / _modulo * _modulo;
+	return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, _precision));
+}
+
+
 void
 RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 {
-	QString text = QString ("%1").arg (_value, 0, 'f', 1);
+	QString text = stringify_value (_value);
 
 	QFont font (_font_20);
 	QFontMetricsF metrics (font);
@@ -113,7 +127,7 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 		painter.setPen (get_pen (Qt::green, 1.0f));
 		painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 								Qt::AlignBottom | Qt::AlignRight,
-								QString ("%1").arg (_normal_value, 0, 'f', 1));
+								stringify_value (_normal_value));
 	}
 
 	painter.restore();

@@ -20,7 +20,7 @@
 									<setting name='altitude.landing.warning.hi' value='1000 ft'/>
 									<setting name='altitude.landing.warning.lo' value='500 ft'/>
 								</settings>
-								<properties path='/efis'>
+								<properties path='//efis'>
 									<directory path='/speed'>
 										<property name='speed.ias.serviceable' path='/ias.serviceable' default='true'/>
 										<property name='speed.ias' path='/ias' default='121.3 kt'/>
@@ -198,8 +198,109 @@
 				</item>
 				<separator/>
 				<item stretch-factor='4'>
-					<layout type='vertical'>
-						<item stretch-factor='6'>
+					<layout type='stack' path='//efis/mfd-mode'>
+						<item>
+							<layout type='horizontal'>
+								<item stretch-factor='1'/>
+								<item stretch-factor='20'>
+									<layout type='vertical'>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-L-RPM'>
+												<settings>
+													<setting name='value.modulo' value='10'/>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='4000'/>
+													<setting name='value.maximum.warning' value='3500'/>
+													<setting name='value.maximum.critical' value='3900'/>
+												</settings>
+												<properties path='//sensors/engines/left'>
+													<property name='value' path='/rpm'/>
+													<property name='value.normal' path='/rpm.cruise' default='2300'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-L-AMP'>
+												<settings>
+													<setting name='value.precision' value='1'/>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='45'/>
+													<setting name='value.maximum.warning' value='43'/>
+													<setting name='value.maximum.critical' value='45'/>
+												</settings>
+												<properties path='//sensors/engines/left'>
+													<property name='value' path='/amps'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-L-TEMP'>
+												<settings>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='150'/>
+													<setting name='value.maximum.warning' value='140'/>
+													<setting name='value.maximum.critical' value='150'/>
+												</settings>
+												<properties path='//sensors/engines/left'>
+													<property name='value' path='/temperature'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='35'/>
+									</layout>
+								</item>
+								<item stretch-factor='20'>
+									<layout type='vertical'>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-R-RPM'>
+												<settings>
+													<setting name='value.modulo' value='10'/>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='4000'/>
+													<setting name='value.maximum.warning' value='3500'/>
+													<setting name='value.maximum.critical' value='3900'/>
+												</settings>
+												<properties path='//sensors/engines/right'>
+													<property name='value' path='/rpm'/>
+													<property name='value.normal' path='/rpm.cruise' default='2300'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-R-AMP'>
+												<settings>
+													<setting name='value.precision' value='1'/>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='45'/>
+													<setting name='value.maximum.warning' value='43'/>
+													<setting name='value.maximum.critical' value='45'/>
+												</settings>
+												<properties path='//sensors/engines/right'>
+													<property name='value' path='/amps'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/radial-indicator' instance='engine-R-TEMP'>
+												<settings>
+													<setting name='value.minimum' value='0'/>
+													<setting name='value.maximum' value='150'/>
+													<setting name='value.maximum.warning' value='140'/>
+													<setting name='value.maximum.critical' value='150'/>
+												</settings>
+												<properties path='//sensors/engines/right'>
+													<property name='value' path='/temperature'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='35'/>
+									</layout>
+								</item>
+								<item stretch-factor='50'>
+								</item>
+							</layout>
+						</item>
+						<item>
 							<module name='instruments/hsi' instance='main'>
 								<properties>
 									<directory path='/settings/hsi'>
@@ -234,64 +335,6 @@
 									</directory>
 								</properties>
 							</module>
-						</item>
-						<separator/>
-						<item stretch-factor='1'>
-							<layout type='horizontal'>
-								<item stretch-factor='1'>
-								</item>
-								<item stretch-factor='15'>
-									<layout type='horizontal'>
-										<item>
-											<module name='instruments/radial-indicator' instance='N1'>
-												<properties path='/sensors/engine'>
-													<property name='value' path='/n1'/>
-													<property name='target' path='/config/n1-target' default='18.7'/>
-													<property name='value-minimum' path='/config/n1-minimum' default='0.0'/>
-													<property name='value-warning' path='/config/n1-warning' default='107.0'/>
-													<property name='value-critical' path='/config/n1-critical' default='110.0'/>
-													<property name='value-maximum' path='/config/n1-maximum' default='110.0'/>
-												</properties>
-											</module>
-										</item>
-										<item>
-											<module name='instruments/radial-indicator' instance='N2'>
-												<properties path='/sensors/engine'>
-													<property name='value' path='/n2'/>
-													<property name='value-minimum' path='/config/n2-minimum' default='0.0'/>
-													<property name='value-warning' path='/config/n2-warning' default='107.0'/>
-													<property name='value-critical' path='/config/n2-critical' default='110.0'/>
-													<property name='value-maximum' path='/config/n2-maximum' default='110.0'/>
-												</properties>
-											</module>
-										</item>
-										<item>
-											<module name='instruments/radial-indicator' instance='EGT'>
-												<properties path='/sensors/engine'>
-													<property name='value' path='/egt'/>
-													<property name='value-minimum' path='/config/egt-minimum' default='0.0'/>
-													<property name='value-maximum' path='/config/egt-maximum' default='850.0'/>
-													<property name='value-warning' path='/config/egt-warning' default='800.0'/>
-													<property name='value-critical' path='/config/egt-critical' default='850.0'/>
-													<property name='value-normal' path='/config/egt-normal' default='715.0'/>
-												</properties>
-											</module>
-										</item>
-										<item>
-											<module name='instruments/radial-indicator' instance='EPR'>
-												<properties path='/sensors/engine'>
-													<property name='value' path='/epr'/>
-													<property name='value-minimum' path='/config/epr-minimum' default='1.0'/>
-													<property name='value-maximum' path='/config/epr-maximum' default='4.0'/>
-													<property name='value-normal' path='/config/epr-normal' default='3.0'/>
-												</properties>
-											</module>
-										</item>
-									</layout>
-								</item>
-								<item stretch-factor='1'>
-								</item>
-							</layout>
 						</item>
 					</layout>
 				</item>
