@@ -45,16 +45,23 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "settings")
+		{
+			parse_settings (e, {
+				{ "value.precision", _value_precision, false },
+				{ "value.modulo", _value_modulo, false },
+				{ "value.minimum", _value_minimum, true },
+				{ "value.maximum", _value_maximum, true },
+				{ "value.maximum.warning", _value_maximum_warning, false },
+				{ "value.maximum.critical", _value_maximum_critical, false },
+			});
+		}
+		else if (e == "properties")
 		{
 			parse_properties (e, {
 				{ "value", _value, true },
-				{ "target", _target, false },
-				{ "value-minimum", _range_minimum, true },
-				{ "value-maximum", _range_maximum, true },
-				{ "value-warning", _warning_value, false },
-				{ "value-critical", _critical_value, false },
-				{ "value-normal", _normal_value, false },
+				{ "value.bug", _value_bug, false },
+				{ "value.normal", _value_normal, false },
 			});
 			found_properties_config = true;
 		}
@@ -68,21 +75,23 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 void
 RadialIndicator::read()
 {
-	_widget->set_range (Xefis::Range<double> { *_range_minimum, *_range_maximum });
+	_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
+	_widget->set_precision (_value_precision);
+	_widget->set_modulo (_value_modulo);
 
 	_widget->set_value (*_value);
 	_widget->set_value_visible (_value.valid());
 
-	_widget->set_target_value (*_target);
-	_widget->set_target_visible (_target.valid());
+	_widget->set_target_value (*_value_bug);
+	_widget->set_target_visible (_value_bug.valid());
 
-	_widget->set_warning_value (*_warning_value);
-	_widget->set_warning_visible (_warning_value.valid());
+	_widget->set_warning_value (_value_maximum_warning);
+	_widget->set_warning_visible (has_setting ("value.maximum.warning"));
 
-	_widget->set_critical_value (*_critical_value);
-	_widget->set_critical_visible (_critical_value.valid());
+	_widget->set_critical_value (_value_maximum_critical);
+	_widget->set_critical_visible (has_setting ("value.maximum.critical"));
 
-	_widget->set_normal_value (*_normal_value);
-	_widget->set_normal_visible (_normal_value.valid());
+	_widget->set_normal_value (*_value_normal);
+	_widget->set_normal_visible (_value_normal.valid());
 }
 

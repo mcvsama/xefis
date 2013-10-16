@@ -44,6 +44,20 @@ class RadialIndicatorWidget:
 	set_range (Xefis::Range<float>);
 
 	/**
+	 * Set precision (digits after decimal point).
+	 * Negative values are accepted (value will be divided by 10^n).
+	 */
+	void
+	set_precision (int precision);
+
+	/**
+	 * Set modulo value. If > 0, value will be converted to int,
+	 * divided by n and the multipled by n again.
+	 */
+	void
+	set_modulo (unsigned int modulo);
+
+	/**
 	 * Set indicated power value.
 	 */
 	void
@@ -110,6 +124,9 @@ class RadialIndicatorWidget:
 	void
 	paintEvent (QPaintEvent*) override;
 
+	QString
+	stringify_value (float value) const;
+
 	void
 	paint_text (Xefis::Painter&, float q, float r);
 
@@ -121,6 +138,8 @@ class RadialIndicatorWidget:
 						_text_painter_cache;
 	// Parameters:
 	Xefis::Range<float>	_range				= { 0.f, 1.f };
+	int					_precision			= 0;
+	unsigned int		_modulo				= 0;
 	float				_value				= 0.f;
 	bool				_value_visible		= false;
 	float				_warning_value		= 1.f;
@@ -138,6 +157,22 @@ inline void
 RadialIndicatorWidget::set_range (Xefis::Range<float> range)
 {
 	_range = range;
+	update();
+}
+
+
+inline void
+RadialIndicatorWidget::set_precision (int precision)
+{
+	_precision = precision;
+	update();
+}
+
+
+inline void
+RadialIndicatorWidget::set_modulo (unsigned int modulo)
+{
+	_modulo = modulo;
 	update();
 }
 
