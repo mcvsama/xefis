@@ -4,7 +4,10 @@
 	<doc:meta>
 		<doc:title>Technical introduction</doc:title>
 	</doc:meta>
-	<section>
+	<section id='running-xefis'>
+		<h1>Running XEFIS</h1>
+	</section>
+	<section id='types-and-units'>
 		<h1>Value types and units</h1>
 		<p>
 			There are various value types used throughout the program and its configuration. In most cases (or maybe even all), where a certain value type is expected
@@ -97,8 +100,12 @@
 		<p>As a user, you have to tell all the loaded modules, where to store the data. This is done in module's XML configuration.
 		The format is described in next section.</p>
 	</section>
-	<section id='standard-configuration-format'>
-		<h1>Standard configuration format</h1>
+	<section id='configuration-file'>
+		<h1>Configuration file</h1>
+		<p>XEFIS reads XML configuration file pointed to by XEFIS_CONFIG environment variable.</p>
+	</section>
+	<section id='standard-configuration-formats'>
+		<h1>Standard configuration formats</h1>
 		<p>This is standarized XML format for configuring most of the modules.</p>
 		<section id='settings'>
 			<h1>Settings</h1>
