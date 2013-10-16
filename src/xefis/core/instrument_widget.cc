@@ -146,13 +146,16 @@ void
 InstrumentWidget::resizeEvent (QResizeEvent* event)
 {
 	QWidget::resizeEvent (event);
-	_paint_mutex.synchronize ([&]() {
-		_threadsafe_size = size();
-		_threadsafe_window_size = window()->size();
-		_paint_buffer = QImage (size(), QImage::Format_ARGB32_Premultiplied);
-		_paint_buffer.fill (Qt::black);
-		request_repaint();
-	});
+	if (_paint_work_unit)
+	{
+		_paint_mutex.synchronize ([&]() {
+			_threadsafe_size = size();
+			_threadsafe_window_size = window()->size();
+			_paint_buffer = QImage (size(), QImage::Format_ARGB32_Premultiplied);
+			_paint_buffer.fill (Qt::black);
+			request_repaint();
+		});
+	}
 }
 
 

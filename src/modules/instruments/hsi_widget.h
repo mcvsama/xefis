@@ -586,6 +586,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 	set_rounded_clipping (bool enabled);
 
   private:
+	// API of QWidget
+	void
+	resizeEvent (QResizeEvent*) override;
+
 	// InstrumentWidget API
 	void
 	push_params() override;
