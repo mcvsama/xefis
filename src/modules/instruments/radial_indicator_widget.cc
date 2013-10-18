@@ -29,7 +29,7 @@
 
 RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
 	InstrumentWidget (parent),
-	InstrumentAids (0.8f)
+	InstrumentAids (0.9f)
 { }
 
 
@@ -60,12 +60,12 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 
 	// Clear with black background:
 	painter.setPen (Qt::NoPen);
-	painter.setBrush (QBrush (QColor (0, 0, 0), Qt::SolidPattern));
+	painter.setBrush (Qt::black);
 	painter.drawRect (rect());
 
-	painter.translate (w / 2.25f, h / 2.f);
+	painter.translate (w / 2.f, h / 2.4f);
 
-	float q = 0.06f * wh();
+	float q = 0.068f * wh();
 	float r = 6.5f * q;
 
 	paint_text (painter, q, r);
@@ -251,9 +251,9 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	{
 		painter.setPen (green_pen);
 		painter.rotate (normal_angle);
-		painter.drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.1f * r, 0.f));
-		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, -0.14f * r));
-		painter.drawLine (QPointF (1.1f * r + pen_width (1.f), 0.f), QPointF (1.3f * r, +0.14f * r));
+		painter.drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.17f * r, 0.f));
+		painter.drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, -0.14f * r));
+		painter.drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, +0.14f * r));
 	}
 
 	painter.restore();
