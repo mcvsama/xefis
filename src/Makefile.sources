@@ -160,6 +160,8 @@ SRC_HEADERS += modules/instruments/efis_widget.h
 SRC_HEADERS += modules/instruments/hsi.h
 SRC_HEADERS += modules/instruments/hsi_widget.h
 SRC_HEADERS += modules/instruments/label.h
+SRC_HEADERS += modules/instruments/linear_indicator.h
+SRC_HEADERS += modules/instruments/linear_indicator_widget.h
 SRC_HEADERS += modules/instruments/radial_indicator.h
 SRC_HEADERS += modules/instruments/radial_indicator_widget.h
 
@@ -168,6 +170,8 @@ SRC_SOURCES += modules/instruments/efis_widget.cc
 SRC_SOURCES += modules/instruments/hsi.cc
 SRC_SOURCES += modules/instruments/hsi_widget.cc
 SRC_SOURCES += modules/instruments/label.cc
+SRC_SOURCES += modules/instruments/linear_indicator.cc
+SRC_SOURCES += modules/instruments/linear_indicator_widget.cc
 SRC_SOURCES += modules/instruments/radial_indicator.cc
 SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
 
