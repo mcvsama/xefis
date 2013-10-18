@@ -89,17 +89,16 @@ class RadialIndicatorWidget:
 	paint_indicator (Xefis::Painter&, float q, float r);
 
   private:
-	Xefis::TextPainter::Cache
-						_text_painter_cache;
+	Xefis::TextPainter::Cache	_text_painter_cache;
 	// Parameters:
-	Xefis::Range<double>	_range				= { 0.f, 1.f };
-	int						_precision			= 0;
-	unsigned int			_modulo				= 0;
-	Optional<double>		_value;
-	Optional<double>		_warning_value;
-	Optional<double>		_critical_value;
-	Optional<double>		_normal_value;
-	Optional<double>		_target_value;
+	Xefis::Range<double>		_range				= { 0.f, 1.f };
+	int							_precision			= 0;
+	unsigned int				_modulo				= 0;
+	Optional<double>			_value;
+	Optional<double>			_warning_value;
+	Optional<double>			_critical_value;
+	Optional<double>			_normal_value;
+	Optional<double>			_target_value;
 };
 
 
