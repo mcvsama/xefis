@@ -90,6 +90,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 	{
 		adi_paint (painter);
 
+		paint_nav (painter);
 		paint_center_cross (painter, false, true);
 		paint_flight_director (painter);
 		paint_control_stick (painter);
@@ -101,7 +102,6 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 			paint_altitude_agl (painter);
 
 		paint_minimums_setting (painter);
-		paint_nav (painter);
 		paint_hints (painter);
 		paint_critical_aoa (painter);
 
@@ -2123,11 +2123,11 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 	if (_params.runway_visible && !_params.lateral_deviation_failure)
 	{
-		float w = 0.10f * wh();
+		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * Xefis::limit (_params.lateral_deviation_deg, -2_deg, +2_deg).deg();
-		float ypos = -pitch_to_px (Xefis::limit (_params.pitch + _params.runway_position, 0_deg, 25_deg));
+		float offset = 0.5f * Xefis::limit (_params.lateral_deviation_deg, -1.5_deg, +1.5_deg).deg();
+		float ypos = -pitch_to_px (Xefis::limit (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, ypos);
@@ -2140,16 +2140,20 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		for (QPointF& point: bps)
 			point += QPointF (2.5f * p * w * offset, 0);
 
-		painter.setClipRect (QRectF (-2.5f * w, -0.2f * h, 5.f * w, 1.4f * h));
+		painter.setClipRect (QRectF (-1.675f * w, -0.2f * h, 3.35f * w, 1.4f * h));
 
 		QPolygonF runway = QPolygonF() << tps[0] << tps[2] << bps[2] << bps[0];
 
 		painter.setBrush (Qt::NoBrush);
-		for (auto pen: { QPen (_navigation_color.darker (400), pen_width (2.f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin),
-						 QPen (_navigation_color, pen_width (1.33f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin) })
+		for (auto pen: { QPen (_navigation_color.darker (400), pen_width (2.f)),
+						 QPen (_navigation_color, pen_width (1.33f)) })
 		{
+			pen.setCapStyle (Qt::RoundCap);
 			painter.setPen (pen);
 			painter.drawPolygon (runway);
+
+			pen.setCapStyle (Qt::FlatCap);
+			painter.setPen (pen);
 			painter.drawLine (tps[1], bps[1]);
 		}
 	}
