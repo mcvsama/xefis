@@ -32,44 +32,26 @@
 
 class RadialIndicator: public Xefis::Instrument
 {
-	Q_OBJECT
-
   public:
 	// Ctor
 	RadialIndicator (Xefis::ModuleManager*, QDomElement const& config);
 
-  public slots:
-	/**
-	 * Force EFIS to read data from properties.
-	 */
-	void
-	read();
-
-  protected:
 	void
 	data_updated() override;
 
   private:
-	RadialIndicatorWidget*		_widget = nullptr;
-	std::string					_property_path;
+	RadialIndicatorWidget*					_widget = nullptr;
 	// Settings:
-	int							_value_precision			= 0;
-	unsigned int				_value_modulo				= 0;
-	Xefis::PropertyFloat::Type	_value_minimum;
-	Xefis::PropertyFloat::Type	_value_maximum;
-	Xefis::PropertyFloat::Type	_value_maximum_warning		= 0.f;
-	Xefis::PropertyFloat::Type	_value_maximum_critical		= 0.f;
+	int										_value_precision			= 0;
+	unsigned int							_value_modulo				= 0;
+	Xefis::PropertyFloat::Type				_value_minimum;
+	Optional<Xefis::PropertyFloat::Type>	_value_maximum_warning;
+	Optional<Xefis::PropertyFloat::Type>	_value_maximum_critical;
+	Xefis::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	Xefis::PropertyFloat		_value;
-	Xefis::PropertyFloat		_value_bug;
-	Xefis::PropertyFloat		_value_normal;
+	Xefis::PropertyFloat					_value;
+	Xefis::PropertyFloat					_value_target;
+	Xefis::PropertyFloat					_value_normal;
 };
-
-
-inline void
-RadialIndicator::data_updated()
-{
-	read();
-}
 
 #endif

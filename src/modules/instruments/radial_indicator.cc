@@ -41,8 +41,6 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 	layout->setSpacing (0);
 	layout->addWidget (_widget);
 
-	bool found_properties_config = false;
-
 	for (QDomElement& e: config)
 	{
 		if (e == "settings")
@@ -51,47 +49,34 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 				{ "value.precision", _value_precision, false },
 				{ "value.modulo", _value_modulo, false },
 				{ "value.minimum", _value_minimum, true },
-				{ "value.maximum", _value_maximum, true },
 				{ "value.maximum.warning", _value_maximum_warning, false },
 				{ "value.maximum.critical", _value_maximum_critical, false },
+				{ "value.maximum", _value_maximum, true },
 			});
 		}
 		else if (e == "properties")
 		{
 			parse_properties (e, {
 				{ "value", _value, true },
-				{ "value.bug", _value_bug, false },
+				{ "value.target", _value_target, false },
 				{ "value.normal", _value_normal, false },
 			});
-			found_properties_config = true;
 		}
 	}
-
-	if (!found_properties_config)
-		throw Xefis::Exception ("module configuration missing");
 }
 
 
 void
-RadialIndicator::read()
+RadialIndicator::data_updated()
 {
 	_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
 	_widget->set_precision (_value_precision);
 	_widget->set_modulo (_value_modulo);
 
-	_widget->set_value (*_value);
-	_widget->set_value_visible (_value.valid());
-
-	_widget->set_target_value (*_value_bug);
-	_widget->set_target_visible (_value_bug.valid());
-
+	_widget->set_value (_value.get_optional());
 	_widget->set_warning_value (_value_maximum_warning);
-	_widget->set_warning_visible (has_setting ("value.maximum.warning"));
-
 	_widget->set_critical_value (_value_maximum_critical);
-	_widget->set_critical_visible (has_setting ("value.maximum.critical"));
-
-	_widget->set_normal_value (*_value_normal);
-	_widget->set_normal_visible (_value_normal.valid());
+	_widget->set_target_value (_value_target.get_optional());
+	_widget->set_normal_value (_value_normal.get_optional());
 }
 

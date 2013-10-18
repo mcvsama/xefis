@@ -41,7 +41,7 @@ class RadialIndicatorWidget:
 	 * Set new range to be used with RadialIndicatorWidget.
 	 */
 	void
-	set_range (Xefis::Range<float>);
+	set_range (Xefis::Range<double>);
 
 	/**
 	 * Set precision (digits after decimal point).
@@ -57,65 +57,20 @@ class RadialIndicatorWidget:
 	void
 	set_modulo (unsigned int modulo);
 
-	/**
-	 * Set indicated power value.
-	 */
 	void
-	set_value (float value);
+	set_value (Optional<double>);
 
-	/**
-	 * Set validity of the input value.
-	 */
 	void
-	set_value_visible (bool visible);
+	set_warning_value (Optional<double>);
 
-	/**
-	 * Set warning value. This starts the section that is drawn in yellow.
-	 */
 	void
-	set_warning_value (float);
+	set_critical_value (Optional<double>);
 
-	/**
-	 * Set visibility of the warning bug.
-	 */
 	void
-	set_warning_visible (bool visible);
+	set_normal_value (Optional<double>);
 
-	/**
-	 * Set critical value.
-	 */
 	void
-	set_critical_value (float);
-
-	/**
-	 * Set visibility of the critical bug.
-	 */
-	void
-	set_critical_visible (bool visible);
-
-	/**
-	 * Set normal/desired value. This sets the green bug position on the scale.
-	 */
-	void
-	set_normal_value (float);
-
-	/**
-	 * Set visibility of the normal/desired value bug.
-	 */
-	void
-	set_normal_visible (bool visible);
-
-	/**
-	 * Set target value (setting bug).
-	 */
-	void
-	set_target_value (float);
-
-	/**
-	 * Set target value visibility.
-	 */
-	void
-	set_target_visible (bool visible);
+	set_target_value (Optional<double>);
 
   protected:
 	void
@@ -125,7 +80,7 @@ class RadialIndicatorWidget:
 	paintEvent (QPaintEvent*) override;
 
 	QString
-	stringify_value (float value) const;
+	stringify_value (double value) const;
 
 	void
 	paint_text (Xefis::Painter&, float q, float r);
@@ -137,24 +92,19 @@ class RadialIndicatorWidget:
 	Xefis::TextPainter::Cache
 						_text_painter_cache;
 	// Parameters:
-	Xefis::Range<float>	_range				= { 0.f, 1.f };
-	int					_precision			= 0;
-	unsigned int		_modulo				= 0;
-	float				_value				= 0.f;
-	bool				_value_visible		= false;
-	float				_warning_value		= 1.f;
-	bool				_warning_visible	= false;
-	float				_critical_value		= 1.f;
-	bool				_critical_visible	= false;
-	float				_normal_value		= 1.f;
-	bool				_normal_visible		= false;
-	float				_target_value		= 0.f;
-	bool				_target_visible		= false;
+	Xefis::Range<double>	_range				= { 0.f, 1.f };
+	int						_precision			= 0;
+	unsigned int			_modulo				= 0;
+	Optional<double>		_value;
+	Optional<double>		_warning_value;
+	Optional<double>		_critical_value;
+	Optional<double>		_normal_value;
+	Optional<double>		_target_value;
 };
 
 
 inline void
-RadialIndicatorWidget::set_range (Xefis::Range<float> range)
+RadialIndicatorWidget::set_range (Xefis::Range<double> range)
 {
 	_range = range;
 	update();
@@ -178,7 +128,7 @@ RadialIndicatorWidget::set_modulo (unsigned int modulo)
 
 
 inline void
-RadialIndicatorWidget::set_value (float value)
+RadialIndicatorWidget::set_value (Optional<double> value)
 {
 	_value = value;
 	update();
@@ -186,15 +136,7 @@ RadialIndicatorWidget::set_value (float value)
 
 
 inline void
-RadialIndicatorWidget::set_value_visible (bool visible)
-{
-	_value_visible = visible;
-	update();
-}
-
-
-inline void
-RadialIndicatorWidget::set_warning_value (float warning_value)
+RadialIndicatorWidget::set_warning_value (Optional<double> warning_value)
 {
 	_warning_value = warning_value;
 	update();
@@ -202,15 +144,7 @@ RadialIndicatorWidget::set_warning_value (float warning_value)
 
 
 inline void
-RadialIndicatorWidget::set_warning_visible (bool visible)
-{
-	_warning_visible = visible;
-	update();
-}
-
-
-inline void
-RadialIndicatorWidget::set_critical_value (float critical_value)
+RadialIndicatorWidget::set_critical_value (Optional<double> critical_value)
 {
 	_critical_value = critical_value;
 	update();
@@ -218,15 +152,7 @@ RadialIndicatorWidget::set_critical_value (float critical_value)
 
 
 inline void
-RadialIndicatorWidget::set_critical_visible (bool visible)
-{
-	_critical_visible = visible;
-	update();
-}
-
-
-inline void
-RadialIndicatorWidget::set_normal_value (float normal_value)
+RadialIndicatorWidget::set_normal_value (Optional<double> normal_value)
 {
 	_normal_value = normal_value;
 	update();
@@ -234,25 +160,9 @@ RadialIndicatorWidget::set_normal_value (float normal_value)
 
 
 inline void
-RadialIndicatorWidget::set_normal_visible (bool visible)
-{
-	_normal_visible = visible;
-	update();
-}
-
-
-inline void
-RadialIndicatorWidget::set_target_value (float target_value)
+RadialIndicatorWidget::set_target_value (Optional<double> target_value)
 {
 	_target_value = target_value;
-	update();
-}
-
-
-inline void
-RadialIndicatorWidget::set_target_visible (bool visible)
-{
-	_target_visible = visible;
 	update();
 }
 

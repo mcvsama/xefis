@@ -74,9 +74,9 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 
 
 QString
-RadialIndicatorWidget::stringify_value (float value) const
+RadialIndicatorWidget::stringify_value (double value) const
 {
-	float numeric_value = value;
+	double numeric_value = value;
 	if (_precision < 0)
 		numeric_value /= std::pow (10.0, -_precision);
 	if (_modulo > 0)
@@ -88,7 +88,9 @@ RadialIndicatorWidget::stringify_value (float value) const
 void
 RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 {
-	QString text = stringify_value (_value);
+	QString text;
+	if (_value)
+		text = stringify_value (*_value);
 
 	QFont font (_font_20);
 	QFontMetricsF metrics (font);
@@ -108,7 +110,7 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 
 	painter.save();
 	painter.setFont (font);
-	if (_value_visible)
+	if (_value)
 	{
 		painter.setPen (pen);
 		painter.drawRect (rect);
@@ -121,13 +123,13 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 		painter.drawRect (rect);
 	}
 
-	if (_normal_visible)
+	if (_normal_value)
 	{
 		painter.setFont (small_font);
 		painter.setPen (get_pen (Qt::green, 1.0f));
 		painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 								Qt::AlignBottom | Qt::AlignRight,
-								stringify_value (_normal_value));
+								stringify_value (*_normal_value));
 	}
 
 	painter.restore();
@@ -168,20 +170,20 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	QRectF rect (-r, -r, 2.f * r, 2.f * r);
 
 	float value_span_angle = 210.f;
-	float value = limit (_value, _range);
-	float warning = limit (_warning_value, _range);
-	float critical = limit (_critical_value, _range);
-	float normal = limit (_normal_value, _range);
-	float target = limit (_target_value, _range);
+	float value = _value ? limit (*_value, _range) : 0.f;
+	float warning = _warning_value ? limit (*_warning_value, _range) : 0.f;
+	float critical = _critical_value ? limit (*_critical_value, _range) : 0.f;
+	float normal = _normal_value ? limit (*_normal_value, _range) : 0.f;
+	float target = _target_value ? limit (*_target_value, _range) : 0.f;
 
-	if (!_warning_visible)
+	if (!_warning_value)
 		warning = _range.max();
-	if (!_critical_visible)
+	if (!_critical_value)
 		critical = _range.max();
 	// Fill colors:
-	if (_warning_visible && value >= warning)
+	if (_warning_value && value >= warning)
 		brush.setColor (orange.darker (100));
-	if (_critical_visible && value >= critical)
+	if (_critical_value && value >= critical)
 		brush.setColor (red);
 
 	float value_angle = value_span_angle * (value - _range.min()) / _range.extent();
@@ -192,7 +194,7 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 
 	painter.save();
 
-	if (_value_visible)
+	if (_value)
 	{
 		painter.save();
 		painter.setPen (Qt::NoPen);
@@ -222,9 +224,9 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	float gap_degs = 4;
 
 	points.emplace_back (0.f, silver_pen, 0.f);
-	if (_warning_visible)
+	if (_warning_value)
 		points.emplace_back (warning_angle, warning_pen, 0.1f * r);
-	if (_critical_visible)
+	if (_critical_value)
 		points.emplace_back (critical_angle, critical_pen, 0.2f * r);
 	points.emplace_back (value_span_angle, critical_pen, 0.f);
 
@@ -245,7 +247,7 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	}
 
 	// Normal value bug:
-	if (_normal_visible)
+	if (_normal_value)
 	{
 		painter.setPen (green_pen);
 		painter.rotate (normal_angle);
@@ -257,14 +259,14 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	painter.restore();
 
 	// Needle:
-	if (_value_visible)
+	if (_value)
 	{
 		painter.rotate (value_angle);
 		painter.setPen (pointer_pen);
 		painter.set_shadow_color (Qt::black);
 		painter.set_shadow_width (1.9f);
 
-		if (_target_visible)
+		if (_target_value)
 		{
 			float ext = 0.15f * r;
 			float extr = 1.15f * r;

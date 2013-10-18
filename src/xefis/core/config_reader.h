@@ -50,48 +50,49 @@ class ConfigReader
 		{
 			QString			name;
 			bool			required;
-			bool*			value_bool		= nullptr;
-			int8_t*			value_int8		= nullptr;
-			int16_t*		value_int16		= nullptr;
-			int32_t*		value_int32		= nullptr;
-			int64_t*		value_int64		= nullptr;
-			uint8_t*		value_uint8		= nullptr;
-			uint16_t*		value_uint16	= nullptr;
-			uint32_t*		value_uint32	= nullptr;
-			uint64_t*		value_uint64	= nullptr;
-			float*			value_float		= nullptr;
-			double*			value_double	= nullptr;
-			std::string*	value_string	= nullptr;
-			QString*		value_qstring	= nullptr;
-			SI::Value*		value_si_value	= nullptr;
+#define XEFIS_DEF_ATTR_S(type, name) \
+	type* value_##name = nullptr; \
+	Optional<type>* value_optional_##name = nullptr;
+#define XEFIS_DEF_ATTR(type_name) \
+	XEFIS_DEF_ATTR_S (type_name, type_name)
+			XEFIS_DEF_ATTR (bool)
+			XEFIS_DEF_ATTR (int8_t)
+			XEFIS_DEF_ATTR (int16_t)
+			XEFIS_DEF_ATTR (int32_t)
+			XEFIS_DEF_ATTR (int64_t)
+			XEFIS_DEF_ATTR (uint8_t)
+			XEFIS_DEF_ATTR (uint16_t)
+			XEFIS_DEF_ATTR (uint32_t)
+			XEFIS_DEF_ATTR (uint64_t)
+			XEFIS_DEF_ATTR (float)
+			XEFIS_DEF_ATTR (double)
+			XEFIS_DEF_ATTR_S (std::string, string)
+			XEFIS_DEF_ATTR_S (QString, qstring)
+			XEFIS_DEF_ATTR_S (SI::Value, si_value)
+#undef XEFIS_DEF_ATTR
+#undef XEFIS_DEF_ATTR_S
 
-			NameAndSetting (QString const& name, bool& value, bool required);
-
-			NameAndSetting (QString const& name, int8_t& value, bool required);
-
-			NameAndSetting (QString const& name, int16_t& value, bool required);
-
-			NameAndSetting (QString const& name, int32_t& value, bool required);
-
-			NameAndSetting (QString const& name, int64_t& value, bool required);
-
-			NameAndSetting (QString const& name, uint8_t& value, bool required);
-
-			NameAndSetting (QString const& name, uint16_t& value, bool required);
-
-			NameAndSetting (QString const& name, uint32_t& value, bool required);
-
-			NameAndSetting (QString const& name, uint64_t& value, bool required);
-
-			NameAndSetting (QString const& name, float& value, bool required);
-
-			NameAndSetting (QString const& name, double& value, bool required);
-
-			NameAndSetting (QString const& name, std::string& value, bool required);
-
-			NameAndSetting (QString const& name, QString& value, bool required);
-
-			NameAndSetting (QString const& name, SI::Value& value, bool required);
+#define XEFIS_DEF_CONSTR(type) \
+	NameAndSetting (QString const& name, type& value, bool required); \
+	NameAndSetting (QString const& name, Optional<type>& value, bool required);
+#define XEFIS_DEF_CONSTR_SINGLE(type) \
+	NameAndSetting (QString const& name, type& value, bool required); \
+			XEFIS_DEF_CONSTR (bool)
+			XEFIS_DEF_CONSTR (int8_t)
+			XEFIS_DEF_CONSTR (int16_t)
+			XEFIS_DEF_CONSTR (int32_t)
+			XEFIS_DEF_CONSTR (int64_t)
+			XEFIS_DEF_CONSTR (uint8_t)
+			XEFIS_DEF_CONSTR (uint16_t)
+			XEFIS_DEF_CONSTR (uint32_t)
+			XEFIS_DEF_CONSTR (uint64_t)
+			XEFIS_DEF_CONSTR (float)
+			XEFIS_DEF_CONSTR (double)
+			XEFIS_DEF_CONSTR (std::string)
+			XEFIS_DEF_CONSTR (QString)
+			XEFIS_DEF_CONSTR_SINGLE (SI::Value)
+#undef XEFIS_DEF_CONSTR_SINGLE
+#undef XEFIS_DEF_CONSTR
 		};
 
 		typedef std::vector<NameAndSetting>	SettingsList;
@@ -245,116 +246,43 @@ class ConfigException: public Exception
 };
 
 
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, bool& value, bool required):
-	name (name),
-	required (required),
-	value_bool (&value)
-{ }
+#define XEFIS_DEF_CONSTR_SINGLE(type, xname) \
+	inline ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, type& value, bool required): \
+		name (name), \
+		required (required), \
+		value_##xname (&value) \
+	{ }
+#define XEFIS_DEF_CONSTR_S(type, xname) \
+	inline ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, type& value, bool required): \
+		name (name), \
+		required (required), \
+		value_##xname (&value) \
+	{ } \
+	inline ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, Optional<type>& value, bool required): \
+		name (name), \
+		required (required), \
+		value_optional_##xname (&value) \
+	{ }
+#define XEFIS_DEF_CONSTR(type_name) \
+	XEFIS_DEF_CONSTR_S (type_name, type_name)
 
+XEFIS_DEF_CONSTR (bool)
+XEFIS_DEF_CONSTR (int8_t)
+XEFIS_DEF_CONSTR (int16_t)
+XEFIS_DEF_CONSTR (int32_t)
+XEFIS_DEF_CONSTR (int64_t)
+XEFIS_DEF_CONSTR (uint8_t)
+XEFIS_DEF_CONSTR (uint16_t)
+XEFIS_DEF_CONSTR (uint32_t)
+XEFIS_DEF_CONSTR (uint64_t)
+XEFIS_DEF_CONSTR (float)
+XEFIS_DEF_CONSTR (double)
+XEFIS_DEF_CONSTR_S (std::string, string)
+XEFIS_DEF_CONSTR_S (QString, qstring)
+XEFIS_DEF_CONSTR_SINGLE (SI::Value, si_value)
 
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, int8_t& value, bool required):
-	name (name),
-	required (required),
-	value_int8 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, int16_t& value, bool required):
-	name (name),
-	required (required),
-	value_int16 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, int32_t& value, bool required):
-	name (name),
-	required (required),
-	value_int32 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, int64_t& value, bool required):
-	name (name),
-	required (required),
-	value_int64 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, uint8_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint8 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, uint16_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint16 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, uint32_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint32 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, uint64_t& value, bool required):
-	name (name),
-	required (required),
-	value_uint64 (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, float& value, bool required):
-	name (name),
-	required (required),
-	value_float (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, double& value, bool required):
-	name (name),
-	required (required),
-	value_double (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, std::string& value, bool required):
-	name (name),
-	required (required),
-	value_string (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, QString& value, bool required):
-	name (name),
-	required (required),
-	value_qstring (&value)
-{ }
-
-
-inline
-ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, SI::Value& value, bool required):
-	name (name),
-	required (required),
-	value_si_value (&value)
-{ }
+#undef XEFIS_DEF_CONSTR
+#undef XEFIS_DEF_CONSTR_S
 
 
 inline bool
