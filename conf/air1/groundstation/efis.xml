@@ -202,7 +202,7 @@
 						<item>
 							<layout type='horizontal'>
 								<item stretch-factor='1'/>
-								<item stretch-factor='20'>
+								<item stretch-factor='18'>
 									<layout type='vertical'>
 										<item stretch-factor='10'>
 											<module name='instruments/radial-indicator' instance='engine-L-RPM'>
@@ -246,10 +246,62 @@
 												</properties>
 											</module>
 										</item>
-										<item stretch-factor='35'/>
+										<item stretch-factor='10'>
+											<module name='instruments/linear-indicator' instance='engine-L-VOLT'>
+												<settings>
+													<setting name='value.minimum' value='10.0'/>
+													<setting name='value.maximum' value='13.0'/>
+													<setting name='value.digits' value='4'/>
+													<setting name='value.precision' value='1'/>
+													<setting name='style.mirrored' value='false'/>
+												</settings>
+												<properties path='//sensors/engines/left'>
+													<property name='value' path='/esc-voltage' default='10.1'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='25'/>
 									</layout>
 								</item>
-								<item stretch-factor='20'>
+								<item stretch-factor='4'>
+									<layout type='vertical'>
+										<item stretch-factor='9'>
+											<module name='instruments/label' instance='engine-RPM'>
+												<label>RPM</label>
+												<align>hcenter bottom</align>
+												<color>#4bf</color>
+												<font-size>11</font-size>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/label' instance='engine-AMP'>
+												<label>AMP</label>
+												<align>hcenter bottom</align>
+												<color>#4bf</color>
+												<font-size>11</font-size>
+											</module>
+										</item>
+										<item stretch-factor='10'>
+											<module name='instruments/label' instance='engine-TEMP'>
+												<label>TEMP</label>
+												<align>hcenter bottom</align>
+												<color>#4bf</color>
+												<font-size>11</font-size>
+											</module>
+										</item>
+										<item stretch-factor='1'/>
+										<item stretch-factor='10'>
+											<module name='instruments/label' instance='engine-VOLT'>
+												<label>VOLT</label>
+												<align>hcenter vcenter</align>
+												<color>#4bf</color>
+												<font-size>11</font-size>
+											</module>
+										</item>
+										<item stretch-factor='25'/>
+									</layout>
+								</item>
+								<item stretch-factor='18'>
 									<layout type='vertical'>
 										<item stretch-factor='10'>
 											<module name='instruments/radial-indicator' instance='engine-R-RPM'>
@@ -293,7 +345,21 @@
 												</properties>
 											</module>
 										</item>
-										<item stretch-factor='35'/>
+										<item stretch-factor='10'>
+											<module name='instruments/linear-indicator' instance='engine-R-VOLT'>
+												<settings>
+													<setting name='value.minimum' value='10.0'/>
+													<setting name='value.maximum' value='13.0'/>
+													<setting name='value.digits' value='4'/>
+													<setting name='value.precision' value='1'/>
+													<setting name='style.mirrored' value='true'/>
+												</settings>
+												<properties path='//sensors/engines/right'>
+													<property name='value' path='/esc-voltage' default='9.8'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='25'/>
 									</layout>
 								</item>
 								<item stretch-factor='50'>
