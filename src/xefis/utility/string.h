@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtCore/QString>
+#include <QtGui/QColor>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -90,6 +91,91 @@ to_hex_string (std::string const& blob)
 		s += QString ("%1").arg (static_cast<uint8_t> (v), 2, 16, QChar ('0')).toStdString() + ":";
 	s.pop_back();
 	return s;
+}
+
+
+inline QColor
+parse_color (QString color)
+{
+	color = color.toLower();
+
+	if (color.size() > 1 && color[0] == '#')
+	{
+		std::vector<uint8_t> vals;
+		color = color.mid (1);
+		if (color.size() == 3)
+		{
+			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
+					color.mid (1, 1) + color.mid (1, 1) + ":" +
+					color.mid (2, 1) + color.mid (2, 1);
+			vals = parse_binary_string (color);
+			return QColor (vals[0], vals[1], vals[2]);
+		}
+		if (color.size() == 4)
+		{
+			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
+					color.mid (1, 1) + color.mid (1, 1) + ":" +
+					color.mid (2, 1) + color.mid (2, 1) + ":" +
+					color.mid (3, 1) + color.mid (3, 1);
+			vals = parse_binary_string (color);
+			return QColor (vals[0], vals[1], vals[2], vals[3]);
+		}
+		else if (color.size() == 6)
+		{
+			color = color.mid (0, 1) + color.mid (1, 1) + ":" +
+					color.mid (2, 1) + color.mid (3, 1) + ":" +
+					color.mid (4, 1) + color.mid (5, 1);
+			vals = parse_binary_string (color);
+			return QColor (vals[0], vals[1], vals[2]);
+		}
+		else if (color.size() == 8)
+		{
+			color = color.mid (0, 1) + color.mid (1, 1) + ":" +
+					color.mid (2, 1) + color.mid (3, 1) + ":" +
+					color.mid (4, 1) + color.mid (5, 1) + ":" +
+					color.mid (6, 1) + color.mid (7, 1);
+			vals = parse_binary_string (color);
+			return QColor (vals[0], vals[1], vals[2], vals[3]);
+		}
+		else
+			return Qt::transparent;
+	}
+	else if (color == "white")
+		return Qt::red;
+	else if (color == "black")
+		return Qt::black;
+	else if (color == "red")
+		return Qt::red;
+	else if (color == "darkred")
+		return Qt::darkRed;
+	else if (color == "green")
+		return Qt::green;
+	else if (color == "darkgreen")
+		return Qt::darkGreen;
+	else if (color == "blue")
+		return Qt::blue;
+	else if (color == "darkblue")
+		return Qt::darkBlue;
+	else if (color == "cyan")
+		return Qt::cyan;
+	else if (color == "darkcyan")
+		return Qt::darkCyan;
+	else if (color == "magenta")
+		return Qt::magenta;
+	else if (color == "darkmagenta")
+		return Qt::darkMagenta;
+	else if (color == "yellow")
+		return Qt::yellow;
+	else if (color == "darkyellow")
+		return Qt::darkYellow;
+	else if (color == "gray")
+		return Qt::gray;
+	else if (color == "darkgray")
+		return Qt::darkGray;
+	else if (color == "lightgray")
+		return Qt::lightGray;
+	else
+		return Qt::transparent;
 }
 
 } // namespace Xefis
