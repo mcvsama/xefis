@@ -76,8 +76,8 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 				if (known_values.find (name) == known_values.end())
 					throw Exception (QString ("configuration for unknown setting: %1").arg (name));
 
-			if (configured_values.find (name) != configured_values.end())
-				throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
+				if (configured_values.find (name) != configured_values.end())
+					throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
 
 				if (!d.hasAttribute ("value"))
 					throw Exception (QString ("missing attribute @value for setting: %1").arg (name));
@@ -92,34 +92,33 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 					return;
 
 				NameAndSetting* nas = it->second;
-				if (nas->value_bool)
-					*nas->value_bool = value == "true";
-				else if (nas->value_int8)
-					*nas->value_int8 = parse_int<int8_t> (value);
-				else if (nas->value_int16)
-					*nas->value_int16 = parse_int<int16_t> (value);
-				else if (nas->value_int32)
-					*nas->value_int32 = parse_int<int32_t> (value);
-				else if (nas->value_int64)
-					*nas->value_int64 = parse_int<int64_t> (value);
-				else if (nas->value_uint8)
-					*nas->value_uint8 = parse_int<uint8_t> (value);
-				else if (nas->value_uint16)
-					*nas->value_uint16 = parse_int<uint16_t> (value);
-				else if (nas->value_uint32)
-					*nas->value_uint32 = parse_int<uint32_t> (value);
-				else if (nas->value_uint64)
-					*nas->value_uint64 = parse_int<uint64_t> (value);
-				else if (nas->value_float)
-					*nas->value_float = boost::lexical_cast<float> (value.toStdString());
-				else if (nas->value_double)
-					*nas->value_double = boost::lexical_cast<double> (value.toStdString());
-				else if (nas->value_string)
-					*nas->value_string = value.toStdString();
-				else if (nas->value_qstring)
-					*nas->value_qstring = value;
+
+#define XEFIS_CHECK_S(type, name, expr) \
+	if (nas->value_##name) \
+		*nas->value_##name = (expr); \
+	else if (nas->value_optional_##name) \
+		*nas->value_optional_##name = (expr);
+#define XEFIS_CHECK(type_name, expr) \
+	XEFIS_CHECK_S (type_name, type_name, expr)
+
+				XEFIS_CHECK (bool, value == "true")
+				else XEFIS_CHECK (int8_t, parse_int<int8_t> (value))
+				else XEFIS_CHECK (int16_t, parse_int<int16_t> (value))
+				else XEFIS_CHECK (int32_t, parse_int<int32_t> (value))
+				else XEFIS_CHECK (int64_t, parse_int<int64_t> (value))
+				else XEFIS_CHECK (uint8_t, parse_int<uint8_t> (value))
+				else XEFIS_CHECK (uint16_t, parse_int<uint16_t> (value))
+				else XEFIS_CHECK (uint32_t, parse_int<uint32_t> (value))
+				else XEFIS_CHECK (uint64_t, parse_int<uint64_t> (value))
+				else XEFIS_CHECK (float, boost::lexical_cast<float> (value.toStdString()))
+				else XEFIS_CHECK (double, boost::lexical_cast<double> (value.toStdString()))
+				else XEFIS_CHECK_S (std::string, string, value.toStdString())
+				else XEFIS_CHECK_S (QString, qstring, value)
 				else if (nas->value_si_value)
 					nas->value_si_value->parse (value.toStdString());
+
+#undef XEFIS_CHECK
+#undef XEFIS_CHECK_S
 
 				_set.insert (name);
 			}

@@ -172,7 +172,6 @@ SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
 SRC_MOCHDRS += modules/instruments/efis.h
 SRC_MOCHDRS += modules/instruments/efis_widget.h
 SRC_MOCHDRS += modules/instruments/hsi.h
-SRC_MOCHDRS += modules/instruments/radial_indicator.h
 
 ######## /modules/io ########
 

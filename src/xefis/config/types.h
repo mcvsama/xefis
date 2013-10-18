@@ -18,6 +18,9 @@
 #include <stdint.h>
 #include <string>
 
+// Boost:
+#include <boost/optional.hpp>
+
 // Qt:
 #include <QtCore/QString>
 
@@ -46,6 +49,9 @@ operator"" _qstr (const char* string, size_t)
 typedef half_float::half	float16_t;
 typedef float				float32_t;
 typedef double				float64_t;
+
+template<class Value>
+	using Optional = boost::optional<Value>;
 
 #endif
 

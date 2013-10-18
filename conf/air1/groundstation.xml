@@ -2,7 +2,7 @@
 <xefis-config version='1.0'>
 	<settings>
 		<setting name='navaids.enable' value='false'/>
-		<setting name='scale.pen' value='1.0'/>
+		<setting name='scale.pen' value='0.95'/>
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
