@@ -1869,7 +1869,7 @@ EFISWidget::PaintWorkUnit::paint_flight_director (Xefis::Painter& painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	for (auto pen: { get_pen (_autopilot_pen_1.color(), 2.4f),
+	for (auto pen: { get_pen (_autopilot_pen_1.color(), 2.3f),
 					 get_pen (_autopilot_pen_2.color(), 1.65f) })
 	{
 		painter.setPen (pen);
