@@ -256,11 +256,26 @@
 													<setting name='style.mirrored' value='false'/>
 												</settings>
 												<properties path='//sensors/engines/left'>
-													<property name='value' path='/esc-voltage' default='10.1'/>
+													<property name='value' path='/esc.voltage' default='10.1'/>
 												</properties>
 											</module>
 										</item>
-										<item stretch-factor='25'/>
+										<item stretch-factor='1'/>
+										<item stretch-factor='7'>
+											<module name='instruments/linear-indicator' instance='engine-L-ESC-TEMP'>
+												<settings>
+													<setting name='value.minimum' value='0.0'/>
+													<setting name='value.maximum' value='150.0'/>
+													<setting name='value.digits' value='3'/>
+													<setting name='value.precision' value='0'/>
+													<setting name='style.mirrored' value='false'/>
+												</settings>
+												<properties path='//sensors/engines/left'>
+													<property name='value' path='/esc.temperature' default='74'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='17'/>
 									</layout>
 								</item>
 								<item stretch-factor='4'>
@@ -291,14 +306,23 @@
 										</item>
 										<item stretch-factor='1'/>
 										<item stretch-factor='10'>
-											<module name='instruments/label' instance='engine-VOLT'>
+											<module name='instruments/label' instance='engine-ESC-VOLT'>
 												<label>VOLT</label>
 												<align>hcenter vcenter</align>
 												<color>#4bf</color>
 												<font-size>11</font-size>
 											</module>
 										</item>
-										<item stretch-factor='25'/>
+										<item stretch-factor='1'/>
+										<item stretch-factor='7'>
+											<module name='instruments/label' instance='engine-ESC-TEMP'>
+												<label>ESCT</label>
+												<align>hcenter vcenter</align>
+												<color>#4bf</color>
+												<font-size>11</font-size>
+											</module>
+										</item>
+										<item stretch-factor='17'/>
 									</layout>
 								</item>
 								<item stretch-factor='18'>
@@ -355,11 +379,26 @@
 													<setting name='style.mirrored' value='true'/>
 												</settings>
 												<properties path='//sensors/engines/right'>
-													<property name='value' path='/esc-voltage' default='9.8'/>
+													<property name='value' path='/esc.voltage' default='9.8'/>
 												</properties>
 											</module>
 										</item>
-										<item stretch-factor='25'/>
+										<item stretch-factor='1'/>
+										<item stretch-factor='7'>
+											<module name='instruments/linear-indicator' instance='engine-R-ESC-TEMP'>
+												<settings>
+													<setting name='value.minimum' value='0.0'/>
+													<setting name='value.maximum' value='150.0'/>
+													<setting name='value.digits' value='3'/>
+													<setting name='value.precision' value='0'/>
+													<setting name='style.mirrored' value='true'/>
+												</settings>
+												<properties path='//sensors/engines/right'>
+													<property name='value' path='/esc.temperature' default='72'/>
+												</properties>
+											</module>
+										</item>
+										<item stretch-factor='17'/>
 									</layout>
 								</item>
 								<item stretch-factor='50'>

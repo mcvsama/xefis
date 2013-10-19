@@ -72,7 +72,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	painter.setBrush (Qt::black);
 	painter.drawRect (rect());
 
-	float q = 0.06f * wh();
+	float q = 0.05f * w;
 	float m = 0.7f * q;
 	QRectF area (m, m, w - 2.f * m, h - 2.f * m);
 
@@ -111,7 +111,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	QFontMetricsF metrics (font);
 	float char_width = metrics.width ("0");
 	float ycorr = 0.04f * metrics.height();
-	float hcorr = 2.f * ycorr;
+	float hcorr = 1.2f * ycorr;
 
 	QString text;
 	if (_value)
@@ -121,7 +121,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	painter.setFont (font);
 	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, h / 2.f), Qt::AlignRight | Qt::AlignVCenter, text);
 	text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
-	painter.setPen (pen_white);
+	painter.setPen (get_pen (Qt::white, 0.8f));
 	painter.setBrush (Qt::NoBrush);
 	painter.drawRect (text_rect);
 	QPointF position;

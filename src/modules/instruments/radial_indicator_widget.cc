@@ -97,7 +97,7 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 	QFont small_font (_font_16);
 	QFontMetricsF small_metrics (small_font);
 
-	QPen pen = get_pen (Qt::white, 1.f);
+	QPen pen = get_pen (Qt::white, 0.8f);
 	pen.setCapStyle (Qt::RoundCap);
 
 	float margin = 0.4f * q;
