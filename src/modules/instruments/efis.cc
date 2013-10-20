@@ -114,10 +114,12 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "approach.localizer-id", _approach_localizer_id, false },
 				{ "approach.dme-distance", _approach_dme_distance, false },
 				{ "flight-path.deviation.vertical.serviceable", _flight_path_deviation_vertical_serviceable, false },
-				{ "flight-path.deviation.vertical", _flight_path_deviation_vertical, false },
+				{ "flight-path.deviation.vertical.app", _flight_path_deviation_vertical_app, false },
+				{ "flight-path.deviation.vertical.fp", _flight_path_deviation_vertical_fp, false },
 				{ "flight-path.deviation.lateral.serviceable", _flight_path_deviation_lateral_serviceable, false },
-				{ "flight-path.deviation.lateral", _flight_path_deviation_lateral, false },
-				{ "flight-path.deviation.use-ils-style", _flight_path_deviation_use_ils_style, false },
+				{ "flight-path.deviation.lateral.app", _flight_path_deviation_lateral_app, false },
+				{ "flight-path.deviation.lateral.fp", _flight_path_deviation_lateral_fp, false },
+				{ "flight-path.deviation.mixed-mode", _flight_path_deviation_mixed_mode, false },
 				{ "flight-mode.hint.visible", _flight_mode_hint_visible, false },
 				{ "flight-mode.hint", _flight_mode_hint, false },
 				{ "flight-mode.fma.visible", _flight_mode_fma_visible, false },
@@ -171,261 +173,179 @@ EFIS::read()
 {
 	_fpv_computer.data_updated (update_time());
 
-	_efis_widget->set_speed_ladder_line_every (_speed_ladder_line_every);
-	_efis_widget->set_speed_ladder_number_every (_speed_ladder_number_every);
-	_efis_widget->set_speed_ladder_extent (_speed_ladder_extent);
-	_efis_widget->set_speed_ladder_minimum (_speed_ladder_minimum);
-	_efis_widget->set_speed_ladder_maximum (_speed_ladder_maximum);
+	EFISWidget::Parameters params;
 
-	_efis_widget->set_altitude_ladder_line_every (_altitude_ladder_line_every);
-	_efis_widget->set_altitude_ladder_number_every (_altitude_ladder_number_every);
-	_efis_widget->set_altitude_ladder_emphasis_every (_altitude_ladder_emphasis_every);
-	_efis_widget->set_altitude_ladder_bold_every (_altitude_ladder_bold_every);
-	_efis_widget->set_altitude_ladder_extent (_altitude_ladder_extent);
-
-	_efis_widget->set_landing_altitude_warning_hi (_altitude_landing_warning_hi);
-	_efis_widget->set_landing_altitude_warning_lo (_altitude_landing_warning_lo);
-
-	_efis_widget->set_heading_numbers_visible (_orientation_heading_numbers_visible.read (false));
-
-	_efis_widget->set_speed_visible (_speed_ias.valid());
-	_efis_widget->set_speed_failure (!_speed_ias_serviceable.read (true));
-	if (_speed_ias.valid())
-		_efis_widget->set_speed (*_speed_ias);
-
-	_efis_widget->set_speed_tendency_visible (_speed_ias_lookahead.valid());
-	if (_speed_ias_lookahead.valid())
-		_efis_widget->set_speed_tendency (*_speed_ias_lookahead);
-
-	_efis_widget->set_minimum_speed_visible (_speed_ias_minimum.valid());
-	if (_speed_ias_minimum.valid())
-		_efis_widget->set_minimum_speed (*_speed_ias_minimum);
-
-	_efis_widget->set_minimum_maneuver_speed_visible (_speed_ias_minimum_maneuver.valid());
-	if (_speed_ias_minimum_maneuver.valid())
-		_efis_widget->set_minimum_maneuver_speed (*_speed_ias_minimum_maneuver);
-
-	_efis_widget->set_maximum_maneuver_speed_visible (_speed_ias_maximum_maneuver.valid());
-	if (_speed_ias_maximum_maneuver.valid())
-		_efis_widget->set_maximum_maneuver_speed (*_speed_ias_maximum_maneuver);
-
-	_efis_widget->set_maximum_speed_visible (_speed_ias_maximum.valid());
-	if (_speed_ias_maximum.valid())
-		_efis_widget->set_maximum_speed (*_speed_ias_maximum);
-
-	_efis_widget->set_mach_visible (_speed_mach.valid());
-	if (_speed_mach.valid())
-		_efis_widget->set_mach (*_speed_mach);
-
-	_efis_widget->set_pitch_visible (_orientation_pitch.valid());
-	if (_orientation_pitch.valid())
-		_efis_widget->set_pitch (*_orientation_pitch);
-
-	_efis_widget->set_roll_visible (_orientation_roll.valid());
-	if (_orientation_roll.valid())
-		_efis_widget->set_roll (*_orientation_roll);
-
-	_efis_widget->set_attitude_failure (!_orientation_serviceable.read (true));
-
-	if (_aoa_alpha.valid() && _aoa_critical.valid() && _aoa_critical_visible.read (false))
-	{
-		_efis_widget->set_aoa_alpha (*_aoa_alpha);
-		_efis_widget->set_critical_aoa (*_aoa_critical);
-		if (_aoa_warning_threshold.valid() && _aoa_alpha.valid() && _aoa_critical.valid())
-			_efis_widget->set_critical_aoa_visible (*_aoa_critical - *_aoa_alpha <= *_aoa_warning_threshold);
-		else
-			_efis_widget->set_critical_aoa_visible (false);
-	}
-	else
-		_efis_widget->set_critical_aoa_visible (false);
-
-	_efis_widget->set_heading_visible (_orientation_heading_magnetic.valid());
-	if (_orientation_heading_magnetic.valid())
-		_efis_widget->set_heading (*_orientation_heading_magnetic);
-
-	_efis_widget->set_slip_skid_visible (_slip_skid.valid());
-	if (_slip_skid.valid())
-		_efis_widget->set_slip_skid (*_slip_skid);
-
-	_efis_widget->set_altitude_visible (_altitude_amsl.valid());
-	_efis_widget->set_altitude_failure (!_altitude_amsl_serviceable.read (true));
-	if (_altitude_amsl.valid())
-		_efis_widget->set_altitude (*_altitude_amsl);
-
-	_efis_widget->set_altitude_tendency_visible (_altitude_amsl_lookahead.valid());
-	if (_altitude_amsl_lookahead.valid())
-		_efis_widget->set_altitude_tendency (*_altitude_amsl_lookahead);
-
-	_efis_widget->set_altitude_agl_visible (_altitude_agl.valid());
-	_efis_widget->set_radar_altimeter_failure (!_altitude_agl_serviceable.read (true));
-	if (_altitude_agl.valid())
-		_efis_widget->set_altitude_agl (*_altitude_agl);
-
-	if (_altitude_minimums_setting.valid())
-		_efis_widget->set_altitude_minimums_setting (*_altitude_minimums_setting);
-	if (_altitude_minimums_amsl.valid())
-		_efis_widget->set_altitude_minimums_amsl (*_altitude_minimums_amsl);
-	_efis_widget->set_minimums_altitude_visible (_altitude_minimums_setting.valid() && _altitude_minimums_amsl.valid());
-
-	if (_altitude_landing_amsl.valid())
-		_efis_widget->set_landing_altitude_amsl (*_altitude_landing_amsl);
-	_efis_widget->set_landing_altitude_visible (_altitude_landing_amsl.valid());
-
-	if (_pressure_use_std.valid())
-		_efis_widget->set_standard_pressure (*_pressure_use_std);
-	else
-		_efis_widget->set_standard_pressure (false);
-
-	_efis_widget->set_minimums_type (QString::fromStdString (_altitude_minimums_type.read ("")));
-
-	_efis_widget->set_pressure_visible (_pressure_qnh.valid());
-	if (_pressure_qnh.valid())
-		_efis_widget->set_pressure (*_pressure_qnh);
-
-	if (_pressure_display_hpa.valid())
-		_efis_widget->set_pressure_display_hpa (*_pressure_display_hpa);
-
-	_efis_widget->set_vertical_speed_visible (_vertical_speed.valid());
-	_efis_widget->set_vertical_speed_failure (!_vertical_speed_serviceable.read (true));
-	if (_vertical_speed.valid())
-		_efis_widget->set_vertical_speed (*_vertical_speed);
-
-	_efis_widget->set_variometer_visible (_vertical_speed_variometer.valid());
-	if (_vertical_speed_variometer.valid())
-		_efis_widget->set_variometer_rate (*_vertical_speed_variometer);
-
-	bool cmd_visible = _flight_director_cmd_visible.read (false);
-
-	_efis_widget->set_cmd_altitude_visible (cmd_visible && _flight_director_cmd_altitude.valid());
-	if (_flight_director_cmd_altitude.valid())
-		_efis_widget->set_cmd_altitude (*_flight_director_cmd_altitude);
-	_efis_widget->set_cmd_altitude_acquired (_flight_director_cmd_altitude_acquired.valid() && *_flight_director_cmd_altitude_acquired);
-
-	_efis_widget->set_cmd_speed_visible (cmd_visible && _flight_director_cmd_ias.valid());
-	if (_flight_director_cmd_ias.valid())
-		_efis_widget->set_cmd_speed (*_flight_director_cmd_ias);
-
-	_efis_widget->set_cmd_vertical_speed_visible (cmd_visible && _flight_director_cmd_vertical_speed.valid());
-	if (_flight_director_cmd_vertical_speed.valid())
-		_efis_widget->set_cmd_vertical_speed (*_flight_director_cmd_vertical_speed);
-
-	bool flight_director_guidance_visible = _flight_director_guidance_visible.read (false);
-
-	_efis_widget->set_flight_director_failure (!_flight_director_serviceable.read (true));
-
-	_efis_widget->set_flight_director_pitch_visible (flight_director_guidance_visible && _flight_director_guidance_pitch.valid());
-	if (_flight_director_guidance_pitch.valid())
-		_efis_widget->set_flight_director_pitch (*_flight_director_guidance_pitch);
-
-	_efis_widget->set_flight_director_roll_visible (flight_director_guidance_visible && _flight_director_guidance_roll.valid());
-	if (_flight_director_guidance_roll.valid())
-		_efis_widget->set_flight_director_roll (*_flight_director_guidance_roll);
-
-	bool control_stick_visible = _control_stick_visible.valid() && *_control_stick_visible;
-
-	_efis_widget->set_control_stick_visible (control_stick_visible && _control_stick_pitch.valid() && _control_stick_roll.valid());
-
-	if (_control_stick_pitch.valid())
-		_efis_widget->set_control_stick_pitch (*_control_stick_pitch);
-
-	if (_control_stick_roll.valid())
-		_efis_widget->set_control_stick_roll (*_control_stick_roll);
-
-	if (_approach_reference_visible.valid() && *_approach_reference_visible)
-	{
-		_efis_widget->set_approach_hint (_approach_type_hint.read ("").c_str());
-		_efis_widget->set_approach_reference_visible (true);
-		if (_altitude_agl.valid())
-		{
-			_efis_widget->set_runway_visible (_flight_path_deviation_lateral.valid() && *_altitude_agl <= 1000_ft);
-			_efis_widget->set_runway_position (Xefis::limit<Length> (*_altitude_agl, 0_ft, 250_ft) / 250_ft * 25_deg);
-		}
-	}
-	else
-	{
-		_efis_widget->set_approach_reference_visible (false);
-		_efis_widget->set_approach_hint ("");
-	}
-
-	_efis_widget->set_dme_distance_visible (_approach_dme_distance.valid());
-	if (_approach_dme_distance.valid())
-		_efis_widget->set_dme_distance (*_approach_dme_distance);
-
-	if (_approach_localizer_id.valid() && _orientation_heading_true.valid() && _orientation_heading_magnetic.valid())
-	{
-		Xefis::Navaid const* navaid = navaid_storage()->find_by_id (Xefis::Navaid::LOC, (*_approach_localizer_id).c_str());
-		if (navaid)
-		{
-			_efis_widget->set_localizer_id ((*_approach_localizer_id).c_str());
-			_efis_widget->set_localizer_magnetic_bearing (*_orientation_heading_magnetic - *_orientation_heading_true + navaid->true_bearing());
-		}
-		else
-		{
-			_efis_widget->set_localizer_id ((*_approach_localizer_id).c_str());
-			_efis_widget->set_localizer_magnetic_bearing (0_deg);
-		}
-		_efis_widget->set_localizer_info_visible (true);
-	}
-	else
-		_efis_widget->set_localizer_info_visible (false);
-
-	_efis_widget->set_novspd_flag (_warning_novspd_flag.read (false));
-	_efis_widget->set_ldgalt_flag (_warning_ldgalt_flag.read (false));
-
+	params.old_style = _style_old.read (false);
+	params.show_metric = _style_show_metric.read (false);
+	// Speed
+	params.speed_failure = !_speed_ias_serviceable.read (true);
+	params.speed_visible = _speed_ias.valid();
+	params.speed = *_speed_ias;
+	params.speed_lookahead_visible = _speed_ias_lookahead.valid();
+	params.speed_lookahead = *_speed_ias_lookahead;
+	params.speed_minimum_visible = _speed_ias_minimum.valid();
+	params.speed_minimum = *_speed_ias_minimum;
+	params.speed_minimum_maneuver_visible = _speed_ias_minimum_maneuver.valid();
+	params.speed_minimum_maneuver = *_speed_ias_minimum_maneuver;
+	params.speed_maximum_maneuver_visible = _speed_ias_maximum_maneuver.valid();
+	params.speed_maximum_maneuver = *_speed_ias_maximum_maneuver;
+	params.speed_maximum_visible = _speed_ias_maximum.valid();
+	params.speed_maximum = *_speed_ias_maximum;
+	params.speed_mach_visible = _speed_mach.valid();
+	params.speed_mach = *_speed_mach;
+	// V1
 	if (_speed_v1.valid())
-		_efis_widget->add_speed_bug ("V1", *_speed_v1);
+		params.speed_bugs["V1"] = *_speed_v1;
 	else
-		_efis_widget->remove_speed_bug ("V1");
-
+		params.speed_bugs.erase ("V1");
+	// Vr
 	if (_speed_vr.valid())
-		_efis_widget->add_speed_bug ("VR", *_speed_vr);
+		params.speed_bugs["VR"] = *_speed_vr;
 	else
-		_efis_widget->remove_speed_bug ("VR");
-
+		params.speed_bugs.erase ("VR");
+	// Vref
 	if (_speed_vref.valid())
-		_efis_widget->add_speed_bug ("REF", *_speed_vref);
+		params.speed_bugs["REF"] = *_speed_vref;
 	else
-		_efis_widget->remove_speed_bug ("REF");
+		params.speed_bugs.erase ("REF");
+	// Orientation
+	params.orientation_failure = !_orientation_serviceable.read (true);
+	params.orientation_pitch_visible = _orientation_pitch.valid();
+	params.orientation_pitch = *_orientation_pitch;
+	params.orientation_roll_visible = _orientation_roll.valid();
+	params.orientation_roll = *_orientation_roll;
+	params.orientation_heading_visible = _orientation_heading_magnetic.valid();
+	params.orientation_heading = *_orientation_heading_magnetic;
+	params.orientation_heading_numbers_visible = _orientation_heading_numbers_visible.read (false);
+	// Slip-skid
+	params.slip_skid_visible = _slip_skid.valid();
+	params.slip_skid = *_slip_skid;
+	// Flight path vector:
+	params.flight_path_marker_failure = _computed_fpv_failure;
+	params.flight_path_visible = _computed_fpv_visible;
+	params.flight_path_alpha = _computed_fpv_alpha;
+	params.flight_path_beta = _computed_fpv_beta;
+	// AOA limit
+	params.critical_aoa_visible = _aoa_alpha.valid() && _aoa_critical.valid() &&
+								  _aoa_critical_visible.read (false) && _aoa_warning_threshold.valid() &&
+								  (*_aoa_critical - *_aoa_alpha <= *_aoa_warning_threshold);
+	params.critical_aoa = *_aoa_critical;
+	params.aoa_alpha = *_aoa_alpha;
+	// Altitude
+	params.altitude_failure = !_altitude_amsl_serviceable.read (true);
+	params.altitude_visible = _altitude_amsl.valid();
+	params.altitude = *_altitude_amsl;
+	params.altitude_lookahead_visible = _altitude_amsl_lookahead.valid();
+	params.altitude_lookahead = *_altitude_amsl_lookahead;
+	params.altitude_agl_failure = !_altitude_agl_serviceable.read (true);
+	params.altitude_agl_visible = _altitude_agl.valid();
+	params.altitude_agl = *_altitude_agl;
+	params.altitude_landing_visible = _altitude_landing_amsl.valid();
+	params.altitude_landing_amsl = *_altitude_landing_amsl;
+	params.altitude_landing_warning_hi = _altitude_landing_warning_hi;
+	params.altitude_landing_warning_lo = _altitude_landing_warning_lo;
+	// Minimums
+	params.minimums_altitude_visible = _altitude_minimums_setting.valid() && _altitude_minimums_amsl.valid();
+	params.minimums_type = QString::fromStdString (_altitude_minimums_type.read (""));
+	params.minimums_amsl = *_altitude_minimums_amsl;
+	params.minimums_setting = *_altitude_minimums_setting;
+	// Vertical speed
+	params.vertical_speed_failure = !_vertical_speed_serviceable.read (true);
+	params.vertical_speed_visible = _vertical_speed.valid();
+	params.vertical_speed = *_vertical_speed;
+	params.variometer_visible = _vertical_speed_variometer.valid();
+	params.variometer_rate = *_vertical_speed_variometer;
+	// Pressure settings
+	params.pressure_visible = _pressure_qnh.valid();
+	params.pressure_qnh = *_pressure_qnh;
+	params.pressure_display_hpa = _pressure_display_hpa.read (false);
+	params.use_standard_pressure = _pressure_use_std.read (false);
+	// Command settings
+	bool cmd_visible = _flight_director_cmd_visible.read (false);
+	params.cmd_altitude_visible = cmd_visible && _flight_director_cmd_altitude.valid();
+	params.cmd_altitude = *_flight_director_cmd_altitude;
+	params.cmd_altitude_acquired = _flight_director_cmd_altitude_acquired.read (false);
+	params.cmd_vertical_speed_visible = cmd_visible && _flight_director_cmd_vertical_speed.valid();
+	params.cmd_vertical_speed = *_flight_director_cmd_vertical_speed;
+	params.cmd_speed_visible = cmd_visible && _flight_director_cmd_ias.valid();
+	params.cmd_speed = *_flight_director_cmd_ias;
+	// Flight director
+	bool guidance_visible = _flight_director_guidance_visible.read (false);
+	params.flight_director_failure = !_flight_director_serviceable.read (true);
+	params.flight_director_pitch_visible = guidance_visible && _flight_director_guidance_pitch.valid();
+	params.flight_director_pitch = *_flight_director_guidance_pitch;
+	params.flight_director_roll_visible = guidance_visible && _flight_director_guidance_roll.valid();
+	params.flight_director_roll = *_flight_director_guidance_roll;
+	// Control stick
+	params.control_stick_visible = _control_stick_visible.read (false) && _control_stick_pitch.valid() && _control_stick_roll.valid();
+	params.control_stick_pitch = *_control_stick_pitch;
+	params.control_stick_roll = *_control_stick_roll;
+	// Approach reference
+	params.approach_reference_visible = _approach_reference_visible.read (false);
+	params.approach_hint = QString::fromStdString (_approach_type_hint.read (""));
+	params.dme_distance_visible = _approach_dme_distance.valid();
+	params.dme_distance = *_approach_dme_distance;
+	params.localizer_info_visible = _approach_localizer_id.valid() && _orientation_heading_true.valid() && _orientation_heading_magnetic.valid();
+	params.localizer_id = QString::fromStdString (*_approach_localizer_id);
+	if (params.localizer_info_visible)
+	{
+		Xefis::Navaid const* navaid = navaid_storage()->find_by_id (Xefis::Navaid::LOC, QString::fromStdString (*_approach_localizer_id));
+		if (navaid)
+			params.localizer_magnetic_bearing = *_orientation_heading_magnetic - *_orientation_heading_true + navaid->true_bearing();
+		else
+			params.localizer_magnetic_bearing = 0_deg;
+	}
+	// Approach, flight path deviations
+	params.deviation_vertical_failure = !_flight_path_deviation_vertical_serviceable.read (true);
+	params.deviation_vertical_visible = _approach_reference_visible.read (false);
+	params.deviation_vertical_approach = *_flight_path_deviation_vertical_app;
+	params.deviation_vertical_flight_path = *_flight_path_deviation_vertical_fp;
+	params.deviation_lateral_failure = !_flight_path_deviation_lateral_serviceable.read (true);
+	params.deviation_lateral_visible = _approach_reference_visible.read (false);
+	params.deviation_lateral_approach = *_flight_path_deviation_lateral_app;
+	params.deviation_lateral_flight_path = *_flight_path_deviation_lateral_fp;
+	params.deviation_mixed_mode = _flight_path_deviation_mixed_mode.read (false);
+	// Raising runway
+	params.runway_visible = _flight_path_deviation_lateral_app.valid() && *_altitude_agl <= 1000_ft;
+	params.runway_position = Xefis::limit<Length> (*_altitude_agl, 0_ft, 250_ft) / 250_ft * 25_deg;
+	// Control hint
+	params.control_hint_visible = _flight_mode_hint_visible.read (false);
+	params.control_hint = QString::fromStdString (_flight_mode_hint.read (""));
+	// FMA
+	params.fma_visible = _flight_mode_fma_visible.read (false);
+	params.fma_speed_hint = QString::fromStdString (_flight_mode_fma_speed_hint.read (""));
+	params.fma_speed_small_hint = QString::fromStdString (_flight_mode_fma_speed_small_hint.read (""));
+	params.fma_lateral_hint = QString::fromStdString (_flight_mode_fma_lateral_hint.read (""));
+	params.fma_lateral_small_hint = QString::fromStdString (_flight_mode_fma_lateral_small_hint.read (""));
+	params.fma_vertical_hint = QString::fromStdString (_flight_mode_fma_vertical_hint.read (""));
+	params.fma_vertical_small_hint = QString::fromStdString (_flight_mode_fma_vertical_small_hint.read (""));
+	// TCAS
+	params.tcas_ra_pitch_minimum = _tcas_resolution_advisory_pitch_minimum.get_optional();
+	params.tcas_ra_pitch_maximum = _tcas_resolution_advisory_pitch_maximum.get_optional();
+	params.tcas_ra_vertical_speed_minimum = _tcas_resolution_advisory_vertical_speed_minimum.get_optional();
+	params.tcas_ra_vertical_speed_maximum = _tcas_resolution_advisory_vertical_speed_maximum.get_optional();
+	// Warning flags
+	params.novspd_flag = _warning_novspd_flag.read (false);
+	params.ldgalt_flag = _warning_ldgalt_flag.read (false);
+	params.pitch_disagree = _warning_pitch_disagree.read (false);
+	params.roll_disagree = _warning_roll_disagree.read (false);
+	params.ias_disagree = _warning_ias_disagree.read (false);
+	params.altitude_disagree = _warning_altitude_disagree.read (false);
+	params.roll_warning = _warning_roll.read (false);
+	params.slip_skid_warning = _warning_slip_skid.read (false);
+	// Settings:
+	params.sl_extent = 1_kt * _speed_ladder_extent;
+	params.sl_minimum = _speed_ladder_minimum;
+	params.sl_maximum = _speed_ladder_maximum;
+	params.sl_line_every = _speed_ladder_line_every;
+	params.sl_number_every = _speed_ladder_number_every;
+	params.al_extent = 1_ft * _altitude_ladder_extent;
+	params.al_emphasis_every = _altitude_ladder_emphasis_every;
+	params.al_bold_every = _altitude_ladder_bold_every;
+	params.al_line_every = _altitude_ladder_line_every;
+	params.al_number_every = _altitude_ladder_number_every;
 
-	_efis_widget->set_vertical_deviation_visible (_flight_path_deviation_vertical.valid());
-	if (_flight_path_deviation_vertical.valid())
-		_efis_widget->set_vertical_deviation (*_flight_path_deviation_vertical);
-
-	_efis_widget->set_vertical_deviation_failure (!_flight_path_deviation_vertical_serviceable.read (true));
-
-	_efis_widget->set_lateral_deviation_visible (_flight_path_deviation_lateral.valid());
-	if (_flight_path_deviation_lateral.valid())
-		_efis_widget->set_lateral_deviation (*_flight_path_deviation_lateral);
-
-	_efis_widget->set_lateral_deviation_failure (!_flight_path_deviation_lateral_serviceable.read (true));
-
-	_efis_widget->set_deviation_uses_ils_style (_flight_path_deviation_use_ils_style.read (false));
-
-	_efis_widget->set_control_hint_visible (_flight_mode_hint_visible.read (false));
-	_efis_widget->set_control_hint (_flight_mode_hint.read ("").c_str());
-
-	_efis_widget->set_fma_visible (_flight_mode_fma_visible.read (false));
-	_efis_widget->set_fma_speed_hint (_flight_mode_fma_speed_hint.read ("").c_str());
-	_efis_widget->set_fma_speed_small_hint (_flight_mode_fma_speed_small_hint.read ("").c_str());
-	_efis_widget->set_fma_lateral_hint (_flight_mode_fma_lateral_hint.read ("").c_str());
-	_efis_widget->set_fma_lateral_small_hint (_flight_mode_fma_lateral_small_hint.read ("").c_str());
-	_efis_widget->set_fma_vertical_hint (_flight_mode_fma_vertical_hint.read ("").c_str());
-	_efis_widget->set_fma_vertical_small_hint (_flight_mode_fma_vertical_small_hint.read ("").c_str());
-
-	_efis_widget->set_tcas_ra_pitch_minimum (_tcas_resolution_advisory_pitch_minimum.get_optional());
-	_efis_widget->set_tcas_ra_pitch_maximum (_tcas_resolution_advisory_pitch_maximum.get_optional());
-	_efis_widget->set_tcas_ra_vertical_speed_minimum (_tcas_resolution_advisory_vertical_speed_minimum.get_optional());
-	_efis_widget->set_tcas_ra_vertical_speed_maximum (_tcas_resolution_advisory_vertical_speed_maximum.get_optional());
-
-	_efis_widget->set_pitch_disagree (_warning_pitch_disagree.read (false));
-	_efis_widget->set_roll_disagree (_warning_roll_disagree.read (false));
-	_efis_widget->set_ias_disagree (_warning_ias_disagree.read (false));
-	_efis_widget->set_altitude_disagree (_warning_altitude_disagree.read (false));
-	_efis_widget->set_roll_warning (_warning_roll.read (false));
-	_efis_widget->set_slip_skid_warning (_warning_slip_skid.read (false));
-
-	_efis_widget->set_old_style (_style_old.read (false));
-	_efis_widget->set_show_metric (_style_show_metric.read (false));
+	_efis_widget->set_params (params);
 }
 
 
@@ -451,18 +371,15 @@ EFIS::compute_fpv()
 		Angle hdiff = Xefis::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
 		Angle roll = *_orientation_roll;
 
-		Angle alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
-		Angle beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
-
-		_efis_widget->set_flight_path_alpha (alpha);
-		_efis_widget->set_flight_path_beta (beta);
-		_efis_widget->set_flight_path_marker_visible (_fpv_visible.read (false));
-		_efis_widget->set_flight_path_marker_failure (false);
+		_computed_fpv_alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
+		_computed_fpv_beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
+		_computed_fpv_failure = false;
+		_computed_fpv_visible = _fpv_visible.read (false);
 	}
 	else
 	{
-		_efis_widget->set_flight_path_marker_visible (false);
-		_efis_widget->set_flight_path_marker_failure (_fpv_visible.read (false));
+		_computed_fpv_visible = false;
+		_computed_fpv_failure = _fpv_visible.read (false);
 	}
 }
 

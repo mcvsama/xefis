@@ -107,10 +107,12 @@
 							<directory path='/flight-path'>
 								<directory path='/deviation'>
 									<property name='flight-path.deviation.vertical.serviceable' path='/vertical.serviceable' default='true'/>
-									<property name='flight-path.deviation.vertical' path='/vertical' default='-0.3 deg'/>
+									<property name='flight-path.deviation.vertical.app' path='/vertical.app' default='0.55 deg'/>
+									<property name='flight-path.deviation.vertical.fp' path='/vertical.fp' default='-0.3 deg'/>
 									<property name='flight-path.deviation.lateral.serviceable' path='/lateral.serviceable' default='true'/>
-									<property name='flight-path.deviation.lateral' path='/lateral' default='2.26 deg'/>
-									<property name='flight-path.deviation.use-ils-style' path='/use-ils-style' default='false'/>
+									<property name='flight-path.deviation.lateral.app' path='/lateral.app' default='0.11 deg'/>
+									<property name='flight-path.deviation.lateral.fp' path='/lateral.fp' default='2.26 deg'/>
+									<property name='flight-path.deviation.mixed-mode' path='/mixed-mode' default='true'/>
 								</directory>
 							</directory>
 							<directory path='/flight-mode'>

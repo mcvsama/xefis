@@ -98,6 +98,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat			_slip_skid;
 	// Flight Path Vector
 	Xefis::PropertyBoolean			_fpv_visible;
+	bool							_computed_fpv_failure			= false;
+	bool							_computed_fpv_visible			= false;
+	Angle							_computed_fpv_alpha				= 0_deg;
+	Angle							_computed_fpv_beta				= 0_deg;
 	// Angle of Attack
 	Xefis::PropertyAngle			_aoa_alpha;
 	Xefis::PropertyAngle			_aoa_warning_threshold;
@@ -142,10 +146,13 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyLength			_approach_dme_distance;
 	// Flight path deviation
 	Xefis::PropertyBoolean			_flight_path_deviation_lateral_serviceable;
-	Xefis::PropertyAngle			_flight_path_deviation_lateral;
+	Xefis::PropertyAngle			_flight_path_deviation_lateral_app;
+	Xefis::PropertyAngle			_flight_path_deviation_lateral_fp;
 	Xefis::PropertyBoolean			_flight_path_deviation_vertical_serviceable;
 	Xefis::PropertyAngle			_flight_path_deviation_vertical;
-	Xefis::PropertyBoolean			_flight_path_deviation_use_ils_style;
+	Xefis::PropertyAngle			_flight_path_deviation_vertical_app;
+	Xefis::PropertyAngle			_flight_path_deviation_vertical_fp;
+	Xefis::PropertyBoolean			_flight_path_deviation_mixed_mode;
 	// Flight mode information
 	Xefis::PropertyBoolean			_flight_mode_hint_visible;
 	Xefis::PropertyString			_flight_mode_hint;

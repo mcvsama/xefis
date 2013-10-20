@@ -44,157 +44,189 @@ class EFISWidget: public Xefis::InstrumentWidget
 	typedef std::map<QString, Speed> SpeedBugs;
 	typedef std::map<QString, Length> AltitudeBugs;
 
+	class PaintWorkUnit;
+
+  public:
 	class Parameters
 	{
+		friend class EFISWidget;
+		friend class PaintWorkUnit;
+
 	  public:
-		bool					old_style						= false;
-		bool					show_metric						= false;
-		Angle					fov								= 120_deg;
-		bool					input_alert_visible				= false;
-		Angle					pitch							= 0_deg;
-		bool					pitch_visible					= false;
-		Angle					aoa_alpha						= 0_deg;
-		Angle					critical_aoa					= 0_deg;
-		bool					critical_aoa_visible			= false;
-		Angle					roll							= 0_deg;
-		bool					roll_visible					= false;
-		Angle					heading							= 0_deg;
-		bool					heading_visible					= false;
-		bool					heading_numbers_visible			= false;
-		float					slip_skid						= 0.f;
-		bool					slip_skid_visible				= false;
-		Angle					flight_path_alpha				= 0_deg;
-		Angle					flight_path_beta				= 0_deg;
-		bool					flight_path_visible				= false;
-		Speed					speed							= 0_kt;
-		bool					speed_visible					= false;
-		Speed					speed_tendency					= 0_kt;
-		bool					speed_tendency_visible			= false;
-		Length					altitude						= 0_ft;
-		bool					altitude_visible				= false;
-		Length					altitude_tendency				= 0_ft;
-		bool					altitude_tendency_visible		= false;
-		Length					altitude_agl					= 0_ft;
-		bool					altitude_agl_visible			= false;
+		bool				old_style							= false;
+		bool				show_metric							= false;
+		Angle				fov									= 120_deg;
+		bool				input_alert_visible					= false;
+		// Speed
+		bool				speed_failure						= false;
+		bool				speed_visible						= false;
+		Speed				speed								= 0_kt;
+		bool				speed_lookahead_visible				= false;
+		Speed				speed_lookahead						= 0_kt;
+		bool				speed_minimum_visible				= false;
+		Speed				speed_minimum						= 0_kt;
+		bool				speed_minimum_maneuver_visible		= false;
+		Speed				speed_minimum_maneuver				= 0_kt;
+		bool				speed_maximum_maneuver_visible		= false;
+		Speed				speed_maximum_maneuver				= 0_kt;
+		bool				speed_maximum_visible				= false;
+		Speed				speed_maximum						= 0_kt;
+		bool				speed_mach_visible					= false;
+		float				speed_mach							= 0.f;
+		SpeedBugs			speed_bugs;
+		// Orientation
+		bool				orientation_failure					= false;
+		bool				orientation_pitch_visible			= false;
+		Angle				orientation_pitch					= 0_deg;
+		bool				orientation_roll_visible			= false;
+		Angle				orientation_roll					= 0_deg;
+		bool				orientation_heading_visible			= false;
+		Angle				orientation_heading					= 0_deg;
+		bool				orientation_heading_numbers_visible	= false;
+		// Slip-skid
+		bool				slip_skid_visible					= false;
+		float				slip_skid							= 0.f;
+		// Flight path vector
+		bool				flight_path_marker_failure			= false;
+		bool				flight_path_visible					= false;
+		Angle				flight_path_alpha					= 0_deg;
+		Angle				flight_path_beta					= 0_deg;
+		// AOA limit
+		bool				critical_aoa_visible				= false;
+		Angle				critical_aoa						= 0_deg;
+		Angle				aoa_alpha							= 0_deg;
+		// Altitude
+		bool				altitude_failure					= false;
+		bool				altitude_visible					= false;
+		Length				altitude							= 0_ft;
+		bool				altitude_lookahead_visible			= false;
+		Length				altitude_lookahead					= 0_ft;
+		bool				altitude_agl_failure				= false;
+		bool				altitude_agl_visible				= false;
+		Length				altitude_agl						= 0_ft;
+		bool				altitude_landing_visible			= false;
+		Length				altitude_landing_amsl				= 0_ft;
+		Length				altitude_landing_warning_hi			= 0_ft;
+		Length				altitude_landing_warning_lo			= 0_ft;
+		AltitudeBugs		altitude_bugs;
+		// Minimums
+		bool				minimums_altitude_visible			= false;
+		QString				minimums_type;
+		Length				minimums_amsl						= 0_ft;
+		Length				minimums_setting					= 0_ft;
+		// Vertical speed
+		bool				vertical_speed_failure				= false;
+		bool				vertical_speed_visible				= false;
+		Speed				vertical_speed						= 0_fpm;
+		bool				variometer_visible					= false;
+		Speed				variometer_rate						= 0_fpm;
+		// Pressure settings
+		bool				pressure_visible					= false;
+		Pressure			pressure_qnh						= 0_inHg;
+		bool				pressure_display_hpa				= false;
+		bool				use_standard_pressure				= false;
+		// Command settings
+		bool				cmd_altitude_visible				= false;
+		Length				cmd_altitude						= 0_ft;
+		bool				cmd_altitude_acquired				= false;
+		bool				cmd_vertical_speed_visible			= false;
+		Speed				cmd_vertical_speed					= 0_fpm;
+		bool				cmd_speed_visible					= false;
+		Speed				cmd_speed							= 0_kt;
+		// Flight director
+		bool				flight_director_failure				= false;
+		bool				flight_director_pitch_visible		= false;
+		Angle				flight_director_pitch				= 0_deg;
+		bool				flight_director_roll_visible		= false;
+		Angle				flight_director_roll				= 0_deg;
+		// Control stick
+		bool				control_stick_visible				= false;
+		Angle				control_stick_pitch					= 0_deg;
+		Angle				control_stick_roll					= 0_deg;
+		// Approach reference
+		bool				approach_reference_visible			= false;
+		QString				approach_hint;
+		bool				dme_distance_visible				= false;
+		Length				dme_distance						= 0_nm;
+		bool				localizer_info_visible				= false;
+		QString				localizer_id;
+		Angle				localizer_magnetic_bearing			= 0_deg;
+		// Approach, flight path deviations
+		bool				deviation_vertical_failure			= false;
+		bool				deviation_vertical_visible			= false;
+		Angle				deviation_vertical_approach;
+		Angle				deviation_vertical_flight_path;
+		bool				deviation_lateral_failure			= false;
+		bool				deviation_lateral_visible			= false;
+		Angle				deviation_lateral_approach;
+		Angle				deviation_lateral_flight_path;
+		bool				deviation_mixed_mode				= false;
+		// Raising runway
+		bool				runway_visible						= false;
+		Angle				runway_position						= 0_deg;
+		// Control hint
+		bool				control_hint_visible				= false;
+		QString				control_hint;
+		// FMA
+		bool				fma_visible							= false;
+		QString				fma_speed_hint;
+		QString				fma_speed_small_hint;
+		QString				fma_lateral_hint;
+		QString				fma_lateral_small_hint;
+		QString				fma_vertical_hint;
+		QString				fma_vertical_small_hint;
+		// TCAS
+		Optional<Angle>		tcas_ra_pitch_minimum;
+		Optional<Angle>		tcas_ra_pitch_maximum;
+		Optional<Speed>		tcas_ra_vertical_speed_minimum;
+		Optional<Speed>		tcas_ra_vertical_speed_maximum;
+		// Warning flags
+		bool				novspd_flag							= false;
+		bool				ldgalt_flag							= false;
+		bool				pitch_disagree						= false;
+		bool				roll_disagree						= false;
+		bool				ias_disagree						= false;
+		bool				altitude_disagree					= false;
+		bool				roll_warning						= false;
+		bool				slip_skid_warning					= false;
+		// Speed ladder
+		Speed				sl_extent							= 124_kt;
+		int					sl_minimum							= 0;
+		int					sl_maximum							= 9999;
+		int					sl_line_every						= 10;
+		int					sl_number_every						= 20;
+		// Altitude ladder
+		Length				al_extent							= 825_ft;
+		int					al_emphasis_every					= 1000;
+		int					al_bold_every						= 500;
+		int					al_number_every						= 200;
+		int					al_line_every						= 100;
+
+	  private:
+		/**
+		 * Sanitize all the parameters.
+		 */
+		void
+		sanitize();
+	};
+
+  private:
+	class LocalParameters
+	{
+	  public:
+		bool					speed_blink							= false;
+		bool					speed_blinking_active				= false;
+		bool					minimums_blink						= false;
+		bool					minimums_blinking_active			= false;
 		QDateTime				altitude_agl_ts;
-		bool					altitude_landing_visible		= false;
-		Length					altitude_landing_amsl			= 0_ft;
-		Length					altitude_landing_warning_hi		= 0_ft;
-		Length					altitude_landing_warning_lo		= 0_ft;
-		QString					minimums_type;
-		Length					minimums_amsl					= 0_ft;
-		Length					minimums_setting				= 0_ft;
-		bool					minimums_altitude_visible		= false;
 		QDateTime				minimums_altitude_ts;
-		Speed					vertical_speed					= 0_fpm;
-		bool					vertical_speed_visible			= false;
-		Speed					variometer_rate					= 0_fpm;
-		bool					variometer_visible				= false;
-		float					mach							= 0.f;
-		bool					mach_visible					= false;
-		Pressure				pressure						= 0_inHg;
-		bool					pressure_display_hpa			= false;
-		bool					pressure_visible				= false;
-		bool					use_standard_pressure			= false;
-		Speed					minimum_speed					= 0_kt;
-		bool					minimum_speed_visible			= false;
-		Speed					minimum_maneuver_speed			= 0_kt;
-		bool					minimum_maneuver_speed_visible	= false;
-		Speed					maximum_maneuver_speed			= 0_kt;
-		bool					maximum_maneuver_speed_visible	= false;
-		Speed					maximum_speed					= 0_kt;
-		bool					maximum_speed_visible			= false;
-		Length					cmd_altitude					= 0_ft;
-		bool					cmd_altitude_acquired			= false;
-		bool					cmd_altitude_visible			= false;
-		Speed					cmd_vertical_speed				= 0_fpm;
-		bool					cmd_vertical_speed_visible		= false;
-		Speed					cmd_speed						= 0_kt;
-		bool					cmd_speed_visible				= false;
-		Angle					flight_director_pitch			= 0_deg;
-		bool					flight_director_pitch_visible	= false;
-		Angle					flight_director_roll			= 0_deg;
-		bool					flight_director_roll_visible	= false;
-		Angle					control_stick_pitch				= 0_deg;
-		Angle					control_stick_roll				= 0_deg;
-		bool					control_stick_visible			= false;
-		bool					approach_reference_visible		= false;
-		Angle					vertical_deviation_deg			= 0_deg;
-		bool					vertical_deviation_failure		= false;
-		bool					vertical_deviation_visible		= false;
-		Angle					lateral_deviation_deg			= 0_deg;
-		bool					lateral_deviation_failure		= false;
-		bool					lateral_deviation_visible		= false;
-		bool					deviation_uses_ils_style		= false;
-		bool					runway_visible					= false;
-		Angle					runway_position					= 0_deg;
-		QString					approach_hint;
-		Length					dme_distance					= 0_nm;
-		bool					dme_distance_visible			= false;
-		QString					localizer_id;
-		Angle					localizer_magnetic_bearing		= 0_deg;
-		bool					localizer_info_visible			= false;
-		QString					control_hint;
-		bool					control_hint_visible			= false;
 		QDateTime				control_hint_ts;
-		bool					fma_visible						= false;
-		QString					fma_speed_hint;
 		QDateTime				fma_speed_ts;
-		QString					fma_speed_small_hint;
 		QDateTime				fma_speed_small_ts;
-		QString					fma_lateral_hint;
 		QDateTime				fma_lateral_ts;
-		QString					fma_lateral_small_hint;
 		QDateTime				fma_lateral_small_ts;
-		QString					fma_vertical_hint;
 		QDateTime				fma_vertical_ts;
-		QString					fma_vertical_small_hint;
-		boost::optional<Angle>	tcas_ra_pitch_minimum;
-		boost::optional<Angle>	tcas_ra_pitch_maximum;
-		boost::optional<Speed>	tcas_ra_vertical_speed_minimum;
-		boost::optional<Speed>	tcas_ra_vertical_speed_maximum;
 		QDateTime				fma_vertical_small_ts;
-		SpeedBugs				speed_bugs;
-		AltitudeBugs			altitude_bugs;
-		bool					speed_blink						= false;
-		bool					speed_blinking_active			= false;
-		bool					minimums_blink					= false;
-		bool					minimums_blinking_active		= false;
-		bool					attitude_failure				= false;
-		bool					ias_failure						= false;
-		bool					altitude_failure				= false;
-		bool					vertical_speed_failure			= false;
-		bool					flight_path_marker_failure		= false;
-		bool					radar_altimeter_failure			= false;
-		bool					flight_director_failure			= false;
-		bool					novspd_flag						= false;
-		bool					ldgalt_flag						= false;
-		bool					pitch_disagree					= false;
-		bool					roll_disagree					= false;
-		bool					ias_disagree					= false;
-		bool					altitude_disagree				= false;
-		bool					roll_warning					= false;
-		bool					slip_skid_warning				= false;
-
-		/*
-		 * Speed ladder
-		 */
-
-		Speed				sl_extent						= 124_kt;
-		int					sl_minimum						= 0;
-		int					sl_maximum						= 9999;
-		int					sl_line_every					= 10;
-		int					sl_number_every					= 20;
-
-		/*
-		 * Altitude ladder
-		 */
-
-		int					al_line_every					= 100;
-		int					al_number_every					= 200;
-		int					al_emphasis_every				= 1000;
-		int					al_bold_every					= 500;
-		Length				al_extent						= 825_ft;
 	};
 
 	class PaintWorkUnit:
@@ -462,6 +494,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 	  private:
 		Parameters			_params;
 		Parameters			_params_next;
+		LocalParameters		_local_params;
+		LocalParameters		_local_params_next;
 		float				_w;
 		float				_h;
 		float				_max_w_h;
@@ -541,777 +575,10 @@ class EFISWidget: public Xefis::InstrumentWidget
 	~EFISWidget();
 
 	/**
-	 * Set old-style EFIS (pre-787).
+	 * Set new params for the widget.
 	 */
 	void
-	set_old_style (bool enabled);
-
-	/**
-	 * Enable metric values.
-	 */
-	void
-	set_show_metric (bool enabled);
-
-	/**
-	 * Set how often lines should be drawn on speed ladder.
-	 */
-	void
-	set_speed_ladder_line_every (int knots);
-
-	/**
-	 * Set how often numbers should be drawn on speed ladder.
-	 */
-	void
-	set_speed_ladder_number_every (int knots);
-
-	/**
-	 * Set speed ladder scale extent.
-	 */
-	void
-	set_speed_ladder_extent (int knots);
-
-	/**
-	 * Set speed ladder lowest value.
-	 */
-	void
-	set_speed_ladder_minimum (int knots);
-
-	/**
-	 * Set speed ladder highest value.
-	 */
-	void
-	set_speed_ladder_maximum (int knots);
-
-	/**
-	 * Set how often lines should be drawn on altitude ladder.
-	 */
-	void
-	set_altitude_ladder_line_every (int feet);
-
-	/**
-	 * Set how often numbers should be drawn on altitude ladder.
-	 */
-	void
-	set_altitude_ladder_number_every (int feet);
-
-	/**
-	 * Set how often emphasis lines (top and bottom)
-	 * should be drawn around number on altitude ladder.
-	 */
-	void
-	set_altitude_ladder_emphasis_every (int feet);
-
-	/**
-	 * Set how often lines should be drawn bold on altitude ladder.
-	 */
-	void
-	set_altitude_ladder_bold_every (int feet);
-
-	/**
-	 * Set altitude ladder scale extent.
-	 */
-	void
-	set_altitude_ladder_extent (int feet);
-
-	/**
-	 * Set pitch value.
-	 */
-	void
-	set_pitch (Angle);
-
-	/**
-	 * Toggle pitch scale visibility.
-	 * Toggles also artifical horizon.
-	 */
-	void
-	set_pitch_visible (bool visible);
-
-	/**
-	 * Set current AOA.
-	 */
-	void
-	set_aoa_alpha (Angle aoa_alpha);
-
-	/**
-	 * Set pitch limit (absolute value).
-	 */
-	void
-	set_critical_aoa (Angle critical_aoa);
-
-	/**
-	 * Set pitch limit indicator visibility.
-	 */
-	void
-	set_critical_aoa_visible (bool visible);
-
-	/**
-	 * Set roll value.
-	 */
-	void
-	set_roll (Angle);
-
-	/**
-	 * Toggle roll scale visibility.
-	 * Toggles also artifical horizon.
-	 */
-	void
-	set_roll_visible (bool visible);
-
-	/**
-	 * Set heading value.
-	 */
-	void
-	set_heading (Angle);
-
-	/**
-	 * Toggle heading scale visibility.
-	 */
-	void
-	set_heading_visible (bool visible);
-
-	/**
-	 * Toggle heading scale numbers visibility (only on ADI, not on NAV widget).
-	 */
-	void
-	set_heading_numbers_visible (bool visible);
-
-	/**
-	 * Set slip-skid value.
-	 */
-	void
-	set_slip_skid (float value);
-
-	/**
-	 * Set slip-skid indicator visibility.
-	 */
-	void
-	set_slip_skid_visible (bool visible);
-
-	/**
-	 * Set flight path vertical deviation.
-	 */
-	void
-	set_flight_path_alpha (Angle);
-
-	/**
-	 * Set flight path horizontal deviation.
-	 */
-	void
-	set_flight_path_beta (Angle);
-
-	/**
-	 * Set visibility of the Flight Path Marker.
-	 */
-	void
-	set_flight_path_marker_visible (bool visible);
-
-	/**
-	 * Set speed shown on speed ladder.
-	 */
-	void
-	set_speed (Speed);
-
-	/**
-	 * Toggle visibility of the speed scale.
-	 */
-	void
-	set_speed_visible (bool visible);
-
-	/**
-	 * Set speed tendency value.
-	 */
-	void
-	set_speed_tendency (Speed);
-
-	/**
-	 * Set speed tendency arrow visibility.
-	 */
-	void
-	set_speed_tendency_visible (bool visible);
-
-	/**
-	 * Set visibility of the NO VSPD (no V-speeds)
-	 * flag.
-	 */
-	void
-	set_novspd_flag (bool visible);
-
-	/**
-	 * Set visibility of the LDG ALT flag.
-	 */
-	void
-	set_ldgalt_flag (bool visible);
-
-	/**
-	 * Set altitude value.
-	 */
-	void
-	set_altitude (Length);
-
-	/**
-	 * Toggle visibility of the altitude scale.
-	 */
-	void
-	set_altitude_visible (bool visible);
-
-	/**
-	 * Set altitude tendency value.
-	 */
-	void
-	set_altitude_tendency (Length);
-
-	/**
-	 * Set altitude tendency arrow visibility.
-	 */
-	void
-	set_altitude_tendency_visible (bool visible);
-
-	/**
-	 * Set radar altitude.
-	 */
-	void
-	set_altitude_agl (Length);
-
-	/**
-	 * Set radar altitude visibility.
-	 */
-	void
-	set_altitude_agl_visible (bool visible);
-
-	/**
-	 * Set visibility of the altitude warnings (500 and 1000 ft) above
-	 * max of AGL altitude and LDG altitude or 0.
-	 */
-	void
-	set_landing_altitude_visible (bool visible);
-
-	/**
-	 * Set landing altitude.
-	 */
-	void
-	set_landing_altitude_amsl (Length altitude);
-
-	/**
-	 * Set top level warning about approaching landing altitude.
-	 */
-	void
-	set_landing_altitude_warning_hi (Length altitude);
-
-	/**
-	 * Set middle level warning about approaching landing altitude.
-	 */
-	void
-	set_landing_altitude_warning_lo (Length altitude);
-
-	/**
-	 * Set minimums type ("BARO", "RADIO")
-	 */
-	void
-	set_minimums_type (QString const& type);
-
-	/**
-	 * Set minimums setting. This is what's displayed on the EFIS,
-	 * it may not necessarily correspond to AMSL minimums, eg. in
-	 * case of radar-altimeter minimums.
-	 */
-	void
-	set_altitude_minimums_setting (Length);
-
-	/**
-	 * Set minimums indicator position at altitude ladder.
-	 */
-	void
-	set_altitude_minimums_amsl (Length);
-
-	/**
-	 * Set minimums altitude visibility.
-	 */
-	void
-	set_minimums_altitude_visible (bool visible);
-
-	/**
-	 * Set vertical speed.
-	 */
-	void
-	set_vertical_speed (Speed);
-
-	/**
-	 * Set vertical speed visibility.
-	 */
-	void
-	set_vertical_speed_visible (bool visible);
-
-	/**
-	 * Set vario rate.
-	 */
-	void
-	set_variometer_rate (Speed);
-
-	/**
-	 * Set variometer visibility.
-	 */
-	void
-	set_variometer_visible (bool visible);
-
-	/**
-	 * Add new speed bug.
-	 */
-	void
-	add_speed_bug (QString name, Speed);
-
-	/**
-	 * Remove a speed bug.
-	 * Pass QString::null to remove all speed bugs.
-	 */
-	void
-	remove_speed_bug (QString name);
-
-	/**
-	 * Add new altitude bug.
-	 */
-	void
-	add_altitude_bug (QString name, Length altitude);
-
-	/**
-	 * Remove an altitude bug.
-	 * Pass QString::null to remove all altitude bugs.
-	 */
-	void
-	remove_altitude_bug (QString name);
-
-	/**
-	 * Set mach number indicator.
-	 */
-	void
-	set_mach (float value);
-
-	/**
-	 * Set mach number indicator visibility.
-	 */
-	void
-	set_mach_visible (bool visible);
-
-	/**
-	 * Set pressure indicator.
-	 */
-	void
-	set_pressure (Pressure pressure);
-
-	/**
-	 * Set pressure unit to be hPa instead of inHg.
-	 */
-	void
-	set_pressure_display_hpa (bool hpa);
-
-	/**
-	 * Show or hide pressure indicator.
-	 */
-	void
-	set_pressure_visible (bool visible);
-
-	/**
-	 * Enable/disable standard pressure.
-	 */
-	void
-	set_standard_pressure (bool standard);
-
-	/**
-	 * Set minimum speed indicator on the speed ladder.
-	 */
-	void
-	set_minimum_speed (Speed);
-
-	/**
-	 * Set minimum speed indicator visibility.
-	 */
-	void
-	set_minimum_speed_visible (bool visible);
-
-	/**
-	 * Set minimum maneuver speed indicator on the speed ladder.
-	 */
-	void
-	set_minimum_maneuver_speed (Speed);
-
-	/**
-	 * Set maximum maneuver speed indicator visibility.
-	 */
-	void
-	set_maximum_maneuver_speed_visible (bool visible);
-
-	/**
-	 * Set maximum maneuver speed indicator on the speed ladder.
-	 */
-	void
-	set_maximum_maneuver_speed (Speed);
-
-	/**
-	 * Set minimum maneuver speed indicator visibility.
-	 */
-	void
-	set_minimum_maneuver_speed_visible (bool visible);
-
-	/**
-	 * Set maximum speed indicator on the speed ladder.
-	 */
-	void
-	set_maximum_speed (Speed);
-
-	/**
-	 * Set maximum speed indicator visibility.
-	 */
-	void
-	set_maximum_speed_visible (bool visible);
-
-	/**
-	 * Set commanded altitude.
-	 */
-	void
-	set_cmd_altitude (Length);
-
-	/**
-	 * Set commanded altitude emphasis.
-	 */
-	void
-	set_cmd_altitude_acquired (bool acquired);
-
-	/**
-	 * Set AP altitude setting visibility.
-	 */
-	void
-	set_cmd_altitude_visible (bool visible);
-
-	/**
-	 * Set commanded vertical speed setting.
-	 */
-	void
-	set_cmd_vertical_speed (Speed);
-
-	/**
-	 * Set AP vertical speed visibility.
-	 */
-	void
-	set_cmd_vertical_speed_visible (bool visible);
-
-	/**
-	 * Set autothrottle speed.
-	 */
-	void
-	set_cmd_speed (Speed);
-
-	/**
-	 * Set AT speed visibility.
-	 */
-	void
-	set_cmd_speed_visible (bool visible);
-
-	/**
-	 * Set flight director pitch.
-	 */
-	void
-	set_flight_director_pitch (Angle pitch);
-
-	/**
-	 * Set flight director pitch visibility.
-	 */
-	void
-	set_flight_director_pitch_visible (bool visible);
-
-	/**
-	 * Set flight director roll.
-	 */
-	void
-	set_flight_director_roll (Angle roll);
-
-	/**
-	 * Set flight director roll visibility.
-	 */
-	void
-	set_flight_director_roll_visible (bool visible);
-
-	/**
-	 * Set control stick indicator pitch.
-	 */
-	void
-	set_control_stick_pitch (Angle pitch);
-
-	/**
-	 * Set control stick indicator roll.
-	 */
-	void
-	set_control_stick_roll (Angle roll);
-
-	/**
-	 * Set visibility of the control stick indicator.
-	 */
-	void
-	set_control_stick_visible (bool visible);
-
-	/**
-	 * Set visibility of approach reference info (localizer/glideslope needles,
-	 * localizer ID/bearing, DME, etc).
-	 */
-	void
-	set_approach_reference_visible (bool visible);
-
-	/**
-	 * Set vertical deviation.
-	 */
-	void
-	set_vertical_deviation (Angle deviation);
-
-	/**
-	 * Show vertical deviation failure flag.
-	 */
-	void
-	set_vertical_deviation_failure (bool failure);
-
-	/**
-	 * Set navigation vertical needle visibility.
-	 */
-	void
-	set_vertical_deviation_visible (bool visible);
-
-	/**
-	 * Set localizer deviation needle.
-	 */
-	void
-	set_lateral_deviation (Angle value);
-
-	/**
-	 * Show lateral deviation failure flag.
-	 */
-	void
-	set_lateral_deviation_failure (bool failure);
-
-	/**
-	 * Set navigation heading needle visibility.
-	 */
-	void
-	set_lateral_deviation_visible (bool visible);
-
-	/**
-	 * Set deviation needles style.
-	 */
-	void
-	set_deviation_uses_ils_style (bool ils);
-
-	/**
-	 * Set runway visibility (aligns with lateral deviation needle).
-	 */
-	void
-	set_runway_visible (bool visible);
-
-	/**
-	 * Set runway position relative to the horizon.
-	 */
-	void
-	set_runway_position (Angle position);
-
-	/**
-	 * Set navigation hint, a text shown on the top left corner of the ADI.
-	 * Usually something like "ILS" or "VOR".
-	 */
-	void
-	set_approach_hint (QString hint);
-
-	/**
-	 * Set DME distance.
-	 */
-	void
-	set_dme_distance (Length);
-
-	/**
-	 * Set DME info visibility.
-	 */
-	void
-	set_dme_distance_visible (bool visible);
-
-	/**
-	 * Set localizer ID.
-	 */
-	void
-	set_localizer_id (QString const& loc_id);
-
-	/**
-	 * Set localizer magnetic bearing.
-	 */
-	void
-	set_localizer_magnetic_bearing (Angle mag_bearing);
-
-	/**
-	 * Set visibility of localizer ID and its bearing.
-	 */
-	void
-	set_localizer_info_visible (bool visible);
-
-	/**
-	 * Set control hint - the text displayed right above roll scale.
-	 */
-	void
-	set_control_hint (QString const&);
-
-	/**
-	 * Set visibility of the control hint.
-	 */
-	void
-	set_control_hint_visible (bool visible);
-
-	/**
-	 * Set FMA (Flight mode annunciator) visibility.
-	 */
-	void
-	set_fma_visible (bool visible);
-
-	/**
-	 * Set AP speed hint text.
-	 */
-	void
-	set_fma_speed_hint (QString const&);
-
-	/**
-	 * Set additional AP speed hint text.
-	 */
-	void
-	set_fma_speed_small_hint (QString const&);
-
-	/**
-	 * Set AP lateral hint text.
-	 */
-	void
-	set_fma_lateral_hint (QString const&);
-
-	/**
-	 * Set additional AP lateral hint text.
-	 */
-	void
-	set_fma_lateral_small_hint (QString const&);
-
-	/**
-	 * Set AP altitude hint text.
-	 */
-	void
-	set_fma_vertical_hint (QString const&);
-
-	/**
-	 * Set additional AP altitude hint text.
-	 */
-	void
-	set_fma_vertical_small_hint (QString const&);
-
-	/**
-	 * Set TCAS RA minimum pitch.
-	 */
-	void
-	set_tcas_ra_pitch_minimum (boost::optional<Angle> pitch);
-
-	/**
-	 * Set TCAS RA maximum pitch.
-	 */
-	void
-	set_tcas_ra_pitch_maximum (boost::optional<Angle> pitch);
-
-	/**
-	 * Set TCAS RA minimum vertical speed.
-	 */
-	void
-	set_tcas_ra_vertical_speed_minimum (boost::optional<Speed> speed);
-
-	/**
-	 * Set TCAS RA maximum vertical speed.
-	 */
-	void
-	set_tcas_ra_vertical_speed_maximum (boost::optional<Speed> speed);
-
-	/**
-	 * Set field of view.
-	 */
-	void
-	set_fov (Angle);
-
-	/**
-	 * Set input alert visibility.
-	 */
-	void
-	set_input_alert_visible (bool visible);
-
-	/**
-	 * Set attitude failure flag.
-	 */
-	void
-	set_attitude_failure (bool);
-
-	/**
-	 * Set speed failure flag.
-	 */
-	void
-	set_speed_failure (bool);
-
-	/**
-	 * Set altitude failure flag.
-	 */
-	void
-	set_altitude_failure (bool);
-
-	/**
-	 * Set vertical speed failure flag.
-	 */
-	void
-	set_vertical_speed_failure (bool);
-
-	/**
-	 * Set FPM failure flag.
-	 */
-	void
-	set_flight_path_marker_failure (bool);
-
-	/**
-	 * Set radar altimeter (AGL) failure flag.
-	 */
-	void
-	set_radar_altimeter_failure (bool);
-
-	/**
-	 * Set FD failure flag.
-	 */
-	void
-	set_flight_director_failure (bool);
-
-	/**
-	 * Set pitch disagree flag.
-	 */
-	void
-	set_pitch_disagree (bool disagree);
-
-	/**
-	 * Set roll disagree flag.
-	 */
-	void
-	set_roll_disagree (bool disagree);
-
-	/**
-	 * Set ias disagree flag.
-	 */
-	void
-	set_ias_disagree (bool disagree);
-
-	/**
-	 * Set altitude disagree flag.
-	 */
-	void
-	set_altitude_disagree (bool disagree);
-
-	/**
-	 * Set roll warning (amber roll indicator).
-	 */
-	void
-	set_roll_warning (bool enabled);
-
-	/**
-	 * Set slip-skid warning (amber slip-skid indicator).
-	 */
-	void
-	set_slip_skid_warning (bool enabled);
+	set_params (Parameters const&);
 
   protected:
 	// API of QWidget
@@ -1343,6 +610,7 @@ class EFISWidget: public Xefis::InstrumentWidget
   private:
 	PaintWorkUnit		_paint_work_unit;
 	Parameters			_params;
+	LocalParameters		_local_params;
 	QTimer*				_speed_blinking_warning		= nullptr;
 	QTimer*				_minimums_blinking_warning	= nullptr;
 };
@@ -1390,1050 +658,6 @@ inline bool
 EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
 {
 	return timestamp.secsTo (_current_datetime) < time.s();
-}
-
-
-inline void
-EFISWidget::set_old_style (bool enabled)
-{
-	_params.old_style = enabled;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_show_metric (bool enabled)
-{
-	_params.show_metric = enabled;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_ladder_line_every (int knots)
-{
-	_params.sl_line_every = std::max (1, knots);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_ladder_number_every (int knots)
-{
-	_params.sl_number_every = std::max (1, knots);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_ladder_extent (int knots)
-{
-	_params.sl_extent = 1_kt * std::max (1, knots);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_ladder_minimum (int knots)
-{
-	_params.sl_minimum = std::max (0, knots);
-}
-
-
-inline void
-EFISWidget::set_speed_ladder_maximum (int knots)
-{
-	_params.sl_maximum = std::min (9999, knots);
-}
-
-
-inline void
-EFISWidget::set_altitude_ladder_line_every (int feet)
-{
-	_params.al_line_every = std::max (1, feet);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_ladder_number_every (int feet)
-{
-	_params.al_number_every = std::max (1, feet);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_ladder_emphasis_every (int feet)
-{
-	_params.al_emphasis_every = std::max (1, feet);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_ladder_bold_every (int feet)
-{
-	_params.al_bold_every = std::max (1, feet);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_ladder_extent (int feet)
-{
-	_params.al_extent = 1_ft * std::max (1, feet);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pitch (Angle degrees)
-{
-	_params.pitch = degrees;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pitch_visible (bool visible)
-{
-	_params.pitch_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_aoa_alpha (Angle aoa_alpha)
-{
-	_params.aoa_alpha = aoa_alpha;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_critical_aoa (Angle critical_aoa)
-{
-	_params.critical_aoa = critical_aoa;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_critical_aoa_visible (bool visible)
-{
-	_params.critical_aoa_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_roll (Angle degrees)
-{
-	_params.roll = degrees;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_roll_visible (bool visible)
-{
-	_params.roll_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_heading (Angle degrees)
-{
-	_params.heading = degrees;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_heading_visible (bool visible)
-{
-	_params.heading_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_heading_numbers_visible (bool visible)
-{
-	_params.heading_numbers_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_slip_skid (float value)
-{
-	_params.slip_skid = value;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_slip_skid_visible (bool visible)
-{
-	_params.slip_skid_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_path_alpha (Angle pitch)
-{
-	_params.flight_path_alpha = pitch;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_path_beta (Angle heading)
-{
-	_params.flight_path_beta = heading;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_path_marker_visible (bool visible)
-{
-	_params.flight_path_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed (Speed speed)
-{
-	_params.speed = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_visible (bool visible)
-{
-	_params.speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_tendency (Speed speed)
-{
-	_params.speed_tendency = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_tendency_visible (bool visible)
-{
-	_params.speed_tendency_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_novspd_flag (bool visible)
-{
-	_params.novspd_flag = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_ldgalt_flag (bool visible)
-{
-	_params.ldgalt_flag = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude (Length altitude)
-{
-	Length previous_altitude = _params.altitude;
-	_params.altitude = altitude;
-
-	if (previous_altitude > _params.minimums_amsl && altitude < _params.minimums_amsl)
-		_params.minimums_altitude_ts = QDateTime::currentDateTime();
-
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_visible (bool visible)
-{
-	_params.altitude_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_tendency (Length altitude)
-{
-	_params.altitude_tendency = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_tendency_visible (bool visible)
-{
-	_params.altitude_tendency_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_agl (Length altitude)
-{
-	_params.altitude_agl = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_agl_visible (bool visible)
-{
-	if (!_params.altitude_agl_visible && visible)
-		_params.altitude_agl_ts = QDateTime::currentDateTime();
-	_params.altitude_agl_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude_visible (bool visible)
-{
-	_params.altitude_landing_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude_amsl (Length altitude)
-{
-	_params.altitude_landing_amsl = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude_warning_hi (Length altitude)
-{
-	_params.altitude_landing_warning_hi = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_landing_altitude_warning_lo (Length altitude)
-{
-	_params.altitude_landing_warning_lo = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimums_type (QString const& type)
-{
-	_params.minimums_type = type;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_minimums_setting (Length minimums_setting)
-{
-	_params.minimums_setting = minimums_setting;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_minimums_amsl (Length minimums_amsl)
-{
-	_params.minimums_amsl = minimums_amsl;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimums_altitude_visible (bool visible)
-{
-	if (_params.minimums_altitude_visible != visible)
-		_params.minimums_altitude_ts = QDateTime::currentDateTime();
-	_params.minimums_altitude_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_speed (Speed feet_per_minute)
-{
-	_params.vertical_speed = feet_per_minute;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_speed_visible (bool visible)
-{
-	_params.vertical_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_variometer_rate (Speed feet_per_minute)
-{
-	_params.variometer_rate = feet_per_minute;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_variometer_visible (bool visible)
-{
-	_params.variometer_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::add_speed_bug (QString name, Speed speed)
-{
-	_params.speed_bugs[name] = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::remove_speed_bug (QString name)
-{
-	if (name.isNull())
-		_params.speed_bugs.clear();
-	else
-		_params.speed_bugs.erase (name);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::add_altitude_bug (QString name, Length altitude)
-{
-	_params.altitude_bugs[name] = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::remove_altitude_bug (QString name)
-{
-	if (name.isNull())
-		_params.altitude_bugs.clear();
-	else
-		_params.altitude_bugs.erase (name);
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_mach (float value)
-{
-	_params.mach = value;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_mach_visible (bool visible)
-{
-	_params.mach_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pressure (Pressure pressure)
-{
-	_params.pressure = pressure;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pressure_display_hpa (bool hpa)
-{
-	_params.pressure_display_hpa = hpa;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pressure_visible (bool visible)
-{
-	_params.pressure_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_standard_pressure (bool standard)
-{
-	_params.use_standard_pressure = standard;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimum_speed (Speed minimum_speed)
-{
-	_params.minimum_speed = minimum_speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimum_speed_visible (bool visible)
-{
-	_params.minimum_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimum_maneuver_speed (Speed speed)
-{
-	_params.minimum_maneuver_speed = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_minimum_maneuver_speed_visible (bool visible)
-{
-	_params.minimum_maneuver_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_maximum_maneuver_speed (Speed speed)
-{
-	_params.maximum_maneuver_speed = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_maximum_maneuver_speed_visible (bool visible)
-{
-	_params.maximum_maneuver_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_maximum_speed (Speed maximum_speed)
-{
-	_params.maximum_speed = maximum_speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_maximum_speed_visible (bool visible)
-{
-	_params.maximum_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_altitude (Length altitude)
-{
-	_params.cmd_altitude = altitude;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_altitude_acquired (bool acquired)
-{
-	_params.cmd_altitude_acquired = acquired;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_altitude_visible (bool visible)
-{
-	_params.cmd_altitude_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_vertical_speed (Speed speed)
-{
-	_params.cmd_vertical_speed = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_vertical_speed_visible (bool visible)
-{
-	_params.cmd_vertical_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_speed (Speed speed)
-{
-	_params.cmd_speed = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_cmd_speed_visible (bool visible)
-{
-	_params.cmd_speed_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_director_pitch (Angle pitch)
-{
-	_params.flight_director_pitch = pitch;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_director_pitch_visible (bool visible)
-{
-	_params.flight_director_pitch_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_director_roll (Angle roll)
-{
-	_params.flight_director_roll = roll;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_director_roll_visible (bool visible)
-{
-	_params.flight_director_roll_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_control_stick_pitch (Angle pitch)
-{
-	_params.control_stick_pitch = pitch;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_control_stick_roll (Angle roll)
-{
-	_params.control_stick_roll = roll;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_control_stick_visible (bool visible)
-{
-	_params.control_stick_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_approach_reference_visible (bool visible)
-{
-	_params.approach_reference_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_deviation (Angle deviation)
-{
-	_params.vertical_deviation_deg = deviation;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_deviation_failure (bool failure)
-{
-	_params.vertical_deviation_failure = failure;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_deviation_visible (bool visible)
-{
-	_params.vertical_deviation_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_lateral_deviation (Angle deviation)
-{
-	_params.lateral_deviation_deg = deviation;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_lateral_deviation_failure (bool failure)
-{
-	_params.lateral_deviation_failure = failure;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_lateral_deviation_visible (bool visible)
-{
-	_params.lateral_deviation_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_deviation_uses_ils_style (bool ils)
-{
-	_params.deviation_uses_ils_style = ils;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_runway_visible (bool visible)
-{
-	_params.runway_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_runway_position (Angle position)
-{
-	_params.runway_position = position;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_approach_hint (QString hint)
-{
-	_params.approach_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_dme_distance (Length distance)
-{
-	_params.dme_distance = distance;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_dme_distance_visible (bool visible)
-{
-	_params.dme_distance_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_localizer_id (QString const& loc_id)
-{
-	_params.localizer_id = loc_id;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_localizer_magnetic_bearing (Angle mag_bearing)
-{
-	_params.localizer_magnetic_bearing = mag_bearing;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_localizer_info_visible (bool visible)
-{
-	_params.localizer_info_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_control_hint (QString const& hint)
-{
-	if (_params.control_hint != hint)
-		_params.control_hint_ts = QDateTime::currentDateTime();
-	_params.control_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_control_hint_visible (bool visible)
-{
-	if (_params.control_hint_visible != visible)
-		_params.control_hint_ts = QDateTime::currentDateTime();
-	_params.control_hint_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_visible (bool visible)
-{
-	_params.fma_visible = visible;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_speed_hint (QString const& hint)
-{
-	if (_params.fma_speed_hint != hint)
-		_params.fma_speed_ts = QDateTime::currentDateTime();
-	_params.fma_speed_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_speed_small_hint (QString const& hint)
-{
-	if (_params.fma_speed_small_hint != hint)
-		_params.fma_speed_small_ts = QDateTime::currentDateTime();
-	_params.fma_speed_small_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_lateral_hint (QString const& hint)
-{
-	if (_params.fma_lateral_hint != hint)
-		_params.fma_lateral_ts = QDateTime::currentDateTime();
-	_params.fma_lateral_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_lateral_small_hint (QString const& hint)
-{
-	if (_params.fma_lateral_small_hint != hint)
-		_params.fma_lateral_small_ts = QDateTime::currentDateTime();
-	_params.fma_lateral_small_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_vertical_hint (QString const& hint)
-{
-	if (_params.fma_vertical_hint != hint)
-		_params.fma_vertical_ts = QDateTime::currentDateTime();
-	_params.fma_vertical_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fma_vertical_small_hint (QString const& hint)
-{
-	if (_params.fma_vertical_small_hint != hint)
-		_params.fma_vertical_small_ts = QDateTime::currentDateTime();
-	_params.fma_vertical_small_hint = hint;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_tcas_ra_pitch_minimum (boost::optional<Angle> pitch)
-{
-	_params.tcas_ra_pitch_minimum = pitch;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_tcas_ra_pitch_maximum (boost::optional<Angle> pitch)
-{
-	_params.tcas_ra_pitch_maximum = pitch;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_tcas_ra_vertical_speed_minimum (boost::optional<Speed> speed)
-{
-	_params.tcas_ra_vertical_speed_minimum = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_tcas_ra_vertical_speed_maximum (boost::optional<Speed> speed)
-{
-	_params.tcas_ra_vertical_speed_maximum = speed;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_fov (Angle degrees)
-{
-	_params.fov = degrees;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_input_alert_visible (bool visible)
-{
-	_params.input_alert_visible = visible;
-}
-
-
-inline void
-EFISWidget::set_attitude_failure (bool set)
-{
-	_params.attitude_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_speed_failure (bool set)
-{
-	_params.ias_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_failure (bool set)
-{
-	_params.altitude_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_vertical_speed_failure (bool set)
-{
-	_params.vertical_speed_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_path_marker_failure (bool set)
-{
-	_params.flight_path_marker_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_radar_altimeter_failure (bool set)
-{
-	_params.radar_altimeter_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_flight_director_failure (bool set)
-{
-	_params.flight_director_failure = set;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_pitch_disagree (bool disagree)
-{
-	_params.pitch_disagree = disagree;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_roll_disagree (bool disagree)
-{
-	_params.roll_disagree = disagree;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_ias_disagree (bool disagree)
-{
-	_params.ias_disagree = disagree;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_altitude_disagree (bool disagree)
-{
-	_params.altitude_disagree = disagree;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_roll_warning (bool enabled)
-{
-	_params.roll_warning = enabled;
-	request_repaint();
-}
-
-
-inline void
-EFISWidget::set_slip_skid_warning (bool enabled)
-{
-	_params.slip_skid_warning = enabled;
-	request_repaint();
 }
 
 #endif
