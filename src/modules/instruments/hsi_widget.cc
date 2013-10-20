@@ -37,6 +37,19 @@ using Xefis::Navaid;
 using Xefis::NavaidStorage;
 
 
+void
+HSIWidget::Parameters::sanitize()
+{
+	range = Xefis::limit (range, 1_ft, 5000_nm);
+	heading_magnetic = Xefis::limit (heading_magnetic, 0_deg, 360_deg);
+	heading_true = Xefis::limit (heading_true, 0_deg, 360_deg);
+	ap_magnetic_heading = Xefis::limit (ap_magnetic_heading, 0_deg, 360_deg);
+	track_magnetic = Xefis::limit (track_magnetic, 0_deg, 360_deg);
+	true_home_direction = Xefis::limit (true_home_direction, 0_deg, 360_deg);
+	wind_from_magnetic_heading = Xefis::limit (wind_from_magnetic_heading, 0_deg, 360_deg);
+}
+
+
 HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
 	InstrumentWidget::PaintWorkUnit (hsi_widget),
 	InstrumentAids (0.5f)
@@ -241,24 +254,24 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		resized();
 	}
 
-	_params.true_track = Xefis::floored_mod (_params.magnetic_track + (_params.true_heading - _params.magnetic_heading), 360_deg);
+	_locals.track_true = Xefis::floored_mod (_params.track_magnetic + (_params.heading_true - _params.heading_magnetic), 360_deg);
 
-	_params.track =
+	_locals.track =
 		_params.heading_mode == HeadingMode::Magnetic
-			? _params.magnetic_track
-			: _params.true_track;
+			? _params.track_magnetic
+			: _locals.track_true;
 
-	_params.heading = _params.heading_mode == HeadingMode::Magnetic
-		? _params.magnetic_heading
-		: _params.true_heading;
+	_locals.heading = _params.heading_mode == HeadingMode::Magnetic
+		? _params.heading_magnetic
+		: _params.heading_true;
 
-	_params.rotation = _params.display_track ? _params.track : _params.heading;
+	_locals.rotation = _params.display_track ? _locals.track : _locals.heading;
 
 	_heading_transform.reset();
-	_heading_transform.rotate (-_params.heading.deg());
+	_heading_transform.rotate (-_locals.heading.deg());
 
 	_track_transform.reset();
-	_track_transform.rotate (-_params.track.deg());
+	_track_transform.rotate (-_locals.track.deg());
 
 	_rotation_transform =
 		_params.display_track
@@ -267,12 +280,12 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 
 	_features_transform = _rotation_transform;
 	if (_params.heading_mode == HeadingMode::Magnetic)
-		_features_transform.rotate ((_params.magnetic_heading - _params.true_heading).deg());
+		_features_transform.rotate ((_params.heading_magnetic - _params.heading_true).deg());
 
-	_params.ap_heading = _params.ap_magnetic_heading;
+	_locals.ap_heading = _params.ap_magnetic_heading;
 	if (_params.heading_mode == HeadingMode::True)
-		_params.ap_heading += _params.true_heading - _params.magnetic_heading;
-	_params.ap_heading = Xefis::floored_mod (_params.ap_heading, 360_deg);
+		_locals.ap_heading += _params.heading_true - _params.heading_magnetic;
+	_locals.ap_heading = Xefis::floored_mod (_locals.ap_heading, 360_deg);
 
 	Xefis::Painter painter (&image, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
@@ -319,7 +332,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 	// MAG/TRUE heading
 	if (_params.heading_visible)
 	{
-		int hdg = static_cast<int> ((_params.display_track ? _params.track : _params.heading).deg() + 0.5f) % 360;
+		int hdg = static_cast<int> ((_params.display_track ? _locals.track : _locals.heading).deg() + 0.5f) % 360;
 
 		switch (_params.display_mode)
 		{
@@ -415,7 +428,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	QPointF text_hook = QPointF (hplus, _h - 1.125f * _q + vplus);
 	painter.fast_draw_text (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
 	// Box for emphasis:
-	if (_params.positioning_hint != "" && is_newly_set (_params.positioning_hint_ts))
+	if (_params.positioning_hint != "" && is_newly_set (_locals.positioning_hint_ts))
 	{
 		float v = 0.03f * _q;
 		QRectF frame (0.f, 0.f, metrics.width (_params.positioning_hint), metrics.height());
@@ -451,7 +464,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 	{
 		// Scale and track line:
 		painter.setPen (QPen (_silver, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
-		painter.rotate ((_params.track - _params.rotation).deg());
+		painter.rotate ((_locals.track - _locals.rotation).deg());
 		float extension = 0.0;
 		if (_params.display_mode != DisplayMode::Auxiliary && _params.display_track)
 			extension = 0.6 * _q;
@@ -498,7 +511,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 		// Heading triangle:
 		painter.setClipRect (_map_clip_rect);
 		painter.setTransform (_aircraft_center_transform);
-		painter.rotate ((_params.heading - _params.rotation).deg());
+		painter.rotate ((_locals.heading - _locals.rotation).deg());
 
 		painter.setPen (get_pen (Qt::white, 2.2f));
 		painter.translate (0.f, -1.003f * _r);
@@ -589,7 +602,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipping (false);
 
-		int sel_hdg = static_cast<int> (_params.ap_heading.deg() + 0.5f) % 360;
+		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
 
 		// AP heading always set as magnetic, but can be displayed as true:
 		QString text_1 = "SEL HDG";
@@ -625,7 +638,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
-		painter.rotate ((_params.ap_heading - _params.rotation).deg());
+		painter.rotate ((_locals.ap_heading - _locals.rotation).deg());
 
 		for (auto p: { shadow_pen, pen })
 		{
@@ -641,11 +654,11 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		switch (_params.display_mode)
 		{
 			case DisplayMode::Auxiliary:
-				limited_rotation = Xefis::limit (Xefis::floored_mod (_params.ap_heading - _params.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+				limited_rotation = Xefis::limit (Xefis::floored_mod (_locals.ap_heading - _locals.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
 				break;
 
 			default:
-				limited_rotation = _params.ap_heading - _params.rotation;
+				limited_rotation = _locals.ap_heading - _locals.rotation;
 				break;
 		}
 
@@ -796,7 +809,7 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 		painter.fast_draw_text (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
 
 		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
-		painter.rotate ((_params.wind_from_magnetic_heading - _params.magnetic_heading + 180_deg).deg());
+		painter.rotate ((_params.wind_from_magnetic_heading - _params.heading_magnetic + 180_deg).deg());
 		painter.setPen (get_pen (Qt::white, 1.0));
 		painter.add_shadow ([&]() {
 			QPointF a = QPointF (0.f, -0.7f * _q);
@@ -834,7 +847,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 		painter.setTransform (base_transform);
 		painter.translate (-z - 0.1f * _q, _q);
-		painter.rotate ((_params.true_home_direction - _params.true_heading).deg());
+		painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		painter.add_shadow ([&]() {
 			painter.drawPolyline (home_arrow);
@@ -1204,6 +1217,27 @@ HSIWidget::~HSIWidget()
 	wait_for_painter();
 }
 
+
+void
+HSIWidget::set_params (Parameters const& new_params)
+{
+	QDateTime now = QDateTime::currentDateTime();
+
+	Parameters old = _params;
+	_params = new_params;
+	_params.sanitize();
+
+	if (_params.display_mode != old.display_mode)
+		_paint_work_unit._recalculation_needed = true;
+
+	if (_params.positioning_hint != old.positioning_hint)
+		_locals.positioning_hint_ts = now;
+
+	if (_params.positioning_hint_visible != old.positioning_hint_visible)
+		_locals.positioning_hint_ts = now;
+
+	request_repaint();
+}
 
 void
 HSIWidget::resizeEvent (QResizeEvent* event)
