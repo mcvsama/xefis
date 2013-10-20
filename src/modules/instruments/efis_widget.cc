@@ -30,6 +30,22 @@
 #include "efis_widget.h"
 
 
+void
+EFISWidget::Parameters::sanitize()
+{
+	sl_line_every = std::max (sl_line_every, 1);
+	sl_number_every = std::max (sl_number_every, 1);
+	sl_extent = std::max (sl_extent, 1_kt);
+	sl_minimum = std::max (sl_minimum, 0);
+	sl_maximum = std::min (sl_maximum, 9999);
+	al_line_every = std::max (al_line_every, 1);
+	al_number_every = std::max (al_number_every, 1);
+	al_emphasis_every = std::max (al_emphasis_every, 1);
+	al_bold_every = std::max (al_bold_every, 1);
+	al_extent = std::max (al_extent, 1_ft);
+}
+
+
 EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 	InstrumentWidget::PaintWorkUnit (efis_widget),
 	InstrumentAids (0.8f)
@@ -51,6 +67,7 @@ void
 EFISWidget::PaintWorkUnit::pop_params()
 {
 	_params = _params_next;
+	_local_params = _local_params_next;
 }
 
 
@@ -96,7 +113,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 		paint_control_stick (painter);
 		paint_center_cross (painter, true, false);
 
-		if (_params.radar_altimeter_failure)
+		if (_params.altitude_agl_failure)
 			paint_radar_altimeter_failure (painter);
 		else
 			paint_altitude_agl (painter);
@@ -149,9 +166,9 @@ EFISWidget::PaintWorkUnit::adi_post_resize()
 void
 EFISWidget::PaintWorkUnit::adi_pre_paint()
 {
-	Angle p = Xefis::floored_mod (_params.pitch + 180_deg, 360_deg) - 180_deg;
-	Angle r = Xefis::floored_mod (_params.roll + 180_deg, 360_deg) - 180_deg;
-	Angle hdg = Xefis::floored_mod (_params.heading, 360_deg);
+	Angle p = Xefis::floored_mod (_params.orientation_pitch + 180_deg, 360_deg) - 180_deg;
+	Angle r = Xefis::floored_mod (_params.orientation_roll + 180_deg, 360_deg) - 180_deg;
+	Angle hdg = Xefis::floored_mod (_params.orientation_heading, 360_deg);
 
 	// Mirroring, eg. -180° pitch is the same
 	// as 0° pitch with roll inverted:
@@ -166,9 +183,9 @@ EFISWidget::PaintWorkUnit::adi_pre_paint()
 		r = +180_deg - r;
 	}
 
-	_params.pitch = p;
-	_params.roll = r;
-	_params.heading = hdg;
+	_params.orientation_pitch = p;
+	_params.orientation_roll = r;
+	_params.orientation_heading = hdg;
 
 	_pitch_transform.reset();
 	_pitch_transform.translate (0.f, -pitch_to_px (p));
@@ -196,7 +213,7 @@ EFISWidget::PaintWorkUnit::adi_paint (Xefis::Painter& painter)
 {
 	adi_pre_paint();
 
-	if (_params.attitude_failure)
+	if (_params.orientation_failure)
 	{
 		adi_clear (painter);
 		adi_paint_attitude_failure (painter);
@@ -236,7 +253,7 @@ EFISWidget::PaintWorkUnit::adi_clear (Xefis::Painter& painter)
 void
 EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 {
-	if (_params.pitch_visible && _params.roll_visible)
+	if (_params.orientation_pitch_visible && _params.orientation_roll_visible)
 	{
 		painter.setClipping (false);
 		if (_params.old_style)
@@ -257,7 +274,7 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 void
 EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
 {
-	if (!_params.pitch_visible)
+	if (!_params.orientation_pitch_visible)
 		return;
 
 	float const w = wh() * 0.22222f; // 0.(2) == 2/9
@@ -276,8 +293,8 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
 
 	// Pitch scale is clipped to small rectangle, so narrow it even more:
 	float clipped_pitch_factor = 0.45f;
-	Xefis::Range<Angle> deg_range (_params.pitch - clipped_pitch_factor * 0.485f * _params.fov,
-								   _params.pitch + clipped_pitch_factor * 0.365f * _params.fov);
+	Xefis::Range<Angle> deg_range (_params.orientation_pitch - clipped_pitch_factor * 0.485f * _params.fov,
+								   _params.orientation_pitch + clipped_pitch_factor * 0.365f * _params.fov);
 
 	painter.setPen (get_pen (Qt::white, 1.f));
 	// 10° lines, exclude +/-90°:
@@ -382,7 +399,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
 		}
 	}
 
-	if (!_params.roll_visible)
+	if (!_params.orientation_roll_visible)
 		return;
 
 	float const bold_width = pen_width (3.f);
@@ -463,7 +480,7 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 	float const w = wh() * 2.25f / 9.f;
 	float const fpxs = _font_10.pixelSize();
 
-	if (!_params.pitch_visible || !_params.roll_visible)
+	if (!_params.orientation_pitch_visible || !_params.orientation_roll_visible)
 		return;
 
 	// Clip rectangle before and after rotation:
@@ -477,14 +494,14 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 	painter.setPen (p);
 	painter.setFont (_font_10);
 
-	if (_params.heading_visible)
+	if (_params.orientation_heading_visible)
 	{
 		float clipped_pitch_factor = 0.5f;
-		Xefis::Range<Angle> deg_range (_params.heading - clipped_pitch_factor * 0.485f * _params.fov,
-									   _params.heading + clipped_pitch_factor * 0.350f * _params.fov);
+		Xefis::Range<Angle> deg_range (_params.orientation_heading - clipped_pitch_factor * 0.485f * _params.fov,
+									   _params.orientation_heading + clipped_pitch_factor * 0.350f * _params.fov);
 
 		painter.setTransform (_heading_transform * _horizon_transform);
-		if (_params.heading_numbers_visible)
+		if (_params.orientation_heading_numbers_visible)
 		{
 			for (int deg = -180; deg < 540; deg += 10)
 			{
@@ -613,11 +630,11 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 	float const wh = this->wh();
 
 	_params.speed = Xefis::limit (_params.speed, 0_kt, 9999.99_kt);
-	_params.mach = Xefis::limit (_params.mach, 0.f, 9.99f);
-	_params.minimum_speed = Xefis::limit (_params.minimum_speed, 0.0_kt, 9999.99_kt);
-	_params.minimum_maneuver_speed = Xefis::limit (_params.minimum_maneuver_speed, 0.0_kt, 9999.99_kt);
-	_params.maximum_maneuver_speed = Xefis::limit (_params.maximum_maneuver_speed, 0.0_kt, 9999.99_kt);
-	_params.maximum_speed = Xefis::limit (_params.maximum_speed, 0.0_kt, 9999.99_kt);
+	_params.speed_mach = Xefis::limit (_params.speed_mach, 0.f, 9.99f);
+	_params.speed_minimum = Xefis::limit (_params.speed_minimum, 0.0_kt, 9999.99_kt);
+	_params.speed_minimum_maneuver = Xefis::limit (_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+	_params.speed_maximum_maneuver = Xefis::limit (_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+	_params.speed_maximum = Xefis::limit (_params.speed_maximum, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -663,7 +680,7 @@ EFISWidget::PaintWorkUnit::sl_paint (Xefis::Painter& painter)
 	painter.setClipping (false);
 	painter.setTransform (_sl_transform);
 
-	if (_params.ias_failure)
+	if (_params.speed_failure)
 		sl_paint_failure (painter);
 	else
 	{
@@ -699,11 +716,11 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = _sl_black_box_pen;
-	bool speed_is_in_warning_area = (_params.minimum_speed < _params.speed && _params.speed < _params.minimum_maneuver_speed) ||
-									(_params.maximum_speed > _params.speed && _params.speed > _params.maximum_maneuver_speed);
-	if (_params.speed_blinking_active || speed_is_in_warning_area)
+	bool speed_is_in_warning_area = (_params.speed_minimum < _params.speed && _params.speed < _params.speed_minimum_maneuver) ||
+									(_params.speed_maximum > _params.speed && _params.speed > _params.speed_maximum_maneuver);
+	if (_local_params.speed_blinking_active || speed_is_in_warning_area)
 	{
-		if (_params.speed_blink || speed_is_in_warning_area)
+		if (_local_params.speed_blink || speed_is_in_warning_area)
 			border_pen.setColor (_warning_color_2);
 		else
 			border_pen.setColor (Qt::black);
@@ -831,14 +848,14 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 	painter.translate (tr_right, 0.f);
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
-	float min_posy = kt_to_px (_params.minimum_speed);
-	float min_man_posy = kt_to_px (_params.minimum_maneuver_speed);
-	float max_man_posy = kt_to_px (_params.maximum_maneuver_speed);
-	float max_posy = kt_to_px (_params.maximum_speed);
+	float min_posy = kt_to_px (_params.speed_minimum);
+	float min_man_posy = kt_to_px (_params.speed_minimum_maneuver);
+	float max_man_posy = kt_to_px (_params.speed_maximum_maneuver);
+	float max_posy = kt_to_px (_params.speed_maximum);
 	QPointF min_point = _sl_ladder_rect.bottomRight() + ydif;
 	QPointF max_point = _sl_ladder_rect.topRight() - ydif;
 
-	if (_params.minimum_maneuver_speed_visible && _params.minimum_maneuver_speed > _sl_min_shown)
+	if (_params.speed_minimum_maneuver_visible && _params.speed_minimum_maneuver > _sl_min_shown)
 	{
 		QPolygonF poly = QPolygonF()
 			<< QPointF (_sl_ladder_rect.right() - tr_right, min_man_posy)
@@ -850,7 +867,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 		});
 	}
 
-	if (_params.maximum_maneuver_speed_visible && _params.maximum_maneuver_speed < _sl_max_shown)
+	if (_params.speed_maximum_maneuver_visible && _params.speed_maximum_maneuver < _sl_max_shown)
 	{
 		QPolygonF poly = QPolygonF()
 			<< QPointF (_sl_ladder_rect.right() - tr_right, max_man_posy)
@@ -862,7 +879,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 		});
 	}
 
-	if (_params.maximum_speed_visible && _params.maximum_speed < _sl_max_shown)
+	if (_params.speed_maximum_visible && _params.speed_maximum < _sl_max_shown)
 	{
 		painter.setPen (pen_b);
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), max_point);
@@ -870,7 +887,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), max_posy), max_point);
 	}
 
-	if (_params.minimum_speed_visible && _params.minimum_speed > _sl_min_shown)
+	if (_params.speed_minimum_visible && _params.speed_minimum > _sl_min_shown)
 	{
 		painter.setPen (pen_b);
 		painter.drawLine (QPointF (_sl_ladder_rect.right(), min_posy), min_point);
@@ -883,7 +900,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 void
 EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Xefis::Painter& painter, float x)
 {
-	if (!_params.speed_tendency_visible || !_params.speed_visible)
+	if (!_params.speed_lookahead_visible || !_params.speed_visible)
 		return;
 
 	QPen pen (get_pen (_navigation_color, 1.25f));
@@ -893,10 +910,10 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (Xefis::Painter& painter, flo
 	painter.setTransform (_sl_transform);
 	painter.setPen (pen);
 	painter.translate (1.2f * x, 0.f);
-	if (_params.speed_tendency < _params.speed)
+	if (_params.speed_lookahead < _params.speed)
 		painter.scale (1.f, -1.f);
 	float length = std::min<float> (_sl_ladder_rect.height() / 2.f,
-									1.f * std::abs (kt_to_px (Xefis::limit (_params.speed_tendency, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
+									1.f * std::abs (kt_to_px (Xefis::limit (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -970,7 +987,7 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 void
 EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float x)
 {
-	if (!_params.mach_visible)
+	if (!_params.speed_mach_visible)
 		return;
 
 	painter.setClipping (false);
@@ -979,7 +996,7 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float 
 
 	QFont font = _font_20;
 
-	QString mach_str = QString ("%1").arg (_params.mach, 0, 'f', 3);
+	QString mach_str = QString ("%1").arg (_params.speed_mach, 0, 'f', 3);
 	if (mach_str.left (2) == "0.")
 		mach_str = mach_str.mid (1);
 
@@ -1342,7 +1359,7 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Xefis::Painter& painter, float
 void
 EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Xefis::Painter& painter, float x)
 {
-	if (!_params.altitude_tendency_visible || !_params.altitude_visible)
+	if (!_params.altitude_lookahead_visible || !_params.altitude_visible)
 		return;
 
 	QPen pen (get_pen (_navigation_color, 1.25f));
@@ -1352,9 +1369,9 @@ EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (Xefis::Painter& painter, 
 	painter.setTransform (_al_transform);
 	painter.translate (-1.2f * x, 0.f);
 	painter.setPen (pen);
-	if (_params.altitude_tendency < _params.altitude)
+	if (_params.altitude_lookahead < _params.altitude)
 		painter.scale (1.f, -1.f);
-	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (_params.altitude_tendency))) - 0.5f * x;
+	float length = std::min<float> (_al_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (_params.altitude_lookahead))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -1468,7 +1485,7 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		{
 			if (_params.minimums_amsl > _al_min_shown && _params.minimums_amsl < _al_max_shown)
 			{
-				if (!(_params.minimums_blinking_active && !_params.minimums_blink))
+				if (!(_local_params.minimums_blinking_active && !_local_params.minimums_blink))
 				{
 					float posy = ft_to_px (_params.minimums_amsl);
 					painter.setTransform (_al_transform);
@@ -1649,7 +1666,7 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (Xefis::Painter& painter, float x)
 
 	QString unit_str = _params.pressure_display_hpa? " HPA" : " IN";
 	int precision = _params.pressure_display_hpa ? 0 : 2;
-	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure.hPa() : _params.pressure.inHg(), 0, 'f', precision);
+	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure_qnh.hPa() : _params.pressure_qnh.inHg(), 0, 'f', precision);
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
@@ -1855,10 +1872,10 @@ EFISWidget::PaintWorkUnit::paint_flight_director (Xefis::Painter& painter)
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _params.fov / 4.f;
 
-	Angle pitch = std::cos (_params.roll) * (_params.flight_director_pitch - _params.pitch);
+	Angle pitch = std::cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
 	pitch = Xefis::limit (pitch, -range, +range);
 
-	Angle roll = _params.flight_director_roll - _params.roll;
+	Angle roll = _params.flight_director_roll - _params.orientation_roll;
 	if (std::abs (roll.deg()) > 180.0)
 		roll = roll - sgn (roll.deg()) * 360_deg;
 	roll = Xefis::limit (roll, -range, +range);
@@ -1873,9 +1890,9 @@ EFISWidget::PaintWorkUnit::paint_flight_director (Xefis::Painter& painter)
 					 get_pen (_autopilot_pen_2.color(), 1.65f) })
 	{
 		painter.setPen (pen);
-		if (_params.flight_director_pitch_visible && _params.pitch_visible)
+		if (_params.flight_director_pitch_visible && _params.orientation_pitch_visible)
 			painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
-		if (_params.flight_director_roll_visible && _params.roll_visible)
+		if (_params.flight_director_roll_visible && _params.orientation_roll_visible)
 			painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
 	}
 }
@@ -1932,7 +1949,7 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (Xefis::Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	if (is_newly_set (_params.altitude_agl_ts))
+	if (is_newly_set (_local_params.altitude_agl_ts))
 		painter.setPen (get_pen (Qt::white, 1.25f));
 	else
 		painter.setPen (Qt::NoPen);
@@ -1973,7 +1990,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 
 	QPen minimums_pen = get_pen (get_minimums_color(), 1.f);
 
-	if (!(_params.minimums_blinking_active && !_params.minimums_blink))
+	if (!(_local_params.minimums_blinking_active && !_local_params.minimums_blink))
 	{
 		painter.setPen (minimums_pen);
 		painter.setFont (font_a);
@@ -1982,7 +1999,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 		painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
 	}
 
-	if (is_newly_set (_params.minimums_altitude_ts))
+	if (is_newly_set (_local_params.minimums_altitude_ts))
 	{
 		float v = 0.06f * _q;
 		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
@@ -2033,9 +2050,10 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
-		auto paint_ladder = [&](bool needle_visible, Angle original_track_deviation) -> void
+		auto paint_ladder = [&](bool needle_visible, Angle original_approach_deviation, Angle original_path_deviation) -> void
 		{
-			Angle track_deviation = Xefis::limit (original_track_deviation, -2.25_deg, +2.25_deg);
+			Angle approach_deviation = Xefis::limit (original_approach_deviation, -2.25_deg, +2.25_deg);
+			Angle path_deviation = Xefis::limit (original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -2052,38 +2070,58 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 			if (needle_visible)
 			{
-				QPolygonF pointer;
-				if (_params.deviation_uses_ils_style)
+				QPolygonF pink_pointer;
+				QPolygonF white_pointer;
+
+				if (!_params.deviation_mixed_mode)
 				{
 					float w = 0.012f * wh();
-					pointer = QPolygonF()
+					pink_pointer = QPolygonF()
 						<< QPointF (0.f, -w)
 						<< QPointF (+1.6f * w, 0.f)
 						<< QPointF (0.f, +w)
-						<< QPointF (-1.6f * w, 0.f);
+						<< QPointF (-1.6f * w, 0.f)
+						<< QPointF (0.f, -w);
+					pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
 				}
 				else
 				{
 					float w = 0.012f * wh();
-					pointer = QPolygonF()
+					pink_pointer = QPolygonF()
 						<< QPointF (0.f, -0.2f * w)
 						<< QPointF (+1.0f * w, 2.0f * w)
 						<< QPointF (-1.0f * w, 2.0f * w);
+					pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
+					white_pointer = QPolygonF()
+						<< QPointF (0.f, -0.8f * w)
+						<< QPointF (+1.6f * w, 0.f)
+						<< QPointF (0.f, +0.8f * w)
+						<< QPointF (-1.6f * w, 0.f)
+						<< QPointF (0.f, -0.8f * w);
+					white_pointer.translate (approach_deviation.deg() * 0.075f * wh(), -0.65f * w);
 				}
-				pointer.translate (track_deviation.deg() * 0.075f * wh(), 0.f);
+
 				for (QColor color: { _autopilot_pen_1.color(), _autopilot_pen_2.color() })
 				{
 					painter.setPen (get_pen (color, 1.f));
-					if (std::abs (original_track_deviation.deg()) > std::abs (track_deviation.deg()))
+					if (std::abs (original_approach_deviation.deg()) > std::abs (approach_deviation.deg()))
 						painter.setBrush (Qt::NoBrush);
 					else
 						painter.setBrush (color);
-					painter.drawPolygon (pointer);
+					painter.drawPolygon (pink_pointer);
+				}
+
+				if (_params.deviation_mixed_mode)
+				{
+					painter.setPen (get_pen (Qt::white, 1.f));
+					painter.setBrush (Qt::NoBrush);
+					painter.drawPolyline (white_pointer);
 				}
 			}
 
-			if (_params.deviation_uses_ils_style)
+			if (!_params.deviation_mixed_mode)
 			{
+				// Paint path deviation:
 				painter.setPen (get_pen (Qt::white, 1.5f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, -0.5f, +0.5f, +1.f })
@@ -2092,6 +2130,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			}
 			else
 			{
+				// Paint ILS deviation:
 				painter.setPen (get_pen (Qt::white, 1.2f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, +1.f })
@@ -2105,28 +2144,28 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, 0.452f * wh());
-		if (_params.lateral_deviation_failure)
+		if (_params.deviation_lateral_failure)
 			paint_horizontal_failure_flag (painter, QPointF (0.f, 0.f), font_size (18.f), "LOC");
 		else
-			paint_ladder (_params.lateral_deviation_visible, _params.lateral_deviation_deg);
+			paint_ladder (_params.deviation_lateral_visible, _params.deviation_lateral_approach, _params.deviation_lateral_flight_path);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
-		if (_params.vertical_deviation_failure)
+		if (_params.deviation_vertical_failure)
 			paint_vertical_failure_flag (painter, QPointF (0.f, 0.f), font_size (18.f), "G/S");
 		else
 		{
 			painter.rotate (-90);
-			paint_ladder (_params.vertical_deviation_visible, _params.vertical_deviation_deg);
+			paint_ladder (_params.deviation_vertical_visible, _params.deviation_vertical_approach, _params.deviation_vertical_flight_path);
 		}
 	}
 
-	if (_params.runway_visible && !_params.lateral_deviation_failure)
+	if (_params.runway_visible && !_params.deviation_lateral_failure)
 	{
 		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * Xefis::limit (_params.lateral_deviation_deg, -1.5_deg, +1.5_deg).deg();
+		float offset = 0.5f * Xefis::limit (_params.deviation_lateral_approach, -1.5_deg, +1.5_deg).deg();
 		float ypos = -pitch_to_px (Xefis::limit (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
@@ -2175,7 +2214,7 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QPointF text_hook = QPointF (0.f, -3.1f * q);
 		painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, _params.control_hint);
 
-		if (is_newly_set (_params.control_hint_ts))
+		if (is_newly_set (_local_params.control_hint_ts))
 		{
 			float a = 0.055f * _q;
 			float v = -0.02f * _q;
@@ -2243,19 +2282,19 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QPointF a_small (0.f, 0.01f * _q);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
-		if (_params.fma_speed_hint != "" && is_newly_set (_params.fma_speed_ts))
+		if (_params.fma_speed_hint != "" && is_newly_set (_local_params.fma_speed_ts))
 			paint_big_rect (b1);
-		if (_params.fma_lateral_hint != "" && is_newly_set (_params.fma_lateral_ts))
+		if (_params.fma_lateral_hint != "" && is_newly_set (_local_params.fma_lateral_ts))
 			paint_big_rect (b2);
-		if (_params.fma_vertical_hint != "" && is_newly_set (_params.fma_vertical_ts))
+		if (_params.fma_vertical_hint != "" && is_newly_set (_local_params.fma_vertical_ts))
 			paint_big_rect (b3);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		if (_params.fma_speed_small_hint != "" && is_newly_set (_params.fma_speed_small_ts))
+		if (_params.fma_speed_small_hint != "" && is_newly_set (_local_params.fma_speed_small_ts))
 			paint_small_rect (s1);
-		if (_params.fma_lateral_small_hint != "" && is_newly_set (_params.fma_lateral_small_ts))
+		if (_params.fma_lateral_small_hint != "" && is_newly_set (_local_params.fma_lateral_small_ts))
 			paint_small_rect (s2);
-		if (_params.fma_vertical_small_hint != "" && is_newly_set (_params.fma_vertical_small_ts))
+		if (_params.fma_vertical_small_hint != "" && is_newly_set (_local_params.fma_vertical_small_ts))
 			paint_small_rect (s3);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
@@ -2276,7 +2315,7 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 void
 EFISWidget::PaintWorkUnit::paint_critical_aoa (Xefis::Painter& painter)
 {
-	if (!_params.critical_aoa_visible || !_params.pitch_visible)
+	if (!_params.critical_aoa_visible || !_params.orientation_pitch_visible)
 		return;
 
 	painter.setClipping (false);
@@ -2577,7 +2616,7 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	_minimums_blinking_warning->setInterval (200);
 	QObject::connect (_minimums_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_minimums()));
 
-	_params.minimums_altitude_ts = QDateTime::currentDateTime();
+	_local_params.minimums_altitude_ts = QDateTime::currentDateTime();
 
 	set_painter (&_paint_work_unit);
 }
@@ -2586,6 +2625,53 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 EFISWidget::~EFISWidget()
 {
 	wait_for_painter();
+}
+
+
+void
+EFISWidget::set_params (Parameters const& new_params)
+{
+	QDateTime now = QDateTime::currentDateTime();
+
+	// Minimums:
+	Parameters old = _params;
+	_params = new_params;
+	_params.sanitize();
+
+	if (_params.minimums_amsl < old.altitude && _params.altitude < _params.minimums_amsl)
+		_local_params.minimums_altitude_ts = now;
+
+	if (_params.altitude_agl_visible && !old.altitude_agl_visible)
+		_local_params.altitude_agl_ts = now;
+
+	if (_params.minimums_altitude_visible != old.minimums_altitude_visible)
+		_local_params.minimums_altitude_ts = now;
+
+	if (_params.control_hint != old.control_hint)
+		_local_params.control_hint_ts = now;
+
+	if (_params.control_hint_visible != old.control_hint_visible)
+		_local_params.control_hint_ts = now;
+
+	if (_params.fma_speed_hint != old.fma_speed_hint)
+		_local_params.fma_speed_ts = now;
+
+	if (_params.fma_speed_small_hint != old.fma_speed_small_hint)
+		_local_params.fma_speed_small_ts = now;
+
+	if (_params.fma_lateral_hint != old.fma_lateral_hint)
+		_local_params.fma_lateral_ts = now;
+
+	if (_params.fma_lateral_small_hint != old.fma_lateral_small_hint)
+		_local_params.fma_lateral_small_ts = now;
+
+	if (_params.fma_vertical_hint != old.fma_vertical_hint)
+		_local_params.fma_vertical_ts = now;
+
+	if (_params.fma_vertical_small_hint != old.fma_vertical_small_hint)
+		_local_params.fma_vertical_small_ts = now;
+
+	request_repaint();
 }
 
 
@@ -2605,15 +2691,15 @@ EFISWidget::request_repaint()
 {
 	update_blinker (_speed_blinking_warning,
 					_params.speed_visible &&
-					((_params.minimum_speed_visible && _params.speed < _params.minimum_speed) ||
-					 (_params.maximum_speed_visible && _params.speed > _params.maximum_speed)),
-					&_params.speed_blink);
+					((_params.speed_minimum_visible && _params.speed < _params.speed_minimum) ||
+					 (_params.speed_maximum_visible && _params.speed > _params.speed_maximum)),
+					&_local_params.speed_blink);
 
 	update_blinker (_minimums_blinking_warning,
 					_params.altitude_visible && _params.minimums_altitude_visible &&
 					_params.altitude < _params.minimums_amsl &&
-					_paint_work_unit.is_newly_set (_params.minimums_altitude_ts, 5_s),
-					&_params.minimums_blink);
+					_paint_work_unit.is_newly_set (_local_params.minimums_altitude_ts, 5_s),
+					&_local_params.minimums_blink);
 
 	InstrumentWidget::request_repaint();
 }
@@ -2622,9 +2708,10 @@ EFISWidget::request_repaint()
 void
 EFISWidget::push_params()
 {
-	_params.speed_blinking_active = _speed_blinking_warning->isActive();
-	_params.minimums_blinking_active = _minimums_blinking_warning->isActive();
+	_local_params.speed_blinking_active = _speed_blinking_warning->isActive();
+	_local_params.minimums_blinking_active = _minimums_blinking_warning->isActive();
 	_paint_work_unit._params_next = _params;
+	_paint_work_unit._local_params_next = _local_params;
 }
 
 
@@ -2647,13 +2734,13 @@ EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_s
 void
 EFISWidget::blink_speed()
 {
-	_params.speed_blink = !_params.speed_blink;
+	_local_params.speed_blink = !_local_params.speed_blink;
 }
 
 
 void
 EFISWidget::blink_minimums()
 {
-	_params.minimums_blink = !_params.minimums_blink;
+	_local_params.minimums_blink = !_local_params.minimums_blink;
 }
 
