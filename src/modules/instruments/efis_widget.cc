@@ -67,7 +67,7 @@ void
 EFISWidget::PaintWorkUnit::pop_params()
 {
 	_params = _params_next;
-	_local_params = _local_params_next;
+	_locals = _locals_next;
 }
 
 
@@ -718,9 +718,9 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 	QPen border_pen = _sl_black_box_pen;
 	bool speed_is_in_warning_area = (_params.speed_minimum < _params.speed && _params.speed < _params.speed_minimum_maneuver) ||
 									(_params.speed_maximum > _params.speed && _params.speed > _params.speed_maximum_maneuver);
-	if (_local_params.speed_blinking_active || speed_is_in_warning_area)
+	if (_locals.speed_blinking_active || speed_is_in_warning_area)
 	{
-		if (_local_params.speed_blink || speed_is_in_warning_area)
+		if (_locals.speed_blink || speed_is_in_warning_area)
 			border_pen.setColor (_warning_color_2);
 		else
 			border_pen.setColor (Qt::black);
@@ -1485,7 +1485,7 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		{
 			if (_params.minimums_amsl > _al_min_shown && _params.minimums_amsl < _al_max_shown)
 			{
-				if (!(_local_params.minimums_blinking_active && !_local_params.minimums_blink))
+				if (!(_locals.minimums_blinking_active && !_locals.minimums_blink))
 				{
 					float posy = ft_to_px (_params.minimums_amsl);
 					painter.setTransform (_al_transform);
@@ -1949,7 +1949,7 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (Xefis::Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	if (is_newly_set (_local_params.altitude_agl_ts))
+	if (is_newly_set (_locals.altitude_agl_ts))
 		painter.setPen (get_pen (Qt::white, 1.25f));
 	else
 		painter.setPen (Qt::NoPen);
@@ -1990,7 +1990,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 
 	QPen minimums_pen = get_pen (get_minimums_color(), 1.f);
 
-	if (!(_local_params.minimums_blinking_active && !_local_params.minimums_blink))
+	if (!(_locals.minimums_blinking_active && !_locals.minimums_blink))
 	{
 		painter.setPen (minimums_pen);
 		painter.setFont (font_a);
@@ -1999,7 +1999,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 		painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
 	}
 
-	if (is_newly_set (_local_params.minimums_altitude_ts))
+	if (is_newly_set (_locals.minimums_altitude_ts))
 	{
 		float v = 0.06f * _q;
 		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
@@ -2214,7 +2214,7 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QPointF text_hook = QPointF (0.f, -3.1f * q);
 		painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, _params.control_hint);
 
-		if (is_newly_set (_local_params.control_hint_ts))
+		if (is_newly_set (_locals.control_hint_ts))
 		{
 			float a = 0.055f * _q;
 			float v = -0.02f * _q;
@@ -2282,19 +2282,19 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QPointF a_small (0.f, 0.01f * _q);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
-		if (_params.fma_speed_hint != "" && is_newly_set (_local_params.fma_speed_ts))
+		if (_params.fma_speed_hint != "" && is_newly_set (_locals.fma_speed_ts))
 			paint_big_rect (b1);
-		if (_params.fma_lateral_hint != "" && is_newly_set (_local_params.fma_lateral_ts))
+		if (_params.fma_lateral_hint != "" && is_newly_set (_locals.fma_lateral_ts))
 			paint_big_rect (b2);
-		if (_params.fma_vertical_hint != "" && is_newly_set (_local_params.fma_vertical_ts))
+		if (_params.fma_vertical_hint != "" && is_newly_set (_locals.fma_vertical_ts))
 			paint_big_rect (b3);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		if (_params.fma_speed_small_hint != "" && is_newly_set (_local_params.fma_speed_small_ts))
+		if (_params.fma_speed_small_hint != "" && is_newly_set (_locals.fma_speed_small_ts))
 			paint_small_rect (s1);
-		if (_params.fma_lateral_small_hint != "" && is_newly_set (_local_params.fma_lateral_small_ts))
+		if (_params.fma_lateral_small_hint != "" && is_newly_set (_locals.fma_lateral_small_ts))
 			paint_small_rect (s2);
-		if (_params.fma_vertical_small_hint != "" && is_newly_set (_local_params.fma_vertical_small_ts))
+		if (_params.fma_vertical_small_hint != "" && is_newly_set (_locals.fma_vertical_small_ts))
 			paint_small_rect (s3);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
@@ -2616,7 +2616,7 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	_minimums_blinking_warning->setInterval (200);
 	QObject::connect (_minimums_blinking_warning, SIGNAL (timeout()), this, SLOT (blink_minimums()));
 
-	_local_params.minimums_altitude_ts = QDateTime::currentDateTime();
+	_locals.minimums_altitude_ts = QDateTime::currentDateTime();
 
 	set_painter (&_paint_work_unit);
 }
@@ -2633,43 +2633,42 @@ EFISWidget::set_params (Parameters const& new_params)
 {
 	QDateTime now = QDateTime::currentDateTime();
 
-	// Minimums:
 	Parameters old = _params;
 	_params = new_params;
 	_params.sanitize();
 
 	if (_params.minimums_amsl < old.altitude && _params.altitude < _params.minimums_amsl)
-		_local_params.minimums_altitude_ts = now;
+		_locals.minimums_altitude_ts = now;
 
 	if (_params.altitude_agl_visible && !old.altitude_agl_visible)
-		_local_params.altitude_agl_ts = now;
+		_locals.altitude_agl_ts = now;
 
 	if (_params.minimums_altitude_visible != old.minimums_altitude_visible)
-		_local_params.minimums_altitude_ts = now;
+		_locals.minimums_altitude_ts = now;
 
 	if (_params.control_hint != old.control_hint)
-		_local_params.control_hint_ts = now;
+		_locals.control_hint_ts = now;
 
 	if (_params.control_hint_visible != old.control_hint_visible)
-		_local_params.control_hint_ts = now;
+		_locals.control_hint_ts = now;
 
 	if (_params.fma_speed_hint != old.fma_speed_hint)
-		_local_params.fma_speed_ts = now;
+		_locals.fma_speed_ts = now;
 
 	if (_params.fma_speed_small_hint != old.fma_speed_small_hint)
-		_local_params.fma_speed_small_ts = now;
+		_locals.fma_speed_small_ts = now;
 
 	if (_params.fma_lateral_hint != old.fma_lateral_hint)
-		_local_params.fma_lateral_ts = now;
+		_locals.fma_lateral_ts = now;
 
 	if (_params.fma_lateral_small_hint != old.fma_lateral_small_hint)
-		_local_params.fma_lateral_small_ts = now;
+		_locals.fma_lateral_small_ts = now;
 
 	if (_params.fma_vertical_hint != old.fma_vertical_hint)
-		_local_params.fma_vertical_ts = now;
+		_locals.fma_vertical_ts = now;
 
 	if (_params.fma_vertical_small_hint != old.fma_vertical_small_hint)
-		_local_params.fma_vertical_small_ts = now;
+		_locals.fma_vertical_small_ts = now;
 
 	request_repaint();
 }
@@ -2693,13 +2692,13 @@ EFISWidget::request_repaint()
 					_params.speed_visible &&
 					((_params.speed_minimum_visible && _params.speed < _params.speed_minimum) ||
 					 (_params.speed_maximum_visible && _params.speed > _params.speed_maximum)),
-					&_local_params.speed_blink);
+					&_locals.speed_blink);
 
 	update_blinker (_minimums_blinking_warning,
 					_params.altitude_visible && _params.minimums_altitude_visible &&
 					_params.altitude < _params.minimums_amsl &&
-					_paint_work_unit.is_newly_set (_local_params.minimums_altitude_ts, 5_s),
-					&_local_params.minimums_blink);
+					_paint_work_unit.is_newly_set (_locals.minimums_altitude_ts, 5_s),
+					&_locals.minimums_blink);
 
 	InstrumentWidget::request_repaint();
 }
@@ -2708,10 +2707,10 @@ EFISWidget::request_repaint()
 void
 EFISWidget::push_params()
 {
-	_local_params.speed_blinking_active = _speed_blinking_warning->isActive();
-	_local_params.minimums_blinking_active = _minimums_blinking_warning->isActive();
+	_locals.speed_blinking_active = _speed_blinking_warning->isActive();
+	_locals.minimums_blinking_active = _minimums_blinking_warning->isActive();
 	_paint_work_unit._params_next = _params;
-	_paint_work_unit._local_params_next = _local_params;
+	_paint_work_unit._locals_next = _locals;
 }
 
 
@@ -2734,13 +2733,13 @@ EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_s
 void
 EFISWidget::blink_speed()
 {
-	_local_params.speed_blink = !_local_params.speed_blink;
+	_locals.speed_blink = !_locals.speed_blink;
 }
 
 
 void
 EFISWidget::blink_minimums()
 {
-	_local_params.minimums_blink = !_local_params.minimums_blink;
+	_locals.minimums_blink = !_locals.minimums_blink;
 }
 
