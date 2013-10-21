@@ -68,8 +68,10 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyInteger::Type	_altitude_ladder_emphasis_every	= 1000;
 	Xefis::PropertyInteger::Type	_altitude_ladder_bold_every		= 500;
 	Xefis::PropertyInteger::Type	_altitude_ladder_extent			= 825;
-	Xefis::PropertyLength::Type		_altitude_landing_warning_hi	= 1000_ft;
-	Xefis::PropertyLength::Type		_altitude_landing_warning_lo	= 500_ft;
+	Length							_altitude_landing_warning_hi	= 1000_ft;
+	Length							_altitude_landing_warning_lo	= 500_ft;
+	Length							_raising_runway_visibility		= 1000_ft;
+	Length							_raising_runway_threshold		= 250_ft;
 	// Speed
 	Xefis::PropertyBoolean			_speed_ias_serviceable;
 	Xefis::PropertySpeed			_speed_ias;
