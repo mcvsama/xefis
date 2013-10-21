@@ -42,31 +42,29 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "display-mode", _display_mode, true },
 				{ "range", _range, true },
 				{ "trend-vector-range", _trend_vector_range, false },
-				{ "speed.gs", _gs, false },
-				{ "speed.tas", _tas, false },
-				{ "altitude", _altitude, false },
-				{ "altitude.target", _target_altitude, false },
+				{ "speed.gs", _speed_gs, false },
+				{ "speed.tas", _speed_tas, false },
 				{ "altitude.target.reach-distance", _target_altitude_reach_distance, false },
-				{ "orientation.heading.magnetic", _magnetic_heading, false },
-				{ "orientation.heading.true", _true_heading, false },
+				{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
+				{ "orientation.heading.true", _orientation_heading_true, false },
 				{ "orientation.display-true-heading", _use_true_heading, false },
-				{ "home.true-direction", _true_home_direction, false },
-				{ "home.distance.vlos", _home_dist_vlos, false },
-				{ "home.distance.ground", _home_dist_ground, false },
-				{ "home.distance.vertical", _home_dist_vertical, false },
-				{ "cmd.visible", _cmd_settings_visible, false },
-				{ "cmd.heading", _cmd_heading_setting, false },
+				{ "home.true-direction", _home_true_direction, false },
+				{ "home.distance.vlos", _home_distance_vlos, false },
+				{ "home.distance.ground", _home_distance_ground, false },
+				{ "home.distance.vertical", _home_distance_vertical, false },
+				{ "cmd.visible", _cmd_visible, false },
+				{ "cmd.heading", _cmd_heading, false },
 				{ "cmd.track-visible", _cmd_track_visible, false },
-				{ "position.latitude", _position_lat, false },
-				{ "position.longitude", _position_lon, false },
-				{ "position.source", _positioning_hint, false },
-				{ "track.visible", _display_track, false },
-				{ "track.lateral-magnetic", _magnetic_track, false },
+				{ "position.latitude", _position_latitude, false },
+				{ "position.longitude", _position_longitude, false },
+				{ "position.source", _position_source, false },
+				{ "track.visible", _track_visible, false },
+				{ "track.lateral-magnetic", _track_lateral_magnetic, false },
 				{ "track.delta.lateral", _track_lateral_delta_dpm, false },
-				{ "wind.from-mag-heading", _wind_from_magnetic_heading, false },
-				{ "wind.tas", _wind_tas, false },
+				{ "wind.from.magnetic", _wind_from_magnetic, false },
+				{ "wind.tas", _wind_speed_tas, false },
 				{ "localizer-id", _localizer_id, false },
-				{ "climb-glide-ratio", _climb_glide_ratio, false },
+				{ "glide-ratio", _glide_ratio, false },
 			});
 		}
 	}
@@ -100,48 +98,48 @@ HSI::read()
 	}
 	params.heading_mode = _use_true_heading.read (false) ? HSIWidget::HeadingMode::Magnetic : HSIWidget::HeadingMode::True;
 	params.range = _range.read (5_nm);
-	params.heading_visible = _magnetic_heading.valid();
-	params.heading_magnetic = *_magnetic_heading;
-	params.heading_true = *_true_heading;
-	params.ap_heading_visible = _cmd_settings_visible.read (false) && _cmd_heading_setting.valid();
+	params.heading_visible = _orientation_heading_magnetic.valid();
+	params.heading_magnetic = *_orientation_heading_magnetic;
+	params.heading_true = *_orientation_heading_true;
+	params.ap_heading_visible = _cmd_visible.read (false) && _cmd_heading.valid();
 	params.ap_track_visible = _cmd_track_visible.read (false);
-	params.ap_magnetic_heading = *_cmd_heading_setting;
-	params.track_visible = _magnetic_track.valid();
-	params.track_magnetic = params.track_visible ? *_magnetic_track : *_magnetic_heading;
-	params.display_track = _display_track.read (false);
-	params.home_direction_visible = _true_home_direction.valid();
-	params.true_home_direction = *_true_home_direction;
-	params.dist_to_home_ground_visible = _home_dist_ground.valid();
-	params.dist_to_home_ground = *_home_dist_ground;
-	params.dist_to_home_vlos_visible = _home_dist_vlos.valid();
-	params.dist_to_home_vlos = *_home_dist_vlos;
-	params.dist_to_home_vert_visible = _home_dist_vertical.valid();
-	params.dist_to_home_vert = *_home_dist_vertical;
-	params.ground_speed_visible = _gs.valid();
-	params.ground_speed = *_gs;
-	params.true_air_speed_visible = _tas.valid();
-	params.true_air_speed = *_tas;
+	params.ap_magnetic_heading = *_cmd_heading;
+	params.track_visible = _track_lateral_magnetic.valid();
+	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
+	params.display_track = _track_visible.read (false);
+	params.home_direction_visible = _home_true_direction.valid();
+	params.true_home_direction = *_home_true_direction;
+	params.dist_to_home_ground_visible = _home_distance_ground.valid();
+	params.dist_to_home_ground = *_home_distance_ground;
+	params.dist_to_home_vlos_visible = _home_distance_vlos.valid();
+	params.dist_to_home_vlos = *_home_distance_vlos;
+	params.dist_to_home_vert_visible = _home_distance_vertical.valid();
+	params.dist_to_home_vert = *_home_distance_vertical;
+	params.ground_speed_visible = _speed_gs.valid();
+	params.ground_speed = *_speed_gs;
+	params.true_air_speed_visible = _speed_tas.valid();
+	params.true_air_speed = *_speed_tas;
 	params.trend_vector_visible = _track_lateral_delta_dpm.valid();
 	params.track_lateral_delta = Xefis::limit (*_track_lateral_delta_dpm, -180.0_deg, +180.0_deg);
 	params.trend_vector_lookahead = *_trend_vector_range;
 	params.altitude_reach_visible = _target_altitude_reach_distance.valid();
 	params.altitude_reach_distance = *_target_altitude_reach_distance;
-	params.wind_information_visible = _wind_from_magnetic_heading.valid() && _wind_tas.valid();
-	params.wind_from_magnetic_heading = *_wind_from_magnetic_heading;
-	params.wind_tas_speed = *_wind_tas;
-	params.position_valid = _position_lat.valid() && _position_lon.valid();
-	params.position = LonLat (*_position_lon, *_position_lat);
-	params.navaids_visible = _true_heading.valid();
+	params.wind_information_visible = _wind_from_magnetic.valid() && _wind_speed_tas.valid();
+	params.wind_from_magnetic_heading = *_wind_from_magnetic;
+	params.wind_tas_speed = *_wind_speed_tas;
+	params.position_valid = _position_latitude.valid() && _position_longitude.valid();
+	params.position = LonLat (*_position_longitude, *_position_latitude);
+	params.navaids_visible = _orientation_heading_true.valid();
 	params.vor_visible = true;
 	params.dme_visible = true;
 	params.ndb_visible = true;
 	params.loc_visible = true;
 	params.fix_visible = true;
 	params.highlighted_loc = QString::fromStdString (_localizer_id.read (""));
-	params.positioning_hint_visible = _positioning_hint.valid();
-	params.positioning_hint = QString::fromStdString (*_positioning_hint);
-	params.climb_glide_ratio_visible = _climb_glide_ratio.valid();
-	params.climb_glide_ratio = *_climb_glide_ratio;
+	params.positioning_hint_visible = _position_source.valid();
+	params.positioning_hint = QString::fromStdString (*_position_source);
+	params.climb_glide_ratio_visible = _glide_ratio.valid();
+	params.climb_glide_ratio = *_glide_ratio;
 	params.round_clip = false;
 
 	_hsi_widget->set_params (params);
