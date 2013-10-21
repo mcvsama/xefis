@@ -211,6 +211,9 @@ class ConfigReader
 	process_includes (QDomElement parent);
 
 	void
+	process_ifs (QDomElement parent);
+
+	void
 	process_settings_element (QDomElement const& settings_element);
 
 	void
@@ -230,6 +233,7 @@ class ConfigReader
 	ModuleManager*	_module_manager		= nullptr;
 	QDomDocument	_config_document;
 	QDir			_current_dir;
+	QString			_config_mode;
 	bool			_has_windows		= false;
 	bool			_navaids_enable		= true;
 	float			_scale_pen			= 1.f;
