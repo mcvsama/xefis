@@ -39,7 +39,18 @@ Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 {
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
+		if (e == "settings")
+		{
+			parse_settings (e, {
+				{ "dead-zone.x", _dead_zone_x, false },
+				{ "dead-zone.y", _dead_zone_y, false },
+				{ "speed.x", _speed_x, false },
+				{ "speed.y", _speed_y, false },
+				{ "acceleration.x", _acceleration_x, false },
+				{ "acceleration.y", _acceleration_y, false },
+			});
+		}
+		else if (e == "properties")
 		{
 			parse_properties (e, {
 				{ "axis-x", _axis_x, true },
@@ -47,19 +58,10 @@ Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "button", _button, true },
 			});
 		}
-		else if (e == "dead-zone-x")
-			_dead_zone_x = e.text().toFloat();
-		else if (e == "dead-zone-y")
-			_dead_zone_y = e.text().toFloat();
-		else if (e == "speed-x")
-			_speed_x = 20.f * e.text().toFloat();
-		else if (e == "speed-y")
-			_speed_y = 20.f * e.text().toFloat();
-		else if (e == "acceleration-x")
-			_acceleration_x = e.text().toFloat();
-		else if (e == "acceleration-y")
-			_acceleration_y = e.text().toFloat();
 	}
+
+	_speed_x *= 20.f;
+	_speed_y *= 20.f;
 
 	QTimer* check_timer = new QTimer (this);
 	check_timer->setInterval (1000.f / 50.f);
