@@ -51,6 +51,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "altitude-ladder.extent", _altitude_ladder_extent, false },
 				{ "altitude.landing.warning.hi", _altitude_landing_warning_hi, false },
 				{ "altitude.landing.warning.lo", _altitude_landing_warning_lo, false },
+				{ "raising-runway.visibility", _raising_runway_visibility, false },
+				{ "raising-runway.threshold", _raising_runway_threshold, false },
 			});
 		}
 		else if (e == "properties")
@@ -306,8 +308,9 @@ EFIS::read()
 	params.deviation_lateral_flight_path = *_flight_path_deviation_lateral_fp;
 	params.deviation_mixed_mode = _flight_path_deviation_mixed_mode.read (false);
 	// Raising runway
-	params.runway_visible = _flight_path_deviation_lateral_app.valid() && *_altitude_agl <= 1000_ft;
-	params.runway_position = Xefis::limit<Length> (*_altitude_agl, 0_ft, 250_ft) / 250_ft * 25_deg;
+	params.runway_visible = _approach_reference_visible.read (false) && _altitude_agl.valid() &&
+							_flight_path_deviation_lateral_app.valid() && *_altitude_agl <= _raising_runway_visibility;
+	params.runway_position = Xefis::limit<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
 	// Control hint
 	params.control_hint_visible = _flight_mode_hint_visible.read (false);
 	params.control_hint = QString::fromStdString (_flight_mode_hint.read (""));
