@@ -27,11 +27,12 @@
 			<p>A raising runway will be drawn on EFIS, showing ILS deviation from the runway position, if following points are met:</p>
 			<ul>
 				<li>approach reference is set to visible,</li>
-				<li>radio altimeter input is valid,</li>
-				<li>radio altitude is below 1000 ft AGL,</li>
-				<li>ILS localizer deviation input is valid.</li>
+				<li>ILS localizer deviation input is valid,</li>
+				<li>altitude AGL input is valid,</li>
+				<li>altitude AGL is below <code>raising-runway.visibility</code> setting,</li>
 			</ul>
 			<p>Raising runway is a green runway symbol, changing its position from bottom to the horizon line as the aircraft descend (radio altitude input is decreasing).</p>
+			<p>Below altitude <code>raising-runway.threshold</code> AGL, the symbol will start moving from the bottom of ADI to its center.</p>
 		</section>
 	</section>
 	<section id='configuration'>
@@ -75,6 +76,12 @@
 				</doc:item>
 				<doc:item name='altitude.landing.warning.lo' type='length'>
 					Langing altitude approach indicator. This indicates position of the top of amber color strip.
+				</doc:item>
+				<doc:item name='raising-runway.visibility' type='length'>
+					Below this altitude AGL, a raising runway will be drawn. Default: 1000 ft.
+				</doc:item>
+				<doc:item name='raising-runway.threshold' type='length'>
+					Below this altitude AGL, raising runway will start moving towards ADI center. Default: 250 ft.
 				</doc:item>
 			</doc:settings>
 		</section>
@@ -154,10 +161,13 @@
 				<h1>Track</h1>
 				<doc:properties>
 					<doc:item name='track.lateral.magnetic' type='angle'>
+						Magnetic lateral track of the plane (lateral motion vector relative to the ground).
 					</doc:item>
 					<doc:item name='track.lateral.true' type='angle'>
+						True lateral track of the plane.
 					</doc:item>
 					<doc:item name='track.vertical' type='angle'>
+						Vertical track of the plane. 0 means level flight, positive is climbing.
 					</doc:item>
 				</doc:properties>
 			</section>
@@ -166,7 +176,7 @@
 				<p>The slip-skid indicator has form of rectangle located under triangular roll bug.</p>
 				<doc:properties>
 					<doc:item name='slip-skid' type='float'>
-						Current slip-skid value.
+						Current slip-skid value. It is unitless (at least for now), sensible values are in range [-2, 2].
 					</doc:item>
 				</doc:properties>
 			</section>
@@ -188,14 +198,14 @@
 					Angle of attack alpha value (often called just <q>angle of attack</q>).
 				</doc:item>
 				<doc:item name='aoa.warning-threshold' type='angle'>
-					Minimum angle of attack for which pitch limit will be drawn on EFIS.
+					If <code>aoa.alpha</code> is greater than this value, pitch limit indicator will be drawn on EFIS
+					(if enabled by <code>aoa.critical.visible</code>).
 				</doc:item>
 				<doc:item name='aoa.critical' type='angle'>
 					Current critical AOA.
 				</doc:item>
 				<doc:item name='aoa.critical.visible' type='boolean'>
-					If <var>true</var> and if <code>aoa.critical - aoa.alpha</code> is less than <code>aoa.warning-threshold</code>,
-					pitch limit indicator will be drawn.
+					Enable pitch limit indicator.
 				</doc:item>
 			</doc:properties>
 			<section>
@@ -331,12 +341,17 @@
 				<h1>Approach information</h1>
 				<doc:properties>
 					<doc:item name='approach.reference-visible' type='boolean'>
+						Show approach information.
 					</doc:item>
 					<doc:item name='approach.type-hint' type='string'>
+						Type of localizer/glideslope guidance ("ILS", "GPS", etc).
 					</doc:item>
 					<doc:item name='approach.localizer-id' type='string'>
+						Localizer identifier. Navaids database will be searched by this string,
+						and magnetic bearing will be shown after the localizer name.
 					</doc:item>
 					<doc:item name='approach.dme-distance' type='length'>
+						Distance to the localizer.
 					</doc:item>
 				</doc:properties>
 			</section>
@@ -347,19 +362,26 @@
 				only the ILS deviation is shown, when mixed style is used, both ILS and flight path deviation is shown.</p>
 				<doc:properties>
 					<doc:item name='flight-path.deviation.vertical.serviceable' type='boolean'>
+						Glideslope sensor serviceable flag. <var>nil</var> is treated the same as <var>true</var>.
 					</doc:item>
 					<doc:item name='flight-path.deviation.vertical.app' type='angle'>
+						Glideslope deviation.
 					</doc:item>
 					<doc:item name='flight-path.deviation.vertical.fp' type='angle'>
+						Flight path vertical deviation.
 					</doc:item>
 					<doc:item name='flight-path.deviation.lateral.serviceable' type='boolean'>
+						Localizer sensor serviceable flag. <var>nil</var> is treated the same as <var>true</var>.
 					</doc:item>
 					<doc:item name='flight-path.deviation.lateral.app' type='angle'>
+						Localizer deviation.
 					</doc:item>
 					<doc:item name='flight-path.deviation.lateral.fp' type='angle'>
+						Flight path lateral deviation.
 					</doc:item>
 					<doc:item name='flight-path.deviation.mixed-mode' type='boolean'>
-						Use ILS-style indicators for flight path deviation.
+						If <var>true</var>, both glideslope/localizer and flight-path deviations
+						will be shown, otherwise there will be just glideslope/localizer deviations.
 					</doc:item>
 				</doc:properties>
 			</section>
@@ -369,8 +391,10 @@
 					<h1>Flight mode hint</h1>
 					<doc:properties>
 						<doc:item name='flight-mode.hint.visible' type='boolean'>
+							Show flight mode hint (on top of ADI).
 						</doc:item>
 						<doc:item name='flight-mode.hint' type='string'>
+							Flight mode hint.
 						</doc:item>
 					</doc:properties>
 				</section>
@@ -378,18 +402,25 @@
 					<h1>Flight Mode Annunciator</h1>
 					<doc:properties>
 						<doc:item name='flight-mode.fma.visible' type='boolean'>
+							Show FMA bar.
 						</doc:item>
 						<doc:item name='flight-mode.fma.speed-hint' type='string'>
+							Top-left text on FMA.
 						</doc:item>
 						<doc:item name='flight-mode.fma.speed-small-hint' type='string'>
+							Bottom-left text on FMA.
 						</doc:item>
 						<doc:item name='flight-mode.fma.lateral-hint' type='string'>
+							Top-center text on FMA.
 						</doc:item>
 						<doc:item name='flight-mode.fma.lateral-small-hint' type='string'>
+							Bottom-center text on FMA.
 						</doc:item>
 						<doc:item name='flight-mode.fma.vertical-hint' type='string'>
+							Top-right text on FMA.
 						</doc:item>
 						<doc:item name='flight-mode.fma.vertical-small-hint' type='string'>
+							Bottom-right text on FMA.
 						</doc:item>
 					</doc:properties>
 				</section>
@@ -398,12 +429,20 @@
 				<h1>TCAS Resolution Advisory</h1>
 				<doc:properties>
 					<doc:item name='tcas.resolution-advisory.pitch.minimum' type='angle'>
+						If not <var>nil</var>, TCAS pitch RA will be drawn on EFIS.
+						This is minimum pitch to avoid collision.
 					</doc:item>
 					<doc:item name='tcas.resolution-advisory.pitch.maximum' type='angle'>
+						If not <var>nil</var>, TCAS pitch RA will be drawn on EFIS.
+						This is maximum pitch to avoid collision.
 					</doc:item>
 					<doc:item name='tcas.resolution-advisory.vertical-speed.minimum' type='speed'>
+						If not <var>nil</var>, TCAS vertical-speed RA will be drawn on vertical-speed ladder.
+						This is minimum V/S to avoid collision.
 					</doc:item>
 					<doc:item name='tcas.resolution-advisory.vertical-speed.maximum' type='speed'>
+						If not <var>nil</var>, TCAS vertical-speed RA will be drawn on vertical-speed ladder.
+						This is maximum V/S to avoid collision.
 					</doc:item>
 				</doc:properties>
 			</section>
