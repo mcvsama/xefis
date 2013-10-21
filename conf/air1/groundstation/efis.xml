@@ -182,10 +182,10 @@
 										<property name='position.source' path='/position/source'/>
 										<property name='position.latitude' path='/position/latitude'/>
 										<property name='position.longitude' path='/position/longitude'/>
-										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
+										<property name='wind.from.magnetic' path='/wind/magnetic-orientation-from'/>
 										<property name='wind.tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
-										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
+										<property name='glide-ratio' path='/performance/glide-ratio'/>
 									</directory>
 									<directory path='/systems/rcms'>
 										<property name='home.distance.vlos' path='/home/vlos-distance'/>
@@ -434,10 +434,10 @@
 										<property name='position.source' path='/position/source'/>
 										<property name='position.latitude' path='/position/latitude'/>
 										<property name='position.longitude' path='/position/longitude'/>
-										<property name='wind.from-mag-heading' path='/wind/magnetic-orientation-from'/>
+										<property name='wind.from.magnetic' path='/wind/magnetic-orientation-from'/>
 										<property name='wind.tas' path='/wind/true-airspeed'/>
 										<property name='localizer-id' path='/localizer/identifier'/>
-										<property name='climb-glide-ratio' path='/performance/climb-glide-ratio'/>
+										<property name='glide-ratio' path='/performance/glide-ratio'/>
 										<property name='altitude.target.reach-distance' path='/performance/target-altitude-reach-distance'/>
 									</directory>
 								</properties>

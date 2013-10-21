@@ -272,7 +272,11 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 ConfigReader::ConfigReader (Application* application, ModuleManager* module_manager):
 	_application (application),
 	_module_manager (module_manager)
-{ }
+{
+	const char* mode = getenv ("XEFIS_MODE");
+	if (mode)
+		_config_mode = mode;
+}
 
 
 void
@@ -316,6 +320,7 @@ ConfigReader::process()
 {
 	QDomElement root = _config_document.documentElement();
 
+	process_ifs (root);
 	process_includes (root);
 
 	if (root != "xefis-config")
@@ -367,6 +372,40 @@ ConfigReader::process_includes (QDomElement parent)
 		}
 		else
 			process_includes (e);
+	}
+
+	for (QDomElement& e: to_remove)
+		parent.removeChild (e);
+}
+
+
+void
+ConfigReader::process_ifs (QDomElement parent)
+{
+	std::list<QDomElement> to_remove;
+
+	for (QDomElement& e: parent)
+	{
+		if (e == "if")
+		{
+			if (e.hasAttribute ("mode") && e.attribute ("mode") == _config_mode)
+			{
+				std::list<QDomElement> moveup;
+				for (QDomElement c: e)
+					moveup.push_back (c);
+				for (QDomElement c: moveup)
+				{
+					e.removeChild (c);
+					parent.insertAfter (c, e);
+				}
+
+				for (QDomElement c: e)
+					process_ifs (c);
+			}
+			to_remove.push_back (e);
+		}
+		else
+			process_ifs (e);
 	}
 
 	for (QDomElement& e: to_remove)
