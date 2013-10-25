@@ -9,12 +9,10 @@
 			<setting name='pressure.read-interval' value='50 ms'/>
 			<setting name='temperature.read-interval' value='500 ms'/>
 		</settings>
-		<properties>
-			<directory path='/sensors'>
-				<property name='serviceable' path='/pressure/serviceable'/>
-				<property name='pressure' path='/pressure/pressure'/>
-				<property name='temperature' path='/temperature/static'/>
-			</directory>
+		<properties path='/sensors'>
+			<property name='serviceable' path='/pressure/serviceable'/>
+			<property name='pressure' path='/pressure/pressure'/>
+			<property name='temperature' path='/temperature/static'/>
 		</properties>
 	</module>
 </xefis-include>
