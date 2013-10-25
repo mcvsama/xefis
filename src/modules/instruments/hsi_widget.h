@@ -88,7 +88,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle			ap_magnetic_heading			= 0_deg;
 		bool			track_visible				= false;
 		Angle			track_magnetic				= 0_deg;
-		bool			display_track				= false;
+		bool			center_on_track				= false;
 		bool			home_direction_visible		= false;
 		Angle			true_home_direction			= 0_deg;
 		bool			dist_to_home_ground_visible	= false;
