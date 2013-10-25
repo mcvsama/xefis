@@ -624,7 +624,7 @@ template<class T>
 	{
 		if (is_nil())
 		{
-			ensure_path (path(), Type());
+			write (Type());
 			set_nil();
 		}
 	}
