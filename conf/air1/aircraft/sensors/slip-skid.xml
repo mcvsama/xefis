@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/slip-skid'>
+		<properties path='/sensors'>
+			<directory path='/imu/acceleration'>
+				<property name='acceleration.x' path='/x'/>
+				<property name='acceleration.y' path='/y'/>
+				<property name='acceleration.z' path='/z'/>
+			</directory>
+			<property name='slip-skid' path='/slip-skid/slip-skid'/>
+		</properties>
+	</module>
+</xefis-include>
+

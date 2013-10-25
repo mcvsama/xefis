@@ -1,0 +1,41 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='io/gps'>
+		<settings>
+			<setting name='device' value='/dev/ttyAMA0'/>
+			<setting name='receiver-accuracy' value='1.8 m'/>
+			<setting name='synchronize-system-clock' value='true'/>
+			<setting name='default-baud-rate' value='9600'/>
+			<setting name='baud-rate' value='38400'/>
+			<setting name='debug' value='false'/>
+		</settings>
+		<properties path='/sensors'>
+			<directory path='/gps'>
+				<property name='serviceable' path='/serviceable'/>
+				<property name='read-errors' path='/read-errors'/>
+				<property name='fix-quality' path='/fix-quality'/>
+				<property name='type-of-fix' path='/type-of-fix'/>
+				<property name='latitude' path='/latitude'/>
+				<property name='longitude' path='/longitude'/>
+				<property name='altitude-amsl' path='/altitude-amsl'/>
+				<property name='altitude-above-wgs84' path='/altitude-above-wgs84'/>
+				<property name='groundspeed' path='/groundspeed'/>
+				<property name='track' path='/track'/>
+				<property name='tracked-satellites' path='/tracked-satellites'/>
+				<property name='hdop' path='/hdop'/>
+				<property name='vdop' path='/vdop'/>
+				<property name='lateral-accuracy' path='/lateral-accuracy'/>
+				<property name='vertical-accuracy' path='/vertical-accuracy'/>
+				<property name='dgps-station-id' path='/dgps-station-id'/>
+				<property name='update-timestamp' path='/update-timestamp'/>
+				<property name='epoch-time' path='/epoch-time'/>
+			</directory>
+		</properties>
+		<initialization>
+			<pmtk comment='update rate'>PMTK220,100</pmtk>
+			<pmtk comment='enable SBAS'>PMTK313,1</pmtk>
+			<pmtk comment='integrity SBAS mode'>PMTK319,1</pmtk>
+		</initialization>
+	</module>
+</xefis-include>
+

@@ -7,16 +7,18 @@
 			<setting name='ekf.process-variance' value='0.5'/>
 			<setting name='sample-rate' value='50 Hz'/>
 		</settings>
-		<properties>
-			<directory path='//sensors/ahrs'>
+		<properties path='//sensors'>
+			<directory path='/ahrs'>
 				<property name='serviceable' path='/serviceable'/>
 				<property name='failures' path='/failures'/>
 				<property name='internal-temperature' path='/internal-temperature'/>
-				<property name='orientation.pitch' path='/orientation/pitch'/>
-				<property name='orientation.roll' path='/orientation/roll'/>
-				<property name='orientation.magnetic-heading' path='/orientation/magnetic-heading'/>
+				<directory path='/orientation'>
+					<property name='orientation.pitch' path='/pitch'/>
+					<property name='orientation.roll' path='/roll'/>
+					<property name='orientation.magnetic-heading' path='/magnetic-heading'/>
+				</directory>
 			</directory>
-			<directory path='//sensors/imu'>
+			<directory path='/imu'>
 				<property name='acceleration.x' path='/acceleration/x'/>
 				<property name='acceleration.y' path='/acceleration/y'/>
 				<property name='acceleration.z' path='/acceleration/z'/>

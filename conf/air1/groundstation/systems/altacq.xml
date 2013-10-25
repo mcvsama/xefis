@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/altacq'>
+		<properties>
+			<!-- Input -->
+			<property name='altitude.amsl' path='/systems/adc/altitude/amsl'/>
+			<property name='altitude.acquire.amsl' path='/settings/flight-director/cmd/altitude'/>
+			<property name='vertical-speed' path='/systems/adc/vertical-speed/speed'/>
+			<property name='ground-speed' path='/systems/nc/track/ground-speed'/>
+			<!-- Output -->
+			<directory path='/systems/altacq'>
+				<property name='altitude.acquire.distance' path='/distance'/>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+

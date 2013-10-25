@@ -6,13 +6,32 @@
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
-		<include name='groundstation/joystick.xml'/>
-		<include name='groundstation/link.xml'/>
-		<include name='groundstation/ht16k33.xml'/>
-		<include name='groundstation/state.xml'/>
-		<include name='groundstation/xbee.xml'/>
-		<module name='log/latency' disabled='true'/>
+		<include name='groundstation/hardware/joystick.xml'/>
+		<!--include name='groundstation/systems/state.xml'/-->
+		<include name='groundstation/systems/adc.xml'/>
+		<include name='groundstation/systems/nc.xml'/>
+		<include name='groundstation/systems/rcms.xml'/>
+		<include name='groundstation/systems/altacq.xml'/>
+		<if mode=''>
+			<include name='groundstation/comm/link.xml'/>
+			<include name='groundstation/comm/xbee.xml'/>
+		</if>
+		<if mode='fg'>
+			<include name='groundstation/sim/flightgear.xml'/>
+		</if>
 	</modules>
-	<include name='groundstation/efis.xml'/>
+	<windows>
+		<window width='1366' height='768' full-screen='false'>
+			<layout type='horizontal'>
+				<item stretch-factor='4'>
+					<include name='groundstation/instruments/pfd.xml'/>
+				</item>
+				<separator/>
+				<item stretch-factor='4'>
+					<include name='groundstation/instruments/mfd.xml'/>
+				</item>
+			</layout>
+		</window>
+	</windows>
 </xefis-config>
 
