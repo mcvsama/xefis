@@ -2072,9 +2072,11 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			{
 				QPolygonF pink_pointer;
 				QPolygonF white_pointer;
+				bool filled = false;
 
 				if (!_params.deviation_mixed_mode)
 				{
+					// Only ILS:
 					float w = 0.012f * wh();
 					pink_pointer = QPolygonF()
 						<< QPointF (0.f, -w)
@@ -2083,9 +2085,11 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 						<< QPointF (-1.6f * w, 0.f)
 						<< QPointF (0.f, -w);
 					pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
+					filled = std::abs (original_approach_deviation.deg()) <= std::abs (approach_deviation.deg());
 				}
 				else
 				{
+					// ILS and flight path:
 					float w = 0.012f * wh();
 					pink_pointer = QPolygonF()
 						<< QPointF (0.f, -0.2f * w)
@@ -2099,15 +2103,16 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 						<< QPointF (-1.6f * w, 0.f)
 						<< QPointF (0.f, -0.8f * w);
 					white_pointer.translate (approach_deviation.deg() * 0.075f * wh(), -0.65f * w);
+					filled = std::abs (original_path_deviation.deg()) <= std::abs (path_deviation.deg());
 				}
 
 				for (QColor color: { _autopilot_pen_1.color(), _autopilot_pen_2.color() })
 				{
 					painter.setPen (get_pen (color, 1.f));
-					if (std::abs (original_approach_deviation.deg()) > std::abs (approach_deviation.deg()))
-						painter.setBrush (Qt::NoBrush);
-					else
+					if (filled)
 						painter.setBrush (color);
+					else
+						painter.setBrush (Qt::NoBrush);
 					painter.drawPolygon (pink_pointer);
 				}
 
@@ -2121,7 +2126,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 			if (!_params.deviation_mixed_mode)
 			{
-				// Paint path deviation:
+				// Paint path deviation scale:
 				painter.setPen (get_pen (Qt::white, 1.5f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, -0.5f, +0.5f, +1.f })
@@ -2130,7 +2135,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			}
 			else
 			{
-				// Paint ILS deviation:
+				// Paint ILS deviation scale:
 				painter.setPen (get_pen (Qt::white, 1.2f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, +1.f })
