@@ -44,6 +44,9 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "trend-vector-range", _trend_vector_range, false },
 				{ "speed.gs", _speed_gs, false },
 				{ "speed.tas", _speed_tas, false },
+				{ "cmd.visible", _cmd_visible, false },
+				{ "cmd.heading", _cmd_heading, false },
+				{ "cmd.track-visible", _cmd_track_visible, false },
 				{ "altitude.target.reach-distance", _target_altitude_reach_distance, false },
 				{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
 				{ "orientation.heading.true", _orientation_heading_true, false },
@@ -52,15 +55,13 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				{ "home.distance.vlos", _home_distance_vlos, false },
 				{ "home.distance.ground", _home_distance_ground, false },
 				{ "home.distance.vertical", _home_distance_vertical, false },
-				{ "cmd.visible", _cmd_visible, false },
-				{ "cmd.heading", _cmd_heading, false },
-				{ "cmd.track-visible", _cmd_track_visible, false },
 				{ "position.latitude", _position_latitude, false },
 				{ "position.longitude", _position_longitude, false },
 				{ "position.source", _position_source, false },
 				{ "track.visible", _track_visible, false },
-				{ "track.lateral-magnetic", _track_lateral_magnetic, false },
-				{ "track.delta.lateral", _track_lateral_delta_dpm, false },
+				{ "track.lateral.magnetic", _track_lateral_magnetic, false },
+				{ "track.lateral.delta", _track_lateral_delta_dpm, false },
+				{ "track.center-on-track", _track_center_on_track, false },
 				{ "wind.from.magnetic", _wind_from_magnetic, false },
 				{ "wind.tas", _wind_speed_tas, false },
 				{ "localizer-id", _localizer_id, false },
@@ -96,7 +97,7 @@ HSI::read()
 		case 1:		params.display_mode = HSIWidget::DisplayMode::Rose; break;
 		default:	params.display_mode = HSIWidget::DisplayMode::Auxiliary; break;
 	}
-	params.heading_mode = _use_true_heading.read (false) ? HSIWidget::HeadingMode::Magnetic : HSIWidget::HeadingMode::True;
+	params.heading_mode = _use_true_heading.read (false) ? HSIWidget::HeadingMode::True : HSIWidget::HeadingMode::Magnetic;
 	params.range = _range.read (5_nm);
 	params.heading_visible = _orientation_heading_magnetic.valid();
 	params.heading_magnetic = *_orientation_heading_magnetic;
@@ -104,9 +105,9 @@ HSI::read()
 	params.ap_heading_visible = _cmd_visible.read (false) && _cmd_heading.valid();
 	params.ap_track_visible = _cmd_track_visible.read (false);
 	params.ap_magnetic_heading = *_cmd_heading;
-	params.track_visible = _track_lateral_magnetic.valid();
+	params.track_visible = _track_visible.read (false) && _track_lateral_magnetic.valid();
 	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
-	params.display_track = _track_visible.read (false);
+	params.center_on_track = _track_center_on_track.read (true);
 	params.home_direction_visible = _home_true_direction.valid();
 	params.true_home_direction = *_home_true_direction;
 	params.dist_to_home_ground_visible = _home_distance_ground.valid();

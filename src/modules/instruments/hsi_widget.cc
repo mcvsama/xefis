@@ -265,7 +265,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		? _params.heading_magnetic
 		: _params.heading_true;
 
-	_locals.rotation = _params.display_track ? _locals.track : _locals.heading;
+	_locals.rotation = _params.center_on_track ? _locals.track : _locals.heading;
 
 	_heading_transform.reset();
 	_heading_transform.rotate (-_locals.heading.deg());
@@ -274,7 +274,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	_track_transform.rotate (-_locals.track.deg());
 
 	_rotation_transform =
-		_params.display_track
+		_params.center_on_track
 			? _track_transform
 			: _heading_transform;
 
@@ -332,7 +332,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 	// MAG/TRUE heading
 	if (_params.heading_visible)
 	{
-		int hdg = static_cast<int> ((_params.display_track ? _locals.track : _locals.heading).deg() + 0.5f) % 360;
+		int hdg = static_cast<int> ((_params.center_on_track ? _locals.track : _locals.heading).deg() + 0.5f) % 360;
 
 		switch (_params.display_mode)
 		{
@@ -340,7 +340,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 			{
 				QString text_1 =
 					QString (_params.heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU") +
-					QString (_params.display_track ? " TRK" : "");
+					QString (_params.center_on_track ? " TRK" : "");
 				QString text_2 = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
 				QFont font_1 (_font_13);
@@ -372,7 +372,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 			default:
 			{
-				QString text_1 = _params.display_track ? "TRK" : "HDG";
+				QString text_1 = _params.center_on_track ? "TRK" : "HDG";
 				QString text_2 = _params.heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU";
 				QString text_v = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
 
@@ -466,12 +466,11 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 		painter.setPen (QPen (_silver, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
 		painter.rotate ((_locals.track - _locals.rotation).deg());
 		float extension = 0.0;
-		if (_params.display_mode != DisplayMode::Auxiliary && _params.display_track)
+		if (_params.display_mode != DisplayMode::Auxiliary && _params.center_on_track)
 			extension = 0.6 * _q;
 		painter.draw_outlined_line (QPointF (0.f, start_point), QPointF (0.f, -_r - extension));
 		painter.setPen (QPen (Qt::white, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
 
-		//painter.setClipPath (_outer_map_clip);
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
 			Length range;

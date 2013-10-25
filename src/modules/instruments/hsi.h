@@ -64,6 +64,9 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyLength	_trend_vector_range;
 	Xefis::PropertySpeed	_speed_gs;
 	Xefis::PropertySpeed	_speed_tas;
+	Xefis::PropertyBoolean	_cmd_visible;
+	Xefis::PropertyAngle	_cmd_heading;
+	Xefis::PropertyBoolean	_cmd_track_visible;
 	Xefis::PropertyLength	_target_altitude_reach_distance;
 	Xefis::PropertyAngle	_orientation_heading_magnetic;
 	Xefis::PropertyAngle	_orientation_heading_true;
@@ -72,12 +75,10 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyLength	_home_distance_vlos;
 	Xefis::PropertyLength	_home_distance_ground;
 	Xefis::PropertyLength	_home_distance_vertical;
-	Xefis::PropertyBoolean	_cmd_visible;
-	Xefis::PropertyAngle	_cmd_heading;
-	Xefis::PropertyBoolean	_cmd_track_visible;
 	Xefis::PropertyBoolean	_track_visible;
 	Xefis::PropertyAngle	_track_lateral_magnetic;
 	Xefis::PropertyAngle	_track_lateral_delta_dpm;
+	Xefis::PropertyBoolean	_track_center_on_track;
 	Xefis::PropertyAngle	_position_latitude;
 	Xefis::PropertyAngle	_position_longitude;
 	Xefis::PropertyString	_position_source;
