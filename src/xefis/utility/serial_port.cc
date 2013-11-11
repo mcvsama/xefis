@@ -104,9 +104,9 @@ SerialPort::set_max_write_failures (unsigned int number)
 
 
 void
-SerialPort::write (std::string const& data)
+SerialPort::write (Blob const& data)
 {
-	_output_buffer += data;
+	_output_buffer.insert (_output_buffer.end(), data.begin(), data.end());
 
 	int written = ::write (_device, _output_buffer.data(), _output_buffer.size());
 
@@ -116,16 +116,19 @@ SerialPort::write (std::string const& data)
 
 		if (errno != EAGAIN && errno != EWOULDBLOCK)
 		{
+			log() << "Write failure (could not write " << _output_buffer.size() << " bytes)." << std::endl;
 			_write_failure_count++;
 			if (_write_failure_count > _max_write_failure_count)
 				notify_failure ("multiple write failures");
 		}
+		else
+			log() << "Write failure: would block." << std::endl;
 	}
 	else if (written < static_cast<int> (_output_buffer.size()))
 	{
 		log() << "Write buffer overrun." << std::endl;
 
-		_output_buffer.erase (0, written);
+		_output_buffer.erase (_output_buffer.begin(), _output_buffer.begin() + written);
 	}
 	else
 	{
@@ -252,7 +255,7 @@ SerialPort::read()
 		for (;;)
 		{
 			std::string::size_type prev_size = buffer.size();
-			std::string::size_type try_read = 1024;
+			std::string::size_type try_read = 4096;
 			buffer.resize (prev_size + try_read);
 			int n = ::read (_device, &buffer[prev_size], try_read);
 
@@ -262,6 +265,7 @@ SerialPort::read()
 				{
 					// Nothing to read (read would block)
 					buffer.resize (prev_size);
+					log() << "Nothing to read (read would block)." << std::endl;
 					break;
 				}
 				else
@@ -276,6 +280,7 @@ SerialPort::read()
 				buffer.resize (prev_size + n);
 				if (n == 0)
 				{
+					log() << "Read failure (0 bytes read by read())." << std::endl;
 					_read_failure_count++;
 					if (_read_failure_count > _max_read_failure_count)
 						notify_failure ("multiple read failures");
@@ -294,7 +299,7 @@ SerialPort::read()
 
 	if (!buffer.empty())
 	{
-		_input_buffer += buffer;
+		_input_buffer.insert (_input_buffer.end(), buffer.begin(), buffer.end());
 		_data_ready();
 	}
 }
@@ -351,7 +356,7 @@ SerialPort::set_device_options()
 
 	tcflush (_device, TCIOFLUSH);
 
-	if (tcsetattr (_device, TCSANOW, &options) != 0)
+	if (tcsetattr (_device, TCSAFLUSH, &options) != 0)
 	{
 		log() << "Could not setup serial port: " << _device_path << ": " << strerror (errno) << std::endl;
 		return false;

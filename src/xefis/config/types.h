@@ -17,6 +17,7 @@
 // Standard:
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 // Boost:
 #include <boost/optional.hpp>
@@ -46,9 +47,11 @@ operator"" _qstr (const char* string, size_t)
 }
 
 
-typedef half_float::half	float16_t;
-typedef float				float32_t;
-typedef double				float64_t;
+typedef half_float::half		float16_t;
+typedef float					float32_t;
+typedef double					float64_t;
+
+typedef std::vector<uint8_t>	Blob;
 
 template<class Value>
 	using Optional = boost::optional<Value>;

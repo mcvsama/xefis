@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <algorithm>
 
 // Local:
 #include "packet_reader.h"
@@ -20,7 +21,7 @@
 
 namespace Xefis {
 
-PacketReader::PacketReader (std::string const& magic, ParseCallback parse):
+PacketReader::PacketReader (Blob const& magic, ParseCallback parse):
 	_magic (magic),
 	_parse (parse)
 {
@@ -45,37 +46,39 @@ PacketReader::set_buffer_capacity (std::size_t bytes) noexcept
 
 
 void
-PacketReader::feed (std::string const& data)
+PacketReader::feed (Blob const& data)
 {
 	if (_capacity > 0 && _buffer.size() + data.size() > _capacity)
 	{
 		// Trim input buffer:
 		if (data.size() > _capacity)
-			_buffer = data.substr (data.size() - _capacity);
+			_buffer = Blob (data.begin() + data.size() - _capacity, data.end());
 		else
 		{
-			_buffer.erase (0, _buffer.size() + data.size() - _capacity);
-			_buffer += data;
+			_buffer.erase (_buffer.begin(), _buffer.begin() + _buffer.size() + data.size() - _capacity);
+			_buffer.insert (_buffer.end(), data.begin(), data.end());
 		}
 	}
 	else
-		_buffer += data;
+		_buffer.insert (_buffer.end(), data.begin(), data.end());
 
 	for (;;)
 	{
-		std::string::size_type p = _buffer.find (_magic);
+		// Find magic string in buffer:
+		Blob::iterator p = std::search (_buffer.begin(), _buffer.end(),
+										_magic.begin(), _magic.end());
 		// If magic found:
-		if (p != std::string::npos)
+		if (p != _buffer.end())
 		{
 			// Everything until packet magic is considered gibberish:
-			_buffer.erase (0, p);
+			_buffer.erase (_buffer.begin(), p);
 			// If enough data to parse:
 			if (_buffer.size() >= _minimum_packet_size)
 			{
 				std::size_t parsed_bytes = _parse();
 				if (parsed_bytes > 0)
 				{
-					_buffer.erase (0, parsed_bytes);
+					_buffer.erase (_buffer.begin(), _buffer.begin() + parsed_bytes);
 					// If buffer is still non-empty, try parsing again:
 					if (!_buffer.empty())
 						continue;
