@@ -43,10 +43,10 @@ class CHRUM6:
 {
 	Q_OBJECT
 
-	static constexpr Time AlignDelay			= 2_min;
 	static constexpr Time RestartDelay			= 200_ms;
-	static constexpr Time AliveCheckInterval	= 2_s;
+	static constexpr Time AliveCheckInterval	= 500_ms;
 	static constexpr Time StatusCheckInterval	= 200_ms;
+	static constexpr Time InitializationDelay	= 3_s;
 
 	// Register write or read?
 	enum class Operation
@@ -242,6 +242,14 @@ class CHRUM6:
 		MagInitFail			= 1u << 31,
 	};
 
+	enum class Stage
+	{
+		Initialize,
+		Run,
+	};
+
+	typedef std::vector<uint8_t> Blob;
+
   public:
 	// Ctor
 	CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config);
@@ -260,6 +268,12 @@ class CHRUM6:
 	alive_check_failed();
 
 	/**
+	 * Called when initialization takes too long to complete.
+	 */
+	void
+	initialization_timeout();
+
+	/**
 	 * Try to restart operation after failure is detected.
 	 */
 	void
@@ -273,17 +287,31 @@ class CHRUM6:
 
   private:
 	/**
-	 * Set up device.
+	 * Start setting up the device. It's asynchronous, and will
+	 * issue several commands. When it's finished, initialization_complete()
+	 * will be called.
 	 */
 	void
 	initialize();
 
 	/**
-	 * Align gyro. That is discard all output data until gyro
-	 * aligns itself and warms to its operational temperature.
+	 * Goes to next initialization step, after 'command complete' packet
+	 * is received from the device.
 	 */
 	void
-	align();
+	next_initialization_step();
+
+	/**
+	 * Repeat last initialization step.
+	 */
+	void
+	repeat_initialization_step();
+
+	/**
+	 * Called when initialization is complete.
+	 */
+	void
+	initialization_complete();
 
 	/**
 	 * Reset buffer and state. A must after a failure of some sort.
@@ -336,9 +364,15 @@ class CHRUM6:
 	read_register (Address);
 
 	/**
+	 * Sends packet through serial port.
+	 */
+	void
+	send_packet (Blob const&);
+
+	/**
 	 * Create packet for UM6 for single (non-batch) operation.
 	 */
-	std::string
+	Blob
 	make_packet (Address, Operation, uint32_t data = 0);
 
 	/**
@@ -349,16 +383,10 @@ class CHRUM6:
 	parse_packet();
 
 	/**
-	 * Process data from given address.
-	 */
-	void
-	process_data (Address, bool failed, uint32_t data);
-
-	/**
 	 * Called when COMMAND_COMPLETE is sent from the UM6.
 	 */
 	void
-	command_complete (Address, bool failed);
+	process_packet (Address, bool failed, bool has_data, uint32_t data);
 
 	/**
 	 * Get upper 16-bit signed integer from UM6 register.
@@ -389,15 +417,20 @@ class CHRUM6:
 
   private:
 	QTimer*						_restart_timer			= nullptr;
-	QTimer*						_status_check_timer		= nullptr;
 	QTimer*						_alive_check_timer		= nullptr;
+	QTimer*						_status_check_timer		= nullptr;
+	QTimer*						_initialization_timer	= nullptr;
 	Xefis::SerialPort			_serial_port;
 	Xefis::PacketReader			_packet_reader;
 	int							_failure_count			= 0;
 	float						_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
-	bool						_aligned				= false;
 	bool						_signal_data_updated	= false;
+	Stage						_stage					= Stage::Initialize;
+	int							_initialization_step	= 0;
+	// Backup gyro bias values:
+	Optional<uint32_t>			_gyro_bias_xy;
+	Optional<uint32_t>			_gyro_bias_z;
 
 	Xefis::PropertyBoolean		_serviceable;
 	Xefis::PropertyInteger		_failures;

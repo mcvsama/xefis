@@ -44,7 +44,7 @@ XEFIS_REGISTER_MODULE_CLASS ("io/chr-um6", CHRUM6);
 CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_serial_port (std::bind (&CHRUM6::serial_ready, this), std::bind (&CHRUM6::serial_failure, this)),
-	_packet_reader ("snp", std::bind (&CHRUM6::parse_packet, this))
+	_packet_reader ({ 's', 'n', 'p' }, std::bind (&CHRUM6::parse_packet, this))
 {
 	std::string device_path;
 	std::string baud_rate = "115200";
@@ -89,7 +89,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_serial_port.set_stop_bits (1);
 	_serial_port.set_parity_bit (Xefis::SerialPort::Parity::None);
 
-	_packet_reader.set_minimum_packet_size (11);
+	_packet_reader.set_minimum_packet_size (7);
 	_packet_reader.set_buffer_capacity (4096);
 
 	_restart_timer = new QTimer (this);
@@ -97,15 +97,20 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_restart_timer->setSingleShot (true);
 	QObject::connect (_restart_timer, SIGNAL (timeout()), this, SLOT (open_device()));
 
+	_alive_check_timer = new QTimer (this);
+	_alive_check_timer->setInterval (AliveCheckInterval.ms());
+	_alive_check_timer->setSingleShot (false);
+	QObject::connect (_alive_check_timer, SIGNAL (timeout()), this, SLOT (alive_check_failed()));
+
 	_status_check_timer = new QTimer (this);
 	_status_check_timer->setInterval (StatusCheckInterval.ms());
 	_status_check_timer->setSingleShot (false);
 	QObject::connect (_status_check_timer, SIGNAL (timeout()), this, SLOT (status_check()));
 
-	_alive_check_timer = new QTimer (this);
-	_alive_check_timer->setInterval (AliveCheckInterval.ms());
-	_alive_check_timer->setSingleShot (false);
-	QObject::connect (_alive_check_timer, SIGNAL (timeout()), this, SLOT (alive_check_failed()));
+	_initialization_timer = new QTimer (this);
+	_initialization_timer->setInterval (InitializationDelay.ms());
+	_initialization_timer->setSingleShot (true);
+	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
 	_serviceable.set_default (false);
 	_failures.set_default (0);
@@ -141,6 +146,7 @@ CHRUM6::failure (std::string const& reason)
 		_failures.write (*_failures + 1);
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
+	_failure_count++;
 
 	restart();
 }
@@ -150,6 +156,13 @@ void
 CHRUM6::alive_check_failed()
 {
 	failure ("alive check failed");
+}
+
+
+void
+CHRUM6::initialization_timeout()
+{
+	failure ("initialization timeout");
 }
 
 
@@ -170,49 +183,122 @@ CHRUM6::status_check()
 void
 CHRUM6::initialize()
 {
-	uint32_t data = 0;
-	data |= static_cast<uint32_t> (CommunicationRegister::BEN);
-	data |= static_cast<uint32_t> (CommunicationRegister::EU);
-	data |= static_cast<uint32_t> (CommunicationRegister::AP);
-	data |= static_cast<uint32_t> (CommunicationRegister::GP);
-	data |= static_cast<uint32_t> (CommunicationRegister::MP);
-	data |= 0x500; // Baud-rate: 115200
-	data |= sample_rate_setting (_sample_rate);
-	write_register (Address::Communication, data);
+	_stage = Stage::Initialize;
+	_initialization_step = 0;
 
-	data = 0;
-	data |= static_cast<uint32_t> (MiscConfigRegister::MUE);
-	data |= static_cast<uint32_t> (MiscConfigRegister::AUE);
-	data |= static_cast<uint32_t> (MiscConfigRegister::CAL);
-	data |= static_cast<uint32_t> (MiscConfigRegister::QUAT);
-	write_register (Address::MiscConfig, data);
-
-	// Read process-variance value:
-	read_register (Address::EKFProcessVariance);
-
-	align();
+	next_initialization_step();
 }
 
 
 void
-CHRUM6::align()
+CHRUM6::next_initialization_step()
 {
-	if (has_setting ("ekf.process-variance"))
-		write_register (Address::EKFProcessVariance, _ekf_process_variance);
+	if (_stage == Stage::Initialize)
+	{
+		switch (_initialization_step++)
+		{
+			case 0:
+			{
+				log() << "Begin initialization." << std::endl;
+				_initialization_timer->start();
 
-	if (_aligned)
-		return;
+				uint32_t data = 0;
+				data |= static_cast<uint32_t> (CommunicationRegister::BEN);
+				data |= static_cast<uint32_t> (CommunicationRegister::EU);
+				data |= static_cast<uint32_t> (CommunicationRegister::AP);
+				data |= static_cast<uint32_t> (CommunicationRegister::GP);
+				data |= static_cast<uint32_t> (CommunicationRegister::MP);
+				data |= static_cast<uint32_t> (CommunicationRegister::TMP);
+				data |= 0x500; // TODO according to setting, 0x500 is Baud-rate: 115200
+				data |= sample_rate_setting (_sample_rate);
+				write_register (Address::Communication, data);
+				break;
+			}
 
-	// Log firmware version:
-	issue_command (Address::GetFWVersion);
-	// Accelerators realign:
-	issue_command (Address::SetAccelRef);
-	// Magnetic realign:
-	issue_command (Address::SetMagRef);
-	// Send ZERO_GYROS command and wait for completion
-	issue_command (Address::ZeroGyros);
+			case 1:
+			{
+				uint32_t data = 0;
+				data |= static_cast<uint32_t> (MiscConfigRegister::MUE);
+				data |= static_cast<uint32_t> (MiscConfigRegister::AUE);
+				data |= static_cast<uint32_t> (MiscConfigRegister::CAL);
+				data |= static_cast<uint32_t> (MiscConfigRegister::QUAT);
+				write_register (Address::MiscConfig, data);
+				break;
+			}
 
-	_aligned = true;
+			case 2:
+				// Log firmware version:
+				issue_command (Address::GetFWVersion);
+				break;
+
+			case 3:
+				// Log current process-variance value:
+				read_register (Address::EKFProcessVariance);
+				break;
+
+			case 4:
+				if (has_setting ("ekf.process-variance"))
+				{
+					write_register (Address::EKFProcessVariance, _ekf_process_variance);
+					break;
+				}
+				else
+					++_initialization_step;
+				// Fall-over:
+			case 5:
+				// Reset Extended Kalmann Filter:
+				issue_command (Address::ResetEKF);
+				break;
+
+			case 6:
+				// Accelerators realign:
+				issue_command (Address::SetAccelRef);
+				break;
+
+			case 7:
+				// Magnetic realign:
+				issue_command (Address::SetMagRef);
+				break;
+
+			case 8:
+				if (_gyro_bias_xy && _gyro_bias_z)
+				{
+					log() << "Setting previously acquired gyro biases." << std::endl;
+					write_register (Address::GyroBiasXY, *_gyro_bias_xy);
+					write_register (Address::GyroBiasZ, *_gyro_bias_z);
+					next_initialization_step();
+				}
+				else
+				{
+					// Send ZERO_GYROS command and wait for completion:
+					issue_command (Address::ZeroGyros);
+				}
+				break;
+
+			case 9:
+				_stage = Stage::Run;
+				initialization_complete();
+				break;
+		}
+	}
+}
+
+
+void
+CHRUM6::repeat_initialization_step()
+{
+	--_initialization_step;
+	next_initialization_step();
+}
+
+
+void
+CHRUM6::initialization_complete()
+{
+	log() << "Initialization complete." << std::endl;
+	_initialization_timer->stop();
+	_serviceable.write (true);
+	_status_check_timer->start();
 }
 
 
@@ -232,6 +318,9 @@ CHRUM6::reset()
 	_magnetic_x.set_nil();
 	_magnetic_y.set_nil();
 	_magnetic_z.set_nil();
+
+	_stage = Stage::Initialize;
+	_initialization_step = 0;
 }
 
 
@@ -255,14 +344,14 @@ CHRUM6::serial_failure()
 void
 CHRUM6::issue_command (Address address)
 {
-	_serial_port.write (make_packet (address, Operation::Command));
+	send_packet (make_packet (address, Operation::Command));
 }
 
 
 void
 CHRUM6::write_register (Address address, uint32_t data)
 {
-	_serial_port.write (make_packet (address, Operation::Write, data));
+	send_packet (make_packet (address, Operation::Write, data));
 }
 
 
@@ -277,14 +366,21 @@ CHRUM6::write_register (Address address, float value)
 void
 CHRUM6::read_register (Address address)
 {
-	_serial_port.write (make_packet (address, Operation::Read));
+	send_packet (make_packet (address, Operation::Read));
 }
 
 
-std::string
+void
+CHRUM6::send_packet (Blob const& packet)
+{
+	_serial_port.write (packet);
+}
+
+
+CHRUM6::Blob
 CHRUM6::make_packet (Address address, Operation operation, uint32_t data)
 {
-	std::string result = "snp";
+	Blob result = { 's', 'n', 'p' };
 
 	uint8_t packet_type = 0;
 
@@ -300,16 +396,16 @@ CHRUM6::make_packet (Address address, Operation operation, uint32_t data)
 
 	// Bit 0: command failed (unused here).
 
-	result += packet_type;
-	result += static_cast<uint8_t> (address);
+	result.push_back (packet_type);
+	result.push_back (static_cast<uint8_t> (address));
 
 	if (operation == Operation::Write)
 	{
 		boost::endian::native_to_little (data);
-		result += (data >> 24) & 0xff;
-		result += (data >> 16) & 0xff;
-		result += (data >> 8) & 0xff;
-		result += (data >> 0) & 0xff;
+		result.push_back ((data >> 24) & 0xff);
+		result.push_back ((data >> 16) & 0xff);
+		result.push_back ((data >> 8) & 0xff);
+		result.push_back ((data >> 0) & 0xff);
 	}
 
 	// Compute checksum:
@@ -318,10 +414,9 @@ CHRUM6::make_packet (Address address, Operation operation, uint32_t data)
 		checksum += c;
 	boost::endian::native_to_little (checksum);
 
-	result += (checksum >> 8) & 0xff;
-	result += (checksum >> 0) & 0xff;
+	result.push_back ((checksum >> 8) & 0xff);
+	result.push_back ((checksum >> 0) & 0xff);
 
-log() << "PACKET " << Xefis::to_hex_string (result) << "\n";
 	return result;
 }
 
@@ -329,12 +424,12 @@ log() << "PACKET " << Xefis::to_hex_string (result) << "\n";
 std::size_t
 CHRUM6::parse_packet()
 {
-	std::string& packet = _packet_reader.buffer();
+	Blob& packet = _packet_reader.buffer();
 
 	// Packet type byte:
 	uint8_t packet_type = packet[3];
 
-	bool has_data = (packet_type >> 7) & 1;
+	bool has_data = (packet_type >> 7) & 0x01;
 	bool failed = packet_type & 0x01;
 	bool is_batch = (packet_type >> 6) & 0x01;
 	std::size_t data_words = (packet_type >> 2) & 0x0f;
@@ -347,7 +442,7 @@ CHRUM6::parse_packet()
 		return 0;
 
 	// Address byte:
-	Address address = static_cast<Address> (packet[4]);
+	Address address = static_cast<Address> (static_cast<uint8_t> (packet[4]));
 
 	// Checksum:
 	uint16_t checksum = 0;
@@ -360,10 +455,14 @@ CHRUM6::parse_packet()
 
 	// Skip this packet on error:
 	if (checksum != cmp_checksum)
+	{
+		log() << "Received packet with wrong checksum 0x" << std::hex << checksum << ", declared 0x" << cmp_checksum << std::dec
+			  << ": " << Xefis::to_hex_string (packet) << std::endl;
 		return required_size;
+	}
 
 	if (!has_data)
-		command_complete (address, failed);
+		process_packet (address, failed, false, 0);
 	else
 	{
 		// Read words:
@@ -375,7 +474,7 @@ CHRUM6::parse_packet()
 						  + (static_cast<uint32_t> (packet[4 * w + 8]) << 0);
 			Address relative_address = static_cast<Address> (static_cast<uint8_t> (address) + w);
 			if (has_data)
-				process_data (relative_address, failed, data);
+				process_packet (relative_address, failed, true, data);
 		}
 
 		if (_signal_data_updated)
@@ -390,36 +489,54 @@ CHRUM6::parse_packet()
 
 
 void
-CHRUM6::process_data (Address address, bool failed, uint32_t data)
+CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t data)
 {
 	if (failed)
-		return;
+	{
+		log() << "Command 0x"
+			<< std::hex << std::setfill ('0') << std::setprecision (2) << static_cast<int> (address)
+			<< std::dec << " failed." << std::endl;
+	}
 
 	switch (address)
 	{
-		case Address::GetFWVersion:
-		{
-			std::string version (4, ' ');
-			for (int i = 3; i >= 0; --i)
-				version[3 - i] = static_cast<char> ((data >> (8 * i)) & 0xff);
-			log() << "Firmware version: " << version << std::endl;
+		case Address::GyroBiasXY:
+			if (!failed)
+			{
+				if (!_gyro_bias_xy)
+				{
+					_gyro_bias_xy = data;
+					log() << "Gyro bias X: " << upper16 (data) << std::endl;
+					log() << "Gyro bias Y: " << lower16 (data) << std::endl;
+				}
+			}
 			break;
-		}
 
-		case Address::EKFProcessVariance:
-			log() << "EKF process variance: " << to_float (data) << std::endl;
+		case Address::GyroBiasZ:
+			if (!failed)
+			{
+				if (!_gyro_bias_z)
+				{
+					_gyro_bias_z = data;
+					log() << "Gyro bias Z: " << upper16 (data) << std::endl;
+				}
+			}
 			break;
 
 		case Address::Temperature:
 		{
+			if (failed)
+				break;
 			if (_internal_temperature.configured())
-				_internal_temperature.write (1_degC * to_float (data));
-			_signal_data_updated = false;
+				_internal_temperature.write (1_K * (273.15 + to_float (data)));
+			_signal_data_updated = true;
 			break;
 		}
 
 		case Address::EulerPhiTheta:
 		{
+			if (failed || !*_serviceable)
+				break;
 			// Pitch (phi) and Roll (theta):
 			const float factor = 0.0109863;
 			float phi = factor * upper16 (data);
@@ -432,6 +549,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::EulerPsi:
 		{
+			if (failed || !*_serviceable)
+				break;
 			// Heading:
 			const float factor = 0.0109863;
 			float psi = Xefis::floored_mod (factor * upper16 (data), 0.f, 360.f);
@@ -442,6 +561,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::AccelProcXY:
 		{
+			if (failed)
+				break;
 			if (_acceleration_x.configured() || _acceleration_y.configured())
 			{
 				const float factor = 0.000183105;
@@ -458,6 +579,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::AccelProcZ:
 		{
+			if (failed)
+				break;
 			if (_acceleration_z.configured())
 			{
 				const float factor = 0.000183105;
@@ -470,6 +593,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::GyroProcXY:
 		{
+			if (failed)
+				break;
 			if (_rotation_x.configured() || _rotation_y.configured())
 			{
 				const float factor = 0.0610352;
@@ -486,6 +611,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::GyroProcZ:
 		{
+			if (failed)
+				break;
 			if (_rotation_z.configured())
 			{
 				const float factor = 0.0610352;
@@ -498,6 +625,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::MagProcXY:
 		{
+			if (failed)
+				break;
 			if (_magnetic_x.configured() || _magnetic_y.configured())
 			{
 				const float factor = 0.000305176;
@@ -514,6 +643,8 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 
 		case Address::MagProcZ:
 		{
+			if (failed)
+				break;
 			if (_magnetic_z.configured())
 			{
 				const float factor = 0.000305176;
@@ -524,37 +655,81 @@ CHRUM6::process_data (Address address, bool failed, uint32_t data)
 			break;
 		}
 
-		default:
-			log() << "Unhandled message 0x"
-				<< std::hex << std::setfill ('0') << std::setprecision (2) << static_cast<int> (address)
-				<< std::dec << std::endl;
+		case Address::Communication:
+		case Address::MiscConfig:
+			next_initialization_step();
 			break;
-	}
-}
 
+		/*
+		 * Command registers.
+		 */
 
-void
-CHRUM6::command_complete (Address address, bool failed)
-{
-	switch (address)
-	{
+		case Address::GetFWVersion:
+		{
+			if (!failed)
+			{
+				std::string version (4, ' ');
+				for (int i = 3; i >= 0; --i)
+					version[3 - i] = static_cast<char> ((data >> (8 * i)) & 0xff);
+				log() << "Firmware version: " << version << std::endl;
+			}
+			next_initialization_step();
+			break;
+		}
+
+		case Address::FlashCommit:
+			log() << "Unexpected FlashCommit packet." << std::endl;
+			break;
+
 		case Address::ZeroGyros:
-			// Reset Extended Kalmann Filter:
-			issue_command (Address::ResetEKF);
-
-			_serviceable.write (!failed);
-
 			if (failed)
+			{
 				log() << "Failed to zero gyros." << std::endl;
+				repeat_initialization_step();
+			}
 			else
 			{
 				log() << "Gyros zeroed." << std::endl;
-				_status_check_timer->start();
+				next_initialization_step();
+			}
+			break;
+
+		case Address::ResetEKF:
+			next_initialization_step();
+			break;
+
+		case Address::GetData:
+			log() << "Unexpected GetData packet." << std::endl;
+			break;
+
+		case Address::SetAccelRef:
+		case Address::SetMagRef:
+			next_initialization_step();
+			break;
+
+		case Address::ResetToFactory:
+			log() << "Unexpected ResetToFactory packet." << std::endl;
+			break;
+
+		case Address::GPSSetHomePosition:
+			log() << "Unexpected GPSSetHomePosition packet." << std::endl;
+			break;
+
+		case Address::EKFProcessVariance:
+			if (failed)
+				repeat_initialization_step();
+			else
+			{
+				if (has_data)
+					log() << "EKF process variance: " << to_float (data) << std::endl;
+				next_initialization_step();
 			}
 			break;
 
 		case Address::BadChecksum:
+			// Don't pop command. Retry.
 			log() << "Command failed: bad checksum." << std::endl;
+			repeat_initialization_step();
 			break;
 
 		case Address::UnknownAddress:
@@ -566,12 +741,9 @@ CHRUM6::command_complete (Address address, bool failed)
 			break;
 
 		default:
-			if (failed)
-			{
-				log() << "Command 0x"
-					<< std::hex << std::setfill ('0') << std::setprecision (2) << static_cast<int> (address)
-					<< std::dec << " failed." << std::endl;
-			}
+			log() << "Unhandled address 0x"
+				<< std::hex << std::setfill ('0') << std::setprecision (2) << static_cast<int> (address)
+				<< std::dec << "." << std::endl;
 			break;
 	}
 }
@@ -581,7 +753,7 @@ uint32_t
 CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 {
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
-	int32_t x = ((frequency - 20_Hz) / (280.0 / 255.0)).Hz();
-	return Xefis::limit (x, 0, 255);
+	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).Hz();
+	return Xefis::limit (x, 0u, 255u);
 }
 
