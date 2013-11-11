@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <string>
+#include <vector>
 #include <functional>
 
 // Qt:
@@ -37,6 +38,8 @@ class SerialPort:
 	Q_OBJECT
 
   public:
+	typedef std::vector<uint8_t> Blob;
+
 	// Parity bit:
 	enum class Parity
 	{
@@ -148,7 +151,7 @@ class SerialPort:
 	 * Access the input buffer. You should remove the data
 	 * that have been processed from the beginning of the buffer.
 	 */
-	std::string&
+	Blob&
 	input_buffer() noexcept;
 
 	/**
@@ -157,7 +160,7 @@ class SerialPort:
 	 * when function returns.
 	 */
 	void
-	write (std::string const& data);
+	write (Blob const& data);
 
 	/**
 	 * Request writing output-buffered data to the device.
@@ -218,10 +221,7 @@ class SerialPort:
 	 * Return logger object.
 	 */
 	Logger const&
-	log() const
-	{
-		return *_logger;
-	}
+	log() const;
 
   private:
 	Logger const*		_logger						= nullptr;
@@ -242,8 +242,8 @@ class SerialPort:
 	unsigned int		_max_read_failure_count		= 0;
 	unsigned int		_write_failure_count		= 0;
 	unsigned int		_max_write_failure_count	= 0;
-	std::string			_input_buffer;				// Data from the device.
-	std::string			_output_buffer;				// Data to to sent to the device.
+	Blob				_input_buffer;				// Data from the device.
+	Blob				_output_buffer;				// Data to to sent to the device.
 };
 
 
@@ -275,7 +275,7 @@ SerialPort::error() const noexcept
 }
 
 
-inline std::string&
+inline SerialPort::Blob&
 SerialPort::input_buffer() noexcept
 {
 	return _input_buffer;
@@ -285,7 +285,7 @@ SerialPort::input_buffer() noexcept
 inline void
 SerialPort::write()
 {
-	write ("");
+	write ({});
 }
 
 
@@ -293,6 +293,13 @@ inline bool
 SerialPort::flushed() const noexcept
 {
 	return _output_buffer.empty();
+}
+
+
+inline Logger const&
+SerialPort::log() const
+{
+	return *_logger;
 }
 
 } // namespace Xefis

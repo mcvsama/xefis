@@ -16,7 +16,7 @@
 
 // Standard:
 #include <cstddef>
-#include <string>
+#include <vector>
 #include <functional>
 
 // Xefis:
@@ -37,13 +37,18 @@ class PacketReader: private Noncopyable
 	 */
 	typedef std::function<std::size_t()> ParseCallback;
 
+	/**
+	 * Binary data type.
+	 */
+	typedef std::vector<uint8_t> Blob;
+
   public:
 	/**
 	 * Ctor
 	 * @callback will get called, whenever there's data in buffer with
 	 * @magic value and when its size > minimum packet size.
 	 */
-	PacketReader (std::string const& magic, ParseCallback callback);
+	PacketReader (Blob const& magic, ParseCallback callback);
 
 	/**
 	 * Set minimum packet size in bytes. If data in the input buffer
@@ -64,24 +69,24 @@ class PacketReader: private Noncopyable
 	 * and asks if synchronization is possible.
 	 */
 	void
-	feed (std::string const& data);
+	feed (Blob const& data);
 
 	/**
 	 * Access input buffer.
 	 */
-	std::string&
+	Blob&
 	buffer() noexcept;
 
   private:
-	std::string		_magic;
+	Blob			_magic;
 	std::size_t		_minimum_packet_size	= 0;
 	std::size_t		_capacity				= 0;
-	std::string		_buffer;
+	Blob			_buffer;
 	ParseCallback	_parse;
 };
 
 
-inline std::string&
+inline PacketReader::Blob&
 PacketReader::buffer() noexcept
 {
 	return _buffer;

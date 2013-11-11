@@ -94,6 +94,13 @@ to_hex_string (std::string const& blob)
 }
 
 
+inline std::string
+to_hex_string (Blob const& blob)
+{
+	return to_hex_string (std::string (blob.begin(), blob.end()));
+}
+
+
 inline QColor
 parse_color (QString color)
 {
