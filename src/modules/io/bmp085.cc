@@ -39,7 +39,7 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 
 	for (QDomElement& e: config)
 	{
-		if (e == "setting")
+		if (e == "settings")
 		{
 			parse_settings (e, {
 				{ "i2c.bus", i2c_bus, true },
