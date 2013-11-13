@@ -153,13 +153,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Angle				localizer_magnetic_bearing			= 0_deg;
 		// Approach, flight path deviations
 		bool				deviation_vertical_failure			= false;
-		bool				deviation_vertical_visible			= false;
-		Angle				deviation_vertical_approach;
-		Angle				deviation_vertical_flight_path;
+		Optional<Angle>		deviation_vertical_approach;
+		Optional<Angle>		deviation_vertical_flight_path;
 		bool				deviation_lateral_failure			= false;
-		bool				deviation_lateral_visible			= false;
-		Angle				deviation_lateral_approach;
-		Angle				deviation_lateral_flight_path;
+		Optional<Angle>		deviation_lateral_approach;
+		Optional<Angle>		deviation_lateral_flight_path;
 		bool				deviation_mixed_mode				= false;
 		// Raising runway
 		bool				runway_visible						= false;

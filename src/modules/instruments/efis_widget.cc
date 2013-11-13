@@ -2050,10 +2050,14 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
-		auto paint_ladder = [&](bool needle_visible, Angle original_approach_deviation, Angle original_path_deviation) -> void
+		auto paint_ladder = [&](Optional<Angle> original_approach_deviation, Optional<Angle> original_path_deviation) -> void
 		{
-			Angle approach_deviation = Xefis::limit (original_approach_deviation, -2.25_deg, +2.25_deg);
-			Angle path_deviation = Xefis::limit (original_path_deviation, -2.25_deg, +2.25_deg);
+			Angle approach_deviation;
+			if (original_approach_deviation)
+				approach_deviation = Xefis::limit (*original_approach_deviation, -2.25_deg, +2.25_deg);
+			Angle path_deviation;
+			if (original_path_deviation)
+				path_deviation = Xefis::limit (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
@@ -2068,60 +2072,66 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 				painter.drawRect (rect);
 			}
 
-			if (needle_visible)
+			QPolygonF pink_pointer;
+			QPolygonF white_pointer;
+			bool pink_filled = false;
+			bool pink_visible = false;
+			bool white_visible = false;
+
+			if (!_params.deviation_mixed_mode)
 			{
-				QPolygonF pink_pointer;
-				QPolygonF white_pointer;
-				bool filled = false;
+				// Only ILS:
+				float w = 0.012f * wh();
+				pink_pointer = QPolygonF()
+					<< QPointF (0.f, -w)
+					<< QPointF (+1.6f * w, 0.f)
+					<< QPointF (0.f, +w)
+					<< QPointF (-1.6f * w, 0.f)
+					<< QPointF (0.f, -w);
+				pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
+				pink_visible = !!original_approach_deviation;
+				pink_filled = original_approach_deviation && std::abs ((*original_approach_deviation).deg()) <= std::abs (approach_deviation.deg());
+				white_visible = false;
+			}
+			else
+			{
+				// ILS and flight path:
+				float w = 0.012f * wh();
+				pink_pointer = QPolygonF()
+					<< QPointF (0.f, -0.2f * w)
+					<< QPointF (+1.0f * w, 2.0f * w)
+					<< QPointF (-1.0f * w, 2.0f * w);
+				pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
+				pink_visible = !!original_path_deviation;
+				pink_filled = original_path_deviation && std::abs ((*original_path_deviation).deg()) <= std::abs (path_deviation.deg());
+				white_pointer = QPolygonF()
+					<< QPointF (0.f, -0.8f * w)
+					<< QPointF (+1.6f * w, 0.f)
+					<< QPointF (0.f, +0.8f * w)
+					<< QPointF (-1.6f * w, 0.f)
+					<< QPointF (0.f, -0.8f * w);
+				white_pointer.translate (approach_deviation.deg() * 0.075f * wh(), -0.65f * w);
+				white_visible = !!original_approach_deviation;
+			}
 
-				if (!_params.deviation_mixed_mode)
-				{
-					// Only ILS:
-					float w = 0.012f * wh();
-					pink_pointer = QPolygonF()
-						<< QPointF (0.f, -w)
-						<< QPointF (+1.6f * w, 0.f)
-						<< QPointF (0.f, +w)
-						<< QPointF (-1.6f * w, 0.f)
-						<< QPointF (0.f, -w);
-					pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
-					filled = std::abs (original_approach_deviation.deg()) <= std::abs (approach_deviation.deg());
-				}
-				else
-				{
-					// ILS and flight path:
-					float w = 0.012f * wh();
-					pink_pointer = QPolygonF()
-						<< QPointF (0.f, -0.2f * w)
-						<< QPointF (+1.0f * w, 2.0f * w)
-						<< QPointF (-1.0f * w, 2.0f * w);
-					pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
-					white_pointer = QPolygonF()
-						<< QPointF (0.f, -0.8f * w)
-						<< QPointF (+1.6f * w, 0.f)
-						<< QPointF (0.f, +0.8f * w)
-						<< QPointF (-1.6f * w, 0.f)
-						<< QPointF (0.f, -0.8f * w);
-					white_pointer.translate (approach_deviation.deg() * 0.075f * wh(), -0.65f * w);
-					filled = std::abs (original_path_deviation.deg()) <= std::abs (path_deviation.deg());
-				}
-
+			if (pink_visible)
+			{
 				for (QColor color: { _autopilot_pen_1.color(), _autopilot_pen_2.color() })
 				{
 					painter.setPen (get_pen (color, 1.f));
-					if (filled)
+					if (pink_filled)
 						painter.setBrush (color);
 					else
 						painter.setBrush (Qt::NoBrush);
 					painter.drawPolygon (pink_pointer);
 				}
+			}
 
-				if (_params.deviation_mixed_mode)
-				{
-					painter.setPen (get_pen (Qt::white, 1.f));
-					painter.setBrush (Qt::NoBrush);
-					painter.drawPolyline (white_pointer);
-				}
+			if (white_visible)
+			{
+				painter.setPen (get_pen (Qt::white, 1.f));
+				painter.setBrush (Qt::NoBrush);
+				painter.drawPolyline (white_pointer);
 			}
 
 			if (!_params.deviation_mixed_mode)
@@ -2152,7 +2162,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		if (_params.deviation_lateral_failure)
 			paint_horizontal_failure_flag (painter, QPointF (0.f, 0.f), font_size (18.f), "LOC");
 		else
-			paint_ladder (_params.deviation_lateral_visible, _params.deviation_lateral_approach, _params.deviation_lateral_flight_path);
+			paint_ladder (_params.deviation_lateral_approach, _params.deviation_lateral_flight_path);
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.28f * wh(), 0.f);
@@ -2161,16 +2171,16 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		else
 		{
 			painter.rotate (-90);
-			paint_ladder (_params.deviation_vertical_visible, _params.deviation_vertical_approach, _params.deviation_vertical_flight_path);
+			paint_ladder (_params.deviation_vertical_approach, _params.deviation_vertical_flight_path);
 		}
 	}
 
-	if (_params.runway_visible && !_params.deviation_lateral_failure)
+	if (_params.runway_visible && !_params.deviation_lateral_failure && _params.deviation_lateral_approach)
 	{
 		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * Xefis::limit (_params.deviation_lateral_approach, -1.5_deg, +1.5_deg).deg();
+		float offset = 0.5f * Xefis::limit (*_params.deviation_lateral_approach, -1.5_deg, +1.5_deg).deg();
 		float ypos = -pitch_to_px (Xefis::limit (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
