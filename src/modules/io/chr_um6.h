@@ -415,6 +415,12 @@ class CHRUM6:
 	static uint32_t
 	sample_rate_setting (Frequency) noexcept;
 
+	/**
+	 * Checks status bits and sets status/serviceable properties.
+	 */
+	void
+	status_verify (uint32_t data);
+
   private:
 	QTimer*						_restart_timer			= nullptr;
 	QTimer*						_alive_check_timer		= nullptr;
@@ -433,6 +439,7 @@ class CHRUM6:
 	Optional<uint32_t>			_gyro_bias_z;
 
 	Xefis::PropertyBoolean		_serviceable;
+	Xefis::PropertyBoolean		_caution;
 	Xefis::PropertyInteger		_failures;
 	Xefis::PropertyTemperature	_internal_temperature;
 	Xefis::PropertyAngle		_orientation_pitch;

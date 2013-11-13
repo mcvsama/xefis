@@ -64,6 +64,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 		{
 			parse_properties (e, {
 				{ "serviceable", _serviceable, true },
+				{ "caution", _caution, false },
 				{ "failures", _failures, false },
 				{ "internal-temperature", _internal_temperature, false },
 				{ "orientation.pitch", _orientation_pitch, true },
@@ -113,6 +114,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
 	_serviceable.set_default (false);
+	_caution.set_default (false);
 	_failures.set_default (0);
 
 	open_device();
@@ -177,6 +179,7 @@ CHRUM6::restart()
 void
 CHRUM6::status_check()
 {
+	read_register (Address::Status);
 }
 
 
@@ -456,8 +459,7 @@ CHRUM6::parse_packet()
 	// Skip this packet on error:
 	if (checksum != cmp_checksum)
 	{
-		log() << "Received packet with wrong checksum 0x" << std::hex << checksum << ", declared 0x" << cmp_checksum << std::dec
-			  << ": " << Xefis::to_hex_string (packet) << std::endl;
+		log() << "Received packet with wrong checksum 0x" << std::hex << checksum << ", declared 0x" << cmp_checksum << std::dec << std::endl;
 		return required_size;
 	}
 
@@ -500,6 +502,10 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 
 	switch (address)
 	{
+		case Address::Status:
+			status_verify (data);
+			break;
+
 		case Address::GyroBiasXY:
 			if (!failed)
 			{
@@ -755,5 +761,137 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
 	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).Hz();
 	return Xefis::limit (x, 0u, 255u);
+}
+
+
+void
+CHRUM6::status_verify (uint32_t data)
+{
+	bool serviceable = true;
+	bool caution = false;
+
+	auto isset = [&](StatusRegister reg) -> bool
+	{
+		return !!(data & static_cast<uint32_t> (reg));
+	};
+
+	if (isset (StatusRegister::MagDel))
+	{
+		caution = true;
+		log() << "Magnetic sensor timeout." << std::endl;
+	}
+
+	if (isset (StatusRegister::AccelDel))
+	{
+		caution = true;
+		log() << "Acceleration sensor timeout." << std::endl;
+	}
+
+	if (isset (StatusRegister::GyroDel))
+	{
+		caution = true;
+		log() << "Gyroscope sensor timeout." << std::endl;
+	}
+
+	if (isset (StatusRegister::EKFDivergent))
+	{
+		caution = true;
+		log() << "Divergent EKF - reset performed." << std::endl;
+	}
+
+	if (isset (StatusRegister::BusMagError))
+	{
+		caution = true;
+		log() << "Magnetic sensor bus error." << std::endl;
+	}
+
+	if (isset (StatusRegister::BusAccelError))
+	{
+		caution = true;
+		log() << "Acceleration sensor bus error." << std::endl;
+	}
+
+	if (isset (StatusRegister::BusGyroError))
+	{
+		caution = true;
+		log() << "Gyroscope sensor bus error." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestMagZFail))
+	{
+		serviceable = false;
+		log() << "Magnetic sensor Z axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestMagYFail))
+	{
+		serviceable = false;
+		log() << "Magnetic sensor Y axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestMagXFail))
+	{
+		serviceable = false;
+		log() << "Magnetic sensor X axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestAccelZFail))
+	{
+		serviceable = false;
+		log() << "Acceleration sensor Z axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestAccelYFail))
+	{
+		serviceable = false;
+		log() << "Acceleration sensor Y axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestAccelXFail))
+	{
+		serviceable = false;
+		log() << "Acceleration sensor X axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestGyroZFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor Z axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestGyroYFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor Y axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::SelfTestGyroXFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor X axis: self test failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::GyroInitFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor initialization failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::AccelInitFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor initialization failure." << std::endl;
+	}
+
+	if (isset (StatusRegister::MagInitFail))
+	{
+		serviceable = false;
+		log() << "Gyroscope sensor initialization failure." << std::endl;
+	}
+
+	if (!serviceable)
+		_serviceable.write (false);
+	if (caution)
+		_caution.write (true);
 }
 
