@@ -299,13 +299,11 @@ EFIS::read()
 	}
 	// Approach, flight path deviations
 	params.deviation_vertical_failure = !_flight_path_deviation_vertical_serviceable.read (true);
-	params.deviation_vertical_visible = _approach_reference_visible.read (false);
-	params.deviation_vertical_approach = *_flight_path_deviation_vertical_app;
-	params.deviation_vertical_flight_path = *_flight_path_deviation_vertical_fp;
+	params.deviation_vertical_approach = _flight_path_deviation_vertical_app.get_optional();
+	params.deviation_vertical_flight_path = _flight_path_deviation_vertical_fp.get_optional();
 	params.deviation_lateral_failure = !_flight_path_deviation_lateral_serviceable.read (true);
-	params.deviation_lateral_visible = _approach_reference_visible.read (false);
-	params.deviation_lateral_approach = *_flight_path_deviation_lateral_app;
-	params.deviation_lateral_flight_path = *_flight_path_deviation_lateral_fp;
+	params.deviation_lateral_approach = _flight_path_deviation_lateral_app.get_optional();
+	params.deviation_lateral_flight_path = _flight_path_deviation_lateral_fp.get_optional();
 	params.deviation_mixed_mode = _flight_path_deviation_mixed_mode.read (false);
 	// Raising runway
 	params.runway_visible = _approach_reference_visible.read (false) && _altitude_agl.valid() &&
