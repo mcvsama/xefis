@@ -166,11 +166,10 @@ PerformanceComputer::compute_total_energy_variometer()
 			_speed_ias.valid() &&
 			*_speed_ias > _total_energy_variometer_min_ias)
 		{
-			double const m = *_aircraft_weight_g;
-			double const g = 9.81;
-
 			if ((_total_energy_variometer_time += update_dt) > 0.1_s)
 			{
+				double const m = *_aircraft_weight_g;
+				double const g = 9.81;
 				double const v = (*_speed_ias).mps();
 				double const Ep = m * g * (*_altitude_amsl_std).m();
 				double const Ek = m * v * v * 0.5;

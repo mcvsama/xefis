@@ -134,7 +134,7 @@ class WorkPerformer: private Noncopyable
 	 * Set scheduling parameter for all threads.
 	 */
 	void
-	set_sched (Thread::SchedType, int priority) noexcept;
+	set_sched (Thread::SchedType, int priority) const noexcept;
 
 	/**
 	 * Return number of threads created.

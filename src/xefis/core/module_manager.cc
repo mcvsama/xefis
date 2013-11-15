@@ -141,7 +141,7 @@ ModuleManager::create_module_by_name (QString const& name, QDomElement const& co
 
 
 void
-ModuleManager::module_data_updated (Module* module)
+ModuleManager::module_data_updated (Module* module) const
 {
 	Module::Pointer modptr = find (module);
 	Time dt = Time::measure ([&]() {

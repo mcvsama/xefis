@@ -56,7 +56,7 @@ LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
 LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
 CXXFLAGS		+= $(shell pkg-config --cflags $(PKGCONFIGS))
 
-.PHONY: all dep help clean distclean release doc
+.PHONY: all dep help clean distclean release doc check
 
 HEADERS =
 SOURCES =
@@ -214,6 +214,10 @@ release:
 
 doc:
 	@cd doc && doxygen doxygen.conf
+
+check:
+	cppcheck --force --std=c++11 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
+		lib modules xefis $(SRC_HEADERS) 2> check.log
 
 $(MAINDEPFILE): Makefile.sources $(DEPFILES)
 	$(call prepdir, $@)

@@ -162,8 +162,8 @@ template<class TargetInt>
 		else
 		{
 			if (s.startsWith ("0x"))
-				return s.mid (2).toInt (nullptr, 16);
-			return s.toInt();
+				return s.mid (2).toUInt (nullptr, 16);
+			return s.toUInt();
 		}
 	}
 

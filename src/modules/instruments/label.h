@@ -38,7 +38,7 @@ class Label:
 
   protected:
 	void
-	paintEvent (QPaintEvent*);
+	paintEvent (QPaintEvent*) override;
 
   private:
 	Xefis::TextPainter::Cache	_text_painter_cache;

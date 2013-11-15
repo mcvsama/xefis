@@ -64,7 +64,7 @@ class InstrumentAids
 	win_wh() const;
 
 	QPen
-	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin);
+	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin) const;
 
 	float
 	pen_width (float scale = 1.0f) const;
@@ -72,20 +72,20 @@ class InstrumentAids
 	float
 	font_size (float scale = 1.0f) const;
 
-	int
-	get_digit_width (QFont&) const;
+	static int
+	get_digit_width (QFont&);
 
-	float
+	static float
 	translate_descent (QFontMetricsF const& smaller_metrics, QFontMetricsF const& bigger_metrics);
 
-	void
-	centrify (QRectF& rectf) const;
+	static void
+	centrify (QRectF& rectf);
 
-	float
-	arc_degs (Angle deg) const;
+	static float
+	arc_degs (Angle deg);
 
-	float
-	arc_span (Angle deg) const;
+	static float
+	arc_span (Angle deg);
 
   protected:
 	QFont				_font;
@@ -94,16 +94,16 @@ class InstrumentAids
 	QFont				_font_13;
 	QFont				_font_16;
 	QFont				_font_20;
-	float				_font_8_digit_width;
-	float				_font_10_digit_width;
-	float				_font_13_digit_width;
-	float				_font_16_digit_width;
-	float				_font_20_digit_width;
-	float				_font_8_digit_height;
-	float				_font_10_digit_height;
-	float				_font_13_digit_height;
-	float				_font_16_digit_height;
-	float				_font_20_digit_height;
+	float				_font_8_digit_width		= 0.f;
+	float				_font_10_digit_width	= 0.f;
+	float				_font_13_digit_width	= 0.f;
+	float				_font_16_digit_width	= 0.f;
+	float				_font_20_digit_width	= 0.f;
+	float				_font_8_digit_height	= 0.f;
+	float				_font_10_digit_height	= 0.f;
+	float				_font_13_digit_height	= 0.f;
+	float				_font_16_digit_height	= 0.f;
+	float				_font_20_digit_height	= 0.f;
 	QColor				_autopilot_color;
 	QColor				_navigation_color;
 	QColor				_silver					= { 0xcc, 0xca, 0xc2 };
@@ -112,10 +112,10 @@ class InstrumentAids
 	float				_master_font_scale		= 1.f;
 	QPen				_autopilot_pen_1;
 	QPen				_autopilot_pen_2;
-	float				_w;
-	float				_h;
-	float				_window_w;
-	float				_window_h;
+	float				_w						= 0.f;
+	float				_h						= 0.f;
+	float				_window_w				= 0.f;
+	float				_window_h				= 0.f;
 
 	static const char	DIGITS[10];
 	static const char*	MINUS_SIGN;
@@ -137,7 +137,7 @@ InstrumentAids::win_wh() const
 
 
 inline QPen
-InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Qt::PenCapStyle cap, Qt::PenJoinStyle join)
+InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Qt::PenCapStyle cap, Qt::PenJoinStyle join) const
 {
 	QPen pen (color, pen_width (width), style, cap, join);
 	pen.setMiterLimit (0.25);
@@ -160,21 +160,21 @@ InstrumentAids::font_size (float scale) const
 
 
 inline void
-InstrumentAids::centrify (QRectF& rectf) const
+InstrumentAids::centrify (QRectF& rectf)
 {
 	rectf.translate (-0.5f * rectf.width(), -0.5f * rectf.height());
 }
 
 
 inline float
-InstrumentAids::arc_degs (Angle deg) const
+InstrumentAids::arc_degs (Angle deg)
 {
 	return (-16.f * (deg - 90_deg)).deg();
 }
 
 
 inline float
-InstrumentAids::arc_span (Angle deg) const
+InstrumentAids::arc_span (Angle deg)
 {
 	return (-16.f * deg).deg();
 }

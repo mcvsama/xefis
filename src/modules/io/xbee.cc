@@ -627,7 +627,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 
 
 int
-XBee::baud_rate_to_xbee_code (int baud_rate) const
+XBee::baud_rate_to_xbee_code (int baud_rate)
 {
 	switch (baud_rate)
 	{

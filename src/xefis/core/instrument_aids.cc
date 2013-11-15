@@ -89,7 +89,7 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 
 
 int
-InstrumentAids::get_digit_width (QFont& font) const
+InstrumentAids::get_digit_width (QFont& font)
 {
 	QFontMetrics font_metrics (font);
 	int digit_width = 0;

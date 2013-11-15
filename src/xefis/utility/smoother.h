@@ -200,6 +200,9 @@ template<class V>
 	inline typename Smoother<V>::ValueType
 	Smoother<V>::process (ValueType s, Time dt) noexcept
 	{
+		if (!std::isfinite (s))
+			return _z;
+
 		if (_invalidate)
 		{
 			_invalidate = false;
@@ -212,10 +215,6 @@ template<class V>
 		int iterations = std::round (dt / _precision);
 		if (iterations > 1)
 		{
-			// Protect from NaNs and infs:
-			if (!std::isfinite (s))
-				reset (s);
-
 			if (_winding_enabled)
 			{
 				ValueType p = _history[0];
@@ -253,6 +252,13 @@ template<class V>
 					_z += v;
 				_z /= _history.size();
 			}
+		}
+		else
+		{
+			if (_winding_enabled)
+				_z = floored_mod<ValueType> (s, _winding.min(), _winding.max());
+			else
+				_z = s;
 		}
 
 		return _z;

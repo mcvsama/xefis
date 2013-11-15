@@ -50,7 +50,7 @@ Link::ItemStream::ItemStream (Link* link, QDomElement& element)
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::ItemStream::size() const
 {
 	Blob::size_type s = 0;
@@ -68,7 +68,7 @@ Link::ItemStream::produce (Blob& blob)
 }
 
 
-inline Link::Blob::iterator
+inline Blob::iterator
 Link::ItemStream::eat (Blob::iterator begin, Blob::iterator end)
 {
 	for (Item* item: _items)
@@ -182,7 +182,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::PropertyItem::size() const
 {
 	return _bytes;
@@ -262,7 +262,7 @@ Link::PropertyItem::produce (Blob& blob)
 }
 
 
-Link::Blob::iterator
+Blob::iterator
 Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 {
 	Blob::iterator result = begin;
@@ -409,7 +409,7 @@ template<class CastType, class SourceType>
 
 
 template<class CastType, class SourceType>
-	inline Link::Blob::iterator
+	inline Blob::iterator
 	Link::PropertyItem::unserialize (Blob::iterator begin, Blob::iterator end, SourceType& src)
 	{
 		if (static_cast<std::size_t> (std::distance (begin, end)) < sizeof (CastType))
@@ -479,7 +479,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::BitfieldItem::size() const
 {
 	return _size;
@@ -517,7 +517,7 @@ Link::BitfieldItem::produce (Blob& blob)
 }
 
 
-Link::Blob::iterator
+Blob::iterator
 Link::BitfieldItem::eat (Blob::iterator begin, Blob::iterator end)
 {
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (size()))
@@ -609,7 +609,7 @@ Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::SignatureItem::size() const
 {
 	return ItemStream::size() + _random_bytes + _signature_bytes;
@@ -645,7 +645,7 @@ Link::SignatureItem::produce (Blob& blob)
 }
 
 
-Link::Blob::iterator
+Blob::iterator
 Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 {
 	Blob::size_type data_size = ItemStream::size();
@@ -692,14 +692,14 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 }
 
 
-inline Link::Blob const&
+inline Blob const&
 Link::Packet::magic() const
 {
 	return _magic;
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::Packet::size() const
 {
 	return ItemStream::size();
@@ -832,7 +832,7 @@ Link::reacquire()
 }
 
 
-inline Link::Blob::size_type
+inline Blob::size_type
 Link::size() const
 {
 	Blob::size_type s = 0;

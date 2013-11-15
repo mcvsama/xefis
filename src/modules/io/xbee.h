@@ -236,8 +236,8 @@ class XBee:
 	/**
 	 * Return XBee protocol code for setting up baud rate.
 	 */
-	int
-	baud_rate_to_xbee_code (int baud_rate) const;
+	static int
+	baud_rate_to_xbee_code (int baud_rate);
 
 	/**
 	 * Make API frame without escaped characters from given data.

@@ -1205,9 +1205,9 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 
 HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
-	_paint_work_unit (this)
+	_local_paint_work_unit (this)
 {
-	set_painter (&_paint_work_unit);
+	set_painter (&_local_paint_work_unit);
 }
 
 
@@ -1227,7 +1227,7 @@ HSIWidget::set_params (Parameters const& new_params)
 	_params.sanitize();
 
 	if (_params.display_mode != old.display_mode)
-		_paint_work_unit._recalculation_needed = true;
+		_local_paint_work_unit._recalculation_needed = true;
 
 	if (_params.positioning_hint != old.positioning_hint)
 		_locals.positioning_hint_ts = now;
@@ -1245,6 +1245,6 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 
 	auto xw = dynamic_cast<Xefis::Window*> (window());
 	if (xw)
-		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
+		_local_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
 }
 

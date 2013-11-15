@@ -38,8 +38,6 @@ class Link:
 {
 	Q_OBJECT
 
-	typedef std::vector<uint8_t> Blob;
-
 	class ParseError: public Xefis::Exception
 	{
 	  public:
@@ -156,21 +154,21 @@ class Link:
 		 * Serialize SourceType and add to Blob.
 		 */
 		template<class CastType, class SourceType>
-			void
+			static void
 			serialize (Blob&, SourceType);
 
 		/**
 		 * Unserialize data from Blob and put it to src.
 		 */
 		template<class CastType, class SourceType>
-			Blob::iterator
+			static Blob::iterator
 			unserialize (Blob::iterator begin, Blob::iterator end, SourceType&);
 
 		/**
 		 * Set SI property by SI's value internal representation.
 		 */
 		template<class SIType>
-			SIType
+			static SIType
 			si_from_internal (Xefis::PropertyFloat::Type float_value);
 
 	  private:
@@ -244,7 +242,7 @@ class Link:
 	  private:
 		unsigned int		_random_bytes		= 0;
 		unsigned int		_signature_bytes	= 0;
-		Link::Blob			_key;
+		Blob				_key;
 		std::random_device	_rd;
 		std::mt19937		_rng;
 		Blob				_temp;

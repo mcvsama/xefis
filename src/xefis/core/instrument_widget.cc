@@ -50,7 +50,6 @@ InstrumentWidget::PaintWorkUnit::resized()
 void
 InstrumentWidget::PaintWorkUnit::execute()
 {
-	bool paint_again = false;
 	RecursiveMutex& m = _widget->_paint_mutex;
 
 	for (;;)
@@ -67,7 +66,7 @@ InstrumentWidget::PaintWorkUnit::execute()
 			pop_params();
 		});
 
-		paint_again = false;
+		bool paint_again = false;
 		paint (_image);
 
 		m.synchronize ([&]() {

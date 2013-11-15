@@ -2619,7 +2619,7 @@ EFISWidget::PaintWorkUnit::get_pitch_scale_clipping_path() const
 
 EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
-	_paint_work_unit (this)
+	_local_paint_work_unit (this)
 {
 	setAttribute (Qt::WA_NoBackground);
 
@@ -2633,7 +2633,7 @@ EFISWidget::EFISWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
 
 	_locals.minimums_altitude_ts = QDateTime::currentDateTime();
 
-	set_painter (&_paint_work_unit);
+	set_painter (&_local_paint_work_unit);
 }
 
 
@@ -2696,7 +2696,7 @@ EFISWidget::resizeEvent (QResizeEvent* event)
 
 	auto xw = dynamic_cast<Xefis::Window*> (window());
 	if (xw)
-		_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
+		_local_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
 }
 
 
@@ -2712,7 +2712,7 @@ EFISWidget::request_repaint()
 	update_blinker (_minimums_blinking_warning,
 					_params.altitude_visible && _params.minimums_altitude_visible &&
 					_params.altitude < _params.minimums_amsl &&
-					_paint_work_unit.is_newly_set (_locals.minimums_altitude_ts, 5_s),
+					_local_paint_work_unit.is_newly_set (_locals.minimums_altitude_ts, 5_s),
 					&_locals.minimums_blink);
 
 	InstrumentWidget::request_repaint();
@@ -2724,8 +2724,8 @@ EFISWidget::push_params()
 {
 	_locals.speed_blinking_active = _speed_blinking_warning->isActive();
 	_locals.minimums_blinking_active = _minimums_blinking_warning->isActive();
-	_paint_work_unit._params_next = _params;
-	_paint_work_unit._locals_next = _locals;
+	_local_paint_work_unit._params_next = _params;
+	_local_paint_work_unit._locals_next = _locals;
 }
 
 

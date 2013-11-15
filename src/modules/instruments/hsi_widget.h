@@ -309,7 +309,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	push_params() override;
 
   private:
-	PaintWorkUnit	_paint_work_unit;
+	PaintWorkUnit	_local_paint_work_unit;
 	Parameters		_params;
 	LocalParameters	_locals;
 };
@@ -383,15 +383,15 @@ HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) c
 inline void
 HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 {
-	_paint_work_unit.set_navaid_storage (navaid_storage);
+	_local_paint_work_unit.set_navaid_storage (navaid_storage);
 	request_repaint();
 }
 
 inline void
 HSIWidget::push_params()
 {
-	_paint_work_unit._params_next = _params;
-	_paint_work_unit._locals_next = _locals;
+	_local_paint_work_unit._params_next = _params;
+	_local_paint_work_unit._locals_next = _locals;
 }
 
 #endif

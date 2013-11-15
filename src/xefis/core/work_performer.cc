@@ -82,7 +82,7 @@ WorkPerformer::add (Unit* unit)
 
 
 void
-WorkPerformer::set_sched (Thread::SchedType sched_type, int priority) noexcept
+WorkPerformer::set_sched (Thread::SchedType sched_type, int priority) const noexcept
 {
 	for (Performer* p: _performers)
 		p->set_sched (sched_type, priority);

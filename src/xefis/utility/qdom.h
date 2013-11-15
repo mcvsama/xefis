@@ -40,10 +40,10 @@ class QDomElementIterator
 	QDomElementIterator (QDomElement element);
 
 	bool
-	operator== (QDomElementIterator const& other);
+	operator== (QDomElementIterator const& other) const;
 
 	bool
-	operator!= (QDomElementIterator const& other);
+	operator!= (QDomElementIterator const& other) const;
 
 	void
 	operator++();
@@ -63,14 +63,14 @@ QDomElementIterator::QDomElementIterator (QDomElement element):
 
 
 inline bool
-QDomElementIterator::operator== (QDomElementIterator const& other)
+QDomElementIterator::operator== (QDomElementIterator const& other) const
 {
 	return _element == other._element;
 }
 
 
 inline bool
-QDomElementIterator::operator!= (QDomElementIterator const& other)
+QDomElementIterator::operator!= (QDomElementIterator const& other) const
 {
 	return _element != other._element;
 }

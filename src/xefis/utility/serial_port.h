@@ -38,8 +38,6 @@ class SerialPort:
 	Q_OBJECT
 
   public:
-	typedef std::vector<uint8_t> Blob;
-
 	// Parity bit:
 	enum class Parity
 	{
@@ -275,7 +273,7 @@ SerialPort::error() const noexcept
 }
 
 
-inline SerialPort::Blob&
+inline Blob&
 SerialPort::input_buffer() noexcept
 {
 	return _input_buffer;

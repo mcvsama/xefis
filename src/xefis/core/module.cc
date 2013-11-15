@@ -66,7 +66,7 @@ Module::has_setting (QString const& name)
 
 
 void
-Module::signal_data_updated()
+Module::signal_data_updated() const
 {
 	_module_manager->application()->data_updated();
 }

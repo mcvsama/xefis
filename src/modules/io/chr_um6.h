@@ -248,8 +248,6 @@ class CHRUM6:
 		Run,
 	};
 
-	typedef std::vector<uint8_t> Blob;
-
   public:
 	// Ctor
 	CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config);

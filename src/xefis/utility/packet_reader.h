@@ -37,11 +37,6 @@ class PacketReader: private Noncopyable
 	 */
 	typedef std::function<std::size_t()> ParseCallback;
 
-	/**
-	 * Binary data type.
-	 */
-	typedef std::vector<uint8_t> Blob;
-
   public:
 	/**
 	 * Ctor
@@ -86,7 +81,7 @@ class PacketReader: private Noncopyable
 };
 
 
-inline PacketReader::Blob&
+inline Blob&
 PacketReader::buffer() noexcept
 {
 	return _buffer;
