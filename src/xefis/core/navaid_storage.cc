@@ -38,7 +38,6 @@ NavaidStorage::load()
 {
 	parse_nav_dat();
 	parse_fix_dat();
-	parse_awy_dat();
 
 	_navaids_tree.optimize();
 
@@ -125,9 +124,6 @@ NavaidStorage::parse_nav_dat()
 		QString line = ts.readLine();
 		QTextStream line_ts (&line);
 
-		int unused_int;
-		float unused_float;
-
 		int type_int;
 		Navaid::Type type;
 		LonLat pos;
@@ -151,6 +147,8 @@ NavaidStorage::parse_nav_dat()
 		{
 			case Navaid::NDB:
 			{
+				int unused_int;
+				float unused_float;
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
@@ -256,13 +254,6 @@ NavaidStorage::parse_fix_dat()
 
 		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0_nm));
 	}
-}
-
-
-void
-NavaidStorage::parse_awy_dat()
-{
-	// TODO
 }
 
 } // namespace Xefis

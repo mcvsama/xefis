@@ -113,7 +113,7 @@ class Navaid
 	 * and ICAO code for localisers.
 	 */
 	QString const&
-	identifier_for_hsi();
+	identifier_for_hsi() const;
 
 	/**
 	 * Return VOR subtype, if this navaid is VOR.
@@ -137,7 +137,7 @@ class Navaid
 	Angle		_true_bearing		= 0_deg; // LOC* only
 	QString		_icao;
 	QString		_runway;
-	VorType		_vor_type;
+	VorType		_vor_type			= VOROnly;
 };
 
 
@@ -279,7 +279,7 @@ Navaid::runway() const
 
 
 inline QString const&
-Navaid::identifier_for_hsi()
+Navaid::identifier_for_hsi() const
 {
 	if (_type == LOC || _type == LOCSA)
 		return icao();

@@ -161,7 +161,7 @@ class Module: private Noncopyable
 	 * Signal that this module has updated property tree.
 	 */
 	void
-	signal_data_updated();
+	signal_data_updated() const;
 
 	/**
 	 * Access NavaidStorage.

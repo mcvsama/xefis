@@ -523,7 +523,6 @@ GPS::process_message (std::string message)
 	}
 
 	std::string contents = message.substr (1, message.size() - 1 - 3);
-	std::string::size_type k = contents.find (',');
 	std::string type = contents.substr (0, contents.find (','));
 
 	if (_debug_mode)
@@ -813,8 +812,6 @@ GPS::process_gprmc (std::string message_contents)
 bool
 GPS::process_pmtk_ack (std::string message_contents)
 {
-	std::string baud_rate_switch_command = "PMTK251";
-
 	// Skip message name:
 	std::string::size_type p = read_value (message_contents, 0);
 

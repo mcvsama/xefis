@@ -494,8 +494,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Parameters			_params_next;
 		LocalParameters		_locals;
 		LocalParameters		_locals_next;
-		float				_w;
-		float				_h;
 		float				_max_w_h;
 		float				_q;
 		QColor				_sky_color;
@@ -606,7 +604,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 	blink_minimums();
 
   private:
-	PaintWorkUnit		_paint_work_unit;
+	PaintWorkUnit		_local_paint_work_unit;
 	Parameters			_params;
 	LocalParameters		_locals;
 	QTimer*				_speed_blinking_warning		= nullptr;

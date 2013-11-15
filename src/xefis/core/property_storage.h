@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/noncopyable.h>
 
 
 namespace Xefis {
@@ -31,7 +32,7 @@ class PropertyDirectoryNode;
 /**
  * Storage class for properties.
  */
-class PropertyStorage
+class PropertyStorage: public Noncopyable
 {
 	friend class PropertyNode;
 

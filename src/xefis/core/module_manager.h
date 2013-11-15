@@ -103,7 +103,7 @@ class ModuleManager
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
 
 	void
-	module_data_updated (Module*);
+	module_data_updated (Module*) const;
 
   private:
 	Application*		_application = nullptr;

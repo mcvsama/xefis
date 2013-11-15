@@ -35,7 +35,6 @@ namespace Xefis {
 inline std::vector<uint8_t>
 parse_binary_string (QString const& string)
 {
-	typedef std::vector<uint8_t> Blob;
 	enum State { MSB, LSB, Colon };
 
 	auto from_xdigit = [&string](QChar& c) -> uint8_t

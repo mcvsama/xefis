@@ -380,7 +380,7 @@ CHRUM6::send_packet (Blob const& packet)
 }
 
 
-CHRUM6::Blob
+Blob
 CHRUM6::make_packet (Address address, Operation operation, uint32_t data)
 {
 	Blob result = { 's', 'n', 'p' };

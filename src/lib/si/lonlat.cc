@@ -30,8 +30,8 @@ LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
 	// Convert to radians:
-	Angle const rot_lat = rotation.lat();
-	Angle const rot_lon = rotation.lon();
+	Angle const& rot_lat = rotation.lat();
+	Angle const& rot_lon = rotation.lon();
 	// Get cartesian from polar coords:
 	double const x = -std::cos (lat()) * std::cos (lon());
 	double const y = +std::cos (lat()) * std::sin (lon());

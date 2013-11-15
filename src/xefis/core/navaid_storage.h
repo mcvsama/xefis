@@ -86,9 +86,6 @@ class NavaidStorage
 	void
 	parse_fix_dat();
 
-	void
-	parse_awy_dat();
-
   private:
 	NavaidsTree		_navaids_tree;
 	const char*		_nav_dat_file	= "share/nav/nav.dat";
