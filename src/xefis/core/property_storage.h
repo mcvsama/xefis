@@ -90,9 +90,9 @@ class PropertyStorage: public Noncopyable
 	uncache_path (std::string const& old_path);
 
   private:
-	static PropertyStorage*	_default_storage;
-	PropertyDirectoryNode*	_root;
-	PropertiesByPath		_properties_by_path;
+	static Unique<PropertyStorage>	_default_storage;
+	PropertyDirectoryNode*			_root;
+	PropertiesByPath				_properties_by_path;
 };
 
 

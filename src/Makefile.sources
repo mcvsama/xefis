@@ -41,6 +41,9 @@ SRC_HEADERS += xefis/config/constants.h
 SRC_HEADERS += xefis/config/resources.h
 SRC_HEADERS += xefis/config/system.h
 SRC_HEADERS += xefis/config/types.h
+SRC_HEADERS += xefis/config/cpp14.h
+SRC_HEADERS += xefis/config/exception.h
+SRC_HEADERS += xefis/config/version.h
 
 NODEP_SOURCES += $(VERSION_FILE)
 

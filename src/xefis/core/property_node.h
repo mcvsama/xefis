@@ -325,11 +325,11 @@ template<class tType>
 		write (Type const& value);
 
 		/**
-		 * Write value to this node. If boost::optional value
+		 * Write value to this node. If Optional value
 		 * doesn't hold any value, set node to nil.
 		 */
 		void
-		write (boost::optional<Type> const& value);
+		write (Optional<Type> const& value);
 
 		/**
 		 * Return human-readable value for UI.
@@ -537,7 +537,7 @@ template<class T>
 
 template<class T>
 	inline void
-	PropertyValueNode<T>::write (boost::optional<Type> const& value)
+	PropertyValueNode<T>::write (Optional<Type> const& value)
 	{
 		if (value)
 			write (*value);

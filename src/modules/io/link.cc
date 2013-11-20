@@ -816,7 +816,7 @@ Link::failsafe()
 	_link_valid = false;
 	if (_failsafes.configured())
 		_failsafes.write (*_failsafes + 1);
-	for (Packet* p: _packets)
+	for (auto p: _packets)
 		p->failsafe();
 }
 
@@ -836,7 +836,7 @@ inline Blob::size_type
 Link::size() const
 {
 	Blob::size_type s = 0;
-	for (Packet* p: _packets)
+	for (auto p: _packets)
 		s += p->size();
 	return s;
 }
@@ -845,7 +845,7 @@ Link::size() const
 void
 Link::produce (Blob& blob)
 {
-	for (Packet* p: _packets)
+	for (auto p: _packets)
 		p->produce (blob);
 
 #if XEFIS_LINK_SEND_DEBUG
@@ -889,7 +889,7 @@ Link::eat (Blob& blob)
 				if (packet_and_magic == _packet_magics.end())
 					throw ParseError();
 
-				Packet* packet = packet_and_magic->second;
+				auto packet = packet_and_magic->second;
 				// Now see if we have enough data in input buffer for this packet type.
 				// If not, return and retry when enough data is read.
 				if (blob.size() - _magic_size < packet->size())
@@ -938,12 +938,12 @@ Link::parse_protocol (QDomElement const& protocol)
 	for (QDomElement& e: protocol)
 	{
 		if (e == "packet")
-			_packets.push_back (new Packet (this, e));
+			_packets.push_back (std::make_shared<Packet> (this, e));
 	}
 
 	_packet_magics.clear();
 	// Ensure all packets have distinct magic values and the same size:
-	for (Packet* p: _packets)
+	for (auto p: _packets)
 	{
 		if (_magic_size == 0)
 			_magic_size = p->magic().size();

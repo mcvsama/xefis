@@ -56,5 +56,11 @@ typedef std::vector<uint8_t>	Blob;
 template<class Value>
 	using Optional = boost::optional<Value>;
 
+template<class Type>
+	using Shared = std::shared_ptr<Type>;
+
+template<class Type>
+	using Unique = std::unique_ptr<Type>;
+
 #endif
 

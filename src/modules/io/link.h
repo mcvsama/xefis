@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -270,8 +271,8 @@ class Link:
 		uint64_t	_send_pos		= 0;
 	};
 
-	typedef std::vector<Packet*> Packets;
-	typedef std::map<Blob, Packet*> PacketMagics;
+	typedef std::vector<Shared<Packet>>		Packets;
+	typedef std::map<Blob, Shared<Packet>>	PacketMagics;
 
   public:
 	// Ctor

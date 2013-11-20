@@ -301,7 +301,7 @@ NavigationComputer::compute_track()
 		_track_lateral_magnetic.set_nil();
 	}
 
-	boost::optional<Angle> result_delta;
+	Optional<Angle> result_delta;
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{
 		Length len10 = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);

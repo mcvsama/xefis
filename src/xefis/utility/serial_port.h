@@ -222,26 +222,26 @@ class SerialPort:
 	log() const;
 
   private:
-	Logger const*		_logger						= nullptr;
-	Logger				_internal_logger;
-	DataReadyCallback	_data_ready;
-	FailureCallback		_failure;
-	QSocketNotifier*	_notifier					= nullptr;
-	std::string			_device_path;
-	std::string			_baud_rate;
-	unsigned int		_data_bits					= 8;
-	Parity				_parity						= Parity::None;
-	unsigned int		_stop_bits					= 1;
-	bool				_rtscts						= false;
-	int					_device;
-	bool				_good;
-	std::string			_error;
-	unsigned int		_read_failure_count			= 0;
-	unsigned int		_max_read_failure_count		= 0;
-	unsigned int		_write_failure_count		= 0;
-	unsigned int		_max_write_failure_count	= 0;
-	Blob				_input_buffer;				// Data from the device.
-	Blob				_output_buffer;				// Data to to sent to the device.
+	Logger const*			_logger						= nullptr;
+	Logger					_internal_logger;
+	DataReadyCallback		_data_ready;
+	FailureCallback			_failure;
+	Unique<QSocketNotifier>	_notifier;
+	std::string				_device_path;
+	std::string				_baud_rate;
+	unsigned int			_data_bits					= 8;
+	Parity					_parity						= Parity::None;
+	unsigned int			_stop_bits					= 1;
+	bool					_rtscts						= false;
+	int						_device;
+	bool					_good;
+	std::string				_error;
+	unsigned int			_read_failure_count			= 0;
+	unsigned int			_max_read_failure_count		= 0;
+	unsigned int			_write_failure_count		= 0;
+	unsigned int			_max_write_failure_count	= 0;
+	Blob					_input_buffer;				// Data from the device.
+	Blob					_output_buffer;				// Data to to sent to the device.
 };
 
 

@@ -61,12 +61,12 @@ Application::Application (int argc, char** argv):
 	// Init property storage:
 	PropertyStorage::initialize();
 
-	_accounting = new Accounting();
-	_navaid_storage = new NavaidStorage();
-	_module_manager = new ModuleManager (this);
-	_window_manager = new WindowManager (this);
-	_config_reader = new ConfigReader (this, _module_manager);
-	_work_performer = new WorkPerformer (Services::detected_cores());
+	_accounting = std::make_unique<Accounting>();
+	_navaid_storage = std::make_unique<NavaidStorage>();
+	_module_manager = std::make_unique<ModuleManager> (this);
+	_window_manager = std::make_unique<WindowManager> (this);
+	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
+	_work_performer = std::make_unique<WorkPerformer> (Services::detected_cores());
 
 	_postponed_update = new QTimer (this);
 	_postponed_update->setSingleShot (true);
@@ -89,7 +89,7 @@ Application::Application (int argc, char** argv):
 	_config_reader->load (config_file);
 
 	if (_config_reader->has_windows())
-		_configurator_widget = new ConfiguratorWidget (_module_manager, nullptr);
+		_configurator_widget = std::make_unique<ConfiguratorWidget> (_module_manager.get(), nullptr);
 	if (_config_reader->load_navaids())
 		_navaid_storage->load();
 }
@@ -97,13 +97,6 @@ Application::Application (int argc, char** argv):
 
 Application::~Application()
 {
-	delete _work_performer;
-	delete _configurator_widget;
-	delete _config_reader;
-	delete _module_manager;
-	delete _window_manager;
-	delete _navaid_storage;
-	delete _accounting;
 	Services::deinitialize();
 	_application = nullptr;
 }

@@ -40,9 +40,6 @@ class HSI: public Xefis::Instrument
 	// Ctor
 	HSI (Xefis::ModuleManager*, QDomElement const& config);
 
-	// Dtor
-	~HSI();
-
   public slots:
 	/**
 	 * Force HSI to read data from properties.
@@ -55,9 +52,9 @@ class HSI: public Xefis::Instrument
 	data_updated() override;
 
   private:
-	HSIWidget*				_hsi_widget				= nullptr;
+	Unique<HSIWidget>		_hsi_widget;
 	std::array<LonLat, 3>	_positions;
-	bool					_positions_valid		= false;
+	bool					_positions_valid = false;
 
 	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyLength	_range;

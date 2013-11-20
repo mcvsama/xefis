@@ -44,9 +44,6 @@ class ModuleManager
 	// Ctor
 	ModuleManager (Application*);
 
-	// Dtor
-	virtual ~ModuleManager();
-
 	/**
 	 * Access Application object.
 	 */

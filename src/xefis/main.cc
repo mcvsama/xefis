@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 // System:
 #include <signal.h>
@@ -54,9 +55,8 @@ int main (int argc, char** argv, char**)
 		}
 		else
 		{
-			Xefis::Application* app = new Xefis::Application (argc, argv);
+			auto app = std::make_unique<Xefis::Application> (argc, argv);
 			app->exec();
-			delete app;
 		}
 	}
 	catch (Xefis::Exception& e)

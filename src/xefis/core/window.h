@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 #include <set>
 
 // Qt:
@@ -45,14 +46,11 @@ class Window: public QWidget
 		QStackedLayout*	layout;
 	};
 
-	typedef std::set<Stack*> Stacks;
+	typedef std::set<Shared<Stack>> Stacks;
 
   public:
 	// Ctor
 	Window (Application*, ConfigReader*, QDomElement const&);
-
-	// Dtor
-	~Window();
 
 	/**
 	 * Needed for layouts to update visible widgets, etc.
@@ -77,7 +75,7 @@ class Window: public QWidget
 	process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel);
 
 	void
-	process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Stack* stack);
+	process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Shared<Stack> stack);
 
 	void
 	configurator_taken();
@@ -88,10 +86,10 @@ class Window: public QWidget
 
   private:
 	Application*	_application;
+	ConfigReader*	_config_reader;
 	QStackedWidget*	_stack;
 	QWidget*		_instruments_panel;
 	QWidget*		_configurator_panel;
-	ConfigReader*	_config_reader;
 	QPoint			_mouse_pos;
 	Stacks			_stacks;
 };

@@ -210,8 +210,8 @@ class GPS:
 	static std::map<std::string, std::string>	_pmtk_hints;
 	static bool									_pmtk_hints_initialized;
 
-	QTimer*						_restart_timer				= nullptr;
-	QTimer*						_alive_check_timer			= nullptr;
+	Unique<QTimer>				_restart_timer;
+	Unique<QTimer>				_alive_check_timer;
 	std::map<int, int>			_baud_rates_map;
 	std::string					_default_baud_rate			= "9600";
 	std::string					_current_baud_rate			= "9600";
@@ -223,7 +223,7 @@ class GPS:
 	bool						_synchronize_input			= true;
 	bool						_initialization_commands	= true;
 	bool						_synchronize_system_clock	= false;
-	QSocketNotifier*			_notifier					= nullptr;
+	Unique<QSocketNotifier>		_notifier;
 	std::string					_buffer;
 	std::string					_value;
 	Length						_receiver_accuracy;

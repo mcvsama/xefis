@@ -152,15 +152,15 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
-	Accounting*			_accounting				= nullptr;
-	NavaidStorage*		_navaid_storage			= nullptr;
-	ModuleManager*		_module_manager			= nullptr;
-	WindowManager*		_window_manager			= nullptr;
-	ConfigReader*		_config_reader			= nullptr;
-	ConfiguratorWidget*	_configurator_widget	= nullptr;
-	QTimer*				_postponed_update		= nullptr;
-	QTimer*				_offline_updater		= nullptr;
-	WorkPerformer*		_work_performer			= nullptr;
+	Unique<Accounting>				_accounting;
+	Unique<NavaidStorage>			_navaid_storage;
+	Unique<ModuleManager>			_module_manager;
+	Unique<WindowManager>			_window_manager;
+	Unique<ConfigReader>			_config_reader;
+	Unique<ConfiguratorWidget>		_configurator_widget;
+	Unique<WorkPerformer>			_work_performer;
+	QTimer*							_postponed_update	= nullptr;
+	QTimer*							_offline_updater	= nullptr;
 };
 
 
@@ -181,49 +181,49 @@ Application::DataUpdatedEvent::time() const
 inline Accounting*
 Application::accounting() const
 {
-	return _accounting;
+	return _accounting.get();
 }
 
 
 inline ModuleManager*
 Application::module_manager() const
 {
-	return _module_manager;
+	return _module_manager.get();
 }
 
 
 inline WindowManager*
 Application::window_manager() const
 {
-	return _window_manager;
+	return _window_manager.get();
 }
 
 
 inline ConfigReader*
 Application::config_reader() const
 {
-	return _config_reader;
+	return _config_reader.get();
 }
 
 
 inline NavaidStorage*
 Application::navaid_storage() const
 {
-	return _navaid_storage;
+	return _navaid_storage.get();
 }
 
 
 inline WorkPerformer*
 Application::work_performer() const
 {
-	return _work_performer;
+	return _work_performer.get();
 }
 
 
 inline ConfiguratorWidget*
 Application::configurator_widget() const
 {
-	return _configurator_widget;
+	return _configurator_widget.get();
 }
 
 } // namespace Xefis

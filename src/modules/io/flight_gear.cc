@@ -181,26 +181,18 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		}
 	}
 
-	_timeout_timer = new QTimer();
+	_timeout_timer = std::make_unique<QTimer>();
 	_timeout_timer->setSingleShot (true);
 	_timeout_timer->setInterval (200);
-	QObject::connect (_timeout_timer, SIGNAL (timeout()), this, SLOT (invalidate_all()));
+	QObject::connect (_timeout_timer.get(), SIGNAL (timeout()), this, SLOT (invalidate_all()));
 
-	_input = new QUdpSocket();
+	_input = std::make_unique<QUdpSocket>();
 	_input->bind (QHostAddress (_input_host), _input_port, QUdpSocket::ShareAddress);
-	QObject::connect (_input, SIGNAL (readyRead()), this, SLOT (got_packet()));
+	QObject::connect (_input.get(), SIGNAL (readyRead()), this, SLOT (got_packet()));
 
-	_output = new QUdpSocket();
+	_output = std::make_unique<QUdpSocket>();
 
 	invalidate_all();
-}
-
-
-FlightGearIO::~FlightGearIO()
-{
-	delete _input;
-	delete _output;
-	delete _timeout_timer;
 }
 
 

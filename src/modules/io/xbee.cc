@@ -295,10 +295,9 @@ XBee::open_device()
 				failure ("set_device_options()");
 			else
 			{
-				delete _notifier;
-				_notifier = new QSocketNotifier (_device, QSocketNotifier::Read, this);
+				_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 				_notifier->setEnabled (true);
-				QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+				QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
 
 				configure_modem();
 			}
@@ -316,8 +315,7 @@ XBee::failure (std::string const& reason)
 {
 	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _device_path.toStdString() << std::endl;
 
-	delete _notifier;
-	_notifier = nullptr;
+	_notifier.release();
 	::close (_device);
 
 	if (_failures.configured())

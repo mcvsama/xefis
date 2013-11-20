@@ -36,9 +36,6 @@ class UDP:
 	// Ctor
 	UDP (Xefis::ModuleManager*, QDomElement const& config);
 
-	// Dtor
-	~UDP();
-
   protected:
 	void
 	data_updated() override;
@@ -61,11 +58,11 @@ class UDP:
 	bool					_receive_interference	= false;
 	QByteArray				_receive_datagram;
 	bool					_udp_send_enabled		= false;
-	QUdpSocket*				_udp_send				= nullptr;
+	Unique<QUdpSocket>		_udp_send;
 	QString					_udp_send_host;
 	int						_udp_send_port			= 0;
 	bool					_udp_receive_enabled	= false;
-	QUdpSocket*				_udp_receive			= nullptr;
+	Unique<QUdpSocket>		_udp_receive;
 	QString					_udp_receive_host;
 	int						_udp_receive_port		= 0;
 };

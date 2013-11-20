@@ -33,13 +33,6 @@ ModuleManager::ModuleManager (Application* application):
 { }
 
 
-ModuleManager::~ModuleManager()
-{
-	for (Module* m: _modules)
-		delete m;
-}
-
-
 Module*
 ModuleManager::load_module (QString const& name, QString const& instance, QDomElement const& config, QWidget* parent)
 {

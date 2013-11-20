@@ -63,10 +63,10 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 
 	_oversampling = Oversampling3;
 
-	_reinitialize_timer = new QTimer (this);
+	_reinitialize_timer = std::make_unique<QTimer> (this);
 	_reinitialize_timer->setInterval (250);
 	_reinitialize_timer->setSingleShot (true);
-	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
+	QObject::connect (_reinitialize_timer.get(), SIGNAL (timeout()), this, SLOT (initialize()));
 
 	_serviceable.set_default (false);
 
@@ -94,25 +94,25 @@ BMP085::initialize()
 		_mc = read_s16 (MC_REG);
 		_md = read_s16 (MD_REG);
 
-		_temperature_timer = new QTimer (this);
+		_temperature_timer = std::make_unique<QTimer> (this);
 		_temperature_timer->setInterval (_temperature_interval.ms());
 		_temperature_timer->setSingleShot (false);
-		QObject::connect (_temperature_timer, SIGNAL (timeout()), this, SLOT (request_temperature()));
+		QObject::connect (_temperature_timer.get(), SIGNAL (timeout()), this, SLOT (request_temperature()));
 
-		_temperature_ready_timer = new QTimer (this);
+		_temperature_ready_timer = std::make_unique<QTimer> (this);
 		_temperature_ready_timer->setInterval (5);
 		_temperature_ready_timer->setSingleShot (true);
-		QObject::connect (_temperature_ready_timer, SIGNAL (timeout()), this, SLOT (read_temperature()));
+		QObject::connect (_temperature_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_temperature()));
 
-		_pressure_timer = new QTimer (this);
+		_pressure_timer = std::make_unique<QTimer> (this);
 		_pressure_timer->setInterval (_pressure_interval.ms());
 		_pressure_timer->setSingleShot (false);
-		QObject::connect (_pressure_timer, SIGNAL (timeout()), this, SLOT (request_pressure()));
+		QObject::connect (_pressure_timer.get(), SIGNAL (timeout()), this, SLOT (request_pressure()));
 
-		_pressure_ready_timer = new QTimer (this);
+		_pressure_ready_timer = std::make_unique<QTimer> (this);
 		_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].ms());
 		_pressure_ready_timer->setSingleShot (true);
-		QObject::connect (_pressure_ready_timer, SIGNAL (timeout()), this, SLOT (read_pressure()));
+		QObject::connect (_pressure_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_pressure()));
 
 		_temperature_timer->start();
 		_pressure_timer->start();
@@ -130,15 +130,10 @@ BMP085::reinitialize()
 	_middle_of_request = false;
 	_request_other = false;
 
-	delete _temperature_timer;
-	delete _temperature_ready_timer;
-	delete _pressure_timer;
-	delete _pressure_ready_timer;
-
-	_temperature_timer = nullptr;
-	_temperature_ready_timer = nullptr;
-	_pressure_timer = nullptr;
-	_pressure_ready_timer = nullptr;
+	_temperature_timer.release();
+	_temperature_ready_timer.release();
+	_pressure_timer.release();
+	_pressure_ready_timer.release();
 
 	_reinitialize_timer->start();
 }

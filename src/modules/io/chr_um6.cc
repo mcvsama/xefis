@@ -93,25 +93,25 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_packet_reader.set_minimum_packet_size (7);
 	_packet_reader.set_buffer_capacity (4096);
 
-	_restart_timer = new QTimer (this);
+	_restart_timer = std::make_unique<QTimer> (this);
 	_restart_timer->setInterval (RestartDelay.ms());
 	_restart_timer->setSingleShot (true);
-	QObject::connect (_restart_timer, SIGNAL (timeout()), this, SLOT (open_device()));
+	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
 
-	_alive_check_timer = new QTimer (this);
+	_alive_check_timer = std::make_unique<QTimer> (this);
 	_alive_check_timer->setInterval (AliveCheckInterval.ms());
 	_alive_check_timer->setSingleShot (false);
-	QObject::connect (_alive_check_timer, SIGNAL (timeout()), this, SLOT (alive_check_failed()));
+	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (alive_check_failed()));
 
-	_status_check_timer = new QTimer (this);
+	_status_check_timer = std::make_unique<QTimer> (this);
 	_status_check_timer->setInterval (StatusCheckInterval.ms());
 	_status_check_timer->setSingleShot (false);
-	QObject::connect (_status_check_timer, SIGNAL (timeout()), this, SLOT (status_check()));
+	QObject::connect (_status_check_timer.get(), SIGNAL (timeout()), this, SLOT (status_check()));
 
-	_initialization_timer = new QTimer (this);
+	_initialization_timer = std::make_unique<QTimer> (this);
 	_initialization_timer->setInterval (InitializationDelay.ms());
 	_initialization_timer->setSingleShot (true);
-	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialization_timeout()));
+	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
 	_serviceable.set_default (false);
 	_caution.set_default (false);

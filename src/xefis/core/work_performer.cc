@@ -51,7 +51,7 @@ WorkPerformer::WorkPerformer (unsigned int threads_number)
 
 	for (unsigned int i = 0; i < threads_number; ++i)
 	{
-		Performer* p = new Performer (this, i);
+		Shared<Performer> p = std::make_shared<Performer> (this, i);
 		_performers.push_back (p);
 		p->start();
 	}
@@ -62,11 +62,8 @@ WorkPerformer::~WorkPerformer()
 {
 	for (decltype (_performers.size()) i = 0; i < _performers.size(); ++i)
 		_queue_semaphore.post();
-	for (Performer* p: _performers)
-	{
+	for (auto p: _performers)
 		p->wait();
-		delete p;
-	}
 }
 
 
@@ -84,7 +81,7 @@ WorkPerformer::add (Unit* unit)
 void
 WorkPerformer::set_sched (Thread::SchedType sched_type, int priority) const noexcept
 {
-	for (Performer* p: _performers)
+	for (auto p: _performers)
 		p->set_sched (sched_type, priority);
 }
 

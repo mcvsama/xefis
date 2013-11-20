@@ -24,13 +24,13 @@
 
 namespace Xefis {
 
-PropertyStorage* PropertyStorage::_default_storage = nullptr;
+Unique<PropertyStorage> PropertyStorage::_default_storage;
 
 
 void
 PropertyStorage::initialize()
 {
-	_default_storage = new PropertyStorage();
+	_default_storage = std::make_unique<PropertyStorage>();
 }
 
 
@@ -49,7 +49,7 @@ PropertyStorage::root() const noexcept
 PropertyStorage*
 PropertyStorage::default_storage()
 {
-	return _default_storage;
+	return _default_storage.get();
 }
 
 

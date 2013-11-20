@@ -143,9 +143,9 @@ class Services
 	instrument_font();
 
   private:
-	static signed int			_detected_cores;
-	static CallOutDispatcher*	_call_out_dispatcher;
-	static QFont				_instrument_font;
+	static signed int					_detected_cores;
+	static Unique<CallOutDispatcher>	_call_out_dispatcher;
+	static QFont						_instrument_font;
 };
 
 
