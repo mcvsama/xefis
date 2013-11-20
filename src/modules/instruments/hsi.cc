@@ -70,19 +70,13 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		}
 	}
 
-	_hsi_widget = new HSIWidget (this, work_performer());
+	_hsi_widget = std::make_unique<HSIWidget> (this, work_performer());
 	_hsi_widget->set_navaid_storage (navaid_storage());
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_hsi_widget);
-}
-
-
-HSI::~HSI()
-{
-	delete _hsi_widget;
+	layout->addWidget (_hsi_widget.get());
 }
 
 

@@ -32,9 +32,9 @@
 
 namespace Xefis {
 
-signed int			Services::_detected_cores = -1;
-CallOutDispatcher*	Services::_call_out_dispatcher;
-QFont				Services::_instrument_font ("sans");
+signed int					Services::_detected_cores = -1;
+Unique<CallOutDispatcher>	Services::_call_out_dispatcher;
+QFont						Services::_instrument_font ("sans");
 
 
 void
@@ -52,7 +52,7 @@ CallOutDispatcher::customEvent (QEvent* event)
 void
 Services::initialize()
 {
-	_call_out_dispatcher = new CallOutDispatcher();
+	_call_out_dispatcher = std::make_unique<CallOutDispatcher>();
 
 	auto add_fonts_from = [](QString dirname) -> void {
 		for (QString entry: QDir (dirname).entryList ({ "*.ttf", "*.otf" }))
@@ -73,7 +73,6 @@ Services::initialize()
 void
 Services::deinitialize()
 {
-	delete _call_out_dispatcher;
 }
 
 
@@ -112,7 +111,7 @@ Services::CallOutEvent*
 Services::call_out (boost::function<void()> callback)
 {
 	CallOutEvent* e = new CallOutEvent (callback);
-	QApplication::postEvent (_call_out_dispatcher, e);
+	QApplication::postEvent (_call_out_dispatcher.get(), e);
 	return e;
 }
 

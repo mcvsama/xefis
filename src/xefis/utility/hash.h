@@ -38,7 +38,7 @@ class Hash
 	/**
 	 * Compute and finalize hash of given vector.
 	 */
-	explicit Hash (std::vector<uint8_t> vector);
+	explicit Hash (std::vector<uint8_t> const& vector);
 
 	/**
 	 * Compute and finalize hash of given vector.
@@ -52,7 +52,7 @@ class Hash
 	 * Slow due to allocation. Use only on big chunks.
 	 */
 	void
-	update (std::vector<uint8_t> vector);
+	update (std::vector<uint8_t> const& vector);
 
 	void
 	update (const void* data, std::size_t size);
@@ -105,7 +105,7 @@ Hash::Hash()
 
 
 inline
-Hash::Hash (std::vector<uint8_t> vector):
+Hash::Hash (std::vector<uint8_t> const& vector):
 	Hash()
 {
 	update (vector);
@@ -132,12 +132,9 @@ Hash::~Hash()
 
 
 inline void
-Hash::update (std::vector<uint8_t> vector)
+Hash::update (std::vector<uint8_t> const& vector)
 {
-	uint8_t* data = new uint8_t[vector.size()];
-	std::copy (vector.begin(), vector.end(), data);
-	update (data, vector.size());
-	delete[] data;
+	update (vector.data(), vector.size());
 }
 
 

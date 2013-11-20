@@ -40,10 +40,10 @@ class HT16K33:
 	class Display;
 	class Switch;
 
-	typedef std::vector<std::shared_ptr<Display>> Displays;
-	typedef std::vector<std::shared_ptr<Switch>> Switches;
-	typedef uint8_t	Row;
-	typedef uint8_t	Column;
+	typedef std::vector<Shared<Display>>	Displays;
+	typedef std::vector<Shared<Switch>>		Switches;
+	typedef uint8_t							Row;
+	typedef uint8_t							Column;
 
 	enum Blinking {
 		Fast		= 0,

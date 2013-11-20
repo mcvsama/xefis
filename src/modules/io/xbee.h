@@ -386,7 +386,7 @@ class XBee:
 
   private:
 	bool					_debug					= false;
-	QSocketNotifier*		_notifier				= nullptr;
+	Unique<QSocketNotifier>	_notifier;
 	QString					_device_path;
 	int						_device					= 0;
 	QTimer*					_restart_timer			= nullptr;

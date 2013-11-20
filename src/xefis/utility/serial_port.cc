@@ -158,9 +158,9 @@ SerialPort::open()
 		{
 			log() << "Connected." << std::endl;
 			_good = true;
-			_notifier = new QSocketNotifier (_device, QSocketNotifier::Read, this);
+			_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 			_notifier->setEnabled (true);
-			QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+			QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
 		}
 		else
 			log() << "Failed to set device parameters." << std::endl;
@@ -173,7 +173,7 @@ SerialPort::open()
 void
 SerialPort::close()
 {
-	delete _notifier;
+	_notifier.release();
 
 	if (_device)
 	{

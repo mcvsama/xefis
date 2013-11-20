@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 #include <random>
 
 // Qt:
@@ -60,24 +61,17 @@ UDP::UDP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	if (has_setting ("send.host") && has_setting ("send.port"))
 	{
 		_udp_send_enabled = true;
-		_udp_send = new QUdpSocket();
+		_udp_send = std::make_unique<QUdpSocket>();
 	}
 
 	if (has_setting ("receive.host") && has_setting ("receive.port"))
 	{
 		_udp_receive_enabled = true;
-		_udp_receive = new QUdpSocket();
+		_udp_receive = std::make_unique<QUdpSocket>();
 		if (!_udp_receive->bind (QHostAddress (_udp_receive_host), _udp_receive_port, QUdpSocket::ShareAddress))
 			log() << "Failed to bind to address " << _udp_receive_host.toStdString() << ":" << _udp_receive_port << std::endl;
-		QObject::connect (_udp_receive, SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
+		QObject::connect (_udp_receive.get(), SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
 	}
-}
-
-
-UDP::~UDP()
-{
-	delete _udp_receive;
-	delete _udp_send;
 }
 
 

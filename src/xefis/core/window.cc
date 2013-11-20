@@ -88,17 +88,10 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 }
 
 
-Window::~Window()
-{
-	for (Stack* stack: _stacks)
-		delete stack;
-}
-
-
 void
 Window::data_updated (Time const&)
 {
-	for (Stack* stack: _stacks)
+	for (auto stack: _stacks)
 	{
 		if (stack->property.fresh() && stack->property.valid())
 			stack->layout->setCurrentIndex (*stack->property);
@@ -124,7 +117,7 @@ QLayout*
 Window::process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel)
 {
 	QLayout* new_layout = nullptr;
-	Stack* stack = nullptr;
+	Shared<Stack> stack;
 
 	QString type = layout_element.attribute ("type");
 
@@ -137,7 +130,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* inst
 		if (!layout_element.hasAttribute ("path"))
 			throw Exception ("missing @path attribute on <layout type='stack'>");
 
-		stack = new Stack();
+		stack = std::make_shared<Stack>();
 		stack->property.set_path (layout_element.attribute ("path").toStdString());
 		stack->property.set_default (0);
 		new_layout = stack->layout = new QStackedLayout();
@@ -175,7 +168,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* inst
 
 
 void
-Window::process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Stack* stack)
+Window::process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Shared<Stack> stack)
 {
 	QBoxLayout* box_layout = dynamic_cast<QBoxLayout*> (layout);
 	QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*> (layout);

@@ -40,9 +40,6 @@ class FlightGearIO:
 	// Ctor
 	FlightGearIO (Xefis::ModuleManager*, QDomElement const& config);
 
-	// Dtor
-	~FlightGearIO();
-
   private slots:
 	/**
 	 * Called whenever there's data ready to be read from socket.
@@ -70,14 +67,14 @@ class FlightGearIO:
 	write_output();
 
   private:
-	QTimer*						_timeout_timer				= nullptr;
+	Unique<QTimer>				_timeout_timer;
 	QString						_input_host;
 	int							_input_port;
-	QUdpSocket*					_input						= nullptr;
+	Unique<QUdpSocket>			_input;
 	QByteArray					_input_datagram;
 	QString						_output_host;
 	int							_output_port;
-	QUdpSocket*					_output						= nullptr;
+	Unique<QUdpSocket>			_output;
 	std::string					_property_path;
 	bool						_input_enabled				= false;
 	bool						_output_enabled				= false;

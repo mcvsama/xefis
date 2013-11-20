@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <string>
+#include <memory>
 
 // Qt:
 #include <QtCore/QSocketNotifier>
@@ -420,10 +421,10 @@ class CHRUM6:
 	status_verify (uint32_t data);
 
   private:
-	QTimer*						_restart_timer			= nullptr;
-	QTimer*						_alive_check_timer		= nullptr;
-	QTimer*						_status_check_timer		= nullptr;
-	QTimer*						_initialization_timer	= nullptr;
+	Unique<QTimer>				_restart_timer;
+	Unique<QTimer>				_alive_check_timer;
+	Unique<QTimer>				_status_check_timer;
+	Unique<QTimer>				_initialization_timer;
 	Xefis::SerialPort			_serial_port;
 	Xefis::PacketReader			_packet_reader;
 	int							_failure_count			= 0;

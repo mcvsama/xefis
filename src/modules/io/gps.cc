@@ -114,15 +114,15 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	_current_baud_rate = _default_baud_rate;
 
-	_restart_timer = new QTimer (this);
+	_restart_timer = std::make_unique<QTimer> (this);
 	_restart_timer->setInterval (500);
 	_restart_timer->setSingleShot (true);
-	QObject::connect (_restart_timer, SIGNAL (timeout()), this, SLOT (open_device()));
+	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
 
-	_alive_check_timer = new QTimer (this);
+	_alive_check_timer = std::make_unique<QTimer> (this);
 	_alive_check_timer->setInterval (2000);
 	_alive_check_timer->setSingleShot (false);
-	QObject::connect (_alive_check_timer, SIGNAL (timeout()), this, SLOT (failure()));
+	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (failure()));
 
 	open_device();
 }
@@ -269,10 +269,9 @@ GPS::open_device()
 				failure ("set_device_options()");
 			else
 			{
-				delete _notifier;
-				_notifier = new QSocketNotifier (_device, QSocketNotifier::Read, this);
+				_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 				_notifier->setEnabled (true);
-				QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+				QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
 			}
 		}
 	}
@@ -290,8 +289,7 @@ GPS::failure (std::string const& reason)
 
 	_alive_check_timer->stop();
 
-	delete _notifier;
-	_notifier = nullptr;
+	_notifier.release();
 	::close (_device);
 
 	reset_properties();
@@ -566,7 +564,7 @@ GPS::process_gpgga (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// Latitude:
-	boost::optional<Angle> latitude;
+	Optional<Angle> latitude;
 	p = read_value (message_contents, p);
 	if (_value.size() >= 3)
 	{
@@ -589,7 +587,7 @@ GPS::process_gpgga (std::string message_contents)
 		latitude.reset();
 
 	// Longitude:
-	boost::optional<Angle> longitude;
+	Optional<Angle> longitude;
 	p = read_value (message_contents, p);
 	if (_value.size() >= 4)
 	{
@@ -619,7 +617,7 @@ GPS::process_gpgga (std::string message_contents)
 		fix_quality = digit_from_ascii (_value[0]);
 
 	// Number of tracked satellites:
-	boost::optional<Xefis::PropertyInteger::Type> tracked_satellites;
+	Optional<Xefis::PropertyInteger::Type> tracked_satellites;
 	p = read_value (message_contents, p);
 	try {
 		tracked_satellites = boost::lexical_cast<Xefis::PropertyInteger::Type> (_value);
@@ -633,7 +631,7 @@ GPS::process_gpgga (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// Altitude above mean sea level (meters):
-	boost::optional<Length> altitude_amsl;
+	Optional<Length> altitude_amsl;
 	p = read_value (message_contents, p);
 	try {
 		altitude_amsl = 1_m * boost::lexical_cast<double> (_value);
@@ -648,7 +646,7 @@ GPS::process_gpgga (std::string message_contents)
 		altitude_amsl.reset();
 
 	// Height above WGS84 geoid (meters):
-	boost::optional<Length> altitude_above_wgs84;
+	Optional<Length> altitude_above_wgs84;
 	p = read_value (message_contents, p);
 	try {
 		altitude_above_wgs84 = 1_m * boost::lexical_cast<double> (_value);
@@ -693,7 +691,7 @@ GPS::process_gpgsa (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// Type of fix: none, 2D, 3D:
-	boost::optional<Xefis::PropertyInteger::Type> type_of_fix;
+	Optional<Xefis::PropertyInteger::Type> type_of_fix;
 	p = read_value (message_contents, p);
 	try {
 		type_of_fix = boost::lexical_cast<Xefis::PropertyInteger::Type> (_value);
@@ -712,7 +710,7 @@ GPS::process_gpgsa (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// HDOP - if available, use it:
-	boost::optional<double> hdop;
+	Optional<double> hdop;
 	p = read_value (message_contents, p);
 	try {
 		hdop = boost::lexical_cast<double> (_value);
@@ -721,7 +719,7 @@ GPS::process_gpgsa (std::string message_contents)
 	{ }
 
 	// VDOP - Vertical Dilusion of Precision:
-	boost::optional<double> vdop;
+	Optional<double> vdop;
 	p = read_value (message_contents, p);
 	try {
 		vdop = boost::lexical_cast<double> (_value);
@@ -772,7 +770,7 @@ GPS::process_gprmc (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// Groundspeed:
-	boost::optional<Speed> groundspeed;
+	Optional<Speed> groundspeed;
 	p = read_value (message_contents, p);
 	try {
 		groundspeed = 1_kt * boost::lexical_cast<double> (_value);
@@ -781,7 +779,7 @@ GPS::process_gprmc (std::string message_contents)
 	{ }
 
 	// Track:
-	boost::optional<Angle> track;
+	Optional<Angle> track;
 	p = read_value (message_contents, p);
 	try {
 		track = 1_deg * boost::lexical_cast<double> (_value);

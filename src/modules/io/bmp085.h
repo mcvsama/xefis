@@ -105,11 +105,11 @@ class BMP085:
 	Xefis::I2C::Device			_i2c_device;
 	Oversampling				_oversampling				= Oversampling3;
 	Time						_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
-	QTimer*						_reinitialize_timer			= nullptr;
-	QTimer*						_temperature_timer			= nullptr;
-	QTimer*						_temperature_ready_timer	= nullptr;
-	QTimer*						_pressure_timer				= nullptr;
-	QTimer*						_pressure_ready_timer		= nullptr;
+	Unique<QTimer>				_reinitialize_timer;
+	Unique<QTimer>				_temperature_timer;
+	Unique<QTimer>				_temperature_ready_timer;
+	Unique<QTimer>				_pressure_timer;
+	Unique<QTimer>				_pressure_ready_timer;
 	// Set to true, between request_ and read_ functions.
 	bool						_middle_of_request			= false;
 	bool						_request_other				= false;

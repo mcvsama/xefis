@@ -67,7 +67,7 @@ class TextPainter: public QPainter
 			operator= (Glyph const& other);
 
 		  public:
-			std::shared_ptr<Data> data;
+			Shared<Data> data;
 		};
 
 		struct Font

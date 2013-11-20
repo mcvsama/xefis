@@ -127,7 +127,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 						power = v.text().toFloat();
 				}
 
-				Axis* axis = new Axis();
+				auto axis = std::make_shared<Axis>();
 				axis->center = center;
 				axis->dead_zone = dead_zone;
 				axis->reverse = reverse;
@@ -145,21 +145,12 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 	if (!found_device)
 		throw Xefis::Exception ("config for the io/joystick module needs <device> element");
 
-	_reopen_timer = new QTimer (this);
+	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);
 	_reopen_timer->setSingleShot (true);
-	QObject::connect (_reopen_timer, SIGNAL (timeout()), this, SLOT (open_device()));
+	QObject::connect (_reopen_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
 
 	open_device();
-}
-
-
-JoystickInput::~JoystickInput()
-{
-	for (auto& x: _buttons)
-		delete x;
-	for (auto& x: _axes)
-		delete x;
 }
 
 
@@ -179,10 +170,9 @@ JoystickInput::open_device()
 		else
 		{
 			_failure_count = 0;
-			delete _notifier;
-			_notifier = new QSocketNotifier (_device, QSocketNotifier::Read, this);
+			_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 			_notifier->setEnabled (true);
-			QObject::connect (_notifier, SIGNAL (activated (int)), this, SLOT (read()));
+			QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
 		}
 	}
 	catch (...)
@@ -199,8 +189,7 @@ JoystickInput::failure()
 		log() << "Failure detected, closing device " << _device_path.toStdString() << std::endl;
 
 	_failure_count += 1;
-	delete _notifier;
-	_notifier = nullptr;
+	_notifier.release();
 	::close (_device);
 
 	restart();
@@ -236,7 +225,7 @@ JoystickInput::read()
 				{
 					button = _buttons[ev.number];
 					if (!button)
-						button = _buttons[ev.number] = new Button();
+						button = _buttons[ev.number] = std::make_shared<Button>();
 					QString path = QString ("%1/button/%2").arg (_prop_path).arg (ev.number);
 					_buttons[ev.number]->set_path (path.toStdString());
 				}
@@ -260,7 +249,7 @@ JoystickInput::read()
 				{
 					axis = _axes[ev.number];
 					if (!axis)
-						axis = _axes[ev.number] = new Axis();
+						axis = _axes[ev.number] = std::make_shared<Axis>();
 					QString path = QString ("%1/axis/%2").arg (_prop_path).arg (ev.number);
 					_axes[ev.number]->set_path (path.toStdString());
 				}
@@ -283,10 +272,10 @@ JoystickInput::read()
 void
 JoystickInput::reset_properties()
 {
-	for (Button* b: _buttons)
+	for (auto b: _buttons)
 		if (b)
 			b->prop.set_nil();
-	for (Axis* a: _axes)
+	for (auto a: _axes)
 		if (a)
 			a->prop.set_nil();
 }

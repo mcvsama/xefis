@@ -275,9 +275,9 @@ template<class tType>
 		operator= (Property const& other);
 
 		/**
-		 * Get boost::optional value. Takes 'nil' value into account.
+		 * Get Optional value. Takes 'nil' value into account.
 		 */
-		boost::optional<Type>
+		Optional<Type>
 		get_optional() const;
 
 		/**
@@ -308,10 +308,10 @@ template<class tType>
 
 		/**
 		 * Write to the property.
-		 * If boost::optional doesn't hold a value, set the property to nil.
+		 * If Optional doesn't hold a value, set the property to nil.
 		 */
 		void
-		write (boost::optional<Type> const&);
+		write (Optional<Type> const&);
 
 		/**
 		 * Write to the property.
@@ -322,11 +322,11 @@ template<class tType>
 
 		/**
 		 * Write to the property.
-		 * If boost::optional doesn't hold a value, set the property to nil.
+		 * If Optional doesn't hold a value, set the property to nil.
 		 * If node can't be found, throw PropertyNotFound.
 		 */
 		void
-		write_signalling (boost::optional<Type> const&);
+		write_signalling (Optional<Type> const&);
 
 		/**
 		 * Sets value (like write) if property is not singular
@@ -631,12 +631,12 @@ template<class T>
 
 
 template<class T>
-	inline boost::optional<T>
+	inline Optional<T>
 	Property<T>::get_optional() const
 	{
 		if (is_nil())
-			return boost::optional<T>();
-		return boost::optional<T> (**this);
+			return Optional<T>();
+		return Optional<T> (**this);
 	}
 
 
@@ -705,7 +705,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write (boost::optional<Type> const& value)
+	Property<T>::write (Optional<Type> const& value)
 	{
 		if (value)
 			write (*value);
@@ -727,7 +727,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write_signalling (boost::optional<Type> const& value)
+	Property<T>::write_signalling (Optional<Type> const& value)
 	{
 		if (value)
 			write_signalling (*value);

@@ -63,15 +63,12 @@ class JoystickInput:
 		float					power		= 1.f;
 	};
 
-	typedef std::vector<Button*>	Buttons;
-	typedef std::vector<Axis*>		Axes;
+	typedef std::vector<Shared<Button>>	Buttons;
+	typedef std::vector<Shared<Axis>>	Axes;
 
   public:
 	// Ctor
 	JoystickInput (Xefis::ModuleManager*, QDomElement const& config);
-
-	// Dtor
-	~JoystickInput();
 
   private slots:
 	/**
@@ -106,14 +103,14 @@ class JoystickInput:
 	reset_properties();
 
   private:
-	QString				_prop_path		= "/joystick";
-	QString				_device_path;
-	int					_device			= 0;
-	QSocketNotifier*	_notifier		= nullptr;
-	QTimer*				_reopen_timer	= nullptr;
-	Buttons				_buttons;
-	Axes				_axes;
-	unsigned int		_failure_count	= 0;
+	QString					_prop_path		= "/joystick";
+	QString					_device_path;
+	int						_device			= 0;
+	Unique<QSocketNotifier>	_notifier;
+	Unique<QTimer>			_reopen_timer;
+	Buttons					_buttons;
+	Axes					_axes;
+	unsigned int			_failure_count	= 0;
 };
 
 #endif

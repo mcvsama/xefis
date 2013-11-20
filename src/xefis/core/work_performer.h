@@ -173,10 +173,10 @@ class WorkPerformer: private Noncopyable
 
   private:
 	// Current queue. Points either to _queues[1] or _queues[2]:
-	Units					_queue;
-	Mutex					_queue_mutex;
-	Semaphore				_queue_semaphore;
-	std::vector<Performer*>	_performers;
+	Units							_queue;
+	Mutex							_queue_mutex;
+	Semaphore						_queue_semaphore;
+	std::vector<Shared<Performer>>	_performers;
 };
 
 

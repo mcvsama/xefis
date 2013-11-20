@@ -25,7 +25,7 @@
 namespace Xefis {
 
 TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar const& character):
-	data (new Data())
+	data (std::make_shared<Data>())
 {
 	QFontMetricsF metrics (font);
 	QSize size (std::ceil (metrics.width (character)) + 1, std::ceil (metrics.height()) + 1);
