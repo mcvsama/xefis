@@ -415,6 +415,13 @@ class CHRUM6:
 	sample_rate_setting (Frequency) noexcept;
 
 	/**
+	 * Return bit value used in communication register
+	 * for baud rate. Bits are not shifted to the right position.
+	 */
+	static uint32_t
+	bits_for_baud_rate (std::string const& baud_rate);
+
+	/**
 	 * Checks status bits and sets status/serviceable properties.
 	 */
 	void
@@ -430,6 +437,7 @@ class CHRUM6:
 	int							_failure_count			= 0;
 	float						_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
+	std::string					_baud_rate				= "115200";
 	bool						_signal_data_updated	= false;
 	Stage						_stage					= Stage::Initialize;
 	int							_initialization_step	= 0;

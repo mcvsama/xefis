@@ -47,7 +47,6 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_packet_reader ({ 's', 'n', 'p' }, std::bind (&CHRUM6::parse_packet, this))
 {
 	std::string device_path;
-	std::string baud_rate = "115200";
 
 	for (QDomElement& e: config)
 	{
@@ -55,7 +54,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 		{
 			parse_settings (e, {
 				{ "serial.device", device_path, true },
-				{ "serial.baud-rate", baud_rate, true },
+				{ "serial.baud-rate", _baud_rate, true },
 				{ "sample-rate", _sample_rate, true },
 				{ "ekf.process-variance", _ekf_process_variance, false },
 			});
@@ -85,7 +84,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 
 	_serial_port.set_logger (log());
 	_serial_port.set_device_path (device_path);
-	_serial_port.set_baud_rate (baud_rate);
+	_serial_port.set_baud_rate (_baud_rate);
 	_serial_port.set_data_bits (8);
 	_serial_port.set_stop_bits (1);
 	_serial_port.set_parity_bit (Xefis::SerialPort::Parity::None);
@@ -212,7 +211,7 @@ CHRUM6::next_initialization_step()
 				data |= static_cast<uint32_t> (CommunicationRegister::GP);
 				data |= static_cast<uint32_t> (CommunicationRegister::MP);
 				data |= static_cast<uint32_t> (CommunicationRegister::TMP);
-				data |= 0x500; // TODO according to setting, 0x500 is Baud-rate: 115200
+				data |= bits_for_baud_rate (_baud_rate) << 8;
 				data |= sample_rate_setting (_sample_rate);
 				write_register (Address::Communication, data);
 				break;
@@ -761,6 +760,33 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
 	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).Hz();
 	return Xefis::limit (x, 0u, 255u);
+}
+
+
+uint32_t
+CHRUM6::bits_for_baud_rate (std::string const& baud_rate_str)
+{
+	static std::map<int, uint32_t> baud_rates_map;
+
+	if (baud_rates_map.empty())
+	{
+		baud_rates_map[9600] = 0;
+		baud_rates_map[14400] = 1;
+		baud_rates_map[19200] = 2;
+		baud_rates_map[38400] = 3;
+		baud_rates_map[57600] = 4;
+		baud_rates_map[115200] = 5;
+	}
+
+	uint32_t baud_rate = boost::lexical_cast<unsigned int> (baud_rate_str);
+
+	auto c = baud_rates_map.find (baud_rate);
+	if (c == baud_rates_map.end())
+		c = baud_rates_map.upper_bound (baud_rate);
+	if (c == baud_rates_map.end())
+		return 0;
+
+	return c->second;
 }
 
 
