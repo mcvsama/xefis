@@ -275,4 +275,7 @@ $(LINKEDS):
 	$(LD) -o $@ $(NODEP_OBJECTS) $(OBJECTS) $(MOCOBJS) $(LDFLAGS)
 
 -include $(MAINDEPFILE)
+ifneq ($(DIST),)
+	include Makefile.dist.$(DIST)
+endif
 
