@@ -105,6 +105,8 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
 	_headings_computer.observe ({
 		&_orientation_input_heading_magnetic,
+		&_orientation_input_pitch,
+		&_orientation_input_roll,
 		&_magnetic_declination,
 	});
 
