@@ -6,12 +6,12 @@
 			<property name='position.input.longitude' path='/sensors/gps/longitude'/>
 			<property name='position.input.latitude' path='/sensors/gps/latitude'/>
 			<property name='position.input.altitude.amsl' path='/sensors/gps/altitude-amsl'/>
-			<property name='position.input.accuracy.lateral' path='/sensors/gps/accuracy.lateral'/>
-			<property name='position.input.accuracy.vertical' path='/sensors/gps/accuracy.vertical'/>
+			<property name='position.input.accuracy.lateral' path='/sensors/gps/accuracy.lateral' default='1 m'/>
+			<property name='position.input.accuracy.vertical' path='/sensors/gps/accuracy.vertical' default='1 m'/>
 			<property name='position.input.source' path='/sensors/gps/source'/>
-			<property name='orientation.input.pitch' path='/sensors/ahrs/pitch'/>
-			<property name='orientation.input.roll' path='/sensors/ahrs/roll'/>
-			<property name='orientation.input.heading.magnetic' path='/sensors/ahrs/magnetic-heading'/>
+			<property name='orientation.input.pitch' path='/sensors/ahrs/orientation/pitch'/>
+			<property name='orientation.input.roll' path='/sensors/ahrs/orientation/roll'/>
+			<property name='orientation.input.heading.magnetic' path='/sensors/ahrs/orientation/magnetic-heading'/>
 			<!-- Output -->
 			<directory path='/systems/nc'>
 				<property name='position.longitude' path='/position/longitude'/>

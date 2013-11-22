@@ -48,21 +48,21 @@
 					<property name='vertical-speed.serviceable' path='/systems/adc/vertical-speed/serviceable'/>
 					<property name='vertical-speed' path='/systems/adc/vertical-speed/speed'/>
 					<property name='vertical-speed.variometer' path='/systems/pc/total-energy-variometer'/>
-					<property name='pressure.qnh' path='/settings/pressure/qnh'/>
-					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa'/>
-					<property name='pressure.use-std' path='/settings/pressure/use-std'/>
-					<property name='flight-director.serviceable' path='/systems/fd/serviceable'/>
+					<property name='pressure.qnh' path='/settings/pressure/qnh' default='30.29 inHg'/>
+					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa' default='true'/>
+					<property name='pressure.use-std' path='/settings/pressure/use-std' default='false'/>
+					<property name='flight-director.serviceable' path='/systems/flight-director/serviceable'/>
 					<property name='flight-director.cmd.visible' path='/settings/flight-director/cmd/visible'/>
 					<property name='flight-director.cmd.ias' path='/settings/flight-director/cmd/ias'/>
 					<property name='flight-director.cmd.altitude' path='/settings/flight-director/cmd/altitude'/>
-					<property name='flight-director.cmd.altitude.acquired' path='/systems/fd/altitude-acquired'/>
+					<property name='flight-director.cmd.altitude.acquired' path='/systems/flight-director/altitude-acquired'/>
 					<property name='flight-director.cmd.vertical-speed' path='/settings/flight-director/cmd/vertical-speed'/>
-					<property name='flight-director.guidance.visible' path='/settings/fd/guidance/visible'/>
-					<property name='flight-director.guidance.pitch' path='/systems/fd/guidance/pitch'/>
-					<property name='flight-director.guidance.roll' path='/systems/fd/guidance/roll'/>
+					<property name='flight-director.guidance.visible' path='/settings/flight-director/guidance/visible'/>
+					<property name='flight-director.guidance.pitch' path='/systems/flight-director/guidance/pitch'/>
+					<property name='flight-director.guidance.roll' path='/systems/flight-director/guidance/roll'/>
 					<property name='control-stick.visible' path='/settings/control-stick-visible'/>
-					<property name='control-stick.pitch' path='/systems/fbw/stick/pitch'/>
-					<property name='control-stick.roll' path='/systems/fbw/stick/roll'/>
+					<property name='control-stick.pitch' path='/systems/fly-by-wire/stick/pitch'/>
+					<property name='control-stick.roll' path='/systems/fly-by-wire/stick/roll'/>
 					<directory path='//efis'>
 						<directory path='/approach'>
 							<property name='approach.reference-visible' path='/reference-visible' default='true'/>
@@ -72,12 +72,12 @@
 						</directory>
 						<directory path='/flight-path'>
 							<directory path='/deviation'>
-								<property name='flight-path.deviation.vertical.serviceable' path='/vertical.serviceable' default='true'/>
-								<property name='flight-path.deviation.vertical.app' path='/vertical.app' default='0.55 deg'/>
-								<property name='flight-path.deviation.vertical.fp' path='/vertical.fp' default='-0.3 deg'/>
-								<property name='flight-path.deviation.lateral.serviceable' path='/lateral.serviceable' default='true'/>
-								<property name='flight-path.deviation.lateral.app' path='/lateral.app' default='0.11 deg'/>
-								<property name='flight-path.deviation.lateral.fp' path='/lateral.fp' default='2.26 deg'/>
+								<property name='flight-path.deviation.vertical.serviceable' path='/vertical.serviceable'/>
+								<property name='flight-path.deviation.vertical.app' path='/vertical.app'/>
+								<property name='flight-path.deviation.vertical.fp' path='/vertical.fp'/>
+								<property name='flight-path.deviation.lateral.serviceable' path='/lateral.serviceable'/>
+								<property name='flight-path.deviation.lateral.app' path='/lateral.app'/>
+								<property name='flight-path.deviation.lateral.fp' path='/lateral.fp'/>
 								<property name='flight-path.deviation.mixed-mode' path='/mixed-mode' default='true'/>
 							</directory>
 						</directory>
@@ -117,7 +117,7 @@
 					<property name='track.center-on-track' path='/settings/hsi-aux/center-on-track'/>
 					<property name='track.visible' path='/settings/hsi-aux/track-visible'/>
 					<property name='cmd.visible' path='/settings/hsi-aux/cmd/visible'/>
-					<property name='cmd.heading' path='/settings/hsi-aux/cmd/heading'/>
+					<property name='cmd.heading' path='/settings/flight-director/cmd/magnetic-heading-track'/>
 					<property name='cmd.track-visible' path='/settings/hsi-aux/cmd/track-visible'/>
 					<property name='altitude.target.reach-distance' path='/systems/altacq/distance'/>
 					<property name='orientation.display-true-heading' path='/settings/hsi-aux/display-true-heading'/>

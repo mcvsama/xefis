@@ -1,18 +1,16 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='io/bmp085'>
-		<i2c>
-			<bus>1</bus>
-			<address>0x77</address>
-		</i2c>
 		<settings>
+			<setting name='i2c.bus' value='2'/>
+			<setting name='i2c.address' value='0x77'/>
 			<setting name='pressure.read-interval' value='50 ms'/>
 			<setting name='temperature.read-interval' value='500 ms'/>
 		</settings>
 		<properties path='/sensors'>
 			<property name='serviceable' path='/pressure/serviceable'/>
-			<property name='pressure' path='/pressure/pressure'/>
-			<property name='temperature' path='/temperature/static'/>
+			<property name='pressure' path='/pressure/static'/>
+			<property name='temperature' path='/air-temperature/static'/>
 		</properties>
 	</module>
 </xefis-include>

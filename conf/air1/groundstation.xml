@@ -14,10 +14,12 @@
 		<include name='groundstation/systems/altacq.xml'/>
 		<if mode=''>
 			<include name='groundstation/comm/link.xml'/>
-			<include name='groundstation/comm/xbee.xml'/>
+			<include name='groundstation/comm/udp.xml'/>
 		</if>
 		<if mode='fg'>
 			<include name='groundstation/sim/flightgear.xml'/>
+			<include name='groundstation/sim/flight-director.xml'/>
+			<include name='groundstation/sim/fly-by-wire.xml'/>
 		</if>
 	</modules>
 	<windows>

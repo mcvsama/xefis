@@ -2,7 +2,7 @@
 <xefis-include>
 	<module name='io/chr-um6'>
 		<settings>
-			<setting name='serial.device' value='/dev/ttyAMA0'/>
+			<setting name='serial.device' value='/dev/ttyO1'/>
 			<setting name='serial.baud-rate' value='115200'/>
 			<setting name='ekf.process-variance' value='0.5'/>
 			<setting name='sample-rate' value='50 Hz'/>

@@ -19,11 +19,11 @@
 						<property name='orientation-magnetic-heading' path='/magnetic-heading'/>
 					</directory>
 					<!-- airspeed -->
-					<property name='ias' path='/speed/ias'/>
+					<property name='ias' path='/airspeed/ias'/>
 					<!-- pressure -->
 					<property name='pressure' path='/pressure/static'/>
 					<!-- temperature -->
-					<property name='static-air-temperature' path='/temperature/static'/>
+					<property name='static-air-temperature' path='/air-temperature/static'/>
 					<!-- radar altimeter -->
 					<property name='altitude-agl' path='/radar-altimeter/agl'/>
 					<!-- slip-skid -->

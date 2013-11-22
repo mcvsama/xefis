@@ -2,8 +2,8 @@
 <xefis-include>
 	<module name='io/udp'>
 		<settings>
-			<setting name='send.host' value='192.168.0.1'/>
-			<setting name='send.port' value='9952'/>
+			<setting name='send.host' value='192.168.0.12'/>
+			<setting name='send.port' value='9951'/>
 			<setting name='receive.host' value='192.168.0.1'/>
 			<setting name='receive.port' value='9951'/>
 		</settings>
