@@ -13,8 +13,8 @@
 			</directory>
 			<directory path='//sensors'>
 				<property name='pressure.static' path='/pressure/static'/>
-				<property name='ias' path='/speed/ias'/>
-				<property name='static-air-temperature' path='/temperature/static'/>
+				<property name='ias' path='/airspeed/ias'/>
+				<property name='static-air-temperature' path='/air-temperature/static'/>
 			</directory>
 			<!-- Output -->
 			<directory path='//systems/adc'>

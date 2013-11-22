@@ -22,9 +22,9 @@
 					<property type='angle' bytes='2' path='/sensors/ahrs/orientation/magnetic-heading'/>
 					<property type='temperature' bytes='2' path='/sensors/ahrs/internal-temperature'/>
 					<property type='float' bytes='2' path='/sensors/slip-skid/slip-skid'/>
-					<property type='pressure' bytes='4' path='/sensors/pressure/pressure'/>
-					<property type='speed' bytes='4' path='/sensors/speed/airspeed'/>
-					<property type='float' bytes='2' path='/sensors/temperature/static'/>
+					<property type='pressure' bytes='4' path='/sensors/pressure/static'/>
+					<property type='speed' bytes='4' path='/sensors/airspeed/ias'/>
+					<property type='temperature' bytes='2' path='/sensors/air-temperature/static'/>
 					<property type='integer' bytes='4' path='/sensors/gps/read-errors'/>
 					<property type='integer' bytes='1' path='/sensors/gps/fix-quality'/>
 					<property type='integer' bytes='1' path='/sensors/gps/type-of-fix'/>
@@ -62,7 +62,7 @@
 	</module>
 	<module name='io/link' instance='output'>
 		<settings>
-			<setting name='frequency' value='0.001 Hz'/>
+			<setting name='frequency' value='50 Hz'/>
 		</settings>
 		<properties>
 			<property name='output' path='/link/data/to-aircraft'/>

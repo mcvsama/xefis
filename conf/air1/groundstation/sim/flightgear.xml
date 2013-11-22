@@ -13,7 +13,7 @@
 						<property name='position-amsl' path='/altitude-amsl'/>
 					</directory>
 					<!-- ahrs -->
-					<directory path='/ahrs'>
+					<directory path='/ahrs/orientation'>
 						<property name='orientation-pitch' path='/pitch'/>
 						<property name='orientation-roll' path='/roll'/>
 						<property name='orientation-magnetic-heading' path='/magnetic-heading'/>
