@@ -60,6 +60,7 @@ void
 HSIWidget::PaintWorkUnit::pop_params()
 {
 	_params = _params_next;
+	_locals = _locals_next;
 }
 
 
