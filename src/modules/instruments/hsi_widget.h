@@ -387,6 +387,7 @@ HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 	request_repaint();
 }
 
+
 inline void
 HSIWidget::push_params()
 {
