@@ -217,9 +217,9 @@ template<class V>
 		{
 			if (_winding_enabled)
 			{
-				ValueType p = _history[0];
-				ValueType cos_p = _history_cos[0];
-				ValueType sin_p = _history_sin[0];
+				ValueType p = _history.back();
+				ValueType cos_p = _history_cos.back();
+				ValueType sin_p = _history_sin.back();
 				ValueType rad_s = encircle (s);
 				ValueType cos_s = std::cos (rad_s);
 				ValueType sin_s = std::sin (rad_s);
@@ -243,7 +243,7 @@ template<class V>
 			}
 			else
 			{
-				ValueType p = _history[0];
+				ValueType p = _history.back();
 				for (int i = 0; i < iterations; ++i)
 					_history.push_back (p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
 
@@ -277,7 +277,7 @@ template<class V>
 	inline typename Smoother<V>::ValueType
 	Smoother<V>::last_sample() const noexcept
 	{
-		return _history[0];
+		return _history.back();
 	}
 
 
