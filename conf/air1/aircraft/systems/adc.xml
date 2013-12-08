@@ -9,7 +9,7 @@
 			<!-- Input -->
 			<directory path='//settings/altimeter'>
 				<property name='settings.pressure.use-std' path='/use-std-pressure'/>
-				<property name='settings.pressure.qnh' path='/pressure.qnh' default='1013 hPa'/>
+				<property name='settings.pressure.qnh' path='/pressure.qnh'/>
 			</directory>
 			<directory path='//sensors'>
 				<property name='pressure.static' path='/pressure/static'/>

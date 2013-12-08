@@ -43,10 +43,16 @@ RotaryEncoder::data_updated()
 	int da = _prev_a - a;
 	int db = _prev_b - b;
 
+	if (da == 0 && db == 0)
+		return; // No change.
+
 	if ((da == 1 && b == 0) || (a == 1 && db == 1) || (da == -1 && b == 1) || (a == 0 && db == -1))
-		_callback (Up);
+		_callback (+1);
 	else
-		_callback (Down);
+		_callback (-1);
+
+	_prev_a = a;
+	_prev_b = b;
 }
 
 } // namespace Xefis

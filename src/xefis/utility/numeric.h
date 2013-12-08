@@ -69,6 +69,14 @@ template<class T>
 	}
 
 
+template<class T = int, class S>
+	inline constexpr T
+	symmetric_round (S s) noexcept
+	{
+		return static_cast<T> (sgn (s) * 0.5 + s);
+	}
+
+
 /**
  * Works properly only on floats.
  * \param	n - dividend

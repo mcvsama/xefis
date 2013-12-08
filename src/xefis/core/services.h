@@ -142,10 +142,17 @@ class Services
 	static QFont
 	instrument_font();
 
+	/**
+	 * Return font suitable for panels.
+	 */
+	static QFont
+	panel_font();
+
   private:
 	static signed int					_detected_cores;
 	static Unique<CallOutDispatcher>	_call_out_dispatcher;
 	static QFont						_instrument_font;
+	static QFont						_panel_font;
 };
 
 
@@ -198,6 +205,13 @@ inline QFont
 Services::instrument_font()
 {
 	return _instrument_font;
+}
+
+
+inline QFont
+Services::panel_font()
+{
+	return _panel_font;
 }
 
 } // namespace Xefis

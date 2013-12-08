@@ -1,4 +1,35 @@
 <?xml version='1.0'?>
 <xefis-include>
+	<instrument name='instruments/hsi' instance='mfd'>
+		<properties>
+			<property name='display-mode' path='/settings/hsi/display-mode/mfd' default='0'/>
+			<property name='range' path='/settings/hsi/range'/>
+			<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
+			<property name='track.center-on-track' path='/settings/hsi/center-on-track'/>
+			<property name='track.visible' path='/settings/hsi/track-visible' default='true'/>
+			<property name='cmd.visible' path='/settings/flight-director/cmd/visible'/>
+			<property name='cmd.heading' path='/settings/flight-director/cmd/magnetic-heading-track'/>
+			<property name='cmd.track-visible' path='/settings/efis/flight-director-visible'/>
+			<property name='altitude.target.reach-distance' path='/systems/altacq/distance'/>
+			<property name='orientation.display-true-heading' path='/settings/hsi/display-true-heading'/>
+			<property name='localizer-id' path='/settings/hsi/localizer-id'/>
+			<property name='speed.gs' path='/systems/nc/track/ground-speed'/>
+			<property name='speed.tas' path='/systems/adc/speed/tas'/>
+			<property name='orientation.heading.magnetic' path='/systems/nc/orientation/heading/magnetic'/>
+			<property name='orientation.heading.true' path='/systems/nc/orientation/heading/true'/>
+			<property name='home.true-direction' path='/systems/rcms/home/true-direction'/>
+			<property name='home.distance.vlos' path='/systems/rcms/home/distance/vlos'/>
+			<property name='home.distance.ground' path='/systems/rcms/home/distance/ground'/>
+			<property name='home.distance.vertical' path='/systems/rcms/home/distance/vertical'/>
+			<property name='position.latitude' path='/systems/nc/position/latitude'/>
+			<property name='position.longitude' path='/systems/nc/position/longitude'/>
+			<property name='position.source' path='/systems/nc/position/source'/>
+			<property name='track.lateral.magnetic' path='/systems/nc/track/lateral/magnetic'/>
+			<property name='track.lateral.delta' path='/systems/nc/track/lateral/delta'/>
+			<property name='wind.from.magnetic' path='/systems/pc/wind/from/magnetic'/>
+			<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
+			<property name='glide-ratio' path='/systems/pc/glide-ratio'/>
+		</properties>
+	</instrument>
 </xefis-include>
 

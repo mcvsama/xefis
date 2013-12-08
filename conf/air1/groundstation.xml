@@ -6,10 +6,11 @@
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
-		<include name='groundstation/hardware/joystick.xml'/>
-		<!--include name='groundstation/systems/state.xml'/-->
+		<!--include name='groundstation/hardware/joystick.xml'/-->
+		<include name='groundstation/systems/state.xml'/>
 		<include name='groundstation/systems/adc.xml'/>
 		<include name='groundstation/systems/nc.xml'/>
+		<include name='groundstation/systems/pc.xml'/>
 		<include name='groundstation/systems/rcms.xml'/>
 		<include name='groundstation/systems/altacq.xml'/>
 		<if mode=''>
@@ -23,14 +24,21 @@
 		</if>
 	</modules>
 	<windows>
-		<window width='1366' height='768' full-screen='false'>
-			<layout type='horizontal'>
-				<item stretch-factor='4'>
-					<include name='groundstation/instruments/pfd.xml'/>
+		<window width='1366' height='960' full-screen='false'>
+			<layout type='vertical'>
+				<item stretch-factor='12'>
+					<layout type='horizontal'>
+						<item stretch-factor='4'>
+							<include name='groundstation/instruments/pfd.xml'/>
+						</item>
+						<separator/>
+						<item stretch-factor='4'>
+							<include name='groundstation/instruments/mfd.xml'/>
+						</item>
+					</layout>
 				</item>
-				<separator/>
-				<item stretch-factor='4'>
-					<include name='groundstation/instruments/mfd.xml'/>
+				<item stretch-factor='3'>
+					<include name='groundstation/sim/mcp.xml'/>
 				</item>
 			</layout>
 		</window>

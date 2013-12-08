@@ -17,14 +17,19 @@
 // Qt:
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QStackedLayout>
+#include <QtWidgets/QLabel>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/panel.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/widgets/panel_button.h>
+#include <xefis/widgets/panel_rotary_encoder.h>
+#include <xefis/widgets/panel_numeric_display.h>
 
 // Local:
 #include "window.h"
@@ -62,7 +67,7 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	configurator_layout->setMargin (WidgetMargin);
 	configurator_layout->setSpacing (0);
 
-	QLayout* layout = new QVBoxLayout (this);
+	QBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_stack);
@@ -71,20 +76,9 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	_stack->addWidget (_configurator_panel);
 	_stack->setCurrentWidget (_instruments_panel);
 
-	for (QDomElement& e: element)
-	{
-		if (e == "layout")
-		{
-			QLayout* layout = process_layout_element (e, _instruments_panel);
-			if (_instruments_panel->layout())
-				throw Exception ("a window can only have one layout");
-			_instruments_panel->setLayout (layout);
-		}
-		else
-			throw Exception (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
-	}
-
 	new QShortcut (Qt::Key_Escape, this, SLOT (show_configurator()));
+
+	process_window_element (element);
 }
 
 
@@ -113,18 +107,170 @@ Window::font_scale() const
 }
 
 
+void
+Window::process_window_element (QDomElement const& window_element)
+{
+	for (QDomElement& e: window_element)
+	{
+		if (e == "layout")
+		{
+			QLayout* layout = process_layout_element (e, _instruments_panel, nullptr);
+			if (_instruments_panel->layout())
+				throw Exception ("a window can only have one layout");
+			_instruments_panel->setLayout (layout);
+		}
+		else
+			throw Exception (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
+	}
+}
+
+
+Panel*
+Window::process_panel_element (QDomElement const& panel_element, QWidget* parent_widget)
+{
+	Panel* panel = new Panel (parent_widget, _application);
+
+	for (QDomElement& e: panel_element)
+	{
+		if (e == "layout")
+		{
+			QLayout* layout = process_layout_element (e, panel, panel);
+			layout->setMargin (5);
+			if (panel->layout())
+				throw Exception ("a panel can only have one layout");
+			panel->setLayout (layout);
+		}
+		else
+			throw Exception (QString ("unsupported child of <panel>: <%1>").arg (e.tagName()).toStdString());
+	}
+
+	return panel;
+}
+
+
+QGroupBox*
+Window::process_group_element (QDomElement const& group_element, QWidget* parent_widget, Panel* panel)
+{
+	if (!panel)
+		throw Exception ("<group> can only be used as descendant of <panel>");
+
+	QGroupBox* group = new QGroupBox (group_element.attribute ("label").replace ("&", "&&"), parent_widget);
+
+	for (QDomElement& e: group_element)
+	{
+		if (e == "layout")
+		{
+			QLayout* layout = process_layout_element (e, group, panel);
+			layout->setMargin (5);
+			if (group->layout())
+				throw Exception ("a group can only have one layout");
+			group->setLayout (layout);
+		}
+		else
+			throw Exception (QString ("unsupported child of <group>: <%1>").arg (e.tagName()).toStdString());
+	}
+
+	return group;
+}
+
+
+QWidget*
+Window::process_widget_element (QDomElement const& widget_element, QWidget* parent_widget, Panel* panel)
+{
+	if (!panel)
+		throw Exception ("<widget> can only be used as descendant of <panel>");
+
+	QString type = widget_element.attribute ("type");
+	QWidget* widget = nullptr;
+	QWidget* label_wrapper = nullptr;
+	QLabel* top_label = nullptr;
+	QLabel* bottom_label = nullptr;
+
+	QString top_label_str = widget_element.attribute ("top-label");
+	QString bottom_label_str = widget_element.attribute ("bottom-label");
+
+	if (!top_label_str.isEmpty() || !bottom_label_str.isEmpty())
+	{
+		label_wrapper = new PanelWidget (parent_widget, panel);
+
+		if (!top_label_str.isEmpty())
+		{
+			top_label = new QLabel (top_label_str, label_wrapper);
+			top_label->setTextFormat (Qt::PlainText);
+			top_label->setAlignment (Qt::AlignHCenter | Qt::AlignBottom);
+			top_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+		}
+
+		if (!bottom_label_str.isEmpty())
+		{
+			bottom_label = new QLabel (bottom_label_str, label_wrapper);
+			bottom_label->setTextFormat (Qt::PlainText);
+			bottom_label->setAlignment (Qt::AlignHCenter | Qt::AlignTop);
+			bottom_label->setSizePolicy (QSizePolicy::Fixed, QSizePolicy::Fixed);
+		}
+	}
+
+	if (type == "button")
+	{
+		PanelButton::LEDColor color = PanelButton::Green;
+		if (widget_element.attribute ("led-color") == "amber")
+			color = PanelButton::Amber;
+
+		widget = new PanelButton (parent_widget, panel, color,
+								  PropertyBoolean (widget_element.attribute ("click-property").toStdString()),
+								  PropertyBoolean (widget_element.attribute ("led-property").toStdString()));
+	}
+	else if (type == "rotary-encoder")
+	{
+		widget = new PanelRotaryEncoder (parent_widget, panel,
+										 widget_element.attribute ("click-label"),
+										 PropertyBoolean (widget_element.attribute ("rotate-a-property").toStdString()),
+										 PropertyBoolean (widget_element.attribute ("rotate-b-property").toStdString()),
+										 PropertyBoolean (widget_element.attribute ("click-property").toStdString()));
+	}
+	else if (type == "numeric-display")
+	{
+		widget = new PanelNumericDisplay (parent_widget, panel,
+										  widget_element.attribute ("digits").toUInt(),
+										  widget_element.attribute ("pad-with-zeros") == "true",
+										  PropertyInteger (widget_element.attribute ("value-property").toStdString()));
+	}
+	else
+		throw Exception (QString ("unsupported widget type '%1'").arg (type));
+
+	if (label_wrapper)
+	{
+		QVBoxLayout* layout = new QVBoxLayout (label_wrapper);
+		layout->setMargin (0);
+		layout->setSpacing (2);
+		layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+		if (top_label)
+			layout->addWidget (top_label, 0, Qt::AlignCenter);
+		layout->addWidget (widget, 0, Qt::AlignCenter);
+		if (bottom_label)
+			layout->addWidget (bottom_label, 0, Qt::AlignCenter);
+		layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+		return label_wrapper;
+	}
+	else
+		return widget;
+}
+
+
 QLayout*
-Window::process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel)
+Window::process_layout_element (QDomElement const& layout_element, QWidget* parent_widget, Panel* panel)
 {
 	QLayout* new_layout = nullptr;
+	QBoxLayout* box_new_layout = nullptr;
 	Shared<Stack> stack;
 
 	QString type = layout_element.attribute ("type");
+	unsigned int spacing = layout_element.attribute ("spacing").toUInt();
 
 	if (type == "horizontal")
-		new_layout = new QHBoxLayout();
+		new_layout = box_new_layout = new QHBoxLayout();
 	else if (type == "vertical")
-		new_layout = new QVBoxLayout();
+		new_layout = box_new_layout = new QVBoxLayout();
 	else if (type == "stack")
 	{
 		if (!layout_element.hasAttribute ("path"))
@@ -142,16 +288,27 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* inst
 	new_layout->setSpacing (0);
 	new_layout->setMargin (0);
 
+	if (box_new_layout)
+		box_new_layout->setSpacing (spacing);
+
 	for (QDomElement& e: layout_element)
 	{
 		if (e == "item")
-			process_item_element (e, new_layout, instruments_panel, stack);
+			process_item_element (e, new_layout, parent_widget, panel, stack);
+		else if (e == "stretch")
+		{
+			if (!panel)
+				throw Exception ("<stretch> can only be used as descendant of <panel>");
+
+			if (box_new_layout)
+				box_new_layout->addStretch (10000);
+		}
 		else if (e == "separator")
 		{
 			if (type == "stack")
 				throw Exception ("<separator> not allowed in stack-type layout");
 
-			QWidget* separator = new QWidget (instruments_panel);
+			QWidget* separator = new QWidget (parent_widget);
 			separator->setMinimumSize (2, 2);
 			separator->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 			separator->setBackgroundRole (QPalette::Dark);
@@ -168,7 +325,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* inst
 
 
 void
-Window::process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Shared<Stack> stack)
+Window::process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* parent_widget, Panel* panel, Shared<Stack> stack)
 {
 	QBoxLayout* box_layout = dynamic_cast<QBoxLayout*> (layout);
 	QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*> (layout);
@@ -196,38 +353,44 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 		{
 			if (box_layout)
 			{
-				QLayout* sub_layout = process_layout_element (e, instruments_panel);
-				box_layout->addLayout (sub_layout);
-				box_layout->setStretchFactor (sub_layout, stretch);
+				QLayout* sub_layout = process_layout_element (e, parent_widget, panel);
+				box_layout->addLayout (sub_layout, stretch);
 			}
 			else if (stacked_layout)
 			{
-				QLayout* sub_layout = process_layout_element (e, instruments_panel);
-				QWidget* proxy_widget = new QWidget (instruments_panel);
+				QLayout* sub_layout = process_layout_element (e, parent_widget, panel);
+				QWidget* proxy_widget = new QWidget (parent_widget);
 				proxy_widget->setLayout (sub_layout);
 				stacked_layout->addWidget (proxy_widget);
 				stacked_layout->setCurrentWidget (proxy_widget);
 			}
 		}
-		else if (e == "module")
+		else if (e == "instrument" || e == "panel" || e == "group" || e == "widget")
 		{
-			Module* module = _config_reader->process_module_element (e, instruments_panel);
-			if (module)
-			{
-				QWidget* module_widget = dynamic_cast<QWidget*> (module);
+			QWidget* widget = nullptr;
 
-				if (module_widget)
+			if (e == "instrument")
+			{
+				Module* module = _config_reader->process_module_element (e, parent_widget);
+				if (module)
+					widget = dynamic_cast<QWidget*> (module);
+			}
+			else if (e == "panel")
+				widget = process_panel_element (e, parent_widget);
+			else if (e == "group")
+				widget = process_group_element (e, parent_widget, panel);
+			else if (e == "widget")
+				widget = process_widget_element (e, parent_widget, panel);
+
+			// If it's a widget, add it to layout:
+			if (widget)
+			{
+				if (box_layout)
+					box_layout->addWidget (widget, stretch);
+				else if (stacked_layout)
 				{
-					if (box_layout)
-					{
-						box_layout->addWidget (module_widget);
-						box_layout->setStretchFactor (module_widget, stretch);
-					}
-					else if (stacked_layout)
-					{
-						stacked_layout->addWidget (module_widget);
-						stacked_layout->setCurrentWidget (module_widget);
-					}
+					stacked_layout->addWidget (widget);
+					stacked_layout->setCurrentWidget (widget);
 				}
 			}
 		}
@@ -247,7 +410,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 		else if (stacked_layout)
 		{
 			// Empty widget:
-			QWidget* empty_widget = new QWidget (instruments_panel);
+			QWidget* empty_widget = new QWidget (parent_widget);
 			empty_widget->setCursor (QCursor (Qt::CrossCursor));
 			stacked_layout->addWidget (empty_widget);
 			stacked_layout->setCurrentWidget (empty_widget);

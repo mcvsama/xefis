@@ -1,0 +1,320 @@
+<?xml version='1.0'?>
+<xefis-include>
+<!--
+bank angle limit
+
+eicas canc
+eicas recall
+
+master caution
+rth engage
+
+flap control (up, down)
+		 -->
+	<panel>
+		<layout type='horizontal' spacing='5'>
+			<stretch/>
+			<item>
+				<group label='PFD &amp; ND'>
+					<layout type='horizontal' spacing='20'>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='rotary-encoder' top-label='MINS' click-label='B/R' rotate-a-property='/panels/mcp/mins-a' rotate-b-property='/panels/mcp/mins-b' click-property='/panels/mcp/mins-mode'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='APPR' click-property='/panels/mcp/appr' led-property='/settings/efis/approach-reference-visible' led-color='green'/>
+								</item>
+								<item>
+									<widget type='button' top-label='FD' click-property='/panels/mcp/fd' led-property='/settings/efis/flight-director-visible' led-color='green'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='STICK' click-property='/panels/mcp/stick' led-property='/settings/efis/stick-visible' led-color='green'/>
+								</item>
+								<item>
+									<widget type='button' top-label='FPV' click-property='/panels/mcp/fpv' led-property='/settings/efis/fpv-visible' led-color='green'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='rotary-encoder' top-label='ALTM' click-label='hPa' rotate-a-property='/panels/mcp/qnh-a' rotate-b-property='/panels/mcp/qnh-b' click-property='/panels/mcp/qnh-hpa'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='STD' click-property='/panels/mcp/std' led-property='/settings/pressure/use-std'/>
+								</item>
+								<item>
+									<widget type='button' top-label='METRIC' click-property='/panels/mcp/metric' led-property='/settings/efis/show-metric' led-color='green'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='rotary-encoder' top-label='RANGE' click-label='CTR' rotate-a-property='/panels/mcp/range-a' rotate-b-property='/panels/mcp/range-b' click-property='/panels/mcp/range-ctr'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='HDG/TRK' click-property='/panels/mcp/hdg-trk'/>
+								</item>
+								<item>
+									<widget type='button' top-label='MAG/TRU' click-property='/panels/mcp/mag-tru'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='COURSE'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/panels/mcp/display/course'/>
+						</item>
+						<item>
+							<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' rotate-a-property='/panels/mcp/course-a' rotate-b-property='/panels/mcp/course-b' click-property='/panels/mcp/course-hide'/>
+						</item>
+						<stretch/>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='FBW'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='button' top-label='A/P' click-property='/panels/mcp/ap' led-property='/panels/mcp/ap' led-color='amber'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='PROT' click-property='/panels/mcp/prot' led-property='/panels/mcp/prot' led-color='amber'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='ATT✶' click-property='/panels/mcp/att' led-property='/panels/mcp/att' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='button' top-label='A/T' click-property='/panels/mcp/at' led-property='/panels/mcp/at' led-color='amber'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='TAC' click-property='/panels/mcp/tac' led-property='/panels/mcp/tac' led-color='amber'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='C/T✶' click-property='/panels/mcp/ct' led-property='/panels/mcp/ct' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='SPEED'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='numeric-display' digits='4' value-property='/panels/mcp/display/speed'/>
+						</item>
+						<item>
+							<widget type='rotary-encoder' top-label='IAS • MACH' rotate-a-property='/panels/mcp/speed-a' rotate-b-property='/panels/mcp/speed-b' click-property='/panels/mcp/speed-ias-mach'/>
+						</item>
+						<stretch/>
+						<item>
+							<layout type='horizontal' spacing='10'>
+								<item>
+									<widget type='button' top-label='SPD SEL' click-property='/panels/mcp/speed-sel' led-property='/panels/mcp/led/speed-sel' led-color='amber'/>
+								</item>
+								<item>
+									<widget type='button' top-label='HOLD' click-property='/panels/mcp/speed-hold' led-property='/panels/mcp/led/speed-hold' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='HEADING'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/panels/mcp/display/heading'/>
+						</item>
+						<item>
+							<widget type='rotary-encoder' top-label='HDG • TRK' rotate-a-property='/panels/mcp/heading-a' rotate-b-property='/panels/mcp/heading-b' click-property='/panels/mcp/heading-hdg-trk'/>
+						</item>
+						<stretch/>
+						<item>
+							<layout type='horizontal' spacing='10'>
+								<item>
+									<widget type='button' top-label='HDG SEL' click-property='/panels/mcp/heading-sel' led-property='/panels/mcp/led/heading-sel' led-color='amber'/>
+								</item>
+								<item>
+									<widget type='button' top-label='HOLD' click-property='/panels/mcp/heading-hold' led-property='/panels/mcp/led/heading-hold' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='button' top-label='VNAV' click-property='/panels/mcp/vnav' led-property='/panels/mcp/led/vnav' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='LNAV' click-property='/panels/mcp/lnav' led-property='/panels/mcp/led/lnav' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='APP' click-property='/panels/mcp/app' led-property='/panels/mcp/app' led-color='amber'/>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='ALTITUDE'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='numeric-display' digits='5' value-property='/panels/mcp/display/altitude'/>
+						</item>
+						<item>
+							<widget type='rotary-encoder' top-label='10 • 100' rotate-a-property='/panels/mcp/altitude-a' rotate-b-property='/panels/mcp/altitude-b' click-property='/panels/mcp/altitude-stepch'/>
+						</item>
+						<stretch/>
+						<item>
+							<layout type='horizontal' spacing='10'>
+								<item>
+									<widget type='button' top-label='FLCH' click-property='/panels/mcp/altitude-flch' led-property='/panels/mcp/led/altitude-flch' led-color='amber'/>
+								</item>
+								<item>
+									<widget type='button' top-label='HOLD' click-property='/panels/mcp/altitude-hold' led-property='/panels/mcp/led/altitude-hold' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='VERTICAL SPEED'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='numeric-display' digits='5' value-property='/panels/mcp/display/vertical-speed'/>
+						</item>
+						<item>
+							<widget type='rotary-encoder' top-label='V/S • FPA' rotate-a-property='/panels/mcp/vspd-a' rotate-b-property='/panels/mcp/vspd-b' click-property='/panels/mcp/vspd-vs-fpa'/>
+						</item>
+						<stretch/>
+						<item>
+							<layout type='horizontal' spacing='10'>
+								<item>
+									<widget type='button' top-label='VS/FPA' click-property='/panels/mcp/vspd-sel' led-property='/panels/mcp/vspd-sel' led-color='amber'/>
+								</item>
+								<item>
+									<widget type='button' top-label='CLB/CON' click-property='/panels/mcp/vspd-clb-con' led-property='/panels/mcp/vspd-clb-con' led-color='amber'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='GPWS'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='button' top-label='FLAP INH.' click-property='/panels/mcp/gpws-flap-inh' led-property='/panels/mcp/gpws-flap-inh' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='GEAR INH.' click-property='/panels/mcp/gpws-gear-inh' led-property='/panels/mcp/gpws-gear-inh' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='TERR INH.' click-property='/panels/mcp/gpws-terr-inh' led-property='/panels/mcp/gpws-terr-inh' led-color='amber'/>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='LIGHTS'>
+					<layout type='vertical' spacing='10'>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='STROBE' click-property='/panels/mcp/lights-strobe' led-property='/settings/lights/strobe' led-color='green'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='POS' click-property='/panels/mcp/lights-pos' led-property='/settings/lights/position' led-color='green'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='LAND' click-property='/panels/mcp/lights-ldg' led-property='/settings/lights/landing' led-color='green'/>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='EICAS'>
+					<layout type='vertical' spacing='10'>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='CANCEL' click-property='/panels/mcp/eicas-cancel'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='RECALL' click-property='/panels/mcp/eicas-recall'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='【OK】' click-property='/panels/mcp/eicas-ok'/>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<layout type='vertical' spacing='5'>
+					<item>
+						<widget type='button' top-label='EICAS' click-property='/panels/mcp/show-eicas'/>
+					</item>
+					<item>
+						<widget type='button' top-label='ND' click-property='/panels/mcp/show-nd'/>
+					</item>
+					<item>
+						<widget type='button' top-label='CHKL' click-property='/panels/mcp/show-chklst'/>
+					</item>
+					<stretch/>
+				</layout>
+			</item>
+			<stretch/>
+		</layout>
+	</panel>
+</xefis-include>
+

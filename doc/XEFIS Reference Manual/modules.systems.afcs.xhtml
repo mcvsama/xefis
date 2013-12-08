@@ -1,0 +1,142 @@
+<?xml version='1.0'?>
+<?xml-stylesheet type='application/xslt+xml' href='stylesheets/html.xsl'?>
+<doc:module xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
+	<doc:meta>
+		<doc:title>AFCS - Automated Flight Control System</doc:title>
+		<doc:name>systems/afcs</doc:name>
+	</doc:meta>
+	<section>
+		<h1>Glossary</h1>
+		<p>FMC is Flight Management Computer.</p>
+		<p>MCP is Main Control Panel.</p>
+	</section>
+	<section>
+		<h1>Speed modes</h1>
+		<table>
+			<tr>
+				<th scope='col'>Mode on FMA</th>
+				<th scope='col'>Controls</th>
+				<th scope='col'>Meaning</th>
+			</tr>
+			<tr>
+				<td>TO/GA</td>
+				<td>thrust</td>
+				<td>Use maximum temporary thrust available.</td>
+			</tr>
+			<tr>
+				<td>N1</td>
+				<td>thrust</td>
+				<td>Maintain maximum continuous thrust, configured in FMC.</td>
+			</tr>
+			<tr>
+				<td>FMC SPD</td>
+				<td>speed</td>
+				<td>Maintain normal cruise speed, set in FMC.</td>
+			</tr>
+			<tr>
+				<td>MCP SPD</td>
+				<td>speed</td>
+				<td>Maintain speed selected on MCP panel.</td>
+			</tr>
+			<tr>
+				<td>SPD HOLD</td>
+				<td>speed</td>
+				<td>Maintain speed present at the moment the HOLD mode was engaged.</td>
+			</tr>
+			<tr>
+				<td>FMC DESC</td>
+				<td>speed</td>
+				<td>Maintain speed for descend, configured in FMC.</td>
+			</tr>
+			<tr>
+				<td>IDLE</td>
+				<td>thrust</td>
+				<td>Maintain minimum thrust.</td>
+			</tr>
+		</table>
+	</section>
+	<section>
+		<h1>Lateral modes</h1>
+		<table>
+			<tr>
+				<th scope='col'>Mode on FMA</th>
+				<th scope='col'>Controls</th>
+				<th scope='col'>Meaning</th>
+			</tr>
+		</table>
+	</section>
+	<section>
+		<h1>Vertical modes</h1>
+		<table>
+			<tr>
+				<th scope='col'>Mode on FMA</th>
+				<th scope='col'>Controls</th>
+				<th scope='col'>Meaning</th>
+			</tr>
+			<tr>
+				<td>LVL CHG</td>
+			</tr>
+			<tr>
+				<td>VNAV PTH</td>
+			</tr>
+			<tr>
+				<td>VNAV ALT</td>
+			</tr>
+			<tr>
+				<td>VNAV SPD</td>
+			</tr>
+			<tr>
+				<td>ALT HOLD</td>
+			</tr>
+		</table>
+		<p>Buttons</p>
+		<table>
+			<tr>
+				<th scope='col'>Button</th>
+				<th scope='col'>FMA message</th>
+				<th scope='col'>Description</th>
+			</tr>
+			<tr>
+				<td>CLB/CON</td>
+				<td>N1 (speed),<br/>CLB/CON (vertical)</td>
+				<td>
+					<p>Set thrust to N1, maintain vertical speed with pitch. Default vertical speed is configured in FMC.</p>
+					<p>Disengages when vertical speed on MCP is set to or below 0 fpm.</p>
+				</td>
+			</tr>
+			<tr>
+				<td>V/S HOLD</td>
+				<td>
+					V/S
+				</td>
+				<td>
+					<p>Maintain current vertical speed with pitch.</p>
+					<p>MCP counter is set to current vertical speed.</p>
+					<p>If FLCH mode was engaged when the button was pressed,
+						this mode will disengage when selected altitude is reached.</p>
+					<p>When vertical speed is set to 0 on the counter, the mode disengages. If FLCH
+						was engaged when counter was set to 0, FLCH mode also disengages and altitude
+						mode is set to ALT HOLD.</p>
+				</td>
+			</tr>
+			<tr>
+				<td>VS/FPA</td>
+				<td>VS or FPA</td>
+				<td>
+					<p>Climb or descend with VS or FPA selected on the counter.</p>
+					<p>Disabling this mode by pressing the button will:</p>
+					<ul>
+						<li>enable ALT HOLD mode at current altitude, if FLCH mode was not engaged previously</li>
+						<li>continue in LVL CHG mode with default vertical speed</li>
+					</ul>
+					<p>If FLCH mode was engaged when the button was pressed:</p>
+					<ul>
+						<li>if VS or FPA is set to 0 or in the opposite direction than the commanded altitude,
+						FLCH mode will disengage.</li>
+						<li>when altitude selected on ALTITUDE counter is reached, this mode will be deactivated.</li>
+					</ul>
+				</td>
+			</tr>
+		</table>
+	</section>
+</doc:module>
