@@ -2,7 +2,7 @@
 <xefis-include>
 	<layout type='vertical'>
 		<item stretch-factor='8'>
-			<module name='instruments/efis'>
+			<instrument name='instruments/efis'>
 				<settings>
 					<setting name='speed-ladder.line-every' value='10'/>
 					<setting name='speed-ladder.number-every' value='20'/>
@@ -48,24 +48,24 @@
 					<property name='vertical-speed.serviceable' path='/systems/adc/vertical-speed/serviceable'/>
 					<property name='vertical-speed' path='/systems/adc/vertical-speed/speed'/>
 					<property name='vertical-speed.variometer' path='/systems/pc/total-energy-variometer'/>
-					<property name='pressure.qnh' path='/settings/pressure/qnh' default='30.29 inHg'/>
-					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa' default='true'/>
-					<property name='pressure.use-std' path='/settings/pressure/use-std' default='false'/>
+					<property name='pressure.qnh' path='/settings/pressure/qnh'/>
+					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa'/>
+					<property name='pressure.use-std' path='/settings/pressure/use-std'/>
 					<property name='flight-director.serviceable' path='/systems/flight-director/serviceable'/>
-					<property name='flight-director.cmd.visible' path='/settings/flight-director/cmd/visible'/>
+					<property name='flight-director.cmd.visible' path='/settings/flight-director/cmd/visible' default='true'/>
 					<property name='flight-director.cmd.ias' path='/settings/flight-director/cmd/ias'/>
 					<property name='flight-director.cmd.altitude' path='/settings/flight-director/cmd/altitude'/>
 					<property name='flight-director.cmd.altitude.acquired' path='/systems/flight-director/altitude-acquired'/>
 					<property name='flight-director.cmd.vertical-speed' path='/settings/flight-director/cmd/vertical-speed'/>
-					<property name='flight-director.guidance.visible' path='/settings/flight-director/guidance/visible'/>
+					<property name='flight-director.guidance.visible' path='/settings/efis/flight-director-visible'/>
 					<property name='flight-director.guidance.pitch' path='/systems/flight-director/guidance/pitch'/>
 					<property name='flight-director.guidance.roll' path='/systems/flight-director/guidance/roll'/>
-					<property name='control-stick.visible' path='/settings/control-stick-visible'/>
+					<property name='control-stick.visible' path='/settings/efis/control-stick-visible'/>
 					<property name='control-stick.pitch' path='/systems/fly-by-wire/stick/pitch'/>
 					<property name='control-stick.roll' path='/systems/fly-by-wire/stick/roll'/>
 					<directory path='//efis'>
 						<directory path='/approach'>
-							<property name='approach.reference-visible' path='/reference-visible' default='true'/>
+							<property name='approach.reference-visible' path='//settings/efis/approach-reference-visible'/>
 							<property name='approach.type-hint' path='/type-hint' default='ILS'/>
 							<property name='approach.localizer-id' path='/identifier-id' default='RSV'/>
 							<property name='approach.dme-distance' path='/dme-distance' default='5.4 nm'/>
@@ -84,7 +84,7 @@
 					</directory>
 					<property name='flight-mode.hint.visible' path='/settings/flight-mode/visible'/>
 					<property name='flight-mode.hint' path='/settings/flight-mode/hint'/>
-					<property name='flight-mode.fma.visible' path='/settings/fma/visible'/>
+					<property name='flight-mode.fma.visible' path='/settings/fma/visible' default='true'/>
 					<property name='flight-mode.fma.speed-hint' path='/settings/fma/speed-hint'/>
 					<property name='flight-mode.fma.speed-small-hint' path='/settings/fma/speed-small-hint'/>
 					<property name='flight-mode.fma.lateral-hint' path='/settings/fma/lateral-hint'/>
@@ -106,22 +106,22 @@
 					<property name='style.old' path='/settings/efis/old-style'/>
 					<property name='style.show-metric' path='/settings/efis/show-metric'/>
 				</properties>
-			</module>
+			</instrument>
 		</item>
 		<item stretch-factor='5'>
-			<module name='instruments/hsi' instance='aux'>
+			<instrument name='instruments/hsi' instance='aux'>
 				<properties>
-					<property name='display-mode' path='/settings/hsi-aux/display-mode' default='2'/>
-					<property name='range' path='/settings/hsi-aux/range'/>
-					<property name='trend-vector-range' path='/settings/hsi-aux/trend-vector-range'/>
-					<property name='track.center-on-track' path='/settings/hsi-aux/center-on-track'/>
-					<property name='track.visible' path='/settings/hsi-aux/track-visible'/>
-					<property name='cmd.visible' path='/settings/hsi-aux/cmd/visible'/>
+					<property name='display-mode' path='/settings/hsi/display-mode/aux' default='2'/>
+					<property name='range' path='/settings/hsi/range'/>
+					<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
+					<property name='track.center-on-track' path='/settings/hsi/center-on-track'/>
+					<property name='track.visible' path='/settings/hsi/track-visible'/>
+					<property name='cmd.visible' path='/settings/flight-director/cmd/visible'/>
 					<property name='cmd.heading' path='/settings/flight-director/cmd/magnetic-heading-track'/>
-					<property name='cmd.track-visible' path='/settings/hsi-aux/cmd/track-visible'/>
+					<property name='cmd.track-visible' path='/settings/efis/flight-director-visible'/>
 					<property name='altitude.target.reach-distance' path='/systems/altacq/distance'/>
-					<property name='orientation.display-true-heading' path='/settings/hsi-aux/display-true-heading'/>
-					<property name='localizer-id' path='/settings/hsi-aux/localizer-id'/>
+					<property name='orientation.display-true-heading' path='/settings/hsi/display-true-heading'/>
+					<property name='localizer-id' path='/settings/hsi/localizer-id'/>
 					<property name='speed.gs' path='/systems/nc/track/ground-speed'/>
 					<property name='speed.tas' path='/systems/adc/speed/tas'/>
 					<property name='orientation.heading.magnetic' path='/systems/nc/orientation/heading/magnetic'/>
@@ -139,7 +139,7 @@
 					<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
 					<property name='glide-ratio' path='/systems/pc/glide-ratio'/>
 				</properties>
-			</module>
+			</instrument>
 		</item>
 	</layout>
 </xefis-include>

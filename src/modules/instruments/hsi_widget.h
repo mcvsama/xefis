@@ -141,7 +141,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle			track_true					= 0_deg; // Computed.
 		Angle			track						= 0_deg; // Mag or true, depending on heading mode.
 		Angle			rotation					= 0_deg;
-		QDateTime		positioning_hint_ts;
+		QDateTime		positioning_hint_ts			= QDateTime::fromTime_t (0);
 	};
 
 	class PaintWorkUnit:

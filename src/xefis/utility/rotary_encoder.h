@@ -29,13 +29,12 @@ namespace Xefis {
  * Takes two boolean properties and
  * calls 'up' or 'down' callbacks depending
  * on how these boolean values change.
+ * TODO RENAME TO RotaryDecoder
  */
 class RotaryEncoder
 {
   public:
-	enum Direction { Up, Down };
-
-	typedef std::function<void (Direction)> Callback;
+	typedef std::function<void (int delta)> Callback;
 
   public:
 	// Ctor:
@@ -48,6 +47,18 @@ class RotaryEncoder
 	void
 	data_updated();
 
+	/**
+	 * Force callback to be called with given delta value.
+	 */
+	void
+	operator() (int delta);
+
+	/**
+	 * Alias for operator().
+	 */
+	void
+	call (int delta);
+
   private:
 	bool					_prev_a;
 	bool					_prev_b;
@@ -55,6 +66,20 @@ class RotaryEncoder
 	Xefis::PropertyBoolean&	_property_b;
 	Callback				_callback;
 };
+
+
+inline void
+RotaryEncoder::operator() (int delta)
+{
+	_callback (delta);
+}
+
+
+inline void
+RotaryEncoder::call (int delta)
+{
+	_callback (delta);
+}
 
 } // namespace Xefis
 

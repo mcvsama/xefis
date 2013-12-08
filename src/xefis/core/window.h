@@ -24,6 +24,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStackedLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtXml/QDomElement>
 
 // Xefis:
@@ -34,6 +35,7 @@
 
 namespace Xefis {
 
+class Panel;
 class ConfigReader;
 
 class Window: public QWidget
@@ -71,11 +73,23 @@ class Window: public QWidget
 	font_scale() const;
 
   private:
+	void
+	process_window_element (QDomElement const& window_element);
+
+	Panel*
+	process_panel_element (QDomElement const& panel_element, QWidget* parent_widget);
+
+	QGroupBox*
+	process_group_element (QDomElement const& group_element, QWidget* parent_widget, Panel* panel);
+
+	QWidget*
+	process_widget_element (QDomElement const& widget_element, QWidget* parent_widget, Panel* panel);
+
 	QLayout*
-	process_layout_element (QDomElement const& layout_element, QWidget* instruments_panel);
+	process_layout_element (QDomElement const& layout_element, QWidget* parent_widget, Panel* panel);
 
 	void
-	process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* instruments_panel, Shared<Stack> stack);
+	process_item_element (QDomElement const& item_element, QLayout* layout, QWidget* parent_widget, Panel* panel, Shared<Stack> stack);
 
 	void
 	configurator_taken();

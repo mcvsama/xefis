@@ -35,6 +35,7 @@ namespace Xefis {
 signed int					Services::_detected_cores = -1;
 Unique<CallOutDispatcher>	Services::_call_out_dispatcher;
 QFont						Services::_instrument_font ("sans");
+QFont						Services::_panel_font ("sans");
 
 
 void
@@ -65,8 +66,13 @@ Services::initialize()
 	_instrument_font = QFont ("Crystal");
 	_instrument_font.setBold (false);
 	_instrument_font.setStretch (110);
-
 	_instrument_font.setHintingPreference (QFont::PreferFullHinting);
+
+	_panel_font = QFont ("Century Gothic");
+	_panel_font.setBold (false);
+	_panel_font.setStretch (110);
+	_panel_font.setHintingPreference (QFont::PreferFullHinting);
+	_panel_font.setPixelSize (11.0);
 }
 
 

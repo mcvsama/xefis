@@ -1768,9 +1768,9 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 
 	// 11000 part of the altitude setting:
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
-	QString minus_sign_s = cmd_altitude < 0_ft ? MINUS_SIGN : "";
+	QString minus_sign_s = cmd_altitude < -0.5_ft ? MINUS_SIGN : "";
 	painter.fast_draw_text (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-							minus_sign_s + QString::number (std::abs (static_cast<int> (cmd_altitude / 1000_ft))));
+							minus_sign_s + QString::number (std::abs (Xefis::symmetric_round (cmd_altitude.ft()) / 1000)));
 
 	painter.setFont (s_font);
 
@@ -1981,12 +1981,13 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 	QFontMetricsF metrics_a (font_a);
 	QFontMetricsF metrics_b (font_b);
 
-	QString baro_str = _params.minimums_type;
+	QString mins_str = _params.minimums_type;
 	QString alt_str = QString ("%1").arg (_params.minimums_setting.ft(), 0, 'f', 0);
 
-	QRectF baro_rect (x, 1.8f * x, metrics_a.width (baro_str), metrics_a.height());
+	QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.width (mins_str), metrics_a.height());
+	mins_rect.moveRight (mins_rect.left());
 	QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
-	alt_rect.moveTopRight (baro_rect.bottomRight());
+	alt_rect.moveTopRight (mins_rect.bottomRight());
 
 	QPen minimums_pen = get_pen (get_minimums_color(), 1.f);
 
@@ -1994,7 +1995,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 	{
 		painter.setPen (minimums_pen);
 		painter.setFont (font_a);
-		painter.fast_draw_text (baro_rect, Qt::AlignVCenter | Qt::AlignRight, baro_str);
+		painter.fast_draw_text (mins_rect, Qt::AlignVCenter | Qt::AlignRight, mins_str);
 		painter.setFont (font_b);
 		painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
 	}
@@ -2002,7 +2003,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (Xefis::Painter& painter)
 	if (is_newly_set (_locals.minimums_altitude_ts))
 	{
 		float v = 0.06f * _q;
-		QRectF frame = alt_rect.united (baro_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
+		QRectF frame = alt_rect.united (mins_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
 		painter.setPen (minimums_pen);
 		painter.setBrush (Qt::NoBrush);
 		painter.add_shadow ([&]() {
@@ -2297,19 +2298,19 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QPointF a_small (0.f, 0.01f * _q);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));
-		if (_params.fma_speed_hint != "" && is_newly_set (_locals.fma_speed_ts))
+		if (is_newly_set (_locals.fma_speed_ts))
 			paint_big_rect (b1);
-		if (_params.fma_lateral_hint != "" && is_newly_set (_locals.fma_lateral_ts))
+		if (is_newly_set (_locals.fma_lateral_ts))
 			paint_big_rect (b2);
-		if (_params.fma_vertical_hint != "" && is_newly_set (_locals.fma_vertical_ts))
+		if (is_newly_set (_locals.fma_vertical_ts))
 			paint_big_rect (b3);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		if (_params.fma_speed_small_hint != "" && is_newly_set (_locals.fma_speed_small_ts))
+		if (is_newly_set (_locals.fma_speed_small_ts))
 			paint_small_rect (s1);
-		if (_params.fma_lateral_small_hint != "" && is_newly_set (_locals.fma_lateral_small_ts))
+		if (is_newly_set (_locals.fma_lateral_small_ts))
 			paint_small_rect (s2);
-		if (_params.fma_vertical_small_hint != "" && is_newly_set (_locals.fma_vertical_small_ts))
+		if (is_newly_set (_locals.fma_vertical_small_ts))
 			paint_small_rect (s3);
 
 		painter.setPen (get_pen (_navigation_color, 1.0f));

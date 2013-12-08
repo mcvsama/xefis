@@ -216,15 +216,15 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool					speed_blinking_active				= false;
 		bool					minimums_blink						= false;
 		bool					minimums_blinking_active			= false;
-		QDateTime				altitude_agl_ts;
-		QDateTime				minimums_altitude_ts;
-		QDateTime				control_hint_ts;
-		QDateTime				fma_speed_ts;
-		QDateTime				fma_speed_small_ts;
-		QDateTime				fma_lateral_ts;
-		QDateTime				fma_lateral_small_ts;
-		QDateTime				fma_vertical_ts;
-		QDateTime				fma_vertical_small_ts;
+		QDateTime				altitude_agl_ts						= QDateTime::fromTime_t (0);
+		QDateTime				minimums_altitude_ts				= QDateTime::fromTime_t (0);
+		QDateTime				control_hint_ts						= QDateTime::fromTime_t (0);
+		QDateTime				fma_speed_ts						= QDateTime::fromTime_t (0);
+		QDateTime				fma_speed_small_ts					= QDateTime::fromTime_t (0);
+		QDateTime				fma_lateral_ts						= QDateTime::fromTime_t (0);
+		QDateTime				fma_lateral_small_ts				= QDateTime::fromTime_t (0);
+		QDateTime				fma_vertical_ts						= QDateTime::fromTime_t (0);
+		QDateTime				fma_vertical_small_ts				= QDateTime::fromTime_t (0);
 	};
 
 	class PaintWorkUnit:

@@ -5,7 +5,7 @@
 		<item stretch-factor='18'>
 			<layout type='vertical'>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-L-RPM'>
+					<instrument name='instruments/radial-indicator' instance='engine-L-RPM'>
 						<settings>
 							<setting name='value.modulo' value='10'/>
 							<setting name='value.minimum' value='0'/>
@@ -17,10 +17,10 @@
 							<property name='value' path='/rpm'/>
 							<property name='value.normal' path='/rpm.cruise' default='2300'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-L-AMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-L-AMP'>
 						<settings>
 							<setting name='value.precision' value='1'/>
 							<setting name='value.minimum' value='0'/>
@@ -31,10 +31,10 @@
 						<properties path='//sensors/engines/left'>
 							<property name='value' path='/amps'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-L-TEMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-L-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
 							<setting name='value.maximum' value='150'/>
@@ -44,10 +44,10 @@
 						<properties path='//sensors/engines/left'>
 							<property name='value' path='/temperature'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/linear-indicator' instance='engine-L-VOLT'>
+					<instrument name='instruments/linear-indicator' instance='engine-L-VOLT'>
 						<settings>
 							<setting name='value.minimum' value='10.0'/>
 							<setting name='value.maximum' value='13.0'/>
@@ -58,11 +58,11 @@
 						<properties path='//sensors/engines/left'>
 							<property name='value' path='/esc.voltage' default='10.1'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='1'/>
 				<item stretch-factor='7'>
-					<module name='instruments/linear-indicator' instance='engine-L-ESC-TEMP'>
+					<instrument name='instruments/linear-indicator' instance='engine-L-ESC-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0.0'/>
 							<setting name='value.maximum' value='150.0'/>
@@ -73,7 +73,7 @@
 						<properties path='//sensors/engines/left'>
 							<property name='value' path='/esc.temperature' default='74'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='17'/>
 			</layout>
@@ -81,46 +81,46 @@
 		<item stretch-factor='4'>
 			<layout type='vertical'>
 				<item stretch-factor='9'>
-					<module name='instruments/label' instance='engine-RPM'>
+					<instrument name='instruments/label' instance='engine-RPM'>
 						<label>RPM</label>
 						<align>hcenter bottom</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/label' instance='engine-AMP'>
+					<instrument name='instruments/label' instance='engine-AMP'>
 						<label>AMP</label>
 						<align>hcenter bottom</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/label' instance='engine-TEMP'>
+					<instrument name='instruments/label' instance='engine-TEMP'>
 						<label>TEMP</label>
 						<align>hcenter bottom</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='1'/>
 				<item stretch-factor='10'>
-					<module name='instruments/label' instance='engine-ESC-VOLT'>
+					<instrument name='instruments/label' instance='engine-ESC-VOLT'>
 						<label>VOLT</label>
 						<align>hcenter vcenter</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='1'/>
 				<item stretch-factor='7'>
-					<module name='instruments/label' instance='engine-ESC-TEMP'>
+					<instrument name='instruments/label' instance='engine-ESC-TEMP'>
 						<label>ESCT</label>
 						<align>hcenter vcenter</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='17'/>
 			</layout>
@@ -128,7 +128,7 @@
 		<item stretch-factor='18'>
 			<layout type='vertical'>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-R-RPM'>
+					<instrument name='instruments/radial-indicator' instance='engine-R-RPM'>
 						<settings>
 							<setting name='value.modulo' value='10'/>
 							<setting name='value.minimum' value='0'/>
@@ -140,10 +140,10 @@
 							<property name='value' path='/rpm'/>
 							<property name='value.normal' path='/rpm.cruise' default='2300'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-R-AMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-R-AMP'>
 						<settings>
 							<setting name='value.precision' value='1'/>
 							<setting name='value.minimum' value='0'/>
@@ -154,10 +154,10 @@
 						<properties path='//sensors/engines/right'>
 							<property name='value' path='/amps'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/radial-indicator' instance='engine-R-TEMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-R-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
 							<setting name='value.maximum' value='150'/>
@@ -167,10 +167,10 @@
 						<properties path='//sensors/engines/right'>
 							<property name='value' path='/temperature'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<module name='instruments/linear-indicator' instance='engine-R-VOLT'>
+					<instrument name='instruments/linear-indicator' instance='engine-R-VOLT'>
 						<settings>
 							<setting name='value.minimum' value='10.0'/>
 							<setting name='value.maximum' value='13.0'/>
@@ -181,11 +181,11 @@
 						<properties path='//sensors/engines/right'>
 							<property name='value' path='/esc.voltage' default='9.8'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='1'/>
 				<item stretch-factor='7'>
-					<module name='instruments/linear-indicator' instance='engine-R-ESC-TEMP'>
+					<instrument name='instruments/linear-indicator' instance='engine-R-ESC-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0.0'/>
 							<setting name='value.maximum' value='150.0'/>
@@ -196,7 +196,7 @@
 						<properties path='//sensors/engines/right'>
 							<property name='value' path='/esc.temperature' default='72'/>
 						</properties>
-					</module>
+					</instrument>
 				</item>
 				<item stretch-factor='17'/>
 			</layout>
