@@ -30,6 +30,10 @@
 
 namespace Xefis {
 
+constexpr QSize	PanelRotaryEncoder::KnobSize;
+constexpr int	PanelRotaryEncoder::Notches;
+
+
 PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label, PropertyBoolean rotate_a, PropertyBoolean rotate_b):
 	PanelRotaryEncoder (parent, panel, knob_label, rotate_a, rotate_b, PropertyBoolean())
 { }

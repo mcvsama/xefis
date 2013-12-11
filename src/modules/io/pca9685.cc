@@ -32,6 +32,11 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/pca9685", PCA9685);
 
 
+constexpr Time			PCA9685::InitializationDelay;
+constexpr unsigned int	PCA9685::Channels;
+constexpr Frequency		PCA9685::InternalFrequency;
+
+
 Time
 PCA9685::Channel::compute_duty_cycle()
 {

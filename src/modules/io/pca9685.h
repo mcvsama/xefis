@@ -35,9 +35,9 @@ class PCA9685:
 {
 	Q_OBJECT
 
-	static constexpr Time InitializationDelay		= 0.1_s;
-	static constexpr unsigned int Channels			= 16;
-	static constexpr Frequency InternalFrequency	= 25_MHz;
+	static constexpr Time			InitializationDelay	= 0.1_s;
+	static constexpr unsigned int	Channels			= 16;
+	static constexpr Frequency		InternalFrequency	= 25_MHz;
 
 	enum Register: uint8_t
 	{

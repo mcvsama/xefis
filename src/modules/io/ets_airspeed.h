@@ -37,12 +37,12 @@ class ETSAirspeed:
 {
 	Q_OBJECT
 
-	static constexpr uint8_t ValueRegister					= 0xea;
-	static constexpr float ValueScale						= 1.8f;
-	static constexpr Time InitializationDelay				= 0.2_s;
-	static constexpr unsigned int OffsetCalculationSamples	= 100;
-	static constexpr uint16_t RawValueMinimum				= 1450;
-	static constexpr uint16_t RawValueMaximum				= 1750;
+	static constexpr uint8_t		ValueRegister				= 0xea;
+	static constexpr float			ValueScale					= 1.8f;
+	static constexpr Time			InitializationDelay			= 0.2_s;
+	static constexpr unsigned int	OffsetCalculationSamples	= 100;
+	static constexpr uint16_t		RawValueMinimum				= 1450;
+	static constexpr uint16_t		RawValueMaximum				= 1750;
 
 	enum class Stage {
 		Calibrating,

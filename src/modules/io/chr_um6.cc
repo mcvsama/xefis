@@ -41,6 +41,12 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/chr-um6", CHRUM6);
 
 
+constexpr Time	CHRUM6::RestartDelay;
+constexpr Time	CHRUM6::AliveCheckInterval;
+constexpr Time	CHRUM6::StatusCheckInterval;
+constexpr Time	CHRUM6::InitializationDelay;
+
+
 CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_serial_port (std::bind (&CHRUM6::serial_ready, this), std::bind (&CHRUM6::serial_failure, this)),

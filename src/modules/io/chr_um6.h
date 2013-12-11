@@ -44,10 +44,10 @@ class CHRUM6:
 {
 	Q_OBJECT
 
-	static constexpr Time RestartDelay			= 200_ms;
-	static constexpr Time AliveCheckInterval	= 500_ms;
-	static constexpr Time StatusCheckInterval	= 200_ms;
-	static constexpr Time InitializationDelay	= 3_s;
+	static constexpr Time	RestartDelay			= 200_ms;
+	static constexpr Time	AliveCheckInterval		= 500_ms;
+	static constexpr Time	StatusCheckInterval		= 200_ms;
+	static constexpr Time	InitializationDelay		= 3_s;
 
 	// Register write or read?
 	enum class Operation

@@ -29,6 +29,14 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/ets-airspeed", ETSAirspeed);
 
 
+constexpr uint8_t		ETSAirspeed::ValueRegister;
+constexpr float			ETSAirspeed::ValueScale;
+constexpr Time			ETSAirspeed::InitializationDelay;
+constexpr unsigned int	ETSAirspeed::OffsetCalculationSamples;
+constexpr uint16_t		ETSAirspeed::RawValueMinimum;
+constexpr uint16_t		ETSAirspeed::RawValueMaximum;
+
+
 ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
