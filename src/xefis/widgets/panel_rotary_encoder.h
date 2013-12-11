@@ -31,8 +31,8 @@ namespace Xefis {
 
 class PanelRotaryEncoder: public PanelWidget
 {
-	static constexpr QSize KnobSize	= { 40, 40 };
-	static constexpr int Notches	= 12;
+	static constexpr QSize	KnobSize	= { 40, 40 };
+	static constexpr int	Notches		= 12;
 
 	Q_OBJECT
 

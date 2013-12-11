@@ -40,23 +40,21 @@ class XBee:
 {
 	Q_OBJECT
 
-	static constexpr int MaxReadFailureCount		= 10;
-	static constexpr int MaxWriteFailureCount		= 10;
-	static constexpr size_t MaxOutputBufferSize		= 256;
+	static constexpr int		MaxReadFailureCount			= 10;
+	static constexpr int		MaxWriteFailureCount		= 10;
+	static constexpr size_t		MaxOutputBufferSize			= 256;
 
-	static constexpr uint8_t PacketDelimiter		= 0x7e;
-	static constexpr uint8_t PeriodicPingFrameID	= 0xfd;
-	static constexpr uint8_t ClearChannelFrameID	= 0xfe;
+	static constexpr uint8_t	PacketDelimiter				= 0x7e;
+	static constexpr uint8_t	PeriodicPingFrameID			= 0xfd;
+	static constexpr uint8_t	ClearChannelFrameID			= 0xfe;
 
-	static constexpr Time CommandTimeout			= 200_ms;
-	static constexpr Time RestartAfter				= 500_ms;
-	static constexpr Time PeriodicAliveCheck		= 500_ms;
-	static constexpr Time PeriodicAliveCheckTimeout	= 500_ms;
-	static constexpr Time ClearChannelCheck			= 2_s;
-	static constexpr Time AfterRestartGraceTime		= 500_ms;
-	static constexpr Time RSSITimeout				= 1_s;
-
-	static constexpr char EscapeChar				= '-';
+	static constexpr Time		CommandTimeout				= 200_ms;
+	static constexpr Time		RestartAfter				= 500_ms;
+	static constexpr Time		PeriodicAliveCheck			= 500_ms;
+	static constexpr Time		PeriodicAliveCheckTimeout	= 500_ms;
+	static constexpr Time		ClearChannelCheck			= 2_s;
+	static constexpr Time		AfterRestartGraceTime		= 500_ms;
+	static constexpr Time		RSSITimeout					= 1_s;
 
 	// Modem API frame types:
 	enum class SendAPI: uint8_t
