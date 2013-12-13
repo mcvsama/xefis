@@ -36,27 +36,19 @@ XEFIS_REGISTER_MODULE_CLASS ("io/udp", UDP);
 UDP::UDP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "send.host", _udp_send_host, false },
-				{ "send.port", _udp_send_port, false },
-				{ "send.interference", _send_interference, false },
-				{ "receive.host", _udp_receive_host, false },
-				{ "receive.port", _udp_receive_port, false },
-				{ "receive.interference", _receive_interference, false },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "send", _send, true },
-				{ "receive", _receive, true }
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "send.host", _udp_send_host, false },
+		{ "send.port", _udp_send_port, false },
+		{ "send.interference", _send_interference, false },
+		{ "receive.host", _udp_receive_host, false },
+		{ "receive.port", _udp_receive_port, false },
+		{ "receive.interference", _receive_interference, false },
+	});
+
+	parse_properties (config, {
+		{ "send", _send, true },
+		{ "receive", _receive, true }
+	});
 
 	if (has_setting ("send.host") && has_setting ("send.port"))
 	{

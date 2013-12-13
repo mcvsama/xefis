@@ -64,34 +64,26 @@ constexpr Time		XBee::RSSITimeout;
 XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "debug", _debug, false },
-				{ "device", _device_path, true },
-				{ "baud-rate", _baud_rate, true },
-				{ "channel", _channel, true },
-				{ "pan-id", _pan_id_string, true },
-				{ "local-address", _local_address_string, true },
-				{ "remote-address", _remote_address_string, true },
-				{ "power-level", _power_level, false },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "serviceable", _serviceable, true },
-				{ "send", _send, true },
-				{ "receive", _receive, true },
-				{ "input-errors", _input_errors, true },
-				{ "rssi-dbm", _rssi_dbm, true },
-				{ "failures", _failures, true },
-				{ "cca-failures", _cca_failures, false },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "debug", _debug, false },
+		{ "device", _device_path, true },
+		{ "baud-rate", _baud_rate, true },
+		{ "channel", _channel, true },
+		{ "pan-id", _pan_id_string, true },
+		{ "local-address", _local_address_string, true },
+		{ "remote-address", _remote_address_string, true },
+		{ "power-level", _power_level, false },
+	});
+
+	parse_properties (config, {
+		{ "serviceable", _serviceable, true },
+		{ "send", _send, true },
+		{ "receive", _receive, true },
+		{ "input-errors", _input_errors, true },
+		{ "rssi-dbm", _rssi_dbm, true },
+		{ "failures", _failures, true },
+		{ "cca-failures", _cca_failures, false },
+	});
 
 	_restart_timer = new QTimer (this);
 	_restart_timer->setInterval (RestartAfter.ms());

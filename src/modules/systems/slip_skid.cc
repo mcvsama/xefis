@@ -31,19 +31,13 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/slip-skid", SlipSkid);
 SlipSkid::SlipSkid (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "acceleration.y", _y_acceleration, true },
-				{ "acceleration.z", _z_acceleration, true },
-				// Output:
-				{ "slip-skid", _slip_skid, true },
-			});
-		}
-	}
+	parse_properties (config, {
+		// Input:
+		{ "acceleration.y", _y_acceleration, true },
+		{ "acceleration.z", _z_acceleration, true },
+		// Output:
+		{ "slip-skid", _slip_skid, true },
+	});
 
 	_slip_skid_computer.set_callback (std::bind (&SlipSkid::compute_slip_skid, this));
 	_slip_skid_computer.observe ({ &_y_acceleration, &_z_acceleration });

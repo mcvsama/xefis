@@ -41,30 +41,22 @@ LinearIndicator::LinearIndicator (Xefis::ModuleManager* module_manager, QDomElem
 	layout->setSpacing (0);
 	layout->addWidget (_widget);
 
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "style.mirrored", _style_mirrored, false },
-				{ "value.precision", _value_precision, false },
-				{ "value.modulo", _value_modulo, false },
-				{ "value.digits", _value_digits, false },
-				{ "value.minimum", _value_minimum, true },
-				{ "value.minimum.critical", _value_minimum_critical, false },
-				{ "value.minimum.warning", _value_minimum_warning, false },
-				{ "value.maximum.warning", _value_maximum_warning, false },
-				{ "value.maximum.critical", _value_maximum_critical, false },
-				{ "value.maximum", _value_maximum, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "value", _value, true },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "style.mirrored", _style_mirrored, false },
+		{ "value.precision", _value_precision, false },
+		{ "value.modulo", _value_modulo, false },
+		{ "value.digits", _value_digits, false },
+		{ "value.minimum", _value_minimum, true },
+		{ "value.minimum.critical", _value_minimum_critical, false },
+		{ "value.minimum.warning", _value_minimum_warning, false },
+		{ "value.maximum.warning", _value_maximum_warning, false },
+		{ "value.maximum.critical", _value_maximum_critical, false },
+		{ "value.maximum", _value_maximum, true },
+	});
+
+	parse_properties (config, {
+		{ "value", _value, true },
+	});
 }
 
 

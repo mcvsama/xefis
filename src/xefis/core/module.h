@@ -139,17 +139,19 @@ class Module: private Noncopyable
 	/**
 	 * Parse the <properties> element and initialize properties
 	 * by their names matching the <properties> children.
+	 * \param	element can be <properties> or parent of <properties> element.
 	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
-	parse_properties (QDomElement const& properties_element, ConfigReader::PropertiesParser::PropertiesList);
+	parse_properties (QDomElement const& element, ConfigReader::PropertiesParser::PropertiesList);
 
 	/**
 	 * Parse the <settings> element and initialize variables.
+	 * \param	element can be <settings> or parent of <settings> element.
 	 * \throw	Xefis::Exception if something's wrong.
 	 */
 	void
-	parse_settings (QDomElement const& settings_element, ConfigReader::SettingsParser::SettingsList);
+	parse_settings (QDomElement const& element, ConfigReader::SettingsParser::SettingsList);
 
 	/**
 	 * Return true if given setting has been found in configuration.

@@ -61,49 +61,45 @@ PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 	Xefis::I2C::Bus::ID i2c_bus;
 	Xefis::I2C::Address::ID i2c_address;
 
-	for (QDomElement& e: config)
+	// Settings:
+
+	typedef Xefis::ConfigReader::SettingsParser::SettingsList SettingsList;
+
+	SettingsList settings_list = {
+		{ "i2c.bus", i2c_bus, true },
+		{ "i2c.address", i2c_address, true },
+		{ "output-period", _output_period, false },
+	};
+
+	for (std::size_t i = 0; i < Channels; ++i)
 	{
-		if (e == "settings")
-		{
-			typedef Xefis::ConfigReader::SettingsParser::SettingsList SettingsList;
+		QString i_str  = QString ("%1").arg (i);
 
-			SettingsList settings_list = {
-				{ "i2c.bus", i2c_bus, true },
-				{ "i2c.address", i2c_address, true },
-				{ "output-period", _output_period, false },
-			};
-
-			for (std::size_t i = 0; i < Channels; ++i)
-			{
-				QString i_str  = QString ("%1").arg (i);
-
-				SettingsList channel_settings = {
-					{ "channel." + i_str + ".input.default", _channels[i].input_default, false },
-					{ "channel." + i_str + ".input.minimum", _channels[i].input_minimum, false },
-					{ "channel." + i_str + ".input.maximum", _channels[i].input_maximum, false },
-					{ "channel." + i_str + ".output.minimum", _channels[i].output_minimum, false },
-					{ "channel." + i_str + ".output.maximum", _channels[i].output_maximum, false },
-					{ "channel." + i_str + ".fallback-to-last-valid", _channels[i].fallback_to_last_valid, false },
-					{ "channel." + i_str + ".smoothing", _channels[i].smoothing_time, false },
-				};
-				settings_list.insert (settings_list.end(), channel_settings.begin(), channel_settings.end());
-			}
-
-			parse_settings (e, settings_list);
-		}
-		else if (e == "properties")
-		{
-			Xefis::ConfigReader::PropertiesParser::PropertiesList properties_list;
-
-			for (std::size_t i = 0; i < Channels; ++i)
-			{
-				QString i_str  = QString ("%1").arg (i);
-				properties_list.emplace_back ("channel." + i_str, _channels[i].input, false);
-			}
-
-			parse_properties (e, properties_list);
-		}
+		SettingsList channel_settings = {
+			{ "channel." + i_str + ".input.default", _channels[i].input_default, false },
+			{ "channel." + i_str + ".input.minimum", _channels[i].input_minimum, false },
+			{ "channel." + i_str + ".input.maximum", _channels[i].input_maximum, false },
+			{ "channel." + i_str + ".output.minimum", _channels[i].output_minimum, false },
+			{ "channel." + i_str + ".output.maximum", _channels[i].output_maximum, false },
+			{ "channel." + i_str + ".fallback-to-last-valid", _channels[i].fallback_to_last_valid, false },
+			{ "channel." + i_str + ".smoothing", _channels[i].smoothing_time, false },
+		};
+		settings_list.insert (settings_list.end(), channel_settings.begin(), channel_settings.end());
 	}
+
+	parse_settings (config, settings_list);
+
+	// Properties:
+
+	Xefis::ConfigReader::PropertiesParser::PropertiesList properties_list;
+
+	for (std::size_t i = 0; i < Channels; ++i)
+	{
+		QString i_str  = QString ("%1").arg (i);
+		properties_list.emplace_back ("channel." + i_str, _channels[i].input, false);
+	}
+
+	parse_properties (config, properties_list);
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
 	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));

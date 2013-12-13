@@ -54,39 +54,31 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 {
 	std::string device_path;
 
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "serial.device", device_path, true },
-				{ "serial.baud-rate", _baud_rate, true },
-				{ "sample-rate", _sample_rate, true },
-				{ "ekf.process-variance", _ekf_process_variance, false },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "serviceable", _serviceable, true },
-				{ "caution", _caution, false },
-				{ "failures", _failures, false },
-				{ "internal-temperature", _internal_temperature, false },
-				{ "orientation.pitch", _orientation_pitch, true },
-				{ "orientation.roll", _orientation_roll, true },
-				{ "orientation.magnetic-heading", _orientation_magnetic_heading, true },
-				{ "acceleration.x", _acceleration_x, false },
-				{ "acceleration.y", _acceleration_y, false },
-				{ "acceleration.z", _acceleration_z, false },
-				{ "rotation.x", _rotation_x, false },
-				{ "rotation.y", _rotation_y, false },
-				{ "rotation.z", _rotation_z, false },
-				{ "magnetic.x", _magnetic_x, false },
-				{ "magnetic.y", _magnetic_y, false },
-				{ "magnetic.z", _magnetic_z, false },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "serial.device", device_path, true },
+		{ "serial.baud-rate", _baud_rate, true },
+		{ "sample-rate", _sample_rate, true },
+		{ "ekf.process-variance", _ekf_process_variance, false },
+	});
+
+	parse_properties (config, {
+		{ "serviceable", _serviceable, true },
+		{ "caution", _caution, false },
+		{ "failures", _failures, false },
+		{ "internal-temperature", _internal_temperature, false },
+		{ "orientation.pitch", _orientation_pitch, true },
+		{ "orientation.roll", _orientation_roll, true },
+		{ "orientation.magnetic-heading", _orientation_magnetic_heading, true },
+		{ "acceleration.x", _acceleration_x, false },
+		{ "acceleration.y", _acceleration_y, false },
+		{ "acceleration.z", _acceleration_z, false },
+		{ "rotation.x", _rotation_x, false },
+		{ "rotation.y", _rotation_y, false },
+		{ "rotation.z", _rotation_z, false },
+		{ "magnetic.x", _magnetic_x, false },
+		{ "magnetic.y", _magnetic_y, false },
+		{ "magnetic.z", _magnetic_z, false },
+	});
 
 	_serial_port.set_logger (log());
 	_serial_port.set_device_path (device_path);

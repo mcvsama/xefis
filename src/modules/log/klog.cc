@@ -33,19 +33,13 @@ XEFIS_REGISTER_MODULE_CLASS ("log/klog", KLog);
 KLog::KLog (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				// Output:
-				{ "flag.oom", _flag_oom, true },
-				{ "flag.io", _flag_io, true },
-				{ "flag.oops", _flag_oops, true },
-				{ "flag.bug", _flag_bug, true },
-			});
-		}
-	}
+	parse_properties (config, {
+		// Output:
+		{ "flag.oom", _flag_oom, true },
+		{ "flag.io", _flag_io, true },
+		{ "flag.oops", _flag_oops, true },
+		{ "flag.bug", _flag_bug, true },
+	});
 
 	_timer = new QTimer (this);
 	_timer->setInterval (100);
