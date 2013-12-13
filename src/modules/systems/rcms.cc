@@ -35,26 +35,20 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 {
 	create_configurator_widget();
 
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "home.longitude", _home_longitude, true },
-				{ "home.latitude", _home_latitude, true },
-				{ "home.altitude-amsl", _home_altitude_amsl, true },
-				{ "position.longitude", _position_longitude, true },
-				{ "position.latitude", _position_latitude, true },
-				{ "position.altitude-amsl", _position_altitude_amsl, true },
-				// Output:
-				{ "home.distance.vlos", _distance_vlos, false },
-				{ "home.distance.ground", _distance_ground, false },
-				{ "home.distance.vertical", _distance_vertical, false },
-				{ "home.true-direction", _true_home_direction, false },
-			});
-		}
-	}
+	parse_properties (config, {
+		// Input:
+		{ "home.longitude", _home_longitude, true },
+		{ "home.latitude", _home_latitude, true },
+		{ "home.altitude-amsl", _home_altitude_amsl, true },
+		{ "position.longitude", _position_longitude, true },
+		{ "position.latitude", _position_latitude, true },
+		{ "position.altitude-amsl", _position_altitude_amsl, true },
+		// Output:
+		{ "home.distance.vlos", _distance_vlos, false },
+		{ "home.distance.ground", _distance_ground, false },
+		{ "home.distance.vertical", _distance_vertical, false },
+		{ "home.true-direction", _true_home_direction, false },
+	});
 
 	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));
 	_distance_computer.observe ({ &_home_longitude, &_home_latitude, &_home_altitude_amsl,

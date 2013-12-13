@@ -37,44 +37,36 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 	_altitude_amsl_estimator.set_minimum_integration_time (0.2_s);
 	_speed_ias_estimator.set_minimum_integration_time (0.2_s);
 
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "ias.valid-minimum", _ias_valid_minimum, true },
-				{ "ias.valid-maximum", _ias_valid_maximum, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "settings.pressure.use-std", _pressure_use_std, false },
-				{ "settings.pressure.qnh", _pressure_qnh, true },
-				{ "pressure.static.serviceable", _pressure_static_serviceable, false },
-				{ "pressure.static", _pressure_static, true },
-				{ "ias.serviceable", _ias_serviceable, false },
-				{ "ias", _ias, true },
-				{ "static-air-temperature", _static_air_temperature, true },
-				// Output:
-				{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, true },
-				{ "altitude.amsl", _altitude_amsl, true },
-				{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, true },
-				{ "altitude.amsl.qnh", _altitude_amsl_qnh, true },
-				{ "altitude.amsl.std", _altitude_amsl_std, true },
-				{ "density-altitude", _density_altitude, true },
-				{ "speed.ias.serviceable", _speed_ias_serviceable, true },
-				{ "speed.ias", _speed_ias, true },
-				{ "speed.ias.lookahead", _speed_ias_lookahead, true },
-				{ "speed.tas", _speed_tas, true },
-				{ "speed.mach", _speed_mach, true },
-				{ "speed.sound", _speed_sound, true },
-				{ "vertical-speed.serviceable", _vertical_speed_serviceable, true },
-				{ "vertical-speed", _vertical_speed, true },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "ias.valid-minimum", _ias_valid_minimum, true },
+		{ "ias.valid-maximum", _ias_valid_maximum, true },
+	});
+
+	parse_properties (config, {
+		// Input:
+		{ "settings.pressure.use-std", _pressure_use_std, false },
+		{ "settings.pressure.qnh", _pressure_qnh, true },
+		{ "pressure.static.serviceable", _pressure_static_serviceable, false },
+		{ "pressure.static", _pressure_static, true },
+		{ "ias.serviceable", _ias_serviceable, false },
+		{ "ias", _ias, true },
+		{ "static-air-temperature", _static_air_temperature, true },
+		// Output:
+		{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, true },
+		{ "altitude.amsl", _altitude_amsl, true },
+		{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, true },
+		{ "altitude.amsl.qnh", _altitude_amsl_qnh, true },
+		{ "altitude.amsl.std", _altitude_amsl_std, true },
+		{ "density-altitude", _density_altitude, true },
+		{ "speed.ias.serviceable", _speed_ias_serviceable, true },
+		{ "speed.ias", _speed_ias, true },
+		{ "speed.ias.lookahead", _speed_ias_lookahead, true },
+		{ "speed.tas", _speed_tas, true },
+		{ "speed.mach", _speed_mach, true },
+		{ "speed.sound", _speed_sound, true },
+		{ "vertical-speed.serviceable", _vertical_speed_serviceable, true },
+		{ "vertical-speed", _vertical_speed, true },
+	});
 
 	_altitude_computer.set_callback (std::bind (&AirDataComputer::compute_altitude, this));
 	_altitude_computer.observe ({

@@ -725,31 +725,27 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Time failsafe_after = 1_ms;
 	Time reacquire_after = 1_ms;
 
+	parse_properties (config, {
+		{ "input", _input, false },
+		{ "output", _output, false 	},
+		{ "link-valid", _link_valid_prop, false },
+		{ "failsafes", _failsafes, false },
+		{ "reacquires", _reacquires, false },
+		{ "error-bytes", _error_bytes, false },
+		{ "valid-bytes", _valid_bytes, false },
+		{ "valid-packets", _valid_packets, false },
+	});
+
+	parse_settings (config, {
+		{ "failsafe-after", failsafe_after, false },
+		{ "reacquire-after", reacquire_after, false },
+		{ "frequency", output_frequency, false },
+	});
+
 	for (QDomElement& e: config)
 	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "input", _input, false },
-				{ "output", _output, false 	},
-				{ "link-valid", _link_valid_prop, false },
-				{ "failsafes", _failsafes, false },
-				{ "reacquires", _reacquires, false },
-				{ "error-bytes", _error_bytes, false },
-				{ "valid-bytes", _valid_bytes, false },
-				{ "valid-packets", _valid_packets, false },
-			});
-		}
-		else if (e == "protocol")
+		if (e == "protocol")
 			parse_protocol (e);
-		else if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "failsafe-after", failsafe_after, false },
-				{ "reacquire-after", reacquire_after, false },
-				{ "frequency", output_frequency, false },
-			});
-		}
 	}
 
 	_input_blob.reserve (2 * size());

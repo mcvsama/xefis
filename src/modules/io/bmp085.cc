@@ -37,26 +37,18 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	Xefis::I2C::Bus::ID i2c_bus;
 	Xefis::I2C::Address::ID i2c_address;
 
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "i2c.bus", i2c_bus, true },
-				{ "i2c.address", i2c_address, true },
-				{ "temperature.read-interval", _temperature_interval, true },
-				{ "pressure.read-interval", _pressure_interval, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "serviceable", _serviceable, true },
-				{ "temperature", _temperature, true },
-				{ "pressure", _pressure, true },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "i2c.bus", i2c_bus, true },
+		{ "i2c.address", i2c_address, true },
+		{ "temperature.read-interval", _temperature_interval, true },
+		{ "pressure.read-interval", _pressure_interval, true },
+	});
+
+	parse_properties (config, {
+		{ "serviceable", _serviceable, true },
+		{ "temperature", _temperature, true },
+		{ "pressure", _pressure, true },
+	});
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
 	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));

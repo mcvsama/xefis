@@ -272,25 +272,21 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 	Xefis::I2C::Bus::ID i2c_bus;
 	Xefis::I2C::Address::ID i2c_address;
 
+	parse_settings (config, {
+		{ "i2c.bus", i2c_bus, true },
+		{ "i2c.address", i2c_address, true },
+	});
+
+	parse_properties (config, {
+		{ "enabled", _enabled, false },
+		{ "brightness", _brightness, false },
+		{ "blinking", _blinking, false },
+		{ "blinking.mode", _blinking_mode, false },
+	});
+
 	for (QDomElement& e: config)
 	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "i2c.bus", i2c_bus, true },
-				{ "i2c.address", i2c_address, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "enabled", _enabled, false },
-				{ "brightness", _brightness, false },
-				{ "blinking", _blinking, false },
-				{ "blinking.mode", _blinking_mode, false },
-			});
-		}
-		else if (e == "input")
+		if (e == "input")
 		{
 			_reliable_mode = e.attribute ("reliable-mode") == "true";
 

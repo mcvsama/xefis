@@ -36,36 +36,28 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 {
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
 
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "total-energy-variometer.minimum-ias", _total_energy_variometer_min_ias, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "aircraft.weight", _aircraft_weight_g, true },
-				{ "speed.ias", _speed_ias, true },
-				{ "speed.tas", _speed_tas, true },
-				{ "speed.gs", _speed_gs, true },
-				{ "vertical-speed", _vertical_speed, true },
-				{ "altitude.amsl.std", _altitude_amsl_std, true },
-				{ "track.lateral.true", _track_lateral_true, true },
-				{ "orientation.heading.true", _orientation_heading_true, true },
-				{ "magnetic.declination", _magnetic_declination, true },
-				// Output:
-				{ "wind.from.true", _wind_from_true, true },
-				{ "wind.from.magnetic", _wind_from_magnetic, true },
-				{ "wind.speed.tas", _wind_tas, true },
-				{ "glide-ratio", _glide_ratio, true },
-				{ "total-energy-variometer", _total_energy_variometer, true },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "total-energy-variometer.minimum-ias", _total_energy_variometer_min_ias, true },
+	});
+
+	parse_properties (config, {
+		// Input:
+		{ "aircraft.weight", _aircraft_weight_g, true },
+		{ "speed.ias", _speed_ias, true },
+		{ "speed.tas", _speed_tas, true },
+		{ "speed.gs", _speed_gs, true },
+		{ "vertical-speed", _vertical_speed, true },
+		{ "altitude.amsl.std", _altitude_amsl_std, true },
+		{ "track.lateral.true", _track_lateral_true, true },
+		{ "orientation.heading.true", _orientation_heading_true, true },
+		{ "magnetic.declination", _magnetic_declination, true },
+		// Output:
+		{ "wind.from.true", _wind_from_true, true },
+		{ "wind.from.magnetic", _wind_from_magnetic, true },
+		{ "wind.speed.tas", _wind_tas, true },
+		{ "glide-ratio", _glide_ratio, true },
+		{ "total-energy-variometer", _total_energy_variometer, true },
+	});
 
 	_wind_computer.set_callback (std::bind (&PerformanceComputer::compute_wind, this));
 	_wind_computer.observe ({

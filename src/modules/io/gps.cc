@@ -64,43 +64,39 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	// 18 - CHN
 	_pmtk_commands.push_back ("PMTK314,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
 
+	parse_settings (config, {
+		{ "debug", _debug_mode, false },
+		{ "device", _device_path, true },
+		{ "receiver-accuracy", _receiver_accuracy, true },
+		{ "synchronize-system-clock", _synchronize_system_clock, false },
+		{ "default-baud-rate", _default_baud_rate, true },
+		{ "baud-rate", _target_baud_rate, true },
+	});
+
+	parse_properties (config, {
+		{ "serviceable", _serviceable, true },
+		{ "read-errors", _read_errors, true },
+		{ "fix-quality", _fix_quality, true },
+		{ "type-of-fix", _type_of_fix, true },
+		{ "latitude", _latitude, true },
+		{ "longitude", _longitude, true },
+		{ "altitude-amsl", _altitude_amsl, true },
+		{ "altitude-above-wgs84", _altitude_above_wgs84, true },
+		{ "groundspeed", _groundspeed, true },
+		{ "track", _track, true },
+		{ "tracked-satellites", _tracked_satellites, true },
+		{ "hdop", _hdop, true },
+		{ "vdop", _vdop, true },
+		{ "lateral-accuracy", _lateral_accuracy, true },
+		{ "vertical-accuracy", _vertical_accuracy, true },
+		{ "dgps-station-id", _dgps_station_id, true },
+		{ "update-timestamp", _update_timestamp, true },
+		{ "epoch-time", _epoch_time, true },
+	});
+
 	for (QDomElement& e: config)
 	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "debug", _debug_mode, false },
-				{ "device", _device_path, true },
-				{ "receiver-accuracy", _receiver_accuracy, true },
-				{ "synchronize-system-clock", _synchronize_system_clock, false },
-				{ "default-baud-rate", _default_baud_rate, true },
-				{ "baud-rate", _target_baud_rate, true },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "serviceable", _serviceable, true },
-				{ "read-errors", _read_errors, true },
-				{ "fix-quality", _fix_quality, true },
-				{ "type-of-fix", _type_of_fix, true },
-				{ "latitude", _latitude, true },
-				{ "longitude", _longitude, true },
-				{ "altitude-amsl", _altitude_amsl, true },
-				{ "altitude-above-wgs84", _altitude_above_wgs84, true },
-				{ "groundspeed", _groundspeed, true },
-				{ "track", _track, true },
-				{ "tracked-satellites", _tracked_satellites, true },
-				{ "hdop", _hdop, true },
-				{ "vdop", _vdop, true },
-				{ "lateral-accuracy", _lateral_accuracy, true },
-				{ "vertical-accuracy", _vertical_accuracy, true },
-				{ "dgps-station-id", _dgps_station_id, true },
-				{ "update-timestamp", _update_timestamp, true },
-				{ "epoch-time", _epoch_time, true },
-			});
-		}
-		else if (e == "initialization")
+		if (e == "initialization")
 		{
 			for (QDomElement& pmtk: e)
 			{

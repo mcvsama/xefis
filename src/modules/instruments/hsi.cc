@@ -34,41 +34,35 @@ XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI);
 HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "display-mode", _display_mode, true },
-				{ "range", _range, true },
-				{ "trend-vector-range", _trend_vector_range, false },
-				{ "speed.gs", _speed_gs, false },
-				{ "speed.tas", _speed_tas, false },
-				{ "cmd.visible", _cmd_visible, false },
-				{ "cmd.heading", _cmd_heading, false },
-				{ "cmd.track-visible", _cmd_track_visible, false },
-				{ "altitude.target.reach-distance", _target_altitude_reach_distance, false },
-				{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
-				{ "orientation.heading.true", _orientation_heading_true, false },
-				{ "orientation.display-true-heading", _use_true_heading, false },
-				{ "home.true-direction", _home_true_direction, false },
-				{ "home.distance.vlos", _home_distance_vlos, false },
-				{ "home.distance.ground", _home_distance_ground, false },
-				{ "home.distance.vertical", _home_distance_vertical, false },
-				{ "position.latitude", _position_latitude, false },
-				{ "position.longitude", _position_longitude, false },
-				{ "position.source", _position_source, false },
-				{ "track.visible", _track_visible, false },
-				{ "track.lateral.magnetic", _track_lateral_magnetic, false },
-				{ "track.lateral.delta", _track_lateral_delta_dpm, false },
-				{ "track.center-on-track", _track_center_on_track, false },
-				{ "wind.from.magnetic", _wind_from_magnetic, false },
-				{ "wind.tas", _wind_speed_tas, false },
-				{ "localizer-id", _localizer_id, false },
-				{ "glide-ratio", _glide_ratio, false },
-			});
-		}
-	}
+	parse_properties (config, {
+		{ "display-mode", _display_mode, true },
+		{ "range", _range, true },
+		{ "trend-vector-range", _trend_vector_range, false },
+		{ "speed.gs", _speed_gs, false },
+		{ "speed.tas", _speed_tas, false },
+		{ "cmd.visible", _cmd_visible, false },
+		{ "cmd.heading", _cmd_heading, false },
+		{ "cmd.track-visible", _cmd_track_visible, false },
+		{ "altitude.target.reach-distance", _target_altitude_reach_distance, false },
+		{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
+		{ "orientation.heading.true", _orientation_heading_true, false },
+		{ "orientation.display-true-heading", _use_true_heading, false },
+		{ "home.true-direction", _home_true_direction, false },
+		{ "home.distance.vlos", _home_distance_vlos, false },
+		{ "home.distance.ground", _home_distance_ground, false },
+		{ "home.distance.vertical", _home_distance_vertical, false },
+		{ "position.latitude", _position_latitude, false },
+		{ "position.longitude", _position_longitude, false },
+		{ "position.source", _position_source, false },
+		{ "track.visible", _track_visible, false },
+		{ "track.lateral.magnetic", _track_lateral_magnetic, false },
+		{ "track.lateral.delta", _track_lateral_delta_dpm, false },
+		{ "track.center-on-track", _track_center_on_track, false },
+		{ "wind.from.magnetic", _wind_from_magnetic, false },
+		{ "wind.tas", _wind_speed_tas, false },
+		{ "localizer-id", _localizer_id, false },
+		{ "glide-ratio", _glide_ratio, false },
+	});
 
 	_hsi_widget = std::make_unique<HSIWidget> (this, work_performer());
 	_hsi_widget->set_navaid_storage (navaid_storage());

@@ -43,16 +43,56 @@ Module::Module (ModuleManager* module_manager, QDomElement const& config):
 
 
 void
-Module::parse_properties (QDomElement const& properties_element, ConfigReader::PropertiesParser::PropertiesList list)
+Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesParser::PropertiesList list)
 {
+	QDomElement properties_element;
+	if (element == "properties")
+		properties_element = element;
+	else
+	{
+		for (QDomElement& e: element)
+		{
+			if (e == "properties")
+			{
+				if (properties_element.isNull())
+					properties_element = e;
+				else
+					throw Exception ("multiple <properties> elements");
+			}
+		}
+	}
+
+	if (properties_element.isNull())
+		throw Exception ("missing <properties> element");
+
 	_properties_parser = ConfigReader::PropertiesParser (list);
 	_properties_parser.parse (properties_element);
 }
 
 
 void
-Module::parse_settings (QDomElement const& settings_element, ConfigReader::SettingsParser::SettingsList list)
+Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser::SettingsList list)
 {
+	QDomElement settings_element;
+	if (element == "settings")
+		settings_element = element;
+	else
+	{
+		for (QDomElement& e: element)
+		{
+			if (e == "settings")
+			{
+				if (settings_element.isNull())
+					settings_element = e;
+				else
+					throw Exception ("multiple <settings> elements");
+			}
+		}
+	}
+
+	if (settings_element.isNull())
+		throw Exception ("missing <settings> element");
+
 	_settings_parser = ConfigReader::SettingsParser (list);
 	_settings_parser.parse (settings_element);
 }

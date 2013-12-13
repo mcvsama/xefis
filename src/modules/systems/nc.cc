@@ -48,42 +48,36 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 		for (std::size_t i = 0; i < positions->capacity(); ++i)
 			positions->push_back (Position());
 
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "position.input.longitude", _position_input_longitude, true },
-				{ "position.input.latitude", _position_input_latitude, true },
-				{ "position.input.altitude.amsl", _position_input_altitude_amsl, true },
-				{ "position.input.accuracy.lateral", _position_input_accuracy_lateral, true },
-				{ "position.input.accuracy.vertical", _position_input_accuracy_vertical, true },
-				{ "position.input.source", _position_input_source, true },
-				{ "orientation.input.pitch", _orientation_input_pitch, true },
-				{ "orientation.input.roll", _orientation_input_roll, true },
-				{ "orientation.input.heading.magnetic", _orientation_input_heading_magnetic, true },
-				// Output:
-				{ "position.longitude", _position_longitude, true },
-				{ "position.latitude", _position_latitude, true },
-				{ "position.altitude.amsl", _position_altitude_amsl, true },
-				{ "position.accuracy.lateral", _position_accuracy_lateral, true },
-				{ "position.accuracy.vertical", _position_accuracy_vertical, true },
-				{ "position.source", _position_source, true },
-				{ "orientation.pitch", _orientation_pitch, true },
-				{ "orientation.roll", _orientation_roll, true },
-				{ "orientation.heading.magnetic", _orientation_heading_magnetic, true },
-				{ "orientation.heading.true", _orientation_heading_true, true },
-				{ "track.vertical", _track_vertical, true },
-				{ "track.lateral.magnetic", _track_lateral_magnetic, true },
-				{ "track.lateral.true", _track_lateral_true, true },
-				{ "track.lateral.delta", _track_lateral_delta_dpm, true },
-				{ "track.ground-speed", _track_ground_speed, true },
-				{ "magnetic.declination", _magnetic_declination, true },
-				{ "magnetic.inclination", _magnetic_inclination, true },
-			});
-		}
-	}
+	parse_properties (config, {
+		// Input:
+		{ "position.input.longitude", _position_input_longitude, true },
+		{ "position.input.latitude", _position_input_latitude, true },
+		{ "position.input.altitude.amsl", _position_input_altitude_amsl, true },
+		{ "position.input.accuracy.lateral", _position_input_accuracy_lateral, true },
+		{ "position.input.accuracy.vertical", _position_input_accuracy_vertical, true },
+		{ "position.input.source", _position_input_source, true },
+		{ "orientation.input.pitch", _orientation_input_pitch, true },
+		{ "orientation.input.roll", _orientation_input_roll, true },
+		{ "orientation.input.heading.magnetic", _orientation_input_heading_magnetic, true },
+		// Output:
+		{ "position.longitude", _position_longitude, true },
+		{ "position.latitude", _position_latitude, true },
+		{ "position.altitude.amsl", _position_altitude_amsl, true },
+		{ "position.accuracy.lateral", _position_accuracy_lateral, true },
+		{ "position.accuracy.vertical", _position_accuracy_vertical, true },
+		{ "position.source", _position_source, true },
+		{ "orientation.pitch", _orientation_pitch, true },
+		{ "orientation.roll", _orientation_roll, true },
+		{ "orientation.heading.magnetic", _orientation_heading_magnetic, true },
+		{ "orientation.heading.true", _orientation_heading_true, true },
+		{ "track.vertical", _track_vertical, true },
+		{ "track.lateral.magnetic", _track_lateral_magnetic, true },
+		{ "track.lateral.true", _track_lateral_true, true },
+		{ "track.lateral.delta", _track_lateral_delta_dpm, true },
+		{ "track.ground-speed", _track_ground_speed, true },
+		{ "magnetic.declination", _magnetic_declination, true },
+		{ "magnetic.inclination", _magnetic_inclination, true },
+	});
 
 	_position_computer.set_callback (std::bind (&NavigationComputer::compute_position, this));
 	_position_computer.observe ({

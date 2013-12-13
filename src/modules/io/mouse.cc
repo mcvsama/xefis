@@ -37,28 +37,20 @@ XEFIS_REGISTER_MODULE_CLASS ("io/mouse", Mouse);
 Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "settings")
-		{
-			parse_settings (e, {
-				{ "dead-zone.x", _dead_zone_x, false },
-				{ "dead-zone.y", _dead_zone_y, false },
-				{ "speed.x", _speed_x, false },
-				{ "speed.y", _speed_y, false },
-				{ "acceleration.x", _acceleration_x, false },
-				{ "acceleration.y", _acceleration_y, false },
-			});
-		}
-		else if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "axis-x", _axis_x, true },
-				{ "axis-y", _axis_y, true },
-				{ "button", _button, true },
-			});
-		}
-	}
+	parse_settings (config, {
+		{ "dead-zone.x", _dead_zone_x, false },
+		{ "dead-zone.y", _dead_zone_y, false },
+		{ "speed.x", _speed_x, false },
+		{ "speed.y", _speed_y, false },
+		{ "acceleration.x", _acceleration_x, false },
+		{ "acceleration.y", _acceleration_y, false },
+	});
+
+	parse_properties (config, {
+		{ "axis-x", _axis_x, true },
+		{ "axis-y", _axis_y, true },
+		{ "button", _button, true },
+	});
 
 	_speed_x *= 20.f;
 	_speed_y *= 20.f;

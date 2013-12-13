@@ -32,21 +32,15 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/altacq", AltAcq);
 AltAcq::AltAcq (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				// Input:
-				{ "altitude.amsl", _altitude_amsl, false },
-				{ "altitude.acquire.amsl", _altitude_acquire_amsl, false },
-				{ "vertical-speed", _vertical_speed, false },
-				{ "ground-speed", _ground_speed, false },
-				// Output:
-				{ "altitude.acquire.distance", _altitude_acquire_distance, true },
-			});
-		}
-	}
+	parse_properties (config, {
+		// Input:
+		{ "altitude.amsl", _altitude_amsl, false },
+		{ "altitude.acquire.amsl", _altitude_acquire_amsl, false },
+		{ "vertical-speed", _vertical_speed, false },
+		{ "ground-speed", _ground_speed, false },
+		// Output:
+		{ "altitude.acquire.distance", _altitude_acquire_distance, true },
+	});
 
 	_altitude_acquire_distance_computer.set_callback (std::bind (&AltAcq::compute_altitude_acquire_distance, this));
 	_altitude_acquire_distance_computer.observe ({
