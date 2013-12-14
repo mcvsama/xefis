@@ -1,6 +1,9 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/altacq'>
+		<settings>
+			<setting name='minimum-altitude-difference' value='100 ft'/>
+		</settings>
 		<properties>
 			<!-- Input -->
 			<property name='altitude.amsl' path='/systems/adc/altitude/amsl'/>

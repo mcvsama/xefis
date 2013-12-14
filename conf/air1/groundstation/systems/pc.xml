@@ -6,7 +6,7 @@
 		</settings>
 		<properties>
 			<!-- Input -->
-			<property name='aircraft.weight' path='/settings/aircraft/weight'/>
+			<property name='aircraft.weight' path='/settings/aircraft/weight' default='1000'/>
 			<property name='speed.ias' path='/systems/adc/speed/ias'/>
 			<property name='speed.tas' path='/systems/adc/speed/tas'/>
 			<property name='speed.gs' path='/systems/nc/track/ground-speed'/>

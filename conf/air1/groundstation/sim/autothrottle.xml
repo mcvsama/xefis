@@ -1,0 +1,10 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<!--module name='systems/autothrottle'>
+		<properties>
+			<directory path='/systems/autothrottle'>
+			</directory>
+		</properties>
+	</module-->
+</xefis-include>
+

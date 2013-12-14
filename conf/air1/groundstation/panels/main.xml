@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<!-- TODO
+	bank angle limit
+
+	master caution
+	rth engage
+
+	flap control (up, down)
+	 -->
+	<panel>
+		<layout type='horizontal' spacing='5'>
+			<item>
+				<group label='GPWS'>
+				</group>
+			</item>
+		</layout>
+	</panel>
+</xefis-include>
+

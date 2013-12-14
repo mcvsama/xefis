@@ -1,0 +1,67 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/afcs'>
+		<properties>
+			<directory path='/panels/mcp'>
+				<property name='button.ap' path='/ap'/>
+				<property name='button.at' path='/at'/>
+				<property name='button.prot' path='/prot'/>
+				<property name='button.tac' path='/tac'/>
+				<property name='button.att' path='/att'/>
+				<property name='button.ct' path='/ct'/>
+				<property name='button.speed.ias-mach' path='/speed-ias-mach'/>
+				<property name='button.speed.sel' path='/speed-sel'/>
+				<property name='button.speed.hold' path='/speed-hold'/>
+				<property name='button.heading.hdg-trk' path='/heading-hdg-trk'/>
+				<property name='button.heading.sel' path='/heading-sel'/>
+				<property name='button.heading.hold' path='/heading-hold'/>
+				<property name='button.vnav' path='/vnav'/>
+				<property name='button.lnav' path='/lnav'/>
+				<property name='button.app' path='/app'/>
+				<property name='button.altitude.stepch' path='/altitude-stepch'/>
+				<property name='button.altitude.flch' path='/altitude-flch'/>
+				<property name='button.altitude.hold' path='/altitude-hold'/>
+				<property name='button.vertical-speed.vs-fpa' path='/vspd-vs-fpa'/>
+				<property name='button.vertical-speed.sel' path='/vspd-sel'/>
+				<property name='button.vertical-speed.clb-con' path='/vspd-clb-con'/>
+				<property name='rotary-encoder.speed.a' path='/speed-a'/>
+				<property name='rotary-encoder.speed.b' path='/speed-b'/>
+				<property name='rotary-encoder.heading.a' path='/heading-a'/>
+				<property name='rotary-encoder.heading.b' path='/heading-b'/>
+				<property name='rotary-encoder.altitude.a' path='/altitude-a'/>
+				<property name='rotary-encoder.altitude.b' path='/altitude-b'/>
+				<property name='rotary-encoder.vertical-speed.a' path='/vspd-a'/>
+				<property name='rotary-encoder.vertical-speed.b' path='/vspd-b'/>
+			</directory>
+			<directory path='/panels/mcp/display'>
+				<property name='display.speed' path='/speed'/>
+				<property name='display.heading' path='/heading'/>
+				<property name='display.altitude' path='/altitude'/>
+				<property name='display.vertical-speed' path='/vertical-speed'/>
+			</directory>
+			<directory path='/panels/mcp/led'>
+				<property name='led.speed.sel' path='/speed-sel'/>
+				<property name='led.speed.hold' path='/speed-hold'/>
+				<property name='led.heading.sel' path='/heading-sel'/>
+				<property name='led.heading.hold' path='/heading-hold'/>
+				<property name='led.vnav' path='/vnav'/>
+				<property name='led.lnav' path='/lnav'/>
+				<property name='led.app' path='/app'/>
+				<property name='led.altitude.flch' path='/altitude-flch'/>
+				<property name='led.altitude.hold' path='/altitude-hold'/>
+				<property name='led.vertical-speed.sel' path='/vspd-sel'/>
+				<property name='led.vertical-speed.clb-con' path='/vspd-clb-con'/>
+			</directory>
+			<directory path='/settings/flight-director/cmd'>
+				<property name='cmd.roll-mode' path='/roll-mode'/>
+				<property name='cmd.pitch-mode' path='/pitch-mode'/>
+				<property name='cmd.ias' path='/ias'/>
+				<property name='cmd.magnetic-heading-track' path='/magnetic-heading-track'/>
+				<property name='cmd.altitude' path='/altitude'/>
+				<property name='cmd.vertical-speed' path='/vertical-speed'/>
+				<property name='cmd.fpa' path='/fpa'/>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+

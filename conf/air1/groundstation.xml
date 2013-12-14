@@ -2,12 +2,13 @@
 <xefis-config version='1.0'>
 	<settings>
 		<setting name='navaids.enable' value='false'/>
-		<setting name='scale.pen' value='0.95'/>
+		<setting name='scale.pen' value='0.92'/>
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
 		<!--include name='groundstation/hardware/joystick.xml'/-->
 		<include name='groundstation/systems/state.xml'/>
+		<include name='groundstation/systems/afcs.xml'/>
 		<include name='groundstation/systems/adc.xml'/>
 		<include name='groundstation/systems/nc.xml'/>
 		<include name='groundstation/systems/pc.xml'/>
@@ -20,6 +21,7 @@
 		<if mode='fg'>
 			<include name='groundstation/sim/flightgear.xml'/>
 			<include name='groundstation/sim/flight-director.xml'/>
+			<include name='groundstation/sim/autothrottle.xml'/>
 			<include name='groundstation/sim/fly-by-wire.xml'/>
 		</if>
 	</modules>
@@ -38,10 +40,17 @@
 					</layout>
 				</item>
 				<item stretch-factor='3'>
-					<include name='groundstation/sim/mcp.xml'/>
+					<include name='groundstation/panels/mcp.xml'/>
 				</item>
 			</layout>
 		</window>
+		<!--window width='1366' height='960' full-screen='false'>
+			<layout type='vertical'>
+				<item>
+					<include name='groundstation/panels/main.xml'/>
+				</item>
+			</layout>
+		</window-->
 	</windows>
 </xefis-config>
 

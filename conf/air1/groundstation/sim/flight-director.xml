@@ -2,21 +2,22 @@
 <xefis-include>
 	<module name='systems/flight-director'>
 		<properties>
-			<directory path='/systems/flight-director'>
+			<property name='disengage-ap' path='/systems/flight-director/disengage-ap'/>
+			<directory path='/systems/flight-director/guidance'>
 				<property name='output.pitch' path='/pitch'/>
 				<property name='output.roll' path='/roll'/>
-				<property name='mode.vertical.hint' path='/hints/vertical-hint'/>
-				<property name='mode.lateral.hint' path='/hints/lateral-hint'/>
 			</directory>
 			<directory path='/settings/flight-director'>
-				<property name='enabled' path='/enabled'/>
-				<property name='mode.lateral' path='/lateral-mode'/>
-				<property name='mode.vertical' path='/vertical-mode'/>
-				<property name='orientation.pitch-limit' path='/limits/pitch'/>
-				<property name='orientation.roll-limit' path='/limits/roll'/>
+				<property name='enabled' path='/enabled' default='true'/>
+				<property name='orientation.pitch-limit.max' path='/limits/pitch.max' default='10 deg'/>
+				<property name='orientation.pitch-limit.min' path='/limits/pitch.min' default='-10 deg'/>
+				<property name='orientation.roll-limit' path='/limits/roll' default='25 deg'/>
+				<property name='cmd.roll-mode' path='/cmd/roll-mode' default='0'/>
+				<property name='cmd.pitch-mode' path='/cmd/pitch-mode' default='1'/>
 				<property name='cmd.heading.magnetic' path='/cmd/magnetic-heading-track'/>
 				<property name='cmd.track.magnetic' path='/cmd/magnetic-heading-track'/>
 				<property name='cmd.altitude' path='/cmd/altitude'/>
+				<property name='cmd.ias' path='/cmd/ias'/>
 				<property name='cmd.vertical-speed' path='/cmd/vertical-speed'/>
 				<property name='cmd.fpa' path='/cmd/fpa'/>
 			</directory>
@@ -26,6 +27,7 @@
 			</directory>
 			<directory path='/systems/adc'>
 				<property name='measured.altitude' path='/altitude/amsl'/>
+				<property name='measured.ias' path='/speed/ias'/>
 				<property name='measured.vertical-speed' path='/vertical-speed/speed'/>
 				<property name='measured.fpa' path='/fpm/alpha'/>
 			</directory>
