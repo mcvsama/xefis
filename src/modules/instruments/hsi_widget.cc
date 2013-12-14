@@ -334,6 +334,8 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 	if (_params.heading_visible)
 	{
 		int hdg = static_cast<int> ((_params.center_on_track ? _locals.track : _locals.heading).deg() + 0.5f) % 360;
+		if (hdg == 0)
+			hdg = 360;
 
 		switch (_params.display_mode)
 		{
@@ -603,6 +605,8 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		painter.setClipping (false);
 
 		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
+		if (sel_hdg == 0)
+			sel_hdg = 360;
 
 		// AP heading always set as magnetic, but can be displayed as true:
 		QString text_1 = "SEL HDG";
