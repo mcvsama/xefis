@@ -34,121 +34,170 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 	_magnetic_heading_pid (1.0, 0.1, 0.0, 0.0),
 	_magnetic_track_pid (1.0, 0.1, 0.0, 0.0),
 	_altitude_pid (1.0, 0.1, 0.0, 0.0),
+	_ias_pid (1.0, 0.1, 0.0, 0.0),
 	_vertical_speed_pid (1.0, 0.1, 0.0, 0.0),
 	_fpa_pid (1.0, 0.1, 0.0, 0.0)
 {
-	for (QDomElement& e: config)
-	{
-		if (e == "properties")
-		{
-			parse_properties (e, {
-				{ "enabled", _enabled, true },
-				{ "mode.lateral", _lateral_mode, true },
-				{ "mode.vertical", _vertical_mode, true },
-				{ "orientation.pitch-limit", _pitch_limit, true },
-				{ "orientation.roll-limit", _roll_limit, true },
-				{ "cmd.heading.magnetic", _selected_magnetic_heading, true },
-				{ "cmd.track.magnetic", _selected_magnetic_track, true },
-				{ "cmd.altitude", _selected_altitude, true },
-				{ "cmd.vertical-speed", _selected_vertical_speed, true },
-				{ "cmd.fpa", _selected_fpa, true },
-				{ "measured.heading.magnetic", _measured_magnetic_heading, true },
-				{ "measured.track.magnetic", _measured_magnetic_track, true },
-				{ "measured.altitude", _measured_altitude, true },
-				{ "measured.vertical-speed", _measured_vertical_speed, true },
-				{ "measured.fpa", _measured_fpa, true },
-				{ "output.pitch", _output_pitch, true },
-				{ "output.roll", _output_roll, true },
-				{ "mode.vertical.hint", _vertical_mode_hint, false },
-				{ "mode.lateral.hint", _lateral_mode_hint, false }
-			});
-		}
-	}
-
 	for (auto* pid: { &_magnetic_heading_pid, &_magnetic_track_pid })
 	{
 		pid->set_i_limit ({ -0.05f, +0.05f });
 		pid->set_winding (true);
 	}
-	for (auto* pid: { &_altitude_pid, &_vertical_speed_pid, &_fpa_pid })
+	for (auto* pid: { &_altitude_pid, &_ias_pid, &_vertical_speed_pid, &_fpa_pid })
 		pid->set_i_limit ({ -0.05f, +0.05f });
 
-	_lateral_hint_computer.set_callback (std::bind (&FlightDirector::update_lateral_hint, this));
-	_lateral_hint_computer.observe (_lateral_mode);
+	parse_properties (config, {
+		{ "enabled", _enabled, true },
+		{ "orientation.pitch-limit.max", _pitch_limit_max, true },
+		{ "orientation.pitch-limit.min", _pitch_limit_min, true },
+		{ "orientation.roll-limit", _roll_limit, true },
+		{ "cmd.roll-mode", _cmd_roll_mode, true },
+		{ "cmd.pitch-mode", _cmd_pitch_mode, true },
+		{ "cmd.heading.magnetic", _cmd_magnetic_heading, true },
+		{ "cmd.track.magnetic", _cmd_magnetic_track, true },
+		{ "cmd.altitude", _cmd_altitude, true },
+		{ "cmd.ias", _cmd_ias, true },
+		{ "cmd.vertical-speed", _cmd_vertical_speed, true },
+		{ "cmd.fpa", _cmd_fpa, true },
+		{ "measured.heading.magnetic", _measured_magnetic_heading, true },
+		{ "measured.track.magnetic", _measured_magnetic_track, true },
+		{ "measured.altitude", _measured_altitude, true },
+		{ "measured.ias", _measured_ias, true },
+		{ "measured.vertical-speed", _measured_vertical_speed, true },
+		{ "measured.fpa", _measured_fpa, true },
+		{ "output.pitch", _output_pitch, true },
+		{ "output.roll", _output_roll, true },
+		{ "disengage-ap", _disengage_ap, true },
+	});
 
-	_vertical_hint_computer.set_callback (std::bind (&FlightDirector::update_vertical_hint, this));
-	_vertical_hint_computer.observe (_vertical_mode);
+	roll_mode_changed();
+	pitch_mode_changed();
 }
 
 
 void
 FlightDirector::data_updated()
 {
-	using Xefis::limit;
-
-	_lateral_hint_computer.data_updated (update_time());
-	_vertical_hint_computer.data_updated (update_time());
+	bool disengage = false;
 
 	// Don't process if dt is too small:
 	_dt += update_dt();
-	if (_dt < 0.005_s)
+	if (_dt < 5_ms)
 		return;
+
+	if (_cmd_roll_mode.fresh())
+		roll_mode_changed();
+
+	if (_cmd_pitch_mode.fresh())
+		pitch_mode_changed();
 
 	if (*_enabled)
 	{
 		double const altitude_output_scale = 0.10;
 		double const vertical_speed_output_scale = 0.01;
 		double const rl = (*_roll_limit).deg();
-		double const pl = (*_pitch_limit).deg();
+		double const pl_max = (*_pitch_limit_max).deg();
+		double const pl_min = (*_pitch_limit_min).deg();
 		Xefis::Range<float> roll_limit (-rl, +rl);
-		Xefis::Range<float> pitch_limit (-pl, +pl);
+		Xefis::Range<float> pitch_limit (pl_min, pl_max);
 
-		_magnetic_heading_pid.set_target (Xefis::renormalize ((*_selected_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
-		_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-
-		_magnetic_track_pid.set_target (Xefis::renormalize ((*_selected_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
-		_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-
-		_altitude_pid.set_target ((*_selected_altitude).ft());
-		_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
-
-		_vertical_speed_pid.set_target ((*_selected_vertical_speed).fpm());
-		_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
-
-		_fpa_pid.set_target ((*_selected_fpa).deg());
-		_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
-
-		switch (static_cast<VerticalMode> (*_vertical_mode))
+		switch (_roll_mode)
 		{
-			case VerticalDisabled:
-				_computed_output_pitch = 0_deg;
+			case RollMode::Heading:
+				if (_cmd_magnetic_heading.is_nil() || _measured_magnetic_heading.is_nil())
+				{
+					_magnetic_heading_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_magnetic_heading_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
+					_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+					_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
+				}
 				break;
 
-			case AltitudeHold:
-				_computed_output_pitch = 1_deg * limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
+			case RollMode::Track:
+				if (_cmd_magnetic_track.is_nil() || _measured_magnetic_track.is_nil())
+				{
+					_magnetic_track_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_magnetic_track_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
+					_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+					_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
+				}
 				break;
 
-			case VerticalSpeed:
-				_computed_output_pitch = 1_deg * limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
-				break;
-
-			case FlightPathAngle:
-				_computed_output_pitch = 1_deg * limit<float> (_fpa_pid.output(), pitch_limit);
+			case RollMode::None:
+			case RollMode::sentinel:
+				_computed_output_roll = 0_deg;
 				break;
 		}
 
-		switch (static_cast<LateralMode> (*_lateral_mode))
+		switch (_pitch_mode)
 		{
-			case LateralDisabled:
+			case PitchMode::Altitude:
+				if (_cmd_altitude.is_nil() || _measured_altitude.is_nil())
+				{
+					_altitude_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_altitude_pid.set_target ((*_cmd_altitude).ft());
+					_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
+					_computed_output_pitch = 1_deg * Xefis::limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
+				}
+				break;
+
+			case PitchMode::Airspeed:
+				if (_cmd_ias.is_nil() || _measured_ias.is_nil())
+				{
+					_ias_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_ias_pid.set_target ((*_cmd_ias).kt());
+					_ias_pid.process ((*_measured_ias).kt(), _dt.s());
+					_computed_output_pitch = 1_deg * Xefis::limit<float> (_ias_pid.output(), pitch_limit);
+				}
+				break;
+
+			case PitchMode::VerticalSpeed:
+				if (_cmd_vertical_speed.is_nil() || _measured_vertical_speed.is_nil())
+				{
+					_vertical_speed_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_vertical_speed_pid.set_target ((*_cmd_vertical_speed).fpm());
+					_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
+					_computed_output_pitch = 1_deg * Xefis::limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
+				}
+				break;
+
+			case PitchMode::FPA:
+				if (_cmd_fpa.is_nil() || _measured_fpa.is_nil())
+				{
+					_fpa_pid.reset();
+					disengage = true;
+				}
+				else
+				{
+					_fpa_pid.set_target ((*_cmd_fpa).deg());
+					_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
+					_computed_output_pitch = 1_deg * Xefis::limit<float> (_fpa_pid.output(), pitch_limit);
+				}
+				break;
+
+			case PitchMode::None:
+			case PitchMode::sentinel:
 				_computed_output_roll = 0_deg;
-				break;
-
-			case FollowHeading:
-				_computed_output_roll = 1_deg * limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
-				break;
-
-			case FollowTrack:
-				_computed_output_roll = 1_deg * limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
 				break;
 		}
 	}
@@ -158,59 +207,26 @@ FlightDirector::data_updated()
 		_computed_output_roll = 0_deg;
 	}
 
-	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt()));
-	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt()));
+	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), _dt));
+	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), _dt));
+	_disengage_ap.write (disengage);
 
-	_dt = Time::epoch();
+	_dt = Time::now();
 }
 
 
 void
-FlightDirector::update_lateral_hint()
+FlightDirector::roll_mode_changed()
 {
-	if (_lateral_mode_hint.configured())
-	{
-		switch (static_cast<LateralMode> (*_lateral_mode))
-		{
-			case LateralDisabled:
-				_lateral_mode_hint.write ("");
-				break;
-
-			case FollowHeading:
-				_lateral_mode_hint.write ("HDG HOLD");
-				break;
-
-			case FollowTrack:
-				_lateral_mode_hint.write ("TRK HOLD");
-				break;
-		}
-	}
+	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_roll_mode.read (-1), 0, static_cast<decltype (m)> (RollMode::sentinel) - 1);
+	_roll_mode = static_cast<RollMode> (m);
 }
 
 
 void
-FlightDirector::update_vertical_hint()
+FlightDirector::pitch_mode_changed()
 {
-	if (_vertical_mode_hint.configured())
-	{
-		switch (static_cast<VerticalMode> (*_vertical_mode))
-		{
-			case VerticalDisabled:
-				_vertical_mode_hint.write ("");
-				break;
-
-			case AltitudeHold:
-				_vertical_mode_hint.write ("ALT HOLD");
-				break;
-
-			case VerticalSpeed:
-				_vertical_mode_hint.write ("V/SPD");
-				break;
-
-			case FlightPathAngle:
-				_vertical_mode_hint.write ("FPA");
-				break;
-		}
-	}
+	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_pitch_mode.read (-1), 0, static_cast<decltype (m)> (PitchMode::sentinel) - 1);
+	_pitch_mode = static_cast<PitchMode> (m);
 }
 
