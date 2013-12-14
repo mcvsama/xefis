@@ -24,7 +24,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -32,19 +31,22 @@
 class FlightDirector: public Xefis::Module
 {
   public:
-	enum LateralMode
+	enum class RollMode
 	{
-		LateralDisabled		= 0,
-		FollowHeading		= 1,
-		FollowTrack			= 2
+		None			= 0,
+		Heading			= 1,
+		Track			= 2,
+		sentinel		= 3,
 	};
 
-	enum VerticalMode
+	enum class PitchMode
 	{
-		VerticalDisabled	= 0,
-		AltitudeHold		= 1,
-		VerticalSpeed		= 2,
-		FlightPathAngle		= 3
+		None			= 0,
+		Altitude		= 1,
+		Airspeed		= 2,
+		VerticalSpeed	= 3,
+		FPA				= 4,
+		sentinel		= 5,
 	};
 
   public:
@@ -57,49 +59,49 @@ class FlightDirector: public Xefis::Module
 
   private:
 	void
-	update_lateral_hint();
+	roll_mode_changed();
 
 	void
-	update_vertical_hint();
+	pitch_mode_changed();
 
   private:
+	Time						_dt							= 0_s;
 	Xefis::PIDControl<float>	_magnetic_heading_pid;
 	Xefis::PIDControl<float>	_magnetic_track_pid;
 	Xefis::PIDControl<float>	_altitude_pid;
+	Xefis::PIDControl<float>	_ias_pid;
 	Xefis::PIDControl<float>	_vertical_speed_pid;
 	Xefis::PIDControl<float>	_fpa_pid;
-	Xefis::Smoother<double>		_output_pitch_smoother		= 250_ms;
-	Xefis::Smoother<double>		_output_roll_smoother		= 250_ms;
+	Xefis::Smoother<double>		_output_pitch_smoother		= 1_s;
+	Xefis::Smoother<double>		_output_roll_smoother		= 1_s;
 	Angle						_computed_output_pitch;
 	Angle						_computed_output_roll;
-	Time						_dt = 0_s;
-	Xefis::PropertyObserver		_lateral_hint_computer;
-	Xefis::PropertyObserver		_vertical_hint_computer;
-
+	RollMode					_roll_mode					= RollMode::None;
+	PitchMode					_pitch_mode					= PitchMode::None;
 	// Input:
 	// TODO PID params as settings:
-	// TODO handle nil values, and reset smoothers when nil change to normal values.
 	Xefis::PropertyBoolean		_enabled;
-	Xefis::PropertyInteger		_lateral_mode;
-	Xefis::PropertyInteger		_vertical_mode;
-	Xefis::PropertyAngle		_pitch_limit;
+	Xefis::PropertyAngle		_pitch_limit_max;
+	Xefis::PropertyAngle		_pitch_limit_min;
 	Xefis::PropertyAngle		_roll_limit;
-	Xefis::PropertyAngle		_selected_magnetic_heading;
-	Xefis::PropertyAngle		_selected_magnetic_track;
-	Xefis::PropertyLength		_selected_altitude;
-	Xefis::PropertySpeed		_selected_vertical_speed;
-	Xefis::PropertyAngle		_selected_fpa;
+	Xefis::PropertyInteger		_cmd_roll_mode;
+	Xefis::PropertyInteger		_cmd_pitch_mode;
+	Xefis::PropertyAngle		_cmd_magnetic_heading;
+	Xefis::PropertyAngle		_cmd_magnetic_track;
+	Xefis::PropertyLength		_cmd_altitude;
+	Xefis::PropertySpeed		_cmd_ias;
+	Xefis::PropertySpeed		_cmd_vertical_speed;
+	Xefis::PropertyAngle		_cmd_fpa;
 	Xefis::PropertyAngle		_measured_magnetic_heading;
 	Xefis::PropertyAngle		_measured_magnetic_track;
 	Xefis::PropertyLength		_measured_altitude;
+	Xefis::PropertySpeed		_measured_ias;
 	Xefis::PropertySpeed		_measured_vertical_speed;
 	Xefis::PropertyAngle		_measured_fpa;
-
 	// Output:
 	Xefis::PropertyAngle		_output_pitch;
 	Xefis::PropertyAngle		_output_roll;
-	Xefis::PropertyString		_vertical_mode_hint;
-	Xefis::PropertyString		_lateral_mode_hint;
+	Xefis::PropertyBoolean		_disengage_ap;
 };
 
 #endif
