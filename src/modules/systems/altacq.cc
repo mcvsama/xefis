@@ -32,6 +32,10 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/altacq", AltAcq);
 AltAcq::AltAcq (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	parse_settings (config, {
+		{ "minimum-altitude-difference", _minimum_altitude_difference, false },
+	});
+
 	parse_properties (config, {
 		// Input:
 		{ "altitude.amsl", _altitude_amsl, false },
@@ -75,7 +79,11 @@ AltAcq::compute_altitude_acquire_distance()
 	{
 		Length const alt_diff = *_altitude_acquire_amsl - *_altitude_amsl;
 		Length const distance = *_ground_speed * (alt_diff / *_vertical_speed);
-		_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.m(), update_dt));
+
+		if (!has_setting ("minimum-altitude-difference") || std::abs (alt_diff.ft()) >= _minimum_altitude_difference.ft())
+			_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.m(), update_dt));
+		else
+			_altitude_acquire_distance.set_nil();
 	}
 	else
 	{
