@@ -171,7 +171,7 @@ FlyByWire::data_updated()
 	if (_output_roll.configured())
 		_output_roll.write (_pre_output_roll);
 
-	_dt = Time::epoch();
+	_dt = 0_s;
 }
 
 
