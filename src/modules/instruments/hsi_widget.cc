@@ -529,7 +529,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
-	float len = nm_to_px (6_nm);
+	float len = Xefis::limit (nm_to_px (6_nm), 2.f * _q, 7.f * _q);
 	float pos = nm_to_px (_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
