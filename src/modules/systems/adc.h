@@ -73,7 +73,8 @@ class AirDataComputer: public Xefis::Module
 	bool						_prev_use_standard_pressure			= false;
 	Time						_hide_alt_lookahead_until			= 0_s;
 	Length						_prev_altitude_amsl					= 0_ft;
-	Time						_vertical_speed_time				= 0_s;
+	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
+	// then PropertyObservers, to ensure correct order of destruction.
 	Xefis::Smoother<double>		_vertical_speed_smoother			= 1_s;
 	Xefis::Smoother<double>		_altitude_amsl_smoother				= 500_ms;
 	Xefis::Smoother<double>		_altitude_amsl_qnh_smoother			= 500_ms;
@@ -85,7 +86,6 @@ class AirDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_speed_ias_lookahead_o_smoother		= 1000_ms;
 	Xefis::Lookahead<double>	_altitude_amsl_estimator			= Xefis::Lookahead<double> (10_s);
 	Xefis::Lookahead<double>	_speed_ias_estimator				= Xefis::Lookahead<double> (10_s);
-	// Property observers:
 	Xefis::PropertyObserver		_altitude_computer;
 	Xefis::PropertyObserver		_density_altitude_computer;
 	Xefis::PropertyObserver		_ias_computer;

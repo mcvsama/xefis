@@ -68,7 +68,15 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		{ "vertical-speed", _vertical_speed, true },
 	});
 
+	_altitude_computer.set_minimum_dt (5_ms);
 	_altitude_computer.set_callback (std::bind (&AirDataComputer::compute_altitude, this));
+	_altitude_computer.add_depending_smoothers ({
+		&_altitude_amsl_lookahead_i_smoother,
+		&_altitude_amsl_lookahead_o_smoother,
+		&_altitude_amsl_smoother,
+		&_altitude_amsl_qnh_smoother,
+		&_altitude_amsl_std_smoother,
+	});
 	_altitude_computer.observe ({
 		&_pressure_static,
 		&_pressure_use_std,
@@ -83,12 +91,19 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 	});
 
 	_ias_computer.set_callback (std::bind (&AirDataComputer::compute_ias, this));
+	_ias_computer.add_depending_smoothers ({
+		&_speed_ias_smoother
+	});
 	_ias_computer.observe ({
 		&_ias,
 		&_ias_serviceable,
 	});
 
 	_ias_lookahead_computer.set_callback (std::bind (&AirDataComputer::compute_ias_lookahead, this));
+	_ias_lookahead_computer.add_depending_smoothers ({
+		&_speed_ias_lookahead_i_smoother,
+		&_speed_ias_lookahead_o_smoother,
+	});
 	_ias_lookahead_computer.observe ({
 		&_ias,
 	});
@@ -111,7 +126,11 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		&_speed_sound,
 	});
 
+	_vertical_speed_computer.set_minimum_dt (50_ms);
 	_vertical_speed_computer.set_callback (std::bind (&AirDataComputer::compute_vertical_speed, this));
+	_vertical_speed_computer.add_depending_smoothers ({
+		&_vertical_speed_smoother,
+	});
 	_vertical_speed_computer.observe ({
 		&_altitude_amsl_std,
 	});
@@ -147,7 +166,7 @@ AirDataComputer::compute_altitude()
 	if (_pressure_static.valid() &&
 		((_pressure_use_std.read (false)) || _pressure_qnh.valid()))
 	{
-		auto compute_altitude = [&](Pressure pressure_setting) -> Length {
+		auto do_compute_altitude = [&](Pressure pressure_setting) -> Length {
 			// Good for heights below tropopause (36 kft):
 			double a = 6.8755856e-6;
 			double b = 5.2558797;
@@ -176,9 +195,9 @@ AirDataComputer::compute_altitude()
 		if (hide_alt_lookahead)
 			_hide_alt_lookahead_until = update_time + _altitude_amsl_lookahead_o_smoother.smoothing_time() + _altitude_amsl_lookahead_i_smoother.smoothing_time();
 
-		Length height = compute_altitude (pressure_setting);
-		Length qnh_height = compute_altitude (*_pressure_qnh);
-		Length std_height = compute_altitude (29.92_inHg);
+		Length height = do_compute_altitude (pressure_setting);
+		Length qnh_height = do_compute_altitude (*_pressure_qnh);
+		Length std_height = do_compute_altitude (29.92_inHg);
 
 		_altitude_amsl.write (1_ft * _altitude_amsl_smoother.process (height.ft(), update_dt));
 		_altitude_amsl_qnh.write (1_ft * _altitude_amsl_qnh_smoother.process (qnh_height.ft(), update_dt));
@@ -329,16 +348,10 @@ AirDataComputer::compute_vertical_speed()
 		if (_vertical_speed.is_nil())
 			_prev_altitude_amsl = *_altitude_amsl_std;
 
-		Time& time = _vertical_speed_time;
-		time += update_dt;
-		if (time > 0.05_s)
-		{
-			Length alt_diff = *_altitude_amsl_std - _prev_altitude_amsl;
-			Speed computed_vertical_speed = alt_diff / time;
-			time = 0_s;
-			_prev_altitude_amsl = *_altitude_amsl_std;
-			_vertical_speed.write (1_fpm * _vertical_speed_smoother.process (computed_vertical_speed.fpm(), update_dt));
-		}
+		Length alt_diff = *_altitude_amsl_std - _prev_altitude_amsl;
+		Speed computed_vertical_speed = alt_diff / update_dt;
+		_prev_altitude_amsl = *_altitude_amsl_std;
+		_vertical_speed.write (1_fpm * _vertical_speed_smoother.process (computed_vertical_speed.fpm(), update_dt));
 	}
 	else
 	{

@@ -42,7 +42,11 @@ AltAcq::AltAcq (Xefis::ModuleManager* module_manager, QDomElement const& config)
 		{ "altitude.acquire.distance", _altitude_acquire_distance, true },
 	});
 
+	_altitude_acquire_distance_computer.set_minimum_dt (100_ms);
 	_altitude_acquire_distance_computer.set_callback (std::bind (&AltAcq::compute_altitude_acquire_distance, this));
+	_altitude_acquire_distance_computer.add_depending_smoothers ({
+		&_altitude_acquire_distance_smoother,
+	});
 	_altitude_acquire_distance_computer.observe ({
 		&_altitude_acquire_amsl,
 		&_altitude_amsl,

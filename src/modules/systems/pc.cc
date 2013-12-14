@@ -60,6 +60,10 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 	});
 
 	_wind_computer.set_callback (std::bind (&PerformanceComputer::compute_wind, this));
+	_wind_computer.add_depending_smoothers ({
+		&_wind_direction_smoother,
+		&_wind_speed_smoother,
+	});
 	_wind_computer.observe ({
 		&_speed_tas,
 		&_speed_gs,
@@ -74,7 +78,11 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 		&_vertical_speed,
 	});
 
+	_total_energy_variometer_computer.set_minimum_dt (50_ms);
 	_total_energy_variometer_computer.set_callback (std::bind (&PerformanceComputer::compute_total_energy_variometer, this));
+	_total_energy_variometer_computer.add_depending_smoothers ({
+		&_total_energy_variometer_smoother,
+	});
 	_total_energy_variometer_computer.observe ({
 		&_aircraft_weight_g,
 		&_altitude_amsl_std,
@@ -114,11 +122,10 @@ PerformanceComputer::compute_wind()
 		wt.set_aircraft_track (*_track_lateral_true);
 		wt.set_aircraft_ground_speed (*_speed_gs);
 		wt.set_aircraft_heading (*_orientation_heading_true);
-		// TODO instead of smoothing result, smooth all input parameters
 		wt.update();
 		_wind_from_true.write (Xefis::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt), 360_deg));
 		_wind_from_magnetic.write (Xefis::true_to_magnetic (*_wind_from_true, *_magnetic_declination));
-		_wind_tas.write (wt.wind_speed());
+		_wind_tas.write (1_kt * _wind_speed_smoother.process (wt.wind_speed().kt(), update_dt));
 	}
 	else
 	{
@@ -126,6 +133,7 @@ PerformanceComputer::compute_wind()
 		_wind_from_magnetic.set_nil();
 		_wind_tas.set_nil();
 		_wind_direction_smoother.invalidate();
+		_wind_speed_smoother.invalidate();
 	}
 }
 
@@ -158,32 +166,27 @@ PerformanceComputer::compute_total_energy_variometer()
 			_speed_ias.valid() &&
 			*_speed_ias > _total_energy_variometer_min_ias)
 		{
-			if ((_total_energy_variometer_time += update_dt) > 0.1_s)
-			{
-				double const m = *_aircraft_weight_g;
-				double const g = 9.81;
-				double const v = (*_speed_ias).mps();
-				double const Ep = m * g * (*_altitude_amsl_std).m();
-				double const Ek = m * v * v * 0.5;
-				double const total_energy = Ep + Ek;
+			double const m = *_aircraft_weight_g;
+			double const g = 9.81;
+			double const v = (*_speed_ias).mps();
+			double const Ep = m * g * (*_altitude_amsl_std).m();
+			double const Ek = m * v * v * 0.5;
+			double const total_energy = Ep + Ek;
 
-				// If total energy was nil (invalid), reset _prev_total_energy
-				// value to the current _total_energy:
-				if (_total_energy_variometer.is_nil())
-					_prev_total_energy = total_energy;
-
-				double const energy_diff = total_energy - _prev_total_energy;
-				Speed tev = (1_m * energy_diff / (m * g)) / _total_energy_variometer_time;
-
-				_total_energy_variometer_time = 0_s;
-				_total_energy_variometer.write (1_fpm * _total_energy_variometer_smoother.process (tev.fpm(), update_dt));
-
+			// If total energy was nil (invalid), reset _prev_total_energy
+			// value to the current _total_energy:
+			if (_total_energy_variometer.is_nil())
 				_prev_total_energy = total_energy;
-			}
+
+			double const energy_diff = total_energy - _prev_total_energy;
+			Speed tev = (1_m * energy_diff / (m * g)) / update_dt;
+
+			_total_energy_variometer.write (1_fpm * _total_energy_variometer_smoother.process (tev.fpm(), update_dt));
+
+			_prev_total_energy = total_energy;
 		}
 		else
 		{
-			_total_energy_variometer_time = 0_s;
 			_total_energy_variometer.set_nil();
 			_total_energy_variometer_smoother.invalidate();
 		}
