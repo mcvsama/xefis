@@ -45,34 +45,73 @@ PropertyObserver::observe (std::initializer_list<Object> list)
 
 
 void
-PropertyObserver::set_callback (Callback callback)
+PropertyObserver::set_callback (Callback callback) noexcept
 {
 	_callback = callback;
 }
 
 
 void
+PropertyObserver::set_minimum_dt (Time dt) noexcept
+{
+	_minimum_dt = dt;
+}
+
+
+void
 PropertyObserver::data_updated (Time update_time)
 {
-	bool updated = false;
+	Time obs_dt = update_time - _obs_update_time;
+	_accumulated_dt += update_time - _fire_time;
 
 	for (Object& o: _objects)
 	{
 		PropertyNode::Serial new_serial = o.remote_serial();
 		if (new_serial != o._saved_serial)
 		{
-			updated = true;
+			_need_callback = true;
 			o._saved_serial = new_serial;
 		}
 	}
 
-	if (updated)
+	// Minimum time (granularity) for updates caused by working smoothers - 1 ms.
+	if (_need_callback || (obs_dt >= 1_ms && obs_dt <= longest_smoothing_time()))
 	{
-		_update_dt = update_time - _update_time;
-		_update_time = update_time;
-		++_serial;
-		_callback();
+		if (_accumulated_dt >= _minimum_dt)
+		{
+			if (_need_callback)
+				_obs_update_time = update_time;
+			_need_callback = false;
+			_accumulated_dt = 0_ms;
+			_fire_dt = update_time - _fire_time;
+			_fire_time = update_time;
+			++_serial;
+			_callback();
+		}
 	}
+}
+
+
+void
+PropertyObserver::add_depending_smoother (SmootherBase& smoother)
+{
+	_smoothers.push_back (&smoother);
+}
+
+
+void
+PropertyObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> list)
+{
+	_smoothers.insert (_smoothers.end(), list.begin(), list.end());
+}
+
+
+Time
+PropertyObserver::longest_smoothing_time() const noexcept
+{
+	return (*std::max_element (_smoothers.begin(), _smoothers.end(), [](SmootherBase* a, SmootherBase* b) -> bool {
+		return a->smoothing_time() < b->smoothing_time();
+	}))->smoothing_time();
 }
 
 } // namespace Xefis

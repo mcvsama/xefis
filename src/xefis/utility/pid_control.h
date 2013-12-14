@@ -158,6 +158,12 @@ template<class tValueType>
 		ValueType
 		output() const noexcept;
 
+		/**
+		 * Reset to default state.
+		 */
+		void
+		reset() noexcept;
+
 	  private:
 		bool				_winding		= false;
 		ValueType			_target			= ValueType();
@@ -182,7 +188,9 @@ template<class T>
 		_p (p),
 		_i (i),
 		_d (d)
-	{ }
+	{
+		reset();
+	}
 
 
 template<class T>
@@ -355,6 +363,17 @@ template<class T>
 	PIDControl<T>::output() const noexcept
 	{
 		return _output;
+	}
+
+
+template<class T>
+	inline void
+	PIDControl<T>::reset() noexcept
+	{
+		_output = ValueType();
+		_previous_error = ValueType();
+		_integral = ValueType();
+		_derivative = ValueType();
 	}
 
 } // namespace Xefis
