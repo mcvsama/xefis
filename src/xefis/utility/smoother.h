@@ -31,49 +31,73 @@
 namespace Xefis {
 
 /**
- * Implementation of one-pole LPF.
- * See http://musicdsp.org/showone.php?id=257
+ * Contains all type-independend methods for the smoother.
+ */
+class SmootherBase
+{
+  public:
+	// Dtor
+	virtual ~SmootherBase() {}
+
+	/**
+	 * Set new smoothing time.
+	 * It's the size of the smoothing window. After that time, output value will reach target value.
+	 */
+	void
+	set_smoothing_time (Time smoothing_time) noexcept;
+
+	/**
+	 * Return smoothing time.
+	 */
+	Time
+	smoothing_time() const noexcept;
+
+	/**
+	 * Set sampling precision.
+	 */
+	void
+	set_precision (Time precision) noexcept;
+
+	/**
+	 * Resets the smoother when the next process() is called,
+	 * to the value given in process() call.
+	 */
+	void
+	invalidate() noexcept;
+
+  protected:
+	/**
+	 * Subclass implementation.
+	 */
+	virtual void
+	set_smoothing_time_impl (int milliseconds) noexcept = 0;
+
+  protected:
+	Time	_smoothing_time;
+	Time	_precision;
+	bool	_invalidate = false;
+};
+
+
+/**
+ * Implementation of moving averages.
  */
 template<class tValueType>
-	class Smoother
+	class Smoother: public SmootherBase
 	{
 	  public:
 		typedef tValueType ValueType;
 		typedef float SamplesType;
 
 	  public:
+		// Ctor
 		Smoother (Time smoothing_time = 1_ms, Time precision = 1_ms) noexcept;
-
-		/**
-		 * Set new smoothing time.
-		 */
-		void
-		set_smoothing_time (Time smoothing_time) noexcept;
-
-		/**
-		 * Set sampling precision.
-		 */
-		void
-		set_precision (Time precision) noexcept;
-
-		/**
-		 * Return smoothing time.
-		 */
-		Time
-		smoothing_time() const noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
 		 */
 		void
 		reset (ValueType value = ValueType()) noexcept;
-
-		/**
-		 * Resets the smoother when next process() is called,
-		 * to the value given in process() call.
-		 */
-		void
-		invalidate() noexcept;
 
 		/**
 		 * Enable winding and set valid values range.
@@ -100,6 +124,10 @@ template<class tValueType>
 		ValueType
 		last_sample() const noexcept;
 
+	  protected:
+		void
+		set_smoothing_time_impl (int milliseconds) noexcept override;
+
 	  private:
 		ValueType
 		encircle (ValueType s) const noexcept;
@@ -107,17 +135,54 @@ template<class tValueType>
 		ValueType
 		decircle (ValueType s) const noexcept;
 
+		void
+		recompute_window() noexcept;
+
 	  private:
-		Time								_smoothing_time;
-		Time								_precision;
+		Time								_accumulated_dt		= 0_s;
 		ValueType							_z;
 		Range<ValueType>					_winding;
 		bool								_winding_enabled	= false;
-		bool								_invalidate			= false;
 		boost::circular_buffer<ValueType>	_history;
 		boost::circular_buffer<ValueType>	_history_cos;
 		boost::circular_buffer<ValueType>	_history_sin;
+		std::vector<ValueType>				_window;
 	};
+
+
+inline void
+SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
+{
+	_smoothing_time = smoothing_time;
+	int millis = _smoothing_time.ms();
+	// Due to the nature of Hann window, minimum number of samples is 3,
+	// therefore minimum smoothing time is 3 ms.
+	if (millis < 3)
+		millis = 3;
+	set_smoothing_time_impl (millis);
+}
+
+
+inline Time
+SmootherBase::smoothing_time() const noexcept
+{
+	return _smoothing_time;
+}
+
+
+inline void
+SmootherBase::set_precision (Time precision) noexcept
+{
+	_precision = precision;
+	invalidate();
+}
+
+
+inline void
+SmootherBase::invalidate() noexcept
+{
+	_invalidate = true;
+}
 
 
 template<class V>
@@ -132,33 +197,14 @@ template<class V>
 
 template<class V>
 	inline void
-	Smoother<V>::set_smoothing_time (Time smoothing_time) noexcept
+	Smoother<V>::set_smoothing_time_impl (int millis) noexcept
 	{
-		_smoothing_time = smoothing_time;
-		int millis = _smoothing_time.ms();
-		if (millis < 1)
-			millis = 1;
 		_history.resize (millis);
 		_history_cos.resize (millis);
 		_history_sin.resize (millis);
+		_window.resize (millis);
+		recompute_window();
 		invalidate();
-	}
-
-
-template<class V>
-	inline void
-	Smoother<V>::set_precision (Time precision) noexcept
-	{
-		_precision = precision;
-		invalidate();
-	}
-
-
-template<class V>
-	inline Time
-	Smoother<V>::smoothing_time() const noexcept
-	{
-		return _smoothing_time;
 	}
 
 
@@ -180,14 +226,6 @@ template<class V>
 
 template<class V>
 	inline void
-	Smoother<V>::invalidate() noexcept
-	{
-		_invalidate = true;
-	}
-
-
-template<class V>
-	inline void
 	Smoother<V>::set_winding (Range<ValueType> range)
 	{
 		_winding = range;
@@ -200,6 +238,8 @@ template<class V>
 	inline typename Smoother<V>::ValueType
 	Smoother<V>::process (ValueType s, Time dt) noexcept
 	{
+		_accumulated_dt += dt;
+
 		if (!std::isfinite (s))
 			return _z;
 
@@ -209,10 +249,11 @@ template<class V>
 			reset (s);
 		}
 
-		if (dt > 10 * _smoothing_time)
-			dt = 10 * _smoothing_time;
+		if (_accumulated_dt > 10 * _smoothing_time)
+			_accumulated_dt = 10 * _smoothing_time;
 
-		int iterations = std::round (dt / _precision);
+		int iterations = _accumulated_dt / _precision;
+
 		if (iterations > 1)
 		{
 			if (_winding_enabled)
@@ -236,9 +277,13 @@ template<class V>
 				ValueType y = 0.0;
 				for (typename boost::circular_buffer<ValueType>::size_type i = 0; i < _history.size(); ++i)
 				{
-					x += _history_cos[i];
-					y += _history_sin[i];
+					x += _history_cos[i] * _window[i];
+					y += _history_sin[i] * _window[i];
 				}
+				x /= _history.size() - 1;
+				y /= _history.size() - 1;
+				x *= 2.0;
+				y *= 2.0; // Window energy correction.
 				_z = floored_mod<ValueType> (decircle (std::atan2 (y, x)), _winding.min(), _winding.max());
 			}
 			else
@@ -248,17 +293,13 @@ template<class V>
 					_history.push_back (p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
 
 				_z = 0.0;
-				for (ValueType v: _history)
-					_z += v;
-				_z /= _history.size();
+				for (std::size_t i = 0; i < _history.size(); ++i)
+					_z += _history[i] * _window[i];
+				_z /= _history.size() - 1; // Some coeffs are 0 in the window.
+				_z *= 2.0; // Window energy correction.
 			}
-		}
-		else
-		{
-			if (_winding_enabled)
-				_z = floored_mod<ValueType> (s, _winding.min(), _winding.max());
-			else
-				_z = s;
+
+			_accumulated_dt = 0_s;
 		}
 
 		return _z;
@@ -294,6 +335,16 @@ template<class V>
 	Smoother<V>::decircle (ValueType s) const noexcept
 	{
 		return renormalize (s, Range<ValueType> (0.0, 2.0 * M_PI), _winding);
+	}
+
+
+template<class V>
+	inline void
+	Smoother<V>::recompute_window() noexcept
+	{
+		std::size_t N = _window.size();
+		for (std::size_t n = 0; n < N; ++n)
+			_window[n] = 0.5 * (1.0 - std::cos (2.0 * M_PI * n / (N - 1)));
 	}
 
 } // namespace Xefis
