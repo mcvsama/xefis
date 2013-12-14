@@ -211,7 +211,7 @@ FlightDirector::data_updated()
 	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), _dt));
 	_disengage_ap.write (disengage);
 
-	_dt = Time::now();
+	_dt = 0_s;
 }
 
 
