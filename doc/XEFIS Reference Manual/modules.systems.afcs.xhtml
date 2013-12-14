@@ -6,137 +6,323 @@
 		<doc:name>systems/afcs</doc:name>
 	</doc:meta>
 	<section>
-		<h1>Glossary</h1>
-		<p>FMC is Flight Management Computer.</p>
-		<p>MCP is Main Control Panel.</p>
+		<h1>Description</h1>
+		<p>
+			AFCS is a module that controls autothrottle and flight director modules by engaging different modes suitable for given type of flight.
+			There are three parts to be controlled: speed or thrust (controlled by A/T), lateral movement (controlled by plane roll) and vertical movement
+			(controlled by plane pitch). FMA (Flight Mode Annunciator) shows current and armed modes on EFIS. AFCS provides string properties
+			to be displayed on EFIS for active and armed modes. AFCS is controlled by boolean properties representing buttons and rotary encoders on MCP (Mode Control Panel).
+			AFCS provides boolean properties telling which LEDs under the buttons should be lit.
+		</p>
 	</section>
 	<section>
-		<h1>Speed modes</h1>
-		<table>
+		<h1>A/T modes</h1>
+		<table style='width: 100%'>
 			<tr>
-				<th scope='col'>Mode on FMA</th>
-				<th scope='col'>Controls</th>
-				<th scope='col'>Meaning</th>
-			</tr>
-			<tr>
-				<td>TO/GA</td>
-				<td>thrust</td>
-				<td>Use maximum temporary thrust available.</td>
-			</tr>
-			<tr>
-				<td>N1</td>
-				<td>thrust</td>
-				<td>Maintain maximum continuous thrust, configured in FMC.</td>
-			</tr>
-			<tr>
-				<td>FMC SPD</td>
-				<td>speed</td>
-				<td>Maintain normal cruise speed, set in FMC.</td>
-			</tr>
-			<tr>
-				<td>MCP SPD</td>
-				<td>speed</td>
-				<td>Maintain speed selected on MCP panel.</td>
-			</tr>
-			<tr>
-				<td>SPD HOLD</td>
-				<td>speed</td>
-				<td>Maintain speed present at the moment the HOLD mode was engaged.</td>
-			</tr>
-			<tr>
-				<td>FMC DESC</td>
-				<td>speed</td>
-				<td>Maintain speed for descend, configured in FMC.</td>
-			</tr>
-			<tr>
-				<td>IDLE</td>
-				<td>thrust</td>
-				<td>Maintain minimum thrust.</td>
-			</tr>
-		</table>
-	</section>
-	<section>
-		<h1>Lateral modes</h1>
-		<table>
-			<tr>
-				<th scope='col'>Mode on FMA</th>
-				<th scope='col'>Controls</th>
-				<th scope='col'>Meaning</th>
-			</tr>
-		</table>
-	</section>
-	<section>
-		<h1>Vertical modes</h1>
-		<table>
-			<tr>
-				<th scope='col'>Mode on FMA</th>
-				<th scope='col'>Controls</th>
-				<th scope='col'>Meaning</th>
-			</tr>
-			<tr>
-				<td>LVL CHG</td>
-			</tr>
-			<tr>
-				<td>VNAV PTH</td>
-			</tr>
-			<tr>
-				<td>VNAV ALT</td>
-			</tr>
-			<tr>
-				<td>VNAV SPD</td>
-			</tr>
-			<tr>
-				<td>ALT HOLD</td>
-			</tr>
-		</table>
-		<p>Buttons</p>
-		<table>
-			<tr>
-				<th scope='col'>Button</th>
-				<th scope='col'>FMA message</th>
+				<th scope='col'>Mode</th>
+				<th scope='col'>A/T controls</th>
 				<th scope='col'>Description</th>
 			</tr>
 			<tr>
-				<td>CLB/CON</td>
-				<td>N1 (speed),<br/>CLB/CON (vertical)</td>
-				<td>
-					<p>Set thrust to N1, maintain vertical speed with pitch. Default vertical speed is configured in FMC.</p>
-					<p>Disengages when vertical speed on MCP is set to or below 0 fpm.</p>
-				</td>
+				<td><doc:fma>TO/GA</doc:fma></td>
+				<td>thrust</td>
+				<td>Use maximum thrust available (for limited amount of time).</td>
 			</tr>
 			<tr>
-				<td>V/S HOLD</td>
-				<td>
-					V/S
-				</td>
-				<td>
-					<p>Maintain current vertical speed with pitch.</p>
-					<p>MCP counter is set to current vertical speed.</p>
-					<p>If FLCH mode was engaged when the button was pressed,
-						this mode will disengage when selected altitude is reached.</p>
-					<p>When vertical speed is set to 0 on the counter, the mode disengages. If FLCH
-						was engaged when counter was set to 0, FLCH mode also disengages and altitude
-						mode is set to ALT HOLD.</p>
-				</td>
+				<td><doc:fma>THR</doc:fma></td>
+				<td>thrust</td>
+				<td>Maintain maximum continuous thrust.</td>
 			</tr>
 			<tr>
-				<td>VS/FPA</td>
-				<td>VS or FPA</td>
-				<td>
-					<p>Climb or descend with VS or FPA selected on the counter.</p>
-					<p>Disabling this mode by pressing the button will:</p>
-					<ul>
-						<li>enable ALT HOLD mode at current altitude, if FLCH mode was not engaged previously</li>
-						<li>continue in LVL CHG mode with default vertical speed</li>
-					</ul>
-					<p>If FLCH mode was engaged when the button was pressed:</p>
-					<ul>
-						<li>if VS or FPA is set to 0 or in the opposite direction than the commanded altitude,
-						FLCH mode will disengage.</li>
-						<li>when altitude selected on ALTITUDE counter is reached, this mode will be deactivated.</li>
-					</ul>
-				</td>
+				<td><doc:fma>THR REF</doc:fma></td>
+				<td>thrust</td>
+				<td>Maintain reference thrust (different for descent and climb) pointed by green caret on N1 thrust indicators on EICAS.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>IDLE</doc:fma></td>
+				<td>thrust</td>
+				<td>Maintain minimum thrust.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>SPD REF</doc:fma></td>
+				<td>airspeed</td>
+				<td>Maintain computed airspeed (different for descent, cruise and climb) pointed by REF marker on speed ladder on EFIS.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>SPD SEL</doc:fma></td>
+				<td>airspeed</td>
+				<td>Change airspeed to the one selected on MCP counter (operation in progress).</td>
+			</tr>
+			<tr>
+				<td><doc:fma>MCP SPD</doc:fma></td>
+				<td>airspeed</td>
+				<td>Maintain airspeed selected on MCP counter. Set after MCP speed is acquired.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>HOLD</doc:fma></td>
+				<td>airspeed</td>
+				<td>Maintain airspeed present at the moment the HOLD mode was engaged.</td>
 			</tr>
 		</table>
+	</section>
+	<section>
+		<h1>Roll modes</h1>
+		<table style='width: 100%'>
+			<tr>
+				<th scope='col'>Mode</th>
+				<th scope='col'>Controls</th>
+				<th scope='col'>Description</th>
+			</tr>
+			<tr>
+				<td><doc:fma>HDG SEL</doc:fma></td>
+				<td>lateral flight path</td>
+				<td>Command roll to turn to MCP-selected heading.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>HDG</doc:fma></td>
+				<td>lateral flight path</td>
+				<td>Command roll to hold onto MCP-selected heading.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>TRK SEL</doc:fma></td>
+				<td>lateral flight path</td>
+				<td>Command roll to turn to MCP-selected track.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>HDG</doc:fma></td>
+				<td>lateral flight path</td>
+				<td>Command roll to hold onto MCP-selected track.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>LOC</doc:fma></td>
+				<td>lateral flight path</td>
+				<td>Command roll do hold onto localizer path.</td>
+			</tr>
+		</table>
+	</section>
+	<section>
+		<h1>Pitch modes</h1>
+		<table style='width: 100%'>
+			<tr>
+				<th scope='col'>Mode</th>
+				<th scope='col'>Pitch controls</th>
+				<th scope='col'>Description</th>
+			</tr>
+			<tr>
+				<td><doc:fma>FLCH SPD</doc:fma></td>
+				<td>airspeed</td>
+				<td>
+					Change altitude mode. Target altitude is selected by the altitude counter. When selected altitude is reached,
+					vertical mode is automatically changed to ALT.
+				</td>
+			</tr>
+			<tr>
+				<td><doc:fma>FLCH V/S</doc:fma></td>
+				<td>vertical&#xa0;speed</td>
+				<td>Just like FLCH&#xa0;SPD, but pitch is used to control vertical speed.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>FLCH FPA</doc:fma></td>
+				<td>flight&#xa0;path</td>
+				<td>Just like FLCH&#xa0;SPD, but pitch is used to maintain vertical flight path angle.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>V/S</doc:fma></td>
+				<td>vertical&#xa0;speed</td>
+				<td>Maintain vertical speed set on MCP counter.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>FPA</doc:fma></td>
+				<td>flight&#xa0;path</td>
+				<td>Maintain flight path angle set on MCP counter.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>CLB/CON</doc:fma></td>
+				<td>airspeed</td>
+				<td>Climb with maximum continuous thrust.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>VNAV SPD</doc:fma></td>
+				<td>airspeed</td>
+				<td>Command pitch to hold selected airspeed.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>VNAV PTH</doc:fma></td>
+				<td>flight&#xa0;path</td>
+				<td>Command pitch to hold configured target altitude or VNAV path.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>ALT</doc:fma></td>
+				<td>altitude</td>
+				<td>Command pitch to hold MCP selected altitude. Set after MCP altitude is acquired.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>ALT HOLD</doc:fma></td>
+				<td>altitude</td>
+				<td>Command pitch to hold current altitude.</td>
+			</tr>
+			<tr>
+				<td><doc:fma>G/S</doc:fma></td>
+				<td>flight&#xa0;path</td>
+				<td>Command pitch do hold onto glide slope path.</td>
+			</tr>
+		</table>
+	</section>
+	<section>
+		<h1>MCP panel buttons</h1>
+		<p>Each button has corresponding property to control it. If button has a LED light, there's also a property that controls that light.
+			Refer to the input and output properties tables.</p>
+		<section>
+			<p><doc:btn>SPD SEL</doc:btn></p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					Set A/T mode to <doc:fma>SPD SEL</doc:fma>.
+					For the pitch mode, following changes apply:
+					<ul>
+						<li><doc:fma>FLCH SPD</doc:fma> changes to <doc:todo/></li>
+						<li><doc:fma>CLB/CON</doc:fma> changes to <doc:todo/></li>
+						<li><doc:fma>VNAV SPD</doc:fma> changes to <doc:todo/></li>
+						<li>Other modes are kept.</li>
+					</ul>
+				</dd>
+				<dt>When target speed is reached</dt>
+				<dd>Change A/T mode to <doc:fma>MCP SPD</doc:fma>.</dd>
+				<dt>When disengaged</dt>
+				<dd><doc:todo/></dd>
+			</dl>
+		</section>
+		<section>
+			<p><doc:btn>HOLD</doc:btn> on speed panel</p>
+			<doc:todo/>
+		</section>
+		<section>
+			<p><doc:btn>HDG SEL</doc:btn></p>
+			<doc:todo/>
+		</section>
+		<section>
+			<p><doc:btn>HOLD</doc:btn> on heading panel</p>
+			<doc:todo/>
+		</section>
+		<section>
+			<p><doc:btn>VNAV</doc:btn></p>
+			<p>Engage VNAV pitch mode.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					A/T mode is changed to <doc:fma>SPD REF</doc:fma> for cruise.
+				</dd>
+				<dt>When disengaged</dt>
+				<dd>
+					<doc:todo/>
+				</dd>
+			</dl>
+		</section>
+		<section>
+			<p><doc:btn>LNAV</doc:btn></p>
+			<p>Engage LNAV roll mode.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					Roll mode changes to <doc:fma>LNAV</doc:fma>.
+				</dd>
+				<dt>When disengaged</dt>
+				<dd>
+					<doc:todo/>
+				</dd>
+			</dl>
+		</section>
+		<section>
+			<p><doc:btn>APP</doc:btn></p>
+			<p>Arm or change to LOC/G/S modes. This mode uses ILS localizer and glide slope information for guiding aircraft.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					If localizer/glide slope is available, changes roll/pitch modes to <doc:fma>LOC</doc:fma>/<doc:fma>G/S</doc:fma>.
+					If unavailable, arms LOC and G/S modes and activates them as soon as localizer/glide slope is captured.
+					A/T mode is changed to <doc:fma>SPD REF</doc:fma> for approach as soon as glide slope is captured.
+				</dd>
+				<dt>When disengaged</dt>
+				<dd>
+					<doc:todo/>
+				</dd>
+			</dl>
+		</section>
+		<section>
+			<p><doc:btn>HOLD</doc:btn> on altitude panel</p>
+			<doc:todo/>
+		</section>
+		<section>
+			<p><doc:btn>FLCH</doc:btn></p>
+			<p>Engage flight level change mode.</p>
+			<p>Aircraft will climb or descend to altitude selected by altitude MCP counter.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					A/T mode is set to <doc:fma>THR REF</doc:fma> for climb, or <doc:fma>IDLE</doc:fma> for descent.
+					Pitch mode is set to <doc:fma>FLCH SPD</doc:fma>.
+				</dd>
+				<dt>When target altitude is reached</dt>
+				<dd>A/T mode is set to <doc:todo/>. Pitch mode is set to <doc:fma>ALT</doc:fma>.</dd>
+				<dt>When disengaged</dt>
+				<dd>A/T mode is set to <doc:todo/>. Pitch mode is set to <doc:todo/>.</dd>
+			</dl>
+		</section>
+		<section>
+			<p><doc:btn>VS/FPA</doc:btn></p>
+			<p>Climb or descend with VS or FPA selected on the counter.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					If A/T operates in thrust mode, it's changed to <doc:fma>SPD REF</doc:fma> for climb or descent. If A/T operates in speed mode, no change is applied.
+					If FLCH mode was engaged, pitch mode is set to <doc:fma>FLCH V/S</doc:fma> or <doc:fma>FLCH FPA</doc:fma>. Otherwise,
+					pitch mode is set to <doc:fma>V/S</doc:fma> or <doc:fma>FPA</doc:fma>.
+				</dd>
+				<dt>When disengaged</dt>
+				<dd>
+					If FLCH was engaged, vertical speed is set to default, A/T mode is set back to <doc:fma>THR REF</doc:fma>.
+					If FLCH was not engaged, A/T mode is set to <doc:fma>MCP SPD</doc:fma>, pitch mode is set to <doc:fma>ALT HOLD</doc:fma>.
+				</dd>
+			</dl>
+			<p>Mode disengages when vertical speed or FPA is set to 0 or in the opposite direction than the commanded altitude. Above mode changes apply.</p>
+		</section>
+		<section>
+			<p><doc:btn>V/S&#xa0;HOLD</doc:btn></p>
+			<p>Maintain current vertical speed with pitch.</p>
+			<dl>
+				<dt>When engaged</dt>
+				<dd>
+					<p>MCP counter is set to current vertical speed.</p>
+					<p>If A/T operates in thrust mode, it's changed to <doc:fma>SPD REF</doc:fma> for climb or descent. If A/T operates in speed mode, no change is applied.
+					Pitch mode is set to <doc:fma>V/S</doc:fma>.</p>
+				</dd>
+				<dt>When disengaged</dt>
+				<dd><doc:todo/></dd>
+			</dl>
+			<p>Disengages when vertical speed is set to 0 on the counter.</p>
+		</section>
+		<section>
+			<p><doc:btn>CLB/CON</doc:btn></p>
+			<p>Climb with maximum continuous thrust and airspeed set on MCP counter.</p>
+			<dl>
+				<dt>A/T</dt>
+				<dd><doc:fma>THR</doc:fma></dd>
+				<dt>Pitch mode</dt>
+				<dd><doc:fma>CLB/CON</doc:fma></dd>
+			</dl>
+		</section>
+	</section>
+	<section>
+		<h1>Failures</h1>
+		<doc:todo/> Opis kiedy tryby się disengagują, np. jeśli zniknie info o TRK (z GPS) czy coś. Wtedy wyłącza się A/P lub A/T lub oba.
+		<p>When remote control is unavailable, A/P and A/T will never disengage.</p>
+	</section>
+	<section>
+		<h1>Input</h1>
+		<doc:todo/>
+	</section>
+	<section>
+		<h1>Output</h1>
+		<doc:todo/>
 	</section>
 </doc:module>

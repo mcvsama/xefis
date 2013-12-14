@@ -205,6 +205,22 @@
 		</tr>
 	</xsl:template>
 
+	<xsl:template match='doc:fma'>
+		<span class='fma-mode'>
+			<xsl:apply-templates/>
+		</span>
+	</xsl:template>
+
+	<xsl:template match='doc:btn'>
+		<span class='mcp-button'>
+			<xsl:apply-templates/>
+		</span>
+	</xsl:template>
+
+	<xsl:template match='doc:todo'>
+		<span class='todo'>TODO</span>
+	</xsl:template>
+
 	<xsl:template match='*'>
 		<xsl:copy>
 			<xsl:copy-of select='@*'/>
