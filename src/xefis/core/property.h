@@ -201,21 +201,8 @@ class TypedProperty: public GenericProperty
 	TypedProperty (TypedProperty const&) = default;
 	TypedProperty& operator= (TypedProperty const&) = default;
 
-// TODO
-#if 0
 	// Inherit other constructors:
 	using GenericProperty::GenericProperty;
-#else
-	// Ctor
-	TypedProperty (std::string path):
-		GenericProperty (path)
-	{ }
-
-	// Ctor
-	TypedProperty (PropertyDirectoryNode* root, std::string path):
-		GenericProperty (root, path)
-	{ }
-#endif
 
   public:
 	/**
