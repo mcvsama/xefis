@@ -43,7 +43,7 @@
 				<property name='input-roll-axis' path='/main/axis/0'/>
 				<property name='input-yaw-axis' path='/rudder/axis/2'/>
 			</directory>
-			<directory path='/systems/flight-director'>
+			<directory path='/systems/flight-director/guidance'>
 				<property name='input-pitch' path='/pitch'/>
 				<property name='input-roll' path='/roll'/>
 			</directory>
