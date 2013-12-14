@@ -43,8 +43,11 @@ class AltAcq: public Xefis::Module
 	compute_altitude_acquire_distance();
 
   private:
+	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
+	// then PropertyObservers, to ensure correct order of destruction.
+	Xefis::Smoother<double>		_altitude_acquire_distance_smoother	= 2_s;
 	Xefis::PropertyObserver		_altitude_acquire_distance_computer;
-	Xefis::Smoother<double>		_altitude_acquire_distance_smoother		= 1_s;
+	Length						_minimum_altitude_difference;
 	// Input:
 	Xefis::PropertyLength		_altitude_amsl;
 	Xefis::PropertyLength		_altitude_acquire_amsl;

@@ -97,6 +97,11 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	});
 
 	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
+	_headings_computer.add_depending_smoothers ({
+		&_orientation_heading_magnetic_smoother,
+		&_orientation_pitch_smoother,
+		&_orientation_roll_smoother,
+	});
 	_headings_computer.observe ({
 		&_orientation_input_heading_magnetic,
 		&_orientation_input_pitch,
@@ -105,12 +110,20 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	});
 
 	_track_computer.set_callback (std::bind (&NavigationComputer::compute_track, this));
+	_track_computer.add_depending_smoothers ({
+		&_track_vertical_smoother,
+		&_track_lateral_true_smoother,
+		&_track_heading_delta_smoother,
+	});
 	_track_computer.observe ({
 		&_position_computer,
 		&_magnetic_declination,
 	});
 
 	_ground_speed_computer.set_callback (std::bind (&NavigationComputer::compute_ground_speed, this));
+	_ground_speed_computer.add_depending_smoothers ({
+		&_track_ground_speed_smoother,
+	});
 	_ground_speed_computer.observe ({
 		&_position_computer
 	});

@@ -49,14 +49,17 @@ class PerformanceComputer: public Xefis::Module
 	compute_total_energy_variometer();
 
   private:
-	Time						_total_energy_variometer_time		= 100_ms;
+	Time						_total_energy_variometer_time		= 50_ms;
 	Speed						_total_energy_variometer_min_ias	= 0_kt;
 	double						_prev_total_energy					= 0.0;
+	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
+	// then PropertyObservers, to ensure correct order of destruction.
+	Xefis::Smoother<double>		_wind_direction_smoother			= 5_s;
+	Xefis::Smoother<double>		_wind_speed_smoother				= 5_s;
+	Xefis::Smoother<double>		_total_energy_variometer_smoother	= 1_s;
 	Xefis::PropertyObserver		_wind_computer;
 	Xefis::PropertyObserver		_glide_ratio_computer;
 	Xefis::PropertyObserver		_total_energy_variometer_computer;
-	Xefis::Smoother<double>		_wind_direction_smoother			= 10_s;
-	Xefis::Smoother<double>		_total_energy_variometer_smoother	= 200_ms;
 	// Input:
 	Xefis::PropertyFloat		_aircraft_weight_g;
 	Xefis::PropertySpeed		_speed_ias;
