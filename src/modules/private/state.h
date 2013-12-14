@@ -20,7 +20,6 @@
 
 // Qt:
 #include <QtCore/QString>
-#include <QtCore/QTime>
 #include <QtXml/QDomElement>
 
 // Xefis:
@@ -31,12 +30,8 @@
 #include <xefis/utility/range.h>
 
 
-class State:
-	public QObject,
-	public Xefis::Module
+class State: public Xefis::Module
 {
-	Q_OBJECT
-
 	static constexpr Length					MinimumsBaroStep		= 10_ft;
 	static constexpr Length					MinimumsRadioStep		= 1_ft;
 	static constexpr Xefis::Range<Length>	MinimumsBaroRange		= { 0_ft, 5000_ft };
@@ -44,12 +39,6 @@ class State:
 	static constexpr Pressure				QNHhPaStep				= 1_hPa;
 	static constexpr Pressure				QNHinHgStep				= 0.01_inHg;
 	static constexpr Xefis::Range<Pressure>	QNHRange				= { 800_hPa, 1100_hPa };
-	static constexpr Xefis::Range<Speed>	CmdSpeedRange			= { 10_kt, 300_kt };
-	static constexpr Xefis::Range<Length>	CmdAltitudeRange		= { -5000_ft, 50000_ft };
-	static constexpr Speed					CmdVSpdStep				= 10_fpm;
-	static constexpr Xefis::Range<Speed>	CmdVSpdRange			= { -6000_fpm, 6000_fpm };
-	static constexpr Angle					HeadingHoldPitchLimit	= 30_deg;
-	static constexpr Angle					AltitudeHoldRollLimit	= 30_deg;
 
 	enum class MinimumsType
 	{
@@ -62,35 +51,6 @@ class State:
 		EICAS	= 0,
 		ND		= 1,
 		CHKLST	= 2,
-	};
-
-	enum class CmdAltitudeStep
-	{
-		Ft10,
-		Ft100,
-	};
-
-	enum class SpeedMode
-	{
-		None,
-		Select,
-		Hold,
-	};
-
-	enum class LateralMode
-	{
-		None,
-		LNAV,	// Follow a course provided by flight plan module.
-		Select,	// Follow a course set on the counter.
-		Hold,	// Follow a course set on the counter.
-	};
-
-	enum class VerticalMode
-	{
-		None,
-		VNAV,	// Follow a course provided by flight plan module.
-		Select,	// Follow a course set on the counter.
-		Hold,	// Follow a course set on the counter.
 	};
 
 	/**
@@ -211,24 +171,6 @@ class State:
 	prepare_efis_settings();
 
 	void
-	prepare_afcs_main_panel();
-
-	void
-	prepare_speed_panel();
-
-	void
-	prepare_heading_panel();
-
-	void
-	prepare_nav_panel();
-
-	void
-	prepare_altitude_panel();
-
-	void
-	prepare_vspd_panel();
-
-	void
 	prepare_lights_gpws_mfd_panels();
 
 	/**
@@ -242,12 +184,6 @@ class State:
 	 */
 	void
 	solve_pressure();
-
-	/**
-	 * Compute and solve settings of Flight Director.
-	 */
-	void
-	solve_fd();
 
 	/**
 	 * Call given callback when button is pressed (property becomes true).
@@ -273,41 +209,7 @@ class State:
 	Length								_minimums_setting_radio		= 0_ft;
 	Pressure							_qnh_setting				= 29.92_inHg;
 	Angle								_course						= 0_deg;
-	Speed								_cmd_speed_counter			= CmdSpeedRange.min();
-	Speed								_cmd_speed_selected			= CmdSpeedRange.min();
-	Angle								_cmd_heading_counter		= 0_deg;
-	Angle								_cmd_heading_selected		= 0_deg;
-	Length								_cmd_altitude_counter		= 1000_ft;
-	Length								_cmd_altitude_selected		= 1000_ft;
-	Speed								_cmd_vspd_counter			= 0_fpm;
-	Speed								_cmd_vspd_selected			= 0_fpm;
-	CmdAltitudeStep						_cmd_altitude_step			= CmdAltitudeStep::Ft10;
-	SpeedMode							_speed_mode					= SpeedMode::None;
-	LateralMode							_lateral_mode				= LateralMode::None;
-	VerticalMode						_vertical_mode				= VerticalMode::None;
 	// Buttons, switches, knobs:
-	Observable<Xefis::PropertyBoolean>	_saitek_a;
-	Observable<Xefis::PropertyBoolean>	_saitek_b;
-	Observable<Xefis::PropertyBoolean>	_saitek_c;
-	Observable<Xefis::PropertyBoolean>	_saitek_d;
-	Observable<Xefis::PropertyBoolean>	_saitek_shift;
-	Observable<Xefis::PropertyBoolean>	_saitek_t1;
-	Observable<Xefis::PropertyBoolean>	_saitek_t2;
-	Observable<Xefis::PropertyBoolean>	_saitek_t3;
-	Observable<Xefis::PropertyBoolean>	_saitek_t4;
-	Observable<Xefis::PropertyBoolean>	_saitek_t5;
-	Observable<Xefis::PropertyBoolean>	_saitek_t6;
-	Observable<Xefis::PropertyBoolean>	_saitek_mode_1;
-	Observable<Xefis::PropertyBoolean>	_saitek_mode_2;
-	Observable<Xefis::PropertyBoolean>	_saitek_mode_3;
-	Observable<Xefis::PropertyBoolean>	_saitek_mfd_startstop;
-	Observable<Xefis::PropertyBoolean>	_saitek_mfd_reset;
-	Observable<Xefis::PropertyBoolean>	_saitek_function_up;
-	Observable<Xefis::PropertyBoolean>	_saitek_function_down;
-	Observable<Xefis::PropertyBoolean>	_saitek_function_press;
-	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_up;
-	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_down;
-	Observable<Xefis::PropertyBoolean>	_saitek_mfd_select_press;
 	Xefis::PropertyBoolean				_mcp_mins_a;
 	Xefis::PropertyBoolean				_mcp_mins_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_mins_decoder;
@@ -332,39 +234,6 @@ class State:
 	Xefis::PropertyBoolean				_mcp_course_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_course_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_course_hide;
-	Observable<Xefis::PropertyBoolean>	_mcp_ap;
-	Observable<Xefis::PropertyBoolean>	_mcp_at;
-	Observable<Xefis::PropertyBoolean>	_mcp_prot;
-	Observable<Xefis::PropertyBoolean>	_mcp_tac;
-	Observable<Xefis::PropertyBoolean>	_mcp_att;
-	Observable<Xefis::PropertyBoolean>	_mcp_ct;
-	Xefis::PropertyBoolean				_mcp_speed_a;
-	Xefis::PropertyBoolean				_mcp_speed_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_speed_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_speed_ias_mach;
-	Observable<Xefis::PropertyBoolean>	_mcp_speed_sel;
-	Observable<Xefis::PropertyBoolean>	_mcp_speed_hold;
-	Xefis::PropertyBoolean				_mcp_heading_a;
-	Xefis::PropertyBoolean				_mcp_heading_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_heading_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_heading_hdg_trk;
-	Observable<Xefis::PropertyBoolean>	_mcp_heading_sel;
-	Observable<Xefis::PropertyBoolean>	_mcp_heading_hold;
-	Observable<Xefis::PropertyBoolean>	_mcp_vnav;
-	Observable<Xefis::PropertyBoolean>	_mcp_lnav;
-	Observable<Xefis::PropertyBoolean>	_mcp_app;
-	Xefis::PropertyBoolean				_mcp_altitude_a;
-	Xefis::PropertyBoolean				_mcp_altitude_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_altitude_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_altitude_stepch;
-	Observable<Xefis::PropertyBoolean>	_mcp_altitude_flch;
-	Observable<Xefis::PropertyBoolean>	_mcp_altitude_hold;
-	Xefis::PropertyBoolean				_mcp_vspd_a;
-	Xefis::PropertyBoolean				_mcp_vspd_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_vspd_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_vspd_vs_fpa;
-	Observable<Xefis::PropertyBoolean>	_mcp_vspd_sel;
-	Observable<Xefis::PropertyBoolean>	_mcp_vspd_clb_con;
 	Observable<Xefis::PropertyBoolean>	_mcp_gpws_flap_inh;
 	Observable<Xefis::PropertyBoolean>	_mcp_gpws_gear_inh;
 	Observable<Xefis::PropertyBoolean>	_mcp_gpws_terr_inh;
@@ -379,25 +248,6 @@ class State:
 	Observable<Xefis::PropertyBoolean>	_mcp_show_chklst;
 	// LEDs, displays:
 	Xefis::PropertyInteger				_mcp_course_display;
-	Xefis::PropertyInteger				_mcp_speed_display;
-	Xefis::PropertyInteger				_mcp_heading_display;
-	Xefis::PropertyInteger				_mcp_altitude_display;
-	Xefis::PropertyInteger				_mcp_vspd_display;
-	Xefis::PropertyBoolean				_mcp_speed_sel_led;
-	Xefis::PropertyBoolean				_mcp_speed_hold_led;
-	Xefis::PropertyBoolean				_mcp_heading_sel_led;
-	Xefis::PropertyBoolean				_mcp_heading_hold_led;
-	Xefis::PropertyBoolean				_mcp_lnav_led;
-	Xefis::PropertyBoolean				_mcp_vnav_led;
-	Xefis::PropertyBoolean				_mcp_altitude_flch_led;
-	Xefis::PropertyBoolean				_mcp_altitude_hold_led;
-	// Input
-	Xefis::PropertyAngle				_orientation_pitch;
-	Xefis::PropertyAngle				_orientation_roll;
-	Xefis::PropertyAngle				_orientation_magnetic_heading;
-	Xefis::PropertyAngle				_orientation_magnetic_track;
-	Xefis::PropertySpeed				_speed_ias;
-	Xefis::PropertyLength				_altitude_amsl;
 	// Controlled properties:
 	Xefis::PropertyBoolean				_setting_efis_fpv_visible;
 	Xefis::PropertyBoolean				_setting_efis_show_metric;
@@ -411,10 +261,6 @@ class State:
 	Xefis::PropertyLength				_setting_minimums_amsl;
 	Xefis::PropertyLength				_setting_minimums_setting;
 	Xefis::PropertyString				_setting_minimums_type;
-	Xefis::PropertySpeed				_setting_cmd_speed;
-	Xefis::PropertyAngle				_setting_cmd_heading;
-	Xefis::PropertyLength				_setting_cmd_altitude;
-	Xefis::PropertySpeed				_setting_cmd_vspd;
 	Xefis::PropertyBoolean				_setting_hsi_display_true_heading;
 	Xefis::PropertyBoolean				_setting_hsi_center_on_track;
 	Xefis::PropertyInteger				_setting_hsi_display_mode_mfd;
@@ -422,13 +268,9 @@ class State:
 	Xefis::PropertyBoolean				_setting_lights_strobe;
 	Xefis::PropertyBoolean				_setting_lights_position;
 	Xefis::PropertyBoolean				_setting_lights_landing;
-	Xefis::PropertyString				_setting_fma_speed;
-	Xefis::PropertyString				_setting_fma_lateral;
-	Xefis::PropertyString				_setting_fma_vertical;
 	// Other:
 	std::vector<ObservableBase*>		_observables;
 	std::vector<Xefis::RotaryEncoder*>	_rotary_decoders;
-	QTimer*								_periodic_timer;
 };
 
 
