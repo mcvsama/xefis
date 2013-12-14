@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/smoother.h>
 
 // Local:
 #include "property.h"
@@ -40,10 +41,10 @@ class PropertyObserver
 		friend class PropertyObserver;
 
 	  public:
-		// Ctor:
+		// Ctor
 		Object (GenericProperty*);
 
-		// Ctor:
+		// Ctor
 		Object (PropertyObserver*);
 
 		PropertyNode::Serial
@@ -55,73 +56,122 @@ class PropertyObserver
 		PropertyNode::Serial	_saved_serial	= 0;
 	};
 
-	typedef std::list<Object>		ObjectsList;
+	typedef std::list<Object>			ObjectsList;
+	typedef std::list<SmootherBase*>	SmoothersList;
 
   public:
-	typedef PropertyNode::Serial	Serial;
-	typedef std::function<void()>	Callback;
+	typedef PropertyNode::Serial		Serial;
+	typedef std::function<void()>		Callback;
 
   public:
 	/**
-	 * Add property to be tracked.
-	 * Property is added by reference, so the property object
-	 * must live as long as the PropertyObserver.
+	 * Add property to be observed.
+	 * When property's value changes (that is the fresh() method returns true), the callback function is called.
+	 *
+	 * Property is added by reference, so the property object must live as long as the PropertyObserver.
 	 */
 	void
 	observe (GenericProperty& property);
 
 	/**
 	 * Add another PropertyObserver to observe.
+	 * Similarly to observing property, if the other observer fires its callback function, then this observer
+	 * will fire its own.
+	 *
+	 * The other observer is added by reference, and it must live as long as this observer lives.
 	 */
 	void
 	observe (PropertyObserver& observer);
 
 	/**
 	 * Add list of properties to be tracked.
+	 * Same as calling observe (GenericProperty&) for each of the objects in list, in sequence.
 	 */
 	void
 	observe (std::initializer_list<Object> list);
 
 	/**
 	 * Setup callback function.
+	 * This function will be called when one of observed properties is changed or observers is fired.
 	 */
 	void
-	set_callback (Callback callback);
+	set_callback (Callback callback) noexcept;
 
 	/**
-	 * Signal data update, so the observer will do
-	 * its checks.
+	 * Set minimum time-delta accumulation before firing the callback function.
+	 * To avoid aliasing, it's good to make sure that the observed data doesn't contain high-frequency value changes.
+	 * Default is 0_s.
+	 */
+	void
+	set_minimum_dt (Time) noexcept;
+
+	/**
+	 * Signal data update, so the observer will do its checks.
 	 */
 	void
 	data_updated (Time update_time);
 
 	/**
 	 * Return serial value.
-	 * It's incremented every time the callback function
-	 * is called.
+	 * It's incremented every time the callback function is called.
 	 */
 	Serial
 	serial() const noexcept;
 
 	/**
 	 * Return last update time.
+	 * This is the time of the last fire of the callback function.
 	 */
 	Time
 	update_time() const noexcept;
 
 	/**
-	 * Return time delta since last update and
-	 * call to the callback function.
+	 * Return time delta since last fire of the callback function.
 	 */
 	Time
 	update_dt() const noexcept;
 
+	/**
+	 * Register smoother with this observer.
+	 * Several smoothers can be registered. The longest smoothing time from those smoothers is collected every
+	 * time this Observer is updated (data_updated(...) is called). Then, for that period of time, observer
+	 * will fire callback function several times. Frequency of fires is controlled by set_smoothing_frequency(...).
+	 *
+	 * Smoother is added by reference, so it must live as long as this object lives.
+	 */
+	void
+	add_depending_smoother (SmootherBase& smoother);
+
+	/**
+	 * Register smoothers with this overver.
+	 * Convenience method.
+	 */
+	void
+	add_depending_smoothers (std::initializer_list<SmootherBase*> list);
+
+  private:
+	/**
+	 * Find longest smoothing time from all registered smoothers.
+	 * Return 0_s, if no smoothers are registered.
+	 */
+	Time
+	longest_smoothing_time() const noexcept;
+
   private:
 	ObjectsList		_objects;
+	SmoothersList	_smoothers;
 	Callback		_callback;
-	Serial			_serial			= 0;
-	Time			_update_time	= 0_s;
-	Time			_update_dt		= 0_s;
+	Serial			_serial				= 0;
+	// Time of last change of observed property:
+	Time			_obs_update_time	= 0_s;
+	// Time of last firing of the callback function:
+	Time			_fire_time			= 0_s;
+	Time			_fire_dt			= 0_s;
+	Time			_accumulated_dt		= 0_s;
+	Time			_minimum_dt			= 0_s;
+	// Set to true, when observed property is updated, but
+	// _minimum_dt prevented firing the callback.
+	bool			_need_callback		= false;
 };
 
 
@@ -156,14 +206,14 @@ PropertyObserver::serial() const noexcept
 inline Time
 PropertyObserver::update_time() const noexcept
 {
-	return _update_time;
+	return _fire_time;
 }
 
 
 inline Time
 PropertyObserver::update_dt() const noexcept
 {
-	return _update_dt;
+	return _fire_dt;
 }
 
 } // namespace Xefis

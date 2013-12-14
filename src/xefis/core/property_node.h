@@ -491,8 +491,11 @@ TypedPropertyValueNode::valid() const noexcept
 inline void
 TypedPropertyValueNode::set_nil() noexcept
 {
-	_is_nil = true;
-	bump_serial();
+	if (!_is_nil)
+	{
+		_is_nil = true;
+		bump_serial();
+	}
 }
 
 
@@ -508,9 +511,17 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::copy (PropertyValueNode const& other)
 	{
-		_value = other._value;
-		_is_nil = other._is_nil;
-		bump_serial();
+		if (_is_nil != other._is_nil)
+		{
+			_value = other._value;
+			_is_nil = other._is_nil;
+			bump_serial();
+		}
+		else if (!_is_nil && _value != other._value)
+		{
+			_value = other._value;
+			bump_serial();
+		}
 	}
 
 
@@ -529,9 +540,12 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::write (Type const& value)
 	{
-		_value = value;
-		_is_nil = false;
-		bump_serial();
+		if (_is_nil || _value != value)
+		{
+			_value = value;
+			_is_nil = false;
+			bump_serial();
+		}
 	}
 
 
@@ -590,9 +604,9 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::parse (std::string const& str)
 	{
-		_value.parse (str);
-		_is_nil = false;
-		bump_serial();
+		Type parsed;
+		parsed.parse (str);
+		write (parsed);
 	}
 
 
@@ -616,9 +630,7 @@ template<>
 	inline void
 	PropertyValueNode<bool>::parse (std::string const& str)
 	{
-		_value = (str == "true") || (str == "1");
-		_is_nil = false;
-		bump_serial();
+		write (str == "true" || str == "1");
 	}
 
 
@@ -627,9 +639,7 @@ template<>
 	PropertyValueNode<int64_t>::parse (std::string const& str)
 	{
 		try {
-			_value = boost::lexical_cast<int64_t> (str);
-			_is_nil = false;
-			bump_serial();
+			write (boost::lexical_cast<int64_t> (str));
 		}
 		catch (boost::bad_lexical_cast&)
 		{
@@ -643,9 +653,7 @@ template<>
 	PropertyValueNode<double>::parse (std::string const& str)
 	{
 		try {
-			_value = boost::lexical_cast<double> (str);
-			_is_nil = false;
-			bump_serial();
+			write (boost::lexical_cast<double> (str));
 		}
 		catch (boost::bad_lexical_cast&)
 		{
@@ -658,9 +666,7 @@ template<>
 	inline void
 	PropertyValueNode<std::string>::parse (std::string const& str)
 	{
-		_value = str;
-		_is_nil = false;
-		bump_serial();
+		write (str);
 	}
 
 } // namespace Xefis
