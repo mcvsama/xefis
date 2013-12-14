@@ -212,19 +212,19 @@ class EFISWidget: public Xefis::InstrumentWidget
 	class LocalParameters
 	{
 	  public:
-		bool					speed_blink							= false;
-		bool					speed_blinking_active				= false;
-		bool					minimums_blink						= false;
-		bool					minimums_blinking_active			= false;
-		QDateTime				altitude_agl_ts						= QDateTime::fromTime_t (0);
-		QDateTime				minimums_altitude_ts				= QDateTime::fromTime_t (0);
-		QDateTime				control_hint_ts						= QDateTime::fromTime_t (0);
-		QDateTime				fma_speed_ts						= QDateTime::fromTime_t (0);
-		QDateTime				fma_speed_small_ts					= QDateTime::fromTime_t (0);
-		QDateTime				fma_lateral_ts						= QDateTime::fromTime_t (0);
-		QDateTime				fma_lateral_small_ts				= QDateTime::fromTime_t (0);
-		QDateTime				fma_vertical_ts						= QDateTime::fromTime_t (0);
-		QDateTime				fma_vertical_small_ts				= QDateTime::fromTime_t (0);
+		bool					speed_blink						= false;
+		bool					speed_blinking_active			= false;
+		bool					minimums_blink					= false;
+		bool					minimums_blinking_active		= false;
+		QDateTime				altitude_agl_ts					= QDateTime::fromTime_t (0);
+		QDateTime				minimums_altitude_ts			= QDateTime::fromTime_t (0);
+		QDateTime				control_hint_ts					= QDateTime::fromTime_t (0);
+		QDateTime				fma_speed_ts					= QDateTime::fromTime_t (0);
+		QDateTime				fma_speed_small_ts				= QDateTime::fromTime_t (0);
+		QDateTime				fma_lateral_ts					= QDateTime::fromTime_t (0);
+		QDateTime				fma_lateral_small_ts			= QDateTime::fromTime_t (0);
+		QDateTime				fma_vertical_ts					= QDateTime::fromTime_t (0);
+		QDateTime				fma_vertical_small_ts			= QDateTime::fromTime_t (0);
 	};
 
 	class PaintWorkUnit:
