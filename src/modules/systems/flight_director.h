@@ -72,8 +72,8 @@ class FlightDirector: public Xefis::Module
 	Xefis::PIDControl<float>	_ias_pid;
 	Xefis::PIDControl<float>	_vertical_speed_pid;
 	Xefis::PIDControl<float>	_fpa_pid;
-	Xefis::Smoother<double>		_output_pitch_smoother		= 1_s;
-	Xefis::Smoother<double>		_output_roll_smoother		= 1_s;
+	Xefis::Smoother<double>		_output_pitch_smoother		= 2.5_s;
+	Xefis::Smoother<double>		_output_roll_smoother		= 2.5_s;
 	Angle						_computed_output_pitch;
 	Angle						_computed_output_roll;
 	RollMode					_roll_mode					= RollMode::None;

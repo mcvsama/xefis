@@ -419,7 +419,6 @@ ConfigReader::process_settings_element (QDomElement const& settings_element)
 		{ "navaids.enable", _navaids_enable, false },
 		{ "scale.pen", _scale_pen, false },
 		{ "scale.font", _scale_font, false },
-		// TODO use these settings in Instrument modules
 	});
 	sp.parse (settings_element);
 }

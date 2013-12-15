@@ -34,6 +34,7 @@ namespace Xefis {
 template<class tValueType>
 	class PIDControl
 	{
+	  public:
 		typedef tValueType ValueType;
 		typedef double ParamType;
 		typedef double TimeType;
@@ -157,6 +158,12 @@ template<class tValueType>
 		 */
 		ValueType
 		output() const noexcept;
+
+		/**
+		 * Return error value.
+		 */
+		ValueType
+		error() const noexcept;
 
 		/**
 		 * Reset to default state.
@@ -363,6 +370,14 @@ template<class T>
 	PIDControl<T>::output() const noexcept
 	{
 		return _output;
+	}
+
+
+template<class T>
+	inline typename PIDControl<T>::ValueType
+	PIDControl<T>::error() const noexcept
+	{
+		return _previous_error;
 	}
 
 
