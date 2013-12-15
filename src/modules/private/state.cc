@@ -114,7 +114,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_efis_fd_visible.set_default (false);
 	_setting_efis_appr_visible.set_path ("/settings/efis/approach-reference-visible");
 	_setting_efis_appr_visible.set_default (false);
-	_setting_efis_stick_visible.set_path ("/settings/efis/stick-visible");
+	_setting_efis_stick_visible.set_path ("/settings/efis/control-stick-visible");
 	_setting_efis_stick_visible.set_default (false);
 	_setting_efis_mfd_mode.set_path ("/settings/efis/mfd-mode");
 	_setting_efis_mfd_mode.set_default (static_cast<int> (MFDMode::EICAS));
