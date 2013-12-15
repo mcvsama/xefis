@@ -39,9 +39,9 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	_positions_accurate_9_times (3)
 {
 	_track_lateral_true_smoother.set_winding ({ 0.0, 360.0 });
-	_orientation_pitch_smoother.set_winding ({ 0.0, 360.0 });
-	_orientation_roll_smoother.set_winding ({ 0.0, 360.0 });
 	_orientation_heading_magnetic_smoother.set_winding ({ 0.0, 360.0 });
+	_orientation_pitch_smoother.set_winding ({ -180.0, 180.0 });
+	_orientation_roll_smoother.set_winding ({ -180.0, 180.0 });
 
 	// Initialize _positions* with invalid vals, to get them non-empty:
 	for (Positions* positions: { &_positions, &_positions_accurate_2_times, &_positions_accurate_9_times })
