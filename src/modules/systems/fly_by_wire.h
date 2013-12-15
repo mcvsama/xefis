@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/utility/pid_control.h>
+#include <xefis/utility/smoother.h>
 
 
 class FlyByWire: public Xefis::Module
@@ -48,14 +49,16 @@ class FlyByWire: public Xefis::Module
 
   private:
 	// Used with joystick input:
-	Xefis::PIDControl<float>	_manual_pitch_pid;
-	Xefis::PIDControl<float>	_manual_roll_pid;
+	Xefis::PIDControl<double>	_manual_pitch_pid;
+	Xefis::PIDControl<double>	_manual_roll_pid;
 	Angle						_computed_output_pitch	= 0_deg;
 	Angle						_computed_output_roll	= 0_deg;
 	// Stabilizer PIDs:
-	Xefis::PIDControl<float>	_elevator_pid;
-	Xefis::PIDControl<float>	_ailerons_pid;
-	Xefis::PIDControl<float>	_rudder_pid;
+	Xefis::PIDControl<double>	_elevator_pid;
+	Xefis::PIDControl<double>	_ailerons_pid;
+	Xefis::PIDControl<double>	_rudder_pid;
+	Xefis::Smoother<double>		_elevator_smoother		= 50_ms;
+	Xefis::Smoother<double>		_ailerons_smoother		= 50_ms;
 	Time						_dt						= 0_s;
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.

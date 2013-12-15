@@ -104,6 +104,9 @@ FlyByWire::data_updated()
 	switch (static_cast<Mode> (*_mode))
 	{
 		case ManualMode:
+			_elevator_smoother.invalidate();
+			_ailerons_smoother.invalidate();
+
 			_output_elevator.write (-*_input_pitch_axis);
 			_output_ailerons.write (*_input_roll_axis);
 			_output_rudder.write (*_input_yaw_axis);
@@ -126,22 +129,22 @@ FlyByWire::data_updated()
 				_computed_output_roll = *_input_roll;
 			}
 
-			float stabilization_gain = *_stabilization_gain;
+			double stabilization_gain = *_stabilization_gain;
 
 			_elevator_pid.set_pid (*_pitch_p, *_pitch_i, *_pitch_d);
 			_elevator_pid.set_gain (*_pitch_gain * stabilization_gain);
 			_elevator_pid.set_error_power (*_pitch_error_power);
-			_elevator_pid.set_output_limit (Range<float> (*_elevator_minimum, *_elevator_maximum));
+			_elevator_pid.set_output_limit (Range<double> (*_elevator_minimum, *_elevator_maximum));
 
 			_ailerons_pid.set_pid (*_roll_p, *_roll_i, *_roll_d);
 			_ailerons_pid.set_gain (*_roll_gain * stabilization_gain);
 			_ailerons_pid.set_error_power (*_roll_error_power);
-			_ailerons_pid.set_output_limit (Range<float> (*_ailerons_minimum, *_ailerons_maximum));
+			_ailerons_pid.set_output_limit (Range<double> (*_ailerons_minimum, *_ailerons_maximum));
 
 			_rudder_pid.set_pid (*_yaw_p, *_yaw_i, *_yaw_d);
 			_rudder_pid.set_gain (*_yaw_gain * stabilization_gain);
 			_rudder_pid.set_error_power (*_yaw_error_power);
-			_rudder_pid.set_output_limit (Range<float> (*_rudder_minimum, *_rudder_maximum));
+			_rudder_pid.set_output_limit (Range<double> (*_rudder_minimum, *_rudder_maximum));
 
 			_elevator_pid.set_target (_computed_output_pitch / 180_deg);
 			_elevator_pid.process (*_measured_pitch / 180_deg, _dt.s());
@@ -152,10 +155,13 @@ FlyByWire::data_updated()
 			_rudder_pid.set_target (0.0);
 			_rudder_pid.process (*_measured_slip_skid_g, _dt.s());
 
-			_output_elevator.write (-std::cos (*_measured_roll) * _elevator_pid.output());
-			_output_ailerons.write (_ailerons_pid.output());
+			double computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
+			double computed_ailerons = _ailerons_pid.output();
 
-			float yaw_axis = *_input_yaw_axis;
+			_output_elevator.write (_elevator_smoother.process (computed_elevator, _dt));
+			_output_ailerons.write (_ailerons_smoother.process (computed_ailerons, _dt));
+
+			double yaw_axis = *_input_yaw_axis;
 			_output_rudder.write (yaw_axis + (1.0f - yaw_axis) * _rudder_pid.output());
 			break;
 		}
@@ -184,8 +190,8 @@ FlyByWire::integrate_manual_input()
 
 	Angle target_pitch_extent = *_pitch_extent;
 	Angle target_roll_extent = *_roll_extent;
-	float axis_pitch = *_input_pitch_axis;
-	float axis_roll = *_input_roll_axis;
+	double axis_pitch = *_input_pitch_axis;
+	double axis_roll = *_input_roll_axis;
 	Angle measured_pitch = *_measured_pitch;
 	Angle measured_roll = *_measured_roll;
 
@@ -193,20 +199,20 @@ FlyByWire::integrate_manual_input()
 
 	Angle target_pitch = measured_pitch + std::cos (measured_roll) * axis_pitch * target_pitch_extent;
 	Angle target_roll = measured_roll + axis_roll * target_roll_extent;
-	target_pitch = floored_mod<float> (target_pitch.deg(), -180.0, +180.0) * 1_deg;
-	target_roll = floored_mod<float> (target_roll.deg(), -180.0, +180.0) * 1_deg;
+	target_pitch = floored_mod<double> (target_pitch.deg(), -180.0, +180.0) * 1_deg;
+	target_roll = floored_mod<double> (target_roll.deg(), -180.0, +180.0) * 1_deg;
 
 	// Update output attitude:
 
 	_manual_pitch_pid.set_target (target_pitch.deg() / 180.f);
 	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, _dt.s());
 	_computed_output_pitch += std::abs (axis_pitch) * _manual_pitch_pid.output() * 360_deg;
-	_computed_output_pitch = floored_mod<float> (_computed_output_pitch.deg(), -180.0, +180.0) * 1_deg;
+	_computed_output_pitch = floored_mod<double> (_computed_output_pitch.deg(), -180.0, +180.0) * 1_deg;
 
 	_manual_roll_pid.set_target (target_roll.deg() / 180.f);
 	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, _dt.s());
 	_computed_output_roll += std::abs (axis_roll) * _manual_roll_pid.output() * 360_deg;
-	_computed_output_roll = floored_mod<float> (_computed_output_roll.deg(), -180.0, +180.0) * 1_deg;
+	_computed_output_roll = floored_mod<double> (_computed_output_roll.deg(), -180.0, +180.0) * 1_deg;
 
 	// Joystick visualisation on EFIS:
 	if (_output_control_stick_pitch.configured())
