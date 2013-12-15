@@ -43,8 +43,12 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 		pid->set_i_limit ({ -0.05f, +0.05f });
 		pid->set_winding (true);
 	}
+
 	for (auto* pid: { &_altitude_pid, &_ias_pid, &_vertical_speed_pid, &_fpa_pid })
 		pid->set_i_limit ({ -0.05f, +0.05f });
+
+	_output_pitch_smoother.set_winding ({ -180.0, +180.0 });
+	_output_roll_smoother.set_winding ({ -180.0, +180.0 });
 
 	parse_properties (config, {
 		{ "enabled", _enabled, true },

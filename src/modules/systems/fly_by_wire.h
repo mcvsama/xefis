@@ -50,15 +50,16 @@ class FlyByWire: public Xefis::Module
 	// Used with joystick input:
 	Xefis::PIDControl<float>	_manual_pitch_pid;
 	Xefis::PIDControl<float>	_manual_roll_pid;
-	Angle						_pre_output_pitch	= 0_deg;
-	Angle						_pre_output_roll	= 0_deg;
+	Angle						_computed_output_pitch	= 0_deg;
+	Angle						_computed_output_roll	= 0_deg;
 	// Stabilizer PIDs:
 	Xefis::PIDControl<float>	_elevator_pid;
 	Xefis::PIDControl<float>	_ailerons_pid;
 	Xefis::PIDControl<float>	_rudder_pid;
-	Time						_dt					= 0_s;
+	Time						_dt						= 0_s;
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
+	// TODO PID params as settings, not properties.
 	Xefis::PropertyInteger		_mode;
 	Xefis::PropertyAngle		_pitch_extent;
 	Xefis::PropertyAngle		_roll_extent;
