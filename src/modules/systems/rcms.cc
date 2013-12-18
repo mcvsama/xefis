@@ -130,7 +130,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 		_distance_vertical.write (alt_diff);
 		_distance_ground.write (ground_dist);
 		_distance_vlos.write (1_nm * std::sqrt (ground_dist.nm() * ground_dist.nm() + alt_diff.nm() * alt_diff.nm()));
-		_true_home_direction.write (curr.initial_bearing (home));
+		_true_home_direction.write (Xefis::floored_mod (curr.initial_bearing (home), 360_deg));
 	}
 	else
 	{

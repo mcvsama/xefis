@@ -69,9 +69,12 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyAngle	_orientation_heading_true;
 	Xefis::PropertyBoolean	_use_true_heading;
 	Xefis::PropertyAngle	_home_true_direction;
+	Xefis::PropertyBoolean	_home_track_visible;
 	Xefis::PropertyLength	_home_distance_vlos;
 	Xefis::PropertyLength	_home_distance_ground;
 	Xefis::PropertyLength	_home_distance_vertical;
+	Xefis::PropertyAngle	_home_position_longitude;
+	Xefis::PropertyAngle	_home_position_latitude;
 	Xefis::PropertyBoolean	_track_visible;
 	Xefis::PropertyAngle	_track_lateral_magnetic;
 	Xefis::PropertyAngle	_track_lateral_delta_dpm;

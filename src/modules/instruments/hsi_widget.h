@@ -90,6 +90,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle			track_magnetic				= 0_deg;
 		bool			center_on_track				= false;
 		bool			home_direction_visible		= false;
+		bool			home_track_visible			= false;
 		Angle			true_home_direction			= 0_deg;
 		bool			dist_to_home_ground_visible	= false;
 		Length			dist_to_home_ground			= 0_nm;
@@ -97,6 +98,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Length			dist_to_home_vlos			= 0_nm;
 		bool			dist_to_home_vert_visible	= false;
 		Length			dist_to_home_vert			= 0_nm;
+		Optional<Angle>	home_longitude;
+		Optional<Angle>	home_latitude;
 		bool			ground_speed_visible		= false;
 		Speed			ground_speed				= 0_kt;
 		bool			true_air_speed_visible		= false;
@@ -254,6 +257,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPen					_vor_pen;
 		QPen					_dme_pen;
 		QPen					_fix_pen;
+		QPen					_home_pen;
 		QPen					_lo_loc_pen;
 		QPen					_hi_loc_pen;
 		QFont					_radials_font;
@@ -261,6 +265,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPolygonF				_dme_for_vor_shape;
 		QPolygonF				_vor_shape;
 		QPolygonF				_vortac_shape;
+		QPolygonF				_home_shape;
 		QPolygonF				_aircraft_shape;
 		QPolygonF				_ap_bug_shape;
 		bool					_navs_retrieved				= false;
