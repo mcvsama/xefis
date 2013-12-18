@@ -40,13 +40,16 @@ using Xefis::NavaidStorage;
 void
 HSIWidget::Parameters::sanitize()
 {
-	range = Xefis::limit (range, 1_ft, 5000_nm);
-	heading_magnetic = Xefis::limit (heading_magnetic, 0_deg, 360_deg);
-	heading_true = Xefis::limit (heading_true, 0_deg, 360_deg);
-	ap_magnetic_heading = Xefis::limit (ap_magnetic_heading, 0_deg, 360_deg);
-	track_magnetic = Xefis::limit (track_magnetic, 0_deg, 360_deg);
-	true_home_direction = Xefis::limit (true_home_direction, 0_deg, 360_deg);
-	wind_from_magnetic_heading = Xefis::limit (wind_from_magnetic_heading, 0_deg, 360_deg);
+	using Xefis::limit;
+	using Xefis::floored_mod;
+
+	range = limit (range, 1_ft, 5000_nm);
+	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
+	heading_true = floored_mod (heading_true, 360_deg);
+	ap_magnetic_heading = floored_mod (ap_magnetic_heading, 360_deg);
+	track_magnetic = floored_mod (track_magnetic, 360_deg);
+	true_home_direction = floored_mod (true_home_direction, 360_deg);
+	wind_from_magnetic_heading = floored_mod (wind_from_magnetic_heading, 360_deg);
 }
 
 
@@ -164,6 +167,7 @@ HSIWidget::PaintWorkUnit::resized()
 	_vor_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_dme_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_home_pen = QPen (Qt::green, 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
 	// Shapes:
 	_ndb_shape = QPainterPath();
@@ -220,6 +224,13 @@ HSIWidget::PaintWorkUnit::resized()
 		<< QPointF (+0.25f, +0.44f)
 		<< QPointF (-0.25f, +0.44f)
 		<< QPointF (-0.5f, 0.f);
+
+	_home_shape = QPolygonF()
+		<< QPointF (-0.4f, 0.f)
+		<< QPointF (0.f, -0.5f)
+		<< QPointF (+0.4f, 0.f)
+		<< QPointF (0.f, +0.5f)
+		<< QPointF (-0.4f, 0.f);
 
 	_aircraft_shape = QPolygonF()
 		<< QPointF (0.f, 0.f)
@@ -644,7 +655,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		painter.setClipPath (_outer_map_clip);
 		painter.rotate ((_locals.ap_heading - _locals.rotation).deg());
 
-		for (auto p: { shadow_pen, pen })
+		for (auto const& p: { shadow_pen, pen })
 		{
 			painter.setPen (p);
 			painter.drawLine (QPointF (0.f, 0.f), QPointF (0.f, -_r));
@@ -985,38 +996,60 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 	if (!_params.navaids_visible || !_params.position_valid)
 		return;
 
+	float scale = 0.55f * _q;
+
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 	painter.setFont (_font_10);
 
 	retrieve_navaids();
-
 	paint_locs (painter);
+
+	// Return feature position on screen relative to _aircraft_center_transform.
+	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
+	{
+		QPointF mapped_pos = get_navaid_xy (position);
+
+		if (limit_to_range)
+		{
+			double range = 0.95f * _r;
+			double rpx = std::sqrt (mapped_pos.x() * mapped_pos.x() + mapped_pos.y() * mapped_pos.y());
+			*limit_to_range = rpx >= range;
+			if (*limit_to_range)
+			{
+				QTransform rot;
+				rot.rotate ((1_rad * std::atan2 (mapped_pos.y(), mapped_pos.x())).deg());
+				mapped_pos = rot.map (QPointF (range, 0.0));
+			}
+		}
+
+		return mapped_pos;
+	};
 
 	auto paint_navaid = [&](Navaid const& navaid)
 	{
-		QPointF mapped_pos = get_navaid_xy (navaid.position());
-		QTransform centered_transform = _aircraft_center_transform;
-		centered_transform.translate (mapped_pos.x(), mapped_pos.y());
+		QTransform feature_centered_transform = _aircraft_center_transform;
+		QPointF translation = position_feature (navaid.position());
+		feature_centered_transform.translate (translation.x(), translation.y());
 
-		QTransform scaled_transform = centered_transform;
-		scaled_transform.scale (0.55f * _q, 0.55f * _q);
+		QTransform feature_scaled_transform = feature_centered_transform;
+		feature_scaled_transform.scale (scale, scale);
 
 		switch (navaid.type())
 		{
 			case Navaid::NDB:
 			{
-				painter.setTransform (scaled_transform);
+				painter.setTransform (feature_scaled_transform);
 				painter.setPen (_ndb_pen);
 				painter.setBrush (_ndb_pen.color());
 				painter.drawPath (_ndb_shape);
-				painter.setTransform (centered_transform);
+				painter.setTransform (feature_centered_transform);
 				painter.fast_draw_text (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
 				break;
 			}
 
 			case Navaid::VOR:
-				painter.setTransform (scaled_transform);
+				painter.setTransform (feature_scaled_transform);
 				painter.setPen (_vor_pen);
 				painter.setBrush (_navigation_color);
 				if (navaid.vor_type() == Navaid::VOROnly)
@@ -1032,12 +1065,12 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				}
 				else if (navaid.vor_type() == Navaid::VORTAC)
 					painter.drawPolyline (_vortac_shape);
-				painter.setTransform (centered_transform);
+				painter.setTransform (feature_centered_transform);
 				painter.fast_draw_text (QPointF (0.35f * _q, 0.55f * _q), navaid.identifier());
 				break;
 
 			case Navaid::DME:
-				painter.setTransform (scaled_transform);
+				painter.setTransform (feature_scaled_transform);
 				painter.setPen (_dme_pen);
 				painter.drawRect (QRectF (-0.5f, -0.5f, 1.f, 1.f));
 				break;
@@ -1049,10 +1082,10 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				QPointF b (+0.5f * h, +0.33f * h);
 				QPointF c (-0.5f * h, +0.33f * h);
 				QPointF points[] = { a, b, c, a };
-				painter.setTransform (scaled_transform);
+				painter.setTransform (feature_scaled_transform);
 				painter.setPen (_fix_pen);
 				painter.drawPolyline (points, sizeof (points) / sizeof (*points));
-				painter.setTransform (centered_transform);
+				painter.setTransform (feature_centered_transform);
 				painter.translate (0.5f, 0.5f);
 				painter.fast_draw_text (QPointF (0.25f * _q, 0.45f * _q), navaid.identifier());
 				break;
@@ -1078,6 +1111,52 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 	if (_params.vor_visible)
 		for (auto& navaid: _vor_navs)
 			paint_navaid (navaid);
+
+	if (_params.home_longitude && _params.home_latitude)
+	{
+		LonLat home_position (*_params.home_longitude, *_params.home_latitude);
+		// Whether the feature is in configured HSI range:
+		bool outside_range = false;
+		QPointF translation = position_feature (home_position, &outside_range);
+		QTransform feature_centered_transform = _aircraft_center_transform;
+		feature_centered_transform.translate (translation.x(), translation.y());
+
+		// Line from aircraft to the HOME feature:
+		if (_params.home_track_visible)
+		{
+			float const shadow_scale = 2.0;
+
+			QPen home_line_pen (_home_pen.color(), pen_width (1.f), Qt::DashLine, Qt::RoundCap);
+			home_line_pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
+
+			QPen shadow_pen (painter.shadow_color(), pen_width (2.f), Qt::DashLine, Qt::RoundCap);
+			shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
+
+			painter.setTransform (_aircraft_center_transform);
+
+			for (auto const& p: { shadow_pen, home_line_pen })
+			{
+				painter.setPen (p);
+				painter.drawLine (QPointF (0.f, 0.f), translation);
+			}
+		}
+
+		painter.setTransform (feature_centered_transform);
+		painter.scale (scale, scale);
+
+		if (outside_range)
+		{
+			painter.setPen (_home_pen);
+			painter.setBrush (Qt::black);
+			painter.drawPolygon (_home_shape);
+		}
+		else
+		{
+			painter.setPen (_home_pen);
+			painter.setBrush (_home_pen.color());
+			painter.drawPolygon (_home_shape);
+		}
+	}
 }
 
 

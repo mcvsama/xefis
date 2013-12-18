@@ -48,9 +48,12 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "orientation.heading.true", _orientation_heading_true, false },
 		{ "orientation.display-true-heading", _use_true_heading, false },
 		{ "home.true-direction", _home_true_direction, false },
+		{ "home.track-visible", _home_track_visible, false },
 		{ "home.distance.vlos", _home_distance_vlos, false },
 		{ "home.distance.ground", _home_distance_ground, false },
 		{ "home.distance.vertical", _home_distance_vertical, false },
+		{ "home.position.longitude", _home_position_longitude, false },
+		{ "home.position.latitude", _home_position_latitude, false },
 		{ "position.latitude", _position_latitude, false },
 		{ "position.longitude", _position_longitude, false },
 		{ "position.source", _position_source, false },
@@ -97,6 +100,7 @@ HSI::read()
 	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
 	params.center_on_track = _track_center_on_track.read (true);
 	params.home_direction_visible = _home_true_direction.valid();
+	params.home_track_visible = _home_track_visible.read (false);
 	params.true_home_direction = *_home_true_direction;
 	params.dist_to_home_ground_visible = _home_distance_ground.valid();
 	params.dist_to_home_ground = *_home_distance_ground;
@@ -104,6 +108,8 @@ HSI::read()
 	params.dist_to_home_vlos = *_home_distance_vlos;
 	params.dist_to_home_vert_visible = _home_distance_vertical.valid();
 	params.dist_to_home_vert = *_home_distance_vertical;
+	params.home_longitude = _home_position_longitude.get_optional();
+	params.home_latitude = _home_position_latitude.get_optional();
 	params.ground_speed_visible = _speed_gs.valid();
 	params.ground_speed = *_speed_gs;
 	params.true_air_speed_visible = _speed_tas.valid();
