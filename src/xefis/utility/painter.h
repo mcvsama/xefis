@@ -33,7 +33,7 @@ namespace Xefis {
 
 class Painter: public TextPainter
 {
-	constexpr static float DefaultShadowWidth = 1.9f;
+	constexpr static float DefaultShadowWidth = 1.2f;
 
   public:
 	Painter (QPaintDevice* device, TextPainter::Cache* cache);
@@ -124,7 +124,7 @@ Painter::configure_for_shadow()
 	_saved_pen = pen();
 	QPen s = _saved_pen;
 	s.setColor (_shadow_color);
-	s.setWidth (s.width() + _shadow_width);
+	s.setWidthF (s.width() + _shadow_width);
 	setPen (s);
 }
 

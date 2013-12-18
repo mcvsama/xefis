@@ -160,6 +160,18 @@ EFISWidget::PaintWorkUnit::adi_post_resize()
 		_old_horizon_clip = QPainterPath();
 		_old_horizon_clip.addRoundedRect (-w, -h, 2.f * w, 2.f * h, r, r);
 	}
+
+	// Pitch scale clipping path:
+	{
+		float const w = wh() * 2.f / 9.f;
+
+		QPainterPath clip_path;
+		clip_path.setFillRule (Qt::WindingFill);
+		clip_path.addEllipse (QRectF (-1.f * w, -1.f * w, 2.f * w, 2.f * w));
+		clip_path.addRect (QRectF (-1.f * w, 0.f, 2.f * w, 1.375f * w));
+
+		_pitch_scale_clipping_path = clip_path;
+	}
 }
 
 
@@ -283,7 +295,7 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
 
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipPath (get_pitch_scale_clipping_path());
+	painter.setClipPath (_pitch_scale_clipping_path);
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-w, -1.f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 	painter.setTransform (_horizon_transform);
@@ -485,7 +497,7 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 
 	// Clip rectangle before and after rotation:
 	painter.setTransform (_center_transform);
-	painter.setClipPath (get_pitch_scale_clipping_path());
+	painter.setClipPath (_pitch_scale_clipping_path);
 	painter.setTransform (_roll_transform * _center_transform);
 	painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
 
@@ -618,7 +630,7 @@ EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (Xefis::Painter& painter
 	painter.translate (_flight_path_marker_position);
 	painter.setPen (get_pen (Qt::white, 1.25f));
 	painter.setBrush (Qt::NoBrush);
-	painter.add_shadow (2.2, [&]() {
+	painter.add_shadow (1.8f, [&]() {
 		painter.drawPath (_flight_path_marker_shape);
 	});
 }
@@ -653,6 +665,18 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 
 	_sl_transform = _center_transform;
 	_sl_transform.translate (-0.4f * wh, 0.f);
+
+	// Speed bug shape:
+	{
+		float const x = _sl_ladder_rect.width() / 4.0f;
+
+		_sl_bug_shape = QPolygonF()
+			<< QPointF (0.f, 0.f)
+			<< QPointF (+0.5f * x, -0.5f * x)
+			<< QPointF (2.f * x, -0.5f * x)
+			<< QPointF (2.f * x, +0.5f * x)
+			<< QPointF (+0.5f * x, +0.5f * x);
+	}
 }
 
 
@@ -740,7 +764,7 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 
 	QColor ps = painter.shadow_color();
 	painter.set_shadow_color (Qt::black);
-	painter.add_shadow (1.95f, [&]() {
+	painter.add_shadow ([&]() {
 		painter.drawPolygon (black_box_polygon);
 	});
 	painter.set_shadow_color (ps);
@@ -966,20 +990,13 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 	{
 		float posy = Xefis::limit (kt_to_px (Xefis::limit (_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
 								   static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
-		// TODO extract bug_shape to sl_post_resize()
-		QPolygonF bug_shape = QPolygonF()
-			<< QPointF (0.f, 0.f)
-			<< QPointF (+0.5f * x, -0.5f * x)
-			<< QPointF (2.f * x, -0.5f * x)
-			<< QPointF (2.f * x, +0.5f * x)
-			<< QPointF (+0.5f * x, +0.5f * x);
 		painter.setClipRect (_sl_ladder_rect.translated (2.5f * x, 0.f));
 		painter.translate (1.25f * x, posy);
 		painter.setBrush (Qt::NoBrush);
 		painter.setPen (_autopilot_pen_1);
-		painter.drawPolygon (bug_shape);
+		painter.drawPolygon (_sl_bug_shape);
 		painter.setPen (_autopilot_pen_2);
-		painter.drawPolygon (bug_shape);
+		painter.drawPolygon (_sl_bug_shape);
 	}
 }
 
@@ -1204,7 +1221,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 		// Metric box:
 		QColor ps = painter.shadow_color();
 		painter.set_shadow_color (Qt::black);
-		painter.add_shadow (1.95f, [&]() {
+		painter.add_shadow ([&]() {
 			painter.drawRect (_al_metric_box_rect);
 		});
 		painter.set_shadow_color (ps);
@@ -1227,7 +1244,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 	// Feet box:
 	QColor ps = painter.shadow_color();
 	painter.set_shadow_color (Qt::black);
-	painter.add_shadow (1.95f, [&]() {
+	painter.add_shadow ([&]() {
 		painter.drawPolygon (black_box_polygon);
 	});
 	painter.set_shadow_color (ps);
@@ -1287,7 +1304,6 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Xefis::Painter& painter, float
 	float const s_ladder_digit_height = _font_10_digit_height;
 
 	// Special clipping that leaves some margin around black indicator:
-	// TODO extract this path
 	QPainterPath clip_path_m;
 	clip_path_m.addRect (_al_black_box_rect.translated (-x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
 	QPainterPath clip_path;
@@ -1311,7 +1327,6 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (Xefis::Painter& painter, float
 		painter.setPen (ft % _params.al_bold_every == 0 ? _al_scale_pen_2 : _al_scale_pen_1);
 		painter.draw_outlined_line (QPointF (0.f, posy), QPointF (0.8f * x, posy));
 
-		// TODO extract painting text to separate loop
 		if (ft % _params.al_number_every == 0)
 		{
 			QRectF big_text_box (1.1f * x, -0.425f * b_ladder_digit_height + posy,
@@ -2601,20 +2616,6 @@ EFISWidget::PaintWorkUnit::paint_vertical_failure_flag (Xefis::Painter& painter,
 	QPointF top_letter = center + QPointF (0.f, -0.5f * digit_height * (message.size() - 1));
 	for (int i = 0; i < message.size(); ++i)
 		painter.fast_draw_text (top_letter + QPointF (0.f, i * digit_height), Qt::AlignHCenter | Qt::AlignVCenter, message[i]);
-}
-
-
-QPainterPath
-EFISWidget::PaintWorkUnit::get_pitch_scale_clipping_path() const
-{
-	float const w = wh() * 2.f / 9.f;
-
-	QPainterPath clip_path; // TODO cache this
-	clip_path.setFillRule (Qt::WindingFill);
-	clip_path.addEllipse (QRectF (-1.f * w, -1.f * w, 2.f * w, 2.f * w));
-	clip_path.addRect (QRectF (-1.f * w, 0.f, 2.f * w, 1.375f * w));
-
-	return clip_path;
 }
 
 

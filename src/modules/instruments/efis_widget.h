@@ -522,6 +522,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QPainterPath		_flight_path_marker_shape;
 		QPointF				_flight_path_marker_position;
 		QPainterPath		_old_horizon_clip;
+		QPainterPath		_pitch_scale_clipping_path;
 
 		/*
 		 * Speed ladder
@@ -539,6 +540,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QPen				_sl_speed_bug_pen;
 		float				_sl_margin;
 		int					_sl_digits;
+		QPolygonF			_sl_bug_shape;
 
 		/*
 		 * Altitude ladder
