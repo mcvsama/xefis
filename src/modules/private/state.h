@@ -214,6 +214,8 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_mins_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_mins_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_mins_mode;
+	Observable<Xefis::PropertyBoolean>	_mcp_ap;
+	Observable<Xefis::PropertyBoolean>	_mcp_att;
 	Observable<Xefis::PropertyBoolean>	_mcp_appr;
 	Observable<Xefis::PropertyBoolean>	_mcp_fd;
 	Xefis::PropertyBoolean				_mcp_qnh_a;
@@ -221,7 +223,6 @@ class State: public Xefis::Module
 	Unique<Xefis::RotaryEncoder>		_mcp_qnh_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_qnh_hpa;
 	Observable<Xefis::PropertyBoolean>	_mcp_std;
-	Observable<Xefis::PropertyBoolean>	_mcp_stick;
 	Observable<Xefis::PropertyBoolean>	_mcp_metric;
 	Observable<Xefis::PropertyBoolean>	_mcp_fpv;
 	Xefis::PropertyBoolean				_mcp_range_a;
@@ -253,7 +254,6 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_setting_efis_show_metric;
 	Xefis::PropertyBoolean				_setting_efis_fd_visible;
 	Xefis::PropertyBoolean				_setting_efis_appr_visible;
-	Xefis::PropertyBoolean				_setting_efis_stick_visible;
 	Xefis::PropertyInteger				_setting_efis_mfd_mode;
 	Xefis::PropertyPressure				_setting_pressure_qnh;
 	Xefis::PropertyBoolean				_setting_pressure_display_hpa;

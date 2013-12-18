@@ -103,7 +103,7 @@ FlyByWire::data_updated()
 
 	switch (static_cast<Mode> (*_mode))
 	{
-		case ManualMode:
+		case Mode::Manual:
 			_elevator_smoother.invalidate();
 			_ailerons_smoother.invalidate();
 
@@ -115,15 +115,15 @@ FlyByWire::data_updated()
 			_computed_output_roll = *_measured_roll;
 			break;
 
-		case StabilizedMode:
-		case FlightDirectorMode:
+		case Mode::Stabilized:
+		case Mode::FlightDirector:
 		{
 			using Xefis::Range;
 
 			// Should always be computed:
 			integrate_manual_input();
 
-			if (static_cast<Mode> (*_mode) == FlightDirectorMode)
+			if (static_cast<Mode> (*_mode) == Mode::FlightDirector)
 			{
 				_computed_output_pitch = *_input_pitch;
 				_computed_output_roll = *_input_roll;

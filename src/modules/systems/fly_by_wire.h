@@ -29,11 +29,12 @@
 
 class FlyByWire: public Xefis::Module
 {
-	enum Mode
+  public:
+	enum class Mode
 	{
-		ManualMode			= 0,
-		StabilizedMode		= 1,
-		FlightDirectorMode	= 2
+		Manual			= 0,
+		Stabilized		= 1,
+		FlightDirector	= 2,
 	};
 
   public:

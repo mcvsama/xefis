@@ -80,7 +80,6 @@ class FlightDirector: public Xefis::Module
 	PitchMode					_pitch_mode					= PitchMode::None;
 	// Input:
 	// TODO PID params as settings:
-	Xefis::PropertyBoolean		_enabled;
 	Xefis::PropertyAngle		_pitch_limit_max;
 	Xefis::PropertyAngle		_pitch_limit_min;
 	Xefis::PropertyAngle		_roll_limit;

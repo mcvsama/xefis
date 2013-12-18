@@ -51,7 +51,6 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 	_output_roll_smoother.set_winding ({ -180.0, +180.0 });
 
 	parse_properties (config, {
-		{ "enabled", _enabled, true },
 		{ "orientation.pitch-limit.max", _pitch_limit_max, true },
 		{ "orientation.pitch-limit.min", _pitch_limit_min, true },
 		{ "orientation.roll-limit", _roll_limit, true },
@@ -95,120 +94,112 @@ FlightDirector::data_updated()
 	if (_cmd_pitch_mode.fresh())
 		pitch_mode_changed();
 
-	if (*_enabled)
+	double const altitude_output_scale = 0.10;
+	double const vertical_speed_output_scale = 0.01;
+	double const rl = (*_roll_limit).deg();
+	double const pl_max = (*_pitch_limit_max).deg();
+	double const pl_min = (*_pitch_limit_min).deg();
+	Xefis::Range<float> roll_limit (-rl, +rl);
+	Xefis::Range<float> pitch_limit (pl_min, pl_max);
+
+	switch (_roll_mode)
 	{
-		double const altitude_output_scale = 0.10;
-		double const vertical_speed_output_scale = 0.01;
-		double const rl = (*_roll_limit).deg();
-		double const pl_max = (*_pitch_limit_max).deg();
-		double const pl_min = (*_pitch_limit_min).deg();
-		Xefis::Range<float> roll_limit (-rl, +rl);
-		Xefis::Range<float> pitch_limit (pl_min, pl_max);
+		case RollMode::Heading:
+			if (_cmd_magnetic_heading.is_nil() || _measured_magnetic_heading.is_nil())
+			{
+				_magnetic_heading_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_magnetic_heading_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
+				_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+				_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
+			}
+			break;
 
-		switch (_roll_mode)
-		{
-			case RollMode::Heading:
-				if (_cmd_magnetic_heading.is_nil() || _measured_magnetic_heading.is_nil())
-				{
-					_magnetic_heading_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_magnetic_heading_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
-					_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-					_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
-				}
-				break;
+		case RollMode::Track:
+			if (_cmd_magnetic_track.is_nil() || _measured_magnetic_track.is_nil())
+			{
+				_magnetic_track_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_magnetic_track_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
+				_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
+				_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
+			}
+			break;
 
-			case RollMode::Track:
-				if (_cmd_magnetic_track.is_nil() || _measured_magnetic_track.is_nil())
-				{
-					_magnetic_track_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_magnetic_track_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
-					_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-					_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
-				}
-				break;
-
-			case RollMode::None:
-			case RollMode::sentinel:
-				_computed_output_roll = 0_deg;
-				break;
-		}
-
-		switch (_pitch_mode)
-		{
-			case PitchMode::Altitude:
-				if (_cmd_altitude.is_nil() || _measured_altitude.is_nil())
-				{
-					_altitude_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_altitude_pid.set_target ((*_cmd_altitude).ft());
-					_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
-					_computed_output_pitch = 1_deg * Xefis::limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
-				}
-				break;
-
-			case PitchMode::Airspeed:
-				if (_cmd_ias.is_nil() || _measured_ias.is_nil())
-				{
-					_ias_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_ias_pid.set_target ((*_cmd_ias).kt());
-					_ias_pid.process ((*_measured_ias).kt(), _dt.s());
-					_computed_output_pitch = 1_deg * Xefis::limit<float> (_ias_pid.output(), pitch_limit);
-				}
-				break;
-
-			case PitchMode::VerticalSpeed:
-				if (_cmd_vertical_speed.is_nil() || _measured_vertical_speed.is_nil())
-				{
-					_vertical_speed_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_vertical_speed_pid.set_target ((*_cmd_vertical_speed).fpm());
-					_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
-					_computed_output_pitch = 1_deg * Xefis::limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
-				}
-				break;
-
-			case PitchMode::FPA:
-				if (_cmd_fpa.is_nil() || _measured_fpa.is_nil())
-				{
-					_fpa_pid.reset();
-					disengage = true;
-				}
-				else
-				{
-					_fpa_pid.set_target ((*_cmd_fpa).deg());
-					_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
-					_computed_output_pitch = 1_deg * Xefis::limit<float> (_fpa_pid.output(), pitch_limit);
-				}
-				break;
-
-			case PitchMode::None:
-			case PitchMode::sentinel:
-				_computed_output_roll = 0_deg;
-				break;
-		}
+		case RollMode::None:
+		case RollMode::sentinel:
+			_computed_output_roll = 0_deg;
+			break;
 	}
-	else
+
+	switch (_pitch_mode)
 	{
-		_computed_output_pitch = 0_deg;
-		_computed_output_roll = 0_deg;
+		case PitchMode::Altitude:
+			if (_cmd_altitude.is_nil() || _measured_altitude.is_nil())
+			{
+				_altitude_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_altitude_pid.set_target ((*_cmd_altitude).ft());
+				_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
+				_computed_output_pitch = 1_deg * Xefis::limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
+			}
+			break;
+
+		case PitchMode::Airspeed:
+			if (_cmd_ias.is_nil() || _measured_ias.is_nil())
+			{
+				_ias_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_ias_pid.set_target ((*_cmd_ias).kt());
+				_ias_pid.process ((*_measured_ias).kt(), _dt.s());
+				_computed_output_pitch = 1_deg * Xefis::limit<float> (_ias_pid.output(), pitch_limit);
+			}
+			break;
+
+		case PitchMode::VerticalSpeed:
+			if (_cmd_vertical_speed.is_nil() || _measured_vertical_speed.is_nil())
+			{
+				_vertical_speed_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_vertical_speed_pid.set_target ((*_cmd_vertical_speed).fpm());
+				_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
+				_computed_output_pitch = 1_deg * Xefis::limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
+			}
+			break;
+
+		case PitchMode::FPA:
+			if (_cmd_fpa.is_nil() || _measured_fpa.is_nil())
+			{
+				_fpa_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_fpa_pid.set_target ((*_cmd_fpa).deg());
+				_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
+				_computed_output_pitch = 1_deg * Xefis::limit<float> (_fpa_pid.output(), pitch_limit);
+			}
+			break;
+
+		case PitchMode::None:
+		case PitchMode::sentinel:
+			_computed_output_roll = 0_deg;
+			break;
 	}
 
 	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), _dt));
