@@ -8,12 +8,11 @@
 				<property name='output.roll' path='/roll'/>
 			</directory>
 			<directory path='/settings/flight-director'>
-				<property name='enabled' path='/enabled' default='true'/>
 				<property name='orientation.pitch-limit.max' path='/limits/pitch.max' default='10 deg'/>
 				<property name='orientation.pitch-limit.min' path='/limits/pitch.min' default='-10 deg'/>
 				<property name='orientation.roll-limit' path='/limits/roll' default='25 deg'/>
-				<property name='cmd.roll-mode' path='/cmd/roll-mode' default='0'/>
-				<property name='cmd.pitch-mode' path='/cmd/pitch-mode' default='1'/>
+				<property name='cmd.roll-mode' path='/cmd/roll-mode'/>
+				<property name='cmd.pitch-mode' path='/cmd/pitch-mode'/>
 				<property name='cmd.heading.magnetic' path='/cmd/magnetic-heading-track'/>
 				<property name='cmd.track.magnetic' path='/cmd/magnetic-heading-track'/>
 				<property name='cmd.altitude' path='/cmd/altitude'/>

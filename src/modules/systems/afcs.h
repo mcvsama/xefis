@@ -27,6 +27,7 @@
 #include <xefis/core/property_observer.h>
 #include <xefis/utility/rotary_encoder.h>
 #include <xefis/utility/range.h>
+#include <modules/systems/fly_by_wire.h>
 
 
 class AutomatedFlightControlSystem: public Xefis::Module
@@ -102,6 +103,9 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	prepare_afcs_main_panel();
 
 	void
+	process_afcs_main_panel();
+
+	void
 	prepare_speed_panel();
 
 	void
@@ -123,7 +127,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	 * Compute and solve settings of Flight Director.
 	 */
 	void
-	solve_fd();
+	solve_mode();
 
 	/**
 	 * Update FMA messages.
@@ -140,7 +144,16 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	static std::string const&
 	pitch_mode_string (PitchMode);
 
+	/**
+	 * Return true if given button is fresh() and set to true.
+	 */
+	static bool
+	pressed (Xefis::PropertyBoolean const&);
+
   private:
+	bool								_ap_on						= false;
+	bool								_at_on						= false;
+	bool								_att_on						= false;
 	Speed								_cmd_speed_counter			= CmdSpeedRange.min();
 	Speed								_cmd_speed_selected			= CmdSpeedRange.min();
 	Angle								_cmd_heading_counter		= 0_deg;
@@ -192,6 +205,8 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyInteger				_mcp_heading_display;
 	Xefis::PropertyInteger				_mcp_altitude_display;
 	Xefis::PropertyInteger				_mcp_vspd_display;
+	Xefis::PropertyBoolean				_mcp_ap_led;
+	Xefis::PropertyBoolean				_mcp_att_led;
 	Xefis::PropertyBoolean				_mcp_speed_sel_led;
 	Xefis::PropertyBoolean				_mcp_speed_hold_led;
 	Xefis::PropertyBoolean				_mcp_heading_sel_led;
@@ -204,6 +219,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_vspd_sel_led;
 	Xefis::PropertyBoolean				_mcp_vspd_clb_con_led;
 	// Output:
+	Xefis::PropertyInteger				_fbw_mode;
 	Xefis::PropertyInteger				_cmd_roll_mode;
 	Xefis::PropertyInteger				_cmd_pitch_mode;
 	Xefis::PropertySpeed				_cmd_ias;
@@ -211,6 +227,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyLength				_cmd_altitude;
 	Xefis::PropertySpeed				_cmd_vspd;
 	Xefis::PropertyAngle				_cmd_fpa;
+	Xefis::PropertyString				_fma_control_hint;
 	Xefis::PropertyString				_fma_speed_mode;
 	Xefis::PropertyString				_fma_roll_mode;
 	Xefis::PropertyString				_fma_pitch_mode;

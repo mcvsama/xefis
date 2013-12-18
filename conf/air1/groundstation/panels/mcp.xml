@@ -24,7 +24,7 @@
 							<layout type='vertical' spacing='10'>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='STICK' click-property='/panels/mcp/stick' led-property='/settings/efis/stick-visible' led-color='green'/>
+									<widget type='button' top-label='---' click-property='/panels/mcp/---' led-property='/---' led-color='green'/>
 								</item>
 								<item>
 									<widget type='button' top-label='FPV' click-property='/panels/mcp/fpv' led-property='/settings/efis/fpv-visible' led-color='green'/>
@@ -87,7 +87,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='button' top-label='A/P' click-property='/panels/mcp/ap' led-property='/panels/mcp/ap' led-color='amber'/>
+									<widget type='button' top-label='A/P' click-property='/panels/mcp/ap' led-property='/panels/mcp/led/ap' led-color='amber'/>
 								</item>
 								<stretch/>
 								<item>
@@ -95,7 +95,7 @@
 								</item>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='ATT✶' click-property='/panels/mcp/att' led-property='/panels/mcp/att' led-color='amber'/>
+									<widget type='button' top-label='ATT✶' click-property='/panels/mcp/att' led-property='/panels/mcp/led/att' led-color='amber'/>
 								</item>
 							</layout>
 						</item>

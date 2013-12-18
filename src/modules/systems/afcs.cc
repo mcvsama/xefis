@@ -76,6 +76,8 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "display.heading", _mcp_heading_display, true },
 		{ "display.altitude", _mcp_altitude_display, true },
 		{ "display.vertical-speed", _mcp_vspd_display, true },
+		{ "led.ap", _mcp_ap_led, true },
+		{ "led.att", _mcp_att_led, true },
 		{ "led.speed.sel", _mcp_speed_sel_led, true },
 		{ "led.speed.hold", _mcp_speed_hold_led, true },
 		{ "led.heading.sel", _mcp_heading_sel_led, true },
@@ -87,6 +89,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "led.altitude.hold", _mcp_altitude_hold_led, true },
 		{ "led.vertical-speed.sel", _mcp_vspd_sel_led, true },
 		{ "led.vertical-speed.clb-con", _mcp_vspd_clb_con_led, true },
+		{ "fbw.mode", _fbw_mode, true },
 		{ "cmd.roll-mode", _cmd_roll_mode, true },
 		{ "cmd.pitch-mode", _cmd_pitch_mode, true },
 		{ "cmd.ias", _cmd_ias, true },
@@ -94,6 +97,10 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "cmd.altitude", _cmd_altitude, true },
 		{ "cmd.vertical-speed", _cmd_vspd, true },
 		{ "cmd.fpa", _cmd_fpa, true },
+		{ "fma.control-hint", _fma_control_hint, true },
+		{ "fma.speed-mode", _fma_speed_mode, true },
+		{ "fma.roll-mode", _fma_roll_mode, true },
+		{ "fma.pitch-mode", _fma_pitch_mode, true },
 	});
 
 	prepare_afcs_main_panel();
@@ -112,6 +119,8 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 
 	for (auto* decoder: _rotary_decoders)
 		decoder->call (0);
+
+	solve_mode();
 }
 
 
@@ -121,6 +130,7 @@ AutomatedFlightControlSystem::data_updated()
 	for (Xefis::RotaryEncoder* r: _rotary_decoders)
 		r->data_updated();
 
+	process_afcs_main_panel();
 	process_altitude_panel();
 }
 
@@ -138,11 +148,28 @@ AutomatedFlightControlSystem::prepare_afcs_main_panel()
 
 
 void
+AutomatedFlightControlSystem::process_afcs_main_panel()
+{
+	if (pressed (_mcp_ap))
+	{
+		_ap_on = !_ap_on;
+		solve_mode();
+	}
+
+	if (pressed (_mcp_att))
+	{
+		_att_on = !_att_on;
+		solve_mode();
+	}
+}
+
+
+void
 AutomatedFlightControlSystem::prepare_speed_panel()
 {
 	_mcp_speed_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_speed_a, _mcp_speed_b, [this](int delta) {
 		_cmd_speed_counter = Xefis::limit (_cmd_speed_counter + 1_kt * delta, CmdSpeedRange);
-		solve_fd();
+		solve_mode();
 	});
 
 //	TODO _mcp_speed_ias_mach;
@@ -158,7 +185,7 @@ AutomatedFlightControlSystem::prepare_heading_panel()
 {
 	_mcp_heading_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_heading_a, _mcp_heading_b, [this](int delta) {
 		_cmd_heading_counter = Xefis::floored_mod (_cmd_heading_counter + 1_deg * delta, 360_deg);
-		solve_fd();
+		solve_mode();
 	});
 
 //	TODO _mcp_heading_hdg_trk;
@@ -189,7 +216,7 @@ AutomatedFlightControlSystem::prepare_altitude_panel()
 			case CmdAltitudeStep::Ft100:	altitude_step = 100_ft; break;
 		}
 		_cmd_altitude_counter = Xefis::limit (_cmd_altitude_counter + altitude_step * delta, CmdAltitudeRange);
-		solve_fd();
+		solve_mode();
 	});
 
 //	TODO _mcp_altitude_flch
@@ -203,7 +230,7 @@ void
 AutomatedFlightControlSystem::process_altitude_panel()
 {
 	// Altitude Step Change:
-	if (_mcp_altitude_stepch.fresh() && _mcp_altitude_stepch.read (false))
+	if (pressed (_mcp_altitude_stepch))
 	{
 		switch (_cmd_altitude_step)
 		{
@@ -222,7 +249,7 @@ AutomatedFlightControlSystem::prepare_vspd_panel()
 {
 	_mcp_vspd_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_vspd_a, _mcp_vspd_b, [this](int delta) {
 		_cmd_vspd_counter = Xefis::limit (_cmd_vspd_counter + CmdVSpdStep * delta, CmdVSpdRange);
-		solve_fd();
+		solve_mode();
 	});
 
 //	TODO _mcp_vspd_vs_fpa
@@ -232,27 +259,10 @@ AutomatedFlightControlSystem::prepare_vspd_panel()
 
 
 void
-AutomatedFlightControlSystem::solve_fd()
+AutomatedFlightControlSystem::solve_mode()
 {
-	bool led_speed_sel = false;
-	bool led_speed_hold = false;
-	bool led_lnav = false;
-	bool led_heading_sel = false;
-	bool led_heading_hold = false;
-	bool led_vnav = false;
-	bool led_altitude_flch = false;
-	bool led_altitude_hold = false;
-
-//	TODO control LEDs
-
-	_mcp_speed_sel_led.write (led_speed_sel);
-	_mcp_speed_hold_led.write (led_speed_hold);
-	_mcp_lnav_led.write (led_lnav);
-	_mcp_heading_sel_led.write (led_heading_sel);
-	_mcp_heading_hold_led.write (led_heading_hold);
-	_mcp_vnav_led.write (led_vnav);
-	_mcp_altitude_flch_led.write (led_altitude_flch);
-	_mcp_altitude_hold_led.write (led_altitude_hold);
+	_mcp_ap_led.write (_ap_on);
+	_mcp_att_led.write (_att_on);
 	_mcp_speed_display.write (Xefis::symmetric_round (_cmd_speed_counter.kt()));
 	int heading = Xefis::symmetric_round (_cmd_heading_counter.deg());
 	if (heading == 0)
@@ -261,6 +271,15 @@ AutomatedFlightControlSystem::solve_fd()
 	_mcp_altitude_display.write (Xefis::symmetric_round (_cmd_altitude_counter.ft()));
 	_mcp_vspd_display.write (Xefis::symmetric_round (_cmd_vspd_counter.fpm()));
 
+	// Control FBW module:
+	FlyByWire::Mode fbw_mode = FlyByWire::Mode::Manual;
+	if (_ap_on)
+		fbw_mode = FlyByWire::Mode::FlightDirector;
+	else if (_att_on)
+		fbw_mode = FlyByWire::Mode::Stabilized;
+	_fbw_mode.write (static_cast<decltype (_fbw_mode)::Type> (fbw_mode));
+
+	// Control A/T and FD modules:
 	_cmd_ias.write (_cmd_speed_counter);
 	_cmd_heading_track.write (_cmd_heading_counter);
 	_cmd_altitude.write (_cmd_altitude_counter);
@@ -268,6 +287,7 @@ AutomatedFlightControlSystem::solve_fd()
 	_cmd_vspd.write (_cmd_vspd_counter);
 	_cmd_fpa.write (0.0_deg);//TODO
 
+	update_fma();
 	signal_data_updated();
 }
 
@@ -275,6 +295,25 @@ AutomatedFlightControlSystem::solve_fd()
 void
 AutomatedFlightControlSystem::update_fma()
 {
+	switch (static_cast<FlyByWire::Mode> (*_fbw_mode))
+	{
+		case FlyByWire::Mode::Manual:
+			_fma_control_hint.write ("");
+			break;
+
+		case FlyByWire::Mode::Stabilized:
+			_fma_control_hint.write ("ATT");
+			break;
+
+		case FlyByWire::Mode::FlightDirector:
+			_fma_control_hint.write ("FLT DIR");
+			break;
+
+		default:
+			_fma_control_hint.write ("---");
+			break;
+	}
+
 	_fma_speed_mode.write (speed_mode_string (_speed_mode));
 	_fma_roll_mode.write (roll_mode_string (_roll_mode));
 	_fma_pitch_mode.write (pitch_mode_string (_pitch_mode));
@@ -337,5 +376,12 @@ AutomatedFlightControlSystem::pitch_mode_string (PitchMode pitch_mode)
 	};
 
 	return names[static_cast<std::size_t> (pitch_mode)];
+}
+
+
+bool
+AutomatedFlightControlSystem::pressed (Xefis::PropertyBoolean const& property)
+{
+	return property.fresh() && property.read (false);
 }
 

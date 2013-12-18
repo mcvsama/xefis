@@ -40,6 +40,8 @@
 				<property name='display.vertical-speed' path='/vertical-speed'/>
 			</directory>
 			<directory path='/panels/mcp/led'>
+				<property name='led.ap' path='/ap'/>
+				<property name='led.att' path='/att'/>
 				<property name='led.speed.sel' path='/speed-sel'/>
 				<property name='led.speed.hold' path='/speed-hold'/>
 				<property name='led.heading.sel' path='/heading-sel'/>
@@ -60,6 +62,13 @@
 				<property name='cmd.altitude' path='/altitude'/>
 				<property name='cmd.vertical-speed' path='/vertical-speed'/>
 				<property name='cmd.fpa' path='/fpa'/>
+			</directory>
+			<property name='fbw.mode' path='/settings/fly-by-wire/mode'/>
+			<directory path='/systems/afcs/fma'>
+				<property name='fma.control-hint' path='/control-hint'/>
+				<property name='fma.speed-mode' path='/speed-mode'/>
+				<property name='fma.roll-mode' path='/roll-mode'/>
+				<property name='fma.pitch-mode' path='/pitch-mode'/>
 			</directory>
 		</properties>
 	</module>

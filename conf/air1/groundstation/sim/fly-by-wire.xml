@@ -2,7 +2,7 @@
 <xefis-include>
 	<module name='systems/fly-by-wire'>
 		<properties>
-			<property name='mode' path='/settings/fly-by-wire/mode' default='0'/>
+			<property name='mode' path='/settings/fly-by-wire/mode'/>
 			<directory path='/systems/fly-by-wire/config'>
 				<property name='stabilization-gain' path='/gain' default='1.0'/>
 				<property name='pitch-gain' path='/pitch/gain' default='1.0'/>

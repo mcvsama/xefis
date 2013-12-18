@@ -74,13 +74,13 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_mins_a.set_path (mcp_root + "/mins-a");
 	_mcp_mins_b.set_path (mcp_root + "/mins-b");
 	_mcp_mins_mode.set_path (mcp_root + "/mins-mode");
+	_mcp_ap.set_path (mcp_root + "/ap");
 	_mcp_appr.set_path (mcp_root + "/appr");
 	_mcp_fd.set_path (mcp_root + "/fd");
 	_mcp_qnh_a.set_path (mcp_root + "/qnh-a");
 	_mcp_qnh_b.set_path (mcp_root + "/qnh-b");
 	_mcp_qnh_hpa.set_path (mcp_root + "/qnh-hpa");
 	_mcp_std.set_path (mcp_root + "/std");
-	_mcp_stick.set_path (mcp_root + "/stick");
 	_mcp_metric.set_path (mcp_root + "/metric");
 	_mcp_fpv.set_path (mcp_root + "/fpv");
 	_mcp_range_a.set_path (mcp_root + "/range-a");
@@ -114,8 +114,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_efis_fd_visible.set_default (false);
 	_setting_efis_appr_visible.set_path ("/settings/efis/approach-reference-visible");
 	_setting_efis_appr_visible.set_default (false);
-	_setting_efis_stick_visible.set_path ("/settings/efis/control-stick-visible");
-	_setting_efis_stick_visible.set_default (false);
 	_setting_efis_mfd_mode.set_path ("/settings/efis/mfd-mode");
 	_setting_efis_mfd_mode.set_default (static_cast<int> (MFDMode::EICAS));
 	_setting_pressure_qnh.set_path ("/settings/pressure/qnh");
@@ -147,11 +145,11 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	_observables = {
 		&_mcp_mins_mode,
+		&_mcp_ap,
 		&_mcp_appr,
 		&_mcp_fd,
 		&_mcp_qnh_hpa,
 		&_mcp_std,
-		&_mcp_stick,
 		&_mcp_metric,
 		&_mcp_fpv,
 		&_mcp_range_ctr,
@@ -231,6 +229,10 @@ State::prepare_efis_settings()
 		solve_minimums();
 	});
 
+	make_switch (_mcp_ap, [this]() {
+		_setting_efis_fd_visible.write (true);
+	});
+
 	make_toggle (_mcp_appr, _setting_efis_appr_visible);
 	make_toggle (_mcp_fd, _setting_efis_fd_visible);
 
@@ -246,7 +248,6 @@ State::prepare_efis_settings()
 
 	make_toggle (_mcp_qnh_hpa, _setting_pressure_display_hpa);
 	make_toggle (_mcp_std, _setting_pressure_use_std);
-	make_toggle (_mcp_stick, _setting_efis_stick_visible);
 	make_toggle (_mcp_metric, _setting_efis_show_metric);
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 

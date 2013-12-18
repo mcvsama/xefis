@@ -60,7 +60,7 @@
 					<property name='flight-director.guidance.visible' path='/settings/efis/flight-director-visible'/>
 					<property name='flight-director.guidance.pitch' path='/systems/flight-director/guidance/pitch'/>
 					<property name='flight-director.guidance.roll' path='/systems/flight-director/guidance/roll'/>
-					<property name='control-stick.visible' path='/settings/efis/control-stick-visible'/>
+					<property name='control-stick.visible' path='/panels/mcp/led/att'/>
 					<property name='control-stick.pitch' path='/systems/fly-by-wire/stick/pitch'/>
 					<property name='control-stick.roll' path='/systems/fly-by-wire/stick/roll'/>
 					<directory path='//efis'>
@@ -82,15 +82,17 @@
 							</directory>
 						</directory>
 					</directory>
-					<property name='flight-mode.hint.visible' path='/settings/flight-mode/visible'/>
-					<property name='flight-mode.hint' path='/settings/flight-mode/hint'/>
+					<property name='flight-mode.hint.visible' path='/settings/flight-mode/visible' default='true'/>
 					<property name='flight-mode.fma.visible' path='/settings/fma/visible' default='true'/>
-					<property name='flight-mode.fma.speed-hint' path='/settings/fma/speed-hint'/>
-					<property name='flight-mode.fma.speed-small-hint' path='/settings/fma/speed-small-hint'/>
-					<property name='flight-mode.fma.lateral-hint' path='/settings/fma/lateral-hint'/>
-					<property name='flight-mode.fma.lateral-small-hint' path='/settings/fma/lateral-small-hint'/>
-					<property name='flight-mode.fma.vertical-hint' path='/settings/fma/vertical-hint'/>
-					<property name='flight-mode.fma.vertical-small-hint' path='/settings/fma/vertical-small-hint'/>
+					<directory path='/systems/afcs/fma'>
+						<property name='flight-mode.hint' path='/control-hint'/>
+						<property name='flight-mode.fma.speed-hint' path='/speed-mode'/>
+						<property name='flight-mode.fma.speed-small-hint' path='/armed-speed-mode'/>
+						<property name='flight-mode.fma.lateral-hint' path='/roll-mode'/>
+						<property name='flight-mode.fma.lateral-small-hint' path='/armed-roll-mode'/>
+						<property name='flight-mode.fma.vertical-hint' path='/pitch-mode'/>
+						<property name='flight-mode.fma.vertical-small-hint' path='/armed-pitch-mode'/>
+					</directory>
 					<property name='tcas.resolution-advisory.pitch.minimum' path='/systems/tcas/resolution-advisory/pitch.minimum'/>
 					<property name='tcas.resolution-advisory.pitch.maximum' path='/systems/tcas/resolution-advisory/pitch.maximum'/>
 					<property name='tcas.resolution-advisory.vertical-speed.minimum' path='/systems/tcas/resolution-advisory/vertical-speed.minimum'/>
