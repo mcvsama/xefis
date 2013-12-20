@@ -218,6 +218,7 @@ class State: public Xefis::Module
 	Observable<Xefis::PropertyBoolean>	_mcp_att;
 	Observable<Xefis::PropertyBoolean>	_mcp_appr;
 	Observable<Xefis::PropertyBoolean>	_mcp_fd;
+	Observable<Xefis::PropertyBoolean>	_mcp_htrk;
 	Xefis::PropertyBoolean				_mcp_qnh_a;
 	Xefis::PropertyBoolean				_mcp_qnh_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_qnh_decoder;
@@ -265,6 +266,7 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_setting_hsi_center_on_track;
 	Xefis::PropertyInteger				_setting_hsi_display_mode_mfd;
 	Xefis::PropertyLength				_setting_hsi_range;
+	Xefis::PropertyBoolean				_setting_hsi_home_track_visible;
 	Xefis::PropertyBoolean				_setting_lights_strobe;
 	Xefis::PropertyBoolean				_setting_lights_position;
 	Xefis::PropertyBoolean				_setting_lights_landing;

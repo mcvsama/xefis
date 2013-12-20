@@ -77,6 +77,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_ap.set_path (mcp_root + "/ap");
 	_mcp_appr.set_path (mcp_root + "/appr");
 	_mcp_fd.set_path (mcp_root + "/fd");
+	_mcp_htrk.set_path (mcp_root + "/htrk");
 	_mcp_qnh_a.set_path (mcp_root + "/qnh-a");
 	_mcp_qnh_b.set_path (mcp_root + "/qnh-b");
 	_mcp_qnh_hpa.set_path (mcp_root + "/qnh-hpa");
@@ -133,6 +134,8 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_hsi_display_mode_mfd.set_default (0);
 	_setting_hsi_range.set_path ("/settings/hsi/range");
 	_setting_hsi_range.set_default (1_nm);
+	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
+	_setting_hsi_home_track_visible.set_default (false);
 	_setting_lights_strobe.set_path ("/settings/lights/strobe");
 	_setting_lights_strobe.set_default (false);
 	_setting_lights_position.set_path ("/settings/lights/position");
@@ -148,6 +151,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_mcp_ap,
 		&_mcp_appr,
 		&_mcp_fd,
+		&_mcp_htrk,
 		&_mcp_qnh_hpa,
 		&_mcp_std,
 		&_mcp_metric,
@@ -235,6 +239,7 @@ State::prepare_efis_settings()
 
 	make_toggle (_mcp_appr, _setting_efis_appr_visible);
 	make_toggle (_mcp_fd, _setting_efis_fd_visible);
+	make_toggle (_mcp_htrk, _setting_hsi_home_track_visible);
 
 	_mcp_qnh_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_qnh_a, _mcp_qnh_b, [this](int delta) {
 		if (*_setting_pressure_display_hpa)
