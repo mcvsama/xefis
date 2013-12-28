@@ -34,29 +34,66 @@ namespace Xefis {
 class Exception: public std::runtime_error
 {
   public:
+	/**
+	 * Create exception object.
+	 * \param	message
+	 * 			Message for user. Don't capitalize first letter, and don't add dot at the end.
+	 * 			It should be a simple phrase, that can be embedded into a bigger sentence.
+	 */
 	Exception (const char* message, Exception const* inner = nullptr);
 
+	/**
+	 * Convenience function.
+	 */
 	Exception (std::string const& message, Exception const* inner = nullptr);
 
+	/**
+	 * Convenience function.
+	 */
 	Exception (QString const& message, Exception const* inner = nullptr);
 
+	// Dtor
 	virtual ~Exception() noexcept;
 
+	/**
+	 * Return true if this exception wraps another exception.
+	 */
 	bool
 	has_inner() const noexcept;
 
+	/**
+	 * Return exception message.
+	 */
 	std::string const&
 	message() const;
 
+	/**
+	 * Return message of the wrapped exception, if there's any.
+	 * If there is none, return empty string.
+	 */
 	std::string const&
 	inner_message() const;
 
+	/**
+	 * Return backtrace created when the exception was constructed.
+	 */
 	Backtrace const&
 	backtrace() const;
 
+	/**
+	 * Same as guard_and_rethrow, but doesn't rethrow. Instead it returns
+	 * true if exception occured, and false otherwise.
+	 */
 	static bool
 	guard (std::function<void()> guarded_code);
 
+	/**
+	 * Execute guarded_code and catch exceptions. If exception is catched,
+	 * it's logged and rethrown. If exception is of type Xefis::Exceptions,
+	 * it's full message is logged (backtrace, etc). Boost and standard
+	 * exceptions are logged just by their typeid().name. Other types
+	 * just cause mentioning an exception.
+	 */
 	static void
 	guard_and_rethrow (std::function<void()> guarded_code);
 

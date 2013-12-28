@@ -41,7 +41,7 @@ class ConfigReader
 
   public:
 	/**
-	 * Standard parser for a <settings> element.
+	 * Standard parser for a <settings> element, used in module configurations.
 	 */
 	class SettingsParser
 	{
@@ -99,10 +99,17 @@ class ConfigReader
 		typedef std::set<QString>			SettingsSet;
 
 	  public:
-		// Ctor
+		/**
+		 * Create parser with empty settings list.
+		 */
 		SettingsParser() = default;
 
-		// Ctor
+		/**
+		 * Create parser and register list of name/variable paris.
+		 * As settings are parsed from the config DOM elmeent,
+		 * appropriate setting values are assigned to variables
+		 * referenced in list.
+		 */
 		explicit SettingsParser (SettingsList const& list);
 
 		/**
@@ -131,7 +138,7 @@ class ConfigReader
 	};
 
 	/**
-	 * Standard parser for a <properties> element.
+	 * Standard parser for a <properties> element, used in module configurations.
 	 */
 	class PropertiesParser
 	{
@@ -150,14 +157,22 @@ class ConfigReader
 		typedef std::vector<NameAndProperty> PropertiesList;
 
 	  public:
-		// Ctor
+		/**
+		 * Create parser with empty properties list.
+		 */
 		PropertiesParser() = default;
 
-		// Ctor
+		/**
+		 * Create parser and register list of name/variable paris.
+		 * As properties are read from DOM configuration, referenced
+		 * properties are configured according to the XML configuration
+		 * (path, etc).
+		 */
 		explicit PropertiesParser (PropertiesList const& list);
 
 		/**
-		 * Parse element and assign values.
+		 * Process configuration element <properties> and assign values
+		 * to properties.
 		 */
 		void
 		parse (QDomElement const&);
