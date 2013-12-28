@@ -138,6 +138,16 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 }
 
 
+std::vector<QString>
+ConfigReader::SettingsParser::registered_names() const
+{
+	std::vector<QString> result;
+	for (auto const& p: _list)
+		result.push_back (p.name);
+	return result;
+}
+
+
 bool
 ConfigReader::SettingsParser::has_setting (QString const& name)
 {
@@ -265,6 +275,16 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 	{
 		throw Exception ("error when parsing <properties>", &e);
 	}
+}
+
+
+std::vector<QString>
+ConfigReader::PropertiesParser::registered_names() const
+{
+	std::vector<QString> result;
+	for (auto const& p: _list)
+		result.push_back (p.name);
+	return result;
 }
 
 

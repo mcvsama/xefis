@@ -59,6 +59,10 @@ int main (int argc, char** argv, char**)
 			app->exec();
 		}
 	}
+	catch (Xefis::Application::QuitInstruction)
+	{
+		return EXIT_SUCCESS;
+	}
 	catch (Xefis::Exception& e)
 	{
 		std::cerr << e << std::endl;

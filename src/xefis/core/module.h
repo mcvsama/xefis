@@ -135,6 +135,12 @@ class Module: private Noncopyable
 	static FactoryFunction
 	find_factory (std::string const& name);
 
+	/**
+	 * Dumps module info to the log.
+	 */
+	void
+	dump_debug_log();
+
   protected:
 	/**
 	 * Parse the <properties> element and initialize properties
