@@ -39,6 +39,19 @@ Module::Module (ModuleManager* module_manager, QDomElement const& config):
 	_instance (config.attribute ("instance", "").toStdString())
 {
 	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % _name % _instance).str());
+	_settings_parser = std::make_unique<ConfigReader::SettingsParser>();
+	_properties_parser = std::make_unique<ConfigReader::PropertiesParser>();
+}
+
+
+void
+Module::dump_debug_log()
+{
+	for (auto const& s: _settings_parser->registered_names())
+		log() << "* setting: " << s.toStdString() << std::endl;
+
+	for (auto const& s: _properties_parser->registered_names())
+		log() << "* property: " << s.toStdString() << std::endl;
 }
 
 
@@ -65,8 +78,8 @@ Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesPa
 	if (properties_element.isNull())
 		throw Exception ("missing <properties> element");
 
-	_properties_parser = ConfigReader::PropertiesParser (list);
-	_properties_parser.parse (properties_element);
+	_properties_parser = std::make_unique<ConfigReader::PropertiesParser> (list);
+	_properties_parser->parse (properties_element);
 }
 
 
@@ -93,22 +106,22 @@ Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser
 	if (settings_element.isNull())
 		throw Exception ("missing <settings> element");
 
-	_settings_parser = ConfigReader::SettingsParser (list);
-	_settings_parser.parse (settings_element);
+	_settings_parser = std::make_unique<ConfigReader::SettingsParser> (list);
+	_settings_parser->parse (settings_element);
 }
 
 
 bool
 Module::has_setting (QString const& name)
 {
-	return _settings_parser.has_setting (name);
+	return _settings_parser->has_setting (name);
 }
 
 
 void
-Module::signal_data_updated() const
+Module::signal_data_updated()
 {
-	_module_manager->application()->data_updated();
+	_signalled_data_update = true;
 }
 
 

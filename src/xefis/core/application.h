@@ -16,6 +16,8 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
+#include <map>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -43,7 +45,7 @@ class Application: public QApplication
 	class DataUpdatedEvent: public QEvent
 	{
 	  public:
-		DataUpdatedEvent (Time);
+		explicit DataUpdatedEvent (Time);
 
 		Time
 		time() const;
@@ -51,6 +53,25 @@ class Application: public QApplication
 	  private:
 		Time _time;
 	};
+
+  public:
+	class NonValuedArgumentException: public Exception
+	{
+	  public:
+		explicit NonValuedArgumentException (std::string const& argument);
+	};
+
+	class QuitInstruction { };
+
+  public:
+	// Options related to command line arguments.
+	enum class Option
+	{
+		ModulesDebugLog		= 1UL << 0,
+		WatchDogFD			= 1UL << 1,
+	};
+
+	typedef std::map<Option, std::string> OptionsMap;
 
   public:
 	// Ctor
@@ -116,6 +137,19 @@ class Application: public QApplication
 	ConfiguratorWidget*
 	configurator_widget() const;
 
+	/**
+	 * Return true if application was run with given command-line option.
+	 */
+	bool
+	has_option (Option) const;
+
+	/**
+	 * Return value of given command-line options.
+	 * If no value was given, return empty string.
+	 */
+	std::string
+	option (Option) const;
+
   public slots:
 	/**
 	 * Indicate that the data in property tree has been updated
@@ -144,6 +178,12 @@ class Application: public QApplication
 
   private:
 	/**
+	 * Parse command line options and fill _options map.
+	 */
+	void
+	parse_args (int argc, char** argv);
+
+	/**
 	 * UNIX signal handler. Calls quit() on Application instance.
 	 */
 	static void
@@ -161,7 +201,14 @@ class Application: public QApplication
 	Unique<WorkPerformer>			_work_performer;
 	QTimer*							_postponed_update	= nullptr;
 	QTimer*							_offline_updater	= nullptr;
+	OptionsMap						_options;
 };
+
+
+inline
+Application::NonValuedArgumentException::NonValuedArgumentException (std::string const& argument):
+	Exception ("argument '" + argument + "' doesn't take any values")
+{ }
 
 
 inline
@@ -224,6 +271,24 @@ inline ConfiguratorWidget*
 Application::configurator_widget() const
 {
 	return _configurator_widget.get();
+}
+
+
+inline bool
+Application::has_option (Option option) const
+{
+	return _options.find (option) != _options.end();
+}
+
+
+inline std::string
+Application::option (Option option) const
+{
+	auto o = _options.find (option);
+	if (o != _options.end())
+		return o->second;
+	else
+		return std::string();
 }
 
 } // namespace Xefis

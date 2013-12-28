@@ -119,7 +119,13 @@ class ConfigReader
 		parse (QDomElement const&);
 
 		/**
-		 * Return true if given setting has been found in configuration.
+		 * Return list of registered (not parsed) setting names.
+		 */
+		std::vector<QString>
+		registered_names() const;
+
+		/**
+		 * Return true if given setting has been found in DOM configuration.
 		 */
 		bool
 		has_setting (QString const& name);
@@ -176,6 +182,12 @@ class ConfigReader
 		 */
 		void
 		parse (QDomElement const&);
+
+		/**
+		 * Return list of registered property names.
+		 */
+		std::vector<QString>
+		registered_names() const;
 
 	  private:
 		PropertiesList	_list;

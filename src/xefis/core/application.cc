@@ -53,6 +53,8 @@ Application::Application (int argc, char** argv):
 		throw std::runtime_error ("can create only one Application object");
 	_application = this;
 
+	parse_args (argc, argv);
+
 	// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
 	// Also encode std::strings and const chars* in UTF-8:
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
@@ -174,6 +176,44 @@ Application::event (QEvent* event)
 	}
 	else
 		return QApplication::event (event);
+}
+
+
+void
+Application::parse_args (int argc, char** argv)
+{
+	std::vector<std::string> args (argv, argv + argc);
+	if (args.empty())
+		return;
+	args.erase (args.begin(), args.begin() + 1);
+
+	for (auto const& arg: args)
+	{
+		std::string::size_type eq_pos = arg.find ('=');
+		std::string arg_name = arg;
+		std::string arg_value;
+
+		if (eq_pos != std::string::npos)
+		{
+			arg_name = arg.substr (0, eq_pos);
+			arg_value = arg.substr (eq_pos + 1);
+		}
+
+		if (arg_name == "--help")
+		{
+			std::cout << "List of available options:" << std::endl;
+			std::cout << "  --modules-debug-log - dump module settings/properties information" << std::endl;
+			throw QuitInstruction();
+		}
+		else if (arg_name == "--modules-debug-log")
+		{
+			if (!arg_value.empty())
+				throw NonValuedArgumentException (arg_name);
+			_options[Option::ModulesDebugLog] = "";
+		}
+		else
+			throw Exception ("unrecognized option '" + arg_name + "', try --help");
+	}
 }
 
 

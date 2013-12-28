@@ -51,6 +51,9 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 	else
 		_non_instrument_modules.insert (module);
 
+	if (_application->has_option (Application::Option::ModulesDebugLog))
+		module->dump_debug_log();
+
 	return module;
 }
 
