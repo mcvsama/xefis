@@ -226,6 +226,8 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 										 widget_element.attribute ("click-label"),
 										 PropertyBoolean (widget_element.attribute ("rotate-a-property").toStdString()),
 										 PropertyBoolean (widget_element.attribute ("rotate-b-property").toStdString()),
+										 PropertyBoolean (widget_element.attribute ("rotate-up-property").toStdString()),
+										 PropertyBoolean (widget_element.attribute ("rotate-down-property").toStdString()),
 										 PropertyBoolean (widget_element.attribute ("click-property").toStdString()));
 	}
 	else if (type == "numeric-display")
