@@ -19,6 +19,7 @@
 // Qt:
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QMenu>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -36,6 +37,8 @@ PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
 	_property_tree_widget = new PropertyTreeWidget (root_node, this);
 	QObject::connect (_property_tree_widget, SIGNAL (itemSelectionChanged()), this, SLOT (item_selected()));
 	QObject::connect (_property_tree_widget, SIGNAL (itemClicked (QTreeWidgetItem*, int)), this, SLOT (item_changed (QTreeWidgetItem*, int)));
+	QObject::connect (_property_tree_widget, SIGNAL (itemDoubleClicked (QTreeWidgetItem*, int)), this, SLOT (focus_editor (QTreeWidgetItem*, int)));
+	QObject::connect (_property_tree_widget, SIGNAL (context_menu (QTreeWidgetItem*, QPoint const&)), this, SLOT (handle_context_menu_request (QTreeWidgetItem*, QPoint const&)));
 
 	_editable_value = new QLineEdit (this);
 	_normal_color = _editable_value->palette().color (QPalette::Base);
@@ -71,6 +74,25 @@ PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
 	QObject::connect (_accepted_blink_timer, SIGNAL (timeout()), this, SLOT (reset_error()));
 
 	item_selected();
+}
+
+
+void
+PropertyEditor::handle_context_menu_request (QTreeWidgetItem* item, QPoint const& pos)
+{
+	if (!item)
+		return;
+
+	PropertyTreeWidgetItem* prop_item = dynamic_cast<PropertyTreeWidgetItem*> (item);
+	if (!prop_item)
+		return;
+
+	QMenu* menu = new QMenu (this);
+	QAction* set_nil_action = menu->addAction ("Set <nil>", this, SLOT (context_item_set_nil()));
+	set_nil_action->setEnabled (!!dynamic_cast<TypedPropertyValueNode*> (prop_item->node()));
+
+	_context_item = prop_item;
+	menu->exec (pos);
 }
 
 
@@ -181,6 +203,29 @@ PropertyEditor::reset_error()
 {
 	_accepted_blink_timer->stop();
 	set_line_edit_color (_normal_color);
+}
+
+
+void
+PropertyEditor::focus_editor (QTreeWidgetItem* item, int)
+{
+	auto pitem = dynamic_cast<PropertyTreeWidgetItem*> (item);
+	if (pitem)
+		_editable_value->setFocus();
+}
+
+
+void
+PropertyEditor::context_item_set_nil()
+{
+	if (_context_item)
+	{
+		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (_context_item->node());
+		if (!val_node)
+			return;
+
+		val_node->set_nil();
+	}
 }
 
 } // namespace Xefis

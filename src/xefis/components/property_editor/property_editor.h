@@ -45,6 +45,13 @@ class PropertyEditor: public QWidget
   public:
 	PropertyEditor (PropertyNode* root_node, QWidget* parent);
 
+  public slots:
+	/**
+	 * Display context menu for a property.
+	 */
+	void
+	handle_context_menu_request (QTreeWidgetItem*, QPoint const& pos);
+
   private:
 	void
 	set_line_edit_color (QColor);
@@ -65,15 +72,22 @@ class PropertyEditor: public QWidget
 	void
 	reset_error();
 
+	void
+	focus_editor (QTreeWidgetItem*, int column);
+
+	void
+	context_item_set_nil();
+
   private:
-	QColor				_accepted_color			= { 0x60, 0xff, 0x70 };
-	QColor				_error_color			= { 0xff, 0xa7, 0xa7 };
-	QColor				_normal_color			= Qt::white;
-	PropertyTreeWidget*	_property_tree_widget;
-	QLineEdit*			_editable_value;
-	QPushButton*		_update_button;
-	QPushButton*		_set_nil_button;
-	QTimer*				_accepted_blink_timer;
+	QColor					_accepted_color			= { 0x60, 0xff, 0x70 };
+	QColor					_error_color			= { 0xff, 0xa7, 0xa7 };
+	QColor					_normal_color			= Qt::white;
+	PropertyTreeWidget*		_property_tree_widget;
+	PropertyTreeWidgetItem*	_context_item			= nullptr;
+	QLineEdit*				_editable_value;
+	QPushButton*			_update_button;
+	QPushButton*			_set_nil_button;
+	QTimer*					_accepted_blink_timer;
 };
 
 } // namespace Xefis

@@ -58,6 +58,8 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setInterval (1000.0 / 15.0);
 	QObject::connect (_refresh_timer, SIGNAL (timeout()), this, SLOT (read()));
+
+	QObject::connect (this, &QTreeWidget::customContextMenuRequested, this, &PropertyTreeWidget::handle_context_menu_request);
 }
 
 
@@ -143,6 +145,17 @@ PropertyTreeWidget::convert_item (QTreeWidgetItem* item)
 	if (ret)
 		return ret;
 	throw std::logic_error ("generic QTreeWidgetItem in PropertyTreeWidget");
+}
+
+
+void
+PropertyTreeWidget::handle_context_menu_request (QPoint const& pos)
+{
+	// Find the item and emit context_menu signal:
+	QTreeWidgetItem* item = itemAt (pos);
+	if (!item)
+		return;
+	emit context_menu (item, QCursor::pos());
 }
 
 
