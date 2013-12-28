@@ -99,6 +99,9 @@ class ModuleManager
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
 
+	/**
+	 * Call data_updated() on module, measure time it takes to process the call.
+	 */
 	void
 	module_data_updated (Module*) const;
 

@@ -93,8 +93,12 @@ class InstrumentWidget: public QWidget
 	constexpr static int RequestRepaintEvent	= QEvent::MaxUser - 2;
 
   public:
-	// Ctor
-	InstrumentWidget (QWidget* parent, WorkPerformer* = nullptr);
+	/**
+	 * \param	parent Parent widget as defined by Qt.
+	 * \param	work_performer Work performer used for rendering data in separate thread.
+	 * 			Pass nullptr, if not to be used.
+	 */
+	InstrumentWidget (QWidget* parent, WorkPerformer* work_performer = nullptr);
 
 	/**
 	 * Enable threaded painter.
