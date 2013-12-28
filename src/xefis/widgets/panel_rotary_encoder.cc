@@ -34,16 +34,16 @@ constexpr QSize	PanelRotaryEncoder::KnobSize;
 constexpr int	PanelRotaryEncoder::Notches;
 
 
-PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label, PropertyBoolean rotate_a, PropertyBoolean rotate_b):
-	PanelRotaryEncoder (parent, panel, knob_label, rotate_a, rotate_b, PropertyBoolean())
-{ }
-
-
-PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label, PropertyBoolean rotate_a, PropertyBoolean rotate_b, PropertyBoolean click_property):
+PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label,
+										PropertyBoolean rotate_a, PropertyBoolean rotate_b,
+										PropertyBoolean rotate_up, PropertyBoolean rotate_down,
+										PropertyBoolean click_property):
 	PanelWidget (parent, panel),
 	_knob_label (knob_label),
 	_rotate_a (rotate_a),
 	_rotate_b (rotate_b),
+	_rotate_up (rotate_up),
+	_rotate_down (rotate_down),
 	_click_property (click_property)
 {
 	QVBoxLayout* layout = new QVBoxLayout (this);
@@ -51,10 +51,39 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	layout->setSpacing (0);
 	layout->addItem (new QSpacerItem (KnobSize.width(), KnobSize.height(), QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-	_click_timer = new QTimer (this);
+	_click_timer = std::make_unique<QTimer>();
 	_click_timer->setSingleShot (true);
-	_click_timer->setInterval (100);
-	QObject::connect (_click_timer, SIGNAL (timeout()), this, SLOT (click_timeout()));
+	_click_timer->setInterval (10);
+	QObject::connect (_click_timer.get(), &QTimer::timeout, [&]() {
+// TODO fix it - doesn't always work. Perhaps counting button should be used?
+		if (_click_property.configured())
+		{
+			_click_property.write (false);
+			signal_data_updated();
+		}
+	});
+
+	_rotate_up_timer = std::make_unique<QTimer>();
+	_rotate_up_timer->setSingleShot (true);
+	_rotate_up_timer->setInterval (10);
+	QObject::connect (_rotate_up_timer.get(), &QTimer::timeout, [&]() {
+		if (_rotate_up.configured())
+		{
+			_rotate_up.write (false);
+			signal_data_updated();
+		}
+	});
+
+	_rotate_down_timer = std::make_unique<QTimer>();
+	_rotate_down_timer->setSingleShot (true);
+	_rotate_down_timer->setInterval (10);
+	QObject::connect (_rotate_down_timer.get(), &QTimer::timeout, [&]() {
+		if (_rotate_down.configured())
+		{
+			_rotate_down.write (false);
+			signal_data_updated();
+		}
+	});
 }
 
 
@@ -168,6 +197,7 @@ PanelRotaryEncoder::mouseMoveEvent (QMouseEvent* event)
 		{
 			_value = apply_steps (_value, Xefis::sgn (pixels));
 			_angle += Xefis::sgn (pixels) * 360_deg / Notches / 4.f;
+			rotate (pixels);
 			write();
 		}
 
@@ -186,6 +216,7 @@ PanelRotaryEncoder::wheelEvent (QWheelEvent* event)
 
 	_value = apply_steps (_value, Xefis::sgn (event->delta()));
 	_angle += Xefis::sgn (event->delta()) * 360_deg / Notches / 4.f;
+	rotate (event->delta());
 
 	write();
 }
@@ -204,17 +235,6 @@ PanelRotaryEncoder::mouseDoubleClickEvent (QMouseEvent*)
 
 
 void
-PanelRotaryEncoder::click_timeout()
-{
-	if (_click_property.configured())
-	{
-		_click_property.write (false);
-		signal_data_updated();
-	}
-}
-
-
-void
 PanelRotaryEncoder::write()
 {
 	_rotate_a.write (_value & 2);
@@ -222,6 +242,22 @@ PanelRotaryEncoder::write()
 
 	update();
 	signal_data_updated();
+}
+
+
+void
+PanelRotaryEncoder::rotate (int delta)
+{
+	if (delta > 0)
+	{
+		_rotate_up.write (true);
+		_rotate_up_timer->start();
+	}
+	else if (delta < 0)
+	{
+		_rotate_down.write (true);
+		_rotate_down_timer->start();
+	}
 }
 
 
