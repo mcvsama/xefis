@@ -41,6 +41,7 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 		throw Xefis::Exception (QString ("module '%1' with instance name '%2' already loaded").arg (name).arg (instance).toStdString());
 
 	Module* module = create_module_by_name (name, config, parent);
+
 	_modules.insert (module);
 	_module_to_pointer_map[module] = pointer;
 	_pointer_to_module_map[pointer] = module;
@@ -61,12 +62,18 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 void
 ModuleManager::data_updated (Time time)
 {
+	bool requested_another_update = false;
+
 	_update_dt = 1_s * (time.s() - _update_time.s());
 	if (_update_dt > 1.0_s)
 		_update_dt = Time::epoch() + 1_s;
 
 	_update_time = time;
 
+	for (Module* mod: _modules)
+		mod->reset_data_update_flag();
+
+	// Process non-instrument modules:
 	for (Module* mod: _non_instrument_modules)
 		module_data_updated (mod);
 
@@ -82,6 +89,14 @@ ModuleManager::data_updated (Time time)
 	{
 		// In case of inhibited instruments update, postpone the update a bit:
 		application()->postponed_data_updated();
+		requested_another_update = true;
+	}
+
+	// Check the data-updated flag:
+	if (!requested_another_update &&
+		std::any_of (_modules.begin(), _modules.end(), [](Module* mod) { return mod->signalled_data_update(); }))
+	{
+		application()->data_updated();
 	}
 }
 

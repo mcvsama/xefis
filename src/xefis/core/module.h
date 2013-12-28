@@ -88,7 +88,11 @@ class Module: private Noncopyable
 	};
 
   public:
-	// Ctor
+	/**
+	 * Create a module.
+	 * \param	config
+	 * 			DOM configuration element for the module.
+	 */
 	Module (ModuleManager*, QDomElement const& config);
 
 	// Dtor
@@ -116,6 +120,18 @@ class Module: private Noncopyable
 	update_dt() const;
 
 	/**
+	 * Return module name.
+	 */
+	std::string const&
+	name() const noexcept;
+
+	/**
+	 * Return module instance.
+	 */
+	std::string const&
+	instance() const noexcept;
+
+	/**
 	 * Return configurator widget.
 	 * If module doesn't have one, return nullptr.
 	 * Default implementation returns nullptr.
@@ -134,6 +150,20 @@ class Module: private Noncopyable
 	 */
 	static FactoryFunction
 	find_factory (std::string const& name);
+
+	/**
+	 * Reset data update flag. When module calls signal_data_updated(),
+	 * the flag is set to true. It can be read with signalled_data_update().
+	 */
+	void
+	reset_data_update_flag() noexcept;
+
+	/**
+	 * Return true if the module has signalled data update since last call
+	 * to reset_data_update_flag().
+	 */
+	bool
+	signalled_data_update() const noexcept;
 
 	/**
 	 * Dumps module info to the log.
@@ -169,7 +199,7 @@ class Module: private Noncopyable
 	 * Signal that this module has updated property tree.
 	 */
 	void
-	signal_data_updated() const;
+	signal_data_updated();
 
 	/**
 	 * Access NavaidStorage.
@@ -184,7 +214,7 @@ class Module: private Noncopyable
 	work_performer() const;
 
 	/**
-	 * Access accounting information.
+	 * Access accounting information for all modules.
 	 */
 	Accounting*
 	accounting() const;
@@ -204,12 +234,13 @@ class Module: private Noncopyable
 	factories();
 
   private:
-	ModuleManager*					_module_manager = nullptr;
-	ConfigReader::SettingsParser	_settings_parser;
-	ConfigReader::PropertiesParser	_properties_parser;
-	std::string						_name;
-	std::string						_instance;
-	Xefis::Logger					_logger;
+	ModuleManager*							_module_manager			= nullptr;
+	Unique<ConfigReader::SettingsParser>	_settings_parser;
+	Unique<ConfigReader::PropertiesParser>	_properties_parser;
+	std::string								_name;
+	std::string								_instance;
+	Xefis::Logger							_logger;
+	bool									_signalled_data_update	= false;
 };
 
 
@@ -260,6 +291,34 @@ Module::~Module()
 inline void
 Module::data_updated()
 { }
+
+
+inline std::string const&
+Module::name() const noexcept
+{
+	return _name;
+}
+
+
+inline std::string const&
+Module::instance() const noexcept
+{
+	return _instance;
+}
+
+
+inline void
+Module::reset_data_update_flag() noexcept
+{
+	_signalled_data_update = false;
+}
+
+
+inline bool
+Module::signalled_data_update() const noexcept
+{
+	return _signalled_data_update;
+}
 
 } // namespace Xefis
 
