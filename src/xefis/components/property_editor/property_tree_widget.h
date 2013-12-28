@@ -81,6 +81,20 @@ class PropertyTreeWidget: public QTreeWidget
 	static PropertyTreeWidgetItem*
 	convert_item (QTreeWidgetItem* item);
 
+  signals:
+	/**
+	 * Emitted when context menu is requested.
+	 */
+	void
+	context_menu (QTreeWidgetItem*, QPoint const&);
+
+  private slots:
+	/**
+	 * Right clicked.
+	 */
+	void
+	handle_context_menu_request (const QPoint& pos);
+
   private:
 	/**
 	 * Sets up widget appereance.
