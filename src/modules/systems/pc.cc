@@ -163,8 +163,7 @@ PerformanceComputer::compute_total_energy_variometer()
 
 		if (_aircraft_weight_g.valid() &&
 			_altitude_amsl_std.valid() &&
-			_speed_ias.valid() &&
-			*_speed_ias > _total_energy_variometer_min_ias)
+			_speed_ias.valid())
 		{
 			double const m = *_aircraft_weight_g;
 			double const g = 9.81;
@@ -181,7 +180,12 @@ PerformanceComputer::compute_total_energy_variometer()
 			double const energy_diff = total_energy - _prev_total_energy;
 			Speed tev = (1_m * energy_diff / (m * g)) / update_dt;
 
-			_total_energy_variometer.write (1_fpm * _total_energy_variometer_smoother.process (tev.fpm(), update_dt));
+			// If IAS not in valid range, continue computations but only set output to nil.
+			_total_energy_variometer_smoother.process (tev.fpm(), update_dt);
+			if (*_speed_ias > _total_energy_variometer_min_ias)
+				_total_energy_variometer.write (1_fpm * _total_energy_variometer_smoother.value());
+			else
+				_total_energy_variometer.set_nil();
 
 			_prev_total_energy = total_energy;
 		}
