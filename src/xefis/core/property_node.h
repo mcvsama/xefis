@@ -46,6 +46,17 @@ typedef std::list<PropertyNode*> PropertyNodeList;
 
 
 /**
+ * Indicates a nil-node, for example when trying to read
+ * the value of such node.
+ */
+class NilNode: public Exception
+{
+  public:
+	NilNode();
+};
+
+
+/**
  * Indicates invalid operation on node of a specific type,
  * for example attempt to read int value of a directory-type
  * node.
@@ -313,10 +324,18 @@ template<class tType>
 		copy (PropertyValueNode const& other);
 
 		/**
-		 * Return stored value.
+		 * Return stored value. If node is a nil-node,
+		 * throw NilNode exception.
+		 */
+		Type const&
+		read() const;
+
+		/**
+		 * Return stored value. If node is a nil-node,
+		 * return default_value.
 		 */
 		Type
-		read (Type default_value = Type()) const;
+		read (Type default_value) const;
 
 		/**
 		 * Write value to this node.
@@ -365,6 +384,12 @@ template<class tType>
 	  private:
 		Type _value;
 	};
+
+
+inline
+NilNode::NilNode():
+	Exception ("accessed a nil-node")
+{ }
 
 
 inline
@@ -522,6 +547,17 @@ template<class T>
 			_value = other._value;
 			bump_serial();
 		}
+	}
+
+
+template<class T>
+	inline typename PropertyValueNode<T>::Type const&
+	PropertyValueNode<T>::read() const
+	{
+		if (_is_nil)
+			throw NilNode();
+		else
+			return _value;
 	}
 
 

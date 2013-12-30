@@ -146,7 +146,7 @@ PropertyEditor::item_changed (QTreeWidgetItem* item, int column)
 	if (node_bool)
 	{
 		bool checked = prop_item->checkState (column) == Qt::Checked;
-		if (checked != node_bool->read())
+		if (checked != node_bool->read (false))
 		{
 			node_bool->write (checked);
 			prop_item->read();

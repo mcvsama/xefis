@@ -77,12 +77,12 @@ HSIWidget::PaintWorkUnit::resized()
 	{
 		case DisplayMode::Expanded:
 		{
-			_q = 0.05f * size().height();
-			_r = 0.80f * size().height();
+			_q = 0.0500f * size().height();
+			_r = 0.7111f * size().height();
 			float const rx = nm_to_px (_params.range);
 
 			_aircraft_center_transform.reset();
-			_aircraft_center_transform.translate (0.5f * size().width(), 0.9f * size().height());
+			_aircraft_center_transform.translate (0.5f * size().width(), 0.8f * size().height());
 
 			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 2.2f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
@@ -299,6 +299,14 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		_locals.ap_heading += _params.heading_true - _params.heading_magnetic;
 	_locals.ap_heading = Xefis::floored_mod (_locals.ap_heading, 360_deg);
 
+	if (_params.course_setting_magnetic)
+	{
+		_locals.course_heading = *_params.course_setting_magnetic;
+		if (_params.heading_mode == HeadingMode::True)
+			_locals.course_heading += _params.heading_true - _params.heading_magnetic;
+		_locals.course_heading = Xefis::floored_mod (_locals.course_heading, 360_deg);
+	}
+
 	Xefis::Painter painter (&image, &_text_painter_cache);
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
@@ -317,13 +325,15 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_directions (painter);
 	paint_ap_settings (painter);
 	paint_track (painter, true);
-	paint_aircraft (painter);
 	paint_speeds_and_wind (painter);
 	paint_home_direction (painter);
 	paint_climb_glide_ratio (painter);
 	paint_range (painter);
 	paint_hints (painter);
 	paint_trend_vector (painter);
+	paint_course (painter);
+	paint_pointers (painter);
+	paint_aircraft (painter);
 }
 
 
@@ -645,10 +655,14 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 	{
 		float const shadow_scale = 2.0;
 
-		QPen pen (_autopilot_pen_2.color(), pen_width (1.f), Qt::DashLine, Qt::RoundCap);
+		double pink_pen_width = 1.5f;
+		if (_params.display_mode == DisplayMode::Auxiliary)
+			pink_pen_width = 1.2f;
+
+		QPen pen (_autopilot_pen_2.color(), pen_width (pink_pen_width), Qt::DashLine, Qt::RoundCap);
 		pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
 
-		QPen shadow_pen (painter.shadow_color(), pen_width (2.f), Qt::DashLine, Qt::RoundCap);
+		QPen shadow_pen (painter.shadow_color(), pen_width (pink_pen_width + 1.f), Qt::DashLine, Qt::RoundCap);
 		shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
 
 		painter.setTransform (_aircraft_center_transform);
@@ -871,15 +885,17 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible || _params.dist_to_home_vert_visible)
 	{
-		float z = 2.f * _q;
+		float z = 0.99f * _q;
+		float h = 0.66f * _q;
 		QPolygonF distance_triangle = QPolygonF()
 			<< QPointF (z, 0.f)
 			<< QPointF (0.f, 0.f)
-			<< QPointF (z, -0.3f * z);
+			<< QPointF (z, -h);
 
 		painter.setPen (get_pen (Qt::white, 1.0));
 		painter.setFont (_font_13);
 		painter.setTransform (base_transform);
+
 		if (_params.dist_to_home_vlos_visible)
 		{
 			QString s = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
@@ -888,6 +904,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 				s = s.mid (1);
 			painter.fast_draw_text (QPointF (0.f, -1.75f * _q), Qt::AlignRight | Qt::AlignBottom, s);
 		}
+
 		if (_params.dist_to_home_ground_visible)
 		{
 			QString s = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
@@ -896,15 +913,240 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 				s = s.mid (1);
 			painter.fast_draw_text (QPointF (0.f, -0.75f * _q), Qt::AlignRight | Qt::AlignTop, s);
 		}
+
 		if (_params.dist_to_home_vert_visible)
 		{
 			QString s = QString ("%1\u2008↑").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
 			painter.fast_draw_text (QPointF (0.f, -2.4 * _q), Qt::AlignRight | Qt::AlignBottom, s);
 		}
+
 		painter.translate (-z - 0.1f * _q, -_q);
+		painter.setPen (get_pen (Qt::gray, 1.0));
 		painter.add_shadow ([&]() {
 			painter.drawPolyline (distance_triangle);
 		});
+	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
+{
+	if (!_params.heading_visible || !_params.course_setting_magnetic)
+		return;
+
+	painter.setTransform (_aircraft_center_transform);
+	painter.setClipPath (_outer_map_clip);
+	painter.setTransform (_aircraft_center_transform);
+	painter.rotate ((_locals.course_heading - _locals.rotation).deg());
+
+	double k = 1.0;
+	double z = 1.0;
+	double pink_pen_width = 1.5f;
+	double shadow_pen_width = 2.5;
+	QFont font = _font_20;
+
+	switch (_params.display_mode)
+	{
+		case DisplayMode::Expanded:
+			k = _r / 15.0;
+			z = _q / 6.0;
+			break;
+
+		case DisplayMode::Rose:
+			k = _r / 10.0;
+			z = _q / 7.0;
+			break;
+
+		case DisplayMode::Auxiliary:
+			k = _r / 10.0;
+			z = _q / 7.0;
+			pink_pen_width = 1.2f;
+			shadow_pen_width = 2.2f;
+			font = _font_16;
+			break;
+	}
+
+	float dev_1_deg_px = 1.5f * k;
+
+	// Front pink line:
+	QPen front_pink_pen = get_pen (_autopilot_pen_2.color(), pink_pen_width);
+	QPen front_shadow_pen = get_pen (painter.shadow_color(), shadow_pen_width);
+	for (auto const& p: { front_shadow_pen, front_pink_pen })
+	{
+		painter.setPen (p);
+		painter.drawLine (QPointF (0.0, -3.5 * k), QPointF (0.0, -0.99 * _r));
+	}
+
+	// Back pink line:
+	double shadow_scale = 2.0;
+	QPen back_pink_pen = get_pen (_autopilot_pen_2.color(), pink_pen_width, Qt::DashLine);
+	back_pink_pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
+	QPen back_shadow_pen = get_pen (painter.shadow_color(), shadow_pen_width);
+	back_shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
+	for (auto const& p: { back_shadow_pen, back_pink_pen })
+	{
+		painter.setPen (p);
+		painter.drawLine (QPointF (0.0, 3.5 * k - z), QPointF (0.0, 0.99 * _r));
+	}
+
+	// White bars:
+	painter.setPen (get_pen (Qt::white, 1.2f));
+	QPolygonF top_bar = QPolygonF()
+		<< QPointF (0.0, -3.5 * k)
+		<< QPointF (-z, -3.5 * k + z)
+		<< QPointF (-z, -2.5 * k)
+		<< QPointF (+z, -2.5 * k)
+		<< QPointF (+z, -3.5 * k + z)
+		<< QPointF (0.0, -3.5 * k);
+	QPolygonF bottom_bar = QPolygonF()
+		<< QPointF (-z, 2.5 * k)
+		<< QPointF (-z, 3.5 * k - z)
+		<< QPointF (+z, 3.5 * k - z)
+		<< QPointF (+z, 2.5 * k)
+		<< QPointF (-z, 2.5 * k);
+	painter.drawPolyline (top_bar);
+	painter.drawPolyline (bottom_bar);
+
+	// Deviation bar:
+	if (_params.course_deviation)
+	{
+		bool filled = false;
+		Angle deviation = Xefis::limit (*_params.course_deviation, -2.5_deg, +2.5_deg);
+		if (std::abs (_params.course_deviation->deg()) <= std::abs (deviation.deg()))
+			filled = true;
+
+		double pw = pen_width (1.75f);
+		QRectF bar (-z, -2.5f * k + pw, 2.f * z, 5.f * k - 2.f * pw);
+		bar.translate (dev_1_deg_px * deviation.deg(), 0.f);
+
+		painter.setPen (get_pen (Qt::black, 2.0));
+		painter.setBrush (Qt::NoBrush);
+		painter.drawRect (bar);
+
+		painter.setPen (_autopilot_pen_2);
+		if (filled)
+			painter.setBrush (_autopilot_pen_2.color());
+		else
+			painter.setBrush (Qt::NoBrush);
+		painter.drawRect (bar);
+	}
+
+	// Deviation scale:
+	QRectF elli (0.f, 0.f, 0.25f * _q, 0.25f * _q);
+	elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
+
+	painter.setPen (get_pen (Qt::white, 2.f));
+	painter.setBrush (Qt::NoBrush);
+	for (float x: { -2.f, -1.f, +1.f, +2.f })
+		painter.drawEllipse (elli.translated (dev_1_deg_px * x, 0.f));
+
+	// TO/FROM flag - always on the right, regardless of rotation.
+	if (_params.course_to_flag)
+	{
+		QString text = *_params.course_to_flag ? "TO" : "FROM";
+		Qt::Alignment flags = Qt::AlignLeft | Qt::AlignVCenter;
+		QPointF position (4.0f * k, 0.f);
+
+		painter.setTransform (_aircraft_center_transform);
+		painter.setPen (get_pen (Qt::white, 1.f));
+		painter.setFont (_font_20);
+		painter.fast_draw_text (position, flags, text);
+	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
+{
+	if (!_params.heading_visible)
+		return;
+
+	painter.resetTransform();
+	painter.setClipping (false);
+
+	struct Opts
+	{
+		bool			primary;
+		QColor			color;
+		Optional<Angle>	angle;
+	};
+
+	QColor cyan (0x00, 0xdd, 0xff);
+
+	for (Opts const& opts: { Opts { true, Qt::green, _params.pointer_green_primary },
+							 Opts { false, Qt::green, _params.pointer_green_secondary },
+							 Opts { true, cyan, _params.pointer_cyan_primary },
+							 Opts { false, cyan, _params.pointer_cyan_secondary } })
+	{
+		if (!opts.angle)
+			continue;
+
+		float width = 1.5f;
+		if (_params.display_mode == DisplayMode::Auxiliary)
+			width = 1.2f;
+
+		painter.setPen (get_pen (opts.color, width));
+		painter.setTransform (_aircraft_center_transform);
+		painter.setClipRect (_map_clip_rect);
+		painter.setTransform (_features_transform * _aircraft_center_transform);
+		painter.rotate (opts.angle->deg());
+
+		if (opts.primary)
+		{
+			double z = 0.13 * _q;
+			double delta = 0.5 * z;
+
+			double to_top = -_r - 3.0 * z;
+			double to_bottom = -_r + 12.0 * z;
+
+			painter.drawLine (QPointF (0.0, to_top + delta), QPointF (0.0, to_bottom));
+			painter.drawLine (QPointF (0.0, to_top), QPointF (+z, to_top + 1.4 * z));
+			painter.drawLine (QPointF (0.0, to_top), QPointF (-z, to_top + 1.4 * z));
+			painter.drawLine (QPointF (-2.0 * z, to_bottom - 0.5 * z), QPointF (+2.0 * z, to_bottom - 0.5 * z));
+
+			double from_top = _r - 11.0 * z;
+			double from_bottom = _r + 3.0 * z;
+
+			painter.drawLine (QPointF (0.0, from_top), QPointF (0.0, from_bottom));
+			painter.drawLine (QPointF (-2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+			painter.drawLine (QPointF (+2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+		}
+		else
+		{
+			double z = 0.13 * _q;
+
+			double to_top = -_r - 3.0 * z;
+			double to_bottom = -_r + 11.0 * z;
+			QPolygonF top_arrow = QPolygonF()
+				<< QPointF (0.0, to_top)
+				<< QPointF (+z, to_top + 1.2 * z)
+				<< QPointF (+z, to_bottom)
+				<< QPointF (+2.5 * z, to_bottom)
+				<< QPointF (+2.5 * z, to_bottom + 1.7 * z)
+				<< QPointF (-2.5 * z, to_bottom + 1.7 * z)
+				<< QPointF (-2.5 * z, to_bottom)
+				<< QPointF (-z, to_bottom)
+				<< QPointF (-z, to_top + 1.2 * z)
+				<< QPointF (0.0, to_top);
+			painter.drawPolyline (top_arrow);
+
+			double from_top = _r - 12.0 * z;
+			double from_bottom = _r;
+			QPolygonF bottom_arrow = QPolygonF()
+				<< QPointF (0.0, from_top)
+				<< QPointF (+z, from_top + 1.2 * z)
+				<< QPointF (+z, from_bottom)
+				<< QPointF (+2.5 * z, from_bottom + z)
+				<< QPointF (+2.5 * z, from_bottom + 2.7 * z)
+				<< QPointF (0.0, from_bottom + 1.7 * z)
+				<< QPointF (-2.5 * z, from_bottom + 2.7 * z)
+				<< QPointF (-2.5 * z, from_bottom + z)
+				<< QPointF (-z, from_bottom)
+				<< QPointF (-z, from_top + 1.2 * z)
+				<< QPointF (0.0, from_top);
+			painter.drawPolyline (bottom_arrow);
+		}
 	}
 }
 

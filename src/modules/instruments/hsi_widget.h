@@ -88,6 +88,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle			ap_magnetic_heading			= 0_deg;
 		bool			track_visible				= false;
 		Angle			track_magnetic				= 0_deg;
+		Optional<Angle>	pointer_green_primary;
+		Optional<Angle>	pointer_green_secondary;
+		Optional<Angle>	pointer_cyan_primary;
+		Optional<Angle>	pointer_cyan_secondary;
+		Optional<Angle>	course_setting_magnetic;
+		Optional<Angle>	course_deviation;
+		Optional<bool>	course_to_flag;
 		bool			center_on_track				= false;
 		bool			home_direction_visible		= false;
 		bool			home_track_visible			= false;
@@ -141,6 +148,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	  public:
 		Angle			heading						= 0_deg; // Computed mag or true, depending on heading mode.
 		Angle			ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
+		Angle			course_heading				= 0_deg; // Computed mag or true, depending on heading mode.
 		Angle			track_true					= 0_deg; // Computed.
 		Angle			track						= 0_deg; // Mag or true, depending on heading mode.
 		Angle			rotation					= 0_deg;
@@ -197,6 +205,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 		void
 		paint_home_direction (Xefis::Painter&);
+
+		void
+		paint_course (Xefis::Painter&);
+
+		void
+		paint_pointers (Xefis::Painter&);
 
 		void
 		paint_climb_glide_ratio (Xefis::Painter&);

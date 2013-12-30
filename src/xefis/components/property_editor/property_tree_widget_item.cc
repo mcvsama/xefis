@@ -63,7 +63,7 @@ PropertyTreeWidgetItem::read()
 	if (node_bool)
 	{
 		setFlags (flags() | Qt::ItemIsUserCheckable);
-		setCheckState (1, node_bool->read() ? Qt::Checked : Qt::Unchecked);
+		setCheckState (1, node_bool->read (false) ? Qt::Checked : Qt::Unchecked);
 	}
 	else
 		setFlags (flags() & ~Qt::ItemIsUserCheckable);

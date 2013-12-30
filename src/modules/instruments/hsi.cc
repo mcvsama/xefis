@@ -61,6 +61,13 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "track.lateral.magnetic", _track_lateral_magnetic, false },
 		{ "track.lateral.delta", _track_lateral_delta_dpm, false },
 		{ "track.center-on-track", _track_center_on_track, false },
+		{ "pointer.green.primary", _pointer_green_primary, false },
+		{ "pointer.green.secondary", _pointer_green_secondary, false },
+		{ "pointer.cyan.primary", _pointer_cyan_primary, false },
+		{ "pointer.cyan.secondary", _pointer_cyan_secondary, false },
+		{ "course.setting.magnetic", _course_setting_magnetic, false },
+		{ "course.deviation", _course_deviation, false },
+		{ "course.to-flag", _course_to_flag, false },
 		{ "wind.from.magnetic", _wind_from_magnetic, false },
 		{ "wind.tas", _wind_speed_tas, false },
 		{ "localizer-id", _localizer_id, false },
@@ -98,6 +105,13 @@ HSI::read()
 	params.ap_magnetic_heading = *_cmd_heading;
 	params.track_visible = _track_visible.read (false) && _track_lateral_magnetic.valid();
 	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
+	params.pointer_green_primary = _pointer_green_primary.get_optional();
+	params.pointer_green_secondary = _pointer_green_secondary.get_optional();
+	params.pointer_cyan_primary = _pointer_cyan_primary.get_optional();
+	params.pointer_cyan_secondary = _pointer_cyan_secondary.get_optional();
+	params.course_setting_magnetic = _course_setting_magnetic.get_optional();
+	params.course_deviation = _course_deviation.get_optional();
+	params.course_to_flag = _course_to_flag.get_optional();
 	params.center_on_track = _track_center_on_track.read (true);
 	params.home_direction_visible = _home_true_direction.valid();
 	params.home_track_visible = _home_track_visible.read (false);

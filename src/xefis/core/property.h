@@ -286,6 +286,14 @@ template<class tType>
 		operator*() const;
 
 		/**
+		 * Pointer operator for accessing members of the stored value.
+		 * \throw	SingularProperty if property is singular.
+		 * \throw	NilNode if node is a nil-node.
+		 */
+		Type const*
+		operator->() const;
+
+		/**
 		 * Write to the property.
 		 * If node can't be found, create it.
 		 * If not possible, throw PropertyPathConflict.
@@ -628,8 +636,7 @@ template<class T>
 
 
 template<class T>
-	inline typename
-	Property<T>::Type
+	inline typename Property<T>::Type
 	Property<T>::read (Type default_value) const
 	{
 		if (_root)
@@ -648,8 +655,7 @@ template<class T>
 
 
 template<class T>
-	inline typename
-	Property<T>::Type
+	inline typename Property<T>::Type
 	Property<T>::read_signalling() const
 	{
 		if (_root)
@@ -660,11 +666,21 @@ template<class T>
 
 
 template<class T>
-	inline typename
-	Property<T>::Type
+	inline typename Property<T>::Type
 	Property<T>::operator*() const
 	{
 		return read();
+	}
+
+
+template<class T>
+	inline typename Property<T>::Type const*
+	Property<T>::operator->() const
+	{
+		if (_root)
+			return &get_value_node_signalling()->read();
+		else
+			throw SingularProperty ("can't read from a singular property: " + _path);
 	}
 
 

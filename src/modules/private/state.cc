@@ -136,6 +136,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_hsi_range.set_default (1_nm);
 	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
 	_setting_hsi_home_track_visible.set_default (false);
+	_setting_course.set_path ("/settings/course/magnetic");
 	_setting_lights_strobe.set_path ("/settings/lights/strobe");
 	_setting_lights_strobe.set_default (false);
 	_setting_lights_position.set_path ("/settings/lights/position");
@@ -290,6 +291,7 @@ State::prepare_efis_settings()
 		if (course == 0)
 			course = 360;
 		_mcp_course_display.write (course);
+		_setting_course.write (1_deg * course);
 		signal_data_updated();
 	});
 
