@@ -104,21 +104,20 @@ class LinearIndicatorWidget:
 	pad_string (QString const& input) const;
 
   private:
-	Xefis::TextPainter::Cache
-						_text_painter_cache;
+	Xefis::TextPainter::Cache	_text_painter_cache;
 	// Parameters:
-	bool					_mirrored			= false;
-	Xefis::Range<double>	_range				= { 0.f, 1.f };
-	int						_precision			= 0;
-	unsigned int			_modulo				= 0;
-	unsigned int			_digits				= 3;
-	Optional<double>		_value;
-	Optional<double>		_minimum_critical_value;
-	Optional<double>		_minimum_warning_value;
-	Optional<double>		_maximum_warning_value;
-	Optional<double>		_maximum_critical_value;
-	Optional<double>		_normal_value;
-	Optional<double>		_target_value;
+	bool						_mirrored			= false;
+	Xefis::Range<double>		_range				= { 0.f, 1.f };
+	int							_precision			= 0;
+	unsigned int				_modulo				= 0;
+	unsigned int				_digits				= 3;
+	Optional<double>			_value;
+	Optional<double>			_minimum_critical_value;
+	Optional<double>			_minimum_warning_value;
+	Optional<double>			_maximum_warning_value;
+	Optional<double>			_maximum_critical_value;
+	Optional<double>			_normal_value;
+	Optional<double>			_target_value;
 };
 
 

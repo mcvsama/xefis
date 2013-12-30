@@ -59,12 +59,12 @@ class UDP:
 	QByteArray				_receive_datagram;
 	bool					_udp_send_enabled		= false;
 	Unique<QUdpSocket>		_udp_send;
-	QString					_udp_send_host;
-	int						_udp_send_port			= 0;
+	Optional<QString>		_udp_send_host;
+	Optional<int>			_udp_send_port;
 	bool					_udp_receive_enabled	= false;
 	Unique<QUdpSocket>		_udp_receive;
-	QString					_udp_receive_host;
-	int						_udp_receive_port		= 0;
+	Optional<QString>		_udp_receive_host;
+	Optional<int>			_udp_receive_port;
 };
 
 #endif

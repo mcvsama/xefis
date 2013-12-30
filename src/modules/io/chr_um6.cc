@@ -237,9 +237,9 @@ CHRUM6::next_initialization_step()
 				break;
 
 			case 4:
-				if (has_setting ("ekf.process-variance"))
+				if (_ekf_process_variance)
 				{
-					write_register (Address::EKFProcessVariance, _ekf_process_variance);
+					write_register (Address::EKFProcessVariance, *_ekf_process_variance);
 					break;
 				}
 				else
