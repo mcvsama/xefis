@@ -11,7 +11,7 @@
 	<panel>
 		<layout type='horizontal' spacing='5'>
 			<item>
-				<group label='GPWS'>
+				<group label='EICAS'>
 				</group>
 			</item>
 		</layout>
