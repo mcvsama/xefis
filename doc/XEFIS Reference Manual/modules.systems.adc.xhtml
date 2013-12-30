@@ -56,6 +56,9 @@
 		<h1>Output</h1>
 		<p>IAS is in <q>valid range</q> when IAS reported by the sensor is in range [<code>ias.valid-minimum</code>, <code>ias.valid-maximum</code>].</p>
 		<doc:properties>
+			<doc:item name='density-altitude' type='length'>
+				<p>Density altitude for given pressure and static air temperature.</p>
+			</doc:item>
 			<doc:group title='Altitude'>
 				<doc:item name='altitude.amsl.serviceable' type='boolean'>
 					<p>Sensors used to calculate altitude are all serviceable.</p>
@@ -80,9 +83,6 @@
 				</doc:item>
 				<doc:item name='altitude.amsl.std' type='length'>
 					<p>Pressure altitude computed for STD setting (regardless of value of <code>settings.pressure.use-std</code>).</p>
-				</doc:item>
-				<doc:item name='altitude.density-altitude' type='length'>
-					<p>Density altitude for given pressure and static air temperature.</p>
 				</doc:item>
 			</doc:group>
 			<doc:group title='Speed'>

@@ -24,7 +24,7 @@
 							<layout type='vertical' spacing='10'>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='---' click-property='/panels/mcp/---' led-property='/---' led-color='green'/>
+									<widget type='button' top-label='H/TRK' click-property='/panels/mcp/htrk' led-property='/settings/hsi/home-track-visible' led-color='green'/>
 								</item>
 								<item>
 									<widget type='button' top-label='FPV' click-property='/panels/mcp/fpv' led-property='/settings/efis/fpv-visible' led-color='green'/>
@@ -249,7 +249,6 @@
 			<item>
 				<group label='LIGHTS'>
 					<layout type='vertical' spacing='10'>
-						<stretch/>
 						<item>
 							<widget type='button' top-label='STROBE' click-property='/panels/mcp/lights-strobe' led-property='/settings/lights/strobe' led-color='green'/>
 						</item>
@@ -270,9 +269,8 @@
 			<item>
 				<group label='EICAS'>
 					<layout type='vertical' spacing='10'>
-						<stretch/>
 						<item>
-							<widget type='button' top-label='CANCEL' click-property='/panels/mcp/eicas-cancel'/>
+							<widget type='rotary-encoder' top-label='MSG' click-label='DEL' click-property='/panels/mcp/eicas-del' rotate-up-property='/panels/mcp/eicas-up' rotate-down-property='/panels/mcp/eicas-down'/>
 						</item>
 						<stretch/>
 						<item>
@@ -280,7 +278,7 @@
 						</item>
 						<stretch/>
 						<item>
-							<widget type='button' top-label='【OK】' click-property='/panels/mcp/eicas-ok'/>
+							<widget type='button' top-label='CLEAR' click-property='/panels/mcp/eicas-clear'/>
 						</item>
 					</layout>
 				</group>

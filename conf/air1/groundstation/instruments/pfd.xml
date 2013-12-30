@@ -113,6 +113,9 @@
 		<item stretch-factor='5'>
 			<instrument name='instruments/hsi' instance='aux'>
 				<properties>
+					<property name='course.setting.magnetic' path='/settings/course/magnetic'/>
+					<property name='course.deviation' path='/efis/course/deviation'/>
+					<property name='course.to-flag' path='/efis/course/to-flag'/>
 					<property name='display-mode' path='/settings/hsi/display-mode/aux' default='2'/>
 					<property name='range' path='/settings/hsi/range'/>
 					<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
@@ -129,7 +132,7 @@
 					<property name='orientation.heading.magnetic' path='/systems/nc/orientation/heading/magnetic'/>
 					<property name='orientation.heading.true' path='/systems/nc/orientation/heading/true'/>
 					<property name='home.true-direction' path='/systems/rcms/home/true-direction'/>
-					<property name='home.track-visible' path='systems/rcms/home/track-visible'/>
+					<property name='home.track-visible' path='/settings/hsi/home-track-visible'/>
 					<property name='home.distance.vlos' path='/systems/rcms/home/distance/vlos'/>
 					<property name='home.distance.ground' path='/systems/rcms/home/distance/ground'/>
 					<property name='home.distance.vertical' path='/systems/rcms/home/distance/vertical'/>

@@ -201,7 +201,36 @@
 				<item stretch-factor='17'/>
 			</layout>
 		</item>
-		<item stretch-factor='50'>
+		<item stretch-factor='2'/>
+		<item stretch-factor='48'>
+			<layout type='vertical'>
+				<item stretch-factor='50'>
+					<instrument name='instruments/eicas'>
+						<properties>
+							<property name='button.cursor-up' path='/panels/mcp/eicas-up'/>
+							<property name='button.cursor-down' path='/panels/mcp/eicas-down'/>
+							<property name='button.cursor-del' path='/panels/mcp/eicas-del'/>
+							<property name='button.recall' path='/panels/mcp/eicas-recall'/>
+							<property name='button.clear' path='/panels/mcp/eicas-clear'/>
+						</properties>
+						<messages>
+							<message path='/systems/adc/altitude/amsl.serviceable' message='ADC ALT AMSL FAIL' fail-on='false'/>
+							<message path='/systems/adc/speed/ias.serviceable' message='ADC IAS FAIL' fail-on='false'/>
+							<message path='/systems/adc/vertical-speed/serviceable' message='V/SPD FAIL' fail-on='false'/>
+							<message path='/systems/flight-director/serviceable' message='FD FAIL' fail-on='false'/>
+							<message path='/systems/nc/orientation/serviceable' message='NC ADI FAIL' fail-on='false'/>
+							<message path='/sensors/ahrs/serviceable' message='AHRS FAIL' fail-on='false'/>
+							<message path='/sensors/pressure/serviceable' message='STATIC PRESS FAIL' fail-on='false'/>
+							<message path='/sensors/gps/serviceable' message='GPS FAIL' fail-on='false'/>
+							<message path='/sensors/airspeed/serviceable' message='PITOT FAIL' fail-on='false'/>
+							<message path='/sensors/radar-altimeter/serviceable' message='RA FAIL' fail-on='false'/>
+							<message path='/link/xbee/serviceable' message='LINK FAIL' fail-on='false'/>
+						</messages>
+					</instrument>
+				</item>
+				<item stretch-factor='50'>
+				</item>
+			</layout>
 		</item>
 	</layout>
 </xefis-include>
