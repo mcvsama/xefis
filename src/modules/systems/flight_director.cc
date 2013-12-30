@@ -31,12 +31,12 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/flight-director", FlightDirector);
 
 FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
-	_magnetic_heading_pid (1.0, 0.1, 0.0, 0.0),
-	_magnetic_track_pid (1.0, 0.1, 0.0, 0.0),
-	_altitude_pid (1.0, 0.1, 0.0, 0.0),
-	_ias_pid (1.0, 0.1, 0.0, 0.0),
-	_vertical_speed_pid (1.0, 0.1, 0.0, 0.0),
-	_fpa_pid (1.0, 0.1, 0.0, 0.0)
+	_magnetic_heading_pid (_magnetic_heading_pid_p, _magnetic_heading_pid_i, _magnetic_heading_pid_d, 0.0),
+	_magnetic_track_pid (_magnetic_track_pid_p, _magnetic_track_pid_i, _magnetic_track_pid_d, 0.0),
+	_altitude_pid (_altitude_pid_p, _altitude_pid_i, _altitude_pid_d, 0.0),
+	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0),
+	_vertical_speed_pid (_vertical_speed_pid_p, _vertical_speed_pid_i, _vertical_speed_pid_d, 0.0),
+	_fpa_pid (_fpa_pid_p, _fpa_pid_i, _fpa_pid_d, 0.0)
 {
 	for (auto* pid: { &_magnetic_heading_pid, &_magnetic_track_pid })
 	{
@@ -49,6 +49,27 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 
 	_output_pitch_smoother.set_winding ({ -180.0, +180.0 });
 	_output_roll_smoother.set_winding ({ -180.0, +180.0 });
+
+	parse_settings (config, {
+		{ "magnetic-heading.pid.p", _magnetic_heading_pid_p, false },
+		{ "magnetic-heading.pid.i", _magnetic_heading_pid_i, false },
+		{ "magnetic-heading.pid.d", _magnetic_heading_pid_d, false },
+		{ "magnetic-track.pid.p", _magnetic_track_pid_p, false },
+		{ "magnetic-track.pid.i", _magnetic_track_pid_i, false },
+		{ "magnetic-track.pid.d", _magnetic_track_pid_d, false },
+		{ "altitude.pid.p", _altitude_pid_p, false },
+		{ "altitude.pid.i", _altitude_pid_i, false },
+		{ "altitude.pid.d", _altitude_pid_d, false },
+		{ "ias.pid.p", _ias_pid_p, false },
+		{ "ias.pid.i", _ias_pid_i, false },
+		{ "ias.pid.d", _ias_pid_d, false },
+		{ "vertical-speed.pid.p", _vertical_speed_pid_p, false },
+		{ "vertical-speed.pid.i", _vertical_speed_pid_i, false },
+		{ "vertical-speed.pid.d", _vertical_speed_pid_d, false },
+		{ "fpa.pid.p", _fpa_pid_p, false },
+		{ "fpa.pid.i", _fpa_pid_i, false },
+		{ "fpa.pid.d", _fpa_pid_d, false },
+	});
 
 	parse_properties (config, {
 		{ "orientation.pitch-limit.max", _pitch_limit_max, true },
@@ -72,6 +93,14 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 		{ "output.roll", _output_roll, true },
 		{ "disengage-ap", _disengage_ap, true },
 	});
+
+	// Update PID params:
+	_magnetic_heading_pid.set_pid (_magnetic_heading_pid_p, _magnetic_heading_pid_i, _magnetic_heading_pid_d);
+	_magnetic_track_pid.set_pid (_magnetic_track_pid_p, _magnetic_track_pid_i, _magnetic_track_pid_d);
+	_altitude_pid.set_pid (_altitude_pid_p, _altitude_pid_i, _altitude_pid_d);
+	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d);
+	_vertical_speed_pid.set_pid (_vertical_speed_pid_p, _vertical_speed_pid_i, _vertical_speed_pid_d);
+	_fpa_pid.set_pid (_fpa_pid_p, _fpa_pid_i, _fpa_pid_d);
 
 	roll_mode_changed();
 	pitch_mode_changed();
@@ -99,8 +128,8 @@ FlightDirector::data_updated()
 	double const rl = (*_roll_limit).deg();
 	double const pl_max = (*_pitch_limit_max).deg();
 	double const pl_min = (*_pitch_limit_min).deg();
-	Xefis::Range<float> roll_limit (-rl, +rl);
-	Xefis::Range<float> pitch_limit (pl_min, pl_max);
+	Xefis::Range<double> roll_limit (-rl, +rl);
+	Xefis::Range<double> pitch_limit (pl_min, pl_max);
 
 	switch (_roll_mode)
 	{
@@ -112,9 +141,9 @@ FlightDirector::data_updated()
 			}
 			else
 			{
-				_magnetic_heading_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f));
-				_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-				_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_heading_pid.output() * 180.f, roll_limit);
+				_magnetic_heading_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_heading).deg(), 0.0, 360.0, -1.0, +1.0));
+				_magnetic_heading_pid.process (Xefis::renormalize ((*_measured_magnetic_heading).deg(), 0.0, 360.0, -1.0, +1.0), _dt.s());
+				_computed_output_roll = 1_deg * Xefis::limit<double> (_magnetic_heading_pid.output() * 180.0, roll_limit);
 			}
 			break;
 
@@ -126,9 +155,9 @@ FlightDirector::data_updated()
 			}
 			else
 			{
-				_magnetic_track_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f));
-				_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.f, 360.f, -1.f, +1.f), _dt.s());
-				_computed_output_roll = 1_deg * Xefis::limit<float> (_magnetic_track_pid.output() * 180.f, roll_limit);
+				_magnetic_track_pid.set_target (Xefis::renormalize ((*_cmd_magnetic_track).deg(), 0.0, 360.0, -1.0, +1.0));
+				_magnetic_track_pid.process (Xefis::renormalize ((*_measured_magnetic_track).deg(), 0.0, 360.0, -1.0, +1.0), _dt.s());
+				_computed_output_roll = 1_deg * Xefis::limit<double> (_magnetic_track_pid.output() * 180.0, roll_limit);
 			}
 			break;
 
@@ -150,7 +179,7 @@ FlightDirector::data_updated()
 			{
 				_altitude_pid.set_target ((*_cmd_altitude).ft());
 				_altitude_pid.process ((*_measured_altitude).ft(), _dt.s());
-				_computed_output_pitch = 1_deg * Xefis::limit<float> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
+				_computed_output_pitch = 1_deg * Xefis::limit<double> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
 			}
 			break;
 
@@ -164,7 +193,7 @@ FlightDirector::data_updated()
 			{
 				_ias_pid.set_target ((*_cmd_ias).kt());
 				_ias_pid.process ((*_measured_ias).kt(), _dt.s());
-				_computed_output_pitch = 1_deg * Xefis::limit<float> (_ias_pid.output(), pitch_limit);
+				_computed_output_pitch = 1_deg * Xefis::limit<double> (_ias_pid.output(), pitch_limit);
 			}
 			break;
 
@@ -178,7 +207,7 @@ FlightDirector::data_updated()
 			{
 				_vertical_speed_pid.set_target ((*_cmd_vertical_speed).fpm());
 				_vertical_speed_pid.process ((*_measured_vertical_speed).fpm(), _dt.s());
-				_computed_output_pitch = 1_deg * Xefis::limit<float> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
+				_computed_output_pitch = 1_deg * Xefis::limit<double> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
 			}
 			break;
 
@@ -192,7 +221,7 @@ FlightDirector::data_updated()
 			{
 				_fpa_pid.set_target ((*_cmd_fpa).deg());
 				_fpa_pid.process ((*_measured_fpa).deg(), _dt.s());
-				_computed_output_pitch = 1_deg * Xefis::limit<float> (_fpa_pid.output(), pitch_limit);
+				_computed_output_pitch = 1_deg * Xefis::limit<double> (_fpa_pid.output(), pitch_limit);
 			}
 			break;
 

@@ -31,14 +31,22 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/autothrottle", Autothrottle);
 
 Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
-	_thrust_pid (1.0, 0.1, 0.0, 0.0),
-	_ias_pid (1.0, 0.1, 0.0, 0.0)
+	_thrust_pid (_thrust_pid_p, _thrust_pid_i, _thrust_pid_d, 0.0),
+	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0)
 {
 	for (auto* pid: { &_thrust_pid, &_ias_pid })
 		pid->set_i_limit ({ -0.05f, +0.05f });
 
+	parse_settings (config, {
+		{ "thrust.pid.p", _thrust_pid_p, false },
+		{ "thrust.pid.i", _thrust_pid_i, false },
+		{ "thrust.pid.d", _thrust_pid_d, false },
+		{ "ias.pid.p", _ias_pid_p, false },
+		{ "ias.pid.i", _ias_pid_i, false },
+		{ "ias.pid.d", _ias_pid_d, false },
+	});
+
 	parse_properties (config, {
-		{ "enabled", _enabled, true },
 		{ "power-limit.max", _power_limit_max, true },
 		{ "power-limit.min", _power_limit_min, true },
 		{ "cmd.speed-mode", _cmd_speed_mode, true },
@@ -49,6 +57,9 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 		{ "output.power", _output_power, true },
 		{ "disengage-at", _disengage_at, true },
 	});
+
+	_thrust_pid.set_pid (_thrust_pid_p, _thrust_pid_i, _thrust_pid_d),
+	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d),
 
 	speed_mode_changed();
 }
