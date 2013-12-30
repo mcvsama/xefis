@@ -57,9 +57,13 @@ class Autothrottle: public Xefis::Module
 	Xefis::Smoother<double>		_output_power_smoother		= 250_ms;
 	double						_computed_output_power;
 	SpeedMode					_speed_mode					= SpeedMode::None;
-	// TODO PID params as settings
+	double						_thrust_pid_p				= 1.0;
+	double						_thrust_pid_i				= 0.1;
+	double						_thrust_pid_d				= 0.0;
+	double						_ias_pid_p					= 1.0;
+	double						_ias_pid_i					= 0.1;
+	double						_ias_pid_d					= 0.0;
 	// Input:
-	Xefis::PropertyBoolean		_enabled;
 	Xefis::PropertyFloat		_power_limit_max;
 	Xefis::PropertyFloat		_power_limit_min;
 	Xefis::PropertyInteger		_cmd_speed_mode;

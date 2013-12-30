@@ -66,20 +66,37 @@ class FlightDirector: public Xefis::Module
 
   private:
 	Time						_dt							= 0_s;
-	Xefis::PIDControl<float>	_magnetic_heading_pid;
-	Xefis::PIDControl<float>	_magnetic_track_pid;
-	Xefis::PIDControl<float>	_altitude_pid;
-	Xefis::PIDControl<float>	_ias_pid;
-	Xefis::PIDControl<float>	_vertical_speed_pid;
-	Xefis::PIDControl<float>	_fpa_pid;
+	Xefis::PIDControl<double>	_magnetic_heading_pid;
+	Xefis::PIDControl<double>	_magnetic_track_pid;
+	Xefis::PIDControl<double>	_altitude_pid;
+	Xefis::PIDControl<double>	_ias_pid;
+	Xefis::PIDControl<double>	_vertical_speed_pid;
+	Xefis::PIDControl<double>	_fpa_pid;
 	Xefis::Smoother<double>		_output_pitch_smoother		= 2.5_s;
 	Xefis::Smoother<double>		_output_roll_smoother		= 2.5_s;
 	Angle						_computed_output_pitch;
 	Angle						_computed_output_roll;
 	RollMode					_roll_mode					= RollMode::None;
 	PitchMode					_pitch_mode					= PitchMode::None;
+	double						_magnetic_heading_pid_p		= 1.0;
+	double						_magnetic_heading_pid_i		= 0.1;
+	double						_magnetic_heading_pid_d		= 0.0;
+	double						_magnetic_track_pid_p		= 1.0;
+	double						_magnetic_track_pid_i		= 0.1;
+	double						_magnetic_track_pid_d		= 0.0;
+	double						_altitude_pid_p				= 1.0;
+	double						_altitude_pid_i				= 0.1;
+	double						_altitude_pid_d				= 0.0;
+	double						_ias_pid_p					= 1.0;
+	double						_ias_pid_i					= 0.1;
+	double						_ias_pid_d					= 0.0;
+	double						_vertical_speed_pid_p		= 1.0;
+	double						_vertical_speed_pid_i		= 0.1;
+	double						_vertical_speed_pid_d		= 0.0;
+	double						_fpa_pid_p					= 1.0;
+	double						_fpa_pid_i					= 0.1;
+	double						_fpa_pid_d					= 0.0;
 	// Input:
-	// TODO PID params as settings:
 	Xefis::PropertyAngle		_pitch_limit_max;
 	Xefis::PropertyAngle		_pitch_limit_min;
 	Xefis::PropertyAngle		_roll_limit;
