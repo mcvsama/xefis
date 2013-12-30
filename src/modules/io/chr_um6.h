@@ -435,7 +435,7 @@ class CHRUM6:
 	Xefis::SerialPort			_serial_port;
 	Xefis::PacketReader			_packet_reader;
 	int							_failure_count			= 0;
-	float						_ekf_process_variance	= 0.5f;
+	Optional<float>				_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
 	std::string					_baud_rate				= "115200";
 	bool						_signal_data_updated	= false;

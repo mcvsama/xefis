@@ -50,11 +50,11 @@ class ConfigReader
 		{
 			QString			name;
 			bool			required;
-#define XEFIS_DEF_ATTR_S(type, name) \
+#define XEFIS_DEF_ATTR_LOW(type, name) \
 	type* value_##name = nullptr; \
 	Optional<type>* value_optional_##name = nullptr;
 #define XEFIS_DEF_ATTR(type_name) \
-	XEFIS_DEF_ATTR_S (type_name, type_name)
+	XEFIS_DEF_ATTR_LOW (type_name, type_name)
 			XEFIS_DEF_ATTR (bool)
 			XEFIS_DEF_ATTR (int8_t)
 			XEFIS_DEF_ATTR (int16_t)
@@ -66,17 +66,17 @@ class ConfigReader
 			XEFIS_DEF_ATTR (uint64_t)
 			XEFIS_DEF_ATTR (float)
 			XEFIS_DEF_ATTR (double)
-			XEFIS_DEF_ATTR_S (std::string, string)
-			XEFIS_DEF_ATTR_S (QString, qstring)
-			XEFIS_DEF_ATTR_S (SI::Value, si_value)
+			XEFIS_DEF_ATTR_LOW (std::string, string)
+			XEFIS_DEF_ATTR_LOW (QString, qstring)
+			XEFIS_DEF_ATTR_LOW (SI::Value, si_value)
 #undef XEFIS_DEF_ATTR
-#undef XEFIS_DEF_ATTR_S
+#undef XEFIS_DEF_ATTR_LOW
 
 #define XEFIS_DEF_CONSTR(type) \
 	NameAndSetting (QString const& name, type& value, bool required); \
 	NameAndSetting (QString const& name, Optional<type>& value, bool required);
 #define XEFIS_DEF_CONSTR_SINGLE(type) \
-	NameAndSetting (QString const& name, type& value, bool required); \
+	NameAndSetting (QString const& name, type& value, bool required);
 			XEFIS_DEF_CONSTR (bool)
 			XEFIS_DEF_CONSTR (int8_t)
 			XEFIS_DEF_CONSTR (int16_t)
@@ -90,6 +90,8 @@ class ConfigReader
 			XEFIS_DEF_CONSTR (double)
 			XEFIS_DEF_CONSTR (std::string)
 			XEFIS_DEF_CONSTR (QString)
+			//  This is without Optional version, since Optional<SI::Value>
+			//  and Optional<derived-of-SI::Value> are not convertible.
 			XEFIS_DEF_CONSTR_SINGLE (SI::Value)
 #undef XEFIS_DEF_CONSTR_SINGLE
 #undef XEFIS_DEF_CONSTR
@@ -283,7 +285,7 @@ class ConfigException: public Exception
 		required (required), \
 		value_##xname (&value) \
 	{ }
-#define XEFIS_DEF_CONSTR_S(type, xname) \
+#define XEFIS_DEF_CONSTR_LOW(type, xname) \
 	inline ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, type& value, bool required): \
 		name (name), \
 		required (required), \
@@ -295,7 +297,7 @@ class ConfigException: public Exception
 		value_optional_##xname (&value) \
 	{ }
 #define XEFIS_DEF_CONSTR(type_name) \
-	XEFIS_DEF_CONSTR_S (type_name, type_name)
+	XEFIS_DEF_CONSTR_LOW (type_name, type_name)
 
 XEFIS_DEF_CONSTR (bool)
 XEFIS_DEF_CONSTR (int8_t)
@@ -308,12 +310,12 @@ XEFIS_DEF_CONSTR (uint32_t)
 XEFIS_DEF_CONSTR (uint64_t)
 XEFIS_DEF_CONSTR (float)
 XEFIS_DEF_CONSTR (double)
-XEFIS_DEF_CONSTR_S (std::string, string)
-XEFIS_DEF_CONSTR_S (QString, qstring)
+XEFIS_DEF_CONSTR_LOW (std::string, string)
+XEFIS_DEF_CONSTR_LOW (QString, qstring)
 XEFIS_DEF_CONSTR_SINGLE (SI::Value, si_value)
 
 #undef XEFIS_DEF_CONSTR
-#undef XEFIS_DEF_CONSTR_S
+#undef XEFIS_DEF_CONSTR_LOW
 
 
 inline bool

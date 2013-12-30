@@ -50,18 +50,18 @@ UDP::UDP (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "receive", _receive, true }
 	});
 
-	if (has_setting ("send.host") && has_setting ("send.port"))
+	if (_udp_send_host && _udp_send_port)
 	{
 		_udp_send_enabled = true;
 		_udp_send = std::make_unique<QUdpSocket>();
 	}
 
-	if (has_setting ("receive.host") && has_setting ("receive.port"))
+	if (_udp_receive_host && _udp_receive_port)
 	{
 		_udp_receive_enabled = true;
 		_udp_receive = std::make_unique<QUdpSocket>();
-		if (!_udp_receive->bind (QHostAddress (_udp_receive_host), _udp_receive_port, QUdpSocket::ShareAddress))
-			log() << "Failed to bind to address " << _udp_receive_host.toStdString() << ":" << _udp_receive_port << std::endl;
+		if (!_udp_receive->bind (QHostAddress (*_udp_receive_host), *_udp_receive_port, QUdpSocket::ShareAddress))
+			log() << "Failed to bind to address " << _udp_receive_host->toStdString() << ":" << *_udp_receive_port << std::endl;
 		QObject::connect (_udp_receive.get(), SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
 	}
 }
@@ -78,8 +78,8 @@ UDP::data_updated()
 		if (_send_interference)
 			interfere (blob);
 
-		if (_udp_send)
-			_udp_send->writeDatagram (blob.data(), blob.size(), QHostAddress (_udp_send_host), _udp_send_port);
+		if (_udp_send && _udp_send_host && _udp_send_port)
+			_udp_send->writeDatagram (blob.data(), blob.size(), QHostAddress (*_udp_send_host), *_udp_send_port);
 	}
 }
 

@@ -604,9 +604,9 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::SetLocalAddress:
-				if (has_setting ("power-level"))
+				if (_power_level)
 				{
-					request_at (ConfigurationStep::SetPowerLevel, "PL", { static_cast<uint8_t> (_power_level) });
+					request_at (ConfigurationStep::SetPowerLevel, "PL", { static_cast<uint8_t> (*_power_level) });
 					break;
 				}
 				else
