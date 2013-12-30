@@ -186,6 +186,12 @@ class State: public Xefis::Module
 	solve_pressure();
 
 	/**
+	 * Compute course settings.
+	 */
+	void
+	solve_course();
+
+	/**
 	 * Call given callback when button is pressed (property becomes true).
 	 */
 	void
@@ -209,6 +215,7 @@ class State: public Xefis::Module
 	Length								_minimums_setting_radio		= 0_ft;
 	Pressure							_qnh_setting				= 29.92_inHg;
 	Angle								_course						= 0_deg;
+	bool								_course_visible				= false;
 	// Buttons, switches, knobs:
 	Xefis::PropertyBoolean				_mcp_mins_a;
 	Xefis::PropertyBoolean				_mcp_mins_b;

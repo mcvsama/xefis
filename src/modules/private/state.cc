@@ -187,6 +187,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	solve_minimums();
 	solve_pressure();
+	solve_course();
 }
 
 
@@ -291,11 +292,14 @@ State::prepare_efis_settings()
 		if (course == 0)
 			course = 360;
 		_mcp_course_display.write (course);
-		_setting_course.write (1_deg * course);
+		solve_course();
 		signal_data_updated();
 	});
 
-//	_mcp_course_hide
+	make_switch (_mcp_course_hide, [this]() {
+		_course_visible = !_course_visible;
+		solve_course();
+	});
 }
 
 
@@ -349,6 +353,16 @@ State::solve_pressure()
 	_qnh_setting = Xefis::limit (_qnh_setting, QNHRange);
 	_setting_pressure_qnh.write (_qnh_setting);
 	signal_data_updated();
+}
+
+
+void
+State::solve_course()
+{
+	if (_course_visible)
+		_setting_course.write (_course);
+	else
+		_setting_course.set_nil();
 }
 
 
