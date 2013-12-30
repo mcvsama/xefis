@@ -2076,10 +2076,10 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 				path_deviation = Xefis::limit (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
-			rect.translate (-rect.width() / 2.f, -rect.height() / 2.f);
+			centrify (rect);
 
 			QRectF elli (0.f, 0.f, 0.015f * wh(), 0.015f * wh());
-			elli.translate (-elli.width() / 2.f, -elli.height() / 2.f);
+			centrify (elli);
 
 			if (!_params.old_style)
 			{
@@ -2106,7 +2106,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 					<< QPointF (0.f, -w);
 				pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_approach_deviation;
-				pink_filled = original_approach_deviation && std::abs ((*original_approach_deviation).deg()) <= std::abs (approach_deviation.deg());
+				pink_filled = original_approach_deviation && std::abs (original_approach_deviation->deg()) <= std::abs (approach_deviation.deg());
 				white_visible = false;
 			}
 			else
@@ -2119,7 +2119,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 					<< QPointF (-1.0f * w, 2.0f * w);
 				pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_path_deviation;
-				pink_filled = original_path_deviation && std::abs ((*original_path_deviation).deg()) <= std::abs (path_deviation.deg());
+				pink_filled = original_path_deviation && std::abs (original_path_deviation->deg()) <= std::abs (path_deviation.deg());
 				white_pointer = QPolygonF()
 					<< QPointF (0.f, -0.8f * w)
 					<< QPointF (+1.6f * w, 0.f)
@@ -2152,7 +2152,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 			if (!_params.deviation_mixed_mode)
 			{
-				// Paint path deviation scale:
+				// Paint ILS deviation scale:
 				painter.setPen (get_pen (Qt::white, 1.5f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, -0.5f, +0.5f, +1.f })
@@ -2161,7 +2161,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			}
 			else
 			{
-				// Paint ILS deviation scale:
+				// Paint path deviation scale:
 				painter.setPen (get_pen (Qt::white, 1.2f));
 				painter.setBrush (Qt::NoBrush);
 				for (float x: { -1.f, +1.f })
@@ -2196,7 +2196,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * Xefis::limit (*_params.deviation_lateral_approach, -1.5_deg, +1.5_deg).deg();
+		float offset = 0.5f * Xefis::limit (_params.deviation_lateral_approach->deg(), -1.5, +1.5);
 		float ypos = -pitch_to_px (Xefis::limit (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
