@@ -32,7 +32,7 @@ InstrumentAids::InstrumentAids (float height_for_width):
 	_height_for_width (height_for_width)
 {
 	_font = Xefis::Services::instrument_font();
-	_autopilot_color = QColor (250, 70, 255);
+	_autopilot_color = QColor (250, 20, 255);
 	_navigation_color = QColor (60, 255, 40);
 }
 
@@ -83,8 +83,8 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 	_font_20_digit_height = QFontMetrics (_font_20).height();
 	_font_20_digit_height = font_height_scale_factor * QFontMetrics (_font_20).height();
 
-	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 1.65f);
-	_autopilot_pen_2 = get_pen (_autopilot_color, 1.0f);
+	_autopilot_pen_1 = get_pen (_autopilot_color.darker (300), 1.8f);
+	_autopilot_pen_2 = get_pen (_autopilot_color, 1.25f);
 }
 
 

@@ -267,6 +267,7 @@ class State: public Xefis::Module
 	Xefis::PropertyInteger				_setting_hsi_display_mode_mfd;
 	Xefis::PropertyLength				_setting_hsi_range;
 	Xefis::PropertyBoolean				_setting_hsi_home_track_visible;
+	Xefis::PropertyAngle				_setting_course;
 	Xefis::PropertyBoolean				_setting_lights_strobe;
 	Xefis::PropertyBoolean				_setting_lights_position;
 	Xefis::PropertyBoolean				_setting_lights_landing;
