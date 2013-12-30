@@ -215,9 +215,12 @@ AirDataComputer::compute_altitude()
 
 	if (_altitude_amsl.valid() && update_time > _hide_alt_lookahead_until)
 	{
-		double est = _altitude_amsl_estimator.process (_altitude_amsl_lookahead_i_smoother.process ((*_altitude_amsl).ft(), update_dt), update_dt);
+		double est = _altitude_amsl_estimator.process (_altitude_amsl_lookahead_i_smoother.process (_altitude_amsl->ft(), update_dt), update_dt);
 		est = _altitude_amsl_lookahead_o_smoother.process (est, update_dt);
 		_altitude_amsl_lookahead.write (1_ft * est);
+
+		if (std::abs (est - _altitude_amsl->ft()) > 1)
+			_altitude_computer.keep_going();
 	}
 	else
 	{
@@ -273,9 +276,12 @@ AirDataComputer::compute_ias_lookahead()
 	{
 		Time update_dt = _ias_lookahead_computer.update_dt();
 
-		double est = _speed_ias_estimator.process (_speed_ias_lookahead_i_smoother.process ((*_ias).kt(), update_dt), update_dt);
+		double est = _speed_ias_estimator.process (_speed_ias_lookahead_i_smoother.process (_ias->kt(), update_dt), update_dt);
 		est = _speed_ias_lookahead_o_smoother.process (est, update_dt);
 		_speed_ias_lookahead.write (1_kt * est);
+
+		if (std::abs (est - _ias->kt()) > 1.0)
+			_ias_lookahead_computer.keep_going();
 	}
 	else
 	{

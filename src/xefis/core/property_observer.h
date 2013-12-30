@@ -149,29 +149,41 @@ class PropertyObserver
 	void
 	add_depending_smoothers (std::initializer_list<SmootherBase*> list);
 
+	/**
+	 * Tells the property observer to do a callback on next occasion,
+	 * regardless of other conditions, but takes into consideration
+	 * minimum dt set with set_minimum_dt().
+	 */
+	void
+	keep_going() noexcept;
+
   private:
 	/**
 	 * Find longest smoothing time from all registered smoothers.
 	 * Return 0_s, if no smoothers are registered.
 	 */
 	Time
-	longest_smoothing_time() const noexcept;
+	longest_smoothing_time() noexcept;
 
   private:
 	ObjectsList		_objects;
 	SmoothersList	_smoothers;
 	Callback		_callback;
-	Serial			_serial				= 0;
+	Serial			_serial						= 0;
 	// Time of last change of observed property:
-	Time			_obs_update_time	= 0_s;
+	Time			_obs_update_time			= 0_s;
 	// Time of last firing of the callback function:
-	Time			_fire_time			= 0_s;
-	Time			_fire_dt			= 0_s;
-	Time			_accumulated_dt		= 0_s;
-	Time			_minimum_dt			= 0_s;
+	Time			_fire_time					= 0_s;
+	Time			_fire_dt					= 0_s;
+	Time			_accumulated_dt				= 0_s;
+	Time			_minimum_dt					= 0_s;
+	Time			_longest_smoother			= 0_s;
+	bool			_recompute_longest_smoother	= false;
 	// Set to true, when observed property is updated, but
 	// _minimum_dt prevented firing the callback.
-	bool			_need_callback		= false;
+	bool			_need_callback				= false;
+	bool			_last_recompute				= false;
+	bool			_keep_going					= false;
 };
 
 
@@ -214,6 +226,13 @@ inline Time
 PropertyObserver::update_dt() const noexcept
 {
 	return _fire_dt;
+}
+
+
+inline void
+PropertyObserver::keep_going() noexcept
+{
+	_keep_going = true;
 }
 
 } // namespace Xefis
