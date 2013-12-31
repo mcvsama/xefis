@@ -37,7 +37,8 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 	_rudder_pid (0.0, 0.0, 0.0, 0.0)
 {
 	parse_properties (config, {
-		{ "mode", _mode, true },
+		{ "attitude-mode", _attitude_mode, true },
+		{ "throttle-mode", _throttle_mode, true },
 		{ "stabilization-gain", _stabilization_gain, true },
 		{ "pitch-gain", _pitch_gain, true },
 		{ "pitch-p", _pitch_p, true },
@@ -54,29 +55,32 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "yaw-i", _yaw_i, true },
 		{ "yaw-d", _yaw_d, true },
 		{ "yaw-error-power", _yaw_error_power, true },
-		{ "input-pitch-axis", _input_pitch_axis, true },
-		{ "input-roll-axis", _input_roll_axis, true },
-		{ "input-yaw-axis", _input_yaw_axis, true },
+		{ "input.pitch-axis", _input_pitch_axis, true },
+		{ "input.roll-axis", _input_roll_axis, true },
+		{ "input.yaw-axis", _input_yaw_axis, true },
+		{ "input.throttle-axis", _input_throttle_axis, true },
 		{ "pitch-extent", _pitch_extent, true },
 		{ "roll-extent", _roll_extent, true },
-		{ "input-pitch", _input_pitch, true },
-		{ "input-roll", _input_roll, true },
-		{ "measured-pitch", _measured_pitch, true },
-		{ "measured-roll", _measured_roll, true },
-		{ "measured-slip-skid", _measured_slip_skid_g, true },
-		{ "elevator-minimum", _elevator_minimum, true },
-		{ "elevator-maximum", _elevator_maximum, true },
-		{ "ailerons-minimum", _ailerons_minimum, true },
-		{ "ailerons-maximum", _ailerons_maximum, true },
-		{ "rudder-minimum", _rudder_minimum, true },
-		{ "rudder-maximum", _rudder_maximum, true },
-		{ "output-control-stick-pitch", _output_control_stick_pitch, false },
-		{ "output-control-stick-roll", _output_control_stick_roll, false },
-		{ "output-pitch", _output_pitch, true },
-		{ "output-roll", _output_roll, true },
-		{ "output-elevator", _output_elevator, true },
-		{ "output-ailerons", _output_ailerons, true },
-		{ "output-rudder", _output_rudder, true },
+		{ "input.pitch", _input_pitch, true },
+		{ "input.roll", _input_roll, true },
+		{ "input.throttle", _input_throttle, true },
+		{ "measured.pitch", _measured_pitch, true },
+		{ "measured.roll", _measured_roll, true },
+		{ "measured.slip-skid", _measured_slip_skid_g, true },
+		{ "elevator.minimum", _elevator_minimum, true },
+		{ "elevator.maximum", _elevator_maximum, true },
+		{ "ailerons.minimum", _ailerons_minimum, true },
+		{ "ailerons.maximum", _ailerons_maximum, true },
+		{ "rudder.minimum", _rudder_minimum, true },
+		{ "rudder.maximum", _rudder_maximum, true },
+		{ "output.control-stick-pitch", _output_control_stick_pitch, false },
+		{ "output.control-stick-roll", _output_control_stick_roll, false },
+		{ "output.pitch", _output_pitch, true },
+		{ "output.roll", _output_roll, true },
+		{ "output.elevator", _output_elevator, true },
+		{ "output.ailerons", _output_ailerons, true },
+		{ "output.rudder", _output_rudder, true },
+		{ "output.throttle", _output_throttle, true },
 	});
 
 	_elevator_pid.set_i_limit ({ -0.1f, +0.1f });
@@ -101,9 +105,9 @@ FlyByWire::data_updated()
 	if (_dt < 0.005_s)
 		return;
 
-	switch (static_cast<Mode> (*_mode))
+	switch (static_cast<AttitudeMode> (*_attitude_mode))
 	{
-		case Mode::Manual:
+		case AttitudeMode::Manual:
 			_elevator_smoother.invalidate();
 			_ailerons_smoother.invalidate();
 
@@ -115,15 +119,15 @@ FlyByWire::data_updated()
 			_computed_output_roll = *_measured_roll;
 			break;
 
-		case Mode::Stabilized:
-		case Mode::FlightDirector:
+		case AttitudeMode::Stabilized:
+		case AttitudeMode::FlightDirector:
 		{
 			using Xefis::Range;
 
 			// Should always be computed:
 			integrate_manual_input();
 
-			if (static_cast<Mode> (*_mode) == Mode::FlightDirector)
+			if (static_cast<AttitudeMode> (*_attitude_mode) == AttitudeMode::FlightDirector)
 			{
 				_computed_output_pitch = *_input_pitch;
 				_computed_output_roll = *_input_roll;
@@ -167,7 +171,22 @@ FlyByWire::data_updated()
 		}
 
 		default:
-			log() << "stabilizer: unknown mode: " << *_mode << std::endl;
+			log() << "unknown attitude mode: " << *_attitude_mode << std::endl;
+			break;
+	}
+
+	switch (static_cast<ThrottleMode> (*_throttle_mode))
+	{
+		case ThrottleMode::Manual:
+			_output_throttle.write (Xefis::renormalize (*_input_throttle_axis, { 1.0, -1.0 }, { 0.0, 1.0 }));
+			break;
+
+		case ThrottleMode::Autothrottle:
+			_output_throttle.write (*_input_throttle);
+			break;
+
+		default:
+			log() << "unknownn throttle mode: " << *_throttle_mode << std::endl;
 			break;
 	}
 

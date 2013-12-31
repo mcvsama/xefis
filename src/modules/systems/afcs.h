@@ -155,13 +155,9 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	bool								_at_on						= false;
 	bool								_att_on						= false;
 	Speed								_cmd_speed_counter			= CmdSpeedRange.min();
-	Speed								_cmd_speed_selected			= CmdSpeedRange.min();
 	Angle								_cmd_heading_counter		= 0_deg;
-	Angle								_cmd_heading_selected		= 0_deg;
 	Length								_cmd_altitude_counter		= 1000_ft;
-	Length								_cmd_altitude_selected		= 1000_ft;
 	Speed								_cmd_vspd_counter			= 0_fpm;
-	Speed								_cmd_vspd_selected			= 0_fpm;
 	CmdAltitudeStep						_cmd_altitude_step			= CmdAltitudeStep::Ft10;
 	SpeedMode							_speed_mode					= SpeedMode::None;
 	RollMode							_roll_mode					= RollMode::None;
@@ -206,6 +202,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyInteger				_mcp_altitude_display;
 	Xefis::PropertyInteger				_mcp_vspd_display;
 	Xefis::PropertyBoolean				_mcp_ap_led;
+	Xefis::PropertyBoolean				_mcp_at_led;
 	Xefis::PropertyBoolean				_mcp_att_led;
 	Xefis::PropertyBoolean				_mcp_speed_sel_led;
 	Xefis::PropertyBoolean				_mcp_speed_hold_led;
@@ -219,7 +216,8 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_vspd_sel_led;
 	Xefis::PropertyBoolean				_mcp_vspd_clb_con_led;
 	// Output:
-	Xefis::PropertyInteger				_fbw_mode;
+	Xefis::PropertyInteger				_fbw_attitude_mode;
+	Xefis::PropertyInteger				_fbw_throttle_mode;
 	Xefis::PropertyInteger				_cmd_roll_mode;
 	Xefis::PropertyInteger				_cmd_pitch_mode;
 	Xefis::PropertySpeed				_cmd_ias;

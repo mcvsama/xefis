@@ -24,6 +24,16 @@
 				<type>float</type>
 				<node>/controls/flight/rudder</node>
 			</chunk>
+			<chunk>
+				<name>t1</name>
+				<type>float</type>
+				<node>/controls/engines/engine/throttle</node>
+			</chunk>
+			<chunk>
+				<name>t2</name>
+				<type>float</type>
+				<node>/controls/engines/engine/throttle-2</node>
+			</chunk>
 			<!--chunk>
 				<name>f</name>
 				<type>float</type>

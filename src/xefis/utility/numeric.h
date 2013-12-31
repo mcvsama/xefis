@@ -26,8 +26,8 @@
 
 namespace Xefis {
 
-inline constexpr float
-renormalize (float value, float a1, float b1, float a2, float b2) noexcept
+inline constexpr double
+renormalize (double value, double a1, double b1, double a2, double b2) noexcept
 {
 	return b1 == a1
 		? a2
@@ -35,8 +35,8 @@ renormalize (float value, float a1, float b1, float a2, float b2) noexcept
 }
 
 
-inline constexpr float
-renormalize (float value, Range<float> range1, Range<float> range2) noexcept
+inline constexpr double
+renormalize (double value, Range<double> range1, Range<double> range2) noexcept
 {
 	return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
 }

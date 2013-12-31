@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__PIDCONTROL_H__INCLUDED
-#define XEFIS__UTILITY__PIDCONTROL_H__INCLUDED
+#ifndef XEFIS__UTILITY__PID_CONTROL_H__INCLUDED
+#define XEFIS__UTILITY__PID_CONTROL_H__INCLUDED
 
 // Standard:
 #include <cstddef>

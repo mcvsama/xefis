@@ -42,6 +42,12 @@ constexpr Xefis::Range<Speed>	AutomatedFlightControlSystem::CmdVSpdRange;
 AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	parse_settings (config, {
+		{ "default.speed", _cmd_speed_counter, true },
+		{ "default.heading", _cmd_heading_counter, true },
+		{ "default.altitude", _cmd_altitude_counter, true },
+	});
+
 	parse_properties (config, {
 		{ "button.ap", _mcp_ap, true },
 		{ "button.at", _mcp_at, true },
@@ -77,6 +83,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "display.altitude", _mcp_altitude_display, true },
 		{ "display.vertical-speed", _mcp_vspd_display, true },
 		{ "led.ap", _mcp_ap_led, true },
+		{ "led.at", _mcp_at_led, true },
 		{ "led.att", _mcp_att_led, true },
 		{ "led.speed.sel", _mcp_speed_sel_led, true },
 		{ "led.speed.hold", _mcp_speed_hold_led, true },
@@ -89,7 +96,8 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "led.altitude.hold", _mcp_altitude_hold_led, true },
 		{ "led.vertical-speed.sel", _mcp_vspd_sel_led, true },
 		{ "led.vertical-speed.clb-con", _mcp_vspd_clb_con_led, true },
-		{ "fbw.mode", _fbw_mode, true },
+		{ "fbw.attitude-mode", _fbw_attitude_mode, true },
+		{ "fbw.throttle-mode", _fbw_throttle_mode, true },
 		{ "cmd.roll-mode", _cmd_roll_mode, true },
 		{ "cmd.pitch-mode", _cmd_pitch_mode, true },
 		{ "cmd.ias", _cmd_ias, true },
@@ -153,6 +161,12 @@ AutomatedFlightControlSystem::process_afcs_main_panel()
 	if (pressed (_mcp_ap))
 	{
 		_ap_on = !_ap_on;
+		solve_mode();
+	}
+
+	if (pressed (_mcp_at))
+	{
+		_at_on = !_at_on;
 		solve_mode();
 	}
 
@@ -262,6 +276,7 @@ void
 AutomatedFlightControlSystem::solve_mode()
 {
 	_mcp_ap_led.write (_ap_on);
+	_mcp_at_led.write (_at_on);
 	_mcp_att_led.write (_att_on);
 	_mcp_speed_display.write (Xefis::symmetric_round (_cmd_speed_counter.kt()));
 	int heading = Xefis::symmetric_round (_cmd_heading_counter.deg());
@@ -272,12 +287,17 @@ AutomatedFlightControlSystem::solve_mode()
 	_mcp_vspd_display.write (Xefis::symmetric_round (_cmd_vspd_counter.fpm()));
 
 	// Control FBW module:
-	FlyByWire::Mode fbw_mode = FlyByWire::Mode::Manual;
+	FlyByWire::AttitudeMode fbw_attitude_mode = FlyByWire::AttitudeMode::Manual;
 	if (_ap_on)
-		fbw_mode = FlyByWire::Mode::FlightDirector;
+		fbw_attitude_mode = FlyByWire::AttitudeMode::FlightDirector;
 	else if (_att_on)
-		fbw_mode = FlyByWire::Mode::Stabilized;
-	_fbw_mode.write (static_cast<decltype (_fbw_mode)::Type> (fbw_mode));
+		fbw_attitude_mode = FlyByWire::AttitudeMode::Stabilized;
+	_fbw_attitude_mode.write (static_cast<decltype (_fbw_attitude_mode)::Type> (fbw_attitude_mode));
+
+	FlyByWire::ThrottleMode fbw_throttle_mode = FlyByWire::ThrottleMode::Manual;
+	if (_at_on)
+		fbw_throttle_mode = FlyByWire::ThrottleMode::Autothrottle;
+	_fbw_throttle_mode.write (static_cast<decltype (_fbw_throttle_mode)::Type> (fbw_throttle_mode));
 
 	// Control A/T and FD modules:
 	_cmd_ias.write (_cmd_speed_counter);
@@ -295,17 +315,17 @@ AutomatedFlightControlSystem::solve_mode()
 void
 AutomatedFlightControlSystem::update_fma()
 {
-	switch (static_cast<FlyByWire::Mode> (*_fbw_mode))
+	switch (static_cast<FlyByWire::AttitudeMode> (*_fbw_attitude_mode))
 	{
-		case FlyByWire::Mode::Manual:
+		case FlyByWire::AttitudeMode::Manual:
 			_fma_control_hint.write ("");
 			break;
 
-		case FlyByWire::Mode::Stabilized:
+		case FlyByWire::AttitudeMode::Stabilized:
 			_fma_control_hint.write ("ATT");
 			break;
 
-		case FlyByWire::Mode::FlightDirector:
+		case FlyByWire::AttitudeMode::FlightDirector:
 			_fma_control_hint.write ("FLT DIR");
 			break;
 
