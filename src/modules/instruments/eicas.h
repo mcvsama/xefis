@@ -43,6 +43,16 @@ class EICAS: public Xefis::Instrument
 	{
 	  public:
 		/**
+		 * Severity affects color of the message
+		 * and resulting alert sound. (TODO)
+		 */
+		enum Severity
+		{
+			Critical,
+			Warning,
+		};
+
+		/**
 		 * Result returned by test().
 		 */
 		enum StateChange
@@ -55,6 +65,12 @@ class EICAS: public Xefis::Instrument
 	  public:
 		// Ctor
 		explicit MessageDefinition (QDomElement const& message_element);
+
+		/**
+		 * Return severity of the message.
+		 */
+		Severity
+		severity() const noexcept;
 
 		/**
 		 * Test whether message should be shown or not,
@@ -93,10 +109,17 @@ class EICAS: public Xefis::Instrument
 		bool
 		has_message_id() const noexcept;
 
+		/**
+		 * Return color appropriate for this message.
+		 */
+		QColor
+		color() const noexcept;
+
 	  private:
 		Xefis::PropertyBoolean	_observed_property;
 		bool					_valid_state		= true;
 		bool					_fail_on_nil		= false;
+		Severity				_severity			= Severity::Warning;
 		QString					_message;
 		uint64_t				_message_id			= 0;
 		bool					_has_message		= false;
@@ -138,6 +161,13 @@ class EICAS: public Xefis::Instrument
 	bool							_alert_started		= false;
 	QProcess*						_alert_command;
 };
+
+
+inline EICAS::MessageDefinition::Severity
+EICAS::MessageDefinition::severity() const noexcept
+{
+	return _severity;
+}
 
 
 inline QString

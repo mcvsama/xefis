@@ -48,6 +48,17 @@ EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
 	if (message_element.hasAttribute ("fail-on-nil") && fail_on_nil != "true" && fail_on_nil != "false")
 		throw Xefis::Exception ("invalid value for attribute @fail-on-nil on <message> element - must be 'true' or 'false'");
 
+	QString severity_str = message_element.attribute ("severity");
+	if (message_element.hasAttribute ("severity"))
+	{
+		if (severity_str == "critical")
+			_severity = Severity::Critical;
+		else if (severity_str == "warning")
+			_severity = Severity::Warning;
+		else
+			throw Xefis::Exception ("invalid value for attribute @severity on <message> element - must be 'warning' or 'critical'");
+	}
+
 	_observed_property.set_path (message_element.attribute ("path").toStdString());
 	_valid_state = fail_on != "true";
 	_fail_on_nil = fail_on_nil == "true";
@@ -76,6 +87,18 @@ EICAS::MessageDefinition::test() const
 	}
 
 	return NoChange;
+}
+
+
+QColor
+EICAS::MessageDefinition::color() const noexcept
+{
+	switch (_severity)
+	{
+		case Severity::Critical:	return Qt::red;
+		case Severity::Warning:		return QColor (255, 200, 50);
+	}
+	return Qt::white;
 }
 
 
@@ -136,7 +159,7 @@ EICAS::data_updated()
 					m.deassign_message_id();
 				}
 				// Show new one:
-				m.set_message_id (_eicas_widget->add_message (m.message()));
+				m.set_message_id (_eicas_widget->add_message (m.message(), m.color()));
 				break;
 
 			case MessageDefinition::Revoke:
