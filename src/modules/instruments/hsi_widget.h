@@ -259,8 +259,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QTransform				_aircraft_center_transform;
 		QTransform				_heading_transform;
 		QTransform				_track_transform;
+		// TRK/HDG transform, depending if HDG or TRK is selected:
 		QTransform				_rotation_transform;
+		// Transform for ground objects:
 		QTransform				_features_transform;
+		// Transform used for VOR/ADF pointers, that are represented by magnetic heading:
+		QTransform				_pointers_transform;
 		QRectF					_map_clip_rect;
 		QRectF					_trend_vector_clip_rect;
 		QPainterPath			_inner_map_clip;

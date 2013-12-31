@@ -296,6 +296,10 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	if (_params.heading_mode == HeadingMode::Magnetic)
 		_features_transform.rotate ((_params.heading_magnetic - _params.heading_true).deg());
 
+	_pointers_transform = _rotation_transform;
+	if (_params.heading_mode == HeadingMode::True)
+		_pointers_transform.rotate ((_params.heading_true - _params.heading_magnetic).deg());
+
 	_locals.ap_heading = _params.ap_magnetic_heading;
 	if (_params.heading_mode == HeadingMode::True)
 		_locals.ap_heading += _params.heading_true - _params.heading_magnetic;
@@ -324,8 +328,8 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_range (painter());
 	paint_hints (painter());
 	paint_trend_vector (painter());
-	paint_course (painter());
 	paint_pointers (painter());
+	paint_course (painter());
 	paint_aircraft (painter());
 }
 
@@ -1082,7 +1086,7 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 		painter.setPen (get_pen (opts.color, width));
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipRect (_map_clip_rect);
-		painter.setTransform (_features_transform * _aircraft_center_transform);
+		painter.setTransform (_pointers_transform * _aircraft_center_transform);
 		painter.rotate (opts.angle->deg());
 
 		if (opts.primary)
