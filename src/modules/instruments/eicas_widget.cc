@@ -186,27 +186,21 @@ EICASWidget::resizeEvent (QResizeEvent* event)
 void
 EICASWidget::paintEvent (QPaintEvent*)
 {
-	Xefis::Painter painter (this, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-
-	painter.setPen (Qt::NoPen);
-	painter.fillRect (rect(), Qt::black);
+	auto painting_token = get_token (this);
+	clear_with_black();
 
 	// Messages:
-	painter.setBrush (Qt::NoBrush);
-	painter.setFont (_font);
+	painter().setBrush (Qt::NoBrush);
+	painter().setFont (_font);
 	int n = std::min<int> (static_cast<int> (_shown_messages.size()) - _scroll, _max_shown_messages);
 	for (int i = 0; i < n; ++i)
 	{
 		Message const& message = _shown_messages[i + _scroll];
 		if (message.outdated)
-			painter.setPen (QPen (Qt::cyan));
+			painter().setPen (QPen (Qt::cyan));
 		else
-			painter.setPen (QPen (message.color));
-		painter.fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * i), Qt::AlignTop | Qt::AlignLeft, message.message);
+			painter().setPen (QPen (message.color));
+		painter().fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * i), Qt::AlignTop | Qt::AlignLeft, message.message);
 	}
 
 	// Cursor:
@@ -214,14 +208,14 @@ EICASWidget::paintEvent (QPaintEvent*)
 	{
 		float margin = pen_width (1.f);
 		QRectF cursor (_viewport.left(), _viewport.top() + _line_height * (_cursor - _scroll), _viewport.width(), _line_height);
-		cursor.adjust (-margin, 0.0, margin, -0.75f * margin);
-		painter.setPen (get_pen (Qt::white, 1.2f));
-		painter.drawRect (cursor);
+		cursor.adjust (-margin, 0.0, margin, 0.0);
+		painter().setPen (get_pen (Qt::white, 1.2f));
+		painter().drawRect (cursor);
 	}
 
 	// For up/down arrows:
-	painter.setPen (get_pen (Qt::white, 1.f));
-	painter.setBrush (Qt::white);
+	painter().setPen (get_pen (Qt::white, 1.f));
+	painter().setBrush (Qt::white);
 
 	// Both arrows are blinking:
 	if (_blink_status)
@@ -234,7 +228,7 @@ EICASWidget::paintEvent (QPaintEvent*)
 				<< QPointF (-_arrow_height, 0.f)
 				<< QPointF (+_arrow_height, 0.f);
 
-			painter.drawPolygon (arrow.translated (_viewport.center().x(), _viewport.top()));
+			painter().drawPolygon (arrow.translated (_viewport.center().x(), _viewport.top()));
 		}
 
 		// Down arrow:
@@ -245,7 +239,7 @@ EICASWidget::paintEvent (QPaintEvent*)
 				<< QPointF (+_arrow_height, 0.f)
 				<< QPointF (0.f, _arrow_height);
 
-			painter.drawPolygon (arrow.translated (_viewport.center().x(), _viewport.bottom()));
+			painter().drawPolygon (arrow.translated (_viewport.center().x(), _viewport.bottom()));
 		}
 	}
 }

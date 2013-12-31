@@ -68,19 +68,13 @@ Label::Label (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 Label::paintEvent (QPaintEvent*)
 {
-	Xefis::Painter painter (this, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
+	auto paint_token = get_token (this);
+	clear_with_black();
 
 	QFont font (_font_10);
 	font.setPixelSize (font_size (_font_size));
-	painter.setFont (font);
-	painter.setBrush (Qt::black);
-	painter.setPen (Qt::NoPen);
-	painter.drawRect (rect());
-	painter.setPen (_color);
-	painter.fast_draw_text (rect(), _alignment, _label);
+	painter().setFont (font);
+	painter().setPen (_color);
+	painter().fast_draw_text (rect(), _alignment, _label);
 }
 

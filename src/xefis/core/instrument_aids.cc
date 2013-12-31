@@ -29,6 +29,7 @@ const char*	InstrumentAids::MINUS_SIGN = "−";
 
 
 InstrumentAids::InstrumentAids (float height_for_width):
+	_painter (&_text_painter_cache),
 	_height_for_width (height_for_width)
 {
 	_font = Xefis::Services::instrument_font();
@@ -42,6 +43,30 @@ InstrumentAids::set_scaling (float pen_scale, float font_scale)
 {
 	_master_pen_scale = pen_scale;
 	_master_font_scale = font_scale;
+}
+
+
+Shared<InstrumentAids::Token>
+InstrumentAids::get_token (QPaintDevice* device)
+{
+	auto token = std::make_shared<Token> (&_painter, device);
+	_painter.setRenderHint (QPainter::Antialiasing, true);
+	_painter.setRenderHint (QPainter::TextAntialiasing, true);
+	_painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
+	_painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
+	_painter.set_font_position_correction ({ 0.0, 0.035 });
+	return token;
+}
+
+
+void
+InstrumentAids::clear_with_black()
+{
+	QPaintDevice* d = painter().device();
+
+	painter().setPen (Qt::NoPen);
+	painter().setBrush (Qt::black);
+	painter().drawRect (QRect (0, 0, d->width(), d->height()));
 }
 
 

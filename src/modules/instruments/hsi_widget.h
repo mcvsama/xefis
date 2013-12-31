@@ -256,8 +256,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					_recalculation_needed		= true;
 		float					_r;
 		float					_q;
-		Xefis::TextPainter::Cache
-								_text_painter_cache;
 		QTransform				_aircraft_center_transform;
 		QTransform				_heading_transform;
 		QTransform				_track_transform;

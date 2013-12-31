@@ -36,6 +36,10 @@ class Painter: public TextPainter
 	constexpr static float DefaultShadowWidth = 1.2f;
 
   public:
+	// Ctor
+	Painter (TextPainter::Cache* cache);
+
+	// Ctor
 	Painter (QPaintDevice* device, TextPainter::Cache* cache);
 
 	void

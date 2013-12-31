@@ -509,8 +509,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QTransform			_roll_transform;
 		QTransform			_heading_transform;
 		QTransform			_horizon_transform;
-		Xefis::TextPainter::Cache
-							_text_painter_cache;
 		QDateTime			_current_datetime;
 
 		/*

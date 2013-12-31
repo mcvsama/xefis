@@ -24,6 +24,11 @@
 
 namespace Xefis {
 
+Painter::Painter (TextPainter::Cache* cache):
+	TextPainter (cache)
+{ }
+
+
 Painter::Painter (QPaintDevice* device, TextPainter::Cache* cache):
 	TextPainter (device, cache)
 { }

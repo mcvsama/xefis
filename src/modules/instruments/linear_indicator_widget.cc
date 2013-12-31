@@ -49,28 +49,21 @@ LinearIndicatorWidget::resizeEvent (QResizeEvent* event)
 void
 LinearIndicatorWidget::paintEvent (QPaintEvent*)
 {
+	auto painting_token = get_token (this);
+
 	float const w = width();
 	float const h = height();
-
-	Xefis::Painter painter (this, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 	QPen pen_white = get_pen (Qt::white, 1.f);
 	QPen pen_silver = get_pen (QColor (0xbb, 0xbd, 0xbf), 1.f);
 
+	clear_with_black();
+
 	if (_mirrored)
 	{
-		painter.translate (w, 0.f);
-		painter.scale (-1.f, 1.f);
+		painter().translate (w, 0.f);
+		painter().scale (-1.f, 1.f);
 	}
-
-	// Clear with black background:
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (Qt::black);
-	painter.drawRect (rect());
 
 	float q = 0.05f * w;
 	float m = 0.7f * q;
@@ -81,8 +74,8 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 
 	// Indicator
 
-	painter.setPen (pen_silver);
-	painter.drawLine (p0, p1);
+	painter().setPen (pen_silver);
+	painter().drawLine (p0, p1);
 
 	if (_value)
 	{
@@ -90,18 +83,18 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 		bool inbound = _range.includes (*_value);
 
 		if (inbound)
-			painter.setBrush (Qt::white);
+			painter().setBrush (Qt::white);
 		else
-			painter.setBrush (Qt::NoBrush);
+			painter().setBrush (Qt::NoBrush);
 
-		painter.setPen (pen_white);
+		painter().setPen (pen_white);
 		QPolygonF polygon = QPolygonF()
 			<< QPointF (0.f, 0.f)
 			<< QPointF (1.9f * q, -0.5f * q)
 			<< QPointF (1.9f * q, +0.5f * q);
 		polygon.translate (p1.x(), Xefis::renormalize (value, _range.min(), _range.max(), p1.y(), p0.y()));
-		painter.add_shadow ([&]() {
-			painter.drawPolygon (polygon);
+		painter().add_shadow ([&]() {
+			painter().drawPolygon (polygon);
 		});
 	}
 
@@ -110,32 +103,29 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	QFont font (_font_20);
 	QFontMetricsF metrics (font);
 	float char_width = metrics.width ("0");
-	float ycorr = 0.04f * metrics.height();
-	float hcorr = 1.2f * ycorr;
+	float hcorr = 0.025f * metrics.height();
 
 	QString text;
 	if (_value)
 		text = stringify_value (*_value);
 	text = pad_string (text);
 
-	painter.setFont (font);
-	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, h / 2.f), Qt::AlignRight | Qt::AlignVCenter, text);
+	painter().setFont (font);
+	QRectF text_rect = painter().get_text_box (QPointF (p0.x() - q, h / 2.f), Qt::AlignRight | Qt::AlignVCenter, text);
 	text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
-	painter.setPen (get_pen (Qt::white, 0.8f));
-	painter.setBrush (Qt::NoBrush);
-	painter.drawRect (text_rect);
+	painter().setPen (get_pen (Qt::white, 0.8f));
+	painter().setBrush (Qt::NoBrush);
+	painter().drawRect (text_rect);
 	QPointF position;
 	if (_mirrored)
 	{
-   		position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y() + ycorr);
-		position = painter.transform().map (position);
-		painter.resetTransform();
+		position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
+		position = painter().transform().map (position);
+		painter().resetTransform();
 	}
 	else
-	{
-   		position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y() + ycorr);
-	}
-	painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, text);
+		position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
+	painter().fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, text);
 }
 
 

@@ -258,6 +258,8 @@ HSIWidget::PaintWorkUnit::resized()
 void
 HSIWidget::PaintWorkUnit::paint (QImage& image)
 {
+	auto paint_token = get_token (&image);
+
 	_current_datetime = QDateTime::currentDateTime();
 
 	if (_recalculation_needed)
@@ -307,33 +309,24 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		_locals.course_heading = Xefis::floored_mod (_locals.course_heading, 360_deg);
 	}
 
-	Xefis::Painter painter (&image, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-	painter.set_shadow_color (Qt::black);
+	painter().set_shadow_color (Qt::black);
+	clear_with_black();
 
-	// Clear with black background:
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (QBrush (Qt::black, Qt::SolidPattern));
-	painter.drawRect (QRect (QPoint (0, 0), size()));
-
-	paint_navaids (painter);
-	paint_altitude_reach (painter);
-	paint_track (painter, false);
-	paint_directions (painter);
-	paint_ap_settings (painter);
-	paint_track (painter, true);
-	paint_speeds_and_wind (painter);
-	paint_home_direction (painter);
-	paint_climb_glide_ratio (painter);
-	paint_range (painter);
-	paint_hints (painter);
-	paint_trend_vector (painter);
-	paint_course (painter);
-	paint_pointers (painter);
-	paint_aircraft (painter);
+	paint_navaids (painter());
+	paint_altitude_reach (painter());
+	paint_track (painter(), false);
+	paint_directions (painter());
+	paint_ap_settings (painter());
+	paint_track (painter(), true);
+	paint_speeds_and_wind (painter());
+	paint_home_direction (painter());
+	paint_climb_glide_ratio (painter());
+	paint_range (painter());
+	paint_hints (painter());
+	paint_trend_vector (painter());
+	paint_course (painter());
+	paint_pointers (painter());
+	paint_aircraft (painter());
 }
 
 
@@ -388,7 +381,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 				{
 					painter.setBrush (Qt::NoBrush);
 					painter.add_shadow ([&]() {
-						painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f).translated (0.f, -0.02f * _q));
+						painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f));
 					});
 				}
 				break;

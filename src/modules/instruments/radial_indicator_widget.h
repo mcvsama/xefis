@@ -83,14 +83,12 @@ class RadialIndicatorWidget:
 	stringify_value (double value) const;
 
 	void
-	paint_text (Xefis::Painter&, float q, float r);
+	paint_text (float q, float r);
 
 	void
-	paint_indicator (Xefis::Painter&, float q, float r);
+	paint_indicator (float q, float r);
 
   private:
-	Xefis::TextPainter::Cache	_text_painter_cache;
-	// Parameters:
 	Xefis::Range<double>		_range				= { 0.f, 1.f };
 	int							_precision			= 0;
 	unsigned int				_modulo				= 0;
