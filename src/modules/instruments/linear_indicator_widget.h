@@ -104,8 +104,6 @@ class LinearIndicatorWidget:
 	pad_string (QString const& input) const;
 
   private:
-	Xefis::TextPainter::Cache	_text_painter_cache;
-	// Parameters:
 	bool						_mirrored			= false;
 	Xefis::Range<double>		_range				= { 0.f, 1.f };
 	int							_precision			= 0;

@@ -152,7 +152,6 @@ class EICASWidget:
 	bool						_cursor_visible		= false;
 	QFont						_font;
 	QRectF						_viewport;
-	Xefis::TextPainter::Cache	_text_painter_cache;
 	Messages					_shown_messages;
 	Messages					_hidden_messages;
 	Unique<QTimer>				_blinking_timer;

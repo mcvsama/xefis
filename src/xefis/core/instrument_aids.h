@@ -26,12 +26,31 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/painter.h>
 
 
 namespace Xefis {
 
 class InstrumentAids
 {
+  public:
+	/**
+	 * RAII-style painting token. It calls begin() and end() methods,
+	 * when constructed and destructed (last copy), respectively.
+	 */
+	class Token
+	{
+	  public:
+		// Ctor
+		Token (QPainter*, QPaintDevice*);
+
+		// Dtor
+		~Token();
+
+	  private:
+		QPainter* _painter;
+	};
+
   public:
 	// Ctor
 	InstrumentAids (float height_for_width);
@@ -43,6 +62,26 @@ class InstrumentAids
 	set_scaling (float pen_scale, float font_scale);
 
   protected:
+	/**
+	 * Return Xefis::Painter to use. Use begin() and end() methods to begin/end painting.
+	 */
+	Painter&
+	painter() noexcept;
+
+	/**
+	 * Get RAII-style painting token. You must create token with this method,
+	 * before attemtping to paint. You can paint as long as the token
+	 * lives (or the last copy lives).
+	 */
+	Shared<Token>
+	get_token (QPaintDevice* device);
+
+	/**
+	 * Clear the widget with black.
+	 */
+	void
+	clear_with_black();
+
 	/**
 	 * Needs to be called when instrument widget size changes.
 	 */
@@ -88,38 +127,62 @@ class InstrumentAids
 	arc_span (Angle deg);
 
   protected:
-	QFont				_font;
-	QFont				_font_8;
-	QFont				_font_10;
-	QFont				_font_13;
-	QFont				_font_16;
-	QFont				_font_20;
-	float				_font_8_digit_width		= 0.f;
-	float				_font_10_digit_width	= 0.f;
-	float				_font_13_digit_width	= 0.f;
-	float				_font_16_digit_width	= 0.f;
-	float				_font_20_digit_width	= 0.f;
-	float				_font_8_digit_height	= 0.f;
-	float				_font_10_digit_height	= 0.f;
-	float				_font_13_digit_height	= 0.f;
-	float				_font_16_digit_height	= 0.f;
-	float				_font_20_digit_height	= 0.f;
-	QColor				_autopilot_color;
-	QColor				_navigation_color;
-	QColor				_silver					= { 0xcc, 0xca, 0xc2 };
-	float				_height_for_width		= 1.f;
-	float				_master_pen_scale		= 1.f;
-	float				_master_font_scale		= 1.f;
-	QPen				_autopilot_pen_1;
-	QPen				_autopilot_pen_2;
-	float				_w						= 0.f;
-	float				_h						= 0.f;
-	float				_window_w				= 0.f;
-	float				_window_h				= 0.f;
+	Xefis::Painter				_painter;
+	Xefis::TextPainter::Cache	_text_painter_cache;
+	QFont						_font;
+	QFont						_font_8;
+	QFont						_font_10;
+	QFont						_font_13;
+	QFont						_font_16;
+	QFont						_font_20;
+	float						_font_8_digit_width		= 0.f;
+	float						_font_10_digit_width	= 0.f;
+	float						_font_13_digit_width	= 0.f;
+	float						_font_16_digit_width	= 0.f;
+	float						_font_20_digit_width	= 0.f;
+	float						_font_8_digit_height	= 0.f;
+	float						_font_10_digit_height	= 0.f;
+	float						_font_13_digit_height	= 0.f;
+	float						_font_16_digit_height	= 0.f;
+	float						_font_20_digit_height	= 0.f;
+	QColor						_autopilot_color;
+	QColor						_navigation_color;
+	QColor						_silver					= { 0xcc, 0xca, 0xc2 };
+	float						_height_for_width		= 1.f;
+	float						_master_pen_scale		= 1.f;
+	float						_master_font_scale		= 1.f;
+	QPen						_autopilot_pen_1;
+	QPen						_autopilot_pen_2;
+	float						_w						= 0.f;
+	float						_h						= 0.f;
+	float						_window_w				= 0.f;
+	float						_window_h				= 0.f;
 
-	static const char	DIGITS[10];
-	static const char*	MINUS_SIGN;
+	static const char			DIGITS[10];
+	static const char*			MINUS_SIGN;
 };
+
+
+inline
+InstrumentAids::Token::Token (QPainter* painter, QPaintDevice* device):
+	_painter (painter)
+{
+	_painter->begin (device);
+}
+
+
+inline
+InstrumentAids::Token::~Token()
+{
+	_painter->end();
+}
+
+
+inline Painter&
+InstrumentAids::painter() noexcept
+{
+	return _painter;
+}
 
 
 inline float

@@ -41,7 +41,6 @@ class Label:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	Xefis::TextPainter::Cache	_text_painter_cache;
 	float						_font_size		= 10.f;
 	QString						_label;
 	QColor						_color			= Qt::white;

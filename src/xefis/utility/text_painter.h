@@ -59,7 +59,7 @@ class TextPainter: public QPainter
 			/**
 			 * Generate all images for given character and font.
 			 */
-			Glyph (QFont const&, QColor const&, QChar const&);
+			Glyph (QFont const&, QColor, QChar, QPointF position_correction);
 
 			Glyph (Glyph const& other);
 
@@ -86,7 +86,17 @@ class TextPainter: public QPainter
 	};
 
   public:
+	// Ctor
+	TextPainter (Cache* cache);
+
+	// Ctor
 	TextPainter (QPaintDevice* device, Cache* cache);
+
+	/**
+	 * Set font position correction (value is relative to font's size, it's not represented in pixels).
+	 */
+	void
+	set_font_position_correction (QPointF correction);
 
 	QRectF
 	get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
@@ -102,6 +112,7 @@ class TextPainter: public QPainter
 
   private:
 	Cache*	_cache;
+	QPointF	_position_correction;
 };
 
 

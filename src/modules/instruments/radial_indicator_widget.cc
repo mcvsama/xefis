@@ -49,27 +49,20 @@ RadialIndicatorWidget::resizeEvent (QResizeEvent* event)
 void
 RadialIndicatorWidget::paintEvent (QPaintEvent*)
 {
+	auto painting_token = get_token (this);
+
 	float const w = width();
 	float const h = height();
 
-	Xefis::Painter painter (this, &_text_painter_cache);
-	painter.setRenderHint (QPainter::Antialiasing, true);
-	painter.setRenderHint (QPainter::TextAntialiasing, true);
-	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
+	clear_with_black();
 
-	// Clear with black background:
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (Qt::black);
-	painter.drawRect (rect());
-
-	painter.translate (w / 2.f, h / 2.4f);
+	painter().translate (w / 2.f, h / 2.4f);
 
 	float q = 0.068f * wh();
 	float r = 6.5f * q;
 
-	paint_text (painter, q, r);
-	paint_indicator (painter, q, r);
+	paint_text (q, r);
+	paint_indicator (q, r);
 }
 
 
@@ -86,7 +79,7 @@ RadialIndicatorWidget::stringify_value (double value) const
 
 
 void
-RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
+RadialIndicatorWidget::paint_text (float q, float)
 {
 	QString text;
 	if (_value)
@@ -108,36 +101,36 @@ RadialIndicatorWidget::paint_text (Xefis::Painter& painter, float q, float)
 	text_rect.translate (margin, -text_rect.height());
 	QRectF rect = text_rect.adjusted (-margin, 0, margin, 0);
 
-	painter.save();
-	painter.setFont (font);
+	painter().save();
+
+	painter().setFont (font);
 	if (_value)
 	{
-		painter.setPen (pen);
-		painter.drawRect (rect);
-		float const bit_lower = 0.13f * q;
-		painter.fast_draw_text (text_rect.translated (0.f, bit_lower), Qt::AlignRight | Qt::AlignVCenter, text);
+		painter().setPen (pen);
+		painter().drawRect (rect);
+		painter().fast_draw_text (text_rect, Qt::AlignRight | Qt::AlignVCenter, text);
 	}
 	else
 	{
-		painter.setPen (pen);
-		painter.drawRect (rect);
+		painter().setPen (pen);
+		painter().drawRect (rect);
 	}
 
 	if (_normal_value)
 	{
-		painter.setFont (small_font);
-		painter.setPen (get_pen (Qt::green, 1.0f));
-		painter.fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
-								Qt::AlignBottom | Qt::AlignRight,
-								stringify_value (*_normal_value));
+		painter().setFont (small_font);
+		painter().setPen (get_pen (Qt::green, 1.0f));
+		painter().fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
+								  Qt::AlignBottom | Qt::AlignRight,
+								  stringify_value (*_normal_value));
 	}
 
-	painter.restore();
+	painter().restore();
 }
 
 
 void
-RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
+RadialIndicatorWidget::paint_indicator (float, float r)
 {
 	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);
@@ -192,22 +185,22 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 	float normal_angle = value_span_angle * (normal - _range.min()) / _range.extent();
 	float target_angle = value_span_angle * (target - _range.min()) / _range.extent();
 
-	painter.save();
+	painter().save();
 
 	if (_value)
 	{
-		painter.save();
-		painter.setPen (Qt::NoPen);
-		painter.setBrush (brush);
-		painter.drawPie (rect, -16.f * 0.f, -16.f * value_angle);
-		painter.setPen (gray_pen);
-		painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
-		painter.restore();
+		painter().save();
+		painter().setPen (Qt::NoPen);
+		painter().setBrush (brush);
+		painter().drawPie (rect, -16.f * 0.f, -16.f * value_angle);
+		painter().setPen (gray_pen);
+		painter().drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
+		painter().restore();
 	}
 
 	// Warning/critical bugs:
 
-	painter.save();
+	painter().save();
 
 	struct PointInfo
 	{
@@ -236,49 +229,49 @@ RadialIndicatorWidget::paint_indicator (Xefis::Painter& painter, float, float r)
 		PointInfo next = points[i + 1];
 		float is_last = i == points.size() - 2;
 
-		painter.save();
-		painter.setPen (curr.pen);
-		painter.drawArc (rect,
-						 -16.f * curr.angle,
-						 -16.f * (next.angle - curr.angle - (is_last ? 0 : gap_degs)));
-		painter.rotate (curr.angle);
-		painter.drawLine (QPointF (r, 0.f), QPointF (r + curr.tick_len, 0.f));
-		painter.restore();
+		painter().save();
+		painter().setPen (curr.pen);
+		painter().drawArc (rect,
+						   -16.f * curr.angle,
+						   -16.f * (next.angle - curr.angle - (is_last ? 0 : gap_degs)));
+		painter().rotate (curr.angle);
+		painter().drawLine (QPointF (r, 0.f), QPointF (r + curr.tick_len, 0.f));
+		painter().restore();
 	}
 
 	// Normal value bug:
 	if (_normal_value)
 	{
-		painter.setPen (green_pen);
-		painter.rotate (normal_angle);
-		painter.drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.17f * r, 0.f));
-		painter.drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, -0.14f * r));
-		painter.drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, +0.14f * r));
+		painter().setPen (green_pen);
+		painter().rotate (normal_angle);
+		painter().drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.17f * r, 0.f));
+		painter().drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, -0.14f * r));
+		painter().drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, +0.14f * r));
 	}
 
-	painter.restore();
+	painter().restore();
 
 	// Needle:
 	if (_value)
 	{
-		painter.rotate (value_angle);
-		painter.setPen (pointer_pen);
-		painter.set_shadow_color (Qt::black);
-		painter.set_shadow_width (1.9f);
+		painter().rotate (value_angle);
+		painter().setPen (pointer_pen);
+		painter().set_shadow_color (Qt::black);
+		painter().set_shadow_width (1.9f);
 
 		if (_target_value)
 		{
 			float ext = 0.15f * r;
 			float extr = 1.15f * r;
-			painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (extr, 0.f));
-			painter.rotate (target_angle - value_angle);
-			painter.draw_outlined_line (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
-			painter.drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
+			painter().draw_outlined_line (QPointF (0.f, 0.f), QPointF (extr, 0.f));
+			painter().rotate (target_angle - value_angle);
+			painter().draw_outlined_line (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
+			painter().drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
 		}
 		else
-			painter.draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
+			painter().draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
 	}
 
-	painter.restore();
+	painter().restore();
 }
 

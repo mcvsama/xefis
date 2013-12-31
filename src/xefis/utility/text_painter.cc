@@ -24,10 +24,12 @@
 
 namespace Xefis {
 
-TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar const& character):
+TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar character, QPointF position_correction):
 	data (std::make_shared<Data>())
 {
 	QFontMetricsF metrics (font);
+	position_correction.setX (position_correction.x() * metrics.width("0"));
+	position_correction.setY (position_correction.y() * metrics.height());
 	QSize size (std::ceil (metrics.width (character)) + 1, std::ceil (metrics.height()) + 1);
 	QImage image (size, QImage::Format_ARGB32_Premultiplied);
 	QColor alpha = color;
@@ -49,6 +51,7 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar 
 			float const fy = 1.f * y / Rank;
 
 			QPointF position (fx, fy + metrics.ascent());
+			position += position_correction;
 			QPainterPath glyph_path;
 			glyph_path.addText (position, font, character);
 
@@ -72,12 +75,27 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor const& color, QChar 
 }
 
 
+TextPainter::TextPainter (Cache* cache):
+	_cache (cache)
+{
+	if (!_cache)
+		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
+}
+
+
 TextPainter::TextPainter (QPaintDevice* device, Cache* cache):
 	QPainter (device),
 	_cache (cache)
 {
 	if (!_cache)
 		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
+}
+
+
+void
+TextPainter::set_font_position_correction (QPointF correction)
+{
+	_position_correction = correction;
 }
 
 
@@ -164,7 +182,7 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 	{
 		auto glyph = glyphs_cache->find (*c);
 		if (glyph == glyphs_cache->end())
-			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c) }).first;
+			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c, _position_correction) }).first;
 		float fx = floored_mod<float> (offset.x(), 1.f);
 		float fy = floored_mod<float> (offset.y(), 1.f);
 		int dx = limit<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
