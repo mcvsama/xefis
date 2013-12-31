@@ -259,7 +259,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
 	_mcp_range_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_range_a, _mcp_range_b, [this](int delta) {
-		int range_nm = Xefis::symmetric_round ((*_setting_hsi_range).nm());
+		int range_nm = Xefis::symmetric_round (_setting_hsi_range->nm());
 		delta = -delta;
 
 		if (range_nm < 2)
