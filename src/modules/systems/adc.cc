@@ -256,7 +256,7 @@ AirDataComputer::compute_ias()
 	Time update_dt = _ias_computer.update_dt();
 
 	if (_ias.valid())
-		_speed_ias.write (1_kt * _speed_ias_smoother.process ((*_ias).kt(), update_dt));
+		_speed_ias.write (1_kt * _speed_ias_smoother.process (_ias->kt(), update_dt));
 	else
 	{
 		_speed_ias.set_nil();
@@ -319,7 +319,7 @@ AirDataComputer::compute_tas()
 		{
 			// This does not take into account air compressibility factor, so it's valid
 			// for low speeds (mach < 0.3) and altitude below tropopause (36 kft):
-			_speed_tas.write (cas / std::pow (1 - 6.8755856 * 1e-6 * (*_density_altitude).ft(), 2.127940));
+			_speed_tas.write (cas / std::pow (1 - 6.8755856 * 1e-6 * _density_altitude->ft(), 2.127940));
 		}
 		else
 			// Very simple equation for TAS, fix it to use air temperature someday:
