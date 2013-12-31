@@ -30,11 +30,17 @@
 class FlyByWire: public Xefis::Module
 {
   public:
-	enum class Mode
+	enum class AttitudeMode
 	{
 		Manual			= 0,
 		Stabilized		= 1,
 		FlightDirector	= 2,
+	};
+
+	enum class ThrottleMode
+	{
+		Manual			= 0,
+		Autothrottle	= 1,
 	};
 
   public:
@@ -64,7 +70,8 @@ class FlyByWire: public Xefis::Module
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
 	// TODO PID params as settings, not properties.
-	Xefis::PropertyInteger		_mode;
+	Xefis::PropertyInteger		_attitude_mode;
+	Xefis::PropertyInteger		_throttle_mode;
 	Xefis::PropertyAngle		_pitch_extent;
 	Xefis::PropertyAngle		_roll_extent;
 	Xefis::PropertyFloat		_stabilization_gain;
@@ -88,6 +95,8 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat		_input_yaw_axis;
 	Xefis::PropertyAngle		_input_pitch;
 	Xefis::PropertyAngle		_input_roll;
+	Xefis::PropertyFloat		_input_throttle_axis;
+	Xefis::PropertyFloat		_input_throttle;
 	Xefis::PropertyAngle		_measured_pitch;
 	Xefis::PropertyAngle		_measured_roll;
 	Xefis::PropertyFloat		_measured_slip_skid_g;
@@ -105,6 +114,7 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat		_output_elevator;
 	Xefis::PropertyFloat		_output_ailerons;
 	Xefis::PropertyFloat		_output_rudder;
+	Xefis::PropertyFloat		_output_throttle;
 };
 
 #endif

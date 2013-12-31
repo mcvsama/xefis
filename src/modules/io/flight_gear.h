@@ -124,6 +124,8 @@ class FlightGearIO:
 	Xefis::PropertyFloat		_ailerons;
 	Xefis::PropertyFloat		_elevator;
 	Xefis::PropertyFloat		_rudder;
+	Xefis::PropertyFloat		_throttle_1;
+	Xefis::PropertyFloat		_throttle_2;
 };
 
 #endif

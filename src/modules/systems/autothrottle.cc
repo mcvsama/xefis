@@ -44,20 +44,20 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 		{ "ias.pid.p", _ias_pid_p, false },
 		{ "ias.pid.i", _ias_pid_i, false },
 		{ "ias.pid.d", _ias_pid_d, false },
+		{ "ias-to-throttle-scale", _ias_to_throttle_scale, false },
 	});
 
 	parse_properties (config, {
-		{ "power-limit.max", _power_limit_max, true },
-		{ "power-limit.min", _power_limit_min, true },
 		{ "cmd.speed-mode", _cmd_speed_mode, true },
 		{ "cmd.thrust", _cmd_thrust, true },
 		{ "cmd.ias", _cmd_ias, true },
 		{ "measured.thrust", _measured_thrust, true },
 		{ "measured.ias", _measured_ias, true },
-		{ "output.power", _output_power, true },
+		{ "output.throttle", _output_throttle, true },
 		{ "disengage-at", _disengage_at, true },
 	});
 
+	// Update PID params according to settings:
 	_thrust_pid.set_pid (_thrust_pid_p, _thrust_pid_i, _thrust_pid_d),
 	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d),
 
@@ -68,23 +68,62 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 void
 Autothrottle::data_updated()
 {
+	bool disengage = false;
+	double computed_thrust = 0.0;
+
 	// Don't process if dt is too small:
 	_dt += update_dt();
-	if (_dt < 0.005_s)
+	if (_dt < 5_ms)
 		return;
 
-	if (*_enabled)
+	if (_cmd_speed_mode.fresh())
+		speed_mode_changed();
+
+	switch (_speed_mode)
 	{
-		// TODO
-	}
-	else
-	{
-		_computed_output_power = 0.0;
+		case SpeedMode::Thrust:
+			if (_cmd_thrust.is_nil() || _measured_thrust.is_nil())
+			{
+				_thrust_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				_thrust_pid.set_target (*_cmd_thrust);
+				_thrust_pid.process (*_measured_thrust, _dt.s());
+				computed_thrust = _thrust_pid.output();
+			}
+			break;
+
+		case SpeedMode::Airspeed:
+			if (_cmd_ias.is_nil() || _measured_ias.is_nil())
+			{
+				_ias_pid.reset();
+				disengage = true;
+			}
+			else
+			{
+				// This is more tricky, since we measure IAS, but control thrust.
+				// There's no 1:1 correlaction between them.
+				_ias_pid.set_target (_cmd_ias->kt());
+				_ias_pid.process (_measured_ias->kt(), _dt.s());
+				computed_thrust = Xefis::limit (_ias_pid.output() / _ias_to_throttle_scale, -1.0, 1.0);
+				computed_thrust = Xefis::renormalize (computed_thrust, { -1.0, 1.0 }, { 0.0, 1.0 });
+			}
+			break;
+
+		case SpeedMode::None:
+		case SpeedMode::sentinel:
+			_computed_output_throttle = 0.0;
+			break;
 	}
 
-	_output_power.write (_output_power_smoother.process (_computed_output_power, _dt));
+	_output_throttle.write (_output_throttle_smoother.process (computed_thrust, _dt));
 
-	_dt = Time::now();
+	if (disengage || _disengage_at.is_nil())
+		_disengage_at.write (disengage);
+
+	_dt = 0_s;
 }
 
 

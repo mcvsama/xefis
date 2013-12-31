@@ -94,7 +94,7 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 		{ "disengage-ap", _disengage_ap, true },
 	});
 
-	// Update PID params:
+	// Update PID params according to settings:
 	_magnetic_heading_pid.set_pid (_magnetic_heading_pid_p, _magnetic_heading_pid_i, _magnetic_heading_pid_d);
 	_magnetic_track_pid.set_pid (_magnetic_track_pid_p, _magnetic_track_pid_i, _magnetic_track_pid_d);
 	_altitude_pid.set_pid (_altitude_pid_p, _altitude_pid_i, _altitude_pid_d);
@@ -233,7 +233,9 @@ FlightDirector::data_updated()
 
 	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), _dt));
 	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), _dt));
-	_disengage_ap.write (disengage);
+
+	if (disengage || _disengage_ap.is_nil())
+		_disengage_ap.write (disengage);
 
 	_dt = 0_s;
 }
