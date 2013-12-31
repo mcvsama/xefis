@@ -61,9 +61,9 @@ EICASWidget::EICASWidget (QWidget* parent):
 
 
 uint64_t
-EICASWidget::add_message (QString const& message)
+EICASWidget::add_message (QString const& message, QColor color)
 {
-	Message m { _id_generator++, message, false };
+	Message m { _id_generator++, message, false, color };
 	_shown_messages.push_back (m);
 
 	solve_scroll_and_cursor();
@@ -203,9 +203,9 @@ EICASWidget::paintEvent (QPaintEvent*)
 	{
 		Message const& message = _shown_messages[i + _scroll];
 		if (message.outdated)
-			painter.setPen (QPen (QColor (255, 255, 255)));
+			painter.setPen (QPen (Qt::cyan));
 		else
-			painter.setPen (QPen (QColor (255, 200, 50)));
+			painter.setPen (QPen (message.color));
 		painter.fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * i), Qt::AlignTop | Qt::AlignLeft, message.message);
 	}
 

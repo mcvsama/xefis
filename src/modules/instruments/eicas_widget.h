@@ -52,6 +52,7 @@ class EICASWidget:
 		uint64_t	id;
 		QString		message;
 		bool		outdated;
+		QColor		color;
 	};
 
   private:
@@ -65,7 +66,7 @@ class EICASWidget:
 	 * Add new message to show.
 	 */
 	uint64_t
-	add_message (QString const& message);
+	add_message (QString const& message, QColor color);
 
 	/**
 	 * Remove message identified by ID.
