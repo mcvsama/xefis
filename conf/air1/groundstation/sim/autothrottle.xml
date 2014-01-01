@@ -1,10 +1,28 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<!--module name='systems/autothrottle'>
+	<module name='systems/autothrottle'>
+		<settings>
+			<setting name='output.thrust.minimum' value='0.0'/>
+			<setting name='output.thrust.maximum' value='2500.0'/>
+			<setting name='ias.pid.p' value='2.0'/>
+			<setting name='ias.pid.i' value='0.5'/>
+			<setting name='ias.pid.d' value='0.0'/>
+			<setting name='ias-to-thrust-scale' value='10.0'/>
+		</settings>
 		<properties>
+			<directory path='/settings/autothrottle'>
+				<property name='cmd.speed-mode' path='/cmd/speed-mode'/>
+				<property name='cmd.thrust' path='/cmd/thrust'/>
+				<property name='cmd.ias' path='/cmd/ias'/>
+			</directory>
 			<directory path='/systems/autothrottle'>
+				<property name='output.thrust' path='/thrust'/>
+				<property name='disengage-at' path='/disengage-at'/>
+			</directory>
+			<directory path='/systems/adc'>
+				<property name='measured.ias' path='/speed/ias'/>
 			</directory>
 		</properties>
-	</module-->
+	</module>
 </xefis-include>
 

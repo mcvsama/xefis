@@ -5,31 +5,32 @@
 		<item stretch-factor='18'>
 			<layout type='vertical'>
 				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-L-RPM'>
+					<instrument name='instruments/radial-indicator' instance='engine-L-THR'>
 						<settings>
 							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='4000'/>
-							<setting name='value.maximum.warning' value='3500'/>
-							<setting name='value.maximum.critical' value='3900'/>
+							<setting name='value.minimum' value='-200'/>
+							<setting name='value.maximum' value='800'/>
+							<setting name='value.maximum.warning' value='750'/>
+							<setting name='value.maximum.critical' value='800'/>
 						</settings>
-						<properties path='//sensors/engines/left'>
-							<property name='value' path='/rpm'/>
-							<property name='value.normal' path='/rpm.cruise' default='2300'/>
+						<properties path='//sensors/engines/1'>
+							<property name='value' path='/thrust'/>
+							<property name='value.reference' path='/thrust.reference' default='520'/>
+							<property name='value.target' path='//input/main/axis/2'/>
 						</properties>
 					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-L-AMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-L-RPM'>
 						<settings>
-							<setting name='value.precision' value='1'/>
+							<setting name='value.modulo' value='10'/>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='45'/>
-							<setting name='value.maximum.warning' value='43'/>
-							<setting name='value.maximum.critical' value='45'/>
+							<setting name='value.maximum' value='3500'/>
+							<setting name='value.maximum.warning' value='3000'/>
+							<setting name='value.maximum.critical' value='3500'/>
 						</settings>
-						<properties path='//sensors/engines/left'>
-							<property name='value' path='/amps'/>
+						<properties path='//sensors/engines/1'>
+							<property name='value' path='/rpm'/>
 						</properties>
 					</instrument>
 				</item>
@@ -37,60 +38,45 @@
 					<instrument name='instruments/radial-indicator' instance='engine-L-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='150'/>
-							<setting name='value.maximum.warning' value='140'/>
-							<setting name='value.maximum.critical' value='150'/>
+							<setting name='value.maximum' value='900'/>
+							<setting name='value.maximum.warning' value='800'/>
+							<setting name='value.maximum.critical' value='900'/>
 						</settings>
-						<properties path='//sensors/engines/left'>
+						<properties path='//sensors/engines/1'>
 							<property name='value' path='/temperature'/>
 						</properties>
 					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<instrument name='instruments/linear-indicator' instance='engine-L-VOLT'>
+					<instrument name='instruments/linear-indicator' instance='engine-L-PITCH'>
 						<settings>
-							<setting name='value.minimum' value='10.0'/>
-							<setting name='value.maximum' value='13.0'/>
+							<setting name='value.minimum' value='9.0'/>
+							<setting name='value.maximum' value='27.0'/>
 							<setting name='value.digits' value='4'/>
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='false'/>
 						</settings>
-						<properties path='//sensors/engines/left'>
-							<property name='value' path='/esc.voltage' default='10.1'/>
+						<properties path='//sensors/engines/1'>
+							<property name='value' path='/pitch'/>
 						</properties>
 					</instrument>
 				</item>
-				<item stretch-factor='1'/>
-				<item stretch-factor='7'>
-					<instrument name='instruments/linear-indicator' instance='engine-L-ESC-TEMP'>
-						<settings>
-							<setting name='value.minimum' value='0.0'/>
-							<setting name='value.maximum' value='150.0'/>
-							<setting name='value.digits' value='3'/>
-							<setting name='value.precision' value='0'/>
-							<setting name='style.mirrored' value='false'/>
-						</settings>
-						<properties path='//sensors/engines/left'>
-							<property name='value' path='/esc.temperature' default='74'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='17'/>
+				<item stretch-factor='32'/>
 			</layout>
 		</item>
 		<item stretch-factor='4'>
 			<layout type='vertical'>
 				<item stretch-factor='9'>
-					<instrument name='instruments/label' instance='engine-RPM'>
-						<label>RPM</label>
+					<instrument name='instruments/label' instance='engine-THR'>
+						<label>THR</label>
 						<align>hcenter bottom</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<instrument name='instruments/label' instance='engine-AMP'>
-						<label>AMP</label>
+					<instrument name='instruments/label' instance='engine-RPM'>
+						<label>RPM</label>
 						<align>hcenter bottom</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
@@ -106,53 +92,45 @@
 				</item>
 				<item stretch-factor='1'/>
 				<item stretch-factor='10'>
-					<instrument name='instruments/label' instance='engine-ESC-VOLT'>
-						<label>VOLT</label>
+					<instrument name='instruments/label' instance='engine-ESC-PITCH'>
+						<label>PTCH</label>
 						<align>hcenter vcenter</align>
 						<color>#4bf</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
-				<item stretch-factor='1'/>
-				<item stretch-factor='7'>
-					<instrument name='instruments/label' instance='engine-ESC-TEMP'>
-						<label>ESCT</label>
-						<align>hcenter vcenter</align>
-						<color>#4bf</color>
-						<font-size>11</font-size>
-					</instrument>
-				</item>
-				<item stretch-factor='17'/>
+				<item stretch-factor='32'/>
 			</layout>
 		</item>
 		<item stretch-factor='18'>
 			<layout type='vertical'>
 				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-R-RPM'>
+					<instrument name='instruments/radial-indicator' instance='engine-R-THR'>
 						<settings>
 							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='4000'/>
-							<setting name='value.maximum.warning' value='3500'/>
-							<setting name='value.maximum.critical' value='3900'/>
+							<setting name='value.minimum' value='-200'/>
+							<setting name='value.maximum' value='800'/>
+							<setting name='value.maximum.warning' value='750'/>
+							<setting name='value.maximum.critical' value='800'/>
 						</settings>
-						<properties path='//sensors/engines/right'>
-							<property name='value' path='/rpm'/>
-							<property name='value.normal' path='/rpm.cruise' default='2300'/>
+						<properties path='//sensors/engines/2'>
+							<property name='value' path='/thrust'/>
+							<property name='value.reference' path='/thrust.reference' default='520'/>
+							<property name='value.target' path='//input/main/axis/2'/>
 						</properties>
 					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-R-AMP'>
+					<instrument name='instruments/radial-indicator' instance='engine-R-RPM'>
 						<settings>
-							<setting name='value.precision' value='1'/>
+							<setting name='value.modulo' value='10'/>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='45'/>
-							<setting name='value.maximum.warning' value='43'/>
-							<setting name='value.maximum.critical' value='45'/>
+							<setting name='value.maximum' value='3500'/>
+							<setting name='value.maximum.warning' value='3000'/>
+							<setting name='value.maximum.critical' value='3500'/>
 						</settings>
-						<properties path='//sensors/engines/right'>
-							<property name='value' path='/amps'/>
+						<properties path='//sensors/engines/2'>
+							<property name='value' path='/rpm'/>
 						</properties>
 					</instrument>
 				</item>
@@ -160,45 +138,30 @@
 					<instrument name='instruments/radial-indicator' instance='engine-R-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='150'/>
-							<setting name='value.maximum.warning' value='140'/>
-							<setting name='value.maximum.critical' value='150'/>
+							<setting name='value.maximum' value='900'/>
+							<setting name='value.maximum.warning' value='800'/>
+							<setting name='value.maximum.critical' value='900'/>
 						</settings>
-						<properties path='//sensors/engines/right'>
+						<properties path='//sensors/engines/2'>
 							<property name='value' path='/temperature'/>
 						</properties>
 					</instrument>
 				</item>
 				<item stretch-factor='10'>
-					<instrument name='instruments/linear-indicator' instance='engine-R-VOLT'>
+					<instrument name='instruments/linear-indicator' instance='engine-R-PITCH'>
 						<settings>
-							<setting name='value.minimum' value='10.0'/>
-							<setting name='value.maximum' value='13.0'/>
+							<setting name='value.minimum' value='9.0'/>
+							<setting name='value.maximum' value='27.0'/>
 							<setting name='value.digits' value='4'/>
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='true'/>
 						</settings>
-						<properties path='//sensors/engines/right'>
-							<property name='value' path='/esc.voltage' default='9.8'/>
+						<properties path='//sensors/engines/2'>
+							<property name='value' path='/pitch'/>
 						</properties>
 					</instrument>
 				</item>
-				<item stretch-factor='1'/>
-				<item stretch-factor='7'>
-					<instrument name='instruments/linear-indicator' instance='engine-R-ESC-TEMP'>
-						<settings>
-							<setting name='value.minimum' value='0.0'/>
-							<setting name='value.maximum' value='150.0'/>
-							<setting name='value.digits' value='3'/>
-							<setting name='value.precision' value='0'/>
-							<setting name='style.mirrored' value='true'/>
-						</settings>
-						<properties path='//sensors/engines/right'>
-							<property name='value' path='/esc.temperature' default='72'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='17'/>
+				<item stretch-factor='32'/>
 			</layout>
 		</item>
 		<item stretch-factor='2'/>
@@ -218,13 +181,13 @@
 							<message path='/systems/adc/speed/ias.serviceable' message='ADC IAS FAIL' fail-on='false'/>
 							<message path='/systems/adc/vertical-speed/serviceable' message='V/SPD FAIL' fail-on='false'/>
 							<message path='/systems/flight-director/serviceable' message='FD FAIL' fail-on='false'/>
-							<message path='/systems/nc/orientation/serviceable' message='NC ADI FAIL' fail-on='false'/>
-							<message path='/sensors/ahrs/serviceable' message='AHRS FAIL' fail-on='false'/>
+							<message path='/systems/nc/orientation/serviceable' message='NC ADI FAIL' fail-on='false' severity='critical'/>
+							<message path='/sensors/ahrs/serviceable' message='AHRS FAIL' fail-on='false' severity='critical'/>
 							<message path='/sensors/pressure/serviceable' message='STATIC PRESS FAIL' fail-on='false'/>
-							<message path='/sensors/gps/serviceable' message='GPS FAIL' fail-on='false'/>
+							<message path='/sensors/gps/serviceable' message='GPS FAIL' fail-on='false' severity='critical'/>
 							<message path='/sensors/airspeed/serviceable' message='PITOT FAIL' fail-on='false'/>
 							<message path='/sensors/radar-altimeter/serviceable' message='RA FAIL' fail-on='false'/>
-							<message path='/link/xbee/serviceable' message='LINK FAIL' fail-on='false'/>
+							<message path='/link/xbee/serviceable' message='LINK FAIL' fail-on='false' severity='critical'/>
 						</messages>
 					</instrument>
 				</item>

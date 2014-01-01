@@ -6,7 +6,7 @@
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
-		<!--include name='groundstation/hardware/joystick.xml'/-->
+		<include name='groundstation/hardware/joystick.xml'/>
 		<include name='groundstation/systems/state.xml'/>
 		<include name='groundstation/systems/afcs.xml'/>
 		<include name='groundstation/systems/adc.xml'/>

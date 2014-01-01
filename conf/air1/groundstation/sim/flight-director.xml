@@ -8,8 +8,8 @@
 				<property name='output.roll' path='/roll'/>
 			</directory>
 			<directory path='/settings/flight-director'>
-				<property name='orientation.pitch-limit.max' path='/limits/pitch.max' default='10 deg'/>
-				<property name='orientation.pitch-limit.min' path='/limits/pitch.min' default='-10 deg'/>
+				<property name='orientation.pitch-limit.maximum' path='/limits/pitch.max' default='5 deg'/>
+				<property name='orientation.pitch-limit.minimum' path='/limits/pitch.min' default='-5 deg'/>
 				<property name='orientation.roll-limit' path='/limits/roll' default='25 deg'/>
 				<property name='cmd.roll-mode' path='/cmd/roll-mode'/>
 				<property name='cmd.pitch-mode' path='/cmd/pitch-mode'/>

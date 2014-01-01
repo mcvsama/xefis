@@ -13,10 +13,19 @@
 			<dead-zone>0.016</dead-zone>
 			<power>1.4</power>
 		</axis>
+		<!-- Throttle -->
+		<axis id='2'>
+			<reverse/>
+			<output>
+				<minimum>-50</minimum>
+				<maximum>600</maximum>
+			</output>
+		</axis>
 	</module>
 	<module name='io/joystick' instance='pedals'>
 		<device>/dev/input/js0</device>
 		<path>/input/rudder</path>
+		<!-- Pedals -->
 		<axis id='2'>
 			<power>3</power>
 		</axis>
