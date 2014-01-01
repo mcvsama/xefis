@@ -32,7 +32,7 @@
 			<chunk>
 				<name>t2</name>
 				<type>float</type>
-				<node>/controls/engines/engine/throttle-2</node>
+				<node>/controls/engines/engine[1]/throttle</node>
 			</chunk>
 			<!--chunk>
 				<name>f</name>

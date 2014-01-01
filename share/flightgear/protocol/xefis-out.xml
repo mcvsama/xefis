@@ -209,25 +209,77 @@
 				<type>double</type>
 				<node>/controls/engines/engine/throttle</node>
 			</chunk>
+			<!-- Engine 1 -->
 			<chunk>
-				<name>epr</name>
+				<name>thrust1</name>
+				<type>double</type>
+				<node>/engines/engine/thrust_lb</node>
+			</chunk>
+			<chunk>
+				<name>rpm1</name>
+				<type>double</type>
+				<node>/engines/engine/rpm</node>
+			</chunk>
+			<chunk>
+				<name>pitch1</name>
+				<type>double</type>
+				<node>/engines/engine/thruster/pitch</node>
+			</chunk>
+			<chunk>
+				<name>epr1</name>
 				<type>double</type>
 				<node>/engines/engine/epr</node>
 			</chunk>
 			<chunk>
-				<name>n1</name>
+				<name>n1-1</name>
 				<type>double</type>
 				<node>/engines/engine/n1</node>
 			</chunk>
 			<chunk>
-				<name>n2</name>
+				<name>n2-1</name>
 				<type>double</type>
 				<node>/engines/engine/n2</node>
 			</chunk>
 			<chunk>
-				<name>egt</name>
+				<name>egt1</name>
 				<type>double</type>
 				<node>/engines/engine/egt-degf</node>
+			</chunk>
+			<!-- Engine 2 -->
+			<chunk>
+				<name>thrust2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/thrust_lb</node>
+			</chunk>
+			<chunk>
+				<name>rpm2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/rpm</node>
+			</chunk>
+			<chunk>
+				<name>pitch2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/thruster/pitch</node>
+			</chunk>
+			<chunk>
+				<name>epr2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/epr</node>
+			</chunk>
+			<chunk>
+				<name>n1-2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/n1</node>
+			</chunk>
+			<chunk>
+				<name>n2-2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/n2</node>
+			</chunk>
+			<chunk>
+				<name>egt2</name>
+				<type>double</type>
+				<node>/engines/engine[1]/egt-degf</node>
 			</chunk>
 			<!-- Wind -->
 			<chunk>
