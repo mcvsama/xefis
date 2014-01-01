@@ -99,10 +99,7 @@ UDP::got_udp_packet()
 		interfere (_receive_datagram);
 
 	if (_receive.configured())
-	{
 		_receive.write (std::string (_receive_datagram.data(), _receive_datagram.size()));
-		signal_data_updated();
-	}
 }
 
 

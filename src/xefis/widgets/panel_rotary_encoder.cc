@@ -55,12 +55,8 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_click_timer->setSingleShot (true);
 	_click_timer->setInterval (10);
 	QObject::connect (_click_timer.get(), &QTimer::timeout, [&]() {
-// TODO fix it - doesn't always work. Perhaps counting button should be used?
 		if (_click_property.configured())
-		{
 			_click_property.write (false);
-			signal_data_updated();
-		}
 	});
 
 	_rotate_up_timer = std::make_unique<QTimer>();
@@ -68,10 +64,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_rotate_up_timer->setInterval (10);
 	QObject::connect (_rotate_up_timer.get(), &QTimer::timeout, [&]() {
 		if (_rotate_up.configured())
-		{
 			_rotate_up.write (false);
-			signal_data_updated();
-		}
 	});
 
 	_rotate_down_timer = std::make_unique<QTimer>();
@@ -79,10 +72,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_rotate_down_timer->setInterval (10);
 	QObject::connect (_rotate_down_timer.get(), &QTimer::timeout, [&]() {
 		if (_rotate_down.configured())
-		{
 			_rotate_down.write (false);
-			signal_data_updated();
-		}
 	});
 }
 
@@ -228,7 +218,6 @@ PanelRotaryEncoder::mouseDoubleClickEvent (QMouseEvent*)
 	if (_click_property.configured())
 	{
 		_click_property.write (true);
-		signal_data_updated();
 		_click_timer->start();
 	}
 }
@@ -241,7 +230,6 @@ PanelRotaryEncoder::write()
 	_rotate_b.write (_value & 1);
 
 	update();
-	signal_data_updated();
 }
 
 

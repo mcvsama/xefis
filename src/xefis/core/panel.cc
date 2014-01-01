@@ -81,13 +81,6 @@ Panel::unregister_panel_widget (PanelWidget* panel_widget)
 
 
 void
-Panel::signal_data_updated()
-{
-	_application->data_updated();
-}
-
-
-void
 Panel::read()
 {
 	for (PanelWidget* pw: _panel_widgets)

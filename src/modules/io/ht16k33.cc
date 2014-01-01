@@ -381,11 +381,8 @@ HT16K33::pool_keys()
 		KeyMatrix::DataArray& key_array = _key_matrix.array();
 		_i2c_device.read_register (KeyMatrixRegister, key_array);
 
-		bool generated_change = false;
 		for (auto sw: _switches)
-			generated_change = generated_change || sw->key_matrix_updated (_key_matrix);
-		if (generated_change)
-			signal_data_updated();
+			sw->key_matrix_updated (_key_matrix);
 	});
 }
 

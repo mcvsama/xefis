@@ -161,7 +161,6 @@ PCA9685::reinitialize()
 	_serviceable.write (false);
 	_i2c_device.close();
 	_initialization_timer->start();
-	signal_data_updated();
 }
 
 

@@ -290,8 +290,6 @@ FlightGearIO::invalidate_all()
 		if (property->valid())
 			property->set_nil();
 	}
-
-	signal_data_updated();
 }
 
 
@@ -399,8 +397,6 @@ FlightGearIO::read_input()
 		_engine_1_egt_degc.write (5.0 / 9.0 * (*_engine_1_egt_degc - 32.0));
 	if (_engine_2_egt_degc.valid())
 		_engine_2_egt_degc.write (5.0 / 9.0 * (*_engine_2_egt_degc - 32.0));
-
-	signal_data_updated();
 
 	_timeout_timer->start();
 }

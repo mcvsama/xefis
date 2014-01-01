@@ -799,7 +799,6 @@ Link::send_output()
 		std::string s;
 		s.insert (s.end(), _output_blob.begin(), _output_blob.end());
 		_output.write (s);
-		signal_data_updated();
 	}
 }
 
@@ -860,7 +859,6 @@ Link::eat (Blob& blob)
 	Blob _tmp_input_magic;
 	_tmp_input_magic.resize (_magic_size);
 
-	bool applied = false;
 	while (blob.size() > _magic_size + 1)
 	{
 		auto skip_byte_and_retry = [&]() -> void
@@ -895,7 +893,6 @@ Link::eat (Blob& blob)
 				Blob::size_type valid_bytes = std::distance (blob.begin(), e);
 				blob.erase (blob.begin(), e);
 				packet->apply();
-				applied = true;
 
 				if (_valid_packets.configured())
 					_valid_packets.write (*_valid_packets + 1);
@@ -922,9 +919,6 @@ Link::eat (Blob& blob)
 			}
 		});
 	}
-
-	if (applied)
-		signal_data_updated();
 }
 
 

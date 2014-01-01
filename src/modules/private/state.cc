@@ -217,7 +217,6 @@ State::prepare_efis_settings()
 		}
 
 		solve_minimums();
-		signal_data_updated();
 	});
 
 	make_switch (_mcp_mins_mode, [this]() {
@@ -250,7 +249,6 @@ State::prepare_efis_settings()
 			_qnh_setting += QNHinHgStep * delta;
 
 		solve_pressure();
-		signal_data_updated();
 	});
 
 	make_toggle (_mcp_qnh_hpa, _setting_pressure_display_hpa);
@@ -275,8 +273,6 @@ State::prepare_efis_settings()
 
 		range_nm = Xefis::limit (range_nm, 1, 50);
 		_setting_hsi_range.write (1_nm * range_nm);
-
-		signal_data_updated();
 	});
 
 	make_switch (_mcp_range_ctr, [this]() {
@@ -293,7 +289,6 @@ State::prepare_efis_settings()
 			course = 360;
 		_mcp_course_display.write (course);
 		solve_course();
-		signal_data_updated();
 	});
 
 	make_switch (_mcp_course_hide, [this]() {
@@ -352,7 +347,6 @@ State::solve_pressure()
 {
 	_qnh_setting = Xefis::limit (_qnh_setting, QNHRange);
 	_setting_pressure_qnh.write (_qnh_setting);
-	signal_data_updated();
 }
 
 
@@ -371,10 +365,7 @@ State::make_switch (Observable<Xefis::PropertyBoolean>& bool_observable, std::fu
 {
 	bool_observable.set_callback ([callback,this](Xefis::PropertyBoolean& prop) {
 		if (*prop)
-		{
 			callback();
-			signal_data_updated();
-		}
 	});
 }
 
@@ -384,10 +375,7 @@ State::make_toggle (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::
 {
 	bool_observable.set_callback ([&](Xefis::PropertyBoolean& prop) {
 		if (*prop)
-		{
 			target_switch.write (!*target_switch);
-			signal_data_updated();
-		}
 	});
 }
 
@@ -397,10 +385,7 @@ State::make_int_writer (Observable<Xefis::PropertyBoolean>& bool_observable, Xef
 {
 	bool_observable.set_callback ([&target_property,value,this](Xefis::PropertyBoolean& prop) {
 		if (*prop)
-		{
 			target_property.write (value);
-			signal_data_updated();
-		}
 	});
 }
 

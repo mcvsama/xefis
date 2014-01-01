@@ -106,25 +106,18 @@ ETSAirspeed::reinitialize()
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.
 	_initialization_timer->start();
-
-	signal_data_updated();
 }
 
 
 void
 ETSAirspeed::read()
 {
-	bool updated = false;
-
 	guard ([&]() {
 		uint16_t raw_value = _i2c_device.read_register<uint16_t> (ValueRegister);
 		boost::endian::little_to_native (raw_value);
 
 		if (!_serviceable.read (false))
-		{
-			updated = true;
 			_serviceable.write (true);
-		}
 
 		switch (_stage)
 		{
@@ -144,13 +137,9 @@ ETSAirspeed::read()
 				if (raw_value >= _offset)
 					speed = 1_mps * (ValueScale * std::sqrt (1.0f * (raw_value - _offset)));
 				_airspeed.write (1_kt * _airspeed_smoother.process (speed.kt(), _airspeed_read_interval));
-				updated = true;
 				break;
 		}
 	});
-
-	if (updated)
-		signal_data_updated();
 }
 
 

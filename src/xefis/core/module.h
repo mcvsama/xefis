@@ -152,20 +152,6 @@ class Module: private Noncopyable
 	find_factory (std::string const& name);
 
 	/**
-	 * Reset data update flag. When module calls signal_data_updated(),
-	 * the flag is set to true. It can be read with signalled_data_update().
-	 */
-	void
-	reset_data_update_flag() noexcept;
-
-	/**
-	 * Return true if the module has signalled data update since last call
-	 * to reset_data_update_flag().
-	 */
-	bool
-	signalled_data_update() const noexcept;
-
-	/**
 	 * Dumps module info to the log.
 	 */
 	void
@@ -194,12 +180,6 @@ class Module: private Noncopyable
 	 */
 	bool
 	has_setting (QString const& name);
-
-	/**
-	 * Signal that this module has updated property tree.
-	 */
-	void
-	signal_data_updated();
 
 	/**
 	 * Access NavaidStorage.
@@ -240,7 +220,6 @@ class Module: private Noncopyable
 	std::string								_name;
 	std::string								_instance;
 	Xefis::Logger							_logger;
-	bool									_signalled_data_update	= false;
 };
 
 
@@ -304,20 +283,6 @@ inline std::string const&
 Module::instance() const noexcept
 {
 	return _instance;
-}
-
-
-inline void
-Module::reset_data_update_flag() noexcept
-{
-	_signalled_data_update = false;
-}
-
-
-inline bool
-Module::signalled_data_update() const noexcept
-{
-	return _signalled_data_update;
 }
 
 } // namespace Xefis

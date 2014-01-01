@@ -308,7 +308,6 @@ AutomatedFlightControlSystem::solve_mode()
 	_cmd_fpa.write (0.0_deg);//TODO
 
 	update_fma();
-	signal_data_updated();
 }
 
 
@@ -337,8 +336,6 @@ AutomatedFlightControlSystem::update_fma()
 	_fma_speed_mode.write (speed_mode_string (_speed_mode));
 	_fma_roll_mode.write (roll_mode_string (_roll_mode));
 	_fma_pitch_mode.write (pitch_mode_string (_pitch_mode));
-
-	signal_data_updated();
 }
 
 
