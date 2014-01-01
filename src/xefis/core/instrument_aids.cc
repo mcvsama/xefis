@@ -54,7 +54,7 @@ InstrumentAids::get_token (QPaintDevice* device)
 	_painter.setRenderHint (QPainter::TextAntialiasing, true);
 	_painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
 	_painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-	_painter.set_font_position_correction ({ 0.0, 0.035 });
+	_painter.set_font_position_correction ({ 0.0, 0.04 });
 	return token;
 }
 
