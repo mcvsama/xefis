@@ -46,7 +46,7 @@ namespace Xefis {
 Application* Application::_application = nullptr;
 
 
-Application::Application (int argc, char** argv):
+Application::Application (int& argc, char** argv):
 	QApplication (argc, argv)
 {
 	if (_application)
@@ -70,15 +70,11 @@ Application::Application (int argc, char** argv):
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
 	_work_performer = std::make_unique<WorkPerformer> (Services::detected_cores());
 
-	_postponed_update = new QTimer (this);
-	_postponed_update->setSingleShot (true);
-	_postponed_update->setInterval (1000.f / 30.f);
-	QObject::connect (_postponed_update, SIGNAL (timeout()), this, SLOT (data_updated()));
-
-	_offline_updater = new QTimer (this);
-	_offline_updater->setInterval (100.f);
-	QObject::connect (_offline_updater, SIGNAL (timeout()), this, SLOT (offline_data_updated()));
-	_offline_updater->start();
+	_data_updater = new QTimer (this);
+	_data_updater->setInterval (10.f);
+	_data_updater->setSingleShot (false);
+	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
+	_data_updater->start();
 
 	signal (SIGHUP, s_quit);
 
@@ -142,40 +138,9 @@ Application::quit()
 void
 Application::data_updated()
 {
-	postEvent (this, new DataUpdatedEvent (Time::now()));
-	// Restart offline timer:
-	_offline_updater->start();
-}
-
-
-void
-Application::offline_data_updated()
-{
-	postEvent (this, new DataUpdatedEvent (Time::now()));
-}
-
-
-void
-Application::postponed_data_updated()
-{
-	if (!_postponed_update->isActive())
-		_postponed_update->start();
-}
-
-
-bool
-Application::event (QEvent* event)
-{
-	DataUpdatedEvent* data_update_event = dynamic_cast<DataUpdatedEvent*> (event);
-
-	if (data_update_event)
-	{
-		_module_manager->data_updated (data_update_event->time());
-		_window_manager->data_updated (data_update_event->time());
-		return true;
-	}
-	else
-		return QApplication::event (event);
+	Time t = Time::now();
+	_module_manager->data_updated (t);
+	_window_manager->data_updated (t);
 }
 
 

@@ -42,18 +42,6 @@ class Application: public QApplication
 {
 	Q_OBJECT
 
-	class DataUpdatedEvent: public QEvent
-	{
-	  public:
-		explicit DataUpdatedEvent (Time);
-
-		Time
-		time() const;
-
-	  private:
-		Time _time;
-	};
-
   public:
 	class NonValuedArgumentException: public Exception
 	{
@@ -75,7 +63,7 @@ class Application: public QApplication
 
   public:
 	// Ctor
-	Application (int argc, char** argv);
+	Application (int& argc, char** argv);
 
 	// Dtor
 	~Application();
@@ -150,31 +138,12 @@ class Application: public QApplication
 	std::string
 	option (Option) const;
 
-  public slots:
+  private slots:
 	/**
-	 * Indicate that the data in property tree has been updated
-	 * from an IO module.
+	 * Called by data updater. Causes call of data_updated() on all modules.
 	 */
 	void
 	data_updated();
-
-	/**
-	 * Called by offline data updater. Similar to data updated,
-	 * but will not restart offline timer.
-	 */
-	void
-	offline_data_updated();
-
-	/**
-	 * Indicate that the data was updated, but the update signal
-	 * can be send later.
-	 */
-	void
-	postponed_data_updated();
-
-  protected:
-	bool
-	event (QEvent*) override;
 
   private:
 	/**
@@ -199,8 +168,7 @@ class Application: public QApplication
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<WorkPerformer>			_work_performer;
-	QTimer*							_postponed_update	= nullptr;
-	QTimer*							_offline_updater	= nullptr;
+	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
 };
 
@@ -209,20 +177,6 @@ inline
 Application::NonValuedArgumentException::NonValuedArgumentException (std::string const& argument):
 	Exception ("argument '" + argument + "' doesn't take any values")
 { }
-
-
-inline
-Application::DataUpdatedEvent::DataUpdatedEvent (Time time):
-	QEvent (QEvent::User),
-	_time (time)
-{ }
-
-
-inline Time
-Application::DataUpdatedEvent::time() const
-{
-	return _time;
-}
 
 
 inline Accounting*
