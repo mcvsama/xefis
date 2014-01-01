@@ -92,7 +92,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 
 	_ias_computer.set_callback (std::bind (&AirDataComputer::compute_ias, this));
 	_ias_computer.add_depending_smoothers ({
-		&_speed_ias_smoother
+		&_speed_ias_smoother,
 	});
 	_ias_computer.observe ({
 		&_ias,
