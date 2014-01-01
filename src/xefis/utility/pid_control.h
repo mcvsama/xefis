@@ -22,6 +22,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/range.h>
+#include <xefis/utility/smoother.h>
 
 
 namespace Xefis {
@@ -37,10 +38,16 @@ template<class tValueType>
 	  public:
 		typedef tValueType ValueType;
 		typedef double ParamType;
-		typedef double TimeType;
 
 	  public:
 		PIDControl (ParamType p, ParamType i, ParamType d, ValueType target);
+
+		/**
+		 * Enable/disable output smoothing.
+		 * When enabling, smoothing_time is used to configure internal output smoother.
+		 */
+		void
+		set_output_smoothing (bool enable, Time smoothing_time = 0_s);
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
@@ -151,7 +158,7 @@ template<class tValueType>
 		 * Input value should be normalized to [-1..1].
 		 */
 		ValueType
-		process (ValueType input, TimeType dt) noexcept;
+		process (ValueType input, Time dt) noexcept;
 
 		/**
 		 * Return current controller output value.
@@ -171,20 +178,46 @@ template<class tValueType>
 		void
 		reset() noexcept;
 
+		/**
+		 * Return internal input smoother.
+		 */
+		Smoother<ValueType>&
+		input_smoother() noexcept;
+
+		/**
+		 * Return internal input smoother.
+		 */
+		Smoother<ValueType> const&
+		input_smoother() const noexcept;
+
+		/**
+		 * Return internal output smoother.
+		 */
+		Smoother<ValueType>&
+		output_smoother() noexcept;
+
+		/**
+		 * Return internal output smoother.
+		 */
+		Smoother<ValueType> const&
+		output_smoother() const noexcept;
+
 	  private:
-		bool				_winding		= false;
-		ValueType			_target			= ValueType();
-		ValueType			_output			= ValueType();
-		ValueType			_previous_error	= ValueType();
-		ValueType			_integral		= ValueType();
-		ValueType			_derivative		= ValueType();
-		ParamType			_p				= 0.0;
-		ParamType			_i				= 0.0;
-		Range<ValueType>	_i_limit		= { -1.0, +1.0 };
-		ParamType			_d				= 0.0;
-		ParamType			_gain			= 1.0;
-		ParamType			_error_power	= 1.0;
-		Range<ValueType>	_output_limit	= { -std::numeric_limits<ValueType>::max(), std::numeric_limits<ValueType>::max() };
+		bool				_winding					= false;
+		bool				_output_smoothing_enabled	= false;
+		Smoother<ValueType>	_output_smoother			= 1_ms;
+		ValueType			_target						= ValueType();
+		ValueType			_output						= ValueType();
+		ValueType			_previous_error				= ValueType();
+		ValueType			_integral					= ValueType();
+		ValueType			_derivative					= ValueType();
+		ParamType			_p							= 0.0;
+		ParamType			_i							= 0.0;
+		Range<ValueType>	_i_limit					= { -1.0, +1.0 };
+		ParamType			_d							= 0.0;
+		ParamType			_gain						= 1.0;
+		ParamType			_error_power				= 1.0;
+		Range<ValueType>	_output_limit				= { -std::numeric_limits<ValueType>::max(), std::numeric_limits<ValueType>::max() };
 	};
 
 
@@ -197,6 +230,16 @@ template<class T>
 		_d (d)
 	{
 		reset();
+	}
+
+
+template<class T>
+	inline void
+	PIDControl<T>::set_output_smoothing (bool enable, Time smoothing_time)
+	{
+		_output_smoothing_enabled = enable;
+		if (enable)
+			_output_smoother.set_smoothing_time (smoothing_time);
 	}
 
 
@@ -340,7 +383,7 @@ template<class T>
 
 template<class T>
 	inline typename PIDControl<T>::ValueType
-	PIDControl<T>::process (ValueType measured_value, TimeType dt) noexcept
+	PIDControl<T>::process (ValueType measured_value, Time dt) noexcept
 	{
 		ValueType error;
 		if (_winding)
@@ -351,9 +394,9 @@ template<class T>
 		}
 		else
 			error = _target - measured_value;
-		_integral += error * dt;
+		_integral += error * dt.s();
 		_integral = limit<ParamType> (_integral, _i_limit);
-		_derivative = (error - _previous_error) / dt;
+		_derivative = (error - _previous_error) / dt.s();
 		if (!std::isfinite (_derivative))
 			_derivative = 0.0;
 		_output = limit<ValueType> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +
@@ -361,6 +404,10 @@ template<class T>
 											 _d * _derivative),
 									_output_limit);
 		_previous_error = error;
+
+		if (_output_smoothing_enabled)
+			_output = _output_smoother.process (_output, dt);
+
 		return _output;
 	}
 
@@ -389,6 +436,22 @@ template<class T>
 		_previous_error = ValueType();
 		_integral = ValueType();
 		_derivative = ValueType();
+	}
+
+
+template<class T>
+	inline Smoother<typename PIDControl<T>::ValueType>&
+	PIDControl<T>::output_smoother() noexcept
+	{
+		return _output_smoother;
+	}
+
+
+template<class T>
+	inline Smoother<typename PIDControl<T>::ValueType> const&
+	PIDControl<T>::output_smoother() const noexcept
+	{
+		return _output_smoother;
 	}
 
 } // namespace Xefis

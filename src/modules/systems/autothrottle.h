@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -48,29 +49,29 @@ class Autothrottle: public Xefis::Module
 
   private:
 	void
+	compute_thrust();
+
+	void
 	speed_mode_changed();
 
   private:
-	Time						_dt							= 0_s;
-	Xefis::PIDControl<double>	_thrust_pid;
 	Xefis::PIDControl<double>	_ias_pid;
-	Xefis::Smoother<double>		_output_throttle_smoother	= 250_ms;
-	double						_computed_output_throttle	= 0.0;
-	SpeedMode					_speed_mode					= SpeedMode::None;
-	double						_thrust_pid_p				= 1.0;
-	double						_thrust_pid_i				= 0.1;
-	double						_thrust_pid_d				= 0.0;
-	double						_ias_pid_p					= 1.0;
-	double						_ias_pid_i					= 0.1;
-	double						_ias_pid_d					= 0.0;
-	double						_ias_to_throttle_scale		= 1.0;
+	Xefis::PropertyObserver		_thrust_computer;
+	double						_computed_output_thrust	= 0.0;
+	SpeedMode					_speed_mode				= SpeedMode::None;
+	double						_output_thrust_minimum	= 0.0;
+	double						_output_thrust_maximum	= 1.0;
+	double						_ias_pid_p				= 1.0;
+	double						_ias_pid_i				= 0.1;
+	double						_ias_pid_d				= 0.0;
+	double						_ias_to_thrust_scale	= 1.0;
+	Xefis::Range<double>		_output_thrust_extent;
 	// Input:
 	Xefis::PropertyInteger		_cmd_speed_mode;
 	Xefis::PropertyFloat		_cmd_thrust;
 	Xefis::PropertySpeed		_cmd_ias;
-	Xefis::PropertyFloat		_measured_thrust;
 	Xefis::PropertySpeed		_measured_ias;
-	Xefis::PropertyFloat		_output_throttle;
+	Xefis::PropertyFloat		_output_thrust;
 	Xefis::PropertyBoolean		_disengage_at;
 };
 
