@@ -102,7 +102,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='button' top-label='A/T' click-property='/panels/mcp/at' led-property='/panels/mcp/at' led-color='amber'/>
+									<widget type='button' top-label='A/T' click-property='/panels/mcp/at' led-property='/panels/mcp/led/at' led-color='amber'/>
 								</item>
 								<stretch/>
 								<item>

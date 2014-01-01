@@ -1,6 +1,11 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/afcs'>
+		<settings>
+			<setting name='default.speed' value='112 kt'/>
+			<setting name='default.heading' value='0 deg'/>
+			<setting name='default.altitude' value='3000 ft'/>
+		</settings>
 		<properties>
 			<directory path='/panels/mcp'>
 				<property name='button.ap' path='/ap'/>
@@ -41,6 +46,7 @@
 			</directory>
 			<directory path='/panels/mcp/led'>
 				<property name='led.ap' path='/ap'/>
+				<property name='led.at' path='/at'/>
 				<property name='led.att' path='/att'/>
 				<property name='led.speed.sel' path='/speed-sel'/>
 				<property name='led.speed.hold' path='/speed-hold'/>
@@ -57,13 +63,16 @@
 			<directory path='/settings/flight-director/cmd'>
 				<property name='cmd.roll-mode' path='/roll-mode'/>
 				<property name='cmd.pitch-mode' path='/pitch-mode'/>
-				<property name='cmd.ias' path='/ias'/>
 				<property name='cmd.magnetic-heading-track' path='/magnetic-heading-track'/>
 				<property name='cmd.altitude' path='/altitude'/>
 				<property name='cmd.vertical-speed' path='/vertical-speed'/>
 				<property name='cmd.fpa' path='/fpa'/>
 			</directory>
-			<property name='fbw.mode' path='/settings/fly-by-wire/mode'/>
+			<directory path='/settings/autothrottle/cmd'>
+				<property name='cmd.ias' path='/ias'/>
+			</directory>
+			<property name='fbw.attitude-mode' path='/settings/fly-by-wire/attitude-mode'/>
+			<property name='fbw.throttle-mode' path='/settings/fly-by-wire/throttle-mode'/>
 			<directory path='/systems/afcs/fma'>
 				<property name='fma.control-hint' path='/control-hint'/>
 				<property name='fma.speed-mode' path='/speed-mode'/>

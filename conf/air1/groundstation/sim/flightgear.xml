@@ -29,10 +29,20 @@
 					<!-- slip-skid -->
 					<property name='slip-skid' path='/slip-skid/slip-skid'/>
 					<!-- engine -->
-					<property name='engine-n1' path='/engine/n1'/>
-					<property name='engine-n2' path='/engine/n2'/>
-					<property name='engine-egt' path='/engine/egt'/>
-					<property name='engine-epr' path='/engine/epr'/>
+					<property name='engine.1.thrust' path='/engines/1/thrust'/>
+					<property name='engine.1.rpm' path='/engines/1/rpm'/>
+					<property name='engine.1.n1' path='/engines/1/n1'/>
+					<property name='engine.1.n2' path='/engines/1/n2'/>
+					<property name='engine.1.egt' path='/engines/1/temperature'/>
+					<property name='engine.1.epr' path='/engines/1/epr'/>
+					<property name='engine.1.pitch' path='/engines/1/pitch'/>
+					<property name='engine.2.thrust' path='/engines/2/thrust'/>
+					<property name='engine.2.rpm' path='/engines/2/rpm'/>
+					<property name='engine.2.n1' path='/engines/2/n1'/>
+					<property name='engine.2.n2' path='/engines/2/n2'/>
+					<property name='engine.2.egt' path='/engines/2/temperature'/>
+					<property name='engine.2.epr' path='/engines/2/epr'/>
+					<property name='engine.2.pitch' path='/engines/2/pitch'/>
 				</directory>
 				<directory path='/other/fgdata'>
 					<property name='gs' path='/speed/ground-speed'/>
@@ -66,6 +76,8 @@
 				<property name='ailerons' path='/ailerons'/>
 				<property name='elevator' path='/elevator'/>
 				<property name='rudder' path='/rudder'/>
+				<property name='throttle.1' path='/throttle'/>
+				<property name='throttle.2' path='/throttle'/>
 			</properties>
 		</output>
 	</module>
