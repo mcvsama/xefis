@@ -51,7 +51,7 @@ class RadialIndicator: public Xefis::Instrument
 	// Properties:
 	Xefis::PropertyFloat					_value;
 	Xefis::PropertyFloat					_value_target;
-	Xefis::PropertyFloat					_value_normal;
+	Xefis::PropertyFloat					_value_reference;
 };
 
 #endif

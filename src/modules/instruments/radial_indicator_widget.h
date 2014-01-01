@@ -67,7 +67,7 @@ class RadialIndicatorWidget:
 	set_critical_value (Optional<double>);
 
 	void
-	set_normal_value (Optional<double>);
+	set_reference_value (Optional<double>);
 
 	void
 	set_target_value (Optional<double>);
@@ -91,11 +91,11 @@ class RadialIndicatorWidget:
   private:
 	Xefis::Range<double>		_range				= { 0.f, 1.f };
 	int							_precision			= 0;
-	unsigned int				_modulo				= 0;
+	int							_modulo				= 0;
 	Optional<double>			_value;
 	Optional<double>			_warning_value;
 	Optional<double>			_critical_value;
-	Optional<double>			_normal_value;
+	Optional<double>			_reference_value;
 	Optional<double>			_target_value;
 };
 
@@ -149,9 +149,9 @@ RadialIndicatorWidget::set_critical_value (Optional<double> critical_value)
 
 
 inline void
-RadialIndicatorWidget::set_normal_value (Optional<double> normal_value)
+RadialIndicatorWidget::set_reference_value (Optional<double> reference_value)
 {
-	_normal_value = normal_value;
+	_reference_value = reference_value;
 	update();
 }
 

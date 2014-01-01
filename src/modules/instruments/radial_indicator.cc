@@ -53,7 +53,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 	parse_properties (config, {
 		{ "value", _value, true },
 		{ "value.target", _value_target, false },
-		{ "value.normal", _value_normal, false },
+		{ "value.reference", _value_reference, false },
 	});
 }
 
@@ -69,6 +69,6 @@ RadialIndicator::data_updated()
 	_widget->set_warning_value (_value_maximum_warning);
 	_widget->set_critical_value (_value_maximum_critical);
 	_widget->set_target_value (_value_target.get_optional());
-	_widget->set_normal_value (_value_normal.get_optional());
+	_widget->set_reference_value (_value_reference.get_optional());
 }
 
