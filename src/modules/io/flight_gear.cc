@@ -76,10 +76,20 @@ struct FGInputData
 	FGDouble	slip_skid_g;					// ss
 	FGDouble	static_air_temperature_K;		// tmp
 	FGDouble	engine_throttle_pct;			// thr
-	FGDouble	engine_epr;						// epr
-	FGDouble	engine_n1_pct;					// n1
-	FGDouble	engine_n2_pct;					// n2
-	FGDouble	engine_egt_degc;				// egt
+	FGDouble	engine_1_thrust;				// thrust1
+	FGDouble	engine_1_rpm;					// rpm1
+	FGDouble	engine_1_pitch;					// pitch1
+	FGDouble	engine_1_epr;					// epr1
+	FGDouble	engine_1_n1_pct;				// n1-1
+	FGDouble	engine_1_n2_pct;				// n2-1
+	FGDouble	engine_1_egt_degc;				// egt1
+	FGDouble	engine_2_thrust;				// thrust2
+	FGDouble	engine_2_rpm;					// rpm2
+	FGDouble	engine_2_pitch;					// pitch2
+	FGDouble	engine_2_epr;					// epr2
+	FGDouble	engine_2_n1_pct;				// n1-2
+	FGDouble	engine_2_n2_pct;				// n2-2
+	FGDouble	engine_2_egt_degc;				// egt2
 	FGDouble	wind_from_magnetic_heading_deg;	// wfh
 	FGDouble	wind_tas_kt;					// ws
 }
@@ -148,10 +158,20 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "dme-distance", _dme_distance, false },
 						{ "static-air-temperature", _static_air_temperature, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
-						{ "engine-epr", _engine_epr, false },
-						{ "engine-n1", _engine_n1_pct, false },
-						{ "engine-n2", _engine_n2_pct, false },
-						{ "engine-egt", _engine_egt_degc, false },
+						{ "engine.1.thrust", _engine_1_thrust, false },
+						{ "engine.1.rpm", _engine_1_rpm, false },
+						{ "engine.1.pitch", _engine_1_pitch, false },
+						{ "engine.1.epr", _engine_1_epr, false },
+						{ "engine.1.n1", _engine_1_n1_pct, false },
+						{ "engine.1.n2", _engine_1_n2_pct, false },
+						{ "engine.1.egt", _engine_1_egt_degc, false },
+						{ "engine.2.thrust", _engine_2_thrust, false },
+						{ "engine.2.rpm", _engine_2_rpm, false },
+						{ "engine.2.pitch", _engine_2_pitch, false },
+						{ "engine.2.epr", _engine_2_epr, false },
+						{ "engine.2.n1", _engine_2_n1_pct, false },
+						{ "engine.2.n2", _engine_2_n2_pct, false },
+						{ "engine.2.egt", _engine_2_egt_degc, false },
 						{ "position-latitude", _position_lat, false },
 						{ "position-longitude", _position_lng, false },
 						{ "position-amsl", _position_amsl, false },
@@ -244,10 +264,20 @@ FlightGearIO::invalidate_all()
 		&_dme_distance,
 		&_static_air_temperature,
 		&_engine_throttle_pct,
-		&_engine_epr,
-		&_engine_n1_pct,
-		&_engine_n2_pct,
-		&_engine_egt_degc,
+		&_engine_1_thrust,
+		&_engine_1_rpm,
+		&_engine_1_pitch,
+		&_engine_1_epr,
+		&_engine_1_n1_pct,
+		&_engine_1_n2_pct,
+		&_engine_1_egt_degc,
+		&_engine_2_thrust,
+		&_engine_2_rpm,
+		&_engine_2_pitch,
+		&_engine_2_epr,
+		&_engine_2_n1_pct,
+		&_engine_2_n2_pct,
+		&_engine_2_egt_degc,
 		&_position_lat,
 		&_position_lng,
 		&_position_amsl,
@@ -322,10 +352,20 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (slip_skid_g);
 		ASSIGN (K,    static_air_temperature);
 		ASSIGN_UNITLESS (engine_throttle_pct);
-		ASSIGN_UNITLESS (engine_epr);
-		ASSIGN_UNITLESS (engine_n1_pct);
-		ASSIGN_UNITLESS (engine_n2_pct);
-		ASSIGN_UNITLESS (engine_egt_degc);
+		ASSIGN_UNITLESS (engine_1_thrust);
+		ASSIGN_UNITLESS (engine_1_rpm);
+		ASSIGN_UNITLESS (engine_1_pitch);
+		ASSIGN_UNITLESS (engine_1_epr);
+		ASSIGN_UNITLESS (engine_1_n1_pct);
+		ASSIGN_UNITLESS (engine_1_n2_pct);
+		ASSIGN_UNITLESS (engine_1_egt_degc);
+		ASSIGN_UNITLESS (engine_2_thrust);
+		ASSIGN_UNITLESS (engine_2_rpm);
+		ASSIGN_UNITLESS (engine_2_pitch);
+		ASSIGN_UNITLESS (engine_2_epr);
+		ASSIGN_UNITLESS (engine_2_n1_pct);
+		ASSIGN_UNITLESS (engine_2_n2_pct);
+		ASSIGN_UNITLESS (engine_2_egt_degc);
 		ASSIGN (deg,  wind_from_magnetic_heading);
 		ASSIGN (kt,   wind_tas);
 
@@ -355,8 +395,10 @@ FlightGearIO::read_input()
 	if (_altitude_agl.valid() && *_altitude_agl > 2500_ft)
 		_altitude_agl.set_nil();
 	// Convert EGT from °F to °C:
-	if (_engine_egt_degc.valid())
-		_engine_egt_degc.write (5.f / 9.f * (*_engine_egt_degc - 32.f));
+	if (_engine_1_egt_degc.valid())
+		_engine_1_egt_degc.write (5.0 / 9.0 * (*_engine_1_egt_degc - 32.0));
+	if (_engine_2_egt_degc.valid())
+		_engine_2_egt_degc.write (5.0 / 9.0 * (*_engine_2_egt_degc - 32.0));
 
 	signal_data_updated();
 
