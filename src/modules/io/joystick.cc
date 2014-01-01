@@ -69,6 +69,8 @@ JoystickInput::Axis::set_value (float value)
 	value *= scale;
 	// Power:
 	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
+	// Renormalize from standard [-1.0, 1.0]:
+	value = Xefis::renormalize (value, { -1.0, 1.0 }, { output_minimum, output_maximum });
 
 	prop.write (value);
 }
@@ -107,32 +109,32 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 			unsigned int id = e.attribute ("id").toUInt();
 			if (id < _axes.size())
 			{
-				float center = 0.f;
-				float dead_zone = 0.f;
-				float reverse = 1.f;
-				float scale = 1.f;
-				float power = 1.f;
+				auto axis = std::make_shared<Axis>();
 
 				for (QDomElement& v: e)
 				{
 					if (v == "center")
-						center = v.text().toFloat();
+						axis->center = v.text().toFloat();
 					else if (v == "dead-zone")
-						dead_zone = v.text().toFloat();
+						axis->dead_zone = v.text().toFloat();
 					else if (v == "reverse")
-						reverse = -1.f;
+						axis->reverse = -1.f;
 					else if (v == "scale")
-						scale = v.text().toFloat();
+						axis->scale = v.text().toFloat();
 					else if (v == "power")
-						power = v.text().toFloat();
+						axis->power = v.text().toFloat();
+					else if (v == "output")
+					{
+						for (QDomElement& w: v)
+						{
+							if (w == "minimum")
+								axis->output_minimum = w.text().toFloat();
+							else if (w == "maximum")
+								axis->output_maximum = w.text().toFloat();
+						}
+					}
 				}
 
-				auto axis = std::make_shared<Axis>();
-				axis->center = center;
-				axis->dead_zone = dead_zone;
-				axis->reverse = reverse;
-				axis->scale = scale;
-				axis->power = power;
 				_axes[id] = axis;
 			}
 		}

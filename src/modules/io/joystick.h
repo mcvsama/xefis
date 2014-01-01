@@ -56,11 +56,13 @@ class JoystickInput:
 		set_value (float value);
 
 		Xefis::PropertyFloat	prop;
-		float					center		= 0.f;
-		float					dead_zone	= 0.f;
-		float					reverse		= 1.f;
-		float					scale		= 1.f;
-		float					power		= 1.f;
+		float					center			= 0.f;
+		float					dead_zone		= 0.f;
+		float					reverse			= 1.f;
+		float					scale			= 1.f;
+		float					power			= 1.f;
+		float					output_minimum	= -1.f;
+		float					output_maximum	= +1.f;
 	};
 
 	typedef std::vector<Shared<Button>>	Buttons;
