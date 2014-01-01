@@ -91,7 +91,6 @@ void
 PanelButton::write()
 {
 	_controlled_property.write (_button->isDown() || _button->isChecked());
-	signal_data_updated();
 }
 
 } // namespace Xefis

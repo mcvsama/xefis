@@ -45,12 +45,5 @@ void
 PanelWidget::data_updated()
 { }
 
-
-void
-PanelWidget::signal_data_updated()
-{
-	_panel->signal_data_updated();
-}
-
 } // namespace Xefis
 

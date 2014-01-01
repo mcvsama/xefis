@@ -1065,10 +1065,7 @@ void
 XBee::write_output_property (std::string const& data)
 {
 	if (_receive.configured() && configured())
-	{
 		_receive.write (data);
-		signal_data_updated();
-	}
 }
 
 

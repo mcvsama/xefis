@@ -42,13 +42,6 @@ class PanelWidget: public QWidget
 	virtual void
 	data_updated();
 
-  protected:
-	/**
-	 * Notify the system about updating data.
-	 */
-	void
-	signal_data_updated();
-
   private:
 	Panel* _panel;
 };

@@ -58,7 +58,6 @@ SlipSkid::compute_slip_skid()
 	{
 		float const scale = 10.f;
 		_slip_skid.write (scale * std::atan2 (*_y_acceleration, -*_z_acceleration) / (2.f * M_PI));
-		signal_data_updated();
 	}
 	else
 		_slip_skid.set_nil();

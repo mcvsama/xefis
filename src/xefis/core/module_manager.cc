@@ -62,16 +62,11 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 void
 ModuleManager::data_updated (Time time)
 {
-	bool requested_another_update = false;
-
 	_update_dt = 1_s * (time.s() - _update_time.s());
 	if (_update_dt > 1.0_s)
 		_update_dt = Time::epoch() + 1_s;
 
 	_update_time = time;
-
-	for (Module* mod: _modules)
-		mod->reset_data_update_flag();
 
 	// Process non-instrument modules:
 	for (Module* mod: _non_instrument_modules)
@@ -84,19 +79,6 @@ ModuleManager::data_updated (Time time)
 		for (Module* mod: _instrument_modules)
 			module_data_updated (mod);
 		_instrument_update_time = time;
-	}
-	else
-	{
-		// In case of inhibited instruments update, postpone the update a bit:
-		application()->postponed_data_updated();
-		requested_another_update = true;
-	}
-
-	// Check the data-updated flag:
-	if (!requested_another_update &&
-		std::any_of (_modules.begin(), _modules.end(), [](Module* mod) { return mod->signalled_data_update(); }))
-	{
-		application()->data_updated();
 	}
 }
 

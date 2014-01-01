@@ -266,8 +266,6 @@ JoystickInput::read()
 			}
 		}
 	}
-
-	signal_data_updated();
 }
 
 

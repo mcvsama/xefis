@@ -438,7 +438,6 @@ class CHRUM6:
 	Optional<float>				_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
 	std::string					_baud_rate				= "115200";
-	bool						_signal_data_updated	= false;
 	Stage						_stage					= Stage::Initialize;
 	int							_initialization_step	= 0;
 	// Backup gyro bias values:

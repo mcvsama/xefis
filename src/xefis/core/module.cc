@@ -128,13 +128,6 @@ Module::has_setting (QString const& name)
 }
 
 
-void
-Module::signal_data_updated()
-{
-	_signalled_data_update = true;
-}
-
-
 Time
 Module::update_time() const
 {

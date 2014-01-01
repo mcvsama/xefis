@@ -475,12 +475,6 @@ CHRUM6::parse_packet()
 			if (has_data)
 				process_packet (relative_address, failed, true, data);
 		}
-
-		if (_signal_data_updated)
-		{
-			signal_data_updated();
-			_signal_data_updated = false;
-		}
 	}
 
 	return required_size;
@@ -532,7 +526,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 				break;
 			if (_internal_temperature.configured())
 				_internal_temperature.write (1_K * (273.15 + to_float (data)));
-			_signal_data_updated = true;
 			break;
 		}
 
@@ -546,7 +539,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 			float theta = factor * lower16 (data);
 			_orientation_pitch.write (1_deg * theta);
 			_orientation_roll.write (1_deg * phi);
-			_signal_data_updated = true;
 			break;
 		}
 
@@ -558,7 +550,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 			const float factor = 0.0109863;
 			float psi = Xefis::floored_mod (factor * upper16 (data), 0.f, 360.f);
 			_orientation_magnetic_heading.write (1_deg * psi);
-			_signal_data_updated = true;
 			break;
 		}
 
@@ -575,7 +566,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 					_acceleration_x.write (x);
 				if (_acceleration_y.configured())
 					_acceleration_y.write (y);
-				_signal_data_updated = true;
 			}
 			break;
 		}
@@ -589,7 +579,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 				const float factor = 0.000183105;
 				float z = factor * upper16 (data);
 				_acceleration_z.write (z);
-				_signal_data_updated = true;
 			}
 			break;
 		}
@@ -607,7 +596,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 					_rotation_x.write (1_deg * x);
 				if (_rotation_y.configured())
 					_rotation_y.write (1_deg * y);
-				_signal_data_updated = true;
 			}
 			break;
 		}
@@ -621,7 +609,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 				const float factor = 0.0610352;
 				float z = factor * upper16 (data);
 				_rotation_z.write (1_deg * z);
-				_signal_data_updated = true;
 			}
 			break;
 		}
@@ -639,7 +626,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 					_magnetic_x.write (x);
 				if (_magnetic_y.configured())
 					_magnetic_y.write (y);
-				_signal_data_updated = true;
 			}
 			break;
 		}
@@ -653,7 +639,6 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 				const float factor = 0.000305176;
 				float z = factor * upper16 (data);
 				_magnetic_z.write (z);
-				_signal_data_updated = true;
 			}
 			break;
 		}

@@ -245,8 +245,6 @@ BMP085::handle_other (void (BMP085::*request_function)())
 	}
 	else
 		_request_other = false;
-
-	signal_data_updated();
 }
 
 

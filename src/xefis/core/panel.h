@@ -55,12 +55,6 @@ class Panel: public QWidget
 	void
 	unregister_panel_widget (PanelWidget*);
 
-	/**
-	 * Signal data update by one of the child PanelWidgets.
-	 */
-	void
-	signal_data_updated();
-
   private slots:
 	void
 	read();
