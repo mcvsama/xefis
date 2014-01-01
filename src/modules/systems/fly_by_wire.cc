@@ -151,13 +151,13 @@ FlyByWire::data_updated()
 			_rudder_pid.set_output_limit (Range<double> (*_rudder_minimum, *_rudder_maximum));
 
 			_elevator_pid.set_target (_computed_output_pitch / 180_deg);
-			_elevator_pid.process (*_measured_pitch / 180_deg, _dt.s());
+			_elevator_pid.process (*_measured_pitch / 180_deg, _dt);
 
 			_ailerons_pid.set_target (_computed_output_roll / 180_deg);
-			_ailerons_pid.process (*_measured_roll / 180_deg, _dt.s());
+			_ailerons_pid.process (*_measured_roll / 180_deg, _dt);
 
 			_rudder_pid.set_target (0.0);
-			_rudder_pid.process (*_measured_slip_skid_g, _dt.s());
+			_rudder_pid.process (*_measured_slip_skid_g, _dt);
 
 			double computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
 			double computed_ailerons = _ailerons_pid.output();
@@ -224,12 +224,12 @@ FlyByWire::integrate_manual_input()
 	// Update output attitude:
 
 	_manual_pitch_pid.set_target (target_pitch.deg() / 180.f);
-	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, _dt.s());
+	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, _dt);
 	_computed_output_pitch += std::abs (axis_pitch) * _manual_pitch_pid.output() * 360_deg;
 	_computed_output_pitch = floored_mod<double> (_computed_output_pitch.deg(), -180.0, +180.0) * 1_deg;
 
 	_manual_roll_pid.set_target (target_roll.deg() / 180.f);
-	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, _dt.s());
+	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, _dt);
 	_computed_output_roll += std::abs (axis_roll) * _manual_roll_pid.output() * 360_deg;
 	_computed_output_roll = floored_mod<double> (_computed_output_roll.deg(), -180.0, +180.0) * 1_deg;
 

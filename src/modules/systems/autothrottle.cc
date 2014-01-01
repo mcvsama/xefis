@@ -31,35 +31,45 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/autothrottle", Autothrottle);
 
 Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
-	_thrust_pid (_thrust_pid_p, _thrust_pid_i, _thrust_pid_d, 0.0),
 	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0)
 {
-	for (auto* pid: { &_thrust_pid, &_ias_pid })
-		pid->set_i_limit ({ -0.05f, +0.05f });
+	_ias_pid.set_i_limit ({ -0.05f, +0.05f });
 
 	parse_settings (config, {
-		{ "thrust.pid.p", _thrust_pid_p, false },
-		{ "thrust.pid.i", _thrust_pid_i, false },
-		{ "thrust.pid.d", _thrust_pid_d, false },
+		{ "output.thrust.minimum", _output_thrust_minimum, true },
+		{ "output.thrust.maximum", _output_thrust_maximum, true },
 		{ "ias.pid.p", _ias_pid_p, false },
 		{ "ias.pid.i", _ias_pid_i, false },
 		{ "ias.pid.d", _ias_pid_d, false },
-		{ "ias-to-throttle-scale", _ias_to_throttle_scale, false },
+		{ "ias-to-thrust-scale", _ias_to_thrust_scale, false },
 	});
 
 	parse_properties (config, {
 		{ "cmd.speed-mode", _cmd_speed_mode, true },
 		{ "cmd.thrust", _cmd_thrust, true },
 		{ "cmd.ias", _cmd_ias, true },
-		{ "measured.thrust", _measured_thrust, true },
 		{ "measured.ias", _measured_ias, true },
-		{ "output.throttle", _output_throttle, true },
+		{ "output.thrust", _output_thrust, true },
 		{ "disengage-at", _disengage_at, true },
 	});
 
+	// Extents:
+	_output_thrust_extent = { _output_thrust_minimum, _output_thrust_maximum };
 	// Update PID params according to settings:
-	_thrust_pid.set_pid (_thrust_pid_p, _thrust_pid_i, _thrust_pid_d),
-	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d),
+	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d);
+	_ias_pid.set_output_smoothing (true, 250_ms);
+
+	_thrust_computer.set_minimum_dt (5_ms);
+	_thrust_computer.set_callback (std::bind (&Autothrottle::compute_thrust, this));
+	_thrust_computer.add_depending_smoothers ({
+		&_ias_pid.output_smoother(),
+	});
+	_thrust_computer.observe ({
+		&_cmd_speed_mode,
+		&_cmd_thrust,
+		&_cmd_ias,
+		&_measured_ias,
+	});
 
 	speed_mode_changed();
 }
@@ -68,13 +78,16 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 void
 Autothrottle::data_updated()
 {
+	_thrust_computer.data_updated (update_time());
+}
+
+
+void
+Autothrottle::compute_thrust()
+{
 	bool disengage = false;
 	double computed_thrust = 0.0;
-
-	// Don't process if dt is too small:
-	_dt += update_dt();
-	if (_dt < 5_ms)
-		return;
+	Time dt = _thrust_computer.update_dt();
 
 	if (_cmd_speed_mode.fresh())
 		speed_mode_changed();
@@ -82,17 +95,10 @@ Autothrottle::data_updated()
 	switch (_speed_mode)
 	{
 		case SpeedMode::Thrust:
-			if (_cmd_thrust.is_nil() || _measured_thrust.is_nil())
-			{
-				_thrust_pid.reset();
+			if (_cmd_thrust.is_nil())
 				disengage = true;
-			}
 			else
-			{
-				_thrust_pid.set_target (*_cmd_thrust);
-				_thrust_pid.process (*_measured_thrust, _dt.s());
-				computed_thrust = _thrust_pid.output();
-			}
+				computed_thrust = *_cmd_thrust;
 			break;
 
 		case SpeedMode::Airspeed:
@@ -106,24 +112,22 @@ Autothrottle::data_updated()
 				// This is more tricky, since we measure IAS, but control thrust.
 				// There's no 1:1 correlaction between them.
 				_ias_pid.set_target (_cmd_ias->kt());
-				_ias_pid.process (_measured_ias->kt(), _dt.s());
-				computed_thrust = Xefis::limit (_ias_pid.output() / _ias_to_throttle_scale, -1.0, 1.0);
-				computed_thrust = Xefis::renormalize (computed_thrust, { -1.0, 1.0 }, { 0.0, 1.0 });
+				_ias_pid.process (_measured_ias->kt(), dt);
+				computed_thrust = Xefis::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
+				computed_thrust = Xefis::renormalize (computed_thrust, { -1.0, 1.0 }, _output_thrust_extent);
 			}
 			break;
 
 		case SpeedMode::None:
 		case SpeedMode::sentinel:
-			_computed_output_throttle = 0.0;
+			_computed_output_thrust = 0.0;
 			break;
 	}
 
-	_output_throttle.write (_output_throttle_smoother.process (computed_thrust, _dt));
+	_output_thrust.write (computed_thrust);
 
 	if (disengage || _disengage_at.is_nil())
 		_disengage_at.write (disengage);
-
-	_dt = 0_s;
 }
 
 
