@@ -116,13 +116,13 @@ RadialIndicatorWidget::paint_text (float q, float)
 		painter().drawRect (rect);
 	}
 
-	if (_normal_value)
+	if (_reference_value)
 	{
 		painter().setFont (small_font);
 		painter().setPen (get_pen (Qt::green, 1.0f));
 		painter().fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 								  Qt::AlignBottom | Qt::AlignRight,
-								  stringify_value (*_normal_value));
+								  stringify_value (*_reference_value));
 	}
 
 	painter().restore();
@@ -166,7 +166,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	float value = _value ? limit (*_value, _range) : 0.f;
 	float warning = _warning_value ? limit (*_warning_value, _range) : 0.f;
 	float critical = _critical_value ? limit (*_critical_value, _range) : 0.f;
-	float normal = _normal_value ? limit (*_normal_value, _range) : 0.f;
+	float reference = _reference_value ? limit (*_reference_value, _range) : 0.f;
 	float target = _target_value ? limit (*_target_value, _range) : 0.f;
 
 	if (!_warning_value)
@@ -182,7 +182,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	float value_angle = value_span_angle * (value - _range.min()) / _range.extent();
 	float warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
 	float critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
-	float normal_angle = value_span_angle * (normal - _range.min()) / _range.extent();
+	float reference_angle = value_span_angle * (reference - _range.min()) / _range.extent();
 	float target_angle = value_span_angle * (target - _range.min()) / _range.extent();
 
 	painter().save();
@@ -240,10 +240,10 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	}
 
 	// Normal value bug:
-	if (_normal_value)
+	if (_reference_value)
 	{
 		painter().setPen (green_pen);
-		painter().rotate (normal_angle);
+		painter().rotate (reference_angle);
 		painter().drawLine (QPointF (r + pen_width (1.f), 0.f), QPointF (1.17f * r, 0.f));
 		painter().drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, -0.14f * r));
 		painter().drawLine (QPointF (1.15f * r, 0.f), QPointF (1.3f * r, +0.14f * r));

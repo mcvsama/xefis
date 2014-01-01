@@ -107,7 +107,7 @@ class LinearIndicatorWidget:
 	bool						_mirrored			= false;
 	Xefis::Range<double>		_range				= { 0.f, 1.f };
 	int							_precision			= 0;
-	unsigned int				_modulo				= 0;
+	int							_modulo				= 0;
 	unsigned int				_digits				= 3;
 	Optional<double>			_value;
 	Optional<double>			_minimum_critical_value;
