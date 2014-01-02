@@ -873,6 +873,8 @@ Link::eat (Blob& blob)
 			_reacquire_timer->stop();
 		};
 
+		bool return_from_function = false;
+
 		Xefis::Exception::guard ([&] {
 			try {
 				// Find the right magic and packet:
@@ -887,7 +889,10 @@ Link::eat (Blob& blob)
 				// Now see if we have enough data in input buffer for this packet type.
 				// If not, return and retry when enough data is read.
 				if (blob.size() - _magic_size < packet->size())
+				{
+					return_from_function = true;
 					return;
+				}
 
 				Blob::iterator e = packet->eat (blob.begin() + _magic_size, blob.end());
 				Blob::size_type valid_bytes = std::distance (blob.begin(), e);
@@ -918,6 +923,9 @@ Link::eat (Blob& blob)
 				throw;
 			}
 		});
+
+		if (return_from_function)
+			return;
 	}
 }
 
