@@ -779,11 +779,17 @@ Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 Link::data_updated()
 {
-	if (_input.valid() && _input.fresh())
+	try {
+		if (_input.valid() && _input.fresh())
+		{
+			std::string data = *_input;
+			_input_blob.insert (_input_blob.end(), data.begin(), data.end());
+			eat (_input_blob);
+		}
+	}
+	catch (ParseError const&)
 	{
-		std::string data = *_input;
-		_input_blob.insert (_input_blob.end(), data.begin(), data.end());
-		eat (_input_blob);
+		log() << "Packet parse error. Couldn't synchronize." << std::endl;
 	}
 }
 

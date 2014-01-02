@@ -39,13 +39,8 @@ class Link:
 {
 	Q_OBJECT
 
-	class ParseError: public Xefis::Exception
-	{
-	  public:
-		ParseError():
-			Exception ("ParseError")
-		{ }
-	};
+	class ParseError
+	{ };
 
 	class Item
 	{
