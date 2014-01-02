@@ -410,15 +410,14 @@ FlightGearIO::write_output()
 
 	FGOutputData fg_data;
 
-#define ASSIGN(x) \
-		if (_##x.valid()) \
-			fg_data.x = *_##x;
+#define ASSIGN(x, def) \
+		fg_data.x = _##x.read (def);
 
-	ASSIGN (ailerons);
-	ASSIGN (elevator);
-	ASSIGN (rudder);
-	ASSIGN (throttle_1);
-	ASSIGN (throttle_2);
+	ASSIGN (ailerons, 0.0);
+	ASSIGN (elevator, 0.0);
+	ASSIGN (rudder, 0.0);
+	ASSIGN (throttle_1, 0.0);
+	ASSIGN (throttle_2, 0.0);
 
 #undef ASSIGN
 
