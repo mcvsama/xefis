@@ -197,7 +197,7 @@ EICASWidget::paintEvent (QPaintEvent*)
 	{
 		Message const& message = _shown_messages[i + _scroll];
 		if (message.outdated)
-			painter().setPen (QPen (Qt::cyan));
+			painter().setPen (QPen (QColor (0x70, 0x70, 0x70)));
 		else
 			painter().setPen (QPen (message.color));
 		painter().fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * i), Qt::AlignTop | Qt::AlignLeft, message.message);
