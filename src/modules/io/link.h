@@ -170,6 +170,7 @@ class Link:
 	  private:
 		Type							_type				= Type::Unknown;
 		uint8_t							_bytes				= 0;
+		bool							_retained			= false;
 		Xefis::PropertyInteger			_property_integer;
 		Xefis::PropertyFloat			_property_float;
 		Xefis::PropertyAngle			_property_angle;
@@ -189,6 +190,7 @@ class Link:
 		struct BitSource
 		{
 			bool							is_boolean			= false;
+			bool							retained			= false;
 			uint8_t							bits				= 0;
 			Xefis::PropertyBoolean			property_boolean;
 			Xefis::PropertyInteger			property_integer;
@@ -311,6 +313,9 @@ class Link:
 
 	static std::string
 	to_string (Blob const&);
+
+	static bool
+	check_retained_attribute (QDomElement const& element, bool default_value);
 
   private:
 	QTimer*					_failsafe_timer;
