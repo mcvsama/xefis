@@ -122,6 +122,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	if (_type == Type::Unknown)
 		throw Xefis::Exception ("unknown type: " + type_attr.toStdString());
 
+	_retained = Link::check_retained_attribute (element, false);
+
 	switch (_type)
 	{
 		case Type::Integer:
@@ -325,7 +327,10 @@ Link::PropertyItem::apply()
 #define XEFIS_CASE_FLOAT(type, property) \
 	case Type::type: \
 		if (std::isnan (_float_value)) \
-			_property_##property.set_nil(); \
+		{ \
+			if (!_retained) \
+				_property_##property.set_nil(); \
+		} \
 		else \
 			_property_##property.write (si_from_internal<type> (_float_value)); \
 		break;
@@ -338,7 +343,10 @@ Link::PropertyItem::apply()
 
 		case Type::Float:
 			if (std::isnan (_float_value))
-				_property_float.set_nil();
+			{
+				if (!_retained)
+					_property_float.set_nil();
+			}
 			else
 				_property_float.write (_float_value);
 			break;
@@ -368,27 +376,30 @@ Link::PropertyItem::failsafe()
 		_property_##property.set_nil(); \
 		break;
 
-	switch (_type)
+	if (!_retained)
 	{
-		case Type::Integer:
-			_property_integer.set_nil();
-			break;
+		switch (_type)
+		{
+			case Type::Integer:
+				_property_integer.set_nil();
+				break;
 
-		case Type::Float:
-			_property_float.set_nil();
-			break;
+			case Type::Float:
+				_property_float.set_nil();
+				break;
 
-		XEFIS_CASE_FLOAT (Angle, angle);
-		XEFIS_CASE_FLOAT (Frequency, frequency);
-		XEFIS_CASE_FLOAT (Length, length);
-		XEFIS_CASE_FLOAT (Pressure, pressure);
-		XEFIS_CASE_FLOAT (Speed, speed);
-		XEFIS_CASE_FLOAT (Temperature, temperature);
-		XEFIS_CASE_FLOAT (Time, time);
+			XEFIS_CASE_FLOAT (Angle, angle);
+			XEFIS_CASE_FLOAT (Frequency, frequency);
+			XEFIS_CASE_FLOAT (Length, length);
+			XEFIS_CASE_FLOAT (Pressure, pressure);
+			XEFIS_CASE_FLOAT (Speed, speed);
+			XEFIS_CASE_FLOAT (Temperature, temperature);
+			XEFIS_CASE_FLOAT (Time, time);
 
-		case Type::Unknown:
-			// Impossible.
-			;
+			case Type::Unknown:
+				// Impossible.
+				;
+		}
 	}
 
 #undef XEFIS_CASE_FLOAT
@@ -448,6 +459,8 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 
 			QString s_type = e.attribute ("type");
 			QString s_path = e.attribute ("path");
+
+			bs.retained = check_retained_attribute (e, false);
 
 			if (s_type == "boolean")
 			{
@@ -569,10 +582,13 @@ Link::BitfieldItem::failsafe()
 {
 	for (BitSource& bs: _bit_sources)
 	{
-		if (bs.is_boolean)
-			bs.property_boolean.set_nil();
-		else
-			bs.property_integer.set_nil();
+		if (!bs.retained)
+		{
+			if (bs.is_boolean)
+				bs.property_boolean.set_nil();
+			else
+				bs.property_integer.set_nil();
+		}
 	}
 }
 
@@ -972,5 +988,22 @@ Link::to_string (Blob const& blob)
 		s += QString ("%1").arg (v, 2, 16, QChar ('0')).toStdString() + ":";
 	s.pop_back();
 	return s;
+}
+
+
+bool
+Link::check_retained_attribute (QDomElement const& element, bool default_value)
+{
+	QString s_retained = element.attribute ("retained");
+
+	if (element.hasAttribute ("retained"))
+	{
+		if (s_retained == "true")
+			default_value = true;
+		else if (s_retained != "false")
+			throw Xefis::Exception ("@retained attribute must be 'true' or 'false'");
+	}
+
+	return default_value;
 }
 
