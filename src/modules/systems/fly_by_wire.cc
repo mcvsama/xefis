@@ -36,9 +36,7 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 	_ailerons_pid (0.0, 0.0, 0.0, 0.0),
 	_rudder_pid (0.0, 0.0, 0.0, 0.0)
 {
-	parse_properties (config, {
-		{ "attitude-mode", _attitude_mode, true },
-		{ "throttle-mode", _throttle_mode, true },
+	parse_settings (config, {
 		{ "stabilization-gain", _stabilization_gain, true },
 		{ "pitch-gain", _pitch_gain, true },
 		{ "pitch-p", _pitch_p, true },
@@ -55,6 +53,11 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "yaw-i", _yaw_i, true },
 		{ "yaw-d", _yaw_d, true },
 		{ "yaw-error-power", _yaw_error_power, true },
+	});
+
+	parse_properties (config, {
+		{ "attitude-mode", _attitude_mode, true },
+		{ "throttle-mode", _throttle_mode, true },
 		{ "input.pitch-axis", _input_pitch_axis, true },
 		{ "input.roll-axis", _input_roll_axis, true },
 		{ "input.yaw-axis", _input_yaw_axis, true },
@@ -73,6 +76,7 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "ailerons.maximum", _ailerons_maximum, true },
 		{ "rudder.minimum", _rudder_minimum, true },
 		{ "rudder.maximum", _rudder_maximum, true },
+		{ "output.serviceable", _serviceable, true },
 		{ "output.control-stick-pitch", _output_control_stick_pitch, false },
 		{ "output.control-stick-roll", _output_control_stick_roll, false },
 		{ "output.pitch", _output_pitch, true },
@@ -105,89 +109,118 @@ FlyByWire::data_updated()
 	if (_dt < 0.005_s)
 		return;
 
-	switch (static_cast<AttitudeMode> (*_attitude_mode))
+	double computed_elevator = 0.0;
+	double computed_ailerons = 0.0;
+	double computed_rudder = 0.0;
+
+	if (_attitude_mode.valid())
 	{
-		case AttitudeMode::Manual:
-			_elevator_smoother.invalidate();
-			_ailerons_smoother.invalidate();
-
-			_output_elevator.write (-*_input_pitch_axis);
-			_output_ailerons.write (*_input_roll_axis);
-			_output_rudder.write (*_input_yaw_axis);
-
-			_computed_output_pitch = *_measured_pitch;
-			_computed_output_roll = *_measured_roll;
-			break;
-
-		case AttitudeMode::Stabilized:
-		case AttitudeMode::FlightDirector:
+		switch (static_cast<AttitudeMode> (*_attitude_mode))
 		{
-			using Xefis::Range;
+			case AttitudeMode::Manual:
+				_elevator_smoother.invalidate();
+				_ailerons_smoother.invalidate();
 
-			// Should always be computed:
-			integrate_manual_input();
+				_computed_output_pitch = 0_deg;
+				_computed_output_roll = 0_deg;
 
-			if (static_cast<AttitudeMode> (*_attitude_mode) == AttitudeMode::FlightDirector)
+				computed_elevator = _input_pitch_axis.read (0.0);
+				computed_ailerons = _input_roll_axis.read (0.0);
+				computed_rudder = _input_yaw_axis.read (0.0);
+				break;
+
+			case AttitudeMode::Stabilized:
+			case AttitudeMode::FlightDirector:
 			{
-				_computed_output_pitch = *_input_pitch;
-				_computed_output_roll = *_input_roll;
+				using Xefis::Range;
+
+				if (_measured_pitch.is_nil() || _measured_roll.is_nil())
+				{
+					diagnose();
+
+					_computed_output_pitch = 0_deg;
+					_computed_output_roll = 0_deg;
+
+					_serviceable.write (false);
+				}
+				else
+				{
+					// Should be computed for both Stabilized and FD modes:
+					integrate_manual_input();
+
+					if (static_cast<AttitudeMode> (*_attitude_mode) == AttitudeMode::FlightDirector)
+					{
+						_computed_output_pitch = _input_pitch.read (0_deg);
+						_computed_output_roll = _input_roll.read (0_deg);
+					}
+
+					_elevator_pid.set_pid (_pitch_p, _pitch_i, _pitch_d);
+					_elevator_pid.set_gain (_pitch_gain * _stabilization_gain);
+					_elevator_pid.set_error_power (_pitch_error_power);
+					_elevator_pid.set_output_limit (Range<double> (_elevator_minimum.read (-1.0), _elevator_maximum.read (1.0)));
+					_elevator_pid.set_target (_computed_output_pitch / 180_deg);
+					_elevator_pid.process (*_measured_pitch / 180_deg, _dt);
+
+					_ailerons_pid.set_pid (_roll_p, _roll_i, _roll_d);
+					_ailerons_pid.set_gain (_roll_gain * _stabilization_gain);
+					_ailerons_pid.set_error_power (_roll_error_power);
+					_ailerons_pid.set_output_limit (Range<double> (_ailerons_minimum.read (-1.0), _ailerons_maximum.read (1.0)));
+					_ailerons_pid.set_target (_computed_output_roll / 180_deg);
+					_ailerons_pid.process (*_measured_roll / 180_deg, _dt);
+
+					_rudder_pid.set_pid (_yaw_p, _yaw_i, _yaw_d);
+					_rudder_pid.set_gain (_yaw_gain * _stabilization_gain);
+					_rudder_pid.set_error_power (_yaw_error_power);
+					_rudder_pid.set_output_limit (Range<double> (_rudder_minimum.read (-1.0), _rudder_maximum.read (1.0)));
+					_rudder_pid.set_target (0.0);
+					_rudder_pid.process (_measured_slip_skid_g.read (0.0), _dt);
+
+					computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
+					computed_elevator = _elevator_smoother.process (computed_elevator, _dt);
+
+					computed_ailerons = _ailerons_pid.output();
+					computed_ailerons = _ailerons_smoother.process (computed_ailerons, _dt);
+
+					// Mix manual rudder with auto-coordinated:
+					double yaw_axis = _input_yaw_axis.read (0.0);
+					_output_rudder.write (yaw_axis + (1.0f - yaw_axis) * _rudder_pid.output());
+
+					_serviceable.write (true);
+				}
+				break;
 			}
 
-			double stabilization_gain = *_stabilization_gain;
-
-			_elevator_pid.set_pid (*_pitch_p, *_pitch_i, *_pitch_d);
-			_elevator_pid.set_gain (*_pitch_gain * stabilization_gain);
-			_elevator_pid.set_error_power (*_pitch_error_power);
-			_elevator_pid.set_output_limit (Range<double> (*_elevator_minimum, *_elevator_maximum));
-
-			_ailerons_pid.set_pid (*_roll_p, *_roll_i, *_roll_d);
-			_ailerons_pid.set_gain (*_roll_gain * stabilization_gain);
-			_ailerons_pid.set_error_power (*_roll_error_power);
-			_ailerons_pid.set_output_limit (Range<double> (*_ailerons_minimum, *_ailerons_maximum));
-
-			_rudder_pid.set_pid (*_yaw_p, *_yaw_i, *_yaw_d);
-			_rudder_pid.set_gain (*_yaw_gain * stabilization_gain);
-			_rudder_pid.set_error_power (*_yaw_error_power);
-			_rudder_pid.set_output_limit (Range<double> (*_rudder_minimum, *_rudder_maximum));
-
-			_elevator_pid.set_target (_computed_output_pitch / 180_deg);
-			_elevator_pid.process (*_measured_pitch / 180_deg, _dt);
-
-			_ailerons_pid.set_target (_computed_output_roll / 180_deg);
-			_ailerons_pid.process (*_measured_roll / 180_deg, _dt);
-
-			_rudder_pid.set_target (0.0);
-			_rudder_pid.process (*_measured_slip_skid_g, _dt);
-
-			double computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
-			double computed_ailerons = _ailerons_pid.output();
-
-			_output_elevator.write (_elevator_smoother.process (computed_elevator, _dt));
-			_output_ailerons.write (_ailerons_smoother.process (computed_ailerons, _dt));
-
-			double yaw_axis = *_input_yaw_axis;
-			_output_rudder.write (yaw_axis + (1.0f - yaw_axis) * _rudder_pid.output());
-			break;
+			default:
+				log() << "unknown attitude mode: " << *_attitude_mode << std::endl;
+				_serviceable.write (false);
+				break;
 		}
-
-		default:
-			log() << "unknown attitude mode: " << *_attitude_mode << std::endl;
-			break;
+	}
+	else
+	{
+		_serviceable.write (false);
 	}
 
-	switch (static_cast<ThrottleMode> (*_throttle_mode))
+	if (_throttle_mode.valid())
 	{
-		case ThrottleMode::Manual:
-			_output_throttle.write (Xefis::renormalize (*_input_throttle_axis, { 1.0, -1.0 }, { 0.0, 1.0 }));
-			break;
+		switch (static_cast<ThrottleMode> (*_throttle_mode))
+		{
+			case ThrottleMode::Manual:
+				_output_throttle.write (_input_throttle_axis.read (0.0));
+				break;
 
-		case ThrottleMode::Autothrottle:
-			_output_throttle.write (*_input_throttle);
-			break;
+			case ThrottleMode::Autothrottle:
+				_output_throttle.write (_input_throttle.read (0.0));
+				break;
 
-		default:
-			log() << "unknownn throttle mode: " << *_throttle_mode << std::endl;
-			break;
+			default:
+				log() << "unknownn throttle mode: " << *_throttle_mode << std::endl;
+				break;
+		}
+	}
+	else
+	{
+		_serviceable.write (false);
 	}
 
 	// Output:
@@ -196,7 +229,22 @@ FlyByWire::data_updated()
 	if (_output_roll.configured())
 		_output_roll.write (_computed_output_roll);
 
+	if (_output_elevator.configured())
+		_output_elevator.write (computed_elevator);
+	if (_output_ailerons.configured())
+		_output_ailerons.write (computed_ailerons);
+	if (_output_rudder.configured())
+		_output_rudder.write (computed_rudder);
+
 	_dt = 0_s;
+}
+
+
+void
+FlyByWire::rescue()
+{
+	if (_serviceable.configured())
+		_serviceable.write (false);
 }
 
 
@@ -205,39 +253,59 @@ FlyByWire::integrate_manual_input()
 {
 	using Xefis::floored_mod;
 
-	// Shortcuts:
+	if (_pitch_extent.is_nil())
+		log() << "pitch-extent is nil, using default value" << std::endl;
+	if (_roll_extent.is_nil())
+		log() << "roll-extent is nil, using default value" << std::endl;
 
-	Angle target_pitch_extent = *_pitch_extent;
-	Angle target_roll_extent = *_roll_extent;
-	double axis_pitch = *_input_pitch_axis;
-	double axis_roll = *_input_roll_axis;
+	Angle target_pitch_extent = _pitch_extent.read (5_deg);
+	Angle target_roll_extent = _roll_extent.read (30_deg);
+
+	if (_input_pitch_axis.is_nil())
+		log() << "input.pitch-axis is nil, using 0.0" << std::endl;
+	if (_input_roll_axis.is_nil())
+		log() << "input.roll-axis is nil, using 0.0" << std::endl;
+
+	double axis_pitch = _input_pitch_axis.read (0.0);
+	double axis_roll = _input_roll_axis.read (0.0);
+
 	Angle measured_pitch = *_measured_pitch;
 	Angle measured_roll = *_measured_roll;
 
 	// Target attitude - computed from current orientation and joystick deflection:
-
 	Angle target_pitch = measured_pitch + std::cos (measured_roll) * axis_pitch * target_pitch_extent;
 	Angle target_roll = measured_roll + axis_roll * target_roll_extent;
-	target_pitch = floored_mod<double> (target_pitch.deg(), -180.0, +180.0) * 1_deg;
-	target_roll = floored_mod<double> (target_roll.deg(), -180.0, +180.0) * 1_deg;
+	target_pitch = floored_mod (target_pitch, -180_deg, +180_deg);
+	target_roll = floored_mod (target_roll, -180_deg, +180_deg);
 
-	// Update output attitude:
-
+	// Update output pitch attitude:
 	_manual_pitch_pid.set_target (target_pitch.deg() / 180.f);
 	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, _dt);
 	_computed_output_pitch += std::abs (axis_pitch) * _manual_pitch_pid.output() * 360_deg;
-	_computed_output_pitch = floored_mod<double> (_computed_output_pitch.deg(), -180.0, +180.0) * 1_deg;
+	_computed_output_pitch = floored_mod (_computed_output_pitch, -180_deg, +180_deg);
 
+	// Update output roll attitude:
 	_manual_roll_pid.set_target (target_roll.deg() / 180.f);
 	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, _dt);
 	_computed_output_roll += std::abs (axis_roll) * _manual_roll_pid.output() * 360_deg;
-	_computed_output_roll = floored_mod<double> (_computed_output_roll.deg(), -180.0, +180.0) * 1_deg;
+	_computed_output_roll = floored_mod (_computed_output_roll, -180_deg, +180_deg);
 
 	// Joystick visualisation on EFIS:
 	if (_output_control_stick_pitch.configured())
 		_output_control_stick_pitch.write (axis_pitch * target_pitch_extent);
-
 	if (_output_control_stick_roll.configured())
 		_output_control_stick_roll.write (axis_roll * target_roll_extent);
+}
+
+
+void
+FlyByWire::diagnose()
+{
+	if (_attitude_mode.is_nil())
+		log() << "Attitude mode is nil!" << std::endl;
+	if (_measured_pitch.is_nil())
+		log() << "Measured pitch is nil!" << std::endl;
+	if (_measured_roll.is_nil())
+		log() << "Measured roll is nil!" << std::endl;
 }
 

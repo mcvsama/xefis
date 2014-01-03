@@ -31,7 +31,7 @@
 
 namespace Xefis {
 
-class Exception: public std::runtime_error
+class Exception: public std::exception
 {
   public:
 	/**
@@ -122,7 +122,6 @@ Exception::Exception (const char* message, Exception const* inner):
 
 inline
 Exception::Exception (std::string const& message, Exception const* inner):
-	std::runtime_error (message),
 	_message ("Error: " + message)
 {
 	if (inner)
