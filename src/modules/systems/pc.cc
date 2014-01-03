@@ -42,7 +42,6 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 
 	parse_properties (config, {
 		// Input:
-		{ "aircraft.weight", _aircraft_weight_g, true },
 		{ "speed.ias", _speed_ias, true },
 		{ "speed.tas", _speed_tas, true },
 		{ "speed.gs", _speed_gs, true },
@@ -84,7 +83,6 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 		&_total_energy_variometer_smoother,
 	});
 	_total_energy_variometer_computer.observe ({
-		&_aircraft_weight_g,
 		&_altitude_amsl_std,
 		&_speed_ias,
 	});
@@ -161,11 +159,10 @@ PerformanceComputer::compute_total_energy_variometer()
 	{
 		Time update_dt = _total_energy_variometer_computer.update_dt();
 
-		if (_aircraft_weight_g.valid() &&
-			_altitude_amsl_std.valid() &&
+		if (_altitude_amsl_std.valid() &&
 			_speed_ias.valid())
 		{
-			double const m = *_aircraft_weight_g;
+			double const m = 1.0; // Doesn't matter, it will be reduced anyway.
 			double const g = 9.81;
 			double const v = (*_speed_ias).mps();
 			double const Ep = m * g * (*_altitude_amsl_std).m();

@@ -61,7 +61,6 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertyObserver		_glide_ratio_computer;
 	Xefis::PropertyObserver		_total_energy_variometer_computer;
 	// Input:
-	Xefis::PropertyFloat		_aircraft_weight_g;
 	Xefis::PropertySpeed		_speed_ias;
 	Xefis::PropertySpeed		_speed_tas;
 	Xefis::PropertySpeed		_speed_gs;
