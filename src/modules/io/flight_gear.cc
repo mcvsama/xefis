@@ -38,60 +38,60 @@ typedef uint32_t	FGInt;
 BEGIN_PACKED_STRUCT
 struct FGInputData
 {
-	FGDouble	cmd_alt_setting_ft;				// apa
-	FGDouble	cmd_cbr_setting_fpm;			// apc
-	FGDouble	cmd_speed_setting_kt;			// ats
-	FGDouble	cmd_heading_setting_deg;		// aph
-	FGDouble	flight_director_pitch_deg;		// fdp
-	FGDouble	flight_director_roll_deg;		// fdr
-	FGDouble	ias_kt;							// ias
-	FGDouble	tas_kt;							// tas
-	FGDouble	gs_kt;							// gs
-	FGDouble	mach;							// ma
-	FGDouble	ias_lookahead_kt;				// iasl
-	FGDouble	maximum_ias_kt;					// iasma
-	FGDouble	minimum_ias_kt;					// iasmi
-	FGBool		standard_pressure;				// std
-	FGDouble	altitude_ft;					// al
-	FGDouble	altitude_agl_ft;				// alr
-	FGDouble	pressure_inHg;					// als
-	FGDouble	cbr_fpm;						// cbr
-	FGDouble	position_lat_deg;				// lt
-	FGDouble	position_lng_deg;				// ln
-	FGDouble	position_amsl_ft;				// alg
-	FGDouble	pitch_deg;						// p
-	FGDouble	roll_deg;						// r
-	FGDouble	magnetic_heading_deg;			// h
-	FGDouble	true_heading_deg;				// th
-	FGDouble	fpm_alpha_deg;					// fpa
-	FGDouble	fpm_beta_deg;					// fpb
-	FGDouble	magnetic_track_deg;				// tr
-	FGBool		navigation_needles_visible;		// nav
-	FGBool		vertical_deviation_ok;			// ngso
-	FGDouble	vertical_deviation_deg;			// ngs
-	FGBool		lateral_deviation_ok;			// nhdo
-	FGDouble	lateral_deviation_deg;			// nhd
-	FGBool		navigation_dme_ok;				// dok
-	FGDouble	dme_distance_nm;				// dme
-	FGDouble	slip_skid_g;					// ss
-	FGDouble	static_air_temperature_K;		// tmp
-	FGDouble	engine_throttle_pct;			// thr
-	FGDouble	engine_1_thrust;				// thrust1
-	FGDouble	engine_1_rpm;					// rpm1
-	FGDouble	engine_1_pitch;					// pitch1
-	FGDouble	engine_1_epr;					// epr1
-	FGDouble	engine_1_n1_pct;				// n1-1
-	FGDouble	engine_1_n2_pct;				// n2-1
-	FGDouble	engine_1_egt_degc;				// egt1
-	FGDouble	engine_2_thrust;				// thrust2
-	FGDouble	engine_2_rpm;					// rpm2
-	FGDouble	engine_2_pitch;					// pitch2
-	FGDouble	engine_2_epr;					// epr2
-	FGDouble	engine_2_n1_pct;				// n1-2
-	FGDouble	engine_2_n2_pct;				// n2-2
-	FGDouble	engine_2_egt_degc;				// egt2
-	FGDouble	wind_from_magnetic_heading_deg;	// wfh
-	FGDouble	wind_tas_kt;					// ws
+	FGDouble	cmd_alt_setting_ft;					// apa
+	FGDouble	cmd_cbr_setting_fpm;				// apc
+	FGDouble	cmd_speed_setting_kt;				// ats
+	FGDouble	cmd_heading_setting_deg;			// aph
+	FGDouble	flight_director_pitch_deg;			// fdp
+	FGDouble	flight_director_roll_deg;			// fdr
+	FGDouble	ias_kt;								// ias
+	FGDouble	tas_kt;								// tas
+	FGDouble	gs_kt;								// gs
+	FGDouble	mach;								// ma
+	FGDouble	ias_lookahead_kt;					// iasl
+	FGDouble	maximum_ias_kt;						// iasma
+	FGDouble	minimum_ias_kt;						// iasmi
+	FGBool		standard_pressure;					// std
+	FGDouble	altitude_ft;						// al
+	FGDouble	radar_altimeter_altitude_agl_ft;	// alr
+	FGDouble	pressure_inHg;						// als
+	FGDouble	cbr_fpm;							// cbr
+	FGDouble	gps_latitude_deg;					// lt
+	FGDouble	gps_longitude_deg;					// ln
+	FGDouble	gps_amsl_ft;						// alg
+	FGDouble	ahrs_pitch_deg;						// p
+	FGDouble	ahrs_roll_deg;						// r
+	FGDouble	ahrs_magnetic_heading_deg;			// h
+	FGDouble	ahrs_true_heading_deg;				// th
+	FGDouble	fpm_alpha_deg;						// fpa
+	FGDouble	fpm_beta_deg;						// fpb
+	FGDouble	magnetic_track_deg;					// tr
+	FGBool		navigation_needles_visible;			// nav
+	FGBool		vertical_deviation_ok;				// ngso
+	FGDouble	vertical_deviation_deg;				// ngs
+	FGBool		lateral_deviation_ok;				// nhdo
+	FGDouble	lateral_deviation_deg;				// nhd
+	FGBool		navigation_dme_ok;					// dok
+	FGDouble	dme_distance_nm;					// dme
+	FGDouble	slip_skid_g;						// ss
+	FGDouble	static_air_temperature_K;			// tmp
+	FGDouble	engine_throttle_pct;				// thr
+	FGDouble	engine_1_thrust;					// thrust1
+	FGDouble	engine_1_rpm;						// rpm1
+	FGDouble	engine_1_pitch_deg;					// pitch1
+	FGDouble	engine_1_epr;						// epr1
+	FGDouble	engine_1_n1_pct;					// n1-1
+	FGDouble	engine_1_n2_pct;					// n2-1
+	FGDouble	engine_1_egt_degc;					// egt1
+	FGDouble	engine_2_thrust;					// thrust2
+	FGDouble	engine_2_rpm;						// rpm2
+	FGDouble	engine_2_pitch_deg;					// pitch2
+	FGDouble	engine_2_epr;						// epr2
+	FGDouble	engine_2_n1_pct;					// n1-2
+	FGDouble	engine_2_n2_pct;					// n2-2
+	FGDouble	engine_2_egt_degc;					// egt2
+	FGDouble	wind_from_magnetic_heading_deg;		// wfh
+	FGDouble	wind_tas_kt;						// ws
 }
 END_PACKED_STRUCT
 
@@ -130,22 +130,26 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "ias-lookahead", _ias_lookahead, false },
 						{ "ias-minimum", _minimum_ias, false },
 						{ "ias-maximum", _maximum_ias, false },
+						{ "ias.serviceable", _ias_serviceable, false },
 						{ "gs", _gs, false },
 						{ "tas", _tas, false },
 						{ "mach", _mach, false },
-						{ "orientation-pitch", _pitch, false },
-						{ "orientation-roll", _roll, false },
-						{ "orientation-magnetic-heading", _magnetic_heading, false },
-						{ "orientation-true-heading", _true_heading, false },
+						{ "ahrs.pitch", _ahrs_pitch, false },
+						{ "ahrs.roll", _ahrs_roll, false },
+						{ "ahrs.magnetic-heading", _ahrs_magnetic_heading, false },
+						{ "ahrs.true-heading", _ahrs_true_heading, false },
+						{ "ahrs.serviceable", _ahrs_serviceable, false },
 						{ "slip-skid", _slip_skid_g, false },
 						{ "flight-path-marker-alpha", _fpm_alpha, false },
 						{ "flight-path-marker-beta", _fpm_beta, false },
 						{ "magnetic-track", _magnetic_track, false },
 						{ "standard-pressure", _standard_pressure, false },
 						{ "altitude", _altitude, false },
-						{ "altitude-agl", _altitude_agl, false },
+						{ "radar-altimeter.altitude.agl", _radar_altimeter_altitude_agl, false },
+						{ "radar-altimeter.serviceable", _radar_altimeter_serviceable, false },
 						{ "cbr", _cbr, false },
 						{ "pressure", _pressure, false },
+						{ "pressure.serviceable", _pressure_serviceable, false },
 						{ "cmd-setting-altitude", _cmd_alt_setting, false },
 						{ "cmd-setting-ias", _cmd_speed_setting, false },
 						{ "cmd-setting-heading", _cmd_heading_setting, false },
@@ -172,9 +176,13 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "engine.2.n1", _engine_2_n1_pct, false },
 						{ "engine.2.n2", _engine_2_n2_pct, false },
 						{ "engine.2.egt", _engine_2_egt_degc, false },
-						{ "position-latitude", _position_lat, false },
-						{ "position-longitude", _position_lng, false },
-						{ "position-amsl", _position_amsl, false },
+						{ "gps.latitude", _gps_latitude, false },
+						{ "gps.longitude", _gps_longitude, false },
+						{ "gps.amsl", _gps_amsl, false },
+						{ "gps.accuracy.lateral", _gps_accuracy_lateral, false },
+						{ "gps.accuracy.vertical", _gps_accuracy_vertical, false },
+						{ "gps.source", _gps_source, false },
+						{ "gps.serviceable", _gps_serviceable, false },
 						{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
 						{ "wind-tas", _wind_tas, false },
 					});
@@ -205,33 +213,15 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		}
 	}
 
-	_timeout_timer = std::make_unique<QTimer>();
-	_timeout_timer->setSingleShot (true);
-	_timeout_timer->setInterval (200);
-	QObject::connect (_timeout_timer.get(), SIGNAL (timeout()), this, SLOT (invalidate_all()));
+	_serviceable_flags = {
+		&_ahrs_serviceable,
+		&_ias_serviceable,
+		&_radar_altimeter_serviceable,
+		&_pressure_serviceable,
+		&_gps_serviceable,
+	};
 
-	_input = std::make_unique<QUdpSocket>();
-	_input->bind (QHostAddress (_input_host), _input_port, QUdpSocket::ShareAddress);
-	QObject::connect (_input.get(), SIGNAL (readyRead()), this, SLOT (got_packet()));
-
-	_output = std::make_unique<QUdpSocket>();
-
-	invalidate_all();
-}
-
-
-void
-FlightGearIO::got_packet()
-{
-	read_input();
-	write_output();
-}
-
-
-void
-FlightGearIO::invalidate_all()
-{
-	Xefis::GenericProperty* properties[] = {
+	_output_properties = {
 		&_ias,
 		&_ias_lookahead,
 		&_minimum_ias,
@@ -239,17 +229,17 @@ FlightGearIO::invalidate_all()
 		&_gs,
 		&_tas,
 		&_mach,
-		&_pitch,
-		&_roll,
-		&_magnetic_heading,
-		&_true_heading,
+		&_ahrs_pitch,
+		&_ahrs_roll,
+		&_ahrs_magnetic_heading,
+		&_ahrs_true_heading,
 		&_slip_skid_g,
 		&_fpm_alpha,
 		&_fpm_beta,
 		&_magnetic_track,
 		&_standard_pressure,
 		&_altitude,
-		&_altitude_agl,
+		&_radar_altimeter_altitude_agl,
 		&_cbr,
 		&_pressure,
 		&_cmd_alt_setting,
@@ -278,18 +268,48 @@ FlightGearIO::invalidate_all()
 		&_engine_2_n1_pct,
 		&_engine_2_n2_pct,
 		&_engine_2_egt_degc,
-		&_position_lat,
-		&_position_lng,
-		&_position_amsl,
+		&_gps_latitude,
+		&_gps_longitude,
+		&_gps_amsl,
+		&_gps_accuracy_lateral,
+		&_gps_accuracy_vertical,
 		&_wind_from_magnetic_heading,
 		&_wind_tas
 	};
 
-	for (auto property: properties)
-	{
-		if (property->valid())
+	_timeout_timer = std::make_unique<QTimer>();
+	_timeout_timer->setSingleShot (true);
+	_timeout_timer->setInterval (200);
+	QObject::connect (_timeout_timer.get(), SIGNAL (timeout()), this, SLOT (invalidate_all()));
+
+	_input = std::make_unique<QUdpSocket>();
+	_input->bind (QHostAddress (_input_host), _input_port, QUdpSocket::ShareAddress);
+	QObject::connect (_input.get(), SIGNAL (readyRead()), this, SLOT (got_packet()));
+
+	_output = std::make_unique<QUdpSocket>();
+
+	invalidate_all();
+}
+
+
+void
+FlightGearIO::got_packet()
+{
+	read_input();
+	write_output();
+}
+
+
+void
+FlightGearIO::invalidate_all()
+{
+	for (auto property: _output_properties)
+		if (property->configured())
 			property->set_nil();
-	}
+
+	for (auto flag: _serviceable_flags)
+		if (flag->configured())
+			flag->write (false);
 }
 
 
@@ -332,16 +352,16 @@ FlightGearIO::read_input()
 		ASSIGN (kt,   minimum_ias);
 		ASSIGN_UNITLESS (standard_pressure);
 		ASSIGN (ft,   altitude);
-		ASSIGN (ft,   altitude_agl);
+		ASSIGN (ft,   radar_altimeter_altitude_agl);
 		ASSIGN (inHg, pressure);
 		ASSIGN (fpm,  cbr);
-		ASSIGN (deg,  position_lat);
-		ASSIGN (deg,  position_lng);
-		ASSIGN (ft,   position_amsl);
-		ASSIGN (deg,  pitch);
-		ASSIGN (deg,  roll);
-		ASSIGN (deg,  magnetic_heading);
-		ASSIGN (deg,  true_heading);
+		ASSIGN (deg,  gps_latitude);
+		ASSIGN (deg,  gps_longitude);
+		ASSIGN (ft,   gps_amsl);
+		ASSIGN (deg,  ahrs_pitch);
+		ASSIGN (deg,  ahrs_roll);
+		ASSIGN (deg,  ahrs_magnetic_heading);
+		ASSIGN (deg,  ahrs_true_heading);
 		ASSIGN (deg,  fpm_alpha);
 		ASSIGN (deg,  fpm_beta);
 		ASSIGN (deg,  magnetic_track);
@@ -352,14 +372,14 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (engine_throttle_pct);
 		ASSIGN_UNITLESS (engine_1_thrust);
 		ASSIGN_UNITLESS (engine_1_rpm);
-		ASSIGN_UNITLESS (engine_1_pitch);
+		ASSIGN (deg,  engine_1_pitch);
 		ASSIGN_UNITLESS (engine_1_epr);
 		ASSIGN_UNITLESS (engine_1_n1_pct);
 		ASSIGN_UNITLESS (engine_1_n2_pct);
 		ASSIGN_UNITLESS (engine_1_egt_degc);
 		ASSIGN_UNITLESS (engine_2_thrust);
 		ASSIGN_UNITLESS (engine_2_rpm);
-		ASSIGN_UNITLESS (engine_2_pitch);
+		ASSIGN (deg,  engine_2_pitch);
 		ASSIGN_UNITLESS (engine_2_epr);
 		ASSIGN_UNITLESS (engine_2_n1_pct);
 		ASSIGN_UNITLESS (engine_2_n2_pct);
@@ -390,13 +410,21 @@ FlightGearIO::read_input()
 		_maximum_ias.set_nil();
 	if (_minimum_ias.valid() && *_minimum_ias < 1_kt)
 		_minimum_ias.set_nil();
-	if (_altitude_agl.valid() && *_altitude_agl > 2500_ft)
-		_altitude_agl.set_nil();
+	if (_radar_altimeter_altitude_agl.valid() && *_radar_altimeter_altitude_agl > 2500_ft)
+		_radar_altimeter_altitude_agl.set_nil();
 	// Convert EGT from °F to °C:
 	if (_engine_1_egt_degc.valid())
 		_engine_1_egt_degc.write (5.0 / 9.0 * (*_engine_1_egt_degc - 32.0));
 	if (_engine_2_egt_degc.valid())
 		_engine_2_egt_degc.write (5.0 / 9.0 * (*_engine_2_egt_degc - 32.0));
+
+	for (auto flag: _serviceable_flags)
+		if (flag->configured())
+			flag->write (true);
+
+	_gps_accuracy_lateral.write (1_m);
+	_gps_accuracy_vertical.write (1_m);
+	_gps_source.write ("GPS");
 
 	_timeout_timer->start();
 }
