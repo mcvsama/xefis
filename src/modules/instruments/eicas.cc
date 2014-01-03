@@ -30,23 +30,51 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/eicas", EICAS);
 
 
-EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
+EICAS::MessageDefinition::Observation::Observation (QDomElement const& observe_element)
 {
-	if (!message_element.hasAttribute ("path"))
+	QString fail_on_nil = observe_element.attribute ("fail-on-nil");
+	if (observe_element.hasAttribute ("fail-on-nil") && fail_on_nil != "true" && fail_on_nil != "false")
+		throw Xefis::Exception ("invalid value for attribute @fail-on-nil on <message> element - must be 'true' or 'false'");
+
+	if (!observe_element.hasAttribute ("path"))
 		throw Xefis::Exception ("missing @path property on <message> element");
 
-	if (!message_element.hasAttribute ("message"))
-		throw Xefis::Exception ("missing @message property on <message> element");
-
-	QString fail_on = message_element.attribute ("fail-on");
-	if (!message_element.hasAttribute ("fail-on"))
+	QString fail_on = observe_element.attribute ("fail-on");
+	if (!observe_element.hasAttribute ("fail-on"))
 		throw Xefis::Exception ("missing @fail-on property on <message> element");
 	if (fail_on != "true" && fail_on != "false")
 		throw Xefis::Exception ("invalid value for attribute @fail-on on <message> element - must be 'true' or 'false'");
 
-	QString fail_on_nil = message_element.attribute ("fail-on-nil");
-	if (message_element.hasAttribute ("fail-on-nil") && fail_on_nil != "true" && fail_on_nil != "false")
-		throw Xefis::Exception ("invalid value for attribute @fail-on-nil on <message> element - must be 'true' or 'false'");
+	_observed_property.set_path (observe_element.attribute ("path").toStdString());
+	_valid_state = fail_on != "true";
+	_fail_on_nil = fail_on_nil == "true";
+}
+
+
+bool
+EICAS::MessageDefinition::Observation::fresh() const
+{
+	return _observed_property.fresh();
+}
+
+
+bool
+EICAS::MessageDefinition::Observation::test() const
+{
+	// Force fresh() to return false until next value change:
+	_observed_property.read();
+
+	if (_observed_property.is_nil())
+		return _fail_on_nil;
+	else
+		return *_observed_property != _valid_state;
+}
+
+
+EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
+{
+	if (!message_element.hasAttribute ("message"))
+		throw Xefis::Exception ("missing @message property on <message> element");
 
 	QString severity_str = message_element.attribute ("severity");
 	if (message_element.hasAttribute ("severity"))
@@ -59,34 +87,43 @@ EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
 			throw Xefis::Exception ("invalid value for attribute @severity on <message> element - must be 'warning' or 'critical'");
 	}
 
-	_observed_property.set_path (message_element.attribute ("path").toStdString());
-	_valid_state = fail_on != "true";
-	_fail_on_nil = fail_on_nil == "true";
+	for (QDomElement o: message_element)
+		if (o == "observe")
+			_observations.push_back (Observation (o));
+
 	_message = message_element.attribute ("message");
 }
 
 
 EICAS::MessageDefinition::StateChange
-EICAS::MessageDefinition::test() const
+EICAS::MessageDefinition::test()
 {
-	if (_observed_property.fresh())
+	bool any_fresh = false;
+	bool show = false;
+
+	for (Observation const& o: _observations)
 	{
-		// Force fresh() to return false until next value change:
-		_observed_property.read();
-
-		if (_fail_on_nil && _observed_property.is_nil())
-			return Show;
-
-		if (_observed_property.valid())
+		if (o.fresh())
 		{
-			if (*_observed_property == _valid_state)
-				return Revoke;
-			else
-				return Show;
+			any_fresh = true;
+			show = o.test();
 		}
 	}
 
-	return NoChange;
+	if (any_fresh)
+	{
+		if (show == _shown)
+			return NoChange;
+		else
+		{
+			_shown = show;
+			if (show)
+				return Show;
+			return Revoke;
+		}
+	}
+	else
+		return NoChange;
 }
 
 

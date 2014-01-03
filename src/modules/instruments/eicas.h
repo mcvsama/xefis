@@ -62,6 +62,34 @@ class EICAS: public Xefis::Instrument
 			NoChange,
 		};
 
+		/**
+		 * Observed property and conditions.
+		 */
+		class Observation
+		{
+		  public:
+			// Ctor
+			explicit Observation (QDomElement const& observe_element);
+
+			/**
+			 * Return true, if property has changed its value since
+			 * last call to the test() method.
+			 */
+			bool
+			fresh() const;
+
+			/**
+			 * Return true, if conditions for showing message apply.
+			 */
+			bool
+			test() const;
+
+		  private:
+			Xefis::PropertyBoolean	_observed_property;
+			bool					_valid_state	= true;
+			bool					_fail_on_nil	= false;
+		};
+
 	  public:
 		// Ctor
 		explicit MessageDefinition (QDomElement const& message_element);
@@ -77,7 +105,7 @@ class EICAS: public Xefis::Instrument
 		 * according to the configuration and current property state.
 		 */
 		StateChange
-		test() const;
+		test();
 
 		/**
 		 * Message to show on EICAS.
@@ -116,13 +144,12 @@ class EICAS: public Xefis::Instrument
 		color() const noexcept;
 
 	  private:
-		Xefis::PropertyBoolean	_observed_property;
-		bool					_valid_state		= true;
-		bool					_fail_on_nil		= false;
-		Severity				_severity			= Severity::Warning;
-		QString					_message;
-		uint64_t				_message_id			= 0;
-		bool					_has_message		= false;
+		std::vector<Observation>	_observations;
+		bool						_shown				= false;
+		Severity					_severity			= Severity::Warning;
+		QString						_message;
+		uint64_t					_message_id			= 0;
+		bool						_has_message		= false;
 	};
 
   public:
