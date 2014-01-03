@@ -106,6 +106,13 @@ class Module: private Noncopyable
 	data_updated();
 
 	/**
+	 * Called when exception is caught from data_updated() method.
+	 * Default implementation does nothing.
+	 */
+	virtual void
+	rescue();
+
+	/**
 	 * Return last update time.
 	 */
 	Time
@@ -269,6 +276,11 @@ Module::~Module()
 
 inline void
 Module::data_updated()
+{ }
+
+
+inline void
+Module::rescue()
 { }
 
 

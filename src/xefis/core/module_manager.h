@@ -105,6 +105,13 @@ class ModuleManager
 	void
 	module_data_updated (Module*) const;
 
+	/**
+	 * Try to call the rescue() method on a module, and catch exceptions.
+	 * If exception is caught, it's described and not rethrown.
+	 */
+	void
+	try_rescue (Module*) const;
+
   private:
 	Application*		_application = nullptr;
 	Modules				_modules;

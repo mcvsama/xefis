@@ -52,7 +52,20 @@ class FlyByWire: public Xefis::Module
 	data_updated() override;
 
 	void
+	rescue() override;
+
+	/**
+	 * Do integration of joystick axes, to compute user-desired attitude
+	 * for stabilized control mode.
+	 */
+	void
 	integrate_manual_input();
+
+	/**
+	 * Check properties and diagnose problem on the log.
+	 */
+	void
+	diagnose();
 
   private:
 	// Used with joystick input:
@@ -67,29 +80,29 @@ class FlyByWire: public Xefis::Module
 	Xefis::Smoother<double>		_elevator_smoother		= 50_ms;
 	Xefis::Smoother<double>		_ailerons_smoother		= 50_ms;
 	Time						_dt						= 0_s;
+	// Settings:
+	double						_stabilization_gain;
+	double						_pitch_gain;
+	double						_pitch_p;
+	double						_pitch_i;
+	double						_pitch_d;
+	double						_pitch_error_power;
+	double						_roll_gain;
+	double						_roll_p;
+	double						_roll_i;
+	double						_roll_d;
+	double						_roll_error_power;
+	double						_yaw_gain;
+	double						_yaw_p;
+	double						_yaw_i;
+	double						_yaw_d;
+	double						_yaw_error_power;
 	// Input:
 	// TODO different stabilization parameters for joystick input and for F/D input.
-	// TODO PID params as settings, not properties.
 	Xefis::PropertyInteger		_attitude_mode;
 	Xefis::PropertyInteger		_throttle_mode;
 	Xefis::PropertyAngle		_pitch_extent;
 	Xefis::PropertyAngle		_roll_extent;
-	Xefis::PropertyFloat		_stabilization_gain;
-	Xefis::PropertyFloat		_pitch_gain;
-	Xefis::PropertyFloat		_pitch_p;
-	Xefis::PropertyFloat		_pitch_i;
-	Xefis::PropertyFloat		_pitch_d;
-	Xefis::PropertyFloat		_pitch_error_power;
-	Xefis::PropertyFloat		_roll_gain;
-	Xefis::PropertyFloat		_roll_p;
-	Xefis::PropertyFloat		_roll_i;
-	Xefis::PropertyFloat		_roll_d;
-	Xefis::PropertyFloat		_roll_error_power;
-	Xefis::PropertyFloat		_yaw_gain;
-	Xefis::PropertyFloat		_yaw_p;
-	Xefis::PropertyFloat		_yaw_i;
-	Xefis::PropertyFloat		_yaw_d;
-	Xefis::PropertyFloat		_yaw_error_power;
 	Xefis::PropertyFloat		_input_pitch_axis;
 	Xefis::PropertyFloat		_input_roll_axis;
 	Xefis::PropertyFloat		_input_yaw_axis;
@@ -107,6 +120,7 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat		_rudder_minimum;
 	Xefis::PropertyFloat		_rudder_maximum;
 	// Output:
+	Xefis::PropertyBoolean		_serviceable;
 	Xefis::PropertyAngle		_output_control_stick_pitch;
 	Xefis::PropertyAngle		_output_control_stick_roll;
 	Xefis::PropertyAngle		_output_pitch;
