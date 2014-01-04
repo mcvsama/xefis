@@ -7,25 +7,29 @@
 			<properties>
 				<directory path='/sensors'>
 					<!-- gps -->
-					<directory path='/gps'>
-						<property name='position-longitude' path='/longitude'/>
-						<property name='position-latitude' path='/latitude'/>
-						<property name='position-amsl' path='/altitude-amsl'/>
-					</directory>
+					<property name='gps.longitude' path='/gps/longitude'/>
+					<property name='gps.latitude' path='/gps/latitude'/>
+					<property name='gps.amsl' path='/gps/altitude-amsl'/>
+					<property name='gps.accuracy.lateral' path='/gps/accuracy.lateral'/>
+					<property name='gps.accuracy.vertical' path='/gps/accuracy.vertical'/>
+					<property name='gps.serviceable' path='/gps/serviceable'/>
+					<property name='gps.source' path='/gps/source'/>
 					<!-- ahrs -->
-					<directory path='/ahrs/orientation'>
-						<property name='orientation-pitch' path='/pitch'/>
-						<property name='orientation-roll' path='/roll'/>
-						<property name='orientation-magnetic-heading' path='/magnetic-heading'/>
-					</directory>
+					<property name='ahrs.serviceable' path='/ahrs/serviceable'/>
+					<property name='ahrs.pitch' path='/ahrs/orientation/pitch'/>
+					<property name='ahrs.roll' path='/ahrs/orientation/roll'/>
+					<property name='ahrs.magnetic-heading' path='/ahrs/orientation/magnetic-heading'/>
 					<!-- airspeed -->
 					<property name='ias' path='/airspeed/ias'/>
+					<property name='ias.serviceable' path='/airspeed/serviceable'/>
 					<!-- pressure -->
 					<property name='pressure' path='/pressure/static'/>
+					<property name='pressure.serviceable' path='/pressure/serviceable'/>
 					<!-- temperature -->
 					<property name='static-air-temperature' path='/air-temperature/static'/>
 					<!-- radar altimeter -->
-					<property name='altitude-agl' path='/radar-altimeter/altitude.agl'/>
+					<property name='radar-altimeter.altitude.agl' path='/radar-altimeter/altitude.agl'/>
+					<property name='radar-altimeter.serviceable' path='/radar-altimeter/serviceable'/>
 					<!-- slip-skid -->
 					<property name='slip-skid' path='/slip-skid/slip-skid'/>
 					<!-- engine -->
@@ -44,7 +48,7 @@
 					<property name='engine.2.epr' path='/engines/2/epr'/>
 					<property name='engine.2.pitch' path='/engines/2/pitch'/>
 				</directory>
-				<directory path='/other/fgdata'>
+				<directory path='/sensors/flightgear-other'>
 					<property name='gs' path='/speed/ground-speed'/>
 					<property name='tas' path='/speed/true-airspeed'/>
 					<property name='mach' path='/speed/mach'/>
@@ -55,7 +59,7 @@
 					<property name='magnetic-track' path='/flight-path/magnetic-track'/>
 					<property name='cbr' path='/altitude/vertical-speed'/>
 					<property name='altitude' path='/altitude/amsl'/>
-					<property name='orientation-true-heading' path='/orientation/true-heading'/>
+					<property name='ahrs.true-heading' path='/orientation/true-heading'/>
 					<property name='ias-minimum' path='/speed/ias-minimum'/>
 					<property name='ias-maximum' path='/speed/ias-maximum'/>
 					<property name='ias-lookahead' path='/speed/ias-lookahead'/>
@@ -72,10 +76,10 @@
 		<output disabled='false'>
 			<host>127.0.0.1</host>
 			<port>9001</port>
-			<properties path='/systems/fly-by-wire'>
-				<property name='ailerons' path='/ailerons'/>
-				<property name='elevator' path='/elevator'/>
-				<property name='rudder' path='/rudder'/>
+			<properties path='/input'>
+				<property name='ailerons' path='/stick-ailerons'/>
+				<property name='elevator' path='/stick-elevator'/>
+				<property name='rudder' path='/pedals'/>
 				<property name='throttle.1' path='/throttle'/>
 				<property name='throttle.2' path='/throttle'/>
 			</properties>

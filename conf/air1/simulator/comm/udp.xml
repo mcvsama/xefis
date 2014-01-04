@@ -3,13 +3,13 @@
 	<module name='io/udp'>
 		<settings>
 			<setting name='send.host' value='127.0.0.1'/>
-			<setting name='send.port' value='9952'/>
+			<setting name='send.port' value='9951'/>
 			<setting name='receive.host' value='127.0.0.1'/>
-			<setting name='receive.port' value='9951'/>
+			<setting name='receive.port' value='9952'/>
 		</settings>
 		<properties>
-			<property name='send' path='/link/data/to-aircraft'/>
-			<property name='receive' path='/link/data/to-groundstation'/>
+			<property name='send' path='/link/data/to-groundstation'/>
+			<property name='receive' path='/link/data/to-aircraft'/>
 		</properties>
 	</module>
 </xefis-include>
