@@ -133,6 +133,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 	});
 	_vertical_speed_computer.observe ({
 		&_altitude_amsl_std,
+		&_altitude_amsl_serviceable,
 	});
 }
 
@@ -365,6 +366,6 @@ AirDataComputer::compute_vertical_speed()
 		_vertical_speed_smoother.invalidate();
 	}
 
-	_vertical_speed_serviceable.write (_vertical_speed.valid());
+	_vertical_speed_serviceable.copy (_altitude_amsl_serviceable);
 }
 
