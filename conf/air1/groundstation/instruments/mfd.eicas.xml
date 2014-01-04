@@ -57,7 +57,7 @@
 							<setting name='style.mirrored' value='false'/>
 						</settings>
 						<properties path='//sensors/engines/1'>
-							<property name='value' path='/pitch'/>
+							<property name='value' path='/pitch.deg'/>
 						</properties>
 					</instrument>
 				</item>
@@ -157,7 +157,7 @@
 							<setting name='style.mirrored' value='true'/>
 						</settings>
 						<properties path='//sensors/engines/2'>
-							<property name='value' path='/pitch'/>
+							<property name='value' path='/pitch.deg'/>
 						</properties>
 					</instrument>
 				</item>
