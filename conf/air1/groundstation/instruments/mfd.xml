@@ -2,10 +2,10 @@
 <xefis-include>
 	<layout type='stack' path='//settings/efis/mfd-mode'>
 		<item>
-			<include name='eicas.xml'/>
+			<include name='mfd.eicas.xml'/>
 		</item>
 		<item>
-			<include name='nd.xml'/>
+			<include name='mfd.nd.xml'/>
 		</item>
 	</layout>
 </xefis-include>
