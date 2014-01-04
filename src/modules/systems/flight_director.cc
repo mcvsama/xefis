@@ -104,18 +104,54 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 
 	roll_mode_changed();
 	pitch_mode_changed();
+
+	_fd_computer.set_minimum_dt (5_ms);
+	_fd_computer.set_callback (std::bind (&FlightDirector::compute_fd, this));
+	_fd_computer.add_depending_smoothers ({
+		&_output_pitch_smoother,
+		&_output_roll_smoother,
+	});
+	_fd_computer.observe ({
+		&_pitch_limit_max,
+		&_pitch_limit_min,
+		&_roll_limit,
+		&_cmd_roll_mode,
+		&_cmd_pitch_mode,
+		&_cmd_magnetic_heading,
+		&_cmd_magnetic_track,
+		&_cmd_altitude,
+		&_cmd_ias,
+		&_cmd_vertical_speed,
+		&_cmd_fpa,
+		&_measured_magnetic_heading,
+		&_measured_magnetic_track,
+		&_measured_altitude,
+		&_measured_ias,
+		&_measured_vertical_speed,
+		&_measured_fpa,
+	});
 }
 
 
 void
 FlightDirector::data_updated()
 {
-	bool disengage = false;
+	_fd_computer.data_updated (update_time());
+}
 
-	// Don't process if dt is too small:
-	_dt += update_dt();
-	if (_dt < 5_ms)
-		return;
+
+void
+FlightDirector::rescue()
+{
+	_disengage_ap.write (true);
+}
+
+
+void
+FlightDirector::compute_fd()
+{
+	Time update_dt = _fd_computer.update_dt();
+	bool disengage = false;
 
 	if (_cmd_roll_mode.fresh())
 		roll_mode_changed();
@@ -142,7 +178,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_magnetic_heading_pid.set_target (Xefis::renormalize (_cmd_magnetic_heading->deg(), 0.0, 360.0, -1.0, +1.0));
-				_magnetic_heading_pid.process (Xefis::renormalize (_measured_magnetic_heading->deg(), 0.0, 360.0, -1.0, +1.0), _dt);
+				_magnetic_heading_pid.process (Xefis::renormalize (_measured_magnetic_heading->deg(), 0.0, 360.0, -1.0, +1.0), update_dt);
 				_computed_output_roll = 1_deg * Xefis::limit<double> (_magnetic_heading_pid.output() * 180.0, roll_limit);
 			}
 			break;
@@ -156,7 +192,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_magnetic_track_pid.set_target (Xefis::renormalize (_cmd_magnetic_track->deg(), 0.0, 360.0, -1.0, +1.0));
-				_magnetic_track_pid.process (Xefis::renormalize (_measured_magnetic_track->deg(), 0.0, 360.0, -1.0, +1.0), _dt);
+				_magnetic_track_pid.process (Xefis::renormalize (_measured_magnetic_track->deg(), 0.0, 360.0, -1.0, +1.0), update_dt);
 				_computed_output_roll = 1_deg * Xefis::limit<double> (_magnetic_track_pid.output() * 180.0, roll_limit);
 			}
 			break;
@@ -178,7 +214,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_altitude_pid.set_target (_cmd_altitude->ft());
-				_altitude_pid.process (_measured_altitude->ft(), _dt);
+				_altitude_pid.process (_measured_altitude->ft(), update_dt);
 				_computed_output_pitch = 1_deg * Xefis::limit<double> (altitude_output_scale * _altitude_pid.output(), pitch_limit);
 			}
 			break;
@@ -192,7 +228,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_ias_pid.set_target (_cmd_ias->kt());
-				_ias_pid.process (_measured_ias->kt(), _dt);
+				_ias_pid.process (_measured_ias->kt(), update_dt);
 				_computed_output_pitch = 1_deg * Xefis::limit<double> (_ias_pid.output(), pitch_limit);
 			}
 			break;
@@ -206,7 +242,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_vertical_speed_pid.set_target (_cmd_vertical_speed->fpm());
-				_vertical_speed_pid.process (_measured_vertical_speed->fpm(), _dt);
+				_vertical_speed_pid.process (_measured_vertical_speed->fpm(), update_dt);
 				_computed_output_pitch = 1_deg * Xefis::limit<double> (vertical_speed_output_scale * _vertical_speed_pid.output(), pitch_limit);
 			}
 			break;
@@ -220,7 +256,7 @@ FlightDirector::data_updated()
 			else
 			{
 				_fpa_pid.set_target (_cmd_fpa->deg());
-				_fpa_pid.process (_measured_fpa->deg(), _dt);
+				_fpa_pid.process (_measured_fpa->deg(), update_dt);
 				_computed_output_pitch = 1_deg * Xefis::limit<double> (_fpa_pid.output(), pitch_limit);
 			}
 			break;
@@ -231,13 +267,11 @@ FlightDirector::data_updated()
 			break;
 	}
 
-	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), _dt));
-	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), _dt));
+	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt));
+	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt));
 
 	if (disengage || _disengage_ap.is_nil())
 		_disengage_ap.write (disengage);
-
-	_dt = 0_s;
 }
 
 
