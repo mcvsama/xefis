@@ -16,7 +16,7 @@
 						<properties path='//sensors/engines/1'>
 							<property name='value' path='/thrust'/>
 							<property name='value.reference' path='/thrust.reference' default='520'/>
-							<property name='value.target' path='//input/main/axis/2'/>
+							<property name='value.target' path='//input/stick/axis/2'/>
 						</properties>
 					</instrument>
 				</item>
@@ -116,7 +116,7 @@
 						<properties path='//sensors/engines/2'>
 							<property name='value' path='/thrust'/>
 							<property name='value.reference' path='/thrust.reference' default='520'/>
-							<property name='value.target' path='//input/main/axis/2'/>
+							<property name='value.target' path='//input/stick/axis/2'/>
 						</properties>
 					</instrument>
 				</item>
@@ -177,17 +177,51 @@
 							<property name='button.clear' path='/panels/mcp/eicas-clear'/>
 						</properties>
 						<messages>
-							<message path='/systems/adc/altitude/amsl.serviceable' message='ADC ALT AMSL FAIL' fail-on='false'/>
-							<message path='/systems/adc/speed/ias.serviceable' message='ADC IAS FAIL' fail-on='false'/>
-							<message path='/systems/adc/vertical-speed/serviceable' message='V/SPD FAIL' fail-on='false'/>
-							<message path='/systems/flight-director/serviceable' message='FD FAIL' fail-on='false'/>
-							<message path='/systems/nc/orientation/serviceable' message='NC ADI FAIL' fail-on='false' severity='critical'/>
-							<message path='/sensors/ahrs/serviceable' message='AHRS FAIL' fail-on='false' severity='critical'/>
-							<message path='/sensors/pressure/serviceable' message='STATIC PRESS FAIL' fail-on='false'/>
-							<message path='/sensors/gps/serviceable' message='GPS FAIL' fail-on='false' severity='critical'/>
-							<message path='/sensors/airspeed/serviceable' message='PITOT FAIL' fail-on='false'/>
-							<message path='/sensors/radar-altimeter/serviceable' message='RA FAIL' fail-on='false'/>
-							<message path='/link/xbee/serviceable' message='LINK FAIL' fail-on='false' severity='critical'/>
+							<message message='LINK FAIL' severity='critical'>
+								<observe path='/link/xbee/serviceable' fail-on='false'/>
+							</message>
+							<message message='ADC AMSL SYS' severity='critical'>
+								<observe path='/aircraft/systems/adc/altitude/amsl.serviceable' fail-on='false'/>
+							</message>
+							<message message='ADC IAS SYS' severity='critical'>
+								<observe path='/aircraft/systems/adc/speed/ias.serviceable' fail-on='false'/>
+							</message>
+							<message message='ADC V/SPD SYS' severity='critical'>
+								<observe path='/aircraft/systems/adc/vertical-speed/serviceable' fail-on='false'/>
+							</message>
+							<message message='NC POS ACCURACY SYS' severity='critical'>
+								<observe path='/aircraft/systems/nc/position/accuracy.serviceable' fail-on='false'/>
+							</message>
+							<message message='FBW SYS' severity='critical'>
+								<observe path='/aircraft/systems/fbw/serviceable' fail-on='false'/>
+							</message>
+							<message message='ADC ALT AMSL FAIL'>
+								<observe path='/systems/adc/altitude/amsl.serviceable' fail-on='false'/>
+							</message>
+							<message message='ADC IAS FAIL'>
+								<observe path='/systems/adc/speed/ias.serviceable' fail-on='false'/>
+							</message>
+							<message message='V/SPD FAIL'>
+								<observe path='/systems/adc/vertical-speed/serviceable' fail-on='false'/>
+							</message>
+							<message message='FD SYS FAIL'>
+								<observe path='/systems/flight-director/serviceable' fail-on='false'/>
+							</message>
+							<message message='AHRS FAIL'>
+								<observe path='/sensors/ahrs/serviceable' fail-on='false'/>
+							</message>
+							<message message='STATIC PRESS FAIL'>
+								<observe path='/sensors/pressure/serviceable' fail-on='false'/>
+							</message>
+							<message message='GPS FAIL'>
+								<observe path='/sensors/gps/serviceable' fail-on='false'/>
+							</message>
+							<message message='PITOT FAIL'>
+								<observe path='/sensors/airspeed/serviceable' fail-on='false'/>
+							</message>
+							<message message='RA FAIL'>
+								<observe path='/sensors/radar-altimeter/serviceable' fail-on='false'/>
+							</message>
 						</messages>
 					</instrument>
 				</item>

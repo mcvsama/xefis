@@ -1,0 +1,37 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/adc'>
+		<settings>
+			<setting name='ias.valid-minimum' value='20 kt'/>
+			<setting name='ias.valid-maximum' value='800 kt'/>
+		</settings>
+		<properties>
+			<!-- Input -->
+			<property name='settings.pressure.use-std' path='/settings/pressure/use-std'/>
+			<property name='settings.pressure.qnh' path='/settings/pressure/qnh'/>
+			<property name='pressure.static.serviceable' path='/sensors/pressure/serviceable'/>
+			<property name='pressure.static' path='/sensors/pressure/static'/>
+			<property name='ias.serviceable' path='/sensors/airspeed/serviceable'/>
+			<property name='ias' path='/sensors/airspeed/ias'/>
+			<property name='static-air-temperature' path='/sensors/air-temperature/static'/>
+			<!-- Output -->
+			<directory path='/systems/adc'>
+				<property name='altitude.amsl.serviceable' path='/altitude/amsl.serviceable'/>
+				<property name='altitude.amsl' path='/altitude/amsl'/>
+				<property name='altitude.amsl.lookahead' path='/altitude/amsl.lookahead'/>
+				<property name='altitude.amsl.qnh' path='/altitude/amsl.qnh'/>
+				<property name='altitude.amsl.std' path='/altitude/amsl.std'/>
+				<property name='density-altitude' path='/density-altitude'/>
+				<property name='speed.ias.serviceable' path='/speed/ias.serviceable'/>
+				<property name='speed.ias' path='/speed/ias'/>
+				<property name='speed.ias.lookahead' path='/speed/ias.lookahead'/>
+				<property name='speed.tas' path='/speed/tas'/>
+				<property name='speed.mach' path='/speed/mach'/>
+				<property name='speed.sound' path='/speed/sound'/>
+				<property name='vertical-speed.serviceable' path='/vertical-speed/serviceable'/>
+				<property name='vertical-speed' path='/vertical-speed/speed'/>
+			</directory>
+		</properties>
+	</module>
+</xefis-include>
+

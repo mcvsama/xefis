@@ -310,6 +310,7 @@ NavigationComputer::compute_track()
 		_track_lateral_magnetic.set_nil();
 	}
 
+	// DPM = degrees per mile
 	Optional<Angle> result_delta;
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{

@@ -1,18 +1,11 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='io/link' instance='input'>
+	<module name='io/link' instance='output'>
 		<settings>
-			<setting name='failsafe-after' value='500 ms'/>
-			<setting name='reacquire-after' value='150 ms'/>
+			<setting name='frequency' value='30 Hz'/>
 		</settings>
 		<properties>
-			<property name='input' path='/link/data/to-groundstation'/>
-			<property name='link-valid' path='/link/local/valid'/>
-			<property name='failsafes' path='/link/local/failsafes'/>
-			<property name='reacquires' path='/link/local/reacquires'/>
-			<property name='error-bytes' path='/link/local/error-bytes'/>
-			<property name='valid-bytes' path='/link/local/valid-bytes'/>
-			<property name='valid-packets' path='/link/local/valid-packets'/>
+			<property name='output' path='/link/data/to-groundstation'/>
 		</properties>
 		<protocol>
 			<packet magic='ca:fe'>
@@ -52,47 +45,54 @@
 						<property path='/sensors/gps/serviceable' type='boolean'/>
 						<property path='/sensors/radar-altimeter/serviceable' type='boolean'/>
 						<!-- Computers -->
-						<property path='/aircraft/systems/adc/altitude/amsl.serviceable' type='boolean'/>
-						<property path='/aircraft/systems/adc/speed/ias.serviceable' type='boolean'/>
-						<property path='/aircraft/systems/adc/vertical-speed/serviceable' type='boolean'/>
-						<property path='/aircraft/systems/fbw/serviceable' type='boolean'/>
+						<property path='/systems/adc/altitude/amsl.serviceable' type='boolean'/>
+						<property path='/systems/adc/speed/ias.serviceable' type='boolean'/>
+						<property path='/systems/adc/vertical-speed/serviceable' type='boolean'/>
+						<property path='/systems/fbw/serviceable' type='boolean'/>
 					</bitfield>
 				</signature>
 			</packet>
-			<packet magic='e4:40'>
+			<packet magic='e4:40' send-every='10' send-offset='0'>
 				<signature random-bytes='2' signature-bytes='2' key='44:55:66:77'>
-					<property bytes='2' path='/link/remote/failsafes' type='integer'/>
+					<property bytes='2' path='/link/local/failsafes' type='integer'/>
 					<bitfield>
-						<property path='/link/remote/valid' type='boolean'/>
+						<property path='/link/local/valid' type='boolean'/>
 					</bitfield>
 				</signature>
 			</packet>
 		</protocol>
 	</module>
-	<module name='io/link' instance='output'>
+	<module name='io/link' instance='input'>
 		<settings>
-			<setting name='frequency' value='50 Hz'/>
+			<setting name='failsafe-after' value='500 ms'/>
+			<setting name='reacquire-after' value='150 ms'/>
 		</settings>
 		<properties>
-			<property name='output' path='/link/data/to-aircraft'/>
+			<property name='input' path='/link/data/to-aircraft'/>
+			<property name='link-valid' path='/link/local/valid'/>
+			<property name='failsafes' path='/link/local/failsafes'/>
+			<property name='reacquires' path='/link/local/reacquires'/>
+			<property name='error-bytes' path='/link/local/error-bytes'/>
+			<property name='valid-bytes' path='/link/local/valid-bytes'/>
+			<property name='valid-packets' path='/link/local/valid-packets'/>
 		</properties>
 		<protocol>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
-					<property bytes='2' path='/input/stick/axis/1' type='float'/>
-					<property bytes='2' path='/input/stick/axis/0' type='float'/>
-					<property bytes='2' path='/input/pedals/axis/2' type='float'/>
-					<property bytes='2' path='/input/stick/axis/2' type='float'/>
-					<property bytes='2' path='/settings/pressure/qnh' type='pressure'/>
+					<property bytes='2' path='/input/stick-elevator' type='float'/>
+					<property bytes='2' path='/input/stick-ailerons' type='float'/>
+					<property bytes='2' path='/input/pedals' type='float'/>
+					<property bytes='2' path='/input/throttle' type='float'/>
+					<property bytes='2' path='/settings/pressure/qnh' type='pressure' retained='true'/>
 					<bitfield>
-						<property path='/settings/pressure/use-std' type='boolean'/>
+						<property path='/settings/pressure/use-std' type='boolean' retained='true'/>
 					</bitfield>
 				</signature>
 			</packet>
-			<packet magic='a3:80' send-every='1000' send-offset='0'>
+			<packet magic='a3:80'>
 				<signature random-bytes='2' signature-bytes='4' key='cc:dd:ee:ff'>
-					<property bytes='8' path='/settings/home/latitude' type='angle'/>
-					<property bytes='8' path='/settings/home/longitude' type='angle'/>
+					<property bytes='8' path='/settings/home/latitude' type='angle' retained='true'/>
+					<property bytes='8' path='/settings/home/longitude' type='angle' retained='true'/>
 				</signature>
 			</packet>
 		</protocol>

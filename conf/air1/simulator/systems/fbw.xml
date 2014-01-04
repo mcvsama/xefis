@@ -1,26 +1,28 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='systems/fly-by-wire'>
+	<module name='systems/fly-by-wire' disabled='true'>
+		<settings>
+			<setting name='stabilization-gain' path='/gain' value='1.0'/>
+			<setting name='pitch-gain' path='/pitch/gain' value='1.0'/>
+			<setting name='pitch-p' path='/pitch/p' value='10.0'/>
+			<setting name='pitch-i' path='/pitch/i' value='1.5'/>
+			<setting name='pitch-d' path='/pitch/d' value='0.5'/>
+			<setting name='pitch-error-power' path='/pitch/error-power' value='1.0'/>
+			<setting name='roll-gain' path='/roll/gain' value='1.0'/>
+			<setting name='roll-p' path='/roll/p' value='10.0'/>
+			<setting name='roll-i' path='/roll/i' value='1.5'/>
+			<setting name='roll-d' path='/roll/d' value='0.5'/>
+			<setting name='roll-error-power' path='/roll/error-power' value='1.0'/>
+			<setting name='yaw-gain' path='/yaw/gain' value='0.1'/>
+			<setting name='yaw-p' path='/yaw/p' value='0.1'/>
+			<setting name='yaw-i' path='/yaw/i' value='0.05'/>
+			<setting name='yaw-d' path='/yaw/d' value='0.01'/>
+			<setting name='yaw-error-power' path='/yaw/error-power' value='0.5'/>
+		</settings>
 		<properties>
 			<property name='attitude-mode' path='/settings/fly-by-wire/attitude-mode'/>
 			<property name='throttle-mode' path='/settings/fly-by-wire/throttle-mode'/>
 			<directory path='/systems/fly-by-wire/config'>
-				<property name='stabilization-gain' path='/gain' default='1.0'/>
-				<property name='pitch-gain' path='/pitch/gain' default='1.0'/>
-				<property name='pitch-p' path='/pitch/p' default='10.0'/>
-				<property name='pitch-i' path='/pitch/i' default='1.5'/>
-				<property name='pitch-d' path='/pitch/d' default='0.5'/>
-				<property name='pitch-error-power' path='/pitch/error-power' default='1.0'/>
-				<property name='roll-gain' path='/roll/gain' default='1.0'/>
-				<property name='roll-p' path='/roll/p' default='10.0'/>
-				<property name='roll-i' path='/roll/i' default='1.5'/>
-				<property name='roll-d' path='/roll/d' default='0.5'/>
-				<property name='roll-error-power' path='/roll/error-power' default='1.0'/>
-				<property name='yaw-gain' path='/yaw/gain' default='0.1'/>
-				<property name='yaw-p' path='/yaw/p' default='0.1'/>
-				<property name='yaw-i' path='/yaw/i' default='0.05'/>
-				<property name='yaw-d' path='/yaw/d' default='0.01'/>
-				<property name='yaw-error-power' path='/yaw/error-power' default='0.5'/>
 				<property name='elevator.minimum' path='/elevator/minimum' default='-0.75'/>
 				<property name='elevator.maximum' path='/elevator/maximum' default='+0.75'/>
 				<property name='ailerons.minimum' path='/ailerons/minimum' default='-0.5'/>
@@ -58,6 +60,7 @@
 				<property name='measured.roll' path='/orientation/roll'/>
 				<property name='measured.slip-skid' path='//sensors/slip-skid/slip-skid'/>
 			</directory>
+			<property name='serviceable' path='/systems/fly-by-wire/serviceable'/>
 		</properties>
 	</module>
 </xefis-include>
