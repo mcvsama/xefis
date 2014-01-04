@@ -23,6 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -55,11 +56,17 @@ class FlyByWire: public Xefis::Module
 	rescue() override;
 
 	/**
+	 * Do all FBW computations and write to output properties.
+	 */
+	void
+	compute_fbw();
+
+	/**
 	 * Do integration of joystick axes, to compute user-desired attitude
 	 * for stabilized control mode.
 	 */
 	void
-	integrate_manual_input();
+	integrate_manual_input (Time update_dt);
 
 	/**
 	 * Check properties and diagnose problem on the log.
@@ -68,6 +75,7 @@ class FlyByWire: public Xefis::Module
 	diagnose();
 
   private:
+	Xefis::PropertyObserver		_fbw_computer;
 	// Used with joystick input:
 	Xefis::PIDControl<double>	_manual_pitch_pid;
 	Xefis::PIDControl<double>	_manual_roll_pid;
@@ -79,7 +87,6 @@ class FlyByWire: public Xefis::Module
 	Xefis::PIDControl<double>	_rudder_pid;
 	Xefis::Smoother<double>		_elevator_smoother		= 50_ms;
 	Xefis::Smoother<double>		_ailerons_smoother		= 50_ms;
-	Time						_dt						= 0_s;
 	// Settings:
 	double						_stabilization_gain;
 	double						_pitch_gain;

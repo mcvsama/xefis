@@ -98,16 +98,57 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		pid->set_i_limit ({ -0.05f, +0.05f });
 		pid->set_winding (true);
 	}
+
+	_fbw_computer.set_minimum_dt (5_ms);
+	_fbw_computer.set_callback (std::bind (&FlyByWire::compute_fbw, this));
+	_fbw_computer.add_depending_smoothers ({
+		&_elevator_smoother,
+		&_ailerons_smoother,
+	});
+	_fbw_computer.observe ({
+		&_attitude_mode,
+		&_throttle_mode,
+		&_pitch_extent,
+		&_roll_extent,
+		&_input_pitch_axis,
+		&_input_roll_axis,
+		&_input_yaw_axis,
+		&_input_pitch,
+		&_input_roll,
+		&_input_throttle_axis,
+		&_input_throttle,
+		&_measured_pitch,
+		&_measured_roll,
+		&_measured_slip_skid_g,
+		&_elevator_minimum,
+		&_elevator_maximum,
+		&_ailerons_minimum,
+		&_ailerons_maximum,
+		&_rudder_minimum,
+		&_rudder_maximum,
+	});
 }
 
 
 void
 FlyByWire::data_updated()
 {
-	// Don't process if dt is too small:
-	_dt += update_dt();
-	if (_dt < 0.005_s)
-		return;
+	_fbw_computer.data_updated (update_time());
+}
+
+
+void
+FlyByWire::rescue()
+{
+	if (_serviceable.configured())
+		_serviceable.write (false);
+}
+
+
+void
+FlyByWire::compute_fbw()
+{
+	Time update_dt = _fbw_computer.update_dt();
 
 	double computed_elevator = 0.0;
 	double computed_ailerons = 0.0;
@@ -146,7 +187,7 @@ FlyByWire::data_updated()
 				else
 				{
 					// Should be computed for both Stabilized and FD modes:
-					integrate_manual_input();
+					integrate_manual_input (update_dt);
 
 					if (static_cast<AttitudeMode> (*_attitude_mode) == AttitudeMode::FlightDirector)
 					{
@@ -159,27 +200,27 @@ FlyByWire::data_updated()
 					_elevator_pid.set_error_power (_pitch_error_power);
 					_elevator_pid.set_output_limit (Range<double> (_elevator_minimum.read (-1.0), _elevator_maximum.read (1.0)));
 					_elevator_pid.set_target (_computed_output_pitch / 180_deg);
-					_elevator_pid.process (*_measured_pitch / 180_deg, _dt);
+					_elevator_pid.process (*_measured_pitch / 180_deg, update_dt);
 
 					_ailerons_pid.set_pid (_roll_p, _roll_i, _roll_d);
 					_ailerons_pid.set_gain (_roll_gain * _stabilization_gain);
 					_ailerons_pid.set_error_power (_roll_error_power);
 					_ailerons_pid.set_output_limit (Range<double> (_ailerons_minimum.read (-1.0), _ailerons_maximum.read (1.0)));
 					_ailerons_pid.set_target (_computed_output_roll / 180_deg);
-					_ailerons_pid.process (*_measured_roll / 180_deg, _dt);
+					_ailerons_pid.process (*_measured_roll / 180_deg, update_dt);
 
 					_rudder_pid.set_pid (_yaw_p, _yaw_i, _yaw_d);
 					_rudder_pid.set_gain (_yaw_gain * _stabilization_gain);
 					_rudder_pid.set_error_power (_yaw_error_power);
 					_rudder_pid.set_output_limit (Range<double> (_rudder_minimum.read (-1.0), _rudder_maximum.read (1.0)));
 					_rudder_pid.set_target (0.0);
-					_rudder_pid.process (_measured_slip_skid_g.read (0.0), _dt);
+					_rudder_pid.process (_measured_slip_skid_g.read (0.0), update_dt);
 
 					computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
-					computed_elevator = _elevator_smoother.process (computed_elevator, _dt);
+					computed_elevator = _elevator_smoother.process (computed_elevator, update_dt);
 
 					computed_ailerons = _ailerons_pid.output();
-					computed_ailerons = _ailerons_smoother.process (computed_ailerons, _dt);
+					computed_ailerons = _ailerons_smoother.process (computed_ailerons, update_dt);
 
 					// Mix manual rudder with auto-coordinated:
 					double yaw_axis = _input_yaw_axis.read (0.0);
@@ -235,21 +276,11 @@ FlyByWire::data_updated()
 		_output_ailerons.write (computed_ailerons);
 	if (_output_rudder.configured())
 		_output_rudder.write (computed_rudder);
-
-	_dt = 0_s;
 }
 
 
 void
-FlyByWire::rescue()
-{
-	if (_serviceable.configured())
-		_serviceable.write (false);
-}
-
-
-void
-FlyByWire::integrate_manual_input()
+FlyByWire::integrate_manual_input (Time update_dt)
 {
 	using Xefis::floored_mod;
 
@@ -280,13 +311,13 @@ FlyByWire::integrate_manual_input()
 
 	// Update output pitch attitude:
 	_manual_pitch_pid.set_target (target_pitch.deg() / 180.f);
-	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, _dt);
+	_manual_pitch_pid.process (_computed_output_pitch.deg() / 180.f, update_dt);
 	_computed_output_pitch += std::abs (axis_pitch) * _manual_pitch_pid.output() * 360_deg;
 	_computed_output_pitch = floored_mod (_computed_output_pitch, -180_deg, +180_deg);
 
 	// Update output roll attitude:
 	_manual_roll_pid.set_target (target_roll.deg() / 180.f);
-	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, _dt);
+	_manual_roll_pid.process (_computed_output_roll.deg() / 180.f, update_dt);
 	_computed_output_roll += std::abs (axis_roll) * _manual_roll_pid.output() * 360_deg;
 	_computed_output_roll = floored_mod (_computed_output_roll, -180_deg, +180_deg);
 
