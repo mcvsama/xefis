@@ -408,13 +408,5 @@ HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
 	request_repaint();
 }
 
-
-inline void
-HSIWidget::push_params()
-{
-	_local_paint_work_unit._params_next = _params;
-	_local_paint_work_unit._locals_next = _locals;
-}
-
 #endif
 
