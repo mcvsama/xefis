@@ -1,0 +1,105 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+# Get output from XEFIS log run with --modules-debug-log and feed it to this script.
+
+DOC_DIR = '../doc/XEFIS Reference Manual'
+
+if RUBY_VERSION.split('.')[0].to_i < 2
+	puts "This script requires Ruby 2.0 or newer"
+	exit 1
+end
+
+begin
+	require 'rexml/document'
+rescue
+	puts "Please install REXML"
+end
+
+require 'set'
+
+# Parse/process XEFIS output:
+
+module_info = {}
+
+$stdin.each_line do |line|
+	if m = /^(\d+\.\d+) \[(.+)#(.+)\] \* (.+): (.+)$/.match(line)
+		module_name = m[2].strip
+		type = m[4]
+		name = m[5]
+		unless module_info[module_name]
+			module_info[module_name] = { settings: Set.new, properties: Set.new }
+		end
+		case type
+			when 'setting'
+				module_info[module_name][:settings] << name
+			when 'property'
+				module_info[module_name][:properties] << name
+		end
+	end
+end
+
+# Process doc files:
+
+documented_info = {}
+
+errors = []
+module_info.each_pair do |name, info|
+	file_name = DOC_DIR + '/modules.' + name.gsub('/', '.') + '.xhtml'
+
+	if !File.exist?(file_name)
+		errors << "Missing file #{file_name}"
+	else
+		documented_info[name] = { settings: Set.new, properties: Set.new }
+
+		File.open(file_name) do |file|
+			begin
+				xml = REXML::Document.new(file.read)
+				xml.elements.each('//doc:settings//doc:item') do |item|
+					documented_info[name][:settings] << item.attribute('name').value
+				end
+				xml.elements.each('//doc:properties//doc:item') do |item|
+					documented_info[name][:properties] << item.attribute('name').value
+				end
+			rescue => e
+				errors << "Error while parsing #{file_name}: #{e.message}"
+			end
+		end
+
+		undocumented_settings = module_info[name][:settings] - documented_info[name][:settings]
+		deprecated_settings = documented_info[name][:settings] - module_info[name][:settings]
+		undocumented_properties = module_info[name][:properties] - documented_info[name][:properties]
+		deprecated_properties = documented_info[name][:properties] - module_info[name][:properties]
+
+		if !undocumented_settings.empty? or !deprecated_settings.empty? or !undocumented_properties.empty? or !deprecated_properties.empty?
+			puts "Module #{name}:"
+			unless undocumented_settings.empty?
+				puts "  Undocumented settings:"
+				for setting in undocumented_settings
+					puts "    #{setting}"
+				end
+			end
+			unless undocumented_properties.empty?
+				puts "  Undocumented properties:"
+				for property in undocumented_properties
+					puts "    #{property}"
+				end
+			end
+			unless deprecated_settings.empty?
+				puts "  Deprecated settings:"
+				for setting in deprecated_settings
+					puts "    #{setting}"
+				end
+			end
+			unless deprecated_properties.empty?
+				puts "  Deprecated properties:"
+				for property in deprecated_properties
+					puts "    #{property}"
+				end
+			end
+		end
+	end
+end
+
+puts errors.join("\n")
+
