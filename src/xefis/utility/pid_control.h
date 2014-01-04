@@ -179,18 +179,6 @@ template<class tValueType>
 		reset() noexcept;
 
 		/**
-		 * Return internal input smoother.
-		 */
-		Smoother<ValueType>&
-		input_smoother() noexcept;
-
-		/**
-		 * Return internal input smoother.
-		 */
-		Smoother<ValueType> const&
-		input_smoother() const noexcept;
-
-		/**
 		 * Return internal output smoother.
 		 */
 		Smoother<ValueType>&
