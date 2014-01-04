@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -57,7 +58,16 @@ class FlightDirector: public Xefis::Module
 	void
 	data_updated() override;
 
+	void
+	rescue() override;
+
   private:
+	/**
+	 * Compute all needed data and write to output properties.
+	 */
+	void
+	compute_fd();
+
 	void
 	roll_mode_changed();
 
@@ -65,7 +75,7 @@ class FlightDirector: public Xefis::Module
 	pitch_mode_changed();
 
   private:
-	Time						_dt							= 0_s;
+	Xefis::PropertyObserver		_fd_computer;
 	Xefis::PIDControl<double>	_magnetic_heading_pid;
 	Xefis::PIDControl<double>	_magnetic_track_pid;
 	Xefis::PIDControl<double>	_altitude_pid;
