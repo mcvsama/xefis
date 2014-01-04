@@ -2655,45 +2655,8 @@ EFISWidget::~EFISWidget()
 void
 EFISWidget::set_params (Parameters const& new_params)
 {
-	QDateTime now = QDateTime::currentDateTime();
-
-	Parameters old = _params;
 	_params = new_params;
 	_params.sanitize();
-
-	if (_params.minimums_amsl < old.altitude && _params.altitude < _params.minimums_amsl)
-		_locals.minimums_altitude_ts = now;
-
-	if (_params.altitude_agl_visible && !old.altitude_agl_visible)
-		_locals.altitude_agl_ts = now;
-
-	if (_params.minimums_altitude_visible != old.minimums_altitude_visible)
-		_locals.minimums_altitude_ts = now;
-
-	if (_params.control_hint != old.control_hint)
-		_locals.control_hint_ts = now;
-
-	if (_params.control_hint_visible != old.control_hint_visible)
-		_locals.control_hint_ts = now;
-
-	if (_params.fma_speed_hint != old.fma_speed_hint)
-		_locals.fma_speed_ts = now;
-
-	if (_params.fma_speed_small_hint != old.fma_speed_small_hint)
-		_locals.fma_speed_small_ts = now;
-
-	if (_params.fma_lateral_hint != old.fma_lateral_hint)
-		_locals.fma_lateral_ts = now;
-
-	if (_params.fma_lateral_small_hint != old.fma_lateral_small_hint)
-		_locals.fma_lateral_small_ts = now;
-
-	if (_params.fma_vertical_hint != old.fma_vertical_hint)
-		_locals.fma_vertical_ts = now;
-
-	if (_params.fma_vertical_small_hint != old.fma_vertical_small_hint)
-		_locals.fma_vertical_small_ts = now;
-
 	request_repaint();
 }
 
@@ -2731,6 +2694,43 @@ EFISWidget::request_repaint()
 void
 EFISWidget::push_params()
 {
+	QDateTime now = QDateTime::currentDateTime();
+
+	Parameters old = _local_paint_work_unit._params_next;
+
+	if (_params.minimums_amsl < old.altitude && _params.altitude < _params.minimums_amsl)
+		_locals.minimums_altitude_ts = now;
+
+	if (_params.altitude_agl_visible && !old.altitude_agl_visible)
+		_locals.altitude_agl_ts = now;
+
+	if (_params.minimums_altitude_visible != old.minimums_altitude_visible)
+		_locals.minimums_altitude_ts = now;
+
+	if (_params.control_hint != old.control_hint)
+		_locals.control_hint_ts = now;
+
+	if (_params.control_hint_visible != old.control_hint_visible)
+		_locals.control_hint_ts = now;
+
+	if (_params.fma_speed_hint != old.fma_speed_hint)
+		_locals.fma_speed_ts = now;
+
+	if (_params.fma_speed_small_hint != old.fma_speed_small_hint)
+		_locals.fma_speed_small_ts = now;
+
+	if (_params.fma_lateral_hint != old.fma_lateral_hint)
+		_locals.fma_lateral_ts = now;
+
+	if (_params.fma_lateral_small_hint != old.fma_lateral_small_hint)
+		_locals.fma_lateral_small_ts = now;
+
+	if (_params.fma_vertical_hint != old.fma_vertical_hint)
+		_locals.fma_vertical_ts = now;
+
+	if (_params.fma_vertical_small_hint != old.fma_vertical_small_hint)
+		_locals.fma_vertical_small_ts = now;
+
 	_locals.speed_blinking_active = _speed_blinking_warning->isActive();
 	_locals.minimums_blinking_active = _minimums_blinking_warning->isActive();
 	_local_paint_work_unit._params_next = _params;

@@ -1543,21 +1543,8 @@ HSIWidget::~HSIWidget()
 void
 HSIWidget::set_params (Parameters const& new_params)
 {
-	QDateTime now = QDateTime::currentDateTime();
-
-	Parameters old = _params;
 	_params = new_params;
 	_params.sanitize();
-
-	if (_params.display_mode != old.display_mode)
-		_local_paint_work_unit._recalculation_needed = true;
-
-	if (_params.positioning_hint != old.positioning_hint)
-		_locals.positioning_hint_ts = now;
-
-	if (_params.positioning_hint_visible != old.positioning_hint_visible)
-		_locals.positioning_hint_ts = now;
-
 	request_repaint();
 }
 
@@ -1569,5 +1556,26 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 	auto xw = dynamic_cast<Xefis::Window*> (window());
 	if (xw)
 		_local_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
+}
+
+
+void
+HSIWidget::push_params()
+{
+	QDateTime now = QDateTime::currentDateTime();
+
+	Parameters old = _local_paint_work_unit._params_next;
+
+	if (_params.display_mode != old.display_mode)
+		_local_paint_work_unit._recalculation_needed = true;
+
+	if (_params.positioning_hint != old.positioning_hint)
+		_locals.positioning_hint_ts = now;
+
+	if (_params.positioning_hint_visible != old.positioning_hint_visible)
+		_locals.positioning_hint_ts = now;
+
+	_local_paint_work_unit._params_next = _params;
+	_local_paint_work_unit._locals_next = _locals;
 }
 
