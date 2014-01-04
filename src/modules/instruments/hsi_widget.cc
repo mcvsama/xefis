@@ -456,7 +456,6 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		frame.moveTo (text_hook + QPointF (0.f, 0.5f * metrics.height()));
 		centrify (frame);
 		frame.adjust (-0.1f * _q, -v, +0.1f * _q, +v);
-		frame.translate (0.f, -0.02f * _q);
 		painter.setBrush (Qt::NoBrush);
 		painter.add_shadow ([&]() {
 			painter.drawRect (frame);
