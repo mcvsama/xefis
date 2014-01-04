@@ -87,7 +87,6 @@ template<class tValueType>
 	{
 	  public:
 		typedef tValueType ValueType;
-		typedef float SamplesType;
 
 	  public:
 		// Ctor
