@@ -176,6 +176,12 @@ SRC_SOURCES += lib/si/time.cc
 
 ######## /modules/instruments ########
 
+SRC_HEADERS += modules/helpers/string_translator.h
+
+SRC_SOURCES += modules/helpers/string_translator.cc
+
+######## /modules/instruments ########
+
 SRC_HEADERS += modules/instruments/efis.h
 SRC_HEADERS += modules/instruments/efis_widget.h
 SRC_HEADERS += modules/instruments/eicas.h
