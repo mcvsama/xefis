@@ -142,6 +142,10 @@ EICAS::MessageDefinition::color() const noexcept
 EICAS::EICAS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
+	parse_settings (config, {
+		{ "minimum-message-display-time", _minimum_display_time, false },
+	});
+
 	parse_properties (config, {
 		{ "button.cursor-up", _button_cursor_up, false },
 		{ "button.cursor-down", _button_cursor_down, false },
@@ -170,17 +174,25 @@ EICAS::EICAS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 EICAS::data_updated()
 {
-	if (_button_cursor_up.valid() && _button_cursor_up.fresh() && *_button_cursor_up)
+	auto pressed = [](Xefis::PropertyBoolean& property) -> bool {
+		return property.valid() && property.fresh() && *property;
+	};
+
+	if (pressed (_button_cursor_up))
 		_eicas_widget->cursor_up();
 
-	if (_button_cursor_down.valid() && _button_cursor_down.fresh() && *_button_cursor_down)
+	if (pressed (_button_cursor_down))
 		_eicas_widget->cursor_down();
 
-	if (_button_cursor_del.valid() && _button_cursor_del.fresh() && *_button_cursor_del)
+	if (pressed (_button_cursor_del))
 		_eicas_widget->cursor_del();
 
-	if (_button_recall.valid() && _button_recall.fresh() && *_button_recall)
+	if (pressed (_button_recall))
 		_eicas_widget->recall();
+
+	if (pressed (_button_clear))
+		if (Time::now() - _last_message_timestamp > _minimum_display_time)
+			_eicas_widget->clear();
 
 	bool sound_alert = false;
 	for (auto& m: _messages)
@@ -197,6 +209,7 @@ EICAS::data_updated()
 				}
 				// Show new one:
 				m.set_message_id (_eicas_widget->add_message (m.message(), m.color()));
+				_last_message_timestamp = Time::now();
 				break;
 
 			case MessageDefinition::Revoke:

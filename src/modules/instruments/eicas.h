@@ -177,16 +177,18 @@ class EICAS: public Xefis::Instrument
 	request_alert();
 
   private:
-	EICASWidget*					_eicas_widget		= nullptr;
+	EICASWidget*					_eicas_widget			= nullptr;
 	Xefis::PropertyBoolean			_button_cursor_up;
 	Xefis::PropertyBoolean			_button_cursor_down;
 	Xefis::PropertyBoolean			_button_cursor_del;
 	Xefis::PropertyBoolean			_button_recall;
 	Xefis::PropertyBoolean			_button_clear;
 	std::list<MessageDefinition>	_messages;
-	bool							_alert_requested	= false;
-	bool							_alert_started		= false;
+	bool							_alert_requested		= false;
+	bool							_alert_started			= false;
 	QProcess*						_alert_command;
+	Time							_minimum_display_time	= 5_s;
+	Time							_last_message_timestamp;
 };
 
 
