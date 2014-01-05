@@ -6,6 +6,8 @@
 		<setting name='scale.font' value='1.0'/>
 	</settings>
 	<modules>
+		<include name='comm/link.xml'/>
+		<include name='comm/udp.xml'/>
 		<include name='hardware/joystick.xml'/>
 		<include name='systems/state.xml'/>
 		<include name='systems/adc.xml'/>
@@ -13,8 +15,7 @@
 		<include name='systems/pc.xml'/>
 		<include name='systems/rcms.xml'/>
 		<include name='systems/altacq.xml'/>
-		<include name='comm/link.xml'/>
-		<include name='comm/udp.xml'/>
+		<include name='helpers/fma.xml'/>
 	</modules>
 	<windows>
 		<window width='1366' height='960' full-screen='false'>

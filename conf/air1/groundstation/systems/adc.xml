@@ -9,11 +9,11 @@
 			<!-- Input -->
 			<property name='settings.pressure.use-std' path='/settings/pressure/use-std'/>
 			<property name='settings.pressure.qnh' path='/settings/pressure/qnh'/>
-			<property name='pressure.static.serviceable' path='/sensors/pressure/serviceable'/>
-			<property name='pressure.static' path='/sensors/pressure/static'/>
-			<property name='ias.serviceable' path='/sensors/airspeed/serviceable'/>
-			<property name='ias' path='/sensors/airspeed/ias'/>
-			<property name='static-air-temperature' path='/sensors/air-temperature/static'/>
+			<property name='pressure.static.serviceable' path='/aircraft/sensors/pressure/serviceable'/>
+			<property name='pressure.static' path='/aircraft/sensors/pressure/static'/>
+			<property name='ias.serviceable' path='/aircraft/sensors/airspeed/serviceable'/>
+			<property name='ias' path='/aircraft/sensors/airspeed/ias'/>
+			<property name='static-air-temperature' path='/aircraft/sensors/air-temperature/static'/>
 			<!-- Output -->
 			<directory path='/systems/adc'>
 				<property name='altitude.amsl.serviceable' path='/altitude/amsl.serviceable'/>

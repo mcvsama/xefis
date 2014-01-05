@@ -7,7 +7,7 @@
 		<properties>
 			<!-- Input -->
 			<property name='altitude.amsl' path='/systems/adc/altitude/amsl'/>
-			<property name='altitude.acquire.amsl' path='/settings/flight-director/cmd/altitude'/>
+			<property name='altitude.acquire.amsl' path='/aircraft/settings/cmd/altitude'/>
 			<property name='vertical-speed' path='/systems/adc/vertical-speed/speed'/>
 			<property name='ground-speed' path='/systems/nc/track/ground-speed'/>
 			<!-- Output -->

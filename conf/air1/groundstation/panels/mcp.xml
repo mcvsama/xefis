@@ -16,7 +16,7 @@
 									<widget type='button' top-label='APPR' click-property='/panels/mcp/appr' led-property='/settings/efis/approach-reference-visible' led-color='green'/>
 								</item>
 								<item>
-									<widget type='button' top-label='FD' click-property='/panels/mcp/fd' led-property='/settings/efis/flight-director-visible' led-color='green'/>
+									<widget type='button' top-label='FD' click-property='/panels/mcp/fd' led-property='/settings/efis/cmd-guidance-visible' led-color='green'/>
 								</item>
 							</layout>
 						</item>
@@ -69,7 +69,7 @@
 				<group label='COURSE'>
 					<layout type='vertical' spacing='10'>
 						<item>
-							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/panels/mcp/display/course'/>
+							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/settings/course/magnetic.integer'/>
 						</item>
 						<item>
 							<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' rotate-a-property='/panels/mcp/course-a' rotate-b-property='/panels/mcp/course-b' click-property='/panels/mcp/course-hide'/>

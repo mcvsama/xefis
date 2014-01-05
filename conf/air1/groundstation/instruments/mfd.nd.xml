@@ -10,9 +10,9 @@
 			<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
 			<property name='track.center-on-track' path='/settings/hsi/center-on-track'/>
 			<property name='track.visible' path='/settings/hsi/track-visible' default='true'/>
-			<property name='cmd.visible' path='/settings/flight-director/cmd/visible'/>
-			<property name='cmd.heading' path='/settings/flight-director/cmd/magnetic-heading-track'/>
-			<property name='cmd.track-visible' path='/settings/efis/flight-director-visible'/>
+			<property name='cmd.visible' path='/settings/efis/cmd-settings-visible'/>
+			<property name='cmd.track-visible' path='/settings/efis/cmd-guidance-visible'/>
+			<property name='cmd.heading' path='/aircraft/settings/cmd/magnetic-heading-track'/>
 			<property name='altitude.target.reach-distance' path='/systems/altacq/distance'/>
 			<property name='orientation.display-true-heading' path='/settings/hsi/display-true-heading'/>
 			<property name='localizer-id' path='/settings/hsi/localizer-id'/>

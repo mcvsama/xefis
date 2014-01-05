@@ -10,12 +10,12 @@
 			<setting name='ias-to-thrust-scale' value='10.0'/>
 		</settings>
 		<properties>
-			<directory path='/settings/autothrottle'>
-				<property name='cmd.speed-mode' path='/cmd/speed-mode'/>
-				<property name='cmd.thrust' path='/cmd/thrust'/>
-				<property name='cmd.ias' path='/cmd/ias'/>
+			<directory path='/settings/cmd'>
+				<property name='cmd.speed-mode' path='/speed-mode'/>
+				<property name='cmd.thrust' path='/thrust'/>
+				<property name='cmd.ias' path='/ias'/>
 			</directory>
-			<directory path='/systems/autothrottle'>
+			<directory path='/systems/at'>
 				<property name='output.thrust' path='/thrust'/>
 				<property name='disengage-at' path='/disengage-at'/>
 			</directory>
