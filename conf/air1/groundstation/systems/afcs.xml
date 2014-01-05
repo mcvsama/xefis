@@ -73,12 +73,7 @@
 			</directory>
 			<property name='fbw.attitude-mode' path='/settings/fbw/attitude-mode'/>
 			<property name='fbw.throttle-mode' path='/settings/fbw/throttle-mode'/>
-			<directory path='/systems/afcs/fma'>
-				<property name='fma.control-hint' path='/control-hint'/>
-				<property name='fma.speed-mode' path='/speed-mode'/>
-				<property name='fma.roll-mode' path='/roll-mode'/>
-				<property name='fma.pitch-mode' path='/pitch-mode'/>
-			</directory>
+			<property name='flight-mode' path='/systems/afcs/flight-mode'/>
 		</properties>
 	</module>
 </xefis-include>

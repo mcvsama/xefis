@@ -49,6 +49,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "altitude.landing.warning.lo", _altitude_landing_warning_lo, false },
 		{ "raising-runway.visibility", _raising_runway_visibility, false },
 		{ "raising-runway.threshold", _raising_runway_threshold, false },
+		{ "aoa.visibility-threshold", _aoa_visibility_threshold, false },
 	});
 
 	parse_properties (config, {
@@ -75,9 +76,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "slip-skid", _slip_skid, false },
 		{ "fpv.visible", _fpv_visible, false },
 		{ "aoa.alpha", _aoa_alpha, false },
-		{ "aoa.warning-threshold", _aoa_warning_threshold, false },
-		{ "aoa.critical", _aoa_critical, false },
-		{ "aoa.critical.visible", _aoa_critical_visible, false },
+		{ "aoa.alpha.maximum", _aoa_alpha_maximum, false },
+		{ "aoa.alpha.visible", _aoa_alpha_visible, false },
 		{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, false },
 		{ "altitude.amsl", _altitude_amsl, false },
 		{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, false },
@@ -220,10 +220,9 @@ EFIS::read()
 	params.flight_path_alpha = _computed_fpv_alpha;
 	params.flight_path_beta = _computed_fpv_beta;
 	// AOA limit
-	params.critical_aoa_visible = _aoa_alpha.valid() && _aoa_critical.valid() &&
-								  _aoa_critical_visible.read (false) && _aoa_warning_threshold.valid() &&
-								  (*_aoa_critical - *_aoa_alpha <= *_aoa_warning_threshold);
-	params.critical_aoa = *_aoa_critical;
+	params.critical_aoa_visible = _aoa_alpha.valid() && _aoa_alpha_maximum.valid() && _aoa_alpha_visible.read (false) &&
+								  (*_aoa_alpha_maximum - *_aoa_alpha <= _aoa_visibility_threshold);
+	params.critical_aoa = *_aoa_alpha_maximum;
 	params.aoa_alpha = *_aoa_alpha;
 	// Altitude
 	params.altitude_failure = !_altitude_amsl_serviceable.read (true);

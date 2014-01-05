@@ -45,7 +45,6 @@ class AutomatedFlightControlSystem: public Xefis::Module
 		Ft100,
 	};
 
-	// When updating this, update also speed_mode_string() method.
 	enum class SpeedMode
 	{
 		None		= 0,
@@ -60,7 +59,6 @@ class AutomatedFlightControlSystem: public Xefis::Module
 		sentinel	= 9,
 	};
 
-	// When updating this, update also roll_mode_string() method.
 	enum class RollMode
 	{
 		None		= 0,
@@ -72,7 +70,6 @@ class AutomatedFlightControlSystem: public Xefis::Module
 		sentinel	= 6,
 	};
 
-	// When updating this, update also pitch_mode_string() method.
 	enum class PitchMode
 	{
 		None		= 0,
@@ -133,16 +130,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	 * Update FMA messages.
 	 */
 	void
-	update_fma();
-
-	static std::string const&
-	speed_mode_string (SpeedMode);
-
-	static std::string const&
-	roll_mode_string (RollMode);
-
-	static std::string const&
-	pitch_mode_string (PitchMode);
+	update_efis();
 
 	/**
 	 * Return true if given button is fresh() and set to true.
@@ -225,10 +213,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyLength				_cmd_altitude;
 	Xefis::PropertySpeed				_cmd_vspd;
 	Xefis::PropertyAngle				_cmd_fpa;
-	Xefis::PropertyString				_fma_control_hint;
-	Xefis::PropertyString				_fma_speed_mode;
-	Xefis::PropertyString				_fma_roll_mode;
-	Xefis::PropertyString				_fma_pitch_mode;
+	Xefis::PropertyString				_flight_mode;
 	// Other:
 	std::vector<Xefis::RotaryEncoder*>	_rotary_decoders;
 };

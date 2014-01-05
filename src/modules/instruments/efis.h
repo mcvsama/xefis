@@ -72,6 +72,7 @@ class EFIS: public Xefis::Instrument
 	Length							_altitude_landing_warning_lo	= 500_ft;
 	Length							_raising_runway_visibility		= 1000_ft;
 	Length							_raising_runway_threshold		= 250_ft;
+	Angle							_aoa_visibility_threshold		= 17.5_deg;
 	// Speed
 	Xefis::PropertyBoolean			_speed_ias_serviceable;
 	Xefis::PropertySpeed			_speed_ias;
@@ -106,9 +107,8 @@ class EFIS: public Xefis::Instrument
 	Angle							_computed_fpv_beta				= 0_deg;
 	// Angle of Attack
 	Xefis::PropertyAngle			_aoa_alpha;
-	Xefis::PropertyAngle			_aoa_warning_threshold;
-	Xefis::PropertyAngle			_aoa_critical;
-	Xefis::PropertyBoolean			_aoa_critical_visible;
+	Xefis::PropertyAngle			_aoa_alpha_maximum;
+	Xefis::PropertyBoolean			_aoa_alpha_visible;
 	// Pressure and radio altitude
 	Xefis::PropertyBoolean			_altitude_amsl_serviceable;
 	Xefis::PropertyLength			_altitude_amsl;

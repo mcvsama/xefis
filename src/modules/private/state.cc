@@ -105,13 +105,13 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_show_eicas.set_path (mcp_root + "/show-eicas");
 	_mcp_show_chklst.set_path (mcp_root + "/show-chklst");
 
-	_mcp_course_display.set_path ("/panels/mcp/display/course");
+	_mcp_course_display.set_path ("/settings/course/magnetic.integer");
 
 	_setting_efis_fpv_visible.set_path ("/settings/efis/fpv-visible");
 	_setting_efis_fpv_visible.set_default (false);
 	_setting_efis_show_metric.set_path ("/settings/efis/show-metric");
 	_setting_efis_show_metric.set_default (false);
-	_setting_efis_fd_visible.set_path ("/settings/efis/flight-director-visible");
+	_setting_efis_fd_visible.set_path ("/settings/efis/cmd-guidance-visible");
 	_setting_efis_fd_visible.set_default (false);
 	_setting_efis_appr_visible.set_path ("/settings/efis/approach-reference-visible");
 	_setting_efis_appr_visible.set_default (false);
@@ -119,7 +119,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_efis_mfd_mode.set_default (static_cast<int> (MFDMode::EICAS));
 	_setting_pressure_qnh.set_path ("/settings/pressure/qnh");
 	_setting_pressure_qnh.set_default (29.92_inHg);
-	_setting_pressure_display_hpa.set_path ("/settings/pressure/display-hpa");
+	_setting_pressure_display_hpa.set_path ("/settings/efis/display-hpa");
 	_setting_pressure_display_hpa.set_default (true);
 	_setting_pressure_use_std.set_path ("/settings/pressure/use-std");
 	_setting_pressure_use_std.set_default (false);
