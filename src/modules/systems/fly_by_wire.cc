@@ -140,8 +140,7 @@ FlyByWire::data_updated()
 void
 FlyByWire::rescue()
 {
-	if (_serviceable.configured())
-		_serviceable.write (false);
+	_serviceable.write (false);
 }
 
 
@@ -168,6 +167,8 @@ FlyByWire::compute_fbw()
 				computed_elevator = _input_pitch_axis.read (0.0);
 				computed_ailerons = _input_roll_axis.read (0.0);
 				computed_rudder = _input_yaw_axis.read (0.0);
+
+				_serviceable.write (true);
 				break;
 
 			case AttitudeMode::Stabilized:
@@ -177,11 +178,10 @@ FlyByWire::compute_fbw()
 
 				if (_measured_pitch.is_nil() || _measured_roll.is_nil())
 				{
-					diagnose();
-
 					_computed_output_pitch = 0_deg;
 					_computed_output_roll = 0_deg;
 
+					diagnose();
 					_serviceable.write (false);
 				}
 				else
@@ -239,6 +239,7 @@ FlyByWire::compute_fbw()
 	}
 	else
 	{
+		diagnose();
 		_serviceable.write (false);
 	}
 
@@ -261,6 +262,7 @@ FlyByWire::compute_fbw()
 	}
 	else
 	{
+		diagnose();
 		_serviceable.write (false);
 	}
 
@@ -334,6 +336,8 @@ FlyByWire::diagnose()
 {
 	if (_attitude_mode.is_nil())
 		log() << "Attitude mode is nil!" << std::endl;
+	if (_throttle_mode.is_nil())
+		log() << "Throttle mode is nil!" << std::endl;
 	if (_measured_pitch.is_nil())
 		log() << "Measured pitch is nil!" << std::endl;
 	if (_measured_roll.is_nil())
