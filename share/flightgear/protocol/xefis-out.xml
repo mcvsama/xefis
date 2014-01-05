@@ -9,6 +9,22 @@
 		<output>
 			<binary_mode>true</binary_mode>
 			<byte_order>host</byte_order>
+			<!-- Angle of Attack -->
+			<chunk>
+				<name>ama</name>
+				<type>double</type>
+				<node>/fdm/jsbsim/aero/alpha-max-rad</node>
+			</chunk>
+			<chunk>
+				<name>ami</name>
+				<type>double</type>
+				<node>/fdm/jsbsim/aero/alpha-min-rad</node>
+			</chunk>
+			<chunk>
+				<name>aoa</name>
+				<type>double</type>
+				<node>/fdm/jsbsim/aero/alpha-rad</node>
+			</chunk>
 			<!-- Autopilot/autothrottle -->
 			<chunk>
 				<name>apa</name>
