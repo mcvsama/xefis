@@ -38,6 +38,9 @@ typedef uint32_t	FGInt;
 BEGIN_PACKED_STRUCT
 struct FGInputData
 {
+	FGDouble	aoa_alpha_maximum_rad;				// ama
+	FGDouble	aoa_alpha_minimum_rad;				// ami
+	FGDouble	aoa_alpha_rad;						// aoa
 	FGDouble	cmd_alt_setting_ft;					// apa
 	FGDouble	cmd_cbr_setting_fpm;				// apc
 	FGDouble	cmd_speed_setting_kt;				// ats
@@ -126,6 +129,9 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 				else if (e2 == "properties")
 				{
 					parse_properties (e2, {
+						{ "aoa.alpha.maximum", _aoa_alpha_maximum, false },
+						{ "aoa.alpha.minimum", _aoa_alpha_minimum, false },
+						{ "aoa.alpha", _aoa_alpha, false },
 						{ "ias", _ias, false },
 						{ "ias-lookahead", _ias_lookahead, false },
 						{ "ias-minimum", _minimum_ias, false },
@@ -222,6 +228,9 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 	};
 
 	_output_properties = {
+		&_aoa_alpha_maximum,
+		&_aoa_alpha_minimum,
+		&_aoa_alpha,
 		&_ias,
 		&_ias_lookahead,
 		&_minimum_ias,
@@ -343,6 +352,9 @@ FlightGearIO::read_input()
 		ASSIGN (deg,  cmd_heading_setting);
 		ASSIGN (deg,  flight_director_pitch);
 		ASSIGN (deg,  flight_director_roll);
+		ASSIGN (rad,  aoa_alpha_maximum);
+		ASSIGN (rad,  aoa_alpha_minimum);
+		ASSIGN (rad,  aoa_alpha);
 		ASSIGN (kt,   ias);
 		ASSIGN (kt,   tas);
 		ASSIGN (kt,   gs);

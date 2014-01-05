@@ -81,7 +81,9 @@ class FlightGearIO:
 	std::vector<Xefis::GenericProperty*>	_output_properties;
 	std::vector<Xefis::PropertyBoolean*>	_serviceable_flags;
 	// Input:
-	// TODO rename props according to sensor names
+	Xefis::PropertyAngle					_aoa_alpha_maximum;
+	Xefis::PropertyAngle					_aoa_alpha_minimum;
+	Xefis::PropertyAngle					_aoa_alpha;
 	Xefis::PropertySpeed					_ias;
 	Xefis::PropertySpeed					_ias_lookahead;
 	Xefis::PropertySpeed					_minimum_ias;

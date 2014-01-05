@@ -6,6 +6,10 @@
 			<port>9000</port>
 			<properties>
 				<directory path='/sensors'>
+					<!-- aoa -->
+					<property name='aoa.alpha.maximum' path='/aoa/alpha.maximum'/>
+					<property name='aoa.alpha.minimum' path='/aoa/alpha.minimum'/>
+					<property name='aoa.alpha' path='/aoa/alpha'/>
 					<!-- gps -->
 					<property name='gps.longitude' path='/gps/longitude'/>
 					<property name='gps.latitude' path='/gps/latitude'/>
