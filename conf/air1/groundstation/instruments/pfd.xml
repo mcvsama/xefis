@@ -15,6 +15,7 @@
 					<setting name='altitude-ladder.extent' value='825'/>
 					<setting name='altitude.landing.warning.hi' value='1000 ft'/>
 					<setting name='altitude.landing.warning.lo' value='500 ft'/>
+					<setting name='aoa.visibility-threshold' value='17.5 deg'/>
 				</settings>
 				<properties>
 					<property name='orientation.heading.numbers-visible' path='/settings/efis/heading-numbers-visible' default='true'/>
@@ -32,10 +33,9 @@
 					<property name='track.vertical' path='/systems/nc/track/vertical'/>
 					<property name='slip-skid' path='/aircraft/sensors/slip-skid/slip-skid'/>
 					<property name='fpv.visible' path='/settings/efis/fpv-visible'/>
-					<property name='aoa.alpha' path='/systems/aoa/alpha'/>
-					<property name='aoa.warning-threshold' path='/settings/aoa/warning-threshold'/>
-					<property name='aoa.critical' path='/systems/aoa/critical'/>
-					<property name='aoa.critical.visible' path='/systems/aoa/critical.visible'/>
+					<property name='aoa.alpha' path='/aircraft/sensors/aoa/alpha'/>
+					<property name='aoa.alpha.maximum' path='/aircraft/sensors/aoa/alpha.maximum'/>
+					<property name='aoa.alpha.visible' path='/settings/efis/aoa.alpha.visible' default='true'/>
 					<property name='altitude.amsl.serviceable' path='/systems/adc/altitude/amsl.serviceable'/>
 					<property name='altitude.amsl' path='/systems/adc/altitude/amsl'/>
 					<property name='altitude.amsl.lookahead' path='/systems/adc/altitude/amsl.lookahead'/>
@@ -49,7 +49,7 @@
 					<property name='vertical-speed' path='/systems/adc/vertical-speed/speed'/>
 					<property name='vertical-speed.variometer' path='/systems/pc/total-energy-variometer'/>
 					<property name='pressure.qnh' path='/settings/pressure/qnh'/>
-					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa'/>
+					<property name='pressure.display-hpa' path='/settings/efis/display-hpa'/>
 					<property name='pressure.use-std' path='/settings/pressure/use-std'/>
 					<property name='flight-director.serviceable' path='/aircraft/systems/fd/serviceable'/>
 					<property name='flight-director.cmd.visible' path='/settings/efis/cmd-settings-visible' default='true'/>
@@ -82,9 +82,9 @@
 							</directory>
 						</directory>
 					</directory>
-					<property name='flight-mode.hint.visible' path='/settings/flight-mode/visible' default='true'/>
+					<property name='flight-mode.hint.visible' path='/settings/efis/flight-mode-visible' default='true'/>
 					<property name='flight-mode.fma.visible' path='/settings/efis/fma-visible' default='true'/>
-					<property name='flight-mode.hint' path='/systems/afcs/fma/control-hint'/>
+					<property name='flight-mode.hint' path='/systems/afcs/flight-mode'/>
 					<directory path='/systems/fma'>
 						<property name='flight-mode.fma.speed-hint' path='/speed-mode'/>
 						<property name='flight-mode.fma.speed-small-hint' path='/armed-speed-mode'/>
@@ -97,14 +97,14 @@
 					<property name='tcas.resolution-advisory.pitch.maximum' path='/systems/tcas/resolution-advisory/pitch.maximum'/>
 					<property name='tcas.resolution-advisory.vertical-speed.minimum' path='/systems/tcas/resolution-advisory/vertical-speed.minimum'/>
 					<property name='tcas.resolution-advisory.vertical-speed.maximum' path='/systems/tcas/resolution-advisory/vertical-speed.maximum'/>
-					<property name='warning.novspd-flag' path='/settings/efis-flags/novspd-flag' default='false'/>
-					<property name='warning.ldgalt-flag' path='/settings/efis-flags/ldgalt-flag' default='false'/>
-					<property name='warning.pitch-disagree' path='/settings/efis-flags/pitch-disagree' default='false'/>
-					<property name='warning.roll-disagree' path='/settings/efis-flags/roll-disagree' default='false'/>
-					<property name='warning.ias-disagree' path='/settings/efis-flags/ias-disagree' default='false'/>
-					<property name='warning.altitude-disagree' path='/settings/efis-flags/altitude-disagree' default='false'/>
-					<property name='warning.roll' path='/settings/efis-flags/roll-warning'/>
-					<property name='warning.slip-skid' path='/settings/efis-flags/slip-skid-warning'/>
+					<property name='warning.novspd-flag' path='/settings/efis/flags/novspd-flag' default='false'/>
+					<property name='warning.ldgalt-flag' path='/settings/efis/flags/ldgalt-flag' default='false'/>
+					<property name='warning.pitch-disagree' path='/settings/efis/flags/pitch-disagree' default='false'/>
+					<property name='warning.roll-disagree' path='/settings/efis/flags/roll-disagree' default='false'/>
+					<property name='warning.ias-disagree' path='/settings/efis/flags/ias-disagree' default='false'/>
+					<property name='warning.altitude-disagree' path='/settings/efis/flags/altitude-disagree' default='false'/>
+					<property name='warning.roll' path='/settings/efis/flags/roll-warning'/>
+					<property name='warning.slip-skid' path='/settings/efis/flags/slip-skid-warning'/>
 					<property name='style.old' path='/settings/efis/old-style'/>
 					<property name='style.show-metric' path='/settings/efis/show-metric'/>
 				</properties>

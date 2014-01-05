@@ -105,10 +105,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "cmd.altitude", _cmd_altitude, true },
 		{ "cmd.vertical-speed", _cmd_vspd, true },
 		{ "cmd.fpa", _cmd_fpa, true },
-		{ "fma.control-hint", _fma_control_hint, true },
-		{ "fma.speed-mode", _fma_speed_mode, true },
-		{ "fma.roll-mode", _fma_roll_mode, true },
-		{ "fma.pitch-mode", _fma_pitch_mode, true },
+		{ "flight-mode", _flight_mode, true },
 	});
 
 	prepare_afcs_main_panel();
@@ -307,92 +304,31 @@ AutomatedFlightControlSystem::solve_mode()
 	_cmd_vspd.write (_cmd_vspd_counter);
 	_cmd_fpa.write (0.0_deg);//TODO
 
-	update_fma();
+	update_efis();
 }
 
 
 void
-AutomatedFlightControlSystem::update_fma()
+AutomatedFlightControlSystem::update_efis()
 {
 	switch (static_cast<FlyByWire::AttitudeMode> (*_fbw_attitude_mode))
 	{
 		case FlyByWire::AttitudeMode::Manual:
-			_fma_control_hint.write ("");
+			_flight_mode.write ("");
 			break;
 
 		case FlyByWire::AttitudeMode::Stabilized:
-			_fma_control_hint.write ("ATT");
+			_flight_mode.write ("ATT");
 			break;
 
 		case FlyByWire::AttitudeMode::FlightDirector:
-			_fma_control_hint.write ("FLT DIR");
+			_flight_mode.write ("FLT DIR");
 			break;
 
 		default:
-			_fma_control_hint.write ("---");
+			_flight_mode.write ("---");
 			break;
 	}
-
-	_fma_speed_mode.write (speed_mode_string (_speed_mode));
-	_fma_roll_mode.write (roll_mode_string (_roll_mode));
-	_fma_pitch_mode.write (pitch_mode_string (_pitch_mode));
-}
-
-
-std::string const&
-AutomatedFlightControlSystem::speed_mode_string (SpeedMode speed_mode)
-{
-	static std::array<std::string, 9> names = {
-		"",
-		"TO/GA",
-		"THR",
-		"THR REF",
-		"IDLE",
-		"SPD REF",
-		"SPD SEL",
-		"MCP SPD",
-		"HOLD",
-	};
-
-	return names[static_cast<std::size_t> (speed_mode)];
-}
-
-
-std::string const&
-AutomatedFlightControlSystem::roll_mode_string (RollMode roll_mode)
-{
-	static std::array<std::string, 6> names = {
-		"",
-		"HDG SEL",
-		"HDG",
-		"TRK SEL",
-		"TRK",
-		"LOC",
-	};
-
-	return names[static_cast<std::size_t> (roll_mode)];
-}
-
-
-std::string const&
-AutomatedFlightControlSystem::pitch_mode_string (PitchMode pitch_mode)
-{
-	static std::array<std::string, 12> names = {
-		"",
-		"FLCH SPD",
-		"FLCH V/S",
-		"FLCH FPA",
-		"V/S",
-		"FPA",
-		"CLB/CON",
-		"VNAV SPD",
-		"VNAV PTH",
-		"ALT",
-		"ALT HOLD",
-		"G/S",
-	};
-
-	return names[static_cast<std::size_t> (pitch_mode)];
 }
 
 
