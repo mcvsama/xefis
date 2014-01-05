@@ -297,7 +297,7 @@ FlyByWire::integrate_manual_input (Time update_dt)
 	if (_input_roll_axis.is_nil())
 		log() << "input.roll-axis is nil, using 0.0" << std::endl;
 
-	double axis_pitch = _input_pitch_axis.read (0.0);
+	double axis_pitch = -_input_pitch_axis.read (0.0);
 	double axis_roll = _input_roll_axis.read (0.0);
 
 	Angle measured_pitch = *_measured_pitch;
