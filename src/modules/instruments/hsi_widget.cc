@@ -649,16 +649,18 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 
 	if (_params.ap_track_visible)
 	{
-		float const shadow_scale = 2.0;
-
 		double pink_pen_width = 1.5f;
 		if (_params.display_mode == DisplayMode::Auxiliary)
 			pink_pen_width = 1.2f;
 
+		double shadow_pen_width = pink_pen_width + 1.f;
+
+		float const shadow_scale = shadow_pen_width / pink_pen_width;
+
 		QPen pen (_autopilot_pen_2.color(), pen_width (pink_pen_width), Qt::DashLine, Qt::RoundCap);
 		pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
 
-		QPen shadow_pen (painter.shadow_color(), pen_width (pink_pen_width + 1.f), Qt::DashLine, Qt::RoundCap);
+		QPen shadow_pen (painter.shadow_color(), pen_width (shadow_pen_width), Qt::DashLine, Qt::RoundCap);
 		shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
 
 		painter.setTransform (_aircraft_center_transform);
