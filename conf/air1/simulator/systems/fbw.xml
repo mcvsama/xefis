@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='systems/fly-by-wire' disabled='true'>
+	<module name='systems/fly-by-wire'>
 		<settings>
 			<setting name='stabilization-gain' path='/gain' value='1.0'/>
 			<setting name='pitch-gain' path='/pitch/gain' value='1.0'/>
@@ -20,9 +20,9 @@
 			<setting name='yaw-error-power' path='/yaw/error-power' value='0.5'/>
 		</settings>
 		<properties>
-			<property name='attitude-mode' path='/settings/fly-by-wire/attitude-mode'/>
-			<property name='throttle-mode' path='/settings/fly-by-wire/throttle-mode'/>
-			<directory path='/systems/fly-by-wire/config'>
+			<property name='attitude-mode' path='/settings/fbw/attitude-mode'/>
+			<property name='throttle-mode' path='/settings/fbw/throttle-mode'/>
+			<directory path='/systems/fbw/config'>
 				<property name='elevator.minimum' path='/elevator/minimum' default='-0.75'/>
 				<property name='elevator.maximum' path='/elevator/maximum' default='+0.75'/>
 				<property name='ailerons.minimum' path='/ailerons/minimum' default='-0.5'/>
@@ -32,7 +32,7 @@
 				<property name='pitch-extent' path='/pitch-extent' default='20 deg'/>
 				<property name='roll-extent' path='/roll-extent' default='20 deg'/>
 			</directory>
-			<directory path='/systems/fly-by-wire'>
+			<directory path='/systems/fbw'>
 				<property name='output.control-stick-pitch' path='/stick/pitch'/>
 				<property name='output.control-stick-roll' path='/stick/roll'/>
 				<property name='output.pitch' path='/pitch'/>
@@ -41,18 +41,19 @@
 				<property name='output.ailerons' path='/ailerons'/>
 				<property name='output.rudder' path='/rudder'/>
 				<property name='output.throttle' path='/throttle'/>
+				<property name='output.serviceable' path='/serviceable'/>
 			</directory>
 			<directory path='/input'>
-				<property name='input.pitch-axis' path='/main/axis/1'/>
-				<property name='input.roll-axis' path='/main/axis/0'/>
-				<property name='input.yaw-axis' path='/rudder/axis/2'/>
-				<property name='input.throttle-axis' path='/main/axis/2'/>
+				<property name='input.pitch-axis' path='/stick-elevator'/>
+				<property name='input.roll-axis' path='/stick-ailerons'/>
+				<property name='input.yaw-axis' path='/pedals'/>
+				<property name='input.throttle-axis' path='/throttle'/>
 			</directory>
-			<directory path='/systems/flight-director/guidance'>
+			<directory path='/systems/fd'>
 				<property name='input.pitch' path='/pitch'/>
 				<property name='input.roll' path='/roll'/>
 			</directory>
-			<directory path='/systems/autothrottle'>
+			<directory path='/systems/at'>
 				<property name='input.throttle' path='/throttle'/>
 			</directory>
 			<directory path='/systems/nc'>
@@ -60,7 +61,6 @@
 				<property name='measured.roll' path='/orientation/roll'/>
 				<property name='measured.slip-skid' path='//sensors/slip-skid/slip-skid'/>
 			</directory>
-			<property name='serviceable' path='/systems/fly-by-wire/serviceable'/>
 		</properties>
 	</module>
 </xefis-include>

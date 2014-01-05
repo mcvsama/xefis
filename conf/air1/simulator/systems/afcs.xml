@@ -60,7 +60,7 @@
 				<property name='led.vertical-speed.sel' path='/vspd-sel'/>
 				<property name='led.vertical-speed.clb-con' path='/vspd-clb-con'/>
 			</directory>
-			<directory path='/settings/flight-director/cmd'>
+			<directory path='/settings/fd/cmd'>
 				<property name='cmd.roll-mode' path='/roll-mode'/>
 				<property name='cmd.pitch-mode' path='/pitch-mode'/>
 				<property name='cmd.magnetic-heading-track' path='/magnetic-heading-track'/>
@@ -68,11 +68,11 @@
 				<property name='cmd.vertical-speed' path='/vertical-speed'/>
 				<property name='cmd.fpa' path='/fpa'/>
 			</directory>
-			<directory path='/settings/autothrottle/cmd'>
+			<directory path='/settings/at/cmd'>
 				<property name='cmd.ias' path='/ias'/>
 			</directory>
-			<property name='fbw.attitude-mode' path='/settings/fly-by-wire/attitude-mode'/>
-			<property name='fbw.throttle-mode' path='/settings/fly-by-wire/throttle-mode'/>
+			<property name='fbw.attitude-mode' path='/settings/fbw/attitude-mode'/>
+			<property name='fbw.throttle-mode' path='/settings/fbw/throttle-mode'/>
 			<directory path='/systems/afcs/fma'>
 				<property name='fma.control-hint' path='/control-hint'/>
 				<property name='fma.speed-mode' path='/speed-mode'/>

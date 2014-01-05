@@ -10,6 +10,9 @@
 		<include name='systems/adc.xml'/>
 		<include name='systems/nc.xml'/>
 		<include name='systems/pc.xml'/>
+		<include name='systems/fbw.xml'/>
+		<include name='systems/fd.xml'/>
+		<include name='systems/at.xml'/>
 	</modules>
 	<windows>
 		<window width='400' height='500' full-screen='false'>

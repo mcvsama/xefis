@@ -37,18 +37,33 @@
 					<property bytes='2' path='/sensors/engines/2/egt' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/epr' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/pitch' type='angle'/>
+					<property bytes='2' path='/systems/fbw/stick/pitch' type='angle'/>
+					<property bytes='2' path='/systems/fbw/stick/roll' type='angle'/>
+					<property bytes='4' path='/settings/cmd/ias' type='speed'/>
+					<property bytes='4' path='/settings/cmd/altitude' type='length'/>
+					<property bytes='4' path='/settings/cmd/vertical-speed' type='speed'/>
+					<property bytes='4' path='/settings/cmd/magnetic-heading-track' type='angle'/>
+					<property bytes='2' path='/systems/fd/pitch' type='angle'/>
+					<property bytes='2' path='/systems/fd/roll' type='angle'/>
 					<bitfield>
-						<!-- Sensors -->
+						<!-- Sensors - sensors -->
 						<property path='/sensors/ahrs/serviceable' type='boolean'/>
 						<property path='/sensors/airspeed/serviceable' type='boolean'/>
 						<property path='/sensors/pressure/serviceable' type='boolean'/>
 						<property path='/sensors/gps/serviceable' type='boolean'/>
 						<property path='/sensors/radar-altimeter/serviceable' type='boolean'/>
-						<!-- Computers -->
+						<!-- Serviceable - computers -->
 						<property path='/systems/adc/altitude/amsl.serviceable' type='boolean'/>
 						<property path='/systems/adc/speed/ias.serviceable' type='boolean'/>
 						<property path='/systems/adc/vertical-speed/serviceable' type='boolean'/>
 						<property path='/systems/fbw/serviceable' type='boolean'/>
+						<property path='/systems/fd/serviceable' type='boolean' retained='true'/>
+						<!-- CMD modes -->
+						<property path='/settings/cmd/speed-mode' type='integer' bits='4'/>
+						<property path='/settings/cmd/roll-mode' type='integer' bits='3'/>
+						<property path='/settings/cmd/pitch-mode' type='integer' bits='4'/>
+						<!-- Other flags -->
+						<property path='/systems/fd/altitude-acquired' type='boolean'/>
 					</bitfield>
 				</signature>
 			</packet>
@@ -84,6 +99,7 @@
 					<property bytes='2' path='/input/pedals' type='float'/>
 					<property bytes='2' path='/input/throttle' type='float'/>
 					<property bytes='2' path='/settings/pressure/qnh' type='pressure' retained='true'/>
+					<property bytes='4' path='/settings/course/magnetic' type='angle'/>
 					<bitfield>
 						<property path='/settings/pressure/use-std' type='boolean' retained='true'/>
 					</bitfield>

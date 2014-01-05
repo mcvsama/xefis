@@ -3,15 +3,15 @@
 	<module name='systems/nc'>
 		<properties>
 			<!-- Input -->
-			<property name='position.input.longitude' path='/sensors/gps/longitude'/>
-			<property name='position.input.latitude' path='/sensors/gps/latitude'/>
-			<property name='position.input.altitude.amsl' path='/sensors/gps/altitude-amsl'/>
-			<property name='position.input.accuracy.lateral' path='/sensors/gps/accuracy.lateral'/>
-			<property name='position.input.accuracy.vertical' path='/sensors/gps/accuracy.vertical'/>
-			<property name='position.input.source' path='/sensors/gps/source'/>
-			<property name='orientation.input.pitch' path='/sensors/ahrs/orientation/pitch'/>
-			<property name='orientation.input.roll' path='/sensors/ahrs/orientation/roll'/>
-			<property name='orientation.input.heading.magnetic' path='/sensors/ahrs/orientation/magnetic-heading'/>
+			<property name='position.input.longitude' path='/aircraft/sensors/gps/longitude'/>
+			<property name='position.input.latitude' path='/aircraft/sensors/gps/latitude'/>
+			<property name='position.input.altitude.amsl' path='/aircraft/sensors/gps/altitude-amsl'/>
+			<property name='position.input.accuracy.lateral' path='/aircraft/sensors/gps/accuracy.lateral'/>
+			<property name='position.input.accuracy.vertical' path='/aircraft/sensors/gps/accuracy.vertical'/>
+			<property name='position.input.source' path='/aircraft/sensors/gps/source'/>
+			<property name='orientation.input.pitch' path='/aircraft/sensors/ahrs/orientation/pitch'/>
+			<property name='orientation.input.roll' path='/aircraft/sensors/ahrs/orientation/roll'/>
+			<property name='orientation.input.heading.magnetic' path='/aircraft/sensors/ahrs/orientation/magnetic-heading'/>
 			<!-- Output -->
 			<directory path='/systems/nc'>
 				<property name='position.longitude' path='/position/longitude'/>

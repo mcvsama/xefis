@@ -13,7 +13,7 @@
 							<setting name='value.maximum.warning' value='750'/>
 							<setting name='value.maximum.critical' value='800'/>
 						</settings>
-						<properties path='//sensors/engines/1'>
+						<properties path='//aircraft/sensors/engines/1'>
 							<property name='value' path='/thrust'/>
 							<property name='value.reference' path='/thrust.reference' default='520'/>
 							<property name='value.target' path='//input/stick/axis/2'/>
@@ -29,7 +29,7 @@
 							<setting name='value.maximum.warning' value='3000'/>
 							<setting name='value.maximum.critical' value='3500'/>
 						</settings>
-						<properties path='//sensors/engines/1'>
+						<properties path='//aircraft/sensors/engines/1'>
 							<property name='value' path='/rpm'/>
 						</properties>
 					</instrument>
@@ -42,7 +42,7 @@
 							<setting name='value.maximum.warning' value='800'/>
 							<setting name='value.maximum.critical' value='900'/>
 						</settings>
-						<properties path='//sensors/engines/1'>
+						<properties path='//aircraft/sensors/engines/1'>
 							<property name='value' path='/temperature'/>
 						</properties>
 					</instrument>
@@ -56,7 +56,7 @@
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='false'/>
 						</settings>
-						<properties path='//sensors/engines/1'>
+						<properties path='//aircraft/sensors/engines/1'>
 							<property name='value' path='/pitch.deg'/>
 						</properties>
 					</instrument>
@@ -113,7 +113,7 @@
 							<setting name='value.maximum.warning' value='750'/>
 							<setting name='value.maximum.critical' value='800'/>
 						</settings>
-						<properties path='//sensors/engines/2'>
+						<properties path='//aircraft/sensors/engines/2'>
 							<property name='value' path='/thrust'/>
 							<property name='value.reference' path='/thrust.reference' default='520'/>
 							<property name='value.target' path='//input/stick/axis/2'/>
@@ -129,7 +129,7 @@
 							<setting name='value.maximum.warning' value='3000'/>
 							<setting name='value.maximum.critical' value='3500'/>
 						</settings>
-						<properties path='//sensors/engines/2'>
+						<properties path='//aircraft/sensors/engines/2'>
 							<property name='value' path='/rpm'/>
 						</properties>
 					</instrument>
@@ -142,7 +142,7 @@
 							<setting name='value.maximum.warning' value='800'/>
 							<setting name='value.maximum.critical' value='900'/>
 						</settings>
-						<properties path='//sensors/engines/2'>
+						<properties path='//aircraft/sensors/engines/2'>
 							<property name='value' path='/temperature'/>
 						</properties>
 					</instrument>
@@ -156,7 +156,7 @@
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='true'/>
 						</settings>
-						<properties path='//sensors/engines/2'>
+						<properties path='//aircraft/sensors/engines/2'>
 							<property name='value' path='/pitch.deg'/>
 						</properties>
 					</instrument>
@@ -179,6 +179,12 @@
 						<messages>
 							<message message='LINK FAIL' severity='critical'>
 								<observe path='/link/xbee/serviceable' fail-on='false'/>
+							</message>
+							<message message='LINK TX SYS' severity='critical'>
+								<observe path='/link/local/valid' fail-on='false'/>
+							</message>
+							<message message='LINK RX SYS' severity='critical'>
+								<observe path='/link/remote/valid' fail-on='false'/>
 							</message>
 							<message message='ADC AMSL SYS' severity='critical'>
 								<observe path='/aircraft/systems/adc/altitude/amsl.serviceable' fail-on='false'/>
@@ -205,22 +211,22 @@
 								<observe path='/systems/adc/vertical-speed/serviceable' fail-on='false'/>
 							</message>
 							<message message='FD SYS FAIL'>
-								<observe path='/systems/flight-director/serviceable' fail-on='false'/>
+								<observe path='/systems/fd/serviceable' fail-on='false'/>
 							</message>
 							<message message='AHRS FAIL'>
-								<observe path='/sensors/ahrs/serviceable' fail-on='false'/>
+								<observe path='/aircraft/sensors/ahrs/serviceable' fail-on='false'/>
 							</message>
 							<message message='STATIC PRESS FAIL'>
-								<observe path='/sensors/pressure/serviceable' fail-on='false'/>
+								<observe path='/aircraft/sensors/pressure/serviceable' fail-on='false'/>
 							</message>
 							<message message='GPS FAIL'>
-								<observe path='/sensors/gps/serviceable' fail-on='false'/>
+								<observe path='/aircraft/sensors/gps/serviceable' fail-on='false'/>
 							</message>
 							<message message='PITOT FAIL'>
-								<observe path='/sensors/airspeed/serviceable' fail-on='false'/>
+								<observe path='/aircraft/sensors/airspeed/serviceable' fail-on='false'/>
 							</message>
 							<message message='RA FAIL'>
-								<observe path='/sensors/radar-altimeter/serviceable' fail-on='false'/>
+								<observe path='/aircraft/sensors/radar-altimeter/serviceable' fail-on='false'/>
 							</message>
 						</messages>
 					</instrument>

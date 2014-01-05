@@ -17,7 +17,7 @@
 					<setting name='altitude.landing.warning.lo' value='500 ft'/>
 				</settings>
 				<properties>
-					<property name='orientation.heading.numbers-visible' path='/settings/efis/heading-numbers-visible'/>
+					<property name='orientation.heading.numbers-visible' path='/settings/efis/heading-numbers-visible' default='true'/>
 					<property name='speed.ias.serviceable' path='/systems/adc/speed/ias.serviceable'/>
 					<property name='speed.ias' path='/systems/adc/speed/ias'/>
 					<property name='speed.ias.lookahead' path='/systems/adc/speed/ias.lookahead'/>
@@ -30,7 +30,7 @@
 					<property name='track.lateral.magnetic' path='/systems/nc/track/lateral/magnetic'/>
 					<property name='track.lateral.true' path='/systems/nc/track/lateral/true'/>
 					<property name='track.vertical' path='/systems/nc/track/vertical'/>
-					<property name='slip-skid' path='/sensors/slip-skid/slip-skid'/>
+					<property name='slip-skid' path='/aircraft/sensors/slip-skid/slip-skid'/>
 					<property name='fpv.visible' path='/settings/efis/fpv-visible'/>
 					<property name='aoa.alpha' path='/systems/aoa/alpha'/>
 					<property name='aoa.warning-threshold' path='/settings/aoa/warning-threshold'/>
@@ -39,8 +39,8 @@
 					<property name='altitude.amsl.serviceable' path='/systems/adc/altitude/amsl.serviceable'/>
 					<property name='altitude.amsl' path='/systems/adc/altitude/amsl'/>
 					<property name='altitude.amsl.lookahead' path='/systems/adc/altitude/amsl.lookahead'/>
-					<property name='altitude.agl.serviceable' path='/sensors/radar-altimeter/serviceable'/>
-					<property name='altitude.agl' path='/sensors/radar-altimeter/altitude.agl'/>
+					<property name='altitude.agl.serviceable' path='/aircraft/sensors/radar-altimeter/serviceable'/>
+					<property name='altitude.agl' path='/aircraft/sensors/radar-altimeter/altitude.agl'/>
 					<property name='altitude.minimums.type' path='/settings/minimums/type'/>
 					<property name='altitude.minimums.setting' path='/settings/minimums/setting'/>
 					<property name='altitude.minimums.amsl' path='/settings/minimums/amsl'/>
@@ -51,18 +51,18 @@
 					<property name='pressure.qnh' path='/settings/pressure/qnh'/>
 					<property name='pressure.display-hpa' path='/settings/pressure/display-hpa'/>
 					<property name='pressure.use-std' path='/settings/pressure/use-std'/>
-					<property name='flight-director.serviceable' path='/systems/flight-director/serviceable'/>
-					<property name='flight-director.cmd.visible' path='/settings/flight-director/cmd/visible' default='true'/>
-					<property name='flight-director.cmd.ias' path='/settings/autothrottle/cmd/ias'/>
-					<property name='flight-director.cmd.altitude' path='/settings/flight-director/cmd/altitude'/>
-					<property name='flight-director.cmd.altitude.acquired' path='/systems/flight-director/altitude-acquired'/>
-					<property name='flight-director.cmd.vertical-speed' path='/settings/flight-director/cmd/vertical-speed'/>
-					<property name='flight-director.guidance.visible' path='/settings/efis/flight-director-visible'/>
-					<property name='flight-director.guidance.pitch' path='/systems/flight-director/guidance/pitch'/>
-					<property name='flight-director.guidance.roll' path='/systems/flight-director/guidance/roll'/>
+					<property name='flight-director.serviceable' path='/aircraft/systems/fd/serviceable'/>
+					<property name='flight-director.cmd.visible' path='/settings/efis/cmd-settings-visible' default='true'/>
+					<property name='flight-director.cmd.ias' path='/aircraft/settings/cmd/ias'/>
+					<property name='flight-director.cmd.altitude' path='/aircraft/settings/cmd/altitude'/>
+					<property name='flight-director.cmd.altitude.acquired' path='/aircraft/systems/fd/altitude-acquired'/>
+					<property name='flight-director.cmd.vertical-speed' path='/aircraft/settings/cmd/vertical-speed'/>
+					<property name='flight-director.guidance.visible' path='/settings/efis/cmd-guidance-visible'/>
+					<property name='flight-director.guidance.pitch' path='/aircraft/systems/fd/pitch'/>
+					<property name='flight-director.guidance.roll' path='/aircraft/systems/fd/roll'/>
 					<property name='control-stick.visible' path='/panels/mcp/led/att'/>
-					<property name='control-stick.pitch' path='/systems/fly-by-wire/stick/pitch'/>
-					<property name='control-stick.roll' path='/systems/fly-by-wire/stick/roll'/>
+					<property name='control-stick.pitch' path='/aircraft/systems/fbw/stick/pitch'/>
+					<property name='control-stick.roll' path='/aircraft/systems/fbw/stick/roll'/>
 					<directory path='//efis'>
 						<directory path='/approach'>
 							<property name='approach.reference-visible' path='//settings/efis/approach-reference-visible'/>
@@ -83,9 +83,9 @@
 						</directory>
 					</directory>
 					<property name='flight-mode.hint.visible' path='/settings/flight-mode/visible' default='true'/>
-					<property name='flight-mode.fma.visible' path='/settings/fma/visible' default='true'/>
-					<directory path='/systems/afcs/fma'>
-						<property name='flight-mode.hint' path='/control-hint'/>
+					<property name='flight-mode.fma.visible' path='/settings/efis/fma-visible' default='true'/>
+					<property name='flight-mode.hint' path='/systems/afcs/fma/control-hint'/>
+					<directory path='/systems/fma'>
 						<property name='flight-mode.fma.speed-hint' path='/speed-mode'/>
 						<property name='flight-mode.fma.speed-small-hint' path='/armed-speed-mode'/>
 						<property name='flight-mode.fma.lateral-hint' path='/roll-mode'/>
@@ -121,9 +121,9 @@
 					<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
 					<property name='track.center-on-track' path='/settings/hsi/center-on-track'/>
 					<property name='track.visible' path='/settings/hsi/track-visible'/>
-					<property name='cmd.visible' path='/settings/flight-director/cmd/visible'/>
-					<property name='cmd.heading' path='/settings/flight-director/cmd/magnetic-heading-track'/>
-					<property name='cmd.track-visible' path='/settings/efis/flight-director-visible'/>
+					<property name='cmd.visible' path='/settings/efis/cmd-settings-visible'/>
+					<property name='cmd.track-visible' path='/settings/efis/cmd-guidance-visible'/>
+					<property name='cmd.heading' path='/aircraft/settings/cmd/magnetic-heading-track'/>
 					<property name='altitude.target.reach-distance' path='/systems/altacq/distance'/>
 					<property name='orientation.display-true-heading' path='/settings/hsi/display-true-heading'/>
 					<property name='localizer-id' path='/settings/hsi/localizer-id'/>
