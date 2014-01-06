@@ -308,6 +308,27 @@
 				<type>double</type>
 				<node>/environment/wind-speed-kt</node>
 			</chunk>
+			<!-- Gear -->
+			<chunk>
+				<name>gd</name>
+				<type>bool</type>
+				<node>/controls/gear/gear-down</node>
+			</chunk>
+			<chunk>
+				<name>gdn</name>
+				<type>double</type>
+				<node>/gear/gear/position-norm</node>
+			</chunk>
+			<chunk>
+				<name>gdl</name>
+				<type>double</type>
+				<node>/gear/gear[1]/position-norm</node>
+			</chunk>
+			<chunk>
+				<name>gdr</name>
+				<type>double</type>
+				<node>/gear/gear[2]/position-norm</node>
+			</chunk>
 		</output>
 	</generic>
 </PropertyList>

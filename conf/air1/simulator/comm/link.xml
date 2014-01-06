@@ -67,6 +67,14 @@
 						<!-- FBW modes -->
 						<property path='/settings/fbw/attitude-mode' type='integer' bits='2'/>
 						<property path='/settings/fbw/throttle-mode' type='integer' bits='1'/>
+						<!-- Gear -->
+						<property path='/sensors/gear/setting.down' type='boolean'/>
+						<property path='/sensors/gear/nose.up' type='boolean'/>
+						<property path='/sensors/gear/nose.down' type='boolean'/>
+						<property path='/sensors/gear/left.up' type='boolean'/>
+						<property path='/sensors/gear/left.down' type='boolean'/>
+						<property path='/sensors/gear/right.up' type='boolean'/>
+						<property path='/sensors/gear/right.down' type='boolean'/>
 						<!-- Other flags -->
 						<property path='/systems/fd/altitude-acquired' type='boolean'/>
 					</bitfield>
