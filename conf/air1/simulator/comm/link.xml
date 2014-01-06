@@ -2,7 +2,7 @@
 <xefis-include>
 	<module name='io/link' instance='output'>
 		<settings>
-			<setting name='frequency' value='30 Hz'/>
+			<setting name='frequency' value='100 Hz'/>
 		</settings>
 		<properties>
 			<property name='output' path='/link/data/to-groundstation'/>
@@ -10,6 +10,7 @@
 		<protocol>
 			<packet magic='ca:fe'>
 				<signature random-bytes='1' signature-bytes='2' key='00:11:22:33'>
+					<property bytes='2' path='/link/local/failsafes' type='integer'/>
 					<property bytes='4' path='/settings/cmd/ias' type='speed'/>
 					<property bytes='4' path='/settings/cmd/altitude' type='length'/>
 					<property bytes='4' path='/settings/cmd/vertical-speed' type='speed'/>
@@ -47,6 +48,8 @@
 					<property bytes='2' path='/systems/fbw/stick/roll' type='angle'/>
 					<property bytes='2' path='/systems/fd/pitch' type='angle'/>
 					<property bytes='2' path='/systems/fd/roll' type='angle'/>
+					<property bytes='2' path='/sensors/flaps/setting' type='angle'/>
+					<property bytes='2' path='/sensors/flaps/current' type='angle'/>
 					<bitfield>
 						<!-- Sensors - sensors -->
 						<property path='/sensors/ahrs/serviceable' type='boolean'/>
@@ -59,7 +62,6 @@
 						<property path='/systems/adc/speed/ias.serviceable' type='boolean'/>
 						<property path='/systems/adc/vertical-speed/serviceable' type='boolean'/>
 						<property path='/systems/fbw/serviceable' type='boolean'/>
-						<property path='/systems/fd/serviceable' type='boolean' retained='true'/>
 						<!-- CMD modes -->
 						<property path='/settings/cmd/speed-mode' type='integer' bits='4'/>
 						<property path='/settings/cmd/roll-mode' type='integer' bits='3'/>
@@ -77,13 +79,6 @@
 						<property path='/sensors/gear/right.down' type='boolean'/>
 						<!-- Other flags -->
 						<property path='/systems/fd/altitude-acquired' type='boolean'/>
-					</bitfield>
-				</signature>
-			</packet>
-			<packet magic='e4:40' send-every='10' send-offset='0'>
-				<signature random-bytes='2' signature-bytes='2' key='44:55:66:77'>
-					<property bytes='2' path='/link/local/failsafes' type='integer'/>
-					<bitfield>
 						<property path='/link/local/valid' type='boolean'/>
 					</bitfield>
 				</signature>
@@ -112,12 +107,19 @@
 					<property bytes='2' path='/input/pedals' type='float'/>
 					<property bytes='2' path='/input/throttle' type='float'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure' retained='true'/>
-					<property bytes='4' path='/settings/course/magnetic' type='angle'/>
+					<property bytes='4' path='/settings/course/magnetic' type='angle' retained='true'/>
+					<property bytes='4' path='/settings/cmd/ias' type='speed' retained='true'/>
+					<property bytes='4' path='/settings/cmd/magnetic-heading-track' type='angle' retained='true'/>
+					<property bytes='4' path='/settings/cmd/altitude' type='length' retained='true'/>
+					<property bytes='4' path='/settings/cmd/vertical-speed' type='speed' retained='true'/>
+					<property bytes='4' path='/settings/cmd/fpa' type='angle' retained='true'/>
 					<bitfield>
 						<property path='/settings/pressure/use-std' type='boolean' retained='true'/>
 						<property path='/settings/lights/strobe' type='boolean' retained='true'/>
 						<property path='/settings/lights/position' type='boolean' retained='true'/>
 						<property path='/settings/lights/landing' type='boolean' retained='true'/>
+						<property path='/settings/fbw/attitude-mode' type='integer' bits='2' retained='true'/>
+						<property path='/settings/fbw/throttle-mode' type='integer' bits='1' retained='true'/>
 					</bitfield>
 				</signature>
 			</packet>

@@ -60,20 +60,20 @@
 				<property name='led.vertical-speed.sel' path='/vspd-sel'/>
 				<property name='led.vertical-speed.clb-con' path='/vspd-clb-con'/>
 			</directory>
-			<directory path='/settings/fd/cmd'>
+			<directory path='/settings/cmd'>
 				<property name='cmd.roll-mode' path='/roll-mode'/>
 				<property name='cmd.pitch-mode' path='/pitch-mode'/>
+				<property name='cmd.ias' path='/ias'/>
 				<property name='cmd.magnetic-heading-track' path='/magnetic-heading-track'/>
 				<property name='cmd.altitude' path='/altitude'/>
 				<property name='cmd.vertical-speed' path='/vertical-speed'/>
 				<property name='cmd.fpa' path='/fpa'/>
 			</directory>
-			<directory path='/settings/at/cmd'>
-				<property name='cmd.ias' path='/ias'/>
+			<directory path='/systems/afcs'>
+				<property name='fbw.attitude-mode' path='/fbw-attitude-mode'/>
+				<property name='fbw.throttle-mode' path='/fbw-throttle-mode'/>
+				<property name='flight-mode' path='/flight-mode'/>
 			</directory>
-			<property name='fbw.attitude-mode' path='/settings/fbw/attitude-mode'/>
-			<property name='fbw.throttle-mode' path='/settings/fbw/throttle-mode'/>
-			<property name='flight-mode' path='/systems/afcs/flight-mode'/>
 		</properties>
 	</module>
 </xefis-include>
