@@ -270,15 +270,15 @@
 				<group label='EICAS'>
 					<layout type='vertical' spacing='10'>
 						<item>
-							<widget type='rotary-encoder' top-label='MSG' click-label='DEL' click-property='/panels/mcp/eicas-del' rotate-up-property='/panels/mcp/eicas-up' rotate-down-property='/panels/mcp/eicas-down'/>
+							<widget type='rotary-encoder' top-label='MSG' click-label='DEL' click-property='/panels/mcp/status-del' rotate-up-property='/panels/mcp/status-up' rotate-down-property='/panels/mcp/status-down'/>
 						</item>
 						<stretch/>
 						<item>
-							<widget type='button' top-label='RECALL' click-property='/panels/mcp/eicas-recall'/>
+							<widget type='button' top-label='RECALL' click-property='/panels/mcp/status-recall'/>
 						</item>
 						<stretch/>
 						<item>
-							<widget type='button' top-label='CLEAR' click-property='/panels/mcp/eicas-clear'/>
+							<widget type='button' top-label='CLEAR' click-property='/panels/mcp/status-clear'/>
 						</item>
 					</layout>
 				</group>
