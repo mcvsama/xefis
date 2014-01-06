@@ -143,6 +143,13 @@ class FlightGearIO:
 	Xefis::PropertyString					_gps_source;
 	Xefis::PropertyAngle					_wind_from_magnetic_heading;
 	Xefis::PropertySpeed					_wind_tas;
+	Xefis::PropertyBoolean					_gear_setting_down;
+	Xefis::PropertyBoolean					_gear_nose_up;
+	Xefis::PropertyBoolean					_gear_nose_down;
+	Xefis::PropertyBoolean					_gear_left_up;
+	Xefis::PropertyBoolean					_gear_left_down;
+	Xefis::PropertyBoolean					_gear_right_up;
+	Xefis::PropertyBoolean					_gear_right_down;
 	// Output:
 	Xefis::PropertyFloat					_ailerons;
 	Xefis::PropertyFloat					_elevator;

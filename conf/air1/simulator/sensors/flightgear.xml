@@ -51,6 +51,14 @@
 					<property name='engine.2.egt' path='/engines/2/temperature'/>
 					<property name='engine.2.epr' path='/engines/2/epr'/>
 					<property name='engine.2.pitch' path='/engines/2/pitch'/>
+					<!-- gear -->
+					<property name='gear.setting.down' path='/gear/setting.down'/>
+					<property name='gear.nose.up' path='/gear/nose.up'/>
+					<property name='gear.nose.down' path='/gear/nose.down'/>
+					<property name='gear.left.up' path='/gear/left.up'/>
+					<property name='gear.left.down' path='/gear/left.down'/>
+					<property name='gear.right.up' path='/gear/right.up'/>
+					<property name='gear.right.down' path='/gear/right.down'/>
 				</directory>
 				<directory path='/sensors/flightgear-other'>
 					<property name='gs' path='/speed/ground-speed'/>

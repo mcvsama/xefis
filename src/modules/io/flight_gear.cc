@@ -95,6 +95,10 @@ struct FGInputData
 	FGDouble	engine_2_egt_degc;					// egt2
 	FGDouble	wind_from_magnetic_heading_deg;		// wfh
 	FGDouble	wind_tas_kt;						// ws
+	FGBool		gear_setting_down;					// gd
+	FGDouble	gear_nose_position;					// gdn
+	FGDouble	gear_left_position;					// gdl
+	FGDouble	gear_right_position;				// gdr
 }
 END_PACKED_STRUCT
 
@@ -191,6 +195,13 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "gps.serviceable", _gps_serviceable, false },
 						{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
 						{ "wind-tas", _wind_tas, false },
+						{ "gear.setting.down", _gear_setting_down, false },
+						{ "gear.nose.up", _gear_nose_up, false },
+						{ "gear.nose.down", _gear_nose_down, false },
+						{ "gear.left.up", _gear_left_up, false },
+						{ "gear.left.down", _gear_left_down, false },
+						{ "gear.right.up", _gear_right_up, false },
+						{ "gear.right.down", _gear_right_down, false },
 					});
 				}
 			}
@@ -283,7 +294,14 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		&_gps_accuracy_lateral,
 		&_gps_accuracy_vertical,
 		&_wind_from_magnetic_heading,
-		&_wind_tas
+		&_wind_tas,
+		&_gear_setting_down,
+		&_gear_nose_up,
+		&_gear_nose_down,
+		&_gear_left_up,
+		&_gear_left_down,
+		&_gear_right_up,
+		&_gear_right_down,
 	};
 
 	_timeout_timer = std::make_unique<QTimer>();
@@ -398,6 +416,7 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (engine_2_egt_degc);
 		ASSIGN (deg,  wind_from_magnetic_heading);
 		ASSIGN (kt,   wind_tas);
+		ASSIGN_UNITLESS (gear_setting_down);
 
 #undef ASSIGN_UNITLESS
 #undef ASSIGN
@@ -416,6 +435,14 @@ FlightGearIO::read_input()
 
 		if (_static_air_temperature.valid())
 			_static_air_temperature.write (*_static_air_temperature + 273.15_K);
+
+		_gear_nose_down.write (fg_data->gear_nose_position > 0.999);
+		_gear_left_down.write (fg_data->gear_left_position > 0.999);
+		_gear_right_down.write (fg_data->gear_right_position > 0.999);
+
+		_gear_nose_up.write (fg_data->gear_nose_position < 0.001);
+		_gear_left_up.write (fg_data->gear_left_position < 0.001);
+		_gear_right_up.write (fg_data->gear_right_position < 0.001);
 	}
 
 	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)
