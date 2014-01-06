@@ -70,7 +70,7 @@
 					<instrument name='instruments/label' instance='engine-THR'>
 						<label>THR</label>
 						<align>hcenter bottom</align>
-						<color>#4bf</color>
+						<color>#4df</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
@@ -78,7 +78,7 @@
 					<instrument name='instruments/label' instance='engine-RPM'>
 						<label>RPM</label>
 						<align>hcenter bottom</align>
-						<color>#4bf</color>
+						<color>#4df</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
@@ -86,7 +86,7 @@
 					<instrument name='instruments/label' instance='engine-TEMP'>
 						<label>TEMP</label>
 						<align>hcenter bottom</align>
-						<color>#4bf</color>
+						<color>#4df</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
@@ -95,7 +95,7 @@
 					<instrument name='instruments/label' instance='engine-ESC-PITCH'>
 						<label>PTCH</label>
 						<align>hcenter vcenter</align>
-						<color>#4bf</color>
+						<color>#4df</color>
 						<font-size>11</font-size>
 					</instrument>
 				</item>
@@ -167,7 +167,7 @@
 		<item stretch-factor='2'/>
 		<item stretch-factor='48'>
 			<layout type='vertical'>
-				<item stretch-factor='50'>
+				<item stretch-factor='30'>
 					<instrument name='instruments/eicas'>
 						<properties>
 							<property name='button.cursor-up' path='/panels/mcp/eicas-up'/>
@@ -231,7 +231,19 @@
 						</messages>
 					</instrument>
 				</item>
-				<item stretch-factor='50'>
+				<item stretch-factor='15'>
+					<instrument name='instruments/flaps'>
+						<settings>
+							<setting name='maximum' value='30 deg'/>
+							<setting name='hide-retracted' value='true'/>
+						</settings>
+						<properties>
+							<property name='current' path='/_current' default='0 deg'/>
+							<property name='setting' path='/_setting' default='0 deg'/>
+						</properties>
+					</instrument>
+				</item>
+				<item stretch-factor='30'>
 				</item>
 			</layout>
 		</item>

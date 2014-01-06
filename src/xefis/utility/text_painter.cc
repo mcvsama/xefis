@@ -104,16 +104,23 @@ TextPainter::get_text_box (QPointF const& position, Qt::Alignment flags, QString
 {
 	QFontMetricsF metrics (font());
 	QRectF target (position.x(), position.y(), metrics.width (text), metrics.height());
+	apply_alignment (target, flags);
 
-	if (flags & Qt::AlignHCenter)
-		target.translate (-0.5f * target.width(), 0.f);
-	else if (flags & Qt::AlignRight)
-		target.translate (-target.width(), 0.f);
+	return target;
+}
 
-	if (flags & Qt::AlignVCenter)
-		target.translate (0.f, -0.5f * target.height());
-	else if (flags & Qt::AlignBottom)
-		target.translate (0.f, -target.height());
+
+QRectF
+TextPainter::get_vertical_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const
+{
+	QFontMetricsF metrics (font());
+
+	float widest_char = 0.f;
+	for (auto const& c: text)
+		widest_char = std::max<float> (widest_char, metrics.width (c));
+
+	QRectF target (position.x(), position.y(), widest_char, metrics.height() * text.size());
+	apply_alignment (target, flags);
 
 	return target;
 }
@@ -193,6 +200,35 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 
 	if (saved_transform)
 		setTransform (painter_transform);
+}
+
+
+void
+TextPainter::fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text)
+{
+	QFontMetricsF metrics (font());
+	QRectF rect = get_vertical_text_box (position, flags, text);
+
+	QPointF top_char (rect.center().x(), rect.top() + 0.5f * metrics.height());
+	QPointF char_height (0.f, metrics.height());
+
+	for (int i = 0; i < text.size(); ++i)
+		fast_draw_text (top_char + i * char_height, Qt::AlignVCenter | Qt::AlignHCenter, text[i]);
+}
+
+
+void
+TextPainter::apply_alignment (QRectF& rect, Qt::Alignment flags)
+{
+	if (flags & Qt::AlignHCenter)
+		rect.translate (-0.5f * rect.width(), 0.f);
+	else if (flags & Qt::AlignRight)
+		rect.translate (-rect.width(), 0.f);
+
+	if (flags & Qt::AlignVCenter)
+		rect.translate (0.f, -0.5f * rect.height());
+	else if (flags & Qt::AlignBottom)
+		rect.translate (0.f, -rect.height());
 }
 
 } // namespace Xefis
