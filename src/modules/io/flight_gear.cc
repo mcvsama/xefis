@@ -111,6 +111,7 @@ struct FGOutputData
 	FGFloat		rudder;							// r
 	FGFloat		throttle_1;						// t1
 	FGFloat		throttle_2;						// t2
+	FGFloat		flaps;							// f
 }
 END_PACKED_STRUCT
 
@@ -224,6 +225,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "rudder", _rudder, false },
 						{ "throttle.1", _throttle_1, false },
 						{ "throttle.2", _throttle_2, false },
+						{ "flaps", _flaps, false },
 					});
 				}
 			}
@@ -485,6 +487,7 @@ FlightGearIO::write_output()
 	ASSIGN (rudder, 0.0);
 	ASSIGN (throttle_1, 0.0);
 	ASSIGN (throttle_2, 0.0);
+	ASSIGN (flaps, 0.0);
 
 #undef ASSIGN
 
