@@ -156,6 +156,7 @@ class FlightGearIO:
 	Xefis::PropertyFloat					_rudder;
 	Xefis::PropertyFloat					_throttle_1;
 	Xefis::PropertyFloat					_throttle_2;
+	Xefis::PropertyFloat					_flaps;
 };
 
 #endif
