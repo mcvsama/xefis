@@ -249,9 +249,6 @@ class State: public Xefis::Module
 	Observable<Xefis::PropertyBoolean>	_mcp_lights_strobe;
 	Observable<Xefis::PropertyBoolean>	_mcp_lights_pos;
 	Observable<Xefis::PropertyBoolean>	_mcp_lights_ldg;
-	Observable<Xefis::PropertyBoolean>	_mcp_eicas_cancel;
-	Observable<Xefis::PropertyBoolean>	_mcp_eicas_recall;
-	Observable<Xefis::PropertyBoolean>	_mcp_eicas_ok;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_nd;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_eicas;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_chklst;
