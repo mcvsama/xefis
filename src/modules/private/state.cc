@@ -98,9 +98,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_lights_strobe.set_path (mcp_root + "/lights-strobe");
 	_mcp_lights_pos.set_path (mcp_root + "/lights-pos");
 	_mcp_lights_ldg.set_path (mcp_root + "/lights-ldg");
-	_mcp_eicas_cancel.set_path (mcp_root + "/eicas-cancel");
-	_mcp_eicas_recall.set_path (mcp_root + "/eicas-recall");
-	_mcp_eicas_ok.set_path (mcp_root + "/eicas-ok");
 	_mcp_show_nd.set_path (mcp_root + "/show-nd");
 	_mcp_show_eicas.set_path (mcp_root + "/show-eicas");
 	_mcp_show_chklst.set_path (mcp_root + "/show-chklst");
@@ -167,9 +164,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_mcp_lights_strobe,
 		&_mcp_lights_pos,
 		&_mcp_lights_ldg,
-		&_mcp_eicas_cancel,
-		&_mcp_eicas_recall,
-		&_mcp_eicas_ok,
 		&_mcp_show_nd,
 		&_mcp_show_eicas,
 		&_mcp_show_chklst,
@@ -308,10 +302,6 @@ State::prepare_lights_gpws_mfd_panels()
 	make_toggle (_mcp_lights_strobe, _setting_lights_strobe);
 	make_toggle (_mcp_lights_pos, _setting_lights_position);
 	make_toggle (_mcp_lights_ldg, _setting_lights_landing);
-
-//	_mcp_eicas_cancel;
-//	_mcp_eicas_recall;
-//	_mcp_eicas_ok;
 
 	make_int_writer (_mcp_show_eicas, _setting_efis_mfd_mode, static_cast<int> (MFDMode::EICAS));
 	make_int_writer (_mcp_show_nd, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ND));
