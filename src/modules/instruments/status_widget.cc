@@ -22,20 +22,20 @@
 #include <xefis/core/window.h>
 
 // Local:
-#include "eicas_widget.h"
+#include "status_widget.h"
 
 
-constexpr Time EICASWidget::MessageHideTimeout;
+constexpr Time StatusWidget::MessageHideTimeout;
 
 
 void
-EICASWidget::Message::mark_as_outdated()
+StatusWidget::Message::mark_as_outdated()
 {
 	outdated = true;
 }
 
 
-EICASWidget::EICASWidget (QWidget* parent):
+StatusWidget::StatusWidget (QWidget* parent):
 	InstrumentWidget (parent),
 	InstrumentAids (1.0f)
 {
@@ -61,7 +61,7 @@ EICASWidget::EICASWidget (QWidget* parent):
 
 
 uint64_t
-EICASWidget::add_message (QString const& message, QColor color)
+StatusWidget::add_message (QString const& message, QColor color)
 {
 	Message m { _id_generator++, message, false, color };
 	_shown_messages.push_back (m);
@@ -74,7 +74,7 @@ EICASWidget::add_message (QString const& message, QColor color)
 
 
 void
-EICASWidget::remove_message (uint64_t message_id)
+StatusWidget::remove_message (uint64_t message_id)
 {
 	// Mark message as outdated:
 	Message* msg = find_message (message_id);
@@ -96,7 +96,7 @@ EICASWidget::remove_message (uint64_t message_id)
 
 
 void
-EICASWidget::cursor_up()
+StatusWidget::cursor_up()
 {
 	if (!_cursor_visible && !_shown_messages.empty())
 		_cursor_visible = true;
@@ -112,7 +112,7 @@ EICASWidget::cursor_up()
 
 
 void
-EICASWidget::cursor_down()
+StatusWidget::cursor_down()
 {
 	if (!_cursor_visible && !_shown_messages.empty())
 		_cursor_visible = true;
@@ -128,7 +128,7 @@ EICASWidget::cursor_down()
 
 
 void
-EICASWidget::cursor_del()
+StatusWidget::cursor_del()
 {
 	if (_shown_messages.empty())
 		return;
@@ -147,7 +147,7 @@ EICASWidget::cursor_del()
 
 
 void
-EICASWidget::recall()
+StatusWidget::recall()
 {
 	_shown_messages.insert (_shown_messages.end(), _hidden_messages.begin(), _hidden_messages.end());
 	_hidden_messages.clear();
@@ -158,7 +158,7 @@ EICASWidget::recall()
 
 
 void
-EICASWidget::clear()
+StatusWidget::clear()
 {
 	_hidden_messages.insert (_hidden_messages.end(), _shown_messages.begin(), _shown_messages.end());
 	_shown_messages.clear();
@@ -169,7 +169,7 @@ EICASWidget::clear()
 
 
 void
-EICASWidget::resizeEvent (QResizeEvent* event)
+StatusWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
@@ -184,7 +184,7 @@ EICASWidget::resizeEvent (QResizeEvent* event)
 
 
 void
-EICASWidget::paintEvent (QPaintEvent*)
+StatusWidget::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
 	clear_with_black();
@@ -246,7 +246,7 @@ EICASWidget::paintEvent (QPaintEvent*)
 
 
 void
-EICASWidget::recompute()
+StatusWidget::recompute()
 {
 	float margin = pen_width (2.f);
 	_font = _font_16;
@@ -266,7 +266,7 @@ EICASWidget::recompute()
 
 
 void
-EICASWidget::solve_scroll_and_cursor()
+StatusWidget::solve_scroll_and_cursor()
 {
 	if (_cursor >= _scroll + _max_shown_messages)
 		_scroll = _cursor - _max_shown_messages + 1;
@@ -284,7 +284,7 @@ EICASWidget::solve_scroll_and_cursor()
 
 
 void
-EICASWidget::do_remove_message (uint64_t message_id)
+StatusWidget::do_remove_message (uint64_t message_id)
 {
 	Messages* vector;
 	Messages::iterator* iterator;
@@ -298,8 +298,8 @@ EICASWidget::do_remove_message (uint64_t message_id)
 }
 
 
-EICASWidget::Message*
-EICASWidget::find_message (uint64_t message_id, Messages** vector_ptr, Messages::iterator** iterator_ptr)
+StatusWidget::Message*
+StatusWidget::find_message (uint64_t message_id, Messages** vector_ptr, Messages::iterator** iterator_ptr)
 {
 	for (Messages* vector: { &_hidden_messages, &_shown_messages })
 	{

@@ -23,14 +23,14 @@
 #include <xefis/utility/qdom.h>
 
 // Local:
-#include "eicas.h"
-#include "eicas_widget.h"
+#include "status.h"
+#include "status_widget.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/eicas", EICAS);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/status", Status);
 
 
-EICAS::MessageDefinition::Observation::Observation (QDomElement const& observe_element)
+Status::MessageDefinition::Observation::Observation (QDomElement const& observe_element)
 {
 	QString fail_on_nil = observe_element.attribute ("fail-on-nil");
 	if (observe_element.hasAttribute ("fail-on-nil") && fail_on_nil != "true" && fail_on_nil != "false")
@@ -52,14 +52,14 @@ EICAS::MessageDefinition::Observation::Observation (QDomElement const& observe_e
 
 
 bool
-EICAS::MessageDefinition::Observation::fresh() const
+Status::MessageDefinition::Observation::fresh() const
 {
 	return _observed_property.fresh();
 }
 
 
 bool
-EICAS::MessageDefinition::Observation::test() const
+Status::MessageDefinition::Observation::test() const
 {
 	// Force fresh() to return false until next value change:
 	_observed_property.read();
@@ -71,7 +71,7 @@ EICAS::MessageDefinition::Observation::test() const
 }
 
 
-EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
+Status::MessageDefinition::MessageDefinition (QDomElement const& message_element)
 {
 	if (!message_element.hasAttribute ("message"))
 		throw Xefis::Exception ("missing @message property on <message> element");
@@ -95,8 +95,8 @@ EICAS::MessageDefinition::MessageDefinition (QDomElement const& message_element)
 }
 
 
-EICAS::MessageDefinition::StateChange
-EICAS::MessageDefinition::test()
+Status::MessageDefinition::StateChange
+Status::MessageDefinition::test()
 {
 	bool any_fresh = false;
 	bool show = false;
@@ -128,7 +128,7 @@ EICAS::MessageDefinition::test()
 
 
 QColor
-EICAS::MessageDefinition::color() const noexcept
+Status::MessageDefinition::color() const noexcept
 {
 	switch (_severity)
 	{
@@ -139,7 +139,7 @@ EICAS::MessageDefinition::color() const noexcept
 }
 
 
-EICAS::EICAS (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Status::Status (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
 	parse_settings (config, {
@@ -160,39 +160,39 @@ EICAS::EICAS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				if (message_el == "message")
 					_messages.push_back (MessageDefinition (message_el));
 
-	_eicas_widget = new EICASWidget (this);
+	_status_widget = new StatusWidget (this);
 	_alert_command = new QProcess (this);
 	QObject::connect (_alert_command, SIGNAL (finished (int, QProcess::ExitStatus)), this, SLOT (alert_finished (int, QProcess::ExitStatus)));
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_eicas_widget);
+	layout->addWidget (_status_widget);
 }
 
 
 void
-EICAS::data_updated()
+Status::data_updated()
 {
 	auto pressed = [](Xefis::PropertyBoolean& property) -> bool {
 		return property.valid() && property.fresh() && *property;
 	};
 
 	if (pressed (_button_cursor_up))
-		_eicas_widget->cursor_up();
+		_status_widget->cursor_up();
 
 	if (pressed (_button_cursor_down))
-		_eicas_widget->cursor_down();
+		_status_widget->cursor_down();
 
 	if (pressed (_button_cursor_del))
-		_eicas_widget->cursor_del();
+		_status_widget->cursor_del();
 
 	if (pressed (_button_recall))
-		_eicas_widget->recall();
+		_status_widget->recall();
 
 	if (pressed (_button_clear))
 		if (Time::now() - _last_message_timestamp > _minimum_display_time)
-			_eicas_widget->clear();
+			_status_widget->clear();
 
 	bool sound_alert = false;
 	for (auto& m: _messages)
@@ -204,11 +204,11 @@ EICAS::data_updated()
 				// Hide old message:
 				if (m.has_message_id())
 				{
-					_eicas_widget->remove_message (m.message_id());
+					_status_widget->remove_message (m.message_id());
 					m.deassign_message_id();
 				}
 				// Show new one:
-				m.set_message_id (_eicas_widget->add_message (m.message(), m.color()));
+				m.set_message_id (_status_widget->add_message (m.message(), m.color()));
 				_last_message_timestamp = Time::now();
 				break;
 
@@ -216,7 +216,7 @@ EICAS::data_updated()
 				// Hide the message:
 				if (m.has_message_id())
 				{
-					_eicas_widget->remove_message (m.message_id());
+					_status_widget->remove_message (m.message_id());
 					m.deassign_message_id();
 				}
 				break;
@@ -232,7 +232,7 @@ EICAS::data_updated()
 
 
 void
-EICAS::alert_finished (int, QProcess::ExitStatus)
+Status::alert_finished (int, QProcess::ExitStatus)
 {
 	_alert_started = false;
 
@@ -245,7 +245,7 @@ EICAS::alert_finished (int, QProcess::ExitStatus)
 
 
 void
-EICAS::request_alert()
+Status::request_alert()
 {
 	if (_alert_started)
 		_alert_requested = true;

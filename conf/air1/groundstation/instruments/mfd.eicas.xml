@@ -168,13 +168,13 @@
 		<item stretch-factor='48'>
 			<layout type='vertical'>
 				<item stretch-factor='30'>
-					<instrument name='instruments/eicas'>
+					<instrument name='instruments/status'>
 						<properties>
-							<property name='button.cursor-up' path='/panels/mcp/eicas-up'/>
-							<property name='button.cursor-down' path='/panels/mcp/eicas-down'/>
-							<property name='button.cursor-del' path='/panels/mcp/eicas-del'/>
-							<property name='button.recall' path='/panels/mcp/eicas-recall'/>
-							<property name='button.clear' path='/panels/mcp/eicas-clear'/>
+							<property name='button.cursor-up' path='/panels/mcp/status-up'/>
+							<property name='button.cursor-down' path='/panels/mcp/status-down'/>
+							<property name='button.cursor-del' path='/panels/mcp/status-del'/>
+							<property name='button.recall' path='/panels/mcp/status-recall'/>
+							<property name='button.clear' path='/panels/mcp/status-clear'/>
 						</properties>
 						<messages>
 							<message message='LINK FAIL' severity='critical'>

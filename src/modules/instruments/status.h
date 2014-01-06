@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__EICAS_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__EICAS_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__STATUS_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__STATUS_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,9 +28,9 @@
 #include <xefis/core/instrument.h>
 
 
-class EICASWidget;
+class StatusWidget;
 
-class EICAS: public Xefis::Instrument
+class Status: public Xefis::Instrument
 {
 	Q_OBJECT
 
@@ -108,19 +108,19 @@ class EICAS: public Xefis::Instrument
 		test();
 
 		/**
-		 * Message to show on EICAS.
+		 * Message to show on Status.
 		 */
 		QString
 		message() const noexcept;
 
 		/**
-		 * Set message ID from EICASWidget.
+		 * Set message ID from StatusWidget.
 		 */
 		void
 		set_message_id (uint64_t id) noexcept;
 
 		/**
-		 * Deassigns message ID from EICASWidget.
+		 * Deassigns message ID from StatusWidget.
 		 */
 		void
 		deassign_message_id() noexcept;
@@ -132,7 +132,7 @@ class EICAS: public Xefis::Instrument
 		message_id() const noexcept;
 
 		/**
-		 * Return true if message ID from EICASWidget has been assigned.
+		 * Return true if message ID from StatusWidget has been assigned.
 		 */
 		bool
 		has_message_id() const noexcept;
@@ -154,7 +154,7 @@ class EICAS: public Xefis::Instrument
 
   public:
 	// Ctor
-	EICAS (Xefis::ModuleManager*, QDomElement const& config);
+	Status (Xefis::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -177,7 +177,7 @@ class EICAS: public Xefis::Instrument
 	request_alert();
 
   private:
-	EICASWidget*					_eicas_widget			= nullptr;
+	StatusWidget*					_status_widget			= nullptr;
 	Xefis::PropertyBoolean			_button_cursor_up;
 	Xefis::PropertyBoolean			_button_cursor_down;
 	Xefis::PropertyBoolean			_button_cursor_del;
@@ -192,22 +192,22 @@ class EICAS: public Xefis::Instrument
 };
 
 
-inline EICAS::MessageDefinition::Severity
-EICAS::MessageDefinition::severity() const noexcept
+inline Status::MessageDefinition::Severity
+Status::MessageDefinition::severity() const noexcept
 {
 	return _severity;
 }
 
 
 inline QString
-EICAS::MessageDefinition::message() const noexcept
+Status::MessageDefinition::message() const noexcept
 {
 	return _message;
 }
 
 
 inline void
-EICAS::MessageDefinition::set_message_id (uint64_t id) noexcept
+Status::MessageDefinition::set_message_id (uint64_t id) noexcept
 {
 	_message_id = id;
 	_has_message = true;
@@ -215,7 +215,7 @@ EICAS::MessageDefinition::set_message_id (uint64_t id) noexcept
 
 
 inline void
-EICAS::MessageDefinition::deassign_message_id() noexcept
+Status::MessageDefinition::deassign_message_id() noexcept
 {
 	_message_id = 0;
 	_has_message = false;
@@ -223,14 +223,14 @@ EICAS::MessageDefinition::deassign_message_id() noexcept
 
 
 inline uint64_t
-EICAS::MessageDefinition::message_id() const noexcept
+Status::MessageDefinition::message_id() const noexcept
 {
 	return _message_id;
 }
 
 
 inline bool
-EICAS::MessageDefinition::has_message_id() const noexcept
+Status::MessageDefinition::has_message_id() const noexcept
 {
 	return _has_message;
 }

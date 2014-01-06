@@ -184,8 +184,6 @@ SRC_SOURCES += modules/helpers/string_translator.cc
 
 SRC_HEADERS += modules/instruments/efis.h
 SRC_HEADERS += modules/instruments/efis_widget.h
-SRC_HEADERS += modules/instruments/eicas.h
-SRC_HEADERS += modules/instruments/eicas_widget.h
 SRC_HEADERS += modules/instruments/flaps.h
 SRC_HEADERS += modules/instruments/gear.h
 SRC_HEADERS += modules/instruments/hsi.h
@@ -195,11 +193,11 @@ SRC_HEADERS += modules/instruments/linear_indicator.h
 SRC_HEADERS += modules/instruments/linear_indicator_widget.h
 SRC_HEADERS += modules/instruments/radial_indicator.h
 SRC_HEADERS += modules/instruments/radial_indicator_widget.h
+SRC_HEADERS += modules/instruments/status.h
+SRC_HEADERS += modules/instruments/status_widget.h
 
 SRC_SOURCES += modules/instruments/efis.cc
 SRC_SOURCES += modules/instruments/efis_widget.cc
-SRC_SOURCES += modules/instruments/eicas.cc
-SRC_SOURCES += modules/instruments/eicas_widget.cc
 SRC_SOURCES += modules/instruments/flaps.cc
 SRC_SOURCES += modules/instruments/gear.cc
 SRC_SOURCES += modules/instruments/hsi.cc
@@ -209,12 +207,14 @@ SRC_SOURCES += modules/instruments/linear_indicator.cc
 SRC_SOURCES += modules/instruments/linear_indicator_widget.cc
 SRC_SOURCES += modules/instruments/radial_indicator.cc
 SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
+SRC_SOURCES += modules/instruments/status.cc
+SRC_SOURCES += modules/instruments/status_widget.cc
 
 SRC_MOCHDRS += modules/instruments/efis.h
 SRC_MOCHDRS += modules/instruments/efis_widget.h
 SRC_MOCHDRS += modules/instruments/hsi.h
-SRC_MOCHDRS += modules/instruments/eicas.h
-SRC_MOCHDRS += modules/instruments/eicas_widget.h
+SRC_MOCHDRS += modules/instruments/status.h
+SRC_MOCHDRS += modules/instruments/status_widget.h
 
 ######## /modules/io ########
 
