@@ -101,6 +101,9 @@ class TextPainter: public QPainter
 	QRectF
 	get_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
 
+	QRectF
+	get_vertical_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
+
 	void
 	fast_draw_text (QPointF const& position, QString const& text);
 
@@ -109,6 +112,16 @@ class TextPainter: public QPainter
 
 	void
 	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text);
+
+	void
+	fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text);
+
+  private:
+	/**
+	 * Apply alignment flags to given rectangle.
+	 */
+	static void
+	apply_alignment (QRectF& rect, Qt::Alignment flags);
 
   private:
 	Cache*	_cache;
