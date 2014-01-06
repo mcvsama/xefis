@@ -36,7 +36,7 @@
 					<property name='radar-altimeter.serviceable' path='/radar-altimeter/serviceable'/>
 					<!-- slip-skid -->
 					<property name='slip-skid' path='/slip-skid/slip-skid'/>
-					<!-- engine -->
+					<!-- engines -->
 					<property name='engine.1.thrust' path='/engines/1/thrust'/>
 					<property name='engine.1.rpm' path='/engines/1/rpm'/>
 					<property name='engine.1.n1' path='/engines/1/n1'/>
@@ -88,12 +88,12 @@
 		<output disabled='false'>
 			<host>127.0.0.1</host>
 			<port>9001</port>
-			<properties path='/input'>
-				<property name='ailerons' path='/stick-ailerons'/>
-				<property name='elevator' path='/stick-elevator'/>
-				<property name='rudder' path='/pedals'/>
+			<properties path='/systems/fbw'>
+				<property name='ailerons' path='/ailerons'/>
+				<property name='elevator' path='/elevator'/>
 				<property name='throttle.1' path='/throttle'/>
 				<property name='throttle.2' path='/throttle'/>
+				<property name='rudder' path='//input/pedals'/>
 			</properties>
 		</output>
 	</module>

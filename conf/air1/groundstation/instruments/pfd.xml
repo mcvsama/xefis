@@ -51,7 +51,6 @@
 					<property name='pressure.qnh' path='/settings/pressure/qnh'/>
 					<property name='pressure.display-hpa' path='/settings/efis/display-hpa'/>
 					<property name='pressure.use-std' path='/settings/pressure/use-std'/>
-					<property name='flight-director.serviceable' path='/aircraft/systems/fd/serviceable'/>
 					<property name='flight-director.cmd.visible' path='/settings/efis/cmd-settings-visible' default='true'/>
 					<property name='flight-director.cmd.ias' path='/aircraft/settings/cmd/ias'/>
 					<property name='flight-director.cmd.altitude' path='/aircraft/settings/cmd/altitude'/>

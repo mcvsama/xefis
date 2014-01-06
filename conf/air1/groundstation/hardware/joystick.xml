@@ -18,8 +18,8 @@
 		<axis id='2'>
 			<reverse/>
 			<output>
-				<minimum>-50</minimum>
-				<maximum>600</maximum>
+				<minimum>0</minimum>
+				<maximum>1</maximum>
 			</output>
 		</axis>
 	</module>

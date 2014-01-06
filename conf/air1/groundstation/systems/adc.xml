@@ -3,7 +3,7 @@
 	<module name='systems/adc'>
 		<settings>
 			<setting name='ias.valid-minimum' value='20 kt'/>
-			<setting name='ias.valid-maximum' value='250 kt'/>
+			<setting name='ias.valid-maximum' value='800 kt'/>
 		</settings>
 		<properties>
 			<!-- Input -->

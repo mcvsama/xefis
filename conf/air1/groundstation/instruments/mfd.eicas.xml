@@ -232,16 +232,34 @@
 					</instrument>
 				</item>
 				<item stretch-factor='15'>
-					<instrument name='instruments/flaps'>
-						<settings>
-							<setting name='maximum' value='30 deg'/>
-							<setting name='hide-retracted' value='true'/>
-						</settings>
-						<properties>
-							<property name='current' path='/_current' default='0 deg'/>
-							<property name='setting' path='/_setting' default='0 deg'/>
-						</properties>
-					</instrument>
+					<layout type='horizontal'>
+						<item stretch-factor='10'>
+							<instrument name='instruments/gear'>
+								<properties>
+									<property name='setting.down' path='/aircraft/sensors/gear/setting.down'/>
+									<property name='nose.up' path='/aircraft/sensors/gear/nose.up'/>
+									<property name='nose.down' path='/aircraft/sensors/gear/nose.down'/>
+									<property name='left.up' path='/aircraft/sensors/gear/left.up'/>
+									<property name='left.down' path='/aircraft/sensors/gear/left.down'/>
+									<property name='right.up' path='/aircraft/sensors/gear/right.up'/>
+									<property name='right.down' path='/aircraft/sensors/gear/right.down'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='5'>
+							<instrument name='instruments/flaps'>
+								<settings>
+									<setting name='maximum' value='30 deg'/>
+									<setting name='hide-retracted' value='true'/>
+								</settings>
+								<properties>
+									<property name='current' path='/aircraft/sensors/flaps/current'/>
+									<property name='setting' path='/aircraft/sensors/flaps/setting'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='5'/>
+					</layout>
 				</item>
 				<item stretch-factor='30'>
 				</item>
