@@ -122,8 +122,10 @@ HSI::read()
 	params.dist_to_home_vlos = *_home_distance_vlos;
 	params.dist_to_home_vert_visible = _home_distance_vertical.valid();
 	params.dist_to_home_vert = *_home_distance_vertical;
-	params.home_longitude = _home_position_longitude.get_optional();
-	params.home_latitude = _home_position_latitude.get_optional();
+	if (_home_position_longitude.valid() && _home_position_latitude.valid())
+		params.home = LonLat (*_home_position_longitude, *_home_position_latitude);
+	else
+		params.home.reset();
 	params.ground_speed_visible = _speed_gs.valid();
 	params.ground_speed = *_speed_gs;
 	params.true_air_speed_visible = _speed_tas.valid();
@@ -137,7 +139,10 @@ HSI::read()
 	params.wind_from_magnetic_heading = *_wind_from_magnetic;
 	params.wind_tas_speed = *_wind_speed_tas;
 	params.position_valid = _position_latitude.valid() && _position_longitude.valid();
-	params.position = LonLat (*_position_longitude, *_position_latitude);
+	if (params.position_valid)
+		params.position = LonLat (*_position_longitude, *_position_latitude);
+	else
+		params.position.reset();
 	params.navaids_visible = _orientation_heading_true.valid();
 	params.vor_visible = true;
 	params.dme_visible = true;
