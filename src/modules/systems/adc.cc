@@ -221,7 +221,7 @@ AirDataComputer::compute_altitude()
 		_altitude_amsl_lookahead.write (1_ft * est);
 
 		if (std::abs (est - _altitude_amsl->ft()) > 1)
-			_altitude_computer.keep_going();
+			_altitude_computer.touch();
 	}
 	else
 	{
@@ -282,7 +282,7 @@ AirDataComputer::compute_ias_lookahead()
 		_speed_ias_lookahead.write (1_kt * est);
 
 		if (std::abs (est - _ias->kt()) > 1.0)
-			_ias_lookahead_computer.keep_going();
+			_ias_lookahead_computer.touch();
 	}
 	else
 	{
