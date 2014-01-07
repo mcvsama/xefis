@@ -656,8 +656,9 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 	_sl_margin = 0.25f * digit_width;
 	_sl_digits = _params.speed >= 1000.0_kt - 0.5_kt ? 4 : 3;
 
-	_sl_black_box_rect = QRectF (-_sl_digits * digit_width - 2.f * _sl_margin, -digit_height,
-								 +_sl_digits * digit_width + 2.f * _sl_margin, 2.f * digit_height);
+	float const box_height_factor = 2.35;
+	_sl_black_box_rect = QRectF (-_sl_digits * digit_width - 2.f * _sl_margin, -0.5f * box_height_factor * digit_height,
+								 +_sl_digits * digit_width + 2.f * _sl_margin, box_height_factor * digit_height);
 
 	_sl_transform = _center_transform;
 	_sl_transform.translate (-0.4f * wh, 0.f);
@@ -1106,8 +1107,9 @@ EFISWidget::PaintWorkUnit::al_post_resize()
 	int const s_digits = 3;
 	_al_margin = 0.25f * b_digit_width;
 
-	_al_b_digits_box = QRectF (0.f, 0.f, b_digits * b_digit_width, 2.f * b_digit_height - 2.f * _al_margin);
-	_al_s_digits_box = QRectF (0.f, 0.f, s_digits * s_digit_width, 2.f * b_digit_height - 2.f * _al_margin);
+	float const box_height_factor = 2.35;
+	_al_b_digits_box = QRectF (0.f, 0.f, b_digits * b_digit_width, box_height_factor * b_digit_height - 2.f * _al_margin);
+	_al_s_digits_box = QRectF (0.f, 0.f, s_digits * s_digit_width, box_height_factor * b_digit_height - 2.f * _al_margin);
 	_al_black_box_rect = QRectF (0.f, -0.5f * _al_b_digits_box.height() - _al_margin,
 								 _al_b_digits_box.width() + _al_s_digits_box.width() + 2.f * _al_margin, _al_b_digits_box.height() + 2.f * _al_margin);
 	_al_metric_box_rect = QRectF (_al_black_box_rect.topLeft() - QPointF (0.f, 1.25f * _font_16_digit_height), _al_black_box_rect.topRight());
@@ -1258,7 +1260,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (Xefis::Painter& painter, float x)
 
 	// 00011 part:
 	float pos_00011 = (_al_rounded_altitude - _params.altitude.ft()) / 20.f;
-	paint_rotating_value (painter, box_00011, pos_00011, 0.7f,
+	paint_rotating_value (painter, box_00011, pos_00011, 0.75f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f - 2.f, 10.f)))) + "0");
