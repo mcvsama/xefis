@@ -136,7 +136,7 @@ HSIWidget::PaintWorkUnit::resized()
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * size().width(), 0.705f * size().height());
 
-			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 1.2f * _r);
+			_map_clip_rect = QRectF (-1.1f * _r, -1.1f * _r, 2.2f * _r, 1.11f * _r);
 			_trend_vector_clip_rect = QRectF (-rx, -rx, 2.f * rx, rx);
 
 			QPainterPath clip1;
@@ -147,7 +147,7 @@ HSIWidget::PaintWorkUnit::resized()
 			else
 				clip2.addRect (QRectF (-rx, -rx, 2.f * rx, 2.f * rx));
 			QPainterPath clip3;
-			clip3.addRect (QRectF (-rx, -rx, 2.f * rx, 1.23f * rx));
+			clip3.addRect (QRectF (-rx, -rx, 2.f * rx, 1.45f * rx));
 
 			_inner_map_clip = clip1 & clip3;
 			_outer_map_clip = clip2 & clip3;
@@ -320,8 +320,8 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_altitude_reach (painter());
 	paint_track (painter(), false);
 	paint_directions (painter());
-	paint_ap_settings (painter());
 	paint_track (painter(), true);
+	paint_ap_settings (painter());
 	paint_speeds_and_wind (painter());
 	paint_home_direction (painter());
 	paint_climb_glide_ratio (painter());
@@ -347,6 +347,44 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 	});
 
 	painter.translate (0.f, -_r);
+
+	// AP info: SEL HDG 000
+	if (_params.display_mode == DisplayMode::Auxiliary)
+	{
+		painter.setTransform (_aircraft_center_transform);
+		painter.setClipping (false);
+
+		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
+		if (sel_hdg == 0)
+			sel_hdg = 360;
+
+		// AP heading always set as magnetic, but can be displayed as true:
+		QString text_1 = "SEL HDG";
+		QString text_2 = QString ("%1").arg (sel_hdg, 3, 10, QChar ('0'));
+
+		QFont font_1 (_font_13);
+		QFont font_2 (_font_16);
+		QFontMetricsF metrics_1 (font_1);
+		QFontMetricsF metrics_2 (font_2);
+		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
+		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
+		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
+		rect_1.moveLeft (-rect_1.right() - metrics_1.width (" "));
+
+		painter.resetTransform();
+		painter.translate (0.5f * _w - metrics_2.width ("000") - _q, _h - 1.125f * _q);
+		// Background:
+		painter.setPen (Qt::NoPen);
+		painter.setBrush (Qt::black);
+		float a = 0.1 * metrics_2.height();
+		painter.drawRect (rect_1.united (rect_2).adjusted (-a, 0.0, a, 0.0));
+		// Texts:
+		painter.setPen (_autopilot_pen_2);
+		painter.setFont (font_1);
+		painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
+		painter.setFont (font_2);
+		painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+	}
 
 	// MAG/TRUE heading
 	if (_params.heading_visible)
@@ -375,6 +413,12 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 				painter.resetTransform();
 				painter.translate (0.5f * _w + _q, _h - 1.125f * _q);
+				// Background:
+				painter.setPen (Qt::NoPen);
+				painter.setBrush (Qt::black);
+				float a = 0.1 * metrics_2.height();
+				painter.drawRect (rect_1.united (rect_2).adjusted (-a, 0.0, a, 0.0));
+				// Texts:
 				painter.setPen (get_pen (_navigation_color, 1.f));
 				painter.setFont (font_1);
 				painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
@@ -443,10 +487,17 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	float hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
 	painter.setFont (_font_13);
 	QFontMetricsF metrics (painter.font());
+	QPointF text_hook = QPointF (hplus, _h - 1.125f * _q + vplus);
 	painter.setClipping (false);
 	painter.resetTransform();
+	// Background:
+	QRectF text_box = painter.get_text_box (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
+	painter.setPen (Qt::NoPen);
+	painter.setBrush (Qt::black);
+	float a = 0.1 * metrics.height();
+	painter.drawRect (text_box.adjusted (-a, 0.0, a, 0.0));
+	// Text:
 	painter.setPen (get_pen (_navigation_color, 1.f));
-	QPointF text_hook = QPointF (hplus, _h - 1.125f * _q + vplus);
 	painter.fast_draw_text (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
 	// Box for emphasis:
 	if (_params.positioning_hint != "" && is_newly_set (_locals.positioning_hint_ts))
@@ -455,7 +506,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		QRectF frame (0.f, 0.f, metrics.width (_params.positioning_hint), metrics.height());
 		frame.moveTo (text_hook + QPointF (0.f, 0.5f * metrics.height()));
 		centrify (frame);
-		frame.adjust (-0.1f * _q, -v, +0.1f * _q, +v);
+		frame.adjust (-0.1f * _q, -v, +0.1f * _q, +0.5f * v);
 		painter.setBrush (Qt::NoBrush);
 		painter.add_shadow ([&]() {
 			painter.drawRect (frame);
@@ -615,45 +666,16 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 	if (!_params.ap_heading_visible)
 		return;
 
-	// SEL HDG 000
-	if (_params.display_mode == DisplayMode::Auxiliary)
-	{
-		painter.setTransform (_aircraft_center_transform);
-		painter.setClipping (false);
-
-		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
-		if (sel_hdg == 0)
-			sel_hdg = 360;
-
-		// AP heading always set as magnetic, but can be displayed as true:
-		QString text_1 = "SEL HDG";
-		QString text_2 = QString ("%1").arg (sel_hdg, 3, 10, QChar ('0'));
-
-		QFont font_1 (_font_13);
-		QFont font_2 (_font_16);
-		QFontMetricsF metrics_1 (font_1);
-		QFontMetricsF metrics_2 (font_2);
-		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
-		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
-		rect_1.moveLeft (-rect_1.right() - metrics_1.width (" "));
-
-		painter.resetTransform();
-		painter.translate (0.5f * _w - metrics_2.width ("000") - _q, _h - 1.125f * _q);
-		painter.setPen (_autopilot_pen_2);
-		painter.setFont (font_1);
-		painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
-		painter.setFont (font_2);
-		painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
-	}
-
+	// AP dashed line:
 	if (_params.ap_track_visible)
 	{
 		double pink_pen_width = 1.5f;
+		double shadow_pen_width = 2.5f;
 		if (_params.display_mode == DisplayMode::Auxiliary)
+		{
 			pink_pen_width = 1.2f;
-
-		double shadow_pen_width = pink_pen_width + 1.f;
+			shadow_pen_width = 2.2f;
+		}
 
 		float const shadow_scale = shadow_pen_width / pink_pen_width;
 
@@ -681,7 +703,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		switch (_params.display_mode)
 		{
 			case DisplayMode::Auxiliary:
-				limited_rotation = Xefis::limit (Xefis::floored_mod (_locals.ap_heading - _locals.rotation + 180_deg, 360_deg) - 180_deg, -96_deg, +96_deg);
+				limited_rotation = Xefis::floored_mod (_locals.ap_heading - _locals.rotation + 180_deg, 360_deg) - 180_deg;
 				break;
 
 			default:
@@ -978,6 +1000,7 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 			break;
 	}
 
+	double shadow_scale = shadow_pen_width / pink_pen_width;
 	float dev_1_deg_px = 1.5f * k;
 
 	// Front pink line:
@@ -990,11 +1013,12 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 	}
 
 	// Back pink line:
-	double shadow_scale = 2.0;
 	QPen back_pink_pen = get_pen (_autopilot_pen_2.color(), pink_pen_width, Qt::DashLine);
 	back_pink_pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
+
 	QPen back_shadow_pen = get_pen (painter.shadow_color(), shadow_pen_width);
 	back_shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
+
 	for (auto const& p: { back_shadow_pen, back_pink_pen })
 	{
 		painter.setPen (p);
@@ -1376,12 +1400,20 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 		// Line from aircraft to the HOME feature:
 		if (_params.home_track_visible)
 		{
-			float const shadow_scale = 2.0;
+			float green_pen_width = 1.5f;
+			float shadow_pen_width = 2.5f;
+			if (_params.display_mode == DisplayMode::Auxiliary)
+			{
+				green_pen_width = 1.2f;
+				shadow_pen_width = 2.2f;
+			}
 
-			QPen home_line_pen (_home_pen.color(), pen_width (1.f), Qt::DashLine, Qt::RoundCap);
+			float const shadow_scale = shadow_pen_width / green_pen_width;
+
+			QPen home_line_pen (_home_pen.color(), pen_width (green_pen_width), Qt::DashLine, Qt::RoundCap);
 			home_line_pen.setDashPattern (QVector<qreal>() << 7.5 << 12);
 
-			QPen shadow_pen (painter.shadow_color(), pen_width (2.f), Qt::DashLine, Qt::RoundCap);
+			QPen shadow_pen (painter.shadow_color(), pen_width (shadow_pen_width), Qt::DashLine, Qt::RoundCap);
 			shadow_pen.setDashPattern (QVector<qreal>() << 7.5 / shadow_scale << 12 / shadow_scale);
 
 			painter.setTransform (_aircraft_center_transform);
