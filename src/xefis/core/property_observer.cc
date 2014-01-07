@@ -83,14 +83,14 @@ PropertyObserver::data_updated (Time update_time)
 		_last_recompute = false;
 	}
 
-	if (should_recompute || _keep_going)
+	if (should_recompute || _touch)
 	{
 		if (_accumulated_dt >= _minimum_dt)
 		{
 			if (_need_callback)
 				_obs_update_time = update_time;
 			_need_callback = false;
-			_keep_going = false;
+			_touch = false;
 			_accumulated_dt = 0_ms;
 			_fire_dt = update_time - _fire_time;
 			_fire_time = update_time;

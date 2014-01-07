@@ -155,7 +155,7 @@ class PropertyObserver
 	 * minimum dt set with set_minimum_dt().
 	 */
 	void
-	keep_going() noexcept;
+	touch() noexcept;
 
   private:
 	/**
@@ -183,7 +183,7 @@ class PropertyObserver
 	// _minimum_dt prevented firing the callback.
 	bool			_need_callback				= false;
 	bool			_last_recompute				= false;
-	bool			_keep_going					= false;
+	bool			_touch						= false;
 };
 
 
@@ -230,9 +230,9 @@ PropertyObserver::update_dt() const noexcept
 
 
 inline void
-PropertyObserver::keep_going() noexcept
+PropertyObserver::touch() noexcept
 {
-	_keep_going = true;
+	_touch = true;
 }
 
 } // namespace Xefis
