@@ -436,7 +436,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 {
-	if (!_params.positioning_hint_visible || !_params.position_valid)
+	if (!_params.positioning_hint_visible || !_params.position)
 		return;
 
 	float vplus = translate_descent (QFontMetricsF (_font_13), QFontMetricsF (_font_16));
@@ -855,6 +855,9 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 	if (_params.display_mode != DisplayMode::Auxiliary)
 		return;
 
+	if (!_params.position || !_params.home)
+		return;
+
 	QTransform base_transform;
 	base_transform.translate (_w - 0.2 * _q, 0.5f * _h);
 
@@ -863,22 +866,32 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 	if (_params.home_direction_visible)
 	{
+		bool at_home = _params.home->haversine_earth (*_params.position) < 10_m;
 		float z = 0.75f * _q;
-		QPolygonF home_arrow = QPolygonF()
-			<< QPointF (0.f, z)
-			<< QPointF (0.f, 0.2f * -z)
-			<< QPointF (-0.2f * z, 0.6f * -z)
-			<< QPointF (0.f, -z)
-			<< QPointF (+0.2f * z, 0.6f * -z)
-			<< QPointF (0.f, 0.2f * -z);
 
 		painter.setTransform (base_transform);
 		painter.translate (-z - 0.1f * _q, _q);
-		painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
 		painter.setPen (get_pen (_navigation_color, 1.0));
-		painter.add_shadow ([&]() {
-			painter.drawPolyline (home_arrow);
-		});
+		if (at_home)
+		{
+			float v = 0.5f * z;
+			painter.setBrush (Qt::black);
+			painter.drawEllipse (QRectF (-v, -v, 2.f * v, 2.f * v));
+		}
+		else
+		{
+			QPolygonF home_arrow = QPolygonF()
+				<< QPointF (0.f, z)
+				<< QPointF (0.f, 0.2f * -z)
+				<< QPointF (-0.2f * z, 0.6f * -z)
+				<< QPointF (0.f, -z)
+				<< QPointF (+0.2f * z, 0.6f * -z)
+				<< QPointF (0.f, 0.2f * -z);
+			painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
+			painter.add_shadow ([&]() {
+				painter.drawPolyline (home_arrow);
+			});
+		}
 	}
 
 	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible || _params.dist_to_home_vert_visible)
@@ -1233,7 +1246,7 @@ HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 {
-	if (!_params.navaids_visible || !_params.position_valid)
+	if (!_params.navaids_visible || !_params.position)
 		return;
 
 	float scale = 0.55f * _q;
@@ -1352,12 +1365,11 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 		for (auto& navaid: _vor_navs)
 			paint_navaid (navaid);
 
-	if (_params.home_longitude && _params.home_latitude)
+	if (_params.home)
 	{
-		LonLat home_position (*_params.home_longitude, *_params.home_latitude);
 		// Whether the feature is in configured HSI range:
 		bool outside_range = false;
-		QPointF translation = position_feature (home_position, &outside_range);
+		QPointF translation = position_feature (*_params.home, &outside_range);
 		QTransform feature_centered_transform = _aircraft_center_transform;
 		feature_centered_transform.translate (translation.x(), translation.y());
 
@@ -1477,10 +1489,10 @@ HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::retrieve_navaids()
 {
-	if (!_navaid_storage)
+	if (!_navaid_storage || !_params.position)
 		return;
 
-	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
+	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (*_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
 		return;
 
 	_loc_navs.clear();
@@ -1489,7 +1501,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	_dme_navs.clear();
 	_fix_navs.clear();
 
-	for (Navaid const& navaid: _navaid_storage->get_navs (_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
+	for (Navaid const& navaid: _navaid_storage->get_navs (*_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
 	{
 		switch (navaid.type())
 		{
@@ -1522,7 +1534,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	}
 
 	_navs_retrieved = true;
-	_navs_retrieve_position = _params.position;
+	_navs_retrieve_position = *_params.position;
 	_navs_retrieve_range = _params.range;
 }
 

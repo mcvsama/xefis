@@ -77,62 +77,61 @@ class HSIWidget: public Xefis::InstrumentWidget
 		friend class PaintWorkUnit;
 
 	  public:
-		DisplayMode		display_mode				= DisplayMode::Expanded;
-		HeadingMode		heading_mode				= HeadingMode::Magnetic;
-		Length			range						= 1_nm;
-		bool			heading_visible				= false;
-		Angle			heading_magnetic			= 0_deg;
-		Angle			heading_true				= 0_deg;
-		bool			ap_heading_visible			= false;
-		bool			ap_track_visible			= false;
-		Angle			ap_magnetic_heading			= 0_deg;
-		bool			track_visible				= false;
-		Angle			track_magnetic				= 0_deg;
-		Optional<Angle>	pointer_green_primary;
-		Optional<Angle>	pointer_green_secondary;
-		Optional<Angle>	pointer_cyan_primary;
-		Optional<Angle>	pointer_cyan_secondary;
-		Optional<Angle>	course_setting_magnetic;
-		Optional<Angle>	course_deviation;
-		Optional<bool>	course_to_flag;
-		bool			center_on_track				= false;
-		bool			home_direction_visible		= false;
-		bool			home_track_visible			= false;
-		Angle			true_home_direction			= 0_deg;
-		bool			dist_to_home_ground_visible	= false;
-		Length			dist_to_home_ground			= 0_nm;
-		bool			dist_to_home_vlos_visible	= false;
-		Length			dist_to_home_vlos			= 0_nm;
-		bool			dist_to_home_vert_visible	= false;
-		Length			dist_to_home_vert			= 0_nm;
-		Optional<Angle>	home_longitude;
-		Optional<Angle>	home_latitude;
-		bool			ground_speed_visible		= false;
-		Speed			ground_speed				= 0_kt;
-		bool			true_air_speed_visible		= false;
-		Speed			true_air_speed				= 0_kt;
-		bool			trend_vector_visible		= false;
-		Angle			track_lateral_delta			= 0_deg;
-		Length			trend_vector_lookahead		= 5_nm;
-		bool			altitude_reach_visible		= false;
-		Length			altitude_reach_distance		= 0_nm;
-		bool			wind_information_visible	= false;
-		Angle			wind_from_magnetic_heading	= 0_deg;
-		Speed			wind_tas_speed				= 0_kt;
-		bool			position_valid				= false;
-		LonLat			position					= { 0_deg, 0_deg };
-		bool			navaids_visible				= false;
-		bool			vor_visible					= false;
-		bool			dme_visible					= false;
-		bool			ndb_visible					= false;
-		bool			loc_visible					= false;
-		bool			fix_visible					= false;
-		QString			highlighted_loc;
-		bool			positioning_hint_visible	= false;
-		QString			positioning_hint;
-		bool			climb_glide_ratio_visible	= false;
-		float			climb_glide_ratio			= 0.0;
-		bool			round_clip					= false;
+		DisplayMode			display_mode				= DisplayMode::Expanded;
+		HeadingMode			heading_mode				= HeadingMode::Magnetic;
+		Length				range						= 1_nm;
+		bool				heading_visible				= false;
+		Angle				heading_magnetic			= 0_deg;
+		Angle				heading_true				= 0_deg;
+		bool				ap_heading_visible			= false;
+		bool				ap_track_visible			= false;
+		Angle				ap_magnetic_heading			= 0_deg;
+		bool				track_visible				= false;
+		Angle				track_magnetic				= 0_deg;
+		Optional<Angle>		pointer_green_primary;
+		Optional<Angle>		pointer_green_secondary;
+		Optional<Angle>		pointer_cyan_primary;
+		Optional<Angle>		pointer_cyan_secondary;
+		Optional<Angle>		course_setting_magnetic;
+		Optional<Angle>		course_deviation;
+		Optional<bool>		course_to_flag;
+		bool				center_on_track				= false;
+		bool				home_direction_visible		= false;
+		bool				home_track_visible			= false;
+		Angle				true_home_direction			= 0_deg;
+		bool				dist_to_home_ground_visible	= false;
+		Length				dist_to_home_ground			= 0_nm;
+		bool				dist_to_home_vlos_visible	= false;
+		Length				dist_to_home_vlos			= 0_nm;
+		bool				dist_to_home_vert_visible	= false;
+		Length				dist_to_home_vert			= 0_nm;
+		Optional<LonLat>	home;
+		bool				ground_speed_visible		= false;
+		Speed				ground_speed				= 0_kt;
+		bool				true_air_speed_visible		= false;
+		Speed				true_air_speed				= 0_kt;
+		bool				trend_vector_visible		= false;
+		Angle				track_lateral_delta			= 0_deg;
+		Length				trend_vector_lookahead		= 5_nm;
+		bool				altitude_reach_visible		= false;
+		Length				altitude_reach_distance		= 0_nm;
+		bool				wind_information_visible	= false;
+		Angle				wind_from_magnetic_heading	= 0_deg;
+		Speed				wind_tas_speed				= 0_kt;
+		bool				position_valid				= false;
+		Optional<LonLat>	position;
+		bool				navaids_visible				= false;
+		bool				vor_visible					= false;
+		bool				dme_visible					= false;
+		bool				ndb_visible					= false;
+		bool				loc_visible					= false;
+		bool				fix_visible					= false;
+		QString				highlighted_loc;
+		bool				positioning_hint_visible	= false;
+		QString				positioning_hint;
+		bool				climb_glide_ratio_visible	= false;
+		float				climb_glide_ratio			= 0.0;
+		bool				round_clip					= false;
 
 	  private:
 		/**
@@ -346,7 +345,9 @@ HSIWidget::PaintWorkUnit::set_navaid_storage (NavaidStorage* navaid_storage)
 inline QPointF
 HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
 {
-	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (_params.position).project_flat();
+	if (!_params.position)
+		return QPointF();
+	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (*_params.position).project_flat();
 	return _features_transform.map (QPointF (nm_to_px (1_nm * navaid_pos.x()), nm_to_px (1_nm * navaid_pos.y())));
 }
 
