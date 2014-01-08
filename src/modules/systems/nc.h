@@ -78,7 +78,7 @@ class NavigationComputer: public Xefis::Module
 	// then PropertyObservers, to ensure correct order of destruction.
 	Xefis::Smoother<double>		_orientation_pitch_smoother				= 25_ms;
 	Xefis::Smoother<double>		_orientation_roll_smoother				= 25_ms;
-	Xefis::Smoother<double>		_orientation_heading_magnetic_smoother	= 100_ms;
+	Xefis::Smoother<double>		_orientation_heading_magnetic_smoother	= 200_ms;
 	Xefis::Smoother<double>		_track_vertical_smoother				= 500_ms;
 	Xefis::Smoother<double>		_track_lateral_true_smoother			= 500_ms;
 	Xefis::Smoother<double>		_track_heading_delta_smoother			= 500_ms;
