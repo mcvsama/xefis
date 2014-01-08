@@ -897,7 +897,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		painter.setPen (get_pen (_navigation_color, 1.0));
 		if (at_home)
 		{
-			float v = 0.5f * z;
+			float v = 0.35f * z;
 			painter.setBrush (Qt::black);
 			painter.drawEllipse (QRectF (-v, -v, 2.f * v, 2.f * v));
 		}
