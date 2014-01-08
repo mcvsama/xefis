@@ -52,6 +52,7 @@ LinearIndicator::LinearIndicator (Xefis::ModuleManager* module_manager, QDomElem
 		{ "value.maximum.warning", _value_maximum_warning, false },
 		{ "value.maximum.critical", _value_maximum_critical, false },
 		{ "value.maximum", _value_maximum, true },
+		{ "unit", _unit, false },
 	});
 
 	parse_properties (config, {
@@ -69,7 +70,11 @@ LinearIndicator::data_updated()
 	_widget->set_modulo (_value_modulo);
 	_widget->set_digits (_value_digits);
 
-	_widget->set_value (_value.get_optional());
+	Optional<double> value;
+	if (_value.valid())
+		value = _value.floatize (_unit);
+
+	_widget->set_value (value);
 	_widget->set_minimum_critical_value (_value_minimum_critical);
 	_widget->set_minimum_warning_value (_value_minimum_warning);
 	_widget->set_maximum_warning_value (_value_maximum_warning);

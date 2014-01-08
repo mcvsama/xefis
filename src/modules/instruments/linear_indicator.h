@@ -46,6 +46,7 @@ class LinearIndicator: public Xefis::Instrument
 	int										_value_precision			= 0;
 	unsigned int							_value_modulo				= 0;
 	unsigned int							_value_digits				= 3;
+	std::string								_unit;
 	Xefis::PropertyFloat::Type				_value_minimum;
 	Optional<Xefis::PropertyFloat::Type>	_value_minimum_critical;
 	Optional<Xefis::PropertyFloat::Type>	_value_minimum_warning;
@@ -53,7 +54,7 @@ class LinearIndicator: public Xefis::Instrument
 	Optional<Xefis::PropertyFloat::Type>	_value_maximum_critical;
 	Xefis::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	Xefis::PropertyFloat					_value;
+	Xefis::TypedProperty					_value;
 };
 
 #endif

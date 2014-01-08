@@ -194,9 +194,14 @@ class GenericProperty
 };
 
 
+/**
+ * Common base for typed properties, that is not templateized
+ * yet. One can use methods like stringify(), parse() or floatize()
+ * to get value from the node.
+ */
 class TypedProperty: public GenericProperty
 {
-  protected:
+  public:
 	TypedProperty() = default;
 	TypedProperty (TypedProperty const&) = default;
 	TypedProperty& operator= (TypedProperty const&) = default;
@@ -207,15 +212,18 @@ class TypedProperty: public GenericProperty
   public:
 	/**
 	 * Ensures that this property exists.
+	 * Does nothing in this class.
 	 */
 	virtual void
-	ensure_existence() = 0;
+	ensure_existence();
 
 	/**
 	 * Set value from humanized string (eg. "10 kt").
+	 * This version (not overridden) doesn't create a nil node,
+	 * when it can't find one, but quietly does nothing.
 	 */
 	virtual void
-	parse (std::string const&) = 0;
+	parse (std::string const&);
 };
 
 
@@ -570,6 +578,34 @@ GenericProperty::normalized_path (std::string path)
 	if (p != std::string::npos)
 		return path.substr (p + 1);
 	return path;
+}
+
+
+inline void
+TypedProperty::ensure_existence()
+{
+	// Pass
+}
+
+
+inline void
+TypedProperty::parse (std::string const& str_value)
+{
+	if (_root)
+	{
+		if (!_path.empty())
+		{
+			PropertyNode* node = get_node();
+			if (node)
+			{
+				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
+				if (typed_node)
+					typed_node->parse (str_value);
+			}
+		}
+	}
+	else
+		throw SingularProperty ("can't write to a singular property: " + _path);
 }
 
 
