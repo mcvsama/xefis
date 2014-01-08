@@ -126,14 +126,14 @@ class FlightGearIO:
 	Xefis::PropertyFloat					_engine_1_epr;
 	Xefis::PropertyFloat					_engine_1_n1_pct;
 	Xefis::PropertyFloat					_engine_1_n2_pct;
-	Xefis::PropertyFloat					_engine_1_egt_degc;
+	Xefis::PropertyTemperature				_engine_1_egt_degc;
 	Xefis::PropertyFloat					_engine_2_thrust;
 	Xefis::PropertyFloat					_engine_2_rpm;
 	Xefis::PropertyAngle					_engine_2_pitch;
 	Xefis::PropertyFloat					_engine_2_epr;
 	Xefis::PropertyFloat					_engine_2_n1_pct;
 	Xefis::PropertyFloat					_engine_2_n2_pct;
-	Xefis::PropertyFloat					_engine_2_egt_degc;
+	Xefis::PropertyTemperature				_engine_2_egt_degc;
 	Xefis::PropertyAngle					_gps_latitude;
 	Xefis::PropertyAngle					_gps_longitude;
 	Xefis::PropertyLength					_gps_amsl;

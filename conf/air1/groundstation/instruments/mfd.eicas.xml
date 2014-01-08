@@ -38,9 +38,10 @@
 					<instrument name='instruments/radial-indicator' instance='engine-L-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='900'/>
-							<setting name='value.maximum.warning' value='800'/>
-							<setting name='value.maximum.critical' value='900'/>
+							<setting name='value.maximum' value='1200'/>
+							<setting name='value.maximum.warning' value='1100'/>
+							<setting name='value.maximum.critical' value='1200'/>
+							<setting name='unit' value='degC'/>
 						</settings>
 						<properties path='//aircraft/sensors/engines/1'>
 							<property name='value' path='/temperature'/>
@@ -55,9 +56,10 @@
 							<setting name='value.digits' value='4'/>
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='false'/>
+							<setting name='unit' value='deg'/>
 						</settings>
-						<properties path='//aircraft/sensors/engines/1'>
-							<property name='value' path='/pitch.deg'/>
+						<properties>
+							<property name='value' path='/aircraft/sensors/engines/1/pitch'/>
 						</properties>
 					</instrument>
 				</item>
@@ -138,9 +140,10 @@
 					<instrument name='instruments/radial-indicator' instance='engine-R-TEMP'>
 						<settings>
 							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='900'/>
-							<setting name='value.maximum.warning' value='800'/>
-							<setting name='value.maximum.critical' value='900'/>
+							<setting name='value.maximum' value='1200'/>
+							<setting name='value.maximum.warning' value='1100'/>
+							<setting name='value.maximum.critical' value='1200'/>
+							<setting name='unit' value='degC'/>
 						</settings>
 						<properties path='//aircraft/sensors/engines/2'>
 							<property name='value' path='/temperature'/>
@@ -155,9 +158,10 @@
 							<setting name='value.digits' value='4'/>
 							<setting name='value.precision' value='1'/>
 							<setting name='style.mirrored' value='true'/>
+							<setting name='unit' value='deg'/>
 						</settings>
-						<properties path='//aircraft/sensors/engines/2'>
-							<property name='value' path='/pitch.deg'/>
+						<properties>
+							<property name='value' path='/aircraft/sensors/engines/2/pitch'/>
 						</properties>
 					</instrument>
 				</item>

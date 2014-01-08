@@ -408,14 +408,12 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (engine_1_epr);
 		ASSIGN_UNITLESS (engine_1_n1_pct);
 		ASSIGN_UNITLESS (engine_1_n2_pct);
-		ASSIGN_UNITLESS (engine_1_egt_degc);
 		ASSIGN_UNITLESS (engine_2_thrust);
 		ASSIGN_UNITLESS (engine_2_rpm);
 		ASSIGN (deg,  engine_2_pitch);
 		ASSIGN_UNITLESS (engine_2_epr);
 		ASSIGN_UNITLESS (engine_2_n1_pct);
 		ASSIGN_UNITLESS (engine_2_n2_pct);
-		ASSIGN_UNITLESS (engine_2_egt_degc);
 		ASSIGN (deg,  wind_from_magnetic_heading);
 		ASSIGN (kt,   wind_tas);
 		ASSIGN_UNITLESS (gear_setting_down);
@@ -445,6 +443,12 @@ FlightGearIO::read_input()
 		_gear_nose_up.write (fg_data->gear_nose_position < 0.001);
 		_gear_left_up.write (fg_data->gear_left_position < 0.001);
 		_gear_right_up.write (fg_data->gear_right_position < 0.001);
+
+		// Convert EGT from °F to Kelvins:
+		if (_engine_1_egt_degc.configured())
+			_engine_1_egt_degc.write (1_K * (5.0 / 9.0 * (fg_data->engine_1_egt_degc - 32.0) + 273.15));
+		if (_engine_2_egt_degc.configured())
+			_engine_2_egt_degc.write (1_K * (5.0 / 9.0 * (fg_data->engine_1_egt_degc - 32.0) + 273.15));
 	}
 
 	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)
@@ -453,11 +457,6 @@ FlightGearIO::read_input()
 		_minimum_ias.set_nil();
 	if (_radar_altimeter_altitude_agl.valid() && *_radar_altimeter_altitude_agl > 2500_ft)
 		_radar_altimeter_altitude_agl.set_nil();
-	// Convert EGT from °F to °C:
-	if (_engine_1_egt_degc.valid())
-		_engine_1_egt_degc.write (5.0 / 9.0 * (*_engine_1_egt_degc - 32.0));
-	if (_engine_2_egt_degc.valid())
-		_engine_2_egt_degc.write (5.0 / 9.0 * (*_engine_2_egt_degc - 32.0));
 
 	for (auto flag: _serviceable_flags)
 		if (flag->configured())

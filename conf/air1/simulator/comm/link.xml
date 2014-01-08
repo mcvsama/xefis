@@ -34,16 +34,16 @@
 					<property bytes='2' path='/sensors/engines/1/rpm' type='float'/>
 					<property bytes='2' path='/sensors/engines/1/n1' type='float'/>
 					<property bytes='2' path='/sensors/engines/1/n2' type='float'/>
-					<property bytes='2' path='/sensors/engines/1/egt' type='float'/>
 					<property bytes='2' path='/sensors/engines/1/epr' type='float'/>
 					<property bytes='2' path='/sensors/engines/1/pitch' type='angle'/>
+					<property bytes='2' path='/sensors/engines/1/temperature' type='temperature'/>
 					<property bytes='2' path='/sensors/engines/2/thrust' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/rpm' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/n1' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/n2' type='float'/>
-					<property bytes='2' path='/sensors/engines/2/egt' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/epr' type='float'/>
 					<property bytes='2' path='/sensors/engines/2/pitch' type='angle'/>
+					<property bytes='2' path='/sensors/engines/2/temperature' type='temperature'/>
 					<property bytes='2' path='/systems/fbw/stick/pitch' type='angle'/>
 					<property bytes='2' path='/systems/fbw/stick/roll' type='angle'/>
 					<property bytes='2' path='/systems/fd/pitch' type='angle'/>
