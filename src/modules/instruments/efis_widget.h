@@ -502,8 +502,6 @@ class EFISWidget: public Xefis::InstrumentWidget
 		QColor				_ground_shadow;
 		QColor				_ladder_color;
 		QColor				_ladder_border_color;
-		QColor				_warning_color_1;
-		QColor				_warning_color_2;
 		QTransform			_center_transform;
 		QTransform			_pitch_transform;
 		QTransform			_roll_transform;

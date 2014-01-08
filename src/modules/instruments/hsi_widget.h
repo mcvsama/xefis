@@ -131,6 +131,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString				positioning_hint;
 		bool				climb_glide_ratio_visible	= false;
 		float				climb_glide_ratio			= 0.0;
+		Optional<bool>		tcas_on;
+		Optional<Length>	tcas_range;
 		bool				round_clip					= false;
 
 	  private:
@@ -222,6 +224,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 		void
 		paint_locs (Xefis::Painter&);
+
+		void
+		paint_tcas();
+
+		void
+		paint_bottom_text (bool left, unsigned int line_from_bottom, QColor, QString text);
 
 		/**
 		 * Retrieve navaids from navaid storage for current aircraft

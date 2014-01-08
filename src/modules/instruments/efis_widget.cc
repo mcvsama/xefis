@@ -58,8 +58,6 @@ EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 	_ground_shadow.setAlpha (127);
 	_ladder_color = QColor (64, 51, 108, 0x80);
 	_ladder_border_color = _ladder_color.darker (120);
-	_warning_color_1 = QColor (255, 40, 40);
-	_warning_color_2 = QColor (255, 200, 50);
 }
 
 

@@ -145,8 +145,10 @@ class InstrumentAids
 	float						_font_13_digit_height	= 0.f;
 	float						_font_16_digit_height	= 0.f;
 	float						_font_20_digit_height	= 0.f;
-	QColor						_autopilot_color;
-	QColor						_navigation_color;
+	QColor						_autopilot_color		= { 250, 20, 255 };
+	QColor						_navigation_color		= { 60, 255, 40 };
+	QColor						_warning_color_1		= { 255, 40, 40 };
+	QColor						_warning_color_2		= { 255, 200, 50 };
 	QColor						_silver					= { 0xcc, 0xca, 0xc2 };
 	float						_height_for_width		= 1.f;
 	float						_master_pen_scale		= 1.f;
