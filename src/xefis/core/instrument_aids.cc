@@ -100,6 +100,12 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 	_font_16_digit_height = QFontMetrics (_font_16).height();
 	_font_16_digit_height = font_height_scale_factor * QFontMetrics (_font_16).height();
 
+	_font_18 = _font;
+	_font_18.setPixelSize (font_size (18.f));
+	_font_18_digit_width = get_digit_width (_font_18);
+	_font_18_digit_height = QFontMetrics (_font_18).height();
+	_font_18_digit_height = font_height_scale_factor * QFontMetrics (_font_18).height();
+
 	_font_20 = _font;
 	_font_20.setPixelSize (font_size (20.f));
 	_font_20_digit_width = get_digit_width (_font_20);
