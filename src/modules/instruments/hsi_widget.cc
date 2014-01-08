@@ -807,7 +807,7 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 {
 	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
-	QFont font_b = _font_16;
+	QFont font_b = _font_18;
 	QFontMetricsF metr_a (font_a);
 	QFontMetricsF metr_b (font_b);
 
