@@ -40,18 +40,27 @@ class RadialIndicator: public Xefis::Instrument
 	data_updated() override;
 
   private:
+	/**
+	 * Return Optional<double> from given property
+	 * and configured unit name.
+	 */
+	Optional<double>
+	get_optional_value (Xefis::TypedProperty const& property);
+
+  private:
 	RadialIndicatorWidget*					_widget = nullptr;
 	// Settings:
 	int										_value_precision			= 0;
 	unsigned int							_value_modulo				= 0;
+	std::string								_unit;
 	Xefis::PropertyFloat::Type				_value_minimum;
 	Optional<Xefis::PropertyFloat::Type>	_value_maximum_warning;
 	Optional<Xefis::PropertyFloat::Type>	_value_maximum_critical;
 	Xefis::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	Xefis::PropertyFloat					_value;
-	Xefis::PropertyFloat					_value_target;
-	Xefis::PropertyFloat					_value_reference;
+	Xefis::TypedProperty					_value;
+	Xefis::TypedProperty					_value_target;
+	Xefis::TypedProperty					_value_reference;
 };
 
 #endif

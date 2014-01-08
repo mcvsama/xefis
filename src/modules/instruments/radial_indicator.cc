@@ -48,6 +48,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 		{ "value.maximum.warning", _value_maximum_warning, false },
 		{ "value.maximum.critical", _value_maximum_critical, false },
 		{ "value.maximum", _value_maximum, true },
+		{ "unit", _unit, false },
 	});
 
 	parse_properties (config, {
@@ -65,10 +66,20 @@ RadialIndicator::data_updated()
 	_widget->set_precision (_value_precision);
 	_widget->set_modulo (_value_modulo);
 
-	_widget->set_value (_value.get_optional());
+	_widget->set_value (get_optional_value (_value));
 	_widget->set_warning_value (_value_maximum_warning);
 	_widget->set_critical_value (_value_maximum_critical);
-	_widget->set_target_value (_value_target.get_optional());
-	_widget->set_reference_value (_value_reference.get_optional());
+	_widget->set_target_value (get_optional_value (_value_target));
+	_widget->set_reference_value (get_optional_value (_value_reference));
+}
+
+
+Optional<double>
+RadialIndicator::get_optional_value (Xefis::TypedProperty const& property)
+{
+	Optional<double> result;
+	if (property.valid())
+		result = property.floatize (_unit);
+	return result;
 }
 
