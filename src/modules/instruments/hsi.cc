@@ -72,6 +72,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "wind.tas", _wind_speed_tas, false },
 		{ "localizer-id", _localizer_id, false },
 		{ "glide-ratio", _glide_ratio, false },
+		{ "tcas.on", _tcas_on, false },
+		{ "tcas.range", _tcas_range, false },
 	});
 
 	_hsi_widget = std::make_unique<HSIWidget> (this, work_performer());
@@ -154,6 +156,8 @@ HSI::read()
 	params.positioning_hint = QString::fromStdString (*_position_source);
 	params.climb_glide_ratio_visible = _glide_ratio.valid();
 	params.climb_glide_ratio = *_glide_ratio;
+	params.tcas_on = _tcas_on.get_optional();
+	params.tcas_range = _tcas_range.get_optional();
 	params.round_clip = false;
 
 	_hsi_widget->set_params (params);

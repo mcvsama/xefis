@@ -330,6 +330,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_trend_vector (painter());
 	paint_pointers (painter());
 	paint_course (painter());
+	paint_tcas();
 	paint_aircraft (painter());
 }
 
@@ -1073,8 +1074,10 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 
 	painter.setPen (get_pen (Qt::white, 2.f));
 	painter.setBrush (Qt::NoBrush);
-	for (float x: { -2.f, -1.f, +1.f, +2.f })
-		painter.drawEllipse (elli.translated (dev_1_deg_px * x, 0.f));
+	painter.add_shadow ([&]() {
+		for (float x: { -2.f, -1.f, +1.f, +2.f })
+			painter.drawEllipse (elli.translated (dev_1_deg_px * x, 0.f));
+	});
 
 	// TO/FROM flag - always on the right, regardless of rotation.
 	if (_params.course_to_flag)
@@ -1515,6 +1518,83 @@ HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 		paint_loc (*hi_loc);
 		paint_texts_to_paint();
 	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_tcas()
+{
+	if (!_params.tcas_on)
+		return;
+
+	if (!*_params.tcas_on)
+	{
+		paint_bottom_text (true, 3, _warning_color_2, "TCAS");
+		paint_bottom_text (true, 2, _warning_color_2, "OFF ");
+	}
+
+	painter().setTransform (_aircraft_center_transform);
+	painter().setClipping (false);
+	painter().setPen (get_pen (Qt::white, 1.f));
+
+	if (_params.tcas_range)
+	{
+		double z = 0.075 * _q;
+		double v = 0.025 * _q;
+		double r = nm_to_px (*_params.tcas_range);
+
+		// Don't draw too small range points:
+		if (r > 15.0)
+		{
+			QRectF big_point (-z, -z, 2.0 * z, 2.0 * z);
+			QRectF small_point (-v, -v, 2.0 * v, 2.0 * v);
+
+			for (int angle = 0; angle < 360; angle += 30)
+			{
+				painter().translate (0.0, r);
+
+				if (angle % 90 == 0)
+				{
+					painter().setBrush (Qt::NoBrush);
+					painter().add_shadow ([&]() {
+						painter().drawEllipse (big_point);
+					});
+				}
+				else
+				{
+					painter().setBrush (Qt::white);
+					painter().add_shadow ([&]() {
+						painter().drawEllipse (small_point);
+					});
+				}
+
+				painter().translate (0.0, -r);
+				painter().rotate (30);
+			}
+		}
+	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_bottom_text (bool left, unsigned int line_from_bottom, QColor color, QString text)
+{
+	painter().resetTransform();
+	painter().setClipping (false);
+	painter().setFont (_font_16);
+	// Positioning:
+	double z = 0.2f * _q;
+	double h_corr = 0.8;
+	Qt::Alignment alignment = Qt::AlignVCenter | (left ? Qt::AlignLeft : Qt::AlignRight);
+	QFontMetricsF metrics (painter().font());
+	QPointF text_hook = { (left ? z : _w - z), _h - z - line_from_bottom * h_corr * metrics.height() - 0.5 * metrics.height() };
+	QRectF text_box = painter().get_text_box (text_hook, alignment, text);
+	// Paint:
+	painter().setPen (Qt::NoPen);
+	painter().setBrush (Qt::black);
+	painter().drawRect (text_box);
+	painter().setPen (get_pen (color, 1.f));
+	painter().fast_draw_text (text_hook, alignment, text);
 }
 
 

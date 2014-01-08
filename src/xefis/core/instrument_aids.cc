@@ -33,8 +33,6 @@ InstrumentAids::InstrumentAids (float height_for_width):
 	_height_for_width (height_for_width)
 {
 	_font = Xefis::Services::instrument_font();
-	_autopilot_color = QColor (250, 20, 255);
-	_navigation_color = QColor (60, 255, 40);
 }
 
 

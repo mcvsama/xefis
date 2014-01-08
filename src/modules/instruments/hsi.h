@@ -93,6 +93,8 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertySpeed	_wind_speed_tas;
 	Xefis::PropertyString	_localizer_id;
 	Xefis::PropertyFloat	_glide_ratio;
+	Xefis::PropertyBoolean	_tcas_on;
+	Xefis::PropertyLength	_tcas_range;
 };
 
 
