@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Temperature::_supported_units = { "K", "degC", "degF" };
+std::vector<std::string> Temperature::_supported_units = { "K", "Ra", "degC", "degF" };
 
 } // namespace SI
 
