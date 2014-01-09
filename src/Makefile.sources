@@ -182,6 +182,7 @@ SRC_SOURCES += modules/helpers/string_translator.cc
 
 ######## /modules/instruments ########
 
+SRC_HEADERS += modules/instruments/datatable.h
 SRC_HEADERS += modules/instruments/efis.h
 SRC_HEADERS += modules/instruments/efis_widget.h
 SRC_HEADERS += modules/instruments/flaps.h
@@ -196,6 +197,7 @@ SRC_HEADERS += modules/instruments/radial_indicator_widget.h
 SRC_HEADERS += modules/instruments/status.h
 SRC_HEADERS += modules/instruments/status_widget.h
 
+SRC_SOURCES += modules/instruments/datatable.cc
 SRC_SOURCES += modules/instruments/efis.cc
 SRC_SOURCES += modules/instruments/efis_widget.cc
 SRC_SOURCES += modules/instruments/flaps.cc
