@@ -77,7 +77,7 @@ struct FGInputData
 	FGBool		navigation_dme_ok;					// dok
 	FGDouble	dme_distance_nm;					// dme
 	FGDouble	slip_skid_g;						// ss
-	FGDouble	static_air_temperature_K;			// tmp
+	FGDouble	static_air_temperature_degc;		// tmp
 	FGDouble	engine_throttle_pct;				// thr
 	FGDouble	engine_1_thrust;					// thrust1
 	FGDouble	engine_1_rpm;						// rpm1
@@ -85,14 +85,14 @@ struct FGInputData
 	FGDouble	engine_1_epr;						// epr1
 	FGDouble	engine_1_n1_pct;					// n1-1
 	FGDouble	engine_1_n2_pct;					// n2-1
-	FGDouble	engine_1_egt_degc;					// egt1
+	FGDouble	engine_1_egt_degf;					// egt1
 	FGDouble	engine_2_thrust;					// thrust2
 	FGDouble	engine_2_rpm;						// rpm2
 	FGDouble	engine_2_pitch_deg;					// pitch2
 	FGDouble	engine_2_epr;						// epr2
 	FGDouble	engine_2_n1_pct;					// n1-2
 	FGDouble	engine_2_n2_pct;					// n2-2
-	FGDouble	engine_2_egt_degc;					// egt2
+	FGDouble	engine_2_egt_degf;					// egt2
 	FGDouble	wind_from_magnetic_heading_deg;		// wfh
 	FGDouble	wind_tas_kt;						// ws
 	FGBool		gear_setting_down;					// gd
@@ -179,14 +179,14 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "engine.1.epr", _engine_1_epr, false },
 						{ "engine.1.n1", _engine_1_n1_pct, false },
 						{ "engine.1.n2", _engine_1_n2_pct, false },
-						{ "engine.1.egt", _engine_1_egt_degc, false },
+						{ "engine.1.egt", _engine_1_egt, false },
 						{ "engine.2.thrust", _engine_2_thrust, false },
 						{ "engine.2.rpm", _engine_2_rpm, false },
 						{ "engine.2.pitch", _engine_2_pitch, false },
 						{ "engine.2.epr", _engine_2_epr, false },
 						{ "engine.2.n1", _engine_2_n1_pct, false },
 						{ "engine.2.n2", _engine_2_n2_pct, false },
-						{ "engine.2.egt", _engine_2_egt_degc, false },
+						{ "engine.2.egt", _engine_2_egt, false },
 						{ "gps.latitude", _gps_latitude, false },
 						{ "gps.longitude", _gps_longitude, false },
 						{ "gps.amsl", _gps_amsl, false },
@@ -282,14 +282,14 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		&_engine_1_epr,
 		&_engine_1_n1_pct,
 		&_engine_1_n2_pct,
-		&_engine_1_egt_degc,
+		&_engine_1_egt,
 		&_engine_2_thrust,
 		&_engine_2_rpm,
 		&_engine_2_pitch,
 		&_engine_2_epr,
 		&_engine_2_n1_pct,
 		&_engine_2_n2_pct,
-		&_engine_2_egt_degc,
+		&_engine_2_egt,
 		&_gps_latitude,
 		&_gps_longitude,
 		&_gps_amsl,
@@ -400,7 +400,6 @@ FlightGearIO::read_input()
 		ASSIGN_UNITLESS (navigation_needles_visible);
 		ASSIGN (nm,   dme_distance);
 		ASSIGN_UNITLESS (slip_skid_g);
-		ASSIGN (K,    static_air_temperature);
 		ASSIGN_UNITLESS (engine_throttle_pct);
 		ASSIGN_UNITLESS (engine_1_thrust);
 		ASSIGN_UNITLESS (engine_1_rpm);
@@ -433,9 +432,6 @@ FlightGearIO::read_input()
 		if (!fg_data->navigation_dme_ok && _dme_distance.configured())
 			_dme_distance.set_nil();
 
-		if (_static_air_temperature.valid())
-			_static_air_temperature.write (*_static_air_temperature + 273.15_K);
-
 		_gear_nose_down.write (fg_data->gear_nose_position > 0.999);
 		_gear_left_down.write (fg_data->gear_left_position > 0.999);
 		_gear_right_down.write (fg_data->gear_right_position > 0.999);
@@ -444,11 +440,15 @@ FlightGearIO::read_input()
 		_gear_left_up.write (fg_data->gear_left_position < 0.001);
 		_gear_right_up.write (fg_data->gear_right_position < 0.001);
 
+		// SAT
+		if (_static_air_temperature.configured())
+			_static_air_temperature.write (Temperature::from_degC (fg_data->static_air_temperature_degc));
+
 		// Convert EGT from °F to Kelvins:
-		if (_engine_1_egt_degc.configured())
-			_engine_1_egt_degc.write (1_K * (5.0 / 9.0 * (fg_data->engine_1_egt_degc - 32.0) + 273.15));
-		if (_engine_2_egt_degc.configured())
-			_engine_2_egt_degc.write (1_K * (5.0 / 9.0 * (fg_data->engine_1_egt_degc - 32.0) + 273.15));
+		if (_engine_1_egt.configured())
+			_engine_1_egt.write (Temperature::from_degF (fg_data->engine_1_egt_degf));
+		if (_engine_2_egt.configured())
+			_engine_2_egt.write (Temperature::from_degF (fg_data->engine_2_egt_degf));
 	}
 
 	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)

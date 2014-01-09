@@ -175,7 +175,7 @@ BMP085::read_temperature()
 		int32_t x2 = (_mc << 11) / (x1 + _md);
 		_b5 = x1 + x2;
 		_ct = (_b5 + 8) >> 4;
-		_temperature.write (1_K * (274.15 + _ct / 10.0));
+		_temperature.write (Temperature::from_degC (_ct / 10.0));
 
 		handle_other (&BMP085::request_pressure);
 	});

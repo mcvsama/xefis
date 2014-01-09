@@ -525,7 +525,7 @@ CHRUM6::process_packet (Address address, bool failed, bool has_data, uint32_t da
 			if (failed)
 				break;
 			if (_internal_temperature.configured())
-				_internal_temperature.write (1_K * (273.15 + to_float (data)));
+				_internal_temperature.write (Temperature::from_degC (to_float (data)));
 			break;
 		}
 
