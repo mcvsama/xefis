@@ -228,13 +228,19 @@ HT16K33::NumericDisplay::update_led_matrix (LedMatrix& led_matrix) const
 Xefis::PropertyInteger::Type
 HT16K33::NumericDisplay::get_integer_value() const
 {
-	Xefis::PropertyFloat::Type value = _property.floatize (_unit);
-	Xefis::PropertyInteger::Type int_value = value;
+	try {
+		Xefis::PropertyFloat::Type value = _property.floatize (_unit);
+		Xefis::PropertyInteger::Type int_value = value;
 
-	if (_rounding)
-		int_value = value + 0.5;
+		if (_rounding)
+			int_value = value + 0.5;
 
-	return int_value;
+		return int_value;
+	}
+	catch (UnsupportedUnit const&)
+	{
+		return 0;
+	}
 }
 
 

@@ -60,7 +60,7 @@ Label::Label (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		else if (e == "color")
 			_color = Xefis::parse_color (e.text());
 		else if (e == "font-size")
-			_font_size = e.text().toFloat();
+			_font_size = e.text().toDouble();
 	}
 }
 

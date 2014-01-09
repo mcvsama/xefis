@@ -41,7 +41,7 @@ class Label:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	float						_font_size		= 10.f;
+	double						_font_size		= 10.0;
 	QString						_label;
 	QColor						_color			= Qt::white;
 	Qt::Alignment				_alignment		= Qt::AlignVCenter | Qt::AlignHCenter;
