@@ -329,8 +329,8 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_hints (painter());
 	paint_trend_vector (painter());
 	paint_pointers (painter());
-	paint_course (painter());
 	paint_tcas();
+	paint_course (painter());
 	paint_aircraft (painter());
 }
 
@@ -1041,8 +1041,10 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 		<< QPointF (+z, 3.5 * k - z)
 		<< QPointF (+z, 2.5 * k)
 		<< QPointF (-z, 2.5 * k);
-	painter.drawPolyline (top_bar);
-	painter.drawPolyline (bottom_bar);
+	painter.add_shadow ([&]() {
+		painter.drawPolyline (top_bar);
+		painter.drawPolyline (bottom_bar);
+	});
 
 	// Deviation bar:
 	if (_params.course_deviation)
@@ -1199,7 +1201,7 @@ HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Xefis::Painter& painter)
 
 	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
-	QFont font_b = _font_16;
+	QFont font_b = _font_18;
 	QFontMetricsF metr_a (font_a);
 	QFontMetricsF metr_b (font_b);
 
