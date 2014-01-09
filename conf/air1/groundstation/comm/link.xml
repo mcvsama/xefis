@@ -27,8 +27,8 @@
 					<property bytes='2' path='/aircraft/sensors/ahrs/orientation/pitch' type='angle'/>
 					<property bytes='2' path='/aircraft/sensors/ahrs/orientation/roll' type='angle'/>
 					<property bytes='2' path='/aircraft/sensors/ahrs/orientation/magnetic-heading' type='angle'/>
-					<property bytes='8' path='/aircraft/sensors/gps/latitude' type='angle'/>
-					<property bytes='8' path='/aircraft/sensors/gps/longitude' type='angle'/>
+					<property bytes='8' path='/aircraft/sensors/gps/latitude' type='angle' retained='true'/>
+					<property bytes='8' path='/aircraft/sensors/gps/longitude' type='angle' retained='true'/>
 					<property bytes='4' path='/aircraft/sensors/gps/altitude-amsl' type='length'/>
 					<property bytes='2' path='/aircraft/sensors/gps/accuracy.lateral' type='length'/>
 					<property bytes='2' path='/aircraft/sensors/gps/accuracy.vertical' type='length'/>

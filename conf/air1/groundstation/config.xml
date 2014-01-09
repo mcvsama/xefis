@@ -37,13 +37,13 @@
 				</item>
 			</layout>
 		</window>
-		<!--window width='1366' height='960' full-screen='false'>
+		<window width='640' height='320' full-screen='false'>
 			<layout type='vertical'>
 				<item>
 					<include name='panels/main.xml'/>
 				</item>
 			</layout>
-		</window-->
+		</window>
 	</windows>
 </xefis-config>
 

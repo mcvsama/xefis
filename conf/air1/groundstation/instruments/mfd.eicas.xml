@@ -1,171 +1,253 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<layout type='horizontal'>
-		<item stretch-factor='1'/>
-		<item stretch-factor='18'>
+		<item stretch-factor='40'>
 			<layout type='vertical'>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-L-THR'>
+				<item stretch-factor='40'>
+					<layout type='horizontal'>
+						<item stretch-factor='18'>
+							<layout type='vertical'>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-L-THR'>
+										<settings>
+											<setting name='value.modulo' value='10'/>
+											<setting name='value.minimum' value='-200'/>
+											<setting name='value.maximum' value='800'/>
+											<setting name='value.maximum.warning' value='750'/>
+											<setting name='value.maximum.critical' value='800'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/1'>
+											<property name='value' path='/thrust'/>
+											<property name='value.reference' path='/thrust.reference' default='520'/>
+											<property name='value.target' path='//input/stick/axis/2'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-L-RPM'>
+										<settings>
+											<setting name='value.modulo' value='10'/>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='3500'/>
+											<setting name='value.maximum.warning' value='3000'/>
+											<setting name='value.maximum.critical' value='3500'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/1'>
+											<property name='value' path='/rpm'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-L-TEMP'>
+										<settings>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='1200'/>
+											<setting name='value.maximum.warning' value='1100'/>
+											<setting name='value.maximum.critical' value='1200'/>
+											<setting name='unit' value='degC'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/1'>
+											<property name='value' path='/temperature'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/linear-indicator' instance='engine-L-PITCH'>
+										<settings>
+											<setting name='value.minimum' value='9.0'/>
+											<setting name='value.maximum' value='27.0'/>
+											<setting name='value.digits' value='4'/>
+											<setting name='value.precision' value='1'/>
+											<setting name='style.mirrored' value='false'/>
+											<setting name='unit' value='deg'/>
+										</settings>
+										<properties>
+											<property name='value' path='/aircraft/sensors/engines/1/pitch'/>
+										</properties>
+									</instrument>
+								</item>
+							</layout>
+						</item>
+						<item stretch-factor='4'>
+							<layout type='vertical'>
+								<item stretch-factor='9'>
+									<instrument name='instruments/label' instance='engine-THR'>
+										<label>THR</label>
+										<align>hcenter bottom</align>
+										<color>#0df</color>
+										<font-size>11</font-size>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/label' instance='engine-RPM'>
+										<label>RPM</label>
+										<align>hcenter bottom</align>
+										<color>#0df</color>
+										<font-size>11</font-size>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/label' instance='engine-TEMP'>
+										<label>TEMP</label>
+										<align>hcenter bottom</align>
+										<color>#0df</color>
+										<font-size>11</font-size>
+									</instrument>
+								</item>
+								<item stretch-factor='1'/>
+								<item stretch-factor='10'>
+									<instrument name='instruments/label' instance='engine-ESC-PITCH'>
+										<label>PTCH</label>
+										<align>hcenter vcenter</align>
+										<color>#0df</color>
+										<font-size>11</font-size>
+									</instrument>
+								</item>
+							</layout>
+						</item>
+						<item stretch-factor='18'>
+							<layout type='vertical'>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-R-THR'>
+										<settings>
+											<setting name='value.modulo' value='10'/>
+											<setting name='value.minimum' value='-200'/>
+											<setting name='value.maximum' value='800'/>
+											<setting name='value.maximum.warning' value='750'/>
+											<setting name='value.maximum.critical' value='800'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/2'>
+											<property name='value' path='/thrust'/>
+											<property name='value.reference' path='/thrust.reference' default='520'/>
+											<property name='value.target' path='//input/stick/axis/2'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-R-RPM'>
+										<settings>
+											<setting name='value.modulo' value='10'/>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='3500'/>
+											<setting name='value.maximum.warning' value='3000'/>
+											<setting name='value.maximum.critical' value='3500'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/2'>
+											<property name='value' path='/rpm'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/radial-indicator' instance='engine-R-TEMP'>
+										<settings>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='1200'/>
+											<setting name='value.maximum.warning' value='1100'/>
+											<setting name='value.maximum.critical' value='1200'/>
+											<setting name='unit' value='degC'/>
+										</settings>
+										<properties path='//aircraft/sensors/engines/2'>
+											<property name='value' path='/temperature'/>
+										</properties>
+									</instrument>
+								</item>
+								<item stretch-factor='10'>
+									<instrument name='instruments/linear-indicator' instance='engine-R-PITCH'>
+										<settings>
+											<setting name='value.minimum' value='9.0'/>
+											<setting name='value.maximum' value='27.0'/>
+											<setting name='value.digits' value='4'/>
+											<setting name='value.precision' value='1'/>
+											<setting name='style.mirrored' value='true'/>
+											<setting name='unit' value='deg'/>
+										</settings>
+										<properties>
+											<property name='value' path='/aircraft/sensors/engines/2/pitch'/>
+										</properties>
+									</instrument>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</item>
+				<item stretch-factor='8'>
+				</item>
+				<item stretch-factor='8'>
+					<layout type='horizontal'>
+						<item stretch-factor='18'>
+							<instrument name='instruments/linear-indicator' instance='signal-air'>
+								<settings>
+									<setting name='value.minimum' value='-120.0'/>
+									<setting name='value.maximum' value='-60'/>
+									<setting name='value.digits' value='6'/>
+									<setting name='value.precision' value='1'/>
+									<setting name='style.mirrored' value='false'/>
+								</settings>
+								<properties>
+									<property name='value' path='/link/remote/failsafes'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='4'>
+							<instrument name='instruments/label' instance='signal-air'>
+								<label>RSSI</label>
+								<align>hcenter vcenter</align>
+								<color>#0df</color>
+								<font-size>11</font-size>
+							</instrument>
+						</item>
+						<item stretch-factor='18'>
+							<instrument name='instruments/linear-indicator' instance='signal-gnd'>
+								<settings>
+									<setting name='value.minimum' value='-120.0'/>
+									<setting name='value.maximum' value='-60'/>
+									<setting name='value.digits' value='6'/>
+									<setting name='value.precision' value='1'/>
+									<setting name='style.mirrored' value='true'/>
+								</settings>
+								<properties>
+									<property name='value' path='/link/remote/failsafes'/>
+								</properties>
+							</instrument>
+						</item>
+					</layout>
+				</item>
+				<item stretch-factor='16'>
+					<instrument name='instruments/datatable' instance='gps-info'>
 						<settings>
-							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='-200'/>
-							<setting name='value.maximum' value='800'/>
-							<setting name='value.maximum.warning' value='750'/>
-							<setting name='value.maximum.critical' value='800'/>
+							<setting name='label-color' value='#aaa'/>
+							<setting name='value-color' value='#fff'/>
+							<setting name='label-font-size' value='16'/>
+							<setting name='value-font-size' value='18'/>
 						</settings>
-						<properties path='//aircraft/sensors/engines/1'>
-							<property name='value' path='/thrust'/>
-							<property name='value.reference' path='/thrust.reference' default='520'/>
-							<property name='value.target' path='//input/stick/axis/2'/>
-						</properties>
+						<table>
+							<row>
+								<label>SATELLITES</label>
+								<value path='/aircraft/sensors/gps/satellites' format='%f' nil='--'/>
+							</row>
+							<row>
+								<label>ACCURACY HORZ</label>
+								<value path='/aircraft/sensors/gps/accuracy.lateral' unit='m' format='%.1f' nil='--'/>
+							</row>
+							<row>
+								<label>ACCURACY VERT</label>
+								<value path='/aircraft/sensors/gps/accuracy.vertical' unit='m' format='%.1f' nil='--'/>
+							</row>
+							<row>
+								<label>FIX</label>
+								<value path='/aircraft/sensors/gps/type-of-fix' nil='--'/> <!-- -|2D|3D DGPS|PPS|... -->
+							</row>
+							<row>
+								<label>LAT</label>
+								<value path='/aircraft/sensors/gps/latitude' unit='deg' format='%f' nil='--'/>
+							</row>
+							<row>
+								<label>LON</label>
+								<value path='/aircraft/sensors/gps/longitude' unit='deg' format='%f' nil='--'/>
+							</row>
+						</table>
 					</instrument>
 				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-L-RPM'>
-						<settings>
-							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='3500'/>
-							<setting name='value.maximum.warning' value='3000'/>
-							<setting name='value.maximum.critical' value='3500'/>
-						</settings>
-						<properties path='//aircraft/sensors/engines/1'>
-							<property name='value' path='/rpm'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-L-TEMP'>
-						<settings>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='1200'/>
-							<setting name='value.maximum.warning' value='1100'/>
-							<setting name='value.maximum.critical' value='1200'/>
-							<setting name='unit' value='degC'/>
-						</settings>
-						<properties path='//aircraft/sensors/engines/1'>
-							<property name='value' path='/temperature'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/linear-indicator' instance='engine-L-PITCH'>
-						<settings>
-							<setting name='value.minimum' value='9.0'/>
-							<setting name='value.maximum' value='27.0'/>
-							<setting name='value.digits' value='4'/>
-							<setting name='value.precision' value='1'/>
-							<setting name='style.mirrored' value='false'/>
-							<setting name='unit' value='deg'/>
-						</settings>
-						<properties>
-							<property name='value' path='/aircraft/sensors/engines/1/pitch'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='32'/>
-			</layout>
-		</item>
-		<item stretch-factor='4'>
-			<layout type='vertical'>
-				<item stretch-factor='9'>
-					<instrument name='instruments/label' instance='engine-THR'>
-						<label>THR</label>
-						<align>hcenter bottom</align>
-						<color>#4df</color>
-						<font-size>11</font-size>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/label' instance='engine-RPM'>
-						<label>RPM</label>
-						<align>hcenter bottom</align>
-						<color>#4df</color>
-						<font-size>11</font-size>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/label' instance='engine-TEMP'>
-						<label>TEMP</label>
-						<align>hcenter bottom</align>
-						<color>#4df</color>
-						<font-size>11</font-size>
-					</instrument>
-				</item>
-				<item stretch-factor='1'/>
-				<item stretch-factor='10'>
-					<instrument name='instruments/label' instance='engine-ESC-PITCH'>
-						<label>PTCH</label>
-						<align>hcenter vcenter</align>
-						<color>#4df</color>
-						<font-size>11</font-size>
-					</instrument>
-				</item>
-				<item stretch-factor='32'/>
-			</layout>
-		</item>
-		<item stretch-factor='18'>
-			<layout type='vertical'>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-R-THR'>
-						<settings>
-							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='-200'/>
-							<setting name='value.maximum' value='800'/>
-							<setting name='value.maximum.warning' value='750'/>
-							<setting name='value.maximum.critical' value='800'/>
-						</settings>
-						<properties path='//aircraft/sensors/engines/2'>
-							<property name='value' path='/thrust'/>
-							<property name='value.reference' path='/thrust.reference' default='520'/>
-							<property name='value.target' path='//input/stick/axis/2'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-R-RPM'>
-						<settings>
-							<setting name='value.modulo' value='10'/>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='3500'/>
-							<setting name='value.maximum.warning' value='3000'/>
-							<setting name='value.maximum.critical' value='3500'/>
-						</settings>
-						<properties path='//aircraft/sensors/engines/2'>
-							<property name='value' path='/rpm'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/radial-indicator' instance='engine-R-TEMP'>
-						<settings>
-							<setting name='value.minimum' value='0'/>
-							<setting name='value.maximum' value='1200'/>
-							<setting name='value.maximum.warning' value='1100'/>
-							<setting name='value.maximum.critical' value='1200'/>
-							<setting name='unit' value='degC'/>
-						</settings>
-						<properties path='//aircraft/sensors/engines/2'>
-							<property name='value' path='/temperature'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='10'>
-					<instrument name='instruments/linear-indicator' instance='engine-R-PITCH'>
-						<settings>
-							<setting name='value.minimum' value='9.0'/>
-							<setting name='value.maximum' value='27.0'/>
-							<setting name='value.digits' value='4'/>
-							<setting name='value.precision' value='1'/>
-							<setting name='style.mirrored' value='true'/>
-							<setting name='unit' value='deg'/>
-						</settings>
-						<properties>
-							<property name='value' path='/aircraft/sensors/engines/2/pitch'/>
-						</properties>
-					</instrument>
-				</item>
-				<item stretch-factor='32'/>
 			</layout>
 		</item>
 		<item stretch-factor='2'/>
@@ -266,6 +348,33 @@
 					</layout>
 				</item>
 				<item stretch-factor='30'>
+					<layout type='horizontal'>
+						<item stretch-factor='5'>
+							<instrument name='instruments/datatable' instance='general'>
+								<settings>
+									<setting name='label-color' value='#0df'/>
+									<setting name='value-color' value='#fff'/>
+									<setting name='label-font-size' value='16'/>
+									<setting name='value-font-size' value='18'/>
+								</settings>
+								<table>
+									<row>
+										<label>DENSITY ALT</label>
+										<value path='/systems/adc/density-altitude' unit='ft' format='%.0f   ' nil='----   '/>
+									</row>
+									<row>
+										<label>LDG ALT</label>
+										<value path='/...' format='%.0f   ' nil='----   '/>
+									</row>
+									<row>
+										<label>SAT</label>
+										<value path='/aircraft/sensors/air-temperature/static' unit='degC' format='%.0f °C' nil='-- °C'/>
+									</row>
+								</table>
+							</instrument>
+						</item>
+						<item stretch-factor='4'/>
+					</layout>
 				</item>
 			</layout>
 		</item>
