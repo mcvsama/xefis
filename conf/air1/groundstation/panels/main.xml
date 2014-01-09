@@ -12,6 +12,73 @@
 		<layout type='horizontal' spacing='5'>
 			<item>
 				<group label='EICAS'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='button' top-label='MASTER WARNING' click-property='/panels/main/eicas/button.master-warning'/>
+								</item>
+								<item>
+									<widget type='button' top-label='MARKER' click-property='/panels/main/eicas/button.marker'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='rotary-encoder' top-label='MSG' click-label='DEL' click-property='/panels/mcp/status-del' rotate-up-property='/panels/mcp/status-up' rotate-down-property='/panels/mcp/status-down'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='RECALL' click-property='/panels/mcp/status-recall'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='CLEAR' click-property='/panels/mcp/status-clear'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='LIGHTS'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='button' top-label='STROBE' click-property='/panels/mcp/lights-strobe' led-property='/settings/lights/strobe' led-color='green'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='POS' click-property='/panels/mcp/lights-pos' led-property='/settings/lights/position' led-color='green'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='LAND' click-property='/panels/mcp/lights-ldg' led-property='/settings/lights/landing' led-color='green'/>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<stretch/>
+			<separator/>
+			<stretch/>
+			<item>
+				<group label='GPWS'>
+					<layout type='vertical' spacing='10'>
+						<item>
+							<widget type='button' top-label='FLAP INH.' click-property='/panels/mcp/gpws-flap-inh' led-property='/panels/mcp/gpws-flap-inh' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='GEAR INH.' click-property='/panels/mcp/gpws-gear-inh' led-property='/panels/mcp/gpws-gear-inh' led-color='amber'/>
+						</item>
+						<stretch/>
+						<item>
+							<widget type='button' top-label='TERR INH.' click-property='/panels/mcp/gpws-terr-inh' led-property='/panels/mcp/gpws-terr-inh' led-color='amber'/>
+						</item>
+					</layout>
 				</group>
 			</item>
 		</layout>
