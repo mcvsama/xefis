@@ -84,7 +84,15 @@ RadialIndicator::get_optional_value (Xefis::TypedProperty const& property)
 {
 	Optional<double> result;
 	if (property.valid())
-		result = property.floatize (_unit);
+	{
+		try {
+			result = property.floatize (_unit);
+		}
+		catch (UnsupportedUnit const&)
+		{
+			log() << "Unsupported unit '" << _unit << "'." << std::endl;
+		}
+	}
 	return result;
 }
 
