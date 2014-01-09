@@ -64,20 +64,33 @@ LinearIndicator::LinearIndicator (Xefis::ModuleManager* module_manager, QDomElem
 void
 LinearIndicator::data_updated()
 {
-	_widget->set_mirrored_style (_style_mirrored);
-	_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
-	_widget->set_precision (_value_precision);
-	_widget->set_modulo (_value_modulo);
-	_widget->set_digits (_value_digits);
+	if (_initialize || _value.fresh())
+	{
+		_widget->set_mirrored_style (_style_mirrored);
+		_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
+		_widget->set_precision (_value_precision);
+		_widget->set_modulo (_value_modulo);
+		_widget->set_digits (_value_digits);
 
-	Optional<double> value;
-	if (_value.valid())
-		value = _value.floatize (_unit);
+		Optional<double> value;
+		if (_value.valid())
+		{
+			try {
+				value = _value.floatize (_unit);
+			}
+			catch (UnsupportedUnit const&)
+			{
+				log() << "Unsupported unit '" << _unit << "'." << std::endl;
+			}
+		}
 
-	_widget->set_value (value);
-	_widget->set_minimum_critical_value (_value_minimum_critical);
-	_widget->set_minimum_warning_value (_value_minimum_warning);
-	_widget->set_maximum_warning_value (_value_maximum_warning);
-	_widget->set_maximum_critical_value (_value_maximum_critical);
+		_widget->set_value (value);
+		_widget->set_minimum_critical_value (_value_minimum_critical);
+		_widget->set_minimum_warning_value (_value_minimum_warning);
+		_widget->set_maximum_warning_value (_value_maximum_warning);
+		_widget->set_maximum_critical_value (_value_maximum_critical);
+
+		_initialize = false;
+	}
 }
 

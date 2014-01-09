@@ -42,13 +42,16 @@ Flaps::Flaps (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "current", _current, true },
 		{ "setting", _setting, true },
 	});
+
+	update();
 }
 
 
 void
 Flaps::data_updated()
 {
-	update();
+	if (_current.fresh() || _setting.fresh())
+		update();
 }
 
 

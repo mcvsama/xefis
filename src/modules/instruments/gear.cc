@@ -42,13 +42,24 @@ Gear::Gear (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "right.up", _right_up, true },
 		{ "right.down", _right_down, true },
 	});
+
+	update();
 }
 
 
 void
 Gear::data_updated()
 {
-	update();
+	if (_setting_down.fresh() ||
+		_nose_up.fresh() ||
+		_nose_down.fresh() ||
+		_left_up.fresh() ||
+		_left_down.fresh() ||
+		_right_up.fresh() ||
+		_right_down.fresh())
+	{
+		update();
+	}
 }
 
 
