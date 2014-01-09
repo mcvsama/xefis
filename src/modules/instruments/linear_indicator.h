@@ -42,6 +42,7 @@ class LinearIndicator: public Xefis::Instrument
   private:
 	LinearIndicatorWidget*					_widget = nullptr;
 	// Settings:
+	bool									_initialize					= true;
 	bool									_style_mirrored				= false;
 	int										_value_precision			= 0;
 	unsigned int							_value_modulo				= 0;

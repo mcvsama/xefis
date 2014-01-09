@@ -50,6 +50,7 @@ class RadialIndicator: public Xefis::Instrument
   private:
 	RadialIndicatorWidget*					_widget = nullptr;
 	// Settings:
+	bool									_initialize					= true;
 	int										_value_precision			= 0;
 	unsigned int							_value_modulo				= 0;
 	std::string								_unit;
