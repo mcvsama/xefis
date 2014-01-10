@@ -215,7 +215,7 @@
 				<node>/instrumentation/slip-skid-ball/indicated-slip-skid</node>
 			</chunk>
 			<chunk>
-				<name>tmp</name>
+				<name>tat</name>
 				<type>double</type>
 				<node>/environment/temperature-degc</node>
 			</chunk>

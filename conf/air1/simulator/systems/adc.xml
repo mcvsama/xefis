@@ -4,6 +4,7 @@
 		<settings>
 			<setting name='ias.valid-minimum' value='20 kt'/>
 			<setting name='ias.valid-maximum' value='800 kt'/>
+			<setting name='using-ias-sensor' value='true'/>
 		</settings>
 		<properties>
 			<!-- Input -->
@@ -11,11 +12,13 @@
 			<property name='settings.pressure.qnh' path='/settings/pressure/qnh'/>
 			<property name='pressure.static.serviceable' path='/sensors/pressure/serviceable'/>
 			<property name='pressure.static' path='/sensors/pressure/static'/>
+			<property name='pressure.total' path='/sensors/pressure/total'/>
 			<property name='ias.serviceable' path='/sensors/airspeed/serviceable'/>
 			<property name='ias' path='/sensors/airspeed/ias'/>
-			<property name='static-air-temperature' path='/sensors/air-temperature/static'/>
+			<property name='air-temperature.total' path='/sensors/air-temperature/total'/>
 			<!-- Output -->
 			<directory path='/systems/adc'>
+				<property name='pressure.dynamic' path='/pressure/dynamic'/>
 				<property name='altitude.amsl.serviceable' path='/altitude/amsl.serviceable'/>
 				<property name='altitude.amsl' path='/altitude/amsl'/>
 				<property name='altitude.amsl.lookahead' path='/altitude/amsl.lookahead'/>
@@ -30,6 +33,7 @@
 				<property name='speed.sound' path='/speed/sound'/>
 				<property name='vertical-speed.serviceable' path='/vertical-speed/serviceable'/>
 				<property name='vertical-speed' path='/vertical-speed/speed'/>
+				<property name='air-temperature.static' path='/air-temperature/static'/>
 			</directory>
 		</properties>
 	</module>

@@ -48,22 +48,25 @@ class AirDataComputer: public Xefis::Module
 	compute_altitude();
 
 	void
-	compute_density_altitude();
-
-	void
 	compute_ias();
 
 	void
 	compute_ias_lookahead();
 
 	void
+	compute_mach();
+
+	void
+	compute_sat();
+
+	void
+	compute_density_altitude();
+
+	void
 	compute_sound_speed();
 
 	void
 	compute_tas();
-
-	void
-	compute_mach();
 
 	void
 	compute_vertical_speed();
@@ -93,19 +96,23 @@ class AirDataComputer: public Xefis::Module
 	Xefis::PropertyObserver		_sound_speed_computer;
 	Xefis::PropertyObserver		_tas_computer;
 	Xefis::PropertyObserver		_mach_computer;
+	Xefis::PropertyObserver		_sat_computer;
 	Xefis::PropertyObserver		_vertical_speed_computer;
 	// Settings:
 	Speed						_ias_valid_minimum;
 	Speed						_ias_valid_maximum;
+	bool						_using_ias_sensor					= false;
 	// Input:
 	Xefis::PropertyBoolean		_pressure_use_std;
 	Xefis::PropertyPressure		_pressure_qnh;
 	Xefis::PropertyBoolean		_pressure_static_serviceable;
 	Xefis::PropertyPressure		_pressure_static;
+	Xefis::PropertyPressure		_pressure_total;
 	Xefis::PropertyBoolean		_ias_serviceable;
 	Xefis::PropertySpeed		_ias;
-	Xefis::PropertyTemperature	_static_air_temperature;
+	Xefis::PropertyTemperature	_total_air_temperature;
 	// Output:
+	Xefis::PropertyPressure		_pressure_dynamic;
 	Xefis::PropertyBoolean		_altitude_amsl_serviceable;
 	Xefis::PropertyLength		_altitude_amsl;
 	Xefis::PropertyLength		_altitude_amsl_lookahead;
@@ -120,6 +127,7 @@ class AirDataComputer: public Xefis::Module
 	Xefis::PropertySpeed		_speed_sound;
 	Xefis::PropertyBoolean		_vertical_speed_serviceable;
 	Xefis::PropertySpeed		_vertical_speed;
+	Xefis::PropertyTemperature	_static_air_temperature;
 };
 
 #endif

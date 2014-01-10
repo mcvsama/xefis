@@ -26,8 +26,9 @@
 					<property bytes='2' path='/sensors/gps/accuracy.lateral' type='length'/>
 					<property bytes='2' path='/sensors/gps/accuracy.vertical' type='length'/>
 					<property bytes='4' path='/sensors/pressure/static' type='pressure'/>
+					<property bytes='4' path='/sensors/pressure/total' type='pressure'/>
 					<property bytes='4' path='/sensors/airspeed/ias' type='speed'/>
-					<property bytes='4' path='/sensors/air-temperature/static' type='temperature'/>
+					<property bytes='4' path='/sensors/air-temperature/total' type='temperature'/>
 					<property bytes='4' path='/sensors/radar-altimeter/altitude.agl' type='length'/>
 					<property bytes='2' path='/sensors/slip-skid/slip-skid' type='float'/>
 					<property bytes='2' path='/sensors/engines/1/thrust' type='float'/>

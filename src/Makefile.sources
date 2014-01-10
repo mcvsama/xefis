@@ -98,6 +98,7 @@ SRC_MOCHDRS += xefis/core/window.h
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
+SRC_HEADERS += xefis/utility/convergence.h
 SRC_HEADERS += xefis/utility/finally.h
 SRC_HEADERS += xefis/utility/hash.h
 SRC_HEADERS += xefis/utility/hextable.h

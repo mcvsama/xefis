@@ -118,7 +118,7 @@ class FlightGearIO:
 	Xefis::PropertyAngle					_lateral_deviation;
 	Xefis::PropertyAngle					_vertical_deviation;
 	Xefis::PropertyLength					_dme_distance;
-	Xefis::PropertyTemperature				_static_air_temperature;
+	Xefis::PropertyTemperature				_total_air_temperature;
 	Xefis::PropertyFloat					_engine_throttle_pct;
 	Xefis::PropertyFloat					_engine_1_thrust;
 	Xefis::PropertyFloat					_engine_1_rpm;

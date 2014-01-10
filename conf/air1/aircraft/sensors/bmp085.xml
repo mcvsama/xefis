@@ -10,7 +10,7 @@
 		<properties path='/sensors'>
 			<property name='serviceable' path='/pressure/serviceable'/>
 			<property name='pressure' path='/pressure/static'/>
-			<property name='temperature' path='/air-temperature/static'/>
+			<property name='temperature' path='/air-temperature/total'/>
 		</properties>
 	</module>
 </xefis-include>

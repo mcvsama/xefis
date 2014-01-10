@@ -77,7 +77,7 @@ struct FGInputData
 	FGBool		navigation_dme_ok;					// dok
 	FGDouble	dme_distance_nm;					// dme
 	FGDouble	slip_skid_g;						// ss
-	FGDouble	static_air_temperature_degc;		// tmp
+	FGDouble	total_air_temperature_degc;			// tat
 	FGDouble	engine_throttle_pct;				// thr
 	FGDouble	engine_1_thrust;					// thrust1
 	FGDouble	engine_1_rpm;						// rpm1
@@ -171,7 +171,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 						{ "lateral-deviation", _lateral_deviation, false },
 						{ "vertical-deviation", _vertical_deviation, false },
 						{ "dme-distance", _dme_distance, false },
-						{ "static-air-temperature", _static_air_temperature, false },
+						{ "total-air-temperature", _total_air_temperature, false },
 						{ "engine-throttle-pct", _engine_throttle_pct, false },
 						{ "engine.1.thrust", _engine_1_thrust, false },
 						{ "engine.1.rpm", _engine_1_rpm, false },
@@ -274,7 +274,7 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 		&_lateral_deviation,
 		&_vertical_deviation,
 		&_dme_distance,
-		&_static_air_temperature,
+		&_total_air_temperature,
 		&_engine_throttle_pct,
 		&_engine_1_thrust,
 		&_engine_1_rpm,
@@ -440,9 +440,9 @@ FlightGearIO::read_input()
 		_gear_left_up.write (fg_data->gear_left_position < 0.001);
 		_gear_right_up.write (fg_data->gear_right_position < 0.001);
 
-		// SAT
-		if (_static_air_temperature.configured())
-			_static_air_temperature.write (Temperature::from_degC (fg_data->static_air_temperature_degc));
+		// TAT
+		if (_total_air_temperature.configured())
+			_total_air_temperature.write (Temperature::from_degC (fg_data->total_air_temperature_degc));
 
 		// Convert EGT from °F to Kelvins:
 		if (_engine_1_egt.configured())

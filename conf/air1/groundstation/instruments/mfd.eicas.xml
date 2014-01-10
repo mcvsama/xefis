@@ -367,8 +367,12 @@
 										<value path='/...' format='%.0f   ' nil='----   '/>
 									</row>
 									<row>
+										<label>TAT</label>
+										<value path='/aircraft/sensors/air-temperature/total' unit='degC' format='%.0f °C' nil='-- °C'/>
+									</row>
+									<row>
 										<label>SAT</label>
-										<value path='/aircraft/sensors/air-temperature/static' unit='degC' format='%.0f °C' nil='-- °C'/>
+										<value path='/systems/adc/air-temperature/static' unit='degC' format='%.0f °C' nil='-- °C'/>
 									</row>
 								</table>
 							</instrument>
