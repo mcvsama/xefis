@@ -30,7 +30,7 @@
 					<property name='pressure' path='/pressure/static'/>
 					<property name='pressure.serviceable' path='/pressure/serviceable'/>
 					<!-- temperature -->
-					<property name='static-air-temperature' path='/air-temperature/static'/>
+					<property name='total-air-temperature' path='/air-temperature/total'/>
 					<!-- radar altimeter -->
 					<property name='radar-altimeter.altitude.agl' path='/radar-altimeter/altitude.agl'/>
 					<property name='radar-altimeter.serviceable' path='/radar-altimeter/serviceable'/>

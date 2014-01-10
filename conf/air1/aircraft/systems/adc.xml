@@ -14,7 +14,7 @@
 			<directory path='//sensors'>
 				<property name='pressure.static' path='/pressure/static'/>
 				<property name='ias' path='/airspeed/ias'/>
-				<property name='static-air-temperature' path='/air-temperature/static'/>
+				<property name='air-temperature.total' path='/air-temperature/total'/>
 			</directory>
 			<!-- Output -->
 			<directory path='//systems/adc'>
@@ -40,6 +40,7 @@
 					<property name='vertical-speed.serviceable' path='/serviceable'/>
 					<property name='vertical-speed' path='/vertical-speed'/>
 				</directory>
+				<property name='air-temperature.static' path='/air-temperature/static'/>
 			</directory>
 		</properties>
 	</module>

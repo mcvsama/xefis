@@ -11,11 +11,13 @@
 			<property name='settings.pressure.qnh' path='/settings/pressure/qnh'/>
 			<property name='pressure.static.serviceable' path='/aircraft/sensors/pressure/serviceable'/>
 			<property name='pressure.static' path='/aircraft/sensors/pressure/static'/>
+			<property name='pressure.total' path='/aircraft/sensors/pressure/total'/>
 			<property name='ias.serviceable' path='/aircraft/sensors/airspeed/serviceable'/>
 			<property name='ias' path='/aircraft/sensors/airspeed/ias'/>
-			<property name='static-air-temperature' path='/aircraft/sensors/air-temperature/static'/>
+			<property name='air-temperature.total' path='/aircraft/sensors/air-temperature/total'/>
 			<!-- Output -->
 			<directory path='/systems/adc'>
+				<property name='pressure.dynamic' path='/pressure/dynamic'/>
 				<property name='altitude.amsl.serviceable' path='/altitude/amsl.serviceable'/>
 				<property name='altitude.amsl' path='/altitude/amsl'/>
 				<property name='altitude.amsl.lookahead' path='/altitude/amsl.lookahead'/>
@@ -30,6 +32,7 @@
 				<property name='speed.sound' path='/speed/sound'/>
 				<property name='vertical-speed.serviceable' path='/vertical-speed/serviceable'/>
 				<property name='vertical-speed' path='/vertical-speed/speed'/>
+				<property name='air-temperature.static' path='/air-temperature/static'/>
 			</directory>
 		</properties>
 	</module>

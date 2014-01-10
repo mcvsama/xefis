@@ -21,6 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/convergence.h>
 #include <xefis/airnav/density_altitude.h>
 #include <xefis/airnav/sound_speed.h>
 
@@ -40,6 +41,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 	parse_settings (config, {
 		{ "ias.valid-minimum", _ias_valid_minimum, true },
 		{ "ias.valid-maximum", _ias_valid_maximum, true },
+		{ "using-ias-sensor", _using_ias_sensor, false },
 	});
 
 	parse_properties (config, {
@@ -48,10 +50,12 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		{ "settings.pressure.qnh", _pressure_qnh, true },
 		{ "pressure.static.serviceable", _pressure_static_serviceable, false },
 		{ "pressure.static", _pressure_static, true },
+		{ "pressure.total", _pressure_total, true },
 		{ "ias.serviceable", _ias_serviceable, false },
 		{ "ias", _ias, true },
-		{ "static-air-temperature", _static_air_temperature, true },
+		{ "air-temperature.total", _total_air_temperature, true },
 		// Output:
+		{ "pressure.dynamic", _pressure_dynamic, true },
 		{ "altitude.amsl.serviceable", _altitude_amsl_serviceable, true },
 		{ "altitude.amsl", _altitude_amsl, true },
 		{ "altitude.amsl.lookahead", _altitude_amsl_lookahead, true },
@@ -66,6 +70,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		{ "speed.sound", _speed_sound, true },
 		{ "vertical-speed.serviceable", _vertical_speed_serviceable, true },
 		{ "vertical-speed", _vertical_speed, true },
+		{ "air-temperature.static", _static_air_temperature, true },
 	});
 
 	_altitude_computer.set_minimum_dt (5_ms);
@@ -82,12 +87,6 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		&_pressure_use_std,
 		&_pressure_qnh,
 		&_pressure_static_serviceable,
-	});
-
-	_density_altitude_computer.set_callback (std::bind (&AirDataComputer::compute_density_altitude, this));
-	_density_altitude_computer.observe ({
-		&_static_air_temperature,
-		&_altitude_amsl,
 	});
 
 	_ias_computer.set_callback (std::bind (&AirDataComputer::compute_ias, this));
@@ -108,6 +107,24 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		&_ias,
 	});
 
+	_mach_computer.set_callback (std::bind (&AirDataComputer::compute_mach, this));
+	_mach_computer.observe ({
+		&_pressure_static,
+		&_pressure_total,
+	});
+
+	_sat_computer.set_callback (std::bind (&AirDataComputer::compute_sat, this));
+	_sat_computer.observe ({
+		&_mach_computer,
+		&_total_air_temperature,
+	});
+
+	_density_altitude_computer.set_callback (std::bind (&AirDataComputer::compute_density_altitude, this));
+	_density_altitude_computer.observe ({
+		&_static_air_temperature,
+		&_altitude_amsl,
+	});
+
 	_sound_speed_computer.set_callback (std::bind (&AirDataComputer::compute_sound_speed, this));
 	_sound_speed_computer.observe ({
 		&_static_air_temperature,
@@ -118,12 +135,6 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		&_speed_ias,
 		&_density_altitude,
 		&_altitude_amsl,
-	});
-
-	_mach_computer.set_callback (std::bind (&AirDataComputer::compute_mach, this));
-	_mach_computer.observe ({
-		&_speed_tas,
-		&_speed_sound,
 	});
 
 	_vertical_speed_computer.set_minimum_dt (50_ms);
@@ -144,12 +155,13 @@ AirDataComputer::data_updated()
 	Xefis::PropertyObserver* computers[] = {
 		// Order is important:
 		&_altitude_computer,
-		&_density_altitude_computer,
 		&_ias_computer,
 		&_ias_lookahead_computer,
+		&_mach_computer,
+		&_sat_computer,
+		&_density_altitude_computer,
 		&_sound_speed_computer,
 		&_tas_computer,
-		&_mach_computer,
 		&_vertical_speed_computer,
 	};
 
@@ -255,9 +267,40 @@ void
 AirDataComputer::compute_ias()
 {
 	Time update_dt = _ias_computer.update_dt();
+	// Sound speed in STD sea level:
+	Speed const a0 = 661.4788_kt;
+	// STD sea level pressure:
+	Pressure const p0 = 29.92126_inHg;
 
-	if (_ias.valid())
-		_speed_ias.write (1_kt * _speed_ias_smoother.process (_ias->kt(), update_dt));
+	// If we're using ready-made IAS sensor, we need to recover total pressure
+	// from static pressure and TAS.
+	if (_using_ias_sensor)
+	{
+		if (_ias.valid() && _pressure_static.valid())
+		{
+			Pressure p = *_pressure_static;
+			// Formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
+			// solved for qc (dynamic (impact) pressure):
+			double ia0 = *_ias / a0;
+			Pressure qc = p0 * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
+			_pressure_total.write (qc + p);
+		}
+		else
+			_pressure_total.set_nil();
+	}
+
+	if (_pressure_static.valid() && _pressure_total.valid())
+	{
+		// Compute dynamic pressure:
+		_pressure_dynamic.write (*_pressure_total - *_pressure_static);
+
+		// Using formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
+		// Impact pressure (dynamic pressure) - difference between total pressure and static pressure:
+		Pressure qc = *_pressure_total - *_pressure_static;
+
+		Speed ias = a0 * std::sqrt (5.0 * (std::pow (qc / p0 + 1.0, 2.0 / 7.0) - 1.0));
+		_speed_ias.write (1_kt * _speed_ias_smoother.process (ias.kt(), update_dt));
+	}
 	else
 	{
 		_speed_ias.set_nil();
@@ -299,8 +342,9 @@ AirDataComputer::compute_sound_speed()
 {
 	if (_static_air_temperature.valid())
 	{
+		Temperature sat = *_static_air_temperature;
 		Xefis::SoundSpeed ss;
-		ss.set_static_air_temperature (*_static_air_temperature);
+		ss.set_static_air_temperature (sat);
 		ss.update();
 		_speed_sound.write (ss.sound_speed());
 	}
@@ -334,11 +378,58 @@ AirDataComputer::compute_tas()
 void
 AirDataComputer::compute_mach()
 {
-	// The approximate speed of sound in dry (0% humidity) air:
-	if (_speed_tas.valid() && _speed_sound.valid())
-		_speed_mach.write (*_speed_tas / *_speed_sound);
+	// The approximate speed of sound in dry (0% humidity) air is TAS / sound-of-speed.
+	// We don't want to use either, because they depend on SAT, and SAT is calculated
+	// using Mach number, so we'd have a cycle.
+	//
+	// Instead use algorithm described here:
+	// <http://en.wikipedia.org/wiki/Mach_number#Calculating_Mach_Number_from_Pitot_Tube_Pressure>
+
+	if (_pressure_static.valid() && _pressure_total.valid() && _pressure_dynamic.valid())
+	{
+		// Dynamic pressure behind the normal shock (no-one will ever fly above Mach 1, so doesn't really
+		// matter where the sensor is installed). Use normal total pressure source:
+		Pressure qc = *_pressure_dynamic;
+		// Static pressure:
+		Pressure p = *_pressure_static;
+
+		// Compute sub-sonic Mach:
+		double M = std::sqrt (5.0 * (std::pow (qc / p + 1, 2.0 / 7.0) - 1.0));
+
+		if (M < 1.0)
+			_speed_mach.write (M);
+		else
+		{
+			// If Mach turned out to be > 1, try to converge M from the second formula.
+			// Limit iterations to 100.
+			Xefis::Convergence<double> super_mach (1e-9, 100, [&](double M) {
+				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M * M), 2.5));
+			});
+			if (super_mach.converge (M))
+				_speed_mach.write (super_mach.result());
+			else
+			{
+				log() << "Mach number did not converge." << std::endl;
+				_speed_mach.set_nil();
+			}
+		}
+	}
 	else
 		_speed_mach.set_nil();
+}
+
+
+void
+AirDataComputer::compute_sat()
+{
+	// SAT = TAT * (1 + 0.2 * M^2)
+	if (_total_air_temperature.valid() && _speed_mach.valid())
+	{
+		double mach = *_speed_mach;
+		_static_air_temperature.write (*_total_air_temperature / (1.0 + 0.2 * mach * mach));
+	}
+	else
+		_static_air_temperature.set_nil();
 }
 
 
