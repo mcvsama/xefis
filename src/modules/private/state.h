@@ -51,6 +51,7 @@ class State: public Xefis::Module
 		EICAS	= 0,
 		ND		= 1,
 		CHKLST	= 2,
+		ELEC	= 3,
 	};
 
 	/**
@@ -252,6 +253,7 @@ class State: public Xefis::Module
 	Observable<Xefis::PropertyBoolean>	_mcp_show_nd;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_eicas;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_chklst;
+	Observable<Xefis::PropertyBoolean>	_mcp_show_elec;
 	// LEDs, displays:
 	Xefis::PropertyInteger				_mcp_course_display;
 	// Controlled properties:

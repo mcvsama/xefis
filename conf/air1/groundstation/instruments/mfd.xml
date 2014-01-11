@@ -7,6 +7,12 @@
 		<item>
 			<include name='mfd.nd.xml'/>
 		</item>
+		<item>
+			<include name='mfd.chkl.xml'/>
+		</item>
+		<item>
+			<include name='mfd.elec.xml'/>
+		</item>
 	</layout>
 </xefis-include>
 
