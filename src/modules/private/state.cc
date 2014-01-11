@@ -101,6 +101,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_show_nd.set_path (mcp_root + "/show-nd");
 	_mcp_show_eicas.set_path (mcp_root + "/show-eicas");
 	_mcp_show_chklst.set_path (mcp_root + "/show-chklst");
+	_mcp_show_elec.set_path (mcp_root + "/show-elec");
 
 	_mcp_course_display.set_path ("/settings/course/magnetic.integer");
 
@@ -167,6 +168,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_mcp_show_nd,
 		&_mcp_show_eicas,
 		&_mcp_show_chklst,
+		&_mcp_show_elec,
 	};
 
 	_rotary_decoders = {
@@ -306,6 +308,7 @@ State::prepare_lights_gpws_mfd_panels()
 	make_int_writer (_mcp_show_eicas, _setting_efis_mfd_mode, static_cast<int> (MFDMode::EICAS));
 	make_int_writer (_mcp_show_nd, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ND));
 	make_int_writer (_mcp_show_chklst, _setting_efis_mfd_mode, static_cast<int> (MFDMode::CHKLST));
+	make_int_writer (_mcp_show_elec, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ELEC));
 }
 
 

@@ -243,6 +243,9 @@
 					<item>
 						<widget type='button' top-label='CHKL' click-property='/panels/mcp/show-chklst'/>
 					</item>
+					<item>
+						<widget type='button' top-label='ELEC' click-property='/panels/mcp/show-elec'/>
+					</item>
 					<stretch/>
 				</layout>
 			</item>

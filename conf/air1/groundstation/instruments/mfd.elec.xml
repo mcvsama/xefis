@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<layout type='vertical'>
+		<item>
+			<layout type='horizontal'>
+				<item stretch-factor='50'>
+					<!--group label='BEC'-->
+						<layout type='vertical'>
+							<item>
+								<instrument name='instruments/datatable' instance='elect-bec'>
+									<settings>
+										<setting name='label-color' value='#0df'/>
+										<setting name='value-color' value='#fff'/>
+										<setting name='label-font-size' value='16'/>
+										<setting name='value-font-size' value='18'/>
+									</settings>
+									<table>
+										<row>
+											<label>SYS BEC 1</label>
+											<value path='/' format='%.1f V' nil='--  '/>
+										</row>
+										<row>
+											<label>SYS BEC 2</label>
+											<value path='/' format='%.1f V' nil='--  '/>
+										</row>
+										<row>
+											<label>FCTL BEC 1</label>
+											<value path='/' format='%.1f V' nil='--  '/>
+										</row>
+										<row>
+											<label>FCTL BEC 2</label>
+											<value path='/' format='%.1f V' nil='--  '/>
+										</row>
+									</table>
+								</instrument>
+							</item>
+						</layout>
+					<!--/group-->
+				</item>
+				<item stretch-factor='50'/>
+			</layout>
+		</item>
+	</layout>
+</xefis-include>
+
