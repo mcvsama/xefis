@@ -79,7 +79,7 @@ class Window: public QWidget
 	Panel*
 	process_panel_element (QDomElement const& panel_element, QWidget* parent_widget);
 
-	QGroupBox*
+	QWidget*
 	process_group_element (QDomElement const& group_element, QWidget* parent_widget, Panel* panel);
 
 	QWidget*
@@ -93,6 +93,12 @@ class Window: public QWidget
 
 	void
 	configurator_taken();
+
+	static std::array<int, 4>
+	parse_margin (QString const&);
+
+	static std::array<int, 4>
+	parse_padding (QString const&);
 
   private slots:
 	void

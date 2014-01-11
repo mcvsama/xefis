@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <array>
 
 // Qt:
 #include <QtWidgets/QShortcut>
@@ -30,6 +31,7 @@
 #include <xefis/widgets/panel_button.h>
 #include <xefis/widgets/panel_rotary_encoder.h>
 #include <xefis/widgets/panel_numeric_display.h>
+#include <xefis/widgets/group_box.h>
 
 // Local:
 #include "window.h"
@@ -148,22 +150,47 @@ Window::process_panel_element (QDomElement const& panel_element, QWidget* parent
 }
 
 
-QGroupBox*
+QWidget*
 Window::process_group_element (QDomElement const& group_element, QWidget* parent_widget, Panel* panel)
 {
-	if (!panel)
-		throw Exception ("<group> can only be used as descendant of <panel>");
+	QWidget* group = nullptr;
+	QString label = group_element.attribute ("label");
+	bool is_q = false;
 
-	QGroupBox* group = new QGroupBox (group_element.attribute ("label").replace ("&", "&&"), parent_widget);
+	// @padding
+	std::array<int, 4> padding = parse_padding (group_element.attribute ("padding"));
 
+	// Two types of groups: different for instruments and for panels:
+	if (panel)
+	{
+		is_q = true;
+		group = new QGroupBox (label.replace ("&", "&&"), parent_widget);
+	}
+	else
+	{
+		GroupBox* group_box = new GroupBox (label, parent_widget);
+		group_box->set_padding (padding);
+		group = group_box;
+	}
+
+	// Children of <group>:
 	for (QDomElement& e: group_element)
 	{
 		if (e == "layout")
 		{
 			QLayout* layout = process_layout_element (e, group, panel);
-			layout->setMargin (5);
+
+			// Multiple layouts?
 			if (group->layout())
 				throw Exception ("a group can only have one layout");
+
+			// Configure layout:
+			if (is_q)
+				layout->setMargin (5);
+			else
+			{
+				layout->setMargin (0);
+			}
 			group->setLayout (layout);
 		}
 		else
@@ -343,55 +370,8 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 	if (box_layout && item_element.hasAttribute ("id"))
 		throw Exception ("attribute @id not allowed on <item> of non-stack-type layout");
 
-	std::array<int, 4> margins = { 0, 0, 0, 0 };
-
 	// @margin
-	if (item_element.hasAttribute ("margin"))
-	{
-		QString margin = item_element.attribute ("margin");
-		// Margin can be 1, 2, 3 or 4 numbers of pixels. Order: same as in CSS.
-		// No units allowed - just numbers.
-		QStringList numbers = margin.simplified().split (" ", QString::SkipEmptyParts);
-		switch (numbers.size())
-		{
-			case 1:
-			{
-				int a = numbers[0].toInt();
-				margins = { a, a, a, a };
-				break;
-			}
-
-			case 2:
-			{
-				int v = numbers[0].toInt();
-				int h = numbers[1].toInt();
-				margins = { h, v, h, v };
-				break;
-			}
-
-			case 3:
-			{
-				int t = numbers[0].toInt();
-				int h = numbers[1].toInt();
-				int b = numbers[2].toInt();
-				margins = { h, t, h, b };
-				break;
-			}
-
-			case 4:
-			{
-				int t = numbers[0].toInt();
-				int r = numbers[1].toInt();
-				int b = numbers[2].toInt();
-				int l = numbers[3].toInt();
-				margins = { l, t, r, b };
-				break;
-			}
-
-			default:
-				throw Exception ("invalid format of @margin attribute");
-		}
-	}
+	std::array<int, 4> margins = parse_margin (item_element.attribute ("margin"));
 
 	bool has_child = false;
 	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
@@ -506,6 +486,68 @@ void
 Window::configurator_taken()
 {
 	_stack->setCurrentWidget (_instruments_panel);
+}
+
+
+std::array<int, 4>
+Window::parse_margin (QString const& string)
+{
+	std::array<int, 4> margins = { 0, 0, 0, 0 };
+
+	if (!string.isEmpty())
+	{
+		// Margin can be 1, 2, 3 or 4 numbers of pixels. Order: same as in CSS.
+		// No units allowed - just numbers.
+		QStringList numbers = string.simplified().split (" ", QString::SkipEmptyParts);
+		switch (numbers.size())
+		{
+			case 1:
+			{
+				int a = numbers[0].toInt();
+				margins = { a, a, a, a };
+				break;
+			}
+
+			case 2:
+			{
+				int v = numbers[0].toInt();
+				int h = numbers[1].toInt();
+				margins = { h, v, h, v };
+				break;
+			}
+
+			case 3:
+			{
+				int t = numbers[0].toInt();
+				int h = numbers[1].toInt();
+				int b = numbers[2].toInt();
+				margins = { h, t, h, b };
+				break;
+			}
+
+			case 4:
+			{
+				int t = numbers[0].toInt();
+				int r = numbers[1].toInt();
+				int b = numbers[2].toInt();
+				int l = numbers[3].toInt();
+				margins = { l, t, r, b };
+				break;
+			}
+
+			default:
+				throw Exception ("invalid format of @margin attribute");
+		}
+	}
+
+	return margins;
+}
+
+
+std::array<int, 4>
+Window::parse_padding (QString const& string)
+{
+	return parse_margin (string);
 }
 
 } // namespace Xefis
