@@ -14,6 +14,12 @@
 // Standard:
 #include <cstddef>
 
+// Lib:
+#include <boost/format.hpp>
+
+// Xefis:
+#include <xefis/utility/numeric.h>
+
 // Local:
 #include "angle.h"
 
@@ -21,6 +27,46 @@
 namespace SI {
 
 std::vector<std::string> Angle::_supported_units = { "°", "deg", "rad" };
+
+
+std::string
+Angle::to_dms() const
+{
+	double const degs = std::trunc (Xefis::floored_mod (deg(), -180.0, +180.0));
+	double const remainder = 60.0 * std::abs (deg() - degs);
+	double const mins = std::floor (remainder);
+	double const secs = 60.0 * std::abs (remainder - mins);
+
+	return (boost::format ("%02d°%02d'%02d\"") % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
+}
+
+
+std::string
+Angle::to_latitude_dms() const
+{
+	std::string dms = to_dms();
+
+	if (dms.empty())
+		return dms;
+	else if (dms[0] == '-')
+		return dms.substr (1) + "S";
+	else
+		return dms + "N";
+}
+
+
+std::string
+Angle::to_longitude_dms() const
+{
+	std::string dms = to_dms();
+
+	if (dms.empty())
+		return dms;
+	else if (dms[0] == '-')
+		return dms.substr (1) + "W";
+	else
+		return dms + "E";
+}
 
 } // namespace SI
 

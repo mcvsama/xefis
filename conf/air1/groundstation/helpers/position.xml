@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='helpers/lonlat-translator' instance='position'>
+		<properties>
+			<property name='input.longitude' path='/aircraft/sensors/gps/longitude'/>
+			<property name='input.latitude' path='/aircraft/sensors/gps/latitude'/>
+			<property name='output.longitude' path='/aircraft/sensors/gps/longitude.dms'/>
+			<property name='output.latitude' path='/aircraft/sensors/gps/latitude.dms'/>
+		</properties>
+	</module>
+</xefis-include>
+

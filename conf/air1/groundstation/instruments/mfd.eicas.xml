@@ -242,11 +242,11 @@
 										</row>
 										<row>
 											<label>LAT</label>
-											<value path='/aircraft/sensors/gps/latitude' unit='deg' format='%f' nil='--'/>
+											<value path='/aircraft/sensors/gps/latitude.dms' unit='deg' format='%s' nil='--'/>
 										</row>
 										<row>
 											<label>LON</label>
-											<value path='/aircraft/sensors/gps/longitude' unit='deg' format='%f' nil='--'/>
+											<value path='/aircraft/sensors/gps/longitude.dms' unit='deg' format='%s' nil='--'/>
 										</row>
 									</table>
 								</instrument>
