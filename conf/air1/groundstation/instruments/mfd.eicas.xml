@@ -170,83 +170,89 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='8'>
+				<item stretch-factor='16' margin='0 10'>
+					<group label='LINK' padding='10 0'>
+						<layout type='horizontal'>
+							<item stretch-factor='18'>
+								<instrument name='instruments/linear-indicator' instance='signal-air'>
+									<settings>
+										<setting name='value.minimum' value='-120.0'/>
+										<setting name='value.maximum' value='-60'/>
+										<setting name='value.digits' value='6'/>
+										<setting name='value.precision' value='1'/>
+										<setting name='style.mirrored' value='false'/>
+									</settings>
+									<properties>
+										<property name='value' path='/link/remote/failsafes'/>
+									</properties>
+								</instrument>
+							</item>
+							<item stretch-factor='4'>
+								<instrument name='instruments/label' instance='signal-air'>
+									<label>RSSI</label>
+									<align>hcenter vcenter</align>
+									<color>#0df</color>
+									<font-size>11</font-size>
+								</instrument>
+							</item>
+							<item stretch-factor='18'>
+								<instrument name='instruments/linear-indicator' instance='signal-gnd'>
+									<settings>
+										<setting name='value.minimum' value='-120.0'/>
+										<setting name='value.maximum' value='-60'/>
+										<setting name='value.digits' value='6'/>
+										<setting name='value.precision' value='1'/>
+										<setting name='style.mirrored' value='true'/>
+									</settings>
+									<properties>
+										<property name='value' path='/link/remote/failsafes'/>
+									</properties>
+								</instrument>
+							</item>
+						</layout>
+					</group>
 				</item>
-				<item stretch-factor='8'>
-					<layout type='horizontal'>
-						<item stretch-factor='18'>
-							<instrument name='instruments/linear-indicator' instance='signal-air'>
-								<settings>
-									<setting name='value.minimum' value='-120.0'/>
-									<setting name='value.maximum' value='-60'/>
-									<setting name='value.digits' value='6'/>
-									<setting name='value.precision' value='1'/>
-									<setting name='style.mirrored' value='false'/>
-								</settings>
-								<properties>
-									<property name='value' path='/link/remote/failsafes'/>
-								</properties>
-							</instrument>
-						</item>
-						<item stretch-factor='4'>
-							<instrument name='instruments/label' instance='signal-air'>
-								<label>RSSI</label>
-								<align>hcenter vcenter</align>
-								<color>#0df</color>
-								<font-size>11</font-size>
-							</instrument>
-						</item>
-						<item stretch-factor='18'>
-							<instrument name='instruments/linear-indicator' instance='signal-gnd'>
-								<settings>
-									<setting name='value.minimum' value='-120.0'/>
-									<setting name='value.maximum' value='-60'/>
-									<setting name='value.digits' value='6'/>
-									<setting name='value.precision' value='1'/>
-									<setting name='style.mirrored' value='true'/>
-								</settings>
-								<properties>
-									<property name='value' path='/link/remote/failsafes'/>
-								</properties>
-							</instrument>
-						</item>
-					</layout>
-				</item>
-				<item stretch-factor='16' margin='5 10'>
-					<instrument name='instruments/datatable' instance='gps-info'>
-						<settings>
-							<setting name='label-color' value='#aaa'/>
-							<setting name='value-color' value='#fff'/>
-							<setting name='label-font-size' value='16'/>
-							<setting name='value-font-size' value='18'/>
-						</settings>
-						<table>
-							<row>
-								<label>SATELLITES</label>
-								<value path='/aircraft/sensors/gps/satellites' format='%f' nil='--'/>
-							</row>
-							<row>
-								<label>ACCURACY HORZ</label>
-								<value path='/aircraft/sensors/gps/accuracy.lateral' unit='m' format='%.1f' nil='--'/>
-							</row>
-							<row>
-								<label>ACCURACY VERT</label>
-								<value path='/aircraft/sensors/gps/accuracy.vertical' unit='m' format='%.1f' nil='--'/>
-							</row>
-							<row>
-								<label>FIX</label>
-								<value path='/aircraft/sensors/gps/type-of-fix' nil='--'/> <!-- -|2D|3D DGPS|PPS|... -->
-							</row>
-							<row>
-								<label>LAT</label>
-								<value path='/aircraft/sensors/gps/latitude' unit='deg' format='%f' nil='--'/>
-							</row>
-							<row>
-								<label>LON</label>
-								<value path='/aircraft/sensors/gps/longitude' unit='deg' format='%f' nil='--'/>
-							</row>
-						</table>
-					</instrument>
+				<item stretch-factor='14' margin='0 10'>
+					<group label='GPS'>
+						<layout type='vertical'>
+							<item>
+								<instrument name='instruments/datatable' instance='gps-info'>
+									<settings>
+										<setting name='label-color' value='#aaa'/>
+										<setting name='value-color' value='#fff'/>
+										<setting name='label-font-size' value='16'/>
+										<setting name='value-font-size' value='18'/>
+									</settings>
+									<table>
+										<row>
+											<label>SATELLITES</label>
+											<value path='/aircraft/sensors/gps/satellites' format='%f' nil='--'/>
+										</row>
+										<row>
+											<label>ACCURACY HORZ</label>
+											<value path='/aircraft/sensors/gps/accuracy.lateral' unit='m' format='%.1f' nil='--'/>
+										</row>
+										<row>
+											<label>ACCURACY VERT</label>
+											<value path='/aircraft/sensors/gps/accuracy.vertical' unit='m' format='%.1f' nil='--'/>
+										</row>
+										<row>
+											<label>FIX</label>
+											<value path='/aircraft/sensors/gps/type-of-fix' nil='--'/> <!-- -|2D|3D DGPS|PPS|... -->
+										</row>
+										<row>
+											<label>LAT</label>
+											<value path='/aircraft/sensors/gps/latitude' unit='deg' format='%f' nil='--'/>
+										</row>
+										<row>
+											<label>LON</label>
+											<value path='/aircraft/sensors/gps/longitude' unit='deg' format='%f' nil='--'/>
+										</row>
+									</table>
+								</instrument>
+							</item>
+						</layout>
+					</group>
 				</item>
 			</layout>
 		</item>

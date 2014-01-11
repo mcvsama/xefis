@@ -4,7 +4,7 @@
 		<item>
 			<layout type='horizontal'>
 				<item stretch-factor='50'>
-					<!--group label='BEC'-->
+					<group label='BEC'>
 						<layout type='vertical'>
 							<item>
 								<instrument name='instruments/datatable' instance='elect-bec'>
@@ -35,7 +35,7 @@
 								</instrument>
 							</item>
 						</layout>
-					<!--/group-->
+					</group>
 				</item>
 				<item stretch-factor='50'/>
 			</layout>
