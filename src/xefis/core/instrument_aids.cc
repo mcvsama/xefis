@@ -58,12 +58,12 @@ InstrumentAids::get_token (QPaintDevice* device)
 
 
 void
-InstrumentAids::clear_with_black()
+InstrumentAids::clear_background (QColor color)
 {
 	QPaintDevice* d = painter().device();
 
 	painter().setPen (Qt::NoPen);
-	painter().setBrush (Qt::black);
+	painter().setBrush (color);
 	painter().drawRect (QRect (0, 0, d->width(), d->height()));
 }
 

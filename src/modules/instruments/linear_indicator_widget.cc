@@ -57,7 +57,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	QPen pen_white = get_pen (Qt::white, 1.f);
 	QPen pen_silver = get_pen (QColor (0xbb, 0xbd, 0xbf), 1.f);
 
-	clear_with_black();
+	clear_background();
 
 	if (_mirrored)
 	{

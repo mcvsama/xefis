@@ -80,7 +80,7 @@ class InstrumentAids
 	 * Clear the widget with black.
 	 */
 	void
-	clear_with_black();
+	clear_background (QColor = Qt::black);
 
 	/**
 	 * Needs to be called when instrument widget size changes.

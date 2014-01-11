@@ -78,7 +78,7 @@ void
 Gear::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
-	clear_with_black();
+	clear_background();
 
 	bool setting_down = _setting_down.read (false);
 	bool setting_invalid = _setting_down.is_nil();
