@@ -172,7 +172,7 @@ class State: public Xefis::Module
 	prepare_efis_settings();
 
 	void
-	prepare_lights_gpws_mfd_panels();
+	prepare_mfd_panels();
 
 	/**
 	 * Compute _setting_minimums_amsl from landing altitude and minimums setting.
@@ -244,12 +244,6 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_course_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_course_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_course_hide;
-	Observable<Xefis::PropertyBoolean>	_mcp_gpws_flap_inh;
-	Observable<Xefis::PropertyBoolean>	_mcp_gpws_gear_inh;
-	Observable<Xefis::PropertyBoolean>	_mcp_gpws_terr_inh;
-	Observable<Xefis::PropertyBoolean>	_mcp_lights_strobe;
-	Observable<Xefis::PropertyBoolean>	_mcp_lights_pos;
-	Observable<Xefis::PropertyBoolean>	_mcp_lights_ldg;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_nd;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_eicas;
 	Observable<Xefis::PropertyBoolean>	_mcp_show_chklst;
@@ -274,9 +268,6 @@ class State: public Xefis::Module
 	Xefis::PropertyLength				_setting_hsi_range;
 	Xefis::PropertyBoolean				_setting_hsi_home_track_visible;
 	Xefis::PropertyAngle				_setting_course;
-	Xefis::PropertyBoolean				_setting_lights_strobe;
-	Xefis::PropertyBoolean				_setting_lights_position;
-	Xefis::PropertyBoolean				_setting_lights_landing;
 	// Other:
 	std::vector<ObservableBase*>		_observables;
 	std::vector<Xefis::RotaryEncoder*>	_rotary_decoders;

@@ -19,27 +19,27 @@
 		<include name='helpers/fma.xml'/>
 	</modules>
 	<windows>
-		<window width='1366' height='960' full-screen='false'>
-			<layout type='vertical'>
-				<item stretch-factor='12'>
-					<layout type='horizontal'>
-						<item stretch-factor='4'>
-							<include name='instruments/pfd.xml'/>
+		<window width='1666' height='960' full-screen='false'>
+			<layout type='horizontal'>
+				<item stretch-factor='1366'>
+					<layout type='vertical'>
+						<item stretch-factor='12'>
+							<layout type='horizontal'>
+								<item stretch-factor='4'>
+									<include name='instruments/pfd.xml'/>
+								</item>
+								<separator/>
+								<item stretch-factor='4'>
+									<include name='instruments/mfd.xml'/>
+								</item>
+							</layout>
 						</item>
-						<separator/>
-						<item stretch-factor='4'>
-							<include name='instruments/mfd.xml'/>
+						<item stretch-factor='3'>
+							<include name='panels/mcp.xml'/>
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='3'>
-					<include name='panels/mcp.xml'/>
-				</item>
-			</layout>
-		</window>
-		<window width='640' height='320' full-screen='false'>
-			<layout type='vertical'>
-				<item>
+				<item stretch-factor='300'>
 					<include name='panels/main.xml'/>
 				</item>
 			</layout>
