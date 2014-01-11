@@ -334,11 +334,63 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 
 	assert (stacked_layout && stack);
 
+	// @stretch-factor
 	if (stacked_layout && item_element.hasAttribute ("stretch-factor"))
 		throw Exception ("attribute @stretch-factor not allowed on <item> of stack-type layout");
 
+	// @id
 	if (box_layout && item_element.hasAttribute ("id"))
 		throw Exception ("attribute @id not allowed on <item> of non-stack-type layout");
+
+	std::array<int, 4> margins = { 0, 0, 0, 0 };
+
+	// @margin
+	if (item_element.hasAttribute ("margin"))
+	{
+		QString margin = item_element.attribute ("margin");
+		// Margin can be 1, 2, 3 or 4 numbers of pixels. Order: same as in CSS.
+		// No units allowed - just numbers.
+		QStringList numbers = margin.simplified().split (" ", QString::SkipEmptyParts);
+		switch (numbers.size())
+		{
+			case 1:
+			{
+				int a = numbers[0].toInt();
+				margins = { a, a, a, a };
+				break;
+			}
+
+			case 2:
+			{
+				int v = numbers[0].toInt();
+				int h = numbers[1].toInt();
+				margins = { h, v, h, v };
+				break;
+			}
+
+			case 3:
+			{
+				int t = numbers[0].toInt();
+				int h = numbers[1].toInt();
+				int b = numbers[2].toInt();
+				margins = { h, t, h, b };
+				break;
+			}
+
+			case 4:
+			{
+				int t = numbers[0].toInt();
+				int r = numbers[1].toInt();
+				int b = numbers[2].toInt();
+				int l = numbers[3].toInt();
+				margins = { l, t, r, b };
+				break;
+			}
+
+			default:
+				throw Exception ("invalid format of @margin attribute");
+		}
+	}
 
 	bool has_child = false;
 	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
@@ -356,6 +408,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 			if (box_layout)
 			{
 				QLayout* sub_layout = process_layout_element (e, parent_widget, panel);
+				sub_layout->setContentsMargins (margins[0], margins[1], margins[2], margins[3]);
 				box_layout->addLayout (sub_layout, stretch);
 			}
 			else if (stacked_layout)
@@ -388,7 +441,15 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 			if (widget)
 			{
 				if (box_layout)
-					box_layout->addWidget (widget, stretch);
+				{
+					// Another proxy layout is here so that we can add margins around the widget.
+					// That is because setContentsMargins() doesn't work at all on QWidgets,
+					// but it does on QLayout.
+					QVBoxLayout* proxy_layout = new QVBoxLayout();
+					proxy_layout->setContentsMargins (margins[0], margins[1], margins[2], margins[3]);
+					proxy_layout->addWidget (widget);
+					box_layout->addLayout (proxy_layout, stretch);
+				}
 				else if (stacked_layout)
 				{
 					stacked_layout->addWidget (widget);
