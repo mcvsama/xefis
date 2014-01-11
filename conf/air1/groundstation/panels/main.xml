@@ -88,6 +88,26 @@
 					</layout>
 				</group>
 			</item>
+			<item>
+				<group label='PITOT'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<widget type='button' top-label='CAL' toggle-property='/' led-property='/' led-color='amber'/>
+						</item>
+						<stretch/>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='AHRS'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<widget type='button' top-label='ALIGN' toggle-property='/' led-property='/' led-color='amber'/>
+						</item>
+						<stretch/>
+					</layout>
+				</group>
+			</item>
 			<stretch/>
 		</layout>
 	</panel>
