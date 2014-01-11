@@ -138,11 +138,13 @@ SRC_MOCHDRS += xefis/utility/serial_port.h
 
 ######## /xefis/widgets ########
 
+SRC_HEADERS += xefis/widgets/group_box.h
 SRC_HEADERS += xefis/widgets/panel_button.h
 SRC_HEADERS += xefis/widgets/panel_rotary_encoder.h
 SRC_HEADERS += xefis/widgets/panel_numeric_display.h
 SRC_HEADERS += xefis/widgets/panel_widget.h
 
+SRC_SOURCES += xefis/widgets/group_box.cc
 SRC_SOURCES += xefis/widgets/panel_button.cc
 SRC_SOURCES += xefis/widgets/panel_rotary_encoder.cc
 SRC_SOURCES += xefis/widgets/panel_numeric_display.cc
