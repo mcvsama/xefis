@@ -894,15 +894,16 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 		painter.setTransform (base_transform);
 		painter.translate (-z - 0.1f * _q, _q);
-		painter.setPen (get_pen (_navigation_color, 1.0));
 		if (at_home)
 		{
+			painter.setPen (get_pen (_navigation_color, 1.25));
 			float v = 0.35f * z;
 			painter.setBrush (Qt::black);
 			painter.drawEllipse (QRectF (-v, -v, 2.f * v, 2.f * v));
 		}
 		else
 		{
+			painter.setPen (get_pen (_navigation_color, 1.0));
 			QPolygonF home_arrow = QPolygonF()
 				<< QPointF (0.f, z)
 				<< QPointF (0.f, 0.2f * -z)
