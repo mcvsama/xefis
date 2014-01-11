@@ -92,12 +92,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_course_a.set_path (mcp_root + "/course-a");
 	_mcp_course_b.set_path (mcp_root + "/course-b");
 	_mcp_course_hide.set_path (mcp_root + "/course-hide");
-	_mcp_gpws_flap_inh.set_path (mcp_root + "/gpws-flap-inh");
-	_mcp_gpws_gear_inh.set_path (mcp_root + "/gpws-gear-inh");
-	_mcp_gpws_terr_inh.set_path (mcp_root + "/gpws-terr-inh");
-	_mcp_lights_strobe.set_path (mcp_root + "/lights-strobe");
-	_mcp_lights_pos.set_path (mcp_root + "/lights-pos");
-	_mcp_lights_ldg.set_path (mcp_root + "/lights-ldg");
 	_mcp_show_nd.set_path (mcp_root + "/show-nd");
 	_mcp_show_eicas.set_path (mcp_root + "/show-eicas");
 	_mcp_show_chklst.set_path (mcp_root + "/show-chklst");
@@ -135,15 +129,9 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
 	_setting_hsi_home_track_visible.set_default (false);
 	_setting_course.set_path ("/settings/course/magnetic");
-	_setting_lights_strobe.set_path ("/settings/lights/strobe");
-	_setting_lights_strobe.set_default (false);
-	_setting_lights_position.set_path ("/settings/lights/position");
-	_setting_lights_position.set_default (false);
-	_setting_lights_landing.set_path ("/settings/lights/landing");
-	_setting_lights_landing.set_default (false);
 
 	prepare_efis_settings();
-	prepare_lights_gpws_mfd_panels();
+	prepare_mfd_panels();
 
 	_observables = {
 		&_mcp_mins_mode,
@@ -159,12 +147,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_mcp_hdg_trk,
 		&_mcp_mag_tru,
 		&_mcp_course_hide,
-		&_mcp_gpws_flap_inh,
-		&_mcp_gpws_gear_inh,
-		&_mcp_gpws_terr_inh,
-		&_mcp_lights_strobe,
-		&_mcp_lights_pos,
-		&_mcp_lights_ldg,
 		&_mcp_show_nd,
 		&_mcp_show_eicas,
 		&_mcp_show_chklst,
@@ -295,16 +277,8 @@ State::prepare_efis_settings()
 
 
 void
-State::prepare_lights_gpws_mfd_panels()
+State::prepare_mfd_panels()
 {
-//	_mcp_gpws_flap_inh
-//	_mcp_gpws_gear_inh
-//	_mcp_gpws_terr_inh
-
-	make_toggle (_mcp_lights_strobe, _setting_lights_strobe);
-	make_toggle (_mcp_lights_pos, _setting_lights_position);
-	make_toggle (_mcp_lights_ldg, _setting_lights_landing);
-
 	make_int_writer (_mcp_show_eicas, _setting_efis_mfd_mode, static_cast<int> (MFDMode::EICAS));
 	make_int_writer (_mcp_show_nd, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ND));
 	make_int_writer (_mcp_show_chklst, _setting_efis_mfd_mode, static_cast<int> (MFDMode::CHKLST));

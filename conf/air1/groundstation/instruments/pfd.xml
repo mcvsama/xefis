@@ -145,6 +145,8 @@
 					<property name='wind.from.magnetic' path='/systems/pc/wind/from/magnetic'/>
 					<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
 					<property name='glide-ratio' path='/systems/pc/glide-ratio'/>
+					<property name='tcas.on' path='/settings/tcas/on'/>
+					<property name='tcas.range' path='/settings/tcas/range'/>
 				</properties>
 			</instrument>
 		</item>

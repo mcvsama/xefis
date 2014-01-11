@@ -212,7 +212,7 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='16'>
+				<item stretch-factor='16' margin='5 10'>
 					<instrument name='instruments/datatable' instance='gps-info'>
 						<settings>
 							<setting name='label-color' value='#aaa'/>
@@ -255,12 +255,12 @@
 			<layout type='vertical'>
 				<item stretch-factor='30'>
 					<instrument name='instruments/status'>
-						<properties>
-							<property name='button.cursor-up' path='/panels/mcp/status-up'/>
-							<property name='button.cursor-down' path='/panels/mcp/status-down'/>
-							<property name='button.cursor-del' path='/panels/mcp/status-del'/>
-							<property name='button.recall' path='/panels/mcp/status-recall'/>
-							<property name='button.clear' path='/panels/mcp/status-clear'/>
+						<properties path='/panels/eicas-status'>
+							<property name='button.cursor-up' path='/up'/>
+							<property name='button.cursor-down' path='/down'/>
+							<property name='button.cursor-del' path='/del'/>
+							<property name='button.recall' path='/recall'/>
+							<property name='button.clear' path='/clear'/>
 						</properties>
 						<messages>
 							<message message='LINK FAIL' severity='critical'>
