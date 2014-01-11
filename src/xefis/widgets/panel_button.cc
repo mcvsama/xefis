@@ -26,14 +26,10 @@
 
 namespace Xefis {
 
-PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, PropertyBoolean controlled_property):
-	PanelButton (parent, panel, color, controlled_property, PropertyBoolean())
-{ }
-
-
-PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, PropertyBoolean controlled_property, PropertyBoolean led_property):
+PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property):
 	PanelWidget (parent, panel),
-	_controlled_property (controlled_property),
+	_click_property (click_property),
+	_toggle_property (toggle_property),
 	_led_property (led_property)
 {
 	if (_led_property.configured())
@@ -90,7 +86,11 @@ PanelButton::read()
 void
 PanelButton::write()
 {
-	_controlled_property.write (_button->isDown() || _button->isChecked());
+	if (_click_property.configured())
+		_click_property.write (_button->isDown() || _button->isChecked());
+
+	if (_button->isDown() && _toggle_property.configured())
+		_toggle_property.write (!_toggle_property.read (false));
 }
 
 } // namespace Xefis
