@@ -74,6 +74,10 @@ Datatable::LabelValue::stringify() const
 	try {
 		if (value.is_nil())
 			return nil_value;
+		else if (value.is_type<std::string>())
+			return QString::fromStdString ((boost::format (format) % value.stringify()).str());
+		else if (value.is_type<bool>())
+			return (value.stringify() == "true") ? "ON" : "OFF";
 		else
 			return QString::fromStdString ((boost::format (format) % value.floatize (unit)).str());
 	}

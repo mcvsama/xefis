@@ -70,6 +70,27 @@ class Angle: public LinearValue<double, Angle>
 	double
 	floatize (std::string unit) const override;
 
+	/**
+	 * Convert to Degrees/Minutes/Seconds format.
+	 * Uses +/- notation on degrees.
+	 */
+	std::string
+	to_dms() const;
+
+	/**
+	 * Like to_dms(), but uses N/S suffix to denote
+	 * latitude.
+	 */
+	std::string
+	to_latitude_dms() const;
+
+	/**
+	 * Like to_dms(), but uses E/W suffix to denote
+	 * longitude.
+	 */
+	std::string
+	to_longitude_dms() const;
+
   private:
 	static std::vector<std::string> _supported_units;
 };

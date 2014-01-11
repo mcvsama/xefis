@@ -145,8 +145,8 @@ class GenericProperty
 	fresh() const;
 
 	/**
-	 * Check whether this property is TypedProperty
-	 * instantiated over given type Target.
+	 * Check whether the node this property points to,
+	 * is a PropertyValueNode of given Target type.
 	 */
 	template<class Target>
 		bool
@@ -523,8 +523,10 @@ template<class Target>
 	inline bool
 	GenericProperty::is_type() const
 	{
-		Property<Target>* tp = dynamic_cast<Property<Target>*> (this);
-		return !!tp;
+		PropertyNode const* node = get_node();
+		if (!node)
+			return false;
+		return !!dynamic_cast<PropertyValueNode<Target> const*> (node);
 	}
 
 
