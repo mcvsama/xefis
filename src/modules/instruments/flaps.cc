@@ -70,7 +70,7 @@ void
 Flaps::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
-	clear_with_black();
+	clear_background();
 
 	if (_hide_retracted)
 		if (_current.valid() && *_current < 0.1_deg)

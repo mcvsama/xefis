@@ -69,7 +69,7 @@ void
 Label::paintEvent (QPaintEvent*)
 {
 	auto paint_token = get_token (this);
-	clear_with_black();
+	clear_background();
 
 	QFont font (_font_10);
 	font.setPixelSize (font_size (_font_size));

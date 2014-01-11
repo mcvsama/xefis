@@ -314,7 +314,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	}
 
 	painter().set_shadow_color (Qt::black);
-	clear_with_black();
+	clear_background();
 
 	paint_navaids (painter());
 	paint_altitude_reach (painter());

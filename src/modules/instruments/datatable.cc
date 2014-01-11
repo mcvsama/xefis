@@ -136,7 +136,7 @@ void
 Datatable::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
-	clear_with_black();
+	clear_background();
 
 	QFont label_font = _font_10;
 	QFont value_font = _font_10;

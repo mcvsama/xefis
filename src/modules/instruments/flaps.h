@@ -40,9 +40,11 @@ class Flaps:
 	data_updated() override;
 
   protected:
+	// QWidget API
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// QWidget API
 	void
 	paintEvent (QPaintEvent*) override;
 

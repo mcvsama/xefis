@@ -54,7 +54,7 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 	float const w = width();
 	float const h = height();
 
-	clear_with_black();
+	clear_background();
 
 	painter().translate (w / 2.f, h / 2.4f);
 

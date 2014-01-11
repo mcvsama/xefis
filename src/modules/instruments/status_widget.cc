@@ -187,7 +187,7 @@ void
 StatusWidget::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
-	clear_with_black();
+	clear_background();
 
 	// Messages:
 	painter().setBrush (Qt::NoBrush);
