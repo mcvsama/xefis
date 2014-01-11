@@ -218,6 +218,7 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 
 		widget = new PanelButton (parent_widget, panel, color,
 								  PropertyBoolean (widget_element.attribute ("click-property").toStdString()),
+								  PropertyBoolean (widget_element.attribute ("toggle-property").toStdString()),
 								  PropertyBoolean (widget_element.attribute ("led-property").toStdString()));
 	}
 	else if (type == "rotary-encoder")

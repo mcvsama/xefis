@@ -44,14 +44,9 @@ class PanelButton: public PanelWidget
 
   public:
 	/**
-	 * Create empty button.
-	 */
-	PanelButton (QWidget* parent, Panel*, LEDColor, PropertyBoolean controlled_property);
-
-	/**
 	 * Create button with LED indicator.
 	 */
-	PanelButton (QWidget* parent, Panel*, LEDColor, PropertyBoolean controlled_property, PropertyBoolean led_property);
+	PanelButton (QWidget* parent, Panel*, LEDColor, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property);
 
   protected:
 	void
@@ -72,14 +67,15 @@ class PanelButton: public PanelWidget
 	read();
 
 	/**
-	 * Write to controlled property.
+	 * Write to controlled properties.
 	 */
 	void
 	write();
 
   private:
 	QPushButton*	_button					= nullptr;
-	PropertyBoolean	_controlled_property;
+	PropertyBoolean	_click_property;
+	PropertyBoolean	_toggle_property;
 	PropertyBoolean	_led_property;
 	QIcon			_icon_on;
 	QIcon			_icon_off;
