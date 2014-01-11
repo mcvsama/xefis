@@ -129,8 +129,16 @@ InstrumentWidget::request_repaint()
 	if (!_paint_requested)
 	{
 		_paint_requested = true;
-		QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (RequestRepaintEvent)));
+		handle_paint_requested();
 	}
+}
+
+
+void
+InstrumentWidget::handle_paint_requested()
+{
+	if (_paint_requested && _visible)
+		QApplication::postEvent (this, new QEvent (static_cast<QEvent::Type> (RequestRepaintEvent)));
 }
 
 
@@ -195,6 +203,23 @@ InstrumentWidget::customEvent (QEvent* event)
 		default:
 			break;
 	}
+}
+
+
+void
+InstrumentWidget::showEvent (QShowEvent* event)
+{
+	_visible = true;
+	QWidget::showEvent (event);
+	handle_paint_requested();
+}
+
+
+void
+InstrumentWidget::hideEvent (QHideEvent* event)
+{
+	_visible = false;
+	QWidget::hideEvent (event);
 }
 
 } // namespace Xefis

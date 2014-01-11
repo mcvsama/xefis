@@ -135,6 +135,13 @@ class InstrumentWidget: public QWidget
 	request_repaint();
 
 	/**
+	 * If paint was requested, post async event to self
+	 * telling to wake up painting thread.
+	 */
+	void
+	handle_paint_requested();
+
+	/**
 	 * Pass params to painter object queue.
 	 * Default implementation does nothing.
 	 * \threadsafe
@@ -155,6 +162,14 @@ class InstrumentWidget: public QWidget
 	void
 	customEvent (QEvent*) override;
 
+	// QWidget API
+	void
+	showEvent (QShowEvent*) override;
+
+	// QWidget API
+	void
+	hideEvent (QHideEvent*) override;
+
   private:
 	WorkPerformer*			_work_performer				= nullptr;
 	PaintWorkUnit*			_paint_work_unit			= nullptr;
@@ -166,6 +181,7 @@ class InstrumentWidget: public QWidget
 	bool					_paint_again				= false;
 	bool					_paint_in_progress			= false;
 	bool					_paint_requested			= false;
+	bool					_visible					= false;
 };
 
 
