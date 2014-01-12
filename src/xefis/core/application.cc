@@ -32,6 +32,7 @@
 #include <xefis/core/accounting.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/window_manager.h>
+#include <xefis/core/sound_manager.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
@@ -67,6 +68,7 @@ Application::Application (int& argc, char** argv):
 	_navaid_storage = std::make_unique<NavaidStorage>();
 	_module_manager = std::make_unique<ModuleManager> (this);
 	_window_manager = std::make_unique<WindowManager> (this);
+	_sound_manager = std::make_unique<SoundManager> (this);
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
 	_work_performer = std::make_unique<WorkPerformer> (Services::detected_cores());
 

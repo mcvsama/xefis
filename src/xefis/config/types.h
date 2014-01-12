@@ -62,5 +62,8 @@ template<class Type>
 template<class Type>
 	using Unique = std::unique_ptr<Type>;
 
+template<class Type>
+	using Weak = std::weak_ptr<Type>;
+
 #endif
 

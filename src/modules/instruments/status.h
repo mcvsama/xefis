@@ -18,7 +18,6 @@
 #include <cstddef>
 
 // Qt:
-#include <QtCore/QProcess>
 #include <QtWidgets/QWidget>
 #include <QtXml/QDomElement>
 
@@ -26,6 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/sound_manager.h>
 
 
 class StatusWidget;
@@ -160,13 +160,6 @@ class Status: public Xefis::Instrument
 	void
 	data_updated() override;
 
-  private slots:
-	/**
-	 * Called when alert command finishes.
-	 */
-	void
-	alert_finished (int exit_code, QProcess::ExitStatus exit_status);
-
   private:
 	/**
 	 * Request alert sound. If it's sounding already,
@@ -177,18 +170,16 @@ class Status: public Xefis::Instrument
 	request_alert();
 
   private:
-	StatusWidget*					_status_widget			= nullptr;
-	Xefis::PropertyBoolean			_button_cursor_up;
-	Xefis::PropertyBoolean			_button_cursor_down;
-	Xefis::PropertyBoolean			_button_cursor_del;
-	Xefis::PropertyBoolean			_button_recall;
-	Xefis::PropertyBoolean			_button_clear;
-	std::list<MessageDefinition>	_messages;
-	bool							_alert_requested		= false;
-	bool							_alert_started			= false;
-	QProcess*						_alert_command;
-	Time							_minimum_display_time	= 5_s;
-	Time							_last_message_timestamp;
+	StatusWidget*						_status_widget			= nullptr;
+	Xefis::PropertyBoolean				_button_cursor_up;
+	Xefis::PropertyBoolean				_button_cursor_down;
+	Xefis::PropertyBoolean				_button_cursor_del;
+	Xefis::PropertyBoolean				_button_recall;
+	Xefis::PropertyBoolean				_button_clear;
+	Weak<Xefis::SoundManager::Sound>	_alert_sound;
+	std::list<MessageDefinition>		_messages;
+	Time								_minimum_display_time	= 5_s;
+	Time								_last_message_timestamp;
 };
 
 
