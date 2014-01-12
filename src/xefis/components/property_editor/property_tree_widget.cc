@@ -52,7 +52,6 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 
 	addTopLevelItem (new PropertyTreeWidgetItem (root_node, this));
 
-	read();
 	setup_appereance();
 
 	_refresh_timer = new QTimer (this);
