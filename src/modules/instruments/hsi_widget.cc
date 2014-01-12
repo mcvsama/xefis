@@ -328,9 +328,9 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_range (painter());
 	paint_hints (painter());
 	paint_trend_vector (painter());
-	paint_pointers (painter());
 	paint_tcas();
 	paint_course (painter());
+	paint_pointers (painter());
 	paint_aircraft (painter());
 }
 
@@ -1141,17 +1141,19 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 			double to_top = -_r - 3.0 * z;
 			double to_bottom = -_r + 12.0 * z;
 
-			painter.drawLine (QPointF (0.0, to_top + delta), QPointF (0.0, to_bottom));
-			painter.drawLine (QPointF (0.0, to_top), QPointF (+z, to_top + 1.4 * z));
-			painter.drawLine (QPointF (0.0, to_top), QPointF (-z, to_top + 1.4 * z));
-			painter.drawLine (QPointF (-2.0 * z, to_bottom - 0.5 * z), QPointF (+2.0 * z, to_bottom - 0.5 * z));
-
 			double from_top = _r - 11.0 * z;
 			double from_bottom = _r + 3.0 * z;
 
-			painter.drawLine (QPointF (0.0, from_top), QPointF (0.0, from_bottom));
-			painter.drawLine (QPointF (-2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
-			painter.drawLine (QPointF (+2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+			painter.add_shadow ([&]() {
+				painter.drawLine (QPointF (0.0, to_top + delta), QPointF (0.0, to_bottom));
+				painter.drawLine (QPointF (0.0, to_top), QPointF (+z, to_top + 1.4 * z));
+				painter.drawLine (QPointF (0.0, to_top), QPointF (-z, to_top + 1.4 * z));
+				painter.drawLine (QPointF (-2.0 * z, to_bottom - 0.5 * z), QPointF (+2.0 * z, to_bottom - 0.5 * z));
+
+				painter.drawLine (QPointF (0.0, from_top), QPointF (0.0, from_bottom));
+				painter.drawLine (QPointF (-2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+				painter.drawLine (QPointF (+2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+			});
 		}
 		else
 		{
@@ -1170,7 +1172,6 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 				<< QPointF (-z, to_bottom)
 				<< QPointF (-z, to_top + 1.2 * z)
 				<< QPointF (0.0, to_top);
-			painter.drawPolyline (top_arrow);
 
 			double from_top = _r - 12.0 * z;
 			double from_bottom = _r;
@@ -1186,7 +1187,11 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 				<< QPointF (-z, from_bottom)
 				<< QPointF (-z, from_top + 1.2 * z)
 				<< QPointF (0.0, from_top);
-			painter.drawPolyline (bottom_arrow);
+
+			painter.add_shadow ([&]() {
+				painter.drawPolyline (top_arrow);
+				painter.drawPolyline (bottom_arrow);
+			});
 		}
 	}
 }
