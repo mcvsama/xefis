@@ -98,16 +98,19 @@ Datatable::Datatable (Xefis::ModuleManager* module_manager, QDomElement const& c
 {
 	QString label_color_str;
 	QString value_color_str;
+	QString align_str;
 
 	parse_settings (config, {
 		{ "label-color", label_color_str, false },
 		{ "value-color", value_color_str, false },
 		{ "label-font-size", _label_font_size, false },
 		{ "value-font-size", _value_font_size, false },
+		{ "align", align_str, false },
 	});
 
 	_default_label_color = Xefis::parse_color (label_color_str);
 	_default_value_color = Xefis::parse_color (value_color_str);
+	_alignment = Xefis::parse_alignment (align_str);
 
 	for (QDomElement e: config)
 		if (e == "table")
@@ -148,8 +151,13 @@ Datatable::paintEvent (QPaintEvent*)
 	value_font.setPixelSize (_value_font_size);
 
 	double line_height = std::max (QFontMetricsF (label_font).height(), QFontMetricsF (value_font).height());
+	double empty_height = height() - line_height * _list.size();
 
-	painter().translate (rect().topLeft());
+	if (_alignment & Qt::AlignVCenter)
+		painter().translate (QPointF (0.0, 0.5 * empty_height));
+	else if (_alignment & Qt::AlignBottom)
+		painter().translate (QPointF (0.0, empty_height));
+
 	for (std::size_t i = 0; i < _list.size(); ++i)
 	{
 		LabelValue const& lv = _list[i];

@@ -39,24 +39,7 @@ Label::Label (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		if (e == "label")
 			_label = e.text();
 		else if (e == "align")
-		{
-			QStringList list = e.text().split (" ");
-			_alignment = 0;
-
-			if (list.contains ("top"))
-				_alignment |= Qt::AlignTop;
-			else if (list.contains ("vcenter"))
-				_alignment |= Qt::AlignVCenter;
-			else if (list.contains ("bottom"))
-				_alignment |= Qt::AlignBottom;
-
-			if (list.contains ("left"))
-				_alignment |= Qt::AlignLeft;
-			else if (list.contains ("hcenter"))
-				_alignment |= Qt::AlignHCenter;
-			else if (list.contains ("right"))
-				_alignment |= Qt::AlignRight;
-		}
+			_alignment = Xefis::parse_alignment (e.text());
 		else if (e == "color")
 			_color = Xefis::parse_color (e.text());
 		else if (e == "font-size")

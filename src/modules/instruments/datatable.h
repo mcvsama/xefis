@@ -78,6 +78,7 @@ class Datatable:
 	double					_value_font_size		= 18.0;
 	QColor					_default_label_color	= { 0xff, 0xff, 0xff };
 	QColor					_default_value_color	= { 0xff, 0xff, 0xff };
+	Qt::Alignment			_alignment				= Qt::AlignTop;
 	std::vector<LabelValue>	_list;
 };
 

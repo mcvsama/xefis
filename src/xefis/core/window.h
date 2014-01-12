@@ -42,10 +42,19 @@ class Window: public QWidget
 {
 	Q_OBJECT
 
-	struct Stack
+	class Stack
 	{
-		PropertyInteger	property;
-		QStackedLayout*	layout;
+	  public:
+		// Ctor
+		Stack (Time delay);
+
+	  public:
+		PropertyInteger			property;
+		Unique<QStackedLayout>	layout;
+		Unique<QTimer>			timer;
+
+	  private:
+		Unique<QWidget>			_black_widget;
 	};
 
 	typedef std::set<Shared<Stack>> Stacks;

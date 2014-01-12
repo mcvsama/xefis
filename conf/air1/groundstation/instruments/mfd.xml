@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<layout type='stack' path='//settings/efis/mfd-mode'>
+	<layout type='stack' path='//settings/efis/mfd-mode' switch-delay='100 ms'>
 		<item>
 			<include name='mfd.eicas.xml'/>
 		</item>

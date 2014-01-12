@@ -39,6 +39,24 @@
 
 namespace Xefis {
 
+Window::Stack::Stack (Time delay)
+{
+	_black_widget = std::make_unique<QWidget>();
+
+	layout = std::make_unique<QStackedLayout>();
+	layout->addWidget (_black_widget.get());
+
+	// This delay is here, because it just looks good:
+	timer = std::make_unique<QTimer>();
+	timer->setSingleShot (true);
+	timer->setInterval (delay.ms());
+
+	QObject::connect (timer.get(), &QTimer::timeout, [&]() {
+		layout->setCurrentIndex (*property + 1);
+	});
+}
+
+
 Window::Window (Application* application, ConfigReader* config_reader, QDomElement const& element):
 	_application (application),
 	_config_reader (config_reader)
@@ -89,8 +107,15 @@ Window::data_updated (Time const&)
 {
 	for (auto stack: _stacks)
 	{
-		if (stack->property.fresh() && stack->property.valid())
-			stack->layout->setCurrentIndex (*stack->property);
+		if (stack->property.valid() && stack->property.fresh())
+		{
+			// Unfresh it:
+			stack->property.read();
+			// First, set black empty widget (the first one).
+			// Then start a timer to show requested layout after a delay.
+			stack->layout->setCurrentIndex (0);
+			stack->timer->start();
+		}
 	}
 }
 
@@ -306,10 +331,14 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 		if (!layout_element.hasAttribute ("path"))
 			throw Exception ("missing @path attribute on <layout type='stack'>");
 
-		stack = std::make_shared<Stack>();
+		Time switch_delay = 0_ms;
+		if (layout_element.hasAttribute ("switch-delay"))
+			switch_delay.parse (layout_element.attribute ("switch-delay").toStdString());
+
+		stack = std::make_shared<Stack> (switch_delay);
 		stack->property.set_path (layout_element.attribute ("path").toStdString());
 		stack->property.set_default (0);
-		new_layout = stack->layout = new QStackedLayout();
+		new_layout = stack->layout.get();
 		_stacks.insert (stack);
 	}
 	else
