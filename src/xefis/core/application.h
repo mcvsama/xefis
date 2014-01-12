@@ -32,6 +32,7 @@ namespace Xefis {
 class NavaidStorage;
 class ModuleManager;
 class WindowManager;
+class SoundManager;
 class ConfigReader;
 class WorkPerformer;
 class ConfiguratorWidget;
@@ -100,6 +101,12 @@ class Application: public QApplication
 	window_manager() const;
 
 	/**
+	 * Return SoundManager object.
+	 */
+	SoundManager*
+	sound_manager() const;
+
+	/**
 	 * Return ConfigReader object.
 	 */
 	ConfigReader*
@@ -165,6 +172,7 @@ class Application: public QApplication
 	Unique<NavaidStorage>			_navaid_storage;
 	Unique<ModuleManager>			_module_manager;
 	Unique<WindowManager>			_window_manager;
+	Unique<SoundManager>			_sound_manager;
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<WorkPerformer>			_work_performer;
@@ -197,6 +205,13 @@ inline WindowManager*
 Application::window_manager() const
 {
 	return _window_manager.get();
+}
+
+
+inline SoundManager*
+Application::sound_manager() const
+{
+	return _sound_manager.get();
 }
 
 

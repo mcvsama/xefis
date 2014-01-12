@@ -19,6 +19,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/application.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/core/sound_manager.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
 
@@ -161,8 +164,6 @@ Status::Status (Xefis::ModuleManager* module_manager, QDomElement const& config)
 					_messages.push_back (MessageDefinition (message_el));
 
 	_status_widget = new StatusWidget (this);
-	_alert_command = new QProcess (this);
-	QObject::connect (_alert_command, SIGNAL (finished (int, QProcess::ExitStatus)), this, SLOT (alert_finished (int, QProcess::ExitStatus)));
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
@@ -232,27 +233,11 @@ Status::data_updated()
 
 
 void
-Status::alert_finished (int, QProcess::ExitStatus)
-{
-	_alert_started = false;
-
-	if (_alert_requested)
-	{
-		_alert_requested = false;
-		request_alert();
-	}
-}
-
-
-void
 Status::request_alert()
 {
-	if (_alert_started)
-		_alert_requested = true;
-	else
-	{
-		_alert_started = true;
-		_alert_command->start ("aplay", { XEFIS_SHARED_DIRECTORY "/sounds/caution.wav" });
-	}
+	auto sptr = _alert_sound.lock();
+
+	if (!sptr || sptr->finished())
+		_alert_sound = module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/caution.wav");
 }
 

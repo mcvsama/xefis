@@ -164,6 +164,12 @@ class Module: private Noncopyable
 	void
 	dump_debug_log();
 
+	/**
+	 * Return ModuleManager owning this module.
+	 */
+	ModuleManager*
+	module_manager() const noexcept;
+
   protected:
 	/**
 	 * Parse the <settings> element and initialize variables.
@@ -295,6 +301,13 @@ inline std::string const&
 Module::instance() const noexcept
 {
 	return _instance;
+}
+
+
+inline ModuleManager*
+Module::module_manager() const noexcept
+{
+	return _module_manager;
 }
 
 } // namespace Xefis
