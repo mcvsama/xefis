@@ -170,7 +170,7 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='16' margin='0 10'>
+				<item stretch-factor='16' margin='10 10 0 10'>
 					<group label='LINK' padding='10 0'>
 						<layout type='horizontal'>
 							<item stretch-factor='18'>
@@ -218,7 +218,7 @@
 							<item>
 								<instrument name='instruments/datatable' instance='gps-info'>
 									<settings>
-										<setting name='label-color' value='#aaa'/>
+										<setting name='label-color' value='#0df'/>
 										<setting name='value-color' value='#fff'/>
 										<setting name='label-font-size' value='16'/>
 										<setting name='value-font-size' value='18'/>
@@ -241,11 +241,11 @@
 											<value path='/aircraft/sensors/gps/type-of-fix' nil='--'/> <!-- -|2D|3D DGPS|PPS|... -->
 										</row>
 										<row>
-											<label>LAT</label>
+											<label>LATITUDE</label>
 											<value path='/aircraft/sensors/gps/latitude.dms' unit='deg' format='%s' nil='--'/>
 										</row>
 										<row>
-											<label>LON</label>
+											<label>LONGITUDE</label>
 											<value path='/aircraft/sensors/gps/longitude.dms' unit='deg' format='%s' nil='--'/>
 										</row>
 									</table>
