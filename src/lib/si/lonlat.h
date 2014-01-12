@@ -82,6 +82,7 @@ class LonLat
 	/**
 	 * Initial bearing when flying orthodrome (great circle path)
 	 * to another point. Final bearing will be: (result + 180_deg) % 360_deg.
+	 * Result is in range [-180_deg, +180_deg].
 	 */
 	Angle
 	initial_bearing (LonLat const& other) const;
