@@ -103,10 +103,11 @@
 		<protocol>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
-					<property bytes='2' path='/input/stick/axis/1' type='float'/>
-					<property bytes='2' path='/input/stick/axis/0' type='float'/>
+					<property bytes='2' path='/input/joystick/axis/1' type='float'/>
+					<property bytes='2' path='/input/joystick/axis/0' type='float'/>
 					<property bytes='2' path='/input/pedals/axis/2' type='float'/>
-					<property bytes='2' path='/input/stick/axis/2' type='float'/>
+					<property bytes='2' path='/input/throttle/axis/3' type='float'/>
+					<property bytes='2' path='/input/throttle/axis/2' type='float'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure'/>
 					<property bytes='4' path='/settings/course/magnetic' type='angle'/>
 					<property bytes='4' path='/settings/cmd/ias' type='speed'/>
