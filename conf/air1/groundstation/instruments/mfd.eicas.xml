@@ -11,15 +11,15 @@
 									<instrument name='instruments/radial-indicator' instance='engine-L-THR'>
 										<settings>
 											<setting name='value.modulo' value='10'/>
-											<setting name='value.minimum' value='-200'/>
-											<setting name='value.maximum' value='800'/>
-											<setting name='value.maximum.warning' value='750'/>
-											<setting name='value.maximum.critical' value='800'/>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='1'/>
+											<setting name='value.maximum.warning' value='0.9'/>
+											<setting name='value.maximum.critical' value='1'/>
 										</settings>
 										<properties path='//aircraft/sensors/engines/1'>
 											<property name='value' path='/thrust'/>
 											<property name='value.reference' path='/thrust.reference' default='520'/>
-											<property name='value.target' path='//input/stick/axis/2'/>
+											<property name='value.target' path='//input/throttle/axis/3'/>
 										</properties>
 									</instrument>
 								</item>
@@ -111,15 +111,15 @@
 									<instrument name='instruments/radial-indicator' instance='engine-R-THR'>
 										<settings>
 											<setting name='value.modulo' value='10'/>
-											<setting name='value.minimum' value='-200'/>
-											<setting name='value.maximum' value='800'/>
-											<setting name='value.maximum.warning' value='750'/>
-											<setting name='value.maximum.critical' value='800'/>
+											<setting name='value.minimum' value='0'/>
+											<setting name='value.maximum' value='1'/>
+											<setting name='value.maximum.warning' value='0.9'/>
+											<setting name='value.maximum.critical' value='1'/>
 										</settings>
 										<properties path='//aircraft/sensors/engines/2'>
 											<property name='value' path='/thrust'/>
 											<property name='value.reference' path='/thrust.reference' default='520'/>
-											<property name='value.target' path='//input/stick/axis/2'/>
+											<property name='value.target' path='//input/throttle/axis/2'/>
 										</properties>
 									</instrument>
 								</item>

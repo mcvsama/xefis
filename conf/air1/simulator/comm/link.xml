@@ -106,7 +106,8 @@
 					<property bytes='2' path='/input/stick-elevator' type='float'/>
 					<property bytes='2' path='/input/stick-ailerons' type='float'/>
 					<property bytes='2' path='/input/pedals' type='float'/>
-					<property bytes='2' path='/input/throttle' type='float'/>
+					<property bytes='2' path='/input/throttle-left' type='float'/>
+					<property bytes='2' path='/input/throttle-right' type='float'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure' retained='true'/>
 					<property bytes='4' path='/settings/course/magnetic' type='angle' retained='true'/>
 					<property bytes='4' path='/settings/cmd/ias' type='speed' retained='true'/>
