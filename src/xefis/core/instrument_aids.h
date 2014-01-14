@@ -114,9 +114,6 @@ class InstrumentAids
 	static int
 	get_digit_width (QFont&);
 
-	static float
-	translate_descent (QFontMetricsF const& smaller_metrics, QFontMetricsF const& bigger_metrics);
-
 	static void
 	centrify (QRectF& rectf);
 
@@ -162,6 +159,7 @@ class InstrumentAids
 	float						_h						= 0.f;
 	float						_window_w				= 0.f;
 	float						_window_h				= 0.f;
+	QRectF						_rect;
 
 	static const char			DIGITS[10];
 	static const char*			MINUS_SIGN;

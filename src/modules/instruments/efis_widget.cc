@@ -2067,8 +2067,8 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 			painter.fast_draw_text (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _params.approach_hint);
 		}
 
-		QString dme_val = QString ("DME %1").arg (_params.dme_distance.nm(), 0, 'f', 1);
-		if (!_params.dme_distance_visible)
+		QString dme_val = QString ("DME %1").arg (_params.approach_distance.nm(), 0, 'f', 1);
+		if (!_params.approach_distance_visible)
 			dme_val = "DME –––";
 		QFont font = _font_10;
 

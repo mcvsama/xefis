@@ -5,6 +5,7 @@
 			<property name='course.setting.magnetic' path='/settings/course/magnetic'/>
 			<property name='course.deviation' path='/systems/vor/deviation'/>
 			<property name='course.to-flag' path='/systems/vor/to-flag'/>
+			<property name='course.distance' path='/systems/vor/distance'/>
 			<property name='pointer.green.primary' path='/systems/vor/reciprocal.magnetic'/>
 			<property name='display-mode' path='/settings/hsi/display-mode/mfd' default='0'/>
 			<property name='range' path='/settings/hsi/range'/>
@@ -35,7 +36,6 @@
 			<property name='track.lateral.delta' path='/systems/nc/track/lateral/delta'/>
 			<property name='wind.from.magnetic' path='/systems/pc/wind/from/magnetic'/>
 			<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
-			<property name='glide-ratio' path='/systems/pc/glide-ratio'/>
 			<property name='tcas.on' path='/settings/tcas/on'/>
 			<property name='tcas.range' path='/settings/tcas/range' default='0.2 nm'/>
 		</properties>

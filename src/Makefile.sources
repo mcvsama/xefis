@@ -121,6 +121,7 @@ SRC_HEADERS += xefis/utility/semaphore.h
 SRC_HEADERS += xefis/utility/serial_port.h
 SRC_HEADERS += xefis/utility/smoother.h
 SRC_HEADERS += xefis/utility/string.h
+SRC_HEADERS += xefis/utility/text_layout.h
 SRC_HEADERS += xefis/utility/text_painter.h
 SRC_HEADERS += xefis/utility/thread.h
 SRC_HEADERS += xefis/utility/time.h
@@ -133,6 +134,7 @@ SRC_SOURCES += xefis/utility/painter.cc
 SRC_SOURCES += xefis/utility/rotary_encoder.cc
 SRC_SOURCES += xefis/utility/semaphore.cc
 SRC_SOURCES += xefis/utility/serial_port.cc
+SRC_SOURCES += xefis/utility/text_layout.cc
 SRC_SOURCES += xefis/utility/text_painter.cc
 SRC_SOURCES += xefis/utility/thread.cc
 

@@ -42,6 +42,7 @@ VOR::VOR (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "output.reciprocal.magnetic", _output_reciprocal_magnetic, false },
 		{ "output.deviation", _output_deviation, true },
 		{ "output.to-flag", _output_to_flag, true },
+		{ "output.distance", _output_distance, true },
 	});
 
 	_vor_computer.set_callback (std::bind (&VOR::compute, this));
@@ -94,6 +95,7 @@ VOR::compute()
 			_output_reciprocal_magnetic.write (normalize (current_radial + 180_deg - declination));
 		_output_to_flag.write (std::abs (denormalize (current_radial - input_radial).deg()) > 90.0);
 		_output_deviation.write (1_deg * _deviation_smoother.process (deviation.deg(), dt));
+		_output_distance.write (station_position.haversine_earth (aircraft_position));
 	}
 	else
 	{

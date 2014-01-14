@@ -65,9 +65,9 @@
 					<directory path='//efis'>
 						<directory path='/approach'>
 							<property name='approach.reference-visible' path='//settings/efis/approach-reference-visible'/>
-							<property name='approach.type-hint' path='/type-hint' default='ILS'/>
+							<property name='approach.type-hint' path='/type-hint' default='VOR'/>
 							<property name='approach.localizer-id' path='/identifier-id' default='RSV'/>
-							<property name='approach.dme-distance' path='/dme-distance' default='5.4 nm'/>
+							<property name='approach.distance' path='//systems/vor/distance'/>
 						</directory>
 						<directory path='/flight-path'>
 							<directory path='/deviation'>
@@ -115,6 +115,7 @@
 					<property name='course.setting.magnetic' path='/settings/course/magnetic'/>
 					<property name='course.deviation' path='/systems/vor/deviation'/>
 					<property name='course.to-flag' path='/systems/vor/to-flag'/>
+					<property name='course.distance' path='/systems/vor/distance'/>
 					<property name='pointer.green.primary' path='/systems/vor/reciprocal.magnetic'/>
 					<property name='display-mode' path='/settings/hsi/display-mode/aux' default='2'/>
 					<property name='range' path='/settings/hsi/range'/>
@@ -145,7 +146,6 @@
 					<property name='track.lateral.delta' path='/systems/nc/track/lateral/delta'/>
 					<property name='wind.from.magnetic' path='/systems/pc/wind/from/magnetic'/>
 					<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
-					<property name='glide-ratio' path='/systems/pc/glide-ratio'/>
 					<property name='tcas.on' path='/settings/tcas/on'/>
 					<property name='tcas.range' path='/settings/tcas/range'/>
 				</properties>
