@@ -17,6 +17,9 @@
 #include <vector>
 #include <cmath>
 
+// Lib:
+#include <boost/format.hpp>
+
 // Qt:
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
@@ -28,6 +31,7 @@
 #include <xefis/core/window.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
+#include <xefis/utility/text_layout.h>
 
 // Local:
 #include "hsi_widget.h"
@@ -252,6 +256,8 @@ HSIWidget::PaintWorkUnit::resized()
 		point.rx() *= +0.5f;
 		point.ry() *= -0.5f;
 	}
+
+	_margin = 0.15 * _q;
 }
 
 
@@ -324,7 +330,6 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_ap_settings (painter());
 	paint_speeds_and_wind (painter());
 	paint_home_direction (painter());
-	paint_climb_glide_ratio (painter());
 	paint_range (painter());
 	paint_hints (painter());
 	paint_trend_vector (painter());
@@ -347,44 +352,22 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 		painter.drawPolyline (_aircraft_shape);
 	});
 
-	painter.translate (0.f, -_r);
+	painter.resetTransform();
+	painter.setClipping (false);
 
 	// AP info: SEL HDG 000
 	if (_params.display_mode == DisplayMode::Auxiliary)
 	{
-		painter.setTransform (_aircraft_center_transform);
-		painter.setClipping (false);
-
 		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
 		if (sel_hdg == 0)
 			sel_hdg = 360;
 
 		// AP heading always set as magnetic, but can be displayed as true:
-		QString text_1 = "SEL HDG";
-		QString text_2 = QString ("%1").arg (sel_hdg, 3, 10, QChar ('0'));
-
-		QFont font_1 (_font_13);
-		QFont font_2 (_font_16);
-		QFontMetricsF metrics_1 (font_1);
-		QFontMetricsF metrics_2 (font_2);
-		QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-		QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
-		rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
-		rect_1.moveLeft (-rect_1.right() - metrics_1.width (" "));
-
-		painter.resetTransform();
-		painter.translate (0.5f * _w - metrics_2.width ("000") - _q, _h - 1.125f * _q);
-		// Background:
-		painter.setPen (Qt::NoPen);
-		painter.setBrush (Qt::black);
-		float a = 0.1 * metrics_2.height();
-		painter.drawRect (rect_1.united (rect_2).adjusted (-a, 0.0, a, 0.0));
-		// Texts:
-		painter.setPen (_autopilot_pen_2);
-		painter.setFont (font_1);
-		painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
-		painter.setFont (font_2);
-		painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+		Xefis::TextLayout layout;
+		layout.set_background (Qt::black, { _margin, 0.0 });
+		layout.add_fragment ("SEL HDG ", _font_13, _autopilot_pen_2.color());
+		layout.add_fragment (QString ("%1").arg (sel_hdg, 3, 10, QChar ('0')), _font_16, _autopilot_pen_2.color());
+		layout.paint (QPointF (0.5 * _w - _q, _h - 0.5 * layout.height()), Qt::AlignBottom | Qt::AlignRight, painter);
 	}
 
 	// MAG/TRUE heading
@@ -401,38 +384,16 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 				QString text_1 =
 					QString (_params.heading_mode == HeadingMode::Magnetic ? "MAG" : "TRU") +
 					QString (_params.center_on_track ? " TRK" : "");
-				QString text_2 = QString ("%1").arg (hdg, 3, 10, QChar ('0'));
-
-				QFont font_1 (_font_13);
-				QFont font_2 (_font_16);
-				QFontMetricsF metrics_1 (font_1);
-				QFontMetricsF metrics_2 (font_2);
-				QRectF rect_1 (0.f, 0.f, metrics_1.width (text_1), metrics_1.height());
-				QRectF rect_2 (0.f, 0.f, metrics_2.width ("000"), metrics_2.height());
-				rect_1.translate (0.f, translate_descent (metrics_1, metrics_2));
-				rect_2.moveLeft (rect_1.right() + metrics_1.width (" "));
-
-				painter.resetTransform();
-				painter.translate (0.5f * _w + _q, _h - 1.125f * _q);
-				// Background:
-				painter.setPen (Qt::NoPen);
-				painter.setBrush (Qt::black);
-				float a = 0.1 * metrics_2.height();
-				painter.drawRect (rect_1.united (rect_2).adjusted (-a, 0.0, a, 0.0));
-				// Texts:
-				painter.setPen (get_pen (_navigation_color, 1.f));
-				painter.setFont (font_1);
-				painter.fast_draw_text (rect_1, Qt::AlignLeft | Qt::AlignBottom, text_1);
-				painter.setFont (font_2);
-				painter.fast_draw_text (rect_2, Qt::AlignRight | Qt::AlignBottom, text_2);
+				QPen box_pen = Qt::NoPen;
 				// True heading is boxed for emphasis:
 				if (_params.heading_mode == HeadingMode::True)
-				{
-					painter.setBrush (Qt::NoBrush);
-					painter.add_shadow ([&]() {
-						painter.drawRect (rect_2.adjusted (-0.1f * _q, 0.f, +0.1f * _q, 0.f));
-					});
-				}
+					box_pen = get_pen (_navigation_color, 1.0);
+
+				Xefis::TextLayout layout;
+				layout.set_background (Qt::black, { _margin, 0.0 });
+				layout.add_fragment (text_1 + " ", _font_13, _navigation_color);
+				layout.add_fragment (QString ("%1").arg (hdg, 3, 10, QChar ('0')), _font_16, _navigation_color, box_pen);
+				layout.paint (QPointF (0.5 * _w + _q, _h - 0.5 * layout.height()), Qt::AlignBottom | Qt::AlignLeft, painter);
 				break;
 			}
 
@@ -484,35 +445,25 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	if (!_params.positioning_hint_visible || !_params.position)
 		return;
 
-	float vplus = translate_descent (QFontMetricsF (_font_13), QFontMetricsF (_font_16));
-	float hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
-	painter.setFont (_font_13);
-	QFontMetricsF metrics (painter.font());
-	QPointF text_hook = QPointF (hplus, _h - 1.125f * _q + vplus);
-	painter.setClipping (false);
 	painter.resetTransform();
-	// Background:
-	QRectF text_box = painter.get_text_box (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
-	painter.setPen (Qt::NoPen);
-	painter.setBrush (Qt::black);
-	float a = 0.1 * metrics.height();
-	painter.drawRect (text_box.adjusted (-a, 0.0, a, 0.0));
-	// Text:
-	painter.setPen (get_pen (_navigation_color, 1.f));
-	painter.fast_draw_text (text_hook, Qt::AlignTop | Qt::AlignHCenter, _params.positioning_hint);
+	painter.setClipping (false);
+
+	double hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
+	QString hint = _params.positioning_hint;
+
 	// Box for emphasis:
-	if (_params.positioning_hint != "" && is_newly_set (_locals.positioning_hint_ts))
+	QPen box_pen = Qt::NoPen;
+	if (is_newly_set (_locals.positioning_hint_ts))
 	{
-		float v = 0.03f * _q;
-		QRectF frame (0.f, 0.f, metrics.width (_params.positioning_hint), metrics.height());
-		frame.moveTo (text_hook + QPointF (0.f, 0.5f * metrics.height()));
-		centrify (frame);
-		frame.adjust (-0.1f * _q, -v, +0.1f * _q, +0.5f * v);
-		painter.setBrush (Qt::NoBrush);
-		painter.add_shadow ([&]() {
-			painter.drawRect (frame);
-		});
+		if (hint == "")
+			hint = "---";
+		box_pen = get_pen (_navigation_color, 1.0);
 	}
+
+	Xefis::TextLayout layout;
+	layout.set_background (Qt::black, { _margin, 0.0 });
+	layout.add_fragment (hint, _font_13, _navigation_color, box_pen);
+	layout.paint (QPointF (hplus, _h - 0.7 * layout.height()), Qt::AlignBottom | Qt::AlignHCenter, painter);
 }
 
 
@@ -805,68 +756,57 @@ HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 {
-	QPen pen = get_pen (Qt::white, 0.6f);
 	QFont font_a = _font_13;
 	QFont font_b = _font_18;
 	QFontMetricsF metr_a (font_a);
 	QFontMetricsF metr_b (font_b);
 
-	// Return width of painter strings:
-	auto paint_speed = [&](QString str, QString val) -> float
-	{
-		QRectF str_rect (0.f, 0.f, metr_a.width (str) * 1.1f, metr_a.height());
-		QRectF val_rect (0.f, 0.f, std::max (metr_b.width ("000"), metr_b.width (val)), metr_b.height());
-		// Correct baseline position:
-		str_rect.translate (0.f, translate_descent (metr_a, metr_b));
-		val_rect.moveLeft (str_rect.right());
+	Xefis::TextLayout layout;
+	layout.set_alignment (Qt::AlignLeft);
 
-		painter.setFont (font_a);
-		painter.fast_draw_text (str_rect, Qt::AlignLeft | Qt::AlignBottom, str);
-		painter.setFont (font_b);
-		painter.fast_draw_text (val_rect, Qt::AlignRight | Qt::AlignBottom, val);
-
-		return str_rect.width() + val_rect.width();
-	};
-
-	float offset = 0;
-
-	painter.resetTransform();
-	painter.translate (0.2f * _q, 0.f);
-	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
-		painter.translate (0.f, 0.15f * _q);
-	painter.setClipping (false);
-	painter.setPen (pen);
-
+	// GS
+	layout.add_fragment ("GS", _font_13, Qt::white);
+	QString gs_str = "---";
 	if (_params.ground_speed_visible)
-		offset = paint_speed ("GS", QString::number (static_cast<int> (_params.ground_speed.kt())));
+		gs_str = QString::number (static_cast<int> (_params.ground_speed.kt()));
+	layout.add_fragment (gs_str, _font_18, Qt::white);
 
+	layout.add_fragment (" ", _font_13, Qt::white);
+
+	// TAS
+	layout.add_fragment ("TAS", _font_13, Qt::white);
+	QString tas_str = "---";
 	if (_params.true_air_speed_visible)
-	{
-		painter.translate (offset * 1.2f, 0.f);
-		paint_speed ("TAS", QString::number (static_cast<int> (_params.true_air_speed.kt())));
-	}
+		tas_str = QString::number (static_cast<int> (_params.true_air_speed.kt()));
+	layout.add_fragment (tas_str, _font_18, Qt::white);
 
+	// Wind data (direction/strength):
 	if (_params.wind_information_visible)
 	{
 		QString wind_str = QString ("%1°/%2")
 			.arg (static_cast<long> (_params.wind_from_magnetic_heading.deg()), 3, 10, QChar ('0'))
 			.arg (static_cast<long> (_params.wind_tas_speed.kt()), 3, 10, QChar (L'\u2007'));
-		painter.resetTransform();
-		painter.translate (0.2f * _q, metr_b.height());
-		if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
-			painter.translate (0.f, 0.15f * _q);
-		painter.setPen (get_pen (Qt::white, 1.0f));
-		painter.fast_draw_text (QPointF (0.f, 0.f), Qt::AlignTop | Qt::AlignLeft, wind_str);
+		layout.add_new_line();
+		layout.add_fragment (wind_str, _font_16, Qt::white);
+	}
 
-		painter.translate (0.8f * _q, 0.8f * _q + metr_b.height());
+	painter.resetTransform();
+	painter.setClipping (false);
+	layout.paint (_rect.topLeft() + QPointF (_margin, 0.0), Qt::AlignTop | Qt::AlignLeft, painter);
+
+	// Wind arrow:
+	if (_params.wind_information_visible)
+	{
+		painter.setPen (get_pen (Qt::white, 0.6f));
+		painter.translate (0.8f * _q + _margin, 0.8f * _q + layout.height());
 		painter.rotate ((_params.wind_from_magnetic_heading - _params.heading_magnetic + 180_deg).deg());
 		painter.setPen (get_pen (Qt::white, 1.0));
 		painter.add_shadow ([&]() {
 			QPointF a = QPointF (0.f, -0.7f * _q);
 			QPointF b = QPointF (0.f, +0.7f * _q);
 			painter.drawLine (a + QPointF (0.f, 0.05f * _q), b);
-			painter.drawLine (a, a + QPointF (+0.15f * _q, +0.15f * _q));
-			painter.drawLine (a, a + QPointF (-0.15f * _q, +0.15f * _q));
+			painter.drawLine (a, a + QPointF (+_margin, +_margin));
+			painter.drawLine (a, a + QPointF (-_margin, +_margin));
 		});
 	}
 }
@@ -882,11 +822,12 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		return;
 
 	QTransform base_transform;
-	base_transform.translate (_w - 0.2 * _q, 0.5f * _h);
+	base_transform.translate (_w - _margin, 0.55f * _h);
 
 	painter.resetTransform();
 	painter.setClipping (false);
 
+	// Home direction arrow:
 	if (_params.home_direction_visible)
 	{
 		bool at_home = _params.home->haversine_earth (*_params.position) < 10_m;
@@ -918,6 +859,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		}
 	}
 
+	// Height/VLOS distance/ground distance:
 	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible || _params.dist_to_home_vert_visible)
 	{
 		float z = 0.99f * _q;
@@ -927,39 +869,35 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (z, -h);
 
-		painter.setPen (get_pen (Qt::white, 1.0));
-		painter.setFont (_font_13);
-		painter.setTransform (base_transform);
+		QColor silver (0xbb, 0xbb, 0xbb);
 
-		if (_params.dist_to_home_vlos_visible)
-		{
-			QString s = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
-			// Cut out the "0.":
-			if (s.left (2) == "0.")
-				s = s.mid (1);
-			painter.fast_draw_text (QPointF (0.f, -1.75f * _q), Qt::AlignRight | Qt::AlignBottom, s);
-		}
+		Xefis::TextLayout layout;
+		layout.set_alignment (Qt::AlignRight);
 
-		if (_params.dist_to_home_ground_visible)
-		{
-			QString s = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
-			// Cut out the "0.":
-			if (s.left (2) == "0.")
-				s = s.mid (1);
-			painter.fast_draw_text (QPointF (0.f, -0.75f * _q), Qt::AlignRight | Qt::AlignTop, s);
-		}
-
+		QString vert_str = "---";
 		if (_params.dist_to_home_vert_visible)
-		{
-			QString s = QString ("%1\u2008↑").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
-			painter.fast_draw_text (QPointF (0.f, -2.4 * _q), Qt::AlignRight | Qt::AlignBottom, s);
-		}
+			vert_str = QString ("%1").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
+		layout.add_fragment ("↑", _font_16, Qt::gray);
+		layout.add_fragment (vert_str, _font_16, Qt::white);
+		layout.add_fragment ("FT", _font_13, silver);
+		layout.add_new_line();
 
-		painter.translate (-z - 0.1f * _q, -_q);
-		painter.setPen (get_pen (Qt::gray, 1.0));
-		painter.add_shadow ([&]() {
-			painter.drawPolyline (distance_triangle);
-		});
+		QString vlos_str = "---";
+		if (_params.dist_to_home_vlos_visible)
+			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
+		layout.add_fragment ("VLOS ", _font_13, Qt::gray);
+		layout.add_fragment (vlos_str, _font_16, Qt::white);
+		layout.add_fragment ("NM", _font_13, silver);
+		layout.add_new_line();
+
+		QString ground_str = "---";
+		if (_params.dist_to_home_ground_visible)
+			ground_str = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
+		layout.add_fragment (ground_str, _font_16, Qt::white);
+		layout.add_fragment ("NM", _font_13, silver);
+
+		painter.setTransform (base_transform);
+		layout.paint (QPointF (0.0, 0.0), Qt::AlignRight | Qt::AlignBottom, painter);
 	}
 }
 
@@ -1094,6 +1032,39 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 		painter.setFont (_font_20);
 		painter.fast_draw_text (position, flags, text);
 	}
+
+	// Navaid info:
+	if (_params.course_distance)
+	{
+		painter.resetTransform();
+		painter.setClipping (false);
+
+		QString navaid_name = "LOL";
+
+		std::string course_str = "/--- ";
+		int course_int = Xefis::symmetric_round (_params.course_setting_magnetic->deg());
+		if (course_int == 0)
+			course_int = 360;
+		if (_params.course_setting_magnetic)
+			course_str = (boost::format ("/%03d°") % course_int).str();
+
+		std::string distance_str = "-----";
+		if (_params.course_distance)
+			distance_str = (boost::format ("%3.1f") % _params.course_distance->nm()).str();
+
+		Xefis::TextLayout layout;
+		layout.set_alignment (Qt::AlignRight);
+		layout.add_fragment (navaid_name, _font_18, _autopilot_pen_2.color());
+		layout.add_fragment (course_str, _font_13, Qt::white);
+		layout.add_new_line();
+		layout.add_fragment ("------", _font_18, Qt::white);
+		layout.add_fragment ("Z", _font_13, Qt::white);
+		layout.add_new_line();
+		layout.add_fragment (distance_str, _font_18, Qt::white);
+		layout.add_fragment ("NM", _font_13, Qt::white);
+
+		layout.paint (_rect.topRight() - QPointF (_margin, 0.0), Qt::AlignTop | Qt::AlignRight, painter);
+	}
 }
 
 
@@ -1194,58 +1165,6 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 			});
 		}
 	}
-}
-
-
-void
-HSIWidget::PaintWorkUnit::paint_climb_glide_ratio (Xefis::Painter& painter)
-{
-	if (!_params.climb_glide_ratio_visible)
-		return;
-
-	_params.climb_glide_ratio = Xefis::limit<float> (_params.climb_glide_ratio, -99, 99);
-
-	QPen pen = get_pen (Qt::white, 0.6f);
-	QFont font_a = _font_13;
-	QFont font_b = _font_18;
-	QFontMetricsF metr_a (font_a);
-	QFontMetricsF metr_b (font_b);
-
-	painter.resetTransform();
-	painter.translate (-0.2f * _q, 0.f);
-	painter.setClipping (false);
-	painter.setPen (pen);
-
-	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
-		painter.translate (0.f, 0.15f * _q);
-
-	QString str, arr, val;
-
-	if (_params.climb_glide_ratio > 0.0)
-	{
-		str = "CR";
-		arr = "↑";
-	}
-	else if (_params.climb_glide_ratio < -0.0)
-	{
-		str = "GR";
-		arr = "↓";
-	}
-	else
-	{
-		str = "CGR";
-		arr = "";
-	}
-
-	if (std::abs (_params.climb_glide_ratio) > 0.0)
-		val = arr + "\u2009" + QString ("%1\u2009˸1").arg (std::abs (static_cast<int> (_params.climb_glide_ratio)), 2, 10, QChar (L'\u2007'));
-	else
-		val = "––";
-
-	painter.setFont (font_a);
-	painter.fast_draw_text (QPointF (_w - metr_b.width ("\u20090000:1"), translate_descent (metr_a, metr_b)), Qt::AlignTop | Qt::AlignRight, str);
-	painter.setFont (font_b);
-	painter.fast_draw_text (QPointF (_w, metr_b.height()), Qt::AlignBottom | Qt::AlignRight, val);
 }
 
 

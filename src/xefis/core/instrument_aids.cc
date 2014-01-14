@@ -73,6 +73,7 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 {
 	_w = size.width();
 	_h = size.height();
+	_rect = QRectF (QPointF (0.0, 0.0), size);
 	_window_w = window_size.width();
 	_window_h = window_size.height();
 
@@ -125,13 +126,6 @@ InstrumentAids::get_digit_width (QFont& font)
 	for (char c: DIGITS)
 		digit_width = std::max (digit_width, font_metrics.width (c));
 	return digit_width;
-}
-
-
-float
-InstrumentAids::translate_descent (QFontMetricsF const& smaller_metrics, QFontMetricsF const& bigger_metrics)
-{
-	return bigger_metrics.height() - bigger_metrics.descent() - smaller_metrics.height() + smaller_metrics.descent();
 }
 
 } // namespace Xefis

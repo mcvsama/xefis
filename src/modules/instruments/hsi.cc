@@ -68,10 +68,10 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "course.setting.magnetic", _course_setting_magnetic, false },
 		{ "course.deviation", _course_deviation, false },
 		{ "course.to-flag", _course_to_flag, false },
+		{ "course.distance", _course_distance, false },
 		{ "wind.from.magnetic", _wind_from_magnetic, false },
 		{ "wind.tas", _wind_speed_tas, false },
 		{ "localizer-id", _localizer_id, false },
-		{ "glide-ratio", _glide_ratio, false },
 		{ "tcas.on", _tcas_on, false },
 		{ "tcas.range", _tcas_range, false },
 	});
@@ -114,6 +114,7 @@ HSI::read()
 	params.course_setting_magnetic = _course_setting_magnetic.get_optional();
 	params.course_deviation = _course_deviation.get_optional();
 	params.course_to_flag = _course_to_flag.get_optional();
+	params.course_distance = _course_distance.get_optional();
 	params.center_on_track = _track_center_on_track.read (true);
 	params.home_direction_visible = _home_true_direction.valid();
 	params.home_track_visible = _home_track_visible.read (false);
@@ -154,8 +155,6 @@ HSI::read()
 	params.highlighted_loc = QString::fromStdString (_localizer_id.read (""));
 	params.positioning_hint_visible = _position_source.valid();
 	params.positioning_hint = QString::fromStdString (*_position_source);
-	params.climb_glide_ratio_visible = _glide_ratio.valid();
-	params.climb_glide_ratio = *_glide_ratio;
 	params.tcas_on = _tcas_on.get_optional();
 	params.tcas_range = _tcas_range.get_optional();
 	params.round_clip = false;

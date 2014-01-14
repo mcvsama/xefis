@@ -73,6 +73,7 @@ class VOR: public Xefis::Module
 	Xefis::PropertyAngle	_output_reciprocal_magnetic;
 	Xefis::PropertyAngle	_output_deviation;
 	Xefis::PropertyBoolean	_output_to_flag;
+	Xefis::PropertyLength	_output_distance;
 };
 
 #endif

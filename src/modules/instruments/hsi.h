@@ -89,10 +89,10 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyAngle	_course_setting_magnetic;
 	Xefis::PropertyAngle	_course_deviation;
 	Xefis::PropertyBoolean	_course_to_flag;
+	Xefis::PropertyLength	_course_distance;
 	Xefis::PropertyAngle	_wind_from_magnetic;
 	Xefis::PropertySpeed	_wind_speed_tas;
 	Xefis::PropertyString	_localizer_id;
-	Xefis::PropertyFloat	_glide_ratio;
 	Xefis::PropertyBoolean	_tcas_on;
 	Xefis::PropertyLength	_tcas_range;
 };

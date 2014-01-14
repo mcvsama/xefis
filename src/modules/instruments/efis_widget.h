@@ -146,8 +146,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		// Approach reference
 		bool				approach_reference_visible			= false;
 		QString				approach_hint;
-		bool				dme_distance_visible				= false;
-		Length				dme_distance						= 0_nm;
+		bool				approach_distance_visible			= false;
+		Length				approach_distance					= 0_nm;
 		bool				localizer_info_visible				= false;
 		QString				localizer_id;
 		Angle				localizer_magnetic_bearing			= 0_deg;

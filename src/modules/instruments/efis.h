@@ -145,7 +145,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean			_approach_reference_visible;
 	Xefis::PropertyString			_approach_type_hint;
 	Xefis::PropertyString			_approach_localizer_id;
-	Xefis::PropertyLength			_approach_dme_distance;
+	Xefis::PropertyLength			_approach_distance;
 	// Flight path deviation
 	Xefis::PropertyBoolean			_flight_path_deviation_lateral_serviceable;
 	Xefis::PropertyAngle			_flight_path_deviation_lateral_app;

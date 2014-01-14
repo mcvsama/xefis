@@ -7,11 +7,12 @@
 			<property name='input.station.longitude' path='/systems/rcms/home/longitude'/>
 			<property name='input.aircraft.latitude' path='/systems/nc/position/latitude'/>
 			<property name='input.aircraft.longitude' path='/systems/nc/position/longitude'/>
-			<property name='input.radial.magnetic' path='/settings/course/magnetic' default='0 deg'/>
+			<property name='input.radial.magnetic' path='/settings/course/magnetic'/>
 			<property name='output.radial.magnetic' path='/systems/vor/radial.magnetic'/>
 			<property name='output.reciprocal.magnetic' path='/systems/vor/reciprocal.magnetic'/>
 			<property name='output.deviation' path='/systems/vor/deviation'/>
 			<property name='output.to-flag' path='/systems/vor/to-flag'/>
+			<property name='output.distance' path='/systems/vor/distance'/>
 		</properties>
 	</module>
 </xefis-include>

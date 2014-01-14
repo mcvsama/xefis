@@ -95,6 +95,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Optional<Angle>		course_setting_magnetic;
 		Optional<Angle>		course_deviation;
 		Optional<bool>		course_to_flag;
+		Optional<Length>	course_distance;
 		bool				center_on_track				= false;
 		bool				home_direction_visible		= false;
 		bool				home_track_visible			= false;
@@ -129,8 +130,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString				highlighted_loc;
 		bool				positioning_hint_visible	= false;
 		QString				positioning_hint;
-		bool				climb_glide_ratio_visible	= false;
-		float				climb_glide_ratio			= 0.0;
 		Optional<bool>		tcas_on;
 		Optional<Length>	tcas_range;
 		bool				round_clip					= false;
@@ -214,9 +213,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_pointers (Xefis::Painter&);
 
 		void
-		paint_climb_glide_ratio (Xefis::Painter&);
-
-		void
 		paint_range (Xefis::Painter&);
 
 		void
@@ -263,6 +259,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					_recalculation_needed		= true;
 		float					_r;
 		float					_q;
+		float					_margin;
 		QTransform				_aircraft_center_transform;
 		QTransform				_heading_transform;
 		QTransform				_track_transform;
