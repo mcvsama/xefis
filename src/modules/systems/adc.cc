@@ -402,11 +402,12 @@ AirDataComputer::compute_mach()
 		{
 			// If Mach turned out to be > 1, try to converge M from the second formula.
 			// Limit iterations to 100.
-			Xefis::Convergence<double> super_mach (1e-9, 100, [&](double M) {
-				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M * M), 2.5));
+			Optional<double> mach = Xefis::converge<double> (M, 1e-9, 100, [&](double M_it) {
+				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M_it * M_it), 2.5));
 			});
-			if (super_mach.converge (M))
-				_speed_mach.write (super_mach.result());
+
+			if (mach)
+				_speed_mach.write (*mach);
 			else
 			{
 				log() << "Mach number did not converge." << std::endl;

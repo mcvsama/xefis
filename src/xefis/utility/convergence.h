@@ -53,9 +53,17 @@ template<class tValueType>
 		ValueType
 		result() const noexcept;
 
+		/**
+		 * Return number of iterations that was needed
+		 * to compute result.
+		 */
+		unsigned int
+		iterations() const noexcept;
+
 	  private:
 		ValueType		_delta;
 		unsigned int	_max_iterations;
+		unsigned int	_actual_iterations = 0;
 		FormulaFunction	_formula;
 		ValueType		_result;
 	};
@@ -85,7 +93,9 @@ template<class V>
 			rp = rn;
 		}
 		while (delta > _delta && i++ < _max_iterations);
+
 		_result = rn;
+		_actual_iterations = i;
 
 		return delta <= _delta;
 	}
@@ -96,6 +106,28 @@ template<class V>
 	Convergence<V>::result() const noexcept
 	{
 		return _result;
+	}
+
+
+template<class V>
+	inline unsigned int
+	Convergence<V>::iterations() const noexcept
+	{
+		return _actual_iterations;
+	}
+
+
+/**
+ * Simpler API for convergence.
+ */
+template<class ValueType>
+	inline Optional<ValueType>
+	converge (ValueType initial_value, ValueType delta, unsigned int max_iterations, std::function<ValueType (ValueType)> formula) noexcept
+	{
+		Convergence<ValueType> comp (delta, max_iterations, formula);
+		if (comp.converge (initial_value))
+			return comp.result();
+		return {};
 	}
 
 } // namespace Xefis
