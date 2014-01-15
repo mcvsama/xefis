@@ -1042,7 +1042,6 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	if (!_params.navaid_visible)
 		return;
 
-	// Navaid info:
 	painter().resetTransform();
 	painter().setClipping (false);
 
@@ -1093,6 +1092,9 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 void
 HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 {
+	painter().resetTransform();
+	painter().setClipping (false);
+
 	auto configure_layout = [&](Xefis::TextLayout& layout, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
 	{
 		QColor color = Qt::green; //TODO or cyan
