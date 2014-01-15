@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
 
 // Local:
 #include "lonlat_translator.h"
