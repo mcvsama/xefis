@@ -495,39 +495,40 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 			extension = 0.6 * _q;
 		painter.draw_outlined_line (QPointF (0.f, start_point), QPointF (0.f, -_r - extension));
 		painter.setPen (QPen (Qt::white, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
+	}
 
-		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
+	// Scale ticks:
+	auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
+	{
+		Length range;
+		if (ratio == 0.5 && _params.range >= 2_nm)
+			range = 1_nm * std::round (((10.f * ratio * _params.range) / 10.f).nm());
+		else
+			range = ratio * _params.range;
+		float range_tick_vpx = nm_to_px (range);
+		float range_tick_hpx = 0.1f * _q;
+		int precision = 0;
+		if (range < 1_nm)
+			precision = 1;
+		QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', precision);
+		painter.draw_outlined_line (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
+
+		if (draw_text)
 		{
-			Length range;
-			if (ratio == 0.5 && _params.range >= 2_nm)
-				range = 1_nm * std::round (((10.f * ratio * _params.range) / 10.f).nm());
-			else
-				range = ratio * _params.range;
-			float range_tick_vpx = nm_to_px (range);
-			float range_tick_hpx = 0.1f * _q;
-			int precision = 0;
-			if (range < 1_nm)
-				precision = 1;
-			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', precision);
-			painter.draw_outlined_line (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
-
-			if (draw_text)
-			{
-				QRectF half_range_rect (0.f, 0.f, metrics.width (half_range_str), metrics.height());
-				centrify (half_range_rect);
-				half_range_rect.moveRight (-2.f * range_tick_hpx);
-				half_range_rect.translate (0.f, -range_tick_vpx);
-				painter.setFont (font);
-				painter.fast_draw_text (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
-			}
-		};
-
-		paint_range_tick (0.5, true);
-		if (_params.display_mode != DisplayMode::Auxiliary)
-		{
-			paint_range_tick (0.25, false);
-			paint_range_tick (0.75, false);
+			QRectF half_range_rect (0.f, 0.f, metrics.width (half_range_str), metrics.height());
+			centrify (half_range_rect);
+			half_range_rect.moveRight (-2.f * range_tick_hpx);
+			half_range_rect.translate (0.f, -range_tick_vpx);
+			painter.setFont (font);
+			painter.fast_draw_text (half_range_rect, Qt::AlignVCenter | Qt::AlignHCenter, half_range_str);
 		}
+	};
+
+	paint_range_tick (0.5, true);
+	if (_params.display_mode != DisplayMode::Auxiliary)
+	{
+		paint_range_tick (0.25, false);
+		paint_range_tick (0.75, false);
 	}
 
 	if (_params.heading_visible && paint_heading_triangle)
