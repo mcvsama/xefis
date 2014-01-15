@@ -129,6 +129,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
 	_setting_hsi_home_track_visible.set_default (false);
 	_setting_course.set_path ("/settings/course/magnetic");
+	_setting_course_visible.set_path ("/settings/course/visible");
 
 	prepare_efis_settings();
 	prepare_mfd_panels();
@@ -320,10 +321,8 @@ State::solve_pressure()
 void
 State::solve_course()
 {
-	if (_course_visible)
-		_setting_course.write (_course);
-	else
-		_setting_course.set_nil();
+	_setting_course.write (_course);
+	_setting_course_visible.write (_course_visible);
 }
 
 

@@ -144,13 +144,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Angle				control_stick_pitch					= 0_deg;
 		Angle				control_stick_roll					= 0_deg;
 		// Approach reference
-		bool				approach_reference_visible			= false;
-		QString				approach_hint;
-		bool				approach_distance_visible			= false;
-		Length				approach_distance					= 0_nm;
-		bool				localizer_info_visible				= false;
-		QString				localizer_id;
-		Angle				localizer_magnetic_bearing			= 0_deg;
+		bool				navaid_reference_visible			= false;
+		Optional<Angle>		navaid_course_magnetic;
+		QString				navaid_hint;
+		QString				navaid_identifier;
+		Optional<Length>	navaid_distance;
 		// Approach, flight path deviations
 		bool				deviation_vertical_failure			= false;
 		Optional<Angle>		deviation_vertical_approach;

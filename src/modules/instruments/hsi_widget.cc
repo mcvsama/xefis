@@ -335,6 +335,8 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_trend_vector (painter());
 	paint_tcas();
 	paint_course (painter());
+	paint_selected_navaid_info();
+	paint_navaid_info();
 	paint_pointers (painter());
 	paint_aircraft (painter());
 }
@@ -869,8 +871,6 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (z, -h);
 
-		QColor silver (0xbb, 0xbb, 0xbb);
-
 		Xefis::TextLayout layout;
 		layout.set_alignment (Qt::AlignRight);
 
@@ -879,22 +879,22 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 			vert_str = QString ("%1").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
 		layout.add_fragment ("↑", _font_16, Qt::gray);
 		layout.add_fragment (vert_str, _font_16, Qt::white);
-		layout.add_fragment ("FT", _font_13, silver);
+		layout.add_fragment ("FT", _font_13, Qt::white);
 		layout.add_new_line();
 
 		QString vlos_str = "---";
 		if (_params.dist_to_home_vlos_visible)
 			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
-		layout.add_fragment ("VLOS ", _font_13, Qt::gray);
+		layout.add_fragment ("VLOS ", _font_13, Qt::white);
 		layout.add_fragment (vlos_str, _font_16, Qt::white);
-		layout.add_fragment ("NM", _font_13, silver);
+		layout.add_fragment ("NM", _font_13, Qt::white);
 		layout.add_new_line();
 
 		QString ground_str = "---";
 		if (_params.dist_to_home_ground_visible)
 			ground_str = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment (ground_str, _font_16, Qt::white);
-		layout.add_fragment ("NM", _font_13, silver);
+		layout.add_fragment ("NM", _font_13, Qt::white);
 
 		painter.setTransform (base_transform);
 		layout.paint (QPointF (0.0, 0.0), Qt::AlignRight | Qt::AlignBottom, painter);
@@ -905,7 +905,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 {
-	if (!_params.heading_visible || !_params.course_setting_magnetic)
+	if (!_params.heading_visible || !_params.course_setting_magnetic || !_params.course_visible)
 		return;
 
 	painter.setTransform (_aircraft_center_transform);
@@ -1032,38 +1032,94 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 		painter.setFont (_font_20);
 		painter.fast_draw_text (position, flags, text);
 	}
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
+{
+	if (!_params.navaid_visible)
+		return;
 
 	// Navaid info:
-	if (_params.course_distance)
+	painter().resetTransform();
+	painter().setClipping (false);
+
+	std::string course_str = "/---°";
+	if (_params.navaid_course_magnetic)
 	{
-		painter.resetTransform();
-		painter.setClipping (false);
-
-		QString navaid_name = "LOL";
-
-		std::string course_str = "/--- ";
-		int course_int = Xefis::symmetric_round (_params.course_setting_magnetic->deg());
+		int course_int = Xefis::symmetric_round (_params.navaid_course_magnetic->deg());
 		if (course_int == 0)
 			course_int = 360;
-		if (_params.course_setting_magnetic)
-			course_str = (boost::format ("/%03d°") % course_int).str();
+		course_str = (boost::format ("/%03d°") % course_int).str();
+	}
 
-		std::string distance_str = "-----";
-		if (_params.course_distance)
-			distance_str = (boost::format ("%3.1f") % _params.course_distance->nm()).str();
+	std::string eta_str = "-----";
+	if (_params.navaid_eta)
+	{
+		int s_int = _params.navaid_eta->s();
+		eta_str = (boost::format ("%02d%02d") % (s_int / 60) % (s_int % 60)).str();
+	}
 
-		Xefis::TextLayout layout;
-		layout.set_alignment (Qt::AlignRight);
-		layout.add_fragment (navaid_name, _font_18, _autopilot_pen_2.color());
-		layout.add_fragment (course_str, _font_13, Qt::white);
+	std::string distance_str = "---";
+	if (_params.navaid_distance)
+		distance_str = (boost::format ("%3.1f") % _params.navaid_distance->nm()).str();
+
+	Xefis::TextLayout layout;
+	layout.set_alignment (Qt::AlignRight);
+	// If reference name is not empty, format is:
+	//   <reference:green> <identifier>/<course>°
+	// Otherwise:
+	//   <identifier:magenta>/<course>°
+	if (!_params.navaid_reference.isEmpty())
+	{
+		layout.add_fragment (_params.navaid_reference + " ", _font_18, Qt::green);
+		layout.add_fragment (_params.navaid_identifier, _font_18, Qt::white);
+	}
+	else
+		layout.add_fragment (_params.navaid_identifier, _font_18, _autopilot_pen_2.color());
+	layout.add_fragment (course_str, _font_13, Qt::white);
+	layout.add_new_line();
+	layout.add_fragment ("ETA ", _font_13, Qt::white);
+	layout.add_fragment (eta_str, _font_18, Qt::white);
+	layout.add_new_line();
+	layout.add_fragment (distance_str, _font_18, Qt::white);
+	layout.add_fragment ("NM", _font_13, Qt::white);
+	layout.paint (_rect.topRight() - QPointF (_margin, 0.0), Qt::AlignTop | Qt::AlignRight, painter());
+}
+
+
+void
+HSIWidget::PaintWorkUnit::paint_navaid_info()
+{
+	auto configure_layout = [&](Xefis::TextLayout& layout, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
+	{
+		QColor color = Qt::green; //TODO or cyan
+		if (!reference.isEmpty())
+		{
+			layout.add_fragment (reference, _font_16, color);
+			layout.add_new_line();
+		}
+		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, _font_16, color);
 		layout.add_new_line();
-		layout.add_fragment ("------", _font_18, Qt::white);
-		layout.add_fragment ("Z", _font_13, Qt::white);
-		layout.add_new_line();
-		layout.add_fragment (distance_str, _font_18, Qt::white);
-		layout.add_fragment ("NM", _font_13, Qt::white);
+		layout.add_fragment ("DME ", _font_13, Qt::green);
+		layout.add_fragment (distance ? QString::number (distance->nm()) : QString ("---"), _font_16, color);
+	};
 
-		layout.paint (_rect.topRight() - QPointF (_margin, 0.0), Qt::AlignTop | Qt::AlignRight, painter);
+	if (_params.navaid_left_visible)
+	{
+		Xefis::TextLayout left_layout;
+		left_layout.set_alignment (Qt::AlignLeft);
+		configure_layout (left_layout, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
+		left_layout.paint (_rect.bottomLeft() + QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignLeft, painter());
+	}
+
+	if (_params.navaid_right_visible)
+	{
+		Xefis::TextLayout right_layout;
+		right_layout.set_alignment (Qt::AlignRight);
+		configure_layout (right_layout, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
+		right_layout.paint (_rect.bottomRight() - QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignRight, painter());
 	}
 }
 
@@ -1082,16 +1138,16 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 		bool			primary;
 		QColor			color;
 		Optional<Angle>	angle;
+		bool			visible;
 	};
 
 	QColor cyan (0x00, 0xdd, 0xff);
 
-	for (Opts const& opts: { Opts { true, Qt::green, _params.pointer_green_primary },
-							 Opts { false, Qt::green, _params.pointer_green_secondary },
-							 Opts { true, cyan, _params.pointer_cyan_primary },
-							 Opts { false, cyan, _params.pointer_cyan_secondary } })
+	// TODO or cyan:
+	for (Opts const& opts: { Opts { true, Qt::green, _params.navaid_left_reciprocal_magnetic, _params.navaid_left_visible },
+							 Opts { false, Qt::green, _params.navaid_right_reciprocal_magnetic, _params.navaid_right_visible } })
 	{
-		if (!opts.angle)
+		if (!opts.angle || !opts.visible)
 			continue;
 
 		float width = 1.5f;

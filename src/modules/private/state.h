@@ -268,6 +268,7 @@ class State: public Xefis::Module
 	Xefis::PropertyLength				_setting_hsi_range;
 	Xefis::PropertyBoolean				_setting_hsi_home_track_visible;
 	Xefis::PropertyAngle				_setting_course;
+	Xefis::PropertyBoolean				_setting_course_visible;
 	// Other:
 	std::vector<ObservableBase*>		_observables;
 	std::vector<Xefis::RotaryEncoder*>	_rotary_decoders;

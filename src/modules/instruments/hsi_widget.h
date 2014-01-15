@@ -88,14 +88,26 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle				ap_magnetic_heading			= 0_deg;
 		bool				track_visible				= false;
 		Angle				track_magnetic				= 0_deg;
-		Optional<Angle>		pointer_green_primary;
-		Optional<Angle>		pointer_green_secondary;
-		Optional<Angle>		pointer_cyan_primary;
-		Optional<Angle>		pointer_cyan_secondary;
+		bool				course_visible				= false;
 		Optional<Angle>		course_setting_magnetic;
 		Optional<Angle>		course_deviation;
 		Optional<bool>		course_to_flag;
-		Optional<Length>	course_distance;
+		bool				navaid_visible;
+		QString				navaid_identifier;
+		QString				navaid_reference;
+		Optional<Length>	navaid_distance;
+		Optional<Time>		navaid_eta;
+		Optional<Angle>		navaid_course_magnetic;
+		bool				navaid_left_visible;
+		QString				navaid_left_reference;
+		QString				navaid_left_identifier;
+		Optional<Length>	navaid_left_distance;
+		Optional<Angle>		navaid_left_reciprocal_magnetic;
+		bool				navaid_right_visible;
+		QString				navaid_right_reference;
+		QString				navaid_right_identifier;
+		Optional<Length>	navaid_right_distance;
+		Optional<Angle>		navaid_right_reciprocal_magnetic;
 		bool				center_on_track				= false;
 		bool				home_direction_visible		= false;
 		bool				home_track_visible			= false;
@@ -208,6 +220,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 		void
 		paint_course (Xefis::Painter&);
+
+		void
+		paint_selected_navaid_info();
+
+		void
+		paint_navaid_info();
 
 		void
 		paint_pointers (Xefis::Painter&);
