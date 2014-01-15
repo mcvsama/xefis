@@ -16,6 +16,9 @@
 #include <utility>
 #include <cmath>
 
+// Lib:
+#include <boost/format.hpp>
+
 // Qt:
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
@@ -2046,34 +2049,34 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
-	if (_params.approach_reference_visible)
+	if (_params.navaid_reference_visible)
 	{
-		if (_params.localizer_info_visible)
+		QString loc_str = _params.navaid_identifier;
+		if (_params.navaid_course_magnetic)
 		{
-			QString loc_str = QString ("%1/%2°").arg (_params.localizer_id).arg (std::round (Xefis::floored_mod (_params.localizer_magnetic_bearing.deg(), 360.0)));
-			QFont font = _font_10;
-
-			painter.setPen (Qt::white);
-			painter.setFont (font);
-			painter.fast_draw_text (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
+			int course_int = Xefis::symmetric_round (_params.navaid_course_magnetic->deg());
+			if (course_int == 0)
+				course_int = 360;
+			loc_str += QString::fromStdString ((boost::format ("/%03d°") % course_int).str());
 		}
-
-		if (_params.approach_hint != "")
-		{
-			QFont font = _font_16;
-
-			painter.setPen (Qt::white);
-			painter.setFont (font);
-			painter.fast_draw_text (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _params.approach_hint);
-		}
-
-		QString dme_val = QString ("DME %1").arg (_params.approach_distance.nm(), 0, 'f', 1);
-		if (!_params.approach_distance_visible)
-			dme_val = "DME –––";
-		QFont font = _font_10;
 
 		painter.setPen (Qt::white);
-		painter.setFont (font);
+		painter.setFont (_font_10);
+		painter.fast_draw_text (QPointF (-0.24f * wh(), -0.3925f * wh()), Qt::AlignTop | Qt::AlignLeft, loc_str);
+
+		if (_params.navaid_hint != "")
+		{
+			painter.setPen (Qt::white);
+			painter.setFont (_font_16);
+			painter.fast_draw_text (QPointF (-0.24f * wh(), -0.32f * wh()), Qt::AlignTop | Qt::AlignLeft, _params.navaid_hint);
+		}
+
+		QString dme_val = "DME ---";
+		if (_params.navaid_distance)
+			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % _params.navaid_distance->nm()).str());
+
+		painter.setPen (Qt::white);
+		painter.setFont (_font_10);
 		painter.fast_draw_text (QPointF (-0.24f * wh(), -0.36f * wh()), Qt::AlignTop | Qt::AlignLeft, dme_val);
 
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);

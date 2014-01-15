@@ -2,11 +2,6 @@
 <xefis-include>
 	<instrument name='instruments/hsi' instance='mfd'>
 		<properties>
-			<property name='course.setting.magnetic' path='/settings/course/magnetic'/>
-			<property name='course.deviation' path='/systems/vor/deviation'/>
-			<property name='course.to-flag' path='/systems/vor/to-flag'/>
-			<property name='course.distance' path='/systems/vor/distance'/>
-			<property name='pointer.green.primary' path='/systems/vor/reciprocal.magnetic'/>
 			<property name='display-mode' path='/settings/hsi/display-mode/mfd' default='0'/>
 			<property name='range' path='/settings/hsi/range'/>
 			<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>

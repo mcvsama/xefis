@@ -61,14 +61,26 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "track.lateral.magnetic", _track_lateral_magnetic, false },
 		{ "track.lateral.delta", _track_lateral_delta_dpm, false },
 		{ "track.center-on-track", _track_center_on_track, false },
-		{ "pointer.green.primary", _pointer_green_primary, false },
-		{ "pointer.green.secondary", _pointer_green_secondary, false },
-		{ "pointer.cyan.primary", _pointer_cyan_primary, false },
-		{ "pointer.cyan.secondary", _pointer_cyan_secondary, false },
+		{ "course.visible", _course_visible, false },
 		{ "course.setting.magnetic", _course_setting_magnetic, false },
 		{ "course.deviation", _course_deviation, false },
 		{ "course.to-flag", _course_to_flag, false },
-		{ "course.distance", _course_distance, false },
+		{ "navaid.selected.visible", _navaid_visible, false },
+		{ "navaid.selected.reference", _navaid_reference, false },
+		{ "navaid.selected.identifier", _navaid_identifier, false },
+		{ "navaid.selected.distance", _navaid_distance, false },
+		{ "navaid.selected.eta", _navaid_eta, false },
+		{ "navaid.selected.course.magnetic", _navaid_course_magnetic, false },
+		{ "navaid.left.visible", _navaid_left_visible, false },
+		{ "navaid.left.reference", _navaid_left_reference, false },
+		{ "navaid.left.identifier", _navaid_left_identifier, false },
+		{ "navaid.left.distance", _navaid_left_distance, false },
+		{ "navaid.left.reciprocal.magnetic", _navaid_left_reciprocal_magnetic, false },
+		{ "navaid.right.visible", _navaid_right_visible, false },
+		{ "navaid.right.reference", _navaid_right_reference, false },
+		{ "navaid.right.identifier", _navaid_right_identifier, false },
+		{ "navaid.right.distance", _navaid_right_distance, false },
+		{ "navaid.right.reciprocal.magnetic", _navaid_right_reciprocal_magnetic, false },
 		{ "wind.from.magnetic", _wind_from_magnetic, false },
 		{ "wind.tas", _wind_speed_tas, false },
 		{ "localizer-id", _localizer_id, false },
@@ -107,14 +119,26 @@ HSI::read()
 	params.ap_magnetic_heading = *_cmd_heading;
 	params.track_visible = _track_visible.read (false) && _track_lateral_magnetic.valid();
 	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
-	params.pointer_green_primary = _pointer_green_primary.get_optional();
-	params.pointer_green_secondary = _pointer_green_secondary.get_optional();
-	params.pointer_cyan_primary = _pointer_cyan_primary.get_optional();
-	params.pointer_cyan_secondary = _pointer_cyan_secondary.get_optional();
+	params.course_visible = _course_visible.read (false);
 	params.course_setting_magnetic = _course_setting_magnetic.get_optional();
 	params.course_deviation = _course_deviation.get_optional();
 	params.course_to_flag = _course_to_flag.get_optional();
-	params.course_distance = _course_distance.get_optional();
+	params.navaid_visible = _navaid_visible.read (false);
+	params.navaid_identifier = QString::fromStdString (_navaid_identifier.read (""));
+	params.navaid_reference = QString::fromStdString (_navaid_reference.read (""));
+	params.navaid_distance = _navaid_distance.get_optional();
+	params.navaid_eta = _navaid_eta.get_optional();
+	params.navaid_course_magnetic = _navaid_course_magnetic.get_optional();
+	params.navaid_left_visible = _navaid_left_visible.read (false);
+	params.navaid_left_reference = QString::fromStdString (_navaid_left_reference.read (""));
+	params.navaid_left_identifier = QString::fromStdString (_navaid_left_identifier.read (""));
+	params.navaid_left_distance = _navaid_left_distance.get_optional();
+	params.navaid_left_reciprocal_magnetic = _navaid_left_reciprocal_magnetic.get_optional();
+	params.navaid_right_visible = _navaid_right_visible.read (false);
+	params.navaid_right_reference = QString::fromStdString (_navaid_right_reference.read (""));
+	params.navaid_right_identifier = QString::fromStdString (_navaid_right_identifier.read (""));
+	params.navaid_right_distance = _navaid_right_distance.get_optional();
+	params.navaid_right_reciprocal_magnetic = _navaid_right_reciprocal_magnetic.get_optional();
 	params.center_on_track = _track_center_on_track.read (true);
 	params.home_direction_visible = _home_true_direction.valid();
 	params.home_track_visible = _home_track_visible.read (false);

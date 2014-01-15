@@ -142,10 +142,11 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyAngle			_control_stick_pitch;
 	Xefis::PropertyAngle			_control_stick_roll;
 	// Approach information
-	Xefis::PropertyBoolean			_approach_reference_visible;
-	Xefis::PropertyString			_approach_type_hint;
-	Xefis::PropertyString			_approach_localizer_id;
-	Xefis::PropertyLength			_approach_distance;
+	Xefis::PropertyBoolean			_navaid_reference_visible;
+	Xefis::PropertyAngle			_navaid_course_magnetic;
+	Xefis::PropertyString			_navaid_type_hint;
+	Xefis::PropertyString			_navaid_identifier;
+	Xefis::PropertyLength			_navaid_distance;
 	// Flight path deviation
 	Xefis::PropertyBoolean			_flight_path_deviation_lateral_serviceable;
 	Xefis::PropertyAngle			_flight_path_deviation_lateral_app;

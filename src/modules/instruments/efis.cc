@@ -105,10 +105,11 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "control-stick.visible", _control_stick_visible, false },
 		{ "control-stick.pitch", _control_stick_pitch, false },
 		{ "control-stick.roll", _control_stick_roll, false },
-		{ "approach.reference-visible", _approach_reference_visible, false },
-		{ "approach.type-hint", _approach_type_hint, false },
-		{ "approach.localizer-id", _approach_localizer_id, false },
-		{ "approach.distance", _approach_distance, false },
+		{ "navaid.reference-visible", _navaid_reference_visible, false },
+		{ "navaid.course.magnetic", _navaid_course_magnetic, false },
+		{ "navaid.type-hint", _navaid_type_hint, false },
+		{ "navaid.localizer-id", _navaid_identifier, false },
+		{ "navaid.distance", _navaid_distance, false },
 		{ "flight-path.deviation.vertical.serviceable", _flight_path_deviation_vertical_serviceable, false },
 		{ "flight-path.deviation.vertical.app", _flight_path_deviation_vertical_app, false },
 		{ "flight-path.deviation.vertical.fp", _flight_path_deviation_vertical_fp, false },
@@ -273,21 +274,12 @@ EFIS::read()
 	params.control_stick_visible = _control_stick_visible.read (false) && _control_stick_pitch.valid() && _control_stick_roll.valid();
 	params.control_stick_pitch = *_control_stick_pitch;
 	params.control_stick_roll = *_control_stick_roll;
-	// Approach reference
-	params.approach_reference_visible = _approach_reference_visible.read (false);
-	params.approach_hint = QString::fromStdString (_approach_type_hint.read (""));
-	params.approach_distance_visible = _approach_distance.valid();
-	params.approach_distance = *_approach_distance;
-	params.localizer_info_visible = _approach_localizer_id.valid() && _orientation_heading_true.valid() && _orientation_heading_magnetic.valid();
-	params.localizer_id = QString::fromStdString (*_approach_localizer_id);
-	if (params.localizer_info_visible)
-	{
-		Xefis::Navaid const* navaid = navaid_storage()->find_by_id (Xefis::Navaid::LOC, QString::fromStdString (*_approach_localizer_id));
-		if (navaid)
-			params.localizer_magnetic_bearing = *_orientation_heading_magnetic - *_orientation_heading_true + navaid->true_bearing();
-		else
-			params.localizer_magnetic_bearing = 0_deg;
-	}
+	// Approach/navaid reference
+	params.navaid_reference_visible = _navaid_reference_visible.read (false);
+	params.navaid_course_magnetic = _navaid_course_magnetic.get_optional();
+	params.navaid_distance = _navaid_distance.get_optional();
+	params.navaid_hint = QString::fromStdString (_navaid_type_hint.read (""));
+	params.navaid_identifier = QString::fromStdString (*_navaid_identifier);
 	// Approach, flight path deviations
 	params.deviation_vertical_failure = !_flight_path_deviation_vertical_serviceable.read (true);
 	params.deviation_vertical_approach = _flight_path_deviation_vertical_app.get_optional();
@@ -297,7 +289,7 @@ EFIS::read()
 	params.deviation_lateral_flight_path = _flight_path_deviation_lateral_fp.get_optional();
 	params.deviation_mixed_mode = _flight_path_deviation_mixed_mode.read (false);
 	// Raising runway
-	params.runway_visible = _approach_reference_visible.read (false) && _altitude_agl.valid() &&
+	params.runway_visible = _navaid_reference_visible.read (false) && _altitude_agl.valid() &&
 							_flight_path_deviation_lateral_app.valid() && *_altitude_agl <= _raising_runway_visibility;
 	params.runway_position = Xefis::limit<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
 	// Control hint
