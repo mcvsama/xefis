@@ -23,14 +23,20 @@ namespace Xefis {
 void
 TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter) const
 {
+	QPointF lh_corr (0.0, 0.5 * (_metrics.height() - _height));
 	painter.setFont (_font);
 	painter.setPen (QPen (_color, 1.0));
-	painter.fast_draw_text (top_left, Qt::AlignTop | Qt::AlignLeft, _text);
+	painter.fast_draw_text (top_left - lh_corr, Qt::AlignTop | Qt::AlignLeft, _text);
 	painter.setPen (_box_pen);
 	painter.setBrush (Qt::NoBrush);
 	double m = 0.15 * _height;
 	painter.drawRect (QRectF (top_left - QPointF (m, 0.0), QSizeF (_width + 2.0 * m, _height)));
 }
+
+
+TextLayout::Line::Line (double line_height_factor):
+	_line_height_factor (line_height_factor)
+{ }
 
 
 double
@@ -76,7 +82,7 @@ TextLayout::Line::paint (QPointF top_left, TextPainter& painter) const
 void
 TextLayout::add_fragment (QString const& text, QFont const& font, QColor const& color, QPen const& box_pen)
 {
-	_lines.back().add_fragment (Fragment (text, font, color, box_pen));
+	_lines.back().add_fragment (Fragment (text, font, color, box_pen, _line_height_factor));
 }
 
 

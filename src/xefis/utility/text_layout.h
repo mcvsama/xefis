@@ -42,7 +42,7 @@ class TextLayout
 	{
 	  public:
 		// Ctor
-		Fragment (QString const&, QFont const&, QColor const&, QPen const&);
+		Fragment (QString const&, QFont const&, QColor const&, QPen const&, double line_height_factor);
 
 		/**
 		 * Return fragment width.
@@ -77,6 +77,7 @@ class TextLayout
 		double			_width;
 		double			_height;
 		QFontMetricsF	_metrics;
+		double			_line_height_factor;
 	};
 
 	typedef std::vector<Fragment> Fragments;
@@ -87,6 +88,9 @@ class TextLayout
 	class Line
 	{
 	  public:
+		// Ctor
+		Line (double line_height_factor);
+
 		/**
 		 * Compute total width of line - sum of all fragments'
 		 * widths.
@@ -115,6 +119,7 @@ class TextLayout
 
 	  private:
 		Fragments	_fragments;
+		double		_line_height_factor;
 	};
 
 	typedef std::vector<Line> Lines;
@@ -136,6 +141,12 @@ class TextLayout
 	 */
 	void
 	set_background (QBrush, QSizeF margin = { 0.0, 0.0 });
+
+	/**
+	 * Set line height factor.
+	 */
+	void
+	set_line_height_factor (double factor);
 
 	/**
 	 * Add new line to the layout.
@@ -193,19 +204,22 @@ class TextLayout
 	QBrush			_background					= Qt::NoBrush;
 	QSizeF			_background_margin			= { 0.0, 0.0 };
 	Lines			_lines;
+	double			_line_height_factor			= 1.0;
 };
 
 
 inline
-TextLayout::Fragment::Fragment (QString const& text, QFont const& font, QColor const& color, QPen const& box_pen):
+TextLayout::Fragment::Fragment (QString const& text, QFont const& font, QColor const& color, QPen const& box_pen, double line_height_factor):
 	_text (text),
 	_font (font),
 	_color (color),
 	_box_pen (box_pen),
-	_metrics (_font)
+	_metrics (_font),
+	_line_height_factor (line_height_factor)
 {
 	_width = _metrics.width (text);
-	_height = _metrics.height();
+	double const hardcoded_additional_factor = 0.9;
+	_height = _line_height_factor * hardcoded_additional_factor * _metrics.height();
 }
 
 
@@ -260,9 +274,16 @@ TextLayout::set_background (QBrush brush, QSizeF margin)
 
 
 inline void
+TextLayout::set_line_height_factor (double factor)
+{
+	_line_height_factor = factor;
+}
+
+
+inline void
 TextLayout::add_new_line()
 {
-	_lines.emplace_back();
+	_lines.emplace_back (_line_height_factor);
 }
 
 
