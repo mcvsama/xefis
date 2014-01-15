@@ -1054,11 +1054,13 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 		course_str = (boost::format ("/%03d°") % course_int).str();
 	}
 
-	std::string eta_str = "-----";
+	std::string eta_min = "--";
+	std::string eta_sec = "--";
 	if (_params.navaid_eta)
 	{
 		int s_int = _params.navaid_eta->s();
-		eta_str = (boost::format ("%02d%02d") % (s_int / 60) % (s_int % 60)).str();
+		eta_min = (boost::format ("%02d") % (s_int / 60)).str();
+		eta_sec = (boost::format ("%02d") % (s_int % 60)).str();
 	}
 
 	std::string distance_str = "---";
@@ -1073,7 +1075,8 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	//   <identifier:magenta>/<course>°
 	if (!_params.navaid_reference.isEmpty())
 	{
-		layout.add_fragment (_params.navaid_reference + " ", _font_18, Qt::green);
+		layout.add_fragment (_params.navaid_reference, _font_18, Qt::green);
+		layout.add_fragment (" ", _font_10, Qt::white);
 		layout.add_fragment (_params.navaid_identifier, _font_18, Qt::white);
 	}
 	else
@@ -1081,7 +1084,10 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	layout.add_fragment (course_str, _font_13, Qt::white);
 	layout.add_new_line();
 	layout.add_fragment ("ETA ", _font_13, Qt::white);
-	layout.add_fragment (eta_str, _font_18, Qt::white);
+	layout.add_fragment (eta_min, _font_18, Qt::white);
+	layout.add_fragment ("M", _font_13, Qt::white);
+	layout.add_fragment (eta_sec, _font_18, Qt::white);
+	layout.add_fragment ("S", _font_13, Qt::white);
 	layout.add_new_line();
 	layout.add_fragment (distance_str, _font_18, Qt::white);
 	layout.add_fragment ("NM", _font_13, Qt::white);
