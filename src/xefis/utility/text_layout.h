@@ -155,6 +155,14 @@ class TextLayout
 	add_new_line();
 
 	/**
+	 * Add empty lines to the layout.
+	 * \param	font is used to compute empty line height.
+	 * \param	number is number of empty lines to add.
+	 */
+	void
+	add_skips (QFont const& font, unsigned int number);
+
+	/**
 	 * Add text fragment to current line.
 	 */
 	void
