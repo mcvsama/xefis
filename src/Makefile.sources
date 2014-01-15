@@ -184,9 +184,11 @@ SRC_SOURCES += lib/si/time.cc
 ######## /modules/instruments ########
 
 SRC_HEADERS += modules/helpers/lonlat_translator.h
+SRC_HEADERS += modules/helpers/navaid_selector.h
 SRC_HEADERS += modules/helpers/string_translator.h
 
 SRC_SOURCES += modules/helpers/lonlat_translator.cc
+SRC_SOURCES += modules/helpers/navaid_selector.cc
 SRC_SOURCES += modules/helpers/string_translator.cc
 
 ######## /modules/instruments ########
