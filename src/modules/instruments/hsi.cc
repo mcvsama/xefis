@@ -117,8 +117,8 @@ HSI::read()
 	params.ap_heading_visible = _cmd_visible.read (false) && _cmd_heading.valid();
 	params.ap_track_visible = _cmd_track_visible.read (false);
 	params.ap_magnetic_heading = *_cmd_heading;
-	params.track_visible = _track_visible.read (false) && _track_lateral_magnetic.valid();
-	params.track_magnetic = params.track_visible ? *_track_lateral_magnetic : *_orientation_heading_magnetic;
+	params.track_visible = _track_visible.read (false) && (_track_lateral_magnetic.valid() || _orientation_heading_magnetic.valid());
+	params.track_magnetic = _track_lateral_magnetic.read (*_orientation_heading_magnetic);
 	params.course_visible = _course_visible.read (false);
 	params.course_setting_magnetic = _course_setting_magnetic.get_optional();
 	params.course_deviation = _course_deviation.get_optional();
