@@ -225,7 +225,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_selected_navaid_info();
 
 		void
-		paint_navaid_info();
+		paint_tcas_and_navaid_info();
 
 		void
 		paint_pointers (Xefis::Painter&);

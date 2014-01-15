@@ -86,6 +86,17 @@ TextLayout::add_fragment (QString const& text, QFont const& font, QColor const& 
 }
 
 
+void
+TextLayout::add_skips (QFont const& font, unsigned int number)
+{
+	for (unsigned int i = 0; i < number; ++i)
+	{
+		add_new_line();
+		add_fragment ("", font, Qt::white);
+	}
+}
+
+
 double
 TextLayout::width() const
 {

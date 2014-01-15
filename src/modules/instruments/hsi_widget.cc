@@ -336,7 +336,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_tcas();
 	paint_course (painter());
 	paint_selected_navaid_info();
-	paint_navaid_info();
+	paint_tcas_and_navaid_info();
 	paint_pointers (painter());
 	paint_aircraft (painter());
 }
@@ -369,7 +369,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 		layout.set_background (Qt::black, { _margin, 0.0 });
 		layout.add_fragment ("SEL HDG ", _font_13, _autopilot_pen_2.color());
 		layout.add_fragment (QString ("%1").arg (sel_hdg, 3, 10, QChar ('0')), _font_16, _autopilot_pen_2.color());
-		layout.paint (QPointF (0.5 * _w - _q, _h - 0.5 * layout.height()), Qt::AlignBottom | Qt::AlignRight, painter);
+		layout.paint (QPointF (0.5 * _w - _q, _h - 0.1 * layout.height()), Qt::AlignBottom | Qt::AlignRight, painter);
 	}
 
 	// MAG/TRUE heading
@@ -395,7 +395,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 				layout.set_background (Qt::black, { _margin, 0.0 });
 				layout.add_fragment (text_1 + " ", _font_13, _navigation_color);
 				layout.add_fragment (QString ("%1").arg (hdg, 3, 10, QChar ('0')), _font_16, _navigation_color, box_pen);
-				layout.paint (QPointF (0.5 * _w + _q, _h - 0.5 * layout.height()), Qt::AlignBottom | Qt::AlignLeft, painter);
+				layout.paint (QPointF (0.5 * _w + _q, _h - 0.1 * layout.height()), Qt::AlignBottom | Qt::AlignLeft, painter);
 				break;
 			}
 
@@ -450,7 +450,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	painter.resetTransform();
 	painter.setClipping (false);
 
-	double hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.8f * _w : 0.75f * _w;
+	double hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.775f * _w : 0.75f * _w;
 	QString hint = _params.positioning_hint;
 
 	// Box for emphasis:
@@ -465,7 +465,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	Xefis::TextLayout layout;
 	layout.set_background (Qt::black, { _margin, 0.0 });
 	layout.add_fragment (hint, _font_13, _navigation_color, box_pen);
-	layout.paint (QPointF (hplus, _h - 0.7 * layout.height()), Qt::AlignBottom | Qt::AlignHCenter, painter);
+	layout.paint (QPointF (hplus, _h - 1.4 * 0.1 * layout.height()), Qt::AlignBottom | Qt::AlignHCenter, painter);
 }
 
 
@@ -839,21 +839,21 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		painter.translate (-z - 0.1f * _q, _q);
 		if (at_home)
 		{
-			painter.setPen (get_pen (_navigation_color, 1.25));
+			painter.setPen (get_pen (Qt::white, 1.25));
 			float v = 0.35f * z;
 			painter.setBrush (Qt::black);
 			painter.drawEllipse (QRectF (-v, -v, 2.f * v, 2.f * v));
 		}
 		else
 		{
-			painter.setPen (get_pen (_navigation_color, 1.0));
+			painter.setPen (get_pen (Qt::white, 1.0));
 			QPolygonF home_arrow = QPolygonF()
-				<< QPointF (0.f, z)
-				<< QPointF (0.f, 0.2f * -z)
-				<< QPointF (-0.2f * z, 0.6f * -z)
-				<< QPointF (0.f, -z)
-				<< QPointF (+0.2f * z, 0.6f * -z)
-				<< QPointF (0.f, 0.2f * -z);
+				<< QPointF (0.0, z)
+				<< QPointF (0.0, -0.8 * z)
+				<< QPointF (-0.2 * z, -0.8 * z)
+				<< QPointF (0.0, -z)
+				<< QPointF (+0.2 * z, -0.8 * z)
+				<< QPointF (0.0, -0.8 * z);
 			painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
 			painter.add_shadow ([&]() {
 				painter.drawPolyline (home_arrow);
@@ -874,9 +874,9 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 		Xefis::TextLayout layout;
 		layout.set_alignment (Qt::AlignRight);
 
-		QString vert_str = "---";
+		std::string vert_str = "---";
 		if (_params.dist_to_home_vert_visible)
-			vert_str = QString ("%1").arg (static_cast<int> (_params.dist_to_home_vert.ft()));
+			vert_str = (boost::format ("%+d") % static_cast<int> (_params.dist_to_home_vert.ft())).str();
 		layout.add_fragment ("↑", _font_16, Qt::gray);
 		layout.add_fragment (vert_str, _font_16, Qt::white);
 		layout.add_fragment ("FT", _font_13, Qt::white);
@@ -1090,7 +1090,7 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 
 
 void
-HSIWidget::PaintWorkUnit::paint_navaid_info()
+HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 {
 	auto configure_layout = [&](Xefis::TextLayout& layout, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
 	{
@@ -1106,21 +1106,30 @@ HSIWidget::PaintWorkUnit::paint_navaid_info()
 		layout.add_fragment (distance ? QString::number (distance->nm()) : QString ("---"), _font_16, color);
 	};
 
-	if (_params.navaid_left_visible)
+	Xefis::TextLayout left_layout;
+	left_layout.set_alignment (Qt::AlignLeft);
+
+	if (_params.tcas_on && !*_params.tcas_on)
 	{
-		Xefis::TextLayout left_layout;
-		left_layout.set_alignment (Qt::AlignLeft);
-		configure_layout (left_layout, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
-		left_layout.paint (_rect.bottomLeft() + QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignLeft, painter());
+		left_layout.add_fragment ("TCAS", _font_16, _warning_color_2);
+		left_layout.add_new_line();
+		left_layout.add_fragment ("OFF", _font_16, _warning_color_2);
 	}
 
+	left_layout.add_new_line();
+	if (_params.navaid_left_visible)
+		configure_layout (left_layout, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
+	else
+		left_layout.add_skips (_font_16, 3);
+
+	Xefis::TextLayout right_layout;
+	right_layout.set_alignment (Qt::AlignRight);
+
 	if (_params.navaid_right_visible)
-	{
-		Xefis::TextLayout right_layout;
-		right_layout.set_alignment (Qt::AlignRight);
 		configure_layout (right_layout, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
-		right_layout.paint (_rect.bottomRight() - QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignRight, painter());
-	}
+
+	left_layout.paint (_rect.bottomLeft() + QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignLeft, painter());
+	right_layout.paint (_rect.bottomRight() - QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignRight, painter());
 }
 
 
@@ -1509,12 +1518,6 @@ HSIWidget::PaintWorkUnit::paint_tcas()
 {
 	if (!_params.tcas_on)
 		return;
-
-	if (!*_params.tcas_on)
-	{
-		paint_bottom_text (true, 3, _warning_color_2, "TCAS");
-		paint_bottom_text (true, 2, _warning_color_2, "OFF ");
-	}
 
 	painter().setTransform (_aircraft_center_transform);
 	painter().setClipping (false);
