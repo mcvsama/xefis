@@ -19,6 +19,10 @@
 				<maximum>1</maximum>
 			</output>
 		</axis>
+		<!-- Rudder trim -->
+		<axis id='4'>
+			<center>0.002594</center>
+		</axis>
 	</module>
 	<module name='io/joystick' instance='joystick'>
 		<device>/dev/input/by-id/usb-Thustmaster_Joystick_-_HOTAS_Warthog-joystick</device>
