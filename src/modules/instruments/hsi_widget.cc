@@ -1566,28 +1566,6 @@ HSIWidget::PaintWorkUnit::paint_tcas()
 
 
 void
-HSIWidget::PaintWorkUnit::paint_bottom_text (bool left, unsigned int line_from_bottom, QColor color, QString text)
-{
-	painter().resetTransform();
-	painter().setClipping (false);
-	painter().setFont (_font_16);
-	// Positioning:
-	double z = 0.2f * _q;
-	double h_corr = 0.8;
-	Qt::Alignment alignment = Qt::AlignVCenter | (left ? Qt::AlignLeft : Qt::AlignRight);
-	QFontMetricsF metrics (painter().font());
-	QPointF text_hook = { (left ? z : _w - z), _h - z - line_from_bottom * h_corr * metrics.height() - 0.5 * metrics.height() };
-	QRectF text_box = painter().get_text_box (text_hook, alignment, text);
-	// Paint:
-	painter().setPen (Qt::NoPen);
-	painter().setBrush (Qt::black);
-	painter().drawRect (text_box);
-	painter().setPen (get_pen (color, 1.f));
-	painter().fast_draw_text (text_hook, alignment, text);
-}
-
-
-void
 HSIWidget::PaintWorkUnit::retrieve_navaids()
 {
 	if (!_navaid_storage || !_params.position)

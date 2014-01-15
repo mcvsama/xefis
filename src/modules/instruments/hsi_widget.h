@@ -242,9 +242,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		void
 		paint_tcas();
 
-		void
-		paint_bottom_text (bool left, unsigned int line_from_bottom, QColor, QString text);
-
 		/**
 		 * Retrieve navaids from navaid storage for current aircraft
 		 * position and populate _*_navs variables.
