@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='helpers/navaid-selector'>
+		<properties>
+			<property name='input.selected' path='/settings/navaid/selected' default='0'/>
+			<property name='input.left.reference' path='/systems/navaid/left/reference' default='VOR L'/>
+			<property name='input.left.identifier' path='/systems/navaid/left/identifier' default='ILMA'/>
+			<property name='input.left.radial.magnetic' path='/systems/navaid/left/radial.magnetic' default='20 deg'/>
+			<property name='input.left.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic' default='200 deg'/>
+			<property name='input.left.distance' path='/systems/navaid/left/distance' default='11.3 nm'/>
+			<property name='input.left.eta' path='/systems/navaid/left/eta' default='121 s'/>
+			<property name='input.right.reference' path='/systems/navaid/right/reference' default='VOR R'/>
+			<property name='input.right.identifier' path='/systems/navaid/right/identifier' default='SY'/>
+			<property name='input.right.radial.magnetic' path='/systems/navaid/right/radial.magnetic' default='45 deg'/>
+			<property name='input.right.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic' default='225 deg'/>
+			<property name='input.right.distance' path='/systems/navaid/right/distance' default='143.1 nm'/>
+			<property name='input.right.eta' path='/systems/navaid/right/eta'/>
+			<property name='output.reference' path='/systems/navaid/selected/reference'/>
+			<property name='output.identifier' path='/systems/navaid/selected/identifier'/>
+			<property name='output.radial.magnetic' path='/systems/navaid/selected/radial.magnetic'/>
+			<property name='output.reciprocal.magnetic' path='/systems/navaid/selected/reciprocal.magnetic'/>
+			<property name='output.distance' path='/systems/navaid/selected/distance'/>
+			<property name='output.eta' path='/systems/navaid/selected/eta'/>
+		</properties>
+	</module>
+</xefis-include>
+

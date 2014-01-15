@@ -18,6 +18,7 @@
 		<include name='systems/afcs.xml'/>
 		<include name='systems/vor.xml'/>
 		<include name='helpers/fma.xml'/>
+		<include name='helpers/navaids.xml'/>
 		<include name='helpers/position.xml'/>
 	</modules>
 	<windows>
