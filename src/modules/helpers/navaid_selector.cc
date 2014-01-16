@@ -28,20 +28,27 @@ XEFIS_REGISTER_MODULE_CLASS ("helpers/navaid-selector", NavaidSelector);
 NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	parse_properties (config, {
+	Xefis::ConfigReader::PropertiesParser::PropertiesList properties_list;
+
+	for (std::size_t i = 0; i < MaxInputs; ++i)
+	{
+		QString i_str = QString ("%1").arg (i);
+
+#define XEFIS_SELECTOR_DEF_PROP(str, name) \
+		properties_list.emplace_back ("input." + i_str + "." str, _inputs_##name[i], false)
+
+		XEFIS_SELECTOR_DEF_PROP ("reference", reference);
+		XEFIS_SELECTOR_DEF_PROP ("identifier", identifier);
+		XEFIS_SELECTOR_DEF_PROP ("radial.magnetic", radial_magnetic);
+		XEFIS_SELECTOR_DEF_PROP ("reciprocal.magnetic", reciprocal_magnetic);
+		XEFIS_SELECTOR_DEF_PROP ("distance", distance);
+		XEFIS_SELECTOR_DEF_PROP ("eta", eta);
+
+#undef XEFIS_SELECTOR_DEF_PROP
+	}
+
+	properties_list.insert (properties_list.end(), {
 		{ "input.selected", _selected_input, true },
-		{ "input.left.reference", _input_l_reference, true },
-		{ "input.left.identifier", _input_l_identifier, true },
-		{ "input.left.radial.magnetic", _input_l_radial_magnetic, true },
-		{ "input.left.reciprocal.magnetic", _input_l_reciprocal_magnetic, true },
-		{ "input.left.distance", _input_l_distance, true },
-		{ "input.left.eta", _input_l_eta, true },
-		{ "input.right.reference", _input_r_reference, true },
-		{ "input.right.identifier", _input_r_identifier, true },
-		{ "input.right.radial.magnetic", _input_r_radial_magnetic, true },
-		{ "input.right.reciprocal.magnetic", _input_r_reciprocal_magnetic, true },
-		{ "input.right.distance", _input_r_distance, true },
-		{ "input.right.eta", _input_r_eta, true },
 		{ "output.reference", _output_reference, true },
 		{ "output.identifier", _output_identifier, true },
 		{ "output.radial.magnetic", _output_radial_magnetic, true },
@@ -49,6 +56,8 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 		{ "output.distance", _output_distance, true },
 		{ "output.eta", _output_eta, true },
 	});
+
+	parse_properties (config, properties_list);
 }
 
 
@@ -57,36 +66,48 @@ NavaidSelector::data_updated()
 {
 	if (_selected_input.valid())
 	{
-		int input = Xefis::limit (*_selected_input, 0L, 1L);
 		bool sel_fresh = _selected_input.fresh();
-#define XEFIS_SELECTOR_COPY(name) copy (sel_fresh, input, _input_l_##name, _input_r_##name, _output_##name)
-		XEFIS_SELECTOR_COPY (reference);
-		XEFIS_SELECTOR_COPY (identifier);
-		XEFIS_SELECTOR_COPY (radial_magnetic);
-		XEFIS_SELECTOR_COPY (reciprocal_magnetic);
-		XEFIS_SELECTOR_COPY (distance);
-		XEFIS_SELECTOR_COPY (eta);
+		auto input = *_selected_input;
+
+		if (input < 0 || input > MaxInputs - 1)
+			reset_all();
+		else
+		{
+#define XEFIS_SELECTOR_COPY(name) \
+		copy (sel_fresh, _inputs_##name[input], _output_##name)
+
+			XEFIS_SELECTOR_COPY (reference);
+			XEFIS_SELECTOR_COPY (identifier);
+			XEFIS_SELECTOR_COPY (radial_magnetic);
+			XEFIS_SELECTOR_COPY (reciprocal_magnetic);
+			XEFIS_SELECTOR_COPY (distance);
+			XEFIS_SELECTOR_COPY (eta);
+
 #undef XEFIS_SELECTOR_COPY
+		}
 	}
 	else
-	{
-		_output_reference.set_nil();
-		_output_identifier.set_nil();
-		_output_radial_magnetic.set_nil();
-		_output_reciprocal_magnetic.set_nil();
-		_output_distance.set_nil();
-		_output_eta.set_nil();
-	}
+		reset_all();
+}
+
+
+void
+NavaidSelector::reset_all()
+{
+	_output_reference.set_nil();
+	_output_identifier.set_nil();
+	_output_radial_magnetic.set_nil();
+	_output_reciprocal_magnetic.set_nil();
+	_output_distance.set_nil();
+	_output_eta.set_nil();
 }
 
 
 template<class PropertyType>
 	inline void
-	NavaidSelector::copy (bool selector_fresh, int input, PropertyType& left, PropertyType& right, PropertyType& output)
+	NavaidSelector::copy (bool selector_fresh, PropertyType& input_property, PropertyType& output_property)
 	{
-		if (input == 0)//&& (left.fresh() || selector_fresh))
-			output.copy (left);
-		else// if (right.fresh() || selector_fresh)
-			output.copy (right);
+		if (input_property.configured() && (selector_fresh || input_property.fresh()))
+			output_property.copy (input_property);
 	}
 

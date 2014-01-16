@@ -25,6 +25,8 @@
 
 class NavaidSelector: public Xefis::Module
 {
+	static constexpr int MaxInputs = 8;
+
   public:
 	// Ctor
 	NavaidSelector (Xefis::ModuleManager*, QDomElement const& config);
@@ -35,36 +37,35 @@ class NavaidSelector: public Xefis::Module
 
   private:
 	/**
-	 * Copy left or right property to the output property
-	 * depending on the input value (0 or 1). Also check
-	 * if property we're going to copy from is fresh.
+	 * Set all output properties to nil.
+	 */
+	void
+	reset_all();
+
+	/**
+	 * Copy property to the output property, if input property is fresh,
+	 * or selector property is fresh (selector_fresh is true).
 	 */
 	template<class PropertyType>
 		static void
-		copy (bool selector_fresh, int input, PropertyType& left, PropertyType& right, PropertyType& output);
+		copy (bool selector_fresh, PropertyType& input_property, PropertyType& output_property);
 
   private:
 	// Input:
-	Xefis::PropertyInteger	_selected_input;
-	Xefis::PropertyString	_input_l_reference;
-	Xefis::PropertyString	_input_l_identifier;
-	Xefis::PropertyAngle	_input_l_radial_magnetic;
-	Xefis::PropertyAngle	_input_l_reciprocal_magnetic;
-	Xefis::PropertyLength	_input_l_distance;
-	Xefis::PropertyTime		_input_l_eta;
-	Xefis::PropertyString	_input_r_reference;
-	Xefis::PropertyString	_input_r_identifier;
-	Xefis::PropertyAngle	_input_r_radial_magnetic;
-	Xefis::PropertyAngle	_input_r_reciprocal_magnetic;
-	Xefis::PropertyLength	_input_r_distance;
-	Xefis::PropertyTime		_input_r_eta;
+	Xefis::PropertyInteger							_selected_input;
+	std::array<Xefis::PropertyString, MaxInputs>	_inputs_reference;
+	std::array<Xefis::PropertyString, MaxInputs>	_inputs_identifier;
+	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_radial_magnetic;
+	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_reciprocal_magnetic;
+	std::array<Xefis::PropertyLength, MaxInputs>	_inputs_distance;
+	std::array<Xefis::PropertyTime, MaxInputs>		_inputs_eta;
 	// Output:
-	Xefis::PropertyString	_output_reference;
-	Xefis::PropertyString	_output_identifier;
-	Xefis::PropertyAngle	_output_radial_magnetic;
-	Xefis::PropertyAngle	_output_reciprocal_magnetic;
-	Xefis::PropertyLength	_output_distance;
-	Xefis::PropertyTime		_output_eta;
+	Xefis::PropertyString							_output_reference;
+	Xefis::PropertyString							_output_identifier;
+	Xefis::PropertyAngle							_output_radial_magnetic;
+	Xefis::PropertyAngle							_output_reciprocal_magnetic;
+	Xefis::PropertyLength							_output_distance;
+	Xefis::PropertyTime								_output_eta;
 };
 
 #endif
