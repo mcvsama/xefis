@@ -138,20 +138,6 @@ class State: public Xefis::Module
 			Callback					_callback;
 		};
 
-	/**
-	 * Observable that watches boolean momentary switch,
-	 * and switches another boolean property in latching way.
-	 */
-	class Switch: public Observable<Xefis::PropertyBoolean>
-	{
-	  public:
-		// Ctor
-		Switch (std::string const& momentary_path, std::string const& latching_path);
-
-	  private:
-		Xefis::PropertyBoolean	_latching_prop;
-	};
-
   public:
 	State (Xefis::ModuleManager* module_manager, QDomElement const& config);
 

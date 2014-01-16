@@ -54,17 +54,6 @@ template<class P>
 	}
 
 
-State::Switch::Switch (std::string const& momentary_path, std::string const& latching_path):
-	Observable (momentary_path),
-	_latching_prop (latching_path)
-{
-	set_callback ([this](Xefis::PropertyBoolean& momentary_prop) {
-		if (*momentary_prop)
-			_latching_prop.write (!*_latching_prop);
-	});
-}
-
-
 State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
