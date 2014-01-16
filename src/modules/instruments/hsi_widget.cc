@@ -1196,8 +1196,8 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 				painter.drawLine (QPointF (-2.0 * z, to_bottom - 0.5 * z), QPointF (+2.0 * z, to_bottom - 0.5 * z));
 
 				painter.drawLine (QPointF (0.0, from_top), QPointF (0.0, from_bottom));
-				painter.drawLine (QPointF (-2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
-				painter.drawLine (QPointF (+2.0 * z, from_bottom - 1.3 * z), QPointF (0.0, from_bottom - 2.0 * z));
+				painter.drawLine (QPointF (-2.0 * z, from_bottom - 1.2 * z), QPointF (0.0, from_bottom - 2.05 * z));
+				painter.drawLine (QPointF (+2.0 * z, from_bottom - 1.2 * z), QPointF (0.0, from_bottom - 2.05 * z));
 			});
 		}
 		else
@@ -1205,7 +1205,7 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 			double z = 0.13 * _q;
 
 			double to_top = -_r - 3.0 * z;
-			double to_bottom = -_r + 11.0 * z;
+			double to_bottom = -_r + 10.7 * z;
 			QPolygonF top_arrow = QPolygonF()
 				<< QPointF (0.0, to_top)
 				<< QPointF (+z, to_top + 1.2 * z)
@@ -1219,16 +1219,16 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 				<< QPointF (0.0, to_top);
 
 			double from_top = _r - 12.0 * z;
-			double from_bottom = _r;
+			double from_bottom = _r + 0.3 * z;
 			QPolygonF bottom_arrow = QPolygonF()
 				<< QPointF (0.0, from_top)
 				<< QPointF (+z, from_top + 1.2 * z)
 				<< QPointF (+z, from_bottom)
-				<< QPointF (+2.5 * z, from_bottom + z)
+				<< QPointF (+2.5 * z, from_bottom + 0.7 * z)
 				<< QPointF (+2.5 * z, from_bottom + 2.7 * z)
 				<< QPointF (0.0, from_bottom + 1.7 * z)
 				<< QPointF (-2.5 * z, from_bottom + 2.7 * z)
-				<< QPointF (-2.5 * z, from_bottom + z)
+				<< QPointF (-2.5 * z, from_bottom + 0.7 * z)
 				<< QPointF (-z, from_bottom)
 				<< QPointF (-z, from_top + 1.2 * z)
 				<< QPointF (0.0, from_top);
