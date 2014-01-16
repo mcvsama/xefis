@@ -43,6 +43,8 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 		XEFIS_SELECTOR_DEF_PROP ("reciprocal.magnetic", reciprocal_magnetic);
 		XEFIS_SELECTOR_DEF_PROP ("distance", distance);
 		XEFIS_SELECTOR_DEF_PROP ("eta", eta);
+		XEFIS_SELECTOR_DEF_PROP ("deviation", deviation);
+		XEFIS_SELECTOR_DEF_PROP ("to-flag", to_flag);
 
 #undef XEFIS_SELECTOR_DEF_PROP
 	}
@@ -55,6 +57,8 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 		{ "output.reciprocal.magnetic", _output_reciprocal_magnetic, true },
 		{ "output.distance", _output_distance, true },
 		{ "output.eta", _output_eta, true },
+		{ "output.deviation", _output_deviation, true },
+		{ "output.to-flag", _output_to_flag, true },
 	});
 
 	parse_properties (config, properties_list);
@@ -82,6 +86,8 @@ NavaidSelector::data_updated()
 			XEFIS_SELECTOR_COPY (reciprocal_magnetic);
 			XEFIS_SELECTOR_COPY (distance);
 			XEFIS_SELECTOR_COPY (eta);
+			XEFIS_SELECTOR_COPY (deviation);
+			XEFIS_SELECTOR_COPY (to_flag);
 
 #undef XEFIS_SELECTOR_COPY
 		}
@@ -100,6 +106,8 @@ NavaidSelector::reset_all()
 	_output_reciprocal_magnetic.set_nil();
 	_output_distance.set_nil();
 	_output_eta.set_nil();
+	_output_deviation.set_nil();
+	_output_to_flag.set_nil();
 }
 
 
