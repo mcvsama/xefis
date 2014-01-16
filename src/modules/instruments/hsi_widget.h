@@ -92,18 +92,15 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Optional<Angle>		course_setting_magnetic;
 		Optional<Angle>		course_deviation;
 		Optional<bool>		course_to_flag;
-		bool				navaid_visible;
-		QString				navaid_identifier;
-		QString				navaid_reference;
-		Optional<Length>	navaid_distance;
-		Optional<Time>		navaid_eta;
-		Optional<Angle>		navaid_course_magnetic;
-		bool				navaid_left_visible;
+		QString				navaid_selected_reference;
+		QString				navaid_selected_identifier;
+		Optional<Length>	navaid_selected_distance;
+		Optional<Time>		navaid_selected_eta;
+		Optional<Angle>		navaid_selected_course_magnetic;
 		QString				navaid_left_reference;
 		QString				navaid_left_identifier;
 		Optional<Length>	navaid_left_distance;
 		Optional<Angle>		navaid_left_reciprocal_magnetic;
-		bool				navaid_right_visible;
 		QString				navaid_right_reference;
 		QString				navaid_right_identifier;
 		Optional<Length>	navaid_right_distance;
@@ -165,6 +162,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Angle			track						= 0_deg; // Mag or true, depending on heading mode.
 		Angle			rotation					= 0_deg;
 		QDateTime		positioning_hint_ts			= QDateTime::fromTime_t (0);
+		bool			navaid_selected_visible		= false;
+		bool			navaid_left_visible			= false;
+		bool			navaid_right_visible		= false;
 	};
 
 	class PaintWorkUnit:
