@@ -59,6 +59,8 @@ class NavaidSelector: public Xefis::Module
 	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_reciprocal_magnetic;
 	std::array<Xefis::PropertyLength, MaxInputs>	_inputs_distance;
 	std::array<Xefis::PropertyTime, MaxInputs>		_inputs_eta;
+	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_deviation;
+	std::array<Xefis::PropertyBoolean, MaxInputs>	_inputs_to_flag;
 	// Output:
 	Xefis::PropertyString							_output_reference;
 	Xefis::PropertyString							_output_identifier;
@@ -66,6 +68,8 @@ class NavaidSelector: public Xefis::Module
 	Xefis::PropertyAngle							_output_reciprocal_magnetic;
 	Xefis::PropertyLength							_output_distance;
 	Xefis::PropertyTime								_output_eta;
+	Xefis::PropertyAngle							_output_deviation;
+	Xefis::PropertyBoolean							_output_to_flag;
 };
 
 #endif

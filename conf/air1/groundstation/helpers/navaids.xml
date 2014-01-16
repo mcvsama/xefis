@@ -5,33 +5,49 @@
 			<!-- Input -->
 			<property name='input.selected' path='/settings/navaid/selected-main'/>
 			<!-- Input:0 -->
-			<property name='input.0.reference' path='/systems/navaid/ils/reference'/>
-			<property name='input.0.identifier' path='/systems/navaid/ils/identifier'/>
-			<property name='input.0.radial.magnetic' path='/systems/navaid/ils/radial.magnetic'/>
-			<property name='input.0.reciprocal.magnetic' path='/systems/navaid/ils/reciprocal.magnetic'/>
-			<property name='input.0.distance' path='/systems/navaid/ils/distance'/>
-			<property name='input.0.eta' path='/systems/navaid/ils/eta'/>
+			<directory path='/systems/navaid/ils'>
+				<property name='input.0.reference' path='/reference'/>
+				<property name='input.0.identifier' path='/identifier'/>
+				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.distance' path='/distance'/>
+				<property name='input.0.eta' path='/eta'/>
+				<property name='input.0.deviation' path='/deviation'/>
+				<property name='input.0.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Input:1 -->
-			<property name='input.1.reference' path='/systems/navaid/left/reference'/>
-			<property name='input.1.identifier' path='/systems/navaid/left/identifier'/>
-			<property name='input.1.radial.magnetic' path='/systems/navaid/left/radial.magnetic'/>
-			<property name='input.1.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
-			<property name='input.1.distance' path='/systems/navaid/left/distance'/>
-			<property name='input.1.eta' path='/systems/navaid/left/eta'/>
+			<directory path='/systems/navaid/left'>
+				<property name='input.1.reference' path='/reference'/>
+				<property name='input.1.identifier' path='/identifier'/>
+				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.distance' path='/distance'/>
+				<property name='input.1.eta' path='/eta'/>
+				<property name='input.1.deviation' path='/deviation'/>
+				<property name='input.1.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Input:2 -->
-			<property name='input.2.reference' path='/systems/navaid/right/reference'/>
-			<property name='input.2.identifier' path='/systems/navaid/right/identifier'/>
-			<property name='input.2.radial.magnetic' path='/systems/navaid/right/radial.magnetic'/>
-			<property name='input.2.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
-			<property name='input.2.distance' path='/systems/navaid/right/distance'/>
-			<property name='input.2.eta' path='/systems/navaid/right/eta'/>
+			<directory path='/systems/navaid/right'>
+				<property name='input.2.reference' path='/reference'/>
+				<property name='input.2.identifier' path='/identifier'/>
+				<property name='input.2.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.2.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.2.distance' path='/distance'/>
+				<property name='input.2.eta' path='/eta'/>
+				<property name='input.2.deviation' path='/deviation'/>
+				<property name='input.2.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Output -->
-			<property name='output.reference' path='/systems/navaid/selected/reference'/>
-			<property name='output.identifier' path='/systems/navaid/selected/identifier'/>
-			<property name='output.radial.magnetic' path='/systems/navaid/selected/radial.magnetic'/>
-			<property name='output.reciprocal.magnetic' path='/systems/navaid/selected/reciprocal.magnetic'/>
-			<property name='output.distance' path='/systems/navaid/selected/distance'/>
-			<property name='output.eta' path='/systems/navaid/selected/eta'/>
+			<directory path='/systems/navaid/selected'>
+				<property name='output.reference' path='/reference'/>
+				<property name='output.identifier' path='/identifier'/>
+				<property name='output.radial.magnetic' path='/radial.magnetic'/>
+				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.distance' path='/distance'/>
+				<property name='output.eta' path='/eta'/>
+				<property name='output.deviation' path='/deviation'/>
+				<property name='output.to-flag' path='/to-flag'/>
+			</directory>
 		</properties>
 	</module>
 	<module name='helpers/navaid-selector' instance='left'>
@@ -39,26 +55,38 @@
 			<!-- Input -->
 			<property name='input.selected' path='/settings/navaid/selected-left'/>
 			<!-- Input:0 -->
-			<property name='input.0.reference' path='/systems/vor/left/reference' default='VOR L'/>
-			<property name='input.0.identifier' path='/systems/vor/left/identifier' default='OSOB'/>
-			<property name='input.0.radial.magnetic' path='/systems/vor/left/radial.magnetic'/>
-			<property name='input.0.reciprocal.magnetic' path='/systems/vor/left/reciprocal.magnetic'/>
-			<property name='input.0.distance' path='/systems/vor/left/distance'/>
-			<property name='input.0.eta' path='/systems/vor/left/eta'/>
+			<directory path='/systems/vor/left'>
+				<property name='input.0.reference' path='/reference' default='VOR L'/>
+				<property name='input.0.identifier' path='/identifier' default='OSOB'/>
+				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.distance' path='/distance'/>
+				<property name='input.0.eta' path='/eta'/>
+				<property name='input.0.deviation' path='/deviation'/>
+				<property name='input.0.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Input:1 -->
-			<property name='input.1.reference' path='/systems/vor/home/reference'/>
-			<property name='input.1.identifier' path='/systems/vor/home/identifier' default='HOME'/>
-			<property name='input.1.radial.magnetic' path='/systems/vor/home/radial.magnetic'/>
-			<property name='input.1.reciprocal.magnetic' path='/systems/vor/home/reciprocal.magnetic'/>
-			<property name='input.1.distance' path='/systems/vor/home/distance'/>
-			<property name='input.1.eta' path='/systems/vor/home/eta'/>
+			<directory path='/systems/vor/home'>
+				<property name='input.1.reference' path='/reference'/>
+				<property name='input.1.identifier' path='/identifier' default='HOME'/>
+				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.distance' path='/distance'/>
+				<property name='input.1.eta' path='/eta'/>
+				<property name='input.1.deviation' path='/deviation'/>
+				<property name='input.1.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Output -->
-			<property name='output.reference' path='/systems/navaid/left/reference'/>
-			<property name='output.identifier' path='/systems/navaid/left/identifier'/>
-			<property name='output.radial.magnetic' path='/systems/navaid/left/radial.magnetic'/>
-			<property name='output.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
-			<property name='output.distance' path='/systems/navaid/left/distance'/>
-			<property name='output.eta' path='/systems/navaid/left/eta'/>
+			<directory path='/systems/navaid/left'>
+				<property name='output.reference' path='/reference'/>
+				<property name='output.identifier' path='/identifier'/>
+				<property name='output.radial.magnetic' path='/radial.magnetic'/>
+				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.distance' path='/distance'/>
+				<property name='output.eta' path='/eta'/>
+				<property name='output.deviation' path='/deviation'/>
+				<property name='output.to-flag' path='/to-flag'/>
+			</directory>
 		</properties>
 	</module>
 	<module name='helpers/navaid-selector' instance='right'>
@@ -66,26 +94,38 @@
 			<!-- Input -->
 			<property name='input.selected' path='/settings/navaid/selected-right'/>
 			<!-- Input:0 -->
-			<property name='input.0.reference' path='/systems/vor/right/reference' default='VOR R'/>
-			<property name='input.0.identifier' path='/systems/vor/right/identifier' default='POLA'/>
-			<property name='input.0.radial.magnetic' path='/systems/vor/right/radial.magnetic'/>
-			<property name='input.0.reciprocal.magnetic' path='/systems/vor/right/reciprocal.magnetic'/>
-			<property name='input.0.distance' path='/systems/vor/right/distance'/>
-			<property name='input.0.eta' path='/systems/vor/right/eta'/>
+			<directory path='/systems/vor/right'>
+				<property name='input.0.reference' path='/reference' default='VOR R'/>
+				<property name='input.0.identifier' path='/identifier' default='POLA'/>
+				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.distance' path='/distance'/>
+				<property name='input.0.eta' path='/eta'/>
+				<property name='input.0.deviation' path='/deviation'/>
+				<property name='input.0.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Input:1 -->
-			<property name='input.1.reference' path='/systems/vor/home/reference'/>
-			<property name='input.1.identifier' path='/systems/vor/home/identifier' default='HOME'/>
-			<property name='input.1.radial.magnetic' path='/systems/vor/home/radial.magnetic'/>
-			<property name='input.1.reciprocal.magnetic' path='/systems/vor/home/reciprocal.magnetic'/>
-			<property name='input.1.distance' path='/systems/vor/home/distance'/>
-			<property name='input.1.eta' path='/systems/vor/home/eta'/>
+			<directory path='/systems/vor/home'>
+				<property name='input.1.reference' path='/reference'/>
+				<property name='input.1.identifier' path='/identifier' default='HOME'/>
+				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
+				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.distance' path='/distance'/>
+				<property name='input.1.eta' path='/eta'/>
+				<property name='input.1.deviation' path='/deviation'/>
+				<property name='input.1.to-flag' path='/to-flag'/>
+			</directory>
 			<!-- Output -->
-			<property name='output.reference' path='/systems/navaid/right/reference'/>
-			<property name='output.identifier' path='/systems/navaid/right/identifier'/>
-			<property name='output.radial.magnetic' path='/systems/navaid/right/radial.magnetic'/>
-			<property name='output.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
-			<property name='output.distance' path='/systems/navaid/right/distance'/>
-			<property name='output.eta' path='/systems/navaid/right/eta'/>
+			<directory path='/systems/navaid/right'>
+				<property name='output.reference' path='/reference'/>
+				<property name='output.identifier' path='/identifier'/>
+				<property name='output.radial.magnetic' path='/radial.magnetic'/>
+				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.distance' path='/distance'/>
+				<property name='output.eta' path='/eta'/>
+				<property name='output.deviation' path='/deviation'/>
+				<property name='output.to-flag' path='/to-flag'/>
+			</directory>
 		</properties>
 	</module>
 </xefis-include>
