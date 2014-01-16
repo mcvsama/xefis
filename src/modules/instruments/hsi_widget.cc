@@ -1121,7 +1121,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, _font_16, color);
 		layout.add_new_line();
 		layout.add_fragment ("DME ", _font_13, Qt::green);
-		layout.add_fragment (distance ? QString::number (distance->nm()) : QString ("---"), _font_16, color);
+		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->nm()).str() : std::string ("---"), _font_16, color);
 	};
 
 	Xefis::TextLayout left_layout;
