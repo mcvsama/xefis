@@ -319,6 +319,15 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		_locals.course_heading = Xefis::floored_mod (_locals.course_heading, 360_deg);
 	}
 
+	_locals.navaid_selected_visible = !_params.navaid_selected_reference.isEmpty() || !_params.navaid_selected_identifier.isEmpty() ||
+									  _params.navaid_selected_distance || _params.navaid_selected_eta;
+
+	_locals.navaid_left_visible = !_params.navaid_left_reference.isEmpty() || !_params.navaid_left_identifier.isEmpty() ||
+								  _params.navaid_left_distance || _params.navaid_left_reciprocal_magnetic;
+
+	_locals.navaid_right_visible = !_params.navaid_right_reference.isEmpty() || !_params.navaid_right_identifier.isEmpty() ||
+								  _params.navaid_right_distance || _params.navaid_right_reciprocal_magnetic;
+
 	painter().set_shadow_color (Qt::black);
 	clear_background();
 
@@ -1039,16 +1048,16 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 {
-	if (!_params.navaid_visible)
+	if (!_locals.navaid_selected_visible)
 		return;
 
 	painter().resetTransform();
 	painter().setClipping (false);
 
 	std::string course_str = "/---°";
-	if (_params.navaid_course_magnetic)
+	if (_params.navaid_selected_course_magnetic)
 	{
-		int course_int = Xefis::symmetric_round (_params.navaid_course_magnetic->deg());
+		int course_int = Xefis::symmetric_round (_params.navaid_selected_course_magnetic->deg());
 		if (course_int == 0)
 			course_int = 360;
 		course_str = (boost::format ("/%03d°") % course_int).str();
@@ -1056,16 +1065,16 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 
 	std::string eta_min = "--";
 	std::string eta_sec = "--";
-	if (_params.navaid_eta)
+	if (_params.navaid_selected_eta)
 	{
-		int s_int = _params.navaid_eta->s();
+		int s_int = _params.navaid_selected_eta->s();
 		eta_min = (boost::format ("%02d") % (s_int / 60)).str();
 		eta_sec = (boost::format ("%02d") % (s_int % 60)).str();
 	}
 
 	std::string distance_str = "---";
-	if (_params.navaid_distance)
-		distance_str = (boost::format ("%3.1f") % _params.navaid_distance->nm()).str();
+	if (_params.navaid_selected_distance)
+		distance_str = (boost::format ("%3.1f") % _params.navaid_selected_distance->nm()).str();
 
 	Xefis::TextLayout layout;
 	layout.set_alignment (Qt::AlignRight);
@@ -1073,14 +1082,14 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	//   <reference:green> <identifier>/<course>°
 	// Otherwise:
 	//   <identifier:magenta>/<course>°
-	if (!_params.navaid_reference.isEmpty())
+	if (!_params.navaid_selected_reference.isEmpty())
 	{
-		layout.add_fragment (_params.navaid_reference, _font_18, Qt::green);
+		layout.add_fragment (_params.navaid_selected_reference, _font_18, Qt::green);
 		layout.add_fragment (" ", _font_10, Qt::white);
-		layout.add_fragment (_params.navaid_identifier, _font_18, Qt::white);
+		layout.add_fragment (_params.navaid_selected_identifier, _font_18, Qt::white);
 	}
 	else
-		layout.add_fragment (_params.navaid_identifier, _font_18, _autopilot_pen_2.color());
+		layout.add_fragment (_params.navaid_selected_identifier, _font_18, _autopilot_pen_2.color());
 	layout.add_fragment (course_str, _font_13, Qt::white);
 	layout.add_new_line();
 	layout.add_fragment ("ETA ", _font_13, Qt::white);
@@ -1126,7 +1135,8 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	}
 
 	left_layout.add_new_line();
-	if (_params.navaid_left_visible)
+
+	if (_locals.navaid_left_visible)
 		configure_layout (left_layout, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
 	else
 		left_layout.add_skips (_font_16, 3);
@@ -1134,7 +1144,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	Xefis::TextLayout right_layout;
 	right_layout.set_alignment (Qt::AlignRight);
 
-	if (_params.navaid_right_visible)
+	if (_locals.navaid_right_visible)
 		configure_layout (right_layout, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
 
 	left_layout.paint (_rect.bottomLeft() + QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignLeft, painter());
@@ -1162,8 +1172,8 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 	QColor cyan (0x00, 0xdd, 0xff);
 
 	// TODO or cyan:
-	for (Opts const& opts: { Opts { true, Qt::green, _params.navaid_left_reciprocal_magnetic, _params.navaid_left_visible },
-							 Opts { false, Qt::green, _params.navaid_right_reciprocal_magnetic, _params.navaid_right_visible } })
+	for (Opts const& opts: { Opts { true, Qt::green, _params.navaid_left_reciprocal_magnetic, _locals.navaid_left_visible },
+							 Opts { false, Qt::green, _params.navaid_right_reciprocal_magnetic, _locals.navaid_right_visible } })
 	{
 		if (!opts.angle || !opts.visible)
 			continue;
