@@ -69,15 +69,73 @@
 			<separator/>
 			<stretch/>
 			<item>
+				<group label='NAVAID L/R'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<layout type='vertical' spacing='5'>
+								<item>
+									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-left/button.off' led-property='/panels/mcp/navaid-left/led.off' led-color='green'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='VOR L' click-property='/panels/mcp/navaid-left/button.vor' led-property='/panels/mcp/navaid-left/led.vor' led-color='green'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='HOME' click-property='/panels/mcp/navaid-left/button.home' led-property='/panels/mcp/navaid-left/led.home' led-color='green'/>
+								</item>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='5'>
+								<item>
+									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-right/button.off' led-property='/panels/mcp/navaid-right/led.off' led-color='green'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='VOR R' click-property='/panels/mcp/navaid-right/button.vor' led-property='/panels/mcp/navaid-right/led.vor' led-color='green'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='HOME' click-property='/panels/mcp/navaid-right/button.home' led-property='/panels/mcp/navaid-right/led.home' led-color='green'/>
+								</item>
+							</layout>
+						</item>
+					</layout>
+				</group>
+			</item>
+			<item>
 				<group label='COURSE'>
-					<layout type='vertical' spacing='10'>
+					<layout type='horizontal' spacing='15'>
 						<item>
-							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/settings/course/magnetic.integer'/>
+							<layout type='vertical' spacing='5'>
+								<item>
+									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid/button.off' led-property='/panels/mcp/navaid/led.off' led-color='amber'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='ILS' click-property='/panels/mcp/navaid/button.ils' led-property='/panels/mcp/navaid/led.ils' led-color='green'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='NAV L' click-property='/panels/mcp/navaid/button.vor-l' led-property='/panels/mcp/navaid/led.vor-l' led-color='green'/>
+								</item>
+							</layout>
 						</item>
 						<item>
-							<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' rotate-a-property='/panels/mcp/course-a' rotate-b-property='/panels/mcp/course-b' click-property='/panels/mcp/course-hide'/>
+							<layout type='vertical' spacing='10'>
+								<item>
+									<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/settings/course/magnetic.integer'/>
+								</item>
+								<item>
+									<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' rotate-a-property='/panels/mcp/course-a' rotate-b-property='/panels/mcp/course-b' click-property='/panels/mcp/course-hide'/>
+								</item>
+								<stretch/>
+								<item>
+									<widget type='button' top-label='NAV R' click-property='/panels/mcp/navaid/button.vor-r' led-property='/panels/mcp/navaid/led.vor-r' led-color='green'/>
+								</item>
+							</layout>
 						</item>
-						<stretch/>
 					</layout>
 				</group>
 			</item>
@@ -233,21 +291,32 @@
 			<separator/>
 			<stretch/>
 			<item>
-				<layout type='vertical' spacing='5'>
-					<item>
-						<widget type='button' top-label='EICAS' click-property='/panels/mcp/show-eicas'/>
-					</item>
-					<item>
-						<widget type='button' top-label='ND' click-property='/panels/mcp/show-nd'/>
-					</item>
-					<item>
-						<widget type='button' top-label='CHKL' click-property='/panels/mcp/show-chklst'/>
-					</item>
-					<item>
-						<widget type='button' top-label='ELEC' click-property='/panels/mcp/show-elec'/>
-					</item>
-					<stretch/>
-				</layout>
+				<group label='MFD'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<layout type='vertical' spacing='5'>
+								<item>
+									<widget type='button' top-label='EICAS' click-property='/panels/mcp/show-eicas'/>
+								</item>
+								<item>
+									<widget type='button' top-label='ND' click-property='/panels/mcp/show-nd'/>
+								</item>
+								<stretch/>
+							</layout>
+						</item>
+						<item>
+							<layout type='vertical' spacing='5'>
+								<item>
+									<widget type='button' top-label='CHKL' click-property='/panels/mcp/show-chklst'/>
+								</item>
+								<item>
+									<widget type='button' top-label='ELEC' click-property='/panels/mcp/show-elec'/>
+								</item>
+								<stretch/>
+							</layout>
+						</item>
+					</layout>
+				</group>
 			</item>
 			<stretch/>
 		</layout>

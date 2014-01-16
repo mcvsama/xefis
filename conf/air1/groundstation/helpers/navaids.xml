@@ -1,26 +1,91 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<module name='helpers/navaid-selector'>
+	<module name='helpers/navaid-selector' instance='main'>
 		<properties>
-			<property name='input.selected' path='/settings/navaid/selected' default='0'/>
-			<property name='input.left.reference' path='/systems/navaid/left/reference' default='VOR L'/>
-			<property name='input.left.identifier' path='/systems/navaid/left/identifier' default='ILMA'/>
-			<property name='input.left.radial.magnetic' path='/systems/navaid/left/radial.magnetic' default='20 deg'/>
-			<property name='input.left.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic' default='200 deg'/>
-			<property name='input.left.distance' path='/systems/navaid/left/distance' default='11.3 nm'/>
-			<property name='input.left.eta' path='/systems/navaid/left/eta' default='121 s'/>
-			<property name='input.right.reference' path='/systems/navaid/right/reference' default='VOR R'/>
-			<property name='input.right.identifier' path='/systems/navaid/right/identifier' default='SY'/>
-			<property name='input.right.radial.magnetic' path='/systems/navaid/right/radial.magnetic' default='45 deg'/>
-			<property name='input.right.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic' default='225 deg'/>
-			<property name='input.right.distance' path='/systems/navaid/right/distance' default='143.1 nm'/>
-			<property name='input.right.eta' path='/systems/navaid/right/eta'/>
+			<!-- Input -->
+			<property name='input.selected' path='/settings/navaid/selected-main'/>
+			<!-- Input:0 -->
+			<property name='input.0.reference' path='/systems/navaid/ils/reference'/>
+			<property name='input.0.identifier' path='/systems/navaid/ils/identifier'/>
+			<property name='input.0.radial.magnetic' path='/systems/navaid/ils/radial.magnetic'/>
+			<property name='input.0.reciprocal.magnetic' path='/systems/navaid/ils/reciprocal.magnetic'/>
+			<property name='input.0.distance' path='/systems/navaid/ils/distance'/>
+			<property name='input.0.eta' path='/systems/navaid/ils/eta'/>
+			<!-- Input:1 -->
+			<property name='input.1.reference' path='/systems/navaid/left/reference'/>
+			<property name='input.1.identifier' path='/systems/navaid/left/identifier'/>
+			<property name='input.1.radial.magnetic' path='/systems/navaid/left/radial.magnetic'/>
+			<property name='input.1.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
+			<property name='input.1.distance' path='/systems/navaid/left/distance'/>
+			<property name='input.1.eta' path='/systems/navaid/left/eta'/>
+			<!-- Input:2 -->
+			<property name='input.2.reference' path='/systems/navaid/right/reference'/>
+			<property name='input.2.identifier' path='/systems/navaid/right/identifier'/>
+			<property name='input.2.radial.magnetic' path='/systems/navaid/right/radial.magnetic'/>
+			<property name='input.2.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
+			<property name='input.2.distance' path='/systems/navaid/right/distance'/>
+			<property name='input.2.eta' path='/systems/navaid/right/eta'/>
+			<!-- Output -->
 			<property name='output.reference' path='/systems/navaid/selected/reference'/>
 			<property name='output.identifier' path='/systems/navaid/selected/identifier'/>
 			<property name='output.radial.magnetic' path='/systems/navaid/selected/radial.magnetic'/>
 			<property name='output.reciprocal.magnetic' path='/systems/navaid/selected/reciprocal.magnetic'/>
 			<property name='output.distance' path='/systems/navaid/selected/distance'/>
 			<property name='output.eta' path='/systems/navaid/selected/eta'/>
+		</properties>
+	</module>
+	<module name='helpers/navaid-selector' instance='left'>
+		<properties>
+			<!-- Input -->
+			<property name='input.selected' path='/settings/navaid/selected-left'/>
+			<!-- Input:0 -->
+			<property name='input.0.reference' path='/systems/vor/left/reference' default='VOR L'/>
+			<property name='input.0.identifier' path='/systems/vor/left/identifier' default='OSOB'/>
+			<property name='input.0.radial.magnetic' path='/systems/vor/left/radial.magnetic'/>
+			<property name='input.0.reciprocal.magnetic' path='/systems/vor/left/reciprocal.magnetic'/>
+			<property name='input.0.distance' path='/systems/vor/left/distance'/>
+			<property name='input.0.eta' path='/systems/vor/left/eta'/>
+			<!-- Input:1 -->
+			<property name='input.1.reference' path='/systems/vor/home/reference'/>
+			<property name='input.1.identifier' path='/systems/vor/home/identifier' default='HOME'/>
+			<property name='input.1.radial.magnetic' path='/systems/vor/home/radial.magnetic'/>
+			<property name='input.1.reciprocal.magnetic' path='/systems/vor/home/reciprocal.magnetic'/>
+			<property name='input.1.distance' path='/systems/vor/home/distance'/>
+			<property name='input.1.eta' path='/systems/vor/home/eta'/>
+			<!-- Output -->
+			<property name='output.reference' path='/systems/navaid/left/reference'/>
+			<property name='output.identifier' path='/systems/navaid/left/identifier'/>
+			<property name='output.radial.magnetic' path='/systems/navaid/left/radial.magnetic'/>
+			<property name='output.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
+			<property name='output.distance' path='/systems/navaid/left/distance'/>
+			<property name='output.eta' path='/systems/navaid/left/eta'/>
+		</properties>
+	</module>
+	<module name='helpers/navaid-selector' instance='right'>
+		<properties>
+			<!-- Input -->
+			<property name='input.selected' path='/settings/navaid/selected-right'/>
+			<!-- Input:0 -->
+			<property name='input.0.reference' path='/systems/vor/right/reference' default='VOR R'/>
+			<property name='input.0.identifier' path='/systems/vor/right/identifier' default='POLA'/>
+			<property name='input.0.radial.magnetic' path='/systems/vor/right/radial.magnetic'/>
+			<property name='input.0.reciprocal.magnetic' path='/systems/vor/right/reciprocal.magnetic'/>
+			<property name='input.0.distance' path='/systems/vor/right/distance'/>
+			<property name='input.0.eta' path='/systems/vor/right/eta'/>
+			<!-- Input:1 -->
+			<property name='input.1.reference' path='/systems/vor/home/reference'/>
+			<property name='input.1.identifier' path='/systems/vor/home/identifier' default='HOME'/>
+			<property name='input.1.radial.magnetic' path='/systems/vor/home/radial.magnetic'/>
+			<property name='input.1.reciprocal.magnetic' path='/systems/vor/home/reciprocal.magnetic'/>
+			<property name='input.1.distance' path='/systems/vor/home/distance'/>
+			<property name='input.1.eta' path='/systems/vor/home/eta'/>
+			<!-- Output -->
+			<property name='output.reference' path='/systems/navaid/right/reference'/>
+			<property name='output.identifier' path='/systems/navaid/right/identifier'/>
+			<property name='output.radial.magnetic' path='/systems/navaid/right/radial.magnetic'/>
+			<property name='output.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
+			<property name='output.distance' path='/systems/navaid/right/distance'/>
+			<property name='output.eta' path='/systems/navaid/right/eta'/>
 		</properties>
 	</module>
 </xefis-include>
