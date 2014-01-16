@@ -73,7 +73,7 @@ PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 
 	for (std::size_t i = 0; i < Channels; ++i)
 	{
-		QString i_str  = QString ("%1").arg (i);
+		QString i_str = QString ("%1").arg (i);
 
 		SettingsList channel_settings = {
 			{ "channel." + i_str + ".input.default", _channels[i].input_default, false },
@@ -95,7 +95,7 @@ PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 
 	for (std::size_t i = 0; i < Channels; ++i)
 	{
-		QString i_str  = QString ("%1").arg (i);
+		QString i_str = QString ("%1").arg (i);
 		properties_list.emplace_back ("channel." + i_str, _channels[i].input, false);
 	}
 
