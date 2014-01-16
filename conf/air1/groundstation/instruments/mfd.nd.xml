@@ -7,21 +7,18 @@
 			<property name='course.setting.magnetic' path='/settings/course/magnetic'/>
 			<property name='course.deviation' path='/systems/navaid/selected/deviation'/>
 			<property name='course.to-flag' path='/systems/navaid/selected/to-flag'/>
-			<property name='navaid.selected.visible' path='/systems/navaid/selected/visible' default='true'/>
 			<property name='navaid.selected.reference' path='/systems/navaid/selected/reference'/>
 			<property name='navaid.selected.identifier' path='/systems/navaid/selected/identifier'/>
 			<property name='navaid.selected.distance' path='/systems/navaid/selected/distance'/>
 			<property name='navaid.selected.eta' path='/systems/navaid/selected/eta'/>
 			<property name='navaid.selected.course.magnetic' path='/settings/course/magnetic'/>
-			<property name='navaid.left.visible' path='/systems/navaid/left/visible' default='true'/>
 			<property name='navaid.left.reference' path='/systems/navaid/left/reference'/>
 			<property name='navaid.left.identifier' path='/systems/navaid/left/identifier'/>
-			<property name='navaid.left.reciprocal.magnetic' path='/systems/navaid/selected/reciprocal.magnetic'/>
+			<property name='navaid.left.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
 			<property name='navaid.left.distance' path='/systems/navaid/left/distance'/>
-			<property name='navaid.right.visible' path='/systems/navaid/right/visible' default='true'/>
 			<property name='navaid.right.reference' path='/systems/navaid/right/reference'/>
 			<property name='navaid.right.identifier' path='/systems/navaid/right/identifier'/>
-			<property name='navaid.right.reciprocal.magnetic' path='/systems/navaid/selected/reciprocal.magnetic'/>
+			<property name='navaid.right.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
 			<property name='navaid.right.distance' path='/systems/navaid/right/distance'/>
 			<property name='range' path='/settings/hsi/range'/>
 			<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>
