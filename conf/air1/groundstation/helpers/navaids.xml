@@ -11,6 +11,7 @@
 				<property name='input.0.identifier' path='/identifier'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.0.distance' path='/distance'/>
 				<property name='input.0.eta' path='/eta'/>
 				<property name='input.0.deviation' path='/deviation'/>
@@ -23,6 +24,7 @@
 				<property name='input.1.identifier' path='/identifier'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.1.distance' path='/distance'/>
 				<property name='input.1.eta' path='/eta'/>
 				<property name='input.1.deviation' path='/deviation'/>
@@ -35,6 +37,7 @@
 				<property name='input.2.identifier' path='/identifier'/>
 				<property name='input.2.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.2.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.2.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.2.distance' path='/distance'/>
 				<property name='input.2.eta' path='/eta'/>
 				<property name='input.2.deviation' path='/deviation'/>
@@ -47,6 +50,7 @@
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
 				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='output.distance' path='/distance'/>
 				<property name='output.eta' path='/eta'/>
 				<property name='output.deviation' path='/deviation'/>
@@ -65,6 +69,7 @@
 				<property name='input.0.identifier' path='/identifier' default='OSOB'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.0.distance' path='/distance'/>
 				<property name='input.0.eta' path='/eta'/>
 				<property name='input.0.deviation' path='/deviation'/>
@@ -77,6 +82,7 @@
 				<property name='input.1.identifier' path='/identifier' default='HOME'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.1.distance' path='/distance'/>
 				<property name='input.1.eta' path='/eta'/>
 				<property name='input.1.deviation' path='/deviation'/>
@@ -89,6 +95,7 @@
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
 				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='output.distance' path='/distance'/>
 				<property name='output.eta' path='/eta'/>
 				<property name='output.deviation' path='/deviation'/>
@@ -107,6 +114,7 @@
 				<property name='input.0.identifier' path='/identifier' default='POLA'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.0.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.0.distance' path='/distance'/>
 				<property name='input.0.eta' path='/eta'/>
 				<property name='input.0.deviation' path='/deviation'/>
@@ -119,6 +127,7 @@
 				<property name='input.1.identifier' path='/identifier' default='HOME'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.1.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='input.1.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='input.1.distance' path='/distance'/>
 				<property name='input.1.eta' path='/eta'/>
 				<property name='input.1.deviation' path='/deviation'/>
@@ -131,6 +140,7 @@
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
 				<property name='output.reciprocal.magnetic' path='/reciprocal.magnetic'/>
+				<property name='output.initial-bearing.magnetic' path='/initial-bearing.magnetic'/>
 				<property name='output.distance' path='/distance'/>
 				<property name='output.eta' path='/eta'/>
 				<property name='output.deviation' path='/deviation'/>
