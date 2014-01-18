@@ -302,6 +302,20 @@ template<class tType>
 		operator->() const;
 
 		/**
+		 * Overload for write (Type&);
+		 * \return	*this
+		 */
+		Property<Type>&
+		operator= (Type const&);
+
+		/**
+		 * Overload for write (Optional<Type>&);
+		 * \return	*this
+		 */
+		Property<Type>&
+		operator= (Optional<Type> const&);
+
+		/**
 		 * Write to the property.
 		 * If node can't be found, create it.
 		 * If not possible, throw PropertyPathConflict.
@@ -719,6 +733,24 @@ template<class T>
 			return &get_value_node_signalling()->read();
 		else
 			throw SingularProperty ("can't read from a singular property: " + _path);
+	}
+
+
+template<class T>
+	inline Property<T>&
+	Property<T>::operator= (Type const& value)
+	{
+		write (value);
+		return *this;
+	}
+
+
+template<class T>
+	inline Property<T>&
+	Property<T>::operator= (Optional<Type> const& value)
+	{
+		write (value);
+		return *this;
 	}
 
 
