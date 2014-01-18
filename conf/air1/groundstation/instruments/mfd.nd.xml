@@ -15,12 +15,12 @@
 			<property name='navaid.left.type' path='/systems/navaid/left/type'/>
 			<property name='navaid.left.reference' path='/systems/navaid/left/reference'/>
 			<property name='navaid.left.identifier' path='/systems/navaid/left/identifier'/>
-			<property name='navaid.left.reciprocal.magnetic' path='/systems/navaid/left/reciprocal.magnetic'/>
+			<property name='navaid.left.initial-bearing.magnetic' path='/systems/navaid/left/initial-bearing.magnetic'/>
 			<property name='navaid.left.distance' path='/systems/navaid/left/distance'/>
 			<property name='navaid.right.type' path='/systems/navaid/right/type'/>
 			<property name='navaid.right.reference' path='/systems/navaid/right/reference'/>
 			<property name='navaid.right.identifier' path='/systems/navaid/right/identifier'/>
-			<property name='navaid.right.reciprocal.magnetic' path='/systems/navaid/right/reciprocal.magnetic'/>
+			<property name='navaid.right.initial-bearing.magnetic' path='/systems/navaid/right/initial-bearing.magnetic'/>
 			<property name='navaid.right.distance' path='/systems/navaid/right/distance'/>
 			<property name='range' path='/settings/hsi/range'/>
 			<property name='trend-vector-range' path='/settings/hsi/trend-vector-range'/>

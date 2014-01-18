@@ -323,10 +323,10 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 									  _params.navaid_selected_distance || _params.navaid_selected_eta;
 
 	_locals.navaid_left_visible = !_params.navaid_left_reference.isEmpty() || !_params.navaid_left_identifier.isEmpty() ||
-								  _params.navaid_left_distance || _params.navaid_left_reciprocal_magnetic;
+								  _params.navaid_left_distance || _params.navaid_left_initial_bearing_magnetic;
 
 	_locals.navaid_right_visible = !_params.navaid_right_reference.isEmpty() || !_params.navaid_right_identifier.isEmpty() ||
-								  _params.navaid_right_distance || _params.navaid_right_reciprocal_magnetic;
+								  _params.navaid_right_distance || _params.navaid_right_initial_bearing_magnetic;
 
 	painter().set_shadow_color (Qt::black);
 	clear_background();
@@ -1172,8 +1172,8 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 
 	QColor cyan (0x00, 0xdd, 0xff);
 
-	for (Opts const& opts: { Opts { true, (_params.navaid_left_type == 0 ? Qt::green : cyan), _params.navaid_left_reciprocal_magnetic, _locals.navaid_left_visible },
-							 Opts { false, (_params.navaid_right_type == 0 ? Qt::green : cyan), _params.navaid_right_reciprocal_magnetic, _locals.navaid_right_visible } })
+	for (Opts const& opts: { Opts { true, (_params.navaid_left_type == 0 ? Qt::green : cyan), _params.navaid_left_initial_bearing_magnetic, _locals.navaid_left_visible },
+							 Opts { false, (_params.navaid_right_type == 0 ? Qt::green : cyan), _params.navaid_right_initial_bearing_magnetic, _locals.navaid_right_visible } })
 	{
 		if (!opts.angle || !opts.visible)
 			continue;

@@ -42,6 +42,7 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 		XEFIS_SELECTOR_DEF_PROP ("identifier", identifier);
 		XEFIS_SELECTOR_DEF_PROP ("radial.magnetic", radial_magnetic);
 		XEFIS_SELECTOR_DEF_PROP ("reciprocal.magnetic", reciprocal_magnetic);
+		XEFIS_SELECTOR_DEF_PROP ("initial-bearing.magnetic", initial_bearing_magnetic);
 		XEFIS_SELECTOR_DEF_PROP ("distance", distance);
 		XEFIS_SELECTOR_DEF_PROP ("eta", eta);
 		XEFIS_SELECTOR_DEF_PROP ("deviation", deviation);
@@ -57,6 +58,7 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 		{ "output.identifier", _output_identifier, true },
 		{ "output.radial.magnetic", _output_radial_magnetic, true },
 		{ "output.reciprocal.magnetic", _output_reciprocal_magnetic, true },
+		{ "output.initial-bearing.magnetic", _output_initial_bearing_magnetic, true },
 		{ "output.distance", _output_distance, true },
 		{ "output.eta", _output_eta, true },
 		{ "output.deviation", _output_deviation, true },
@@ -87,6 +89,7 @@ NavaidSelector::data_updated()
 			XEFIS_SELECTOR_COPY (identifier);
 			XEFIS_SELECTOR_COPY (radial_magnetic);
 			XEFIS_SELECTOR_COPY (reciprocal_magnetic);
+			XEFIS_SELECTOR_COPY (initial_bearing_magnetic);
 			XEFIS_SELECTOR_COPY (distance);
 			XEFIS_SELECTOR_COPY (eta);
 			XEFIS_SELECTOR_COPY (deviation);
@@ -108,6 +111,7 @@ NavaidSelector::reset_all()
 	_output_identifier.set_nil();
 	_output_radial_magnetic.set_nil();
 	_output_reciprocal_magnetic.set_nil();
+	_output_initial_bearing_magnetic.set_nil();
 	_output_distance.set_nil();
 	_output_eta.set_nil();
 	_output_deviation.set_nil();
