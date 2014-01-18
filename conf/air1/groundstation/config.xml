@@ -16,6 +16,7 @@
 		<include name='systems/rcms.xml'/>
 		<include name='systems/afcs.xml'/>
 		<include name='systems/altacq.xml'/>
+		<include name='systems/eta.xml'/>
 		<include name='systems/flaps.xml'/>
 		<include name='systems/vor.xml'/>
 		<include name='helpers/fma.xml'/>
