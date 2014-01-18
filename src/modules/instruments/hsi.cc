@@ -70,10 +70,12 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "navaid.selected.distance", _navaid_selected_distance, false },
 		{ "navaid.selected.eta", _navaid_selected_eta, false },
 		{ "navaid.selected.course.magnetic", _navaid_selected_course_magnetic, false },
+		{ "navaid.left.type", _navaid_left_type, false },
 		{ "navaid.left.reference", _navaid_left_reference, false },
 		{ "navaid.left.identifier", _navaid_left_identifier, false },
 		{ "navaid.left.distance", _navaid_left_distance, false },
 		{ "navaid.left.reciprocal.magnetic", _navaid_left_reciprocal_magnetic, false },
+		{ "navaid.right.type", _navaid_right_type, false },
 		{ "navaid.right.reference", _navaid_right_reference, false },
 		{ "navaid.right.identifier", _navaid_right_identifier, false },
 		{ "navaid.right.distance", _navaid_right_distance, false },
@@ -126,9 +128,11 @@ HSI::read()
 	params.navaid_selected_eta = _navaid_selected_eta.get_optional();
 	params.navaid_selected_course_magnetic = _navaid_selected_course_magnetic.get_optional();
 	params.navaid_left_reference = QString::fromStdString (_navaid_left_reference.read (""));
+	params.navaid_left_type = _navaid_left_type.read (0);
 	params.navaid_left_identifier = QString::fromStdString (_navaid_left_identifier.read (""));
 	params.navaid_left_distance = _navaid_left_distance.get_optional();
 	params.navaid_left_reciprocal_magnetic = _navaid_left_reciprocal_magnetic.get_optional();
+	params.navaid_right_type = _navaid_right_type.read (0);
 	params.navaid_right_reference = QString::fromStdString (_navaid_right_reference.read (""));
 	params.navaid_right_identifier = QString::fromStdString (_navaid_right_identifier.read (""));
 	params.navaid_right_distance = _navaid_right_distance.get_optional();

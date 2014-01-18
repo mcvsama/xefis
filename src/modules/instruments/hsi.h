@@ -91,10 +91,12 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyLength	_navaid_selected_distance;
 	Xefis::PropertyTime		_navaid_selected_eta;
 	Xefis::PropertyAngle	_navaid_selected_course_magnetic;
+	Xefis::PropertyInteger	_navaid_left_type;
 	Xefis::PropertyString	_navaid_left_reference;
 	Xefis::PropertyString	_navaid_left_identifier;
 	Xefis::PropertyLength	_navaid_left_distance;
 	Xefis::PropertyAngle	_navaid_left_reciprocal_magnetic;
+	Xefis::PropertyInteger	_navaid_right_type;
 	Xefis::PropertyString	_navaid_right_reference;
 	Xefis::PropertyString	_navaid_right_identifier;
 	Xefis::PropertyLength	_navaid_right_distance;

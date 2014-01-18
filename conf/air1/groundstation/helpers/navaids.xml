@@ -6,6 +6,7 @@
 			<property name='input.selected' path='/settings/navaid/selected-main'/>
 			<!-- Input:0 -->
 			<directory path='/systems/navaid/ils'>
+				<property name='input.0.type' path='/type'/>
 				<property name='input.0.reference' path='/reference'/>
 				<property name='input.0.identifier' path='/identifier'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
@@ -17,6 +18,7 @@
 			</directory>
 			<!-- Input:1 -->
 			<directory path='/systems/navaid/left'>
+				<property name='input.1.type' path='/type'/>
 				<property name='input.1.reference' path='/reference'/>
 				<property name='input.1.identifier' path='/identifier'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
@@ -28,6 +30,7 @@
 			</directory>
 			<!-- Input:2 -->
 			<directory path='/systems/navaid/right'>
+				<property name='input.2.type' path='/type'/>
 				<property name='input.2.reference' path='/reference'/>
 				<property name='input.2.identifier' path='/identifier'/>
 				<property name='input.2.radial.magnetic' path='/radial.magnetic'/>
@@ -39,6 +42,7 @@
 			</directory>
 			<!-- Output -->
 			<directory path='/systems/navaid/selected'>
+				<property name='output.type' path='/type'/>
 				<property name='output.reference' path='/reference'/>
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
@@ -56,6 +60,7 @@
 			<property name='input.selected' path='/settings/navaid/selected-left'/>
 			<!-- Input:0 -->
 			<directory path='/systems/vor/left'>
+				<property name='input.0.type' path='/type' default='0'/>
 				<property name='input.0.reference' path='/reference' default='VOR L'/>
 				<property name='input.0.identifier' path='/identifier' default='OSOB'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
@@ -67,6 +72,7 @@
 			</directory>
 			<!-- Input:1 -->
 			<directory path='/systems/vor/home'>
+				<property name='input.1.type' path='/type' default='1'/>
 				<property name='input.1.reference' path='/reference'/>
 				<property name='input.1.identifier' path='/identifier' default='HOME'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
@@ -78,6 +84,7 @@
 			</directory>
 			<!-- Output -->
 			<directory path='/systems/navaid/left'>
+				<property name='output.type' path='/type'/>
 				<property name='output.reference' path='/reference'/>
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
@@ -95,6 +102,7 @@
 			<property name='input.selected' path='/settings/navaid/selected-right'/>
 			<!-- Input:0 -->
 			<directory path='/systems/vor/right'>
+				<property name='input.0.type' path='/type' default='0'/>
 				<property name='input.0.reference' path='/reference' default='VOR R'/>
 				<property name='input.0.identifier' path='/identifier' default='POLA'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
@@ -106,6 +114,7 @@
 			</directory>
 			<!-- Input:1 -->
 			<directory path='/systems/vor/home'>
+				<property name='input.1.type' path='/type' default='1'/>
 				<property name='input.1.reference' path='/reference'/>
 				<property name='input.1.identifier' path='/identifier' default='HOME'/>
 				<property name='input.1.radial.magnetic' path='/radial.magnetic'/>
@@ -117,6 +126,7 @@
 			</directory>
 			<!-- Output -->
 			<directory path='/systems/navaid/right'>
+				<property name='output.type' path='/type'/>
 				<property name='output.reference' path='/reference'/>
 				<property name='output.identifier' path='/identifier'/>
 				<property name='output.radial.magnetic' path='/radial.magnetic'/>
