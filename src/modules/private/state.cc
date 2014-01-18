@@ -199,7 +199,7 @@ State::data_updated()
 {
 	for (ObservableBase* o: _observables)
 		o->process();
-	for (Xefis::RotaryEncoder* r: _rotary_decoders)
+	for (Xefis::RotaryDecoder* r: _rotary_decoders)
 		r->data_updated();
 
 	static std::vector<Action*> actions = {
@@ -219,7 +219,7 @@ State::data_updated()
 void
 State::prepare_efis_settings()
 {
-	_mcp_mins_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_mins_a, _mcp_mins_b, [this](int delta) {
+	_mcp_mins_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_mins_a, _mcp_mins_b, [this](int delta) {
 		switch (_minimums_type)
 		{
 			case MinimumsType::Baro:
@@ -238,7 +238,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fd, _setting_efis_fd_visible);
 	make_toggle (_mcp_htrk, _setting_hsi_home_track_visible);
 
-	_mcp_qnh_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_qnh_a, _mcp_qnh_b, [this](int delta) {
+	_mcp_qnh_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_qnh_a, _mcp_qnh_b, [this](int delta) {
 		if (*_setting_pressure_display_hpa)
 			_qnh_setting += QNHhPaStep * delta;
 		else
@@ -252,7 +252,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_metric, _setting_efis_show_metric);
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
-	_mcp_range_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_range_a, _mcp_range_b, [this](int delta) {
+	_mcp_range_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_range_a, _mcp_range_b, [this](int delta) {
 		int range_nm = Xefis::symmetric_round (_setting_hsi_range->nm());
 		delta = -delta;
 
@@ -278,7 +278,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_hdg_trk, _setting_hsi_center_on_track);
 	make_toggle (_mcp_mag_tru, _setting_hsi_display_true_heading);
 
-	_mcp_course_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_course_a, _mcp_course_b, [this](int delta) {
+	_mcp_course_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_course_a, _mcp_course_b, [this](int delta) {
 		_course = Xefis::floored_mod (_course + 1_deg * delta, 360_deg);
 		int course = Xefis::symmetric_round (_course.deg());
 		if (course == 0)

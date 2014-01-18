@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__ROTARY_ENCODER_H__INCLUDED
-#define XEFIS__UTILITY__ROTARY_ENCODER_H__INCLUDED
+#ifndef XEFIS__UTILITY__ROTARY_DECODER_H__INCLUDED
+#define XEFIS__UTILITY__ROTARY_DECODER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -29,16 +29,15 @@ namespace Xefis {
  * Takes two boolean properties and
  * calls 'up' or 'down' callbacks depending
  * on how these boolean values change.
- * TODO RENAME TO RotaryDecoder
  */
-class RotaryEncoder
+class RotaryDecoder
 {
   public:
 	typedef std::function<void (int delta)> Callback;
 
   public:
 	// Ctor:
-	RotaryEncoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback);
+	RotaryDecoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -69,14 +68,14 @@ class RotaryEncoder
 
 
 inline void
-RotaryEncoder::operator() (int delta)
+RotaryDecoder::operator() (int delta)
 {
 	_callback (delta);
 }
 
 
 inline void
-RotaryEncoder::call (int delta)
+RotaryDecoder::call (int delta)
 {
 	_callback (delta);
 }
