@@ -91,14 +91,14 @@ VOR::compute()
 			deviation = -denormalize (deviation + 180_deg);
 
 		if (_output_radial_magnetic.configured())
-			_output_radial_magnetic.write (normalize (current_radial - declination));
+			_output_radial_magnetic = normalize (current_radial - declination);
 		if (_output_reciprocal_magnetic.configured())
-			_output_reciprocal_magnetic.write (normalize (current_radial + 180_deg - declination));
+			_output_reciprocal_magnetic = normalize (current_radial + 180_deg - declination);
 		if (_output_initial_bearing_magnetic.configured())
-			_output_initial_bearing_magnetic.write (normalize (aircraft_position.initial_bearing (station_position) - declination));
-		_output_to_flag.write (std::abs (denormalize (current_radial - input_radial).deg()) > 90.0);
-		_output_deviation.write (1_deg * _deviation_smoother.process (deviation.deg(), dt));
-		_output_distance.write (station_position.haversine_earth (aircraft_position));
+			_output_initial_bearing_magnetic = normalize (aircraft_position.initial_bearing (station_position) - declination);
+		_output_to_flag = std::abs (denormalize (current_radial - input_radial).deg()) > 90.0;
+		_output_deviation = 1_deg * _deviation_smoother.process (deviation.deg(), dt);
+		_output_distance = station_position.haversine_earth (aircraft_position);
 	}
 	else
 	{
