@@ -56,8 +56,8 @@
 					<property bytes='2' path='/aircraft/systems/fbw/stick/roll' type='angle'/>
 					<property bytes='2' path='/aircraft/systems/fd/pitch' type='angle'/>
 					<property bytes='2' path='/aircraft/systems/fd/roll' type='angle'/>
-					<property bytes='2' path='/aircraft/sensors/flaps/setting' type='angle' retained='true'/>
-					<property bytes='2' path='/aircraft/sensors/flaps/current' type='angle'/>
+					<property bytes='2' path='/aircraft/systems/flaps/setting' type='angle' retained='true'/>
+					<property bytes='2' path='/aircraft/systems/flaps/current' type='angle'/>
 					<bitfield>
 						<!-- Sensors - sensors -->
 						<property path='/aircraft/sensors/ahrs/serviceable' type='boolean' retained='true'/>
@@ -115,6 +115,7 @@
 					<property bytes='4' path='/settings/cmd/altitude' type='length'/>
 					<property bytes='4' path='/settings/cmd/vertical-speed' type='speed'/>
 					<property bytes='4' path='/settings/cmd/fpa' type='angle'/>
+					<property bytes='2' path='/settings/flaps/setting' type='angle'/>
 					<bitfield>
 						<property path='/settings/pressure/use-std' type='boolean'/>
 						<property path='/settings/lights/strobe' type='boolean'/>

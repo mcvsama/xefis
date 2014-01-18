@@ -14,8 +14,9 @@
 		<include name='systems/nc.xml'/>
 		<include name='systems/pc.xml'/>
 		<include name='systems/rcms.xml'/>
-		<include name='systems/altacq.xml'/>
 		<include name='systems/afcs.xml'/>
+		<include name='systems/altacq.xml'/>
+		<include name='systems/flaps.xml'/>
 		<include name='systems/vor.xml'/>
 		<include name='helpers/fma.xml'/>
 		<include name='helpers/navaids.xml'/>
