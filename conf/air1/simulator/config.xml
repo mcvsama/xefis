@@ -12,6 +12,7 @@
 		<include name='systems/pc.xml'/>
 		<include name='systems/fbw.xml'/>
 		<include name='systems/fd.xml'/>
+		<include name='systems/flaps.xml'/>
 		<include name='systems/at.xml'/>
 	</modules>
 	<windows>

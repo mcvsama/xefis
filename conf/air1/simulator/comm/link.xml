@@ -49,8 +49,8 @@
 					<property bytes='2' path='/systems/fbw/stick/roll' type='angle'/>
 					<property bytes='2' path='/systems/fd/pitch' type='angle'/>
 					<property bytes='2' path='/systems/fd/roll' type='angle'/>
-					<property bytes='2' path='/sensors/flaps/setting' type='angle'/>
-					<property bytes='2' path='/sensors/flaps/current' type='angle'/>
+					<property bytes='2' path='/systems/flaps/setting' type='angle'/>
+					<property bytes='2' path='/systems/flaps/current' type='angle'/>
 					<bitfield>
 						<!-- Sensors - sensors -->
 						<property path='/sensors/ahrs/serviceable' type='boolean'/>
@@ -115,6 +115,7 @@
 					<property bytes='4' path='/settings/cmd/altitude' type='length' retained='true'/>
 					<property bytes='4' path='/settings/cmd/vertical-speed' type='speed' retained='true'/>
 					<property bytes='4' path='/settings/cmd/fpa' type='angle' retained='true'/>
+					<property bytes='2' path='/settings/flaps/setting' type='angle'/>
 					<bitfield>
 						<property path='/settings/pressure/use-std' type='boolean' retained='true'/>
 						<property path='/settings/lights/strobe' type='boolean' retained='true'/>

@@ -345,8 +345,8 @@
 									<setting name='hide-retracted' value='true'/>
 								</settings>
 								<properties>
-									<property name='current' path='/aircraft/sensors/flaps/current'/>
-									<property name='setting' path='/aircraft/sensors/flaps/setting'/>
+									<property name='current' path='/aircraft/systems/flaps/current'/>
+									<property name='setting' path='/aircraft/systems/flaps/setting'/>
 								</properties>
 							</instrument>
 						</item>
