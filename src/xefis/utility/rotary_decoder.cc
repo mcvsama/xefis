@@ -18,12 +18,12 @@
 #include <semaphore.h>
 
 // Local:
-#include "rotary_encoder.h"
+#include "rotary_decoder.h"
 
 
 namespace Xefis {
 
-RotaryEncoder::RotaryEncoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback):
+RotaryDecoder::RotaryDecoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback):
 	_prev_a (property_a.read (false)),
 	_prev_b (property_b.read (false)),
 	_property_a (property_a),
@@ -33,7 +33,7 @@ RotaryEncoder::RotaryEncoder (Xefis::PropertyBoolean& property_a, Xefis::Propert
 
 
 void
-RotaryEncoder::data_updated()
+RotaryDecoder::data_updated()
 {
 	if (!_property_a.valid() || !_property_b.valid() || !_callback)
 		return;

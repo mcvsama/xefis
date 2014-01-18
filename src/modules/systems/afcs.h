@@ -25,7 +25,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
-#include <xefis/utility/rotary_encoder.h>
+#include <xefis/utility/rotary_decoder.h>
 #include <xefis/utility/range.h>
 #include <modules/systems/fly_by_wire.h>
 
@@ -159,13 +159,13 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_ct;
 	Xefis::PropertyBoolean				_mcp_speed_a;
 	Xefis::PropertyBoolean				_mcp_speed_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_speed_decoder;
+	Unique<Xefis::RotaryDecoder>		_mcp_speed_decoder;
 	Xefis::PropertyBoolean				_mcp_speed_ias_mach;
 	Xefis::PropertyBoolean				_mcp_speed_sel;
 	Xefis::PropertyBoolean				_mcp_speed_hold;
 	Xefis::PropertyBoolean				_mcp_heading_a;
 	Xefis::PropertyBoolean				_mcp_heading_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_heading_decoder;
+	Unique<Xefis::RotaryDecoder>		_mcp_heading_decoder;
 	Xefis::PropertyBoolean				_mcp_heading_hdg_trk;
 	Xefis::PropertyBoolean				_mcp_heading_sel;
 	Xefis::PropertyBoolean				_mcp_heading_hold;
@@ -174,13 +174,13 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_app;
 	Xefis::PropertyBoolean				_mcp_altitude_a;
 	Xefis::PropertyBoolean				_mcp_altitude_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_altitude_decoder;
+	Unique<Xefis::RotaryDecoder>		_mcp_altitude_decoder;
 	Xefis::PropertyBoolean				_mcp_altitude_stepch;
 	Xefis::PropertyBoolean				_mcp_altitude_flch;
 	Xefis::PropertyBoolean				_mcp_altitude_hold;
 	Xefis::PropertyBoolean				_mcp_vspd_a;
 	Xefis::PropertyBoolean				_mcp_vspd_b;
-	Unique<Xefis::RotaryEncoder>		_mcp_vspd_decoder;
+	Unique<Xefis::RotaryDecoder>		_mcp_vspd_decoder;
 	Xefis::PropertyBoolean				_mcp_vspd_vs_fpa;
 	Xefis::PropertyBoolean				_mcp_vspd_sel;
 	Xefis::PropertyBoolean				_mcp_vspd_clb_con;
@@ -215,7 +215,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyAngle				_cmd_fpa;
 	Xefis::PropertyString				_flight_mode;
 	// Other:
-	std::vector<Xefis::RotaryEncoder*>	_rotary_decoders;
+	std::vector<Xefis::RotaryDecoder*>	_rotary_decoders;
 };
 
 #endif

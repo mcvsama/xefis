@@ -132,7 +132,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 void
 AutomatedFlightControlSystem::data_updated()
 {
-	for (Xefis::RotaryEncoder* r: _rotary_decoders)
+	for (Xefis::RotaryDecoder* r: _rotary_decoders)
 		r->data_updated();
 
 	process_afcs_main_panel();
@@ -178,7 +178,7 @@ AutomatedFlightControlSystem::process_afcs_main_panel()
 void
 AutomatedFlightControlSystem::prepare_speed_panel()
 {
-	_mcp_speed_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_speed_a, _mcp_speed_b, [this](int delta) {
+	_mcp_speed_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_speed_a, _mcp_speed_b, [this](int delta) {
 		_cmd_speed_counter = Xefis::limit (_cmd_speed_counter + 1_kt * delta, CmdSpeedRange);
 		solve_mode();
 	});
@@ -194,7 +194,7 @@ AutomatedFlightControlSystem::prepare_speed_panel()
 void
 AutomatedFlightControlSystem::prepare_heading_panel()
 {
-	_mcp_heading_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_heading_a, _mcp_heading_b, [this](int delta) {
+	_mcp_heading_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_heading_a, _mcp_heading_b, [this](int delta) {
 		_cmd_heading_counter = Xefis::floored_mod (_cmd_heading_counter + 1_deg * delta, 360_deg);
 		solve_mode();
 	});
@@ -219,7 +219,7 @@ AutomatedFlightControlSystem::prepare_nav_panel()
 void
 AutomatedFlightControlSystem::prepare_altitude_panel()
 {
-	_mcp_altitude_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_altitude_a, _mcp_altitude_b, [this](int delta) {
+	_mcp_altitude_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_altitude_a, _mcp_altitude_b, [this](int delta) {
 		Length altitude_step;
 		switch (_cmd_altitude_step)
 		{
@@ -258,7 +258,7 @@ AutomatedFlightControlSystem::process_altitude_panel()
 void
 AutomatedFlightControlSystem::prepare_vspd_panel()
 {
-	_mcp_vspd_decoder = std::make_unique<Xefis::RotaryEncoder> (_mcp_vspd_a, _mcp_vspd_b, [this](int delta) {
+	_mcp_vspd_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_vspd_a, _mcp_vspd_b, [this](int delta) {
 		_cmd_vspd_counter = Xefis::limit (_cmd_vspd_counter + CmdVSpdStep * delta, CmdVSpdRange);
 		solve_mode();
 	});
