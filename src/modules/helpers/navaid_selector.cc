@@ -37,6 +37,7 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 #define XEFIS_SELECTOR_DEF_PROP(str, name) \
 		properties_list.emplace_back ("input." + i_str + "." str, _inputs_##name[i], false)
 
+		XEFIS_SELECTOR_DEF_PROP ("type", type);
 		XEFIS_SELECTOR_DEF_PROP ("reference", reference);
 		XEFIS_SELECTOR_DEF_PROP ("identifier", identifier);
 		XEFIS_SELECTOR_DEF_PROP ("radial.magnetic", radial_magnetic);
@@ -51,6 +52,7 @@ NavaidSelector::NavaidSelector (Xefis::ModuleManager* module_manager, QDomElemen
 
 	properties_list.insert (properties_list.end(), {
 		{ "input.selected", _selected_input, true },
+		{ "output.type", _output_type, true },
 		{ "output.reference", _output_reference, true },
 		{ "output.identifier", _output_identifier, true },
 		{ "output.radial.magnetic", _output_radial_magnetic, true },
@@ -80,6 +82,7 @@ NavaidSelector::data_updated()
 #define XEFIS_SELECTOR_COPY(name) \
 		copy (sel_fresh, _inputs_##name[input], _output_##name)
 
+			XEFIS_SELECTOR_COPY (type);
 			XEFIS_SELECTOR_COPY (reference);
 			XEFIS_SELECTOR_COPY (identifier);
 			XEFIS_SELECTOR_COPY (radial_magnetic);
@@ -100,6 +103,7 @@ NavaidSelector::data_updated()
 void
 NavaidSelector::reset_all()
 {
+	_output_type.set_nil();
 	_output_reference.set_nil();
 	_output_identifier.set_nil();
 	_output_radial_magnetic.set_nil();

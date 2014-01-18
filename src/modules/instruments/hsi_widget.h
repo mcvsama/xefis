@@ -97,10 +97,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Optional<Length>	navaid_selected_distance;
 		Optional<Time>		navaid_selected_eta;
 		Optional<Angle>		navaid_selected_course_magnetic;
+		int					navaid_left_type			= 0;
 		QString				navaid_left_reference;
 		QString				navaid_left_identifier;
 		Optional<Length>	navaid_left_distance;
 		Optional<Angle>		navaid_left_reciprocal_magnetic;
+		int					navaid_right_type			= 0;
 		QString				navaid_right_reference;
 		QString				navaid_right_identifier;
 		Optional<Length>	navaid_right_distance;
