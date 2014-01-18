@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/flaps-control'>
+		<settings>
+			<setting name='settings-list' value='0,5,10,20,30'/>
+			<setting name='degrees-per-second' value='2.5'/>
+			<setting name='control.minimum' value='0.0'/>
+			<setting name='control.maximum' value='0.5'/>
+		</settings>
+		<properties>
+			<!-- Input -->
+			<property name='input.setting' path='/settings/flaps/setting'/>
+			<!-- Output -->
+			<property name='output.setting' path='/systems/flaps/setting'/>
+			<property name='output.current' path='/systems/flaps/current'/>
+			<property name='output.control' path='/systems/flaps/control'/>
+		</properties>
+	</module>
+</xefis-include>
+

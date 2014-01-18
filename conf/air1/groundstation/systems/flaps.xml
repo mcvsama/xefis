@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/flaps-control'>
+		<settings>
+			<setting name='settings-list' value='0,5,10,20,30'/>
+		</settings>
+		<properties>
+			<!-- Input -->
+			<property name='input.up' path='/input/throttle/button/10'/>
+			<property name='input.down' path='/input/throttle/button/11'/>
+			<property name='input.setting' path='/settings/flaps/setting'/>
+		</properties>
+	</module>
+</xefis-include>
+
