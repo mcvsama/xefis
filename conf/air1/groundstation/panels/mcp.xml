@@ -9,7 +9,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='rotary-encoder' top-label='MINS' click-label='B/R' rotate-a-property='/panels/mcp/mins-a' rotate-b-property='/panels/mcp/mins-b' click-property='/panels/mcp/mins-mode'/>
+									<widget type='rotary-encoder' top-label='MINS' click-label='B/R' rotate-a-property='/panels/mcp/mins-a' rotate-b-property='/panels/mcp/mins-b' click-property='/panels/mcp/efis/button.mins-mode'/>
 								</item>
 								<stretch/>
 								<item>
@@ -74,7 +74,7 @@
 						<item>
 							<layout type='vertical' spacing='5'>
 								<item>
-									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-left/button.off' led-property='/panels/mcp/navaid-left/led.off' led-color='green'/>
+									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-left/button.off' led-property='/panels/mcp/navaid-left/led.off' led-color='amber'/>
 								</item>
 								<stretch/>
 								<item>
@@ -89,7 +89,7 @@
 						<item>
 							<layout type='vertical' spacing='5'>
 								<item>
-									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-right/button.off' led-property='/panels/mcp/navaid-right/led.off' led-color='green'/>
+									<widget type='button' top-label='OFF' click-property='/panels/mcp/navaid-right/button.off' led-property='/panels/mcp/navaid-right/led.off' led-color='amber'/>
 								</item>
 								<stretch/>
 								<item>
@@ -148,7 +148,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='button' top-label='A/P' click-property='/panels/mcp/ap' led-property='/panels/mcp/led/ap' led-color='amber'/>
+									<widget type='button' top-label='A/P' click-property='/panels/mcp/afcs/button.ap' led-property='/panels/mcp/afcs/led.ap' led-color='amber'/>
 								</item>
 								<stretch/>
 								<item>
@@ -296,10 +296,10 @@
 						<item>
 							<layout type='vertical' spacing='5'>
 								<item>
-									<widget type='button' top-label='EICAS' click-property='/panels/mcp/show-eicas'/>
+									<widget type='button' top-label='EICAS' click-property='/panels/mcp/mfd/button.eicas' led-property='/panels/mcp/mfd/led.eicas'/>
 								</item>
 								<item>
-									<widget type='button' top-label='ND' click-property='/panels/mcp/show-nd'/>
+									<widget type='button' top-label='ND' click-property='/panels/mcp/mfd/button.nd' led-property='/panels/mcp/mfd/led.nd'/>
 								</item>
 								<stretch/>
 							</layout>
@@ -307,10 +307,10 @@
 						<item>
 							<layout type='vertical' spacing='5'>
 								<item>
-									<widget type='button' top-label='CHKL' click-property='/panels/mcp/show-chklst'/>
+									<widget type='button' top-label='CHKL' click-property='/panels/mcp/mfd/button.chkl' led-property='/panels/mcp/mfd/led.chkl'/>
 								</item>
 								<item>
-									<widget type='button' top-label='ELEC' click-property='/panels/mcp/show-elec'/>
+									<widget type='button' top-label='ELEC' click-property='/panels/mcp/mfd/button.elec' led-property='/panels/mcp/mfd/led.elec'/>
 								</item>
 								<stretch/>
 							</layout>

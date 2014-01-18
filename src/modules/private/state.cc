@@ -62,8 +62,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	_mcp_mins_a.set_path (mcp_root + "/mins-a");
 	_mcp_mins_b.set_path (mcp_root + "/mins-b");
-	_mcp_mins_mode.set_path (mcp_root + "/mins-mode");
-	_mcp_ap.set_path (mcp_root + "/ap");
 	_mcp_appr.set_path (mcp_root + "/appr");
 	_mcp_fd.set_path (mcp_root + "/fd");
 	_mcp_htrk.set_path (mcp_root + "/htrk");
@@ -81,10 +79,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_mcp_course_a.set_path (mcp_root + "/course-a");
 	_mcp_course_b.set_path (mcp_root + "/course-b");
 	_mcp_course_hide.set_path (mcp_root + "/course-hide");
-	_mcp_show_nd.set_path (mcp_root + "/show-nd");
-	_mcp_show_eicas.set_path (mcp_root + "/show-eicas");
-	_mcp_show_chklst.set_path (mcp_root + "/show-chklst");
-	_mcp_show_elec.set_path (mcp_root + "/show-elec");
 
 	_mcp_course_display.set_path ("/settings/course/magnetic.integer");
 
@@ -96,8 +90,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_efis_fd_visible.set_default (false);
 	_setting_efis_appr_visible.set_path ("/settings/efis/approach-reference-visible");
 	_setting_efis_appr_visible.set_default (false);
-	_setting_efis_mfd_mode.set_path ("/settings/efis/mfd-mode");
-	_setting_efis_mfd_mode.set_default (static_cast<int> (MFDMode::EICAS));
 	_setting_pressure_qnh.set_path ("/settings/pressure/qnh");
 	_setting_pressure_qnh.set_default (29.92_inHg);
 	_setting_pressure_display_hpa.set_path ("/settings/efis/display-hpa");
@@ -121,11 +113,8 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_course_visible.set_path ("/settings/course/visible");
 
 	prepare_efis_settings();
-	prepare_mfd_panels();
 
 	_observables = {
-		&_mcp_mins_mode,
-		&_mcp_ap,
 		&_mcp_appr,
 		&_mcp_fd,
 		&_mcp_htrk,
@@ -137,10 +126,6 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_mcp_hdg_trk,
 		&_mcp_mag_tru,
 		&_mcp_course_hide,
-		&_mcp_show_nd,
-		&_mcp_show_eicas,
-		&_mcp_show_chklst,
-		&_mcp_show_elec,
 	};
 
 	_rotary_decoders = {
@@ -156,6 +141,56 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	solve_minimums();
 	solve_pressure();
 	solve_course();
+
+	// EFIS panel
+
+	_efis_mins_mode_button = std::make_unique<Button> ("/panels/mcp/efis/button.mins-mode", [&]() {
+		if (_minimums_type == MinimumsType::Baro)
+			_minimums_type = MinimumsType::Radio;
+		else
+			_minimums_type = MinimumsType::Baro;
+		solve_minimums();
+	});
+
+	// COURSE panel
+
+	_navaid_select_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-main", {
+		{ "/panels/mcp/navaid/button.off", "/panels/mcp/navaid/led.off", -1, true },
+		{ "/panels/mcp/navaid/button.ils", "/panels/mcp/navaid/led.ils", 0 },
+		{ "/panels/mcp/navaid/button.vor-l", "/panels/mcp/navaid/led.vor-l", 1 },
+		{ "/panels/mcp/navaid/button.vor-r", "/panels/mcp/navaid/led.vor-r", 2 },
+	}));
+
+	// NAVAID L/R panel
+
+	_navaid_left_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-left", {
+		{ "/panels/mcp/navaid-left/button.off", "/panels/mcp/navaid-left/led.off", -1, true },
+		{ "/panels/mcp/navaid-left/button.vor", "/panels/mcp/navaid-left/led.vor", 0 },
+		{ "/panels/mcp/navaid-left/button.home", "/panels/mcp/navaid-left/led.home", 1 },
+	}));
+
+	_navaid_right_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-right", {
+		{ "/panels/mcp/navaid-right/button.off", "/panels/mcp/navaid-right/led.off", -1, true },
+		{ "/panels/mcp/navaid-right/button.vor", "/panels/mcp/navaid-right/led.vor", 0 },
+		{ "/panels/mcp/navaid-right/button.home", "/panels/mcp/navaid-right/led.home", 1 },
+	}));
+
+	// MFD panel
+
+	_mfd_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/efis/mfd-mode", {
+		{ "/panels/mcp/mfd/button.eicas", "/panels/mcp/mfd/led.eicas", 0, true },
+		{ "/panels/mcp/mfd/button.nd", "/panels/mcp/mfd/led.nd", 1 },
+		{ "/panels/mcp/mfd/button.chkl", "/panels/mcp/mfd/led.chkl", 2 },
+		{ "/panels/mcp/mfd/button.elec", "/panels/mcp/mfd/led.elec", 3 },
+	}));
+
+	// AFCS/FBW panel
+
+	_afcs_ap_button = std::make_unique<ToggleButton> ("/panels/mcp/afcs/button.ap", "/panels/mcp/afcs/led.ap");
+	_afcs_ap_button->set_callback ([&](bool state) {
+		if (state)
+			_setting_efis_fd_visible.write (true);
+	});
 }
 
 
@@ -166,6 +201,18 @@ State::data_updated()
 		o->process();
 	for (Xefis::RotaryEncoder* r: _rotary_decoders)
 		r->data_updated();
+
+	static std::vector<Action*> actions = {
+		_efis_mins_mode_button.get(),
+		_navaid_select_panel.get(),
+		_navaid_left_panel.get(),
+		_navaid_right_panel.get(),
+		_afcs_ap_button.get(),
+		_mfd_panel.get(),
+	};
+
+	for (auto* a: actions)
+		a->data_updated();
 }
 
 
@@ -185,25 +232,6 @@ State::prepare_efis_settings()
 		}
 
 		solve_minimums();
-	});
-
-	make_switch (_mcp_mins_mode, [this]() {
-		switch (_minimums_type)
-		{
-			case MinimumsType::Baro:
-				_minimums_type = MinimumsType::Radio;
-				break;
-
-			case MinimumsType::Radio:
-				_minimums_type = MinimumsType::Baro;
-				break;
-		}
-
-		solve_minimums();
-	});
-
-	make_switch (_mcp_ap, [this]() {
-		_setting_efis_fd_visible.write (true);
 	});
 
 	make_toggle (_mcp_appr, _setting_efis_appr_visible);
@@ -263,16 +291,6 @@ State::prepare_efis_settings()
 		_course_visible = !_course_visible;
 		solve_course();
 	});
-}
-
-
-void
-State::prepare_mfd_panels()
-{
-	make_int_writer (_mcp_show_eicas, _setting_efis_mfd_mode, static_cast<int> (MFDMode::EICAS));
-	make_int_writer (_mcp_show_nd, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ND));
-	make_int_writer (_mcp_show_chklst, _setting_efis_mfd_mode, static_cast<int> (MFDMode::CHKLST));
-	make_int_writer (_mcp_show_elec, _setting_efis_mfd_mode, static_cast<int> (MFDMode::ELEC));
 }
 
 

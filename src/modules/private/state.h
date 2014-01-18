@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <vector>
 
 // Qt:
 #include <QtCore/QString>
@@ -28,6 +29,201 @@
 #include <xefis/core/property.h>
 #include <xefis/utility/rotary_encoder.h>
 #include <xefis/utility/range.h>
+
+
+class Action
+{
+  public:
+	virtual void
+	data_updated() = 0;
+};
+
+
+class Button: public Action
+{
+  public:
+	typedef std::function<void()> Callback;
+
+  public:
+	// Ctor
+	Button (std::string const& button_path, Callback callback):
+		_callback (callback)
+	{
+		_button.set_path (button_path);
+	}
+
+	// Action API
+	void
+	data_updated() override
+	{
+		if (_button.fresh() && *_button)
+			_callback();
+	}
+
+  protected:
+	Xefis::PropertyBoolean	_button;
+	Callback				_callback;
+};
+
+
+class ToggleButton: public Action
+{
+  public:
+	typedef std::function<void (bool)> Callback;
+
+  public:
+	// Ctor
+	ToggleButton (std::string const& button_path, std::string const& toggle_path)
+	{
+		_button.set_path (button_path);
+		_toggle.set_path (toggle_path);
+	}
+
+	/**
+	 * Set press callback.
+	 */
+	void
+	set_callback (Callback callback)
+	{
+		_callback = callback;
+	}
+
+	/**
+	 * Set to mode that disallows resetting state
+	 * by another press.
+	 */
+	void
+	set_radio_mode()
+	{
+		_radio_mode = true;
+	}
+
+	/**
+	 * Return true if button is pressed.
+	 */
+	bool
+	pressed() const
+	{
+		return _button.read (false);
+	}
+
+	/**
+	 * Set toggle to false.
+	 */
+	void
+	reset()
+	{
+		_toggle.write (false);
+		call();
+	}
+
+	/**
+	 * Return LED state.
+	 */
+	bool
+	active() const
+	{
+		return _toggle.read (false);
+	}
+
+	/**
+	 * Select this option.
+	 */
+	void
+	select()
+	{
+		if (_radio_mode)
+			_toggle.write (true);
+		else
+			_toggle.write (!_toggle.read (false));
+		call();
+	}
+
+	/**
+	 * Call the callback.
+	 */
+	void
+	call()
+	{
+		if (_callback)
+			_callback (_toggle.read (false));
+	}
+
+	// Action API
+	void
+	data_updated() override
+	{
+		if (_button.fresh() && *_button)
+			select();
+	}
+
+  protected:
+	Xefis::PropertyBoolean	_button;
+	Xefis::PropertyBoolean	_toggle;
+	Callback				_callback;
+	bool					_radio_mode = false;
+};
+
+
+class ButtonOptions: public Action
+{
+  public:
+	class Option
+	{
+	  public:
+		// Ctor
+		Option (std::string const& button_path, std::string const& toggle_path, int value, bool is_default = false):
+			button (button_path, toggle_path),
+			value (value),
+			is_default (is_default)
+		{
+			button.set_radio_mode();
+		}
+
+		ToggleButton	button;
+		int				value;
+		bool			is_default;
+	};
+
+	typedef std::vector<Option> Options;
+
+  public:
+	// Ctor
+	ButtonOptions (std::string const& value_path, Options const& options):
+		_options (options)
+	{
+		_value_target.set_path (value_path);
+
+		// Press the "default" button:
+		for (Option& option: _options)
+			if (option.is_default)
+				option.button.select();
+	}
+
+	// Action API
+	void
+	data_updated() override
+	{
+		for (Option& option: _options)
+			option.button.data_updated();
+
+		for (Option& option: _options)
+		{
+			if (option.button.pressed())
+			{
+				for (Option& option_to_reset: _options)
+					if (&option_to_reset != &option)
+						option_to_reset.button.reset();
+				_value_target.write (option.value);
+				break;
+			}
+		}
+	}
+
+  private:
+	Options					_options;
+	Xefis::PropertyInteger	_value_target;
+};
 
 
 class State: public Xefis::Module
@@ -44,14 +240,6 @@ class State: public Xefis::Module
 	{
 		Baro,
 		Radio,
-	};
-
-	enum class MFDMode: int
-	{
-		EICAS	= 0,
-		ND		= 1,
-		CHKLST	= 2,
-		ELEC	= 3,
 	};
 
 	/**
@@ -157,9 +345,6 @@ class State: public Xefis::Module
 	void
 	prepare_efis_settings();
 
-	void
-	prepare_mfd_panels();
-
 	/**
 	 * Compute _setting_minimums_amsl from landing altitude and minimums setting.
 	 */
@@ -203,12 +388,17 @@ class State: public Xefis::Module
 	Pressure							_qnh_setting				= 29.92_inHg;
 	Angle								_course						= 0_deg;
 	bool								_course_visible				= false;
+	// Logic:
+	Unique<Button>						_efis_mins_mode_button;
+	Unique<ButtonOptions>				_navaid_select_panel;
+	Unique<ButtonOptions>				_navaid_left_panel;
+	Unique<ButtonOptions>				_navaid_right_panel;
+	Unique<ToggleButton>				_afcs_ap_button;
+	Unique<ButtonOptions>				_mfd_panel;
 	// Buttons, switches, knobs:
 	Xefis::PropertyBoolean				_mcp_mins_a;
 	Xefis::PropertyBoolean				_mcp_mins_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_mins_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_mins_mode;
-	Observable<Xefis::PropertyBoolean>	_mcp_ap;
 	Observable<Xefis::PropertyBoolean>	_mcp_att;
 	Observable<Xefis::PropertyBoolean>	_mcp_appr;
 	Observable<Xefis::PropertyBoolean>	_mcp_fd;
@@ -230,10 +420,6 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_course_b;
 	Unique<Xefis::RotaryEncoder>		_mcp_course_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_course_hide;
-	Observable<Xefis::PropertyBoolean>	_mcp_show_nd;
-	Observable<Xefis::PropertyBoolean>	_mcp_show_eicas;
-	Observable<Xefis::PropertyBoolean>	_mcp_show_chklst;
-	Observable<Xefis::PropertyBoolean>	_mcp_show_elec;
 	// LEDs, displays:
 	Xefis::PropertyInteger				_mcp_course_display;
 	// Controlled properties:
@@ -241,7 +427,6 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_setting_efis_show_metric;
 	Xefis::PropertyBoolean				_setting_efis_fd_visible;
 	Xefis::PropertyBoolean				_setting_efis_appr_visible;
-	Xefis::PropertyInteger				_setting_efis_mfd_mode;
 	Xefis::PropertyPressure				_setting_pressure_qnh;
 	Xefis::PropertyBoolean				_setting_pressure_display_hpa;
 	Xefis::PropertyBoolean				_setting_pressure_use_std;
