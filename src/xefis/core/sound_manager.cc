@@ -56,6 +56,8 @@ SoundManager::cleanup()
 	for (auto s = _sounds.begin(); s != _sounds.end(); )
 		if ((*s)->finished())
 			_sounds.erase (s++);
+		else
+			++s;
 }
 
 } // namespace Xefis
