@@ -50,6 +50,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "raising-runway.visibility", _raising_runway_visibility, false },
 		{ "raising-runway.threshold", _raising_runway_threshold, false },
 		{ "aoa.visibility-threshold", _aoa_visibility_threshold, false },
+		{ "show-mach-above", _show_mach_above, false },
 	});
 
 	parse_properties (config, {
@@ -61,6 +62,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "speed.ias.maximum-maneuver", _speed_ias_maximum_maneuver, false },
 		{ "speed.ias.maximum", _speed_ias_maximum, false },
 		{ "speed.mach", _speed_mach, false },
+		{ "speed.ground", _speed_ground, false },
 		{ "speed.v1", _speed_v1, false },
 		{ "speed.vr", _speed_vr, false },
 		{ "speed.vref", _speed_vref, false },
@@ -186,8 +188,9 @@ EFIS::read()
 	params.speed_maximum_maneuver = *_speed_ias_maximum_maneuver;
 	params.speed_maximum_visible = _speed_ias_maximum.valid();
 	params.speed_maximum = *_speed_ias_maximum;
-	params.speed_mach_visible = _speed_mach.valid();
+	params.speed_mach_visible = _speed_mach.valid() && *_speed_mach > _show_mach_above;
 	params.speed_mach = *_speed_mach;
+	params.speed_ground = _speed_ground.get_optional();
 	// V1
 	if (_speed_v1.valid())
 		params.speed_bugs["V1"] = *_speed_v1;

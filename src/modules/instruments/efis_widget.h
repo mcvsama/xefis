@@ -73,6 +73,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Speed				speed_maximum						= 0_kt;
 		bool				speed_mach_visible					= false;
 		float				speed_mach							= 0.f;
+		Optional<Speed>		speed_ground;
 		SpeedBugs			speed_bugs;
 		// Orientation
 		bool				orientation_failure					= false;
@@ -318,7 +319,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_paint_bugs (Xefis::Painter&, float x);
 
 		void
-		sl_paint_mach_number (Xefis::Painter&, float x);
+		sl_paint_mach_or_gs (Xefis::Painter&, float x);
 
 		void
 		sl_paint_ap_setting (Xefis::Painter&);
