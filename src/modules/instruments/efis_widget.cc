@@ -28,6 +28,7 @@
 #include <xefis/core/window.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
+#include <xefis/utility/text_layout.h>
 
 // Local:
 #include "efis_widget.h"
@@ -718,7 +719,7 @@ EFISWidget::PaintWorkUnit::sl_paint (Xefis::Painter& painter)
 		sl_paint_ias_disagree (painter, x);
 	}
 
-	sl_paint_mach_number (painter, x);
+	sl_paint_mach_or_gs (painter, x);
 	sl_paint_novspd_flag (painter);
 	sl_paint_ap_setting (painter);
 }
@@ -1000,24 +1001,37 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_mach_number (Xefis::Painter& painter, float x)
+EFISWidget::PaintWorkUnit::sl_paint_mach_or_gs (Xefis::Painter& painter, float x)
 {
-	if (!_params.speed_mach_visible)
+	if (!_params.speed_mach_visible && !_params.speed_ground)
 		return;
 
 	painter.setClipping (false);
 	painter.setTransform (_sl_transform);
 	painter.translate (0.f, 0.75f * x);
+	QPointF paint_position (0.0, _sl_ladder_rect.bottom() + 0.5 * _font_20_digit_height);
 
-	QFont font = _font_20;
+	if (_params.speed_mach_visible)
+	{
+		QFont font = _font_20;
 
-	QString mach_str = QString ("%1").arg (_params.speed_mach, 0, 'f', 3);
-	if (mach_str.left (2) == "0.")
-		mach_str = mach_str.mid (1);
+		QString mach_str = QString ("%1").arg (_params.speed_mach, 0, 'f', 3);
+		if (mach_str.left (2) == "0.")
+			mach_str = mach_str.mid (1);
 
-	painter.setPen (get_pen (Qt::white, 1.f));
-	painter.setFont (font);
-	painter.fast_draw_text (QPointF (0.f, _sl_ladder_rect.bottom() + 0.5f * _font_20_digit_height), Qt::AlignHCenter | Qt::AlignCenter, mach_str);
+		painter.setPen (get_pen (Qt::white, 1.f));
+		painter.setFont (font);
+		painter.fast_draw_text (paint_position, Qt::AlignCenter, mach_str);
+	}
+	else if (_params.speed_ground)
+	{
+		Xefis::TextLayout layout;
+		layout.set_alignment (Qt::AlignHCenter);
+		layout.add_fragment ("GS", _font_16, Qt::white);
+		layout.add_fragment (" ", _font_10, Qt::white);
+		layout.add_fragment (QString::number (static_cast<int> (_params.speed_ground->kt())), _font_20, Qt::white);
+		layout.paint (paint_position, Qt::AlignCenter, painter);
+	}
 }
 
 

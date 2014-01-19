@@ -73,6 +73,7 @@ class EFIS: public Xefis::Instrument
 	Length							_raising_runway_visibility		= 1000_ft;
 	Length							_raising_runway_threshold		= 250_ft;
 	Angle							_aoa_visibility_threshold		= 17.5_deg;
+	double							_show_mach_above				= 0.4;
 	// Speed
 	Xefis::PropertyBoolean			_speed_ias_serviceable;
 	Xefis::PropertySpeed			_speed_ias;
@@ -82,6 +83,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertySpeed			_speed_ias_maximum_maneuver;
 	Xefis::PropertySpeed			_speed_ias_maximum;
 	Xefis::PropertyFloat			_speed_mach;
+	Xefis::PropertySpeed			_speed_ground;
 	// Speed bugs
 	Xefis::PropertySpeed			_speed_v1;
 	Xefis::PropertySpeed			_speed_vr;
