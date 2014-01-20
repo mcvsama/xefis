@@ -48,6 +48,9 @@ class TrimControl: public Xefis::Module
 	void
 	update_trim();
 
+	void
+	update_trim_without_sound();
+
 	/**
 	 * Return true if given button is 'pressed'.
 	 */

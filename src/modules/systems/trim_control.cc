@@ -60,7 +60,7 @@ TrimControl::TrimControl (Xefis::ModuleManager* module_manager, QDomElement cons
 		&_input_down_trim_button,
 	});
 
-	update_trim();
+	update_trim_without_sound();
 }
 
 
@@ -111,9 +111,16 @@ TrimControl::compute_trim()
 void
 TrimControl::update_trim()
 {
+	update_trim_without_sound();
+	this->module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
+}
+
+
+void
+TrimControl::update_trim_without_sound()
+{
 	_trim_value = Xefis::limit (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * _trim_step, -1.0, 1.0);
 	_output_trim_value = _trim_value;
-	this->module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
 }
 
 
