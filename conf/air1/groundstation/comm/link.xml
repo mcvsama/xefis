@@ -105,11 +105,12 @@
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
 					<property bytes='2' path='/controls/elevator-stick' type='float'/>
 					<property bytes='2' path='/controls/ailerons-stick' type='float'/>
-					<property bytes='2' path='/controls/rudder' type='float'/>
+					<property bytes='2' path='/controls/rudder-pedals' type='float'/>
 					<property bytes='2' path='/controls/throttle-left' type='float'/>
 					<property bytes='2' path='/controls/throttle-right' type='float'/>
 					<property bytes='2' path='/systems/trim-control/elevator-trim' type='float'/>
 					<property bytes='2' path='/systems/trim-control/ailerons-trim' type='float'/>
+					<property bytes='2' path='/systems/trim-control/rudder-trim' type='float'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure'/>
 					<property bytes='4' path='/settings/course/magnetic' type='angle'/>
 					<property bytes='4' path='/settings/cmd/ias' type='speed'/>

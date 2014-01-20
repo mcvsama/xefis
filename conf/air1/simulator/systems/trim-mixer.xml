@@ -14,5 +14,12 @@
 			<property name='output.axis' path='/controls/ailerons'/>
 		</properties>
 	</module>
+	<module name='systems/trim-mixer' instance='yaw'>
+		<properties>
+			<property name='input.axis' path='/controls/rudder-pedals'/>
+			<property name='input.trim-value' path='/controls/rudder-trim'/>
+			<property name='output.axis' path='/controls/rudder'/>
+		</properties>
+	</module>
 </xefis-include>
 

@@ -25,10 +25,10 @@
 			<center>0.002594</center>
 		</axis>
 		<axis id='5'>
-			<path>/controls/trim-axis-horizontal</path>
+			<path>/controls/rudder-trim</path>
 		</axis>
 		<axis id='6'>
-			<path>/controls/trim-axis-vertical</path>
+			<path>/controls/throttle-trim</path>
 		</axis>
 		<button id='10'>
 			<path>/controls/flaps-up</path>
@@ -70,7 +70,7 @@
 		<path>/input/pedals</path>
 		<!-- Pedals -->
 		<axis id='2'>
-			<path>/controls/rudder</path>
+			<path>/controls/rudder-pedals</path>
 			<power>3</power>
 		</axis>
 	</module>
