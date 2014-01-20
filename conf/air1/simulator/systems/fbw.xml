@@ -43,11 +43,11 @@
 				<property name='output.throttle' path='/throttle'/>
 				<property name='output.serviceable' path='/serviceable'/>
 			</directory>
-			<directory path='/input'>
-				<property name='input.pitch-axis' path='/stick-elevator'/>
-				<property name='input.roll-axis' path='/stick-ailerons'/>
-				<property name='input.yaw-axis' path='/pedals'/>
-				<property name='input.throttle-axis' path='/throttle-left'/>
+			<directory path='/controls'>
+				<property name='input.pitch-axis' path='/elevator'/>
+				<property name='input.roll-axis' path='/ailerons'/>
+				<property name='input.yaw-axis' path='//input/pedals'/>
+				<property name='input.throttle-axis' path='//input/throttle-left'/>
 			</directory>
 			<directory path='/systems/fd'>
 				<property name='input.pitch' path='/pitch'/>

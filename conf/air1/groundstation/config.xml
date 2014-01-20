@@ -19,6 +19,7 @@
 		<include name='systems/eta.xml'/>
 		<include name='systems/flaps.xml'/>
 		<include name='systems/vor.xml'/>
+		<include name='systems/trim-control.xml'/>
 		<include name='helpers/fma.xml'/>
 		<include name='helpers/navaids.xml'/>
 		<include name='helpers/position.xml'/>
