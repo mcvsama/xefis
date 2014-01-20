@@ -91,9 +91,9 @@
 			<properties path='/systems/fbw'>
 				<property name='ailerons' path='/ailerons'/>
 				<property name='elevator' path='/elevator'/>
-				<property name='throttle.1' path='//input/throttle-left'/>
-				<property name='throttle.2' path='//input/throttle-right'/>
-				<property name='rudder' path='//input/pedals'/>
+				<property name='throttle.1' path='//controls/throttle-left'/>
+				<property name='throttle.2' path='//controls/throttle-right'/>
+				<property name='rudder' path='//controls/pedals'/>
 			</properties>
 		</output>
 	</module>

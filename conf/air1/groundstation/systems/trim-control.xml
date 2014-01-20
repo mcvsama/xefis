@@ -2,13 +2,13 @@
 <xefis-include>
 	<module name='systems/trim-control' instance='pitch'>
 		<properties>
-			<property name='input.trim-axis' path='/input/joystick/axis/3'/>
+			<property name='input.trim-axis' path='/controls/elevator-trim'/>
 			<property name='output.trim-value' path='/systems/trim-control/elevator-trim'/>
 		</properties>
 	</module>
 	<module name='systems/trim-control' instance='roll'>
 		<properties>
-			<property name='input.trim-axis' path='/input/joystick/axis/2'/>
+			<property name='input.trim-axis' path='/controls/ailerons-trim'/>
 			<property name='output.trim-value' path='/systems/trim-control/ailerons-trim'/>
 		</properties>
 	</module>
