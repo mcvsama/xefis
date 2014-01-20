@@ -103,11 +103,11 @@
 		<protocol>
 			<packet magic='e4:40'>
 				<signature random-bytes='2' signature-bytes='4' key='88:99:aa:bb'>
-					<property bytes='2' path='/input/joystick/axis/1' type='float'/>
-					<property bytes='2' path='/input/joystick/axis/0' type='float'/>
-					<property bytes='2' path='/input/pedals/axis/2' type='float'/>
-					<property bytes='2' path='/input/throttle/axis/3' type='float'/>
-					<property bytes='2' path='/input/throttle/axis/2' type='float'/>
+					<property bytes='2' path='/controls/elevator-stick' type='float'/>
+					<property bytes='2' path='/controls/ailerons-stick' type='float'/>
+					<property bytes='2' path='/controls/rudder' type='float'/>
+					<property bytes='2' path='/controls/throttle-left' type='float'/>
+					<property bytes='2' path='/controls/throttle-right' type='float'/>
 					<property bytes='2' path='/systems/trim-control/elevator-trim' type='float'/>
 					<property bytes='2' path='/systems/trim-control/ailerons-trim' type='float'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure'/>

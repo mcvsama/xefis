@@ -5,6 +5,7 @@
 		<path>/input/throttle</path>
 		<!-- Throttle R -->
 		<axis id='2'>
+			<path>/controls/throttle-right</path>
 			<reverse/>
 			<output>
 				<minimum>0</minimum>
@@ -13,39 +14,63 @@
 		</axis>
 		<!-- Throttle L -->
 		<axis id='3'>
+			<path>/controls/throttle-left</path>
 			<reverse/>
 			<output>
 				<minimum>0</minimum>
 				<maximum>1</maximum>
 			</output>
 		</axis>
-		<!-- Rudder trim -->
 		<axis id='4'>
 			<center>0.002594</center>
 		</axis>
+		<axis id='5'>
+			<path>/controls/trim-axis-horizontal</path>
+		</axis>
+		<axis id='6'>
+			<path>/controls/trim-axis-vertical</path>
+		</axis>
+		<button id='10'>
+			<path>/controls/flaps-up</path>
+		</button>
+		<button id='11'>
+			<path>/controls/flaps-down</path>
+		</button>
 	</module>
 	<module name='io/joystick' instance='joystick'>
 		<device>/dev/input/by-id/usb-Thustmaster_Joystick_-_HOTAS_Warthog-joystick</device>
 		<path>/input/joystick</path>
 		<!-- Roll -->
 		<axis id='0'>
+			<path>/controls/ailerons-stick</path>
 			<center>0.0</center>
 			<dead-zone>0.005</dead-zone>
 			<power>1.5</power>
 		</axis>
 		<!-- Pitch -->
 		<axis id='1'>
+			<path>/controls/elevator-stick</path>
 			<reverse/>
 			<center>0.0</center>
 			<dead-zone>0.005</dead-zone>
 			<power>1.5</power>
 		</axis>
+		<!-- Roll trim -->
+		<axis id='2'>
+			<path>/controls/ailerons-trim</path>
+		</axis>
+		<!-- Pitch trim -->
+		<axis id='3'>
+			<path>/controls/elevator-trim</path>
+			<reverse/>
+		</axis>
 	</module>
 	<module name='io/joystick' instance='pedals'>
-		<device>/dev/input/js0</device>
+		<device>/dev/input/js4</device>
 		<path>/input/pedals</path>
 		<!-- Pedals -->
 		<axis id='2'>
+			<path>/controls/rudder</path>
 			<power>3</power>
 		</axis>
 	</module>

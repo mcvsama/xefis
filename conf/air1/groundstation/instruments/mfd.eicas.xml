@@ -19,7 +19,7 @@
 										<properties path='//aircraft/sensors/engines/1'>
 											<property name='value' path='/thrust'/>
 											<property name='value.reference' path='/thrust.reference' default='520'/>
-											<property name='value.target' path='//input/throttle/axis/3'/>
+											<property name='value.target' path='//controls/throttle-left'/>
 										</properties>
 									</instrument>
 								</item>
@@ -119,7 +119,7 @@
 										<properties path='//aircraft/sensors/engines/2'>
 											<property name='value' path='/thrust'/>
 											<property name='value.reference' path='/thrust.reference' default='520'/>
-											<property name='value.target' path='//input/throttle/axis/2'/>
+											<property name='value.target' path='//controls/throttle-right'/>
 										</properties>
 									</instrument>
 								</item>

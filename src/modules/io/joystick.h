@@ -39,23 +39,19 @@ class JoystickInput:
 	struct Button
 	{
 		void
-		set_path (std::string const& path);
-
-		void
 		set_value (float value);
 
 		Xefis::PropertyBoolean	prop;
+		Xefis::PropertyBoolean	alt_prop;
 	};
 
 	struct Axis
 	{
 		void
-		set_path (std::string const& path);
-
-		void
 		set_value (float value);
 
 		Xefis::PropertyFloat	prop;
+		Xefis::PropertyFloat	alt_prop;
 		float					center			= 0.f;
 		float					dead_zone		= 0.f;
 		float					reverse			= 1.f;

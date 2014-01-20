@@ -6,8 +6,8 @@
 		</settings>
 		<properties>
 			<!-- Input -->
-			<property name='input.up' path='/input/throttle/button/10'/>
-			<property name='input.down' path='/input/throttle/button/11'/>
+			<property name='input.up' path='/controls/flaps-up'/>
+			<property name='input.down' path='/controls/flaps-down'/>
 			<property name='input.setting' path='/settings/flaps/setting'/>
 		</properties>
 	</module>
