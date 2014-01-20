@@ -167,34 +167,11 @@ HSIWidget::PaintWorkUnit::resized()
 	_hi_loc_pen = QPen (Qt::cyan, pen_width (0.8f), Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 
 	// Unscaled pens:
-	_ndb_pen = QPen (QColor (88, 88, 88), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_ndb_pen = QPen (QColor (99, 99, 99), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_vor_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_dme_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_home_pen = QPen (Qt::green, 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
-
-	// Shapes:
-	_ndb_shape = QPainterPath();
-	{
-		QPainterPath s_point;
-		s_point.addEllipse (QRectF (-0.035f, -0.035f, 0.07f, 0.07f));
-		QPainterPath point_1 = s_point.translated (0.f, -0.35f);
-		QPainterPath point_2 = s_point.translated (0.f, -0.55f);
-		QTransform t;
-
-		_ndb_shape.addEllipse (QRectF (-0.07f, -0.07f, 0.14f, 0.14f));
-		for (int i = 0; i < 12; ++i)
-		{
-			t.rotate (30.f);
-			_ndb_shape.addPath (t.map (point_1));
-		}
-		t.rotate (15.f);
-		for (int i = 0; i < 18; ++i)
-		{
-			t.rotate (20.f);
-			_ndb_shape.addPath (t.map (point_2));
-		}
-	}
 
 	_dme_for_vor_shape = QPolygonF()
 		<< QPointF (-0.5f, -0.5f)
@@ -1336,9 +1313,9 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				painter.setTransform (feature_scaled_transform);
 				painter.setPen (_ndb_pen);
 				painter.setBrush (_ndb_pen.color());
-				painter.drawPath (_ndb_shape);
+				painter.drawEllipse (QRectF (-0.1f, -0.1f, 0.2f, 0.2f));
 				painter.setTransform (feature_centered_transform);
-				painter.fast_draw_text (QPointF (0.35 * _q, 0.55f * _q), navaid.identifier());
+				painter.fast_draw_text (QPointF (0.15 * _q, 0.10 * _q), Qt::AlignLeft | Qt::AlignTop, navaid.identifier());
 				break;
 			}
 
