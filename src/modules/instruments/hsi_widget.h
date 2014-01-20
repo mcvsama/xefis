@@ -298,7 +298,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPen					_lo_loc_pen;
 		QPen					_hi_loc_pen;
 		QFont					_radials_font;
-		QPainterPath			_ndb_shape;
 		QPolygonF				_dme_for_vor_shape;
 		QPolygonF				_vor_shape;
 		QPolygonF				_vortac_shape;
