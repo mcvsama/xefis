@@ -60,6 +60,8 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "throttle-mode", _throttle_mode, true },
 		{ "input.pitch-axis", _input_pitch_axis, true },
 		{ "input.roll-axis", _input_roll_axis, true },
+		{ "input.pitch-axis.untrimmed", _input_pitch_axis_untrimmed, true },
+		{ "input.roll-axis.untrimmed", _input_roll_axis_untrimmed, true },
 		{ "input.yaw-axis", _input_yaw_axis, true },
 		{ "input.throttle-axis", _input_throttle_axis, true },
 		{ "pitch-extent", _pitch_extent, true },
@@ -112,6 +114,8 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		&_roll_extent,
 		&_input_pitch_axis,
 		&_input_roll_axis,
+		&_input_pitch_axis_untrimmed,
+		&_input_roll_axis_untrimmed,
 		&_input_yaw_axis,
 		&_input_pitch,
 		&_input_roll,
@@ -290,13 +294,13 @@ FlyByWire::integrate_manual_input (Time update_dt)
 	Angle target_pitch_extent = _pitch_extent.read (5_deg);
 	Angle target_roll_extent = _roll_extent.read (30_deg);
 
-	if (_input_pitch_axis.is_nil())
+	if (_input_pitch_axis_untrimmed.is_nil())
 		log() << "input.pitch-axis is nil, using 0.0" << std::endl;
-	if (_input_roll_axis.is_nil())
+	if (_input_roll_axis_untrimmed.is_nil())
 		log() << "input.roll-axis is nil, using 0.0" << std::endl;
 
-	double axis_pitch = -_input_pitch_axis.read (0.0);
-	double axis_roll = _input_roll_axis.read (0.0);
+	double axis_pitch = -_input_pitch_axis_untrimmed.read (0.0);
+	double axis_roll = _input_roll_axis_untrimmed.read (0.0);
 
 	Angle measured_pitch = *_measured_pitch;
 	Angle measured_roll = *_measured_roll;

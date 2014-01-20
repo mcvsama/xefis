@@ -45,7 +45,9 @@
 			</directory>
 			<directory path='/controls'>
 				<property name='input.pitch-axis' path='/elevator'/>
+				<property name='input.pitch-axis.untrimmed' path='/elevator-stick'/>
 				<property name='input.roll-axis' path='/ailerons'/>
+				<property name='input.roll-axis.untrimmed' path='/ailerons-stick'/>
 				<property name='input.yaw-axis' path='/rudder'/>
 				<property name='input.throttle-axis' path='/throttle-left'/>
 			</directory>
