@@ -14,6 +14,7 @@
 		<include name='systems/fd.xml'/>
 		<include name='systems/flaps.xml'/>
 		<include name='systems/at.xml'/>
+		<include name='systems/trim-mixer.xml'/>
 	</modules>
 	<windows>
 		<window width='400' height='500' full-screen='false'>

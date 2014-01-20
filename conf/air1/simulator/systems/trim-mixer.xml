@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/trim-mixer' instance='pitch'>
+		<properties>
+			<property name='input.axis' path='/input/elevator-stick'/>
+			<property name='input.trim-value' path='/input/elevator-trim'/>
+			<property name='output.axis' path='/controls/elevator'/>
+		</properties>
+	</module>
+	<module name='systems/trim-mixer' instance='roll'>
+		<properties>
+			<property name='input.axis' path='/input/ailerons-stick'/>
+			<property name='input.trim-value' path='/input/ailerons-trim'/>
+			<property name='output.axis' path='/controls/ailerons'/>
+		</properties>
+	</module>
+</xefis-include>
+
