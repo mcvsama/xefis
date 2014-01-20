@@ -112,6 +112,9 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyAngle		_roll_extent;
 	Xefis::PropertyFloat		_input_pitch_axis;
 	Xefis::PropertyFloat		_input_roll_axis;
+	Xefis::PropertyFloat		_input_pitch_axis_untrimmed;
+	Xefis::PropertyFloat		_input_roll_axis_untrimmed;
+	Xefis::PropertyAngle		_input_roll_stick;
 	Xefis::PropertyFloat		_input_yaw_axis;
 	Xefis::PropertyAngle		_input_pitch;
 	Xefis::PropertyAngle		_input_roll;
