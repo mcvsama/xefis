@@ -207,6 +207,7 @@ SRC_HEADERS += modules/instruments/radial_indicator.h
 SRC_HEADERS += modules/instruments/radial_indicator_widget.h
 SRC_HEADERS += modules/instruments/status.h
 SRC_HEADERS += modules/instruments/status_widget.h
+SRC_HEADERS += modules/instruments/vertical_trim.h
 
 SRC_SOURCES += modules/instruments/datatable.cc
 SRC_SOURCES += modules/instruments/efis.cc
@@ -222,6 +223,7 @@ SRC_SOURCES += modules/instruments/radial_indicator.cc
 SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
 SRC_SOURCES += modules/instruments/status.cc
 SRC_SOURCES += modules/instruments/status_widget.cc
+SRC_SOURCES += modules/instruments/vertical_trim.cc
 
 SRC_MOCHDRS += modules/instruments/efis.h
 SRC_MOCHDRS += modules/instruments/efis_widget.h
