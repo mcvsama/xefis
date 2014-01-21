@@ -51,6 +51,8 @@ class VerticalTrim:
 	stringify (double value);
 
   private:
+	// Settings:
+	QString					_label = "STAB";
 	// Properties:
 	Xefis::PropertyFloat	_input_trim_value;
 	Xefis::PropertyFloat	_input_trim_reference;
