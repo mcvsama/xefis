@@ -325,7 +325,17 @@
 				</item>
 				<item stretch-factor='15'>
 					<layout type='horizontal'>
-						<item stretch-factor='10'>
+						<item stretch-factor='7' margin='20 0'>
+							<instrument name='instruments/vertical-trim'>
+								<properties>
+									<property name='input.trim-value' path='/systems/trim-control/elevator-trim'/>
+									<property name='input.trim-reference' path='/systems/trim-control/elevator-trim.reference' default='0.0'/>
+									<property name='input.trim-reference.minimum' path='/systems/trim-control/elevator-trim.reference.minimum' default='-0.2'/>
+									<property name='input.trim-reference.maximum' path='/systems/trim-control/elevator-trim.reference.maximum' default='+0.2'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='7'>
 							<instrument name='instruments/gear'>
 								<properties>
 									<property name='setting.down' path='/aircraft/sensors/gear/setting.down'/>
@@ -338,7 +348,7 @@
 								</properties>
 							</instrument>
 						</item>
-						<item stretch-factor='5'>
+						<item stretch-factor='6'>
 							<instrument name='instruments/flaps'>
 								<settings>
 									<setting name='maximum' value='30 deg'/>
@@ -350,10 +360,11 @@
 								</properties>
 							</instrument>
 						</item>
-						<item stretch-factor='5'/>
 					</layout>
 				</item>
-				<item stretch-factor='30'>
+				<item stretch-factor='15'>
+				</item>
+				<item stretch-factor='15'>
 					<layout type='horizontal'>
 						<item stretch-factor='5'>
 							<instrument name='instruments/datatable' instance='general'>
