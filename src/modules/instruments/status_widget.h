@@ -33,8 +33,6 @@ class StatusWidget:
 	public Xefis::InstrumentWidget,
 	public Xefis::InstrumentAids
 {
-	Q_OBJECT
-
 	static constexpr Time MessageHideTimeout = 5_s;
 
   public:

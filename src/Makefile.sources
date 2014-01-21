@@ -227,7 +227,6 @@ SRC_MOCHDRS += modules/instruments/efis.h
 SRC_MOCHDRS += modules/instruments/efis_widget.h
 SRC_MOCHDRS += modules/instruments/hsi.h
 SRC_MOCHDRS += modules/instruments/status.h
-SRC_MOCHDRS += modules/instruments/status_widget.h
 
 ######## /modules/io ########
 
