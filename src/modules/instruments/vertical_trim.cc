@@ -36,6 +36,10 @@ VerticalTrim::VerticalTrim (Xefis::ModuleManager* module_manager, QDomElement co
 	Xefis::Instrument (module_manager, config),
 	InstrumentAids (0.5f)
 {
+	parse_settings (config, {
+		{ "label", _label, false },
+	});
+
 	parse_properties (config, {
 		{ "input.trim-value", _input_trim_value, true },
 		{ "input.trim-reference", _input_trim_reference, false },
@@ -103,9 +107,9 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	painter().setFont (nu_nd_font);
 	painter().setTransform (center_point_transform);
 	painter().drawPolyline (line);
+	painter().drawLine (QPointF (-0.5 * h, 0.0), QPointF (+0.5 * h, 0.0));
 	painter().fast_draw_text (nd - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "ND");
 	painter().fast_draw_text (nu - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "NU");
-	painter().drawLine (QPointF (-0.5 * h, 0.0), QPointF (+0.5 * h, 0.0));
 
 	// Reference range:
 	if (ref_min && ref_max)
@@ -129,7 +133,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	// Cyan vertical text:
 	painter().setFont (label_font);
 	painter().setPen (cyan);
-	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, "STAB");
+	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, _label);
 
 	// Pointer:
 	if (trim)
@@ -167,7 +171,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 		QString ref_str = stringify (-*ref);
 		painter().setPen (get_pen (_autopilot_color, 1.0));
 		painter().setFont (reference_font);
-		painter().fast_draw_text (QPointF (box.center().x(), -0.75 * _font_18_digit_height), Qt::AlignBottom | Qt::AlignHCenter, ref_str);
+		painter().fast_draw_text (QPointF (box.center().x(), box.top()), Qt::AlignBottom | Qt::AlignHCenter, ref_str);
 	}
 }
 
