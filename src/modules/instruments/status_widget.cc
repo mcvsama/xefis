@@ -200,7 +200,7 @@ StatusWidget::paintEvent (QPaintEvent*)
 			painter().setPen (QPen (QColor (0x70, 0x70, 0x70)));
 		else
 			painter().setPen (QPen (message.color));
-		painter().fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * i), Qt::AlignTop | Qt::AlignLeft, message.message);
+		painter().fast_draw_text (QPointF (_viewport.left(), _viewport.top() + _line_height * (i + 0.5)), Qt::AlignVCenter | Qt::AlignLeft, message.message);
 	}
 
 	// Cursor:
@@ -251,7 +251,7 @@ StatusWidget::recompute()
 	float margin = pen_width (2.f);
 	_font = _font_16;
 	QFontMetricsF metrics (_font);
-	_line_height = metrics.height();
+	_line_height = 0.85 * metrics.height();
 	// Compute space needed for more-up/more-down arrows and actual
 	// messages viewport.
 	_arrow_height = 0.5f * _line_height;
