@@ -365,9 +365,35 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='15'>
+				<item stretch-factor='10'>
+					<layout type='horizontal'>
+						<item stretch-factor='7'>
+							<instrument name='instruments/horizontal-trim' instance='rudder'>
+								<settings>
+									<setting name='label' value='RUDDER TRIM'/>
+								</settings>
+								<properties>
+									<property name='input.trim-value' path='/systems/trim-control/rudder-trim'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='1'/>
+						<item stretch-factor='7'>
+							<instrument name='instruments/horizontal-trim' instance='ailerons'>
+								<settings>
+									<setting name='label' value='AILERONS TRIM'/>
+									<setting name='label.minimum' value='LWD'/>
+									<setting name='label.maximum' value='RWD'/>
+								</settings>
+								<properties>
+									<property name='input.trim-value' path='/systems/trim-control/ailerons-trim'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='5'/>
+					</layout>
 				</item>
-				<item stretch-factor='15'>
+				<item stretch-factor='20'>
 					<layout type='horizontal'>
 						<item stretch-factor='5'>
 							<instrument name='instruments/datatable' instance='general'>
