@@ -20,6 +20,7 @@
 				<property name='wind.from.magnetic' path='/wind/from/magnetic'/>
 				<property name='wind.speed.tas' path='/wind/speed/tas'/>
 				<property name='glide-ratio' path='/glide-ratio'/>
+				<property name='glide-ratio.string' path='/glide-ratio.string'/>
 				<property name='total-energy-variometer' path='/total-energy-variometer'/>
 			</directory>
 		</properties>
