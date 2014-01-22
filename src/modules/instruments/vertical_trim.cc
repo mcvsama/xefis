@@ -93,7 +93,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	QFont reference_font = _font_13;
 	QColor cyan { 0x44, 0xdd, 0xff };
 	QTransform center_point_transform;
-	center_point_transform.translate (0.6 * width(), 0.5 * height());
+	center_point_transform.translate (0.65 * width(), 0.5 * height());
 
 	// Scale line:
 	QPointF nd (-h, 0.5 * (h - height()));
