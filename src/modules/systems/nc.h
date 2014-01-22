@@ -16,7 +16,6 @@
 
 // Standard:
 #include <cstddef>
-#include <array>
 
 // Boost:
 #include <boost/circular_buffer.hpp>

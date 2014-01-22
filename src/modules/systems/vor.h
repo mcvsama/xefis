@@ -16,7 +16,6 @@
 
 // Standard:
 #include <cstddef>
-#include <array>
 
 // Qt:
 #include <QtXml/QDomElement>
