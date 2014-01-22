@@ -112,7 +112,7 @@ void
 TrimControl::update_trim()
 {
 	update_trim_without_sound();
-	this->module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
+	module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
 }
 
 
