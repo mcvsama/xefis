@@ -259,7 +259,7 @@
 		<item stretch-factor='2'/>
 		<item stretch-factor='48'>
 			<layout type='vertical'>
-				<item stretch-factor='30'>
+				<item stretch-factor='20'>
 					<instrument name='instruments/status'>
 						<properties path='/panels/eicas-status'>
 							<property name='button.cursor-up' path='/up'/>
@@ -323,9 +323,50 @@
 						</messages>
 					</instrument>
 				</item>
-				<item stretch-factor='15'>
+				<item stretch-factor='12'>
 					<layout type='horizontal'>
-						<item stretch-factor='7' margin='20 0'>
+						<item stretch-factor='5'>
+							<instrument name='instruments/horizontal-trim' instance='ailerons'>
+								<settings>
+									<setting name='label' value='ALRNS TRIM'/>
+									<setting name='label.minimum' value='LWD'/>
+									<setting name='label.maximum' value='RWD'/>
+								</settings>
+								<properties>
+									<property name='input.trim-value' path='/systems/trim-control/ailerons-trim'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='5' margin='0 0 0 10'>
+							<instrument name='instruments/flaps'>
+								<settings>
+									<setting name='maximum' value='30 deg'/>
+									<setting name='hide-retracted' value='true'/>
+								</settings>
+								<properties>
+									<property name='current' path='/aircraft/systems/flaps/current'/>
+									<property name='setting' path='/aircraft/systems/flaps/setting'/>
+								</properties>
+							</instrument>
+						</item>
+						<item stretch-factor='6'>
+							<instrument name='instruments/gear'>
+								<properties>
+									<property name='setting.down' path='/aircraft/sensors/gear/setting.down'/>
+									<property name='nose.up' path='/aircraft/sensors/gear/nose.up'/>
+									<property name='nose.down' path='/aircraft/sensors/gear/nose.down'/>
+									<property name='left.up' path='/aircraft/sensors/gear/left.up'/>
+									<property name='left.down' path='/aircraft/sensors/gear/left.down'/>
+									<property name='right.up' path='/aircraft/sensors/gear/right.up'/>
+									<property name='right.down' path='/aircraft/sensors/gear/right.down'/>
+								</properties>
+							</instrument>
+						</item>
+					</layout>
+				</item>
+				<item stretch-factor='10'>
+					<layout type='horizontal'>
+						<item stretch-factor='7'>
 							<instrument name='instruments/vertical-trim' instance='pitch'>
 								<settings>
 									<setting name='label' value='STAB'/>
@@ -339,35 +380,6 @@
 							</instrument>
 						</item>
 						<item stretch-factor='7'>
-							<instrument name='instruments/gear'>
-								<properties>
-									<property name='setting.down' path='/aircraft/sensors/gear/setting.down'/>
-									<property name='nose.up' path='/aircraft/sensors/gear/nose.up'/>
-									<property name='nose.down' path='/aircraft/sensors/gear/nose.down'/>
-									<property name='left.up' path='/aircraft/sensors/gear/left.up'/>
-									<property name='left.down' path='/aircraft/sensors/gear/left.down'/>
-									<property name='right.up' path='/aircraft/sensors/gear/right.up'/>
-									<property name='right.down' path='/aircraft/sensors/gear/right.down'/>
-								</properties>
-							</instrument>
-						</item>
-						<item stretch-factor='6'>
-							<instrument name='instruments/flaps'>
-								<settings>
-									<setting name='maximum' value='30 deg'/>
-									<setting name='hide-retracted' value='true'/>
-								</settings>
-								<properties>
-									<property name='current' path='/aircraft/systems/flaps/current'/>
-									<property name='setting' path='/aircraft/systems/flaps/setting'/>
-								</properties>
-							</instrument>
-						</item>
-					</layout>
-				</item>
-				<item stretch-factor='10'>
-					<layout type='horizontal'>
-						<item stretch-factor='7'>
 							<instrument name='instruments/horizontal-trim' instance='rudder'>
 								<settings>
 									<setting name='label' value='RUDDER TRIM'/>
@@ -377,25 +389,12 @@
 								</properties>
 							</instrument>
 						</item>
-						<item stretch-factor='1'/>
-						<item stretch-factor='7'>
-							<instrument name='instruments/horizontal-trim' instance='ailerons'>
-								<settings>
-									<setting name='label' value='AILERONS TRIM'/>
-									<setting name='label.minimum' value='LWD'/>
-									<setting name='label.maximum' value='RWD'/>
-								</settings>
-								<properties>
-									<property name='input.trim-value' path='/systems/trim-control/ailerons-trim'/>
-								</properties>
-							</instrument>
-						</item>
-						<item stretch-factor='5'/>
+						<item stretch-factor='6'/>
 					</layout>
 				</item>
 				<item stretch-factor='20'>
 					<layout type='horizontal'>
-						<item stretch-factor='5'>
+						<item stretch-factor='5' margin='20 0 0 0'>
 							<instrument name='instruments/datatable' instance='general'>
 								<settings>
 									<setting name='label-color' value='#0df'/>
