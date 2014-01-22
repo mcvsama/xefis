@@ -74,6 +74,7 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertyAngle		_wind_from_magnetic;
 	Xefis::PropertySpeed		_wind_tas;
 	Xefis::PropertyFloat		_glide_ratio;
+	Xefis::PropertyString		_glide_ratio_string;
 	Xefis::PropertySpeed		_total_energy_variometer;
 };
 

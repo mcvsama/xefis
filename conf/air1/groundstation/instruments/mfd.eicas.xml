@@ -409,12 +409,12 @@
 										<value path='/systems/adc/density-altitude' unit='ft' format='%.0f   ' nil='----   '/>
 									</row>
 									<row>
-										<label>MACH</label>
-										<value path='/systems/adc/speed/mach' format='%.3f   ' nil='--   '/>
+										<label>GLIDE RATIO</label>
+										<value path='/systems/pc/glide-ratio.string' format='%s   ' nil='----   '/>
 									</row>
 									<row>
-										<label>GR</label>
-										<value path='/systems/pc/glide-ratio' format='%02d   ' nil='--   '/>
+										<label>MACH</label>
+										<value path='/systems/adc/speed/mach' format='%.3f   ' nil='--   '/>
 									</row>
 									<row>
 										<label>TAT</label>

@@ -55,6 +55,7 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 		{ "wind.from.magnetic", _wind_from_magnetic, true },
 		{ "wind.speed.tas", _wind_tas, true },
 		{ "glide-ratio", _glide_ratio, true },
+		{ "glide-ratio.string", _glide_ratio_string, false },
 		{ "total-energy-variometer", _total_energy_variometer, true },
 	});
 
@@ -146,9 +147,30 @@ PerformanceComputer::compute_glide_ratio()
 			? Xefis::limit<int> (forward_speed / *_vertical_speed, -99, +99)
 			: 0;
 		_glide_ratio.write (ratio);
+
+		if (_glide_ratio_string.configured())
+		{
+			std::string arr;
+
+			if (ratio > 0)
+				arr = "↑";
+			else if (ratio < 0)
+				arr = "↓";
+			else
+				arr = "";
+
+			if (std::abs (ratio) > 0)
+				_glide_ratio_string = arr + (boost::format ("%02d:1") % std::abs (ratio)).str();
+			else
+				_glide_ratio_string = "=";
+		}
 	}
 	else
+	{
 		_glide_ratio.set_nil();
+		if (_glide_ratio_string.configured())
+			_glide_ratio_string.set_nil();
+	}
 }
 
 
