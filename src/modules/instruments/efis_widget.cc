@@ -642,8 +642,10 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 	_params.speed = Xefis::limit (_params.speed, 0_kt, 9999.99_kt);
 	_params.speed_mach = Xefis::limit (_params.speed_mach, 0.f, 9.99f);
 	_params.speed_minimum = Xefis::limit (_params.speed_minimum, 0.0_kt, 9999.99_kt);
-	_params.speed_minimum_maneuver = Xefis::limit (_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
-	_params.speed_maximum_maneuver = Xefis::limit (_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+	if (_params.speed_minimum_maneuver)
+		_params.speed_minimum_maneuver = Xefis::limit (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+	if (_params.speed_maximum_maneuver)
+		_params.speed_maximum_maneuver = Xefis::limit (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
 	_params.speed_maximum = Xefis::limit (_params.speed_maximum, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
@@ -739,8 +741,8 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (Xefis::Painter& painter, float x)
 	painter.translate (+0.75f * x, 0.f);
 
 	QPen border_pen = _sl_black_box_pen;
-	bool speed_is_in_warning_area = (_params.speed_minimum < _params.speed && _params.speed < _params.speed_minimum_maneuver) ||
-									(_params.speed_maximum > _params.speed && _params.speed > _params.speed_maximum_maneuver);
+	bool speed_is_in_warning_area = (_params.speed_minimum < _params.speed && _params.speed_minimum_maneuver && _params.speed < *_params.speed_minimum_maneuver) ||
+									(_params.speed_maximum > _params.speed && _params.speed_maximum_maneuver && _params.speed > *_params.speed_maximum_maneuver);
 	if (_locals.speed_blinking_active || speed_is_in_warning_area)
 	{
 		if (_locals.speed_blink || speed_is_in_warning_area)
@@ -872,13 +874,13 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
 	float min_posy = kt_to_px (_params.speed_minimum);
-	float min_man_posy = kt_to_px (_params.speed_minimum_maneuver);
-	float max_man_posy = kt_to_px (_params.speed_maximum_maneuver);
+	float min_man_posy = kt_to_px (_params.speed_minimum_maneuver ? *_params.speed_minimum_maneuver : 0_kt);
+	float max_man_posy = kt_to_px (_params.speed_maximum_maneuver ? *_params.speed_maximum_maneuver : 0_kt);
 	float max_posy = kt_to_px (_params.speed_maximum);
 	QPointF min_point = _sl_ladder_rect.bottomRight() + ydif;
 	QPointF max_point = _sl_ladder_rect.topRight() - ydif;
 
-	if (_params.speed_minimum_maneuver_visible && _params.speed_minimum_maneuver > _sl_min_shown)
+	if (_params.speed_minimum_maneuver && *_params.speed_minimum_maneuver > _sl_min_shown)
 	{
 		QPolygonF poly = QPolygonF()
 			<< QPointF (_sl_ladder_rect.right() - tr_right, min_man_posy)
@@ -890,7 +892,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (Xefis::Painter& painter, float
 		});
 	}
 
-	if (_params.speed_maximum_maneuver_visible && _params.speed_maximum_maneuver < _sl_max_shown)
+	if (_params.speed_maximum_maneuver && *_params.speed_maximum_maneuver < _sl_max_shown)
 	{
 		QPolygonF poly = QPolygonF()
 			<< QPointF (_sl_ladder_rect.right() - tr_right, max_man_posy)

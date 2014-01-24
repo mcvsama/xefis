@@ -65,10 +65,8 @@ class EFISWidget: public Xefis::InstrumentWidget
 		Speed				speed_lookahead						= 0_kt;
 		bool				speed_minimum_visible				= false;
 		Speed				speed_minimum						= 0_kt;
-		bool				speed_minimum_maneuver_visible		= false;
-		Speed				speed_minimum_maneuver				= 0_kt;
-		bool				speed_maximum_maneuver_visible		= false;
-		Speed				speed_maximum_maneuver				= 0_kt;
+		Optional<Speed>		speed_minimum_maneuver				= 0_kt;
+		Optional<Speed>		speed_maximum_maneuver				= 0_kt;
 		bool				speed_maximum_visible				= false;
 		Speed				speed_maximum						= 0_kt;
 		bool				speed_mach_visible					= false;

@@ -203,10 +203,8 @@ EFIS::read()
 	params.speed_lookahead = *_speed_ias_lookahead;
 	params.speed_minimum_visible = _speed_ias_minimum.valid();
 	params.speed_minimum = *_speed_ias_minimum;
-	params.speed_minimum_maneuver_visible = _speed_ias_minimum_maneuver.valid();
-	params.speed_minimum_maneuver = *_speed_ias_minimum_maneuver;
-	params.speed_maximum_maneuver_visible = _speed_ias_maximum_maneuver.valid();
-	params.speed_maximum_maneuver = *_speed_ias_maximum_maneuver;
+	params.speed_minimum_maneuver = _speed_ias_minimum_maneuver.get_optional();
+	params.speed_maximum_maneuver = _speed_ias_maximum_maneuver.get_optional();
 	params.speed_maximum_visible = _speed_ias_maximum.valid();
 	params.speed_maximum = *_speed_ias_maximum;
 	params.speed_mach_visible = _speed_mach.valid() && *_speed_mach > _show_mach_above;
