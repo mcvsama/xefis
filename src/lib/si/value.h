@@ -71,7 +71,7 @@ template<class tValueType>
 		typedef tValueType	ValueType;
 
 	  protected:
-		constexpr explicit
+		explicit constexpr
 		TypedValue (ValueType);
 
 		constexpr
