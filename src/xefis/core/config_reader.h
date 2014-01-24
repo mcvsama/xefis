@@ -199,10 +199,17 @@ class ConfigReader
 	ConfigReader (Application*, ModuleManager*);
 
 	/**
-	 * Read config, create windows and loads modules.
+	 * Read config, parse it, prepare for processing, but don't yet load anything.
+	 * Sub-configurations will become accessible after this call, like fe. airframe_config().
 	 */
 	void
 	load (QString const& path);
+
+	/**
+	 * Process config. Load modules, create windows, etc.
+	 */
+	void
+	process();
 
 	/**
 	 * Determines if there are any windows (and instruments)
@@ -229,12 +236,18 @@ class ConfigReader
 	float
 	font_scale() const;
 
+	/**
+	 * Return sub-configuration for the Airframe module.
+	 */
+	QDomElement
+	airframe_config() const;
+
   private:
 	QDomDocument
 	parse_file (QString const& path);
 
 	void
-	process();
+	preprocess();
 
 	void
 	process_includes (QDomElement parent);
@@ -258,15 +271,19 @@ class ConfigReader
 	process_module_element (QDomElement const& module_element, QWidget* window = nullptr);
 
   private:
-	Application*	_application		= nullptr;
-	ModuleManager*	_module_manager		= nullptr;
-	QDomDocument	_config_document;
-	QDir			_current_dir;
-	QString			_config_mode;
-	bool			_has_windows		= false;
-	bool			_navaids_enable		= true;
-	float			_scale_pen			= 1.f;
-	float			_scale_font			= 1.f;
+	Application*			_application		= nullptr;
+	ModuleManager*			_module_manager		= nullptr;
+	QDomDocument			_config_document;
+	QDir					_current_dir;
+	QString					_config_mode;
+	std::list<QDomElement>	_settings_elements;
+	std::list<QDomElement>	_windows_elements;
+	std::list<QDomElement>	_modules_elements;
+	QDomElement				_airframe_config;
+	bool					_has_windows		= false;
+	bool					_navaids_enable		= true;
+	float					_scale_pen			= 1.f;
+	float					_scale_font			= 1.f;
 };
 
 
@@ -343,6 +360,13 @@ inline float
 ConfigReader::font_scale() const
 {
 	return _scale_font;
+}
+
+
+inline QDomElement
+ConfigReader::airframe_config() const
+{
+	return _airframe_config;
 }
 
 } // namespace Xefis

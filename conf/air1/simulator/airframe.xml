@@ -1,0 +1,5 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<include name='airframe/flaps.xml'/>
+</xefis-include>
+

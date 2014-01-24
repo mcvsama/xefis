@@ -37,6 +37,7 @@ class ConfigReader;
 class WorkPerformer;
 class ConfiguratorWidget;
 class Accounting;
+class Airframe;
 
 
 class Application: public QApplication
@@ -125,6 +126,12 @@ class Application: public QApplication
 	work_performer() const;
 
 	/**
+	 * Return Airframe object.
+	 */
+	Airframe*
+	airframe() const;
+
+	/**
 	 * Return configurator widget.
 	 * May return nullptr, if configurator widget is disabled
 	 * (eg. for instrument-less configurations of XEFIS).
@@ -176,6 +183,7 @@ class Application: public QApplication
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<WorkPerformer>			_work_performer;
+	Unique<Airframe>				_airframe;
 	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
 };
@@ -233,6 +241,13 @@ inline WorkPerformer*
 Application::work_performer() const
 {
 	return _work_performer.get();
+}
+
+
+inline Airframe*
+Application::airframe() const
+{
+	return _airframe.get();
 }
 
 

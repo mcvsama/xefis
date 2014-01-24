@@ -27,6 +27,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/airframe/airframe.h>
 #include <xefis/core/services.h>
 #include <xefis/core/property_storage.h>
 #include <xefis/core/accounting.h>
@@ -87,6 +88,10 @@ Application::Application (int& argc, char** argv):
 		config_file = "xefis-config.xml";
 	}
 	_config_reader->load (config_file);
+
+	_airframe = std::make_unique<Airframe> (this, _config_reader->airframe_config());
+
+	_config_reader->process();
 
 	if (_config_reader->has_windows())
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (_module_manager.get(), nullptr);
