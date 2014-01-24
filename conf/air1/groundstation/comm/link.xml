@@ -86,7 +86,7 @@
 						<property path='/aircraft/sensors/gear/right.up' type='boolean' retained='true'/>
 						<property path='/aircraft/sensors/gear/right.down' type='boolean' retained='true'/>
 						<!-- Other flags -->
-						<property path='/aircraft/systems/fd/altitude-acquired' type='boolean'/>
+						<property path='/aircraft/systems/altacq/flag' type='boolean'/>
 						<property path='/link/remote/valid' type='boolean'/>
 					</bitfield>
 				</signature>

@@ -34,16 +34,19 @@ AltAcq::AltAcq (Xefis::ModuleManager* module_manager, QDomElement const& config)
 {
 	parse_settings (config, {
 		{ "minimum-altitude-difference", _minimum_altitude_difference, false },
+		{ "flag-altitude-difference.on", _flag_diff_on, false },
+		{ "flag-altitude-difference.off", _flag_diff_off, false },
 	});
 
 	parse_properties (config, {
 		// Input:
-		{ "altitude.amsl", _altitude_amsl, false },
-		{ "altitude.acquire.amsl", _altitude_acquire_amsl, false },
+		{ "altitude.amsl", _altitude_amsl, true },
+		{ "altitude.acquire.amsl", _altitude_acquire_amsl, true },
 		{ "vertical-speed", _vertical_speed, false },
 		{ "ground-speed", _ground_speed, false },
 		// Output:
-		{ "altitude.acquire.distance", _altitude_acquire_distance, true },
+		{ "altitude.acquire.distance", _altitude_acquire_distance, false },
+		{ "altitude.acquire.flag", _altitude_acquire_flag, false },
 	});
 
 	_altitude_acquire_distance_computer.set_minimum_dt (100_ms);
@@ -64,6 +67,32 @@ void
 AltAcq::data_updated()
 {
 	_altitude_acquire_distance_computer.data_updated (update_time());
+
+	if (_altitude_acquire_flag.configured() && _altitude_amsl.valid() && _altitude_acquire_amsl.valid())
+	{
+		if (_altitude_amsl.fresh() || _altitude_acquire_amsl.fresh())
+		{
+			if (_altitude_acquire_amsl.fresh())
+				_altitude_acquire_amsl_timestamp = Time::now();
+
+			Length diff = 1_ft * std::abs ((*_altitude_amsl - *_altitude_acquire_amsl).ft());
+			// Arm flag when difference beyond 'on-diff':
+			if (diff > _flag_diff_on)
+				_flag_armed = true;
+			// But don't allow arming if alt setting was changed recently:
+			if (Time::now() - _altitude_acquire_amsl_timestamp < 1_s)
+				_flag_armed = false;
+			// Disarm and disable when approaching commanded altitude,
+			// so that it doesn't engage again when the craft is on the
+			// other side of commanded alt:
+			if (diff < _flag_diff_off)
+				_flag_armed = false;
+
+			_altitude_acquire_flag.write (_flag_armed && _flag_diff_off <= diff && diff <= _flag_diff_on);
+		}
+	}
+	else
+		_altitude_acquire_flag.set_nil();
 }
 
 

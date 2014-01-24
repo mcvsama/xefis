@@ -145,6 +145,12 @@ class GenericProperty
 	fresh() const;
 
 	/**
+	 * Convenience method that checks for valid()ity and fresh()ness.
+	 */
+	bool
+	valid_and_fresh() const;
+
+	/**
 	 * Check whether the node this property points to,
 	 * is a PropertyValueNode of given Target type.
 	 */
@@ -530,6 +536,13 @@ inline bool
 GenericProperty::fresh() const
 {
 	return serial() + 1 > _last_read_serial;
+}
+
+
+inline bool
+GenericProperty::valid_and_fresh() const
+{
+	return valid() && fresh();
 }
 
 

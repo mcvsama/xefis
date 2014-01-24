@@ -47,13 +47,18 @@ class AltAcq: public Xefis::Module
 	Xefis::Smoother<double>		_altitude_acquire_distance_smoother	= 2_s;
 	Xefis::PropertyObserver		_altitude_acquire_distance_computer;
 	Length						_minimum_altitude_difference;
+	Length						_flag_diff_on						= 1000_ft;
+	Length						_flag_diff_off						= 100_ft;
+	bool						_flag_armed							= false;
 	// Input:
 	Xefis::PropertyLength		_altitude_amsl;
 	Xefis::PropertyLength		_altitude_acquire_amsl;
+	Time						_altitude_acquire_amsl_timestamp;
 	Xefis::PropertySpeed		_vertical_speed;
 	Xefis::PropertySpeed		_ground_speed;
 	// Output:
 	Xefis::PropertyLength		_altitude_acquire_distance;
+	Xefis::PropertyBoolean		_altitude_acquire_flag;
 };
 
 #endif
