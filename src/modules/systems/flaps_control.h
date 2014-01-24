@@ -27,6 +27,10 @@
 #include <xefis/core/property.h>
 
 
+/**
+ * Controls extending/retracting flaps with configured speed.
+ * Reacts to buttons to change to next or previous setting.
+ */
 class FlapsControl: public Xefis::Module
 {
 	static constexpr Time kUpdateInterval = 10_ms;
