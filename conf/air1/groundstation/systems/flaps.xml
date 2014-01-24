@@ -11,5 +11,12 @@
 			<property name='input.setting' path='/settings/flaps/setting'/>
 		</properties>
 	</module>
+	<module name='systems/flaps-bugs'>
+		<properties>
+			<property name='input.flaps-setting' path='/settings/flaps/setting'/>
+			<property name='output.flaps-bug.speed' path='/systems/flaps/bugs/speed'/>
+			<property name='output.flaps-bug.label' path='/systems/flaps/bugs/label'/>
+		</properties>
+	</module>
 </xefis-include>
 

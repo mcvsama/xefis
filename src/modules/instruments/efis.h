@@ -89,6 +89,9 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertySpeed				_speed_v1;
 	Xefis::PropertySpeed				_speed_vr;
 	Xefis::PropertySpeed				_speed_vref;
+	Xefis::PropertyString				_speed_flaps_label;
+	Xefis::PropertySpeed				_speed_flaps_speed;
+	QString								_speed_flaps_current_label;
 	// Attitude and heading
 	Xefis::PropertyBoolean				_orientation_serviceable;
 	Xefis::PropertyAngle				_orientation_pitch;
