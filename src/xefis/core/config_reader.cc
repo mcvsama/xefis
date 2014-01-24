@@ -309,9 +309,21 @@ ConfigReader::load (QString const& path)
 	_current_dir = cwd.absolutePath() + '/' + dirname;
 
 	_config_document = parse_file (basename);
-	process();
+	preprocess();
 
 	_current_dir = cwd;
+}
+
+
+void
+ConfigReader::process()
+{
+	for (auto e: _settings_elements)
+		process_settings_element (e);
+	for (auto e: _windows_elements)
+		process_windows_element (e);
+	for (auto e: _modules_elements)
+		process_modules_element (e);
 }
 
 
@@ -335,7 +347,7 @@ ConfigReader::parse_file (QString const& path)
 
 
 void
-ConfigReader::process()
+ConfigReader::preprocess()
 {
 	QDomElement root = _config_document.documentElement();
 
@@ -348,11 +360,13 @@ ConfigReader::process()
 	for (QDomElement& e: root)
 	{
 		if (e == "settings")
-			process_settings_element (e);
+			_settings_elements.push_back (e);
 		else if (e == "windows")
-			process_windows_element (e);
+			_windows_elements.push_back (e);
 		else if (e == "modules")
-			process_modules_element (e);
+			_modules_elements.push_back (e);
+		else if (e == "airframe")
+			_airframe_config = e;
 		else
 			throw ConfigException (QString ("unsupported child of <xefis-config>: <%1>").arg (e.tagName()).toStdString());
 	}

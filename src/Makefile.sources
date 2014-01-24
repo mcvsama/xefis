@@ -4,6 +4,14 @@
 
 SRC_SOURCES += xefis/main.cc
 
+######## /xefis/airframe ########
+
+SRC_HEADERS += xefis/airframe/airframe.h
+SRC_HEADERS += xefis/airframe/flaps.h
+
+SRC_SOURCES += xefis/airframe/airframe.cc
+SRC_SOURCES += xefis/airframe/flaps.cc
+
 ######## /xefis/airnav ########
 
 SRC_HEADERS += xefis/airnav/density_altitude.h

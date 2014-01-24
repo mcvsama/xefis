@@ -5,6 +5,9 @@
 		<setting name='scale.pen' value='0.92'/>
 		<setting name='scale.font' value='1.0'/>
 	</settings>
+	<airframe>
+		<include name='../simulator/airframe.xml'/>
+	</airframe>
 	<modules>
 		<include name='comm/link.xml'/>
 		<include name='comm/udp.xml'/>

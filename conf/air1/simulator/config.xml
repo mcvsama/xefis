@@ -3,6 +3,9 @@
 	<settings>
 		<setting name='navaids.enable' value='false'/>
 	</settings>
+	<airframe>
+		<include name='airframe.xml'/>
+	</airframe>
 	<modules>
 		<include name='comm/link.xml'/>
 		<include name='comm/udp.xml'/>
