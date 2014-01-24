@@ -17,6 +17,7 @@
 					<setting name='altitude.landing.warning.lo' value='500 ft'/>
 					<setting name='aoa.visibility-threshold' value='17.5 deg'/>
 					<setting name='show-mach-above' value='0.4'/>
+					<setting name='play-altacq-sound' value='true'/>
 				</settings>
 				<properties>
 					<property name='orientation.heading.numbers-visible' path='/settings/efis/heading-numbers-visible' default='true'/>
@@ -56,7 +57,7 @@
 					<property name='flight-director.cmd.visible' path='/settings/efis/cmd-settings-visible' default='true'/>
 					<property name='flight-director.cmd.ias' path='/aircraft/settings/cmd/ias'/>
 					<property name='flight-director.cmd.altitude' path='/aircraft/settings/cmd/altitude'/>
-					<property name='flight-director.cmd.altitude.acquired' path='/aircraft/systems/fd/altitude-acquired'/>
+					<property name='flight-director.cmd.altitude.acquired' path='/aircraft/systems/altacq/flag'/>
 					<property name='flight-director.cmd.vertical-speed' path='/aircraft/settings/cmd/vertical-speed'/>
 					<property name='flight-director.guidance.visible' path='/settings/efis/cmd-guidance-visible'/>
 					<property name='flight-director.guidance.pitch' path='/aircraft/systems/fd/pitch'/>

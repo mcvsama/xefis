@@ -8,6 +8,7 @@
 		<include name='comm/udp.xml'/>
 		<include name='sensors/flightgear.xml'/>
 		<include name='systems/adc.xml'/>
+		<include name='systems/altacq.xml'/>
 		<include name='systems/nc.xml'/>
 		<include name='systems/pc.xml'/>
 		<include name='systems/fbw.xml'/>

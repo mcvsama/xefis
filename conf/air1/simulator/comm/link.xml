@@ -79,7 +79,7 @@
 						<property path='/sensors/gear/right.up' type='boolean'/>
 						<property path='/sensors/gear/right.down' type='boolean'/>
 						<!-- Other flags -->
-						<property path='/systems/fd/altitude-acquired' type='boolean'/>
+						<property path='/systems/altacq/flag' type='boolean'/>
 						<property path='/link/local/valid' type='boolean'/>
 					</bitfield>
 				</signature>
