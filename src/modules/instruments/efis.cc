@@ -69,6 +69,8 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "speed.v1", _speed_v1, false },
 		{ "speed.vr", _speed_vr, false },
 		{ "speed.vref", _speed_vref, false },
+		{ "speed.flaps-bug.label", _speed_flaps_label, false },
+		{ "speed.flaps-bug.speed", _speed_flaps_speed, false },
 		{ "orientation.serviceable", _orientation_serviceable, false },
 		{ "orientation.pitch", _orientation_pitch, false },
 		{ "orientation.roll", _orientation_roll, false },
@@ -225,6 +227,14 @@ EFIS::read()
 		params.speed_bugs["REF"] = *_speed_vref;
 	else
 		params.speed_bugs.erase ("REF");
+	// Flaps bug:
+	if (_speed_flaps_speed.valid() && _speed_flaps_label.valid())
+	{
+		_speed_flaps_current_label = QString::fromStdString (*_speed_flaps_label);
+		params.speed_bugs[_speed_flaps_current_label] = *_speed_flaps_speed;
+	}
+	else
+		params.speed_bugs.erase (_speed_flaps_current_label);
 	// Orientation
 	params.orientation_failure = !_orientation_serviceable.read (true);
 	params.orientation_pitch_visible = _orientation_pitch.valid();

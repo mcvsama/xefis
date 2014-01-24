@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <limits>
+#include <type_traits>
 
 // Boost:
 #include <boost/lexical_cast.hpp>
@@ -47,7 +48,7 @@ template<class tValueType, class tDerived>
 		typedef tDerived					Derived;
 
 	  protected:
-		constexpr explicit
+		explicit constexpr
 		LinearValue (ValueType);
 
 		constexpr
@@ -57,6 +58,9 @@ template<class tValueType, class tDerived>
 		LinearValue (LinearValue const&) noexcept = default;
 
 	  public:
+		static constexpr Derived
+		from_internal (ValueType internal);
+
 		/*
 		 * Unary operators
 		 */
@@ -139,6 +143,14 @@ template<class V, class T>
 	LinearValue<V, T>::LinearValue (ValueType value):
 		TypedValue (value)
 	{ }
+
+
+template<class V, class T>
+	inline constexpr typename LinearValue<V, T>::Derived
+	LinearValue<V, T>::from_internal (ValueType internal)
+	{
+		return Derived (internal);
+	}
 
 
 template<class V, class T>
@@ -294,6 +306,18 @@ template<class V, class T>
 	}
 
 } // namespace SI
+
+
+namespace std {
+
+template<class D, class = typename std::enable_if<std::is_base_of<SI::LinearValue<typename D::ValueType, D>, D>::value>::type>
+	inline D
+	abs (D const& a)
+	{
+		return D::from_internal (std::abs (a.internal()));
+	}
+
+} // namespace std
 
 #endif
 

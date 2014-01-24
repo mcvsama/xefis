@@ -26,6 +26,8 @@
 					<property name='speed.ias.lookahead' path='/systems/adc/speed/ias.lookahead'/>
 					<property name='speed.mach' path='/systems/adc/speed/mach'/>
 					<property name='speed.ground' path='/systems/nc/track/ground-speed'/>
+					<property name='speed.flaps-bug.label' path='/systems/flaps/bugs/label'/>
+					<property name='speed.flaps-bug.speed' path='/systems/flaps/bugs/speed'/>
 					<property name='orientation.serviceable' path='/systems/nc/orientation/serviceable'/>
 					<property name='orientation.pitch' path='/systems/nc/orientation/pitch'/>
 					<property name='orientation.roll' path='/systems/nc/orientation/roll'/>
