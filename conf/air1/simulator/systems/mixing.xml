@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/mixer' instance='anti-adverse-yaw'>
+		<settings>
+			<setting name='input-a-factor' value='1.0'/>
+			<setting name='input-b-factor' value='0.1'/>
+		</settings>
+		<properties>
+			<property name='input.a.value' path='/controls/rudder'/>
+			<property name='input.b.value' path='/controls/ailerons'/>
+			<property name='output.value' path='/controls/rudder-anti-adverse-yaw'/>
+		</properties>
+	</module>
+</xefis-include>
+
