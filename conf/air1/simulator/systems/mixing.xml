@@ -3,12 +3,23 @@
 	<module name='systems/mixer' instance='anti-adverse-yaw'>
 		<settings>
 			<setting name='input-a-factor' value='1.0'/>
-			<setting name='input-b-factor' value='0.1'/>
+			<setting name='input-b-factor' value='0.2'/>
 		</settings>
 		<properties>
 			<property name='input.a.value' path='/controls/rudder'/>
 			<property name='input.b.value' path='/controls/ailerons'/>
 			<property name='output.value' path='/controls/rudder-anti-adverse-yaw'/>
+		</properties>
+	</module>
+	<module name='systems/mixer' instance='yaw-damper'>
+		<settings>
+			<setting name='input-a-factor' value='1.0'/>
+			<setting name='input-b-factor' value='1.0'/>
+		</settings>
+		<properties>
+			<property name='input.a.value' path='/controls/rudder-anti-adverse-yaw'/>
+			<property name='input.b.value' path='/systems/yaw-damper/rudder'/>
+			<property name='output.value' path='/controls/coordinated-rudder'/>
 		</properties>
 	</module>
 </xefis-include>
