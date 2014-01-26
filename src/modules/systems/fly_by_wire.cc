@@ -89,11 +89,22 @@ FlyByWire::FlyByWire (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "output.throttle", _output_throttle, true },
 	});
 
+	_elevator_pid.set_pid (_pitch_p, _pitch_i, _pitch_d);
+	_elevator_pid.set_gain (_pitch_gain * _stabilization_gain);
 	_elevator_pid.set_i_limit ({ -0.1f, +0.1f });
+	_elevator_pid.set_error_power (_pitch_error_power);
 	_elevator_pid.set_winding (true);
+
+	_ailerons_pid.set_pid (_roll_p, _roll_i, _roll_d);
+	_ailerons_pid.set_gain (_roll_gain * _stabilization_gain);
 	_ailerons_pid.set_i_limit ({ -0.1f, +0.1f });
+	_ailerons_pid.set_error_power (_roll_error_power);
 	_ailerons_pid.set_winding (true);
+
+	_rudder_pid.set_pid (_yaw_p, _yaw_i, _yaw_d);
+	_rudder_pid.set_gain (_yaw_gain * _stabilization_gain);
 	_rudder_pid.set_i_limit ({ -0.1f, +0.1f });
+	_rudder_pid.set_error_power (_yaw_error_power);
 
 	for (auto pid: { &_manual_pitch_pid, &_manual_roll_pid })
 	{
@@ -209,23 +220,14 @@ FlyByWire::compute_fbw()
 					_computed_output_roll = _input_roll.read (0_deg);
 				}
 
-				_elevator_pid.set_pid (_pitch_p, _pitch_i, _pitch_d);
-				_elevator_pid.set_gain (_pitch_gain * _stabilization_gain);
-				_elevator_pid.set_error_power (_pitch_error_power);
 				_elevator_pid.set_output_limit (Range<double> (_elevator_minimum.read (-1.0), _elevator_maximum.read (1.0)));
 				_elevator_pid.set_target (_computed_output_pitch / 180_deg);
 				_elevator_pid.process (*_measured_pitch / 180_deg, update_dt);
 
-				_ailerons_pid.set_pid (_roll_p, _roll_i, _roll_d);
-				_ailerons_pid.set_gain (_roll_gain * _stabilization_gain);
-				_ailerons_pid.set_error_power (_roll_error_power);
 				_ailerons_pid.set_output_limit (Range<double> (_ailerons_minimum.read (-1.0), _ailerons_maximum.read (1.0)));
 				_ailerons_pid.set_target (_computed_output_roll / 180_deg);
 				_ailerons_pid.process (*_measured_roll / 180_deg, update_dt);
 
-				_rudder_pid.set_pid (_yaw_p, _yaw_i, _yaw_d);
-				_rudder_pid.set_gain (_yaw_gain * _stabilization_gain);
-				_rudder_pid.set_error_power (_yaw_error_power);
 				_rudder_pid.set_output_limit (Range<double> (_rudder_minimum.read (-1.0), _rudder_maximum.read (1.0)));
 				_rudder_pid.set_target (0.0);
 				_rudder_pid.process (_measured_slip_skid_g.read (0.0), update_dt);
