@@ -1,0 +1,11 @@
+#!/bin/sh
+
+old=$1
+new=$2
+if [ "$old" = "" ] || [ "$new" = "" ]; then
+	echo "Usage: $0 old-year new-year"
+	echo "Example: $0 2011 2012"
+	exit 1
+fi
+find . -type f -exec sed -i -e 's/Copyleft 2012…'"$old"'/Copyleft 2012…'"$new"'/g' {} \;
+
