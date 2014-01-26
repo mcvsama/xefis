@@ -51,6 +51,10 @@
 					<property bytes='2' path='/systems/fd/roll' type='angle'/>
 					<property bytes='2' path='/systems/flaps/setting' type='angle'/>
 					<property bytes='2' path='/systems/flaps/current' type='angle'/>
+					<property bytes='2' path='/systems/speeds/minimum' type='speed'/>
+					<property bytes='2' path='/systems/speeds/minimum-maneuver' type='speed'/>
+					<property bytes='2' path='/systems/speeds/maximum-maneuver' type='speed'/>
+					<property bytes='2' path='/systems/speeds/maximum' type='speed'/>
 					<bitfield>
 						<!-- Sensors - sensors -->
 						<property path='/sensors/ahrs/serviceable' type='boolean'/>

@@ -1,9 +1,6 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<module name='systems/flaps-control'>
-		<settings>
-			<setting name='settings-list' value='0,5,10,20,30'/>
-		</settings>
 		<properties>
 			<!-- Input -->
 			<property name='input.up' path='/controls/flaps-up'/>
@@ -12,10 +9,17 @@
 		</properties>
 	</module>
 	<module name='systems/flaps-bugs'>
+		<settings>
+			<setting name='margin-factor' value='1.2'/>
+		</settings>
 		<properties>
 			<property name='input.flaps-setting' path='/settings/flaps/setting'/>
-			<property name='output.flaps-bug.speed' path='/systems/flaps/bugs/speed'/>
-			<property name='output.flaps-bug.label' path='/systems/flaps/bugs/label'/>
+			<property name='output.flaps.up.speed' path='/systems/flaps/bugs/up.speed'/>
+			<property name='output.flaps.up.label' path='/systems/flaps/bugs/up.label'/>
+			<property name='output.flaps.a.speed' path='/systems/flaps/bugs/a.speed'/>
+			<property name='output.flaps.a.label' path='/systems/flaps/bugs/a.label'/>
+			<property name='output.flaps.b.speed' path='/systems/flaps/bugs/b.speed'/>
+			<property name='output.flaps.b.label' path='/systems/flaps/bugs/b.label'/>
 		</properties>
 	</module>
 </xefis-include>

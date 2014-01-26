@@ -44,11 +44,17 @@ class FlapsBugs: public Xefis::Module
 	data_updated() override;
 
   private:
+	// Settings:
+	double					_margin_factor = 1.2;
 	// Input:
 	Xefis::PropertyAngle	_input_flaps_setting;
 	// Output:
-	Xefis::PropertyString	_output_bug_label;
-	Xefis::PropertySpeed	_output_bug_speed;
+	Xefis::PropertyString	_output_flaps_up_label;
+	Xefis::PropertySpeed	_output_flaps_up_speed;
+	Xefis::PropertyString	_output_flaps_a_label;
+	Xefis::PropertySpeed	_output_flaps_a_speed;
+	Xefis::PropertyString	_output_flaps_b_label;
+	Xefis::PropertySpeed	_output_flaps_b_speed;
 };
 
 #endif

@@ -24,10 +24,18 @@
 					<property name='speed.ias.serviceable' path='/systems/adc/speed/ias.serviceable'/>
 					<property name='speed.ias' path='/systems/adc/speed/ias'/>
 					<property name='speed.ias.lookahead' path='/systems/adc/speed/ias.lookahead'/>
+					<property name='speed.ias.minimum' path='/aircraft/systems/speeds/minimum'/>
+					<property name='speed.ias.minimum-maneuver' path='/aircraft/systems/speeds/minimum-maneuver'/>
+					<property name='speed.ias.maximum-maneuver' path='/aircraft/systems/speeds/maximum-maneuver'/>
+					<property name='speed.ias.maximum' path='/aircraft/systems/speeds/maximum'/>
 					<property name='speed.mach' path='/systems/adc/speed/mach'/>
 					<property name='speed.ground' path='/systems/nc/track/ground-speed'/>
-					<property name='speed.flaps-bug.label' path='/systems/flaps/bugs/label'/>
-					<property name='speed.flaps-bug.speed' path='/systems/flaps/bugs/speed'/>
+					<property name='speed.flaps.up.label' path='/systems/flaps/bugs/up.label'/>
+					<property name='speed.flaps.up.speed' path='/systems/flaps/bugs/up.speed'/>
+					<property name='speed.flaps.a.label' path='/systems/flaps/bugs/a.label'/>
+					<property name='speed.flaps.a.speed' path='/systems/flaps/bugs/a.speed'/>
+					<property name='speed.flaps.b.label' path='/systems/flaps/bugs/b.label'/>
+					<property name='speed.flaps.b.speed' path='/systems/flaps/bugs/b.speed'/>
 					<property name='orientation.serviceable' path='/systems/nc/orientation/serviceable'/>
 					<property name='orientation.pitch' path='/systems/nc/orientation/pitch'/>
 					<property name='orientation.roll' path='/systems/nc/orientation/roll'/>

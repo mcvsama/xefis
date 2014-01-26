@@ -2,7 +2,6 @@
 <xefis-include>
 	<module name='systems/flaps-control'>
 		<settings>
-			<setting name='settings-list' value='0,5,10,20,30'/>
 			<setting name='degrees-per-second' value='2.5'/>
 			<setting name='control.minimum' value='0.0'/>
 			<setting name='control.maximum' value='0.5'/>

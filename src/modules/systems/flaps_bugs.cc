@@ -32,10 +32,18 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-bugs", FlapsBugs);
 FlapsBugs::FlapsBugs (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	parse_settings (config, {
+		{ "margin-factor", _margin_factor, false },
+	});
+
 	parse_properties (config, {
 		{ "input.flaps-setting", _input_flaps_setting, true },
-		{ "output.flaps-bug.label", _output_bug_label, true },
-		{ "output.flaps-bug.speed", _output_bug_speed, true },
+		{ "output.flaps.up.label", _output_flaps_up_label, true },
+		{ "output.flaps.up.speed", _output_flaps_up_speed, true },
+		{ "output.flaps.a.label", _output_flaps_a_label, true },
+		{ "output.flaps.a.speed", _output_flaps_a_speed, true },
+		{ "output.flaps.b.label", _output_flaps_b_label, true },
+		{ "output.flaps.b.speed", _output_flaps_b_speed, true },
 	});
 }
 
@@ -49,32 +57,38 @@ FlapsBugs::data_updated()
 	{
 		if (_input_flaps_setting.fresh())
 		{
-			Xefis::Flaps::Settings::const_iterator s1 = flaps.find_setting_iterator (*_input_flaps_setting);
-			Xefis::Flaps::Settings::const_iterator s2 = s1;
-			std::advance (s2, std::min<int> (1, std::distance (s2, flaps.settings().end())));
-			Xefis::Flaps::Settings::const_iterator end = flaps.settings().end();
+			_output_flaps_up_label = "UP";
+			_output_flaps_up_speed = _margin_factor * flaps.find_setting (0_deg).speed_range().min();
 
-			Optional<std::string> label;
-			Optional<Speed> speed;
+			Optional<std::string> label_a;
+			Optional<Speed> speed_a;
+			Optional<std::string> label_b;
+			Optional<Speed> speed_b;
 
-			if (s1 != end)
-				label = s1->second.label().toStdString();
-			else if (s2 != end)
-				label = s2->second.label().toStdString();
+			auto sett_b = flaps.find_setting (*_input_flaps_setting);
+			auto sett_a = sett_b.prev();
 
-			if (s2 != end)
-				speed = s2->second.speed_range().max();
-			else if (s1 != end)
-				speed = s1->second.speed_range().min();
+			label_b = sett_b.label().toStdString();
+			speed_b = _margin_factor * sett_b.speed_range().min();
 
-			_output_bug_label = label;
-			_output_bug_speed = speed;
+			if (sett_a)
+			{
+				label_a = sett_a->label().toStdString();
+				speed_a = _margin_factor * sett_a->speed_range().min();
+			}
+
+			_output_flaps_a_label = label_a;
+			_output_flaps_a_speed = speed_a;
+			_output_flaps_b_label = label_b;
+			_output_flaps_b_speed = speed_b;
 		}
 	}
 	else
 	{
-		_output_bug_label.set_nil();
-		_output_bug_speed.set_nil();
+		_output_flaps_a_label.set_nil();
+		_output_flaps_a_speed.set_nil();
+		_output_flaps_b_label.set_nil();
+		_output_flaps_b_speed.set_nil();
 	}
 }
 
