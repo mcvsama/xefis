@@ -312,6 +312,7 @@ SRC_HEADERS += modules/systems/speeds.h
 SRC_HEADERS += modules/systems/trim_control.h
 SRC_HEADERS += modules/systems/trim_mixer.h
 SRC_HEADERS += modules/systems/vor.h
+SRC_HEADERS += modules/systems/yaw_damper.h
 
 SRC_SOURCES += modules/systems/adc.cc
 SRC_SOURCES += modules/systems/afcs.cc
@@ -331,6 +332,7 @@ SRC_SOURCES += modules/systems/speeds.cc
 SRC_SOURCES += modules/systems/trim_control.cc
 SRC_SOURCES += modules/systems/trim_mixer.cc
 SRC_SOURCES += modules/systems/vor.cc
+SRC_SOURCES += modules/systems/yaw_damper.cc
 
 SRC_MOCHDRS += modules/systems/rcms.h
 

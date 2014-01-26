@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<xefis-include>
+	<module name='systems/yaw-damper'>
+		<settings>
+			<setting name='rudder-p' value='0.05'/>
+			<setting name='rudder-i' value='0.3'/>
+			<setting name='rudder-d' value='0.1'/>
+			<setting name='rudder-gain' value='1.0'/>
+			<setting name='limit' value='0.3'/>
+		</settings>
+		<properties>
+			<property name='input.enabled' path='/settings/yaw-damper/enabled'/>
+			<property name='input.slip-skid-g' path='/sensors/slip-skid/slip-skid'/>
+			<property name='output.rudder' path='/systems/yaw-damper/rudder'/>
+		</properties>
+	</module>
+</xefis-include>
+

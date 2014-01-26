@@ -93,7 +93,7 @@
 				<property name='elevator' path='/elevator'/>
 				<property name='throttle.1' path='//controls/throttle-left'/>
 				<property name='throttle.2' path='//controls/throttle-right'/>
-				<property name='rudder' path='//controls/rudder-anti-adverse-yaw'/>
+				<property name='rudder' path='//controls/coordinated-rudder'/>
 			</properties>
 		</output>
 	</module>
