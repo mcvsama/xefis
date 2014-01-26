@@ -69,8 +69,12 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "speed.v1", _speed_v1, false },
 		{ "speed.vr", _speed_vr, false },
 		{ "speed.vref", _speed_vref, false },
-		{ "speed.flaps-bug.label", _speed_flaps_label, false },
-		{ "speed.flaps-bug.speed", _speed_flaps_speed, false },
+		{ "speed.flaps.up.label", _speed_flaps_up_label, false },
+		{ "speed.flaps.up.speed", _speed_flaps_up_speed, false },
+		{ "speed.flaps.a.label", _speed_flaps_a_label, false },
+		{ "speed.flaps.a.speed", _speed_flaps_a_speed, false },
+		{ "speed.flaps.b.label", _speed_flaps_b_label, false },
+		{ "speed.flaps.b.speed", _speed_flaps_b_speed, false },
 		{ "orientation.serviceable", _orientation_serviceable, false },
 		{ "orientation.pitch", _orientation_pitch, false },
 		{ "orientation.roll", _orientation_roll, false },
@@ -225,14 +229,30 @@ EFIS::read()
 		params.speed_bugs["REF"] = *_speed_vref;
 	else
 		params.speed_bugs.erase ("REF");
-	// Flaps bug:
-	if (_speed_flaps_speed.valid() && _speed_flaps_label.valid())
+	// Flaps UP bug:
+	if (_speed_flaps_up_speed.valid() && _speed_flaps_up_label.valid())
 	{
-		_speed_flaps_current_label = QString::fromStdString (*_speed_flaps_label);
-		params.speed_bugs[_speed_flaps_current_label] = *_speed_flaps_speed;
+		_speed_flaps_up_current_label = QString::fromStdString (*_speed_flaps_up_label);
+		params.speed_bugs[_speed_flaps_up_current_label] = *_speed_flaps_up_speed;
 	}
 	else
-		params.speed_bugs.erase (_speed_flaps_current_label);
+		params.speed_bugs.erase (_speed_flaps_up_current_label);
+	// Flaps "a" bug:
+	if (_speed_flaps_a_speed.valid() && _speed_flaps_a_label.valid())
+	{
+		_speed_flaps_a_current_label = QString::fromStdString (*_speed_flaps_a_label);
+		params.speed_bugs[_speed_flaps_a_current_label] = *_speed_flaps_a_speed;
+	}
+	else
+		params.speed_bugs.erase (_speed_flaps_a_current_label);
+	// Flaps "b" bug:
+	if (_speed_flaps_b_speed.valid() && _speed_flaps_b_label.valid())
+	{
+		_speed_flaps_b_current_label = QString::fromStdString (*_speed_flaps_b_label);
+		params.speed_bugs[_speed_flaps_b_current_label] = *_speed_flaps_b_speed;
+	}
+	else
+		params.speed_bugs.erase (_speed_flaps_b_current_label);
 	// Orientation
 	params.orientation_failure = !_orientation_serviceable.read (true);
 	params.orientation_pitch_visible = _orientation_pitch.valid();

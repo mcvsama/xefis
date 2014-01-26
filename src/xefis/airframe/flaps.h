@@ -32,6 +32,8 @@ class Flaps
   public:
 	class Setting
 	{
+		friend class Flaps;
+
 	  public:
 		// Ctor
 		Setting (QDomElement const& config);
@@ -61,11 +63,29 @@ class Flaps
 		Angle const&
 		aoa_correction() const noexcept;
 
+		/**
+		 * Return prev (lower angle) flap setting or nullptr if this is the last.
+		 */
+		Setting const*
+		prev() const noexcept;
+
+		/**
+		 * Return next (higher angle) flap setting or nullptr if this is the last.
+		 */
+		Setting const*
+		next() const noexcept;
+
+	  private:
+		void
+		link (Setting const* prev, Setting const* next);
+
 	  private:
 		QString			_label;
 		Angle			_angle;
 		Range<Speed>	_speed_range;
 		Angle			_aoa_correction;
+		Setting const*	_next	= nullptr;
+		Setting const*	_prev	= nullptr;
 	};
 
 	typedef std::map<Angle, Setting> Settings;
@@ -110,6 +130,13 @@ class Flaps
 	get_aoa_correction (Angle const& flaps_angle) const;
 
 	/**
+	 * Compute speeds range for given flaps angle.
+	 * Value is interpolated.
+	 */
+	Range<Speed>
+	get_speed_range (Angle const& flaps_angle) const;
+
+	/**
 	 * Return interator to a setting for given flaps angle.
 	 */
 	Settings::const_iterator
@@ -145,6 +172,20 @@ inline Angle const&
 Flaps::Setting::aoa_correction() const noexcept
 {
 	return _aoa_correction;
+}
+
+
+inline Flaps::Setting const*
+Flaps::Setting::prev() const noexcept
+{
+	return _prev;
+}
+
+
+inline Flaps::Setting const*
+Flaps::Setting::next() const noexcept
+{
+	return _next;
 }
 
 

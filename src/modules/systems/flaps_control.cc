@@ -16,6 +16,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/airframe/airframe.h>
+#include <xefis/airframe/flaps.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/core/application.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -35,7 +39,6 @@ FlapsControl::FlapsControl (Xefis::ModuleManager* module_manager, QDomElement co
 	QString settings_list_str;
 
 	parse_settings (config, {
-		{ "settings-list", settings_list_str, true },
 		{ "degrees-per-second", _degrees_per_second, false },
 		{ "control.minimum", _ctl_minimum, false },
 		{ "control.maximum", _ctl_maximum, false },
@@ -50,11 +53,11 @@ FlapsControl::FlapsControl (Xefis::ModuleManager* module_manager, QDomElement co
 		{ "output.control", _output_control, false },
 	});
 
-	for (auto s: settings_list_str.split (","))
-		_settings_list.insert (1_deg * s.toDouble());
+	for (auto s: module_manager->application()->airframe()->flaps().settings())
+		_settings_list.insert (s.second.angle());
 
 	if (_settings_list.empty())
-		throw Xefis::Exception ("settings list must not be empty");
+		throw Xefis::Exception ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
 	_timer->setInterval (kUpdateInterval.ms());

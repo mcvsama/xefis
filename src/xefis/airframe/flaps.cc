@@ -41,6 +41,14 @@ Flaps::Setting::Setting (QDomElement const& config)
 }
 
 
+void
+Flaps::Setting::link (Setting const* prev, Setting const* next)
+{
+	_prev = prev;
+	_next = next;
+}
+
+
 Flaps::Flaps (QDomElement const& config)
 {
 	for (QDomElement const& e: config)
@@ -50,6 +58,24 @@ Flaps::Flaps (QDomElement const& config)
 			Setting setting (e);
 			_settings.insert (std::make_pair (setting.angle(), setting));
 		}
+	}
+
+	for (auto s = _settings.begin(); s != _settings.end(); ++s)
+	{
+		Setting const* prev = nullptr;
+		Setting const* next = nullptr;
+
+		if (s != _settings.begin())
+		{
+			auto s_prev = s;
+			prev = &(--s_prev)->second;
+		}
+
+		auto s_next = s;
+		if (++s_next != _settings.end())
+			next = &s_next->second;
+
+		s->second.link (prev, next);
 	}
 }
 
@@ -84,8 +110,8 @@ Flaps::prev_setting (Angle const& flaps_angle) const
 Angle
 Flaps::get_aoa_correction (Angle const& flaps_angle) const
 {
-	Settings::const_iterator ub = _settings.upper_bound (flaps_angle);
-	Settings::const_iterator lb = ub;
+	auto ub = _settings.upper_bound (flaps_angle);
+	auto lb = ub;
 	if (lb != _settings.begin())
 		--lb;
 
@@ -103,15 +129,41 @@ Flaps::get_aoa_correction (Angle const& flaps_angle) const
 }
 
 
+Range<Speed>
+Flaps::get_speed_range (Angle const& flaps_angle) const
+{
+	if (_settings.empty())
+		throw Exception ("missing flaps configuration");
+
+	auto ub = _settings.upper_bound (flaps_angle);
+	auto lb = ub;
+
+	if (lb != _settings.begin())
+		--lb;
+
+	if (ub == _settings.end())
+		--ub;
+
+	Range<double> from (lb->first.deg(), ub->first.deg());
+	Range<double> to_min (lb->second.speed_range().min().kt(), ub->second.speed_range().min().kt());
+	Range<double> to_max (lb->second.speed_range().max().kt(), ub->second.speed_range().max().kt());
+
+	return {
+		1_kt * renormalize (flaps_angle.deg(), from, to_min),
+		1_kt * renormalize (flaps_angle.deg(), from, to_max),
+	};
+}
+
+
 Flaps::Settings::const_iterator
 Flaps::find_setting_iterator (Angle const& flaps_angle) const
 {
 	if (_settings.empty())
-		throw Exception ("flaps misconfiguration");
+		throw Exception ("missing flaps configuration");
 
 	// Find Setting for given flaps_angle.
-	Settings::const_iterator ub = _settings.upper_bound (flaps_angle);
-	Settings::const_iterator lb = ub;
+	auto ub = _settings.upper_bound (flaps_angle);
+	auto lb = ub;
 	if (lb != _settings.begin())
 		--lb;
 

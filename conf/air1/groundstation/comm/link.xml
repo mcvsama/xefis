@@ -58,6 +58,10 @@
 					<property bytes='2' path='/aircraft/systems/fd/roll' type='angle'/>
 					<property bytes='2' path='/aircraft/systems/flaps/setting' type='angle' retained='true'/>
 					<property bytes='2' path='/aircraft/systems/flaps/current' type='angle'/>
+					<property bytes='2' path='/aircraft/systems/speeds/minimum' type='speed'/>
+					<property bytes='2' path='/aircraft/systems/speeds/minimum-maneuver' type='speed'/>
+					<property bytes='2' path='/aircraft/systems/speeds/maximum-maneuver' type='speed'/>
+					<property bytes='2' path='/aircraft/systems/speeds/maximum' type='speed'/>
 					<bitfield>
 						<!-- Sensors - sensors -->
 						<property path='/aircraft/sensors/ahrs/serviceable' type='boolean' retained='true'/>

@@ -323,9 +323,9 @@
 						</messages>
 					</instrument>
 				</item>
-				<item stretch-factor='12'>
+				<item stretch-factor='10' margin='0 30'>
 					<layout type='horizontal'>
-						<item stretch-factor='5'>
+						<item stretch-factor='6'>
 							<instrument name='instruments/gear'>
 								<properties>
 									<property name='setting.down' path='/aircraft/sensors/gear/setting.down'/>
@@ -338,7 +338,7 @@
 								</properties>
 							</instrument>
 						</item>
-						<item stretch-factor='7'>
+						<item stretch-factor='6'>
 							<instrument name='instruments/flaps'>
 								<settings>
 									<setting name='maximum' value='30 deg'/>
@@ -352,7 +352,7 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='10'>
+				<item stretch-factor='8'>
 					<layout type='horizontal'>
 						<item stretch-factor='4'>
 							<instrument name='instruments/horizontal-trim' instance='ailerons'>
@@ -391,7 +391,7 @@
 						</item>
 					</layout>
 				</item>
-				<item stretch-factor='20'>
+				<item stretch-factor='24'>
 					<layout type='horizontal'>
 						<item stretch-factor='5' margin='20 0 0 0'>
 							<instrument name='instruments/datatable' instance='general'>
