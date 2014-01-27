@@ -89,7 +89,7 @@ ETA::compute()
 		Angle angle_diff = station_bearing - *_input_track_lateral_true;
 		angle_diff = Xefis::floored_mod (angle_diff, -180_deg, +180_deg);
 
-		if (std::abs (angle_diff.deg()) > 30.0)
+		if (std::abs (angle_diff) > 30_deg)
 			throw SetNil (true);
 
 		if (_prev_distance)

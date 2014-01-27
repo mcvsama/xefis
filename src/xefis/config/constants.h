@@ -28,7 +28,7 @@ constexpr Pressure STD_PRESSURE = 29.92_inHg;
 inline bool
 is_std_pressure (Pressure pressure)
 {
-	return 1_inHg * std::abs ((STD_PRESSURE - pressure).inHg()) < 0.01_inHg;
+	return std::abs (STD_PRESSURE - pressure) < 0.01_inHg;
 }
 
 // UI constants:

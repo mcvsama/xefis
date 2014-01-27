@@ -107,10 +107,10 @@ FlapsControl::update_flap_position()
 	Angle difference = _setting - _current;
 	Angle delta = 1_deg * (kUpdateInterval.s() * _degrees_per_second);
 
-	if (std::abs (difference.deg()) > delta.deg())
+	if (std::abs (difference) > delta)
 	{
 		Angle diff_to_add = sgn * delta;
-		if (std::abs (diff_to_add.deg()) > std::abs (difference.deg()))
+		if (std::abs (diff_to_add) > std::abs (difference))
 			diff_to_add = difference;
 		_current += sgn * delta;
 	}

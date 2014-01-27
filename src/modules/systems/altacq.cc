@@ -75,7 +75,7 @@ AltAcq::data_updated()
 			if (_altitude_acquire_amsl.fresh())
 				_altitude_acquire_amsl_timestamp = Time::now();
 
-			Length diff = 1_ft * std::abs ((*_altitude_amsl - *_altitude_acquire_amsl).ft());
+			Length diff = std::abs (*_altitude_amsl - *_altitude_acquire_amsl);
 			// Arm flag when difference beyond 'on-diff':
 			if (diff > _flag_diff_on)
 				_flag_armed = true;
@@ -109,7 +109,7 @@ AltAcq::compute_altitude_acquire_distance()
 		Length const alt_diff = *_altitude_acquire_amsl - *_altitude_amsl;
 		Length const distance = *_ground_speed * (alt_diff / *_vertical_speed);
 
-		if (!has_setting ("minimum-altitude-difference") || std::abs (alt_diff.ft()) >= _minimum_altitude_difference.ft())
+		if (!has_setting ("minimum-altitude-difference") || std::abs (alt_diff) >= _minimum_altitude_difference)
 			_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.m(), update_dt));
 		else
 			_altitude_acquire_distance.set_nil();

@@ -1902,7 +1902,7 @@ EFISWidget::PaintWorkUnit::paint_flight_director (Xefis::Painter& painter)
 	pitch = Xefis::limit (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.orientation_roll;
-	if (std::abs (roll.deg()) > 180.0)
+	if (std::abs (roll) > 180_deg)
 		roll = roll - sgn (roll.deg()) * 360_deg;
 	roll = Xefis::limit (roll, -range, +range);
 
@@ -2137,7 +2137,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 					<< QPointF (0.f, -w);
 				pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_approach_deviation;
-				pink_filled = original_approach_deviation && std::abs (original_approach_deviation->deg()) <= std::abs (approach_deviation.deg());
+				pink_filled = original_approach_deviation && std::abs (*original_approach_deviation) <= std::abs (approach_deviation);
 				white_visible = false;
 			}
 			else
@@ -2150,7 +2150,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 					<< QPointF (-1.0f * w, 2.0f * w);
 				pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_path_deviation;
-				pink_filled = original_path_deviation && std::abs (original_path_deviation->deg()) <= std::abs (path_deviation.deg());
+				pink_filled = original_path_deviation && std::abs (*original_path_deviation) <= std::abs (path_deviation);
 				white_pointer = QPolygonF()
 					<< QPointF (0.f, -0.8f * w)
 					<< QPointF (+1.6f * w, 0.f)
