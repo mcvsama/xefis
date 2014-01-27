@@ -90,7 +90,7 @@ FlapsControl::data_updated()
 			_input_setting.write (*next_setting);
 	}
 
-	if (_input_setting.fresh() && _input_setting.valid())
+	if (_input_setting.valid_and_fresh())
 	{
 		_setting = Xefis::limit (*_input_setting, _minimum, _maximum);
 		if (_output_setting.configured())

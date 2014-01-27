@@ -176,7 +176,7 @@ void
 Status::data_updated()
 {
 	auto pressed = [](Xefis::PropertyBoolean& property) -> bool {
-		return property.valid() && property.fresh() && *property;
+		return property.valid_and_fresh() && *property;
 	};
 
 	if (pressed (_button_cursor_up))
