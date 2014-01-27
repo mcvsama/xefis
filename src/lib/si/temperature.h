@@ -100,6 +100,44 @@ class Temperature: public LinearValue<double, Temperature>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Temperature
+operator"" _K (long double kelvins)
+{
+	return Temperature (static_cast<Temperature::ValueType> (kelvins));
+}
+
+
+inline constexpr Temperature
+operator"" _K (unsigned long long kelvins)
+{
+	return Temperature (static_cast<Temperature::ValueType> (kelvins));
+}
+
+
+inline constexpr Temperature
+operator"" _Ra (long double rankines)
+{
+	return Temperature (static_cast<Temperature::ValueType> (rankines) / 1.8);
+}
+
+
+inline constexpr Temperature
+operator"" _Ra (unsigned long long rankines)
+{
+	return Temperature (static_cast<Temperature::ValueType> (rankines) / 1.8);
+}
+
+
+/*
+ * Temperature implementation
+ */
+
+
 inline constexpr
 Temperature::Temperature (ValueType kelvins):
 	LinearValue (kelvins)
@@ -193,39 +231,6 @@ inline constexpr Temperature
 Temperature::from_degF (double fahrenheit)
 {
 	return Temperature (fahrenheit + 459.67) / 1.8;
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Temperature
-operator"" _K (long double kelvins)
-{
-	return Temperature (static_cast<Temperature::ValueType> (kelvins));
-}
-
-
-inline constexpr Temperature
-operator"" _K (unsigned long long kelvins)
-{
-	return Temperature (static_cast<Temperature::ValueType> (kelvins));
-}
-
-
-inline constexpr Temperature
-operator"" _Ra (long double rankines)
-{
-	return Temperature (static_cast<Temperature::ValueType> (rankines) / 1.8);
-}
-
-
-inline constexpr Temperature
-operator"" _Ra (unsigned long long rankines)
-{
-	return Temperature (static_cast<Temperature::ValueType> (rankines) / 1.8);
 }
 
 } // namespace SI

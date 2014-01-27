@@ -103,6 +103,100 @@ class Time: public LinearValue<double, Time>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Time
+operator"" _ns (long double ns)
+{
+	return Time (static_cast<Time::ValueType> (ns / 1e9));
+}
+
+
+inline constexpr Time
+operator"" _ns (unsigned long long ns)
+{
+	return Time (static_cast<Time::ValueType> (ns / 1e9));
+}
+
+
+inline constexpr Time
+operator"" _us (long double us)
+{
+	return Time (static_cast<Time::ValueType> (us / 1e6));
+}
+
+
+inline constexpr Time
+operator"" _us (unsigned long long us)
+{
+	return Time (static_cast<Time::ValueType> (us / 1e6));
+}
+
+
+inline constexpr Time
+operator"" _ms (long double ms)
+{
+	return Time (static_cast<Time::ValueType> (ms / 1e3));
+}
+
+
+inline constexpr Time
+operator"" _ms (unsigned long long ms)
+{
+	return Time (static_cast<Time::ValueType> (ms / 1e3));
+}
+
+
+inline constexpr Time
+operator"" _s (long double seconds)
+{
+	return Time (static_cast<Time::ValueType> (seconds));
+}
+
+
+inline constexpr Time
+operator"" _s (unsigned long long seconds)
+{
+	return Time (static_cast<Time::ValueType> (seconds));
+}
+
+
+inline constexpr Time
+operator"" _min (long double m)
+{
+	return Time (static_cast<Time::ValueType> (m * 60.0));
+}
+
+
+inline constexpr Time
+operator"" _min (unsigned long long m)
+{
+	return Time (static_cast<Time::ValueType> (m * 60.0));
+}
+
+
+inline constexpr Time
+operator"" _h (long double h)
+{
+	return Time (static_cast<Time::ValueType> (h * 3600.0));
+}
+
+
+inline constexpr Time
+operator"" _h (unsigned long long h)
+{
+	return Time (static_cast<Time::ValueType> (h * 3600.0));
+}
+
+
+/*
+ * Time implementation
+ */
+
+
 inline constexpr
 Time::Time (ValueType seconds):
 	LinearValue (seconds)
@@ -231,95 +325,6 @@ Time::measure (std::function<void()> callback) noexcept
 	Time t = now();
 	callback();
 	return now() - t;
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Time
-operator"" _ns (long double ns)
-{
-	return Time (static_cast<Time::ValueType> (ns / 1e9));
-}
-
-
-inline constexpr Time
-operator"" _ns (unsigned long long ns)
-{
-	return Time (static_cast<Time::ValueType> (ns / 1e9));
-}
-
-
-inline constexpr Time
-operator"" _us (long double us)
-{
-	return Time (static_cast<Time::ValueType> (us / 1e6));
-}
-
-
-inline constexpr Time
-operator"" _us (unsigned long long us)
-{
-	return Time (static_cast<Time::ValueType> (us / 1e6));
-}
-
-
-inline constexpr Time
-operator"" _ms (long double ms)
-{
-	return Time (static_cast<Time::ValueType> (ms / 1e3));
-}
-
-
-inline constexpr Time
-operator"" _ms (unsigned long long ms)
-{
-	return Time (static_cast<Time::ValueType> (ms / 1e3));
-}
-
-
-inline constexpr Time
-operator"" _s (long double seconds)
-{
-	return Time (static_cast<Time::ValueType> (seconds));
-}
-
-
-inline constexpr Time
-operator"" _s (unsigned long long seconds)
-{
-	return Time (static_cast<Time::ValueType> (seconds));
-}
-
-
-inline constexpr Time
-operator"" _min (long double m)
-{
-	return Time (static_cast<Time::ValueType> (m * 60.0));
-}
-
-
-inline constexpr Time
-operator"" _min (unsigned long long m)
-{
-	return Time (static_cast<Time::ValueType> (m * 60.0));
-}
-
-
-inline constexpr Time
-operator"" _h (long double h)
-{
-	return Time (static_cast<Time::ValueType> (h * 3600.0));
-}
-
-
-inline constexpr Time
-operator"" _h (unsigned long long h)
-{
-	return Time (static_cast<Time::ValueType> (h * 3600.0));
 }
 
 } // namespace SI
