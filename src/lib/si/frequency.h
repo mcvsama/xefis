@@ -71,6 +71,58 @@ class Frequency: public LinearValue<double, Frequency>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Frequency
+operator"" _Hz (long double Hz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (Hz));
+}
+
+
+inline constexpr Frequency
+operator"" _Hz (unsigned long long Hz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (Hz));
+}
+
+
+inline constexpr Frequency
+operator"" _kHz (long double kHz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (kHz) * 1000.0);
+}
+
+
+inline constexpr Frequency
+operator"" _kHz (unsigned long long kHz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (kHz) * 1000.0);
+}
+
+
+inline constexpr Frequency
+operator"" _MHz (long double MHz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (MHz) * 1000000.0);
+}
+
+
+inline constexpr Frequency
+operator"" _MHz (unsigned long long MHz)
+{
+	return Frequency (static_cast<Frequency::ValueType> (MHz) * 1000000.0);
+}
+
+
+/*
+ * Frequency implementation
+ */
+
+
 inline constexpr
 Frequency::Frequency (ValueType Hz):
 	LinearValue (Hz)
@@ -139,53 +191,6 @@ Frequency::floatize (std::string unit) const
 		return MHz();
 	else
 		throw UnsupportedUnit ("can't convert Frequency to " + unit);
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Frequency
-operator"" _Hz (long double Hz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (Hz));
-}
-
-
-inline constexpr Frequency
-operator"" _Hz (unsigned long long Hz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (Hz));
-}
-
-
-inline constexpr Frequency
-operator"" _kHz (long double kHz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (kHz) * 1000.0);
-}
-
-
-inline constexpr Frequency
-operator"" _kHz (unsigned long long kHz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (kHz) * 1000.0);
-}
-
-
-inline constexpr Frequency
-operator"" _MHz (long double MHz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (MHz) * 1000000.0);
-}
-
-
-inline constexpr Frequency
-operator"" _MHz (unsigned long long MHz)
-{
-	return Frequency (static_cast<Frequency::ValueType> (MHz) * 1000000.0);
 }
 
 } // namespace SI

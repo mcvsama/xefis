@@ -81,6 +81,72 @@ class Speed: public LinearValue<double, Speed>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Speed
+operator"" _kt (long double knots)
+{
+	return Speed (static_cast<Speed::ValueType> (knots));
+}
+
+
+inline constexpr Speed
+operator"" _kt (unsigned long long knots)
+{
+	return Speed (static_cast<Speed::ValueType> (knots));
+}
+
+
+inline constexpr Speed
+operator"" _kph (long double kph)
+{
+	return Speed (static_cast<Speed::ValueType> (kph / 1.852));
+}
+
+
+inline constexpr Speed
+operator"" _kph (unsigned long long kph)
+{
+	return Speed (static_cast<Speed::ValueType> (kph / 1.852));
+}
+
+
+inline constexpr Speed
+operator"" _fpm (long double fpm)
+{
+	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
+}
+
+
+inline constexpr Speed
+operator"" _fpm (unsigned long long fpm)
+{
+	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
+}
+
+
+inline constexpr Speed
+operator"" _mps (long double mps)
+{
+	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
+}
+
+
+inline constexpr Speed
+operator"" _mps (unsigned long long mps)
+{
+	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
+}
+
+
+/*
+ * Speed implementation
+ */
+
+
 inline constexpr
 Speed::Speed (ValueType kt):
 	LinearValue (kt)
@@ -156,67 +222,6 @@ Speed::floatize (std::string unit) const
 		return fpm();
 	else
 		throw UnsupportedUnit ("can't convert Speed to " + unit);
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Speed
-operator"" _kt (long double knots)
-{
-	return Speed (static_cast<Speed::ValueType> (knots));
-}
-
-
-inline constexpr Speed
-operator"" _kt (unsigned long long knots)
-{
-	return Speed (static_cast<Speed::ValueType> (knots));
-}
-
-
-inline constexpr Speed
-operator"" _kph (long double kph)
-{
-	return Speed (static_cast<Speed::ValueType> (kph / 1.852));
-}
-
-
-inline constexpr Speed
-operator"" _kph (unsigned long long kph)
-{
-	return Speed (static_cast<Speed::ValueType> (kph / 1.852));
-}
-
-
-inline constexpr Speed
-operator"" _fpm (long double fpm)
-{
-	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
-}
-
-
-inline constexpr Speed
-operator"" _fpm (unsigned long long fpm)
-{
-	return Speed (static_cast<Speed::ValueType> (fpm / 101.268591426));
-}
-
-
-inline constexpr Speed
-operator"" _mps (long double mps)
-{
-	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
-}
-
-
-inline constexpr Speed
-operator"" _mps (unsigned long long mps)
-{
-	return Speed (static_cast<Speed::ValueType> (mps * 1.9438612860586));
 }
 
 } // namespace SI

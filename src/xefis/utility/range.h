@@ -81,7 +81,7 @@ template<class tValueType>
 		 * inclusively.
 		 */
 		constexpr bool
-		includes (ValueType);
+		includes (ValueType) const;
 
 	  private:
 		ValueType	_min	= ValueType();
@@ -166,7 +166,7 @@ template<class T>
 
 template<class T>
 	constexpr bool
-	Range<T>::includes (ValueType value)
+	Range<T>::includes (ValueType value) const
 	{
 		return _min <= _max
 			? (_min <= value && value <= _max)

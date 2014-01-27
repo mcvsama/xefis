@@ -85,6 +85,86 @@ class Length: public LinearValue<double, Length>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Length
+operator"" _m (long double m)
+{
+	return Length (static_cast<Length::ValueType> (m));
+}
+
+
+inline constexpr Length
+operator"" _m (unsigned long long m)
+{
+	return Length (static_cast<Length::ValueType> (m));
+}
+
+
+inline constexpr Length
+operator"" _km (long double km)
+{
+	return Length (static_cast<Length::ValueType> (km) * 1000.0);
+}
+
+
+inline constexpr Length
+operator"" _km (unsigned long long km)
+{
+	return Length (static_cast<Length::ValueType> (km) * 1000.0);
+}
+
+
+inline constexpr Length
+operator"" _ft (long double ft)
+{
+	return Length (static_cast<Length::ValueType> (ft) * 0.3048);
+}
+
+
+inline constexpr Length
+operator"" _ft (unsigned long long ft)
+{
+	return Length (static_cast<Length::ValueType> (ft) * 0.3048);
+}
+
+
+inline constexpr Length
+operator"" _nm (long double nm)
+{
+	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
+}
+
+
+inline constexpr Length
+operator"" _nm (unsigned long long nm)
+{
+	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
+}
+
+
+inline constexpr Length
+operator"" _mil (long double mil)
+{
+	return Length (static_cast<Length::ValueType> (mil) * 1609.344);
+}
+
+
+inline constexpr Length
+operator"" _mil (unsigned long long mil)
+{
+	return Length (static_cast<Length::ValueType> (mil) * 1609.344);
+}
+
+
+/*
+ * Length implementation
+ */
+
+
 inline constexpr
 Length::Length (ValueType m):
 	LinearValue (m)
@@ -175,81 +255,6 @@ Length::floatize (std::string unit) const
 		return mil();
 	else
 		throw UnsupportedUnit ("can't convert Length to " + unit);
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Length
-operator"" _m (long double m)
-{
-	return Length (static_cast<Length::ValueType> (m));
-}
-
-
-inline constexpr Length
-operator"" _m (unsigned long long m)
-{
-	return Length (static_cast<Length::ValueType> (m));
-}
-
-
-inline constexpr Length
-operator"" _km (long double km)
-{
-	return Length (static_cast<Length::ValueType> (km) * 1000.0);
-}
-
-
-inline constexpr Length
-operator"" _km (unsigned long long km)
-{
-	return Length (static_cast<Length::ValueType> (km) * 1000.0);
-}
-
-
-inline constexpr Length
-operator"" _ft (long double ft)
-{
-	return Length (static_cast<Length::ValueType> (ft) * 0.3048);
-}
-
-
-inline constexpr Length
-operator"" _ft (unsigned long long ft)
-{
-	return Length (static_cast<Length::ValueType> (ft) * 0.3048);
-}
-
-
-inline constexpr Length
-operator"" _nm (long double nm)
-{
-	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
-}
-
-
-inline constexpr Length
-operator"" _nm (unsigned long long nm)
-{
-	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
-}
-
-
-inline constexpr Length
-operator"" _mil (long double mil)
-{
-	return Length (static_cast<Length::ValueType> (mil) * 1609.344);
-}
-
-
-inline constexpr Length
-operator"" _mil (unsigned long long mil)
-{
-	return Length (static_cast<Length::ValueType> (mil) * 1609.344);
 }
 
 } // namespace SI

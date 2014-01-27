@@ -75,6 +75,58 @@ class Pressure: public LinearValue<float, Pressure>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Pressure
+operator"" _psi (long double psi)
+{
+	return Pressure (static_cast<Pressure::ValueType> (psi));
+}
+
+
+inline constexpr Pressure
+operator"" _psi (unsigned long long psi)
+{
+	return Pressure (static_cast<Pressure::ValueType> (psi));
+}
+
+
+inline constexpr Pressure
+operator"" _hPa (long double hPa)
+{
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
+}
+
+
+inline constexpr Pressure
+operator"" _hPa (unsigned long long hPa)
+{
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
+}
+
+
+inline constexpr Pressure
+operator"" _inHg (long double inHg)
+{
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
+}
+
+
+inline constexpr Pressure
+operator"" _inHg (unsigned long long inHg)
+{
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
+}
+
+
+/*
+ * Pressure implementation
+ */
+
+
 inline constexpr
 Pressure::Pressure (ValueType psi):
 	LinearValue (psi)
@@ -143,53 +195,6 @@ Pressure::floatize (std::string unit) const
 		return inHg();
 	else
 		throw UnsupportedUnit ("can't convert Pressure to " + unit);
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Pressure
-operator"" _psi (long double psi)
-{
-	return Pressure (static_cast<Pressure::ValueType> (psi));
-}
-
-
-inline constexpr Pressure
-operator"" _psi (unsigned long long psi)
-{
-	return Pressure (static_cast<Pressure::ValueType> (psi));
-}
-
-
-inline constexpr Pressure
-operator"" _hPa (long double hPa)
-{
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
-}
-
-
-inline constexpr Pressure
-operator"" _hPa (unsigned long long hPa)
-{
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
-}
-
-
-inline constexpr Pressure
-operator"" _inHg (long double inHg)
-{
-	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
-}
-
-
-inline constexpr Pressure
-operator"" _inHg (unsigned long long inHg)
-{
-	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
 }
 
 } // namespace SI

@@ -96,6 +96,44 @@ class Angle: public LinearValue<double, Angle>
 };
 
 
+/*
+ * Global functions
+ */
+
+
+inline constexpr Angle
+operator"" _rad (long double radians)
+{
+	return Angle (static_cast<Angle::ValueType> (radians));
+}
+
+
+inline constexpr Angle
+operator"" _rad (unsigned long long radians)
+{
+	return Angle (static_cast<Angle::ValueType> (radians));
+}
+
+
+inline constexpr Angle
+operator"" _deg (long double degrees)
+{
+	return Angle (static_cast<Angle::ValueType> (degrees * M_PI / 180.0));
+}
+
+
+inline constexpr Angle
+operator"" _deg (unsigned long long degrees)
+{
+	return Angle (static_cast<Angle::ValueType> (degrees) * M_PI / 180.0);
+}
+
+
+/*
+ * Angle implementation
+ */
+
+
 inline constexpr
 Angle::Angle (ValueType radians):
 	LinearValue (radians)
@@ -153,39 +191,6 @@ Angle::floatize (std::string unit) const
 		return rad();
 	else
 		throw UnsupportedUnit ("can't convert Angle to " + unit);
-}
-
-
-/*
- * Global functions
- */
-
-
-inline constexpr Angle
-operator"" _rad (long double radians)
-{
-	return Angle (static_cast<Angle::ValueType> (radians));
-}
-
-
-inline constexpr Angle
-operator"" _rad (unsigned long long radians)
-{
-	return Angle (static_cast<Angle::ValueType> (radians));
-}
-
-
-inline constexpr Angle
-operator"" _deg (long double degrees)
-{
-	return Angle (static_cast<Angle::ValueType> (degrees * M_PI / 180.0));
-}
-
-
-inline constexpr Angle
-operator"" _deg (unsigned long long degrees)
-{
-	return Angle (static_cast<Angle::ValueType> (degrees) * M_PI / 180.0);
 }
 
 } // namespace SI
