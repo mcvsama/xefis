@@ -91,6 +91,7 @@ TextLayout::add_skips (QFont const& font, unsigned int number)
 {
 	for (unsigned int i = 0; i < number; ++i)
 	{
+		add_fragment ("", font, Qt::white);
 		add_new_line();
 		add_fragment ("", font, Qt::white);
 	}

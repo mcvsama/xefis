@@ -85,6 +85,12 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "localizer-id", _localizer_id, false },
 		{ "tcas.on", _tcas_on, false },
 		{ "tcas.range", _tcas_range, false },
+		{ "features.fix", _features_fix, false },
+		{ "features.vor", _features_vor, false },
+		{ "features.dme", _features_dme, false },
+		{ "features.ndb", _features_ndb, false },
+		{ "features.loc", _features_loc, false },
+		{ "features.arpt", _features_arpt, false },
 	});
 
 	_hsi_widget = std::make_unique<HSIWidget> (this, work_performer());
@@ -169,11 +175,12 @@ HSI::read()
 	else
 		params.position.reset();
 	params.navaids_visible = _orientation_heading_true.valid();
-	params.vor_visible = true;
-	params.dme_visible = true;
-	params.ndb_visible = true;
-	params.loc_visible = true;
-	params.fix_visible = true;
+	params.fix_visible = _features_fix.read (false);
+	params.vor_visible = _features_vor.read (false);
+	params.dme_visible = _features_dme.read (false);
+	params.ndb_visible = _features_ndb.read (false);
+	params.loc_visible = _features_loc.read (false);
+	params.arpt_visible = _features_arpt.read (false);
 	params.highlighted_loc = QString::fromStdString (_localizer_id.read (""));
 	params.positioning_hint_visible = _position_source.valid();
 	params.positioning_hint = QString::fromStdString (*_position_source);

@@ -1,15 +1,5 @@
 <?xml version='1.0'?>
 <xefis-include>
-	<!-- TODO
-	bank angle limit
-
-	master caution
-	rth engage
-
-	flap control (up, down)
-	<widget ...rotary-encoder... toggle-property
-	<widget ...rotary-selector... values='1 2 5 10 20 50 100'/>
-	 -->
 	<panel>
 		<layout type='vertical' spacing='5'>
 			<item>
@@ -103,6 +93,28 @@
 					<layout type='horizontal' spacing='10'>
 						<item>
 							<widget type='button' top-label='ALIGN' toggle-property='/' led-property='/' led-color='amber'/>
+						</item>
+						<stretch/>
+					</layout>
+				</group>
+			</item>
+			<item>
+				<group label='ND'>
+					<layout type='horizontal' spacing='10'>
+						<item>
+							<widget type='button' top-label='TERR' toggle-property='/settings/hsi/show-terr' led-property='/settings/hsi/show-terr' led-color='green'/>
+						</item>
+						<item>
+							<widget type='button' top-label='LOC' toggle-property='/settings/hsi/show-loc' led-property='/settings/hsi/show-loc' led-color='green'/>
+						</item>
+						<item>
+							<widget type='button' top-label='ARPT' toggle-property='/settings/hsi/show-arpt' led-property='/settings/hsi/show-arpt' led-color='green'/>
+						</item>
+						<item>
+							<widget type='button' top-label='STA' toggle-property='/settings/hsi/show-sta' led-property='/settings/hsi/show-sta' led-color='green'/>
+						</item>
+						<item>
+							<widget type='button' top-label='WPT' toggle-property='/settings/hsi/show-wpt' led-property='/settings/hsi/show-wpt' led-color='green'/>
 						</item>
 						<stretch/>
 					</layout>

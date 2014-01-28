@@ -1095,10 +1095,8 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	auto configure_layout = [&](Xefis::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
 	{
 		if (!reference.isEmpty())
-		{
 			layout.add_fragment (reference, _font_16, color);
-			layout.add_new_line();
-		}
+		layout.add_skips (_font_16, 1);
 		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, _font_16, color);
 		layout.add_new_line();
 		layout.add_fragment ("DME ", _font_13, color);
@@ -1107,23 +1105,42 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 
 	Xefis::TextLayout left_layout;
 	left_layout.set_alignment (Qt::AlignLeft);
+	left_layout.set_background (Qt::black, { _margin, 0.0 });
+
+	if (_params.loc_visible)
+		left_layout.add_fragment ("LOC", _font_16, cyan);
+	left_layout.add_skips (_font_16, 1);
+
+	if (_params.arpt_visible)
+		left_layout.add_fragment ("ARPT", _font_16, cyan);
+	left_layout.add_skips (_font_16, 1);
+
+	if (_params.fix_visible)
+		left_layout.add_fragment ("WPT", _font_16, cyan);
+	left_layout.add_skips (_font_16, 1);
+
+	if (_params.vor_visible || _params.dme_visible || _params.ndb_visible)
+		left_layout.add_fragment ("STA", _font_16, cyan);
+	left_layout.add_skips (_font_16, 1);
 
 	if (_params.tcas_on && !*_params.tcas_on)
 	{
 		left_layout.add_fragment ("TCAS", _font_16, _warning_color_2);
 		left_layout.add_new_line();
 		left_layout.add_fragment ("OFF", _font_16, _warning_color_2);
+		left_layout.add_new_line();
 	}
-
-	left_layout.add_new_line();
+	else
+		left_layout.add_skips (_font_16, 2);
 
 	if (_locals.navaid_left_visible)
 		configure_layout (left_layout, (_params.navaid_left_type == 0) ? Qt::green : cyan, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
 	else
-		left_layout.add_skips (_font_16, 3);
+		left_layout.add_skips (_font_16, 2);
 
 	Xefis::TextLayout right_layout;
 	right_layout.set_alignment (Qt::AlignRight);
+	right_layout.set_background (Qt::black, { _margin, 0.0 });
 
 	if (_locals.navaid_right_visible)
 		configure_layout (right_layout, (_params.navaid_right_type == 0) ? Qt::green : cyan, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
@@ -1274,7 +1291,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 	painter.setFont (_font_10);
 
 	retrieve_navaids();
-	paint_locs (painter);
+	paint_locs();
 
 	// Return feature position on screen relative to _aircraft_center_transform.
 	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
@@ -1439,9 +1456,12 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_locs()
 {
-	QFontMetricsF font_metrics (painter.font());
+	if (!_params.loc_visible)
+		return;
+
+	QFontMetricsF font_metrics (painter().font());
 	QTransform rot_1; rot_1.rotate (-2.f);
 	QTransform rot_2; rot_2.rotate (+2.f);
 	QPointF zero (0.f, 0.f);
@@ -1453,9 +1473,9 @@ HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 
 	auto paint_texts_to_paint = [&]() -> void
 	{
-		painter.resetTransform();
+		painter().resetTransform();
 		for (auto const& text_and_xy: texts_to_paint)
-			painter.fast_draw_text (text_and_xy.first, text_and_xy.second);
+			painter().fast_draw_text (text_and_xy.first, text_and_xy.second);
 		texts_to_paint.clear();
 	};
 
@@ -1474,21 +1494,21 @@ HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 		QPointF pt_1 (rot_1.map (QPointF (0.f, line_2)));
 		QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
 
-		painter.setTransform (transform);
+		painter().setTransform (transform);
 		if (_params.range < 16_nm)
-			painter.drawLine (zero, pt_0);
-		painter.drawLine (zero, pt_1);
-		painter.drawLine (zero, pt_2);
-		painter.drawLine (pt_0, pt_1);
-		painter.drawLine (pt_0, pt_2);
+			painter().drawLine (zero, pt_0);
+		painter().drawLine (zero, pt_1);
+		painter().drawLine (zero, pt_2);
+		painter().drawLine (pt_0, pt_1);
+		painter().drawLine (pt_0, pt_2);
 
 		QPointF text_offset (0.5f * font_metrics.width (navaid.identifier()), -0.35f * font_metrics.height());
 		texts_to_paint.emplace_back (transform.map (pt_0 + QPointF (0.f, 0.6f * _q)) - text_offset, navaid.identifier());
 	};
 
 	// Paint localizers:
-	painter.setBrush (Qt::NoBrush);
-	painter.setPen (_lo_loc_pen);
+	painter().setBrush (Qt::NoBrush);
+	painter().setPen (_lo_loc_pen);
 	Navaid const* hi_loc = nullptr;
 	for (auto& navaid: _loc_navs)
 	{
@@ -1505,7 +1525,7 @@ HSIWidget::PaintWorkUnit::paint_locs (Xefis::Painter& painter)
 	// Highlighted localizer with text:
 	if (hi_loc)
 	{
-		painter.setPen (_hi_loc_pen);
+		painter().setPen (_hi_loc_pen);
 		paint_loc (*hi_loc);
 		paint_texts_to_paint();
 	}
@@ -1570,11 +1590,12 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (*_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
 		return;
 
-	_loc_navs.clear();
-	_ndb_navs.clear();
+	_fix_navs.clear();
 	_vor_navs.clear();
 	_dme_navs.clear();
-	_fix_navs.clear();
+	_ndb_navs.clear();
+	_loc_navs.clear();
+	_arpt_navs.clear();
 
 	for (Navaid const& navaid: _navaid_storage->get_navs (*_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
 	{

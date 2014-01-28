@@ -106,6 +106,12 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyString	_localizer_id;
 	Xefis::PropertyBoolean	_tcas_on;
 	Xefis::PropertyLength	_tcas_range;
+	Xefis::PropertyBoolean	_features_fix;
+	Xefis::PropertyBoolean	_features_vor;
+	Xefis::PropertyBoolean	_features_dme;
+	Xefis::PropertyBoolean	_features_ndb;
+	Xefis::PropertyBoolean	_features_loc;
+	Xefis::PropertyBoolean	_features_arpt;
 };
 
 
