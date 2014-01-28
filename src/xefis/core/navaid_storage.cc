@@ -28,6 +28,70 @@
 
 namespace Xefis {
 
+class DatFileIterator
+{
+  public:
+	// Ctor
+	explicit DatFileIterator (QFile& file);
+
+	/**
+	 * Return true if pointer doesn't point to the end of the line.
+	 */
+	operator bool() const;
+
+	/**
+	 * Go to the next line.
+	 */
+	void
+	operator++();
+
+	/**
+	 * Return QTextStream made of the line content.
+	 */
+	QTextStream&
+	operator*();
+
+  private:
+	QTextStream			_file_stream;
+	Unique<QTextStream>	_line_stream;
+	QString				_line;
+};
+
+
+inline
+DatFileIterator::DatFileIterator (QFile& file):
+	_file_stream (&file)
+{
+	// Skip two first lines (file origin and copyrights):
+	operator++();
+	operator++();
+}
+
+
+inline
+DatFileIterator::operator bool() const
+{
+	return !_line.simplified().isEmpty() || !_file_stream.atEnd();
+}
+
+
+void
+DatFileIterator::operator++()
+{
+	_line.clear();
+	while (_line.simplified().isEmpty() && !_file_stream.atEnd())
+		_line = _file_stream.readLine();
+	_line_stream = std::make_unique<QTextStream> (&_line);
+}
+
+
+QTextStream&
+DatFileIterator::operator*()
+{
+	return *_line_stream;
+}
+
+
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_position)
 { }
@@ -38,6 +102,7 @@ NavaidStorage::load()
 {
 	parse_nav_dat();
 	parse_fix_dat();
+	parse_apt_dat();
 
 	_navaids_tree.optimize();
 
@@ -113,27 +178,21 @@ NavaidStorage::parse_nav_dat()
 {
 	QFile file (_nav_dat_file);
 	file.open (QFile::ReadOnly);
-	QTextStream ts (&file);
 
-	// Skip two first lines (file origin and Copyrights):
-	ts.readLine();
-	ts.readLine();
-
-	while (!ts.atEnd())
+	for (DatFileIterator line (file); line; ++line)
 	{
-		QString line = ts.readLine();
-		QTextStream line_ts (&line);
+		auto& line_ts = *line;
 
 		int type_int;
-		Navaid::Type type;
+		Nav type;
 		LonLat pos;
-		float amsl;
-		float khz;
+		double elevation_ft;
+		double khz;
 		QString identifier;
-		float range;
+		double range;
 		QString name;
-		float pos_lon;
-		float pos_lat;
+		double pos_lon;
+		double pos_lat;
 
 		line_ts >> type_int >> pos_lat >> pos_lon;
 
@@ -141,35 +200,35 @@ NavaidStorage::parse_nav_dat()
 			break;
 
 		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
-		type = static_cast<Navaid::Type> (type_int);
+		type = static_cast<Nav> (type_int);
 
 		switch (type)
 		{
-			case Navaid::NDB:
+			case Nav::NDB:
 			{
 				int unused_int;
-				float unused_float;
+				double unused_float;
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
-				Navaid navaid (type, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::NDB, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10_kHz);
 				_navaids_tree.insert (navaid);
 				break;
 			}
 
-			case Navaid::VOR:
+			case Nav::VOR:
 			{
-				float slaved_variation_deg;
-				line_ts >> amsl >> khz >> range >> slaved_variation_deg >> identifier;
+				double slaved_variation_deg;
+				line_ts >> elevation_ft >> khz >> range >> slaved_variation_deg >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (type, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::VOR, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
-				navaid.set_amsl (1_ft * amsl);
+				navaid.set_elevation (1_ft * elevation_ft);
 				if (name.endsWith ("VOR-DME"))
 					navaid.set_vor_type (Navaid::VOR_DME);
 				else if (name.endsWith ("VORTAC"))
@@ -180,41 +239,37 @@ NavaidStorage::parse_nav_dat()
 				break;
 			}
 
-			case Navaid::LOC:		// ILS localizer
-			case Navaid::LOCSA:		// Stand-alone localizer
+			case Nav::LOC:		// ILS localizer
+			case Nav::LOCSA:	// Stand-alone localizer
 			{
-				float true_bearing_deg;
+				double true_bearing_deg;
 				QString icao;
-				QString runway;
-				line_ts >> amsl >> khz >> range >> true_bearing_deg >> identifier >> icao >> runway;
+				QString runway_id;
+				line_ts >> elevation_ft >> khz >> range >> true_bearing_deg >> identifier >> icao >> runway_id;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (type, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::LOC, pos, identifier, name, 1_nm * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_true_bearing (1_deg * true_bearing_deg);
-				navaid.set_amsl (1_ft * amsl);
+				navaid.set_elevation (1_ft * elevation_ft);
 				navaid.set_icao (icao);
-				navaid.set_runway (runway);
+				navaid.set_runway_id (runway_id);
 				_navaids_tree.insert (navaid);
 				break;
 			}
 
-			case Navaid::GS:
+			case Nav::GS:
 				break;
 
-			case Navaid::OM:
-			case Navaid::MM:
-			case Navaid::IM:
+			case Nav::OM:
+			case Nav::MM:
+			case Nav::IM:
 				break;
 
-			case Navaid::DMESF:		// Suppress frequency
-			case Navaid::DME:		// Display frequency
-				break;
-
-			case Navaid::Fix:
-				// Not in this file.
+			case Nav::DMESF:	// Suppress frequency
+			case Nav::DME:		// Display frequency
 				break;
 
 			default:
@@ -229,21 +284,15 @@ NavaidStorage::parse_fix_dat()
 {
 	QFile file (_fix_dat_file);
 	file.open (QFile::ReadOnly);
-	QTextStream ts (&file);
 
-	// Skip two first lines (file origin and Copyrights):
-	ts.readLine();
-	ts.readLine();
-
-	while (!ts.atEnd())
+	for (DatFileIterator line (file); line; ++line)
 	{
-		QString line = ts.readLine();
-		QTextStream line_ts (&line);
+		auto& line_ts = *line;
 
 		LonLat pos;
 		QString identifier;
-		float pos_lon;
-		float pos_lat;
+		double pos_lon;
+		double pos_lat;
 
 		line_ts >> pos_lat >> pos_lon >> identifier;
 
@@ -252,8 +301,121 @@ NavaidStorage::parse_fix_dat()
 
 		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 
-		_navaids_tree.insert (Navaid (Navaid::Fix, pos, identifier, identifier, 0_nm));
+		_navaids_tree.insert (Navaid (Navaid::FIX, pos, identifier, identifier, 0_nm));
 	}
+}
+
+
+void
+NavaidStorage::parse_apt_dat()
+{
+	QFile file (_apt_dat_file);
+	file.open (QFile::ReadOnly);
+
+	Unique<Navaid> cur_land_airport;
+	Navaid::Runways runways;
+	std::size_t loaded_airports = 0;
+
+	auto push_navaid = [&] {
+		if (cur_land_airport && !runways.empty())
+		{
+			// Compute position:
+			LonLat min_position = runways[0].pos_1();
+			LonLat max_position = min_position;
+			for (auto rwy: runways)
+			{
+				for (auto point: { rwy.pos_1(), rwy.pos_2() })
+				{
+					min_position.lon() = std::min (min_position.lon(), point.lon());
+					min_position.lat() = std::min (min_position.lat(), point.lat());
+					max_position.lon() = std::max (max_position.lon(), point.lon());
+					max_position.lat() = std::max (max_position.lat(), point.lat());
+				}
+			}
+			if (sgn (min_position.lon().deg()) != sgn (max_position.lon().deg()))
+			{ }// TODO
+			if (sgn (min_position.lat().deg()) != sgn (max_position.lat().deg()))
+			{ }// TODO
+			LonLat mean_position (0.5 * (min_position.lon() + max_position.lon()),
+								  0.5 * (min_position.lat() + max_position.lat()));
+			cur_land_airport->set_position (mean_position);
+
+			_navaids_tree.insert (*cur_land_airport);
+			cur_land_airport.reset();
+			runways.clear();
+
+			++loaded_airports;
+		}
+	};
+
+	for (DatFileIterator line (file); line; ++line)
+	{
+		auto& line_ts = *line;
+
+		int type;
+		line_ts >> type;
+
+		if (type == 99) // EOF sentinel
+			break;
+
+		switch (static_cast<Apt> (type))
+		{
+			case Apt::LandAirport:
+			{
+				push_navaid();
+
+				int elevation_ft;
+				int deprecated;
+				QString identifier;
+				QString name;
+
+				line_ts >> elevation_ft >> deprecated >> identifier;
+				name = line_ts.readAll();
+
+				cur_land_airport = std::make_unique<Navaid> (Navaid::ARPT);
+				cur_land_airport->set_identifier (identifier);
+				cur_land_airport->set_name (name);
+				cur_land_airport->set_elevation (1_ft * elevation_ft);
+				break;
+			}
+
+			case Apt::Runway:
+			{
+				if (cur_land_airport)
+				{
+					double width_m;
+					int runway_surface_type;
+					int shoulder_surface_type;
+					double smoothness;
+					int center_line_lights;
+					int edge_lights;
+					int distance_remaining_lights;
+					QString identifier[2];
+					double lat_deg[2];
+					double lon_deg[2];
+					double displaced_threshold_m[2];
+					double blast_pad_length_m[2];
+					int runway_markings[2]; // Visual, non-precision, precision
+					int approach_lighting[2];
+					int touchdown_zone_lighting[2]; // Flag (true/false)
+					int runway_end_identifier_lights[2];
+
+					line_ts >> width_m >> runway_surface_type >> shoulder_surface_type >> smoothness >> center_line_lights
+							>> edge_lights >> distance_remaining_lights;
+					for (int i = 0; i < 2; ++i)
+						line_ts >> identifier[i] >> lat_deg[i] >> lon_deg[i] >> displaced_threshold_m[i] >> blast_pad_length_m[i]
+								>> runway_markings[i] >> approach_lighting[i] >> touchdown_zone_lighting[i] >> runway_end_identifier_lights[i];
+
+					runways.push_back (Navaid::Runway (identifier[0],
+													   LonLat (1_deg * lon_deg[0], 1_deg * lat_deg[0]),
+													   identifier[1],
+													   LonLat (1_deg * lon_deg[1], 1_deg * lat_deg[1])));
+				}
+			}
+		}
+	}
+
+	push_navaid();
 }
 
 } // namespace Xefis

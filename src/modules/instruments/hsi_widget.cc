@@ -1292,6 +1292,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 
 	retrieve_navaids();
 	paint_locs();
+	paint_arpts();
 
 	// Return feature position on screen relative to _aircraft_center_transform.
 	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
@@ -1363,7 +1364,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				painter.drawRect (QRectF (-0.5f, -0.5f, 1.f, 1.f));
 				break;
 
-			case Navaid::Fix:
+			case Navaid::FIX:
 			{
 				float const h = 0.75f;
 				QPointF a (0.f, -0.66f * h);
@@ -1533,6 +1534,13 @@ HSIWidget::PaintWorkUnit::paint_locs()
 
 
 void
+HSIWidget::PaintWorkUnit::paint_arpts()
+{
+	// TODO _arpt_navs
+}
+
+
+void
 HSIWidget::PaintWorkUnit::paint_tcas()
 {
 	if (!_params.tcas_on)
@@ -1602,7 +1610,6 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 		switch (navaid.type())
 		{
 			case Navaid::LOC:
-			case Navaid::LOCSA:
 				_loc_navs.push_back (navaid);
 				break;
 
@@ -1615,12 +1622,15 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 				break;
 
 			case Navaid::DME:
-			case Navaid::DMESF:
 				_dme_navs.push_back (navaid);
 				break;
 
-			case Navaid::Fix:
+			case Navaid::FIX:
 				_fix_navs.push_back (navaid);
+				break;
+
+			case Navaid::ARPT:
+				// TODO ARPT
 				break;
 
 			default:
