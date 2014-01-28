@@ -316,14 +316,26 @@ ConfigReader::load (QString const& path)
 
 
 void
-ConfigReader::process()
+ConfigReader::process_settings()
 {
 	for (auto e: _settings_elements)
 		process_settings_element (e);
-	for (auto e: _windows_elements)
-		process_windows_element (e);
+}
+
+
+void
+ConfigReader::process_modules()
+{
 	for (auto e: _modules_elements)
 		process_modules_element (e);
+}
+
+
+void
+ConfigReader::process_windows()
+{
+	for (auto e: _windows_elements)
+		process_windows_element (e);
 }
 
 

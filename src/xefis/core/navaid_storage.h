@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/logger.h>
 #include <kdtree++/kdtree.hpp>
 
 // Local:
@@ -116,6 +117,7 @@ class NavaidStorage
 	parse_apt_dat();
 
   private:
+	Logger			_logger;
 	NavaidsTree		_navaids_tree;
 	const char*		_nav_dat_file	= "share/nav/nav.dat";
 	const char*		_fix_dat_file	= "share/nav/fix.dat";

@@ -91,12 +91,16 @@ Application::Application (int& argc, char** argv):
 
 	_airframe = std::make_unique<Airframe> (this, _config_reader->airframe_config());
 
-	_config_reader->process();
+	_config_reader->process_settings();
+
+	if (_config_reader->load_navaids())
+		_navaid_storage->load();
+
+	_config_reader->process_modules();
+	_config_reader->process_windows();
 
 	if (_config_reader->has_windows())
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (_module_manager.get(), nullptr);
-	if (_config_reader->load_navaids())
-		_navaid_storage->load();
 }
 
 

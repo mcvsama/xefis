@@ -94,7 +94,9 @@ DatFileIterator::operator*()
 
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_position)
-{ }
+{
+	_logger.set_prefix ("navaid storage");
+}
 
 
 void
@@ -176,6 +178,8 @@ NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Fre
 void
 NavaidStorage::parse_nav_dat()
 {
+	_logger << "Loading navaids" << std::endl;
+
 	QFile file (_nav_dat_file);
 	file.open (QFile::ReadOnly);
 
@@ -276,12 +280,16 @@ NavaidStorage::parse_nav_dat()
 				break;
 		}
 	}
+
+	_logger << "Loading navaids: done" << std::endl;
 }
 
 
 void
 NavaidStorage::parse_fix_dat()
 {
+	_logger << "Loading fixes" << std::endl;
+
 	QFile file (_fix_dat_file);
 	file.open (QFile::ReadOnly);
 
@@ -303,12 +311,16 @@ NavaidStorage::parse_fix_dat()
 
 		_navaids_tree.insert (Navaid (Navaid::FIX, pos, identifier, identifier, 0_nm));
 	}
+
+	_logger << "Loading fixes: done" << std::endl;
 }
 
 
 void
 NavaidStorage::parse_apt_dat()
 {
+	_logger << "Loading airports" << std::endl;
+
 	QFile file (_apt_dat_file);
 	file.open (QFile::ReadOnly);
 
@@ -416,6 +428,8 @@ NavaidStorage::parse_apt_dat()
 	}
 
 	push_navaid();
+
+	_logger << "Loading airports: done" << std::endl;
 }
 
 } // namespace Xefis

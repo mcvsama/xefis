@@ -206,10 +206,22 @@ class ConfigReader
 	load (QString const& path);
 
 	/**
-	 * Process config. Load modules, create windows, etc.
+	 * Preprocess config's settings.
 	 */
 	void
-	process();
+	process_settings();
+
+	/**
+	 * Load non-instrument modules.
+	 */
+	void
+	process_modules();
+
+	/**
+	 * Process and show windows.
+	 */
+	void
+	process_windows();
 
 	/**
 	 * Determines if there are any windows (and instruments)
