@@ -133,11 +133,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool				position_valid				= false;
 		Optional<LonLat>	position;
 		bool				navaids_visible				= false;
+		bool				fix_visible					= false;
 		bool				vor_visible					= false;
 		bool				dme_visible					= false;
 		bool				ndb_visible					= false;
 		bool				loc_visible					= false;
-		bool				fix_visible					= false;
+		bool				arpt_visible				= false;
 		QString				highlighted_loc;
 		bool				positioning_hint_visible	= false;
 		QString				positioning_hint;
@@ -239,7 +240,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_navaids (Xefis::Painter&);
 
 		void
-		paint_locs (Xefis::Painter&);
+		paint_locs();
+
+		void
+		paint_arpts();
 
 		void
 		paint_tcas();
@@ -307,11 +311,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool					_navs_retrieved				= false;
 		LonLat					_navs_retrieve_position		= { 0_deg, 0_deg };
 		Length					_navs_retrieve_range		= 0_nm;
-		NavaidStorage::Navaids	_loc_navs;
-		NavaidStorage::Navaids	_ndb_navs;
+		NavaidStorage::Navaids	_fix_navs;
 		NavaidStorage::Navaids	_vor_navs;
 		NavaidStorage::Navaids	_dme_navs;
-		NavaidStorage::Navaids	_fix_navs;
+		NavaidStorage::Navaids	_ndb_navs;
+		NavaidStorage::Navaids	_loc_navs;
+		NavaidStorage::Navaids	_arpt_navs;
 		Parameters				_params;
 		Parameters				_params_next;
 		LocalParameters			_locals;

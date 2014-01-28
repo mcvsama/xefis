@@ -172,6 +172,12 @@
 					<property name='wind.tas' path='/systems/pc/wind/speed/tas'/>
 					<property name='tcas.on' path='/settings/tcas/on'/>
 					<property name='tcas.range' path='/settings/tcas/range'/>
+					<property name='features.fix' path='/settings/hsi/show-wpt'/>
+					<property name='features.vor' path='/settings/hsi/show-sta'/>
+					<property name='features.dme' path='/settings/hsi/show-sta'/>
+					<property name='features.ndb' path='/settings/hsi/show-sta'/>
+					<property name='features.loc' path='/settings/hsi/show-loc'/>
+					<property name='features.arpt' path='/settings/hsi/show-arpt'/>
 				</properties>
 			</instrument>
 		</item>
