@@ -117,7 +117,7 @@ Flaps::paintEvent (QPaintEvent*)
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / _maximum * block.height();
 		painter().setPen (get_pen (Qt::green, 2.f));
-		painter().add_shadow ([&]() {
+		painter().add_shadow ([&] {
 			painter().drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));
 		});
 

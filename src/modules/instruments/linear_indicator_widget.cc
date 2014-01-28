@@ -93,7 +93,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 			<< QPointF (1.9f * q, -0.5f * q)
 			<< QPointF (1.9f * q, +0.5f * q);
 		polygon.translate (p1.x(), Xefis::renormalize (value, _range.min(), _range.max(), p1.y(), p0.y()));
-		painter().add_shadow ([&]() {
+		painter().add_shadow ([&] {
 			painter().drawPolygon (polygon);
 		});
 	}

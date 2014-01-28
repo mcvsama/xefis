@@ -89,7 +89,7 @@ ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement cons
 void
 ETSAirspeed::initialize()
 {
-	guard ([&]() {
+	guard ([&] {
 		_i2c_device.open();
 		// Start gathering samples for computation of an offset:
 		_periodic_read_timer->start();
@@ -112,7 +112,7 @@ ETSAirspeed::reinitialize()
 void
 ETSAirspeed::read()
 {
-	guard ([&]() {
+	guard ([&] {
 		uint16_t raw_value = _i2c_device.read_register<uint16_t> (ValueRegister);
 		boost::endian::little_to_native (raw_value);
 

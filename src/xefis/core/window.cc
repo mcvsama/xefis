@@ -51,7 +51,7 @@ Window::Stack::Stack (Time delay)
 	timer->setSingleShot (true);
 	timer->setInterval (delay.ms());
 
-	QObject::connect (timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (timer.get(), &QTimer::timeout, [&] {
 		layout->setCurrentIndex (*property + 1);
 	});
 }

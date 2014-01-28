@@ -174,20 +174,17 @@ HT16K33::NumericDisplay::update_led_matrix (LedMatrix& led_matrix) const
 	for (auto c: QString ("%1").arg (integer))
 		digits.push_back (c.digitValue());
 
-	auto clear_all_digits = [&]() -> void
-	{
+	auto clear_all_digits = [&] {
 		for (Row row: _digit_rows)
 			led_matrix.set_column (row, 0);
 	};
 
-	auto set_all_digits_9 = [&]() -> void
-	{
+	auto set_all_digits_9 = [&] {
 		for (Row row: _digit_rows)
 			led_matrix.set_column (row, _digit_symbols[9]);
 	};
 
-	auto normally_display = [&]() -> void
-	{
+	auto normally_display = [&] {
 		std::size_t ds = digits.size();
 		for (unsigned int i = 0; i < ds; ++i)
 			led_matrix.set_column (_digit_rows[ds - i - 1], _digit_symbols[digits[i]]);
@@ -342,7 +339,7 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 	QObject::connect (_scan_timer, SIGNAL (timeout()), this, SLOT (pool_keys()));
 	_scan_timer->start();
 
-	guard ([&]() {
+	guard ([&] {
 		initialize();
 	});
 }
@@ -351,7 +348,7 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 void
 HT16K33::initialize()
 {
-	guard ([&]() {
+	guard ([&] {
 		_i2c_device.write (SetupRegister | SetupOn);
 		_i2c_device.write (RowIntRegister | RowIntRow);
 	});
@@ -371,7 +368,7 @@ HT16K33::reinitialize()
 void
 HT16K33::pool_keys()
 {
-	guard ([&]() {
+	guard ([&] {
 		// Check for interrupt flag:
 		uint8_t interrupt_flag = _i2c_device.read_register (InterruptRegister);
 
@@ -414,7 +411,7 @@ HT16K33::guard (std::function<void()> guarded_code)
 void
 HT16K33::data_updated()
 {
-	guard ([&]() {
+	guard ([&] {
 		uint8_t display = 0;
 		uint8_t brightness = 0;
 

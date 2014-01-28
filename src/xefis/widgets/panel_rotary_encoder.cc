@@ -54,7 +54,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_click_timer = std::make_unique<QTimer>();
 	_click_timer->setSingleShot (true);
 	_click_timer->setInterval (10);
-	QObject::connect (_click_timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (_click_timer.get(), &QTimer::timeout, [&] {
 		if (_click_property.configured())
 			_click_property.write (false);
 	});
@@ -62,7 +62,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_rotate_up_timer = std::make_unique<QTimer>();
 	_rotate_up_timer->setSingleShot (true);
 	_rotate_up_timer->setInterval (10);
-	QObject::connect (_rotate_up_timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (_rotate_up_timer.get(), &QTimer::timeout, [&] {
 		if (_rotate_up.configured())
 			_rotate_up.write (false);
 	});
@@ -70,7 +70,7 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 	_rotate_down_timer = std::make_unique<QTimer>();
 	_rotate_down_timer->setSingleShot (true);
 	_rotate_down_timer->setInterval (10);
-	QObject::connect (_rotate_down_timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (_rotate_down_timer.get(), &QTimer::timeout, [&] {
 		if (_rotate_down.configured())
 			_rotate_down.write (false);
 	});

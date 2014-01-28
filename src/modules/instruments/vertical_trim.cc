@@ -124,7 +124,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	if (ref)
 	{
 		painter().setPen (get_pen (_autopilot_color, 2.0));
-		painter().add_shadow ([&]() {
+		painter().add_shadow ([&] {
 			painter().drawLine (QPointF (pen_width (0.5), -*ref * 0.5 * v),
 								QPointF (pen_width (7.5), -*ref * 0.5 * v));
 		});
@@ -146,7 +146,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 		QColor color = within_reference ? Qt::green : Qt::white;
 		painter().setPen (get_pen (color, 1.0));
 		painter().setBrush (color);
-		painter().add_shadow ([&]() {
+		painter().add_shadow ([&] {
 			painter().drawPolygon (triangle.translated (0.0, -*trim * 0.5 * v));
 		});
 	}

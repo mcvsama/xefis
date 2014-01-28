@@ -54,7 +54,7 @@ InstrumentWidget::PaintWorkUnit::execute()
 
 	for (;;)
 	{
-		m.synchronize ([&]() {
+		m.synchronize ([&] {
 			std::pair<QSize, QSize> sizes = _widget->threadsafe_sizes();
 			if (_image.size() != sizes.first)
 			{
@@ -69,7 +69,7 @@ InstrumentWidget::PaintWorkUnit::execute()
 		bool paint_again = false;
 		paint (_image);
 
-		m.synchronize ([&]() {
+		m.synchronize ([&] {
 			_widget->_paint_buffer = _image;
 			_widget->threadsafe_update();
 			paint_again = _widget->_paint_again;
@@ -155,7 +155,7 @@ InstrumentWidget::resizeEvent (QResizeEvent* event)
 	QWidget::resizeEvent (event);
 	if (_paint_work_unit)
 	{
-		_paint_mutex.synchronize ([&]() {
+		_paint_mutex.synchronize ([&] {
 			_threadsafe_size = size();
 			_threadsafe_window_size = window()->size();
 			_paint_buffer = QImage (size(), QImage::Format_ARGB32_Premultiplied);
@@ -170,7 +170,7 @@ void
 InstrumentWidget::paintEvent (QPaintEvent*)
 {
 	QPainter painter (this);
-	_paint_mutex.synchronize ([&]() {
+	_paint_mutex.synchronize ([&] {
 		painter.drawImage (QPoint (0, 0), _paint_buffer);
 	});
 }
@@ -187,7 +187,7 @@ InstrumentWidget::customEvent (QEvent* event)
 
 		case RequestRepaintEvent:
 			_paint_requested = false;
-			_paint_mutex.synchronize ([&]() {
+			_paint_mutex.synchronize ([&] {
 				push_params();
 				if (_paint_in_progress)
 					_paint_again = true;

@@ -186,7 +186,7 @@ void
 GPS::read()
 {
 	bool err = false;
-	bool exc = Xefis::Exception::guard ([&]() {
+	bool exc = Xefis::Exception::guard ([&] {
 		// Read as much as possible:
 		for (;;)
 		{
@@ -439,7 +439,7 @@ GPS::process()
 	std::string::size_type crlf = 0;
 	std::string::size_type parsed = 0;
 
-	Xefis::Finally remove_parsed_properties ([&]() {
+	Xefis::Finally remove_parsed_properties ([&] {
 		_buffer.erase (0, parsed);
 	});
 
@@ -450,7 +450,7 @@ GPS::process()
 			break;
 		parsed = crlf + 2;
 
-		Xefis::Exception::guard ([&]() {
+		Xefis::Exception::guard ([&] {
 			if (process_message (_buffer.substr (start, crlf - start)))
 			{
 				_serviceable.write (true);
@@ -524,7 +524,7 @@ GPS::process_message (std::string message)
 
 	bool result = true;
 
-	Xefis::Exception::guard ([&]() {
+	Xefis::Exception::guard ([&] {
 		try {
 			if (type == "GPGGA")
 				result = process_gpgga (contents);
