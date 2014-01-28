@@ -34,13 +34,13 @@ class LonLat
 
   public:
 	// Ctor
-	LonLat();
+	constexpr LonLat();
 
 	/**
 	 * \param	longitude Angle between -180_deg and 180_deg.
 	 * \param	latitude Angle between -90_deg and 90_deg.
 	 */
-	LonLat (Angle longitude, Angle latitude);
+	constexpr LonLat (Angle longitude, Angle latitude);
 
   public:
 	Angle&
@@ -101,13 +101,13 @@ class LonLat
 };
 
 
-inline
+constexpr inline
 LonLat::LonLat():
 	LonLat (0_deg, 0_deg)
 { }
 
 
-inline
+constexpr inline
 LonLat::LonLat (Angle longitude, Angle latitude):
 	_lon (longitude),
 	_lat (latitude)
