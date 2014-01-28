@@ -33,6 +33,13 @@ namespace Xefis {
 
 class TextLayout
 {
+  public:
+	enum BackgroundMode
+	{
+		Whole,
+		PerLine,
+	};
+
   private:
 	/**
 	 * Represents one fragment of text with individual font,
@@ -143,6 +150,12 @@ class TextLayout
 	set_background (QBrush, QSizeF margin = { 0.0, 0.0 });
 
 	/**
+	 * Set background filling mode.
+	 */
+	void
+	set_background_mode (BackgroundMode mode);
+
+	/**
 	 * Set line height factor.
 	 */
 	void
@@ -211,6 +224,7 @@ class TextLayout
 	Qt::Alignment	_default_line_alignment		= Qt::AlignLeft | Qt::AlignTop;
 	QBrush			_background					= Qt::NoBrush;
 	QSizeF			_background_margin			= { 0.0, 0.0 };
+	BackgroundMode	_background_mode			= Whole;
 	Lines			_lines;
 	double			_line_height_factor			= 1.0;
 };
@@ -278,6 +292,13 @@ TextLayout::set_background (QBrush brush, QSizeF margin)
 {
 	_background = brush;
 	_background_margin = margin;
+}
+
+
+inline void
+TextLayout::set_background_mode (BackgroundMode mode)
+{
+	_background_mode = mode;
 }
 
 
