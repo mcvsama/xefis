@@ -78,7 +78,7 @@
 								</item>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='VOR L' click-property='/panels/mcp/navaid-left/button.vor' led-property='/panels/mcp/navaid-left/led.vor' led-color='green'/>
+									<widget type='button' top-label='VOR 1' click-property='/panels/mcp/navaid-left/button.vor' led-property='/panels/mcp/navaid-left/led.vor' led-color='green'/>
 								</item>
 								<stretch/>
 								<item>
@@ -93,7 +93,7 @@
 								</item>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='VOR R' click-property='/panels/mcp/navaid-right/button.vor' led-property='/panels/mcp/navaid-right/led.vor' led-color='green'/>
+									<widget type='button' top-label='VOR 2' click-property='/panels/mcp/navaid-right/button.vor' led-property='/panels/mcp/navaid-right/led.vor' led-color='green'/>
 								</item>
 								<stretch/>
 								<item>
@@ -118,7 +118,7 @@
 								</item>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='NAV L' click-property='/panels/mcp/navaid/button.vor-l' led-property='/panels/mcp/navaid/led.vor-l' led-color='green'/>
+									<widget type='button' top-label='NAV 1' click-property='/panels/mcp/navaid/button.vor-l' led-property='/panels/mcp/navaid/led.vor-l' led-color='green'/>
 								</item>
 							</layout>
 						</item>
@@ -132,7 +132,7 @@
 								</item>
 								<stretch/>
 								<item>
-									<widget type='button' top-label='NAV R' click-property='/panels/mcp/navaid/button.vor-r' led-property='/panels/mcp/navaid/led.vor-r' led-color='green'/>
+									<widget type='button' top-label='NAV 2' click-property='/panels/mcp/navaid/button.vor-r' led-property='/panels/mcp/navaid/led.vor-r' led-color='green'/>
 								</item>
 							</layout>
 						</item>

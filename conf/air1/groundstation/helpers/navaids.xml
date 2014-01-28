@@ -65,7 +65,7 @@
 			<!-- Input:0 -->
 			<directory path='/systems/vor/left'>
 				<property name='input.0.type' path='/type' default='0'/>
-				<property name='input.0.reference' path='/reference' default='VOR L'/>
+				<property name='input.0.reference' path='/reference' default='VOR 1'/>
 				<property name='input.0.identifier' path='/identifier' default='OSOB'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
@@ -110,7 +110,7 @@
 			<!-- Input:0 -->
 			<directory path='/systems/vor/right'>
 				<property name='input.0.type' path='/type' default='0'/>
-				<property name='input.0.reference' path='/reference' default='VOR R'/>
+				<property name='input.0.reference' path='/reference' default='VOR 2'/>
 				<property name='input.0.identifier' path='/identifier' default='POLA'/>
 				<property name='input.0.radial.magnetic' path='/radial.magnetic'/>
 				<property name='input.0.reciprocal.magnetic' path='/reciprocal.magnetic'/>
