@@ -131,7 +131,7 @@ PCA9685::data_updated()
 void
 PCA9685::initialize()
 {
-	guard ([&]() {
+	guard ([&] {
 		_i2c_device.open();
 
 		log() << "Resetting PCA9685." << std::endl;
@@ -167,7 +167,7 @@ PCA9685::reinitialize()
 void
 PCA9685::set_pwm_values()
 {
-	guard ([&]() {
+	guard ([&] {
 		for (std::size_t ch = 0; ch < _channels.size(); ++ch)
 		{
 			Channel& channel = _channels[ch];

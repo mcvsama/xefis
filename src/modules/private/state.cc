@@ -144,7 +144,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// EFIS panel
 
-	_efis_mins_mode_button = std::make_unique<Button> ("/panels/mcp/efis/button.mins-mode", [&]() {
+	_efis_mins_mode_button = std::make_unique<Button> ("/panels/mcp/efis/button.mins-mode", [&] {
 		if (_minimums_type == MinimumsType::Baro)
 			_minimums_type = MinimumsType::Radio;
 		else
@@ -271,7 +271,7 @@ State::prepare_efis_settings()
 		_setting_hsi_range.write (1_nm * range_nm);
 	});
 
-	make_switch (_mcp_range_ctr, [this]() {
+	make_switch (_mcp_range_ctr, [this] {
 		_setting_hsi_display_mode_mfd.write ((_setting_hsi_display_mode_mfd.read (0) + 1) % 2);
 	});
 
@@ -287,7 +287,7 @@ State::prepare_efis_settings()
 		solve_course();
 	});
 
-	make_switch (_mcp_course_hide, [this]() {
+	make_switch (_mcp_course_hide, [this] {
 		_course_visible = !_course_visible;
 		solve_course();
 	});

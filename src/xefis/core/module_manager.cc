@@ -138,7 +138,7 @@ ModuleManager::module_data_updated (Module* module) const
 {
 	Module::Pointer modptr = find (module);
 
-	Time dt = Time::measure ([&]() {
+	Time dt = Time::measure ([&] {
 		try {
 			module->data_updated();
 		}

@@ -336,7 +336,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 	// Aircraft triangle - shadow and triangle:
 	painter.setPen (get_pen (Qt::white, 1.f));
-	painter.add_shadow ([&]() {
+	painter.add_shadow ([&] {
 		painter.drawPolyline (_aircraft_shape);
 	});
 
@@ -530,7 +530,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 		painter.setPen (get_pen (Qt::white, 2.2f));
 		painter.translate (0.f, -1.003f * _r);
 		painter.scale (0.465f, -0.465f);
-		painter.add_shadow ([&]() {
+		painter.add_shadow ([&] {
 			painter.drawPolyline (_aircraft_shape);
 		});
 	}
@@ -597,7 +597,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 			transform.translate (0.f, -px);
 		}
 
-		painter.add_shadow ([&]() {
+		painter.add_shadow ([&] {
 			painter.drawPolyline (polygon);
 		});
 	}
@@ -691,7 +691,7 @@ HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 
 	QTransform t = _rotation_transform * _aircraft_center_transform;
 
-	painter.add_shadow ([&]() {
+	painter.add_shadow ([&] {
 		painter.setTransform (_aircraft_center_transform);
 
 		QPointF line_long;
@@ -793,7 +793,7 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 		painter.translate (0.8f * _q + _margin, 0.8f * _q + layout.height());
 		painter.rotate ((_params.wind_from_magnetic_heading - _params.heading_magnetic + 180_deg).deg());
 		painter.setPen (get_pen (Qt::white, 1.0));
-		painter.add_shadow ([&]() {
+		painter.add_shadow ([&] {
 			QPointF a = QPointF (0.f, -0.7f * _q);
 			QPointF b = QPointF (0.f, +0.7f * _q);
 			painter.drawLine (a + QPointF (0.f, 0.05f * _q), b);
@@ -845,7 +845,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 				<< QPointF (+0.2 * z, -0.8 * z)
 				<< QPointF (0.0, -0.8 * z);
 			painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
-			painter.add_shadow ([&]() {
+			painter.add_shadow ([&] {
 				painter.drawPolyline (home_arrow);
 			});
 		}
@@ -970,7 +970,7 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 		<< QPointF (+z, 3.5 * k - z)
 		<< QPointF (+z, 2.5 * k)
 		<< QPointF (-z, 2.5 * k);
-	painter.add_shadow ([&]() {
+	painter.add_shadow ([&] {
 		painter.drawPolyline (top_bar);
 		painter.drawPolyline (bottom_bar);
 	});
@@ -1005,7 +1005,7 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 
 	painter.setPen (get_pen (Qt::white, 2.f));
 	painter.setBrush (Qt::NoBrush);
-	painter.add_shadow ([&]() {
+	painter.add_shadow ([&] {
 		for (float x: { -2.f, -1.f, +1.f, +2.f })
 			painter.drawEllipse (elli.translated (dev_1_deg_px * x, 0.f));
 	});
@@ -1196,7 +1196,7 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 			double from_top = _r - 11.0 * z;
 			double from_bottom = _r + 3.0 * z;
 
-			painter.add_shadow ([&]() {
+			painter.add_shadow ([&] {
 				painter.drawLine (QPointF (0.0, to_top + delta), QPointF (0.0, to_bottom));
 				painter.drawLine (QPointF (0.0, to_top), QPointF (+z, to_top + 1.4 * z));
 				painter.drawLine (QPointF (0.0, to_top), QPointF (-z, to_top + 1.4 * z));
@@ -1240,7 +1240,7 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 				<< QPointF (-z, from_top + 1.2 * z)
 				<< QPointF (0.0, from_top);
 
-			painter.add_shadow ([&]() {
+			painter.add_shadow ([&] {
 				painter.drawPolyline (top_arrow);
 				painter.drawPolyline (bottom_arrow);
 			});
@@ -1561,14 +1561,14 @@ HSIWidget::PaintWorkUnit::paint_tcas()
 				if (angle % 90 == 0)
 				{
 					painter().setBrush (Qt::NoBrush);
-					painter().add_shadow ([&]() {
+					painter().add_shadow ([&] {
 						painter().drawEllipse (big_point);
 					});
 				}
 				else
 				{
 					painter().setBrush (Qt::white);
-					painter().add_shadow ([&]() {
+					painter().add_shadow ([&] {
 						painter().drawEllipse (small_point);
 					});
 				}

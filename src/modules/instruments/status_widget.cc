@@ -44,7 +44,7 @@ StatusWidget::StatusWidget (QWidget* parent):
 	_blinking_timer = std::make_unique<QTimer>();
 	_blinking_timer->setInterval (200);
 	_blinking_timer->setSingleShot (false);
-	QObject::connect (_blinking_timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (_blinking_timer.get(), &QTimer::timeout, [&] {
 		_blink_status = !_blink_status;
 		update();
 	});
@@ -53,7 +53,7 @@ StatusWidget::StatusWidget (QWidget* parent):
 	_cursor_hide_timer = std::make_unique<QTimer>();
 	_cursor_hide_timer->setInterval (5000);
 	_cursor_hide_timer->setSingleShot (true);
-	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&]() {
+	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&] {
 		_cursor_visible = false;
 		update();
 	});
@@ -87,7 +87,7 @@ StatusWidget::remove_message (uint64_t message_id)
 	QTimer* timer = new QTimer (this);
 	timer->setInterval (MessageHideTimeout.ms());
 	timer->setSingleShot (true);
-	QObject::connect (timer, &QTimer::timeout, [this,timer,message_id]() {
+	QObject::connect (timer, &QTimer::timeout, [this,timer,message_id] {
 		do_remove_message (message_id);
 		timer->deleteLater();
 	});

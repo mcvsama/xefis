@@ -62,7 +62,7 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 
 	_serviceable.set_default (false);
 
-	guard ([&]() {
+	guard ([&] {
 		initialize();
 	});
 }
@@ -71,7 +71,7 @@ BMP085::BMP085 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 void
 BMP085::initialize()
 {
-	guard ([&]() {
+	guard ([&] {
 		_i2c_device.open();
 
 		_ac1 = read_s16 (AC1_REG);
@@ -138,7 +138,7 @@ BMP085::request_temperature()
 		_request_other = true;
 	else
 	{
-		guard ([&]() {
+		guard ([&] {
 			_middle_of_request = true;
 			write (0xf4, 0x2e);
 			_temperature_ready_timer->start();
@@ -154,7 +154,7 @@ BMP085::request_pressure()
 		_request_other = true;
 	else
 	{
-		guard ([&]() {
+		guard ([&] {
 			_middle_of_request = true;
 			int os = static_cast<int> (_oversampling);
 			write (0xf4, 0x34 + (os << 6));
@@ -169,7 +169,7 @@ BMP085::read_temperature()
 {
 	_middle_of_request = false;
 
-	guard ([&]() {
+	guard ([&] {
 		_ut = read_u16 (0xf6);
 		int32_t x1 = ((_ut - _ac6) * _ac5) >> 15;
 		int32_t x2 = (_mc << 11) / (x1 + _md);
@@ -187,7 +187,7 @@ BMP085::read_pressure()
 {
 	_middle_of_request = false;
 
-	guard ([&]() {
+	guard ([&] {
 		int os = static_cast<int> (_oversampling);
 		_up = read_u24 (0xf6) >> (8 - os);
 		_b6 = _b5 - 4000;
