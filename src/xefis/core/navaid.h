@@ -29,83 +29,135 @@ namespace Xefis {
 class Navaid
 {
   public:
-	enum Type {
-		OTHER	= 0,
-		NDB		= 2,	// NDB
-		VOR		= 3,	// VOR, VOR-DME, VORTAC
-		LOC		= 4,	// ILS localizer component
-		LOCSA	= 5,	// Stand-alone localiser
-		GS		= 6,	// ILS glideslope component
-		OM		= 7,	// ILS outer marker
-		MM		= 8,	// ILS middle marker
-		IM		= 9,	// ILS inner marker
-		DMESF	= 12,	// Standalone DME or a component of NDB-DME (suppressed frequency)
-		DME		= 13,	// Like DMESF, but frequency is displayed
-		Fix		= 50,	// Fix
+	class Runway
+	{
+	  public:
+		// Ctor
+		Runway (QString const& identifier_1, LonLat const& pos_1, QString const& identifier_2, LonLat const& pos_2) noexcept;
+
+		/**
+		 * Runway ID of the first end.
+		 */
+		QString const&
+		identifier_1() const noexcept;
+
+		/**
+		 * Location of the first end.
+		 */
+		LonLat const&
+		pos_1() const noexcept;
+
+		/**
+		 * Runway ID of the second end.
+		 */
+		QString const&
+		identifier_2() const noexcept;
+
+		/**
+		 * Location of the second end.
+		 */
+		LonLat const&
+		pos_2() const noexcept;
+
+	  private:
+		QString	_identifier_1;
+		LonLat	_pos_1;
+		QString	_identifier_2;
+		LonLat	_pos_2;
 	};
 
-	enum VorType {
-		VOROnly	= 1,	// Just VOR
-		VOR_DME	= 2,	// VOR and DME
-		VORTAC	= 3,	// VOR/TACAN
+	enum Type
+	{
+		OTHER,
+		NDB,		// NDB
+		VOR,		// VOR, VOR-DME, VORTAC
+		LOC,		// ILS localizer component, stand-alone localizer
+		FIX,		// Fix
+		DME,		// DME
+		ARPT		// Land airport
 	};
+
+	enum VorType
+	{
+		VOROnly,	// Just VOR
+		VOR_DME,	// VOR and DME
+		VORTAC,		// VOR/TACAN
+	};
+
+	typedef std::vector<Runway> Runways;
 
   public:
+	// Ctor
+	Navaid (Type);
+
+	// Ctor
 	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Length range);
 
 	bool
 	operator< (Navaid const& other) const;
 
 	Type
-	type() const;
+	type() const noexcept;
 
 	LonLat const&
-	position() const;
-
-	QString const&
-	identifier() const;
-
-	QString const&
-	name() const;
-
-	Length
-	range() const;
+	position() const noexcept;
 
 	void
-	set_frequency (Frequency);
+	set_position (LonLat const& position) noexcept;
+
+	QString const&
+	identifier() const noexcept;
+
+	void
+	set_identifier (QString const& identifier) noexcept;
+
+	QString const&
+	name() const noexcept;
+
+	void
+	set_name (QString const& name) noexcept;
+
+	Length
+	range() const noexcept;
+
+	void
+	set_range (Length const& range) noexcept;
+
+	void
+	set_frequency (Frequency) noexcept;
 
 	Frequency
-	frequency() const;
+	frequency() const noexcept;
 
 	void
-	set_slaved_variation (Angle);
+	set_slaved_variation (Angle) noexcept;
 
 	Angle
-	slaved_variation() const;
+	slaved_variation() const noexcept;
 
 	void
-	set_amsl (Length);
+	set_elevation (Length) noexcept;
 
 	Length
-	amsl() const;
+	elevation() const noexcept;
 
 	void
-	set_true_bearing (Angle);
+	set_true_bearing (Angle) noexcept;
 
 	Angle
-	true_bearing() const;
+	true_bearing() const noexcept;
 
 	void
 	set_icao (QString const& icao);
 
 	QString const&
-	icao() const;
+	icao() const noexcept;
 
 	void
-	set_runway (QString const& runway);
+	set_runway_id (QString const& runway_id);
 
 	QString const&
-	runway() const;
+	runway_id() const noexcept;
 
 	/**
 	 * Return appropriate identifier for displaying on HSI.
@@ -113,32 +165,88 @@ class Navaid
 	 * and ICAO code for localisers.
 	 */
 	QString const&
-	identifier_for_hsi() const;
+	identifier_for_hsi() const noexcept;
 
 	/**
 	 * Return VOR subtype, if this navaid is VOR.
 	 * Undefined foro non-VOR navaids.
 	 */
 	VorType
-	vor_type() const;
+	vor_type() const noexcept;
 
 	void
-	set_vor_type (VorType);
+	set_vor_type (VorType) noexcept;
+
+	/**
+	 * Return list of runways.
+	 */
+	Runways const&
+	runways() const noexcept;
+
+	/**
+	 * Set runways list.
+	 */
+	void
+	set_runways (Runways const& runways);
 
   private:
 	Type		_type;
-	LonLat		_position;
+	LonLat		_position			= { 0_deg, 0_deg };
 	QString		_identifier;
 	QString		_name;
-	Length		_range;
+	Length		_range				= 0_nm;
 	Frequency	_frequency			= 0_Hz;
 	Angle		_slaved_variation	= 0_deg; // VOR only
-	Length		_amsl				= 0_ft;
+	Length		_elevation			= 0_ft;
 	Angle		_true_bearing		= 0_deg; // LOC* only
 	QString		_icao;
-	QString		_runway;
+	QString		_runway_id;
 	VorType		_vor_type			= VOROnly;
+	Runways		_runways; // ARPT only
 };
+
+
+inline
+Navaid::Runway::Runway (QString const& identifier_1, LonLat const& pos_1, QString const& identifier_2, LonLat const& pos_2) noexcept:
+	_identifier_1 (identifier_1),
+	_pos_1 (pos_1),
+	_identifier_2 (identifier_2),
+	_pos_2 (pos_2)
+{ }
+
+
+inline QString const&
+Navaid::Runway::identifier_1() const noexcept
+{
+	return _identifier_1;
+}
+
+
+inline LonLat const&
+Navaid::Runway::pos_1() const noexcept
+{
+	return _pos_1;
+}
+
+
+inline QString const&
+Navaid::Runway::identifier_2() const noexcept
+{
+	return _identifier_2;
+}
+
+
+inline LonLat const&
+Navaid::Runway::pos_2() const noexcept
+{
+	return _pos_2;
+}
+
+
+inline
+Navaid::Navaid (Type type):
+	_type (type)
+{ }
 
 
 inline
@@ -160,91 +268,119 @@ Navaid::operator< (Navaid const& other) const
 
 
 inline Navaid::Type
-Navaid::type() const
+Navaid::type() const noexcept
 {
 	return _type;
 }
 
 
 inline LonLat const&
-Navaid::position() const
+Navaid::position() const noexcept
 {
 	return _position;
 }
 
 
+inline void
+Navaid::set_position (LonLat const& position) noexcept
+{
+	_position = position;
+}
+
+
 inline QString const&
-Navaid::identifier() const
+Navaid::identifier() const noexcept
 {
 	return _identifier;
 }
 
 
+inline void
+Navaid::set_identifier (QString const& identifier) noexcept
+{
+	_identifier = identifier;
+}
+
+
 inline QString const&
-Navaid::name() const
+Navaid::name() const noexcept
 {
 	return _name;
 }
 
 
+inline void
+Navaid::set_name (QString const& name) noexcept
+{
+	_name = name;
+}
+
+
 inline Length
-Navaid::range() const
+Navaid::range() const noexcept
 {
 	return _range;
 }
 
 
 inline void
-Navaid::set_frequency (Frequency frequency)
+Navaid::set_range (Length const& range) noexcept
+{
+	_range = range;
+}
+
+
+inline void
+Navaid::set_frequency (Frequency frequency) noexcept
 {
 	_frequency = frequency;
 }
 
 
 inline Frequency
-Navaid::frequency() const
+Navaid::frequency() const noexcept
 {
 	return _frequency;
 }
 
 
 inline void
-Navaid::set_slaved_variation (Angle degrees)
+Navaid::set_slaved_variation (Angle degrees) noexcept
 {
 	_slaved_variation = degrees;
 }
 
 
 inline Angle
-Navaid::slaved_variation() const
+Navaid::slaved_variation() const noexcept
 {
 	return _slaved_variation;
 }
 
 
 inline void
-Navaid::set_amsl (Length amsl)
+Navaid::set_elevation (Length elevation) noexcept
 {
-	_amsl = amsl;
+	_elevation = elevation;
 }
 
 
 inline Length
-Navaid::amsl() const
+Navaid::elevation() const noexcept
 {
-	return _amsl;
+	return _elevation;
 }
 
 
 inline void
-Navaid::set_true_bearing (Angle bearing)
+Navaid::set_true_bearing (Angle bearing) noexcept
 {
 	_true_bearing = bearing;
 }
 
 
 inline Angle
-Navaid::true_bearing() const
+Navaid::true_bearing() const noexcept
 {
 	return _true_bearing;
 }
@@ -258,46 +394,60 @@ Navaid::set_icao (QString const& icao)
 
 
 inline QString const&
-Navaid::icao() const
+Navaid::icao() const noexcept
 {
 	return _icao;
 }
 
 
 inline void
-Navaid::set_runway (QString const& runway)
+Navaid::set_runway_id (QString const& runway_id)
 {
-	_runway = runway;
+	_runway_id = runway_id;
 }
 
 
 inline QString const&
-Navaid::runway() const
+Navaid::runway_id() const noexcept
 {
-	return _runway;
+	return _runway_id;
 }
 
 
 inline QString const&
-Navaid::identifier_for_hsi() const
+Navaid::identifier_for_hsi() const noexcept
 {
-	if (_type == LOC || _type == LOCSA)
+	if (_type == LOC)
 		return icao();
 	return identifier();
 }
 
 
 inline Navaid::VorType
-Navaid::vor_type() const
+Navaid::vor_type() const noexcept
 {
 	return _vor_type;
 }
 
 
 inline void
-Navaid::set_vor_type (VorType vor_type)
+Navaid::set_vor_type (VorType vor_type) noexcept
 {
 	_vor_type = vor_type;
+}
+
+
+inline Navaid::Runways const&
+Navaid::runways() const noexcept
+{
+	return _runways;
+}
+
+
+inline void
+Navaid::set_runways (Runways const& runways)
+{
+	_runways = runways;
 }
 
 } // namespace Xefis

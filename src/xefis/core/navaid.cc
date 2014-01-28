@@ -20,5 +20,3 @@
 // Local:
 #include "navaid.h"
 
-
-

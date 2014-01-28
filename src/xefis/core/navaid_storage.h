@@ -39,6 +39,32 @@ class NavaidStorage
 
 	typedef std::map<Navaid::Type, Group> NavaidsByType;
 
+	enum class Fix
+	{
+		FIX				= 50,	// Fix
+	};
+
+	enum class Nav
+	{
+		OTHER			= 0,
+		NDB				= 2,	// NDB
+		VOR				= 3,	// VOR, VOR-DME, VORTAC
+		LOC				= 4,	// ILS localizer component
+		LOCSA			= 5,	// Stand-alone localiser
+		GS				= 6,	// ILS glideslope component
+		OM				= 7,	// ILS outer marker
+		MM				= 8,	// ILS middle marker
+		IM				= 9,	// ILS inner marker
+		DMESF			= 12,	// Standalone DME or a component of NDB-DME (suppressed frequency)
+		DME				= 13,	// Like DMESF, but frequency is displayed
+	};
+
+	enum class Apt
+	{
+		LandAirport		= 1,
+		Runway			= 100,
+	};
+
   public:
 	typedef std::vector<Navaid> Navaids;
 
@@ -86,11 +112,14 @@ class NavaidStorage
 	void
 	parse_fix_dat();
 
+	void
+	parse_apt_dat();
+
   private:
 	NavaidsTree		_navaids_tree;
 	const char*		_nav_dat_file	= "share/nav/nav.dat";
 	const char*		_fix_dat_file	= "share/nav/fix.dat";
-	const char*		_awy_dat_file	= "share/nav/awy.dat";
+	const char*		_apt_dat_file	= "share/nav/apt.dat";
 	NavaidsByType	_navaids_by_type;
 };
 
