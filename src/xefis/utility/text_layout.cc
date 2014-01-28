@@ -137,7 +137,8 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 	painter.save();
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (_background);
-	painter.drawRect (QRectF (position - margin, size + 2 * _background_margin));
+	if (_background_mode == Whole)
+		painter.drawRect (QRectF (position - margin, size + 2 * _background_margin));
 	painter.translate (position);
 	for (Line const& line: _lines)
 	{
@@ -149,6 +150,11 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 		else if (_default_line_alignment & Qt::AlignHCenter)
 			pos.setX (0.5 * (size.width() - line.width()));
 
+		if (_background_mode == PerLine)
+		{
+			painter.setBrush (_background);
+			painter.drawRect (QRectF (pos, QSizeF (line.width(), line.height())));
+		}
 		line.paint (pos, painter);
 		painter.translate (0.0, line.height());
 	}

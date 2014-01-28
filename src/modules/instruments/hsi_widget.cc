@@ -168,8 +168,8 @@ HSIWidget::PaintWorkUnit::resized()
 
 	// Unscaled pens:
 	_ndb_pen = QPen (QColor (99, 99, 99), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-	_vor_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
-	_dme_pen = QPen (QColor (0, 132, 255), 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_vor_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_dme_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_home_pen = QPen (Qt::green, 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
@@ -862,6 +862,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 			<< QPointF (z, -h);
 
 		Xefis::TextLayout layout;
+		layout.set_background (Qt::black, { _margin, 0.0 });
 		layout.set_alignment (Qt::AlignRight);
 
 		std::string vert_str = "---";
@@ -1057,6 +1058,8 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 		distance_str = (boost::format ("%3.1f") % _params.navaid_selected_distance->nm()).str();
 
 	Xefis::TextLayout layout;
+	layout.set_background (Qt::black, { _margin, 0.0 });
+	layout.set_background_mode (Xefis::TextLayout::PerLine);
 	layout.set_alignment (Qt::AlignRight);
 	// If reference name is not empty, format is:
 	//   <reference:green> <identifier>/<course>°
