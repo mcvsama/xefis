@@ -171,6 +171,7 @@ HSIWidget::PaintWorkUnit::resized()
 	_vor_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_dme_pen = QPen (Qt::green, 0.09f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_fix_pen = QPen (QColor (0, 132, 255), 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
+	_arpt_pen = QPen (Qt::white, 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::BevelJoin);
 	_home_pen = QPen (Qt::green, 0.1f, Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
 	_dme_for_vor_shape = QPolygonF()
@@ -1111,20 +1112,20 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	left_layout.set_background (Qt::black, { _margin, 0.0 });
 
 	if (_params.loc_visible)
-		left_layout.add_fragment ("LOC", _font_16, cyan);
-	left_layout.add_skips (_font_16, 1);
+		left_layout.add_fragment ("LOC", _font_13, cyan);
+	left_layout.add_skips (_font_13, 1);
 
 	if (_params.arpt_visible)
-		left_layout.add_fragment ("ARPT", _font_16, cyan);
-	left_layout.add_skips (_font_16, 1);
+		left_layout.add_fragment ("ARPT", _font_13, cyan);
+	left_layout.add_skips (_font_13, 1);
 
 	if (_params.fix_visible)
-		left_layout.add_fragment ("WPT", _font_16, cyan);
-	left_layout.add_skips (_font_16, 1);
+		left_layout.add_fragment ("WPT", _font_13, cyan);
+	left_layout.add_skips (_font_13, 1);
 
 	if (_params.vor_visible || _params.dme_visible || _params.ndb_visible)
-		left_layout.add_fragment ("STA", _font_16, cyan);
-	left_layout.add_skips (_font_16, 1);
+		left_layout.add_fragment ("STA", _font_13, cyan);
+	left_layout.add_skips (_font_13, 2);
 
 	if (_params.tcas_on && !*_params.tcas_on)
 	{
@@ -1295,7 +1296,6 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 
 	retrieve_navaids();
 	paint_locs();
-	paint_arpts();
 
 	// Return feature position on screen relative to _aircraft_center_transform.
 	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
@@ -1383,6 +1383,63 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				break;
 			}
 
+			case Navaid::ARPT:
+			{
+				if (_params.range > _params.arpt_runways_range_threshold)
+				{
+					// Draw circles for airports:
+					double v = 1.1;
+					painter.setTransform (feature_scaled_transform);
+					painter.setPen (_arpt_pen);
+					painter.setBrush (Qt::NoBrush);
+					painter.drawEllipse (QRectF (QPointF (-0.5 * v, -0.5 * v), QSizeF (1.0 * v, 1.0 * v)));
+					// Label:
+					painter.setTransform (feature_centered_transform);
+					painter.fast_draw_text (QPointF (0.46 * scale, 0.46 * scale), Qt::AlignTop | Qt::AlignLeft, navaid.identifier());
+				}
+				else if (_params.range > _params.arpt_map_range_threshold)
+				{
+					// Draw airport runways:
+					for (Xefis::Navaid::Runway const& runway: navaid.runways())
+					{
+						// Make the drawn runway somewhat more wide:
+						double half_width = 1.5 * nm_to_px (runway.width());
+						QTransform tr_l; tr_l.translate (-half_width, 0.0);
+						QTransform tr_r; tr_r.translate (+half_width, 0.0);
+						// Find runway's true bearing from pos_1 to pos_2 and runway
+						// length in pixels:
+						Angle true_bearing = runway.pos_1().initial_bearing (runway.pos_2());
+						double length_px = nm_to_px (runway.pos_1().haversine_earth (runway.pos_2()));
+						double extended_length_px = nm_to_px (_params.arpt_runway_extension_length);
+						// Create transform so that the first end of the runway
+						// is at (0, 0) and runway extends to the top.
+						QPointF point_1 = get_navaid_xy (runway.pos_1());
+						QTransform transform = _aircraft_center_transform;
+						transform.translate (point_1.x(), point_1.y());
+						transform = _features_transform * transform;
+						transform.rotate (true_bearing.deg());
+
+						painter.setTransform (transform);
+						// The runway:
+						painter.setPen (get_pen (Qt::white, 1.0));
+						painter.drawLine (tr_l.map (QPointF (0.0, 0.0)), tr_l.map (QPointF (0.0, -length_px)));
+						painter.drawLine (tr_r.map (QPointF (0.0, 0.0)), tr_r.map (QPointF (0.0, -length_px)));
+						// Extended runway:
+						double m_px = Xefis::limit<double> (nm_to_px (1_m), 0.02, 0.04);
+						QPen dashed_pen = get_pen (Qt::white, 1.0, Qt::DashLine);
+						dashed_pen.setDashPattern (QVector<qreal>() << 300 * m_px << 200 * m_px);
+						painter.setPen (dashed_pen);
+						painter.drawLine (QPointF (0.0, 0.0), QPointF (0.0, extended_length_px));
+						painter.drawLine (QPointF (0.0, -length_px), QPointF (0.0, -length_px - extended_length_px));
+					}
+				}
+				else
+				{
+					// TODO airport map
+				}
+				break;
+			}
+
 			default:
 				break;
 		}
@@ -1402,6 +1459,10 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 
 	if (_params.vor_visible)
 		for (auto& navaid: _vor_navs)
+			paint_navaid (navaid);
+
+	if (_params.arpt_visible)
+		for (auto& navaid: _arpt_navs)
 			paint_navaid (navaid);
 
 	if (_params.home)
@@ -1537,13 +1598,6 @@ HSIWidget::PaintWorkUnit::paint_locs()
 
 
 void
-HSIWidget::PaintWorkUnit::paint_arpts()
-{
-	// TODO _arpt_navs
-}
-
-
-void
 HSIWidget::PaintWorkUnit::paint_tcas()
 {
 	if (!_params.tcas_on)
@@ -1633,7 +1687,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 				break;
 
 			case Navaid::ARPT:
-				// TODO ARPT
+				_arpt_navs.push_back (navaid);
 				break;
 
 			default:

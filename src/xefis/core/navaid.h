@@ -59,11 +59,24 @@ class Navaid
 		LonLat const&
 		pos_2() const noexcept;
 
+		/**
+		 * Get width.
+		 */
+		Length
+		width() const noexcept;
+
+		/**
+		 * Set width.
+		 */
+		void
+		set_width (Length width) noexcept;
+
 	  private:
 		QString	_identifier_1;
 		LonLat	_pos_1;
 		QString	_identifier_2;
 		LonLat	_pos_2;
+		Length	_width;
 	};
 
 	enum Type
@@ -240,6 +253,20 @@ inline LonLat const&
 Navaid::Runway::pos_2() const noexcept
 {
 	return _pos_2;
+}
+
+
+inline Length
+Navaid::Runway::width() const noexcept
+{
+	return _width;
+}
+
+
+inline void
+Navaid::Runway::set_width (Length width) noexcept
+{
+	_width = width;
 }
 
 
