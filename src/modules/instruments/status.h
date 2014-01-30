@@ -44,7 +44,7 @@ class Status: public Xefis::Instrument
 	  public:
 		/**
 		 * Severity affects color of the message
-		 * and resulting alert sound. (TODO)
+		 * and resulting alert sound.
 		 */
 		enum Severity
 		{

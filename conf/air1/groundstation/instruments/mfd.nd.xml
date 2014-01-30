@@ -1,6 +1,11 @@
 <?xml version='1.0'?>
 <xefis-include>
 	<instrument name='instruments/hsi' instance='mfd'>
+		<settings>
+			<setting name='arpt.runways-range-threshold' value='39 nm'/>
+			<setting name='arpt.map-range-threshold' value='0.5 nm'/>
+			<setting name='arpt.runway-extension-length' value='5 nm'/>
+		</settings>
 		<properties>
 			<property name='display-mode' path='/settings/hsi/display-mode/mfd' default='0'/>
 			<property name='course.visible' path='/settings/course/visible'/>

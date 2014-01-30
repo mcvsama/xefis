@@ -95,7 +95,7 @@ DatFileIterator::operator*()
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_position)
 {
-	_logger.set_prefix ("navaid storage");
+	_logger.set_prefix ("<navaid storage>");
 }
 
 
@@ -344,13 +344,10 @@ NavaidStorage::parse_apt_dat()
 					max_position.lat() = std::max (max_position.lat(), point.lat());
 				}
 			}
-			if (sgn (min_position.lon().deg()) != sgn (max_position.lon().deg()))
-			{ }// TODO
-			if (sgn (min_position.lat().deg()) != sgn (max_position.lat().deg()))
-			{ }// TODO
-			LonLat mean_position (0.5 * (min_position.lon() + max_position.lon()),
-								  0.5 * (min_position.lat() + max_position.lat()));
+			LonLat mean_position (Angle::mean (min_position.lon(), max_position.lon()),
+								  Angle::mean (min_position.lat(), max_position.lat()));
 			cur_land_airport->set_position (mean_position);
+			cur_land_airport->set_runways (runways);
 
 			_navaids_tree.insert (*cur_land_airport);
 			cur_land_airport.reset();
@@ -377,11 +374,12 @@ NavaidStorage::parse_apt_dat()
 				push_navaid();
 
 				int elevation_ft;
+				int twr;
 				int deprecated;
 				QString identifier;
 				QString name;
 
-				line_ts >> elevation_ft >> deprecated >> identifier;
+				line_ts >> elevation_ft >> twr >> deprecated >> identifier;
 				name = line_ts.readAll();
 
 				cur_land_airport = std::make_unique<Navaid> (Navaid::ARPT);
@@ -418,10 +416,12 @@ NavaidStorage::parse_apt_dat()
 						line_ts >> identifier[i] >> lat_deg[i] >> lon_deg[i] >> displaced_threshold_m[i] >> blast_pad_length_m[i]
 								>> runway_markings[i] >> approach_lighting[i] >> touchdown_zone_lighting[i] >> runway_end_identifier_lights[i];
 
-					runways.push_back (Navaid::Runway (identifier[0],
-													   LonLat (1_deg * lon_deg[0], 1_deg * lat_deg[0]),
-													   identifier[1],
-													   LonLat (1_deg * lon_deg[1], 1_deg * lat_deg[1])));
+					Navaid::Runway runway (identifier[0],
+										   LonLat (1_deg * lon_deg[0], 1_deg * lat_deg[0]),
+										   identifier[1],
+										   LonLat (1_deg * lon_deg[1], 1_deg * lat_deg[1]));
+					runway.set_width (1_m * width_m);
+					runways.push_back (runway);
 				}
 			}
 		}

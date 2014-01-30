@@ -144,6 +144,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString				positioning_hint;
 		Optional<bool>		tcas_on;
 		Optional<Length>	tcas_range;
+		Length				arpt_runways_range_threshold;
+		Length				arpt_map_range_threshold;
+		Length				arpt_runway_extension_length;
 		bool				round_clip					= false;
 
 	  private:
@@ -243,9 +246,6 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_locs();
 
 		void
-		paint_arpts();
-
-		void
 		paint_tcas();
 
 		/**
@@ -298,6 +298,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPen					_vor_pen;
 		QPen					_dme_pen;
 		QPen					_fix_pen;
+		QPen					_arpt_pen;
 		QPen					_home_pen;
 		QPen					_lo_loc_pen;
 		QPen					_hi_loc_pen;

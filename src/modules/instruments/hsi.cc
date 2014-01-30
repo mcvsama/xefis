@@ -34,6 +34,12 @@ XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI);
 HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
+	parse_settings (config, {
+		{ "arpt.runways-range-threshold", _arpt_runways_range_threshold, false },
+		{ "arpt.map-range-threshold", _arpt_map_range_threshold, false },
+		{ "arpt.runway-extension-length", _arpt_runway_extension_length, false },
+	});
+
 	parse_properties (config, {
 		{ "display-mode", _display_mode, true },
 		{ "range", _range, true },
@@ -186,6 +192,9 @@ HSI::read()
 	params.positioning_hint = QString::fromStdString (*_position_source);
 	params.tcas_on = _tcas_on.get_optional();
 	params.tcas_range = _tcas_range.get_optional();
+	params.arpt_runways_range_threshold = _arpt_runways_range_threshold;
+	params.arpt_map_range_threshold = _arpt_map_range_threshold;
+	params.arpt_runway_extension_length = _arpt_runway_extension_length;
 	params.round_clip = false;
 
 	_hsi_widget->set_params (params);

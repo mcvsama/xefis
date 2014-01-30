@@ -91,6 +91,12 @@ class Angle: public LinearValue<double, Angle>
 	std::string
 	to_longitude_dms() const;
 
+	/**
+	 * Mean value for two angles on a circle.
+	 */
+	static Angle
+	mean (Angle lhs, Angle rhs);
+
   private:
 	static std::vector<std::string> _supported_units;
 };

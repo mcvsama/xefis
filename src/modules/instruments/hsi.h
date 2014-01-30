@@ -55,7 +55,11 @@ class HSI: public Xefis::Instrument
 	Unique<HSIWidget>		_hsi_widget;
 	std::array<LonLat, 3>	_positions;
 	bool					_positions_valid = false;
-
+	// Settings:
+	Length					_arpt_runways_range_threshold;
+	Length					_arpt_map_range_threshold;
+	Length					_arpt_runway_extension_length;
+	// Input:
 	Xefis::PropertyInteger	_display_mode;
 	Xefis::PropertyLength	_range;
 	Xefis::PropertyLength	_trend_vector_range;
