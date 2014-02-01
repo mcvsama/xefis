@@ -1091,8 +1091,6 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 void
 HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 {
-	QColor cyan (0x00, 0xdd, 0xff);
-
 	painter().resetTransform();
 	painter().setClipping (false);
 
@@ -1112,19 +1110,19 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	left_layout.set_background (Qt::black, { _margin, 0.0 });
 
 	if (_params.loc_visible)
-		left_layout.add_fragment ("LOC", _font_13, cyan);
+		left_layout.add_fragment ("LOC", _font_13, _cyan);
 	left_layout.add_skips (_font_13, 1);
 
 	if (_params.arpt_visible)
-		left_layout.add_fragment ("ARPT", _font_13, cyan);
+		left_layout.add_fragment ("ARPT", _font_13, _cyan);
 	left_layout.add_skips (_font_13, 1);
 
 	if (_params.fix_visible)
-		left_layout.add_fragment ("WPT", _font_13, cyan);
+		left_layout.add_fragment ("WPT", _font_13, _cyan);
 	left_layout.add_skips (_font_13, 1);
 
 	if (_params.vor_visible || _params.dme_visible || _params.ndb_visible)
-		left_layout.add_fragment ("STA", _font_13, cyan);
+		left_layout.add_fragment ("STA", _font_13, _cyan);
 	left_layout.add_skips (_font_13, 2);
 
 	if (_params.tcas_on && !*_params.tcas_on)
@@ -1138,7 +1136,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 		left_layout.add_skips (_font_16, 2);
 
 	if (_locals.navaid_left_visible)
-		configure_layout (left_layout, (_params.navaid_left_type == 0) ? Qt::green : cyan, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
+		configure_layout (left_layout, (_params.navaid_left_type == 0) ? Qt::green : _cyan, _params.navaid_left_reference, _params.navaid_left_identifier, _params.navaid_left_distance);
 	else
 		left_layout.add_skips (_font_16, 2);
 
@@ -1147,7 +1145,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	right_layout.set_background (Qt::black, { _margin, 0.0 });
 
 	if (_locals.navaid_right_visible)
-		configure_layout (right_layout, (_params.navaid_right_type == 0) ? Qt::green : cyan, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
+		configure_layout (right_layout, (_params.navaid_right_type == 0) ? Qt::green : _cyan, _params.navaid_right_reference, _params.navaid_right_identifier, _params.navaid_right_distance);
 
 	left_layout.paint (_rect.bottomLeft() + QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignLeft, painter());
 	right_layout.paint (_rect.bottomRight() - QPointF (_margin, 0.0), Qt::AlignBottom | Qt::AlignRight, painter());
@@ -1171,10 +1169,8 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 		bool			visible;
 	};
 
-	QColor cyan (0x00, 0xdd, 0xff);
-
-	for (Opts const& opts: { Opts { true, (_params.navaid_left_type == 0 ? Qt::green : cyan), _params.navaid_left_initial_bearing_magnetic, _locals.navaid_left_visible },
-							 Opts { false, (_params.navaid_right_type == 0 ? Qt::green : cyan), _params.navaid_right_initial_bearing_magnetic, _locals.navaid_right_visible } })
+	for (Opts const& opts: { Opts { true, (_params.navaid_left_type == 0 ? Qt::green : _cyan), _params.navaid_left_initial_bearing_magnetic, _locals.navaid_left_visible },
+							 Opts { false, (_params.navaid_right_type == 0 ? Qt::green : _cyan), _params.navaid_right_initial_bearing_magnetic, _locals.navaid_right_visible } })
 	{
 		if (!opts.angle || !opts.visible)
 			continue;
