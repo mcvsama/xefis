@@ -21,6 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/qzdevice.h>
 
 // Local:
 #include "navaid_storage.h"
@@ -28,11 +29,11 @@
 
 namespace Xefis {
 
-class DatFileIterator
+class GzDataFileIterator
 {
   public:
 	// Ctor
-	explicit DatFileIterator (QFile& file);
+	explicit GzDataFileIterator (QString const& path);
 
 	/**
 	 * Return true if pointer doesn't point to the end of the line.
@@ -52,16 +53,22 @@ class DatFileIterator
 	operator*();
 
   private:
-	QTextStream			_file_stream;
+	QFile				_file;
+	Unique<QZDevice>	_decompressor;
+	Unique<QTextStream>	_decompressed_stream;
 	Unique<QTextStream>	_line_stream;
 	QString				_line;
 };
 
 
 inline
-DatFileIterator::DatFileIterator (QFile& file):
-	_file_stream (&file)
+GzDataFileIterator::GzDataFileIterator (QString const& path):
+	_file (path)
 {
+	_file.open (QFile::ReadOnly);
+	_decompressor = std::make_unique<QZDevice> (&_file);
+	_decompressor->open (QZDevice::ReadOnly);
+	_decompressed_stream = std::make_unique<QTextStream> (_decompressor.get());
 	// Skip two first lines (file origin and copyrights):
 	operator++();
 	operator++();
@@ -69,24 +76,24 @@ DatFileIterator::DatFileIterator (QFile& file):
 
 
 inline
-DatFileIterator::operator bool() const
+GzDataFileIterator::operator bool() const
 {
-	return !_line.simplified().isEmpty() || !_file_stream.atEnd();
+	return !_line.simplified().isEmpty() || !_decompressed_stream->atEnd();
 }
 
 
 void
-DatFileIterator::operator++()
+GzDataFileIterator::operator++()
 {
 	_line.clear();
-	while (_line.simplified().isEmpty() && !_file_stream.atEnd())
-		_line = _file_stream.readLine();
+	while (_line.simplified().isEmpty() && !_decompressed_stream->atEnd())
+		_line = _decompressed_stream->readLine();
 	_line_stream = std::make_unique<QTextStream> (&_line);
 }
 
 
 QTextStream&
-DatFileIterator::operator*()
+GzDataFileIterator::operator*()
 {
 	return *_line_stream;
 }
@@ -180,10 +187,7 @@ NavaidStorage::parse_nav_dat()
 {
 	_logger << "Loading navaids" << std::endl;
 
-	QFile file (_nav_dat_file);
-	file.open (QFile::ReadOnly);
-
-	for (DatFileIterator line (file); line; ++line)
+	for (GzDataFileIterator line (_nav_dat_file); line; ++line)
 	{
 		auto& line_ts = *line;
 
@@ -290,10 +294,7 @@ NavaidStorage::parse_fix_dat()
 {
 	_logger << "Loading fixes" << std::endl;
 
-	QFile file (_fix_dat_file);
-	file.open (QFile::ReadOnly);
-
-	for (DatFileIterator line (file); line; ++line)
+	for (GzDataFileIterator line (_fix_dat_file); line; ++line)
 	{
 		auto& line_ts = *line;
 
@@ -320,9 +321,6 @@ void
 NavaidStorage::parse_apt_dat()
 {
 	_logger << "Loading airports" << std::endl;
-
-	QFile file (_apt_dat_file);
-	file.open (QFile::ReadOnly);
 
 	Unique<Navaid> cur_land_airport;
 	Navaid::Runways runways;
@@ -357,7 +355,7 @@ NavaidStorage::parse_apt_dat()
 		}
 	};
 
-	for (DatFileIterator line (file); line; ++line)
+	for (GzDataFileIterator line (_apt_dat_file); line; ++line)
 	{
 		auto& line_ts = *line;
 
