@@ -42,7 +42,7 @@ LDFLAGS			:= -rdynamic
 AR				:= ar
 MOC				:= $(QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system pthread mhash
-PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets
+PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets zlib
 CXXFLAGS_s		:= $(CXXFLAGS)
 ifeq ($(DEBUG),1)
 XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT

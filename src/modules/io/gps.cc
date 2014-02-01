@@ -32,7 +32,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hextable.h>
-#include <xefis/utility/finally.h>
+#include <xefis/utility/resource.h>
 #include <xefis/utility/serial_port.h>
 
 // Local:
@@ -439,7 +439,7 @@ GPS::process()
 	std::string::size_type crlf = 0;
 	std::string::size_type parsed = 0;
 
-	Xefis::Finally remove_parsed_properties ([&] {
+	Xefis::Resource remove_parsed_properties ([&] {
 		_buffer.erase (0, parsed);
 	});
 

@@ -119,9 +119,9 @@ class NavaidStorage
   private:
 	Logger			_logger;
 	NavaidsTree		_navaids_tree;
-	const char*		_nav_dat_file	= "share/nav/nav.dat";
-	const char*		_fix_dat_file	= "share/nav/fix.dat";
-	const char*		_apt_dat_file	= "share/nav/apt.dat";
+	const char*		_nav_dat_file	= "share/nav/nav.dat.gz";
+	const char*		_fix_dat_file	= "share/nav/fix.dat.gz";
+	const char*		_apt_dat_file	= "share/nav/apt.dat.gz";
 	NavaidsByType	_navaids_by_type;
 };
 
