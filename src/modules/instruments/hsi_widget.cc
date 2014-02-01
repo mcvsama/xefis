@@ -1264,7 +1264,11 @@ HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
 		QFontMetricsF metr_a (font_a);
 		QFontMetricsF metr_b (font_b);
 		QString s ("RANGE");
-		QString r (QString ("%1").arg (_params.range.nm(), 0, 'f', 0));
+		QString r;
+		if (_params.range < 1_nm)
+			r = QString::fromStdString ((boost::format ("%.1f") % _params.range.nm()).str());
+		else
+			r = QString::fromStdString ((boost::format ("%d") % _params.range.nm()).str());
 
 		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _q, metr_a.height() + metr_b.height());
 
