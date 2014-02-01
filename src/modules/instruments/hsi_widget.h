@@ -294,6 +294,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QRectF					_trend_vector_clip_rect;
 		QPainterPath			_inner_map_clip;
 		QPainterPath			_outer_map_clip;
+		QColor					_cyan						= { 0, 180, 255 };
 		QPen					_ndb_pen;
 		QPen					_vor_pen;
 		QPen					_dme_pen;
