@@ -253,22 +253,41 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
 	_mcp_range_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_range_a, _mcp_range_b, [this](int delta) {
-		int range_nm = Xefis::symmetric_round (_setting_hsi_range->nm());
+		Optional<Length> new_half_range;
 		delta = -delta;
 
-		if (range_nm < 2)
-			range_nm += 1 * delta;
-		else if (range_nm < 20)
-			range_nm += 2 * delta;
-		else if (range_nm < 60)
-			range_nm += 10 * delta;
-		else if (range_nm < 100)
-			range_nm += 20 * delta;
-		else
-			range_nm += 50 * delta;
+		constexpr Length da = 0.01_nm;
+		static std::set<Length> half_ranges = {
+			0.1_nm, 0.2_nm, 0.3_nm, 0.4_nm, 0.5_nm, 0.6_nm, 0.7_nm, 0.8_nm, 0.9_nm,
+			1_nm, 2_nm, 3_nm, 4_nm, 5_nm, 6_nm, 7_nm, 8_nm, 9_nm,
+			10_nm, 12_nm, 14_nm, 16_nm, 18_nm,
+			20_nm, 30_nm, 40_nm, 50_nm, 60_nm, 70_nm, 80_nm, 90_nm,
+			100_nm, 120_nm, 140_nm, 160_nm, 180_nm, 200_nm,
+			250_nm,
+		};
 
-		range_nm = Xefis::limit (range_nm, 1, 50);
-		_setting_hsi_range.write (1_nm * range_nm);
+		auto it = half_ranges.upper_bound (0.5 * *_setting_hsi_range - da);
+
+		if (delta > 0)
+		{
+			if (it != half_ranges.end())
+			{
+				++it;
+				if (it != half_ranges.end())
+					new_half_range = *it;
+			}
+		}
+		else if (delta < 0)
+		{
+			if (it != half_ranges.begin())
+			{
+				--it;
+				new_half_range = *it;
+			}
+		}
+
+		if (new_half_range)
+			_setting_hsi_range.write (2.0 * *new_half_range);
 	});
 
 	make_switch (_mcp_range_ctr, [this] {
