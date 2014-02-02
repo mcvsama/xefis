@@ -72,7 +72,7 @@
 					<property name='flight-director.guidance.visible' path='/settings/efis/cmd-guidance-visible'/>
 					<property name='flight-director.guidance.pitch' path='/aircraft/systems/fd/pitch'/>
 					<property name='flight-director.guidance.roll' path='/aircraft/systems/fd/roll'/>
-					<property name='control-stick.visible' path='/panels/mcp/led/att'/>
+					<property name='control-stick.visible' path='/panels/mcp/afcs/led.att'/>
 					<property name='control-stick.pitch' path='/aircraft/systems/fbw/stick/pitch'/>
 					<property name='control-stick.roll' path='/aircraft/systems/fbw/stick/roll'/>
 					<property name='navaid.reference-visible' path='/settings/efis/approach-reference-visible'/>

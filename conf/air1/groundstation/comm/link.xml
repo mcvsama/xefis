@@ -78,9 +78,10 @@
 						<property path='/aircraft/settings/cmd/speed-mode' type='integer' bits='4'/>
 						<property path='/aircraft/settings/cmd/roll-mode' type='integer' bits='3'/>
 						<property path='/aircraft/settings/cmd/pitch-mode' type='integer' bits='4'/>
-						<!-- FBW modes -->
+						<!-- AP/AT/FBW modes -->
 						<property path='/aircraft/settings/fbw/attitude-mode' type='integer' bits='2'/>
 						<property path='/aircraft/settings/fbw/throttle-mode' type='integer' bits='1'/>
+						<property path='/aircraft/settings/yaw-damper/enabled' type='boolean'/>
 						<!-- Gear -->
 						<property path='/aircraft/sensors/gear/setting.down' type='boolean' retained='true'/>
 						<property path='/aircraft/sensors/gear/nose.up' type='boolean' retained='true'/>
@@ -128,6 +129,7 @@
 						<property path='/settings/lights/strobe' type='boolean'/>
 						<property path='/settings/lights/position' type='boolean'/>
 						<property path='/settings/lights/landing' type='boolean'/>
+						<property path='/settings/yaw-damper/enabled' type='boolean'/>
 						<property path='/systems/afcs/fbw-attitude-mode' type='integer' bits='2'/>
 						<property path='/systems/afcs/fbw-throttle-mode' type='integer' bits='1'/>
 					</bitfield>
