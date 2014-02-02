@@ -51,10 +51,10 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 	parse_properties (config, {
 		{ "button.ap", _mcp_ap, true },
 		{ "button.at", _mcp_at, true },
+		{ "button.yd", _mcp_yd, true },
 		{ "button.prot", _mcp_prot, true },
 		{ "button.tac", _mcp_tac, true },
 		{ "button.att", _mcp_att, true },
-		{ "button.ct", _mcp_ct, true },
 		{ "button.speed.ias-mach", _mcp_speed_ias_mach, true },
 		{ "button.speed.sel", _mcp_speed_sel, true },
 		{ "button.speed.hold", _mcp_speed_hold, true },
@@ -84,6 +84,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "display.vertical-speed", _mcp_vspd_display, true },
 		{ "led.ap", _mcp_ap_led, true },
 		{ "led.at", _mcp_at_led, true },
+		{ "led.yd", _mcp_yd_led, true },
 		{ "led.att", _mcp_att_led, true },
 		{ "led.speed.sel", _mcp_speed_sel_led, true },
 		{ "led.speed.hold", _mcp_speed_hold_led, true },
@@ -106,6 +107,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "cmd.vertical-speed", _cmd_vspd, true },
 		{ "cmd.fpa", _cmd_fpa, true },
 		{ "flight-mode", _flight_mode, true },
+		{ "yaw-damper-enabled", _yaw_damper_enabled, true },
 	});
 
 	prepare_afcs_main_panel();
@@ -143,12 +145,10 @@ AutomatedFlightControlSystem::data_updated()
 void
 AutomatedFlightControlSystem::prepare_afcs_main_panel()
 {
-//	TODO _mcp_ap;
 //	TODO _mcp_at;
 //	TODO _mcp_prot;
 //	TODO _mcp_tac;
 //	TODO _mcp_att;
-//	TODO _mcp_ct;
 }
 
 
@@ -158,6 +158,16 @@ AutomatedFlightControlSystem::process_afcs_main_panel()
 	if (pressed (_mcp_ap))
 	{
 		_ap_on = !_ap_on;
+		if (_ap_on)
+			_yd_on = true;
+		solve_mode();
+	}
+
+	if (pressed (_mcp_yd))
+	{
+		_yd_on = !_yd_on;
+		if (!_yd_on)
+			_ap_on = false;
 		solve_mode();
 	}
 
@@ -274,6 +284,7 @@ AutomatedFlightControlSystem::solve_mode()
 {
 	_mcp_ap_led.write (_ap_on);
 	_mcp_at_led.write (_at_on);
+	_mcp_yd_led.write (_yd_on);
 	_mcp_att_led.write (_att_on);
 	_mcp_speed_display.write (Xefis::symmetric_round (_cmd_speed_counter.kt()));
 	int heading = Xefis::symmetric_round (_cmd_heading_counter.deg());
@@ -295,6 +306,8 @@ AutomatedFlightControlSystem::solve_mode()
 	if (_at_on)
 		fbw_throttle_mode = FlyByWire::ThrottleMode::Autothrottle;
 	_fbw_throttle_mode.write (static_cast<decltype (_fbw_throttle_mode)::Type> (fbw_throttle_mode));
+
+	_yaw_damper_enabled = _yd_on;
 
 	// Control A/T and FD modules:
 	_cmd_ias.write (_cmd_speed_counter);

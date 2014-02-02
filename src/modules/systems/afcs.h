@@ -141,6 +141,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
   private:
 	bool								_ap_on						= false;
 	bool								_at_on						= false;
+	bool								_yd_on						= false;
 	bool								_att_on						= false;
 	Speed								_cmd_speed_counter			= CmdSpeedRange.min();
 	Angle								_cmd_heading_counter		= 0_deg;
@@ -153,10 +154,10 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	// Buttons, encoders:
 	Xefis::PropertyBoolean				_mcp_ap;
 	Xefis::PropertyBoolean				_mcp_at;
+	Xefis::PropertyBoolean				_mcp_yd;
 	Xefis::PropertyBoolean				_mcp_prot;
 	Xefis::PropertyBoolean				_mcp_tac;
 	Xefis::PropertyBoolean				_mcp_att;
-	Xefis::PropertyBoolean				_mcp_ct;
 	Xefis::PropertyBoolean				_mcp_speed_a;
 	Xefis::PropertyBoolean				_mcp_speed_b;
 	Unique<Xefis::RotaryDecoder>		_mcp_speed_decoder;
@@ -191,6 +192,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyInteger				_mcp_vspd_display;
 	Xefis::PropertyBoolean				_mcp_ap_led;
 	Xefis::PropertyBoolean				_mcp_at_led;
+	Xefis::PropertyBoolean				_mcp_yd_led;
 	Xefis::PropertyBoolean				_mcp_att_led;
 	Xefis::PropertyBoolean				_mcp_speed_sel_led;
 	Xefis::PropertyBoolean				_mcp_speed_hold_led;
@@ -214,6 +216,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertySpeed				_cmd_vspd;
 	Xefis::PropertyAngle				_cmd_fpa;
 	Xefis::PropertyString				_flight_mode;
+	Xefis::PropertyBoolean				_yaw_damper_enabled;
 	// Other:
 	std::vector<Xefis::RotaryDecoder*>	_rotary_decoders;
 };

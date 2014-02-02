@@ -71,9 +71,10 @@
 						<property path='/settings/cmd/speed-mode' type='integer' bits='4'/>
 						<property path='/settings/cmd/roll-mode' type='integer' bits='3'/>
 						<property path='/settings/cmd/pitch-mode' type='integer' bits='4'/>
-						<!-- FBW modes -->
+						<!-- AP/AT/FBW modes -->
 						<property path='/settings/fbw/attitude-mode' type='integer' bits='2'/>
 						<property path='/settings/fbw/throttle-mode' type='integer' bits='1'/>
+						<property path='/settings/yaw-damper/enabled' type='boolean'/>
 						<!-- Gear -->
 						<property path='/sensors/gear/setting.down' type='boolean'/>
 						<property path='/sensors/gear/nose.up' type='boolean'/>
@@ -128,6 +129,7 @@
 						<property path='/settings/lights/strobe' type='boolean' retained='true'/>
 						<property path='/settings/lights/position' type='boolean' retained='true'/>
 						<property path='/settings/lights/landing' type='boolean' retained='true'/>
+						<property path='/settings/yaw-damper/enabled' type='boolean'/>
 						<property path='/settings/fbw/attitude-mode' type='integer' bits='2' retained='true'/>
 						<property path='/settings/fbw/throttle-mode' type='integer' bits='1' retained='true'/>
 					</bitfield>
