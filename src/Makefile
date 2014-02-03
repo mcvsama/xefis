@@ -32,8 +32,14 @@ endif
 
 CXX				:= g++
 DEPCC			:= $(CXX)
+ifeq ($(CXX),g++)
 CXXFLAGS		+= -fPIE -O4 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
+endif
+ifeq ($(CXX),clang++)
+CXXFLAGS		+= -fPIE -O3 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -fstrict-aliasing
+CXXFLAGS		+= -pthread -I. -Ilib
+endif
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
 SO				:= $(CXX) -shared
 SOFLAGS			:=
