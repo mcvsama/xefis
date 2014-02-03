@@ -27,6 +27,12 @@ namespace Xefis {
 Unique<PropertyStorage> PropertyStorage::_default_storage;
 
 
+PropertyStorage::~PropertyStorage()
+{
+	delete _root;
+}
+
+
 void
 PropertyStorage::initialize()
 {

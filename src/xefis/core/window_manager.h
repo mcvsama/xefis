@@ -36,7 +36,7 @@ class WindowManager: public QWidget
 	 * Add window to be managed.
 	 */
 	void
-	add_window (Window*);
+	add_window (Unique<Window>);
 
 	/**
 	 * Call data_updated() on all windows.
@@ -45,8 +45,8 @@ class WindowManager: public QWidget
 	data_updated (Time const& update_time);
 
   private:
-	Application*		_application;
-	std::set<Window*>	_windows;
+	Application*				_application;
+	std::set<Unique<Window>>	_windows;
 };
 
 } // namespace Xefis

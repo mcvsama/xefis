@@ -59,7 +59,7 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManag
 QWidget*
 RemoteControlManagementSystem::configurator_widget() const
 {
-	return _configurator_widget;
+	return _configurator_widget.get();
 }
 
 
@@ -80,13 +80,13 @@ RemoteControlManagementSystem::acquire_home()
 void
 RemoteControlManagementSystem::create_configurator_widget()
 {
-	_configurator_widget = new QWidget();
+	_configurator_widget = std::make_unique<QWidget>();
 	_configurator_widget->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-	QPushButton* acquire_home_button = new QPushButton ("Acquire HOME position", _configurator_widget);
+	QPushButton* acquire_home_button = new QPushButton ("Acquire HOME position", _configurator_widget.get());
 	QObject::connect (acquire_home_button, SIGNAL (clicked (bool)), this, SLOT (acquire_home()));
 
-	QHBoxLayout* layout = new QHBoxLayout (_configurator_widget);
+	QHBoxLayout* layout = new QHBoxLayout (_configurator_widget.get());
 	layout->setMargin (0);
 	layout->setSpacing (WidgetSpacing);
 	layout->addWidget (acquire_home_button);

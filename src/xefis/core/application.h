@@ -177,8 +177,13 @@ class Application: public QApplication
 
 	Unique<Accounting>				_accounting;
 	Unique<NavaidStorage>			_navaid_storage;
-	Unique<ModuleManager>			_module_manager;
 	Unique<WindowManager>			_window_manager;
+	// Note: it is important that the _module_manager is after _window_manager, so that
+	// upon destruction, _module_manager deletes all instruments first, and prevents
+	// _window_manager deleting them like they were managed by parent QObjects.
+	// Unfortunately Qt doesn't allow inserting a widget into a window without creating parent-child
+	// relationship, so we have to make workarounds like this.
+	Unique<ModuleManager>			_module_manager;
 	Unique<SoundManager>			_sound_manager;
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
