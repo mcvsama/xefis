@@ -90,7 +90,7 @@ class Link:
 		ItemStream (Link*, QDomElement&);
 
 		// Dtor
-		virtual ~ItemStream() { }
+		virtual ~ItemStream();
 
 		Blob::size_type
 		size() const override;

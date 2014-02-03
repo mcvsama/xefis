@@ -51,6 +51,9 @@ typedef half_float::half		float16_t;
 typedef float					float32_t;
 typedef double					float64_t;
 
+// C-compatibility:
+typedef bool					_Bool;
+
 typedef std::vector<uint8_t>	Blob;
 
 template<class Value>

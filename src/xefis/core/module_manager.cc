@@ -42,7 +42,9 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 
 	Module* module = create_module_by_name (name, config, parent);
 
-	_modules.insert (module);
+	// Sink into Unique:
+	_modules.emplace (module);
+
 	_module_to_pointer_map[module] = pointer;
 	_pointer_to_module_map[pointer] = module;
 

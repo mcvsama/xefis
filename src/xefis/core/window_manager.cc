@@ -30,16 +30,16 @@ WindowManager::WindowManager (Application* application):
 
 
 void
-WindowManager::add_window (Window* window)
+WindowManager::add_window (Unique<Window> window)
 {
-	_windows.insert (window);
+	_windows.insert (std::move (window));
 }
 
 
 void
 WindowManager::data_updated (Time const& update_time)
 {
-	for (Window* window: _windows)
+	for (auto const& window: _windows)
 		window->data_updated (update_time);
 }
 

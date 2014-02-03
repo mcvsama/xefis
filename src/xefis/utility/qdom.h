@@ -96,8 +96,6 @@ QDomElementIterator::operator*()
  * Support for generic iterating over element's children
  * with range-for.
  */
-namespace std {
-
 inline Xefis::QDomElementIterator
 begin (QDomElement element)
 {
@@ -105,13 +103,15 @@ begin (QDomElement element)
 }
 
 
+/**
+ * Support for generic iterating over element's children
+ * with range-for.
+ */
 inline Xefis::QDomElementIterator
 end (QDomElement)
 {
 	return Xefis::QDomElementIterator();
 }
-
-} // namespace std
 
 
 /**

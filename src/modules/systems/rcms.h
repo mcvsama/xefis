@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtXml/QDomElement>
+#include <QtWidgets/QWidget>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -65,7 +66,7 @@ class RemoteControlManagementSystem:
 	compute_true_home_direction();
 
   private:
-	QWidget*				_configurator_widget	= nullptr;
+	Unique<QWidget>			_configurator_widget;
 	bool					_home_acquired			= false;
 	Xefis::PropertyObserver	_distance_computer;
 	// Input:

@@ -50,6 +50,13 @@ Link::ItemStream::ItemStream (Link* link, QDomElement& element)
 }
 
 
+Link::ItemStream::~ItemStream()
+{
+	for (Item* item: _items)
+		delete item;
+}
+
+
 inline Blob::size_type
 Link::ItemStream::size() const
 {

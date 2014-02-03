@@ -39,6 +39,9 @@ class PropertyStorage: public Noncopyable
 	typedef std::map<std::string, PropertyNode*> PropertiesByPath;
 
   public:
+	// Dtor
+	~PropertyStorage();
+
 	/**
 	 * Initialize storage - create default storage.
 	 */

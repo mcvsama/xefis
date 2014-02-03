@@ -34,7 +34,8 @@ class Application;
 
 class ModuleManager
 {
-	typedef std::set<Module*> Modules;
+	typedef std::set<Module*>					Modules;
+	typedef std::set<Unique<Module>>			OwnedModules;
 
   public:
 	typedef std::map<Module*, Module::Pointer>	ModuleToPointerMap;
@@ -114,7 +115,7 @@ class ModuleManager
 
   private:
 	Application*		_application = nullptr;
-	Modules				_modules;
+	OwnedModules		_modules;
 	Modules				_instrument_modules;
 	Modules				_non_instrument_modules;
 	Time				_update_time;

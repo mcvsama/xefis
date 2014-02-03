@@ -492,8 +492,8 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 	// Auto delete if Window throws an exception:
 	Unique<Window> window = std::make_unique<Window> (_application, this, window_element);
 	window->show();
-	_application->window_manager()->add_window (window.get());
-	window.release();
+	_application->window_manager()->add_window (std::move (window));
+	// window is now gone
 	_has_windows = true;
 }
 
