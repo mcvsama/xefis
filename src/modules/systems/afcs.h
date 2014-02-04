@@ -25,7 +25,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
-#include <xefis/utility/rotary_decoder.h>
+#include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
 #include <modules/systems/fly_by_wire.h>
 
@@ -158,30 +158,26 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyBoolean				_mcp_prot;
 	Xefis::PropertyBoolean				_mcp_tac;
 	Xefis::PropertyBoolean				_mcp_att;
-	Xefis::PropertyBoolean				_mcp_speed_a;
-	Xefis::PropertyBoolean				_mcp_speed_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_speed_decoder;
+	Xefis::PropertyInteger				_mcp_speed_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_speed_decoder;
 	Xefis::PropertyBoolean				_mcp_speed_ias_mach;
 	Xefis::PropertyBoolean				_mcp_speed_sel;
 	Xefis::PropertyBoolean				_mcp_speed_hold;
-	Xefis::PropertyBoolean				_mcp_heading_a;
-	Xefis::PropertyBoolean				_mcp_heading_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_heading_decoder;
+	Xefis::PropertyInteger				_mcp_heading_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_heading_decoder;
 	Xefis::PropertyBoolean				_mcp_heading_hdg_trk;
 	Xefis::PropertyBoolean				_mcp_heading_sel;
 	Xefis::PropertyBoolean				_mcp_heading_hold;
 	Xefis::PropertyBoolean				_mcp_vnav;
 	Xefis::PropertyBoolean				_mcp_lnav;
 	Xefis::PropertyBoolean				_mcp_app;
-	Xefis::PropertyBoolean				_mcp_altitude_a;
-	Xefis::PropertyBoolean				_mcp_altitude_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_altitude_decoder;
+	Xefis::PropertyInteger				_mcp_altitude_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_altitude_decoder;
 	Xefis::PropertyBoolean				_mcp_altitude_stepch;
 	Xefis::PropertyBoolean				_mcp_altitude_flch;
 	Xefis::PropertyBoolean				_mcp_altitude_hold;
-	Xefis::PropertyBoolean				_mcp_vspd_a;
-	Xefis::PropertyBoolean				_mcp_vspd_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_vspd_decoder;
+	Xefis::PropertyInteger				_mcp_vspd_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_vspd_decoder;
 	Xefis::PropertyBoolean				_mcp_vspd_vs_fpa;
 	Xefis::PropertyBoolean				_mcp_vspd_sel;
 	Xefis::PropertyBoolean				_mcp_vspd_clb_con;
@@ -218,7 +214,7 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	Xefis::PropertyString				_flight_mode;
 	Xefis::PropertyBoolean				_yaw_damper_enabled;
 	// Other:
-	std::vector<Xefis::RotaryDecoder*>	_rotary_decoders;
+	std::vector<Xefis::DeltaDecoder*>	_rotary_decoders;
 };
 
 #endif

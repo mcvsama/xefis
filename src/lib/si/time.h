@@ -340,6 +340,11 @@ template<>
 	class numeric_limits<SI::Time>: public numeric_limits<SI::Time::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Time>: public is_floating_point<SI::Time::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

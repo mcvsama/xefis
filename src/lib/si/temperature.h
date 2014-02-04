@@ -246,6 +246,11 @@ template<>
 	class numeric_limits<SI::Temperature>: public numeric_limits<SI::Temperature::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Temperature>: public is_floating_point<SI::Temperature::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

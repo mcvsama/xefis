@@ -27,7 +27,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
-#include <xefis/utility/rotary_decoder.h>
+#include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
 
 
@@ -396,29 +396,25 @@ class State: public Xefis::Module
 	Unique<ToggleButton>				_afcs_ap_button;
 	Unique<ButtonOptions>				_mfd_panel;
 	// Buttons, switches, knobs:
-	Xefis::PropertyBoolean				_mcp_mins_a;
-	Xefis::PropertyBoolean				_mcp_mins_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_mins_decoder;
+	Xefis::PropertyInteger				_mcp_mins_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_mins_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_att;
 	Observable<Xefis::PropertyBoolean>	_mcp_appr;
 	Observable<Xefis::PropertyBoolean>	_mcp_fd;
 	Observable<Xefis::PropertyBoolean>	_mcp_htrk;
-	Xefis::PropertyBoolean				_mcp_qnh_a;
-	Xefis::PropertyBoolean				_mcp_qnh_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_qnh_decoder;
+	Xefis::PropertyInteger				_mcp_qnh_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_qnh_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_qnh_hpa;
 	Observable<Xefis::PropertyBoolean>	_mcp_std;
 	Observable<Xefis::PropertyBoolean>	_mcp_metric;
 	Observable<Xefis::PropertyBoolean>	_mcp_fpv;
-	Xefis::PropertyBoolean				_mcp_range_a;
-	Xefis::PropertyBoolean				_mcp_range_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_range_decoder;
+	Xefis::PropertyInteger				_mcp_range_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_range_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_range_ctr;
 	Observable<Xefis::PropertyBoolean>	_mcp_hdg_trk;
 	Observable<Xefis::PropertyBoolean>	_mcp_mag_tru;
-	Xefis::PropertyBoolean				_mcp_course_a;
-	Xefis::PropertyBoolean				_mcp_course_b;
-	Unique<Xefis::RotaryDecoder>		_mcp_course_decoder;
+	Xefis::PropertyInteger				_mcp_course_value;
+	Unique<Xefis::DeltaDecoder>			_mcp_course_decoder;
 	Observable<Xefis::PropertyBoolean>	_mcp_course_hide;
 	// LEDs, displays:
 	Xefis::PropertyInteger				_mcp_course_display;
@@ -442,7 +438,7 @@ class State: public Xefis::Module
 	Xefis::PropertyBoolean				_setting_course_visible;
 	// Other:
 	std::vector<ObservableBase*>		_observables;
-	std::vector<Xefis::RotaryDecoder*>	_rotary_decoders;
+	std::vector<Xefis::DeltaDecoder*>	_rotary_decoders;
 };
 
 

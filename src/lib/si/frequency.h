@@ -206,6 +206,11 @@ template<>
 	class numeric_limits<SI::Frequency>: public numeric_limits<SI::Frequency::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Frequency>: public is_floating_point<SI::Frequency::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

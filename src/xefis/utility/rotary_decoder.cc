@@ -14,9 +14,6 @@
 // Standard:
 #include <cstddef>
 
-// System:
-#include <semaphore.h>
-
 // Local:
 #include "rotary_decoder.h"
 

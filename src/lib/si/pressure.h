@@ -210,6 +210,11 @@ template<>
 	class numeric_limits<SI::Pressure>: public numeric_limits<SI::Pressure::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Pressure>: public is_floating_point<SI::Pressure::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

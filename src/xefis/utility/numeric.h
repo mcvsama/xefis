@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <type_traits>
 #include <complex>
 #include <cmath>
 
@@ -78,21 +79,26 @@ template<class T = int, class S>
 
 
 /**
- * Works properly only on floats.
+ * For floats.
  * \param	n - dividend
  * \param	d - divisor
  */
 template<class Number>
 	inline constexpr Number
-	floored_mod (Number n, Number d)
+	floored_mod (Number n, typename std::enable_if<std::is_floating_point<Number>::value, Number>::type d)
 	{
 		return n - (d * std::floor (n / d));
 	}
 
 
-template<>
-	inline constexpr int
-	floored_mod<int> (int n, int d)
+/**
+ * For integral types.
+ * \param	n - dividend
+ * \param	d - divisor
+ */
+template<class Number>
+	inline constexpr Number
+	floored_mod (Number n, typename std::enable_if<std::is_integral<Number>::value, Number>::type d)
 	{
 		return (n % d) >= 0 ? (n % d) : (n % d) + std::abs (d);
 	}
