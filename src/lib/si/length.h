@@ -270,6 +270,11 @@ template<>
 	class numeric_limits<SI::Length>: public numeric_limits<SI::Length::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Length>: public is_floating_point<SI::Length::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

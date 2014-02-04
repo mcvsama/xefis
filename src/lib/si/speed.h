@@ -237,6 +237,11 @@ template<>
 	class numeric_limits<SI::Speed>: public numeric_limits<SI::Speed::ValueType>
 	{ };
 
+
+template<>
+	class is_floating_point<SI::Speed>: public is_floating_point<SI::Speed::ValueType>
+	{ };
+
 } // namespace std
 
 #endif

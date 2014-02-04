@@ -42,9 +42,7 @@ class PanelRotaryEncoder: public PanelWidget
 	 * rotate_a and rotate_b correspond to real rotary encoder outputs (using Gray code).
 	 */
 	PanelRotaryEncoder (QWidget* parent, Panel*, QString const& knob_label,
-						PropertyBoolean rotate_a, PropertyBoolean rotate_b,
-						PropertyBoolean rotate_up, PropertyBoolean rotate_down,
-						PropertyBoolean click_property);
+						PropertyInteger value_property, PropertyBoolean click_property);
 
   protected:
 	void
@@ -72,32 +70,15 @@ class PanelRotaryEncoder: public PanelWidget
 	void
 	write();
 
-	/**
-	 * "Press" up or down buttons according to rotation delta.
-	 */
-	void
-	rotate (int delta);
-
-	/**
-	 * Apply N Gray code steps. Value is Gray-code.
-	 */
-	uint8_t
-	apply_steps (uint8_t value, int steps);
-
   private:
-	Unique<QTimer>	_click_timer;
-	Unique<QTimer>	_rotate_up_timer;
-	Unique<QTimer>	_rotate_down_timer;
-	QPoint			_mouse_last_position;
-	bool			_mouse_pressed			= false;
-	uint8_t			_value					= 0; // Gray code
-	QString			_knob_label;
-	Angle			_angle					= 0_deg;
-	PropertyBoolean	_rotate_a;
-	PropertyBoolean	_rotate_b;
-	PropertyBoolean	_rotate_up;
-	PropertyBoolean	_rotate_down;
-	PropertyBoolean	_click_property;
+	Unique<QTimer>			_click_timer;
+	QPoint					_mouse_last_position;
+	bool					_mouse_pressed			= false;
+	QString					_knob_label;
+	Angle					_angle					= 0_deg;
+	PropertyInteger::Type	_value					= 0;
+	PropertyInteger			_value_property;
+	PropertyBoolean			_click_property;
 };
 
 } // namespace Xefis

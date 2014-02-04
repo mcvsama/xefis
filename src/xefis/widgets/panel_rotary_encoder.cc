@@ -35,15 +35,10 @@ constexpr int	PanelRotaryEncoder::Notches;
 
 
 PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label,
-										PropertyBoolean rotate_a, PropertyBoolean rotate_b,
-										PropertyBoolean rotate_up, PropertyBoolean rotate_down,
-										PropertyBoolean click_property):
+										PropertyInteger value_property, PropertyBoolean click_property):
 	PanelWidget (parent, panel),
 	_knob_label (knob_label),
-	_rotate_a (rotate_a),
-	_rotate_b (rotate_b),
-	_rotate_up (rotate_up),
-	_rotate_down (rotate_down),
+	_value_property (value_property),
 	_click_property (click_property)
 {
 	QVBoxLayout* layout = new QVBoxLayout (this);
@@ -53,26 +48,10 @@ PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString c
 
 	_click_timer = std::make_unique<QTimer>();
 	_click_timer->setSingleShot (true);
-	_click_timer->setInterval (10);
+	_click_timer->setInterval (20);
 	QObject::connect (_click_timer.get(), &QTimer::timeout, [&] {
 		if (_click_property.configured())
 			_click_property.write (false);
-	});
-
-	_rotate_up_timer = std::make_unique<QTimer>();
-	_rotate_up_timer->setSingleShot (true);
-	_rotate_up_timer->setInterval (10);
-	QObject::connect (_rotate_up_timer.get(), &QTimer::timeout, [&] {
-		if (_rotate_up.configured())
-			_rotate_up.write (false);
-	});
-
-	_rotate_down_timer = std::make_unique<QTimer>();
-	_rotate_down_timer->setSingleShot (true);
-	_rotate_down_timer->setInterval (10);
-	QObject::connect (_rotate_down_timer.get(), &QTimer::timeout, [&] {
-		if (_rotate_down.configured())
-			_rotate_down.write (false);
 	});
 }
 
@@ -102,11 +81,12 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	}
 
 	float rot = 0;
-	if (_value == 1)
+	PropertyInteger::Type value_mod = floored_mod<PropertyInteger::Type> (_value, 0, 4);
+	if (value_mod == 1)
 		rot = 360.f / Notches / 4.f * 1.f;
-	else if (_value == 3)
+	else if (value_mod == 2)
 		rot = 360.f / Notches / 4.f * 2.f;
-	else if (_value == 2)
+	else if (value_mod == 3)
 		rot = 360.f / Notches / 4.f * 3.f;
 
 	QColor bg = palette().color (QPalette::Window);
@@ -183,15 +163,12 @@ PanelRotaryEncoder::mouseMoveEvent (QMouseEvent* event)
 		event->accept();
 		int pixels = _mouse_last_position.y() - event->pos().y();
 
-		for (int i = 0; i < std::abs (pixels); ++i)
-		{
-			_value = apply_steps (_value, Xefis::sgn (pixels));
-			_angle += Xefis::sgn (pixels) * 360_deg / Notches / 4.f;
-			rotate (pixels);
-			write();
-		}
-
+		_angle += pixels * 360_deg / Notches / 4.f;
+		_value += pixels;
 		_mouse_last_position = event->pos();
+
+		write();
+		update();
 	}
 }
 
@@ -204,11 +181,11 @@ PanelRotaryEncoder::wheelEvent (QWheelEvent* event)
 	if (_mouse_pressed)
 		return;
 
-	_value = apply_steps (_value, Xefis::sgn (event->delta()));
-	_angle += Xefis::sgn (event->delta()) * 360_deg / Notches / 4.f;
-	rotate (event->delta());
+	_angle += sgn (event->delta()) * 360_deg / Notches / 4.f;
+	_value += sgn (event->delta());
 
 	write();
+	update();
 }
 
 
@@ -226,55 +203,8 @@ PanelRotaryEncoder::mouseDoubleClickEvent (QMouseEvent*)
 void
 PanelRotaryEncoder::write()
 {
-	_rotate_a.write (_value & 2);
-	_rotate_b.write (_value & 1);
-
-	update();
-}
-
-
-void
-PanelRotaryEncoder::rotate (int delta)
-{
-	if (delta > 0)
-	{
-		_rotate_up.write (true);
-		_rotate_up_timer->start();
-	}
-	else if (delta < 0)
-	{
-		_rotate_down.write (true);
-		_rotate_down_timer->start();
-	}
-}
-
-
-uint8_t
-PanelRotaryEncoder::apply_steps (uint8_t value, int steps)
-{
-	bool a = value & 2;
-	bool b = value & 1;
-
-	if (steps == 1)
-	{
-		if (!a && !b)		b = true;
-		else if (!a && b)	a = true;
-		else if (a && b)	b = false;
-		else				a = false;
-
-		value = static_cast<uint8_t> (a) << 1 | static_cast<uint8_t> (b);
-	}
-	else if (steps == -1)
-	{
-		if (!a && !b)		a = true;
-		else if (!a && b)	b = false;
-		else if (a && b)	a = false;
-		else				b = true;
-
-		value = static_cast<uint8_t> (a) << 1 | static_cast<uint8_t> (b);
-	}
-
-	return value;
+	if (_value_property.configured())
+		_value_property = _value;
 }
 
 } // namespace Xefis

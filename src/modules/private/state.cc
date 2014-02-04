@@ -60,24 +60,20 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	// TODO not hardcoded
 	std::string mcp_root = "/panels/mcp";
 
-	_mcp_mins_a.set_path (mcp_root + "/mins-a");
-	_mcp_mins_b.set_path (mcp_root + "/mins-b");
+	_mcp_mins_value.set_path (mcp_root + "/mins");
 	_mcp_appr.set_path (mcp_root + "/appr");
 	_mcp_fd.set_path (mcp_root + "/fd");
 	_mcp_htrk.set_path (mcp_root + "/htrk");
-	_mcp_qnh_a.set_path (mcp_root + "/qnh-a");
-	_mcp_qnh_b.set_path (mcp_root + "/qnh-b");
+	_mcp_qnh_value.set_path (mcp_root + "/qnh");
 	_mcp_qnh_hpa.set_path (mcp_root + "/qnh-hpa");
 	_mcp_std.set_path (mcp_root + "/std");
 	_mcp_metric.set_path (mcp_root + "/metric");
 	_mcp_fpv.set_path (mcp_root + "/fpv");
-	_mcp_range_a.set_path (mcp_root + "/range-a");
-	_mcp_range_b.set_path (mcp_root + "/range-b");
+	_mcp_range_value.set_path (mcp_root + "/range");
 	_mcp_range_ctr.set_path (mcp_root + "/range-ctr");
 	_mcp_hdg_trk.set_path (mcp_root + "/hdg-trk");
 	_mcp_mag_tru.set_path (mcp_root + "/mag-tru");
-	_mcp_course_a.set_path (mcp_root + "/course-a");
-	_mcp_course_b.set_path (mcp_root + "/course-b");
+	_mcp_course_value.set_path (mcp_root + "/course");
 	_mcp_course_hide.set_path (mcp_root + "/course-hide");
 
 	_mcp_course_display.set_path ("/settings/course/magnetic.integer");
@@ -199,7 +195,7 @@ State::data_updated()
 {
 	for (ObservableBase* o: _observables)
 		o->process();
-	for (Xefis::RotaryDecoder* r: _rotary_decoders)
+	for (Xefis::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
 	static std::vector<Action*> actions = {
@@ -219,7 +215,7 @@ State::data_updated()
 void
 State::prepare_efis_settings()
 {
-	_mcp_mins_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_mins_a, _mcp_mins_b, [this](int delta) {
+	_mcp_mins_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_mins_value, [this](int delta) {
 		switch (_minimums_type)
 		{
 			case MinimumsType::Baro:
@@ -238,7 +234,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fd, _setting_efis_fd_visible);
 	make_toggle (_mcp_htrk, _setting_hsi_home_track_visible);
 
-	_mcp_qnh_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_qnh_a, _mcp_qnh_b, [this](int delta) {
+	_mcp_qnh_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_qnh_value, [this](int delta) {
 		if (*_setting_pressure_display_hpa)
 			_qnh_setting += QNHhPaStep * delta;
 		else
@@ -252,7 +248,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_metric, _setting_efis_show_metric);
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
-	_mcp_range_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_range_a, _mcp_range_b, [this](int delta) {
+	_mcp_range_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_range_value, [this](int delta) {
 		Optional<Length> new_half_range;
 		delta = -delta;
 
@@ -297,7 +293,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_hdg_trk, _setting_hsi_center_on_track);
 	make_toggle (_mcp_mag_tru, _setting_hsi_display_true_heading);
 
-	_mcp_course_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_course_a, _mcp_course_b, [this](int delta) {
+	_mcp_course_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_course_value, [this](int delta) {
 		_course = Xefis::floored_mod (_course + 1_deg * delta, 360_deg);
 		int course = Xefis::symmetric_round (_course.deg());
 		if (course == 0)

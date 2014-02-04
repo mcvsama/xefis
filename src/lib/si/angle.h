@@ -213,6 +213,11 @@ template<>
 	{ };
 
 
+template<>
+	class is_floating_point<SI::Angle>: public is_floating_point<SI::Angle::ValueType>
+	{ };
+
+
 #define FORWARD_ANGLE_TO_STD_FUNCTION_1(function_name)				\
 	inline SI::Angle::ValueType function_name (SI::Angle const& a)	\
 	{																\

@@ -70,14 +70,10 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 		{ "button.vertical-speed.vs-fpa", _mcp_vspd_vs_fpa, true },
 		{ "button.vertical-speed.sel", _mcp_vspd_sel, true },
 		{ "button.vertical-speed.clb-con", _mcp_vspd_clb_con, true },
-		{ "rotary-encoder.speed.a", _mcp_speed_a, true },
-		{ "rotary-encoder.speed.b", _mcp_speed_b, true },
-		{ "rotary-encoder.heading.a", _mcp_heading_a, true },
-		{ "rotary-encoder.heading.b", _mcp_heading_b, true },
-		{ "rotary-encoder.altitude.a", _mcp_altitude_a, true },
-		{ "rotary-encoder.altitude.b", _mcp_altitude_b, true },
-		{ "rotary-encoder.vertical-speed.a", _mcp_vspd_a, true },
-		{ "rotary-encoder.vertical-speed.b", _mcp_vspd_b, true },
+		{ "rotary-encoder.speed", _mcp_speed_value, true },
+		{ "rotary-encoder.heading", _mcp_heading_value, true },
+		{ "rotary-encoder.altitude", _mcp_altitude_value, true },
+		{ "rotary-encoder.vertical-speed", _mcp_vspd_value, true },
 		{ "display.speed", _mcp_speed_display, true },
 		{ "display.heading", _mcp_heading_display, true },
 		{ "display.altitude", _mcp_altitude_display, true },
@@ -134,7 +130,7 @@ AutomatedFlightControlSystem::AutomatedFlightControlSystem (Xefis::ModuleManager
 void
 AutomatedFlightControlSystem::data_updated()
 {
-	for (Xefis::RotaryDecoder* r: _rotary_decoders)
+	for (Xefis::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
 	process_afcs_main_panel();
@@ -188,7 +184,7 @@ AutomatedFlightControlSystem::process_afcs_main_panel()
 void
 AutomatedFlightControlSystem::prepare_speed_panel()
 {
-	_mcp_speed_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_speed_a, _mcp_speed_b, [this](int delta) {
+	_mcp_speed_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_speed_value, [this](int delta) {
 		_cmd_speed_counter = Xefis::limit (_cmd_speed_counter + 1_kt * delta, CmdSpeedRange);
 		solve_mode();
 	});
@@ -204,7 +200,7 @@ AutomatedFlightControlSystem::prepare_speed_panel()
 void
 AutomatedFlightControlSystem::prepare_heading_panel()
 {
-	_mcp_heading_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_heading_a, _mcp_heading_b, [this](int delta) {
+	_mcp_heading_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_heading_value, [this](int delta) {
 		_cmd_heading_counter = Xefis::floored_mod (_cmd_heading_counter + 1_deg * delta, 360_deg);
 		solve_mode();
 	});
@@ -229,7 +225,7 @@ AutomatedFlightControlSystem::prepare_nav_panel()
 void
 AutomatedFlightControlSystem::prepare_altitude_panel()
 {
-	_mcp_altitude_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_altitude_a, _mcp_altitude_b, [this](int delta) {
+	_mcp_altitude_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_altitude_value, [this](int delta) {
 		Length altitude_step;
 		switch (_cmd_altitude_step)
 		{
@@ -268,7 +264,7 @@ AutomatedFlightControlSystem::process_altitude_panel()
 void
 AutomatedFlightControlSystem::prepare_vspd_panel()
 {
-	_mcp_vspd_decoder = std::make_unique<Xefis::RotaryDecoder> (_mcp_vspd_a, _mcp_vspd_b, [this](int delta) {
+	_mcp_vspd_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_vspd_value, [this](int delta) {
 		_cmd_vspd_counter = Xefis::limit (_cmd_vspd_counter + CmdVSpdStep * delta, CmdVSpdRange);
 		solve_mode();
 	});

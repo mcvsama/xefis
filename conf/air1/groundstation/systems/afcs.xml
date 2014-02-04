@@ -29,14 +29,10 @@
 				<property name='button.vertical-speed.vs-fpa' path='/button.vspd-vs-fpa'/>
 				<property name='button.vertical-speed.sel' path='/button.vspd-sel'/>
 				<property name='button.vertical-speed.clb-con' path='/button.vspd-clb-con'/>
-				<property name='rotary-encoder.speed.a' path='/rotary-encoder.speed-a'/>
-				<property name='rotary-encoder.speed.b' path='/rotary-encoder.speed-b'/>
-				<property name='rotary-encoder.heading.a' path='/rotary-encoder.heading-a'/>
-				<property name='rotary-encoder.heading.b' path='/rotary-encoder.heading-b'/>
-				<property name='rotary-encoder.altitude.a' path='/rotary-encoder.altitude-a'/>
-				<property name='rotary-encoder.altitude.b' path='/rotary-encoder.altitude-b'/>
-				<property name='rotary-encoder.vertical-speed.a' path='/rotary-encoder.vspd-a'/>
-				<property name='rotary-encoder.vertical-speed.b' path='/rotary-encoder.vspd-b'/>
+				<property name='rotary-encoder.speed' path='/rotary-encoder.speed'/>
+				<property name='rotary-encoder.heading' path='/rotary-encoder.heading'/>
+				<property name='rotary-encoder.altitude' path='/rotary-encoder.altitude'/>
+				<property name='rotary-encoder.vertical-speed' path='/rotary-encoder.vspd'/>
 			</directory>
 			<directory path='/panels/mcp/afcs'>
 				<property name='display.speed' path='/display.speed'/>

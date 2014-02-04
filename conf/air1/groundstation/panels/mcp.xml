@@ -9,7 +9,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='rotary-encoder' top-label='MINS' click-label='B/R' rotate-a-property='/panels/mcp/mins-a' rotate-b-property='/panels/mcp/mins-b' click-property='/panels/mcp/efis/button.mins-mode'/>
+									<widget type='rotary-encoder' top-label='MINS' click-label='B/R' value-property='/panels/mcp/mins'/>
 								</item>
 								<stretch/>
 								<item>
@@ -23,7 +23,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='rotary-encoder' top-label='PFD RNG' rotate-a-property='/panels/mcp/pfd-range-a' rotate-b-property='/panels/mcp/pfd-range-b'/>
+									<widget type='rotary-encoder' top-label='PFD RNG' value-property='/panels/mcp/pfd-range'/>
 								</item>
 								<stretch/>
 								<item>
@@ -37,7 +37,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='rotary-encoder' top-label='ALTM' click-label='hPa' rotate-a-property='/panels/mcp/qnh-a' rotate-b-property='/panels/mcp/qnh-b' click-property='/panels/mcp/qnh-hpa'/>
+									<widget type='rotary-encoder' top-label='ALTM' click-label='hPa' value-property='/panels/mcp/qnh' click-property='/panels/mcp/qnh-hpa'/>
 								</item>
 								<stretch/>
 								<item>
@@ -51,7 +51,7 @@
 						<item>
 							<layout type='vertical' spacing='10'>
 								<item>
-									<widget type='rotary-encoder' top-label='RANGE' click-label='CTR' rotate-a-property='/panels/mcp/range-a' rotate-b-property='/panels/mcp/range-b' click-property='/panels/mcp/range-ctr'/>
+									<widget type='rotary-encoder' top-label='RANGE' click-label='CTR' value-property='/panels/mcp/range' click-property='/panels/mcp/range-ctr'/>
 								</item>
 								<stretch/>
 								<item>
@@ -128,7 +128,7 @@
 									<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/settings/course/magnetic.integer'/>
 								</item>
 								<item>
-									<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' rotate-a-property='/panels/mcp/course-a' rotate-b-property='/panels/mcp/course-b' click-property='/panels/mcp/course-hide'/>
+									<widget type='rotary-encoder' click-label='─┼' top-label='HIDE' value-property='/panels/mcp/course' click-property='/panels/mcp/course-hide'/>
 								</item>
 								<stretch/>
 								<item>
@@ -185,7 +185,7 @@
 							<widget type='numeric-display' digits='4' value-property='/panels/mcp/afcs/display.speed'/>
 						</item>
 						<item>
-							<widget type='rotary-encoder' top-label='IAS • MACH' rotate-a-property='/panels/mcp/afcs/rotary-encoder.speed-a' rotate-b-property='/panels/mcp/afcs/rotary-encoder.speed-b' click-property='/panels/mcp/afcs/rotary-encoder.speed-ias-mach'/>
+							<widget type='rotary-encoder' top-label='IAS • MACH' value-property='/panels/mcp/afcs/rotary-encoder.speed' click-property='/panels/mcp/afcs/rotary-encoder.speed-ias-mach'/>
 						</item>
 						<stretch/>
 						<item>
@@ -208,7 +208,7 @@
 							<widget type='numeric-display' digits='3' pad-with-zeros='true' value-property='/panels/mcp/afcs/display.heading'/>
 						</item>
 						<item>
-							<widget type='rotary-encoder' top-label='HDG • TRK' rotate-a-property='/panels/mcp/afcs/rotary-encoder.heading-a' rotate-b-property='/panels/mcp/afcs/rotary-encoder.heading-b' click-property='/panels/mcp/afcs/rotary-encoder.heading-hdg-trk'/>
+							<widget type='rotary-encoder' top-label='HDG • TRK' value-property='/panels/mcp/afcs/rotary-encoder.heading' click-property='/panels/mcp/afcs/rotary-encoder.heading-hdg-trk'/>
 						</item>
 						<stretch/>
 						<item>
@@ -248,7 +248,7 @@
 							<widget type='numeric-display' digits='5' value-property='/panels/mcp/afcs/display.altitude'/>
 						</item>
 						<item>
-							<widget type='rotary-encoder' top-label='10 • 100' rotate-a-property='/panels/mcp/afcs/rotary-encoder.altitude-a' rotate-b-property='/panels/mcp/afcs/rotary-encoder.altitude-b' click-property='/panels/mcp/afcs/rotary-encoder.altitude-stepch'/>
+							<widget type='rotary-encoder' top-label='10 • 100' value-property='/panels/mcp/afcs/rotary-encoder.altitude' click-property='/panels/mcp/afcs/rotary-encoder.altitude-stepch'/>
 						</item>
 						<stretch/>
 						<item>
@@ -271,7 +271,7 @@
 							<widget type='numeric-display' digits='5' value-property='/panels/mcp/afcs/display.vertical-speed'/>
 						</item>
 						<item>
-							<widget type='rotary-encoder' top-label='V/S • FPA' rotate-a-property='/panels/mcp/afcs/rotary-encoder.vspd-a' rotate-b-property='/panels/mcp/afcs/rotary-encoder.vspd-b' click-property='/panels/mcp/afcs/rotary-encoder.vspd-vs-fpa'/>
+							<widget type='rotary-encoder' top-label='V/S • FPA' value-property='/panels/mcp/afcs/rotary-encoder.vspd' click-property='/panels/mcp/afcs/rotary-encoder.vspd-vs-fpa'/>
 						</item>
 						<stretch/>
 						<item>
