@@ -98,12 +98,6 @@ class Services
 	deinitialize();
 
 	/**
-	 * Return number of detected processor cores.
-	 */
-	static unsigned int
-	detected_cores();
-
-	/**
 	 * Return vector of compiled-in feature names.
 	 */
 	static std::vector<const char*>
@@ -149,7 +143,6 @@ class Services
 	panel_font();
 
   private:
-	static signed int					_detected_cores;
 	static Unique<CallOutDispatcher>	_call_out_dispatcher;
 	static QFont						_instrument_font;
 	static QFont						_panel_font;
