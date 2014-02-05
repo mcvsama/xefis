@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <thread>
 
 // System:
 #include <signal.h>
@@ -71,7 +72,7 @@ Application::Application (int& argc, char** argv):
 	_module_manager = std::make_unique<ModuleManager> (this);
 	_sound_manager = std::make_unique<SoundManager> (this);
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
-	_work_performer = std::make_unique<WorkPerformer> (Services::detected_cores());
+	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 
 	_data_updater = new QTimer (this);
 	_data_updater->setInterval (10.f);

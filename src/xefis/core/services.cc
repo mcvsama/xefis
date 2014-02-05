@@ -32,7 +32,6 @@
 
 namespace Xefis {
 
-signed int					Services::_detected_cores = -1;
 Unique<CallOutDispatcher>	Services::_call_out_dispatcher;
 QFont						Services::_instrument_font ("sans");
 QFont						Services::_panel_font ("sans");
@@ -79,28 +78,6 @@ Services::initialize()
 void
 Services::deinitialize()
 {
-}
-
-
-unsigned int
-Services::detected_cores()
-{
-	if (_detected_cores != -1)
-		return _detected_cores;
-
-	_detected_cores = 0;
-	std::ifstream cpuinfo ("/proc/cpuinfo");
-	std::string line;
-	while (cpuinfo.good())
-	{
-		std::getline (cpuinfo, line);
-		std::istringstream s (line);
-		std::string name, colon;
-		s >> name >> colon;
-		if (name == "processor" && colon == ":")
-			++_detected_cores;
-	}
-	return _detected_cores;
 }
 
 
