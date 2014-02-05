@@ -113,9 +113,9 @@
 					<property bytes='2' path='/controls/rudder-pedals' type='float'/>
 					<property bytes='2' path='/controls/throttle-left' type='float'/>
 					<property bytes='2' path='/controls/throttle-right' type='float'/>
-					<property bytes='2' path='/controls/elevator-trim' type='float'/>
-					<property bytes='2' path='/controls/ailerons-trim' type='float'/>
-					<property bytes='2' path='/controls/rudder-trim' type='float'/>
+					<property bytes='2' path='/controls/elevator-trim' type='float' retained='true'/>
+					<property bytes='2' path='/controls/ailerons-trim' type='float' retained='true'/>
+					<property bytes='2' path='/controls/rudder-trim' type='float' retained='true'/>
 					<property bytes='4' path='/settings/pressure/qnh' type='pressure' retained='true'/>
 					<property bytes='4' path='/settings/course/magnetic' type='angle' retained='true'/>
 					<property bytes='4' path='/settings/cmd/ias' type='speed' retained='true'/>
