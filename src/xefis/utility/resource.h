@@ -66,16 +66,16 @@ class Resource
 	~Resource();
 
 	/**
-	 * Manually release resource, before this is deleted.
+	 * Destroy the tracked resource.
+	 */
+	void
+	destroy();
+
+	/**
+	 * Release the resource so that it's not tracked anymore.
 	 */
 	void
 	release();
-
-	/**
-	 * Forget about the resource (don't release it).
-	 */
-	void
-	forget();
 
   private:
 	Callback _callback;
@@ -91,9 +91,9 @@ Resource::Resource (Callback callback) noexcept:
 inline Resource&
 Resource::operator= (Resource&& other) noexcept
 {
-	release();
+	destroy();
 	_callback = other._callback;
-	other.forget();
+	other.release();
 	return *this;
 }
 
@@ -101,7 +101,7 @@ Resource::operator= (Resource&& other) noexcept
 inline Resource&
 Resource::operator= (Callback callback) noexcept
 {
-	release();
+	destroy();
 	_callback = callback;
 	return *this;
 }
@@ -110,21 +110,21 @@ Resource::operator= (Callback callback) noexcept
 inline
 Resource::~Resource()
 {
+	destroy();
+}
+
+
+inline void
+Resource::destroy()
+{
+	if (_callback)
+		_callback();
 	release();
 }
 
 
 inline void
 Resource::release()
-{
-	if (_callback)
-		_callback();
-	forget();
-}
-
-
-inline void
-Resource::forget()
 {
 	_callback = nullptr;
 }
