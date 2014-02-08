@@ -48,48 +48,6 @@ SerialPort::~SerialPort()
 
 
 void
-SerialPort::set_device_path (std::string const& device_path)
-{
-	_device_path = device_path;
-}
-
-
-void
-SerialPort::set_baud_rate (std::string const& baud_rate)
-{
-	_baud_rate = baud_rate;
-}
-
-
-void
-SerialPort::set_data_bits (unsigned int data_bits)
-{
-	_data_bits = Xefis::limit (data_bits, 5u, 8u);
-}
-
-
-void
-SerialPort::set_parity_bit (Parity parity)
-{
-	_parity = parity;
-}
-
-
-void
-SerialPort::set_stop_bits (unsigned int stop_bits)
-{
-	_stop_bits = Xefis::limit (stop_bits, 1u, 2u);
-}
-
-
-void
-SerialPort::set_hardware_control_flow (bool enabled)
-{
-	_rtscts = enabled;
-}
-
-
-void
 SerialPort::set_max_read_failures (unsigned int number)
 {
 	_max_read_failure_count = number;
@@ -141,16 +99,16 @@ SerialPort::write (Blob const& data)
 bool
 SerialPort::open()
 {
-	log() << "Opening device " << _device_path << std::endl;
+	log() << "Opening device " << _configuration._device_path << std::endl;
 	close();
-	_device = ::open (_device_path.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+	_device = ::open (_configuration._device_path.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (_device < 0)
 	{
 		auto es = strerror (errno);
 		_error = es;
 		_good = false;
-		log() << "Could not open device file " << _device_path << ": " << es << std::endl;
+		log() << "Could not open device file " << _configuration._device_path << ": " << es << std::endl;
 	}
 	else
 	{
@@ -285,8 +243,6 @@ SerialPort::read()
 					if (_read_failure_count > _max_read_failure_count)
 						notify_failure ("multiple read failures");
 				}
-				else
-					_read_failure_count = 0;
 
 				if (n < static_cast<int> (try_read))
 					break;
@@ -300,7 +256,8 @@ SerialPort::read()
 	if (!buffer.empty())
 	{
 		_input_buffer.insert (_input_buffer.end(), buffer.begin(), buffer.end());
-		_data_ready();
+		if (_data_ready)
+			_data_ready();
 	}
 }
 
@@ -309,11 +266,12 @@ bool
 SerialPort::set_device_options()
 {
 	std::string parity_str = "none";
-	if (_parity == Parity::Odd)
+	if (_configuration._parity == Parity::Odd)
 		parity_str = "odd";
-	else if (_parity == Parity::Even)
+	else if (_configuration._parity == Parity::Even)
 		parity_str = "even";
-	log() << "Setting baud rate: " << _baud_rate << ", data bits: " << _data_bits << ", parity: " << parity_str << ", stop bits: " << _stop_bits << std::endl;
+	log() << "Setting baud rate: " << _configuration._baud_rate << ", data bits: " << _configuration._data_bits
+		  << ", parity: " << parity_str << ", stop bits: " << _configuration._stop_bits << std::endl;
 
 	termios options;
 	bzero (&options, sizeof (options));
@@ -325,7 +283,7 @@ SerialPort::set_device_options()
 	// Set output and local modes to defaults:
 	options.c_cflag = CREAD | CLOCAL;
 
-	switch (_data_bits)
+	switch (_configuration._data_bits)
 	{
 		case 5: options.c_cflag |= CS5; break;
 		case 6: options.c_cflag |= CS6; break;
@@ -333,24 +291,24 @@ SerialPort::set_device_options()
 		case 8: options.c_cflag |= CS8; break;
 	}
 
-	if (_stop_bits == 2)
+	if (_configuration._stop_bits == 2)
 		options.c_cflag |= CSTOPB;
 
-	switch (_parity)
+	switch (_configuration._parity)
 	{
 		case Parity::None:	break;
 		case Parity::Odd:	options.c_cflag |= PARENB | PARODD; break;
 		case Parity::Even:	options.c_cflag |= PARENB; break;
 	}
 
-	if (_rtscts)
+	if (_configuration._rtscts)
 		options.c_cflag |= CRTSCTS;
 
 	options.c_iflag = IGNPAR;
 	options.c_oflag = 0;
 	options.c_lflag = 0;
 
-	int baud_rate_const = termios_baud_rate (_baud_rate);
+	int baud_rate_const = termios_baud_rate (_configuration._baud_rate);
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 
@@ -358,13 +316,13 @@ SerialPort::set_device_options()
 
 	if (tcsetattr (_device, TCSAFLUSH, &options) != 0)
 	{
-		log() << "Could not setup serial port: " << _device_path << ": " << strerror (errno) << std::endl;
+		log() << "Could not setup serial port: " << _configuration._device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
 	if (tcflow (_device, TCOON | TCION) != 0)
 	{
-		log() << "Could not enable flow: tcflow(): " << _device_path << ": " << strerror (errno) << std::endl;
+		log() << "Could not enable flow: tcflow(): " << _configuration._device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
@@ -377,7 +335,8 @@ SerialPort::notify_failure (std::string const& message)
 {
 	_error = message;
 	log() << "Failure detected: " << message << std::endl;
-	_failure();
+	if (_failure)
+		_failure();
 	close();
 }
 

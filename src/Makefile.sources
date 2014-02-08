@@ -105,6 +105,12 @@ SRC_MOCHDRS += xefis/core/panel.h
 SRC_MOCHDRS += xefis/core/services.h
 SRC_MOCHDRS += xefis/core/window.h
 
+######## /xefis/hardware ########
+
+SRC_HEADERS += xefis/hardware/chr_um6.h
+
+SRC_SOURCES += xefis/hardware/chr_um6.cc
+
 ######## /xefis/utility ########
 
 SRC_HEADERS += xefis/utility/backtrace.h
