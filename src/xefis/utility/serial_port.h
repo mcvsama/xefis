@@ -27,6 +27,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
+#include <xefis/utility/numeric.h>
 
 
 namespace Xefis {
@@ -46,6 +47,68 @@ class SerialPort:
 		Even,
 	};
 
+	/**
+	 * Represents serial port configuration.
+	 */
+	class Configuration
+	{
+		friend class SerialPort;
+
+	  public:
+		/**
+		 * Get path to the device.
+		 */
+		std::string
+		device_path() const noexcept;
+
+		/**
+		 * Set path to the device.
+		 */
+		void
+		set_device_path (std::string const& device_path);
+
+		/**
+		 * Set device options.
+		 * Baud rate is parsed from baud_rate.
+		 */
+		void
+		set_baud_rate (std::string const& baud_rate);
+
+		/**
+		 * Set data bits. Possible values are: 5, 6, 7, 8.
+		 * Default: 8.
+		 */
+		void
+		set_data_bits (unsigned int data_bits);
+
+		/**
+		 * Set parity bit: even or odd.
+		 */
+		void
+		set_parity_bit (Parity);
+
+		/**
+		 * Set stop bits: possible values are: 1, 2.
+		 * Default: 1
+		 */
+		void
+		set_stop_bits (unsigned int stop_bits);
+
+		/**
+		 * Enable hardware flow control.
+		 */
+		void
+		set_hardware_control_flow (bool enabled);
+
+	  private:
+		std::string		_device_path;
+		std::string		_baud_rate;
+		unsigned int	_data_bits	= 8;
+		Parity			_parity		= Parity::None;
+		unsigned int	_stop_bits	= 1;
+		bool			_rtscts		= false;
+	};
+
 	typedef std::function<void()>	DataReadyCallback;
 	typedef std::function<void()>	FailureCallback;
 
@@ -55,62 +118,40 @@ class SerialPort:
 	 * @data_ready is called when there's something to read.
 	 * @failure is called when failure is detected.
 	 */
-	SerialPort (DataReadyCallback data_ready, FailureCallback failure);
+	SerialPort (DataReadyCallback data_ready = nullptr, FailureCallback failure = nullptr);
 
 	// Dtor
 	~SerialPort();
 
-  public:
+	/**
+	 * Set data ready callback.
+	 */
+	void
+	set_data_ready_callback (DataReadyCallback);
+
+	/**
+	 * Set failure callback.
+	 */
+	void
+	set_failure_callback (FailureCallback);
+
+	/**
+	 * Set serial port configuration.
+	 */
+	void
+	set_configuration (Configuration const&);
+
+	/**
+	 * Return configuration.
+	 */
+	Configuration const&
+	configuration() const noexcept;
+
 	/**
 	 * Set logger.
 	 */
 	void
 	set_logger (Logger const& logger);
-
-	/**
-	 * Get path to the device.
-	 */
-	std::string
-	device_path() const noexcept;
-
-	/**
-	 * Set path to the device.
-	 */
-	void
-	set_device_path (std::string const& device_path);
-
-	/**
-	 * Set device options.
-	 * Baud rate is parsed from baud_rate.
-	 */
-	void
-	set_baud_rate (std::string const& baud_rate);
-
-	/**
-	 * Set data bits. Possible values are: 5, 6, 7, 8.
-	 * Default: 8.
-	 */
-	void
-	set_data_bits (unsigned int data_bits);
-
-	/**
-	 * Set parity bit: even or odd.
-	 */
-	void
-	set_parity_bit (Parity);
-
-	/**
-	 * Set stop bits: possible values are: 1, 2.
-	 * Default: 1
-	 */
-	void
-	set_stop_bits (unsigned int stop_bits);
-
-	/**
-	 * Enable hardware flow control.
-	 */
-	void
-	set_hardware_control_flow (bool enabled);
 
 	/**
 	 * Set number of read failures at which
@@ -224,15 +265,10 @@ class SerialPort:
   private:
 	Logger const*			_logger						= nullptr;
 	Logger					_internal_logger;
+	Configuration			_configuration;
 	DataReadyCallback		_data_ready;
 	FailureCallback			_failure;
 	Unique<QSocketNotifier>	_notifier;
-	std::string				_device_path;
-	std::string				_baud_rate;
-	unsigned int			_data_bits					= 8;
-	Parity					_parity						= Parity::None;
-	unsigned int			_stop_bits					= 1;
-	bool					_rtscts						= false;
 	int						_device;
 	bool					_good;
 	std::string				_error;
@@ -245,17 +281,87 @@ class SerialPort:
 };
 
 
+inline std::string
+SerialPort::Configuration::device_path() const noexcept
+{
+	return _device_path;
+}
+
+
+inline void
+SerialPort::Configuration::set_device_path (std::string const& device_path)
+{
+	_device_path = device_path;
+}
+
+
+inline void
+SerialPort::Configuration::set_baud_rate (std::string const& baud_rate)
+{
+	_baud_rate = baud_rate;
+}
+
+
+inline void
+SerialPort::Configuration::set_data_bits (unsigned int data_bits)
+{
+	_data_bits = Xefis::limit (data_bits, 5u, 8u);
+}
+
+
+inline void
+SerialPort::Configuration::set_parity_bit (Parity parity)
+{
+	_parity = parity;
+}
+
+
+inline void
+SerialPort::Configuration::set_stop_bits (unsigned int stop_bits)
+{
+	_stop_bits = Xefis::limit (stop_bits, 1u, 2u);
+}
+
+
+inline void
+SerialPort::Configuration::set_hardware_control_flow (bool enabled)
+{
+	_rtscts = enabled;
+}
+
+
+inline void
+SerialPort::set_data_ready_callback (DataReadyCallback callback)
+{
+	_data_ready = callback;
+}
+
+
+inline void
+SerialPort::set_failure_callback (FailureCallback callback)
+{
+	_failure = callback;
+}
+
+
+inline void
+SerialPort::set_configuration (Configuration const& conf)
+{
+	_configuration = conf;
+}
+
+
+inline SerialPort::Configuration const&
+SerialPort::configuration() const noexcept
+{
+	return _configuration;
+}
+
+
 inline void
 SerialPort::set_logger (Logger const& logger)
 {
 	_logger = &logger;
-}
-
-
-inline std::string
-SerialPort::device_path() const noexcept
-{
-	return _device_path;
 }
 
 
