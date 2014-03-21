@@ -5,7 +5,7 @@ html {
 	background: #fff;
 	max-width: 960px;
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 2em;
 	font-family: 'Droid Sans', sans-serif;
 	font-size: 11pt;
 	line-height: 140%;
@@ -14,6 +14,7 @@ html {
 body {
 	margin: 0;
 	padding: 0;
+	font-size: 100%;
 }
 
 header {
@@ -118,6 +119,7 @@ table {
 	outline: 1px solid #000;
 	margin: 1.5em auto;
 	min-width: 70%;
+	font-size: 100%;
 }
 
 table.short-headers th[scope='row'] {
