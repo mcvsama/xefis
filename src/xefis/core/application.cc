@@ -38,6 +38,7 @@
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
+#include <xefis/core/licenses.h>
 #include <xefis/components/configurator/configurator_widget.h>
 
 // Local:
@@ -182,6 +183,11 @@ Application::parse_args (int argc, char** argv)
 			std::cout << "  --modules-debug-log - dump module settings/properties information" << std::endl;
 			throw QuitInstruction();
 		}
+		else if (arg_name == "--copyright")
+		{
+			print_copyrights (std::cout);
+			throw QuitInstruction();
+		}
 		else if (arg_name == "--modules-debug-log")
 		{
 			if (!arg_value.empty())
@@ -191,6 +197,33 @@ Application::parse_args (int argc, char** argv)
 		else
 			throw Exception ("unrecognized option '" + arg_name + "', try --help");
 	}
+}
+
+
+void
+Application::print_copyrights (std::ostream& out)
+{
+	using std::endl;
+
+	out	<< "Main program license" << std::endl
+		<< "====================" << endl
+		<< endl
+		<< License::main << endl
+		<< endl;
+	out << "Fonts" << endl
+		<< "=====" << endl
+		<< License::font_crystal << endl
+		<< endl;
+	out << "The 'half' library is distributed under the following license" << endl
+		<< "=============================================================" << endl
+		<< endl
+		<< License::lib_half << endl
+		<< endl;
+	out << "The 'kdtree++' library is distributed under the following license" << endl
+		<< "=================================================================" << endl
+		<< endl
+		<< License::lib_kdtreeplusplus << endl
+		<< endl;
 }
 
 

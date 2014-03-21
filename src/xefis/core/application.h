@@ -167,6 +167,12 @@ class Application: public QApplication
 	parse_args (int argc, char** argv);
 
 	/**
+	 * Print copyright information on iostream.
+	 */
+	static void
+	print_copyrights (std::ostream&);
+
+	/**
 	 * UNIX signal handler. Calls quit() on Application instance.
 	 */
 	static void
