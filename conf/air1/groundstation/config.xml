@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
 	<settings>
+		<setting name='update-frequency' value='100 Hz'/>
 		<setting name='navaids.enable' value='true'/>
 		<setting name='scale.pen' value='0.92'/>
 		<setting name='scale.font' value='1.0'/>

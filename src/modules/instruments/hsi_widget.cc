@@ -83,7 +83,7 @@ HSIWidget::PaintWorkUnit::resized()
 		{
 			_q = 0.0500f * size().height();
 			_r = 0.7111f * size().height();
-			float const rx = nm_to_px (_params.range);
+			float const rx = to_px (_params.range);
 
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * size().width(), 0.8f * size().height());
@@ -110,7 +110,7 @@ HSIWidget::PaintWorkUnit::resized()
 			_r = 0.40f * size().height();
 			if (_r > 0.85f * wh())
 				_r = 0.85f * wh();
-			float const rx = nm_to_px (_params.range);
+			float const rx = to_px (_params.range);
 
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * size().width(), 0.5 * size().height());
@@ -135,7 +135,7 @@ HSIWidget::PaintWorkUnit::resized()
 		{
 			_q = 0.1f * wh();
 			_r = 6.5f * _q;
-			float const rx = nm_to_px (_params.range);
+			float const rx = to_px (_params.range);
 
 			_aircraft_center_transform.reset();
 			_aircraft_center_transform.translate (0.5f * size().width(), 0.705f * size().height());
@@ -464,7 +464,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 	if (2.f * trend_start > trend_range)
 		trend_range = 0_nm;
 
-	float start_point = _params.trend_vector_visible ? -nm_to_px (trend_range) - 0.25f * _q : 0.f;
+	float start_point = _params.trend_vector_visible ? -to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
@@ -494,7 +494,7 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 				range = 1_nm * std::round (((10.f * ratio * _params.range) / 10.f).nm());
 			else
 				range = ratio * _params.range;
-			float range_tick_vpx = nm_to_px (range);
+			float range_tick_vpx = to_px (range);
 			float range_tick_hpx = 0.1f * _q;
 			int precision = 0;
 			if (range < 1_nm)
@@ -544,8 +544,8 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
-	float len = Xefis::limit (nm_to_px (6_nm), 2.f * _q, 7.f * _q);
-	float pos = nm_to_px (_params.altitude_reach_distance);
+	float len = Xefis::limit (to_px (6_nm), 2.f * _q, 7.f * _q);
+	float pos = to_px (_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
 	rect.moveTop (-pos);
@@ -591,7 +591,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 		for (Length pos = 0_nm; pos < trend_range; pos += step)
 		{
 			step = pos > trend_range ? normal_step : initial_step;
-			float px = nm_to_px (step);
+			float px = to_px (step);
 			transform.rotate (angle_per_step.deg());
 			if (pos > trend_start)
 				polygon << transform.map (QPointF (0.f, -px));
@@ -1403,14 +1403,14 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 					for (Xefis::Navaid::Runway const& runway: navaid.runways())
 					{
 						// Make the drawn runway somewhat more wide:
-						double half_width = 1.5 * nm_to_px (runway.width());
+						double half_width = 1.5 * to_px (runway.width());
 						QTransform tr_l; tr_l.translate (-half_width, 0.0);
 						QTransform tr_r; tr_r.translate (+half_width, 0.0);
 						// Find runway's true bearing from pos_1 to pos_2 and runway
 						// length in pixels:
 						Angle true_bearing = runway.pos_1().initial_bearing (runway.pos_2());
-						double length_px = nm_to_px (runway.pos_1().haversine_earth (runway.pos_2()));
-						double extended_length_px = nm_to_px (_params.arpt_runway_extension_length);
+						double length_px = to_px (runway.pos_1().haversine_earth (runway.pos_2()));
+						double extended_length_px = to_px (_params.arpt_runway_extension_length);
 						// Create transform so that the first end of the runway
 						// is at (0, 0) and runway extends to the top.
 						QPointF point_1 = get_navaid_xy (runway.pos_1());
@@ -1425,7 +1425,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 						painter.drawLine (tr_l.map (QPointF (0.0, 0.0)), tr_l.map (QPointF (0.0, -length_px)));
 						painter.drawLine (tr_r.map (QPointF (0.0, 0.0)), tr_r.map (QPointF (0.0, -length_px)));
 						// Extended runway:
-						double m_px = Xefis::limit<double> (nm_to_px (1_m), 0.02, 0.04);
+						double m_px = Xefis::limit<double> (to_px (1_m), 0.02, 0.04);
 						QPen dashed_pen = get_pen (Qt::white, 1.0, Qt::DashLine);
 						dashed_pen.setDashPattern (QVector<qreal>() << 300 * m_px << 200 * m_px);
 						painter.setPen (dashed_pen);
@@ -1552,7 +1552,7 @@ HSIWidget::PaintWorkUnit::paint_locs()
 		transform = _features_transform * transform;
 		transform.rotate (navaid.true_bearing().deg());
 
-		float const line_1 = nm_to_px (navaid.range());
+		float const line_1 = to_px (navaid.range());
 		float const line_2 = 1.03f * line_1;
 
 		QPointF pt_0 (0.f, line_1);
@@ -1611,7 +1611,7 @@ HSIWidget::PaintWorkUnit::paint_tcas()
 	{
 		double z = 0.075 * _q;
 		double v = 0.025 * _q;
-		double r = nm_to_px (*_params.tcas_range);
+		double r = to_px (*_params.tcas_range);
 
 		// Don't draw too small range points:
 		if (r > 15.0)

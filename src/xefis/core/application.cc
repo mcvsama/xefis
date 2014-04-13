@@ -75,12 +75,6 @@ Application::Application (int& argc, char** argv):
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
 	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 
-	_data_updater = new QTimer (this);
-	_data_updater->setInterval (10.f);
-	_data_updater->setSingleShot (false);
-	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
-	_data_updater->start();
-
 	signal (SIGHUP, s_quit);
 
 	const char* config_file = getenv ("XEFIS_CONFIG");
@@ -103,6 +97,12 @@ Application::Application (int& argc, char** argv):
 
 	if (_config_reader->has_windows())
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (_module_manager.get(), nullptr);
+
+	_data_updater = new QTimer (this);
+	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).ms());
+	_data_updater->setSingleShot (false);
+	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
+	_data_updater->start();
 }
 
 
@@ -194,9 +194,23 @@ Application::parse_args (int argc, char** argv)
 				throw NonValuedArgumentException (arg_name);
 			_options[Option::ModulesDebugLog] = "";
 		}
+		else if (arg_name == "--watchdog-write-fd")
+		{
+			if (arg_value.empty())
+				throw MissingValueException (arg_name);
+			_options[Option::WatchdogWriteFd] = arg_value;
+		}
+		else if (arg_name == "--watchdog-read-fd")
+		{
+			if (arg_value.empty())
+				throw MissingValueException (arg_name);
+			_options[Option::WatchdogReadFd] = arg_value;
+		}
 		else
 			throw Exception ("unrecognized option '" + arg_name + "', try --help");
 	}
+
+	_options_helper = std::make_unique<OptionsHelper> (this);
 }
 
 

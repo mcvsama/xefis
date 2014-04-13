@@ -231,22 +231,28 @@ class ConfigReader
 	has_windows() const;
 
 	/**
+	 * Return module update frequency.
+	 */
+	Frequency
+	update_frequency() const noexcept;
+
+	/**
 	 * Return true if navaids are supposed to be loaded.
 	 */
 	bool
-	load_navaids() const;
+	load_navaids() const noexcept;
 
 	/**
 	 * Return master pen scale.
 	 */
 	float
-	pen_scale() const;
+	pen_scale() const noexcept;
 
 	/**
 	 * Return master font scale.
 	 */
 	float
-	font_scale() const;
+	font_scale() const noexcept;
 
 	/**
 	 * Return sub-configuration for the Airframe module.
@@ -293,6 +299,7 @@ class ConfigReader
 	std::list<QDomElement>	_modules_elements;
 	QDomElement				_airframe_config;
 	bool					_has_windows		= false;
+	Frequency				_update_frequency	= 100_Hz;
 	bool					_navaids_enable		= true;
 	float					_scale_pen			= 1.f;
 	float					_scale_font			= 1.f;
@@ -354,22 +361,29 @@ ConfigReader::has_windows() const
 }
 
 
+inline Frequency
+ConfigReader::update_frequency() const noexcept
+{
+	return _update_frequency;
+}
+
+
 inline bool
-ConfigReader::load_navaids() const
+ConfigReader::load_navaids() const noexcept
 {
 	return _navaids_enable;
 }
 
 
 inline float
-ConfigReader::pen_scale() const
+ConfigReader::pen_scale() const noexcept
 {
 	return _scale_pen;
 }
 
 
 inline float
-ConfigReader::font_scale() const
+ConfigReader::font_scale() const noexcept
 {
 	return _scale_font;
 }

@@ -1,370 +1,400 @@
 # vim:ts=4
 
+######## /lib/si ########
+
+SI_HEADERS += lib/si/all.h
+SI_HEADERS += lib/si/angle.h
+SI_HEADERS += lib/si/constants.h
+SI_HEADERS += lib/si/frequency.h
+SI_HEADERS += lib/si/length.h
+SI_HEADERS += lib/si/lonlat.h
+SI_HEADERS += lib/si/operators.h
+SI_HEADERS += lib/si/pressure.h
+SI_HEADERS += lib/si/speed.h
+SI_HEADERS += lib/si/temperature.h
+SI_HEADERS += lib/si/time.h
+SI_HEADERS += lib/si/value.h
+
+SI_SOURCES += lib/si/angle.cc
+SI_SOURCES += lib/si/frequency.cc
+SI_SOURCES += lib/si/length.cc
+SI_SOURCES += lib/si/lonlat.cc
+SI_SOURCES += lib/si/pressure.cc
+SI_SOURCES += lib/si/speed.cc
+SI_SOURCES += lib/si/temperature.cc
+SI_SOURCES += lib/si/time.cc
+
 ######## /xefis ########
 
-SRC_SOURCES += xefis/main.cc
+XEFIS_HEADERS += $(SI_HEADERS)
+
+XEFIS_SOURCES += $(SI_SOURCES)
+XEFIS_SOURCES += xefis/main.cc
+
+WATCHDOG_HEADERS += $(SI_HEADERS)
+WATCHDOG_HEADERS += xefis/core/fail.h
+WATCHDOG_HEADERS += xefis/core/services.h
+WATCHDOG_HEADERS += xefis/utility/backtrace.h
+
+WATCHDOG_SOURCES += $(SI_SOURCES)
+WATCHDOG_SOURCES += xefis/core/fail.cc
+WATCHDOG_SOURCES += xefis/core/services.cc
+WATCHDOG_SOURCES += xefis/utility/backtrace.cc
+WATCHDOG_SOURCES += xefis/watchdog.cc
+
+WATCHDOG_MOCHDRS += xefis/core/services.h
 
 ######## /xefis/airframe ########
 
-SRC_HEADERS += xefis/airframe/airframe.h
-SRC_HEADERS += xefis/airframe/flaps.h
+XEFIS_HEADERS += xefis/airframe/airframe.h
+XEFIS_HEADERS += xefis/airframe/flaps.h
 
-SRC_SOURCES += xefis/airframe/airframe.cc
-SRC_SOURCES += xefis/airframe/flaps.cc
+XEFIS_SOURCES += xefis/airframe/airframe.cc
+XEFIS_SOURCES += xefis/airframe/flaps.cc
 
 ######## /xefis/airnav ########
 
-SRC_HEADERS += xefis/airnav/density_altitude.h
-SRC_HEADERS += xefis/airnav/magnetic_variation.h
-SRC_HEADERS += xefis/airnav/sound_speed.h
-SRC_HEADERS += xefis/airnav/wind_triangle.h
+XEFIS_HEADERS += xefis/airnav/density_altitude.h
+XEFIS_HEADERS += xefis/airnav/magnetic_variation.h
+XEFIS_HEADERS += xefis/airnav/sound_speed.h
+XEFIS_HEADERS += xefis/airnav/wind_triangle.h
 
-SRC_SOURCES += xefis/airnav/magnetic_variation.cc
+XEFIS_SOURCES += xefis/airnav/magnetic_variation.cc
 
 ######## /xefis/components ########
 
-SRC_HEADERS += xefis/components/property_editor/property_editor.h
-SRC_HEADERS += xefis/components/property_editor/property_tree_widget.h
-SRC_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
-SRC_HEADERS += xefis/components/configurator/configurator_widget.h
-SRC_HEADERS += xefis/components/configurator/modules_list.h
-SRC_HEADERS += xefis/components/configurator/modules_list_item.h
+XEFIS_HEADERS += xefis/components/property_editor/property_editor.h
+XEFIS_HEADERS += xefis/components/property_editor/property_tree_widget.h
+XEFIS_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
+XEFIS_HEADERS += xefis/components/configurator/configurator_widget.h
+XEFIS_HEADERS += xefis/components/configurator/modules_list.h
+XEFIS_HEADERS += xefis/components/configurator/modules_list_item.h
 
-SRC_SOURCES += xefis/components/property_editor/property_editor.cc
-SRC_SOURCES += xefis/components/property_editor/property_tree_widget.cc
-SRC_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
-SRC_SOURCES += xefis/components/configurator/configurator_widget.cc
-SRC_SOURCES += xefis/components/configurator/modules_list.cc
-SRC_SOURCES += xefis/components/configurator/modules_list_item.cc
+XEFIS_SOURCES += xefis/components/property_editor/property_editor.cc
+XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget.cc
+XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
+XEFIS_SOURCES += xefis/components/configurator/configurator_widget.cc
+XEFIS_SOURCES += xefis/components/configurator/modules_list.cc
+XEFIS_SOURCES += xefis/components/configurator/modules_list_item.cc
 
-SRC_MOCHDRS += xefis/components/property_editor/property_editor.h
-SRC_MOCHDRS += xefis/components/property_editor/property_tree_widget.h
-SRC_MOCHDRS += xefis/components/configurator/configurator_widget.h
-SRC_MOCHDRS += xefis/components/configurator/modules_list.h
+XEFIS_MOCHDRS += xefis/components/property_editor/property_editor.h
+XEFIS_MOCHDRS += xefis/components/property_editor/property_tree_widget.h
+XEFIS_MOCHDRS += xefis/components/configurator/configurator_widget.h
+XEFIS_MOCHDRS += xefis/components/configurator/modules_list.h
 
 ######## /xefis/config ########
 
-SRC_HEADERS += xefis/config/all.h
-SRC_HEADERS += xefis/config/constants.h
-SRC_HEADERS += xefis/config/resources.h
-SRC_HEADERS += xefis/config/system.h
-SRC_HEADERS += xefis/config/types.h
-SRC_HEADERS += xefis/config/cpp14.h
-SRC_HEADERS += xefis/config/exception.h
-SRC_HEADERS += xefis/config/version.h
+XEFIS_HEADERS += xefis/config/all.h
+XEFIS_HEADERS += xefis/config/constants.h
+XEFIS_HEADERS += xefis/config/resources.h
+XEFIS_HEADERS += xefis/config/system.h
+XEFIS_HEADERS += xefis/config/types.h
+XEFIS_HEADERS += xefis/config/cpp14.h
+XEFIS_HEADERS += xefis/config/exception.h
+XEFIS_HEADERS += xefis/config/version.h
 
 NODEP_SOURCES += $(VERSION_FILE)
 
 ######## /xefis/core ########
 
-SRC_HEADERS += xefis/core/accounting.h
-SRC_HEADERS += xefis/core/application.h
-SRC_HEADERS += xefis/core/config_reader.h
-SRC_HEADERS += xefis/core/fail.h
-SRC_HEADERS += xefis/core/instrument.h
-SRC_HEADERS += xefis/core/instrument_aids.h
-SRC_HEADERS += xefis/core/instrument_widget.h
-SRC_HEADERS += xefis/core/licenses.h
-SRC_HEADERS += xefis/core/module.h
-SRC_HEADERS += xefis/core/module_manager.h
-SRC_HEADERS += xefis/core/navaid.h
-SRC_HEADERS += xefis/core/navaid_storage.h
-SRC_HEADERS += xefis/core/panel.h
-SRC_HEADERS += xefis/core/property.h
-SRC_HEADERS += xefis/core/property_node.h
-SRC_HEADERS += xefis/core/property_observer.h
-SRC_HEADERS += xefis/core/property_storage.h
-SRC_HEADERS += xefis/core/services.h
-SRC_HEADERS += xefis/core/sound_manager.h
-SRC_HEADERS += xefis/core/window.h
-SRC_HEADERS += xefis/core/window_manager.h
-SRC_HEADERS += xefis/core/work_performer.h
+XEFIS_HEADERS += xefis/core/accounting.h
+XEFIS_HEADERS += xefis/core/application.h
+XEFIS_HEADERS += xefis/core/config_reader.h
+XEFIS_HEADERS += xefis/core/fail.h
+XEFIS_HEADERS += xefis/core/instrument.h
+XEFIS_HEADERS += xefis/core/instrument_aids.h
+XEFIS_HEADERS += xefis/core/instrument_widget.h
+XEFIS_HEADERS += xefis/core/licenses.h
+XEFIS_HEADERS += xefis/core/module.h
+XEFIS_HEADERS += xefis/core/module_manager.h
+XEFIS_HEADERS += xefis/core/navaid.h
+XEFIS_HEADERS += xefis/core/navaid_storage.h
+XEFIS_HEADERS += xefis/core/panel.h
+XEFIS_HEADERS += xefis/core/property.h
+XEFIS_HEADERS += xefis/core/property_node.h
+XEFIS_HEADERS += xefis/core/property_observer.h
+XEFIS_HEADERS += xefis/core/property_storage.h
+XEFIS_HEADERS += xefis/core/services.h
+XEFIS_HEADERS += xefis/core/sound_manager.h
+XEFIS_HEADERS += xefis/core/window.h
+XEFIS_HEADERS += xefis/core/window_manager.h
+XEFIS_HEADERS += xefis/core/work_performer.h
 
-SRC_SOURCES += xefis/core/accounting.cc
-SRC_SOURCES += xefis/core/application.cc
-SRC_SOURCES += xefis/core/config_reader.cc
-SRC_SOURCES += xefis/core/fail.cc
-SRC_SOURCES += xefis/core/instrument_aids.cc
-SRC_SOURCES += xefis/core/instrument_widget.cc
-SRC_SOURCES += xefis/core/licenses.cc
-SRC_SOURCES += xefis/core/module.cc
-SRC_SOURCES += xefis/core/module_manager.cc
-SRC_SOURCES += xefis/core/navaid.cc
-SRC_SOURCES += xefis/core/navaid_storage.cc
-SRC_SOURCES += xefis/core/panel.cc
-SRC_SOURCES += xefis/core/property_node.cc
-SRC_SOURCES += xefis/core/property_observer.cc
-SRC_SOURCES += xefis/core/property_storage.cc
-SRC_SOURCES += xefis/core/services.cc
-SRC_SOURCES += xefis/core/sound_manager.cc
-SRC_SOURCES += xefis/core/window.cc
-SRC_SOURCES += xefis/core/window_manager.cc
-SRC_SOURCES += xefis/core/work_performer.cc
+XEFIS_SOURCES += xefis/core/accounting.cc
+XEFIS_SOURCES += xefis/core/application.cc
+XEFIS_SOURCES += xefis/core/config_reader.cc
+XEFIS_SOURCES += xefis/core/fail.cc
+XEFIS_SOURCES += xefis/core/instrument_aids.cc
+XEFIS_SOURCES += xefis/core/instrument_widget.cc
+XEFIS_SOURCES += xefis/core/licenses.cc
+XEFIS_SOURCES += xefis/core/module.cc
+XEFIS_SOURCES += xefis/core/module_manager.cc
+XEFIS_SOURCES += xefis/core/navaid.cc
+XEFIS_SOURCES += xefis/core/navaid_storage.cc
+XEFIS_SOURCES += xefis/core/panel.cc
+XEFIS_SOURCES += xefis/core/property_node.cc
+XEFIS_SOURCES += xefis/core/property_observer.cc
+XEFIS_SOURCES += xefis/core/property_storage.cc
+XEFIS_SOURCES += xefis/core/services.cc
+XEFIS_SOURCES += xefis/core/sound_manager.cc
+XEFIS_SOURCES += xefis/core/window.cc
+XEFIS_SOURCES += xefis/core/window_manager.cc
+XEFIS_SOURCES += xefis/core/work_performer.cc
 
-SRC_MOCHDRS += xefis/core/accounting.h
-SRC_MOCHDRS += xefis/core/application.h
-SRC_MOCHDRS += xefis/core/panel.h
-SRC_MOCHDRS += xefis/core/services.h
-SRC_MOCHDRS += xefis/core/window.h
+XEFIS_MOCHDRS += xefis/core/accounting.h
+XEFIS_MOCHDRS += xefis/core/application.h
+XEFIS_MOCHDRS += xefis/core/panel.h
+XEFIS_MOCHDRS += xefis/core/services.h
+XEFIS_MOCHDRS += xefis/core/window.h
 
 ######## /xefis/hardware ########
 
-SRC_HEADERS += xefis/hardware/chr_um6.h
+XEFIS_HEADERS += xefis/hardware/chr_um6.h
 
-SRC_SOURCES += xefis/hardware/chr_um6.cc
+XEFIS_SOURCES += xefis/hardware/chr_um6.cc
 
 ######## /xefis/utility ########
 
-SRC_HEADERS += xefis/utility/backtrace.h
-SRC_HEADERS += xefis/utility/convergence.h
-SRC_HEADERS += xefis/utility/delta_decoder.h
-SRC_HEADERS += xefis/utility/hash.h
-SRC_HEADERS += xefis/utility/hextable.h
-SRC_HEADERS += xefis/utility/i2c.h
-SRC_HEADERS += xefis/utility/logger.h
-SRC_HEADERS += xefis/utility/lookahead.h
-SRC_HEADERS += xefis/utility/mutex.h
-SRC_HEADERS += xefis/utility/navigation.h
-SRC_HEADERS += xefis/utility/noncopyable.h
-SRC_HEADERS += xefis/utility/numeric.h
-SRC_HEADERS += xefis/utility/packet_reader.h
-SRC_HEADERS += xefis/utility/painter.h
-SRC_HEADERS += xefis/utility/pid_control.h
-SRC_HEADERS += xefis/utility/qdom.h
-SRC_HEADERS += xefis/utility/qzdevice.h
-SRC_HEADERS += xefis/utility/range.h
-SRC_HEADERS += xefis/utility/resource.h
-SRC_HEADERS += xefis/utility/rotary_decoder.h
-SRC_HEADERS += xefis/utility/semaphore.h
-SRC_HEADERS += xefis/utility/serial_port.h
-SRC_HEADERS += xefis/utility/smoother.h
-SRC_HEADERS += xefis/utility/string.h
-SRC_HEADERS += xefis/utility/text_layout.h
-SRC_HEADERS += xefis/utility/text_painter.h
-SRC_HEADERS += xefis/utility/thread.h
-SRC_HEADERS += xefis/utility/time.h
+XEFIS_HEADERS += xefis/utility/backtrace.h
+XEFIS_HEADERS += xefis/utility/convergence.h
+XEFIS_HEADERS += xefis/utility/delta_decoder.h
+XEFIS_HEADERS += xefis/utility/hash.h
+XEFIS_HEADERS += xefis/utility/hextable.h
+XEFIS_HEADERS += xefis/utility/i2c.h
+XEFIS_HEADERS += xefis/utility/logger.h
+XEFIS_HEADERS += xefis/utility/lookahead.h
+XEFIS_HEADERS += xefis/utility/mutex.h
+XEFIS_HEADERS += xefis/utility/navigation.h
+XEFIS_HEADERS += xefis/utility/noncopyable.h
+XEFIS_HEADERS += xefis/utility/numeric.h
+XEFIS_HEADERS += xefis/utility/packet_reader.h
+XEFIS_HEADERS += xefis/utility/painter.h
+XEFIS_HEADERS += xefis/utility/pid_control.h
+XEFIS_HEADERS += xefis/utility/qdom.h
+XEFIS_HEADERS += xefis/utility/qzdevice.h
+XEFIS_HEADERS += xefis/utility/range.h
+XEFIS_HEADERS += xefis/utility/resource.h
+XEFIS_HEADERS += xefis/utility/rotary_decoder.h
+XEFIS_HEADERS += xefis/utility/semaphore.h
+XEFIS_HEADERS += xefis/utility/serial_port.h
+XEFIS_HEADERS += xefis/utility/smoother.h
+XEFIS_HEADERS += xefis/utility/string.h
+XEFIS_HEADERS += xefis/utility/text_layout.h
+XEFIS_HEADERS += xefis/utility/text_painter.h
+XEFIS_HEADERS += xefis/utility/thread.h
+XEFIS_HEADERS += xefis/utility/time.h
 
-SRC_SOURCES += xefis/utility/backtrace.cc
-SRC_SOURCES += xefis/utility/delta_decoder.cc
-SRC_SOURCES += xefis/utility/i2c.cc
-SRC_SOURCES += xefis/utility/mutex.cc
-SRC_SOURCES += xefis/utility/packet_reader.cc
-SRC_SOURCES += xefis/utility/painter.cc
-SRC_SOURCES += xefis/utility/qzdevice.cc
-SRC_SOURCES += xefis/utility/rotary_decoder.cc
-SRC_SOURCES += xefis/utility/semaphore.cc
-SRC_SOURCES += xefis/utility/serial_port.cc
-SRC_SOURCES += xefis/utility/text_layout.cc
-SRC_SOURCES += xefis/utility/text_painter.cc
-SRC_SOURCES += xefis/utility/thread.cc
+XEFIS_SOURCES += xefis/utility/backtrace.cc
+XEFIS_SOURCES += xefis/utility/delta_decoder.cc
+XEFIS_SOURCES += xefis/utility/i2c.cc
+XEFIS_SOURCES += xefis/utility/mutex.cc
+XEFIS_SOURCES += xefis/utility/packet_reader.cc
+XEFIS_SOURCES += xefis/utility/painter.cc
+XEFIS_SOURCES += xefis/utility/qzdevice.cc
+XEFIS_SOURCES += xefis/utility/rotary_decoder.cc
+XEFIS_SOURCES += xefis/utility/semaphore.cc
+XEFIS_SOURCES += xefis/utility/serial_port.cc
+XEFIS_SOURCES += xefis/utility/text_layout.cc
+XEFIS_SOURCES += xefis/utility/text_painter.cc
+XEFIS_SOURCES += xefis/utility/thread.cc
 
-SRC_MOCHDRS += xefis/utility/serial_port.h
+XEFIS_MOCHDRS += xefis/utility/serial_port.h
 
 ######## /xefis/widgets ########
 
-SRC_HEADERS += xefis/widgets/group_box.h
-SRC_HEADERS += xefis/widgets/panel_button.h
-SRC_HEADERS += xefis/widgets/panel_rotary_encoder.h
-SRC_HEADERS += xefis/widgets/panel_numeric_display.h
-SRC_HEADERS += xefis/widgets/panel_widget.h
+XEFIS_HEADERS += xefis/widgets/group_box.h
+XEFIS_HEADERS += xefis/widgets/panel_button.h
+XEFIS_HEADERS += xefis/widgets/panel_rotary_encoder.h
+XEFIS_HEADERS += xefis/widgets/panel_numeric_display.h
+XEFIS_HEADERS += xefis/widgets/panel_widget.h
 
-SRC_SOURCES += xefis/widgets/group_box.cc
-SRC_SOURCES += xefis/widgets/panel_button.cc
-SRC_SOURCES += xefis/widgets/panel_rotary_encoder.cc
-SRC_SOURCES += xefis/widgets/panel_numeric_display.cc
-SRC_SOURCES += xefis/widgets/panel_widget.cc
+XEFIS_SOURCES += xefis/widgets/group_box.cc
+XEFIS_SOURCES += xefis/widgets/panel_button.cc
+XEFIS_SOURCES += xefis/widgets/panel_rotary_encoder.cc
+XEFIS_SOURCES += xefis/widgets/panel_numeric_display.cc
+XEFIS_SOURCES += xefis/widgets/panel_widget.cc
 
-SRC_MOCHDRS += xefis/widgets/panel_button.h
-SRC_MOCHDRS += xefis/widgets/panel_rotary_encoder.h
-
-######## /lib/si ########
-
-SRC_HEADERS += lib/si/all.h
-SRC_HEADERS += lib/si/angle.h
-SRC_HEADERS += lib/si/constants.h
-SRC_HEADERS += lib/si/frequency.h
-SRC_HEADERS += lib/si/length.h
-SRC_HEADERS += lib/si/lonlat.h
-SRC_HEADERS += lib/si/operators.h
-SRC_HEADERS += lib/si/pressure.h
-SRC_HEADERS += lib/si/speed.h
-SRC_HEADERS += lib/si/temperature.h
-SRC_HEADERS += lib/si/time.h
-SRC_HEADERS += lib/si/value.h
-
-SRC_SOURCES += lib/si/angle.cc
-SRC_SOURCES += lib/si/frequency.cc
-SRC_SOURCES += lib/si/length.cc
-SRC_SOURCES += lib/si/lonlat.cc
-SRC_SOURCES += lib/si/pressure.cc
-SRC_SOURCES += lib/si/speed.cc
-SRC_SOURCES += lib/si/temperature.cc
-SRC_SOURCES += lib/si/time.cc
+XEFIS_MOCHDRS += xefis/widgets/panel_button.h
+XEFIS_MOCHDRS += xefis/widgets/panel_rotary_encoder.h
 
 ######## /modules/instruments ########
 
-SRC_HEADERS += modules/helpers/lonlat_translator.h
-SRC_HEADERS += modules/helpers/navaid_selector.h
-SRC_HEADERS += modules/helpers/string_translator.h
+XEFIS_HEADERS += modules/helpers/lonlat_translator.h
+XEFIS_HEADERS += modules/helpers/navaid_selector.h
+XEFIS_HEADERS += modules/helpers/string_translator.h
 
-SRC_SOURCES += modules/helpers/lonlat_translator.cc
-SRC_SOURCES += modules/helpers/navaid_selector.cc
-SRC_SOURCES += modules/helpers/string_translator.cc
+XEFIS_SOURCES += modules/helpers/lonlat_translator.cc
+XEFIS_SOURCES += modules/helpers/navaid_selector.cc
+XEFIS_SOURCES += modules/helpers/string_translator.cc
 
 ######## /modules/instruments ########
 
-SRC_HEADERS += modules/instruments/datatable.h
-SRC_HEADERS += modules/instruments/efis.h
-SRC_HEADERS += modules/instruments/efis_widget.h
-SRC_HEADERS += modules/instruments/flaps.h
-SRC_HEADERS += modules/instruments/gear.h
-SRC_HEADERS += modules/instruments/horizontal_trim.h
-SRC_HEADERS += modules/instruments/hsi.h
-SRC_HEADERS += modules/instruments/hsi_widget.h
-SRC_HEADERS += modules/instruments/label.h
-SRC_HEADERS += modules/instruments/linear_indicator.h
-SRC_HEADERS += modules/instruments/linear_indicator_widget.h
-SRC_HEADERS += modules/instruments/radial_indicator.h
-SRC_HEADERS += modules/instruments/radial_indicator_widget.h
-SRC_HEADERS += modules/instruments/status.h
-SRC_HEADERS += modules/instruments/status_widget.h
-SRC_HEADERS += modules/instruments/vertical_trim.h
+XEFIS_HEADERS += modules/instruments/datatable.h
+XEFIS_HEADERS += modules/instruments/efis.h
+XEFIS_HEADERS += modules/instruments/efis_widget.h
+XEFIS_HEADERS += modules/instruments/flaps.h
+XEFIS_HEADERS += modules/instruments/gear.h
+XEFIS_HEADERS += modules/instruments/horizontal_trim.h
+XEFIS_HEADERS += modules/instruments/hsi.h
+XEFIS_HEADERS += modules/instruments/hsi_widget.h
+XEFIS_HEADERS += modules/instruments/label.h
+XEFIS_HEADERS += modules/instruments/linear_indicator.h
+XEFIS_HEADERS += modules/instruments/linear_indicator_widget.h
+XEFIS_HEADERS += modules/instruments/radial_indicator.h
+XEFIS_HEADERS += modules/instruments/radial_indicator_widget.h
+XEFIS_HEADERS += modules/instruments/status.h
+XEFIS_HEADERS += modules/instruments/status_widget.h
+XEFIS_HEADERS += modules/instruments/vertical_trim.h
 
-SRC_SOURCES += modules/instruments/datatable.cc
-SRC_SOURCES += modules/instruments/efis.cc
-SRC_SOURCES += modules/instruments/efis_widget.cc
-SRC_SOURCES += modules/instruments/flaps.cc
-SRC_SOURCES += modules/instruments/gear.cc
-SRC_SOURCES += modules/instruments/horizontal_trim.cc
-SRC_SOURCES += modules/instruments/hsi.cc
-SRC_SOURCES += modules/instruments/hsi_widget.cc
-SRC_SOURCES += modules/instruments/label.cc
-SRC_SOURCES += modules/instruments/linear_indicator.cc
-SRC_SOURCES += modules/instruments/linear_indicator_widget.cc
-SRC_SOURCES += modules/instruments/radial_indicator.cc
-SRC_SOURCES += modules/instruments/radial_indicator_widget.cc
-SRC_SOURCES += modules/instruments/status.cc
-SRC_SOURCES += modules/instruments/status_widget.cc
-SRC_SOURCES += modules/instruments/vertical_trim.cc
+XEFIS_SOURCES += modules/instruments/datatable.cc
+XEFIS_SOURCES += modules/instruments/efis.cc
+XEFIS_SOURCES += modules/instruments/efis_widget.cc
+XEFIS_SOURCES += modules/instruments/flaps.cc
+XEFIS_SOURCES += modules/instruments/gear.cc
+XEFIS_SOURCES += modules/instruments/horizontal_trim.cc
+XEFIS_SOURCES += modules/instruments/hsi.cc
+XEFIS_SOURCES += modules/instruments/hsi_widget.cc
+XEFIS_SOURCES += modules/instruments/label.cc
+XEFIS_SOURCES += modules/instruments/linear_indicator.cc
+XEFIS_SOURCES += modules/instruments/linear_indicator_widget.cc
+XEFIS_SOURCES += modules/instruments/radial_indicator.cc
+XEFIS_SOURCES += modules/instruments/radial_indicator_widget.cc
+XEFIS_SOURCES += modules/instruments/status.cc
+XEFIS_SOURCES += modules/instruments/status_widget.cc
+XEFIS_SOURCES += modules/instruments/vertical_trim.cc
 
-SRC_MOCHDRS += modules/instruments/efis.h
-SRC_MOCHDRS += modules/instruments/efis_widget.h
-SRC_MOCHDRS += modules/instruments/hsi.h
-SRC_MOCHDRS += modules/instruments/status.h
+XEFIS_MOCHDRS += modules/instruments/efis.h
+XEFIS_MOCHDRS += modules/instruments/efis_widget.h
+XEFIS_MOCHDRS += modules/instruments/hsi.h
+XEFIS_MOCHDRS += modules/instruments/status.h
 
 ######## /modules/io ########
 
-SRC_HEADERS += modules/io/bmp085.h
-SRC_HEADERS += modules/io/chr_um6.h
-SRC_HEADERS += modules/io/ets_airspeed.h
-SRC_HEADERS += modules/io/flight_gear.h
-SRC_HEADERS += modules/io/gps.h
-SRC_HEADERS += modules/io/ht16k33.h
-SRC_HEADERS += modules/io/joystick.h
-SRC_HEADERS += modules/io/mouse.h
-SRC_HEADERS += modules/io/pca9685.h
-SRC_HEADERS += modules/io/link.h
-SRC_HEADERS += modules/io/udp.h
-SRC_HEADERS += modules/io/xbee.h
+XEFIS_HEADERS += modules/io/bmp085.h
+XEFIS_HEADERS += modules/io/chr_um6.h
+XEFIS_HEADERS += modules/io/ets_airspeed.h
+XEFIS_HEADERS += modules/io/flight_gear.h
+XEFIS_HEADERS += modules/io/gps.h
+XEFIS_HEADERS += modules/io/ht16k33.h
+XEFIS_HEADERS += modules/io/joystick.h
+XEFIS_HEADERS += modules/io/mouse.h
+XEFIS_HEADERS += modules/io/pca9685.h
+XEFIS_HEADERS += modules/io/link.h
+XEFIS_HEADERS += modules/io/udp.h
+XEFIS_HEADERS += modules/io/xbee.h
 
-SRC_SOURCES += modules/io/bmp085.cc
-SRC_SOURCES += modules/io/chr_um6.cc
-SRC_SOURCES += modules/io/ets_airspeed.cc
-SRC_SOURCES += modules/io/flight_gear.cc
-SRC_SOURCES += modules/io/gps.cc
-SRC_SOURCES += modules/io/ht16k33.cc
-SRC_SOURCES += modules/io/joystick.cc
-SRC_SOURCES += modules/io/mouse.cc
-SRC_SOURCES += modules/io/pca9685.cc
-SRC_SOURCES += modules/io/link.cc
-SRC_SOURCES += modules/io/udp.cc
-SRC_SOURCES += modules/io/xbee.cc
+XEFIS_SOURCES += modules/io/bmp085.cc
+XEFIS_SOURCES += modules/io/chr_um6.cc
+XEFIS_SOURCES += modules/io/ets_airspeed.cc
+XEFIS_SOURCES += modules/io/flight_gear.cc
+XEFIS_SOURCES += modules/io/gps.cc
+XEFIS_SOURCES += modules/io/ht16k33.cc
+XEFIS_SOURCES += modules/io/joystick.cc
+XEFIS_SOURCES += modules/io/mouse.cc
+XEFIS_SOURCES += modules/io/pca9685.cc
+XEFIS_SOURCES += modules/io/link.cc
+XEFIS_SOURCES += modules/io/udp.cc
+XEFIS_SOURCES += modules/io/xbee.cc
 
-SRC_MOCHDRS += modules/io/bmp085.h
-SRC_MOCHDRS += modules/io/chr_um6.h
-SRC_MOCHDRS += modules/io/ets_airspeed.h
-SRC_MOCHDRS += modules/io/flight_gear.h
-SRC_MOCHDRS += modules/io/gps.h
-SRC_MOCHDRS += modules/io/ht16k33.h
-SRC_MOCHDRS += modules/io/joystick.h
-SRC_MOCHDRS += modules/io/mouse.h
-SRC_MOCHDRS += modules/io/pca9685.h
-SRC_MOCHDRS += modules/io/link.h
-SRC_MOCHDRS += modules/io/udp.h
-SRC_MOCHDRS += modules/io/xbee.h
+XEFIS_MOCHDRS += modules/io/bmp085.h
+XEFIS_MOCHDRS += modules/io/chr_um6.h
+XEFIS_MOCHDRS += modules/io/ets_airspeed.h
+XEFIS_MOCHDRS += modules/io/flight_gear.h
+XEFIS_MOCHDRS += modules/io/gps.h
+XEFIS_MOCHDRS += modules/io/ht16k33.h
+XEFIS_MOCHDRS += modules/io/joystick.h
+XEFIS_MOCHDRS += modules/io/mouse.h
+XEFIS_MOCHDRS += modules/io/pca9685.h
+XEFIS_MOCHDRS += modules/io/link.h
+XEFIS_MOCHDRS += modules/io/udp.h
+XEFIS_MOCHDRS += modules/io/xbee.h
 
 ######## /modules/log ########
 
-SRC_HEADERS += modules/log/latency.h
-SRC_HEADERS += modules/log/klog.h
+XEFIS_HEADERS += modules/log/latency.h
+XEFIS_HEADERS += modules/log/klog.h
 
-SRC_SOURCES += modules/log/latency.cc
-SRC_SOURCES += modules/log/klog.cc
+XEFIS_SOURCES += modules/log/latency.cc
+XEFIS_SOURCES += modules/log/klog.cc
 
-SRC_MOCHDRS += modules/log/latency.h
-SRC_MOCHDRS += modules/log/klog.h
+XEFIS_MOCHDRS += modules/log/latency.h
+XEFIS_MOCHDRS += modules/log/klog.h
 
 ######## /modules/systems ########
 
-SRC_HEADERS += modules/systems/adc.h
-SRC_HEADERS += modules/systems/afcs.h
-SRC_HEADERS += modules/systems/altacq.h
-SRC_HEADERS += modules/systems/autothrottle.h
-SRC_HEADERS += modules/systems/eta.h
-SRC_HEADERS += modules/systems/flaps_bugs.h
-SRC_HEADERS += modules/systems/flaps_control.h
-SRC_HEADERS += modules/systems/flight_director.h
-SRC_HEADERS += modules/systems/fly_by_wire.h
-SRC_HEADERS += modules/systems/mixer.h
-SRC_HEADERS += modules/systems/nc.h
-SRC_HEADERS += modules/systems/pc.h
-SRC_HEADERS += modules/systems/rcms.h
-SRC_HEADERS += modules/systems/slip_skid.h
-SRC_HEADERS += modules/systems/speeds.h
-SRC_HEADERS += modules/systems/trim_control.h
-SRC_HEADERS += modules/systems/trim_mixer.h
-SRC_HEADERS += modules/systems/vor.h
-SRC_HEADERS += modules/systems/yaw_damper.h
+XEFIS_HEADERS += modules/systems/adc.h
+XEFIS_HEADERS += modules/systems/afcs.h
+XEFIS_HEADERS += modules/systems/altacq.h
+XEFIS_HEADERS += modules/systems/autothrottle.h
+XEFIS_HEADERS += modules/systems/eta.h
+XEFIS_HEADERS += modules/systems/flaps_bugs.h
+XEFIS_HEADERS += modules/systems/flaps_control.h
+XEFIS_HEADERS += modules/systems/flight_director.h
+XEFIS_HEADERS += modules/systems/fly_by_wire.h
+XEFIS_HEADERS += modules/systems/mixer.h
+XEFIS_HEADERS += modules/systems/nc.h
+XEFIS_HEADERS += modules/systems/pc.h
+XEFIS_HEADERS += modules/systems/rcms.h
+XEFIS_HEADERS += modules/systems/slip_skid.h
+XEFIS_HEADERS += modules/systems/speeds.h
+XEFIS_HEADERS += modules/systems/trim_control.h
+XEFIS_HEADERS += modules/systems/trim_mixer.h
+XEFIS_HEADERS += modules/systems/vor.h
+XEFIS_HEADERS += modules/systems/watchdog.h
+XEFIS_HEADERS += modules/systems/yaw_damper.h
 
-SRC_SOURCES += modules/systems/adc.cc
-SRC_SOURCES += modules/systems/afcs.cc
-SRC_SOURCES += modules/systems/altacq.cc
-SRC_SOURCES += modules/systems/autothrottle.cc
-SRC_SOURCES += modules/systems/eta.cc
-SRC_SOURCES += modules/systems/flaps_bugs.cc
-SRC_SOURCES += modules/systems/flaps_control.cc
-SRC_SOURCES += modules/systems/flight_director.cc
-SRC_SOURCES += modules/systems/fly_by_wire.cc
-SRC_SOURCES += modules/systems/mixer.cc
-SRC_SOURCES += modules/systems/nc.cc
-SRC_SOURCES += modules/systems/pc.cc
-SRC_SOURCES += modules/systems/rcms.cc
-SRC_SOURCES += modules/systems/slip_skid.cc
-SRC_SOURCES += modules/systems/speeds.cc
-SRC_SOURCES += modules/systems/trim_control.cc
-SRC_SOURCES += modules/systems/trim_mixer.cc
-SRC_SOURCES += modules/systems/vor.cc
-SRC_SOURCES += modules/systems/yaw_damper.cc
+XEFIS_SOURCES += modules/systems/adc.cc
+XEFIS_SOURCES += modules/systems/afcs.cc
+XEFIS_SOURCES += modules/systems/altacq.cc
+XEFIS_SOURCES += modules/systems/autothrottle.cc
+XEFIS_SOURCES += modules/systems/eta.cc
+XEFIS_SOURCES += modules/systems/flaps_bugs.cc
+XEFIS_SOURCES += modules/systems/flaps_control.cc
+XEFIS_SOURCES += modules/systems/flight_director.cc
+XEFIS_SOURCES += modules/systems/fly_by_wire.cc
+XEFIS_SOURCES += modules/systems/mixer.cc
+XEFIS_SOURCES += modules/systems/nc.cc
+XEFIS_SOURCES += modules/systems/pc.cc
+XEFIS_SOURCES += modules/systems/rcms.cc
+XEFIS_SOURCES += modules/systems/slip_skid.cc
+XEFIS_SOURCES += modules/systems/speeds.cc
+XEFIS_SOURCES += modules/systems/trim_control.cc
+XEFIS_SOURCES += modules/systems/trim_mixer.cc
+XEFIS_SOURCES += modules/systems/vor.cc
+XEFIS_SOURCES += modules/systems/watchdog.cc
+XEFIS_SOURCES += modules/systems/yaw_damper.cc
 
-SRC_MOCHDRS += modules/systems/rcms.h
+XEFIS_MOCHDRS += modules/systems/rcms.h
 
 ######## /modules/private ########
 
-SRC_HEADERS += modules/private/state.h
+XEFIS_HEADERS += modules/private/state.h
 
-SRC_SOURCES += modules/private/state.cc
+XEFIS_SOURCES += modules/private/state.cc
 
 ################
 
-VERSION_FILE := xefis/config/version.cc
-HEADERS += $(SRC_HEADERS)
-SOURCES += $(SRC_SOURCES)
-MOCSRCS += $(call mkmocs, $(foreach file, $(SRC_MOCHDRS), $(file)))
-OBJECTS += $(call mkobjs, $(SOURCES))
-OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
-MOCOBJS += $(call mkmocobjs, $(MOCSRCS))
-TARGETS += $(distdir)/xefis
-LINKEDS += $(distdir)/xefis
+XEFIS_OBJECTS += $(call mkobjs, $(XEFIS_SOURCES))
+XEFIS_MOCSRCS += $(call mkmocs, $(foreach file, $(XEFIS_MOCHDRS), $(file)))
+XEFIS_MOCOBJS += $(call mkmocobjs, $(XEFIS_MOCSRCS))
 
-$(distdir)/xefis: $(OBJECTS) $(MOCOBJS)
+WATCHDOG_OBJECTS += $(call mkobjs, $(WATCHDOG_SOURCES))
+WATCHDOG_MOCSRCS += $(call mkmocs, $(foreach file, $(WATCHDOG_MOCHDRS), $(file)))
+WATCHDOG_MOCOBJS += $(call mkmocobjs, $(WATCHDOG_MOCSRCS))
+
+HEADERS += $(XEFIS_HEADERS) $(WATCHDOG_HEADERS)
+SOURCES += $(XEFIS_SOURCES) $(WATCHDOG_SOURCES)
+MOCSRCS += $(XEFIS_MOCSRCS) $(WATCHDOG_MOCSRCS)
+MOCOBJS += $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS)
+
+OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
+OBJECTS += $(call mkobjs, $(SOURCES))
+
+VERSION_FILE := xefis/config/version.cc
+TARGETS += $(distdir)/xefis $(distdir)/watchdog
+LINKEDS += $(distdir)/xefis $(distdir)/watchdog
+
+$(distdir)/xefis: $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
+
+$(distdir)/watchdog: $(WATCHDOG_OBJECTS) $(WATCHDOG_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 

@@ -1,6 +1,7 @@
 <?xml version='1.0'?>
 <xefis-config version='1.0'>
 	<settings>
+		<setting name='update-frequency' value='100 Hz'/>
 		<setting name='navaids.enable' value='false'/>
 	</settings>
 	<airframe>
@@ -22,6 +23,7 @@
 		<include name='systems/speeds.xml'/>
 		<include name='systems/mixing.xml'/>
 		<include name='systems/yaw-damper.xml'/>
+		<include name='systems/watchdog.xml'/>
 	</modules>
 	<windows>
 		<window width='400' height='500' full-screen='false'>
