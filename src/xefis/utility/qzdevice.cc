@@ -50,7 +50,7 @@ QZDevice::atEnd() const
 void
 QZDevice::close()
 {
-	_ctx_resource.release();
+	_ctx_resource.destroy();
 	QIODevice::close();
 }
 

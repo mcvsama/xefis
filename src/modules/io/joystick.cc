@@ -199,7 +199,7 @@ JoystickInput::failure()
 		log() << "Failure detected, closing device " << _device_path.toStdString() << std::endl;
 
 	_failure_count += 1;
-	_notifier.release();
+	_notifier.reset();
 	::close (_device);
 
 	restart();

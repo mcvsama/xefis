@@ -122,10 +122,10 @@ BMP085::reinitialize()
 	_middle_of_request = false;
 	_request_other = false;
 
-	_temperature_timer.release();
-	_temperature_ready_timer.release();
-	_pressure_timer.release();
-	_pressure_ready_timer.release();
+	_temperature_timer.reset();
+	_temperature_ready_timer.reset();
+	_pressure_timer.reset();
+	_pressure_ready_timer.reset();
 
 	_reinitialize_timer->start();
 }

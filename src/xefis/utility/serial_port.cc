@@ -131,7 +131,7 @@ SerialPort::open()
 void
 SerialPort::close()
 {
-	_notifier.release();
+	_notifier.reset();
 
 	if (_device)
 	{
