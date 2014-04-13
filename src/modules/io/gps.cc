@@ -285,7 +285,7 @@ GPS::failure (std::string const& reason)
 
 	_alive_check_timer->stop();
 
-	_notifier.release();
+	_notifier.reset();
 	::close (_device);
 
 	reset_properties();

@@ -324,7 +324,7 @@ XBee::failure (std::string const& reason)
 {
 	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _device_path.toStdString() << std::endl;
 
-	_notifier.release();
+	_notifier.reset();
 	::close (_device);
 
 	if (_failures.configured())
