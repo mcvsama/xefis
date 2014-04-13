@@ -42,6 +42,7 @@ template<class T, class... Args>
 
 
 template<class T, class... Args>
+	static inline
 	std::unique_ptr<T> make_unique (Args&&... args)
 	{
 		return make_unique_helper<T> (std::is_array<T>(), std::forward<Args>(args)...);

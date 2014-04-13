@@ -269,7 +269,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		actual_trend_start() const;
 
 		float
-		nm_to_px (Length miles);
+		to_px (Length miles);
 
 		bool
 		is_newly_set (QDateTime const& timestamp, Time time = 10_s) const;
@@ -376,7 +376,7 @@ HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
 	if (!_params.position)
 		return QPointF();
 	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (*_params.position).project_flat();
-	return _features_transform.map (QPointF (nm_to_px (1_nm * navaid_pos.x()), nm_to_px (1_nm * navaid_pos.y())));
+	return _features_transform.map (QPointF (to_px (1_nm * navaid_pos.x()), to_px (1_nm * navaid_pos.y())));
 }
 
 
@@ -417,7 +417,7 @@ HSIWidget::PaintWorkUnit::actual_trend_start() const
 
 
 inline float
-HSIWidget::PaintWorkUnit::nm_to_px (Length miles)
+HSIWidget::PaintWorkUnit::to_px (Length miles)
 {
 	return miles / _params.range * _r;
 }

@@ -40,6 +40,14 @@
 											<value path='/' format='%.3f A' nil='-----  '/>
 										</row>
 										<row>
+											<label>  MAX 1</label>
+											<value path='/' format='%.3f A' nil='-----  '/>
+										</row>
+										<row>
+											<label>  MAX 2</label>
+											<value path='/' format='%.3f A' nil='-----  '/>
+										</row>
+										<row>
 											<label>BEC 1</label>
 											<value path='/' format='%.1f V' nil='--  '/>
 										</row>
@@ -79,6 +87,14 @@
 										</row>
 										<row>
 											<label>CURRENT 2</label>
+											<value path='/' format='%.3f A' nil='-----  '/>
+										</row>
+										<row>
+											<label>  MAX 1</label>
+											<value path='/' format='%.3f A' nil='-----  '/>
+										</row>
+										<row>
+											<label>  MAX 2</label>
 											<value path='/' format='%.3f A' nil='-----  '/>
 										</row>
 										<row>

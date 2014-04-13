@@ -19,6 +19,9 @@
 #include <string>
 #include <map>
 
+// Lib:
+#include <boost/lexical_cast.hpp>
+
 // Qt:
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
@@ -45,20 +48,54 @@ class Application: public QApplication
 	Q_OBJECT
 
   public:
+	/**
+	 * Thrown when user gives value to a command line option that doesn't take values.
+	 */
 	class NonValuedArgumentException: public Exception
 	{
 	  public:
 		explicit NonValuedArgumentException (std::string const& argument);
 	};
 
+	/**
+	 * Thrown when user doesn't give a value to a command line option that takes values.
+	 */
+	class MissingValueException: public Exception
+	{
+	  public:
+		explicit MissingValueException (std::string const& argument);
+	};
+
 	class QuitInstruction { };
 
   public:
+	/**
+	 * Contains methods that return command line argument values
+	 * with proper type.
+	 */
+	class OptionsHelper
+	{
+	  public:
+		// Ctor:
+		OptionsHelper (Application*);
+
+		Optional<int>
+		watchdog_write_fd() const noexcept;
+
+		Optional<int>
+		watchdog_read_fd() const noexcept;
+
+	  private:
+		Optional<int>	_watchdog_write_fd;
+		Optional<int>	_watchdog_read_fd;
+	};
+
 	// Options related to command line arguments.
 	enum class Option
 	{
 		ModulesDebugLog		= 1UL << 0,
-		WatchDogFD			= 1UL << 1,
+		WatchdogWriteFd		= 1UL << 1,
+		WatchdogReadFd		= 1UL << 2,
 	};
 
 	typedef std::map<Option, std::string> OptionsMap;
@@ -152,6 +189,13 @@ class Application: public QApplication
 	std::string
 	option (Option) const;
 
+	/**
+	 * Return Options object that contains methods for retrieving
+	 * various options with correct type.
+	 */
+	OptionsHelper const&
+	options() const noexcept;
+
   private slots:
 	/**
 	 * Called by data updater. Causes call of data_updated() on all modules.
@@ -188,13 +232,15 @@ class Application: public QApplication
 	// upon destruction, _module_manager deletes all instruments first, and prevents
 	// _window_manager deleting them like they were managed by parent QObjects.
 	// Unfortunately Qt doesn't allow inserting a widget into a window without creating parent-child
-	// relationship, so we have to make workarounds like this.
+	// relationship, or at least marking such children not to be deleted by their parent,
+	// so we have to make workarounds like this.
 	Unique<ModuleManager>			_module_manager;
 	Unique<SoundManager>			_sound_manager;
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<WorkPerformer>			_work_performer;
 	Unique<Airframe>				_airframe;
+	Unique<OptionsHelper>			_options_helper;
 	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
 };
@@ -204,6 +250,37 @@ inline
 Application::NonValuedArgumentException::NonValuedArgumentException (std::string const& argument):
 	Exception ("argument '" + argument + "' doesn't take any values")
 { }
+
+
+inline
+Application::MissingValueException::MissingValueException (std::string const& argument):
+	Exception ("argument '" + argument + "' needs a value")
+{ }
+
+
+inline
+Application::OptionsHelper::OptionsHelper (Application* application)
+{
+	if (application->has_option (Application::Option::WatchdogWriteFd))
+		_watchdog_write_fd = boost::lexical_cast<int> (application->option (Application::Option::WatchdogWriteFd));
+
+	if (application->has_option (Application::Option::WatchdogReadFd))
+		_watchdog_read_fd = boost::lexical_cast<int> (application->option (Application::Option::WatchdogReadFd));
+}
+
+
+inline Optional<int>
+Application::OptionsHelper::watchdog_write_fd() const noexcept
+{
+	return _watchdog_write_fd;
+}
+
+
+inline Optional<int>
+Application::OptionsHelper::watchdog_read_fd() const noexcept
+{
+	return _watchdog_read_fd;
+}
 
 
 inline Accounting*
@@ -284,6 +361,13 @@ Application::option (Option option) const
 		return o->second;
 	else
 		return std::string();
+}
+
+
+inline Application::OptionsHelper const&
+Application::options() const noexcept
+{
+	return *_options_helper;
 }
 
 } // namespace Xefis
