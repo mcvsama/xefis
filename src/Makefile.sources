@@ -219,10 +219,12 @@ XEFIS_MOCHDRS += xefis/widgets/panel_rotary_encoder.h
 
 ######## /modules/instruments ########
 
+XEFIS_HEADERS += modules/helpers/ahrs_selector.h
 XEFIS_HEADERS += modules/helpers/lonlat_translator.h
 XEFIS_HEADERS += modules/helpers/navaid_selector.h
 XEFIS_HEADERS += modules/helpers/string_translator.h
 
+XEFIS_SOURCES += modules/helpers/ahrs_selector.cc
 XEFIS_SOURCES += modules/helpers/lonlat_translator.cc
 XEFIS_SOURCES += modules/helpers/navaid_selector.cc
 XEFIS_SOURCES += modules/helpers/string_translator.cc
@@ -325,6 +327,7 @@ XEFIS_MOCHDRS += modules/log/klog.h
 XEFIS_HEADERS += modules/systems/adc.h
 XEFIS_HEADERS += modules/systems/afcs.h
 XEFIS_HEADERS += modules/systems/altacq.h
+XEFIS_HEADERS += modules/systems/aoa.h
 XEFIS_HEADERS += modules/systems/autothrottle.h
 XEFIS_HEADERS += modules/systems/eta.h
 XEFIS_HEADERS += modules/systems/flaps_bugs.h
@@ -346,6 +349,7 @@ XEFIS_HEADERS += modules/systems/yaw_damper.h
 XEFIS_SOURCES += modules/systems/adc.cc
 XEFIS_SOURCES += modules/systems/afcs.cc
 XEFIS_SOURCES += modules/systems/altacq.cc
+XEFIS_SOURCES += modules/systems/aoa.cc
 XEFIS_SOURCES += modules/systems/autothrottle.cc
 XEFIS_SOURCES += modules/systems/eta.cc
 XEFIS_SOURCES += modules/systems/flaps_bugs.cc
