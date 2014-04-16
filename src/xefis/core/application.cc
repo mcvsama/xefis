@@ -181,6 +181,7 @@ Application::parse_args (int argc, char** argv)
 		{
 			std::cout << "List of available options:" << std::endl;
 			std::cout << "  --modules-debug-log - dump module settings/properties information" << std::endl;
+			std::cout << "  --copyright         - print license info" << std::endl;
 			throw QuitInstruction();
 		}
 		else if (arg_name == "--copyright")
