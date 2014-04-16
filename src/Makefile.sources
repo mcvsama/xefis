@@ -29,7 +29,7 @@ SI_SOURCES += lib/si/time.cc
 XEFIS_HEADERS += $(SI_HEADERS)
 
 XEFIS_SOURCES += $(SI_SOURCES)
-XEFIS_SOURCES += xefis/main.cc
+XEFIS_SOURCES += xefis/xefis.cc
 
 WATCHDOG_HEADERS += $(SI_HEADERS)
 WATCHDOG_HEADERS += xefis/core/fail.h
