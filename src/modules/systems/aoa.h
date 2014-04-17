@@ -49,8 +49,10 @@ class AOA: public Xefis::Module
 	// Input:
 	Xefis::PropertyAngle		_input_flaps_angle;
 	Xefis::PropertyAngle		_input_spoilers_angle;
+	Xefis::PropertyAngle		_input_aoa_alpha;
 	// Output:
 	Xefis::PropertyAngle		_output_critical_aoa;
+	Xefis::PropertyBoolean		_output_stall;
 };
 
 #endif

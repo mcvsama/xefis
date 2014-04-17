@@ -42,15 +42,18 @@ AOA::AOA (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		// Input:
 		{ "input.flaps-angle", _input_flaps_angle, false },
 		{ "input.spoilers-angle", _input_spoilers_angle, false },
+		{ "input.aoa.alpha", _input_aoa_alpha, false },
 		// Output:
 		{ "output.critical-aoa", _output_critical_aoa, true },
+		{ "output.stall", _output_stall, false },
 	});
 
-	_critical_aoa_computer.set_minimum_dt (5_ms);
+	_critical_aoa_computer.set_minimum_dt (1_ms);
 	_critical_aoa_computer.set_callback (std::bind (&AOA::compute_critical_aoa, this));
 	_critical_aoa_computer.observe ({
 		&_input_flaps_angle,
 		&_input_spoilers_angle,
+		&_input_aoa_alpha,
 	});
 }
 
@@ -70,6 +73,15 @@ AOA::compute_critical_aoa()
 		result += _setting_flaps_factor * *_input_flaps_angle;
 	if (_input_spoilers_angle.valid())
 		result += _setting_spoilers_factor * *_input_spoilers_angle;
+
 	_output_critical_aoa = result;
+
+	if (_output_stall.configured())
+	{
+		if (_input_aoa_alpha.valid())
+			_output_stall = *_input_aoa_alpha >= *_output_critical_aoa;
+		else
+			_output_stall.set_nil();
+	}
 }
 

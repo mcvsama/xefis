@@ -88,8 +88,7 @@ AHRSSelector::data_updated()
 		}
 	}
 
-	if (_output_failover_flag.read (ok) != !ok)
-		_output_failover_flag = !ok;
+	_output_failover_flag = !ok;
 
 	if (!ok)
 	{
