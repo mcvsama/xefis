@@ -37,7 +37,7 @@ class Pressure: public LinearValue<float, Pressure>
   protected:
 	/**
 	 * Used by the _inhg, _hpa, _psi and similar suffix operators.
-	 * To create an Pressure use these operators directly.
+	 * To create a Pressure use these operators directly.
 	 */
 	explicit constexpr
 	Pressure (ValueType psi);

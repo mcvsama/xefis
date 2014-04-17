@@ -40,7 +40,7 @@ class Speed: public LinearValue<double, Speed>
   protected:
 	/**
 	 * Used by the _rad and _deg suffix operators.
-	 * To create an Speed use these operators directly.
+	 * To create a Speed use these operators directly.
 	 */
 	explicit constexpr
 	Speed (ValueType kt);

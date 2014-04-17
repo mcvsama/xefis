@@ -113,6 +113,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Float;
 	else if (type_attr == "angle")
 		_type = Type::Angle;
+	else if (type_attr == "current")
+		_type = Type::Current;
 	else if (type_attr == "frequency")
 		_type = Type::Frequency;
 	else if (type_attr == "length")
@@ -125,6 +127,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Temperature;
 	else if (type_attr == "time")
 		_type = Type::Time;
+	else if (type_attr == "weight")
+		_type = Type::Weight;
 
 	if (_type == Type::Unknown)
 		throw Xefis::Exception ("unknown type: " + type_attr.toStdString());
@@ -136,12 +140,14 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Integer:
 		case Type::Float:
 		case Type::Angle:
+		case Type::Current:
 		case Type::Frequency:
 		case Type::Length:
 		case Type::Pressure:
 		case Type::Speed:
 		case Type::Temperature:
 		case Type::Time:
+		case Type::Weight:
 			if (!element.hasAttribute ("bytes"))
 				throw Xefis::Exception (QString ("<property> of type %1 needs attribute 'bytes'").arg (element.attribute ("type")).toStdString());
 			break;
@@ -160,12 +166,14 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 				break;
 			case Type::Float:
 			case Type::Angle:
+			case Type::Current:
 			case Type::Frequency:
 			case Type::Length:
 			case Type::Pressure:
 			case Type::Speed:
 			case Type::Temperature:
 			case Type::Time:
+			case Type::Weight:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 2, 4 or 8").arg (_bytes).toStdString());
 				break;
@@ -232,12 +240,14 @@ Link::PropertyItem::produce (Blob& blob)
 			break;
 
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
+		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
 			// Impossible.
@@ -288,12 +298,14 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 
 		case Type::Float:
 		case Type::Angle:
+		case Type::Current:
 		case Type::Frequency:
 		case Type::Length:
 		case Type::Pressure:
 		case Type::Speed:
 		case Type::Temperature:
 		case Type::Time:
+		case Type::Weight:
 			kind = Kind::Float;
 			break;
 
@@ -359,12 +371,14 @@ Link::PropertyItem::apply()
 			break;
 
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
+		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
 			// Impossible.
@@ -396,12 +410,14 @@ Link::PropertyItem::failsafe()
 				break;
 
 			XEFIS_CASE_FLOAT (Angle, angle);
+			XEFIS_CASE_FLOAT (Current, current);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
 			XEFIS_CASE_FLOAT (Length, length);
 			XEFIS_CASE_FLOAT (Pressure, pressure);
 			XEFIS_CASE_FLOAT (Speed, speed);
 			XEFIS_CASE_FLOAT (Temperature, temperature);
 			XEFIS_CASE_FLOAT (Time, time);
+			XEFIS_CASE_FLOAT (Weight, weight);
 
 			case Type::Unknown:
 				// Impossible.

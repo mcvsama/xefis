@@ -39,10 +39,6 @@ class Length: public LinearValue<double, Length>
 	friend constexpr Length operator"" _mil (unsigned long long);
 
   protected:
-	/**
-	 * Used by the _inhg, _hpa, _psi and similar suffix operators.
-	 * To create an Length use these operators directly.
-	 */
 	explicit constexpr
 	Length (ValueType psi);
 

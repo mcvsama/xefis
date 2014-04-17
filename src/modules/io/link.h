@@ -119,12 +119,14 @@ class Link:
 			Integer,
 			Float,
 			Angle,
+			Current,
 			Pressure,
 			Frequency,
 			Length,
+			Speed,
 			Temperature,
 			Time,
-			Speed,
+			Weight,
 		};
 
 	  public:
@@ -174,12 +176,14 @@ class Link:
 		Xefis::PropertyInteger			_property_integer;
 		Xefis::PropertyFloat			_property_float;
 		Xefis::PropertyAngle			_property_angle;
+		Xefis::PropertyCurrent			_property_current;
 		Xefis::PropertyPressure			_property_pressure;
 		Xefis::PropertyFrequency		_property_frequency;
 		Xefis::PropertyLength			_property_length;
+		Xefis::PropertySpeed			_property_speed;
 		Xefis::PropertyTemperature		_property_temperature;
 		Xefis::PropertyTime				_property_time;
-		Xefis::PropertySpeed			_property_speed;
+		Xefis::PropertyWeight			_property_weight;
 		Xefis::PropertyInteger::Type	_integer_value;
 		Xefis::PropertyFloat::Type		_float_value;
 	};
