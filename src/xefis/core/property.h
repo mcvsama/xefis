@@ -922,12 +922,14 @@ typedef Property<int64_t>		PropertyInteger;
 typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
 typedef Property<Angle>			PropertyAngle;
+typedef Property<Current>		PropertyCurrent;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
 typedef Property<Length>		PropertyLength;
 typedef Property<Speed>			PropertySpeed;
 typedef Property<Temperature>	PropertyTemperature;
 typedef Property<Time>			PropertyTime;
+typedef Property<Weight>		PropertyWeight;
 
 } // namespace Xefis
 

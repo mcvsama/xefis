@@ -4,6 +4,7 @@
 
 SI_HEADERS += lib/si/all.h
 SI_HEADERS += lib/si/angle.h
+SI_HEADERS += lib/si/current.h
 SI_HEADERS += lib/si/constants.h
 SI_HEADERS += lib/si/frequency.h
 SI_HEADERS += lib/si/length.h
@@ -13,9 +14,11 @@ SI_HEADERS += lib/si/pressure.h
 SI_HEADERS += lib/si/speed.h
 SI_HEADERS += lib/si/temperature.h
 SI_HEADERS += lib/si/time.h
+SI_HEADERS += lib/si/weight.h
 SI_HEADERS += lib/si/value.h
 
 SI_SOURCES += lib/si/angle.cc
+SI_SOURCES += lib/si/current
 SI_SOURCES += lib/si/frequency.cc
 SI_SOURCES += lib/si/length.cc
 SI_SOURCES += lib/si/lonlat.cc
@@ -23,6 +26,7 @@ SI_SOURCES += lib/si/pressure.cc
 SI_SOURCES += lib/si/speed.cc
 SI_SOURCES += lib/si/temperature.cc
 SI_SOURCES += lib/si/time.cc
+SI_SOURCES += lib/si/weight.cc
 
 ######## /xefis ########
 
