@@ -30,6 +30,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/noncopyable.h>
 
 #include "property_storage.h"
 
@@ -82,7 +83,7 @@ class PropertyPathConflict: public Exception
 /**
  * Property tree node.
  */
-class PropertyNode
+class PropertyNode: private Noncopyable
 {
 	friend class PropertyStorage;
 	friend class PropertyDirectoryNode;
