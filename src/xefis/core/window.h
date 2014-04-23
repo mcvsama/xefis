@@ -63,6 +63,9 @@ class Window: public QWidget
 	// Ctor
 	Window (Application*, ConfigReader*, QDomElement const&);
 
+	// Dtor
+	~Window();
+
 	/**
 	 * Needed for layouts to update visible widgets, etc.
 	 */
@@ -82,6 +85,12 @@ class Window: public QWidget
 	font_scale() const;
 
   private:
+	/**
+	 * Unparent all children that are managed by ModuleManager.
+	 */
+	void
+	unparent_modules();
+
 	void
 	process_window_element (QDomElement const& window_element);
 

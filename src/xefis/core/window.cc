@@ -61,44 +61,57 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 	_application (application),
 	_config_reader (config_reader)
 {
-	setWindowTitle ("XEFIS");
-	resize (limit (element.attribute ("width").toInt(), 40, 10000),
-			limit (element.attribute ("height").toInt(), 30, 10000));
-	setMouseTracking (true);
-	setAttribute (Qt::WA_TransparentForMouseEvents);
+	try {
+		setWindowTitle ("XEFIS");
+		resize (limit (element.attribute ("width").toInt(), 40, 10000),
+				limit (element.attribute ("height").toInt(), 30, 10000));
+		setMouseTracking (true);
+		setAttribute (Qt::WA_TransparentForMouseEvents);
 
-	if (element.attribute ("full-screen") == "true")
-		setWindowState (windowState() | Qt::WindowFullScreen);
+		if (element.attribute ("full-screen") == "true")
+			setWindowState (windowState() | Qt::WindowFullScreen);
 
-	_stack = new QStackedWidget (this);
+		_stack = new QStackedWidget (this);
 
-	_instruments_panel = new QWidget (_stack);
-	_instruments_panel->setBackgroundRole (QPalette::Shadow);
-	_instruments_panel->setAutoFillBackground (true);
-	// Black background:
-	QPalette p = palette();
-	p.setColor (QPalette::Shadow, Qt::black);
-	p.setColor (QPalette::Dark, Qt::gray);
-	_instruments_panel->setPalette (p);
+		_instruments_panel = new QWidget (_stack);
+		_instruments_panel->setBackgroundRole (QPalette::Shadow);
+		_instruments_panel->setAutoFillBackground (true);
+		// Black background:
+		QPalette p = palette();
+		p.setColor (QPalette::Shadow, Qt::black);
+		p.setColor (QPalette::Dark, Qt::gray);
+		_instruments_panel->setPalette (p);
 
-	_configurator_panel = new QWidget (this);
+		_configurator_panel = new QWidget (this);
 
-	QLayout* configurator_layout = new QVBoxLayout (_configurator_panel);
-	configurator_layout->setMargin (WidgetMargin);
-	configurator_layout->setSpacing (0);
+		QLayout* configurator_layout = new QVBoxLayout (_configurator_panel);
+		configurator_layout->setMargin (WidgetMargin);
+		configurator_layout->setSpacing (0);
 
-	QBoxLayout* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
-	layout->setSpacing (0);
-	layout->addWidget (_stack);
+		QBoxLayout* layout = new QVBoxLayout (this);
+		layout->setMargin (0);
+		layout->setSpacing (0);
+		layout->addWidget (_stack);
 
-	_stack->addWidget (_instruments_panel);
-	_stack->addWidget (_configurator_panel);
-	_stack->setCurrentWidget (_instruments_panel);
+		_stack->addWidget (_instruments_panel);
+		_stack->addWidget (_configurator_panel);
+		_stack->setCurrentWidget (_instruments_panel);
 
-	new QShortcut (Qt::Key_Escape, this, SLOT (show_configurator()));
+		new QShortcut (Qt::Key_Escape, this, SLOT (show_configurator()));
 
-	process_window_element (element);
+		process_window_element (element);
+	}
+	catch (...)
+	{
+		unparent_modules();
+		throw;
+	}
+}
+
+
+Window::~Window()
+{
+	unparent_modules();
 }
 
 
@@ -131,6 +144,17 @@ float
 Window::font_scale() const
 {
 	return _application->config_reader()->font_scale();
+}
+
+
+void
+Window::unparent_modules()
+{
+	// Since children of type Module are managed by the ModuleManager, we must not delete them.
+	// Find them and reparent to 0.
+	for (auto child: findChildren<QWidget*>())
+		if (dynamic_cast<Module*> (child))
+			child->setParent (nullptr);
 }
 
 
