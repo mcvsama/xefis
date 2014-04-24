@@ -61,7 +61,7 @@ class InstrumentAids
 	void
 	set_scaling (float pen_scale, float font_scale);
 
-  protected:
+  public:
 	/**
 	 * Return Xefis::Painter to use. Use begin() and end() methods to begin/end painting.
 	 */

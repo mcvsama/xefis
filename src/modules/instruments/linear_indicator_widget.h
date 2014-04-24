@@ -31,7 +31,7 @@
 
 class LinearIndicatorWidget:
 	public Xefis::InstrumentWidget,
-	public Xefis::InstrumentAids
+	protected Xefis::InstrumentAids
 {
   public:
 	// Ctor
