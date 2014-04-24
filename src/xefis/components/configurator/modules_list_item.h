@@ -43,7 +43,7 @@ class ModulesListItem: public QTreeWidgetItem
 	 * Update item (module stats).
 	 */
 	void
-	read();
+	reload();
 
   private:
 	/**

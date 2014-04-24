@@ -132,8 +132,8 @@ template<class V>
 		ValueType result = 0.0;
 		std::string unit;
 
-		int p = str.find_first_of (' ');
-		if (p == -1)
+		std::size_t p = str.find_first_of (' ');
+		if (p == std::string::npos)
 			throw UnparsableValue (std::string ("error while parsing: ") + str);
 
 		try {

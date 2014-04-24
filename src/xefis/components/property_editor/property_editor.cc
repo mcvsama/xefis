@@ -149,7 +149,7 @@ PropertyEditor::item_changed (QTreeWidgetItem* item, int column)
 		if (checked != node_bool->read (false))
 		{
 			node_bool->write (checked);
-			prop_item->read();
+			prop_item->reload();
 			item_selected();
 		}
 	}

@@ -43,6 +43,18 @@ PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, Propert
 			case Amber:
 				_icon_on = QIcon (Resources::Icons16::led_amber_on());
 				break;
+
+			case Red:
+				_icon_on = QIcon (Resources::Icons16::led_red_on());
+				break;
+
+			case White:
+				_icon_on = QIcon (Resources::Icons16::led_white_on());
+				break;
+
+			case Blue:
+				_icon_on = QIcon (Resources::Icons16::led_blue_on());
+				break;
 		}
 
 		_icon_off = QIcon (Resources::Icons16::led_off());

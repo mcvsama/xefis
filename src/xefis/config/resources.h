@@ -81,6 +81,9 @@ namespace Resources {
 		XEFIS_CONFIG_HAS_ICON_16 (property_value, "property-value.png");
 		XEFIS_CONFIG_HAS_ICON_16 (led_green_on, "led-green-on.png");
 		XEFIS_CONFIG_HAS_ICON_16 (led_amber_on, "led-amber-on.png");
+		XEFIS_CONFIG_HAS_ICON_16 (led_red_on, "led-red-on.png");
+		XEFIS_CONFIG_HAS_ICON_16 (led_white_on, "led-white-on.png");
+		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png");
 		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png");
 
 #undef XEFIS_CONFIG_HAS_ICON_16

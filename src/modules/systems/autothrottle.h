@@ -55,8 +55,6 @@ class Autothrottle: public Xefis::Module
 	speed_mode_changed();
 
   private:
-	Xefis::PIDControl<double>	_ias_pid;
-	Xefis::PropertyObserver		_thrust_computer;
 	double						_computed_output_thrust	= 0.0;
 	SpeedMode					_speed_mode				= SpeedMode::None;
 	double						_output_thrust_minimum	= 0.0;
@@ -65,6 +63,8 @@ class Autothrottle: public Xefis::Module
 	double						_ias_pid_i				= 0.1;
 	double						_ias_pid_d				= 0.0;
 	double						_ias_to_thrust_scale	= 1.0;
+	Xefis::PIDControl<double>	_ias_pid;
+	Xefis::PropertyObserver		_thrust_computer;
 	Xefis::Range<double>		_output_thrust_extent;
 	// Input:
 	Xefis::PropertyInteger		_cmd_speed_mode;

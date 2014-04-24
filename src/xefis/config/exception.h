@@ -55,6 +55,9 @@ class Exception: public std::exception
 	// Dtor
 	virtual ~Exception() noexcept;
 
+	// Ctor
+	Exception (Exception const&) = default;
+
 	/**
 	 * Return true if this exception wraps another exception.
 	 */

@@ -37,8 +37,7 @@ SoundManager::Sound::Sound (QString const& wav_file_name)
 }
 
 
-SoundManager::SoundManager (Application* application):
-	_application (application)
+SoundManager::SoundManager (Application*)
 { }
 
 

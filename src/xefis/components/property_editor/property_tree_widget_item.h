@@ -40,7 +40,7 @@ class PropertyTreeWidgetItem: public QTreeWidgetItem
 	 * Reads the node and update itself.
 	 */
 	void
-	read();
+	reload();
 
 	/**
 	 * Return PropertyNode* associated with this item.

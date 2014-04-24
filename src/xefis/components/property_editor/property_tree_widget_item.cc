@@ -37,7 +37,7 @@ PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget*
 	_node (node)
 {
 	setup_appereance();
-	read();
+	reload();
 }
 
 
@@ -46,12 +46,12 @@ PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidgetI
 	_node (node)
 {
 	setup_appereance();
-	read();
+	reload();
 }
 
 
 void
-PropertyTreeWidgetItem::read()
+PropertyTreeWidgetItem::reload()
 {
 	static_cast<PropertyTreeWidget*> (treeWidget())->read (this, _node);
 
