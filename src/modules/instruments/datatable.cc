@@ -71,24 +71,7 @@ Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_lab
 QString
 Datatable::LabelValue::stringify() const
 {
-	try {
-		if (value.is_nil())
-			return nil_value;
-		else if (value.is_type<std::string>())
-			return QString::fromStdString ((boost::format (format) % value.stringify()).str());
-		else if (value.is_type<bool>())
-			return (value.stringify() == "true") ? "ON" : "OFF";
-		else
-			return QString::fromStdString ((boost::format (format) % value.floatize (unit)).str());
-	}
-	catch (UnsupportedUnit const&)
-	{
-		return "unit error";
-	}
-	catch (boost::io::too_few_args const&)
-	{
-		return "format error";
-	}
+	return QString::fromStdString (value.stringify (boost::format (format), unit, nil_value.toStdString()));
 }
 
 
