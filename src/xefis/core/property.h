@@ -22,6 +22,7 @@
 
 // Boost:
 #include <boost/optional.hpp>
+#include <boost/format.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -171,6 +172,12 @@ class GenericProperty
 	 */
 	virtual std::string
 	stringify() const;
+
+	/**
+	 * Return humanized value (using boost::format and specified unit).
+	 */
+	virtual std::string
+	stringify (boost::format, std::string const& unit, std::string nil_value) const;
 
 	/**
 	 * Return float-like value of the property.
@@ -580,6 +587,30 @@ GenericProperty::stringify() const
 	if (node)
 		return node->stringify();
 	return "";
+}
+
+
+inline std::string
+GenericProperty::stringify (boost::format format, std::string const& unit, std::string nil_value) const
+{
+	try {
+		if (is_nil())
+			return nil_value;
+		else if (is_type<std::string>())
+			return (format % stringify()).str();
+		else if (is_type<bool>())
+			return (stringify() == "true") ? "ON" : "OFF";
+		else
+			return (format % floatize (unit)).str();
+	}
+	catch (UnsupportedUnit const&)
+	{
+		return "unit error";
+	}
+	catch (boost::io::too_few_args const&)
+	{
+		return "format error";
+	}
 }
 
 
