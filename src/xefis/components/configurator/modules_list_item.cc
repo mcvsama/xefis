@@ -47,7 +47,7 @@ ModulesListItem::ModulesListItem (Module::Pointer const& module_pointer, ModuleM
 
 
 void
-ModulesListItem::read()
+ModulesListItem::reload()
 {
 	Module* module = _module_manager->find (_module_pointer);
 	if (module)

@@ -73,7 +73,6 @@ class PanelNumericDisplay: public PanelWidget
 	unsigned int			_num_digits;
 	bool					_pad_with_zeros;
 	std::vector<QPixmap>	_digits_to_display;
-	PropertyInteger::Type	_value;
 	PropertyInteger			_value_property;
 	std::array<QPixmap, 12>	_digit_images; // [10] is minus sign, [11] is empty.
 };

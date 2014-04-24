@@ -24,8 +24,7 @@
 
 namespace Xefis {
 
-WindowManager::WindowManager (Application* application):
-	_application (application)
+WindowManager::WindowManager (Application*)
 { }
 
 

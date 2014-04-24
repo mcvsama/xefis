@@ -39,7 +39,8 @@ CXXFLAGS		+= -fPIE -O4 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-f
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)
-CXXFLAGS		+= -fPIE -O3 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -fstrict-aliasing
+CLANG_DISABLED_WARNINGS = mismatched-tags disabled-macro-expansion c++98-compat-pedantic documentation-unknown-command
+CXXFLAGS		+= -fPIE -O3 -g -c -std=c++11 -Wall -Wall -Wextra -Wunused  -Wunused-function -Wunused-label -fstrict-aliasing $(foreach warning, $(CLANG_DISABLED_WARNINGS), -Wno-$(warning))
 CXXFLAGS		+= -pthread -I. -Ilib
 endif
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer

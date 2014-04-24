@@ -45,7 +45,6 @@ class WindowManager: public QWidget
 	data_updated (Time const& update_time);
 
   private:
-	Application*				_application;
 	std::set<Unique<Window>>	_windows;
 };
 

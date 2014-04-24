@@ -46,9 +46,9 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 	{
 		if (message)
 			std::clog << "Assertion failed: " << message << std::endl;
-# if XEFIS_ENABLE_FATAL_ASSERT
+#ifdef XEFIS_ENABLE_FATAL_ASSERT
 		raise (SIGTRAP);
-# endif
+#endif
 	}
 }
 
@@ -56,7 +56,7 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 /**
  * Prints debug output.
  */
-#define xdebug(x...) fprintf (stderr, x)
+#define xdebug(...) fprintf (stderr, __VA_ARGS__)
 
 #endif
 

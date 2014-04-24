@@ -25,8 +25,7 @@
 
 namespace Xefis {
 
-Airframe::Airframe (Application* application, QDomElement const& config):
-	_application (application)
+Airframe::Airframe (Application*, QDomElement const& config)
 {
 	if (!config.isNull())
 	{

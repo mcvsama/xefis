@@ -41,7 +41,6 @@ class Airframe
 	flaps() const;
 
   private:
-	Application*	_application;
 	Unique<Flaps>	_flaps;
 };
 

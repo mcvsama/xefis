@@ -75,19 +75,6 @@ class FlightDirector: public Xefis::Module
 	pitch_mode_changed();
 
   private:
-	Xefis::PropertyObserver		_fd_computer;
-	Xefis::PIDControl<double>	_magnetic_heading_pid;
-	Xefis::PIDControl<double>	_magnetic_track_pid;
-	Xefis::PIDControl<double>	_altitude_pid;
-	Xefis::PIDControl<double>	_ias_pid;
-	Xefis::PIDControl<double>	_vertical_speed_pid;
-	Xefis::PIDControl<double>	_fpa_pid;
-	Xefis::Smoother<double>		_output_pitch_smoother		= 2.5_s;
-	Xefis::Smoother<double>		_output_roll_smoother		= 2.5_s;
-	Angle						_computed_output_pitch;
-	Angle						_computed_output_roll;
-	RollMode					_roll_mode					= RollMode::None;
-	PitchMode					_pitch_mode					= PitchMode::None;
 	double						_magnetic_heading_pid_p		= 1.0;
 	double						_magnetic_heading_pid_i		= 0.1;
 	double						_magnetic_heading_pid_d		= 0.0;
@@ -106,6 +93,19 @@ class FlightDirector: public Xefis::Module
 	double						_fpa_pid_p					= 1.0;
 	double						_fpa_pid_i					= 0.1;
 	double						_fpa_pid_d					= 0.0;
+	Xefis::PropertyObserver		_fd_computer;
+	Xefis::PIDControl<double>	_magnetic_heading_pid;
+	Xefis::PIDControl<double>	_magnetic_track_pid;
+	Xefis::PIDControl<double>	_altitude_pid;
+	Xefis::PIDControl<double>	_ias_pid;
+	Xefis::PIDControl<double>	_vertical_speed_pid;
+	Xefis::PIDControl<double>	_fpa_pid;
+	Xefis::Smoother<double>		_output_pitch_smoother		= 2.5_s;
+	Xefis::Smoother<double>		_output_roll_smoother		= 2.5_s;
+	Angle						_computed_output_pitch;
+	Angle						_computed_output_roll;
+	RollMode					_roll_mode					= RollMode::None;
+	PitchMode					_pitch_mode					= PitchMode::None;
 	// Input:
 	Xefis::PropertyAngle		_pitch_limit_max;
 	Xefis::PropertyAngle		_pitch_limit_min;

@@ -40,6 +40,9 @@ class PanelButton: public PanelWidget
 	{
 		Green,
 		Amber,
+		Red,
+		White,
+		Blue,
 	};
 
   public:

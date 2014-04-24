@@ -289,8 +289,15 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 	if (type == "button")
 	{
 		PanelButton::LEDColor color = PanelButton::Green;
-		if (widget_element.attribute ("led-color") == "amber")
+		QString color_attr = widget_element.attribute ("led-color");
+		if (color_attr == "amber")
 			color = PanelButton::Amber;
+		else if (color_attr == "red")
+			color = PanelButton::Red;
+		else if (color_attr == "white")
+			color = PanelButton::White;
+		else if (color_attr == "blue")
+			color = PanelButton::Blue;
 
 		widget = new PanelButton (parent_widget, panel, color,
 								  PropertyBoolean (widget_element.attribute ("click-property").toStdString()),
@@ -542,7 +549,7 @@ Window::configurator_taken()
 std::array<int, 4>
 Window::parse_margin (QString const& string)
 {
-	std::array<int, 4> margins = { 0, 0, 0, 0 };
+	std::array<int, 4> margins = { { 0, 0, 0, 0 } };
 
 	if (!string.isEmpty())
 	{
@@ -554,7 +561,7 @@ Window::parse_margin (QString const& string)
 			case 1:
 			{
 				int a = numbers[0].toInt();
-				margins = { a, a, a, a };
+				margins = { { a, a, a, a } };
 				break;
 			}
 
@@ -562,7 +569,7 @@ Window::parse_margin (QString const& string)
 			{
 				int v = numbers[0].toInt();
 				int h = numbers[1].toInt();
-				margins = { h, v, h, v };
+				margins = { { h, v, h, v } };
 				break;
 			}
 
@@ -571,7 +578,7 @@ Window::parse_margin (QString const& string)
 				int t = numbers[0].toInt();
 				int h = numbers[1].toInt();
 				int b = numbers[2].toInt();
-				margins = { h, t, h, b };
+				margins = { { h, t, h, b } };
 				break;
 			}
 
@@ -581,7 +588,7 @@ Window::parse_margin (QString const& string)
 				int r = numbers[1].toInt();
 				int b = numbers[2].toInt();
 				int l = numbers[3].toInt();
-				margins = { l, t, r, b };
+				margins = { { l, t, r, b } };
 				break;
 			}
 

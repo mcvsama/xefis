@@ -89,7 +89,7 @@ ModulesList::read()
 		if (p != module_ptrs.end())
 		{
 			// Update module/remove from @module_ptrs:
-			mli->read();
+			mli->reload();
 			module_ptrs.erase (p);
 		}
 		else

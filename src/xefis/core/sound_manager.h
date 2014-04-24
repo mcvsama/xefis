@@ -69,7 +69,6 @@ class SoundManager
 	cleanup();
 
   private:
-	Application*			_application;
 	std::set<Shared<Sound>>	_sounds;
 };
 

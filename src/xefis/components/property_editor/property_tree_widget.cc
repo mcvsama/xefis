@@ -122,7 +122,7 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 				if (s != subnodes.end())
 				{
 					// Update item and remove from @subnodes:
-					c->read();
+					c->reload();
 					subnodes.erase (s);
 				}
 				else
