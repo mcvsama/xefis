@@ -30,7 +30,7 @@
 
 class Datatable:
 	public Xefis::Instrument,
-	public Xefis::InstrumentAids
+	protected Xefis::InstrumentAids
 {
 	class LabelValue
 	{
@@ -50,6 +50,7 @@ class Datatable:
 		QString
 		stringify() const;
 
+	  public:
 		QString					label;
 		QColor					label_color;
 		Xefis::TypedProperty	value;

@@ -226,7 +226,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	class PaintWorkUnit:
 		public InstrumentWidget::PaintWorkUnit,
-		public Xefis::InstrumentAids
+		protected Xefis::InstrumentAids
 	{
 		friend class EFISWidget;
 

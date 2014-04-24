@@ -30,7 +30,7 @@
 
 class Gear:
 	public Xefis::Instrument,
-	public Xefis::InstrumentAids
+	protected Xefis::InstrumentAids
 {
   public:
 	// Ctor
