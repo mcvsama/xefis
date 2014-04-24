@@ -67,13 +67,13 @@ Application::Application (int& argc, char** argv):
 	// Init property storage:
 	PropertyStorage::initialize();
 
+	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 	_accounting = std::make_unique<Accounting>();
+	_sound_manager = std::make_unique<SoundManager> (this);
 	_navaid_storage = std::make_unique<NavaidStorage>();
 	_window_manager = std::make_unique<WindowManager> (this);
 	_module_manager = std::make_unique<ModuleManager> (this);
-	_sound_manager = std::make_unique<SoundManager> (this);
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
-	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 
 	signal (SIGHUP, s_quit);
 

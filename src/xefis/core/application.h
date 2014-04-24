@@ -225,7 +225,9 @@ class Application: public QApplication
   private:
 	static Application*	_application;
 
+	Unique<WorkPerformer>			_work_performer;
 	Unique<Accounting>				_accounting;
+	Unique<SoundManager>			_sound_manager;
 	Unique<NavaidStorage>			_navaid_storage;
 	Unique<WindowManager>			_window_manager;
 	// Note: it is important that the _module_manager is after _window_manager, so that
@@ -235,10 +237,8 @@ class Application: public QApplication
 	// relationship, or at least marking such children not to be deleted by their parent,
 	// so we have to make workarounds like this.
 	Unique<ModuleManager>			_module_manager;
-	Unique<SoundManager>			_sound_manager;
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
-	Unique<WorkPerformer>			_work_performer;
 	Unique<Airframe>				_airframe;
 	Unique<OptionsHelper>			_options_helper;
 	QTimer*							_data_updater = nullptr;
