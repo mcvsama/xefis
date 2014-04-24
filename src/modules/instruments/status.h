@@ -48,7 +48,7 @@ class Status: public Xefis::Instrument
 		 */
 		enum Severity
 		{
-			Critical,
+			Caution,
 			Warning,
 		};
 
@@ -171,11 +171,15 @@ class Status: public Xefis::Instrument
 
   private:
 	StatusWidget*						_status_widget			= nullptr;
-	Xefis::PropertyBoolean				_button_cursor_up;
-	Xefis::PropertyBoolean				_button_cursor_down;
-	Xefis::PropertyBoolean				_button_cursor_del;
-	Xefis::PropertyBoolean				_button_recall;
-	Xefis::PropertyBoolean				_button_clear;
+	Xefis::PropertyBoolean				_input_button_cursor_up;
+	Xefis::PropertyBoolean				_input_button_cursor_down;
+	Xefis::PropertyBoolean				_input_button_cursor_del;
+	Xefis::PropertyBoolean				_input_button_recall;
+	Xefis::PropertyBoolean				_input_button_clear;
+	Xefis::PropertyBoolean				_input_button_master_caution;
+	Xefis::PropertyBoolean				_input_button_master_warning;
+	Xefis::PropertyBoolean				_output_master_caution;
+	Xefis::PropertyBoolean				_output_master_warning;
 	Weak<Xefis::SoundManager::Sound>	_alert_sound;
 	std::list<MessageDefinition>		_messages;
 	Time								_minimum_display_time	= 5_s;

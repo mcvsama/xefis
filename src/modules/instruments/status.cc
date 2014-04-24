@@ -82,12 +82,12 @@ Status::MessageDefinition::MessageDefinition (QDomElement const& message_element
 	QString severity_str = message_element.attribute ("severity");
 	if (message_element.hasAttribute ("severity"))
 	{
-		if (severity_str == "critical")
-			_severity = Severity::Critical;
+		if (severity_str == "caution")
+			_severity = Severity::Caution;
 		else if (severity_str == "warning")
 			_severity = Severity::Warning;
 		else
-			throw Xefis::Exception ("invalid value for attribute @severity on <message> element - must be 'warning' or 'critical'");
+			throw Xefis::Exception ("invalid value for attribute @severity on <message> element - must be 'caution' or 'warning'");
 	}
 
 	for (QDomElement o: message_element)
@@ -135,8 +135,11 @@ Status::MessageDefinition::color() const noexcept
 {
 	switch (_severity)
 	{
-		case Severity::Critical:	return Qt::red;
-		case Severity::Warning:		return QColor (255, 200, 50);
+		case Severity::Caution:
+			return QColor (255, 200, 50);
+
+		case Severity::Warning:
+			return Qt::red;
 	}
 	return Qt::white;
 }
@@ -150,11 +153,15 @@ Status::Status (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	});
 
 	parse_properties (config, {
-		{ "button.cursor-up", _button_cursor_up, false },
-		{ "button.cursor-down", _button_cursor_down, false },
-		{ "button.cursor-del", _button_cursor_del, false },
-		{ "button.recall", _button_recall, false },
-		{ "button.clear", _button_clear, false },
+		{ "input.button.cursor-up", _input_button_cursor_up, false },
+		{ "input.button.cursor-down", _input_button_cursor_down, false },
+		{ "input.button.cursor-del", _input_button_cursor_del, false },
+		{ "input.button.recall", _input_button_recall, false },
+		{ "input.button.clear", _input_button_clear, false },
+		{ "input.button.master-caution", _input_button_master_caution, false },
+		{ "input.button.master-warning", _input_button_master_warning, false },
+		{ "output.master-caution", _output_master_caution, false },
+		{ "output.master-warning", _output_master_warning, false },
 	});
 
 	for (QDomElement e: config)
@@ -179,23 +186,30 @@ Status::data_updated()
 		return property.valid_and_fresh() && *property;
 	};
 
-	if (pressed (_button_cursor_up))
+	if (pressed (_input_button_master_caution))
+		_output_master_caution = false;
+
+	if (pressed (_input_button_master_warning))
+		_output_master_warning = false;
+
+	if (pressed (_input_button_cursor_up))
 		_status_widget->cursor_up();
 
-	if (pressed (_button_cursor_down))
+	if (pressed (_input_button_cursor_down))
 		_status_widget->cursor_down();
 
-	if (pressed (_button_cursor_del))
+	if (pressed (_input_button_cursor_del))
 		_status_widget->cursor_del();
 
-	if (pressed (_button_recall))
+	if (pressed (_input_button_recall))
 		_status_widget->recall();
 
-	if (pressed (_button_clear))
+	if (pressed (_input_button_clear))
 		if (Time::now() - _last_message_timestamp > _minimum_display_time)
 			_status_widget->clear();
 
 	bool sound_alert = false;
+
 	for (auto& m: _messages)
 	{
 		switch (m.test())
@@ -211,6 +225,17 @@ Status::data_updated()
 				// Show new one:
 				m.set_message_id (_status_widget->add_message (m.message(), m.color()));
 				_last_message_timestamp = Time::now();
+				// Master* buttons?
+				switch (m.severity())
+				{
+					case MessageDefinition::Severity::Caution:
+						_output_master_warning = true;
+						break;
+
+					case MessageDefinition::Severity::Warning:
+						_output_master_warning = true;
+						break;
+				}
 				break;
 
 			case MessageDefinition::Revoke:
@@ -227,7 +252,8 @@ Status::data_updated()
 		}
 	}
 
-	if (sound_alert)
+	// Play warning sound in loop if master-warning is active:
+	if (sound_alert || *_output_master_warning)
 		request_alert();
 }
 
@@ -238,6 +264,11 @@ Status::request_alert()
 	auto sptr = _alert_sound.lock();
 
 	if (!sptr || sptr->finished())
-		_alert_sound = module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/caution.wav");
+	{
+		const char* filename = XEFIS_SHARED_DIRECTORY "/sounds/caution.wav";
+		if (*_output_master_warning)
+			filename = XEFIS_SHARED_DIRECTORY "/sounds/warning.wav";
+		_alert_sound = module_manager()->application()->sound_manager()->play (filename);
+	}
 }
 
