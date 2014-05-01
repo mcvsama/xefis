@@ -54,18 +54,19 @@ Sound::Alarm::operator< (Alarm const& other) const noexcept
 bool
 Sound::Alarm::check()
 {
-	bool test = *_property && (!_finished_timestamp || (_repeat && *_finished_timestamp + _repeat_period <= Time::now()));
 	auto sptr = _sound.lock();
 
-	if (_was_started && (!sptr || sptr->finished()))
+	if (_repeat && _was_started && (!sptr || sptr->finished()))
 	{
 		_finished_timestamp = Time::now();
 		_was_started = false;
 	}
 
+	bool test = *_property && (!_finished_timestamp || (_repeat && *_finished_timestamp + _repeat_period <= Time::now()));
+
 	if (test)
 	{
-		if (!sptr || sptr->finished())
+		if (!_was_started && (!sptr || sptr->finished()))
 		{
 			_sound = _sound_manager->play (_sound_file_path);
 			_was_started = true;
