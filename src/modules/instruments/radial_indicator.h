@@ -62,6 +62,7 @@ class RadialIndicator: public Xefis::Instrument
 	Xefis::TypedProperty					_value;
 	Xefis::TypedProperty					_value_target;
 	Xefis::TypedProperty					_value_reference;
+	Xefis::TypedProperty					_value_automatic;
 };
 
 #endif

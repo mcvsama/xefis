@@ -72,6 +72,9 @@ class RadialIndicatorWidget:
 	void
 	set_target_value (Optional<double>);
 
+	void
+	set_automatic_value (Optional<double>);
+
   protected:
 	void
 	resizeEvent (QResizeEvent*) override;
@@ -97,6 +100,7 @@ class RadialIndicatorWidget:
 	Optional<double>			_critical_value;
 	Optional<double>			_reference_value;
 	Optional<double>			_target_value;
+	Optional<double>			_automatic_value;
 };
 
 
@@ -160,6 +164,14 @@ inline void
 RadialIndicatorWidget::set_target_value (Optional<double> target_value)
 {
 	_target_value = target_value;
+	update();
+}
+
+
+inline void
+RadialIndicatorWidget::set_automatic_value (Optional<double> automatic_value)
+{
+	_automatic_value = automatic_value;
 	update();
 }
 
