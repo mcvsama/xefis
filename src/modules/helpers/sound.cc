@@ -93,15 +93,22 @@ Sound::Alarm::stop()
 }
 
 
-Sound::Group::Group (QDomElement const& group_element, Xefis::SoundManager* sound_manager)
+Sound::Group::Group (QDomElement const& element, Xefis::SoundManager* sound_manager)
 {
-	for (QDomElement e: group_element)
+	if (element == "group")
 	{
-		if (e == "alarm")
-			_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
-		else
-			throw Xefis::UnsupportedElementException (e);
+		for (QDomElement e: element)
+		{
+			if (e == "alarm")
+				_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
+			else
+				throw Xefis::UnsupportedElementException (e);
+		}
 	}
+	else if (element == "alarm")
+		_alarms.insert (std::make_unique<Alarm> (element, sound_manager));
+	else
+		throw Xefis::UnsupportedElementException (element);
 }
 
 
@@ -129,7 +136,7 @@ Sound::Sound (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{
 			for (QDomElement e2: e)
 			{
-				if (e2 == "group")
+				if (e2 == "group" || e2 == "alarm")
 					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->application()->sound_manager()));
 				else
 					throw Xefis::UnsupportedElementException (e2);
