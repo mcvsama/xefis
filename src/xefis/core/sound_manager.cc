@@ -37,6 +37,19 @@ SoundManager::Sound::Sound (QString const& wav_file_name)
 }
 
 
+SoundManager::Sound::~Sound()
+{
+	stop();
+}
+
+
+void
+SoundManager::Sound::stop()
+{
+	_play_process->terminate();
+}
+
+
 SoundManager::SoundManager (Application*)
 { }
 

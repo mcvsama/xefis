@@ -41,11 +41,20 @@ class SoundManager
 		// Ctor
 		Sound (QString const& wav_file_name);
 
+		// Dtor
+		~Sound();
+
 		/**
 		 * Return true if sound has finished playing.
 		 */
 		bool
 		finished() const noexcept;
+
+		/**
+		 * Stop the sound.
+		 */
+		void
+		stop();
 
 	  private:
 		Unique<QProcess>	_play_process;
