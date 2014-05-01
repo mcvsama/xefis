@@ -21,7 +21,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/services.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/sound_manager.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
@@ -53,7 +52,6 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "raising-runway.threshold", _raising_runway_threshold, false },
 		{ "aoa.visibility-threshold", _aoa_visibility_threshold, false },
 		{ "show-mach-above", _show_mach_above, false },
-		{ "play-altacq-sound", _play_altacq_sound, false },
 	});
 
 	parse_properties (config, {
@@ -180,22 +178,6 @@ EFIS::read()
 	_fpv_computer.data_updated (update_time());
 
 	EFISWidget::Parameters params;
-
-	if (_play_altacq_sound)
-	{
-		if (_flight_director_cmd_altitude_acquired.valid_and_fresh())
-		{
-			if (_prev_altacq_state == false && *_flight_director_cmd_altitude_acquired)
-			{
-				auto sptr = _altacq_sound.lock();
-
-				if (!sptr || sptr->finished())
-					_altacq_sound = module_manager()->application()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/altacq.wav");
-			}
-
-			_prev_altacq_state = *_flight_director_cmd_altitude_acquired;
-		}
-	}
 
 	params.old_style = _style_old.read (false);
 	params.show_metric = _style_show_metric.read (false);
