@@ -21,7 +21,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/sound_manager.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
 
@@ -208,14 +207,11 @@ Status::data_updated()
 		if (Time::now() - _last_message_timestamp > _minimum_display_time)
 			_status_widget->clear();
 
-	bool sound_alert = false;
-
 	for (auto& m: _messages)
 	{
 		switch (m.test())
 		{
 			case MessageDefinition::Show:
-				sound_alert = true;
 				// Hide old message:
 				if (m.has_message_id())
 				{

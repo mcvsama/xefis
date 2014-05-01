@@ -27,7 +27,6 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/sound_manager.h>
 
 // Local:
 #include "efis_widget.h"
@@ -144,9 +143,6 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyBoolean				_flight_director_cmd_visible;
 	Xefis::PropertyLength				_flight_director_cmd_altitude;
 	Xefis::PropertyBoolean				_flight_director_cmd_altitude_acquired;
-	bool								_play_altacq_sound				= false;
-	bool								_prev_altacq_state				= false;
-	Weak<Xefis::SoundManager::Sound>	_altacq_sound;
 	Xefis::PropertySpeed				_flight_director_cmd_ias;
 	Xefis::PropertySpeed				_flight_director_cmd_vertical_speed;
 	Xefis::PropertyBoolean				_flight_director_guidance_visible;
