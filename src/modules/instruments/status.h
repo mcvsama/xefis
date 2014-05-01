@@ -25,7 +25,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/sound_manager.h>
 
 
 class StatusWidget;
@@ -161,15 +160,6 @@ class Status: public Xefis::Instrument
 	data_updated() override;
 
   private:
-	/**
-	 * Request alert sound. If it's sounding already,
-	 * set _restart_alert to true and start a timer
-	 * to restart it again soon.
-	 */
-	void
-	request_alert();
-
-  private:
 	StatusWidget*						_status_widget			= nullptr;
 	Xefis::PropertyBoolean				_input_button_cursor_up;
 	Xefis::PropertyBoolean				_input_button_cursor_down;
@@ -180,7 +170,6 @@ class Status: public Xefis::Instrument
 	Xefis::PropertyBoolean				_input_button_master_warning;
 	Xefis::PropertyBoolean				_output_master_caution;
 	Xefis::PropertyBoolean				_output_master_warning;
-	Weak<Xefis::SoundManager::Sound>	_alert_sound;
 	std::list<MessageDefinition>		_messages;
 	Time								_minimum_display_time	= 5_s;
 	Time								_last_message_timestamp;

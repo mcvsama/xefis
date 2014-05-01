@@ -251,24 +251,5 @@ Status::data_updated()
 				break;
 		}
 	}
-
-	// Play warning sound in loop if master-warning is active:
-	if (sound_alert || *_output_master_warning)
-		request_alert();
-}
-
-
-void
-Status::request_alert()
-{
-	auto sptr = _alert_sound.lock();
-
-	if (!sptr || sptr->finished())
-	{
-		const char* filename = XEFIS_SHARED_DIRECTORY "/sounds/caution.wav";
-		if (*_output_master_warning)
-			filename = XEFIS_SHARED_DIRECTORY "/sounds/warning.wav";
-		_alert_sound = module_manager()->application()->sound_manager()->play (filename);
-	}
 }
 
