@@ -4,6 +4,9 @@ first: all
 
 # Override these variables in Makefile.local.
 
+LC_ALL			:= C
+export LC_ALL
+
 # Show verbose compilation commands?
 VERBOSE			:= 0
 # How many threads use for compilation?
