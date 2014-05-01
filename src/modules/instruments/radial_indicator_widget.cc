@@ -159,6 +159,9 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	QPen gray_pen = get_pen (QColor (0xb0, 0xb0, 0xb0), 1.f);
 	gray_pen.setCapStyle (Qt::RoundCap);
 
+	QPen automatic_pen = get_pen (QColor (0x22, 0xaa, 0xff), 1.1f);
+	automatic_pen.setCapStyle (Qt::RoundCap);
+
 	QBrush brush (gray, Qt::SolidPattern);
 	QRectF rect (-r, -r, 2.f * r, 2.f * r);
 
@@ -168,6 +171,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	float critical = _critical_value ? limit (*_critical_value, _range) : 0.f;
 	float reference = _reference_value ? limit (*_reference_value, _range) : 0.f;
 	float target = _target_value ? limit (*_target_value, _range) : 0.f;
+	float automatic = _automatic_value ? limit (*_automatic_value, _range) : 0.f;
 
 	if (!_warning_value)
 		warning = _range.max();
@@ -179,11 +183,12 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	if (_critical_value && value >= critical)
 		brush.setColor (red);
 
-	float value_angle = value_span_angle * (value - _range.min()) / _range.extent();
-	float warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
-	float critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
-	float reference_angle = value_span_angle * (reference - _range.min()) / _range.extent();
-	float target_angle = value_span_angle * (target - _range.min()) / _range.extent();
+	double value_angle = value_span_angle * (value - _range.min()) / _range.extent();
+	double warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
+	double critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
+	double reference_angle = value_span_angle * (reference - _range.min()) / _range.extent();
+	double target_angle = value_span_angle * (target - _range.min()) / _range.extent();
+	double automatic_angle = value_span_angle * (automatic - _range.min()) / _range.extent();
 
 	painter().save();
 
@@ -255,21 +260,31 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	if (_value)
 	{
 		painter().rotate (value_angle);
-		painter().setPen (pointer_pen);
 		painter().set_shadow_color (Qt::black);
 		painter().set_shadow_width (1.9f);
 
-		if (_target_value)
+		auto draw_outside_arc = [&] (double angle, double ext_adj, double intr, double extr, bool with_core_pointer)
 		{
-			float ext = 0.15f * r;
-			float extr = 1.15f * r;
-			painter().draw_outlined_line (QPointF (0.f, 0.f), QPointF (extr, 0.f));
-			painter().rotate (target_angle - value_angle);
-			painter().draw_outlined_line (QPointF (1.01f * r, 0.f), QPointF (extr, 0.f));
-			painter().drawArc (rect.adjusted (-ext, -ext, +ext, +ext), arc_degs (90_deg), arc_span (1_deg * (value_angle - target_angle)));
-		}
+			if (with_core_pointer)
+				painter().draw_outlined_line (QPointF (0.0, 0.0), QPointF (extr, 0.0));
+			else
+				painter().draw_outlined_line (QPointF (1.0, 0.0), QPointF (extr, 0.0));
+			painter().rotate (angle - value_angle);
+			painter().draw_outlined_line (QPointF (intr, 0.0), QPointF (extr, 0.0));
+			painter().drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj), arc_degs (90_deg), arc_span (1_deg * (value_angle - angle)));
+		};
+
+		painter().save();
+		painter().setPen (automatic_pen);
+		if (_automatic_value)
+			draw_outside_arc (automatic_angle, 0.10 * r, 0.95 * r, 1.10 * r, false);
+
+		painter().restore();
+		painter().setPen (pointer_pen);
+		if (_target_value)
+			draw_outside_arc (target_angle, 0.15 * r, 1.01 * r, 1.15 * r, true);
 		else
-			painter().draw_outlined_line (QPointF (0.f, 0.f), QPointF (0.99f * r, 0.f));
+			painter().draw_outlined_line (QPointF (0.0, 0.0), QPointF (0.99f * r, 0.0));
 	}
 
 	painter().restore();

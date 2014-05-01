@@ -55,6 +55,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 		{ "value", _value, true },
 		{ "value.target", _value_target, false },
 		{ "value.reference", _value_reference, false },
+		{ "value.automatic", _value_automatic, false },
 	});
 }
 
@@ -62,7 +63,7 @@ RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElem
 void
 RadialIndicator::data_updated()
 {
-	if (_initialize || _value.fresh() || _value_target.fresh() || _value_reference.fresh())
+	if (_initialize || _value.fresh() || _value_target.fresh() || _value_reference.fresh() || _value_automatic.fresh())
 	{
 		_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
 		_widget->set_precision (_value_precision);
@@ -73,6 +74,7 @@ RadialIndicator::data_updated()
 		_widget->set_critical_value (_value_maximum_critical);
 		_widget->set_target_value (get_optional_value (_value_target));
 		_widget->set_reference_value (get_optional_value (_value_reference));
+		_widget->set_automatic_value (get_optional_value (_value_automatic));
 
 		_initialize = false;
 	}
