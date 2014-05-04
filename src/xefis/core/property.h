@@ -67,6 +67,16 @@ class InvalidOperation: public Exception
 };
 
 
+/**
+ * Indicates that there was an error during stringify operation.
+ */
+class StringifyError: public Exception
+{
+  public:
+	StringifyError (std::string const& message);
+};
+
+
 class GenericProperty
 {
   public:
@@ -424,6 +434,12 @@ InvalidOperation::InvalidOperation (std::string const& message):
 
 
 inline
+StringifyError::StringifyError (std::string const& message):
+	Exception (message)
+{ }
+
+
+inline
 GenericProperty::GenericProperty():
 	_root (PropertyStorage::default_storage()->root())
 { }
@@ -605,11 +621,19 @@ GenericProperty::stringify (boost::format format, std::string const& unit, std::
 	}
 	catch (UnsupportedUnit const&)
 	{
-		return "unit error";
+		throw StringifyError ("unit error");
 	}
 	catch (boost::io::too_few_args const&)
 	{
-		return "format error";
+		throw StringifyError ("format: too few args");
+	}
+	catch (boost::io::too_many_args const&)
+	{
+		throw StringifyError ("format: too many args");
+	}
+	catch (...)
+	{
+		throw StringifyError ("format error");
 	}
 }
 

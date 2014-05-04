@@ -123,7 +123,7 @@ class InstrumentAids
 	static float
 	arc_span (Angle deg);
 
-  protected:
+  public:
 	Xefis::Painter				_painter;
 	Xefis::TextPainter::Cache	_text_painter_cache;
 	QFont						_font;

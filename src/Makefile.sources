@@ -240,6 +240,7 @@ XEFIS_MOCHDRS += modules/helpers/sound.h
 
 ######## /modules/instruments ########
 
+XEFIS_HEADERS += modules/instruments/cdu.h
 XEFIS_HEADERS += modules/instruments/datatable.h
 XEFIS_HEADERS += modules/instruments/efis.h
 XEFIS_HEADERS += modules/instruments/efis_widget.h
@@ -257,6 +258,7 @@ XEFIS_HEADERS += modules/instruments/status.h
 XEFIS_HEADERS += modules/instruments/status_widget.h
 XEFIS_HEADERS += modules/instruments/vertical_trim.h
 
+XEFIS_SOURCES += modules/instruments/cdu.cc
 XEFIS_SOURCES += modules/instruments/datatable.cc
 XEFIS_SOURCES += modules/instruments/efis.cc
 XEFIS_SOURCES += modules/instruments/efis_widget.cc
