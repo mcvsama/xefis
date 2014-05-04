@@ -36,8 +36,8 @@ class TextLayout
   public:
 	enum BackgroundMode
 	{
-		Whole,
-		PerLine,
+		Whole,		// Whole background rectangle will have background.
+		PerLine,	// Each line (with presumably different width) have background painted separately.
 	};
 
   private:
