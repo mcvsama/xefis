@@ -65,7 +65,13 @@ class Exception: public std::exception
 	has_inner() const noexcept;
 
 	/**
-	 * Return exception message.
+	 * Return plain exception message.
+	 */
+	const char*
+	what() const noexcept;
+
+	/**
+	 * Return combined exception message.
 	 */
 	std::string const&
 	message() const;
@@ -102,6 +108,7 @@ class Exception: public std::exception
 
   private:
 	bool		_has_inner = false;
+	std::string	_what;
 	std::string	_message;
 	std::string	_inner_message;
 	Backtrace	_backtrace;
@@ -125,6 +132,7 @@ Exception::Exception (const char* message, Exception const* inner):
 
 inline
 Exception::Exception (std::string const& message, Exception const* inner):
+	_what (message),
 	_message ("Error: " + message)
 {
 	if (inner)
@@ -151,6 +159,13 @@ inline bool
 Exception::has_inner() const noexcept
 {
 	return _has_inner;
+}
+
+
+inline const char*
+Exception::what() const noexcept
+{
+	return _what.c_str();
 }
 
 
