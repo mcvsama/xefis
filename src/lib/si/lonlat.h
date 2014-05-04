@@ -34,26 +34,26 @@ class LonLat
 
   public:
 	// Ctor
-	constexpr LonLat();
+	constexpr LonLat() noexcept;
 
 	/**
 	 * \param	longitude Angle between -180_deg and 180_deg.
 	 * \param	latitude Angle between -90_deg and 90_deg.
 	 */
-	constexpr LonLat (Angle longitude, Angle latitude);
+	constexpr LonLat (Angle longitude, Angle latitude) noexcept;
 
   public:
 	Angle&
-	lat();
+	lat() noexcept;
 
 	Angle const&
-	lat() const;
+	lat() const noexcept;
 
 	Angle&
-	lon();
+	lon() noexcept;
 
 	Angle const&
-	lon() const;
+	lon() const noexcept;
 
 	LonLat&
 	rotate (LonLat const& rotation);
@@ -102,41 +102,41 @@ class LonLat
 
 
 constexpr inline
-LonLat::LonLat():
+LonLat::LonLat() noexcept:
 	LonLat (0_deg, 0_deg)
 { }
 
 
 constexpr inline
-LonLat::LonLat (Angle longitude, Angle latitude):
+LonLat::LonLat (Angle longitude, Angle latitude) noexcept:
 	_lon (longitude),
 	_lat (latitude)
 { }
 
 
 inline Angle&
-LonLat::lon()
+LonLat::lon() noexcept
 {
 	return _lon;
 }
 
 
 inline Angle const&
-LonLat::lon() const
+LonLat::lon() const noexcept
 {
 	return _lon;
 }
 
 
 inline Angle&
-LonLat::lat()
+LonLat::lat() noexcept
 {
 	return _lat;
 }
 
 
 inline Angle const&
-LonLat::lat() const
+LonLat::lat() const noexcept
 {
 	return _lat;
 }

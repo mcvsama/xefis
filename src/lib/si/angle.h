@@ -43,14 +43,14 @@ class Angle: public LinearValue<double, Angle>
 	 * To create an Angle use these operators directly.
 	 */
 	explicit constexpr
-	Angle (ValueType radians);
+	Angle (ValueType radians) noexcept;
 
   public:
 	constexpr
-	Angle() = default;
+	Angle() noexcept = default;
 
 	constexpr
-	Angle (Angle const&) = default;
+	Angle (Angle const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -141,7 +141,7 @@ operator"" _deg (unsigned long long degrees)
 
 
 inline constexpr
-Angle::Angle (ValueType radians):
+Angle::Angle (ValueType radians) noexcept:
 	LinearValue (radians)
 { }
 

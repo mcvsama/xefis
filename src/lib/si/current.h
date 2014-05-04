@@ -34,14 +34,14 @@ class Current: public LinearValue<double, Current>
 
   protected:
 	explicit constexpr
-	Current (ValueType psi);
+	Current (ValueType psi) noexcept;
 
   public:
 	constexpr
-	Current() = default;
+	Current() noexcept = default;
 
 	constexpr
-	Current (Current const&) = default;
+	Current (Current const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -105,7 +105,7 @@ operator"" _mA (unsigned long long mA)
 
 
 inline constexpr
-Current::Current (ValueType m):
+Current::Current (ValueType m) noexcept:
 	LinearValue (m)
 { }
 

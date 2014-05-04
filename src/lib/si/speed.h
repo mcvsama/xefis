@@ -43,14 +43,14 @@ class Speed: public LinearValue<double, Speed>
 	 * To create a Speed use these operators directly.
 	 */
 	explicit constexpr
-	Speed (ValueType kt);
+	Speed (ValueType kt) noexcept;
 
   public:
 	constexpr
-	Speed() = default;
+	Speed() noexcept = default;
 
 	constexpr
-	Speed (Speed const&) = default;
+	Speed (Speed const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -148,7 +148,7 @@ operator"" _mps (unsigned long long mps)
 
 
 inline constexpr
-Speed::Speed (ValueType kt):
+Speed::Speed (ValueType kt) noexcept:
 	LinearValue (kt)
 { }
 

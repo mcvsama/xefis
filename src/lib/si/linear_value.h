@@ -49,7 +49,7 @@ template<class tValueType, class tDerived>
 
 	  protected:
 		explicit constexpr
-		LinearValue (ValueType);
+		LinearValue (ValueType) noexcept;
 
 		constexpr
 		LinearValue() noexcept = default;
@@ -140,7 +140,7 @@ UnsupportedUnit::UnsupportedUnit (std::string const& message):
 
 template<class V, class T>
 	inline constexpr
-	LinearValue<V, T>::LinearValue (ValueType value):
+	LinearValue<V, T>::LinearValue (ValueType value) noexcept:
 		TypedValue (value)
 	{ }
 
