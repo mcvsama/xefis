@@ -34,14 +34,14 @@ class Weight: public LinearValue<double, Weight>
 
   protected:
 	explicit constexpr
-	Weight (ValueType psi);
+	Weight (ValueType psi) noexcept;
 
   public:
 	constexpr
-	Weight() = default;
+	Weight() noexcept = default;
 
 	constexpr
-	Weight (Weight const&) = default;
+	Weight (Weight const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -105,7 +105,7 @@ operator"" _kg (unsigned long long kg)
 
 
 inline constexpr
-Weight::Weight (ValueType m):
+Weight::Weight (ValueType m) noexcept:
 	LinearValue (m)
 { }
 

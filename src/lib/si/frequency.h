@@ -36,14 +36,14 @@ class Frequency: public LinearValue<double, Frequency>
 
   protected:
 	explicit constexpr
-	Frequency (ValueType Hz);
+	Frequency (ValueType Hz) noexcept;
 
   public:
 	constexpr
-	Frequency() = default;
+	Frequency() noexcept = default;
 
 	constexpr
-	Frequency (Frequency const&) = default;
+	Frequency (Frequency const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -124,7 +124,7 @@ operator"" _MHz (unsigned long long MHz)
 
 
 inline constexpr
-Frequency::Frequency (ValueType Hz):
+Frequency::Frequency (ValueType Hz) noexcept:
 	LinearValue (Hz)
 { }
 

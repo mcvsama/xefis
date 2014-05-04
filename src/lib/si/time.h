@@ -49,14 +49,14 @@ class Time: public LinearValue<double, Time>
 	 * Used by the suffix operators.
 	 */
 	explicit constexpr
-	Time (ValueType seconds);
+	Time (ValueType seconds) noexcept;
 
   public:
 	constexpr
-	Time() = default;
+	Time() noexcept = default;
 
 	constexpr
-	Time (Time const&) = default;
+	Time (Time const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -198,7 +198,7 @@ operator"" _h (unsigned long long h)
 
 
 inline constexpr
-Time::Time (ValueType seconds):
+Time::Time (ValueType seconds) noexcept:
 	LinearValue (seconds)
 { }
 

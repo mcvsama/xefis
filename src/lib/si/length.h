@@ -40,14 +40,14 @@ class Length: public LinearValue<double, Length>
 
   protected:
 	explicit constexpr
-	Length (ValueType psi);
+	Length (ValueType psi) noexcept;
 
   public:
 	constexpr
-	Length() = default;
+	Length() noexcept = default;
 
 	constexpr
-	Length (Length const&) = default;
+	Length (Length const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -162,7 +162,7 @@ operator"" _mil (unsigned long long mil)
 
 
 inline constexpr
-Length::Length (ValueType m):
+Length::Length (ValueType m) noexcept:
 	LinearValue (m)
 { }
 

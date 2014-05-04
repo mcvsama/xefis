@@ -40,14 +40,14 @@ class Pressure: public LinearValue<float, Pressure>
 	 * To create a Pressure use these operators directly.
 	 */
 	explicit constexpr
-	Pressure (ValueType psi);
+	Pressure (ValueType psi) noexcept;
 
   public:
 	constexpr
-	Pressure() = default;
+	Pressure() noexcept = default;
 
 	constexpr
-	Pressure (Pressure const&) = default;
+	Pressure (Pressure const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -128,7 +128,7 @@ operator"" _inHg (unsigned long long inHg)
 
 
 inline constexpr
-Pressure::Pressure (ValueType psi):
+Pressure::Pressure (ValueType psi) noexcept:
 	LinearValue (psi)
 { }
 

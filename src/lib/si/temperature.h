@@ -38,14 +38,14 @@ class Temperature: public LinearValue<double, Temperature>
 	 * Used by the suffix operators.
 	 */
 	explicit constexpr
-	Temperature (ValueType kelvins);
+	Temperature (ValueType kelvins) noexcept;
 
   public:
 	constexpr
-	Temperature() = default;
+	Temperature() noexcept = default;
 
 	constexpr
-	Temperature (Temperature const&) = default;
+	Temperature (Temperature const&) noexcept = default;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -139,7 +139,7 @@ operator"" _Ra (unsigned long long rankines)
 
 
 inline constexpr
-Temperature::Temperature (ValueType kelvins):
+Temperature::Temperature (ValueType kelvins) noexcept:
 	LinearValue (kelvins)
 { }
 
