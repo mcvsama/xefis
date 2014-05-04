@@ -337,12 +337,12 @@ CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, C
 	if (!setting_element.hasAttribute ("path"))
 		throw Xefis::Exception ("<setting> needs a @path attribute");
 
-	if (setting_element.hasAttribute ("nil-value"))
-		_nil_value = setting_element.attribute ("nil-value").toStdString();
-
+	_nil_value = setting_element.attribute ("nil-value", "").toStdString();
+	_format = setting_element.attribute ("format", "%1%").toStdString();
+	_true_value = setting_element.attribute ("true-value", "ON").toStdString();
+	_false_value = setting_element.attribute ("false-value", "OFF").toStdString();
+	_read_only = setting_element.attribute ("read-only") == "true";
 	_property.set_path (setting_element.attribute ("path").toStdString());
-	if (setting_element.hasAttribute ("format"))
-		_format = setting_element.attribute ("format").toStdString();
 	_unit = setting_element.attribute ("unit").toStdString();
 }
 
@@ -357,8 +357,9 @@ CDU::SettingStrip::fresh() const noexcept
 void
 CDU::SettingStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 {
-	if (_button_rect.contains (event->pos()))
-		_button_state = ButtonState::Pressed;
+	if (!_read_only)
+		if (_button_rect.contains (event->pos()))
+			_button_state = ButtonState::Pressed;
 }
 
 
@@ -367,7 +368,9 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 {
 	_button_state = ButtonState::Normal;
 
-	if (_button_rect.contains (event->pos()) && _property.configured())
+	if (!_read_only &&
+		_button_rect.contains (event->pos()) &&
+		_property.configured())
 	{
 		if (_property.is_type<bool>())
 		{
@@ -418,8 +421,12 @@ void
 CDU::SettingStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
 {
 	_button_rect = rect;
-	bool over_button = _button_rect.contains (cdu().mapFromGlobal (QCursor::pos()));
-	paint_button_helper (rect, aids, painter, column, over_button ? _button_state : ButtonState::Normal);
+	ButtonState button_state = ButtonState::Normal;
+	if (_read_only)
+		button_state = ButtonState::Disabled;
+	else if (_button_rect.contains (cdu().mapFromGlobal (QCursor::pos())))
+		button_state = _button_state;
+	paint_button_helper (rect, aids, painter, column, button_state);
 }
 
 
@@ -438,8 +445,8 @@ CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids,
 		if (_property.is_type<bool>())
 		{
 			bool p = *static_cast<Xefis::PropertyBoolean&> (_property);
-			const char* act_val = p ? "ON" : "OFF";
-			const char* inact_val = p ? "OFF" : "ON";
+			std::string const act_val = p ? _true_value : _false_value;
+			std::string const inact_val = p ? _false_value : _true_value;
 
 			Xefis::TextLayout tl;
 			tl.set_alignment (Qt::AlignCenter);
@@ -464,7 +471,7 @@ CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids,
 		}
 		else
 		{
-			QColor str_color = Qt::white;
+			QColor str_color = _read_only ? QColor (0x22, 0xcc, 0xff) : Qt::white;
 			QString str_val;
 			try {
 				str_val = QString::fromStdString (_property.stringify (boost::format (_format), _unit, _nil_value));
@@ -489,7 +496,8 @@ CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids,
 void
 CDU::SettingStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column)
 {
-	paint_focus_helper (rect, button_rect, aids, painter, column);
+	if (!_read_only)
+		paint_focus_helper (rect, button_rect, aids, painter, column);
 }
 
 
