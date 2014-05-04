@@ -47,6 +47,7 @@ Instrument::Instrument (ModuleManager* module_manager, QDomElement const& config
 	QWidget (nullptr)
 {
 	setFont (Xefis::Services::instrument_font());
+	setCursor (QCursor (Qt::CrossCursor));
 }
 
 } // namespace Xefis
