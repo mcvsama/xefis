@@ -183,10 +183,13 @@ class CDU:
 
 	  private:
 		Xefis::TypedProperty	_property;
-		std::string				_format			= "%1%";
+		std::string				_format;
 		std::string				_unit;
 		std::string				_nil_value;
+		std::string				_true_value;
+		std::string				_false_value;
 		ButtonState				_button_state	= ButtonState::Normal;
+		bool					_read_only		= false;
 		QRectF					_button_rect;
 	};
 
