@@ -155,7 +155,21 @@ Datatable::paintEvent (QPaintEvent*)
 		// Value:
 		painter().setFont (value_font);
 		painter().setPen (get_pen (lv.value_color, 1.0));
-		painter().fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, lv.stringify());
+		QString lv_s;
+		try {
+			lv_s = lv.stringify();
+		}
+		catch (Xefis::StringifyError const& exception)
+		{
+			painter().setPen (get_pen (Qt::red, 1.0));
+			lv_s = exception.what();
+		}
+		catch (boost::io::bad_format_string const&)
+		{
+			painter().setPen (get_pen (Qt::red, 1.0));
+			lv_s = "format: ill formed";
+		}
+		painter().fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, lv_s);
 	}
 }
 
