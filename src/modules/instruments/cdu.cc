@@ -567,6 +567,18 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 	Column current_column_dir = Column::Left;
 	Strips* current_column = nullptr;
 
+	auto forget_strip = [&] (Strip* ptr)
+	{
+		for (UniqueStrips::iterator it = _strips.begin(); it != _strips.end(); ++it)
+		{
+			if (it->get() == ptr)
+			{
+				_strips.erase (it);
+				break;
+			}
+		}
+	};
+
 	auto parse_column = [&] (QDomElement const& column_element)
 	{
 		bool has_fill_element = false;
@@ -604,8 +616,9 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 		{
 			if (dynamic_cast<FillStrip*> (current_column->at (i)))
 			{
-				// Replace with enough EmptyStrips so that total size is equal to config.rows():
+				// Replace with enough EmptyStrips so that the total size is equal to config.rows():
 				Strips::iterator it = current_column->begin() + i;
+				forget_strip (*it);
 				current_column->erase (it);
 				if (current_column->size() < config.rows())
 				{
@@ -619,12 +632,16 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 			}
 		}
 
-		// Make sure that the column has exactly [rows] elements:
+		// Make sure that the column has exactly [rows] elements.
+		// Remove overflow:
 		if (current_column->size() > config.rows())
 		{
 			logger << "Warning: page '" << _id.toStdString() << "': number of elements exceed rows setting (" << config.rows() << ")" << std::endl;
-			_strips.resize (config.rows());
+			for (auto it = current_column->begin() + config.rows(); it != current_column->end(); ++it)
+				forget_strip (*it);
+			current_column->resize (config.rows());
 		}
+		// Fill in underflow:
 		else if (current_column->size() < config.rows())
 		{
 			for (std::size_t i = 0, n = config.rows() - current_column->size(); i < n; ++i)
