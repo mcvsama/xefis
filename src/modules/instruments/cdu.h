@@ -199,6 +199,9 @@ class CDU:
 		// Ctor
 		explicit GotoStrip (CDU&, QDomElement const& goto_element, Column);
 
+		QString const&
+		target_page_id() const noexcept;
+
 		// Strip
 		void
 		handle_mouse_press (QMouseEvent*, CDU*) override;
@@ -343,6 +346,13 @@ class CDU:
 		default_page_id() const noexcept;
 
 		/**
+		 * Return default page.
+		 * May return nullptr.
+		 */
+		Page*
+		default_page() const noexcept;
+
+		/**
 		 * Return number of button rows/strips per page.
 		 */
 		std::size_t
@@ -355,10 +365,18 @@ class CDU:
 		Page*
 		find_page_by_id (QString const& id) const noexcept;
 
+		/**
+		 * Ensure that all pages are reachable from the first page.
+		 * Log errors on logger.
+		 */
+		void
+		check_reachability() const;
+
 	  private:
-		PagesMap	_pages_by_id;
-		QString		_default_page_id;
-		std::size_t	_rows = 8;
+		PagesMap				_pages_by_id;
+		QString					_default_page_id;
+		std::size_t				_rows = 8;
+		Xefis::Logger const&	_logger;
 	};
 
   public:

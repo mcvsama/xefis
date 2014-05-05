@@ -511,6 +511,13 @@ CDU::GotoStrip::GotoStrip (CDU& cdu, QDomElement const& goto_element, Column col
 }
 
 
+inline QString const&
+CDU::GotoStrip::target_page_id() const noexcept
+{
+	return _target_page_id;
+}
+
+
 void
 CDU::GotoStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 {
@@ -816,7 +823,8 @@ CDU::Page::reset()
 }
 
 
-CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger const& logger)
+CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger const& logger):
+	_logger (logger)
 {
 	_default_page_id = pages_element.attribute ("default");
 
@@ -834,6 +842,8 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger c
 		else
 			throw Xefis::Exception ("unsupported element '" + e.tagName() + "'");
 	}
+
+	check_reachability();
 }
 
 
@@ -854,6 +864,13 @@ CDU::Config::default_page_id() const noexcept
 }
 
 
+CDU::Page*
+CDU::Config::default_page() const noexcept
+{
+	return find_page_by_id (default_page_id());
+}
+
+
 std::size_t
 CDU::Config::rows() const noexcept
 {
@@ -870,6 +887,46 @@ CDU::Config::find_page_by_id (QString const& id) const noexcept
 		return nullptr;
 	else
 		return cp->second.get();
+}
+
+
+void
+CDU::Config::check_reachability() const
+{
+	std::set<Page*> all_pages;
+	for (auto pit: _pages_by_id)
+		all_pages.insert (pit.second.get());
+
+	std::function<void (Page*)> traverse = [&] (Page* page)
+	{
+		all_pages.erase (page);
+
+		for (auto const& strip: page->strips())
+		{
+			GotoStrip* goto_strip = dynamic_cast<GotoStrip*> (strip.get());
+			if (goto_strip)
+			{
+				Page* next_hop = find_page_by_id (goto_strip->target_page_id());
+				if (!next_hop)
+					_logger << "Warning: page '" << goto_strip->target_page_id().toStdString() << "' referenced by '" << page->id().toStdString() << "' doesn't exist." << std::endl;
+				else if (all_pages.find (next_hop) != all_pages.end())
+					traverse (next_hop);
+			}
+		}
+	};
+
+	if (default_page())
+	{
+		traverse (default_page());
+
+		if (!all_pages.empty())
+		{
+			QStringList pages;
+			for (auto& page: all_pages)
+				pages.push_back (page->id());
+			_logger << "Warning: the following pages are not reachable from the main page: " << pages.join (", ").toStdString() << "." << std::endl;
+		}
+	}
 }
 
 
