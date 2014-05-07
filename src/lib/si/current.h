@@ -34,7 +34,7 @@ class Current: public LinearValue<double, Current>
 
   protected:
 	explicit constexpr
-	Current (ValueType psi) noexcept;
+	Current (ValueType A) noexcept;
 
   public:
 	constexpr
@@ -105,8 +105,8 @@ operator"" _mA (unsigned long long mA)
 
 
 inline constexpr
-Current::Current (ValueType m) noexcept:
-	LinearValue (m)
+Current::Current (ValueType A) noexcept:
+	LinearValue (A)
 { }
 
 

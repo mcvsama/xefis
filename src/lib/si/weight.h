@@ -34,7 +34,7 @@ class Weight: public LinearValue<double, Weight>
 
   protected:
 	explicit constexpr
-	Weight (ValueType psi) noexcept;
+	Weight (ValueType gr) noexcept;
 
   public:
 	constexpr
@@ -105,8 +105,8 @@ operator"" _kg (unsigned long long kg)
 
 
 inline constexpr
-Weight::Weight (ValueType m) noexcept:
-	LinearValue (m)
+Weight::Weight (ValueType gr) noexcept:
+	LinearValue (gr)
 { }
 
 
@@ -155,7 +155,7 @@ Weight::floatize (std::string unit) const
 {
 	boost::to_lower (unit);
 
-	if (unit == "gr")
+	if (unit == "gr" || unit == "gram")
 		return gr();
 	else if (unit == "kg")
 		return kg();
