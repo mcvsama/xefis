@@ -9,6 +9,38 @@
 		<output>
 			<binary_mode>true</binary_mode>
 			<byte_order>host</byte_order>
+			<!-- Gyros -->
+			<chunk>
+				<name>rox</name>
+				<type>double</type>
+				<node>/orientation/roll-rate-degps</node>
+			</chunk>
+			<chunk>
+				<name>roy</name>
+				<type>double</type>
+				<node>/orientation/pitch-rate-degps</node>
+			</chunk>
+			<chunk>
+				<name>roz</name>
+				<type>double</type>
+				<node>/orientation/yaw-rate-degps</node>
+			</chunk>
+			<!-- Acceleration -->
+			<chunk>
+				<name>acx</name>
+				<type>double</type>
+				<node>/accelerations/pilot/x-accel-fps_sec</node>
+			</chunk>
+			<chunk>
+				<name>acy</name>
+				<type>double</type>
+				<node>/accelerations/pilot/y-accel-fps_sec</node>
+			</chunk>
+			<chunk>
+				<name>acz</name>
+				<type>double</type>
+				<node>/accelerations/pilot/z-accel-fps_sec</node>
+			</chunk>
 			<!-- Angle of Attack -->
 			<chunk>
 				<name>ama</name>

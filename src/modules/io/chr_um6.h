@@ -19,9 +19,6 @@
 #include <string>
 #include <memory>
 
-// Qt:
-#include <QtCore/QSocketNotifier>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
@@ -58,6 +55,11 @@ class CHRUM6:
   public:
 	// Ctor
 	CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config);
+
+  protected:
+	// Xefis::Module
+	void
+	data_updated() override;
 
   private slots:
 	/**
@@ -213,6 +215,11 @@ class CHRUM6:
 	Optional<uint32_t>			_gyro_bias_xy;
 	Optional<uint32_t>			_gyro_bias_z;
 
+	// Input:
+	Xefis::PropertyAcceleration	_input_centrifugal_x;
+	Xefis::PropertyAcceleration	_input_centrifugal_y;
+	Xefis::PropertyAcceleration	_input_centrifugal_z;
+	// Output:
 	Xefis::PropertyBoolean		_serviceable;
 	Xefis::PropertyBoolean		_caution;
 	Xefis::PropertyInteger		_failures;
@@ -220,15 +227,13 @@ class CHRUM6:
 	Xefis::PropertyAngle		_orientation_pitch;
 	Xefis::PropertyAngle		_orientation_roll;
 	Xefis::PropertyAngle		_orientation_magnetic_heading;
-	// In gravities:
-	Xefis::PropertyFloat		_acceleration_x;
-	Xefis::PropertyFloat		_acceleration_y;
-	Xefis::PropertyFloat		_acceleration_z;
-	// In deg/s:
-	Xefis::PropertyAngle		_rotation_x;
-	Xefis::PropertyAngle		_rotation_y;
-	Xefis::PropertyAngle		_rotation_z;
-	// In... what?
+	Xefis::PropertyAcceleration	_acceleration_x;
+	Xefis::PropertyAcceleration	_acceleration_y;
+	Xefis::PropertyAcceleration	_acceleration_z;
+	Xefis::PropertyFrequency	_rotation_x;
+	Xefis::PropertyFrequency	_rotation_y;
+	Xefis::PropertyFrequency	_rotation_z;
+	// What's the unit?
 	Xefis::PropertyFloat		_magnetic_x;
 	Xefis::PropertyFloat		_magnetic_y;
 	Xefis::PropertyFloat		_magnetic_z;
