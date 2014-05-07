@@ -58,7 +58,6 @@ class VOR: public Xefis::Module
 	denormalize (Angle);
 
   private:
-	Xefis::PropertyObserver	_vor_computer;
 	Xefis::Smoother<double>	_deviation_smoother			= 500_ms;
 	// Input:
 	Xefis::PropertyAngle	_input_magnetic_declination;
@@ -74,6 +73,8 @@ class VOR: public Xefis::Module
 	Xefis::PropertyAngle	_output_deviation;
 	Xefis::PropertyBoolean	_output_to_flag;
 	Xefis::PropertyLength	_output_distance;
+	// Other:
+	Xefis::PropertyObserver	_vor_computer;
 };
 
 #endif

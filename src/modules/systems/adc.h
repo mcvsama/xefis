@@ -88,15 +88,6 @@ class AirDataComputer: public Xefis::Module
 	Xefis::Smoother<double>		_speed_ias_lookahead_o_smoother		= 1000_ms;
 	Xefis::Lookahead<double>	_altitude_amsl_estimator			= Xefis::Lookahead<double> (10_s);
 	Xefis::Lookahead<double>	_speed_ias_estimator				= Xefis::Lookahead<double> (10_s);
-	Xefis::PropertyObserver		_altitude_computer;
-	Xefis::PropertyObserver		_density_altitude_computer;
-	Xefis::PropertyObserver		_ias_computer;
-	Xefis::PropertyObserver		_ias_lookahead_computer;
-	Xefis::PropertyObserver		_sound_speed_computer;
-	Xefis::PropertyObserver		_tas_computer;
-	Xefis::PropertyObserver		_mach_computer;
-	Xefis::PropertyObserver		_sat_computer;
-	Xefis::PropertyObserver		_vertical_speed_computer;
 	// Settings:
 	Speed						_ias_valid_minimum;
 	Speed						_ias_valid_maximum;
@@ -127,6 +118,16 @@ class AirDataComputer: public Xefis::Module
 	Xefis::PropertyBoolean		_vertical_speed_serviceable;
 	Xefis::PropertySpeed		_vertical_speed;
 	Xefis::PropertyTemperature	_static_air_temperature;
+	// Other:
+	Xefis::PropertyObserver		_altitude_computer;
+	Xefis::PropertyObserver		_density_altitude_computer;
+	Xefis::PropertyObserver		_ias_computer;
+	Xefis::PropertyObserver		_ias_lookahead_computer;
+	Xefis::PropertyObserver		_sound_speed_computer;
+	Xefis::PropertyObserver		_tas_computer;
+	Xefis::PropertyObserver		_mach_computer;
+	Xefis::PropertyObserver		_sat_computer;
+	Xefis::PropertyObserver		_vertical_speed_computer;
 };
 
 #endif

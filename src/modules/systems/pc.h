@@ -57,9 +57,6 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::Smoother<double>		_wind_direction_smoother			= 5_s;
 	Xefis::Smoother<double>		_wind_speed_smoother				= 5_s;
 	Xefis::Smoother<double>		_total_energy_variometer_smoother	= 1_s;
-	Xefis::PropertyObserver		_wind_computer;
-	Xefis::PropertyObserver		_glide_ratio_computer;
-	Xefis::PropertyObserver		_total_energy_variometer_computer;
 	// Input:
 	Xefis::PropertySpeed		_speed_ias;
 	Xefis::PropertySpeed		_speed_tas;
@@ -76,6 +73,10 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertyFloat		_glide_ratio;
 	Xefis::PropertyString		_glide_ratio_string;
 	Xefis::PropertySpeed		_total_energy_variometer;
+	// Other:
+	Xefis::PropertyObserver		_wind_computer;
+	Xefis::PropertyObserver		_glide_ratio_computer;
+	Xefis::PropertyObserver		_total_energy_variometer_computer;
 };
 
 #endif

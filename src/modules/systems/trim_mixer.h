@@ -45,12 +45,13 @@ class TrimMixer: public Xefis::Module
 	compute_mix();
 
   private:
-	Xefis::PropertyObserver	_mix_computer;
 	// Input:
 	Xefis::PropertyFloat	_input_axis;
 	Xefis::PropertyFloat	_input_trim_value;
 	// Output:
 	Xefis::PropertyFloat	_output_axis;
+	// Other:
+	Xefis::PropertyObserver	_mix_computer;
 };
 
 #endif

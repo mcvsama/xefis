@@ -41,7 +41,6 @@ class AOA: public Xefis::Module
 	compute_critical_aoa();
 
   private:
-	Xefis::PropertyObserver		_critical_aoa_computer;
 	// Settings:
 	double						_setting_flaps_factor		= 1.0;
 	double						_setting_spoilers_factor	= 1.0;
@@ -53,6 +52,8 @@ class AOA: public Xefis::Module
 	// Output:
 	Xefis::PropertyAngle		_output_critical_aoa;
 	Xefis::PropertyBoolean		_output_stall;
+	// Other:
+	Xefis::PropertyObserver		_critical_aoa_computer;
 };
 
 #endif
