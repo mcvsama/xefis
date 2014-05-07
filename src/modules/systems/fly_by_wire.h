@@ -75,7 +75,6 @@ class FlyByWire: public Xefis::Module
 	diagnose();
 
   private:
-	Xefis::PropertyObserver		_fbw_computer;
 	// Used with joystick input:
 	Xefis::PIDControl<double>	_manual_pitch_pid;
 	Xefis::PIDControl<double>	_manual_roll_pid;
@@ -139,6 +138,8 @@ class FlyByWire: public Xefis::Module
 	Xefis::PropertyFloat		_output_ailerons;
 	Xefis::PropertyFloat		_output_rudder;
 	Xefis::PropertyFloat		_output_throttle;
+	// Other:
+	Xefis::PropertyObserver		_fbw_computer;
 };
 
 #endif

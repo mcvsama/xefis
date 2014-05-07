@@ -74,8 +74,6 @@ class TrimControl: public Xefis::Module
 	double					_trim_value		= 0.0;
 	bool					_trimming_up	= false;
 	bool					_trimming_down	= false;
-	Xefis::PropertyObserver	_trim_computer;
-	Xefis::PropertyObserver	_mix_computer;
 	Unique<QTimer>			_timer;
 	// Input:
 	Xefis::PropertyFloat	_input_trim_axis;
@@ -84,6 +82,9 @@ class TrimControl: public Xefis::Module
 	Xefis::PropertyBoolean	_input_down_trim_button;
 	// Output:
 	Xefis::PropertyFloat	_output_trim_value;
+	// Other:
+	Xefis::PropertyObserver	_trim_computer;
+	Xefis::PropertyObserver	_mix_computer;
 };
 
 #endif

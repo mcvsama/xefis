@@ -82,11 +82,6 @@ class NavigationComputer: public Xefis::Module
 	Xefis::Smoother<double>		_track_lateral_true_smoother			= 500_ms;
 	Xefis::Smoother<double>		_track_heading_delta_smoother			= 500_ms;
 	Xefis::Smoother<double>		_track_ground_speed_smoother			= 2_s;
-	Xefis::PropertyObserver		_position_computer;
-	Xefis::PropertyObserver		_magnetic_variation_computer;
-	Xefis::PropertyObserver		_headings_computer;
-	Xefis::PropertyObserver		_track_computer;
-	Xefis::PropertyObserver		_ground_speed_computer;
 	Time						_track_accumulated_dt					= 0_s;
 	// Input:
 	Xefis::PropertyAngle		_position_input_longitude;
@@ -116,6 +111,12 @@ class NavigationComputer: public Xefis::Module
 	Xefis::PropertySpeed		_track_ground_speed;
 	Xefis::PropertyAngle		_magnetic_declination;
 	Xefis::PropertyAngle		_magnetic_inclination;
+	// Other:
+	Xefis::PropertyObserver		_position_computer;
+	Xefis::PropertyObserver		_magnetic_variation_computer;
+	Xefis::PropertyObserver		_headings_computer;
+	Xefis::PropertyObserver		_track_computer;
+	Xefis::PropertyObserver		_ground_speed_computer;
 };
 
 #endif

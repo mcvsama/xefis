@@ -68,7 +68,6 @@ class RemoteControlManagementSystem:
   private:
 	Unique<QWidget>			_configurator_widget;
 	bool					_home_acquired			= false;
-	Xefis::PropertyObserver	_distance_computer;
 	// Input:
 	Xefis::PropertyLength	_vlos_caution_distance;
 	Xefis::PropertyLength	_vlos_warning_distance;
@@ -83,6 +82,8 @@ class RemoteControlManagementSystem:
 	Xefis::PropertyLength	_distance_ground;
 	Xefis::PropertyLength	_distance_vertical;
 	Xefis::PropertyAngle	_true_home_direction;
+	// Other:
+	Xefis::PropertyObserver	_distance_computer;
 };
 
 #endif

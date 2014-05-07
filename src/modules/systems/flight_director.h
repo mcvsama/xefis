@@ -93,7 +93,6 @@ class FlightDirector: public Xefis::Module
 	double						_fpa_pid_p					= 1.0;
 	double						_fpa_pid_i					= 0.1;
 	double						_fpa_pid_d					= 0.0;
-	Xefis::PropertyObserver		_fd_computer;
 	Xefis::PIDControl<double>	_magnetic_heading_pid;
 	Xefis::PIDControl<double>	_magnetic_track_pid;
 	Xefis::PIDControl<double>	_altitude_pid;
@@ -128,6 +127,8 @@ class FlightDirector: public Xefis::Module
 	Xefis::PropertyAngle		_output_pitch;
 	Xefis::PropertyAngle		_output_roll;
 	Xefis::PropertyBoolean		_disengage_ap;
+	// Other:
+	Xefis::PropertyObserver		_fd_computer;
 };
 
 #endif

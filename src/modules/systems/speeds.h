@@ -50,7 +50,6 @@ class Speeds: public Xefis::Module
 		min (Optional<T>, T);
 
   private:
-	Xefis::PropertyObserver	_speeds_computer;
 	// Input:
 	Xefis::PropertyAngle	_input_flaps_angle;
 	// Output:
@@ -58,6 +57,8 @@ class Speeds: public Xefis::Module
 	Xefis::PropertySpeed	_output_speed_minimum_maneuver;
 	Xefis::PropertySpeed	_output_speed_maximum_maneuver;
 	Xefis::PropertySpeed	_output_speed_maximum;
+	// Other:
+	Xefis::PropertyObserver	_speeds_computer;
 };
 
 #endif

@@ -45,7 +45,6 @@ class AltAcq: public Xefis::Module
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	Xefis::Smoother<double>		_altitude_acquire_distance_smoother	= 2_s;
-	Xefis::PropertyObserver		_altitude_acquire_distance_computer;
 	Length						_minimum_altitude_difference;
 	Length						_flag_diff_on						= 1000_ft;
 	Length						_flag_diff_off						= 100_ft;
@@ -59,6 +58,8 @@ class AltAcq: public Xefis::Module
 	// Output:
 	Xefis::PropertyLength		_altitude_acquire_distance;
 	Xefis::PropertyBoolean		_altitude_acquire_flag;
+	// Other:
+	Xefis::PropertyObserver		_altitude_acquire_distance_computer;
 };
 
 #endif

@@ -43,7 +43,6 @@ class YawDamper: public Xefis::Module
 	compute();
 
   private:
-	Xefis::PropertyObserver		_rudder_computer;
 	Xefis::PIDControl<double>	_rudder_pid;
 	// Settings:
 	double						_rudder_p;
@@ -56,6 +55,8 @@ class YawDamper: public Xefis::Module
 	Xefis::PropertyFloat		_input_slip_skid_g;
 	// Output:
 	Xefis::PropertyFloat		_output_rudder;
+	// Other:
+	Xefis::PropertyObserver		_rudder_computer;
 };
 
 #endif

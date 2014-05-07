@@ -41,7 +41,6 @@ class ETA: public Xefis::Module
 
   private:
 	Xefis::Smoother<double>	_smoother = 3_s;
-	Xefis::PropertyObserver	_eta_computer;
 	Optional<Length>		_prev_distance;
 	// Input:
 	Xefis::PropertyAngle	_input_station_latitude;
@@ -51,6 +50,8 @@ class ETA: public Xefis::Module
 	Xefis::PropertyAngle	_input_track_lateral_true;
 	// Output:
 	Xefis::PropertyTime		_output_eta;
+	// Other:
+	Xefis::PropertyObserver	_eta_computer;
 };
 
 #endif

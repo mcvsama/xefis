@@ -44,12 +44,13 @@ class SlipSkid: public Xefis::Module
 	compute_slip_skid();
 
   private:
-	Xefis::PropertyObserver	_slip_skid_computer;
 	// Input:
 	Xefis::PropertyFloat	_y_acceleration;
 	Xefis::PropertyFloat	_z_acceleration;
 	// Output:
 	Xefis::PropertyFloat	_slip_skid;
+	// Other:
+	Xefis::PropertyObserver	_slip_skid_computer;
 };
 
 #endif

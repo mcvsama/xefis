@@ -56,7 +56,6 @@ class EFIS: public Xefis::Instrument
 
   private:
 	EFISWidget*							_efis_widget					= nullptr;
-	Xefis::PropertyObserver				_fpv_computer;
 	// Setting
 	Xefis::PropertyInteger::Type		_speed_ladder_line_every		= 10;
 	Xefis::PropertyInteger::Type		_speed_ladder_number_every		= 20;
@@ -194,6 +193,8 @@ class EFIS: public Xefis::Instrument
 	// Style
 	Xefis::PropertyBoolean				_style_old;
 	Xefis::PropertyBoolean				_style_show_metric;
+	// Other:
+	Xefis::PropertyObserver				_fpv_computer;
 };
 
 
