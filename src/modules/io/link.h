@@ -118,6 +118,7 @@ class Link:
 			Unknown,
 			Integer,
 			Float,
+			Acceleration,
 			Angle,
 			Current,
 			Pressure,
@@ -175,6 +176,7 @@ class Link:
 		bool							_retained			= false;
 		Xefis::PropertyInteger			_property_integer;
 		Xefis::PropertyFloat			_property_float;
+		Xefis::PropertyAcceleration		_property_acceleration;
 		Xefis::PropertyAngle			_property_angle;
 		Xefis::PropertyCurrent			_property_current;
 		Xefis::PropertyPressure			_property_pressure;

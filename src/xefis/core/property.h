@@ -976,6 +976,7 @@ typedef Property<bool>			PropertyBoolean;
 typedef Property<int64_t>		PropertyInteger;
 typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
+typedef Property<Acceleration>	PropertyAcceleration;
 typedef Property<Angle>			PropertyAngle;
 typedef Property<Current>		PropertyCurrent;
 typedef Property<Pressure>		PropertyPressure;
