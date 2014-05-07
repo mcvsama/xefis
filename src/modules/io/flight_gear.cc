@@ -38,6 +38,12 @@ typedef uint32_t	FGInt;
 BEGIN_PACKED_STRUCT
 struct FGInputData
 {
+	FGDouble	rotation_x_degps;					// rox
+	FGDouble	rotation_y_degps;					// roy
+	FGDouble	rotation_z_degps;					// roz
+	FGDouble	acceleration_x_fps2;				// acx
+	FGDouble	acceleration_y_fps2;				// acy
+	FGDouble	acceleration_z_fps2;				// acz
 	FGDouble	aoa_alpha_maximum_rad;				// ama
 	FGDouble	aoa_alpha_minimum_rad;				// ami
 	FGDouble	aoa_alpha_rad;						// aoa
@@ -134,6 +140,12 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 				else if (e2 == "properties")
 				{
 					parse_properties (e2, {
+						{ "rotation.x", _rotation_x, false },
+						{ "rotation.y", _rotation_y, false },
+						{ "rotation.z", _rotation_z, false },
+						{ "acceleration.x", _acceleration_x, false },
+						{ "acceleration.y", _acceleration_y, false },
+						{ "acceleration.z", _acceleration_z, false },
 						{ "aoa.alpha.maximum", _aoa_alpha_maximum, false },
 						{ "aoa.alpha.minimum", _aoa_alpha_minimum, false },
 						{ "aoa.alpha", _aoa_alpha, false },
@@ -241,6 +253,12 @@ FlightGearIO::FlightGearIO (Xefis::ModuleManager* module_manager, QDomElement co
 	};
 
 	_output_properties = {
+		&_rotation_x,
+		&_rotation_y,
+		&_rotation_z,
+		&_acceleration_x,
+		&_acceleration_y,
+		&_acceleration_z,
 		&_aoa_alpha_maximum,
 		&_aoa_alpha_minimum,
 		&_aoa_alpha,
@@ -419,6 +437,14 @@ FlightGearIO::read_input()
 
 #undef ASSIGN_UNITLESS
 #undef ASSIGN
+
+		_rotation_x = 1_deg * fg_data->rotation_x_degps / 1_s;
+		_rotation_y = 1_deg * fg_data->rotation_y_degps / 1_s;
+		_rotation_z = 1_deg * fg_data->rotation_z_degps / 1_s;
+
+		_acceleration_x = 1_ft * fg_data->acceleration_x_fps2 / 1_s / 1_s;
+		_acceleration_y = 1_ft * fg_data->acceleration_y_fps2 / 1_s / 1_s;
+		_acceleration_z = -1_ft * fg_data->acceleration_z_fps2 / 1_s / 1_s;
 
 		if (_vertical_deviation.configured())
 			_vertical_deviation.write (2_deg * fg_data->vertical_deviation_deg);

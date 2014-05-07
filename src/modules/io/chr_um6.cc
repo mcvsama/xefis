@@ -60,6 +60,9 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	});
 
 	parse_properties (config, {
+		{ "input.centrifugal.x", _input_centrifugal_x, false },
+		{ "input.centrifugal.y", _input_centrifugal_y, false },
+		{ "input.centrifugal.z", _input_centrifugal_z, false },
 		{ "serviceable", _serviceable, true },
 		{ "caution", _caution, false },
 		{ "failures", _failures, false },
@@ -121,6 +124,40 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_sensor->set_auto_retry (true);
 
 	open_device();
+}
+
+
+void
+CHRUM6::data_updated()
+{
+	if (_sensor)
+	{
+		// Earth acceleration = measured acceleration - centrifugal acceleration.
+
+		if (_acceleration_x.fresh() || _input_centrifugal_x.fresh())
+		{
+			Acceleration earth_x = 0_g;
+			if (_acceleration_x.valid() && _input_centrifugal_x.valid())
+				earth_x = *_acceleration_x - *_input_centrifugal_x;
+			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.g()));
+		}
+
+		if (_acceleration_y.fresh() || _input_centrifugal_y.fresh())
+		{
+			Acceleration earth_y = 0_g;
+			if (_acceleration_y.valid() && _input_centrifugal_y.valid())
+				earth_y = *_acceleration_y - *_input_centrifugal_y;
+			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.g()));
+		}
+
+		if (_acceleration_z.fresh() || _input_centrifugal_z.fresh())
+		{
+			Acceleration earth_z = 1_g;
+			if (_acceleration_z.valid() && _input_centrifugal_z.valid())
+				earth_z = *_acceleration_z - *_input_centrifugal_z;
+			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.g()));
+		}
+	}
 }
 
 
@@ -412,12 +449,13 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 			if (req.success() && (_acceleration_x.configured() || _acceleration_y.configured()))
 			{
 				const float factor = 0.000183105;
+				// x, y is in gravities:
 				float x = factor * req.value_upper16();
 				float y = factor * req.value_lower16();
 				if (_acceleration_x.configured())
-					_acceleration_x.write (x);
+					_acceleration_x.write (1_g * x);
 				if (_acceleration_y.configured())
-					_acceleration_y.write (y);
+					_acceleration_y.write (1_g * y);
 			}
 			break;
 		}
@@ -427,8 +465,9 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 			if (req.success() && _acceleration_z.configured())
 			{
 				const float factor = 0.000183105;
+				// z is in gravities:
 				float z = factor * req.value_upper16();
-				_acceleration_z.write (z);
+				_acceleration_z.write (1_g * z);
 			}
 			break;
 		}
@@ -438,12 +477,13 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 			if (req.success() && (_rotation_x.configured() || _rotation_y.configured()))
 			{
 				const float factor = 0.0610352;
+				// x, y are in degs per second:
 				float x = factor * req.value_upper16();
 				float y = factor * req.value_lower16();
 				if (_rotation_x.configured())
-					_rotation_x.write (1_deg * x);
+					_rotation_x.write (1_deg * x / 1_s);
 				if (_rotation_y.configured())
-					_rotation_y.write (1_deg * y);
+					_rotation_y.write (1_deg * y / 1_s);
 			}
 			break;
 		}
@@ -453,8 +493,9 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 			if (req.success() && _rotation_z.configured())
 			{
 				const float factor = 0.0610352;
+				// z is in degs per second:
 				float z = factor * req.value_upper16();
-				_rotation_z.write (1_deg * z);
+				_rotation_z.write (1_deg * z / 1_s);
 			}
 			break;
 		}

@@ -81,6 +81,12 @@ class FlightGearIO:
 	std::vector<Xefis::GenericProperty*>	_output_properties;
 	std::vector<Xefis::PropertyBoolean*>	_serviceable_flags;
 	// Input:
+	Xefis::PropertyFrequency				_rotation_x;
+	Xefis::PropertyFrequency				_rotation_y;
+	Xefis::PropertyFrequency				_rotation_z;
+	Xefis::PropertyAcceleration				_acceleration_x;
+	Xefis::PropertyAcceleration				_acceleration_y;
+	Xefis::PropertyAcceleration				_acceleration_z;
 	Xefis::PropertyAngle					_aoa_alpha_maximum;
 	Xefis::PropertyAngle					_aoa_alpha_minimum;
 	Xefis::PropertyAngle					_aoa_alpha;
