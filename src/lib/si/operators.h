@@ -61,6 +61,41 @@ operator/ (double value, Frequency const& frequency)
 	return 1_s * (value / frequency.Hz());
 }
 
+
+inline constexpr Frequency
+operator/ (Angle const& angle, Time const& time)
+{
+	return 1_Hz * (angle.rad() / (2.0 * M_PI * time.s()));
+}
+
+
+inline constexpr Acceleration
+operator/ (Speed const& speed, Time const& time)
+{
+	return 1_mps2 * (speed.mps() / time.s());
+}
+
+
+inline constexpr Acceleration
+operator* (Frequency const& frequency, Speed const& speed)
+{
+	return 1_mps2 * (frequency.Hz() * speed.mps());
+}
+
+
+inline constexpr Acceleration
+operator* (Speed const& speed, Frequency const& frequency)
+{
+	return frequency * speed;
+}
+
+
+inline constexpr Length
+operator/ (Speed const& speed, Frequency const& frequency)
+{
+	return 1_m * (speed.mps() / frequency.Hz());
+}
+
 } // namespace SI
 
 #endif

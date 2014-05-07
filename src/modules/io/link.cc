@@ -111,6 +111,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Integer;
 	else if (type_attr == "float")
 		_type = Type::Float;
+	else if (type_attr == "acceleration")
+		_type = Type::Acceleration;
 	else if (type_attr == "angle")
 		_type = Type::Angle;
 	else if (type_attr == "current")
@@ -139,6 +141,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	{
 		case Type::Integer:
 		case Type::Float:
+		case Type::Acceleration:
 		case Type::Angle:
 		case Type::Current:
 		case Type::Frequency:
@@ -165,6 +168,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 1, 2, 4 or 8").arg (_bytes).toStdString());
 				break;
 			case Type::Float:
+			case Type::Acceleration:
 			case Type::Angle:
 			case Type::Current:
 			case Type::Frequency:
@@ -239,6 +243,7 @@ Link::PropertyItem::produce (Blob& blob)
 				float_value = *_property_float;
 			break;
 
+		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
@@ -297,6 +302,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 			break;
 
 		case Type::Float:
+		case Type::Acceleration:
 		case Type::Angle:
 		case Type::Current:
 		case Type::Frequency:
@@ -370,6 +376,7 @@ Link::PropertyItem::apply()
 				_property_float.write (_float_value);
 			break;
 
+		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
@@ -409,6 +416,7 @@ Link::PropertyItem::failsafe()
 				_property_float.set_nil();
 				break;
 
+			XEFIS_CASE_FLOAT (Acceleration, acceleration);
 			XEFIS_CASE_FLOAT (Angle, angle);
 			XEFIS_CASE_FLOAT (Current, current);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
