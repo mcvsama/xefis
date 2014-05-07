@@ -40,7 +40,7 @@ class Length: public LinearValue<double, Length>
 
   protected:
 	explicit constexpr
-	Length (ValueType psi) noexcept;
+	Length (ValueType m) noexcept;
 
   public:
 	constexpr
