@@ -41,7 +41,7 @@ namespace Xefis {
 class PropertyNotFound: public Exception
 {
   public:
-	PropertyNotFound (std::string const& message);
+	explicit PropertyNotFound (std::string const& message);
 };
 
 
@@ -52,7 +52,7 @@ class PropertyNotFound: public Exception
 class SingularProperty: public Exception
 {
   public:
-	SingularProperty (std::string const& message);
+	explicit SingularProperty (std::string const& message);
 };
 
 
@@ -63,7 +63,7 @@ class SingularProperty: public Exception
 class InvalidOperation: public Exception
 {
   public:
-	InvalidOperation (std::string const& message);
+	explicit InvalidOperation (std::string const& message);
 };
 
 
@@ -73,7 +73,7 @@ class InvalidOperation: public Exception
 class StringifyError: public Exception
 {
   public:
-	StringifyError (std::string const& message);
+	explicit StringifyError (std::string const& message);
 };
 
 
