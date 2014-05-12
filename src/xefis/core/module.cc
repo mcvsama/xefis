@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 
 // Local:
@@ -70,7 +71,7 @@ Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser
 				if (settings_element.isNull())
 					settings_element = e;
 				else
-					throw Exception ("multiple <settings> elements");
+					throw BadConfiguration ("multiple <settings> elements");
 			}
 		}
 	}
@@ -80,7 +81,7 @@ Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser
 		// If at least one of provided settings is required,
 		// throw an error.
 		if (std::any_of (list.begin(), list.end(), [](ConfigReader::SettingsParser::NameAndSetting const& s) { return s.required; }))
-			throw Exception ("missing <settings> element");
+			throw BadConfiguration ("missing <settings> element");
 	}
 
 	_settings_parser = std::make_unique<ConfigReader::SettingsParser> (list);
@@ -103,7 +104,7 @@ Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesPa
 				if (properties_element.isNull())
 					properties_element = e;
 				else
-					throw Exception ("multiple <properties> elements");
+					throw BadConfiguration ("multiple <properties> elements");
 			}
 		}
 	}
@@ -113,7 +114,7 @@ Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesPa
 		// If at least one of provided properties is required,
 		// throw an error.
 		if (std::any_of (list.begin(), list.end(), [](ConfigReader::PropertiesParser::NameAndProperty const& s) { return s.required; }))
-			throw Exception ("missing <properties> element");
+			throw BadConfiguration ("missing <properties> element");
 	}
 
 	_properties_parser = std::make_unique<ConfigReader::PropertiesParser> (list);

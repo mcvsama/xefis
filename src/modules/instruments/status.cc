@@ -21,6 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
 
@@ -36,16 +37,16 @@ Status::MessageDefinition::Observation::Observation (QDomElement const& observe_
 {
 	QString fail_on_nil = observe_element.attribute ("fail-on-nil");
 	if (observe_element.hasAttribute ("fail-on-nil") && fail_on_nil != "true" && fail_on_nil != "false")
-		throw Xefis::Exception ("invalid value for attribute @fail-on-nil on <message> element - must be 'true' or 'false'");
+		throw Xefis::BadDomAttribute (observe_element, "fail-on-nil", "must be 'true' or 'false'");
 
 	if (!observe_element.hasAttribute ("path"))
-		throw Xefis::Exception ("missing @path property on <message> element");
+		throw Xefis::MissingDomAttribute (observe_element, "path");
 
 	QString fail_on = observe_element.attribute ("fail-on");
 	if (!observe_element.hasAttribute ("fail-on"))
-		throw Xefis::Exception ("missing @fail-on property on <message> element");
+		throw Xefis::MissingDomAttribute (observe_element, "fail-on");
 	if (fail_on != "true" && fail_on != "false")
-		throw Xefis::Exception ("invalid value for attribute @fail-on on <message> element - must be 'true' or 'false'");
+		throw Xefis::BadDomAttribute (observe_element, "fail-on", "must be 'true' or 'false'");
 
 	_observed_property.set_path (observe_element.attribute ("path").toStdString());
 	_valid_state = fail_on != "true";
@@ -76,7 +77,7 @@ Status::MessageDefinition::Observation::test() const
 Status::MessageDefinition::MessageDefinition (QDomElement const& message_element)
 {
 	if (!message_element.hasAttribute ("message"))
-		throw Xefis::Exception ("missing @message property on <message> element");
+		throw Xefis::MissingDomAttribute (message_element, "message");
 
 	QString severity_str = message_element.attribute ("severity");
 	if (message_element.hasAttribute ("severity"))
@@ -86,7 +87,7 @@ Status::MessageDefinition::MessageDefinition (QDomElement const& message_element
 		else if (severity_str == "warning")
 			_severity = Severity::Warning;
 		else
-			throw Xefis::Exception ("invalid value for attribute @severity on <message> element - must be 'caution' or 'warning'");
+			throw Xefis::BadDomAttribute (message_element, "severity", "must be 'caution' or 'warning'");
 	}
 
 	for (QDomElement o: message_element)

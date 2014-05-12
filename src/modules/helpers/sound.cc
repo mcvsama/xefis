@@ -103,13 +103,13 @@ Sound::Group::Group (QDomElement const& element, Xefis::SoundManager* sound_mana
 			if (e == "alarm")
 				_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
 			else
-				throw Xefis::UnsupportedElementException (e);
+				throw Xefis::BadDomElement (e);
 		}
 	}
 	else if (element == "alarm")
 		_alarms.insert (std::make_unique<Alarm> (element, sound_manager));
 	else
-		throw Xefis::UnsupportedElementException (element);
+		throw Xefis::BadDomElement (element);
 }
 
 
@@ -140,11 +140,11 @@ Sound::Sound (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				if (e2 == "group" || e2 == "alarm")
 					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->application()->sound_manager()));
 				else
-					throw Xefis::UnsupportedElementException (e2);
+					throw Xefis::BadDomElement (e2);
 			}
 		}
 		else
-			throw Xefis::UnsupportedElementException (e);
+			throw Xefis::BadDomElement (e);
 	}
 }
 

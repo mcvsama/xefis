@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qdom.h>
 
@@ -227,9 +228,9 @@ PCA9685::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::I2C::IOError& e)
+	catch (Xefis::IOError& e)
 	{
-		log() << "I2C error: " << e.message() << std::endl;
+		log() << "I/O error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

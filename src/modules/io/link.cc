@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hash.h>
 #include <xefis/utility/hextable.h>
@@ -103,7 +104,7 @@ Link::ItemStream::failsafe()
 Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 {
 	if (!element.hasAttribute ("type"))
-		throw Xefis::Exception ("<property> needs attribute 'type'");
+		throw Xefis::MissingDomAttribute (element, "type");
 
 	QString type_attr = element.attribute ("type");
 
@@ -115,6 +116,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Acceleration;
 	else if (type_attr == "angle")
 		_type = Type::Angle;
+	else if (type_attr == "capacity")
+		_type = Type::Capacity;
 	else if (type_attr == "current")
 		_type = Type::Current;
 	else if (type_attr == "frequency")
@@ -133,7 +136,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Weight;
 
 	if (_type == Type::Unknown)
-		throw Xefis::Exception ("unknown type: " + type_attr.toStdString());
+		throw Xefis::BadDomAttribute (element, "type", "unknown type: " + type_attr);
 
 	_retained = Link::check_retained_attribute (element, false);
 
@@ -152,7 +155,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Time:
 		case Type::Weight:
 			if (!element.hasAttribute ("bytes"))
-				throw Xefis::Exception (QString ("<property> of type %1 needs attribute 'bytes'").arg (element.attribute ("type")).toStdString());
+				throw Xefis::MissingDomAttribute (element, "bytes");
 			break;
 		default:
 			;
@@ -165,7 +168,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		{
 			case Type::Integer:
 				if (_bytes != 1 && _bytes != 2 && _bytes != 4 && _bytes != 8)
-					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 1, 2, 4 or 8").arg (_bytes).toStdString());
+					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 1, 2, 4 or 8").arg (_bytes));
 				break;
 			case Type::Float:
 			case Type::Acceleration:
@@ -179,7 +182,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Time:
 			case Type::Weight:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
-					throw Xefis::Exception (QString ("invalid 'bytes' attribute %1, should be 2, 4 or 8").arg (_bytes).toStdString());
+					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
 				break;
 			case Type::Unknown:
 				// Impossible.
@@ -188,7 +191,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	}
 
 	if (!element.hasAttribute ("path"))
-		throw Xefis::Exception ("<property> needs attribute 'path'");
+		throw Xefis::MissingDomAttribute (element, "path");
 
 	std::string path = element.attribute ("path").toStdString();
 	_property_integer.set_path (path);
@@ -482,9 +485,9 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 		if (e == "property")
 		{
 			if (!e.hasAttribute ("type"))
-				throw Xefis::Exception ("<property> needs attribute 'type'");
+				throw Xefis::MissingDomAttribute (e, "type");
 			if (!e.hasAttribute ("path"))
-				throw Xefis::Exception ("<property> needs attribute 'path'");
+				throw Xefis::MissingDomAttribute (e, "path");
 
 			BitSource bs;
 
@@ -502,14 +505,14 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 			else if (s_type == "integer")
 			{
 				if (!e.hasAttribute ("bits"))
-					throw Xefis::Exception ("<property> of type 'integer' needs attribute 'bits'");
+					throw Xefis::MissingDomAttribute (e, "bits");
 
 				bs.is_boolean = false;
 				bs.property_integer.set_path (e.attribute ("path").toStdString());
 				bs.bits = e.attribute ("bits").toUInt();
 			}
 			else
-				throw Xefis::Exception ("attribute 'type' of <property> must be 'boolean' or 'integer'");
+				throw Xefis::BadDomAttribute (e, "type", "must be 'boolean' or 'integer'");
 
 			_bit_sources.push_back (bs);
 		}
@@ -725,11 +728,11 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 	ItemStream (link, element)
 {
 	if (!element.hasAttribute ("magic"))
-		throw Xefis::Exception ("<packet> needs 'magic' attribute");
+		throw Xefis::MissingDomAttribute (element, "magic");
 
 	_magic = Xefis::parse_binary_string (element.attribute ("magic"));
 	if (_magic.empty())
-		throw Xefis::Exception ("magic value must have at least one byte length");
+		throw Xefis::BadDomAttribute (element, "magic", "value must be at least one byte long");
 
 	if (element.hasAttribute ("send-every"))
 		_send_every = element.attribute ("send-every").toUInt();
@@ -999,13 +1002,13 @@ Link::parse_protocol (QDomElement const& protocol)
 		if (_magic_size == 0)
 			_magic_size = p->magic().size();
 		if (_magic_size != p->magic().size())
-			throw Xefis::Exception ("all magic values have to have equal number of bytes");
+			throw Xefis::BadConfiguration ("all magic values have to have equal number of bytes");
 		if (!_packet_magics.insert ({ p->magic(), p }).second)
-			throw Xefis::Exception ("magic " + to_string (p->magic()) + " used for two or more packets");
+			throw Xefis::BadConfiguration ("same magic value " + to_string (p->magic()) + " used for two or more packets");
 	}
 
 	if (_packets.empty())
-		throw Xefis::Exception ("protocol must not be empty");
+		throw Xefis::BadConfiguration ("protocol must not be empty");
 }
 
 
@@ -1032,7 +1035,7 @@ Link::check_retained_attribute (QDomElement const& element, bool default_value)
 		if (s_retained == "true")
 			default_value = true;
 		else if (s_retained != "false")
-			throw Xefis::Exception ("@retained attribute must be 'true' or 'false'");
+			throw Xefis::BadDomAttribute (element, "retained", "must be 'true' or 'false'");
 	}
 
 	return default_value;

@@ -26,6 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/window.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/text_layout.h>
 
@@ -335,7 +336,7 @@ CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, C
 	Strip (cdu, setting_element.attribute ("title"), column)
 {
 	if (!setting_element.hasAttribute ("path"))
-		throw Xefis::Exception ("<setting> needs a @path attribute");
+		throw Xefis::MissingDomAttribute (setting_element, "path");
 
 	_nil_value = setting_element.attribute ("nil-value", "").toStdString();
 	_format = setting_element.attribute ("format", "%1%").toStdString();
@@ -505,7 +506,7 @@ CDU::GotoStrip::GotoStrip (CDU& cdu, QDomElement const& goto_element, Column col
 	Strip (cdu, goto_element.attribute ("title"), column)
 {
 	if (!goto_element.hasAttribute ("page-id"))
-		throw Xefis::Exception ("<goto> needs a @page-id attribute");
+		throw Xefis::MissingDomAttribute (goto_element, "page-id");
 
 	_target_page_id = goto_element.attribute ("page-id");
 }
@@ -615,7 +616,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 					current_column->push_back (new FillStrip (cdu));
 			}
 			else
-				throw Xefis::Exception ("unsupported element '" + e.tagName() + "'");
+				throw Xefis::BadDomElement (e);
 		}
 
 		// Handle FillStrips:
@@ -674,7 +675,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 			parse_column (e);
 		}
 		else
-			throw Xefis::Exception ("unsupported element '" + e.tagName() + "'");
+			throw Xefis::BadDomElement (e);
 	}
 }
 
@@ -837,10 +838,10 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger c
 		{
 			Shared<Page> page = std::make_shared<Page> (cdu, e, *this, logger);
 			if (!_pages_by_id.insert ({ page->id(), page }).second)
-				throw Xefis::Exception ("duplicate page with id '" + page->id() + "'");
+				throw Xefis::BadConfiguration ("duplicate page with id '" + page->id() + "'");
 		}
 		else
-			throw Xefis::Exception ("unsupported element '" + e.tagName() + "'");
+			throw Xefis::BadDomElement (e);
 	}
 
 	check_reachability();
@@ -945,7 +946,7 @@ CDU::CDU (Xefis::ModuleManager* module_manager, QDomElement const& config):
 			break;
 		}
 		else if (e != "settings" && e != "properties")
-			throw Xefis::Exception ("unsupported element '" + e.tagName() + "'");
+			throw Xefis::BadDomElement (e);
 	}
 
 	_current_page_id = _config->default_page_id();

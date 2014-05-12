@@ -25,6 +25,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/panel.h>
 #include <xefis/core/config_reader.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/components/configurator/configurator_widget.h>
@@ -167,11 +168,11 @@ Window::process_window_element (QDomElement const& window_element)
 		{
 			QLayout* layout = process_layout_element (e, _instruments_panel, nullptr);
 			if (_instruments_panel->layout())
-				throw Exception ("a window can only have one layout");
+				throw BadConfiguration ("a window can only have one layout");
 			_instruments_panel->setLayout (layout);
 		}
 		else
-			throw Exception (QString ("unsupported child of <window>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 }
 
@@ -188,11 +189,11 @@ Window::process_panel_element (QDomElement const& panel_element, QWidget* parent
 			QLayout* layout = process_layout_element (e, panel, panel);
 			layout->setMargin (5);
 			if (panel->layout())
-				throw Exception ("a panel can only have one layout");
+				throw BadConfiguration ("a panel can only have one layout");
 			panel->setLayout (layout);
 		}
 		else
-			throw Exception (QString ("unsupported child of <panel>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 
 	return panel;
@@ -207,7 +208,7 @@ Window::process_group_element (QDomElement const& group_element, QWidget* parent
 	bool is_q = false;
 
 	// @padding
-	std::array<int, 4> padding = parse_padding (group_element.attribute ("padding"));
+	std::array<int, 4> padding = parse_padding (group_element, "padding");
 
 	// Two types of groups: different for instruments and for panels:
 	if (panel)
@@ -231,7 +232,7 @@ Window::process_group_element (QDomElement const& group_element, QWidget* parent
 
 			// Multiple layouts?
 			if (group->layout())
-				throw Exception ("a group can only have one layout");
+				throw BadConfiguration ("a group can only have one layout");
 
 			// Configure layout:
 			if (is_q)
@@ -243,7 +244,7 @@ Window::process_group_element (QDomElement const& group_element, QWidget* parent
 			group->setLayout (layout);
 		}
 		else
-			throw Exception (QString ("unsupported child of <group>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 
 	return group;
@@ -254,7 +255,7 @@ QWidget*
 Window::process_widget_element (QDomElement const& widget_element, QWidget* parent_widget, Panel* panel)
 {
 	if (!panel)
-		throw Exception ("<widget> can only be used as descendant of <panel>");
+		throw BadDomElement (widget_element, "<widget> can only be used as descendant of <panel>");
 
 	QString type = widget_element.attribute ("type");
 	QWidget* widget = nullptr;
@@ -319,7 +320,7 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 										  PropertyInteger (widget_element.attribute ("value-property").toStdString()));
 	}
 	else
-		throw Exception (QString ("unsupported widget type '%1'").arg (type));
+		throw BadDomAttribute (widget_element, "type");
 
 	if (label_wrapper)
 	{
@@ -357,7 +358,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 	else if (type == "stack")
 	{
 		if (!layout_element.hasAttribute ("path"))
-			throw Exception ("missing @path attribute on <layout type='stack'>");
+			throw MissingDomAttribute (layout_element, "path");
 
 		Time switch_delay = 0_ms;
 		if (layout_element.hasAttribute ("switch-delay"))
@@ -370,7 +371,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 		_stacks.insert (stack);
 	}
 	else
-		throw Exception ("layout type must be 'vertical', 'horizontal' or 'stack'");
+		throw BadDomAttribute (layout_element, "type", "must be 'vertical', 'horizontal' or 'stack'");
 
 	new_layout->setSpacing (0);
 	new_layout->setMargin (0);
@@ -385,7 +386,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 		else if (e == "stretch")
 		{
 			if (!panel)
-				throw Exception ("<stretch> can only be used as descendant of <panel>");
+				throw BadDomElement (e, "<stretch> can only be used as descendant of <panel>");
 
 			if (box_new_layout)
 				box_new_layout->addStretch (10000);
@@ -393,7 +394,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 		else if (e == "separator")
 		{
 			if (type == "stack")
-				throw Exception ("<separator> not allowed in stack-type layout");
+				throw BadDomElement (e, "<separator> not allowed in stack-type layout");
 
 			QWidget* separator = new QWidget (parent_widget);
 			separator->setMinimumSize (2, 2);
@@ -404,7 +405,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 			new_layout->addWidget (separator);
 		}
 		else
-			throw Exception (QString ("unsupported child of <layout>: <%1>").arg (e.tagName()));
+			throw BadDomElement (e);
 	}
 
 	return new_layout;
@@ -421,14 +422,14 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 
 	// @stretch-factor
 	if (stacked_layout && item_element.hasAttribute ("stretch-factor"))
-		throw Exception ("attribute @stretch-factor not allowed on <item> of stack-type layout");
+		throw BadDomAttribute (item_element, "stretch-factor", "'stretch-factor' not allowed on <item> of stack-type layout");
 
 	// @id
 	if (box_layout && item_element.hasAttribute ("id"))
-		throw Exception ("attribute @id not allowed on <item> of non-stack-type layout");
+		throw BadDomAttribute (item_element, "id", "'id' not allowed on <item> of non-stack-type layout");
 
 	// @margin
-	std::array<int, 4> margins = parse_margin (item_element.attribute ("margin"));
+	std::array<int, 4> margins = parse_margin (item_element, "margin");
 
 	bool has_child = false;
 	int stretch = limit (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
@@ -437,7 +438,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 	for (QDomElement& e: item_element)
 	{
 		if (has_child)
-			throw Exception ("only one child element per <item> allowed");
+			throw BadConfiguration ("only one child element per <item> allowed");
 
 		has_child = true;
 
@@ -496,7 +497,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 			}
 		}
 		else
-			throw Exception (QString ("unsupported child of <item>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 
 	if (!has_child)
@@ -547,9 +548,10 @@ Window::configurator_taken()
 
 
 std::array<int, 4>
-Window::parse_margin (QString const& string)
+Window::parse_margin (QDomElement const& element, QString const& attribute_name)
 {
 	std::array<int, 4> margins = { { 0, 0, 0, 0 } };
+	QString string = element.attribute (attribute_name);
 
 	if (!string.isEmpty())
 	{
@@ -593,7 +595,7 @@ Window::parse_margin (QString const& string)
 			}
 
 			default:
-				throw Exception ("invalid format of @margin attribute");
+				throw BadDomAttribute (element, attribute_name, "bad format");
 		}
 	}
 
@@ -602,9 +604,9 @@ Window::parse_margin (QString const& string)
 
 
 std::array<int, 4>
-Window::parse_padding (QString const& string)
+Window::parse_padding (QDomElement const& element, QString const& attribute_name)
 {
-	return parse_margin (string);
+	return parse_margin (element, attribute_name);
 }
 
 } // namespace Xefis

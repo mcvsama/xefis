@@ -26,13 +26,104 @@
 
 namespace Xefis {
 
-class UnsupportedElementException: public Exception
+class DomException: public Exception
+{
+  public:
+	using Exception::Exception;
+
+  protected:
+	static QString
+	get_path (QDomElement const& element)
+	{
+		QString result;
+		QDomNode node = element;
+
+		while (!node.isNull() && node.isElement())
+		{
+			result = "/" + node.toElement().tagName() + result;
+			node = node.parentNode();
+		}
+
+		return result;
+	}
+};
+
+
+/**
+ * Throw to indicate that subelement required but missing.
+ */
+class MissingDomElement: public DomException
 {
   public:
 	// Ctor
-	UnsupportedElementException (QDomElement element):
-		Exception ("unsupported element '" + element.tagName() + "'")
+	MissingDomElement (QDomElement const& parent, QString const& child_name):
+		DomException ("missing subelement <" + child_name + "> in " + get_path (parent))
 	{ }
+};
+
+
+/**
+ * Throw when an element is not supported in given context.
+ */
+class BadDomElement: public DomException
+{
+  public:
+	// Ctor
+	BadDomElement (QDomElement const& element, QString const& additional_message = QString()):
+		DomException ("element '" + element.tagName() + "' is not supported in " + get_path (element) +
+					  (additional_message.isEmpty() ? "" : ("; " + additional_message)))
+	{ }
+
+	// Ctor
+	BadDomElement (QString const& message):
+		DomException (message)
+	{ }
+};
+
+
+/**
+ * Throw to indicate that element needs an attribute.
+ */
+class MissingDomAttribute: public DomException
+{
+  public:
+	// Ctor
+	MissingDomAttribute (QDomElement const& element, QString const& attribute_name):
+		DomException ("element <" + element.tagName() + "> needs attribute '" + attribute_name + "'")
+	{ }
+};
+
+
+/**
+ * Throw to indicate that an attribute has invalid value.
+ */
+class BadDomAttribute: public DomException
+{
+  public:
+	// Ctor
+	BadDomAttribute (QDomElement const& element, QString const& attribute_name, QString const& message = QString()):
+		DomException ("invalid value for attribute '" + attribute_name + "' in " + get_path (element) + ": " + message)
+	{ }
+};
+
+
+/**
+ * General configuration error.
+ */
+class BadConfiguration: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
+
+/**
+ * General IO error.
+ */
+class IOError: public Exception
+{
+  public:
+	using Exception::Exception;
 };
 
 } // namespace Xefis

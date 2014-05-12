@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -133,7 +134,7 @@ Range<Speed>
 Flaps::get_speed_range (Angle const& flaps_angle) const
 {
 	if (_settings.empty())
-		throw Exception ("missing flaps configuration");
+		throw BadConfiguration ("missing flaps configuration");
 
 	auto ub = _settings.upper_bound (flaps_angle);
 	auto lb = ub;
@@ -159,7 +160,7 @@ Flaps::Settings::const_iterator
 Flaps::find_setting_iterator (Angle const& flaps_angle) const
 {
 	if (_settings.empty())
-		throw Exception ("missing flaps configuration");
+		throw BadConfiguration ("missing flaps configuration");
 
 	// Find Setting for given flaps_angle.
 	auto ub = _settings.upper_bound (flaps_angle);

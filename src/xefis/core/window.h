@@ -113,10 +113,10 @@ class Window: public QWidget
 	configurator_taken();
 
 	static std::array<int, 4>
-	parse_margin (QString const&);
+	parse_margin (QDomElement const& element, QString const& attribute_name);
 
 	static std::array<int, 4>
-	parse_padding (QString const&);
+	parse_padding (QDomElement const& element, QString const& attribute_name);
 
   private slots:
 	void
