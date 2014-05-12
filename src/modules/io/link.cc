@@ -146,6 +146,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Float:
 		case Type::Acceleration:
 		case Type::Angle:
+		case Type::Capacity:
 		case Type::Current:
 		case Type::Frequency:
 		case Type::Length:
@@ -173,6 +174,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Float:
 			case Type::Acceleration:
 			case Type::Angle:
+			case Type::Capacity:
 			case Type::Current:
 			case Type::Frequency:
 			case Type::Length:
@@ -248,6 +250,7 @@ Link::PropertyItem::produce (Blob& blob)
 
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
@@ -307,6 +310,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Float:
 		case Type::Acceleration:
 		case Type::Angle:
+		case Type::Capacity:
 		case Type::Current:
 		case Type::Frequency:
 		case Type::Length:
@@ -381,6 +385,7 @@ Link::PropertyItem::apply()
 
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
@@ -421,6 +426,7 @@ Link::PropertyItem::failsafe()
 
 			XEFIS_CASE_FLOAT (Acceleration, acceleration);
 			XEFIS_CASE_FLOAT (Angle, angle);
+			XEFIS_CASE_FLOAT (Capacity, capacity);
 			XEFIS_CASE_FLOAT (Current, current);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
 			XEFIS_CASE_FLOAT (Length, length);

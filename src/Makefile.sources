@@ -5,6 +5,7 @@
 SI_HEADERS += lib/si/all.h
 SI_HEADERS += lib/si/acceleration.h
 SI_HEADERS += lib/si/angle.h
+SI_HEADERS += lib/si/capacity.h
 SI_HEADERS += lib/si/current.h
 SI_HEADERS += lib/si/constants.h
 SI_HEADERS += lib/si/frequency.h
@@ -20,6 +21,7 @@ SI_HEADERS += lib/si/value.h
 
 SI_SOURCES += lib/si/acceleration.cc
 SI_SOURCES += lib/si/angle.cc
+SI_SOURCES += lib/si/capacity.cc
 SI_SOURCES += lib/si/current.cc
 SI_SOURCES += lib/si/frequency.cc
 SI_SOURCES += lib/si/length.cc

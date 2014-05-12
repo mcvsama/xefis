@@ -1011,6 +1011,7 @@ typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
 typedef Property<Acceleration>	PropertyAcceleration;
 typedef Property<Angle>			PropertyAngle;
+typedef Property<Capacity>		PropertyCapacity;
 typedef Property<Current>		PropertyCurrent;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
