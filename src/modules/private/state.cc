@@ -178,6 +178,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "/panels/mcp/mfd/button.nd", "/panels/mcp/mfd/led.nd", 1 },
 		{ "/panels/mcp/mfd/button.chkl", "/panels/mcp/mfd/led.chkl", 2 },
 		{ "/panels/mcp/mfd/button.elec", "/panels/mcp/mfd/led.elec", 3 },
+		{ "/panels/mcp/mfd/button.cdu", "/panels/mcp/mfd/led.cdu", 4 },
 	}));
 
 	// AFCS/FBW panel
