@@ -68,7 +68,7 @@ Thread::start()
 	switch (::pthread_create (&_pthread, &att, callback, this))
 	{
 		case EAGAIN:
-			throw std::runtime_error ("not enough system resources or maximum Threads count achieved");
+			throw Exception ("not enough system resources or maximum Threads count achieved");
 	}
 	pthread_attr_destroy (&att);
 }

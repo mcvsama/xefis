@@ -57,7 +57,7 @@ FlapsControl::FlapsControl (Xefis::ModuleManager* module_manager, QDomElement co
 		_settings_list.insert (s.second.angle());
 
 	if (_settings_list.empty())
-		throw Xefis::Exception ("missing flaps configuration");
+		throw Xefis::BadConfiguration ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
 	_timer->setInterval (kUpdateInterval.ms());

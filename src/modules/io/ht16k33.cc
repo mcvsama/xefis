@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -119,11 +120,11 @@ HT16K33::KeyMatrix::array()
 HT16K33::SingleLed::SingleLed (QDomElement const& element)
 {
 	if (!element.hasAttribute ("row"))
-		throw Xefis::Exception ("<single-led> needs attribute 'row'");
+		throw Xefis::MissingDomAttribute (element, "row");
 	if (!element.hasAttribute ("column"))
-		throw Xefis::Exception ("<single-led> needs attribute 'column'");
+		throw Xefis::MissingDomAttribute (element, "column");
 	if (!element.hasAttribute ("path"))
-		throw Xefis::Exception ("<single-led> needs attribute 'path'");
+		throw Xefis::MissingDomAttribute (element, "path");
 
 	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 0, 15);
 	_column = Xefis::limit<int> (element.attribute ("column").toInt(), 0, 7);
@@ -143,7 +144,7 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 	_rounding = element.hasAttribute ("rounding") && element.attribute ("rounding") == "true";
 
 	if (!element.hasAttribute ("path"))
-		throw Xefis::Exception ("<numeric-display> needs attribute 'path'");
+		throw Xefis::MissingDomAttribute (element, "path");
 	_property.set_path (element.attribute ("path").toStdString());
 
 	for (QDomElement& e: element)
@@ -151,7 +152,7 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 		if (e == "digit")
 		{
 			if (!e.hasAttribute ("row"))
-				throw Xefis::Exception ("<digit> needs attribute 'row'");
+				throw Xefis::MissingDomAttribute (e, "row");
 			int row = Xefis::limit (e.attribute ("row").toInt(), 0, 15);
 			_digit_rows.push_back (row);
 		}
@@ -244,7 +245,7 @@ HT16K33::NumericDisplay::get_integer_value() const
 HT16K33::SingleSwitch::SingleSwitch (QDomElement const& element)
 {
 	if (!element.hasAttribute ("path"))
-		throw Xefis::Exception ("<numeric-display> needs attribute 'path'");
+		throw Xefis::MissingDomAttribute (element, "path");
 	_property_boolean.set_path (element.attribute ("path").toStdString());
 
 	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 3, 15);
@@ -294,11 +295,11 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 			_reliable_mode = e.attribute ("reliable-mode") == "true";
 
 			if (!e.hasAttribute ("scan-frequency"))
-				throw Xefis::Exception ("<input> needs 'scan-frequency' attribute");
+				throw Xefis::MissingDomAttribute (e, "scan-frequency");
 			_scan_frequency.parse (e.attribute ("scan-frequency").toStdString());
 
 			if (_scan_frequency > 25_Hz && !_reliable_mode)
-				throw Xefis::Exception ("if 'scan-frequency' is greater than 25 Hz, 'reliable-mode' must be 'true'");
+				throw Xefis::BadDomAttribute (e, "scan-frequency", "if greater than 25 Hz, 'reliable-mode' must be 'true'");
 
 			// According to docs, each scan takes 20 ms, so limit sampling rate to 50 Hz:
 			_scan_frequency = Xefis::limit (_scan_frequency, 0_Hz, 50_Hz);
@@ -308,7 +309,7 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 				if (e2 == "single-switch")
 					_switches.push_back (std::make_shared<SingleSwitch> (e2));
 				else
-					throw Xefis::Exception (QString ("element <%1> not supported in <input>").arg (e2.tagName()).toStdString());
+					throw Xefis::BadDomElement (e2);
 			}
 		}
 		else if (e == "output")
@@ -320,7 +321,7 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 				else if (e2 == "single-led")
 					_displays.push_back (std::make_shared<SingleLed> (e2));
 				else
-					throw Xefis::Exception (QString ("element <%1> not supported in <output>").arg (e2.tagName()).toStdString());
+					throw Xefis::BadDomElement (e2);
 			}
 		}
 	}
@@ -396,9 +397,9 @@ HT16K33::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::I2C::IOError& e)
+	catch (Xefis::IOError& e)
 	{
-		log() << "I2C error: " << e.message() << std::endl;
+		log() << "I/O error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

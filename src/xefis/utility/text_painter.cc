@@ -79,7 +79,7 @@ TextPainter::TextPainter (Cache* cache):
 	_cache (cache)
 {
 	if (!_cache)
-		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
+		throw Exception ("attempted to create TextPainter with nullptr cache");
 }
 
 
@@ -88,7 +88,7 @@ TextPainter::TextPainter (QPaintDevice* device, Cache* cache):
 	_cache (cache)
 {
 	if (!_cache)
-		throw std::runtime_error ("attempted to create TextPainter with nullptr cache");
+		throw Exception ("attempted to create TextPainter with nullptr cache");
 }
 
 

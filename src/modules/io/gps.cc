@@ -30,6 +30,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hextable.h>
 #include <xefis/utility/resource.h>
@@ -103,7 +104,7 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				if (pmtk == "pmtk")
 					_pmtk_commands.push_back (pmtk.text().toStdString());
 				else
-					throw Xefis::Exception (QString ("element <%1> not supported in <initialization>").arg (pmtk.tagName()));
+					throw Xefis::BadDomElement (pmtk);
 			}
 		}
 	}

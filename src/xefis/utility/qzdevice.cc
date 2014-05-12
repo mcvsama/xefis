@@ -17,6 +17,9 @@
 // Lib:
 #include <zlib.h>
 
+// Xefis:
+#include <xefis/core/stdexcept.h>
+
 // Local:
 #include "qzdevice.h"
 
@@ -127,7 +130,7 @@ QZDevice::pull()
 	auto n = _input->read (reinterpret_cast<char*> (_input_buffer.data()), _input_buffer.size());
 
 	if (n == -1 && !_input->atEnd())
-		throw Xefis::Exception ("failed to read from input file");
+		throw IOError ("failed to read from input file");
 
 	_input_buffer.resize (n);
 	_ctx.avail_in = _input_buffer.size();
@@ -152,13 +155,13 @@ QZDevice::decompress()
 	switch (::inflate (&_ctx, Z_SYNC_FLUSH))
 	{
 		case Z_NEED_DICT:
-			throw Xefis::Exception ("failed to decompress input file: Z_NEED_DICT");
+			throw Xefis::IOError ("failed to decompress input file: Z_NEED_DICT");
 
 		case Z_DATA_ERROR:
-			throw Xefis::Exception ("failed to decompress input file: Z_DATA_ERROR");
+			throw Xefis::IOError ("failed to decompress input file: Z_DATA_ERROR");
 
 		case Z_MEM_ERROR:
-			throw Xefis::Exception ("failed to decompress input file: Z_MEM_ERROR");
+			throw Xefis::IOError ("failed to decompress input file: Z_MEM_ERROR");
 
 		case Z_STREAM_END:
 			_z_at_eof = true;

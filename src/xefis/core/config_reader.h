@@ -306,15 +306,6 @@ class ConfigReader
 };
 
 
-class ConfigException: public Exception
-{
-  public:
-	ConfigException (std::string const& message):
-		Exception (message)
-	{ }
-};
-
-
 #define XEFIS_DEF_CONSTR_SINGLE(type, xname) \
 	inline ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (QString const& name, type& value, bool required): \
 		name (name), \

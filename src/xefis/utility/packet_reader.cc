@@ -26,7 +26,7 @@ PacketReader::PacketReader (Blob const& magic, ParseCallback parse):
 	_parse (parse)
 {
 	if (_magic.empty())
-		throw Xefis::Exception ("magic value must not be empty");
+		throw Exception ("magic value must not be empty");
 }
 
 

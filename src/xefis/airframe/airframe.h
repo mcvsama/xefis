@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/airframe/flaps.h>
 
 
@@ -49,7 +50,7 @@ inline Flaps const&
 Airframe::flaps() const
 {
 	if (!_flaps)
-		throw Exception ("flaps submodule not configured");
+		throw BadConfiguration ("flaps submodule not configured");
 	return *_flaps;
 }
 

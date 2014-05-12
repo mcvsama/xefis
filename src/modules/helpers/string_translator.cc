@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 
 // Local:
@@ -27,8 +28,10 @@ XEFIS_REGISTER_MODULE_CLASS ("helpers/string-translator", StringTranslator);
 
 StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 {
-	if (!config.hasAttribute ("input-path") || !config.hasAttribute ("output-path"))
-		throw Xefis::Exception ("<translate> needs @input-path and @output-path attributes");
+	if (!config.hasAttribute ("input-path"))
+		throw Xefis::MissingDomAttribute (config, "input-path");
+	if (!config.hasAttribute ("output-path"))
+		throw Xefis::MissingDomAttribute (config, "output-path");
 
 	_input.set_path (config.attribute ("input-path").toStdString());
 	_output.set_path (config.attribute ("output-path").toStdString());
@@ -37,14 +40,16 @@ StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 	{
 		if (e == "string")
 		{
-			if (!e.hasAttribute ("input") || !e.hasAttribute ("output"))
-				throw Xefis::Exception ("<string> needs @input and @output attributes");
+			if (!e.hasAttribute ("input"))
+				throw Xefis::MissingDomAttribute (e, "input");
+			if (!e.hasAttribute ("output"))
+				throw Xefis::MissingDomAttribute (e, "output");
 			_map.insert ({ e.attribute ("input").toLong(), e.attribute ("output").toStdString() });
 		}
 		else if (e == "default")
 		{
 			if (!e.hasAttribute ("output"))
-				throw Xefis::Exception ("<default> needs @output attribute");
+				throw Xefis::MissingDomAttribute (e, "output");
 			_default = e.attribute ("output").toStdString();
 		}
 	}

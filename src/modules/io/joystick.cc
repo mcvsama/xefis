@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -81,7 +82,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		if (e == "device")
 		{
 			if (found_device)
-				throw Xefis::Exception ("only one <device> supported in configuration for the io/joystick module");
+				throw Xefis::BadDomElement ("only one <device> supported in configuration for the io/joystick module");
 			found_device = true;
 
 			_device_path = e.text();
@@ -89,7 +90,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		else if (e == "path")
 		{
 			if (found_path)
-				throw Xefis::Exception ("only one <path> supported in configuration for the io/joystick module");
+				throw Xefis::BadDomElement ("only one <path> supported in configuration for the io/joystick module");
 			found_path = true;
 
 			_prop_path = e.text();
@@ -147,13 +148,13 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 			}
 		}
 		else
-			throw Xefis::Exception (QString ("unsupported config element for io/joystick module: <%1>").arg (e.tagName()).toStdString());
+			throw Xefis::BadDomElement (e);
 	}
 
 	if (!found_path)
-		throw Xefis::Exception ("config for the io/joystick module needs <path> element");
+		throw Xefis::MissingDomElement (config, "path");
 	if (!found_device)
-		throw Xefis::Exception ("config for the io/joystick module needs <device> element");
+		throw Xefis::MissingDomElement (config, "device");
 
 	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);

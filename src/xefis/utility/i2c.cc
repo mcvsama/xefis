@@ -24,6 +24,9 @@
 // Lib:
 #include <boost/format.hpp>
 
+// Xefis:
+#include <xefis/core/stdexcept.h>
+
 // Local:
 #include "i2c.h"
 

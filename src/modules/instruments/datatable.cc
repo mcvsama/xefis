@@ -23,6 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/window.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/qdom.h>
@@ -50,7 +51,7 @@ Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_lab
 		else if (e == "value")
 		{
 			if (!e.hasAttribute ("path"))
-				throw Xefis::Exception ("<value> needs attribute @path");
+				throw Xefis::MissingDomAttribute (e, "path");
 
 			if (e.hasAttribute ("color"))
 				value_color = Xefis::parse_color (e.attribute ("color"));

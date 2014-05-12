@@ -68,6 +68,27 @@ class InvalidOperation: public Exception
 
 
 /**
+ * Indicates that there's type conflict between existing property
+ * and property requested to be created.
+ */
+class TypeConflict: public Exception
+{
+  public:
+	explicit TypeConflict (std::string const& path);
+};
+
+
+/**
+ * Indicates that given string is not a valid supported type.
+ */
+class BadType: public Exception
+{
+  public:
+	explicit BadType (std::string const& name);
+};
+
+
+/**
  * Indicates that there was an error during stringify operation.
  */
 class StringifyError: public Exception
@@ -391,7 +412,7 @@ template<class tType>
 
 		/**
 		 * Return node casted to PropertyValueNode.
-		 * If unable to cast, throw InvalidOperation.
+		 * If unable to cast, throw TypeConflict.
 		 * If property node doesn't exist, return nullptr.
 		 */
 		ValueNodeType*
@@ -399,7 +420,7 @@ template<class tType>
 
 		/**
 		 * Return node casted to PropertyValueNode.
-		 * If unable to cast, throw InvalidOperation.
+		 * If unable to cast, throw TypeConflict.
 		 * If property node doesn't exist, throw PropertyNotFound.
 		 */
 		ValueNodeType*
@@ -430,6 +451,18 @@ SingularProperty::SingularProperty (std::string const& message):
 inline
 InvalidOperation::InvalidOperation (std::string const& message):
 	Exception (message)
+{ }
+
+
+inline
+TypeConflict::TypeConflict (std::string const& path):
+	Exception ("property under path '" + path + "' already exists and has different type")
+{ }
+
+
+inline
+BadType::BadType (std::string const& name):
+	Exception ("'" + name + "' is not valid type name")
 { }
 
 
@@ -930,7 +963,7 @@ template<class T>
 			if (val_node)
 				return val_node;
 			else
-				throw InvalidOperation ("incompatible type: " + _path);
+				throw TypeConflict ("incompatible type: " + _path);
 		}
 		else
 			return nullptr;

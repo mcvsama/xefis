@@ -31,6 +31,7 @@
 #include <xefis/core/window_manager.h>
 #include <xefis/core/module.h>
 #include <xefis/core/window.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -57,7 +58,7 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 		for (NameAndSetting& element: _list)
 		{
 			if (map.insert ({ element.name, &element }).second == false)
-				throw Exception ("duplicated entry name in settings list");
+				throw BadConfiguration ("duplicated entry name in settings list");
 			if (element.required)
 				unconfigured_values.insert (element.name);
 			known_values.insert (element.name);
@@ -68,18 +69,18 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 			if (d == "setting")
 			{
 				if (!d.hasAttribute ("name"))
-					throw Exception ("missing attribute @name for setting");
+					throw MissingDomAttribute (d, "name");
 
 				QString name = d.attribute ("name");
 
 				if (known_values.find (name) == known_values.end())
-					throw Exception (QString ("configuration for unknown setting: %1").arg (name));
+					throw BadConfiguration (QString ("configuration for unknown setting: %1").arg (name));
 
 				if (configured_values.find (name) != configured_values.end())
-					throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
+					throw BadConfiguration (QString ("duplicated entry <properties>: %1").arg (name));
 
 				if (!d.hasAttribute ("value"))
-					throw Exception (QString ("missing attribute @value for setting: %1").arg (name));
+					throw MissingDomAttribute (d, "value");
 
 				QString value = d.attribute ("value");
 
@@ -128,12 +129,12 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 			QStringList list;
 			for (auto s: unconfigured_values)
 				list << s;
-			throw Exception (QString ("missing configuration for the following settings: %1").arg (list.join (", ")));
+			throw BadConfiguration (QString ("missing configuration for the following settings: %1").arg (list.join (", ")));
 		}
 	}
 	catch (Exception& e)
 	{
-		throw Exception ("error when parsing <settings>", &e);
+		throw BadConfiguration ("error when parsing <settings>", &e);
 	}
 }
 
@@ -194,7 +195,7 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 		for (NameAndProperty& element: _list)
 		{
 			if (map.insert ({ element.name, element.property }).second == false)
-				throw Exception ("duplicated entry name in property list");
+				throw BadConfiguration ("duplicated entry name in property list");
 			if (element.required)
 				unconfigured_values.insert (element.name);
 			known_values.insert (element.name);
@@ -205,15 +206,15 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 		auto parse_property = [&] (QDomElement const& e) -> void
 		{
 			if (!e.hasAttribute ("name"))
-				throw Exception ("missing attribute @name for property");
+				throw MissingDomAttribute (e, "name");
 
 			QString name = e.attribute ("name");
 
 			if (known_values.find (name) == known_values.end())
-				throw Exception (QString ("configuration for unknown property: %1").arg (name));
+				throw BadConfiguration (QString ("configuration for unknown property: %1").arg (name));
 
 			if (configured_values.find (name) != configured_values.end())
-				throw Exception (QString ("duplicated entry <properties>: %1").arg (name));
+				throw BadConfiguration (QString ("duplicated entry <properties>: %1").arg (name));
 
 			unconfigured_values.erase (name);
 			configured_values.insert (name);
@@ -229,7 +230,7 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 				it->second->set_path (path);
 			}
 			else
-				throw Exception (QString ("missing parameter @path for property: %1").arg (name));
+				throw MissingDomAttribute (e, "path");
 
 			if (!e.hasAttribute ("default"))
 				it->second->ensure_existence();
@@ -268,12 +269,12 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 			QStringList list;
 			for (auto s: unconfigured_values)
 				list << s;
-			throw Exception (QString ("missing configuration for the following properties: %1").arg (list.join (", ")));
+			throw BadConfiguration (QString ("missing configuration for the following properties: %1").arg (list.join (", ")));
 		}
 	}
 	catch (Exception& e)
 	{
-		throw Exception ("error when parsing <properties>", &e);
+		throw BadConfiguration ("error when parsing <properties>", &e);
 	}
 }
 
@@ -346,13 +347,13 @@ ConfigReader::parse_file (QString const& path)
 	QDomDocument doc;
 
 	if (!file.exists())
-		throw ConfigException (("file not found: " + path).toStdString());
+		throw BadConfiguration (("file not found: " + path).toStdString());
 
 	if (!file.open (QFile::ReadOnly))
-		throw ConfigException (("file access error: " + path).toStdString());
+		throw BadConfiguration (("file access error: " + path).toStdString());
 
 	if (!doc.setContent (&file, true))
-		throw ConfigException (("config parse error: " + path).toStdString());
+		throw BadConfiguration (("config parse error: " + path).toStdString());
 
 	return doc;
 }
@@ -367,7 +368,7 @@ ConfigReader::preprocess()
 	process_includes (root);
 
 	if (root != "xefis-config")
-		throw ConfigException (("config process error: unsupported root tag: " + root.tagName()).toStdString());
+		throw BadConfiguration (("config process error: unsupported root tag: " + root.tagName()).toStdString());
 
 	for (QDomElement& e: root)
 	{
@@ -380,7 +381,7 @@ ConfigReader::preprocess()
 		else if (e == "airframe")
 			_airframe_config = e;
 		else
-			throw ConfigException (QString ("unsupported child of <xefis-config>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 }
 
@@ -479,7 +480,7 @@ ConfigReader::process_windows_element (QDomElement const& windows_element)
 		if (e == "window")
 			process_window_element (e);
 		else
-			throw ConfigException (QString ("unsupported child of <windows>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 }
 
@@ -507,7 +508,7 @@ ConfigReader::process_modules_element (QDomElement const& modules_element)
 		if (e == "module")
 			process_module_element (e);
 		else
-			throw ConfigException (QString ("unsupported child of <modules>: <%1>").arg (e.tagName()).toStdString());
+			throw BadDomElement (e);
 	}
 }
 

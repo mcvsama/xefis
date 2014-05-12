@@ -45,15 +45,6 @@ enum Operation {
 };
 
 
-class IOError: public Exception
-{
-  public:
-	explicit IOError (std::string const& message, Exception const* inner = nullptr):
-		Exception (message, inner)
-	{ }
-};
-
-
 class Bus: public Noncopyable
 {
   public:

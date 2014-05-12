@@ -19,6 +19,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/accounting.h>
+#include <xefis/core/stdexcept.h>
 
 // Local:
 #include "module_manager.h"
@@ -38,7 +39,7 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 {
 	Module::Pointer pointer (name.toStdString(), instance.toStdString());
 	if (_pointer_to_module_map.find (pointer) != _pointer_to_module_map.end())
-		throw Xefis::Exception (QString ("module '%1' with instance name '%2' already loaded").arg (name).arg (instance).toStdString());
+		throw BadConfiguration (QString ("module '%1' with instance name '%2' already loaded").arg (name).arg (instance).toStdString());
 
 	Module* module = create_module_by_name (name, config, parent);
 
