@@ -120,6 +120,7 @@ class Link:
 			Float,
 			Acceleration,
 			Angle,
+			Capacity,
 			Current,
 			Pressure,
 			Frequency,
@@ -178,6 +179,7 @@ class Link:
 		Xefis::PropertyFloat			_property_float;
 		Xefis::PropertyAcceleration		_property_acceleration;
 		Xefis::PropertyAngle			_property_angle;
+		Xefis::PropertyCapacity			_property_capacity;
 		Xefis::PropertyCurrent			_property_current;
 		Xefis::PropertyPressure			_property_pressure;
 		Xefis::PropertyFrequency		_property_frequency;
