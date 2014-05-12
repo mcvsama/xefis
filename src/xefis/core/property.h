@@ -268,6 +268,16 @@ class TypedProperty: public GenericProperty
 	 */
 	virtual void
 	parse (std::string const&);
+
+	/**
+	 * Create new property node of given type.
+	 * \throw	TypeConflict
+	 * 			when there's another property under the same path with different type.
+	 * \throw	BadType
+	 * 			when type doesn't name correct type.
+	 */
+	static void
+	create (std::string const& path, std::string const& type);
 };
 
 

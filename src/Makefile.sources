@@ -141,6 +141,7 @@ XEFIS_SOURCES += xefis/core/module_manager.cc
 XEFIS_SOURCES += xefis/core/navaid.cc
 XEFIS_SOURCES += xefis/core/navaid_storage.cc
 XEFIS_SOURCES += xefis/core/panel.cc
+XEFIS_SOURCES += xefis/core/property.cc
 XEFIS_SOURCES += xefis/core/property_node.cc
 XEFIS_SOURCES += xefis/core/property_observer.cc
 XEFIS_SOURCES += xefis/core/property_storage.cc
