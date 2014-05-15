@@ -85,15 +85,15 @@ struct FGInputData
 	FGDouble	slip_skid_g;						// ss
 	FGDouble	total_air_temperature_degc;			// tat
 	FGDouble	engine_throttle_pct;				// thr
-	FGDouble	engine_1_thrust;					// thrust1
-	FGDouble	engine_1_rpm;						// rpm1
+	FGDouble	engine_1_thrust_lb;					// thrust1
+	FGDouble	engine_1_rpm_rpm;					// rpm1
 	FGDouble	engine_1_pitch_deg;					// pitch1
 	FGDouble	engine_1_epr;						// epr1
 	FGDouble	engine_1_n1_pct;					// n1-1
 	FGDouble	engine_1_n2_pct;					// n2-1
 	FGDouble	engine_1_egt_degf;					// egt1
-	FGDouble	engine_2_thrust;					// thrust2
-	FGDouble	engine_2_rpm;						// rpm2
+	FGDouble	engine_2_thrust_lb;					// thrust2
+	FGDouble	engine_2_rpm_rpm;					// rpm2
 	FGDouble	engine_2_pitch_deg;					// pitch2
 	FGDouble	engine_2_epr;						// epr2
 	FGDouble	engine_2_n1_pct;					// n1-2
@@ -419,14 +419,14 @@ FlightGearIO::read_input()
 		ASSIGN (nm,   dme_distance);
 		ASSIGN_UNITLESS (slip_skid_g);
 		ASSIGN_UNITLESS (engine_throttle_pct);
-		ASSIGN_UNITLESS (engine_1_thrust);
-		ASSIGN_UNITLESS (engine_1_rpm);
+		ASSIGN (lb,   engine_1_thrust);
+		ASSIGN (rpm,  engine_1_rpm);
 		ASSIGN (deg,  engine_1_pitch);
 		ASSIGN_UNITLESS (engine_1_epr);
 		ASSIGN_UNITLESS (engine_1_n1_pct);
 		ASSIGN_UNITLESS (engine_1_n2_pct);
-		ASSIGN_UNITLESS (engine_2_thrust);
-		ASSIGN_UNITLESS (engine_2_rpm);
+		ASSIGN (lb,   engine_2_thrust);
+		ASSIGN (rpm,  engine_2_rpm);
 		ASSIGN (deg,  engine_2_pitch);
 		ASSIGN_UNITLESS (engine_2_epr);
 		ASSIGN_UNITLESS (engine_2_n1_pct);
