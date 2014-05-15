@@ -211,6 +211,12 @@ class GenericProperty
 	stringify (boost::format, std::string const& unit, std::string nil_value) const;
 
 	/**
+	 * Return binary representation of the value.
+	 */
+	virtual Blob
+	binarify() const;
+
+	/**
 	 * Return float-like value of the property.
 	 */
 	virtual double
@@ -268,6 +274,14 @@ class TypedProperty: public GenericProperty
 	 */
 	virtual void
 	parse (std::string const&);
+
+	/**
+	 * Set value from binary blob.
+	 * This version (not overridden) doesn't create a nil node,
+	 * when it can't find one, but quietly does nothing.
+	 */
+	virtual void
+	parse_blob (Blob const&);
 
 	/**
 	 * Create new property node of given type.
@@ -419,6 +433,10 @@ template<class tType>
 		// TypedProperty API
 		void
 		parse (std::string const&) override;
+
+		// TypedProperty API
+		void
+		parse_blob (Blob const&) override;
 
 		/**
 		 * Return node casted to PropertyValueNode.
@@ -681,6 +699,16 @@ GenericProperty::stringify (boost::format format, std::string const& unit, std::
 }
 
 
+inline Blob
+GenericProperty::binarify() const
+{
+	TypedPropertyValueNode* node = dynamic_cast<TypedPropertyValueNode*> (get_node());
+	if (node)
+		return node->binarify();
+	return Blob();
+}
+
+
 inline double
 GenericProperty::floatize (std::string unit) const
 {
@@ -728,6 +756,27 @@ TypedProperty::parse (std::string const& str_value)
 				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
 				if (typed_node)
 					typed_node->parse (str_value);
+			}
+		}
+	}
+	else
+		throw SingularProperty ("can't write to a singular property: " + _path);
+}
+
+
+inline void
+TypedProperty::parse_blob (Blob const& value)
+{
+	if (_root)
+	{
+		if (!_path.empty())
+		{
+			PropertyNode* node = get_node();
+			if (node)
+			{
+				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
+				if (typed_node)
+					typed_node->parse_blob (value);
 			}
 		}
 	}
@@ -954,6 +1003,29 @@ template<class T>
 				{
 					ValueNodeType* val_node = ensure_path (_path, Type());
 					val_node->parse (value);
+				}
+			}
+		}
+		else
+			throw SingularProperty ("can't write to a singular property: " + _path);
+	}
+
+
+template<class T>
+	inline void
+	Property<T>::parse_blob (Blob const& value)
+	{
+		if (_root)
+		{
+			if (!_path.empty())
+			{
+				try {
+					get_value_node_signalling()->parse_blob (value);
+				}
+				catch (PropertyNotFound)
+				{
+					ValueNodeType* val_node = ensure_path (_path, Type());
+					val_node->parse_blob (value);
 				}
 			}
 		}

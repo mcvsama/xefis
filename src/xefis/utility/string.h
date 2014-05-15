@@ -30,11 +30,14 @@ namespace Xefis {
 
 /**
  * Parse binary string of the form: 00:11:22:aa:ff to a vector
- * of bytes.
+ * of bytes (Blob).
  */
-inline std::vector<uint8_t>
-parse_binary_string (QString const& string)
+inline Blob
+parse_hex_string (QString const& string)
 {
+	if (string.isEmpty())
+		return Blob();
+
 	enum State { MSB, LSB, Colon };
 
 	auto from_xdigit = [&string](QChar& c) -> uint8_t
@@ -80,6 +83,16 @@ parse_binary_string (QString const& string)
 }
 
 
+inline Blob
+make_blob (void const* pointer, std::size_t bytes)
+{
+	uint8_t const* begin = reinterpret_cast<uint8_t const*> (pointer);
+	uint8_t const* end = begin + bytes;
+
+	return Blob (begin, end);
+}
+
+
 inline std::string
 to_hex_string (std::string const& blob)
 {
@@ -107,14 +120,14 @@ parse_color (QString color)
 
 	if (color.size() > 1 && color[0] == '#')
 	{
-		std::vector<uint8_t> vals;
+		Blob vals;
 		color = color.mid (1);
 		if (color.size() == 3)
 		{
 			color = color.mid (0, 1) + color.mid (0, 1) + ":" +
 					color.mid (1, 1) + color.mid (1, 1) + ":" +
 					color.mid (2, 1) + color.mid (2, 1);
-			vals = parse_binary_string (color);
+			vals = parse_hex_string (color);
 			return QColor (vals[0], vals[1], vals[2]);
 		}
 		if (color.size() == 4)
@@ -123,7 +136,7 @@ parse_color (QString color)
 					color.mid (1, 1) + color.mid (1, 1) + ":" +
 					color.mid (2, 1) + color.mid (2, 1) + ":" +
 					color.mid (3, 1) + color.mid (3, 1);
-			vals = parse_binary_string (color);
+			vals = parse_hex_string (color);
 			return QColor (vals[0], vals[1], vals[2], vals[3]);
 		}
 		else if (color.size() == 6)
@@ -131,7 +144,7 @@ parse_color (QString color)
 			color = color.mid (0, 1) + color.mid (1, 1) + ":" +
 					color.mid (2, 1) + color.mid (3, 1) + ":" +
 					color.mid (4, 1) + color.mid (5, 1);
-			vals = parse_binary_string (color);
+			vals = parse_hex_string (color);
 			return QColor (vals[0], vals[1], vals[2]);
 		}
 		else if (color.size() == 8)
@@ -140,7 +153,7 @@ parse_color (QString color)
 					color.mid (2, 1) + color.mid (3, 1) + ":" +
 					color.mid (4, 1) + color.mid (5, 1) + ":" +
 					color.mid (6, 1) + color.mid (7, 1);
-			vals = parse_binary_string (color);
+			vals = parse_hex_string (color);
 			return QColor (vals[0], vals[1], vals[2], vals[3]);
 		}
 		else

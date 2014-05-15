@@ -16,7 +16,11 @@
 
 // Standard:
 #include <cstddef>
+#include <vector>
 #include <string>
+
+// Boost:
+#include <boost/endian/conversion.hpp>
 
 
 namespace SI {
@@ -35,6 +39,9 @@ class UnsupportedUnit: public Xefis::Exception
 };
 
 
+typedef std::vector<uint8_t> Blob;
+
+
 class Value
 {
   public:
@@ -51,10 +58,22 @@ class Value
 	parse (std::string const&) = 0;
 
 	/**
+	 * Parse value from blob.
+	 */
+	virtual void
+	parse_blob (Blob const&) = 0;
+
+	/**
 	 * Output string with value and unit.
 	 */
 	virtual std::string
 	stringify() const = 0;
+
+	/**
+	 * Output binary blob representing value.
+	 */
+	virtual Blob
+	binarify() const = 0;
 
 	/**
 	 * Return float value in given units.
@@ -81,6 +100,14 @@ template<class tValueType>
 		TypedValue (TypedValue const&) noexcept = default;
 
 	  public:
+		// Value API
+		void
+		parse_blob (Blob const&) override;
+
+		// Value API
+		Blob
+		binarify() const override;
+
 		/**
 		 * Access internal representation.
 		 */
@@ -107,6 +134,40 @@ template<class V>
 	TypedValue<V>::TypedValue (ValueType value):
 		_value (value)
 	{ }
+
+
+template<class V>
+	inline void
+	TypedValue<V>::parse_blob (Blob const& blob)
+	{
+		if (blob.size() == sizeof (ValueType))
+		{
+			ValueType parsed;
+			uint8_t const* begin = blob.data();
+			uint8_t const* end = blob.data() + blob.size();
+			uint8_t* destination = reinterpret_cast<uint8_t*> (&parsed);
+			std::copy (begin, end, destination);
+			boost::endian::little_to_native (parsed);
+			internal() = parsed;
+		}
+		else
+			throw UnparsableValue ("wrong size of binary data");
+	}
+
+
+template<class V>
+	inline Blob
+	TypedValue<V>::binarify() const
+	{
+		Blob result (sizeof (ValueType));
+		ValueType copy = internal();
+		boost::endian::native_to_little (copy);
+		uint8_t const* begin = reinterpret_cast<uint8_t const*> (&copy);
+		uint8_t const* end = begin + sizeof (ValueType);
+		uint8_t* destination = &*result.begin();
+		std::copy (begin, end, destination);
+		return result;
+	}
 
 
 template<class V>

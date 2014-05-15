@@ -19,3 +19,5 @@
 #include "constants.h"
 #include "cpp14.h"
 
+namespace xf = Xefis;
+
