@@ -45,7 +45,7 @@ TypedProperty::create (std::string const& path, std::string const& type)
 	else if (type == "pressure")
 		PropertyPressure (path).ensure_existence();
 	else if (type == "frequency")
-		PropertyFrequency (path);
+		PropertyFrequency (path).ensure_existence();
 	else if (type == "length")
 		PropertyLength (path).ensure_existence();
 	else if (type == "speed")
