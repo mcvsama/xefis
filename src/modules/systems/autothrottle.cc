@@ -86,7 +86,7 @@ void
 Autothrottle::compute_thrust()
 {
 	bool disengage = false;
-	double computed_thrust = 0.0;
+	Frequency computed_thrust = 0.0_rpm;
 	Time dt = _thrust_computer.update_dt();
 
 	if (_cmd_speed_mode.fresh())
@@ -113,14 +113,14 @@ Autothrottle::compute_thrust()
 				// There's no 1:1 correlaction between them.
 				_ias_pid.set_target (_cmd_ias->kt());
 				_ias_pid.process (_measured_ias->kt(), dt);
-				computed_thrust = Xefis::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
-				computed_thrust = Xefis::renormalize (computed_thrust, { -1.0, 1.0 }, _output_thrust_extent);
+				computed_thrust = 1_rpm * Xefis::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
+				computed_thrust = 1_rpm * Xefis::renormalize (computed_thrust.rpm(), { -1.0, 1.0}, { _output_thrust_extent.min().rpm(), _output_thrust_extent.max().rpm() });
 			}
 			break;
 
 		case SpeedMode::None:
 		case SpeedMode::sentinel:
-			_computed_output_thrust = 0.0;
+			_computed_output_thrust = 0.0_rpm;
 			break;
 	}
 
