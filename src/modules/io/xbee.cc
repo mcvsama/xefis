@@ -123,7 +123,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	QObject::connect (_rssi_timer, SIGNAL (timeout()), this, SLOT (rssi_timeout()));
 	_rssi_timer->start();
 
-	if (!vector_to_uint16 (Xefis::parse_binary_string (_local_address_string), _local_address))
+	if (!vector_to_uint16 (Xefis::parse_hex_string (_local_address_string), _local_address))
 	{
 		log() << "Error: local address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
 		_local_address = 0x0000;
@@ -134,7 +134,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		_local_address = 0x0000;
 	}
 
-	if (!vector_to_uint16 (Xefis::parse_binary_string (_remote_address_string), _remote_address))
+	if (!vector_to_uint16 (Xefis::parse_hex_string (_remote_address_string), _remote_address))
 	{
 		log() << "Error: remote address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
 		_remote_address = 0x0000;
@@ -146,7 +146,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	}
 
 	// PAN ID:
-	if (!vector_to_uint16 (Xefis::parse_binary_string (_pan_id_string), _pan_id))
+	if (!vector_to_uint16 (Xefis::parse_hex_string (_pan_id_string), _pan_id))
 	{
 		log() << "Invalid pan-id setting: must be 2-byte binary string (eg. 01:23). Setting pan-id to default 00:00." << std::endl;
 		_pan_id = 0x0000;

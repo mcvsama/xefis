@@ -26,11 +26,12 @@
 
 // Boost:
 #include <boost/lexical_cast.hpp>
-#include <boost/optional.hpp>
+#include <boost/endian/conversion.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/string.h>
 
 #include "property_storage.h"
 
@@ -288,6 +289,12 @@ class TypedPropertyValueNode: public PropertyNode
 	stringify() const = 0;
 
 	/**
+	 * Return binary blob representing value.
+	 */
+	virtual Blob
+	binarify() const = 0;
+
+	/**
 	 * Return float-like value for the property.
 	 */
 	virtual double
@@ -298,6 +305,12 @@ class TypedPropertyValueNode: public PropertyNode
 	 */
 	virtual void
 	parse (std::string const&) = 0;
+
+	/**
+	 * Parse value from binary representation.
+	 */
+	virtual void
+	parse_blob (Blob const&) = 0;
 
   private:
 	bool _is_nil = false;
@@ -358,6 +371,12 @@ template<class tType>
 		stringify() const override;
 
 		/**
+		 * Return binary blob representing value.
+		 */
+		Blob
+		binarify() const override;
+
+		/**
 		 * Return float-like value.
 		 */
 		double
@@ -368,6 +387,12 @@ template<class tType>
 		 */
 		void
 		parse (std::string const&) override;
+
+		/**
+		 * Parse value from binary representation.
+		 */
+		void
+		parse_blob (Blob const&) override;
 
 	  private:
 		/**
@@ -622,6 +647,73 @@ template<>
 
 
 template<class T>
+	inline Blob
+	PropertyValueNode<T>::binarify() const
+	{
+		if (!_is_nil)
+			return _value.binarify();
+		else
+			return Blob();
+	}
+
+
+template<>
+	inline Blob
+	PropertyValueNode<bool>::binarify() const
+	{
+		if (!_is_nil)
+			return _value ? Blob ({ 0x01 }) : Blob ({ 0x00 });
+		else
+			return Blob();
+	};
+
+
+template<>
+	inline Blob
+	PropertyValueNode<int64_t>::binarify() const
+	{
+		if (!_is_nil)
+		{
+			int64_t int_value = _value;
+			boost::endian::native_to_little (int_value);
+			return make_blob (&int_value, sizeof (int_value));
+		}
+		else
+			return Blob();
+	}
+
+
+template<>
+	inline Blob
+	PropertyValueNode<double>::binarify() const
+	{
+		if (!_is_nil)
+		{
+			double double_value = _value;
+			boost::endian::native_to_little (double_value);
+			return make_blob (&double_value, sizeof (double_value));
+		}
+		else
+			return Blob();
+	}
+
+
+template<>
+	inline Blob
+	PropertyValueNode<std::string>::binarify() const
+	{
+		if (!_is_nil)
+		{
+			Blob result ({ 0x00 });
+			result.insert (result.end(), _value.begin(), _value.end());
+			return result;
+		}
+		else
+			return Blob();
+	}
+
+
+template<class T>
 	inline double
 	PropertyValueNode<T>::floatize (std::string unit) const
 	{
@@ -644,22 +736,6 @@ template<class T>
 		Type parsed;
 		parsed.parse (str);
 		write (parsed);
-	}
-
-
-template<class T>
-	inline double
-	PropertyValueNode<T>::specialized_floatize (std::string, std::false_type) const
-	{
-		return _value;
-	}
-
-
-template<class T>
-	inline double
-	PropertyValueNode<T>::specialized_floatize (std::string unit, std::true_type) const
-	{
-		return _value.floatize (unit);
 	}
 
 
@@ -704,6 +780,89 @@ template<>
 	PropertyValueNode<std::string>::parse (std::string const& str)
 	{
 		write (str);
+	}
+
+
+template<class T>
+	inline void
+	PropertyValueNode<T>::parse_blob (Blob const& blob)
+	{
+		if (blob.empty())
+			set_nil();
+		else
+		{
+			Type parsed;
+			parsed.parse_blob (blob);
+			write (parsed);
+		}
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<bool>::parse_blob (Blob const& blob)
+	{
+		if (blob.empty())
+			set_nil();
+		else
+			write (blob[0] != 0x00);
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<int64_t>::parse_blob (Blob const& blob)
+	{
+		if (blob.empty())
+			set_nil();
+		else if (blob.size() == sizeof (int64_t))
+		{
+			int64_t int_value = *reinterpret_cast<int64_t const*> (blob.data());
+			boost::endian::little_to_native (int_value);
+			write (int_value);
+		}
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<double>::parse_blob (Blob const& blob)
+	{
+		if (blob.empty())
+			set_nil();
+		else if (blob.size() == sizeof (double))
+		{
+			double double_value = *reinterpret_cast<double const*> (blob.data());
+			boost::endian::little_to_native (double_value);
+			write (double_value);
+		}
+	}
+
+
+template<>
+	inline void
+	PropertyValueNode<std::string>::parse_blob (Blob const& blob)
+	{
+		if (blob.empty())
+			set_nil();
+		else if (blob[0] == 0x00)
+			write (std::string (blob.begin() + 1, blob.end()));
+	}
+
+
+template<class T>
+	inline double
+	PropertyValueNode<T>::specialized_floatize (std::string, std::false_type) const
+	{
+		return _value;
+	}
+
+
+template<class T>
+	inline double
+	PropertyValueNode<T>::specialized_floatize (std::string unit, std::true_type) const
+	{
+		return _value.floatize (unit);
 	}
 
 } // namespace Xefis

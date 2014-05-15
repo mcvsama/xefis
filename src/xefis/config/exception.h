@@ -133,11 +133,11 @@ Exception::Exception (const char* message, Exception const* inner):
 inline
 Exception::Exception (std::string const& message, Exception const* inner):
 	_what (message),
-	_message ("Error: " + message)
+	_message (message)
 {
 	if (inner)
 	{
-		_message += "\n" + inner->message();
+		_message += "; cause: " + inner->message();
 		_inner_message = inner->message();
 		_backtrace = inner->backtrace();
 	}

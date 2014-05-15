@@ -657,7 +657,7 @@ Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 	}
 
 	if (element.hasAttribute ("key"))
-		_key = Xefis::parse_binary_string (element.attribute ("key"));
+		_key = Xefis::parse_hex_string (element.attribute ("key"));
 	else
 		_key = { 0 };
 
@@ -736,7 +736,7 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 	if (!element.hasAttribute ("magic"))
 		throw Xefis::MissingDomAttribute (element, "magic");
 
-	_magic = Xefis::parse_binary_string (element.attribute ("magic"));
+	_magic = Xefis::parse_hex_string (element.attribute ("magic"));
 	if (_magic.empty())
 		throw Xefis::BadDomAttribute (element, "magic", "value must be at least one byte long");
 
