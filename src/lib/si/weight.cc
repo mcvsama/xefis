@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Weight::_supported_units = { "gr", "gram", "kg" };
+std::vector<std::string> Weight::_supported_units = { "gr", "gram", "kg", "lb" };
 
 } // namespace SI
 

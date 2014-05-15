@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Frequency::_supported_units = { "hz", "khz", "mhz" };
+std::vector<std::string> Frequency::_supported_units = { "hz", "khz", "mhz", "rpm" };
 
 } // namespace SI
 
