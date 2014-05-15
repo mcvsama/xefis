@@ -33,6 +33,8 @@ class Frequency: public LinearValue<double, Frequency>
 	friend constexpr Frequency operator"" _kHz (unsigned long long);
 	friend constexpr Frequency operator"" _MHz (long double);
 	friend constexpr Frequency operator"" _MHz (unsigned long long);
+	friend constexpr Frequency operator"" _rpm (long double);
+	friend constexpr Frequency operator"" _rpm (unsigned long long);
 
   protected:
 	explicit constexpr
@@ -56,6 +58,9 @@ class Frequency: public LinearValue<double, Frequency>
 
 	constexpr ValueType
 	MHz() const noexcept;
+
+	constexpr ValueType
+	rpm() const noexcept;
 
 	void
 	parse (std::string const&) override;
@@ -118,6 +123,20 @@ operator"" _MHz (unsigned long long MHz)
 }
 
 
+inline constexpr Frequency
+operator"" _rpm (long double rpm)
+{
+	return Frequency (static_cast<Frequency::ValueType> (rpm) / 60.0);
+}
+
+
+inline constexpr Frequency
+operator"" _rpm (unsigned long long rpm)
+{
+	return Frequency (static_cast<Frequency::ValueType> (rpm) / 60.0);
+}
+
+
 /*
  * Frequency implementation
  */
@@ -157,6 +176,13 @@ Frequency::MHz() const noexcept
 }
 
 
+inline constexpr Frequency::ValueType
+Frequency::rpm() const noexcept
+{
+	return internal() * 60.0;
+}
+
+
 inline void
 Frequency::parse (std::string const& str)
 {
@@ -168,6 +194,8 @@ Frequency::parse (std::string const& str)
 		*this = p.first * 1_kHz;
 	else if (p.second == "mhz")
 		*this = p.first * 1_MHz;
+	else if (p.second == "rpm")
+		*this = p.first * 1_rpm;
 }
 
 
@@ -189,6 +217,8 @@ Frequency::floatize (std::string unit) const
 		return kHz();
 	else if (unit == "mhz")
 		return MHz();
+	else if (unit == "rpm")
+		return rpm();
 	else
 		throw UnsupportedUnit ("can't convert Frequency to " + unit);
 }

@@ -31,6 +31,8 @@ class Weight: public LinearValue<double, Weight>
 	friend constexpr Weight operator"" _gr (unsigned long long);
 	friend constexpr Weight operator"" _kg (long double);
 	friend constexpr Weight operator"" _kg (unsigned long long);
+	friend constexpr Weight operator"" _lb (long double);
+	friend constexpr Weight operator"" _lb (unsigned long long);
 
   protected:
 	explicit constexpr
@@ -51,6 +53,9 @@ class Weight: public LinearValue<double, Weight>
 
 	constexpr ValueType
 	kg() const noexcept;
+
+	constexpr ValueType
+	lb() const noexcept;
 
 	void
 	parse (std::string const&) override;
@@ -99,6 +104,20 @@ operator"" _kg (unsigned long long kg)
 }
 
 
+inline constexpr Weight
+operator"" _lb (long double lb)
+{
+	return Weight (static_cast<Weight::ValueType> (lb) * 453.592);
+}
+
+
+inline constexpr Weight
+operator"" _lb (unsigned long long lb)
+{
+	return Weight (static_cast<Weight::ValueType> (lb) * 453.592);
+}
+
+
 /*
  * Weight implementation
  */
@@ -131,6 +150,13 @@ Weight::kg() const noexcept
 }
 
 
+inline constexpr Weight::ValueType
+Weight::lb() const noexcept
+{
+	return internal() / 453.592;
+}
+
+
 inline void
 Weight::parse (std::string const& str)
 {
@@ -140,6 +166,8 @@ Weight::parse (std::string const& str)
 		*this = p.first * 1_gr;
 	else if (p.second == "kg")
 		*this = p.first * 1_kg;
+	else if (p.second == "lb")
+		*this = p.first * 1_lb;
 }
 
 
@@ -159,6 +187,8 @@ Weight::floatize (std::string unit) const
 		return gr();
 	else if (unit == "kg")
 		return kg();
+	else if (unit == "lb")
+		return lb();
 	else
 		throw UnsupportedUnit ("can't convert Weight to " + unit);
 }
