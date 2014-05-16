@@ -28,8 +28,8 @@
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/property.h>
 #include <xefis/core/config_reader.h>
+#include <xefis/hardware/i2c.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/i2c.h>
 #include <xefis/utility/logger.h>
 
 

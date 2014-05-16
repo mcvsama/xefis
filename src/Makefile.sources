@@ -160,8 +160,14 @@ XEFIS_MOCHDRS += xefis/core/window.h
 ######## /xefis/hardware ########
 
 XEFIS_HEADERS += xefis/hardware/chr_um6.h
+XEFIS_HEADERS += xefis/hardware/i2c.h
+XEFIS_HEADERS += xefis/hardware/serial_port.h
 
 XEFIS_SOURCES += xefis/hardware/chr_um6.cc
+XEFIS_SOURCES += xefis/hardware/i2c.cc
+XEFIS_SOURCES += xefis/hardware/serial_port.cc
+
+XEFIS_MOCHDRS += xefis/hardware/serial_port.h
 
 ######## /xefis/utility ########
 
@@ -170,7 +176,6 @@ XEFIS_HEADERS += xefis/utility/convergence.h
 XEFIS_HEADERS += xefis/utility/delta_decoder.h
 XEFIS_HEADERS += xefis/utility/hash.h
 XEFIS_HEADERS += xefis/utility/hextable.h
-XEFIS_HEADERS += xefis/utility/i2c.h
 XEFIS_HEADERS += xefis/utility/logger.h
 XEFIS_HEADERS += xefis/utility/lookahead.h
 XEFIS_HEADERS += xefis/utility/mutex.h
@@ -186,7 +191,6 @@ XEFIS_HEADERS += xefis/utility/range.h
 XEFIS_HEADERS += xefis/utility/resource.h
 XEFIS_HEADERS += xefis/utility/rotary_decoder.h
 XEFIS_HEADERS += xefis/utility/semaphore.h
-XEFIS_HEADERS += xefis/utility/serial_port.h
 XEFIS_HEADERS += xefis/utility/smoother.h
 XEFIS_HEADERS += xefis/utility/string.h
 XEFIS_HEADERS += xefis/utility/text_layout.h
@@ -196,19 +200,15 @@ XEFIS_HEADERS += xefis/utility/time.h
 
 XEFIS_SOURCES += xefis/utility/backtrace.cc
 XEFIS_SOURCES += xefis/utility/delta_decoder.cc
-XEFIS_SOURCES += xefis/utility/i2c.cc
 XEFIS_SOURCES += xefis/utility/mutex.cc
 XEFIS_SOURCES += xefis/utility/packet_reader.cc
 XEFIS_SOURCES += xefis/utility/painter.cc
 XEFIS_SOURCES += xefis/utility/qzdevice.cc
 XEFIS_SOURCES += xefis/utility/rotary_decoder.cc
 XEFIS_SOURCES += xefis/utility/semaphore.cc
-XEFIS_SOURCES += xefis/utility/serial_port.cc
 XEFIS_SOURCES += xefis/utility/text_layout.cc
 XEFIS_SOURCES += xefis/utility/text_painter.cc
 XEFIS_SOURCES += xefis/utility/thread.cc
-
-XEFIS_MOCHDRS += xefis/utility/serial_port.h
 
 ######## /xefis/widgets ########
 

@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/module.h>
 #include <xefis/hardware/chr_um6.h>
-#include <xefis/utility/serial_port.h>
+#include <xefis/hardware/serial_port.h>
 
 
 /**

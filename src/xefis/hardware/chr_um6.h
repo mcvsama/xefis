@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/serial_port.h>
+#include <xefis/hardware/serial_port.h>
 #include <xefis/utility/packet_reader.h>
 #include <xefis/utility/logger.h>
 
