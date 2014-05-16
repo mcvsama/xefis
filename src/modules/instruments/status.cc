@@ -153,8 +153,7 @@ Status::Status (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	});
 
 	parse_properties (config, {
-		{ "input.button.cursor-up", _input_button_cursor_up, false },
-		{ "input.button.cursor-down", _input_button_cursor_down, false },
+		{ "input.cursor", _input_cursor_value, false },
 		{ "input.button.cursor-del", _input_button_cursor_del, false },
 		{ "input.button.recall", _input_button_recall, false },
 		{ "input.button.clear", _input_button_clear, false },
@@ -176,12 +175,29 @@ Status::Status (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	layout->setMargin (0);
 	layout->setSpacing (0);
 	layout->addWidget (_status_widget);
+
+	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder> (_input_cursor_value, [this](int delta) {
+		if (delta > 0)
+		{
+			for (int i = 0; i < delta; ++i)
+				_status_widget->cursor_up();
+		}
+		else if (delta < 0)
+		{
+			for (int i = 0; i > delta; --i)
+				_status_widget->cursor_down();
+		}
+	});
+
+	_input_cursor_decoder->call (0);
 }
 
 
 void
 Status::data_updated()
 {
+	_input_cursor_decoder->data_updated();
+
 	auto pressed = [](Xefis::PropertyBoolean& property) -> bool {
 		return property.valid_and_fresh() && *property;
 	};
@@ -191,12 +207,6 @@ Status::data_updated()
 
 	if (pressed (_input_button_master_warning))
 		_output_master_warning = false;
-
-	if (pressed (_input_button_cursor_up))
-		_status_widget->cursor_up();
-
-	if (pressed (_input_button_cursor_down))
-		_status_widget->cursor_down();
 
 	if (pressed (_input_button_cursor_del))
 		_status_widget->cursor_del();
