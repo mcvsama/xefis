@@ -31,10 +31,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/hardware/serial_port.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hextable.h>
 #include <xefis/utility/resource.h>
-#include <xefis/utility/serial_port.h>
 
 // Local:
 #include "gps.h"

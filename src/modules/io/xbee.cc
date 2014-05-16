@@ -33,9 +33,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/hardware/serial_port.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
-#include <xefis/utility/serial_port.h>
 
 // Local:
 #include "xbee.h"
