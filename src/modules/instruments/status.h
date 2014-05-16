@@ -25,6 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/instrument.h>
+#include <xefis/utility/delta_decoder.h>
 
 
 class StatusWidget;
@@ -161,8 +162,8 @@ class Status: public Xefis::Instrument
 
   private:
 	StatusWidget*						_status_widget			= nullptr;
-	Xefis::PropertyBoolean				_input_button_cursor_up;
-	Xefis::PropertyBoolean				_input_button_cursor_down;
+	Xefis::PropertyInteger				_input_cursor_value;
+	Unique<xf::DeltaDecoder>			_input_cursor_decoder;
 	Xefis::PropertyBoolean				_input_button_cursor_del;
 	Xefis::PropertyBoolean				_input_button_recall;
 	Xefis::PropertyBoolean				_input_button_clear;
