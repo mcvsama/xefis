@@ -111,7 +111,7 @@ PropertyEditor::item_selected()
 	PropertyNode* node = _property_tree_widget->selected_property_node();
 	if (node)
 	{
-		QWidget* widgets[] = { _editable_value, _update_button };
+		QWidget* widgets[] = { _editable_value, _update_button, _set_nil_button };
 
 		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
 		if (!val_node || PropertyTreeWidget::contains_binary_data (val_node))
