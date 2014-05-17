@@ -31,7 +31,15 @@ namespace Xefis {
 
 ModuleManager::ModuleManager (Application* application):
 	_application (application)
-{ }
+{
+	std::clog << "Creating ModuleManager" << std::endl;
+}
+
+
+ModuleManager::~ModuleManager()
+{
+	std::clog << "Destroying ModuleManager" << std::endl;
+}
 
 
 Module*

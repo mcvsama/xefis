@@ -25,7 +25,15 @@
 namespace Xefis {
 
 WindowManager::WindowManager (Application*)
-{ }
+{
+	std::clog << "Creating WindowManager" << std::endl;
+}
+
+
+WindowManager::~WindowManager()
+{
+	std::clog << "Destroying WindowManager" << std::endl;
+}
 
 
 void

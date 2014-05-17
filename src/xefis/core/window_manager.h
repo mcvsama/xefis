@@ -32,6 +32,9 @@ class WindowManager: public QWidget
 	// Ctor
 	WindowManager (Application*);
 
+	// Dtor
+	~WindowManager();
+
 	/**
 	 * Add window to be managed.
 	 */

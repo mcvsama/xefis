@@ -51,7 +51,15 @@ SoundManager::Sound::stop()
 
 
 SoundManager::SoundManager (Application*)
-{ }
+{
+	std::clog << "Creating SoundManager" << std::endl;
+}
+
+
+SoundManager::~SoundManager()
+{
+	std::clog << "Destroying SoundManager" << std::endl;
+}
 
 
 Shared<SoundManager::Sound>

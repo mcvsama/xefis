@@ -28,6 +28,26 @@
 
 namespace Xefis {
 
+ConfiguratorWidget::Decorator::Decorator (QWidget* child, QWidget* parent):
+	QWidget (parent),
+	_child (child)
+{
+	QGridLayout* layout = new QGridLayout (this);
+	layout->setMargin (0);
+	layout->setSpacing (0);
+	layout->addWidget (child, 0, 0);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 1);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, 0);
+}
+
+
+ConfiguratorWidget::Decorator::~Decorator()
+{
+	_child->hide();
+	_child->setParent (nullptr);
+}
+
+
 ConfiguratorWidget::ConfiguratorWidget (ModuleManager* module_manager, QWidget* parent):
 	QWidget (parent),
 	_module_manager (module_manager)
@@ -87,15 +107,8 @@ ConfiguratorWidget::module_selected (Module::Pointer const& module_pointer)
 void
 ConfiguratorWidget::decorate_widget (QWidget* configurator_widget)
 {
-	QWidget* decorator = new QWidget (this);
+	Decorator* decorator = new Decorator (configurator_widget, this);
 	_config_decorators[configurator_widget] = decorator;
-
-	QGridLayout* layout = new QGridLayout (decorator);
-	layout->setMargin (0);
-	layout->setSpacing (0);
-	layout->addWidget (configurator_widget, 0, 0);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 1);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, 0);
 }
 
 } // namespace Xefis

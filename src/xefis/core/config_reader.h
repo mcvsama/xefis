@@ -196,7 +196,11 @@ class ConfigReader
 	};
 
   public:
+	// Ctor
 	ConfigReader (Application*, ModuleManager*);
+
+	// Dtor
+	~ConfigReader();
 
 	/**
 	 * Read config, parse it, prepare for processing, but don't yet load anything.

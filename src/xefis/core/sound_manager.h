@@ -65,6 +65,9 @@ class SoundManager
 	// Ctor
 	SoundManager (Application*);
 
+	// Dtor
+	~SoundManager();
+
 	/**
 	 * Play sound.
 	 */

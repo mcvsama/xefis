@@ -47,6 +47,8 @@ WorkPerformer::Performer::run()
 
 WorkPerformer::WorkPerformer (unsigned int threads_number)
 {
+	std::clog << "Creating WorkPerformer" << std::endl;
+
 	threads_number = std::max (1u, threads_number);
 
 	for (unsigned int i = 0; i < threads_number; ++i)
@@ -60,6 +62,8 @@ WorkPerformer::WorkPerformer (unsigned int threads_number)
 
 WorkPerformer::~WorkPerformer()
 {
+	std::clog << "Destroying WorkPerformer" << std::endl;
+
 	for (decltype (_performers.size()) i = 0; i < _performers.size(); ++i)
 		_queue_semaphore.post();
 	for (auto p: _performers)
