@@ -15,8 +15,12 @@
 #include <cstddef>
 
 // Qt:
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QMessageBox>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -28,23 +32,57 @@
 
 namespace Xefis {
 
-ConfiguratorWidget::Decorator::Decorator (QWidget* child, QWidget* parent):
+ConfiguratorWidget::OwnershipBreakingDecorator::OwnershipBreakingDecorator (QWidget* child, QWidget* parent):
 	QWidget (parent),
 	_child (child)
 {
-	QGridLayout* layout = new QGridLayout (this);
+	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (child, 0, 0);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 1);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, 0);
+	layout->addWidget (child, 0, Qt::AlignTop | Qt::AlignLeft);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 }
 
 
-ConfiguratorWidget::Decorator::~Decorator()
+ConfiguratorWidget::OwnershipBreakingDecorator::~OwnershipBreakingDecorator()
 {
 	_child->hide();
 	_child->setParent (nullptr);
+}
+
+
+ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Module* module, QWidget* parent):
+	QWidget (parent)
+{
+	QPushButton* reload_button = new QPushButton ("Force module restart", this);
+	QObject::connect (reload_button, &QPushButton::clicked, [module,this]() {
+		QString instance_html = module->instance().empty()
+			? "<i>default</i>"
+			: "<b>" + QString::fromStdString (module->instance()).toHtmlEscaped() + "</b>";
+		QString message = QString ("<p>Confirm module restart:</p>")
+			+ "<table style='margin: 1em 0'>"
+			+ "<tr><td>Module name: </td><td><b>" + QString::fromStdString (module->name()).toHtmlEscaped() + "</b></td></tr>"
+			+ "<tr><td>Instance: </td><td>" + instance_html + "</td></tr>"
+			+ "</table>";
+		if (QMessageBox::question (this, "Module restart", message) == QMessageBox::Ok)
+			module->module_manager()->post_module_reload_request (module);
+	});
+
+	QHBoxLayout* buttons_layout = new QHBoxLayout();
+	buttons_layout->addWidget (reload_button);
+	buttons_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+	QTabWidget* tabs = new QTabWidget (this);
+	QWidget* module_config_widget = module->configurator_widget();
+	if (module_config_widget)
+		tabs->addTab (new OwnershipBreakingDecorator (module_config_widget, this), "Module config");
+	tabs->addTab (new QWidget (this), "I/O");
+
+	QVBoxLayout* layout = new QVBoxLayout (this);
+	layout->setMargin (0);
+	layout->setSpacing (WidgetSpacing);
+	layout->addLayout (buttons_layout);
+	layout->addWidget (tabs);
 }
 
 
@@ -52,8 +90,8 @@ ConfiguratorWidget::ConfiguratorWidget (ModuleManager* module_manager, QWidget* 
 	QWidget (parent),
 	_module_manager (module_manager)
 {
-	_no_config_placeholder = new QLabel ("This module doesn't have configuration UI", this);
-	_no_config_placeholder->setAlignment (Qt::AlignCenter);
+	_no_module_selected = new QLabel ("No module selected", this);
+	_no_module_selected->setAlignment (Qt::AlignCenter);
 
 	_property_editor = new PropertyEditor (PropertyStorage::default_storage()->root(), this);
 
@@ -63,7 +101,7 @@ ConfiguratorWidget::ConfiguratorWidget (ModuleManager* module_manager, QWidget* 
 
 	_modules_stack = new QStackedWidget (this);
 	_modules_stack->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	_modules_stack->addWidget (_no_config_placeholder);
+	_modules_stack->addWidget (_no_module_selected);
 
 	QWidget* _module_configurator = new QWidget (this);
 
@@ -88,27 +126,19 @@ void
 ConfiguratorWidget::module_selected (Module::Pointer const& module_pointer)
 {
 	Module* module = _module_manager->find (module_pointer);
-	QWidget* configurator_widget = module->configurator_widget();
 
-	if (configurator_widget)
+	auto gmw = _general_module_widgets.find (module);
+	if (gmw == _general_module_widgets.end())
 	{
-		if (_modules_stack->indexOf (configurator_widget) == -1)
-		{
-			decorate_widget (configurator_widget);
-			_modules_stack->addWidget (_config_decorators[configurator_widget]);
-		}
-		_modules_stack->setCurrentWidget (_config_decorators[configurator_widget]);
+		auto new_gmw = std::make_unique<GeneralModuleWidget> (module, this);
+		gmw = _general_module_widgets.insert ({ module, new_gmw.get() }).first;
+		new_gmw.release();
 	}
-	else
-		_modules_stack->setCurrentWidget (_no_config_placeholder);
-}
 
+	if (_modules_stack->indexOf (gmw->second) == -1)
+		_modules_stack->addWidget (gmw->second);
 
-void
-ConfiguratorWidget::decorate_widget (QWidget* configurator_widget)
-{
-	Decorator* decorator = new Decorator (configurator_widget, this);
-	_config_decorators[configurator_widget] = decorator;
+	_modules_stack->setCurrentWidget (gmw->second);
 }
 
 } // namespace Xefis

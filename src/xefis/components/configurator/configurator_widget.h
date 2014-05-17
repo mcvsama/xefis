@@ -39,24 +39,36 @@ class ConfiguratorWidget: public QWidget
 	Q_OBJECT
 
 	/**
-	 * Decorator widget that ensures its child widget is NOT deleted
+	 * OwnershipBreakingDecorator widget that ensures its child widget is NOT deleted
 	 * when decorator is deleted. Used to break Qt's parent-child relationship
 	 * when it comes to pointer ownership (since Qt doesn't have its own
 	 * mechanism for this).
 	 *
 	 * Also - lays out the child widget.
 	 */
-	class Decorator: public QWidget
+	class OwnershipBreakingDecorator: public QWidget
 	{
 	  public:
 		// Ctor
-		Decorator (QWidget* child, QWidget* parent);
+		OwnershipBreakingDecorator (QWidget* child, QWidget* parent);
 
 		// Dtor
-		~Decorator();
+		~OwnershipBreakingDecorator();
 
 	  private:
 		QWidget* _child;
+	};
+
+	/**
+	 * Configuration widget for module.
+	 * Contains generic config widgets, module's configurator widget,
+	 * and other stuff.
+	 */
+	class GeneralModuleWidget: public QWidget
+	{
+	  public:
+		// Ctor
+		GeneralModuleWidget (Module*, QWidget* parent);
 	};
 
   public:
@@ -81,14 +93,14 @@ class ConfiguratorWidget: public QWidget
 	decorate_widget (QWidget* configurator_widget);
 
   private:
-	ModuleManager*					_module_manager			= nullptr;
-	PropertyEditor*					_property_editor		= nullptr;
-	ModulesList*					_modules_list			= nullptr;
-	QStackedWidget*					_modules_stack			= nullptr;
-	QTabWidget*						_tabs					= nullptr;
-	Window*							_owning_window			= nullptr;
-	QLabel*							_no_config_placeholder	= nullptr;
-	std::map<QWidget*, QWidget*>	_config_decorators;
+	ModuleManager*							_module_manager			= nullptr;
+	PropertyEditor*							_property_editor		= nullptr;
+	ModulesList*							_modules_list			= nullptr;
+	QStackedWidget*							_modules_stack			= nullptr;
+	QTabWidget*								_tabs					= nullptr;
+	Window*									_owning_window			= nullptr;
+	QLabel*									_no_module_selected		= nullptr;
+	std::map<Module*, GeneralModuleWidget*>	_general_module_widgets;
 };
 
 
