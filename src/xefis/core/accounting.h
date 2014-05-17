@@ -121,6 +121,9 @@ class Accounting: public QObject
 	// Ctor:
 	Accounting();
 
+	// Dtor
+	~Accounting();
+
 	/**
 	 * Return latency stats.
 	 */

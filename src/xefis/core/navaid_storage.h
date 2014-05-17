@@ -79,6 +79,9 @@ class NavaidStorage
 	// Ctor
 	NavaidStorage();
 
+	// Dtor
+	~NavaidStorage();
+
 	/**
 	 * Load navaids and fixes.
 	 */

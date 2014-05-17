@@ -293,9 +293,16 @@ ConfigReader::ConfigReader (Application* application, ModuleManager* module_mana
 	_application (application),
 	_module_manager (module_manager)
 {
+	std::clog << "Creating ConfigReader" << std::endl;
 	const char* mode = getenv ("XEFIS_MODE");
 	if (mode)
 		_config_mode = mode;
+}
+
+
+ConfigReader::~ConfigReader()
+{
+	std::clog << "Destroying ConfigReader" << std::endl;
 }
 
 

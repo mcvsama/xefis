@@ -38,6 +38,27 @@ class ConfiguratorWidget: public QWidget
 {
 	Q_OBJECT
 
+	/**
+	 * Decorator widget that ensures its child widget is NOT deleted
+	 * when decorator is deleted. Used to break Qt's parent-child relationship
+	 * when it comes to pointer ownership (since Qt doesn't have its own
+	 * mechanism for this).
+	 *
+	 * Also - lays out the child widget.
+	 */
+	class Decorator: public QWidget
+	{
+	  public:
+		// Ctor
+		Decorator (QWidget* child, QWidget* parent);
+
+		// Dtor
+		~Decorator();
+
+	  private:
+		QWidget* _child;
+	};
+
   public:
 	// Ctor
 	ConfiguratorWidget (ModuleManager* module_manager, QWidget* parent);

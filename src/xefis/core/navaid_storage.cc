@@ -102,7 +102,14 @@ GzDataFileIterator::operator*()
 NavaidStorage::NavaidStorage():
 	_navaids_tree (access_position)
 {
+	std::clog << "Creating NavaidStorage" << std::endl;
 	_logger.set_prefix ("<navaid storage>");
+}
+
+
+NavaidStorage::~NavaidStorage()
+{
+	std::clog << "Destroying NavaidStorage" << std::endl;
 }
 
 

@@ -84,11 +84,18 @@ Accounting::Stats::average() const noexcept
 
 Accounting::Accounting()
 {
+	std::clog << "Creating Accounting" << std::endl;
 	_latency_check_timer = new QTimer (this);
 	_latency_check_timer->setSingleShot (false);
 	_latency_check_timer->setInterval (10);
 	QObject::connect (_latency_check_timer, SIGNAL (timeout()), this, SLOT (latency_check()));
 	_latency_check_timer->start();
+}
+
+
+Accounting::~Accounting()
+{
+	std::clog << "Destroying Accounting" << std::endl;
 }
 
 
