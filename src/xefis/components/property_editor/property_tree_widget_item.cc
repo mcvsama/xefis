@@ -37,7 +37,6 @@ PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget*
 	_node (node)
 {
 	setup_appereance();
-	reload();
 }
 
 
@@ -46,7 +45,6 @@ PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidgetI
 	_node (node)
 {
 	setup_appereance();
-	reload();
 }
 
 
@@ -105,7 +103,9 @@ PropertyTreeWidgetItem::setup_appereance()
 		setIcon (0, Resources::Icons16::property_dir());
 	else
 		setIcon (0, Resources::Icons16::property_value());
-	setFirstColumnSpanned (!!dynamic_cast<PropertyDirectoryNode*> (_node));
+	// Note: setFirstColumnSpanned is extremely slow in Qt, so it's currently disabled.
+	// Once it's fixed in future, the following line can be uncommented:
+	// setFirstColumnSpanned (!!dynamic_cast<PropertyDirectoryNode*> (_node));
 	QSize s = sizeHint (0);
 	s.setHeight (Services::default_font_size (treeWidget()->physicalDpiY()));
 	setSizeHint (0, s);
