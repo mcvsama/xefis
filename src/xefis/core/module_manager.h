@@ -99,6 +99,13 @@ class ModuleManager
 	PointerToModuleMap const&
 	modules() const;
 
+	/**
+	 * Request module reload, that is destroy given instance and load it again
+	 * with the same configuration.
+	 */
+	void
+	post_module_reload_request (Module*);
+
   private:
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);

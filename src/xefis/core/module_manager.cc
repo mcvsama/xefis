@@ -121,6 +121,13 @@ ModuleManager::modules() const
 }
 
 
+void
+ModuleManager::post_module_reload_request (Module*)
+{
+	// TODO
+}
+
+
 Module*
 ModuleManager::create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent)
 {
