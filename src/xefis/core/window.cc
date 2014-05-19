@@ -263,8 +263,8 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 	QLabel* top_label = nullptr;
 	QLabel* bottom_label = nullptr;
 
-	QString top_label_str = widget_element.attribute ("top-label");
-	QString bottom_label_str = widget_element.attribute ("bottom-label");
+	QString top_label_str = widget_element.attribute ("top-label").toHtmlEscaped();
+	QString bottom_label_str = widget_element.attribute ("bottom-label").toHtmlEscaped();
 
 	if (!top_label_str.isEmpty() || !bottom_label_str.isEmpty())
 	{
