@@ -234,6 +234,7 @@ ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
 	Module* module = find (module_ptr);
 	if (module)
 	{
+		std::clog << "ModuleManager: restarting module " << module_ptr << "." << std::endl;
 		// If this is instrument module, we need to access its window,
 		// then get the decorator widget.
 		Window::InstrumentDecorator* decorator = nullptr;
@@ -270,7 +271,7 @@ ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
 		}
 	}
 	else
-		std::clog << "ModuleManager: couldn't find module " << module_ptr << " to reload." << std::endl;
+		std::clog << "ModuleManager: couldn't find module " << module_ptr << " to restart." << std::endl;
 }
 
 
