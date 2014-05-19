@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <map>
 #include <stdexcept>
 
 // Qt:
@@ -195,6 +196,8 @@ class ConfigReader
 		PropertiesList	_list;
 	};
 
+	typedef std::map<std::pair<QString, QString>, QDomElement> ModuleConfigs;
+
   public:
 	// Ctor
 	ConfigReader (Application*, ModuleManager*);
@@ -264,6 +267,12 @@ class ConfigReader
 	QDomElement
 	airframe_config() const;
 
+	/**
+	 * Return configuration element for given module name/instance pair.
+	 */
+	QDomElement
+	module_config (QString const& name, QString const& instance) const;
+
   private:
 	QDomDocument
 	parse_file (QString const& path);
@@ -290,7 +299,7 @@ class ConfigReader
 	process_modules_element (QDomElement const& modules_element);
 
 	Module*
-	process_module_element (QDomElement const& module_element, QWidget* window = nullptr);
+	process_module_element (QDomElement const& module_element, QWidget* parent_widget = nullptr);
 
   private:
 	Application*			_application		= nullptr;
@@ -307,6 +316,7 @@ class ConfigReader
 	bool					_navaids_enable		= true;
 	float					_scale_pen			= 1.f;
 	float					_scale_font			= 1.f;
+	ModuleConfigs			_module_configs;
 };
 
 

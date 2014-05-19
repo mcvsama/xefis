@@ -347,6 +347,16 @@ ConfigReader::process_windows()
 }
 
 
+QDomElement
+ConfigReader::module_config (QString const& name, QString const& instance) const
+{
+	auto m = _module_configs.find ({ name, instance });
+	if (m == _module_configs.end())
+		throw Exception ("no config found for " + name + "#" + instance);
+	return m->second;
+}
+
+
 QDomDocument
 ConfigReader::parse_file (QString const& path)
 {
@@ -521,7 +531,7 @@ ConfigReader::process_modules_element (QDomElement const& modules_element)
 
 
 Module*
-ConfigReader::process_module_element (QDomElement const& module_element, QWidget* window)
+ConfigReader::process_module_element (QDomElement const& module_element, QWidget* parent_widget)
 {
 	if (module_element.attribute ("disabled") == "true")
 		return nullptr;
@@ -529,7 +539,9 @@ ConfigReader::process_module_element (QDomElement const& module_element, QWidget
 	QString name = module_element.attribute ("name");
 	QString instance = module_element.attribute ("instance");
 
-	return _module_manager->load_module (name, instance, module_element, window);
+	_module_configs[{ name, instance }] = module_element;
+
+	return _module_manager->load_module (name, instance, module_element, parent_widget);
 }
 
 } // namespace Xefis

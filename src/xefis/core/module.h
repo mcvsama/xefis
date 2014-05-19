@@ -139,6 +139,12 @@ class Module: private Noncopyable
 	instance() const noexcept;
 
 	/**
+	 * Get Pointer object for this module.
+	 */
+	Module::Pointer
+	get_pointer() const;
+
+	/**
 	 * Return configurator widget.
 	 * If module doesn't have one, return nullptr.
 	 * Default implementation returns nullptr.
@@ -304,11 +310,22 @@ Module::instance() const noexcept
 }
 
 
+inline Module::Pointer
+Module::get_pointer() const
+{
+	return { name(), instance() };
+}
+
+
 inline ModuleManager*
 Module::module_manager() const noexcept
 {
 	return _module_manager;
 }
+
+
+std::ostream&
+operator<< (std::ostream&, Module::Pointer const&);
 
 } // namespace Xefis
 

@@ -48,12 +48,24 @@ class ModulesList: public QWidget
 	ModuleManager*
 	module_manager() const noexcept;
 
+	/**
+	 * Deselect any selected module.
+	 */
+	void
+	deselect();
+
   signals:
 	/**
 	 * Emitted when user changes module selection.
 	 */
 	void
 	module_selected (Module::Pointer const& module_pointer);
+
+	/**
+	 * Emitted when module selection is cleared.
+	 */
+	void
+	none_selected();
 
   private slots:
 	/**

@@ -25,9 +25,23 @@
 #include "module_manager.h"
 #include "module.h"
 #include "instrument.h"
+#include "window.h"
 
 
 namespace Xefis {
+
+ModuleManager::ModuleReloadRequest::ModuleReloadRequest (Module::Pointer const& module_ptr):
+	QEvent (QEvent::User),
+	_module_ptr (module_ptr)
+{ }
+
+
+Module::Pointer const&
+ModuleManager::ModuleReloadRequest::module_ptr() const noexcept
+{
+	return _module_ptr;
+}
+
 
 ModuleManager::ModuleManager (Application* application):
 	_application (application)
@@ -67,6 +81,28 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 		module->dump_debug_log();
 
 	return module;
+}
+
+
+void
+ModuleManager::unload_module (Module* module)
+{
+	for (auto const& umod: _modules)
+	{
+		if (umod.get() == module)
+		{
+			// Remove the module:
+			_instrument_modules.erase (module);
+			_non_instrument_modules.erase (module);
+
+			Module::Pointer ptr = _module_to_pointer_map[module];
+			_module_to_pointer_map.erase (module);
+			_pointer_to_module_map.erase (ptr);
+
+			_modules.erase (umod);
+			break;
+		}
+	}
 }
 
 
@@ -122,9 +158,18 @@ ModuleManager::modules() const
 
 
 void
-ModuleManager::post_module_reload_request (Module*)
+ModuleManager::post_module_reload_request (Module::Pointer const& module_ptr)
 {
-	// TODO
+	QApplication::postEvent (this, new ModuleReloadRequest (module_ptr));
+}
+
+
+void
+ModuleManager::customEvent (QEvent* event)
+{
+	auto mrr = dynamic_cast<ModuleReloadRequest*> (event);
+	if (mrr)
+		do_module_reload_request (mrr->module_ptr());
 }
 
 
@@ -180,6 +225,52 @@ ModuleManager::module_data_updated (Module* module) const
 	});
 
 	_application->accounting()->add_module_stats (modptr, dt);
+}
+
+
+void
+ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
+{
+	Module* module = find (module_ptr);
+	if (module)
+	{
+		// If this is instrument module, we need to access its window,
+		// then get the decorator widget.
+		Window::InstrumentDecorator* decorator = nullptr;
+		Instrument* instrument = dynamic_cast<Instrument*> (module);
+		if (instrument)
+		{
+			QWidget* module_window = instrument->window();
+			if (module_window)
+			{
+				Window* window = dynamic_cast<Window*> (module_window);
+				if (window)
+					decorator = window->get_decorator_for (instrument->get_pointer());
+			}
+		}
+
+		QString name = QString::fromStdString (module->name());
+		QString instance = QString::fromStdString (module->instance());
+
+		unload_module (module);
+
+		ConfigReader* config_reader = _application->config_reader();
+		if (config_reader)
+		{
+			Exception::guard ([&] {
+				QDomElement module_config = config_reader->module_config (name, instance);
+				Module* new_module = load_module (name, instance, module_config, decorator);
+				if (decorator)
+				{
+					Instrument* new_instrument = dynamic_cast<Instrument*> (new_module);
+					if (new_instrument)
+						decorator->set_instrument (new_instrument);
+				}
+			});
+		}
+	}
+	else
+		std::clog << "ModuleManager: couldn't find module " << module_ptr << " to reload." << std::endl;
 }
 
 
