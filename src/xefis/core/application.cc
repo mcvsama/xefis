@@ -47,7 +47,8 @@
 
 namespace Xefis {
 
-Application* Application::_application = nullptr;
+Application*	Application::_application = nullptr;
+Logger			Application::_logger;
 
 
 Application::Application (int& argc, char** argv):
@@ -56,6 +57,7 @@ Application::Application (int& argc, char** argv):
 	if (_application)
 		throw std::runtime_error ("can create only one Application object");
 	_application = this;
+	_logger.set_prefix ("<application>");
 
 	parse_args (argc, argv);
 
@@ -80,7 +82,7 @@ Application::Application (int& argc, char** argv):
 	const char* config_file = getenv ("XEFIS_CONFIG");
 	if (!config_file)
 	{
-		std::clog << "XEFIS_CONFIG not set, trying to read default ./xefis-config.xml" << std::endl;
+		_logger << "XEFIS_CONFIG not set, trying to read default ./xefis-config.xml" << std::endl;
 		config_file = "xefis-config.xml";
 	}
 	_config_reader->load (config_file);
@@ -121,19 +123,19 @@ Application::notify (QObject* receiver, QEvent* event)
 	}
 	catch (Exception const& e)
 	{
-		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded Xefis::Exception:" << std::endl << e << std::endl;
+		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded Xefis::Exception:" << std::endl << e << std::endl;
 	}
 	catch (boost::exception const& e)
 	{
-		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded boost::exception " << typeid (e).name() << std::endl;
+		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded boost::exception " << typeid (e).name() << std::endl;
 	}
 	catch (std::exception const& e)
 	{
-		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded std::exception " << typeid (e).name() << std::endl;
+		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded std::exception " << typeid (e).name() << std::endl;
 	}
 	catch (...)
 	{
-		std::clog << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded unknown exception" << std::endl;
+		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded unknown exception" << std::endl;
 	}
 
 	return false;
@@ -245,7 +247,7 @@ Application::print_copyrights (std::ostream& out)
 void
 Application::s_quit (int)
 {
-	std::clog << "HUP received, exiting." << std::endl;
+	_logger << "HUP received, exiting." << std::endl;
 	if (_application)
 		_application->quit();
 }

@@ -24,6 +24,7 @@
 #include <xefis/utility/semaphore.h>
 #include <xefis/utility/thread.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/logger.h>
 
 
 namespace Xefis {
@@ -172,6 +173,7 @@ class WorkPerformer: private Noncopyable
 	take_unit();
 
   private:
+	Logger							_logger;
 	// Current queue. Points either to _queues[1] or _queues[2]:
 	Units							_queue;
 	Mutex							_queue_mutex;

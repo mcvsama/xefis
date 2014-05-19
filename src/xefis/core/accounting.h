@@ -164,6 +164,7 @@ class Accounting: public QObject
 	customEvent (QEvent*) override;
 
   private:
+	Logger		_logger;
 	QTimer*		_latency_check_timer;
 	StatsSet	_latency_stats;
 	ModuleStats	_module_stats;

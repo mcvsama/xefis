@@ -84,7 +84,8 @@ Accounting::Stats::average() const noexcept
 
 Accounting::Accounting()
 {
-	std::clog << "Creating Accounting" << std::endl;
+	_logger.set_prefix ("<accounting>");
+	_logger << "Creating Accounting" << std::endl;
 	_latency_check_timer = new QTimer (this);
 	_latency_check_timer->setSingleShot (false);
 	_latency_check_timer->setInterval (10);
@@ -95,7 +96,7 @@ Accounting::Accounting()
 
 Accounting::~Accounting()
 {
-	std::clog << "Destroying Accounting" << std::endl;
+	_logger << "Destroying Accounting" << std::endl;
 }
 
 

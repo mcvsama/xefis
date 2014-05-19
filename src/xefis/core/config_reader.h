@@ -302,6 +302,7 @@ class ConfigReader
 	process_module_element (QDomElement const& module_element, QWidget* parent_widget = nullptr);
 
   private:
+	Logger					_logger;
 	Application*			_application		= nullptr;
 	ModuleManager*			_module_manager		= nullptr;
 	QDomDocument			_config_document;
