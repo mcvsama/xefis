@@ -46,13 +46,14 @@ ModuleManager::ModuleReloadRequest::module_ptr() const noexcept
 ModuleManager::ModuleManager (Application* application):
 	_application (application)
 {
-	std::clog << "Creating ModuleManager" << std::endl;
+	_logger.set_prefix ("<module manager>");
+	_logger << "Creating ModuleManager" << std::endl;
 }
 
 
 ModuleManager::~ModuleManager()
 {
-	std::clog << "Destroying ModuleManager" << std::endl;
+	_logger << "Destroying ModuleManager" << std::endl;
 }
 
 
@@ -234,7 +235,7 @@ ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
 	Module* module = find (module_ptr);
 	if (module)
 	{
-		std::clog << "ModuleManager: restarting module " << module_ptr << "." << std::endl;
+		_logger << "ModuleManager: restarting module " << module_ptr << "." << std::endl;
 		// If this is instrument module, we need to access its window,
 		// then get the decorator widget.
 		Window::InstrumentDecorator* decorator = nullptr;
@@ -271,7 +272,7 @@ ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
 		}
 	}
 	else
-		std::clog << "ModuleManager: couldn't find module " << module_ptr << " to restart." << std::endl;
+		_logger << "ModuleManager: couldn't find module " << module_ptr << " to restart." << std::endl;
 }
 
 

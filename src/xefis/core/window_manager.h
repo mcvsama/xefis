@@ -48,6 +48,7 @@ class WindowManager: public QWidget
 	data_updated (Time const& update_time);
 
   private:
+	Logger						_logger;
 	std::set<Unique<Window>>	_windows;
 };
 

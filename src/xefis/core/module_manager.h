@@ -157,6 +157,7 @@ class ModuleManager: public QObject
 	try_rescue (Module*) const;
 
   private:
+	Logger				_logger;
 	Application*		_application = nullptr;
 	OwnedModules		_modules;
 	Modules				_instrument_modules;

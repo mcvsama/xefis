@@ -28,6 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/logger.h>
 
 
 namespace Xefis {
@@ -223,7 +224,8 @@ class Application: public QApplication
 	s_quit (int);
 
   private:
-	static Application*	_application;
+	static Application*				_application;
+	static Logger					_logger;
 
 	Unique<WorkPerformer>			_work_performer;
 	Unique<Accounting>				_accounting;

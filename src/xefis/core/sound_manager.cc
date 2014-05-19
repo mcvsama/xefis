@@ -52,13 +52,14 @@ SoundManager::Sound::stop()
 
 SoundManager::SoundManager (Application*)
 {
-	std::clog << "Creating SoundManager" << std::endl;
+	_logger.set_prefix ("<sound manager>");
+	_logger << "Creating SoundManager" << std::endl;
 }
 
 
 SoundManager::~SoundManager()
 {
-	std::clog << "Destroying SoundManager" << std::endl;
+	_logger << "Destroying SoundManager" << std::endl;
 }
 
 
