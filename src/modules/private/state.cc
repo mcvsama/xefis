@@ -199,7 +199,7 @@ State::data_updated()
 	for (Xefis::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
-	static std::vector<Action*> actions = {
+	std::vector<Action*> actions = {
 		_efis_mins_mode_button.get(),
 		_navaid_select_panel.get(),
 		_navaid_left_panel.get(),
