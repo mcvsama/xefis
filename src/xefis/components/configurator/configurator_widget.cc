@@ -51,32 +51,36 @@ ConfiguratorWidget::OwnershipBreakingDecorator::~OwnershipBreakingDecorator()
 }
 
 
-ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Module* module, QWidget* parent):
-	QWidget (parent)
+ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Application* application, Module* module, ConfiguratorWidget* configurator_widget, QWidget* parent):
+	QWidget (parent),
+	_application (application),
+	_module (module),
+	_configurator_widget (configurator_widget)
 {
-	QPushButton* reload_button = new QPushButton ("Force module restart", this);
-	QObject::connect (reload_button, &QPushButton::clicked, [module,this]() {
-		QString instance_html = module->instance().empty()
-			? "<i>default</i>"
-			: "<b>" + QString::fromStdString (module->instance()).toHtmlEscaped() + "</b>";
-		QString message = QString ("<p>Confirm module restart:</p>")
-			+ "<table style='margin: 1em 0'>"
-			+ "<tr><td>Module name: </td><td><b>" + QString::fromStdString (module->name()).toHtmlEscaped() + "</b></td></tr>"
-			+ "<tr><td>Instance: </td><td>" + instance_html + "</td></tr>"
-			+ "</table>";
-		if (QMessageBox::question (this, "Module restart", message) == QMessageBox::Ok)
-			module->module_manager()->post_module_reload_request (module);
-	});
+	_module_ptr = module->get_pointer();
 
-	QHBoxLayout* buttons_layout = new QHBoxLayout();
-	buttons_layout->addWidget (reload_button);
-	buttons_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	QPushButton* reload_button = new QPushButton ("Force module restart", this);
+	QObject::connect (reload_button, &QPushButton::clicked, this, &GeneralModuleWidget::reload_module);
+
+	QString full_name_str = QString::fromStdString (module->name());
+	if (!module->instance().empty())
+		full_name_str += " • " + QString::fromStdString (module->instance());
+	QLabel* name_label = new QLabel (full_name_str.toHtmlEscaped());
+	name_label->setAlignment (Qt::AlignLeft);
+	QFont font = name_label->font();
+	font.setPointSize (2.0 * font.pointSize());
+	name_label->setFont (font);
 
 	QTabWidget* tabs = new QTabWidget (this);
 	QWidget* module_config_widget = module->configurator_widget();
 	if (module_config_widget)
 		tabs->addTab (new OwnershipBreakingDecorator (module_config_widget, this), "Module config");
 	tabs->addTab (new QWidget (this), "I/O");
+
+	QHBoxLayout* buttons_layout = new QHBoxLayout();
+	buttons_layout->addWidget (name_label);
+	buttons_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	buttons_layout->addWidget (reload_button);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
@@ -86,18 +90,45 @@ ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Module* module, QW
 }
 
 
-ConfiguratorWidget::ConfiguratorWidget (ModuleManager* module_manager, QWidget* parent):
+void
+ConfiguratorWidget::GeneralModuleWidget::reload_module()
+{
+	auto module_manager = _application->module_manager();
+	if (module_manager)
+	{
+		QString instance_html = _module_ptr.instance().empty()
+			? "<i>default</i>"
+			: "<b>" + QString::fromStdString (_module_ptr.instance()).toHtmlEscaped() + "</b>";
+		QString message = QString ("<p>Confirm module restart:</p>")
+			+ "<table style='margin: 1em 0'>"
+			+ "<tr><td>Module name: </td><td><b>" + QString::fromStdString (_module_ptr.name()).toHtmlEscaped() + "</b></td></tr>"
+			+ "<tr><td>Instance: </td><td>" + instance_html + "</td></tr>"
+			+ "</table>";
+
+		if (QMessageBox::question (this, "Module restart", message) == QMessageBox::Yes)
+		{
+			module_manager->post_module_reload_request (_module_ptr);
+			// Must be called last, since @this will be deleted by this call:
+			_configurator_widget->reload_module_widget (this);
+			// Note! @this is dangling now.
+		}
+	}
+}
+
+
+ConfiguratorWidget::ConfiguratorWidget (Application* application, QWidget* parent):
 	QWidget (parent),
-	_module_manager (module_manager)
+	_application (application)
 {
 	_no_module_selected = new QLabel ("No module selected", this);
 	_no_module_selected->setAlignment (Qt::AlignCenter);
 
 	_property_editor = new PropertyEditor (PropertyStorage::default_storage()->root(), this);
 
-	_modules_list = new ModulesList (_module_manager, this);
+	_modules_list = new ModulesList (_application->module_manager(), this);
 	_modules_list->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Minimum);
-	QObject::connect (_modules_list, SIGNAL (module_selected (Module::Pointer const&)), this, SLOT (module_selected (Module::Pointer const&)));
+	QObject::connect (_modules_list, &ModulesList::module_selected, this, &ConfiguratorWidget::module_selected);
+	QObject::connect (_modules_list, &ModulesList::none_selected, this, &ConfiguratorWidget::none_selected);
 
 	_modules_stack = new QStackedWidget (this);
 	_modules_stack->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -125,20 +156,37 @@ ConfiguratorWidget::ConfiguratorWidget (ModuleManager* module_manager, QWidget* 
 void
 ConfiguratorWidget::module_selected (Module::Pointer const& module_pointer)
 {
-	Module* module = _module_manager->find (module_pointer);
-
-	auto gmw = _general_module_widgets.find (module);
-	if (gmw == _general_module_widgets.end())
+	Module* module = _application->module_manager()->find (module_pointer);
+	if (module)
 	{
-		auto new_gmw = std::make_unique<GeneralModuleWidget> (module, this);
-		gmw = _general_module_widgets.insert ({ module, new_gmw.get() }).first;
-		new_gmw.release();
+		auto gmw = _general_module_widgets.find (module);
+		if (gmw == _general_module_widgets.end())
+		{
+			auto new_gmw = std::make_shared<GeneralModuleWidget> (_application, module, this, this);
+			gmw = _general_module_widgets.insert ({ module, new_gmw }).first;
+		}
+
+		if (_modules_stack->indexOf (gmw->second.get()) == -1)
+			_modules_stack->addWidget (gmw->second.get());
+
+		_modules_stack->setCurrentWidget (gmw->second.get());
 	}
+}
 
-	if (_modules_stack->indexOf (gmw->second) == -1)
-		_modules_stack->addWidget (gmw->second);
 
-	_modules_stack->setCurrentWidget (gmw->second);
+void
+ConfiguratorWidget::none_selected()
+{
+	_modules_stack->setCurrentWidget (_no_module_selected);
+}
+
+
+void
+ConfiguratorWidget::reload_module_widget (GeneralModuleWidget* module_widget)
+{
+	_modules_list->deselect();
+	if (_general_module_widgets.find (module_widget->module()) != _general_module_widgets.end())
+		_general_module_widgets.erase (module_widget->module());
 }
 
 } // namespace Xefis

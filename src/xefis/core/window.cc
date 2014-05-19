@@ -58,6 +58,23 @@ Window::Stack::Stack (Time delay)
 }
 
 
+Window::InstrumentDecorator::InstrumentDecorator (QWidget* parent):
+	QWidget (parent)
+{
+	_layout = new QHBoxLayout (this);
+	_layout->setMargin (0);
+	_layout->setSpacing (0);
+}
+
+
+void
+Window::InstrumentDecorator::set_instrument (Instrument * instrument)
+{
+	_instrument = instrument;
+	_layout->addWidget (instrument);
+}
+
+
 Window::Window (Application* application, ConfigReader* config_reader, QDomElement const& element):
 	_application (application),
 	_config_reader (config_reader)
@@ -145,6 +162,16 @@ float
 Window::font_scale() const
 {
 	return _application->config_reader()->font_scale();
+}
+
+
+Window::InstrumentDecorator*
+Window::get_decorator_for (Module::Pointer const& ptr) const
+{
+	auto decorator = _decorators.find (ptr);
+	if (decorator != _decorators.end())
+		return decorator->second;
+	return nullptr;
 }
 
 
@@ -467,7 +494,18 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 			{
 				Module* module = _config_reader->process_module_element (e, parent_widget);
 				if (module)
-					widget = dynamic_cast<QWidget*> (module);
+				{
+					Instrument* instrument = dynamic_cast<Instrument*> (module);
+					if (instrument)
+					{
+						// Put instrument widget into a decorator:
+						auto decorated_instrument = std::make_unique<InstrumentDecorator> (parent_widget);
+						decorated_instrument->set_instrument (instrument);
+						widget = decorated_instrument.get();
+						_decorators[module->get_pointer()] = decorated_instrument.get();
+						decorated_instrument.release();
+					}
+				}
 			}
 			else if (e == "panel")
 				widget = process_panel_element (e, parent_widget);

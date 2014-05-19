@@ -202,5 +202,13 @@ Module::factories()
 	return factories;
 }
 
+
+std::ostream&
+operator<< (std::ostream& s, Module::Pointer const& module_ptr)
+{
+	s << module_ptr.name() << "#" << module_ptr.instance();
+	return s;
+}
+
 } // namespace Xefis
 

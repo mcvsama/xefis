@@ -68,12 +68,30 @@ class ConfiguratorWidget: public QWidget
 	{
 	  public:
 		// Ctor
-		GeneralModuleWidget (Module*, QWidget* parent);
+		GeneralModuleWidget (Application*, Module*, ConfiguratorWidget*, QWidget* parent);
+
+		/**
+		 * Return module.
+		 */
+		Module*
+		module() const noexcept;
+
+		/**
+		 * Reload module.
+		 */
+		void
+		reload_module();
+
+	  private:
+		Application*		_application;
+		Module*				_module;
+		Module::Pointer		_module_ptr;
+		ConfiguratorWidget*	_configurator_widget;
 	};
 
   public:
 	// Ctor
-	ConfiguratorWidget (ModuleManager* module_manager, QWidget* parent);
+	ConfiguratorWidget (Application* application, QWidget* parent);
 
 	Window*
 	owning_window() const;
@@ -81,27 +99,38 @@ class ConfiguratorWidget: public QWidget
 	void
 	set_owning_window (Window*);
 
-  private slots:
+  private:
 	void
 	module_selected (Module::Pointer const&);
 
-  private:
+	void
+	none_selected();
+
 	/**
-	 * Create a decorator for given widget.
+	 * Causes module widget to be reloaded.
+	 * The one passed in parameter will be deleted.
 	 */
 	void
-	decorate_widget (QWidget* configurator_widget);
+	reload_module_widget (GeneralModuleWidget*);
 
   private:
-	ModuleManager*							_module_manager			= nullptr;
-	PropertyEditor*							_property_editor		= nullptr;
-	ModulesList*							_modules_list			= nullptr;
-	QStackedWidget*							_modules_stack			= nullptr;
-	QTabWidget*								_tabs					= nullptr;
-	Window*									_owning_window			= nullptr;
-	QLabel*									_no_module_selected		= nullptr;
-	std::map<Module*, GeneralModuleWidget*>	_general_module_widgets;
+	Application*		_application			= nullptr;
+	PropertyEditor*		_property_editor		= nullptr;
+	ModulesList*		_modules_list			= nullptr;
+	QStackedWidget*		_modules_stack			= nullptr;
+	QTabWidget*			_tabs					= nullptr;
+	Window*				_owning_window			= nullptr;
+	QLabel*				_no_module_selected		= nullptr;
+	std::map<Module*, Shared<GeneralModuleWidget>>
+						_general_module_widgets;
 };
+
+
+inline Module*
+ConfiguratorWidget::GeneralModuleWidget::module() const noexcept
+{
+	return _module;
+}
 
 
 inline Window*

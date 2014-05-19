@@ -96,7 +96,7 @@ Application::Application (int& argc, char** argv):
 	_config_reader->process_windows();
 
 	if (_config_reader->has_windows())
-		_configurator_widget = std::make_unique<ConfiguratorWidget> (_module_manager.get(), nullptr);
+		_configurator_widget = std::make_unique<ConfiguratorWidget> (this, nullptr);
 
 	_data_updater = new QTimer (this);
 	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).ms());

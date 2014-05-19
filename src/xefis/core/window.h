@@ -32,16 +32,48 @@
 #include <xefis/core/application.h>
 #include <xefis/core/property.h>
 
+// Local:
+#include "module.h"
+
 
 namespace Xefis {
 
 class Panel;
 class ConfigReader;
+class Instrument;
 
 class Window: public QWidget
 {
 	Q_OBJECT
 
+  public:
+	/**
+	 * Decorator for instruments. Allows replacing one instrument
+	 * with another (or just newly created instance).
+	 */
+	class InstrumentDecorator: public QWidget
+	{
+	  public:
+		// Ctor
+		InstrumentDecorator (QWidget* parent);
+
+		/**
+		 * Set instrument to be decorated.
+		 * Old is overwritten without any other action.
+		 */
+		void
+		set_instrument (Instrument*);
+
+	  private:
+		Instrument*	_instrument	= nullptr;
+		QBoxLayout*	_layout;
+	};
+
+  private:
+	/**
+	 * Stack of layouts. Multiple instruments can be put in here
+	 * and be shown according to an integer property.
+	 */
 	class Stack
 	{
 	  public:
@@ -57,7 +89,8 @@ class Window: public QWidget
 		Unique<QWidget>			_black_widget;
 	};
 
-	typedef std::set<Shared<Stack>> Stacks;
+	typedef std::set<Shared<Stack>>							Stacks;
+	typedef std::map<Module::Pointer, InstrumentDecorator*>	Decorators;
 
   public:
 	// Ctor
@@ -83,6 +116,13 @@ class Window: public QWidget
 	 */
 	float
 	font_scale() const;
+
+	/**
+	 * Return decorator object for given instrument.
+	 * May return nullptr.
+	 */
+	InstrumentDecorator*
+	get_decorator_for (Module::Pointer const&) const;
 
   private:
 	/**
@@ -130,6 +170,7 @@ class Window: public QWidget
 	QWidget*		_configurator_panel;
 	QPoint			_mouse_pos;
 	Stacks			_stacks;
+	Decorators		_decorators;
 };
 
 } // namespace Xefis

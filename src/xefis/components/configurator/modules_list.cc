@@ -71,6 +71,14 @@ ModulesList::ModulesList (ModuleManager* module_manager, QWidget* parent):
 
 
 void
+ModulesList::deselect()
+{
+	_list->clearSelection();
+	_list->setCurrentItem (nullptr);
+}
+
+
+void
 ModulesList::read()
 {
 	std::set<Module::Pointer> module_ptrs;
@@ -104,9 +112,14 @@ ModulesList::read()
 void
 ModulesList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
 {
-	ModulesListItem* mli = dynamic_cast<ModulesListItem*> (current);
-	if (mli)
-		emit module_selected (mli->module_pointer());
+	if (current)
+	{
+		ModulesListItem* mli = dynamic_cast<ModulesListItem*> (current);
+		if (mli)
+			emit module_selected (mli->module_pointer());
+	}
+	else
+		emit none_selected();
 }
 
 } // namespace Xefis

@@ -32,8 +32,21 @@ namespace Xefis {
 class Module;
 class Application;
 
-class ModuleManager
+class ModuleManager: public QObject
 {
+	class ModuleReloadRequest: public QEvent
+	{
+	  public:
+		// Ctor
+		ModuleReloadRequest (Module::Pointer const&);
+
+		Module::Pointer const&
+		module_ptr() const noexcept;
+
+	  private:
+		Module::Pointer _module_ptr;
+	};
+
 	typedef std::set<Module*>					Modules;
 	typedef std::set<Unique<Module>>			OwnedModules;
 
@@ -60,6 +73,12 @@ class ModuleManager
 	 */
 	Module*
 	load_module (QString const& name, QString const& instnace, QDomElement const& config, QWidget* parent);
+
+	/**
+	 * Unload module by pointer.
+	 */
+	void
+	unload_module (Module*);
 
 	/**
 	 * Signal that the data in property tree has been updated.
@@ -89,6 +108,7 @@ class ModuleManager
 
 	/**
 	 * Return Module* by Module::Pointer.
+	 * May return nullptr.
 	 */
 	Module*
 	find (Module::Pointer const&) const;
@@ -104,9 +124,16 @@ class ModuleManager
 	 * with the same configuration.
 	 */
 	void
-	post_module_reload_request (Module*);
+	post_module_reload_request (Module::Pointer const&);
 
   private:
+	// QObject
+	void
+	customEvent (QEvent* event) override;
+
+	/**
+	 * Instantiate module by name.
+	 */
 	Module*
 	create_module_by_name (QString const& name, QDomElement const& config, QWidget* parent);
 
@@ -115,6 +142,12 @@ class ModuleManager
 	 */
 	void
 	module_data_updated (Module*) const;
+
+	/**
+	 * Module reload.
+	 */
+	void
+	do_module_reload_request (Module::Pointer const&);
 
 	/**
 	 * Try to call the rescue() method on a module, and catch exceptions.
