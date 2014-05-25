@@ -345,6 +345,7 @@ XEFIS_MOCHDRS += modules/log/klog.h
 XEFIS_HEADERS += modules/systems/adc.h
 XEFIS_HEADERS += modules/systems/afcs.h
 XEFIS_HEADERS += modules/systems/afcs_at.h
+XEFIS_HEADERS += modules/systems/afcs_eac_yd.h
 XEFIS_HEADERS += modules/systems/afcs_fd.h
 XEFIS_HEADERS += modules/systems/altacq.h
 XEFIS_HEADERS += modules/systems/aoa.h
@@ -363,11 +364,11 @@ XEFIS_HEADERS += modules/systems/trim_control.h
 XEFIS_HEADERS += modules/systems/trim_mixer.h
 XEFIS_HEADERS += modules/systems/vor.h
 XEFIS_HEADERS += modules/systems/watchdog.h
-XEFIS_HEADERS += modules/systems/yaw_damper.h
 
 XEFIS_SOURCES += modules/systems/adc.cc
 XEFIS_SOURCES += modules/systems/afcs.cc
 XEFIS_SOURCES += modules/systems/afcs_at.cc
+XEFIS_SOURCES += modules/systems/afcs_eac_yd.cc
 XEFIS_SOURCES += modules/systems/afcs_fd.cc
 XEFIS_SOURCES += modules/systems/altacq.cc
 XEFIS_SOURCES += modules/systems/aoa.cc
@@ -386,7 +387,6 @@ XEFIS_SOURCES += modules/systems/trim_control.cc
 XEFIS_SOURCES += modules/systems/trim_mixer.cc
 XEFIS_SOURCES += modules/systems/vor.cc
 XEFIS_SOURCES += modules/systems/watchdog.cc
-XEFIS_SOURCES += modules/systems/yaw_damper.cc
 
 XEFIS_MOCHDRS += modules/systems/rcms.h
 

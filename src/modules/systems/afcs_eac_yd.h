@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__YAW_DAMPER_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__YAW_DAMPER_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__AFCS_EAC_YD_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,11 +25,11 @@
 #include <xefis/utility/pid_control.h>
 
 
-class YawDamper: public Xefis::Module
+class AFCS_EAC_YD: public Xefis::Module
 {
   public:
 	// Ctor
-	YawDamper (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_EAC_YD (Xefis::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
