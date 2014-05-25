@@ -344,6 +344,7 @@ XEFIS_MOCHDRS += modules/log/klog.h
 
 XEFIS_HEADERS += modules/systems/adc.h
 XEFIS_HEADERS += modules/systems/afcs.h
+XEFIS_HEADERS += modules/systems/afcs_fd.h
 XEFIS_HEADERS += modules/systems/altacq.h
 XEFIS_HEADERS += modules/systems/aoa.h
 XEFIS_HEADERS += modules/systems/autothrottle.h
@@ -368,6 +369,7 @@ XEFIS_HEADERS += modules/systems/yaw_damper.h
 
 XEFIS_SOURCES += modules/systems/adc.cc
 XEFIS_SOURCES += modules/systems/afcs.cc
+XEFIS_SOURCES += modules/systems/afcs_fd.cc
 XEFIS_SOURCES += modules/systems/altacq.cc
 XEFIS_SOURCES += modules/systems/aoa.cc
 XEFIS_SOURCES += modules/systems/autothrottle.cc

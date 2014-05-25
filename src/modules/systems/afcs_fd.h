@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__FLIGHT_DIRECTOR_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__FLIGHT_DIRECTOR_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__AFCS_FD_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__AFCS_FD_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -29,7 +29,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class FlightDirector: public Xefis::Module
+class AFCS_FD: public Xefis::Module
 {
   public:
 	enum class RollMode
@@ -52,7 +52,7 @@ class FlightDirector: public Xefis::Module
 
   public:
 	// Ctor
-	FlightDirector (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_FD (Xefis::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
