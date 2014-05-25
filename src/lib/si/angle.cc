@@ -37,7 +37,7 @@ Angle::to_dms() const
 	double const mins = std::floor (remainder);
 	double const secs = 60.0 * std::abs (remainder - mins);
 
-	return (boost::format ("%02d°%02d'%02d\"") % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
+	return (boost::format ("%03d°%02d'%02d\"") % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
 }
 
 

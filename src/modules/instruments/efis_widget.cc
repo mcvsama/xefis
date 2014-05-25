@@ -525,10 +525,10 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (Xefis::Painter& painter)
 				// 5° lines:
 				painter.draw_outlined_line (QPointF (d05, -w / 36.f), QPointF (d05, 0.f));
 
-				QString text = QString::number (Xefis::floored_mod (1.f * deg, 360.f) / 10);
-				if (text == "0")
+				QString text = QString::fromStdString ((boost::format ("%02d") % (Xefis::floored_mod (1.f * deg, 360.f) / 10)).str());
+				if (text == "00")
 					text = "N";
-				else if (text == "9")
+				else if (text == "09")
 					text = "E";
 				else if (text == "18")
 					text = "S";
