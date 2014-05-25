@@ -23,13 +23,13 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "flight_director.h"
+#include "afcs_fd.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/flight-director", FlightDirector);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-fd", AFCS_FD);
 
 
-FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_FD::AFCS_FD (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_magnetic_heading_pid (_magnetic_heading_pid_p, _magnetic_heading_pid_i, _magnetic_heading_pid_d, 0.0),
 	_magnetic_track_pid (_magnetic_track_pid_p, _magnetic_track_pid_i, _magnetic_track_pid_d, 0.0),
@@ -106,7 +106,7 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 	pitch_mode_changed();
 
 	_fd_computer.set_minimum_dt (5_ms);
-	_fd_computer.set_callback (std::bind (&FlightDirector::compute_fd, this));
+	_fd_computer.set_callback (std::bind (&AFCS_FD::compute_fd, this));
 	_fd_computer.add_depending_smoothers ({
 		&_output_pitch_smoother,
 		&_output_roll_smoother,
@@ -134,21 +134,21 @@ FlightDirector::FlightDirector (Xefis::ModuleManager* module_manager, QDomElemen
 
 
 void
-FlightDirector::data_updated()
+AFCS_FD::data_updated()
 {
 	_fd_computer.data_updated (update_time());
 }
 
 
 void
-FlightDirector::rescue()
+AFCS_FD::rescue()
 {
 	_disengage_ap.write (true);
 }
 
 
 void
-FlightDirector::compute_fd()
+AFCS_FD::compute_fd()
 {
 	Time update_dt = _fd_computer.update_dt();
 	bool disengage = false;
@@ -276,7 +276,7 @@ FlightDirector::compute_fd()
 
 
 void
-FlightDirector::roll_mode_changed()
+AFCS_FD::roll_mode_changed()
 {
 	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_roll_mode.read (-1), 0, static_cast<decltype (m)> (RollMode::sentinel) - 1);
 	_roll_mode = static_cast<RollMode> (m);
@@ -284,7 +284,7 @@ FlightDirector::roll_mode_changed()
 
 
 void
-FlightDirector::pitch_mode_changed()
+AFCS_FD::pitch_mode_changed()
 {
 	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_pitch_mode.read (-1), 0, static_cast<decltype (m)> (PitchMode::sentinel) - 1);
 	_pitch_mode = static_cast<PitchMode> (m);
