@@ -18,13 +18,13 @@
 #include <xefis/config/all.h>
 
 // Local:
-#include "yaw_damper.h"
+#include "afcs_eac_yd.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/yaw-damper", YawDamper);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-eac-yd", AFCS_EAC_YD);
 
 
-YawDamper::YawDamper (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_EAC_YD::AFCS_EAC_YD (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_rudder_pid (1.0, 0.1, 0.0, 0.0)
 {
@@ -47,7 +47,7 @@ YawDamper::YawDamper (Xefis::ModuleManager* module_manager, QDomElement const& c
 	_rudder_pid.set_i_limit ({ -0.1f, +0.1f });
 	_rudder_pid.set_output_limit ({ -_limit, +_limit });
 
-	_rudder_computer.set_callback (std::bind (&YawDamper::compute, this));
+	_rudder_computer.set_callback (std::bind (&AFCS_EAC_YD::compute, this));
 	_rudder_computer.observe ({
 		&_input_enabled,
 		&_input_slip_skid_g,
@@ -56,14 +56,14 @@ YawDamper::YawDamper (Xefis::ModuleManager* module_manager, QDomElement const& c
 
 
 void
-YawDamper::data_updated()
+AFCS_EAC_YD::data_updated()
 {
 	_rudder_computer.data_updated (update_time());
 }
 
 
 void
-YawDamper::compute()
+AFCS_EAC_YD::compute()
 {
 	Time dt = _rudder_computer.update_dt();
 
