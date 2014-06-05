@@ -108,6 +108,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "flight-director.cmd.altitude.acquired", _flight_director_cmd_altitude_acquired, false },
 		{ "flight-director.cmd.ias", _flight_director_cmd_ias, false },
 		{ "flight-director.cmd.vertical-speed", _flight_director_cmd_vertical_speed, false },
+		{ "flight-director.cmd.fpa", _flight_director_cmd_fpa, false },
 		{ "flight-director.guidance.visible", _flight_director_guidance_visible, false },
 		{ "flight-director.guidance.pitch", _flight_director_guidance_pitch, false },
 		{ "flight-director.guidance.roll", _flight_director_guidance_roll, false },
@@ -288,13 +289,21 @@ EFIS::read()
 	params.use_standard_pressure = _pressure_use_std.read (false);
 	// Command settings
 	bool cmd_visible = _flight_director_cmd_visible.read (false);
-	params.cmd_altitude_visible = cmd_visible && _flight_director_cmd_altitude.valid();
-	params.cmd_altitude = *_flight_director_cmd_altitude;
+	if (cmd_visible)
+	{
+		params.cmd_speed = _flight_director_cmd_ias.get_optional();
+		params.cmd_altitude = _flight_director_cmd_altitude.get_optional();
+		params.cmd_vertical_speed = _flight_director_cmd_vertical_speed.get_optional();
+		params.cmd_fpa = _flight_director_cmd_fpa.get_optional();
+	}
+	else
+	{
+		params.cmd_speed.reset();
+		params.cmd_altitude.reset();
+		params.cmd_vertical_speed.reset();
+		params.cmd_fpa.reset();
+	}
 	params.cmd_altitude_acquired = _flight_director_cmd_altitude_acquired.read (false);
-	params.cmd_vertical_speed_visible = cmd_visible && _flight_director_cmd_vertical_speed.valid();
-	params.cmd_vertical_speed = *_flight_director_cmd_vertical_speed;
-	params.cmd_speed_visible = cmd_visible && _flight_director_cmd_ias.valid();
-	params.cmd_speed = *_flight_director_cmd_ias;
 	// Flight director
 	bool guidance_visible = _flight_director_guidance_visible.read (false);
 	params.flight_director_failure = !_flight_director_serviceable.read (true);
