@@ -30,42 +30,45 @@ std::vector<std::string> Angle::_supported_units = { "°", "deg", "rad" };
 
 
 std::string
-Angle::to_dms() const
+Angle::to_dms (bool three_digits) const
 {
 	double const degs = std::trunc (Xefis::floored_mod (deg(), -180.0, +180.0));
 	double const remainder = 60.0 * std::abs (deg() - degs);
 	double const mins = std::floor (remainder);
 	double const secs = 60.0 * std::abs (remainder - mins);
 
-	return (boost::format ("%03d°%02d'%02d\"") % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
+	char const* fmt = three_digits
+		? "%03d°%02d'%02d\""
+		: "%02d°%02d'%02d\"";
+	return (boost::format (fmt) % static_cast<int> (degs) % static_cast<int> (mins) % static_cast<int> (secs)).str();
 }
 
 
 std::string
 Angle::to_latitude_dms() const
 {
-	std::string dms = to_dms();
+	std::string dms = to_dms (false);
 
 	if (dms.empty())
 		return dms;
 	else if (dms[0] == '-')
-		return dms.substr (1) + "S";
+		return "S" + dms.substr (1);
 	else
-		return dms + "N";
+		return "N" + dms;
 }
 
 
 std::string
 Angle::to_longitude_dms() const
 {
-	std::string dms = to_dms();
+	std::string dms = to_dms (true);
 
 	if (dms.empty())
 		return dms;
 	else if (dms[0] == '-')
-		return dms.substr (1) + "W";
+		return "W" + dms.substr (1);
 	else
-		return dms + "E";
+		return "E" + dms;
 }
 
 
