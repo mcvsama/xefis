@@ -75,7 +75,7 @@ class Angle: public LinearValue<double, Angle>
 	 * Uses +/- notation on degrees.
 	 */
 	std::string
-	to_dms() const;
+	to_dms (bool three_digits = false) const;
 
 	/**
 	 * Like to_dms(), but uses N/S suffix to denote
