@@ -125,13 +125,11 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				pressure_display_hpa				= false;
 		bool				use_standard_pressure				= false;
 		// Command settings
-		bool				cmd_altitude_visible				= false;
-		Length				cmd_altitude						= 0_ft;
+		Optional<Speed>		cmd_speed;
+		Optional<Length>	cmd_altitude;
+		Optional<Speed>		cmd_vertical_speed;
+		Optional<Angle>		cmd_fpa;
 		bool				cmd_altitude_acquired				= false;
-		bool				cmd_vertical_speed_visible			= false;
-		Speed				cmd_vertical_speed					= 0_fpm;
-		bool				cmd_speed_visible					= false;
-		Speed				cmd_speed							= 0_kt;
 		// Flight director
 		bool				flight_director_failure				= false;
 		bool				flight_director_pitch_visible		= false;
@@ -265,7 +263,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_paint_horizon (Xefis::Painter&);
 
 		void
-		adi_paint_pitch (Xefis::Painter&);
+		adi_paint_pitch_scale (Xefis::Painter&);
 
 		void
 		adi_paint_heading (Xefis::Painter&);
@@ -274,7 +272,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_paint_tcas_ra (Xefis::Painter&);
 
 		void
-		adi_paint_roll (Xefis::Painter&);
+		adi_paint_roll_scale (Xefis::Painter&);
 
 		void
 		adi_paint_pitch_disagree (Xefis::Painter&);

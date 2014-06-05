@@ -231,10 +231,10 @@ EFISWidget::PaintWorkUnit::adi_paint (Xefis::Painter& painter)
 	else
 	{
 		adi_paint_horizon (painter);
-		adi_paint_pitch (painter);
+		adi_paint_pitch_scale (painter);
 		adi_paint_heading (painter);
 		adi_paint_tcas_ra (painter);
-		adi_paint_roll (painter);
+		adi_paint_roll_scale (painter);
 		adi_paint_pitch_disagree (painter);
 		adi_paint_roll_disagree (painter);
 	}
@@ -282,7 +282,7 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (Xefis::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_pitch_scale (Xefis::Painter& painter)
 {
 	if (!_params.orientation_pitch_visible)
 		return;
@@ -361,11 +361,27 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch (Xefis::Painter& painter)
 			});
 		}
 	}
+
+	// FPA bug:
+	if (_params.cmd_fpa)
+	{
+		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
+		{
+			Angle fpa = *_params.cmd_fpa;
+			painter.setPen (pen);
+			for (auto y_angle: { fpa - 0.5_deg, fpa + 0.5_deg })
+			{
+				auto y_pos = pitch_to_px (y_angle);
+				painter.drawLine (QPointF (-z, y_pos), QPointF (-0.25 * z, y_pos));
+				painter.drawLine (QPointF (+z, y_pos), QPointF (+0.25 * z, y_pos));
+			}
+		}
+	}
 }
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_roll (Xefis::Painter& painter)
+EFISWidget::PaintWorkUnit::adi_paint_roll_scale (Xefis::Painter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -987,9 +1003,9 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 	}
 
 	// AT bug:
-	if (_params.cmd_speed_visible)
+	if (_params.cmd_speed)
 	{
-		float posy = Xefis::limit (kt_to_px (Xefis::limit (_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
+		float posy = Xefis::limit (kt_to_px (Xefis::limit (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
 								   static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
 		painter.setClipRect (_sl_ladder_rect.translated (2.5f * x, 0.f));
 		painter.translate (1.25f * x, posy);
@@ -1040,7 +1056,7 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_or_gs (Xefis::Painter& painter, float x
 void
 EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 {
-	if (!_params.cmd_speed_visible)
+	if (!_params.cmd_speed)
 		return;
 
 	QFont actual_speed_font = _font_20;
@@ -1064,7 +1080,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 	painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_params.cmd_speed.kt()))));
+	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_params.cmd_speed->kt()))));
 }
 
 
@@ -1486,9 +1502,9 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 		}
 
 		// AP bug:
-		if (_params.cmd_altitude_visible)
+		if (_params.cmd_altitude)
 		{
-			Length cmd_altitude = Xefis::limit (_params.cmd_altitude, -99999_ft, +99999_ft);
+			Length cmd_altitude = Xefis::limit (*_params.cmd_altitude, -99999_ft, +99999_ft);
 			float posy = Xefis::limit (ft_to_px (cmd_altitude),
 									   static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
@@ -1536,12 +1552,12 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (Xefis::Painter& painter, float x)
 	}
 
 	// Vertical speed bug:
-	if (_params.cmd_vertical_speed_visible && _params.vertical_speed_visible)
+	if (_params.cmd_vertical_speed && _params.vertical_speed_visible)
 	{
 		painter.setClipping (false);
 		painter.setTransform (_al_transform);
 		painter.translate (4.15f * x, 0.f);
-		float posy = -8.f * x * scale_vertical_speed (_params.cmd_vertical_speed);
+		float posy = -8.f * x * scale_vertical_speed (*_params.cmd_vertical_speed);
 		for (auto pen: { _autopilot_pen_1, _autopilot_pen_2 })
 		{
 			painter.setPen (pen);
@@ -1721,10 +1737,10 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (Xefis::Painter& painter, float x)
 void
 EFISWidget::PaintWorkUnit::al_paint_ap_setting (Xefis::Painter& painter)
 {
-	if (!_params.cmd_altitude_visible)
+	if (!_params.cmd_altitude)
 		return;
 
-	Length cmd_altitude = Xefis::limit (_params.cmd_altitude, -99999_ft, +99999_ft);
+	Length cmd_altitude = Xefis::limit (*_params.cmd_altitude, -99999_ft, +99999_ft);
 
 	QFont b_font = _font_20;
 	QFontMetricsF b_metrics (b_font);
@@ -2354,14 +2370,18 @@ EFISWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		if (is_newly_set (_locals.fma_vertical_small_ts))
 			paint_small_rect (s3);
 
+		QFont font_big = _font_16;
+		font_big.setPixelSize (font_size (14.f));
+		QFont font_small = _font_13;
+
 		painter.setPen (get_pen (_navigation_color, 1.0f));
-		painter.setFont (_font_16);
+		painter.setFont (font_big);
 		painter.fast_draw_text (b1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_hint);
 		painter.fast_draw_text (b2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_hint);
 		painter.fast_draw_text (b3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_hint);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		painter.setFont (_font_13);
+		painter.setFont (font_small);
 		painter.fast_draw_text (s1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
 		painter.fast_draw_text (s2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
 		painter.fast_draw_text (s3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
