@@ -96,6 +96,20 @@ operator/ (Speed const& speed, Frequency const& frequency)
 	return 1_m * (speed.mps() / frequency.Hz());
 }
 
+
+inline constexpr Angle
+operator* (Time const& time, Frequency const& frequency)
+{
+	return 1_rad * (frequency.Hz() * 2.0 * M_PI * time.s());
+}
+
+
+inline constexpr Angle
+operator* (Frequency const& frequency, Time const& time)
+{
+	return time * frequency;
+}
+
 } // namespace SI
 
 #endif

@@ -73,7 +73,7 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 		{ "track.vertical", _track_vertical, true },
 		{ "track.lateral.magnetic", _track_lateral_magnetic, true },
 		{ "track.lateral.true", _track_lateral_true, true },
-		{ "track.lateral.delta", _track_lateral_delta_dpm, true },
+		{ "track.lateral.rotation", _track_lateral_rotation, true },
 		{ "track.ground-speed", _track_ground_speed, true },
 		{ "magnetic.declination", _magnetic_declination, true },
 		{ "magnetic.inclination", _magnetic_inclination, true },
@@ -113,7 +113,7 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 	_track_computer.add_depending_smoothers ({
 		&_track_vertical_smoother,
 		&_track_lateral_true_smoother,
-		&_track_heading_delta_smoother,
+		&_track_lateral_rotation_smoother,
 	});
 	_track_computer.observe ({
 		&_position_computer,
@@ -310,31 +310,32 @@ NavigationComputer::compute_track()
 		_track_lateral_magnetic.set_nil();
 	}
 
-	// DPM = degrees per mile
-	Optional<Angle> result_delta;
+	Optional<Frequency> result_rotation_speed;
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{
-		Length len10 = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);
+		Length len_from_prev = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);
 
-		if (len10 >= *_position_accuracy_lateral)
+		if (len_from_prev >= *_position_accuracy_lateral)
 		{
+			Time dt = pos_last.time - pos_prev.time;
 			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (pos_prev_prev.lateral_position,
 																 pos_prev.lateral_position,
 																 pos_last.lateral_position);
-			Angle beta_per_mile = alpha / len10.nm();
+			// Lateral (parallel to the ground) rotation:
+			Frequency rotation_speed = alpha / dt;
 
-			if (!std::isinf (beta_per_mile.internal()) && !std::isnan (beta_per_mile.internal()))
+			if (!std::isinf (rotation_speed.internal()) && !std::isnan (rotation_speed.internal()))
 			{
-				beta_per_mile = 1_deg * _track_heading_delta_smoother.process (beta_per_mile.deg(), update_dt);
-				result_delta = Xefis::limit (beta_per_mile, -180.0_deg, +180.0_deg);
+				rotation_speed = 1_Hz * _track_lateral_rotation_smoother.process (rotation_speed.Hz(), update_dt);
+				result_rotation_speed = Xefis::limit (rotation_speed, -1_Hz, +1_Hz);
 			}
 			else
-				_track_heading_delta_smoother.invalidate();
+				_track_lateral_rotation_smoother.invalidate();
 		}
 	}
 	else
-		_track_heading_delta_smoother.invalidate();
-	_track_lateral_delta_dpm.write (result_delta);
+		_track_lateral_rotation_smoother.invalidate();
+	_track_lateral_rotation.write (result_rotation_speed);
 }
 
 
