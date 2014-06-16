@@ -32,6 +32,7 @@
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>
+#include <xefis/airnav/wind_triangle.h>
 
 // Local:
 #include "hsi_widget.h"
@@ -52,7 +53,8 @@ HSIWidget::Parameters::sanitize()
 	heading_true = floored_mod (heading_true, 360_deg);
 	ap_magnetic_heading = floored_mod (ap_magnetic_heading, 360_deg);
 	track_magnetic = floored_mod (track_magnetic, 360_deg);
-	true_home_direction = floored_mod (true_home_direction, 360_deg);
+	if (true_home_direction)
+		true_home_direction = floored_mod (*true_home_direction, 360_deg);
 	wind_from_magnetic_heading = floored_mod (wind_from_magnetic_heading, 360_deg);
 }
 
@@ -460,11 +462,8 @@ void
 HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_heading_triangle)
 {
 	Length trend_range = actual_trend_range();
-	Length trend_start = actual_trend_start();
-	if (2.f * trend_start > trend_range)
-		trend_range = 0_nm;
 
-	float start_point = _params.trend_vector_visible ? -to_px (trend_range) - 0.25f * _q : 0.f;
+	float start_point = _params.track_lateral_rotation ? -to_px (trend_range) - 0.25f * _q : 0.f;
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
@@ -569,38 +568,74 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 	painter.setClipPath (_inner_map_clip);
 	painter.setPen (est_pen);
 
-	Length trend_range = actual_trend_range();
-	Length trend_start = actual_trend_start();
-	if (2.f * trend_start > trend_range)
-		trend_range = 0_nm;
-
-	if (_params.trend_vector_visible)
+	if (_params.track_lateral_rotation && _params.ground_speed &&
+		2.f * trend_time_gap() < _params.trend_vector_times[2] && _params.range <= _params.trend_vector_max_range)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipRect (_trend_vector_clip_rect);
 
-		Length initial_step = trend_range / 150.f;
-		Length normal_step = trend_range / 10.f;
-		Length step = initial_step;
-		Angle const angle_per_step = step.nm() * _params.track_lateral_delta;
+		Time step = *std::min_element (_params.trend_vector_times.begin(), _params.trend_vector_times.end()) / 100.0;
+		Angle const angle_per_step = step * *_params.track_lateral_rotation;
+		Angle total_angle = 0_deg;
 
 		QTransform transform;
 		QPolygonF polygon;
 
-		for (Length pos = 0_nm; pos < trend_range; pos += step)
+		// Initially rotate the transform to match HDG or TRK setting:
+		transform.rotate ((_locals.track - _locals.rotation).deg());
+
+		// Take wind into consideration if track info is available:
+		Optional<xf::WindTriangle> wt;
+		if (_params.true_air_speed && _params.heading_visible && _params.track_visible)
 		{
-			step = pos > trend_range ? normal_step : initial_step;
-			float px = to_px (step);
+			wt = xf::WindTriangle();
+			wt->set_air_vector (*_params.true_air_speed, _params.heading_magnetic);
+			wt->set_ground_vector (*_params.ground_speed, _params.track_magnetic);
+			wt->compute_wind_vector();
+		}
+
+		for (Time t = 0_s; t < _params.trend_vector_times[2]; t += step)
+		{
 			transform.rotate (angle_per_step.deg());
-			if (pos > trend_start)
+			total_angle += angle_per_step;
+
+			Speed ground_speed = wt
+				? wt->get_ground_speed (_locals.track + total_angle)
+				: *_params.ground_speed;
+
+			float px = to_px (ground_speed * step);
+
+			// If the turn is too tight, stop drawing trend vectors:
+			if (std::abs (total_angle) >= 180_deg)
+			{
+				polygon.clear();
+				break;
+			}
+
+			if ((_params.trend_vector_min_ranges[0] <= _params.range && trend_time_gap() <= t && t < _params.trend_vector_times[0]) ||
+				(_params.trend_vector_min_ranges[1] <= _params.range && trend_time_gap() + _params.trend_vector_times[0] <= t && t < _params.trend_vector_times[1]) ||
+				(_params.trend_vector_min_ranges[2] <= _params.range && trend_time_gap() + _params.trend_vector_times[1] <= t && t < _params.trend_vector_times[2]))
+			{
 				polygon << transform.map (QPointF (0.f, -px));
+			}
+			else if (!polygon.empty())
+			{
+				painter.add_shadow ([&] {
+					painter.drawPolyline (polygon);
+				});
+				polygon.clear();
+			}
+
 			transform.translate (0.f, -px);
 		}
 
-		painter.add_shadow ([&] {
-			painter.drawPolyline (polygon);
-		});
+		if (!polygon.empty())
+		{
+			painter.add_shadow ([&] {
+				painter.drawPolyline (polygon);
+			});
+		}
 	}
 }
 
@@ -760,8 +795,8 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 	// GS
 	layout.add_fragment ("GS", _font_13, Qt::white);
 	QString gs_str = "---";
-	if (_params.ground_speed_visible)
-		gs_str = QString::number (static_cast<int> (_params.ground_speed.kt()));
+	if (_params.ground_speed)
+		gs_str = QString::number (static_cast<int> (_params.ground_speed->kt()));
 	layout.add_fragment (gs_str, _font_18, Qt::white);
 
 	layout.add_fragment (" ", _font_13, Qt::white);
@@ -769,8 +804,8 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 	// TAS
 	layout.add_fragment ("TAS", _font_13, Qt::white);
 	QString tas_str = "---";
-	if (_params.true_air_speed_visible)
-		tas_str = QString::number (static_cast<int> (_params.true_air_speed.kt()));
+	if (_params.true_air_speed)
+		tas_str = QString::number (static_cast<int> (_params.true_air_speed->kt()));
 	layout.add_fragment (tas_str, _font_18, Qt::white);
 
 	// Wind data (direction/strength):
@@ -821,7 +856,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 	painter.setClipping (false);
 
 	// Home direction arrow:
-	if (_params.home_direction_visible)
+	if (_params.true_home_direction)
 	{
 		bool at_home = _params.home->haversine_earth (*_params.position) < 10_m;
 		float z = 0.75f * _q;
@@ -845,7 +880,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 				<< QPointF (0.0, -z)
 				<< QPointF (+0.2 * z, -0.8 * z)
 				<< QPointF (0.0, -0.8 * z);
-			painter.rotate ((_params.true_home_direction - _params.heading_true).deg());
+			painter.rotate ((*_params.true_home_direction - _params.heading_true).deg());
 			painter.add_shadow ([&] {
 				painter.drawPolyline (home_arrow);
 			});
@@ -1699,6 +1734,77 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	_navs_retrieved = true;
 	_navs_retrieve_position = *_params.position;
 	_navs_retrieve_range = _params.range;
+}
+
+
+inline QPointF
+HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
+{
+	if (!_params.position)
+		return QPointF();
+	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (*_params.position).project_flat();
+	return _features_transform.map (QPointF (to_px (1_nm * navaid_pos.x()), to_px (1_nm * navaid_pos.y())));
+}
+
+
+inline Length
+HSIWidget::PaintWorkUnit::actual_trend_range() const
+{
+	if (_params.ground_speed && _params.range <= _params.trend_vector_max_range)
+	{
+		Time time = 0_s;
+
+		if (_params.range >= _params.trend_vector_min_ranges[2])
+			time = _params.trend_vector_times[2];
+		else if (_params.range >= _params.trend_vector_min_ranges[1])
+			time = _params.trend_vector_times[1];
+		else if (_params.range >= _params.trend_vector_min_ranges[0])
+			time = _params.trend_vector_times[0];
+
+		return *_params.ground_speed * time;
+	}
+	else
+		return 0_m;
+}
+
+
+inline Length
+HSIWidget::PaintWorkUnit::trend_gap() const
+{
+	switch (_params.display_mode)
+	{
+		case DisplayMode::Expanded:
+			return 0.015f * _params.range;
+		case DisplayMode::Rose:
+			return 0.030f * _params.range;
+		case DisplayMode::Auxiliary:
+			return 0.0375f * _params.range;
+	}
+	return 0_nm;
+}
+
+
+inline Time
+HSIWidget::PaintWorkUnit::trend_time_gap() const
+{
+	if (_params.ground_speed)
+		return trend_gap() / *_params.ground_speed;
+	else
+		return 0_s;
+}
+
+
+inline float
+HSIWidget::PaintWorkUnit::to_px (Length miles)
+{
+	return miles / _params.range * _r;
+}
+
+
+inline bool
+HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
+{
+	return timestamp.secsTo (_current_datetime) < time.s();
 }
 
 
