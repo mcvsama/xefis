@@ -38,12 +38,18 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "arpt.runways-range-threshold", _arpt_runways_range_threshold, false },
 		{ "arpt.map-range-threshold", _arpt_map_range_threshold, false },
 		{ "arpt.runway-extension-length", _arpt_runway_extension_length, false },
+		{ "trend-vector.vertex.0.time", _trend_vector_times[0], false },
+		{ "trend-vector.vertex.1.time", _trend_vector_times[1], false },
+		{ "trend-vector.vertex.2.time", _trend_vector_times[2], false },
+		{ "trend-vector.vertex.0.minimum-range", _trend_vector_min_ranges[0], false },
+		{ "trend-vector.vertex.1.minimum-range", _trend_vector_min_ranges[1], false },
+		{ "trend-vector.vertex.2.minimum-range", _trend_vector_min_ranges[2], false },
+		{ "trend-vector.maximum-range", _trend_vector_max_range, false },
 	});
 
 	parse_properties (config, {
 		{ "display-mode", _display_mode, true },
 		{ "range", _range, true },
-		{ "trend-vector-range", _trend_vector_range, false },
 		{ "speed.gs", _speed_gs, false },
 		{ "speed.tas", _speed_tas, false },
 		{ "cmd.visible", _cmd_visible, false },
@@ -65,7 +71,7 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "position.source", _position_source, false },
 		{ "track.visible", _track_visible, false },
 		{ "track.lateral.magnetic", _track_lateral_magnetic, false },
-		{ "track.lateral.delta", _track_lateral_delta_dpm, false },
+		{ "track.lateral.rotation", _track_lateral_rotation, false },
 		{ "track.center-on-track", _track_center_on_track, false },
 		{ "course.visible", _course_visible, false },
 		{ "course.setting.magnetic", _course_setting_magnetic, false },
@@ -150,9 +156,8 @@ HSI::read()
 	params.navaid_right_distance = _navaid_right_distance.get_optional();
 	params.navaid_right_initial_bearing_magnetic = _navaid_right_initial_bearing_magnetic.get_optional();
 	params.center_on_track = _track_center_on_track.read (true);
-	params.home_direction_visible = _home_true_direction.valid();
 	params.home_track_visible = _home_track_visible.read (false);
-	params.true_home_direction = *_home_true_direction;
+	params.true_home_direction = _home_true_direction.get_optional();
 	params.dist_to_home_ground_visible = _home_distance_ground.valid();
 	params.dist_to_home_ground = *_home_distance_ground;
 	params.dist_to_home_vlos_visible = _home_distance_vlos.valid();
@@ -163,13 +168,12 @@ HSI::read()
 		params.home = LonLat (*_home_position_longitude, *_home_position_latitude);
 	else
 		params.home.reset();
-	params.ground_speed_visible = _speed_gs.valid();
-	params.ground_speed = *_speed_gs;
-	params.true_air_speed_visible = _speed_tas.valid();
+	params.ground_speed = _speed_gs.get_optional();
+	params.true_air_speed = _speed_tas.get_optional();
 	params.true_air_speed = *_speed_tas;
-	params.trend_vector_visible = _track_lateral_delta_dpm.valid();
-	params.track_lateral_delta = Xefis::limit (*_track_lateral_delta_dpm, -180.0_deg, +180.0_deg);
-	params.trend_vector_lookahead = *_trend_vector_range;
+	params.track_lateral_rotation = _track_lateral_rotation.get_optional();
+	if (params.track_lateral_rotation)
+		params.track_lateral_rotation = Xefis::limit (*params.track_lateral_rotation, -1_Hz, +1_Hz);
 	params.altitude_reach_visible = _target_altitude_reach_distance.valid();
 	params.altitude_reach_distance = *_target_altitude_reach_distance;
 	params.wind_information_visible = _wind_from_magnetic.valid() && _wind_speed_tas.valid();
@@ -195,6 +199,9 @@ HSI::read()
 	params.arpt_runways_range_threshold = _arpt_runways_range_threshold;
 	params.arpt_map_range_threshold = _arpt_map_range_threshold;
 	params.arpt_runway_extension_length = _arpt_runway_extension_length;
+	params.trend_vector_times = _trend_vector_times;
+	params.trend_vector_min_ranges = _trend_vector_min_ranges;
+	params.trend_vector_max_range = _trend_vector_max_range;
 	params.round_clip = false;
 
 	_hsi_widget->set_params (params);

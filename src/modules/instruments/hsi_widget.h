@@ -108,9 +108,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Optional<Length>	navaid_right_distance;
 		Optional<Angle>		navaid_right_initial_bearing_magnetic;
 		bool				center_on_track				= false;
-		bool				home_direction_visible		= false;
 		bool				home_track_visible			= false;
-		Angle				true_home_direction			= 0_deg;
+		Optional<Angle>		true_home_direction;
 		bool				dist_to_home_ground_visible	= false;
 		Length				dist_to_home_ground			= 0_nm;
 		bool				dist_to_home_vlos_visible	= false;
@@ -118,13 +117,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool				dist_to_home_vert_visible	= false;
 		Length				dist_to_home_vert			= 0_nm;
 		Optional<LonLat>	home;
-		bool				ground_speed_visible		= false;
-		Speed				ground_speed				= 0_kt;
-		bool				true_air_speed_visible		= false;
-		Speed				true_air_speed				= 0_kt;
-		bool				trend_vector_visible		= false;
-		Angle				track_lateral_delta			= 0_deg;
-		Length				trend_vector_lookahead		= 5_nm;
+		Optional<Speed>		ground_speed;
+		Optional<Speed>		true_air_speed;
+		Optional<Frequency>	track_lateral_rotation;
 		bool				altitude_reach_visible		= false;
 		Length				altitude_reach_distance		= 0_nm;
 		bool				wind_information_visible	= false;
@@ -147,6 +142,10 @@ class HSIWidget: public Xefis::InstrumentWidget
 		Length				arpt_runways_range_threshold;
 		Length				arpt_map_range_threshold;
 		Length				arpt_runway_extension_length;
+		std::array<Time, 3>	trend_vector_times;
+		std::array<Length, 3>
+							trend_vector_min_ranges;
+		Length				trend_vector_max_range;
 		bool				round_clip					= false;
 
 	  private:
@@ -262,11 +261,23 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPointF
 		get_navaid_xy (LonLat const& position);
 
+		/**
+		 * Trend vector range.
+		 */
 		Length
 		actual_trend_range() const;
 
+		/**
+		 * Gap between lines on trend vector.
+		 */
 		Length
-		actual_trend_start() const;
+		trend_gap() const;
+
+		/**
+		 * Time gap between lines on trend vector.
+		 */
+		Time
+		trend_time_gap() const;
 
 		float
 		to_px (Length miles);
@@ -367,66 +378,6 @@ inline void
 HSIWidget::PaintWorkUnit::set_navaid_storage (NavaidStorage* navaid_storage)
 {
 	_navaid_storage = navaid_storage;
-}
-
-
-inline QPointF
-HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
-{
-	if (!_params.position)
-		return QPointF();
-	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (*_params.position).project_flat();
-	return _features_transform.map (QPointF (to_px (1_nm * navaid_pos.x()), to_px (1_nm * navaid_pos.y())));
-}
-
-
-inline Length
-HSIWidget::PaintWorkUnit::actual_trend_range() const
-{
-	float limit = 0;
-	switch (_params.display_mode)
-	{
-		case DisplayMode::Expanded:
-			limit = 0.13f;
-			break;
-		case DisplayMode::Rose:
-			limit = 0.18f;
-			break;
-		case DisplayMode::Auxiliary:
-			limit = 0.36f;
-			break;
-	}
-	return std::min (_params.trend_vector_lookahead, limit * _params.range);
-}
-
-
-inline Length
-HSIWidget::PaintWorkUnit::actual_trend_start() const
-{
-	switch (_params.display_mode)
-	{
-		case DisplayMode::Expanded:
-			return 0.015f * _params.range;
-		case DisplayMode::Rose:
-			return 0.030f * _params.range;
-		case DisplayMode::Auxiliary:
-			return 0.0375f * _params.range;
-	}
-	return 0_nm;
-}
-
-
-inline float
-HSIWidget::PaintWorkUnit::to_px (Length miles)
-{
-	return miles / _params.range * _r;
-}
-
-
-inline bool
-HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
-{
-	return timestamp.secsTo (_current_datetime) < time.s();
 }
 
 

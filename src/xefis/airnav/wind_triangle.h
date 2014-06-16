@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <complex>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -24,38 +25,80 @@
 
 namespace Xefis {
 
+/**
+ * Note - headings should be all magnetic or all true.
+ * Result will be magnetic or true, depending on what you give on input.
+ */
 class WindTriangle
 {
   public:
 	/**
-	 * Set aircraft's true airspeed.
+	 * Set aircraft TAS (true air speed) and heading.
+	 * The angle doesn't have to be normalized to 0..360°.
 	 */
 	void
-	set_aircraft_tas (Speed);
+	set_air_vector (Speed true_air_speed, Angle heading);
 
 	/**
-	 * Set aircraft's track (course).
+	 * Set ground speed and ground track.
+	 * The angle doesn't have to be normalized to 0..360°.
 	 */
 	void
-	set_aircraft_track (Angle);
+	set_ground_vector (Speed ground_speed, Angle track);
 
 	/**
-	 * Set aircraft's ground speed.
+	 * Set wind speed and direction.
+	 * The angle doesn't have to be normalized to 0..360°.
+	 *
+	 * NOTE: This is the direction the wind blows to, not from.
+	 * Add 180° to the angle if you have a 'from' angle.
 	 */
 	void
-	set_aircraft_ground_speed (Speed);
+	set_wind_vector (Speed wind_speed, Angle direction);
 
 	/**
-	 * Set aircraft's heading.
+	 * Compute air vector.
 	 */
 	void
-	set_aircraft_heading (Angle);
+	compute_air_vector();
 
 	/**
-	 * Calculate result.
+	 * Compute ground vector.
 	 */
 	void
-	update();
+	compute_ground_vector();
+
+	/**
+	 * Compute wind vector.
+	 */
+	void
+	compute_wind_vector();
+
+	/**
+	 * Return resulting air speed (TAS).
+	 */
+	Speed
+	air_speed() const;
+
+	/**
+	 * Return resulting air direction (aircraft heading).
+	 * Result is normalized to 0..360°.
+	 */
+	Angle
+	air_direction() const;
+
+	/**
+	 * Return resulting ground speed.
+	 */
+	Speed
+	ground_speed() const;
+
+	/**
+	 * Return resulting ground direction (ground track).
+	 * Result is normalized to 0..360°.
+	 */
+	Angle
+	ground_direction() const;
 
 	/**
 	 * Return resulting wind speed.
@@ -64,74 +107,134 @@ class WindTriangle
 	wind_speed() const;
 
 	/**
-	 * Return resulting wind direction
-	 * (heading FROM which wind blows).
+	 * Return resulting wind direction (heading TO which wind blows).
+	 * Result is normalized to 0..360°.
 	 */
 	Angle
 	wind_direction() const;
 
+	/**
+	 * Return resulting wind direction (heading FROM which wind blows).
+	 * Result is normalized to 0..360°.
+	 */
+	Angle
+	wind_from() const;
+
+	/**
+	 * Compute ground speed in given direction.
+	 */
+	Speed
+	get_ground_speed (Angle heading) const;
+
   private:
-	Speed	_a_tas;
-	Angle	_a_track;
-	Speed	_a_gs;
-	Angle	_a_heading;
-	Speed	_w_speed;
-	Angle	_w_direction;
+	// Speeds are in mps() and angles in rad():
+	std::complex<double>	_air_vector;
+	std::complex<double>	_ground_vector;
+	std::complex<double>	_wind_vector;
 };
 
 
 inline void
-WindTriangle::set_aircraft_tas (Speed tas)
+WindTriangle::set_air_vector (Speed true_air_speed, Angle heading)
 {
-	_a_tas = tas;
+	_air_vector = std::polar (true_air_speed.mps(), heading.rad());
 }
 
 
 inline void
-WindTriangle::set_aircraft_track (Angle track)
+WindTriangle::set_ground_vector (Speed ground_speed, Angle track)
 {
-	_a_track = track;
+	_ground_vector = std::polar (ground_speed.mps(), track.rad());
 }
 
 
 inline void
-WindTriangle::set_aircraft_ground_speed (Speed gs)
+WindTriangle::set_wind_vector (Speed wind_speed, Angle direction)
 {
-	_a_gs = gs;
+	_wind_vector = std::polar (wind_speed.mps(), direction.rad());
 }
 
 
 inline void
-WindTriangle::set_aircraft_heading (Angle heading)
+WindTriangle::compute_wind_vector()
 {
-	_a_heading = heading;
+	// G = A + W;  W = G - A
+	_wind_vector = _ground_vector - _air_vector;
 }
 
 
 inline void
-WindTriangle::update()
+WindTriangle::compute_air_vector()
 {
-	_w_speed = 1.0_kt * std::pow ((_a_tas - _a_gs).kt(), 2.0)
-			 + 4.0_kt * _a_tas.kt() * _a_gs.kt() * std::pow (std::sin ((_a_heading - _a_track) / 2.0), 2.0);
-	_w_speed = 1_kt * std::sqrt (_w_speed.kt());
+	// G = A + W;  A = G - W
+	_air_vector = _ground_vector - _wind_vector;
+}
 
-	_w_direction = 1_rad * (_a_track.rad() + std::atan2 ((_a_tas * std::sin (_a_heading - _a_track)).kt(),
-														 (_a_tas * std::cos (_a_heading - _a_track) - _a_gs).kt()));
-	_w_direction = floored_mod (_w_direction, 360_deg);
+
+inline void
+WindTriangle::compute_ground_vector()
+{
+	// G = A + W
+	_ground_vector = _air_vector + _wind_vector;
+}
+
+
+inline Speed
+WindTriangle::air_speed() const
+{
+	return 1_mps * std::abs (_air_vector);
+}
+
+
+inline Angle
+WindTriangle::air_direction() const
+{
+	return floored_mod (1_rad * std::arg (_air_vector), 360_deg);
+}
+
+
+inline Speed
+WindTriangle::ground_speed() const
+{
+	return 1_mps * std::abs (_ground_vector);
+}
+
+
+inline Angle
+WindTriangle::ground_direction() const
+{
+	return floored_mod (1_rad * std::arg (_ground_vector), 360_deg);
 }
 
 
 inline Speed
 WindTriangle::wind_speed() const
 {
-	return _w_speed;
+	return 1_mps * std::abs (_wind_vector);
 }
 
 
 inline Angle
 WindTriangle::wind_direction() const
 {
-	return _w_direction;
+	return floored_mod (1_rad * std::arg (_wind_vector), 360_deg);
+}
+
+
+inline Angle
+WindTriangle::wind_from() const
+{
+	return floored_mod (wind_direction() + 180_deg, 360_deg);
+}
+
+
+inline Speed
+WindTriangle::get_ground_speed (Angle aircraft_heading) const
+{
+	WindTriangle wt (*this);
+	wt.set_air_vector (air_speed(), aircraft_heading);
+	wt.compute_ground_vector();
+	return wt.ground_speed();
 }
 
 } // namespace Xefis

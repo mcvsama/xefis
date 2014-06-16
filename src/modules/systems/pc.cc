@@ -117,12 +117,10 @@ PerformanceComputer::compute_wind()
 		Time update_dt = _wind_computer.update_dt();
 
 		Xefis::WindTriangle wt;
-		wt.set_aircraft_tas (*_speed_tas);
-		wt.set_aircraft_track (*_track_lateral_true);
-		wt.set_aircraft_ground_speed (*_speed_gs);
-		wt.set_aircraft_heading (*_orientation_heading_true);
-		wt.update();
-		_wind_from_true.write (Xefis::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_direction().deg(), update_dt), 360_deg));
+		wt.set_air_vector (*_speed_tas, *_orientation_heading_true);
+		wt.set_ground_vector (*_speed_gs, *_track_lateral_true);
+		wt.compute_wind_vector();
+		_wind_from_true.write (Xefis::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_from().deg(), update_dt), 360_deg));
 		_wind_from_magnetic.write (Xefis::true_to_magnetic (*_wind_from_true, *_magnetic_declination));
 		_wind_tas.write (1_kt * _wind_speed_smoother.process (wt.wind_speed().kt(), update_dt));
 	}
