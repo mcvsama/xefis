@@ -11,26 +11,22 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef SI__ALL_H__INCLUDED
-#define SI__ALL_H__INCLUDED
+// Standard:
+#include <cstddef>
+
+// Lib:
+#include <boost/format.hpp>
+
+// Xefis:
+#include <xefis/utility/numeric.h>
 
 // Local:
-#include "acceleration.h"
-#include "angle.h"
-#include "capacity.h"
-#include "current.h"
-#include "frequency.h"
-#include "length.h"
-#include "pressure.h"
-#include "speed.h"
-#include "time.h"
 #include "torque.h"
-#include "weight.h"
-#include "lonlat.h"
-#include "temperature.h"
-#include "constants.h"
-#include "operators.h"
-#include "asserts.h"
 
-#endif
+
+namespace SI {
+
+std::vector<std::string> Torque::_supported_units = { "nm" };
+
+} // namespace SI
 

@@ -132,6 +132,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Temperature;
 	else if (type_attr == "time")
 		_type = Type::Time;
+	else if (type_attr == "torque")
+		_type = Type::Torque;
 	else if (type_attr == "weight")
 		_type = Type::Weight;
 
@@ -154,6 +156,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Speed:
 		case Type::Temperature:
 		case Type::Time:
+		case Type::Torque:
 		case Type::Weight:
 			if (!element.hasAttribute ("bytes"))
 				throw Xefis::MissingDomAttribute (element, "bytes");
@@ -182,6 +185,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Speed:
 			case Type::Temperature:
 			case Type::Time:
+			case Type::Torque:
 			case Type::Weight:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
@@ -258,6 +262,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
+		XEFIS_CASE_FLOAT (Torque, torque);
 		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
@@ -318,6 +323,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Speed:
 		case Type::Temperature:
 		case Type::Time:
+		case Type::Torque:
 		case Type::Weight:
 			kind = Kind::Float;
 			break;
@@ -393,6 +399,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
+		XEFIS_CASE_FLOAT (Torque, torque);
 		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
@@ -434,6 +441,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Speed, speed);
 			XEFIS_CASE_FLOAT (Temperature, temperature);
 			XEFIS_CASE_FLOAT (Time, time);
+			XEFIS_CASE_FLOAT (Torque, torque);
 			XEFIS_CASE_FLOAT (Weight, weight);
 
 			case Type::Unknown:

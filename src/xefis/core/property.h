@@ -1101,6 +1101,7 @@ typedef Property<Length>		PropertyLength;
 typedef Property<Speed>			PropertySpeed;
 typedef Property<Temperature>	PropertyTemperature;
 typedef Property<Time>			PropertyTime;
+typedef Property<Torque>		PropertyTorque;
 typedef Property<Weight>		PropertyWeight;
 
 } // namespace Xefis

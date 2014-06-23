@@ -23,21 +23,21 @@ namespace SI {
 inline constexpr Time
 operator/ (Length const& length, Speed const& speed)
 {
-	return 1_h * (length.nm() / speed.kt());
+	return 1_h * (length.nmi() / speed.kt());
 }
 
 
 inline constexpr Speed
 operator/ (Length const& length, Time const& time)
 {
-	return 1_kt * (length.nm() / time.h());
+	return 1_kt * (length.nmi() / time.h());
 }
 
 
 inline constexpr Length
 operator* (Speed const& speed, Time const& time)
 {
-	return 1_nm * (speed.kt() * time.h());
+	return 1_nmi * (speed.kt() * time.h());
 }
 
 

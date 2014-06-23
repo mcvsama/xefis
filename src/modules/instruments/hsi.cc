@@ -127,7 +127,7 @@ HSI::read()
 		default:	params.display_mode = HSIWidget::DisplayMode::Auxiliary; break;
 	}
 	params.heading_mode = _use_true_heading.read (false) ? HSIWidget::HeadingMode::True : HSIWidget::HeadingMode::Magnetic;
-	params.range = _range.read (5_nm);
+	params.range = _range.read (5_nmi);
 	params.heading_visible = _orientation_heading_magnetic.valid();
 	params.heading_magnetic = *_orientation_heading_magnetic;
 	params.heading_true = *_orientation_heading_true;

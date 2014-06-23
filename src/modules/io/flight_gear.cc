@@ -81,7 +81,7 @@ struct FGInputData
 	FGBool		lateral_deviation_ok;				// nhdo
 	FGDouble	lateral_deviation_deg;				// nhd
 	FGBool		navigation_dme_ok;					// dok
-	FGDouble	dme_distance_nm;					// dme
+	FGDouble	dme_distance_nmi;					// dme
 	FGDouble	slip_skid_g;						// ss
 	FGDouble	total_air_temperature_degc;			// tat
 	FGDouble	engine_throttle_pct;				// thr
@@ -416,7 +416,7 @@ FlightGearIO::read_input()
 		ASSIGN (deg,  fpm_beta);
 		ASSIGN (deg,  magnetic_track);
 		ASSIGN_UNITLESS (navigation_needles_visible);
-		ASSIGN (nm,   dme_distance);
+		ASSIGN (nmi,  dme_distance);
 		ASSIGN_UNITLESS (slip_skid_g);
 		ASSIGN_UNITLESS (engine_throttle_pct);
 		ASSIGN (lb,   engine_1_thrust);

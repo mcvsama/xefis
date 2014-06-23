@@ -79,7 +79,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 	  public:
 		DisplayMode			display_mode				= DisplayMode::Expanded;
 		HeadingMode			heading_mode				= HeadingMode::Magnetic;
-		Length				range						= 1_nm;
+		Length				range						= 1_nmi;
 		bool				heading_visible				= false;
 		Angle				heading_magnetic			= 0_deg;
 		Angle				heading_true				= 0_deg;
@@ -111,17 +111,17 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool				home_track_visible			= false;
 		Optional<Angle>		true_home_direction;
 		bool				dist_to_home_ground_visible	= false;
-		Length				dist_to_home_ground			= 0_nm;
+		Length				dist_to_home_ground			= 0_nmi;
 		bool				dist_to_home_vlos_visible	= false;
-		Length				dist_to_home_vlos			= 0_nm;
+		Length				dist_to_home_vlos			= 0_nmi;
 		bool				dist_to_home_vert_visible	= false;
-		Length				dist_to_home_vert			= 0_nm;
+		Length				dist_to_home_vert			= 0_nmi;
 		Optional<LonLat>	home;
 		Optional<Speed>		ground_speed;
 		Optional<Speed>		true_air_speed;
 		Optional<Frequency>	track_lateral_rotation;
 		bool				altitude_reach_visible		= false;
-		Length				altitude_reach_distance		= 0_nm;
+		Length				altitude_reach_distance		= 0_nmi;
 		bool				wind_information_visible	= false;
 		Angle				wind_from_magnetic_heading	= 0_deg;
 		Speed				wind_tas_speed				= 0_kt;
@@ -323,7 +323,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QPolygonF				_ap_bug_shape;
 		bool					_navs_retrieved				= false;
 		LonLat					_navs_retrieve_position		= { 0_deg, 0_deg };
-		Length					_navs_retrieve_range		= 0_nm;
+		Length					_navs_retrieve_range		= 0_nmi;
 		NavaidStorage::Navaids	_fix_navs;
 		NavaidStorage::Navaids	_vor_navs;
 		NavaidStorage::Navaids	_dme_navs;

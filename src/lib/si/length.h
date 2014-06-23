@@ -33,8 +33,8 @@ class Length: public LinearValue<double, Length>
 	friend constexpr Length operator"" _km (unsigned long long);
 	friend constexpr Length operator"" _ft (long double);
 	friend constexpr Length operator"" _ft (unsigned long long);
-	friend constexpr Length operator"" _nm (long double);
-	friend constexpr Length operator"" _nm (unsigned long long);
+	friend constexpr Length operator"" _nmi (long double);
+	friend constexpr Length operator"" _nmi (unsigned long long);
 	friend constexpr Length operator"" _mil (long double);
 	friend constexpr Length operator"" _mil (unsigned long long);
 
@@ -62,7 +62,7 @@ class Length: public LinearValue<double, Length>
 	ft() const noexcept;
 
 	constexpr ValueType
-	nm() const noexcept;
+	nmi() const noexcept;
 
 	constexpr ValueType
 	mil() const noexcept;
@@ -129,16 +129,16 @@ operator"" _ft (unsigned long long ft)
 
 
 inline constexpr Length
-operator"" _nm (long double nm)
+operator"" _nmi (long double nmi)
 {
-	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
+	return Length (static_cast<Length::ValueType> (nmi) * 1852.0);
 }
 
 
 inline constexpr Length
-operator"" _nm (unsigned long long nm)
+operator"" _nmi (unsigned long long nmi)
 {
-	return Length (static_cast<Length::ValueType> (nm) * 1852.0);
+	return Length (static_cast<Length::ValueType> (nmi) * 1852.0);
 }
 
 
@@ -196,7 +196,7 @@ Length::ft() const noexcept
 
 
 inline constexpr Length::ValueType
-Length::nm() const noexcept
+Length::nmi() const noexcept
 {
 	return internal() * 0.0005399568;
 }
@@ -220,8 +220,8 @@ Length::parse (std::string const& str)
 		*this = p.first * 1_km;
 	else if (p.second == "ft")
 		*this = p.first * 1_ft;
-	else if (p.second == "nm")
-		*this = p.first * 1_nm;
+	else if (p.second == "nmi")
+		*this = p.first * 1_nmi;
 	else if (p.second == "mil")
 		*this = p.first * 1_mil;
 }
@@ -245,8 +245,8 @@ Length::floatize (std::string unit) const
 		return km();
 	else if (unit == "ft")
 		return ft();
-	else if (unit == "nm")
-		return nm();
+	else if (unit == "nmi")
+		return nmi();
 	else if (unit == "mil")
 		return mil();
 	else

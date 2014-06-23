@@ -54,6 +54,8 @@ TypedProperty::create (std::string const& path, std::string const& type)
 		PropertyTemperature (path).ensure_existence();
 	else if (type == "time")
 		PropertyTime (path).ensure_existence();
+	else if (type == "torque")
+		PropertyTorque (path).ensure_existence();
 	else if (type == "weight")
 		PropertyWeight (path).ensure_existence();
 	else

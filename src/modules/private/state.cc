@@ -102,7 +102,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	_setting_hsi_display_mode_mfd.set_path ("/settings/hsi/display-mode/mfd");
 	_setting_hsi_display_mode_mfd.set_default (0);
 	_setting_hsi_range.set_path ("/settings/hsi/range");
-	_setting_hsi_range.set_default (1_nm);
+	_setting_hsi_range.set_default (1_nmi);
 	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
 	_setting_hsi_home_track_visible.set_default (false);
 	_setting_course.set_path ("/settings/course/magnetic");
@@ -253,14 +253,14 @@ State::prepare_efis_settings()
 		Optional<Length> new_half_range;
 		delta = -delta;
 
-		constexpr Length da = 0.01_nm;
+		constexpr Length da = 0.01_nmi;
 		static std::set<Length> half_ranges = {
-			0.1_nm, 0.2_nm, 0.3_nm, 0.4_nm, 0.5_nm, 0.6_nm, 0.7_nm, 0.8_nm, 0.9_nm,
-			1_nm, 2_nm, 3_nm, 4_nm, 5_nm, 6_nm, 7_nm, 8_nm, 9_nm,
-			10_nm, 12_nm, 14_nm, 16_nm, 18_nm,
-			20_nm, 30_nm, 40_nm, 50_nm, 60_nm, 70_nm, 80_nm, 90_nm,
-			100_nm, 120_nm, 140_nm, 160_nm, 180_nm, 200_nm,
-			250_nm,
+			0.1_nmi, 0.2_nmi, 0.3_nmi, 0.4_nmi, 0.5_nmi, 0.6_nmi, 0.7_nmi, 0.8_nmi, 0.9_nmi,
+			1_nmi, 2_nmi, 3_nmi, 4_nmi, 5_nmi, 6_nmi, 7_nmi, 8_nmi, 9_nmi,
+			10_nmi, 12_nmi, 14_nmi, 16_nmi, 18_nmi,
+			20_nmi, 30_nmi, 40_nmi, 50_nmi, 60_nmi, 70_nmi, 80_nmi, 90_nmi,
+			100_nmi, 120_nmi, 140_nmi, 160_nmi, 180_nmi, 200_nmi,
+			250_nmi,
 		};
 
 		auto it = half_ranges.upper_bound (0.5 * *_setting_hsi_range - da);
