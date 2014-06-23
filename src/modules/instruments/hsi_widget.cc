@@ -48,7 +48,7 @@ HSIWidget::Parameters::sanitize()
 	using Xefis::limit;
 	using Xefis::floored_mod;
 
-	range = limit (range, 1_ft, 5000_nm);
+	range = limit (range, 1_ft, 5000_nmi);
 	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
 	heading_true = floored_mod (heading_true, 360_deg);
 	ap_magnetic_heading = floored_mod (ap_magnetic_heading, 360_deg);
@@ -489,16 +489,16 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 		auto paint_range_tick = [&] (float ratio, bool draw_text) -> void
 		{
 			Length range;
-			if (ratio == 0.5 && _params.range >= 2_nm)
-				range = 1_nm * std::round (((10.f * ratio * _params.range) / 10.f).nm());
+			if (ratio == 0.5 && _params.range >= 2_nmi)
+				range = 1_nmi * std::round (((10.f * ratio * _params.range) / 10.f).nmi());
 			else
 				range = ratio * _params.range;
 			float range_tick_vpx = to_px (range);
 			float range_tick_hpx = 0.1f * _q;
 			int precision = 0;
-			if (range < 1_nm)
+			if (range < 1_nmi)
 				precision = 1;
-			QString half_range_str = QString ("%1").arg (range.nm(), 0, 'f', precision);
+			QString half_range_str = QString ("%1").arg (range.nmi(), 0, 'f', precision);
 			painter.draw_outlined_line (QPointF (-range_tick_hpx, -range_tick_vpx), QPointF (range_tick_hpx, -range_tick_vpx));
 
 			if (draw_text)
@@ -543,7 +543,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
-	float len = Xefis::limit (to_px (6_nm), 2.f * _q, 7.f * _q);
+	float len = Xefis::limit (to_px (6_nmi), 2.f * _q, 7.f * _q);
 	float pos = to_px (_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
@@ -911,7 +911,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 		QString vlos_str = "---";
 		if (_params.dist_to_home_vlos_visible)
-			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos.nm(), 0, 'f', 2, QChar ('0'));
+			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos.nmi(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment ("VLOS ", _font_13, Qt::white);
 		layout.add_fragment (vlos_str, _font_16, Qt::white);
 		layout.add_fragment ("NM", _font_13, Qt::white);
@@ -919,7 +919,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 		QString ground_str = "---";
 		if (_params.dist_to_home_ground_visible)
-			ground_str = QString ("%1").arg (_params.dist_to_home_ground.nm(), 0, 'f', 2, QChar ('0'));
+			ground_str = QString ("%1").arg (_params.dist_to_home_ground.nmi(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment (ground_str, _font_16, Qt::white);
 		layout.add_fragment ("NM", _font_13, Qt::white);
 
@@ -1091,7 +1091,7 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 
 	std::string distance_str = "---";
 	if (_params.navaid_selected_distance)
-		distance_str = (boost::format ("%3.1f") % _params.navaid_selected_distance->nm()).str();
+		distance_str = (boost::format ("%3.1f") % _params.navaid_selected_distance->nmi()).str();
 
 	Xefis::TextLayout layout;
 	layout.set_background (Qt::black, { _margin, 0.0 });
@@ -1137,7 +1137,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 		layout.add_fragment (identifier.isEmpty() ? "---" : identifier, _font_16, color);
 		layout.add_new_line();
 		layout.add_fragment ("DME ", _font_13, color);
-		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->nm()).str() : std::string ("---"), _font_16, color);
+		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->nmi()).str() : std::string ("---"), _font_16, color);
 	};
 
 	Xefis::TextLayout left_layout;
@@ -1296,10 +1296,10 @@ HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
 		QFontMetricsF metr_b (font_b);
 		QString s ("RANGE");
 		QString r;
-		if (_params.range < 1_nm)
-			r = QString::fromStdString ((boost::format ("%.1f") % _params.range.nm()).str());
+		if (_params.range < 1_nmi)
+			r = QString::fromStdString ((boost::format ("%.1f") % _params.range.nmi()).str());
 		else
-			r = QString::fromStdString ((boost::format ("%d") % _params.range.nm()).str());
+			r = QString::fromStdString ((boost::format ("%d") % _params.range.nmi()).str());
 
 		QRectF rect (0.f, 0.f, std::max (metr_a.width (s), metr_b.width (r)) + 0.4f * _q, metr_a.height() + metr_b.height());
 
@@ -1595,7 +1595,7 @@ HSIWidget::PaintWorkUnit::paint_locs()
 		QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
 
 		painter().setTransform (transform);
-		if (_params.range < 16_nm)
+		if (_params.range < 16_nmi)
 			painter().drawLine (zero, pt_0);
 		painter().drawLine (zero, pt_1);
 		painter().drawLine (zero, pt_2);
@@ -1697,7 +1697,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	_loc_navs.clear();
 	_arpt_navs.clear();
 
-	for (Navaid const& navaid: _navaid_storage->get_navs (*_params.position, std::max (_params.range + 20_nm, 2.f * _params.range)))
+	for (Navaid const& navaid: _navaid_storage->get_navs (*_params.position, std::max (_params.range + 20_nmi, 2.f * _params.range)))
 	{
 		switch (navaid.type())
 		{
@@ -1742,8 +1742,8 @@ HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
 {
 	if (!_params.position)
 		return QPointF();
-	QPointF navaid_pos = EARTH_MEAN_RADIUS.nm() * position.rotated (*_params.position).project_flat();
-	return _features_transform.map (QPointF (to_px (1_nm * navaid_pos.x()), to_px (1_nm * navaid_pos.y())));
+	QPointF navaid_pos = EARTH_MEAN_RADIUS.nmi() * position.rotated (*_params.position).project_flat();
+	return _features_transform.map (QPointF (to_px (1_nmi * navaid_pos.x()), to_px (1_nmi * navaid_pos.y())));
 }
 
 
@@ -1780,7 +1780,7 @@ HSIWidget::PaintWorkUnit::trend_gap() const
 		case DisplayMode::Auxiliary:
 			return 0.0375f * _params.range;
 	}
-	return 0_nm;
+	return 0_nmi;
 }
 
 

@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Length::_supported_units = { "m", "km", "ft", "nm", "mil" };
+std::vector<std::string> Length::_supported_units = { "m", "km", "ft", "nmi", "mil" };
 
 } // namespace SI
 

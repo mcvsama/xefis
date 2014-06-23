@@ -207,7 +207,7 @@ class Navaid
 	LonLat		_position			= { 0_deg, 0_deg };
 	QString		_identifier;
 	QString		_name;
-	Length		_range				= 0_nm;
+	Length		_range				= 0_nmi;
 	Frequency	_frequency			= 0_Hz;
 	Angle		_slaved_variation	= 0_deg; // VOR only
 	Length		_elevation			= 0_ft;

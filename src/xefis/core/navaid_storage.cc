@@ -146,7 +146,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 		return true;
 	};
 
-	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0_nm);
+	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0_nmi);
 	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::ValueType>::max(), inserter_and_predicate);
 
 	return set;
@@ -226,7 +226,7 @@ NavaidStorage::parse_nav_dat()
 				line_ts >> unused_int >> unused_int >> khz >> range >> unused_float >> identifier;
 				// Rest of the line is the name:
 				name = line_ts.readLine();
-				Navaid navaid (Navaid::NDB, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::NDB, pos, identifier, name, 1_nmi * range);
 				navaid.set_frequency (khz * 10_kHz);
 				_navaids_tree.insert (navaid);
 				break;
@@ -240,7 +240,7 @@ NavaidStorage::parse_nav_dat()
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (Navaid::VOR, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::VOR, pos, identifier, name, 1_nmi * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_slaved_variation (1_deg * slaved_variation_deg);
 				navaid.set_elevation (1_ft * elevation_ft);
@@ -265,7 +265,7 @@ NavaidStorage::parse_nav_dat()
 				name = line_ts.readLine();
 				khz *= 10.f;
 
-				Navaid navaid (Navaid::LOC, pos, identifier, name, 1_nm * range);
+				Navaid navaid (Navaid::LOC, pos, identifier, name, 1_nmi * range);
 				navaid.set_frequency (khz * 10_kHz);
 				navaid.set_true_bearing (1_deg * true_bearing_deg);
 				navaid.set_elevation (1_ft * elevation_ft);
@@ -317,7 +317,7 @@ NavaidStorage::parse_fix_dat()
 
 		pos = LonLat (1_deg * pos_lon, 1_deg * pos_lat);
 
-		_navaids_tree.insert (Navaid (Navaid::FIX, pos, identifier, identifier, 0_nm));
+		_navaids_tree.insert (Navaid (Navaid::FIX, pos, identifier, identifier, 0_nmi));
 	}
 
 	_logger << "Loading fixes: done" << std::endl;

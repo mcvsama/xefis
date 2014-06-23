@@ -159,7 +159,7 @@ NavigationComputer::compute_position()
 	_position_accuracy_vertical.copy (_position_input_accuracy_vertical);
 	_position_source.copy (_position_input_source);
 
-	Length const failed_accuracy = 100_nm;
+	Length const failed_accuracy = 100_nmi;
 
 	Position position;
 	position.lateral_position = LonLat (*_position_longitude, *_position_latitude);

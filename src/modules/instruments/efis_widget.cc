@@ -2105,7 +2105,7 @@ EFISWidget::PaintWorkUnit::paint_nav (Xefis::Painter& painter)
 
 		QString dme_val = "DME ---";
 		if (_params.navaid_distance)
-			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % _params.navaid_distance->nm()).str());
+			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % _params.navaid_distance->nmi()).str());
 
 		painter.setPen (Qt::white);
 		painter.setFont (_font_10);

@@ -128,6 +128,7 @@ class Link:
 			Speed,
 			Temperature,
 			Time,
+			Torque,
 			Weight,
 		};
 
@@ -187,6 +188,7 @@ class Link:
 		Xefis::PropertySpeed			_property_speed;
 		Xefis::PropertyTemperature		_property_temperature;
 		Xefis::PropertyTime				_property_time;
+		Xefis::PropertyTorque			_property_torque;
 		Xefis::PropertyWeight			_property_weight;
 		Xefis::PropertyInteger::Type	_integer_value;
 		Xefis::PropertyFloat::Type		_float_value;

@@ -95,7 +95,7 @@ ETA::compute()
 		if (_prev_distance)
 		{
 			Length distance_diff = distance - *_prev_distance;
-			if (distance_diff >= 0_nm)
+			if (distance_diff >= 0_nmi)
 			{
 				_prev_distance = distance;
 				throw SetNil (false);

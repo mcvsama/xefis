@@ -102,7 +102,7 @@
 								<property name='approach.reference-visible' path='/reference-visible' default='true'/>
 								<property name='approach.type-hint' path='/type-hint' default='ILS'/>
 								<property name='approach.localizer-id' path='/identifier-id' default='RSV'/>
-								<property name='approach.dme-distance' path='/dme-distance' default='5.4 nm'/>
+								<property name='approach.dme-distance' path='/dme-distance' default='5.4 nmi'/>
 							</directory>
 							<directory path='/flight-path'>
 								<directory path='/deviation'>

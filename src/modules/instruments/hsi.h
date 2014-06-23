@@ -60,8 +60,8 @@ class HSI: public Xefis::Instrument
 	Length						_arpt_map_range_threshold;
 	Length						_arpt_runway_extension_length;
 	std::array<Time, 3>			_trend_vector_times				= { { 30_s, 60_s, 90_s } };
-	std::array<Length, 3>		_trend_vector_min_ranges		= { { 5_nm, 10_nm, 15_nm } };
-	Length						_trend_vector_max_range			= 30_nm;
+	std::array<Length, 3>		_trend_vector_min_ranges		= { { 5_nmi, 10_nmi, 15_nmi } };
+	Length						_trend_vector_max_range			= 30_nmi;
 	// Input:
 	Xefis::PropertyInteger		_display_mode;
 	Xefis::PropertyLength		_range;
