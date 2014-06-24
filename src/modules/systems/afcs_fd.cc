@@ -91,7 +91,7 @@ AFCS_FD::AFCS_FD (Xefis::ModuleManager* module_manager, QDomElement const& confi
 		{ "measured.fpa", _measured_fpa, true },
 		{ "output.pitch", _output_pitch, true },
 		{ "output.roll", _output_roll, true },
-		{ "disengage-ap", _disengage_ap, true },
+		{ "output.operative", _operative, true },
 	});
 
 	// Update PID params according to settings:
@@ -143,7 +143,7 @@ AFCS_FD::data_updated()
 void
 AFCS_FD::rescue()
 {
-	_disengage_ap.write (true);
+	_operative.write (false);
 }
 
 
@@ -270,8 +270,8 @@ AFCS_FD::compute_fd()
 	_output_pitch.write (1_deg * _output_pitch_smoother.process (_computed_output_pitch.deg(), update_dt));
 	_output_roll.write (1_deg * _output_roll_smoother.process (_computed_output_roll.deg(), update_dt));
 
-	if (disengage || _disengage_ap.is_nil())
-		_disengage_ap.write (disengage);
+	if (disengage || _operative.is_nil())
+		_operative.write (!disengage);
 }
 
 

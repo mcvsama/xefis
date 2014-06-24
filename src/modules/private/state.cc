@@ -140,7 +140,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// EFIS panel
 
-	_efis_mins_mode_button = std::make_unique<Button> ("/panels/mcp/efis/button.mins-mode", [&] {
+	_efis_mins_mode_button = std::make_unique<xf::ButtonAction> (xf::PropertyBoolean ("/panels/mcp/efis/button.mins-mode"), [&] {
 		if (_minimums_type == MinimumsType::Baro)
 			_minimums_type = MinimumsType::Radio;
 		else
@@ -150,7 +150,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// COURSE panel
 
-	_navaid_select_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-main", {
+	_navaid_select_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-main", {
 		{ "/panels/mcp/navaid/button.off", "/panels/mcp/navaid/led.off", -1, true },
 		{ "/panels/mcp/navaid/button.ils", "/panels/mcp/navaid/led.ils", 0 },
 		{ "/panels/mcp/navaid/button.vor-l", "/panels/mcp/navaid/led.vor-l", 1 },
@@ -159,13 +159,13 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// NAVAID L/R panel
 
-	_navaid_left_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-left", {
+	_navaid_left_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-left", {
 		{ "/panels/mcp/navaid-left/button.off", "/panels/mcp/navaid-left/led.off", -1, true },
 		{ "/panels/mcp/navaid-left/button.vor", "/panels/mcp/navaid-left/led.vor", 0 },
 		{ "/panels/mcp/navaid-left/button.home", "/panels/mcp/navaid-left/led.home", 1 },
 	}));
 
-	_navaid_right_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/navaid/selected-right", {
+	_navaid_right_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-right", {
 		{ "/panels/mcp/navaid-right/button.off", "/panels/mcp/navaid-right/led.off", -1, true },
 		{ "/panels/mcp/navaid-right/button.vor", "/panels/mcp/navaid-right/led.vor", 0 },
 		{ "/panels/mcp/navaid-right/button.home", "/panels/mcp/navaid-right/led.home", 1 },
@@ -173,7 +173,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// MFD panel
 
-	_mfd_panel = Unique<ButtonOptions> (new ButtonOptions ("/settings/efis/mfd-mode", {
+	_mfd_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/efis/mfd-mode", {
 		{ "/panels/mcp/mfd/button.eicas", "/panels/mcp/mfd/led.eicas", 0, true },
 		{ "/panels/mcp/mfd/button.nd", "/panels/mcp/mfd/led.nd", 1 },
 		{ "/panels/mcp/mfd/button.chkl", "/panels/mcp/mfd/led.chkl", 2 },
@@ -183,7 +183,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// AFCS/FBW panel
 
-	_afcs_ap_button = std::make_unique<ToggleButton> ("/panels/mcp/afcs/button.ap", "/panels/mcp/afcs/led.ap");
+	_afcs_ap_button = std::make_unique<xf::ToggleButtonAction> ("/panels/mcp/afcs/button.ap", "/panels/mcp/afcs/led.ap");
 	_afcs_ap_button->set_callback ([&](bool state) {
 		if (state)
 			_setting_efis_fd_visible.write (true);
@@ -199,7 +199,7 @@ State::data_updated()
 	for (Xefis::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
-	std::vector<Action*> actions = {
+	std::vector<xf::Action*> actions = {
 		_efis_mins_mode_button.get(),
 		_navaid_select_panel.get(),
 		_navaid_left_panel.get(),

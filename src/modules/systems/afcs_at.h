@@ -29,7 +29,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class Autothrottle: public Xefis::Module
+class AFCS_AT: public Xefis::Module
 {
 	enum class SpeedMode
 	{
@@ -41,7 +41,7 @@ class Autothrottle: public Xefis::Module
 
   public:
 	// Ctor
-	Autothrottle (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_AT (Xefis::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

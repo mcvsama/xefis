@@ -27,203 +27,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
-
-
-class Action
-{
-  public:
-	virtual void
-	data_updated() = 0;
-};
-
-
-class Button: public Action
-{
-  public:
-	typedef std::function<void()> Callback;
-
-  public:
-	// Ctor
-	Button (std::string const& button_path, Callback callback):
-		_callback (callback)
-	{
-		_button.set_path (button_path);
-	}
-
-	// Action API
-	void
-	data_updated() override
-	{
-		if (_button.fresh() && *_button)
-			_callback();
-	}
-
-  protected:
-	Xefis::PropertyBoolean	_button;
-	Callback				_callback;
-};
-
-
-class ToggleButton: public Action
-{
-  public:
-	typedef std::function<void (bool)> Callback;
-
-  public:
-	// Ctor
-	ToggleButton (std::string const& button_path, std::string const& toggle_path)
-	{
-		_button.set_path (button_path);
-		_toggle.set_path (toggle_path);
-	}
-
-	/**
-	 * Set press callback.
-	 */
-	void
-	set_callback (Callback callback)
-	{
-		_callback = callback;
-	}
-
-	/**
-	 * Set to mode that disallows resetting state
-	 * by another press.
-	 */
-	void
-	set_radio_mode()
-	{
-		_radio_mode = true;
-	}
-
-	/**
-	 * Return true if button is pressed.
-	 */
-	bool
-	pressed() const
-	{
-		return _button.read (false);
-	}
-
-	/**
-	 * Set toggle to false.
-	 */
-	void
-	reset()
-	{
-		_toggle.write (false);
-		call();
-	}
-
-	/**
-	 * Return LED state.
-	 */
-	bool
-	active() const
-	{
-		return _toggle.read (false);
-	}
-
-	/**
-	 * Select this option.
-	 */
-	void
-	select()
-	{
-		if (_radio_mode)
-			_toggle.write (true);
-		else
-			_toggle.write (!_toggle.read (false));
-		call();
-	}
-
-	/**
-	 * Call the callback.
-	 */
-	void
-	call()
-	{
-		if (_callback)
-			_callback (_toggle.read (false));
-	}
-
-	// Action API
-	void
-	data_updated() override
-	{
-		if (_button.fresh() && *_button)
-			select();
-	}
-
-  protected:
-	Xefis::PropertyBoolean	_button;
-	Xefis::PropertyBoolean	_toggle;
-	Callback				_callback;
-	bool					_radio_mode = false;
-};
-
-
-class ButtonOptions: public Action
-{
-  public:
-	class Option
-	{
-	  public:
-		// Ctor
-		Option (std::string const& button_path, std::string const& toggle_path, int value, bool is_default = false):
-			button (button_path, toggle_path),
-			value (value),
-			is_default (is_default)
-		{
-			button.set_radio_mode();
-		}
-
-		ToggleButton	button;
-		int				value;
-		bool			is_default;
-	};
-
-	typedef std::vector<Option> Options;
-
-  public:
-	// Ctor
-	ButtonOptions (std::string const& value_path, Options const& options):
-		_options (options)
-	{
-		_value_target.set_path (value_path);
-
-		// Press the "default" button:
-		for (Option& option: _options)
-			if (option.is_default)
-				option.button.select();
-	}
-
-	// Action API
-	void
-	data_updated() override
-	{
-		for (Option& option: _options)
-			option.button.data_updated();
-
-		for (Option& option: _options)
-		{
-			if (option.button.pressed())
-			{
-				for (Option& option_to_reset: _options)
-					if (&option_to_reset != &option)
-						option_to_reset.button.reset();
-				_value_target.write (option.value);
-				break;
-			}
-		}
-	}
-
-  private:
-	Options					_options;
-	Xefis::PropertyInteger	_value_target;
-};
 
 
 class State: public Xefis::Module
@@ -389,12 +195,12 @@ class State: public Xefis::Module
 	Angle								_course						= 0_deg;
 	bool								_course_visible				= false;
 	// Logic:
-	Unique<Button>						_efis_mins_mode_button;
-	Unique<ButtonOptions>				_navaid_select_panel;
-	Unique<ButtonOptions>				_navaid_left_panel;
-	Unique<ButtonOptions>				_navaid_right_panel;
-	Unique<ToggleButton>				_afcs_ap_button;
-	Unique<ButtonOptions>				_mfd_panel;
+	Unique<xf::ButtonAction>			_efis_mins_mode_button;
+	Unique<xf::ButtonOptionsAction>		_navaid_select_panel;
+	Unique<xf::ButtonOptionsAction>		_navaid_left_panel;
+	Unique<xf::ButtonOptionsAction>		_navaid_right_panel;
+	Unique<xf::ToggleButtonAction>		_afcs_ap_button;
+	Unique<xf::ButtonOptionsAction>		_mfd_panel;
 	// Buttons, switches, knobs:
 	Xefis::PropertyInteger				_mcp_mins_value;
 	Unique<Xefis::DeltaDecoder>			_mcp_mins_decoder;

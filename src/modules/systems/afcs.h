@@ -25,21 +25,73 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
-#include <modules/systems/fly_by_wire.h>
 
 
-class AutomatedFlightControlSystem: public Xefis::Module
+class AFCS: public xf::Module
 {
-	static constexpr Xefis::Range<Speed>	CmdSpeedRange			= { 10_kt, 300_kt };
-	static constexpr Xefis::Range<Length>	CmdAltitudeRange		= { 0_ft, 50000_ft };
-	static constexpr Speed					CmdVSpdStep				= 10_fpm;
-	static constexpr Xefis::Range<Speed>	CmdVSpdRange			= { -8000_fpm, 8000_fpm };
-	static constexpr Angle					HeadingHoldPitchLimit	= 30_deg;
-	static constexpr Angle					AltitudeHoldRollLimit	= 30_deg;
+	static constexpr xf::Range<Speed>	SpeedRange				= { 10_kt, 300_kt };
+	static constexpr xf::Range<Length>	AltitudeRange			= { 0_ft, 50000_ft };
+	static constexpr Speed				VSpdStep				= 10_fpm;
+	static constexpr xf::Range<Speed>	VSpdRange				= { -8000_fpm, +8000_fpm };
+	static constexpr Angle				FPAStep					= 0.1_deg;
+	static constexpr xf::Range<Angle>	FPARange				= { -10_deg, +10_deg };
+	static constexpr Angle				HeadingHoldPitchLimit	= 30_deg;
+	static constexpr Angle				AltitudeHoldRollLimit	= 30_deg;
 
-	enum class CmdAltitudeStep
+	class DisengageAP: public std::runtime_error
+	{
+	  public:
+		using runtime_error::runtime_error;
+	};
+
+	class DisengageAT: public std::runtime_error
+	{
+	  public:
+		using runtime_error::runtime_error;
+	};
+
+	class Disengage: public std::runtime_error
+	{
+	  public:
+		using runtime_error::runtime_error;
+	};
+
+	class InvalidState: public xf::Exception
+	{
+	  public:
+		InvalidState():
+			Exception ("invalid AFCS state")
+		{ }
+	};
+
+	enum class FlightStage
+	{
+		Cruise,
+		Approach,
+	};
+
+	enum class SpeedUnits
+	{
+		KIAS,
+		Mach,
+	};
+
+	enum class LateralDirection
+	{
+		Heading,
+		Track,
+	};
+
+	enum class PitchUnits
+	{
+		VS,
+		FPA,
+	};
+
+	enum class AltitudeStep
 	{
 		Ft10,
 		Ft100,
@@ -63,11 +115,15 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	{
 		None		= 0,
 		HDG_SEL		= 1,
-		HDG			= 2,
-		TRK_SEL		= 3,
-		TRK			= 4,
-		LOC			= 5,
-		sentinel	= 6,
+		HDG_HOLD	= 2,
+		HDG			= 3,
+		TRK_SEL		= 4,
+		TRK_HOLD	= 5,
+		TRK			= 6,
+		LOC			= 7,
+		WNG_LVL		= 8,
+		LNAV		= 9,
+		sentinel	= 10,
 	};
 
 	enum class PitchMode
@@ -89,36 +145,85 @@ class AutomatedFlightControlSystem: public Xefis::Module
 
   public:
 	// Ctor
-	AutomatedFlightControlSystem (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
 	data_updated() override;
 
   private:
-	void
-	prepare_afcs_main_panel();
+	/*
+	 * Button and knob callbacks.
+	 */
 
 	void
-	process_afcs_main_panel();
+	button_press_ap();
 
 	void
-	prepare_speed_panel();
+	button_press_at();
 
 	void
-	prepare_heading_panel();
+	button_press_yd();
 
 	void
-	prepare_nav_panel();
+	button_press_speed_ias_mach();
 
 	void
-	prepare_altitude_panel();
+	apply_pitch_changes_for_airspeed_via_at();
 
 	void
-	process_altitude_panel();
+	button_press_speed_sel();
 
 	void
-	prepare_vspd_panel();
+	button_press_speed_hold();
+
+	void
+	button_press_heading_hdg_trk();
+
+	void
+	button_press_heading_sel();
+
+	void
+	button_press_heading_hold();
+
+	void
+	button_press_vnav();
+
+	void
+	button_press_lnav();
+
+	void
+	button_press_app();
+
+	void
+	button_press_altitude_stepch();
+
+	void
+	button_press_altitude_flch();
+
+	void
+	button_press_altitude_hold();
+
+	void
+	button_press_vspd_vs_fpa();
+
+	void
+	button_press_vspd_sel();
+
+	void
+	button_press_vspd_clb_con();
+
+	void
+	knob_speed (int delta);
+
+	void
+	knob_heading (int delta);
+
+	void
+	knob_altitude (int delta);
+
+	void
+	knob_vspd (int delta);
 
 	/**
 	 * Compute and solve settings of Flight Director.
@@ -133,88 +238,185 @@ class AutomatedFlightControlSystem: public Xefis::Module
 	update_efis();
 
 	/**
-	 * Return true if given button is fresh() and set to true.
+	 * Disengage A/P.
+	 * From data_updated() it's better to throw DisengageAP.
 	 */
-	static bool
-	pressed (Xefis::PropertyBoolean const&);
+	void
+	disengage_ap (const char* reason);
+
+	/**
+	 * Disengage A/T.
+	 * From data_updated() it's better to throw DisengageAT.
+	 */
+	void
+	disengage_at (const char* reason);
+
+	/**
+	 * Set spd reference for given flight stage.
+	 */
+	void
+	set_spd_ref_for_flight_stage (FlightStage stage);
+
+	/**
+	 * Return current V/S rounded to _vertical_speed_rounding.
+	 */
+	Speed
+	current_rounded_vs() const;
+
+	/**
+	 * Return true if A/T operates in thrust mode.
+	 */
+	bool
+	at_in_thrust_mode();
+
+	/**
+	 * Return true if A/T operates in speed mode.
+	 */
+	bool
+	at_in_speed_mode();
+
+	/**
+	 * Return true if pitch mode is engaged in flight level change mode.
+	 */
+	bool
+	flch_engaged();
+
+	/**
+	 * Create a Unique<ButtonAction> for button press.
+	 * Wrap button press callback and add call to solve_mode() at the end.
+	 */
+	Unique<xf::ButtonAction>
+	make_button_action (xf::PropertyBoolean, void (AFCS::* callback)());
+
+	/**
+	 * Create a knob action for knob movement.
+	 * Wrap knob rotate callback and add call to solve_mode() at the end.
+	 */
+	Unique<xf::DeltaDecoder>
+	make_knob_action (xf::PropertyInteger, void (AFCS::* callback)(int));
 
   private:
-	bool								_ap_on						= false;
-	bool								_at_on						= false;
-	bool								_yd_on						= false;
-	bool								_att_on						= false;
-	Speed								_cmd_speed_counter			= CmdSpeedRange.min();
-	Angle								_cmd_heading_counter		= 0_deg;
-	Length								_cmd_altitude_counter		= 1000_ft;
-	Speed								_cmd_vspd_counter			= 0_fpm;
-	CmdAltitudeStep						_cmd_altitude_step			= CmdAltitudeStep::Ft10;
-	SpeedMode							_speed_mode					= SpeedMode::None;
-	RollMode							_roll_mode					= RollMode::None;
-	PitchMode							_pitch_mode					= PitchMode::None;
+	// Settings:
+	Speed							_altitude_hold_threshold_vs	= 100_fpm;
+	Speed							_vertical_speed_rounding	= 100_fpm;
+	// State:
+	FlightStage						_flight_stage				= FlightStage::Cruise;
+	SpeedUnits						_speed_units				= SpeedUnits::KIAS;
+	LateralDirection				_lateral_direction			= LateralDirection::Track;
+	PitchUnits						_pitch_units				= PitchUnits::VS;
+	AltitudeStep					_altitude_step				= AltitudeStep::Ft10;
+	Speed							_ias_counter				= SpeedRange.min();
+	xf::PropertyFloat::Type			_mach_counter				= 0.0;
+	Angle							_heading_counter			= 0_deg;
+	Length							_altitude_counter			= 1000_ft;
+	Speed							_vspd_counter				= 0_fpm;
+	Angle							_fpa_counter				= 0_deg;
+	SpeedMode						_speed_mode					= SpeedMode::None;
+	RollMode						_roll_mode					= RollMode::None;
+	PitchMode						_pitch_mode					= PitchMode::None;
+	Speed							_hold_ias;
+	xf::PropertyFloat::Type			_hold_mach;
+	Angle							_hold_magnetic_heading_or_track;
+	Length							_hold_altitude_amsl;
+	Speed							_hold_vs;
+	Angle							_hold_fpa;
+	bool							_ap_on						= false;
+	bool							_at_on						= false;
+	bool							_yd_on						= false;
+	// Measurements:
+	xf::PropertySpeed				_measured_vs;
+	xf::PropertyLength				_measured_altitude_amsl;
+	xf::PropertyAngle				_measured_magnetic_heading;
+	xf::PropertyAngle				_measured_magnetic_track;
+	xf::PropertyAngle				_measured_vertical_track;
+	// Config:
+	xf::PropertyFrequency			_thr_ref_for_cruise;
+	xf::PropertyFrequency			_thr_ref_for_climb;
+	xf::PropertyFrequency			_thr_ref_for_descent;
+	xf::PropertySpeed				_spd_ref_for_cruise;
+	xf::PropertySpeed				_spd_ref_for_approach;
 	// Buttons, encoders:
-	Xefis::PropertyBoolean				_mcp_ap;
-	Xefis::PropertyBoolean				_mcp_at;
-	Xefis::PropertyBoolean				_mcp_yd;
-	Xefis::PropertyBoolean				_mcp_prot;
-	Xefis::PropertyBoolean				_mcp_tac;
-	Xefis::PropertyBoolean				_mcp_att;
-	Xefis::PropertyInteger				_mcp_speed_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_speed_decoder;
-	Xefis::PropertyBoolean				_mcp_speed_ias_mach;
-	Xefis::PropertyBoolean				_mcp_speed_sel;
-	Xefis::PropertyBoolean				_mcp_speed_hold;
-	Xefis::PropertyInteger				_mcp_heading_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_heading_decoder;
-	Xefis::PropertyBoolean				_mcp_heading_hdg_trk;
-	Xefis::PropertyBoolean				_mcp_heading_sel;
-	Xefis::PropertyBoolean				_mcp_heading_hold;
-	Xefis::PropertyBoolean				_mcp_vnav;
-	Xefis::PropertyBoolean				_mcp_lnav;
-	Xefis::PropertyBoolean				_mcp_app;
-	Xefis::PropertyInteger				_mcp_altitude_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_altitude_decoder;
-	Xefis::PropertyBoolean				_mcp_altitude_stepch;
-	Xefis::PropertyBoolean				_mcp_altitude_flch;
-	Xefis::PropertyBoolean				_mcp_altitude_hold;
-	Xefis::PropertyInteger				_mcp_vspd_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_vspd_decoder;
-	Xefis::PropertyBoolean				_mcp_vspd_vs_fpa;
-	Xefis::PropertyBoolean				_mcp_vspd_sel;
-	Xefis::PropertyBoolean				_mcp_vspd_clb_con;
-	// LEDs, displays:
-	Xefis::PropertyInteger				_mcp_speed_display;
-	Xefis::PropertyInteger				_mcp_heading_display;
-	Xefis::PropertyInteger				_mcp_altitude_display;
-	Xefis::PropertyInteger				_mcp_vspd_display;
-	Xefis::PropertyBoolean				_mcp_ap_led;
-	Xefis::PropertyBoolean				_mcp_at_led;
-	Xefis::PropertyBoolean				_mcp_yd_led;
-	Xefis::PropertyBoolean				_mcp_att_led;
-	Xefis::PropertyBoolean				_mcp_speed_sel_led;
-	Xefis::PropertyBoolean				_mcp_speed_hold_led;
-	Xefis::PropertyBoolean				_mcp_heading_sel_led;
-	Xefis::PropertyBoolean				_mcp_heading_hold_led;
-	Xefis::PropertyBoolean				_mcp_vnav_led;
-	Xefis::PropertyBoolean				_mcp_lnav_led;
-	Xefis::PropertyBoolean				_mcp_app_led;
-	Xefis::PropertyBoolean				_mcp_altitude_flch_led;
-	Xefis::PropertyBoolean				_mcp_altitude_hold_led;
-	Xefis::PropertyBoolean				_mcp_vspd_sel_led;
-	Xefis::PropertyBoolean				_mcp_vspd_clb_con_led;
+	xf::PropertyBoolean				_mcp_ap_button;
+	Unique<xf::ButtonAction>		_mcp_ap_action;
+	xf::PropertyBoolean				_mcp_ap_led;
+	xf::PropertyBoolean				_mcp_at_button;
+	Unique<xf::ButtonAction>		_mcp_at_action;
+	xf::PropertyBoolean				_mcp_at_led;
+	xf::PropertyBoolean				_mcp_yd_button;
+	Unique<xf::ButtonAction>		_mcp_yd_action;
+	xf::PropertyBoolean				_mcp_yd_led;
+	xf::PropertyInteger				_mcp_speed_knob;
+	Unique<xf::DeltaDecoder>		_mcp_speed_decoder;
+	xf::PropertyInteger				_mcp_speed_display;
+	xf::PropertyBoolean				_mcp_speed_ias_mach_button;
+	Unique<xf::ButtonAction>		_mcp_speed_ias_mach_action;
+	xf::PropertyBoolean				_mcp_speed_sel_button;
+	Unique<xf::ButtonAction>		_mcp_speed_sel_action;
+	xf::PropertyBoolean				_mcp_speed_sel_led;
+	xf::PropertyBoolean				_mcp_speed_hold_button;
+	Unique<xf::ButtonAction>		_mcp_speed_hold_action;
+	xf::PropertyBoolean				_mcp_speed_hold_led;
+	xf::PropertyInteger				_mcp_heading_knob;
+	Unique<xf::DeltaDecoder>		_mcp_heading_decoder;
+	xf::PropertyInteger				_mcp_heading_display;
+	xf::PropertyBoolean				_mcp_heading_hdg_trk_button;
+	Unique<xf::ButtonAction>		_mcp_heading_hdg_trk_action;
+	xf::PropertyBoolean				_mcp_heading_sel_button;
+	Unique<xf::ButtonAction>		_mcp_heading_sel_action;
+	xf::PropertyBoolean				_mcp_heading_sel_led;
+	xf::PropertyBoolean				_mcp_heading_hold_button;
+	Unique<xf::ButtonAction>		_mcp_heading_hold_action;
+	xf::PropertyBoolean				_mcp_heading_hold_led;
+	xf::PropertyBoolean				_mcp_vnav_button;
+	Unique<xf::ButtonAction>		_mcp_vnav_action;
+	xf::PropertyBoolean				_mcp_vnav_led;
+	xf::PropertyBoolean				_mcp_lnav_button;
+	Unique<xf::ButtonAction>		_mcp_lnav_action;
+	xf::PropertyBoolean				_mcp_lnav_led;
+	xf::PropertyBoolean				_mcp_app_button;
+	Unique<xf::ButtonAction>		_mcp_app_action;
+	xf::PropertyBoolean				_mcp_app_led;
+	xf::PropertyInteger				_mcp_altitude_knob;
+	Unique<xf::DeltaDecoder>		_mcp_altitude_decoder;
+	xf::PropertyInteger				_mcp_altitude_display;
+	xf::PropertyBoolean				_mcp_altitude_stepch_button;
+	Unique<xf::ButtonAction>		_mcp_altitude_stepch_action;
+	xf::PropertyBoolean				_mcp_altitude_flch_button;
+	Unique<xf::ButtonAction>		_mcp_altitude_flch_action;
+	xf::PropertyBoolean				_mcp_altitude_flch_led;
+	xf::PropertyBoolean				_mcp_altitude_hold_button;
+	Unique<xf::ButtonAction>		_mcp_altitude_hold_action;
+	xf::PropertyBoolean				_mcp_altitude_hold_led;
+	xf::PropertyInteger				_mcp_vspd_knob;
+	Unique<xf::DeltaDecoder>		_mcp_vspd_decoder;
+	xf::PropertyInteger				_mcp_vspd_display;
+	xf::PropertyBoolean				_mcp_vspd_vs_fpa_button;
+	Unique<xf::ButtonAction>		_mcp_vspd_vs_fpa_action;
+	xf::PropertyBoolean				_mcp_vspd_sel_button;
+	Unique<xf::ButtonAction>		_mcp_vspd_sel_action;
+	xf::PropertyBoolean				_mcp_vspd_sel_led;
+	xf::PropertyBoolean				_mcp_vspd_clb_con_button;
+	Unique<xf::ButtonAction>		_mcp_vspd_clb_con_action;
+	xf::PropertyBoolean				_mcp_vspd_clb_con_led;
 	// Output:
-	Xefis::PropertyInteger				_fbw_attitude_mode;
-	Xefis::PropertyInteger				_fbw_throttle_mode;
-	Xefis::PropertyInteger				_cmd_roll_mode;
-	Xefis::PropertyInteger				_cmd_pitch_mode;
-	Xefis::PropertySpeed				_cmd_ias;
-	Xefis::PropertyAngle				_cmd_heading_track;
-	Xefis::PropertyLength				_cmd_altitude;
-	Xefis::PropertySpeed				_cmd_vspd;
-	Xefis::PropertyAngle				_cmd_fpa;
-	Xefis::PropertyString				_flight_mode;
-	Xefis::PropertyBoolean				_yaw_damper_enabled;
+	xf::PropertyInteger				_cmd_roll_mode;
+	xf::PropertyInteger				_cmd_pitch_mode;
+	xf::PropertySpeed				_cmd_ias;
+	xf::PropertyFloat				_cmd_mach;
+	xf::PropertyAngle				_cmd_magnetic_heading_track;
+	xf::PropertyLength				_cmd_altitude;
+	xf::PropertySpeed				_cmd_vs;
+	xf::PropertyAngle				_cmd_fpa;
+	xf::PropertyFrequency			_thr_ref;
+	xf::PropertySpeed				_spd_ref;
+	xf::PropertyBoolean				_yaw_damper_enabled;
+	xf::PropertyString				_flight_mode_hint;
+	xf::PropertyString				_flight_mode_speed_hint;
+	xf::PropertyString				_flight_mode_roll_hint;
+	xf::PropertyString				_flight_mode_pitch_hint;
 	// Other:
-	std::vector<Xefis::DeltaDecoder*>	_rotary_decoders;
+	std::vector<xf::Action*>		_button_actions;
+	std::vector<xf::DeltaDecoder*>	_rotary_decoders;
 };
 
 #endif

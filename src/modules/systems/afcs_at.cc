@@ -23,13 +23,13 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "autothrottle.h"
+#include "afcs_at.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/autothrottle", Autothrottle);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-at", AFCS_AT);
 
 
-Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_AT::AFCS_AT (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0)
 {
@@ -60,7 +60,7 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 	_ias_pid.set_output_smoothing (true, 250_ms);
 
 	_thrust_computer.set_minimum_dt (5_ms);
-	_thrust_computer.set_callback (std::bind (&Autothrottle::compute_thrust, this));
+	_thrust_computer.set_callback (std::bind (&AFCS_AT::compute_thrust, this));
 	_thrust_computer.add_depending_smoothers ({
 		&_ias_pid.output_smoother(),
 	});
@@ -76,14 +76,14 @@ Autothrottle::Autothrottle (Xefis::ModuleManager* module_manager, QDomElement co
 
 
 void
-Autothrottle::data_updated()
+AFCS_AT::data_updated()
 {
 	_thrust_computer.data_updated (update_time());
 }
 
 
 void
-Autothrottle::compute_thrust()
+AFCS_AT::compute_thrust()
 {
 	bool disengage = false;
 	Frequency computed_thrust = 0.0_rpm;
@@ -132,7 +132,7 @@ Autothrottle::compute_thrust()
 
 
 void
-Autothrottle::speed_mode_changed()
+AFCS_AT::speed_mode_changed()
 {
 	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_speed_mode.read (-1), 0, static_cast<decltype (m)> (SpeedMode::sentinel) - 1);
 	_speed_mode = static_cast<SpeedMode> (m);
