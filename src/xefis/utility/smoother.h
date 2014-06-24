@@ -40,6 +40,12 @@ class SmootherBase
 	virtual ~SmootherBase() {}
 
 	/**
+	 * Return smoothing time.
+	 */
+	Time
+	smoothing_time() const noexcept;
+
+	/**
 	 * Set new smoothing time.
 	 * It's the size of the smoothing window. After that time, output value will reach target value.
 	 */
@@ -47,10 +53,10 @@ class SmootherBase
 	set_smoothing_time (Time smoothing_time) noexcept;
 
 	/**
-	 * Return smoothing time.
+	 * Return sampling precision.
 	 */
 	Time
-	smoothing_time() const noexcept;
+	precision() const noexcept;
 
 	/**
 	 * Set sampling precision.
@@ -149,6 +155,13 @@ template<class tValueType>
 	};
 
 
+inline Time
+SmootherBase::smoothing_time() const noexcept
+{
+	return _smoothing_time;
+}
+
+
 inline void
 SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
 {
@@ -163,9 +176,9 @@ SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
 
 
 inline Time
-SmootherBase::smoothing_time() const noexcept
+SmootherBase::precision() const noexcept
 {
-	return _smoothing_time;
+	return _precision;
 }
 
 

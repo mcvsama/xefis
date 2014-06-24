@@ -126,7 +126,7 @@ class AFCS_FD: public Xefis::Module
 	// Output:
 	Xefis::PropertyAngle		_output_pitch;
 	Xefis::PropertyAngle		_output_roll;
-	Xefis::PropertyBoolean		_disengage_ap;
+	Xefis::PropertyBoolean		_operative;
 	// Other:
 	Xefis::PropertyObserver		_fd_computer;
 };

@@ -173,6 +173,7 @@ XEFIS_MOCHDRS += xefis/hardware/serial_port.h
 
 ######## /xefis/utility ########
 
+XEFIS_HEADERS += xefis/utility/actions.h
 XEFIS_HEADERS += xefis/utility/backtrace.h
 XEFIS_HEADERS += xefis/utility/convergence.h
 XEFIS_HEADERS += xefis/utility/delta_decoder.h
@@ -200,6 +201,7 @@ XEFIS_HEADERS += xefis/utility/text_layout.h
 XEFIS_HEADERS += xefis/utility/text_painter.h
 XEFIS_HEADERS += xefis/utility/thread.h
 XEFIS_HEADERS += xefis/utility/time.h
+XEFIS_HEADERS += xefis/utility/transistor.h
 
 XEFIS_SOURCES += xefis/utility/backtrace.cc
 XEFIS_SOURCES += xefis/utility/delta_decoder.cc
@@ -237,12 +239,14 @@ XEFIS_HEADERS += modules/helpers/lonlat_translator.h
 XEFIS_HEADERS += modules/helpers/navaid_selector.h
 XEFIS_HEADERS += modules/helpers/sound.h
 XEFIS_HEADERS += modules/helpers/string_translator.h
+XEFIS_HEADERS += modules/helpers/transistor.h
 
 XEFIS_SOURCES += modules/helpers/ahrs_selector.cc
 XEFIS_SOURCES += modules/helpers/lonlat_translator.cc
 XEFIS_SOURCES += modules/helpers/navaid_selector.cc
 XEFIS_SOURCES += modules/helpers/sound.cc
 XEFIS_SOURCES += modules/helpers/string_translator.cc
+XEFIS_SOURCES += modules/helpers/transistor.cc
 
 XEFIS_MOCHDRS += modules/helpers/sound.h
 
@@ -347,6 +351,7 @@ XEFIS_MOCHDRS += modules/log/klog.h
 
 XEFIS_HEADERS += modules/systems/adc.h
 XEFIS_HEADERS += modules/systems/afcs.h
+XEFIS_HEADERS += modules/systems/afcs_ap.h
 XEFIS_HEADERS += modules/systems/afcs_at.h
 XEFIS_HEADERS += modules/systems/afcs_eac_yd.h
 XEFIS_HEADERS += modules/systems/afcs_fd.h
@@ -372,6 +377,7 @@ XEFIS_HEADERS += modules/systems/watchdog.h
 
 XEFIS_SOURCES += modules/systems/adc.cc
 XEFIS_SOURCES += modules/systems/afcs.cc
+XEFIS_SOURCES += modules/systems/afcs_ap.cc
 XEFIS_SOURCES += modules/systems/afcs_at.cc
 XEFIS_SOURCES += modules/systems/afcs_eac_yd.cc
 XEFIS_SOURCES += modules/systems/afcs_fd.cc

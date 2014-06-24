@@ -64,23 +64,24 @@ h1 {
 section section h1,
 h2 {
 	font-size: 160%;
-	margin: 1em 0;
+	margin: 1.5em 0 0.5em;
 }
 
 section section section h1,
 h3 {
 	font-size: 120%;
-	margin: 1em 0;
+	margin: 2em 0 0.5em;
 }
 
 section section section section h1,
 h4 {
 	font-size: 100%;
-	margin: 1em 0;
+	margin: 2em 0 0.5em;
 }
 
 p {
 	text-align: justify;
+	margin: 0.5em 0;
 }
 
 tt, pre, code {
