@@ -128,7 +128,7 @@ HT16K33::SingleLed::SingleLed (QDomElement const& element)
 
 	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 0, 15);
 	_column = Xefis::limit<int> (element.attribute ("column").toInt(), 0, 7);
-	_property_boolean.set_path (element.attribute ("path").toStdString());
+	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 }
 
 
@@ -145,7 +145,7 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 
 	if (!element.hasAttribute ("path"))
 		throw Xefis::MissingDomAttribute (element, "path");
-	_property.set_path (element.attribute ("path").toStdString());
+	_property.set_path (xf::PropertyPath (element.attribute ("path")));
 
 	for (QDomElement& e: element)
 	{
@@ -246,7 +246,7 @@ HT16K33::SingleSwitch::SingleSwitch (QDomElement const& element)
 {
 	if (!element.hasAttribute ("path"))
 		throw Xefis::MissingDomAttribute (element, "path");
-	_property_boolean.set_path (element.attribute ("path").toStdString());
+	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 
 	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 3, 15);
 	_column = Xefis::limit<int> (element.attribute ("column").toInt(), 1, 3);

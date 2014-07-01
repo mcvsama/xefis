@@ -20,6 +20,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
 #include <memory>
 #include <type_traits>
 #include <stdint.h>
@@ -34,6 +35,7 @@
 #include <xefis/utility/string.h>
 
 #include "property_storage.h"
+#include "property_utils.h"
 
 
 namespace Xefis {
@@ -45,40 +47,6 @@ template<class T>
 	class PropertyValueNode;
 
 typedef std::list<PropertyNode*> PropertyNodeList;
-
-
-/**
- * Indicates a nil-node, for example when trying to read
- * the value of such node.
- */
-class NilNode: public Exception
-{
-  public:
-	NilNode();
-};
-
-
-/**
- * Indicates invalid operation on node of a specific type,
- * for example attempt to read int value of a directory-type
- * node.
- */
-class PropertyAccessError: public Exception
-{
-  public:
-	PropertyAccessError (std::string const& message);
-};
-
-
-/**
- * Indicates that there was a path conflict while creating
- * directory path with mkpath().
- */
-class PropertyPathConflict: public Exception
-{
-  public:
-	PropertyPathConflict (std::string const& message);
-};
 
 
 /**
@@ -115,7 +83,7 @@ class PropertyNode: private Noncopyable
 	/**
 	 * Return node path.
 	 */
-	std::string const&
+	PropertyPath const&
 	path() const noexcept;
 
 	/**
@@ -167,7 +135,7 @@ class PropertyNode: private Noncopyable
 	PropertyDirectoryNode*	_parent		= nullptr;
 	PropertyStorage*		_storage	= nullptr;
 	std::string				_name;
-	std::string				_path;
+	PropertyPath			_path;
 	Serial					_serial		= 0;
 };
 
@@ -217,7 +185,7 @@ class PropertyDirectoryNode: public PropertyNode
 	 * For accessing direct descendands, child() is faster.
 	 */
 	PropertyNode*
-	locate (std::string const& path);
+	locate (PropertyPath const& path);
 
 	/**
 	 * Create directory hierarchy. Return bottom-leaf directory node.
@@ -226,7 +194,7 @@ class PropertyDirectoryNode: public PropertyNode
 	 * The part already created will remain in there.
 	 */
 	PropertyDirectoryNode*
-	mkpath (std::string const& path);
+	mkpath (PropertyPath const& path);
 
 	/**
 	 * Add new property as a subproperty.
@@ -413,24 +381,6 @@ template<class tType>
 
 
 inline
-NilNode::NilNode():
-	Exception ("accessed a nil-node")
-{ }
-
-
-inline
-PropertyAccessError::PropertyAccessError (std::string const& message):
-	Exception (message)
-{ }
-
-
-inline
-PropertyPathConflict::PropertyPathConflict (std::string const& message):
-	Exception (message)
-{ }
-
-
-inline
 PropertyNode::PropertyNode (PropertyStorage* storage)
 {
 	_storage = storage;
@@ -455,7 +405,7 @@ PropertyNode::name() const noexcept
 }
 
 
-inline std::string const&
+inline PropertyPath const&
 PropertyNode::path() const noexcept
 {
 	return _path;

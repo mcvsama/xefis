@@ -60,9 +60,9 @@ PropertyStorage::default_storage()
 
 
 PropertyNode*
-PropertyStorage::locate (std::string const& path) const
+PropertyStorage::locate (PropertyPath const& path) const
 {
-	auto it = _properties_by_path.find (path);
+	auto it = _properties_by_path.find (path.string());
 	if (it == _properties_by_path.end())
 		return nullptr;
 	return it->second;
@@ -72,14 +72,14 @@ PropertyStorage::locate (std::string const& path) const
 void
 PropertyStorage::cache_path (PropertyNode* node)
 {
-	_properties_by_path[node->path()] = node;
+	_properties_by_path[node->path().string()] = node;
 }
 
 
 void
-PropertyStorage::uncache_path (std::string const& old_path)
+PropertyStorage::uncache_path (PropertyPath const& old_path)
 {
-	_properties_by_path.erase (old_path);
+	_properties_by_path.erase (old_path.string());
 }
 
 } // namespace Xefis

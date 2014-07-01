@@ -105,7 +105,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 				for (QDomElement& v: e)
 				{
 					if (v == "path")
-						axis->alt_prop.set_path (v.text().toStdString());
+						axis->alt_prop.set_path (xf::PropertyPath (v.text()));
 					else if (v == "center")
 						axis->center = v.text().toFloat();
 					else if (v == "dead-zone")
@@ -141,7 +141,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 				for (QDomElement& v: e)
 				{
 					if (v == "path")
-						button->alt_prop.set_path (v.text().toStdString());
+						button->alt_prop.set_path (xf::PropertyPath (v.text()));
 				}
 
 				_buttons[id] = button;
@@ -237,8 +237,8 @@ JoystickInput::read()
 					button = _buttons[ev.number];
 					if (!button)
 						button = _buttons[ev.number] = std::make_shared<Button>();
-					QString path = QString ("%1/button/%2").arg (_prop_path).arg (ev.number);
-					_buttons[ev.number]->prop.set_path (path.toStdString());
+					xf::PropertyPath path (QString ("%1/button/%2").arg (_prop_path).arg (ev.number));
+					_buttons[ev.number]->prop.set_path (path);
 				}
 				else
 				{
@@ -261,8 +261,8 @@ JoystickInput::read()
 					axis = _axes[ev.number];
 					if (!axis)
 						axis = _axes[ev.number] = std::make_shared<Axis>();
-					QString path = QString ("%1/axis/%2").arg (_prop_path).arg (ev.number);
-					_axes[ev.number]->prop.set_path (path.toStdString());
+					xf::PropertyPath path (QString ("%1/axis/%2").arg (_prop_path).arg (ev.number));
+					_axes[ev.number]->prop.set_path (path);
 				}
 				else
 				{

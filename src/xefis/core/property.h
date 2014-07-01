@@ -30,73 +30,10 @@
 // Local:
 #include "property_node.h"
 #include "property_storage.h"
+#include "property_utils.h"
 
 
 namespace Xefis {
-
-/**
- * Indicates that property tried to be read
- * could not be found in the node tree.
- */
-class PropertyNotFound: public Exception
-{
-  public:
-	explicit PropertyNotFound (std::string const& message);
-};
-
-
-/**
- * Indicates that the property is singular (not attached to any tree)
- * and can't be written or read.
- */
-class SingularProperty: public Exception
-{
-  public:
-	explicit SingularProperty (std::string const& message);
-};
-
-
-/**
- * Indicates that the operation is invalid on certain
- * node type.
- */
-class InvalidOperation: public Exception
-{
-  public:
-	explicit InvalidOperation (std::string const& message);
-};
-
-
-/**
- * Indicates that there's type conflict between existing property
- * and property requested to be created.
- */
-class TypeConflict: public Exception
-{
-  public:
-	explicit TypeConflict (std::string const& path);
-};
-
-
-/**
- * Indicates that given string is not a valid supported type.
- */
-class BadType: public Exception
-{
-  public:
-	explicit BadType (std::string const& name);
-};
-
-
-/**
- * Indicates that there was an error during stringify operation.
- */
-class StringifyError: public Exception
-{
-  public:
-	explicit StringifyError (std::string const& message);
-};
-
 
 class GenericProperty
 {
@@ -112,10 +49,10 @@ class GenericProperty
 	operator= (GenericProperty const&) = default;
 
 	// Ctor
-	GenericProperty (std::string path);
+	GenericProperty (PropertyPath const& path);
 
 	// Ctor
-	GenericProperty (PropertyDirectoryNode* root, std::string path);
+	GenericProperty (PropertyDirectoryNode* root, PropertyPath const& path);
 
 	// Dtor
 	virtual ~GenericProperty();
@@ -154,14 +91,14 @@ class GenericProperty
 	/**
 	 * Return property path.
 	 */
-	std::string const&
+	PropertyPath const&
 	path() const noexcept;
 
 	/**
 	 * Point this property to another PropertyNode.
 	 */
 	void
-	set_path (std::string const&);
+	set_path (PropertyPath const&);
 
 	/**
 	 * Return the serial value of the property.
@@ -233,13 +170,13 @@ class GenericProperty
 	 * Normalize path so if there's "//" in it,
 	 * it will be replaced by leading "/".
 	 */
-	static std::string
-	normalized_path (std::string path);
+	static PropertyPath
+	normalized_path (PropertyPath path);
 
   protected:
 	PropertyDirectoryNode*			_root = nullptr;
 	mutable PropertyNode*			_node = nullptr;
-	std::string						_path;
+	PropertyPath					_path;
 	mutable PropertyNode::Serial	_last_read_serial = 0;
 };
 
@@ -291,7 +228,7 @@ class TypedProperty: public GenericProperty
 	 * 			when type doesn't name correct type.
 	 */
 	static void
-	create (std::string const& path, std::string const& type);
+	create (PropertyPath const& path, PropertyType const& type);
 };
 
 
@@ -323,13 +260,13 @@ template<class tType>
 		 * NOTE: The PropertyStorage must be initialized before attempting
 		 * to use this constructor.
 		 */
-		Property (std::string const& path);
+		Property (PropertyPath const& path);
 
 		/**
 		 * Create a Property that belongs to a PropertyStorage,
 		 * bound to given path.
 		 */
-		Property (PropertyDirectoryNode* root, std::string const& path);
+		Property (PropertyDirectoryNode* root, PropertyPath const& path);
 
 		/**
 		 * Copy from other property.
@@ -460,44 +397,8 @@ template<class tType>
 		 */
 		template<class V>
 			ValueNodeType*
-			ensure_path (std::string const& path, V value);
+			ensure_path (PropertyPath const& path, V value);
 	};
-
-
-inline
-PropertyNotFound::PropertyNotFound (std::string const& message):
-	Exception (message)
-{ }
-
-
-inline
-SingularProperty::SingularProperty (std::string const& message):
-	Exception (message)
-{ }
-
-
-inline
-InvalidOperation::InvalidOperation (std::string const& message):
-	Exception (message)
-{ }
-
-
-inline
-TypeConflict::TypeConflict (std::string const& path):
-	Exception ("property under path '" + path + "' already exists and has different type")
-{ }
-
-
-inline
-BadType::BadType (std::string const& name):
-	Exception ("'" + name + "' is not valid type name")
-{ }
-
-
-inline
-StringifyError::StringifyError (std::string const& message):
-	Exception (message)
-{ }
 
 
 inline
@@ -507,14 +408,14 @@ GenericProperty::GenericProperty():
 
 
 inline
-GenericProperty::GenericProperty (std::string path):
+GenericProperty::GenericProperty (PropertyPath const& path):
 	_root (PropertyStorage::default_storage()->root()),
 	_path (normalized_path (path))
 { }
 
 
 inline
-GenericProperty::GenericProperty (PropertyDirectoryNode* root, std::string path):
+GenericProperty::GenericProperty (PropertyDirectoryNode* root, PropertyPath const& path):
 	_root (root),
 	_path (normalized_path (path))
 { }
@@ -537,13 +438,13 @@ GenericProperty::is_nil() const
 			if (val_node)
 				return val_node->is_nil();
 			else
-				throw InvalidOperation ("can't check if directory node is nil: " + _path);
+				throw InvalidOperation ("can't check if directory node is nil: " + _path.string());
 		}
 		else
 			return true;
 	}
 	else
-		throw SingularProperty ("can't read from a singular property: " + _path);
+		throw SingularProperty ("can't read from a singular property: " + _path.string());
 }
 
 
@@ -559,11 +460,11 @@ GenericProperty::set_nil()
 			if (val_node)
 				val_node->set_nil();
 			else
-				throw InvalidOperation ("can't set directory node to nil: " + _path);
+				throw InvalidOperation ("can't set directory node to nil: " + _path.string());
 		}
 	}
 	else
-		throw SingularProperty ("can't write to a singular property: " + _path);
+		throw SingularProperty ("can't write to a singular property: " + _path.string());
 }
 
 
@@ -577,7 +478,7 @@ GenericProperty::is_singular() const noexcept
 inline bool
 GenericProperty::configured() const noexcept
 {
-	return !is_singular() && !path().empty();
+	return !is_singular() && !path().string().empty();
 }
 
 
@@ -588,7 +489,7 @@ GenericProperty::valid() const noexcept
 }
 
 
-inline std::string const&
+inline PropertyPath const&
 GenericProperty::path() const noexcept
 {
 	return _path;
@@ -596,7 +497,7 @@ GenericProperty::path() const noexcept
 
 
 inline void
-GenericProperty::set_path (std::string const& new_path)
+GenericProperty::set_path (PropertyPath const& new_path)
 {
 	_path = normalized_path (new_path);
 	// The node will be localized again, when it's needed:
@@ -644,7 +545,7 @@ template<class Target>
 inline PropertyNode*
 GenericProperty::get_node() const
 {
-	if (_root && !_path.empty())
+	if (_root && !_path.string().empty())
 	{
 		if (_node && _node->path() == _path)
 			return _node;
@@ -726,12 +627,12 @@ GenericProperty::unfresh() const
 }
 
 
-inline std::string
-GenericProperty::normalized_path (std::string path)
+inline PropertyPath
+GenericProperty::normalized_path (PropertyPath path)
 {
-	std::size_t p = path.rfind ("//");
+	std::size_t p = path.string().rfind ("//");
 	if (p != std::string::npos)
-		return path.substr (p + 1);
+		return PropertyPath (path.string().substr (p + 1));
 	return path;
 }
 
@@ -748,7 +649,7 @@ TypedProperty::parse (std::string const& str_value)
 {
 	if (_root)
 	{
-		if (!_path.empty())
+		if (!_path.string().empty())
 		{
 			PropertyNode* node = get_node();
 			if (node)
@@ -760,7 +661,7 @@ TypedProperty::parse (std::string const& str_value)
 		}
 	}
 	else
-		throw SingularProperty ("can't write to a singular property: " + _path);
+		throw SingularProperty ("can't write to a singular property: " + _path.string());
 }
 
 
@@ -769,7 +670,7 @@ TypedProperty::parse_blob (Blob const& value)
 {
 	if (_root)
 	{
-		if (!_path.empty())
+		if (!_path.string().empty())
 		{
 			PropertyNode* node = get_node();
 			if (node)
@@ -781,14 +682,14 @@ TypedProperty::parse_blob (Blob const& value)
 		}
 	}
 	else
-		throw SingularProperty ("can't write to a singular property: " + _path);
+		throw SingularProperty ("can't write to a singular property: " + _path.string());
 }
 
 
 template<class T>
 	inline
 	Property<T>::Property():
-		Property ("")
+		Property (PropertyPath (""))
 	{ }
 
 
@@ -801,17 +702,17 @@ template<class T>
 
 template<class T>
 	inline
-	Property<T>::Property (std::string const& path):
+	Property<T>::Property (PropertyPath const& path):
 		Property (PropertyStorage::default_storage()->root(), path)
 	{
 		if (!_root)
-			throw SingularProperty ("PropertyStorage is not initialized, can't construct Property with default storage: " + _path);
+			throw SingularProperty ("PropertyStorage is not initialized, can't construct Property with default storage: " + _path.string());
 	}
 
 
 template<class T>
 	inline
-	Property<T>::Property (PropertyDirectoryNode* node, std::string const& path):
+	Property<T>::Property (PropertyDirectoryNode* node, PropertyPath const& path):
 		TypedProperty (node->root(), path)
 	{ }
 
@@ -873,7 +774,7 @@ template<class T>
 		if (_root)
 			return get_value_node_signalling()->read();
 		else
-			throw SingularProperty ("can't read from a singular property: " + _path);
+			throw SingularProperty ("can't read from a singular property: " + _path.string());
 	}
 
 
@@ -892,7 +793,7 @@ template<class T>
 		if (_root)
 			return &get_value_node_signalling()->read();
 		else
-			throw SingularProperty ("can't read from a singular property: " + _path);
+			throw SingularProperty ("can't read from a singular property: " + _path.string());
 	}
 
 
@@ -920,7 +821,7 @@ template<class T>
 	{
 		if (_root)
 		{
-			if (!_path.empty())
+			if (!_path.string().empty())
 			{
 				try {
 					get_value_node_signalling()->write (value);
@@ -932,7 +833,7 @@ template<class T>
 			}
 		}
 		else
-			throw SingularProperty ("can't write to a singular property: " + _path);
+			throw SingularProperty ("can't write to a singular property: " + _path.string());
 	}
 
 
@@ -954,7 +855,7 @@ template<class T>
 		if (_root)
 			get_value_node_signalling()->write (value);
 		else
-			throw SingularProperty ("can't write to a singular property: " + _path);
+			throw SingularProperty ("can't write to a singular property: " + _path.string());
 	}
 
 
@@ -994,7 +895,7 @@ template<class T>
 	{
 		if (_root)
 		{
-			if (!_path.empty())
+			if (!_path.string().empty())
 			{
 				try {
 					get_value_node_signalling()->parse (value);
@@ -1007,7 +908,7 @@ template<class T>
 			}
 		}
 		else
-			throw SingularProperty ("can't write to a singular property: " + _path);
+			throw SingularProperty ("can't write to a singular property: " + _path.string());
 	}
 
 
@@ -1017,7 +918,7 @@ template<class T>
 	{
 		if (_root)
 		{
-			if (!_path.empty())
+			if (!_path.string().empty())
 			{
 				try {
 					get_value_node_signalling()->parse_blob (value);
@@ -1030,7 +931,7 @@ template<class T>
 			}
 		}
 		else
-			throw SingularProperty ("can't write to a singular property: " + _path);
+			throw SingularProperty ("can't write to a singular property: " + _path.string());
 	}
 
 
@@ -1045,7 +946,7 @@ template<class T>
 			if (val_node)
 				return val_node;
 			else
-				throw TypeConflict ("incompatible type: " + _path);
+				throw TypeConflict (_path);
 		}
 		else
 			return nullptr;
@@ -1060,22 +961,23 @@ template<class T>
 		if (val_node)
 			return val_node;
 		else
-			throw PropertyNotFound ("could not find property by path: " + _path);
+			throw PropertyNotFound ("could not find property by path: " + _path.string());
 	}
 
 
 template<class T>
 	template<class V>
 		inline typename Property<T>::ValueNodeType*
-		Property<T>::ensure_path (std::string const& path, V value)
+		Property<T>::ensure_path (PropertyPath const& path, V value)
 		{
-			std::string::size_type s = path.find_last_of ('/');
-			std::string dir = path.substr (0, s);
-			std::string pro = path.substr (s + 1);
+			std::string const& path_str = path.string();
+			std::string::size_type s = path_str.find_last_of ('/');
+			std::string dir = path_str.substr (0, s);
+			std::string pro = path_str.substr (s + 1);
 
 			PropertyDirectoryNode* parent = _root;
 			if (s != std::string::npos)
-				parent = _root->mkpath (dir);
+				parent = _root->mkpath (PropertyPath (dir));
 			ValueNodeType* child = new ValueNodeType (pro, value);
 			parent->add_child (child);
 			return child;

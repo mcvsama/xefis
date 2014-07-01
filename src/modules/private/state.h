@@ -81,10 +81,10 @@ class State: public Xefis::Module
 			Observable();
 
 			// Ctor
-			Observable (std::string const& path);
+			Observable (xf::PropertyPath const& path);
 
 			// Ctor
-			Observable (std::string const& path, Callback callback);
+			Observable (xf::PropertyPath const& path, Callback callback);
 
 			/**
 			 * Access internal property object.
@@ -102,7 +102,7 @@ class State: public Xefis::Module
 			 * Set property's path and reset.
 			 */
 			void
-			set_path (std::string const& path);
+			set_path (xf::PropertyPath const& path);
 
 			/**
 			 * Set callback.
@@ -114,7 +114,7 @@ class State: public Xefis::Module
 			 * Set property's path and callback.
 			 */
 			void
-			observe (std::string const& path, Callback callback);
+			observe (xf::PropertyPath const& path, Callback callback);
 
 			// ObservableBase API
 			void
@@ -261,7 +261,7 @@ template<class P>
 
 template<class P>
 	inline
-	State::Observable<P>::Observable (std::string const& path):
+	State::Observable<P>::Observable (xf::PropertyPath const& path):
 		_property (path)
 	{
 		reset();
@@ -270,7 +270,7 @@ template<class P>
 
 template<class P>
 	inline
-	State::Observable<P>::Observable (std::string const& path, Callback callback):
+	State::Observable<P>::Observable (xf::PropertyPath const& path, Callback callback):
 		_property (path),
 		_callback (callback)
 	{
@@ -296,7 +296,7 @@ template<class P>
 
 template<class P>
 	inline void
-	State::Observable<P>::set_path (std::string const& path)
+	State::Observable<P>::set_path (xf::PropertyPath const& path)
 	{
 		_property.set_path (path);
 		reset();
@@ -313,7 +313,7 @@ template<class P>
 
 template<class P>
 	inline void
-	State::Observable<P>::observe (std::string const& path, Callback callback)
+	State::Observable<P>::observe (xf::PropertyPath const& path, Callback callback)
 	{
 		set_path (path);
 		set_callback (callback);

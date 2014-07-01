@@ -62,7 +62,7 @@ Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_lab
 			if (e.hasAttribute ("nil"))
 				nil_value = e.attribute ("nil");
 
-			value.set_path (e.attribute ("path").toStdString());
+			value.set_path (xf::PropertyPath (e.attribute ("path")));
 			unit = e.attribute ("unit").toStdString();
 		}
 	}

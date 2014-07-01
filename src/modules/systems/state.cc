@@ -46,31 +46,17 @@ State::ConfigVariable::ConfigVariable (QDomElement const& config)
 
 	if (!config.hasAttribute ("type"))
 		throw xf::MissingDomAttribute (config, "type");
-	_type = config.attribute ("type");
+	_type = xf::PropertyType (config.attribute ("type"));
 
 	if (!config.hasAttribute ("path"))
 		throw xf::MissingDomAttribute (config, "path");
-	_path = config.attribute ("path");
+	_path = xf::PropertyPath (config.attribute ("path"));
 
-	xf::TypedProperty::create (_path.toStdString(), _type.toStdString());
-	_property.set_path (_path.toStdString());
+	xf::TypedProperty::create (_path, _type);
+	_property.set_path (_path);
 
 	if (config.hasAttribute ("default"))
 		_property.parse (config.attribute ("default").toStdString());
-}
-
-
-inline QString const&
-State::ConfigVariable::path() const noexcept
-{
-	return _path;
-}
-
-
-inline void
-State::ConfigVariable::set_path (QString const& path)
-{
-	_path = path;
 }
 
 
@@ -88,7 +74,21 @@ State::ConfigVariable::set_id (QString const& id)
 }
 
 
-inline QString const&
+inline xf::PropertyPath const&
+State::ConfigVariable::path() const noexcept
+{
+	return _path;
+}
+
+
+inline void
+State::ConfigVariable::set_path (xf::PropertyPath const& path)
+{
+	_path = path;
+}
+
+
+inline xf::PropertyType const&
 State::ConfigVariable::type() const noexcept
 {
 	return _type;
@@ -96,7 +96,7 @@ State::ConfigVariable::type() const noexcept
 
 
 inline void
-State::ConfigVariable::set_type (QString const& type)
+State::ConfigVariable::set_type (xf::PropertyType const& type)
 {
 	_type = type;
 }
@@ -227,7 +227,7 @@ State::load_state()
 					auto cv = _config_variables.find (id);
 					if (cv != _config_variables.end())
 					{
-						QString type = e.attribute ("type");
+						xf::PropertyType type (e.attribute ("type"));
 						if (type == cv->second.type())
 						{
 							try {
@@ -240,7 +240,7 @@ State::load_state()
 						}
 						else
 							log() << "Type mismatch for setting '" << id.toStdString() << "': saved: "
-								  << type.toStdString() << ", configured: " << cv->second.type().toStdString() << std::endl;
+								  << type.string() << ", configured: " << cv->second.type().string() << std::endl;
 					}
 					else
 						log() << "Ignoring not configured setting '" << id.toStdString() << "'" << std::endl;
@@ -269,7 +269,7 @@ State::save_state()
 		{
 			QDomElement cv_element = doc.createElement ("state-variable");
 			cv_element.setAttribute ("id", cv.second.id());
-			cv_element.setAttribute ("type", cv.second.type());
+			cv_element.setAttribute ("type", QString::fromStdString (cv.second.type().string()));
 			cv_element.setAttribute ("value", QString::fromStdString (xf::to_hex_string (cv.second.property().binarify())));
 			root.appendChild (cv_element);
 		}

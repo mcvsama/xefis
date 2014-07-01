@@ -60,53 +60,53 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	// TODO not hardcoded
 	std::string mcp_root = "/panels/mcp";
 
-	_mcp_mins_value.set_path (mcp_root + "/mins");
-	_mcp_appr.set_path (mcp_root + "/appr");
-	_mcp_fd.set_path (mcp_root + "/fd");
-	_mcp_htrk.set_path (mcp_root + "/htrk");
-	_mcp_qnh_value.set_path (mcp_root + "/qnh");
-	_mcp_qnh_hpa.set_path (mcp_root + "/qnh-hpa");
-	_mcp_std.set_path (mcp_root + "/std");
-	_mcp_metric.set_path (mcp_root + "/metric");
-	_mcp_fpv.set_path (mcp_root + "/fpv");
-	_mcp_range_value.set_path (mcp_root + "/range");
-	_mcp_range_ctr.set_path (mcp_root + "/range-ctr");
-	_mcp_hdg_trk.set_path (mcp_root + "/hdg-trk");
-	_mcp_mag_tru.set_path (mcp_root + "/mag-tru");
-	_mcp_course_value.set_path (mcp_root + "/course");
-	_mcp_course_hide.set_path (mcp_root + "/course-hide");
+	_mcp_mins_value.set_path (xf::PropertyPath (mcp_root + "/mins"));
+	_mcp_appr.set_path (xf::PropertyPath (mcp_root + "/appr"));
+	_mcp_fd.set_path (xf::PropertyPath (mcp_root + "/fd"));
+	_mcp_htrk.set_path (xf::PropertyPath (mcp_root + "/htrk"));
+	_mcp_qnh_value.set_path (xf::PropertyPath (mcp_root + "/qnh"));
+	_mcp_qnh_hpa.set_path (xf::PropertyPath (mcp_root + "/qnh-hpa"));
+	_mcp_std.set_path (xf::PropertyPath (mcp_root + "/std"));
+	_mcp_metric.set_path (xf::PropertyPath (mcp_root + "/metric"));
+	_mcp_fpv.set_path (xf::PropertyPath (mcp_root + "/fpv"));
+	_mcp_range_value.set_path (xf::PropertyPath (mcp_root + "/range"));
+	_mcp_range_ctr.set_path (xf::PropertyPath (mcp_root + "/range-ctr"));
+	_mcp_hdg_trk.set_path (xf::PropertyPath (mcp_root + "/hdg-trk"));
+	_mcp_mag_tru.set_path (xf::PropertyPath (mcp_root + "/mag-tru"));
+	_mcp_course_value.set_path (xf::PropertyPath (mcp_root + "/course"));
+	_mcp_course_hide.set_path (xf::PropertyPath (mcp_root + "/course-hide"));
 
-	_mcp_course_display.set_path ("/settings/course/magnetic.integer");
+	_mcp_course_display.set_path (xf::PropertyPath ("/settings/course/magnetic.integer"));
 
-	_setting_efis_fpv_visible.set_path ("/settings/efis/fpv-visible");
+	_setting_efis_fpv_visible.set_path (xf::PropertyPath ("/settings/efis/fpv-visible"));
 	_setting_efis_fpv_visible.set_default (false);
-	_setting_efis_show_metric.set_path ("/settings/efis/show-metric");
+	_setting_efis_show_metric.set_path (xf::PropertyPath ("/settings/efis/show-metric"));
 	_setting_efis_show_metric.set_default (false);
-	_setting_efis_fd_visible.set_path ("/settings/efis/cmd-guidance-visible");
+	_setting_efis_fd_visible.set_path (xf::PropertyPath ("/settings/efis/cmd-guidance-visible"));
 	_setting_efis_fd_visible.set_default (false);
-	_setting_efis_appr_visible.set_path ("/settings/efis/approach-reference-visible");
+	_setting_efis_appr_visible.set_path (xf::PropertyPath ("/settings/efis/approach-reference-visible"));
 	_setting_efis_appr_visible.set_default (false);
-	_setting_pressure_qnh.set_path ("/settings/pressure/qnh");
+	_setting_pressure_qnh.set_path (xf::PropertyPath ("/settings/pressure/qnh"));
 	_setting_pressure_qnh.set_default (29.92_inHg);
-	_setting_pressure_display_hpa.set_path ("/settings/efis/display-hpa");
+	_setting_pressure_display_hpa.set_path (xf::PropertyPath ("/settings/efis/display-hpa"));
 	_setting_pressure_display_hpa.set_default (true);
-	_setting_pressure_use_std.set_path ("/settings/pressure/use-std");
+	_setting_pressure_use_std.set_path (xf::PropertyPath ("/settings/pressure/use-std"));
 	_setting_pressure_use_std.set_default (false);
-	_setting_minimums_amsl.set_path ("/settings/minimums/amsl");
-	_setting_minimums_setting.set_path ("/settings/minimums/setting");
-	_setting_minimums_type.set_path ("/settings/minimums/type");
-	_setting_hsi_display_true_heading.set_path ("/settings/hsi/display-true-heading");
+	_setting_minimums_amsl.set_path (xf::PropertyPath ("/settings/minimums/amsl"));
+	_setting_minimums_setting.set_path (xf::PropertyPath ("/settings/minimums/setting"));
+	_setting_minimums_type.set_path (xf::PropertyPath ("/settings/minimums/type"));
+	_setting_hsi_display_true_heading.set_path (xf::PropertyPath ("/settings/hsi/display-true-heading"));
 	_setting_hsi_display_true_heading.set_default (false);
-	_setting_hsi_center_on_track.set_path ("/settings/hsi/center-on-track");
+	_setting_hsi_center_on_track.set_path (xf::PropertyPath ("/settings/hsi/center-on-track"));
 	_setting_hsi_center_on_track.set_default (true);
-	_setting_hsi_display_mode_mfd.set_path ("/settings/hsi/display-mode/mfd");
+	_setting_hsi_display_mode_mfd.set_path (xf::PropertyPath ("/settings/hsi/display-mode/mfd"));
 	_setting_hsi_display_mode_mfd.set_default (0);
-	_setting_hsi_range.set_path ("/settings/hsi/range");
+	_setting_hsi_range.set_path (xf::PropertyPath ("/settings/hsi/range"));
 	_setting_hsi_range.set_default (1_nmi);
-	_setting_hsi_home_track_visible.set_path ("/settings/hsi/home-track-visible");
+	_setting_hsi_home_track_visible.set_path (xf::PropertyPath ("/settings/hsi/home-track-visible"));
 	_setting_hsi_home_track_visible.set_default (false);
-	_setting_course.set_path ("/settings/course/magnetic");
-	_setting_course_visible.set_path ("/settings/course/visible");
+	_setting_course.set_path (xf::PropertyPath ("/settings/course/magnetic"));
+	_setting_course_visible.set_path (xf::PropertyPath ("/settings/course/visible"));
 
 	prepare_efis_settings();
 
@@ -140,7 +140,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// EFIS panel
 
-	_efis_mins_mode_button = std::make_unique<xf::ButtonAction> (xf::PropertyBoolean ("/panels/mcp/efis/button.mins-mode"), [&] {
+	_efis_mins_mode_button = std::make_unique<xf::ButtonAction> (xf::PropertyBoolean (xf::PropertyPath ("/panels/mcp/efis/button.mins-mode")), [&] {
 		if (_minimums_type == MinimumsType::Baro)
 			_minimums_type = MinimumsType::Radio;
 		else
@@ -150,7 +150,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// COURSE panel
 
-	_navaid_select_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-main", {
+	_navaid_select_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-main"), {
 		{ "/panels/mcp/navaid/button.off", "/panels/mcp/navaid/led.off", -1, true },
 		{ "/panels/mcp/navaid/button.ils", "/panels/mcp/navaid/led.ils", 0 },
 		{ "/panels/mcp/navaid/button.vor-l", "/panels/mcp/navaid/led.vor-l", 1 },
@@ -159,13 +159,13 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// NAVAID L/R panel
 
-	_navaid_left_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-left", {
+	_navaid_left_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-left"), {
 		{ "/panels/mcp/navaid-left/button.off", "/panels/mcp/navaid-left/led.off", -1, true },
 		{ "/panels/mcp/navaid-left/button.vor", "/panels/mcp/navaid-left/led.vor", 0 },
 		{ "/panels/mcp/navaid-left/button.home", "/panels/mcp/navaid-left/led.home", 1 },
 	}));
 
-	_navaid_right_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/navaid/selected-right", {
+	_navaid_right_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-right"), {
 		{ "/panels/mcp/navaid-right/button.off", "/panels/mcp/navaid-right/led.off", -1, true },
 		{ "/panels/mcp/navaid-right/button.vor", "/panels/mcp/navaid-right/led.vor", 0 },
 		{ "/panels/mcp/navaid-right/button.home", "/panels/mcp/navaid-right/led.home", 1 },
@@ -173,7 +173,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// MFD panel
 
-	_mfd_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction ("/settings/efis/mfd-mode", {
+	_mfd_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/efis/mfd-mode"), {
 		{ "/panels/mcp/mfd/button.eicas", "/panels/mcp/mfd/led.eicas", 0, true },
 		{ "/panels/mcp/mfd/button.nd", "/panels/mcp/mfd/led.nd", 1 },
 		{ "/panels/mcp/mfd/button.chkl", "/panels/mcp/mfd/led.chkl", 2 },
@@ -183,7 +183,7 @@ State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
 
 	// AFCS/FBW panel
 
-	_afcs_ap_button = std::make_unique<xf::ToggleButtonAction> ("/panels/mcp/afcs/button.ap", "/panels/mcp/afcs/led.ap");
+	_afcs_ap_button = std::make_unique<xf::ToggleButtonAction> (xf::PropertyPath ("/panels/mcp/afcs/button.ap"), xf::PropertyPath ("/panels/mcp/afcs/led.ap"));
 	_afcs_ap_button->set_callback ([&](bool state) {
 		if (state)
 			_setting_efis_fd_visible.write (true);

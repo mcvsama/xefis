@@ -64,7 +64,7 @@ class ToggleButtonAction: public Action
 
   public:
 	// Ctor
-	ToggleButtonAction (std::string const& button_path, std::string const& toggle_path)
+	ToggleButtonAction (PropertyPath const& button_path, PropertyPath const& toggle_path)
 	{
 		_button.set_path (button_path);
 		_toggle.set_path (toggle_path);
@@ -164,7 +164,7 @@ class ButtonOptionsAction: public Action
 	  public:
 		// Ctor
 		Option (std::string const& button_path, std::string const& toggle_path, int value, bool is_default = false):
-			button (button_path, toggle_path),
+			button (PropertyPath (button_path), PropertyPath (toggle_path)),
 			value (value),
 			is_default (is_default)
 		{
@@ -180,7 +180,7 @@ class ButtonOptionsAction: public Action
 
   public:
 	// Ctor
-	ButtonOptionsAction (std::string const& value_path, Options const& options):
+	ButtonOptionsAction (PropertyPath const& value_path, Options const& options):
 		_options (options)
 	{
 		_value_target.set_path (value_path);

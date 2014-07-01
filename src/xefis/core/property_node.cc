@@ -33,8 +33,8 @@ PropertyNode::update_path()
 		storage->uncache_path (_path);
 
 	_path = _parent
-		? _parent->path() + "/" + _name
-		: _name;
+		? PropertyPath (_parent->path().string() + "/" + _name)
+		: PropertyPath (_name);
 
 	if (storage)
 		storage->cache_path (this);
@@ -60,16 +60,18 @@ PropertyDirectoryNode::child (std::string const& name)
 
 
 PropertyNode*
-PropertyDirectoryNode::locate (std::string const& path)
+PropertyDirectoryNode::locate (PropertyPath const& path)
 {
-	if (path.empty())
+	std::string const& path_str = path.string();
+
+	if (path_str.empty())
 		return this;
 
 	// If we are root node, try searching PropertyStorage cache first.
 	// Normalize path before searching:
 	if (!_parent && _storage)
 	{
-		PropertyNode* node = _storage->locate (path[0] == '/' ? path : '/' + path);
+		PropertyNode* node = _storage->locate (path_str[0] == '/' ? path : PropertyPath ('/' + path_str));
 		if (node)
 			return node;
 		else
@@ -77,21 +79,21 @@ PropertyDirectoryNode::locate (std::string const& path)
 			return nullptr;
 	}
 
-	if (path[0] == '/')
-		return root()->locate (path.substr (1));
+	if (path_str[0] == '/')
+		return root()->locate (PropertyPath (path_str.substr (1)));
 
-	std::string::size_type slash = path.find ('/');
-	std::string segment = path.substr (0, slash);
+	std::string::size_type slash = path_str.find ('/');
+	std::string segment = path_str.substr (0, slash);
 	std::string rest;
 	if (slash != std::string::npos)
-		rest = path.substr (slash + 1);
+		rest = path_str.substr (slash + 1);
 
 	if (segment == ".")
-		return locate (rest);
+		return locate (PropertyPath (rest));
 	else if (segment == "..")
 	{
 		if (_parent)
-			return _parent->locate (rest);
+			return _parent->locate (PropertyPath (rest));
 		return nullptr;
 	}
 	else
@@ -101,7 +103,7 @@ PropertyDirectoryNode::locate (std::string const& path)
 		{
 			PropertyDirectoryNode* dir = dynamic_cast<PropertyDirectoryNode*> (c);
 			if (dir)
-				return dir->locate (rest);
+				return dir->locate (PropertyPath (rest));
 			else
 				return nullptr;
 		}
@@ -112,27 +114,29 @@ PropertyDirectoryNode::locate (std::string const& path)
 
 
 PropertyDirectoryNode*
-PropertyDirectoryNode::mkpath (std::string const& path)
+PropertyDirectoryNode::mkpath (PropertyPath const& path)
 {
-	if (path.empty())
+	std::string const& path_str = path.string();
+
+	if (path_str.empty())
 		return this;
 
-	if (path[0] == '/')
-		return root()->mkpath (path.substr (1));
+	if (path_str[0] == '/')
+		return root()->mkpath (PropertyPath (path_str.substr (1)));
 
-	std::string::size_type slash = path.find ('/');
-	std::string segment = path.substr (0, slash);
+	std::string::size_type slash = path_str.find ('/');
+	std::string segment = path_str.substr (0, slash);
 	std::string rest;
 	if (slash != std::string::npos)
-		rest = path.substr (slash + 1);
+		rest = path_str.substr (slash + 1);
 
 	if (segment == ".")
-		return mkpath (rest);
+		return mkpath (PropertyPath (rest));
 	else if (segment == "..")
 	{
 		if (!_parent)
 			throw PropertyPathConflict ("couldn't reach above the top node");
-		return _parent->mkpath (rest);
+		return _parent->mkpath (PropertyPath (rest));
 	}
 	else
 	{
@@ -141,15 +145,15 @@ PropertyDirectoryNode::mkpath (std::string const& path)
 		{
 			PropertyDirectoryNode* dir = new PropertyDirectoryNode (segment);
 			add_child (dir);
-			return dir->mkpath (rest);
+			return dir->mkpath (PropertyPath (rest));
 		}
 		else
 		{
 			PropertyDirectoryNode* dir = dynamic_cast<PropertyDirectoryNode*> (c);
 			if (dir)
-				return dir->mkpath (rest);
+				return dir->mkpath (PropertyPath (rest));
 			else
-				throw PropertyPathConflict ("can't create directory path, would conflict with intermediate node: "_str + path);
+				throw PropertyPathConflict ("can't create directory path, would conflict with intermediate node: "_str + path_str);
 		}
 	}
 }
