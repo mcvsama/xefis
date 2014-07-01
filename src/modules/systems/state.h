@@ -53,20 +53,20 @@ class State: public xf::Module
 		set_id (QString const&);
 
 		// Getter
-		QString const&
+		xf::PropertyType const&
 		type() const noexcept;
 
 		// Setter
 		void
-		set_type (QString const&);
+		set_type (xf::PropertyType const&);
 
 		// Getter
-		QString const&
+		xf::PropertyPath const&
 		path() const noexcept;
 
 		// Setter
 		void
-		set_path (QString const&);
+		set_path (xf::PropertyPath const&);
 
 		// Getter
 		xf::TypedProperty&
@@ -84,8 +84,8 @@ class State: public xf::Module
 
 	  private:
 		QString				_id;
-		QString				_type;
-		QString				_path;
+		xf::PropertyType	_type;
+		xf::PropertyPath	_path;
 		xf::TypedProperty	_property;
 	};
 

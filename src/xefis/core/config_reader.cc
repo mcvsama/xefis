@@ -225,10 +225,7 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 				return;
 
 			if (e.hasAttribute ("path"))
-			{
-				std::string path = (root + e.attribute ("path")).toStdString();
-				it->second->set_path (path);
-			}
+				it->second->set_path (PropertyPath (root + e.attribute ("path")));
 			else
 				throw MissingDomAttribute (e, "path");
 

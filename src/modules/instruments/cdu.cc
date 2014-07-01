@@ -343,7 +343,7 @@ CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, C
 	_true_value = setting_element.attribute ("true-value", "ON").toStdString();
 	_false_value = setting_element.attribute ("false-value", "OFF").toStdString();
 	_read_only = setting_element.attribute ("read-only") == "true";
-	_property.set_path (setting_element.attribute ("path").toStdString());
+	_property.set_path (xf::PropertyPath (setting_element.attribute ("path")));
 	_unit = setting_element.attribute ("unit").toStdString();
 }
 

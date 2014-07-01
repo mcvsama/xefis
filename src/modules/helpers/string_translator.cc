@@ -33,8 +33,8 @@ StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 	if (!config.hasAttribute ("output-path"))
 		throw Xefis::MissingDomAttribute (config, "output-path");
 
-	_input.set_path (config.attribute ("input-path").toStdString());
-	_output.set_path (config.attribute ("output-path").toStdString());
+	_input.set_path (xf::PropertyPath (config.attribute ("input-path")));
+	_output.set_path (xf::PropertyPath (config.attribute ("output-path")));
 
 	for (QDomElement e: config)
 	{

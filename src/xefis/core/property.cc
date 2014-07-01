@@ -24,42 +24,44 @@
 namespace Xefis {
 
 void
-TypedProperty::create (std::string const& path, std::string const& type)
+TypedProperty::create (PropertyPath const& path, PropertyType const& type)
 {
-	if (type == "boolean")
+	std::string const& type_str = type.string();
+
+	if (type_str == "boolean")
 		PropertyBoolean (path).ensure_existence();
-	else if (type == "integer")
+	else if (type_str == "integer")
 		PropertyInteger (path).ensure_existence();
-	else if (type == "float")
+	else if (type_str == "float")
 		PropertyFloat (path).ensure_existence();
-	else if (type == "string")
+	else if (type_str == "string")
 		PropertyString (path).ensure_existence();
-	else if (type == "acceleration")
+	else if (type_str == "acceleration")
 		PropertyAcceleration (path).ensure_existence();
-	else if (type == "angle")
+	else if (type_str == "angle")
 		PropertyAngle (path).ensure_existence();
-	else if (type == "capacity")
+	else if (type_str == "capacity")
 		PropertyCapacity (path).ensure_existence();
-	else if (type == "current")
+	else if (type_str == "current")
 		PropertyCurrent (path).ensure_existence();
-	else if (type == "pressure")
+	else if (type_str == "pressure")
 		PropertyPressure (path).ensure_existence();
-	else if (type == "frequency")
+	else if (type_str == "frequency")
 		PropertyFrequency (path).ensure_existence();
-	else if (type == "length")
+	else if (type_str == "length")
 		PropertyLength (path).ensure_existence();
-	else if (type == "speed")
+	else if (type_str == "speed")
 		PropertySpeed (path).ensure_existence();
-	else if (type == "temperature")
+	else if (type_str == "temperature")
 		PropertyTemperature (path).ensure_existence();
-	else if (type == "time")
+	else if (type_str == "time")
 		PropertyTime (path).ensure_existence();
-	else if (type == "torque")
+	else if (type_str == "torque")
 		PropertyTorque (path).ensure_existence();
-	else if (type == "weight")
+	else if (type_str == "weight")
 		PropertyWeight (path).ensure_existence();
 	else
-		throw BadType (type);
+		throw BadType (type_str);
 }
 
 } // namespace Xefis

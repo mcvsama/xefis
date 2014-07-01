@@ -34,7 +34,7 @@ Sound::Alarm::Alarm (QDomElement const& alarm_element, Xefis::SoundManager* soun
 	_sound_manager (sound_manager)
 {
 	_sound_file_path = alarm_element.attribute ("sound");
-	_property.set_path (alarm_element.attribute ("property-path").toStdString());
+	_property.set_path (xf::PropertyPath (alarm_element.attribute ("property-path")));
 	_priority = alarm_element.attribute ("priority").toInt();
 	_repeat = alarm_element.hasAttribute ("repeat-period");
 	if (_repeat)

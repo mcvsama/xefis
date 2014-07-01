@@ -48,7 +48,7 @@ Status::MessageDefinition::Observation::Observation (QDomElement const& observe_
 	if (fail_on != "true" && fail_on != "false")
 		throw Xefis::BadDomAttribute (observe_element, "fail-on", "must be 'true' or 'false'");
 
-	_observed_property.set_path (observe_element.attribute ("path").toStdString());
+	_observed_property.set_path (xf::PropertyPath (observe_element.attribute ("path")));
 	_valid_state = fail_on != "true";
 	_fail_on_nil = fail_on_nil == "true";
 }

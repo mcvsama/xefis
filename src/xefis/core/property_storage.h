@@ -23,6 +23,9 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
 
+// Local:
+#include "property_utils.h"
+
 
 namespace Xefis {
 
@@ -70,7 +73,7 @@ class PropertyStorage: public Noncopyable
 	 * Return nullptr if not found.
 	 */
 	PropertyNode*
-	locate (std::string const& path) const;
+	locate (PropertyPath const& path) const;
 
 	/**
 	 * Get map of all registered properties.
@@ -90,7 +93,7 @@ class PropertyStorage: public Noncopyable
 	 * Remove previously cached path.
 	 */
 	void
-	uncache_path (std::string const& old_path);
+	uncache_path (PropertyPath const& old_path);
 
   private:
 	static Unique<PropertyStorage>	_default_storage;

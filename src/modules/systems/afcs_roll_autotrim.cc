@@ -51,7 +51,6 @@ AFCS_RollAutotrim::data_updated()
 {
 	if (_input_airspeed.fresh() || _input_engine_torque.fresh())
 	{
-		xdebug ("ATRIM %d %d\n", _input_airspeed.valid(), _input_engine_torque.valid());
 		if (_input_airspeed.valid() && _input_engine_torque.valid())
 		{
 			xf::PropertyFloat::Type correction = _airspeed_coefficient / _input_airspeed->mps()

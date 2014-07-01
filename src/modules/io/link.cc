@@ -199,7 +199,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	if (!element.hasAttribute ("path"))
 		throw Xefis::MissingDomAttribute (element, "path");
 
-	std::string path = element.attribute ("path").toStdString();
+	xf::PropertyPath path (element.attribute ("path"));
 	_property_integer.set_path (path);
 	_property_float.set_path (path);
 	_property_angle.set_path (path);
@@ -514,7 +514,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 			{
 				bs.is_boolean = true;
 				bs.bits = 1;
-				bs.property_boolean.set_path (e.attribute ("path").toStdString());
+				bs.property_boolean.set_path (xf::PropertyPath (e.attribute ("path")));
 			}
 			else if (s_type == "integer")
 			{
@@ -522,7 +522,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 					throw Xefis::MissingDomAttribute (e, "bits");
 
 				bs.is_boolean = false;
-				bs.property_integer.set_path (e.attribute ("path").toStdString());
+				bs.property_integer.set_path (xf::PropertyPath (e.attribute ("path")));
 				bs.bits = e.attribute ("bits").toUInt();
 			}
 			else

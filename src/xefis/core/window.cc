@@ -328,23 +328,23 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 			color = PanelButton::Blue;
 
 		widget = new PanelButton (parent_widget, panel, color,
-								  PropertyBoolean (widget_element.attribute ("click-property").toStdString()),
-								  PropertyBoolean (widget_element.attribute ("toggle-property").toStdString()),
-								  PropertyBoolean (widget_element.attribute ("led-property").toStdString()));
+								  PropertyBoolean (PropertyPath (widget_element.attribute ("click-property"))),
+								  PropertyBoolean (PropertyPath (widget_element.attribute ("toggle-property"))),
+								  PropertyBoolean (PropertyPath (widget_element.attribute ("led-property"))));
 	}
 	else if (type == "rotary-encoder")
 	{
 		widget = new PanelRotaryEncoder (parent_widget, panel,
 										 widget_element.attribute ("click-label"),
-										 PropertyInteger (widget_element.attribute ("value-property").toStdString()),
-										 PropertyBoolean (widget_element.attribute ("click-property").toStdString()));
+										 PropertyInteger (PropertyPath (widget_element.attribute ("value-property"))),
+										 PropertyBoolean (PropertyPath (widget_element.attribute ("click-property"))));
 	}
 	else if (type == "numeric-display")
 	{
 		widget = new PanelNumericDisplay (parent_widget, panel,
 										  widget_element.attribute ("digits").toUInt(),
 										  widget_element.attribute ("pad-with-zeros") == "true",
-										  PropertyInteger (widget_element.attribute ("value-property").toStdString()));
+										  PropertyPath (widget_element.attribute ("value-property")));
 	}
 	else
 		throw BadDomAttribute (widget_element, "type");
@@ -392,7 +392,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 			switch_delay.parse (layout_element.attribute ("switch-delay").toStdString());
 
 		stack = std::make_shared<Stack> (switch_delay);
-		stack->property.set_path (layout_element.attribute ("path").toStdString());
+		stack->property.set_path (PropertyPath (layout_element.attribute ("path")));
 		stack->property.set_default (0);
 		new_layout = stack->layout.get();
 		_stacks.insert (stack);

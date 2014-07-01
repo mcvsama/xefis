@@ -962,6 +962,8 @@ AFCS::at_in_thrust_mode()
 			_speed_mode = SpeedMode::None;
 			throw InvalidState();
 	}
+
+	return false;
 }
 
 
@@ -997,6 +999,8 @@ AFCS::flch_engaged()
 			_pitch_mode = PitchMode::None;
 			throw InvalidState();
 	}
+
+	return false;
 }
 
 
