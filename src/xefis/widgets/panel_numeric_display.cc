@@ -26,14 +26,11 @@
 
 namespace Xefis {
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, bool pad_with_zeros, PropertyInteger value_property):
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path):
 	PanelWidget (parent, panel),
 	_num_digits (num_digits),
-	_pad_with_zeros (pad_with_zeros),
-	_value_property (value_property)
+	_unit (unit)
 {
-	_digits_to_display.resize (_num_digits);
-
 	_digit_images[0] = Resources::Digits::digit_0();
 	_digit_images[1] = Resources::Digits::digit_1();
 	_digit_images[2] = Resources::Digits::digit_2();
@@ -44,11 +41,29 @@ PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigne
 	_digit_images[7] = Resources::Digits::digit_7();
 	_digit_images[8] = Resources::Digits::digit_8();
 	_digit_images[9] = Resources::Digits::digit_9();
-	_digit_images[10] = Resources::Digits::digit_minus();
-	_digit_images[11] = Resources::Digits::digit_empty();
+	_digit_images[MinusSymbolIndex] = Resources::Digits::digit_minus();
+	_digit_images[EmptySymbolIndex] = Resources::Digits::digit_empty();
+	_digit_images[DotSymbolIndex] = Resources::Digits::digit_dot();
 
-	setMinimumSize (_digit_images[0].width() * _num_digits + 2 * (BorderWidth + Margin), _digit_images[0].height() + 2 * (BorderWidth + Margin));
+	_digits_to_display.resize (_num_digits, nullptr);
+	setMinimumSize (_digit_images[0].width() * _num_digits + 2 * (BorderWidth + Margin),
+					_digit_images[0].height() + 2 * (BorderWidth + Margin));
+	_value_property.set_path (value_property_path);
+}
 
+
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, std::string const& format):
+	PanelNumericDisplay (parent, panel, num_digits, unit, value_property_path)
+{
+	_static_format = boost::format (format);
+	read();
+}
+
+
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, PropertyString const& format_property):
+	PanelNumericDisplay (parent, panel, num_digits, unit, value_property_path)
+{
+	_dynamic_format = format_property;
 	read();
 }
 
@@ -84,10 +99,18 @@ PanelNumericDisplay::paintEvent (QPaintEvent*)
 	painter.fillRect (re.adjusted (BorderWidth, BorderWidth, -1 - BorderWidth, -1 - BorderWidth), Qt::black);
 
 	QPointF correction (1.f, 0.f);
+	int digit_pos = 0;
 	for (unsigned int d = 0; d < _digits_to_display.size(); ++d)
-		painter.drawPixmap (BorderWidth + Margin + d * _digit_images[0].width() + correction.x() + re.left(),
+	{
+		if (!_digits_to_display[d])
+			continue;
+
+		painter.drawPixmap (BorderWidth + Margin + digit_pos * _digit_images[0].width() + correction.x() + re.left(),
 							BorderWidth + Margin + correction.y() + re.top(),
-							_digits_to_display[d]);
+							*_digits_to_display[d]);
+		if (d + 1 < _digits_to_display.size() && _digits_to_display[d + 1] != &_digit_images[DotSymbolIndex])
+			digit_pos += 1;
+	}
 }
 
 
@@ -101,48 +124,65 @@ PanelNumericDisplay::data_updated()
 void
 PanelNumericDisplay::read()
 {
-	QString digits;
+	std::string digits;
+
 	if (_value_property.is_nil())
-		digits = QString (_num_digits, ' ');
+		digits = std::string (_num_digits, ' ');
 	else
-		digits = convert_to_digits (*_value_property, _num_digits, _pad_with_zeros);
+		digits = convert_to_digits (_value_property.floatize (_unit));
 
 	for (unsigned int i = 0; i < _num_digits; ++i)
 	{
-		auto c = digits[i];
+		auto c = i < digits.size()
+			? digits[i]
+			: ' ';
 
 		if (c == '-')
-			_digits_to_display[i] = _digit_images[MinusSymbolIndex];
-		else if (c.isDigit())
-			_digits_to_display[i] = _digit_images[c.digitValue()];
+			_digits_to_display[i] = &_digit_images[MinusSymbolIndex];
+		else if (c == '.')
+			_digits_to_display[i] = &_digit_images[DotSymbolIndex];
+		else if (std::isdigit (c))
+			_digits_to_display[i] = &_digit_images[c - '0'];
 		else
-			_digits_to_display[i] = _digit_images[EmptySymbolIndex];
+			_digits_to_display[i] = &_digit_images[EmptySymbolIndex];
 	}
 
 	update();
 }
 
 
-QString
-PanelNumericDisplay::convert_to_digits (int64_t value, unsigned int num_digits, bool pad_with_zeros)
+std::string
+PanelNumericDisplay::convert_to_digits (int64_t value)
 {
-	if (num_digits == 0)
-		return QString();
+	std::string result;
 
-	if (value < 0)
-		pad_with_zeros = false;
+	try {
+		if (_dynamic_format.configured())
+		{
+			if (_dynamic_format.valid())
+				result = (boost::format (*_dynamic_format) % value).str();
+		}
+		else
+			result = (_static_format % value).str();
 
-	QString result = QString ("%1").arg (value, num_digits, 10, pad_with_zeros ? QChar ('0') : QChar (' '));
+		std::size_t allowed_size = _num_digits;
+		if (result.find ('.') != std::string::npos)
+			allowed_size += 1;
 
-	if (value >= 0)
-	{
-		if (result.size() > static_cast<int> (num_digits))
-			result = QString (num_digits, QChar ('9'));
+		if (value >= 0)
+		{
+			if (result.size() > allowed_size)
+				result = std::string (_num_digits, '9');
+		}
+		else
+		{
+			if (result.size() > allowed_size)
+				result = '-' + std::string (_num_digits - 1, '9');
+		}
 	}
-	else
+	catch (boost::io::format_error&)
 	{
-		if (result.size() > static_cast<int> (num_digits))
-			result = '-' + QString (num_digits - 1, QChar ('9'));
+		result = "-.";
 	}
 
 	return result;

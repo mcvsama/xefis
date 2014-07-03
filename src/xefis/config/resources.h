@@ -115,6 +115,7 @@ namespace Resources {
 		XEFIS_CONFIG_HAS_DIGIT (digit_minus, "digit-minus.png");
 		XEFIS_CONFIG_HAS_DIGIT (digit_empty, "digit-empty.png");
 		XEFIS_CONFIG_HAS_DIGIT (digit_full, "digit-full.png");
+		XEFIS_CONFIG_HAS_DIGIT (digit_dot, "digit-dot.png");
 
 #undef XEFIS_CONFIG_HAS_DIGIT
 	} // namespace Digits

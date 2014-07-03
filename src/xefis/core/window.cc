@@ -341,10 +341,18 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 	}
 	else if (type == "numeric-display")
 	{
-		widget = new PanelNumericDisplay (parent_widget, panel,
-										  widget_element.attribute ("digits").toUInt(),
-										  widget_element.attribute ("pad-with-zeros") == "true",
-										  PropertyPath (widget_element.attribute ("value-property")));
+		if (widget_element.hasAttribute ("format-property"))
+			widget = new PanelNumericDisplay (parent_widget, panel,
+											  widget_element.attribute ("digits").toUInt(),
+											  widget_element.attribute ("unit").toStdString(),
+											  PropertyPath (widget_element.attribute ("value-property")),
+											  PropertyString (PropertyPath (widget_element.attribute ("format-property"))));
+		else
+			widget = new PanelNumericDisplay (parent_widget, panel,
+											  widget_element.attribute ("digits").toUInt(),
+											  widget_element.attribute ("unit").toStdString(),
+											  PropertyPath (widget_element.attribute ("value-property")),
+											  widget_element.attribute ("format").toStdString());
 	}
 	else
 		throw BadDomAttribute (widget_element, "type");

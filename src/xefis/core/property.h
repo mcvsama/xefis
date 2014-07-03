@@ -183,7 +183,7 @@ class GenericProperty
 
 /**
  * Common base for typed properties, that is not templateized
- * yet. One can use methods like stringify(), parse() or floatize()
+ * yet. One can use methods like parse() or parse_blob()
  * to get value from the node.
  */
 class TypedProperty: public GenericProperty
@@ -581,15 +581,15 @@ GenericProperty::stringify (boost::format format, std::string const& unit, std::
 		else
 			return (format % floatize (unit)).str();
 	}
-	catch (UnsupportedUnit const&)
+	catch (UnsupportedUnit&)
 	{
 		throw StringifyError ("unit error");
 	}
-	catch (boost::io::too_few_args const&)
+	catch (boost::io::too_few_args&)
 	{
 		throw StringifyError ("format: too few args");
 	}
-	catch (boost::io::too_many_args const&)
+	catch (boost::io::too_many_args&)
 	{
 		throw StringifyError ("format: too many args");
 	}
