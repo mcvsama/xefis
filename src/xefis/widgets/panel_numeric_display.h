@@ -37,12 +37,22 @@ class PanelNumericDisplay: public PanelWidget
 
 	static constexpr std::size_t MinusSymbolIndex	= 10;
 	static constexpr std::size_t EmptySymbolIndex	= 11;
+	static constexpr std::size_t DotSymbolIndex		= 12;
+
+  private:
+	// Ctor
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path);
 
   public:
 	/**
-	 * Create simple 7-segment numeric display with given number of digits.
+	 * Create 7-segment display for floatizable properties with hard-coded display format.
 	 */
-	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, bool pad_with_zeros, PropertyInteger value_property);
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, std::string const& format);
+
+	/**
+	 * Create 7-segment display for floatizable properties with display format provided in a property.
+	 */
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, PropertyString const& format_property);
 
   protected:
 	void
@@ -61,20 +71,20 @@ class PanelNumericDisplay: public PanelWidget
   private:
 	/**
 	 * Convert an integer to string of characters to display.
-	 * Returned string will always have size equal to num_digits.
-	 * Minimum value for num_digits is 1.
-	 * If pad_with_zeros is true and value > 0, then the result will be
-	 * padded with '0' chars instead of spaces.
+	 * Returned string will always have size equal to num_digits or one character more
+	 * (the dot).
 	 */
-	static QString
-	convert_to_digits (int64_t value, unsigned int num_digits, bool pad_with_zeros);
+	std::string
+	convert_to_digits (int64_t value);
 
   private:
-	unsigned int			_num_digits;
-	bool					_pad_with_zeros;
-	std::vector<QPixmap>	_digits_to_display;
-	PropertyInteger			_value_property;
-	std::array<QPixmap, 12>	_digit_images; // [10] is minus sign, [11] is empty.
+	unsigned int			_num_digits = 0;
+	std::string				_unit;
+	boost::format			_static_format;
+	PropertyString			_dynamic_format;
+	std::vector<QPixmap*>	_digits_to_display;
+	GenericProperty			_value_property;
+	std::array<QPixmap, 13>	_digit_images; // [10] is minus sign, [11] is empty, [12] is dot.
 };
 
 } // namespace Xefis
