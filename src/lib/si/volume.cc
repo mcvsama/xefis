@@ -15,12 +15,12 @@
 #include <cstddef>
 
 // Local:
-#include "temperature.h"
+#include "volume.h"
 
 
 namespace SI {
 
-std::vector<std::string> Temperature::_supported_units = { "k", "ra", "degc", "degf" };
+std::vector<std::string> Volume::_supported_units = { "m3", "m³" };
 
 } // namespace SI
 

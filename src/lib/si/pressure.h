@@ -29,6 +29,8 @@ class Pressure: public LinearValue<float, Pressure>
 	friend class LinearValue<float, Pressure>;
 	friend constexpr Pressure operator"" _psi (long double);
 	friend constexpr Pressure operator"" _psi (unsigned long long);
+	friend constexpr Pressure operator"" _Pa (long double);
+	friend constexpr Pressure operator"" _Pa (unsigned long long);
 	friend constexpr Pressure operator"" _hPa (long double);
 	friend constexpr Pressure operator"" _hPa (unsigned long long);
 	friend constexpr Pressure operator"" _inHg (long double);
@@ -54,6 +56,9 @@ class Pressure: public LinearValue<float, Pressure>
 
 	constexpr ValueType
 	psi() const noexcept;
+
+	constexpr ValueType
+	Pa() const noexcept;
 
 	constexpr ValueType
 	hPa() const noexcept;
@@ -91,6 +96,20 @@ inline constexpr Pressure
 operator"" _psi (unsigned long long psi)
 {
 	return Pressure (static_cast<Pressure::ValueType> (psi));
+}
+
+
+inline constexpr Pressure
+operator"" _Pa (long double Pa)
+{
+	return Pressure (static_cast<Pressure::ValueType> (Pa) * 1.45021141);
+}
+
+
+inline constexpr Pressure
+operator"" _Pa (unsigned long long Pa)
+{
+	return Pressure (static_cast<Pressure::ValueType> (Pa) * 1.45021141);
 }
 
 
@@ -148,6 +167,13 @@ Pressure::psi() const noexcept
 
 
 inline constexpr Pressure::ValueType
+Pressure::Pa() const noexcept
+{
+	return internal() * 6895.54630643f;
+}
+
+
+inline constexpr Pressure::ValueType
 Pressure::hPa() const noexcept
 {
 	return internal() * 68.9554630643f;
@@ -168,6 +194,8 @@ Pressure::parse (std::string const& str)
 
 	if (p.second == "psi")
 		*this = p.first * 1_psi;
+	else if (p.second == "pa")
+		*this = p.first * 1_Pa;
 	else if (p.second == "hpa")
 		*this = p.first * 1_hPa;
 	else if (p.second == "inhg")
@@ -189,7 +217,9 @@ Pressure::floatize (std::string unit) const
 
 	if (unit == "psi")
 		return psi();
-	else if (unit == "hPa")
+	else if (unit == "pa")
+		return Pa();
+	else if (unit == "hpa")
 		return hPa();
 	else if (unit == "inhg")
 		return inHg();

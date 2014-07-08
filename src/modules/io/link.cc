@@ -116,10 +116,16 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Acceleration;
 	else if (type_attr == "angle")
 		_type = Type::Angle;
+	else if (type_attr == "area")
+		_type = Type::Area;
 	else if (type_attr == "capacity")
 		_type = Type::Capacity;
 	else if (type_attr == "current")
 		_type = Type::Current;
+	else if (type_attr == "density")
+		_type = Type::Density;
+	else if (type_attr == "force")
+		_type = Type::Force;
 	else if (type_attr == "frequency")
 		_type = Type::Frequency;
 	else if (type_attr == "length")
@@ -134,6 +140,8 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		_type = Type::Time;
 	else if (type_attr == "torque")
 		_type = Type::Torque;
+	else if (type_attr == "volume")
+		_type = Type::Volume;
 	else if (type_attr == "weight")
 		_type = Type::Weight;
 
@@ -148,8 +156,11 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Float:
 		case Type::Acceleration:
 		case Type::Angle:
+		case Type::Area:
 		case Type::Capacity:
 		case Type::Current:
+		case Type::Density:
+		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
 		case Type::Pressure:
@@ -157,6 +168,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		case Type::Temperature:
 		case Type::Time:
 		case Type::Torque:
+		case Type::Volume:
 		case Type::Weight:
 			if (!element.hasAttribute ("bytes"))
 				throw Xefis::MissingDomAttribute (element, "bytes");
@@ -177,8 +189,11 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Float:
 			case Type::Acceleration:
 			case Type::Angle:
+			case Type::Area:
 			case Type::Capacity:
 			case Type::Current:
+			case Type::Density:
+			case Type::Force:
 			case Type::Frequency:
 			case Type::Length:
 			case Type::Pressure:
@@ -186,6 +201,7 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 			case Type::Temperature:
 			case Type::Time:
 			case Type::Torque:
+			case Type::Volume:
 			case Type::Weight:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
@@ -254,8 +270,11 @@ Link::PropertyItem::produce (Blob& blob)
 
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Area, area);
 		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
+		XEFIS_CASE_FLOAT (Density, density);
+		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -263,6 +282,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
 		XEFIS_CASE_FLOAT (Torque, torque);
+		XEFIS_CASE_FLOAT (Volume, volume);
 		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
@@ -315,8 +335,11 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Float:
 		case Type::Acceleration:
 		case Type::Angle:
+		case Type::Area:
 		case Type::Capacity:
 		case Type::Current:
+		case Type::Density:
+		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
 		case Type::Pressure:
@@ -324,6 +347,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Temperature:
 		case Type::Time:
 		case Type::Torque:
+		case Type::Volume:
 		case Type::Weight:
 			kind = Kind::Float;
 			break;
@@ -391,8 +415,11 @@ Link::PropertyItem::apply()
 
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
+		XEFIS_CASE_FLOAT (Area, area);
 		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
+		XEFIS_CASE_FLOAT (Density, density);
+		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -400,6 +427,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Temperature, temperature);
 		XEFIS_CASE_FLOAT (Time, time);
 		XEFIS_CASE_FLOAT (Torque, torque);
+		XEFIS_CASE_FLOAT (Volume, volume);
 		XEFIS_CASE_FLOAT (Weight, weight);
 
 		case Type::Unknown:
@@ -433,8 +461,11 @@ Link::PropertyItem::failsafe()
 
 			XEFIS_CASE_FLOAT (Acceleration, acceleration);
 			XEFIS_CASE_FLOAT (Angle, angle);
+			XEFIS_CASE_FLOAT (Area, area);
 			XEFIS_CASE_FLOAT (Capacity, capacity);
 			XEFIS_CASE_FLOAT (Current, current);
+			XEFIS_CASE_FLOAT (Density, density);
+			XEFIS_CASE_FLOAT (Force, force);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
 			XEFIS_CASE_FLOAT (Length, length);
 			XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -442,6 +473,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Temperature, temperature);
 			XEFIS_CASE_FLOAT (Time, time);
 			XEFIS_CASE_FLOAT (Torque, torque);
+			XEFIS_CASE_FLOAT (Volume, volume);
 			XEFIS_CASE_FLOAT (Weight, weight);
 
 			case Type::Unknown:

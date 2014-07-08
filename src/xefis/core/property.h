@@ -995,8 +995,11 @@ typedef Property<double>		PropertyFloat;
 typedef Property<std::string>	PropertyString;
 typedef Property<Acceleration>	PropertyAcceleration;
 typedef Property<Angle>			PropertyAngle;
+typedef Property<Area>			PropertyArea;
 typedef Property<Capacity>		PropertyCapacity;
 typedef Property<Current>		PropertyCurrent;
+typedef Property<Density>		PropertyDensity;
+typedef Property<Force>			PropertyForce;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
 typedef Property<Length>		PropertyLength;
@@ -1004,6 +1007,7 @@ typedef Property<Speed>			PropertySpeed;
 typedef Property<Temperature>	PropertyTemperature;
 typedef Property<Time>			PropertyTime;
 typedef Property<Torque>		PropertyTorque;
+typedef Property<Volume>		PropertyVolume;
 typedef Property<Weight>		PropertyWeight;
 
 } // namespace Xefis

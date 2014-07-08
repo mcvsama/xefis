@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Pressure::_supported_units = { "psi", "hpa", "inhg" };
+std::vector<std::string> Pressure::_supported_units = { "psi", "pa", "hpa", "inhg" };
 
 } // namespace SI
 
