@@ -54,6 +54,9 @@ class Pressure: public LinearValue<float, Pressure>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	psi() const noexcept;
 
@@ -65,6 +68,9 @@ class Pressure: public LinearValue<float, Pressure>
 
 	constexpr ValueType
 	inHg() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -159,6 +165,13 @@ Pressure::supported_units() const
 }
 
 
+inline Pressure::ValueType
+Pressure::si_units() const noexcept
+{
+	return Pa();
+}
+
+
 inline constexpr Pressure::ValueType
 Pressure::psi() const noexcept
 {
@@ -184,6 +197,13 @@ inline constexpr Pressure::ValueType
 Pressure::inHg() const noexcept
 {
 	return internal() * 2.036254f;
+}
+
+
+inline void
+Pressure::set_si_units (ValueType units)
+{
+	*this = 1_Pa * units;
 }
 
 

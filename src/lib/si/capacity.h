@@ -27,6 +27,8 @@ namespace SI {
 class Capacity: public LinearValue<double, Capacity>
 {
 	friend class LinearValue<double, Capacity>;
+	friend constexpr Capacity operator"" _C (long double);
+	friend constexpr Capacity operator"" _C (unsigned long long);
 	friend constexpr Capacity operator"" _Ah (long double);
 	friend constexpr Capacity operator"" _Ah (unsigned long long);
 	friend constexpr Capacity operator"" _mAh (long double);
@@ -34,7 +36,7 @@ class Capacity: public LinearValue<double, Capacity>
 
   protected:
 	explicit constexpr
-	Capacity (ValueType Ah) noexcept;
+	Capacity (ValueType C) noexcept;
 
   public:
 	constexpr
@@ -46,11 +48,21 @@ class Capacity: public LinearValue<double, Capacity>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
+	// Coulombs (Ampere-seconds):
+	constexpr ValueType
+	C() const noexcept;
+
 	constexpr ValueType
 	Ah() const noexcept;
 
 	constexpr ValueType
 	mAh() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -72,30 +84,44 @@ class Capacity: public LinearValue<double, Capacity>
 
 
 inline constexpr Capacity
+operator"" _C (long double C)
+{
+	return Capacity (static_cast<Capacity::ValueType> (C));
+}
+
+
+inline constexpr Capacity
+operator"" _C (unsigned long long C)
+{
+	return Capacity (static_cast<Capacity::ValueType> (C));
+}
+
+
+inline constexpr Capacity
 operator"" _Ah (long double Ah)
 {
-	return Capacity (static_cast<Capacity::ValueType> (Ah));
+	return Capacity (static_cast<Capacity::ValueType> (Ah) * 3600.0);
 }
 
 
 inline constexpr Capacity
 operator"" _Ah (unsigned long long Ah)
 {
-	return Capacity (static_cast<Capacity::ValueType> (Ah));
+	return Capacity (static_cast<Capacity::ValueType> (Ah) * 3600.0);
 }
 
 
 inline constexpr Capacity
 operator"" _mAh (long double mAh)
 {
-	return Capacity (static_cast<Capacity::ValueType> (mAh) / 1000.0);
+	return Capacity (static_cast<Capacity::ValueType> (mAh) * 3.6);
 }
 
 
 inline constexpr Capacity
 operator"" _mAh (unsigned long long mAh)
 {
-	return Capacity (static_cast<Capacity::ValueType> (mAh) / 1000.0);
+	return Capacity (static_cast<Capacity::ValueType> (mAh) * 3.6);
 }
 
 
@@ -105,8 +131,8 @@ operator"" _mAh (unsigned long long mAh)
 
 
 inline constexpr
-Capacity::Capacity (ValueType Ah) noexcept:
-	LinearValue (Ah)
+Capacity::Capacity (ValueType C) noexcept:
+	LinearValue (C)
 { }
 
 
@@ -117,17 +143,38 @@ Capacity::supported_units() const
 }
 
 
+inline Capacity::ValueType
+Capacity::si_units() const noexcept
+{
+	return C();
+}
+
+
 inline constexpr Capacity::ValueType
-Capacity::Ah() const noexcept
+Capacity::C() const noexcept
 {
 	return internal();
 }
 
 
 inline constexpr Capacity::ValueType
+Capacity::Ah() const noexcept
+{
+	return internal() / 3600.0;
+}
+
+
+inline constexpr Capacity::ValueType
 Capacity::mAh() const noexcept
 {
-	return internal() * 1000.0;
+	return internal() / 3.6;
+}
+
+
+inline void
+Capacity::set_si_units (ValueType units)
+{
+	*this = 1_C * units;
 }
 
 
@@ -136,7 +183,9 @@ Capacity::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
 
-	if (p.second == "ah")
+	if (p.second == "c")
+		*this = p.first * 1_C;
+	else if (p.second == "ah")
 		*this = p.first * 1_Ah;
 	else if (p.second == "mah")
 		*this = p.first * 1_mAh;
@@ -155,7 +204,9 @@ Capacity::floatize (std::string unit) const
 {
 	boost::to_lower (unit);
 
-	if (unit == "ah")
+	if (unit == "c")
+		return C();
+	else if (unit == "ah")
 		return Ah();
 	else if (unit == "mah")
 		return mAh();

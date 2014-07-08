@@ -61,6 +61,9 @@ class Time: public LinearValue<double, Time>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	ns() const noexcept;
 
@@ -78,6 +81,9 @@ class Time: public LinearValue<double, Time>
 
 	constexpr ValueType
 	h() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -210,6 +216,13 @@ Time::supported_units() const
 }
 
 
+inline Time::ValueType
+Time::si_units() const noexcept
+{
+	return s();
+}
+
+
 inline constexpr Time::ValueType
 Time::ns() const noexcept
 {
@@ -249,6 +262,13 @@ inline constexpr Time::ValueType
 Time::h() const noexcept
 {
 	return internal() / 3600.0;
+}
+
+
+inline void
+Time::set_si_units (ValueType units)
+{
+	*this = 1_s * units;
 }
 
 

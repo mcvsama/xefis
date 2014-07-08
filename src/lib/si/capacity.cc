@@ -20,7 +20,7 @@
 
 namespace SI {
 
-std::vector<std::string> Capacity::_supported_units = { "ah", "mah" };
+std::vector<std::string> Capacity::_supported_units = { "c", "ah", "mah" };
 
 } // namespace SI
 

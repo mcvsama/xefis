@@ -48,6 +48,9 @@ class Weight: public LinearValue<double, Weight>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	gr() const noexcept;
 
@@ -56,6 +59,9 @@ class Weight: public LinearValue<double, Weight>
 
 	constexpr ValueType
 	lb() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -136,6 +142,13 @@ Weight::supported_units() const
 }
 
 
+inline Weight::ValueType
+Weight::si_units() const noexcept
+{
+	return kg();
+}
+
+
 inline constexpr Weight::ValueType
 Weight::gr() const noexcept
 {
@@ -154,6 +167,13 @@ inline constexpr Weight::ValueType
 Weight::lb() const noexcept
 {
 	return internal() / 453.592;
+}
+
+
+inline void
+Weight::set_si_units (ValueType units)
+{
+	*this = 1_kg * units;
 }
 
 

@@ -100,6 +100,15 @@ template<class tValueType>
 		TypedValue (TypedValue const&) noexcept = default;
 
 	  public:
+		virtual ValueType
+		si_units() const noexcept;
+
+		/**
+		 * Set from SI units.
+		 */
+		virtual void
+		set_si_units (ValueType) = 0;
+
 		// Value API
 		void
 		parse_blob (Blob const&) override;
