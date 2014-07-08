@@ -109,6 +109,7 @@ class AirDataComputer: public Xefis::Module
 	Xefis::PropertyLength		_altitude_amsl_qnh;
 	Xefis::PropertyLength		_altitude_amsl_std;
 	Xefis::PropertyLength		_density_altitude;
+	Xefis::PropertyDensity		_air_density_static;
 	Xefis::PropertyBoolean		_speed_ias_serviceable;
 	Xefis::PropertySpeed		_speed_ias;
 	Xefis::PropertySpeed		_speed_ias_lookahead;

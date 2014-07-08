@@ -62,6 +62,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 		{ "altitude.amsl.qnh", _altitude_amsl_qnh, true },
 		{ "altitude.amsl.std", _altitude_amsl_std, true },
 		{ "density-altitude", _density_altitude, true },
+		{ "air-density-static", _air_density_static, true },
 		{ "speed.ias.serviceable", _speed_ias_serviceable, true },
 		{ "speed.ias", _speed_ias, true },
 		{ "speed.ias.lookahead", _speed_ias_lookahead, true },
@@ -260,6 +261,12 @@ AirDataComputer::compute_density_altitude()
 	}
 	else
 		_density_altitude.set_nil();
+
+	// Also compute air density:
+	if (_pressure_static.valid() && _static_air_temperature.valid())
+		_air_density_static = 1_kgpm3 * _pressure_static->Pa() / (287.058 * _static_air_temperature->K());
+	else
+		_air_density_static.set_nil();
 }
 
 
