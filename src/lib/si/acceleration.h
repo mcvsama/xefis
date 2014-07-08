@@ -94,14 +94,14 @@ operator"" _mps2 (unsigned long long mps2)
 inline constexpr Acceleration
 operator"" _g (long double g)
 {
-	return Acceleration (static_cast<Acceleration::ValueType> (g));
+	return Acceleration (static_cast<Acceleration::ValueType> (g) * 9.80665);
 }
 
 
 inline constexpr Acceleration
 operator"" _g (unsigned long long g)
 {
-	return Acceleration (static_cast<Acceleration::ValueType> (g));
+	return Acceleration (static_cast<Acceleration::ValueType> (g) * 9.80665);
 }
 
 
