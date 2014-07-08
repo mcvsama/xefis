@@ -59,7 +59,7 @@ JoystickInput::Axis::set_value (float value)
 	// Power:
 	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
 	// Renormalize from standard [-1.0, 1.0]:
-	value = Xefis::renormalize (value, { -1.0, 1.0 }, { output_minimum, output_maximum });
+	value = Xefis::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (output_minimum, output_maximum));
 
 	prop = value;
 	if (alt_prop.configured())
