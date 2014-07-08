@@ -79,7 +79,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 
 	if (_value)
 	{
-		float value = Xefis::limit<float> (*_value, _range.min(), _range.max());
+		auto value = Xefis::limit<double> (*_value, _range.min(), _range.max());
 		bool inbound = _range.includes (*_value);
 
 		if (inbound)

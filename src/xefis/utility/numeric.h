@@ -27,20 +27,22 @@
 
 namespace Xefis {
 
-inline constexpr double
-renormalize (double value, double a1, double b1, double a2, double b2) noexcept
-{
-	return b1 == a1
-		? a2
-		: (b2 - a2) / (b1 - a1) * value + (-(b2 - a2) / (b1 - a1) * a1 + a2);
-}
+template<class A, class B, class = typename std::enable_if<std::is_floating_point<A>::value, A>::type>
+	inline constexpr B
+	renormalize (A a, A a_min, A a_max, B b_min, B b_max)
+	{
+		return a_min == a_max
+			? b_min
+			: ((a - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
+	}
 
 
-inline constexpr double
-renormalize (double value, Range<double> range1, Range<double> range2) noexcept
-{
-	return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
-}
+template<class A, class B>
+	inline constexpr B
+	renormalize (A value, Range<A> range1, Range<B> range2) noexcept
+	{
+		return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
+	}
 
 
 template<class T>

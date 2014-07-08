@@ -114,7 +114,7 @@ AFCS_AT::compute_thrust()
 				_ias_pid.set_target (_cmd_ias->kt());
 				_ias_pid.process (_measured_ias->kt(), dt);
 				computed_thrust = 1_rpm * Xefis::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
-				computed_thrust = 1_rpm * Xefis::renormalize (computed_thrust.rpm(), { -1.0, 1.0}, { _output_thrust_extent.min().rpm(), _output_thrust_extent.max().rpm() });
+				computed_thrust = Xefis::renormalize (computed_thrust.rpm(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
 			}
 			break;
 

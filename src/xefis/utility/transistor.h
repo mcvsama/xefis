@@ -198,7 +198,7 @@ template<class T>
 	Transistor<T>::process (ValueType s0, ValueType s1, Time dt) noexcept
 	{
 		ValueType f = _smoother.process (_selected_second ? 1.0 : 0.0, dt);
-		return _output = Xefis::renormalize (f, { 0.0, 1.0 }, { s0, s1 });
+		return _output = Xefis::renormalize (f, Range<double> (0.0, 1.0), Range<ValueType> (s0, s1));
 	}
 
 
