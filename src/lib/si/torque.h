@@ -53,8 +53,14 @@ class Torque: public LinearValue<double, Torque>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	Nm() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -107,10 +113,24 @@ Torque::supported_units() const
 }
 
 
+inline Torque::ValueType
+Torque::si_units() const noexcept
+{
+	return Nm();
+}
+
+
 inline constexpr Torque::ValueType
 Torque::Nm() const noexcept
 {
 	return internal();
+}
+
+
+inline void
+Torque::set_si_units (ValueType units)
+{
+	*this = 1_Nm * units;
 }
 
 

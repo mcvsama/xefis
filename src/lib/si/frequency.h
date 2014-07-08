@@ -50,6 +50,9 @@ class Frequency: public LinearValue<double, Frequency>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	Hz() const noexcept;
 
@@ -61,6 +64,9 @@ class Frequency: public LinearValue<double, Frequency>
 
 	constexpr ValueType
 	rpm() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -155,6 +161,13 @@ Frequency::supported_units() const
 }
 
 
+inline Frequency::ValueType
+Frequency::si_units() const noexcept
+{
+	return Hz();
+}
+
+
 inline constexpr Frequency::ValueType
 Frequency::Hz() const noexcept
 {
@@ -180,6 +193,13 @@ inline constexpr Frequency::ValueType
 Frequency::rpm() const noexcept
 {
 	return internal() * 60.0;
+}
+
+
+inline void
+Frequency::set_si_units (ValueType units)
+{
+	*this = 1_Hz * units;
 }
 
 

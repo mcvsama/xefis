@@ -52,6 +52,9 @@ class Length: public LinearValue<double, Length>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	m() const noexcept;
 
@@ -66,6 +69,9 @@ class Length: public LinearValue<double, Length>
 
 	constexpr ValueType
 	mil() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -174,6 +180,13 @@ Length::supported_units() const
 }
 
 
+inline Length::ValueType
+Length::si_units() const noexcept
+{
+	return m();
+}
+
+
 inline constexpr Length::ValueType
 Length::m() const noexcept
 {
@@ -206,6 +219,13 @@ inline constexpr Length::ValueType
 Length::mil() const noexcept
 {
 	return internal() * 0.0006213711;
+}
+
+
+inline void
+Length::set_si_units (ValueType units)
+{
+	*this = 1_m * units;
 }
 
 

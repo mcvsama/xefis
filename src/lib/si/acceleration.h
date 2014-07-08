@@ -46,11 +46,17 @@ class Acceleration: public LinearValue<double, Acceleration>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	mps2() const noexcept;
 
 	constexpr ValueType
 	g() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -117,6 +123,13 @@ Acceleration::supported_units() const
 }
 
 
+inline Acceleration::ValueType
+Acceleration::si_units() const noexcept
+{
+	return mps2();
+}
+
+
 inline constexpr Acceleration::ValueType
 Acceleration::mps2() const noexcept
 {
@@ -128,6 +141,13 @@ inline constexpr Acceleration::ValueType
 Acceleration::g() const noexcept
 {
 	return mps2() / 9.80665;
+}
+
+
+inline void
+Acceleration::set_si_units (ValueType units)
+{
+	*this = 1_mps2 * units;
 }
 
 

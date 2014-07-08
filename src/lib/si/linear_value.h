@@ -58,8 +58,11 @@ template<class tValueType, class tDerived>
 		LinearValue (LinearValue const&) noexcept = default;
 
 	  public:
+		static Derived
+		from_si_units (ValueType units) noexcept;
+
 		static constexpr Derived
-		from_internal (ValueType internal);
+		from_internal (ValueType internal) noexcept;
 
 		/*
 		 * Unary operators
@@ -146,8 +149,18 @@ template<class V, class T>
 
 
 template<class V, class T>
+	inline typename LinearValue<V, T>::Derived
+	LinearValue<V, T>::from_si_units (ValueType units) noexcept
+	{
+		Derived value;
+		value.set_si_units (units);
+		return value;
+	}
+
+
+template<class V, class T>
 	inline constexpr typename LinearValue<V, T>::Derived
-	LinearValue<V, T>::from_internal (ValueType internal)
+	LinearValue<V, T>::from_internal (ValueType internal) noexcept
 	{
 		return Derived (internal);
 	}

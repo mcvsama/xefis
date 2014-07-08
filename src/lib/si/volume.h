@@ -44,8 +44,14 @@ class Volume: public LinearValue<double, Volume>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	m3() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -98,10 +104,24 @@ Volume::supported_units() const
 }
 
 
+inline Volume::ValueType
+Volume::si_units() const noexcept
+{
+	return m3();
+}
+
+
 inline constexpr Volume::ValueType
 Volume::m3() const noexcept
 {
 	return internal();
+}
+
+
+inline void
+Volume::set_si_units (ValueType units)
+{
+	*this = 1_m3 * units;
 }
 
 

@@ -44,8 +44,14 @@ class Area: public LinearValue<double, Area>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	m2() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -98,10 +104,24 @@ Area::supported_units() const
 }
 
 
+inline Area::ValueType
+Area::si_units() const noexcept
+{
+	return m2();
+}
+
+
 inline constexpr Area::ValueType
 Area::m2() const noexcept
 {
 	return internal();
+}
+
+
+inline void
+Area::set_si_units (ValueType units)
+{
+	*this = 1_m2 * units;
 }
 
 

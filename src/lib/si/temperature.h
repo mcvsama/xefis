@@ -50,6 +50,9 @@ class Temperature: public LinearValue<double, Temperature>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	/**
 	 * Return number of Kelvins.
 	 */
@@ -73,6 +76,9 @@ class Temperature: public LinearValue<double, Temperature>
 	 */
 	constexpr ValueType
 	degF() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -151,6 +157,13 @@ Temperature::supported_units() const
 }
 
 
+inline Temperature::ValueType
+Temperature::si_units() const noexcept
+{
+	return K();
+}
+
+
 inline constexpr Temperature::ValueType
 Temperature::K() const noexcept
 {
@@ -176,6 +189,13 @@ inline constexpr Temperature::ValueType
 Temperature::degF() const noexcept
 {
 	return internal() * 1.8 - 459.67;
+}
+
+
+inline void
+Temperature::set_si_units (ValueType units)
+{
+	*this = 1_K * units;
 }
 
 

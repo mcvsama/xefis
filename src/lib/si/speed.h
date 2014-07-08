@@ -55,6 +55,9 @@ class Speed: public LinearValue<double, Speed>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	kt() const noexcept;
 
@@ -66,6 +69,9 @@ class Speed: public LinearValue<double, Speed>
 
 	constexpr ValueType
 	mps() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -160,6 +166,13 @@ Speed::supported_units() const
 }
 
 
+inline Speed::ValueType
+Speed::si_units() const noexcept
+{
+	return mps();
+}
+
+
 inline constexpr Speed::ValueType
 Speed::kt() const noexcept
 {
@@ -185,6 +198,13 @@ inline constexpr Speed::ValueType
 Speed::mps() const noexcept
 {
 	return internal() / 1.9438612860586;
+}
+
+
+inline void
+Speed::set_si_units (ValueType units)
+{
+	*this = 1_mps * units;
 }
 
 

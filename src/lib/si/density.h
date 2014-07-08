@@ -44,8 +44,14 @@ class Density: public LinearValue<double, Density>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	kgpm3() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -98,10 +104,24 @@ Density::supported_units() const
 }
 
 
+inline Density::ValueType
+Density::si_units() const noexcept
+{
+	return kgpm3();
+}
+
+
 inline constexpr Density::ValueType
 Density::kgpm3() const noexcept
 {
 	return internal();
+}
+
+
+inline void
+Density::set_si_units (ValueType units)
+{
+	*this = 1_kgpm3 * units;
 }
 
 

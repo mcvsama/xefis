@@ -46,11 +46,17 @@ class Current: public LinearValue<double, Current>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	A() const noexcept;
 
 	constexpr ValueType
 	mA() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -117,6 +123,13 @@ Current::supported_units() const
 }
 
 
+inline Current::ValueType
+Current::si_units() const noexcept
+{
+	return A();
+}
+
+
 inline constexpr Current::ValueType
 Current::A() const noexcept
 {
@@ -128,6 +141,13 @@ inline constexpr Current::ValueType
 Current::mA() const noexcept
 {
 	return internal() * 1000.0;
+}
+
+
+inline void
+Current::set_si_units (ValueType units)
+{
+	*this = 1_A * units;
 }
 
 

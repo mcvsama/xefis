@@ -44,8 +44,14 @@ class Force: public LinearValue<double, Force>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	N() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -98,10 +104,24 @@ Force::supported_units() const
 }
 
 
+inline Force::ValueType
+Force::si_units() const noexcept
+{
+	return N();
+}
+
+
 inline constexpr Force::ValueType
 Force::N() const noexcept
 {
 	return internal();
+}
+
+
+inline void
+Force::set_si_units (ValueType units)
+{
+	*this = 1_N * units;
 }
 
 

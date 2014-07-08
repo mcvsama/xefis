@@ -55,11 +55,17 @@ class Angle: public LinearValue<double, Angle>
 	std::vector<std::string> const&
 	supported_units() const override;
 
+	ValueType
+	si_units() const noexcept override;
+
 	constexpr ValueType
 	rad() const noexcept;
 
 	constexpr ValueType
 	deg() const noexcept;
+
+	void
+	set_si_units (ValueType) override;
 
 	void
 	parse (std::string const&) override;
@@ -153,6 +159,13 @@ Angle::supported_units() const
 }
 
 
+inline Angle::ValueType
+Angle::si_units() const noexcept
+{
+	return rad();
+}
+
+
 inline constexpr Angle::ValueType
 Angle::rad() const noexcept
 {
@@ -164,6 +177,13 @@ inline constexpr Angle::ValueType
 Angle::deg() const noexcept
 {
 	return internal() * 180.0 / M_PI;
+}
+
+
+inline void
+Angle::set_si_units (ValueType units)
+{
+	*this = 1_rad * units;
 }
 
 
