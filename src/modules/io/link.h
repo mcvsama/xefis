@@ -120,8 +120,11 @@ class Link:
 			Float,
 			Acceleration,
 			Angle,
+			Area,
 			Capacity,
 			Current,
+			Density,
+			Force,
 			Pressure,
 			Frequency,
 			Length,
@@ -129,6 +132,7 @@ class Link:
 			Temperature,
 			Time,
 			Torque,
+			Volume,
 			Weight,
 		};
 
@@ -180,8 +184,11 @@ class Link:
 		Xefis::PropertyFloat			_property_float;
 		Xefis::PropertyAcceleration		_property_acceleration;
 		Xefis::PropertyAngle			_property_angle;
+		Xefis::PropertyArea				_property_area;
 		Xefis::PropertyCapacity			_property_capacity;
 		Xefis::PropertyCurrent			_property_current;
+		Xefis::PropertyDensity			_property_density;
+		Xefis::PropertyForce			_property_force;
 		Xefis::PropertyPressure			_property_pressure;
 		Xefis::PropertyFrequency		_property_frequency;
 		Xefis::PropertyLength			_property_length;
@@ -189,6 +196,7 @@ class Link:
 		Xefis::PropertyTemperature		_property_temperature;
 		Xefis::PropertyTime				_property_time;
 		Xefis::PropertyTorque			_property_torque;
+		Xefis::PropertyVolume			_property_volume;
 		Xefis::PropertyWeight			_property_weight;
 		Xefis::PropertyInteger::Type	_integer_value;
 		Xefis::PropertyFloat::Type		_float_value;

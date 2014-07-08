@@ -110,6 +110,27 @@ operator* (Frequency const& frequency, Time const& time)
 	return time * frequency;
 }
 
+
+inline constexpr Force
+operator* (Weight const& mass, Acceleration const& acceleration)
+{
+	return 1_N * (mass.kg() * acceleration.mps2());
+}
+
+
+inline constexpr Force
+operator* (Acceleration const& acceleration, Weight const& mass)
+{
+	return mass * acceleration;
+}
+
+
+inline constexpr Pressure
+operator/ (Force const& force, Area const& area)
+{
+	return 1_Pa * (force.N() / area.m2());
+}
+
 } // namespace SI
 
 #endif
