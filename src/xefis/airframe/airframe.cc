@@ -37,6 +37,8 @@ Airframe::Airframe (Application*, QDomElement const& config)
 		{
 			if (e == "flaps")
 				_flaps = std::make_unique<Flaps> (e);
+			else if (e == "spoilers")
+				_spoilers = std::make_unique<Spoilers> (e);
 			else if (e == "lift")
 				_lift = std::make_unique<Lift> (e);
 			else if (e == "drag")
