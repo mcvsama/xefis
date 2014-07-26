@@ -101,7 +101,7 @@ template<class tValueType>
 
 	  public:
 		virtual ValueType
-		si_units() const noexcept;
+		si_units() const noexcept = 0;
 
 		/**
 		 * Set from SI units.
@@ -221,7 +221,7 @@ template<class V>
 		return { result, unit };
 	}
 
-} // namespace std
+} // namespace SI
 
 
 namespace std {
