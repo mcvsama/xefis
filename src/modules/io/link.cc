@@ -218,13 +218,22 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 	xf::PropertyPath path (element.attribute ("path"));
 	_property_integer.set_path (path);
 	_property_float.set_path (path);
+	_property_acceleration.set_path (path);
 	_property_angle.set_path (path);
+	_property_area.set_path (path);
+	_property_capacity.set_path (path);
+	_property_current.set_path (path);
+	_property_density.set_path (path);
+	_property_force.set_path (path);
+	_property_pressure.set_path (path);
 	_property_frequency.set_path (path);
 	_property_length.set_path (path);
-	_property_pressure.set_path (path);
 	_property_speed.set_path (path);
 	_property_temperature.set_path (path);
 	_property_time.set_path (path);
+	_property_torque.set_path (path);
+	_property_volume.set_path (path);
+	_property_weight.set_path (path);
 }
 
 
