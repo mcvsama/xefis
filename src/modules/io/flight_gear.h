@@ -126,14 +126,14 @@ class FlightGearIO:
 	Xefis::PropertyLength					_dme_distance;
 	Xefis::PropertyTemperature				_total_air_temperature;
 	Xefis::PropertyFloat					_engine_throttle_pct;
-	Xefis::PropertyWeight					_engine_1_thrust;
+	Xefis::PropertyForce					_engine_1_thrust;
 	Xefis::PropertyFrequency				_engine_1_rpm;
 	Xefis::PropertyAngle					_engine_1_pitch;
 	Xefis::PropertyFloat					_engine_1_epr;
 	Xefis::PropertyFloat					_engine_1_n1_pct;
 	Xefis::PropertyFloat					_engine_1_n2_pct;
 	Xefis::PropertyTemperature				_engine_1_egt;
-	Xefis::PropertyWeight					_engine_2_thrust;
+	Xefis::PropertyForce					_engine_2_thrust;
 	Xefis::PropertyFrequency				_engine_2_rpm;
 	Xefis::PropertyAngle					_engine_2_pitch;
 	Xefis::PropertyFloat					_engine_2_epr;

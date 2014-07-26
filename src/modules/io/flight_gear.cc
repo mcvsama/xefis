@@ -419,13 +419,11 @@ FlightGearIO::read_input()
 		ASSIGN (nmi,  dme_distance);
 		ASSIGN_UNITLESS (slip_skid_g);
 		ASSIGN_UNITLESS (engine_throttle_pct);
-		ASSIGN (lb,   engine_1_thrust);
 		ASSIGN (rpm,  engine_1_rpm);
 		ASSIGN (deg,  engine_1_pitch);
 		ASSIGN_UNITLESS (engine_1_epr);
 		ASSIGN_UNITLESS (engine_1_n1_pct);
 		ASSIGN_UNITLESS (engine_1_n2_pct);
-		ASSIGN (lb,   engine_2_thrust);
 		ASSIGN (rpm,  engine_2_rpm);
 		ASSIGN (deg,  engine_2_pitch);
 		ASSIGN_UNITLESS (engine_2_epr);
@@ -475,6 +473,10 @@ FlightGearIO::read_input()
 			_engine_1_egt.write (Temperature::from_degF (fg_data->engine_1_egt_degf));
 		if (_engine_2_egt.configured())
 			_engine_2_egt.write (Temperature::from_degF (fg_data->engine_2_egt_degf));
+
+		// Engine thrust:
+		_engine_1_thrust = 1_lb * fg_data->engine_1_thrust_lb * 1_g;
+		_engine_2_thrust = 1_lb * fg_data->engine_2_thrust_lb * 1_g;
 	}
 
 	if (_maximum_ias.valid() && *_maximum_ias < 1_kt)
