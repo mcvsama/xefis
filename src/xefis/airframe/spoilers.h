@@ -11,14 +11,32 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#include "types.h"
-#include "system.h"
-#include "resources.h"
-#include "strong_typedef.h"
-#include "version.h"
-#include "exception.h"
-#include "constants.h"
-#include "cpp14.h"
+#ifndef XEFIS__CORE__AIRFRAME__SPOILERS_H__INCLUDED
+#define XEFIS__CORE__AIRFRAME__SPOILERS_H__INCLUDED
 
-namespace xf = Xefis;
+// Standard:
+#include <cstddef>
+#include <map>
+
+// Qt:
+#include <QtXml/QDomElement>
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/range.h>
+#include <xefis/airframe/lift_mod.h>
+
+
+namespace Xefis {
+
+class Spoilers: public LiftMod
+{
+  public:
+	// Ctor
+	using LiftMod::LiftMod;
+};
+
+} // namespace Xefis
+
+#endif
 

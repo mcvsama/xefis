@@ -11,29 +11,29 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__AIRFRAME__FLAPS_H__INCLUDED
-#define XEFIS__CORE__AIRFRAME__FLAPS_H__INCLUDED
+#ifndef XEFIS__CORE__AIRFRAME__TYPES_H__INCLUDED
+#define XEFIS__CORE__AIRFRAME__TYPES_H__INCLUDED
 
 // Standard:
 #include <cstddef>
-#include <map>
-
-// Qt:
-#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/range.h>
-#include <xefis/airframe/lift_mod.h>
 
 
 namespace Xefis {
 
-class Flaps: public LiftMod
+XEFIS_STRONG_TYPEDEF (Angle, FlapsAngle);
+XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle);
+XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack);
+
+
+class LiftCoefficient:
+	public StrongWrapper<double>,
+	private std::rel_ops::IncludeRelOps
 {
-  public:
-	// Ctor
-	using LiftMod::LiftMod;
+	using StrongWrapper::StrongWrapper;
+	using StrongWrapper::operator=;
 };
 
 } // namespace Xefis

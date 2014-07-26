@@ -35,6 +35,7 @@ Speeds::Speeds (Xefis::ModuleManager* module_manager, QDomElement const& config)
 {
 	parse_properties (config, {
 		{ "input.flaps-angle", _input_flaps_angle, false },
+		{ "input.stall-speed", _input_stall_speed_5deg, false },
 		{ "output.speed.minimum", _output_speed_minimum, true },
 		{ "output.speed.minimum-maneuver", _output_speed_minimum_maneuver, true },
 		{ "output.speed.maximum-maneuver", _output_speed_maximum_maneuver, true },
@@ -44,6 +45,7 @@ Speeds::Speeds (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_speeds_computer.set_callback (std::bind (&Speeds::compute, this));
 	_speeds_computer.observe ({
 		&_input_flaps_angle,
+		&_input_stall_speed_5deg,
 	});
 }
 
@@ -63,12 +65,17 @@ Speeds::compute()
 	Optional<Speed> minimum;
 	Optional<Speed> maximum;
 
+	// Flaps speed limits:
 	if (_input_flaps_angle.valid())
 	{
 		auto flaps_range = flaps.get_speed_range (*_input_flaps_angle);
 		minimum = max (minimum, flaps_range.min());
 		maximum = min (maximum, flaps_range.max());
 	}
+
+	// Stall speed:
+	if (_input_stall_speed_5deg.valid())
+		minimum = max (minimum, *_input_stall_speed_5deg);
 
 	_output_speed_minimum_maneuver = minimum;
 	_output_speed_maximum_maneuver = maximum;

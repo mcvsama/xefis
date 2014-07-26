@@ -11,29 +11,39 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__AIRFRAME__FLAPS_H__INCLUDED
-#define XEFIS__CORE__AIRFRAME__FLAPS_H__INCLUDED
+#ifndef XEFIS__CORE__AIRFRAME__DRAG_H__INCLUDED
+#define XEFIS__CORE__AIRFRAME__DRAG_H__INCLUDED
 
 // Standard:
 #include <cstddef>
-#include <map>
 
 // Qt:
 #include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/range.h>
-#include <xefis/airframe/lift_mod.h>
 
 
 namespace Xefis {
 
-class Flaps: public LiftMod
+class Drag
 {
+	typedef std::map<Angle, double> Coefficients;
+
   public:
 	// Ctor
-	using LiftMod::LiftMod;
+	Drag (QDomElement const& config);
+
+	/**
+	 * Return drag coefficient (C_D) for given angle of attack.
+	 *
+	 * Uses linear interpolation.
+	 */
+	double
+	get_cd (Angle const& aoa) const;
+
+  private:
+	Coefficients _coeffs;
 };
 
 } // namespace Xefis

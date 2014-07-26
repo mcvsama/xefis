@@ -48,6 +48,27 @@ class PerformanceComputer: public Xefis::Module
 	void
 	compute_total_energy_variometer();
 
+	void
+	compute_speeds();
+
+	Optional<Speed>
+	get_stall_ias (Angle const& max_bank_angle) const;
+
+	Optional<Speed>
+	convert_to_ias (Speed const& tas) const;
+
+	void
+	compute_critical_aoa();
+
+	void
+	compute_C_L();
+
+	void
+	compute_C_D();
+
+	void
+	compute_estimations();
+
   private:
 	Time						_total_energy_variometer_time		= 50_ms;
 	Speed						_total_energy_variometer_min_ias	= 0_kt;
@@ -57,6 +78,7 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::Smoother<double>		_wind_direction_smoother			= 5_s;
 	Xefis::Smoother<double>		_wind_speed_smoother				= 5_s;
 	Xefis::Smoother<double>		_total_energy_variometer_smoother	= 1_s;
+	xf::Smoother<double>		_cl_smoother						= 1_s;
 	// Input:
 	Xefis::PropertySpeed		_speed_ias;
 	Xefis::PropertySpeed		_speed_tas;
@@ -66,6 +88,14 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertyAngle		_track_lateral_true;
 	Xefis::PropertyAngle		_orientation_heading_true;
 	Xefis::PropertyAngle		_magnetic_declination;
+	xf::PropertyLength			_density_altitude;
+	xf::PropertyDensity			_input_air_density_static;
+	xf::PropertyWeight			_input_aircraft_weight;
+	Xefis::PropertyAngle		_input_flaps_angle;
+	Xefis::PropertyAngle		_input_spoilers_angle;
+	Xefis::PropertyAngle		_input_aoa_alpha;
+	xf::PropertyAcceleration	_input_load;
+	xf::PropertyAngle			_input_bank_angle;
 	// Output:
 	Xefis::PropertyAngle		_wind_from_true;
 	Xefis::PropertyAngle		_wind_from_magnetic;
@@ -73,10 +103,28 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertyFloat		_glide_ratio;
 	Xefis::PropertyString		_glide_ratio_string;
 	Xefis::PropertySpeed		_total_energy_variometer;
+	xf::PropertySpeed			_v_s;
+	xf::PropertySpeed			_v_s_0_deg;
+	xf::PropertySpeed			_v_s_5_deg;
+	xf::PropertySpeed			_v_s_30_deg;
+	xf::PropertySpeed			_v_r;
+	xf::PropertySpeed			_v_a;
+	xf::PropertySpeed			_v_approach;
+	xf::PropertyAngle			_critical_aoa;
+	xf::PropertyBoolean			_stall;
+	xf::PropertyFloat			_lift_coefficient;
+	xf::PropertySpeed			_estimated_ias;
+	xf::PropertySpeed			_estimated_ias_error;
+	xf::PropertyAngle			_estimated_aoa;
+	xf::PropertyAngle			_estimated_aoa_error;
 	// Other:
 	Xefis::PropertyObserver		_wind_computer;
 	Xefis::PropertyObserver		_glide_ratio_computer;
 	Xefis::PropertyObserver		_total_energy_variometer_computer;
+	xf::PropertyObserver		_speeds_computer;
+	xf::PropertyObserver		_aoa_computer;
+	xf::PropertyObserver		_cl_computer;
+	xf::PropertyObserver		_estimations_computer;
 };
 
 #endif

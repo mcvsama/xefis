@@ -52,6 +52,7 @@ class Speeds: public Xefis::Module
   private:
 	// Input:
 	Xefis::PropertyAngle	_input_flaps_angle;
+	Xefis::PropertySpeed	_input_stall_speed_5deg;
 	// Output:
 	Xefis::PropertySpeed	_output_speed_minimum;
 	Xefis::PropertySpeed	_output_speed_minimum_maneuver;

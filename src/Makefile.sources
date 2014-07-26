@@ -65,10 +65,17 @@ WATCHDOG_MOCHDRS += xefis/core/services.h
 ######## /xefis/airframe ########
 
 XEFIS_HEADERS += xefis/airframe/airframe.h
+XEFIS_HEADERS += xefis/airframe/drag.h
 XEFIS_HEADERS += xefis/airframe/flaps.h
+XEFIS_HEADERS += xefis/airframe/lift.h
+XEFIS_HEADERS += xefis/airframe/lift_mod.h
+XEFIS_HEADERS += xefis/airframe/spoilers.h
 
 XEFIS_SOURCES += xefis/airframe/airframe.cc
-XEFIS_SOURCES += xefis/airframe/flaps.cc
+XEFIS_SOURCES += xefis/airframe/drag.cc
+XEFIS_SOURCES += xefis/airframe/lift.cc
+XEFIS_SOURCES += xefis/airframe/lift_mod.cc
+
 
 ######## /xefis/airnav ########
 
@@ -76,6 +83,7 @@ XEFIS_HEADERS += xefis/airnav/density_altitude.h
 XEFIS_HEADERS += xefis/airnav/magnetic_variation.h
 XEFIS_HEADERS += xefis/airnav/sound_speed.h
 XEFIS_HEADERS += xefis/airnav/wind_triangle.h
+XEFIS_HEADERS += xefis/airnav/true_airspeed.h
 
 XEFIS_SOURCES += xefis/airnav/magnetic_variation.cc
 
@@ -105,6 +113,7 @@ XEFIS_MOCHDRS += xefis/components/configurator/modules_list.h
 XEFIS_HEADERS += xefis/config/all.h
 XEFIS_HEADERS += xefis/config/constants.h
 XEFIS_HEADERS += xefis/config/resources.h
+XEFIS_HEADERS += xefis/config/strong_typedef.h
 XEFIS_HEADERS += xefis/config/system.h
 XEFIS_HEADERS += xefis/config/types.h
 XEFIS_HEADERS += xefis/config/cpp14.h
@@ -204,6 +213,7 @@ XEFIS_HEADERS += xefis/utility/range.h
 XEFIS_HEADERS += xefis/utility/resource.h
 XEFIS_HEADERS += xefis/utility/rotary_decoder.h
 XEFIS_HEADERS += xefis/utility/semaphore.h
+XEFIS_HEADERS += xefis/utility/sequence.h
 XEFIS_HEADERS += xefis/utility/smoother.h
 XEFIS_HEADERS += xefis/utility/string.h
 XEFIS_HEADERS += xefis/utility/temporal.h
@@ -367,7 +377,6 @@ XEFIS_HEADERS += modules/systems/afcs_eac_yd.h
 XEFIS_HEADERS += modules/systems/afcs_fd.h
 XEFIS_HEADERS += modules/systems/afcs_roll_autotrim.h
 XEFIS_HEADERS += modules/systems/altacq.h
-XEFIS_HEADERS += modules/systems/aoa.h
 XEFIS_HEADERS += modules/systems/engine_torque.h
 XEFIS_HEADERS += modules/systems/eta.h
 XEFIS_HEADERS += modules/systems/flaps_bugs.h
@@ -393,7 +402,6 @@ XEFIS_SOURCES += modules/systems/afcs_eac_yd.cc
 XEFIS_SOURCES += modules/systems/afcs_fd.cc
 XEFIS_SOURCES += modules/systems/afcs_roll_autotrim.cc
 XEFIS_SOURCES += modules/systems/altacq.cc
-XEFIS_SOURCES += modules/systems/aoa.cc
 XEFIS_SOURCES += modules/systems/engine_torque.cc
 XEFIS_SOURCES += modules/systems/eta.cc
 XEFIS_SOURCES += modules/systems/flaps_bugs.cc
