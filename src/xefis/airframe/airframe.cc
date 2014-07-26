@@ -17,6 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/application.h>
+#include <xefis/core/config_reader.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 
 // Local:
@@ -27,16 +29,75 @@ namespace Xefis {
 
 Airframe::Airframe (Application*, QDomElement const& config)
 {
+	QDomElement settings_element;
+
 	if (!config.isNull())
 	{
 		for (QDomElement const& e: config)
 		{
 			if (e == "flaps")
-			{
 				_flaps = std::make_unique<Flaps> (e);
-			}
+			else if (e == "lift")
+				_lift = std::make_unique<Lift> (e);
+			else if (e == "drag")
+				_drag = std::make_unique<Drag> (e);
+			else if (e == "settings")
+				settings_element = e;
 		}
 	}
+
+	if (settings_element.isNull())
+		throw MissingDomElement (config, "settings");
+	else
+	{
+		double min_g;
+		double max_g;
+
+		ConfigReader::SettingsParser settings_parser ({
+			{ "wings-area", _wings_area, true },
+			{ "max-negative-load-factor", min_g, true },
+			{ "max-positive-load-factor", max_g, true },
+			{ "safe-aoa-correction", _safe_aoa_correction, true },
+		});
+		settings_parser.parse (settings_element);
+
+		_load_factor_limits = { min_g, max_g };
+	}
+}
+
+
+LiftCoefficient
+Airframe::get_cl (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+{
+	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle.value()) + spoilers().get_aoa_correction (spoilers_angle.value());
+	return LiftCoefficient (lift().get_cl (total_aoa));
+}
+
+
+Angle
+Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+{
+	Angle normal_aoa = lift().get_aoa_in_normal_regime (cl);
+	Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle.value());
+	Angle spoilers_aoa_correction = spoilers().get_aoa_correction (spoilers_angle.value());
+	return normal_aoa - flaps_aoa_correction - spoilers_aoa_correction;
+}
+
+
+Angle
+Airframe::get_critical_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+{
+	Angle critical_aoa = lift().critical_aoa();
+	critical_aoa -= flaps().find_setting (flaps_angle.value()).aoa_correction();
+	critical_aoa += spoilers().find_setting (spoilers_angle.value()).aoa_correction();
+	return critical_aoa;
+}
+
+
+Angle
+Airframe::get_max_safe_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+{
+	return get_critical_aoa (flaps_angle, spoilers_angle) + safe_aoa_correction();
 }
 
 } // namespace Xefis
