@@ -70,21 +70,21 @@ class PanelNumericDisplay: public PanelWidget
 
   private:
 	/**
-	 * Convert an integer to string of characters to display.
+	 * Convert a float to string of characters to display.
 	 * Returned string will always have size equal to num_digits or one character more
 	 * (the dot).
 	 */
 	std::string
-	convert_to_digits (int64_t value);
+	convert_to_digits (double value);
 
   private:
 	unsigned int			_num_digits = 0;
 	std::string				_unit;
 	boost::format			_static_format;
 	PropertyString			_dynamic_format;
-	std::vector<QPixmap*>	_digits_to_display;
+	std::vector<QPixmap*>	_digits_to_display;	// Pointers not owned.
 	GenericProperty			_value_property;
-	std::array<QPixmap, 13>	_digit_images; // [10] is minus sign, [11] is empty, [12] is dot.
+	std::array<QPixmap, 13>	_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
 };
 
 } // namespace Xefis

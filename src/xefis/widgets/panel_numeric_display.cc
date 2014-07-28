@@ -45,7 +45,7 @@ PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigne
 	_digit_images[EmptySymbolIndex] = Resources::Digits::digit_empty();
 	_digit_images[DotSymbolIndex] = Resources::Digits::digit_dot();
 
-	_digits_to_display.resize (_num_digits, nullptr);
+	_digits_to_display.resize (_num_digits + 1, nullptr); // Add margin (+1) for dot image.
 	setMinimumSize (_digit_images[0].width() * _num_digits + 2 * (BorderWidth + Margin),
 					_digit_images[0].height() + 2 * (BorderWidth + Margin));
 	_value_property.set_path (value_property_path);
@@ -100,16 +100,23 @@ PanelNumericDisplay::paintEvent (QPaintEvent*)
 
 	QPointF correction (1.f, 0.f);
 	int digit_pos = 0;
+
 	for (unsigned int d = 0; d < _digits_to_display.size(); ++d)
 	{
 		if (!_digits_to_display[d])
 			continue;
 
+		if (_digits_to_display[d] == &_digit_images[DotSymbolIndex])
+			digit_pos -= 1;
+
+		if (digit_pos < 0)
+			digit_pos = 0;
+
 		painter.drawPixmap (BorderWidth + Margin + digit_pos * _digit_images[0].width() + correction.x() + re.left(),
 							BorderWidth + Margin + correction.y() + re.top(),
 							*_digits_to_display[d]);
-		if (d + 1 < _digits_to_display.size() && _digits_to_display[d + 1] != &_digit_images[DotSymbolIndex])
-			digit_pos += 1;
+
+		digit_pos += 1;
 	}
 }
 
@@ -124,6 +131,9 @@ PanelNumericDisplay::data_updated()
 void
 PanelNumericDisplay::read()
 {
+	if (!_value_property.fresh())
+		return;
+
 	std::string digits;
 
 	if (_value_property.is_nil())
@@ -131,7 +141,9 @@ PanelNumericDisplay::read()
 	else
 		digits = convert_to_digits (_value_property.floatize (_unit));
 
-	for (unsigned int i = 0; i < _num_digits; ++i)
+	std::fill (_digits_to_display.begin(), _digits_to_display.end(), nullptr);
+
+	for (unsigned int i = 0; i < digits.size(); ++i)
 	{
 		auto c = i < digits.size()
 			? digits[i]
@@ -152,7 +164,7 @@ PanelNumericDisplay::read()
 
 
 std::string
-PanelNumericDisplay::convert_to_digits (int64_t value)
+PanelNumericDisplay::convert_to_digits (double value)
 {
 	std::string result;
 
