@@ -24,6 +24,7 @@
 #include <xefis/utility/convergence.h>
 #include <xefis/airnav/density_altitude.h>
 #include <xefis/airnav/sound_speed.h>
+#include <xefis/airnav/true_airspeed.h>
 
 // Local:
 #include "adc.h"
@@ -365,17 +366,19 @@ AirDataComputer::compute_tas()
 {
 	if (_ias_in_valid_range && _altitude_amsl.valid())
 	{
-		Speed cas = *_speed_ias;
+		Speed ias = *_speed_ias;
 
 		if (_density_altitude.valid())
 		{
-			// This does not take into account air compressibility factor, so it's valid
-			// for low speeds (mach < 0.3) and altitude below tropopause (36 kft):
-			_speed_tas.write (cas / std::pow (1 - 6.8755856 * 1e-6 * _density_altitude->ft(), 2.127940));
+			xf::TrueAirspeed calc;
+			calc.set_ias (*_speed_ias);
+			calc.set_density_altitude (*_density_altitude);
+			calc.compute_tas();
+			_speed_tas = calc.tas();
 		}
 		else
-			// Very simple equation for TAS, fix it to use air temperature someday:
-			_speed_tas.write (cas + 0.02 * cas * (*_altitude_amsl / 1000_ft));
+			// Very simple equation for TAS when DA is unavailable:
+			_speed_tas.write (ias + 0.02 * ias * (*_altitude_amsl / 1000_ft));
 	}
 	else
 		_speed_tas.set_nil();
