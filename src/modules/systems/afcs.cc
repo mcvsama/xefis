@@ -50,6 +50,12 @@ AFCS::AFCS (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "default.speed", _ias_counter, true },
 		{ "default.heading", _heading_counter, true },
 		{ "default.altitude", _altitude_counter, true },
+		{ "mcp-speed-format.kias", _mcp_speed_format_kias, false },
+		{ "mcp-speed-format.mach", _mcp_speed_format_mach, false },
+		{ "mcp-heading-format", _mcp_heading_format, false },
+		{ "mcp-altitude-format", _mcp_altitude_format, false },
+		{ "mcp-vspd-format.vs", _mcp_vspd_format_vs, false },
+		{ "mcp-vspd-format.fpa", _mcp_vspd_format_fpa, false },
 		{ "altitude-hold-threshold-vs", _altitude_hold_threshold_vs, true },
 	});
 
@@ -118,6 +124,10 @@ AFCS::AFCS (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "output.flight-mode-speed-hint", _flight_mode_speed_hint, true },
 		{ "output.flight-mode-roll-hint", _flight_mode_roll_hint, true },
 		{ "output.flight-mode-pitch-hint", _flight_mode_pitch_hint, true },
+		{ "output.mcp-speed-format", _output_mcp_speed_format, false },
+		{ "output.mcp-heading-format", _output_mcp_heading_format, false },
+		{ "output.mcp-altitude-format", _output_mcp_altitude_format, false },
+		{ "output.mcp-vspd-format", _output_mcp_vspd_format, false },
 		{ "output.yaw-damper-enabled", _yaw_damper_enabled, true },
 	});
 
@@ -330,7 +340,7 @@ void
 AFCS::button_press_speed_hold()
 {
 	apply_pitch_changes_for_airspeed_via_at();
-	_speed_mode = SpeedMode::HOLD;
+	_speed_mode = SpeedMode::SPD_HOLD;
 }
 
 
@@ -543,22 +553,24 @@ AFCS::button_press_vspd_vs_fpa()
 {
 	// TODO change FLCH_VS <-> FLCH_FPA
 	// TODO change VS <-> FPA
-	switch (_pitch_units)
+	switch (_vspd_units)
 	{
-		case PitchUnits::VS:
-			if (!_measured_vertical_track.valid())
-				throw DisengageAP ("invalid measured vertical track");
+		case VSPDUnits::VS:
+			if (_measured_vertical_track.valid())
+				_cmd_fpa = *_measured_vertical_track;
+			else
+				_cmd_fpa = 0_deg;
 
-			_cmd_fpa = *_measured_vertical_track;
-			_pitch_units = PitchUnits::FPA;
+			_vspd_units = VSPDUnits::FPA;
 			break;
 
-		case PitchUnits::FPA:
-			if (!_measured_vs.valid())
-				throw DisengageAP ("invalid measured v/s");
+		case VSPDUnits::FPA:
+			if (_measured_vs.valid())
+				_cmd_vs = current_rounded_vs();
+			else
+				_cmd_vs = 0_fpm;
 
-			_cmd_vs = current_rounded_vs();
-			_pitch_units = PitchUnits::VS;
+			_vspd_units = VSPDUnits::VS;
 			break;
 	}
 }
@@ -576,26 +588,26 @@ AFCS::button_press_vspd_sel()
 
 	if (flch_engaged())
 	{
-		switch (_pitch_units)
+		switch (_vspd_units)
 		{
-			case PitchUnits::VS:
+			case VSPDUnits::VS:
 				_pitch_mode = PitchMode::FLCH_VS;
 				break;
 
-			case PitchUnits::FPA:
+			case VSPDUnits::FPA:
 				_pitch_mode = PitchMode::FLCH_FPA;
 				break;
 		}
 	}
 	else
 	{
-		switch (_pitch_units)
+		switch (_vspd_units)
 		{
-			case PitchUnits::VS:
+			case VSPDUnits::VS:
 				_pitch_mode = PitchMode::VS;
 				break;
 
-			case PitchUnits::FPA:
+			case VSPDUnits::FPA:
 				_pitch_mode = PitchMode::FPA;
 				break;
 		}
@@ -655,9 +667,9 @@ AFCS::knob_altitude (int delta)
 void
 AFCS::knob_vspd (int delta)
 {
-	switch (_pitch_units)
+	switch (_vspd_units)
 	{
-		case PitchUnits::VS:
+		case VSPDUnits::VS:
 			_vspd_counter = xf::limit (_vspd_counter + VSpdStep * delta, VSpdRange);
 
 			// Disengage on 0 crossing:
@@ -676,11 +688,11 @@ AFCS::knob_vspd (int delta)
 			}
 			break;
 
-		case PitchUnits::FPA:
+		case VSPDUnits::FPA:
 			_fpa_counter = xf::limit (_fpa_counter + FPAStep * delta, FPARange);
 
 			// Disengage on 0 crossing:
-			if (xf::Range<Angle> ({ -0.1_deg, +0.1_deg }).includes (_fpa_counter))
+			if (xf::Range<Angle> ({ -0.01_deg, +0.01_deg }).includes (_fpa_counter))
 			{
 				_fpa_counter = 0_deg;
 
@@ -712,20 +724,20 @@ AFCS::solve_mode()
 	_mcp_heading_display.write (heading);
 	_mcp_altitude_display.write (xf::symmetric_round (_altitude_counter.ft()));
 
-	switch (_pitch_units)
+	switch (_vspd_units)
 	{
-		case PitchUnits::VS:
+		case VSPDUnits::VS:
 			_mcp_vspd_display.write (xf::symmetric_round (_vspd_counter.fpm()));
 			break;
 
-		case PitchUnits::FPA:
+		case VSPDUnits::FPA:
 			_mcp_vspd_display.write (xf::symmetric_round (10.0 * _fpa_counter.deg()) / 10.0);
 			break;
 	}
 
 	// Speed:
 	_mcp_speed_sel_led.write (_speed_mode == SpeedMode::SPD_SEL);
-	_mcp_speed_hold_led.write (_speed_mode == SpeedMode::HOLD);
+	_mcp_speed_hold_led.write (_speed_mode == SpeedMode::SPD_HOLD);
 
 	// Control A/T and FD modules:
 	_cmd_ias.write (_ias_counter);
@@ -780,12 +792,12 @@ AFCS::update_efis()
 			_flight_mode_speed_hint = "MCP SPD";
 			break;
 
-		case SpeedMode::HOLD:
-			_flight_mode_speed_hint = "HOLD";
+		case SpeedMode::SPD_HOLD:
+			_flight_mode_speed_hint = "SPD HOLD";
 			break;
 
 		default:
-			_flight_mode_speed_hint = "?";
+			_flight_mode_speed_hint = "X";
 	}
 
 	switch (_roll_mode)
@@ -831,7 +843,7 @@ AFCS::update_efis()
 			break;
 
 		default:
-			_flight_mode_roll_hint = "?";
+			_flight_mode_roll_hint = "X";
 			break;
 	}
 
@@ -886,12 +898,37 @@ AFCS::update_efis()
 			break;
 
 		default:
-			_flight_mode_pitch_hint = "?";
+			_flight_mode_pitch_hint = "X";
 			break;
 	}
 
 	// TODO if engaged, _flight_mode_hint = "FLT DIR" or sth.
 	// TODO if error-mode (unknown mode), _flight_mode_hint = "XXX";
+
+	switch (_speed_units)
+	{
+		case SpeedUnits::KIAS:
+			_output_mcp_speed_format = _mcp_speed_format_kias;
+			break;
+
+		case SpeedUnits::Mach:
+			_output_mcp_speed_format = _mcp_speed_format_mach;
+			break;
+	}
+
+	_output_mcp_heading_format = _mcp_heading_format;
+	_output_mcp_altitude_format = _mcp_altitude_format;
+
+	switch (_vspd_units)
+	{
+		case VSPDUnits::VS:
+			_output_mcp_vspd_format = _mcp_vspd_format_vs;
+			break;
+
+		case VSPDUnits::FPA:
+			_output_mcp_vspd_format = _mcp_vspd_format_fpa;
+			break;
+	}
 }
 
 
@@ -955,7 +992,7 @@ AFCS::at_in_thrust_mode()
 		case SpeedMode::SPD_REF:
 		case SpeedMode::SPD_SEL:
 		case SpeedMode::MCP_SPD:
-		case SpeedMode::HOLD:
+		case SpeedMode::SPD_HOLD:
 			return false;
 
 		case SpeedMode::sentinel:
