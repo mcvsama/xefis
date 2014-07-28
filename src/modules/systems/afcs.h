@@ -85,7 +85,7 @@ class AFCS: public xf::Module
 		Track,
 	};
 
-	enum class PitchUnits
+	enum class VSPDUnits
 	{
 		VS,
 		FPA,
@@ -107,7 +107,7 @@ class AFCS: public xf::Module
 		SPD_REF		= 5,
 		SPD_SEL		= 6,
 		MCP_SPD		= 7,
-		HOLD		= 8,
+		SPD_HOLD	= 8,
 		sentinel	= 9,
 	};
 
@@ -299,11 +299,17 @@ class AFCS: public xf::Module
 	// Settings:
 	Speed							_altitude_hold_threshold_vs	= 100_fpm;
 	Speed							_vertical_speed_rounding	= 100_fpm;
+	std::string						_mcp_speed_format_kias		= "%d";
+	std::string						_mcp_speed_format_mach		= "%.3f";
+	std::string						_mcp_heading_format			= "%03d";
+	std::string						_mcp_altitude_format		= "%d";
+	std::string						_mcp_vspd_format_vs			= "%+d";
+	std::string						_mcp_vspd_format_fpa		= "%.1f";
 	// State:
 	FlightStage						_flight_stage				= FlightStage::Cruise;
 	SpeedUnits						_speed_units				= SpeedUnits::KIAS;
 	LateralDirection				_lateral_direction			= LateralDirection::Track;
-	PitchUnits						_pitch_units				= PitchUnits::VS;
+	VSPDUnits						_vspd_units					= VSPDUnits::VS;
 	AltitudeStep					_altitude_step				= AltitudeStep::Ft10;
 	Speed							_ias_counter				= SpeedRange.min();
 	xf::PropertyFloat::Type			_mach_counter				= 0.0;
@@ -389,7 +395,7 @@ class AFCS: public xf::Module
 	xf::PropertyBoolean				_mcp_altitude_hold_led;
 	xf::PropertyInteger				_mcp_vspd_knob;
 	Unique<xf::DeltaDecoder>		_mcp_vspd_decoder;
-	xf::PropertyInteger				_mcp_vspd_display;
+	xf::PropertyFloat				_mcp_vspd_display;
 	xf::PropertyBoolean				_mcp_vspd_vs_fpa_button;
 	Unique<xf::ButtonAction>		_mcp_vspd_vs_fpa_action;
 	xf::PropertyBoolean				_mcp_vspd_sel_button;
@@ -414,6 +420,10 @@ class AFCS: public xf::Module
 	xf::PropertyString				_flight_mode_speed_hint;
 	xf::PropertyString				_flight_mode_roll_hint;
 	xf::PropertyString				_flight_mode_pitch_hint;
+	xf::PropertyString				_output_mcp_speed_format;		// String format for speed display on MCP.
+	xf::PropertyString				_output_mcp_heading_format;		// String format for heading display on MCP.
+	xf::PropertyString				_output_mcp_altitude_format;	// String format for altitude display on MCP.
+	xf::PropertyString				_output_mcp_vspd_format;		// String format for vertical speed display on MCP.
 	// Other:
 	std::vector<xf::Action*>		_button_actions;
 	std::vector<xf::DeltaDecoder*>	_rotary_decoders;
