@@ -33,6 +33,8 @@
 class AFCS: public xf::Module
 {
 	static constexpr xf::Range<Speed>	SpeedRange				= { 10_kt, 300_kt };
+	static constexpr xf::Range<double>	MachRange				= { 0.000, 1.000 };
+	static constexpr double				MachStep				= 0.001;
 	static constexpr xf::Range<Length>	AltitudeRange			= { 0_ft, 50000_ft };
 	static constexpr Speed				VSpdStep				= 10_fpm;
 	static constexpr xf::Range<Speed>	VSpdRange				= { -8000_fpm, +8000_fpm };
@@ -353,7 +355,7 @@ class AFCS: public xf::Module
 	xf::PropertyBoolean				_mcp_yd_led;
 	xf::PropertyInteger				_mcp_speed_knob;
 	Unique<xf::DeltaDecoder>		_mcp_speed_decoder;
-	xf::PropertyInteger				_mcp_speed_display;
+	xf::PropertyFloat				_mcp_speed_display;
 	xf::PropertyBoolean				_mcp_speed_ias_mach_button;
 	Unique<xf::ButtonAction>		_mcp_speed_ias_mach_action;
 	xf::PropertyBoolean				_mcp_speed_sel_button;
@@ -364,7 +366,7 @@ class AFCS: public xf::Module
 	xf::PropertyBoolean				_mcp_speed_hold_led;
 	xf::PropertyInteger				_mcp_heading_knob;
 	Unique<xf::DeltaDecoder>		_mcp_heading_decoder;
-	xf::PropertyInteger				_mcp_heading_display;
+	xf::PropertyFloat				_mcp_heading_display;
 	xf::PropertyBoolean				_mcp_heading_hdg_trk_button;
 	Unique<xf::ButtonAction>		_mcp_heading_hdg_trk_action;
 	xf::PropertyBoolean				_mcp_heading_sel_button;
@@ -384,7 +386,7 @@ class AFCS: public xf::Module
 	xf::PropertyBoolean				_mcp_app_led;
 	xf::PropertyInteger				_mcp_altitude_knob;
 	Unique<xf::DeltaDecoder>		_mcp_altitude_decoder;
-	xf::PropertyInteger				_mcp_altitude_display;
+	xf::PropertyFloat				_mcp_altitude_display;
 	xf::PropertyBoolean				_mcp_altitude_stepch_button;
 	Unique<xf::ButtonAction>		_mcp_altitude_stepch_action;
 	xf::PropertyBoolean				_mcp_altitude_flch_button;
