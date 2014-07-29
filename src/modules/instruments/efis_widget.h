@@ -126,6 +126,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		bool				use_standard_pressure				= false;
 		// Command settings
 		Optional<Speed>		cmd_speed;
+		Optional<double>	cmd_mach;
 		Optional<Length>	cmd_altitude;
 		Optional<Speed>		cmd_vertical_speed;
 		Optional<Angle>		cmd_fpa;

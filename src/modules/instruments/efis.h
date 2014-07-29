@@ -143,6 +143,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyLength				_flight_director_cmd_altitude;
 	Xefis::PropertyBoolean				_flight_director_cmd_altitude_acquired;
 	Xefis::PropertySpeed				_flight_director_cmd_ias;
+	Xefis::PropertyFloat				_flight_director_cmd_mach;
 	Xefis::PropertySpeed				_flight_director_cmd_vertical_speed;
 	Xefis::PropertyAngle				_flight_director_cmd_fpa;
 	Xefis::PropertyBoolean				_flight_director_guidance_visible;
