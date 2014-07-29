@@ -34,6 +34,8 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/afcs", AFCS);
 constexpr Angle				AFCS::HeadingHoldPitchLimit;
 constexpr Angle				AFCS::AltitudeHoldRollLimit;
 constexpr xf::Range<Speed>	AFCS::SpeedRange;
+constexpr xf::Range<double>	AFCS::MachRange;
+constexpr double			AFCS::MachStep;
 constexpr xf::Range<Length>	AFCS::AltitudeRange;
 constexpr Speed				AFCS::VSpdStep;
 constexpr xf::Range<Speed>	AFCS::VSpdRange;
@@ -47,7 +49,8 @@ AFCS::AFCS (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
-		{ "default.speed", _ias_counter, true },
+		{ "default.ias", _ias_counter, true },
+		{ "default.mach", _mach_counter, true },
 		{ "default.heading", _heading_counter, true },
 		{ "default.altitude", _altitude_counter, true },
 		{ "mcp-speed-format.kias", _mcp_speed_format_kias, false },
@@ -632,8 +635,7 @@ AFCS::knob_speed (int delta)
 			break;
 
 		case SpeedUnits::Mach:
-			_mach_counter = 0.0;// TODO
-			// TODO +- mach unit
+			_mach_counter = xf::limit (_mach_counter + MachStep * delta, MachRange);
 			break;
 	}
 }
@@ -713,11 +715,22 @@ AFCS::knob_vspd (int delta)
 void
 AFCS::solve_mode()
 {
-	// Displays (counters):
+	// LEDs and displays (counters):
 	_mcp_ap_led.write (_ap_on);
 	_mcp_at_led.write (_at_on);
 	_mcp_yd_led.write (_yd_on);
-	_mcp_speed_display.write (xf::symmetric_round (_ias_counter.kt()));
+
+	switch (_speed_units)
+	{
+		case SpeedUnits::KIAS:
+			_mcp_speed_display.write (xf::symmetric_round (_ias_counter.kt()));
+			break;
+
+		case SpeedUnits::Mach:
+			_mcp_speed_display.write (_mach_counter);
+			break;
+	}
+
 	int heading = xf::symmetric_round (_heading_counter.deg());
 	if (heading == 0)
 		heading = 360;
@@ -741,6 +754,7 @@ AFCS::solve_mode()
 
 	// Control A/T and FD modules:
 	_cmd_ias.write (_ias_counter);
+	_cmd_mach.write (_mach_counter);
 	_cmd_magnetic_heading_track.write (_heading_counter);
 	_cmd_altitude.write (_altitude_counter);
 	// TODO only if accplicable
