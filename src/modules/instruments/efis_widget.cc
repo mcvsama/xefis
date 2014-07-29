@@ -1002,7 +1002,7 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (Xefis::Painter& painter, float x)
 		}
 	}
 
-	// AT bug:
+	// Speed bug:
 	if (_params.cmd_speed)
 	{
 		float posy = Xefis::limit (kt_to_px (Xefis::limit (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
@@ -1056,15 +1056,29 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_or_gs (Xefis::Painter& painter, float x
 void
 EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 {
-	if (!_params.cmd_speed)
+	if (!_params.cmd_speed && !_params.cmd_mach)
 		return;
 
 	QFont actual_speed_font = _font_20;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
-
-	int digits = 4;
 	float const margin = 0.2f * digit_width;
+	int digits = 0;
+	QString value;
+
+	// Mach info has priority:
+	if (_params.cmd_mach)
+	{
+		value = QString::fromStdString ((boost::format ("%5.3f") % *_params.cmd_mach).str());
+		if (value.size() > 0 && value[0] == '0')
+			value = value.mid (1);
+		digits = value.size();
+	}
+	else if (_params.cmd_speed)
+	{
+		value = QString::number (std::abs (static_cast<int> (_params.cmd_speed->kt())));
+		digits = 4;
+	}
 
 	QRectF digits_box (0.f, 0.f, digits * digit_width + 2.f * margin, 1.3f * digit_height);
 	QRectF box_rect (_sl_ladder_rect.right() - digits_box.width(), _sl_ladder_rect.top() - 1.4f * digits_box.height(),
@@ -1080,7 +1094,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (Xefis::Painter& painter)
 	painter.setFont (actual_speed_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (_params.cmd_speed->kt()))));
+	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, value);
 }
 
 

@@ -107,6 +107,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "flight-director.cmd.altitude", _flight_director_cmd_altitude, false },
 		{ "flight-director.cmd.altitude.acquired", _flight_director_cmd_altitude_acquired, false },
 		{ "flight-director.cmd.ias", _flight_director_cmd_ias, false },
+		{ "flight-director.cmd.mach", _flight_director_cmd_mach, false },
 		{ "flight-director.cmd.vertical-speed", _flight_director_cmd_vertical_speed, false },
 		{ "flight-director.cmd.fpa", _flight_director_cmd_fpa, false },
 		{ "flight-director.guidance.visible", _flight_director_guidance_visible, false },
@@ -292,6 +293,7 @@ EFIS::read()
 	if (cmd_visible)
 	{
 		params.cmd_speed = _flight_director_cmd_ias.get_optional();
+		params.cmd_mach = _flight_director_cmd_mach.get_optional();
 		params.cmd_altitude = _flight_director_cmd_altitude.get_optional();
 		params.cmd_vertical_speed = _flight_director_cmd_vertical_speed.get_optional();
 		params.cmd_fpa = _flight_director_cmd_fpa.get_optional();
@@ -299,6 +301,7 @@ EFIS::read()
 	else
 	{
 		params.cmd_speed.reset();
+		params.cmd_mach.reset();
 		params.cmd_altitude.reset();
 		params.cmd_vertical_speed.reset();
 		params.cmd_fpa.reset();
