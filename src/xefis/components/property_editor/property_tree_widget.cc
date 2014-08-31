@@ -76,9 +76,14 @@ PropertyTreeWidget::selected_property_node() const
 bool
 PropertyTreeWidget::contains_binary_data (TypedPropertyValueNode const* node)
 {
-	std::string data = node->stringify();
 	PropertyValueNode<std::string> const* string_node = dynamic_cast<PropertyValueNode<std::string> const*> (node);
-	return string_node && std::any_of (data.begin(), data.end(), [](unsigned char c) -> bool { return c < 0x20 || 0x7f < c; });
+	if (string_node)
+	{
+		std::string data = node->stringify();
+		return std::any_of (data.begin(), data.end(), [](unsigned char c) -> bool { return c < 0x20 || 0x7f < c; });
+	}
+	else
+		return false;
 }
 
 
