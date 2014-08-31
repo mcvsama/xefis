@@ -25,10 +25,17 @@ PROFILE			:=
 VERSION			:= alpha0.1dev
 # Release version? (no asserts, etc).
 RELEASE			:= 0
+# Set to 1 to disable some UB-generating optimizations:
+UB_OPTS_DISABLE	:= 0
 
 # Predefined profiles:
 ifeq ($(PROFILE),rpi)
 CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
+endif
+
+# Undefined-Behaviour handling:
+ifeq ($(UB_OPTS_DISABLE),1)
+CXXFLAGS += -fno-strict-overflow -fno-delete-null-pointer-checks -fno-strict-aliasing
 endif
 
 ifeq ($(PROFILE),bbb)
