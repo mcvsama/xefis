@@ -36,7 +36,7 @@ class Weight: public LinearValue<double, Weight>
 
   protected:
 	explicit constexpr
-	Weight (ValueType gr) noexcept;
+	Weight (ValueType kg) noexcept;
 
   public:
 	constexpr
@@ -88,42 +88,42 @@ static_assert (std::is_literal_type<Weight>::value, "Weight must be a literal ty
 inline constexpr Weight
 operator"" _gr (long double gr)
 {
-	return Weight (static_cast<Weight::ValueType> (gr));
+	return Weight (static_cast<Weight::ValueType> (gr) / 1000.0);
 }
 
 
 inline constexpr Weight
 operator"" _gr (unsigned long long gr)
 {
-	return Weight (static_cast<Weight::ValueType> (gr));
+	return Weight (static_cast<Weight::ValueType> (gr) / 1000.0);
 }
 
 
 inline constexpr Weight
 operator"" _kg (long double kg)
 {
-	return Weight (static_cast<Weight::ValueType> (kg) * 1000.0);
+	return Weight (static_cast<Weight::ValueType> (kg));
 }
 
 
 inline constexpr Weight
 operator"" _kg (unsigned long long kg)
 {
-	return Weight (static_cast<Weight::ValueType> (kg) * 1000.0);
+	return Weight (static_cast<Weight::ValueType> (kg));
 }
 
 
 inline constexpr Weight
 operator"" _lb (long double lb)
 {
-	return Weight (static_cast<Weight::ValueType> (lb) * 453.592);
+	return Weight (static_cast<Weight::ValueType> (lb) * 0.453592);
 }
 
 
 inline constexpr Weight
 operator"" _lb (unsigned long long lb)
 {
-	return Weight (static_cast<Weight::ValueType> (lb) * 453.592);
+	return Weight (static_cast<Weight::ValueType> (lb) * 0.453592);
 }
 
 
@@ -133,8 +133,8 @@ operator"" _lb (unsigned long long lb)
 
 
 inline constexpr
-Weight::Weight (ValueType gr) noexcept:
-	LinearValue (gr)
+Weight::Weight (ValueType kg) noexcept:
+	LinearValue (kg)
 { }
 
 
@@ -155,21 +155,21 @@ Weight::si_units() const noexcept
 inline constexpr Weight::ValueType
 Weight::gr() const noexcept
 {
-	return internal();
+	return internal() * 1000.0;
 }
 
 
 inline constexpr Weight::ValueType
 Weight::kg() const noexcept
 {
-	return internal() * 0.001;
+	return internal();
 }
 
 
 inline constexpr Weight::ValueType
 Weight::lb() const noexcept
 {
-	return internal() / 453.592;
+	return internal() / 0.453592;
 }
 
 
@@ -197,7 +197,7 @@ Weight::parse (std::string const& str)
 inline std::string
 Weight::stringify() const
 {
-	return boost::lexical_cast<std::string> (gr()) + " gr";
+	return boost::lexical_cast<std::string> (kg()) + " kg";
 }
 
 
