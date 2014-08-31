@@ -36,13 +36,12 @@ class AFCS: public xf::Module
 	static constexpr xf::Range<double>	MachRange				= { 0.000, 1.000 };
 	static constexpr double				MachStep				= 0.001;
 	static constexpr xf::Range<Length>	AltitudeRange			= { 0_ft, 50000_ft };
-	static constexpr Speed				VSpdStep				= 10_fpm;
-	static constexpr xf::Range<Speed>	VSpdRange				= { -8000_fpm, +8000_fpm };
+	static constexpr Speed				VSStep					= 10_fpm;
+	static constexpr xf::Range<Speed>	VSRange					= { -8000_fpm, +8000_fpm };
 	static constexpr Angle				FPAStep					= 0.1_deg;
 	static constexpr xf::Range<Angle>	FPARange				= { -10_deg, +10_deg };
-	static constexpr Angle				HeadingHoldPitchLimit	= 30_deg;
-	static constexpr Angle				AltitudeHoldRollLimit	= 30_deg;
 
+	// TODO ensure those classes are used
 	class DisengageAP: public std::runtime_error
 	{
 	  public:
@@ -61,33 +60,19 @@ class AFCS: public xf::Module
 		using runtime_error::runtime_error;
 	};
 
-	class InvalidState: public xf::Exception
-	{
-	  public:
-		InvalidState():
-			Exception ("invalid AFCS state")
-		{ }
-	};
-
-	enum class FlightStage
-	{
-		Cruise,
-		Approach,
-	};
-
-	enum class SpeedUnits
+	enum class SpeedControl
 	{
 		KIAS,
 		Mach,
 	};
 
-	enum class LateralDirection
+	enum class LateralControl
 	{
 		Heading,
 		Track,
 	};
 
-	enum class VSPDUnits
+	enum class VerticalControl
 	{
 		VS,
 		FPA,
@@ -99,50 +84,45 @@ class AFCS: public xf::Module
 		Ft100,
 	};
 
-	enum class SpeedMode
+	enum class HeadingStep
 	{
-		None		= 0,
-		TO_GA		= 1,
-		THR			= 2,
-		THR_REF		= 3,
-		IDLE		= 4,
-		SPD_REF		= 5,
-		SPD_SEL		= 6,
-		MCP_SPD		= 7,
-		SPD_HOLD	= 8,
-		sentinel	= 9,
+		Deg1,
+		Deg10,
+	};
+
+	enum class ThrustMode
+	{
+		None			= 0,
+		TO_GA			= 1,
+		CONT			= 2,
+		IDLE			= 3,
+		MCP_SPD			= 4,	// Displayed as "SPD SEL" or "SPD" on FMA.
+		SPD_HOLD		= 5,
+		sentinel		= 6,
 	};
 
 	enum class RollMode
 	{
-		None		= 0,
-		HDG_SEL		= 1,
-		HDG_HOLD	= 2,
-		HDG			= 3,
-		TRK_SEL		= 4,
-		TRK_HOLD	= 5,
-		TRK			= 6,
-		LOC			= 7,
-		WNG_LVL		= 8,
-		LNAV		= 9,
-		sentinel	= 10,
+		None			= 0,
+		MCP				= 1,	// Displayed as "HDG SEL", "TRK SEL", "HDG" or "TRK" on FMA.
+		HOLD			= 2,	// Displayed as "HDG HOLD" or "TRK HOLD" on FMA.
+		WNG_LVL			= 3,
+		LOC				= 4,
+		LNAV			= 5,
+		sentinel		= 6,
 	};
 
 	enum class PitchMode
 	{
-		None		= 0,
-		FLCH_SPD	= 1,
-		FLCH_VS		= 2,
-		FLCH_FPA	= 3,
-		VS			= 4,
-		FPA			= 5,
-		CLB_CON		= 6,
-		VNAV_SPD	= 7,
-		VNAV_PTH	= 8,
-		ALT			= 9,
-		ALT_HOLD	= 10,
-		GS			= 11,
-		sentinel	= 12,
+		None			= 0,
+		MCP_SPD			= 1,
+		ALT_HOLD		= 2,	// Use alt_hold() instead of manually assigning to _pitch_mode.
+		MCP_ALT			= 3,	// Displayed as "ALT" or "FLCH".
+		VC				= 4,	// Vertical Control, displayed as "V/S" or "FPA" on FMA.
+		VNAV_PTH		= 5,
+		GS				= 6,
+		FLARE			= 7,
+		sentinel		= 8,
 	};
 
   public:
@@ -154,10 +134,6 @@ class AFCS: public xf::Module
 	data_updated() override;
 
   private:
-	/*
-	 * Button and knob callbacks.
-	 */
-
 	void
 	button_press_ap();
 
@@ -167,77 +143,155 @@ class AFCS: public xf::Module
 	void
 	button_press_yd();
 
-	void
-	button_press_speed_ias_mach();
+	/*
+	 * Speed/thrust panel
+	 *
+	 * NOTE On each thrust mode change, pitch mode must be adjusted
+	 * so that one of these control airspeed.
+	 */
 
 	void
-	apply_pitch_changes_for_airspeed_via_at();
+	knob_speed_change (int delta);
 
 	void
-	button_press_speed_sel();
+	button_press_xchg_ias_mach();
 
 	void
-	button_press_speed_hold();
+	button_press_toga();
 
 	void
-	button_press_heading_hdg_trk();
+	button_press_spd_hold();
 
 	void
-	button_press_heading_sel();
+	button_press_spd_sel();
+
+	/*
+	 * Heading panel
+	 */
 
 	void
-	button_press_heading_hold();
+	knob_heading_change (int delta);
 
 	void
-	button_press_vnav();
+	button_press_xchg_heading_step();
+
+	void
+	button_press_xchg_hdg_trk();
+
+	void
+	button_press_hdgtrk_sel();
+
+	void
+	button_press_hdgtrk_hold();
+
+	void
+	button_press_wng_lvl();
+
+	void
+	button_press_loc();
+
+	/*
+	 * Misc panel
+	 *
+	 * NOTE On each pitch mode change, thrust mode must be adjusted
+	 * so that one of these control airspeed.
+	 */
 
 	void
 	button_press_lnav();
 
 	void
+	button_press_vnav();
+
+	void
+	button_press_lvl_all();
+
+	void
+	button_press_to();
+
+	void
+	button_press_crz();
+
+	void
 	button_press_app();
 
 	void
-	button_press_altitude_stepch();
+	button_press_ils();
+
+	/*
+	 * Altitude panel
+	 */
 
 	void
-	button_press_altitude_flch();
+	knob_altitude_change (int delta);
+
+	void
+	button_press_xchg_altitude_step();
+
+	void
+	button_press_flch();
 
 	void
 	button_press_altitude_hold();
 
 	void
-	button_press_vspd_vs_fpa();
+	button_press_gs();
+
+	/*
+	 * Vertical speed panel
+	 */
 
 	void
-	button_press_vspd_sel();
+	knob_vertical_change (int delta);
 
 	void
-	button_press_vspd_clb_con();
+	button_press_xchg_vs_fpa();
 
 	void
-	knob_speed (int delta);
+	button_press_vertical_enable();
 
 	void
-	knob_heading (int delta);
+	button_press_vertical_sel();
 
 	void
-	knob_altitude (int delta);
+	button_press_clb_con();
 
+	/**
+	 * Check input values and throws disconnect instruction if needed.
+	 */
 	void
-	knob_vspd (int delta);
+	check_input();
+
+	/**
+	 * Check current measured values and possibly update state.
+	 * Eg. change pitch mode to MCP ALT after FLCH if set altitude is acquired.
+	 */
+	void
+	check_events();
 
 	/**
 	 * Compute and solve settings of Flight Director.
 	 */
 	void
-	solve_mode();
+	solve();
+
+	/**
+	 * Update LEDs and counters on MCP.
+	 */
+	void
+	update_mcp();
 
 	/**
 	 * Update FMA messages.
 	 */
 	void
 	update_efis();
+
+	/**
+	 * Update output cmd_* and *_ref properties.
+	 */
+	void
+	update_output();
 
 	/**
 	 * Disengage A/P.
@@ -254,181 +308,189 @@ class AFCS: public xf::Module
 	disengage_at (const char* reason);
 
 	/**
-	 * Set spd reference for given flight stage.
+	 * Enable SPD HOLD mode for thrust and assign current speed setting to thrust.
+	 * If not possible to set the speed setting, signal error, but keep the mode.
 	 */
 	void
-	set_spd_ref_for_flight_stage (FlightStage stage);
+	spd_hold_with_thrust();
 
 	/**
-	 * Return current V/S rounded to _vertical_speed_rounding.
+	 * Enable HDG|TRK HOLD mode for roll and assign current heading or track
+	 * to cmd heading/track. If not possible to set the setting, signal error,
+	 * but keep the mode.
 	 */
-	Speed
+	void
+	heading_hold_with_roll();
+
+	/**
+	 * Enable ALT HOLD mode for pitch and assign current altitude setting to cmd.
+	 * If not possible to set the altitude setting, signal error, but keep the mode.
+	 */
+	void
+	alt_hold_with_pitch();
+
+	/**
+	 * Exchange two pitch modes, if one if them is active.
+	 */
+	void
+	xchg_modes (PitchMode, PitchMode);
+
+	/**
+	 * Return current V/S rounded to _vs_rounding.
+	 */
+	Optional<Speed>
 	current_rounded_vs() const;
 
 	/**
-	 * Return true if A/T operates in thrust mode.
+	 * Return current FPA rounded to _fpa_rounding.
 	 */
-	bool
-	at_in_thrust_mode();
+	Optional<Angle>
+	current_rounded_fpa() const;
 
 	/**
-	 * Return true if A/T operates in speed mode.
+	 * Return true if pitch is in any of VNAV modes.
 	 */
 	bool
-	at_in_speed_mode();
+	vnav_enabled() const;
 
 	/**
-	 * Return true if pitch mode is engaged in flight level change mode.
+	 * Return true if pitch controls airspeed.
 	 */
 	bool
-	flch_engaged();
+	pitch_controls_airspeed() const;
 
 	/**
-	 * Create a Unique<ButtonAction> for button press.
-	 * Wrap button press callback and add call to solve_mode() at the end.
+	 * Makes pitch control airspeed.
 	 */
-	Unique<xf::ButtonAction>
+	void
+	transfer_airspeed_control_from_thrust_to_pitch();
+
+	/**
+	 * Makes thrust control airspeed.
+	 */
+	void
+	transfer_airspeed_control_from_pitch_to_thrust();
+
+	/**
+	 * Create and save a button action for button press.
+	 * Wrap button press callback and add call to solve() at the end.
+	 */
+	void
 	make_button_action (xf::PropertyBoolean, void (AFCS::* callback)());
 
 	/**
-	 * Create a knob action for knob movement.
-	 * Wrap knob rotate callback and add call to solve_mode() at the end.
+	 * Create and save a knob action for knob movement.
+	 * Wrap knob rotate callback and add call to solve() at the end.
 	 */
-	Unique<xf::DeltaDecoder>
+	void
 	make_knob_action (xf::PropertyInteger, void (AFCS::* callback)(int));
+
+	/**
+	 * Return string ID for a thrust mode.
+	 */
+	Optional<std::string>
+	stringify_thrust_mode() const;
+
+	/**
+	 * Return string ID for a roll mode.
+	 */
+	Optional<std::string>
+	stringify_roll_mode() const;
+
+	/**
+	 * Return string ID for a pitch mode.
+	 */
+	Optional<std::string>
+	stringify_pitch_mode() const;
 
   private:
 	// Settings:
-	Speed							_altitude_hold_threshold_vs	= 100_fpm;
-	Speed							_vertical_speed_rounding	= 100_fpm;
-	std::string						_mcp_speed_format_kias		= "%d";
-	std::string						_mcp_speed_format_mach		= "%.3f";
-	std::string						_mcp_heading_format			= "%03d";
-	std::string						_mcp_altitude_format		= "%d";
-	std::string						_mcp_vspd_format_vs			= "%+d";
-	std::string						_mcp_vspd_format_fpa		= "%.1f";
+	Speed								_acq_delta_ias				= 2_kt;
+	xf::PropertyFloat::Type				_acq_delta_mach				= 0.0033;
+	Angle								_acq_delta_heading			= 2_deg;
+	Length								_acq_delta_altitude			= 100_ft;
+	Speed								_vs_rounding				= 100_fpm;
+	Angle								_fpa_rounding				= 0.1_deg;
+	std::string							_mcp_speed_format_kias		= "%d";
+	std::string							_mcp_speed_format_mach		= "%.3f";
+	std::string							_mcp_heading_format			= "%03d";
+	std::string							_mcp_altitude_format		= "%d";
+	std::string							_mcp_vertical_format_vs		= "%+d";
+	std::string							_mcp_vertical_format_fpa	= "%.1f";
 	// State:
-	FlightStage						_flight_stage				= FlightStage::Cruise;
-	SpeedUnits						_speed_units				= SpeedUnits::KIAS;
-	LateralDirection				_lateral_direction			= LateralDirection::Track;
-	VSPDUnits						_vspd_units					= VSPDUnits::VS;
-	AltitudeStep					_altitude_step				= AltitudeStep::Ft10;
-	Speed							_ias_counter				= SpeedRange.min();
-	xf::PropertyFloat::Type			_mach_counter				= 0.0;
-	Angle							_heading_counter			= 0_deg;
-	Length							_altitude_counter			= 1000_ft;
-	Speed							_vspd_counter				= 0_fpm;
-	Angle							_fpa_counter				= 0_deg;
-	SpeedMode						_speed_mode					= SpeedMode::None;
-	RollMode						_roll_mode					= RollMode::None;
-	PitchMode						_pitch_mode					= PitchMode::None;
-	Speed							_hold_ias;
-	xf::PropertyFloat::Type			_hold_mach;
-	Angle							_hold_magnetic_heading_or_track;
-	Length							_hold_altitude_amsl;
-	Speed							_hold_vs;
-	Angle							_hold_fpa;
-	bool							_ap_on						= false;
-	bool							_at_on						= false;
-	bool							_yd_on						= false;
+	bool								_ap_on						= false;
+	bool								_at_on						= false;
+	bool								_yd_on						= false;
+	ThrustMode							_thrust_mode				= ThrustMode::None;
+	RollMode							_roll_mode					= RollMode::None;
+	RollMode							_armed_roll_mode			= RollMode::None;
+	PitchMode							_pitch_mode					= PitchMode::None;
+	PitchMode							_armed_pitch_mode			= PitchMode::None;
+	SpeedControl						_speed_control				= SpeedControl::KIAS;
+	LateralControl						_lateral_control			= LateralControl::Track;
+	VerticalControl						_vertical_control			= VerticalControl::VS;
+	HeadingStep							_heading_step				= HeadingStep::Deg1;
+	AltitudeStep						_altitude_step				= AltitudeStep::Ft10;
+	// Settings to be displayed on MCP:
+	Speed								_mcp_ias					= SpeedRange.min();
+	xf::PropertyFloat::Type				_mcp_mach					= 0.0;
+	Angle								_mcp_heading				= 0_deg;
+	Angle								_mcp_track					= 0_deg;
+	Length								_mcp_altitude				= 1000_ft;
+	Optional<Speed>						_mcp_vs;
+	Optional<Angle>						_mcp_fpa;
 	// Measurements:
-	xf::PropertySpeed				_measured_vs;
-	xf::PropertyLength				_measured_altitude_amsl;
-	xf::PropertyAngle				_measured_magnetic_heading;
-	xf::PropertyAngle				_measured_magnetic_track;
-	xf::PropertyAngle				_measured_vertical_track;
-	// Config:
-	xf::PropertyFrequency			_thr_ref_for_cruise;
-	xf::PropertyFrequency			_thr_ref_for_climb;
-	xf::PropertyFrequency			_thr_ref_for_descent;
-	xf::PropertySpeed				_spd_ref_for_cruise;
-	xf::PropertySpeed				_spd_ref_for_approach;
-	// Buttons, encoders:
-	xf::PropertyBoolean				_mcp_ap_button;
-	Unique<xf::ButtonAction>		_mcp_ap_action;
-	xf::PropertyBoolean				_mcp_ap_led;
-	xf::PropertyBoolean				_mcp_at_button;
-	Unique<xf::ButtonAction>		_mcp_at_action;
-	xf::PropertyBoolean				_mcp_at_led;
-	xf::PropertyBoolean				_mcp_yd_button;
-	Unique<xf::ButtonAction>		_mcp_yd_action;
-	xf::PropertyBoolean				_mcp_yd_led;
-	xf::PropertyInteger				_mcp_speed_knob;
-	Unique<xf::DeltaDecoder>		_mcp_speed_decoder;
-	xf::PropertyFloat				_mcp_speed_display;
-	xf::PropertyBoolean				_mcp_speed_ias_mach_button;
-	Unique<xf::ButtonAction>		_mcp_speed_ias_mach_action;
-	xf::PropertyBoolean				_mcp_speed_sel_button;
-	Unique<xf::ButtonAction>		_mcp_speed_sel_action;
-	xf::PropertyBoolean				_mcp_speed_sel_led;
-	xf::PropertyBoolean				_mcp_speed_hold_button;
-	Unique<xf::ButtonAction>		_mcp_speed_hold_action;
-	xf::PropertyBoolean				_mcp_speed_hold_led;
-	xf::PropertyInteger				_mcp_heading_knob;
-	Unique<xf::DeltaDecoder>		_mcp_heading_decoder;
-	xf::PropertyFloat				_mcp_heading_display;
-	xf::PropertyBoolean				_mcp_heading_hdg_trk_button;
-	Unique<xf::ButtonAction>		_mcp_heading_hdg_trk_action;
-	xf::PropertyBoolean				_mcp_heading_sel_button;
-	Unique<xf::ButtonAction>		_mcp_heading_sel_action;
-	xf::PropertyBoolean				_mcp_heading_sel_led;
-	xf::PropertyBoolean				_mcp_heading_hold_button;
-	Unique<xf::ButtonAction>		_mcp_heading_hold_action;
-	xf::PropertyBoolean				_mcp_heading_hold_led;
-	xf::PropertyBoolean				_mcp_vnav_button;
-	Unique<xf::ButtonAction>		_mcp_vnav_action;
-	xf::PropertyBoolean				_mcp_vnav_led;
-	xf::PropertyBoolean				_mcp_lnav_button;
-	Unique<xf::ButtonAction>		_mcp_lnav_action;
-	xf::PropertyBoolean				_mcp_lnav_led;
-	xf::PropertyBoolean				_mcp_app_button;
-	Unique<xf::ButtonAction>		_mcp_app_action;
-	xf::PropertyBoolean				_mcp_app_led;
-	xf::PropertyInteger				_mcp_altitude_knob;
-	Unique<xf::DeltaDecoder>		_mcp_altitude_decoder;
-	xf::PropertyFloat				_mcp_altitude_display;
-	xf::PropertyBoolean				_mcp_altitude_stepch_button;
-	Unique<xf::ButtonAction>		_mcp_altitude_stepch_action;
-	xf::PropertyBoolean				_mcp_altitude_flch_button;
-	Unique<xf::ButtonAction>		_mcp_altitude_flch_action;
-	xf::PropertyBoolean				_mcp_altitude_flch_led;
-	xf::PropertyBoolean				_mcp_altitude_hold_button;
-	Unique<xf::ButtonAction>		_mcp_altitude_hold_action;
-	xf::PropertyBoolean				_mcp_altitude_hold_led;
-	xf::PropertyInteger				_mcp_vspd_knob;
-	Unique<xf::DeltaDecoder>		_mcp_vspd_decoder;
-	xf::PropertyFloat				_mcp_vspd_display;
-	xf::PropertyBoolean				_mcp_vspd_vs_fpa_button;
-	Unique<xf::ButtonAction>		_mcp_vspd_vs_fpa_action;
-	xf::PropertyBoolean				_mcp_vspd_sel_button;
-	Unique<xf::ButtonAction>		_mcp_vspd_sel_action;
-	xf::PropertyBoolean				_mcp_vspd_sel_led;
-	xf::PropertyBoolean				_mcp_vspd_clb_con_button;
-	Unique<xf::ButtonAction>		_mcp_vspd_clb_con_action;
-	xf::PropertyBoolean				_mcp_vspd_clb_con_led;
-	// Output:
-	xf::PropertyInteger				_cmd_roll_mode;
-	xf::PropertyInteger				_cmd_pitch_mode;
-	xf::PropertySpeed				_cmd_ias;
-	xf::PropertyFloat				_cmd_mach;
-	xf::PropertyAngle				_cmd_magnetic_heading_track;
-	xf::PropertyLength				_cmd_altitude;
-	xf::PropertySpeed				_cmd_vs;
-	xf::PropertyAngle				_cmd_fpa;
-	xf::PropertyFrequency			_thr_ref;
-	xf::PropertySpeed				_spd_ref;
-	xf::PropertyBoolean				_yaw_damper_enabled;
-	xf::PropertyString				_flight_mode_hint;
-	xf::PropertyString				_flight_mode_speed_hint;
-	xf::PropertyString				_flight_mode_roll_hint;
-	xf::PropertyString				_flight_mode_pitch_hint;
-	xf::PropertyString				_output_mcp_speed_format;		// String format for speed display on MCP.
-	xf::PropertyString				_output_mcp_heading_format;		// String format for heading display on MCP.
-	xf::PropertyString				_output_mcp_altitude_format;	// String format for altitude display on MCP.
-	xf::PropertyString				_output_mcp_vspd_format;		// String format for vertical speed display on MCP.
+	xf::PropertySpeed					_measured_ias;
+	xf::PropertyFloat					_measured_mach;
+	xf::PropertyAngle					_measured_heading;
+	xf::PropertyAngle					_measured_track;
+	xf::PropertyLength					_measured_altitude_amsl;
+	xf::PropertySpeed					_measured_vs;
+	xf::PropertyAngle					_measured_fpa;
+	// Airplane configuration:
+	xf::PropertyForce					_thr_ref_for_toga;
+	xf::PropertyForce					_thr_ref_for_cont;//TODO use it
+	xf::PropertyForce					_thr_ref_for_cruise;
+	xf::PropertyForce					_thr_ref_for_descent;
+	xf::PropertySpeed					_spd_ref_for_climbout;
+	xf::PropertySpeed					_spd_ref_for_cruise;
+	xf::PropertySpeed					_spd_ref_for_approach;
+	// Props for displays and LEDs:
+	xf::PropertyFloat					_mcp_speed_display;
+	xf::PropertyFloat					_mcp_heading_display;
+	xf::PropertyFloat					_mcp_altitude_display;
+	xf::PropertyFloat					_mcp_vertical_display;
+	xf::PropertyString					_mcp_speed_format_out;		// String format for speed display on MCP.
+	xf::PropertyString					_mcp_heading_format_out;	// String format for heading display on MCP.
+	xf::PropertyString					_mcp_altitude_format_out;	// String format for altitude display on MCP.
+	xf::PropertyString					_mcp_vertical_format_out;	// String format for vertical speed display on MCP.
+	xf::PropertyBoolean					_mcp_led_ap;
+	xf::PropertyBoolean					_mcp_led_at;
+	xf::PropertyBoolean					_mcp_led_yd;
+	// Settings forwarded fo FD (might be different than MCP settings):
+	xf::PropertyString					_cmd_thrust_mode;
+	xf::PropertyString					_cmd_roll_mode;
+	xf::PropertyString					_cmd_pitch_mode;
+	xf::PropertySpeed					_cmd_ias;
+	xf::PropertyFloat					_cmd_mach;
+	xf::PropertyAngle					_cmd_heading;
+	xf::PropertyAngle					_cmd_track;
+	xf::PropertyLength					_cmd_altitude;
+	xf::PropertySpeed					_cmd_vs;
+	xf::PropertyAngle					_cmd_fpa;
+	// Speed/thrust bugs for EFIS:
+	xf::PropertyForce					_thr_ref;
+	xf::PropertySpeed					_spd_ref;
+	// Output for FMA:
+	xf::PropertyString					_fma_hint;
+	xf::PropertyString					_fma_speed_hint;
+	xf::PropertyString					_fma_roll_hint;
+	xf::PropertyString					_fma_roll_armed_hint;
+	xf::PropertyString					_fma_pitch_hint;
+	xf::PropertyString					_fma_pitch_armed_hint;
 	// Other:
-	std::vector<xf::Action*>		_button_actions;
-	std::vector<xf::DeltaDecoder*>	_rotary_decoders;
+	std::set<Unique<xf::Action>>		_button_actions;
+	std::set<Unique<xf::DeltaDecoder>>	_rotary_decoders;
 };
 
 #endif
