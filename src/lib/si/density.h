@@ -67,6 +67,9 @@ class Density: public LinearValue<double, Density>
 };
 
 
+static_assert (std::is_literal_type<Density>::value, "Density must be a literal type");
+
+
 /*
  * Global functions
  */

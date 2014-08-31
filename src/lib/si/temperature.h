@@ -106,6 +106,9 @@ class Temperature: public LinearValue<double, Temperature>
 };
 
 
+static_assert (std::is_literal_type<Temperature>::value, "Temperature must be a literal type");
+
+
 /*
  * Global functions
  */

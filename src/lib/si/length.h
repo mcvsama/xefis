@@ -87,6 +87,9 @@ class Length: public LinearValue<double, Length>
 };
 
 
+static_assert (std::is_literal_type<Length>::value, "Length must be a literal type");
+
+
 /*
  * Global functions
  */

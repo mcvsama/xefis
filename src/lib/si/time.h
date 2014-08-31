@@ -109,6 +109,9 @@ class Time: public LinearValue<double, Time>
 };
 
 
+static_assert (std::is_literal_type<Time>::value, "Time must be a literal type");
+
+
 /*
  * Global functions
  */

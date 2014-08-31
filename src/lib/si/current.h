@@ -72,6 +72,9 @@ class Current: public LinearValue<double, Current>
 };
 
 
+static_assert (std::is_literal_type<Current>::value, "Current must be a literal type");
+
+
 /*
  * Global functions
  */

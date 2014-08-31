@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <vector>
 #include <string>
+#include <type_traits>
 
 // Boost:
 #include <boost/endian/conversion.hpp>
@@ -81,6 +82,9 @@ class Value
 	virtual double
 	floatize (std::string unit) const = 0;
 };
+
+
+static_assert (std::is_literal_type<Value>::value, "Base class Value must be a literal type");
 
 
 template<class tValueType>

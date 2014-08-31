@@ -67,6 +67,9 @@ class Volume: public LinearValue<double, Volume>
 };
 
 
+static_assert (std::is_literal_type<Volume>::value, "Volume must be a literal type");
+
+
 /*
  * Global functions
  */

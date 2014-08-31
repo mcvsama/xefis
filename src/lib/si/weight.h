@@ -77,6 +77,9 @@ class Weight: public LinearValue<double, Weight>
 };
 
 
+static_assert (std::is_literal_type<Weight>::value, "Weight must be a literal type");
+
+
 /*
  * Global functions
  */

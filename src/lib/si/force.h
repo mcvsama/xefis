@@ -67,6 +67,9 @@ class Force: public LinearValue<double, Force>
 };
 
 
+static_assert (std::is_literal_type<Force>::value, "Force must be a literal type");
+
+
 /*
  * Global functions
  */
