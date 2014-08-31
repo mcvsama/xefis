@@ -36,11 +36,13 @@ class Mixer: public Xefis::Module
 
   private:
 	// Settings:
-	double					_input_a_factor	= 1.0;
-	double					_input_b_factor	= 1.0;
+	double					_input_0_factor	= 1.0;
+	double					_input_1_factor	= 1.0;
+	Optional<double>		_output_minimum;
+	Optional<double>		_output_maximum;
 	// Input:
-	Xefis::PropertyFloat	_input_a_value;
-	Xefis::PropertyFloat	_input_b_value;
+	Xefis::PropertyFloat	_input_0_value;
+	Xefis::PropertyFloat	_input_1_value;
 	// Output:
 	Xefis::PropertyFloat	_output_value;
 };

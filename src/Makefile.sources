@@ -390,7 +390,6 @@ XEFIS_HEADERS += modules/systems/slip_skid.h
 XEFIS_HEADERS += modules/systems/speeds.h
 XEFIS_HEADERS += modules/systems/state.h
 XEFIS_HEADERS += modules/systems/trim_control.h
-XEFIS_HEADERS += modules/systems/trim_mixer.h
 XEFIS_HEADERS += modules/systems/vor.h
 XEFIS_HEADERS += modules/systems/watchdog.h
 
@@ -415,7 +414,6 @@ XEFIS_SOURCES += modules/systems/slip_skid.cc
 XEFIS_SOURCES += modules/systems/speeds.cc
 XEFIS_SOURCES += modules/systems/state.cc
 XEFIS_SOURCES += modules/systems/trim_control.cc
-XEFIS_SOURCES += modules/systems/trim_mixer.cc
 XEFIS_SOURCES += modules/systems/vor.cc
 XEFIS_SOURCES += modules/systems/watchdog.cc
 

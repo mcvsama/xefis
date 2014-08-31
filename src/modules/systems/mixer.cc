@@ -28,33 +28,44 @@ Mixer::Mixer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
-		{ "input-a-factor", _input_a_factor, true },
-		{ "input-b-factor", _input_b_factor, true },
+		{ "input-0-factor", _input_0_factor, true },
+		{ "input-1-factor", _input_1_factor, true },
+		{ "output-minimum", _output_minimum, false },
+		{ "output-maximum", _output_maximum, false },
 	});
 
 	parse_properties (config, {
-		{ "input.a.value", _input_a_value, true },
-		{ "input.b.value", _input_b_value, true },
+		{ "input.0.value", _input_0_value, true },
+		{ "input.1.value", _input_1_value, true },
 		{ "output.value", _output_value, true },
 	});
+
+	if (_output_minimum && _output_maximum && *_output_minimum > *_output_maximum)
+		log() << "Warning: maximum value is less than the minimum value." << std::endl;
 }
 
 
 void
 Mixer::data_updated()
 {
-	if (_input_a_value.fresh() || _input_b_value.fresh())
+	if (_input_0_value.fresh() || _input_1_value.fresh())
 	{
-		Optional<double> a = _input_a_value.get_optional();
-		Optional<double> b = _input_b_value.get_optional();
+		Optional<double> a = _input_0_value.get_optional();
+		Optional<double> b = _input_1_value.get_optional();
 
 		if (a || b)
 		{
 			double sum = 0.0;
 			if (a)
-				sum += _input_a_factor * *a;
+				sum += _input_0_factor * *a;
 			if (b)
-				sum += _input_b_factor * *b;
+				sum += _input_1_factor * *b;
+
+			if (_output_minimum && sum < *_output_minimum)
+				sum = *_output_minimum;
+
+			if (_output_maximum && sum > *_output_maximum)
+				sum = *_output_maximum;
 
 			_output_value = sum;
 		}
