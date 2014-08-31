@@ -90,6 +90,12 @@ class Exception: public std::exception
 	backtrace() const;
 
 	/**
+	 * Return true if backtrace is not to be shown to user.
+	 */
+	bool
+	backtrace_hidden() const noexcept;
+
+	/**
 	 * Same as guard_and_rethrow, but doesn't rethrow. Instead it returns
 	 * true if exception occured, and false otherwise.
 	 */
@@ -106,8 +112,18 @@ class Exception: public std::exception
 	static void
 	guard_and_rethrow (std::function<void()> guarded_code);
 
+  protected:
+	/**
+	 * Hides backtrace when put to std::ostream.
+	 * Useful for configuration exceptions, where a backtrace
+	 * would be rather confusing.
+	 */
+	void
+	hide_backtrace() noexcept;
+
   private:
-	bool		_has_inner = false;
+	bool		_has_inner		= false;
+	bool		_hide_backtrace	= false;
 	std::string	_what;
 	std::string	_message;
 	std::string	_inner_message;
@@ -119,7 +135,8 @@ inline std::ostream&
 operator<< (std::ostream& os, Exception const& e)
 {
 	os << e.message() << std::endl;
-	os << e.backtrace() << std::endl;
+	if (!e.backtrace_hidden())
+		os << e.backtrace() << std::endl;
 	return os;
 }
 
@@ -139,6 +156,7 @@ Exception::Exception (std::string const& message, Exception const* inner):
 	{
 		_message += "; cause: " + inner->message();
 		_inner_message = inner->message();
+		_hide_backtrace = inner->backtrace_hidden();
 		_backtrace = inner->backtrace();
 	}
 }
@@ -191,6 +209,13 @@ Exception::backtrace() const
 
 
 inline bool
+Exception::backtrace_hidden() const noexcept
+{
+	return _hide_backtrace;
+}
+
+
+inline bool
 Exception::guard (std::function<void()> guarded_code)
 {
 	try {
@@ -230,6 +255,13 @@ Exception::guard_and_rethrow (std::function<void()> guarded_code)
 		std::cerr << "unknown exception" << std::endl;
 		throw;
 	}
+}
+
+
+inline void
+Exception::hide_backtrace() noexcept
+{
+	_hide_backtrace = true;
 }
 
 } // namespace Xefis

@@ -58,7 +58,9 @@ class MissingDomElement: public DomException
 	// Ctor
 	MissingDomElement (QDomElement const& parent, QString const& child_name):
 		DomException ("missing subelement <" + child_name + "> in " + get_path (parent))
-	{ }
+	{
+		hide_backtrace();
+	}
 };
 
 
@@ -72,12 +74,16 @@ class BadDomElement: public DomException
 	BadDomElement (QDomElement const& element, QString const& additional_message = QString()):
 		DomException ("element '" + element.tagName() + "' is not supported in " + get_path (element) +
 					  (additional_message.isEmpty() ? "" : ("; " + additional_message)))
-	{ }
+	{
+		hide_backtrace();
+	}
 
 	// Ctor
 	BadDomElement (QString const& message):
 		DomException (message)
-	{ }
+	{
+		hide_backtrace();
+	}
 };
 
 
@@ -90,7 +96,9 @@ class MissingDomAttribute: public DomException
 	// Ctor
 	MissingDomAttribute (QDomElement const& element, QString const& attribute_name):
 		DomException ("element <" + element.tagName() + "> needs attribute '" + attribute_name + "'")
-	{ }
+	{
+		hide_backtrace();
+	}
 };
 
 
@@ -103,7 +111,9 @@ class BadDomAttribute: public DomException
 	// Ctor
 	BadDomAttribute (QDomElement const& element, QString const& attribute_name, QString const& message = QString()):
 		DomException ("invalid value for attribute '" + attribute_name + "' in " + get_path (element) + ": " + message)
-	{ }
+	{
+		hide_backtrace();
+	}
 };
 
 
@@ -113,7 +123,26 @@ class BadDomAttribute: public DomException
 class BadConfiguration: public Exception
 {
   public:
-	using Exception::Exception;
+	// Ctor
+	BadConfiguration (const char* message, Exception const* inner = nullptr):
+		Exception (message, inner)
+	{
+		hide_backtrace();
+	}
+
+	// Ctor
+	BadConfiguration (std::string const& message, Exception const* inner = nullptr):
+		Exception (message, inner)
+	{
+		hide_backtrace();
+	}
+
+	// Ctor
+	BadConfiguration (QString const& message, Exception const* inner = nullptr):
+		Exception (message, inner)
+	{
+		hide_backtrace();
+	}
 };
 
 
