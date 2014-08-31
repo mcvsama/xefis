@@ -27,14 +27,14 @@ namespace SI {
 class Pressure: public LinearValue<float, Pressure>
 {
 	friend class LinearValue<float, Pressure>;
-	friend constexpr Pressure operator"" _psi (long double);
-	friend constexpr Pressure operator"" _psi (unsigned long long);
 	friend constexpr Pressure operator"" _Pa (long double);
 	friend constexpr Pressure operator"" _Pa (unsigned long long);
 	friend constexpr Pressure operator"" _hPa (long double);
 	friend constexpr Pressure operator"" _hPa (unsigned long long);
 	friend constexpr Pressure operator"" _inHg (long double);
 	friend constexpr Pressure operator"" _inHg (unsigned long long);
+	friend constexpr Pressure operator"" _psi (long double);
+	friend constexpr Pressure operator"" _psi (unsigned long long);
 
   protected:
 	/**
@@ -42,7 +42,7 @@ class Pressure: public LinearValue<float, Pressure>
 	 * To create a Pressure use these operators directly.
 	 */
 	explicit constexpr
-	Pressure (ValueType psi) noexcept;
+	Pressure (ValueType pa) noexcept;
 
   public:
 	constexpr
@@ -58,9 +58,6 @@ class Pressure: public LinearValue<float, Pressure>
 	si_units() const noexcept override;
 
 	constexpr ValueType
-	psi() const noexcept;
-
-	constexpr ValueType
 	Pa() const noexcept;
 
 	constexpr ValueType
@@ -68,6 +65,9 @@ class Pressure: public LinearValue<float, Pressure>
 
 	constexpr ValueType
 	inHg() const noexcept;
+
+	constexpr ValueType
+	psi() const noexcept;
 
 	void
 	set_si_units (ValueType) override;
@@ -95,58 +95,58 @@ static_assert (std::is_literal_type<Pressure>::value, "Pressure must be a litera
 
 
 inline constexpr Pressure
-operator"" _psi (long double psi)
-{
-	return Pressure (static_cast<Pressure::ValueType> (psi));
-}
-
-
-inline constexpr Pressure
-operator"" _psi (unsigned long long psi)
-{
-	return Pressure (static_cast<Pressure::ValueType> (psi));
-}
-
-
-inline constexpr Pressure
 operator"" _Pa (long double Pa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (Pa) * 1.45021141);
+	return Pressure (static_cast<Pressure::ValueType> (Pa));
 }
 
 
 inline constexpr Pressure
 operator"" _Pa (unsigned long long Pa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (Pa) * 1.45021141);
+	return Pressure (static_cast<Pressure::ValueType> (Pa));
 }
 
 
 inline constexpr Pressure
 operator"" _hPa (long double hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.01);
 }
 
 
 inline constexpr Pressure
 operator"" _hPa (unsigned long long hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.0145021141);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.01);
 }
 
 
 inline constexpr Pressure
 operator"" _inHg (long double inHg)
 {
-	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 3386.375258);
 }
 
 
 inline constexpr Pressure
 operator"" _inHg (unsigned long long inHg)
 {
-	return Pressure (static_cast<Pressure::ValueType> (inHg) * 0.491098f);
+	return Pressure (static_cast<Pressure::ValueType> (inHg) * 3386.375258);
+}
+
+
+inline constexpr Pressure
+operator"" _psi (long double psi)
+{
+	return Pressure (static_cast<Pressure::ValueType> (psi) * 6894.744825);
+}
+
+
+inline constexpr Pressure
+operator"" _psi (unsigned long long psi)
+{
+	return Pressure (static_cast<Pressure::ValueType> (psi) * 6894.744825);
 }
 
 
@@ -156,8 +156,8 @@ operator"" _inHg (unsigned long long inHg)
 
 
 inline constexpr
-Pressure::Pressure (ValueType psi) noexcept:
-	LinearValue (psi)
+Pressure::Pressure (ValueType pa) noexcept:
+	LinearValue (pa)
 { }
 
 
@@ -176,30 +176,30 @@ Pressure::si_units() const noexcept
 
 
 inline constexpr Pressure::ValueType
-Pressure::psi() const noexcept
+Pressure::Pa() const noexcept
 {
 	return internal();
 }
 
 
 inline constexpr Pressure::ValueType
-Pressure::Pa() const noexcept
-{
-	return internal() * 6895.54630643f;
-}
-
-
-inline constexpr Pressure::ValueType
 Pressure::hPa() const noexcept
 {
-	return internal() * 68.9554630643f;
+	return internal() * 0.01;
 }
 
 
 inline constexpr Pressure::ValueType
 Pressure::inHg() const noexcept
 {
-	return internal() * 2.036254f;
+	return internal() / 3386.375258;
+}
+
+
+inline constexpr Pressure::ValueType
+Pressure::psi() const noexcept
+{
+	return internal() / 6894.744825;
 }
 
 
@@ -215,14 +215,14 @@ Pressure::parse (std::string const& str)
 {
 	auto p = generic_parse (str);
 
-	if (p.second == "psi")
-		*this = p.first * 1_psi;
-	else if (p.second == "pa")
+	if (p.second == "pa")
 		*this = p.first * 1_Pa;
 	else if (p.second == "hpa")
 		*this = p.first * 1_hPa;
 	else if (p.second == "inhg")
 		*this = p.first * 1_inHg;
+	else if (p.second == "psi")
+		*this = p.first * 1_psi;
 }
 
 
@@ -238,14 +238,14 @@ Pressure::floatize (std::string unit) const
 {
 	boost::to_lower (unit);
 
-	if (unit == "psi")
-		return psi();
-	else if (unit == "pa")
+	if (unit == "pa")
 		return Pa();
 	else if (unit == "hpa")
 		return hPa();
 	else if (unit == "inhg")
 		return inHg();
+	else if (unit == "psi")
+		return psi();
 	else
 		throw UnsupportedUnit ("can't convert Pressure to " + unit);
 }
