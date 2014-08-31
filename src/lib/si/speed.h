@@ -87,6 +87,9 @@ class Speed: public LinearValue<double, Speed>
 };
 
 
+static_assert (std::is_literal_type<Speed>::value, "Speed must be a literal type");
+
+
 /*
  * Global functions
  */

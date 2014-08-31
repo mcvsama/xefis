@@ -82,6 +82,9 @@ class Frequency: public LinearValue<double, Frequency>
 };
 
 
+static_assert (std::is_literal_type<Frequency>::value, "Frequency must be a literal type");
+
+
 /*
  * Global functions
  */

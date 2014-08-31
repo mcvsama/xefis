@@ -86,6 +86,9 @@ class Pressure: public LinearValue<float, Pressure>
 };
 
 
+static_assert (std::is_literal_type<Pressure>::value, "Pressure must be a literal type");
+
+
 /*
  * Global functions
  */

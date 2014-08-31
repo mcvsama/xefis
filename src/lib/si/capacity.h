@@ -78,6 +78,9 @@ class Capacity: public LinearValue<double, Capacity>
 };
 
 
+static_assert (std::is_literal_type<Capacity>::value, "Capacity must be a literal type");
+
+
 /*
  * Global functions
  */

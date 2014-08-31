@@ -67,6 +67,9 @@ class Area: public LinearValue<double, Area>
 };
 
 
+static_assert (std::is_literal_type<Area>::value, "Area must be a literal type");
+
+
 /*
  * Global functions
  */

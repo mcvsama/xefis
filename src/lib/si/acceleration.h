@@ -72,6 +72,9 @@ class Acceleration: public LinearValue<double, Acceleration>
 };
 
 
+static_assert (std::is_literal_type<Acceleration>::value, "Acceleration must be a literal type");
+
+
 /*
  * Global functions
  */

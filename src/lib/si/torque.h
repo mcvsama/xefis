@@ -76,6 +76,9 @@ class Torque: public LinearValue<double, Torque>
 };
 
 
+static_assert (std::is_literal_type<Torque>::value, "Torque must be a literal type");
+
+
 /*
  * Global functions
  */

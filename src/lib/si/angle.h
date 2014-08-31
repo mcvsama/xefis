@@ -108,6 +108,9 @@ class Angle: public LinearValue<double, Angle>
 };
 
 
+static_assert (std::is_literal_type<Angle>::value, "Angle must be a literal type");
+
+
 /*
  * Global functions
  */
