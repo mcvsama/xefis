@@ -16,9 +16,11 @@
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -172,6 +174,56 @@ operator!= (QDomElement const& element, QString const& string) noexcept
 {
 	return !(element == string);
 }
+
+
+/*
+ * Utility functions
+ */
+
+
+namespace Xefis {
+
+/**
+ * Throw BadDomAttribute if there are attributes in the element
+ * that are not listed in the allowed_attributes.
+ */
+inline void
+only_allow_attributes (QDomElement const& e, std::set<QString> const& allowed_attributes)
+{
+	auto const attrs = e.attributes();
+	for (int i = 0; i < attrs.size(); ++i)
+	{
+		QString name = attrs.item (i).toAttr().name();
+		if (allowed_attributes.find (name) != allowed_attributes.end())
+			throw BadDomAttribute (e, name);
+	}
+}
+
+
+/**
+ * Throw MissingDomAttribute if at least one of listed attributes
+ * is missing from the DOM element.
+ */
+inline void
+require_attributes (QDomElement const& e, std::set<QString> const& required_attributes)
+{
+	for (auto const ra: required_attributes)
+		if (!e.hasAttribute (ra))
+			throw MissingDomAttribute (e, ra);
+}
+
+
+/**
+ * Calls both only_allow_attributes() and required_attributes() on given list.
+ */
+inline void
+require_and_only_allow_attributes (QDomElement const& e, std::set<QString> const& attributes)
+{
+	only_allow_attributes (e, attributes);
+	require_attributes (e, attributes);
+}
+
+} // namespace Xefis
 
 #endif
 
