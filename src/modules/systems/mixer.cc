@@ -28,8 +28,8 @@ Mixer::Mixer (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
-		{ "input-0-factor", _input_0_factor, true },
-		{ "input-1-factor", _input_1_factor, true },
+		{ "input.0.factor", _input_0_factor, false },
+		{ "input.1.factor", _input_1_factor, false },
 		{ "output-minimum", _output_minimum, false },
 		{ "output-maximum", _output_maximum, false },
 	});
