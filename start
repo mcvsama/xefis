@@ -1,8 +1,14 @@
 #!/bin/sh
 
+MEMCHECK='valgrind -v --tool=memcheck --num-callers=50 --leak-check=yes --leak-resolution=high --show-reachable=yes'
+MASSIF='valgrind --tool=massif'
+DRD='valgrind --tool=drd'
+VALGRIND=
+
 TARGET="$DIST"
 if [ "$TARGET" = "" ]; then
 	TARGET="$(uname -m)"
 fi
-make -C src && src/build/"$TARGET"/xefis "$@"
+export GLIBCXX_FORCE_NEW=1
+make -C src && $VALGRIND src/build/"$TARGET"/xefis "$@"
 
