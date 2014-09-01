@@ -613,7 +613,10 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 				if (has_fill_element)
 					logger << "Warning: <fill> already defined in the column, ignoring others." << std::endl;
 				else
-					current_column->push_back (new FillStrip (cdu));
+				{
+					_strips.push_back (std::make_unique<FillStrip> (cdu));
+					current_column->push_back (_strips.back().get());
+				}
 			}
 			else
 				throw Xefis::BadDomElement (e);
