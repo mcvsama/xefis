@@ -33,16 +33,20 @@ PropertyType::check_validity (std::string const& type)
 		"string",
 		"acceleration",
 		"angle",
+		"area",
 		"capacity",
 		"current",
-		"pressure",
+		"density",
+		"force",
 		"frequency",
 		"length",
+		"pressure",
 		"speed",
-		"temperature",
 		"time",
 		"torque",
+		"volume",
 		"weight",
+		"temperature",
 	};
 
 	if (valid_types.find (type) == valid_types.end())
