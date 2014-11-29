@@ -170,7 +170,6 @@ HSI::read()
 		params.home.reset();
 	params.ground_speed = _speed_gs.get_optional();
 	params.true_air_speed = _speed_tas.get_optional();
-	params.true_air_speed = *_speed_tas;
 	params.track_lateral_rotation = _track_lateral_rotation.get_optional();
 	if (params.track_lateral_rotation)
 		params.track_lateral_rotation = Xefis::limit (*params.track_lateral_rotation, -1_Hz, +1_Hz);
