@@ -26,6 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/components/property_editor/property_editor.h>
+#include <xefis/components/data_recorder/data_recorder.h>
 #include <xefis/core/window.h>
 
 // Local:
@@ -118,6 +119,7 @@ class ConfiguratorWidget: public QWidget
 	PropertyEditor*		_property_editor		= nullptr;
 	ModulesList*		_modules_list			= nullptr;
 	QStackedWidget*		_modules_stack			= nullptr;
+	DataRecorder*		_data_recorder			= nullptr;
 	QTabWidget*			_tabs					= nullptr;
 	Window*				_owning_window			= nullptr;
 	QLabel*				_no_module_selected		= nullptr;
