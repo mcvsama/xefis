@@ -95,6 +95,9 @@ XEFIS_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
 XEFIS_HEADERS += xefis/components/configurator/configurator_widget.h
 XEFIS_HEADERS += xefis/components/configurator/modules_list.h
 XEFIS_HEADERS += xefis/components/configurator/modules_list_item.h
+XEFIS_HEADERS += xefis/components/data_recorder/data_recorder.h
+XEFIS_HEADERS += xefis/components/data_recorder/graph_widget.h
+XEFIS_HEADERS += xefis/components/data_recorder/graphs_stack.h
 
 XEFIS_SOURCES += xefis/components/property_editor/property_editor.cc
 XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget.cc
@@ -102,6 +105,9 @@ XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
 XEFIS_SOURCES += xefis/components/configurator/configurator_widget.cc
 XEFIS_SOURCES += xefis/components/configurator/modules_list.cc
 XEFIS_SOURCES += xefis/components/configurator/modules_list_item.cc
+XEFIS_SOURCES += xefis/components/data_recorder/data_recorder.cc
+XEFIS_SOURCES += xefis/components/data_recorder/graph_widget.cc
+XEFIS_SOURCES += xefis/components/data_recorder/graphs_stack.cc
 
 XEFIS_MOCHDRS += xefis/components/property_editor/property_editor.h
 XEFIS_MOCHDRS += xefis/components/property_editor/property_tree_widget.h

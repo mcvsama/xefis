@@ -134,17 +134,20 @@ ConfiguratorWidget::ConfiguratorWidget (Application* application, QWidget* paren
 	_modules_stack->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	_modules_stack->addWidget (_no_module_selected);
 
-	QWidget* _module_configurator = new QWidget (this);
+	QWidget* module_configurator = new QWidget (this);
 
-	QHBoxLayout* module_configurator_layout = new QHBoxLayout (_module_configurator);
+	_data_recorder = new DataRecorder (this);
+
+	QHBoxLayout* module_configurator_layout = new QHBoxLayout (module_configurator);
 	module_configurator_layout->setMargin (WidgetMargin);
 	module_configurator_layout->setSpacing (WidgetSpacing);
 	module_configurator_layout->addWidget (_modules_list);
 	module_configurator_layout->addWidget (_modules_stack);
 
 	_tabs = new QTabWidget (this);
-	_tabs->addTab (_property_editor, "Property database");
-	_tabs->addTab (_module_configurator, "Module configuration");
+	_tabs->addTab (_property_editor, "&Property database");
+	_tabs->addTab (module_configurator, "Module &configuration");
+	_tabs->addTab (_data_recorder, "&Data recorder");
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
