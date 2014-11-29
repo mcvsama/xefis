@@ -1015,8 +1015,10 @@ AFCS::update_efis()
 			_fma_pitch_armed_hint = "X";
 	}
 
-	// TODO if engaged, _flight_mode_hint = "FLT DIR" or sth.
-	// TODO if error-mode (unknown mode), _flight_mode_hint = "XXX";
+	if (_ap_on)
+		_fma_hint = "A/P";
+	else
+		_fma_hint = "F/D";
 }
 
 
