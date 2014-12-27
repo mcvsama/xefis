@@ -84,6 +84,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "track.vertical", _track_vertical, false },
 		{ "slip-skid", _slip_skid, false },
 		{ "fpv.visible", _fpv_visible, false },
+		{ "weight-on-wheels", _weight_on_wheels, false },
 		{ "aoa.alpha", _aoa_alpha, false },
 		{ "aoa.alpha.maximum", _aoa_alpha_maximum, false },
 		{ "aoa.alpha.visible", _aoa_alpha_visible, false },
@@ -170,6 +171,7 @@ EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		&_track_lateral_true,
 		&_track_vertical,
 		&_fpv_visible,
+		&_weight_on_wheels,
 	});
 }
 
@@ -409,5 +411,9 @@ EFIS::compute_fpv()
 		_computed_fpv_visible = false;
 		_computed_fpv_failure = _fpv_visible.read (false);
 	}
+
+	// Hide FPV if weight-on-wheels:
+	if (_weight_on_wheels.valid() && *_weight_on_wheels)
+		_computed_fpv_visible = false;
 }
 

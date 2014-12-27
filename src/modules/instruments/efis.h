@@ -111,6 +111,7 @@ class EFIS: public Xefis::Instrument
 	Xefis::PropertyFloat				_slip_skid;
 	// Flight Path Vector
 	Xefis::PropertyBoolean				_fpv_visible;
+	Xefis::PropertyBoolean				_weight_on_wheels;
 	bool								_computed_fpv_failure			= false;
 	bool								_computed_fpv_visible			= false;
 	Angle								_computed_fpv_alpha				= 0_deg;
