@@ -35,7 +35,7 @@ class AFCS: public xf::Module
 	static constexpr xf::Range<Speed>	SpeedRange				= { 10_kt, 300_kt };
 	static constexpr xf::Range<double>	MachRange				= { 0.000, 1.000 };
 	static constexpr double				MachStep				= 0.001;
-	static constexpr xf::Range<Length>	AltitudeRange			= { 0_ft, 50'000_ft };
+	static constexpr xf::Range<Length>	AltitudeRange			= { -5000_ft, 50'000_ft };
 	static constexpr Speed				VSStep					= 10_fpm;
 	static constexpr xf::Range<Speed>	VSRange					= { -8'000_fpm, +8'000_fpm };
 	static constexpr Angle				FPAStep					= 0.1_deg;
