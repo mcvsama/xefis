@@ -150,6 +150,7 @@ class InstrumentAids
 	QColor						_warning_color_1		= { 255, 40, 40 };
 	QColor						_warning_color_2		= { 255, 200, 50 };
 	QColor						_silver					= { 0xcc, 0xca, 0xc2 };
+	QColor						_std_cyan				= { 0x00, 0xcc, 0xff };
 	float						_height_for_width		= 1.f;
 	float						_master_pen_scale		= 1.f;
 	float						_master_font_scale		= 1.f;
