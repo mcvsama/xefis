@@ -54,8 +54,8 @@ class GroupBox:
 
   private:
 	QString				_label;
-	QColor				_label_color	= { 0x00, 0xdd, 0xff };
-	QColor				_frame_color	= { 0x00, 0xb0, 0xcc };
+	QColor				_label_color	= _std_cyan;
+	QColor				_frame_color	= _std_cyan;
 	std::array<int, 4>	_padding		= { { 0, 0, 0, 0 } };
 };
 

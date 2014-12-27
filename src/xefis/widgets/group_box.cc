@@ -31,7 +31,9 @@ GroupBox::GroupBox (QString const& label, QWidget* parent):
 	QWidget (parent),
 	InstrumentAids (1.0),
 	_label (label)
-{ }
+{
+	_frame_color = _frame_color.darker (100);
+}
 
 
 void
