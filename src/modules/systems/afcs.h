@@ -30,6 +30,10 @@
 #include <xefis/utility/range.h>
 
 
+/**
+ * Controls AFCS logic. Gets input from Mode Control Panel,
+ * makes outputs for displays, LEDs, annunciators, also for commanded values (altitude, speed, etc).
+ */
 class AFCS: public xf::Module
 {
 	static constexpr xf::Range<Speed>	SpeedRange				= { 10_kt, 300_kt };
@@ -449,7 +453,7 @@ class AFCS: public xf::Module
 	xf::PropertyAngle					_measured_fpa;
 	// Airplane configuration:
 	xf::PropertyForce					_thr_ref_for_toga;
-	xf::PropertyForce					_thr_ref_for_cont;//TODO use it
+	xf::PropertyForce					_thr_ref_for_cont;
 	xf::PropertyForce					_thr_ref_for_cruise;
 	xf::PropertyForce					_thr_ref_for_descent;
 	xf::PropertySpeed					_spd_ref_for_climbout;

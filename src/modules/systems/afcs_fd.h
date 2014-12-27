@@ -29,6 +29,10 @@
 #include <xefis/utility/smoother.h>
 
 
+/**
+ * Computes desired pitch/roll values to follow.
+ * Output depends on roll-mode and pitch-mode.
+ */
 class AFCS_FD: public Xefis::Module
 {
   public:

@@ -25,6 +25,9 @@
 #include <xefis/utility/pid_control.h>
 
 
+/**
+ * Controls rudder to obtain zero slip-skid value.
+ */
 class AFCS_EAC_YD: public Xefis::Module
 {
   public:

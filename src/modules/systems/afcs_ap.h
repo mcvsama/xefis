@@ -28,6 +28,10 @@
 #include <xefis/utility/smoother.h>
 
 
+/**
+ * Steers control surfaces (ailerons, elevator) to obtain desired orientation
+ * (pitch, roll).
+ */
 class AFCS_AP: public Xefis::Module
 {
   public:
