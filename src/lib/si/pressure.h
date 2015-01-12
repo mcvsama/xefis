@@ -111,14 +111,14 @@ operator"" _Pa (unsigned long long Pa)
 inline constexpr Pressure
 operator"" _hPa (long double hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.01);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 100.0);
 }
 
 
 inline constexpr Pressure
 operator"" _hPa (unsigned long long hPa)
 {
-	return Pressure (static_cast<Pressure::ValueType> (hPa) * 0.01);
+	return Pressure (static_cast<Pressure::ValueType> (hPa) * 100.0);
 }
 
 
