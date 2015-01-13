@@ -101,7 +101,7 @@ Link::ItemStream::failsafe()
 }
 
 
-Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
+Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 {
 	if (!element.hasAttribute ("type"))
 		throw Xefis::MissingDomAttribute (element, "type");
@@ -212,10 +212,10 @@ Link::PropertyItem::PropertyItem (Link*, QDomElement& element)
 		}
 	}
 
-	if (!element.hasAttribute ("path"))
-		throw Xefis::MissingDomAttribute (element, "path");
+	if (!element.hasAttribute (link->_path_attribute_name))
+		throw Xefis::MissingDomAttribute (element, link->_path_attribute_name);
 
-	xf::PropertyPath path (element.attribute ("path"));
+	xf::PropertyPath path (element.attribute (link->_path_attribute_name));
 	_property_integer.set_path (path);
 	_property_float.set_path (path);
 	_property_acceleration.set_path (path);
@@ -533,7 +533,7 @@ template<class SIType>
 	}
 
 
-Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
+Link::BitfieldItem::BitfieldItem (Link* link, QDomElement& element)
 {
 	for (QDomElement& e: element)
 	{
@@ -541,13 +541,13 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 		{
 			if (!e.hasAttribute ("type"))
 				throw Xefis::MissingDomAttribute (e, "type");
-			if (!e.hasAttribute ("path"))
-				throw Xefis::MissingDomAttribute (e, "path");
+			if (!e.hasAttribute (link->_path_attribute_name))
+				throw Xefis::MissingDomAttribute (e, link->_path_attribute_name);
 
 			BitSource bs;
 
 			QString s_type = e.attribute ("type");
-			QString s_path = e.attribute ("path");
+			QString s_path = e.attribute (link->_path_attribute_name);
 
 			bs.retained = check_retained_attribute (e, false);
 
@@ -555,7 +555,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 			{
 				bs.is_boolean = true;
 				bs.bits = 1;
-				bs.property_boolean.set_path (xf::PropertyPath (e.attribute ("path")));
+				bs.property_boolean.set_path (xf::PropertyPath (s_path));
 			}
 			else if (s_type == "integer")
 			{
@@ -563,7 +563,7 @@ Link::BitfieldItem::BitfieldItem (Link*, QDomElement& element)
 					throw Xefis::MissingDomAttribute (e, "bits");
 
 				bs.is_boolean = false;
-				bs.property_integer.set_path (xf::PropertyPath (e.attribute ("path")));
+				bs.property_integer.set_path (xf::PropertyPath (s_path));
 				bs.bits = e.attribute ("bits").toUInt();
 			}
 			else
@@ -1044,6 +1044,15 @@ Link::eat (Blob& blob)
 void
 Link::parse_protocol (QDomElement const& protocol)
 {
+	_path_attribute_name = protocol.attribute ("path-attribute-name");
+	if (!_path_attribute_name.isEmpty())
+	{
+		if (!_path_attribute_name.startsWith ("path-"))
+			throw xf::BadConfiguration ("if used, the 'path-attribute-name' attribute must start with 'path-' prefix");
+	}
+	else
+		_path_attribute_name = "path";
+
 	for (QDomElement& e: protocol)
 	{
 		if (e == "packet")
