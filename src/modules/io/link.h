@@ -354,6 +354,10 @@ class Link:
 	Blob					_output_blob;
 	Blob					_input_blob;
 	Blob					_tmp_input_magic;
+	// When set, all <property> and similar elements should use property path provided
+	// in attribute denoted by _path_attribute_name, not the default "path" attribute. Restriction:
+	// _path_attribute_name should start with "path-" prefix.
+	QString					_path_attribute_name;
 };
 
 #endif
