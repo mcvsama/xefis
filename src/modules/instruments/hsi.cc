@@ -53,8 +53,10 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "speed.gs", _speed_gs, false },
 		{ "speed.tas", _speed_tas, false },
 		{ "cmd.visible", _cmd_visible, false },
-		{ "cmd.heading", _cmd_heading, false },
-		{ "cmd.track-visible", _cmd_track_visible, false },
+		{ "cmd.line-visible", _cmd_line_visible, false },
+		{ "cmd.heading.magnetic", _cmd_heading_magnetic, false },
+		{ "cmd.track.magnetic", _cmd_track_magnetic, false },
+		{ "cmd.use-trk", _cmd_use_trk, false },
 		{ "altitude.target.reach-distance", _target_altitude_reach_distance, false },
 		{ "orientation.heading.magnetic", _orientation_heading_magnetic, false },
 		{ "orientation.heading.true", _orientation_heading_true, false },
@@ -131,9 +133,11 @@ HSI::read()
 	params.heading_visible = _orientation_heading_magnetic.valid();
 	params.heading_magnetic = *_orientation_heading_magnetic;
 	params.heading_true = *_orientation_heading_true;
-	params.ap_heading_visible = _cmd_visible.read (false) && _cmd_heading.valid();
-	params.ap_track_visible = _cmd_track_visible.read (false);
-	params.ap_magnetic_heading = *_cmd_heading;
+	params.ap_visible = _cmd_visible.read (false);
+	params.ap_line_visible = _cmd_line_visible.read (false);
+	params.ap_heading_magnetic = _cmd_heading_magnetic.get_optional();
+	params.ap_track_magnetic = _cmd_track_magnetic.get_optional();
+	params.ap_use_trk = _cmd_use_trk.get_optional();
 	params.track_visible = _track_visible.read (false) && (_track_lateral_magnetic.valid() || _orientation_heading_magnetic.valid());
 	params.track_magnetic = _track_lateral_magnetic.read (*_orientation_heading_magnetic);
 	params.course_visible = _course_visible.read (false);

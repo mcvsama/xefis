@@ -69,7 +69,7 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 		{ "internal-temperature", _internal_temperature, false },
 		{ "orientation.pitch", _orientation_pitch, true },
 		{ "orientation.roll", _orientation_roll, true },
-		{ "orientation.magnetic-heading", _orientation_magnetic_heading, true },
+		{ "orientation.heading.magnetic", _orientation_magnetic_heading, true },
 		{ "acceleration.x", _acceleration_x, false },
 		{ "acceleration.y", _acceleration_y, false },
 		{ "acceleration.z", _acceleration_z, false },

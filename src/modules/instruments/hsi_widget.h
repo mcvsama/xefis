@@ -83,9 +83,11 @@ class HSIWidget: public Xefis::InstrumentWidget
 		bool				heading_visible				= false;
 		Angle				heading_magnetic			= 0_deg;
 		Angle				heading_true				= 0_deg;
-		bool				ap_heading_visible			= false;
-		bool				ap_track_visible			= false;
-		Angle				ap_magnetic_heading			= 0_deg;
+		bool				ap_visible					= false;
+		bool				ap_line_visible				= false;
+		Optional<Angle>		ap_heading_magnetic;
+		Optional<Angle>		ap_track_magnetic;
+		Optional<bool>		ap_use_trk;
 		bool				track_visible				= false;
 		Angle				track_magnetic				= 0_deg;
 		bool				course_visible				= false;
@@ -160,11 +162,12 @@ class HSIWidget: public Xefis::InstrumentWidget
 	class LocalParameters
 	{
 	  public:
-		Angle			heading						= 0_deg; // Computed mag or true, depending on heading mode.
-		Angle			ap_heading					= 0_deg; // Computed mag or true, depending on heading mode.
-		Angle			course_heading				= 0_deg; // Computed mag or true, depending on heading mode.
-		Angle			track_true					= 0_deg; // Computed.
-		Angle			track						= 0_deg; // Mag or true, depending on heading mode.
+		Angle			heading						= 0_deg;	// Computed mag or true, depending on heading mode.
+		Optional<Angle>	ap_bug_magnetic;						// Computed mag or true, depending on heading mode.
+		Optional<bool>	ap_use_trk;
+		Angle			course_heading				= 0_deg;	// Computed mag or true, depending on heading mode.
+		Angle			track_true					= 0_deg;	// Computed.
+		Angle			track						= 0_deg;	// Mag or true, depending on heading mode.
 		Angle			rotation					= 0_deg;
 		QDateTime		positioning_hint_ts			= QDateTime::fromTime_t (0);
 		bool			navaid_selected_visible		= false;

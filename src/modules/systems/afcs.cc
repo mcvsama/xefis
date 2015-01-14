@@ -102,8 +102,8 @@ AFCS::AFCS (xf::ModuleManager* module_manager, QDomElement const& config):
 	parse_properties (config, {
 		{ "input.ias", _measured_ias, true },
 		{ "input.mach", _measured_mach, true },
-		{ "input.heading", _measured_heading, true },
-		{ "input.track", _measured_track, true },
+		{ "input.heading.magnetic", _measured_heading_magnetic, true },
+		{ "input.track.magnetic", _measured_track_magnetic, true },
 		{ "input.altitude.amsl", _measured_altitude_amsl, true },
 		{ "input.vs", _measured_vs, true },
 		{ "input.fpa", _measured_fpa, true },
@@ -162,13 +162,14 @@ AFCS::AFCS (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "output.cmd.pitch-mode", _cmd_pitch_mode, true },
 		{ "output.cmd.ias", _cmd_ias, true },
 		{ "output.cmd.mach", _cmd_mach, true },
-		{ "output.cmd.heading", _cmd_heading, true },
-		{ "output.cmd.track", _cmd_track, true },
+		{ "output.cmd.heading.magnetic", _cmd_heading_magnetic, true },
+		{ "output.cmd.track.magnetic", _cmd_track_magnetic, true },
 		{ "output.cmd.altitude", _cmd_altitude, true },
 		{ "output.cmd.vs", _cmd_vs, true },
 		{ "output.cmd.fpa", _cmd_fpa, true },
 		{ "output.thr-ref", _thr_ref, true },
 		{ "output.spd-ref", _spd_ref, true },
+		{ "output.cmd-use-trk", _cmd_use_trk, false },
 		{ "output.fma.hint", _fma_hint, true },
 		{ "output.fma.speed-hint", _fma_speed_hint, true },
 		{ "output.fma.roll-hint", _fma_roll_hint, true },
@@ -358,16 +359,8 @@ AFCS::knob_heading_change (int delta)
 			break;
 	}
 
-	switch (_lateral_control)
-	{
-		case LateralControl::Heading:
-			_mcp_heading = xf::floored_mod (_mcp_heading + step * delta, 360_deg);
-			break;
-
-		case LateralControl::Track:
-			_mcp_track = xf::floored_mod (_mcp_track + step * delta, 360_deg);
-			break;
-	}
+	_mcp_heading = xf::floored_mod (_mcp_heading + step * delta, 360_deg);
+	_mcp_track = xf::floored_mod (_mcp_track + step * delta, 360_deg);
 }
 
 
@@ -391,8 +384,8 @@ void
 AFCS::button_press_xchg_hdg_trk()
 {
 	Optional<Angle> track_minus_heading;
-	if (_measured_heading.valid() && _measured_track.valid())
-		track_minus_heading = *_measured_track - *_measured_heading;
+	if (_measured_heading_magnetic.valid() && _measured_track_magnetic.valid())
+		track_minus_heading = *_measured_track_magnetic - *_measured_heading_magnetic;
 
 	switch (_lateral_control)
 	{
@@ -715,15 +708,23 @@ AFCS::button_press_clb_con()
 void
 AFCS::check_input()
 {
-	if (!_measured_ias.valid() ||
-		!_measured_mach.valid() ||
-		!_measured_heading.valid() ||
-		!_measured_track.valid() ||
-		!_measured_altitude_amsl.valid() ||
-		!_measured_vs.valid() ||
-		!_measured_fpa.valid())
+	std::array<xf::GenericProperty*, 7> checked_props = {
+		&_measured_ias,
+		&_measured_mach,
+		&_measured_heading_magnetic,
+		&_measured_track_magnetic,
+		&_measured_altitude_amsl,
+		&_measured_vs,
+		&_measured_fpa,
+	};
+
+	if (std::any_of (checked_props.begin(), checked_props.end(), [](xf::GenericProperty* p) { return !p->valid(); }))
 	{
-		throw Disengage ("invalid sensor input");
+		QStringList failed_props;
+		for (auto const& p: checked_props)
+			if (!p->valid())
+				failed_props.push_back (QString::fromStdString (p->path().string()));
+		throw Disengage ("invalid sensor input on props: " + failed_props.join (", ").toStdString());
 	}
 }
 
@@ -875,9 +876,9 @@ AFCS::update_efis()
 			switch (_lateral_control)
 			{
 				case LateralControl::Heading:
-					if (_measured_heading.valid())
+					if (_measured_heading_magnetic.valid())
 					{
-						if (std::abs (*_measured_heading - _mcp_heading) < _acq_delta_heading)
+						if (std::abs (*_measured_heading_magnetic - _mcp_heading) < _acq_delta_heading)
 							_fma_roll_hint = "HDG";
 						else
 							_fma_roll_hint = "HDG SEL";
@@ -885,9 +886,9 @@ AFCS::update_efis()
 					break;
 
 				case LateralControl::Track:
-					if (_measured_track.valid())
+					if (_measured_track_magnetic.valid())
 					{
-						if (std::abs (*_measured_track - _mcp_track) < _acq_delta_heading)
+						if (std::abs (*_measured_track_magnetic - _mcp_track) < _acq_delta_heading)
 							_fma_roll_hint = "TRK";
 						else
 							_fma_roll_hint = "TRK SEL";
@@ -1040,8 +1041,11 @@ AFCS::update_output()
 
 	if (_roll_mode != RollMode::HOLD)
 	{
-		_cmd_heading = _mcp_heading;
-		_cmd_track = _mcp_track;
+		_cmd_heading_magnetic = _mcp_heading;
+		_cmd_track_magnetic = _mcp_track;
+
+		if (_cmd_use_trk.configured())
+			_cmd_use_trk = _lateral_control == LateralControl::Track;
 	}
 
 	if (_pitch_mode != PitchMode::ALT_HOLD)
@@ -1108,13 +1112,13 @@ AFCS::heading_hold_with_roll()
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
-			if (_measured_heading.valid())
-				_cmd_heading = *_measured_heading;
+			if (_measured_heading_magnetic.valid())
+				_cmd_heading_magnetic = *_measured_heading_magnetic;
 			break;
 
 		case LateralControl::Track:
-			if (_measured_track.valid())
-				_cmd_track = *_measured_track;
+			if (_measured_track_magnetic.valid())
+				_cmd_track_magnetic = *_measured_track_magnetic;
 			break;
 	}
 }
@@ -1198,6 +1202,7 @@ AFCS::make_button_action (xf::PropertyBoolean property, void (AFCS::* callback)(
 	Unique<xf::ButtonAction> action = std::make_unique<xf::ButtonAction> (property, [this,callback] {
 		try {
 			(this->*callback)();
+			solve();
 		}
 		catch (...)
 		{
@@ -1216,6 +1221,7 @@ AFCS::make_knob_action (xf::PropertyInteger property, void (AFCS::* callback)(in
 	Unique<xf::DeltaDecoder> action = std::make_unique<xf::DeltaDecoder> (property, [this,callback](int delta) {
 		try {
 			(this->*callback) (delta);
+			solve();
 		}
 		catch (...)
 		{
