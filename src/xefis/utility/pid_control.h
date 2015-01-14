@@ -39,7 +39,19 @@ template<class tValueType>
 		typedef tValueType ValueType;
 		typedef double ParamType;
 
+		class Settings
+		{
+		  public:
+			ValueType	p;
+			ValueType	i;
+			ValueType	d;
+		};
+
 	  public:
+		// Ctor
+		PIDControl (Settings const& settings, ValueType target);
+
+		// Ctor
 		PIDControl (ParamType p, ParamType i, ParamType d, ValueType target);
 
 		/**
@@ -92,6 +104,12 @@ template<class tValueType>
 		 */
 		void
 		set_d (ParamType d) noexcept;
+
+		/**
+		 * Set P, I and D at once.
+		 */
+		void
+		set_pid (Settings const& settings) noexcept;
 
 		/**
 		 * Set P, I and D at once.
@@ -211,6 +229,18 @@ template<class tValueType>
 
 template<class T>
 	inline
+	PIDControl<T>::PIDControl (Settings const& settings, ValueType target):
+		_target (target),
+		_p (settings.p),
+		_i (settings.i),
+		_d (settings.d)
+	{
+		reset();
+	}
+
+
+template<class T>
+	inline
 	PIDControl<T>::PIDControl (ParamType p, ParamType i, ParamType d, ValueType target):
 		_target (target),
 		_p (p),
@@ -284,6 +314,16 @@ template<class T>
 	PIDControl<T>::set_d (ParamType d) noexcept
 	{
 		_d = d;
+	}
+
+
+template<class T>
+	inline void
+	PIDControl<T>::set_pid (Settings const& settings) noexcept
+	{
+		_p = settings.p;
+		_i = settings.i;
+		_d = settings.d;
 	}
 
 
