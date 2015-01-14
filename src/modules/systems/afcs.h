@@ -29,6 +29,9 @@
 #include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
 
+// Local:
+#include "afcs_api.h"
+
 
 /**
  * Controls AFCS logic. Gets input from Mode Control Panel,
@@ -102,7 +105,6 @@ class AFCS: public xf::Module
 		IDLE			= 3,
 		MCP_SPD			= 4,	// Displayed as "SPD SEL" or "SPD" on FMA.
 		SPD_HOLD		= 5,
-		sentinel		= 6,
 	};
 
 	enum class RollMode
@@ -113,7 +115,6 @@ class AFCS: public xf::Module
 		WNG_LVL			= 3,
 		LOC				= 4,
 		LNAV			= 5,
-		sentinel		= 6,
 	};
 
 	enum class PitchMode
@@ -126,7 +127,6 @@ class AFCS: public xf::Module
 		VNAV_PTH		= 5,
 		GS				= 6,
 		FLARE			= 7,
-		sentinel		= 8,
 	};
 
   public:
@@ -392,20 +392,27 @@ class AFCS: public xf::Module
 	/**
 	 * Return string ID for a thrust mode.
 	 */
-	Optional<std::string>
-	stringify_thrust_mode() const;
+	Optional<afcs_api::ThrustMode>
+	translate_thrust_mode() const;
 
 	/**
 	 * Return string ID for a roll mode.
 	 */
-	Optional<std::string>
-	stringify_roll_mode() const;
+	Optional<afcs_api::RollMode>
+	translate_roll_mode() const;
 
 	/**
 	 * Return string ID for a pitch mode.
 	 */
-	Optional<std::string>
-	stringify_pitch_mode() const;
+	Optional<afcs_api::PitchMode>
+	translate_pitch_mode() const;
+
+	/**
+	 * Cast internal Optional types.
+	 */
+	template<class Target, class Source>
+		static Optional<Target>
+		optional_cast (Optional<Source> const& source);
 
   private:
 	// Settings:
@@ -472,9 +479,9 @@ class AFCS: public xf::Module
 	xf::PropertyBoolean					_mcp_led_at;
 	xf::PropertyBoolean					_mcp_led_yd;
 	// Settings forwarded fo FD (might be different than MCP settings):
-	xf::PropertyString					_cmd_thrust_mode;
-	xf::PropertyString					_cmd_roll_mode;
-	xf::PropertyString					_cmd_pitch_mode;
+	xf::PropertyInteger					_cmd_thrust_mode;
+	xf::PropertyInteger					_cmd_roll_mode;
+	xf::PropertyInteger					_cmd_pitch_mode;
 	xf::PropertySpeed					_cmd_ias;
 	xf::PropertyFloat					_cmd_mach;
 	xf::PropertyAngle					_cmd_heading_magnetic;

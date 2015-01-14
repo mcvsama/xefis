@@ -65,6 +65,12 @@ template<class tValueType>
 		extent() const noexcept;
 
 		/**
+		 * Return 0.5 * (min() + max()).
+		 */
+		constexpr ValueType
+		mid() const noexcept;
+
+		/**
 		 * Swap minimum and maximum values.
 		 */
 		void
@@ -145,6 +151,15 @@ template<class T>
 	Range<T>::extent() const noexcept
 	{
 		return _max - _min;
+	}
+
+
+template<class T>
+	constexpr
+	typename Range<T>::ValueType
+	Range<T>::mid() const noexcept
+	{
+		return 0.5 * (_min + _max);
 	}
 
 
