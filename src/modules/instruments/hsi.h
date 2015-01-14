@@ -68,8 +68,10 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertySpeed		_speed_gs;
 	Xefis::PropertySpeed		_speed_tas;
 	Xefis::PropertyBoolean		_cmd_visible;
-	Xefis::PropertyAngle		_cmd_heading;
-	Xefis::PropertyBoolean		_cmd_track_visible;
+	Xefis::PropertyBoolean		_cmd_line_visible;
+	Xefis::PropertyAngle		_cmd_heading_magnetic;
+	Xefis::PropertyAngle		_cmd_track_magnetic;
+	Xefis::PropertyBoolean		_cmd_use_trk;
 	Xefis::PropertyLength		_target_altitude_reach_distance;
 	Xefis::PropertyAngle		_orientation_heading_magnetic;
 	Xefis::PropertyAngle		_orientation_heading_true;

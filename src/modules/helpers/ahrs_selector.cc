@@ -47,7 +47,7 @@ AHRSSelector::AHRSSelector (Xefis::ModuleManager* module_manager, QDomElement co
 		XEFIS_SELECTOR_DEF_PROP ("serviceable", serviceable);
 		XEFIS_SELECTOR_DEF_PROP ("orientation.pitch", orientation_pitch);
 		XEFIS_SELECTOR_DEF_PROP ("orientation.roll", orientation_roll);
-		XEFIS_SELECTOR_DEF_PROP ("orientation.magnetic-heading", orientation_magnetic_heading);
+		XEFIS_SELECTOR_DEF_PROP ("orientation.heading.magnetic", orientation_magnetic_heading);
 
 #undef XEFIS_SELECTOR_DEF_PROP
 	}
@@ -56,7 +56,7 @@ AHRSSelector::AHRSSelector (Xefis::ModuleManager* module_manager, QDomElement co
 		{ "output.serviceable", _output_serviceable, true },
 		{ "output.orientation.pitch", _output_orientation_pitch, true },
 		{ "output.orientation.roll", _output_orientation_roll, true },
-		{ "output.orientation.magnetic-heading", _output_orientation_magnetic_heading, true },
+		{ "output.orientation.heading.magnetic", _output_orientation_magnetic_heading, true },
 		{ "output.flags.pitch-disagree", _output_pitch_disagree_flag, true },
 		{ "output.flags.roll-disagree", _output_roll_disagree_flag, true },
 		{ "output.flags.magnetic-heading-disagree", _output_magnetic_heading_disagree_flag, true },

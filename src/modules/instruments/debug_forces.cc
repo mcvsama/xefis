@@ -31,7 +31,7 @@ DebugForces::DebugForces (Xefis::ModuleManager* module_manager, QDomElement cons
 	parse_properties (config, {
 		{ "input.orientation.pitch", _input_orientation_pitch, true },
 		{ "input.orientation.roll", _input_orientation_roll, true },
-		{ "input.orientation.magnetic-heading", _input_orientation_magnetic_heading, true },
+		{ "input.orientation.heading.magnetic", _input_orientation_magnetic_heading, true },
 		{ "input.accel.measured.x", _input_measured_accel_x, true },
 		{ "input.accel.measured.y", _input_measured_accel_y, true },
 		{ "input.accel.measured.z", _input_measured_accel_z, true },

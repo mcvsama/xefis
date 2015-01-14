@@ -446,8 +446,8 @@ class AFCS: public xf::Module
 	// Measurements:
 	xf::PropertySpeed					_measured_ias;
 	xf::PropertyFloat					_measured_mach;
-	xf::PropertyAngle					_measured_heading;
-	xf::PropertyAngle					_measured_track;
+	xf::PropertyAngle					_measured_heading_magnetic;
+	xf::PropertyAngle					_measured_track_magnetic;
 	xf::PropertyLength					_measured_altitude_amsl;
 	xf::PropertySpeed					_measured_vs;
 	xf::PropertyAngle					_measured_fpa;
@@ -477,14 +477,15 @@ class AFCS: public xf::Module
 	xf::PropertyString					_cmd_pitch_mode;
 	xf::PropertySpeed					_cmd_ias;
 	xf::PropertyFloat					_cmd_mach;
-	xf::PropertyAngle					_cmd_heading;
-	xf::PropertyAngle					_cmd_track;
+	xf::PropertyAngle					_cmd_heading_magnetic;
+	xf::PropertyAngle					_cmd_track_magnetic;
 	xf::PropertyLength					_cmd_altitude;
 	xf::PropertySpeed					_cmd_vs;
 	xf::PropertyAngle					_cmd_fpa;
-	// Speed/thrust bugs for EFIS:
+	// EFIS bugs:
 	xf::PropertyForce					_thr_ref;
 	xf::PropertySpeed					_spd_ref;
+	xf::PropertyBoolean					_cmd_use_trk;
 	// Output for FMA:
 	xf::PropertyString					_fma_hint;
 	xf::PropertyString					_fma_speed_hint;

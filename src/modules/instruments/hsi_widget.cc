@@ -51,7 +51,10 @@ HSIWidget::Parameters::sanitize()
 	range = limit (range, 1_ft, 5000_nmi);
 	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
 	heading_true = floored_mod (heading_true, 360_deg);
-	ap_magnetic_heading = floored_mod (ap_magnetic_heading, 360_deg);
+	if (ap_heading_magnetic)
+		ap_heading_magnetic = floored_mod (*ap_heading_magnetic, 360_deg);
+	if (ap_track_magnetic)
+		ap_track_magnetic = floored_mod (*ap_track_magnetic, 360_deg);
 	track_magnetic = floored_mod (track_magnetic, 360_deg);
 	if (true_home_direction)
 		true_home_direction = floored_mod (*true_home_direction, 360_deg);
@@ -286,10 +289,46 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	if (_params.heading_mode == HeadingMode::True)
 		_pointers_transform.rotate ((_params.heading_true - _params.heading_magnetic).deg());
 
-	_locals.ap_heading = _params.ap_magnetic_heading;
-	if (_params.heading_mode == HeadingMode::True)
-		_locals.ap_heading += _params.heading_true - _params.heading_magnetic;
-	_locals.ap_heading = Xefis::floored_mod (_locals.ap_heading, 360_deg);
+	_locals.ap_use_trk = _params.ap_use_trk;
+	// If use_trk is not nil, use proper heading or track information to position cmd bug.
+	if (_locals.ap_use_trk)
+	{
+		if (*_locals.ap_use_trk)
+			_locals.ap_bug_magnetic = _params.ap_track_magnetic;
+		else
+			_locals.ap_bug_magnetic = _params.ap_heading_magnetic;
+	}
+	// If use_trk is unavailable (nil), then use the only heading/magnetic property
+	// that is set. If both or neither is set, fail.
+	else
+	{
+		if (!_params.ap_heading_magnetic != !_params.ap_track_magnetic)
+		{
+			if (_params.ap_heading_magnetic)
+			{
+				_locals.ap_bug_magnetic = _params.ap_heading_magnetic;
+				_locals.ap_use_trk = false;
+			}
+			else
+			{
+				_locals.ap_bug_magnetic = _params.ap_track_magnetic;
+				_locals.ap_use_trk = true;
+			}
+		}
+		else
+		{
+			_locals.ap_bug_magnetic.reset();
+			_locals.ap_use_trk.reset();
+		}
+	}
+
+	// Finish up cmd bug setting:
+	if (_locals.ap_bug_magnetic)
+	{
+		if (_params.heading_mode == HeadingMode::True)
+			*_locals.ap_bug_magnetic += _params.heading_true - _params.heading_magnetic;
+		_locals.ap_bug_magnetic = xf::floored_mod (*_locals.ap_bug_magnetic, 360_deg);
+	}
 
 	if (_params.course_setting_magnetic)
 	{
@@ -346,17 +385,18 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 	painter.resetTransform();
 	painter.setClipping (false);
 
-	// AP info: SEL HDG 000
-	if (_params.display_mode == DisplayMode::Auxiliary)
+	// AP info: SEL HDG/TRK 000
+	if (_params.display_mode == DisplayMode::Auxiliary && _locals.ap_bug_magnetic && _locals.ap_use_trk)
 	{
-		int sel_hdg = static_cast<int> (_locals.ap_heading.deg() + 0.5f) % 360;
+		int sel_hdg = static_cast<int> (_locals.ap_bug_magnetic->deg() + 0.5f) % 360;
 		if (sel_hdg == 0)
 			sel_hdg = 360;
 
+		QString str = *_locals.ap_use_trk ? "SEL TRK " : "SEL HDG ";
 		// AP heading always set as magnetic, but can be displayed as true:
 		Xefis::TextLayout layout;
 		layout.set_background (Qt::black, { _margin, 0.0 });
-		layout.add_fragment ("SEL HDG ", _font_13, _autopilot_pen_2.color());
+		layout.add_fragment (str, _font_13, _autopilot_pen_2.color());
 		layout.add_fragment (QString ("%1").arg (sel_hdg, 3, 10, QChar ('0')), _font_16, _autopilot_pen_2.color());
 		layout.paint (QPointF (0.5 * _w - _q, _h - 0.1 * layout.height()), Qt::AlignBottom | Qt::AlignRight, painter);
 	}
@@ -643,11 +683,11 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 {
-	if (!_params.ap_heading_visible)
+	if (!_params.ap_visible)
 		return;
 
 	// AP dashed line:
-	if (_params.ap_track_visible)
+	if (_params.ap_line_visible && _locals.ap_bug_magnetic)
 	{
 		double pink_pen_width = 1.5f;
 		double shadow_pen_width = 2.5f;
@@ -667,7 +707,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
-		painter.rotate ((_locals.ap_heading - _locals.rotation).deg());
+		painter.rotate ((*_locals.ap_bug_magnetic - _locals.rotation).deg());
 
 		for (auto const& p: { shadow_pen, pen })
 		{
@@ -677,17 +717,17 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 	}
 
 	// A/P bug
-	if (_params.heading_visible)
+	if (_params.heading_visible && _locals.ap_bug_magnetic)
 	{
 		Angle limited_rotation;
 		switch (_params.display_mode)
 		{
 			case DisplayMode::Auxiliary:
-				limited_rotation = Xefis::floored_mod (_locals.ap_heading - _locals.rotation + 180_deg, 360_deg) - 180_deg;
+				limited_rotation = Xefis::floored_mod (*_locals.ap_bug_magnetic - _locals.rotation + 180_deg, 360_deg) - 180_deg;
 				break;
 
 			default:
-				limited_rotation = _locals.ap_heading - _locals.rotation;
+				limited_rotation = *_locals.ap_bug_magnetic - _locals.rotation;
 				break;
 		}
 
