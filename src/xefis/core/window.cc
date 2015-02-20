@@ -357,6 +357,13 @@ Window::process_widget_element (QDomElement const& widget_element, QWidget* pare
 	else
 		throw BadDomAttribute (widget_element, "type");
 
+	// Is widget disabled?
+	widget->setEnabled (widget_element.tagName() != "disabled-widget");
+
+	// Comment?
+	if (widget_element.hasAttribute ("comment"))
+		widget->setToolTip (widget_element.attribute ("comment").toHtmlEscaped());
+
 	if (label_wrapper)
 	{
 		QVBoxLayout* layout = new QVBoxLayout (label_wrapper);
@@ -494,7 +501,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 				stacked_layout->setCurrentWidget (proxy_widget);
 			}
 		}
-		else if (e == "instrument" || e == "panel" || e == "group" || e == "widget")
+		else if (e == "instrument" || e == "panel" || e == "group" || e == "widget" || e == "disabled-widget")
 		{
 			QWidget* widget = nullptr;
 
@@ -519,7 +526,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 				widget = process_panel_element (e, parent_widget);
 			else if (e == "group")
 				widget = process_group_element (e, parent_widget, panel);
-			else if (e == "widget")
+			else if (e == "widget" || e == "disabled-widget")
 				widget = process_widget_element (e, parent_widget, panel);
 
 			// If it's a widget, add it to layout:
