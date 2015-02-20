@@ -55,7 +55,7 @@ class PerformanceComputer: public Xefis::Module
 	get_stall_ias (Angle const& max_bank_angle) const;
 
 	Optional<Speed>
-	convert_to_ias (Speed const& tas) const;
+	tas_to_ias (Speed const& tas) const;
 
 	void
 	compute_critical_aoa();
@@ -102,14 +102,14 @@ class PerformanceComputer: public Xefis::Module
 	Xefis::PropertySpeed		_wind_tas;
 	Xefis::PropertyFloat		_glide_ratio;
 	Xefis::PropertyString		_glide_ratio_string;
-	Xefis::PropertySpeed		_total_energy_variometer;
-	xf::PropertySpeed			_v_s;
-	xf::PropertySpeed			_v_s_0_deg;
-	xf::PropertySpeed			_v_s_5_deg;
-	xf::PropertySpeed			_v_s_30_deg;
-	xf::PropertySpeed			_v_r;
-	xf::PropertySpeed			_v_a;
-	xf::PropertySpeed			_v_approach;
+	Xefis::PropertySpeed		_total_energy_variometer;			// TODO change to Energy
+	xf::PropertySpeed			_v_s;								// Current stall speed (depends on current bank angle)
+	xf::PropertySpeed			_v_s_0_deg;							// Stall speed with wings level
+	xf::PropertySpeed			_v_s_5_deg;							// Stall speed at 5° bank
+	xf::PropertySpeed			_v_s_30_deg;						// Stall speed at 30° bank
+	xf::PropertySpeed			_v_r;								// Rotation speed
+	xf::PropertySpeed			_v_a;								// Max maneuvering speed
+	xf::PropertySpeed			_v_approach;						// Approach speed
 	xf::PropertyAngle			_critical_aoa;
 	xf::PropertyBoolean			_stall;
 	xf::PropertyFloat			_lift_coefficient;

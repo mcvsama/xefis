@@ -347,7 +347,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 			Speed tas = Speed::from_si_units (std::sqrt (load.si_units() * _input_aircraft_weight->si_units()
 														 / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl.value())));
 
-			return convert_to_ias (tas);
+			return tas_to_ias (tas);
 		}
 		else
 			return nullptr;
@@ -358,7 +358,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 
 
 Optional<Speed>
-PerformanceComputer::convert_to_ias (Speed const& tas) const
+PerformanceComputer::tas_to_ias (Speed const& tas) const
 {
 	if (_density_altitude.valid())
 	{
@@ -463,7 +463,7 @@ PerformanceComputer::compute_estimations()
 			xf::LiftCoefficient cl = airframe->get_cl (*_input_aoa_alpha, flaps_angle, spoilers_angle);
 			double si_tas = std::sqrt (lift_force.N() / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl.value()));
 			Speed tas = Speed::from_si_units (si_tas);
-			_estimated_ias = convert_to_ias (tas);
+			_estimated_ias = tas_to_ias (tas);
 		}
 		else
 			_estimated_ias.set_nil();
