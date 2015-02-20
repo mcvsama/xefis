@@ -3,6 +3,8 @@
 
 # Get output from XEFIS log run with --modules-debug-log and feed it to this script.
 
+puts "Waiting for data on standard input (export data with xefis --modules-debug-log)"
+
 DOC_DIR = '../doc/XEFIS Reference Manual'
 
 if RUBY_VERSION.split('.')[0].to_i < 2
