@@ -109,6 +109,8 @@ class HSIWidget: public Xefis::InstrumentWidget
 		QString				navaid_right_identifier;
 		Optional<Length>	navaid_right_distance;
 		Optional<Angle>		navaid_right_initial_bearing_magnetic;
+		Optional<Length>	navigation_required_performance;
+		Optional<Length>	navigation_actual_performance;
 		bool				center_on_track				= false;
 		bool				home_track_visible			= false;
 		Optional<Angle>		true_home_direction;
@@ -201,6 +203,9 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 		void
 		paint_aircraft (Xefis::Painter&);
+
+		void
+		paint_navperf (Xefis::Painter&);
 
 		void
 		paint_hints (Xefis::Painter&);

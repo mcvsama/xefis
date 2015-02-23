@@ -94,6 +94,8 @@ HSI::HSI (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		{ "navaid.right.identifier", _navaid_right_identifier, false },
 		{ "navaid.right.distance", _navaid_right_distance, false },
 		{ "navaid.right.initial-bearing.magnetic", _navaid_right_initial_bearing_magnetic, false },
+		{ "navigation.required-performance", _navigation_required_performance, false },
+		{ "navigation.actual-performance", _navigation_actual_performance, false },
 		{ "wind.from.magnetic", _wind_from_magnetic, false },
 		{ "wind.tas", _wind_speed_tas, false },
 		{ "localizer-id", _localizer_id, false },
@@ -159,6 +161,8 @@ HSI::read()
 	params.navaid_right_identifier = QString::fromStdString (_navaid_right_identifier.read (""));
 	params.navaid_right_distance = _navaid_right_distance.get_optional();
 	params.navaid_right_initial_bearing_magnetic = _navaid_right_initial_bearing_magnetic.get_optional();
+	params.navigation_required_performance = _navigation_required_performance.get_optional();
+	params.navigation_actual_performance = _navigation_actual_performance.get_optional();
 	params.center_on_track = _track_center_on_track.read (true);
 	params.home_track_visible = _home_track_visible.read (false);
 	params.true_home_direction = _home_true_direction.get_optional();

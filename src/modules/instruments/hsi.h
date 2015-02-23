@@ -109,6 +109,8 @@ class HSI: public Xefis::Instrument
 	Xefis::PropertyString		_navaid_right_identifier;
 	Xefis::PropertyLength		_navaid_right_distance;
 	Xefis::PropertyAngle		_navaid_right_initial_bearing_magnetic;
+	Xefis::PropertyLength		_navigation_required_performance;
+	Xefis::PropertyLength		_navigation_actual_performance;
 	Xefis::PropertyAngle		_wind_from_magnetic;
 	Xefis::PropertySpeed		_wind_speed_tas;
 	Xefis::PropertyString		_localizer_id;
