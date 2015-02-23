@@ -367,6 +367,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	paint_tcas_and_navaid_info();
 	paint_pointers (painter());
 	paint_aircraft (painter());
+	paint_navperf (painter());
 }
 
 
@@ -471,6 +472,59 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 
 void
+HSIWidget::PaintWorkUnit::paint_navperf (Xefis::Painter& painter)
+{
+	if (_params.display_mode != DisplayMode::Auxiliary)
+	{
+		if (_params.navigation_required_performance ||
+			_params.navigation_actual_performance)
+		{
+			double x = 0.045 * _w;
+
+			if (_params.navigation_required_performance)
+			{
+				painter.resetTransform();
+				painter.setClipping (false);
+				painter.translate (0.5 * _w, _h);
+
+				auto val = QString ("%1").arg (_params.navigation_required_performance->m(), 0, 'f', 2);
+
+				xf::TextLayout layout;
+				layout.set_background (Qt::black, { _margin, 0.0 });
+				layout.set_alignment (Qt::AlignHCenter);
+				layout.add_fragment ("RNP", _font_13, _navigation_color);
+				layout.add_new_line();
+				layout.add_fragment (val, _font_13, _navigation_color);
+				layout.paint (QPointF (-x, 0.0), Qt::AlignBottom | Qt::AlignHCenter, painter);
+			}
+
+			if (_params.navigation_actual_performance)
+			{
+				painter.resetTransform();
+				painter.setClipping (false);
+				painter.translate (0.5 * _w, _h);
+
+				auto val = QString ("%1").arg (_params.navigation_actual_performance->m(), 0, 'f', 2);
+
+				QColor text_color = _navigation_color;
+				if (_params.navigation_required_performance)
+					if (*_params.navigation_required_performance < *_params.navigation_actual_performance)
+						text_color = _warning_color_1;
+
+				xf::TextLayout layout;
+				layout.set_background (Qt::black, { _margin, 0.0 });
+				layout.set_alignment (Qt::AlignHCenter);
+				layout.add_fragment ("ANP", _font_13, text_color);
+				layout.add_new_line();
+				layout.add_fragment (val, _font_13, text_color);
+				layout.paint (QPointF (+x, 0.0), Qt::AlignBottom | Qt::AlignHCenter, painter);
+			}
+		}
+	}
+}
+
+
+void
 HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 {
 	if (!_params.positioning_hint_visible || !_params.position)
@@ -479,7 +533,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	painter.resetTransform();
 	painter.setClipping (false);
 
-	double hplus = _params.display_mode == DisplayMode::Auxiliary ? 0.775f * _w : 0.75f * _w;
+	double x = _params.display_mode == DisplayMode::Auxiliary ? 0.775f * _w : 0.725f * _w;
 	QString hint = _params.positioning_hint;
 
 	// Box for emphasis:
@@ -494,7 +548,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 	Xefis::TextLayout layout;
 	layout.set_background (Qt::black, { _margin, 0.0 });
 	layout.add_fragment (hint, _font_13, _navigation_color, box_pen);
-	layout.paint (QPointF (hplus, _h - 1.4 * 0.1 * layout.height()), Qt::AlignBottom | Qt::AlignHCenter, painter);
+	layout.paint (QPointF (x, _h), Qt::AlignBottom | Qt::AlignHCenter, painter);
 }
 
 
