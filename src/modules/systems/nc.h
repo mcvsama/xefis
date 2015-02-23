@@ -99,6 +99,7 @@ class NavigationComputer: public Xefis::Module
 	Xefis::PropertyLength		_position_altitude_amsl;
 	Xefis::PropertyLength		_position_accuracy_lateral;
 	Xefis::PropertyLength		_position_accuracy_vertical;
+	Xefis::PropertyLength		_position_accuracy;
 	Xefis::PropertyString		_position_source;
 	Xefis::PropertyAngle		_orientation_pitch;
 	Xefis::PropertyAngle		_orientation_roll;

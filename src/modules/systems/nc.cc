@@ -65,6 +65,7 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 		{ "position.altitude.amsl", _position_altitude_amsl, true },
 		{ "position.accuracy.lateral", _position_accuracy_lateral, true },
 		{ "position.accuracy.vertical", _position_accuracy_vertical, true },
+		{ "position.accuracy", _position_accuracy, true },
 		{ "position.source", _position_source, true },
 		{ "orientation.pitch", _orientation_pitch, true },
 		{ "orientation.roll", _orientation_roll, true },
@@ -158,6 +159,12 @@ NavigationComputer::compute_position()
 	_position_accuracy_lateral.copy (_position_input_accuracy_lateral);
 	_position_accuracy_vertical.copy (_position_input_accuracy_vertical);
 	_position_source.copy (_position_input_source);
+
+	// Larger of the two:
+	if (_position_accuracy_lateral.valid() && _position_accuracy_vertical.valid())
+		_position_accuracy = std::max (*_position_accuracy_lateral, *_position_accuracy_vertical);
+	else
+		_position_accuracy.set_nil();
 
 	Length const failed_accuracy = 100_nmi;
 
