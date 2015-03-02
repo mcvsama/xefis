@@ -41,10 +41,10 @@ constexpr Frequency		PCA9685::InternalFrequency;
 Time
 PCA9685::Channel::compute_duty_cycle()
 {
-	Xefis::PropertyFloat::Type value = fallback_to_last_valid ? last_value : input_default;
+	xf::PropertyFloat::Type value = fallback_to_last_valid ? last_value : input_default;
 	if (input.valid())
 		value = *input;
-	value = Xefis::limit (value, input_minimum, input_maximum);
+	value = xf::limit (value, input_minimum, input_maximum);
 
 	last_value = value;
 
@@ -52,19 +52,19 @@ PCA9685::Channel::compute_duty_cycle()
 	value = smoother.process (value, now - _last_computation_time);
 	_last_computation_time = now;
 
-	return 1_s * Xefis::renormalize (value, input_minimum, input_maximum, output_minimum.s(), output_maximum.s());
+	return 1_s * xf::renormalize (value, input_minimum, input_maximum, output_minimum.s(), output_maximum.s());
 }
 
 
-PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& config):
+PCA9685::PCA9685 (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	Xefis::I2C::Bus::ID i2c_bus;
-	Xefis::I2C::Address::ID i2c_address;
+	xf::I2C::Bus::ID i2c_bus;
+	xf::I2C::Address::ID i2c_address;
 
 	// Settings:
 
-	typedef Xefis::ConfigReader::SettingsParser::SettingsList SettingsList;
+	typedef xf::ConfigReader::SettingsParser::SettingsList SettingsList;
 
 	SettingsList settings_list = {
 		{ "i2c.bus", i2c_bus, true },
@@ -92,7 +92,7 @@ PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 
 	// Properties:
 
-	Xefis::ConfigReader::PropertiesParser::PropertiesList properties_list;
+	xf::ConfigReader::PropertiesParser::PropertiesList properties_list;
 
 	for (std::size_t i = 0; i < Channels; ++i)
 	{
@@ -103,7 +103,7 @@ PCA9685::PCA9685 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 	parse_properties (config, properties_list);
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::I2C::Address (i2c_address));
 
 	_initialization_timer = new QTimer (this);
 	_initialization_timer->setInterval (InitializationDelay.ms());
@@ -198,8 +198,8 @@ PCA9685::get_config_for_pwm (Time duty_cycle)
 	uint16_t on_time = 0;
 	uint16_t off_time = 4095 * (duty_cycle / _output_period) / y_corr;
 
-	on_time = Xefis::limit<uint16_t> (on_time, 0, 4095);
-	off_time = Xefis::limit<uint16_t> (off_time, 0, 4095);
+	on_time = xf::limit<uint16_t> (on_time, 0, 4095);
+	off_time = xf::limit<uint16_t> (off_time, 0, 4095);
 
 	boost::endian::native_to_little (on_time);
 	boost::endian::native_to_little (off_time);
@@ -228,7 +228,7 @@ PCA9685::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::IOError& e)
+	catch (xf::IOError& e)
 	{
 		log() << "I/O error: " << e.message() << std::endl;
 		reinitialize();

@@ -155,13 +155,13 @@ QZDevice::decompress()
 	switch (::inflate (&_ctx, Z_SYNC_FLUSH))
 	{
 		case Z_NEED_DICT:
-			throw Xefis::IOError ("failed to decompress input file: Z_NEED_DICT");
+			throw xf::IOError ("failed to decompress input file: Z_NEED_DICT");
 
 		case Z_DATA_ERROR:
-			throw Xefis::IOError ("failed to decompress input file: Z_DATA_ERROR");
+			throw xf::IOError ("failed to decompress input file: Z_DATA_ERROR");
 
 		case Z_MEM_ERROR:
-			throw Xefis::IOError ("failed to decompress input file: Z_MEM_ERROR");
+			throw xf::IOError ("failed to decompress input file: Z_MEM_ERROR");
 
 		case Z_STREAM_END:
 			_z_at_eof = true;

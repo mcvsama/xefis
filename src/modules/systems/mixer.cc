@@ -24,7 +24,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/mixer", Mixer);
 
 
-Mixer::Mixer (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Mixer::Mixer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

@@ -35,11 +35,11 @@
  * So: torque = k * d(rpm)/dt + c * rpm
  *     k and c should be obtained experimentally.
  */
-class EngineTorque: public Xefis::Module
+class EngineTorque: public xf::Module
 {
   public:
 	// Ctor
-	EngineTorque (Xefis::ModuleManager*, QDomElement const& config);
+	EngineTorque (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API

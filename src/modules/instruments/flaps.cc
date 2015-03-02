@@ -29,8 +29,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/flaps", Flaps);
 
 
-Flaps::Flaps (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+Flaps::Flaps (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (2.f)
 {
 	parse_settings (config, {
@@ -58,7 +58,7 @@ Flaps::data_updated()
 void
 Flaps::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 
@@ -101,7 +101,7 @@ Flaps::paintEvent (QPaintEvent*)
 	// Filled block showing current value:
 	if (_current.valid())
 	{
-		Angle current = Xefis::limit (*_current, 0_deg, _maximum);
+		Angle current = xf::limit (*_current, 0_deg, _maximum);
 		QRectF filled_block = block;
 		filled_block.setHeight (current / _maximum * filled_block.height());
 		painter().setPen (Qt::NoPen);
@@ -113,7 +113,7 @@ Flaps::paintEvent (QPaintEvent*)
 	if (_setting.valid())
 	{
 		// Green line:
-		Angle setting = Xefis::limit (*_setting, 0_deg, _maximum);
+		Angle setting = xf::limit (*_setting, 0_deg, _maximum);
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / _maximum * block.height();
 		painter().setPen (get_pen (Qt::green, 2.f));
@@ -124,7 +124,7 @@ Flaps::paintEvent (QPaintEvent*)
 		// Number or UP
 		QString number = "UP";
 		if (setting > 0.5_deg)
-			number = QString ("%1").arg (Xefis::symmetric_round (setting.deg()));
+			number = QString ("%1").arg (xf::symmetric_round (setting.deg()));
 		painter().setFont (setting_font);
 		painter().fast_draw_text (QPointF (block.right() + 2.f * w, s), Qt::AlignVCenter | Qt::AlignLeft, number);
 	}

@@ -27,11 +27,11 @@
 #include <xefis/core/property_observer.h>
 
 
-class Speeds: public Xefis::Module
+class Speeds: public xf::Module
 {
   public:
 	// Ctor
-	Speeds (Xefis::ModuleManager*, QDomElement const& config);
+	Speeds (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -51,15 +51,15 @@ class Speeds: public Xefis::Module
 
   private:
 	// Input:
-	Xefis::PropertyAngle	_input_flaps_angle;
-	Xefis::PropertySpeed	_input_stall_speed_5deg;
+	xf::PropertyAngle		_input_flaps_angle;
+	xf::PropertySpeed		_input_stall_speed_5deg;
 	// Output:
-	Xefis::PropertySpeed	_output_speed_minimum;
-	Xefis::PropertySpeed	_output_speed_minimum_maneuver;
-	Xefis::PropertySpeed	_output_speed_maximum_maneuver;
-	Xefis::PropertySpeed	_output_speed_maximum;
+	xf::PropertySpeed		_output_speed_minimum;
+	xf::PropertySpeed		_output_speed_minimum_maneuver;
+	xf::PropertySpeed		_output_speed_maximum_maneuver;
+	xf::PropertySpeed		_output_speed_maximum;
 	// Other:
-	Xefis::PropertyObserver	_speeds_computer;
+	xf::PropertyObserver	_speeds_computer;
 };
 
 #endif

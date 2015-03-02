@@ -33,7 +33,7 @@ Panel::Panel (QWidget* parent, Application* application):
 {
 	setBackgroundRole (QPalette::Window);
 	setAutoFillBackground (true);
-	setFont (Xefis::Services::panel_font());
+	setFont (xf::Services::panel_font());
 	setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 
 	QPalette pal = palette();

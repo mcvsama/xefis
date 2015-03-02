@@ -120,14 +120,14 @@ HT16K33::KeyMatrix::array()
 HT16K33::SingleLed::SingleLed (QDomElement const& element)
 {
 	if (!element.hasAttribute ("row"))
-		throw Xefis::MissingDomAttribute (element, "row");
+		throw xf::MissingDomAttribute (element, "row");
 	if (!element.hasAttribute ("column"))
-		throw Xefis::MissingDomAttribute (element, "column");
+		throw xf::MissingDomAttribute (element, "column");
 	if (!element.hasAttribute ("path"))
-		throw Xefis::MissingDomAttribute (element, "path");
+		throw xf::MissingDomAttribute (element, "path");
 
-	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 0, 15);
-	_column = Xefis::limit<int> (element.attribute ("column").toInt(), 0, 7);
+	_row = xf::limit<int> (element.attribute ("row").toInt(), 0, 15);
+	_column = xf::limit<int> (element.attribute ("column").toInt(), 0, 7);
 	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 }
 
@@ -144,7 +144,7 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 	_rounding = element.hasAttribute ("rounding") && element.attribute ("rounding") == "true";
 
 	if (!element.hasAttribute ("path"))
-		throw Xefis::MissingDomAttribute (element, "path");
+		throw xf::MissingDomAttribute (element, "path");
 	_property.set_path (xf::PropertyPath (element.attribute ("path")));
 
 	for (QDomElement& e: element)
@@ -152,8 +152,8 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 		if (e == "digit")
 		{
 			if (!e.hasAttribute ("row"))
-				throw Xefis::MissingDomAttribute (e, "row");
-			int row = Xefis::limit (e.attribute ("row").toInt(), 0, 15);
+				throw xf::MissingDomAttribute (e, "row");
+			int row = xf::limit (e.attribute ("row").toInt(), 0, 15);
 			_digit_rows.push_back (row);
 		}
 	}
@@ -169,7 +169,7 @@ HT16K33::NumericDisplay::update_led_matrix (LedMatrix& led_matrix) const
 	std::vector<uint8_t> digits;
 	digits.reserve (16);
 
-	Xefis::PropertyInteger::Type integer = get_integer_value();
+	xf::PropertyInteger::Type integer = get_integer_value();
 
 	digits.clear();
 	for (auto c: QString ("%1").arg (integer))
@@ -223,12 +223,12 @@ HT16K33::NumericDisplay::update_led_matrix (LedMatrix& led_matrix) const
 }
 
 
-Xefis::PropertyInteger::Type
+xf::PropertyInteger::Type
 HT16K33::NumericDisplay::get_integer_value() const
 {
 	try {
-		Xefis::PropertyFloat::Type value = _property.floatize (_unit);
-		Xefis::PropertyInteger::Type int_value = value;
+		xf::PropertyFloat::Type value = _property.floatize (_unit);
+		xf::PropertyInteger::Type int_value = value;
 
 		if (_rounding)
 			int_value = value + 0.5;
@@ -245,11 +245,11 @@ HT16K33::NumericDisplay::get_integer_value() const
 HT16K33::SingleSwitch::SingleSwitch (QDomElement const& element)
 {
 	if (!element.hasAttribute ("path"))
-		throw Xefis::MissingDomAttribute (element, "path");
+		throw xf::MissingDomAttribute (element, "path");
 	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 
-	_row = Xefis::limit<int> (element.attribute ("row").toInt(), 3, 15);
-	_column = Xefis::limit<int> (element.attribute ("column").toInt(), 1, 3);
+	_row = xf::limit<int> (element.attribute ("row").toInt(), 3, 15);
+	_column = xf::limit<int> (element.attribute ("column").toInt(), 1, 3);
 }
 
 
@@ -270,11 +270,11 @@ HT16K33::SingleSwitch::invalidate()
 }
 
 
-HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& config):
+HT16K33::HT16K33 (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	Xefis::I2C::Bus::ID i2c_bus;
-	Xefis::I2C::Address::ID i2c_address;
+	xf::I2C::Bus::ID i2c_bus;
+	xf::I2C::Address::ID i2c_address;
 
 	parse_settings (config, {
 		{ "i2c.bus", i2c_bus, true },
@@ -295,21 +295,21 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 			_reliable_mode = e.attribute ("reliable-mode") == "true";
 
 			if (!e.hasAttribute ("scan-frequency"))
-				throw Xefis::MissingDomAttribute (e, "scan-frequency");
+				throw xf::MissingDomAttribute (e, "scan-frequency");
 			_scan_frequency.parse (e.attribute ("scan-frequency").toStdString());
 
 			if (_scan_frequency > 25_Hz && !_reliable_mode)
-				throw Xefis::BadDomAttribute (e, "scan-frequency", "if greater than 25 Hz, 'reliable-mode' must be 'true'");
+				throw xf::BadDomAttribute (e, "scan-frequency", "if greater than 25 Hz, 'reliable-mode' must be 'true'");
 
 			// According to docs, each scan takes 20 ms, so limit sampling rate to 50 Hz:
-			_scan_frequency = Xefis::limit (_scan_frequency, 0_Hz, 50_Hz);
+			_scan_frequency = xf::limit (_scan_frequency, 0_Hz, 50_Hz);
 
 			for (QDomElement& e2: e)
 			{
 				if (e2 == "single-switch")
 					_switches.push_back (std::make_shared<SingleSwitch> (e2));
 				else
-					throw Xefis::BadDomElement (e2);
+					throw xf::BadDomElement (e2);
 			}
 		}
 		else if (e == "output")
@@ -321,13 +321,13 @@ HT16K33::HT16K33 (Xefis::ModuleManager* module_manager, QDomElement const& confi
 				else if (e2 == "single-led")
 					_displays.push_back (std::make_shared<SingleLed> (e2));
 				else
-					throw Xefis::BadDomElement (e2);
+					throw xf::BadDomElement (e2);
 			}
 		}
 	}
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::I2C::Address (i2c_address));
 
 	_reinitialize_timer = new QTimer (this);
 	_reinitialize_timer->setInterval (250);
@@ -397,7 +397,7 @@ HT16K33::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::IOError& e)
+	catch (xf::IOError& e)
 	{
 		log() << "I/O error: " << e.message() << std::endl;
 		reinitialize();
@@ -434,7 +434,7 @@ HT16K33::data_updated()
 				display |= DisplayBlinkSlow;
 		}
 
-		brightness = Xefis::limit<int> (_brightness.read (15), 0, 15) & 0xf;
+		brightness = xf::limit<int> (_brightness.read (15), 0, 15) & 0xf;
 
 		_i2c_device.write (DisplayRegister | display);
 		_i2c_device.write (BrightnessRegister | brightness);

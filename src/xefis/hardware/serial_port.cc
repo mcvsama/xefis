@@ -208,7 +208,7 @@ SerialPort::read()
 	std::string buffer;
 
 	bool err = false;
-	bool exc = Xefis::Exception::guard ([&] {
+	bool exc = xf::Exception::guard ([&] {
 		// Read as much as possible:
 		for (;;)
 		{

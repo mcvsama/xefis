@@ -35,9 +35,9 @@
 
 int main (int argc, char** argv, char**)
 {
-	signal (SIGILL, Xefis::fail);
-	signal (SIGFPE, Xefis::fail);
-	signal (SIGSEGV, Xefis::fail);
+	signal (SIGILL, xf::fail);
+	signal (SIGFPE, xf::fail);
+	signal (SIGSEGV, xf::fail);
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");
@@ -46,30 +46,30 @@ int main (int argc, char** argv, char**)
 		if (argc == 2 && (strcmp (argv[1], "-v") == 0 || strcmp (argv[1], "--version") == 0))
 		{
 			std::cout << "Xefis" << std::endl;
-			std::cout << "Commit: " << Xefis::Version::commit << std::endl;
-			std::cout << "Branch: " << Xefis::Version::branch << std::endl;
+			std::cout << "Commit: " << xf::Version::commit << std::endl;
+			std::cout << "Branch: " << xf::Version::branch << std::endl;
 			std::clog << "Features: ";
-			std::vector<const char*> features = Xefis::Services::features();
+			std::vector<const char*> features = xf::Services::features();
 			std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
 			std::clog << std::endl;
 		}
 		else
 		{
-			auto app = std::make_unique<Xefis::Application> (argc, argv);
+			auto app = std::make_unique<xf::Application> (argc, argv);
 			app->exec();
 		}
 	}
-	catch (Xefis::Application::QuitInstruction)
+	catch (xf::Application::QuitInstruction)
 	{
 		return EXIT_SUCCESS;
 	}
-	catch (Xefis::Exception& e)
+	catch (xf::Exception& e)
 	{
 		std::cerr << e << std::endl;
 	}
 	catch (...)
 	{
-		Xefis::Backtrace::clog();
+		xf::Backtrace::clog();
 		throw;
 	}
 

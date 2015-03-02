@@ -23,6 +23,9 @@
 // Boost:
 #include <boost/endian/conversion.hpp>
 
+// Xefis:
+#include <xefis/config/exception.h>
+
 
 namespace SI {
 

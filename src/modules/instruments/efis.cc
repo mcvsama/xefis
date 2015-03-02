@@ -32,7 +32,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/efis", EFIS);
 
 
-EFIS::EFIS (Xefis::ModuleManager* module_manager, QDomElement const& config):
+EFIS::EFIS (xf::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
 	parse_settings (config, {
@@ -337,7 +337,7 @@ EFIS::read()
 	// Raising runway
 	params.runway_visible = _navaid_reference_visible.read (false) && _altitude_agl.valid() &&
 							_flight_path_deviation_lateral_app.valid() && *_altitude_agl <= _raising_runway_visibility;
-	params.runway_position = Xefis::limit<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
+	params.runway_position = xf::limit<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
 	// Control hint
 	params.control_hint_visible = _flight_mode_hint_visible.read (false);
 	params.control_hint = QString::fromStdString (_flight_mode_hint.read (""));
@@ -382,8 +382,8 @@ EFIS::read()
 void
 EFIS::compute_fpv()
 {
-	Xefis::PropertyAngle* heading = nullptr;
-	Xefis::PropertyAngle* track_lateral = nullptr;
+	xf::PropertyAngle* heading = nullptr;
+	xf::PropertyAngle* track_lateral = nullptr;
 	if (_orientation_heading_magnetic.valid() && _track_lateral_magnetic.valid())
 	{
 		heading = &_orientation_heading_magnetic;
@@ -397,8 +397,8 @@ EFIS::compute_fpv()
 
 	if (_orientation_pitch.valid() && _orientation_roll.valid() && _track_vertical.valid() && heading && track_lateral)
 	{
-		Angle vdiff = Xefis::floored_mod (*_orientation_pitch - *_track_vertical, -180_deg, +180_deg);
-		Angle hdiff = Xefis::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
+		Angle vdiff = xf::floored_mod (*_orientation_pitch - *_track_vertical, -180_deg, +180_deg);
+		Angle hdiff = xf::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
 		Angle roll = *_orientation_roll;
 
 		_computed_fpv_alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);

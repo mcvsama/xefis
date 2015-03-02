@@ -25,7 +25,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/eta", ETA);
 
 
-ETA::ETA (Xefis::ModuleManager* module_manager, QDomElement const& config):
+ETA::ETA (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {
@@ -85,9 +85,9 @@ ETA::compute()
 		LonLat aircraft (*_input_aircraft_longitude, *_input_aircraft_latitude);
 		distance = station.haversine_earth (aircraft);
 
-		Angle station_bearing = Xefis::floored_mod (aircraft.initial_bearing (station), 0_deg, 360_deg);
+		Angle station_bearing = xf::floored_mod (aircraft.initial_bearing (station), 0_deg, 360_deg);
 		Angle angle_diff = station_bearing - *_input_track_lateral_true;
-		angle_diff = Xefis::floored_mod (angle_diff, -180_deg, +180_deg);
+		angle_diff = xf::floored_mod (angle_diff, -180_deg, +180_deg);
 
 		if (std::abs (angle_diff) > 30_deg)
 			throw SetNil (true);

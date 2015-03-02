@@ -28,7 +28,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/slip-skid", SlipSkid);
 
 
-SlipSkid::SlipSkid (Xefis::ModuleManager* module_manager, QDomElement const& config):
+SlipSkid::SlipSkid (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {

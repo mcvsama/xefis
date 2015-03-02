@@ -28,7 +28,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-ap", AFCS_AP);
 
 
-AFCS_AP::AFCS_AP (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_AP::AFCS_AP (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_elevator_pid (0.0, 0.0, 0.0, 0.0),
 	_ailerons_pid (0.0, 0.0, 0.0, 0.0)
@@ -119,7 +119,7 @@ AFCS_AP::compute_ap()
 	double computed_elevator = 0.0;
 	double computed_ailerons = 0.0;
 
-	using Xefis::Range;
+	using xf::Range;
 
 	if (_measured_pitch.is_nil() || _measured_roll.is_nil())
 	{

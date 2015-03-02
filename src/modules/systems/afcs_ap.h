@@ -32,11 +32,11 @@
  * Steers control surfaces (ailerons, elevator) to obtain desired orientation
  * (pitch, roll).
  */
-class AFCS_AP: public Xefis::Module
+class AFCS_AP: public xf::Module
 {
   public:
 	// Ctor
-	AFCS_AP (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_AP (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -59,42 +59,42 @@ class AFCS_AP: public Xefis::Module
 
   private:
 	// Stabilizer PIDs:
-	Xefis::PIDControl<double>	_elevator_pid;
-	Xefis::PIDControl<double>	_ailerons_pid;
-	Xefis::Smoother<double>		_elevator_smoother		= 50_ms;
-	Xefis::Smoother<double>		_ailerons_smoother		= 50_ms;
+	xf::PIDControl<double>	_elevator_pid;
+	xf::PIDControl<double>	_ailerons_pid;
+	xf::Smoother<double>	_elevator_smoother		= 50_ms;
+	xf::Smoother<double>	_ailerons_smoother		= 50_ms;
 	// Settings:
-	double						_stabilization_gain;
-	double						_pitch_gain;
-	double						_pitch_p;
-	double						_pitch_i;
-	double						_pitch_d;
-	double						_pitch_error_power;
-	double						_roll_gain;
-	double						_roll_p;
-	double						_roll_i;
-	double						_roll_d;
-	double						_roll_error_power;
-	double						_yaw_gain;
-	double						_yaw_p;
-	double						_yaw_i;
-	double						_yaw_d;
-	double						_yaw_error_power;
+	double					_stabilization_gain;
+	double					_pitch_gain;
+	double					_pitch_p;
+	double					_pitch_i;
+	double					_pitch_d;
+	double					_pitch_error_power;
+	double					_roll_gain;
+	double					_roll_p;
+	double					_roll_i;
+	double					_roll_d;
+	double					_roll_error_power;
+	double					_yaw_gain;
+	double					_yaw_p;
+	double					_yaw_i;
+	double					_yaw_d;
+	double					_yaw_error_power;
 	// Input:
-	Xefis::PropertyAngle		_input_pitch;
-	Xefis::PropertyAngle		_input_roll;
-	Xefis::PropertyAngle		_measured_pitch;
-	Xefis::PropertyAngle		_measured_roll;
-	Xefis::PropertyFloat		_elevator_minimum;
-	Xefis::PropertyFloat		_elevator_maximum;
-	Xefis::PropertyFloat		_ailerons_minimum;
-	Xefis::PropertyFloat		_ailerons_maximum;
+	xf::PropertyAngle		_input_pitch;
+	xf::PropertyAngle		_input_roll;
+	xf::PropertyAngle		_measured_pitch;
+	xf::PropertyAngle		_measured_roll;
+	xf::PropertyFloat		_elevator_minimum;
+	xf::PropertyFloat		_elevator_maximum;
+	xf::PropertyFloat		_ailerons_minimum;
+	xf::PropertyFloat		_ailerons_maximum;
 	// Output:
-	Xefis::PropertyBoolean		_serviceable;
-	Xefis::PropertyFloat		_output_elevator;
-	Xefis::PropertyFloat		_output_ailerons;
+	xf::PropertyBoolean		_serviceable;
+	xf::PropertyFloat		_output_elevator;
+	xf::PropertyFloat		_output_ailerons;
 	// Other:
-	Xefis::PropertyObserver		_ap_computer;
+	xf::PropertyObserver	_ap_computer;
 };
 
 #endif

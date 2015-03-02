@@ -29,12 +29,12 @@
 
 
 class VerticalTrim:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	VerticalTrim (Xefis::ModuleManager*, QDomElement const& config);
+	VerticalTrim (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -52,12 +52,12 @@ class VerticalTrim:
 
   private:
 	// Settings:
-	QString					_label = "STAB";
+	QString				_label = "STAB";
 	// Properties:
-	Xefis::PropertyFloat	_input_trim_value;
-	Xefis::PropertyFloat	_input_trim_reference;
-	Xefis::PropertyFloat	_input_trim_reference_minimum;
-	Xefis::PropertyFloat	_input_trim_reference_maximum;
+	xf::PropertyFloat	_input_trim_value;
+	xf::PropertyFloat	_input_trim_reference;
+	xf::PropertyFloat	_input_trim_reference_minimum;
+	xf::PropertyFloat	_input_trim_reference_maximum;
 };
 
 #endif

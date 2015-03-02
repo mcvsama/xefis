@@ -33,7 +33,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/adc", AirDataComputer);
 
 
-AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	_altitude_amsl_estimator.set_minimum_integration_time (0.2_s);
@@ -154,7 +154,7 @@ AirDataComputer::AirDataComputer (Xefis::ModuleManager* module_manager, QDomElem
 void
 AirDataComputer::data_updated()
 {
-	Xefis::PropertyObserver* computers[] = {
+	xf::PropertyObserver* computers[] = {
 		// Order is important:
 		&_altitude_computer,
 		&_ias_computer,
@@ -167,7 +167,7 @@ AirDataComputer::data_updated()
 		&_vertical_speed_computer,
 	};
 
-	for (Xefis::PropertyObserver* o: computers)
+	for (xf::PropertyObserver* o: computers)
 		o->data_updated (update_time());
 }
 
@@ -254,7 +254,7 @@ AirDataComputer::compute_density_altitude()
 {
 	if (_static_air_temperature.valid() && _altitude_amsl.valid())
 	{
-		Xefis::DensityAltitude da;
+		xf::DensityAltitude da;
 		da.set_pressure_altitude (*_altitude_amsl);
 		da.set_static_air_temperature (*_static_air_temperature);
 		da.update();
@@ -351,7 +351,7 @@ AirDataComputer::compute_sound_speed()
 	if (_static_air_temperature.valid())
 	{
 		Temperature sat = *_static_air_temperature;
-		Xefis::SoundSpeed ss;
+		xf::SoundSpeed ss;
 		ss.set_static_air_temperature (sat);
 		ss.update();
 		_speed_sound.write (ss.sound_speed());
@@ -412,7 +412,7 @@ AirDataComputer::compute_mach()
 		{
 			// If Mach turned out to be > 1, try to converge M from the second formula.
 			// Limit iterations to 100.
-			Optional<double> mach = Xefis::converge<double> (M, 1e-9, 100, [&](double M_it) {
+			Optional<double> mach = xf::converge<double> (M, 1e-9, 100, [&](double M_it) {
 				return 0.88128485 * std::sqrt ((qc / p + 1.0) * std::pow (1.0 - 1 / (7.0 * M_it * M_it), 2.5));
 			});
 

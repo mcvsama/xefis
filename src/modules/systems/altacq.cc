@@ -29,7 +29,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/altacq", AltAcq);
 
 
-AltAcq::AltAcq (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AltAcq::AltAcq (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

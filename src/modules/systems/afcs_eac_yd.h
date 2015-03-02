@@ -28,11 +28,11 @@
 /**
  * Controls rudder to obtain zero slip-skid value.
  */
-class AFCS_EAC_YD: public Xefis::Module
+class AFCS_EAC_YD: public xf::Module
 {
   public:
 	// Ctor
-	AFCS_EAC_YD (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_EAC_YD (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -46,20 +46,20 @@ class AFCS_EAC_YD: public Xefis::Module
 	compute();
 
   private:
-	Xefis::PIDControl<double>	_rudder_pid;
+	xf::PIDControl<double>	_rudder_pid;
 	// Settings:
-	double						_rudder_p;
-	double						_rudder_i;
-	double						_rudder_d;
-	double						_rudder_gain;
-	double						_limit;
+	double					_rudder_p;
+	double					_rudder_i;
+	double					_rudder_d;
+	double					_rudder_gain;
+	double					_limit;
 	// Input:
-	Xefis::PropertyBoolean		_input_enabled;
-	Xefis::PropertyFloat		_input_slip_skid_g;
+	xf::PropertyBoolean		_input_enabled;
+	xf::PropertyFloat		_input_slip_skid_g;
 	// Output:
-	Xefis::PropertyFloat		_output_rudder;
+	xf::PropertyFloat		_output_rudder;
 	// Other:
-	Xefis::PropertyObserver		_rudder_computer;
+	xf::PropertyObserver	_rudder_computer;
 };
 
 #endif

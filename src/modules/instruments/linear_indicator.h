@@ -30,32 +30,32 @@
 #include "linear_indicator_widget.h"
 
 
-class LinearIndicator: public Xefis::Instrument
+class LinearIndicator: public xf::Instrument
 {
   public:
 	// Ctor
-	LinearIndicator (Xefis::ModuleManager*, QDomElement const& config);
+	LinearIndicator (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
 
   private:
-	LinearIndicatorWidget*					_widget = nullptr;
+	LinearIndicatorWidget*				_widget = nullptr;
 	// Settings:
-	bool									_initialize					= true;
-	bool									_style_mirrored				= false;
-	int										_value_precision			= 0;
-	unsigned int							_value_modulo				= 0;
-	unsigned int							_value_digits				= 3;
-	std::string								_unit;
-	Xefis::PropertyFloat::Type				_value_minimum;
-	Optional<Xefis::PropertyFloat::Type>	_value_minimum_critical;
-	Optional<Xefis::PropertyFloat::Type>	_value_minimum_warning;
-	Optional<Xefis::PropertyFloat::Type>	_value_maximum_warning;
-	Optional<Xefis::PropertyFloat::Type>	_value_maximum_critical;
-	Xefis::PropertyFloat::Type				_value_maximum;
+	bool								_initialize					= true;
+	bool								_style_mirrored				= false;
+	int									_value_precision			= 0;
+	unsigned int						_value_modulo				= 0;
+	unsigned int						_value_digits				= 3;
+	std::string							_unit;
+	xf::PropertyFloat::Type				_value_minimum;
+	Optional<xf::PropertyFloat::Type>	_value_minimum_critical;
+	Optional<xf::PropertyFloat::Type>	_value_minimum_warning;
+	Optional<xf::PropertyFloat::Type>	_value_maximum_warning;
+	Optional<xf::PropertyFloat::Type>	_value_maximum_critical;
+	xf::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	Xefis::TypedProperty					_value;
+	xf::TypedProperty					_value;
 };
 
 #endif

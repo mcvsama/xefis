@@ -29,12 +29,12 @@
 
 
 class Gear:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Gear (Xefis::ModuleManager*, QDomElement const& config);
+	Gear (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -48,13 +48,13 @@ class Gear:
 
   private:
 	// Properties:
-	Xefis::PropertyBoolean	_setting_down;
-	Xefis::PropertyBoolean	_nose_up;
-	Xefis::PropertyBoolean	_nose_down;
-	Xefis::PropertyBoolean	_left_up;
-	Xefis::PropertyBoolean	_left_down;
-	Xefis::PropertyBoolean	_right_up;
-	Xefis::PropertyBoolean	_right_down;
+	xf::PropertyBoolean	_setting_down;
+	xf::PropertyBoolean	_nose_up;
+	xf::PropertyBoolean	_nose_down;
+	xf::PropertyBoolean	_left_up;
+	xf::PropertyBoolean	_left_down;
+	xf::PropertyBoolean	_right_up;
+	xf::PropertyBoolean	_right_down;
 };
 
 #endif

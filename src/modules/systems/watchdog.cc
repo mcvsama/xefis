@@ -30,7 +30,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/watchdog", Watchdog);
 
 
-Watchdog::Watchdog (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Watchdog::Watchdog (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_enabled (false)
 {

@@ -46,7 +46,7 @@ Instrument::Instrument (ModuleManager* module_manager, QDomElement const& config
 	Module (module_manager, config),
 	QWidget (nullptr)
 {
-	setFont (Xefis::Services::instrument_font());
+	setFont (xf::Services::instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
 }
 

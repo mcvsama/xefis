@@ -100,7 +100,7 @@ Hash::Hash()
 	_algorithm = MHASH_SHA1;
 	_mhash_thread = mhash_init (_algorithm);
 	if (_mhash_thread == MHASH_FAILED)
-		throw Xefis::Exception ("failed to setup Hash object");
+		throw xf::Exception ("failed to setup Hash object");
 }
 
 
@@ -142,7 +142,7 @@ inline void
 Hash::update (const void* data, std::size_t size)
 {
 	if (finalized())
-		throw Xefis::Exception ("Hash object already finalized");
+		throw xf::Exception ("Hash object already finalized");
 	::mhash (_mhash_thread, data, size);
 }
 
@@ -151,7 +151,7 @@ inline void
 Hash::finalize()
 {
 	if (finalized())
-		throw Xefis::Exception ("Hash object already finalized");
+		throw xf::Exception ("Hash object already finalized");
 	_result = mhash_end (_mhash_thread);
 }
 

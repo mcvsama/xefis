@@ -30,11 +30,11 @@
 /**
  * Compute centrifugal force from IAS and gyro information.
  */
-class IMUCFF: public Xefis::Module
+class IMUCFF: public xf::Module
 {
   public:
 	// Ctor
-	IMUCFF (Xefis::ModuleManager*, QDomElement const& config);
+	IMUCFF (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -44,21 +44,21 @@ class IMUCFF: public Xefis::Module
 	compute_centrifugal();
 
   private:
-	Xefis::Smoother<double>		_smooth_cf_y;
-	Xefis::Smoother<double>		_smooth_cf_z;
+	xf::Smoother<double>		_smooth_cf_y;
+	xf::Smoother<double>		_smooth_cf_z;
 	// Input:
-	Xefis::PropertyFrequency	_rotation_x;
-	Xefis::PropertyFrequency	_rotation_y;
-	Xefis::PropertyFrequency	_rotation_z;
-	Xefis::PropertySpeed		_ias_x;
-	Xefis::PropertySpeed		_ias_y;
-	Xefis::PropertySpeed		_ias_z;
+	xf::PropertyFrequency		_rotation_x;
+	xf::PropertyFrequency		_rotation_y;
+	xf::PropertyFrequency		_rotation_z;
+	xf::PropertySpeed			_ias_x;
+	xf::PropertySpeed			_ias_y;
+	xf::PropertySpeed			_ias_z;
 	// Output:
-	Xefis::PropertyAcceleration	_centrifugal_x;
-	Xefis::PropertyAcceleration	_centrifugal_y;
-	Xefis::PropertyAcceleration	_centrifugal_z;
+	xf::PropertyAcceleration	_centrifugal_x;
+	xf::PropertyAcceleration	_centrifugal_y;
+	xf::PropertyAcceleration	_centrifugal_z;
 	// Other:
-	Xefis::PropertyObserver		_centrifugal_computer;
+	xf::PropertyObserver		_centrifugal_computer;
 };
 
 #endif

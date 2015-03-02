@@ -29,7 +29,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-at", AFCS_AT);
 
 
-AFCS_AT::AFCS_AT (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_AT::AFCS_AT (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0)
 {
@@ -113,8 +113,8 @@ AFCS_AT::compute_thrust()
 				// There's no 1:1 correlaction between them.
 				_ias_pid.set_target (_cmd_ias->kt());
 				_ias_pid.process (_measured_ias->kt(), dt);
-				computed_thrust = 1_rpm * Xefis::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
-				computed_thrust = Xefis::renormalize (computed_thrust.rpm(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
+				computed_thrust = 1_rpm * xf::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
+				computed_thrust = xf::renormalize (computed_thrust.rpm(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
 			}
 			break;
 
@@ -134,7 +134,7 @@ AFCS_AT::compute_thrust()
 void
 AFCS_AT::speed_mode_changed()
 {
-	Xefis::PropertyInteger::Type m = Xefis::limit<decltype (m)> (_cmd_speed_mode.read (-1), 0, static_cast<decltype (m)> (SpeedMode::sentinel) - 1);
+	xf::PropertyInteger::Type m = xf::limit<decltype (m)> (_cmd_speed_mode.read (-1), 0, static_cast<decltype (m)> (SpeedMode::sentinel) - 1);
 	_speed_mode = static_cast<SpeedMode> (m);
 }
 

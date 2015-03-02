@@ -29,8 +29,8 @@
 
 
 class Datatable:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
 	class LabelValue
 	{
@@ -51,18 +51,18 @@ class Datatable:
 		stringify() const;
 
 	  public:
-		QString					label;
-		QColor					label_color;
-		Xefis::TypedProperty	value;
-		QColor					value_color;
-		QString					nil_value;
-		std::string				unit;
-		std::string				format;
+		QString				label;
+		QColor				label_color;
+		xf::TypedProperty	value;
+		QColor				value_color;
+		QString				nil_value;
+		std::string			unit;
+		std::string			format;
 	};
 
   public:
 	// Ctor
-	Datatable (Xefis::ModuleManager*, QDomElement const& config);
+	Datatable (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;

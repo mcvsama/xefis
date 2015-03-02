@@ -23,11 +23,11 @@
 #include <xefis/core/property.h>
 
 
-class Mixer: public Xefis::Module
+class Mixer: public xf::Module
 {
   public:
 	// Ctor
-	Mixer (Xefis::ModuleManager*, QDomElement const& config);
+	Mixer (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -36,15 +36,15 @@ class Mixer: public Xefis::Module
 
   private:
 	// Settings:
-	double					_input_0_factor	= 1.0;
-	double					_input_1_factor	= 1.0;
-	Optional<double>		_output_minimum;
-	Optional<double>		_output_maximum;
+	double				_input_0_factor	= 1.0;
+	double				_input_1_factor	= 1.0;
+	Optional<double>	_output_minimum;
+	Optional<double>	_output_maximum;
 	// Input:
-	Xefis::PropertyFloat	_input_0_value;
-	Xefis::PropertyFloat	_input_1_value;
+	xf::PropertyFloat	_input_0_value;
+	xf::PropertyFloat	_input_1_value;
 	// Output:
-	Xefis::PropertyFloat	_output_value;
+	xf::PropertyFloat	_output_value;
 };
 
 #endif

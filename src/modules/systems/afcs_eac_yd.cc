@@ -24,7 +24,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-eac-yd", AFCS_EAC_YD);
 
 
-AFCS_EAC_YD::AFCS_EAC_YD (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_EAC_YD::AFCS_EAC_YD (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_rudder_pid (1.0, 0.1, 0.0, 0.0)
 {

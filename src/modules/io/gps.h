@@ -33,7 +33,7 @@
  */
 class GPS:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -41,7 +41,7 @@ class GPS:
 
   public:
 	// Ctor
-	GPS (Xefis::ModuleManager* module_manager, QDomElement const& config);
+	GPS (xf::ModuleManager* module_manager, QDomElement const& config);
 
 	// Dtor
 	~GPS();
@@ -229,24 +229,24 @@ class GPS:
 	Length						_receiver_accuracy;
 	int							_failure_count				= 0;
 
-	Xefis::PropertyBoolean		_serviceable;
-	Xefis::PropertyInteger		_read_errors;
-	Xefis::PropertyInteger		_fix_quality;
-	Xefis::PropertyInteger		_type_of_fix;
-	Xefis::PropertyAngle		_latitude;
-	Xefis::PropertyAngle		_longitude;
-	Xefis::PropertyLength		_altitude_amsl;
-	Xefis::PropertyLength		_altitude_above_wgs84;
-	Xefis::PropertySpeed		_groundspeed;
-	Xefis::PropertyAngle		_track;
-	Xefis::PropertyInteger		_tracked_satellites;
-	Xefis::PropertyFloat		_hdop;
-	Xefis::PropertyFloat		_vdop;
-	Xefis::PropertyLength		_lateral_accuracy;
-	Xefis::PropertyLength		_vertical_accuracy;
-	Xefis::PropertyString		_dgps_station_id;
-	Xefis::PropertyTime			_update_timestamp;
-	Xefis::PropertyTime			_epoch_time;
+	xf::PropertyBoolean			_serviceable;
+	xf::PropertyInteger			_read_errors;
+	xf::PropertyInteger			_fix_quality;
+	xf::PropertyInteger			_type_of_fix;
+	xf::PropertyAngle			_latitude;
+	xf::PropertyAngle			_longitude;
+	xf::PropertyLength			_altitude_amsl;
+	xf::PropertyLength			_altitude_above_wgs84;
+	xf::PropertySpeed			_groundspeed;
+	xf::PropertyAngle			_track;
+	xf::PropertyInteger			_tracked_satellites;
+	xf::PropertyFloat			_hdop;
+	xf::PropertyFloat			_vdop;
+	xf::PropertyLength			_lateral_accuracy;
+	xf::PropertyLength			_vertical_accuracy;
+	xf::PropertyString			_dgps_station_id;
+	xf::PropertyTime			_update_timestamp;
+	xf::PropertyTime			_epoch_time;
 };
 
 

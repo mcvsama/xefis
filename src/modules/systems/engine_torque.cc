@@ -24,7 +24,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/engine-torque", EngineTorque);
 
 
-EngineTorque::EngineTorque (Xefis::ModuleManager* module_manager, QDomElement const& config):
+EngineTorque::EngineTorque (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

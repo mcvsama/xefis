@@ -30,13 +30,13 @@
 XEFIS_REGISTER_MODULE_CLASS ("private/state", State);
 
 
-constexpr Length					State::MinimumsBaroStep;
-constexpr Length					State::MinimumsRadioStep;
-constexpr Xefis::Range<Length>		State::MinimumsBaroRange;
-constexpr Xefis::Range<Length>		State::MinimumsRadioRange;
-constexpr Pressure					State::QNHhPaStep;
-constexpr Pressure					State::QNHinHgStep;
-constexpr Xefis::Range<Pressure>	State::QNHRange;
+constexpr Length				State::MinimumsBaroStep;
+constexpr Length				State::MinimumsRadioStep;
+constexpr xf::Range<Length>		State::MinimumsBaroRange;
+constexpr xf::Range<Length>		State::MinimumsRadioRange;
+constexpr Pressure				State::QNHhPaStep;
+constexpr Pressure				State::QNHinHgStep;
+constexpr xf::Range<Pressure>	State::QNHRange;
 
 
 template<class P>
@@ -54,7 +54,7 @@ template<class P>
 	}
 
 
-State::State (Xefis::ModuleManager* module_manager, QDomElement const& config):
+State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	// TODO not hardcoded
@@ -196,7 +196,7 @@ State::data_updated()
 {
 	for (ObservableBase* o: _observables)
 		o->process();
-	for (Xefis::DeltaDecoder* r: _rotary_decoders)
+	for (xf::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
 	std::vector<xf::Action*> actions = {
@@ -216,7 +216,7 @@ State::data_updated()
 void
 State::prepare_efis_settings()
 {
-	_mcp_mins_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_mins_value, [this](int delta) {
+	_mcp_mins_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_mins_value, [this](int delta) {
 		switch (_minimums_type)
 		{
 			case MinimumsType::Baro:
@@ -235,7 +235,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fd, _setting_efis_fd_visible);
 	make_toggle (_mcp_htrk, _setting_hsi_home_track_visible);
 
-	_mcp_qnh_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_qnh_value, [this](int delta) {
+	_mcp_qnh_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_qnh_value, [this](int delta) {
 		if (*_setting_pressure_display_hpa)
 			_qnh_setting += QNHhPaStep * delta;
 		else
@@ -249,7 +249,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_metric, _setting_efis_show_metric);
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
-	_mcp_range_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_range_value, [this](int delta) {
+	_mcp_range_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_range_value, [this](int delta) {
 		Optional<Length> new_half_range;
 		delta = -delta;
 
@@ -294,9 +294,9 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_hdg_trk, _setting_hsi_center_on_track);
 	make_toggle (_mcp_mag_tru, _setting_hsi_display_true_heading);
 
-	_mcp_course_decoder = std::make_unique<Xefis::DeltaDecoder> (_mcp_course_value, [this](int delta) {
-		_course = Xefis::floored_mod (_course + 1_deg * delta, 360_deg);
-		int course = Xefis::symmetric_round (_course.deg());
+	_mcp_course_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_course_value, [this](int delta) {
+		_course = xf::floored_mod (_course + 1_deg * delta, 360_deg);
+		int course = xf::symmetric_round (_course.deg());
 		if (course == 0)
 			course = 360;
 		_mcp_course_display.write (course);
@@ -313,8 +313,8 @@ State::prepare_efis_settings()
 void
 State::solve_minimums()
 {
-	_minimums_setting_baro = Xefis::limit (_minimums_setting_baro, MinimumsBaroRange);
-	_minimums_setting_radio = Xefis::limit (_minimums_setting_radio, MinimumsRadioRange);
+	_minimums_setting_baro = xf::limit (_minimums_setting_baro, MinimumsBaroRange);
+	_minimums_setting_radio = xf::limit (_minimums_setting_radio, MinimumsRadioRange);
 
 	switch (_minimums_type)
 	{
@@ -336,7 +336,7 @@ State::solve_minimums()
 void
 State::solve_pressure()
 {
-	_qnh_setting = Xefis::limit (_qnh_setting, QNHRange);
+	_qnh_setting = xf::limit (_qnh_setting, QNHRange);
 	_setting_pressure_qnh.write (_qnh_setting);
 }
 
@@ -350,9 +350,9 @@ State::solve_course()
 
 
 void
-State::make_switch (Observable<Xefis::PropertyBoolean>& bool_observable, std::function<void()> callback)
+State::make_switch (Observable<xf::PropertyBoolean>& bool_observable, std::function<void()> callback)
 {
-	bool_observable.set_callback ([callback,this](Xefis::PropertyBoolean& prop) {
+	bool_observable.set_callback ([callback,this](xf::PropertyBoolean& prop) {
 		if (*prop)
 			callback();
 	});
@@ -360,9 +360,9 @@ State::make_switch (Observable<Xefis::PropertyBoolean>& bool_observable, std::fu
 
 
 void
-State::make_toggle (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::PropertyBoolean& target_switch)
+State::make_toggle (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyBoolean& target_switch)
 {
-	bool_observable.set_callback ([&](Xefis::PropertyBoolean& prop) {
+	bool_observable.set_callback ([&](xf::PropertyBoolean& prop) {
 		if (*prop)
 			target_switch.write (!*target_switch);
 	});
@@ -370,9 +370,9 @@ State::make_toggle (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::
 
 
 void
-State::make_int_writer (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::PropertyInteger& target_property, int value)
+State::make_int_writer (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyInteger& target_property, int value)
 {
-	bool_observable.set_callback ([&target_property,value,this](Xefis::PropertyBoolean& prop) {
+	bool_observable.set_callback ([&target_property,value,this](xf::PropertyBoolean& prop) {
 		if (*prop)
 			target_property.write (value);
 	});

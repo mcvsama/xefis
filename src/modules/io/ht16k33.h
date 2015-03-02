@@ -33,7 +33,7 @@
  */
 class HT16K33:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -184,7 +184,7 @@ class HT16K33:
 	  private:
 		Row						_row = 0;
 		Column					_column = 0;
-		Xefis::PropertyBoolean	_property_boolean;
+		xf::PropertyBoolean	_property_boolean;
 	};
 
 	/**
@@ -204,14 +204,14 @@ class HT16K33:
 		update_led_matrix (LedMatrix&) const override;
 
 	  private:
-		Xefis::PropertyInteger::Type
+		xf::PropertyInteger::Type
 		get_integer_value() const;
 
 	  private:
-		bool					_rounding = false;
-		std::string				_unit;
-		DigitRows				_digit_rows;
-		Xefis::GenericProperty	_property;
+		bool				_rounding = false;
+		std::string			_unit;
+		DigitRows			_digit_rows;
+		xf::GenericProperty	_property;
 	};
 
 	/**
@@ -252,14 +252,14 @@ class HT16K33:
 		invalidate() override;
 
 	  private:
-		Row						_row = 0;
-		Column					_column = 0;
-		Xefis::PropertyBoolean	_property_boolean;
+		Row					_row = 0;
+		Column				_column = 0;
+		xf::PropertyBoolean	_property_boolean;
 	};
 
   public:
 	// Ctor:
-	HT16K33 (Xefis::ModuleManager*, QDomElement const& config);
+	HT16K33 (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	void
@@ -286,19 +286,19 @@ class HT16K33:
 	 */
 	static std::array<uint8_t, 11> _digit_symbols;
 
-	Xefis::PropertyBoolean	_enabled;
-	Xefis::PropertyInteger	_brightness;
-	Xefis::PropertyBoolean	_blinking;
-	Xefis::PropertyInteger	_blinking_mode;
-	Xefis::I2C::Device		_i2c_device;
-	LedMatrix				_led_matrix;
-	KeyMatrix				_key_matrix;
-	Displays				_displays;
-	Switches				_switches;
-	QTimer*					_reinitialize_timer	= nullptr;
-	QTimer*					_scan_timer			= nullptr;
-	Frequency				_scan_frequency		= 25_Hz;
-	bool					_reliable_mode		= false;
+	xf::PropertyBoolean	_enabled;
+	xf::PropertyInteger	_brightness;
+	xf::PropertyBoolean	_blinking;
+	xf::PropertyInteger	_blinking_mode;
+	xf::I2C::Device		_i2c_device;
+	LedMatrix			_led_matrix;
+	KeyMatrix			_key_matrix;
+	Displays			_displays;
+	Switches			_switches;
+	QTimer*				_reinitialize_timer	= nullptr;
+	QTimer*				_scan_timer			= nullptr;
+	Frequency			_scan_frequency		= 25_Hz;
+	bool				_reliable_mode		= false;
 };
 
 #endif

@@ -32,7 +32,7 @@ InstrumentAids::InstrumentAids (float height_for_width):
 	_painter (&_text_painter_cache),
 	_height_for_width (height_for_width)
 {
-	_font = Xefis::Services::instrument_font();
+	_font = xf::Services::instrument_font();
 }
 
 

@@ -38,11 +38,11 @@ constexpr uint16_t		ETSAirspeed::RawValueMinimum;
 constexpr uint16_t		ETSAirspeed::RawValueMaximum;
 
 
-ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement const& config):
+ETSAirspeed::ETSAirspeed (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	Xefis::I2C::Bus::ID i2c_bus;
-	Xefis::I2C::Address::ID i2c_address;
+	xf::I2C::Bus::ID i2c_bus;
+	xf::I2C::Address::ID i2c_address;
 
 	parse_settings (config, {
 		{ "i2c.bus", i2c_bus, true },
@@ -59,7 +59,7 @@ ETSAirspeed::ETSAirspeed (Xefis::ModuleManager* module_manager, QDomElement cons
 	});
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (Xefis::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::I2C::Address (i2c_address));
 
 	if (_airspeed_read_interval < 100_ms)
 	{
@@ -165,7 +165,7 @@ ETSAirspeed::offset_collected()
 
 	// Limit offset:
 	uint16_t saved_offset = _offset;
-	Xefis::limit (_offset, RawValueMinimum, RawValueMaximum);
+	xf::limit (_offset, RawValueMinimum, RawValueMaximum);
 	if (saved_offset != _offset)
 		log() << "Offset clipped to: " << _offset << std::endl;
 }
@@ -177,7 +177,7 @@ ETSAirspeed::guard (std::function<void()> guarded_code)
 	try {
 		guarded_code();
 	}
-	catch (Xefis::IOError& e)
+	catch (xf::IOError& e)
 	{
 		log() << "I/O error: " << e.message() << std::endl;
 		reinitialize();

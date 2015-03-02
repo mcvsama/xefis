@@ -30,15 +30,15 @@
 
 class RemoteControlManagementSystem:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	RemoteControlManagementSystem (Xefis::ModuleManager*, QDomElement const& config);
+	RemoteControlManagementSystem (xf::ModuleManager*, QDomElement const& config);
 
-	// Xefis::Module API.
+	// xf::Module API.
 	QWidget*
 	configurator_widget() const override;
 
@@ -69,21 +69,21 @@ class RemoteControlManagementSystem:
 	Unique<QWidget>			_configurator_widget;
 	bool					_home_acquired			= false;
 	// Input:
-	Xefis::PropertyLength	_vlos_caution_distance;
-	Xefis::PropertyLength	_vlos_warning_distance;
-	Xefis::PropertyAngle	_home_longitude;
-	Xefis::PropertyAngle	_home_latitude;
-	Xefis::PropertyLength	_home_altitude_amsl;
-	Xefis::PropertyAngle	_position_longitude;
-	Xefis::PropertyAngle	_position_latitude;
-	Xefis::PropertyLength	_position_altitude_amsl;
+	xf::PropertyLength		_vlos_caution_distance;
+	xf::PropertyLength		_vlos_warning_distance;
+	xf::PropertyAngle		_home_longitude;
+	xf::PropertyAngle		_home_latitude;
+	xf::PropertyLength		_home_altitude_amsl;
+	xf::PropertyAngle		_position_longitude;
+	xf::PropertyAngle		_position_latitude;
+	xf::PropertyLength		_position_altitude_amsl;
 	// Output:
-	Xefis::PropertyLength	_distance_vlos;
-	Xefis::PropertyLength	_distance_ground;
-	Xefis::PropertyLength	_distance_vertical;
-	Xefis::PropertyAngle	_true_home_direction;
+	xf::PropertyLength		_distance_vlos;
+	xf::PropertyLength		_distance_ground;
+	xf::PropertyLength		_distance_vertical;
+	xf::PropertyAngle		_true_home_direction;
 	// Other:
-	Xefis::PropertyObserver	_distance_computer;
+	xf::PropertyObserver	_distance_computer;
 };
 
 #endif

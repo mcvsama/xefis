@@ -51,15 +51,15 @@ JoystickInput::Axis::set_value (float value)
 	if (std::abs (value) < dead_zone)
 		value = 0.f;
 	else
-		value = value - Xefis::sgn (value) * dead_zone;
+		value = value - xf::sgn (value) * dead_zone;
 	// Reverse:
 	value *= reverse;
 	// Scale:
 	value *= scale;
 	// Power:
-	value = Xefis::sgn (value) * std::pow (std::abs (value), power);
+	value = xf::sgn (value) * std::pow (std::abs (value), power);
 	// Renormalize from standard [-1.0, 1.0]:
-	value = Xefis::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (output_minimum, output_maximum));
+	value = xf::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (output_minimum, output_maximum));
 
 	prop = value;
 	if (alt_prop.configured())
@@ -67,7 +67,7 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement const& config):
+JoystickInput::JoystickInput (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	// Support max 256 axes/buttons:
@@ -82,7 +82,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		if (e == "device")
 		{
 			if (found_device)
-				throw Xefis::BadDomElement ("only one <device> supported in configuration for the io/joystick module");
+				throw xf::BadDomElement ("only one <device> supported in configuration for the io/joystick module");
 			found_device = true;
 
 			_device_path = e.text();
@@ -90,7 +90,7 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 		else if (e == "path")
 		{
 			if (found_path)
-				throw Xefis::BadDomElement ("only one <path> supported in configuration for the io/joystick module");
+				throw xf::BadDomElement ("only one <path> supported in configuration for the io/joystick module");
 			found_path = true;
 
 			_prop_path = e.text();
@@ -148,13 +148,13 @@ JoystickInput::JoystickInput (Xefis::ModuleManager* module_manager, QDomElement 
 			}
 		}
 		else
-			throw Xefis::BadDomElement (e);
+			throw xf::BadDomElement (e);
 	}
 
 	if (!found_path)
-		throw Xefis::MissingDomElement (config, "path");
+		throw xf::MissingDomElement (config, "path");
 	if (!found_device)
-		throw Xefis::MissingDomElement (config, "device");
+		throw xf::MissingDomElement (config, "device");
 
 	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);

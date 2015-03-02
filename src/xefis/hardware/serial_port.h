@@ -305,7 +305,7 @@ SerialPort::Configuration::set_baud_rate (std::string const& baud_rate)
 inline void
 SerialPort::Configuration::set_data_bits (unsigned int data_bits)
 {
-	_data_bits = Xefis::limit (data_bits, 5u, 8u);
+	_data_bits = xf::limit (data_bits, 5u, 8u);
 }
 
 
@@ -319,7 +319,7 @@ SerialPort::Configuration::set_parity_bit (Parity parity)
 inline void
 SerialPort::Configuration::set_stop_bits (unsigned int stop_bits)
 {
-	_stop_bits = Xefis::limit (stop_bits, 1u, 2u);
+	_stop_bits = xf::limit (stop_bits, 1u, 2u);
 }
 
 

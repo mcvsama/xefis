@@ -30,8 +30,8 @@
 
 
 class CDU:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;
@@ -94,31 +94,31 @@ class CDU:
 		handle_mouse_release (QMouseEvent*, CDU*);
 
 		virtual void
-		paint (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused);
+		paint (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused);
 
 		virtual void
-		paint_button (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused);
+		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused);
 
 		virtual void
-		paint_title (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused);
+		paint_title (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused);
 
 		virtual void
-		paint_value (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused);
+		paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused);
 
 		virtual void
-		paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids&, Xefis::Painter&, Column);
+		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column);
 
 		static void
-		paint_button_helper (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, ButtonState);
+		paint_button_helper (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, ButtonState);
 
 		static void
-		paint_title_helper (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, QString const& title, QColor);
+		paint_title_helper (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, QString const& title, QColor);
 
 		static void
-		paint_value_helper (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, QString const& value, QColor);
+		paint_value_helper (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, QString const& value, QColor);
 
 		static void
-		paint_focus_helper (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids&, Xefis::Painter&, Column);
+		paint_focus_helper (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column);
 
 	  private:
 		CDU&	_cdu;
@@ -144,7 +144,7 @@ class CDU:
 
 		// Strip
 		void
-		paint_button (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 	};
 
 	class SettingStrip: public Strip
@@ -167,30 +167,30 @@ class CDU:
 
 		// Strip
 		void
-		paint_button (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
 		// Strip
 		void
-		paint_title (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_title (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
 		// Strip
 		void
-		paint_value (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
 		// Strip
 		void
-		paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids&, Xefis::Painter&, Column) override;
+		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
-		Xefis::TypedProperty	_property;
-		std::string				_format;
-		std::string				_unit;
-		std::string				_nil_value;
-		std::string				_true_value;
-		std::string				_false_value;
-		ButtonState				_button_state	= ButtonState::Normal;
-		bool					_read_only		= false;
-		QRectF					_button_rect;
+		xf::TypedProperty	_property;
+		std::string			_format;
+		std::string			_unit;
+		std::string			_nil_value;
+		std::string			_true_value;
+		std::string			_false_value;
+		ButtonState			_button_state	= ButtonState::Normal;
+		bool				_read_only		= false;
+		QRectF				_button_rect;
 	};
 
 	class GotoStrip: public Strip
@@ -212,15 +212,15 @@ class CDU:
 
 		// Strip
 		void
-		paint_button (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
 		// Strip
 		void
-		paint_value (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool focused) override;
+		paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
 		// Strip
 		void
-		paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids&, Xefis::Painter&, Column) override;
+		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
 		QString			_target_page_id;
@@ -236,7 +236,7 @@ class CDU:
 
 	  public:
 		// Ctor
-		explicit Page (CDU&, QDomElement const& page_element, Config&, Xefis::Logger const&);
+		explicit Page (CDU&, QDomElement const& page_element, Config&, xf::Logger const&);
 
 		/**
 		 * Return unique page identifier.
@@ -299,7 +299,7 @@ class CDU:
 		 * Paint the page.
 		 */
 		void
-		paint (QRectF const& rect, Xefis::InstrumentAids&, Xefis::Painter&);
+		paint (QRectF const& rect, xf::InstrumentAids&, xf::Painter&);
 
 		/**
 		 * Return px num from the left edge to the black box left edge.
@@ -331,7 +331,7 @@ class CDU:
 
 	  public:
 		// Ctor
-		explicit Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger const&);
+		explicit Config (CDU& cdu, QDomElement const& pages_element, xf::Logger const&);
 
 		/**
 		 * Return true if any of the properties is fresh.
@@ -373,15 +373,15 @@ class CDU:
 		check_reachability() const;
 
 	  private:
-		PagesMap				_pages_by_id;
-		QString					_default_page_id;
-		std::size_t				_rows = 8;
-		Xefis::Logger const&	_logger;
+		PagesMap			_pages_by_id;
+		QString				_default_page_id;
+		std::size_t			_rows = 8;
+		xf::Logger const&	_logger;
 	};
 
   public:
 	// Ctor
-	CDU (Xefis::ModuleManager*, QDomElement const& config);
+	CDU (xf::ModuleManager*, QDomElement const& config);
 
 	// Module
 	void
@@ -463,7 +463,7 @@ class CDU:
   private:
 	Unique<Config>			_config;
 	QString					_current_page_id;
-	Xefis::PropertyTime		_time_utc;
+	xf::PropertyTime		_time_utc;
 	QString					_entry_value;
 	std::vector<QString>	_messages;
 };
@@ -480,22 +480,22 @@ CDU::Strip::handle_mouse_release (QMouseEvent*, CDU*)
 
 
 inline void
-CDU::Strip::paint_button (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool)
+CDU::Strip::paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool)
 { }
 
 
 inline void
-CDU::Strip::paint_title (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool)
+CDU::Strip::paint_title (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool)
 { }
 
 
 inline void
-CDU::Strip::paint_value (QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column, bool)
+CDU::Strip::paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool)
 { }
 
 
 inline void
-CDU::Strip::paint_focus (QRectF const&, QRectF const&, Xefis::InstrumentAids&, Xefis::Painter&, Column)
+CDU::Strip::paint_focus (QRectF const&, QRectF const&, xf::InstrumentAids&, xf::Painter&, Column)
 { }
 
 #endif

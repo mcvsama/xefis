@@ -30,8 +30,8 @@
 
 
 class StatusWidget:
-	public Xefis::InstrumentWidget,
-	protected Xefis::InstrumentAids
+	public xf::InstrumentWidget,
+	protected xf::InstrumentAids
 {
 	static constexpr Time MessageHideTimeout = 5_s;
 

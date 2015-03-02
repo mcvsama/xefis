@@ -104,7 +104,7 @@ Link::ItemStream::failsafe()
 Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 {
 	if (!element.hasAttribute ("type"))
-		throw Xefis::MissingDomAttribute (element, "type");
+		throw xf::MissingDomAttribute (element, "type");
 
 	QString type_attr = element.attribute ("type");
 
@@ -146,7 +146,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Weight;
 
 	if (_type == Type::Unknown)
-		throw Xefis::BadDomAttribute (element, "type", "unknown type: " + type_attr);
+		throw xf::BadDomAttribute (element, "type", "unknown type: " + type_attr);
 
 	_retained = Link::check_retained_attribute (element, false);
 
@@ -171,7 +171,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Volume:
 		case Type::Weight:
 			if (!element.hasAttribute ("bytes"))
-				throw Xefis::MissingDomAttribute (element, "bytes");
+				throw xf::MissingDomAttribute (element, "bytes");
 			break;
 		default:
 			;
@@ -184,7 +184,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		{
 			case Type::Integer:
 				if (_bytes != 1 && _bytes != 2 && _bytes != 4 && _bytes != 8)
-					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 1, 2, 4 or 8").arg (_bytes));
+					throw xf::BadDomAttribute (element, "bytes", QString ("is %1, should be 1, 2, 4 or 8").arg (_bytes));
 				break;
 			case Type::Float:
 			case Type::Acceleration:
@@ -204,7 +204,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Volume:
 			case Type::Weight:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
-					throw Xefis::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
+					throw xf::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
 				break;
 			case Type::Unknown:
 				// Impossible.
@@ -213,7 +213,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	}
 
 	if (!element.hasAttribute (link->_path_attribute_name))
-		throw Xefis::MissingDomAttribute (element, link->_path_attribute_name);
+		throw xf::MissingDomAttribute (element, link->_path_attribute_name);
 
 	xf::PropertyPath path (element.attribute (link->_path_attribute_name));
 	_property_integer.set_path (path);
@@ -250,8 +250,8 @@ Link::PropertyItem::produce (Blob& blob)
 	enum class Kind { Integer, Float };
 
 	Kind kind = Kind::Integer;
-	Xefis::PropertyInteger::Type integer_value = 0;
-	Xefis::PropertyFloat::Type float_value = 0.f;
+	xf::PropertyInteger::Type integer_value = 0;
+	xf::PropertyFloat::Type float_value = 0.f;
 
 #define XEFIS_CASE_FLOAT(type, property) \
 	case Type::type: \
@@ -525,7 +525,7 @@ template<class CastType, class SourceType>
 
 template<class SIType>
 	inline SIType
-	Link::PropertyItem::si_from_internal (Xefis::PropertyFloat::Type float_value)
+	Link::PropertyItem::si_from_internal (xf::PropertyFloat::Type float_value)
 	{
 		SIType t;
 		t.internal() = float_value;
@@ -540,9 +540,9 @@ Link::BitfieldItem::BitfieldItem (Link* link, QDomElement& element)
 		if (e == "property")
 		{
 			if (!e.hasAttribute ("type"))
-				throw Xefis::MissingDomAttribute (e, "type");
+				throw xf::MissingDomAttribute (e, "type");
 			if (!e.hasAttribute (link->_path_attribute_name))
-				throw Xefis::MissingDomAttribute (e, link->_path_attribute_name);
+				throw xf::MissingDomAttribute (e, link->_path_attribute_name);
 
 			BitSource bs;
 
@@ -560,14 +560,14 @@ Link::BitfieldItem::BitfieldItem (Link* link, QDomElement& element)
 			else if (s_type == "integer")
 			{
 				if (!e.hasAttribute ("bits"))
-					throw Xefis::MissingDomAttribute (e, "bits");
+					throw xf::MissingDomAttribute (e, "bits");
 
 				bs.is_boolean = false;
 				bs.property_integer.set_path (xf::PropertyPath (s_path));
 				bs.bits = e.attribute ("bits").toUInt();
 			}
 			else
-				throw Xefis::BadDomAttribute (e, "type", "must be 'boolean' or 'integer'");
+				throw xf::BadDomAttribute (e, "type", "must be 'boolean' or 'integer'");
 
 			_bit_sources.push_back (bs);
 		}
@@ -600,7 +600,7 @@ Link::BitfieldItem::produce (Blob& blob)
 			bits.push_back (*bs.property_boolean);
 		else
 		{
-			Xefis::PropertyInteger::Type value = *bs.property_integer;
+			xf::PropertyInteger::Type value = *bs.property_integer;
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				bits.push_back ((value >> b) & 1);
 		}
@@ -639,7 +639,7 @@ Link::BitfieldItem::eat (Blob::iterator begin, Blob::iterator end)
 			bs.boolean_value = *bit;
 		else
 		{
-			Xefis::PropertyInteger::Type value = 0;
+			xf::PropertyInteger::Type value = 0;
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				if (*(bit + b))
 					value |= 1 << b;
@@ -706,7 +706,7 @@ Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 	}
 
 	if (element.hasAttribute ("key"))
-		_key = Xefis::parse_hex_string (element.attribute ("key"));
+		_key = xf::parse_hex_string (element.attribute ("key"));
 	else
 		_key = { 0 };
 
@@ -734,7 +734,7 @@ Link::SignatureItem::produce (Blob& blob)
 		_temp.push_back (dist (_rng));
 	// Append the key, compute signature:
 	_temp.insert (_temp.end(), _key.begin(), _key.end());
-	Xefis::Hash hash (_temp);
+	xf::Hash hash (_temp);
 	// Erase appended key:
 	_temp.erase (_temp.end() - std::distance (_key.begin(), _key.end()), _temp.end());
 	// Add signature:
@@ -767,7 +767,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 	std::copy (begin, sign_begin, _temp.begin());
 	// Append the key, compute signature:
 	_temp.insert (_temp.end(), _key.begin(), _key.end());
-	Xefis::Hash hash (_temp);
+	xf::Hash hash (_temp);
 	// If hashes mismatch, that's parsing error:
 	if (!std::equal (sign_begin, sign_end, hash.begin()))
 		throw ParseError();
@@ -783,11 +783,11 @@ Link::Packet::Packet (Link* link, QDomElement& element):
 	ItemStream (link, element)
 {
 	if (!element.hasAttribute ("magic"))
-		throw Xefis::MissingDomAttribute (element, "magic");
+		throw xf::MissingDomAttribute (element, "magic");
 
-	_magic = Xefis::parse_hex_string (element.attribute ("magic"));
+	_magic = xf::parse_hex_string (element.attribute ("magic"));
 	if (_magic.empty())
-		throw Xefis::BadDomAttribute (element, "magic", "value must be at least one byte long");
+		throw xf::BadDomAttribute (element, "magic", "value must be at least one byte long");
 
 	if (element.hasAttribute ("send-every"))
 		_send_every = element.attribute ("send-every").toUInt();
@@ -823,7 +823,7 @@ Link::Packet::produce (Blob& blob)
 }
 
 
-Link::Link (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Link::Link (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	Frequency output_frequency = 1_Hz;
@@ -986,7 +986,7 @@ Link::eat (Blob& blob)
 
 		bool return_from_function = false;
 
-		Xefis::Exception::guard ([&] {
+		xf::Exception::guard ([&] {
 			try {
 				// Find the right magic and packet:
 				std::copy (blob.begin(), blob.begin() + _magic_size, _tmp_input_magic.begin());
@@ -1066,13 +1066,13 @@ Link::parse_protocol (QDomElement const& protocol)
 		if (_magic_size == 0)
 			_magic_size = p->magic().size();
 		if (_magic_size != p->magic().size())
-			throw Xefis::BadConfiguration ("all magic values have to have equal number of bytes");
+			throw xf::BadConfiguration ("all magic values have to have equal number of bytes");
 		if (!_packet_magics.insert ({ p->magic(), p }).second)
-			throw Xefis::BadConfiguration ("same magic value " + to_string (p->magic()) + " used for two or more packets");
+			throw xf::BadConfiguration ("same magic value " + to_string (p->magic()) + " used for two or more packets");
 	}
 
 	if (_packets.empty())
-		throw Xefis::BadConfiguration ("protocol must not be empty");
+		throw xf::BadConfiguration ("protocol must not be empty");
 }
 
 
@@ -1099,7 +1099,7 @@ Link::check_retained_attribute (QDomElement const& element, bool default_value)
 		if (s_retained == "true")
 			default_value = true;
 		else if (s_retained != "false")
-			throw Xefis::BadDomAttribute (element, "retained", "must be 'true' or 'false'");
+			throw xf::BadDomAttribute (element, "retained", "must be 'true' or 'false'");
 	}
 
 	return default_value;

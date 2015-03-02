@@ -30,12 +30,12 @@
 
 
 class DebugForces:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	DebugForces (Xefis::ModuleManager*, QDomElement const& config);
+	DebugForces (xf::ModuleManager*, QDomElement const& config);
 
 	// Module
 	void
@@ -47,15 +47,15 @@ class DebugForces:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	Xefis::PropertyAngle		_input_orientation_pitch;
-	Xefis::PropertyAngle		_input_orientation_roll;
-	Xefis::PropertyAngle		_input_orientation_magnetic_heading;
-	Xefis::PropertyAcceleration	_input_measured_accel_x;
-	Xefis::PropertyAcceleration	_input_measured_accel_y;
-	Xefis::PropertyAcceleration	_input_measured_accel_z;
-	Xefis::PropertyAcceleration	_input_centrifugal_accel_x;
-	Xefis::PropertyAcceleration	_input_centrifugal_accel_y;
-	Xefis::PropertyAcceleration	_input_centrifugal_accel_z;
+	xf::PropertyAngle			_input_orientation_pitch;
+	xf::PropertyAngle			_input_orientation_roll;
+	xf::PropertyAngle			_input_orientation_magnetic_heading;
+	xf::PropertyAcceleration	_input_measured_accel_x;
+	xf::PropertyAcceleration	_input_measured_accel_y;
+	xf::PropertyAcceleration	_input_measured_accel_z;
+	xf::PropertyAcceleration	_input_centrifugal_accel_x;
+	xf::PropertyAcceleration	_input_centrifugal_accel_y;
+	xf::PropertyAcceleration	_input_centrifugal_accel_z;
 };
 
 #endif

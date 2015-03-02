@@ -159,7 +159,7 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 {
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
 	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).Hz();
-	return Xefis::limit (x, 0u, 255u);
+	return xf::limit (x, 0u, 255u);
 }
 
 
@@ -403,10 +403,10 @@ CHRUM6::packet_name (uint32_t address) noexcept
 {
 	switch (address)
 	{
-#define CONFIG_CASE(x) case static_cast<uint32_t> (Xefis::CHRUM6::ConfigurationAddress::x): return #x;
-#define DATA_CASE(x) case static_cast<uint32_t> (Xefis::CHRUM6::DataAddress::x): return #x;
-#define COMMAND_CASE(x) case static_cast<uint32_t> (Xefis::CHRUM6::CommandAddress::x): return #x;
-#define ERROR_CASE(x) case static_cast<uint32_t> (Xefis::CHRUM6::ProtocolError::x): return #x;
+#define CONFIG_CASE(x) case static_cast<uint32_t> (xf::CHRUM6::ConfigurationAddress::x): return #x;
+#define DATA_CASE(x) case static_cast<uint32_t> (xf::CHRUM6::DataAddress::x): return #x;
+#define COMMAND_CASE(x) case static_cast<uint32_t> (xf::CHRUM6::CommandAddress::x): return #x;
+#define ERROR_CASE(x) case static_cast<uint32_t> (xf::CHRUM6::ProtocolError::x): return #x;
 		CONFIG_CASE (Communication)
 		CONFIG_CASE (MiscConfig)
 		CONFIG_CASE (MagRefX)

@@ -35,7 +35,7 @@
 
 class Link:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -174,32 +174,32 @@ class Link:
 		 */
 		template<class SIType>
 			static SIType
-			si_from_internal (Xefis::PropertyFloat::Type float_value);
+			si_from_internal (xf::PropertyFloat::Type float_value);
 
 	  private:
-		Type							_type				= Type::Unknown;
-		uint8_t							_bytes				= 0;
-		bool							_retained			= false;
-		Xefis::PropertyInteger			_property_integer;
-		Xefis::PropertyFloat			_property_float;
-		Xefis::PropertyAcceleration		_property_acceleration;
-		Xefis::PropertyAngle			_property_angle;
-		Xefis::PropertyArea				_property_area;
-		Xefis::PropertyCapacity			_property_capacity;
-		Xefis::PropertyCurrent			_property_current;
-		Xefis::PropertyDensity			_property_density;
-		Xefis::PropertyForce			_property_force;
-		Xefis::PropertyPressure			_property_pressure;
-		Xefis::PropertyFrequency		_property_frequency;
-		Xefis::PropertyLength			_property_length;
-		Xefis::PropertySpeed			_property_speed;
-		Xefis::PropertyTemperature		_property_temperature;
-		Xefis::PropertyTime				_property_time;
-		Xefis::PropertyTorque			_property_torque;
-		Xefis::PropertyVolume			_property_volume;
-		Xefis::PropertyWeight			_property_weight;
-		Xefis::PropertyInteger::Type	_integer_value;
-		Xefis::PropertyFloat::Type		_float_value;
+		Type						_type				= Type::Unknown;
+		uint8_t						_bytes				= 0;
+		bool						_retained			= false;
+		xf::PropertyInteger			_property_integer;
+		xf::PropertyFloat			_property_float;
+		xf::PropertyAcceleration	_property_acceleration;
+		xf::PropertyAngle			_property_angle;
+		xf::PropertyArea			_property_area;
+		xf::PropertyCapacity		_property_capacity;
+		xf::PropertyCurrent			_property_current;
+		xf::PropertyDensity			_property_density;
+		xf::PropertyForce			_property_force;
+		xf::PropertyPressure		_property_pressure;
+		xf::PropertyFrequency		_property_frequency;
+		xf::PropertyLength			_property_length;
+		xf::PropertySpeed			_property_speed;
+		xf::PropertyTemperature		_property_temperature;
+		xf::PropertyTime			_property_time;
+		xf::PropertyTorque			_property_torque;
+		xf::PropertyVolume			_property_volume;
+		xf::PropertyWeight			_property_weight;
+		xf::PropertyInteger::Type	_integer_value;
+		xf::PropertyFloat::Type		_float_value;
 	};
 
 	class BitfieldItem: public Item
@@ -207,13 +207,13 @@ class Link:
 	  public:
 		struct BitSource
 		{
-			bool							is_boolean			= false;
-			bool							retained			= false;
-			uint8_t							bits				= 0;
-			Xefis::PropertyBoolean			property_boolean;
-			Xefis::PropertyInteger			property_integer;
-			Xefis::PropertyBoolean::Type	boolean_value;
-			Xefis::PropertyInteger::Type	integer_value;
+			bool						is_boolean			= false;
+			bool						retained			= false;
+			uint8_t						bits				= 0;
+			xf::PropertyBoolean			property_boolean;
+			xf::PropertyInteger			property_integer;
+			xf::PropertyBoolean::Type	boolean_value;
+			xf::PropertyInteger::Type	integer_value;
 		};
 
 		typedef std::vector<BitSource> BitSources;
@@ -291,7 +291,7 @@ class Link:
 
   public:
 	// Ctor
-	Link (Xefis::ModuleManager*, QDomElement const& config);
+	Link (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -336,28 +336,28 @@ class Link:
 	check_retained_attribute (QDomElement const& element, bool default_value);
 
   private:
-	QTimer*					_failsafe_timer;
-	QTimer*					_reacquire_timer;
-	QTimer*					_output_timer;
-	bool					_link_valid				= false;
-	Xefis::PropertyString	_input;
-	Xefis::PropertyString	_output;
-	Xefis::PropertyBoolean	_link_valid_prop;
-	Xefis::PropertyInteger	_failsafes;
-	Xefis::PropertyInteger	_reacquires;
-	Xefis::PropertyInteger	_error_bytes;
-	Xefis::PropertyInteger	_valid_bytes;
-	Xefis::PropertyInteger	_valid_packets;
-	Packets					_packets;
-	PacketMagics			_packet_magics;
-	Blob::size_type			_magic_size				= 0;
-	Blob					_output_blob;
-	Blob					_input_blob;
-	Blob					_tmp_input_magic;
+	QTimer*				_failsafe_timer;
+	QTimer*				_reacquire_timer;
+	QTimer*				_output_timer;
+	bool				_link_valid				= false;
+	xf::PropertyString	_input;
+	xf::PropertyString	_output;
+	xf::PropertyBoolean	_link_valid_prop;
+	xf::PropertyInteger	_failsafes;
+	xf::PropertyInteger	_reacquires;
+	xf::PropertyInteger	_error_bytes;
+	xf::PropertyInteger	_valid_bytes;
+	xf::PropertyInteger	_valid_packets;
+	Packets				_packets;
+	PacketMagics		_packet_magics;
+	Blob::size_type		_magic_size				= 0;
+	Blob				_output_blob;
+	Blob				_input_blob;
+	Blob				_tmp_input_magic;
 	// When set, all <property> and similar elements should use property path provided
 	// in attribute denoted by _path_attribute_name, not the default "path" attribute. Restriction:
 	// _path_attribute_name should start with "path-" prefix.
-	QString					_path_attribute_name;
+	QString				_path_attribute_name;
 };
 
 #endif

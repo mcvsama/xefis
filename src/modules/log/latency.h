@@ -24,13 +24,13 @@
 
 class Latency:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	Latency (Xefis::ModuleManager*, QDomElement const& config);
+	Latency (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	/**

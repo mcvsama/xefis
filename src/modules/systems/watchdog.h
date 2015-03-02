@@ -25,11 +25,11 @@
 #include <xefis/core/module.h>
 
 
-class Watchdog: public Xefis::Module
+class Watchdog: public xf::Module
 {
   public:
 	// Ctor
-	Watchdog (Xefis::ModuleManager*, QDomElement const& config);
+	Watchdog (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	/**

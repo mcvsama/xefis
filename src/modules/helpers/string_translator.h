@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 
 
-class StringTranslator: public Xefis::Module
+class StringTranslator: public xf::Module
 {
 	/**
 	 * Represents set of one translations
@@ -32,7 +32,7 @@ class StringTranslator: public Xefis::Module
 	 */
 	class StringsSet
 	{
-		typedef std::map<Xefis::PropertyInteger::Type, Xefis::PropertyString::Type> Map;
+		typedef std::map<xf::PropertyInteger::Type, xf::PropertyString::Type> Map;
 
 	  public:
 		// Ctor
@@ -52,15 +52,15 @@ class StringTranslator: public Xefis::Module
 		update();
 
 	  private:
-		Xefis::PropertyInteger		_input;
-		Xefis::PropertyString		_output;
+		xf::PropertyInteger			_input;
+		xf::PropertyString			_output;
 		Map							_map;
-		Xefis::PropertyString::Type	_default;
+		xf::PropertyString::Type	_default;
 	};
 
   public:
 	// Ctor
-	StringTranslator (Xefis::ModuleManager*, QDomElement const& config);
+	StringTranslator (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

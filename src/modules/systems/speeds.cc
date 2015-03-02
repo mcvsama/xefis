@@ -30,7 +30,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/speeds", Speeds);
 
 
-Speeds::Speeds (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Speeds::Speeds (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {
@@ -60,7 +60,7 @@ Speeds::data_updated()
 void
 Speeds::compute()
 {
-	Xefis::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
+	xf::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
 
 	Optional<Speed> minimum;
 	Optional<Speed> maximum;

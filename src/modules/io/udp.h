@@ -28,13 +28,13 @@
 
 class UDP:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	UDP (Xefis::ModuleManager*, QDomElement const& config);
+	UDP (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -52,19 +52,19 @@ class UDP:
 	interfere (QByteArray& blob);
 
   private:
-	Xefis::PropertyString	_send;
-	Xefis::PropertyString	_receive;
-	bool					_send_interference		= false;
-	bool					_receive_interference	= false;
-	QByteArray				_receive_datagram;
-	bool					_udp_send_enabled		= false;
-	Unique<QUdpSocket>		_udp_send;
-	Optional<QString>		_udp_send_host;
-	Optional<int>			_udp_send_port;
-	bool					_udp_receive_enabled	= false;
-	Unique<QUdpSocket>		_udp_receive;
-	Optional<QString>		_udp_receive_host;
-	Optional<int>			_udp_receive_port;
+	xf::PropertyString	_send;
+	xf::PropertyString	_receive;
+	bool				_send_interference		= false;
+	bool				_receive_interference	= false;
+	QByteArray			_receive_datagram;
+	bool				_udp_send_enabled		= false;
+	Unique<QUdpSocket>	_udp_send;
+	Optional<QString>	_udp_send_host;
+	Optional<int>		_udp_send_port;
+	bool				_udp_receive_enabled	= false;
+	Unique<QUdpSocket>	_udp_receive;
+	Optional<QString>	_udp_receive_host;
+	Optional<int>		_udp_receive_port;
 };
 
 #endif

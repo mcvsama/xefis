@@ -31,7 +31,7 @@
  */
 class PCA9685:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -85,16 +85,16 @@ class PCA9685:
 
 	struct Channel
 	{
-		Xefis::PropertyFloat		input;
-		Xefis::PropertyFloat::Type	input_default			= 0.0;
-		Xefis::PropertyFloat::Type	input_minimum			= 0.0;
-		Xefis::PropertyFloat::Type	input_maximum			= 1.0;
-		Xefis::PropertyFloat::Type	last_value				= input_default;
-		Time						output_minimum			= 1_ms;
-		Time						output_maximum			= 2_ms;
-		bool						fallback_to_last_valid	= false;
-		Time						smoothing_time			= 1_ms;
-		Xefis::Smoother<double>		smoother				= smoothing_time;
+		xf::PropertyFloat		input;
+		xf::PropertyFloat::Type	input_default			= 0.0;
+		xf::PropertyFloat::Type	input_minimum			= 0.0;
+		xf::PropertyFloat::Type	input_maximum			= 1.0;
+		xf::PropertyFloat::Type	last_value				= input_default;
+		Time					output_minimum			= 1_ms;
+		Time					output_maximum			= 2_ms;
+		bool					fallback_to_last_valid	= false;
+		Time					smoothing_time			= 1_ms;
+		xf::Smoother<double>	smoother				= smoothing_time;
 
 		Time
 		compute_duty_cycle();
@@ -105,7 +105,7 @@ class PCA9685:
 
   public:
 	// Ctor:
-	PCA9685 (Xefis::ModuleManager*, QDomElement const& config);
+	PCA9685 (xf::ModuleManager*, QDomElement const& config);
 
 	// Module API
 	void
@@ -157,10 +157,10 @@ class PCA9685:
 	guard (std::function<void()> guarded_code);
 
   private:
-	Xefis::PropertyBoolean			_serviceable;
+	xf::PropertyBoolean				_serviceable;
 	std::array<Channel, Channels>	_channels;
 	QTimer*							_initialization_timer;
-	Xefis::I2C::Device				_i2c_device;
+	xf::I2C::Device					_i2c_device;
 	Time							_output_period		= 20_ms;
 };
 

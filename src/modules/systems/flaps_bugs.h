@@ -32,11 +32,11 @@
  * Computes two speed bugs - for two adjacent flap settings - that should
  * be displayed on EFIS' speed ladder.
  */
-class FlapsBugs: public Xefis::Module
+class FlapsBugs: public xf::Module
 {
   public:
 	// Ctor
-	FlapsBugs (Xefis::ModuleManager*, QDomElement const& config);
+	FlapsBugs (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	// Module API
@@ -45,16 +45,16 @@ class FlapsBugs: public Xefis::Module
 
   private:
 	// Settings:
-	double					_margin_factor = 1.2;
+	double				_margin_factor = 1.2;
 	// Input:
-	Xefis::PropertyAngle	_input_flaps_setting;
+	xf::PropertyAngle	_input_flaps_setting;
 	// Output:
-	Xefis::PropertyString	_output_flaps_up_label;
-	Xefis::PropertySpeed	_output_flaps_up_speed;
-	Xefis::PropertyString	_output_flaps_a_label;
-	Xefis::PropertySpeed	_output_flaps_a_speed;
-	Xefis::PropertyString	_output_flaps_b_label;
-	Xefis::PropertySpeed	_output_flaps_b_speed;
+	xf::PropertyString	_output_flaps_up_label;
+	xf::PropertySpeed	_output_flaps_up_speed;
+	xf::PropertyString	_output_flaps_a_label;
+	xf::PropertySpeed	_output_flaps_a_speed;
+	xf::PropertyString	_output_flaps_b_label;
+	xf::PropertySpeed	_output_flaps_b_speed;
 };
 
 #endif

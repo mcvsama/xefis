@@ -28,7 +28,7 @@
 
 class KLog:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -36,7 +36,7 @@ class KLog:
 
   public:
 	// Ctor
-	KLog (Xefis::ModuleManager*, QDomElement const& config);
+	KLog (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	void
@@ -47,10 +47,10 @@ class KLog:
 	bool							_open		= false;
 	std::array<char, BufferSize>	_buffer;
 	// Output:
-	Xefis::PropertyBoolean			_flag_oom;
-	Xefis::PropertyBoolean			_flag_io;
-	Xefis::PropertyBoolean			_flag_oops;
-	Xefis::PropertyBoolean			_flag_bug;
+	xf::PropertyBoolean				_flag_oom;
+	xf::PropertyBoolean				_flag_io;
+	xf::PropertyBoolean				_flag_oops;
+	xf::PropertyBoolean				_flag_bug;
 };
 
 #endif

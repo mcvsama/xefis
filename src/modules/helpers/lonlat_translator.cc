@@ -24,7 +24,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("helpers/lonlat-translator", LonLatTranslator);
 
 
-LonLatTranslator::LonLatTranslator (Xefis::ModuleManager* module_manager, QDomElement const& config):
+LonLatTranslator::LonLatTranslator (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {

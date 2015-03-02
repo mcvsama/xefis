@@ -25,13 +25,13 @@
 
 class Mouse:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	Mouse (Xefis::ModuleManager*, QDomElement const& config);
+	Mouse (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	void
@@ -42,17 +42,17 @@ class Mouse:
 	remove_dead_zone (float input, float dead_deflection);
 
   private:
-	float					_dead_zone_x	= 0.2;
-	float					_dead_zone_y	= 0.2;
-	float					_speed_x		= 1.0f;
-	float					_speed_y		= 1.0f;
-	float					_acceleration_x	= 2.0f;
-	float					_acceleration_y	= 2.0f;
-	bool					_clicked		= false;
+	float				_dead_zone_x	= 0.2;
+	float				_dead_zone_y	= 0.2;
+	float				_speed_x		= 1.0f;
+	float				_speed_y		= 1.0f;
+	float				_acceleration_x	= 2.0f;
+	float				_acceleration_y	= 2.0f;
+	bool				_clicked		= false;
 	// Input:
-	Xefis::PropertyFloat	_axis_x;
-	Xefis::PropertyFloat	_axis_y;
-	Xefis::PropertyBoolean	_button;
+	xf::PropertyFloat	_axis_x;
+	xf::PropertyFloat	_axis_y;
+	xf::PropertyBoolean	_button;
 };
 
 #endif

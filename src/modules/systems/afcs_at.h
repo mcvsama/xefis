@@ -29,7 +29,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class AFCS_AT: public Xefis::Module
+class AFCS_AT: public xf::Module
 {
 	enum class SpeedMode
 	{
@@ -41,7 +41,7 @@ class AFCS_AT: public Xefis::Module
 
   public:
 	// Ctor
-	AFCS_AT (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_AT (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -55,25 +55,25 @@ class AFCS_AT: public Xefis::Module
 	speed_mode_changed();
 
   private:
-	Frequency					_computed_output_thrust	= 0.0_rpm;
-	SpeedMode					_speed_mode				= SpeedMode::None;
-	Frequency					_output_thrust_minimum	= 0.0_rpm;
-	Frequency					_output_thrust_maximum	= 1.0_rpm;
-	double						_ias_pid_p				= 1.0;
-	double						_ias_pid_i				= 0.1;
-	double						_ias_pid_d				= 0.0;
-	double						_ias_to_thrust_scale	= 1.0;
-	Xefis::PIDControl<double>	_ias_pid;
-	Xefis::Range<Frequency>		_output_thrust_extent;
+	Frequency				_computed_output_thrust	= 0.0_rpm;
+	SpeedMode				_speed_mode				= SpeedMode::None;
+	Frequency				_output_thrust_minimum	= 0.0_rpm;
+	Frequency				_output_thrust_maximum	= 1.0_rpm;
+	double					_ias_pid_p				= 1.0;
+	double					_ias_pid_i				= 0.1;
+	double					_ias_pid_d				= 0.0;
+	double					_ias_to_thrust_scale	= 1.0;
+	xf::PIDControl<double>	_ias_pid;
+	xf::Range<Frequency>	_output_thrust_extent;
 	// Input:
-	Xefis::PropertyInteger		_cmd_speed_mode;
-	Xefis::PropertyFrequency	_cmd_thrust;
-	Xefis::PropertySpeed		_cmd_ias;
-	Xefis::PropertySpeed		_measured_ias;
-	Xefis::PropertyFrequency	_output_thrust;
-	Xefis::PropertyBoolean		_disengage_at;
+	xf::PropertyInteger		_cmd_speed_mode;
+	xf::PropertyFrequency	_cmd_thrust;
+	xf::PropertySpeed		_cmd_ias;
+	xf::PropertySpeed		_measured_ias;
+	xf::PropertyFrequency	_output_thrust;
+	xf::PropertyBoolean		_disengage_at;
 	// Other:
-	Xefis::PropertyObserver		_thrust_computer;
+	xf::PropertyObserver	_thrust_computer;
 };
 
 #endif

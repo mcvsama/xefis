@@ -29,11 +29,11 @@
 #include <xefis/utility/smoother.h>
 
 
-class PerformanceComputer: public Xefis::Module
+class PerformanceComputer: public xf::Module
 {
   public:
 	// Ctor
-	PerformanceComputer (Xefis::ModuleManager*, QDomElement const& config);
+	PerformanceComputer (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -75,34 +75,34 @@ class PerformanceComputer: public Xefis::Module
 	double						_prev_total_energy					= 0.0;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
-	Xefis::Smoother<double>		_wind_direction_smoother			= 5_s;
-	Xefis::Smoother<double>		_wind_speed_smoother				= 5_s;
-	Xefis::Smoother<double>		_total_energy_variometer_smoother	= 1_s;
+	xf::Smoother<double>		_wind_direction_smoother			= 5_s;
+	xf::Smoother<double>		_wind_speed_smoother				= 5_s;
+	xf::Smoother<double>		_total_energy_variometer_smoother	= 1_s;
 	xf::Smoother<double>		_cl_smoother						= 1_s;
 	// Input:
-	Xefis::PropertySpeed		_speed_ias;
-	Xefis::PropertySpeed		_speed_tas;
-	Xefis::PropertySpeed		_speed_gs;
-	Xefis::PropertySpeed		_vertical_speed;
-	Xefis::PropertyLength		_altitude_amsl_std;
-	Xefis::PropertyAngle		_track_lateral_true;
-	Xefis::PropertyAngle		_orientation_heading_true;
-	Xefis::PropertyAngle		_magnetic_declination;
+	xf::PropertySpeed			_speed_ias;
+	xf::PropertySpeed			_speed_tas;
+	xf::PropertySpeed			_speed_gs;
+	xf::PropertySpeed			_vertical_speed;
+	xf::PropertyLength			_altitude_amsl_std;
+	xf::PropertyAngle			_track_lateral_true;
+	xf::PropertyAngle			_orientation_heading_true;
+	xf::PropertyAngle			_magnetic_declination;
 	xf::PropertyLength			_density_altitude;
 	xf::PropertyDensity			_input_air_density_static;
 	xf::PropertyWeight			_input_aircraft_weight;
-	Xefis::PropertyAngle		_input_flaps_angle;
-	Xefis::PropertyAngle		_input_spoilers_angle;
-	Xefis::PropertyAngle		_input_aoa_alpha;
+	xf::PropertyAngle			_input_flaps_angle;
+	xf::PropertyAngle			_input_spoilers_angle;
+	xf::PropertyAngle			_input_aoa_alpha;
 	xf::PropertyAcceleration	_input_load;
 	xf::PropertyAngle			_input_bank_angle;
 	// Output:
-	Xefis::PropertyAngle		_wind_from_true;
-	Xefis::PropertyAngle		_wind_from_magnetic;
-	Xefis::PropertySpeed		_wind_tas;
-	Xefis::PropertyFloat		_glide_ratio;
-	Xefis::PropertyString		_glide_ratio_string;
-	Xefis::PropertySpeed		_total_energy_variometer;			// TODO change to Energy
+	xf::PropertyAngle			_wind_from_true;
+	xf::PropertyAngle			_wind_from_magnetic;
+	xf::PropertySpeed			_wind_tas;
+	xf::PropertyFloat			_glide_ratio;
+	xf::PropertyString			_glide_ratio_string;
+	xf::PropertySpeed			_total_energy_variometer;			// TODO change to Energy
 	xf::PropertySpeed			_v_s;								// Current stall speed (depends on current bank angle)
 	xf::PropertySpeed			_v_s_0_deg;							// Stall speed with wings level
 	xf::PropertySpeed			_v_s_5_deg;							// Stall speed at 5° bank
@@ -118,9 +118,9 @@ class PerformanceComputer: public Xefis::Module
 	xf::PropertyAngle			_estimated_aoa;
 	xf::PropertyAngle			_estimated_aoa_error;
 	// Other:
-	Xefis::PropertyObserver		_wind_computer;
-	Xefis::PropertyObserver		_glide_ratio_computer;
-	Xefis::PropertyObserver		_total_energy_variometer_computer;
+	xf::PropertyObserver		_wind_computer;
+	xf::PropertyObserver		_glide_ratio_computer;
+	xf::PropertyObserver		_total_energy_variometer_computer;
 	xf::PropertyObserver		_speeds_computer;
 	xf::PropertyObserver		_aoa_computer;
 	xf::PropertyObserver		_cl_computer;

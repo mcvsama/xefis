@@ -27,7 +27,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/imu-cff", IMUCFF);
 
 
-IMUCFF::IMUCFF (Xefis::ModuleManager* module_manager, QDomElement const& config):
+IMUCFF::IMUCFF (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	Time smoothing_time = 0_s;

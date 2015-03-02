@@ -35,13 +35,13 @@ namespace Xefis {
 void
 fail (int signum)
 {
-	std::vector<const char*> features = Xefis::Services::features();
+	std::vector<const char*> features = xf::Services::features();
 	std::clog << "------------------------------------------------------------------------------------------------" << std::endl;
 	std::clog << "Xefis died by signal." << std::endl << std::endl;
 	std::clog << "  signal: " << signum << std::endl;
 	std::clog << "  source info: " << std::endl;
-	std::cout << "    commit: " << ::Xefis::Version::commit << std::endl;
-	std::cout << "    branch: " << ::Xefis::Version::branch << std::endl;
+	std::cout << "    commit: " << ::xf::Version::commit << std::endl;
+	std::cout << "    branch: " << ::xf::Version::branch << std::endl;
 	std::clog << "  features: ";
 	std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
 	std::clog << std::endl;

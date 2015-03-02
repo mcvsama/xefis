@@ -171,7 +171,7 @@ Module::accounting() const
 }
 
 
-Xefis::Logger const&
+xf::Logger const&
 Module::log() const
 {
 	return _logger;

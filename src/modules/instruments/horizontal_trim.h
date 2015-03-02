@@ -29,12 +29,12 @@
 
 
 class HorizontalTrim:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	HorizontalTrim (Xefis::ModuleManager*, QDomElement const& config);
+	HorizontalTrim (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -52,14 +52,14 @@ class HorizontalTrim:
 
   private:
 	// Settings:
-	QString					_label = "TRIM";
-	QString					_label_min;
-	QString					_label_max;
+	QString				_label = "TRIM";
+	QString				_label_min;
+	QString				_label_max;
 	// Properties:
-	Xefis::PropertyFloat	_input_trim_value;
-	Xefis::PropertyFloat	_input_trim_reference;
-	Xefis::PropertyFloat	_input_trim_reference_minimum;
-	Xefis::PropertyFloat	_input_trim_reference_maximum;
+	xf::PropertyFloat	_input_trim_value;
+	xf::PropertyFloat	_input_trim_reference;
+	xf::PropertyFloat	_input_trim_reference_minimum;
+	xf::PropertyFloat	_input_trim_reference_maximum;
 };
 
 #endif

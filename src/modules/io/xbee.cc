@@ -61,7 +61,7 @@ constexpr Time		XBee::AfterRestartGraceTime;
 constexpr Time		XBee::RSSITimeout;
 
 
-XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
+XBee::XBee (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
@@ -123,7 +123,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	QObject::connect (_rssi_timer, SIGNAL (timeout()), this, SLOT (rssi_timeout()));
 	_rssi_timer->start();
 
-	if (!vector_to_uint16 (Xefis::parse_hex_string (_local_address_string), _local_address))
+	if (!vector_to_uint16 (xf::parse_hex_string (_local_address_string), _local_address))
 	{
 		log() << "Error: local address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
 		_local_address = 0x0000;
@@ -134,7 +134,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		_local_address = 0x0000;
 	}
 
-	if (!vector_to_uint16 (Xefis::parse_hex_string (_remote_address_string), _remote_address))
+	if (!vector_to_uint16 (xf::parse_hex_string (_remote_address_string), _remote_address))
 	{
 		log() << "Error: remote address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
 		_remote_address = 0x0000;
@@ -146,7 +146,7 @@ XBee::XBee (Xefis::ModuleManager* module_manager, QDomElement const& config):
 	}
 
 	// PAN ID:
-	if (!vector_to_uint16 (Xefis::parse_hex_string (_pan_id_string), _pan_id))
+	if (!vector_to_uint16 (xf::parse_hex_string (_pan_id_string), _pan_id))
 	{
 		log() << "Invalid pan-id setting: must be 2-byte binary string (eg. 01:23). Setting pan-id to default 00:00." << std::endl;
 		_pan_id = 0x0000;
@@ -227,7 +227,7 @@ XBee::read()
 	std::string buffer;
 
 	bool err = false;
-	bool exc = Xefis::Exception::guard ([&] {
+	bool exc = xf::Exception::guard ([&] {
 		// Read as much as possible:
 		for (;;)
 		{
@@ -460,7 +460,7 @@ XBee::set_device_options()
 	options.c_oflag = 0;
 	options.c_lflag = 0;
 
-	int baud_rate_const = Xefis::SerialPort::termios_baud_rate (_baud_rate);
+	int baud_rate_const = xf::SerialPort::termios_baud_rate (_baud_rate);
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 
@@ -494,7 +494,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 			full_at += static_cast<char> (b);
 
 		if (_debug)
-			debug() << "Sending AT command " << at << ": " << Xefis::to_hex_string (full_at) << std::endl;
+			debug() << "Sending AT command " << at << ": " << xf::to_hex_string (full_at) << std::endl;
 
 		int written = 0;
 		_last_at_command = full_at;
@@ -543,13 +543,13 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::ReadHardwareVersion:
-				log() << "Hardware version: " << Xefis::to_hex_string (response) << std::endl;
+				log() << "Hardware version: " << xf::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadFirmwareVersion, "VR");
 				break;
 
 			case ConfigurationStep::ReadFirmwareVersion:
-				log() << "Firmware version: " << Xefis::to_hex_string (response) << std::endl;
+				log() << "Firmware version: " << xf::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadSerialNumberH, "SH");
 				break;
@@ -561,7 +561,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 
 			case ConfigurationStep::ReadSerialNumberL:
 				_serial_number_bin += response;
-				log() << "Serial number: " << Xefis::to_hex_string (_serial_number_bin) << std::endl;
+				log() << "Serial number: " << xf::to_hex_string (_serial_number_bin) << std::endl;
 
 				request_at (ConfigurationStep::DisableSleep, "SM", { 0x00 });
 				break;
@@ -655,7 +655,7 @@ std::string
 XBee::make_frame (std::string const& data) const
 {
 	if (data.size() > 0xffff)
-		throw Xefis::Exception ("max frame size is 0xffff");
+		throw xf::Exception ("max frame size is 0xffff");
 
 	std::string result;
 
@@ -886,7 +886,7 @@ void
 XBee::process_rx64_frame (std::string const& frame)
 {
 	if (_debug)
-		debug() << ">> RX64 data: " << Xefis::to_hex_string (frame) << std::endl;
+		debug() << ">> RX64 data: " << xf::to_hex_string (frame) << std::endl;
 
 	// At least 11 bytes:
 	if (frame.size() < 11)
@@ -920,7 +920,7 @@ void
 XBee::process_rx16_frame (std::string const& frame)
 {
 	if (_debug)
-		debug() << ">> RX16 data: " << Xefis::to_hex_string (frame) << std::endl;
+		debug() << ">> RX16 data: " << xf::to_hex_string (frame) << std::endl;
 
 	// At least 5 bytes:
 	if (frame.size() < 5)
@@ -931,7 +931,7 @@ XBee::process_rx16_frame (std::string const& frame)
 	// Address must match our peer's address:
 	if (address != _remote_address)
 	{
-		log() << "Got packet from unknown address: " << Xefis::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
+		log() << "Got packet from unknown address: " << xf::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -958,7 +958,7 @@ void
 XBee::process_modem_status_frame (std::string const& data)
 {
 	if (_debug)
-		debug() << ">> Modem status: " << Xefis::to_hex_string (data) << std::endl;
+		debug() << ">> Modem status: " << xf::to_hex_string (data) << std::endl;
 
 	if (data.size() < 1)
 		return;
@@ -1017,7 +1017,7 @@ void
 XBee::process_at_response_frame (std::string const& frame)
 {
 	if (_debug)
-		debug() << ">> AT status: " << Xefis::to_hex_string (frame) << std::endl;
+		debug() << ">> AT status: " << xf::to_hex_string (frame) << std::endl;
 
 	// Response must be at least 4 bytes long:
 	if (frame.size() < 4)
@@ -1048,7 +1048,7 @@ XBee::process_at_response_frame (std::string const& frame)
 			case ATResponseStatus::InvalidParameter:	os << "Invalid parameter"; break;
 			default:									os << "?"; break;
 		}
-		os << ", data: " << Xefis::to_hex_string (response_data) << std::endl;
+		os << ", data: " << xf::to_hex_string (response_data) << std::endl;
 	}
 
 	// Response data: bytes

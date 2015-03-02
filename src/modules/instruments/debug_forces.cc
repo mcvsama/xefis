@@ -24,8 +24,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/debug-forces", DebugForces);
 
 
-DebugForces::DebugForces (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+DebugForces::DebugForces (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (1.0)
 {
 	parse_properties (config, {
