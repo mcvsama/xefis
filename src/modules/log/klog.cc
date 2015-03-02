@@ -30,7 +30,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("log/klog", KLog);
 
 
-KLog::KLog (Xefis::ModuleManager* module_manager, QDomElement const& config):
+KLog::KLog (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {

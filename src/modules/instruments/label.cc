@@ -30,8 +30,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/label", Label);
 
 
-Label::Label (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (1.f)
 {
 	for (QDomElement& e: config)
@@ -39,9 +39,9 @@ Label::Label (Xefis::ModuleManager* module_manager, QDomElement const& config):
 		if (e == "label")
 			_label = e.text();
 		else if (e == "align")
-			_alignment = Xefis::parse_alignment (e.text());
+			_alignment = xf::parse_alignment (e.text());
 		else if (e == "color")
-			_color = Xefis::parse_color (e.text());
+			_color = xf::parse_color (e.text());
 		else if (e == "font-size")
 			_font_size = e.text().toDouble();
 	}

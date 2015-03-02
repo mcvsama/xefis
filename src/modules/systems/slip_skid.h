@@ -30,11 +30,11 @@
 /**
  * Computes slip-skid value from three-axis accelerometer values.
  */
-class SlipSkid: public Xefis::Module
+class SlipSkid: public xf::Module
 {
   public:
 	// Ctor
-	SlipSkid (Xefis::ModuleManager*, QDomElement const& config);
+	SlipSkid (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -45,12 +45,12 @@ class SlipSkid: public Xefis::Module
 
   private:
 	// Input:
-	Xefis::PropertyFloat	_y_acceleration;
-	Xefis::PropertyFloat	_z_acceleration;
+	xf::PropertyFloat		_y_acceleration;
+	xf::PropertyFloat		_z_acceleration;
 	// Output:
-	Xefis::PropertyFloat	_slip_skid;
+	xf::PropertyFloat		_slip_skid;
 	// Other:
-	Xefis::PropertyObserver	_slip_skid_computer;
+	xf::PropertyObserver	_slip_skid_computer;
 };
 
 #endif

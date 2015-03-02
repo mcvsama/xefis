@@ -186,9 +186,9 @@ watchdog (int argc, char** argv, char**)
 int
 main (int argc, char** argv, char** envp)
 {
-	signal (SIGILL, Xefis::fail);
-	signal (SIGFPE, Xefis::fail);
-	signal (SIGSEGV, Xefis::fail);
+	signal (SIGILL, xf::fail);
+	signal (SIGFPE, xf::fail);
+	signal (SIGSEGV, xf::fail);
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");

@@ -34,7 +34,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/mouse", Mouse);
 
 
-Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Mouse::Mouse (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
@@ -65,7 +65,7 @@ Mouse::Mouse (Xefis::ModuleManager* module_manager, QDomElement const& config):
 void
 Mouse::check()
 {
-	using Xefis::sgn;
+	using xf::sgn;
 
 	try {
 		// Mouse move:
@@ -78,7 +78,7 @@ Mouse::check()
 		// Mouse press:
 		// Unimplementable as QApplication::widgetAt() is broken now in Qt 5.0.
 	}
-	catch (Xefis::Exception const& e)
+	catch (xf::Exception const& e)
 	{
 		log() << "Exception when processing mouse position update." << std::endl;
 		log() << e << std::endl;
@@ -91,6 +91,6 @@ Mouse::remove_dead_zone (float input, float dead_deflection)
 {
 	if (std::abs (input) < dead_deflection)
 		return 0.0;
-	return input - Xefis::sgn (input) * dead_deflection;
+	return input - xf::sgn (input) * dead_deflection;
 }
 

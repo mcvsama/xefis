@@ -104,7 +104,7 @@ class Exception: public std::exception
 
 	/**
 	 * Execute guarded_code and catch exceptions. If exception is catched,
-	 * it's logged and rethrown. If exception is of type Xefis::Exceptions,
+	 * it's logged and rethrown. If exception is of type xf::Exceptions,
 	 * it's full message is logged (backtrace, etc). Boost and standard
 	 * exceptions are logged just by their typeid().name. Other types
 	 * just cause mentioning an exception.

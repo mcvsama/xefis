@@ -38,7 +38,7 @@ RadialIndicatorWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
 

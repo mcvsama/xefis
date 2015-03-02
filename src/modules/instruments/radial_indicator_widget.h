@@ -30,8 +30,8 @@
 
 
 class RadialIndicatorWidget:
-	public Xefis::InstrumentWidget,
-	protected Xefis::InstrumentAids
+	public xf::InstrumentWidget,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
@@ -41,7 +41,7 @@ class RadialIndicatorWidget:
 	 * Set new range to be used with RadialIndicatorWidget.
 	 */
 	void
-	set_range (Xefis::Range<double>);
+	set_range (xf::Range<double>);
 
 	/**
 	 * Set precision (digits after decimal point).
@@ -92,20 +92,20 @@ class RadialIndicatorWidget:
 	paint_indicator (float q, float r);
 
   private:
-	Xefis::Range<double>		_range				= { 0.f, 1.f };
-	int							_precision			= 0;
-	int							_modulo				= 0;
-	Optional<double>			_value;
-	Optional<double>			_warning_value;
-	Optional<double>			_critical_value;
-	Optional<double>			_reference_value;
-	Optional<double>			_target_value;
-	Optional<double>			_automatic_value;
+	xf::Range<double>		_range				= { 0.f, 1.f };
+	int						_precision			= 0;
+	int						_modulo				= 0;
+	Optional<double>		_value;
+	Optional<double>		_warning_value;
+	Optional<double>		_critical_value;
+	Optional<double>		_reference_value;
+	Optional<double>		_target_value;
+	Optional<double>		_automatic_value;
 };
 
 
 inline void
-RadialIndicatorWidget::set_range (Xefis::Range<double> range)
+RadialIndicatorWidget::set_range (xf::Range<double> range)
 {
 	_range = range;
 	update();

@@ -90,7 +90,7 @@ CDU::Strip::fresh() const noexcept
 
 
 void
-CDU::Strip::paint (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool focused)
+CDU::Strip::paint (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool focused)
 {
 	QPen focus_pen = aids._autopilot_pen_2;
 	double fpw = 0.5 * focus_pen.width();
@@ -142,7 +142,7 @@ CDU::Strip::paint (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Paint
 
 
 void
-CDU::Strip::paint_button_helper (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, ButtonState state)
+CDU::Strip::paint_button_helper (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, ButtonState state)
 {
 	QRectF btn_rect (rect.topLeft(), QSizeF (0.6 * rect.width(), rect.height()));
 	if (column == Column::Right)
@@ -222,7 +222,7 @@ CDU::Strip::paint_button_helper (QRectF const& rect, Xefis::InstrumentAids& aids
 
 
 void
-CDU::Strip::paint_title_helper (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, QString const& title, QColor color)
+CDU::Strip::paint_title_helper (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, QString const& title, QColor color)
 {
 	Qt::Alignment title_alignment;
 
@@ -244,7 +244,7 @@ CDU::Strip::paint_title_helper (QRectF const& rect, Xefis::InstrumentAids& aids,
 
 
 void
-CDU::Strip::paint_value_helper (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, QString const& value, QColor color)
+CDU::Strip::paint_value_helper (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, QString const& value, QColor color)
 {
 	Qt::Alignment value_alignment;
 
@@ -266,7 +266,7 @@ CDU::Strip::paint_value_helper (QRectF const& rect, Xefis::InstrumentAids& aids,
 
 
 void
-CDU::Strip::paint_focus_helper (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column)
+CDU::Strip::paint_focus_helper (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
 {
 	QRectF const& r = button_rect;
 	QPolygonF polygon;
@@ -326,7 +326,7 @@ CDU::EmptyStrip::EmptyStrip (CDU& cdu, Column column):
 
 
 void
-CDU::EmptyStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::EmptyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	paint_button_helper (rect, aids, painter, column, ButtonState::Disabled);
 }
@@ -336,7 +336,7 @@ CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, C
 	Strip (cdu, setting_element.attribute ("title"), column)
 {
 	if (!setting_element.hasAttribute ("path"))
-		throw Xefis::MissingDomAttribute (setting_element, "path");
+		throw xf::MissingDomAttribute (setting_element, "path");
 
 	_nil_value = setting_element.attribute ("nil-value", "").toStdString();
 	_format = setting_element.attribute ("format", "%1%").toStdString();
@@ -375,7 +375,7 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 	{
 		if (_property.is_type<bool>())
 		{
-			Xefis::PropertyBoolean& property = static_cast<Xefis::PropertyBoolean&> (_property);
+			xf::PropertyBoolean& property = static_cast<xf::PropertyBoolean&> (_property);
 			property = !*property;
 		}
 		else
@@ -419,7 +419,7 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 
 void
-CDU::SettingStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::SettingStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	_button_rect = rect;
 	ButtonState button_state = ButtonState::Normal;
@@ -432,24 +432,24 @@ CDU::SettingStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids
 
 
 void
-CDU::SettingStrip::paint_title (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::SettingStrip::paint_title (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	paint_title_helper (rect, aids, painter, column, title(), QColor (0xcc, 0xd7, 0xe7));
 }
 
 
 void
-CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	if (_property.valid())
 	{
 		if (_property.is_type<bool>())
 		{
-			bool p = *static_cast<Xefis::PropertyBoolean&> (_property);
+			bool p = *static_cast<xf::PropertyBoolean&> (_property);
 			std::string const act_val = p ? _true_value : _false_value;
 			std::string const inact_val = p ? _false_value : _true_value;
 
-			Xefis::TextLayout tl;
+			xf::TextLayout tl;
 			tl.set_alignment (Qt::AlignCenter);
 			tl.set_background (Qt::NoBrush);
 
@@ -477,7 +477,7 @@ CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids,
 			try {
 				str_val = QString::fromStdString (_property.stringify (boost::format (_format), _unit, _nil_value));
 			}
-			catch (Xefis::StringifyError const& exception)
+			catch (xf::StringifyError const& exception)
 			{
 				str_color = Qt::red;
 				str_val = exception.what();
@@ -495,7 +495,7 @@ CDU::SettingStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids,
 
 
 void
-CDU::SettingStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column)
+CDU::SettingStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
 {
 	if (!_read_only)
 		paint_focus_helper (rect, button_rect, aids, painter, column);
@@ -506,7 +506,7 @@ CDU::GotoStrip::GotoStrip (CDU& cdu, QDomElement const& goto_element, Column col
 	Strip (cdu, goto_element.attribute ("title"), column)
 {
 	if (!goto_element.hasAttribute ("page-id"))
-		throw Xefis::MissingDomAttribute (goto_element, "page-id");
+		throw xf::MissingDomAttribute (goto_element, "page-id");
 
 	_target_page_id = goto_element.attribute ("page-id");
 }
@@ -538,7 +538,7 @@ CDU::GotoStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 
 void
-CDU::GotoStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::GotoStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	_button_rect = rect;
 	bool over_button = _button_rect.contains (cdu().mapFromGlobal (QCursor::pos()));
@@ -547,20 +547,20 @@ CDU::GotoStrip::paint_button (QRectF const& rect, Xefis::InstrumentAids& aids, X
 
 
 void
-CDU::GotoStrip::paint_value (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column, bool)
+CDU::GotoStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	paint_value_helper (rect, aids, painter, column, title(), Qt::white);
 }
 
 
 void
-CDU::GotoStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter, Column column)
+CDU::GotoStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
 {
 	paint_focus_helper (rect, button_rect, aids, painter, column);
 }
 
 
-CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefis::Logger const& logger)
+CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::Logger const& logger)
 {
 	if (page_element.hasAttribute ("id"))
 		_id = page_element.attribute ("id");
@@ -619,7 +619,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 				}
 			}
 			else
-				throw Xefis::BadDomElement (e);
+				throw xf::BadDomElement (e);
 		}
 
 		// Handle FillStrips:
@@ -678,7 +678,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, Xefi
 			parse_column (e);
 		}
 		else
-			throw Xefis::BadDomElement (e);
+			throw xf::BadDomElement (e);
 	}
 }
 
@@ -772,7 +772,7 @@ CDU::Page::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 
 void
-CDU::Page::paint (QRectF const& rect, Xefis::InstrumentAids& aids, Xefis::Painter& painter)
+CDU::Page::paint (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter)
 {
 	auto paint_column = [&] (Column column, QRectF const& column_rect, Page::Strips const& strips)
 	{
@@ -827,7 +827,7 @@ CDU::Page::reset()
 }
 
 
-CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger const& logger):
+CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, xf::Logger const& logger):
 	_logger (logger)
 {
 	_default_page_id = pages_element.attribute ("default");
@@ -841,10 +841,10 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, Xefis::Logger c
 		{
 			Shared<Page> page = std::make_shared<Page> (cdu, e, *this, logger);
 			if (!_pages_by_id.insert ({ page->id(), page }).second)
-				throw Xefis::BadConfiguration ("duplicate page with id '" + page->id() + "'");
+				throw xf::BadConfiguration ("duplicate page with id '" + page->id() + "'");
 		}
 		else
-			throw Xefis::BadDomElement (e);
+			throw xf::BadDomElement (e);
 	}
 
 	check_reachability();
@@ -934,8 +934,8 @@ CDU::Config::check_reachability() const
 }
 
 
-CDU::CDU (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+CDU::CDU (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (0.5f)
 {
 	setFocusPolicy (Qt::StrongFocus);
@@ -949,7 +949,7 @@ CDU::CDU (Xefis::ModuleManager* module_manager, QDomElement const& config):
 			break;
 		}
 		else if (e != "settings" && e != "properties")
-			throw Xefis::BadDomElement (e);
+			throw xf::BadDomElement (e);
 	}
 
 	_current_page_id = _config->default_page_id();
@@ -981,7 +981,7 @@ CDU::post_message (QString const& message)
 void
 CDU::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 

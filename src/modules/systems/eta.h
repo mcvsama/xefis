@@ -25,11 +25,11 @@
 #include <xefis/utility/smoother.h>
 
 
-class ETA: public Xefis::Module
+class ETA: public xf::Module
 {
   public:
 	// Ctor
-	ETA (Xefis::ModuleManager*, QDomElement const& config);
+	ETA (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -40,18 +40,18 @@ class ETA: public Xefis::Module
 	compute();
 
   private:
-	Xefis::Smoother<double>	_smoother = 3_s;
+	xf::Smoother<double>	_smoother = 3_s;
 	Optional<Length>		_prev_distance;
 	// Input:
-	Xefis::PropertyAngle	_input_station_latitude;
-	Xefis::PropertyAngle	_input_station_longitude;
-	Xefis::PropertyAngle	_input_aircraft_latitude;
-	Xefis::PropertyAngle	_input_aircraft_longitude;
-	Xefis::PropertyAngle	_input_track_lateral_true;
+	xf::PropertyAngle		_input_station_latitude;
+	xf::PropertyAngle		_input_station_longitude;
+	xf::PropertyAngle		_input_aircraft_latitude;
+	xf::PropertyAngle		_input_aircraft_longitude;
+	xf::PropertyAngle		_input_track_lateral_true;
 	// Output:
-	Xefis::PropertyTime		_output_eta;
+	xf::PropertyTime		_output_eta;
 	// Other:
-	Xefis::PropertyObserver	_eta_computer;
+	xf::PropertyObserver	_eta_computer;
 };
 
 #endif

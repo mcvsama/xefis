@@ -29,7 +29,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-roll-autotrim", AFCS_RollAutotrim);
 
 
-AFCS_RollAutotrim::AFCS_RollAutotrim (Xefis::ModuleManager* module_manager, QDomElement const& config):
+AFCS_RollAutotrim::AFCS_RollAutotrim (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

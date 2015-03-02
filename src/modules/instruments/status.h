@@ -30,7 +30,7 @@
 
 class StatusWidget;
 
-class Status: public Xefis::Instrument
+class Status: public xf::Instrument
 {
 	Q_OBJECT
 
@@ -85,7 +85,7 @@ class Status: public Xefis::Instrument
 			test() const;
 
 		  private:
-			Xefis::PropertyBoolean	_observed_property;
+			xf::PropertyBoolean	_observed_property;
 			bool					_valid_state	= true;
 			bool					_fail_on_nil	= false;
 		};
@@ -154,26 +154,26 @@ class Status: public Xefis::Instrument
 
   public:
 	// Ctor
-	Status (Xefis::ModuleManager*, QDomElement const& config);
+	Status (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
 	data_updated() override;
 
   private:
-	StatusWidget*						_status_widget			= nullptr;
-	Xefis::PropertyInteger				_input_cursor_value;
-	Unique<xf::DeltaDecoder>			_input_cursor_decoder;
-	Xefis::PropertyBoolean				_input_button_cursor_del;
-	Xefis::PropertyBoolean				_input_button_recall;
-	Xefis::PropertyBoolean				_input_button_clear;
-	Xefis::PropertyBoolean				_input_button_master_caution;
-	Xefis::PropertyBoolean				_input_button_master_warning;
-	Xefis::PropertyBoolean				_output_master_caution;
-	Xefis::PropertyBoolean				_output_master_warning;
-	std::list<MessageDefinition>		_messages;
-	Time								_minimum_display_time	= 5_s;
-	Time								_last_message_timestamp;
+	StatusWidget*					_status_widget			= nullptr;
+	xf::PropertyInteger				_input_cursor_value;
+	Unique<xf::DeltaDecoder>		_input_cursor_decoder;
+	xf::PropertyBoolean				_input_button_cursor_del;
+	xf::PropertyBoolean				_input_button_recall;
+	xf::PropertyBoolean				_input_button_clear;
+	xf::PropertyBoolean				_input_button_master_caution;
+	xf::PropertyBoolean				_input_button_master_warning;
+	xf::PropertyBoolean				_output_master_caution;
+	xf::PropertyBoolean				_output_master_warning;
+	std::list<MessageDefinition>	_messages;
+	Time							_minimum_display_time	= 5_s;
+	Time							_last_message_timestamp;
 };
 
 

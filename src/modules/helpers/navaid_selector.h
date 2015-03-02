@@ -23,13 +23,13 @@
 #include <xefis/core/property.h>
 
 
-class NavaidSelector: public Xefis::Module
+class NavaidSelector: public xf::Module
 {
 	static constexpr int MaxInputs = 8;
 
   public:
 	// Ctor
-	NavaidSelector (Xefis::ModuleManager*, QDomElement const& config);
+	NavaidSelector (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -52,28 +52,28 @@ class NavaidSelector: public Xefis::Module
 
   private:
 	// Input:
-	Xefis::PropertyInteger							_selected_input;
-	std::array<Xefis::PropertyInteger, MaxInputs>	_inputs_type;
-	std::array<Xefis::PropertyString, MaxInputs>	_inputs_reference;
-	std::array<Xefis::PropertyString, MaxInputs>	_inputs_identifier;
-	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_radial_magnetic;
-	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_reciprocal_magnetic;
-	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_initial_bearing_magnetic;
-	std::array<Xefis::PropertyLength, MaxInputs>	_inputs_distance;
-	std::array<Xefis::PropertyTime, MaxInputs>		_inputs_eta;
-	std::array<Xefis::PropertyAngle, MaxInputs>		_inputs_deviation;
-	std::array<Xefis::PropertyBoolean, MaxInputs>	_inputs_to_flag;
+	xf::PropertyInteger							_selected_input;
+	std::array<xf::PropertyInteger, MaxInputs>	_inputs_type;
+	std::array<xf::PropertyString, MaxInputs>	_inputs_reference;
+	std::array<xf::PropertyString, MaxInputs>	_inputs_identifier;
+	std::array<xf::PropertyAngle, MaxInputs>	_inputs_radial_magnetic;
+	std::array<xf::PropertyAngle, MaxInputs>	_inputs_reciprocal_magnetic;
+	std::array<xf::PropertyAngle, MaxInputs>	_inputs_initial_bearing_magnetic;
+	std::array<xf::PropertyLength, MaxInputs>	_inputs_distance;
+	std::array<xf::PropertyTime, MaxInputs>		_inputs_eta;
+	std::array<xf::PropertyAngle, MaxInputs>	_inputs_deviation;
+	std::array<xf::PropertyBoolean, MaxInputs>	_inputs_to_flag;
 	// Output:
-	Xefis::PropertyInteger							_output_type;
-	Xefis::PropertyString							_output_reference;
-	Xefis::PropertyString							_output_identifier;
-	Xefis::PropertyAngle							_output_radial_magnetic;
-	Xefis::PropertyAngle							_output_reciprocal_magnetic;
-	Xefis::PropertyAngle							_output_initial_bearing_magnetic;
-	Xefis::PropertyLength							_output_distance;
-	Xefis::PropertyTime								_output_eta;
-	Xefis::PropertyAngle							_output_deviation;
-	Xefis::PropertyBoolean							_output_to_flag;
+	xf::PropertyInteger							_output_type;
+	xf::PropertyString							_output_reference;
+	xf::PropertyString							_output_identifier;
+	xf::PropertyAngle							_output_radial_magnetic;
+	xf::PropertyAngle							_output_reciprocal_magnetic;
+	xf::PropertyAngle							_output_initial_bearing_magnetic;
+	xf::PropertyLength							_output_distance;
+	xf::PropertyTime							_output_eta;
+	xf::PropertyAngle							_output_deviation;
+	xf::PropertyBoolean							_output_to_flag;
 };
 
 #endif

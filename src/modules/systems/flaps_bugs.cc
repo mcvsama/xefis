@@ -29,7 +29,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-bugs", FlapsBugs);
 
 
-FlapsBugs::FlapsBugs (Xefis::ModuleManager* module_manager, QDomElement const& config):
+FlapsBugs::FlapsBugs (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
@@ -51,7 +51,7 @@ FlapsBugs::FlapsBugs (Xefis::ModuleManager* module_manager, QDomElement const& c
 void
 FlapsBugs::data_updated()
 {
-	Xefis::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
+	xf::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
 
 	if (_input_flaps_setting.valid())
 	{

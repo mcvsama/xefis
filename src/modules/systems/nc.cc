@@ -32,7 +32,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/nc", NavigationComputer);
 
 
-NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
+NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config),
 	_positions (3),
 	_positions_accurate_2_times (3),
@@ -134,7 +134,7 @@ NavigationComputer::NavigationComputer (Xefis::ModuleManager* module_manager, QD
 void
 NavigationComputer::data_updated()
 {
-	Xefis::PropertyObserver* computers[] = {
+	xf::PropertyObserver* computers[] = {
 		// Order is important:
 		&_position_computer,
 		&_magnetic_variation_computer,
@@ -143,7 +143,7 @@ NavigationComputer::data_updated()
 		&_ground_speed_computer,
 	};
 
-	for (Xefis::PropertyObserver* o: computers)
+	for (xf::PropertyObserver* o: computers)
 		o->data_updated (update_time());
 }
 
@@ -213,7 +213,7 @@ NavigationComputer::compute_magnetic_variation()
 {
 	if (_position_longitude.valid() && _position_latitude.valid())
 	{
-		Xefis::MagneticVariation mv;
+		xf::MagneticVariation mv;
 		mv.set_position (LonLat (*_position_longitude, *_position_latitude));
 		if (_position_altitude_amsl.valid())
 			mv.set_altitude_amsl (*_position_altitude_amsl);
@@ -243,7 +243,7 @@ NavigationComputer::compute_headings()
 		_orientation_heading_magnetic.write (1_deg * _orientation_heading_magnetic_smoother.process ((*_orientation_input_heading_magnetic).deg(), update_dt));
 
 		if (_magnetic_declination.valid())
-			_orientation_heading_true.write (Xefis::magnetic_to_true (*_orientation_heading_magnetic, *_magnetic_declination));
+			_orientation_heading_true.write (xf::magnetic_to_true (*_orientation_heading_magnetic, *_magnetic_declination));
 		else
 			_orientation_heading_true.set_nil();
 	}
@@ -292,11 +292,11 @@ NavigationComputer::compute_track()
 			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt));
 
 			Angle initial_true_heading = pos_last.lateral_position.initial_bearing (pos_prev.lateral_position);
-			Angle true_heading = Xefis::floored_mod (initial_true_heading + 180_deg, 360_deg);
+			Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
 			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt));
 
 			if (_magnetic_declination.valid())
-				_track_lateral_magnetic.write (Xefis::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
+				_track_lateral_magnetic.write (xf::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
 			else
 				_track_lateral_magnetic.set_nil();
 		}
@@ -334,7 +334,7 @@ NavigationComputer::compute_track()
 			if (!std::isinf (rotation_speed.internal()) && !std::isnan (rotation_speed.internal()))
 			{
 				rotation_speed = 1_Hz * _track_lateral_rotation_smoother.process (rotation_speed.Hz(), update_dt);
-				result_rotation_speed = Xefis::limit (rotation_speed, -1_Hz, +1_Hz);
+				result_rotation_speed = xf::limit (rotation_speed, -1_Hz, +1_Hz);
 			}
 			else
 				_track_lateral_rotation_smoother.invalidate();

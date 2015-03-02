@@ -30,7 +30,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("helpers/sound", Sound);
 
 
-Sound::Alarm::Alarm (QDomElement const& alarm_element, Xefis::SoundManager* sound_manager):
+Sound::Alarm::Alarm (QDomElement const& alarm_element, xf::SoundManager* sound_manager):
 	_sound_manager (sound_manager)
 {
 	_sound_file_path = alarm_element.attribute ("sound");
@@ -94,7 +94,7 @@ Sound::Alarm::stop()
 }
 
 
-Sound::Group::Group (QDomElement const& element, Xefis::SoundManager* sound_manager)
+Sound::Group::Group (QDomElement const& element, xf::SoundManager* sound_manager)
 {
 	if (element == "group")
 	{
@@ -103,13 +103,13 @@ Sound::Group::Group (QDomElement const& element, Xefis::SoundManager* sound_mana
 			if (e == "alarm")
 				_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
 			else
-				throw Xefis::BadDomElement (e);
+				throw xf::BadDomElement (e);
 		}
 	}
 	else if (element == "alarm")
 		_alarms.insert (std::make_unique<Alarm> (element, sound_manager));
 	else
-		throw Xefis::BadDomElement (element);
+		throw xf::BadDomElement (element);
 }
 
 
@@ -128,7 +128,7 @@ Sound::Group::check()
 }
 
 
-Sound::Sound (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Sound::Sound (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	for (QDomElement e: config)
@@ -140,11 +140,11 @@ Sound::Sound (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				if (e2 == "group" || e2 == "alarm")
 					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->application()->sound_manager()));
 				else
-					throw Xefis::BadDomElement (e2);
+					throw xf::BadDomElement (e2);
 			}
 		}
 		else
-			throw Xefis::BadDomElement (e);
+			throw xf::BadDomElement (e);
 	}
 }
 

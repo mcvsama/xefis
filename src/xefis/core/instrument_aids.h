@@ -63,7 +63,7 @@ class InstrumentAids
 
   public:
 	/**
-	 * Return Xefis::Painter to use. Use begin() and end() methods to begin/end painting.
+	 * Return xf::Painter to use. Use begin() and end() methods to begin/end painting.
 	 */
 	Painter&
 	painter() noexcept;
@@ -124,46 +124,46 @@ class InstrumentAids
 	arc_span (Angle deg);
 
   public:
-	Xefis::Painter				_painter;
-	Xefis::TextPainter::Cache	_text_painter_cache;
-	QFont						_font;
-	QFont						_font_8;
-	QFont						_font_10;
-	QFont						_font_13;
-	QFont						_font_16;
-	QFont						_font_18;
-	QFont						_font_20;
-	float						_font_8_digit_width		= 0.f;
-	float						_font_10_digit_width	= 0.f;
-	float						_font_13_digit_width	= 0.f;
-	float						_font_16_digit_width	= 0.f;
-	float						_font_18_digit_width	= 0.f;
-	float						_font_20_digit_width	= 0.f;
-	float						_font_8_digit_height	= 0.f;
-	float						_font_10_digit_height	= 0.f;
-	float						_font_13_digit_height	= 0.f;
-	float						_font_16_digit_height	= 0.f;
-	float						_font_18_digit_height	= 0.f;
-	float						_font_20_digit_height	= 0.f;
-	QColor						_autopilot_color		= { 250, 20, 255 };
-	QColor						_navigation_color		= { 60, 255, 40 };
-	QColor						_warning_color_1		= { 255, 40, 40 };
-	QColor						_warning_color_2		= { 255, 200, 50 };
-	QColor						_silver					= { 0xcc, 0xca, 0xc2 };
-	QColor						_std_cyan				= { 0x00, 0xcc, 0xff };
-	float						_height_for_width		= 1.f;
-	float						_master_pen_scale		= 1.f;
-	float						_master_font_scale		= 1.f;
-	QPen						_autopilot_pen_1;
-	QPen						_autopilot_pen_2;
-	float						_w						= 0.f;
-	float						_h						= 0.f;
-	float						_window_w				= 0.f;
-	float						_window_h				= 0.f;
-	QRectF						_rect;
+	xf::Painter				_painter;
+	xf::TextPainter::Cache	_text_painter_cache;
+	QFont					_font;
+	QFont					_font_8;
+	QFont					_font_10;
+	QFont					_font_13;
+	QFont					_font_16;
+	QFont					_font_18;
+	QFont					_font_20;
+	float					_font_8_digit_width		= 0.f;
+	float					_font_10_digit_width	= 0.f;
+	float					_font_13_digit_width	= 0.f;
+	float					_font_16_digit_width	= 0.f;
+	float					_font_18_digit_width	= 0.f;
+	float					_font_20_digit_width	= 0.f;
+	float					_font_8_digit_height	= 0.f;
+	float					_font_10_digit_height	= 0.f;
+	float					_font_13_digit_height	= 0.f;
+	float					_font_16_digit_height	= 0.f;
+	float					_font_18_digit_height	= 0.f;
+	float					_font_20_digit_height	= 0.f;
+	QColor					_autopilot_color		= { 250, 20, 255 };
+	QColor					_navigation_color		= { 60, 255, 40 };
+	QColor					_warning_color_1		= { 255, 40, 40 };
+	QColor					_warning_color_2		= { 255, 200, 50 };
+	QColor					_silver					= { 0xcc, 0xca, 0xc2 };
+	QColor					_std_cyan				= { 0x00, 0xcc, 0xff };
+	float					_height_for_width		= 1.f;
+	float					_master_pen_scale		= 1.f;
+	float					_master_font_scale		= 1.f;
+	QPen					_autopilot_pen_1;
+	QPen					_autopilot_pen_2;
+	float					_w						= 0.f;
+	float					_h						= 0.f;
+	float					_window_w				= 0.f;
+	float					_window_h				= 0.f;
+	QRectF					_rect;
 
-	static const char			DIGITS[10];
-	static const char*			MINUS_SIGN;
+	static const char		DIGITS[10];
+	static const char*		MINUS_SIGN;
 };
 
 

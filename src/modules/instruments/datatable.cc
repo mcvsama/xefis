@@ -45,16 +45,16 @@ Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_lab
 		if (e == "label")
 		{
 			if (e.hasAttribute ("color"))
-				label_color = Xefis::parse_color (e.attribute ("color"));
+				label_color = xf::parse_color (e.attribute ("color"));
 			label = e.text();
 		}
 		else if (e == "value")
 		{
 			if (!e.hasAttribute ("path"))
-				throw Xefis::MissingDomAttribute (e, "path");
+				throw xf::MissingDomAttribute (e, "path");
 
 			if (e.hasAttribute ("color"))
-				value_color = Xefis::parse_color (e.attribute ("color"));
+				value_color = xf::parse_color (e.attribute ("color"));
 
 			if (e.hasAttribute ("format"))
 				format = e.attribute ("format").toStdString();
@@ -76,8 +76,8 @@ Datatable::LabelValue::stringify() const
 }
 
 
-Datatable::Datatable (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+Datatable::Datatable (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (0.5f)
 {
 	QString label_color_str;
@@ -92,9 +92,9 @@ Datatable::Datatable (Xefis::ModuleManager* module_manager, QDomElement const& c
 		{ "align", align_str, false },
 	});
 
-	_default_label_color = Xefis::parse_color (label_color_str);
-	_default_value_color = Xefis::parse_color (value_color_str);
-	_alignment = Xefis::parse_alignment (align_str);
+	_default_label_color = xf::parse_color (label_color_str);
+	_default_value_color = xf::parse_color (value_color_str);
+	_alignment = xf::parse_alignment (align_str);
 
 	for (QDomElement e: config)
 		if (e == "table")
@@ -115,7 +115,7 @@ Datatable::data_updated()
 void
 Datatable::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 
@@ -160,7 +160,7 @@ Datatable::paintEvent (QPaintEvent*)
 		try {
 			lv_s = lv.stringify();
 		}
-		catch (Xefis::StringifyError const& exception)
+		catch (xf::StringifyError const& exception)
 		{
 			painter().setPen (get_pen (Qt::red, 1.0));
 			lv_s = exception.what();

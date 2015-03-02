@@ -31,7 +31,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class NavigationComputer: public Xefis::Module
+class NavigationComputer: public xf::Module
 {
   private:
 	struct Position
@@ -48,7 +48,7 @@ class NavigationComputer: public Xefis::Module
 
   public:
 	// Ctor
-	NavigationComputer (Xefis::ModuleManager*, QDomElement const& config);
+	NavigationComputer (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -70,54 +70,54 @@ class NavigationComputer: public Xefis::Module
 	compute_ground_speed();
 
   private:
-	Positions					_positions;
-	Positions					_positions_accurate_2_times;
-	Positions					_positions_accurate_9_times;
+	Positions				_positions;
+	Positions				_positions_accurate_2_times;
+	Positions				_positions_accurate_9_times;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
-	Xefis::Smoother<double>		_orientation_pitch_smoother				= 25_ms;
-	Xefis::Smoother<double>		_orientation_roll_smoother				= 25_ms;
-	Xefis::Smoother<double>		_orientation_heading_magnetic_smoother	= 200_ms;
-	Xefis::Smoother<double>		_track_vertical_smoother				= 500_ms;
-	Xefis::Smoother<double>		_track_lateral_true_smoother			= 500_ms;
-	Xefis::Smoother<double>		_track_lateral_rotation_smoother		= 1500_ms;
-	Xefis::Smoother<double>		_track_ground_speed_smoother			= 2_s;
-	Time						_track_accumulated_dt					= 0_s;
+	xf::Smoother<double>	_orientation_pitch_smoother				= 25_ms;
+	xf::Smoother<double>	_orientation_roll_smoother				= 25_ms;
+	xf::Smoother<double>	_orientation_heading_magnetic_smoother	= 200_ms;
+	xf::Smoother<double>	_track_vertical_smoother				= 500_ms;
+	xf::Smoother<double>	_track_lateral_true_smoother			= 500_ms;
+	xf::Smoother<double>	_track_lateral_rotation_smoother		= 1500_ms;
+	xf::Smoother<double>	_track_ground_speed_smoother			= 2_s;
+	Time					_track_accumulated_dt					= 0_s;
 	// Input:
-	Xefis::PropertyAngle		_position_input_longitude;
-	Xefis::PropertyAngle		_position_input_latitude;
-	Xefis::PropertyLength		_position_input_altitude_amsl;
-	Xefis::PropertyLength		_position_input_accuracy_lateral;
-	Xefis::PropertyLength		_position_input_accuracy_vertical;
-	Xefis::PropertyString		_position_input_source;
-	Xefis::PropertyAngle		_orientation_input_pitch;
-	Xefis::PropertyAngle		_orientation_input_roll;
-	Xefis::PropertyAngle		_orientation_input_heading_magnetic;
+	xf::PropertyAngle		_position_input_longitude;
+	xf::PropertyAngle		_position_input_latitude;
+	xf::PropertyLength		_position_input_altitude_amsl;
+	xf::PropertyLength		_position_input_accuracy_lateral;
+	xf::PropertyLength		_position_input_accuracy_vertical;
+	xf::PropertyString		_position_input_source;
+	xf::PropertyAngle		_orientation_input_pitch;
+	xf::PropertyAngle		_orientation_input_roll;
+	xf::PropertyAngle		_orientation_input_heading_magnetic;
 	// Output:
-	Xefis::PropertyAngle		_position_longitude;
-	Xefis::PropertyAngle		_position_latitude;
-	Xefis::PropertyLength		_position_altitude_amsl;
-	Xefis::PropertyLength		_position_accuracy_lateral;
-	Xefis::PropertyLength		_position_accuracy_vertical;
-	Xefis::PropertyLength		_position_accuracy;
-	Xefis::PropertyString		_position_source;
-	Xefis::PropertyAngle		_orientation_pitch;
-	Xefis::PropertyAngle		_orientation_roll;
-	Xefis::PropertyAngle		_orientation_heading_magnetic;
-	Xefis::PropertyAngle		_orientation_heading_true;
-	Xefis::PropertyAngle		_track_vertical;
-	Xefis::PropertyAngle		_track_lateral_magnetic;
-	Xefis::PropertyAngle		_track_lateral_true;
-	Xefis::PropertyFrequency	_track_lateral_rotation;
-	Xefis::PropertySpeed		_track_ground_speed;
-	Xefis::PropertyAngle		_magnetic_declination;
-	Xefis::PropertyAngle		_magnetic_inclination;
+	xf::PropertyAngle		_position_longitude;
+	xf::PropertyAngle		_position_latitude;
+	xf::PropertyLength		_position_altitude_amsl;
+	xf::PropertyLength		_position_accuracy_lateral;
+	xf::PropertyLength		_position_accuracy_vertical;
+	xf::PropertyLength		_position_accuracy;
+	xf::PropertyString		_position_source;
+	xf::PropertyAngle		_orientation_pitch;
+	xf::PropertyAngle		_orientation_roll;
+	xf::PropertyAngle		_orientation_heading_magnetic;
+	xf::PropertyAngle		_orientation_heading_true;
+	xf::PropertyAngle		_track_vertical;
+	xf::PropertyAngle		_track_lateral_magnetic;
+	xf::PropertyAngle		_track_lateral_true;
+	xf::PropertyFrequency	_track_lateral_rotation;
+	xf::PropertySpeed		_track_ground_speed;
+	xf::PropertyAngle		_magnetic_declination;
+	xf::PropertyAngle		_magnetic_inclination;
 	// Other:
-	Xefis::PropertyObserver		_position_computer;
-	Xefis::PropertyObserver		_magnetic_variation_computer;
-	Xefis::PropertyObserver		_headings_computer;
-	Xefis::PropertyObserver		_track_computer;
-	Xefis::PropertyObserver		_ground_speed_computer;
+	xf::PropertyObserver	_position_computer;
+	xf::PropertyObserver	_magnetic_variation_computer;
+	xf::PropertyObserver	_headings_computer;
+	xf::PropertyObserver	_track_computer;
+	xf::PropertyObserver	_ground_speed_computer;
 };
 
 #endif

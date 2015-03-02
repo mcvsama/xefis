@@ -29,8 +29,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/gear", Gear);
 
 
-Gear::Gear (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config),
+Gear::Gear (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config),
 	InstrumentAids (0.5f)
 {
 	parse_properties (config, {
@@ -66,7 +66,7 @@ Gear::data_updated()
 void
 Gear::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 

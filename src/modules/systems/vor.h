@@ -28,11 +28,11 @@
 #include <xefis/utility/smoother.h>
 
 
-class VOR: public Xefis::Module
+class VOR: public xf::Module
 {
   public:
 	// Ctor
-	VOR (Xefis::ModuleManager*, QDomElement const& config);
+	VOR (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -58,23 +58,23 @@ class VOR: public Xefis::Module
 	denormalize (Angle);
 
   private:
-	Xefis::Smoother<double>	_deviation_smoother			= 500_ms;
+	xf::Smoother<double>	_deviation_smoother			= 500_ms;
 	// Input:
-	Xefis::PropertyAngle	_input_magnetic_declination;
-	Xefis::PropertyAngle	_input_station_latitude;
-	Xefis::PropertyAngle	_input_station_longitude;
-	Xefis::PropertyAngle	_input_aircraft_latitude;
-	Xefis::PropertyAngle	_input_aircraft_longitude;
-	Xefis::PropertyAngle	_input_radial_magnetic;
+	xf::PropertyAngle		_input_magnetic_declination;
+	xf::PropertyAngle		_input_station_latitude;
+	xf::PropertyAngle		_input_station_longitude;
+	xf::PropertyAngle		_input_aircraft_latitude;
+	xf::PropertyAngle		_input_aircraft_longitude;
+	xf::PropertyAngle		_input_radial_magnetic;
 	// Output:
-	Xefis::PropertyAngle	_output_radial_magnetic;
-	Xefis::PropertyAngle	_output_reciprocal_magnetic;
-	Xefis::PropertyAngle	_output_initial_bearing_magnetic;
-	Xefis::PropertyAngle	_output_deviation;
-	Xefis::PropertyBoolean	_output_to_flag;
-	Xefis::PropertyLength	_output_distance;
+	xf::PropertyAngle		_output_radial_magnetic;
+	xf::PropertyAngle		_output_reciprocal_magnetic;
+	xf::PropertyAngle		_output_initial_bearing_magnetic;
+	xf::PropertyAngle		_output_deviation;
+	xf::PropertyBoolean		_output_to_flag;
+	xf::PropertyLength		_output_distance;
 	// Other:
-	Xefis::PropertyObserver	_vor_computer;
+	xf::PropertyObserver	_vor_computer;
 };
 
 #endif

@@ -38,15 +38,15 @@
 #include "hsi_widget.h"
 
 
-using Xefis::Navaid;
-using Xefis::NavaidStorage;
+using xf::Navaid;
+using xf::NavaidStorage;
 
 
 void
 HSIWidget::Parameters::sanitize()
 {
-	using Xefis::limit;
-	using Xefis::floored_mod;
+	using xf::limit;
+	using xf::floored_mod;
 
 	range = limit (range, 1_ft, 5000_nmi);
 	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
@@ -257,7 +257,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		resized();
 	}
 
-	_locals.track_true = Xefis::floored_mod (_params.track_magnetic + (_params.heading_true - _params.heading_magnetic), 360_deg);
+	_locals.track_true = xf::floored_mod (_params.track_magnetic + (_params.heading_true - _params.heading_magnetic), 360_deg);
 
 	_locals.track =
 		_params.heading_mode == HeadingMode::Magnetic
@@ -335,7 +335,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		_locals.course_heading = *_params.course_setting_magnetic;
 		if (_params.heading_mode == HeadingMode::True)
 			_locals.course_heading += _params.heading_true - _params.heading_magnetic;
-		_locals.course_heading = Xefis::floored_mod (_locals.course_heading, 360_deg);
+		_locals.course_heading = xf::floored_mod (_locals.course_heading, 360_deg);
 	}
 
 	_locals.navaid_selected_visible = !_params.navaid_selected_reference.isEmpty() || !_params.navaid_selected_identifier.isEmpty() ||
@@ -372,7 +372,7 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_aircraft (xf::Painter& painter)
 {
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipping (false);
@@ -395,7 +395,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 		QString str = *_locals.ap_use_trk ? "SEL TRK " : "SEL HDG ";
 		// AP heading always set as magnetic, but can be displayed as true:
-		Xefis::TextLayout layout;
+		xf::TextLayout layout;
 		layout.set_background (Qt::black, { _margin, 0.0 });
 		layout.add_fragment (str, _font_13, _autopilot_pen_2.color());
 		layout.add_fragment (QString ("%1").arg (sel_hdg, 3, 10, QChar ('0')), _font_16, _autopilot_pen_2.color());
@@ -421,7 +421,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 				if (_params.heading_mode == HeadingMode::True)
 					box_pen = get_pen (_navigation_color, 1.0);
 
-				Xefis::TextLayout layout;
+				xf::TextLayout layout;
 				layout.set_background (Qt::black, { _margin, 0.0 });
 				layout.add_fragment (text_1 + " ", _font_13, _navigation_color);
 				layout.add_fragment (QString ("%1").arg (hdg, 3, 10, QChar ('0')), _font_16, _navigation_color, box_pen);
@@ -472,7 +472,7 @@ HSIWidget::PaintWorkUnit::paint_aircraft (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_navperf (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_navperf (xf::Painter& painter)
 {
 	if (_params.display_mode != DisplayMode::Auxiliary)
 	{
@@ -525,7 +525,7 @@ HSIWidget::PaintWorkUnit::paint_navperf (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 {
 	if (!_params.positioning_hint_visible || !_params.position)
 		return;
@@ -545,7 +545,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 		box_pen = get_pen (_navigation_color, 1.0);
 	}
 
-	Xefis::TextLayout layout;
+	xf::TextLayout layout;
 	layout.set_background (Qt::black, { _margin, 0.0 });
 	layout.add_fragment (hint, _font_13, _navigation_color, box_pen);
 	layout.paint (QPointF (x, _h), Qt::AlignBottom | Qt::AlignHCenter, painter);
@@ -553,7 +553,7 @@ HSIWidget::PaintWorkUnit::paint_hints (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_heading_triangle)
+HSIWidget::PaintWorkUnit::paint_track (xf::Painter& painter, bool paint_heading_triangle)
 {
 	Length trend_range = actual_trend_range();
 
@@ -632,12 +632,12 @@ HSIWidget::PaintWorkUnit::paint_track (Xefis::Painter& painter, bool paint_headi
 
 
 void
-HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_altitude_reach (xf::Painter& painter)
 {
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
-	float len = Xefis::limit (to_px (6_nmi), 2.f * _q, 7.f * _q);
+	float len = xf::limit (to_px (6_nmi), 2.f * _q, 7.f * _q);
 	float pos = to_px (_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
@@ -654,7 +654,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 {
 	QPen est_pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::RoundCap);
 
@@ -735,7 +735,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_ap_settings (xf::Painter& painter)
 {
 	if (!_params.ap_visible)
 		return;
@@ -777,7 +777,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 		switch (_params.display_mode)
 		{
 			case DisplayMode::Auxiliary:
-				limited_rotation = Xefis::floored_mod (*_locals.ap_bug_magnetic - _locals.rotation + 180_deg, 360_deg) - 180_deg;
+				limited_rotation = xf::floored_mod (*_locals.ap_bug_magnetic - _locals.rotation + 180_deg, 360_deg) - 180_deg;
 				break;
 
 			default:
@@ -806,7 +806,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_directions (xf::Painter& painter)
 {
 	if (!_params.heading_visible)
 		return;
@@ -876,14 +876,14 @@ HSIWidget::PaintWorkUnit::paint_directions (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_speeds_and_wind (xf::Painter& painter)
 {
 	QFont font_a = _font_13;
 	QFont font_b = _font_18;
 	QFontMetricsF metr_a (font_a);
 	QFontMetricsF metr_b (font_b);
 
-	Xefis::TextLayout layout;
+	xf::TextLayout layout;
 	layout.set_alignment (Qt::AlignLeft);
 
 	// GS
@@ -935,7 +935,7 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 {
 	if (_params.display_mode != DisplayMode::Auxiliary)
 		return;
@@ -991,7 +991,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (z, -h);
 
-		Xefis::TextLayout layout;
+		xf::TextLayout layout;
 		layout.set_background (Qt::black, { _margin, 0.0 });
 		layout.set_alignment (Qt::AlignRight);
 
@@ -1024,7 +1024,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_course (xf::Painter& painter)
 {
 	if (!_params.heading_visible || !_params.course_setting_magnetic || !_params.course_visible)
 		return;
@@ -1110,7 +1110,7 @@ HSIWidget::PaintWorkUnit::paint_course (Xefis::Painter& painter)
 	if (_params.course_deviation)
 	{
 		bool filled = false;
-		Angle deviation = Xefis::limit (*_params.course_deviation, -2.5_deg, +2.5_deg);
+		Angle deviation = xf::limit (*_params.course_deviation, -2.5_deg, +2.5_deg);
 		if (std::abs (_params.course_deviation->deg()) <= std::abs (deviation.deg()))
 			filled = true;
 
@@ -1168,7 +1168,7 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	std::string course_str = "/---°";
 	if (_params.navaid_selected_course_magnetic)
 	{
-		int course_int = Xefis::symmetric_round (_params.navaid_selected_course_magnetic->deg());
+		int course_int = xf::symmetric_round (_params.navaid_selected_course_magnetic->deg());
 		if (course_int == 0)
 			course_int = 360;
 		course_str = (boost::format ("/%03d°") % course_int).str();
@@ -1187,9 +1187,9 @@ HSIWidget::PaintWorkUnit::paint_selected_navaid_info()
 	if (_params.navaid_selected_distance)
 		distance_str = (boost::format ("%3.1f") % _params.navaid_selected_distance->nmi()).str();
 
-	Xefis::TextLayout layout;
+	xf::TextLayout layout;
 	layout.set_background (Qt::black, { _margin, 0.0 });
-	layout.set_background_mode (Xefis::TextLayout::PerLine);
+	layout.set_background_mode (xf::TextLayout::PerLine);
 	layout.set_alignment (Qt::AlignRight);
 	// If reference name is not empty, format is:
 	//   <reference:green> <identifier>/<course>°
@@ -1223,7 +1223,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	painter().resetTransform();
 	painter().setClipping (false);
 
-	auto configure_layout = [&](Xefis::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
+	auto configure_layout = [&](xf::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
 	{
 		if (!reference.isEmpty())
 			layout.add_fragment (reference, _font_16, color);
@@ -1234,7 +1234,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 		layout.add_fragment (distance ? (boost::format ("%.1f") % distance->nmi()).str() : std::string ("---"), _font_16, color);
 	};
 
-	Xefis::TextLayout left_layout;
+	xf::TextLayout left_layout;
 	left_layout.set_alignment (Qt::AlignLeft);
 	left_layout.set_background (Qt::black, { _margin, 0.0 });
 
@@ -1269,7 +1269,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	else
 		left_layout.add_skips (_font_16, 2);
 
-	Xefis::TextLayout right_layout;
+	xf::TextLayout right_layout;
 	right_layout.set_alignment (Qt::AlignRight);
 	right_layout.set_background (Qt::black, { _margin, 0.0 });
 
@@ -1282,7 +1282,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 
 
 void
-HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_pointers (xf::Painter& painter)
 {
 	if (!_params.heading_visible)
 		return;
@@ -1379,7 +1379,7 @@ HSIWidget::PaintWorkUnit::paint_pointers (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_range (xf::Painter& painter)
 {
 	if (_params.display_mode == DisplayMode::Expanded || _params.display_mode == DisplayMode::Rose)
 	{
@@ -1412,7 +1412,7 @@ HSIWidget::PaintWorkUnit::paint_range (Xefis::Painter& painter)
 
 
 void
-HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
+HSIWidget::PaintWorkUnit::paint_navaids (xf::Painter& painter)
 {
 	if (!_params.navaids_visible || !_params.position)
 		return;
@@ -1529,7 +1529,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 				else if (_params.range > _params.arpt_map_range_threshold)
 				{
 					// Draw airport runways:
-					for (Xefis::Navaid::Runway const& runway: navaid.runways())
+					for (xf::Navaid::Runway const& runway: navaid.runways())
 					{
 						// Make the drawn runway somewhat more wide:
 						double half_width = 1.5 * to_px (runway.width());
@@ -1554,7 +1554,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (Xefis::Painter& painter)
 						painter.drawLine (tr_l.map (QPointF (0.0, 0.0)), tr_l.map (QPointF (0.0, -length_px)));
 						painter.drawLine (tr_r.map (QPointF (0.0, 0.0)), tr_r.map (QPointF (0.0, -length_px)));
 						// Extended runway:
-						double m_px = Xefis::limit<double> (to_px (1_m), 0.02, 0.04);
+						double m_px = xf::limit<double> (to_px (1_m), 0.02, 0.04);
 						QPen dashed_pen = get_pen (Qt::white, 1.0, Qt::DashLine);
 						dashed_pen.setDashPattern (QVector<qreal>() << 300 * m_px << 200 * m_px);
 						painter.setPen (dashed_pen);
@@ -1902,7 +1902,7 @@ HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) c
 }
 
 
-HSIWidget::HSIWidget (QWidget* parent, Xefis::WorkPerformer* work_performer):
+HSIWidget::HSIWidget (QWidget* parent, xf::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
 	_local_paint_work_unit (this)
 {
@@ -1929,7 +1929,7 @@ HSIWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		_local_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
 }

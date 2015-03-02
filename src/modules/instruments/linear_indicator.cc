@@ -31,8 +31,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/linear-indicator", LinearIndicator);
 
 
-LinearIndicator::LinearIndicator (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config)
+LinearIndicator::LinearIndicator (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config)
 {
 	_widget = new LinearIndicatorWidget (this);
 
@@ -67,7 +67,7 @@ LinearIndicator::data_updated()
 	if (_initialize || _value.fresh())
 	{
 		_widget->set_mirrored_style (_style_mirrored);
-		_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
+		_widget->set_range (xf::Range<double> { _value_minimum, _value_maximum });
 		_widget->set_precision (_value_precision);
 		_widget->set_modulo (_value_modulo);
 		_widget->set_digits (_value_digits);

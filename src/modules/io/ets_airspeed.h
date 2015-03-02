@@ -33,7 +33,7 @@
  */
 class ETSAirspeed:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -51,7 +51,7 @@ class ETSAirspeed:
 
   public:
 	// Ctor:
-	ETSAirspeed (Xefis::ModuleManager*, QDomElement const& config);
+	ETSAirspeed (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	/**
@@ -88,19 +88,19 @@ class ETSAirspeed:
 	guard (std::function<void()> guarded_code);
 
   private:
-	Xefis::PropertyBoolean	_serviceable;
-	Xefis::PropertySpeed	_airspeed;
-	Xefis::PropertySpeed	_airspeed_minimum;
-	Xefis::PropertySpeed	_airspeed_maximum;
+	xf::PropertyBoolean		_serviceable;
+	xf::PropertySpeed		_airspeed;
+	xf::PropertySpeed		_airspeed_minimum;
+	xf::PropertySpeed		_airspeed_maximum;
 	Time					_airspeed_read_interval		= 100_ms;
 	Time					_airspeed_smoothing_time	= 100_ms;
-	Xefis::I2C::Device		_i2c_device;
+	xf::I2C::Device			_i2c_device;
 	Stage					_stage						= Stage::Calibrating;
 	QTimer*					_initialization_timer;
 	QTimer*					_periodic_read_timer;
 	std::vector<uint16_t>	_calibration_data;
 	uint16_t				_offset						= 0;
-	Xefis::Smoother<double>	_airspeed_smoother			= 100_ms;
+	xf::Smoother<double>	_airspeed_smoother			= 100_ms;
 };
 
 #endif

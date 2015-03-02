@@ -31,7 +31,7 @@ namespace Xefis {
 
 class GroupBox:
 	public QWidget,
-	protected Xefis::InstrumentAids
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor

@@ -33,7 +33,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-control", FlapsControl);
 constexpr Time FlapsControl::kUpdateInterval;
 
 
-FlapsControl::FlapsControl (Xefis::ModuleManager* module_manager, QDomElement const& config):
+FlapsControl::FlapsControl (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	QString settings_list_str;
@@ -57,7 +57,7 @@ FlapsControl::FlapsControl (Xefis::ModuleManager* module_manager, QDomElement co
 		_settings_list.insert (s.second.angle());
 
 	if (_settings_list.empty())
-		throw Xefis::BadConfiguration ("missing flaps configuration");
+		throw xf::BadConfiguration ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
 	_timer->setInterval (kUpdateInterval.ms());
@@ -92,7 +92,7 @@ FlapsControl::data_updated()
 
 	if (_input_setting.valid_and_fresh())
 	{
-		_setting = Xefis::limit (*_input_setting, _minimum, _maximum);
+		_setting = xf::limit (*_input_setting, _minimum, _maximum);
 		if (_output_setting.configured())
 			_output_setting.write (_setting);
 		_timer->start();
@@ -103,7 +103,7 @@ FlapsControl::data_updated()
 void
 FlapsControl::update_flap_position()
 {
-	double sgn = Xefis::sgn ((_setting - _current).deg());
+	double sgn = xf::sgn ((_setting - _current).deg());
 	Angle difference = _setting - _current;
 	Angle delta = 1_deg * (kUpdateInterval.s() * _degrees_per_second);
 
@@ -123,6 +123,6 @@ FlapsControl::update_flap_position()
 	if (_output_current.configured())
 		_output_current.write (_current);
 	if (_output_control.configured())
-		_output_control.write (Xefis::renormalize (_current.deg(), _minimum.deg(), _maximum.deg(), _ctl_minimum, _ctl_maximum));
+		_output_control.write (xf::renormalize (_current.deg(), _minimum.deg(), _maximum.deg(), _ctl_minimum, _ctl_maximum));
 }
 

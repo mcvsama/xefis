@@ -28,7 +28,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("log/latency", Latency);
 
 
-Latency::Latency (Xefis::ModuleManager* module_manager, QDomElement const& config):
+Latency::Latency (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	_log_timer = new QTimer (this);
@@ -42,18 +42,18 @@ Latency::Latency (Xefis::ModuleManager* module_manager, QDomElement const& confi
 void
 Latency::log_latency()
 {
-	Xefis::Accounting::StatsSet const& event_latency = accounting()->event_latency_stats();
+	xf::Accounting::StatsSet const& event_latency = accounting()->event_latency_stats();
 	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
 	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
 		% "event handling latency"
-		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s()
-		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).average().s()
-		% (double)event_latency.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s()
+		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).minimum().s()
+		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).average().s()
+		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).maximum().s()
 		<< std::endl;
 
 	// Get module stats, sort by average latency and log.
 
-	typedef Xefis::Accounting::ModuleStats ModuleStats;
+	typedef xf::Accounting::ModuleStats ModuleStats;
 
 	ModuleStats const& ms = accounting()->module_stats();
 	std::vector<ModuleStats::const_iterator> ordered_modules;
@@ -64,8 +64,8 @@ Latency::log_latency()
 	auto order_by_average = [](ModuleStats::const_iterator a, ModuleStats::const_iterator b)
 	{
 		return
-			a->second.select (Xefis::Accounting::Timespan::Last1000Samples).average() >
-			b->second.select (Xefis::Accounting::Timespan::Last1000Samples).average();
+			a->second.select (xf::Accounting::Timespan::Last1000Samples).average() >
+			b->second.select (xf::Accounting::Timespan::Last1000Samples).average();
 	};
 
 	std::sort (ordered_modules.begin(), ordered_modules.end(), order_by_average);
@@ -75,9 +75,9 @@ Latency::log_latency()
 		log() << boost::format ("[%-30s#%-20s] %.06lf %.06lf %.06lf")
 			% m->first.name().c_str()
 			% m->first.instance().c_str()
-			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).minimum().s())
-			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).average().s())
-			% static_cast<double> (m->second.select (Xefis::Accounting::Timespan::Last100Samples).maximum().s())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).minimum().s())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).average().s())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).maximum().s())
 			<< std::endl;
 	}
 }

@@ -206,7 +206,7 @@ ModuleManager::module_data_updated (Module* module) const
 		try {
 			module->data_updated();
 		}
-		catch (Xefis::Exception const& e)
+		catch (xf::Exception const& e)
 		{
 			std::cerr << "Exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
 			std::cerr << e << std::endl;
@@ -282,7 +282,7 @@ ModuleManager::try_rescue (Module* module) const
 	try {
 		module->rescue();
 	}
-	catch (Xefis::Exception const& e)
+	catch (xf::Exception const& e)
 	{
 		std::cerr << "Exception when rescuing module '" << typeid (*module).name() << "'; inhibiting from further actions." << std::endl;
 		std::cerr << e << std::endl;

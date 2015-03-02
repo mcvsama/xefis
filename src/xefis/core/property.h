@@ -255,7 +255,7 @@ template<class tType>
 		Property (Property const& other);
 
 		/**
-		 * Create a Property that belongs to Xefis::PropertyStorage::root()
+		 * Create a Property that belongs to xf::PropertyStorage::root()
 		 * (the default storage) and is bound to given path.
 		 * NOTE: The PropertyStorage must be initialized before attempting
 		 * to use this constructor.

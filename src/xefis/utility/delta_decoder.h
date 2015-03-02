@@ -32,7 +32,7 @@ class DeltaDecoder
 
   public:
 	// Ctor:
-	DeltaDecoder (Xefis::PropertyInteger value_property, Callback callback);
+	DeltaDecoder (xf::PropertyInteger value_property, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -54,9 +54,9 @@ class DeltaDecoder
 	call (int delta);
 
   private:
-	Xefis::PropertyInteger::Type	_prev;
-	Xefis::PropertyInteger			_value_property;
-	Callback						_callback;
+	xf::PropertyInteger::Type	_prev;
+	xf::PropertyInteger			_value_property;
+	Callback					_callback;
 };
 
 

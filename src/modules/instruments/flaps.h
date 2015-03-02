@@ -29,12 +29,12 @@
 
 
 class Flaps:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Flaps (Xefis::ModuleManager*, QDomElement const& config);
+	Flaps (xf::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -50,11 +50,11 @@ class Flaps:
 
   private:
 	// Settings:
-	Angle					_maximum		= 0_deg;
-	bool					_hide_retracted	= false;
+	Angle				_maximum		= 0_deg;
+	bool				_hide_retracted	= false;
 	// Properties:
-	Xefis::PropertyAngle	_current;
-	Xefis::PropertyAngle	_setting;
+	xf::PropertyAngle	_current;
+	xf::PropertyAngle	_setting;
 };
 
 #endif

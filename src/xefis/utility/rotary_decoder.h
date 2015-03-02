@@ -37,7 +37,7 @@ class RotaryDecoder
 
   public:
 	// Ctor:
-	RotaryDecoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback);
+	RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -61,8 +61,8 @@ class RotaryDecoder
   private:
 	bool					_prev_a;
 	bool					_prev_b;
-	Xefis::PropertyBoolean&	_property_a;
-	Xefis::PropertyBoolean&	_property_b;
+	xf::PropertyBoolean&	_property_a;
+	xf::PropertyBoolean&	_property_b;
 	Callback				_callback;
 };
 

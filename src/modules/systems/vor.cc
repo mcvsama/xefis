@@ -28,7 +28,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/vor", VOR);
 
 
-VOR::VOR (Xefis::ModuleManager* module_manager, QDomElement const& config):
+VOR::VOR (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_properties (config, {
@@ -86,7 +86,7 @@ VOR::compute()
 		LonLat const aircraft_position (*_input_aircraft_longitude, *_input_aircraft_latitude);
 
 		Angle current_radial = normalize (station_position.initial_bearing (aircraft_position));
-		Angle deviation = Xefis::floored_mod (input_radial - current_radial, -180_deg, +180_deg);
+		Angle deviation = xf::floored_mod (input_radial - current_radial, -180_deg, +180_deg);
 		if (std::abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
 
@@ -111,13 +111,13 @@ VOR::compute()
 inline Angle
 VOR::normalize (Angle a)
 {
-	return Xefis::floored_mod (a, 0_deg, 360_deg);
+	return xf::floored_mod (a, 0_deg, 360_deg);
 }
 
 
 inline Angle
 VOR::denormalize (Angle a)
 {
-	return Xefis::floored_mod (a, -180_deg, +180_deg);
+	return xf::floored_mod (a, -180_deg, +180_deg);
 }
 

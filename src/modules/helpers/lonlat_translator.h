@@ -24,21 +24,21 @@
 #include <xefis/core/property.h>
 
 
-class LonLatTranslator: public Xefis::Module
+class LonLatTranslator: public xf::Module
 {
   public:
 	// Ctor
-	LonLatTranslator (Xefis::ModuleManager*, QDomElement const& config);
+	LonLatTranslator (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
 	data_updated() override;
 
   private:
-	Xefis::PropertyAngle	_input_longitude;
-	Xefis::PropertyAngle	_input_latitude;
-	Xefis::PropertyString	_output_longitude;
-	Xefis::PropertyString	_output_latitude;
+	xf::PropertyAngle	_input_longitude;
+	xf::PropertyAngle	_input_latitude;
+	xf::PropertyString	_output_longitude;
+	xf::PropertyString	_output_latitude;
 };
 
 #endif

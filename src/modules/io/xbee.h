@@ -36,7 +36,7 @@
  */
 class XBee:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -129,7 +129,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (Xefis::ModuleManager*, QDomElement const& config);
+	XBee (xf::ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	~XBee();
@@ -410,17 +410,17 @@ class XBee:
 	std::string				_input_buffer;
 	std::string				_output_buffer;
 	std::string				_last_at_command;
-	Xefis::Smoother<double>	_rssi_smoother			= 200_ms;
+	xf::Smoother<double>	_rssi_smoother			= 200_ms;
 	Time					_last_rssi_time;
 	uint8_t					_at_frame_id			= 0x00;
 
-	Xefis::PropertyBoolean	_serviceable;
-	Xefis::PropertyString	_send;
-	Xefis::PropertyString	_receive;
-	Xefis::PropertyInteger	_input_errors;
-	Xefis::PropertyFloat	_rssi_dbm;
-	Xefis::PropertyInteger	_failures;
-	Xefis::PropertyInteger	_cca_failures;
+	xf::PropertyBoolean		_serviceable;
+	xf::PropertyString		_send;
+	xf::PropertyString		_receive;
+	xf::PropertyInteger		_input_errors;
+	xf::PropertyFloat		_rssi_dbm;
+	xf::PropertyInteger		_failures;
+	xf::PropertyInteger		_cca_failures;
 };
 
 

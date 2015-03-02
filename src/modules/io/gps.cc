@@ -49,7 +49,7 @@ std::map<std::string, std::string>	GPS::_pmtk_hints;
 bool								GPS::_pmtk_hints_initialized = false;
 
 
-GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
+GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	_buffer.reserve (256);
@@ -104,7 +104,7 @@ GPS::GPS (Xefis::ModuleManager* module_manager, QDomElement const& config):
 				if (pmtk == "pmtk")
 					_pmtk_commands.push_back (pmtk.text().toStdString());
 				else
-					throw Xefis::BadDomElement (pmtk);
+					throw xf::BadDomElement (pmtk);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ void
 GPS::read()
 {
 	bool err = false;
-	bool exc = Xefis::Exception::guard ([&] {
+	bool exc = xf::Exception::guard ([&] {
 		// Read as much as possible:
 		for (;;)
 		{
@@ -359,8 +359,8 @@ GPS::set_device_options (bool use_target_baud_rate)
 	}
 
 	int baud_rate_const = use_target_baud_rate
-		? Xefis::SerialPort::termios_baud_rate (_target_baud_rate)
-		: Xefis::SerialPort::termios_baud_rate (_current_baud_rate);
+		? xf::SerialPort::termios_baud_rate (_target_baud_rate)
+		: xf::SerialPort::termios_baud_rate (_current_baud_rate);
 	cfsetispeed (&options, baud_rate_const);
 	cfsetospeed (&options, baud_rate_const);
 	options.c_cflag |= CLOCAL | CREAD;
@@ -440,7 +440,7 @@ GPS::process()
 	std::string::size_type crlf = 0;
 	std::string::size_type parsed = 0;
 
-	Xefis::Resource remove_parsed_properties ([&] {
+	xf::Resource remove_parsed_properties ([&] {
 		_buffer.erase (0, parsed);
 	});
 
@@ -451,7 +451,7 @@ GPS::process()
 			break;
 		parsed = crlf + 2;
 
-		Xefis::Exception::guard ([&] {
+		xf::Exception::guard ([&] {
 			if (process_message (_buffer.substr (start, crlf - start)))
 			{
 				_serviceable.write (true);
@@ -473,7 +473,7 @@ GPS::process()
 bool
 GPS::process_message (std::string message)
 {
-	static Xefis::HexTable hextable;
+	static xf::HexTable hextable;
 
 	// Must be at least 5 bytes long to calculate checksum:
 	if (message.size() < 5)
@@ -525,7 +525,7 @@ GPS::process_message (std::string message)
 
 	bool result = true;
 
-	Xefis::Exception::guard ([&] {
+	xf::Exception::guard ([&] {
 		try {
 			if (type == "GPGGA")
 				result = process_gpgga (contents);
@@ -614,10 +614,10 @@ GPS::process_gpgga (std::string message_contents)
 		fix_quality = digit_from_ascii (_value[0]);
 
 	// Number of tracked satellites:
-	Optional<Xefis::PropertyInteger::Type> tracked_satellites;
+	Optional<xf::PropertyInteger::Type> tracked_satellites;
 	p = read_value (message_contents, p);
 	try {
-		tracked_satellites = boost::lexical_cast<Xefis::PropertyInteger::Type> (_value);
+		tracked_satellites = boost::lexical_cast<xf::PropertyInteger::Type> (_value);
 	}
 	catch (boost::bad_lexical_cast&)
 	{
@@ -688,10 +688,10 @@ GPS::process_gpgsa (std::string message_contents)
 	p = read_value (message_contents, p);
 
 	// Type of fix: none, 2D, 3D:
-	Optional<Xefis::PropertyInteger::Type> type_of_fix;
+	Optional<xf::PropertyInteger::Type> type_of_fix;
 	p = read_value (message_contents, p);
 	try {
-		type_of_fix = boost::lexical_cast<Xefis::PropertyInteger::Type> (_value);
+		type_of_fix = boost::lexical_cast<xf::PropertyInteger::Type> (_value);
 	}
 	catch (boost::bad_lexical_cast&)
 	{ }

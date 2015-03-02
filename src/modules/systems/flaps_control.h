@@ -31,13 +31,13 @@
  * Controls extending/retracting flaps with configured speed.
  * Reacts to buttons to change to next or previous setting.
  */
-class FlapsControl: public Xefis::Module
+class FlapsControl: public xf::Module
 {
 	static constexpr Time kUpdateInterval = 10_ms;
 
   public:
 	// Ctor
-	FlapsControl (Xefis::ModuleManager*, QDomElement const& config);
+	FlapsControl (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	// Module API
@@ -58,13 +58,13 @@ class FlapsControl: public Xefis::Module
 	Angle					_current;
 	double					_degrees_per_second	= 100.0;
 	// Input:
-	Xefis::PropertyBoolean	_input_up;
-	Xefis::PropertyBoolean	_input_down;
-	Xefis::PropertyAngle	_input_setting;
+	xf::PropertyBoolean		_input_up;
+	xf::PropertyBoolean		_input_down;
+	xf::PropertyAngle		_input_setting;
 	// Output:
-	Xefis::PropertyAngle	_output_setting;
-	Xefis::PropertyAngle	_output_current;
-	Xefis::PropertyFloat	_output_control;
+	xf::PropertyAngle		_output_setting;
+	xf::PropertyAngle		_output_current;
+	xf::PropertyFloat		_output_control;
 	// Other:
 	Unique<QTimer>			_timer;
 };

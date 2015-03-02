@@ -33,9 +33,9 @@
 #include <xefis/utility/mutex.h>
 
 
-using Xefis::NavaidStorage;
+using xf::NavaidStorage;
 
-class HSIWidget: public Xefis::InstrumentWidget
+class HSIWidget: public xf::InstrumentWidget
 {
   public:
 	enum class HeadingMode
@@ -179,7 +179,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 
 	class PaintWorkUnit:
 		public InstrumentWidget::PaintWorkUnit,
-		protected Xefis::InstrumentAids
+		protected xf::InstrumentAids
 	{
 		friend class HSIWidget;
 
@@ -202,37 +202,37 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint (QImage&) override;
 
 		void
-		paint_aircraft (Xefis::Painter&);
+		paint_aircraft (xf::Painter&);
 
 		void
-		paint_navperf (Xefis::Painter&);
+		paint_navperf (xf::Painter&);
 
 		void
-		paint_hints (Xefis::Painter&);
+		paint_hints (xf::Painter&);
 
 		void
-		paint_ap_settings (Xefis::Painter&);
+		paint_ap_settings (xf::Painter&);
 
 		void
-		paint_directions (Xefis::Painter&);
+		paint_directions (xf::Painter&);
 
 		void
-		paint_track (Xefis::Painter&, bool paint_heading_triangle);
+		paint_track (xf::Painter&, bool paint_heading_triangle);
 
 		void
-		paint_altitude_reach (Xefis::Painter&);
+		paint_altitude_reach (xf::Painter&);
 
 		void
-		paint_trend_vector (Xefis::Painter&);
+		paint_trend_vector (xf::Painter&);
 
 		void
-		paint_speeds_and_wind (Xefis::Painter&);
+		paint_speeds_and_wind (xf::Painter&);
 
 		void
-		paint_home_direction (Xefis::Painter&);
+		paint_home_direction (xf::Painter&);
 
 		void
-		paint_course (Xefis::Painter&);
+		paint_course (xf::Painter&);
 
 		void
 		paint_selected_navaid_info();
@@ -241,13 +241,13 @@ class HSIWidget: public Xefis::InstrumentWidget
 		paint_tcas_and_navaid_info();
 
 		void
-		paint_pointers (Xefis::Painter&);
+		paint_pointers (xf::Painter&);
 
 		void
-		paint_range (Xefis::Painter&);
+		paint_range (xf::Painter&);
 
 		void
-		paint_navaids (Xefis::Painter&);
+		paint_navaids (xf::Painter&);
 
 		void
 		paint_locs();
@@ -346,7 +346,7 @@ class HSIWidget: public Xefis::InstrumentWidget
 
   public:
 	// Ctor
-	HSIWidget (QWidget* parent, Xefis::WorkPerformer*);
+	HSIWidget (QWidget* parent, xf::WorkPerformer*);
 
 	// Dtor
 	~HSIWidget();

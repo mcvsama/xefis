@@ -98,10 +98,10 @@ QDomElementIterator::operator*()
  * Support for generic iterating over element's children
  * with range-for.
  */
-inline Xefis::QDomElementIterator
+inline xf::QDomElementIterator
 begin (QDomElement element)
 {
-	return Xefis::QDomElementIterator (element.firstChildElement());
+	return xf::QDomElementIterator (element.firstChildElement());
 }
 
 
@@ -109,10 +109,10 @@ begin (QDomElement element)
  * Support for generic iterating over element's children
  * with range-for.
  */
-inline Xefis::QDomElementIterator
+inline xf::QDomElementIterator
 end (QDomElement)
 {
-	return Xefis::QDomElementIterator();
+	return xf::QDomElementIterator();
 }
 
 

@@ -34,7 +34,7 @@
 
 
 #define XEFIS_REGISTER_MODULE_CLASS(module_name, klass) \
-	static Xefis::Module::Registrator module_registrator (module_name, [](Xefis::ModuleManager* module_manager, QDomElement const& config) -> Xefis::Module* { \
+	static xf::Module::Registrator module_registrator (module_name, [](xf::ModuleManager* module_manager, QDomElement const& config) -> xf::Module* { \
 		return new klass (module_manager, config); \
 	});
 
@@ -180,7 +180,7 @@ class Module: private Noncopyable
 	/**
 	 * Parse the <settings> element and initialize variables.
 	 * \param	element can be <settings> or parent of <settings> element.
-	 * \throw	Xefis::Exception if something's wrong.
+	 * \throw	xf::Exception if something's wrong.
 	 */
 	void
 	parse_settings (QDomElement const& element, ConfigReader::SettingsParser::SettingsList);
@@ -189,7 +189,7 @@ class Module: private Noncopyable
 	 * Parse the <properties> element and initialize properties
 	 * by their names matching the <properties> children.
 	 * \param	element can be <properties> or parent of <properties> element.
-	 * \throw	Xefis::Exception if something's wrong.
+	 * \throw	xf::Exception if something's wrong.
 	 */
 	void
 	parse_properties (QDomElement const& element, ConfigReader::PropertiesParser::PropertiesList);
@@ -222,7 +222,7 @@ class Module: private Noncopyable
 	 * Add header with module name to the log stream and
 	 * return the stream.
 	 */
-	Xefis::Logger const&
+	xf::Logger const&
 	log() const;
 
   private:
@@ -238,7 +238,7 @@ class Module: private Noncopyable
 	Unique<ConfigReader::PropertiesParser>	_properties_parser;
 	std::string								_name;
 	std::string								_instance;
-	Xefis::Logger							_logger;
+	xf::Logger								_logger;
 };
 
 

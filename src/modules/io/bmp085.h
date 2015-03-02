@@ -29,7 +29,7 @@
  */
 class BMP085:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -43,7 +43,7 @@ class BMP085:
 
   public:
 	// Ctor
-	BMP085 (Xefis::ModuleManager*, QDomElement const& config);
+	BMP085 (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	void
@@ -97,43 +97,43 @@ class BMP085:
 	static constexpr uint8_t	MC_REG	= 0xbc;
 	static constexpr uint8_t	MD_REG	= 0xbe;
 	// Data:
-	Xefis::PropertyBoolean		_serviceable;
-	Xefis::PropertyTemperature	_temperature;
-	Time						_temperature_interval		= 500_ms;
-	Xefis::PropertyPressure		_pressure;
-	Time						_pressure_interval			= 50_ms;
-	Xefis::I2C::Device			_i2c_device;
-	Oversampling				_oversampling				= Oversampling3;
-	Time						_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
-	Unique<QTimer>				_reinitialize_timer;
-	Unique<QTimer>				_temperature_timer;
-	Unique<QTimer>				_temperature_ready_timer;
-	Unique<QTimer>				_pressure_timer;
-	Unique<QTimer>				_pressure_ready_timer;
+	xf::PropertyBoolean		_serviceable;
+	xf::PropertyTemperature	_temperature;
+	Time					_temperature_interval		= 500_ms;
+	xf::PropertyPressure	_pressure;
+	Time					_pressure_interval			= 50_ms;
+	xf::I2C::Device			_i2c_device;
+	Oversampling			_oversampling				= Oversampling3;
+	Time					_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
+	Unique<QTimer>			_reinitialize_timer;
+	Unique<QTimer>			_temperature_timer;
+	Unique<QTimer>			_temperature_ready_timer;
+	Unique<QTimer>			_pressure_timer;
+	Unique<QTimer>			_pressure_ready_timer;
 	// Set to true, between request_ and read_ functions.
-	bool						_middle_of_request			= false;
-	bool						_request_other				= false;
+	bool					_middle_of_request			= false;
+	bool					_request_other				= false;
 	// Calibration coeffs:
-	int32_t						_ac1;
-	int32_t						_ac2;
-	int32_t						_ac3;
-	int32_t						_ac4;
-	int32_t						_ac5;
-	int32_t						_ac6;
-	int32_t						_b1;
-	int32_t						_b2;
-	int32_t						_b3;
-	uint32_t					_b4;
-	int32_t						_b5;
-	int32_t						_b6;
-	uint32_t					_b7;
-	int32_t						_mb;
-	int32_t						_mc;
-	int32_t						_md;
-	int32_t						_ut;
-	int32_t						_up;
-	int32_t						_ct;
-	int32_t						_cp;
+	int32_t					_ac1;
+	int32_t					_ac2;
+	int32_t					_ac3;
+	int32_t					_ac4;
+	int32_t					_ac5;
+	int32_t					_ac6;
+	int32_t					_b1;
+	int32_t					_b2;
+	int32_t					_b3;
+	uint32_t				_b4;
+	int32_t					_b5;
+	int32_t					_b6;
+	uint32_t				_b7;
+	int32_t					_mb;
+	int32_t					_mc;
+	int32_t					_md;
+	int32_t					_ut;
+	int32_t					_up;
+	int32_t					_ct;
+	int32_t					_cp;
 };
 
 #endif

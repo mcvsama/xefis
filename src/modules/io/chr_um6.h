@@ -33,7 +33,7 @@
  */
 class CHRUM6:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -42,9 +42,9 @@ class CHRUM6:
 	static constexpr Time	StatusCheckInterval		= 200_ms;
 	static constexpr Time	InitializationDelay		= 3_s;
 
-	typedef Xefis::CHRUM6::ConfigurationAddress		ConfigurationAddress;
-	typedef Xefis::CHRUM6::DataAddress				DataAddress;
-	typedef Xefis::CHRUM6::CommandAddress			CommandAddress;
+	typedef xf::CHRUM6::ConfigurationAddress	ConfigurationAddress;
+	typedef xf::CHRUM6::DataAddress				DataAddress;
+	typedef xf::CHRUM6::CommandAddress			CommandAddress;
 
 	enum class Stage
 	{
@@ -54,10 +54,10 @@ class CHRUM6:
 
   public:
 	// Ctor
-	CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config);
+	CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config);
 
   protected:
-	// Xefis::Module
+	// xf::Module
 	void
 	data_updated() override;
 
@@ -185,27 +185,27 @@ class CHRUM6:
 	 * Process incoming messages from UM6 (everything that wasn't explicitly requested).
 	 */
 	void
-	process_message (Xefis::CHRUM6::Read);
+	process_message (xf::CHRUM6::Read);
 
 	/**
 	 * Checks status bits and sets status/serviceable properties.
 	 */
 	void
-	status_verify (Xefis::CHRUM6::Read);
+	status_verify (xf::CHRUM6::Read);
 
 	/**
 	 * If command has failed, log error information.
 	 */
 	void
-	describe_errors (Xefis::CHRUM6::Request const&);
+	describe_errors (xf::CHRUM6::Request const&);
 
   private:
 	Unique<QTimer>				_restart_timer;
 	Unique<QTimer>				_alive_check_timer;
 	Unique<QTimer>				_status_check_timer;
 	Unique<QTimer>				_initialization_timer;
-	Unique<Xefis::SerialPort>	_serial_port;
-	Unique<Xefis::CHRUM6>		_sensor;
+	Unique<xf::SerialPort>		_serial_port;
+	Unique<xf::CHRUM6>			_sensor;
 	int							_failure_count			= 0;
 	Optional<float>				_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
@@ -216,27 +216,27 @@ class CHRUM6:
 	Optional<uint32_t>			_gyro_bias_z;
 
 	// Input:
-	Xefis::PropertyAcceleration	_input_centrifugal_x;
-	Xefis::PropertyAcceleration	_input_centrifugal_y;
-	Xefis::PropertyAcceleration	_input_centrifugal_z;
+	xf::PropertyAcceleration	_input_centrifugal_x;
+	xf::PropertyAcceleration	_input_centrifugal_y;
+	xf::PropertyAcceleration	_input_centrifugal_z;
 	// Output:
-	Xefis::PropertyBoolean		_serviceable;
-	Xefis::PropertyBoolean		_caution;
-	Xefis::PropertyInteger		_failures;
-	Xefis::PropertyTemperature	_internal_temperature;
-	Xefis::PropertyAngle		_orientation_pitch;
-	Xefis::PropertyAngle		_orientation_roll;
-	Xefis::PropertyAngle		_orientation_magnetic_heading;
-	Xefis::PropertyAcceleration	_acceleration_x;
-	Xefis::PropertyAcceleration	_acceleration_y;
-	Xefis::PropertyAcceleration	_acceleration_z;
-	Xefis::PropertyFrequency	_rotation_x;
-	Xefis::PropertyFrequency	_rotation_y;
-	Xefis::PropertyFrequency	_rotation_z;
+	xf::PropertyBoolean			_serviceable;
+	xf::PropertyBoolean			_caution;
+	xf::PropertyInteger			_failures;
+	xf::PropertyTemperature		_internal_temperature;
+	xf::PropertyAngle			_orientation_pitch;
+	xf::PropertyAngle			_orientation_roll;
+	xf::PropertyAngle			_orientation_magnetic_heading;
+	xf::PropertyAcceleration	_acceleration_x;
+	xf::PropertyAcceleration	_acceleration_y;
+	xf::PropertyAcceleration	_acceleration_z;
+	xf::PropertyFrequency		_rotation_x;
+	xf::PropertyFrequency		_rotation_y;
+	xf::PropertyFrequency		_rotation_z;
 	// What's the unit?
-	Xefis::PropertyFloat		_magnetic_x;
-	Xefis::PropertyFloat		_magnetic_y;
-	Xefis::PropertyFloat		_magnetic_z;
+	xf::PropertyFloat			_magnetic_x;
+	xf::PropertyFloat			_magnetic_y;
+	xf::PropertyFloat			_magnetic_z;
 };
 
 #endif

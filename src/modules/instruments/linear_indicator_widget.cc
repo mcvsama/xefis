@@ -38,7 +38,7 @@ LinearIndicatorWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
-	auto xw = dynamic_cast<Xefis::Window*> (window());
+	auto xw = dynamic_cast<xf::Window*> (window());
 	if (xw)
 		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
 
@@ -79,7 +79,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 
 	if (_value)
 	{
-		auto value = Xefis::limit<double> (*_value, _range.min(), _range.max());
+		auto value = xf::limit<double> (*_value, _range.min(), _range.max());
 		bool inbound = _range.includes (*_value);
 
 		if (inbound)
@@ -92,7 +92,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (1.9f * q, -0.5f * q)
 			<< QPointF (1.9f * q, +0.5f * q);
-		polygon.translate (p1.x(), Xefis::renormalize (value, _range.min(), _range.max(), p1.y(), p0.y()));
+		polygon.translate (p1.x(), xf::renormalize (value, _range.min(), _range.max(), p1.y(), p0.y()));
 		painter().add_shadow ([&] {
 			painter().drawPolygon (polygon);
 		});

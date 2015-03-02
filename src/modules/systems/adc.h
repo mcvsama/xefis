@@ -33,11 +33,11 @@
  * Computations are reliable up to 36,000 ft altitude
  * and about 0.3 mach speed.
  */
-class AirDataComputer: public Xefis::Module
+class AirDataComputer: public xf::Module
 {
   public:
 	// Ctor
-	AirDataComputer (Xefis::ModuleManager*, QDomElement const& config);
+	AirDataComputer (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -71,64 +71,64 @@ class AirDataComputer: public Xefis::Module
 	compute_vertical_speed();
 
   private:
-	bool						_ias_in_valid_range					= false;
-	bool						_prev_use_standard_pressure			= false;
-	Time						_hide_alt_lookahead_until			= 0_s;
-	Length						_prev_altitude_amsl					= 0_ft;
+	bool					_ias_in_valid_range					= false;
+	bool					_prev_use_standard_pressure			= false;
+	Time					_hide_alt_lookahead_until			= 0_s;
+	Length					_prev_altitude_amsl					= 0_ft;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
-	Xefis::Smoother<double>		_vertical_speed_smoother			= 1_s;
-	Xefis::Smoother<double>		_altitude_amsl_smoother				= 500_ms;
-	Xefis::Smoother<double>		_altitude_amsl_qnh_smoother			= 500_ms;
-	Xefis::Smoother<double>		_altitude_amsl_std_smoother			= 500_ms;
-	Xefis::Smoother<double>		_speed_ias_smoother					= 100_ms;
-	Xefis::Smoother<double>		_altitude_amsl_lookahead_i_smoother	= 100_ms;
-	Xefis::Smoother<double>		_altitude_amsl_lookahead_o_smoother	= 500_ms;
-	Xefis::Smoother<double>		_speed_ias_lookahead_i_smoother		= 100_ms;
-	Xefis::Smoother<double>		_speed_ias_lookahead_o_smoother		= 1000_ms;
-	Xefis::Lookahead<double>	_altitude_amsl_estimator			= Xefis::Lookahead<double> (10_s);
-	Xefis::Lookahead<double>	_speed_ias_estimator				= Xefis::Lookahead<double> (10_s);
+	xf::Smoother<double>	_vertical_speed_smoother			= 1_s;
+	xf::Smoother<double>	_altitude_amsl_smoother				= 500_ms;
+	xf::Smoother<double>	_altitude_amsl_qnh_smoother			= 500_ms;
+	xf::Smoother<double>	_altitude_amsl_std_smoother			= 500_ms;
+	xf::Smoother<double>	_speed_ias_smoother					= 100_ms;
+	xf::Smoother<double>	_altitude_amsl_lookahead_i_smoother	= 100_ms;
+	xf::Smoother<double>	_altitude_amsl_lookahead_o_smoother	= 500_ms;
+	xf::Smoother<double>	_speed_ias_lookahead_i_smoother		= 100_ms;
+	xf::Smoother<double>	_speed_ias_lookahead_o_smoother		= 1000_ms;
+	xf::Lookahead<double>	_altitude_amsl_estimator			= xf::Lookahead<double> (10_s);
+	xf::Lookahead<double>	_speed_ias_estimator				= xf::Lookahead<double> (10_s);
 	// Settings:
-	Speed						_ias_valid_minimum;
-	Speed						_ias_valid_maximum;
-	bool						_using_ias_sensor					= false;
+	Speed					_ias_valid_minimum;
+	Speed					_ias_valid_maximum;
+	bool					_using_ias_sensor					= false;
 	// Input:
-	Xefis::PropertyBoolean		_pressure_use_std;
-	Xefis::PropertyPressure		_pressure_qnh;
-	Xefis::PropertyBoolean		_pressure_static_serviceable;
-	Xefis::PropertyPressure		_pressure_static;
-	Xefis::PropertyPressure		_pressure_total;
-	Xefis::PropertyBoolean		_ias_serviceable;
-	Xefis::PropertySpeed		_ias;
-	Xefis::PropertyTemperature	_total_air_temperature;
+	xf::PropertyBoolean		_pressure_use_std;
+	xf::PropertyPressure	_pressure_qnh;
+	xf::PropertyBoolean		_pressure_static_serviceable;
+	xf::PropertyPressure	_pressure_static;
+	xf::PropertyPressure	_pressure_total;
+	xf::PropertyBoolean		_ias_serviceable;
+	xf::PropertySpeed		_ias;
+	xf::PropertyTemperature	_total_air_temperature;
 	// Output:
-	Xefis::PropertyPressure		_pressure_dynamic;
-	Xefis::PropertyBoolean		_altitude_amsl_serviceable;
-	Xefis::PropertyLength		_altitude_amsl;
-	Xefis::PropertyLength		_altitude_amsl_lookahead;
-	Xefis::PropertyLength		_altitude_amsl_qnh;
-	Xefis::PropertyLength		_altitude_amsl_std;
-	Xefis::PropertyLength		_density_altitude;
-	Xefis::PropertyDensity		_air_density_static;
-	Xefis::PropertyBoolean		_speed_ias_serviceable;
-	Xefis::PropertySpeed		_speed_ias;
-	Xefis::PropertySpeed		_speed_ias_lookahead;
-	Xefis::PropertySpeed		_speed_tas;
-	Xefis::PropertyFloat		_speed_mach;
-	Xefis::PropertySpeed		_speed_sound;
-	Xefis::PropertyBoolean		_vertical_speed_serviceable;
-	Xefis::PropertySpeed		_vertical_speed;
-	Xefis::PropertyTemperature	_static_air_temperature;
+	xf::PropertyPressure	_pressure_dynamic;
+	xf::PropertyBoolean		_altitude_amsl_serviceable;
+	xf::PropertyLength		_altitude_amsl;
+	xf::PropertyLength		_altitude_amsl_lookahead;
+	xf::PropertyLength		_altitude_amsl_qnh;
+	xf::PropertyLength		_altitude_amsl_std;
+	xf::PropertyLength		_density_altitude;
+	xf::PropertyDensity		_air_density_static;
+	xf::PropertyBoolean		_speed_ias_serviceable;
+	xf::PropertySpeed		_speed_ias;
+	xf::PropertySpeed		_speed_ias_lookahead;
+	xf::PropertySpeed		_speed_tas;
+	xf::PropertyFloat		_speed_mach;
+	xf::PropertySpeed		_speed_sound;
+	xf::PropertyBoolean		_vertical_speed_serviceable;
+	xf::PropertySpeed		_vertical_speed;
+	xf::PropertyTemperature	_static_air_temperature;
 	// Other:
-	Xefis::PropertyObserver		_altitude_computer;
-	Xefis::PropertyObserver		_density_altitude_computer;
-	Xefis::PropertyObserver		_ias_computer;
-	Xefis::PropertyObserver		_ias_lookahead_computer;
-	Xefis::PropertyObserver		_sound_speed_computer;
-	Xefis::PropertyObserver		_tas_computer;
-	Xefis::PropertyObserver		_mach_computer;
-	Xefis::PropertyObserver		_sat_computer;
-	Xefis::PropertyObserver		_vertical_speed_computer;
+	xf::PropertyObserver	_altitude_computer;
+	xf::PropertyObserver	_density_altitude_computer;
+	xf::PropertyObserver	_ias_computer;
+	xf::PropertyObserver	_ias_lookahead_computer;
+	xf::PropertyObserver	_sound_speed_computer;
+	xf::PropertyObserver	_tas_computer;
+	xf::PropertyObserver	_mach_computer;
+	xf::PropertyObserver	_sat_computer;
+	xf::PropertyObserver	_vertical_speed_computer;
 };
 
 #endif

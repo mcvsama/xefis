@@ -32,7 +32,7 @@
 
 class JoystickInput:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -41,8 +41,8 @@ class JoystickInput:
 		void
 		set_value (float value);
 
-		Xefis::PropertyBoolean	prop;
-		Xefis::PropertyBoolean	alt_prop;
+		xf::PropertyBoolean	prop;
+		xf::PropertyBoolean	alt_prop;
 	};
 
 	struct Axis
@@ -50,15 +50,15 @@ class JoystickInput:
 		void
 		set_value (float value);
 
-		Xefis::PropertyFloat	prop;
-		Xefis::PropertyFloat	alt_prop;
-		float					center			= 0.f;
-		float					dead_zone		= 0.f;
-		float					reverse			= 1.f;
-		float					scale			= 1.f;
-		float					power			= 1.f;
-		float					output_minimum	= -1.f;
-		float					output_maximum	= +1.f;
+		xf::PropertyFloat	prop;
+		xf::PropertyFloat	alt_prop;
+		float				center			= 0.f;
+		float				dead_zone		= 0.f;
+		float				reverse			= 1.f;
+		float				scale			= 1.f;
+		float				power			= 1.f;
+		float				output_minimum	= -1.f;
+		float				output_maximum	= +1.f;
 	};
 
 	typedef std::vector<Shared<Button>>	Buttons;
@@ -66,7 +66,7 @@ class JoystickInput:
 
   public:
 	// Ctor
-	JoystickInput (Xefis::ModuleManager*, QDomElement const& config);
+	JoystickInput (xf::ModuleManager*, QDomElement const& config);
 
   private slots:
 	/**

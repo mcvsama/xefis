@@ -30,8 +30,8 @@
 
 
 class LinearIndicatorWidget:
-	public Xefis::InstrumentWidget,
-	protected Xefis::InstrumentAids
+	public xf::InstrumentWidget,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
@@ -47,7 +47,7 @@ class LinearIndicatorWidget:
 	 * Set new range to be used with LinearIndicatorWidget.
 	 */
 	void
-	set_range (Xefis::Range<double>);
+	set_range (xf::Range<double>);
 
 	/**
 	 * Set precision (digits after decimal point).
@@ -104,18 +104,18 @@ class LinearIndicatorWidget:
 	pad_string (QString const& input) const;
 
   private:
-	bool						_mirrored			= false;
-	Xefis::Range<double>		_range				= { 0.0, 1.0 };
-	int							_precision			= 0;
-	int							_modulo				= 0;
-	unsigned int				_digits				= 3;
-	Optional<double>			_value;
-	Optional<double>			_minimum_critical_value;
-	Optional<double>			_minimum_warning_value;
-	Optional<double>			_maximum_warning_value;
-	Optional<double>			_maximum_critical_value;
-	Optional<double>			_normal_value;
-	Optional<double>			_target_value;
+	bool				_mirrored			= false;
+	xf::Range<double>	_range				= { 0.0, 1.0 };
+	int					_precision			= 0;
+	int					_modulo				= 0;
+	unsigned int		_digits				= 3;
+	Optional<double>	_value;
+	Optional<double>	_minimum_critical_value;
+	Optional<double>	_minimum_warning_value;
+	Optional<double>	_maximum_warning_value;
+	Optional<double>	_maximum_critical_value;
+	Optional<double>	_normal_value;
+	Optional<double>	_target_value;
 };
 
 
@@ -128,7 +128,7 @@ LinearIndicatorWidget::set_mirrored_style (bool mirrored)
 
 
 inline void
-LinearIndicatorWidget::set_range (Xefis::Range<double> range)
+LinearIndicatorWidget::set_range (xf::Range<double> range)
 {
 	_range = range;
 	update();

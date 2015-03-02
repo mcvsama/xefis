@@ -29,9 +29,9 @@ XEFIS_REGISTER_MODULE_CLASS ("helpers/string-translator", StringTranslator);
 StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 {
 	if (!config.hasAttribute ("input-path"))
-		throw Xefis::MissingDomAttribute (config, "input-path");
+		throw xf::MissingDomAttribute (config, "input-path");
 	if (!config.hasAttribute ("output-path"))
-		throw Xefis::MissingDomAttribute (config, "output-path");
+		throw xf::MissingDomAttribute (config, "output-path");
 
 	_input.set_path (xf::PropertyPath (config.attribute ("input-path")));
 	_output.set_path (xf::PropertyPath (config.attribute ("output-path")));
@@ -41,15 +41,15 @@ StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 		if (e == "string")
 		{
 			if (!e.hasAttribute ("input"))
-				throw Xefis::MissingDomAttribute (e, "input");
+				throw xf::MissingDomAttribute (e, "input");
 			if (!e.hasAttribute ("output"))
-				throw Xefis::MissingDomAttribute (e, "output");
+				throw xf::MissingDomAttribute (e, "output");
 			_map.insert ({ e.attribute ("input").toLong(), e.attribute ("output").toStdString() });
 		}
 		else if (e == "default")
 		{
 			if (!e.hasAttribute ("output"))
-				throw Xefis::MissingDomAttribute (e, "output");
+				throw xf::MissingDomAttribute (e, "output");
 			_default = e.attribute ("output").toStdString();
 		}
 	}
@@ -82,7 +82,7 @@ StringTranslator::StringsSet::update()
 }
 
 
-StringTranslator::StringTranslator (Xefis::ModuleManager* module_manager, QDomElement const& config):
+StringTranslator::StringTranslator (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	for (QDomElement e: config)

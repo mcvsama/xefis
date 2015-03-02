@@ -28,11 +28,11 @@
 #include <xefis/utility/smoother.h>
 
 
-class AltAcq: public Xefis::Module
+class AltAcq: public xf::Module
 {
   public:
 	// Ctor
-	AltAcq (Xefis::ModuleManager*, QDomElement const& config);
+	AltAcq (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	void
@@ -44,22 +44,22 @@ class AltAcq: public Xefis::Module
   private:
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
-	Xefis::Smoother<double>		_altitude_acquire_distance_smoother	= 2_s;
-	Length						_minimum_altitude_difference;
-	Length						_flag_diff_on						= 1000_ft;
-	Length						_flag_diff_off						= 100_ft;
-	bool						_flag_armed							= false;
+	xf::Smoother<double>	_altitude_acquire_distance_smoother	= 2_s;
+	Length					_minimum_altitude_difference;
+	Length					_flag_diff_on						= 1000_ft;
+	Length					_flag_diff_off						= 100_ft;
+	bool					_flag_armed							= false;
 	// Input:
-	Xefis::PropertyLength		_altitude_amsl;
-	Xefis::PropertyLength		_altitude_acquire_amsl;
-	Time						_altitude_acquire_amsl_timestamp;
-	Xefis::PropertySpeed		_vertical_speed;
-	Xefis::PropertySpeed		_ground_speed;
+	xf::PropertyLength		_altitude_amsl;
+	xf::PropertyLength		_altitude_acquire_amsl;
+	Time					_altitude_acquire_amsl_timestamp;
+	xf::PropertySpeed		_vertical_speed;
+	xf::PropertySpeed		_ground_speed;
 	// Output:
-	Xefis::PropertyLength		_altitude_acquire_distance;
-	Xefis::PropertyBoolean		_altitude_acquire_flag;
+	xf::PropertyLength		_altitude_acquire_distance;
+	xf::PropertyBoolean		_altitude_acquire_flag;
 	// Other:
-	Xefis::PropertyObserver		_altitude_acquire_distance_computer;
+	xf::PropertyObserver	_altitude_acquire_distance_computer;
 };
 
 #endif

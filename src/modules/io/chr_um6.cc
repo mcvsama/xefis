@@ -47,7 +47,7 @@ constexpr Time	CHRUM6::StatusCheckInterval;
 constexpr Time	CHRUM6::InitializationDelay;
 
 
-CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config):
+CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	std::string device_path;
@@ -105,18 +105,18 @@ CHRUM6::CHRUM6 (Xefis::ModuleManager* module_manager, QDomElement const& config)
 	_caution.set_default (false);
 	_failures.set_default (0);
 
-	Xefis::SerialPort::Configuration sp_config;
+	xf::SerialPort::Configuration sp_config;
 	sp_config.set_device_path (device_path);
 	sp_config.set_baud_rate (_baud_rate);
 	sp_config.set_data_bits (8);
 	sp_config.set_stop_bits (1);
-	sp_config.set_parity_bit (Xefis::SerialPort::Parity::None);
+	sp_config.set_parity_bit (xf::SerialPort::Parity::None);
 
-	_serial_port = std::make_unique<Xefis::SerialPort>();
+	_serial_port = std::make_unique<xf::SerialPort>();
 	_serial_port->set_configuration (sp_config);
 	_serial_port->set_max_read_failures (3);
 
-	_sensor = std::make_unique<Xefis::CHRUM6> (_serial_port.get());
+	_sensor = std::make_unique<xf::CHRUM6> (_serial_port.get());
 	_sensor->set_logger (log());
 	_sensor->set_alive_check_callback (std::bind (&CHRUM6::alive_check, this));
 	_sensor->set_communication_failure_callback (std::bind (&CHRUM6::communication_failure, this));
@@ -139,7 +139,7 @@ CHRUM6::data_updated()
 			Acceleration earth_x = 0_g;
 			if (_acceleration_x.valid() && _input_centrifugal_x.valid())
 				earth_x = *_acceleration_x - *_input_centrifugal_x;
-			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.g()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.g()));
 		}
 
 		if (_acceleration_y.fresh() || _input_centrifugal_y.fresh())
@@ -147,7 +147,7 @@ CHRUM6::data_updated()
 			Acceleration earth_y = 0_g;
 			if (_acceleration_y.valid() && _input_centrifugal_y.valid())
 				earth_y = *_acceleration_y - *_input_centrifugal_y;
-			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.g()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.g()));
 		}
 
 		if (_acceleration_z.fresh() || _input_centrifugal_z.fresh())
@@ -155,7 +155,7 @@ CHRUM6::data_updated()
 			Acceleration earth_z = 1_g;
 			if (_acceleration_z.valid() && _input_centrifugal_z.valid())
 				earth_z = *_acceleration_z - *_input_centrifugal_z;
-			_sensor->write (Xefis::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.g()));
+			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.g()));
 		}
 	}
 }
@@ -219,7 +219,7 @@ CHRUM6::restart()
 void
 CHRUM6::status_check()
 {
-	_sensor->read (Xefis::CHRUM6::DataAddress::Status, std::bind (&CHRUM6::status_verify, this, std::placeholders::_1));
+	_sensor->read (xf::CHRUM6::DataAddress::Status, std::bind (&CHRUM6::status_verify, this, std::placeholders::_1));
 }
 
 
@@ -239,16 +239,16 @@ void
 CHRUM6::setup_communication()
 {
 	uint32_t data = 0;
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::BEN);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::EU);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::AP);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::GP);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::MP);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::CommunicationRegister::TMP);
-	data |= Xefis::CHRUM6::bits_for_baud_rate (_baud_rate) << 8;
-	data |= Xefis::CHRUM6::sample_rate_setting (_sample_rate);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::BEN);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::EU);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::AP);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::GP);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::MP);
+	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::TMP);
+	data |= xf::CHRUM6::bits_for_baud_rate (_baud_rate) << 8;
+	data |= xf::CHRUM6::sample_rate_setting (_sample_rate);
 
-	_sensor->write (ConfigurationAddress::Communication, data, [this] (Xefis::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::Communication, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			setup_misc_config();
@@ -260,12 +260,12 @@ void
 CHRUM6::setup_misc_config()
 {
 	uint32_t data = 0;
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::MiscConfigRegister::MUE);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::MiscConfigRegister::AUE);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::MiscConfigRegister::CAL);
-	data |= static_cast<uint32_t> (Xefis::CHRUM6::MiscConfigRegister::QUAT);
+	data |= static_cast<uint32_t> (xf::CHRUM6::MiscConfigRegister::MUE);
+	data |= static_cast<uint32_t> (xf::CHRUM6::MiscConfigRegister::AUE);
+	data |= static_cast<uint32_t> (xf::CHRUM6::MiscConfigRegister::CAL);
+	data |= static_cast<uint32_t> (xf::CHRUM6::MiscConfigRegister::QUAT);
 
-	_sensor->write (ConfigurationAddress::MiscConfig, data, [this] (Xefis::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::MiscConfig, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			log_firmware_version();
@@ -276,7 +276,7 @@ CHRUM6::setup_misc_config()
 void
 CHRUM6::log_firmware_version()
 {
-	_sensor->command (CommandAddress::GetFWVersion, [this] (Xefis::CHRUM6::Command req) {
+	_sensor->command (CommandAddress::GetFWVersion, [this] (xf::CHRUM6::Command req) {
 		describe_errors (req);
 		if (req.success())
 		{
@@ -290,7 +290,7 @@ CHRUM6::log_firmware_version()
 void
 CHRUM6::set_ekf_process_variance()
 {
-	_sensor->write (ConfigurationAddress::EKFProcessVariance, *_ekf_process_variance, [this] (Xefis::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::EKFProcessVariance, *_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			reset_ekf();
@@ -301,7 +301,7 @@ CHRUM6::set_ekf_process_variance()
 void
 CHRUM6::reset_ekf()
 {
-	_sensor->command (CommandAddress::ResetEKF, [this] (Xefis::CHRUM6::Command req) {
+	_sensor->command (CommandAddress::ResetEKF, [this] (xf::CHRUM6::Command req) {
 		describe_errors (req);
 		if (req.success())
 			restore_gyro_bias_xy();
@@ -316,7 +316,7 @@ CHRUM6::restore_gyro_bias_xy()
 	{
 		log() << "Restoring previously acquired gyro biases: XY" << std::endl;
 
-		_sensor->write (ConfigurationAddress::GyroBiasXY, *_gyro_bias_xy, [this] (Xefis::CHRUM6::Write req) {
+		_sensor->write (ConfigurationAddress::GyroBiasXY, *_gyro_bias_xy, [this] (xf::CHRUM6::Write req) {
 			describe_errors (req);
 			if (req.success())
 				restore_gyro_bias_z();
@@ -334,7 +334,7 @@ CHRUM6::restore_gyro_bias_z()
 	{
 		log() << "Restoring previously acquired gyro biases: Z" << std::endl;
 
-		_sensor->write (ConfigurationAddress::GyroBiasZ, *_gyro_bias_z, [this] (Xefis::CHRUM6::Write req) {
+		_sensor->write (ConfigurationAddress::GyroBiasZ, *_gyro_bias_z, [this] (xf::CHRUM6::Write req) {
 			describe_errors (req);
 			if (req.success())
 				initialization_complete();
@@ -348,7 +348,7 @@ CHRUM6::restore_gyro_bias_z()
 void
 CHRUM6::align_gyros()
 {
-	_sensor->command (CommandAddress::ZeroGyros, [this] (Xefis::CHRUM6::Command req) {
+	_sensor->command (CommandAddress::ZeroGyros, [this] (xf::CHRUM6::Command req) {
 		describe_errors (req);
 		if (req.success())
 		{
@@ -406,7 +406,7 @@ CHRUM6::communication_failure()
 
 
 void
-CHRUM6::process_message (Xefis::CHRUM6::Read req)
+CHRUM6::process_message (xf::CHRUM6::Read req)
 {
 	switch (req.address())
 	{
@@ -438,7 +438,7 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 			{
 				// Heading:
 				const float factor = 0.0109863;
-				float psi = Xefis::floored_mod (factor * req.value_upper16(), 0.f, 360.f);
+				float psi = xf::floored_mod (factor * req.value_upper16(), 0.f, 360.f);
 				_orientation_magnetic_heading.write (1_deg * psi);
 			}
 			break;
@@ -579,9 +579,9 @@ CHRUM6::process_message (Xefis::CHRUM6::Read req)
 
 
 void
-CHRUM6::status_verify (Xefis::CHRUM6::Read req)
+CHRUM6::status_verify (xf::CHRUM6::Read req)
 {
-	typedef Xefis::CHRUM6::StatusRegister StatusRegister;
+	typedef xf::CHRUM6::StatusRegister StatusRegister;
 
 	bool serviceable = true;
 	bool caution = false;
@@ -713,7 +713,7 @@ CHRUM6::status_verify (Xefis::CHRUM6::Read req)
 
 
 void
-CHRUM6::describe_errors (Xefis::CHRUM6::Request const& req)
+CHRUM6::describe_errors (xf::CHRUM6::Request const& req)
 {
 	if (!req.success())
 		log() << "Command " << req.name() << " failed; protocol error: " << req.protocol_error_description() << "; retries: " << req.retries() << "." << std::endl;

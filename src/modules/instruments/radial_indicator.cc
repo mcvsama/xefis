@@ -31,8 +31,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator);
 
 
-RadialIndicator::RadialIndicator (Xefis::ModuleManager* module_manager, QDomElement const& config):
-	Xefis::Instrument (module_manager, config)
+RadialIndicator::RadialIndicator (xf::ModuleManager* module_manager, QDomElement const& config):
+	xf::Instrument (module_manager, config)
 {
 	_widget = new RadialIndicatorWidget (this);
 
@@ -65,7 +65,7 @@ RadialIndicator::data_updated()
 {
 	if (_initialize || _value.fresh() || _value_target.fresh() || _value_reference.fresh() || _value_automatic.fresh())
 	{
-		_widget->set_range (Xefis::Range<double> { _value_minimum, _value_maximum });
+		_widget->set_range (xf::Range<double> { _value_minimum, _value_maximum });
 		_widget->set_precision (_value_precision);
 		_widget->set_modulo (_value_modulo);
 
@@ -82,7 +82,7 @@ RadialIndicator::data_updated()
 
 
 Optional<double>
-RadialIndicator::get_optional_value (Xefis::TypedProperty const& property)
+RadialIndicator::get_optional_value (xf::TypedProperty const& property)
 {
 	Optional<double> result;
 	if (property.valid())

@@ -37,7 +37,7 @@
 #include <xefis/utility/painter.h>
 
 
-class EFISWidget: public Xefis::InstrumentWidget
+class EFISWidget: public xf::InstrumentWidget
 {
 	Q_OBJECT
 
@@ -225,7 +225,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 
 	class PaintWorkUnit:
 		public InstrumentWidget::PaintWorkUnit,
-		protected Xefis::InstrumentAids
+		protected xf::InstrumentAids
 	{
 		friend class EFISWidget;
 
@@ -255,34 +255,34 @@ class EFISWidget: public Xefis::InstrumentWidget
 		adi_pre_paint();
 
 		void
-		adi_paint (Xefis::Painter&);
+		adi_paint (xf::Painter&);
 
 		void
-		adi_clear (Xefis::Painter&);
+		adi_clear (xf::Painter&);
 
 		void
-		adi_paint_horizon (Xefis::Painter&);
+		adi_paint_horizon (xf::Painter&);
 
 		void
-		adi_paint_pitch_scale (Xefis::Painter&);
+		adi_paint_pitch_scale (xf::Painter&);
 
 		void
-		adi_paint_heading (Xefis::Painter&);
+		adi_paint_heading (xf::Painter&);
 
 		void
-		adi_paint_tcas_ra (Xefis::Painter&);
+		adi_paint_tcas_ra (xf::Painter&);
 
 		void
-		adi_paint_roll_scale (Xefis::Painter&);
+		adi_paint_roll_scale (xf::Painter&);
 
 		void
-		adi_paint_pitch_disagree (Xefis::Painter&);
+		adi_paint_pitch_disagree (xf::Painter&);
 
 		void
-		adi_paint_roll_disagree (Xefis::Painter&);
+		adi_paint_roll_disagree (xf::Painter&);
 
 		void
-		adi_paint_flight_path_marker (Xefis::Painter&);
+		adi_paint_flight_path_marker (xf::Painter&);
 
 		/*
 		 * Speed ladder
@@ -295,34 +295,34 @@ class EFISWidget: public Xefis::InstrumentWidget
 		sl_pre_paint();
 
 		void
-		sl_paint (Xefis::Painter&);
+		sl_paint (xf::Painter&);
 
 		void
-		sl_paint_black_box (Xefis::Painter&, float x);
+		sl_paint_black_box (xf::Painter&, float x);
 
 		void
-		sl_paint_ias_disagree (Xefis::Painter&, float x);
+		sl_paint_ias_disagree (xf::Painter&, float x);
 
 		void
-		sl_paint_ladder_scale (Xefis::Painter&, float x);
+		sl_paint_ladder_scale (xf::Painter&, float x);
 
 		void
-		sl_paint_speed_limits (Xefis::Painter&, float x);
+		sl_paint_speed_limits (xf::Painter&, float x);
 
 		void
-		sl_paint_speed_tendency (Xefis::Painter&, float x);
+		sl_paint_speed_tendency (xf::Painter&, float x);
 
 		void
-		sl_paint_bugs (Xefis::Painter&, float x);
+		sl_paint_bugs (xf::Painter&, float x);
 
 		void
-		sl_paint_mach_or_gs (Xefis::Painter&, float x);
+		sl_paint_mach_or_gs (xf::Painter&, float x);
 
 		void
-		sl_paint_ap_setting (Xefis::Painter&);
+		sl_paint_ap_setting (xf::Painter&);
 
 		void
-		sl_paint_novspd_flag (Xefis::Painter&);
+		sl_paint_novspd_flag (xf::Painter&);
 
 		float
 		kt_to_px (Speed) const;
@@ -338,34 +338,34 @@ class EFISWidget: public Xefis::InstrumentWidget
 		al_pre_paint();
 
 		void
-		al_paint (Xefis::Painter&);
+		al_paint (xf::Painter&);
 
 		void
-		al_paint_black_box (Xefis::Painter&, float x);
+		al_paint_black_box (xf::Painter&, float x);
 
 		void
-		al_paint_altitude_disagree (Xefis::Painter&, float x);
+		al_paint_altitude_disagree (xf::Painter&, float x);
 
 		void
-		al_paint_ladder_scale (Xefis::Painter&, float x);
+		al_paint_ladder_scale (xf::Painter&, float x);
 
 		void
-		al_paint_altitude_tendency (Xefis::Painter&, float x);
+		al_paint_altitude_tendency (xf::Painter&, float x);
 
 		void
-		al_paint_bugs (Xefis::Painter&, float x);
+		al_paint_bugs (xf::Painter&, float x);
 
 		void
-		al_paint_vertical_speed (Xefis::Painter&, float x);
+		al_paint_vertical_speed (xf::Painter&, float x);
 
 		void
-		al_paint_pressure (Xefis::Painter&, float x);
+		al_paint_pressure (xf::Painter&, float x);
 
 		void
-		al_paint_ap_setting (Xefis::Painter&);
+		al_paint_ap_setting (xf::Painter&);
 
 		void
-		al_paint_ldgalt_flag (Xefis::Painter&, float x);
+		al_paint_ldgalt_flag (xf::Painter&, float x);
 
 		float
 		ft_to_px (Length) const;
@@ -378,59 +378,59 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 */
 
 		void
-		paint_center_cross (Xefis::Painter&, bool center_box, bool rest);
+		paint_center_cross (xf::Painter&, bool center_box, bool rest);
 
 		void
-		paint_flight_director (Xefis::Painter&);
+		paint_flight_director (xf::Painter&);
 
 		void
-		paint_control_stick (Xefis::Painter&);
+		paint_control_stick (xf::Painter&);
 
 		void
-		paint_altitude_agl (Xefis::Painter&);
+		paint_altitude_agl (xf::Painter&);
 
 		void
-		paint_minimums_setting (Xefis::Painter&);
+		paint_minimums_setting (xf::Painter&);
 
 		void
-		paint_nav (Xefis::Painter&);
+		paint_nav (xf::Painter&);
 
 		void
-		paint_hints (Xefis::Painter&);
+		paint_hints (xf::Painter&);
 
 		void
-		paint_critical_aoa (Xefis::Painter&);
+		paint_critical_aoa (xf::Painter&);
 
 		void
-		paint_input_alert (Xefis::Painter&);
+		paint_input_alert (xf::Painter&);
 
 		void
-		paint_dashed_zone (Xefis::Painter&, QColor const&, QRectF const& target);
+		paint_dashed_zone (xf::Painter&, QColor const&, QRectF const& target);
 
 		/**
 		 * Various failure flags.
 		 */
 
 		void
-		adi_paint_attitude_failure (Xefis::Painter& painter);
+		adi_paint_attitude_failure (xf::Painter& painter);
 
 		void
-		adi_paint_flight_path_marker_failure (Xefis::Painter&);
+		adi_paint_flight_path_marker_failure (xf::Painter&);
 
 		void
-		adi_paint_flight_director_falure (Xefis::Painter&);
+		adi_paint_flight_director_falure (xf::Painter&);
 
 		void
-		sl_paint_failure (Xefis::Painter&);
+		sl_paint_failure (xf::Painter&);
 
 		void
-		al_paint_vertical_speed_failure (Xefis::Painter&, float x);
+		al_paint_vertical_speed_failure (xf::Painter&, float x);
 
 		void
-		al_paint_failure (Xefis::Painter&);
+		al_paint_failure (xf::Painter&);
 
 		void
-		paint_radar_altimeter_failure (Xefis::Painter&);
+		paint_radar_altimeter_failure (xf::Painter&);
 
 		/**
 		 * Render 'rotatable' value on speed/altitude black box.
@@ -443,7 +443,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 *			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
 		 */
 		void
-		paint_rotating_value (Xefis::Painter& painter,
+		paint_rotating_value (xf::Painter& painter,
 							  QRectF const& rect, float position, float height_scale,
 							  QString const& next, QString const& curr, QString const& prev);
 
@@ -454,7 +454,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 *			Draw red/green/blank mark instead of zero.
 		 */
 		void
-		paint_rotating_digit (Xefis::Painter& painter,
+		paint_rotating_digit (xf::Painter& painter,
 							  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 							  bool two_zeros, bool zero_mark, bool black_zero = false);
 
@@ -462,13 +462,13 @@ class EFISWidget: public Xefis::InstrumentWidget
 		 * Paint horizontal failure flag.
 		 */
 		void
-		paint_horizontal_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
+		paint_horizontal_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
 
 		/**
 		 * Paint vertical failure flag.
 		 */
 		void
-		paint_vertical_failure_flag (Xefis::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
+		paint_vertical_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message);
 
 		float
 		pitch_to_px (Angle degrees) const;
@@ -559,7 +559,7 @@ class EFISWidget: public Xefis::InstrumentWidget
 
   public:
 	// Ctor
-	EFISWidget (QWidget* parent, Xefis::WorkPerformer*);
+	EFISWidget (QWidget* parent, xf::WorkPerformer*);
 
 	// Dtor
 	~EFISWidget();

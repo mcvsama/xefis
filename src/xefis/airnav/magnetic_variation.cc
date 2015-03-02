@@ -31,14 +31,14 @@ calc_magvar (double lat, double lon, double h, long dat, double* field);
 
 
 void
-Xefis::MagneticVariation::set_date (int year, int month, int day)
+xf::MagneticVariation::set_date (int year, int month, int day)
 {
 	_julian_date = yymmdd_to_julian_days (year, month, day);
 }
 
 
 void
-Xefis::MagneticVariation::update()
+xf::MagneticVariation::update()
 {
     double field[6];
     _magnetic_declination = 1_rad * calc_magvar (_position.lat().rad(), _position.lon().rad(), _altitude_amsl.km(), _julian_date, field);
@@ -222,7 +222,7 @@ unsigned long int yymmdd_to_julian_days( int yyyy, int mm, int dd )
     unsigned long jd;
 	int yy;
 
-	yy = Xefis::limit (yyyy, 1950, 2049);
+	yy = xf::limit (yyyy, 1950, 2049);
     jd = dd - 32075L + 1461L * (yy + 4800L + (mm - 14) / 12 ) / 4;
     jd = jd + 367L * (mm - 2 - (mm - 14) / 12*12) / 12;
     jd = jd - 3 * ((yy + 4900L + (mm - 14) / 12) / 100) / 4;

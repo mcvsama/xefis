@@ -32,7 +32,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/trim-control", TrimControl);
 
 
-TrimControl::TrimControl (Xefis::ModuleManager* module_manager, QDomElement const& config):
+TrimControl::TrimControl (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
@@ -119,27 +119,27 @@ TrimControl::update_trim()
 void
 TrimControl::update_trim_without_sound()
 {
-	_trim_value = Xefis::limit (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * _trim_step, -1.0, 1.0);
+	_trim_value = xf::limit (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * _trim_step, -1.0, 1.0);
 	_output_trim_value = _trim_value;
 }
 
 
 inline bool
-TrimControl::pressed (Xefis::PropertyBoolean const& property)
+TrimControl::pressed (xf::PropertyBoolean const& property)
 {
 	return property.valid() && *property;
 }
 
 
 inline bool
-TrimControl::moved_up (Xefis::PropertyFloat const& property)
+TrimControl::moved_up (xf::PropertyFloat const& property)
 {
 	return property.valid() && *property > 0.5;
 }
 
 
 inline bool
-TrimControl::moved_down (Xefis::PropertyFloat const& property)
+TrimControl::moved_down (xf::PropertyFloat const& property)
 {
 	return property.valid() && *property < -0.5;
 }

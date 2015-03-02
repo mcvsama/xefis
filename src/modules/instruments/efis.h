@@ -32,13 +32,13 @@
 #include "efis_widget.h"
 
 
-class EFIS: public Xefis::Instrument
+class EFIS: public xf::Instrument
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	EFIS (Xefis::ModuleManager*, QDomElement const& config);
+	EFIS (xf::ModuleManager*, QDomElement const& config);
 
   public slots:
 	/**
@@ -55,149 +55,149 @@ class EFIS: public Xefis::Instrument
 	compute_fpv();
 
   private:
-	EFISWidget*							_efis_widget					= nullptr;
+	EFISWidget*						_efis_widget					= nullptr;
 	// Setting
-	Xefis::PropertyInteger::Type		_speed_ladder_line_every		= 10;
-	Xefis::PropertyInteger::Type		_speed_ladder_number_every		= 20;
-	Xefis::PropertyInteger::Type		_speed_ladder_extent			= 124;
-	Xefis::PropertyInteger::Type		_speed_ladder_minimum			= 20;
-	Xefis::PropertyInteger::Type		_speed_ladder_maximum			= 350;
-	Xefis::PropertyInteger::Type		_altitude_ladder_line_every		= 100;
-	Xefis::PropertyInteger::Type		_altitude_ladder_number_every	= 200;
-	Xefis::PropertyInteger::Type		_altitude_ladder_emphasis_every	= 1000;
-	Xefis::PropertyInteger::Type		_altitude_ladder_bold_every		= 500;
-	Xefis::PropertyInteger::Type		_altitude_ladder_extent			= 825;
-	Length								_altitude_landing_warning_hi	= 1000_ft;
-	Length								_altitude_landing_warning_lo	= 500_ft;
-	Length								_raising_runway_visibility		= 1000_ft;
-	Length								_raising_runway_threshold		= 250_ft;
-	Angle								_aoa_visibility_threshold		= 17.5_deg;
-	double								_show_mach_above				= 0.4;
+	xf::PropertyInteger::Type		_speed_ladder_line_every		= 10;
+	xf::PropertyInteger::Type		_speed_ladder_number_every		= 20;
+	xf::PropertyInteger::Type		_speed_ladder_extent			= 124;
+	xf::PropertyInteger::Type		_speed_ladder_minimum			= 20;
+	xf::PropertyInteger::Type		_speed_ladder_maximum			= 350;
+	xf::PropertyInteger::Type		_altitude_ladder_line_every		= 100;
+	xf::PropertyInteger::Type		_altitude_ladder_number_every	= 200;
+	xf::PropertyInteger::Type		_altitude_ladder_emphasis_every	= 1000;
+	xf::PropertyInteger::Type		_altitude_ladder_bold_every		= 500;
+	xf::PropertyInteger::Type		_altitude_ladder_extent			= 825;
+	Length							_altitude_landing_warning_hi	= 1000_ft;
+	Length							_altitude_landing_warning_lo	= 500_ft;
+	Length							_raising_runway_visibility		= 1000_ft;
+	Length							_raising_runway_threshold		= 250_ft;
+	Angle							_aoa_visibility_threshold		= 17.5_deg;
+	double							_show_mach_above				= 0.4;
 	// Speed
-	Xefis::PropertyBoolean				_speed_ias_serviceable;
-	Xefis::PropertySpeed				_speed_ias;
-	Xefis::PropertySpeed				_speed_ias_lookahead;
-	Xefis::PropertySpeed				_speed_ias_minimum;
-	Xefis::PropertySpeed				_speed_ias_minimum_maneuver;
-	Xefis::PropertySpeed				_speed_ias_maximum_maneuver;
-	Xefis::PropertySpeed				_speed_ias_maximum;
-	Xefis::PropertyFloat				_speed_mach;
-	Xefis::PropertySpeed				_speed_ground;
+	xf::PropertyBoolean				_speed_ias_serviceable;
+	xf::PropertySpeed				_speed_ias;
+	xf::PropertySpeed				_speed_ias_lookahead;
+	xf::PropertySpeed				_speed_ias_minimum;
+	xf::PropertySpeed				_speed_ias_minimum_maneuver;
+	xf::PropertySpeed				_speed_ias_maximum_maneuver;
+	xf::PropertySpeed				_speed_ias_maximum;
+	xf::PropertyFloat				_speed_mach;
+	xf::PropertySpeed				_speed_ground;
 	// Speed bugs
-	Xefis::PropertySpeed				_speed_v1;
-	Xefis::PropertySpeed				_speed_vr;
-	Xefis::PropertySpeed				_speed_vref;
-	Xefis::PropertyString				_speed_flaps_up_label;
-	Xefis::PropertySpeed				_speed_flaps_up_speed;
-	QString								_speed_flaps_up_current_label;
-	Xefis::PropertyString				_speed_flaps_a_label;
-	Xefis::PropertySpeed				_speed_flaps_a_speed;
-	QString								_speed_flaps_a_current_label;
-	Xefis::PropertyString				_speed_flaps_b_label;
-	Xefis::PropertySpeed				_speed_flaps_b_speed;
-	QString								_speed_flaps_b_current_label;
+	xf::PropertySpeed				_speed_v1;
+	xf::PropertySpeed				_speed_vr;
+	xf::PropertySpeed				_speed_vref;
+	xf::PropertyString				_speed_flaps_up_label;
+	xf::PropertySpeed				_speed_flaps_up_speed;
+	QString							_speed_flaps_up_current_label;
+	xf::PropertyString				_speed_flaps_a_label;
+	xf::PropertySpeed				_speed_flaps_a_speed;
+	QString							_speed_flaps_a_current_label;
+	xf::PropertyString				_speed_flaps_b_label;
+	xf::PropertySpeed				_speed_flaps_b_speed;
+	QString							_speed_flaps_b_current_label;
 	// Attitude and heading
-	Xefis::PropertyBoolean				_orientation_serviceable;
-	Xefis::PropertyAngle				_orientation_pitch;
-	Xefis::PropertyAngle				_orientation_roll;
-	Xefis::PropertyAngle				_orientation_heading_magnetic;
-	Xefis::PropertyAngle				_orientation_heading_true;
-	Xefis::PropertyBoolean				_orientation_heading_numbers_visible;
+	xf::PropertyBoolean				_orientation_serviceable;
+	xf::PropertyAngle				_orientation_pitch;
+	xf::PropertyAngle				_orientation_roll;
+	xf::PropertyAngle				_orientation_heading_magnetic;
+	xf::PropertyAngle				_orientation_heading_true;
+	xf::PropertyBoolean				_orientation_heading_numbers_visible;
 	// Track
-	Xefis::PropertyAngle				_track_lateral_magnetic;
-	Xefis::PropertyAngle				_track_lateral_true;
-	Xefis::PropertyAngle				_track_vertical;
+	xf::PropertyAngle				_track_lateral_magnetic;
+	xf::PropertyAngle				_track_lateral_true;
+	xf::PropertyAngle				_track_vertical;
 	// Slip-skid indicator
-	Xefis::PropertyFloat				_slip_skid;
+	xf::PropertyFloat				_slip_skid;
 	// Flight Path Vector
-	Xefis::PropertyBoolean				_fpv_visible;
-	Xefis::PropertyBoolean				_weight_on_wheels;
-	bool								_computed_fpv_failure			= false;
-	bool								_computed_fpv_visible			= false;
-	Angle								_computed_fpv_alpha				= 0_deg;
-	Angle								_computed_fpv_beta				= 0_deg;
+	xf::PropertyBoolean				_fpv_visible;
+	xf::PropertyBoolean				_weight_on_wheels;
+	bool							_computed_fpv_failure			= false;
+	bool							_computed_fpv_visible			= false;
+	Angle							_computed_fpv_alpha				= 0_deg;
+	Angle							_computed_fpv_beta				= 0_deg;
 	// Angle of Attack
-	Xefis::PropertyAngle				_aoa_alpha;
-	Xefis::PropertyAngle				_aoa_alpha_maximum;
-	Xefis::PropertyBoolean				_aoa_alpha_visible;
+	xf::PropertyAngle				_aoa_alpha;
+	xf::PropertyAngle				_aoa_alpha_maximum;
+	xf::PropertyBoolean				_aoa_alpha_visible;
 	// Pressure and radio altitude
-	Xefis::PropertyBoolean				_altitude_amsl_serviceable;
-	Xefis::PropertyLength				_altitude_amsl;
-	Xefis::PropertyLength				_altitude_amsl_lookahead;
-	Xefis::PropertyBoolean				_altitude_agl_serviceable;
-	Xefis::PropertyLength				_altitude_agl;
-	Xefis::PropertyString				_altitude_minimums_type;
-	Xefis::PropertyLength				_altitude_minimums_setting;
-	Xefis::PropertyLength				_altitude_minimums_amsl;
-	Xefis::PropertyLength				_altitude_landing_amsl;
+	xf::PropertyBoolean				_altitude_amsl_serviceable;
+	xf::PropertyLength				_altitude_amsl;
+	xf::PropertyLength				_altitude_amsl_lookahead;
+	xf::PropertyBoolean				_altitude_agl_serviceable;
+	xf::PropertyLength				_altitude_agl;
+	xf::PropertyString				_altitude_minimums_type;
+	xf::PropertyLength				_altitude_minimums_setting;
+	xf::PropertyLength				_altitude_minimums_amsl;
+	xf::PropertyLength				_altitude_landing_amsl;
 	// Vertical speed
-	Xefis::PropertyBoolean				_vertical_speed_serviceable;
-	Xefis::PropertySpeed				_vertical_speed;
-	Xefis::PropertySpeed				_vertical_speed_variometer;
+	xf::PropertyBoolean				_vertical_speed_serviceable;
+	xf::PropertySpeed				_vertical_speed;
+	xf::PropertySpeed				_vertical_speed_variometer;
 	// Air pressure settings
-	Xefis::PropertyPressure				_pressure_qnh;
-	Xefis::PropertyBoolean				_pressure_display_hpa;
-	Xefis::PropertyBoolean				_pressure_use_std;
+	xf::PropertyPressure			_pressure_qnh;
+	xf::PropertyBoolean				_pressure_display_hpa;
+	xf::PropertyBoolean				_pressure_use_std;
 	// Flight director
-	Xefis::PropertyBoolean				_flight_director_serviceable;
-	Xefis::PropertyBoolean				_flight_director_cmd_visible;
-	Xefis::PropertyLength				_flight_director_cmd_altitude;
-	Xefis::PropertyBoolean				_flight_director_cmd_altitude_acquired;
-	Xefis::PropertySpeed				_flight_director_cmd_ias;
-	Xefis::PropertyFloat				_flight_director_cmd_mach;
-	Xefis::PropertySpeed				_flight_director_cmd_vertical_speed;
-	Xefis::PropertyAngle				_flight_director_cmd_fpa;
-	Xefis::PropertyBoolean				_flight_director_guidance_visible;
-	Xefis::PropertyAngle				_flight_director_guidance_pitch;
-	Xefis::PropertyAngle				_flight_director_guidance_roll;
+	xf::PropertyBoolean				_flight_director_serviceable;
+	xf::PropertyBoolean				_flight_director_cmd_visible;
+	xf::PropertyLength				_flight_director_cmd_altitude;
+	xf::PropertyBoolean				_flight_director_cmd_altitude_acquired;
+	xf::PropertySpeed				_flight_director_cmd_ias;
+	xf::PropertyFloat				_flight_director_cmd_mach;
+	xf::PropertySpeed				_flight_director_cmd_vertical_speed;
+	xf::PropertyAngle				_flight_director_cmd_fpa;
+	xf::PropertyBoolean				_flight_director_guidance_visible;
+	xf::PropertyAngle				_flight_director_guidance_pitch;
+	xf::PropertyAngle				_flight_director_guidance_roll;
 	// Stick position indicator
-	Xefis::PropertyBoolean				_control_stick_visible;
-	Xefis::PropertyAngle				_control_stick_pitch;
-	Xefis::PropertyAngle				_control_stick_roll;
+	xf::PropertyBoolean				_control_stick_visible;
+	xf::PropertyAngle				_control_stick_pitch;
+	xf::PropertyAngle				_control_stick_roll;
 	// Approach information
-	Xefis::PropertyBoolean				_navaid_reference_visible;
-	Xefis::PropertyAngle				_navaid_course_magnetic;
-	Xefis::PropertyString				_navaid_type_hint;
-	Xefis::PropertyString				_navaid_identifier;
-	Xefis::PropertyLength				_navaid_distance;
+	xf::PropertyBoolean				_navaid_reference_visible;
+	xf::PropertyAngle				_navaid_course_magnetic;
+	xf::PropertyString				_navaid_type_hint;
+	xf::PropertyString				_navaid_identifier;
+	xf::PropertyLength				_navaid_distance;
 	// Flight path deviation
-	Xefis::PropertyBoolean				_flight_path_deviation_lateral_serviceable;
-	Xefis::PropertyAngle				_flight_path_deviation_lateral_app;
-	Xefis::PropertyAngle				_flight_path_deviation_lateral_fp;
-	Xefis::PropertyBoolean				_flight_path_deviation_vertical_serviceable;
-	Xefis::PropertyAngle				_flight_path_deviation_vertical;
-	Xefis::PropertyAngle				_flight_path_deviation_vertical_app;
-	Xefis::PropertyAngle				_flight_path_deviation_vertical_fp;
-	Xefis::PropertyBoolean				_flight_path_deviation_mixed_mode;
+	xf::PropertyBoolean				_flight_path_deviation_lateral_serviceable;
+	xf::PropertyAngle				_flight_path_deviation_lateral_app;
+	xf::PropertyAngle				_flight_path_deviation_lateral_fp;
+	xf::PropertyBoolean				_flight_path_deviation_vertical_serviceable;
+	xf::PropertyAngle				_flight_path_deviation_vertical;
+	xf::PropertyAngle				_flight_path_deviation_vertical_app;
+	xf::PropertyAngle				_flight_path_deviation_vertical_fp;
+	xf::PropertyBoolean				_flight_path_deviation_mixed_mode;
 	// Flight mode information
-	Xefis::PropertyBoolean				_flight_mode_hint_visible;
-	Xefis::PropertyString				_flight_mode_hint;
-	Xefis::PropertyBoolean				_flight_mode_fma_visible;
-	Xefis::PropertyString				_flight_mode_fma_speed_hint;
-	Xefis::PropertyString				_flight_mode_fma_speed_small_hint;
-	Xefis::PropertyString				_flight_mode_fma_lateral_hint;
-	Xefis::PropertyString				_flight_mode_fma_lateral_small_hint;
-	Xefis::PropertyString				_flight_mode_fma_vertical_hint;
-	Xefis::PropertyString				_flight_mode_fma_vertical_small_hint;
+	xf::PropertyBoolean				_flight_mode_hint_visible;
+	xf::PropertyString				_flight_mode_hint;
+	xf::PropertyBoolean				_flight_mode_fma_visible;
+	xf::PropertyString				_flight_mode_fma_speed_hint;
+	xf::PropertyString				_flight_mode_fma_speed_small_hint;
+	xf::PropertyString				_flight_mode_fma_lateral_hint;
+	xf::PropertyString				_flight_mode_fma_lateral_small_hint;
+	xf::PropertyString				_flight_mode_fma_vertical_hint;
+	xf::PropertyString				_flight_mode_fma_vertical_small_hint;
 	// TCAS
-	Xefis::PropertyAngle				_tcas_resolution_advisory_pitch_minimum;
-	Xefis::PropertyAngle				_tcas_resolution_advisory_pitch_maximum;
-	Xefis::PropertySpeed				_tcas_resolution_advisory_vertical_speed_minimum;
-	Xefis::PropertySpeed				_tcas_resolution_advisory_vertical_speed_maximum;
+	xf::PropertyAngle				_tcas_resolution_advisory_pitch_minimum;
+	xf::PropertyAngle				_tcas_resolution_advisory_pitch_maximum;
+	xf::PropertySpeed				_tcas_resolution_advisory_vertical_speed_minimum;
+	xf::PropertySpeed				_tcas_resolution_advisory_vertical_speed_maximum;
 	// General warning/failure flags
-	Xefis::PropertyBoolean				_warning_novspd_flag;
-	Xefis::PropertyBoolean				_warning_ldgalt_flag;
-	Xefis::PropertyBoolean				_warning_pitch_disagree;
-	Xefis::PropertyBoolean				_warning_roll_disagree;
-	Xefis::PropertyBoolean				_warning_ias_disagree;
-	Xefis::PropertyBoolean				_warning_altitude_disagree;
-	Xefis::PropertyBoolean				_warning_roll;
-	Xefis::PropertyBoolean				_warning_slip_skid;
+	xf::PropertyBoolean				_warning_novspd_flag;
+	xf::PropertyBoolean				_warning_ldgalt_flag;
+	xf::PropertyBoolean				_warning_pitch_disagree;
+	xf::PropertyBoolean				_warning_roll_disagree;
+	xf::PropertyBoolean				_warning_ias_disagree;
+	xf::PropertyBoolean				_warning_altitude_disagree;
+	xf::PropertyBoolean				_warning_roll;
+	xf::PropertyBoolean				_warning_slip_skid;
 	// Style
-	Xefis::PropertyBoolean				_style_old;
-	Xefis::PropertyBoolean				_style_show_metric;
+	xf::PropertyBoolean				_style_old;
+	xf::PropertyBoolean				_style_show_metric;
 	// Other:
-	Xefis::PropertyObserver				_fpv_computer;
+	xf::PropertyObserver			_fpv_computer;
 };
 
 

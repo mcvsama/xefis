@@ -29,12 +29,12 @@
 
 
 class Label:
-	public Xefis::Instrument,
-	protected Xefis::InstrumentAids
+	public xf::Instrument,
+	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Label (Xefis::ModuleManager*, QDomElement const& config);
+	Label (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

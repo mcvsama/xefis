@@ -27,7 +27,7 @@
 
 class Sound:
 	public QObject,
-	public Xefis::Module
+	public xf::Module
 {
 	Q_OBJECT
 
@@ -47,7 +47,7 @@ class Sound:
 		};
 
 	  public:
-		Alarm (QDomElement const&, Xefis::SoundManager*);
+		Alarm (QDomElement const&, xf::SoundManager*);
 
 		/**
 		 * Sort by priority: highest first.
@@ -76,15 +76,15 @@ class Sound:
 		stop();
 
 	  private:
-		QString								_sound_file_path;
-		Xefis::PropertyBoolean				_property;
-		Weak<Xefis::SoundManager::Sound>	_sound;
-		int32_t								_priority;
-		bool								_repeat;
-		Time								_repeat_period;
-		Xefis::SoundManager*				_sound_manager;
-		bool								_was_started = false;
-		Optional<Time>						_finished_timestamp;
+		QString							_sound_file_path;
+		xf::PropertyBoolean				_property;
+		Weak<xf::SoundManager::Sound>	_sound;
+		int32_t							_priority;
+		bool							_repeat;
+		Time							_repeat_period;
+		xf::SoundManager*				_sound_manager;
+		bool							_was_started = false;
+		Optional<Time>					_finished_timestamp;
 	};
 
 	typedef std::set<Unique<Alarm>, Alarm::Compare> Alarms;
@@ -92,7 +92,7 @@ class Sound:
 	class Group
 	{
 	  public:
-		Group (QDomElement const&, Xefis::SoundManager*);
+		Group (QDomElement const&, xf::SoundManager*);
 
 		/**
 		 * Run test to see if any alarms need to be fired.
@@ -108,7 +108,7 @@ class Sound:
 
   public:
 	// Ctor
-	Sound (Xefis::ModuleManager*, QDomElement const& config);
+	Sound (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

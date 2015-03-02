@@ -31,11 +31,11 @@
  * Controls trim value with two buttons or axis.
  * Generates appropriate trimming sound.
  */
-class TrimControl: public Xefis::Module
+class TrimControl: public xf::Module
 {
   public:
 	// Ctor
-	TrimControl (Xefis::ModuleManager*, QDomElement const& config);
+	TrimControl (xf::ModuleManager*, QDomElement const& config);
 
   private:
 	// Module API
@@ -55,19 +55,19 @@ class TrimControl: public Xefis::Module
 	 * Return true if given button is 'pressed'.
 	 */
 	static bool
-	pressed (Xefis::PropertyBoolean const&);
+	pressed (xf::PropertyBoolean const&);
 
 	/**
 	 * Return true if given axis is moved 'up'.
 	 */
 	static bool
-	moved_up (Xefis::PropertyFloat const&);
+	moved_up (xf::PropertyFloat const&);
 
 	/**
 	 * Return true if given axis is moved 'down'.
 	 */
 	static bool
-	moved_down (Xefis::PropertyFloat const&);
+	moved_down (xf::PropertyFloat const&);
 
   private:
 	double					_trim_step		= 0.01;
@@ -76,15 +76,15 @@ class TrimControl: public Xefis::Module
 	bool					_trimming_down	= false;
 	Unique<QTimer>			_timer;
 	// Input:
-	Xefis::PropertyFloat	_input_trim_axis;
-	Xefis::PropertyFloat	_input_trim_value;
-	Xefis::PropertyBoolean	_input_up_trim_button;
-	Xefis::PropertyBoolean	_input_down_trim_button;
+	xf::PropertyFloat		_input_trim_axis;
+	xf::PropertyFloat		_input_trim_value;
+	xf::PropertyBoolean		_input_up_trim_button;
+	xf::PropertyBoolean		_input_down_trim_button;
 	// Output:
-	Xefis::PropertyFloat	_output_trim_value;
+	xf::PropertyFloat		_output_trim_value;
 	// Other:
-	Xefis::PropertyObserver	_trim_computer;
-	Xefis::PropertyObserver	_mix_computer;
+	xf::PropertyObserver	_trim_computer;
+	xf::PropertyObserver	_mix_computer;
 };
 
 #endif

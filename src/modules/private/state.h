@@ -32,15 +32,15 @@
 #include <xefis/utility/range.h>
 
 
-class State: public Xefis::Module
+class State: public xf::Module
 {
 	static constexpr Length					MinimumsBaroStep		= 10_ft;
 	static constexpr Length					MinimumsRadioStep		= 1_ft;
-	static constexpr Xefis::Range<Length>	MinimumsBaroRange		= { 0_ft, 5000_ft };
-	static constexpr Xefis::Range<Length>	MinimumsRadioRange		= { 0_ft, 20_ft };
+	static constexpr xf::Range<Length>		MinimumsBaroRange		= { 0_ft, 5000_ft };
+	static constexpr xf::Range<Length>		MinimumsRadioRange		= { 0_ft, 20_ft };
 	static constexpr Pressure				QNHhPaStep				= 1_hPa;
 	static constexpr Pressure				QNHinHgStep				= 0.01_inHg;
-	static constexpr Xefis::Range<Pressure>	QNHRange				= { 800_hPa, 1100_hPa };
+	static constexpr xf::Range<Pressure>	QNHRange				= { 800_hPa, 1100_hPa };
 
 	enum class MinimumsType
 	{
@@ -133,7 +133,7 @@ class State: public Xefis::Module
 		};
 
   public:
-	State (Xefis::ModuleManager* module_manager, QDomElement const& config);
+	State (xf::ModuleManager* module_manager, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -173,78 +173,78 @@ class State: public Xefis::Module
 	 * Call given callback when button is pressed (property becomes true).
 	 */
 	void
-	make_switch (Observable<Xefis::PropertyBoolean>& bool_observable, std::function<void()>);
+	make_switch (Observable<xf::PropertyBoolean>& bool_observable, std::function<void()>);
 
 	/**
 	 * Set observable to toggle given target_switch.
 	 */
 	void
-	make_toggle (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::PropertyBoolean& target_switch);
+	make_toggle (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyBoolean& target_switch);
 
 	/**
 	 * Set observable to write given integer to target_property.
 	 */
 	void
-	make_int_writer (Observable<Xefis::PropertyBoolean>& bool_observable, Xefis::PropertyInteger& target_property, int value);
+	make_int_writer (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyInteger& target_property, int value);
 
   private:
-	MinimumsType						_minimums_type				= MinimumsType::Baro;
-	Length								_minimums_setting_baro		= 0_ft;
-	Length								_minimums_setting_radio		= 0_ft;
-	Pressure							_qnh_setting				= 29.92_inHg;
-	Angle								_course						= 0_deg;
-	bool								_course_visible				= false;
+	MinimumsType					_minimums_type				= MinimumsType::Baro;
+	Length							_minimums_setting_baro		= 0_ft;
+	Length							_minimums_setting_radio		= 0_ft;
+	Pressure						_qnh_setting				= 29.92_inHg;
+	Angle							_course						= 0_deg;
+	bool							_course_visible				= false;
 	// Logic:
-	Unique<xf::ButtonAction>			_efis_mins_mode_button;
-	Unique<xf::ButtonOptionsAction>		_navaid_select_panel;
-	Unique<xf::ButtonOptionsAction>		_navaid_left_panel;
-	Unique<xf::ButtonOptionsAction>		_navaid_right_panel;
-	Unique<xf::ToggleButtonAction>		_afcs_ap_button;
-	Unique<xf::ButtonOptionsAction>		_mfd_panel;
+	Unique<xf::ButtonAction>		_efis_mins_mode_button;
+	Unique<xf::ButtonOptionsAction>	_navaid_select_panel;
+	Unique<xf::ButtonOptionsAction>	_navaid_left_panel;
+	Unique<xf::ButtonOptionsAction>	_navaid_right_panel;
+	Unique<xf::ToggleButtonAction>	_afcs_ap_button;
+	Unique<xf::ButtonOptionsAction>	_mfd_panel;
 	// Buttons, switches, knobs:
-	Xefis::PropertyInteger				_mcp_mins_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_mins_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_att;
-	Observable<Xefis::PropertyBoolean>	_mcp_appr;
-	Observable<Xefis::PropertyBoolean>	_mcp_fd;
-	Observable<Xefis::PropertyBoolean>	_mcp_htrk;
-	Xefis::PropertyInteger				_mcp_qnh_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_qnh_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_qnh_hpa;
-	Observable<Xefis::PropertyBoolean>	_mcp_std;
-	Observable<Xefis::PropertyBoolean>	_mcp_metric;
-	Observable<Xefis::PropertyBoolean>	_mcp_fpv;
-	Xefis::PropertyInteger				_mcp_range_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_range_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_range_ctr;
-	Observable<Xefis::PropertyBoolean>	_mcp_hdg_trk;
-	Observable<Xefis::PropertyBoolean>	_mcp_mag_tru;
-	Xefis::PropertyInteger				_mcp_course_value;
-	Unique<Xefis::DeltaDecoder>			_mcp_course_decoder;
-	Observable<Xefis::PropertyBoolean>	_mcp_course_hide;
+	xf::PropertyInteger				_mcp_mins_value;
+	Unique<xf::DeltaDecoder>		_mcp_mins_decoder;
+	Observable<xf::PropertyBoolean>	_mcp_att;
+	Observable<xf::PropertyBoolean>	_mcp_appr;
+	Observable<xf::PropertyBoolean>	_mcp_fd;
+	Observable<xf::PropertyBoolean>	_mcp_htrk;
+	xf::PropertyInteger				_mcp_qnh_value;
+	Unique<xf::DeltaDecoder>		_mcp_qnh_decoder;
+	Observable<xf::PropertyBoolean>	_mcp_qnh_hpa;
+	Observable<xf::PropertyBoolean>	_mcp_std;
+	Observable<xf::PropertyBoolean>	_mcp_metric;
+	Observable<xf::PropertyBoolean>	_mcp_fpv;
+	xf::PropertyInteger				_mcp_range_value;
+	Unique<xf::DeltaDecoder>		_mcp_range_decoder;
+	Observable<xf::PropertyBoolean>	_mcp_range_ctr;
+	Observable<xf::PropertyBoolean>	_mcp_hdg_trk;
+	Observable<xf::PropertyBoolean>	_mcp_mag_tru;
+	xf::PropertyInteger				_mcp_course_value;
+	Unique<xf::DeltaDecoder>		_mcp_course_decoder;
+	Observable<xf::PropertyBoolean>	_mcp_course_hide;
 	// LEDs, displays:
-	Xefis::PropertyInteger				_mcp_course_display;
+	xf::PropertyInteger				_mcp_course_display;
 	// Controlled properties:
-	Xefis::PropertyBoolean				_setting_efis_fpv_visible;
-	Xefis::PropertyBoolean				_setting_efis_show_metric;
-	Xefis::PropertyBoolean				_setting_efis_fd_visible;
-	Xefis::PropertyBoolean				_setting_efis_appr_visible;
-	Xefis::PropertyPressure				_setting_pressure_qnh;
-	Xefis::PropertyBoolean				_setting_pressure_display_hpa;
-	Xefis::PropertyBoolean				_setting_pressure_use_std;
-	Xefis::PropertyLength				_setting_minimums_amsl;
-	Xefis::PropertyLength				_setting_minimums_setting;
-	Xefis::PropertyString				_setting_minimums_type;
-	Xefis::PropertyBoolean				_setting_hsi_display_true_heading;
-	Xefis::PropertyBoolean				_setting_hsi_center_on_track;
-	Xefis::PropertyInteger				_setting_hsi_display_mode_mfd;
-	Xefis::PropertyLength				_setting_hsi_range;
-	Xefis::PropertyBoolean				_setting_hsi_home_track_visible;
-	Xefis::PropertyAngle				_setting_course;
-	Xefis::PropertyBoolean				_setting_course_visible;
+	xf::PropertyBoolean				_setting_efis_fpv_visible;
+	xf::PropertyBoolean				_setting_efis_show_metric;
+	xf::PropertyBoolean				_setting_efis_fd_visible;
+	xf::PropertyBoolean				_setting_efis_appr_visible;
+	xf::PropertyPressure			_setting_pressure_qnh;
+	xf::PropertyBoolean				_setting_pressure_display_hpa;
+	xf::PropertyBoolean				_setting_pressure_use_std;
+	xf::PropertyLength				_setting_minimums_amsl;
+	xf::PropertyLength				_setting_minimums_setting;
+	xf::PropertyString				_setting_minimums_type;
+	xf::PropertyBoolean				_setting_hsi_display_true_heading;
+	xf::PropertyBoolean				_setting_hsi_center_on_track;
+	xf::PropertyInteger				_setting_hsi_display_mode_mfd;
+	xf::PropertyLength				_setting_hsi_range;
+	xf::PropertyBoolean				_setting_hsi_home_track_visible;
+	xf::PropertyAngle				_setting_course;
+	xf::PropertyBoolean				_setting_course_visible;
 	// Other:
-	std::vector<ObservableBase*>		_observables;
-	std::vector<Xefis::DeltaDecoder*>	_rotary_decoders;
+	std::vector<ObservableBase*>	_observables;
+	std::vector<xf::DeltaDecoder*>	_rotary_decoders;
 };
 
 

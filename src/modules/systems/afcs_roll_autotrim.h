@@ -32,11 +32,11 @@
  *
  * Works only for air speeds well below Mach 1.
  */
-class AFCS_RollAutotrim: public Xefis::Module
+class AFCS_RollAutotrim: public xf::Module
 {
   public:
 	// Ctor
-	AFCS_RollAutotrim (Xefis::ModuleManager*, QDomElement const& config);
+	AFCS_RollAutotrim (xf::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

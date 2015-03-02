@@ -42,11 +42,11 @@ parse_hex_string (QString const& string)
 
 	auto from_xdigit = [&string](QChar& c) -> uint8_t
 	{
-		static Xefis::HexTable hextable;
+		static xf::HexTable hextable;
 
 		char a = c.toLatin1();
 		if (!std::isxdigit (a))
-			throw Xefis::Exception ("invalid binary string: " + string.toStdString());
+			throw xf::Exception ("invalid binary string: " + string.toStdString());
 		return hextable[a];
 	};
 
@@ -71,14 +71,14 @@ parse_hex_string (QString const& string)
 			case Colon:
 				// Skip it:
 				if (c != ':')
-					throw Xefis::Exception ("invalid binary string: " + string.toStdString());
+					throw xf::Exception ("invalid binary string: " + string.toStdString());
 				state = MSB;
 				break;
 		}
 	}
 	// Must end with state Colon:
 	if (state != Colon)
-		throw Xefis::Exception ("invalid binary string: " + string.toStdString());
+		throw xf::Exception ("invalid binary string: " + string.toStdString());
 	return blob;
 }
 

@@ -30,7 +30,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/rcms", RemoteControlManagementSystem);
 
 
-RemoteControlManagementSystem::RemoteControlManagementSystem (Xefis::ModuleManager* module_manager, QDomElement const& config):
+RemoteControlManagementSystem::RemoteControlManagementSystem (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	create_configurator_widget();
@@ -132,7 +132,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 		_distance_vertical.write (alt_diff);
 		_distance_ground.write (ground_dist);
 		_distance_vlos.write (1_nmi * std::sqrt (ground_dist.nmi() * ground_dist.nmi() + alt_diff.nmi() * alt_diff.nmi()));
-		_true_home_direction.write (Xefis::floored_mod (curr.initial_bearing (home), 360_deg));
+		_true_home_direction.write (xf::floored_mod (curr.initial_bearing (home), 360_deg));
 	}
 	else
 	{

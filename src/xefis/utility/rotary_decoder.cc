@@ -20,7 +20,7 @@
 
 namespace Xefis {
 
-RotaryDecoder::RotaryDecoder (Xefis::PropertyBoolean& property_a, Xefis::PropertyBoolean& property_b, Callback callback):
+RotaryDecoder::RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback):
 	_prev_a (property_a.read (false)),
 	_prev_b (property_b.read (false)),
 	_property_a (property_a),

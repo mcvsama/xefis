@@ -36,7 +36,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("systems/pc", PerformanceComputer);
 
 
-PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, QDomElement const& config):
+PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
@@ -162,7 +162,7 @@ PerformanceComputer::PerformanceComputer (Xefis::ModuleManager* module_manager, 
 void
 PerformanceComputer::data_updated()
 {
-	Xefis::PropertyObserver* computers[] = {
+	xf::PropertyObserver* computers[] = {
 		// Order is important:
 		&_wind_computer,
 		&_glide_ratio_computer,
@@ -173,7 +173,7 @@ PerformanceComputer::data_updated()
 		&_estimations_computer,
 	};
 
-	for (Xefis::PropertyObserver* o: computers)
+	for (xf::PropertyObserver* o: computers)
 		o->data_updated (update_time());
 }
 
@@ -189,12 +189,12 @@ PerformanceComputer::compute_wind()
 	{
 		Time update_dt = _wind_computer.update_dt();
 
-		Xefis::WindTriangle wt;
+		xf::WindTriangle wt;
 		wt.set_air_vector (*_speed_tas, *_orientation_heading_true);
 		wt.set_ground_vector (*_speed_gs, *_track_lateral_true);
 		wt.compute_wind_vector();
-		_wind_from_true.write (Xefis::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_from().deg(), update_dt), 360_deg));
-		_wind_from_magnetic.write (Xefis::true_to_magnetic (*_wind_from_true, *_magnetic_declination));
+		_wind_from_true.write (xf::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_from().deg(), update_dt), 360_deg));
+		_wind_from_magnetic.write (xf::true_to_magnetic (*_wind_from_true, *_magnetic_declination));
 		_wind_tas.write (1_kt * _wind_speed_smoother.process (wt.wind_speed().kt(), update_dt));
 	}
 	else
@@ -215,7 +215,7 @@ PerformanceComputer::compute_glide_ratio()
 	{
 		Speed forward_speed = *_speed_gs;
 		int ratio = (forward_speed > 1_kt)
-			? Xefis::limit<int> (forward_speed / *_vertical_speed, -99, +99)
+			? xf::limit<int> (forward_speed / *_vertical_speed, -99, +99)
 			: 0;
 		_glide_ratio.write (ratio);
 

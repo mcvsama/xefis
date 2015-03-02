@@ -123,7 +123,7 @@ Application::notify (QObject* receiver, QEvent* event)
 	}
 	catch (Exception const& e)
 	{
-		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded Xefis::Exception:" << std::endl << e << std::endl;
+		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded xf::Exception:" << std::endl << e << std::endl;
 	}
 	catch (boost::exception const& e)
 	{
