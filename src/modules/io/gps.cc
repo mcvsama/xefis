@@ -43,12 +43,6 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/gps", GPS);
 
 
-std::array<std::string, 9>			GPS::_fix_quality_strings;
-bool								GPS::_fix_quality_strings_initialized = false;
-std::map<std::string, std::string>	GPS::_pmtk_hints;
-bool								GPS::_pmtk_hints_initialized = false;
-
-
 GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
@@ -135,49 +129,51 @@ GPS::~GPS()
 std::string
 GPS::describe_fix_quality (int code)
 {
-	if (!_fix_quality_strings_initialized)
+	static std::array<std::string, 9> fix_quality_strings;
+
+	if (fix_quality_strings.empty())
 	{
-		_fix_quality_strings[0] = "Invalid";
-		_fix_quality_strings[1] = "GPS";
-		_fix_quality_strings[2] = "DGPS";
-		_fix_quality_strings[3] = "PPS";
-		_fix_quality_strings[4] = "RTK";
-		_fix_quality_strings[5] = "Floa_t RTK";
-		_fix_quality_strings[6] = "Esti_mated";
-		_fix_quality_strings[7] = "Manu_al";
-		_fix_quality_strings[8] = "Simu_lated";
-		_fix_quality_strings_initialized = true;
+		fix_quality_strings[0] = "Invalid";
+		fix_quality_strings[1] = "GPS";
+		fix_quality_strings[2] = "DGPS";
+		fix_quality_strings[3] = "PPS";
+		fix_quality_strings[4] = "RTK";
+		fix_quality_strings[5] = "Floa_t RTK";
+		fix_quality_strings[6] = "Esti_mated";
+		fix_quality_strings[7] = "Manu_al";
+		fix_quality_strings[8] = "Simu_lated";
 	}
 
 	if (code < 0 || 8 < code)
 		code = 0;
-	return _fix_quality_strings[code];
+	return fix_quality_strings[code];
 }
 
 
 std::string
 GPS::describe_pmtk_command (std::string command)
 {
-	if (!_pmtk_hints_initialized)
+	static std::map<std::string, std::string> hints;
+
+	if (hints.empty())
 	{
-		_pmtk_hints["PMTK101"] = "hot start";
-		_pmtk_hints["PMTK102"] = "warm start";
-		_pmtk_hints["PMTK103"] = "cold start";
-		_pmtk_hints["PMTK104"] = "full cold start";
-		_pmtk_hints["PMTK220"] = "set NMEA update rate";
-		_pmtk_hints["PMTK251"] = "set baud rate";
-		_pmtk_hints["PMTK286"] = "enable/disable AIC mode";
-		_pmtk_hints["PMTK300"] = "set fixing rate";
-		_pmtk_hints["PMTK301"] = "set DGPS mode";
-		_pmtk_hints["PMTK313"] = "enable/disable SBAS";
-		_pmtk_hints["PMTK314"] = "set NMEA frequencies";
-		_pmtk_hints["PMTK319"] = "set SBAS mode";
-		_pmtk_hints["PMTK513"] = "enable/disable SBAS";
-		_pmtk_hints_initialized = true;
+		hints["PMTK101"] = "hot start";
+		hints["PMTK102"] = "warm start";
+		hints["PMTK103"] = "cold start";
+		hints["PMTK104"] = "full cold start";
+		hints["PMTK220"] = "set NMEA update rate";
+		hints["PMTK251"] = "set baud rate";
+		hints["PMTK286"] = "enable/disable AIC mode";
+		hints["PMTK300"] = "set fixing rate";
+		hints["PMTK301"] = "set DGPS mode";
+		hints["PMTK313"] = "enable/disable SBAS";
+		hints["PMTK314"] = "set NMEA frequencies";
+		hints["PMTK319"] = "set SBAS mode";
+		hints["PMTK513"] = "enable/disable SBAS";
 	}
 
-	auto h = _pmtk_hints.find (command);
-	if (h != _pmtk_hints.end())
+	auto h = hints.find (command);
+	if (h != hints.end())
 		return h->second;
 	return std::string();
 }
