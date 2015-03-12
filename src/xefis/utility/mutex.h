@@ -79,6 +79,12 @@ class Mutex: private Noncopyable
 		// Dtor. Release lock.
 		~Lock();
 
+		/**
+		 * Release lock explicitly.
+		 */
+		void
+		release();
+
 	  private:
 		Mutex const&	_mutex;
 		bool			_owns_lock;
@@ -106,6 +112,12 @@ class Mutex: private Noncopyable
 		 */
 		bool
 		acquired() const;
+
+		/**
+		 * Release lock explicitly.
+		 */
+		void
+		release();
 
 	  private:
 		Mutex const&	_mutex;
@@ -150,6 +162,12 @@ class Mutex: private Noncopyable
 	 */
 	void
 	yield() const;
+
+	/**
+	 * Locks mutex and returns Lock object for this mutex.
+	 */
+	Lock
+	acquire_lock() const;
 
 	/**
 	 * Lock, execute function, and unlock.
@@ -213,8 +231,18 @@ Mutex::Lock::Lock (Lock&& other):
 inline
 Mutex::Lock::~Lock()
 {
+	release();
+}
+
+
+inline void
+Mutex::Lock::release()
+{
 	if (_owns_lock)
+	{
 		_mutex.unlock();
+		_owns_lock = false;
+	}
 }
 
 
@@ -238,8 +266,7 @@ Mutex::TryLock::TryLock (TryLock&& other):
 inline
 Mutex::TryLock::~TryLock()
 {
-	if (_owns_lock)
-		_mutex.unlock();
+	release();
 }
 
 
@@ -247,6 +274,17 @@ inline bool
 Mutex::TryLock::acquired() const
 {
 	return _owns_lock;
+}
+
+
+inline void
+Mutex::TryLock::release()
+{
+	if (_owns_lock)
+	{
+		_mutex.unlock();
+		_owns_lock = false;
+	}
 }
 
 
@@ -288,6 +326,13 @@ Mutex::yield() const
 {
 	unlock();
 	lock();
+}
+
+
+inline Mutex::Lock
+Mutex::acquire_lock() const
+{
+	return Lock (*this);
 }
 
 

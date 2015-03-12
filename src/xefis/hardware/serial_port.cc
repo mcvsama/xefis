@@ -25,12 +25,16 @@
 // Lib:
 #include <boost/lexical_cast.hpp>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/mutex.h>
 
 // Local:
 #include "serial_port.h"
 
 
 namespace Xefis {
+
+static xf::Mutex termios_baud_rate_entry_mutex;
+
 
 SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 	_data_ready (data_ready),
@@ -150,6 +154,9 @@ SerialPort::close()
 int
 SerialPort::termios_baud_rate (unsigned int baud_rate)
 {
+	// Must acquire lock before statically- and non-statically initializing static variables:
+	auto lock = termios_baud_rate_entry_mutex.acquire_lock();
+
 	static std::map<int, int> baud_rates_map;
 
 	if (baud_rates_map.empty())
