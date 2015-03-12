@@ -35,12 +35,17 @@
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hextable.h>
 #include <xefis/utility/resource.h>
+#include <xefis/utility/mutex.h>
 
 // Local:
 #include "gps.h"
 
 
 XEFIS_REGISTER_MODULE_CLASS ("io/gps", GPS);
+
+
+static xf::Mutex describe_pmtk_command_entry_mutex;
+static xf::Mutex fix_quality_strings_entry_mutex;
 
 
 GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
@@ -129,6 +134,9 @@ GPS::~GPS()
 std::string
 GPS::describe_fix_quality (int code)
 {
+	// Must acquire lock before statically- and non-statically initializing static variables:
+	auto lock = fix_quality_strings_entry_mutex.acquire_lock();
+
 	static std::array<std::string, 9> fix_quality_strings;
 
 	if (fix_quality_strings.empty())
@@ -153,6 +161,9 @@ GPS::describe_fix_quality (int code)
 std::string
 GPS::describe_pmtk_command (std::string command)
 {
+	// Must acquire lock before statically- and non-statically initializing static variables:
+	auto lock = describe_pmtk_command_entry_mutex.acquire_lock();
+
 	static std::map<std::string, std::string> hints;
 
 	if (hints.empty())

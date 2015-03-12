@@ -21,12 +21,16 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/mutex.h>
 
 // Local:
 #include "chr_um6.h"
 
 
 namespace Xefis {
+
+static xf::Mutex bits_for_baud_rate_entry_mutex;
+
 
 std::string
 CHRUM6::Request::protocol_error_description() const
@@ -166,6 +170,9 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 uint32_t
 CHRUM6::bits_for_baud_rate (std::string const& baud_rate_str)
 {
+	// Must acquire lock before statically- and non-statically initializing static variables:
+	auto lock = bits_for_baud_rate_entry_mutex.acquire_lock();
+
 	static std::map<int, uint32_t> baud_rates_map;
 
 	if (baud_rates_map.empty())

@@ -254,6 +254,7 @@ State::prepare_efis_settings()
 		delta = -delta;
 
 		constexpr Length da = 0.01_nmi;
+		// FIXME This is not thread-safe:
 		static std::set<Length> half_ranges = {
 			0.1_nmi, 0.2_nmi, 0.3_nmi, 0.4_nmi, 0.5_nmi, 0.6_nmi, 0.7_nmi, 0.8_nmi, 0.9_nmi,
 			1_nmi, 2_nmi, 3_nmi, 4_nmi, 5_nmi, 6_nmi, 7_nmi, 8_nmi, 9_nmi,
