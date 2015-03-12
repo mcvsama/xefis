@@ -54,6 +54,7 @@ LiftMod::Setting::link (Setting const* prev, Setting const* next)
 
 LiftMod::LiftMod (QDomElement const& config)
 {
+	// Parse config and populate _settings:
 	for (QDomElement const& e: config)
 	{
 		if (e == "setting")
@@ -64,8 +65,9 @@ LiftMod::LiftMod (QDomElement const& config)
 	}
 
 	if (_settings.empty())
-		_settings[0_deg];
+		throw BadConfiguration ("missing configuration");
 
+	// Link all settings to each other, creating a double-linked list:
 	for (auto s = _settings.begin(); s != _settings.end(); ++s)
 	{
 		Setting const* prev = nullptr;
@@ -83,9 +85,6 @@ LiftMod::LiftMod (QDomElement const& config)
 
 		s->second.link (prev, next);
 	}
-
-	if (_settings.empty())
-		throw BadConfiguration ("missing configuration");
 }
 
 
