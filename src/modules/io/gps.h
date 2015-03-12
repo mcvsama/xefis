@@ -205,11 +205,6 @@ class GPS:
 	make_checksum (std::string data);
 
   private:
-	static std::array<std::string, 9>			_fix_quality_strings;
-	static bool									_fix_quality_strings_initialized;
-	static std::map<std::string, std::string>	_pmtk_hints;
-	static bool									_pmtk_hints_initialized;
-
 	Unique<QTimer>				_restart_timer;
 	Unique<QTimer>				_alive_check_timer;
 	std::map<int, int>			_baud_rates_map;
