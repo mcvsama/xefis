@@ -166,7 +166,8 @@ template<class tValueType>
 		set_output_limit (Range<ValueType> limit) noexcept;
 
 		/**
-		 * Set target value. Should be normalized to [-1..1].
+		 * Set target value. Set target value. If winding is enabled,
+		 * then the target should be normalized to [-1..1].
 		 */
 		void
 		set_target (ValueType target) noexcept;
