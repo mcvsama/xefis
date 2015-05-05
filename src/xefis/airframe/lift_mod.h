@@ -28,6 +28,11 @@
 
 namespace Xefis {
 
+/**
+ * Base class for Flaps and Spoilers, since they have identical API.
+ * Contains a list of settings (different angles for flaps/spoilers)
+ * that affect lift in some way.
+ */
 class LiftMod
 {
   public:
@@ -49,14 +54,14 @@ class LiftMod
 		label() const noexcept;
 
 		/**
-		 * Return real flap setting angle.
+		 * Return real flaps or spoilers setting angle.
 		 */
 		Angle const&
 		angle() const noexcept;
 
 		/**
 		 * Return range of allowed IAS speeds
-		 * for this flap setting.
+		 * for this flaps or spoilers setting.
 		 */
 		Range<Speed> const&
 		speed_range() const noexcept;
@@ -65,7 +70,7 @@ class LiftMod
 		 * Return AOA correction for given angle setting.
 		 *
 		 * Nominal critical AOA should be decreased by this amount
-		 * to get critical AOA corrected for this flap setting.
+		 * to get critical AOA corrected for this flap or spoilers setting.
 		 */
 		Angle const&
 		aoa_correction() const noexcept;
@@ -79,13 +84,13 @@ class LiftMod
 		cl_correction() const noexcept;
 
 		/**
-		 * Return prev (lower angle) flap setting or nullptr if this is the last.
+		 * Return prev (lower angle) flaps/spoilers setting or nullptr if this is the last.
 		 */
 		Setting const*
 		prev() const noexcept;
 
 		/**
-		 * Return next (higher angle) flap setting or nullptr if this is the last.
+		 * Return next (higher angle) flaps/spoilers setting or nullptr if this is the last.
 		 */
 		Setting const*
 		next() const noexcept;
@@ -111,27 +116,27 @@ class LiftMod
 	LiftMod (QDomElement const& config);
 
 	/**
-	 * Get list of configured flap settings.
+	 * Get list of configured flaps/spoilers settings.
 	 */
 	Settings const&
 	settings() const noexcept;
 
 	/**
-	 * Get most appropriate flap Setting for given
-	 * flap angle.
+	 * Get most appropriate flaps/spoilers Setting for given
+	 * flaps/spoilers angle.
 	 */
 	Setting const&
 	find_setting (Angle const& surfaces_angle) const;
 
 	/**
-	 * Get next flap setting (more extended flap setting).
+	 * Get next flaps/spoilers setting (more extended flaps/spoilers setting).
 	 * Return nullptr if there's none.
 	 */
 	Setting const*
 	next_setting (Angle const& surfaces_angle) const;
 
 	/**
-	 * Get previous flap setting (more retracted one).
+	 * Get previous flaps/spoilers setting (more retracted one).
 	 * Return nullptr if there's none.
 	 */
 	Setting const*
@@ -139,7 +144,7 @@ class LiftMod
 
 	/**
 	 * Compute AOA correction for given surfaces angle setting
-	 * (how much absolute AOA a flap setting adds to the current AOA).
+	 * (how much absolute AOA a flaps/spoilers setting adds to the current AOA).
 	 * This value is interpolated.
 	 */
 	Angle
