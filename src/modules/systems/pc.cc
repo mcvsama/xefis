@@ -77,6 +77,13 @@ PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDo
 		{ "output.v-r", _v_r, true },
 		{ "output.v-a", _v_a, true },
 		{ "output.v-approach", _v_approach, true },
+		{ "output.v-1", _v_1, true },
+		{ "output.v-bg", _v_bg, true },
+		{ "output.v-br", _v_br, true },
+		{ "output.v-md", _v_md, true },
+		{ "output.v-be", _v_be, true },
+		{ "output.v-x", _v_x, true },
+		{ "output.v-y", _v_y, true },
 		{ "output.critical-aoa", _critical_aoa, true },
 		{ "output.lift-coefficient", _lift_coefficient, true },
 		{ "output.stall", _stall, true },
@@ -321,6 +328,21 @@ PerformanceComputer::compute_speeds()
 		_v_approach = 1.3 * *_v_s_0_deg;
 	else
 		_v_approach.set_nil();
+
+	// V_1
+	// TODO
+	// V_bg (best glide)
+	// TODO
+	// V_br (best range powered)
+	// TODO
+	// V_md (minimum descent unpowered)
+	// TODO
+	// V_be (best endurance powered)
+	// TODO
+	// V_y (best rate of climb)
+	// TODO
+	// V_x (best angle of climb)
+	// TODO
 }
 
 
