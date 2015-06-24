@@ -372,10 +372,10 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 			return tas_to_ias (tas);
 		}
 		else
-			return nullptr;
+			return {};
 	}
 	else
-		return nullptr;
+		return {};
 }
 
 
@@ -391,7 +391,7 @@ PerformanceComputer::tas_to_ias (Speed const& tas) const
 		return tascalc.ias();
 	}
 	else
-		return nullptr;
+		return {};
 }
 
 
