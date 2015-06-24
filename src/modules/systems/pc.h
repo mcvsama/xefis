@@ -110,7 +110,7 @@ class PerformanceComputer: public xf::Module
 	xf::PropertySpeed			_v_r;								// Rotation speed
 	xf::PropertySpeed			_v_a;								// Max maneuvering speed
 	xf::PropertySpeed			_v_approach;						// Approach speed
-	xf::PropertySpeed			_v_1								// One engine inoperative decision speed.
+	xf::PropertySpeed			_v_1;								// One engine inoperative decision speed.
 	xf::PropertySpeed			_v_bg;								// Best glide speed (maximum unpowered range)
 	xf::PropertySpeed			_v_br;								// Best powered range speed
 	xf::PropertySpeed			_v_md;								// Minimum descent speed (maximum time airborne unpowered)
