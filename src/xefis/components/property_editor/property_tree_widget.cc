@@ -105,7 +105,14 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 		// If it's a string and contains binary data, display as binary string:
 		if (contains_binary_data (val_node))
 			data = "binary " + std::to_string (data.size()) + " bytes: " + to_binary_form (data);
-		item->setData (ValueColumn, Qt::DisplayRole, val_node->is_nil() ? "<nil>" : QString::fromStdString (data));
+
+		QString str = val_node->is_nil() ? "<nil>" : QString::fromStdString (data);
+		item->setData (ValueColumn, Qt::DisplayRole, str);
+
+		if (val_node->is_nil())
+			item->setForeground (ValueColumn, QBrush (QColor (0xff, 0xbb, 0x11)));
+		else
+			item->setForeground (ValueColumn, QBrush (Qt::black));
 	}
 	else
 	{
