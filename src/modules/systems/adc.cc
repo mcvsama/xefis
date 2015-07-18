@@ -245,7 +245,7 @@ AirDataComputer::compute_altitude()
 		_altitude_amsl_lookahead_o_smoother.invalidate();
 	}
 
-	_altitude_amsl_serviceable.copy (_pressure_static_serviceable);
+	_altitude_amsl_serviceable.copy_from (_pressure_static_serviceable);
 }
 
 
@@ -317,7 +317,7 @@ AirDataComputer::compute_ias()
 
 	_ias_in_valid_range = _speed_ias.valid() && _ias_valid_minimum <= *_speed_ias && *_speed_ias <= _ias_valid_maximum;
 
-	_speed_ias_serviceable.copy (_ias_serviceable);
+	_speed_ias_serviceable.copy_from (_ias_serviceable);
 }
 
 
@@ -468,6 +468,6 @@ AirDataComputer::compute_vertical_speed()
 		_vertical_speed_smoother.invalidate();
 	}
 
-	_vertical_speed_serviceable.copy (_altitude_amsl_serviceable);
+	_vertical_speed_serviceable.copy_from (_altitude_amsl_serviceable);
 }
 

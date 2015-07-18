@@ -153,12 +153,12 @@ NavigationComputer::compute_position()
 {
 	Time update_time = _position_computer.update_time();
 
-	_position_longitude.copy (_position_input_longitude);
-	_position_latitude.copy (_position_input_latitude);
-	_position_altitude_amsl.copy (_position_input_altitude_amsl);
-	_position_accuracy_lateral.copy (_position_input_accuracy_lateral);
-	_position_accuracy_vertical.copy (_position_input_accuracy_vertical);
-	_position_source.copy (_position_input_source);
+	_position_longitude.copy_from (_position_input_longitude);
+	_position_latitude.copy_from (_position_input_latitude);
+	_position_altitude_amsl.copy_from (_position_input_altitude_amsl);
+	_position_accuracy_lateral.copy_from (_position_input_accuracy_lateral);
+	_position_accuracy_vertical.copy_from (_position_input_accuracy_vertical);
+	_position_source.copy_from (_position_input_source);
 
 	// Larger of the two:
 	if (_position_accuracy_lateral.valid() && _position_accuracy_vertical.valid())

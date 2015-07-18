@@ -124,6 +124,6 @@ template<class PropertyType>
 	NavaidSelector::copy (bool selector_fresh, PropertyType& input_property, PropertyType& output_property)
 	{
 		if (input_property.configured() && (selector_fresh || input_property.fresh()))
-			output_property.copy (input_property);
+			output_property.copy_from (input_property);
 	}
 

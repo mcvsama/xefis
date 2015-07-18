@@ -69,9 +69,9 @@ RemoteControlManagementSystem::acquire_home()
 	if (_position_longitude.valid() && _position_latitude.valid() && _position_altitude_amsl.valid() &&
 		_home_longitude.configured() && _home_latitude.configured() && _home_altitude_amsl.configured())
 	{
-		_home_longitude.copy (_position_longitude);
-		_home_latitude.copy (_position_latitude);
-		_home_altitude_amsl.copy (_position_altitude_amsl);
+		_home_longitude.copy_from (_position_longitude);
+		_home_latitude.copy_from (_position_latitude);
+		_home_altitude_amsl.copy_from (_position_altitude_amsl);
 		_home_acquired = true;
 	}
 }
