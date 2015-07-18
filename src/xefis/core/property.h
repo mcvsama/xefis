@@ -58,6 +58,32 @@ class GenericProperty
 	virtual ~GenericProperty();
 
 	/**
+	 * Return timestamp of the value (time when it was modified).
+	 * It's updated even if the same value was written as before.
+	 */
+	Time
+	modification_timestamp() const;
+
+	/**
+	 * Return timestamp of the last non-nil value.
+	 * It's updated even if the same value was written as before.
+	 */
+	Time
+	valid_timestamp() const;
+
+	/**
+	 * Return age of the value (time since it was last modified).
+	 */
+	Time
+	modification_age() const;
+
+	/**
+	 * Return age of the non-nil value (time since it was last set to a non-nil value).
+	 */
+	Time
+	valid_age() const;
+
+	/**
 	 * Return true if property is nil.
 	 */
 	bool
@@ -424,6 +450,64 @@ GenericProperty::GenericProperty (PropertyDirectoryNode* root, PropertyPath cons
 inline
 GenericProperty::~GenericProperty()
 { }
+
+
+inline Time
+GenericProperty::modification_timestamp() const
+{
+	if (_root)
+	{
+		PropertyNode* node = get_node();
+		if (node)
+		{
+			TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+			if (val_node)
+				return val_node->modification_timestamp();
+			else
+				throw InvalidOperation ("can't check timestamps on non-value node: " + _path.string());
+		}
+		else
+			return 0_s;
+	}
+	else
+		throw SingularProperty ("can't access node from a singular property: " + _path.string());
+}
+
+
+inline Time
+GenericProperty::valid_timestamp() const
+{
+	if (_root)
+	{
+		PropertyNode* node = get_node();
+		if (node)
+		{
+			TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+			if (val_node)
+				return val_node->valid_timestamp();
+			else
+				throw InvalidOperation ("can't check timestamps on non-value node: " + _path.string());
+		}
+		else
+			return 0_s;
+	}
+	else
+		throw SingularProperty ("can't access node from a singular property: " + _path.string());
+}
+
+
+inline Time
+GenericProperty::modification_age() const
+{
+	return Time::now() - modification_timestamp();
+}
+
+
+inline Time
+GenericProperty::valid_age() const
+{
+	return Time::now() - valid_timestamp();
+}
 
 
 inline bool
