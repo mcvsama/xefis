@@ -315,13 +315,6 @@ template<class tType>
 		PropertyValueNode (std::string const& name, Type value);
 
 		/**
-		 * Copies value and nil-flag from other property node.
-		 * Can not be used on PropDirectory nodes.
-		 */
-		void
-		copy (PropertyValueNode const& other);
-
-		/**
 		 * Return stored value. If node is a nil-node,
 		 * throw NilNode exception.
 		 */
@@ -538,24 +531,6 @@ template<class T>
 		TypedPropertyValueNode (name),
 		_value (value)
 	{ }
-
-
-template<class T>
-	inline void
-	PropertyValueNode<T>::copy (PropertyValueNode const& other)
-	{
-		if (_is_nil != other._is_nil)
-		{
-			_value = other._value;
-			_is_nil = other._is_nil;
-			bump_serial();
-		}
-		else if (!_is_nil && _value != other._value)
-		{
-			_value = other._value;
-			bump_serial();
-		}
-	}
 
 
 template<class T>

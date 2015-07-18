@@ -384,10 +384,10 @@ template<class tType>
 		set_default (Type const&);
 
 		/**
-		 * Copy other node. Call PropertyNode::copy().
+		 * Copy other node.
 		 */
 		void
-		copy (Property const& other);
+		copy_from (Property const& from);
 
 		// TypedProperty API
 		void
@@ -965,11 +965,9 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::copy (Property<T> const& other)
+	Property<T>::copy_from (Property<T> const& from)
 	{
-		write (other.read());
-		if (other.is_nil())
-			set_nil();
+		write (from.get_optional());
 	}
 
 

@@ -316,7 +316,7 @@ AFCS::button_press_toga()
 	{
 		transfer_airspeed_control_from_thrust_to_pitch();
 		_thrust_mode = ThrustMode::TO_GA;
-		_thr_ref.copy (_thr_ref_for_toga);
+		_thr_ref.copy_from (_thr_ref_for_toga);
 	}
 	// Off?
 	else
@@ -479,24 +479,24 @@ AFCS::button_press_lvl_all()
 void
 AFCS::button_press_to()
 {
-	_thr_ref.copy (_thr_ref_for_toga);
-	_spd_ref.copy (_spd_ref_for_climbout);
+	_thr_ref.copy_from (_thr_ref_for_toga);
+	_spd_ref.copy_from (_spd_ref_for_climbout);
 }
 
 
 void
 AFCS::button_press_crz()
 {
-	_thr_ref.copy (_thr_ref_for_cruise);
-	_spd_ref.copy (_spd_ref_for_cruise);
+	_thr_ref.copy_from (_thr_ref_for_cruise);
+	_spd_ref.copy_from (_spd_ref_for_cruise);
 }
 
 
 void
 AFCS::button_press_app()
 {
-	_thr_ref.copy (_thr_ref_for_descent);
-	_spd_ref.copy (_spd_ref_for_approach);
+	_thr_ref.copy_from (_thr_ref_for_descent);
+	_spd_ref.copy_from (_spd_ref_for_approach);
 }
 
 
@@ -701,8 +701,8 @@ AFCS::button_press_clb_con()
 {
 	transfer_airspeed_control_from_thrust_to_pitch();
 	_thrust_mode = ThrustMode::CONT;
-	_thr_ref.copy (_thr_ref_for_cont);
-	_spd_ref.copy (_spd_ref_for_climbout);
+	_thr_ref.copy_from (_thr_ref_for_cont);
+	_spd_ref.copy_from (_spd_ref_for_climbout);
 }
 
 
