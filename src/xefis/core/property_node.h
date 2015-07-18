@@ -233,6 +233,20 @@ class TypedPropertyValueNode: public PropertyNode
 	TypedPropertyValueNode (std::string const& name);
 
 	/**
+	 * Return timestamp of the value (time when it was modified).
+	 * It's updated even if the same value was written as before.
+	 */
+	Time
+	modification_timestamp() const noexcept;
+
+	/**
+	 * Return timestamp of the last non-nil value.
+	 * It's updated even if the same value was written as before.
+	 */
+	Time
+	valid_timestamp() const noexcept;
+
+	/**
 	 * Return true if property is nil.
 	 */
 	bool
@@ -281,7 +295,9 @@ class TypedPropertyValueNode: public PropertyNode
 	parse_blob (Blob const&) = 0;
 
   private:
-	bool _is_nil = false;
+	bool	_is_nil					= false;
+	Time	_modification_timestamp	= 0_s;
+	Time	_valid_timestamp		= 0_s;
 };
 
 
@@ -475,6 +491,20 @@ TypedPropertyValueNode::TypedPropertyValueNode (std::string const& name):
 { }
 
 
+inline Time
+TypedPropertyValueNode::modification_timestamp() const noexcept
+{
+	return _modification_timestamp;
+}
+
+
+inline Time
+TypedPropertyValueNode::valid_timestamp() const noexcept
+{
+	return _valid_timestamp;
+}
+
+
 inline bool
 TypedPropertyValueNode::is_nil() const noexcept
 {
@@ -492,6 +522,8 @@ TypedPropertyValueNode::valid() const noexcept
 inline void
 TypedPropertyValueNode::set_nil() noexcept
 {
+	_modification_timestamp = Time::now();
+
 	if (!_is_nil)
 	{
 		_is_nil = true;
@@ -552,6 +584,9 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::write (Type const& value)
 	{
+		_modification_timestamp = Time::now();
+		_valid_timestamp = _modification_timestamp;
+
 		if (_is_nil || _value != value)
 		{
 			_value = value;
