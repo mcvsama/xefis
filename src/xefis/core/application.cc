@@ -71,9 +71,9 @@ Application::Application (int& argc, char** argv):
 
 	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 	_accounting = std::make_unique<Accounting>();
-	_sound_manager = std::make_unique<SoundManager> (this);
+	_sound_manager = std::make_unique<SoundManager>();
 	_navaid_storage = std::make_unique<NavaidStorage>();
-	_window_manager = std::make_unique<WindowManager> (this);
+	_window_manager = std::make_unique<WindowManager>();
 	_module_manager = std::make_unique<ModuleManager> (this);
 	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
 

@@ -56,7 +56,7 @@ class ModuleManager: public QObject
 
   public:
 	// Ctor
-	ModuleManager (Application*);
+	explicit ModuleManager (Application*);
 
 	// Dtor
 	~ModuleManager();
@@ -182,6 +182,8 @@ class ModuleNotFoundException: public Exception
 inline Application*
 ModuleManager::application() const
 {
+	if (!_application)
+		throw std::logic_error ("Application not accessible from ModuleManager");
 	return _application;
 }
 

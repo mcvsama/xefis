@@ -67,6 +67,15 @@ class Application: public QApplication
 		explicit MissingValueException (std::string const& argument);
 	};
 
+	/**
+	 * Throw when attempted to access one of the support objects which is not yet initialized.
+	 */
+	class UninitializedServiceException: public Exception
+	{
+	  public:
+		explicit UninitializedServiceException (std::string const& service_name);
+	};
+
 	class QuitInstruction { };
 
   public:
@@ -261,6 +270,12 @@ Application::MissingValueException::MissingValueException (std::string const& ar
 
 
 inline
+Application::UninitializedServiceException::UninitializedServiceException (std::string const& service_name):
+	Exception ("service '" + service_name + "' is not initialized")
+{ }
+
+
+inline
 Application::OptionsHelper::OptionsHelper (Application* application)
 {
 	if (application->has_option (Application::Option::WatchdogWriteFd))
@@ -288,6 +303,8 @@ Application::OptionsHelper::watchdog_read_fd() const noexcept
 inline Accounting*
 Application::accounting() const
 {
+	if (!_accounting)
+		throw UninitializedServiceException ("Accounting");
 	return _accounting.get();
 }
 
@@ -295,6 +312,8 @@ Application::accounting() const
 inline ModuleManager*
 Application::module_manager() const
 {
+	if (!_module_manager)
+		throw UninitializedServiceException ("ModuleManager");
 	return _module_manager.get();
 }
 
@@ -302,6 +321,8 @@ Application::module_manager() const
 inline WindowManager*
 Application::window_manager() const
 {
+	if (!_window_manager)
+		throw UninitializedServiceException ("WindowManager");
 	return _window_manager.get();
 }
 
@@ -309,6 +330,8 @@ Application::window_manager() const
 inline SoundManager*
 Application::sound_manager() const
 {
+	if (!_sound_manager)
+		throw UninitializedServiceException ("SoundManager");
 	return _sound_manager.get();
 }
 
@@ -316,6 +339,8 @@ Application::sound_manager() const
 inline ConfigReader*
 Application::config_reader() const
 {
+	if (!_config_reader)
+		throw UninitializedServiceException ("ConfigReader");
 	return _config_reader.get();
 }
 
@@ -323,6 +348,8 @@ Application::config_reader() const
 inline NavaidStorage*
 Application::navaid_storage() const
 {
+	if (!_navaid_storage)
+		throw UninitializedServiceException ("NavaidStorage");
 	return _navaid_storage.get();
 }
 
@@ -330,6 +357,8 @@ Application::navaid_storage() const
 inline WorkPerformer*
 Application::work_performer() const
 {
+	if (!_work_performer)
+		throw UninitializedServiceException ("WorkPerformer");
 	return _work_performer.get();
 }
 
@@ -337,6 +366,8 @@ Application::work_performer() const
 inline Airframe*
 Application::airframe() const
 {
+	if (!_airframe)
+		throw UninitializedServiceException ("Airframe");
 	return _airframe.get();
 }
 
@@ -344,6 +375,8 @@ Application::airframe() const
 inline ConfiguratorWidget*
 Application::configurator_widget() const
 {
+	if (!_configurator_widget)
+		throw UninitializedServiceException ("ConfiguratorWidget");
 	return _configurator_widget.get();
 }
 

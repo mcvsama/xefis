@@ -18,6 +18,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/core/application.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/stdexcept.h>
 
