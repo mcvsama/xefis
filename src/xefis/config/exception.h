@@ -134,9 +134,9 @@ class Exception: public std::exception
 inline std::ostream&
 operator<< (std::ostream& os, Exception const& e)
 {
-	os << e.message() << std::endl;
+	os << e.message();
 	if (!e.backtrace_hidden())
-		os << e.backtrace() << std::endl;
+		os << std::endl << e.backtrace();
 	return os;
 }
 
