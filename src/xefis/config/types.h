@@ -68,5 +68,16 @@ template<class Type>
 template<class Type>
 	using Weak = std::weak_ptr<Type>;
 
+
+template<class Target, class SourceOptional>
+	Optional<Target>
+	optional_cast_to (SourceOptional const& source)
+	{
+		if (source)
+			return Optional<Target> (*source);
+		else
+			return boost::none;
+	}
+
 #endif
 

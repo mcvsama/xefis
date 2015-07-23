@@ -155,6 +155,16 @@ class IOError: public Exception
 	using Exception::Exception;
 };
 
+
+/**
+ * Invalid format during conversion (eg. forbidden character in numeric string).
+ */
+class InvalidFormat: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
 } // namespace Xefis
 
 #endif

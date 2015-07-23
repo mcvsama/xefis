@@ -42,6 +42,8 @@ class WorkPerformer;
 class ConfiguratorWidget;
 class Accounting;
 class Airframe;
+class Support;
+class System;
 
 
 class Application: public QApplication
@@ -179,6 +181,12 @@ class Application: public QApplication
 	airframe() const;
 
 	/**
+	 * Return System object.
+	 */
+	System*
+	system() const;
+
+	/**
 	 * Return configurator widget.
 	 * May return nullptr, if configurator widget is disabled
 	 * (eg. for instrument-less configurations of XEFIS).
@@ -251,6 +259,7 @@ class Application: public QApplication
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<Airframe>				_airframe;
+	Unique<System>					_system;
 	Unique<OptionsHelper>			_options_helper;
 	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
@@ -369,6 +378,15 @@ Application::airframe() const
 	if (!_airframe)
 		throw UninitializedServiceException ("Airframe");
 	return _airframe.get();
+}
+
+
+inline System*
+Application::system() const
+{
+	if (!_system)
+		throw UninitializedServiceException ("System");
+	return _system.get();
 }
 
 

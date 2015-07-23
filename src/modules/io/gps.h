@@ -26,10 +26,13 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/module.h>
+#include <xefis/hardware/serial_port.h>
+#include <xefis/support/nmea/parser.h>
 
 
 /**
  * Read NMEA 0183 GPS data from a serial port.
+ * TODO make a thread-object that handles the device in a separate thread.
  */
 class GPS:
 	public QObject,
@@ -37,7 +40,202 @@ class GPS:
 {
 	Q_OBJECT
 
-	static constexpr const char* SET_NMEA_BAUDRATE = "PMTK251";
+	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
+	static constexpr Time			kPowerRestartDelay					= 1_s;
+	static constexpr Time			kAliveCheckInterval					= 2_s;
+	static constexpr unsigned int	kMaxRestartAttempts					= 2;
+	static constexpr const char*	MTK_SET_NMEA_BAUDRATE				= "PMTK251";
+	static constexpr const char*	MTK_SET_NMEA_FREQUENCIES			= "PMTK314";
+	static constexpr const char*	MTK_SET_NMEA_POSITION_FIX_INTERVAL	= "PMTK220";
+
+	class PowerCycle;
+
+	/**
+	 * Represents single GPS connection.
+	 * Serializes instructions for connecting to GPS with SerialPort, initializing it, switching
+	 * baud-rates, etc.
+	 */
+	class Connection:
+		public QObject,
+		public xf::nmea::Parser::Listener
+	{
+	  public:
+		/**
+		 * Initializes the GPS device.
+		 * Configures it appropriately for requested baud-rate.
+		 *
+		 * \param	baud_rate
+		 *			Use this baud rate when opening serial connection.
+		 */
+		Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned int baud_rate);
+
+		// Dtor
+		~Connection();
+
+		/**
+		 * Called from GPS::data_updated().
+		 */
+		void
+		data_updated();
+
+		/**
+		 * Baud rate as requested during construction.
+		 */
+		unsigned int
+		requested_physical_baud_rate() const;
+
+		/**
+		 * Request baud-rate change to desired value over the MTK protocol.
+		 * This sends command to the GPS to change the baud-rate. The device then becomes
+		 * disconnected and new Connection object needs to be created using new baud-rate.
+		 */
+		void
+		request_new_baud_rate (unsigned int new_baud_rate);
+
+	  private:
+		/**
+		 * Open device and start processing data.
+		 */
+		void
+		open_device();
+
+		/**
+		 * Initialize GPS device.
+		 * Send initial MTK commands, etc.
+		 */
+		void
+		initialize_device();
+
+		/**
+		 * Send packet requesting baud rate change to the target (high-speed) baud-rate.
+		 */
+		void
+		request_target_baud_rate();
+
+		/**
+		 * Called when device doesn't respond for a while.
+		 */
+		void
+		alive_check_failed();
+
+		/**
+		 * Indicate failure. Try to reopen device, perhaps with other baud-rate setting.
+		 */
+		void
+		failure (std::string const& reason);
+
+		/**
+		 * Callback from SerialPort.
+		 */
+		void
+		serial_data_ready();
+
+		/**
+		 * Callback from SerialPort.
+		 */
+		void
+		serial_failure();
+
+		/**
+		 * Process message: GPGGA - Global Positioning System Fix Data.
+		 */
+		void
+		process_nmea_sentence (xf::nmea::GPGGA const&);
+
+		/**
+		 * Process message: GPGSA - GPS DOP and active satellites.
+		 */
+		void
+		process_nmea_sentence (xf::nmea::GPGSA const&);
+
+		/**
+		 * Process message: GPRMC - Recommended minimum specific GPS/Transit data.
+		 */
+		void
+		process_nmea_sentence (xf::nmea::GPRMC const&);
+
+		/**
+		 * Process MTK ACK message.
+		 */
+		void
+		process_nmea_sentence (xf::nmea::PMTKACK const&);
+
+		/**
+		 * Compute maximum reliable NMEA messages frequency that can be requested from GPS device
+		 * without overloading serial port. Result is based on serial port baud rate.
+		 */
+		static std::string
+		get_nmea_frequencies_setup_messages (unsigned int baud_rate);
+
+		/**
+		 * Notify (once!) PowerCycle that stable connection is established.
+		 */
+		void
+		message_received();
+
+	  private:
+		// Parents:
+		GPS&							_gps_module;
+		PowerCycle&						_power_cycle;
+
+		// Used to restart after a while if device doesn't respond:
+		Unique<QTimer>					_alive_check_timer;
+		unsigned int					_requested_physical_baud_rate;
+		xf::SerialPort::Configuration	_serial_port_config;
+		Unique<xf::SerialPort>			_serial_port;
+		Unique<xf::nmea::Parser>		_nmea_parser;
+		bool							_reliable_fix_quality	= false;
+		bool							_first_message_received	= false;
+	};
+
+	/**
+	 * Represents single power-on..power-off cycle for the GPS device.
+	 * Uses (creates) Connection objects that manage device communication stuff.
+	 * Switches baud-rates when appropriate.
+	 */
+	class PowerCycle
+	{
+	  public:
+		// Ctor
+		PowerCycle (GPS& gps_module);
+
+		// Dtor
+		~PowerCycle();
+
+		/**
+		 * Called from GPS::data_updated().
+		 * Takes care of actually allocating and destroying of Connections.
+		 */
+		void
+		data_updated();
+
+		/**
+		 * Notify that connection error has occured.
+		 * It will try to restart the connection with alternate
+		 * baud-rates.
+		 */
+		void
+		notify_connection_failure();
+
+		/**
+		 * Notify that connection has been established.
+		 * It will try to recreate Connection with the target baud
+		 * rate, if not yet set.
+		 */
+		void
+		notify_connection_established();
+
+	  private:
+		// Parent:
+		GPS&				_gps_module;
+
+		Unique<Connection>	_connection;
+		// On odd connection attempts, default baud-rate will be used,
+		// on even - target baud rate.
+		unsigned int		_connection_attempts	= 0;
+		// Indicates that Connection restart has been requested:
+		bool				_restart_connection		= false;
+	};
 
   public:
 	// Ctor
@@ -46,219 +244,97 @@ class GPS:
 	// Dtor
 	~GPS();
 
-	/**
-	 * Return string for given fix quality code.
-	 */
-	static std::string
-	describe_fix_quality (int code);
-
-	/**
-	 * Return string describing PMTK command.
-	 * Command must be of form "PMTKnnn".
-	 */
-	static std::string
-	describe_pmtk_command (std::string command);
+  protected:
+	// xf::Module API
+	void
+	data_updated() override;
 
   private slots:
 	/**
-	 * Called when there's data to read from a serial device.
+	 * Attempt new power cycle and increase power-on counter.
 	 */
 	void
-	read();
-
-	/**
-	 * Open device and start processing data.
-	 */
-	void
-	open_device();
-
-	/**
-	 * Indicate failure. Try to reopen device, perhaps
-	 * with other baud-rate setting.
-	 */
-	void
-	failure (std::string const& reason);
-
-	/**
-	 * Overloaded failure to work as slot.
-	 */
-	void
-	failure();
-
-	/**
-	 * Try to restart operation after failure was detected.
-	 */
-	void
-	restart();
+	power_on();
 
   private:
 	/**
-	 * Reset buffer and state. A must after a failure of some sort.
+	 * Power-cycle the device. This destroys PowerCycle object, which
+	 * causes setting of 'power-on' property to false (and thus power-manager
+	 * should react to this by powering off the GPS).
+	 * After a while, create new PowerCycle.
+	 *
+	 * This method uses _power_cycle_timer.
 	 */
 	void
-	reset();
+	request_power_cycle();
 
 	/**
 	 * Set all data properties to nil.
 	 */
 	void
-	reset_properties();
+	reset_data_properties();
 
 	/**
-	 * Set serial port device options, eg. baud-rate.
-	 */
-	bool
-	set_device_options (bool use_target_baud_rate);
-
-	/**
-	 * Called when stream is synchronized and it's safe
-	 * to send commands.
+	 * Set system time. Also set Operating System time. For the latter Xefis executable needs
+	 * CAP_SYS_TIME capability, set it with "setcap cap_sys_time+ep xefis".
 	 */
 	void
-	synchronized();
-
-	/**
-	 * Send packet requesting baud rate change
-	 * and reopen device with new baud rate.
-	 */
-	void
-	switch_baud_rate_request();
-
-	/**
-	 * Send parsed initialization commands.
-	 */
-	void
-	initialization_commands();
-
-	/**
-	 * Process buffered messages.
-	 */
-	void
-	process();
-
-	/**
-	 * Process single message. Message must not contain trailing \r\n.
-	 * Return false if processing fails.
-	 */
-	bool
-	process_message (std::string message);
-
-	/**
-	 * Process message: GPGGA - Global Positioning System Fix Data
-	 * Return false if processing fails.
-	 */
-	bool
-	process_gpgga (std::string message_contents);
-
-	/**
-	 * Process message: GPGSA - GPS DOP and active satellites
-	 * Return false if processing fails.
-	 */
-	bool
-	process_gpgsa (std::string message_contents);
-
-	/**
-	 * Process message: GPRMC - Recommended minimum specific GPS/Transit data
-	 * Return false if processing fails.
-	 */
-	bool
-	process_gprmc (std::string message_contents);
-
-	/**
-	 * Process PMTK ACK message.
-	 */
-	bool
-	process_pmtk_ack (std::string message_contents);
-
-	/**
-	 * Get substring up to next comma (',') and place it into shared
-	 * buffer _value. Return position of the next value (one char after
-	 * the comma) or npos.
-	 */
-	std::string::size_type
-	read_value (std::string const&, std::string::size_type start_pos);
-
-	/**
-	 * Convert ASCII digit to int.
-	 */
-	int
-	digit_from_ascii (char c);
-
-	/**
-	 * Set system time.
-	 * Take date from _date_string/_date_timestamp.
-	 */
-	void
-	synchronize_system_clock (std::string const& date_string, std::string const& time_string);
-
-	/**
-	 * Create PMTK message. Data must include message name: PMTKnnn,
-	 * where nnn is message ID.
-	 */
-	static std::string
-	make_pmtk (std::string data);
-
-	/**
-	 * Return two-character hex checksum of given data.
-	 */
-	static std::string
-	make_checksum (std::string data);
+	update_clock (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
   private:
-	Unique<QTimer>				_restart_timer;
-	Unique<QTimer>				_alive_check_timer;
-	std::map<int, int>			_baud_rates_map;
-	std::string					_default_baud_rate			= "9600";
-	std::string					_current_baud_rate			= "9600";
-	std::string					_target_baud_rate			= "9600";
-	std::vector<std::string>	_pmtk_commands;
-	bool						_debug_mode					= false;
-	QString						_device_path;
-	int							_device						= 0;
-	bool						_synchronize_input			= true;
-	bool						_initialization_commands	= true;
-	bool						_synchronize_system_clock	= false;
-	Unique<QSocketNotifier>		_notifier;
-	std::string					_buffer;
-	std::string					_value;
-	Length						_receiver_accuracy;
-	int							_failure_count				= 0;
+	Unique<PowerCycle>				_power_cycle;
+	// Used to wait a bit after a failure:
+	Unique<QTimer>					_power_cycle_timer;
+	bool							_power_cycle_requested		= false;
+	bool							_reliable_fix_quality		= false;
+	unsigned int					_power_cycle_attempts		= 0;
 
-	xf::PropertyBoolean			_serviceable;
-	xf::PropertyInteger			_read_errors;
-	xf::PropertyInteger			_fix_quality;
-	xf::PropertyInteger			_type_of_fix;
-	xf::PropertyAngle			_latitude;
-	xf::PropertyAngle			_longitude;
-	xf::PropertyLength			_altitude_amsl;
-	xf::PropertyLength			_altitude_above_wgs84;
-	xf::PropertySpeed			_groundspeed;
-	xf::PropertyAngle			_track;
-	xf::PropertyInteger			_tracked_satellites;
-	xf::PropertyFloat			_hdop;
-	xf::PropertyFloat			_vdop;
-	xf::PropertyLength			_lateral_accuracy;
-	xf::PropertyLength			_vertical_accuracy;
-	xf::PropertyString			_dgps_station_id;
-	xf::PropertyTime			_update_timestamp;
-	xf::PropertyTime			_epoch_time;
+	/*
+	 * Settings
+	 */
+
+	std::string						_device_path;
+	std::vector<std::string>		_boot_pmtk_commands;
+	unsigned int					_default_baud_rate			= 9600;
+	unsigned int					_target_baud_rate			= 9600;
+	Length							_receiver_accuracy;
+	bool							_synchronize_system_clock	= false;
+
+	/*
+	 * General output
+	 */
+
+	// Number of serial read failures.
+	xf::PropertyInteger				_read_errors;	// Managed by Connection object.
+	// True if GPS device is serviceable:
+	xf::PropertyBoolean				_serviceable;	// Managed by Connection object.
+	// Manager power to the GPS device:
+	xf::PropertyBoolean				_power_on;		// Managed by PowerCycle object.
+
+	/*
+	 * GPS output
+	 */
+
+	xf::PropertyString				_fix_quality;
+	xf::PropertyString				_fix_mode;		// "2D" or "3D"
+	xf::PropertyAngle				_latitude;
+	xf::PropertyAngle				_longitude;
+	xf::PropertyLength				_altitude_amsl;
+	xf::PropertyLength				_geoid_height;
+	xf::PropertySpeed				_ground_speed;
+	xf::PropertyAngle				_track_true;
+	xf::PropertyInteger				_tracked_satellites;
+	xf::PropertyAngle				_magnetic_declination;
+	xf::PropertyFloat				_hdop;
+	xf::PropertyFloat				_vdop;
+	xf::PropertyFloat				_pdop;
+	xf::PropertyLength				_lateral_accuracy;
+	xf::PropertyLength				_vertical_accuracy;
+	xf::PropertyLength				_accuracy;
+	xf::PropertyInteger				_dgps_station_id;
+	xf::PropertyTime				_fix_system_timestamp;
+	xf::PropertyTime				_fix_gps_timestamp;
 };
-
-
-inline void
-GPS::failure()
-{
-	failure ("");
-}
-
-
-inline int
-GPS::digit_from_ascii (char c)
-{
-	if ('0' <= c && c <= '9')
-		return c - '0';
-	return 0;
-}
 
 #endif
 
