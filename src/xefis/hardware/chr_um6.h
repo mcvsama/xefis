@@ -575,7 +575,7 @@ class CHRUM6
 	 * for baud rate. Bits are not shifted to the right position.
 	 */
 	static uint32_t
-	bits_for_baud_rate (std::string const& baud_rate);
+	bits_for_baud_rate (unsigned int baud_rate);
 
   private:
 	// Serial port callback

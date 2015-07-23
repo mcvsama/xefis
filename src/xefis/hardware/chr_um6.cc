@@ -168,7 +168,7 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 
 
 uint32_t
-CHRUM6::bits_for_baud_rate (std::string const& baud_rate_str)
+CHRUM6::bits_for_baud_rate (unsigned int baud_rate)
 {
 	// Must acquire lock before statically- and non-statically initializing static variables:
 	auto lock = bits_for_baud_rate_entry_mutex.acquire_lock();
@@ -184,8 +184,6 @@ CHRUM6::bits_for_baud_rate (std::string const& baud_rate_str)
 		baud_rates_map[57600] = 4;
 		baud_rates_map[115200] = 5;
 	}
-
-	uint32_t baud_rate = boost::lexical_cast<unsigned int> (baud_rate_str);
 
 	auto c = baud_rates_map.find (baud_rate);
 	if (c == baud_rates_map.end())
