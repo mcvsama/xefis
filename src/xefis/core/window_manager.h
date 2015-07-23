@@ -20,7 +20,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/window.h>
 
 
@@ -30,7 +29,7 @@ class WindowManager: public QWidget
 {
   public:
 	// Ctor
-	WindowManager (Application*);
+	WindowManager();
 
 	// Dtor
 	~WindowManager();

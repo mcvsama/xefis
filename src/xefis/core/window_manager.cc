@@ -24,7 +24,7 @@
 
 namespace Xefis {
 
-WindowManager::WindowManager (Application*)
+WindowManager::WindowManager()
 {
 	_logger.set_prefix ("<window manager>");
 	_logger << "Creating WindowManager" << std::endl;

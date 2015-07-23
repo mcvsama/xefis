@@ -23,7 +23,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/window.h>
 
 
@@ -63,7 +62,7 @@ class SoundManager
 
   public:
 	// Ctor
-	SoundManager (Application*);
+	SoundManager();
 
 	// Dtor
 	~SoundManager();
