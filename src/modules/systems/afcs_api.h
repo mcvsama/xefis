@@ -58,6 +58,8 @@ enum class PitchMode
 {
 	// No vertical movement control.
 	None,
+	// Pitch for TO/GA.
+	TO_GA,
 	// Control airspeed to match value from CMD IAS property.
 	KIAS,
 	// Control airspeed to match value from CMD Mach property.
