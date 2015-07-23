@@ -82,3 +82,8 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 # define assert(a, b...)
 #endif // XEFIS_ENABLE_ASSERT
 
+#ifdef __GNUC__
+#define DO_PRAGMA(x) _Pragma(#x)
+#define TODO(x) DO_PRAGMA(message ("TODO: " #x))
+#endif // __GNUC__
+
