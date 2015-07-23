@@ -24,6 +24,9 @@
 
 // Lib:
 #include <boost/lexical_cast.hpp>
+
+// Xefis:
+#include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/mutex.h>
 
@@ -68,6 +71,9 @@ SerialPort::set_max_write_failures (unsigned int number)
 void
 SerialPort::write (Blob const& data)
 {
+	if (!_good)
+		throw WriteException ("can't write to serial port - device is closed");
+
 	_output_buffer.insert (_output_buffer.end(), data.begin(), data.end());
 
 	int written = ::write (_device, _output_buffer.data(), _output_buffer.size());
@@ -97,6 +103,28 @@ SerialPort::write (Blob const& data)
 		_output_buffer.clear();
 		_write_failure_count = 0;
 	}
+}
+
+
+void
+SerialPort::write (std::string const& data)
+{
+	_output_buffer.insert (_output_buffer.end(), data.begin(), data.end());
+	flush_async();
+}
+
+
+void
+SerialPort::flush_async()
+{
+	write (Blob());
+}
+
+
+void
+SerialPort::flush()
+{
+	::fsync (_device);
 }
 
 
@@ -212,6 +240,9 @@ SerialPort::termios_baud_rate (std::string const& baud_rate)
 void
 SerialPort::read()
 {
+	if (!_good)
+		return;
+
 	std::string buffer;
 
 	bool err = false;
