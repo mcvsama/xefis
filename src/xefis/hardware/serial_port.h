@@ -262,6 +262,12 @@ class SerialPort:
 	Logger const&
 	log() const;
 
+	/**
+	 * Return prefix for logger messages.
+	 */
+	std::string
+	log_prefix() const;
+
   private:
 	Logger const*			_logger						= nullptr;
 	Logger					_internal_logger;
