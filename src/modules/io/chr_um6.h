@@ -204,12 +204,12 @@ class CHRUM6:
 	Unique<QTimer>				_alive_check_timer;
 	Unique<QTimer>				_status_check_timer;
 	Unique<QTimer>				_initialization_timer;
-	Unique<xf::SerialPort>		_serial_port;
+	Shared<xf::SerialPort>		_serial_port;
 	Unique<xf::CHRUM6>			_sensor;
 	int							_failure_count			= 0;
 	Optional<float>				_ekf_process_variance	= 0.5f;
 	Frequency					_sample_rate			= 20_Hz;
-	std::string					_baud_rate				= "115200";
+	unsigned int				_baud_rate				= 115200;
 	Stage						_stage					= Stage::Initialize;
 	// Backup gyro bias values:
 	Optional<uint32_t>			_gyro_bias_xy;

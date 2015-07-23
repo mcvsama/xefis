@@ -151,6 +151,7 @@ XEFIS_HEADERS += xefis/core/property_utils.h
 XEFIS_HEADERS += xefis/core/services.h
 XEFIS_HEADERS += xefis/core/sound_manager.h
 XEFIS_HEADERS += xefis/core/stdexcept.h
+XEFIS_HEADERS += xefis/core/system.h
 XEFIS_HEADERS += xefis/core/window.h
 XEFIS_HEADERS += xefis/core/window_manager.h
 XEFIS_HEADERS += xefis/core/work_performer.h
@@ -174,6 +175,7 @@ XEFIS_SOURCES += xefis/core/property_storage.cc
 XEFIS_SOURCES += xefis/core/property_utils.cc
 XEFIS_SOURCES += xefis/core/services.cc
 XEFIS_SOURCES += xefis/core/sound_manager.cc
+XEFIS_SOURCES += xefis/core/system.cc
 XEFIS_SOURCES += xefis/core/window.cc
 XEFIS_SOURCES += xefis/core/window_manager.cc
 XEFIS_SOURCES += xefis/core/work_performer.cc
@@ -195,6 +197,19 @@ XEFIS_SOURCES += xefis/hardware/i2c.cc
 XEFIS_SOURCES += xefis/hardware/serial_port.cc
 
 XEFIS_MOCHDRS += xefis/hardware/serial_port.h
+
+######## /xefis/support ########
+
+XEFIS_HEADERS += xefis/support/nmea/exceptions.h
+XEFIS_HEADERS += xefis/support/nmea/gps.h
+XEFIS_HEADERS += xefis/support/nmea/mtk.h
+XEFIS_HEADERS += xefis/support/nmea/nmea.h
+XEFIS_HEADERS += xefis/support/nmea/parser.h
+
+XEFIS_SOURCES += xefis/support/nmea/gps.cc
+XEFIS_SOURCES += xefis/support/nmea/mtk.cc
+XEFIS_SOURCES += xefis/support/nmea/nmea.cc
+XEFIS_SOURCES += xefis/support/nmea/parser.cc
 
 ######## /xefis/utility ########
 
