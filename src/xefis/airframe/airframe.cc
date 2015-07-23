@@ -46,24 +46,24 @@ Airframe::Airframe (Application*, QDomElement const& config)
 			else if (e == "settings")
 				settings_element = e;
 		}
-	}
 
-	if (settings_element.isNull())
-		throw MissingDomElement (config, "settings");
-	else
-	{
-		double min_g;
-		double max_g;
+		if (settings_element.isNull())
+			throw MissingDomElement (config, "settings");
+		else
+		{
+			double min_g;
+			double max_g;
 
-		ConfigReader::SettingsParser settings_parser ({
-			{ "wings-area", _wings_area, true },
-			{ "max-negative-load-factor", min_g, true },
-			{ "max-positive-load-factor", max_g, true },
-			{ "safe-aoa-correction", _safe_aoa_correction, true },
-		});
-		settings_parser.parse (settings_element);
+			ConfigReader::SettingsParser settings_parser ({
+				{ "wings-area", _wings_area, true },
+				{ "max-negative-load-factor", min_g, true },
+				{ "max-positive-load-factor", max_g, true },
+				{ "safe-aoa-correction", _safe_aoa_correction, true },
+			});
+			settings_parser.parse (settings_element);
 
-		_load_factor_limits = { min_g, max_g };
+			_load_factor_limits = { min_g, max_g };
+		}
 	}
 }
 
