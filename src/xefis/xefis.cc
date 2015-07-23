@@ -65,12 +65,7 @@ int main (int argc, char** argv, char**)
 	}
 	catch (xf::Exception& e)
 	{
-		std::cerr << e << std::endl;
-	}
-	catch (...)
-	{
-		xf::Backtrace::clog();
-		throw;
+		std::cerr << "Fatal error: " << e << std::endl;
 	}
 
 	return EXIT_SUCCESS;
