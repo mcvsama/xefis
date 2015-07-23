@@ -1,0 +1,4 @@
+* Beware of Argument-Dependent Lookup, put specializations into std in the same header as the class definition.
+
+* boost::format bug with uint8_t arguments. Use static_cast<int> on uint8_t arguments.
+
