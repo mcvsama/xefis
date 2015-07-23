@@ -134,9 +134,9 @@ class Exception: public std::exception
 inline std::ostream&
 operator<< (std::ostream& os, Exception const& e)
 {
-	os << e.message() << std::endl;
+	os << e.message();
 	if (!e.backtrace_hidden())
-		os << e.backtrace() << std::endl;
+		os << std::endl << e.backtrace();
 	return os;
 }
 
@@ -263,6 +263,38 @@ Exception::hide_backtrace() noexcept
 {
 	_hide_backtrace = true;
 }
+
+
+namespace exception_ops {
+
+inline std::ostream&
+operator<< (std::ostream& out, std::exception_ptr const& eptr)
+{
+	try {
+		if (eptr)
+			std::rethrow_exception (eptr);
+	}
+	catch (Exception const& e)
+	{
+		out << e << std::endl;
+	}
+	catch (boost::exception const& e)
+	{
+		out << "boost::exception " << typeid (e).name() << std::endl;
+	}
+	catch (std::exception const& e)
+	{
+		out << "std::exception " << typeid (e).name() << std::endl;
+	}
+	catch (...)
+	{
+		out << "unknown exception" << std::endl;
+	}
+
+	return out;
+}
+
+} // namespace exception_ops
 
 } // namespace Xefis
 

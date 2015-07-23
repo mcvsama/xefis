@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/range.h>
 
 
@@ -163,6 +164,15 @@ inline constexpr Angle
 true_to_magnetic (Angle tru, Angle declination)
 {
 	return floored_mod (tru - declination, 360.0_deg);
+}
+
+
+inline int
+digit_from_ascii (char c)
+{
+	if ('0' <= c && c <= '9')
+		return c - '0';
+	throw InvalidFormat ("non-numeric character '"_str + c + "'");
 }
 
 } // namespace Xefis

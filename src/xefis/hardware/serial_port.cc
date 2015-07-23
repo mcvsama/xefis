@@ -24,6 +24,9 @@
 
 // Lib:
 #include <boost/lexical_cast.hpp>
+
+// Xefis:
+#include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/mutex.h>
 
@@ -68,27 +71,30 @@ SerialPort::set_max_write_failures (unsigned int number)
 void
 SerialPort::write (Blob const& data)
 {
+	if (!_good)
+		throw WriteException ("can't write to serial port - device is closed");
+
 	_output_buffer.insert (_output_buffer.end(), data.begin(), data.end());
 
 	int written = ::write (_device, _output_buffer.data(), _output_buffer.size());
 
 	if (written == -1)
 	{
-		log() << "Write error " << strerror (errno) << std::endl;
+		log() << log_prefix() << "Write error " << strerror (errno) << std::endl;
 
 		if (errno != EAGAIN && errno != EWOULDBLOCK)
 		{
-			log() << "Write failure (could not write " << _output_buffer.size() << " bytes)." << std::endl;
+			log() << log_prefix() << "Write failure (could not write " << _output_buffer.size() << " bytes)." << std::endl;
 			_write_failure_count++;
 			if (_write_failure_count > _max_write_failure_count)
 				notify_failure ("multiple write failures");
 		}
 		else
-			log() << "Write failure: would block." << std::endl;
+			log() << log_prefix() << "Write failure: would block." << std::endl;
 	}
 	else if (written < static_cast<int> (_output_buffer.size()))
 	{
-		log() << "Write buffer overrun." << std::endl;
+		log() << log_prefix() << "Write buffer overrun." << std::endl;
 
 		_output_buffer.erase (_output_buffer.begin(), _output_buffer.begin() + written);
 	}
@@ -100,10 +106,32 @@ SerialPort::write (Blob const& data)
 }
 
 
+void
+SerialPort::write (std::string const& data)
+{
+	_output_buffer.insert (_output_buffer.end(), data.begin(), data.end());
+	flush_async();
+}
+
+
+void
+SerialPort::flush_async()
+{
+	write (Blob());
+}
+
+
+void
+SerialPort::flush()
+{
+	::fsync (_device);
+}
+
+
 bool
 SerialPort::open()
 {
-	log() << "Opening device " << _configuration._device_path << std::endl;
+	log() << log_prefix() << "Opening device " << _configuration._device_path << " at " << configuration().baud_rate() << std::endl;
 	close();
 	_device = ::open (_configuration._device_path.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
@@ -112,20 +140,20 @@ SerialPort::open()
 		auto es = strerror (errno);
 		_error = es;
 		_good = false;
-		log() << "Could not open device file " << _configuration._device_path << ": " << es << std::endl;
+		log() << log_prefix() << "Could not open device file " << _configuration._device_path << ": " << es << std::endl;
 	}
 	else
 	{
 		if (set_device_options())
 		{
-			log() << "Connected." << std::endl;
+			log() << log_prefix() << "Open at " << configuration().baud_rate() << "." << std::endl;
 			_good = true;
 			_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
 			_notifier->setEnabled (true);
 			QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
 		}
 		else
-			log() << "Failed to set device parameters." << std::endl;
+			log() << log_prefix() << "Failed to set device parameters." << std::endl;
 	}
 
 	return good();
@@ -212,6 +240,9 @@ SerialPort::termios_baud_rate (std::string const& baud_rate)
 void
 SerialPort::read()
 {
+	if (!_good)
+		return;
+
 	std::string buffer;
 
 	bool err = false;
@@ -230,12 +261,12 @@ SerialPort::read()
 				{
 					// Nothing to read (read would block)
 					buffer.resize (prev_size);
-					log() << "Nothing to read (read would block)." << std::endl;
+					log() << log_prefix() << "Nothing to read (read would block)." << std::endl;
 					break;
 				}
 				else
 				{
-					log() << "Error while reading from serial port: " << strerror (errno) << std::endl;
+					log() << log_prefix() << "Error while reading from serial port: " << strerror (errno) << std::endl;
 					err = true;
 					break;
 				}
@@ -245,7 +276,7 @@ SerialPort::read()
 				buffer.resize (prev_size + n);
 				if (n == 0)
 				{
-					log() << "Read failure (0 bytes read by read())." << std::endl;
+					log() << log_prefix() << "Read failure (0 bytes read by read())." << std::endl;
 					_read_failure_count++;
 					if (_read_failure_count > _max_read_failure_count)
 						notify_failure ("multiple read failures");
@@ -277,7 +308,7 @@ SerialPort::set_device_options()
 		parity_str = "odd";
 	else if (_configuration._parity == Parity::Even)
 		parity_str = "even";
-	log() << "Setting baud rate: " << _configuration._baud_rate << ", data bits: " << _configuration._data_bits
+	log() << log_prefix() << "Setting baud rate: " << _configuration._baud_rate << ", data bits: " << _configuration._data_bits
 		  << ", parity: " << parity_str << ", stop bits: " << _configuration._stop_bits << std::endl;
 
 	termios options;
@@ -323,13 +354,13 @@ SerialPort::set_device_options()
 
 	if (tcsetattr (_device, TCSAFLUSH, &options) != 0)
 	{
-		log() << "Could not setup serial port: " << _configuration._device_path << ": " << strerror (errno) << std::endl;
+		log() << log_prefix() << "Could not setup serial port: " << _configuration._device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
 	if (tcflow (_device, TCOON | TCION) != 0)
 	{
-		log() << "Could not enable flow: tcflow(): " << _configuration._device_path << ": " << strerror (errno) << std::endl;
+		log() << log_prefix() << "Could not enable flow: tcflow(): " << _configuration._device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
@@ -341,10 +372,17 @@ void
 SerialPort::notify_failure (std::string const& message)
 {
 	_error = message;
-	log() << "Failure detected: " << message << std::endl;
+	log() << log_prefix() << "Failure detected: " << message << std::endl;
 	if (_failure)
 		_failure();
 	close();
+}
+
+
+std::string
+SerialPort::log_prefix() const
+{
+	return (boost::format ("SerialPort<%p>: ") % static_cast<void const*> (this)).str();
 }
 
 } // namespace Xefis

@@ -48,6 +48,16 @@ class SerialPort:
 	};
 
 	/**
+	 * Thrown when write operation can't be performed
+	 * (eg. on closed device).
+	 */
+	class WriteException: public Exception
+	{
+	  public:
+		using Exception::Exception;
+	};
+
+	/**
 	 * Represents serial port configuration.
 	 */
 	class Configuration
@@ -68,11 +78,17 @@ class SerialPort:
 		set_device_path (std::string const& device_path);
 
 		/**
+		 * Return current baud rate.
+		 */
+		unsigned int
+		baud_rate() const noexcept;
+
+		/**
 		 * Set device options.
 		 * Baud rate is parsed from baud_rate.
 		 */
 		void
-		set_baud_rate (std::string const& baud_rate);
+		set_baud_rate (unsigned int baud_rate);
 
 		/**
 		 * Set data bits. Possible values are: 5, 6, 7, 8.
@@ -98,11 +114,11 @@ class SerialPort:
 		 * Enable hardware flow control.
 		 */
 		void
-		set_hardware_control_flow (bool enabled);
+		set_hardware_flow_control (bool enabled);
 
 	  private:
 		std::string		_device_path;
-		std::string		_baud_rate;
+		unsigned int	_baud_rate;
 		unsigned int	_data_bits	= 8;
 		Parity			_parity		= Parity::None;
 		unsigned int	_stop_bits	= 1;
@@ -197,19 +213,36 @@ class SerialPort:
 	 * Write data to the device. Data is written asynchronously,
 	 * and it's possible that not all requested data is written
 	 * when function returns.
+	 * \throws	WriteException
+	 * 			When device is closed.
 	 */
 	void
 	write (Blob const& data);
 
 	/**
-	 * Request writing output-buffered data to the device.
-	 * Same as write ("");
+	 * Write string to the device. Same conditions apply as for
+	 * write (Blob).
+	 * \throws	WriteException
+	 * 			When device is closed.
 	 */
 	void
-	write();
+	write (std::string const& data);
 
 	/**
-	 * Return true if output buffer is not empty.
+	 * Request writing output-buffered data to the device (asynchronously).
+	 */
+	void
+	flush_async();
+
+	/**
+	 * Flush the output buffer to the device - synchronously.
+	 */
+	void
+	flush();
+
+	/**
+	 * Return true if output buffer is empty
+	 * (all data have been written to the device).
 	 */
 	bool
 	flushed() const noexcept;
@@ -262,6 +295,12 @@ class SerialPort:
 	Logger const&
 	log() const;
 
+	/**
+	 * Return prefix for logger messages.
+	 */
+	std::string
+	log_prefix() const;
+
   private:
 	Logger const*			_logger						= nullptr;
 	Logger					_internal_logger;
@@ -295,8 +334,15 @@ SerialPort::Configuration::set_device_path (std::string const& device_path)
 }
 
 
+inline unsigned int
+SerialPort::Configuration::baud_rate() const noexcept
+{
+	return _baud_rate;
+}
+
+
 inline void
-SerialPort::Configuration::set_baud_rate (std::string const& baud_rate)
+SerialPort::Configuration::set_baud_rate (unsigned int baud_rate)
 {
 	_baud_rate = baud_rate;
 }
@@ -324,7 +370,7 @@ SerialPort::Configuration::set_stop_bits (unsigned int stop_bits)
 
 
 inline void
-SerialPort::Configuration::set_hardware_control_flow (bool enabled)
+SerialPort::Configuration::set_hardware_flow_control (bool enabled)
 {
 	_rtscts = enabled;
 }
@@ -383,13 +429,6 @@ inline Blob&
 SerialPort::input_buffer() noexcept
 {
 	return _input_buffer;
-}
-
-
-inline void
-SerialPort::write()
-{
-	write ({});
 }
 
 

@@ -38,6 +38,7 @@
 #include <xefis/core/config_reader.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/work_performer.h>
+#include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/components/configurator/configurator_widget.h>
 
@@ -99,6 +100,8 @@ Application::Application (int& argc, char** argv):
 
 	if (_config_reader->has_windows())
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (this, nullptr);
+
+	_system = std::make_unique<System>();
 
 	_data_updater = new QTimer (this);
 	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).ms());

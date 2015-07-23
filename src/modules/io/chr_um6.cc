@@ -30,6 +30,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/core/application.h>
+#include <xefis/core/system.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/numeric.h>
@@ -112,7 +115,7 @@ CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
 	sp_config.set_stop_bits (1);
 	sp_config.set_parity_bit (xf::SerialPort::Parity::None);
 
-	_serial_port = std::make_unique<xf::SerialPort>();
+	_serial_port = module_manager->application()->system()->allocate_serial_port();
 	_serial_port->set_configuration (sp_config);
 	_serial_port->set_max_read_failures (3);
 
@@ -130,7 +133,7 @@ CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
 void
 CHRUM6::data_updated()
 {
-	if (_sensor)
+	if (_sensor && _serial_port->good())
 	{
 		// Earth acceleration = measured acceleration - centrifugal acceleration.
 
@@ -164,7 +167,7 @@ CHRUM6::data_updated()
 void
 CHRUM6::open_device()
 {
-	try {
+	bool has_thrown = xf::Exception::guard ([&] {
 		_alive_check_timer->start();
 
 		reset();
@@ -172,11 +175,10 @@ CHRUM6::open_device()
 			initialize();
 		else
 			restart();
-	}
-	catch (...)
-	{
+	});
+
+	if (has_thrown)
 		failure ("exception in open_device()");
-	}
 }
 
 

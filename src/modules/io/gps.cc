@@ -16,26 +16,22 @@
 #include <memory>
 #include <ctime>
 
-// System:
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <errno.h>
-
 // Lib:
 #include <boost/lexical_cast.hpp>
-#include <boost/format.hpp>
 #include <boost/optional.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/core/application.h>
+#include <xefis/core/system.h>
 #include <xefis/hardware/serial_port.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/hextable.h>
 #include <xefis/utility/resource.h>
 #include <xefis/utility/mutex.h>
+#include <xefis/support/nmea/parser.h>
+#include <xefis/support/nmea/mtk.h>
 
 // Local:
 #include "gps.h"
@@ -44,54 +40,507 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/gps", GPS);
 
 
-static xf::Mutex describe_pmtk_command_entry_mutex;
-static xf::Mutex fix_quality_strings_entry_mutex;
+#define FUZZ_INPUT
+
+using namespace xf::exception_ops;
+
+
+constexpr unsigned int	GPS::kConnectionAttemptsPerPowerCycle;
+constexpr Time			GPS::kPowerRestartDelay;
+constexpr Time			GPS::kAliveCheckInterval;
+constexpr unsigned int	GPS::kMaxRestartAttempts;
+constexpr const char*	GPS::MTK_SET_NMEA_BAUDRATE;
+constexpr const char*	GPS::MTK_SET_NMEA_FREQUENCIES;
+constexpr const char*	GPS::MTK_SET_NMEA_POSITION_FIX_INTERVAL;
+
+
+GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned int baud_rate):
+	_gps_module (gps_module),
+	_power_cycle (power_cycle),
+	// Store requested baud rate separately, since _serial_port_config may change it
+	// (align to nearest allowed baud rate):
+	_requested_physical_baud_rate (baud_rate)
+{
+	_gps_module.log() << "Create GPS serial connection" << std::endl;
+
+	_alive_check_timer = std::make_unique<QTimer> (this);
+	_alive_check_timer->setInterval (kAliveCheckInterval.ms());
+	_alive_check_timer->setSingleShot (true);
+	QObject::connect (_alive_check_timer.get(), &QTimer::timeout, this, &Connection::alive_check_failed);
+
+	_serial_port_config.set_device_path (_gps_module._device_path);
+	_serial_port_config.set_baud_rate (baud_rate);
+	_serial_port_config.set_data_bits (8);
+	_serial_port_config.set_stop_bits (1);
+	_serial_port_config.set_parity_bit (xf::SerialPort::Parity::None);
+	_serial_port_config.set_hardware_flow_control (false);
+
+	_serial_port = _gps_module.module_manager()->application()->system()->allocate_serial_port (std::bind (&GPS::Connection::serial_data_ready, this),
+																								std::bind (&GPS::Connection::serial_failure, this));
+	_serial_port->set_max_read_failures (3);
+	_serial_port->set_logger (_gps_module.log());
+
+	open_device();
+}
+
+
+GPS::Connection::~Connection()
+{
+	_gps_module.log() << "Stop GPS serial connection" << std::endl;
+	_gps_module.reset_data_properties();
+	_gps_module._serviceable.write (false);
+	_reliable_fix_quality = false;
+}
+
+
+void
+GPS::Connection::data_updated()
+{
+	if (_serial_port && !_serial_port->flushed())
+		_serial_port->flush_async();
+}
+
+
+unsigned int
+GPS::Connection::requested_physical_baud_rate() const
+{
+	return _requested_physical_baud_rate;
+}
+
+
+void
+GPS::Connection::open_device()
+{
+	_serial_port->set_configuration (_serial_port_config);
+
+	bool has_thrown = xf::Exception::guard ([&] {
+		_alive_check_timer->start();
+
+		_gps_module.log() << "Opening device " << _gps_module._device_path << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
+
+		if (_serial_port->open())
+			initialize_device();
+		else
+			failure ("couldn't open serial port");
+	});
+
+	if (has_thrown)
+		failure ("exception in open_device()");
+}
+
+
+void
+GPS::Connection::initialize_device()
+{
+	_nmea_parser = std::make_unique<xf::nmea::Parser> (this);
+
+	_gps_module.log() << "Sending initialization commands." << std::endl;
+
+	_serial_port->write (xf::nmea::make_mtk_sentence (get_nmea_frequencies_setup_messages (_serial_port_config.baud_rate())));
+	// Now send user setup commands:
+	for (auto s: _gps_module._boot_pmtk_commands)
+	{
+		std::string pmtk = xf::nmea::make_mtk_sentence (s);
+		_serial_port->write (pmtk);
+		// Even if all data can't be written now, it shall be flushed
+		// eventually with _serial_port->flush_async() in data_updated().
+	}
+}
+
+
+void
+GPS::Connection::request_new_baud_rate (unsigned int baud_rate)
+{
+	_gps_module.log() << "Requesting baud-rate switch from " << _serial_port_config.baud_rate() << " to " << baud_rate << std::endl;
+	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","_str + boost::lexical_cast<std::string> (baud_rate));
+	_serial_port->write (set_baud_rate_message);
+	_serial_port->flush();
+	_serial_port->close();
+}
+
+
+void
+GPS::Connection::alive_check_failed()
+{
+	failure ("alive check failed");
+}
+
+
+void
+GPS::Connection::failure (std::string const& reason)
+{
+	_gps_module.log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _gps_module._device_path << std::endl;
+	_power_cycle.notify_connection_failure();
+}
+
+
+void
+GPS::Connection::serial_data_ready()
+{
+	_nmea_parser->feed (_serial_port->input_buffer());
+	_serial_port->input_buffer().clear();
+
+	bool processed = true;
+	do {
+		processed = true;
+
+		try {
+			processed = _nmea_parser->process_one();
+
+			if (processed)
+				_alive_check_timer->start();
+		}
+		catch (...)
+		{
+			if (_gps_module._read_errors.configured())
+				_gps_module._read_errors = *_gps_module._read_errors + 1;
+			_gps_module.log() << "Exception when processing NMEA sentence: " << std::current_exception() << std::endl;
+		}
+	} while (processed);
+}
+
+
+void
+GPS::Connection::serial_failure()
+{
+	failure ("serial communication error");
+}
+
+
+void
+GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
+{
+	message_received();
+
+	_gps_module._latitude = sentence.latitude;
+	_gps_module._longitude = sentence.longitude;
+
+	if (sentence.fix_quality)
+		_gps_module._fix_quality = xf::nmea::stringify (*sentence.fix_quality);
+	else
+		_gps_module._fix_quality.set_nil();
+
+	_gps_module._tracked_satellites = optional_cast_to<decltype (_gps_module._dgps_station_id)::Type> (sentence.tracked_satellites);
+	_gps_module._altitude_amsl = sentence.altitude_amsl;
+	_gps_module._geoid_height = sentence.geoid_height;
+	_gps_module._dgps_station_id = optional_cast_to<decltype (_gps_module._dgps_station_id)::Type> (sentence.dgps_station_id);
+	// Use system time as reference:
+	_gps_module._fix_system_timestamp = Time::now();
+	_gps_module._reliable_fix_quality = sentence.reliable_fix_quality();
+}
+
+
+void
+GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
+{
+	message_received();
+
+	if (sentence.fix_mode)
+	{
+		switch (*sentence.fix_mode)
+		{
+			case xf::nmea::GPSFixMode::Fix2D:
+				_gps_module._fix_mode = "2D";
+				break;
+
+			case xf::nmea::GPSFixMode::Fix3D:
+				_gps_module._fix_mode = "3D";
+				break;
+
+			default:
+				_gps_module._fix_mode.set_nil();
+		}
+	}
+	else
+		_gps_module._fix_mode.set_nil();
+
+	_gps_module._pdop = optional_cast_to<double> (sentence.pdop);
+	_gps_module._vdop = optional_cast_to<double> (sentence.vdop);
+	_gps_module._hdop = optional_cast_to<double> (sentence.hdop);
+
+	if (sentence.hdop)
+		_gps_module._lateral_accuracy = _gps_module._receiver_accuracy * *sentence.hdop;
+	else
+		_gps_module._lateral_accuracy.set_nil();
+
+	if (sentence.vdop)
+		_gps_module._vertical_accuracy = _gps_module._receiver_accuracy * *sentence.vdop;
+	else
+		_gps_module._vertical_accuracy.set_nil();
+
+	if (sentence.hdop && sentence.vdop)
+		_gps_module._accuracy = _gps_module._receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
+	else
+		_gps_module._accuracy.set_nil();
+}
+
+
+void
+GPS::Connection::process_nmea_sentence (xf::nmea::GPRMC const& sentence)
+{
+	message_received();
+
+	// If values weren't updated by GGA message, use
+	// position info from RMC:
+	if (_gps_module._latitude.valid_age() > 1.5_s)
+		_gps_module._latitude = sentence.latitude;
+	if (_gps_module._longitude.valid_age() > 1.5_s)
+		_gps_module._longitude = sentence.longitude;
+
+	_gps_module._ground_speed = sentence.ground_speed;
+	_gps_module._track_true = sentence.track_true;
+	_gps_module._magnetic_declination = sentence.magnetic_variation;
+
+	if (sentence.fix_date && sentence.fix_time)
+		_gps_module._fix_gps_timestamp = to_unix_time (*sentence.fix_date, *sentence.fix_time);
+	else
+		_gps_module._fix_gps_timestamp.set_nil();
+
+	if (sentence.receiver_status == xf::nmea::GPSReceiverStatus::Active)
+		if (_gps_module._reliable_fix_quality)
+			if (sentence.fix_date && sentence.fix_time)
+				_gps_module.update_clock (*sentence.fix_date, *sentence.fix_time);
+}
+
+
+void
+GPS::Connection::process_nmea_sentence (xf::nmea::PMTKACK const& sentence)
+{
+	message_received();
+
+	std::string command_hint;
+	if (sentence.command)
+	{
+		command_hint = xf::nmea::describe_mtk_command_by_id (*sentence.command);
+		if (command_hint.empty())
+			command_hint = *sentence.command;
+	}
+
+	if (sentence.result)
+	{
+		switch (*sentence.result)
+		{
+			case xf::nmea::MTKResult::InvalidCommand:
+				_gps_module.log() << "Invalid command/packet: " << command_hint << std::endl;
+				break;
+
+			case xf::nmea::MTKResult::UnsupportedCommand:
+				_gps_module.log() << "Unsupported command/packet: " << command_hint << std::endl;
+				break;
+
+			case xf::nmea::MTKResult::Failure:
+				_gps_module.log() << "Valid command, but action failed for: " << command_hint << std::endl;
+				break;
+
+			case xf::nmea::MTKResult::Success:
+				_gps_module.log() << "Command result: " << command_hint << ": OK" << std::endl;
+				break;
+		}
+	}
+	else
+		_gps_module.log() << "Unrecognizable MTK ACK message (no result flag): " << sentence.contents() << std::endl;
+}
+
+
+std::string
+GPS::Connection::get_nmea_frequencies_setup_messages (unsigned int baud_rate)
+{
+	// Set NMEA packet frequencies.
+	// Index (name):
+	//   0 - GLL
+	//   1 - RMC
+	//   2 - VTG
+	//   3 - GGA
+	//   4 - GSA
+	//   5 - GSV
+	//   ..
+	//   18 - CHN
+	// Available values:
+	//   0 - disabled
+	//   1…5 - output a packet every 1…5 position fixes
+
+	// *_period arguments are 1 to 5 inclusive (output every 1 to 5 position fixes).
+	auto get_required_baud_rate = [](Time fix_interval, int gga_period, int gsa_period, int rmc_period) -> unsigned int
+	{
+		// Required messages and their maximum lengths:
+		constexpr signed int header = 6;
+		constexpr signed int epilog = 5;
+		constexpr signed int GGA_maxlen = header + 10 + 9 + 1 + 9 + 1 + 1 + 2 + 4 + 7 + 1 + 7 + 1 + 5 + epilog + 14;
+		constexpr signed int GSA_maxlen = header + 1 + 1 + (12 * 2) + (3 * 4) + epilog + 17;
+		constexpr signed int RMC_maxlen = header + 10 + 1 + 9 + 1 + 9 + 1 + 6 + 6 + 6 + 6 + 1 + 1 + epilog + 12;
+
+		Frequency gga_per_second = 1.0 / fix_interval / gga_period;
+		Frequency gsa_per_second = 1.0 / fix_interval / gsa_period;
+		Frequency rmc_per_second = 1.0 / fix_interval / rmc_period;
+
+		Frequency byte_freq = GGA_maxlen * gga_per_second + GSA_maxlen * gsa_per_second + RMC_maxlen * rmc_per_second;
+		return static_cast<unsigned int> (std::ceil (8 * byte_freq.Hz()));
+	};
+
+	Time fix_interval = 100_ms;
+	int gga_period = 1;
+	int gsa_period = 1;
+	int rmc_period = 1;
+
+	// Decrease frequency of messages until they fit in the baud-rate.
+	// Most important are GGA, then RMC, then GSA.
+	// Start with least-important messages.
+	while (get_required_baud_rate (fix_interval, gga_period, gsa_period, rmc_period) > baud_rate)
+	{
+		if (rmc_period < 5)
+			rmc_period++;
+		else if (gsa_period < 5)
+			gsa_period++;
+		else if (gga_period < 5)
+			gga_period++;
+		else
+		{
+			gga_period = 1;
+			gsa_period = 1;
+			rmc_period = 1;
+			fix_interval += 100_ms;
+		}
+	}
+
+	unsigned int fix_interval_rounded_to_100ms = static_cast<unsigned int> (fix_interval.ms()) / 100 * 100;
+	std::string mtk_set_nmea_frequencies_body = (boost::format ("%s,0,%d,0,%d,%d,0,0,0,0,0,0,0,0,0,0,0,0,0,0") % MTK_SET_NMEA_FREQUENCIES % rmc_period % gga_period % gsa_period).str();
+	std::string mtk_set_nmea_frequencies = xf::nmea::make_mtk_sentence (mtk_set_nmea_frequencies_body);
+	std::string mtk_set_nmea_position_fix_interval_body = std::string (MTK_SET_NMEA_POSITION_FIX_INTERVAL) + "," + std::to_string (fix_interval_rounded_to_100ms);
+	std::string mtk_set_nmea_position_fix_interval = xf::nmea::make_mtk_sentence (mtk_set_nmea_position_fix_interval_body);
+
+	return mtk_set_nmea_frequencies + mtk_set_nmea_position_fix_interval;
+}
+
+
+inline void
+GPS::Connection::message_received()
+{
+	if (_first_message_received)
+		return;
+
+	_first_message_received = true;
+	_power_cycle.notify_connection_established();
+}
+
+
+GPS::PowerCycle::PowerCycle (GPS& gps_module):
+	_gps_module (gps_module)
+{
+	// Turn on power to the device.
+	_gps_module.log() << "GPS power on" << std::endl;
+	_gps_module._power_on.write (true);
+
+	// Connection will be created in data_updated().
+}
+
+
+GPS::PowerCycle::~PowerCycle()
+{
+	_connection.reset();
+	// Turn off power to the device.
+	_gps_module.log() << "GPS power off" << std::endl;
+	_gps_module._power_on.write (false);
+}
+
+
+void
+GPS::PowerCycle::data_updated()
+{
+	// _connection management is done here, since this method is called
+	// from main Qt event loop, and not directly from the Connection object
+	// itself.
+
+	if (_restart_connection)
+	{
+		_restart_connection = false;
+		_connection.reset();
+	}
+
+	if (!_connection)
+	{
+		++_connection_attempts;
+		unsigned int baud_rate = (_connection_attempts % 2 == 0)
+			? _gps_module._target_baud_rate
+			: _gps_module._default_baud_rate;
+		_connection = std::make_unique<Connection> (_gps_module, *this, baud_rate);
+	}
+
+	_connection->data_updated();
+}
+
+
+void
+GPS::PowerCycle::notify_connection_failure()
+{
+	_gps_module.log() << "Serial connection failure." << std::endl;
+
+	if (_connection_attempts >= kConnectionAttemptsPerPowerCycle)
+		_gps_module.request_power_cycle();
+	else
+		_restart_connection = true;
+}
+
+
+void
+GPS::PowerCycle::notify_connection_established()
+{
+	_gps_module.log() << "Stable connection established." << std::endl;
+	_gps_module._serviceable.write (true);
+
+	// Try to use target baud rate.
+	// If power cycles goes beyond max allowed number, don't try to reconnect
+	// if a working connection is established. Use what we have.
+	if (_gps_module._power_cycle_attempts <= kMaxRestartAttempts)
+	{
+		// If connection attempts < kConnectionAttemptsPerPowerCycle and power cycles num <= kMaxRestartAttempts,
+		// then aim for the target-baud-rate. Otherwise try to settle at the default baud rate.
+		if ((_connection_attempts <= kConnectionAttemptsPerPowerCycle) == (_connection->requested_physical_baud_rate() != _gps_module._target_baud_rate))
+		{
+			_connection->request_new_baud_rate (_gps_module._target_baud_rate);
+			_restart_connection = true;
+		}
+	}
+	else
+		_gps_module.log() << "Max connection attempts achieved, not retrying anymore." << std::endl;
+}
 
 
 GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	_buffer.reserve (256);
-
-	// Set NMEA packet frequencies:
-	// 0 - GLL		0 - disabled
-	// 1 - RMC		1…5 - output every one…5 position fixes
-	// 2 - VTG
-	// 3 - GGA
-	// 4 - GSA
-	// 5 - GSV
-	// ..
-	// 18 - CHN
-	_pmtk_commands.push_back ("PMTK314,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0");
-
 	parse_settings (config, {
-		{ "debug", _debug_mode, false },
-		{ "device", _device_path, true },
+		{ "serial.device", _device_path, true },
+		{ "serial.baud-rate.default", _default_baud_rate, true },
+		{ "serial.baud-rate.target", _target_baud_rate, true },
 		{ "receiver-accuracy", _receiver_accuracy, true },
 		{ "synchronize-system-clock", _synchronize_system_clock, false },
-		{ "default-baud-rate", _default_baud_rate, true },
-		{ "baud-rate", _target_baud_rate, true },
 	});
+
+	// TODO check logic that _target_baud_rate >= _default_baud_rate
 
 	parse_properties (config, {
 		{ "serviceable", _serviceable, true },
 		{ "read-errors", _read_errors, true },
 		{ "fix-quality", _fix_quality, true },
-		{ "type-of-fix", _type_of_fix, true },
+		{ "fix-mode", _fix_mode, true },
 		{ "latitude", _latitude, true },
 		{ "longitude", _longitude, true },
 		{ "altitude-amsl", _altitude_amsl, true },
-		{ "altitude-above-wgs84", _altitude_above_wgs84, true },
-		{ "groundspeed", _groundspeed, true },
-		{ "track", _track, true },
+		{ "geoid-height", _geoid_height, true },
+		{ "ground-speed", _ground_speed, true },
+		{ "track.true", _track_true, true },
 		{ "tracked-satellites", _tracked_satellites, true },
+		{ "magnetic-declination", _magnetic_declination, true },
 		{ "hdop", _hdop, true },
 		{ "vdop", _vdop, true },
+		{ "pdop", _pdop, true },
 		{ "lateral-accuracy", _lateral_accuracy, true },
 		{ "vertical-accuracy", _vertical_accuracy, true },
+		{ "accuracy", _accuracy, true },
 		{ "dgps-station-id", _dgps_station_id, true },
-		{ "update-timestamp", _update_timestamp, true },
-		{ "epoch-time", _epoch_time, true },
+		{ "fix-system-timestamp", _fix_system_timestamp, true },
+		{ "fix-gps-timestamp", _fix_gps_timestamp, true },
+		{ "power-on", _power_on, false },
 	});
 
 	for (QDomElement& e: config)
@@ -101,840 +550,108 @@ GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
 			for (QDomElement& pmtk: e)
 			{
 				if (pmtk == "pmtk")
-					_pmtk_commands.push_back (pmtk.text().toStdString());
+					_boot_pmtk_commands.push_back (pmtk.text().toStdString());
 				else
 					throw xf::BadDomElement (pmtk);
 			}
 		}
 	}
 
-	_current_baud_rate = _default_baud_rate;
+	_power_cycle_timer = std::make_unique<QTimer> (this);
+	_power_cycle_timer->setInterval (kPowerRestartDelay.ms());
+	_power_cycle_timer->setSingleShot (true);
+	QObject::connect (_power_cycle_timer.get(), SIGNAL (timeout()), this, SLOT (power_on()));
 
-	_restart_timer = std::make_unique<QTimer> (this);
-	_restart_timer->setInterval (500);
-	_restart_timer->setSingleShot (true);
-	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
+	_read_errors.write (0);
+	_serviceable.write (false);
+	_power_on.write (false);
 
-	_alive_check_timer = std::make_unique<QTimer> (this);
-	_alive_check_timer->setInterval (2000);
-	_alive_check_timer->setSingleShot (false);
-	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (failure()));
-
-	open_device();
+	power_on();
 }
 
 
 GPS::~GPS()
 {
-	if (_device)
-		::close (_device);
+	_power_cycle.reset();
 }
 
 
-std::string
-GPS::describe_fix_quality (int code)
+void
+GPS::data_updated()
 {
-	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = fix_quality_strings_entry_mutex.acquire_lock();
+	// _power_cycle management is done here, since this method is called
+	// from main Qt event loop.
 
-	static std::array<std::string, 9> fix_quality_strings;
-
-	if (fix_quality_strings.empty())
+	if (_power_cycle_requested)
 	{
-		fix_quality_strings[0] = "Invalid";
-		fix_quality_strings[1] = "GPS";
-		fix_quality_strings[2] = "DGPS";
-		fix_quality_strings[3] = "PPS";
-		fix_quality_strings[4] = "RTK";
-		fix_quality_strings[5] = "Floa_t RTK";
-		fix_quality_strings[6] = "Esti_mated";
-		fix_quality_strings[7] = "Manu_al";
-		fix_quality_strings[8] = "Simu_lated";
+		_power_cycle_requested = false;
+		reset_data_properties();
+		_power_cycle.reset();
+		_power_cycle_timer->start();
 	}
 
-	if (code < 0 || 8 < code)
-		code = 0;
-	return fix_quality_strings[code];
-}
-
-
-std::string
-GPS::describe_pmtk_command (std::string command)
-{
-	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = describe_pmtk_command_entry_mutex.acquire_lock();
-
-	static std::map<std::string, std::string> hints;
-
-	if (hints.empty())
-	{
-		hints["PMTK101"] = "hot start";
-		hints["PMTK102"] = "warm start";
-		hints["PMTK103"] = "cold start";
-		hints["PMTK104"] = "full cold start";
-		hints["PMTK220"] = "set NMEA update rate";
-		hints["PMTK251"] = "set baud rate";
-		hints["PMTK286"] = "enable/disable AIC mode";
-		hints["PMTK300"] = "set fixing rate";
-		hints["PMTK301"] = "set DGPS mode";
-		hints["PMTK313"] = "enable/disable SBAS";
-		hints["PMTK314"] = "set NMEA frequencies";
-		hints["PMTK319"] = "set SBAS mode";
-		hints["PMTK513"] = "enable/disable SBAS";
-	}
-
-	auto h = hints.find (command);
-	if (h != hints.end())
-		return h->second;
-	return std::string();
+	if (_power_cycle)
+		_power_cycle->data_updated();
 }
 
 
 void
-GPS::read()
+GPS::power_on()
 {
-	bool err = false;
-	bool exc = xf::Exception::guard ([&] {
-		// Read as much as possible:
-		for (;;)
-		{
-			std::string::size_type prev_size = _buffer.size();
-			std::string::size_type try_read = 1024;
-			_buffer.resize (prev_size + try_read);
-			int n = ::read (_device, &_buffer[prev_size], try_read);
-
-			if (n < 0)
-			{
-				if (errno == EAGAIN || errno == EWOULDBLOCK)
-				{
-					// Nothing to read (read would block)
-					_buffer.resize (prev_size);
-					break;
-				}
-				else
-				{
-					log() << "Error while reading from serial port: " << strerror (errno) << std::endl;
-					err = true;
-					break;
-				}
-			}
-			else
-			{
-				_buffer.resize (prev_size + n);
-				if (n == 0)
-					break;
-			}
-		}
-
-		if (!err)
-		{
-			// Initial synchronization - discard everything up till first '$':
-			if (_synchronize_input)
-			{
-				std::string::size_type p = _buffer.find ("$GP");
-				if (p != std::string::npos)
-				{
-					_buffer.erase (0, p);
-					_synchronize_input = false;
-					synchronized();
-				}
-			}
-
-			if (!_synchronize_input)
-				process();
-		}
-	});
-
-	if (exc || err)
-		failure ("read()");
+	++_power_cycle_attempts;
+	_power_cycle = std::make_unique<PowerCycle> (*this);
 }
 
 
 void
-GPS::open_device()
+GPS::request_power_cycle()
 {
-	try {
-		_alive_check_timer->start();
-
-		log() << "Opening device " << _device_path.toStdString() << std::endl;
-
-		reset();
-
-		_device = ::open (_device_path.toStdString().c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-
-		if (_device < 0)
-		{
-			log() << "Could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
-			restart();
-		}
-		else
-		{
-			if (!set_device_options (_current_baud_rate == _target_baud_rate))
-				failure ("set_device_options()");
-			else
-			{
-				_notifier = std::make_unique<QSocketNotifier> (_device, QSocketNotifier::Read, this);
-				_notifier->setEnabled (true);
-				QObject::connect (_notifier.get(), SIGNAL (activated (int)), this, SLOT (read()));
-			}
-		}
-	}
-	catch (...)
-	{
-		failure ("exception in open_device()");
-	}
+	_power_cycle_requested = true;
 }
 
 
 void
-GPS::failure (std::string const& reason)
+GPS::reset_data_properties()
 {
-	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _device_path.toStdString() << std::endl;
-
-	_alive_check_timer->stop();
-
-	_notifier.reset();
-	::close (_device);
-
-	reset_properties();
-	_serviceable.write (false);
-	_failure_count += 1;
-
-	// First: try again. If fails again, try other baud rate.
-	// Use target baud rate on Odd number of _failure_count,
-	// and default baud rate on even number of _failure_count.
-	if (_failure_count % 2 == 0)
-		_current_baud_rate = _default_baud_rate;
-	else
-		_current_baud_rate = _target_baud_rate;
-
-	restart();
-}
-
-
-void
-GPS::restart()
-{
-	_restart_timer->start();
-}
-
-
-void
-GPS::reset()
-{
-	_synchronize_input = true;
-	_buffer.clear();
-}
-
-
-void
-GPS::reset_properties()
-{
-	_read_errors.set_nil();
 	_fix_quality.set_nil();
-	_type_of_fix.set_nil();
+	_fix_mode.set_nil();
 	_latitude.set_nil();
 	_longitude.set_nil();
 	_altitude_amsl.set_nil();
-	_altitude_above_wgs84.set_nil();
-	_groundspeed.set_nil();
-	_track.set_nil();
+	_geoid_height.set_nil();
+	_ground_speed.set_nil();
+	_track_true.set_nil();
 	_tracked_satellites.set_nil();
+	_magnetic_declination.set_nil();
 	_hdop.set_nil();
 	_vdop.set_nil();
+	_pdop.set_nil();
 	_lateral_accuracy.set_nil();
 	_vertical_accuracy.set_nil();
+	_accuracy.set_nil();
 	_dgps_station_id.set_nil();
-	_update_timestamp.set_nil();
-	_epoch_time.set_nil();
-}
-
-
-bool
-GPS::set_device_options (bool use_target_baud_rate)
-{
-	log() << "Setting baud rate to " << (use_target_baud_rate ? _target_baud_rate : _current_baud_rate) << std::endl;
-
-	reset();
-
-	termios options;
-
-	if (tcgetattr (_device, &options) != 0)
-	{
-		log() << "Failed to read serial port configuration" << std::endl;
-		return false;
-	}
-
-	int baud_rate_const = use_target_baud_rate
-		? xf::SerialPort::termios_baud_rate (_target_baud_rate)
-		: xf::SerialPort::termios_baud_rate (_current_baud_rate);
-	cfsetispeed (&options, baud_rate_const);
-	cfsetospeed (&options, baud_rate_const);
-	options.c_cflag |= CLOCAL | CREAD;
-	// Disable parity bit:
-	options.c_cflag &= ~PARENB;
-	options.c_cflag &= ~CSTOPB;
-	// Mask the character size bits:
-	options.c_cflag &= ~CSIZE;
-	// Select 8 data bits:
-	options.c_cflag |= CS8;
-	// Disable hardware flow control:
-	options.c_cflag &= ~CRTSCTS;
-	// Disable XON XOFF (for transmit and receive):
-	options.c_iflag &= ~(IXON | IXOFF | IXANY);
-	// Min charachters to be read:
-	options.c_cc[VMIN] = 0;
-	// Time to wait for data (tenths of seconds):
-	options.c_cc[VTIME] = 0;
-	// Set output and local modes to defaults:
-	options.c_oflag = 0;
-	options.c_lflag = 0;
-
-	tcflush (_device, TCIFLUSH);
-
-	if (tcsetattr (_device, TCSANOW, &options) != 0)
-	{
-		log() << "Could not setup serial port: " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
-		return false;
-	}
-
-	return true;
+	_fix_system_timestamp.set_nil();
+	_fix_gps_timestamp.set_nil();
 }
 
 
 void
-GPS::synchronized()
+GPS::update_clock (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& time)
 {
-	log() << "Stream synchronized" << std::endl;
-	if (_current_baud_rate != _target_baud_rate)
-		switch_baud_rate_request();
-	else if (_initialization_commands)
-		initialization_commands();
-}
-
-
-void
-GPS::switch_baud_rate_request()
-{
-	log() << "Switching baud rate from " << _current_baud_rate << " to " << _target_baud_rate << std::endl;
-	std::string set_baud_rate_message = make_pmtk (SET_NMEA_BAUDRATE + ","_str + _target_baud_rate);
-	::write (_device, set_baud_rate_message.data(), set_baud_rate_message.size());
-	::fsync (_device);
-	::close (_device);
-	_current_baud_rate = _target_baud_rate;
-	open_device();
-}
-
-
-void
-GPS::initialization_commands()
-{
-	log() << "Sending initialization commands" << std::endl;
-	for (auto s: _pmtk_commands)
-	{
-		std::string pmtk = make_pmtk (s);
-		::write (_device, pmtk.data(), pmtk.size());
-	}
-	::fsync (_device);
-}
-
-
-void
-GPS::process()
-{
-	// Process all messages terminated with "\r\n".
-	std::string::size_type start = 0;
-	std::string::size_type crlf = 0;
-	std::string::size_type parsed = 0;
-
-	xf::Resource remove_parsed_properties ([&] {
-		_buffer.erase (0, parsed);
-	});
-
-	for (;;)
-	{
-		crlf = _buffer.find ("\r\n", start);
-		if (crlf == std::string::npos)
-			break;
-		parsed = crlf + 2;
-
-		xf::Exception::guard ([&] {
-			if (process_message (_buffer.substr (start, crlf - start)))
-			{
-				_serviceable.write (true);
-				_failure_count = 0;
-				_alive_check_timer->start();
-			}
-			else
-			{
-				if (_read_errors.configured())
-					_read_errors.write (*_read_errors + 1);
-			}
-		});
-
-		start = parsed;
-	}
-}
-
-
-bool
-GPS::process_message (std::string message)
-{
-	static xf::HexTable hextable;
-
-	// Must be at least 5 bytes long to calculate checksum:
-	if (message.size() < 5)
-	{
-		log() << "Read error: packet too short: " << message.size() << " characters" << std::endl;
-		return false;
-	}
-
-	// Prologue:
-	if (message[0] != '$')
-	{
-		log() << "Read error: packet does not start with '$'" << std::endl;
-		return false;
-	}
-
-	// Checksum:
-	if (message[message.size() - 3] != '*')
-	{
-		log() << "Read error: missing '*' at the end of packet" << std::endl;
-		return false;
-	}
-
-	// Message checksum:
-	char c1 = message[message.size() - 2];
-	char c2 = message[message.size() - 1];
-	if (!std::isxdigit (c1) || !std::isxdigit (c2))
-	{
-		log() << "Read error: checksum characters not valid hexadecimal values" << std::endl;
-		return false;
-	}
-	uint8_t checksum = hextable[c1] * 16 + hextable[c2];
-
-	// Our checksum:
-	uint8_t sum = 0;
-	for (std::string::iterator c = message.begin() + 1; c != message.end() && *c != '*'; ++c)
-		sum ^= *c;
-
-	if (sum != checksum)
-	{
-		log() << "Read error: checksum invalid" << std::endl;
-		return false;
-	}
-
-	std::string contents = message.substr (1, message.size() - 1 - 3);
-	std::string type = contents.substr (0, contents.find (','));
-
-	if (_debug_mode)
-		log() << "Read: " << contents << std::endl;
-
-	bool result = true;
-
-	xf::Exception::guard ([&] {
-		try {
-			if (type == "GPGGA")
-				result = process_gpgga (contents);
-			else if (type == "GPGSA")
-				result = process_gpgsa (contents);
-			else if (type == "GPRMC")
-				result = process_gprmc (contents);
-			else if (type == "PMTK001")
-				result = process_pmtk_ack (contents);
-			// Silently ignore unsupported messages.
-		}
-		catch (...)
+	try {
+		Time unix_time = xf::nmea::to_unix_time (date, time);
+		// Synchronize OS clock only once:
+		if (_synchronize_system_clock)
 		{
-			result = false;
-			throw;
-		}
-	});
-
-	if (!result)
-		log() << "Failed to process message: " << contents << std::endl;
-
-	return result;
-}
-
-
-bool
-GPS::process_gpgga (std::string message_contents)
-{
-	// Skip message name:
-	std::string::size_type p = read_value (message_contents, 0);
-
-	// UTC time - skip. Will be read from RMC message.
-	p = read_value (message_contents, p);
-
-	// Latitude:
-	Optional<Angle> latitude;
-	p = read_value (message_contents, p);
-	if (_value.size() >= 3)
-	{
-		latitude = 1_deg * (digit_from_ascii (_value[0]) * 10 +
-							digit_from_ascii (_value[1]));
-		try {
-			latitude = *latitude + 1_deg * boost::lexical_cast<double> (_value.substr (2)) / 60.0;
-		}
-		catch (boost::bad_lexical_cast&)
-		{
-			latitude.reset();
+			if (module_manager()->application()->system()->set_clock (unix_time))
+				log() << "System clock synchronized from GPS." << std::endl;
+			_synchronize_system_clock = false;
 		}
 	}
-
-	// N-S
-	p = read_value (message_contents, p);
-	if (_value == "S")
-		latitude = -1 * *latitude;
-	else if (_value != "N")
-		latitude.reset();
-
-	// Longitude:
-	Optional<Angle> longitude;
-	p = read_value (message_contents, p);
-	if (_value.size() >= 4)
+	catch (xf::nmea::BadDateTime const& e)
 	{
-		longitude = 1_deg * (digit_from_ascii (_value[0]) * 100 +
-							 digit_from_ascii (_value[1]) * 10 +
-							 digit_from_ascii (_value[2]));
-		try {
-			longitude = *longitude + 1_deg * boost::lexical_cast<double> (_value.substr (3)) / 60.0;
-		}
-		catch (boost::bad_lexical_cast&)
-		{
-			longitude.reset();
-		}
+		log() << "Could not use date/time information from GPS (invalid data): error message follows:" << std::endl
+			  << "  " + std::string (e.what()) << std::endl;
 	}
-
-	// E-W
-	p = read_value (message_contents, p);
-	if (_value == "W")
-		longitude = -1 * *longitude;
-	else if (_value != "E")
-		longitude.reset();
-
-	// Fix quality:
-	p = read_value (message_contents, p);
-	int fix_quality = 0;
-	if (_value.size() == 1 && std::isdigit (_value[0]))
-		fix_quality = digit_from_ascii (_value[0]);
-
-	// Number of tracked satellites:
-	Optional<xf::PropertyInteger::Type> tracked_satellites;
-	p = read_value (message_contents, p);
-	try {
-		tracked_satellites = boost::lexical_cast<xf::PropertyInteger::Type> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{
-		tracked_satellites.reset();
-	}
-
-	// Horizontal dilusion of precision - skip. Will be taken from GSA message.
-	p = read_value (message_contents, p);
-
-	// Altitude above mean sea level (meters):
-	Optional<Length> altitude_amsl;
-	p = read_value (message_contents, p);
-	try {
-		altitude_amsl = 1_m * boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{
-		altitude_amsl.reset();
-	}
-	// Read unit: M
-	p = read_value (message_contents, p);
-	if (_value != "M")
-		altitude_amsl.reset();
-
-	// Height above WGS84 geoid (meters):
-	Optional<Length> altitude_above_wgs84;
-	p = read_value (message_contents, p);
-	try {
-		altitude_above_wgs84 = 1_m * boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{
-		altitude_above_wgs84.reset();
-	}
-	// Read unit: M
-	p = read_value (message_contents, p);
-	if (_value != "M")
-		altitude_above_wgs84.reset();
-
-	// Time since last DGPS update:
-	p = read_value (message_contents, p);
-
-	// DGPS station identifier:
-	p = read_value (message_contents, p);
-	std::string dgps_station_id = _value;
-
-	// Set properties:
-
-	_fix_quality.write (fix_quality);
-	_latitude.write (latitude);
-	_longitude.write (longitude);
-	_altitude_amsl.write (altitude_amsl);
-	_altitude_above_wgs84.write (altitude_above_wgs84);
-	_tracked_satellites.write (tracked_satellites);
-	_dgps_station_id.write (dgps_station_id);
-	_update_timestamp.write (Time::now());
-
-	return true;
-}
-
-
-bool
-GPS::process_gpgsa (std::string message_contents)
-{
-	// Skip message name:
-	std::string::size_type p = read_value (message_contents, 0);
-	// Skip A/M (Auto/Manual selection of 2D/3D fix)
-	p = read_value (message_contents, p);
-
-	// Type of fix: none, 2D, 3D:
-	Optional<xf::PropertyInteger::Type> type_of_fix;
-	p = read_value (message_contents, p);
-	try {
-		type_of_fix = boost::lexical_cast<xf::PropertyInteger::Type> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-
-	if (!type_of_fix || (*type_of_fix != 2 && *type_of_fix != 3))
-		type_of_fix = 0;
-
-	// Skip PRNs of satellites used for the fix:
-	for (int i = 0; i < 12; ++i)
-		p = read_value (message_contents, p);
-
-	// PDOP - skip:
-	p = read_value (message_contents, p);
-
-	// HDOP - if available, use it:
-	Optional<double> hdop;
-	p = read_value (message_contents, p);
-	try {
-		hdop = boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-
-	// VDOP - Vertical Dilusion of Precision:
-	Optional<double> vdop;
-	p = read_value (message_contents, p);
-	try {
-		vdop = boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-
-	// Set properties:
-
-	if (type_of_fix)
-		_type_of_fix.write (type_of_fix);
-	else
-		_type_of_fix.set_nil();
-
-	_hdop.write (hdop);
-	if (hdop)
-		_lateral_accuracy.write (_receiver_accuracy * *hdop);
-	else
-		_lateral_accuracy.set_nil();
-
-	_vdop.write (vdop);
-	if (vdop)
-		_vertical_accuracy.write (_receiver_accuracy * *vdop);
-	else
-		_vertical_accuracy.set_nil();
-
-	return true;
-}
-
-
-bool
-GPS::process_gprmc (std::string message_contents)
-{
-	// Skip message name:
-	std::string::size_type p = read_value (message_contents, 0);
-
-	// UTC time:
-	p = read_value (message_contents, p);
-	std::string time_string = _value;
-
-	// Skip status (A or V):
-	p = read_value (message_contents, p);
-
-	// Skip lat/N-S/lon/E-W:
-	p = read_value (message_contents, p);
-	p = read_value (message_contents, p);
-	p = read_value (message_contents, p);
-	p = read_value (message_contents, p);
-
-	// Groundspeed:
-	Optional<Speed> groundspeed;
-	p = read_value (message_contents, p);
-	try {
-		groundspeed = 1_kt * boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-
-	// Track:
-	Optional<Angle> track;
-	p = read_value (message_contents, p);
-	try {
-		track = 1_deg * boost::lexical_cast<double> (_value);
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-
-	// Date:
-	p = read_value (message_contents, p);
-	std::string date_string = _value;
-
-	// Rest is magnetic variation - skip.
-
-	// Set properties:
-
-	_groundspeed.write (groundspeed);
-	_track.write (track);
-
-	// Synchronize system clock only if there's a fix:
-	int type_of_fix = *_type_of_fix;
-	if (type_of_fix == 2 || type_of_fix == 3)
-		synchronize_system_clock (date_string, time_string);
-
-	return true;
-}
-
-
-bool
-GPS::process_pmtk_ack (std::string message_contents)
-{
-	// Skip message name:
-	std::string::size_type p = read_value (message_contents, 0);
-
-	// PMTK command number:
-	p = read_value (message_contents, p);
-	std::string command = "PMTK" + _value;
-	std::string command_hint = describe_pmtk_command (command);
-	if (command_hint.empty())
-		command_hint = command;
-
-	// Result:
-	p = read_value (message_contents, p);
-	std::string result = _value;
-
-	if (result == "0")
-		log() << "Invalid command/packet: " << command_hint << std::endl;
-	else if (result == "1")
-		log() << "Unsupported command/packet: " << command_hint << std::endl;
-	else if (result == "2")
-		log() << "Valid command, but action failed: " << command_hint << std::endl;
-	else if (result == "3")
-		log() << "Command OK: " << command_hint << std::endl;
-
-	return true;
-}
-
-
-std::string::size_type
-GPS::read_value (std::string const& source, std::string::size_type start_pos)
-{
-	std::string::size_type comma = source.find (',', start_pos);
-	if (comma == std::string::npos)
-	{
-		_value.resize (source.size() - start_pos);
-		std::copy (source.begin() + start_pos, source.end(), _value.begin());
-		return std::string::npos;
-	}
-	else
-	{
-		_value.resize (comma - start_pos);
-		std::copy (source.begin() + start_pos, source.begin() + comma, _value.begin());
-		return comma + 1;
-	}
-}
-
-
-void
-GPS::synchronize_system_clock (std::string const& date_string, std::string const& time_string)
-{
-	// Xefis executable needs CAP_SYS_TIME capability, set with "setcap cap_sys_time+ep xefis".
-
-	if (time_string.size() < 6 || date_string.size() != 6)
-	{
-		log() << "Could not parse time value from GPS message" << std::endl;
-		return;
-	}
-
-	try {
-		int hh = boost::lexical_cast<int> (time_string.substr (0, 2));
-		int mm = boost::lexical_cast<int> (time_string.substr (2, 2));
-		int ss = boost::lexical_cast<int> (time_string.substr (4, 2));
-		double fraction = boost::lexical_cast<double> ("0" + time_string.substr (6));
-
-		int dd = boost::lexical_cast<int> (date_string.substr (0, 2));
-		int mo = boost::lexical_cast<int> (date_string.substr (2, 2));
-		int yy = boost::lexical_cast<int> (date_string.substr (4, 2));
-
-		struct tm timeinfo;
-		timeinfo.tm_sec = ss;
-		timeinfo.tm_min = mm;
-		timeinfo.tm_hour = hh;
-		timeinfo.tm_mday = dd;
-		timeinfo.tm_mon = mo - 1;
-		timeinfo.tm_year = 2000 + yy - 1900;
-		timeinfo.tm_wday = -1;
-		timeinfo.tm_yday = -1;
-		timeinfo.tm_isdst = -1;
-
-		time_t now = mktime (&timeinfo);
-		if (now >= 0)
-		{
-			_epoch_time.write (1_s * (1.0 * now + fraction));
-
-			if (_synchronize_system_clock)
-			{
-				::timeval tv = { now, 0 };
-				if (::settimeofday (&tv, nullptr) < 0)
-				{
-					log() << "Could not setup system time: settimeofday() failed with error '" << strerror (errno) << "'; "
-							 "ensure that Xefis executable has cap_sys_time capability set with 'setcap cap_sys_time+ep path-to-xefis-executable'" << std::endl;
-				}
-				else
-					log() << "System clock synchronization OK" << std::endl;
-
-				_synchronize_system_clock = false;
-			}
-		}
-		else
-		{
-			log() << "Could not convert time information from GPS to system time" << std::endl;
-			_epoch_time.set_nil();
-		}
-	}
-	catch (boost::bad_lexical_cast&)
-	{ }
-}
-
-
-std::string
-GPS::make_pmtk (std::string data)
-{
-	return "$" + data + "*" + make_checksum (data) + "\r\n";
-}
-
-
-std::string
-GPS::make_checksum (std::string data)
-{
-	uint8_t sum = 0;
-	for (std::string::iterator c = data.begin(); c != data.end(); ++c)
-		sum ^= *c;
-	return (boost::format ("%02X") % static_cast<int> (sum)).str();
 }
 
