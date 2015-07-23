@@ -46,9 +46,9 @@ Latency::log_latency()
 	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
 	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
 		% "event handling latency"
-		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).minimum().s()
-		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).average().s()
-		% (double)event_latency.select (xf::Accounting::Timespan::Last100Samples).maximum().s()
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).minimum().s())
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).average().s())
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).maximum().s())
 		<< std::endl;
 
 	// Get module stats, sort by average latency and log.
