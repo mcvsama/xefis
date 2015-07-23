@@ -45,12 +45,12 @@ class SlipSkid: public xf::Module
 
   private:
 	// Input:
-	xf::PropertyFloat		_y_acceleration;
-	xf::PropertyFloat		_z_acceleration;
+	xf::PropertyAcceleration	_y_acceleration;
+	xf::PropertyAcceleration	_z_acceleration;
 	// Output:
-	xf::PropertyFloat		_slip_skid;
+	xf::PropertyFloat			_slip_skid;
 	// Other:
-	xf::PropertyObserver	_slip_skid_computer;
+	xf::PropertyObserver		_slip_skid_computer;
 };
 
 #endif

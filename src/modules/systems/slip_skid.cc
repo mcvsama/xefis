@@ -57,7 +57,7 @@ SlipSkid::compute_slip_skid()
 	if (_y_acceleration.valid() && _z_acceleration.valid())
 	{
 		float const scale = 10.f;
-		_slip_skid.write (scale * std::atan2 (*_y_acceleration, -*_z_acceleration) / (2.f * M_PI));
+		_slip_skid.write (scale * std::atan2 (_y_acceleration->mps2(), -_z_acceleration->mps2()) / (2.f * M_PI));
 	}
 	else
 		_slip_skid.set_nil();
