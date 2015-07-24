@@ -318,10 +318,6 @@ template<class V, class T>
 		return b * a;
 	}
 
-} // namespace SI
-
-
-namespace std {
 
 template<class D, class = typename std::enable_if<std::is_base_of<SI::LinearValue<typename D::ValueType, D>, D>::value>::type>
 	inline D
@@ -330,7 +326,7 @@ template<class D, class = typename std::enable_if<std::is_base_of<SI::LinearValu
 		return D::from_internal (std::abs (a.internal()));
 	}
 
-} // namespace std
+} // namespace SI
 
 #endif
 

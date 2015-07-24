@@ -30,6 +30,9 @@
 namespace Xefis {
 namespace nmea {
 
+using std::to_string;
+
+
 static Mutex fix_quality_strings_entry_mutex;
 
 
@@ -42,7 +45,7 @@ mknum (uint8_t c10, uint8_t c01)
 
 
 BadDateTime::BadDateTime (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& time):
-	Exception ("invalid GPS date '" + std::to_string (date) + "' or time '" + std::to_string (time) + "'")
+	Exception ("invalid GPS date '" + to_string (date) + "' or time '" + to_string (time) + "'")
 { }
 
 
@@ -407,12 +410,7 @@ to_unix_time (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& time)
 		throw BadDateTime (date, time);
 }
 
-} // namespace nmea
-} // namespace Xefis
-
-namespace std {
-
-string
+std::string
 to_string (xf::nmea::GPSDate const& date)
 {
 	// Need static_casting due to boost::format bug (?) that prints out uint8_t as characters even
@@ -423,7 +421,7 @@ to_string (xf::nmea::GPSDate const& date)
 			% static_cast<int> (date.day)).str();
 }
 
-string
+std::string
 to_string (xf::nmea::GPSTimeOfDay const& time)
 {
 	// Need static_casting due to boost::format bug (?) that prints out uint8_t as characters even
@@ -435,5 +433,6 @@ to_string (xf::nmea::GPSTimeOfDay const& time)
 			% static_cast<int> (time.seconds_fraction)).str();
 }
 
-} // namespace std
+} // namespace nmea
+} // namespace Xefis
 

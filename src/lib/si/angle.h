@@ -222,6 +222,19 @@ Angle::floatize (std::string unit) const
 		throw UnsupportedUnit ("can't convert Angle to " + unit);
 }
 
+
+#define FORWARD_ANGLE_TO_STD_FUNCTION_1(function_name)		\
+	inline Angle::ValueType function_name (Angle const& a)	\
+	{														\
+		return std::function_name (a.rad());				\
+	}
+
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (sin)
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (cos)
+FORWARD_ANGLE_TO_STD_FUNCTION_1 (tan)
+
+#undef FORWARD_ANGLE_TO_STD_FUNCTION_1
+
 } // namespace SI
 
 
@@ -239,19 +252,6 @@ template<>
 template<>
 	class is_floating_point<SI::Angle>: public is_floating_point<SI::Angle::ValueType>
 	{ };
-
-
-#define FORWARD_ANGLE_TO_STD_FUNCTION_1(function_name)				\
-	inline SI::Angle::ValueType function_name (SI::Angle const& a)	\
-	{																\
-		return function_name (a.rad());								\
-	}
-
-FORWARD_ANGLE_TO_STD_FUNCTION_1 (sin)
-FORWARD_ANGLE_TO_STD_FUNCTION_1 (cos)
-FORWARD_ANGLE_TO_STD_FUNCTION_1 (tan)
-
-#undef FORWARD_ANGLE_TO_STD_FUNCTION_1
 
 } // namespace std
 

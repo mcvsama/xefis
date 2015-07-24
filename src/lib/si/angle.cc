@@ -75,9 +75,13 @@ Angle::to_longitude_dms() const
 Angle
 Angle::mean (Angle lhs, Angle rhs)
 {
-	ValueType x = 0.5 * std::cos (lhs) + std::cos (rhs);
-	ValueType y = 0.5 * std::sin (lhs) + std::sin (rhs);
-	return 1_rad * std::atan2 (y, x);
+	using std::sin;
+	using std::cos;
+	using std::atan2;
+
+	ValueType x = 0.5 * cos (lhs) + cos (rhs);
+	ValueType y = 0.5 * sin (lhs) + sin (rhs);
+	return 1_rad * atan2 (y, x);
 }
 
 } // namespace SI

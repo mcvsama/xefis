@@ -66,6 +66,8 @@ AltAcq::AltAcq (xf::ModuleManager* module_manager, QDomElement const& config):
 void
 AltAcq::data_updated()
 {
+	using std::abs;
+
 	_altitude_acquire_distance_computer.data_updated (update_time());
 
 	if (_altitude_acquire_flag.configured() && _altitude_amsl.valid() && _altitude_acquire_amsl.valid())
@@ -75,7 +77,7 @@ AltAcq::data_updated()
 			if (_altitude_acquire_amsl.fresh())
 				_altitude_acquire_amsl_timestamp = Time::now();
 
-			Length diff = std::abs (*_altitude_amsl - *_altitude_acquire_amsl);
+			Length diff = abs (*_altitude_amsl - *_altitude_acquire_amsl);
 			// Arm flag when difference beyond 'on-diff':
 			if (diff > _flag_diff_on)
 				_flag_armed = true;
@@ -99,6 +101,8 @@ AltAcq::data_updated()
 void
 AltAcq::compute_altitude_acquire_distance()
 {
+	using std::abs;
+
 	Time update_dt = _altitude_acquire_distance_computer.update_dt();
 
 	if (_altitude_acquire_amsl.valid() &&
@@ -109,7 +113,7 @@ AltAcq::compute_altitude_acquire_distance()
 		Length const alt_diff = *_altitude_acquire_amsl - *_altitude_amsl;
 		Length const distance = *_ground_speed * (alt_diff / *_vertical_speed);
 
-		if (!has_setting ("minimum-altitude-difference") || std::abs (alt_diff) >= _minimum_altitude_difference)
+		if (!has_setting ("minimum-altitude-difference") || abs (alt_diff) >= _minimum_altitude_difference)
 			_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.m(), update_dt));
 		else
 			_altitude_acquire_distance.set_nil();

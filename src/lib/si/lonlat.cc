@@ -29,19 +29,23 @@ namespace SI {
 LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
+	using std::sin;
+	using std::cos;
+	using std::atan2;
+
 	// Convert to radians:
 	Angle const& rot_lat = rotation.lat();
 	Angle const& rot_lon = rotation.lon();
 	// Get cartesian from polar coords:
-	double const x = -std::cos (lat()) * std::cos (lon());
-	double const y = +std::cos (lat()) * std::sin (lon());
-	double const z = +std::sin (lat());
+	double const x = -cos (lat()) * cos (lon());
+	double const y = +cos (lat()) * sin (lon());
+	double const z = +sin (lat());
 	// Lat rotation:
-	double const sin_y = std::sin (-rot_lat);
-	double const cos_y = std::cos (-rot_lat);
+	double const sin_y = sin (-rot_lat);
+	double const cos_y = cos (-rot_lat);
 	// Lng rotation:
-	double const sin_z = std::sin (rot_lon);
-	double const cos_z = std::cos (rot_lon);
+	double const sin_z = sin (rot_lon);
+	double const cos_z = cos (rot_lon);
 
 	QTransform rz = {
 		+cos_z, -sin_z, 0.f,
@@ -61,9 +65,9 @@ LonLat::rotate (LonLat const& rotation)
 	double const nz = x * r.m31() + y * r.m32() + z * r.m33();
 
 	// Back to LonLat:
-	double mag = std::sqrt (nx * nx + ny * ny);
-	_lat = 1_rad * std::atan2 (nz, mag);
-	_lon = 1_rad * std::atan2 (ny, nx);
+	double mag = sqrt (nx * nx + ny * ny);
+	_lat = 1_rad * atan2 (nz, mag);
+	_lon = 1_rad * atan2 (ny, nx);
 
 	return *this;
 }
@@ -79,9 +83,12 @@ LonLat::rotated (LonLat const& rotation) const
 QPointF
 LonLat::project_flat() const
 {
+	using std::tan;
+	using std::cos;
+
 	return {
-		+std::tan (lon()) / (1.f + std::tan (lon()) * std::tan (0.5f * lon())) * std::cos (lat()),
-		-std::tan (lat()) / (1.f + std::tan (lat()) * std::tan (0.5f * lat())),
+		+tan (lon()) / (1.f + tan (lon()) * tan (0.5f * lon())) * cos (lat()),
+		-tan (lat()) / (1.f + tan (lat()) * tan (0.5f * lat())),
 	};
 }
 
@@ -89,42 +96,53 @@ LonLat::project_flat() const
 LonLat::ValueType::ValueType
 LonLat::haversine (LonLat const& other) const
 {
+	using std::sin;
+	using std::cos;
+	using std::atan2;
+	using std::sqrt;
+
 	LonLat const& a = *this;
 	LonLat const& b = other;
 
 	Angle dlat = b.lat() - a.lat();
 	Angle dlon = b.lon() - a.lon();
 
-	ValueType::ValueType latsin = std::sin (dlat / 2.0);
-	ValueType::ValueType lonsin = std::sin (dlon / 2.0);
+	ValueType::ValueType latsin = sin (dlat / 2.0);
+	ValueType::ValueType lonsin = sin (dlon / 2.0);
 
 	ValueType::ValueType z = latsin * latsin
 						 + lonsin * lonsin
-						 * std::cos (a.lat())
-						 * std::cos (b.lat());
+						 * cos (a.lat())
+						 * cos (b.lat());
 
-	return 2.0 * std::atan2 (std::sqrt (z), std::sqrt (1.0 - z));
+	return 2.0 * atan2 (sqrt (z), sqrt (1.0 - z));
 }
 
 
 Angle
 LonLat::initial_bearing (LonLat const& other) const
 {
+	using std::sin;
+	using std::cos;
+	using std::atan2;
+
 	Angle dlon = other.lon() - this->lon();
 	Angle lat1 = this->lat();
 	Angle lat2 = other.lat();
 
-	double y = std::sin (dlon) * std::cos (lat2);
-	double x = std::cos (lat1) * std::sin (lat2)
-			 - std::sin (lat1) * std::cos (lat2) * std::cos (dlon);
+	double y = sin (dlon) * cos (lat2);
+	double x = cos (lat1) * sin (lat2)
+			 - sin (lat1) * cos (lat2) * cos (dlon);
 
-	return 1_rad * std::atan2 (y, x);
+	return 1_rad * atan2 (y, x);
 }
 
 
 Angle
 LonLat::great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b)
 {
+	using std::arg;
+
 	LonLat z1 (a.lon() - common.lon(), a.lat() - common.lat());
 	LonLat zero (0_deg, 0_deg);
 	LonLat z2 (b.lon() - common.lon(), b.lat() - common.lat());
@@ -132,7 +150,7 @@ LonLat::great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b
 	std::complex<ValueType::ValueType> x1 (z1.lon().deg(), z1.lat().deg());
 	std::complex<ValueType::ValueType> x2 (z2.lon().deg(), z2.lat().deg());
 
-	return 1_deg * Xefis::floored_mod<double> ((1_rad * (std::arg (x1) - std::arg (x2))).deg(), 360.0);
+	return 1_deg * Xefis::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).deg(), 360.0);
 }
 
 } // namespace SI

@@ -71,6 +71,8 @@ VOR::data_updated()
 void
 VOR::compute()
 {
+	using std::abs;
+
 	Time dt = _vor_computer.update_dt();
 
 	if (_input_magnetic_declination.valid() &&
@@ -87,7 +89,7 @@ VOR::compute()
 
 		Angle current_radial = normalize (station_position.initial_bearing (aircraft_position));
 		Angle deviation = xf::floored_mod (input_radial - current_radial, -180_deg, +180_deg);
-		if (std::abs (deviation) > 90_deg)
+		if (abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
 
 		if (_output_radial_magnetic.configured())
@@ -96,7 +98,7 @@ VOR::compute()
 			_output_reciprocal_magnetic = normalize (current_radial + 180_deg - declination);
 		if (_output_initial_bearing_magnetic.configured())
 			_output_initial_bearing_magnetic = normalize (aircraft_position.initial_bearing (station_position) - declination);
-		_output_to_flag = std::abs (denormalize (current_radial - input_radial)) > 90_deg;
+		_output_to_flag = abs (denormalize (current_radial - input_radial)) > 90_deg;
 		_output_deviation = 1_deg * _deviation_smoother.process (deviation.deg(), dt);
 		_output_distance = station_position.haversine_earth (aircraft_position);
 	}

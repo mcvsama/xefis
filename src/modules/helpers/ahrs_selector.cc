@@ -138,6 +138,7 @@ template<class PropertyType>
 inline bool
 AHRSSelector::compute_disagree_flag (xf::PropertyAngle const& first, xf::PropertyAngle const& second, Angle threshold)
 {
-	return !first.valid() || !second.valid() || std::abs (*first - *second) > threshold;
+	using std::abs;
+	return !first.valid() || !second.valid() || abs (*first - *second) > threshold;
 }
 

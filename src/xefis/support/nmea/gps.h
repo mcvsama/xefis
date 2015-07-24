@@ -276,18 +276,14 @@ stringify (GPSFixQuality);
 extern Time
 to_unix_time (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
-} // namespace nmea
-} // namespace Xefis
-
-namespace std {
-
-extern string
+extern std::string
 to_string (xf::nmea::GPSDate const& date);
 
-extern string
+extern std::string
 to_string (xf::nmea::GPSTimeOfDay const& time);
 
-} // namespace std
+} // namespace nmea
+} // namespace Xefis
 
 #endif
 

@@ -586,7 +586,8 @@ template<class T>
 	inline std::string
 	PropertyValueNode<T>::stringify() const
 	{
-		return std::to_string (_value);
+		using std::to_string;
+		return to_string (_value);
 	}
 
 

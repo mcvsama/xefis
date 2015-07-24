@@ -817,6 +817,8 @@ AFCS::update_mcp()
 void
 AFCS::update_efis()
 {
+	using std::abs;
+
 	switch (_thrust_mode)
 	{
 		case ThrustMode::None:
@@ -841,7 +843,7 @@ AFCS::update_efis()
 				case SpeedControl::KIAS:
 					if (_measured_ias.valid())
 					{
-						if (std::abs (*_measured_ias - _mcp_ias) < _acq_delta_ias)
+						if (abs (*_measured_ias - _mcp_ias) < _acq_delta_ias)
 							_fma_speed_hint = "MCP SPD";
 						else
 							_fma_speed_hint = "SPD";
@@ -851,7 +853,7 @@ AFCS::update_efis()
 				case SpeedControl::Mach:
 					if (_measured_mach.valid())
 					{
-						if (std::abs (*_measured_mach - _mcp_mach) < _acq_delta_mach)
+						if (abs (*_measured_mach - _mcp_mach) < _acq_delta_mach)
 							_fma_speed_hint = "MCP SPD";
 						else
 							_fma_speed_hint = "SPD";
@@ -879,7 +881,7 @@ AFCS::update_efis()
 				case LateralControl::Heading:
 					if (_measured_heading_magnetic.valid())
 					{
-						if (std::abs (*_measured_heading_magnetic - _mcp_heading) < _acq_delta_heading)
+						if (abs (*_measured_heading_magnetic - _mcp_heading) < _acq_delta_heading)
 							_fma_roll_hint = "HDG";
 						else
 							_fma_roll_hint = "HDG SEL";
@@ -889,7 +891,7 @@ AFCS::update_efis()
 				case LateralControl::Track:
 					if (_measured_track_magnetic.valid())
 					{
-						if (std::abs (*_measured_track_magnetic - _mcp_track) < _acq_delta_heading)
+						if (abs (*_measured_track_magnetic - _mcp_track) < _acq_delta_heading)
 							_fma_roll_hint = "TRK";
 						else
 							_fma_roll_hint = "TRK SEL";
@@ -959,7 +961,7 @@ AFCS::update_efis()
 		case PitchMode::MCP_ALT:
 			if (_measured_altitude_amsl.valid())
 			{
-				if (std::abs (*_measured_altitude_amsl - *_cmd_altitude) <= _acq_delta_altitude)
+				if (abs (*_measured_altitude_amsl - *_cmd_altitude) <= _acq_delta_altitude)
 					_fma_pitch_hint = "ALT";
 				else
 				{

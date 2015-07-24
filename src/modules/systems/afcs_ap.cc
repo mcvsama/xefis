@@ -114,6 +114,8 @@ AFCS_AP::rescue()
 void
 AFCS_AP::compute_ap()
 {
+	using std::cos;
+
 	Time update_dt = _ap_computer.update_dt();
 
 	double computed_elevator = 0.0;
@@ -136,7 +138,7 @@ AFCS_AP::compute_ap()
 		_ailerons_pid.set_target (_input_roll.read (0_deg) / 180_deg);
 		_ailerons_pid.process (*_measured_roll / 180_deg, update_dt);
 
-		computed_elevator = -std::cos (*_measured_roll) * _elevator_pid.output();
+		computed_elevator = -cos (*_measured_roll) * _elevator_pid.output();
 		computed_elevator = _elevator_smoother.process (computed_elevator, update_dt);
 
 		computed_ailerons = _ailerons_pid.output();

@@ -656,6 +656,8 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (xf::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 {
+	using std::abs;
+
 	QPen est_pen = QPen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::RoundCap);
 
 	painter.setTransform (_aircraft_center_transform);
@@ -701,7 +703,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 			float px = to_px (ground_speed * step);
 
 			// If the turn is too tight, stop drawing trend vectors:
-			if (std::abs (total_angle) >= 180_deg)
+			if (abs (total_angle) >= 180_deg)
 			{
 				polygon.clear();
 				break;
@@ -1026,6 +1028,8 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_course (xf::Painter& painter)
 {
+	using std::abs;
+
 	if (!_params.heading_visible || !_params.course_setting_magnetic || !_params.course_visible)
 		return;
 
@@ -1111,7 +1115,7 @@ HSIWidget::PaintWorkUnit::paint_course (xf::Painter& painter)
 	{
 		bool filled = false;
 		Angle deviation = xf::limit (*_params.course_deviation, -2.5_deg, +2.5_deg);
-		if (std::abs (_params.course_deviation->deg()) <= std::abs (deviation.deg()))
+		if (abs (*_params.course_deviation) <= abs (deviation))
 			filled = true;
 
 		double pw = pen_width (1.75f);

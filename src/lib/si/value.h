@@ -228,10 +228,6 @@ template<class V>
 		return { result, unit };
 	}
 
-} // namespace SI
-
-
-namespace std {
 
 template<class V>
 	std::string
@@ -240,7 +236,7 @@ template<class V>
 		return value.stringify();
 	}
 
-} // namespace std
+} // namespace SI
 
 #endif
 
