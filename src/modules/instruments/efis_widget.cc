@@ -1924,15 +1924,17 @@ void
 EFISWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 {
 	using xf::sgn;
+	using std::cos;
+	using std::abs;
 
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _params.fov / 4.f;
 
-	Angle pitch = std::cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
+	Angle pitch = cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
 	pitch = xf::limit (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.orientation_roll;
-	if (std::abs (roll) > 180_deg)
+	if (abs (roll) > 180_deg)
 		roll = roll - sgn (roll.deg()) * 360_deg;
 	roll = xf::limit (roll, -range, +range);
 
@@ -2092,6 +2094,8 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (xf::Painter& painter)
 void
 EFISWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 {
+	using std::abs;
+
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
 
@@ -2167,7 +2171,7 @@ EFISWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 					<< QPointF (0.f, -w);
 				pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_approach_deviation;
-				pink_filled = original_approach_deviation && std::abs (*original_approach_deviation) <= std::abs (approach_deviation);
+				pink_filled = original_approach_deviation && abs (*original_approach_deviation) <= abs (approach_deviation);
 				white_visible = false;
 			}
 			else
@@ -2180,7 +2184,7 @@ EFISWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 					<< QPointF (-1.0f * w, 2.0f * w);
 				pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_path_deviation;
-				pink_filled = original_path_deviation && std::abs (*original_path_deviation) <= std::abs (path_deviation);
+				pink_filled = original_path_deviation && abs (*original_path_deviation) <= abs (path_deviation);
 				white_pointer = QPolygonF()
 					<< QPointF (0.f, -0.8f * w)
 					<< QPointF (+1.6f * w, 0.f)

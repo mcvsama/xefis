@@ -103,14 +103,16 @@ FlapsControl::data_updated()
 void
 FlapsControl::update_flap_position()
 {
+	using std::abs;
+
 	double sgn = xf::sgn ((_setting - _current).deg());
 	Angle difference = _setting - _current;
 	Angle delta = 1_deg * (kUpdateInterval.s() * _degrees_per_second);
 
-	if (std::abs (difference) > delta)
+	if (abs (difference) > delta)
 	{
 		Angle diff_to_add = sgn * delta;
-		if (std::abs (diff_to_add) > std::abs (difference))
+		if (abs (diff_to_add) > abs (difference))
 			diff_to_add = difference;
 		_current += sgn * delta;
 	}

@@ -349,6 +349,8 @@ PerformanceComputer::compute_speeds()
 Optional<Speed>
 PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 {
+	using std::cos;
+
 	// Formula:
 	//   V_s = sqrt((load_factor * weight) / (0.5 * air_density * wings_area * C_L_max)).
 
@@ -364,7 +366,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 			xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
 			xf::LiftCoefficient cl = airframe->get_cl (max_safe_aoa, flaps_angle, spoilers_angle);
 
-			Acceleration load = 1.0_g / std::cos (max_bank_angle);
+			Acceleration load = 1.0_g / cos (max_bank_angle);
 			// Note: stick to SI units:
 			Speed tas = Speed::from_si_units (std::sqrt (load.si_units() * _input_aircraft_weight->si_units()
 														 / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl.value())));

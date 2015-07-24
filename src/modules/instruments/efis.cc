@@ -401,8 +401,11 @@ EFIS::compute_fpv()
 		Angle hdiff = xf::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
 		Angle roll = *_orientation_roll;
 
-		_computed_fpv_alpha = vdiff * std::cos (roll) + hdiff * std::sin (roll);
-		_computed_fpv_beta = -vdiff * std::sin (roll) + hdiff * std::cos (roll);
+		using std::sin;
+		using std::cos;
+
+		_computed_fpv_alpha = vdiff * cos (roll) + hdiff * sin (roll);
+		_computed_fpv_beta = -vdiff * sin (roll) + hdiff * cos (roll);
 		_computed_fpv_failure = false;
 		_computed_fpv_visible = _fpv_visible.read (false);
 	}

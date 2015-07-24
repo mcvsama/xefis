@@ -146,9 +146,11 @@ LiftMod::get_speed_range (Angle const& surface_angle) const
 LiftMod::Settings::const_iterator
 LiftMod::find_setting_iterator (Angle const& surface_angle) const
 {
+	using std::abs;
+
 	auto range = extended_adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
-	if (std::abs (surface_angle - range.first->first) < std::abs (surface_angle - range.second->first))
+	if (abs (surface_angle - range.first->first) < abs (surface_angle - range.second->first))
 		return range.first;
 	else
 		return range.second;

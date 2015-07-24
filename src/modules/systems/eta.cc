@@ -61,6 +61,8 @@ ETA::data_updated()
 void
 ETA::compute()
 {
+	using std::abs;
+
 	struct SetNil
 	{
 		SetNil (bool reset_prev_distance):
@@ -89,7 +91,7 @@ ETA::compute()
 		Angle angle_diff = station_bearing - *_input_track_lateral_true;
 		angle_diff = xf::floored_mod (angle_diff, -180_deg, +180_deg);
 
-		if (std::abs (angle_diff) > 30_deg)
+		if (abs (angle_diff) > 30_deg)
 			throw SetNil (true);
 
 		if (_prev_distance)
