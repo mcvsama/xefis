@@ -26,13 +26,13 @@
 #include <xefis/utility/qdom.h>
 
 // Local:
-#include "efis.h"
+#include "adi.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/efis", EFIS);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/adi", ADI);
 
 
-EFIS::EFIS (xf::ModuleManager* module_manager, QDomElement const& config):
+ADI::ADI (xf::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
 	parse_settings (config, {
@@ -154,14 +154,14 @@ EFIS::EFIS (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "style.show-metric", _style_show_metric, false },
 	});
 
-	_efis_widget = new EFISWidget (this, work_performer());
+	_adi_widget = new ADIWidget (this, work_performer());
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_efis_widget);
+	layout->addWidget (_adi_widget);
 
-	_fpv_computer.set_callback (std::bind (&EFIS::compute_fpv, this));
+	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));
 	_fpv_computer.observe ({
 		&_orientation_heading_magnetic,
 		&_orientation_heading_true,
@@ -177,11 +177,11 @@ EFIS::EFIS (xf::ModuleManager* module_manager, QDomElement const& config):
 
 
 void
-EFIS::read()
+ADI::read()
 {
 	_fpv_computer.data_updated (update_time());
 
-	EFISWidget::Parameters params;
+	ADIWidget::Parameters params;
 
 	params.old_style = _style_old.read (false);
 	params.show_metric = _style_show_metric.read (false);
@@ -375,12 +375,12 @@ EFIS::read()
 	params.al_line_every = _altitude_ladder_line_every;
 	params.al_number_every = _altitude_ladder_number_every;
 
-	_efis_widget->set_params (params);
+	_adi_widget->set_params (params);
 }
 
 
 void
-EFIS::compute_fpv()
+ADI::compute_fpv()
 {
 	xf::PropertyAngle* heading = nullptr;
 	xf::PropertyAngle* track_lateral = nullptr;

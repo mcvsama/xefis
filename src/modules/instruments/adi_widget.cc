@@ -31,11 +31,11 @@
 #include <xefis/utility/text_layout.h>
 
 // Local:
-#include "efis_widget.h"
+#include "adi_widget.h"
 
 
 void
-EFISWidget::Parameters::sanitize()
+ADIWidget::Parameters::sanitize()
 {
 	sl_line_every = std::max (sl_line_every, 1);
 	sl_number_every = std::max (sl_number_every, 1);
@@ -50,8 +50,8 @@ EFISWidget::Parameters::sanitize()
 }
 
 
-EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
-	InstrumentWidget::PaintWorkUnit (efis_widget),
+ADIWidget::PaintWorkUnit::PaintWorkUnit (ADIWidget* adi_widget):
+	InstrumentWidget::PaintWorkUnit (adi_widget),
 	InstrumentAids (0.8f)
 {
 	_sky_color.setHsv (213, 230, 255);
@@ -66,7 +66,7 @@ EFISWidget::PaintWorkUnit::PaintWorkUnit (EFISWidget* efis_widget):
 
 
 void
-EFISWidget::PaintWorkUnit::pop_params()
+ADIWidget::PaintWorkUnit::pop_params()
 {
 	_params = _params_next;
 	_locals = _locals_next;
@@ -74,7 +74,7 @@ EFISWidget::PaintWorkUnit::pop_params()
 
 
 void
-EFISWidget::PaintWorkUnit::resized()
+ADIWidget::PaintWorkUnit::resized()
 {
 	InstrumentAids::update_sizes (size(), window_size());
 
@@ -93,7 +93,7 @@ EFISWidget::PaintWorkUnit::resized()
 
 
 void
-EFISWidget::PaintWorkUnit::paint (QImage& image)
+ADIWidget::PaintWorkUnit::paint (QImage& image)
 {
 	auto paint_token = get_token (&image);
 
@@ -127,7 +127,7 @@ EFISWidget::PaintWorkUnit::paint (QImage& image)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_post_resize()
+ADIWidget::PaintWorkUnit::adi_post_resize()
 {
 	float const w_max = 2.f * _max_w_h;
 	float const h_max = 10.f * _max_w_h;
@@ -174,7 +174,7 @@ EFISWidget::PaintWorkUnit::adi_post_resize()
 
 
 void
-EFISWidget::PaintWorkUnit::adi_pre_paint()
+ADIWidget::PaintWorkUnit::adi_pre_paint()
 {
 	Angle p = xf::floored_mod (_params.orientation_pitch + 180_deg, 360_deg) - 180_deg;
 	Angle r = xf::floored_mod (_params.orientation_roll + 180_deg, 360_deg) - 180_deg;
@@ -219,7 +219,7 @@ EFISWidget::PaintWorkUnit::adi_pre_paint()
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint (xf::Painter& painter)
 {
 	adi_pre_paint();
 
@@ -250,7 +250,7 @@ EFISWidget::PaintWorkUnit::adi_paint (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_clear (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_clear (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.resetTransform();
@@ -261,7 +261,7 @@ EFISWidget::PaintWorkUnit::adi_clear (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_horizon (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_horizon (xf::Painter& painter)
 {
 	if (_params.orientation_pitch_visible && _params.orientation_roll_visible)
 	{
@@ -282,7 +282,7 @@ EFISWidget::PaintWorkUnit::adi_paint_horizon (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_pitch_scale (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_pitch_scale (xf::Painter& painter)
 {
 	if (!_params.orientation_pitch_visible)
 		return;
@@ -381,7 +381,7 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch_scale (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -501,7 +501,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_heading (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_heading (xf::Painter& painter)
 {
 	float const w = wh() * 2.25f / 9.f;
 	float const fpxs = _font_10.pixelSize();
@@ -564,7 +564,7 @@ EFISWidget::PaintWorkUnit::adi_paint_heading (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_tcas_ra (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_tcas_ra (xf::Painter& painter)
 {
 	if (_params.tcas_ra_pitch_minimum || _params.tcas_ra_pitch_maximum)
 	{
@@ -602,7 +602,7 @@ EFISWidget::PaintWorkUnit::adi_paint_tcas_ra (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_pitch_disagree (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_pitch_disagree (xf::Painter& painter)
 {
 	if (!_params.pitch_disagree)
 		return;
@@ -618,7 +618,7 @@ EFISWidget::PaintWorkUnit::adi_paint_pitch_disagree (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_roll_disagree (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_roll_disagree (xf::Painter& painter)
 {
 	if (!_params.roll_disagree)
 		return;
@@ -634,7 +634,7 @@ EFISWidget::PaintWorkUnit::adi_paint_roll_disagree (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_flight_path_marker (xf::Painter& painter)
 {
 	if (!_params.flight_path_visible)
 		return;
@@ -651,7 +651,7 @@ EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_post_resize()
+ADIWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
@@ -698,7 +698,7 @@ EFISWidget::PaintWorkUnit::sl_post_resize()
 
 
 void
-EFISWidget::PaintWorkUnit::sl_pre_paint()
+ADIWidget::PaintWorkUnit::sl_pre_paint()
 {
 	_params.speed = xf::limit (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
 	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
@@ -712,7 +712,7 @@ EFISWidget::PaintWorkUnit::sl_pre_paint()
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::sl_paint (xf::Painter& painter)
 {
 	sl_pre_paint();
 
@@ -744,7 +744,7 @@ EFISWidget::PaintWorkUnit::sl_paint (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_black_box (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_black_box (xf::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -811,7 +811,7 @@ EFISWidget::PaintWorkUnit::sl_paint_black_box (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_ias_disagree (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_ias_disagree (xf::Painter& painter, float x)
 {
 	if (!_params.ias_disagree)
 		return;
@@ -829,7 +829,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ias_disagree (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_ladder_scale (xf::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -871,7 +871,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ladder_scale (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -939,7 +939,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x)
 {
 	if (!_params.speed_lookahead_visible || !_params.speed_visible)
 		return;
@@ -973,7 +973,7 @@ EFISWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float 
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 {
 	if (!_params.speed_visible)
 		return;
@@ -1019,7 +1019,7 @@ EFISWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_mach_or_gs (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::sl_paint_mach_or_gs (xf::Painter& painter, float x)
 {
 	if (!_params.speed_mach_visible && !_params.speed_ground)
 		return;
@@ -1054,7 +1054,7 @@ EFISWidget::PaintWorkUnit::sl_paint_mach_or_gs (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_ap_setting (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::sl_paint_ap_setting (xf::Painter& painter)
 {
 	if (!_params.cmd_speed && !_params.cmd_mach)
 		return;
@@ -1099,7 +1099,7 @@ EFISWidget::PaintWorkUnit::sl_paint_ap_setting (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_novspd_flag (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::sl_paint_novspd_flag (xf::Painter& painter)
 {
 	if (_params.novspd_flag)
 	{
@@ -1134,7 +1134,7 @@ EFISWidget::PaintWorkUnit::sl_paint_novspd_flag (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_post_resize()
+ADIWidget::PaintWorkUnit::al_post_resize()
 {
 	float const wh = this->wh();
 
@@ -1166,7 +1166,7 @@ EFISWidget::PaintWorkUnit::al_post_resize()
 
 
 void
-EFISWidget::PaintWorkUnit::al_pre_paint()
+ADIWidget::PaintWorkUnit::al_pre_paint()
 {
 	_params.altitude = xf::limit (_params.altitude, -99999_ft, +99999_ft);
 	_params.vertical_speed = xf::limit (_params.vertical_speed, -9999_fpm, +9999_fpm);
@@ -1182,7 +1182,7 @@ EFISWidget::PaintWorkUnit::al_pre_paint()
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::al_paint (xf::Painter& painter)
 {
 	al_pre_paint();
 
@@ -1226,7 +1226,7 @@ EFISWidget::PaintWorkUnit::al_paint (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 {
 	QFont b_font = _font_20;
 	float const b_digit_width = _font_20_digit_width;
@@ -1315,7 +1315,7 @@ EFISWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_altitude_disagree (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_altitude_disagree (xf::Painter& painter, float x)
 {
 	if (!_params.altitude_disagree)
 		return;
@@ -1333,7 +1333,7 @@ EFISWidget::PaintWorkUnit::al_paint_altitude_disagree (xf::Painter& painter, flo
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_ladder_scale (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_ladder_scale (xf::Painter& painter, float x)
 {
 	if (!_params.altitude_visible)
 		return;
@@ -1415,7 +1415,7 @@ EFISWidget::PaintWorkUnit::al_paint_ladder_scale (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_altitude_tendency (xf::Painter& painter, float x)
 {
 	if (!_params.altitude_lookahead_visible || !_params.altitude_visible)
 		return;
@@ -1448,7 +1448,7 @@ EFISWidget::PaintWorkUnit::al_paint_altitude_tendency (xf::Painter& painter, flo
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 {
 	if (_params.altitude_visible)
 	{
@@ -1583,7 +1583,7 @@ EFISWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x)
 {
 	QPen bold_white_pen = get_pen (Qt::white, 1.25f);
 	QPen thin_white_pen = get_pen (Qt::white, 0.50f);
@@ -1708,7 +1708,7 @@ EFISWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float 
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_pressure (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_pressure (xf::Painter& painter, float x)
 {
 	if (!_params.pressure_visible)
 		return;
@@ -1749,7 +1749,7 @@ EFISWidget::PaintWorkUnit::al_paint_pressure (xf::Painter& painter, float x)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 {
 	if (!_params.cmd_altitude)
 		return;
@@ -1838,7 +1838,7 @@ EFISWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_ldgalt_flag (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_ldgalt_flag (xf::Painter& painter, float x)
 {
 	if (_params.ldgalt_flag)
 	{
@@ -1853,7 +1853,7 @@ EFISWidget::PaintWorkUnit::al_paint_ldgalt_flag (xf::Painter& painter, float x)
 
 
 float
-EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_value) const
+ADIWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_value) const
 {
 	float vspd = std::abs (vertical_speed.fpm());
 
@@ -1874,7 +1874,7 @@ EFISWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max
 
 
 void
-EFISWidget::PaintWorkUnit::paint_center_cross (xf::Painter& painter, bool center_box, bool rest)
+ADIWidget::PaintWorkUnit::paint_center_cross (xf::Painter& painter, bool center_box, bool rest)
 {
 	float const w = wh() * 3.f / 9.f;
 
@@ -1921,7 +1921,7 @@ EFISWidget::PaintWorkUnit::paint_center_cross (xf::Painter& painter, bool center
 
 
 void
-EFISWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 {
 	using xf::sgn;
 	using std::cos;
@@ -1957,7 +1957,7 @@ EFISWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_control_stick (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_control_stick (xf::Painter& painter)
 {
 	if (!_params.control_stick_visible)
 		return;
@@ -2006,7 +2006,7 @@ EFISWidget::PaintWorkUnit::paint_control_stick (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
 {
 	if (!_params.altitude_agl_visible)
 		return;
@@ -2044,7 +2044,7 @@ EFISWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_minimums_setting (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_minimums_setting (xf::Painter& painter)
 {
 	if (!_params.minimums_altitude_visible)
 		return;
@@ -2092,7 +2092,7 @@ EFISWidget::PaintWorkUnit::paint_minimums_setting (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 {
 	using std::abs;
 
@@ -2296,7 +2296,7 @@ EFISWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 {
 	float const q = 0.1f * wh();
 
@@ -2408,7 +2408,7 @@ EFISWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_critical_aoa (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_critical_aoa (xf::Painter& painter)
 {
 	if (!_params.critical_aoa_visible || !_params.orientation_pitch_visible)
 		return;
@@ -2447,7 +2447,7 @@ EFISWidget::PaintWorkUnit::paint_critical_aoa (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_input_alert (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_input_alert (xf::Painter& painter)
 {
 	QFont font = _font;
 	font.setPixelSize (font_size (30.f));
@@ -2479,7 +2479,7 @@ EFISWidget::PaintWorkUnit::paint_input_alert (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_dashed_zone (xf::Painter& painter, QColor const& color, QRectF const& target)
+ADIWidget::PaintWorkUnit::paint_dashed_zone (xf::Painter& painter, QColor const& color, QRectF const& target)
 {
 	QFontMetricsF metrics (painter.font());
 	float w = 0.7f * metrics.width ("0");
@@ -2502,7 +2502,7 @@ EFISWidget::PaintWorkUnit::paint_dashed_zone (xf::Painter& painter, QColor const
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_attitude_failure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_attitude_failure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
@@ -2511,7 +2511,7 @@ EFISWidget::PaintWorkUnit::adi_paint_attitude_failure (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker_failure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_flight_path_marker_failure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
@@ -2521,7 +2521,7 @@ EFISWidget::PaintWorkUnit::adi_paint_flight_path_marker_failure (xf::Painter& pa
 
 
 void
-EFISWidget::PaintWorkUnit::adi_paint_flight_director_falure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::adi_paint_flight_director_falure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
@@ -2530,7 +2530,7 @@ EFISWidget::PaintWorkUnit::adi_paint_flight_director_falure (xf::Painter& painte
 
 
 void
-EFISWidget::PaintWorkUnit::sl_paint_failure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::sl_paint_failure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_sl_transform);
@@ -2539,7 +2539,7 @@ EFISWidget::PaintWorkUnit::sl_paint_failure (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_vertical_speed_failure (xf::Painter& painter, float x)
+ADIWidget::PaintWorkUnit::al_paint_vertical_speed_failure (xf::Painter& painter, float x)
 {
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
@@ -2549,7 +2549,7 @@ EFISWidget::PaintWorkUnit::al_paint_vertical_speed_failure (xf::Painter& painter
 
 
 void
-EFISWidget::PaintWorkUnit::al_paint_failure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::al_paint_failure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_al_transform);
@@ -2558,7 +2558,7 @@ EFISWidget::PaintWorkUnit::al_paint_failure (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_radar_altimeter_failure (xf::Painter& painter)
+ADIWidget::PaintWorkUnit::paint_radar_altimeter_failure (xf::Painter& painter)
 {
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
@@ -2567,7 +2567,7 @@ EFISWidget::PaintWorkUnit::paint_radar_altimeter_failure (xf::Painter& painter)
 
 
 void
-EFISWidget::PaintWorkUnit::paint_rotating_value (xf::Painter& painter,
+ADIWidget::PaintWorkUnit::paint_rotating_value (xf::Painter& painter,
 								  QRectF const& rect, float position, float height_scale,
 								  QString const& next, QString const& curr, QString const& prev)
 {
@@ -2602,7 +2602,7 @@ EFISWidget::PaintWorkUnit::paint_rotating_value (xf::Painter& painter,
 
 
 void
-EFISWidget::PaintWorkUnit::paint_rotating_digit (xf::Painter& painter,
+ADIWidget::PaintWorkUnit::paint_rotating_digit (xf::Painter& painter,
 								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 								  bool two_zeros, bool zero_mark, bool black_zero)
 {
@@ -2636,7 +2636,7 @@ EFISWidget::PaintWorkUnit::paint_rotating_digit (xf::Painter& painter,
 
 
 void
-EFISWidget::PaintWorkUnit::paint_horizontal_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
+ADIWidget::PaintWorkUnit::paint_horizontal_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
 {
 	QFont font = _font_10;
 	font.setPixelSize (pixel_font_size);
@@ -2658,7 +2658,7 @@ EFISWidget::PaintWorkUnit::paint_horizontal_failure_flag (xf::Painter& painter, 
 
 
 void
-EFISWidget::PaintWorkUnit::paint_vertical_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
+ADIWidget::PaintWorkUnit::paint_vertical_failure_flag (xf::Painter& painter, QPointF const& center, float pixel_font_size, QString const& message)
 {
 	QFont font = _font_10;
 	font.setPixelSize (pixel_font_size);
@@ -2683,7 +2683,7 @@ EFISWidget::PaintWorkUnit::paint_vertical_failure_flag (xf::Painter& painter, QP
 }
 
 
-EFISWidget::EFISWidget (QWidget* parent, xf::WorkPerformer* work_performer):
+ADIWidget::ADIWidget (QWidget* parent, xf::WorkPerformer* work_performer):
 	InstrumentWidget (parent, work_performer),
 	_local_paint_work_unit (this)
 {
@@ -2703,14 +2703,14 @@ EFISWidget::EFISWidget (QWidget* parent, xf::WorkPerformer* work_performer):
 }
 
 
-EFISWidget::~EFISWidget()
+ADIWidget::~ADIWidget()
 {
 	wait_for_painter();
 }
 
 
 void
-EFISWidget::set_params (Parameters const& new_params)
+ADIWidget::set_params (Parameters const& new_params)
 {
 	_params = new_params;
 	_params.sanitize();
@@ -2719,7 +2719,7 @@ EFISWidget::set_params (Parameters const& new_params)
 
 
 void
-EFISWidget::resizeEvent (QResizeEvent* event)
+ADIWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
@@ -2730,7 +2730,7 @@ EFISWidget::resizeEvent (QResizeEvent* event)
 
 
 void
-EFISWidget::request_repaint()
+ADIWidget::request_repaint()
 {
 	update_blinker (_speed_blinking_warning,
 					_params.speed_visible &&
@@ -2749,7 +2749,7 @@ EFISWidget::request_repaint()
 
 
 void
-EFISWidget::push_params()
+ADIWidget::push_params()
 {
 	QDateTime now = QDateTime::currentDateTime();
 
@@ -2796,7 +2796,7 @@ EFISWidget::push_params()
 
 
 void
-EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_state)
+ADIWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_state)
 {
 	if (condition)
 	{
@@ -2812,14 +2812,14 @@ EFISWidget::update_blinker (QTimer* warning_timer, bool condition, bool* blink_s
 
 
 void
-EFISWidget::blink_speed()
+ADIWidget::blink_speed()
 {
 	_locals.speed_blink = !_locals.speed_blink;
 }
 
 
 void
-EFISWidget::blink_minimums()
+ADIWidget::blink_minimums()
 {
 	_locals.minimums_blink = !_locals.minimums_blink;
 }

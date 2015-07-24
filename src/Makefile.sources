@@ -293,11 +293,11 @@ XEFIS_MOCHDRS += modules/helpers/sound.h
 
 ######## /modules/instruments ########
 
+XEFIS_HEADERS += modules/instruments/adi.h
+XEFIS_HEADERS += modules/instruments/adi_widget.h
 XEFIS_HEADERS += modules/instruments/cdu.h
 XEFIS_HEADERS += modules/instruments/datatable.h
 XEFIS_HEADERS += modules/instruments/debug_forces.h
-XEFIS_HEADERS += modules/instruments/efis.h
-XEFIS_HEADERS += modules/instruments/efis_widget.h
 XEFIS_HEADERS += modules/instruments/flaps.h
 XEFIS_HEADERS += modules/instruments/gear.h
 XEFIS_HEADERS += modules/instruments/horizontal_trim.h
@@ -312,11 +312,11 @@ XEFIS_HEADERS += modules/instruments/status.h
 XEFIS_HEADERS += modules/instruments/status_widget.h
 XEFIS_HEADERS += modules/instruments/vertical_trim.h
 
+XEFIS_SOURCES += modules/instruments/adi.cc
+XEFIS_SOURCES += modules/instruments/adi_widget.cc
 XEFIS_SOURCES += modules/instruments/cdu.cc
 XEFIS_SOURCES += modules/instruments/datatable.cc
 XEFIS_SOURCES += modules/instruments/debug_forces.cc
-XEFIS_SOURCES += modules/instruments/efis.cc
-XEFIS_SOURCES += modules/instruments/efis_widget.cc
 XEFIS_SOURCES += modules/instruments/flaps.cc
 XEFIS_SOURCES += modules/instruments/gear.cc
 XEFIS_SOURCES += modules/instruments/horizontal_trim.cc
@@ -331,8 +331,8 @@ XEFIS_SOURCES += modules/instruments/status.cc
 XEFIS_SOURCES += modules/instruments/status_widget.cc
 XEFIS_SOURCES += modules/instruments/vertical_trim.cc
 
-XEFIS_MOCHDRS += modules/instruments/efis.h
-XEFIS_MOCHDRS += modules/instruments/efis_widget.h
+XEFIS_MOCHDRS += modules/instruments/adi.h
+XEFIS_MOCHDRS += modules/instruments/adi_widget.h
 XEFIS_MOCHDRS += modules/instruments/hsi.h
 XEFIS_MOCHDRS += modules/instruments/status.h
 
