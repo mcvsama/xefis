@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__EFIS_WIDGET_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__EFIS_WIDGET_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__ADI_WIDGET_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__ADI_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -37,7 +37,7 @@
 #include <xefis/utility/painter.h>
 
 
-class EFISWidget: public xf::InstrumentWidget
+class ADIWidget: public xf::InstrumentWidget
 {
 	Q_OBJECT
 
@@ -49,7 +49,7 @@ class EFISWidget: public xf::InstrumentWidget
   public:
 	class Parameters
 	{
-		friend class EFISWidget;
+		friend class ADIWidget;
 		friend class PaintWorkUnit;
 
 	  public:
@@ -227,10 +227,10 @@ class EFISWidget: public xf::InstrumentWidget
 		public InstrumentWidget::PaintWorkUnit,
 		protected xf::InstrumentAids
 	{
-		friend class EFISWidget;
+		friend class ADIWidget;
 
 	  public:
-		PaintWorkUnit (EFISWidget*);
+		PaintWorkUnit (ADIWidget*);
 
 		~PaintWorkUnit() noexcept { }
 
@@ -559,10 +559,10 @@ class EFISWidget: public xf::InstrumentWidget
 
   public:
 	// Ctor
-	EFISWidget (QWidget* parent, xf::WorkPerformer*);
+	ADIWidget (QWidget* parent, xf::WorkPerformer*);
 
 	// Dtor
-	~EFISWidget();
+	~ADIWidget();
 
 	/**
 	 * Set new params for the widget.
@@ -607,21 +607,21 @@ class EFISWidget: public xf::InstrumentWidget
 
 
 inline float
-EFISWidget::PaintWorkUnit::kt_to_px (Speed speed) const
+ADIWidget::PaintWorkUnit::kt_to_px (Speed speed) const
 {
 	return -0.5f * _sl_ladder_rect.height() * (speed - _params.speed) / (0.5 * _params.sl_extent);
 }
 
 
 inline float
-EFISWidget::PaintWorkUnit::ft_to_px (Length length) const
+ADIWidget::PaintWorkUnit::ft_to_px (Length length) const
 {
 	return -0.5f * _al_ladder_rect.height() * (length - _params.altitude) / (0.5 * _params.al_extent);
 }
 
 
 inline float
-EFISWidget::PaintWorkUnit::pitch_to_px (Angle degrees) const
+ADIWidget::PaintWorkUnit::pitch_to_px (Angle degrees) const
 {
 	float const correction = 0.775f;
 	return -degrees / (_params.fov * correction) * wh();
@@ -629,14 +629,14 @@ EFISWidget::PaintWorkUnit::pitch_to_px (Angle degrees) const
 
 
 inline float
-EFISWidget::PaintWorkUnit::heading_to_px (Angle degrees) const
+ADIWidget::PaintWorkUnit::heading_to_px (Angle degrees) const
 {
 	return pitch_to_px (-degrees);
 }
 
 
 inline QColor
-EFISWidget::PaintWorkUnit::get_minimums_color() const
+ADIWidget::PaintWorkUnit::get_minimums_color() const
 {
 	if (_params.altitude < _params.minimums_amsl)
 		return _warning_color_2;
@@ -645,7 +645,7 @@ EFISWidget::PaintWorkUnit::get_minimums_color() const
 
 
 inline bool
-EFISWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
+ADIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
 {
 	return timestamp.secsTo (_current_datetime) < time.s();
 }

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__EFIS_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__EFIS_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__ADI_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__ADI_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -29,20 +29,20 @@
 #include <xefis/core/instrument.h>
 
 // Local:
-#include "efis_widget.h"
+#include "adi_widget.h"
 
 
-class EFIS: public xf::Instrument
+class ADI: public xf::Instrument
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	EFIS (xf::ModuleManager*, QDomElement const& config);
+	ADI (xf::ModuleManager*, QDomElement const& config);
 
   public slots:
 	/**
-	 * Force EFIS to read data from properties.
+	 * Force ADI to read data from properties.
 	 */
 	void
 	read();
@@ -55,7 +55,7 @@ class EFIS: public xf::Instrument
 	compute_fpv();
 
   private:
-	EFISWidget*						_efis_widget					= nullptr;
+	ADIWidget*						_adi_widget						= nullptr;
 	// Setting
 	xf::PropertyInteger::Type		_speed_ladder_line_every		= 10;
 	xf::PropertyInteger::Type		_speed_ladder_number_every		= 20;
@@ -202,7 +202,7 @@ class EFIS: public xf::Instrument
 
 
 inline void
-EFIS::data_updated()
+ADI::data_updated()
 {
 	read();
 }
