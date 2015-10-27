@@ -4,11 +4,12 @@ MEMCHECK='valgrind -v --tool=memcheck --num-callers=50 --leak-check=yes --leak-r
 MASSIF='valgrind --tool=massif'
 DRD='valgrind --tool=drd'
 VALGRIND=
+GDB=
 
 TARGET="$DIST"
 if [ "$TARGET" = "" ]; then
 	TARGET="$(uname -m)"
 fi
 export GLIBCXX_FORCE_NEW=1
-make -C src && $VALGRIND src/build/"$TARGET"/xefis "$@"
+make -C src && $VALGRIND $GDB src/build/"$TARGET"/xefis "$@"
 

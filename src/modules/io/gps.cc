@@ -215,8 +215,10 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 	_gps_module._latitude = sentence.latitude;
 	_gps_module._longitude = sentence.longitude;
 
+	using xf::nmea::to_string;
+
 	if (sentence.fix_quality)
-		_gps_module._fix_quality = xf::nmea::stringify (*sentence.fix_quality);
+		_gps_module._fix_quality = to_string (*sentence.fix_quality);
 	else
 		_gps_module._fix_quality.set_nil();
 
