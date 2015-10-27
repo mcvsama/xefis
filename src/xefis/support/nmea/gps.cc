@@ -361,7 +361,7 @@ GPRMC::GPRMC (std::string const& sentence):
 
 
 std::string
-stringify (GPSFixQuality code)
+to_string (GPSFixQuality code)
 {
 	// Must acquire lock before statically- and non-statically initializing static variables:
 	auto lock = fix_quality_strings_entry_mutex.acquire_lock();

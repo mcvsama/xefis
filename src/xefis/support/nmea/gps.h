@@ -266,7 +266,7 @@ class GPRMC: public Sentence
  * returned by the GPS module.
  */
 extern std::string
-stringify (GPSFixQuality);
+to_string (GPSFixQuality);
 
 
 /**
