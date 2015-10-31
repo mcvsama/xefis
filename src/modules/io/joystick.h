@@ -101,14 +101,15 @@ class JoystickInput:
 	reset_properties();
 
   private:
-	QString					_prop_path		= "/joystick";
+	QString					_prop_path			= "/joystick";
 	QString					_device_path;
-	int						_device			= 0;
+	int						_device				= 0;
 	Unique<QSocketNotifier>	_notifier;
 	Unique<QTimer>			_reopen_timer;
 	Buttons					_buttons;
 	Axes					_axes;
-	unsigned int			_failure_count	= 0;
+	unsigned int			_failure_count		= 0;
+	bool					_restart_on_failure	= true;
 };
 
 #endif
