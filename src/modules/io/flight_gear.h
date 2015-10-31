@@ -143,8 +143,8 @@ class FlightGearIO:
 	xf::PropertyAngle					_gps_latitude;
 	xf::PropertyAngle					_gps_longitude;
 	xf::PropertyLength					_gps_amsl;
-	xf::PropertyLength					_gps_accuracy_lateral;
-	xf::PropertyLength					_gps_accuracy_vertical;
+	xf::PropertyLength					_gps_lateral_stddev;
+	xf::PropertyLength					_gps_vertical_stddev;
 	xf::PropertyBoolean					_gps_serviceable;
 	xf::PropertyString					_gps_source;
 	xf::PropertyAngle					_wind_from_magnetic_heading;

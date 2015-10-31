@@ -328,9 +328,9 @@ class GPS:
 	xf::PropertyFloat				_hdop;
 	xf::PropertyFloat				_vdop;
 	xf::PropertyFloat				_pdop;
-	xf::PropertyLength				_lateral_accuracy;
-	xf::PropertyLength				_vertical_accuracy;
-	xf::PropertyLength				_accuracy;
+	xf::PropertyLength				_lateral_stddev;
+	xf::PropertyLength				_vertical_stddev;
+	xf::PropertyLength				_position_stddev;
 	xf::PropertyInteger				_dgps_station_id;
 	xf::PropertyTime				_fix_system_timestamp;
 	xf::PropertyTime				_fix_gps_timestamp;

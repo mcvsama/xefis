@@ -261,19 +261,19 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
 	_gps_module._hdop = optional_cast_to<double> (sentence.hdop);
 
 	if (sentence.hdop)
-		_gps_module._lateral_accuracy = _gps_module._receiver_accuracy * *sentence.hdop;
+		_gps_module._lateral_stddev = _gps_module._receiver_accuracy * *sentence.hdop;
 	else
-		_gps_module._lateral_accuracy.set_nil();
+		_gps_module._lateral_stddev.set_nil();
 
 	if (sentence.vdop)
-		_gps_module._vertical_accuracy = _gps_module._receiver_accuracy * *sentence.vdop;
+		_gps_module._vertical_stddev = _gps_module._receiver_accuracy * *sentence.vdop;
 	else
-		_gps_module._vertical_accuracy.set_nil();
+		_gps_module._vertical_stddev.set_nil();
 
 	if (sentence.hdop && sentence.vdop)
-		_gps_module._accuracy = _gps_module._receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
+		_gps_module._position_stddev = _gps_module._receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
 	else
-		_gps_module._accuracy.set_nil();
+		_gps_module._position_stddev.set_nil();
 }
 
 
@@ -536,9 +536,9 @@ GPS::GPS (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "hdop", _hdop, true },
 		{ "vdop", _vdop, true },
 		{ "pdop", _pdop, true },
-		{ "lateral-accuracy", _lateral_accuracy, true },
-		{ "vertical-accuracy", _vertical_accuracy, true },
-		{ "accuracy", _accuracy, true },
+		{ "lateral.stddev", _lateral_stddev, true },
+		{ "vertical.stddev", _vertical_stddev, true },
+		{ "position.stddev", _position_stddev, true },
 		{ "dgps-station-id", _dgps_station_id, true },
 		{ "fix-system-timestamp", _fix_system_timestamp, true },
 		{ "fix-gps-timestamp", _fix_gps_timestamp, true },
@@ -628,9 +628,9 @@ GPS::reset_data_properties()
 	_hdop.set_nil();
 	_vdop.set_nil();
 	_pdop.set_nil();
-	_lateral_accuracy.set_nil();
-	_vertical_accuracy.set_nil();
-	_accuracy.set_nil();
+	_lateral_stddev.set_nil();
+	_vertical_stddev.set_nil();
+	_position_stddev.set_nil();
 	_dgps_station_id.set_nil();
 	_fix_system_timestamp.set_nil();
 	_fix_gps_timestamp.set_nil();
