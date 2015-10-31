@@ -202,8 +202,8 @@ FlightGearIO::FlightGearIO (xf::ModuleManager* module_manager, QDomElement const
 						{ "gps.latitude", _gps_latitude, false },
 						{ "gps.longitude", _gps_longitude, false },
 						{ "gps.amsl", _gps_amsl, false },
-						{ "gps.accuracy.lateral", _gps_accuracy_lateral, false },
-						{ "gps.accuracy.vertical", _gps_accuracy_vertical, false },
+						{ "gps.lateral.stddev", _gps_lateral_stddev, false },
+						{ "gps.vertical.stddev", _gps_vertical_stddev, false },
 						{ "gps.source", _gps_source, false },
 						{ "gps.serviceable", _gps_serviceable, false },
 						{ "wind-from-mag-heading", _wind_from_magnetic_heading, false },
@@ -311,8 +311,8 @@ FlightGearIO::FlightGearIO (xf::ModuleManager* module_manager, QDomElement const
 		&_gps_latitude,
 		&_gps_longitude,
 		&_gps_amsl,
-		&_gps_accuracy_lateral,
-		&_gps_accuracy_vertical,
+		&_gps_lateral_stddev,
+		&_gps_vertical_stddev,
 		&_wind_from_magnetic_heading,
 		&_wind_tas,
 		&_gear_setting_down,
@@ -490,8 +490,8 @@ FlightGearIO::read_input()
 		if (flag->configured())
 			flag->write (true);
 
-	_gps_accuracy_lateral.write (1_m);
-	_gps_accuracy_vertical.write (1_m);
+	_gps_lateral_stddev.write (1_m);
+	_gps_vertical_stddev.write (1_m);
 	_gps_source.write ("GPS");
 
 	_timeout_timer->start();

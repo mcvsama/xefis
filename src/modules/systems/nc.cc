@@ -53,8 +53,8 @@ NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomE
 		{ "position.input.longitude", _position_input_longitude, true },
 		{ "position.input.latitude", _position_input_latitude, true },
 		{ "position.input.altitude.amsl", _position_input_altitude_amsl, true },
-		{ "position.input.accuracy.lateral", _position_input_accuracy_lateral, true },
-		{ "position.input.accuracy.vertical", _position_input_accuracy_vertical, true },
+		{ "position.input.lateral.stddev", _position_input_lateral_stddev, true },
+		{ "position.input.vertical.stddev", _position_input_vertical_stddev, true },
 		{ "position.input.source", _position_input_source, true },
 		{ "orientation.input.pitch", _orientation_input_pitch, true },
 		{ "orientation.input.roll", _orientation_input_roll, true },
@@ -63,9 +63,9 @@ NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomE
 		{ "position.longitude", _position_longitude, true },
 		{ "position.latitude", _position_latitude, true },
 		{ "position.altitude.amsl", _position_altitude_amsl, true },
-		{ "position.accuracy.lateral", _position_accuracy_lateral, true },
-		{ "position.accuracy.vertical", _position_accuracy_vertical, true },
-		{ "position.accuracy", _position_accuracy, true },
+		{ "position.lateral.stddev", _position_lateral_stddev, true },
+		{ "position.vertical.stddev", _position_vertical_stddev, true },
+		{ "position.stddev", _position_stddev, true },
 		{ "position.source", _position_source, true },
 		{ "orientation.pitch", _orientation_pitch, true },
 		{ "orientation.roll", _orientation_roll, true },
@@ -85,8 +85,8 @@ NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomE
 		&_position_input_longitude,
 		&_position_input_latitude,
 		&_position_input_altitude_amsl,
-		&_position_input_accuracy_lateral,
-		&_position_input_accuracy_vertical,
+		&_position_input_lateral_stddev,
+		&_position_input_vertical_stddev,
 		&_position_input_source,
 	});
 
@@ -156,29 +156,29 @@ NavigationComputer::compute_position()
 	_position_longitude.copy_from (_position_input_longitude);
 	_position_latitude.copy_from (_position_input_latitude);
 	_position_altitude_amsl.copy_from (_position_input_altitude_amsl);
-	_position_accuracy_lateral.copy_from (_position_input_accuracy_lateral);
-	_position_accuracy_vertical.copy_from (_position_input_accuracy_vertical);
+	_position_lateral_stddev.copy_from (_position_input_lateral_stddev);
+	_position_vertical_stddev.copy_from (_position_input_vertical_stddev);
 	_position_source.copy_from (_position_input_source);
 
 	// Larger of the two:
-	if (_position_accuracy_lateral.valid() && _position_accuracy_vertical.valid())
-		_position_accuracy = std::max (*_position_accuracy_lateral, *_position_accuracy_vertical);
+	if (_position_lateral_stddev.valid() && _position_vertical_stddev.valid())
+		_position_stddev = std::max (*_position_lateral_stddev, *_position_vertical_stddev);
 	else
-		_position_accuracy.set_nil();
+		_position_stddev.set_nil();
 
 	Length const failed_accuracy = 100_nmi;
 
 	Position position;
 	position.lateral_position = LonLat (*_position_longitude, *_position_latitude);
+	position.lateral_position_stddev = _position_lateral_stddev.read (failed_accuracy);
 	position.altitude = _position_altitude_amsl.read (0.0_ft);
-	position.lateral_accuracy = _position_accuracy_lateral.read (failed_accuracy);
-	position.vertical_accuracy = _position_accuracy_vertical.read (failed_accuracy);
+	position.altitude_stddev = _position_vertical_stddev.read (failed_accuracy);
 	position.time = update_time;
 	position.valid = _position_longitude.valid() &&
 					 _position_latitude.valid() &&
 					 _position_altitude_amsl.valid() &&
-					 _position_accuracy_lateral.valid() &&
-					 _position_accuracy_vertical.valid();
+					 _position_lateral_stddev.valid() &&
+					 _position_vertical_stddev.valid();
 	_positions.push_back (position);
 
 	// Delayed positioning (after enough distance has been traveled):
@@ -187,7 +187,7 @@ NavigationComputer::compute_position()
 		auto add_accurate_position = [&](Positions& accurate_positions, float accuracy_times, Time max_time_difference) -> void
 		{
 			Position const& new_position = _positions.back();
-			Length worse_accuracy = std::max (new_position.lateral_accuracy, accurate_positions.back().lateral_accuracy);
+			Length worse_accuracy = std::max (new_position.lateral_position_stddev, accurate_positions.back().lateral_position_stddev);
 
 			if (!accurate_positions.back().valid ||
 				new_position.lateral_position.haversine_earth (accurate_positions.back().lateral_position) > accuracy_times * worse_accuracy ||
@@ -286,7 +286,7 @@ NavigationComputer::compute_track()
 	if (pos_last.valid && pos_prev.valid)
 	{
 		Length distance = pos_last.lateral_position.haversine_earth (pos_prev.lateral_position);
-		if (distance > 2.0 * pos_last.lateral_accuracy)
+		if (distance > 2.0 * pos_last.lateral_position_stddev)
 		{
 			Length altitude_diff = pos_last.altitude - pos_prev.altitude;
 			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt));
@@ -322,7 +322,7 @@ NavigationComputer::compute_track()
 	{
 		Length len_from_prev = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);
 
-		if (len_from_prev >= *_position_accuracy_lateral)
+		if (len_from_prev >= *_position_lateral_stddev)
 		{
 			Time dt = pos_last.time - pos_prev.time;
 			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (pos_prev_prev.lateral_position,

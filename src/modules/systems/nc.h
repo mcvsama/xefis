@@ -37,9 +37,9 @@ class NavigationComputer: public xf::Module
 	struct Position
 	{
 		LonLat		lateral_position;
+		Length		lateral_position_stddev;
 		Length		altitude;
-		Length		lateral_accuracy;
-		Length		vertical_accuracy;
+		Length		altitude_stddev;
 		Time		time;
 		bool		valid = false;
 	};
@@ -87,8 +87,8 @@ class NavigationComputer: public xf::Module
 	xf::PropertyAngle		_position_input_longitude;
 	xf::PropertyAngle		_position_input_latitude;
 	xf::PropertyLength		_position_input_altitude_amsl;
-	xf::PropertyLength		_position_input_accuracy_lateral;
-	xf::PropertyLength		_position_input_accuracy_vertical;
+	xf::PropertyLength		_position_input_lateral_stddev;
+	xf::PropertyLength		_position_input_vertical_stddev;
 	xf::PropertyString		_position_input_source;
 	xf::PropertyAngle		_orientation_input_pitch;
 	xf::PropertyAngle		_orientation_input_roll;
@@ -97,9 +97,9 @@ class NavigationComputer: public xf::Module
 	xf::PropertyAngle		_position_longitude;
 	xf::PropertyAngle		_position_latitude;
 	xf::PropertyLength		_position_altitude_amsl;
-	xf::PropertyLength		_position_accuracy_lateral;
-	xf::PropertyLength		_position_accuracy_vertical;
-	xf::PropertyLength		_position_accuracy;
+	xf::PropertyLength		_position_lateral_stddev;
+	xf::PropertyLength		_position_vertical_stddev;
+	xf::PropertyLength		_position_stddev;
 	xf::PropertyString		_position_source;
 	xf::PropertyAngle		_orientation_pitch;
 	xf::PropertyAngle		_orientation_roll;
