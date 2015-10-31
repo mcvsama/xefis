@@ -74,28 +74,15 @@ JoystickInput::JoystickInput (xf::ModuleManager* module_manager, QDomElement con
 	_buttons.resize (256, nullptr);
 	_axes.resize (256, nullptr);
 
-	bool found_path = false;
-	bool found_device = false;
+	parse_settings (config, {
+		{ "device", _device_path, true },
+		{ "path", _prop_path, true },
+		{ "restart-on-failure", _restart_on_failure, false },
+	});
 
 	for (QDomElement& e: config)
 	{
-		if (e == "device")
-		{
-			if (found_device)
-				throw xf::BadDomElement ("only one <device> supported in configuration for the io/joystick module");
-			found_device = true;
-
-			_device_path = e.text();
-		}
-		else if (e == "path")
-		{
-			if (found_path)
-				throw xf::BadDomElement ("only one <path> supported in configuration for the io/joystick module");
-			found_path = true;
-
-			_prop_path = e.text();
-		}
-		else if (e == "axis")
+		if (e == "axis")
 		{
 			unsigned int id = e.attribute ("id").toUInt();
 			if (id < _axes.size())
@@ -148,13 +135,11 @@ JoystickInput::JoystickInput (xf::ModuleManager* module_manager, QDomElement con
 			}
 		}
 		else
-			throw xf::BadDomElement (e);
+		{
+			if (e != "settings")
+				throw xf::BadDomElement (e);
+		}
 	}
-
-	if (!found_path)
-		throw xf::MissingDomElement (config, "path");
-	if (!found_device)
-		throw xf::MissingDomElement (config, "device");
 
 	_reopen_timer = std::make_unique<QTimer> (this);
 	_reopen_timer->setInterval (500);
@@ -210,7 +195,8 @@ JoystickInput::failure()
 void
 JoystickInput::restart()
 {
-	_reopen_timer->start();
+	if (_restart_on_failure)
+		_reopen_timer->start();
 }
 
 
