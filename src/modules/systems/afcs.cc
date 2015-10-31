@@ -1069,21 +1069,27 @@ AFCS::update_output()
 void
 AFCS::disengage_ap (const char* reason)
 {
-	std::clog << "AFCS A/P disengage: " << reason << std::endl;
-	_ap_on = false;
-	_roll_mode = RollMode::None;
-	_pitch_mode = PitchMode::None;
-	solve();
+	if (_ap_on)
+	{
+		std::clog << "AFCS A/P disengage: " << reason << std::endl;
+		_ap_on = false;
+		_roll_mode = RollMode::None;
+		_pitch_mode = PitchMode::None;
+		solve();
+	}
 }
 
 
 void
 AFCS::disengage_at (const char* reason)
 {
-	std::clog << "AFCS A/T disengage: " << reason << std::endl;
-	_at_on = false;
-	_thrust_mode = ThrustMode::None;
-	solve();
+	if (_at_on)
+	{
+		std::clog << "AFCS A/T disengage: " << reason << std::endl;
+		_at_on = false;
+		_thrust_mode = ThrustMode::None;
+		solve();
+	}
 }
 
 
