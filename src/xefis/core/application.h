@@ -244,6 +244,7 @@ class Application: public QApplication
 	static Application*				_application;
 	static Logger					_logger;
 
+	Unique<System>					_system;
 	Unique<WorkPerformer>			_work_performer;
 	Unique<Accounting>				_accounting;
 	Unique<SoundManager>			_sound_manager;
@@ -259,7 +260,6 @@ class Application: public QApplication
 	Unique<ConfigReader>			_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<Airframe>				_airframe;
-	Unique<System>					_system;
 	Unique<OptionsHelper>			_options_helper;
 	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
