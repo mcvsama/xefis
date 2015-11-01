@@ -70,6 +70,7 @@ Application::Application (int& argc, char** argv):
 	// Init property storage:
 	PropertyStorage::initialize();
 
+	_system = std::make_unique<System>();
 	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 	_accounting = std::make_unique<Accounting>();
 	_sound_manager = std::make_unique<SoundManager>();
@@ -100,8 +101,6 @@ Application::Application (int& argc, char** argv):
 
 	if (_config_reader->has_windows())
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (this, nullptr);
-
-	_system = std::make_unique<System>();
 
 	_data_updater = new QTimer (this);
 	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).ms());
