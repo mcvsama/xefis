@@ -262,17 +262,15 @@ StatusWidget::recompute()
 		_max_shown_messages = static_cast<unsigned int> (_viewport.height() / _line_height);
 	// Fix viewport size to be integral number of shown messages:
 	_viewport.setHeight (_line_height * _max_shown_messages);
+
+	solve_scroll_and_cursor();
 }
 
 
 void
 StatusWidget::solve_scroll_and_cursor()
 {
-	if (_cursor >= _scroll + _max_shown_messages)
-		_scroll = _cursor - _max_shown_messages + 1;
-	else if (_cursor < _scroll)
-		_scroll = _cursor;
-
+	// Solve _cursor:
 	if (_shown_messages.empty())
 	{
 		_cursor_visible = false;
@@ -280,6 +278,12 @@ StatusWidget::solve_scroll_and_cursor()
 	}
 	else if (_cursor >= static_cast<int> (_shown_messages.size()))
 		_cursor = _shown_messages.size() - 1;
+
+	// Solve _scroll:
+	if (_cursor >= _scroll + _max_shown_messages)
+		_scroll = _cursor - _max_shown_messages + 1;
+	else if (_cursor < _scroll)
+		_scroll = _cursor;
 }
 
 
