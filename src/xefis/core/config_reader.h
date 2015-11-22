@@ -252,16 +252,22 @@ class ConfigReader
 	load_navaids() const noexcept;
 
 	/**
-	 * Return master pen scale.
+	 * Return scaling factor for pens/lines.
 	 */
 	float
 	pen_scale() const noexcept;
 
 	/**
-	 * Return master font scale.
+	 * Return scaling factor for fonts.
 	 */
 	float
 	font_scale() const noexcept;
+
+	/**
+	 * Return scaling factor for UI windows.
+	 */
+	float
+	windows_scale() const noexcept;
 
 	/**
 	 * Return sub-configuration for the Airframe module.
@@ -319,6 +325,8 @@ class ConfigReader
 	bool					_navaids_enable		= true;
 	float					_scale_pen			= 1.f;
 	float					_scale_font			= 1.f;
+	float					_scale_master		= 1.f;
+	float					_scale_windows		= 1.f;
 	ModuleConfigs			_module_configs;
 };
 
@@ -386,14 +394,21 @@ ConfigReader::load_navaids() const noexcept
 inline float
 ConfigReader::pen_scale() const noexcept
 {
-	return _scale_pen;
+	return _scale_master * _scale_pen;
 }
 
 
 inline float
 ConfigReader::font_scale() const noexcept
 {
-	return _scale_font;
+	return _scale_master * _scale_font;
+}
+
+
+inline float
+ConfigReader::windows_scale() const noexcept
+{
+	return _scale_windows;
 }
 
 
