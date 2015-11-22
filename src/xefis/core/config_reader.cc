@@ -482,6 +482,8 @@ ConfigReader::process_settings_element (QDomElement const& settings_element)
 		{ "navaids.enable", _navaids_enable, false },
 		{ "scale.pen", _scale_pen, false },
 		{ "scale.font", _scale_font, false },
+		{ "scale.master", _scale_master, false },
+		{ "scale.windows", _scale_windows, false },
 	});
 	sp.parse (settings_element);
 }

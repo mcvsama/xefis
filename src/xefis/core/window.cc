@@ -81,8 +81,9 @@ Window::Window (Application* application, ConfigReader* config_reader, QDomEleme
 {
 	try {
 		setWindowTitle ("XEFIS");
-		resize (limit (element.attribute ("width").toInt(), 40, 10000),
-				limit (element.attribute ("height").toInt(), 30, 10000));
+		float ws = config_reader->windows_scale();
+		resize (limit<int> (ws * element.attribute ("width").toFloat(), 40, 10000),
+				limit<int> (ws * element.attribute ("height").toFloat(), 30, 10000));
 		setMouseTracking (true);
 		setAttribute (Qt::WA_TransparentForMouseEvents);
 
