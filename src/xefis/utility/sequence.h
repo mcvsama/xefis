@@ -63,6 +63,9 @@ template<class ConstIterator, class Value, class Accessor>
 	}
 
 
+/**
+ * A simple trick to change const_iterator to iterator.
+ */
 template<class Container, typename ConstIterator>
 	inline typename Container::iterator
 	remove_constness (Container& container, ConstIterator iterator)
