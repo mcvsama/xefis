@@ -27,7 +27,11 @@ namespace Xefis {
 class System
 {
   public:
+	// Ctor
 	explicit System();
+
+	// Dtor
+	~System();
 
 	/**
 	 * Set system clock.
