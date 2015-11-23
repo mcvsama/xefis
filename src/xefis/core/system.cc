@@ -37,6 +37,12 @@ System::System()
 }
 
 
+System::~System()
+{
+	_logger << "Destroying System" << std::endl;
+}
+
+
 bool
 System::set_clock (Time const& unix_time)
 {
