@@ -79,7 +79,7 @@ class Parser: private Noncopyable
 	/**
 	 * Feed the parser with data received from GPS module.
 	 * Don't parse it and don't call any listeners. For that,
-	 * use the parse() method.
+	 * use the process_one() method.
 	 */
 	void
 	feed (Blob const& gps_data);
