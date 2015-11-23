@@ -98,7 +98,8 @@ GPGGA::GPGGA (std::string const& sentence):
 	// Fix time (UTC):
 	if (!read_next())
 		return;
-	this->fix_time = GPSTimeOfDay (val());
+	if (!val().empty())
+		this->fix_time = GPSTimeOfDay (val());
 
 	// Latitude:
 	if (!read_latitude (this->latitude))
@@ -296,7 +297,8 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Fix time (UTC):
 	if (!read_next())
 		return;
-	this->fix_time = GPSTimeOfDay (val());
+	if (!val().empty())
+		this->fix_time = GPSTimeOfDay (val());
 
 	// Receiver status:
 	if (!read_next())
@@ -336,7 +338,8 @@ GPRMC::GPRMC (std::string const& sentence):
 	// Fix date:
 	if (!read_next())
 		return;
-	this->fix_date = GPSDate (val());
+	if (!val().empty())
+		this->fix_date = GPSDate (val());
 
 	// Magnetic variation:
 	if (!read_next())
