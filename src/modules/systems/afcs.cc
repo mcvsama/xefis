@@ -709,7 +709,7 @@ AFCS::button_press_clb_con()
 void
 AFCS::check_input()
 {
-	std::array<xf::GenericProperty*, 7> checked_props = {
+	std::array<xf::GenericProperty*, 7> checked_props = { {
 		&_measured_ias,
 		&_measured_mach,
 		&_measured_heading_magnetic,
@@ -717,7 +717,7 @@ AFCS::check_input()
 		&_measured_altitude_amsl,
 		&_measured_vs,
 		&_measured_fpa,
-	};
+	} };
 
 	if (std::any_of (checked_props.begin(), checked_props.end(), [](xf::GenericProperty* p) { return !p->valid(); }))
 	{
