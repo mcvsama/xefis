@@ -23,14 +23,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/airframe/types.h>
+#include <xefis/utility/datatable2d.h>
 
 
 namespace Xefis {
 
 class Lift
 {
-	typedef std::map<Angle, LiftCoefficient> Coefficients;
-
   public:
 	// Ctor
 	Lift (QDomElement const& config);
@@ -56,15 +55,15 @@ class Lift
 	critical_aoa() const noexcept;
 
 	/**
-	 * Return AOA in normal regime for given C_L.
+	 * Return AOA in normal regime (not stalled) for given C_L.
 	 */
 	Angle
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
-	Coefficients	_coeffs;
-	LiftCoefficient	_max_cl;
-	Angle			_critical_aoa;
+	Unique<Datatable2D<Angle, LiftCoefficient>>	_aoa_to_cl;
+	LiftCoefficient								_max_cl;
+	Angle										_critical_aoa;
 };
 
 } // namespace Xefis

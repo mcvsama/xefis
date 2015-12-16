@@ -369,7 +369,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 			Acceleration load = 1.0_g / cos (max_bank_angle);
 			// Note: stick to SI units:
 			Speed tas = Speed::from_si_units (std::sqrt (load.si_units() * _input_aircraft_weight->si_units()
-														 / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl.value())));
+														 / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl)));
 
 			return tas_to_ias (tas);
 		}
@@ -445,7 +445,7 @@ PerformanceComputer::compute_C_L()
 		Speed tas = *_speed_tas;
 		Area wings_area = airframe->wings_area();
 		xf::LiftCoefficient cl (lift.si_units() / (0.5 * _input_air_density_static->si_units() * tas.si_units() * tas.si_units() * wings_area.si_units()));
-		_cl_smoother.process (cl.value(), update_dt);
+		_cl_smoother.process (cl, update_dt);
 		_lift_coefficient = _cl_smoother.value();
 	}
 	else
@@ -485,7 +485,7 @@ PerformanceComputer::compute_estimations()
 		if (_input_aoa_alpha.valid())
 		{
 			xf::LiftCoefficient cl = airframe->get_cl (*_input_aoa_alpha, flaps_angle, spoilers_angle);
-			double si_tas = std::sqrt (lift_force.N() / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl.value()));
+			double si_tas = std::sqrt (lift_force.N() / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl));
 			Speed tas = Speed::from_si_units (si_tas);
 			_estimated_ias = tas_to_ias (tas);
 		}

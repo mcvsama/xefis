@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/numeric.h>
+#include <xefis/utility/datatable2d.h>
 
 // Local:
 #include "drag.h"
@@ -28,6 +28,8 @@ namespace Xefis {
 
 Drag::Drag (QDomElement const& config)
 {
+	decltype (_aoa_to_cd)::element_type::DataMap data;
+
 	for (QDomElement const& e: config)
 	{
 		if (e == "point")
@@ -39,33 +41,22 @@ Drag::Drag (QDomElement const& config)
 
 			Angle aoa;
 			aoa.parse (e.attribute ("aoa").toStdString());
-			double cd = e.attribute ("cd").toDouble();
-			_coeffs[aoa] = cd;
+			DragCoefficient cd = e.attribute ("cd").toDouble();
+			data[aoa] = cd;
 		}
 	}
 
-	if (_coeffs.empty())
-		throw BadConfiguration ("lift module not properly configured");
+	if (data.empty())
+		throw BadConfiguration ("drag module not properly configured");
+
+	_aoa_to_cd = std::make_unique<Datatable2D<Angle, DragCoefficient>> (std::move (data));
 }
 
 
-double
+DragCoefficient
 Drag::get_cd (Angle const& aoa) const
 {
-	// Assume _coeffs is not empty (see ctor).
-
-	Coefficients::const_iterator ub = _coeffs.upper_bound (aoa);
-
-	if (ub == _coeffs.end())
-		return (--ub)->second;
-
-	if (ub == _coeffs.begin())
-		return ub->second;
-
-	Coefficients::const_iterator lb = ub;
-	--lb;
-
-	return xf::renormalize (aoa, Range<Angle> (lb->first, ub->first), Range<double> (lb->second, ub->second));
+	return _aoa_to_cd->extrapolated_value (aoa);
 }
 
 } // namespace Xefis
