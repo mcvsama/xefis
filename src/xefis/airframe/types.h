@@ -28,13 +28,8 @@ XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle);
 XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack);
 
 
-class LiftCoefficient:
-	public StrongWrapper<double>,
-	private std::rel_ops::IncludeRelOps
-{
-	using StrongWrapper::StrongWrapper;
-	using StrongWrapper::operator=;
-};
+typedef double LiftCoefficient;
+typedef double DragCoefficient;
 
 } // namespace Xefis
 

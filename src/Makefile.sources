@@ -216,6 +216,7 @@ XEFIS_SOURCES += xefis/support/nmea/parser.cc
 XEFIS_HEADERS += xefis/utility/actions.h
 XEFIS_HEADERS += xefis/utility/backtrace.h
 XEFIS_HEADERS += xefis/utility/convergence.h
+XEFIS_HEADERS += xefis/utility/datatable2d.h
 XEFIS_HEADERS += xefis/utility/delta_decoder.h
 XEFIS_HEADERS += xefis/utility/hash.h
 XEFIS_HEADERS += xefis/utility/hextable.h

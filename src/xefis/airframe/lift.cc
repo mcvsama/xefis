@@ -14,13 +14,14 @@
 // Standard:
 #include <cstddef>
 #include <algorithm>
+#include <map>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/numeric.h>
 #include <xefis/utility/sequence.h>
+#include <xefis/utility/datatable2d.h>
 
 // Local:
 #include "lift.h"
@@ -30,6 +31,8 @@ namespace Xefis {
 
 Lift::Lift (QDomElement const& config)
 {
+	decltype (_aoa_to_cl)::element_type::DataMap data;
+
 	for (QDomElement const& e: config)
 	{
 		if (e == "point")
@@ -42,37 +45,26 @@ Lift::Lift (QDomElement const& config)
 			Angle aoa;
 			aoa.parse (e.attribute ("aoa").toStdString());
 			LiftCoefficient cl (e.attribute ("cl").toDouble());
-			_coeffs[aoa] = cl;
+			data[aoa] = cl;
 		}
 	}
 
-	if (_coeffs.empty())
+	if (data.empty())
 		throw BadConfiguration ("lift module not properly configured");
 
+	_aoa_to_cl = std::make_unique<Datatable2D<Angle, LiftCoefficient>> (std::move (data));
+
 	// Find maximum C_L and AOA angle for maximum C_L (critical AOA):
-	_max_cl = _coeffs.begin()->second;
-	for (auto cl: _coeffs)
-	{
-		if (cl.second > _max_cl)
-		{
-			_max_cl = cl.second;
-			_critical_aoa = cl.first;
-		}
-	}
+	auto max_cl_point = _aoa_to_cl->max_value();
+	_critical_aoa = max_cl_point.argument;
+	_max_cl = max_cl_point.value;
 }
 
 
 LiftCoefficient
 Lift::get_cl (Angle const& aoa) const
 {
-	// Assume _coeffs is not empty (see ctor).
-
-	auto range = extended_adjacent_find (_coeffs.begin(), _coeffs.end(), aoa, [](Coefficients::value_type pair) { return pair.first; });
-
-	Range<Angle> from (range.first->first, range.second->first);
-	Range<LiftCoefficient::Value> to (range.first->second.value(), range.second->second.value());
-
-	return LiftCoefficient (xf::renormalize (aoa, from, to));
+	return _aoa_to_cl->extrapolated_value (aoa);
 }
 
 
@@ -93,13 +85,10 @@ Lift::critical_aoa() const noexcept
 Angle
 Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 {
-	// Assume _coeffs is not empty (see ctor).
-
-	auto range = extended_adjacent_find (_coeffs.begin(), _coeffs.end(), cl, [](Coefficients::value_type pair) { return pair.second; });
-
-	return xf::renormalize (cl.value(),
-							range.first->second.value(), range.second->second.value(),
-							range.first->first, range.second->first);
+	auto aoas = _aoa_to_cl->arguments (cl, { _aoa_to_cl->min_argument().argument, _critical_aoa });
+	// If AOA/C_L is not-monotonic, there may be multiple results.
+	// In such case return largest matching AOA:
+	return aoas.back().argument;
 }
 
 } // namespace Xefis

@@ -22,14 +22,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/airframe/types.h>
+#include <xefis/utility/datatable2d.h>
 
 
 namespace Xefis {
 
 class Drag
 {
-	typedef std::map<Angle, double> Coefficients;
-
   public:
 	// Ctor
 	Drag (QDomElement const& config);
@@ -39,11 +39,11 @@ class Drag
 	 *
 	 * Uses linear interpolation.
 	 */
-	double
+	DragCoefficient
 	get_cd (Angle const& aoa) const;
 
   private:
-	Coefficients _coeffs;
+	Unique<Datatable2D<Angle, DragCoefficient>>	_aoa_to_cd;
 };
 
 } // namespace Xefis
