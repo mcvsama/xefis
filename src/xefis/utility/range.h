@@ -183,9 +183,7 @@ template<class T>
 	constexpr bool
 	Range<T>::includes (ValueType value) const
 	{
-		return _min <= _max
-			? (_min <= value && value <= _max)
-			: (_max <= value && value <= _min);
+		return (_min <= value && value <= _max) || (_max <= value && value <= _min);
 	}
 
 } // namespace Xefis
