@@ -26,12 +26,12 @@
 #include <xefis/core/module_manager.h>
 #include <xefis/core/application.h>
 #include <xefis/core/system.h>
-#include <xefis/hardware/serial_port.h>
+#include <xefis/support/bus/serial_port.h>
+#include <xefis/support/nmea/parser.h>
+#include <xefis/support/nmea/mtk.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/resource.h>
 #include <xefis/utility/mutex.h>
-#include <xefis/support/nmea/parser.h>
-#include <xefis/support/nmea/mtk.h>
 
 // Local:
 #include "gps.h"

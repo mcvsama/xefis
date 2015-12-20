@@ -22,8 +22,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
+#include <xefis/support/navigation/magnetic_variation.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/airnav/magnetic_variation.h>
 
 // Local:
 #include "nc.h"

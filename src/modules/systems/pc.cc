@@ -24,10 +24,10 @@
 #include <xefis/airframe/airframe.h>
 #include <xefis/airframe/lift.h>
 #include <xefis/airframe/types.h>
+#include <xefis/support/air/wind_triangle.h>
+#include <xefis/support/air/air.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/airnav/wind_triangle.h>
-#include <xefis/airnav/true_airspeed.h>
 
 // Local:
 #include "pc.h"
@@ -385,13 +385,7 @@ Optional<Speed>
 PerformanceComputer::tas_to_ias (Speed const& tas) const
 {
 	if (_density_altitude.valid())
-	{
-		xf::TrueAirspeed tascalc;
-		tascalc.set_tas (tas);
-		tascalc.set_density_altitude (*_density_altitude);
-		tascalc.compute_ias();
-		return tascalc.ias();
-	}
+		return xf::compute_indicated_airspeed (tas, *_density_altitude);
 	else
 		return {};
 }

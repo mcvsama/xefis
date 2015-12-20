@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__HARDWARE__CHRUM6_H__INCLUDED
-#define XEFIS__HARDWARE__CHRUM6_H__INCLUDED
+#ifndef XEFIS__SUPPORT__DEVICES__CHR_UM6_H__INCLUDED
+#define XEFIS__SUPPORT__DEVICES__CHR_UM6_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/hardware/serial_port.h>
+#include <xefis/support/bus/serial_port.h>
 #include <xefis/utility/packet_reader.h>
 #include <xefis/utility/logger.h>
 

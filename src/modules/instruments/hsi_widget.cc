@@ -29,10 +29,10 @@
 #include <xefis/core/navaid.h>
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/window.h>
+#include <xefis/support/air/wind_triangle.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>
-#include <xefis/airnav/wind_triangle.h>
 
 // Local:
 #include "hsi_widget.h"

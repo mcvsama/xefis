@@ -76,17 +76,6 @@ XEFIS_SOURCES += xefis/airframe/drag.cc
 XEFIS_SOURCES += xefis/airframe/lift.cc
 XEFIS_SOURCES += xefis/airframe/lift_mod.cc
 
-
-######## /xefis/airnav ########
-
-XEFIS_HEADERS += xefis/airnav/density_altitude.h
-XEFIS_HEADERS += xefis/airnav/magnetic_variation.h
-XEFIS_HEADERS += xefis/airnav/sound_speed.h
-XEFIS_HEADERS += xefis/airnav/wind_triangle.h
-XEFIS_HEADERS += xefis/airnav/true_airspeed.h
-
-XEFIS_SOURCES += xefis/airnav/magnetic_variation.cc
-
 ######## /xefis/components ########
 
 XEFIS_HEADERS += xefis/components/property_editor/property_editor.h
@@ -186,30 +175,30 @@ XEFIS_MOCHDRS += xefis/core/panel.h
 XEFIS_MOCHDRS += xefis/core/services.h
 XEFIS_MOCHDRS += xefis/core/window.h
 
-######## /xefis/hardware ########
-
-XEFIS_HEADERS += xefis/hardware/chr_um6.h
-XEFIS_HEADERS += xefis/hardware/i2c.h
-XEFIS_HEADERS += xefis/hardware/serial_port.h
-
-XEFIS_SOURCES += xefis/hardware/chr_um6.cc
-XEFIS_SOURCES += xefis/hardware/i2c.cc
-XEFIS_SOURCES += xefis/hardware/serial_port.cc
-
-XEFIS_MOCHDRS += xefis/hardware/serial_port.h
-
 ######## /xefis/support ########
 
+XEFIS_HEADERS += xefis/support/air/air.h
+XEFIS_HEADERS += xefis/support/bus/i2c.h
+XEFIS_HEADERS += xefis/support/bus/serial_port.h
+XEFIS_HEADERS += xefis/support/air/wind_triangle.h
+XEFIS_HEADERS += xefis/support/devices/chr_um6.h
+XEFIS_HEADERS += xefis/support/navigation/magnetic_variation.h
 XEFIS_HEADERS += xefis/support/nmea/exceptions.h
 XEFIS_HEADERS += xefis/support/nmea/gps.h
 XEFIS_HEADERS += xefis/support/nmea/mtk.h
 XEFIS_HEADERS += xefis/support/nmea/nmea.h
 XEFIS_HEADERS += xefis/support/nmea/parser.h
 
+XEFIS_SOURCES += xefis/support/bus/i2c.cc
+XEFIS_SOURCES += xefis/support/bus/serial_port.cc
+XEFIS_SOURCES += xefis/support/devices/chr_um6.cc
+XEFIS_SOURCES += xefis/support/navigation/magnetic_variation.cc
 XEFIS_SOURCES += xefis/support/nmea/gps.cc
 XEFIS_SOURCES += xefis/support/nmea/mtk.cc
 XEFIS_SOURCES += xefis/support/nmea/nmea.cc
 XEFIS_SOURCES += xefis/support/nmea/parser.cc
+
+XEFIS_MOCHDRS += xefis/support/bus/serial_port.h
 
 ######## /xefis/utility ########
 

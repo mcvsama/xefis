@@ -23,8 +23,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/module.h>
-#include <xefis/hardware/chr_um6.h>
-#include <xefis/hardware/serial_port.h>
+#include <xefis/support/bus/serial_port.h>
+#include <xefis/support/devices/chr_um6.h>
 
 
 /**

@@ -26,7 +26,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/module.h>
-#include <xefis/hardware/serial_port.h>
+#include <xefis/support/bus/serial_port.h>
 #include <xefis/support/nmea/parser.h>
 
 
