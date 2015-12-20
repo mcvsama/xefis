@@ -33,7 +33,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/hardware/serial_port.h>
+#include <xefis/support/bus/serial_port.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
 

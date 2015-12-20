@@ -22,9 +22,7 @@
 #include <xefis/config/exception.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/convergence.h>
-#include <xefis/airnav/density_altitude.h>
-#include <xefis/airnav/sound_speed.h>
-#include <xefis/airnav/true_airspeed.h>
+#include <xefis/support/air/air.h>
 
 // Local:
 #include "adc.h"
@@ -253,13 +251,7 @@ void
 AirDataComputer::compute_density_altitude()
 {
 	if (_static_air_temperature.valid() && _altitude_amsl.valid())
-	{
-		xf::DensityAltitude da;
-		da.set_pressure_altitude (*_altitude_amsl);
-		da.set_static_air_temperature (*_static_air_temperature);
-		da.update();
-		_density_altitude.write (da.density_altitude());
-	}
+		_density_altitude = xf::compute_density_altitude (*_altitude_amsl, *_static_air_temperature);
 	else
 		_density_altitude.set_nil();
 
@@ -349,13 +341,7 @@ void
 AirDataComputer::compute_sound_speed()
 {
 	if (_static_air_temperature.valid())
-	{
-		Temperature sat = *_static_air_temperature;
-		xf::SoundSpeed ss;
-		ss.set_static_air_temperature (sat);
-		ss.update();
-		_speed_sound.write (ss.sound_speed());
-	}
+		_speed_sound = xf::compute_sound_speed (*_static_air_temperature);
 	else
 		_speed_sound.set_nil();
 }
@@ -369,13 +355,7 @@ AirDataComputer::compute_tas()
 		Speed ias = *_speed_ias;
 
 		if (_density_altitude.valid())
-		{
-			xf::TrueAirspeed calc;
-			calc.set_ias (*_speed_ias);
-			calc.set_density_altitude (*_density_altitude);
-			calc.compute_tas();
-			_speed_tas = calc.tas();
-		}
+			_speed_tas = xf::compute_true_airspeed (*_speed_ias, *_density_altitude);
 		else
 			// Very simple equation for TAS when DA is unavailable:
 			_speed_tas.write (ias + 0.02 * ias * (*_altitude_amsl / 1000_ft));

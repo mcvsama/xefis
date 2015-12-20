@@ -23,7 +23,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
-#include <xefis/hardware/i2c.h>
+#include <xefis/support/bus/i2c.h>
 #include <xefis/utility/smoother.h>
 
 
