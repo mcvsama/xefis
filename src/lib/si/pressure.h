@@ -36,15 +36,10 @@ class Pressure: public LinearValue<float, Pressure>
 	friend constexpr Pressure operator"" _psi (long double);
 	friend constexpr Pressure operator"" _psi (unsigned long long);
 
-  protected:
-	/**
-	 * Used by the _inhg, _hpa, _psi and similar suffix operators.
-	 * To create a Pressure use these operators directly.
-	 */
+  public:
 	explicit constexpr
 	Pressure (ValueType pa) noexcept;
 
-  public:
 	constexpr
 	Pressure() noexcept = default;
 

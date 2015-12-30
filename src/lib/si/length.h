@@ -38,11 +38,10 @@ class Length: public LinearValue<double, Length>
 	friend constexpr Length operator"" _mil (long double);
 	friend constexpr Length operator"" _mil (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Length (ValueType m) noexcept;
 
-  public:
 	constexpr
 	Length() noexcept = default;
 

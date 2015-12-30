@@ -33,14 +33,10 @@ class Temperature: public LinearValue<double, Temperature>
 	friend constexpr Temperature operator"" _Ra (long double);
 	friend constexpr Temperature operator"" _Ra (unsigned long long);
 
-  protected:
-	/**
-	 * Used by the suffix operators.
-	 */
+  public:
 	explicit constexpr
 	Temperature (ValueType kelvins) noexcept;
 
-  public:
 	constexpr
 	Temperature() noexcept = default;
 

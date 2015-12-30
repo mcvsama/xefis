@@ -32,11 +32,10 @@ class Acceleration: public LinearValue<double, Acceleration>
 	friend constexpr Acceleration operator"" _g (long double);
 	friend constexpr Acceleration operator"" _g (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Acceleration (ValueType mps2) noexcept;
 
-  public:
 	constexpr
 	Acceleration() noexcept = default;
 
