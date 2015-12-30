@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/range.h>
 
 
 namespace Xefis {
@@ -71,6 +72,26 @@ template<class Container, typename ConstIterator>
 	remove_constness (Container& container, ConstIterator iterator)
 	{
 		return container.erase (iterator, iterator);
+	}
+
+
+/**
+ * Find a range of iterators which fall inside range of [min, max] values.
+ * If no iterator matches inside [min, max] range, both result iterators
+ * are set to 'last'.
+ */
+template<class ForwardIt, class Value, class Compare>
+	inline std::pair<ForwardIt, ForwardIt>
+	find_range_exclusive (ForwardIt first, ForwardIt last, Range<Value> value_range, Compare compare)
+	{
+		auto a = std::upper_bound (first, last, value_range.min(), compare);
+
+		if (a == last)
+			return { last, last };
+
+		auto b = std::lower_bound (a, last, value_range.max(), compare);
+
+		return { a, b };
 	}
 
 } // namespace Xefis

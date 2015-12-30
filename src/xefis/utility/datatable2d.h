@@ -138,6 +138,18 @@ template<class pArgument, class pValue>
 		std::vector<Point>
 		arguments (Value const& value, Range<Argument> search_domain) const;
 
+		/**
+		 * Compute average value of all points.
+		 */
+		Value
+		average() const;
+
+		/**
+		 * Compute average value for given range of arguments.
+		 */
+		Value
+		average (Range<Argument> domain) const;
+
 	  private:
 		/**
 		 * Return interpolated value.
@@ -317,6 +329,80 @@ template<class A, class V>
 		}
 		else
 			return { };
+	}
+
+
+template<class A, class V>
+	inline typename Datatable2D<A, V>::Value
+	Datatable2D<A, V>::average() const
+	{
+		return average (domain());
+	}
+
+
+template<class A, class V>
+	inline typename Datatable2D<A, V>::Value
+	Datatable2D<A, V>::average (Range<Argument> search_domain) const
+	{
+		if (_data_map.size() > 1)
+		{
+			Range<std::pair<Argument, Value>> search_domain_2 {
+				std::make_pair (search_domain.min(), Value()),
+				std::make_pair (search_domain.max(), Value()),
+			};
+			auto it_range = find_range_exclusive (_data_map.begin(), _data_map.end(), search_domain_2,
+												  [](auto const& a, auto const& b) { return a.first < b.first; });
+
+			// If there's at least one iterator in range:
+			if (it_range.first != _data_map.end())
+			{
+				typedef decltype (std::declval<Argument>() / std::declval<Argument>()) WeightType;
+				Value total_avg = Value (0);
+				WeightType total_weight = 0;
+
+				auto update_average = [&total_avg, &total_weight](Argument arg_a, Argument arg_b, Value val_a, Value val_b)
+				{
+					Value avg_value = 0.5 * (val_a + val_b);
+					WeightType weight = (arg_b - arg_a) / Argument (1);
+
+					total_avg += avg_value * weight;
+					total_weight += weight;
+				};
+
+				// Compute average value from domain.min() to first iterator:
+				{
+					auto iterator = it_range.first;
+					update_average (search_domain.min(), iterator->first, extrapolated_value (search_domain.min()), iterator->second);
+				}
+
+				// Compute average values between iterators:
+				{
+					auto a = it_range.first;
+					auto b = a;
+					++b;
+
+					for (; b != it_range.second; ++a, ++b)
+						update_average (a->first, b->first, a->second, b->second);
+				}
+
+				// Compute average value from (last iterator - 1) to search_domain.max():
+				{
+					auto iterator = it_range.second;
+					--iterator;
+
+					update_average (iterator->first, search_domain.max(), iterator->second, extrapolated_value (search_domain.max()));
+				}
+
+				return total_avg / total_weight;
+			}
+			else
+			{
+				// Compute average between search_domain.min() and search_domain.max():
+				return 0.5 * (extrapolated_value (search_domain.min()) + extrapolated_value (search_domain.max()));
+			}
+		}
+		else
+			return _data_map.begin()->second;
 	}
 
 
