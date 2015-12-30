@@ -3,7 +3,7 @@
 <doc:module xmlns='http://www.w3.org/1999/xhtml' xmlns:doc='xefis-doc'>
 	<doc:meta>
 		<doc:title>EFIS - Electronic Flight Instrument System</doc:title>
-		<doc:name>instruments/efis</doc:name>
+		<doc:name>instruments/adi</doc:name>
 	</doc:meta>
 	<p>Speed, altitude, attitude indicators and more in one instrument.</p>
 	<doc:toc/>
@@ -14,11 +14,11 @@
 			<p>One of two styles can be selected using a <code>style.old</code> property. The <q>old</q> style
 			isn't as accurately made as the normal style, but still gives quite good feel of pre-787 EFIS.</p>
 			<figure>
-				<img src='images/modules.instruments.efis.png' height='473'/>
+				<img src='images/modules.instruments.adi.png' height='473'/>
 				<figcaption>Modern style: property <code>style.old</code> is <var>false</var></figcaption>
 			</figure>
 			<figure>
-				<img src='images/modules.instruments.efis.old-style.png' height='473'/>
+				<img src='images/modules.instruments.adi.old-style.png' height='473'/>
 				<figcaption>Old style: property <code>style.old</code> is <var>true</var></figcaption>
 			</figure>
 		</section>
@@ -98,7 +98,7 @@
 						</doc:item>
 						<doc:item name='speed.ias' type='speed'>
 							IAS for speed ladder.
-							If <var>nil</var> scale will disappear, but the ladder will be present.
+							If <var>nil</var>, scale will disappear, but the ladder will be present.
 						</doc:item>
 						<doc:item name='speed.ias.lookahead' type='speed'>
 							Estimated IAS in 10 seconds from now. Shown as green arrow on the speed ladder.
