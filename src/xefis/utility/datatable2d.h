@@ -278,7 +278,7 @@ template<class A, class V>
 	inline std::vector<typename Datatable2D<A, V>::Point>
 	Datatable2D<A, V>::arguments (Value const& value) const
 	{
-		return arguments (value, codomain());
+		return arguments (value, domain());
 	}
 
 
