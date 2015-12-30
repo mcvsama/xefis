@@ -30,11 +30,10 @@ class Density: public LinearValue<double, Density>
 	friend constexpr Density operator"" _kgpm3 (long double);
 	friend constexpr Density operator"" _kgpm3 (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Density (ValueType kgpm3) noexcept;
 
-  public:
 	constexpr
 	Density() noexcept = default;
 

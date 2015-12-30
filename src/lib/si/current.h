@@ -32,11 +32,10 @@ class Current: public LinearValue<double, Current>
 	friend constexpr Current operator"" _mA (long double);
 	friend constexpr Current operator"" _mA (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Current (ValueType A) noexcept;
 
-  public:
 	constexpr
 	Current() noexcept = default;
 

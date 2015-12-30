@@ -37,7 +37,7 @@ class Angle: public LinearValue<double, Angle>
 	friend constexpr Angle operator"" _deg (long double);
 	friend constexpr Angle operator"" _deg (unsigned long long);
 
-  protected:
+  public:
 	/**
 	 * Used by the _rad and _deg suffix operators.
 	 * To create an Angle use these operators directly.
@@ -45,7 +45,6 @@ class Angle: public LinearValue<double, Angle>
 	explicit constexpr
 	Angle (ValueType radians) noexcept;
 
-  public:
 	constexpr
 	Angle() noexcept = default;
 

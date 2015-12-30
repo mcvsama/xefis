@@ -35,15 +35,10 @@ class Torque: public LinearValue<double, Torque>
 	friend constexpr Torque operator"" _Nm (long double);
 	friend constexpr Torque operator"" _Nm (unsigned long long);
 
-  protected:
-	/**
-	 * Used by the suffix operators.
-	 * To create a Torque use those operators directly.
-	 */
+  public:
 	explicit constexpr
 	Torque (ValueType newton_meters) noexcept;
 
-  public:
 	constexpr
 	Torque() noexcept = default;
 

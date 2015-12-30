@@ -44,14 +44,10 @@ class Time: public LinearValue<double, Time>
 	friend constexpr Time operator"" _h (long double);
 	friend constexpr Time operator"" _h (unsigned long long);
 
-  protected:
-	/**
-	 * Used by the suffix operators.
-	 */
+  public:
 	explicit constexpr
 	Time (ValueType seconds) noexcept;
 
-  public:
 	constexpr
 	Time() noexcept = default;
 

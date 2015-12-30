@@ -30,11 +30,10 @@ class Area: public LinearValue<double, Area>
 	friend constexpr Area operator"" _m2 (long double);
 	friend constexpr Area operator"" _m2 (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Area (ValueType m2) noexcept;
 
-  public:
 	constexpr
 	Area() noexcept = default;
 

@@ -30,11 +30,10 @@ class Force: public LinearValue<double, Force>
 	friend constexpr Force operator"" _N (long double);
 	friend constexpr Force operator"" _N (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Force (ValueType N) noexcept;
 
-  public:
 	constexpr
 	Force() noexcept = default;
 

@@ -37,15 +37,10 @@ class Speed: public LinearValue<double, Speed>
 	friend constexpr Speed operator"" _mps (long double);
 	friend constexpr Speed operator"" _mps (unsigned long long);
 
-  protected:
-	/**
-	 * Used by the _rad and _deg suffix operators.
-	 * To create a Speed use these operators directly.
-	 */
+  public:
 	explicit constexpr
 	Speed (ValueType kt) noexcept;
 
-  public:
 	constexpr
 	Speed() noexcept = default;
 

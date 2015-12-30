@@ -34,11 +34,10 @@ class Weight: public LinearValue<double, Weight>
 	friend constexpr Weight operator"" _lb (long double);
 	friend constexpr Weight operator"" _lb (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Weight (ValueType kg) noexcept;
 
-  public:
 	constexpr
 	Weight() noexcept = default;
 

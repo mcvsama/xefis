@@ -34,11 +34,10 @@ class Capacity: public LinearValue<double, Capacity>
 	friend constexpr Capacity operator"" _mAh (long double);
 	friend constexpr Capacity operator"" _mAh (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Capacity (ValueType C) noexcept;
 
-  public:
 	constexpr
 	Capacity() noexcept = default;
 

@@ -30,11 +30,10 @@ class Volume: public LinearValue<double, Volume>
 	friend constexpr Volume operator"" _m3 (long double);
 	friend constexpr Volume operator"" _m3 (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Volume (ValueType m3) noexcept;
 
-  public:
 	constexpr
 	Volume() noexcept = default;
 

@@ -36,11 +36,10 @@ class Frequency: public LinearValue<double, Frequency>
 	friend constexpr Frequency operator"" _rpm (long double);
 	friend constexpr Frequency operator"" _rpm (unsigned long long);
 
-  protected:
+  public:
 	explicit constexpr
 	Frequency (ValueType Hz) noexcept;
 
-  public:
 	constexpr
 	Frequency() noexcept = default;
 
