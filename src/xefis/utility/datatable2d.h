@@ -204,7 +204,24 @@ template<class A, class V>
 	inline typename Datatable2D<A, V>::Value
 	Datatable2D<A, V>::extrapolated_value (Argument const& argument) const noexcept
 	{
-		return in_domain_value (argument);
+		if (_data_map.size() == 1)
+			return _data_map.begin()->second;
+		else if (argument < domain().min())
+		{
+			auto p0 = *_data_map.begin();
+			auto p1 = *(++_data_map.begin());
+
+			return xf::renormalize (argument, p0.first, p1.first, p0.second, p1.second);
+		}
+		else if (argument > domain().max())
+		{
+			auto p0 = *_data_map.rbegin();
+			auto p1 = *(++_data_map.rbegin());
+
+			return xf::renormalize (argument, p0.first, p1.first, p0.second, p1.second);
+		}
+		else
+			return in_domain_value (argument);
 	}
 
 
