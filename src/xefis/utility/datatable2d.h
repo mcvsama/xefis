@@ -170,7 +170,7 @@ template<class A, class V>
 	Datatable2D<A, V>::Datatable2D (DataMap const& map):
 		_data_map (map)
 	{
-		if (map.empty())
+		if (_data_map.empty())
 			throw EmptyDomainException();
 	}
 
@@ -180,7 +180,7 @@ template<class A, class V>
 	Datatable2D<A, V>::Datatable2D (DataMap&& map):
 		_data_map (std::move (map))
 	{
-		if (map.empty())
+		if (_data_map.empty())
 			throw EmptyDomainException();
 	}
 
