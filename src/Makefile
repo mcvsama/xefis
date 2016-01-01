@@ -232,7 +232,7 @@ release:
 	@echo Unimplemented
 
 doc:
-	@cd doc && doxygen doxygen.conf
+	@cd doc && doxygen doxygen-conf/doxygen.conf
 
 check:
 	cppcheck --force --std=c++14 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
