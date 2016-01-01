@@ -1081,6 +1081,7 @@ typedef Property<Area>			PropertyArea;
 typedef Property<Capacity>		PropertyCapacity;
 typedef Property<Current>		PropertyCurrent;
 typedef Property<Density>		PropertyDensity;
+typedef Property<Energy>		PropertyEnergy;
 typedef Property<Force>			PropertyForce;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
