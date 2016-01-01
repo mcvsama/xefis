@@ -117,8 +117,9 @@ class ADIWidget: public xf::InstrumentWidget
 		bool				vertical_speed_failure				= false;
 		bool				vertical_speed_visible				= false;
 		Speed				vertical_speed						= 0_fpm;
-		bool				variometer_visible					= false;
-		Speed				variometer_rate						= 0_fpm;
+		bool				energy_variometer_visible			= false;
+		Power				energy_variometer_rate				= 0_W;
+		Power				energy_variometer_1000_fpm_power	= 0_W;
 		// Pressure settings
 		bool				pressure_visible					= false;
 		Pressure			pressure_qnh						= 0_inHg;
@@ -372,6 +373,9 @@ class ADIWidget: public xf::InstrumentWidget
 
 		float
 		scale_vertical_speed (Speed vertical_speed, float max_value = 1.f) const;
+
+		float
+		scale_energy_variometer (Power power, float max_value = 1.f) const;
 
 		/*
 		 * Other
