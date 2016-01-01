@@ -124,6 +124,8 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Current;
 	else if (type_attr == "density")
 		_type = Type::Density;
+	else if (type_attr == "energy")
+		_type = Type::Energy;
 	else if (type_attr == "force")
 		_type = Type::Force;
 	else if (type_attr == "frequency")
@@ -160,6 +162,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Capacity:
 		case Type::Current:
 		case Type::Density:
+		case Type::Energy:
 		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
@@ -193,6 +196,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Capacity:
 			case Type::Current:
 			case Type::Density:
+			case Type::Energy:
 			case Type::Force:
 			case Type::Frequency:
 			case Type::Length:
@@ -224,6 +228,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	_property_capacity.set_path (path);
 	_property_current.set_path (path);
 	_property_density.set_path (path);
+	_property_energy.set_path (path);
 	_property_force.set_path (path);
 	_property_pressure.set_path (path);
 	_property_frequency.set_path (path);
@@ -283,6 +288,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Density, density);
+		XEFIS_CASE_FLOAT (Energy, energy);
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
@@ -348,6 +354,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Capacity:
 		case Type::Current:
 		case Type::Density:
+		case Type::Energy:
 		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
@@ -428,6 +435,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Capacity, capacity);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Density, density);
+		XEFIS_CASE_FLOAT (Energy, energy);
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
@@ -474,6 +482,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Capacity, capacity);
 			XEFIS_CASE_FLOAT (Current, current);
 			XEFIS_CASE_FLOAT (Density, density);
+			XEFIS_CASE_FLOAT (Energy, energy);
 			XEFIS_CASE_FLOAT (Force, force);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
 			XEFIS_CASE_FLOAT (Length, length);

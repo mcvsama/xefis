@@ -48,6 +48,8 @@ TypedProperty::create (PropertyPath const& path, PropertyType const& type)
 		PropertyCurrent (path).ensure_existence();
 	else if (type_str == "density")
 		PropertyDensity (path).ensure_existence();
+	else if (type_str == "energy")
+		PropertyEnergy (path).ensure_existence();
 	else if (type_str == "force")
 		PropertyForce (path).ensure_existence();
 	else if (type_str == "pressure")
