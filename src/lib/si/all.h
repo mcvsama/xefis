@@ -25,6 +25,7 @@
 #include "force.h"
 #include "frequency.h"
 #include "length.h"
+#include "power.h"
 #include "pressure.h"
 #include "speed.h"
 #include "time.h"

@@ -126,6 +126,7 @@ class Link:
 			Density,
 			Energy,
 			Force,
+			Power,
 			Pressure,
 			Frequency,
 			Length,
@@ -191,6 +192,7 @@ class Link:
 		xf::PropertyDensity			_property_density;
 		xf::PropertyEnergy			_property_energy;
 		xf::PropertyForce			_property_force;
+		xf::PropertyPower			_property_power;
 		xf::PropertyPressure		_property_pressure;
 		xf::PropertyFrequency		_property_frequency;
 		xf::PropertyLength			_property_length;
