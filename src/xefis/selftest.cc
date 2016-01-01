@@ -13,23 +13,9 @@
 
 // Standards:
 #include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-
-// System:
-#include <sys/types.h>
-#include <sys/unistd.h>
-#include <sys/fcntl.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <locale.h>
-#include <string.h>
-#include <errno.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/fail.h>
 
 
 int
