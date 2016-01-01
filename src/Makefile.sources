@@ -62,6 +62,13 @@ WATCHDOG_SOURCES += xefis/watchdog.cc
 
 WATCHDOG_MOCHDRS += xefis/core/services.h
 
+SELFTEST_HEADERS += $(SI_HEADERS)
+SELFTEST_HEADERS += xefis/utility/backtrace.h
+
+SELFTEST_SOURCES += $(SI_SOURCES)
+SELFTEST_SOURCES += xefis/utility/backtrace.cc
+SELFTEST_SOURCES += xefis/selftest.cc
+
 ######## /xefis/airframe ########
 
 XEFIS_HEADERS += xefis/airframe/airframe.h
@@ -252,7 +259,7 @@ XEFIS_SOURCES += xefis/utility/text_layout.cc
 XEFIS_SOURCES += xefis/utility/text_painter.cc
 XEFIS_SOURCES += xefis/utility/thread.cc
 
-XEFIS_TEST_SOURCES += xefis/utility/tests/datatable2d.test.cc
+SELFTEST_SOURCES += xefis/utility/tests/datatable2d.test.cc
 
 ######## /xefis/widgets ########
 
@@ -449,29 +456,33 @@ XEFIS_SOURCES += modules/private/state.cc
 
 ################
 
-XEFIS_SOURCES += $(XEFIS_TEST_SOURCES)
-
 XEFIS_OBJECTS += $(call mkobjs, $(XEFIS_SOURCES))
-XEFIS_MOCSRCS += $(call mkmocs, $(foreach file, $(XEFIS_MOCHDRS), $(file)))
+XEFIS_MOCSRCS += $(call mkmocs, $(XEFIS_MOCHDRS))
 XEFIS_MOCOBJS += $(call mkmocobjs, $(XEFIS_MOCSRCS))
 
 WATCHDOG_OBJECTS += $(call mkobjs, $(WATCHDOG_SOURCES))
-WATCHDOG_MOCSRCS += $(call mkmocs, $(foreach file, $(WATCHDOG_MOCHDRS), $(file)))
+WATCHDOG_MOCSRCS += $(call mkmocs, $(WATCHDOG_MOCHDRS))
 WATCHDOG_MOCOBJS += $(call mkmocobjs, $(WATCHDOG_MOCSRCS))
 
-HEADERS += $(XEFIS_HEADERS) $(WATCHDOG_HEADERS)
-SOURCES += $(XEFIS_SOURCES) $(WATCHDOG_SOURCES)
-MOCSRCS += $(XEFIS_MOCSRCS) $(WATCHDOG_MOCSRCS)
-MOCOBJS += $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS)
+SELFTEST_OBJECTS += $(call mkobjs, $(SELFTEST_SOURCES))
+SELFTEST_MOCSRCS += $(call mkmocs, $(SELFTEST_MOCHDRS))
+SELFTEST_MOCOBJS += $(call mkmocobjs, $(SELFTEST_MOCSRCS))
+
+HEADERS += $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
+SOURCES += $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
+MOCSRCS += $(XEFIS_MOCSRCS) $(WATCHDOG_MOCSRCS) $(SELFTEST_MOCSRCS)
+MOCOBJS += $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
 
 OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
 OBJECTS += $(call mkobjs, $(SOURCES))
 
 VERSION_FILE := xefis/config/version.cc
-TARGETS += $(distdir)/xefis $(distdir)/watchdog
-LINKEDS += $(distdir)/xefis $(distdir)/watchdog
+TARGETS += $(distdir)/xefis $(distdir)/watchdog $(distdir)/selftest
+LINKEDS += $(distdir)/xefis $(distdir)/watchdog $(distdir)/selftest
 
 $(distdir)/xefis: $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 
 $(distdir)/watchdog: $(WATCHDOG_OBJECTS) $(WATCHDOG_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
+
+$(distdir)/selftest: $(SELFTEST_OBJECTS) $(SELFTEST_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 
