@@ -200,6 +200,12 @@ XEFIS_SOURCES += xefis/support/nmea/parser.cc
 
 XEFIS_MOCHDRS += xefis/support/bus/serial_port.h
 
+######## /xefis/test ########
+
+XEFIS_HEADERS += xefis/test/stdexcept.h
+XEFIS_HEADERS += xefis/test/test.h
+XEFIS_HEADERS += xefis/test/test_asserts.h>
+
 ######## /xefis/utility ########
 
 XEFIS_HEADERS += xefis/utility/actions.h
@@ -245,6 +251,8 @@ XEFIS_SOURCES += xefis/utility/semaphore.cc
 XEFIS_SOURCES += xefis/utility/text_layout.cc
 XEFIS_SOURCES += xefis/utility/text_painter.cc
 XEFIS_SOURCES += xefis/utility/thread.cc
+
+XEFIS_TEST_SOURCES += xefis/utility/tests/datatable2d.test.cc
 
 ######## /xefis/widgets ########
 
@@ -440,6 +448,8 @@ XEFIS_HEADERS += modules/private/state.h
 XEFIS_SOURCES += modules/private/state.cc
 
 ################
+
+XEFIS_SOURCES += $(XEFIS_TEST_SOURCES)
 
 XEFIS_OBJECTS += $(call mkobjs, $(XEFIS_SOURCES))
 XEFIS_MOCSRCS += $(call mkmocs, $(foreach file, $(XEFIS_MOCHDRS), $(file)))
