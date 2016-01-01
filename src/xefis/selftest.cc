@@ -21,6 +21,8 @@
 int
 main (int, char**, char**)
 {
+	// All statically initialized tests are run before main().
+	// Nothing to do here, really.
 	return EXIT_SUCCESS;
 }
 
