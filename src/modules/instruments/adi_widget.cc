@@ -1628,10 +1628,10 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 	}
 
 	// Variometer:
-	if (_params.variometer_visible)
+	if (_params.energy_variometer_visible)
 	{
 		painter.setClipping (false);
-		float posy = -2.f * y * scale_vertical_speed (_params.variometer_rate);
+		float posy = -2.f * y * scale_energy_variometer (_params.energy_variometer_rate);
 		float x = pen_width (2.0);
 		painter.setPen (QPen (_navigation_color, pen_width (1.0)));
 		painter.setBrush (_navigation_color);
@@ -1870,6 +1870,14 @@ ADIWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_
 		vspd *= -1.f;
 
 	return vspd;
+}
+
+
+float
+ADIWidget::PaintWorkUnit::scale_energy_variometer (Power power, float max_value) const
+{
+	Speed equivalent_speed = power / _params.energy_variometer_1000_fpm_power * 1000_fpm;
+	return scale_vertical_speed (equivalent_speed, max_value);
 }
 
 

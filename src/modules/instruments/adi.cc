@@ -52,6 +52,7 @@ ADI::ADI (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "raising-runway.threshold", _raising_runway_threshold, false },
 		{ "aoa.visibility-threshold", _aoa_visibility_threshold, false },
 		{ "show-mach-above", _show_mach_above, false },
+		{ "energy-variometer.1000-fpm-power", _1000_fpm_power, false },
 	});
 
 	parse_properties (config, {
@@ -99,7 +100,7 @@ ADI::ADI (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "altitude.landing.amsl", _altitude_landing_amsl, false },
 		{ "vertical-speed.serviceable", _vertical_speed_serviceable, false },
 		{ "vertical-speed", _vertical_speed, false },
-		{ "vertical-speed.variometer", _vertical_speed_variometer, false },
+		{ "vertical-speed.energy-variometer", _vertical_speed_energy_variometer, false },
 		{ "pressure.qnh", _pressure_qnh, false },
 		{ "pressure.display-hpa", _pressure_display_hpa, false },
 		{ "pressure.use-std", _pressure_use_std, false },
@@ -283,8 +284,9 @@ ADI::read()
 	params.vertical_speed_failure = !_vertical_speed_serviceable.read (true);
 	params.vertical_speed_visible = _vertical_speed.valid();
 	params.vertical_speed = *_vertical_speed;
-	params.variometer_visible = _vertical_speed_variometer.valid();
-	params.variometer_rate = *_vertical_speed_variometer;
+	params.energy_variometer_visible = _vertical_speed_energy_variometer.valid();
+	params.energy_variometer_rate = *_vertical_speed_energy_variometer;
+	params.energy_variometer_1000_fpm_power = _1000_fpm_power;
 	// Pressure settings
 	params.pressure_visible = _pressure_qnh.valid();
 	params.pressure_qnh = *_pressure_qnh;

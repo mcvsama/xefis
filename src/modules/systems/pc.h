@@ -70,9 +70,8 @@ class PerformanceComputer: public xf::Module
 	compute_estimations();
 
   private:
-	Time						_total_energy_variometer_time		= 50_ms;
 	Speed						_total_energy_variometer_min_ias	= 0_kt;
-	double						_prev_total_energy					= 0.0;
+	Energy						_prev_total_energy					= 0_J;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<double>		_wind_direction_smoother			= 5_s;
@@ -102,7 +101,7 @@ class PerformanceComputer: public xf::Module
 	xf::PropertySpeed			_wind_tas;
 	xf::PropertyFloat			_glide_ratio;
 	xf::PropertyString			_glide_ratio_string;
-	xf::PropertySpeed			_total_energy_variometer;			// TODO change to Energy
+	xf::PropertyPower			_total_energy_variometer;
 	xf::PropertySpeed			_v_s;								// Current stall speed (depends on current bank angle)
 	xf::PropertySpeed			_v_s_0_deg;							// Stall speed with wings level
 	xf::PropertySpeed			_v_s_5_deg;							// Stall speed at 5° bank

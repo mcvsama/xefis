@@ -73,6 +73,7 @@ class ADI: public xf::Instrument
 	Length							_raising_runway_threshold		= 250_ft;
 	Angle							_aoa_visibility_threshold		= 17.5_deg;
 	double							_show_mach_above				= 0.4;
+	Power							_1000_fpm_power					= 1000_W;
 	// Speed
 	xf::PropertyBoolean				_speed_ias_serviceable;
 	xf::PropertySpeed				_speed_ias;
@@ -133,7 +134,7 @@ class ADI: public xf::Instrument
 	// Vertical speed
 	xf::PropertyBoolean				_vertical_speed_serviceable;
 	xf::PropertySpeed				_vertical_speed;
-	xf::PropertySpeed				_vertical_speed_variometer;
+	xf::PropertyPower				_vertical_speed_energy_variometer;
 	// Air pressure settings
 	xf::PropertyPressure			_pressure_qnh;
 	xf::PropertyBoolean				_pressure_display_hpa;

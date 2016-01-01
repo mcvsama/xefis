@@ -260,27 +260,28 @@ PerformanceComputer::compute_total_energy_variometer()
 		Time update_dt = _total_energy_variometer_computer.update_dt();
 
 		if (_altitude_amsl_std.valid() &&
+			_input_aircraft_weight.valid() &&
 			_speed_ias.valid())
 		{
-			double const m = 1.0; // Doesn't matter, it will be reduced anyway.
-			double const g = 9.81;
-			double const v = _speed_ias->mps();
-			double const Ep = m * g * _altitude_amsl_std->m();
-			double const Ek = m * v * v * 0.5;
-			double const total_energy = Ep + Ek;
+			Weight const m = *_input_aircraft_weight;
+			Acceleration const g = 9.81_mps2;
+			Speed const v = *_speed_ias;
+			Energy const Ep = m * g * *_altitude_amsl_std;
+			Energy const Ek = 1_J * m.si_units() * v.si_units() * v.si_units() * 0.5;
+			Energy const total_energy = Ep + Ek;
 
 			// If total energy was nil (invalid), reset _prev_total_energy
 			// value to the current _total_energy:
 			if (_total_energy_variometer.is_nil())
 				_prev_total_energy = total_energy;
 
-			double const energy_diff = total_energy - _prev_total_energy;
-			Speed tev = (1_m * energy_diff / (m * g)) / update_dt;
+			Energy const energy_diff = total_energy - _prev_total_energy;
+			Power tev = energy_diff / update_dt;
 
 			// If IAS not in valid range, continue computations but only set output to nil.
-			_total_energy_variometer_smoother.process (tev.fpm(), update_dt);
+			_total_energy_variometer_smoother.process (tev.W(), update_dt);
 			if (*_speed_ias > _total_energy_variometer_min_ias)
-				_total_energy_variometer.write (1_fpm * _total_energy_variometer_smoother.value());
+				_total_energy_variometer = 1_W * _total_energy_variometer_smoother.value();
 			else
 				_total_energy_variometer.set_nil();
 
