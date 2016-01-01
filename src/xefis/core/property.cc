@@ -52,6 +52,8 @@ TypedProperty::create (PropertyPath const& path, PropertyType const& type)
 		PropertyEnergy (path).ensure_existence();
 	else if (type_str == "force")
 		PropertyForce (path).ensure_existence();
+	else if (type_str == "power")
+		PropertyPower (path).ensure_existence();
 	else if (type_str == "pressure")
 		PropertyPressure (path).ensure_existence();
 	else if (type_str == "frequency")

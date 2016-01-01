@@ -132,6 +132,8 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Frequency;
 	else if (type_attr == "length")
 		_type = Type::Length;
+	else if (type_attr == "power")
+		_type = Type::Power;
 	else if (type_attr == "pressure")
 		_type = Type::Pressure;
 	else if (type_attr == "speed")
@@ -166,6 +168,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
+		case Type::Power:
 		case Type::Pressure:
 		case Type::Speed:
 		case Type::Temperature:
@@ -200,6 +203,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Force:
 			case Type::Frequency:
 			case Type::Length:
+			case Type::Power:
 			case Type::Pressure:
 			case Type::Speed:
 			case Type::Temperature:
@@ -230,6 +234,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	_property_density.set_path (path);
 	_property_energy.set_path (path);
 	_property_force.set_path (path);
+	_property_power.set_path (path);
 	_property_pressure.set_path (path);
 	_property_frequency.set_path (path);
 	_property_length.set_path (path);
@@ -292,6 +297,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
+		XEFIS_CASE_FLOAT (Power, power);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
@@ -358,6 +364,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Force:
 		case Type::Frequency:
 		case Type::Length:
+		case Type::Power:
 		case Type::Pressure:
 		case Type::Speed:
 		case Type::Temperature:
@@ -439,6 +446,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
 		XEFIS_CASE_FLOAT (Length, length);
+		XEFIS_CASE_FLOAT (Power, power);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
 		XEFIS_CASE_FLOAT (Speed, speed);
 		XEFIS_CASE_FLOAT (Temperature, temperature);
@@ -486,6 +494,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Force, force);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
 			XEFIS_CASE_FLOAT (Length, length);
+			XEFIS_CASE_FLOAT (Power, power);
 			XEFIS_CASE_FLOAT (Pressure, pressure);
 			XEFIS_CASE_FLOAT (Speed, speed);
 			XEFIS_CASE_FLOAT (Temperature, temperature);

@@ -1083,6 +1083,7 @@ typedef Property<Current>		PropertyCurrent;
 typedef Property<Density>		PropertyDensity;
 typedef Property<Energy>		PropertyEnergy;
 typedef Property<Force>			PropertyForce;
+typedef Property<Power>			PropertyPower;
 typedef Property<Pressure>		PropertyPressure;
 typedef Property<Frequency>		PropertyFrequency;
 typedef Property<Length>		PropertyLength;

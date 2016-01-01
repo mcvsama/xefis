@@ -131,6 +131,26 @@ operator/ (Force const& force, Area const& area)
 	return 1_Pa * (force.N() / area.m2());
 }
 
+
+inline constexpr Energy
+operator* (Force const& force, Length const& length)
+{
+	return 1_J * (force.N() * length.m());
+}
+
+
+inline constexpr Energy
+operator* (Length const& length, Force const& force)
+{
+	return force * length;
+}
+
+
+inline constexpr Power
+operator/ (Energy const& energy, Time const& time)
+{
+	return 1_W * (energy.J() / time.s());
+}
 } // namespace SI
 
 #endif
