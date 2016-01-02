@@ -35,6 +35,12 @@ class Lift
 	Lift (QDomElement const& config);
 
 	/**
+	 * Get range of AOA for which lift is defined.
+	 */
+	Range<Angle>
+	get_aoa_range() const noexcept;
+
+	/**
 	 * Return lift coefficient (C_L) for given angle of attack.
 	 *
 	 * Uses linear interpolation.
@@ -65,6 +71,13 @@ class Lift
 	LiftCoefficient								_max_cl;
 	Angle										_critical_aoa;
 };
+
+
+inline Range<Angle>
+Lift::get_aoa_range() const noexcept
+{
+	return _aoa_to_cl->domain();
+}
 
 } // namespace Xefis
 

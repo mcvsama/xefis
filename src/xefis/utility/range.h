@@ -74,20 +74,27 @@ template<class tValueType>
 		 * Swap minimum and maximum values.
 		 */
 		void
-		flip();
+		flip() noexcept;
 
 		/**
 		 * Return a copy with swapped minimum and maximum values.
 		 */
 		constexpr Range
-		flipped() const;
+		flipped() const noexcept;
 
 		/**
 		 * Return true if given value fits inside range,
 		 * inclusively.
 		 */
 		constexpr bool
-		includes (ValueType) const;
+		includes (ValueType) const noexcept;
+
+		/**
+		 * Creates a new range with minimum value lesser of the two (this and other) and
+		 * maximum value which is greater of the two.
+		 */
+		constexpr Range
+		extended (Range other) const;
 
 	  private:
 		ValueType	_min	= ValueType();
@@ -165,7 +172,7 @@ template<class T>
 
 template<class T>
 	void
-	Range<T>::flip()
+	Range<T>::flip() noexcept
 	{
 		std::swap (_min, _max);
 	}
@@ -173,7 +180,7 @@ template<class T>
 
 template<class T>
 	constexpr Range<T>
-	Range<T>::flipped() const
+	Range<T>::flipped() const noexcept
 	{
 		return Range { _max, _min };
 	}
@@ -181,9 +188,17 @@ template<class T>
 
 template<class T>
 	constexpr bool
-	Range<T>::includes (ValueType value) const
+	Range<T>::includes (ValueType value) const noexcept
 	{
 		return (_min <= value && value <= _max) || (_max <= value && value <= _min);
+	}
+
+
+template<class T>
+	constexpr Range<T>
+	Range<T>::extended (Range<T> other) const
+	{
+		return { std::min (min(), other.min()), std::max (max(), other.max()) };
 	}
 
 } // namespace Xefis
