@@ -56,6 +56,7 @@ Airframe::Airframe (Application*, QDomElement const& config)
 
 			ConfigReader::SettingsParser settings_parser ({
 				{ "wings-area", _wings_area, true },
+				{ "wings-chord", _wings_chord, true },
 				{ "max-negative-load-factor", min_g, true },
 				{ "max-positive-load-factor", max_g, true },
 				{ "safe-aoa-correction", _safe_aoa_correction, true },
