@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/window.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/qdom.h>
@@ -45,6 +46,17 @@ Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):
 		else if (e == "font-size")
 			_font_size = e.text().toDouble();
 	}
+}
+
+
+void
+Label::resizeEvent (QResizeEvent*)
+{
+	auto xw = dynamic_cast<xf::Window*> (window());
+	if (xw)
+		set_scaling (xw->pen_scale(), xw->font_scale());
+
+	InstrumentAids::update_sizes (size(), window()->size());
 }
 
 

@@ -131,8 +131,8 @@ Datatable::paintEvent (QPaintEvent*)
 
 	QFont label_font = _font_10;
 	QFont value_font = _font_10;
-	label_font.setPixelSize (_label_font_size);
-	value_font.setPixelSize (_value_font_size);
+	label_font.setPixelSize (_label_font_size * _master_font_scale);
+	value_font.setPixelSize (_value_font_size * _master_font_scale);
 
 	double line_height = std::max (QFontMetricsF (label_font).height(), QFontMetricsF (value_font).height());
 	double empty_height = height() - line_height * _list.size();

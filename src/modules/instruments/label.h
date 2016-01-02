@@ -38,6 +38,9 @@ class Label:
 
   protected:
 	void
+	resizeEvent (QResizeEvent*) override;
+
+	void
 	paintEvent (QPaintEvent*) override;
 
   private:
