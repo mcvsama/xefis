@@ -13,6 +13,8 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
+#include <map>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -20,6 +22,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
+#include <xefis/core/module_manager.h>
+#include <xefis/airframe/airframe.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/convergence.h>
 #include <xefis/support/air/air.h>
@@ -36,6 +40,36 @@ AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement
 {
 	_altitude_amsl_estimator.set_minimum_integration_time (0.2_s);
 	_speed_ias_estimator.set_minimum_integration_time (0.2_s);
+
+	// Map of temperature <-> dynamic viscosity taken from
+	// <http://www.engineeringtoolbox.com/air-absolute-kinematic-viscosity-d_601.html>
+	std::map<Temperature, double> const temperature_to_dynamic_viscosity_map {
+		{ Temperature::from_degF ( -40), 157.591e-7 },
+		{ Temperature::from_degF ( -20), 159.986e-7 },
+		{ Temperature::from_degF (   0), 157.591e-7 },
+		{ Temperature::from_degF (  10), 164.776e-7 },
+		{ Temperature::from_degF (  20), 167.650e-7 },
+		{ Temperature::from_degF (  30), 171.482e-7 },
+		{ Temperature::from_degF (  40), 172.440e-7 },
+		{ Temperature::from_degF (  50), 176.272e-7 },
+		{ Temperature::from_degF (  60), 179.625e-7 },
+		{ Temperature::from_degF (  70), 182.978e-7 },
+		{ Temperature::from_degF (  80), 184.894e-7 },
+		{ Temperature::from_degF (  90), 186.810e-7 },
+		{ Temperature::from_degF ( 100), 188.726e-7 },
+		{ Temperature::from_degF ( 120), 192.558e-7 },
+		{ Temperature::from_degF ( 140), 197.827e-7 },
+		{ Temperature::from_degF ( 160), 202.138e-7 },
+		{ Temperature::from_degF ( 180), 207.886e-7 },
+		{ Temperature::from_degF ( 200), 215.071e-7 },
+		{ Temperature::from_degF ( 300), 238.063e-7 },
+		{ Temperature::from_degF ( 400), 250.996e-7 },
+		{ Temperature::from_degF ( 500), 277.820e-7 },
+		{ Temperature::from_degF ( 750), 326.199e-7 },
+		{ Temperature::from_degF (1000), 376.015e-7 },
+		{ Temperature::from_degF (1500), 455.050e-7 },
+	};
+	_temperature_to_dynamic_viscosity = std::make_unique<xf::Datatable2D<Temperature, double>> (std::move (temperature_to_dynamic_viscosity_map));
 
 	parse_settings (config, {
 		{ "ias.valid-minimum", _ias_valid_minimum, true },
@@ -71,6 +105,8 @@ AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement
 		{ "vertical-speed.serviceable", _vertical_speed_serviceable, true },
 		{ "vertical-speed", _vertical_speed, true },
 		{ "air-temperature.static", _static_air_temperature, true },
+		{ "dynamic-viscosity", _dynamic_viscosity, true },
+		{ "reynolds-number", _reynolds_number, true },
 	});
 
 	_altitude_computer.set_minimum_dt (5_ms);
@@ -113,7 +149,7 @@ AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement
 		&_pressure_total,
 	});
 
-	_sat_computer.set_callback (std::bind (&AirDataComputer::compute_sat, this));
+	_sat_computer.set_callback (std::bind (&AirDataComputer::compute_sat_and_viscosity, this));
 	_sat_computer.observe ({
 		&_mach_computer,
 		&_total_air_temperature,
@@ -145,6 +181,14 @@ AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement
 	_vertical_speed_computer.observe ({
 		&_altitude_amsl_std,
 		&_altitude_amsl_serviceable,
+	});
+
+	_reynolds_computer.set_minimum_dt (1_s);
+	_reynolds_computer.set_callback (std::bind (&AirDataComputer::compute_reynolds, this));
+	_reynolds_computer.observe ({
+		&_speed_tas,
+		&_air_density_static,
+		&_dynamic_viscosity,
 	});
 }
 
@@ -411,16 +455,23 @@ AirDataComputer::compute_mach()
 
 
 void
-AirDataComputer::compute_sat()
+AirDataComputer::compute_sat_and_viscosity()
 {
 	// SAT = TAT * (1 + 0.2 * M^2)
 	if (_total_air_temperature.valid() && _speed_mach.valid())
 	{
 		double mach = *_speed_mach;
-		_static_air_temperature.write (*_total_air_temperature / (1.0 + 0.2 * mach * mach));
+		Temperature sat = *_total_air_temperature / (1.0 + 0.2 * mach * mach);
+
+		_static_air_temperature = sat;
+		// Unit is Poiseuville (Pascal * second):
+		_dynamic_viscosity = _temperature_to_dynamic_viscosity->extrapolated_value (sat);
 	}
 	else
+	{
 		_static_air_temperature.set_nil();
+		_dynamic_viscosity.set_nil();
+	}
 }
 
 
@@ -449,5 +500,23 @@ AirDataComputer::compute_vertical_speed()
 	}
 
 	_vertical_speed_serviceable.copy_from (_altitude_amsl_serviceable);
+}
+
+
+void
+AirDataComputer::compute_reynolds()
+{
+	xf::Airframe* airframe = module_manager()->application()->airframe();
+
+	if (airframe &&
+		_speed_tas.valid() &&
+		_air_density_static.valid() &&
+		_dynamic_viscosity.valid())
+	{
+		Length const travelled_length = airframe->wings_chord();
+		_reynolds_number = _air_density_static->si_units() * _speed_tas->si_units() * travelled_length.si_units() / *_dynamic_viscosity;
+	}
+	else
+		_reynolds_number.set_nil();
 }
 

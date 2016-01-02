@@ -67,6 +67,12 @@ class Airframe
 	wings_area() const;
 
 	/**
+	 * Return chord length of the airfoil.
+	 */
+	Length
+	wings_chord() const;
+
+	/**
 	 * Return AOA correction to apply to critical angle of attack.
 	 * This + critical AOA gives the maximum safe AOA to fly at, where controls
 	 * are retained.
@@ -127,6 +133,7 @@ class Airframe
 	Unique<Drag>		_drag;
 	Range<Angle>		_defined_aoa_range;
 	Area				_wings_area;
+	Length				_wings_chord;
 	Range<double>		_load_factor_limits;
 	Angle				_safe_aoa_correction;
 };
@@ -179,6 +186,13 @@ inline Area
 Airframe::wings_area() const
 {
 	return _wings_area;
+}
+
+
+inline Length
+Airframe::wings_chord() const
+{
+	return _wings_chord;
 }
 
 

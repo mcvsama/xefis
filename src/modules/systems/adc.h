@@ -25,6 +25,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
+#include <xefis/utility/datatable2d.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/lookahead.h>
 
@@ -56,7 +57,7 @@ class AirDataComputer: public xf::Module
 	compute_mach();
 
 	void
-	compute_sat();
+	compute_sat_and_viscosity();
 
 	void
 	compute_density_altitude();
@@ -70,11 +71,16 @@ class AirDataComputer: public xf::Module
 	void
 	compute_vertical_speed();
 
+	void
+	compute_reynolds();
+
   private:
 	bool					_ias_in_valid_range					= false;
 	bool					_prev_use_standard_pressure			= false;
 	Time					_hide_alt_lookahead_until			= 0_s;
 	Length					_prev_altitude_amsl					= 0_ft;
+	Unique<xf::Datatable2D<Temperature, double>>
+							_temperature_to_dynamic_viscosity;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<double>	_vertical_speed_smoother			= 1_s;
@@ -119,6 +125,8 @@ class AirDataComputer: public xf::Module
 	xf::PropertyBoolean		_vertical_speed_serviceable;
 	xf::PropertySpeed		_vertical_speed;
 	xf::PropertyTemperature	_static_air_temperature;
+	xf::PropertyFloat		_dynamic_viscosity;
+	xf::PropertyFloat		_reynolds_number;
 	// Other:
 	xf::PropertyObserver	_altitude_computer;
 	xf::PropertyObserver	_density_altitude_computer;
@@ -129,6 +137,7 @@ class AirDataComputer: public xf::Module
 	xf::PropertyObserver	_mach_computer;
 	xf::PropertyObserver	_sat_computer;
 	xf::PropertyObserver	_vertical_speed_computer;
+	xf::PropertyObserver	_reynolds_computer;
 };
 
 #endif
