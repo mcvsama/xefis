@@ -64,6 +64,8 @@ Airframe::Airframe (Application*, QDomElement const& config)
 
 			_load_factor_limits = { min_g, max_g };
 		}
+
+		_defined_aoa_range = lift().get_aoa_range().extended (drag().get_aoa_range());
 	}
 }
 
@@ -73,6 +75,14 @@ Airframe::get_cl (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle
 {
 	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle.value()) + spoilers().get_aoa_correction (spoilers_angle.value());
 	return LiftCoefficient (lift().get_cl (total_aoa));
+}
+
+
+DragCoefficient
+Airframe::get_cd (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
+{
+	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle.value()) + spoilers().get_aoa_correction (spoilers_angle.value());
+	return DragCoefficient (drag().get_cd (total_aoa));
 }
 
 

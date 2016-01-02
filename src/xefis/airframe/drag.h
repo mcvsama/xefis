@@ -35,6 +35,12 @@ class Drag
 	Drag (QDomElement const& config);
 
 	/**
+	 * Get range of AOA for which lift is defined.
+	 */
+	Range<Angle>
+	get_aoa_range() const noexcept;
+
+	/**
 	 * Return drag coefficient (C_D) for given angle of attack.
 	 *
 	 * Uses linear interpolation.
@@ -45,6 +51,13 @@ class Drag
   private:
 	Unique<Datatable2D<Angle, DragCoefficient>>	_aoa_to_cd;
 };
+
+
+inline Range<Angle>
+Drag::get_aoa_range() const noexcept
+{
+	return _aoa_to_cd->domain();
+}
 
 } // namespace Xefis
 

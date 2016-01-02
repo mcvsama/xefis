@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <limits>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -39,6 +40,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/pc", PerformanceComputer);
 PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
+	_airframe = module_manager->application()->airframe();
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
 
 	parse_settings (config, {
@@ -299,8 +301,6 @@ PerformanceComputer::compute_total_energy_variometer()
 void
 PerformanceComputer::compute_speeds()
 {
-	xf::Airframe* airframe = module_manager()->application()->airframe();
-
 	// Vs for load factors equivalent of banking 0_deg, 5_deg and 30_deg.
 	_v_s_0_deg = get_stall_ias (0_deg);
 	_v_s_5_deg = get_stall_ias (5_deg);
@@ -315,9 +315,9 @@ PerformanceComputer::compute_speeds()
 		_v_r.set_nil();
 
 	// V_a; since the formula is almost identical as for V_s, use V_s_0_deg:
-	if (airframe && _v_s_0_deg.valid())
+	if (_airframe && _v_s_0_deg.valid())
 	{
-		xf::Range<double> lf_limits = airframe->load_factor_limits();
+		xf::Range<double> lf_limits = _airframe->load_factor_limits();
 		double max_lf = std::min (lf_limits.max(), -lf_limits.min());
 		_v_a = std::sqrt (max_lf) * *_v_s_0_deg;
 	}
@@ -330,9 +330,10 @@ PerformanceComputer::compute_speeds()
 	else
 		_v_approach.set_nil();
 
+	// Rest:
+	compute_speeds_vbg();
+
 	// V_1
-	// TODO
-	// V_bg (best glide)
 	// TODO
 	// V_br (best range powered)
 	// TODO
@@ -347,6 +348,56 @@ PerformanceComputer::compute_speeds()
 }
 
 
+inline void
+PerformanceComputer::compute_speeds_vbg()
+{
+	// V-bg - "best glide" - speed for best unpowered range.
+	//
+	// Find AOA and IAS for which lift/drag is at maximum
+	// (equivalent to C_L/C_D).
+
+	if (_airframe &&
+		_input_flaps_angle.valid() &&
+		_input_spoilers_angle.valid())
+	{
+		xf::FlapsAngle flaps_angle (*_input_flaps_angle);
+		xf::SpoilersAngle spoilers_angle (*_input_spoilers_angle);
+
+		xf::Range<Angle> aoa_range = _airframe->get_defined_aoa_range();
+
+		Optional<Angle> v_bg_aoa;
+		double v_bg_ratio = std::numeric_limits<double>::max();
+
+		for (Angle aoa = aoa_range.min(); aoa < aoa_range.max(); aoa += 0.25_deg)
+		{
+			double cl = _airframe->get_cl (aoa, flaps_angle, spoilers_angle);
+			double cd = _airframe->get_cd (aoa, flaps_angle, spoilers_angle);
+			double new_ratio = cl / cd;
+
+			if (new_ratio < v_bg_ratio)
+			{
+				v_bg_ratio = new_ratio;
+				v_bg_aoa = aoa;
+			}
+		}
+
+		if (v_bg_aoa)
+		{
+			auto tas = aoa_to_tas_now (*v_bg_aoa);
+
+			if (tas)
+				_v_bg = tas_to_ias (*tas);
+			else
+				_v_bg.set_nil();
+		}
+		else
+			_v_bg.set_nil();
+	}
+	else
+		_v_bg.set_nil();
+}
+
+
 Optional<Speed>
 PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 {
@@ -355,25 +406,17 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 	// Formula:
 	//   V_s = sqrt((load_factor * weight) / (0.5 * air_density * wings_area * C_L_max)).
 
-	xf::Airframe* airframe = module_manager()->application()->airframe();
-	if (airframe)
+	if (_airframe)
 	{
-		if (_input_aircraft_weight.valid() && _input_air_density_static.valid())
-		{
-			xf::Lift const& lift = airframe->lift();
-			Area wings_area = airframe->wings_area();
-			Angle max_safe_aoa = lift.critical_aoa() + airframe->safe_aoa_correction();
-			xf::FlapsAngle flaps_angle (_input_flaps_angle.read (0_deg));
-			xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
-			xf::LiftCoefficient cl = airframe->get_cl (max_safe_aoa, flaps_angle, spoilers_angle);
+		xf::FlapsAngle flaps_angle (_input_flaps_angle.read (0_deg));
+		xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
+		Angle max_safe_aoa = _airframe->get_max_safe_aoa (flaps_angle, spoilers_angle);
+		Acceleration load = 1_g / cos (max_bank_angle);
 
-			Acceleration load = 1.0_g / cos (max_bank_angle);
-			// Note: stick to SI units:
-			Speed tas = Speed::from_si_units (std::sqrt (load.si_units() * _input_aircraft_weight->si_units()
-														 / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl)));
+		auto tas = aoa_to_tas_now (max_safe_aoa, load);
 
-			return tas_to_ias (tas);
-		}
+		if (tas)
+			return tas_to_ias (*tas);
 		else
 			return {};
 	}
@@ -395,13 +438,12 @@ PerformanceComputer::tas_to_ias (Speed const& tas) const
 void
 PerformanceComputer::compute_critical_aoa()
 {
-	xf::Airframe* airframe = module_manager()->application()->airframe();
-	if (airframe)
+	if (_airframe)
 	{
 		xf::FlapsAngle flaps_angle (_input_flaps_angle.read (0_deg));
 		xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
 
-		_critical_aoa = airframe->get_critical_aoa (flaps_angle, spoilers_angle);
+		_critical_aoa = _airframe->get_critical_aoa (flaps_angle, spoilers_angle);
 
 		if (_stall.configured())
 		{
@@ -428,9 +470,8 @@ PerformanceComputer::compute_C_L()
 	//   load is down acceleration (in airplane frame of reference).
 
 	Time update_dt = _cl_computer.update_dt();
-	xf::Airframe* airframe = module_manager()->application()->airframe();
 
-	if (airframe &&
+	if (_airframe &&
 		_input_load.valid() &&
 		_input_aircraft_weight.valid() &&
 		_input_air_density_static.valid() &&
@@ -438,7 +479,7 @@ PerformanceComputer::compute_C_L()
 	{
 		Force lift = *_input_load * *_input_aircraft_weight;
 		Speed tas = *_speed_tas;
-		Area wings_area = airframe->wings_area();
+		Area wings_area = _airframe->wings_area();
 		xf::LiftCoefficient cl (lift.si_units() / (0.5 * _input_air_density_static->si_units() * tas.si_units() * tas.si_units() * wings_area.si_units()));
 		_cl_smoother.process (cl, update_dt);
 		_lift_coefficient = _cl_smoother.value();
@@ -464,22 +505,20 @@ PerformanceComputer::compute_C_D()
 void
 PerformanceComputer::compute_estimations()
 {
-	xf::Airframe* airframe = module_manager()->application()->airframe();
-
-	if (airframe &&
+	if (_airframe &&
 		_input_load.valid() &&
 		_input_aircraft_weight.valid() &&
 		_input_air_density_static.valid())
 	{
 		Force lift_force = *_input_load * *_input_aircraft_weight;
-		Area wings_area = airframe->wings_area();
+		Area wings_area = _airframe->wings_area();
 		xf::FlapsAngle flaps_angle (_input_flaps_angle.read (0_deg));
 		xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
 
 		// Estimate IAS:
 		if (_input_aoa_alpha.valid())
 		{
-			xf::LiftCoefficient cl = airframe->get_cl (*_input_aoa_alpha, flaps_angle, spoilers_angle);
+			xf::LiftCoefficient cl = _airframe->get_cl (*_input_aoa_alpha, flaps_angle, spoilers_angle);
 			double si_tas = std::sqrt (lift_force.N() / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl));
 			Speed tas = Speed::from_si_units (si_tas);
 			_estimated_ias = tas_to_ias (tas);
@@ -492,7 +531,7 @@ PerformanceComputer::compute_estimations()
 		{
 			Speed tas = *_speed_tas;
 			xf::LiftCoefficient cl (lift_force.N() / (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * tas.si_units() * tas.si_units()));
-			_estimated_aoa = airframe->get_aoa_in_normal_regime (cl, flaps_angle, spoilers_angle);
+			_estimated_aoa = _airframe->get_aoa_in_normal_regime (cl, flaps_angle, spoilers_angle);
 		}
 		else
 			_estimated_aoa.set_nil();
@@ -513,5 +552,30 @@ PerformanceComputer::compute_estimations()
 		_estimated_ias.set_nil();
 		_estimated_aoa.set_nil();
 	}
+}
+
+
+inline Optional<Speed>
+PerformanceComputer::aoa_to_tas_now (Angle const& aoa, Optional<Acceleration> const& load) const
+{
+	if (_airframe &&
+		_input_load.valid() &&
+		_input_aircraft_weight.valid() &&
+		_input_air_density_static.valid() &&
+		_input_flaps_angle.valid() &&
+		_input_spoilers_angle.valid())
+	{
+		Area wings_area = _airframe->wings_area();
+		xf::FlapsAngle flaps_angle (*_input_flaps_angle);
+		xf::SpoilersAngle spoilers_angle (*_input_spoilers_angle);
+		xf::LiftCoefficient cl = _airframe->get_cl (aoa, flaps_angle, spoilers_angle);
+		Acceleration xload = load ? *load : *_input_load;
+		Force lift = xload * *_input_aircraft_weight;
+		// Result is TAS:
+		return Speed::from_si_units (std::sqrt (lift.si_units()
+												/ (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl)));
+	}
+	else
+		return {};
 }
 

@@ -51,6 +51,9 @@ class PerformanceComputer: public xf::Module
 	void
 	compute_speeds();
 
+	void
+	compute_speeds_vbg();
+
 	Optional<Speed>
 	get_stall_ias (Angle const& max_bank_angle) const;
 
@@ -69,9 +72,20 @@ class PerformanceComputer: public xf::Module
 	void
 	compute_estimations();
 
+	/**
+	 * Convert AOA to IAS for current environment and configuration.
+	 * Automatically includes flaps/spoilers angle, so parameter @aoa
+	 * should only be wings AOA.
+	 *
+	 * May return empty result if it's not possible to compute TAS.
+	 */
+	Optional<Speed>
+	aoa_to_tas_now (Angle const& aoa, Optional<Acceleration> const& load = {}) const;
+
   private:
 	Speed						_total_energy_variometer_min_ias	= 0_kt;
 	Energy						_prev_total_energy					= 0_J;
+	xf::Airframe*				_airframe;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<double>		_wind_direction_smoother			= 5_s;

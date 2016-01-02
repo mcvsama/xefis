@@ -55,6 +55,12 @@ class Airframe
 	drag() const;
 
 	/**
+	 * Return range of useful AOA, for which computations make sense.
+	 */
+	Range<Angle> const&
+	get_defined_aoa_range() const noexcept;
+
+	/**
 	 * Return total wings area.
 	 */
 	Area
@@ -62,20 +68,29 @@ class Airframe
 
 	/**
 	 * Return AOA correction to apply to critical angle of attack.
-	 * The result is the maximum safe AOA to fly at, where controls
+	 * This + critical AOA gives the maximum safe AOA to fly at, where controls
 	 * are retained.
 	 */
 	Angle
 	safe_aoa_correction() const;
 
 	/**
-	 * Return total C_L, including corrections for flaps and spoilers.
+	 * Return C_L, including corrections for flaps and spoilers.
 	 *
 	 * \param aoa
 	 *        Angle of attack as detected by AOA sensor.
 	 */
 	LiftCoefficient
 	get_cl (Angle const& aoa, FlapsAngle const&, SpoilersAngle const&) const;
+
+	/**
+	 * Return C_D, including corrections for flaps and spoilers.
+	 *
+	 * \param aoa
+	 *        Angle of attack as detected by AOA sensor.
+	 */
+	DragCoefficient
+	get_cd (Angle const& aoa, FlapsAngle const&, SpoilersAngle const&) const;
 
 	/**
 	 * Return AOA for given C_L, corrected for flaps and spoilers.
@@ -110,6 +125,7 @@ class Airframe
 	Unique<Spoilers>	_spoilers;
 	Unique<Lift>		_lift;
 	Unique<Drag>		_drag;
+	Range<Angle>		_defined_aoa_range;
 	Area				_wings_area;
 	Range<double>		_load_factor_limits;
 	Angle				_safe_aoa_correction;
@@ -149,6 +165,13 @@ Airframe::drag() const
 	if (!_drag)
 		throw BadConfiguration ("drag submodule not configured");
 	return *_drag;
+}
+
+
+inline Range<Angle> const&
+Airframe::get_defined_aoa_range() const noexcept
+{
+	return _defined_aoa_range;
 }
 
 
