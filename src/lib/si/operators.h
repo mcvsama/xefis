@@ -151,6 +151,21 @@ operator/ (Energy const& energy, Time const& time)
 {
 	return 1_W * (energy.J() / time.s());
 }
+
+
+inline constexpr Power
+operator* (Force const& force, Speed const& speed)
+{
+	return 1_W * (force.N() * speed.mps());
+}
+
+
+inline constexpr Power
+operator* (Speed const& speed, Force const& force)
+{
+	return force * speed;
+}
+
 } // namespace SI
 
 #endif
