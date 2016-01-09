@@ -36,11 +36,108 @@ XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput);
 constexpr size_t JoystickInput::kMaxID;
 
 
+JoystickInput::Button::Button (QDomElement const& button_element)
+{
+	for (QDomElement& v: button_element)
+	{
+		if (v == "path")
+			_user_defined_property.set_path (xf::PropertyPath (v.text()));
+	}
+}
+
+
+void
+JoystickInput::Button::handle (EventType event_type, HandlerID, int32_t value)
+{
+	if (event_type == EventType::ButtonEvent)
+		set_value (value);
+}
+
+
+void
+JoystickInput::Button::reset()
+{
+	_user_defined_property.set_nil();
+}
+
+
 inline void
 JoystickInput::Button::set_value (float value)
 {
-	if (user_defined_property.configured())
-		user_defined_property = value;
+	if (_user_defined_property.configured())
+		_user_defined_property = value;
+}
+
+
+JoystickInput::Axis::Axis (QDomElement const& axis_element):
+	Axis (axis_element, { }, { })
+{ }
+
+
+JoystickInput::Axis::Axis (QDomElement const& axis_element, Optional<HandlerID> up_button_id, Optional<HandlerID> down_button_id):
+	_up_button_id (up_button_id),
+	_down_button_id (down_button_id)
+{
+	for (QDomElement& v: axis_element)
+	{
+		if (v == "path")
+			_user_defined_property.set_path (xf::PropertyPath (v.text()));
+		else if (v == "center")
+			_center = v.text().toFloat();
+		else if (v == "dead-zone")
+			_dead_zone = v.text().toFloat();
+		else if (v == "reverse")
+			_reverse = -1.f;
+		else if (v == "scale")
+			_scale = v.text().toFloat();
+		else if (v == "power")
+			_power = v.text().toFloat();
+		else if (v == "output")
+		{
+			for (QDomElement& w: v)
+			{
+				if (w == "minimum")
+					_output_minimum = w.text().toFloat();
+				else if (w == "maximum")
+					_output_maximum = w.text().toFloat();
+			}
+		}
+		else
+			throw xf::BadDomElement (v);
+	}
+}
+
+
+void
+JoystickInput::Axis::handle (EventType event_type, HandlerID handler_id, int32_t value)
+{
+	switch (event_type)
+	{
+		case EventType::AxisEvent:
+			if (!_up_button_id && !_down_button_id)
+				set_value (value / 32767.0);
+			break;
+
+		case EventType::ButtonEvent:
+			if (_up_button_id && _down_button_id)
+			{
+				if (handler_id == *_up_button_id)
+					set_value (value > 0);
+				else if (handler_id == *_down_button_id)
+					set_value (-(value > 0));
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
+
+void
+JoystickInput::Axis::reset()
+{
+	_user_defined_property.set_nil();
 }
 
 
@@ -48,23 +145,23 @@ inline void
 JoystickInput::Axis::set_value (float value)
 {
 	// Center:
-	value -= center;
+	value -= _center;
 	// Remove dead zone:
-	if (std::abs (value) < dead_zone)
+	if (std::abs (value) < _dead_zone)
 		value = 0.f;
 	else
-		value = value - xf::sgn (value) * dead_zone;
+		value = value - xf::sgn (value) * _dead_zone;
 	// Reverse:
-	value *= reverse;
+	value *= _reverse;
 	// Scale:
-	value *= scale;
+	value *= _scale;
 	// Power:
-	value = xf::sgn (value) * std::pow (std::abs (value), power);
+	value = xf::sgn (value) * std::pow (std::abs (value), _power);
 	// Renormalize from standard [-1.0, 1.0]:
-	value = xf::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (output_minimum, output_maximum));
+	value = xf::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (_output_minimum, _output_maximum));
 
-	if (user_defined_property.configured())
-		user_defined_property = value;
+	if (_user_defined_property.configured())
+		_user_defined_property = value;
 }
 
 
@@ -72,9 +169,8 @@ JoystickInput::JoystickInput (xf::ModuleManager* module_manager, QDomElement con
 	Module (module_manager, config)
 {
 	// Support max kMaxID axes/buttons:
-	_buttons.resize (kMaxID);
+	_handlers.resize (kMaxID);
 	_button_properties.resize (kMaxID);
-	_axes.resize (kMaxID);
 	_axis_properties.resize (kMaxID);
 
 	parse_settings (config, {
@@ -87,55 +183,40 @@ JoystickInput::JoystickInput (xf::ModuleManager* module_manager, QDomElement con
 	{
 		if (e == "axis")
 		{
-			unsigned int id = e.attribute ("id").toUInt();
-			if (id < _axes.size())
+			if (e.hasAttribute ("id"))
 			{
-				Axis axis;
+				unsigned int id = e.attribute ("id").toUInt();
 
-				for (QDomElement& v: e)
-				{
-					if (v == "path")
-						axis.user_defined_property.set_path (xf::PropertyPath (v.text()));
-					else if (v == "center")
-						axis.center = v.text().toFloat();
-					else if (v == "dead-zone")
-						axis.dead_zone = v.text().toFloat();
-					else if (v == "reverse")
-						axis.reverse = -1.f;
-					else if (v == "scale")
-						axis.scale = v.text().toFloat();
-					else if (v == "power")
-						axis.power = v.text().toFloat();
-					else if (v == "output")
-					{
-						for (QDomElement& w: v)
-						{
-							if (w == "minimum")
-								axis.output_minimum = w.text().toFloat();
-							else if (w == "maximum")
-								axis.output_maximum = w.text().toFloat();
-						}
-					}
-				}
-
-				_axes[id].push_back (std::move (axis));
+				if (id < _handlers.size())
+					_handlers[id].push_back (std::make_shared<Axis> (e));
 			}
+			else if (e.hasAttribute ("up-button-id") && e.hasAttribute ("down-button-id"))
+			{
+				unsigned int u_id = e.attribute ("up-button-id").toUInt();
+				unsigned int d_id = e.attribute ("down-button-id").toUInt();
+
+				if (u_id < _handlers.size() && d_id < _handlers.size())
+				{
+					auto axis = std::make_shared<Axis> (e, u_id, d_id);
+
+					_handlers[u_id].push_back (axis);
+					_handlers[d_id].push_back (axis);
+				}
+			}
+			else
+				throw xf::BadDomElement (e);
 		}
 		else if (e == "button")
 		{
-			unsigned int id = e.attribute ("id").toUInt();
-			if (id < _buttons.size())
+			if (e.hasAttribute ("id"))
 			{
-				Button button;
+				unsigned int id = e.attribute ("id").toUInt();
 
-				for (QDomElement& v: e)
-				{
-					if (v == "path")
-						button.user_defined_property.set_path (xf::PropertyPath (v.text()));
-				}
-
-				_buttons[id].push_back (std::move (button));
+				if (id < _handlers.size())
+					_handlers[id].push_back (std::make_shared<Button> (e));
 			}
+			else
+				throw xf::MissingDomAttribute (e, "id");
 		}
 		else
 		{
@@ -212,48 +293,40 @@ JoystickInput::read()
 		failure();
 	else if (n == sizeof (ev))
 	{
-		switch (ev.type)
+		HandlerID handler_id = ev.number;
+
+		if (handler_id < _handlers.size())
 		{
-			case JS_EVENT_BUTTON:
-			case JS_EVENT_BUTTON + JS_EVENT_INIT:
-			{
-				auto const button_id = ev.number;
-				bool const value = ev.value;
+			EventType event_type = EventType::Unknown;
 
-				if (button_id >= _buttons.size())
+			switch (ev.type)
+			{
+				case JS_EVENT_BUTTON + JS_EVENT_INIT:
+					if (ev.type == JS_EVENT_BUTTON + JS_EVENT_INIT)
+						_button_properties[handler_id].set_path (xf::PropertyPath (QString ("%1/button/%2").arg (_prop_path).arg (handler_id)));
+				// fallthrough
+				case JS_EVENT_BUTTON:
+					event_type = EventType::ButtonEvent;
+					if (_button_properties[handler_id].configured())
+						_button_properties[handler_id] = ev.value;
 					break;
 
-				if (ev.type == JS_EVENT_BUTTON + JS_EVENT_INIT)
-				{
-					_button_properties[button_id].set_path (xf::PropertyPath (QString ("%1/button/%2").arg (_prop_path).arg (button_id)));
-					_button_properties[button_id] = value;
-				}
-
-				for (auto& button: _buttons[button_id])
-					button.set_value (value);
-				break;
-			}
-
-			case JS_EVENT_AXIS:
-			case JS_EVENT_AXIS + JS_EVENT_INIT:
-			{
-				auto const axis_id = ev.number;
-				float const value = ev.value / 32767.0;
-
-				if (axis_id >= _axes.size())
+				case JS_EVENT_AXIS + JS_EVENT_INIT:
+					if (ev.type == JS_EVENT_AXIS + JS_EVENT_INIT)
+						_axis_properties[handler_id].set_path (xf::PropertyPath (QString ("%1/axis/%2").arg (_prop_path).arg (handler_id)));
+				// fallthrough
+				case JS_EVENT_AXIS:
+					event_type = EventType::AxisEvent;
+					if (_axis_properties[handler_id].configured())
+						_axis_properties[handler_id] = ev.value / 32767.0;
 					break;
-
-				if (ev.type == JS_EVENT_AXIS + JS_EVENT_INIT)
-				{
-					_axis_properties[axis_id].set_path (xf::PropertyPath (QString ("%1/axis/%2").arg (_prop_path).arg (axis_id)));
-					_axis_properties[axis_id] = value;
-				}
-
-				for (auto& axis: _axes[axis_id])
-					axis.set_value (value);
-				break;
 			}
+
+			for (auto& handler: _handlers[handler_id])
+				handler->handle (event_type, handler_id, ev.value);
 		}
+		else
+			log() << "Joystick event with ID " << handler_id << " greater than max supported " << kMaxID << std::endl;
 	}
 }
 
@@ -261,16 +334,12 @@ JoystickInput::read()
 void
 JoystickInput::reset_properties()
 {
-	for (auto& buttons: _buttons)
-		for (auto& button: buttons)
-			button.user_defined_property.set_nil();
+	for (auto& handlers: _handlers)
+		for (auto& handler: handlers)
+			handler->reset();
 
 	for (auto& button: _button_properties)
 		button.set_nil();
-
-	for (auto& axes: _axes)
-		for (auto& axis: axes)
-			axis.user_defined_property.set_nil();
 
 	for (auto& axis: _axis_properties)
 		axis.set_nil();

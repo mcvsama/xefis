@@ -38,31 +38,87 @@ class JoystickInput:
 
 	static constexpr size_t kMaxID = 256;
 
-	struct Button
+	typedef std::size_t HandlerID;
+
+	enum class EventType
 	{
+		Unknown = 0,
+		ButtonEvent,
+		AxisEvent,
+	};
+
+	/**
+	 * Base class for axes and buttons.
+	 */
+	class Handler
+	{
+	  public:
+		/**
+		 * Called when new joystick event comes.
+		 * \param	value
+		 * 			Joystick event value, unchanged.
+		 */
+		virtual void
+		handle (EventType, HandlerID, int32_t value) = 0;
+
+		virtual void
+		reset() = 0;
+	};
+
+	class Button: public Handler
+	{
+	  public:
+		// Ctor
+		Button (QDomElement const& button_element);
+
+		void
+		handle (EventType, HandlerID, int32_t value) override;
+
+		void
+		reset() override;
+
+	  private:
 		void
 		set_value (float value);
 
-		xf::PropertyBoolean	user_defined_property;
+	  private:
+		xf::PropertyBoolean	_user_defined_property;
 	};
 
-	struct Axis
+	class Axis: public Handler
 	{
+	  public:
+		// Ctor
+		Axis (QDomElement const& axis_element);
+
+		/**
+		 * Make Axis that is emulated by two buttons on the joystick.
+		 */
+		Axis (QDomElement const& axis_element, Optional<HandlerID> up_button_id, Optional<HandlerID> down_button_id);
+
+		void
+		handle (EventType, HandlerID id, int32_t value) override;
+
+		void
+		reset() override;
+
+	  private:
 		void
 		set_value (float value);
 
-		xf::PropertyFloat	user_defined_property;
-		float				center			= 0.f;
-		float				dead_zone		= 0.f;
-		float				reverse			= 1.f;
-		float				scale			= 1.f;
-		float				power			= 1.f;
-		float				output_minimum	= -1.f;
-		float				output_maximum	= +1.f;
+	  private:
+		xf::PropertyFloat	_user_defined_property;
+		float				_center			= 0.f;
+		float				_dead_zone		= 0.f;
+		float				_reverse		= 1.f;
+		float				_scale			= 1.f;
+		float				_power			= 1.f;
+		float				_output_minimum	= -1.f;
+		float				_output_maximum	= +1.f;
+		// If these are present, Axis is emulated with those two buttons:
+		Optional<HandlerID>	_up_button_id;
+		Optional<HandlerID>	_down_button_id;
 	};
-
-	typedef std::vector<std::vector<Button>>	Buttons;
-	typedef std::vector<std::vector<Axis>>		Axes;
 
 	typedef std::vector<xf::PropertyBoolean>	ButtonProperties;
 	typedef std::vector<xf::PropertyFloat>		AxisProperties;
@@ -109,9 +165,8 @@ class JoystickInput:
 	int						_device				= 0;
 	Unique<QSocketNotifier>	_notifier;
 	Unique<QTimer>			_reopen_timer;
-	Buttons					_buttons;
-	Axes					_axes;
-	// TODO resize
+	std::vector<std::vector<Shared<Handler>>>
+							_handlers;
 	ButtonProperties		_button_properties;
 	AxisProperties			_axis_properties;
 	unsigned int			_failure_count		= 0;
