@@ -104,7 +104,7 @@ class Airframe
 	 * \param cl
 	 *        Lift coefficient.
 	 */
-	Angle
+	Optional<Angle>
 	get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&, SpoilersAngle const&) const;
 
 	/**
