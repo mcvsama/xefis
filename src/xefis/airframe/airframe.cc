@@ -98,7 +98,7 @@ Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&
 		return *normal_aoa - flaps_aoa_correction - spoilers_aoa_correction;
 	}
 	else
-		return {};
+		return { };
 }
 
 
