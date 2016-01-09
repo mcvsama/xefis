@@ -418,10 +418,10 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 		if (tas)
 			return tas_to_ias (*tas);
 		else
-			return {};
+			return { };
 	}
 	else
-		return {};
+		return { };
 }
 
 
@@ -431,7 +431,7 @@ PerformanceComputer::tas_to_ias (Speed const& tas) const
 	if (_density_altitude.valid())
 		return xf::compute_indicated_airspeed (tas, *_density_altitude);
 	else
-		return {};
+		return { };
 }
 
 
@@ -576,6 +576,6 @@ PerformanceComputer::aoa_to_tas_now (Angle const& aoa, Optional<Acceleration> co
 												/ (0.5 * _input_air_density_static->si_units() * wings_area.si_units() * cl)));
 	}
 	else
-		return {};
+		return { };
 }
 

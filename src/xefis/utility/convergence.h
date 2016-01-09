@@ -127,7 +127,7 @@ template<class ValueType>
 		Convergence<ValueType> comp (delta, max_iterations, formula);
 		if (comp.converge (initial_value))
 			return comp.result();
-		return {};
+		return { };
 	}
 
 } // namespace Xefis

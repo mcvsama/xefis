@@ -1157,7 +1157,7 @@ inline Optional<Speed>
 AFCS::current_rounded_vs() const
 {
 	if (!_measured_vs.valid())
-		return {};
+		return { };
 
 	int vsr = _vs_rounding.fpm();
 	return 1_fpm * std::round (_measured_vs->fpm() / vsr) * vsr;
@@ -1168,7 +1168,7 @@ inline Optional<Angle>
 AFCS::current_rounded_fpa() const
 {
 	if (!_measured_fpa.valid())
-		return {};
+		return { };
 
 	int fpar = _fpa_rounding.deg();
 	return 1_deg * std::round (_measured_fpa->deg() / fpar) * fpar;
@@ -1264,7 +1264,7 @@ AFCS::translate_thrust_mode() const
 			break;
 	};
 
-	return {};
+	return { };
 }
 
 
@@ -1287,7 +1287,7 @@ AFCS::translate_roll_mode() const
 		case RollMode::LNAV:		return afcs_api::RollMode::LNAV;
 	}
 
-	return {};
+	return { };
 }
 
 
@@ -1324,7 +1324,7 @@ AFCS::translate_pitch_mode() const
 		case PitchMode::FLARE:		return afcs_api::PitchMode::Flare;
 	}
 
-	return {};
+	return { };
 }
 
 
@@ -1333,7 +1333,7 @@ template<class Target, class Source>
 	AFCS::optional_cast (Optional<Source> const& source)
 	{
 		if (!source)
-			return {};
+			return { };
 		else
 			return static_cast<Target> (*source);
 	}
