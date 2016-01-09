@@ -82,10 +82,14 @@ Lift::critical_aoa() const noexcept
 }
 
 
-Angle
+Optional<Angle>
 Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 {
 	auto aoas = _aoa_to_cl->arguments (cl, { _aoa_to_cl->min_argument().argument, _critical_aoa });
+
+	if (aoas.empty())
+		return {};
+
 	// If AOA/C_L is not-monotonic, there may be multiple results.
 	// In such case return largest matching AOA:
 	return aoas.back().argument;
