@@ -36,13 +36,14 @@ class JoystickInput:
 {
 	Q_OBJECT
 
+	static constexpr size_t kMaxID = 256;
+
 	struct Button
 	{
 		void
 		set_value (float value);
 
-		xf::PropertyBoolean	prop;
-		xf::PropertyBoolean	alt_prop;
+		xf::PropertyBoolean	user_defined_property;
 	};
 
 	struct Axis
@@ -50,8 +51,7 @@ class JoystickInput:
 		void
 		set_value (float value);
 
-		xf::PropertyFloat	prop;
-		xf::PropertyFloat	alt_prop;
+		xf::PropertyFloat	user_defined_property;
 		float				center			= 0.f;
 		float				dead_zone		= 0.f;
 		float				reverse			= 1.f;
@@ -61,8 +61,11 @@ class JoystickInput:
 		float				output_maximum	= +1.f;
 	};
 
-	typedef std::vector<Shared<Button>>	Buttons;
-	typedef std::vector<Shared<Axis>>	Axes;
+	typedef std::vector<std::vector<Button>>	Buttons;
+	typedef std::vector<std::vector<Axis>>		Axes;
+
+	typedef std::vector<xf::PropertyBoolean>	ButtonProperties;
+	typedef std::vector<xf::PropertyFloat>		AxisProperties;
 
   public:
 	// Ctor
@@ -108,6 +111,9 @@ class JoystickInput:
 	Unique<QTimer>			_reopen_timer;
 	Buttons					_buttons;
 	Axes					_axes;
+	// TODO resize
+	ButtonProperties		_button_properties;
+	AxisProperties			_axis_properties;
 	unsigned int			_failure_count		= 0;
 	bool					_restart_on_failure	= true;
 };
