@@ -166,6 +166,27 @@ operator* (Speed const& speed, Force const& force)
 	return force * speed;
 }
 
+
+inline constexpr Power
+operator* (Torque const& torque, Frequency const& frequency)
+{
+	return 1_W * (torque.Nm() * frequency.Hz());
+}
+
+
+inline constexpr Power
+operator* (Frequency const& frequency, Torque const& torque)
+{
+	return torque * frequency;
+}
+
+
+inline constexpr Power
+operator/ (Torque const& torque, Time const& time)
+{
+	return torque * (1.0 / time);
+}
+
 } // namespace SI
 
 #endif
