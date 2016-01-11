@@ -9,7 +9,7 @@ SI_HEADERS += lib/si/area.h
 SI_HEADERS += lib/si/capacity.h
 SI_HEADERS += lib/si/current.h
 SI_HEADERS += lib/si/density.h
-SI_HEADERS += lib/si/energy.h
+SI_HEADERS += lib/si/quantities/energy.h
 SI_HEADERS += lib/si/force.h
 SI_HEADERS += lib/si/constants.h
 SI_HEADERS += lib/si/frequency.h
@@ -25,6 +25,7 @@ SI_HEADERS += lib/si/torque.h
 SI_HEADERS += lib/si/volume.h
 SI_HEADERS += lib/si/weight.h
 SI_HEADERS += lib/si/value.h
+SI_HEADERS += lib/si/units/joule.h
 
 SI_SOURCES += lib/si/acceleration.cc
 SI_SOURCES += lib/si/angle.cc
@@ -32,7 +33,7 @@ SI_SOURCES += lib/si/area.cc
 SI_SOURCES += lib/si/capacity.cc
 SI_SOURCES += lib/si/current.cc
 SI_SOURCES += lib/si/density.cc
-SI_SOURCES += lib/si/energy.cc
+SI_SOURCES += lib/si/quantities/energy.cc
 SI_SOURCES += lib/si/force.cc
 SI_SOURCES += lib/si/frequency.cc
 SI_SOURCES += lib/si/length.cc
@@ -45,6 +46,7 @@ SI_SOURCES += lib/si/time.cc
 SI_SOURCES += lib/si/torque.cc
 SI_SOURCES += lib/si/volume.cc
 SI_SOURCES += lib/si/weight.cc
+SI_SOURCES += lib/si/units/joule.cc
 
 ######## /xefis ########
 
