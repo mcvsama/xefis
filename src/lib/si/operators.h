@@ -170,7 +170,7 @@ operator* (Speed const& speed, Force const& force)
 inline constexpr Power
 operator* (Torque const& torque, Frequency const& frequency)
 {
-	return 1_W * (torque.Nm() * frequency.Hz());
+	return 1_W * (torque.Nm() * frequency.radps());
 }
 
 
