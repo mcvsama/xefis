@@ -11,15 +11,16 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef SI__ENERGY_H__INCLUDED
-#define SI__ENERGY_H__INCLUDED
+#ifndef SI__QUANTITIES__ENERGY_H__INCLUDED
+#define SI__QUANTITIES__ENERGY_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 #include <limits>
 
 // Local:
-#include "linear_value.h"
+#include "../linear_value.h"
+#include "../units/joule.h"
 
 
 namespace SI {
@@ -27,8 +28,6 @@ namespace SI {
 class Energy: public LinearValue<double, Energy>
 {
 	friend class LinearValue<double, Energy>;
-	friend constexpr Energy operator"" _J (long double);
-	friend constexpr Energy operator"" _J (unsigned long long);
 
   public:
 	explicit constexpr
@@ -39,6 +38,12 @@ class Energy: public LinearValue<double, Energy>
 
 	constexpr
 	Energy (Energy const&) noexcept = default;
+
+	constexpr
+	Energy (Joule) noexcept;
+
+	Energy const&
+	operator= (Joule) noexcept;
 
 	std::vector<std::string> const&
 	supported_units() const override;
@@ -73,25 +78,6 @@ static_assert (std::is_literal_type<Energy>::value, "Energy must be a literal ty
 
 
 /*
- * Global functions
- */
-
-
-inline constexpr Energy
-operator"" _J (long double J)
-{
-	return Energy (static_cast<Energy::ValueType> (J));
-}
-
-
-inline constexpr Energy
-operator"" _J (unsigned long long J)
-{
-	return Energy(static_cast<Energy::ValueType> (J));
-}
-
-
-/*
  * Energy implementation
  */
 
@@ -100,6 +86,20 @@ inline constexpr
 Energy::Energy (ValueType J) noexcept:
 	LinearValue (J)
 { }
+
+
+inline constexpr
+Energy::Energy (Joule J) noexcept:
+	LinearValue (J.J())
+{ }
+
+
+inline Energy const&
+Energy::operator= (Joule J) noexcept
+{
+	set_si_units (J.J());
+	return *this;
+}
 
 
 inline std::vector<std::string> const&
@@ -126,7 +126,7 @@ Energy::J() const noexcept
 inline void
 Energy::set_si_units (ValueType units)
 {
-	*this = 1_J * units;
+	*this = Energy (units);
 }
 
 

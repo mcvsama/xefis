@@ -21,7 +21,7 @@
 #include "capacity.h"
 #include "current.h"
 #include "density.h"
-#include "energy.h"
+#include "quantities/energy.h"
 #include "force.h"
 #include "frequency.h"
 #include "length.h"
