@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <limits>
+#include <cmath>
 
 // Local:
 #include "linear_value.h"
@@ -35,6 +36,8 @@ class Frequency: public LinearValue<double, Frequency>
 	friend constexpr Frequency operator"" _MHz (unsigned long long);
 	friend constexpr Frequency operator"" _rpm (long double);
 	friend constexpr Frequency operator"" _rpm (unsigned long long);
+	friend constexpr Frequency operator"" _radps (long double);
+	friend constexpr Frequency operator"" _radps (unsigned long long);
 
   public:
 	explicit constexpr
@@ -63,6 +66,9 @@ class Frequency: public LinearValue<double, Frequency>
 
 	constexpr ValueType
 	rpm() const noexcept;
+
+	constexpr ValueType
+	radps() const noexcept;
 
 	void
 	set_si_units (ValueType) override;
@@ -145,6 +151,20 @@ operator"" _rpm (unsigned long long rpm)
 }
 
 
+inline constexpr Frequency
+operator"" _radps (long double rad_per_s)
+{
+	return Frequency (static_cast<Frequency::ValueType> (rad_per_s) / (2.0 * M_PI));
+}
+
+
+inline constexpr Frequency
+operator"" _radps (unsigned long long rad_per_s)
+{
+	return Frequency (static_cast<Frequency::ValueType> (rad_per_s) / (2.0 * M_PI));
+}
+
+
 /*
  * Frequency implementation
  */
@@ -198,6 +218,13 @@ Frequency::rpm() const noexcept
 }
 
 
+inline constexpr Frequency::ValueType
+Frequency::radps() const noexcept
+{
+	return 2.0 * M_PI * internal();
+}
+
+
 inline void
 Frequency::set_si_units (ValueType units)
 {
@@ -218,6 +245,8 @@ Frequency::parse (std::string const& str)
 		*this = p.first * 1_MHz;
 	else if (p.second == "rpm")
 		*this = p.first * 1_rpm;
+	else if (p.second == "radps" || p.second == "rad/s")
+		*this = p.first * 1_radps;
 }
 
 
