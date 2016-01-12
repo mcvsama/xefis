@@ -36,7 +36,6 @@
 #include "quantities/temperature.h"
 #include "constants.h"
 #include "operators.h"
-#include "asserts.h"
 
 #endif
 
