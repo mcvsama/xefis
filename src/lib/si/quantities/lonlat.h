@@ -101,6 +101,9 @@ class LonLat
 };
 
 
+static_assert (std::is_literal_type<LonLat>::value, "LonLat must be a literal type");
+
+
 constexpr inline
 LonLat::LonLat() noexcept:
 	LonLat (0_deg, 0_deg)
