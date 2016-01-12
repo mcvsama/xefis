@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef SI__TEMPERATURE_H__INCLUDED
-#define SI__TEMPERATURE_H__INCLUDED
+#ifndef SI__QUANTITIES__TEMPERATURE_H__INCLUDED
+#define SI__QUANTITIES__TEMPERATURE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -20,7 +20,7 @@
 #include <limits>
 
 // Local:
-#include "linear_value.h"
+#include "../linear_value.h"
 
 
 namespace SI {

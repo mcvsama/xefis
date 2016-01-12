@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef SI__TIME_H__INCLUDED
-#define SI__TIME_H__INCLUDED
+#ifndef SI__QUANTITIES__TIME_H__INCLUDED
+#define SI__QUANTITIES__TIME_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -23,7 +23,7 @@
 #include <sys/time.h>
 
 // Local:
-#include "linear_value.h"
+#include "../linear_value.h"
 
 
 namespace SI {

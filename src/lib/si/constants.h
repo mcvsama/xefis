@@ -17,7 +17,7 @@
 #define SI__CONSTANTS_H__INCLUDED
 
 // Local:
-#include "length.h"
+#include "quantities/length.h"
 
 
 namespace SI {
