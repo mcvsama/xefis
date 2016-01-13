@@ -27,7 +27,8 @@
 namespace Xefis {
 namespace TestAsserts {
 
-void verify (std::string const& explanation, bool condition)
+inline void
+verify (std::string const& explanation, bool condition)
 {
 	if (!condition)
 		throw TestAssertFailed (explanation, "condition failed");
@@ -35,7 +36,8 @@ void verify (std::string const& explanation, bool condition)
 
 
 template<class T>
-	void verify_equal_with_epsilon (std::string const& explanation, T const& value1, T const& value2, T const& epsilon)
+	inline void
+	verify_equal_with_epsilon (std::string const& explanation, T const& value1, T const& value2, T const& epsilon)
 	{
 		if (value1 - value2 > epsilon &&
 			value2 - value1 > epsilon)
