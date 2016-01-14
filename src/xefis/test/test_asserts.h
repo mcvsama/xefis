@@ -39,7 +39,7 @@ template<class T>
 	inline void
 	verify_equal_with_epsilon (std::string const& explanation, T const& value1, T const& value2, T const& epsilon)
 	{
-		if (value1 - value2 > epsilon &&
+		if (value1 - value2 > epsilon ||
 			value2 - value1 > epsilon)
 		{
 			throw TestAssertFailed (explanation, "value " + boost::lexical_cast<std::string> (value1) + " not equal to " +
