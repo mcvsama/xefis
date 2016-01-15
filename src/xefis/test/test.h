@@ -41,19 +41,19 @@ class RuntimeTest
 inline
 RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 {
-	std::clog << "Test: " << test_name << "…" << std::flush;
+	std::cout << "Test: " << test_name << "…" << std::flush;
 	try {
 		tf();
-		std::clog << " PASS" << std::endl;
+		std::cout << " PASS" << std::endl;
 	}
 	catch (Exception& e)
 	{
-		std::clog << " FAIL" << std::endl;
-		std::clog << "Explanation: " << e.message() << std::endl;
+		std::cout << " FAIL" << std::endl;
+		std::cout << "Explanation: " << e.message() << std::endl;
 	}
 	catch (...)
 	{
-		std::clog << " FAIL with unknown exception" << std::endl;
+		std::cout << " FAIL with unknown exception" << std::endl;
 	}
 }
 
