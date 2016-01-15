@@ -27,25 +27,37 @@
 namespace Xefis {
 namespace TestAsserts {
 
+/**
+ * Accept any expression without generating 'unused variable' warning.
+ * Test expression validity.
+ */
+template<class T>
+	inline void
+	verify_compilation (T&&)
+	{ }
+
+
 inline void
-verify (std::string const& explanation, bool condition)
+verify (std::string const& test_explanation, bool condition)
 {
 	if (!condition)
-		throw TestAssertFailed (explanation, "condition failed");
+		throw TestAssertFailed (test_explanation, "condition failed");
 }
 
 
-template<class T>
+template<class T1, class T2, class T3>
 	inline void
-	verify_equal_with_epsilon (std::string const& explanation, T const& value1, T const& value2, T const& epsilon)
+	verify_equal_with_epsilon (std::string const& test_explanation, T1 const& value1, T2 const& value2, T3 const& epsilon)
 	{
 		if (value1 - value2 > epsilon ||
 			value2 - value1 > epsilon)
 		{
-			throw TestAssertFailed (explanation, "value " + boost::lexical_cast<std::string> (value1) + " not equal to " +
-									boost::lexical_cast<std::string> (value2) + " with epsilon " +
-									boost::lexical_cast<std::string> (epsilon) + "; diff=" +
-									boost::lexical_cast<std::string> (value2 - value1));
+			using std::to_string;
+
+			throw TestAssertFailed (test_explanation, "value " + to_string (value1) + " not equal to " +
+									to_string (value2) + " with epsilon " +
+									to_string (epsilon) + "; diff=" +
+									to_string (value2 - value1));
 		}
 	}
 
