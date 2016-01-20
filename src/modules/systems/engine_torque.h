@@ -52,11 +52,12 @@ class EngineTorque: public xf::Module
 	double								_derivative_coefficient	= 0.0;
 	double								_total_coefficient		= 1.0;
 	// Input:
-	xf::PropertyFrequency				_input_engine_rpm;
+	xf::Property<AngularVelocity>		_input_engine_rpm;
 	// Output:
 	xf::PropertyTorque					_output_engine_torque;
 	// Other:
-	Optional<xf::Temporal<Frequency>>	_previous_engine_spd;
+	Optional<xf::Temporal<AngularVelocity>>
+										_previous_engine_spd;
 };
 
 #endif

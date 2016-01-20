@@ -25,6 +25,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "pca9685.h"
@@ -48,11 +49,11 @@ PCA9685::Channel::compute_duty_cycle()
 
 	last_value = value;
 
-	Time now = Time::now();
+	Time now = xf::TimeHelper::now();
 	value = smoother.process (value, now - _last_computation_time);
 	_last_computation_time = now;
 
-	return 1_s * xf::renormalize (value, input_minimum, input_maximum, output_minimum.s(), output_maximum.s());
+	return 1_s * xf::renormalize (value, input_minimum, input_maximum, output_minimum.quantity<Second>(), output_maximum.quantity<Second>());
 }
 
 
@@ -106,7 +107,7 @@ PCA9685::PCA9685 (xf::ModuleManager* module_manager, QDomElement const& config):
 	_i2c_device.set_address (xf::I2C::Address (i2c_address));
 
 	_initialization_timer = new QTimer (this);
-	_initialization_timer->setInterval (InitializationDelay.ms());
+	_initialization_timer->setInterval (InitializationDelay.quantity<Millisecond>());
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 	_initialization_timer->start();

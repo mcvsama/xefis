@@ -230,9 +230,12 @@ class CHRUM6:
 	xf::PropertyAcceleration	_acceleration_x;
 	xf::PropertyAcceleration	_acceleration_y;
 	xf::PropertyAcceleration	_acceleration_z;
-	xf::PropertyFrequency		_rotation_x;
-	xf::PropertyFrequency		_rotation_y;
-	xf::PropertyFrequency		_rotation_z;
+	xf::Property<AngularVelocity>
+								_rotation_x;
+	xf::Property<AngularVelocity>
+								_rotation_y;
+	xf::Property<AngularVelocity>
+								_rotation_z;
 	// What's the unit?
 	xf::PropertyFloat			_magnetic_x;
 	xf::PropertyFloat			_magnetic_y;

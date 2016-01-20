@@ -75,14 +75,14 @@ class NavigationComputer: public xf::Module
 	Positions				_positions_accurate_9_times;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
-	xf::Smoother<double>	_orientation_pitch_smoother				= 25_ms;
-	xf::Smoother<double>	_orientation_roll_smoother				= 25_ms;
-	xf::Smoother<double>	_orientation_heading_magnetic_smoother	= 200_ms;
-	xf::Smoother<double>	_track_vertical_smoother				= 500_ms;
-	xf::Smoother<double>	_track_lateral_true_smoother			= 500_ms;
-	xf::Smoother<double>	_track_lateral_rotation_smoother		= 1500_ms;
-	xf::Smoother<double>	_track_ground_speed_smoother			= 2_s;
-	Time					_track_accumulated_dt					= 0_s;
+	xf::Smoother<double>	_orientation_pitch_smoother				= Time (25_ms);
+	xf::Smoother<double>	_orientation_roll_smoother				= Time (25_ms);
+	xf::Smoother<double>	_orientation_heading_magnetic_smoother	= Time (200_ms);
+	xf::Smoother<double>	_track_vertical_smoother				= Time (500_ms);
+	xf::Smoother<double>	_track_lateral_true_smoother			= Time (500_ms);
+	xf::Smoother<double>	_track_lateral_rotation_smoother		= Time (1500_ms);
+	xf::Smoother<double>	_track_ground_speed_smoother			= Time (2_s);
+	Time					_track_accumulated_dt					= Time (0_s);
 	// Input:
 	xf::PropertyAngle		_position_input_longitude;
 	xf::PropertyAngle		_position_input_latitude;
@@ -108,7 +108,8 @@ class NavigationComputer: public xf::Module
 	xf::PropertyAngle		_track_vertical;
 	xf::PropertyAngle		_track_lateral_magnetic;
 	xf::PropertyAngle		_track_lateral_true;
-	xf::PropertyFrequency	_track_lateral_rotation;
+	xf::Property<AngularVelocity>
+							_track_lateral_rotation;
 	xf::PropertySpeed		_track_ground_speed;
 	xf::PropertyAngle		_magnetic_declination;
 	xf::PropertyAngle		_magnetic_inclination;

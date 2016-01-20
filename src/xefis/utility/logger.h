@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/time_helper.h>
 
 
 namespace Xefis {
@@ -78,7 +79,7 @@ template<class Item>
 	inline std::ostream&
 	Logger::operator<< (Item const& item) const
 	{
-		(*_stream) << boost::format ("%08.4lf %s ") % Time::now().s() % _prefix;
+		(*_stream) << boost::format ("%08.4lf %s ") % TimeHelper::now().quantity<Second>() % _prefix;
 		return (*_stream) << item;
 	}
 

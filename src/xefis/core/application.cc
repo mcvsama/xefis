@@ -41,6 +41,7 @@
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "application.h"
@@ -103,7 +104,7 @@ Application::Application (int& argc, char** argv):
 		_configurator_widget = std::make_unique<ConfiguratorWidget> (this, nullptr);
 
 	_data_updater = new QTimer (this);
-	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).ms());
+	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).quantity<Millisecond>());
 	_data_updater->setSingleShot (false);
 	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
 	_data_updater->start();
@@ -155,7 +156,7 @@ Application::quit()
 void
 Application::data_updated()
 {
-	Time t = Time::now();
+	Time t = TimeHelper::now();
 	_module_manager->data_updated (t);
 	_window_manager->data_updated (t);
 }

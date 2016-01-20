@@ -24,6 +24,7 @@
 #include <xefis/config/exception.h>
 #include <xefis/support/navigation/magnetic_variation.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "nc.h"
@@ -219,7 +220,7 @@ NavigationComputer::compute_magnetic_variation()
 			mv.set_altitude_amsl (*_position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
-		QDate today = QDateTime::fromTime_t (Time::now().s()).date();
+		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().quantity<Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
 		_magnetic_declination.write (mv.magnetic_declination());
@@ -240,7 +241,7 @@ NavigationComputer::compute_headings()
 
 	if (_orientation_input_heading_magnetic.valid())
 	{
-		_orientation_heading_magnetic.write (1_deg * _orientation_heading_magnetic_smoother.process ((*_orientation_input_heading_magnetic).deg(), update_dt));
+		_orientation_heading_magnetic.write (1_deg * _orientation_heading_magnetic_smoother.process ((*_orientation_input_heading_magnetic).quantity<Degree>(), update_dt));
 
 		if (_magnetic_declination.valid())
 			_orientation_heading_true.write (xf::magnetic_to_true (*_orientation_heading_magnetic, *_magnetic_declination));
@@ -256,7 +257,7 @@ NavigationComputer::compute_headings()
 
 	// Smoothed pitch:
 	if (_orientation_input_pitch.valid())
-		_orientation_pitch.write (1_deg * _orientation_pitch_smoother.process ((*_orientation_input_pitch).deg(), update_dt));
+		_orientation_pitch.write (1_deg * _orientation_pitch_smoother.process ((*_orientation_input_pitch).quantity<Degree>(), update_dt));
 	else
 	{
 		_orientation_pitch.set_nil();
@@ -265,7 +266,7 @@ NavigationComputer::compute_headings()
 
 	// Smoothed roll:
 	if (_orientation_input_roll.valid())
-		_orientation_roll.write (1_deg * _orientation_roll_smoother.process ((*_orientation_input_roll).deg(), update_dt));
+		_orientation_roll.write (1_deg * _orientation_roll_smoother.process ((*_orientation_input_roll).quantity<Degree>(), update_dt));
 	else
 	{
 		_orientation_roll.set_nil();
@@ -293,7 +294,7 @@ NavigationComputer::compute_track()
 
 			Angle initial_true_heading = pos_last.lateral_position.initial_bearing (pos_prev.lateral_position);
 			Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
-			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.deg(), update_dt));
+			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.quantity<Degree>(), update_dt));
 
 			if (_magnetic_declination.valid())
 				_track_lateral_magnetic.write (xf::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
@@ -311,30 +312,33 @@ NavigationComputer::compute_track()
 	}
 	else
 	{
-		_track_lateral_true_smoother.reset ((*_orientation_heading_true).deg());
+		_track_lateral_true_smoother.reset ((*_orientation_heading_true).quantity<Degree>());
 		_track_vertical.set_nil();
 		_track_lateral_true.set_nil();
 		_track_lateral_magnetic.set_nil();
 	}
 
-	Optional<Frequency> result_rotation_speed;
+	Optional<AngularVelocity> result_rotation_speed;
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{
 		Length len_from_prev = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);
 
 		if (len_from_prev >= *_position_lateral_stddev)
 		{
+			using std::isinf;
+			using std::isnan;
+
 			Time dt = pos_last.time - pos_prev.time;
 			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (pos_prev_prev.lateral_position,
 																 pos_prev.lateral_position,
 																 pos_last.lateral_position);
 			// Lateral (parallel to the ground) rotation:
-			Frequency rotation_speed = alpha / dt;
+			AngularVelocity rotation_speed = alpha / dt;
 
-			if (!std::isinf (rotation_speed.internal()) && !std::isnan (rotation_speed.internal()))
+			if (!isinf (rotation_speed) && !isnan (rotation_speed))
 			{
-				rotation_speed = 1_Hz * _track_lateral_rotation_smoother.process (rotation_speed.Hz(), update_dt);
-				result_rotation_speed = xf::limit (rotation_speed, -1_Hz, +1_Hz);
+				rotation_speed = 1_radps * _track_lateral_rotation_smoother.process (rotation_speed.quantity<RadianPerSecond>(), update_dt);
+				result_rotation_speed = xf::limit<AngularVelocity> (rotation_speed, convert (-1_Hz), convert (+1_Hz));
 			}
 			else
 				_track_lateral_rotation_smoother.invalidate();
@@ -358,7 +362,7 @@ NavigationComputer::compute_ground_speed()
 
 		Time dt = pos_last.time - pos_prev.time;
 		Length dl = pos_last.lateral_position.haversine_earth (pos_prev.lateral_position);
-		_track_ground_speed.write (1_kt * _track_ground_speed_smoother.process ((dl / dt).kt(), update_dt));
+		_track_ground_speed.write (1_kt * _track_ground_speed_smoother.process ((dl / dt).quantity<Knot>(), update_dt));
 	}
 	else
 	{

@@ -19,10 +19,15 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/time_helper.h>
 
 
 namespace Xefis {
 
+/**
+ * Container for a value with a timestamp. The timestamp gets updated
+ * every time the value is updated.
+ */
 template<class tValueType>
 	class Temporal
 	{
@@ -48,7 +53,7 @@ template<class tValueType>
 
 		/**
 		 * Assign new value with current timestamp
-		 * (taken from Time::now()).
+		 * (taken from TimeHelper::now()).
 		 */
 		Temporal<ValueType>&
 		operator= (ValueType const& value) noexcept (noexcept (value = value));
@@ -66,6 +71,12 @@ template<class tValueType>
 		value() const noexcept;
 
 		/**
+		 * Return contained value.
+		 */
+		ValueType const&
+		operator*() const noexcept;
+
+		/**
 		 * Return update timestamp.
 		 */
 		Time const&
@@ -81,7 +92,7 @@ template<class T>
 	inline
 	Temporal<T>::Temporal (ValueType const& value) noexcept (noexcept (ValueType (value))):
 		_value (value),
-		_update_time (Time::now())
+		_update_time (TimeHelper::now())
 	{ }
 
 
@@ -98,7 +109,7 @@ template<class T>
 	Temporal<T>::operator= (ValueType const& value) noexcept (noexcept (value = value))
 	{
 		_value = value;
-		_update_time = Time::now();
+		_update_time = TimeHelper::now();
 	}
 
 
@@ -114,6 +125,14 @@ template<class T>
 template<class T>
 	inline typename Temporal<T>::ValueType const&
 	Temporal<T>::value() const noexcept
+	{
+		return _value;
+	}
+
+
+template<class T>
+	inline typename Temporal<T>::ValueType const&
+	Temporal<T>::operator*() const noexcept
 	{
 		return _value;
 	}

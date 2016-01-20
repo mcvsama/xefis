@@ -70,10 +70,10 @@ class NavaidStorage
 	typedef std::vector<Navaid> Navaids;
 
   private:
-	static LonLat::ValueType::ValueType
+	static Angle::Value
 	access_position (Navaid const& navaid, std::size_t const dimension);
 
-	typedef KDTree::KDTree<2, Navaid, std::function<LonLat::ValueType::ValueType (Navaid const&, std::size_t)>> NavaidsTree;
+	typedef KDTree::KDTree<2, Navaid, std::function<Angle::Value (Navaid const&, std::size_t)>> NavaidsTree;
 
   public:
 	// Ctor
@@ -129,10 +129,10 @@ class NavaidStorage
 };
 
 
-inline LonLat::ValueType::ValueType
+inline Angle::Value
 NavaidStorage::access_position (Navaid const& navaid, std::size_t const dimension)
 {
-	return dimension == 0 ? navaid.position().lat().deg() : navaid.position().lon().deg();
+	return dimension == 0 ? navaid.position().lat().quantity<Degree>() : navaid.position().lon().quantity<Degree>();
 }
 
 } // namespace Xefis

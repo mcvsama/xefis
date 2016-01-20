@@ -65,12 +65,12 @@ class ADIWidget: public xf::InstrumentWidget
 		Speed				speed_lookahead						= 0_kt;
 		bool				speed_minimum_visible				= false;
 		Speed				speed_minimum						= 0_kt;
-		Optional<Speed>		speed_minimum_maneuver				= 0_kt;
-		Optional<Speed>		speed_maximum_maneuver				= 0_kt;
+		Optional<Speed>		speed_minimum_maneuver;
+		Optional<Speed>		speed_maximum_maneuver;
 		bool				speed_maximum_visible				= false;
 		Speed				speed_maximum						= 0_kt;
 		bool				speed_mach_visible					= false;
-		float				speed_mach							= 0.f;
+		double				speed_mach							= 0.0;
 		Optional<Speed>		speed_ground;
 		SpeedBugs			speed_bugs;
 		// Orientation
@@ -613,21 +613,21 @@ class ADIWidget: public xf::InstrumentWidget
 inline float
 ADIWidget::PaintWorkUnit::kt_to_px (Speed speed) const
 {
-	return -0.5f * _sl_ladder_rect.height() * (speed - _params.speed) / (0.5 * _params.sl_extent);
+	return -0.5 * _sl_ladder_rect.height() * (speed - _params.speed) / (0.5 * _params.sl_extent);
 }
 
 
 inline float
 ADIWidget::PaintWorkUnit::ft_to_px (Length length) const
 {
-	return -0.5f * _al_ladder_rect.height() * (length - _params.altitude) / (0.5 * _params.al_extent);
+	return -0.5 * _al_ladder_rect.height() * (length - _params.altitude) / (0.5 * _params.al_extent);
 }
 
 
 inline float
 ADIWidget::PaintWorkUnit::pitch_to_px (Angle degrees) const
 {
-	float const correction = 0.775f;
+	auto const correction = 0.775;
 	return -degrees / (_params.fov * correction) * wh();
 }
 
@@ -651,7 +651,7 @@ ADIWidget::PaintWorkUnit::get_minimums_color() const
 inline bool
 ADIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) const
 {
-	return timestamp.secsTo (_current_datetime) < time.s();
+	return timestamp.secsTo (_current_datetime) < time.quantity<Second>();
 }
 
 #endif

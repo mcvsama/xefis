@@ -164,7 +164,7 @@ AFCS_FD_Roll::compute_roll()
 	}
 
 	if (output_roll)
-		_output_roll.write (1_deg * _output_roll_smoother.process (output_roll->deg(), update_dt));
+		_output_roll.write (1_deg * _output_roll_smoother.process (output_roll->quantity<Degree>(), update_dt));
 	else
 	{
 		_output_roll.set_nil();
@@ -184,7 +184,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<double>& pid,
 							xf::Property<Angle> const& measured_direction,
 							Time const& update_dt) const
 {
-	xf::Range<double> roll_limit { -_roll_limit->deg(), +_roll_limit->deg() };
+	xf::Range<Angle> roll_limit { -*_roll_limit, +*_roll_limit };
 
 	if (cmd_direction.is_nil() || measured_direction.is_nil())
 	{
@@ -193,11 +193,11 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<double>& pid,
 	}
 	else
 	{
-		constexpr xf::Range<double> input_range = { 0.0, 360.0 };
+		constexpr xf::Range<Angle> input_range = { 0_deg, 360_deg };
 		constexpr xf::Range<double> artificial_range = { -1.0, +1.0 };
-		pid.set_target (xf::renormalize (cmd_direction->deg(), input_range, artificial_range));
-		pid.process (xf::renormalize (measured_direction->deg(), input_range, artificial_range), update_dt);
-		return 1_deg * xf::limit<double> (pid.output() * input_range.mid(), roll_limit);
+		pid.set_target (xf::renormalize (*cmd_direction, input_range, artificial_range));
+		pid.process (xf::renormalize (*measured_direction, input_range, artificial_range), update_dt);
+		return xf::limit<Angle> (pid.output() * input_range.mid(), roll_limit);
 	}
 }
 

@@ -27,6 +27,7 @@
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/utility/packet_reader.h>
 #include <xefis/utility/logger.h>
+#include <xefis/utility/time_helper.h>
 
 
 namespace Xefis {
@@ -664,7 +665,7 @@ CHRUM6::Request::duration() const noexcept
 	if (finished())
 		return data()->finish_timestamp - data()->start_timestamp;
 	else
-		return Time::now() - data()->start_timestamp;
+		return TimeHelper::now() - data()->start_timestamp;
 }
 
 

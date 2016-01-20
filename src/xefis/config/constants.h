@@ -23,6 +23,12 @@
 #include "types.h"
 
 
+using namespace si;
+using namespace si::units;
+using namespace si::quantities;
+using namespace si::literals;
+
+
 constexpr Pressure STD_PRESSURE = 29.92_inHg;
 
 inline bool

@@ -151,7 +151,7 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 	});
 
 	_save_delay_timer = std::make_unique<QTimer>();
-	_save_delay_timer->setInterval (_max_save_delay.ms());
+	_save_delay_timer->setInterval (_max_save_delay.quantity<Millisecond>());
 	_save_delay_timer->setSingleShot (false);
 	QObject::connect (_save_delay_timer.get(), &QTimer::timeout, std::bind (&State::try_saving, this));
 	_save_delay_timer->start();
@@ -231,7 +231,7 @@ State::load_state()
 						if (type == cv->second.type())
 						{
 							try {
-								cv->second.property().parse_blob (xf::parse_hex_string (e.attribute ("value")));
+								cv->second.property().parse (xf::parse_hex_string (e.attribute ("value")));
 							}
 							catch (xf::Exception const& e)
 							{

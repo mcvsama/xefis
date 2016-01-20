@@ -76,7 +76,7 @@ LinearIndicator::data_updated()
 		if (_value.valid())
 		{
 			try {
-				value = _value.floatize (_unit);
+				value = _value.to_float (_unit);
 			}
 			catch (UnsupportedUnit const&)
 			{

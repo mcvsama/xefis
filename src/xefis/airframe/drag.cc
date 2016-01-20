@@ -39,8 +39,7 @@ Drag::Drag (QDomElement const& config)
 			if (!e.hasAttribute ("cd"))
 				throw MissingDomAttribute (e, "cd");
 
-			Angle aoa;
-			aoa.parse (e.attribute ("aoa").toStdString());
+			auto aoa = parse<Angle> (e.attribute ("aoa").toStdString());
 			DragCoefficient cd = e.attribute ("cd").toDouble();
 			data[aoa] = cd;
 		}

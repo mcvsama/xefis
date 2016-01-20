@@ -71,13 +71,13 @@ ETSAirspeed::ETSAirspeed (xf::ModuleManager* module_manager, QDomElement const& 
 	_airspeed_smoother.set_smoothing_time (_airspeed_smoothing_time);
 
 	_initialization_timer = new QTimer (this);
-	_initialization_timer->setInterval (InitializationDelay.ms());
+	_initialization_timer->setInterval (InitializationDelay.quantity<Millisecond>());
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 	_initialization_timer->start();
 
 	_periodic_read_timer = new QTimer (this);
-	_periodic_read_timer->setInterval (_airspeed_read_interval.ms());
+	_periodic_read_timer->setInterval (_airspeed_read_interval.quantity<Millisecond>());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));
 
@@ -137,7 +137,7 @@ ETSAirspeed::read()
 				Speed speed = 0_kt;
 				if (raw_value >= _offset)
 					speed = 1_mps * (ValueScale * std::sqrt (1.0f * (raw_value - _offset)));
-				_airspeed.write (1_kt * _airspeed_smoother.process (speed.kt(), _airspeed_read_interval));
+				_airspeed.write (1_kt * _airspeed_smoother.process (speed.quantity<Knot>(), _airspeed_read_interval));
 				break;
 		}
 	});

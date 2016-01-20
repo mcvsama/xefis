@@ -22,6 +22,9 @@
 #include <stdexcept>
 #include <functional>
 
+// Boost:
+#include <boost/exception/all.hpp>
+
 // Qt:
 #include <QtCore/QString>
 

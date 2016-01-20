@@ -58,7 +58,7 @@ class VOR: public xf::Module
 	denormalize (Angle);
 
   private:
-	xf::Smoother<double>	_deviation_smoother			= 500_ms;
+	xf::Smoother<double>	_deviation_smoother			= Time (500_ms);
 	// Input:
 	xf::PropertyAngle		_input_magnetic_declination;
 	xf::PropertyAngle		_input_station_latitude;

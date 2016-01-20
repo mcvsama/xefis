@@ -60,7 +60,7 @@ FlapsControl::FlapsControl (xf::ModuleManager* module_manager, QDomElement const
 		throw xf::BadConfiguration ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
-	_timer->setInterval (kUpdateInterval.ms());
+	_timer->setInterval (kUpdateInterval.quantity<Millisecond>());
 	_timer->setSingleShot (false);
 	QObject::connect (_timer.get(), &QTimer::timeout, std::bind (&FlapsControl::update_flap_position, this));
 
@@ -105,9 +105,9 @@ FlapsControl::update_flap_position()
 {
 	using std::abs;
 
-	double sgn = xf::sgn ((_setting - _current).deg());
+	double sgn = xf::sgn ((_setting - _current).quantity<Degree>());
 	Angle difference = _setting - _current;
-	Angle delta = 1_deg * (kUpdateInterval.s() * _degrees_per_second);
+	Angle delta = 1_deg * (kUpdateInterval.quantity<Second>() * _degrees_per_second);
 
 	if (abs (difference) > delta)
 	{
@@ -125,6 +125,6 @@ FlapsControl::update_flap_position()
 	if (_output_current.configured())
 		_output_current.write (_current);
 	if (_output_control.configured())
-		_output_control.write (xf::renormalize (_current.deg(), _minimum.deg(), _maximum.deg(), _ctl_minimum, _ctl_maximum));
+		_output_control.write (xf::renormalize (_current, _minimum, _maximum, _ctl_minimum, _ctl_maximum));
 }
 

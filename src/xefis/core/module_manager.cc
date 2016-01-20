@@ -21,6 +21,7 @@
 #include <xefis/core/application.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "module_manager.h"
@@ -111,9 +112,9 @@ ModuleManager::unload_module (Module* module)
 void
 ModuleManager::data_updated (Time time)
 {
-	_update_dt = 1_s * (time.s() - _update_time.s());
+	_update_dt = time - _update_time;
 	if (_update_dt > 1.0_s)
-		_update_dt = Time::epoch() + 1_s;
+		_update_dt = TimeHelper::epoch() + 1_s;
 
 	_update_time = time;
 
@@ -123,7 +124,7 @@ ModuleManager::data_updated (Time time)
 
 	// Let instruments display data already computed by all other modules.
 	// Also limit FPS of the instrument modules.
-	if (time - _instrument_update_time > 1_s / 30.f)
+	if (time - _instrument_update_time > 1_s / 30.0)
 	{
 		for (Module* mod: _instrument_modules)
 			module_data_updated (mod);
@@ -203,7 +204,7 @@ ModuleManager::module_data_updated (Module* module) const
 {
 	Module::Pointer modptr = find (module);
 
-	Time dt = Time::measure ([&] {
+	Time dt = TimeHelper::measure ([&] {
 		try {
 			module->data_updated();
 		}

@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 // Boost:
 #include <boost/optional.hpp>
@@ -26,17 +27,20 @@
 #include <QtCore/QString>
 
 // Lib:
-#include <lib/si/all.h>
+#include <lib/si/si.h>
 #include <lib/half/half.hpp>
 
 
-using namespace SI;
+using namespace si;
+using namespace si::units;
+using namespace si::quantities;
+using namespace si::literals;
 
 
 inline std::string
-operator"" _str (const char* string, size_t)
+operator"" _str (const char* string, size_t len)
 {
-    return std::string (string);
+    return std::string (string, len);
 }
 
 

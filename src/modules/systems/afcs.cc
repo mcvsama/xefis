@@ -762,7 +762,7 @@ AFCS::update_mcp()
 	{
 		case SpeedControl::KIAS:
 			_mcp_speed_format_out = _mcp_speed_format_kias;
-			_mcp_speed_display.write (xf::symmetric_round (_mcp_ias.kt()));
+			_mcp_speed_display.write (xf::symmetric_round (_mcp_ias.quantity<Knot>()));
 			break;
 
 		case SpeedControl::Mach:
@@ -777,11 +777,11 @@ AFCS::update_mcp()
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
-			lateral_angle = xf::symmetric_round (_mcp_heading.deg());
+			lateral_angle = xf::symmetric_round (_mcp_heading.quantity<Degree>());
 			break;
 
 		case LateralControl::Track:
-			lateral_angle = xf::symmetric_round (_mcp_track.deg());
+			lateral_angle = xf::symmetric_round (_mcp_track.quantity<Degree>());
 			break;
 	}
 	if (lateral_angle == 0)
@@ -790,7 +790,7 @@ AFCS::update_mcp()
 
 	// Altitude window:
 	_mcp_altitude_format_out = _mcp_altitude_format;
-	_mcp_altitude_display.write (xf::symmetric_round (_mcp_altitude.ft()));
+	_mcp_altitude_display.write (xf::symmetric_round (_mcp_altitude.quantity<Foot>()));
 
 	// Vertical-control window:
 	switch (_vertical_control)
@@ -798,7 +798,7 @@ AFCS::update_mcp()
 		case VerticalControl::VS:
 			_mcp_vertical_format_out = _mcp_vertical_format_vs;
 			if (_mcp_vs)
-				_mcp_vertical_display.write (xf::symmetric_round (_mcp_vs->fpm()));
+				_mcp_vertical_display.write (xf::symmetric_round (_mcp_vs->quantity<FootPerMinute>()));
 			else
 				_mcp_vertical_display.set_nil();
 			break;
@@ -806,7 +806,7 @@ AFCS::update_mcp()
 		case VerticalControl::FPA:
 			_mcp_vertical_format_out = _mcp_vertical_format_fpa;
 			if (_mcp_fpa)
-				_mcp_vertical_display.write (xf::symmetric_round (10.0 * _mcp_fpa->deg()) / 10.0);
+				_mcp_vertical_display.write (xf::symmetric_round (10.0 * _mcp_fpa->quantity<Degree>()) / 10.0);
 			else
 				_mcp_vertical_display.set_nil();
 			break;
@@ -1159,8 +1159,7 @@ AFCS::current_rounded_vs() const
 	if (!_measured_vs.valid())
 		return { };
 
-	int vsr = _vs_rounding.fpm();
-	return 1_fpm * std::round (_measured_vs->fpm() / vsr) * vsr;
+	return std::round (*_measured_vs / _vs_rounding) * _vs_rounding;
 }
 
 
@@ -1170,8 +1169,7 @@ AFCS::current_rounded_fpa() const
 	if (!_measured_fpa.valid())
 		return { };
 
-	int fpar = _fpa_rounding.deg();
-	return 1_deg * std::round (_measured_fpa->deg() / fpar) * fpar;
+	return std::round (*_measured_fpa / _fpa_rounding) * _fpa_rounding;
 }
 
 

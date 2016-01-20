@@ -43,33 +43,33 @@ AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement
 
 	// Map of temperature <-> dynamic viscosity taken from
 	// <http://www.engineeringtoolbox.com/air-absolute-kinematic-viscosity-d_601.html>
-	std::map<Temperature, double> const temperature_to_dynamic_viscosity_map {
-		{ Temperature::from_degF ( -40), 157.591e-7 },
-		{ Temperature::from_degF ( -20), 159.986e-7 },
-		{ Temperature::from_degF (   0), 157.591e-7 },
-		{ Temperature::from_degF (  10), 164.776e-7 },
-		{ Temperature::from_degF (  20), 167.650e-7 },
-		{ Temperature::from_degF (  30), 171.482e-7 },
-		{ Temperature::from_degF (  40), 172.440e-7 },
-		{ Temperature::from_degF (  50), 176.272e-7 },
-		{ Temperature::from_degF (  60), 179.625e-7 },
-		{ Temperature::from_degF (  70), 182.978e-7 },
-		{ Temperature::from_degF (  80), 184.894e-7 },
-		{ Temperature::from_degF (  90), 186.810e-7 },
-		{ Temperature::from_degF ( 100), 188.726e-7 },
-		{ Temperature::from_degF ( 120), 192.558e-7 },
-		{ Temperature::from_degF ( 140), 197.827e-7 },
-		{ Temperature::from_degF ( 160), 202.138e-7 },
-		{ Temperature::from_degF ( 180), 207.886e-7 },
-		{ Temperature::from_degF ( 200), 215.071e-7 },
-		{ Temperature::from_degF ( 300), 238.063e-7 },
-		{ Temperature::from_degF ( 400), 250.996e-7 },
-		{ Temperature::from_degF ( 500), 277.820e-7 },
-		{ Temperature::from_degF ( 750), 326.199e-7 },
-		{ Temperature::from_degF (1000), 376.015e-7 },
-		{ Temperature::from_degF (1500), 455.050e-7 },
+	std::map<Temperature, DynamicViscosity> const temperature_to_dynamic_viscosity_map {
+		{  -40_degF, 157.591e-7_Pas },
+		{  -20_degF, 159.986e-7_Pas },
+		{    0_degF, 157.591e-7_Pas },
+		{   10_degF, 164.776e-7_Pas },
+		{   20_degF, 167.650e-7_Pas },
+		{   30_degF, 171.482e-7_Pas },
+		{   40_degF, 172.440e-7_Pas },
+		{   50_degF, 176.272e-7_Pas },
+		{   60_degF, 179.625e-7_Pas },
+		{   70_degF, 182.978e-7_Pas },
+		{   80_degF, 184.894e-7_Pas },
+		{   90_degF, 186.810e-7_Pas },
+		{  100_degF, 188.726e-7_Pas },
+		{  120_degF, 192.558e-7_Pas },
+		{  140_degF, 197.827e-7_Pas },
+		{  160_degF, 202.138e-7_Pas },
+		{  180_degF, 207.886e-7_Pas },
+		{  200_degF, 215.071e-7_Pas },
+		{  300_degF, 238.063e-7_Pas },
+		{  400_degF, 250.996e-7_Pas },
+		{  500_degF, 277.820e-7_Pas },
+		{  750_degF, 326.199e-7_Pas },
+		{ 1000_degF, 376.015e-7_Pas },
+		{ 1500_degF, 455.050e-7_Pas },
 	};
-	_temperature_to_dynamic_viscosity = std::make_unique<xf::Datatable2D<Temperature, double>> (std::move (temperature_to_dynamic_viscosity_map));
+	_temperature_to_dynamic_viscosity = std::make_unique<xf::Datatable2D<Temperature, DynamicViscosity>> (std::move (temperature_to_dynamic_viscosity_map));
 
 	parse_settings (config, {
 		{ "ias.valid-minimum", _ias_valid_minimum, true },
@@ -227,8 +227,8 @@ AirDataComputer::compute_altitude()
 			// Good for heights below tropopause (36 kft):
 			double a = 6.8755856e-6;
 			double b = 5.2558797;
-			double p = _pressure_static->inHg();
-			double p0 = pressure_setting.inHg();
+			double p = _pressure_static->quantity<InchOfMercury>();
+			double p0 = pressure_setting.quantity<InchOfMercury>();
 			return 1_ft * -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
 		};
 
@@ -256,9 +256,9 @@ AirDataComputer::compute_altitude()
 		Length qnh_height = do_compute_altitude (*_pressure_qnh);
 		Length std_height = do_compute_altitude (29.92_inHg);
 
-		_altitude_amsl.write (1_ft * _altitude_amsl_smoother.process (height.ft(), update_dt));
-		_altitude_amsl_qnh.write (1_ft * _altitude_amsl_qnh_smoother.process (qnh_height.ft(), update_dt));
-		_altitude_amsl_std.write (1_ft * _altitude_amsl_std_smoother.process (std_height.ft(), update_dt));
+		_altitude_amsl.write (1_ft * _altitude_amsl_smoother.process (height.quantity<Foot>(), update_dt));
+		_altitude_amsl_qnh.write (1_ft * _altitude_amsl_qnh_smoother.process (qnh_height.quantity<Foot>(), update_dt));
+		_altitude_amsl_std.write (1_ft * _altitude_amsl_std_smoother.process (std_height.quantity<Foot>(), update_dt));
 	}
 	else
 	{
@@ -272,11 +272,11 @@ AirDataComputer::compute_altitude()
 
 	if (_altitude_amsl.valid() && update_time > _hide_alt_lookahead_until)
 	{
-		double est = _altitude_amsl_estimator.process (_altitude_amsl_lookahead_i_smoother.process (_altitude_amsl->ft(), update_dt), update_dt);
+		double est = _altitude_amsl_estimator.process (_altitude_amsl_lookahead_i_smoother.process (_altitude_amsl->quantity<Foot>(), update_dt), update_dt);
 		est = _altitude_amsl_lookahead_o_smoother.process (est, update_dt);
 		_altitude_amsl_lookahead.write (1_ft * est);
 
-		if (std::abs (est - _altitude_amsl->ft()) > 1)
+		if (std::abs (est - _altitude_amsl->quantity<Foot>()) > 1)
 			_altitude_computer.touch();
 	}
 	else
@@ -301,7 +301,10 @@ AirDataComputer::compute_density_altitude()
 
 	// Also compute air density:
 	if (_pressure_static.valid() && _static_air_temperature.valid())
-		_air_density_static = 1_kgpm3 * _pressure_static->Pa() / (287.058 * _static_air_temperature->K());
+	{
+		SpecificHeatCapacity dry_air_specific_constant { 287.058 };
+		_air_density_static = *_pressure_static / (dry_air_specific_constant * *_static_air_temperature);
+	}
 	else
 		_air_density_static.set_nil();
 }
@@ -343,7 +346,7 @@ AirDataComputer::compute_ias()
 		Pressure qc = *_pressure_total - *_pressure_static;
 
 		Speed ias = a0 * std::sqrt (5.0 * (std::pow (qc / p0 + 1.0, 2.0 / 7.0) - 1.0));
-		_speed_ias.write (1_kt * _speed_ias_smoother.process (ias.kt(), update_dt));
+		_speed_ias.write (1_kt * _speed_ias_smoother.process (ias.quantity<Knot>(), update_dt));
 	}
 	else
 	{
@@ -364,11 +367,11 @@ AirDataComputer::compute_ias_lookahead()
 	{
 		Time update_dt = _ias_lookahead_computer.update_dt();
 
-		double est = _speed_ias_estimator.process (_speed_ias_lookahead_i_smoother.process (_ias->kt(), update_dt), update_dt);
+		double est = _speed_ias_estimator.process (_speed_ias_lookahead_i_smoother.process (_ias->quantity<Knot>(), update_dt), update_dt);
 		est = _speed_ias_lookahead_o_smoother.process (est, update_dt);
 		_speed_ias_lookahead.write (1_kt * est);
 
-		if (std::abs (est - _ias->kt()) > 1.0)
+		if (std::abs (est - _ias->quantity<Knot>()) > 1.0)
 			_ias_lookahead_computer.touch();
 	}
 	else
@@ -491,7 +494,7 @@ AirDataComputer::compute_vertical_speed()
 		Length alt_diff = *_altitude_amsl_std - _prev_altitude_amsl;
 		Speed computed_vertical_speed = alt_diff / update_dt;
 		_prev_altitude_amsl = *_altitude_amsl_std;
-		_vertical_speed.write (1_fpm * _vertical_speed_smoother.process (computed_vertical_speed.fpm(), update_dt));
+		_vertical_speed.write (1_fpm * _vertical_speed_smoother.process (computed_vertical_speed.quantity<FootPerMinute>(), update_dt));
 	}
 	else
 	{
@@ -514,7 +517,7 @@ AirDataComputer::compute_reynolds()
 		_dynamic_viscosity.valid())
 	{
 		Length const travelled_length = airframe->wings_chord();
-		_reynolds_number = _air_density_static->si_units() * _speed_tas->si_units() * travelled_length.si_units() / *_dynamic_viscosity;
+		_reynolds_number = (*_air_density_static) * (*_speed_tas) * travelled_length / (*_dynamic_viscosity);
 	}
 	else
 		_reynolds_number.set_nil();

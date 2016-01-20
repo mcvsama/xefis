@@ -15,6 +15,9 @@
 #include <cstddef>
 #include <string>
 
+// Boost:
+#include <boost/lexical_cast.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>

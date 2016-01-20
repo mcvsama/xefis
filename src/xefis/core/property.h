@@ -26,6 +26,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "property_node.h"
@@ -183,7 +184,7 @@ class GenericProperty
 	 * Return float-like value of the property.
 	 */
 	virtual double
-	floatize (std::string unit) const;
+	to_float (std::string unit) const;
 
   protected:
 	/**
@@ -209,7 +210,7 @@ class GenericProperty
 
 /**
  * Common base for typed properties, that is not templateized
- * yet. One can use methods like parse() or parse_blob()
+ * yet. One can use methods like parse(std::string) or parse(Blob)
  * to get value from the node.
  */
 class TypedProperty: public GenericProperty
@@ -244,7 +245,7 @@ class TypedProperty: public GenericProperty
 	 * when it can't find one, but quietly does nothing.
 	 */
 	virtual void
-	parse_blob (Blob const&);
+	parse (Blob const&);
 
 	/**
 	 * Create new property node of given type.
@@ -399,7 +400,7 @@ template<class tType>
 
 		// TypedProperty API
 		void
-		parse_blob (Blob const&) override;
+		parse (Blob const&) override;
 
 		/**
 		 * Return node casted to PropertyValueNode.
@@ -499,14 +500,14 @@ GenericProperty::valid_timestamp() const
 inline Time
 GenericProperty::modification_age() const
 {
-	return Time::now() - modification_timestamp();
+	return TimeHelper::now() - modification_timestamp();
 }
 
 
 inline Time
 GenericProperty::valid_age() const
 {
-	return Time::now() - valid_timestamp();
+	return TimeHelper::now() - valid_timestamp();
 }
 
 
@@ -663,7 +664,7 @@ GenericProperty::stringify (boost::format format, std::string const& unit, std::
 		else if (is_type<bool>())
 			return (stringify() == "true") ? "ON" : "OFF";
 		else
-			return (format % floatize (unit)).str();
+			return (format % to_float (unit)).str();
 	}
 	catch (UnsupportedUnit&)
 	{
@@ -695,11 +696,11 @@ GenericProperty::binarify() const
 
 
 inline double
-GenericProperty::floatize (std::string unit) const
+GenericProperty::to_float (std::string unit) const
 {
 	TypedPropertyValueNode* node = dynamic_cast<TypedPropertyValueNode*> (get_node());
 	if (node)
-		return node->floatize (unit);
+		return node->to_float (unit);
 	return 0.0;
 }
 
@@ -750,7 +751,7 @@ TypedProperty::parse (std::string const& str_value)
 
 
 inline void
-TypedProperty::parse_blob (Blob const& value)
+TypedProperty::parse (Blob const& value)
 {
 	if (_root)
 	{
@@ -761,7 +762,7 @@ TypedProperty::parse_blob (Blob const& value)
 			{
 				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
 				if (typed_node)
-					typed_node->parse_blob (value);
+					typed_node->parse (value);
 			}
 		}
 	}
@@ -996,19 +997,19 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::parse_blob (Blob const& value)
+	Property<T>::parse (Blob const& value)
 	{
 		if (_root)
 		{
 			if (!_path.string().empty())
 			{
 				try {
-					get_value_node_signalling()->parse_blob (value);
+					get_value_node_signalling()->parse (value);
 				}
 				catch (PropertyNotFound)
 				{
 					ValueNodeType* val_node = ensure_path (_path, Type());
-					val_node->parse_blob (value);
+					val_node->parse (value);
 				}
 			}
 		}
@@ -1078,7 +1079,7 @@ typedef Property<std::string>	PropertyString;
 typedef Property<Acceleration>	PropertyAcceleration;
 typedef Property<Angle>			PropertyAngle;
 typedef Property<Area>			PropertyArea;
-typedef Property<Capacity>		PropertyCapacity;
+typedef Property<Charge>		PropertyCharge;
 typedef Property<Current>		PropertyCurrent;
 typedef Property<Density>		PropertyDensity;
 typedef Property<Energy>		PropertyEnergy;
@@ -1092,7 +1093,7 @@ typedef Property<Temperature>	PropertyTemperature;
 typedef Property<Time>			PropertyTime;
 typedef Property<Torque>		PropertyTorque;
 typedef Property<Volume>		PropertyVolume;
-typedef Property<Weight>		PropertyWeight;
+typedef Property<Mass>			PropertyMass;
 
 } // namespace Xefis
 

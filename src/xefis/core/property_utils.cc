@@ -41,7 +41,7 @@ PropertyType::check_validity (std::string const& type)
 		"acceleration",
 		"angle",
 		"area",
-		"capacity",
+		"charge",
 		"current",
 		"density",
 		"force",
@@ -52,7 +52,7 @@ PropertyType::check_validity (std::string const& type)
 		"time",
 		"torque",
 		"volume",
-		"weight",
+		"mass",
 		"temperature",
 	};
 

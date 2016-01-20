@@ -31,15 +31,12 @@ LiftMod::Setting::Setting (QDomElement const& config)
 {
 	_label = config.attribute ("label");
 
-	_angle.parse (config.attribute ("angle").toStdString());
+	parse (config.attribute ("angle").toStdString(), _angle);
 
-	Speed min, max;
-	min.parse (config.attribute ("minimum-speed").toStdString());
-	max.parse (config.attribute ("maximum-speed").toStdString());
-	_speed_range.set_min (min);
-	_speed_range.set_max (max);
+	_speed_range.set_min (parse<Velocity> (config.attribute ("minimum-speed").toStdString()));
+	_speed_range.set_max (parse<Velocity> (config.attribute ("maximum-speed").toStdString()));
 
-	_aoa_correction.parse (config.attribute ("aoa-correction").toStdString());
+	parse (config.attribute ("aoa-correction").toStdString(), _aoa_correction);
 	_cl_correction = config.attribute ("lift-coefficient-correction").toDouble();
 }
 

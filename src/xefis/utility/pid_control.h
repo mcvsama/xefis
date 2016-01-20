@@ -212,7 +212,7 @@ template<class tValueType>
 	  private:
 		bool				_winding					= false;
 		bool				_output_smoothing_enabled	= false;
-		Smoother<ValueType>	_output_smoother			= 1_ms;
+		Smoother<ValueType>	_output_smoother			= Time (1_ms);
 		ValueType			_target						= ValueType();
 		ValueType			_output						= ValueType();
 		ValueType			_previous_error				= ValueType();
@@ -423,9 +423,9 @@ template<class T>
 		}
 		else
 			error = _target - measured_value;
-		_integral += error * dt.s();
+		_integral += error * dt.quantity<Second>();
 		_integral = limit<ParamType> (_integral, _i_limit);
-		_derivative = (error - _previous_error) / dt.s();
+		_derivative = (error - _previous_error) / dt.quantity<Second>();
 		if (!std::isfinite (_derivative))
 			_derivative = 0.0;
 		_output = limit<ValueType> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +

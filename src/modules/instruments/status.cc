@@ -24,6 +24,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "status.h"
@@ -215,7 +216,7 @@ Status::data_updated()
 		_status_widget->recall();
 
 	if (pressed (_input_button_clear))
-		if (Time::now() - _last_message_timestamp > _minimum_display_time)
+		if (xf::TimeHelper::now() - _last_message_timestamp > _minimum_display_time)
 			_status_widget->clear();
 
 	for (auto& m: _messages)
@@ -231,7 +232,7 @@ Status::data_updated()
 				}
 				// Show new one:
 				m.set_message_id (_status_widget->add_message (m.message(), m.color()));
-				_last_message_timestamp = Time::now();
+				_last_message_timestamp = xf::TimeHelper::now();
 				// Master* buttons?
 				switch (m.severity())
 				{

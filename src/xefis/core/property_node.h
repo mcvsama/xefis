@@ -33,6 +33,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/string.h>
+#include <xefis/utility/time_helper.h>
 
 #include "property_storage.h"
 #include "property_utils.h"
@@ -280,7 +281,7 @@ class TypedPropertyValueNode: public PropertyNode
 	 * Return float-like value for the property.
 	 */
 	virtual double
-	floatize (std::string unit) const = 0;
+	to_float (std::string const& unit) const = 0;
 
 	/**
 	 * Parse value and unit.
@@ -292,7 +293,7 @@ class TypedPropertyValueNode: public PropertyNode
 	 * Parse value from binary representation.
 	 */
 	virtual void
-	parse_blob (Blob const&) = 0;
+	parse (Blob const&) = 0;
 
   private:
 	bool	_is_nil					= false;
@@ -357,7 +358,7 @@ template<class tType>
 		 * Return float-like value.
 		 */
 		double
-		floatize (std::string unit) const override;
+		to_float (std::string const& unit) const override;
 
 		/**
 		 * Parse value and unit.
@@ -369,20 +370,7 @@ template<class tType>
 		 * Parse value from binary representation.
 		 */
 		void
-		parse_blob (Blob const&) override;
-
-	  private:
-		/**
-		 * Default floatize that returns _value.
-		 */
-		double
-		specialized_floatize (std::string, std::false_type) const;
-
-		/**
-		 * Specialized floatize for SI types that returns _value->floatize().
-		 */
-		double
-		specialized_floatize (std::string unit, std::true_type) const;
+		parse (Blob const&) override;
 
 	  private:
 		Type _value;
@@ -515,7 +503,7 @@ TypedPropertyValueNode::valid() const noexcept
 inline void
 TypedPropertyValueNode::set_nil() noexcept
 {
-	_modification_timestamp = Time::now();
+	_modification_timestamp = TimeHelper::now();
 
 	if (!_is_nil)
 	{
@@ -559,7 +547,7 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::write (Type const& value)
 	{
-		_modification_timestamp = Time::now();
+		_modification_timestamp = TimeHelper::now();
 		_valid_timestamp = _modification_timestamp;
 
 		if (_is_nil || _value != value)
@@ -612,7 +600,7 @@ template<class T>
 	PropertyValueNode<T>::binarify() const
 	{
 		if (!_is_nil)
-			return _value.binarify();
+			return si::to_blob (_value);
 		else
 			return Blob();
 	}
@@ -676,15 +664,15 @@ template<>
 
 template<class T>
 	inline double
-	PropertyValueNode<T>::floatize (std::string unit) const
+	PropertyValueNode<T>::to_float (std::string const& unit) const
 	{
-		return specialized_floatize (unit, typename std::is_base_of<SI::Value, T>::type());
+		return ::quantity (_value, unit);
 	}
 
 
 template<>
 	inline double
-	PropertyValueNode<std::string>::floatize (std::string) const
+	PropertyValueNode<std::string>::to_float (std::string const&) const
 	{
 		return 0.0;
 	}
@@ -694,9 +682,7 @@ template<class T>
 	inline void
 	PropertyValueNode<T>::parse (std::string const& str)
 	{
-		Type parsed;
-		parsed.parse (str);
-		write (parsed);
+		write (si::parse<Type> (str));
 	}
 
 
@@ -717,7 +703,7 @@ template<>
 		}
 		catch (boost::bad_lexical_cast&)
 		{
-			throw SI::UnparsableValue ("error while parsing: " + str);
+			throw si::UnparsableValue ("error while parsing: " + str);
 		}
 	}
 
@@ -731,7 +717,7 @@ template<>
 		}
 		catch (boost::bad_lexical_cast&)
 		{
-			throw SI::UnparsableValue ("error while parsing: " + str);
+			throw si::UnparsableValue ("error while parsing: " + str);
 		}
 	}
 
@@ -746,22 +732,18 @@ template<>
 
 template<class T>
 	inline void
-	PropertyValueNode<T>::parse_blob (Blob const& blob)
+	PropertyValueNode<T>::parse (Blob const& blob)
 	{
 		if (blob.empty())
 			set_nil();
 		else
-		{
-			Type parsed;
-			parsed.parse_blob (blob);
-			write (parsed);
-		}
+			write (si::parse<Type> (blob));
 	}
 
 
 template<>
 	inline void
-	PropertyValueNode<bool>::parse_blob (Blob const& blob)
+	PropertyValueNode<bool>::parse (Blob const& blob)
 	{
 		if (blob.empty())
 			set_nil();
@@ -772,7 +754,7 @@ template<>
 
 template<>
 	inline void
-	PropertyValueNode<int64_t>::parse_blob (Blob const& blob)
+	PropertyValueNode<int64_t>::parse (Blob const& blob)
 	{
 		if (blob.empty())
 			set_nil();
@@ -787,7 +769,7 @@ template<>
 
 template<>
 	inline void
-	PropertyValueNode<double>::parse_blob (Blob const& blob)
+	PropertyValueNode<double>::parse (Blob const& blob)
 	{
 		if (blob.empty())
 			set_nil();
@@ -802,28 +784,12 @@ template<>
 
 template<>
 	inline void
-	PropertyValueNode<std::string>::parse_blob (Blob const& blob)
+	PropertyValueNode<std::string>::parse (Blob const& blob)
 	{
 		if (blob.empty())
 			set_nil();
 		else if (blob[0] == 0x00)
 			write (std::string (blob.begin() + 1, blob.end()));
-	}
-
-
-template<class T>
-	inline double
-	PropertyValueNode<T>::specialized_floatize (std::string, std::false_type) const
-	{
-		return _value;
-	}
-
-
-template<class T>
-	inline double
-	PropertyValueNode<T>::specialized_floatize (std::string unit, std::true_type) const
-	{
-		return _value.floatize (unit);
 	}
 
 } // namespace Xefis

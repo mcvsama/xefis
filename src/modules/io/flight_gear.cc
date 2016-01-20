@@ -466,13 +466,13 @@ FlightGearIO::read_input()
 
 		// TAT
 		if (_total_air_temperature.configured())
-			_total_air_temperature.write (Temperature::from_degC (fg_data->total_air_temperature_degc));
+			_total_air_temperature.write (Quantity<Celsius> (fg_data->total_air_temperature_degc));
 
 		// Convert EGT from °F to Kelvins:
 		if (_engine_1_egt.configured())
-			_engine_1_egt.write (Temperature::from_degF (fg_data->engine_1_egt_degf));
+			_engine_1_egt.write (Quantity<Fahrenheit> (fg_data->engine_1_egt_degf));
 		if (_engine_2_egt.configured())
-			_engine_2_egt.write (Temperature::from_degF (fg_data->engine_2_egt_degf));
+			_engine_2_egt.write (Quantity<Fahrenheit> (fg_data->engine_2_egt_degf));
 
 		// Engine thrust:
 		_engine_1_thrust = 1_lb * fg_data->engine_1_thrust_lb * 1_g;

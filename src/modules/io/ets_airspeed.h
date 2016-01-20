@@ -100,7 +100,7 @@ class ETSAirspeed:
 	QTimer*					_periodic_read_timer;
 	std::vector<uint16_t>	_calibration_data;
 	uint16_t				_offset						= 0;
-	xf::Smoother<double>	_airspeed_smoother			= 100_ms;
+	xf::Smoother<double>	_airspeed_smoother			= Time (100_ms);
 };
 
 #endif

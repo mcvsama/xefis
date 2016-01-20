@@ -2,53 +2,28 @@
 
 ######## /lib/si ########
 
-SI_HEADERS += lib/si/quantities/acceleration.h
-SI_HEADERS += lib/si/quantities/angle.h
-SI_HEADERS += lib/si/quantities/area.h
-SI_HEADERS += lib/si/quantities/capacity.h
-SI_HEADERS += lib/si/quantities/current.h
-SI_HEADERS += lib/si/quantities/density.h
-SI_HEADERS += lib/si/quantities/energy.h
-SI_HEADERS += lib/si/quantities/force.h
-SI_HEADERS += lib/si/quantities/frequency.h
-SI_HEADERS += lib/si/quantities/length.h
-SI_HEADERS += lib/si/quantities/lonlat.h
-SI_HEADERS += lib/si/quantities/power.h
-SI_HEADERS += lib/si/quantities/pressure.h
-SI_HEADERS += lib/si/quantities/speed.h
-SI_HEADERS += lib/si/quantities/temperature.h
-SI_HEADERS += lib/si/quantities/time.h
-SI_HEADERS += lib/si/quantities/torque.h
-SI_HEADERS += lib/si/quantities/volume.h
-SI_HEADERS += lib/si/quantities/weight.h
-SI_HEADERS += lib/si/quantities/value.h
-SI_HEADERS += lib/si/units/joule.h
-SI_HEADERS += lib/si/all.h
-SI_HEADERS += lib/si/constants.h
-SI_HEADERS += lib/si/linear_value.h
-SI_HEADERS += lib/si/operators.h
-SI_HEADERS += lib/si/value.h
+SI_HEADERS += lib/si/exception.h
+SI_HEADERS += lib/si/functions.h
+SI_HEADERS += lib/si/lonlat.h
+SI_HEADERS += lib/si/quantity.h
+SI_HEADERS += lib/si/si.h
+SI_HEADERS += lib/si/standard_constants.h
+SI_HEADERS += lib/si/standard_literals.h
+SI_HEADERS += lib/si/standard_quantities.h
+SI_HEADERS += lib/si/standard_unit_traits.h
+SI_HEADERS += lib/si/standard_units.h
+SI_HEADERS += lib/si/unit.h
+SI_HEADERS += lib/si/unit_traits.h
+SI_HEADERS += lib/si/utils.h
 
-SI_SOURCES += lib/si/quantities/acceleration.cc
-SI_SOURCES += lib/si/quantities/angle.cc
-SI_SOURCES += lib/si/quantities/area.cc
-SI_SOURCES += lib/si/quantities/capacity.cc
-SI_SOURCES += lib/si/quantities/current.cc
-SI_SOURCES += lib/si/quantities/density.cc
-SI_SOURCES += lib/si/quantities/energy.cc
-SI_SOURCES += lib/si/quantities/force.cc
-SI_SOURCES += lib/si/quantities/frequency.cc
-SI_SOURCES += lib/si/quantities/length.cc
-SI_SOURCES += lib/si/quantities/lonlat.cc
-SI_SOURCES += lib/si/quantities/power.cc
-SI_SOURCES += lib/si/quantities/pressure.cc
-SI_SOURCES += lib/si/quantities/speed.cc
-SI_SOURCES += lib/si/quantities/temperature.cc
-SI_SOURCES += lib/si/quantities/time.cc
-SI_SOURCES += lib/si/quantities/torque.cc
-SI_SOURCES += lib/si/quantities/volume.cc
-SI_SOURCES += lib/si/quantities/weight.cc
-SI_SOURCES += lib/si/units/joule.cc
+SI_SOURCES += lib/si/exception.cc
+SI_SOURCES += lib/si/functions.cc
+SI_SOURCES += lib/si/standard_unit_traits.cc
+SI_SOURCES += lib/si/lonlat.cc
+SI_SOURCES += lib/si/unit.cc
+SI_SOURCES += lib/si/utils.cc
+
+SELFTEST_SOURCES += lib/si/tests/basic_tests.cc
 
 ######## /xefis ########
 
@@ -253,6 +228,7 @@ XEFIS_HEADERS += xefis/utility/text_layout.h
 XEFIS_HEADERS += xefis/utility/text_painter.h
 XEFIS_HEADERS += xefis/utility/thread.h
 XEFIS_HEADERS += xefis/utility/time.h
+XEFIS_HEADERS += xefis/utility/time_helper.h
 XEFIS_HEADERS += xefis/utility/transistor.h
 
 XEFIS_SOURCES += xefis/utility/backtrace.cc

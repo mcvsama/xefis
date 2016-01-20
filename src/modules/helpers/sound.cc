@@ -18,10 +18,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/sound_manager.h>
+#include <xefis/utility/qdom.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "sound.h"
@@ -38,7 +39,7 @@ Sound::Alarm::Alarm (QDomElement const& alarm_element, xf::SoundManager* sound_m
 	_priority = alarm_element.attribute ("priority").toInt();
 	_repeat = alarm_element.hasAttribute ("repeat-period");
 	if (_repeat)
-		_repeat_period.parse (alarm_element.attribute ("repeat-period").toStdString());
+		parse (alarm_element.attribute ("repeat-period").toStdString(), _repeat_period);
 	if (_repeat_period < 0_s)
 		_repeat_period = 0_s;
 }
@@ -58,11 +59,11 @@ Sound::Alarm::check()
 
 	if (_repeat && _was_started && (!sptr || sptr->finished()))
 	{
-		_finished_timestamp = Time::now();
+		_finished_timestamp = xf::TimeHelper::now();
 		_was_started = false;
 	}
 
-	bool test = *_property && (!_finished_timestamp || (_repeat && *_finished_timestamp + _repeat_period <= Time::now()));
+	bool test = *_property && (!_finished_timestamp || (_repeat && *_finished_timestamp + _repeat_period <= xf::TimeHelper::now()));
 
 	if (test)
 	{

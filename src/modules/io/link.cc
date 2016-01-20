@@ -118,8 +118,8 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Angle;
 	else if (type_attr == "area")
 		_type = Type::Area;
-	else if (type_attr == "capacity")
-		_type = Type::Capacity;
+	else if (type_attr == "charge")
+		_type = Type::Charge;
 	else if (type_attr == "current")
 		_type = Type::Current;
 	else if (type_attr == "density")
@@ -146,8 +146,8 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Torque;
 	else if (type_attr == "volume")
 		_type = Type::Volume;
-	else if (type_attr == "weight")
-		_type = Type::Weight;
+	else if (type_attr == "mass")
+		_type = Type::Mass;
 
 	if (_type == Type::Unknown)
 		throw xf::BadDomAttribute (element, "type", "unknown type: " + type_attr);
@@ -161,7 +161,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Acceleration:
 		case Type::Angle:
 		case Type::Area:
-		case Type::Capacity:
+		case Type::Charge:
 		case Type::Current:
 		case Type::Density:
 		case Type::Energy:
@@ -175,7 +175,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Time:
 		case Type::Torque:
 		case Type::Volume:
-		case Type::Weight:
+		case Type::Mass:
 			if (!element.hasAttribute ("bytes"))
 				throw xf::MissingDomAttribute (element, "bytes");
 			break;
@@ -196,7 +196,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Acceleration:
 			case Type::Angle:
 			case Type::Area:
-			case Type::Capacity:
+			case Type::Charge:
 			case Type::Current:
 			case Type::Density:
 			case Type::Energy:
@@ -210,7 +210,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Time:
 			case Type::Torque:
 			case Type::Volume:
-			case Type::Weight:
+			case Type::Mass:
 				if (_bytes != 2 && _bytes != 4 && _bytes != 8)
 					throw xf::BadDomAttribute (element, "bytes", QString ("is %1, should be 2, 4 or 8").arg (_bytes));
 				break;
@@ -229,7 +229,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	_property_acceleration.set_path (path);
 	_property_angle.set_path (path);
 	_property_area.set_path (path);
-	_property_capacity.set_path (path);
+	_property_charge.set_path (path);
 	_property_current.set_path (path);
 	_property_density.set_path (path);
 	_property_energy.set_path (path);
@@ -243,7 +243,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	_property_time.set_path (path);
 	_property_torque.set_path (path);
 	_property_volume.set_path (path);
-	_property_weight.set_path (path);
+	_property_mass.set_path (path);
 }
 
 
@@ -269,7 +269,7 @@ Link::PropertyItem::produce (Blob& blob)
 		if (_property_##property.is_nil()) \
 			float_value = std::numeric_limits<decltype (float_value)>::quiet_NaN(); \
 		else \
-			float_value = _property_##property.read().internal(); \
+			float_value = _property_##property.read().base_quantity(); \
 		break;
 
 	switch (_type)
@@ -290,7 +290,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
 		XEFIS_CASE_FLOAT (Area, area);
-		XEFIS_CASE_FLOAT (Capacity, capacity);
+		XEFIS_CASE_FLOAT (Charge, charge);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Density, density);
 		XEFIS_CASE_FLOAT (Energy, energy);
@@ -304,7 +304,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Time, time);
 		XEFIS_CASE_FLOAT (Torque, torque);
 		XEFIS_CASE_FLOAT (Volume, volume);
-		XEFIS_CASE_FLOAT (Weight, weight);
+		XEFIS_CASE_FLOAT (Mass, mass);
 
 		case Type::Unknown:
 			// Impossible.
@@ -357,7 +357,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Acceleration:
 		case Type::Angle:
 		case Type::Area:
-		case Type::Capacity:
+		case Type::Charge:
 		case Type::Current:
 		case Type::Density:
 		case Type::Energy:
@@ -371,7 +371,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Time:
 		case Type::Torque:
 		case Type::Volume:
-		case Type::Weight:
+		case Type::Mass:
 			kind = Kind::Float;
 			break;
 
@@ -417,7 +417,7 @@ Link::PropertyItem::apply()
 				_property_##property.set_nil(); \
 		} \
 		else \
-			_property_##property.write (si_from_internal<type> (_float_value)); \
+			_property_##property.write (type (_float_value)); \
 		break;
 
 	switch (_type)
@@ -439,7 +439,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Acceleration, acceleration);
 		XEFIS_CASE_FLOAT (Angle, angle);
 		XEFIS_CASE_FLOAT (Area, area);
-		XEFIS_CASE_FLOAT (Capacity, capacity);
+		XEFIS_CASE_FLOAT (Charge, charge);
 		XEFIS_CASE_FLOAT (Current, current);
 		XEFIS_CASE_FLOAT (Density, density);
 		XEFIS_CASE_FLOAT (Energy, energy);
@@ -453,7 +453,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Time, time);
 		XEFIS_CASE_FLOAT (Torque, torque);
 		XEFIS_CASE_FLOAT (Volume, volume);
-		XEFIS_CASE_FLOAT (Weight, weight);
+		XEFIS_CASE_FLOAT (Mass, mass);
 
 		case Type::Unknown:
 			// Impossible.
@@ -487,7 +487,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Acceleration, acceleration);
 			XEFIS_CASE_FLOAT (Angle, angle);
 			XEFIS_CASE_FLOAT (Area, area);
-			XEFIS_CASE_FLOAT (Capacity, capacity);
+			XEFIS_CASE_FLOAT (Charge, charge);
 			XEFIS_CASE_FLOAT (Current, current);
 			XEFIS_CASE_FLOAT (Density, density);
 			XEFIS_CASE_FLOAT (Energy, energy);
@@ -501,7 +501,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Time, time);
 			XEFIS_CASE_FLOAT (Torque, torque);
 			XEFIS_CASE_FLOAT (Volume, volume);
-			XEFIS_CASE_FLOAT (Weight, weight);
+			XEFIS_CASE_FLOAT (Mass, mass);
 
 			case Type::Unknown:
 				// Impossible.
@@ -538,16 +538,6 @@ template<class CastType, class SourceType>
 		boost::endian::little_to_native (casted);
 		src = casted;
 		return begin + size;
-	}
-
-
-template<class SIType>
-	inline SIType
-	Link::PropertyItem::si_from_internal (xf::PropertyFloat::Type float_value)
-	{
-		SIType t;
-		t.internal() = float_value;
-		return t;
 	}
 
 
@@ -883,17 +873,17 @@ Link::Link (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	_failsafe_timer = new QTimer (this);
 	_failsafe_timer->setSingleShot (true);
-	_failsafe_timer->setInterval (failsafe_after.ms());
+	_failsafe_timer->setInterval (failsafe_after.quantity<Millisecond>());
 	QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
 
 	_reacquire_timer = new QTimer (this);
 	_reacquire_timer->setSingleShot (true);
-	_reacquire_timer->setInterval (reacquire_after.ms());
+	_reacquire_timer->setInterval (reacquire_after.quantity<Millisecond>());
 	QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
 
 	_output_timer = new QTimer (this);
 	_output_timer->setSingleShot (false);
-	_output_timer->setInterval (1000 / output_frequency.Hz());
+	_output_timer->setInterval (1000 / output_frequency.quantity<Hertz>());
 	QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
 	_output_timer->start();
 }

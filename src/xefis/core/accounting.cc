@@ -18,6 +18,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "accounting.h"
@@ -129,7 +130,7 @@ Accounting::latency_check()
 void
 Accounting::customEvent (QEvent* event)
 {
-	Time now = Time::now();
+	Time now = TimeHelper::now();
 	LatencyCheckEvent* lce = dynamic_cast<LatencyCheckEvent*> (event);
 	if (lce)
 	{
