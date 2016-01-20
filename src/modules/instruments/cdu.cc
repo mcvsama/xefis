@@ -400,11 +400,11 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 					try {
 						std::rethrow_exception (eptr);
 					}
-					catch (SI::UnsupportedUnit const&)
+					catch (si::UnsupportedUnit const&)
 					{
 						cdu->post_message ("Unsupported unit");
 					}
-					catch (SI::UnparsableValue const&)
+					catch (si::UnparsableValue const&)
 					{
 						cdu->post_message ("Incompatible value type");
 					}
@@ -1015,7 +1015,7 @@ CDU::paintEvent (QPaintEvent*)
 
 		if (_time_utc.valid())
 		{
-			QDateTime datetime = QDateTime::fromTime_t (_time_utc->s());
+			QDateTime datetime = QDateTime::fromTime_t (_time_utc->quantity<Second>());
 			datetime.setTimeZone (QTimeZone (0));
 			time_str = datetime.time().toString ("HH:mm:ss") + " z";
 			date_str = datetime.date().toString ("d MMM yy").toUpper();

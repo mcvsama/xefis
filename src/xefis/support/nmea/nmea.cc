@@ -17,6 +17,7 @@
 
 // Lib:
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>

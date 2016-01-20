@@ -88,7 +88,7 @@ BMP085::initialize()
 		_md = read_s16 (MD_REG);
 
 		_temperature_timer = std::make_unique<QTimer> (this);
-		_temperature_timer->setInterval (_temperature_interval.ms());
+		_temperature_timer->setInterval (_temperature_interval.quantity<Millisecond>());
 		_temperature_timer->setSingleShot (false);
 		QObject::connect (_temperature_timer.get(), SIGNAL (timeout()), this, SLOT (request_temperature()));
 
@@ -98,12 +98,12 @@ BMP085::initialize()
 		QObject::connect (_temperature_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_temperature()));
 
 		_pressure_timer = std::make_unique<QTimer> (this);
-		_pressure_timer->setInterval (_pressure_interval.ms());
+		_pressure_timer->setInterval (_pressure_interval.quantity<Millisecond>());
 		_pressure_timer->setSingleShot (false);
 		QObject::connect (_pressure_timer.get(), SIGNAL (timeout()), this, SLOT (request_pressure()));
 
 		_pressure_ready_timer = std::make_unique<QTimer> (this);
-		_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].ms());
+		_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].quantity<Millisecond>());
 		_pressure_ready_timer->setSingleShot (true);
 		QObject::connect (_pressure_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_pressure()));
 
@@ -176,7 +176,7 @@ BMP085::read_temperature()
 		int32_t x2 = (_mc << 11) / (x1 + _md);
 		_b5 = x1 + x2;
 		_ct = (_b5 + 8) >> 4;
-		_temperature.write (Temperature::from_degC (_ct / 10.0));
+		_temperature.write (Quantity<Celsius> (_ct / 10.0));
 
 		handle_other (&BMP085::request_pressure);
 	});

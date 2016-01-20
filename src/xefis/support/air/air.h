@@ -26,29 +26,29 @@ namespace Xefis {
 inline Speed
 compute_sound_speed (Temperature static_air_temperature)
 {
-	return 38.967854_kt * std::sqrt (static_air_temperature.K());
+	return 38.967854_kt * std::sqrt (static_air_temperature.quantity<Kelvin>());
 }
 
 
 inline Length
 compute_density_altitude (Length pressure_altitude, Temperature static_air_temperature)
 {
-	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.ft()));
-	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.K(), 0.2349690));
+	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.quantity<Foot>()));
+	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.quantity<Kelvin>(), 0.2349690));
 }
 
 
 inline Speed
 compute_true_airspeed (Speed indicated_airspeed, Length density_altitude)
 {
-	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.ft(), 2.127940);
+	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.quantity<Foot>(), 2.127940);
 }
 
 
 inline Speed
 compute_indicated_airspeed (Speed true_airspeed, Length density_altitude)
 {
-	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.ft(), 2.127940);
+	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.quantity<Foot>(), 2.127940);
 }
 
 } // namespace Xefis

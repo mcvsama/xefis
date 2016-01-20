@@ -166,7 +166,7 @@ inline void
 SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
 {
 	_smoothing_time = smoothing_time;
-	int millis = _smoothing_time.ms();
+	int millis = _smoothing_time.quantity<Millisecond>();
 	// Due to the nature of Hann window, minimum number of samples is 3,
 	// therefore minimum smoothing time is 3 ms.
 	if (millis < 3)

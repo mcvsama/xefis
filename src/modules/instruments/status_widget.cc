@@ -85,7 +85,7 @@ StatusWidget::remove_message (uint64_t message_id)
 	}
 	// Later remove the message:
 	QTimer* timer = new QTimer (this);
-	timer->setInterval (MessageHideTimeout.ms());
+	timer->setInterval (MessageHideTimeout.quantity<Millisecond>());
 	timer->setSingleShot (true);
 	QObject::connect (timer, &QTimer::timeout, [this,timer,message_id] {
 		do_remove_message (message_id);

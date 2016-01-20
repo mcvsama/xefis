@@ -50,7 +50,7 @@ Window::Stack::Stack (Time delay)
 	// This delay is here, because it just looks good:
 	timer = std::make_unique<QTimer>();
 	timer->setSingleShot (true);
-	timer->setInterval (delay.ms());
+	timer->setInterval (delay.quantity<Millisecond>());
 
 	QObject::connect (timer.get(), &QTimer::timeout, [&] {
 		layout->setCurrentIndex (*property + 1);
@@ -405,7 +405,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 
 		Time switch_delay = 0_ms;
 		if (layout_element.hasAttribute ("switch-delay"))
-			switch_delay.parse (layout_element.attribute ("switch-delay").toStdString());
+			parse (layout_element.attribute ("switch-delay").toStdString(), switch_delay);
 
 		stack = std::make_shared<Stack> (switch_delay);
 		stack->property.set_path (PropertyPath (layout_element.attribute ("path")));

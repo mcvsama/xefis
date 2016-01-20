@@ -97,12 +97,12 @@ IMUCFF::compute_centrifugal()
 		_centrifugal_x.set_nil();
 
 		if (_rotation_z.valid())
-			_centrifugal_y = 1_mps2 * _smooth_cf_y.process ((*_ias_x * (2.0 * M_PI * -*_rotation_z)).mps2(), dt);
+			_centrifugal_y = 1_mps2 * _smooth_cf_y.process ((*_ias_x * (2.0 * M_PI * -*_rotation_z)).quantity<MeterPerSecondSquared>(), dt);
 		else
 			_centrifugal_y.set_nil();
 
 		if (_rotation_y.valid())
-			_centrifugal_z = 1_mps2 * _smooth_cf_z.process ((*_ias_x * (2.0 * M_PI * *_rotation_y)).mps2(), dt);
+			_centrifugal_z = 1_mps2 * _smooth_cf_z.process ((*_ias_x * (2.0 * M_PI * *_rotation_y)).quantity<MeterPerSecondSquared>(), dt);
 		else
 			_centrifugal_z.set_nil();
 	}

@@ -171,11 +171,11 @@ PropertyEditor::update_item()
 		set_line_edit_color (_accepted_color);
 		_accepted_blink_timer->start();
 	}
-	catch (SI::UnparsableValue const& e)
+	catch (si::UnparsableValue const& e)
 	{
 		set_line_edit_color (_error_color);
 	}
-	catch (SI::UnsupportedUnit const& e)
+	catch (si::UnsupportedUnit const& e)
 	{
 		set_line_edit_color (_error_color);
 	}

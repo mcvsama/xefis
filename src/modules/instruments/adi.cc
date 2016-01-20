@@ -399,8 +399,8 @@ ADI::compute_fpv()
 
 	if (_orientation_pitch.valid() && _orientation_roll.valid() && _track_vertical.valid() && heading && track_lateral)
 	{
-		Angle vdiff = xf::floored_mod (*_orientation_pitch - *_track_vertical, -180_deg, +180_deg);
-		Angle hdiff = xf::floored_mod (**heading - **track_lateral, -180_deg, +180_deg);
+		Angle vdiff = xf::floored_mod<Angle> (*_orientation_pitch - *_track_vertical, -180_deg, +180_deg);
+		Angle hdiff = xf::floored_mod<Angle> (**heading - **track_lateral, -180_deg, +180_deg);
 		Angle roll = *_orientation_roll;
 
 		using std::sin;

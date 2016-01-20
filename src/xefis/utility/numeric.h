@@ -22,13 +22,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/config/types.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/range.h>
 
 
 namespace Xefis {
 
-template<class A, class B, class = typename std::enable_if<std::is_floating_point<A>::value, A>::type>
+template<class A, class B,
+		 class = typename std::enable_if<
+			 (std::is_floating_point<A>::value || si::is_quantity<A>::value) &&
+			 (std::is_floating_point<B>::value || si::is_quantity<B>::value)
+		 >::type>
 	inline constexpr B
 	renormalize (A a, A a_min, A a_max, B b_min, B b_max)
 	{
@@ -88,7 +93,7 @@ template<class T = int, class S>
  */
 template<class Number>
 	inline constexpr Number
-	floored_mod (Number n, typename std::enable_if<std::is_floating_point<Number>::value, Number>::type d)
+	floored_mod (Number n, typename std::enable_if<std::is_floating_point<Number>::value || si::is_quantity<Number>::value, Number>::type d)
 	{
 		return n - (d * std::floor (n / d));
 	}
@@ -104,6 +109,19 @@ template<class Number>
 	floored_mod (Number n, typename std::enable_if<std::is_integral<Number>::value, Number>::type d)
 	{
 		return (n % d) >= 0 ? (n % d) : (n % d) + std::abs (d);
+	}
+
+
+/**
+ * For SI types.
+ * \param	n - dividend
+ * \param	d - divisor
+ */
+template<template<class, class> class Quantity, class Unit, class Value>
+	inline constexpr Quantity<Unit, Value>
+	floored_mod (Quantity<Unit, Value> n, Quantity<Unit, Value> d)
+	{
+		return n - (d * std::floor (n / d));
 	}
 
 
@@ -148,7 +166,7 @@ template<class Value>
 inline constexpr Angle
 magnetic_to_true (Angle mag, Angle declination)
 {
-	return floored_mod (mag + declination, 360.0_deg);
+	return floored_mod (mag + declination, 360_deg);
 }
 
 
@@ -163,7 +181,7 @@ template<class Value>
 inline constexpr Angle
 true_to_magnetic (Angle tru, Angle declination)
 {
-	return floored_mod (tru - declination, 360.0_deg);
+	return floored_mod (tru - declination, 360_deg);
 }
 
 

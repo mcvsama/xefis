@@ -61,8 +61,8 @@ class AFCS_AP: public xf::Module
 	// Stabilizer PIDs:
 	xf::PIDControl<double>	_elevator_pid;
 	xf::PIDControl<double>	_ailerons_pid;
-	xf::Smoother<double>	_elevator_smoother		= 50_ms;
-	xf::Smoother<double>	_ailerons_smoother		= 50_ms;
+	xf::Smoother<double>	_elevator_smoother		= Time (50_ms);
+	xf::Smoother<double>	_ailerons_smoother		= Time (50_ms);
 	// Settings:
 	double					_stabilization_gain;
 	double					_pitch_gain;

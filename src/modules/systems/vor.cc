@@ -88,7 +88,7 @@ VOR::compute()
 		LonLat const aircraft_position (*_input_aircraft_longitude, *_input_aircraft_latitude);
 
 		Angle current_radial = normalize (station_position.initial_bearing (aircraft_position));
-		Angle deviation = xf::floored_mod (input_radial - current_radial, -180_deg, +180_deg);
+		Angle deviation = xf::floored_mod<Angle> (input_radial - current_radial, -180_deg, +180_deg);
 		if (abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
 
@@ -99,7 +99,7 @@ VOR::compute()
 		if (_output_initial_bearing_magnetic.configured())
 			_output_initial_bearing_magnetic = normalize (aircraft_position.initial_bearing (station_position) - declination);
 		_output_to_flag = abs (denormalize (current_radial - input_radial)) > 90_deg;
-		_output_deviation = 1_deg * _deviation_smoother.process (deviation.deg(), dt);
+		_output_deviation = 1_deg * _deviation_smoother.process (deviation.quantity<Degree>(), dt);
 		_output_distance = station_position.haversine_earth (aircraft_position);
 	}
 	else
@@ -113,13 +113,13 @@ VOR::compute()
 inline Angle
 VOR::normalize (Angle a)
 {
-	return xf::floored_mod (a, 0_deg, 360_deg);
+	return xf::floored_mod<Angle> (a, 0_deg, 360_deg);
 }
 
 
 inline Angle
 VOR::denormalize (Angle a)
 {
-	return xf::floored_mod (a, -180_deg, +180_deg);
+	return xf::floored_mod<Angle> (a, -180_deg, +180_deg);
 }
 

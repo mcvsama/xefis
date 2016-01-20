@@ -200,7 +200,7 @@ AFCS_FD_Pitch::compute_pitch()
 	}
 
 	if (output_pitch)
-		_output_pitch.write (1_deg * _output_pitch_smoother.process (output_pitch->deg(), update_dt));
+		_output_pitch.write (1_deg * _output_pitch_smoother.process (output_pitch->quantity<Degree>(), update_dt));
 	else
 	{
 		_output_pitch.set_nil();
@@ -222,7 +222,7 @@ template<class P>
 								  xf::Range<double> const& input_range,
 								  Time const& update_dt) const
 	{
-		xf::Range<double> pitch_limit { -_pitch_limit->deg(), +_pitch_limit->deg() };
+		xf::Range<Angle> pitch_limit { -*_pitch_limit, +*_pitch_limit };
 
 		if (cmd_param.is_nil() || measured_param.is_nil())
 		{
@@ -232,27 +232,11 @@ template<class P>
 		else
 		{
 			constexpr xf::Range<double> artificial_range = { -1.0, +1.0 };
-			pid.set_target (xf::renormalize (retrieve_numeric (*cmd_param), input_range, artificial_range));
-			pid.process (xf::renormalize (retrieve_numeric (*measured_param), input_range, artificial_range), update_dt);
+			pid.set_target (xf::renormalize (base_quantity (*cmd_param), input_range, artificial_range));
+			pid.process (xf::renormalize (base_quantity (*measured_param), input_range, artificial_range), update_dt);
 
-			return 1_deg * xf::limit<double> (pid.output() * input_range.mid(), pitch_limit);
+			return xf::limit<Angle> (1_deg * pid.output() * input_range.mid(), pitch_limit);
 		}
-	}
-
-
-template<class SIValue>
-	inline std::enable_if_t<std::is_base_of<SI::Value, SIValue>::value, double>
-	AFCS_FD_Pitch::retrieve_numeric (SIValue const& si_val)
-	{
-		return si_val.si_units();
-	}
-
-
-template<class FundamentalValue>
-	inline std::enable_if_t<!std::is_base_of<SI::Value, FundamentalValue>::value, double>
-	AFCS_FD_Pitch::retrieve_numeric (FundamentalValue value)
-	{
-		return value;
 	}
 
 

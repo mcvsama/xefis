@@ -103,7 +103,7 @@ class PerformanceComputer: public xf::Module
 	xf::PropertyAngle			_magnetic_declination;
 	xf::PropertyLength			_density_altitude;
 	xf::PropertyDensity			_input_air_density_static;
-	xf::PropertyWeight			_input_aircraft_weight;
+	xf::PropertyMass			_input_aircraft_mass;
 	xf::PropertyAngle			_input_flaps_angle;
 	xf::PropertyAngle			_input_spoilers_angle;
 	xf::PropertyAngle			_input_aoa_alpha;

@@ -297,7 +297,7 @@ State::prepare_efis_settings()
 
 	_mcp_course_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_course_value, [this](int delta) {
 		_course = xf::floored_mod (_course + 1_deg * delta, 360_deg);
-		int course = xf::symmetric_round (_course.deg());
+		int course = xf::symmetric_round (_course.quantity<Degree>());
 		if (course == 0)
 			course = 360;
 		_mcp_course_display.write (course);

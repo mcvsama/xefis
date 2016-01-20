@@ -119,7 +119,7 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	painter.setBrush (Qt::white);
 	painter.resetTransform();
 	painter.translate (width() / 2.f, height() / 2.f);
-	painter.rotate (_angle.deg());
+	painter.rotate (_angle.quantity<Degree>());
 	painter.drawPath (text_path);
 	painter.setPen (QPen (Qt::white, 0.5f));
 	painter.drawPath (text_path);
@@ -163,7 +163,7 @@ PanelRotaryEncoder::mouseMoveEvent (QMouseEvent* event)
 		event->accept();
 		int pixels = _mouse_last_position.y() - event->pos().y();
 
-		_angle += pixels * 360_deg / Notches / 4.f;
+		_angle += pixels * 360_deg / Notches / 4.0;
 		_value += pixels;
 		_mouse_last_position = event->pos();
 
@@ -181,7 +181,7 @@ PanelRotaryEncoder::wheelEvent (QWheelEvent* event)
 	if (_mouse_pressed)
 		return;
 
-	_angle += sgn (event->delta()) * 360_deg / Notches / 4.f;
+	_angle += sgn (event->delta()) * 360_deg / Notches / 4.0;
 	_value += sgn (event->delta());
 
 	write();

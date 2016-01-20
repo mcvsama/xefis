@@ -30,8 +30,8 @@ void
 sleep (Time time)
 {
 	struct timespec ts;
-	ts.tv_sec = static_cast<decltype (ts.tv_sec)> (time.s());
-	ts.tv_nsec = (time - ts.tv_sec * 1_s).ns();
+	ts.tv_sec = static_cast<decltype (ts.tv_sec)> (time.quantity<Second>());
+	ts.tv_nsec = (time - ts.tv_sec * 1_s).quantity<Nanosecond>();
 
 	do {
 		if (nanosleep (&ts, &ts) == -1)

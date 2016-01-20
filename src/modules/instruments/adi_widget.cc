@@ -39,14 +39,14 @@ ADIWidget::Parameters::sanitize()
 {
 	sl_line_every = std::max (sl_line_every, 1);
 	sl_number_every = std::max (sl_number_every, 1);
-	sl_extent = std::max (sl_extent, 1_kt);
+	sl_extent = std::max<Speed> (sl_extent, 1_kt);
 	sl_minimum = std::max (sl_minimum, 0);
 	sl_maximum = std::min (sl_maximum, 9999);
 	al_line_every = std::max (al_line_every, 1);
 	al_number_every = std::max (al_number_every, 1);
 	al_emphasis_every = std::max (al_emphasis_every, 1);
 	al_bold_every = std::max (al_bold_every, 1);
-	al_extent = std::max (al_extent, 1_ft);
+	al_extent = std::max<Length> (al_extent, 1_ft);
 }
 
 
@@ -201,7 +201,7 @@ ADIWidget::PaintWorkUnit::adi_pre_paint()
 	_pitch_transform.translate (0.f, -pitch_to_px (p));
 
 	_roll_transform.reset();
-	_roll_transform.rotate (-r.deg());
+	_roll_transform.rotate (-r.quantity<Degree>());
 
 	_heading_transform.reset();
 	_heading_transform.translate (-heading_to_px (hdg), 0.f);
@@ -212,8 +212,8 @@ ADIWidget::PaintWorkUnit::adi_pre_paint()
 	_horizon_transform.shear (0.0001f, 0.f);
 
 	// Limit FPM position:
-	_params.flight_path_alpha = xf::limit (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
-	_params.flight_path_beta = xf::limit (_params.flight_path_beta, -25.0_deg, +25.0_deg);
+	_params.flight_path_alpha = xf::limit<Angle> (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
+	_params.flight_path_beta = xf::limit<Angle> (_params.flight_path_beta, -25.0_deg, +25.0_deg);
 	_flight_path_marker_position = QPointF (-heading_to_px (_params.flight_path_beta), -pitch_to_px (_params.flight_path_alpha));
 }
 
@@ -655,14 +655,14 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_params.speed = xf::limit (_params.speed, 0_kt, 9999.99_kt);
-	_params.speed_mach = xf::limit (_params.speed_mach, 0.f, 9.99f);
-	_params.speed_minimum = xf::limit (_params.speed_minimum, 0.0_kt, 9999.99_kt);
+	_params.speed = xf::limit<Speed> (_params.speed, 0_kt, 9999.99_kt);
+	_params.speed_mach = xf::limit (_params.speed_mach, 0.0, 9.99);
+	_params.speed_minimum = xf::limit<Speed> (_params.speed_minimum, 0.0_kt, 9999.99_kt);
 	if (_params.speed_minimum_maneuver)
-		_params.speed_minimum_maneuver = xf::limit (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+		_params.speed_minimum_maneuver = xf::limit<Speed> (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
 	if (_params.speed_maximum_maneuver)
-		_params.speed_maximum_maneuver = xf::limit (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
-	_params.speed_maximum = xf::limit (_params.speed_maximum, 0.0_kt, 9999.99_kt);
+		_params.speed_maximum_maneuver = xf::limit<Speed> (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+	_params.speed_maximum = xf::limit<Speed> (_params.speed_maximum, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -674,7 +674,7 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
 	_sl_margin = 0.25f * digit_width;
-	_sl_digits = _params.speed >= 1000.0_kt - 0.5_kt ? 4 : 3;
+	_sl_digits = (_params.speed >= 1000_kt - 0.5_kt) ? 4 : 3;
 
 	float const box_height_factor = 2.35;
 	_sl_black_box_rect = QRectF (-_sl_digits * digit_width - 2.f * _sl_margin, -0.5f * box_height_factor * digit_height,
@@ -700,14 +700,14 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 void
 ADIWidget::PaintWorkUnit::sl_pre_paint()
 {
-	_params.speed = xf::limit (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
+	_params.speed = xf::limit<Speed> (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
 	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
 	_sl_max_shown = _params.speed + 0.5f * _params.sl_extent;
-	_sl_min_shown = std::max (_sl_min_shown, 1_kt * _params.sl_minimum);
-	_sl_max_shown = std::min (_sl_max_shown, 1_kt * _params.sl_maximum);
+	_sl_min_shown = std::max<Speed> (_sl_min_shown, 1_kt * _params.sl_minimum);
+	_sl_max_shown = std::min<Speed> (_sl_max_shown, 1_kt * _params.sl_maximum);
 	if (_sl_min_shown < 0_kt)
 		_sl_min_shown = 0_kt;
-	_sl_rounded_speed = static_cast<int> (_params.speed.kt() + 0.5);
+	_sl_rounded_speed = static_cast<int> (_params.speed.quantity<Knot>() + 0.5);
 }
 
 
@@ -797,10 +797,10 @@ ADIWidget::PaintWorkUnit::sl_paint_black_box (xf::Painter& painter, float x)
 	painter.setPen (QPen (Qt::white, 1.f, Qt::SolidLine, Qt::RoundCap));
 	painter.setFont (actual_speed_font);
 	if (_sl_digits == 4)
-		paint_rotating_digit (painter, box_1000, _params.speed.kt(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
-	paint_rotating_digit (painter, box_0100, _params.speed.kt(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
-	paint_rotating_digit (painter, box_0010, _params.speed.kt(), 10, 1.25f, 0.05f, 0.5f, false, false);
-	float pos_0001 = _sl_rounded_speed - _params.speed.kt();
+		paint_rotating_digit (painter, box_1000, _params.speed.quantity<Knot>(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
+	paint_rotating_digit (painter, box_0100, _params.speed.quantity<Knot>(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
+	paint_rotating_digit (painter, box_0010, _params.speed.quantity<Knot>(), 10, 1.25f, 0.05f, 0.5f, false, false);
+	float pos_0001 = _sl_rounded_speed - _params.speed.quantity<Knot>();
 	paint_rotating_value (painter, box_0001, pos_0001, 0.7f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed + 1.f, 10.f)))),
 						  QString::number (static_cast<int> (std::abs (std::fmod (1.f * _sl_rounded_speed, 10.f)))),
@@ -853,8 +853,8 @@ ADIWidget::PaintWorkUnit::sl_paint_ladder_scale (xf::Painter& painter, float x)
 
 	painter.setPen (_sl_scale_pen);
 	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int kt = (static_cast<int> (_sl_min_shown.kt()) / _params.sl_line_every) * _params.sl_line_every - _params.sl_line_every;
-		 kt <= _sl_max_shown.kt() + _params.sl_line_every;
+	for (int kt = (static_cast<int> (_sl_min_shown.quantity<Knot>()) / _params.sl_line_every) * _params.sl_line_every - _params.sl_line_every;
+		 kt <= _sl_max_shown.quantity<Knot>() + _params.sl_line_every;
 		 kt += _params.sl_line_every)
 	{
 		if (kt < _params.sl_minimum || kt > _params.sl_maximum)
@@ -890,8 +890,8 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
 	painter.setClipRect (_sl_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
 	float min_posy = kt_to_px (_params.speed_minimum);
-	float min_man_posy = kt_to_px (_params.speed_minimum_maneuver ? *_params.speed_minimum_maneuver : 0_kt);
-	float max_man_posy = kt_to_px (_params.speed_maximum_maneuver ? *_params.speed_maximum_maneuver : 0_kt);
+	float min_man_posy = kt_to_px (_params.speed_minimum_maneuver ? *_params.speed_minimum_maneuver : 0_mps);
+	float max_man_posy = kt_to_px (_params.speed_maximum_maneuver ? *_params.speed_maximum_maneuver : 0_mps);
 	float max_posy = kt_to_px (_params.speed_maximum);
 	QPointF min_point = _sl_ladder_rect.bottomRight() + ydif;
 	QPointF max_point = _sl_ladder_rect.topRight() - ydif;
@@ -948,13 +948,15 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x
 	pen.setCapStyle (Qt::RoundCap);
 	pen.setJoinStyle (Qt::RoundJoin);
 
+	using std::abs;
+
 	painter.setTransform (_sl_transform);
 	painter.setPen (pen);
 	painter.translate (1.2f * x, 0.f);
 	if (_params.speed_lookahead < _params.speed)
 		painter.scale (1.f, -1.f);
 	float length = std::min<float> (_sl_ladder_rect.height() / 2.f,
-									1.f * std::abs (kt_to_px (xf::limit (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
+									1.f * abs (kt_to_px (xf::limit<Speed> (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -1005,8 +1007,8 @@ ADIWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 	// Speed bug:
 	if (_params.cmd_speed)
 	{
-		float posy = xf::limit (kt_to_px (xf::limit (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
-								   static_cast<float> (-_sl_ladder_rect.height() / 2.f), static_cast<float> (_sl_ladder_rect.height() / 2.f));
+		float posy = xf::limit<float> (kt_to_px (xf::limit<Speed> (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
+									   -_sl_ladder_rect.height() / 2.0, _sl_ladder_rect.height() / 2.0);
 		painter.setClipRect (_sl_ladder_rect.translated (2.5f * x, 0.f));
 		painter.translate (1.25f * x, posy);
 		painter.setBrush (Qt::NoBrush);
@@ -1047,7 +1049,7 @@ ADIWidget::PaintWorkUnit::sl_paint_mach_or_gs (xf::Painter& painter, float x)
 		layout.set_alignment (Qt::AlignHCenter);
 		layout.add_fragment ("GS", _font_16, Qt::white);
 		layout.add_fragment (" ", _font_10, Qt::white);
-		layout.add_fragment (QString::number (static_cast<int> (_params.speed_ground->kt())), _font_20, Qt::white);
+		layout.add_fragment (QString::number (static_cast<int> (_params.speed_ground->quantity<Knot>())), _font_20, Qt::white);
 		layout.paint (paint_position, Qt::AlignCenter, painter);
 	}
 }
@@ -1076,7 +1078,7 @@ ADIWidget::PaintWorkUnit::sl_paint_ap_setting (xf::Painter& painter)
 	}
 	else if (_params.cmd_speed)
 	{
-		value = QString::number (std::abs (static_cast<int> (_params.cmd_speed->kt())));
+		value = QString::number (std::abs (static_cast<int> (_params.cmd_speed->quantity<Knot>())));
 		digits = 4;
 	}
 
@@ -1168,13 +1170,13 @@ ADIWidget::PaintWorkUnit::al_post_resize()
 void
 ADIWidget::PaintWorkUnit::al_pre_paint()
 {
-	_params.altitude = xf::limit (_params.altitude, -99999_ft, +99999_ft);
-	_params.vertical_speed = xf::limit (_params.vertical_speed, -9999_fpm, +9999_fpm);
+	_params.altitude = xf::limit<Length> (_params.altitude, -99999_ft, +99999_ft);
+	_params.vertical_speed = xf::limit<Speed> (_params.vertical_speed, -9999_fpm, +9999_fpm);
 
 	float sgn = _params.altitude < 0_ft ? -1.f : 1.f;
 	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
 	_al_max_shown = _params.altitude + 0.5f * _params.al_extent;
-	_al_rounded_altitude = static_cast<int> (_params.altitude.ft() + sgn * 10.f) / 20 * 20;
+	_al_rounded_altitude = static_cast<int> (_params.altitude.quantity<Foot>() + sgn * 10.f) / 20 * 20;
 
 	_al_transform = _center_transform;
 	_al_transform.translate (+0.4f * wh(), 0.f);
@@ -1278,7 +1280,7 @@ ADIWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 		painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
 		painter.setPen (get_pen (Qt::white, 1.f));
 		painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-								QString ("%1").arg (std::round (_params.altitude.m()), 0, 'f', 0));
+								QString ("%1").arg (std::round (_params.altitude.quantity<Meter>()), 0, 'f', 0));
 	}
 
 	painter.setPen (_al_black_box_pen);
@@ -1300,13 +1302,13 @@ ADIWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 
 	// 11100 part:
 	painter.setFont (b_font);
-	paint_rotating_digit (painter, box_10000, _params.altitude.ft(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
-	paint_rotating_digit (painter, box_01000, _params.altitude.ft(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
+	paint_rotating_digit (painter, box_10000, _params.altitude.quantity<Foot>(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
+	paint_rotating_digit (painter, box_01000, _params.altitude.quantity<Foot>(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 	painter.setFont (s_font);
-	paint_rotating_digit (painter, box_00100, _params.altitude.ft(), 100, 1.25f, 0.05f, 5.f, false, false);
+	paint_rotating_digit (painter, box_00100, _params.altitude.quantity<Foot>(), 100, 1.25f, 0.05f, 5.f, false, false);
 
 	// 00011 part:
-	float pos_00011 = (_al_rounded_altitude - _params.altitude.ft()) / 20.f;
+	float pos_00011 = (_al_rounded_altitude - _params.altitude.quantity<Foot>()) / 20.f;
 	paint_rotating_value (painter, box_00011, pos_00011, 0.75f,
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 						  QString::number (static_cast<int> (std::abs (std::fmod (_al_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
@@ -1358,8 +1360,8 @@ ADIWidget::PaintWorkUnit::al_paint_ladder_scale (xf::Painter& painter, float x)
 	painter.translate (-2.f * x, 0.f);
 
 	// -+line_every is to have drawn also numbers that barely fit the scale.
-	for (int ft = (static_cast<int> (_al_min_shown.ft()) / _params.al_line_every) * _params.al_line_every - _params.al_line_every;
-		 ft <= _al_max_shown.ft() + _params.al_line_every;
+	for (int ft = (static_cast<int> (_al_min_shown.quantity<Foot>()) / _params.al_line_every) * _params.al_line_every - _params.al_line_every;
+		 ft <= _al_max_shown.quantity<Foot>() + _params.al_line_every;
 		 ft += _params.al_line_every)
 	{
 		if (ft > 100000.f)
@@ -1518,7 +1520,7 @@ ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 		// AP bug:
 		if (_params.cmd_altitude)
 		{
-			Length cmd_altitude = xf::limit (*_params.cmd_altitude, -99999_ft, +99999_ft);
+			Length cmd_altitude = xf::limit<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
 			float posy = xf::limit (ft_to_px (cmd_altitude),
 									   static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
@@ -1688,7 +1690,7 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 
 	// Numeric indicators above and below:
 	painter.setPen (bold_white_pen);
-	int abs_vertical_speed = static_cast<int> (std::abs (_params.vertical_speed.fpm())) / 10 * 10;
+	int abs_vertical_speed = static_cast<int> (std::abs (_params.vertical_speed.quantity<FootPerMinute>())) / 10 * 10;
 	if (abs_vertical_speed >= 100)
 	{
 		QString str = QString::number (abs_vertical_speed);
@@ -1724,7 +1726,7 @@ ADIWidget::PaintWorkUnit::al_paint_pressure (xf::Painter& painter, float x)
 
 	QString unit_str = _params.pressure_display_hpa? " HPA" : " IN";
 	int precision = _params.pressure_display_hpa ? 0 : 2;
-	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure_qnh.hPa() : _params.pressure_qnh.inHg(), 0, 'f', precision);
+	QString pressure_str = QString ("%1").arg (_params.pressure_display_hpa? _params.pressure_qnh.quantity<HectoPascal>() : _params.pressure_qnh.quantity<InchOfMercury>(), 0, 'f', precision);
 
 	QRectF nn_rect (0.f, _al_ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * _font_16_digit_height);
 	QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
@@ -1754,7 +1756,7 @@ ADIWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 	if (!_params.cmd_altitude)
 		return;
 
-	Length cmd_altitude = xf::limit (*_params.cmd_altitude, -99999_ft, +99999_ft);
+	Length cmd_altitude = xf::limit<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
 
 	QFont b_font = _font_20;
 	QFontMetricsF b_metrics (b_font);
@@ -1799,7 +1801,7 @@ ADIWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 		painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
 		painter.setPen (get_pen (_autopilot_color, 1.f));
 		painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-								QString ("%1").arg (std::round (cmd_altitude.m()), 0, 'f', 0));
+								QString ("%1").arg (std::round (cmd_altitude.quantity<Meter>()), 0, 'f', 0));
 	}
 
 	painter.setPen (get_pen (Qt::black, 0.5f));
@@ -1826,14 +1828,14 @@ ADIWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 	QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
 	QString minus_sign_s = cmd_altitude < -0.5_ft ? MINUS_SIGN : "";
 	painter.fast_draw_text (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-							minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.ft()) / 1000)));
+							minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.quantity<Foot>()) / 1000)));
 
 	painter.setFont (s_font);
 
 	// 00111 part of the altitude setting:
 	QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 	painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-							QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.ft()))) % 1000, 3, 'f', 0, '0'));
+							QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.quantity<Foot>()))) % 1000, 3, 'f', 0, '0'));
 }
 
 
@@ -1855,7 +1857,7 @@ ADIWidget::PaintWorkUnit::al_paint_ldgalt_flag (xf::Painter& painter, float x)
 float
 ADIWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_value) const
 {
-	float vspd = std::abs (vertical_speed.fpm());
+	float vspd = std::abs (vertical_speed.quantity<FootPerMinute>());
 
 	if (vspd < 1000.f)
 		vspd = vspd / 1000.f * 0.46f;
@@ -1943,7 +1945,7 @@ ADIWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 
 	Angle roll = _params.flight_director_roll - _params.orientation_roll;
 	if (abs (roll) > 180_deg)
-		roll = roll - sgn (roll.deg()) * 360_deg;
+		roll = roll - sgn (roll.quantity<Degree>()) * 360_deg;
 	roll = xf::limit (roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
@@ -2019,7 +2021,7 @@ ADIWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
 	if (!_params.altitude_agl_visible)
 		return;
 
-	Length aagl = xf::limit (_params.altitude_agl, -9999_ft, +99999_ft);
+	Length aagl = xf::limit<Length> (_params.altitude_agl, -9999_ft, +99999_ft);
 	QFont radar_altimeter_font = _font_20;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
@@ -2047,7 +2049,7 @@ ADIWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
 	painter.setFont (radar_altimeter_font);
 
 	QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.ft())));
+	painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.quantity<Foot>())));
 }
 
 
@@ -2068,7 +2070,7 @@ ADIWidget::PaintWorkUnit::paint_minimums_setting (xf::Painter& painter)
 	QFontMetricsF metrics_b (font_b);
 
 	QString mins_str = _params.minimums_type;
-	QString alt_str = QString ("%1").arg (_params.minimums_setting.ft(), 0, 'f', 0);
+	QString alt_str = QString ("%1").arg (_params.minimums_setting.quantity<Foot>(), 0, 'f', 0);
 
 	QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.width (mins_str), metrics_a.height());
 	mins_rect.moveRight (mins_rect.left());
@@ -2112,7 +2114,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 		QString loc_str = _params.navaid_identifier;
 		if (_params.navaid_course_magnetic)
 		{
-			int course_int = xf::symmetric_round (_params.navaid_course_magnetic->deg());
+			int course_int = xf::symmetric_round (_params.navaid_course_magnetic->quantity<Degree>());
 			if (course_int == 0)
 				course_int = 360;
 			loc_str += QString::fromStdString ((boost::format ("/%03d°") % course_int).str());
@@ -2131,7 +2133,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 
 		QString dme_val = "DME ---";
 		if (_params.navaid_distance)
-			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % _params.navaid_distance->nmi()).str());
+			dme_val = QString::fromStdString ((boost::format ("DME %.1f") % _params.navaid_distance->quantity<NauticalMile>()).str());
 
 		painter.setPen (Qt::white);
 		painter.setFont (_font_10);
@@ -2143,10 +2145,10 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 		{
 			Angle approach_deviation;
 			if (original_approach_deviation)
-				approach_deviation = xf::limit (*original_approach_deviation, -2.25_deg, +2.25_deg);
+				approach_deviation = xf::limit<Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
 			Angle path_deviation;
 			if (original_path_deviation)
-				path_deviation = xf::limit (*original_path_deviation, -2.25_deg, +2.25_deg);
+				path_deviation = xf::limit<Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			centrify (rect);
@@ -2177,7 +2179,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 					<< QPointF (0.f, +w)
 					<< QPointF (-1.6f * w, 0.f)
 					<< QPointF (0.f, -w);
-				pink_pointer.translate (approach_deviation.deg() * 0.075f * wh(), 0.f);
+				pink_pointer.translate (approach_deviation.quantity<Degree>() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_approach_deviation;
 				pink_filled = original_approach_deviation && abs (*original_approach_deviation) <= abs (approach_deviation);
 				white_visible = false;
@@ -2190,7 +2192,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 					<< QPointF (0.f, -0.2f * w)
 					<< QPointF (+1.0f * w, 2.0f * w)
 					<< QPointF (-1.0f * w, 2.0f * w);
-				pink_pointer.translate (path_deviation.deg() * 0.075f * wh(), 0.f);
+				pink_pointer.translate (path_deviation.quantity<Degree>() * 0.075f * wh(), 0.f);
 				pink_visible = !!original_path_deviation;
 				pink_filled = original_path_deviation && abs (*original_path_deviation) <= abs (path_deviation);
 				white_pointer = QPolygonF()
@@ -2199,7 +2201,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 					<< QPointF (0.f, +0.8f * w)
 					<< QPointF (-1.6f * w, 0.f)
 					<< QPointF (0.f, -0.8f * w);
-				white_pointer.translate (approach_deviation.deg() * 0.075f * wh(), -0.65f * w);
+				white_pointer.translate (approach_deviation.quantity<Degree>() * 0.075f * wh(), -0.65f * w);
 				white_visible = !!original_approach_deviation;
 			}
 
@@ -2269,8 +2271,8 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * xf::limit (_params.deviation_lateral_approach->deg(), -1.5, +1.5);
-		float ypos = -pitch_to_px (xf::limit (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
+		float offset = 0.5f * xf::limit (_params.deviation_lateral_approach->quantity<Degree>(), -1.5, +1.5);
+		float ypos = -pitch_to_px (xf::limit<Angle> (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, ypos);
@@ -2423,7 +2425,7 @@ ADIWidget::PaintWorkUnit::paint_critical_aoa (xf::Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (xf::limit (_params.critical_aoa - _params.aoa_alpha, -20_deg, +16_deg)));
+	painter.translate (0.f, pitch_to_px (xf::limit<Angle> (_params.critical_aoa - _params.aoa_alpha, -20_deg, +16_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 

@@ -64,12 +64,12 @@ DebugForces::paintEvent (QPaintEvent*)
 	QPointF earth_accel;
 
 	if (_input_centrifugal_accel_y.valid() && _input_centrifugal_accel_z.valid())
-		centrifugal_accel = QPointF (_input_centrifugal_accel_y->g() * one_gravity_length,
-									 _input_centrifugal_accel_z->g() * one_gravity_length);
+		centrifugal_accel = QPointF (_input_centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
+									 _input_centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
 
 	if (_input_measured_accel_y.valid() && _input_measured_accel_z.valid())
-		measured_accel = QPointF (_input_measured_accel_y->g() * one_gravity_length,
-								  _input_measured_accel_z->g() * one_gravity_length);
+		measured_accel = QPointF (_input_measured_accel_y->quantity<Gravity>() * one_gravity_length,
+								  _input_measured_accel_z->quantity<Gravity>() * one_gravity_length);
 
 	earth_accel = measured_accel - centrifugal_accel;
 
@@ -82,7 +82,7 @@ DebugForces::paintEvent (QPaintEvent*)
 	if (_input_orientation_roll.valid())
 	{
 		// Plane reference frame:
-		painter().rotate (_input_orientation_roll->deg());
+		painter().rotate (_input_orientation_roll->quantity<Degree>());
 		// Plane:
 		painter().setPen (get_pen (Qt::white, 2.5));
 		painter().drawLine (QPointF (-0.25 * width(), 0.0), QPointF (0.25 * width(), 0.0));

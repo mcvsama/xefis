@@ -124,6 +124,8 @@ RemoteControlManagementSystem::compute_distances_to_home()
 {
 	if (home_is_valid() && position_is_valid())
 	{
+		using std::sqrt;
+
 		LonLat home (*_home_longitude, *_home_latitude);
 		LonLat curr (*_position_longitude, *_position_latitude);
 		Length ground_dist = curr.haversine_earth (home);
@@ -131,7 +133,7 @@ RemoteControlManagementSystem::compute_distances_to_home()
 
 		_distance_vertical.write (alt_diff);
 		_distance_ground.write (ground_dist);
-		_distance_vlos.write (1_nmi * std::sqrt (ground_dist.nmi() * ground_dist.nmi() + alt_diff.nmi() * alt_diff.nmi()));
+		_distance_vlos.write (sqrt (ground_dist * ground_dist + alt_diff * alt_diff));
 		_true_home_direction.write (xf::floored_mod (curr.initial_bearing (home), 360_deg));
 	}
 	else

@@ -121,7 +121,7 @@ class Link:
 			Acceleration,
 			Angle,
 			Area,
-			Capacity,
+			Charge,
 			Current,
 			Density,
 			Energy,
@@ -135,7 +135,7 @@ class Link:
 			Time,
 			Torque,
 			Volume,
-			Weight,
+			Mass,
 		};
 
 	  public:
@@ -171,13 +171,6 @@ class Link:
 			static Blob::iterator
 			unserialize (Blob::iterator begin, Blob::iterator end, SourceType&);
 
-		/**
-		 * Set SI property by SI's value internal representation.
-		 */
-		template<class SIType>
-			static SIType
-			si_from_internal (xf::PropertyFloat::Type float_value);
-
 	  private:
 		Type						_type				= Type::Unknown;
 		uint8_t						_bytes				= 0;
@@ -187,7 +180,7 @@ class Link:
 		xf::PropertyAcceleration	_property_acceleration;
 		xf::PropertyAngle			_property_angle;
 		xf::PropertyArea			_property_area;
-		xf::PropertyCapacity		_property_capacity;
+		xf::PropertyCharge			_property_charge;
 		xf::PropertyCurrent			_property_current;
 		xf::PropertyDensity			_property_density;
 		xf::PropertyEnergy			_property_energy;
@@ -201,7 +194,7 @@ class Link:
 		xf::PropertyTime			_property_time;
 		xf::PropertyTorque			_property_torque;
 		xf::PropertyVolume			_property_volume;
-		xf::PropertyWeight			_property_weight;
+		xf::PropertyMass			_property_mass;
 		xf::PropertyInteger::Type	_integer_value;
 		xf::PropertyFloat::Type		_float_value;
 	};

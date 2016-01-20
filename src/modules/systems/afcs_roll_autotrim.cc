@@ -53,8 +53,8 @@ AFCS_RollAutotrim::data_updated()
 	{
 		if (_input_airspeed.valid() && _input_engine_torque.valid())
 		{
-			xf::PropertyFloat::Type correction = _airspeed_coefficient / _input_airspeed->mps()
-											   + _engine_torque_coefficient * _input_engine_torque->Nm();
+			xf::PropertyFloat::Type correction = _airspeed_coefficient / _input_airspeed->quantity<MeterPerSecond>()
+											   + _engine_torque_coefficient * _input_engine_torque->quantity<NewtonMeter>();
 			_output_ailerons_correction = _total_coefficient * correction;
 		}
 		else

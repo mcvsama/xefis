@@ -81,9 +81,9 @@ class FlightGearIO:
 	std::vector<xf::GenericProperty*>	_output_properties;
 	std::vector<xf::PropertyBoolean*>	_serviceable_flags;
 	// Input:
-	xf::PropertyFrequency				_rotation_x;
-	xf::PropertyFrequency				_rotation_y;
-	xf::PropertyFrequency				_rotation_z;
+	xf::Property<AngularVelocity>		_rotation_x;
+	xf::Property<AngularVelocity>		_rotation_y;
+	xf::Property<AngularVelocity>		_rotation_z;
 	xf::PropertyAcceleration			_acceleration_x;
 	xf::PropertyAcceleration			_acceleration_y;
 	xf::PropertyAcceleration			_acceleration_z;
@@ -127,14 +127,14 @@ class FlightGearIO:
 	xf::PropertyTemperature				_total_air_temperature;
 	xf::PropertyFloat					_engine_throttle_pct;
 	xf::PropertyForce					_engine_1_thrust;
-	xf::PropertyFrequency				_engine_1_rpm;
+	xf::Property<AngularVelocity>		_engine_1_rpm;
 	xf::PropertyAngle					_engine_1_pitch;
 	xf::PropertyFloat					_engine_1_epr;
 	xf::PropertyFloat					_engine_1_n1_pct;
 	xf::PropertyFloat					_engine_1_n2_pct;
 	xf::PropertyTemperature				_engine_1_egt;
 	xf::PropertyForce					_engine_2_thrust;
-	xf::PropertyFrequency				_engine_2_rpm;
+	xf::Property<AngularVelocity>		_engine_2_rpm;
 	xf::PropertyAngle					_engine_2_pitch;
 	xf::PropertyFloat					_engine_2_epr;
 	xf::PropertyFloat					_engine_2_n1_pct;

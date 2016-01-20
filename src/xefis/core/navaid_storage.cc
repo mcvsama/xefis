@@ -147,7 +147,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 	};
 
 	Navaid navaid_at_position (Navaid::OTHER, position, "", "", 0_nmi);
-	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::ValueType>::max(), inserter_and_predicate);
+	_navaids_tree.find_nearest_if (navaid_at_position, std::numeric_limits<Length::Value>::max(), inserter_and_predicate);
 
 	return set;
 }
@@ -349,8 +349,8 @@ NavaidStorage::parse_apt_dat()
 					max_position.lat() = std::max (max_position.lat(), point.lat());
 				}
 			}
-			LonLat mean_position (Angle::mean (min_position.lon(), max_position.lon()),
-								  Angle::mean (min_position.lat(), max_position.lat()));
+			LonLat mean_position (mean (min_position.lon(), max_position.lon()),
+								  mean (min_position.lat(), max_position.lat()));
 			cur_land_airport->set_position (mean_position);
 			cur_land_airport->set_runways (runways);
 

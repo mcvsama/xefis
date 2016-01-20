@@ -79,19 +79,19 @@ class AirDataComputer: public xf::Module
 	bool					_prev_use_standard_pressure			= false;
 	Time					_hide_alt_lookahead_until			= 0_s;
 	Length					_prev_altitude_amsl					= 0_ft;
-	Unique<xf::Datatable2D<Temperature, double>>
+	Unique<xf::Datatable2D<Temperature, DynamicViscosity>>
 							_temperature_to_dynamic_viscosity;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<double>	_vertical_speed_smoother			= 1_s;
-	xf::Smoother<double>	_altitude_amsl_smoother				= 500_ms;
-	xf::Smoother<double>	_altitude_amsl_qnh_smoother			= 500_ms;
-	xf::Smoother<double>	_altitude_amsl_std_smoother			= 500_ms;
-	xf::Smoother<double>	_speed_ias_smoother					= 100_ms;
-	xf::Smoother<double>	_altitude_amsl_lookahead_i_smoother	= 100_ms;
-	xf::Smoother<double>	_altitude_amsl_lookahead_o_smoother	= 500_ms;
-	xf::Smoother<double>	_speed_ias_lookahead_i_smoother		= 100_ms;
-	xf::Smoother<double>	_speed_ias_lookahead_o_smoother		= 1000_ms;
+	xf::Smoother<double>	_altitude_amsl_smoother				= Time (500_ms);
+	xf::Smoother<double>	_altitude_amsl_qnh_smoother			= Time (500_ms);
+	xf::Smoother<double>	_altitude_amsl_std_smoother			= Time (500_ms);
+	xf::Smoother<double>	_speed_ias_smoother					= Time (100_ms);
+	xf::Smoother<double>	_altitude_amsl_lookahead_i_smoother	= Time (100_ms);
+	xf::Smoother<double>	_altitude_amsl_lookahead_o_smoother	= Time (500_ms);
+	xf::Smoother<double>	_speed_ias_lookahead_i_smoother		= Time (100_ms);
+	xf::Smoother<double>	_speed_ias_lookahead_o_smoother		= Time (1000_ms);
 	xf::Lookahead<double>	_altitude_amsl_estimator			= xf::Lookahead<double> (10_s);
 	xf::Lookahead<double>	_speed_ias_estimator				= xf::Lookahead<double> (10_s);
 	// Settings:
@@ -125,7 +125,8 @@ class AirDataComputer: public xf::Module
 	xf::PropertyBoolean		_vertical_speed_serviceable;
 	xf::PropertySpeed		_vertical_speed;
 	xf::PropertyTemperature	_static_air_temperature;
-	xf::PropertyFloat		_dynamic_viscosity;
+	xf::Property<DynamicViscosity>
+							_dynamic_viscosity;
 	xf::PropertyFloat		_reynolds_number;
 	// Other:
 	xf::PropertyObserver	_altitude_computer;

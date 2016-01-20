@@ -21,6 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "altacq.h"
@@ -75,14 +76,14 @@ AltAcq::data_updated()
 		if (_altitude_amsl.fresh() || _altitude_acquire_amsl.fresh())
 		{
 			if (_altitude_acquire_amsl.fresh())
-				_altitude_acquire_amsl_timestamp = Time::now();
+				_altitude_acquire_amsl_timestamp = xf::TimeHelper::now();
 
 			Length diff = abs (*_altitude_amsl - *_altitude_acquire_amsl);
 			// Arm flag when difference beyond 'on-diff':
 			if (diff > _flag_diff_on)
 				_flag_armed = true;
 			// But don't allow arming if alt setting was changed recently:
-			if (Time::now() - _altitude_acquire_amsl_timestamp < 1_s)
+			if (xf::TimeHelper::now() - _altitude_acquire_amsl_timestamp < 1_s)
 				_flag_armed = false;
 			// Disarm and disable when approaching commanded altitude,
 			// so that it doesn't engage again when the craft is on the
@@ -114,7 +115,7 @@ AltAcq::compute_altitude_acquire_distance()
 		Length const distance = *_ground_speed * (alt_diff / *_vertical_speed);
 
 		if (!has_setting ("minimum-altitude-difference") || abs (alt_diff) >= _minimum_altitude_difference)
-			_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.m(), update_dt));
+			_altitude_acquire_distance.write (1_m * _altitude_acquire_distance_smoother.process (distance.quantity<Meter>(), update_dt));
 		else
 			_altitude_acquire_distance.set_nil();
 	}

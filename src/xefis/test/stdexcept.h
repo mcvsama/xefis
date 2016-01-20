@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/backtrace.h>
 
 
 namespace Xefis {
@@ -30,20 +31,9 @@ class TestAssertFailed: public Exception
   public:
 	// Ctor
 	TestAssertFailed (std::string const& explanation, std::string const& details):
-		Exception (get_location() + ": failed to verify that " + explanation + "; " + details)
+		Exception ("failed to verify that " + explanation + "; " + details)
 	{
 		hide_backtrace();
-	}
-
-  private:
-	/**
-	 * Must be callable before object is fully constructed.
-	 */
-	std::string
-	get_location()
-	{
-		TODO("location")
-		return "TODO(location)";
 	}
 };
 

@@ -22,6 +22,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/mutex.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "chr_um6.h"
@@ -162,7 +163,7 @@ uint32_t
 CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 {
 	// Use formula from the spec: freq = (280/255) * sample_rate + 20.
-	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).Hz();
+	uint32_t x = (std::max ((frequency - 20_Hz), 0.1_Hz) / (280.0 / 255.0)).quantity<Hertz>();
 	return xf::limit (x, 0u, 255u);
 }
 
@@ -342,7 +343,7 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	if (_alive_check_callback)
 		_alive_check_callback();
 
-	Time now = Time::now();
+	Time now = TimeHelper::now();
 
 	if (failed)
 	{
@@ -389,7 +390,7 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	}
 	else if (_incoming_messages_callback)
 	{
-		Time now = Time::now();
+		Time now = TimeHelper::now();
 		Read req (static_cast<DataAddress> (address));
 		req.data()->address = address;
 		req.data()->start_timestamp = now;

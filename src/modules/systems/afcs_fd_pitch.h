@@ -72,20 +72,6 @@ class AFCS_FD_Pitch: public xf::Module
 					   Time const& update_dt) const;
 
 	/**
-	 * Get the numerical value from xf::Property<T>.
-	 */
-	template<class SIValue>
-		static std::enable_if_t<std::is_base_of<SI::Value, SIValue>::value, double>
-		retrieve_numeric (SIValue const&);
-
-	/**
-	 * Get the numerical value from a basic type.
-	 */
-	template<class FundamentalValue>
-		static std::enable_if_t<!std::is_base_of<SI::Value, FundamentalValue>::value, double>
-		retrieve_numeric (FundamentalValue);
-
-	/**
 	 * Called when pitch mode property changes.
 	 */
 	void

@@ -87,9 +87,9 @@ ETA::compute()
 		LonLat aircraft (*_input_aircraft_longitude, *_input_aircraft_latitude);
 		distance = station.haversine_earth (aircraft);
 
-		Angle station_bearing = xf::floored_mod (aircraft.initial_bearing (station), 0_deg, 360_deg);
+		Angle station_bearing = xf::floored_mod<Angle> (aircraft.initial_bearing (station), 0_deg, 360_deg);
 		Angle angle_diff = station_bearing - *_input_track_lateral_true;
-		angle_diff = xf::floored_mod (angle_diff, -180_deg, +180_deg);
+		angle_diff = xf::floored_mod<Angle> (angle_diff, -180_deg, +180_deg);
 
 		if (abs (angle_diff) > 30_deg)
 			throw SetNil (true);
@@ -104,7 +104,7 @@ ETA::compute()
 			}
 
 			Time eta = dt * (-distance / distance_diff);
-			_output_eta.write (1_s * _smoother.process (eta.s(), dt));
+			_output_eta.write (1_s * _smoother.process (eta.quantity<Second>(), dt));
 		}
 		else
 			_output_eta.set_nil();

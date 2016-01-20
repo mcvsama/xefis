@@ -236,14 +236,14 @@ InstrumentAids::centrify (QRectF& rectf)
 inline float
 InstrumentAids::arc_degs (Angle deg)
 {
-	return (-16.f * (deg - 90_deg)).deg();
+	return (-16.0 * (deg - 90_deg)).quantity<Degree>();
 }
 
 
 inline float
 InstrumentAids::arc_span (Angle deg)
 {
-	return (-16.f * deg).deg();
+	return (-16.0 * deg).quantity<Degree>();
 }
 
 } // namespace Xefis

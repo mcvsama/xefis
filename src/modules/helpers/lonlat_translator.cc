@@ -40,9 +40,9 @@ void
 LonLatTranslator::data_updated()
 {
 	if (_input_longitude.valid_and_fresh())
-		_output_longitude.write (_input_longitude->to_longitude_dms());
+		_output_longitude.write (to_longitude_dms (*_input_longitude));
 
 	if (_input_latitude.valid_and_fresh())
-		_output_latitude.write (_input_latitude->to_latitude_dms());
+		_output_latitude.write (to_latitude_dms (*_input_latitude));
 }
 

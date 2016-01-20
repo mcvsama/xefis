@@ -137,21 +137,21 @@ class WindTriangle
 inline void
 WindTriangle::set_air_vector (Speed true_air_speed, Angle heading)
 {
-	_air_vector = std::polar (true_air_speed.mps(), heading.rad());
+	_air_vector = std::polar (true_air_speed.quantity<MeterPerSecond>(), heading.quantity<Radian>());
 }
 
 
 inline void
 WindTriangle::set_ground_vector (Speed ground_speed, Angle track)
 {
-	_ground_vector = std::polar (ground_speed.mps(), track.rad());
+	_ground_vector = std::polar (ground_speed.quantity<MeterPerSecond>(), track.quantity<Radian>());
 }
 
 
 inline void
 WindTriangle::set_wind_vector (Speed wind_speed, Angle direction)
 {
-	_wind_vector = std::polar (wind_speed.mps(), direction.rad());
+	_wind_vector = std::polar (wind_speed.quantity<MeterPerSecond>(), direction.quantity<Radian>());
 }
 
 

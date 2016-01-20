@@ -55,22 +55,24 @@ class AFCS_AT: public xf::Module
 	speed_mode_changed();
 
   private:
-	Frequency				_computed_output_thrust	= 0.0_rpm;
 	SpeedMode				_speed_mode				= SpeedMode::None;
-	Frequency				_output_thrust_minimum	= 0.0_rpm;
-	Frequency				_output_thrust_maximum	= 1.0_rpm;
+	AngularVelocity			_output_thrust_minimum	= 0.0_rpm; // TODO Force
+	AngularVelocity			_output_thrust_maximum	= 1.0_rpm; // TODO Force
 	double					_ias_pid_p				= 1.0;
 	double					_ias_pid_i				= 0.1;
 	double					_ias_pid_d				= 0.0;
 	double					_ias_to_thrust_scale	= 1.0;
 	xf::PIDControl<double>	_ias_pid;
-	xf::Range<Frequency>	_output_thrust_extent;
+	xf::Range<AngularVelocity>
+							_output_thrust_extent;
 	// Input:
 	xf::PropertyInteger		_cmd_speed_mode;
-	xf::PropertyFrequency	_cmd_thrust;
+	xf::Property<AngularVelocity>
+							_cmd_thrust;
 	xf::PropertySpeed		_cmd_ias;
 	xf::PropertySpeed		_measured_ias;
-	xf::PropertyFrequency	_output_thrust;
+	xf::Property<AngularVelocity>
+							_output_thrust;
 	xf::PropertyBoolean		_disengage_at;
 	// Other:
 	xf::PropertyObserver	_thrust_computer;

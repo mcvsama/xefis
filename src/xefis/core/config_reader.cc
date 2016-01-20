@@ -14,9 +14,13 @@
 // Standard:
 #include <cstddef>
 #include <limits>
+#include <type_traits>
 
 // System:
 #include <unistd.h>
+
+// Boost:
+#include <boost/lexical_cast.hpp>
 
 // Qt:
 #include <QtCore/QFile>
@@ -40,6 +44,30 @@
 
 
 namespace Xefis {
+
+ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (NameAndSetting const& other):
+	name (other.name),
+	required (other.required),
+	_holder (other._holder)
+{ }
+
+
+ConfigReader::SettingsParser::NameAndSetting&
+ConfigReader::SettingsParser::NameAndSetting::operator= (NameAndSetting const& other)
+{
+	name = other.name;
+	required = other.required;
+	_holder = other._holder;
+	return *this;
+}
+
+
+void
+ConfigReader::SettingsParser::NameAndSetting::assign_setting_value (QString const& value_str)
+{
+	_holder->assign_setting_value (value_str);
+}
+
 
 ConfigReader::SettingsParser::SettingsParser (SettingsList const& list):
 	_list (list)
@@ -92,33 +120,7 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 					return;
 
 				NameAndSetting* nas = it->second;
-
-#define XEFIS_CHECK_S(type, name, expr) \
-	if (nas->value_##name) \
-		*nas->value_##name = (expr); \
-	else if (nas->value_optional_##name) \
-		*nas->value_optional_##name = (expr);
-#define XEFIS_CHECK(type_name, expr) \
-	XEFIS_CHECK_S (type_name, type_name, expr)
-
-				XEFIS_CHECK (bool, value == "true")
-				else XEFIS_CHECK (int8_t, parse_int<int8_t> (value))
-				else XEFIS_CHECK (int16_t, parse_int<int16_t> (value))
-				else XEFIS_CHECK (int32_t, parse_int<int32_t> (value))
-				else XEFIS_CHECK (int64_t, parse_int<int64_t> (value))
-				else XEFIS_CHECK (uint8_t, parse_int<uint8_t> (value))
-				else XEFIS_CHECK (uint16_t, parse_int<uint16_t> (value))
-				else XEFIS_CHECK (uint32_t, parse_int<uint32_t> (value))
-				else XEFIS_CHECK (uint64_t, parse_int<uint64_t> (value))
-				else XEFIS_CHECK (float, boost::lexical_cast<float> (value.toStdString()))
-				else XEFIS_CHECK (double, boost::lexical_cast<double> (value.toStdString()))
-				else XEFIS_CHECK_S (std::string, string, value.toStdString())
-				else XEFIS_CHECK_S (QString, qstring, value)
-				else if (nas->value_si_value)
-					nas->value_si_value->parse (value.toStdString());
-
-#undef XEFIS_CHECK
-#undef XEFIS_CHECK_S
+				nas->assign_setting_value (value);
 
 				_set.insert (name);
 			}

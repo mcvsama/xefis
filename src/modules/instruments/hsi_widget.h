@@ -123,7 +123,8 @@ class HSIWidget: public xf::InstrumentWidget
 		Optional<LonLat>	home;
 		Optional<Speed>		ground_speed;
 		Optional<Speed>		true_air_speed;
-		Optional<Frequency>	track_lateral_rotation;
+		Optional<AngularVelocity>
+							track_lateral_rotation;
 		bool				altitude_reach_visible		= false;
 		Length				altitude_reach_distance		= 0_nmi;
 		bool				wind_information_visible	= false;

@@ -86,7 +86,7 @@ void
 AFCS_AT::compute_thrust()
 {
 	bool disengage = false;
-	Frequency computed_thrust = 0.0_rpm;
+	AngularVelocity computed_thrust = 0.0_rpm;
 	Time dt = _thrust_computer.update_dt();
 
 	if (_cmd_speed_mode.fresh())
@@ -111,16 +111,15 @@ AFCS_AT::compute_thrust()
 			{
 				// This is more tricky, since we measure IAS, but control thrust.
 				// There's no 1:1 correlaction between them.
-				_ias_pid.set_target (_cmd_ias->kt());
-				_ias_pid.process (_measured_ias->kt(), dt);
+				_ias_pid.set_target (_cmd_ias->quantity<Knot>());
+				_ias_pid.process (_measured_ias->quantity<Knot>(), dt);
 				computed_thrust = 1_rpm * xf::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
-				computed_thrust = xf::renormalize (computed_thrust.rpm(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
+				computed_thrust = xf::renormalize (computed_thrust.quantity<RotationPerMinute>(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
 			}
 			break;
 
 		case SpeedMode::None:
 		case SpeedMode::sentinel:
-			_computed_output_thrust = 0.0_rpm;
 			break;
 	}
 

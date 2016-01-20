@@ -139,7 +139,7 @@ PanelNumericDisplay::read()
 	if (_value_property.is_nil())
 		digits = std::string (_num_digits, ' ');
 	else
-		digits = convert_to_digits (_value_property.floatize (_unit));
+		digits = convert_to_digits (_value_property.to_float (_unit));
 
 	std::fill (_digits_to_display.begin(), _digits_to_display.end(), nullptr);
 

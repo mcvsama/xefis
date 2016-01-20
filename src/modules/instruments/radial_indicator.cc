@@ -88,7 +88,7 @@ RadialIndicator::get_optional_value (xf::TypedProperty const& property)
 	if (property.valid())
 	{
 		try {
-			result = property.floatize (_unit);
+			result = property.to_float (_unit);
 		}
 		catch (UnsupportedUnit const&)
 		{

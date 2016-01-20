@@ -42,8 +42,7 @@ Lift::Lift (QDomElement const& config)
 			if (!e.hasAttribute ("cl"))
 				throw MissingDomAttribute (e, "cl");
 
-			Angle aoa;
-			aoa.parse (e.attribute ("aoa").toStdString());
+			auto aoa = parse<Angle> (e.attribute ("aoa").toStdString());
 			LiftCoefficient cl (e.attribute ("cl").toDouble());
 			data[aoa] = cl;
 		}

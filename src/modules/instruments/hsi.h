@@ -88,7 +88,8 @@ class HSI: public xf::Instrument
 	xf::PropertyString		_position_source;
 	xf::PropertyBoolean		_track_visible;
 	xf::PropertyAngle		_track_lateral_magnetic;
-	xf::PropertyFrequency	_track_lateral_rotation;
+	xf::Property<AngularVelocity>
+							_track_lateral_rotation;
 	xf::PropertyBoolean		_track_center_on_track;
 	xf::PropertyBoolean		_course_visible;
 	xf::PropertyAngle		_course_setting_magnetic;

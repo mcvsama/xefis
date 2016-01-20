@@ -42,8 +42,8 @@ TypedProperty::create (PropertyPath const& path, PropertyType const& type)
 		PropertyAngle (path).ensure_existence();
 	else if (type_str == "area")
 		PropertyArea (path).ensure_existence();
-	else if (type_str == "capacity")
-		PropertyCapacity (path).ensure_existence();
+	else if (type_str == "charge")
+		PropertyCharge (path).ensure_existence();
 	else if (type_str == "current")
 		PropertyCurrent (path).ensure_existence();
 	else if (type_str == "density")
@@ -70,8 +70,8 @@ TypedProperty::create (PropertyPath const& path, PropertyType const& type)
 		PropertyTorque (path).ensure_existence();
 	else if (type_str == "volume")
 		PropertyVolume (path).ensure_existence();
-	else if (type_str == "weight")
-		PropertyWeight (path).ensure_existence();
+	else if (type_str == "mass")
+		PropertyMass (path).ensure_existence();
 	else
 		throw BadType (type_str);
 }

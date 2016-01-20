@@ -227,7 +227,7 @@ xf::PropertyInteger::Type
 HT16K33::NumericDisplay::get_integer_value() const
 {
 	try {
-		xf::PropertyFloat::Type value = _property.floatize (_unit);
+		xf::PropertyFloat::Type value = _property.to_float (_unit);
 		xf::PropertyInteger::Type int_value = value;
 
 		if (_rounding)
@@ -296,7 +296,7 @@ HT16K33::HT16K33 (xf::ModuleManager* module_manager, QDomElement const& config):
 
 			if (!e.hasAttribute ("scan-frequency"))
 				throw xf::MissingDomAttribute (e, "scan-frequency");
-			_scan_frequency.parse (e.attribute ("scan-frequency").toStdString());
+			parse (e.attribute ("scan-frequency").toStdString(), _scan_frequency);
 
 			if (_scan_frequency > 25_Hz && !_reliable_mode)
 				throw xf::BadDomAttribute (e, "scan-frequency", "if greater than 25 Hz, 'reliable-mode' must be 'true'");
@@ -335,7 +335,7 @@ HT16K33::HT16K33 (xf::ModuleManager* module_manager, QDomElement const& config):
 	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 
 	_scan_timer = new QTimer (this);
-	_scan_timer->setInterval ((1.0 / _scan_frequency).ms());
+	_scan_timer->setInterval ((1.0 / _scan_frequency).quantity<Millisecond>());
 	_scan_timer->setSingleShot (false);
 	QObject::connect (_scan_timer, SIGNAL (timeout()), this, SLOT (pool_keys()));
 	_scan_timer->start();
