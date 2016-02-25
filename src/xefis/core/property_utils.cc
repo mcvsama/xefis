@@ -24,14 +24,14 @@
 
 namespace Xefis {
 
-static xf::Mutex check_validity_entry_mutex;
+static xf::Mutex $check_validity_entry_mutex;
 
 
 std::string const&
 PropertyType::check_validity (std::string const& type)
 {
 	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = check_validity_entry_mutex.acquire_lock();
+	auto lock = $check_validity_entry_mutex.acquire_lock();
 
 	static std::set<std::string> valid_types = {
 		"boolean",

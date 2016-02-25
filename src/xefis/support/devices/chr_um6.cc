@@ -29,7 +29,7 @@
 
 namespace Xefis {
 
-static xf::Mutex bits_for_baud_rate_entry_mutex;
+static xf::Mutex $bits_for_baud_rate_entry_mutex;
 
 
 std::string
@@ -171,7 +171,7 @@ uint32_t
 CHRUM6::bits_for_baud_rate (unsigned int baud_rate)
 {
 	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = bits_for_baud_rate_entry_mutex.acquire_lock();
+	auto lock = $bits_for_baud_rate_entry_mutex.acquire_lock();
 
 	static std::map<int, uint32_t> baud_rates_map;
 
