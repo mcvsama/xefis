@@ -28,7 +28,7 @@
 namespace Xefis {
 namespace nmea {
 
-static HexTable	hextable;
+static HexTable	$hextable;
 
 
 Parser::Parser (Listener* listener):
@@ -134,7 +134,7 @@ Parser::verify_sentence (std::string const& sentence)
 		char c2 = sentence[sentence.size() - 1];
 		if (!std::isxdigit (c1) || !std::isxdigit (c2))
 			throw nmea::InvalidSentence ("checksum characters are not valid hex digits");
-		uint8_t parsed_checksum = hextable[c1] * 16 + hextable[c2];
+		uint8_t parsed_checksum = $hextable[c1] * 16 + $hextable[c2];
 
 		// Verify checksum:
 		uint8_t expected_checksum = 0;

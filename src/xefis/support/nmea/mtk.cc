@@ -28,7 +28,7 @@
 namespace Xefis {
 namespace nmea {
 
-static Mutex describe_mtk_command_entry_mutex;
+static Mutex $describe_mtk_command_entry_mutex;
 
 
 PMTKACK::PMTKACK (std::string const& sentence):
@@ -62,7 +62,7 @@ std::string
 describe_mtk_command_by_id (std::string command)
 {
 	// Must acquire lock before static variables initialization:
-	auto lock = describe_mtk_command_entry_mutex.acquire_lock();
+	auto lock = $describe_mtk_command_entry_mutex.acquire_lock();
 
 	static std::map<std::string, std::string> hints;
 

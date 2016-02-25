@@ -33,7 +33,7 @@ namespace nmea {
 using std::to_string;
 
 
-static Mutex fix_quality_strings_entry_mutex;
+static Mutex $fix_quality_strings_entry_mutex;
 
 
 static inline unsigned int
@@ -367,7 +367,7 @@ std::string
 to_string (GPSFixQuality code)
 {
 	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = fix_quality_strings_entry_mutex.acquire_lock();
+	auto lock = $fix_quality_strings_entry_mutex.acquire_lock();
 
 	static std::array<std::string, 9> fix_quality_strings;
 	static bool initialized = false;
