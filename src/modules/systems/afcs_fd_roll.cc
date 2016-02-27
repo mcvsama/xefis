@@ -27,7 +27,7 @@
 #include "afcs_api.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-fd-roll", AFCS_FD_Roll);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-fd-roll", AFCS_FD_Roll)
 
 
 AFCS_FD_Roll::AFCS_FD_Roll (xf::ModuleManager* module_manager, QDomElement const& config):

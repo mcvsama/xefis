@@ -25,7 +25,7 @@
 #include "slip_skid.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/slip-skid", SlipSkid);
+XEFIS_REGISTER_MODULE_CLASS ("systems/slip-skid", SlipSkid)
 
 
 SlipSkid::SlipSkid (xf::ModuleManager* module_manager, QDomElement const& config):

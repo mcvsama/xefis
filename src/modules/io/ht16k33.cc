@@ -28,7 +28,7 @@
 #include "ht16k33.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/ht16k33", HT16K33);
+XEFIS_REGISTER_MODULE_CLASS ("io/ht16k33", HT16K33)
 
 
 std::array<uint8_t, 11> HT16K33::_digit_symbols = { {

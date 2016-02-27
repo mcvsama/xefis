@@ -28,7 +28,7 @@
 #include "label.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/label", Label);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/label", Label)
 
 
 Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):

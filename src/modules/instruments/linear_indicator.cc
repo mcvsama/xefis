@@ -28,7 +28,7 @@
 #include "linear_indicator.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/linear-indicator", LinearIndicator);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/linear-indicator", LinearIndicator)
 
 
 LinearIndicator::LinearIndicator (xf::ModuleManager* module_manager, QDomElement const& config):

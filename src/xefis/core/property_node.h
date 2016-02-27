@@ -626,7 +626,7 @@ template<>
 			return _value ? Blob ({ 0x01 }) : Blob ({ 0x00 });
 		else
 			return Blob();
-	};
+	}
 
 
 template<>

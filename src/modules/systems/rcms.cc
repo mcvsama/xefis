@@ -27,7 +27,7 @@
 #include "rcms.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/rcms", RemoteControlManagementSystem);
+XEFIS_REGISTER_MODULE_CLASS ("systems/rcms", RemoteControlManagementSystem)
 
 
 RemoteControlManagementSystem::RemoteControlManagementSystem (xf::ModuleManager* module_manager, QDomElement const& config):

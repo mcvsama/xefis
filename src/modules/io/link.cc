@@ -34,7 +34,7 @@
 #include "link.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/link", Link);
+XEFIS_REGISTER_MODULE_CLASS ("io/link", Link)
 
 
 Link::ItemStream::ItemStream (Link* link, QDomElement& element)

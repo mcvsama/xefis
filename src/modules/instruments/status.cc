@@ -30,7 +30,7 @@
 #include "status_widget.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/status", Status);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/status", Status)
 
 
 Status::MessageDefinition::Observation::Observation (QDomElement const& observe_element)

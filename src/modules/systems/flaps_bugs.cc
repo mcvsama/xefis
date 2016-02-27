@@ -26,7 +26,7 @@
 #include "flaps_bugs.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-bugs", FlapsBugs);
+XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-bugs", FlapsBugs)
 
 
 FlapsBugs::FlapsBugs (xf::ModuleManager* module_manager, QDomElement const& config):

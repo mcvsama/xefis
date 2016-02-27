@@ -21,7 +21,7 @@
 #include "debug_forces.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/debug-forces", DebugForces);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/debug-forces", DebugForces)
 
 
 DebugForces::DebugForces (xf::ModuleManager* module_manager, QDomElement const& config):

@@ -26,7 +26,7 @@
 #include "afcs_at.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-at", AFCS_AT);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-at", AFCS_AT)
 
 
 AFCS_AT::AFCS_AT (xf::ModuleManager* module_manager, QDomElement const& config):

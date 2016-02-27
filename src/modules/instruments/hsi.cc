@@ -28,7 +28,7 @@
 #include "hsi.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI)
 
 
 HSI::HSI (xf::ModuleManager* module_manager, QDomElement const& config):

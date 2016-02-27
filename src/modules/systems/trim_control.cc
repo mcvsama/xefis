@@ -29,7 +29,7 @@
 #include "trim_control.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/trim-control", TrimControl);
+XEFIS_REGISTER_MODULE_CLASS ("systems/trim-control", TrimControl)
 
 
 TrimControl::TrimControl (xf::ModuleManager* module_manager, QDomElement const& config):

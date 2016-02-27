@@ -28,7 +28,7 @@
 #include "radial_indicator.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator)
 
 
 RadialIndicator::RadialIndicator (xf::ModuleManager* module_manager, QDomElement const& config):

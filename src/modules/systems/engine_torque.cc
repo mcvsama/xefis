@@ -21,7 +21,7 @@
 #include "engine_torque.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/engine-torque", EngineTorque);
+XEFIS_REGISTER_MODULE_CLASS ("systems/engine-torque", EngineTorque)
 
 
 EngineTorque::EngineTorque (xf::ModuleManager* module_manager, QDomElement const& config):

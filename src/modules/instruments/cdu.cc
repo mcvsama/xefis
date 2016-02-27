@@ -34,7 +34,7 @@
 #include "cdu.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/cdu", CDU);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/cdu", CDU)
 
 
 constexpr double CDU::kButtonWidthForHeight;

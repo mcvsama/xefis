@@ -26,7 +26,7 @@
 #include "flaps.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/flaps", Flaps);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/flaps", Flaps)
 
 
 Flaps::Flaps (xf::ModuleManager* module_manager, QDomElement const& config):

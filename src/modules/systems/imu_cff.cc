@@ -24,7 +24,7 @@
 #include "imu_cff.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/imu-cff", IMUCFF);
+XEFIS_REGISTER_MODULE_CLASS ("systems/imu-cff", IMUCFF)
 
 
 IMUCFF::IMUCFF (xf::ModuleManager* module_manager, QDomElement const& config):

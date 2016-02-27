@@ -26,7 +26,7 @@
 #include "altacq.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/altacq", AltAcq);
+XEFIS_REGISTER_MODULE_CLASS ("systems/altacq", AltAcq)
 
 
 AltAcq::AltAcq (xf::ModuleManager* module_manager, QDomElement const& config):

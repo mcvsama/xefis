@@ -30,7 +30,7 @@
 #include "pca9685.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/pca9685", PCA9685);
+XEFIS_REGISTER_MODULE_CLASS ("io/pca9685", PCA9685)
 
 
 constexpr Time			PCA9685::InitializationDelay;

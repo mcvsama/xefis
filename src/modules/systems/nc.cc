@@ -29,7 +29,7 @@
 #include "nc.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/nc", NavigationComputer);
+XEFIS_REGISTER_MODULE_CLASS ("systems/nc", NavigationComputer)
 
 
 NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomElement const& config):

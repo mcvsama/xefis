@@ -33,7 +33,7 @@
 #include "state.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/state", State);
+XEFIS_REGISTER_MODULE_CLASS ("systems/state", State)
 
 
 namespace {

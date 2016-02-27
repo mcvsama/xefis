@@ -25,7 +25,7 @@
 #include "vor.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/vor", VOR);
+XEFIS_REGISTER_MODULE_CLASS ("systems/vor", VOR)
 
 
 VOR::VOR (xf::ModuleManager* module_manager, QDomElement const& config):

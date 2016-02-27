@@ -31,7 +31,7 @@
 #include "mouse.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/mouse", Mouse);
+XEFIS_REGISTER_MODULE_CLASS ("io/mouse", Mouse)
 
 
 Mouse::Mouse (xf::ModuleManager* module_manager, QDomElement const& config):

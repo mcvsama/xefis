@@ -27,7 +27,7 @@
 #include "sound.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/sound", Sound);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/sound", Sound)
 
 
 Sound::Alarm::Alarm (QDomElement const& alarm_element, xf::SoundManager* sound_manager):

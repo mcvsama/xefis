@@ -25,7 +25,7 @@
 #include "afcs_ap.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-ap", AFCS_AP);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-ap", AFCS_AP)
 
 
 AFCS_AP::AFCS_AP (xf::ModuleManager* module_manager, QDomElement const& config):

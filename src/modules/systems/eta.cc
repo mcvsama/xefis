@@ -22,7 +22,7 @@
 #include "eta.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/eta", ETA);
+XEFIS_REGISTER_MODULE_CLASS ("systems/eta", ETA)
 
 
 ETA::ETA (xf::ModuleManager* module_manager, QDomElement const& config):

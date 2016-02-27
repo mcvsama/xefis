@@ -27,7 +27,7 @@
 #include "speeds.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/speeds", Speeds);
+XEFIS_REGISTER_MODULE_CLASS ("systems/speeds", Speeds)
 
 
 Speeds::Speeds (xf::ModuleManager* module_manager, QDomElement const& config):

@@ -161,7 +161,7 @@ class WorkPerformer: private Noncopyable
 			};
 
 			return new Specialized (fun);
-		};
+		}
 
   private:
 	/**

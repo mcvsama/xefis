@@ -24,7 +24,7 @@
 #include "transistor.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/transistor", Transistor);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/transistor", Transistor)
 
 
 Transistor::Transistor (xf::ModuleManager* module_manager, QDomElement const& config):

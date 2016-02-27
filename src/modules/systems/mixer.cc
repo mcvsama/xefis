@@ -21,7 +21,7 @@
 #include "mixer.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/mixer", Mixer);
+XEFIS_REGISTER_MODULE_CLASS ("systems/mixer", Mixer)
 
 
 Mixer::Mixer (xf::ModuleManager* module_manager, QDomElement const& config):

@@ -34,7 +34,7 @@
 #include "pc.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/pc", PerformanceComputer);
+XEFIS_REGISTER_MODULE_CLASS ("systems/pc", PerformanceComputer)
 
 
 PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDomElement const& config):

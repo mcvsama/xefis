@@ -30,7 +30,7 @@
 #include "udp.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/udp", UDP);
+XEFIS_REGISTER_MODULE_CLASS ("io/udp", UDP)
 
 
 UDP::UDP (xf::ModuleManager* module_manager, QDomElement const& config):

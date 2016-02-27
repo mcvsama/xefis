@@ -26,7 +26,7 @@
 #include "gear.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/gear", Gear);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/gear", Gear)
 
 
 Gear::Gear (xf::ModuleManager* module_manager, QDomElement const& config):

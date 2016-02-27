@@ -29,7 +29,7 @@
 #include "adi.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/adi", ADI);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/adi", ADI)
 
 
 ADI::ADI (xf::ModuleManager* module_manager, QDomElement const& config):

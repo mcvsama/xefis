@@ -27,7 +27,7 @@
 #include "watchdog.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/watchdog", Watchdog);
+XEFIS_REGISTER_MODULE_CLASS ("systems/watchdog", Watchdog)
 
 
 Watchdog::Watchdog (xf::ModuleManager* module_manager, QDomElement const& config):
