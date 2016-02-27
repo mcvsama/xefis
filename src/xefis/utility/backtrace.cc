@@ -32,12 +32,12 @@ Backtrace::Backtrace()
 	const int MAX = 256;
 	void* buffer[MAX];
 	int r = ::backtrace (buffer, MAX);
-	char** symbols = ::backtrace_symbols (buffer, r);
+	std::unique_ptr<char*, decltype(&::free)> symbols (::backtrace_symbols (buffer, r), ::free);
 	if (symbols)
 	{
 		for (int i = 1; i < r; ++i)
 		{
-			std::string symbol (symbols[i]);
+			std::string symbol (symbols.get()[i]);
 			std::string::size_type a = symbol.find ('(') + 1;
 			std::string::size_type b = symbol.find ('+', a);
 			if (b == std::string::npos)
@@ -47,11 +47,9 @@ Backtrace::Backtrace()
 			// Demangle the name:
 			int demangle_status = 0;
 			std::size_t demangled_max_size = 256;
-			char* demangled_name = abi::__cxa_demangle (name.c_str(), NULL, &demangled_max_size, &demangle_status);
-			_symbols.push_back (Symbol ((demangle_status == 0) ? demangled_name : name, symbol.substr (0, a-1)));
-			::free (demangled_name);
+			std::unique_ptr<char, decltype(&::free)> demangled_name (abi::__cxa_demangle (name.c_str(), NULL, &demangled_max_size, &demangle_status), ::free);
+			_symbols.push_back (Symbol ((demangle_status == 0) ? demangled_name.get() : name, symbol.substr (0, a-1)));
 		}
-		::free (symbols);
 	}
 }
 
