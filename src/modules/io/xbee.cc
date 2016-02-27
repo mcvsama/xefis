@@ -41,7 +41,7 @@
 #include "xbee.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/xbee", XBee);
+XEFIS_REGISTER_MODULE_CLASS ("io/xbee", XBee)
 
 
 constexpr int		XBee::MaxReadFailureCount;

@@ -42,7 +42,7 @@ class TestAssertFailed: public Exception
 	std::string
 	get_location()
 	{
-		TODO("location");
+		TODO("location")
 		return "TODO(location)";
 	}
 };

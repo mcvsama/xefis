@@ -27,7 +27,7 @@
 #include "afcs_api.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-fd-pitch", AFCS_FD_Pitch);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-fd-pitch", AFCS_FD_Pitch)
 
 
 AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ModuleManager* module_manager, QDomElement const& config):

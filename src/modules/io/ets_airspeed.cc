@@ -27,7 +27,7 @@
 #include "ets_airspeed.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/ets-airspeed", ETSAirspeed);
+XEFIS_REGISTER_MODULE_CLASS ("io/ets-airspeed", ETSAirspeed)
 
 
 constexpr uint8_t		ETSAirspeed::ValueRegister;

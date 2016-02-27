@@ -27,7 +27,7 @@
 #include "flaps_control.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-control", FlapsControl);
+XEFIS_REGISTER_MODULE_CLASS ("systems/flaps-control", FlapsControl)
 
 
 constexpr Time FlapsControl::kUpdateInterval;

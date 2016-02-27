@@ -29,7 +29,7 @@
 #include "bmp085.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/bmp085", BMP085);
+XEFIS_REGISTER_MODULE_CLASS ("io/bmp085", BMP085)
 
 
 BMP085::BMP085 (xf::ModuleManager* module_manager, QDomElement const& config):

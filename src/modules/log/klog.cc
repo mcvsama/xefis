@@ -27,7 +27,7 @@
 #include "klog.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("log/klog", KLog);
+XEFIS_REGISTER_MODULE_CLASS ("log/klog", KLog)
 
 
 KLog::KLog (xf::ModuleManager* module_manager, QDomElement const& config):

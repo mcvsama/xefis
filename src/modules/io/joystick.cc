@@ -30,7 +30,7 @@
 #include "joystick.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput);
+XEFIS_REGISTER_MODULE_CLASS ("io/joystick", JoystickInput)
 
 
 constexpr size_t JoystickInput::kMaxID;

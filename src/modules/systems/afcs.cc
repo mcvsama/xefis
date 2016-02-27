@@ -29,7 +29,7 @@
 #include "afcs_api.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs", AFCS);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs", AFCS)
 
 
 constexpr xf::Range<Speed>	AFCS::SpeedRange;

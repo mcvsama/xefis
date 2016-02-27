@@ -77,14 +77,14 @@ namespace Resources {
 #define XEFIS_CONFIG_HAS_ICON_16(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/16/" file)
 
-		XEFIS_CONFIG_HAS_ICON_16 (property_dir, "property-dir.png");
-		XEFIS_CONFIG_HAS_ICON_16 (property_value, "property-value.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_green_on, "led-green-on.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_amber_on, "led-amber-on.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_red_on, "led-red-on.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_white_on, "led-white-on.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png");
-		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png");
+		XEFIS_CONFIG_HAS_ICON_16 (property_dir, "property-dir.png")
+		XEFIS_CONFIG_HAS_ICON_16 (property_value, "property-value.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_green_on, "led-green-on.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_amber_on, "led-amber-on.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_red_on, "led-red-on.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_white_on, "led-white-on.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_blue_on, "led-blue-on.png")
+		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
 	} // namespace Icons16
@@ -102,20 +102,20 @@ namespace Resources {
 #define XEFIS_CONFIG_HAS_DIGIT(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/digits/" file)
 
-		XEFIS_CONFIG_HAS_DIGIT (digit_0, "digit-0.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_1, "digit-1.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_2, "digit-2.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_3, "digit-3.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_4, "digit-4.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_5, "digit-5.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_6, "digit-6.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_7, "digit-7.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_8, "digit-8.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_9, "digit-9.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_minus, "digit-minus.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_empty, "digit-empty.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_full, "digit-full.png");
-		XEFIS_CONFIG_HAS_DIGIT (digit_dot, "digit-dot.png");
+		XEFIS_CONFIG_HAS_DIGIT (digit_0, "digit-0.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_1, "digit-1.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_2, "digit-2.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_3, "digit-3.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_4, "digit-4.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_5, "digit-5.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_6, "digit-6.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_7, "digit-7.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_8, "digit-8.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_9, "digit-9.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_minus, "digit-minus.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_empty, "digit-empty.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_full, "digit-full.png")
+		XEFIS_CONFIG_HAS_DIGIT (digit_dot, "digit-dot.png")
 
 #undef XEFIS_CONFIG_HAS_DIGIT
 	} // namespace Digits

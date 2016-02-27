@@ -22,7 +22,7 @@
 #include "navaid_selector.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/navaid-selector", NavaidSelector);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/navaid-selector", NavaidSelector)
 
 
 NavaidSelector::NavaidSelector (xf::ModuleManager* module_manager, QDomElement const& config):

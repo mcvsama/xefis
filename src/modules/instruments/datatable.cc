@@ -32,7 +32,7 @@
 #include "datatable.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/datatable", Datatable);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/datatable", Datatable)
 
 
 Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_label_color, QColor default_value_color):

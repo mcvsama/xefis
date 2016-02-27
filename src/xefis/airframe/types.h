@@ -23,9 +23,9 @@
 
 namespace Xefis {
 
-XEFIS_STRONG_TYPEDEF (Angle, FlapsAngle);
-XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle);
-XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack);
+XEFIS_STRONG_TYPEDEF (Angle, FlapsAngle)
+XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle)
+XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack)
 
 
 typedef double LiftCoefficient;

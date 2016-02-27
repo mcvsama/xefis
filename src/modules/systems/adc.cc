@@ -32,7 +32,7 @@
 #include "adc.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/adc", AirDataComputer);
+XEFIS_REGISTER_MODULE_CLASS ("systems/adc", AirDataComputer)
 
 
 AirDataComputer::AirDataComputer (xf::ModuleManager* module_manager, QDomElement const& config):

@@ -23,7 +23,7 @@
 #include "ahrs_selector.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/ahrs-selector", AHRSSelector);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/ahrs-selector", AHRSSelector)
 
 
 AHRSSelector::AHRSSelector (xf::ModuleManager* module_manager, QDomElement const& config):

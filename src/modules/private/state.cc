@@ -27,7 +27,7 @@
 #include "state.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("private/state", State);
+XEFIS_REGISTER_MODULE_CLASS ("private/state", State)
 
 
 constexpr Length				State::MinimumsBaroStep;

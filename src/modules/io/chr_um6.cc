@@ -41,7 +41,7 @@
 #include "chr_um6.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/chr-um6", CHRUM6);
+XEFIS_REGISTER_MODULE_CLASS ("io/chr-um6", CHRUM6)
 
 
 constexpr Time	CHRUM6::RestartDelay;

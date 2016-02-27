@@ -29,7 +29,7 @@
 #include "vertical_trim.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/vertical-trim", VerticalTrim);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/vertical-trim", VerticalTrim)
 
 
 VerticalTrim::VerticalTrim (xf::ModuleManager* module_manager, QDomElement const& config):

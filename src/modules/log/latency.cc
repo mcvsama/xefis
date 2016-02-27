@@ -25,7 +25,7 @@
 #include "latency.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("log/latency", Latency);
+XEFIS_REGISTER_MODULE_CLASS ("log/latency", Latency)
 
 
 Latency::Latency (xf::ModuleManager* module_manager, QDomElement const& config):

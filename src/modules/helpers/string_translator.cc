@@ -23,7 +23,7 @@
 #include "string_translator.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/string-translator", StringTranslator);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/string-translator", StringTranslator)
 
 
 StringTranslator::StringsSet::StringsSet (QDomElement const& config)

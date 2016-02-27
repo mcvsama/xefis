@@ -37,7 +37,7 @@
 #include "gps.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/gps", GPS);
+XEFIS_REGISTER_MODULE_CLASS ("io/gps", GPS)
 
 
 #define FUZZ_INPUT

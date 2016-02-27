@@ -21,7 +21,7 @@
 #include "afcs_eac_yd.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-eac-yd", AFCS_EAC_YD);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-eac-yd", AFCS_EAC_YD)
 
 
 AFCS_EAC_YD::AFCS_EAC_YD (xf::ModuleManager* module_manager, QDomElement const& config):

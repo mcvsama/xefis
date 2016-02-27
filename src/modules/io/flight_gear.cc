@@ -26,7 +26,7 @@
 #include "flight_gear.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/flightgear", FlightGearIO);
+XEFIS_REGISTER_MODULE_CLASS ("io/flightgear", FlightGearIO)
 
 
 typedef float		FGFloat;

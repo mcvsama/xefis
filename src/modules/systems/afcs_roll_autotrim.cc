@@ -26,7 +26,7 @@
 #include "afcs_roll_autotrim.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-roll-autotrim", AFCS_RollAutotrim);
+XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-roll-autotrim", AFCS_RollAutotrim)
 
 
 AFCS_RollAutotrim::AFCS_RollAutotrim (xf::ModuleManager* module_manager, QDomElement const& config):

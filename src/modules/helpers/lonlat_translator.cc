@@ -21,7 +21,7 @@
 #include "lonlat_translator.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("helpers/lonlat-translator", LonLatTranslator);
+XEFIS_REGISTER_MODULE_CLASS ("helpers/lonlat-translator", LonLatTranslator)
 
 
 LonLatTranslator::LonLatTranslator (xf::ModuleManager* module_manager, QDomElement const& config):

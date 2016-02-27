@@ -29,7 +29,7 @@
 #include "horizontal_trim.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/horizontal-trim", HorizontalTrim);
+XEFIS_REGISTER_MODULE_CLASS ("instruments/horizontal-trim", HorizontalTrim)
 
 
 HorizontalTrim::HorizontalTrim (xf::ModuleManager* module_manager, QDomElement const& config):
