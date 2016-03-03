@@ -345,6 +345,9 @@ CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, C
 	_read_only = setting_element.attribute ("read-only") == "true";
 	_property.set_path (xf::PropertyPath (setting_element.attribute ("path")));
 	_unit = setting_element.attribute ("unit").toStdString();
+
+	if (si::units_map().find (_unit) == si::units_map().end())
+		throw xf::BadConfiguration ("unsupported unit '" + _unit + "'");
 }
 
 
