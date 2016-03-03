@@ -51,6 +51,10 @@ class CDU:
 
 	class Config;
 
+	/**
+	 * Generic strip - something that's stacked vertically on both sides
+	 * of the CDU instrument. Each strip should have a button besides it.
+	 */
 	class Strip
 	{
 	  public:
@@ -127,6 +131,10 @@ class CDU:
 		QRectF	_rect;
 	};
 
+	/**
+	 * Fillstrip is used when <fill/> is in the configuration.
+	 * It get replaced with multiple EmptyStrips to fill space.
+	 */
 	class FillStrip: public Strip
 	{
 	  public:
@@ -136,6 +144,9 @@ class CDU:
 		{ }
 	};
 
+	/**
+	 * Unused, empty strip in the config. Button is inactive for such strip.
+	 */
 	class EmptyStrip: public Strip
 	{
 	  public:
@@ -147,6 +158,9 @@ class CDU:
 		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 	};
 
+	/**
+	 * Strip that contains a value that can be configured.
+	 */
 	class SettingStrip: public Strip
 	{
 	  public:
@@ -193,6 +207,9 @@ class CDU:
 		QRectF				_button_rect;
 	};
 
+	/**
+	 * Strip that causes displaying of another page when its button is clicked.
+	 */
 	class GotoStrip: public Strip
 	{
 	  public:
