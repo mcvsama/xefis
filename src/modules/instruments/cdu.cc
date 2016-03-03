@@ -1050,7 +1050,7 @@ CDU::keyPressEvent (QKeyEvent* event)
 			break;
 
 		default:
-			_entry_value += event->text().toUpper();
+			_entry_value += event->text();
 	}
 
 	update();
