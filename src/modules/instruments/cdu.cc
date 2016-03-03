@@ -409,7 +409,11 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 					}
 					catch (si::UnparsableValue const&)
 					{
-						cdu->post_message ("Incompatible value type");
+						cdu->post_message ("Invalid value");
+					}
+					catch (si::IncompatibleTypes const&)
+					{
+						cdu->post_message ("Incompatible unit");
 					}
 				}
 			}
