@@ -498,6 +498,23 @@ CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf
 			paint_value_helper (rect, aids, painter, column, str_val, str_color);
 		}
 	}
+	else if (!_unit.empty())
+	{
+		bool left = column == Column::Left;
+		// At least paint information about units.
+		auto horz_alignment = left ? Qt::AlignLeft : Qt::AlignRight;
+		QPointF position {
+			(column == Column::Left) ? rect.left() : rect.right(),
+			rect.center().y()
+		};
+		std::string text = left ? ("― [" + _unit + "]") : ("[" + _unit + "] ―");
+
+		xf::TextLayout tl;
+		tl.set_alignment (Qt::AlignCenter);
+		tl.set_background (Qt::NoBrush);
+		tl.add_fragment (text, aids._font_13, Qt::gray);
+		tl.paint (position, horz_alignment | Qt::AlignVCenter, painter);
+	}
 }
 
 
