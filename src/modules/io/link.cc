@@ -37,7 +37,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/link", Link)
 
 
-Link::ItemStream::ItemStream (Link* link, QDomElement& element)
+Link::ItemSequence::ItemSequence (Link* link, QDomElement& element)
 {
 	for (QDomElement& e: element)
 	{
@@ -51,7 +51,7 @@ Link::ItemStream::ItemStream (Link* link, QDomElement& element)
 }
 
 
-Link::ItemStream::~ItemStream()
+Link::ItemSequence::~ItemSequence()
 {
 	for (Item* item: _items)
 		delete item;
@@ -59,7 +59,7 @@ Link::ItemStream::~ItemStream()
 
 
 inline Blob::size_type
-Link::ItemStream::size() const
+Link::ItemSequence::size() const
 {
 	Blob::size_type s = 0;
 	for (Item* item: _items)
@@ -69,7 +69,7 @@ Link::ItemStream::size() const
 
 
 inline void
-Link::ItemStream::produce (Blob& blob)
+Link::ItemSequence::produce (Blob& blob)
 {
 	for (Item* item: _items)
 		item->produce (blob);
@@ -77,7 +77,7 @@ Link::ItemStream::produce (Blob& blob)
 
 
 inline Blob::iterator
-Link::ItemStream::eat (Blob::iterator begin, Blob::iterator end)
+Link::ItemSequence::eat (Blob::iterator begin, Blob::iterator end)
 {
 	for (Item* item: _items)
 		begin = item->eat (begin, end);
@@ -86,7 +86,7 @@ Link::ItemStream::eat (Blob::iterator begin, Blob::iterator end)
 
 
 void
-Link::ItemStream::apply()
+Link::ItemSequence::apply()
 {
 	for (Item* item: _items)
 		item->apply();
@@ -94,7 +94,7 @@ Link::ItemStream::apply()
 
 
 void
-Link::ItemStream::failsafe()
+Link::ItemSequence::failsafe()
 {
 	for (Item* item: _items)
 		item->failsafe();
@@ -691,7 +691,7 @@ Link::BitfieldItem::failsafe()
 
 
 Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
-	ItemStream (link, element),
+	ItemSequence (link, element),
 	_rd(),
 	_rng (_rd())
 {
@@ -725,7 +725,7 @@ Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
 inline Blob::size_type
 Link::SignatureItem::size() const
 {
-	return ItemStream::size() + _random_bytes + _signature_bytes;
+	return ItemSequence::size() + _random_bytes + _signature_bytes;
 }
 
 
@@ -733,7 +733,7 @@ void
 Link::SignatureItem::produce (Blob& blob)
 {
 	_temp.clear();
-	ItemStream::produce (_temp);
+	ItemSequence::produce (_temp);
 
 	// Append random bytes:
 	_temp.reserve (_temp.size() + _random_bytes);
@@ -761,7 +761,7 @@ Link::SignatureItem::produce (Blob& blob)
 Blob::iterator
 Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 {
-	Blob::size_type data_size = ItemStream::size();
+	Blob::size_type data_size = ItemSequence::size();
 	Blob::size_type whole_size = size();
 
 	if (std::distance (begin, end) < static_cast<Blob::difference_type> (whole_size))
@@ -780,7 +780,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 	if (!std::equal (sign_begin, sign_end, hash.begin()))
 		throw ParseError();
 
-	if (ItemStream::eat (begin, begin + data_size) != begin + data_size)
+	if (ItemSequence::eat (begin, begin + data_size) != begin + data_size)
 		throw ParseError();
 
 	return begin + whole_size;
@@ -788,7 +788,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 
 
 Link::Packet::Packet (Link* link, QDomElement& element):
-	ItemStream (link, element)
+	ItemSequence (link, element)
 {
 	if (!element.hasAttribute ("magic"))
 		throw xf::MissingDomAttribute (element, "magic");
@@ -815,7 +815,7 @@ Link::Packet::magic() const
 inline Blob::size_type
 Link::Packet::size() const
 {
-	return ItemStream::size();
+	return ItemSequence::size();
 }
 
 
@@ -825,7 +825,7 @@ Link::Packet::produce (Blob& blob)
 	if (_send_pos % _send_every == _send_offset)
 	{
 		blob.insert (blob.end(), _magic.begin(), _magic.end());
-		ItemStream::produce (blob);
+		ItemSequence::produce (blob);
 	}
 	++_send_pos;
 }

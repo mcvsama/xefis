@@ -42,6 +42,10 @@ class Link:
 	class ParseError
 	{ };
 
+	/**
+	 * An item that can produce or parse data to be sent/received wirelessly. May be a package of
+	 * subitems.
+	 */
 	class Item
 	{
 	  public:
@@ -80,17 +84,20 @@ class Link:
 		failsafe() = 0;
 	};
 
-	class ItemStream: public Item
+	/**
+	 * A sequence of items, that is also an item. Simple.
+	 */
+	class ItemSequence: public Item
 	{
 	  public:
 		typedef std::vector<Item*> Items;
 
 	  public:
 		// Ctor
-		ItemStream (Link*, QDomElement&);
+		ItemSequence (Link*, QDomElement&);
 
 		// Dtor
-		virtual ~ItemStream();
+		virtual ~ItemSequence();
 
 		Blob::size_type
 		size() const override;
@@ -111,6 +118,9 @@ class Link:
 		Items	_items;
 	};
 
+	/**
+	 * Item that refers to a particular Property, so it can send/receive value of that property.
+	 */
 	class PropertyItem: public Item
 	{
 		enum class Type
@@ -199,6 +209,10 @@ class Link:
 		xf::PropertyFloat::Type		_float_value;
 	};
 
+	/**
+	 * An item that contains boolean or limited-width integers.
+	 * Refers to multiple boolean/integer Properties.
+	 */
 	class BitfieldItem: public Item
 	{
 	  public:
@@ -238,7 +252,10 @@ class Link:
 		Blob::size_type	_size = 0;
 	};
 
-	class SignatureItem: public ItemStream
+	/**
+	 * And item that adds or verifies simple digital signature of the contained items.
+	 */
+	class SignatureItem: public ItemSequence
 	{
 	  public:
 		SignatureItem (Link*, QDomElement&);
@@ -261,7 +278,10 @@ class Link:
 		Blob				_temp;
 	};
 
-	class Packet: public ItemStream
+	/**
+	 * A single packet containing a set of items. Configurable how often should be sent.
+	 */
+	class Packet: public ItemSequence
 	{
 	  public:
 		// Ctor
