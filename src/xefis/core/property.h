@@ -172,7 +172,7 @@ class GenericProperty
 	 * Return humanized value (using boost::format and specified unit).
 	 */
 	virtual std::string
-	stringify (boost::format, std::string const& unit, std::string nil_value) const;
+	stringify (boost::format, std::string const& unit, std::string value_if_nil) const;
 
 	/**
 	 * Return binary representation of the value.
@@ -211,7 +211,7 @@ class GenericProperty
 /**
  * Common base for typed properties, that is not templateized
  * yet. One can use methods like parse(std::string) or parse(Blob)
- * to get value from the node.
+ * to set the value in the node.
  */
 class TypedProperty: public GenericProperty
 {
@@ -654,11 +654,11 @@ GenericProperty::stringify() const
 
 
 inline std::string
-GenericProperty::stringify (boost::format format, std::string const& unit, std::string nil_value) const
+GenericProperty::stringify (boost::format format, std::string const& unit, std::string value_if_nil) const
 {
 	try {
 		if (is_nil())
-			return nil_value;
+			return value_if_nil;
 		else if (is_type<std::string>())
 			return (format % stringify()).str();
 		else if (is_type<bool>())
