@@ -67,7 +67,7 @@ typedef Unit< 0,  1, -2, -1,  0,  0,  0,  0>	Tesla;
 typedef Unit< 2,  1, -2, -2,  0,  0,  0,  0>	Henry;
 typedef Unit< 0,  0,  0,  0,  0,  0,  1,  2>	Lumen;
 typedef Unit<-2,  0,  0,  0,  0,  0,  1,  2>	Lux;
-typedef Unit< 0,  0, -1,  0,  0,  0,  1,  0>	Becquerel;
+typedef Unit< 0,  0, -1,  0,  0,  0,  0,  0>	Becquerel;
 typedef Unit< 2,  0, -2,  0,  0,  0,  0,  0>	Gray;
 typedef Unit< 0,  0, -1,  0,  0,  1,  0,  0>	Katal;
 
