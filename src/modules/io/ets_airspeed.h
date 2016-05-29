@@ -28,6 +28,8 @@
 
 
 /**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ *
  * Handles EagleTree Airspeed V3 sensor.
  * The sensor must be in default mode, not in 3-rd party mode.
  */

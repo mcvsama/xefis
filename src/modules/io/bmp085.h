@@ -25,6 +25,8 @@
 
 
 /**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ *
  * This module interfaces Bochs' BMP085 presure and temperature sensor.
  */
 class BMP085:

@@ -27,6 +27,8 @@
 
 
 /**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ *
  * Handles PCA9685-based Adafruit's 16-channel 12-bit PWM controller.
  */
 class PCA9685:

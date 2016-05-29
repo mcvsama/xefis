@@ -28,6 +28,8 @@
 
 
 /**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ *
  * This module interfaces Holtek's HT16K33 chip, for controlling
  * LED displays and scanning keys/switches.
  */
