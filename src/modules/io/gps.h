@@ -31,6 +31,8 @@
 
 
 /**
+ * Warning: this module uses I/O in main thread, which may block.
+ *
  * Read NMEA 0183 GPS data from a serial port.
  * TODO make a thread-object that handles the device in a separate thread.
  */

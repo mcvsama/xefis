@@ -29,6 +29,9 @@
 
 
 /**
+ * Warning: This module is not IO-safe: it uses IO commands in the main thread,
+ * which may block.
+ *
  * XBee Pro modem. Supports only the API mode 1 (non-escaped chars).
  * Use XBee firmware that starts in correct API mode by default,
  * or prepare the modem by issuing "ATAP1" AT command and writing

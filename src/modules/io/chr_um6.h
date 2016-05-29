@@ -28,6 +28,8 @@
 
 
 /**
+ * Warning: this module uses I/O in main thread, which may block.
+ *
  * CH-Robotics UM6 sensor driver.
  * Uses UART for communication.
  */
