@@ -69,11 +69,11 @@ class State: public xf::Module
 		set_path (xf::PropertyPath const&);
 
 		// Getter
-		xf::TypedProperty&
+		xf::GenericProperty&
 		property() noexcept;
 
 		// Getter
-		xf::TypedProperty const&
+		xf::GenericProperty const&
 		property() const noexcept;
 
 		/**
@@ -86,7 +86,7 @@ class State: public xf::Module
 		QString				_id;
 		xf::PropertyType	_type;
 		xf::PropertyPath	_path;
-		xf::TypedProperty	_property;
+		xf::GenericProperty	_property;
 	};
 
 	typedef std::map<QString, ConfigVariable> ConfigVariables;

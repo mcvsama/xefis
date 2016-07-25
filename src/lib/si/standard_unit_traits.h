@@ -125,6 +125,8 @@ template<>
 	{
 		static std::string name()	{ return "Hertz"; }
 		static std::string symbol()	{ return "Hz"; }
+
+		// Becquerel (Bq) has the same exponents vector as Hertz.
 	};
 
 
@@ -245,14 +247,6 @@ template<>
 	{
 		static std::string name()	{ return "Lux"; }
 		static std::string symbol()	{ return "lx"; }
-	};
-
-
-template<>
-	struct UnitTraits<units::Becquerel>: public DefaultUnitTraits
-	{
-		static std::string name()	{ return "Becquerel"; }
-		static std::string symbol()	{ return "Bq"; }
 	};
 
 

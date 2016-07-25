@@ -53,7 +53,7 @@ class Datatable:
 	  public:
 		QString				label;
 		QColor				label_color;
-		xf::TypedProperty	value;
+		xf::GenericProperty	value;
 		QColor				value_color;
 		QString				nil_value;
 		std::string			unit;

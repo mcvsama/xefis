@@ -165,6 +165,16 @@ class InvalidFormat: public Exception
 	using Exception::Exception;
 };
 
+
+/**
+ * Invalid call or wrong arguments.
+ */
+class InvalidCall: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
 } // namespace Xefis
 
 #endif

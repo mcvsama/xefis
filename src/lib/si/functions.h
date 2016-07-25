@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <cmath>
 
 
 namespace si {

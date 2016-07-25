@@ -26,6 +26,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
@@ -163,6 +164,38 @@ class GenericProperty
 	get_node() const;
 
 	/**
+	 * Ensures that this property exists.
+	 *
+	 * \param	type
+	 *			Name of a type. See lib/si for type names.
+	 */
+	void
+	ensure_existence (PropertyType const& type);
+
+	/**
+	 * Set value from humanized string (eg. "10 kt").
+	 * This version (not overridden) doesn't create a nil node,
+	 * when it can't find one, but quietly does nothing.
+	 *
+	 * TODO parse with unit, get info about unit (DynamicUnit/name),
+	 * use ensure_existence (std::string type) to create node and
+	 * parse.
+	 */
+	virtual void
+	parse_existing (std::string const&);
+
+	/**
+	 * Set value from binary blob.
+	 * This version (not overridden) doesn't create a nil node,
+	 * when it can't find one, but quietly does nothing.
+	 *
+	 * \param	type
+	 *			Name of a type. See lib/si for type names.
+	 */
+	virtual void
+	parse_existing (Blob const&, PropertyType const& type);
+
+	/**
 	 * Return humanized value (eg. value with unit).
 	 */
 	virtual std::string
@@ -185,6 +218,30 @@ class GenericProperty
 	 */
 	virtual double
 	to_float (std::string unit) const;
+
+	/**
+	 * Create new property node of given type.
+	 * \throw	TypeConflict
+	 * 			when there's another property under the same path with different type.
+	 * \throw	BadType
+	 * 			when type doesn't name correct type.
+	 */
+	static void
+	create (PropertyPath const& path, PropertyType const& type);
+
+	/**
+	 * Create (if doesn't exist) property and
+	 * set to given argument.
+	 */
+	virtual void
+	create_and_parse (std::string const&);
+
+	/**
+	 * Create (if doesn't exist) property and
+	 * set to given argument.
+	 */
+	virtual void
+	create_and_parse (Blob const&);
 
   protected:
 	/**
@@ -209,62 +266,11 @@ class GenericProperty
 
 
 /**
- * Common base for typed properties, that is not templateized
- * yet. One can use methods like parse(std::string) or parse(Blob)
- * to set the value in the node.
- */
-class TypedProperty: public GenericProperty
-{
-  public:
-	TypedProperty() = default;
-	TypedProperty (TypedProperty const&) = default;
-	TypedProperty& operator= (TypedProperty const&) = default;
-
-	// Inherit other constructors:
-	using GenericProperty::GenericProperty;
-
-  public:
-	/**
-	 * Ensures that this property exists.
-	 * Does nothing in this class.
-	 */
-	virtual void
-	ensure_existence();
-
-	/**
-	 * Set value from humanized string (eg. "10 kt").
-	 * This version (not overridden) doesn't create a nil node,
-	 * when it can't find one, but quietly does nothing.
-	 */
-	virtual void
-	parse (std::string const&);
-
-	/**
-	 * Set value from binary blob.
-	 * This version (not overridden) doesn't create a nil node,
-	 * when it can't find one, but quietly does nothing.
-	 */
-	virtual void
-	parse (Blob const&);
-
-	/**
-	 * Create new property node of given type.
-	 * \throw	TypeConflict
-	 * 			when there's another property under the same path with different type.
-	 * \throw	BadType
-	 * 			when type doesn't name correct type.
-	 */
-	static void
-	create (PropertyPath const& path, PropertyType const& type);
-};
-
-
-/**
  * A property reference. Doesn't hold the data, but only the path,
  * and queries property storage whenever needed.
  */
 template<class tType>
-	class Property: public TypedProperty
+	class Property: public GenericProperty
 	{
 	  public:
 		typedef tType					Type;
@@ -390,17 +396,17 @@ template<class tType>
 		void
 		copy_from (Property const& from);
 
-		// TypedProperty API
+		// GenericProperty API
 		void
-		ensure_existence() override;
+		ensure_existence();
 
-		// TypedProperty API
+		// GenericProperty API
 		void
-		parse (std::string const&) override;
+		create_and_parse (std::string const&) override;
 
-		// TypedProperty API
+		// GenericProperty API
 		void
-		parse (Blob const&) override;
+		create_and_parse (Blob const&) override;
 
 		/**
 		 * Return node casted to PropertyValueNode.
@@ -643,6 +649,60 @@ GenericProperty::get_node() const
 }
 
 
+inline void
+GenericProperty::ensure_existence (PropertyType const& type)
+{
+	create (path(), type);
+}
+
+
+inline void
+GenericProperty::parse_existing (std::string const& str_value)
+{
+	if (_root)
+	{
+		if (!_path.string().empty())
+		{
+			PropertyNode* node = get_node();
+			if (node)
+			{
+				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
+				if (typed_node)
+					typed_node->parse (str_value);
+			}
+			else
+				throw PropertyNotFound ("could not set non-existing property");
+		}
+	}
+	else
+		throw SingularProperty ("can't write to a singular property: " + _path.string());
+}
+
+
+inline void
+GenericProperty::parse_existing (Blob const& value, PropertyType const& /*type*/)
+{
+	// TODO ensure @type matches actual type of the node. Otherwise throw.
+	if (_root)
+	{
+		if (!_path.string().empty())
+		{
+			PropertyNode* node = get_node();
+			if (node)
+			{
+				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
+				if (typed_node)
+					typed_node->parse (value);
+			}
+			else
+				throw PropertyNotFound ("could not set non-existing property");
+		}
+	}
+	else
+		throw SingularProperty ("can't write to a singular property: " + _path.string());
+}
+
+
 inline std::string
 GenericProperty::stringify() const
 {
@@ -706,6 +766,20 @@ GenericProperty::to_float (std::string unit) const
 
 
 inline void
+GenericProperty::create_and_parse (std::string const&)
+{
+	throw InvalidCall ("GenericProperty::create_and_parse() can't be called directly");
+}
+
+
+inline void
+GenericProperty::create_and_parse (Blob const&)
+{
+	throw InvalidCall ("GenericProperty::create_and_parse(Blob) can't be called directly");
+}
+
+
+inline void
 GenericProperty::unfresh() const
 {
 	_last_read_serial = serial() + 1;
@@ -722,55 +796,6 @@ GenericProperty::normalized_path (PropertyPath path)
 }
 
 
-inline void
-TypedProperty::ensure_existence()
-{
-	// Pass
-}
-
-
-inline void
-TypedProperty::parse (std::string const& str_value)
-{
-	if (_root)
-	{
-		if (!_path.string().empty())
-		{
-			PropertyNode* node = get_node();
-			if (node)
-			{
-				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
-				if (typed_node)
-					typed_node->parse (str_value);
-			}
-		}
-	}
-	else
-		throw SingularProperty ("can't write to a singular property: " + _path.string());
-}
-
-
-inline void
-TypedProperty::parse (Blob const& value)
-{
-	if (_root)
-	{
-		if (!_path.string().empty())
-		{
-			PropertyNode* node = get_node();
-			if (node)
-			{
-				TypedPropertyValueNode* typed_node = dynamic_cast<TypedPropertyValueNode*> (node);
-				if (typed_node)
-					typed_node->parse (value);
-			}
-		}
-	}
-	else
-		throw SingularProperty ("can't write to a singular property: " + _path.string());
-}
-
-
 template<class T>
 	inline
 	Property<T>::Property():
@@ -781,7 +806,7 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (Property const& other):
-		TypedProperty (other)
+		GenericProperty (other)
 	{ }
 
 
@@ -798,7 +823,7 @@ template<class T>
 template<class T>
 	inline
 	Property<T>::Property (PropertyDirectoryNode* node, PropertyPath const& path):
-		TypedProperty (node->root(), path)
+		GenericProperty (node->root(), path)
 	{ }
 
 
@@ -806,7 +831,7 @@ template<class T>
 	inline Property<T>&
 	Property<T>::operator= (Property const& other)
 	{
-		TypedProperty::operator= (other);
+		GenericProperty::operator= (other);
 		return *this;
 	}
 
@@ -974,7 +999,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::parse (std::string const& value)
+	Property<T>::create_and_parse (std::string const& value)
 	{
 		if (_root)
 		{
@@ -997,7 +1022,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::parse (Blob const& value)
+	Property<T>::create_and_parse (Blob const& value)
 	{
 		if (_root)
 		{

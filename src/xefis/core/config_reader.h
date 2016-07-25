@@ -211,13 +211,13 @@ class ConfigReader
 	  public:
 		struct NameAndProperty
 		{
-			NameAndProperty (QString const& name, TypedProperty& property, bool required):
+			NameAndProperty (QString const& name, GenericProperty& property, bool required):
 				name (name), property (&property), required (required)
 			{ }
 
-			QString			name;
-			TypedProperty*	property;
-			bool			required;
+			QString				name;
+			GenericProperty*	property;
+			bool				required;
 		};
 
 		typedef std::vector<NameAndProperty> PropertiesList;
