@@ -189,7 +189,7 @@ void
 ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 {
 	try {
-		std::map<QString, TypedProperty*> map;
+		std::map<QString, GenericProperty*> map;
 		std::set<QString> unconfigured_values;
 		std::set<QString> configured_values;
 		std::set<QString> known_values;
@@ -232,11 +232,17 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 				throw MissingDomAttribute (e, "path");
 
 			if (!e.hasAttribute ("default"))
-				it->second->ensure_existence();
+			{
+				// If default value is not given, require attribute 'type' to be present:
+				if (!e.hasAttribute ("type"))
+					throw MissingDomAttribute (e, "type");
+				else
+					it->second->ensure_existence (PropertyType (e.attribute ("type")));
+			}
 			else
 			{
 				QString value = e.attribute ("default");
-				it->second->parse (value.toStdString());
+				it->second->create_and_parse (value.toStdString());
 			}
 		};
 

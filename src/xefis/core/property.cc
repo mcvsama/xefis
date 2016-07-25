@@ -24,7 +24,7 @@
 namespace Xefis {
 
 void
-TypedProperty::create (PropertyPath const& path, PropertyType const& type)
+GenericProperty::create (PropertyPath const& path, PropertyType const& type)
 {
 	std::string const& type_str = type.string();
 

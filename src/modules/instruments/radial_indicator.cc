@@ -82,7 +82,7 @@ RadialIndicator::data_updated()
 
 
 Optional<double>
-RadialIndicator::get_optional_value (xf::TypedProperty const& property)
+RadialIndicator::get_optional_value (xf::GenericProperty const& property)
 {
 	Optional<double> result;
 	if (property.valid())

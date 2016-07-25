@@ -196,7 +196,7 @@ class CDU:
 		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
-		xf::TypedProperty	_property;
+		xf::GenericProperty	_property;
 		std::string			_format;
 		std::string			_unit;
 		std::string			_nil_value;

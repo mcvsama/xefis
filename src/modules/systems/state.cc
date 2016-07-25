@@ -52,11 +52,11 @@ State::ConfigVariable::ConfigVariable (QDomElement const& config)
 		throw xf::MissingDomAttribute (config, "path");
 	_path = xf::PropertyPath (config.attribute ("path"));
 
-	xf::TypedProperty::create (_path, _type);
+	xf::GenericProperty::create (_path, _type);
 	_property.set_path (_path);
 
 	if (config.hasAttribute ("default"))
-		_property.parse (config.attribute ("default").toStdString());
+		_property.parse_existing (config.attribute ("default").toStdString());
 }
 
 
@@ -102,14 +102,14 @@ State::ConfigVariable::set_type (xf::PropertyType const& type)
 }
 
 
-inline xf::TypedProperty&
+inline xf::GenericProperty&
 State::ConfigVariable::property() noexcept
 {
 	return _property;
 }
 
 
-inline xf::TypedProperty const&
+inline xf::GenericProperty const&
 State::ConfigVariable::property() const noexcept
 {
 	return _property;
@@ -231,7 +231,7 @@ State::load_state()
 						if (type == cv->second.type())
 						{
 							try {
-								cv->second.property().parse (xf::parse_hex_string (e.attribute ("value")));
+								cv->second.property().create_and_parse (xf::parse_hex_string (e.attribute ("value")));
 							}
 							catch (xf::Exception const& e)
 							{

@@ -45,7 +45,7 @@ class RadialIndicator: public xf::Instrument
 	 * and configured unit name.
 	 */
 	Optional<double>
-	get_optional_value (xf::TypedProperty const& property);
+	get_optional_value (xf::GenericProperty const& property);
 
   private:
 	RadialIndicatorWidget*				_widget = nullptr;
@@ -59,10 +59,10 @@ class RadialIndicator: public xf::Instrument
 	Optional<xf::PropertyFloat::Type>	_value_maximum_critical;
 	xf::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	xf::TypedProperty					_value;
-	xf::TypedProperty					_value_target;
-	xf::TypedProperty					_value_reference;
-	xf::TypedProperty					_value_automatic;
+	xf::GenericProperty					_value;
+	xf::GenericProperty					_value_target;
+	xf::GenericProperty					_value_reference;
+	xf::GenericProperty					_value_automatic;
 };
 
 #endif

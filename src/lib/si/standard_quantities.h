@@ -65,7 +65,7 @@ typedef Quantity<Becquerel>						Radioactivity;
 typedef Quantity<Gray>							AbsorbedDose;
 typedef Quantity<Katal>							CatalyticActivity;
 
-// Unnamed derived quantities:
+// Derived quantities of unnamed units:
 typedef Quantity<SquareMeter>					Area;
 typedef Quantity<CubicMeter>					Volume;
 typedef Quantity<MeterPerSecond>				Velocity;

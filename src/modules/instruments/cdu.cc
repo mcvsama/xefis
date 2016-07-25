@@ -388,14 +388,14 @@ CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 			// Try first to parse the value just as is. If it fails, try to append default unit.
 			try {
-				_property.parse (entry_value);
+				_property.parse_existing (entry_value);
 			}
 			catch (...)
 			{
 				eptr = std::current_exception();
 
 				try {
-					_property.parse (entry_value + " " + _unit);
+					_property.parse_existing (entry_value + " " + _unit);
 					eptr = nullptr;
 				}
 				catch (...)

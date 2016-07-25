@@ -55,7 +55,7 @@ class LinearIndicator: public xf::Instrument
 	Optional<xf::PropertyFloat::Type>	_value_maximum_critical;
 	xf::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	xf::TypedProperty					_value;
+	xf::GenericProperty					_value;
 };
 
 #endif
