@@ -23,6 +23,9 @@
 #include <xefis/core/property.h>
 
 
+/**
+ * Select one of many AHRS data sources.
+ */
 class AHRSSelector: public xf::Module
 {
 	static constexpr std::size_t MaxInputs = 2;

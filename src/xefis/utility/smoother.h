@@ -301,6 +301,7 @@ template<class V>
 			else
 			{
 				ValueType p = _history.back();
+				// Linear interpolation:
 				for (int i = 0; i < iterations; ++i)
 					_history.push_back (p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
 

@@ -25,6 +25,9 @@
 #include <xefis/utility/transistor.h>
 
 
+/**
+ * Linearly transition between two values.
+ */
 class Transistor: public xf::Module
 {
   public:

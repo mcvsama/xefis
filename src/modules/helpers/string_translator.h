@@ -24,6 +24,9 @@
 #include <xefis/core/property.h>
 
 
+/**
+ * Map input strings to output strings.
+ */
 class StringTranslator: public xf::Module
 {
 	/**

@@ -25,6 +25,9 @@
 #include <xefis/core/sound_manager.h>
 
 
+/**
+ * Play various sounds when corresponding boolean properties become true.
+ */
 class Sound:
 	public QObject,
 	public xf::Module
