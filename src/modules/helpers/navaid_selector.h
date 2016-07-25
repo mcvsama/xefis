@@ -23,6 +23,9 @@
 #include <xefis/core/property.h>
 
 
+/**
+ * Select one of many navaids.
+ */
 class NavaidSelector: public xf::Module
 {
 	static constexpr int MaxInputs = 8;

@@ -24,6 +24,9 @@
 #include <xefis/core/property.h>
 
 
+/**
+ * Translate Property<Angle> to PropertyString in DMS format.
+ */
 class LonLatTranslator: public xf::Module
 {
   public:
