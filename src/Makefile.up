@@ -2,7 +2,7 @@ LANGUAGE=en # This is for Vim, when doing :make Vim jumps to right file on error
 .PHONY: all
 
 all:
-	$(MAKE) all -C ..
+	+$(MAKE) all -C ..
 
 %:
 	@CWD="`pwd`" cd .. && $(MAKE) -s $@ && cd $$CWD
