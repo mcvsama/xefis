@@ -38,6 +38,8 @@ PropertyType::check_validity (std::string const& type)
 		"integer",
 		"float",
 		"string",
+		// SI types:
+		// TODO support all types from standard_quantities.h
 		"acceleration",
 		"angle",
 		"area",

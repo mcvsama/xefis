@@ -215,6 +215,7 @@ class Link:
 	 */
 	class BitfieldItem: public Item
 	{
+		// TODO have a fallback value for integers that don't fit in bitwidth.
 	  public:
 		struct BitSource
 		{
