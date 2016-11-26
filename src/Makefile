@@ -45,12 +45,12 @@ endif
 CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
-CXXFLAGS		+= -fPIC -flto -O4 -g -c -std=c++14 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors
+CXXFLAGS		+= -fPIC -flto -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)
 CLANG_DISABLED_WARNINGS = mismatched-tags disabled-macro-expansion c++98-compat-pedantic documentation-unknown-command
-CXXFLAGS		+= -fPIE -O3 -g -c -std=c++14 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -fstrict-aliasing $(foreach warning, $(CLANG_DISABLED_WARNINGS), -Wno-$(warning))
+CXXFLAGS		+= -fPIE -O3 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -fstrict-aliasing $(foreach warning, $(CLANG_DISABLED_WARNINGS), -Wno-$(warning))
 CXXFLAGS		+= -pthread -I. -Ilib
 endif
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
@@ -235,7 +235,7 @@ doc:
 	@cd doc && doxygen doxygen-conf/doxygen.conf
 
 check:
-	cppcheck --force --std=c++14 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
+	cppcheck --force --std=c++17 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
 		lib modules xefis $(HEADERS) 2> check.log
 
 $(MAINDEPFILE): Makefile.sources $(DEPFILES)
