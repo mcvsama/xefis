@@ -21,6 +21,29 @@
 #include <iostream>
 
 
+// Fixes for std::ostream which has broken support for unsigned/signed/char types
+// and prints 8-bit integers like they were characters.
+namespace ostream_fixes {
+
+inline std::ostream&
+operator<< (std::ostream& os, unsigned char i)
+{
+	return os << static_cast<unsigned int> (i);
+}
+
+
+inline std::ostream&
+operator<< (std::ostream& os, signed char i)
+{
+	return os << static_cast<signed int> (i);
+}
+
+} // namespace ostream_fixes
+
+
+using namespace ostream_fixes;
+
+
 /**
  * Return size (number of elements) of an array.
  */
