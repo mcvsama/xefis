@@ -91,8 +91,8 @@ class GPSTimeOfDay
 	/**
 	 * Ctor
 	 * \param	gps_time
-	 * 			String taken from NMEA message,
-	 * 			formatted: HHMMSS.
+	 *			String taken from NMEA message,
+	 *			formatted: HHMMSS.
 	 */
 	explicit GPSTimeOfDay (std::string const& gps_time);
 
@@ -113,8 +113,8 @@ class GPSDate
 	/**
 	 * Ctor
 	 * \param	gps_date
-	 * 			String taken from NMEA message,
-	 * 			formatted: DDMMYY.
+	 *			String taken from NMEA message,
+	 *			formatted: DDMMYY.
 	 */
 	explicit GPSDate (std::string const& gps_date);
 

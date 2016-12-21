@@ -89,7 +89,7 @@ class Module: private Noncopyable
 	/**
 	 * Create a module.
 	 * \param	config
-	 * 			DOM configuration element for the module.
+	 *			DOM configuration element for the module.
 	 */
 	Module (ModuleManager*, QDomElement const& config);
 
