@@ -56,7 +56,7 @@ class Sentence
 	/**
 	 * Ctor
 	 * \param	sentence
-	 * 			String between the '$' and '*'.
+	 *			String between the '$' and '*'.
 	 */
 	explicit Sentence (std::string const&);
 
@@ -73,7 +73,7 @@ class Sentence
 	 * The string is avaiable through val() method.
 	 *
 	 * \return	true if OK, false if end of string reached in the
-	 * 			previous call to this method.
+	 *			previous call to this method.
 	 */
 	bool
 	read_next();
@@ -88,7 +88,7 @@ class Sentence
 	 * Read latitude (using standard read_next()).
 	 *
 	 * \return	false if read_next() returned false internally,
-	 * 			so it's time to finish.
+	 *			so it's time to finish.
 	 */
 	bool
 	read_latitude (Optional<Angle>& out_latitude);
@@ -126,7 +126,7 @@ Sentence::val() const noexcept
 /**
  * Make NMEA checksum from the input string.
  * \param	data
- * 			String between '$' and '*' (exclusive).
+ *			String between '$' and '*' (exclusive).
  * \return	two-character checksum (do not include '*').
  */
 extern std::string

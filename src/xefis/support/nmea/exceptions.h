@@ -37,9 +37,9 @@ class InvalidType: public Exception
   public:
 	/**
 	 * \param	expected_header
-	 * 			NMEA header that was expected.
+	 *			NMEA header that was expected.
 	 * \param	actual_header
-	 * 			Actual header from the string.
+	 *			Actual header from the string.
 	 */
 	InvalidType (std::string const& expected_header, std::string const& actual_header):
 		Exception ("unexpected NMEA sentence header '" + actual_header + "', expected '" + expected_header + "'")

@@ -72,7 +72,7 @@ class Parser: private Noncopyable
 	/**
 	 * Ctor
 	 * \param	Listener
-	 * 			Callbacks object.
+	 *			Callbacks object.
 	 */
 	Parser (Listener*);
 

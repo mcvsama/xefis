@@ -214,7 +214,7 @@ class SerialPort:
 	 * and it's possible that not all requested data is written
 	 * when function returns.
 	 * \throws	WriteException
-	 * 			When device is closed.
+	 *			When device is closed.
 	 */
 	void
 	write (Blob const& data);
@@ -223,7 +223,7 @@ class SerialPort:
 	 * Write string to the device. Same conditions apply as for
 	 * write (Blob).
 	 * \throws	WriteException
-	 * 			When device is closed.
+	 *			When device is closed.
 	 */
 	void
 	write (std::string const& data);
