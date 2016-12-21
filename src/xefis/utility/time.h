@@ -26,7 +26,11 @@
 
 namespace xf {
 
-void
+// TODO Make Timestamp absolute and create operators for dealing with si::Time
+using Timestamp = Time;
+
+
+inline void
 sleep (Time time)
 {
 	struct timespec ts;
