@@ -45,7 +45,7 @@ endif
 CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
-CXXFLAGS		+= -fPIC -flto -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors
+CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)
@@ -57,7 +57,7 @@ CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
 SO				:= $(CXX) -shared
 SOFLAGS			:=
 LD				:= $(CXX)
-LDFLAGS			:= -flto -rdynamic
+LDFLAGS			:= -rdynamic
 AR				:= ar
 MOC				:= $(QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system pthread mhash
