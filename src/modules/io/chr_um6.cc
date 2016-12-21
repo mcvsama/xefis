@@ -31,8 +31,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/application.h>
 #include <xefis/core/system.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/numeric.h>
@@ -115,7 +115,7 @@ CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
 	sp_config.set_stop_bits (1);
 	sp_config.set_parity_bit (xf::SerialPort::Parity::None);
 
-	_serial_port = module_manager->application()->system()->allocate_serial_port();
+	_serial_port = module_manager->xefis()->system()->allocate_serial_port();
 	_serial_port->set_configuration (sp_config);
 	_serial_port->set_max_read_failures (3);
 

@@ -19,7 +19,6 @@
 
 // Qt:
 #include <QtWidgets/QWidget>
-#include <QtWidgets/QApplication>
 
 // Xefis:
 #include <xefis/config/all.h>

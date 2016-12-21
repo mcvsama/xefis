@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/application.h>
+#include <xefis/core/xefis.h>
 #include <xefis/airframe/airframe.h>
 
 // Local:
@@ -60,7 +60,7 @@ Speeds::data_updated()
 void
 Speeds::compute()
 {
-	xf::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
+	xf::Flaps const& flaps = module_manager()->xefis()->airframe()->flaps();
 
 	Optional<Speed> minimum;
 	Optional<Speed> maximum;

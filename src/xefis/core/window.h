@@ -29,8 +29,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/property.h>
+#include <xefis/core/xefis.h>
 
 // Local:
 #include "module.h"
@@ -94,7 +94,7 @@ class Window: public QWidget
 
   public:
 	// Ctor
-	Window (Application*, ConfigReader*, QDomElement const&);
+	Window (Xefis*, ConfigReader*, QDomElement const&);
 
 	// Dtor
 	~Window();
@@ -163,7 +163,7 @@ class Window: public QWidget
 	show_configurator();
 
   private:
-	Application*	_application;
+	Xefis*			_xefis;
 	ConfigReader*	_config_reader;
 	QStackedWidget*	_stack;
 	QWidget*		_instruments_panel;

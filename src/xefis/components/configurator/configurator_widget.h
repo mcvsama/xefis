@@ -69,7 +69,7 @@ class ConfiguratorWidget: public QWidget
 	{
 	  public:
 		// Ctor
-		GeneralModuleWidget (Application*, Module*, ConfiguratorWidget*, QWidget* parent);
+		GeneralModuleWidget (Xefis*, Module*, ConfiguratorWidget*, QWidget* parent);
 
 		/**
 		 * Return module.
@@ -84,7 +84,7 @@ class ConfiguratorWidget: public QWidget
 		reload_module();
 
 	  private:
-		Application*		_application;
+		Xefis*				_xefis;
 		Module*				_module;
 		Module::Pointer		_module_ptr;
 		ConfiguratorWidget*	_configurator_widget;
@@ -92,7 +92,7 @@ class ConfiguratorWidget: public QWidget
 
   public:
 	// Ctor
-	ConfiguratorWidget (Application* application, QWidget* parent);
+	ConfiguratorWidget (Xefis*, QWidget* parent);
 
 	Window*
 	owning_window() const;
@@ -115,7 +115,7 @@ class ConfiguratorWidget: public QWidget
 	reload_module_widget (GeneralModuleWidget*);
 
   private:
-	Application*		_application			= nullptr;
+	Xefis*				_xefis					= nullptr;
 	PropertyEditor*		_property_editor		= nullptr;
 	ModulesList*		_modules_list			= nullptr;
 	QStackedWidget*		_modules_stack			= nullptr;

@@ -53,7 +53,7 @@ ModulesListItem::reload()
 	if (module)
 	{
 		try {
-			Accounting::Stats const& ms = _module_manager->application()->accounting()->module_stats (_module_pointer, Accounting::Timespan::Last100Samples);
+			Accounting::Stats const& ms = _module_manager->xefis()->accounting()->module_stats (_module_pointer, Accounting::Timespan::Last100Samples);
 			setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg (ms.average().quantity<Second>(), 0, 'f', 6));
 			setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg (ms.maximum().quantity<Second>(), 0, 'f', 6));
 		}

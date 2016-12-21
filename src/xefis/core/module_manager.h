@@ -30,7 +30,7 @@
 namespace xf {
 
 class Module;
-class Application;
+class Xefis;
 
 class ModuleManager: public QObject
 {
@@ -56,16 +56,16 @@ class ModuleManager: public QObject
 
   public:
 	// Ctor
-	explicit ModuleManager (Application*);
+	explicit ModuleManager (Xefis*);
 
 	// Dtor
 	~ModuleManager();
 
 	/**
-	 * Access Application object.
+	 * Access the Xefis object.
 	 */
-	Application*
-	application() const;
+	Xefis*
+	xefis() const;
 
 	/**
 	 * Add module by name.
@@ -158,7 +158,7 @@ class ModuleManager: public QObject
 
   private:
 	Logger				_logger;
-	Application*		_application = nullptr;
+	Xefis*				_xefis = nullptr;
 	OwnedModules		_modules;
 	Modules				_instrument_modules;
 	Modules				_non_instrument_modules;
@@ -179,12 +179,12 @@ class ModuleNotFoundException: public Exception
 };
 
 
-inline Application*
-ModuleManager::application() const
+inline Xefis*
+ModuleManager::xefis() const
 {
-	if (!_application)
-		throw std::logic_error ("Application not accessible from ModuleManager");
-	return _application;
+	if (!_xefis)
+		throw std::logic_error ("The Xefis object is not accessible from ModuleManager");
+	return _xefis;
 }
 
 

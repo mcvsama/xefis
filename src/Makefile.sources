@@ -110,7 +110,6 @@ NODEP_SOURCES += $(VERSION_FILE)
 ######## /xefis/core ########
 
 XEFIS_HEADERS += xefis/core/accounting.h
-XEFIS_HEADERS += xefis/core/application.h
 XEFIS_HEADERS += xefis/core/config_reader.h
 XEFIS_HEADERS += xefis/core/fail.h
 XEFIS_HEADERS += xefis/core/instrument.h
@@ -134,9 +133,9 @@ XEFIS_HEADERS += xefis/core/system.h
 XEFIS_HEADERS += xefis/core/window.h
 XEFIS_HEADERS += xefis/core/window_manager.h
 XEFIS_HEADERS += xefis/core/work_performer.h
+XEFIS_HEADERS += xefis/core/xefis.h
 
 XEFIS_SOURCES += xefis/core/accounting.cc
-XEFIS_SOURCES += xefis/core/application.cc
 XEFIS_SOURCES += xefis/core/config_reader.cc
 XEFIS_SOURCES += xefis/core/fail.cc
 XEFIS_SOURCES += xefis/core/instrument_aids.cc
@@ -158,12 +157,13 @@ XEFIS_SOURCES += xefis/core/system.cc
 XEFIS_SOURCES += xefis/core/window.cc
 XEFIS_SOURCES += xefis/core/window_manager.cc
 XEFIS_SOURCES += xefis/core/work_performer.cc
+XEFIS_SOURCES += xefis/core/xefis.cc
 
 XEFIS_MOCHDRS += xefis/core/accounting.h
-XEFIS_MOCHDRS += xefis/core/application.h
 XEFIS_MOCHDRS += xefis/core/panel.h
 XEFIS_MOCHDRS += xefis/core/services.h
 XEFIS_MOCHDRS += xefis/core/window.h
+XEFIS_MOCHDRS += xefis/core/xefis.h
 
 ######## /xefis/support ########
 

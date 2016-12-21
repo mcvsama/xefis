@@ -30,12 +30,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/window_manager.h>
 #include <xefis/core/module.h>
 #include <xefis/core/window.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -294,8 +294,8 @@ ConfigReader::PropertiesParser::registered_names() const
 }
 
 
-ConfigReader::ConfigReader (Application* application, ModuleManager* module_manager):
-	_application (application),
+ConfigReader::ConfigReader (Xefis* xefis, ModuleManager* module_manager):
+	_xefis (xefis),
 	_module_manager (module_manager)
 {
 	_logger.set_prefix ("<config reader>");
@@ -517,9 +517,9 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 		return;
 
 	// Auto delete if Window throws an exception:
-	Unique<Window> window = std::make_unique<Window> (_application, this, window_element);
+	Unique<Window> window = std::make_unique<Window> (_xefis, this, window_element);
 	window->show();
-	_application->window_manager()->add_window (std::move (window));
+	_xefis->window_manager()->add_window (std::move (window));
 	// window is now gone
 	_has_windows = true;
 }

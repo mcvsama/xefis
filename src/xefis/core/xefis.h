@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__APPLICATION__APPLICATION_H__INCLUDED
-#define XEFIS__APPLICATION__APPLICATION_H__INCLUDED
+#ifndef XEFIS__CORE__XEFIS_H__INCLUDED
+#define XEFIS__CORE__XEFIS_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -42,11 +42,11 @@ class WorkPerformer;
 class ConfiguratorWidget;
 class Accounting;
 class Airframe;
-class Support;
 class System;
+class Machine;
 
 
-class Application: public QApplication
+class Xefis: public QApplication
 {
 	Q_OBJECT
 
@@ -89,7 +89,7 @@ class Application: public QApplication
 	{
 	  public:
 		// Ctor:
-		OptionsHelper (Application*);
+		OptionsHelper (Xefis*);
 
 		Optional<int>
 		watchdog_write_fd() const noexcept;
@@ -114,10 +114,10 @@ class Application: public QApplication
 
   public:
 	// Ctor
-	Application (int& argc, char** argv);
+	Xefis (int& argc, char** argv);
 
 	// Dtor
-	~Application();
+	~Xefis();
 
 	/**
 	 * Override and catch exceptions.
@@ -235,13 +235,13 @@ class Application: public QApplication
 	print_copyrights (std::ostream&);
 
 	/**
-	 * UNIX signal handler. Calls quit() on Application instance.
+	 * UNIX signal handler. Calls quit() on Xefis instance.
 	 */
 	static void
 	s_quit (int);
 
   private:
-	static Application*				_application;
+	static Xefis*					_xefis;
 	static Logger					_logger;
 
 	Unique<System>					_system;
@@ -261,56 +261,57 @@ class Application: public QApplication
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<Airframe>				_airframe;
 	Unique<OptionsHelper>			_options_helper;
+	Unique<Machine>					_machine;
 	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
 };
 
 
 inline
-Application::NonValuedArgumentException::NonValuedArgumentException (std::string const& argument):
+Xefis::NonValuedArgumentException::NonValuedArgumentException (std::string const& argument):
 	Exception ("argument '" + argument + "' doesn't take any values")
 { }
 
 
 inline
-Application::MissingValueException::MissingValueException (std::string const& argument):
+Xefis::MissingValueException::MissingValueException (std::string const& argument):
 	Exception ("argument '" + argument + "' needs a value")
 { }
 
 
 inline
-Application::UninitializedServiceException::UninitializedServiceException (std::string const& service_name):
+Xefis::UninitializedServiceException::UninitializedServiceException (std::string const& service_name):
 	Exception ("service '" + service_name + "' is not initialized")
 { }
 
 
 inline
-Application::OptionsHelper::OptionsHelper (Application* application)
+Xefis::OptionsHelper::OptionsHelper (Xefis* xefis)
 {
-	if (application->has_option (Application::Option::WatchdogWriteFd))
-		_watchdog_write_fd = boost::lexical_cast<int> (application->option (Application::Option::WatchdogWriteFd));
+	if (xefis->has_option (Xefis::Option::WatchdogWriteFd))
+		_watchdog_write_fd = boost::lexical_cast<int> (xefis->option (Xefis::Option::WatchdogWriteFd));
 
-	if (application->has_option (Application::Option::WatchdogReadFd))
-		_watchdog_read_fd = boost::lexical_cast<int> (application->option (Application::Option::WatchdogReadFd));
+	if (xefis->has_option (Xefis::Option::WatchdogReadFd))
+		_watchdog_read_fd = boost::lexical_cast<int> (xefis->option (Xefis::Option::WatchdogReadFd));
 }
 
 
 inline Optional<int>
-Application::OptionsHelper::watchdog_write_fd() const noexcept
+Xefis::OptionsHelper::watchdog_write_fd() const noexcept
 {
 	return _watchdog_write_fd;
 }
 
 
 inline Optional<int>
-Application::OptionsHelper::watchdog_read_fd() const noexcept
+Xefis::OptionsHelper::watchdog_read_fd() const noexcept
 {
 	return _watchdog_read_fd;
 }
 
 
 inline Accounting*
-Application::accounting() const
+Xefis::accounting() const
 {
 	if (!_accounting)
 		throw UninitializedServiceException ("Accounting");
@@ -319,7 +320,7 @@ Application::accounting() const
 
 
 inline ModuleManager*
-Application::module_manager() const
+Xefis::module_manager() const
 {
 	if (!_module_manager)
 		throw UninitializedServiceException ("ModuleManager");
@@ -328,7 +329,7 @@ Application::module_manager() const
 
 
 inline WindowManager*
-Application::window_manager() const
+Xefis::window_manager() const
 {
 	if (!_window_manager)
 		throw UninitializedServiceException ("WindowManager");
@@ -337,7 +338,7 @@ Application::window_manager() const
 
 
 inline SoundManager*
-Application::sound_manager() const
+Xefis::sound_manager() const
 {
 	if (!_sound_manager)
 		throw UninitializedServiceException ("SoundManager");
@@ -346,7 +347,7 @@ Application::sound_manager() const
 
 
 inline ConfigReader*
-Application::config_reader() const
+Xefis::config_reader() const
 {
 	if (!_config_reader)
 		throw UninitializedServiceException ("ConfigReader");
@@ -355,7 +356,7 @@ Application::config_reader() const
 
 
 inline NavaidStorage*
-Application::navaid_storage() const
+Xefis::navaid_storage() const
 {
 	if (!_navaid_storage)
 		throw UninitializedServiceException ("NavaidStorage");
@@ -364,7 +365,7 @@ Application::navaid_storage() const
 
 
 inline WorkPerformer*
-Application::work_performer() const
+Xefis::work_performer() const
 {
 	if (!_work_performer)
 		throw UninitializedServiceException ("WorkPerformer");
@@ -373,7 +374,7 @@ Application::work_performer() const
 
 
 inline Airframe*
-Application::airframe() const
+Xefis::airframe() const
 {
 	if (!_airframe)
 		throw UninitializedServiceException ("Airframe");
@@ -382,7 +383,7 @@ Application::airframe() const
 
 
 inline System*
-Application::system() const
+Xefis::system() const
 {
 	if (!_system)
 		throw UninitializedServiceException ("System");
@@ -391,7 +392,7 @@ Application::system() const
 
 
 inline ConfiguratorWidget*
-Application::configurator_widget() const
+Xefis::configurator_widget() const
 {
 	if (!_configurator_widget)
 		throw UninitializedServiceException ("ConfiguratorWidget");
@@ -400,14 +401,14 @@ Application::configurator_widget() const
 
 
 inline bool
-Application::has_option (Option option) const
+Xefis::has_option (Option option) const
 {
 	return _options.find (option) != _options.end();
 }
 
 
 inline std::string
-Application::option (Option option) const
+Xefis::option (Option option) const
 {
 	auto o = _options.find (option);
 	if (o != _options.end())
@@ -417,8 +418,8 @@ Application::option (Option option) const
 }
 
 
-inline Application::OptionsHelper const&
-Application::options() const noexcept
+inline Xefis::OptionsHelper const&
+Xefis::options() const noexcept
 {
 	return *_options_helper;
 }

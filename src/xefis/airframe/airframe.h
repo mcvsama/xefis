@@ -29,7 +29,7 @@
 
 namespace xf {
 
-class Application;
+class Xefis;
 
 
 /**
@@ -39,7 +39,7 @@ class Airframe
 {
   public:
 	// Ctor
-	Airframe (Application* application, QDomElement const& config);
+	Airframe (Xefis*, QDomElement const& config);
 
   public:
 	Flaps const&

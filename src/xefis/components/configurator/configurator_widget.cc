@@ -51,9 +51,9 @@ ConfiguratorWidget::OwnershipBreakingDecorator::~OwnershipBreakingDecorator()
 }
 
 
-ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Application* application, Module* module, ConfiguratorWidget* configurator_widget, QWidget* parent):
+ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Xefis* xefis, Module* module, ConfiguratorWidget* configurator_widget, QWidget* parent):
 	QWidget (parent),
-	_application (application),
+	_xefis (xefis),
 	_module (module),
 	_configurator_widget (configurator_widget)
 {
@@ -93,7 +93,7 @@ ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Application* appli
 void
 ConfiguratorWidget::GeneralModuleWidget::reload_module()
 {
-	auto module_manager = _application->module_manager();
+	auto module_manager = _xefis->module_manager();
 	if (module_manager)
 	{
 		QString instance_html = _module_ptr.instance().empty()
@@ -116,16 +116,16 @@ ConfiguratorWidget::GeneralModuleWidget::reload_module()
 }
 
 
-ConfiguratorWidget::ConfiguratorWidget (Application* application, QWidget* parent):
+ConfiguratorWidget::ConfiguratorWidget (Xefis* xefis, QWidget* parent):
 	QWidget (parent),
-	_application (application)
+	_xefis (xefis)
 {
 	_no_module_selected = new QLabel ("No module selected", this);
 	_no_module_selected->setAlignment (Qt::AlignCenter);
 
 	_property_editor = new PropertyEditor (PropertyStorage::default_storage()->root(), this);
 
-	_modules_list = new ModulesList (_application->module_manager(), this);
+	_modules_list = new ModulesList (_xefis->module_manager(), this);
 	_modules_list->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Minimum);
 	QObject::connect (_modules_list, &ModulesList::module_selected, this, &ConfiguratorWidget::module_selected);
 	QObject::connect (_modules_list, &ModulesList::none_selected, this, &ConfiguratorWidget::none_selected);
@@ -159,13 +159,13 @@ ConfiguratorWidget::ConfiguratorWidget (Application* application, QWidget* paren
 void
 ConfiguratorWidget::module_selected (Module::Pointer const& module_pointer)
 {
-	Module* module = _application->module_manager()->find (module_pointer);
+	Module* module = _xefis->module_manager()->find (module_pointer);
 	if (module)
 	{
 		auto gmw = _general_module_widgets.find (module);
 		if (gmw == _general_module_widgets.end())
 		{
-			auto new_gmw = std::make_shared<GeneralModuleWidget> (_application, module, this, this);
+			auto new_gmw = std::make_shared<GeneralModuleWidget> (_xefis, module, this, this);
 			gmw = _general_module_widgets.insert ({ module, new_gmw }).first;
 		}
 

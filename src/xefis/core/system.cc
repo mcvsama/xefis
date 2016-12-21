@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
+#include <xefis/core/xefis.h>
 
 // Local:
 #include "system.h"

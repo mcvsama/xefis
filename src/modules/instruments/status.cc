@@ -19,9 +19,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/time_helper.h>
