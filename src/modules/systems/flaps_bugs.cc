@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/airframe/airframe.h>
 #include <xefis/airframe/flaps.h>
@@ -51,7 +51,7 @@ FlapsBugs::FlapsBugs (xf::ModuleManager* module_manager, QDomElement const& conf
 void
 FlapsBugs::data_updated()
 {
-	xf::Flaps const& flaps = module_manager()->application()->airframe()->flaps();
+	xf::Flaps const& flaps = module_manager()->xefis()->airframe()->flaps();
 
 	if (_input_flaps_setting.valid())
 	{

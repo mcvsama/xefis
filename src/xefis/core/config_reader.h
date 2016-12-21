@@ -34,11 +34,12 @@
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/logger.h>
 
 
 namespace xf {
 
-class Application;
+class Xefis;
 class ModuleManager;
 class Module;
 
@@ -257,7 +258,7 @@ class ConfigReader
 
   public:
 	// Ctor
-	ConfigReader (Application*, ModuleManager*);
+	ConfigReader (Xefis*, ModuleManager*);
 
 	// Dtor
 	~ConfigReader();
@@ -366,7 +367,7 @@ class ConfigReader
 
   private:
 	Logger					_logger;
-	Application*			_application		= nullptr;
+	Xefis*					_xefis				= nullptr;
 	ModuleManager*			_module_manager		= nullptr;
 	QDomDocument			_config_document;
 	QDir					_current_dir;

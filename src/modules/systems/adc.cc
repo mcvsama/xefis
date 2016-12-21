@@ -509,7 +509,7 @@ AirDataComputer::compute_vertical_speed()
 void
 AirDataComputer::compute_reynolds()
 {
-	xf::Airframe* airframe = module_manager()->application()->airframe();
+	xf::Airframe* airframe = module_manager()->xefis()->airframe();
 
 	if (airframe &&
 		_speed_tas.valid() &&

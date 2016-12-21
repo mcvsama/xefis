@@ -27,9 +27,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/fail.h>
 #include <xefis/core/services.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/backtrace.h>
 
 
@@ -55,11 +55,11 @@ int main (int argc, char** argv, char**)
 		}
 		else
 		{
-			auto app = std::make_unique<xf::Application> (argc, argv);
+			auto app = std::make_unique<xf::Xefis> (argc, argv);
 			app->exec();
 		}
 	}
-	catch (xf::Application::QuitInstruction)
+	catch (xf::Xefis::QuitInstruction)
 	{
 		return EXIT_SUCCESS;
 	}

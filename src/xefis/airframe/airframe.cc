@@ -16,9 +16,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 
 // Local:
@@ -27,7 +27,7 @@
 
 namespace xf {
 
-Airframe::Airframe (Application*, QDomElement const& config)
+Airframe::Airframe (Xefis*, QDomElement const& config)
 {
 	QDomElement settings_element;
 

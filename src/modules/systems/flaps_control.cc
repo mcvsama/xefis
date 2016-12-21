@@ -19,7 +19,7 @@
 #include <xefis/airframe/airframe.h>
 #include <xefis/airframe/flaps.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/application.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -53,7 +53,7 @@ FlapsControl::FlapsControl (xf::ModuleManager* module_manager, QDomElement const
 		{ "output.control", _output_control, false },
 	});
 
-	for (auto s: module_manager->application()->airframe()->flaps().settings())
+	for (auto s: module_manager->xefis()->airframe()->flaps().settings())
 		_settings_list.insert (s.second.angle());
 
 	if (_settings_list.empty())

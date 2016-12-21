@@ -139,7 +139,7 @@ Sound::Sound (xf::ModuleManager* module_manager, QDomElement const& config):
 			for (QDomElement e2: e)
 			{
 				if (e2 == "group" || e2 == "alarm")
-					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->application()->sound_manager()));
+					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->xefis()->sound_manager()));
 				else
 					throw xf::BadDomElement (e2);
 			}

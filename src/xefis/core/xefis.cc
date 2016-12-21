@@ -42,24 +42,26 @@
 #include <xefis/core/licenses.h>
 #include <xefis/components/configurator/configurator_widget.h>
 #include <xefis/utility/time_helper.h>
+// TODO machine
+#include <configs/cthulhu/cthulhu.h>
 
 // Local:
-#include "application.h"
+#include "xefis.h"
 
 
 namespace xf {
 
-Application*	Application::_application = nullptr;
-Logger			Application::_logger;
+Xefis*	Xefis::_xefis = nullptr;
+Logger	Xefis::_logger;
 
 
-Application::Application (int& argc, char** argv):
+Xefis::Xefis (int& argc, char** argv):
 	QApplication (argc, argv)
 {
-	if (_application)
-		throw std::runtime_error ("can create only one Application object");
-	_application = this;
-	_logger.set_prefix ("<application>");
+	if (_xefis)
+		throw std::runtime_error ("can create only one Xefis object");
+	_xefis = this;
+	_logger.set_prefix ("<xefis>");
 
 	parse_args (argc, argv);
 
@@ -108,18 +110,20 @@ Application::Application (int& argc, char** argv):
 	_data_updater->setSingleShot (false);
 	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
 	_data_updater->start();
+
+	_machine = std::make_unique<Cthulhu> (this);
 }
 
 
-Application::~Application()
+Xefis::~Xefis()
 {
 	Services::deinitialize();
-	_application = nullptr;
+	_xefis = nullptr;
 }
 
 
 bool
-Application::notify (QObject* receiver, QEvent* event)
+Xefis::notify (QObject* receiver, QEvent* event)
 {
 	try {
 		return QApplication::notify (receiver, event);
@@ -146,7 +150,7 @@ Application::notify (QObject* receiver, QEvent* event)
 
 
 void
-Application::quit()
+Xefis::quit()
 {
 	closeAllWindows();
 	QApplication::quit();
@@ -154,7 +158,7 @@ Application::quit()
 
 
 void
-Application::data_updated()
+Xefis::data_updated()
 {
 	Time t = TimeHelper::now();
 	_module_manager->data_updated (t);
@@ -163,7 +167,7 @@ Application::data_updated()
 
 
 void
-Application::parse_args (int argc, char** argv)
+Xefis::parse_args (int argc, char** argv)
 {
 	std::vector<std::string> args (argv, argv + argc);
 	if (args.empty())
@@ -221,7 +225,7 @@ Application::parse_args (int argc, char** argv)
 
 
 void
-Application::print_copyrights (std::ostream& out)
+Xefis::print_copyrights (std::ostream& out)
 {
 	using std::endl;
 
@@ -248,11 +252,11 @@ Application::print_copyrights (std::ostream& out)
 
 
 void
-Application::s_quit (int)
+Xefis::s_quit (int)
 {
 	_logger << "HUP received, exiting." << std::endl;
-	if (_application)
-		_application->quit();
+	if (_xefis)
+		_xefis->quit();
 }
 
 } // namespace xf

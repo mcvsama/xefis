@@ -16,8 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/services.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/widgets/panel_widget.h>
 
@@ -27,9 +27,9 @@
 
 namespace xf {
 
-Panel::Panel (QWidget* parent, Application* application):
+Panel::Panel (QWidget* parent, Xefis* xefis):
 	QWidget (parent),
-	_application (application)
+	_xefis (xefis)
 {
 	setBackgroundRole (QPalette::Window);
 	setAutoFillBackground (true);

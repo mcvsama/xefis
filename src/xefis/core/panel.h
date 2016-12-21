@@ -28,7 +28,7 @@
 
 namespace xf {
 
-class Application;
+class Xefis;
 class PanelWidget;
 
 
@@ -38,7 +38,7 @@ class Panel: public QWidget
 
   public:
 	// Ctor
-	Panel (QWidget* parent, Application*);
+	Panel (QWidget* parent, Xefis*);
 
 	// Dtor
 	~Panel();
@@ -60,7 +60,7 @@ class Panel: public QWidget
 	read();
 
   private:
-	Application*			_application;
+	Xefis*					_xefis;
 	QTimer*					_timer;
 	std::set<PanelWidget*>	_panel_widgets;
 };

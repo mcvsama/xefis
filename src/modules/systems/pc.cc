@@ -40,7 +40,7 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/pc", PerformanceComputer)
 PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	_airframe = module_manager->application()->airframe();
+	_airframe = module_manager->xefis()->airframe();
 	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
 
 	parse_settings (config, {

@@ -24,8 +24,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/module_manager.h>
-#include <xefis/core/application.h>
 #include <xefis/core/system.h>
+#include <xefis/core/xefis.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/nmea/parser.h>
 #include <xefis/support/nmea/mtk.h>
@@ -76,8 +76,8 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_serial_port_config.set_parity_bit (xf::SerialPort::Parity::None);
 	_serial_port_config.set_hardware_flow_control (false);
 
-	_serial_port = _gps_module.module_manager()->application()->system()->allocate_serial_port (std::bind (&GPS::Connection::serial_data_ready, this),
-																								std::bind (&GPS::Connection::serial_failure, this));
+	_serial_port = _gps_module.module_manager()->xefis()->system()->allocate_serial_port (std::bind (&GPS::Connection::serial_data_ready, this),
+																						  std::bind (&GPS::Connection::serial_failure, this));
 	_serial_port->set_max_read_failures (3);
 	_serial_port->set_logger (_gps_module.log());
 
@@ -646,7 +646,7 @@ GPS::update_clock (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& 
 		// Synchronize OS clock only once:
 		if (_synchronize_system_clock)
 		{
-			if (module_manager()->application()->system()->set_clock (unix_time))
+			if (module_manager()->xefis()->system()->set_clock (unix_time))
 				log() << "System clock synchronized from GPS." << std::endl;
 			_synchronize_system_clock = false;
 		}

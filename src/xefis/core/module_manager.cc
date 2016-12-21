@@ -18,7 +18,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/application.h>
+#include <xefis/core/xefis.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/time_helper.h>
@@ -45,8 +45,8 @@ ModuleManager::ModuleReloadRequest::module_ptr() const noexcept
 }
 
 
-ModuleManager::ModuleManager (Application* application):
-	_application (application)
+ModuleManager::ModuleManager (Xefis* xefis):
+	_xefis (xefis)
 {
 	_logger.set_prefix ("<module manager>");
 	_logger << "Creating ModuleManager" << std::endl;
@@ -80,7 +80,7 @@ ModuleManager::load_module (QString const& name, QString const& instance, QDomEl
 	else
 		_non_instrument_modules.insert (module);
 
-	if (_application->has_option (Application::Option::ModulesDebugLog))
+	if (_xefis->has_option (Xefis::Option::ModulesDebugLog))
 		module->dump_debug_log();
 
 	return module;
@@ -227,7 +227,7 @@ ModuleManager::module_data_updated (Module* module) const
 		}
 	});
 
-	_application->accounting()->add_module_stats (modptr, dt);
+	_xefis->accounting()->add_module_stats (modptr, dt);
 }
 
 
@@ -258,7 +258,7 @@ ModuleManager::do_module_reload_request (Module::Pointer const& module_ptr)
 
 		unload_module (module);
 
-		ConfigReader* config_reader = _application->config_reader();
+		ConfigReader* config_reader = _xefis->config_reader();
 		if (config_reader)
 		{
 			Exception::guard ([&] {

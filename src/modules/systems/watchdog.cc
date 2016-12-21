@@ -20,8 +20,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/application.h>
 #include <xefis/core/module_manager.h>
+#include <xefis/core/xefis.h>
 
 // Local:
 #include "watchdog.h"
@@ -34,8 +34,8 @@ Watchdog::Watchdog (xf::ModuleManager* module_manager, QDomElement const& config
 	Module (module_manager, config),
 	_enabled (false)
 {
-	Optional<int> watchdog_write_fd = module_manager->application()->options().watchdog_write_fd();
-	Optional<int> watchdog_read_fd = module_manager->application()->options().watchdog_read_fd();
+	Optional<int> watchdog_write_fd = module_manager->xefis()->options().watchdog_write_fd();
+	Optional<int> watchdog_read_fd = module_manager->xefis()->options().watchdog_read_fd();
 
 	if (!watchdog_write_fd || *watchdog_write_fd < 3)
 	{

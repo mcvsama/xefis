@@ -16,6 +16,7 @@
 
 // Qt:
 #include <QtGui/QPainter>
+#include <QtWidgets/QApplication>
 
 // Xefis:
 #include <xefis/config/all.h>

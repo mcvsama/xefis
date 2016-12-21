@@ -75,8 +75,8 @@ Window::InstrumentDecorator::set_instrument (Instrument * instrument)
 }
 
 
-Window::Window (Application* application, ConfigReader* config_reader, QDomElement const& element):
-	_application (application),
+Window::Window (Xefis* xefis, ConfigReader* config_reader, QDomElement const& element):
+	_xefis (xefis),
 	_config_reader (config_reader)
 {
 	try {
@@ -155,14 +155,14 @@ Window::data_updated (Time const&)
 float
 Window::pen_scale() const
 {
-	return _application->config_reader()->pen_scale();
+	return _xefis->config_reader()->pen_scale();
 }
 
 
 float
 Window::font_scale() const
 {
-	return _application->config_reader()->font_scale();
+	return _xefis->config_reader()->font_scale();
 }
 
 
@@ -208,7 +208,7 @@ Window::process_window_element (QDomElement const& window_element)
 Panel*
 Window::process_panel_element (QDomElement const& panel_element, QWidget* parent_widget)
 {
-	Panel* panel = new Panel (parent_widget, _application);
+	Panel* panel = new Panel (parent_widget, _xefis);
 
 	for (QDomElement& e: panel_element)
 	{
@@ -580,7 +580,7 @@ Window::show_configurator()
 {
 	if (_stack->currentWidget() == _instruments_panel)
 	{
-		ConfiguratorWidget* configurator_widget = _application->configurator_widget();
+		ConfiguratorWidget* configurator_widget = _xefis->configurator_widget();
 		if (!configurator_widget)
 			return;
 		if (configurator_widget->owning_window())
