@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Navaid
 {
@@ -477,7 +477,7 @@ Navaid::set_runways (Runways const& runways)
 	_runways = runways;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

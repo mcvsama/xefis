@@ -26,7 +26,7 @@
 #include <QtXml/QDomElement>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Sequence iterator for use with for(:) loops.
@@ -91,7 +91,7 @@ QDomElementIterator::operator*()
 	return _element;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 
 /**
@@ -181,7 +181,7 @@ operator!= (QDomElement const& element, QString const& string) noexcept
  */
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Throw BadDomAttribute if there are attributes in the element
@@ -223,7 +223,7 @@ require_and_only_allow_attributes (QDomElement const& e, std::set<QString> const
 	require_attributes (e, attributes);
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -30,7 +30,7 @@
 #include "property_tree_widget_item.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent):
 	QTreeWidget (parent),
@@ -201,5 +201,5 @@ PropertyTreeWidget::hideEvent (QHideEvent*)
 	_refresh_timer->stop();
 }
 
-} // namespace Xefis
+} // namespace xf
 

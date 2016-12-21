@@ -31,7 +31,7 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Accounting: public QObject
 {
@@ -215,7 +215,7 @@ Accounting::module_stats() const noexcept
 	return _module_stats;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

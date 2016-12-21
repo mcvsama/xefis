@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * This is a helper for decoding hex-encoded values.
@@ -63,7 +63,7 @@ HexTable::operator[] (char c) const
 	return _table[static_cast<uint8_t> (c)];
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -30,7 +30,7 @@
 #include "nmea.h"
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 using std::to_string;
@@ -440,5 +440,5 @@ to_string (xf::nmea::GPSTimeOfDay const& time)
 }
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 

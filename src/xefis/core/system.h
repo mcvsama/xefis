@@ -22,7 +22,7 @@
 #include <xefis/support/bus//serial_port.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class System
 {
@@ -51,7 +51,7 @@ class System
 	Logger _logger;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

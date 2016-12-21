@@ -27,7 +27,7 @@
 #include "navaid_storage.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class GzDataFileIterator
 {
@@ -437,5 +437,5 @@ NavaidStorage::parse_apt_dat()
 	_logger << "Loading airports: done" << std::endl;
 }
 
-} // namespace Xefis
+} // namespace xf
 

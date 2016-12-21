@@ -39,7 +39,7 @@
 #include "property_utils.h"
 
 
-namespace Xefis {
+namespace xf {
 
 // Forward declarations:
 class PropertyDirectoryNode;
@@ -792,7 +792,7 @@ template<>
 			write (std::string (blob.begin() + 1, blob.end()));
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

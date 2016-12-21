@@ -29,7 +29,7 @@
 #include <xefis/utility/text_painter.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Painter: public TextPainter
 {
@@ -172,7 +172,7 @@ Painter::add_shadow (QColor color, std::function<void()> paint_function)
 	_shadow_color = s;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

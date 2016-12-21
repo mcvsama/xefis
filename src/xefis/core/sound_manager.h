@@ -26,7 +26,7 @@
 #include <xefis/core/window.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class SoundManager
 {
@@ -91,7 +91,7 @@ SoundManager::Sound::finished() const noexcept
 	return _finished;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

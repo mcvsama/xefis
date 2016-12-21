@@ -27,7 +27,7 @@
 #include <xefis/core/module.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Module;
 class Application;
@@ -201,7 +201,7 @@ ModuleManager::update_dt() const
 	return _update_dt;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

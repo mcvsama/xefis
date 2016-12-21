@@ -22,7 +22,7 @@
 #include "text_painter.h"
 
 
-namespace Xefis {
+namespace xf {
 
 TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar character, QPointF position_correction):
 	data (std::make_shared<Data>())
@@ -231,5 +231,5 @@ TextPainter::apply_alignment (QRectF& rect, Qt::Alignment flags)
 		rect.translate (0.f, -rect.height());
 }
 
-} // namespace Xefis
+} // namespace xf
 

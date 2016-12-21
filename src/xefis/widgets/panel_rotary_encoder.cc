@@ -28,7 +28,7 @@
 #include "panel_rotary_encoder.h"
 
 
-namespace Xefis {
+namespace xf {
 
 constexpr QSize	PanelRotaryEncoder::KnobSize;
 constexpr int	PanelRotaryEncoder::Notches;
@@ -207,5 +207,5 @@ PanelRotaryEncoder::write()
 		_value_property = _value;
 }
 
-} // namespace Xefis
+} // namespace xf
 

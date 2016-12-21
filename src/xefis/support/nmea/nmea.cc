@@ -30,7 +30,7 @@
 #include "exceptions.h"
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 Sentence::Sentence (std::string const& sentence)
@@ -163,5 +163,5 @@ get_sentence_type (std::string const& sentence)
 }
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 

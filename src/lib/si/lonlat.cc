@@ -151,7 +151,7 @@ LonLat::great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b
 	std::complex<Angle::Value> x1 (z1.lon().quantity<Degree>(), z1.lat().quantity<Degree>());
 	std::complex<Angle::Value> x2 (z2.lon().quantity<Degree>(), z2.lat().quantity<Degree>());
 
-	return 1_deg * Xefis::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).quantity<Degree>(), 360.0);
+	return 1_deg * xf::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).quantity<Degree>(), 360.0);
 }
 
 } // namespace si

@@ -32,7 +32,7 @@
 #include <xefis/utility/backtrace.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Exception: public std::exception
 {
@@ -299,6 +299,6 @@ operator<< (std::ostream& out, std::exception_ptr const& eptr)
 
 } // namespace exception_ops
 
-} // namespace Xefis
+} // namespace xf
 
 #endif

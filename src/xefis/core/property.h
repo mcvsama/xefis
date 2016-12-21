@@ -35,7 +35,7 @@
 #include "property_utils.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class GenericProperty
 {
@@ -1120,7 +1120,7 @@ typedef Property<Torque>		PropertyTorque;
 typedef Property<Volume>		PropertyVolume;
 typedef Property<Mass>			PropertyMass;
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

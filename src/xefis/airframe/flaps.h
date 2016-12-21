@@ -27,7 +27,7 @@
 #include <xefis/airframe/lift_mod.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Flaps: public LiftMod
 {
@@ -36,7 +36,7 @@ class Flaps: public LiftMod
 	using LiftMod::LiftMod;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

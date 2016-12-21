@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 XEFIS_STRONG_TYPEDEF (Angle, FlapsAngle)
 XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle)
@@ -31,7 +31,7 @@ XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack)
 typedef double LiftCoefficient;
 typedef double DragCoefficient;
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PropertyNode;
 class PropertyTreeWidget;
@@ -79,7 +79,7 @@ PropertyTreeWidgetItem::node() const
 	return _node;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

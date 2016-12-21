@@ -28,7 +28,7 @@
 #include <xefis/utility/range.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Contains all type-independend methods for the smoother.
@@ -360,7 +360,7 @@ template<class V>
 			_window[n] = 0.5 * (1.0 - std::cos (2.0 * M_PI * n / (N - 1)));
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

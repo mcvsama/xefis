@@ -22,7 +22,7 @@
 #include "semaphore.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Semaphore::Semaphore (int value) noexcept:
 	_initial_value (value)
@@ -76,5 +76,5 @@ Semaphore::post() const noexcept
 	::sem_post (&_semaphore);
 }
 
-} // namespace Xefis
+} // namespace xf
 

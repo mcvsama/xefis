@@ -60,8 +60,8 @@ PCA9685::Channel::compute_duty_cycle()
 PCA9685::PCA9685 (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	xf::I2C::Bus::ID i2c_bus;
-	xf::I2C::Address::ID i2c_address;
+	xf::i2c::Bus::ID i2c_bus;
+	xf::i2c::Address::ID i2c_address;
 
 	// Settings:
 
@@ -104,7 +104,7 @@ PCA9685::PCA9685 (xf::ModuleManager* module_manager, QDomElement const& config):
 	parse_properties (config, properties_list);
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (xf::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::i2c::Address (i2c_address));
 
 	_initialization_timer = new QTimer (this);
 	_initialization_timer->setInterval (InitializationDelay.quantity<Millisecond>());

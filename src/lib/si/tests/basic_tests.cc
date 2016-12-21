@@ -24,10 +24,10 @@
 #include "../si.h"
 
 
-namespace Xefis {
-namespace Test {
+namespace xf {
+namespace test {
 
-using namespace TestAsserts;
+using namespace test_asserts;
 using namespace si::units;
 
 // Validity asserts:
@@ -193,7 +193,7 @@ static xf::RuntimeTest t_parsing ("SI parsing tests", []{
 	verify ("m / s kg == m s^-1 kg", parse_unit ("m / s kg") == parse_unit ("m s^-1 kg"));
 });
 
-} // namespace Test
-} // namespace Xefis
+} // namespace test
+} // namespace xf
 
 

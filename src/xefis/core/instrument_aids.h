@@ -29,7 +29,7 @@
 #include <xefis/utility/painter.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class InstrumentAids
 {
@@ -246,7 +246,7 @@ InstrumentAids::arc_span (Angle deg)
 	return (-16.0 * deg).quantity<Degree>();
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -29,7 +29,7 @@
 	}
 
 
-namespace Xefis {
+namespace xf {
 
 class Backtrace
 {
@@ -63,7 +63,7 @@ class Backtrace
 std::ostream&
 operator<< (std::ostream& os, Backtrace const& backtrace);
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

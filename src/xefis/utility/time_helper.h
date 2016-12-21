@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class TimeHelper
 {
@@ -64,7 +64,7 @@ TimeHelper::measure (std::function<void()> callback) noexcept
 	return now() - t;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

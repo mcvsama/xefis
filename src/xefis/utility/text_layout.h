@@ -29,7 +29,7 @@
 #include <xefis/utility/text_painter.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class TextLayout
 {
@@ -336,7 +336,7 @@ TextLayout::size() const
 	return QSizeF (width(), height());
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -27,7 +27,7 @@
 #include <xefis/widgets/panel_widget.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PanelRotaryEncoder: public PanelWidget
 {
@@ -81,7 +81,7 @@ class PanelRotaryEncoder: public PanelWidget
 	PropertyBoolean			_click_property;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

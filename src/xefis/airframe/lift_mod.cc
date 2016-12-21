@@ -25,7 +25,7 @@
 #include "lift_mod.h"
 
 
-namespace Xefis {
+namespace xf {
 
 LiftMod::Setting::Setting (QDomElement const& config)
 {
@@ -153,5 +153,5 @@ LiftMod::find_setting_iterator (Angle const& surface_angle) const
 		return range.second;
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -26,7 +26,7 @@
 #include <xefis/widgets/panel_widget.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PanelButton: public PanelWidget
 {
@@ -84,7 +84,7 @@ class PanelButton: public PanelWidget
 	QIcon			_icon_off;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

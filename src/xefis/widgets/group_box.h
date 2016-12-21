@@ -27,7 +27,7 @@
 #include <xefis/core/instrument_aids.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class GroupBox:
 	public QWidget,
@@ -59,7 +59,7 @@ class GroupBox:
 	std::array<int, 4>	_padding		= { { 0, 0, 0, 0 } };
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

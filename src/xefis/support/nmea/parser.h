@@ -27,7 +27,7 @@
 #include "mtk.h"
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 /**
@@ -108,7 +108,7 @@ class Parser: private Noncopyable
 };
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

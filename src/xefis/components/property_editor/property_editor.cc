@@ -29,7 +29,7 @@
 #include "property_tree_widget_item.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
 	QWidget (parent)
@@ -228,5 +228,5 @@ PropertyEditor::context_item_set_nil()
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

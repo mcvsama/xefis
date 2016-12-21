@@ -162,7 +162,7 @@ class PCA9685:
 	xf::PropertyBoolean				_serviceable;
 	std::array<Channel, Channels>	_channels;
 	QTimer*							_initialization_timer;
-	xf::I2C::Device					_i2c_device;
+	xf::i2c::Device					_i2c_device;
 	Time							_output_period		= 20_ms;
 };
 

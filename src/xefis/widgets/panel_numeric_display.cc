@@ -24,26 +24,26 @@
 #include "panel_numeric_display.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path):
 	PanelWidget (parent, panel),
 	_num_digits (num_digits),
 	_unit (unit)
 {
-	_digit_images[0] = Resources::Digits::digit_0();
-	_digit_images[1] = Resources::Digits::digit_1();
-	_digit_images[2] = Resources::Digits::digit_2();
-	_digit_images[3] = Resources::Digits::digit_3();
-	_digit_images[4] = Resources::Digits::digit_4();
-	_digit_images[5] = Resources::Digits::digit_5();
-	_digit_images[6] = Resources::Digits::digit_6();
-	_digit_images[7] = Resources::Digits::digit_7();
-	_digit_images[8] = Resources::Digits::digit_8();
-	_digit_images[9] = Resources::Digits::digit_9();
-	_digit_images[MinusSymbolIndex] = Resources::Digits::digit_minus();
-	_digit_images[EmptySymbolIndex] = Resources::Digits::digit_empty();
-	_digit_images[DotSymbolIndex] = Resources::Digits::digit_dot();
+	_digit_images[0] = resources::digits::digit_0();
+	_digit_images[1] = resources::digits::digit_1();
+	_digit_images[2] = resources::digits::digit_2();
+	_digit_images[3] = resources::digits::digit_3();
+	_digit_images[4] = resources::digits::digit_4();
+	_digit_images[5] = resources::digits::digit_5();
+	_digit_images[6] = resources::digits::digit_6();
+	_digit_images[7] = resources::digits::digit_7();
+	_digit_images[8] = resources::digits::digit_8();
+	_digit_images[9] = resources::digits::digit_9();
+	_digit_images[MinusSymbolIndex] = resources::digits::digit_minus();
+	_digit_images[EmptySymbolIndex] = resources::digits::digit_empty();
+	_digit_images[DotSymbolIndex] = resources::digits::digit_dot();
 
 	_digits_to_display.resize (_num_digits + 1, nullptr); // Add margin (+1) for dot image.
 	setMinimumSize (_digit_images[0].width() * _num_digits + 2 * (BorderWidth + Margin),
@@ -200,5 +200,5 @@ PanelNumericDisplay::convert_to_digits (double value)
 	return result;
 }
 
-} // namespace Xefis
+} // namespace xf
 

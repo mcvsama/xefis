@@ -25,7 +25,7 @@
 #include "airframe.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Airframe::Airframe (Application*, QDomElement const& config)
 {
@@ -118,5 +118,5 @@ Airframe::get_max_safe_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& 
 	return get_critical_aoa (flaps_angle, spoilers_angle) + safe_aoa_correction();
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -26,7 +26,7 @@
 #include <xefis/utility/datatable2d.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Lift
 {
@@ -79,7 +79,7 @@ Lift::get_aoa_range() const noexcept
 	return _aoa_to_cl->domain();
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -26,7 +26,7 @@
 #include <xefis/utility/range.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Base class for Flaps and Spoilers, since they have identical API.
@@ -228,7 +228,7 @@ LiftMod::settings() const noexcept
 	return _settings;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

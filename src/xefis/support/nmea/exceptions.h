@@ -25,7 +25,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 /**
@@ -70,7 +70,7 @@ class InvalidSentence: public Exception
 };
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

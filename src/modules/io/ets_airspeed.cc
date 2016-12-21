@@ -41,8 +41,8 @@ constexpr uint16_t		ETSAirspeed::RawValueMaximum;
 ETSAirspeed::ETSAirspeed (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	xf::I2C::Bus::ID i2c_bus;
-	xf::I2C::Address::ID i2c_address;
+	xf::i2c::Bus::ID i2c_bus;
+	xf::i2c::Address::ID i2c_address;
 
 	parse_settings (config, {
 		{ "i2c.bus", i2c_bus, true },
@@ -59,7 +59,7 @@ ETSAirspeed::ETSAirspeed (xf::ModuleManager* module_manager, QDomElement const& 
 	});
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (xf::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::i2c::Address (i2c_address));
 
 	if (_airspeed_read_interval < 100_ms)
 	{

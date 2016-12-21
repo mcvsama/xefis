@@ -14,8 +14,7 @@
 #ifndef XEFIS__CONFIG__VERSION_H__INCLUDED
 #define XEFIS__CONFIG__VERSION_H__INCLUDED
 
-namespace Xefis {
-namespace Version {
+namespace xf::version {
 
 /**
  * References to dynamically created commit ID and branch name.
@@ -25,8 +24,7 @@ extern const char* commit;
 extern const char* branch;
 extern const char* version;
 
-} // namespace Version
-} // namespace Xefis
+} // namespace xf::version
 
 #endif
 

@@ -29,7 +29,7 @@
 #include <QtCore/QIODevice>
 
 
-namespace Xefis {
+namespace xf {
 
 class QZDevice: public QIODevice
 {
@@ -94,7 +94,7 @@ class QZDevice: public QIODevice
 	bool					_need_pull			= true;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

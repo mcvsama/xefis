@@ -25,7 +25,7 @@
 #include <xefis/utility/numeric.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class MagneticVariation
 {
@@ -102,7 +102,7 @@ MagneticVariation::magnetic_inclination() const
 	return _magnetic_inclination;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

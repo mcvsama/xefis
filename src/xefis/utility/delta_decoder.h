@@ -23,7 +23,7 @@
 #include <xefis/core/property.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class DeltaDecoder
 {
@@ -73,7 +73,7 @@ DeltaDecoder::call (int delta)
 	_callback (delta);
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

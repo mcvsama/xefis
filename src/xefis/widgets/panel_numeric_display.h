@@ -28,7 +28,7 @@
 #include <xefis/widgets/panel_widget.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PanelNumericDisplay: public PanelWidget
 {
@@ -87,7 +87,7 @@ class PanelNumericDisplay: public PanelWidget
 	std::array<QPixmap, 13>	_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

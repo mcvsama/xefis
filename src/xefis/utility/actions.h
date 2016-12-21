@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Action
 {
@@ -216,7 +216,7 @@ class ButtonOptionsAction: public Action
 	PropertyInteger	_value_target;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

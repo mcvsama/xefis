@@ -31,8 +31,8 @@
 #include "i2c.h"
 
 
-namespace Xefis {
-namespace I2C {
+namespace xf {
+namespace i2c {
 
 Message::Message (Operation operation, Address const& address, uint8_t* data, std::size_t size):
 	_operation (operation),
@@ -191,6 +191,6 @@ Device::ensure_open()
 		_bus.open();
 }
 
-} // namespace I2C
-} // namespace Xefis
+} // namespace i2c
+} // namespace xf
 

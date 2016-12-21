@@ -30,7 +30,7 @@
 #include "window.h"
 
 
-namespace Xefis {
+namespace xf {
 
 ModuleManager::ModuleReloadRequest::ModuleReloadRequest (Module::Pointer const& module_ptr):
 	QEvent (QEvent::User),
@@ -300,5 +300,5 @@ ModuleManager::try_rescue (Module* module) const
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -22,7 +22,7 @@
 #include <xefis/utility/backtrace.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class TestAssertFailed: public Exception
 {
@@ -37,7 +37,7 @@ class TestAssertFailed: public Exception
 	}
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

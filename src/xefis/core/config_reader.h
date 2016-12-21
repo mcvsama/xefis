@@ -36,7 +36,7 @@
 #include <xefis/core/property.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Application;
 class ModuleManager;
@@ -461,7 +461,7 @@ ConfigReader::airframe_config() const
 	return _airframe_config;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

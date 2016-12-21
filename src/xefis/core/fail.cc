@@ -30,18 +30,18 @@
 #include "fail.h"
 
 
-namespace Xefis {
+namespace xf {
 
 void
 fail (int signum)
 {
 	std::vector<const char*> features = xf::Services::features();
 	std::clog << "------------------------------------------------------------------------------------------------" << std::endl;
-	std::clog << "Xefis died by signal." << std::endl << std::endl;
+	std::clog << "Xefis died by a signal." << std::endl << std::endl;
 	std::clog << "  signal: " << signum << std::endl;
 	std::clog << "  source info: " << std::endl;
-	std::cout << "    commit: " << ::xf::Version::commit << std::endl;
-	std::cout << "    branch: " << ::xf::Version::branch << std::endl;
+	std::cout << "    commit: " << ::xf::version::commit << std::endl;
+	std::cout << "    branch: " << ::xf::version::branch << std::endl;
 	std::clog << "  features: ";
 	std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
 	std::clog << std::endl;
@@ -53,5 +53,5 @@ fail (int signum)
 	kill (getpid(), signum);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -292,7 +292,7 @@ class HT16K33:
 	xf::PropertyInteger	_brightness;
 	xf::PropertyBoolean	_blinking;
 	xf::PropertyInteger	_blinking_mode;
-	xf::I2C::Device		_i2c_device;
+	xf::i2c::Device		_i2c_device;
 	LedMatrix			_led_matrix;
 	KeyMatrix			_key_matrix;
 	Displays			_displays;

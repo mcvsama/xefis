@@ -23,7 +23,7 @@
 #include <xefis/core/property.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Takes two boolean properties and
@@ -80,7 +80,7 @@ RotaryDecoder::call (int delta)
 	_callback (delta);
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

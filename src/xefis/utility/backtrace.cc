@@ -25,7 +25,7 @@
 #include "backtrace.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Backtrace::Backtrace()
 {
@@ -69,5 +69,5 @@ operator<< (std::ostream& os, Backtrace const& backtrace)
 	return os;
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class GraphWidget: public QWidget
 {
@@ -34,7 +34,7 @@ class GraphWidget: public QWidget
   private:
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

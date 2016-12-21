@@ -27,7 +27,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Thread is created in "detached" state, that means it will
@@ -127,7 +127,7 @@ class Thread: private Noncopyable
 	Mutex				_wait;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

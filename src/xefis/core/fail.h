@@ -14,7 +14,7 @@
 #ifndef XEFIS__APPLICATION__FAIL_H__INCLUDED
 #define XEFIS__APPLICATION__FAIL_H__INCLUDED
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Called as a UNIX signal handler.
@@ -23,7 +23,7 @@ namespace Xefis {
 extern void
 fail (int signum);
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

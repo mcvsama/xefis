@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 template<class tType>
 	class Lookahead
@@ -124,7 +124,7 @@ template<class T>
 		return _last_output;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

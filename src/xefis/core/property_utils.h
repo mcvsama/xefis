@@ -22,7 +22,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PropertyPath;
 
@@ -337,7 +337,7 @@ PropertyType::string() const noexcept
 	return _type;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -27,7 +27,7 @@
 #include <xefis/utility/logger.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * WorkPerformer queues work units (WorkUnit) and executes them in the context
@@ -188,7 +188,7 @@ WorkPerformer::Unit::added_to_queue()
 	_is_ready.store (false);
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

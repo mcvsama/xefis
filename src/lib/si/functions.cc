@@ -27,7 +27,7 @@ std::string
 to_dms (Angle a, bool three_digits)
 {
 	auto const angle_degs = a.quantity<Degree>();
-	auto const degs = std::trunc (Xefis::floored_mod (angle_degs, -180.0, +180.0));
+	auto const degs = std::trunc (xf::floored_mod (angle_degs, -180.0, +180.0));
 	auto const remainder = 60.0 * std::abs (angle_degs - degs);
 	auto const mins = std::floor (remainder);
 	auto const secs = 60.0 * std::abs (remainder - mins);

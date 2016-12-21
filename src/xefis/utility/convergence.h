@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Executes a formula function iteratively, until result converges to a value,
@@ -130,7 +130,7 @@ template<class ValueType>
 		return { };
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

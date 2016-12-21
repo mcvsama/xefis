@@ -22,7 +22,7 @@
 #include "instrument_aids.h"
 
 
-namespace Xefis {
+namespace xf {
 
 const char	InstrumentAids::DIGITS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 const char*	InstrumentAids::MINUS_SIGN = "−";
@@ -128,5 +128,5 @@ InstrumentAids::get_digit_width (QFont& font)
 	return digit_width;
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -23,7 +23,7 @@
 #include <xefis/core/window.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class WindowManager: public QWidget
 {
@@ -51,7 +51,7 @@ class WindowManager: public QWidget
 	std::set<Unique<Window>>	_windows;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

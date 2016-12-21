@@ -24,7 +24,7 @@
 #include "graphs_stack.h"
 
 
-namespace Xefis {
+namespace xf {
 
 GraphsStack::GraphsStack (QWidget* parent):
 	QWidget (parent)
@@ -44,5 +44,5 @@ GraphsStack::add_graph (GraphWidget* graph_widget)
 	graph_widget->show();
 }
 
-} // namespace Xefis
+} // namespace xf
 

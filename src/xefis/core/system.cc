@@ -28,7 +28,7 @@
 #include "system.h"
 
 
-namespace Xefis {
+namespace xf {
 
 System::System()
 {
@@ -57,5 +57,5 @@ System::set_clock (Time const& unix_time)
 		return true;
 }
 
-} // namespace Xefis
+} // namespace xf
 

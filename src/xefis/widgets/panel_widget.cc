@@ -23,7 +23,7 @@
 #include "panel_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PanelWidget::PanelWidget (QWidget* parent, Panel* panel):
 	QWidget (parent),
@@ -45,5 +45,5 @@ void
 PanelWidget::data_updated()
 { }
 
-} // namespace Xefis
+} // namespace xf
 

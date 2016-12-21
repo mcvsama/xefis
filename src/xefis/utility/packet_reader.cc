@@ -19,7 +19,7 @@
 #include "packet_reader.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PacketReader::PacketReader (Blob const& magic, ParseCallback parse):
 	_magic (magic),
@@ -89,5 +89,5 @@ PacketReader::feed (Blob const& data)
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

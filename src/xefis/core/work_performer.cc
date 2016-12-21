@@ -19,7 +19,7 @@
 #include "work_performer.h"
 
 
-namespace Xefis {
+namespace xf {
 
 WorkPerformer::Performer::Performer (WorkPerformer* work_performer, unsigned int thread_id) noexcept:
 	_work_performer (work_performer),
@@ -107,5 +107,5 @@ WorkPerformer::take_unit()
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

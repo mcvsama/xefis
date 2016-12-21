@@ -31,7 +31,7 @@
 #include "modules_list_item.h"
 
 
-namespace Xefis {
+namespace xf {
 
 ModulesListItem::ModulesListItem (Module::Pointer const& module_pointer, ModuleManager* module_manager, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { "", "", "" }),
@@ -74,5 +74,5 @@ ModulesListItem::setup_appereance()
 	setSizeHint (0, s);
 }
 
-} // namespace Xefis
+} // namespace xf
 

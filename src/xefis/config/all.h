@@ -19,5 +19,3 @@
 #include "exception.h"
 #include "constants.h"
 
-namespace xf = Xefis;
-

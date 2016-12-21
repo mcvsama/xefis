@@ -22,7 +22,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Define an object which executes given function upon destruction.
@@ -129,7 +129,7 @@ Resource::release()
 	_callback = nullptr;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -24,7 +24,7 @@
 #include "graph_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 GraphWidget::GraphWidget (QWidget* parent):
 	QWidget (parent)
@@ -32,5 +32,5 @@ GraphWidget::GraphWidget (QWidget* parent):
 	setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -26,7 +26,7 @@ namespace si {
 class DynamicUnit;
 
 
-class UnparsableValue: public Xefis::Exception
+class UnparsableValue: public xf::Exception
 {
   public:
 	UnparsableValue (std::string const& message):
@@ -35,7 +35,7 @@ class UnparsableValue: public Xefis::Exception
 };
 
 
-class UnsupportedUnit: public Xefis::Exception
+class UnsupportedUnit: public xf::Exception
 {
   public:
 	UnsupportedUnit (std::string const& message):
@@ -44,7 +44,7 @@ class UnsupportedUnit: public Xefis::Exception
 };
 
 
-class IncompatibleTypes: public Xefis::Exception
+class IncompatibleTypes: public xf::Exception
 {
   public:
 	IncompatibleTypes (DynamicUnit const& got, DynamicUnit const& expected);

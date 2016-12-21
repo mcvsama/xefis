@@ -24,7 +24,7 @@
 #include <xefis/utility/sequence.h>
 
 
-namespace Xefis {
+namespace xf {
 
 template<class pArgument, class pValue>
 	class Datatable2D
@@ -436,7 +436,7 @@ template<class A, class V>
 		return renormalize (argument, from, to);
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

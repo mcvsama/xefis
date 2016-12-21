@@ -22,7 +22,7 @@
 #include "window_manager.h"
 
 
-namespace Xefis {
+namespace xf {
 
 WindowManager::WindowManager()
 {
@@ -51,5 +51,5 @@ WindowManager::data_updated (Time const& update_time)
 		window->data_updated (update_time);
 }
 
-} // namespace Xefis
+} // namespace xf
 

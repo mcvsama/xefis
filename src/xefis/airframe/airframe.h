@@ -27,7 +27,7 @@
 #include <xefis/airframe/types.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Application;
 
@@ -209,7 +209,7 @@ Airframe::load_factor_limits() const
 	return _load_factor_limits;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

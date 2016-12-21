@@ -28,7 +28,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Draws bigger text and then scales it down to the destination area
@@ -149,7 +149,7 @@ TextPainter::Cache::Font::operator< (Font const& other) const
 	return std::make_pair (font, color.rgba()) < std::make_pair (other.font, other.color.rgba());
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

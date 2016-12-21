@@ -96,7 +96,7 @@ class ETSAirspeed:
 	xf::PropertySpeed		_airspeed_maximum;
 	Time					_airspeed_read_interval		= 100_ms;
 	Time					_airspeed_smoothing_time	= 100_ms;
-	xf::I2C::Device			_i2c_device;
+	xf::i2c::Device			_i2c_device;
 	Stage					_stage						= Stage::Calibrating;
 	QTimer*					_initialization_timer;
 	QTimer*					_periodic_read_timer;

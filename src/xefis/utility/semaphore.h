@@ -25,7 +25,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * OO-oriented semaphore.
@@ -78,7 +78,7 @@ class Semaphore: private Noncopyable
 	int				_initial_value;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 
