@@ -30,7 +30,7 @@
 #include <xefis/utility/numeric.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class SerialPort:
 	public QObject,
@@ -445,7 +445,7 @@ SerialPort::log() const
 	return *_logger;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

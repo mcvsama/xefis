@@ -18,8 +18,7 @@
 #include "licenses.h"
 
 
-namespace Xefis {
-namespace License {
+namespace xf::licenses {
 
 const char* main =
 	"This program is free software: you can redistribute it and/or modify\n"
@@ -233,6 +232,5 @@ const char* lib_kdtreeplusplus =
 	"OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH\n"
 	"DAMAGE.";
 
-} // namespace License
-} // namespace Xefis
+} // namespace xf::licenses
 

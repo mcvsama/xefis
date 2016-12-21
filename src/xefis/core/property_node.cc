@@ -22,7 +22,7 @@
 #include "property_node.h"
 
 
-namespace Xefis {
+namespace xf {
 
 void
 PropertyNode::update_path()
@@ -201,5 +201,5 @@ PropertyDirectoryNode::clear()
 	_children_by_name.clear();
 }
 
-} // namespace Xefis
+} // namespace xf
 

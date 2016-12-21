@@ -26,7 +26,7 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Logger
 {
@@ -83,7 +83,7 @@ template<class Item>
 		return (*_stream) << item;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

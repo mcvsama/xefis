@@ -23,7 +23,7 @@
 #include "mutex.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Mutex::Mutex (MutexType kind) noexcept
 {
@@ -53,5 +53,5 @@ RecursiveMutex::RecursiveMutex() noexcept:
 	Mutex (Mutex::Recursive)
 { }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -30,7 +30,7 @@
 #include "services.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Unique<CallOutDispatcher>	Services::_call_out_dispatcher;
 QFont						Services::_instrument_font ("sans");
@@ -98,5 +98,5 @@ Services::call_out (boost::function<void()> callback)
 	return e;
 }
 
-} // namespace Xefis
+} // namespace xf
 

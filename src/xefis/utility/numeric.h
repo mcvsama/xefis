@@ -27,7 +27,7 @@
 #include <xefis/utility/range.h>
 
 
-namespace Xefis {
+namespace xf {
 
 template<class A, class B,
 		 class = typename std::enable_if<
@@ -193,7 +193,7 @@ digit_from_ascii (char c)
 	throw InvalidFormat ("non-numeric character '"_str + c + "'");
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

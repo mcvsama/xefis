@@ -38,7 +38,7 @@
 #include "window.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Window::Stack::Stack (Time delay)
 {
@@ -663,5 +663,5 @@ Window::parse_padding (QDomElement const& element, QString const& attribute_name
 	return parse_margin (element, attribute_name);
 }
 
-} // namespace Xefis
+} // namespace xf
 

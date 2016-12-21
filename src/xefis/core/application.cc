@@ -47,7 +47,7 @@
 #include "application.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Application*	Application::_application = nullptr;
 Logger			Application::_logger;
@@ -228,21 +228,21 @@ Application::print_copyrights (std::ostream& out)
 	out	<< "Main program license" << std::endl
 		<< "====================" << endl
 		<< endl
-		<< License::main << endl
+		<< licenses::main << endl
 		<< endl;
 	out << "Fonts" << endl
 		<< "=====" << endl
-		<< License::font_crystal << endl
+		<< licenses::font_crystal << endl
 		<< endl;
 	out << "The 'half' library is distributed under the following license" << endl
 		<< "=============================================================" << endl
 		<< endl
-		<< License::lib_half << endl
+		<< licenses::lib_half << endl
 		<< endl;
 	out << "The 'kdtree++' library is distributed under the following license" << endl
 		<< "=================================================================" << endl
 		<< endl
-		<< License::lib_kdtreeplusplus << endl
+		<< licenses::lib_kdtreeplusplus << endl
 		<< endl;
 }
 
@@ -255,5 +255,5 @@ Application::s_quit (int)
 		_application->quit();
 }
 
-} // namespace Xefis
+} // namespace xf
 

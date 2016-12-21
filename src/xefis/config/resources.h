@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Config {
+namespace xf::config {
 
 enum {
 	Spacing			= 3,
@@ -34,7 +34,7 @@ enum {
 	DialogMargin	= 6
 };
 
-} // namespace Config
+} // namespace xf::config
 
 
 #ifndef XEFIS_PREFIX
@@ -54,7 +54,7 @@ enum {
 #endif
 
 
-namespace Resources {
+namespace xf::resources {
 
 /*
  * Icons resources
@@ -72,7 +72,7 @@ namespace Resources {
 		return p;										\
 	}
 
-	namespace Icons16
+	namespace icons16
 	{
 #define XEFIS_CONFIG_HAS_ICON_16(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/16/" file)
@@ -87,17 +87,17 @@ namespace Resources {
 		XEFIS_CONFIG_HAS_ICON_16 (led_off, "led-off.png")
 
 #undef XEFIS_CONFIG_HAS_ICON_16
-	} // namespace Icons16
+	} // namespace icons16
 
-	namespace Icons22
+	namespace icons22
 	{
 #define XEFIS_CONFIG_HAS_ICON_22(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/22/" file)
 
 #undef XEFIS_CONFIG_HAS_ICON_22
-	} // namespace Icons22
+	} // namespace icons22
 
-	namespace Digits
+	namespace digits
 	{
 #define XEFIS_CONFIG_HAS_DIGIT(key, file) \
 		XEFIS_CONFIG_HAS_ICON(key, XEFIS_SHARED_DIRECTORY "/images/digits/" file)
@@ -118,11 +118,11 @@ namespace Resources {
 		XEFIS_CONFIG_HAS_DIGIT (digit_dot, "digit-dot.png")
 
 #undef XEFIS_CONFIG_HAS_DIGIT
-	} // namespace Digits
+	} // namespace digits
 
 #undef XEFIS_CONFIG_HAS_ICON
 
-} // namespace Config
+} // namespace xf::config
 
 #endif
 

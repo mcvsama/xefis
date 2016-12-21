@@ -34,9 +34,9 @@
 #include "serial_port.h"
 
 
-namespace Xefis {
+namespace xf {
 
-static xf::Mutex termios_baud_rate_entry_mutex;
+static Mutex termios_baud_rate_entry_mutex;
 
 
 SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
@@ -385,5 +385,5 @@ SerialPort::log_prefix() const
 	return (boost::format ("SerialPort<%p>: ") % static_cast<void const*> (this)).str();
 }
 
-} // namespace Xefis
+} // namespace xf
 

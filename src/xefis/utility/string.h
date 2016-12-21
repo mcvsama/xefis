@@ -26,7 +26,7 @@
 #include <xefis/utility/hextable.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Parse binary string of the form: 00:11:22:aa:ff to a vector
@@ -221,7 +221,7 @@ parse_alignment (QString string)
 	return alignment;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

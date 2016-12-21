@@ -29,7 +29,7 @@
 #include "graph_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class GraphsStack: public QWidget
 {
@@ -46,7 +46,7 @@ class GraphsStack: public QWidget
 	QVBoxLayout* _layout;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

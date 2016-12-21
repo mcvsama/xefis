@@ -24,7 +24,7 @@
 #include "accounting.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Accounting::Stats::Stats (LatencySamples::size_type samples):
 	_samples (samples, 0_s)
@@ -140,5 +140,5 @@ Accounting::customEvent (QEvent* event)
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

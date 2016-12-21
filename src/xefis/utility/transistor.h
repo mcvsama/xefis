@@ -25,7 +25,7 @@
 #include <xefis/utility/smoother.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Transitions output value between two input values
@@ -225,7 +225,7 @@ template<class T>
 		return _smoother;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

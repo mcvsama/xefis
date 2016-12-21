@@ -30,7 +30,7 @@
 #include "property_tree_widget_item.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { node->name().c_str() }),
@@ -100,9 +100,9 @@ void
 PropertyTreeWidgetItem::setup_appereance()
 {
 	if (dynamic_cast<PropertyDirectoryNode*> (_node))
-		setIcon (0, Resources::Icons16::property_dir());
+		setIcon (0, resources::icons16::property_dir());
 	else
-		setIcon (0, Resources::Icons16::property_value());
+		setIcon (0, resources::icons16::property_value());
 	// Note: setFirstColumnSpanned is extremely slow in Qt, so it's currently disabled.
 	// Once it's fixed in future, the following line can be uncommented:
 	// setFirstColumnSpanned (!!dynamic_cast<PropertyDirectoryNode*> (_node));
@@ -111,5 +111,5 @@ PropertyTreeWidgetItem::setup_appereance()
 	setSizeHint (0, s);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Noncopyable
 {
@@ -29,7 +29,7 @@ class Noncopyable
 	Noncopyable() noexcept { }
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

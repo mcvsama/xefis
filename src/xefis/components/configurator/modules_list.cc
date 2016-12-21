@@ -28,7 +28,7 @@
 #include "modules_list_item.h"
 
 
-namespace Xefis {
+namespace xf {
 
 ModulesList::ModulesList (ModuleManager* module_manager, QWidget* parent):
 	QWidget (parent),
@@ -122,5 +122,5 @@ ModulesList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
 		emit none_selected();
 }
 
-} // namespace Xefis
+} // namespace xf
 

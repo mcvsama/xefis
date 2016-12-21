@@ -36,7 +36,7 @@
 #include "module.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class Panel;
 class ConfigReader;
@@ -173,7 +173,7 @@ class Window: public QWidget
 	Decorators		_decorators;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

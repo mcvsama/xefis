@@ -33,7 +33,7 @@
 #include "modules_list.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class ConfiguratorWidget: public QWidget
 {
@@ -148,7 +148,7 @@ ConfiguratorWidget::set_owning_window (Window* window)
 	_owning_window = window;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -27,7 +27,7 @@
 #include <xefis/core/module.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class ModulesList: public QWidget
 {
@@ -93,7 +93,7 @@ ModulesList::module_manager() const noexcept
 	return _module_manager;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -21,16 +21,14 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
-namespace License {
+namespace xf::licenses {
 
 extern const char* main;
 extern const char* font_crystal;
 extern const char* lib_half;
 extern const char* lib_kdtreeplusplus;
 
-} // namespace License
-} // namespace Xefis
+} // namespace xf::licenses
 
 #endif
 

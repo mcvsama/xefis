@@ -17,7 +17,7 @@
 #include "nmea.h"
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 enum class MTKResult
@@ -67,7 +67,7 @@ extern std::string
 make_mtk_sentence (std::string const& data);
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

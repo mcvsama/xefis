@@ -30,7 +30,7 @@
 #include "property_tree_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class PropertyEditor: public QWidget
 {
@@ -90,7 +90,7 @@ class PropertyEditor: public QWidget
 	QTimer*					_accepted_blink_timer;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

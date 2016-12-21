@@ -28,7 +28,7 @@
 #include <xefis/utility/semaphore.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class InstrumentWidget: public QWidget
 {
@@ -205,7 +205,7 @@ InstrumentWidget::set_painter (PaintWorkUnit* painter)
 	_paint_work_unit = painter;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

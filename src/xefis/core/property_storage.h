@@ -27,7 +27,7 @@
 #include "property_utils.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class PropertyNode;
 class PropertyDirectoryNode;
@@ -109,7 +109,7 @@ PropertyStorage::properties_map() const
 	return _properties_by_path;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -25,7 +25,7 @@
 #include "group_box.h"
 
 
-namespace Xefis {
+namespace xf {
 
 GroupBox::GroupBox (QString const& label, QWidget* parent):
 	QWidget (parent),
@@ -89,5 +89,5 @@ GroupBox::paintEvent (QPaintEvent*)
 	painter().fast_draw_text (text_hook, alignment, _label);
 }
 
-} // namespace Xefis
+} // namespace xf
 

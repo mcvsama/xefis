@@ -26,7 +26,7 @@
 #include <xefis/core/module_manager.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class ModulesListItem: public QTreeWidgetItem
 {
@@ -64,7 +64,7 @@ ModulesListItem::module_pointer() const noexcept
 	return _module_pointer;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

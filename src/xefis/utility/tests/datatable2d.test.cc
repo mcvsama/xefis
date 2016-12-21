@@ -19,11 +19,11 @@
 #include <xefis/utility/datatable2d.h>
 
 
-namespace Xefis {
-namespace Test {
+namespace xf {
+namespace test {
 
 static xf::RuntimeTest t1 ("Datatable2D<>", []{
-	using namespace xf::TestAsserts;
+	using namespace xf::test_asserts;
 
 	std::map<double, double> m;
 	m[0.0] = 0.0;
@@ -43,6 +43,6 @@ static xf::RuntimeTest t1 ("Datatable2D<>", []{
 	verify_equal_with_epsilon ("average ({ -2.0, 2.0 }) is correct", d.average ({ -2.0, 2.0 }), 0.0, 0.001);
 });
 
-} // namespace Test
-} // namespace Xefis
+} // namespace test
+} // namespace xf
 

@@ -18,7 +18,7 @@
 #include "delta_decoder.h"
 
 
-namespace Xefis {
+namespace xf {
 
 DeltaDecoder::DeltaDecoder (xf::PropertyInteger value_property, Callback callback):
 	_prev (value_property.read (0)),
@@ -38,5 +38,5 @@ DeltaDecoder::data_updated()
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

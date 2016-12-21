@@ -18,7 +18,7 @@
 #include "rotary_decoder.h"
 
 
-namespace Xefis {
+namespace xf {
 
 RotaryDecoder::RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback):
 	_prev_a (property_a.read (false)),
@@ -52,5 +52,5 @@ RotaryDecoder::data_updated()
 	_prev_b = b;
 }
 
-} // namespace Xefis
+} // namespace xf
 

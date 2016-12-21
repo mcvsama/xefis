@@ -25,7 +25,7 @@
 #include "instrument_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 InstrumentWidget::PaintWorkUnit::PaintWorkUnit (InstrumentWidget* widget):
 	_widget (widget),
@@ -222,5 +222,5 @@ InstrumentWidget::hideEvent (QHideEvent* event)
 	QWidget::hideEvent (event);
 }
 
-} // namespace Xefis
+} // namespace xf
 

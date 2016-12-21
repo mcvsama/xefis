@@ -30,7 +30,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Private API, but can't put it inside of Services class,
@@ -207,7 +207,7 @@ Services::panel_font()
 	return _panel_font;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

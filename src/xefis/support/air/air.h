@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 inline Speed
 compute_sound_speed (Temperature static_air_temperature)
@@ -51,7 +51,7 @@ compute_indicated_airspeed (Speed true_airspeed, Length density_altitude)
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.quantity<Foot>(), 2.127940);
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

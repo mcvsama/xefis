@@ -24,7 +24,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PacketReader: private Noncopyable
 {
@@ -87,7 +87,7 @@ PacketReader::buffer() noexcept
 	return _buffer;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

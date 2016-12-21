@@ -24,7 +24,7 @@
 #include <xefis/utility/range.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Find two adjacent iterators a and b that satisfy a <= value && value <= b.
@@ -94,7 +94,7 @@ template<class ForwardIt, class Value, class Compare>
 		return { a, b };
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -25,7 +25,7 @@
 #include <xefis/utility/smoother.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Proportional-Integral-Derivative controller.
@@ -483,7 +483,7 @@ template<class T>
 		return _output_smoother;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

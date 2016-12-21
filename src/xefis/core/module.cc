@@ -32,7 +32,7 @@
 #include "module_manager.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Module::Module (ModuleManager* module_manager, QDomElement const& config):
 	_module_manager (module_manager),
@@ -210,5 +210,5 @@ operator<< (std::ostream& s, Module::Pointer const& module_ptr)
 	return s;
 }
 
-} // namespace Xefis
+} // namespace xf
 

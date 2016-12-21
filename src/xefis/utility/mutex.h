@@ -27,7 +27,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * MutexPermissionException
@@ -389,7 +389,7 @@ template<class Type>
 		throw value;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

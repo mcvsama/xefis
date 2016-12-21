@@ -43,7 +43,7 @@
 #include "config_reader.h"
 
 
-namespace Xefis {
+namespace xf {
 
 ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (NameAndSetting const& other):
 	name (other.name),
@@ -552,5 +552,5 @@ ConfigReader::process_module_element (QDomElement const& module_element, QWidget
 	return _module_manager->load_module (name, instance, module_element, parent_widget);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -25,7 +25,7 @@
 #include "nmea.h"
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 static Mutex $describe_mtk_command_entry_mutex;
@@ -97,5 +97,5 @@ make_mtk_sentence (std::string const& data)
 }
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 

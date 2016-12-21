@@ -27,7 +27,7 @@
 #include "thread.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Thread::Thread() noexcept:
 	_sched_type (SchedOther),
@@ -150,5 +150,5 @@ Thread::callback (void* arg)
 	return 0;
 }
 
-} // namespace Xefis
+} // namespace xf
 

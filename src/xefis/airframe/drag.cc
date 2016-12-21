@@ -24,7 +24,7 @@
 #include "drag.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Drag::Drag (QDomElement const& config)
 {
@@ -58,5 +58,5 @@ Drag::get_cd (Angle const& aoa) const
 	return _aoa_to_cd->extrapolated_value (aoa);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -37,7 +37,7 @@
 	});
 
 
-namespace Xefis {
+namespace xf {
 
 class ModuleManager;
 
@@ -325,7 +325,7 @@ Module::module_manager() const noexcept
 std::ostream&
 operator<< (std::ostream&, Module::Pointer const&);
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

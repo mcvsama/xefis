@@ -27,7 +27,7 @@
 #include "property.h"
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Observes a set of properties, and checks if their values have changed.
@@ -235,7 +235,7 @@ PropertyObserver::touch() noexcept
 	_touch = true;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

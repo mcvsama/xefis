@@ -31,7 +31,7 @@
 #include <xefis/utility/logger.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class NavaidStorage;
 class ModuleManager;
@@ -423,7 +423,7 @@ Application::options() const noexcept
 	return *_options_helper;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

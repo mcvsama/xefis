@@ -23,7 +23,7 @@
 #include <xefis/utility/numeric.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Note - headings should be all magnetic or all true.
@@ -237,7 +237,7 @@ WindTriangle::get_ground_speed (Angle aircraft_heading) const
 	return wt.ground_speed();
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

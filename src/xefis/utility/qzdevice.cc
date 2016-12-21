@@ -24,7 +24,7 @@
 #include "qzdevice.h"
 
 
-namespace Xefis {
+namespace xf {
 
 constexpr std::size_t QZDevice::kBufferSize;
 constexpr uint32_t QZDevice::kEnableGzip;
@@ -176,5 +176,5 @@ QZDevice::decompress()
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 

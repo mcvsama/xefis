@@ -26,7 +26,7 @@
 #include <xefis/utility/datatable2d.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Drag
 {
@@ -59,7 +59,7 @@ Drag::get_aoa_range() const noexcept
 	return _aoa_to_cd->domain();
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

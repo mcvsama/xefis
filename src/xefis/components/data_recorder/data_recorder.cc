@@ -24,7 +24,7 @@
 #include "data_recorder.h"
 
 
-namespace Xefis {
+namespace xf {
 
 DataRecorder::DataRecorder (QWidget* parent):
 	QWidget (parent)
@@ -43,5 +43,5 @@ DataRecorder::DataRecorder (QWidget* parent):
 	layout->addWidget (_scroll_area);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class Panel;
 
@@ -46,7 +46,7 @@ class PanelWidget: public QWidget
 	Panel* _panel;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

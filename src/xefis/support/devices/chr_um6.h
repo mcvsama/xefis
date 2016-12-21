@@ -30,7 +30,7 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Encapsulates protocol used by CHR-UM6 sensor.
@@ -842,7 +842,7 @@ CHRUM6::set_auto_retry (bool enable)
 	_auto_retry = enable;
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

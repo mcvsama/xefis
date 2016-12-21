@@ -21,7 +21,7 @@
 #include "property_observer.h"
 
 
-namespace Xefis {
+namespace xf {
 
 void
 PropertyObserver::observe (GenericProperty& property)
@@ -138,5 +138,5 @@ PropertyObserver::longest_smoothing_time() noexcept
 	return _longest_smoother;
 }
 
-} // namespace Xefis
+} // namespace xf
 

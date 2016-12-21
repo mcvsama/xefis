@@ -30,7 +30,7 @@
 #include "configurator_widget.h"
 
 
-namespace Xefis {
+namespace xf {
 
 ConfiguratorWidget::OwnershipBreakingDecorator::OwnershipBreakingDecorator (QWidget* child, QWidget* parent):
 	QWidget (parent),
@@ -192,5 +192,5 @@ ConfiguratorWidget::reload_module_widget (GeneralModuleWidget* module_widget)
 		_general_module_widgets.erase (module_widget->module());
 }
 
-} // namespace Xefis
+} // namespace xf
 

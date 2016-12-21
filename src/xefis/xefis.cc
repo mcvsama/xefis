@@ -46,8 +46,8 @@ int main (int argc, char** argv, char**)
 		if (argc == 2 && (strcmp (argv[1], "-v") == 0 || strcmp (argv[1], "--version") == 0))
 		{
 			std::cout << "Xefis" << std::endl;
-			std::cout << "Commit: " << xf::Version::commit << std::endl;
-			std::cout << "Branch: " << xf::Version::branch << std::endl;
+			std::cout << "Commit: " << xf::version::commit << std::endl;
+			std::cout << "Branch: " << xf::version::branch << std::endl;
 			std::clog << "Features: ";
 			std::vector<const char*> features = xf::Services::features();
 			std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));

@@ -27,7 +27,7 @@
 #include <xefis/core/services.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class ModuleManager;
 
@@ -50,7 +50,7 @@ Instrument::Instrument (ModuleManager* module_manager, QDomElement const& config
 	setCursor (QCursor (Qt::CrossCursor));
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -28,7 +28,7 @@
 #include "chr_um6.h"
 
 
-namespace Xefis {
+namespace xf {
 
 static xf::Mutex $bits_for_baud_rate_entry_mutex;
 
@@ -541,5 +541,5 @@ CHRUM6::packet_name (uint32_t address) noexcept
 	return "(unknown)";
 }
 
-} // namespace Xefis
+} // namespace xf
 

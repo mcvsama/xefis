@@ -22,7 +22,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 namespace nmea {
 
 /**
@@ -141,7 +141,7 @@ extern SentenceType
 get_sentence_type (std::string const& sentence);
 
 } // namespace nmea
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

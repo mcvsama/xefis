@@ -104,7 +104,7 @@ class BMP085:
 	Time					_temperature_interval		= 500_ms;
 	xf::PropertyPressure	_pressure;
 	Time					_pressure_interval			= 50_ms;
-	xf::I2C::Device			_i2c_device;
+	xf::i2c::Device			_i2c_device;
 	Oversampling			_oversampling				= Oversampling3;
 	Time					_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
 	Unique<QTimer>			_reinitialize_timer;

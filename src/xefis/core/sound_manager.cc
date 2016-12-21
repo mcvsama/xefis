@@ -21,7 +21,7 @@
 #include "sound_manager.h"
 
 
-namespace Xefis {
+namespace xf {
 
 SoundManager::Sound::Sound (QString const& wav_file_name)
 {
@@ -81,5 +81,5 @@ SoundManager::cleanup()
 			++s;
 }
 
-} // namespace Xefis
+} // namespace xf
 

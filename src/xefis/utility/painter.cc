@@ -22,7 +22,7 @@
 #include "painter.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Painter::Painter (TextPainter::Cache* cache):
 	TextPainter (cache)
@@ -53,5 +53,5 @@ Painter::draw_outlined_polygon (QPolygonF const& polygon)
 	drawPolygon (polygon);
 }
 
-} // namespace Xefis
+} // namespace xf
 

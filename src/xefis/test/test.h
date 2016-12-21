@@ -27,7 +27,7 @@
 #include "stdexcept.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class RuntimeTest
 {
@@ -57,7 +57,7 @@ RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 	}
 }
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

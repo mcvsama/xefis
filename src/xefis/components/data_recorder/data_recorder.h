@@ -28,7 +28,7 @@
 #include "graphs_stack.h"
 
 
-namespace Xefis {
+namespace xf {
 
 class DataRecorder: public QWidget
 {
@@ -40,7 +40,7 @@ class DataRecorder: public QWidget
 	QScrollArea*	_scroll_area;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

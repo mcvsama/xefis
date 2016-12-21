@@ -26,7 +26,7 @@
 	};
 
 
-namespace Xefis {
+namespace xf {
 
 template<class tValue>
 	class StrongWrapper
@@ -123,7 +123,7 @@ template<class V>
 		return _value;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 namespace std {
 namespace rel_ops {

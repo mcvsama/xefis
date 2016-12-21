@@ -21,7 +21,7 @@
 #include "property.h"
 
 
-namespace Xefis {
+namespace xf {
 
 void
 GenericProperty::create (PropertyPath const& path, PropertyType const& type)
@@ -76,5 +76,5 @@ GenericProperty::create (PropertyPath const& path, PropertyType const& type)
 		throw BadType (type_str);
 }
 
-} // namespace Xefis
+} // namespace xf
 

@@ -35,8 +35,8 @@ XEFIS_REGISTER_MODULE_CLASS ("io/bmp085", BMP085)
 BMP085::BMP085 (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	xf::I2C::Bus::ID i2c_bus;
-	xf::I2C::Address::ID i2c_address;
+	xf::i2c::Bus::ID i2c_bus;
+	xf::i2c::Address::ID i2c_address;
 
 	parse_settings (config, {
 		{ "i2c.bus", i2c_bus, true },
@@ -52,7 +52,7 @@ BMP085::BMP085 (xf::ModuleManager* module_manager, QDomElement const& config):
 	});
 
 	_i2c_device.bus().set_bus_number (i2c_bus);
-	_i2c_device.set_address (xf::I2C::Address (i2c_address));
+	_i2c_device.set_address (xf::i2c::Address (i2c_address));
 
 	_oversampling = Oversampling3;
 

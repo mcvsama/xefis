@@ -25,7 +25,7 @@
 #include "panel.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Panel::Panel (QWidget* parent, Application* application):
 	QWidget (parent),
@@ -87,5 +87,5 @@ Panel::read()
 		pw->data_updated();
 }
 
-} // namespace Xefis
+} // namespace xf
 

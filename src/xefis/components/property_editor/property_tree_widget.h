@@ -26,7 +26,7 @@
 #include <xefis/core/property_node.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class PropertyNode;
 class PropertyTreeWidgetItem;
@@ -121,7 +121,7 @@ class PropertyTreeWidget: public QTreeWidget
 	PropertyNode*	_root_node;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

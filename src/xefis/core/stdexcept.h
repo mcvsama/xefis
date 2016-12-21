@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace Xefis {
+namespace xf {
 
 class DomException: public Exception
 {
@@ -175,7 +175,7 @@ class InvalidCall: public Exception
 	using Exception::Exception;
 };
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

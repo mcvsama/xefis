@@ -24,7 +24,7 @@
 #include "panel_button.h"
 
 
-namespace Xefis {
+namespace xf {
 
 PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property):
 	PanelWidget (parent, panel),
@@ -37,27 +37,27 @@ PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, Propert
 		switch (color)
 		{
 			case Green:
-				_icon_on = QIcon (Resources::Icons16::led_green_on());
+				_icon_on = QIcon (resources::icons16::led_green_on());
 				break;
 
 			case Amber:
-				_icon_on = QIcon (Resources::Icons16::led_amber_on());
+				_icon_on = QIcon (resources::icons16::led_amber_on());
 				break;
 
 			case Red:
-				_icon_on = QIcon (Resources::Icons16::led_red_on());
+				_icon_on = QIcon (resources::icons16::led_red_on());
 				break;
 
 			case White:
-				_icon_on = QIcon (Resources::Icons16::led_white_on());
+				_icon_on = QIcon (resources::icons16::led_white_on());
 				break;
 
 			case Blue:
-				_icon_on = QIcon (Resources::Icons16::led_blue_on());
+				_icon_on = QIcon (resources::icons16::led_blue_on());
 				break;
 		}
 
-		_icon_off = QIcon (Resources::Icons16::led_off());
+		_icon_off = QIcon (resources::icons16::led_off());
 	}
 
 	_button = new QPushButton (this);
@@ -105,5 +105,5 @@ PanelButton::write()
 		_toggle_property.write (!_toggle_property.read (false));
 }
 
-} // namespace Xefis
+} // namespace xf
 

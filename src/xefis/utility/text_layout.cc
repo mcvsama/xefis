@@ -18,7 +18,7 @@
 #include "text_layout.h"
 
 
-namespace Xefis {
+namespace xf {
 
 void
 TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter) const
@@ -161,5 +161,5 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 	painter.restore();
 }
 
-} // namespace Xefis
+} // namespace xf
 

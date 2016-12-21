@@ -27,7 +27,7 @@
 #include "lift.h"
 
 
-namespace Xefis {
+namespace xf {
 
 Lift::Lift (QDomElement const& config)
 {
@@ -94,5 +94,5 @@ Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 	return aoas.back().argument;
 }
 
-} // namespace Xefis
+} // namespace xf
 

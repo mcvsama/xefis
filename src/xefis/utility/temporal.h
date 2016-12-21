@@ -22,7 +22,7 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace Xefis {
+namespace xf {
 
 /**
  * Container for a value with a timestamp. The timestamp gets updated
@@ -145,7 +145,7 @@ template<class T>
 		return _update_time;
 	}
 
-} // namespace Xefis
+} // namespace xf
 
 #endif
 

@@ -24,8 +24,8 @@
 #include "stdexcept.h"
 
 
-namespace Xefis {
-namespace TestAsserts {
+namespace xf {
+namespace test_asserts {
 
 /**
  * Accept any expression without generating 'unused variable' warning.
@@ -61,8 +61,8 @@ template<class T1, class T2, class T3>
 		}
 	}
 
-} // namespace TestAsserts
-} // namespace Xefis
+} // namespace test_asserts
+} // namespace xf
 
 #endif
 
