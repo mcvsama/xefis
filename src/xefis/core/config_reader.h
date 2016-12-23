@@ -121,7 +121,7 @@ class ConfigReader
 		{
 			/**
 			 * Holds reference to a target object, where settings value will be stored.
-			 * Actually base classes will hold that reference.
+			 * Actually derived classes will hold that reference.
 			 */
 			class Holder
 			{
