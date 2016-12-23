@@ -71,7 +71,7 @@ assign (QString& target, std::string const& value_str)
 // Covers arithmetic types (int_Xt, uint_Xt, float, double).
 template<class V,
 		 std::enable_if_t<std::is_arithmetic<V>::value, int> = 0>
-	inline void
+	static inline void
 	assign (V& target, std::string const& value_str)
 	{
 		target = boost::lexical_cast<V> (value_str);
@@ -81,7 +81,7 @@ template<class V,
 // Covers si::Quantity<> types.
 template<class Q,
 		 std::enable_if_t<si::is_quantity<Q>::value, int> = 0>
-	inline void
+	static inline void
 	assign (Q& target, std::string const& value_str)
 	{
 		parse (value_str, target);
@@ -90,7 +90,7 @@ template<class Q,
 
 // Covers Optional<> types.
 template<class T>
-	inline void
+	static inline void
 	assign (Optional<T>& target, std::string const& value_str)
 	{
 		T t;
