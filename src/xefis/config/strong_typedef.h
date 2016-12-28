@@ -125,14 +125,12 @@ template<class V>
 
 } // namespace xf
 
-namespace std {
-namespace rel_ops {
+namespace std::rel_ops {
 
 struct IncludeRelOps
 { };
 
-} // namespace rel_ops
-} // namespace std
+} // namespace std::rel_ops
 
 #endif
 

@@ -25,8 +25,7 @@
 #include "exceptions.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 static HexTable	$hextable;
 
@@ -146,6 +145,5 @@ Parser::verify_sentence (std::string const& sentence)
 	}
 }
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 

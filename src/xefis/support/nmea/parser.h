@@ -27,8 +27,7 @@
 #include "mtk.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 /**
  * Parser for NMEA protocol for GPS devices.
@@ -107,8 +106,7 @@ class Parser: private Noncopyable
 	Listener*		_listener;
 };
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
 #endif
 

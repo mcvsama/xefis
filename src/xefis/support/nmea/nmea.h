@@ -22,8 +22,7 @@
 #include <xefis/config/all.h>
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 /**
  * Thrown when NMEA or PMTK sentence type can't be resolved.
@@ -140,8 +139,7 @@ make_checksum (std::string const& data);
 extern SentenceType
 get_sentence_type (std::string const& sentence);
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
 #endif
 

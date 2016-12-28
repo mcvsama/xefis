@@ -25,8 +25,7 @@
 #include "nmea.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 static Mutex $describe_mtk_command_entry_mutex;
 
@@ -96,6 +95,5 @@ make_mtk_sentence (std::string const& data)
 	return "$" + data + "*" + make_checksum (data) + "\r\n";
 }
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 

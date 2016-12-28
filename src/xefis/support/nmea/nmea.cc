@@ -30,8 +30,7 @@
 #include "exceptions.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 Sentence::Sentence (std::string const& sentence)
 {
@@ -162,6 +161,5 @@ get_sentence_type (std::string const& sentence)
 		throw UnsupportedSentenceType (sentence);
 }
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
