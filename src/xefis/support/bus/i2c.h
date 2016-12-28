@@ -28,8 +28,7 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace xf {
-namespace i2c {
+namespace xf::i2c {
 
 class Bus;
 class Address;
@@ -462,8 +461,7 @@ template<std::size_t Size>
 		_bus.execute ({ Message (Write, _address, data_to_write) });
 	}
 
-} // namespace i2c
-} // namespace xf
+} // namespace xf::i2c
 
 #endif
 

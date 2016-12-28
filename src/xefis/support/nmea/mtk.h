@@ -17,8 +17,7 @@
 #include "nmea.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 enum class MTKResult
 {
@@ -66,8 +65,7 @@ describe_mtk_command_by_id (std::string command);
 extern std::string
 make_mtk_sentence (std::string const& data);
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
 #endif
 

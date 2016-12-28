@@ -18,8 +18,7 @@
 #include <cstddef>
 
 
-namespace afcs_api
-{
+namespace afcs_api {
 
 enum class ThrustMode
 {

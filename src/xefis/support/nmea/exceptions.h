@@ -25,8 +25,7 @@
 #include <xefis/config/all.h>
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 /**
  * Thrown when trying to construct a NMEA sentence object
@@ -69,8 +68,7 @@ class InvalidSentence: public Exception
 	using Exception::Exception;
 };
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
 #endif
 

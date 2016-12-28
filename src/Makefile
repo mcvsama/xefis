@@ -190,11 +190,11 @@ endif
 
 $(VERSION_FILE): $(COMMIT_FILE) $(BRANCH_FILE)
 	@echo "// Do not edit - automatically generated." >$@
-	@echo "namespace xf { namespace version {" >>$@
+	@echo "namespace xf::version {" >>$@
 	@echo "	const char* commit = \"$(COMMIT_REAL)\";" >>$@
 	@echo "	const char* branch = \"$(BRANCH_REAL)\";" >>$@
 	@echo "	const char* version = \"$(VERSION)\";" >>$@
-	@echo "} }" >>$@
+	@echo "}" >>$@
 
 $(call mkobjs, $(VERSION_FILE)): $(VERSION_FILE)
 endif # GIT_AVAILABLE == OK

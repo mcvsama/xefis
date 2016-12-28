@@ -30,8 +30,7 @@
 #include "nmea.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 using std::to_string;
 
@@ -439,6 +438,5 @@ to_string (xf::nmea::GPSTimeOfDay const& time)
 			% static_cast<int> (time.seconds_fraction)).str();
 }
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 

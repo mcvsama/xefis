@@ -17,8 +17,7 @@
 #include "nmea.h"
 
 
-namespace xf {
-namespace nmea {
+namespace xf::nmea {
 
 class GPSDate;
 class GPSTimeOfDay;
@@ -282,8 +281,7 @@ to_string (xf::nmea::GPSDate const& date);
 extern std::string
 to_string (xf::nmea::GPSTimeOfDay const& time);
 
-} // namespace nmea
-} // namespace xf
+} // namespace xf::nmea
 
 #endif
 
