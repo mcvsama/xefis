@@ -83,16 +83,6 @@ parse_hex_string (QString const& string)
 }
 
 
-inline Blob
-make_blob (void const* pointer, std::size_t bytes)
-{
-	uint8_t const* begin = reinterpret_cast<uint8_t const*> (pointer);
-	uint8_t const* end = begin + bytes;
-
-	return Blob (begin, end);
-}
-
-
 inline std::string
 to_hex_string (std::string const& blob)
 {
@@ -103,13 +93,6 @@ to_hex_string (std::string const& blob)
 		s += QString ("%1").arg (static_cast<uint8_t> (v), 2, 16, QChar ('0')).toStdString() + ":";
 	s.pop_back();
 	return s;
-}
-
-
-inline std::string
-to_hex_string (Blob const& blob)
-{
-	return to_hex_string (std::string (blob.begin(), blob.end()));
 }
 
 

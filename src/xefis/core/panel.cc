@@ -19,7 +19,7 @@
 #include <xefis/core/services.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/widgets/panel_widget.h>
+#include <xefis/support/ui/widgets/panel_widget.h>
 
 // Local:
 #include "panel.h"

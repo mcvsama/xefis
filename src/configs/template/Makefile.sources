@@ -1,0 +1,4 @@
+XEFIS_HEADERS += configs/template/template.h
+
+XEFIS_SOURCES += configs/template/template.cc
+
