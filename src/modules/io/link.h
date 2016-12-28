@@ -139,6 +139,7 @@ class Link:
 			Power,
 			Pressure,
 			Frequency,
+			AngularVelocity,
 			Length,
 			Speed,
 			Temperature,
@@ -198,6 +199,7 @@ class Link:
 		xf::PropertyPower			_property_power;
 		xf::PropertyPressure		_property_pressure;
 		xf::PropertyFrequency		_property_frequency;
+		xf::Property<AngularVelocity> _property_angular_velocity;
 		xf::PropertyLength			_property_length;
 		xf::PropertySpeed			_property_speed;
 		xf::PropertyTemperature		_property_temperature;

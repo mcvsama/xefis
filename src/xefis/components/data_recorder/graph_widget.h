@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__COMPONENTS__DATA_RECORDER__GRAPH_WIDGET_H__INCLUDED
-#define XEFIS__COMPONENTS__DATA_RECORDER__GRAPH_WIDGET_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__DATA_RECORDER__GRAPH_WIDGET_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__DATA_RECORDER__GRAPH_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>

@@ -22,17 +22,17 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/module.h>
 #include <xefis/core/panel.h>
 #include <xefis/core/config_reader.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/support/ui/widgets/panel_button.h>
+#include <xefis/support/ui/widgets/panel_rotary_encoder.h>
+#include <xefis/support/ui/widgets/panel_numeric_display.h>
+#include <xefis/support/ui/widgets/group_box.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/components/configurator/configurator_widget.h>
-#include <xefis/widgets/panel_button.h>
-#include <xefis/widgets/panel_rotary_encoder.h>
-#include <xefis/widgets/panel_numeric_display.h>
-#include <xefis/widgets/group_box.h>
 
 // Local:
 #include "window.h"

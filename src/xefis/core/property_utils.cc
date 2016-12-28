@@ -48,6 +48,7 @@ PropertyType::check_validity (std::string const& type)
 		"density",
 		"force",
 		"frequency",
+		"angular-velocity",
 		"length",
 		"pressure",
 		"speed",

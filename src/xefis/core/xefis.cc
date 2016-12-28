@@ -28,7 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/airframe/airframe.h>
+#include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/services.h>
 #include <xefis/core/property_storage.h>
 #include <xefis/core/accounting.h>
@@ -40,7 +40,7 @@
 #include <xefis/core/work_performer.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
-#include <xefis/components/configurator/configurator_widget.h>
+#include <xefis/support/airframe/airframe.h>
 #include <xefis/utility/time_helper.h>
 // TODO machine
 #include <configs/cthulhu/cthulhu.h>

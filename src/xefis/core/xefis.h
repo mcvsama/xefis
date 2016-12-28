@@ -31,7 +31,12 @@
 #include <xefis/utility/logger.h>
 
 
+namespace x2 { // XXX
+	class Machine;
+}
+
 namespace xf {
+using namespace x2; // XXX
 
 class NavaidStorage;
 class ModuleManager;
@@ -43,7 +48,6 @@ class ConfiguratorWidget;
 class Accounting;
 class Airframe;
 class System;
-class Machine;
 
 
 class Xefis: public QApplication

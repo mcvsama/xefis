@@ -28,7 +28,7 @@
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/hash.h>
 #include <xefis/utility/hextable.h>
-#include <xefis/utility/string.h>
+#include <xefis/utility/blob.h>
 
 // Local:
 #include "link.h"
@@ -130,6 +130,8 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		_type = Type::Force;
 	else if (type_attr == "frequency")
 		_type = Type::Frequency;
+	else if (type_attr == "angular-velocity")
+		_type = Type::AngularVelocity;
 	else if (type_attr == "length")
 		_type = Type::Length;
 	else if (type_attr == "power")
@@ -167,6 +169,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 		case Type::Energy:
 		case Type::Force:
 		case Type::Frequency:
+		case Type::AngularVelocity:
 		case Type::Length:
 		case Type::Power:
 		case Type::Pressure:
@@ -202,6 +205,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 			case Type::Energy:
 			case Type::Force:
 			case Type::Frequency:
+			case Type::AngularVelocity:
 			case Type::Length:
 			case Type::Power:
 			case Type::Pressure:
@@ -237,6 +241,7 @@ Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
 	_property_power.set_path (path);
 	_property_pressure.set_path (path);
 	_property_frequency.set_path (path);
+	_property_angular_velocity.set_path (path);
 	_property_length.set_path (path);
 	_property_speed.set_path (path);
 	_property_temperature.set_path (path);
@@ -296,6 +301,7 @@ Link::PropertyItem::produce (Blob& blob)
 		XEFIS_CASE_FLOAT (Energy, energy);
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
+		XEFIS_CASE_FLOAT (AngularVelocity, angular_velocity);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Power, power);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -363,6 +369,7 @@ Link::PropertyItem::eat (Blob::iterator begin, Blob::iterator end)
 		case Type::Energy:
 		case Type::Force:
 		case Type::Frequency:
+		case Type::AngularVelocity:
 		case Type::Length:
 		case Type::Power:
 		case Type::Pressure:
@@ -445,6 +452,7 @@ Link::PropertyItem::apply()
 		XEFIS_CASE_FLOAT (Energy, energy);
 		XEFIS_CASE_FLOAT (Force, force);
 		XEFIS_CASE_FLOAT (Frequency, frequency);
+		XEFIS_CASE_FLOAT (AngularVelocity, angular_velocity);
 		XEFIS_CASE_FLOAT (Length, length);
 		XEFIS_CASE_FLOAT (Power, power);
 		XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -493,6 +501,7 @@ Link::PropertyItem::failsafe()
 			XEFIS_CASE_FLOAT (Energy, energy);
 			XEFIS_CASE_FLOAT (Force, force);
 			XEFIS_CASE_FLOAT (Frequency, frequency);
+			XEFIS_CASE_FLOAT (AngularVelocity, angular_velocity);
 			XEFIS_CASE_FLOAT (Length, length);
 			XEFIS_CASE_FLOAT (Power, power);
 			XEFIS_CASE_FLOAT (Pressure, pressure);
@@ -840,7 +849,7 @@ Link::Link (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	parse_properties (config, {
 		{ "input", _input, false },
-		{ "output", _output, false 	},
+		{ "output", _output, false },
 		{ "link-valid", _link_valid_prop, false },
 		{ "failsafes", _failsafes, false },
 		{ "reacquires", _reacquires, false },

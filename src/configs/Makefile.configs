@@ -1,0 +1,3 @@
+XEFIS_CONFIGS += template
+XEFIS_CONFIGS += cthulhu
+

@@ -58,6 +58,8 @@ GenericProperty::create (PropertyPath const& path, PropertyType const& type)
 		PropertyPressure (path).ensure_existence();
 	else if (type_str == "frequency")
 		PropertyFrequency (path).ensure_existence();
+	else if (type_str == "angular-velocity")
+		Property<AngularVelocity> (path).ensure_existence();
 	else if (type_str == "length")
 		PropertyLength (path).ensure_existence();
 	else if (type_str == "speed")

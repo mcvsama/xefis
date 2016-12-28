@@ -33,6 +33,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/string.h>
+#include <xefis/utility/blob.h>
 #include <xefis/utility/time_helper.h>
 
 #include "property_storage.h"

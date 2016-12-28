@@ -27,7 +27,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qdom.h>
-#include <xefis/utility/string.h>
+#include <xefis/utility/blob.h>
 
 // Local:
 #include "state.h"
