@@ -212,8 +212,8 @@ ADIWidget::PaintWorkUnit::adi_pre_paint()
 	_horizon_transform.shear (0.0001f, 0.f);
 
 	// Limit FPM position:
-	_params.flight_path_alpha = xf::limit<Angle> (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
-	_params.flight_path_beta = xf::limit<Angle> (_params.flight_path_beta, -25.0_deg, +25.0_deg);
+	_params.flight_path_alpha = xf::clamped<Angle> (_params.flight_path_alpha, -25.0_deg, +25.0_deg);
+	_params.flight_path_beta = xf::clamped<Angle> (_params.flight_path_beta, -25.0_deg, +25.0_deg);
 	_flight_path_marker_position = QPointF (-heading_to_px (_params.flight_path_beta), -pitch_to_px (_params.flight_path_alpha));
 }
 
@@ -471,7 +471,7 @@ ADIWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
 
 		if (_params.slip_skid_visible)
 		{
-			painter.translate (-xf::limit (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
+			painter.translate (-xf::clamped (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
 
 			if (_params.roll_warning || _params.slip_skid_warning)
 				painter.setPen (warning_pen);
@@ -655,14 +655,14 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_params.speed = xf::limit<Speed> (_params.speed, 0_kt, 9999.99_kt);
-	_params.speed_mach = xf::limit (_params.speed_mach, 0.0, 9.99);
-	_params.speed_minimum = xf::limit<Speed> (_params.speed_minimum, 0.0_kt, 9999.99_kt);
+	_params.speed = xf::clamped<Speed> (_params.speed, 0_kt, 9999.99_kt);
+	_params.speed_mach = xf::clamped (_params.speed_mach, 0.0, 9.99);
+	_params.speed_minimum = xf::clamped<Speed> (_params.speed_minimum, 0.0_kt, 9999.99_kt);
 	if (_params.speed_minimum_maneuver)
-		_params.speed_minimum_maneuver = xf::limit<Speed> (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+		_params.speed_minimum_maneuver = xf::clamped<Speed> (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
 	if (_params.speed_maximum_maneuver)
-		_params.speed_maximum_maneuver = xf::limit<Speed> (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
-	_params.speed_maximum = xf::limit<Speed> (_params.speed_maximum, 0.0_kt, 9999.99_kt);
+		_params.speed_maximum_maneuver = xf::clamped<Speed> (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+	_params.speed_maximum = xf::clamped<Speed> (_params.speed_maximum, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -700,7 +700,7 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 void
 ADIWidget::PaintWorkUnit::sl_pre_paint()
 {
-	_params.speed = xf::limit<Speed> (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
+	_params.speed = xf::clamped<Speed> (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
 	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
 	_sl_max_shown = _params.speed + 0.5f * _params.sl_extent;
 	_sl_min_shown = std::max<Speed> (_sl_min_shown, 1_kt * _params.sl_minimum);
@@ -956,7 +956,7 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x
 	if (_params.speed_lookahead < _params.speed)
 		painter.scale (1.f, -1.f);
 	float length = std::min<float> (_sl_ladder_rect.height() / 2.f,
-									1.f * abs (kt_to_px (xf::limit<Speed> (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
+									1.f * abs (kt_to_px (xf::clamped<Speed> (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -1007,8 +1007,8 @@ ADIWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 	// Speed bug:
 	if (_params.cmd_speed)
 	{
-		float posy = xf::limit<float> (kt_to_px (xf::limit<Speed> (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
-									   -_sl_ladder_rect.height() / 2.0, _sl_ladder_rect.height() / 2.0);
+		float posy = xf::clamped<float> (kt_to_px (xf::clamped<Speed> (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
+										 -_sl_ladder_rect.height() / 2.0, _sl_ladder_rect.height() / 2.0);
 		painter.setClipRect (_sl_ladder_rect.translated (2.5f * x, 0.f));
 		painter.translate (1.25f * x, posy);
 		painter.setBrush (Qt::NoBrush);
@@ -1170,8 +1170,8 @@ ADIWidget::PaintWorkUnit::al_post_resize()
 void
 ADIWidget::PaintWorkUnit::al_pre_paint()
 {
-	_params.altitude = xf::limit<Length> (_params.altitude, -99999_ft, +99999_ft);
-	_params.vertical_speed = xf::limit<Speed> (_params.vertical_speed, -9999_fpm, +9999_fpm);
+	_params.altitude = xf::clamped<Length> (_params.altitude, -99999_ft, +99999_ft);
+	_params.vertical_speed = xf::clamped<Speed> (_params.vertical_speed, -9999_fpm, +9999_fpm);
 
 	float sgn = _params.altitude < 0_ft ? -1.f : 1.f;
 	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
@@ -1520,9 +1520,9 @@ ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 		// AP bug:
 		if (_params.cmd_altitude)
 		{
-			Length cmd_altitude = xf::limit<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
-			float posy = xf::limit (ft_to_px (cmd_altitude),
-									   static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
+			Length cmd_altitude = xf::clamped<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
+			float posy = xf::clamped (ft_to_px (cmd_altitude),
+									  static_cast<float> (-_al_ladder_rect.height() / 2), static_cast<float> (_al_ladder_rect.height() / 2));
 			QPolygonF bug_shape = QPolygonF()
 				<< QPointF (0.f, 0.f)
 				<< QPointF (-0.5f * x, -0.5f * x)
@@ -1756,7 +1756,7 @@ ADIWidget::PaintWorkUnit::al_paint_ap_setting (xf::Painter& painter)
 	if (!_params.cmd_altitude)
 		return;
 
-	Length cmd_altitude = xf::limit<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
+	Length cmd_altitude = xf::clamped<Length> (*_params.cmd_altitude, -99999_ft, +99999_ft);
 
 	QFont b_font = _font_20;
 	QFontMetricsF b_metrics (b_font);
@@ -1941,12 +1941,12 @@ ADIWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 	Angle range = _params.fov / 4.f;
 
 	Angle pitch = cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
-	pitch = xf::limit (pitch, -range, +range);
+	pitch = xf::clamped (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.orientation_roll;
 	if (abs (roll) > 180_deg)
 		roll = roll - sgn (roll.quantity<Degree>()) * 360_deg;
-	roll = xf::limit (roll, -range, +range);
+	roll = xf::clamped (roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll) / 2.f;
@@ -1975,8 +1975,8 @@ ADIWidget::PaintWorkUnit::paint_control_stick (xf::Painter& painter)
 	float const w = wh() * 0.2f / 9.f;
 	Angle range = 17.5_deg;
 
-	Angle pitch = xf::limit (_params.control_stick_pitch, -range, +range);
-	Angle roll = xf::limit (_params.control_stick_roll, -range, +range);
+	Angle pitch = xf::clamped (_params.control_stick_pitch, -range, +range);
+	Angle roll = xf::clamped (_params.control_stick_roll, -range, +range);
 
 	float ypos = pitch_to_px (pitch);
 	float xpos = heading_to_px (roll);
@@ -2021,7 +2021,7 @@ ADIWidget::PaintWorkUnit::paint_altitude_agl (xf::Painter& painter)
 	if (!_params.altitude_agl_visible)
 		return;
 
-	Length aagl = xf::limit<Length> (_params.altitude_agl, -9999_ft, +99999_ft);
+	Length aagl = xf::clamped<Length> (_params.altitude_agl, -9999_ft, +99999_ft);
 	QFont radar_altimeter_font = _font_20;
 	float const digit_width = _font_20_digit_width;
 	float const digit_height = _font_20_digit_height;
@@ -2145,10 +2145,10 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 		{
 			Angle approach_deviation;
 			if (original_approach_deviation)
-				approach_deviation = xf::limit<Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
+				approach_deviation = xf::clamped<Angle> (*original_approach_deviation, -2.25_deg, +2.25_deg);
 			Angle path_deviation;
 			if (original_path_deviation)
-				path_deviation = xf::limit<Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
+				path_deviation = xf::clamped<Angle> (*original_path_deviation, -2.25_deg, +2.25_deg);
 
 			QRectF rect (0.f, 0.f, 0.385f * wh(), 0.055f * wh());
 			centrify (rect);
@@ -2271,8 +2271,8 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 		float w = 0.15f * wh();
 		float h = 0.05f * wh();
 		float p = 1.3f;
-		float offset = 0.5f * xf::limit (_params.deviation_lateral_approach->quantity<Degree>(), -1.5, +1.5);
-		float ypos = -pitch_to_px (xf::limit<Angle> (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
+		float offset = 0.5f * xf::clamped (_params.deviation_lateral_approach->quantity<Degree>(), -1.5, +1.5);
+		float ypos = -pitch_to_px (xf::clamped<Angle> (_params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		painter.setTransform (_center_transform);
 		painter.translate (0.f, ypos);
@@ -2425,7 +2425,7 @@ ADIWidget::PaintWorkUnit::paint_critical_aoa (xf::Painter& painter)
 
 	painter.setClipping (false);
 	painter.setTransform (_center_transform);
-	painter.translate (0.f, pitch_to_px (xf::limit<Angle> (_params.critical_aoa - _params.aoa_alpha, -20_deg, +16_deg)));
+	painter.translate (0.f, pitch_to_px (xf::clamped<Angle> (_params.critical_aoa - _params.aoa_alpha, -20_deg, +16_deg)));
 
 	float const w = wh() * 3.f / 9.f;
 

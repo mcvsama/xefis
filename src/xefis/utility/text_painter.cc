@@ -192,8 +192,8 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c, _position_correction) }).first;
 		float fx = floored_mod<float> (offset.x(), 1.f);
 		float fy = floored_mod<float> (offset.y(), 1.f);
-		int dx = limit<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
-		int dy = limit<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		int dx = clamped<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
+		int dy = clamped<int> (fy * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
 		drawImage (QPoint (offset.x(), offset.y()), glyph->second.data->positions[dx][dy]);
 		offset.rx() += metrics.width (*c);
 	}

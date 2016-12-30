@@ -314,8 +314,8 @@ State::prepare_efis_settings()
 void
 State::solve_minimums()
 {
-	_minimums_setting_baro = xf::limit (_minimums_setting_baro, MinimumsBaroRange);
-	_minimums_setting_radio = xf::limit (_minimums_setting_radio, MinimumsRadioRange);
+	xf::clamp (_minimums_setting_baro, MinimumsBaroRange);
+	xf::clamp (_minimums_setting_radio, MinimumsRadioRange);
 
 	switch (_minimums_type)
 	{
@@ -337,7 +337,7 @@ State::solve_minimums()
 void
 State::solve_pressure()
 {
-	_qnh_setting = xf::limit (_qnh_setting, QNHRange);
+	xf::clamp (_qnh_setting, QNHRange);
 	_setting_pressure_qnh.write (_qnh_setting);
 }
 

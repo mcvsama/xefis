@@ -235,7 +235,7 @@ template<class P>
 			pid.set_target (xf::renormalize (base_quantity (*cmd_param), input_range, artificial_range));
 			pid.process (xf::renormalize (base_quantity (*measured_param), input_range, artificial_range), update_dt);
 
-			return xf::limit<Angle> (1_deg * pid.output() * input_range.mid(), pitch_limit);
+			return xf::clamped<Angle> (1_deg * pid.output() * input_range.mid(), pitch_limit);
 		}
 	}
 

@@ -166,12 +166,12 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	QRectF rect (-r, -r, 2.f * r, 2.f * r);
 
 	float value_span_angle = 210.f;
-	float value = _value ? limit (*_value, _range) : 0.f;
-	float warning = _warning_value ? limit (*_warning_value, _range) : 0.f;
-	float critical = _critical_value ? limit (*_critical_value, _range) : 0.f;
-	float reference = _reference_value ? limit (*_reference_value, _range) : 0.f;
-	float target = _target_value ? limit (*_target_value, _range) : 0.f;
-	float automatic = _automatic_value ? limit (*_automatic_value, _range) : 0.f;
+	float value = _value ? clamped (*_value, _range) : 0.f;
+	float warning = _warning_value ? clamped (*_warning_value, _range) : 0.f;
+	float critical = _critical_value ? clamped (*_critical_value, _range) : 0.f;
+	float reference = _reference_value ? clamped (*_reference_value, _range) : 0.f;
+	float target = _target_value ? clamped (*_target_value, _range) : 0.f;
+	float automatic = _automatic_value ? clamped (*_automatic_value, _range) : 0.f;
 
 	if (!_warning_value)
 		warning = _range.max();

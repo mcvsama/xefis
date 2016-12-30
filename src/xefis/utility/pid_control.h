@@ -417,21 +417,21 @@ template<class T>
 		ValueType error;
 		if (_winding)
 		{
-			error = limit<ValueType> (_target - measured_value, -2.0, +2.0);
+			error = clamped<ValueType> (_target - measured_value, -2.0, +2.0);
 			if (std::abs (error) > 1.0)
 				error = error - sgn (error) * 2.0;
 		}
 		else
 			error = _target - measured_value;
 		_integral += error * dt.quantity<Second>();
-		_integral = limit<ParamType> (_integral, _i_limit);
+		clamp<ParamType> (_integral, _i_limit);
 		_derivative = (error - _previous_error) / dt.quantity<Second>();
 		if (!std::isfinite (_derivative))
 			_derivative = 0.0;
-		_output = limit<ValueType> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +
-											 _i * _integral +
-											 _d * _derivative),
-									_output_limit);
+		_output = clamped<ValueType> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +
+											   _i * _integral +
+											   _d * _derivative),
+									  _output_limit);
 		_previous_error = error;
 
 		if (_output_smoothing_enabled)
