@@ -45,10 +45,10 @@ using xf::NavaidStorage;
 void
 HSIWidget::Parameters::sanitize()
 {
-	using xf::limit;
+	using xf::clamped;
 	using xf::floored_mod;
 
-	range = limit<Length> (range, 1_ft, 5000_nmi);
+	range = clamped<Length> (range, 1_ft, 5000_nmi);
 	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
 	heading_true = floored_mod (heading_true, 360_deg);
 	if (ap_heading_magnetic)
@@ -637,7 +637,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (xf::Painter& painter)
 	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
 		return;
 
-	float len = xf::limit (to_px (6_nmi), 2.f * _q, 7.f * _q);
+	float len = xf::clamped (to_px (6_nmi), 2.f * _q, 7.f * _q);
 	float pos = to_px (_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
@@ -1114,7 +1114,7 @@ HSIWidget::PaintWorkUnit::paint_course (xf::Painter& painter)
 	if (_params.course_deviation)
 	{
 		bool filled = false;
-		Angle deviation = xf::limit<Angle> (*_params.course_deviation, -2.5_deg, +2.5_deg);
+		Angle deviation = xf::clamped<Angle> (*_params.course_deviation, -2.5_deg, +2.5_deg);
 		if (abs (*_params.course_deviation) <= abs (deviation))
 			filled = true;
 
@@ -1558,7 +1558,7 @@ HSIWidget::PaintWorkUnit::paint_navaids (xf::Painter& painter)
 						painter.drawLine (tr_l.map (QPointF (0.0, 0.0)), tr_l.map (QPointF (0.0, -length_px)));
 						painter.drawLine (tr_r.map (QPointF (0.0, 0.0)), tr_r.map (QPointF (0.0, -length_px)));
 						// Extended runway:
-						double m_px = xf::limit<double> (to_px (1_m), 0.02, 0.04);
+						double m_px = xf::clamped<double> (to_px (1_m), 0.02, 0.04);
 						QPen dashed_pen = get_pen (Qt::white, 1.0, Qt::DashLine);
 						dashed_pen.setDashPattern (QVector<qreal>() << 300 * m_px << 200 * m_px);
 						painter.setPen (dashed_pen);

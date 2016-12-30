@@ -339,7 +339,7 @@ ADI::read()
 	// Raising runway
 	params.runway_visible = _navaid_reference_visible.read (false) && _altitude_agl.valid() &&
 							_flight_path_deviation_lateral_app.valid() && *_altitude_agl <= _raising_runway_visibility;
-	params.runway_position = xf::limit<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
+	params.runway_position = xf::clamped<Length> (*_altitude_agl, 0_ft, _raising_runway_threshold) / _raising_runway_threshold * 25_deg;
 	// Control hint
 	params.control_hint_visible = _flight_mode_hint_visible.read (false);
 	params.control_hint = QString::fromStdString (_flight_mode_hint.read (""));

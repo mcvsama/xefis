@@ -278,11 +278,11 @@ AFCS::knob_speed_change (int delta)
 	switch (_speed_control)
 	{
 		case SpeedControl::KIAS:
-			_mcp_ias = xf::limit (_mcp_ias + 1_kt * delta, SpeedRange);
+			_mcp_ias = xf::clamped (_mcp_ias + 1_kt * delta, SpeedRange);
 			break;
 
 		case SpeedControl::Mach:
-			_mcp_mach = xf::limit (_mcp_mach + MachStep * delta, MachRange);
+			_mcp_mach = xf::clamped (_mcp_mach + MachStep * delta, MachRange);
 			break;
 	}
 }
@@ -522,7 +522,7 @@ AFCS::knob_altitude_change (int delta)
 			altitude_step = 100_ft;
 			break;
 	}
-	_mcp_altitude = xf::limit (_mcp_altitude + altitude_step * delta, AltitudeRange);
+	_mcp_altitude = xf::clamped (_mcp_altitude + altitude_step * delta, AltitudeRange);
 }
 
 
@@ -593,7 +593,7 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::VS:
 			if (!_mcp_vs)
 				_mcp_vs = 0_fpm;
-			_mcp_vs = xf::limit (*_mcp_vs + VSStep * delta, VSRange);
+			_mcp_vs = xf::clamped (*_mcp_vs + VSStep * delta, VSRange);
 
 			// Disengage on 0 crossing:
 			if (xf::Range<Speed> ({ -0.5 * VSStep, 0.5 * VSStep }).includes (*_mcp_vs))
@@ -606,7 +606,7 @@ AFCS::knob_vertical_change (int delta)
 		case VerticalControl::FPA:
 			if (!_mcp_fpa)
 				_mcp_fpa = 0_deg;
-			_mcp_fpa = xf::limit (*_mcp_fpa + FPAStep * delta, FPARange);
+			_mcp_fpa = xf::clamped (*_mcp_fpa + FPAStep * delta, FPARange);
 
 			// Disengage on 0 crossing:
 			if (xf::Range<Angle> ({ -0.5 * FPAStep, +0.5 * FPAStep }).includes (*_mcp_fpa))

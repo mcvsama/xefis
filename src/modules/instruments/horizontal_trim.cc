@@ -80,7 +80,7 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 
 	Optional<double> trim = _input_trim_value.get_optional();
 	if (trim)
-		trim = xf::limit (*trim, -1.0, +1.0);
+		trim = xf::clamped (*trim, -1.0, +1.0);
 	Optional<double> ref = _input_trim_reference.get_optional();
 	Optional<double> ref_min = _input_trim_reference_minimum.get_optional();
 	Optional<double> ref_max = _input_trim_reference_maximum.get_optional();

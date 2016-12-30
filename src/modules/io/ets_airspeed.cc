@@ -165,7 +165,7 @@ ETSAirspeed::offset_collected()
 
 	// Limit offset:
 	uint16_t saved_offset = _offset;
-	xf::limit (_offset, RawValueMinimum, RawValueMaximum);
+	xf::clamp (_offset, RawValueMinimum, RawValueMaximum);
 	if (saved_offset != _offset)
 		log() << "Offset clipped to: " << _offset << std::endl;
 }

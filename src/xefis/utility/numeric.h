@@ -134,8 +134,29 @@ template<class Number>
 
 
 template<class Value>
+	inline void
+	clamp (Value& value, Value min, Value max) noexcept
+	{
+		if (value < min)
+			value = min;
+		else if (value > max)
+			value = max;
+	}
+
+
+template<class Value>
+	inline void
+	clamp (Value& value, Range<Value> range) noexcept
+	{
+		return range.min() <= range.max()
+			? clamp (value, range.min(), range.max())
+			: clamp (value, range.max(), range.min());
+	}
+
+
+template<class Value>
 	inline constexpr Value
-	limit (Value value, Value min, Value max) noexcept
+	clamped (Value value, Value min, Value max) noexcept
 	{
 		return value < min
 			? min
@@ -147,11 +168,11 @@ template<class Value>
 
 template<class Value>
 	inline constexpr Value
-	limit (Value value, Range<Value> range) noexcept
+	clamped (Value value, Range<Value> range) noexcept
 	{
 		return range.min() <= range.max()
-			? limit (value, range.min(), range.max())
-			: limit (value, range.max(), range.min());
+			? clamped (value, range.min(), range.max())
+			: clamped (value, range.max(), range.min());
 	}
 
 

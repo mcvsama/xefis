@@ -79,7 +79,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 
 	if (_value)
 	{
-		auto value = xf::limit<double> (*_value, _range.min(), _range.max());
+		auto value = xf::clamped (*_value, _range.min(), _range.max());
 		bool inbound = _range.includes (*_value);
 
 		if (inbound)

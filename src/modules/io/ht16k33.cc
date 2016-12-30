@@ -126,8 +126,8 @@ HT16K33::SingleLed::SingleLed (QDomElement const& element)
 	if (!element.hasAttribute ("path"))
 		throw xf::MissingDomAttribute (element, "path");
 
-	_row = xf::limit<int> (element.attribute ("row").toInt(), 0, 15);
-	_column = xf::limit<int> (element.attribute ("column").toInt(), 0, 7);
+	_row = xf::clamped<int> (element.attribute ("row").toInt(), 0, 15);
+	_column = xf::clamped<int> (element.attribute ("column").toInt(), 0, 7);
 	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 }
 
@@ -153,7 +153,7 @@ HT16K33::NumericDisplay::NumericDisplay (QDomElement const& element)
 		{
 			if (!e.hasAttribute ("row"))
 				throw xf::MissingDomAttribute (e, "row");
-			int row = xf::limit (e.attribute ("row").toInt(), 0, 15);
+			int row = xf::clamped (e.attribute ("row").toInt(), 0, 15);
 			_digit_rows.push_back (row);
 		}
 	}
@@ -248,8 +248,8 @@ HT16K33::SingleSwitch::SingleSwitch (QDomElement const& element)
 		throw xf::MissingDomAttribute (element, "path");
 	_property_boolean.set_path (xf::PropertyPath (element.attribute ("path")));
 
-	_row = xf::limit<int> (element.attribute ("row").toInt(), 3, 15);
-	_column = xf::limit<int> (element.attribute ("column").toInt(), 1, 3);
+	_row = xf::clamped<int> (element.attribute ("row").toInt(), 3, 15);
+	_column = xf::clamped<int> (element.attribute ("column").toInt(), 1, 3);
 }
 
 
@@ -302,7 +302,7 @@ HT16K33::HT16K33 (xf::ModuleManager* module_manager, QDomElement const& config):
 				throw xf::BadDomAttribute (e, "scan-frequency", "if greater than 25 Hz, 'reliable-mode' must be 'true'");
 
 			// According to docs, each scan takes 20 ms, so limit sampling rate to 50 Hz:
-			_scan_frequency = xf::limit (_scan_frequency, 0_Hz, 50_Hz);
+			xf::clamp (_scan_frequency, 0_Hz, 50_Hz);
 
 			for (QDomElement& e2: e)
 			{
@@ -434,7 +434,7 @@ HT16K33::data_updated()
 				display |= DisplayBlinkSlow;
 		}
 
-		brightness = xf::limit<int> (_brightness.read (15), 0, 15) & 0xf;
+		brightness = xf::clamped<int> (_brightness.read (15), 0, 15) & 0xf;
 
 		_i2c_device.write (DisplayRegister | display);
 		_i2c_device.write (BrightnessRegister | brightness);

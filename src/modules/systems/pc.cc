@@ -224,7 +224,7 @@ PerformanceComputer::compute_glide_ratio()
 	{
 		Speed forward_speed = *_speed_gs;
 		int ratio = (forward_speed > 1_kt)
-			? xf::limit<int> (forward_speed / *_vertical_speed, -99, +99)
+			? xf::clamped<int> (forward_speed / *_vertical_speed, -99, +99)
 			: 0;
 		_glide_ratio.write (ratio);
 

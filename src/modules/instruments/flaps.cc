@@ -101,7 +101,7 @@ Flaps::paintEvent (QPaintEvent*)
 	// Filled block showing current value:
 	if (_current.valid())
 	{
-		Angle current = xf::limit<Angle> (*_current, 0_deg, _maximum);
+		Angle current = xf::clamped<Angle> (*_current, 0_deg, _maximum);
 		QRectF filled_block = block;
 		filled_block.setHeight (current / _maximum * filled_block.height());
 		painter().setPen (Qt::NoPen);
@@ -113,7 +113,7 @@ Flaps::paintEvent (QPaintEvent*)
 	if (_setting.valid())
 	{
 		// Green line:
-		Angle setting = xf::limit<Angle> (*_setting, 0_deg, _maximum);
+		Angle setting = xf::clamped<Angle> (*_setting, 0_deg, _maximum);
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / _maximum * block.height();
 		painter().setPen (get_pen (Qt::green, 2.f));

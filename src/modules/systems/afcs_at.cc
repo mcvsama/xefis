@@ -113,7 +113,7 @@ AFCS_AT::compute_thrust()
 				// There's no 1:1 correlaction between them.
 				_ias_pid.set_target (_cmd_ias->quantity<Knot>());
 				_ias_pid.process (_measured_ias->quantity<Knot>(), dt);
-				computed_thrust = 1_rpm * xf::limit (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
+				computed_thrust = 1_rpm * xf::clamped (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
 				computed_thrust = xf::renormalize (computed_thrust.quantity<RotationPerMinute>(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
 			}
 			break;
@@ -133,7 +133,7 @@ AFCS_AT::compute_thrust()
 void
 AFCS_AT::speed_mode_changed()
 {
-	xf::PropertyInteger::Type m = xf::limit<decltype (m)> (_cmd_speed_mode.read (-1), 0, static_cast<decltype (m)> (SpeedMode::sentinel) - 1);
+	xf::PropertyInteger::Type m = xf::clamped<decltype (m)> (_cmd_speed_mode.read (-1), 0, static_cast<decltype (m)> (SpeedMode::sentinel) - 1);
 	_speed_mode = static_cast<SpeedMode> (m);
 }
 

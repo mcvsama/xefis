@@ -197,7 +197,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<double>& pid,
 		constexpr xf::Range<double> artificial_range = { -1.0, +1.0 };
 		pid.set_target (xf::renormalize (*cmd_direction, input_range, artificial_range));
 		pid.process (xf::renormalize (*measured_direction, input_range, artificial_range), update_dt);
-		return xf::limit<Angle> (pid.output() * input_range.mid(), roll_limit);
+		return xf::clamped<Angle> (pid.output() * input_range.mid(), roll_limit);
 	}
 }
 

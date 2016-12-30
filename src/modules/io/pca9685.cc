@@ -45,7 +45,7 @@ PCA9685::Channel::compute_duty_cycle()
 	xf::PropertyFloat::Type value = fallback_to_last_valid ? last_value : input_default;
 	if (input.valid())
 		value = *input;
-	value = xf::limit (value, input_minimum, input_maximum);
+	xf::clamp (value, input_minimum, input_maximum);
 
 	last_value = value;
 
@@ -199,8 +199,8 @@ PCA9685::get_config_for_pwm (Time duty_cycle)
 	uint16_t on_time = 0;
 	uint16_t off_time = 4095 * (duty_cycle / _output_period) / y_corr;
 
-	on_time = xf::limit<uint16_t> (on_time, 0, 4095);
-	off_time = xf::limit<uint16_t> (off_time, 0, 4095);
+	xf::clamp<uint16_t> (on_time, 0, 4095);
+	xf::clamp<uint16_t> (off_time, 0, 4095);
 
 	boost::endian::native_to_little (on_time);
 	boost::endian::native_to_little (off_time);

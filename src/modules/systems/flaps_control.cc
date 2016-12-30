@@ -92,7 +92,7 @@ FlapsControl::data_updated()
 
 	if (_input_setting.valid_and_fresh())
 	{
-		_setting = xf::limit (*_input_setting, _minimum, _maximum);
+		_setting = xf::clamped<Angle> (*_input_setting, _minimum, _maximum);
 		if (_output_setting.configured())
 			_output_setting.write (_setting);
 		_timer->start();
