@@ -165,6 +165,13 @@ class GenericProperty
 
 	/**
 	 * Ensures that this property exists.
+	 */
+	virtual void
+	ensure_existence()
+	{ }
+
+	/**
+	 * Ensures that this property exists.
 	 *
 	 * \param	type
 	 *			Name of a type. See lib/si for type names.

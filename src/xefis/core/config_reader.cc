@@ -231,19 +231,21 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 			else
 				throw MissingDomAttribute (e, "path");
 
-			if (!e.hasAttribute ("default"))
-			{
-				// If default value is not given, require attribute 'type' to be present:
-				if (!e.hasAttribute ("type"))
-					throw MissingDomAttribute (e, "type");
-				else
-					it->second->ensure_existence (PropertyType (e.attribute ("type")));
-			}
-			else
-			{
-				QString value = e.attribute ("default");
-				it->second->create_and_parse (value.toStdString());
-			}
+			it->second->ensure_existence();
+
+			//if (!e.hasAttribute ("default"))
+			//{
+			//	// If default value is not given, require attribute 'type' to be present:
+			//	if (!e.hasAttribute ("type"))
+			//		throw MissingDomAttribute (e, "type");
+			//	else
+			//		it->second->ensure_existence (PropertyType (e.attribute ("type")));
+			//}
+			//else
+			//{
+			//	QString value = e.attribute ("default");
+			//	it->second->create_and_parse (value.toStdString());
+			//}
 		};
 
 		std::function<void (QDomElement const& e)> parse_element;
