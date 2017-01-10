@@ -105,13 +105,13 @@ class LonLat
 static_assert (std::is_literal_type<LonLat>::value, "LonLat must be a literal type");
 
 
-inline constexpr
+constexpr
 LonLat::LonLat() noexcept:
 	LonLat (0_deg, 0_deg)
 { }
 
 
-inline constexpr
+constexpr
 LonLat::LonLat (Angle longitude, Angle latitude) noexcept:
 	_lon (longitude),
 	_lat (latitude)

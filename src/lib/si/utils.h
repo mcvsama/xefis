@@ -39,7 +39,7 @@ namespace si {
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	base_quantity (Q value);
 
 
@@ -48,7 +48,7 @@ template<class Q,
  */
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
-	inline constexpr T
+	constexpr T
 	base_quantity (T value);
 
 
@@ -62,7 +62,7 @@ template<class T,
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	quantity (Q value, std::string const& unit_str);
 
 
@@ -73,7 +73,7 @@ template<class Q,
  */
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
-	inline constexpr T
+	constexpr T
 	quantity (T value, std::string const&);
 
 
@@ -85,7 +85,7 @@ template<class T,
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	quantity (Q value, DynamicUnit const& unit);
 
 
@@ -96,7 +96,7 @@ template<class Q,
  */
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
-	inline constexpr T
+	constexpr T
 	quantity (T value, DynamicUnit const& unit);
 
 
@@ -197,7 +197,7 @@ template<class pUnit, class pValue>
  * std::abs() equivalent
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	abs (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
 
 
@@ -205,7 +205,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * std::isinf() equivalent.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	isinf (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
 
 
@@ -213,7 +213,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * std::isnan() equivalent.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	isnan (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
 
 
@@ -223,7 +223,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value,
 		 class = std::enable_if_t<E0 % 2 == 0 && E1 % 2 == 0 && E2 % 2 == 0 && E3 % 2 == 0 &&
 								  E4 % 2 == 0 && E5 % 2 == 0 && E6 % 2 == 0 && E7 % 2 == 0>>
-	inline constexpr auto
+	constexpr auto
 	sqrt (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
 
 
@@ -231,7 +231,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Convert Radians to Hertz.
  */
 template<class pValue>
-	inline constexpr Quantity<units::RadianPerSecond, pValue>
+	constexpr Quantity<units::RadianPerSecond, pValue>
 	convert (Quantity<units::Hertz, pValue> frequency);
 
 
@@ -239,7 +239,7 @@ template<class pValue>
  * Convert value 'source' expressed in 'source_unit's to 'target_unit's.
  */
 template<class pValue>
-	inline constexpr pValue
+	constexpr pValue
 	convert (DynamicUnit const& source_unit, pValue source, DynamicUnit const& target_unit);
 
 
@@ -249,7 +249,7 @@ template<class pValue>
 
 
 template<class Q, class>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	base_quantity (Q value)
 	{
 		return value.base_quantity();
@@ -257,7 +257,7 @@ template<class Q, class>
 
 
 template<class T, class>
-	inline constexpr T
+	constexpr T
 	base_quantity (T value)
 	{
 		return value;
@@ -265,7 +265,7 @@ template<class T, class>
 
 
 template<class Q, class>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	quantity (Q value, std::string const& unit_str)
 	{
 		return quantity (value, parse_unit (unit_str));
@@ -273,7 +273,7 @@ template<class Q, class>
 
 
 template<class T, class>
-	inline constexpr T
+	constexpr T
 	quantity (T value, std::string const&)
 	{
 		return value;
@@ -281,7 +281,7 @@ template<class T, class>
 
 
 template<class Q, class>
-	inline constexpr typename Q::Value
+	constexpr typename Q::Value
 	quantity (Q value, DynamicUnit const& unit)
 	{
 		return convert (Q::Unit::dynamic_unit(), value.quantity(), unit);
@@ -289,7 +289,7 @@ template<class Q, class>
 
 
 template<class T, class>
-	inline constexpr T
+	constexpr T
 	quantity (T value, DynamicUnit const&)
 	{
 		return value;
@@ -415,7 +415,7 @@ template<class pUnit, class pValue>
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	abs (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		return Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> (q.quantity());
@@ -423,7 +423,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	isinf (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		return std::isinf (q.quantity());
@@ -431,7 +431,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	isnan (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		return std::isnan (q.quantity());
@@ -439,7 +439,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class>
-	inline constexpr auto
+	constexpr auto
 	sqrt (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
@@ -450,7 +450,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 template<class pValue>
-	inline constexpr Quantity<units::RadianPerSecond, pValue>
+	constexpr Quantity<units::RadianPerSecond, pValue>
 	convert (Quantity<units::Hertz, pValue> frequency)
 	{
 		return Quantity<units::RadianPerSecond, pValue> (frequency.template quantity<units::Hertz>() * 2.0 * M_PI);
@@ -458,7 +458,7 @@ template<class pValue>
 
 
 template<class pValue>
-	inline constexpr pValue
+	constexpr pValue
 	convert (DynamicUnit const& source_unit, pValue source, DynamicUnit const& target_unit)
 	{
 		// Assert that units are convertible (exponents vector the same):
