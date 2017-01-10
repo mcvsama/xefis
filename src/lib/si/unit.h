@@ -344,7 +344,7 @@ class DynamicUnit
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O>
-	inline constexpr bool
+	constexpr bool
 	Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>::is_dimensionless()
 	{
 		return E0 == 0 && E1 == 0 && E2 == 0 && E3 == 0
@@ -353,7 +353,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O>
-	inline constexpr DynamicUnit
+	constexpr DynamicUnit
 	Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>::dynamic_unit()
 	{
 		return DynamicUnit (E0, E1, E2, E3, E4, E5, E6, E7, DynamicRatio (S::num, S::den), DynamicRatio (O::num, O::den));
@@ -365,14 +365,14 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 
 
-inline constexpr
+constexpr
 DynamicRatio::DynamicRatio (intmax_t numerator, intmax_t denominator):
 	_numerator (numerator),
 	_denominator (denominator)
 { }
 
 
-inline constexpr bool
+constexpr bool
 DynamicRatio::operator== (DynamicRatio const& other) const
 {
 	return _numerator == other._numerator
@@ -380,21 +380,21 @@ DynamicRatio::operator== (DynamicRatio const& other) const
 }
 
 
-inline constexpr bool
+constexpr bool
 DynamicRatio::operator!= (DynamicRatio const& other) const
 {
 	return !(*this == other);
 }
 
 
-inline constexpr bool
+constexpr bool
 DynamicRatio::operator< (DynamicRatio const& other) const
 {
 	return to_floating_point() < other.to_floating_point();
 }
 
 
-inline constexpr DynamicRatio&
+constexpr DynamicRatio&
 DynamicRatio::operator*= (DynamicRatio const& other)
 {
 	_numerator *= other._numerator;
@@ -403,7 +403,7 @@ DynamicRatio::operator*= (DynamicRatio const& other)
 }
 
 
-inline constexpr DynamicRatio&
+constexpr DynamicRatio&
 DynamicRatio::operator/= (DynamicRatio const& other)
 {
 	_numerator *= other._denominator;
@@ -412,28 +412,28 @@ DynamicRatio::operator/= (DynamicRatio const& other)
 }
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 DynamicRatio::inverted() const
 {
 	return DynamicRatio (_denominator, _numerator);
 }
 
 
-inline constexpr intmax_t
+constexpr intmax_t
 DynamicRatio::numerator() const noexcept
 {
 	return _numerator;
 }
 
 
-inline constexpr intmax_t
+constexpr intmax_t
 DynamicRatio::denominator() const noexcept
 {
 	return _denominator;
 }
 
 
-inline constexpr long double
+constexpr long double
 DynamicRatio::to_floating_point() const
 {
 	return static_cast<long double> (_numerator) / static_cast<long double> (_denominator);
@@ -445,7 +445,7 @@ DynamicRatio::to_floating_point() const
  */
 
 
-inline constexpr
+constexpr
 DynamicUnit::DynamicUnit():
 	_exponents ({ 0, 0, 0, 0, 0, 0, 0, 0 }),
 	_scale (1, 1),
@@ -453,7 +453,7 @@ DynamicUnit::DynamicUnit():
 { }
 
 
-inline constexpr
+constexpr
 DynamicUnit::DynamicUnit (int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, DynamicRatio scale, DynamicRatio offset):
 	_exponents ({ E0, E1, E2, E3, E4, E5, E6, E7 }),
 	_scale (scale),
@@ -461,7 +461,7 @@ DynamicUnit::DynamicUnit (int E0, int E1, int E2, int E3, int E4, int E5, int E6
 { }
 
 
-inline constexpr DynamicUnit&
+constexpr DynamicUnit&
 DynamicUnit::operator= (DynamicUnit const& other)
 {
 	_exponents = other._exponents;
@@ -494,42 +494,42 @@ DynamicUnit::operator< (DynamicUnit const& other) const
 }
 
 
-inline constexpr std::array<int, kUnitDimensions>&
+constexpr std::array<int, kUnitDimensions>&
 DynamicUnit::exponents() noexcept
 {
 	return _exponents;
 }
 
 
-inline constexpr std::array<int, kUnitDimensions> const&
+constexpr std::array<int, kUnitDimensions> const&
 DynamicUnit::exponents() const noexcept
 {
 	return _exponents;
 }
 
 
-inline constexpr DynamicRatio&
+constexpr DynamicRatio&
 DynamicUnit::scale() noexcept
 {
 	return _scale;
 }
 
 
-inline constexpr DynamicRatio const&
+constexpr DynamicRatio const&
 DynamicUnit::scale() const noexcept
 {
 	return _scale;
 }
 
 
-inline constexpr DynamicRatio&
+constexpr DynamicRatio&
 DynamicUnit::offset() noexcept
 {
 	return _offset;
 }
 
 
-inline constexpr DynamicRatio const&
+constexpr DynamicRatio const&
 DynamicUnit::offset() const noexcept
 {
 	return _offset;
@@ -541,35 +541,35 @@ DynamicUnit::offset() const noexcept
  */
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 operator* (int x, DynamicRatio const& ratio)
 {
 	return DynamicRatio (x * ratio.numerator(), ratio.denominator());
 }
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 operator* (DynamicRatio const& a, DynamicRatio const& b)
 {
 	return DynamicRatio (a.numerator() * b.numerator(), a.denominator() * b.denominator());
 }
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 operator/ (int x, DynamicRatio const& ratio)
 {
 	return x * ratio.inverted();
 }
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 operator/ (DynamicRatio const& ratio, int x)
 {
 	return ratio * DynamicRatio (1, x);
 }
 
 
-inline constexpr DynamicRatio
+constexpr DynamicRatio
 operator/ (DynamicRatio const& a, DynamicRatio const& b)
 {
 	return DynamicRatio (a.numerator() * b.denominator(), a.denominator() * b.numerator());

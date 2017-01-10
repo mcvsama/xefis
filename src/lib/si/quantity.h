@@ -157,7 +157,7 @@ template<class T>
  * Comparing quantity of the same unit, same scaling, same offset.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator== (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> b) noexcept
 	{
@@ -170,7 +170,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator== (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -184,7 +184,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing quantity of the same unit, same scaling, same offset.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator!= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> b) noexcept
 	{
@@ -197,7 +197,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator!= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -211,7 +211,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing quantities of the same unit, same scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator< (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -224,7 +224,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator< (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -238,7 +238,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator< (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 			   ScalarValue b) noexcept
 	{
@@ -250,7 +250,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator< (ScalarValue a,
 			   Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -262,7 +262,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing quantities of the same unit, same scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator> (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -275,7 +275,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator> (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -289,7 +289,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator> (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 			   ScalarValue b) noexcept
 	{
@@ -301,7 +301,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator> (ScalarValue a,
 			   Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -313,7 +313,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing quantities of the same unit, same scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator<= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -326,7 +326,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator<= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -340,7 +340,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator<= (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 				ScalarValue b) noexcept
 	{
@@ -352,7 +352,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator<= (ScalarValue a,
 				Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -364,7 +364,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing quantities of the same unit, same scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr bool
+	constexpr bool
 	operator>= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -377,7 +377,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr bool
+	constexpr bool
 	operator>= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -391,7 +391,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator>= (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 				ScalarValue b) noexcept
 	{
@@ -403,7 +403,7 @@ template<class Scale, class Value, class ScalarValue>
  * Comparing dimensionless quantity with a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr bool
+	constexpr bool
 	operator>= (ScalarValue a,
 				Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -415,7 +415,7 @@ template<class Scale, class Value, class ScalarValue>
  * Adding quantities of the same unit, same scaling and offset = 0.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator+ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -429,7 +429,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr
+	constexpr
 	Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value>
 	operator+ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
@@ -444,7 +444,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Adding dimensionless quantity to a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr Value
+	constexpr Value
 	operator+ (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 			   ScalarValue b) noexcept
 	{
@@ -456,7 +456,7 @@ template<class Scale, class Value, class ScalarValue>
  * Adding dimensionless quantity to a bare scalar.
  */
 template<class Scale, class Value, class ScalarValue>
-	inline constexpr Value
+	constexpr Value
 	operator+ (ScalarValue a,
 			   Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -468,7 +468,7 @@ template<class Scale, class Value, class ScalarValue>
  * Subtracting quantities of the same unit, same scaling and offset = 0.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator- (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -482,7 +482,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>>
-	inline constexpr
+	constexpr
 	Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value>
 	operator- (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
@@ -498,7 +498,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  */
 template<class Scale, class Value, class ScalarValue,
 		 class = std::enable_if_t<!is_quantity<ScalarValue>::value>>
-	inline constexpr Value
+	constexpr Value
 	operator- (Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> a,
 			   ScalarValue b) noexcept
 	{
@@ -511,7 +511,7 @@ template<class Scale, class Value, class ScalarValue,
  */
 template<class Scale, class Value, class ScalarValue,
 		 class = std::enable_if_t<!is_quantity<ScalarValue>::value>>
-	inline constexpr Value
+	constexpr Value
 	operator- (ScalarValue a,
 			   Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, Scale, std::ratio<0>>, Value> b) noexcept
 	{
@@ -528,7 +528,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
 		 class S, class Value,
 		 class = std::enable_if_t<Ea0 != -Eb0 || Ea1 != -Eb1 || Ea2 != -Eb2 || Ea3 != -Eb3 ||
 								  Ea4 != -Eb4 || Ea5 != -Eb5 || Ea6 != -Eb6 || Ea7 != -Eb7>>
-	inline constexpr auto
+	constexpr auto
 	operator* (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -546,7 +546,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>,
 		 class = std::enable_if_t<Ea0 != -Eb0 || Ea1 != -Eb1 || Ea2 != -Eb2 || Ea3 != -Eb3 ||
 								  Ea4 != -Eb4 || Ea5 != -Eb5 || Ea6 != -Eb6 || Ea7 != -Eb7>>
-	inline constexpr auto
+	constexpr auto
 	operator* (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -562,7 +562,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
  * Multiplying mutually-inverse quantities.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value>
-	inline constexpr Value
+	constexpr Value
 	operator* (Quantity<Unit< E0,  E1,  E2,  E3,  E4,  E5,  E6,  E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<-E0, -E1, -E2, -E3, -E4, -E5, -E6, -E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -582,7 +582,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
 		 class S, class Value,
 		 class = std::enable_if_t<Ea0 != Eb0 || Ea1 != Eb1 || Ea2 != Eb2 || Ea3 != Eb3 ||
 								  Ea4 != Eb4 || Ea5 != Eb5 || Ea6 != Eb6 || Ea7 != Eb7>>
-	inline constexpr auto
+	constexpr auto
 	operator/ (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, S, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, S, std::ratio<0>>, Value> b) noexcept
 	{
@@ -600,7 +600,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
 		 class = std::enable_if_t<std::ratio_not_equal<Sa, Sb>::value>,
 		 class = std::enable_if_t<Ea0 != Eb0 || Ea1 != Eb1 || Ea2 != Eb2 || Ea3 != Eb3 ||
 								  Ea4 != Eb4 || Ea5 != Eb5 || Ea6 != Eb6 || Ea7 != Eb7>>
-	inline constexpr auto
+	constexpr auto
 	operator/ (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -616,7 +616,7 @@ template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
  * Dividing same-unit quantities.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value>
-	inline constexpr Value
+	constexpr Value
 	operator/ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
@@ -631,7 +631,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Multiplying quantity by scalar.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
-	inline constexpr auto
+	constexpr auto
 	operator* (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q,
 			   ScalarValue scalar) noexcept
 	{
@@ -643,7 +643,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Multiplying scalar by quantity.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
-	inline constexpr auto
+	constexpr auto
 	operator* (ScalarValue scalar,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
@@ -655,7 +655,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Dividing quantity by scalar.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
-	inline constexpr auto
+	constexpr auto
 	operator/ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q,
 			   ScalarValue scalar) noexcept
 	{
@@ -667,7 +667,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Dividing scalar by quantity.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
-	inline constexpr auto
+	constexpr auto
 	operator/ (ScalarValue scalar,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
@@ -679,7 +679,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Unary + operator.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator+ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> q) noexcept
 	{
 		return q;
@@ -690,7 +690,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Unary - operator.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class O, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator- (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> q) noexcept
 	{
 		return Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, O>, Value> (-q.quantity());
@@ -701,7 +701,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Make quantity from expressions of form: 1.0 * Hertz() -> Quantity<Hertz>()
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator* (Value quantity, Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>) noexcept
 	{
 		return Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> (quantity);
@@ -712,7 +712,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
  * Make quantity from expressions of form: Hertz() * 1.0 -> Quantity<Hertz>()
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
-	inline constexpr auto
+	constexpr auto
 	operator* (Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>> unit, Value quantity) noexcept
 	{
 		return quantity * unit;

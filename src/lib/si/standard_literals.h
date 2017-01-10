@@ -26,13 +26,13 @@ namespace si {
 namespace literals {
 
 #define SI_DEFINE_LITERAL(xUnit, xliteral)			\
-	inline constexpr Quantity<units::xUnit>			\
+	constexpr Quantity<units::xUnit>			\
 	operator"" xliteral (long double value)			\
 	{												\
 		return Quantity<units::xUnit> (value);		\
 	}												\
 													\
-	inline constexpr Quantity<units::xUnit>			\
+	constexpr Quantity<units::xUnit>			\
 	operator"" xliteral (unsigned long long value)	\
 	{												\
 		return Quantity<units::xUnit> (value);		\
