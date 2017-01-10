@@ -56,9 +56,9 @@ template<class T,
  * Return quantity in given units f Q is Quantity type.
  *
  * \throw	UnsupportedUnit
- * 			If unit_str can't be parsed correctly.
+ *			If unit_str can't be parsed correctly.
  * \throw	IncompatibleTypes
- * 			If quantity can't be expressed in given units.
+ *			If quantity can't be expressed in given units.
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
@@ -81,7 +81,7 @@ template<class T,
  * Return quantity in given units if Q is Quantity type.
  *
  * \throw	IncompatibleTypes
- * 			If quantity can't be expressed in given units.
+ *			If quantity can't be expressed in given units.
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
