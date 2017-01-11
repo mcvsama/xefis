@@ -41,7 +41,6 @@ PerformanceComputer::PerformanceComputer (xf::ModuleManager* module_manager, QDo
 	Module (module_manager, config)
 {
 	_airframe = module_manager->xefis()->airframe();
-	_wind_direction_smoother.set_winding ({ 0.0, 360.0 });
 
 	parse_settings (config, {
 		{ "total-energy-variometer.minimum-ias", _total_energy_variometer_min_ias, true },
@@ -202,9 +201,9 @@ PerformanceComputer::compute_wind()
 		wt.set_air_vector (*_speed_tas, *_orientation_heading_true);
 		wt.set_ground_vector (*_speed_gs, *_track_lateral_true);
 		wt.compute_wind_vector();
-		_wind_from_true.write (xf::floored_mod (1_deg * _wind_direction_smoother.process (wt.wind_from().quantity<Degree>(), update_dt), 360_deg));
+		_wind_from_true.write (xf::floored_mod (_wind_direction_smoother (wt.wind_from(), update_dt), 360_deg));
 		_wind_from_magnetic.write (xf::true_to_magnetic (*_wind_from_true, *_magnetic_declination));
-		_wind_tas.write (1_kt * _wind_speed_smoother.process (wt.wind_speed().quantity<Knot>(), update_dt));
+		_wind_tas.write (_wind_speed_smoother (wt.wind_speed(), update_dt));
 	}
 	else
 	{
@@ -281,9 +280,9 @@ PerformanceComputer::compute_total_energy_variometer()
 			Power tev = energy_diff / update_dt;
 
 			// If IAS not in valid range, continue computations but only set output to nil.
-			_total_energy_variometer_smoother.process (tev.quantity<Watt>(), update_dt);
+			_total_energy_variometer_smoother (tev, update_dt);
 			if (*_speed_ias > _total_energy_variometer_min_ias)
-				_total_energy_variometer = 1_W * _total_energy_variometer_smoother.value();
+				_total_energy_variometer = _total_energy_variometer_smoother.value();
 			else
 				_total_energy_variometer.set_nil();
 

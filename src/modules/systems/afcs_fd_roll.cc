@@ -39,8 +39,6 @@ AFCS_FD_Roll::AFCS_FD_Roll (xf::ModuleManager* module_manager, QDomElement const
 		pid->set_winding (true);
 	}
 
-	_output_roll_smoother.set_winding ({ -180.0, +180.0 });
-
 	parse_settings (config, {
 		{ "heading.magnetic.pid.p", _hdg_pid_settings.p, false },
 		{ "heading.magnetic.pid.i", _hdg_pid_settings.i, false },
@@ -164,7 +162,7 @@ AFCS_FD_Roll::compute_roll()
 	}
 
 	if (output_roll)
-		_output_roll.write (1_deg * _output_roll_smoother.process (output_roll->quantity<Degree>(), update_dt));
+		_output_roll.write (_output_roll_smoother (*output_roll, update_dt));
 	else
 	{
 		_output_roll.set_nil();

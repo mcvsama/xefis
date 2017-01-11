@@ -36,8 +36,6 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ModuleManager* module_manager, QDomElement con
 	for (auto* pid: { &_ias_pid, &_mach_pid, &_alt_pid, &_vs_pid, &_fpa_pid })
 		pid->set_i_limit ({ -0.05f, +0.05f });
 
-	_output_pitch_smoother.set_winding ({ -180.0, +180.0 });
-
 	parse_settings (config, {
 		{ "ias.pid.p", _ias_pid_settings.p, false },
 		{ "ias.pid.i", _ias_pid_settings.i, false },
@@ -200,7 +198,7 @@ AFCS_FD_Pitch::compute_pitch()
 	}
 
 	if (output_pitch)
-		_output_pitch.write (1_deg * _output_pitch_smoother.process (output_pitch->quantity<Degree>(), update_dt));
+		_output_pitch.write (_output_pitch_smoother (*output_pitch, update_dt));
 	else
 	{
 		_output_pitch.set_nil();

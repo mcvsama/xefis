@@ -40,7 +40,7 @@ namespace si {
 template<class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
 	constexpr typename Q::Value
-	base_quantity (Q value);
+	base_quantity (Q value) noexcept;
 
 
 /**
@@ -49,11 +49,30 @@ template<class Q,
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
 	constexpr T
-	base_quantity (T value);
+	base_quantity (T value) noexcept;
 
 
 /**
- * Return quantity in given units f Q is Quantity type.
+ * Return quantity in units default for Q if Q is a Quantity type.
+ */
+template<class Q,
+		 class = std::enable_if_t<is_quantity<Q>::value>>
+	constexpr typename Q::Value
+	quantity (Q value) noexcept;
+
+
+/**
+ * Return value argument if T is non-Quantity type.
+ * Overload of quantity() for handling non-Quantity types.
+ */
+template<class T,
+		 class = std::enable_if_t<!is_quantity<T>::value>>
+	constexpr T
+	quantity (T value) noexcept;
+
+
+/**
+ * Return quantity in given units if Q is a Quantity type.
  *
  * \throw	UnsupportedUnit
  *			If unit_str can't be parsed correctly.
@@ -74,11 +93,11 @@ template<class Q,
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
 	constexpr T
-	quantity (T value, std::string const&);
+	quantity (T value, std::string const&) noexcept;
 
 
 /**
- * Return quantity in given units if Q is Quantity type.
+ * Return quantity in given units if Q is a Quantity type.
  *
  * \throw	IncompatibleTypes
  *			If quantity can't be expressed in given units.
@@ -97,7 +116,7 @@ template<class Q,
 template<class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
 	constexpr T
-	quantity (T value, DynamicUnit const& unit);
+	quantity (T value, DynamicUnit const& unit) noexcept;
 
 
 /**
@@ -228,6 +247,14 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 /**
+ * std::isfinite() equivalent
+ */
+template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
+	constexpr bool
+	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
+
+
+/**
  * Convert Radians to Hertz.
  */
 template<class pValue>
@@ -244,13 +271,13 @@ template<class pValue>
 
 
 /*
- * Implmenetations
+ * Implementations
  */
 
 
 template<class Q, class>
 	constexpr typename Q::Value
-	base_quantity (Q value)
+	base_quantity (Q value) noexcept
 	{
 		return value.base_quantity();
 	}
@@ -258,7 +285,23 @@ template<class Q, class>
 
 template<class T, class>
 	constexpr T
-	base_quantity (T value)
+	base_quantity (T value) noexcept
+	{
+		return value;
+	}
+
+
+template<class Q, class>
+	constexpr typename Q::Value
+	quantity (Q value) noexcept
+	{
+		return value.quantity();
+	}
+
+
+template<class T, class>
+	constexpr T
+	quantity (T value) noexcept
 	{
 		return value;
 	}
@@ -274,7 +317,7 @@ template<class Q, class>
 
 template<class T, class>
 	constexpr T
-	quantity (T value, std::string const&)
+	quantity (T value, std::string const&) noexcept
 	{
 		return value;
 	}
@@ -290,7 +333,7 @@ template<class Q, class>
 
 template<class T, class>
 	constexpr T
-	quantity (T value, DynamicUnit const&)
+	quantity (T value, DynamicUnit const&) noexcept
 	{
 		return value;
 	}
@@ -449,6 +492,14 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	}
 
 
+template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value>
+	constexpr bool
+	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
+	{
+		return std::isfinite (q.quantity());
+	}
+
+
 template<class pValue>
 	constexpr Quantity<units::RadianPerSecond, pValue>
 	convert (Quantity<units::Hertz, pValue> frequency)
@@ -469,6 +520,31 @@ template<class pValue>
 		pValue result = (base_value - target_unit.offset().to_floating_point()) / target_unit.scale().to_floating_point();
 		return result;
 	}
+
+
+/**
+ * Functions in this namespace serve to forward calls to the std functions.
+ *
+ * Use like this:
+ *
+ *   using si::forwards_to_std::isfinite;
+ *   using si::isfinite;
+ *
+ *   if (isfinite (x))
+ *       ...
+ *
+ * The above will work for both x being Quantity-type and other types.
+ */
+namespace forwards_to_std {
+
+template<class T>
+	constexpr bool
+	isfinite (T q) noexcept
+	{
+		return std::isfinite (q);
+	}
+
+} // namespace forwards_to_std
 
 } // namespace si
 

@@ -42,7 +42,7 @@ class SmootherBase
 	/**
 	 * Return smoothing time.
 	 */
-	Time
+	si::Time
 	smoothing_time() const noexcept;
 
 	/**
@@ -50,19 +50,19 @@ class SmootherBase
 	 * It's the size of the smoothing window. After that time, output value will reach target value.
 	 */
 	void
-	set_smoothing_time (Time smoothing_time) noexcept;
+	set_smoothing_time (si::Time smoothing_time) noexcept;
 
 	/**
 	 * Return sampling precision.
 	 */
-	Time
+	si::Time
 	precision() const noexcept;
 
 	/**
 	 * Set sampling precision.
 	 */
 	void
-	set_precision (Time precision) noexcept;
+	set_precision (si::Time precision) noexcept;
 
 	/**
 	 * Resets the smoother when the next process() is called,
@@ -79,54 +79,54 @@ class SmootherBase
 	set_smoothing_time_impl (int milliseconds) noexcept = 0;
 
   protected:
-	Time	_smoothing_time;
-	Time	_precision;
-	bool	_invalidate = false;
+	si::Time	_smoothing_time;
+	si::Time	_precision;
+	bool		_invalidate = false;
 };
 
 
 /**
  * Implementation of moving averages.
  */
-template<class tValueType>
+template<class pValue>
 	class Smoother: public SmootherBase
 	{
 	  public:
-		typedef tValueType ValueType;
+		typedef pValue Value;
 
 	  public:
 		// Ctor
-		Smoother (Time smoothing_time = 1_ms, Time precision = 1_ms) noexcept;
+		Smoother (si::Time smoothing_time = 1_ms, si::Time precision = 1_ms) noexcept;
 
 		/**
 		 * Resets smoother to initial state (or given value).
 		 */
 		void
-		reset (ValueType value = ValueType()) noexcept;
-
-		/**
-		 * Enable winding and set valid values range.
-		 */
-		void
-		set_winding (Range<ValueType> range);
+		reset (Value value = Value()) noexcept;
 
 		/**
 		 * Return smoothed sample from given input sample
 		 * and time from last update.
 		 */
-		ValueType
-		process (ValueType s, Time dt) noexcept;
+		Value
+		process (Value s, si::Time dt) noexcept;
+
+		/**
+		 * Alias for process().
+		 */
+		Value
+		operator() (Value s, si::Time dt) noexcept;
 
 		/**
 		 * Return last processed value.
 		 */
-		ValueType
+		Value
 		value() const noexcept;
 
 		/**
 		 * Return most recently pushed sample.
 		 */
-		ValueType
+		Value
 		last_sample() const noexcept;
 
 	  protected:
@@ -134,28 +134,18 @@ template<class tValueType>
 		set_smoothing_time_impl (int milliseconds) noexcept override;
 
 	  private:
-		ValueType
-		encircle (ValueType s) const noexcept;
-
-		ValueType
-		decircle (ValueType s) const noexcept;
-
 		void
 		recompute_window() noexcept;
 
 	  private:
-		Time								_accumulated_dt		= 0_s;
-		ValueType							_z;
-		Range<ValueType>					_winding;
-		bool								_winding_enabled	= false;
-		boost::circular_buffer<ValueType>	_history;
-		boost::circular_buffer<ValueType>	_history_cos;
-		boost::circular_buffer<ValueType>	_history_sin;
-		std::vector<ValueType>				_window;
+		si::Time						_accumulated_dt		= 0_s;
+		Value							_z;
+		boost::circular_buffer<Value>	_history;
+		std::vector<double>				_window;
 	};
 
 
-inline Time
+inline si::Time
 SmootherBase::smoothing_time() const noexcept
 {
 	return _smoothing_time;
@@ -163,7 +153,7 @@ SmootherBase::smoothing_time() const noexcept
 
 
 inline void
-SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
+SmootherBase::set_smoothing_time (si::Time smoothing_time) noexcept
 {
 	_smoothing_time = smoothing_time;
 	int millis = _smoothing_time.quantity<Millisecond>();
@@ -175,7 +165,7 @@ SmootherBase::set_smoothing_time (Time smoothing_time) noexcept
 }
 
 
-inline Time
+inline si::Time
 SmootherBase::precision() const noexcept
 {
 	return _precision;
@@ -183,7 +173,7 @@ SmootherBase::precision() const noexcept
 
 
 inline void
-SmootherBase::set_precision (Time precision) noexcept
+SmootherBase::set_precision (si::Time precision) noexcept
 {
 	_precision = precision;
 	invalidate();
@@ -199,7 +189,7 @@ SmootherBase::invalidate() noexcept
 
 template<class V>
 	inline
-	Smoother<V>::Smoother (Time smoothing_time, Time precision) noexcept
+	Smoother<V>::Smoother (si::Time smoothing_time, si::Time precision) noexcept
 	{
 		set_smoothing_time (smoothing_time);
 		set_precision (precision);
@@ -212,8 +202,6 @@ template<class V>
 	Smoother<V>::set_smoothing_time_impl (int millis) noexcept
 	{
 		_history.resize (millis);
-		_history_cos.resize (millis);
-		_history_sin.resize (millis);
 		_window.resize (millis);
 		recompute_window();
 		invalidate();
@@ -222,37 +210,23 @@ template<class V>
 
 template<class V>
 	inline void
-	Smoother<V>::reset (ValueType value) noexcept
+	Smoother<V>::reset (Value value) noexcept
 	{
 		std::fill (_history.begin(), _history.end(), value);
-		if (_winding_enabled)
-		{
-			std::fill (_history_cos.begin(), _history_cos.end(), std::cos (encircle (value)));
-			std::fill (_history_sin.begin(), _history_sin.end(), std::sin (encircle (value)));
-			_z = floored_mod<ValueType> (_z, _winding.min(), _winding.max());
-		}
-		else
-			_z = value;
+		_z = value;
 	}
 
 
 template<class V>
-	inline void
-	Smoother<V>::set_winding (Range<ValueType> range)
+	inline typename Smoother<V>::Value
+	Smoother<V>::process (Value s, si::Time dt) noexcept
 	{
-		_winding = range;
-		_winding_enabled = true;
-		reset (range.min());
-	}
+		using si::isfinite;
+		using si::forwards_to_std::isfinite;
 
-
-template<class V>
-	inline typename Smoother<V>::ValueType
-	Smoother<V>::process (ValueType s, Time dt) noexcept
-	{
 		_accumulated_dt += dt;
 
-		if (!std::isfinite (s))
+		if (!isfinite (s))
 			return _z;
 
 		if (_invalidate)
@@ -268,49 +242,16 @@ template<class V>
 
 		if (iterations > 1)
 		{
-			if (_winding_enabled)
-			{
-				ValueType p = _history.back();
-				ValueType cos_p = _history_cos.back();
-				ValueType sin_p = _history_sin.back();
-				ValueType rad_s = encircle (s);
-				ValueType cos_s = std::cos (rad_s);
-				ValueType sin_s = std::sin (rad_s);
+			Value p = _history.back();
+			// Linear interpolation:
+			for (int i = 0; i < iterations; ++i)
+				_history.push_back (p + (static_cast<double> (i + 1) / iterations) * (s - p));
 
-				for (int i = 0; i < iterations; ++i)
-				{
-					ValueType d = static_cast<ValueType> (i + 1) / iterations;
-					_history.push_back (p + d * (s - p));
-					_history_cos.push_back (cos_p + d * (cos_s - cos_p));
-					_history_sin.push_back (sin_p + d * (sin_s - sin_p));
-				}
-
-				ValueType x = 0.0;
-				ValueType y = 0.0;
-				for (typename boost::circular_buffer<ValueType>::size_type i = 0; i < _history.size(); ++i)
-				{
-					x += _history_cos[i] * _window[i];
-					y += _history_sin[i] * _window[i];
-				}
-				x /= _history.size() - 1;
-				y /= _history.size() - 1;
-				x *= 2.0;
-				y *= 2.0; // Window energy correction.
-				_z = floored_mod<ValueType> (decircle (std::atan2 (y, x)), _winding.min(), _winding.max());
-			}
-			else
-			{
-				ValueType p = _history.back();
-				// Linear interpolation:
-				for (int i = 0; i < iterations; ++i)
-					_history.push_back (p + (static_cast<ValueType> (i + 1) / iterations) * (s - p));
-
-				_z = 0.0;
-				for (std::size_t i = 0; i < _history.size(); ++i)
-					_z += _history[i] * _window[i];
-				_z /= _history.size() - 1; // Some coeffs are 0 in the window.
-				_z *= 2.0; // Window energy correction.
-			}
+			_z = Value (0.0);
+			for (std::size_t i = 0; i < _history.size(); ++i)
+				_z += _history[i] * _window[i];
+			_z /= _history.size() - 1; // Some coeffs are 0 in the window.
+			_z *= 2.0; // Window energy correction.
 
 			_accumulated_dt = 0_s;
 		}
@@ -320,7 +261,15 @@ template<class V>
 
 
 template<class V>
-	inline typename Smoother<V>::ValueType
+	inline typename Smoother<V>::Value
+	Smoother<V>::operator() (Value s, si::Time dt) noexcept
+	{
+		return process (s, dt);
+	}
+
+
+template<class V>
+	inline typename Smoother<V>::Value
 	Smoother<V>::value() const noexcept
 	{
 		return _z;
@@ -328,26 +277,10 @@ template<class V>
 
 
 template<class V>
-	inline typename Smoother<V>::ValueType
+	inline typename Smoother<V>::Value
 	Smoother<V>::last_sample() const noexcept
 	{
 		return _history.back();
-	}
-
-
-template<class V>
-	inline typename Smoother<V>::ValueType
-	Smoother<V>::encircle (ValueType s) const noexcept
-	{
-		return renormalize (s, _winding, Range<ValueType> (0.0, 2.0 * M_PI));
-	}
-
-
-template<class V>
-	inline typename Smoother<V>::ValueType
-	Smoother<V>::decircle (ValueType s) const noexcept
-	{
-		return renormalize (s, Range<ValueType> (0.0, 2.0 * M_PI), _winding);
 	}
 
 
