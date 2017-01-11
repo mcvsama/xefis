@@ -133,6 +133,14 @@ template<class Number>
 	}
 
 
+template<class Number>
+	inline constexpr Number
+	floored_mod (Number n, Range<Number> range)
+	{
+		return floored_mod (n - range.min(), range.extent()) + range.min();
+	}
+
+
 template<class Value>
 	inline void
 	clamp (Value& value, Value min, Value max) noexcept

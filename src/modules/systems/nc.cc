@@ -39,11 +39,6 @@ NavigationComputer::NavigationComputer (xf::ModuleManager* module_manager, QDomE
 	_positions_accurate_2_times (3),
 	_positions_accurate_9_times (3)
 {
-	_track_lateral_true_smoother.set_winding ({ 0.0, 360.0 });
-	_orientation_heading_magnetic_smoother.set_winding ({ 0.0, 360.0 });
-	_orientation_pitch_smoother.set_winding ({ -180.0, 180.0 });
-	_orientation_roll_smoother.set_winding ({ -180.0, 180.0 });
-
 	// Initialize _positions* with invalid vals, to get them non-empty:
 	for (Positions* positions: { &_positions, &_positions_accurate_2_times, &_positions_accurate_9_times })
 		for (std::size_t i = 0; i < positions->capacity(); ++i)
@@ -241,7 +236,7 @@ NavigationComputer::compute_headings()
 
 	if (_orientation_input_heading_magnetic.valid())
 	{
-		_orientation_heading_magnetic.write (1_deg * _orientation_heading_magnetic_smoother.process ((*_orientation_input_heading_magnetic).quantity<Degree>(), update_dt));
+		_orientation_heading_magnetic.write (_orientation_heading_magnetic_smoother (*_orientation_input_heading_magnetic, update_dt));
 
 		if (_magnetic_declination.valid())
 			_orientation_heading_true.write (xf::magnetic_to_true (*_orientation_heading_magnetic, *_magnetic_declination));
@@ -257,7 +252,7 @@ NavigationComputer::compute_headings()
 
 	// Smoothed pitch:
 	if (_orientation_input_pitch.valid())
-		_orientation_pitch.write (1_deg * _orientation_pitch_smoother.process ((*_orientation_input_pitch).quantity<Degree>(), update_dt));
+		_orientation_pitch.write (_orientation_pitch_smoother (*_orientation_input_pitch, update_dt));
 	else
 	{
 		_orientation_pitch.set_nil();
@@ -266,7 +261,7 @@ NavigationComputer::compute_headings()
 
 	// Smoothed roll:
 	if (_orientation_input_roll.valid())
-		_orientation_roll.write (1_deg * _orientation_roll_smoother.process ((*_orientation_input_roll).quantity<Degree>(), update_dt));
+		_orientation_roll.write (_orientation_roll_smoother (*_orientation_input_roll, update_dt));
 	else
 	{
 		_orientation_roll.set_nil();
@@ -290,11 +285,11 @@ NavigationComputer::compute_track()
 		if (distance > 2.0 * pos_last.lateral_position_stddev)
 		{
 			Length altitude_diff = pos_last.altitude - pos_prev.altitude;
-			_track_vertical.write (1_rad * _track_vertical_smoother.process (std::atan (altitude_diff / distance), update_dt));
+			_track_vertical.write (_track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt));
 
 			Angle initial_true_heading = pos_last.lateral_position.initial_bearing (pos_prev.lateral_position);
 			Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
-			_track_lateral_true.write (1_deg * _track_lateral_true_smoother.process (true_heading.quantity<Degree>(), update_dt));
+			_track_lateral_true.write (_track_lateral_true_smoother (true_heading, update_dt));
 
 			if (_magnetic_declination.valid())
 				_track_lateral_magnetic.write (xf::true_to_magnetic (*_track_lateral_true, *_magnetic_declination));
@@ -312,7 +307,7 @@ NavigationComputer::compute_track()
 	}
 	else
 	{
-		_track_lateral_true_smoother.reset ((*_orientation_heading_true).quantity<Degree>());
+		_track_lateral_true_smoother.reset (*_orientation_heading_true);
 		_track_vertical.set_nil();
 		_track_lateral_true.set_nil();
 		_track_lateral_magnetic.set_nil();
@@ -337,7 +332,7 @@ NavigationComputer::compute_track()
 
 			if (!isinf (rotation_speed) && !isnan (rotation_speed))
 			{
-				rotation_speed = 1_radps * _track_lateral_rotation_smoother.process (rotation_speed.quantity<RadianPerSecond>(), update_dt);
+				rotation_speed = _track_lateral_rotation_smoother (rotation_speed, update_dt);
 				result_rotation_speed = xf::clamped<AngularVelocity> (rotation_speed, convert (-1_Hz), convert (+1_Hz));
 			}
 			else
@@ -362,7 +357,7 @@ NavigationComputer::compute_ground_speed()
 
 		Time dt = pos_last.time - pos_prev.time;
 		Length dl = pos_last.lateral_position.haversine_earth (pos_prev.lateral_position);
-		_track_ground_speed.write (1_kt * _track_ground_speed_smoother.process ((dl / dt).quantity<Knot>(), update_dt));
+		_track_ground_speed.write (_track_ground_speed_smoother (dl / dt, update_dt));
 	}
 	else
 	{

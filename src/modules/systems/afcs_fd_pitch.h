@@ -27,7 +27,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
-#include <xefis/utility/smoother.h>
+#include <xefis/utility/range_smoother.h>
 
 // Local:
 #include "afcs_api.h"
@@ -94,7 +94,7 @@ class AFCS_FD_Pitch: public xf::Module
 	xf::PIDControl<double>				_alt_pid					= { _alt_pid_settings, 0.0 };
 	xf::PIDControl<double>				_vs_pid						= { _vs_pid_settings, 0.0 };
 	xf::PIDControl<double>				_fpa_pid					= { _fpa_pid_settings, 0.0 };
-	xf::Smoother<double>				_output_pitch_smoother		= 2.5_s;
+	xf::RangeSmoother<si::Angle>		_output_pitch_smoother		= { { -180.0_deg, +180.0_deg }, 2.5_s };
 	afcs_api::PitchMode					_pitch_mode					= afcs_api::PitchMode::None;
 	// Input:
 	xf::PropertyBoolean					_autonomous;

@@ -26,7 +26,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/utility/pid_control.h>
-#include <xefis/utility/smoother.h>
+#include <xefis/utility/range_smoother.h>
 
 // Local:
 #include "afcs_api.h"
@@ -85,7 +85,7 @@ class AFCS_FD_Roll: public xf::Module
 	xf::PIDControl<double>::Settings	_trk_pid_settings			= { 1.0, 0.1, 0.0 };
 	xf::PIDControl<double>				_magnetic_hdg_pid			= { _hdg_pid_settings, 0.0 };
 	xf::PIDControl<double>				_magnetic_trk_pid			= { _trk_pid_settings, 0.0 };
-	xf::Smoother<double>				_output_roll_smoother		= 2.5_s;
+	xf::RangeSmoother<si::Angle>		_output_roll_smoother		= { { -180.0_deg, +180.0_deg }, 2.5_s };
 	afcs_api::RollMode					_roll_mode					= afcs_api::RollMode::None;
 	// Input:
 	xf::PropertyBoolean					_autonomous;

@@ -23,28 +23,28 @@
 
 namespace xf {
 
-template<class tType>
+template<class pValue>
 	class Lookahead
 	{
 	  public:
-		typedef tType Type;
+		typedef pValue Value;
 
 	  public:
 		// Ctor:
-		explicit Lookahead (Time lookahead_time) noexcept;
+		explicit Lookahead (si::Time lookahead_time) noexcept;
 
 		/**
 		 * Set lookahead time.
 		 */
 		void
-		set_lookahead_time (Time) noexcept;
+		set_lookahead_time (si::Time) noexcept;
 
 		/**
 		 * Don't compute new result until given time
 		 * has passed.
 		 */
 		void
-		set_minimum_integration_time (Time) noexcept;
+		set_minimum_integration_time (si::Time) noexcept;
 
 		/**
 		 * Mark value as invalid and reset computations
@@ -56,54 +56,60 @@ template<class tType>
 		/**
 		 * Process new input sample, taken after dt time.
 		 */
-		Type
-		process (Type input, Time dt) noexcept;
+		Value
+		process (Value input, si::Time dt) noexcept;
+
+		/**
+		 * Alias for process().
+		 */
+		Value
+		operator() (Value input, si::Time dt) noexcept;
 
 	  private:
-		Time	_lookahead_time;
-		Time	_time						= 0_s;
-		Time	_minimum_integration_time	= 0_s;
-		Type	_last_input;
-		Type	_last_output;
-		bool	_invalidate					= false;
+		si::Time	_lookahead_time;
+		si::Time	_time						= 0_s;
+		si::Time	_minimum_integration_time	= 0_s;
+		Value		_last_input;
+		Value		_last_output;
+		bool		_invalidate					= false;
 	};
 
 
-template<class T>
+template<class V>
 	inline
-	Lookahead<T>::Lookahead (Time lookahead_time) noexcept:
+	Lookahead<V>::Lookahead (si::Time lookahead_time) noexcept:
 		_lookahead_time (lookahead_time)
 	{ }
 
 
-template<class T>
+template<class V>
 	inline void
-	Lookahead<T>::set_lookahead_time (Time lookahead_time) noexcept
+	Lookahead<V>::set_lookahead_time (si::Time lookahead_time) noexcept
 	{
 		_lookahead_time = lookahead_time;
 		invalidate();
 	}
 
 
-template<class T>
+template<class V>
 	inline void
-	Lookahead<T>::set_minimum_integration_time (Time time) noexcept
+	Lookahead<V>::set_minimum_integration_time (si::Time time) noexcept
 	{
 		_minimum_integration_time = time;
 	}
 
 
-template<class T>
+template<class V>
 	inline void
-	Lookahead<T>::invalidate() noexcept
+	Lookahead<V>::invalidate() noexcept
 	{
 		_invalidate = true;
 	}
 
 
-template<class T>
-	inline typename Lookahead<T>::Type
-	Lookahead<T>::process (Type input, Time dt) noexcept
+template<class V>
+	inline typename Lookahead<V>::Value
+	Lookahead<V>::process (Value input, si::Time dt) noexcept
 	{
 		_time += dt;
 
@@ -122,6 +128,14 @@ template<class T>
 		}
 
 		return _last_output;
+	}
+
+
+template<class V>
+	inline typename Lookahead<V>::Value
+	Lookahead<V>::operator() (Value input, si::Time dt) noexcept
+	{
+		return process (input, dt);
 	}
 
 } // namespace xf
