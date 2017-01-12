@@ -123,7 +123,7 @@ template<class pUnit, class pValue = double>
 		 */
 		template<class OtherScale, class OtherOffset>
 			constexpr
-			operator Quantity<si::Unit<pUnit::E0, Unit::E1, Unit::E2, Unit::E3, Unit::E4, Unit::E5, Unit::E6, Unit::E7, OtherScale, OtherOffset>, Value>() const noexcept
+			operator Quantity<si::Unit<Unit::E0, Unit::E1, Unit::E2, Unit::E3, Unit::E4, Unit::E5, Unit::E6, Unit::E7, OtherScale, OtherOffset>, Value>() const noexcept
 			{
 				auto result = (base_quantity() - to_fp<OtherOffset>()) / to_fp<OtherScale>();
 
@@ -725,7 +725,90 @@ namespace std {
 
 template<class pUnit, class pValue>
 	class numeric_limits<si::Quantity<pUnit, pValue>>: public numeric_limits<typename si::Quantity<pUnit, pValue>::Value>
-	{ };
+	{
+		typedef si::Quantity<pUnit, pValue>	Quantity;
+		typedef typename Quantity::Value	Value;
+
+	  public:
+		static constexpr bool is_specialized		= true;
+		static constexpr auto is_signed				= numeric_limits<Value>::is_signed;
+		static constexpr auto is_integer			= numeric_limits<Value>::is_integer;
+		static constexpr auto is_exact				= numeric_limits<Value>::is_exact;
+		static constexpr auto has_infinity			= numeric_limits<Value>::has_infinity;
+		static constexpr auto has_quiet_NaN			= numeric_limits<Value>::has_quiet_NaN;
+		static constexpr auto has_signaling_NaN		= numeric_limits<Value>::has_signaling_NaN;
+		static constexpr auto has_denorm			= numeric_limits<Value>::has_denorm;
+		static constexpr auto has_denorm_loss		= numeric_limits<Value>::has_denorm_loss;
+		static constexpr auto round_style			= numeric_limits<Value>::round_style;
+		static constexpr auto is_iec559				= numeric_limits<Value>::is_iec559;
+		static constexpr auto is_bounded			= numeric_limits<Value>::is_bounded;
+		static constexpr auto is_modulo				= numeric_limits<Value>::is_modulo;
+		static constexpr auto digits				= numeric_limits<Value>::digits;
+		static constexpr auto digits10				= numeric_limits<Value>::digits10;
+		static constexpr auto max_digits10			= numeric_limits<Value>::max_digits10;
+		static constexpr auto radix					= numeric_limits<Value>::radix;
+		static constexpr auto min_exponent			= numeric_limits<Value>::min_exponent;
+		static constexpr auto min_exponent10		= numeric_limits<Value>::min_exponent10;
+		static constexpr auto max_exponent			= numeric_limits<Value>::max_exponent;
+		static constexpr auto max_exponent10		= numeric_limits<Value>::max_exponent10;
+		static constexpr auto traps					= numeric_limits<Value>::traps;
+		static constexpr auto tinyness_before		= numeric_limits<Value>::tinyness_before;
+
+	  public:
+		static constexpr Quantity
+		min()
+		{
+			return Quantity (numeric_limits<Value>::min());
+		}
+
+		static constexpr Quantity
+		lowest()
+		{
+			return Quantity (numeric_limits<Value>::lowest());
+		}
+
+		static constexpr Quantity
+		max()
+		{
+			return Quantity (numeric_limits<Value>::max());
+		}
+
+		static constexpr Quantity
+		epsilon()
+		{
+			return Quantity (numeric_limits<Value>::epsilon());
+		}
+
+		static constexpr Quantity
+		round_error()
+		{
+			return Quantity (numeric_limits<Value>::round_error());
+		}
+
+		static constexpr Quantity
+		infinity()
+		{
+			return Quantity (numeric_limits<Value>::infinity());
+		}
+
+		static constexpr Quantity
+		quiet_NaN()
+		{
+			return Quantity (numeric_limits<Value>::quiet_NaN());
+		}
+
+		static constexpr Quantity
+		signalling_NaN()
+		{
+			return Quantity (numeric_limits<Value>::signalling_NaN());
+		}
+
+		static constexpr Quantity
+		denorm_min()
+		{
+			return Quantity (numeric_limits<Value>::denorm_min());
+		}
+	};
 
 } // namespace std
 
