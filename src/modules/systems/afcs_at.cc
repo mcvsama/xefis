@@ -21,6 +21,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/range.h>
 
 // Local:
 #include "afcs_at.h"
@@ -30,10 +31,9 @@ XEFIS_REGISTER_MODULE_CLASS ("systems/afcs-at", AFCS_AT)
 
 
 AFCS_AT::AFCS_AT (xf::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config),
-	_ias_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0)
+	Module (module_manager, config)
 {
-	_ias_pid.set_i_limit ({ -0.05f, +0.05f });
+	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });
 
 	parse_settings (config, {
 		{ "output.thrust.minimum", _output_thrust_minimum, true },
@@ -41,7 +41,6 @@ AFCS_AT::AFCS_AT (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "ias.pid.p", _ias_pid_p, false },
 		{ "ias.pid.i", _ias_pid_i, false },
 		{ "ias.pid.d", _ias_pid_d, false },
-		{ "ias-to-thrust-scale", _ias_to_thrust_scale, false },
 	});
 
 	parse_properties (config, {
@@ -56,13 +55,12 @@ AFCS_AT::AFCS_AT (xf::ModuleManager* module_manager, QDomElement const& config):
 	// Extents:
 	_output_thrust_extent = { _output_thrust_minimum, _output_thrust_maximum };
 	// Update PID params according to settings:
-	_ias_pid.set_pid (_ias_pid_p, _ias_pid_i, _ias_pid_d);
-	_ias_pid.set_output_smoothing (true, 250_ms);
+	_ias_pid.set_pid ({ _ias_pid_p, _ias_pid_i, _ias_pid_d });
 
 	_thrust_computer.set_minimum_dt (5_ms);
 	_thrust_computer.set_callback (std::bind (&AFCS_AT::compute_thrust, this));
 	_thrust_computer.add_depending_smoothers ({
-		&_ias_pid.output_smoother(),
+		&_ias_pid_smoother,
 	});
 	_thrust_computer.observe ({
 		&_cmd_speed_mode,
@@ -86,7 +84,7 @@ void
 AFCS_AT::compute_thrust()
 {
 	bool disengage = false;
-	AngularVelocity computed_thrust = 0.0_rpm;
+	si::Force computed_thrust = 0.0_N;
 	Time dt = _thrust_computer.update_dt();
 
 	if (_cmd_speed_mode.fresh())
@@ -105,16 +103,17 @@ AFCS_AT::compute_thrust()
 			if (_cmd_ias.is_nil() || _measured_ias.is_nil())
 			{
 				_ias_pid.reset();
+				_ias_pid_smoother.reset();
 				disengage = true;
 			}
 			else
 			{
 				// This is more tricky, since we measure IAS, but control thrust.
 				// There's no 1:1 correlaction between them.
-				_ias_pid.set_target (_cmd_ias->quantity<Knot>());
-				_ias_pid.process (_measured_ias->quantity<Knot>(), dt);
-				computed_thrust = 1_rpm * xf::clamped (_ias_pid.output() / _ias_to_thrust_scale, -1.0, 1.0);
-				computed_thrust = xf::renormalize (computed_thrust.quantity<RotationPerMinute>(), xf::Range<double> (-1.0, 1.0), _output_thrust_extent);
+				// TODO use _ias_pid.set_output_limit (...);
+				computed_thrust = xf::clamped (_ias_pid_smoother (_ias_pid (*_cmd_ias, *_measured_ias, dt), dt), _output_thrust_extent);
+				// TODO make PID control the change rate of thrust, not the thrust directly. Maybe incorporate
+				// something into the PIDControl object itself? Or create another function-like class.
 			}
 			break;
 

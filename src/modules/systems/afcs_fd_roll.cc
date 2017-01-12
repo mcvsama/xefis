@@ -35,7 +35,7 @@ AFCS_FD_Roll::AFCS_FD_Roll (xf::ModuleManager* module_manager, QDomElement const
 {
 	for (auto* pid: { &_magnetic_hdg_pid, &_magnetic_trk_pid })
 	{
-		pid->set_i_limit ({ -0.05f, +0.05f });
+		pid->set_integral_limit ({ -0.05_s, +0.05_s });
 		pid->set_winding (true);
 	}
 

@@ -59,27 +59,24 @@ class AFCS_AP: public xf::Module
 
   private:
 	// Stabilizer PIDs:
-	xf::PIDControl<double>	_elevator_pid;
-	xf::PIDControl<double>	_ailerons_pid;
-	xf::Smoother<double>	_elevator_smoother		= Time (50_ms);
-	xf::Smoother<double>	_ailerons_smoother		= Time (50_ms);
+	xf::PIDControl<double>	_elevator_pid; // TODO <Angle, Angle> // <pitch, elevator_deflection>
+	xf::PIDControl<double>	_ailerons_pid; // TODO <Angle, Angle> // <roll, ailerons_deflection>
+	xf::Smoother<double>	_elevator_smoother		{ 50_ms };
+	xf::Smoother<double>	_ailerons_smoother		{ 50_ms };
 	// Settings:
 	double					_stabilization_gain;
 	double					_pitch_gain;
 	double					_pitch_p;
 	double					_pitch_i;
 	double					_pitch_d;
-	double					_pitch_error_power;
 	double					_roll_gain;
 	double					_roll_p;
 	double					_roll_i;
 	double					_roll_d;
-	double					_roll_error_power;
 	double					_yaw_gain;
 	double					_yaw_p;
 	double					_yaw_i;
 	double					_yaw_d;
-	double					_yaw_error_power;
 	// Input:
 	xf::PropertyAngle		_input_pitch;
 	xf::PropertyAngle		_input_roll;
