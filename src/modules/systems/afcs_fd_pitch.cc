@@ -34,7 +34,7 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (xf::ModuleManager* module_manager, QDomElement con
 	Module (module_manager, config)
 {
 	for (auto* pid: { &_ias_pid, &_mach_pid, &_alt_pid, &_vs_pid, &_fpa_pid })
-		pid->set_i_limit ({ -0.05f, +0.05f });
+		pid->set_integral_limit ({ -0.05_s, +0.05_s });
 
 	parse_settings (config, {
 		{ "ias.pid.p", _ias_pid_settings.p, false },

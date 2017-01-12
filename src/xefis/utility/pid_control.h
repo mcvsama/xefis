@@ -22,44 +22,48 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/range.h>
-#include <xefis/utility/smoother.h>
 
 
 namespace xf {
 
 /**
  * Proportional-Integral-Derivative controller.
+ *
+ * \param	pValue
+ *			Type of set and measured quantity.
+ * \param	pControl
+ *			Type of output value used to control the measured quantity. Default - same as pValue.
+ * \param	pParam
+ *			Floating-point type for internal computations, default is double.
+ *
  * TODO safety functions: limit derivative or something so it's not 0/nan/inf and the result is limited to certain range.
  * TODO protect from infs and nans
  */
-template<class tValueType>
+template<class pValue, class pControl = pValue, class pParam = double>
 	class PIDControl
 	{
 	  public:
-		typedef tValueType ValueType;
-		typedef double ParamType;
+		using Value			= pValue;
+		using Control		= pControl;
+		using Param			= pParam;
+
+		using Integral		= decltype (std::declval<Value>() * std::declval<si::Time>());
+		using Derivative	= decltype (std::declval<Value>() / std::declval<si::Time>());
 
 		class Settings
 		{
 		  public:
-			ValueType	p;
-			ValueType	i;
-			ValueType	d;
+			Param	p;
+			Param	i;
+			Param	d;
 		};
 
 	  public:
 		// Ctor
-		PIDControl (Settings const& settings, ValueType target);
+		PIDControl (Settings const& settings, Value target);
 
 		// Ctor
-		PIDControl (ParamType p, ParamType i, ParamType d, ValueType target);
-
-		/**
-		 * Enable/disable output smoothing.
-		 * When enabling, smoothing_time is used to configure internal output smoother.
-		 */
-		void
-		set_output_smoothing (bool enable, Time smoothing_time = 0_s);
+		PIDControl (Param p, Param i, Param d, Value target);
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
@@ -72,38 +76,38 @@ template<class tValueType>
 		/**
 		 * Get P parameter.
 		 */
-		ParamType
+		Param
 		p() const noexcept;
 
 		/**
 		 * Set P parameter.
 		 */
 		void
-		set_p (ParamType p) noexcept;
+		set_p (Param p) noexcept;
 
 		/**
 		 * Get I parameter.
 		 */
-		ParamType
+		Param
 		i() const noexcept;
 
 		/**
 		 * Set I parameter.
 		 */
 		void
-		set_i (ParamType i) noexcept;
+		set_i (Param i) noexcept;
 
 		/**
 		 * Get D parameter.
 		 */
-		ParamType
+		Param
 		d() const noexcept;
 
 		/**
 		 * Set D parameter.
 		 */
 		void
-		set_d (ParamType d) noexcept;
+		set_d (Param d) noexcept;
 
 		/**
 		 * Set P, I and D at once.
@@ -112,83 +116,90 @@ template<class tValueType>
 		set_pid (Settings const& settings) noexcept;
 
 		/**
-		 * Set P, I and D at once.
-		 */
-		void
-		set_pid (ParamType p, ParamType i, ParamType d) noexcept;
-
-		/**
 		 * Return overall gain of all three parameters.
 		 */
-		ParamType
+		Param
 		gain() const noexcept;
 
 		/**
 		 * Set overall gain for all three paramters.
 		 */
 		void
-		set_gain (ParamType gain) noexcept;
-
-		/**
-		 * Get power of proportional error.
-		 */
-		ParamType
-		error_power() const noexcept;
-
-		/**
-		 * Set power of proportional error.
-		 */
-		void
-		set_error_power (ParamType) noexcept;
+		set_gain (Param gain) noexcept;
 
 		/**
 		 * I (integral) parameter limit.
 		 */
-		Range<ValueType>
-		i_limit() const noexcept;
+		Optional<Range<Integral>>
+		integral_limit() const noexcept;
 
 		/**
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_i_limit (Range<ValueType> limit) noexcept;
+		set_integral_limit (Range<Integral> limit) noexcept;
+
+		/**
+		 * Set I (integral) parameter limit.
+		 */
+		void
+		set_integral_limit (Optional<Range<Integral>> limit) noexcept;
 
 		/**
 		 * Output limit.
 		 */
-		Range<ValueType>
+		Range<Control>
 		output_limit() const noexcept;
 
 		/**
 		 * Set output limit.
 		 */
 		void
-		set_output_limit (Range<ValueType> limit) noexcept;
+		set_output_limit (Range<Control> limit) noexcept;
 
 		/**
 		 * Set target value. Set target value. If winding is enabled,
 		 * then the target should be normalized to [-1..1].
 		 */
 		void
-		set_target (ValueType target) noexcept;
+		set_target (Value target) noexcept;
 
 		/**
 		 * Process value for given dt (timespan) and return new value.
 		 * Input value should be normalized to [-1..1].
 		 */
-		ValueType
-		process (ValueType input, Time dt) noexcept;
+		Control
+		process (Value measured, si::Time dt) noexcept;
+
+		/**
+		 * Same as process (Value, Time), but also provide target value to be set.
+		 */
+		Control
+		process (Value target, Value measured, Time dt) noexcept;
+
+		/**
+		 * Alias for process().
+		 */
+		Control
+		operator() (Value input, Time dt) noexcept;
+
+		/**
+		 * Alias for process().
+		 */
+		Control
+		operator() (Value target, Value measured, Time dt) noexcept;
 
 		/**
 		 * Return current controller output value.
+		 * TODO change to value() to be compatible with Smoother/RangeSmoother
 		 */
-		ValueType
+		Control
 		output() const noexcept;
 
 		/**
 		 * Return error value.
 		 */
-		ValueType
+		Value
 		error() const noexcept;
 
 		/**
@@ -197,40 +208,25 @@ template<class tValueType>
 		void
 		reset() noexcept;
 
-		/**
-		 * Return internal output smoother.
-		 */
-		Smoother<ValueType>&
-		output_smoother() noexcept;
-
-		/**
-		 * Return internal output smoother.
-		 */
-		Smoother<ValueType> const&
-		output_smoother() const noexcept;
-
 	  private:
-		bool				_winding					= false;
-		bool				_output_smoothing_enabled	= false;
-		Smoother<ValueType>	_output_smoother			= Time (1_ms);
-		ValueType			_target						= ValueType();
-		ValueType			_output						= ValueType();
-		ValueType			_previous_error				= ValueType();
-		ValueType			_integral					= ValueType();
-		ValueType			_derivative					= ValueType();
-		ParamType			_p							= 0.0;
-		ParamType			_i							= 0.0;
-		Range<ValueType>	_i_limit					= { -1.0, +1.0 };
-		ParamType			_d							= 0.0;
-		ParamType			_gain						= 1.0;
-		ParamType			_error_power				= 1.0;
-		Range<ValueType>	_output_limit				= { -std::numeric_limits<ValueType>::max(), std::numeric_limits<ValueType>::max() };
+		bool						_winding					= false;
+		Value						_target						{ };
+		Value						_previous_error				{ };
+		Integral					_integral					{ };
+		Derivative					_derivative					{ };
+		Param						_p							= 0.0;
+		Param						_i							= 0.0;
+		Optional<Range<Integral>>	_integral_limit;
+		Param						_d							= 0.0;
+		Param						_gain						= 1.0;
+		Control						_output						{ };
+		Range<Control>				_output_limit				{ -std::numeric_limits<Control>::max(), std::numeric_limits<Control>::max() };
 	};
 
 
-template<class T>
+template<class V, class C, class P>
 	inline
-	PIDControl<T>::PIDControl (Settings const& settings, ValueType target):
+	PIDControl<V, C, P>::PIDControl (Settings const& settings, Value target):
 		_target (target),
 		_p (settings.p),
 		_i (settings.i),
@@ -240,9 +236,9 @@ template<class T>
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline
-	PIDControl<T>::PIDControl (ParamType p, ParamType i, ParamType d, ValueType target):
+	PIDControl<V, C, P>::PIDControl (Param p, Param i, Param d, Value target):
 		_target (target),
 		_p (p),
 		_i (i),
@@ -252,75 +248,65 @@ template<class T>
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_output_smoothing (bool enable, Time smoothing_time)
-	{
-		_output_smoothing_enabled = enable;
-		if (enable)
-			_output_smoother.set_smoothing_time (smoothing_time);
-	}
-
-
-template<class T>
-	inline void
-	PIDControl<T>::set_winding (bool winding)
+	PIDControl<V, C, P>::set_winding (bool winding)
 	{
 		_winding = winding;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ParamType
-	PIDControl<T>::p() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Param
+	PIDControl<V, C, P>::p() const noexcept
 	{
 		return _p;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_p (ParamType p) noexcept
+	PIDControl<V, C, P>::set_p (Param p) noexcept
 	{
 		_p = p;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ParamType
-	PIDControl<T>::i() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Param
+	PIDControl<V, C, P>::i() const noexcept
 	{
 		return _i;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_i (ParamType i) noexcept
+	PIDControl<V, C, P>::set_i (Param i) noexcept
 	{
 		_i = i;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ParamType
-	PIDControl<T>::d() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Param
+	PIDControl<V, C, P>::d() const noexcept
 	{
 		return _d;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_d (ParamType d) noexcept
+	PIDControl<V, C, P>::set_d (Param d) noexcept
 	{
 		_d = d;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_pid (Settings const& settings) noexcept
+	PIDControl<V, C, P>::set_pid (Settings const& settings) noexcept
 	{
 		_p = settings.p;
 		_i = settings.i;
@@ -328,159 +314,157 @@ template<class T>
 	}
 
 
-template<class T>
-	inline void
-	PIDControl<T>::set_pid (ParamType p, ParamType i, ParamType d) noexcept
-	{
-		_p = p;
-		_i = i;
-		_d = d;
-	}
-
-
-template<class T>
-	inline typename PIDControl<T>::ParamType
-	PIDControl<T>::gain() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Param
+	PIDControl<V, C, P>::gain() const noexcept
 	{
 		return _gain;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_gain (ParamType gain) noexcept
+	PIDControl<V, C, P>::set_gain (Param gain) noexcept
 	{
 		_gain = gain;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ParamType
-	PIDControl<T>::error_power() const noexcept
+template<class V, class C, class P>
+	inline Optional<Range<typename PIDControl<V, C, P>::Integral>>
+	PIDControl<V, C, P>::integral_limit() const noexcept
 	{
-		return _error_power;
+		return _integral_limit;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_error_power (ParamType power) noexcept
+	PIDControl<V, C, P>::set_integral_limit (Range<Integral> limit) noexcept
 	{
-		_error_power = power;
+		_integral_limit = limit;
 	}
 
 
-template<class T>
-	inline Range<typename PIDControl<T>::ValueType>
-	PIDControl<T>::i_limit() const noexcept
-	{
-		return _i_limit;
-	}
-
-
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_i_limit (Range<ValueType> limit) noexcept
+	PIDControl<V, C, P>::set_integral_limit (Optional<Range<Integral>> limit) noexcept
 	{
-		_i_limit = limit;
+		_integral_limit = limit;
 	}
 
 
-template<class T>
-	inline Range<typename PIDControl<T>::ValueType>
-	PIDControl<T>::output_limit() const noexcept
+template<class V, class C, class P>
+	inline Range<typename PIDControl<V, C, P>::Control>
+	PIDControl<V, C, P>::output_limit() const noexcept
 	{
 		return _output_limit;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_output_limit (Range<ValueType> limit) noexcept
+	PIDControl<V, C, P>::set_output_limit (Range<Control> limit) noexcept
 	{
 		_output_limit = limit;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::set_target (ValueType target) noexcept
+	PIDControl<V, C, P>::set_target (Value target) noexcept
 	{
 		_target = target;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ValueType
-	PIDControl<T>::process (ValueType measured_value, Time dt) noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Control
+	PIDControl<V, C, P>::process (Value measured, Time dt) noexcept
 	{
-		ValueType error;
+		using si::isfinite;
+		using si::forwards_to_std::isfinite;
+		using si::abs;
+		using std::abs;
+
+		Value error;
+
 		if (_winding)
 		{
-			error = clamped<ValueType> (_target - measured_value, -2.0, +2.0);
-			if (std::abs (error) > 1.0)
-				error = error - sgn (error) * 2.0;
+			// TODO do it better
+			error = clamped<Value> (_target - measured, Value (-2.0), Value (+2.0));
+			if (abs (error) > Value (1.0))
+				error = error - sgn (error) * Value (2.0);
 		}
 		else
-			error = _target - measured_value;
-		_integral += error * dt.quantity<Second>();
-		clamp<ParamType> (_integral, _i_limit);
-		_derivative = (error - _previous_error) / dt.quantity<Second>();
-		if (!std::isfinite (_derivative))
-			_derivative = 0.0;
-		_output = clamped<ValueType> (_gain * (_p * sgn (error) * std::pow<ValueType> (std::abs (error), _error_power) +
-											   _i * _integral +
-											   _d * _derivative),
-									  _output_limit);
-		_previous_error = error;
+			error = _target - measured;
 
-		if (_output_smoothing_enabled)
-			_output = _output_smoother.process (_output, dt);
+		// I:
+		_integral += error * dt;
+		if (_integral_limit)
+			clamp (_integral, *_integral_limit);
+		// D:
+		_derivative = (error - _previous_error) / dt;
+		if (!si::isfinite (_derivative))
+			_derivative = Derivative();
+		// P and the rest:
+		auto computed = _gain * (_p * error + _i * _integral / 1_s + _d * _derivative * 1_s);
+		_output = clamped<Control> (Control (si::quantity (computed)), _output_limit);
+		_previous_error = error;
 
 		return _output;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ValueType
-	PIDControl<T>::output() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Control
+	PIDControl<V, C, P>::process (Value target, Value measured, Time dt) noexcept
+	{
+		set_target (target);
+		return process (measured, dt);
+	}
+
+
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Control
+	PIDControl<V, C, P>::operator() (Value measured, Time dt) noexcept
+	{
+		return process (measured, dt);
+	}
+
+
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Control
+	PIDControl<V, C, P>::operator() (Value target, Value measured, Time dt) noexcept
+	{
+		return process (target, measured, dt);
+	}
+
+
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Control
+	PIDControl<V, C, P>::output() const noexcept
 	{
 		return _output;
 	}
 
 
-template<class T>
-	inline typename PIDControl<T>::ValueType
-	PIDControl<T>::error() const noexcept
+template<class V, class C, class P>
+	inline typename PIDControl<V, C, P>::Value
+	PIDControl<V, C, P>::error() const noexcept
 	{
 		return _previous_error;
 	}
 
 
-template<class T>
+template<class V, class C, class P>
 	inline void
-	PIDControl<T>::reset() noexcept
+	PIDControl<V, C, P>::reset() noexcept
 	{
-		_output = ValueType();
-		_previous_error = ValueType();
-		_integral = ValueType();
-		_derivative = ValueType();
-	}
-
-
-template<class T>
-	inline Smoother<typename PIDControl<T>::ValueType>&
-	PIDControl<T>::output_smoother() noexcept
-	{
-		return _output_smoother;
-	}
-
-
-template<class T>
-	inline Smoother<typename PIDControl<T>::ValueType> const&
-	PIDControl<T>::output_smoother() const noexcept
-	{
-		return _output_smoother;
+		_output = Control();
+		_previous_error = Value();
+		_integral = Integral();
+		_derivative = Derivative();
 	}
 
 } // namespace xf

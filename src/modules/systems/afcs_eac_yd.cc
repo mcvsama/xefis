@@ -42,9 +42,9 @@ AFCS_EAC_YD::AFCS_EAC_YD (xf::ModuleManager* module_manager, QDomElement const& 
 		{ "output.rudder", _output_rudder, true },
 	});
 
-	_rudder_pid.set_pid (_rudder_p, _rudder_i, _rudder_d);
+	_rudder_pid.set_pid ({ _rudder_p, _rudder_i, _rudder_d });
 	_rudder_pid.set_gain (_rudder_gain);
-	_rudder_pid.set_i_limit ({ -0.1f, +0.1f });
+	_rudder_pid.set_integral_limit ({ -0.1_s, +0.1_s });
 	_rudder_pid.set_output_limit ({ -_limit, +_limit });
 
 	_rudder_computer.set_callback (std::bind (&AFCS_EAC_YD::compute, this));

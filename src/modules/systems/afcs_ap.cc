@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/range.h>
 
 // Local:
 #include "afcs_ap.h"
@@ -39,17 +40,14 @@ AFCS_AP::AFCS_AP (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "pitch-p", _pitch_p, true },
 		{ "pitch-i", _pitch_i, true },
 		{ "pitch-d", _pitch_d, true },
-		{ "pitch-error-power", _pitch_error_power, true },
 		{ "roll-gain", _roll_gain, true },
 		{ "roll-p", _roll_p, true },
 		{ "roll-i", _roll_i, true },
 		{ "roll-d", _roll_d, true },
-		{ "roll-error-power", _roll_error_power, true },
 		{ "yaw-gain", _yaw_gain, true },
 		{ "yaw-p", _yaw_p, true },
 		{ "yaw-i", _yaw_i, true },
 		{ "yaw-d", _yaw_d, true },
-		{ "yaw-error-power", _yaw_error_power, true },
 	});
 
 	parse_properties (config, {
@@ -66,16 +64,14 @@ AFCS_AP::AFCS_AP (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "output.ailerons", _output_ailerons, true },
 	});
 
-	_elevator_pid.set_pid (_pitch_p, _pitch_i, _pitch_d);
+	_elevator_pid.set_pid ({ _pitch_p, _pitch_i, _pitch_d });
 	_elevator_pid.set_gain (_pitch_gain * _stabilization_gain);
-	_elevator_pid.set_i_limit ({ -0.1f, +0.1f });
-	_elevator_pid.set_error_power (_pitch_error_power);
+	_elevator_pid.set_integral_limit ({ -0.1_s, +0.1_s });
 	_elevator_pid.set_winding (true);
 
-	_ailerons_pid.set_pid (_roll_p, _roll_i, _roll_d);
+	_ailerons_pid.set_pid ({ _roll_p, _roll_i, _roll_d });
 	_ailerons_pid.set_gain (_roll_gain * _stabilization_gain);
-	_ailerons_pid.set_i_limit ({ -0.1f, +0.1f });
-	_ailerons_pid.set_error_power (_roll_error_power);
+	_ailerons_pid.set_integral_limit ({ -0.1_s, +0.1_s });
 	_ailerons_pid.set_winding (true);
 
 	_ap_computer.set_minimum_dt (5_ms);

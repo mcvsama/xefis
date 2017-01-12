@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <utility>
 
 // Qt:
 #include <QtXml/QDomElement>
@@ -55,27 +56,25 @@ class AFCS_AT: public xf::Module
 	speed_mode_changed();
 
   private:
-	SpeedMode				_speed_mode				= SpeedMode::None;
-	AngularVelocity			_output_thrust_minimum	= 0.0_rpm; // TODO Force
-	AngularVelocity			_output_thrust_maximum	= 1.0_rpm; // TODO Force
-	double					_ias_pid_p				= 1.0;
-	double					_ias_pid_i				= 0.1;
-	double					_ias_pid_d				= 0.0;
-	double					_ias_to_thrust_scale	= 1.0;
-	xf::PIDControl<double>	_ias_pid;
-	xf::Range<AngularVelocity>
-							_output_thrust_extent;
+	SpeedMode					_speed_mode				= SpeedMode::None;
+	si::Force					_output_thrust_minimum	= 0.0_N;
+	si::Force					_output_thrust_maximum	= 1.0_N;
+	double						_ias_pid_p				= 1.0;
+	double						_ias_pid_i				= 0.1;
+	double						_ias_pid_d				= 0.0;
+	xf::PIDControl<si::Velocity, si::Force>
+								_ias_pid				{ _ias_pid_p, _ias_pid_i, _ias_pid_d, 0.0_kt };
+	xf::Smoother<si::Force>		_ias_pid_smoother		{ 250_ms };
+	xf::Range<si::Force>		_output_thrust_extent;
 	// Input:
-	xf::PropertyInteger		_cmd_speed_mode;
-	xf::Property<AngularVelocity>
-							_cmd_thrust;
-	xf::PropertySpeed		_cmd_ias;
-	xf::PropertySpeed		_measured_ias;
-	xf::Property<AngularVelocity>
-							_output_thrust;
-	xf::PropertyBoolean		_disengage_at;
+	xf::PropertyInteger			_cmd_speed_mode;
+	xf::Property<si::Force>		_cmd_thrust;
+	xf::PropertySpeed			_cmd_ias;
+	xf::PropertySpeed			_measured_ias;
+	xf::Property<si::Force>		_output_thrust;
+	xf::PropertyBoolean			_disengage_at;
 	// Other:
-	xf::PropertyObserver	_thrust_computer;
+	xf::PropertyObserver		_thrust_computer;
 };
 
 #endif
