@@ -26,13 +26,13 @@ namespace si {
 namespace literals {
 
 #define SI_DEFINE_LITERAL(xUnit, xliteral)			\
-	constexpr Quantity<units::xUnit>			\
+	constexpr Quantity<units::xUnit>				\
 	operator"" xliteral (long double value)			\
 	{												\
 		return Quantity<units::xUnit> (value);		\
 	}												\
 													\
-	constexpr Quantity<units::xUnit>			\
+	constexpr Quantity<units::xUnit>				\
 	operator"" xliteral (unsigned long long value)	\
 	{												\
 		return Quantity<units::xUnit> (value);		\
@@ -77,6 +77,7 @@ SI_DEFINE_LITERAL (MeterPerSecondSquared, _mps2)
 SI_DEFINE_LITERAL (RadianPerSecond, _radps)
 SI_DEFINE_LITERAL (RadianPerSecondSquared, _radps2)
 SI_DEFINE_LITERAL (NewtonMeter, _Nm)
+SI_DEFINE_LITERAL (NewtonSecond, _Ns)
 SI_DEFINE_LITERAL (PascalSecond, _Pas)
 
 // Often-used scaled units:
