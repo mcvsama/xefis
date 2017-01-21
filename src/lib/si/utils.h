@@ -255,14 +255,6 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 
 /**
- * Convert Radians to Hertz.
- */
-template<class pValue>
-	constexpr Quantity<units::RadianPerSecond, pValue>
-	convert (Quantity<units::Hertz, pValue> frequency);
-
-
-/**
  * Convert value 'source' expressed in 'source_unit's to 'target_unit's.
  */
 template<class pValue>
@@ -497,14 +489,6 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		return std::isfinite (q.quantity());
-	}
-
-
-template<class pValue>
-	constexpr Quantity<units::RadianPerSecond, pValue>
-	convert (Quantity<units::Hertz, pValue> frequency)
-	{
-		return Quantity<units::RadianPerSecond, pValue> (frequency.template quantity<units::Hertz>() * 2.0 * M_PI);
 	}
 
 

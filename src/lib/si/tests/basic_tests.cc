@@ -109,8 +109,14 @@ static xf::RuntimeTest t_temperature ("SI temperature tests", []{
 static xf::RuntimeTest t_angle ("SI angle tests", []{
 	si::Quantity<Radian> a1 { 1.0 };
 	si::Quantity<Degree> a2 { 57.295'779'513 };
+	si::Quantity<RadianPerSecond> s1 { 1.0 };
+	si::Quantity<Hertz> s2 { 1.0 / (2.0 * M_PI) };
+	si::Quantity<RadianPerSecond> s3 { s2.quantity<Hertz>() * (2.0 * M_PI) };
+	si::Quantity<RadianPerSecond> s4 { 1.0_Hz / (2.0 * M_PI) };
 
 	verify_equal_with_epsilon ("radians/degrees equality test", a1, a2, 1e-9 * Radian());
+	verify_equal_with_epsilon ("radians per second/hertz conversion test 1", s1, s3, 1e-9 * RadianPerSecond());
+	verify_equal_with_epsilon ("radians per second/hertz conversion test 2", s3, s4, 1e-9 * RadianPerSecond());
 });
 
 

@@ -333,7 +333,7 @@ NavigationComputer::compute_track()
 			if (!isinf (rotation_speed) && !isnan (rotation_speed))
 			{
 				rotation_speed = _track_lateral_rotation_smoother (rotation_speed, update_dt);
-				result_rotation_speed = xf::clamped<AngularVelocity> (rotation_speed, convert (-1_Hz), convert (+1_Hz));
+				result_rotation_speed = xf::clamped<si::AngularVelocity> (rotation_speed, -1_Hz, +1_Hz);
 			}
 			else
 				_track_lateral_rotation_smoother.invalidate();
