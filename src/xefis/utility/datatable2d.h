@@ -90,6 +90,12 @@ template<class pArgument, class pValue>
 		extrapolated_value (Argument const&) const noexcept;
 
 		/**
+		 * Alias for extrapolated_value().
+		 */
+		Value
+		operator() (Argument const&) const noexcept;
+
+		/**
 		 * Return the point of minimum known argument.
 		 */
 		Point
@@ -222,6 +228,14 @@ template<class A, class V>
 		}
 		else
 			return in_domain_value (argument);
+	}
+
+
+template<class A, class V>
+	inline auto
+	Datatable2D<A, V>::operator() (Argument const& argument) const noexcept -> Value
+	{
+		return extrapolated_value (argument);
 	}
 
 
