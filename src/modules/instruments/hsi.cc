@@ -180,7 +180,7 @@ HSI::read()
 	params.true_air_speed = _speed_tas.get_optional();
 	params.track_lateral_rotation = _track_lateral_rotation.get_optional();
 	if (params.track_lateral_rotation)
-		params.track_lateral_rotation = xf::clamped (*params.track_lateral_rotation, convert (-1_Hz), convert (+1_Hz));
+		params.track_lateral_rotation = xf::clamped<si::AngularVelocity> (*params.track_lateral_rotation, -1_Hz, +1_Hz);
 	params.altitude_reach_visible = _target_altitude_reach_distance.valid();
 	params.altitude_reach_distance = *_target_altitude_reach_distance;
 	params.wind_information_visible = _wind_from_magnetic.valid() && _wind_speed_tas.valid();

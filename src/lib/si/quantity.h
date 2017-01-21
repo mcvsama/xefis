@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <ratio>
+#include <cmath>
 
 // Local:
 #include "unit.h"
@@ -117,6 +118,34 @@ template<class pUnit, class pValue = double>
 			_quantity /= scalar;
 			return *this;
 		}
+
+		/**
+		 * Conversion operator for radians/s vs Hertz and similar.
+		 */
+		template<int OtherAngleExponent, class OtherScale, class OtherOffset,
+				 class = std::enable_if_t<Unit::AngleExponent != OtherAngleExponent>>
+			constexpr
+			operator Quantity<si::Unit<Unit::E0, Unit::E1, Unit::E2, Unit::E3, Unit::E4, Unit::E5, Unit::E6, OtherAngleExponent, OtherScale, OtherOffset>, Value>() const noexcept
+			{
+				int other_angle_exp_diff = OtherAngleExponent - Unit::AngleExponent;
+				// Conversion: cycles → radians (increasing AngleExponent) => return value * 2 * PI.
+				// Conversion: radians → cycles (decreasing AngleExponent) => return value / (2 * PI).
+				auto result = (base_quantity() - to_fp<OtherOffset>()) / to_fp<OtherScale>();
+
+				// Manual powering to ensure constexprness:
+				if (other_angle_exp_diff > 0)
+				{
+					for (int i = 0; i < other_angle_exp_diff; ++i)
+						result *= 2.0 * M_PI;
+				}
+				else if (other_angle_exp_diff < 0)
+				{
+					for (int i = 0; i > other_angle_exp_diff; --i)
+						result /= 2.0 * M_PI;
+				}
+
+				return Quantity<si::Unit<Unit::E0, Unit::E1, Unit::E2, Unit::E3, Unit::E4, Unit::E5, Unit::E6, OtherAngleExponent, OtherScale, OtherOffset>, Value> (result);
+			}
 
 		/**
 		 * Convert to Unit with the same exponents vector, but different scaling value.
