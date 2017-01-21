@@ -244,6 +244,7 @@ XEFIS_SOURCES += xefis/utility/text_painter.cc
 XEFIS_SOURCES += xefis/utility/thread.cc
 
 SELFTEST_SOURCES += xefis/utility/tests/datatable2d.test.cc
+SELFTEST_SOURCES += xefis/utility/tests/numeric.test.cc
 
 ######## /xefis/widgets ########
 

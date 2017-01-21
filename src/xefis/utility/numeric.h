@@ -222,6 +222,36 @@ digit_from_ascii (char c)
 	throw InvalidFormat ("non-numeric character '"_str + c + "'");
 }
 
+
+/**
+ * Calculate numeric integral over a range with step equal to delta.
+ * Uses trapezoidal approximation.
+ */
+template<class Argument, class Callable>
+	constexpr auto
+	integral (Callable function, Range<Argument> range, Argument delta)
+	{
+		using Value = std::result_of_t<Callable (Argument)>;
+
+		auto sum = Argument() * Value();
+		auto value_a = function (range.min());
+		auto a = range.min();
+
+		while (a < range.max() - delta)
+		{
+			auto b = a + delta;
+			auto value_b = function (b);
+
+			sum += (value_a + value_b) * delta * 0.5;
+			value_a = value_b;
+			a = b;
+		}
+
+		sum += (value_a + function (range.max())) * delta * 0.5;
+
+		return sum;
+	}
+
 } // namespace xf
 
 #endif
