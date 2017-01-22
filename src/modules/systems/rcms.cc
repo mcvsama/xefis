@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/qdom.h>
 
 // Local:
@@ -128,13 +129,13 @@ RemoteControlManagementSystem::compute_distances_to_home()
 
 		LonLat home (*_home_longitude, *_home_latitude);
 		LonLat curr (*_position_longitude, *_position_latitude);
-		Length ground_dist = curr.haversine_earth (home);
+		Length ground_dist = xf::haversine_earth (curr, home);
 		Length alt_diff = *_position_altitude_amsl - *_home_altitude_amsl;
 
 		_distance_vertical.write (alt_diff);
 		_distance_ground.write (ground_dist);
 		_distance_vlos.write (sqrt (ground_dist * ground_dist + alt_diff * alt_diff));
-		_true_home_direction.write (xf::floored_mod (curr.initial_bearing (home), 360_deg));
+		_true_home_direction.write (xf::floored_mod (xf::initial_bearing (curr, home), 360_deg));
 	}
 	else
 	{

@@ -23,6 +23,7 @@
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
 #include <xefis/support/navigation/magnetic_variation.h>
+#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/time_helper.h>
 
@@ -186,7 +187,7 @@ NavigationComputer::compute_position()
 			Length worse_accuracy = std::max (new_position.lateral_position_stddev, accurate_positions.back().lateral_position_stddev);
 
 			if (!accurate_positions.back().valid ||
-				new_position.lateral_position.haversine_earth (accurate_positions.back().lateral_position) > accuracy_times * worse_accuracy ||
+				xf::haversine_earth (new_position.lateral_position, accurate_positions.back().lateral_position) > accuracy_times * worse_accuracy ||
 				new_position.time - accurate_positions.back().time > max_time_difference)
 			{
 				accurate_positions.push_back (new_position);
@@ -281,13 +282,13 @@ NavigationComputer::compute_track()
 
 	if (pos_last.valid && pos_prev.valid)
 	{
-		Length distance = pos_last.lateral_position.haversine_earth (pos_prev.lateral_position);
+		si::Length distance = xf::haversine_earth (pos_last.lateral_position, pos_prev.lateral_position);
 		if (distance > 2.0 * pos_last.lateral_position_stddev)
 		{
 			Length altitude_diff = pos_last.altitude - pos_prev.altitude;
 			_track_vertical.write (_track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt));
 
-			Angle initial_true_heading = pos_last.lateral_position.initial_bearing (pos_prev.lateral_position);
+			Angle initial_true_heading = xf::initial_bearing (pos_last.lateral_position, pos_prev.lateral_position);
 			Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
 			_track_lateral_true.write (_track_lateral_true_smoother (true_heading, update_dt));
 
@@ -316,7 +317,7 @@ NavigationComputer::compute_track()
 	Optional<AngularVelocity> result_rotation_speed;
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{
-		Length len_from_prev = pos_prev.lateral_position.haversine_earth (pos_last.lateral_position);
+		Length len_from_prev = xf::haversine_earth (pos_prev.lateral_position, pos_last.lateral_position);
 
 		if (len_from_prev >= *_position_lateral_stddev)
 		{
@@ -324,9 +325,9 @@ NavigationComputer::compute_track()
 			using std::isnan;
 
 			Time dt = pos_last.time - pos_prev.time;
-			Angle alpha = -180.0_deg + LonLat::great_arcs_angle (pos_prev_prev.lateral_position,
-																 pos_prev.lateral_position,
-																 pos_last.lateral_position);
+			Angle alpha = -180.0_deg + xf::great_arcs_angle (pos_prev_prev.lateral_position,
+															 pos_prev.lateral_position,
+															 pos_last.lateral_position);
 			// Lateral (parallel to the ground) rotation:
 			AngularVelocity rotation_speed = alpha / dt;
 
@@ -356,7 +357,7 @@ NavigationComputer::compute_ground_speed()
 		Time update_dt = _ground_speed_computer.update_dt();
 
 		Time dt = pos_last.time - pos_prev.time;
-		Length dl = pos_last.lateral_position.haversine_earth (pos_prev.lateral_position);
+		Length dl = xf::haversine_earth (pos_last.lateral_position, pos_prev.lateral_position);
 		_track_ground_speed.write (_track_ground_speed_smoother (dl / dt, update_dt));
 	}
 	else

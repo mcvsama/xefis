@@ -30,6 +30,7 @@
 #include <xefis/core/navaid_storage.h>
 #include <xefis/core/window.h>
 #include <xefis/support/air/wind_triangle.h>
+#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>
@@ -954,7 +955,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 	// Home direction arrow:
 	if (_params.true_home_direction)
 	{
-		bool at_home = _params.home->haversine_earth (*_params.position) < 10_m;
+		bool at_home = xf::haversine_earth (*_params.home, *_params.position) < 10_m;
 		float z = 0.75f * _q;
 
 		painter.setTransform (base_transform);
@@ -1541,8 +1542,8 @@ HSIWidget::PaintWorkUnit::paint_navaids (xf::Painter& painter)
 						QTransform tr_r; tr_r.translate (+half_width, 0.0);
 						// Find runway's true bearing from pos_1 to pos_2 and runway
 						// length in pixels:
-						Angle true_bearing = runway.pos_1().initial_bearing (runway.pos_2());
-						double length_px = to_px (runway.pos_1().haversine_earth (runway.pos_2()));
+						Angle true_bearing = xf::initial_bearing (runway.pos_1(), runway.pos_2());
+						double length_px = to_px (xf::haversine_earth (runway.pos_1(), runway.pos_2()));
 						double extended_length_px = to_px (_params.arpt_runway_extension_length);
 						// Create transform so that the first end of the runway
 						// is at (0, 0) and runway extends to the top.
@@ -1785,7 +1786,7 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 	if (!_navaid_storage || !_params.position)
 		return;
 
-	if (_navs_retrieved && _navs_retrieve_position.haversine_earth (*_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
+	if (_navs_retrieved && xf::haversine_earth (_navs_retrieve_position, *_params.position) < 0.1f * _params.range && _params.range == _navs_retrieve_range)
 		return;
 
 	_fix_navs.clear();
@@ -1836,11 +1837,11 @@ HSIWidget::PaintWorkUnit::retrieve_navaids()
 
 
 inline QPointF
-HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& position)
+HSIWidget::PaintWorkUnit::get_navaid_xy (LonLat const& navaid_position)
 {
 	if (!_params.position)
 		return QPointF();
-	QPointF navaid_pos = kEarthMeanRadius.quantity<NauticalMile>() * position.rotated (*_params.position).project_flat();
+	QPointF navaid_pos = xf::kEarthMeanRadius.quantity<si::NauticalMile>() * navaid_position.rotated (*_params.position).project_flat();
 	return _features_transform.map (QPointF (to_px (1_nmi * navaid_pos.x()), to_px (1_nmi * navaid_pos.y())));
 }
 

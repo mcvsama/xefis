@@ -400,8 +400,6 @@ PerformanceComputer::compute_speeds_vbg()
 Optional<Speed>
 PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 {
-	using std::cos;
-
 	// Formula:
 	//   V_s = sqrt((load_factor * weight) / (0.5 * air_density * wings_area * C_L_max)).
 
@@ -410,7 +408,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 		xf::FlapsAngle flaps_angle (_input_flaps_angle.read (0_deg));
 		xf::SpoilersAngle spoilers_angle (_input_spoilers_angle.read (0_deg));
 		Angle max_safe_aoa = _airframe->get_max_safe_aoa (flaps_angle, spoilers_angle);
-		Acceleration load = 1_g / cos (max_bank_angle);
+		Acceleration load = 1_g / si::cos (max_bank_angle);
 
 		auto tas = aoa_to_tas_now (max_safe_aoa, load);
 

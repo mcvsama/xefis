@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/navigation/earth.h>
 
 // Local:
 #include "lonlat_translator.h"
@@ -40,9 +41,9 @@ void
 LonLatTranslator::data_updated()
 {
 	if (_input_longitude.valid_and_fresh())
-		_output_longitude.write (to_longitude_dms (*_input_longitude));
+		_output_longitude.write (xf::to_longitude_dms (*_input_longitude));
 
 	if (_input_latitude.valid_and_fresh())
-		_output_latitude.write (to_latitude_dms (*_input_latitude));
+		_output_latitude.write (xf::to_latitude_dms (*_input_latitude));
 }
 
