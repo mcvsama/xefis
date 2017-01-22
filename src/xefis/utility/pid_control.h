@@ -383,8 +383,8 @@ template<class V, class C, class P>
 	PIDControl<V, C, P>::process (Value measured, Time dt) noexcept
 	{
 		using si::isfinite;
-		using si::forwards_to_std::isfinite;
 		using si::abs;
+		using std::isfinite;
 		using std::abs;
 
 		Value error;

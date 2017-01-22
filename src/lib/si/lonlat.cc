@@ -13,14 +13,13 @@
 
 // Standard:
 #include <cstddef>
+#include <cmath>
 
 // Qt:
 #include <QtGui/QTransform>
 
-// Xefis:
-#include <xefis/utility/numeric.h>
-
 // Local:
+#include "utils.h"
 #include "lonlat.h"
 
 
@@ -29,11 +28,6 @@ namespace si {
 LonLat&
 LonLat::rotate (LonLat const& rotation)
 {
-	using std::sin;
-	using std::cos;
-	using std::atan2;
-	using std::sqrt;
-
 	// Convert to radians:
 	Angle const& rot_lat = rotation.lat();
 	Angle const& rot_lon = rotation.lon();
@@ -49,14 +43,14 @@ LonLat::rotate (LonLat const& rotation)
 	double const cos_z = cos (rot_lon);
 
 	QTransform rz = {
-		+cos_z, -sin_z, 0.f,
-		+sin_z, +cos_z, 0.f,
-		   0.f,    0.f, 1.f
+		+cos_z, -sin_z, 0.0,
+		+sin_z, +cos_z, 0.0,
+		   0.0,    0.0, 1.0
 	};
 	QTransform ry = {
-		+cos_y, 0.f, +sin_y,
-		   0.f, 1.f,    0.f,
-		-sin_y, 0.f, +cos_y
+		+cos_y, 0.0, +sin_y,
+		   0.0, 1.0,    0.0,
+		-sin_y, 0.0, +cos_y
 	};
 	QTransform r = ry * rz;
 
@@ -66,9 +60,9 @@ LonLat::rotate (LonLat const& rotation)
 	double const nz = x * r.m31() + y * r.m32() + z * r.m33();
 
 	// Back to LonLat:
-	double mag = sqrt (nx * nx + ny * ny);
-	_lat = 1_rad * atan2 (nz, mag);
-	_lon = 1_rad * atan2 (ny, nx);
+	double mag = std::sqrt (nx * nx + ny * ny);
+	_lat = 1_rad * std::atan2 (nz, mag);
+	_lon = 1_rad * std::atan2 (ny, nx);
 
 	return *this;
 }
@@ -84,74 +78,10 @@ LonLat::rotated (LonLat const& rotation) const
 QPointF
 LonLat::project_flat() const
 {
-	using std::tan;
-	using std::cos;
-
 	return {
 		+tan (lon()) / (1.0 + tan (lon()) * tan (0.5 * lon())) * cos (lat()),
 		-tan (lat()) / (1.0 + tan (lat()) * tan (0.5 * lat())),
 	};
-}
-
-
-Angle::Value
-LonLat::haversine (LonLat const& other) const
-{
-	using std::sin;
-	using std::cos;
-	using std::atan2;
-	using std::sqrt;
-
-	LonLat const& a = *this;
-	LonLat const& b = other;
-
-	Angle dlat = b.lat() - a.lat();
-	Angle dlon = b.lon() - a.lon();
-
-	Angle::Value latsin = sin (dlat / 2.0);
-	Angle::Value lonsin = sin (dlon / 2.0);
-
-	Angle::Value z = latsin * latsin
-				   + lonsin * lonsin
-				   * cos (a.lat())
-				   * cos (b.lat());
-
-	return 2.0 * atan2 (sqrt (z), sqrt (1.0 - z));
-}
-
-
-Angle
-LonLat::initial_bearing (LonLat const& other) const
-{
-	using std::sin;
-	using std::cos;
-	using std::atan2;
-
-	Angle dlon = other.lon() - this->lon();
-	Angle lat1 = this->lat();
-	Angle lat2 = other.lat();
-
-	double y = sin (dlon) * cos (lat2);
-	double x = cos (lat1) * sin (lat2)
-			 - sin (lat1) * cos (lat2) * cos (dlon);
-
-	return 1_rad * atan2 (y, x);
-}
-
-
-Angle
-LonLat::great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b)
-{
-	using std::arg;
-
-	LonLat z1 (a.lon() - common.lon(), a.lat() - common.lat());
-	LonLat zero (0_deg, 0_deg);
-	LonLat z2 (b.lon() - common.lon(), b.lat() - common.lat());
-
-	std::complex<Angle::Value> x1 (z1.lon().quantity<Degree>(), z1.lat().quantity<Degree>());
-	std::complex<Angle::Value> x2 (z2.lon().quantity<Degree>(), z2.lat().quantity<Degree>());
-
-	return 1_deg * xf::floored_mod<double> ((1_rad * (arg (x1) - arg (x2))).quantity<Degree>(), 360.0);
 }
 
 } // namespace si

@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+#include <cmath>
 #include <experimental/string_view>
 
 // Boost:
@@ -29,6 +30,7 @@
 // Local:
 #include "quantity.h"
 #include "standard_units.h"
+#include "standard_quantities.h"
 
 
 namespace si {
@@ -506,21 +508,6 @@ template<class pValue>
 	}
 
 
-/**
- * Functions in this namespace serve to forward calls to the std functions.
- *
- * Use like this:
- *
- *   using si::forwards_to_std::isfinite;
- *   using si::isfinite;
- *
- *   if (isfinite (x))
- *       ...
- *
- * The above will work for both x being Quantity-type and other types.
- */
-namespace forwards_to_std {
-
 template<class T>
 	constexpr bool
 	isfinite (T q) noexcept
@@ -528,7 +515,26 @@ template<class T>
 		return std::isfinite (q);
 	}
 
-} // namespace forwards_to_std
+
+constexpr quantities::Angle::Value
+sin (quantities::Angle a)
+{
+	return std::sin (a.quantity<units::Radian>());
+}
+
+
+constexpr quantities::Angle::Value
+cos (quantities::Angle a)
+{
+	return std::sin (a.quantity<units::Radian>());
+}
+
+
+constexpr quantities::Angle::Value
+tan (quantities::Angle a)
+{
+	return std::sin (a.quantity<units::Radian>());
+}
 
 } // namespace si
 

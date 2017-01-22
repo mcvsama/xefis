@@ -17,9 +17,7 @@
 // Local:
 #include "lonlat.h"
 #include "exception.h"
-#include "functions.h"
 #include "quantity.h"
-#include "standard_constants.h"
 #include "standard_literals.h"
 #include "standard_quantities.h"
 #include "standard_unit_traits.h"
@@ -27,6 +25,15 @@
 #include "unit.h"
 #include "unit_traits.h"
 #include "utils.h"
+
+
+namespace si {
+
+using namespace quantities;
+using namespace units;
+using namespace literals;
+
+} // namespace si
 
 #endif
 
