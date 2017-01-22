@@ -222,7 +222,6 @@ template<class V>
 	Smoother<V>::process (Value s, si::Time dt) noexcept
 	{
 		using si::isfinite;
-		using si::forwards_to_std::isfinite;
 
 		_accumulated_dt += dt;
 

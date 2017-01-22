@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qzdevice.h>
 
@@ -138,7 +139,7 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 
 	auto inserter_and_predicate = [&] (Navaid const& navaid) -> bool
 	{
-		if (position.haversine_earth (navaid.position()) <= radius)
+		if (xf::haversine_earth (position, navaid.position()) <= radius)
 		{
 			set.push_back (navaid);
 			return false;
@@ -182,7 +183,7 @@ NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Fre
 	}
 
 	std::sort (result.begin(), result.end(), [&](Navaid const& a, Navaid const& b) -> bool {
-		return position.haversine (a.position()) < position.haversine (b.position());
+		return xf::haversine (position, a.position()) < xf::haversine (position, b.position());
 	});
 
 	return result;
@@ -349,8 +350,8 @@ NavaidStorage::parse_apt_dat()
 					max_position.lat() = std::max (max_position.lat(), point.lat());
 				}
 			}
-			LonLat mean_position (mean (min_position.lon(), max_position.lon()),
-								  mean (min_position.lat(), max_position.lat()));
+			LonLat mean_position (xf::mean (min_position.lon(), max_position.lon()),
+								  xf::mean (min_position.lat(), max_position.lat()));
 			cur_land_airport->set_position (mean_position);
 			cur_land_airport->set_runways (runways);
 

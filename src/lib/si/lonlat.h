@@ -21,12 +21,13 @@
 #include <QtCore/QPointF>
 
 // Local:
-#include "standard_constants.h"
 #include "standard_quantities.h"
+#include "standard_literals.h"
 
 
 namespace si {
 
+using namespace literals;
 using quantities::Angle;
 using quantities::Length;
 
@@ -56,45 +57,20 @@ class LonLat
 	Angle const&
 	lon() const noexcept;
 
+	/**
+	 * Change position of this point on a sphere by adding new angles.
+	 */
 	LonLat&
 	rotate (LonLat const& rotation);
 
+	/**
+	 * Like rotate(), but not in-place.
+	 */
 	LonLat
 	rotated (LonLat const& rotation) const;
 
 	QPointF
 	project_flat() const;
-
-	/**
-	 * Compute distance between two sets of coordinates on Earth.
-	 * Result is in sphere radius units.
-	 */
-	Angle::Value
-	haversine (LonLat const& other) const;
-
-	/**
-	 * Convenience function.
-	 * Compute distance between two sets of coordinates on Earth.
-	 * Result is in nautical miles.
-	 */
-	Length
-	haversine_earth (LonLat const& other) const;
-
-	/**
-	 * Initial bearing when flying orthodrome (great circle path)
-	 * to another point. For final bearing, reverse the arguments.
-	 * Result is in range [-180_deg, +180_deg].
-	 */
-	Angle
-	initial_bearing (LonLat const& other) const;
-
-	/**
-	 * Compute angle between two great arcs on a sphere.
-	 * Arcs are given by three points, the second one lies on the intersection.
-	 * Result is in degrees.
-	 */
-	static Angle
-	great_arcs_angle (LonLat const& a, LonLat const& common, LonLat const& b);
 
   private:
 	Angle	_lon;
@@ -143,17 +119,6 @@ inline Angle const&
 LonLat::lat() const noexcept
 {
 	return _lat;
-}
-
-
-/**
- * Convenience function.
- * Compute distance between two sets of coordinates on Earth.
- */
-inline Length
-LonLat::haversine_earth (LonLat const& other) const
-{
-	return haversine (other) * kEarthMeanRadius;
 }
 
 } // namespace si

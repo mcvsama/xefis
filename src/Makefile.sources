@@ -3,11 +3,9 @@
 ######## /lib/si ########
 
 SI_HEADERS += lib/si/exception.h
-SI_HEADERS += lib/si/functions.h
 SI_HEADERS += lib/si/lonlat.h
 SI_HEADERS += lib/si/quantity.h
 SI_HEADERS += lib/si/si.h
-SI_HEADERS += lib/si/standard_constants.h
 SI_HEADERS += lib/si/standard_literals.h
 SI_HEADERS += lib/si/standard_quantities.h
 SI_HEADERS += lib/si/standard_unit_traits.h
@@ -17,7 +15,6 @@ SI_HEADERS += lib/si/unit_traits.h
 SI_HEADERS += lib/si/utils.h
 
 SI_SOURCES += lib/si/exception.cc
-SI_SOURCES += lib/si/functions.cc
 SI_SOURCES += lib/si/standard_unit_traits.cc
 SI_SOURCES += lib/si/lonlat.cc
 SI_SOURCES += lib/si/unit.cc
@@ -173,6 +170,7 @@ XEFIS_HEADERS += xefis/support/bus/serial_port.h
 XEFIS_HEADERS += xefis/support/air/wind_triangle.h
 XEFIS_HEADERS += xefis/support/devices/chr_um6.h
 XEFIS_HEADERS += xefis/support/navigation/magnetic_variation.h
+XEFIS_HEADERS += xefis/support/navigation/earth.h
 XEFIS_HEADERS += xefis/support/nmea/exceptions.h
 XEFIS_HEADERS += xefis/support/nmea/gps.h
 XEFIS_HEADERS += xefis/support/nmea/mtk.h
@@ -183,6 +181,7 @@ XEFIS_SOURCES += xefis/support/bus/i2c.cc
 XEFIS_SOURCES += xefis/support/bus/serial_port.cc
 XEFIS_SOURCES += xefis/support/devices/chr_um6.cc
 XEFIS_SOURCES += xefis/support/navigation/magnetic_variation.cc
+XEFIS_SOURCES += xefis/support/navigation/earth.cc
 XEFIS_SOURCES += xefis/support/nmea/gps.cc
 XEFIS_SOURCES += xefis/support/nmea/mtk.cc
 XEFIS_SOURCES += xefis/support/nmea/nmea.cc
