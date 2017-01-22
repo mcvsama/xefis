@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -87,7 +88,7 @@ VOR::compute()
 		LonLat const station_position (*_input_station_longitude, *_input_station_latitude);
 		LonLat const aircraft_position (*_input_aircraft_longitude, *_input_aircraft_latitude);
 
-		Angle current_radial = normalize (station_position.initial_bearing (aircraft_position));
+		Angle current_radial = normalize (xf::initial_bearing (station_position, aircraft_position));
 		Angle deviation = xf::floored_mod<Angle> (input_radial - current_radial, -180_deg, +180_deg);
 		if (abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
@@ -97,10 +98,10 @@ VOR::compute()
 		if (_output_reciprocal_magnetic.configured())
 			_output_reciprocal_magnetic = normalize (current_radial + 180_deg - declination);
 		if (_output_initial_bearing_magnetic.configured())
-			_output_initial_bearing_magnetic = normalize (aircraft_position.initial_bearing (station_position) - declination);
+			_output_initial_bearing_magnetic = normalize (xf::initial_bearing (aircraft_position, station_position) - declination);
 		_output_to_flag = abs (denormalize (current_radial - input_radial)) > 90_deg;
 		_output_deviation = 1_deg * _deviation_smoother.process (deviation.quantity<Degree>(), dt);
-		_output_distance = station_position.haversine_earth (aircraft_position);
+		_output_distance = xf::haversine_earth (station_position, aircraft_position);
 	}
 	else
 	{

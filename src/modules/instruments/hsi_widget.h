@@ -268,7 +268,7 @@ class HSIWidget: public xf::InstrumentWidget
 		 * relative to the aircraft (assumes usage with aircraft-centered transform).
 		 */
 		QPointF
-		get_navaid_xy (LonLat const& position);
+		get_navaid_xy (LonLat const& navaid_position);
 
 		/**
 		 * Trend vector range.

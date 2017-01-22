@@ -403,11 +403,8 @@ ADI::compute_fpv()
 		Angle hdiff = xf::floored_mod<Angle> (**heading - **track_lateral, -180_deg, +180_deg);
 		Angle roll = *_orientation_roll;
 
-		using std::sin;
-		using std::cos;
-
-		_computed_fpv_alpha = vdiff * cos (roll) + hdiff * sin (roll);
-		_computed_fpv_beta = -vdiff * sin (roll) + hdiff * cos (roll);
+		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
+		_computed_fpv_beta = -vdiff * si::sin (roll) + hdiff * si::cos (roll);
 		_computed_fpv_failure = false;
 		_computed_fpv_visible = _fpv_visible.read (false);
 	}

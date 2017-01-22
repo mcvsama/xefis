@@ -1934,13 +1934,12 @@ void
 ADIWidget::PaintWorkUnit::paint_flight_director (xf::Painter& painter)
 {
 	using xf::sgn;
-	using std::cos;
 	using std::abs;
 
 	float const w = wh() * 1.4f / 9.f;
 	Angle range = _params.fov / 4.f;
 
-	Angle pitch = cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
+	Angle pitch = si::cos (_params.orientation_roll) * (_params.flight_director_pitch - _params.orientation_pitch);
 	pitch = xf::clamped (pitch, -range, +range);
 
 	Angle roll = _params.flight_director_roll - _params.orientation_roll;
