@@ -20,7 +20,7 @@ SI_SOURCES += lib/si/lonlat.cc
 SI_SOURCES += lib/si/unit.cc
 SI_SOURCES += lib/si/utils.cc
 
-SELFTEST_SOURCES += lib/si/tests/basic_tests.cc
+SELFTEST_SOURCES += lib/si/tests/basic.test.cc
 
 ######## /xefis ########
 
