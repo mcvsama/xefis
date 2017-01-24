@@ -74,6 +74,7 @@ class AirDataComputer: public x2::Module
 	x2::PropertyOut<si::Velocity>			output_speed_ias					{ this, "/speed/ias" };
 	x2::PropertyOut<si::Velocity>			output_speed_ias_lookahead			{ this, "/speed/ias.lookahead" };
 	x2::PropertyOut<si::Velocity>			output_speed_tas					{ this, "/speed/tas" };
+	x2::PropertyOut<si::Velocity>			output_speed_eas					{ this, "/speed/eas" };
 	x2::PropertyOut<double>					output_speed_mach					{ this, "/speed/mach" };
 	x2::PropertyOut<si::Velocity>			output_speed_sound					{ this, "/speed/sound" };
 	x2::PropertyOut<bool>					output_vertical_speed_serviceable	{ this, "/vertical-speed/serviceable" };
@@ -117,6 +118,9 @@ class AirDataComputer: public x2::Module
 	compute_tas();
 
 	void
+	compute_eas();
+
+	void
 	compute_vertical_speed();
 
 	void
@@ -149,6 +153,7 @@ class AirDataComputer: public x2::Module
 	x2::PropertyObserver		_ias_lookahead_computer;
 	x2::PropertyObserver		_sound_speed_computer;
 	x2::PropertyObserver		_tas_computer;
+	x2::PropertyObserver		_eas_computer;
 	x2::PropertyObserver		_mach_computer;
 	x2::PropertyObserver		_sat_computer;
 	x2::PropertyObserver		_vertical_speed_computer;

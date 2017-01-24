@@ -131,6 +131,12 @@ AirDataComputer::AirDataComputer (xf::Airframe* airframe, std::string const& ins
 		&output_altitude_amsl,
 	});
 
+	_eas_computer.set_callback (std::bind (&AirDataComputer::compute_eas, this));
+	_eas_computer.observe ({
+		&output_speed_tas,
+		&output_air_density_static,
+	});
+
 	_vertical_speed_computer.set_minimum_dt (50_ms);
 	_vertical_speed_computer.set_callback (std::bind (&AirDataComputer::compute_vertical_speed, this));
 	_vertical_speed_computer.add_depending_smoothers ({
@@ -164,6 +170,7 @@ AirDataComputer::process (x2::Cycle const& cycle)
 		&_density_altitude_computer,
 		&_sound_speed_computer,
 		&_tas_computer,
+		&_eas_computer,
 		&_vertical_speed_computer,
 	};
 
@@ -368,6 +375,20 @@ AirDataComputer::compute_tas()
 	}
 	else
 		output_speed_tas.set_nil();
+}
+
+
+void
+AirDataComputer::compute_eas()
+{
+	if (output_speed_tas && output_air_density_static)
+	{
+		auto rho = *output_air_density_static;
+		auto rho_0 = 1.225_kg / 1_m3 ; // Density at the sea level at 15°C according to Wikipedia.
+		output_speed_eas = *output_speed_tas * std::sqrt (rho / rho_0);
+	}
+	else
+		output_speed_eas.set_nil();
 }
 
 
