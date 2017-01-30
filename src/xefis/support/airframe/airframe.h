@@ -20,11 +20,11 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
-#include <xefis/airframe/flaps.h>
-#include <xefis/airframe/spoilers.h>
-#include <xefis/airframe/lift.h>
-#include <xefis/airframe/drag.h>
-#include <xefis/airframe/types.h>
+#include <xefis/support/airframe/flaps.h>
+#include <xefis/support/airframe/spoilers.h>
+#include <xefis/support/airframe/lift.h>
+#include <xefis/support/airframe/drag.h>
+#include <xefis/support/airframe/types.h>
 
 
 namespace xf {
