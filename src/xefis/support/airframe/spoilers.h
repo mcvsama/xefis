@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/range.h>
-#include <xefis/airframe/lift_mod.h>
+#include <xefis/support/airframe/lift_mod.h>
 
 
 namespace xf {

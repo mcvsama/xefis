@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__AIRFRAME__LIFT_H__INCLUDED
-#define XEFIS__SUPPORT__AIRFRAME__LIFT_H__INCLUDED
+#ifndef XEFIS__SUPPORT__AIRFRAME__DRAG_H__INCLUDED
+#define XEFIS__SUPPORT__AIRFRAME__DRAG_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -22,17 +22,17 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/airframe/types.h>
+#include <xefis/support/airframe/types.h>
 #include <xefis/utility/datatable2d.h>
 
 
 namespace xf {
 
-class Lift
+class Drag
 {
   public:
 	// Ctor
-	Lift (QDomElement const& config);
+	Drag (QDomElement const& config);
 
 	/**
 	 * Get range of AOA for which lift is defined.
@@ -41,42 +41,22 @@ class Lift
 	get_aoa_range() const noexcept;
 
 	/**
-	 * Return lift coefficient (C_L) for given angle of attack.
+	 * Return drag coefficient (C_D) for given angle of attack.
 	 *
 	 * Uses linear interpolation.
 	 */
-	LiftCoefficient
-	get_cl (Angle const& aoa) const;
-
-	/**
-	 * Return maximum possible lift.
-	 */
-	LiftCoefficient
-	max_cl() const noexcept;
-
-	/**
-	 * Return angle for which C_L is maximum.
-	 */
-	Angle
-	critical_aoa() const noexcept;
-
-	/**
-	 * Return AOA in normal regime (not stalled) for given C_L.
-	 */
-	Optional<Angle>
-	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
+	DragCoefficient
+	get_cd (Angle const& aoa) const;
 
   private:
-	Unique<Datatable2D<Angle, LiftCoefficient>>	_aoa_to_cl;
-	LiftCoefficient								_max_cl;
-	Angle										_critical_aoa;
+	Unique<Datatable2D<Angle, DragCoefficient>>	_aoa_to_cd;
 };
 
 
 inline Range<Angle>
-Lift::get_aoa_range() const noexcept
+Drag::get_aoa_range() const noexcept
 {
-	return _aoa_to_cl->domain();
+	return _aoa_to_cd->domain();
 }
 
 } // namespace xf

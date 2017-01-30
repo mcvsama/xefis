@@ -25,8 +25,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/components/property_editor/property_editor.h>
-#include <xefis/components/data_recorder/data_recorder.h>
+#include <xefis/core/components/property_editor/property_editor.h>
+#include <xefis/core/components/data_recorder/data_recorder.h>
 #include <xefis/core/window.h>
 
 // Local:

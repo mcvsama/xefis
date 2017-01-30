@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/support/nmea/nmea.h>
+#include <xefis/support/protocols/nmea/nmea.h>
 
 // Local:
 #include "gps.h"

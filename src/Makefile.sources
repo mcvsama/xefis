@@ -185,47 +185,6 @@ SELFTEST_SOURCES += $(SI_SOURCES)
 SELFTEST_SOURCES += xefis/utility/backtrace.cc
 SELFTEST_SOURCES += xefis/selftest.cc
 
-######## /xefis/airframe ########
-
-XEFIS_HEADERS += xefis/airframe/airframe.h
-XEFIS_HEADERS += xefis/airframe/drag.h
-XEFIS_HEADERS += xefis/airframe/flaps.h
-XEFIS_HEADERS += xefis/airframe/lift.h
-XEFIS_HEADERS += xefis/airframe/lift_mod.h
-XEFIS_HEADERS += xefis/airframe/spoilers.h
-
-XEFIS_SOURCES += xefis/airframe/airframe.cc
-XEFIS_SOURCES += xefis/airframe/drag.cc
-XEFIS_SOURCES += xefis/airframe/lift.cc
-XEFIS_SOURCES += xefis/airframe/lift_mod.cc
-
-######## /xefis/components ########
-
-XEFIS_HEADERS += xefis/components/property_editor/property_editor.h
-XEFIS_HEADERS += xefis/components/property_editor/property_tree_widget.h
-XEFIS_HEADERS += xefis/components/property_editor/property_tree_widget_item.h
-XEFIS_HEADERS += xefis/components/configurator/configurator_widget.h
-XEFIS_HEADERS += xefis/components/configurator/modules_list.h
-XEFIS_HEADERS += xefis/components/configurator/modules_list_item.h
-XEFIS_HEADERS += xefis/components/data_recorder/data_recorder.h
-XEFIS_HEADERS += xefis/components/data_recorder/graph_widget.h
-XEFIS_HEADERS += xefis/components/data_recorder/graphs_stack.h
-
-XEFIS_SOURCES += xefis/components/property_editor/property_editor.cc
-XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget.cc
-XEFIS_SOURCES += xefis/components/property_editor/property_tree_widget_item.cc
-XEFIS_SOURCES += xefis/components/configurator/configurator_widget.cc
-XEFIS_SOURCES += xefis/components/configurator/modules_list.cc
-XEFIS_SOURCES += xefis/components/configurator/modules_list_item.cc
-XEFIS_SOURCES += xefis/components/data_recorder/data_recorder.cc
-XEFIS_SOURCES += xefis/components/data_recorder/graph_widget.cc
-XEFIS_SOURCES += xefis/components/data_recorder/graphs_stack.cc
-
-XEFIS_MOCHDRS += xefis/components/property_editor/property_editor.h
-XEFIS_MOCHDRS += xefis/components/property_editor/property_tree_widget.h
-XEFIS_MOCHDRS += xefis/components/configurator/configurator_widget.h
-XEFIS_MOCHDRS += xefis/components/configurator/modules_list.h
-
 ######## /xefis/config ########
 
 XEFIS_HEADERS += xefis/config/all.h
@@ -239,6 +198,33 @@ XEFIS_HEADERS += xefis/config/exception.h
 XEFIS_HEADERS += xefis/config/version.h
 
 NODEP_SOURCES += $(VERSION_FILE)
+
+######## /xefis/core/components ########
+
+XEFIS_HEADERS += xefis/core/components/property_editor/property_editor.h
+XEFIS_HEADERS += xefis/core/components/property_editor/property_tree_widget.h
+XEFIS_HEADERS += xefis/core/components/property_editor/property_tree_widget_item.h
+XEFIS_HEADERS += xefis/core/components/configurator/configurator_widget.h
+XEFIS_HEADERS += xefis/core/components/configurator/modules_list.h
+XEFIS_HEADERS += xefis/core/components/configurator/modules_list_item.h
+XEFIS_HEADERS += xefis/core/components/data_recorder/data_recorder.h
+XEFIS_HEADERS += xefis/core/components/data_recorder/graph_widget.h
+XEFIS_HEADERS += xefis/core/components/data_recorder/graphs_stack.h
+
+XEFIS_SOURCES += xefis/core/components/property_editor/property_editor.cc
+XEFIS_SOURCES += xefis/core/components/property_editor/property_tree_widget.cc
+XEFIS_SOURCES += xefis/core/components/property_editor/property_tree_widget_item.cc
+XEFIS_SOURCES += xefis/core/components/configurator/configurator_widget.cc
+XEFIS_SOURCES += xefis/core/components/configurator/modules_list.cc
+XEFIS_SOURCES += xefis/core/components/configurator/modules_list_item.cc
+XEFIS_SOURCES += xefis/core/components/data_recorder/data_recorder.cc
+XEFIS_SOURCES += xefis/core/components/data_recorder/graph_widget.cc
+XEFIS_SOURCES += xefis/core/components/data_recorder/graphs_stack.cc
+
+XEFIS_MOCHDRS += xefis/core/components/property_editor/property_editor.h
+XEFIS_MOCHDRS += xefis/core/components/property_editor/property_tree_widget.h
+XEFIS_MOCHDRS += xefis/core/components/configurator/configurator_widget.h
+XEFIS_MOCHDRS += xefis/core/components/configurator/modules_list.h
 
 ######## /xefis/core ########
 
@@ -369,32 +355,78 @@ XEFIS_SOURCES += xefis/modules/systems/watchdog.cc
 
 XEFIS_MOCHDRS += xefis/modules/systems/rcms.h
 
-######## /xefis/support ########
+######## /xefis/support/air ########
 
 XEFIS_HEADERS += xefis/support/air/air.h
+XEFIS_HEADERS += xefis/support/air/wind_triangle.h
+
+######## /xefis/support/bus ########
+
 XEFIS_HEADERS += xefis/support/bus/i2c.h
 XEFIS_HEADERS += xefis/support/bus/serial_port.h
-XEFIS_HEADERS += xefis/support/air/wind_triangle.h
-XEFIS_HEADERS += xefis/support/devices/chr_um6.h
-XEFIS_HEADERS += xefis/support/navigation/magnetic_variation.h
-XEFIS_HEADERS += xefis/support/navigation/earth.h
-XEFIS_HEADERS += xefis/support/nmea/exceptions.h
-XEFIS_HEADERS += xefis/support/nmea/gps.h
-XEFIS_HEADERS += xefis/support/nmea/mtk.h
-XEFIS_HEADERS += xefis/support/nmea/nmea.h
-XEFIS_HEADERS += xefis/support/nmea/parser.h
 
 XEFIS_SOURCES += xefis/support/bus/i2c.cc
 XEFIS_SOURCES += xefis/support/bus/serial_port.cc
-XEFIS_SOURCES += xefis/support/devices/chr_um6.cc
-XEFIS_SOURCES += xefis/support/navigation/magnetic_variation.cc
-XEFIS_SOURCES += xefis/support/navigation/earth.cc
-XEFIS_SOURCES += xefis/support/nmea/gps.cc
-XEFIS_SOURCES += xefis/support/nmea/mtk.cc
-XEFIS_SOURCES += xefis/support/nmea/nmea.cc
-XEFIS_SOURCES += xefis/support/nmea/parser.cc
 
 XEFIS_MOCHDRS += xefis/support/bus/serial_port.h
+
+######## /xefis/support/airframe ########
+
+XEFIS_HEADERS += xefis/support/airframe/airframe.h
+XEFIS_HEADERS += xefis/support/airframe/drag.h
+XEFIS_HEADERS += xefis/support/airframe/flaps.h
+XEFIS_HEADERS += xefis/support/airframe/lift.h
+XEFIS_HEADERS += xefis/support/airframe/lift_mod.h
+XEFIS_HEADERS += xefis/support/airframe/spoilers.h
+
+XEFIS_SOURCES += xefis/support/airframe/airframe.cc
+XEFIS_SOURCES += xefis/support/airframe/drag.cc
+XEFIS_SOURCES += xefis/support/airframe/lift.cc
+XEFIS_SOURCES += xefis/support/airframe/lift_mod.cc
+
+######## /xefis/support/devices ########
+
+XEFIS_HEADERS += xefis/support/devices/chr_um6.h
+
+XEFIS_SOURCES += xefis/support/devices/chr_um6.cc
+
+######## /xefis/support/navigation ########
+
+XEFIS_HEADERS += xefis/support/navigation/magnetic_variation.h
+XEFIS_HEADERS += xefis/support/navigation/earth.h
+
+XEFIS_SOURCES += xefis/support/navigation/magnetic_variation.cc
+XEFIS_SOURCES += xefis/support/navigation/earth.cc
+
+######## /xefis/support/protocols/nmea ########
+
+XEFIS_HEADERS += xefis/support/protocols/nmea/exceptions.h
+XEFIS_HEADERS += xefis/support/protocols/nmea/gps.h
+XEFIS_HEADERS += xefis/support/protocols/nmea/mtk.h
+XEFIS_HEADERS += xefis/support/protocols/nmea/nmea.h
+XEFIS_HEADERS += xefis/support/protocols/nmea/parser.h
+
+XEFIS_SOURCES += xefis/support/protocols/nmea/gps.cc
+XEFIS_SOURCES += xefis/support/protocols/nmea/mtk.cc
+XEFIS_SOURCES += xefis/support/protocols/nmea/nmea.cc
+XEFIS_SOURCES += xefis/support/protocols/nmea/parser.cc
+
+######## /xefis/support/ui/widgets ########
+
+XEFIS_HEADERS += xefis/support/ui/widgets/group_box.h
+XEFIS_HEADERS += xefis/support/ui/widgets/panel_button.h
+XEFIS_HEADERS += xefis/support/ui/widgets/panel_rotary_encoder.h
+XEFIS_HEADERS += xefis/support/ui/widgets/panel_numeric_display.h
+XEFIS_HEADERS += xefis/support/ui/widgets/panel_widget.h
+
+XEFIS_SOURCES += xefis/support/ui/widgets/group_box.cc
+XEFIS_SOURCES += xefis/support/ui/widgets/panel_button.cc
+XEFIS_SOURCES += xefis/support/ui/widgets/panel_rotary_encoder.cc
+XEFIS_SOURCES += xefis/support/ui/widgets/panel_numeric_display.cc
+XEFIS_SOURCES += xefis/support/ui/widgets/panel_widget.cc
+
+XEFIS_MOCHDRS += xefis/support/ui/widgets/panel_button.h
+XEFIS_MOCHDRS += xefis/support/ui/widgets/panel_rotary_encoder.h
 
 ######## /xefis/test ########
 
@@ -457,23 +489,6 @@ XEFIS_SOURCES += xefis/utility/thread.cc
 
 SELFTEST_SOURCES += xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES += xefis/utility/tests/numeric.test.cc
-
-######## /xefis/widgets ########
-
-XEFIS_HEADERS += xefis/widgets/group_box.h
-XEFIS_HEADERS += xefis/widgets/panel_button.h
-XEFIS_HEADERS += xefis/widgets/panel_rotary_encoder.h
-XEFIS_HEADERS += xefis/widgets/panel_numeric_display.h
-XEFIS_HEADERS += xefis/widgets/panel_widget.h
-
-XEFIS_SOURCES += xefis/widgets/group_box.cc
-XEFIS_SOURCES += xefis/widgets/panel_button.cc
-XEFIS_SOURCES += xefis/widgets/panel_rotary_encoder.cc
-XEFIS_SOURCES += xefis/widgets/panel_numeric_display.cc
-XEFIS_SOURCES += xefis/widgets/panel_widget.cc
-
-XEFIS_MOCHDRS += xefis/widgets/panel_button.h
-XEFIS_MOCHDRS += xefis/widgets/panel_rotary_encoder.h
 
 ################
 

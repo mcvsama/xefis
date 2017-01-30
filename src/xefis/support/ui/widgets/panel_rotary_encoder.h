@@ -24,7 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
-#include <xefis/widgets/panel_widget.h>
+#include <xefis/support/ui/widgets/panel_widget.h>
 
 
 namespace xf {
