@@ -230,12 +230,6 @@ template<class pValue>
 		operator= (Optional<Value>);
 
 		/**
-		 * Alias for set (Property<Value>);
-		 */
-		Property const&
-		operator= (Property<Value> const&);
-
-		/**
 		 * Return contained value.
 		 * Throw exception NilProperty if value is nil and no fallback-value is et.
 		 */
@@ -537,15 +531,6 @@ template<class V>
 template<class V>
 	inline Property<V> const&
 	Property<V>::operator= (Optional<Value> value)
-	{
-		set (value);
-		return *this;
-	}
-
-
-template<class V>
-	inline Property<V> const&
-	Property<V>::operator= (Property<Value> const& value)
 	{
 		set (value);
 		return *this;

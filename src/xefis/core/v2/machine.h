@@ -56,7 +56,7 @@ template<class pProcessingLoop, class ...Arg>
 	inline pProcessingLoop*
 	Machine::make_processing_loop (Arg&& ...args)
 	{
-		_processing_loops.push_back (std::make_unique<pProcessingLoop> (this, args...));
+		_processing_loops.push_back (std::make_unique<pProcessingLoop> (this, std::forward<Arg> (args)...));
 
 		return static_cast<pProcessingLoop*> (_processing_loops.back().get());
 	}

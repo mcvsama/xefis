@@ -155,9 +155,10 @@ class Module: private Noncopyable
   protected:
 	/**
 	 * Compute output properties.
+	 * Default implementation does nothing.
 	 */
 	virtual void
-	process (Cycle const& cycle) = 0;
+	process (Cycle const& cycle);
 
 	/**
 	 * Called when exception is caught from the process() method.

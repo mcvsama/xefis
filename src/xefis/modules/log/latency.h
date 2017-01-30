@@ -19,18 +19,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v2/module.h>
 
 
 class Latency:
 	public QObject,
-	public xf::Module
+	public x2::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	Latency (xf::ModuleManager*, QDomElement const& config);
+	Latency (xf::Xefis*, std::string const& instance = {});
 
   private slots:
 	/**
@@ -40,7 +40,8 @@ class Latency:
 	log_latency();
 
   private:
-	QTimer*	_log_timer;
+	xf::Xefis*	_xefis;
+	QTimer*		_log_timer;
 };
 
 #endif

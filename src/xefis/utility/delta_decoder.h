@@ -31,7 +31,7 @@ class DeltaDecoder
 	typedef std::function<void (int delta)> Callback;
 
   public:
-	// Ctor:
+	// Ctor
 	DeltaDecoder (xf::PropertyInteger value_property, Callback callback);
 
 	/**

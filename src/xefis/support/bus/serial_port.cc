@@ -48,6 +48,26 @@ SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 }
 
 
+SerialPort::SerialPort (SerialPort&& other):
+	_owned (std::move (other._owned)),
+	_logger (other._logger),
+	_internal_logger (other._internal_logger),
+	_configuration (other._configuration),
+	_data_ready (other._data_ready),
+	_failure (other._failure),
+	_notifier (std::move (other._notifier)),
+	_device (other._device),
+	_good (other._good),
+	_error (other._error),
+	_read_failure_count (other._read_failure_count),
+	_max_read_failure_count (other._max_read_failure_count),
+	_write_failure_count (other._write_failure_count),
+	_max_write_failure_count (other._max_write_failure_count),
+	_input_buffer (other._input_buffer),
+	_output_buffer (other._output_buffer)
+{ }
+
+
 SerialPort::~SerialPort()
 {
 	close();
@@ -163,18 +183,21 @@ SerialPort::open()
 void
 SerialPort::close()
 {
-	_notifier.reset();
-
-	if (_device)
+	if (_owned)
 	{
-		::close (_device);
-		_device = 0;
-		_good = false;
-		_error.clear();
-		_read_failure_count = 0;
-		_write_failure_count = 0;
-		_input_buffer.clear();
-		_output_buffer.clear();
+		_notifier.reset();
+
+		if (_device)
+		{
+			::close (_device);
+			_device = 0;
+			_good = false;
+			_error.clear();
+			_read_failure_count = 0;
+			_write_failure_count = 0;
+			_input_buffer.clear();
+			_output_buffer.clear();
+		}
 	}
 }
 

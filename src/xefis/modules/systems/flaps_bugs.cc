@@ -38,9 +38,9 @@ FlapsBugs::process (x2::Cycle const&)
 			output_flaps_up_speed = *setting_margin_factor * _flaps.find_setting (0_deg).speed_range().min();
 
 			Optional<std::string> label_a;
-			Optional<Speed> speed_a;
+			Optional<si::Velocity> speed_a;
 			Optional<std::string> label_b;
-			Optional<Speed> speed_b;
+			Optional<si::Velocity> speed_b;
 
 			auto sett_b = _flaps.find_setting (*input_flaps_setting);
 			auto sett_a = sett_b.prev();

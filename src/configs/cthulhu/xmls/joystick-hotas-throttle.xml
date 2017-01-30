@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<joystick>
+	<device>/dev/input/by-id/usb-Thrustmaster_Throttle_-_HOTAS_Warthog-joystick</device>
+	<!-- Right throttle -->
+	<axis id='2'>
+		<reverse/>
+		<output>
+			<minimum>0</minimum>
+			<maximum>1</maximum>
+		</output>
+	</axis>
+	<!-- Left throttle -->
+	<axis id='3'>
+		<reverse/>
+		<output>
+			<minimum>0</minimum>
+			<maximum>1</maximum>
+		</output>
+	</axis>
+	<axis id='4'>
+		<center>0.002594</center>
+	</axis>
+	<!-- Rudder trim -->
+	<axis id='5'>
+	</axis>
+	<!-- Throttle trim -->
+	<axis id='6'>
+	</axis>
+	<!-- Flaps up -->
+	<button id='10'>
+	</button>
+	<!-- Flaps down -->
+	<button id='11'>
+	</button>
+</joystick>
+

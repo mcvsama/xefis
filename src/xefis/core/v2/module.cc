@@ -124,6 +124,11 @@ Module::initialize()
 
 
 void
+Module::process (x2::Cycle const&)
+{ }
+
+
+void
 Module::rescue (std::exception_ptr)
 {
 	// TODO log the exception

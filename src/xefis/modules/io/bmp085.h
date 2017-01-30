@@ -17,10 +17,14 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QTimer>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v2/module.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/setting.h>
 #include <xefis/support/bus/i2c.h>
 
 
@@ -31,12 +35,34 @@
  */
 class BMP085:
 	public QObject,
-	public xf::Module
+	public x2::Module
 {
 	Q_OBJECT
 
   public:
-	enum Oversampling {
+	/*
+	 * Settings
+	 */
+
+	x2::Setting<xf::i2c::Bus::ID>		setting_i2c_bus						{ this };
+	x2::Setting<xf::i2c::Address::ID>	setting_i2c_address					{ this };
+	x2::Setting<si::Time>				setting_temperature_update_interval	{ this, 500_ms };
+	x2::Setting<si::Time>				setting_pressure_update_interval	{ this, 50_ms };
+
+	/*
+	 * Output
+	 */
+
+	x2::PropertyOut<bool>				_serviceable						{ this, "/serviceable" };
+	x2::PropertyOut<si::Temperature>	_temperature						{ this, "/measured-temperature" };
+	x2::PropertyOut<si::Pressure>		_pressure							{ this, "/measured-pressure" };
+
+  public:
+	/**
+	 * BMP085 supports in-chip oversampling.
+	 */
+	enum Oversampling
+	{
 		Oversampling0	= 0,
 		Oversampling1	= 1,
 		Oversampling2	= 2,
@@ -45,14 +71,18 @@ class BMP085:
 
   public:
 	// Ctor
-	BMP085 (xf::ModuleManager*, QDomElement const& config);
+	explicit BMP085 (std::string const& instance = {});
+
+	// Module API
+	void
+	initialize() override;
 
   private slots:
 	void
-	initialize();
+	hw_initialize();
 
 	void
-	reinitialize();
+	hw_reinitialize();
 
 	void
 	request_temperature();
@@ -99,43 +129,38 @@ class BMP085:
 	static constexpr uint8_t	MC_REG	= 0xbc;
 	static constexpr uint8_t	MD_REG	= 0xbe;
 	// Data:
-	xf::PropertyBoolean		_serviceable;
-	xf::PropertyTemperature	_temperature;
-	Time					_temperature_interval		= 500_ms;
-	xf::PropertyPressure	_pressure;
-	Time					_pressure_interval			= 50_ms;
-	xf::i2c::Device			_i2c_device;
-	Oversampling			_oversampling				= Oversampling3;
-	Time					_pressure_waiting_times[4]	= { 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
-	Unique<QTimer>			_reinitialize_timer;
-	Unique<QTimer>			_temperature_timer;
-	Unique<QTimer>			_temperature_ready_timer;
-	Unique<QTimer>			_pressure_timer;
-	Unique<QTimer>			_pressure_ready_timer;
+	xf::i2c::Device				_i2c_device;
+	Oversampling				_oversampling				{ Oversampling3 };
+	si::Time					_pressure_waiting_times[4]	{ 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
+	Unique<QTimer>				_reinitialize_timer;
+	Unique<QTimer>				_temperature_timer;
+	Unique<QTimer>				_temperature_ready_timer;
+	Unique<QTimer>				_pressure_timer;
+	Unique<QTimer>				_pressure_ready_timer;
 	// Set to true, between request_ and read_ functions.
-	bool					_middle_of_request			= false;
-	bool					_request_other				= false;
+	bool						_middle_of_request			{ false };
+	bool						_request_other				{ false };
 	// Calibration coeffs:
-	int32_t					_ac1;
-	int32_t					_ac2;
-	int32_t					_ac3;
-	int32_t					_ac4;
-	int32_t					_ac5;
-	int32_t					_ac6;
-	int32_t					_b1;
-	int32_t					_b2;
-	int32_t					_b3;
-	uint32_t				_b4;
-	int32_t					_b5;
-	int32_t					_b6;
-	uint32_t				_b7;
-	int32_t					_mb;
-	int32_t					_mc;
-	int32_t					_md;
-	int32_t					_ut;
-	int32_t					_up;
-	int32_t					_ct;
-	int32_t					_cp;
+	int32_t						_ac1;
+	int32_t						_ac2;
+	int32_t						_ac3;
+	int32_t						_ac4;
+	int32_t						_ac5;
+	int32_t						_ac6;
+	int32_t						_b1;
+	int32_t						_b2;
+	int32_t						_b3;
+	uint32_t					_b4;
+	int32_t						_b5;
+	int32_t						_b6;
+	uint32_t					_b7;
+	int32_t						_mb;
+	int32_t						_mc;
+	int32_t						_md;
+	int32_t						_ut;
+	int32_t						_up;
+	int32_t						_ct;
+	int32_t						_cp;
 };
 
 #endif

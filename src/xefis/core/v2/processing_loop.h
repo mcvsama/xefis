@@ -112,7 +112,7 @@ template<class pModule, class ...Arg>
 	inline pModule*
 	ProcessingLoop::load_module (Arg&& ...args)
 	{
-		auto module = std::make_unique<pModule> (args...);
+		auto module = std::make_unique<pModule> (std::forward<Arg> (args)...);
 		auto module_raw_ptr = module.get();
 
 		_modules.push_back (std::move (module));

@@ -30,7 +30,7 @@ template<class pValue>
 		typedef pValue Value;
 
 	  public:
-		// Ctor:
+		// Ctor
 		explicit Lookahead (si::Time lookahead_time) noexcept;
 
 		/**

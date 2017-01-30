@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/bus//serial_port.h>
+#include <xefis/support/bus/serial_port.h>
 
 
 namespace xf {

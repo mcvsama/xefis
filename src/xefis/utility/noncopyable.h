@@ -26,7 +26,7 @@ class Noncopyable
 	Noncopyable& operator= (Noncopyable const&) = delete;
 
   protected:
-	Noncopyable() noexcept { }
+	constexpr Noncopyable() noexcept { }
 };
 
 } // namespace xf

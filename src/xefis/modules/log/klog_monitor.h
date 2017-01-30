@@ -23,34 +23,41 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v2/module.h>
+#include <xefis/core/v2/property.h>
 
 
-class KLog:
+class KLogMonitor:
 	public QObject,
-	public xf::Module
+	public x2::Module
 {
 	Q_OBJECT
 
+  public:
+	/*
+	 * Output
+	 */
+
+	x2::PropertyOut<bool>	output_flag_oom		{ this, "/flags/oom" };
+	x2::PropertyOut<bool>	output_flag_io		{ this, "/flags/io-error" };
+	x2::PropertyOut<bool>	output_flag_oops	{ this, "/flags/oops" };
+	x2::PropertyOut<bool>	output_flag_bug		{ this, "/flags/bug" };
+
+  private:
 	static constexpr std::size_t	BufferSize = 1024 * 1024;
 
   public:
 	// Ctor
-	KLog (xf::ModuleManager*, QDomElement const& config);
+	explicit KLogMonitor (std::string const& instance = {});
 
   private slots:
 	void
 	check_klog();
 
   private:
-	QTimer*							_timer		= nullptr;
-	bool							_open		= false;
+	QTimer*							_timer		{ nullptr };
+	bool							_open		{ false };
 	std::array<char, BufferSize>	_buffer;
-	// Output:
-	xf::PropertyBoolean				_flag_oom;
-	xf::PropertyBoolean				_flag_io;
-	xf::PropertyBoolean				_flag_oops;
-	xf::PropertyBoolean				_flag_bug;
 };
 
 #endif

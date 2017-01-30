@@ -52,7 +52,7 @@ class VOR: public x2::Module
 
   public:
 	// Ctor
-	VOR (std::string const& instance = {});
+	explicit VOR (std::string const& instance = {});
 
 	// Module API
 	void

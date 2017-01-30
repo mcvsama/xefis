@@ -98,6 +98,12 @@ template<class pValue>
 		Setting (Module* owner, OptionalTag);
 
 		/**
+		 * Copy-assignment operator.
+		 */
+		Setting const&
+		operator= (Value&& new_value);
+
+		/**
 		 * Return true if setting is required to have a value.
 		 */
 		bool
@@ -114,6 +120,12 @@ template<class pValue>
 		 */
 		Value const&
 		operator*() const noexcept;
+
+		/**
+		 * Read the setting value.
+		 */
+		Value const*
+		operator->() const noexcept;
 
 		// BasicSetting API
 		operator bool() const noexcept override;
@@ -161,12 +173,20 @@ template<class V>
 
 
 template<class V>
+	inline Setting<V> const&
+	Setting<V>::operator= (Value&& value)
+	{
+		_value = std::forward<Value> (value);
+		return *this;
+	}
+
+
+template<class V>
 	inline bool
 	Setting<V>::required() const noexcept
 	{
 		return _required;
 	}
-
 
 
 template<class V>
@@ -182,6 +202,14 @@ template<class V>
 	Setting<V>::operator*() const noexcept -> Value const&
 	{
 		return *_value;
+	}
+
+
+template<class V>
+	inline auto
+	Setting<V>::operator->() const noexcept -> Value const*
+	{
+		return &_value.get();
 	}
 
 
