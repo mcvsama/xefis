@@ -25,11 +25,9 @@
 #include "latency.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("log/latency", Latency)
-
-
-Latency::Latency (xf::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config)
+Latency::Latency (xf::Xefis* xefis, std::string const& instance):
+	Module (instance),
+	_xefis (xefis)
 {
 	_log_timer = new QTimer (this);
 	_log_timer->setInterval (1000);
@@ -42,7 +40,9 @@ Latency::Latency (xf::ModuleManager* module_manager, QDomElement const& config):
 void
 Latency::log_latency()
 {
-	xf::Accounting::StatsSet const& event_latency = accounting()->event_latency_stats();
+	xf::Accounting* accounting = _xefis->accounting();
+	xf::Accounting::StatsSet const& event_latency = accounting->event_latency_stats();
+
 	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
 	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
 		% "event handling latency"
@@ -55,10 +55,10 @@ Latency::log_latency()
 
 	typedef xf::Accounting::ModuleStats ModuleStats;
 
-	ModuleStats const& ms = accounting()->module_stats();
+	ModuleStats const& mstats = accounting->module_stats();
 	std::vector<ModuleStats::const_iterator> ordered_modules;
 
-	for (ModuleStats::const_iterator m = ms.begin(); m != ms.end(); ++m)
+	for (ModuleStats::const_iterator m = mstats.begin(); m != mstats.end(); ++m)
 		ordered_modules.push_back (m);
 
 	auto order_by_average = [](ModuleStats::const_iterator a, ModuleStats::const_iterator b)

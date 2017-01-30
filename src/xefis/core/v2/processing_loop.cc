@@ -69,7 +69,7 @@ ProcessingLoop::execute_cycle()
 	Time dt = t - _previous_timestamp.value_or (t - 1_ms); // -1_ms to prevent division by zero in modules.
 	Cycle cycle { t, dt };
 
-	//std::cout << "--- processing loop ---\n";
+	//XXX std::cout << "--- processing loop ---\n";
 
 	if (_previous_timestamp)
 	{

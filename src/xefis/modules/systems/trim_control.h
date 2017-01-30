@@ -19,29 +19,52 @@
 
 // Qt:
 #include <QtCore/QTimer>
-#include <QtXml/QDomElement>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v2/module.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/property_observer.h>
+#include <xefis/core/v2/setting.h>
 
 
 /**
  * Controls trim value with two buttons or axis.
  * Generates appropriate trimming sound.
  */
-class TrimControl: public xf::Module
+class TrimControl: public x2::Module
 {
   public:
-	// Ctor
-	TrimControl (xf::ModuleManager*, QDomElement const& config);
+	/*
+	 * Settings
+	 */
 
-  private:
+	x2::Setting<double>		setting_trim_step		{ this, 0.01 };
+
+	/*
+	 * Input
+	 */
+
+	x2::PropertyIn<double>	input_trim_axis			{ this, "/axis" };
+	x2::PropertyIn<double>	input_trim_value		{ this, "/value" };
+	x2::PropertyIn<bool>	input_up_trim_button	{ this, "/up-button" };
+	x2::PropertyIn<bool>	input_down_trim_button	{ this, "/down-button" };
+
+	/*
+	 * Output
+	 */
+
+	x2::PropertyOut<double>	output_trim_value		{ this, "/trim-value" };
+
+  public:
+	// Ctor
+	TrimControl (xf::Xefis*, std::string const& instance = {});
+
 	// Module API
 	void
-	data_updated() override;
+	process (x2::Cycle const&) override;
 
+  private:
 	void
 	compute_trim();
 
@@ -55,36 +78,28 @@ class TrimControl: public xf::Module
 	 * Return true if given button is 'pressed'.
 	 */
 	static bool
-	pressed (xf::PropertyBoolean const&);
+	pressed (x2::Property<bool> const&);
 
 	/**
 	 * Return true if given axis is moved 'up'.
 	 */
 	static bool
-	moved_up (xf::PropertyFloat const&);
+	moved_up (x2::Property<double> const&);
 
 	/**
 	 * Return true if given axis is moved 'down'.
 	 */
 	static bool
-	moved_down (xf::PropertyFloat const&);
+	moved_down (x2::Property<double> const&);
 
   private:
-	double					_trim_step		= 0.01;
-	double					_trim_value		= 0.0;
-	bool					_trimming_up	= false;
-	bool					_trimming_down	= false;
+	xf::Xefis*				_xefis;
+	double					_trim_value		{ 0.0 };
+	bool					_trimming_up	{ false };
+	bool					_trimming_down	{ false };
 	Unique<QTimer>			_timer;
-	// Input:
-	xf::PropertyFloat		_input_trim_axis;
-	xf::PropertyFloat		_input_trim_value;
-	xf::PropertyBoolean		_input_up_trim_button;
-	xf::PropertyBoolean		_input_down_trim_button;
-	// Output:
-	xf::PropertyFloat		_output_trim_value;
-	// Other:
-	xf::PropertyObserver	_trim_computer;
-	xf::PropertyObserver	_mix_computer;
+	x2::PropertyObserver	_trim_computer;
+	x2::PropertyObserver	_mix_computer;
 };
 
 #endif

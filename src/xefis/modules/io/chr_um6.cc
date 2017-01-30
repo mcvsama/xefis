@@ -30,10 +30,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module_manager.h>
 #include <xefis/core/system.h>
-#include <xefis/core/xefis.h>
-#include <xefis/utility/qdom.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/numeric.h>
 
@@ -41,48 +38,17 @@
 #include "chr_um6.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/chr-um6", CHRUM6)
+constexpr si::Time	CHRUM6::RestartDelay;
+constexpr si::Time	CHRUM6::AliveCheckInterval;
+constexpr si::Time	CHRUM6::StatusCheckInterval;
+constexpr si::Time	CHRUM6::InitializationDelay;
 
 
-constexpr Time	CHRUM6::RestartDelay;
-constexpr Time	CHRUM6::AliveCheckInterval;
-constexpr Time	CHRUM6::StatusCheckInterval;
-constexpr Time	CHRUM6::InitializationDelay;
-
-
-CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config)
+CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance):
+	Module (instance),
+	_serial_port (std::move (serial_port))
 {
-	std::string device_path;
-
-	parse_settings (config, {
-		{ "serial.device", device_path, true },
-		{ "serial.baud-rate", _baud_rate, true },
-		{ "sample-rate", _sample_rate, true },
-		{ "ekf.process-variance", _ekf_process_variance, false },
-	});
-
-	parse_properties (config, {
-		{ "input.centrifugal.x", _input_centrifugal_x, false },
-		{ "input.centrifugal.y", _input_centrifugal_y, false },
-		{ "input.centrifugal.z", _input_centrifugal_z, false },
-		{ "serviceable", _serviceable, true },
-		{ "caution", _caution, false },
-		{ "failures", _failures, false },
-		{ "internal-temperature", _internal_temperature, false },
-		{ "orientation.pitch", _orientation_pitch, true },
-		{ "orientation.roll", _orientation_roll, true },
-		{ "orientation.heading.magnetic", _orientation_magnetic_heading, true },
-		{ "acceleration.x", _acceleration_x, false },
-		{ "acceleration.y", _acceleration_y, false },
-		{ "acceleration.z", _acceleration_z, false },
-		{ "rotation.x", _rotation_x, false },
-		{ "rotation.y", _rotation_y, false },
-		{ "rotation.z", _rotation_z, false },
-		{ "magnetic.x", _magnetic_x, false },
-		{ "magnetic.y", _magnetic_y, false },
-		{ "magnetic.z", _magnetic_z, false },
-	});
+	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);
 	_restart_timer->setInterval (RestartDelay.quantity<Millisecond>());
@@ -104,60 +70,49 @@ CHRUM6::CHRUM6 (xf::ModuleManager* module_manager, QDomElement const& config):
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
-	_serviceable.set_default (false);
-	_caution.set_default (false);
-	_failures.set_default (0);
-
-	xf::SerialPort::Configuration sp_config;
-	sp_config.set_device_path (device_path);
-	sp_config.set_baud_rate (_baud_rate);
-	sp_config.set_data_bits (8);
-	sp_config.set_stop_bits (1);
-	sp_config.set_parity_bit (xf::SerialPort::Parity::None);
-
-	_serial_port = module_manager->xefis()->system()->allocate_serial_port();
-	_serial_port->set_configuration (sp_config);
-	_serial_port->set_max_read_failures (3);
-
-	_sensor = std::make_unique<xf::CHRUM6> (_serial_port.get());
+	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port);
 	_sensor->set_logger (log());
 	_sensor->set_alive_check_callback (std::bind (&CHRUM6::alive_check, this));
 	_sensor->set_communication_failure_callback (std::bind (&CHRUM6::communication_failure, this));
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));
 	_sensor->set_auto_retry (true);
 
+	output_serviceable = false;
+	output_caution = false;
+	output_failures = 0;
+
 	open_device();
 }
 
 
 void
-CHRUM6::data_updated()
+CHRUM6::process (x2::Cycle const&)
 {
-	if (_sensor && _serial_port->good())
+	if (_sensor && _serial_port.good())
 	{
-		// Earth acceleration = measured acceleration - centrifugal acceleration.
+		// Earth acceleration = measured acceleration + centripetal acceleration.
 
-		if (_acceleration_x.fresh() || _input_centrifugal_x.fresh())
+		if (_output_acceleration_x_changed() || _input_centripetal_x_changed())
 		{
 			Acceleration earth_x = 0_g;
-			if (_acceleration_x.valid() && _input_centrifugal_x.valid())
-				earth_x = *_acceleration_x - *_input_centrifugal_x;
+			if (output_acceleration_x && input_centripetal_x)
+				earth_x = *output_acceleration_x + *input_centripetal_x;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.quantity<Gravity>()));
 		}
 
-		if (_acceleration_y.fresh() || _input_centrifugal_y.fresh())
+		if (_output_acceleration_y_changed() || _input_centripetal_y_changed())
 		{
 			Acceleration earth_y = 0_g;
-			if (_acceleration_y.valid() && _input_centrifugal_y.valid())
-				earth_y = *_acceleration_y - *_input_centrifugal_y;
+			if (output_acceleration_y && input_centripetal_y)
+				earth_y = *output_acceleration_y + *input_centripetal_y;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.quantity<Gravity>()));
 		}
 
-		if (_acceleration_z.fresh() || _input_centrifugal_z.fresh())
+		if (_output_acceleration_z_changed() || _input_centripetal_z_changed())
 		{
 			Acceleration earth_z = 1_g;
-			if (_acceleration_z.valid() && _input_centrifugal_z.valid())
-				earth_z = *_acceleration_z - *_input_centrifugal_z;
+			if (output_acceleration_z && input_centripetal_z)
+				earth_z = *output_acceleration_z + *input_centripetal_z;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.quantity<Gravity>()));
 		}
 	}
@@ -171,7 +126,7 @@ CHRUM6::open_device()
 		_alive_check_timer->start();
 
 		reset();
-		if (_serial_port->open())
+		if (_serial_port.open())
 			initialize();
 		else
 			restart();
@@ -185,9 +140,8 @@ CHRUM6::open_device()
 void
 CHRUM6::failure (std::string const& reason)
 {
-	log() << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port->configuration().device_path() << std::endl;
-	if (_failures.configured())
-		_failures.write (*_failures + 1);
+	log() << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
+	output_failures = *output_failures + 1;
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
 	_failure_count++;
@@ -247,8 +201,8 @@ CHRUM6::setup_communication()
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::GP);
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::MP);
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::TMP);
-	data |= xf::CHRUM6::bits_for_baud_rate (_baud_rate) << 8;
-	data |= xf::CHRUM6::sample_rate_setting (_sample_rate);
+	data |= xf::CHRUM6::bits_for_baud_rate (_serial_port.configuration().baud_rate()) << 8;
+	data |= xf::CHRUM6::sample_rate_setting (*setting_sample_rate);
 
 	_sensor->write (ConfigurationAddress::Communication, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
@@ -292,7 +246,7 @@ CHRUM6::log_firmware_version()
 void
 CHRUM6::set_ekf_process_variance()
 {
-	_sensor->write (ConfigurationAddress::EKFProcessVariance, *_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::EKFProcessVariance, *setting_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			reset_ekf();
@@ -367,7 +321,7 @@ CHRUM6::initialization_complete()
 	log() << "Initialization complete." << std::endl;
 	_stage = Stage::Run;
 	_initialization_timer->stop();
-	_serviceable.write (true);
+	output_serviceable = true;
 	_status_check_timer->start();
 }
 
@@ -375,19 +329,19 @@ CHRUM6::initialization_complete()
 void
 CHRUM6::reset()
 {
-	_serviceable.write (false);
-	_orientation_pitch.set_nil();
-	_orientation_roll.set_nil();
-	_orientation_magnetic_heading.set_nil();
-	_acceleration_x.set_nil();
-	_acceleration_y.set_nil();
-	_acceleration_z.set_nil();
-	_rotation_x.set_nil();
-	_rotation_y.set_nil();
-	_rotation_z.set_nil();
-	_magnetic_x.set_nil();
-	_magnetic_y.set_nil();
-	_magnetic_z.set_nil();
+	output_serviceable = false;
+	output_orientation_pitch.set_nil();
+	output_orientation_roll.set_nil();
+	output_orientation_heading_magnetic.set_nil();
+	output_acceleration_x.set_nil();
+	output_acceleration_y.set_nil();
+	output_acceleration_z.set_nil();
+	output_rotation_x.set_nil();
+	output_rotation_y.set_nil();
+	output_rotation_z.set_nil();
+	output_magnetic_x.set_nil();
+	output_magnetic_y.set_nil();
+	output_magnetic_z.set_nil();
 
 	_stage = Stage::Initialize;
 }
@@ -415,120 +369,96 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		case static_cast<uint32_t> (DataAddress::Temperature):
 		{
 			if (req.success())
-				if (_internal_temperature.configured())
-					_internal_temperature.write (Quantity<Celsius> (req.value_as_float()));
+				output_internal_temperature = Quantity<Celsius> (req.value_as_float());
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPhiTheta):
 		{
-			if (req.success() && *_serviceable)
+			if (req.success() && output_serviceable.value_or (false))
 			{
-				// Pitch (phi) and Roll (theta):
-				const float factor = 0.0109863;
-				float phi = factor * req.value_upper16();
-				float theta = factor * req.value_lower16();
-				_orientation_pitch.write (1_deg * theta);
-				_orientation_roll.write (1_deg * phi);
+				si::Angle const factor = 0.0109863_deg;
+				output_orientation_roll = factor * req.value_upper16();
+				output_orientation_pitch = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPsi):
 		{
-			if (req.success() && *_serviceable)
+			if (req.success() && output_serviceable.value_or (false))
 			{
-				// Heading:
-				const float factor = 0.0109863;
-				float psi = xf::floored_mod (factor * req.value_upper16(), 0.f, 360.f);
-				_orientation_magnetic_heading.write (1_deg * psi);
+				si::Angle const factor = 0.0109863_deg;
+				output_orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::AccelProcXY):
 		{
-			if (req.success() && (_acceleration_x.configured() || _acceleration_y.configured()))
+			if (req.success())
 			{
-				const float factor = 0.000183105;
-				// x, y is in gravities:
-				float x = factor * req.value_upper16();
-				float y = factor * req.value_lower16();
-				if (_acceleration_x.configured())
-					_acceleration_x.write (1_g * x);
-				if (_acceleration_y.configured())
-					_acceleration_y.write (1_g * y);
+				si::Acceleration const factor = 0.000183105_g;
+				output_acceleration_x = factor * req.value_upper16();
+				output_acceleration_y = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::AccelProcZ):
 		{
-			if (req.success() && _acceleration_z.configured())
+			if (req.success())
 			{
-				const float factor = 0.000183105;
-				// z is in gravities:
-				float z = factor * req.value_upper16();
-				_acceleration_z.write (1_g * z);
+				si::Acceleration const factor = 0.000183105_g;
+				output_acceleration_z = factor * req.value_upper16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::GyroProcXY):
 		{
-			if (req.success() && (_rotation_x.configured() || _rotation_y.configured()))
+			if (req.success())
 			{
-				const float factor = 0.0610352;
-				// x, y are in degs per second:
-				float x = factor * req.value_upper16();
-				float y = factor * req.value_lower16();
-				if (_rotation_x.configured())
-					_rotation_x.write (1_deg * x / 1_s);
-				if (_rotation_y.configured())
-					_rotation_y.write (1_deg * y / 1_s);
+				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
+				output_rotation_x = factor * req.value_upper16();
+				output_rotation_y = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::GyroProcZ):
 		{
-			if (req.success() && _rotation_z.configured())
+			if (req.success())
 			{
-				const float factor = 0.0610352;
-				// z is in degs per second:
-				float z = factor * req.value_upper16();
-				_rotation_z.write (1_deg * z / 1_s);
+				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
+				output_rotation_z = factor * req.value_upper16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::MagProcXY):
 		{
-			if (req.success() && (_magnetic_x.configured() || _magnetic_y.configured()))
+			if (req.success())
 			{
-				const float factor = 0.000305176;
-				float x = factor * req.value_upper16();
-				float y = factor * req.value_lower16();
-				if (_magnetic_x.configured())
-					_magnetic_x.write (x);
-				if (_magnetic_y.configured())
-					_magnetic_y.write (y);
+				// Assume values are expressed in Teslas (it's not specified in the documentation):
+				si::MagneticField const factor = 0.000305176_T;
+				output_magnetic_x = factor * req.value_upper16();
+				output_magnetic_y = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::MagProcZ):
 		{
-			if (req.success() && _magnetic_z.configured())
+			if (req.success())
 			{
-				const float factor = 0.000305176;
-				float z = factor * req.value_upper16();
-				_magnetic_z.write (z);
+				si::MagneticField const factor = 0.000305176_T;
+				output_magnetic_z = factor * req.value_upper16();
 			}
 			break;
 		}
 
-		// This is sent after ZeroGyros completes:
+		// This is sent after ZeroGyros is completed:
 		case static_cast<uint32_t> (ConfigurationAddress::GyroBiasXY):
 		{
 			if (req.success())
@@ -708,9 +638,10 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	}
 
 	if (!serviceable)
-		_serviceable.write (false);
+		output_serviceable = false;
+
 	if (caution)
-		_caution.write (true);
+		output_caution = true;
 }
 
 

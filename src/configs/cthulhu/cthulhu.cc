@@ -20,13 +20,35 @@
 #include <xefis/core/v2/property.h>
 #include <xefis/core/v2/compatibility_v1_v2.h>
 #include <xefis/modules/helpers/mixer.h>
+#include <xefis/modules/io/chr_um6.h>
+#include <xefis/modules/io/ets_airspeed.h>
+#include <xefis/modules/io/gps.h>
+#include <xefis/modules/io/joystick.h>
 #include <xefis/modules/systems/adc.h>
 #include <xefis/modules/systems/afcs.h>
 #include <xefis/modules/systems/flaps_control.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/bus/i2c.h>
+#include <xefis/support/bus/serial_port.h>
 
 // Local:
 #include "cthulhu.h"
+
+
+class WarthogStick: public JoystickInput
+{
+  public:
+	/*
+	 * Output
+	 */
+
+	x2::PropertyOut<double>&	pitch_axis	= axis (3);
+	x2::PropertyOut<double>&	roll_axis	= axis (4);
+	x2::PropertyOut<bool>&		fire_button	= button (5);
+
+  public:
+	using JoystickInput::JoystickInput;
+};
 
 
 // TODO temp
@@ -100,22 +122,98 @@ class MyLoop: public x2::ProcessingLoop
 };
 
 
+namespace xf {
+
+//TODO move to qdom or whatever (utility/xml)
+/**
+ * Parse XML document and return QDomDocument.
+ */
+QDomDocument
+load_xml_doc (QFile&& xml_file)
+{
+	QDomDocument doc;
+	std::string path = xml_file.fileName().toStdString();
+
+	if (!xml_file.exists())
+		throw BadConfiguration ("file not found: " + path);
+
+	if (!xml_file.open (QFile::ReadOnly))
+		throw BadConfiguration ("file access error: " + path);
+
+	if (!doc.setContent (&xml_file, true))
+		throw BadConfiguration ("config parse error: " + path);
+
+	return doc;
+}
+
+
+/**
+ * Just like load_xml_doc, except it returns the document element of the doc,
+ * not QDomDocument.
+ */
+QDomElement
+load_xml (QFile&& xml_file)
+{
+	return load_xml_doc (std::forward<QFile> (xml_file)).documentElement();
+}
+
+} // namespace xf
+
+xf::i2c::Device g_i2c_device;
+
 Cthulhu::Cthulhu (xf::Xefis* xefis):
 	Machine (xefis)
 {
-	xf::Airframe airframe (xefis, QDomElement()); // XXX
+	xf::Airframe airframe (xefis, xf::load_xml (QFile ("configs/cthulhu/xmls/airframe.xml")));
 
 	auto* loop = make_processing_loop<MyLoop> (100_Hz);
+
 	auto* flaps_control = loop->load_module<FlapsControl> (airframe);
+	flaps_control->setting_angular_velocity = 2.5_deg / 1_s;
+	flaps_control->setting_control_extents = { 0.0, 0.5 };
 	auto* adc = loop->load_module<AirDataComputer> (&airframe);
 	auto* afcs = loop->load_module<AFCS>();
 	auto* dummy_module = loop->load_module<DummyModule>();
 	auto* temp_module = loop->load_module<TempModule>();
 	auto* mixer = loop->load_module<Mixer<si::Angle>> ("mixer");
-	g_temp_module = temp_module;
 
-	//flaps_control->setting_angular_velocity = 2.5_deg / 1_s;
-	//flaps_control->setting_control_extents = { 0.0, 0.5 };
+	xf::SerialPort::Configuration chrum6_sp_config;
+	chrum6_sp_config.set_device_path ("/dev/ttyS0");
+	chrum6_sp_config.set_baud_rate (115200);
+	chrum6_sp_config.set_data_bits (8);
+	chrum6_sp_config.set_stop_bits (1);
+	chrum6_sp_config.set_parity_bit (xf::SerialPort::Parity::None);
+
+	xf::SerialPort chrum6_serial_port;
+	chrum6_serial_port.set_configuration (chrum6_sp_config);
+
+	//auto* chrum6 = loop->load_module<CHRUM6> (std::move (chrum6_serial_port), "chrum6");
+
+	xf::i2c::Device i2c_device_for_ets_airspeed;
+	i2c_device_for_ets_airspeed.bus().set_bus_number (10);
+	i2c_device_for_ets_airspeed.set_address (xf::i2c::Address (0x75));
+
+	//auto* ets_airspeed = loop->load_module<ETSAirspeed> (std::move (i2c_device_for_ets_airspeed), "ets-airspeed");
+
+	xf::SerialPort::Configuration gps_serial_config;
+	gps_serial_config.set_device_path ("/dev/ttyS1");
+	gps_serial_config.set_baud_rate (9600);
+	gps_serial_config.set_data_bits (8);
+	gps_serial_config.set_stop_bits (1);
+	gps_serial_config.set_parity_bit (xf::SerialPort::Parity::None);
+	gps_serial_config.set_hardware_flow_control (false);
+
+	//auto* gps = loop->load_module<GPS> (xefis->system(), gps_serial_config, "gps");
+
+	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-stick.xml"));
+	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-throttle.xml"));
+	QDomElement pedals_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-saitek-pedals.xml"));
+
+	auto* joystick_input = loop->load_module<WarthogStick> (joystick_config, "stick");
+	auto* throttle_input = loop->load_module<JoystickInput> (throttle_config, "throttle");
+	auto* pedals_input = loop->load_module<JoystickInput> (pedals_config, "pedals");
+
+	g_temp_module = temp_module;
 
 	dummy_module->output_int >> temp_module->input_int;
 	dummy_module->input_int << temp_module->output_int;

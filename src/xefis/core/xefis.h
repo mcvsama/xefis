@@ -92,7 +92,7 @@ class Xefis: public QApplication
 	class OptionsHelper
 	{
 	  public:
-		// Ctor:
+		// Ctor
 		OptionsHelper (Xefis*);
 
 		Optional<int>

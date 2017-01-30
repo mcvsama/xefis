@@ -24,8 +24,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v2/module.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/setting.h>
+#include <xefis/core/system.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/protocols/nmea/parser.h>
 
@@ -38,8 +40,51 @@
  */
 class GPS:
 	public QObject,
-	public xf::Module
+	public x2::Module
 {
+  public:
+	/*
+	 * Settings
+	 */
+
+	x2::Setting<std::vector<std::string>>	setting_boot_pmtk_commands			{ this, { } };
+	x2::Setting<unsigned int>				setting_default_baud_rate			{ this, 9600 };
+	x2::Setting<unsigned int>				setting_target_baud_rate			{ this, 9600 };
+	x2::Setting<si::Length>					setting_receiver_accuracy			{ this };
+	x2::Setting<bool>						setting_synchronize_system_clock	{ this, false };
+
+	/*
+	 * Output
+	 */
+
+	// Number of serial read failures.
+	x2::PropertyOut<int64_t>				output_read_errors					{ this, "/read-errors" };	// Managed by Connection object.
+	// True if GPS device is serviceable:
+	x2::PropertyOut<bool>					output_serviceable					{ this, "/serviceable" };	// Managed by Connection object.
+	// Manager power to the GPS device:
+	x2::PropertyOut<bool>					output_power_on						{ this, "/power-on" };		// Managed by PowerCycle object.
+
+	x2::PropertyOut<std::string>			output_fix_quality					{ this, "/gps/fix-quality" };
+	x2::PropertyOut<std::string>			output_fix_mode						{ this, "/gps/mode" };		// "2D" or "3D"
+	x2::PropertyOut<si::Angle>				output_latitude						{ this, "/gps/latitude" };
+	x2::PropertyOut<si::Angle>				output_longitude					{ this, "/gps/longitude" };
+	x2::PropertyOut<si::Length>				output_altitude_amsl				{ this, "/gps/altitude-amsl" };
+	x2::PropertyOut<si::Length>				output_geoid_height					{ this, "/gps/geoid-height" };
+	x2::PropertyOut<si::Velocity>			output_ground_speed					{ this, "/gps/ground-speed" };
+	x2::PropertyOut<si::Angle>				output_track_true					{ this, "/gps/track.true" };
+	x2::PropertyOut<int64_t>				output_tracked_satellites			{ this, "/gps/tracked-satellites" };
+	x2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/gps/magnetic-declination" };
+	x2::PropertyOut<double>					output_hdop							{ this, "/gps/hdop" };
+	x2::PropertyOut<double>					output_vdop							{ this, "/gps/vdop" };
+	x2::PropertyOut<double>					output_pdop							{ this, "/gps/pdop" };
+	x2::PropertyOut<si::Length>				output_lateral_stddev				{ this, "/gps/lateral-stddev" };
+	x2::PropertyOut<si::Length>				output_vertical_stddev				{ this, "/gps/vertical-stddev" };
+	x2::PropertyOut<si::Length>				output_position_stddev				{ this, "/gps/position-stddev" };
+	x2::PropertyOut<int64_t>				output_dgps_station_id				{ this, "/gps/dgps-station-id" };
+	x2::PropertyOut<si::Time>				output_fix_system_timestamp			{ this, "/gps/fix/system-timestamp" };
+	x2::PropertyOut<si::Time>				output_fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
+
+  private:
 	Q_OBJECT
 
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
@@ -75,10 +120,10 @@ class GPS:
 		~Connection();
 
 		/**
-		 * Called from GPS::data_updated().
+		 * Called from GPS::process().
 		 */
 		void
-		data_updated();
+		process();
 
 		/**
 		 * Baud rate as requested during construction.
@@ -205,11 +250,11 @@ class GPS:
 		~PowerCycle();
 
 		/**
-		 * Called from GPS::data_updated().
+		 * Called from GPS::process().
 		 * Takes care of actually allocating and destroying of Connections.
 		 */
 		void
-		data_updated();
+		process();
 
 		/**
 		 * Notify that connection error has occured.
@@ -241,15 +286,18 @@ class GPS:
 
   public:
 	// Ctor
-	GPS (xf::ModuleManager* module_manager, QDomElement const& config);
+	GPS (xf::System*, xf::SerialPort::Configuration const&, std::string const& instance = {});
 
 	// Dtor
 	~GPS();
 
-  protected:
-	// xf::Module API
+	// Module API
 	void
-	data_updated() override;
+	initialize() override;
+
+	// Module API
+	void
+	process (x2::Cycle const&) override;
 
   private slots:
 	/**
@@ -284,58 +332,15 @@ class GPS:
 	update_clock (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
   private:
+	xf::System*						_system;
 	Unique<PowerCycle>				_power_cycle;
 	// Used to wait a bit after a failure:
 	Unique<QTimer>					_power_cycle_timer;
 	bool							_power_cycle_requested		= false;
 	bool							_reliable_fix_quality		= false;
 	unsigned int					_power_cycle_attempts		= 0;
-
-	/*
-	 * Settings
-	 */
-
-	std::string						_device_path;
-	std::vector<std::string>		_boot_pmtk_commands;
-	unsigned int					_default_baud_rate			= 9600;
-	unsigned int					_target_baud_rate			= 9600;
-	Length							_receiver_accuracy;
-	bool							_synchronize_system_clock	= false;
-
-	/*
-	 * General output
-	 */
-
-	// Number of serial read failures.
-	xf::PropertyInteger				_read_errors;	// Managed by Connection object.
-	// True if GPS device is serviceable:
-	xf::PropertyBoolean				_serviceable;	// Managed by Connection object.
-	// Manager power to the GPS device:
-	xf::PropertyBoolean				_power_on;		// Managed by PowerCycle object.
-
-	/*
-	 * GPS output
-	 */
-
-	xf::PropertyString				_fix_quality;
-	xf::PropertyString				_fix_mode;		// "2D" or "3D"
-	xf::PropertyAngle				_latitude;
-	xf::PropertyAngle				_longitude;
-	xf::PropertyLength				_altitude_amsl;
-	xf::PropertyLength				_geoid_height;
-	xf::PropertySpeed				_ground_speed;
-	xf::PropertyAngle				_track_true;
-	xf::PropertyInteger				_tracked_satellites;
-	xf::PropertyAngle				_magnetic_declination;
-	xf::PropertyFloat				_hdop;
-	xf::PropertyFloat				_vdop;
-	xf::PropertyFloat				_pdop;
-	xf::PropertyLength				_lateral_stddev;
-	xf::PropertyLength				_vertical_stddev;
-	xf::PropertyLength				_position_stddev;
-	xf::PropertyInteger				_dgps_station_id;
-	xf::PropertyTime				_fix_system_timestamp;
-	xf::PropertyTime				_fix_gps_timestamp;
+	xf::SerialPort::Configuration	_serial_port_config;
+	bool							_clock_synchronized			= false;
 };
 
 #endif

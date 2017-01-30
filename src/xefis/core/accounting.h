@@ -119,7 +119,7 @@ class Accounting: public QObject
 	typedef std::map<Module::Pointer, StatsSet> ModuleStats;
 
   public:
-	// Ctor:
+	// Ctor
 	Accounting();
 
 	// Dtor

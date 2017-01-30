@@ -36,7 +36,7 @@ class RotaryDecoder
 	typedef std::function<void (int delta)> Callback;
 
   public:
-	// Ctor:
+	// Ctor
 	RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
 
 	/**

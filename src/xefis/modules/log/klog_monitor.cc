@@ -24,54 +24,47 @@
 #include <xefis/utility/qdom.h>
 
 // Local:
-#include "klog.h"
+#include "klog_monitor.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("log/klog", KLog)
-
-
-KLog::KLog (xf::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config)
+KLogMonitor::KLogMonitor (std::string const& instance):
+	Module (instance)
 {
-	parse_properties (config, {
-		// Output:
-		{ "flag.oom", _flag_oom, true },
-		{ "flag.io", _flag_io, true },
-		{ "flag.oops", _flag_oops, true },
-		{ "flag.bug", _flag_bug, true },
-	});
-
 	_timer = new QTimer (this);
 	_timer->setInterval (100);
 	_timer->setSingleShot (false);
 	QObject::connect (_timer, SIGNAL (timeout()), this, SLOT (check_klog()));
 	_timer->start();
 
-	_flag_oom.set_default (false);
-	_flag_io.set_default (false);
-	_flag_oops.set_default (false);
-	_flag_bug.set_default (false);
+	output_flag_oom = true;
+	output_flag_io = true;
+	output_flag_oops = true;
+	output_flag_bug = true;
 }
 
 
 void
-KLog::check_klog()
+KLogMonitor::check_klog()
 {
 	const int read_all_command = 3;
 	std::size_t len = klogctl (read_all_command, _buffer.data(), _buffer.size());
 	std::string buffer (_buffer.data(), len);
 	std::transform (buffer.begin(), buffer.end(), buffer.begin(), tolower);
+
 	// Search for OOMs:
 	if (buffer.find ("oom-killer") != std::string::npos)
-		_flag_oom.write (true);
+		output_flag_oom = true;
+
 	// Search for I/O errors:
 	if (buffer.find ("i/o error") != std::string::npos)
-		_flag_io.write (true);
+		output_flag_io = true;
+
 	// Search for Oopses:
 	if (buffer.find (" oops") != std::string::npos)
-		_flag_oops.write (true);
+		output_flag_oops = true;
+
 	// Search for BUGs:
 	if (buffer.find (" bug") != std::string::npos)
-		_flag_bug.write (true);
+		output_flag_bug = true;
 }
 

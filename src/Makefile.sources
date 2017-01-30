@@ -65,55 +65,26 @@ XEFIS_MOCHDRS += modules/instruments/status.h
 
 ######## /modules/io ########
 
-XEFIS_HEADERS += modules/io/bmp085.h
-XEFIS_HEADERS += modules/io/chr_um6.h
-XEFIS_HEADERS += modules/io/ets_airspeed.h
-XEFIS_HEADERS += modules/io/flight_gear.h
-XEFIS_HEADERS += modules/io/gps.h
 XEFIS_HEADERS += modules/io/ht16k33.h
-XEFIS_HEADERS += modules/io/joystick.h
 XEFIS_HEADERS += modules/io/mouse.h
 XEFIS_HEADERS += modules/io/pca9685.h
 XEFIS_HEADERS += modules/io/link.h
 XEFIS_HEADERS += modules/io/udp.h
 XEFIS_HEADERS += modules/io/xbee.h
 
-XEFIS_SOURCES += modules/io/bmp085.cc
-XEFIS_SOURCES += modules/io/chr_um6.cc
-XEFIS_SOURCES += modules/io/ets_airspeed.cc
-XEFIS_SOURCES += modules/io/flight_gear.cc
-XEFIS_SOURCES += modules/io/gps.cc
 XEFIS_SOURCES += modules/io/ht16k33.cc
-XEFIS_SOURCES += modules/io/joystick.cc
 XEFIS_SOURCES += modules/io/mouse.cc
 XEFIS_SOURCES += modules/io/pca9685.cc
 XEFIS_SOURCES += modules/io/link.cc
 XEFIS_SOURCES += modules/io/udp.cc
 XEFIS_SOURCES += modules/io/xbee.cc
 
-XEFIS_MOCHDRS += modules/io/bmp085.h
-XEFIS_MOCHDRS += modules/io/chr_um6.h
-XEFIS_MOCHDRS += modules/io/ets_airspeed.h
-XEFIS_MOCHDRS += modules/io/flight_gear.h
-XEFIS_MOCHDRS += modules/io/gps.h
 XEFIS_MOCHDRS += modules/io/ht16k33.h
-XEFIS_MOCHDRS += modules/io/joystick.h
 XEFIS_MOCHDRS += modules/io/mouse.h
 XEFIS_MOCHDRS += modules/io/pca9685.h
 XEFIS_MOCHDRS += modules/io/link.h
 XEFIS_MOCHDRS += modules/io/udp.h
 XEFIS_MOCHDRS += modules/io/xbee.h
-
-######## /modules/log ########
-
-XEFIS_HEADERS += modules/log/latency.h
-XEFIS_HEADERS += modules/log/klog.h
-
-XEFIS_SOURCES += modules/log/latency.cc
-XEFIS_SOURCES += modules/log/klog.cc
-
-XEFIS_MOCHDRS += modules/log/latency.h
-XEFIS_MOCHDRS += modules/log/klog.h
 
 ######## /modules/systems ########
 
@@ -305,6 +276,40 @@ SELFTEST_SOURCES += xefis/core/v2/tests/property.test.cc
 
 XEFIS_HEADERS += xefis/modules/helpers/mixer.h
 
+######## /xefis/modules/io ########
+
+XEFIS_HEADERS += xefis/modules/io/bmp085.h
+XEFIS_HEADERS += xefis/modules/io/chr_um6.h
+XEFIS_HEADERS += xefis/modules/io/ets_airspeed.h
+XEFIS_HEADERS += xefis/modules/io/flight_gear.h
+XEFIS_HEADERS += xefis/modules/io/gps.h
+XEFIS_HEADERS += xefis/modules/io/joystick.h
+
+XEFIS_SOURCES += xefis/modules/io/bmp085.cc
+XEFIS_SOURCES += xefis/modules/io/chr_um6.cc
+XEFIS_SOURCES += xefis/modules/io/ets_airspeed.cc
+XEFIS_SOURCES += xefis/modules/io/flight_gear.cc
+XEFIS_SOURCES += xefis/modules/io/gps.cc
+XEFIS_SOURCES += xefis/modules/io/joystick.cc
+
+XEFIS_MOCHDRS += xefis/modules/io/bmp085.h
+XEFIS_MOCHDRS += xefis/modules/io/chr_um6.h
+XEFIS_MOCHDRS += xefis/modules/io/ets_airspeed.h
+XEFIS_MOCHDRS += xefis/modules/io/flight_gear.h
+XEFIS_MOCHDRS += xefis/modules/io/gps.h
+XEFIS_MOCHDRS += xefis/modules/io/joystick.h
+
+######## /xefis/modules/log ########
+
+XEFIS_HEADERS += xefis/modules/log/klog_monitor.h
+XEFIS_HEADERS += xefis/modules/log/latency.h
+
+XEFIS_SOURCES += xefis/modules/log/klog_monitor.cc
+XEFIS_SOURCES += xefis/modules/log/latency.cc
+
+XEFIS_MOCHDRS += xefis/modules/log/klog_monitor.h
+XEFIS_MOCHDRS += xefis/modules/log/latency.h
+
 ######## /xefis/modules/systems ########
 
 XEFIS_HEADERS += xefis/modules/systems/adc.h
@@ -453,6 +458,7 @@ XEFIS_HEADERS += xefis/utility/mutex.h
 XEFIS_HEADERS += xefis/utility/navigation.h
 XEFIS_HEADERS += xefis/utility/noncopyable.h
 XEFIS_HEADERS += xefis/utility/numeric.h
+XEFIS_HEADERS += xefis/utility/owner_token.h
 XEFIS_HEADERS += xefis/utility/packet_reader.h
 XEFIS_HEADERS += xefis/utility/painter.h
 XEFIS_HEADERS += xefis/utility/pid_control.h

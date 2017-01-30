@@ -14,39 +14,18 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
-#include <xefis/core/module_manager.h>
 #include <xefis/core/sound_manager.h>
 
 // Local:
 #include "trim_control.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("systems/trim-control", TrimControl)
-
-
-TrimControl::TrimControl (xf::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config)
+TrimControl::TrimControl (xf::Xefis* xefis, std::string const& instance):
+	Module (instance),
+	_xefis (xefis)
 {
-	parse_settings (config, {
-		{ "trim-step", _trim_step, false },
-	});
-
-	parse_properties (config, {
-		{ "input.trim-axis", _input_trim_axis, false },
-		{ "input.trim-value", _input_trim_value, false },
-		{ "input.up-trim-button", _input_up_trim_button, false },
-		{ "input.down-trim-button", _input_down_trim_button, false },
-		{ "output.trim-value", _output_trim_value, false },
-	});
-
 	_timer = std::make_unique<QTimer>();
 	_timer->setInterval (180);
 	_timer->setSingleShot (false);
@@ -54,10 +33,10 @@ TrimControl::TrimControl (xf::ModuleManager* module_manager, QDomElement const& 
 
 	_trim_computer.set_callback (std::bind (&TrimControl::compute_trim, this));
 	_trim_computer.observe ({
-		&_input_trim_axis,
-		&_input_trim_value,
-		&_input_up_trim_button,
-		&_input_down_trim_button,
+		&input_trim_axis,
+		&input_trim_value,
+		&input_up_trim_button,
+		&input_down_trim_button,
 	});
 
 	update_trim_without_sound();
@@ -65,35 +44,33 @@ TrimControl::TrimControl (xf::ModuleManager* module_manager, QDomElement const& 
 
 
 void
-TrimControl::data_updated()
+TrimControl::process (x2::Cycle const& cycle)
 {
-	_trim_computer.data_updated (update_time());
+	_trim_computer.process (cycle.update_time());
 }
 
 
 void
 TrimControl::compute_trim()
 {
-	if (_input_trim_value.fresh())
-	{
-		_output_trim_value = *_input_trim_value;
-	}
+	if (input_trim_value)
+		output_trim_value = *input_trim_value;
 	else
 	{
 		_trimming_up = false;
 		_trimming_down = false;
 
-		if (_input_up_trim_button.fresh() && pressed (_input_up_trim_button))
+		if (pressed (input_up_trim_button))
 			_trimming_up = true;
 
-		if (_input_down_trim_button.fresh() && pressed (_input_down_trim_button))
+		if (pressed (input_down_trim_button))
 			_trimming_down = true;
 
-		if (_input_trim_axis.fresh())
+		if (input_trim_axis)
 		{
-			if (moved_up (_input_trim_axis))
+			if (moved_up (input_trim_axis))
 				_trimming_up = true;
-			else if (moved_down (_input_trim_axis))
+			else if (moved_down (input_trim_axis))
 				_trimming_down = true;
 		}
 
@@ -112,34 +89,34 @@ void
 TrimControl::update_trim()
 {
 	update_trim_without_sound();
-	module_manager()->xefis()->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
+	_xefis->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
 }
 
 
 void
 TrimControl::update_trim_without_sound()
 {
-	_trim_value = xf::clamped (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * _trim_step, -1.0, 1.0);
-	_output_trim_value = _trim_value;
+	_trim_value = xf::clamped (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * *setting_trim_step, -1.0, 1.0);
+	output_trim_value = _trim_value;
 }
 
 
 inline bool
-TrimControl::pressed (xf::PropertyBoolean const& property)
+TrimControl::pressed (x2::Property<bool> const& property)
 {
-	return property.valid() && *property;
+	return property && *property;
 }
 
 
 inline bool
-TrimControl::moved_up (xf::PropertyFloat const& property)
+TrimControl::moved_up (x2::Property<double> const& property)
 {
 	return property.valid() && *property > 0.5;
 }
 
 
 inline bool
-TrimControl::moved_down (xf::PropertyFloat const& property)
+TrimControl::moved_down (x2::Property<double> const& property)
 {
 	return property.valid() && *property < -0.5;
 }

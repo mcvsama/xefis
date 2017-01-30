@@ -46,11 +46,11 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= Optional<Value>;
-		using PropertyIn	= x2::PropertyIn<Value>;
+		using Property		= x2::Property<Value>;
 
 	  public:
 		// Ctor
-		explicit PropChanged (PropertyIn& property):
+		explicit PropChanged (Property& property):
 			_property (property),
 			_last_value (property.get_optional())
 		{ }
@@ -73,7 +73,7 @@ template<class pValue>
 		/**
 		 * Return reference to observed property.
 		 */
-		PropertyIn const&
+		Property const&
 		property() const noexcept
 		{
 			return _property;
@@ -82,14 +82,14 @@ template<class pValue>
 		/**
 		 * Return reference to observed property.
 		 */
-		PropertyIn&
+		Property&
 		property() noexcept
 		{
 			return _property;
 		}
 
 	  private:
-		PropertyIn		_property;
+		Property&		_property;
 		OptionalValue	_last_value;
 	};
 
@@ -103,11 +103,11 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using PropertyIn	= typename PropChanged<Value>::PropertyIn;
+		using Property		= typename PropChanged<Value>::Property;
 
 	  public:
 		// Ctor
-		constexpr PropChangedTo (PropertyIn& property, Value value):
+		constexpr PropChangedTo (Property& property, Value value):
 			PropChanged<Value> (property),
 			_expected_value (value)
 		{ }
@@ -144,7 +144,7 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= typename PropChanged<Value>::OptionalValue;
-		using PropertyIn	= typename PropChanged<Value>::PropertyIn;
+		using Property		= typename PropChanged<Value>::Property;
 
 	  public:
 		using PropChanged<Value>::PropChanged;

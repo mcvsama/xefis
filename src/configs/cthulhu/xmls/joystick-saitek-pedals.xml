@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<joystick>
+	<device>/dev/input/by-id/saitek-rudder-pedals</device>
+	<!-- Pedals -->
+	<axis id='2'>
+		<power>3</power>
+	</axis>
+</joystick>
+

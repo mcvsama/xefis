@@ -1,0 +1,25 @@
+<?xml version='1.0'?>
+<joystick>
+	<device>/dev/input/by-id/usb-Thustmaster_Joystick_-_HOTAS_Warthog-joystick</device>
+	<!-- Stick: ailerons -->
+	<axis id='0'>
+		<center>0.0</center>
+		<dead-zone>0.005</dead-zone>
+		<power>1.5</power>
+	</axis>
+	<!-- Stick: elevator -->
+	<axis id='1'>
+		<reverse/>
+		<center>0.0</center>
+		<dead-zone>0.005</dead-zone>
+		<power>1.5</power>
+	</axis>
+	<!-- Trim: ailerons -->
+	<axis id='2'>
+	</axis>
+	<!-- Trim: elevator -->
+	<axis id='3'>
+		<reverse/>
+	</axis>
+</joystick>
+

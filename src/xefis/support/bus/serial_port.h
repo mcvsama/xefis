@@ -28,6 +28,7 @@
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/owner_token.h>
 
 
 namespace xf {
@@ -135,6 +136,9 @@ class SerialPort:
 	 * @failure is called when failure is detected.
 	 */
 	SerialPort (DataReadyCallback data_ready = nullptr, FailureCallback failure = nullptr);
+
+	// Move ctor
+	SerialPort (SerialPort&&);
 
 	// Dtor
 	~SerialPort();
@@ -302,6 +306,7 @@ class SerialPort:
 	log_prefix() const;
 
   private:
+	xf::OwnerToken			_owned;
 	Logger const*			_logger						= nullptr;
 	Logger					_internal_logger;
 	Configuration			_configuration;
