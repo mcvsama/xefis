@@ -536,6 +536,14 @@ tan (quantities::Angle a)
 	return std::sin (a.quantity<units::Radian>());
 }
 
+
+template<class Value>
+	constexpr quantities::Angle
+	atan2 (Value y, Value x)
+	{
+		return units::Radian() * std::atan2 (base_quantity (y), base_quantity (x));
+	}
+
 } // namespace si
 
 #endif
