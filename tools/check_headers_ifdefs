@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require 'find'
+
+Skip = %w[
+	xefis/config/all.h
+]
+
+def ifdef path
+	path.gsub('/', '__').gsub('.', '_').upcase
+end
+
+def check file
+	return true if Skip.include?(file)
+	File.open(file).readlines.any? { |line| line.chomp == "\#ifndef #{ifdef file}__INCLUDED" }
+end
+
+def find dir
+	Find.find(dir) do |path|
+		if File.directory? path
+			if path == '.'
+				Find.prune
+			else
+				next
+			end
+		else
+			begin
+				if path.end_with?('.h') && !check(path)
+					puts "../src/#{path}"
+				end
+			rescue => e
+				puts "Could not check file #{file}: #{e.message}"
+			end
+		end
+	end
+end
+
+Dir.chdir '../src'
+find 'xefis'
