@@ -30,6 +30,7 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/bus/i2c.h>
 #include <xefis/support/bus/serial_port.h>
+#include <xefis/support/devices/ht16k33.h>
 
 // Local:
 #include "cthulhu.h"
@@ -221,5 +222,23 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 	temp_module->temperature_in << xf::Property<Temperature> (xf::PropertyPath ("/sensors/air-temperature/total"));
 
 	loop->start();
+}
+
+
+void
+Cthulhu::setup_ht16k33s()
+{
+	xf::i2c::Device i2c_device;
+	i2c_device.bus().set_bus_number (10);
+	i2c_device.set_address (xf::i2c::Address (0x11));
+
+	x2::PropertyOut<bool> switch_prop { "/switch-prop" };
+	x2::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
+	x2::PropertyOut<bool> led_prop { "/led-prop" };
+
+	xf::HT16K33 chip (std::move (i2c_device));
+	chip.add_single_switch (switch_prop, 0, 1);
+	chip.add_numeric_display<si::Angle, si::Degree> (angle_prop, xf::HT16K33::NumericDisplay<si::Angle, si::Degree>::DigitRows { 0, 1, 2, 3 });
+	chip.add_single_led (led_prop, 0, 2);
 }
 

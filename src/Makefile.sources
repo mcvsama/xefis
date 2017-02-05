@@ -65,21 +65,18 @@ XEFIS_MOCHDRS += modules/instruments/status.h
 
 ######## /modules/io ########
 
-XEFIS_HEADERS += modules/io/ht16k33.h
 XEFIS_HEADERS += modules/io/mouse.h
 XEFIS_HEADERS += modules/io/pca9685.h
 XEFIS_HEADERS += modules/io/link.h
 XEFIS_HEADERS += modules/io/udp.h
 XEFIS_HEADERS += modules/io/xbee.h
 
-XEFIS_SOURCES += modules/io/ht16k33.cc
 XEFIS_SOURCES += modules/io/mouse.cc
 XEFIS_SOURCES += modules/io/pca9685.cc
 XEFIS_SOURCES += modules/io/link.cc
 XEFIS_SOURCES += modules/io/udp.cc
 XEFIS_SOURCES += modules/io/xbee.cc
 
-XEFIS_MOCHDRS += modules/io/ht16k33.h
 XEFIS_MOCHDRS += modules/io/mouse.h
 XEFIS_MOCHDRS += modules/io/pca9685.h
 XEFIS_MOCHDRS += modules/io/link.h
@@ -392,8 +389,12 @@ XEFIS_SOURCES += xefis/support/airframe/lift_mod.cc
 ######## /xefis/support/devices ########
 
 XEFIS_HEADERS += xefis/support/devices/chr_um6.h
+XEFIS_HEADERS += xefis/support/devices/ht16k33.h
 
 XEFIS_SOURCES += xefis/support/devices/chr_um6.cc
+XEFIS_SOURCES += xefis/support/devices/ht16k33.cc
+
+XEFIS_MOCHDRS += xefis/support/devices/ht16k33.h
 
 ######## /xefis/support/navigation ########
 

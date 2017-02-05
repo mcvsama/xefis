@@ -17,6 +17,9 @@
 // Standard:
 #include <cstddef>
 
+// Boost:
+#include <boost/variant.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/module.h>
