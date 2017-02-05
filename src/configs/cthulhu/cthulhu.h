@@ -28,6 +28,10 @@ class Cthulhu: public x2::Machine
   public:
 	// Ctor
 	Cthulhu (xf::Xefis*);
+
+  private:
+	void
+	setup_ht16k33s();
 };
 
 #endif

@@ -55,22 +55,21 @@ template<class T,
 
 
 /**
- * Return quantity in units default for Q if Q is a Quantity type.
+ * Return quantity in units U for quantity Q, if Q is a Quantity type.
  */
-template<class Q,
+template<class U, class Q,
 		 class = std::enable_if_t<is_quantity<Q>::value>>
 	constexpr typename Q::Value
-	quantity (Q value) noexcept;
+	quantity_in_units (Q value) noexcept;
 
 
 /**
- * Return value argument if T is non-Quantity type.
- * Overload of quantity() for handling non-Quantity types.
+ * Return the argument (for non-Quantity arguments). Convenience overload.
  */
-template<class T,
+template<class U, class T,
 		 class = std::enable_if_t<!is_quantity<T>::value>>
 	constexpr T
-	quantity (T value) noexcept;
+	quantity_in_units (T value) noexcept;
 
 
 /**
@@ -285,17 +284,42 @@ template<class T, class>
 	}
 
 
-template<class Q, class>
+/**
+ * Return quantity in units U if Q is a Quantity type.
+ */
+template<class Q, class U = typename Q::Unit,
+		 class = std::enable_if_t<is_quantity<Q>::value>>
 	constexpr typename Q::Value
 	quantity (Q value) noexcept
 	{
-		return value.quantity();
+		return value.template quantity<U>();
 	}
 
 
-template<class T, class>
+/**
+ * Return value argument if T is non-Quantity type.
+ * Overload of quantity() for handling non-Quantity types.
+ */
+template<class T, class Unused = void,
+		 class = std::enable_if_t<!is_quantity<T>::value>>
 	constexpr T
 	quantity (T value) noexcept
+	{
+		return value;
+	}
+
+
+template<class U, class Q, class>
+	constexpr typename Q::Value
+	quantity_in_units (Q value) noexcept
+	{
+		return quantity<Q, U> (value);
+	}
+
+
+template<class U, class T, class>
+	constexpr T
+	quantity_in_units (T value) noexcept
 	{
 		return value;
 	}

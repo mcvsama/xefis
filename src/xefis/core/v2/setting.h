@@ -18,10 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 
-// Boost:
-#include <boost/optional.hpp>
-#include <boost/variant.hpp>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property_utils.h>
