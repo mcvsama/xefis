@@ -50,6 +50,9 @@ class ProcessingLoop: public QObject
 	// Ctor
 	ProcessingLoop (Machine* machine, Frequency loop_frequency);
 
+	// Dtor
+	virtual ~ProcessingLoop() = default;
+
 	/**
 	 * Load module by name and return a pointer.
 	 * Module is owned by Machine object.
