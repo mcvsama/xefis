@@ -15,12 +15,12 @@
 #include <cstddef>
 
 // Local:
-#include "rotary_decoder.h"
+#include "quadrature_decoder.h"
 
 
 namespace xf {
 
-RotaryDecoder::RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback):
+QuadratureDecoder::QuadratureDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback):
 	_prev_a (property_a.read (false)),
 	_prev_b (property_b.read (false)),
 	_property_a (property_a),
@@ -30,7 +30,7 @@ RotaryDecoder::RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoole
 
 
 void
-RotaryDecoder::data_updated()
+QuadratureDecoder::data_updated()
 {
 	if (!_property_a.valid() || !_property_b.valid() || !_callback)
 		return;

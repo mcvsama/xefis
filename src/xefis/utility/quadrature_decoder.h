@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__ROTARY_DECODER_H__INCLUDED
-#define XEFIS__UTILITY__ROTARY_DECODER_H__INCLUDED
+#ifndef XEFIS__UTILITY__QUADRATURE_DECODER_H__INCLUDED
+#define XEFIS__UTILITY__QUADRATURE_DECODER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -30,14 +30,14 @@ namespace xf {
  * calls 'up' or 'down' callbacks depending
  * on how these boolean values change.
  */
-class RotaryDecoder
+class QuadratureDecoder
 {
   public:
 	typedef std::function<void (int delta)> Callback;
 
   public:
 	// Ctor
-	RotaryDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
+	QuadratureDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -68,14 +68,14 @@ class RotaryDecoder
 
 
 inline void
-RotaryDecoder::operator() (int delta)
+QuadratureDecoder::operator() (int delta)
 {
 	_callback (delta);
 }
 
 
 inline void
-RotaryDecoder::call (int delta)
+QuadratureDecoder::call (int delta)
 {
 	_callback (delta);
 }
