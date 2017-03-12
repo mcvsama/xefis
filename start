@@ -6,10 +6,41 @@ DRD='valgrind --tool=drd'
 VALGRIND=
 GDB=
 
-TARGET="$DIST"
-if [ "$TARGET" = "" ]; then
-	TARGET="$(uname -m)"
+# Copy of Makefile.local
+THREADS=4
+VERBOSE=0
+DEBUG=1
+PROFILING=0
+RELEASE=0
+
+if [ "$DEBUG" = "1" ] || [ "$VALGRIND" != "" ] || [ "$GDB" != "" ]; then
+	export GLIBCXX_FORCE_NEW=1
 fi
-export GLIBCXX_FORCE_NEW=1
-make -C src && $VALGRIND $GDB src/build/"$TARGET"/xefis "$@"
+
+BUILDID_ARCH="$(uname -m)"
+
+if [ "$PROFILING" = "1" ]; then
+	BUILDID_PROFILING='-profiling'
+fi
+
+if [ "$DEBUG" = "1" ]; then
+	BUILDID_DEBUG='-debug'
+fi
+
+if [ "$PROFILE" != "" ]; then
+	BUILDID_PROFILE="-$PROFILE"
+fi
+
+export BUILDID="$BUILDID_ARCH$BUILDID_PROFILING$BUILDID_DEBUG$BUILDID_PROFILE"
+echo $BUILDID
+echo
+
+execute()
+{
+	pushd src
+	$VALGRIND $GDB build/"$BUILDID"/xefis "$@"
+	popd
+}
+
+make -j4 -C src && execute
 
