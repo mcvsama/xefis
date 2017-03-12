@@ -40,13 +40,6 @@ class System
 	bool
 	set_clock (Time const& unix_time);
 
-	template<class ...Args>
-		Unique<SerialPort>
-		allocate_serial_port (Args&& ...args)
-		{
-			return std::make_unique<SerialPort> (std::forward<Args> (args)...);
-		}
-
   private:
 	Logger _logger;
 };
