@@ -45,7 +45,7 @@ endif
 CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
-CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors
+CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fnothrow-opt -pedantic-errors -D_GLIBCXX_USE_CXX11_ABI=1
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)

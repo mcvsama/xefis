@@ -16,10 +16,12 @@
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
-#include <cxxabi.h>
 
 // System:
 #include <execinfo.h>
+
+// Xefis:
+#include <xefis/utility/demangle.h>
 
 // Local:
 #include "backtrace.h"
@@ -33,6 +35,7 @@ Backtrace::Backtrace()
 	void* buffer[MAX];
 	int r = ::backtrace (buffer, MAX);
 	std::unique_ptr<char*, decltype(&::free)> symbols (::backtrace_symbols (buffer, r), ::free);
+
 	if (symbols)
 	{
 		for (int i = 1; i < r; ++i)
@@ -44,11 +47,7 @@ Backtrace::Backtrace()
 				b = symbol.find (')');
 			std::string name (symbol.substr (a, b - a));
 
-			// Demangle the name:
-			int demangle_status = 0;
-			std::size_t demangled_max_size = 256;
-			std::unique_ptr<char, decltype(&::free)> demangled_name (abi::__cxa_demangle (name.c_str(), NULL, &demangled_max_size, &demangle_status), ::free);
-			_symbols.push_back (Symbol ((demangle_status == 0) ? demangled_name.get() : name, symbol.substr (0, a-1)));
+			_symbols.emplace_back (demangle (name), symbol.substr (0, a - 1));
 		}
 	}
 }

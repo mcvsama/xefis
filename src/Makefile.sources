@@ -137,20 +137,24 @@ WATCHDOG_HEADERS += $(SI_HEADERS)
 WATCHDOG_HEADERS += xefis/core/fail.h
 WATCHDOG_HEADERS += xefis/core/services.h
 WATCHDOG_HEADERS += xefis/utility/backtrace.h
+WATCHDOG_HEADERS += xefis/utility/demangle.h
 
 WATCHDOG_SOURCES += $(SI_SOURCES)
 WATCHDOG_SOURCES += xefis/core/fail.cc
 WATCHDOG_SOURCES += xefis/core/services.cc
 WATCHDOG_SOURCES += xefis/utility/backtrace.cc
+WATCHDOG_SOURCES += xefis/utility/demangle.cc
 WATCHDOG_SOURCES += xefis/watchdog.cc
 
 WATCHDOG_MOCHDRS += xefis/core/services.h
 
 SELFTEST_HEADERS += $(SI_HEADERS)
 SELFTEST_HEADERS += xefis/utility/backtrace.h
+SELFTEST_HEADERS += xefis/utility/demangle.h
 
 SELFTEST_SOURCES += $(SI_SOURCES)
 SELFTEST_SOURCES += xefis/utility/backtrace.cc
+SELFTEST_SOURCES += xefis/utility/demangle.cc
 SELFTEST_SOURCES += xefis/selftest.cc
 
 ######## /xefis/config ########
@@ -451,6 +455,7 @@ XEFIS_HEADERS += xefis/utility/blob.h
 XEFIS_HEADERS += xefis/utility/convergence.h
 XEFIS_HEADERS += xefis/utility/datatable2d.h
 XEFIS_HEADERS += xefis/utility/delta_decoder.h
+XEFIS_HEADERS += xefis/utility/demangle.h
 XEFIS_HEADERS += xefis/utility/hash.h
 XEFIS_HEADERS += xefis/utility/hextable.h
 XEFIS_HEADERS += xefis/utility/logger.h
@@ -484,6 +489,7 @@ XEFIS_HEADERS += xefis/utility/transistor.h
 XEFIS_SOURCES += xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES += xefis/utility/backtrace.cc
 XEFIS_SOURCES += xefis/utility/delta_decoder.cc
+XEFIS_SOURCES += xefis/utility/demangle.cc
 XEFIS_SOURCES += xefis/utility/mutex.cc
 XEFIS_SOURCES += xefis/utility/packet_reader.cc
 XEFIS_SOURCES += xefis/utility/painter.cc

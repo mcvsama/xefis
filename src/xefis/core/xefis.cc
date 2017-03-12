@@ -42,6 +42,7 @@
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/utility/time_helper.h>
+#include <xefis/utility/demangle.h>
 // TODO machine
 #include <configs/cthulhu/cthulhu.h>
 
@@ -130,19 +131,19 @@ Xefis::notify (QObject* receiver, QEvent* event)
 	}
 	catch (Exception const& e)
 	{
-		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded xf::Exception:" << std::endl << e << std::endl;
+		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded xf::Exception:" << std::endl << e << std::endl;
 	}
 	catch (boost::exception const& e)
 	{
-		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded boost::exception " << typeid (e).name() << std::endl;
+		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded boost::exception " << demangle (typeid (e)) << std::endl;
 	}
 	catch (std::exception const& e)
 	{
-		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded std::exception " << typeid (e).name() << std::endl;
+		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded std::exception " << demangle (typeid (e)) << std::endl;
 	}
 	catch (...)
 	{
-		_logger << typeid (*receiver).name() << "/" << typeid (*event).name() << " yielded unknown exception" << std::endl;
+		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded unknown exception" << std::endl;
 	}
 
 	return false;

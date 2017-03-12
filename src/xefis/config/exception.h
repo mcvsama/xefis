@@ -30,6 +30,7 @@
 
 // Xefis:
 #include <xefis/utility/backtrace.h>
+#include <xefis/utility/demangle.h>
 
 
 namespace xf {
@@ -40,8 +41,8 @@ class Exception: public std::exception
 	/**
 	 * Create exception object.
 	 * \param	message
-	 * 			Message for user. Don't capitalize first letter, and don't add dot at the end.
-	 * 			It should be a simple phrase, that can be embedded into a bigger sentence.
+	 *			Message for user. Don't capitalize first letter, and don't add dot at the end.
+	 *			It should be a simple phrase, that can be embedded into a bigger sentence.
 	 */
 	Exception (const char* message, Exception const* inner = nullptr);
 
@@ -245,12 +246,12 @@ Exception::guard_and_rethrow (std::function<void()> guarded_code)
 	}
 	catch (boost::exception const& e)
 	{
-		std::cerr << "boost::exception " << typeid (e).name() << std::endl;
+		std::cerr << "boost::exception " << demangle (typeid (e)) << std::endl;
 		throw;
 	}
 	catch (std::exception const& e)
 	{
-		std::cerr << "std::exception " << typeid (e).name() << std::endl;
+		std::cerr << "std::exception " << demangle (typeid (e)) << std::endl;
 		throw;
 	}
 	catch (...)
@@ -283,11 +284,11 @@ operator<< (std::ostream& out, std::exception_ptr const& eptr)
 	}
 	catch (boost::exception const& e)
 	{
-		out << "boost::exception " << typeid (e).name() << std::endl;
+		out << "boost::exception " << demangle (typeid (e)) << std::endl;
 	}
 	catch (std::exception const& e)
 	{
-		out << "std::exception " << typeid (e).name() << std::endl;
+		out << "std::exception " << demangle (typeid (e)) << std::endl;
 	}
 	catch (...)
 	{

@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v2/property.h>
 #include <xefis/core/v2/setting.h>
+#include <xefis/utility/demangle.h>
 
 // Local:
 #include "module.h"
@@ -41,7 +42,7 @@ UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
 
 		for (std::size_t i = 0; i < settings.size(); ++i)
 		{
-			result += typeid (*settings[i]).name();
+			result += demangle (typeid (*settings[i]));
 
 			if (i != settings.size() - 1)
 				result += ", ";
@@ -114,7 +115,7 @@ Module::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut* propert
 Module::Module (std::string const& instance):
 	_instance (instance)
 {
-	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % typeid (this).name() % _instance).str());
+	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % demangle (typeid (this).name()) % _instance).str());
 }
 
 
@@ -143,7 +144,7 @@ Module::rescue (std::exception_ptr)
 std::string
 module_identifier (Module& module)
 {
-	return std::string (typeid (module).name()) + "#" + module.instance();
+	return demangle (typeid (module)) + "#" + module.instance();
 }
 
 
