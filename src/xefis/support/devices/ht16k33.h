@@ -21,8 +21,8 @@
 #include <functional>
 
 // Qt:
-#include <QObject>
-#include <QTimer>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -381,7 +381,7 @@ class HT16K33: public QObject
 	 * Symbol number 10 is minus sign, 11 is dot.
 	 * LSB is segment "a", MSB is dot:
 	 */
-	static constexpr std::array<uint8_t, 11> _digit_symbols { {
+	static constexpr std::array<uint8_t, 12> _digit_symbols {
 		0x3f, // 0 |abcdef  |
 		0x06, // 1 | bc     |
 		0x5b, // 2 |ab de g |
@@ -394,7 +394,7 @@ class HT16K33: public QObject
 		0x6f, // 9 |abcd fg |
 		0x40, // - |      g |
 		0x80, // . |       h|
-	} };
+	};
 
 	static constexpr size_t kMinusSignIndex	= 10;
 	static constexpr size_t kDotIndex		= 11;
@@ -503,12 +503,11 @@ template<class V, class U>
 	HT16K33::NumericDisplay<V, U>::get_integer_value() const
 	{
 		auto value = si::quantity_in_units<Unit> (_property.value_or (Value{}));
-		int64_t int_value = value;
 
 		if (_rounding)
-			int_value = value + 0.5;
-
-		return int_value;
+			return value + 0.5;
+		else
+			return value;
 	}
 
 
