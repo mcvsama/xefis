@@ -73,7 +73,8 @@ endif
 CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"' $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
 LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
 LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
-CXXFLAGS		+= $(shell pkg-config --cflags $(PKGCONFIGS))
+# This subst-hack is to hide warnings from Qt that happen from time to time and obscure compiler's output:
+CXXFLAGS		+= $(subst -I,-isystem ,$(shell pkg-config --cflags $(PKGCONFIGS)))
 
 .PHONY: first all dep help clean distclean release doc check
 
