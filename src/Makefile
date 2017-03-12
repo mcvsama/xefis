@@ -82,7 +82,7 @@ HEADERS =
 SOURCES =
 OBJECTS =
 NODEP_OBJECTS =
-MOCSRCS =
+SOURCES_MOC =
 TARGETS =
 
 #### Helpers ####
@@ -222,7 +222,7 @@ help:
 	@echo '  help       Shows this help.'
 
 clean:
-	@rm -f $(MOCSRCS)
+	@rm -f $(SOURCES_MOC)
 	@rm -f $(OBJECTS)
 	@rm -f $(MOCOBJS)
 	@rm -f $(DEPFILES)
@@ -250,7 +250,7 @@ $(MAINDEPFILE): Makefile.sources $(DEPFILES)
 	@for file in $(DEPFILES); do \
 		cat "$$file" >> $@; \
 	 done;
-	@for file in $(MOCSRCS); do \
+	@for file in $(SOURCES_MOC); do \
 		echo "$$(dirname "$$file")/$$(basename "$$file" .cc).o: $$file" >> $@; \
 	 done;
 
