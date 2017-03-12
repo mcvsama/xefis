@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<airframe>
+	<settings>
+		<setting name='wings-area' value='16.3 m^2'/>
+		<setting name='wings-chord' value='2.0 m'/>
+		<setting name='safe-aoa-correction' value='-1.5 deg'/>
+		<setting name='max-negative-load-factor' value='-2.5'/>
+		<setting name='max-positive-load-factor' value='+3.5'/>
+	</settings>
+	<lift>
+		<point aoa='-5 deg' cl='-0.2'/>
+		<point aoa='0 deg' cl='0.4'/>
+		<point aoa='5 deg' cl='0.75'/>
+		<point aoa='10 deg' cl='1.2'/>
+		<point aoa='15 deg' cl='1.6'/>
+		<point aoa='16 deg' cl='1.65'/>
+		<point aoa='17 deg' cl='1.6'/>
+		<point aoa='18 deg' cl='1.5'/>
+		<point aoa='19 deg' cl='1.4'/>
+		<point aoa='21 deg' cl='1.1'/>
+	</lift>
+	<drag>
+		<point aoa='-5 deg' cd='0.035'/>
+		<point aoa='-2.5 deg' cd='0.3'/>
+		<point aoa='0 deg' cd='0.035'/>
+		<point aoa='5 deg' cd='0.05'/>
+		<point aoa='10 deg' cd='0.08'/>
+		<point aoa='15 deg' cd='0.12'/>
+		<point aoa='17 deg' cd='0.14'/>
+	</drag>
+	<flaps>
+		<setting label='UP' angle='0 deg' aoa-correction='0 deg' lift-coefficient-correction='0' minimum-speed='70 kt' maximum-speed='182 kt'/>
+		<setting label='5' angle='5 deg' aoa-correction='1 deg' lift-coefficient-correction='0.3' minimum-speed='66 kt' maximum-speed='120 kt'/>
+		<setting label='10' angle='10 deg' aoa-correction='2 deg' lift-coefficient-correction='0.6' minimum-speed='60 kt' maximum-speed='110 kt'/>
+		<setting label='20' angle='20 deg' aoa-correction='3 deg' lift-coefficient-correction='0.9' minimum-speed='55 kt' maximum-speed='100 kt'/>
+		<setting label='30' angle='30 deg' aoa-correction='4 deg' lift-coefficient-correction='1.2' minimum-speed='50 kt' maximum-speed='90 kt'/>
+	</flaps>
+	<spoilers>
+		<setting label='DOWN' angle='0 deg' aoa-correction='0 deg' lift-coefficient-correction='0' minimum-speed='0 kt' maximum-speed='200 kt'/>
+	</spoilers>
+</airframe>
+
