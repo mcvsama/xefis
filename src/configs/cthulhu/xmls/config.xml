@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<xefis-config version='1.0'>
+	<settings>
+		<setting name='update-frequency' value='100 Hz'/>
+		<setting name='navaids.enable' value='false'/>
+	</settings>
+	<airframe>
+		<include name='airframe.xml'/>
+	</airframe>
+	<modules>
+	</modules>
+	<windows>
+	</windows>
+</xefis-config>
+
