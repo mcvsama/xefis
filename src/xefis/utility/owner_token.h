@@ -56,6 +56,9 @@ class OwnerToken: public Noncopyable
 	constexpr
 	OwnerToken (OwnerToken&&);
 
+	constexpr OwnerToken&
+	operator= (OwnerToken&&);
+
 	/**
 	 * Return true if this object has the 'owner' token.
 	 */
@@ -72,6 +75,15 @@ OwnerToken::OwnerToken (OwnerToken&& other):
 	_has_token (other._has_token)
 {
 	other._has_token = false;
+}
+
+
+constexpr OwnerToken&
+OwnerToken::operator= (OwnerToken&& other)
+{
+	_has_token = other._has_token;
+	other._has_token = false;
+	return *this;
 }
 
 
