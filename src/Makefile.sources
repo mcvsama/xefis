@@ -65,19 +65,16 @@ XEFIS_MOCHDRS += modules/instruments/status.h
 
 ######## /modules/io ########
 
-XEFIS_HEADERS += modules/io/mouse.h
 XEFIS_HEADERS += modules/io/pca9685.h
 XEFIS_HEADERS += modules/io/link.h
 XEFIS_HEADERS += modules/io/udp.h
 XEFIS_HEADERS += modules/io/xbee.h
 
-XEFIS_SOURCES += modules/io/mouse.cc
 XEFIS_SOURCES += modules/io/pca9685.cc
 XEFIS_SOURCES += modules/io/link.cc
 XEFIS_SOURCES += modules/io/udp.cc
 XEFIS_SOURCES += modules/io/xbee.cc
 
-XEFIS_MOCHDRS += modules/io/mouse.h
 XEFIS_MOCHDRS += modules/io/pca9685.h
 XEFIS_MOCHDRS += modules/io/link.h
 XEFIS_MOCHDRS += modules/io/udp.h
