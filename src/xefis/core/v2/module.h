@@ -139,6 +139,9 @@ class Module: private Noncopyable
 	// Ctor
 	explicit Module (std::string const& instance = {});
 
+	// Dtor
+	virtual ~Module() = default;
+
 	/**
 	 * Return module instance name.
 	 */
