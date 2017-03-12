@@ -22,6 +22,7 @@
 #include <xefis/core/accounting.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/time_helper.h>
+#include <xefis/utility/demangle.h>
 
 // Local:
 #include "module_manager.h"
@@ -210,19 +211,19 @@ ModuleManager::module_data_updated (Module* module) const
 		}
 		catch (xf::Exception const& e)
 		{
-			std::cerr << "Exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
+			std::cerr << "Exception when processing update from module '" << demangle (typeid (*module)) << "'" << std::endl;
 			std::cerr << e << std::endl;
 			try_rescue (module);
 		}
 		catch (std::exception const& e)
 		{
-			std::cerr << "Caught std::exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
+			std::cerr << "Caught std::exception when processing update from module '" << demangle (typeid (*module)) << "'" << std::endl;
 			std::cerr << "Message: " << e.what() << std::endl;
 			try_rescue (module);
 		}
 		catch (...)
 		{
-			std::cerr << "Unknown exception when processing update from module '" << typeid (*module).name() << "'" << std::endl;
+			std::cerr << "Unknown exception when processing update from module '" << demangle (typeid (*module)) << "'" << std::endl;
 			try_rescue (module);
 		}
 	});
@@ -286,17 +287,17 @@ ModuleManager::try_rescue (Module* module) const
 	}
 	catch (xf::Exception const& e)
 	{
-		std::cerr << "Exception when rescuing module '" << typeid (*module).name() << "'; inhibiting from further actions." << std::endl;
+		std::cerr << "Exception when rescuing module '" << demangle (typeid (*module)) << "'; inhibiting from further actions." << std::endl;
 		std::cerr << e << std::endl;
 	}
 	catch (std::exception const& e)
 	{
-		std::cerr << "Caught std::exception when rescuing module '" << typeid (*module).name() << "'; inhibiting from further actions." << std::endl;
+		std::cerr << "Caught std::exception when rescuing module '" << demangle (typeid (*module)) << "'; inhibiting from further actions." << std::endl;
 		std::cerr << "Message: " << e.what() << std::endl;
 	}
 	catch (...)
 	{
-		std::cerr << "Unknown exception when rescuing module '" << typeid (*module).name() << "'; inhibiting from further actions." << std::endl;
+		std::cerr << "Unknown exception when rescuing module '" << demangle (typeid (*module)) << "'; inhibiting from further actions." << std::endl;
 	}
 }
 
