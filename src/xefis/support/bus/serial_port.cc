@@ -48,29 +48,38 @@ SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 }
 
 
-SerialPort::SerialPort (SerialPort&& other):
-	_owned (std::move (other._owned)),
-	_logger (other._logger),
-	_internal_logger (other._internal_logger),
-	_configuration (other._configuration),
-	_data_ready (other._data_ready),
-	_failure (other._failure),
-	_notifier (std::move (other._notifier)),
-	_device (other._device),
-	_good (other._good),
-	_error (other._error),
-	_read_failure_count (other._read_failure_count),
-	_max_read_failure_count (other._max_read_failure_count),
-	_write_failure_count (other._write_failure_count),
-	_max_write_failure_count (other._max_write_failure_count),
-	_input_buffer (other._input_buffer),
-	_output_buffer (other._output_buffer)
-{ }
+SerialPort::SerialPort (SerialPort&& other)
+{
+	*this = std::move (other);
+}
 
 
 SerialPort::~SerialPort()
 {
 	close();
+}
+
+
+SerialPort&
+SerialPort::operator= (SerialPort&& other)
+{
+	_owned = std::move (other._owned);
+	_logger = other._logger;
+	_internal_logger = other._internal_logger;
+	_configuration = other._configuration;
+	_data_ready = other._data_ready;
+	_failure = other._failure;
+	_notifier = std::move (other._notifier);
+	_device = other._device;
+	_good = other._good;
+	_error = other._error;
+	_read_failure_count = other._read_failure_count;
+	_max_read_failure_count = other._max_read_failure_count;
+	_write_failure_count = other._write_failure_count;
+	_max_write_failure_count = other._max_write_failure_count;
+	_input_buffer = other._input_buffer;
+	_output_buffer = other._output_buffer;
+	return *this;
 }
 
 

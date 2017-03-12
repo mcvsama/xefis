@@ -143,6 +143,10 @@ class SerialPort:
 	// Dtor
 	~SerialPort();
 
+	// Move operator
+	SerialPort&
+	operator= (SerialPort&&);
+
 	/**
 	 * Set data ready callback.
 	 */
