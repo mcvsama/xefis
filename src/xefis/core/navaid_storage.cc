@@ -34,7 +34,8 @@ class GzDataFileIterator
 {
   public:
 	// Ctor
-	explicit GzDataFileIterator (QString const& path);
+	explicit
+	GzDataFileIterator (QString const& path);
 
 	/**
 	 * Return true if pointer doesn't point to the end of the line.

@@ -59,6 +59,7 @@ class FlapsControl: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	FlapsControl (xf::Airframe&, std::string const& instance = {});
 
   protected:

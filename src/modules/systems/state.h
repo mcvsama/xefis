@@ -34,7 +34,8 @@ class State: public xf::Module
 	class ConfigVariable
 	{
 	  public:
-		explicit ConfigVariable (QDomElement const& config);
+		explicit
+		ConfigVariable (QDomElement const& config);
 
 		ConfigVariable (ConfigVariable const&) = default;
 

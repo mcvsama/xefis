@@ -56,7 +56,8 @@ template<class pValue>
 
 	  public:
 		// Ctor
-		explicit Mixer (std::string const& instance = {});
+		explicit
+		Mixer (std::string const& instance = {});
 
 	  protected:
 		// Module API

@@ -42,6 +42,7 @@ class InstrumentAids
 	{
 	  public:
 		// Ctor
+		explicit
 		Token (QPainter*, QPaintDevice*);
 
 		// Dtor
@@ -53,6 +54,7 @@ class InstrumentAids
 
   public:
 	// Ctor
+	explicit
 	InstrumentAids (float height_for_width);
 
 	/**

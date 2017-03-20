@@ -96,7 +96,7 @@ class PCA9685:
 		Time					output_maximum			= 2_ms;
 		bool					fallback_to_last_valid	= false;
 		Time					smoothing_time			= 1_ms;
-		xf::Smoother<double>	smoother				= smoothing_time;
+		xf::Smoother<double>	smoother				{ smoothing_time };
 
 		Time
 		compute_duty_cycle();

@@ -171,7 +171,7 @@ class ConfigReader
 		 * appropriate setting values are assigned to variables
 		 * referenced in list.
 		 */
-		explicit SettingsParser (SettingsList const& list);
+		SettingsParser (SettingsList const& list);
 
 		/**
 		 * Parse element and assign values.
@@ -212,6 +212,7 @@ class ConfigReader
 	  public:
 		struct NameAndProperty
 		{
+			// Ctor
 			NameAndProperty (QString const& name, GenericProperty& property, bool required):
 				name (name), property (&property), required (required)
 			{ }
@@ -235,7 +236,7 @@ class ConfigReader
 		 * properties are configured according to the XML configuration
 		 * (path, etc).
 		 */
-		explicit PropertiesParser (PropertiesList const& list);
+		PropertiesParser (PropertiesList const& list);
 
 		/**
 		 * Process configuration element <properties> and assign values
@@ -258,6 +259,7 @@ class ConfigReader
 
   public:
 	// Ctor
+	explicit
 	ConfigReader (Xefis*, ModuleManager*);
 
 	// Dtor

@@ -38,6 +38,7 @@ class ButtonAction: public Action
 
   public:
 	// Ctor
+	explicit
 	ButtonAction (PropertyBoolean button, Callback callback):
 		_button (button),
 		_callback (callback)
@@ -64,6 +65,7 @@ class ToggleButtonAction: public Action
 
   public:
 	// Ctor
+	explicit
 	ToggleButtonAction (PropertyPath const& button_path, PropertyPath const& toggle_path)
 	{
 		_button.set_path (button_path);
@@ -180,6 +182,7 @@ class ButtonOptionsAction: public Action
 
   public:
 	// Ctor
+	explicit
 	ButtonOptionsAction (PropertyPath const& value_path, Options const& options):
 		_options (options)
 	{

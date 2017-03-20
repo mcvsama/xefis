@@ -36,10 +36,8 @@ class InstrumentWidget: public QWidget
 	{
 	  public:
 		// Ctor
+		explicit
 		PaintWorkUnit (InstrumentWidget*);
-
-		// Dtor
-		~PaintWorkUnit() noexcept { }
 
 		/**
 		 * Prepare params from the queue to be processed.
@@ -95,8 +93,9 @@ class InstrumentWidget: public QWidget
 	/**
 	 * \param	parent Parent widget as defined by Qt.
 	 * \param	work_performer Work performer used for rendering data in separate thread.
-	 * 			Pass nullptr, if not to be used.
+	 *			Pass nullptr, if not to be used.
 	 */
+	explicit
 	InstrumentWidget (QWidget* parent, WorkPerformer* work_performer = nullptr);
 
 	/**

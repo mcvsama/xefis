@@ -37,6 +37,7 @@ class Instrument:
 {
   public:
 	// Ctor
+	explicit
 	Instrument (ModuleManager*, QDomElement const& config);
 };
 

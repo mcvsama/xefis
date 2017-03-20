@@ -30,6 +30,7 @@ class Machine
 {
   public:
 	// Ctor
+	explicit
 	Machine (Xefis*);
 
 	/**

@@ -60,7 +60,7 @@ class DummyModule: public x2::Module
 	x2::PropertyIn<int64_t>		input_int	{ this, "/input/int" };
 
   public:
-	explicit DummyModule()
+	DummyModule()
 	{ }
 
 	virtual void
@@ -86,7 +86,7 @@ class TempModule: public x2::Module
 	x2::PropertyIn<Temperature>	temperature_in	{ this, "/input/temperature" };
 
   public:
-	explicit TempModule()
+	TempModule()
 	{ }
 
 	virtual void

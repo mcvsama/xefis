@@ -55,7 +55,8 @@ class State: public xf::Module
 	{
 	  public:
 		// Dtor
-		virtual ~ObservableBase();
+		virtual
+		~ObservableBase();
 
 		/**
 		 * Check if the observed value has changed.

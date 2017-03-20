@@ -49,6 +49,7 @@ class PanelButton: public PanelWidget
 	/**
 	 * Create button with LED indicator.
 	 */
+	explicit
 	PanelButton (QWidget* parent, Panel*, LEDColor, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property);
 
   protected:

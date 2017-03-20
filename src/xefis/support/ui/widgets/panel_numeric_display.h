@@ -41,17 +41,20 @@ class PanelNumericDisplay: public PanelWidget
 
   private:
 	// Ctor
+	explicit
 	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path);
 
   public:
 	/**
 	 * Create 7-segment display for floatizable properties with hard-coded display format.
 	 */
+	explicit
 	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, std::string const& format);
 
 	/**
 	 * Create 7-segment display for floatizable properties with display format provided in a property.
 	 */
+	explicit
 	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, PropertyString const& format_property);
 
   protected:

@@ -502,6 +502,7 @@ class CHRUM6
 
   public:
 	// Ctor
+	explicit
 	CHRUM6 (SerialPort* serial_port);
 
 	/**

@@ -111,7 +111,8 @@ class PerformanceComputer: public x2::Module
 
   public:
 	// Ctor
-	explicit PerformanceComputer (xf::Airframe*, std::string const& instance = {});
+	explicit
+	PerformanceComputer (xf::Airframe*, std::string const& instance = {});
 
   protected:
 	void

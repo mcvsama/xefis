@@ -35,6 +35,7 @@ class Logger
 	Logger();
 
 	// Ctor
+	explicit
 	Logger (std::ostream& stream);
 
 	/**

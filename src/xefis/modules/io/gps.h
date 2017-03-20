@@ -114,6 +114,7 @@ class GPS:
 		 * \param	baud_rate
 		 *			Use this baud rate when opening serial connection.
 		 */
+		explicit
 		Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned int baud_rate);
 
 		// Dtor
@@ -244,6 +245,7 @@ class GPS:
 	{
 	  public:
 		// Ctor
+		explicit
 		PowerCycle (GPS& gps_module);
 
 		// Dtor
@@ -286,6 +288,7 @@ class GPS:
 
   public:
 	// Ctor
+	explicit
 	GPS (xf::System*, xf::SerialPort::Configuration const&, std::string const& instance = {});
 
 	// Dtor

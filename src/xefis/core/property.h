@@ -57,7 +57,8 @@ class GenericProperty
 	GenericProperty (PropertyDirectoryNode* root, PropertyPath const& path);
 
 	// Dtor
-	virtual ~GenericProperty();
+	virtual
+	~GenericProperty();
 
 	/**
 	 * Return timestamp of the value (time when it was modified).

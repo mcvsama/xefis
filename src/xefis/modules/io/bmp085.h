@@ -71,7 +71,8 @@ class BMP085:
 
   public:
 	// Ctor
-	explicit BMP085 (std::string const& instance = {});
+	explicit
+	BMP085 (std::string const& instance = {});
 
 	// Module API
 	void

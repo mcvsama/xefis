@@ -48,7 +48,8 @@ class KLogMonitor:
 
   public:
 	// Ctor
-	explicit KLogMonitor (std::string const& instance = {});
+	explicit
+	KLogMonitor (std::string const& instance = {});
 
   private slots:
 	void

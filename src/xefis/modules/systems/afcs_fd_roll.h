@@ -71,7 +71,8 @@ class AFCS_FD_Roll: public x2::Module
 
   public:
 	// Ctor
-	explicit AFCS_FD_Roll (std::string const& instance = {});
+	explicit
+	AFCS_FD_Roll (std::string const& instance = {});
 
   protected:
 	// Module API

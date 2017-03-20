@@ -35,9 +35,11 @@ template<class tValueType>
 
 	  public:
 		// Ctor
+		explicit
 		Temporal (ValueType&& value) noexcept (noexcept (ValueType (value)));
 
 		// Ctor
+		explicit
 		Temporal (ValueType&& value, Time const& update_time) noexcept (noexcept (ValueType (value)));
 
 		// Copy ctor

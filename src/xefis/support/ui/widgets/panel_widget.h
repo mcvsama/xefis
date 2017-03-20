@@ -32,6 +32,7 @@ class Panel;
 class PanelWidget: public QWidget
 {
   public:
+	explicit
 	PanelWidget (QWidget* parent, Panel*);
 
 	~PanelWidget();

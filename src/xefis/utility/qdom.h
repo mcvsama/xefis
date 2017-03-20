@@ -39,6 +39,7 @@ class QDomElementIterator
 	 */
 	QDomElementIterator() = default;
 
+	explicit
 	QDomElementIterator (QDomElement element);
 
 	bool

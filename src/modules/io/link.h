@@ -50,7 +50,8 @@ class Link:
 	{
 	  public:
 		// Dtor
-		virtual ~Item() { }
+		virtual
+		~Item() = default;
 
 		/**
 		 * Return size of the data which will be produced/consumed.
@@ -97,7 +98,8 @@ class Link:
 		ItemSequence (Link*, QDomElement&);
 
 		// Dtor
-		virtual ~ItemSequence();
+		virtual
+		~ItemSequence();
 
 		Blob::size_type
 		size() const override;

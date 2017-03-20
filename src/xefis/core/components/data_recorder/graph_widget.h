@@ -29,6 +29,8 @@ namespace xf {
 class GraphWidget: public QWidget
 {
   public:
+	// Ctor
+	explicit
 	GraphWidget (QWidget* parent);
 
   private:

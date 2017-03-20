@@ -57,6 +57,7 @@ template<class pArgument, class pValue>
 		class EmptyDomainException: public xf::Exception
 		{
 		  public:
+			explicit
 			EmptyDomainException():
 				Exception ("datatable domain must not be empty")
 			{ }
@@ -66,12 +67,14 @@ template<class pArgument, class pValue>
 		/**
 		 * Create a data-table from argument-value points given in the map.
 		 */
-		explicit Datatable2D (DataMap const&);
+		explicit
+		Datatable2D (DataMap const&);
 
 		/**
 		 * Create a data-table from argument-value points given in the map.
 		 */
-		explicit Datatable2D (DataMap&&);
+		explicit
+		Datatable2D (DataMap&&);
 
 		/**
 		 * Return value for given argument.

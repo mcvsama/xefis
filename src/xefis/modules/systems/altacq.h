@@ -56,7 +56,8 @@ class AltAcq: public x2::Module
 
   public:
 	// Ctor
-	explicit AltAcq (std::string const& instance = {});
+	explicit
+	AltAcq (std::string const& instance = {});
 
   protected:
 	// Module API

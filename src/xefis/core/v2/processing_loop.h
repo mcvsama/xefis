@@ -48,10 +48,12 @@ class ProcessingLoop: public QObject
 
   public:
 	// Ctor
+	explicit
 	ProcessingLoop (Machine* machine, Frequency loop_frequency);
 
 	// Dtor
-	virtual ~ProcessingLoop() = default;
+	virtual
+	~ProcessingLoop() = default;
 
 	/**
 	 * Load module by name and return a pointer.

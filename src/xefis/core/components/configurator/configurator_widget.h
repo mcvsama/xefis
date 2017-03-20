@@ -51,6 +51,7 @@ class ConfiguratorWidget: public QWidget
 	{
 	  public:
 		// Ctor
+		explicit
 		OwnershipBreakingDecorator (QWidget* child, QWidget* parent);
 
 		// Dtor
@@ -69,6 +70,7 @@ class ConfiguratorWidget: public QWidget
 	{
 	  public:
 		// Ctor
+		explicit
 		GeneralModuleWidget (Xefis*, Module*, ConfiguratorWidget*, QWidget* parent);
 
 		/**
@@ -92,6 +94,7 @@ class ConfiguratorWidget: public QWidget
 
   public:
 	// Ctor
+	explicit
 	ConfiguratorWidget (Xefis*, QWidget* parent);
 
 	Window*

@@ -46,7 +46,8 @@ class ArrivalETA: public x2::Module
 
   public:
 	// Ctor
-	explicit ArrivalETA (std::string const& instance = {});
+	explicit
+	ArrivalETA (std::string const& instance = {});
 
   protected:
 	// Module API

@@ -77,6 +77,7 @@ class NavaidStorage
 
   public:
 	// Ctor
+	explicit
 	NavaidStorage();
 
 	// Dtor

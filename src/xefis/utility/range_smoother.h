@@ -42,6 +42,7 @@ template<class pValue>
 
 	  public:
 		// Ctor
+		explicit
 		RangeSmoother (Range<Value> range, si::Time smoothing_time = 1_ms, si::Time precision = 1_ms) noexcept;
 
 		/**

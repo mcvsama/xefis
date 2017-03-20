@@ -41,6 +41,7 @@ class PanelRotaryEncoder: public PanelWidget
 	 * Create simple rotary encoder.
 	 * rotate_a and rotate_b correspond to real rotary encoder outputs (using Gray code).
 	 */
+	explicit
 	PanelRotaryEncoder (QWidget* parent, Panel*, QString const& knob_label,
 						PropertyInteger value_property, PropertyBoolean click_property);
 

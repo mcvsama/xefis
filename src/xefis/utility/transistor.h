@@ -43,6 +43,7 @@ template<class tValueType>
 		 * At the beginning both input values are constructed with their
 		 * default operator. The first one is selected as output.
 		 */
+		explicit
 		Transistor (Time smoothing_time, Time precision = 1_ms) noexcept;
 
 		/**
@@ -73,7 +74,7 @@ template<class tValueType>
 		/**
 		 * Switch output.
 		 * \param	Input
-		 * 			Input number - 0 or 1.
+		 *			Input number - 0 or 1.
 		 */
 		template<uint8_t Input>
 			void

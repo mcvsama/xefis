@@ -48,7 +48,8 @@ class BasicSetting
 	/**
 	 * Store pointer to owning module.
 	 */
-	explicit BasicSetting (Module* owner);
+	explicit
+	BasicSetting (Module* owner);
 
 	/**
 	 * Return owning module.
@@ -81,16 +82,19 @@ template<class pValue>
 		/**
 		 * Create a setting object that requires explicit setting of a value.
 		 */
-		explicit Setting (Module* owner);
+		explicit
+		Setting (Module* owner);
 
 		/**
 		 * Creates a setting object that has an initial value.
 		 */
+		explicit
 		Setting (Module* owner, Value&& initial_value);
 
 		/**
 		 * Creates a setting that doesn't have and doesn't require any value.
 		 */
+		explicit
 		Setting (Module* owner, OptionalTag);
 
 		/**

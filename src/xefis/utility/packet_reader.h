@@ -43,6 +43,7 @@ class PacketReader: private Noncopyable
 	 * @callback will get called, whenever there's data in buffer with
 	 * @magic value and when its size > minimum packet size.
 	 */
+	explicit
 	PacketReader (Blob const& magic, ParseCallback callback);
 
 	/**

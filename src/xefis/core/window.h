@@ -55,6 +55,7 @@ class Window: public QWidget
 	{
 	  public:
 		// Ctor
+		explicit
 		InstrumentDecorator (QWidget* parent);
 
 		/**
@@ -78,6 +79,7 @@ class Window: public QWidget
 	{
 	  public:
 		// Ctor
+		explicit
 		Stack (Time delay);
 
 	  public:
@@ -94,6 +96,7 @@ class Window: public QWidget
 
   public:
 	// Ctor
+	explicit
 	Window (Xefis*, ConfigReader*, QDomElement const&);
 
 	// Dtor

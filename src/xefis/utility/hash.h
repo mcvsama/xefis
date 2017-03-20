@@ -38,11 +38,13 @@ class Hash
 	/**
 	 * Compute and finalize hash of given vector.
 	 */
-	explicit Hash (std::vector<uint8_t> const& vector);
+	explicit
+	Hash (std::vector<uint8_t> const& vector);
 
 	/**
 	 * Compute and finalize hash of given vector.
 	 */
+	explicit
 	Hash (const void* data, std::size_t size);
 
 	// Dtor

@@ -44,20 +44,24 @@ class Exception: public std::exception
 	 *			Message for user. Don't capitalize first letter, and don't add dot at the end.
 	 *			It should be a simple phrase, that can be embedded into a bigger sentence.
 	 */
+	explicit
 	Exception (const char* message, Exception const* inner = nullptr);
 
 	/**
 	 * Convenience function.
 	 */
+	explicit
 	Exception (std::string const& message, Exception const* inner = nullptr);
 
 	/**
 	 * Convenience function.
 	 */
+	explicit
 	Exception (QString const& message, Exception const* inner = nullptr);
 
 	// Dtor
-	virtual ~Exception() noexcept;
+	virtual
+	~Exception() noexcept;
 
 	// Ctor
 	Exception (Exception const&) = default;

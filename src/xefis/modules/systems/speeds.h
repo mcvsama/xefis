@@ -45,6 +45,7 @@ class Speeds: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	Speeds (xf::Airframe*, std::string const& instance = {});
 
 	// Module API

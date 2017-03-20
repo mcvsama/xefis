@@ -57,6 +57,7 @@ class AFCS_EAC_YD: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	AFCS_EAC_YD (std::string const& instance = {});
 
   private:

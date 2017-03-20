@@ -38,6 +38,7 @@ class Resource
 	Resource() noexcept = default;
 
 	// Ctor
+	explicit
 	Resource (Callback callback) noexcept;
 
 	// Copy ctor

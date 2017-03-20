@@ -61,7 +61,8 @@ class Xefis: public QApplication
 	class NonValuedArgumentException: public Exception
 	{
 	  public:
-		explicit NonValuedArgumentException (std::string const& argument);
+		explicit
+		NonValuedArgumentException (std::string const& argument);
 	};
 
 	/**
@@ -70,7 +71,8 @@ class Xefis: public QApplication
 	class MissingValueException: public Exception
 	{
 	  public:
-		explicit MissingValueException (std::string const& argument);
+		explicit
+		MissingValueException (std::string const& argument);
 	};
 
 	/**
@@ -79,7 +81,8 @@ class Xefis: public QApplication
 	class UninitializedServiceException: public Exception
 	{
 	  public:
-		explicit UninitializedServiceException (std::string const& service_name);
+		explicit
+		UninitializedServiceException (std::string const& service_name);
 	};
 
 	class QuitInstruction { };
@@ -93,6 +96,7 @@ class Xefis: public QApplication
 	{
 	  public:
 		// Ctor
+		explicit
 		OptionsHelper (Xefis*);
 
 		Optional<int>
@@ -118,6 +122,7 @@ class Xefis: public QApplication
 
   public:
 	// Ctor
+	explicit
 	Xefis (int& argc, char** argv);
 
 	// Dtor

@@ -34,7 +34,8 @@ EngineTorque::process (x2::Cycle const&)
 {
 	struct TorqueComputer: public boost::static_visitor<>
 	{
-		explicit TorqueComputer (EngineTorque* module):
+		explicit
+		TorqueComputer (EngineTorque* module):
 			_module (module)
 		{ }
 

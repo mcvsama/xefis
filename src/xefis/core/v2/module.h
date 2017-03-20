@@ -44,7 +44,8 @@ class UninitializedSettings: public Exception
 {
   public:
 	// Ctor
-	explicit UninitializedSettings (std::vector<BasicSetting*>);
+	explicit
+	UninitializedSettings (std::vector<BasicSetting*>);
 
   private:
 	/**
@@ -73,7 +74,8 @@ class Module: private Noncopyable
 	{
 	  public:
 		// Ctor
-		explicit ProcessingLoopAPI (Module*);
+		explicit
+		ProcessingLoopAPI (Module*);
 
 		/**
 		 * Iterate through registered settings and check that ones without default value have been initialized by user.
@@ -137,10 +139,12 @@ class Module: private Noncopyable
 
   public:
 	// Ctor
-	explicit Module (std::string const& instance = {});
+	explicit
+	Module (std::string const& instance = {});
 
 	// Dtor
-	virtual ~Module() = default;
+	virtual
+	~Module() = default;
 
 	/**
 	 * Return module instance name.

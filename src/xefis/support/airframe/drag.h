@@ -32,6 +32,7 @@ class Drag
 {
   public:
 	// Ctor
+	explicit
 	Drag (QDomElement const& config);
 
 	/**
