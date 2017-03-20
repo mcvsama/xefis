@@ -142,7 +142,8 @@ class FlightGearIO:
 
   public:
 	// Ctor
-	explicit FlightGearIO (std::string const& instance = {});
+	explicit
+	FlightGearIO (std::string const& instance = {});
 
 	// Module API
 	void

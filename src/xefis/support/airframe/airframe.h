@@ -39,6 +39,7 @@ class Airframe
 {
   public:
 	// Ctor
+	explicit
 	Airframe (Xefis*, QDomElement const& config);
 
   public:

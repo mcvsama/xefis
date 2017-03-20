@@ -38,6 +38,7 @@ class Panel: public QWidget
 
   public:
 	// Ctor
+	explicit
 	Panel (QWidget* parent, Xefis*);
 
 	// Dtor

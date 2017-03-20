@@ -39,10 +39,14 @@ class PropertyEditor: public QWidget
 	class EditorWidget
 	{
 	  public:
+		// Ctor
+		explicit
 		EditorWidget (QWidget* parent);
 	};
 
   public:
+	// Ctor
+	explicit
 	PropertyEditor (PropertyNode* root_node, QWidget* parent);
 
   public slots:

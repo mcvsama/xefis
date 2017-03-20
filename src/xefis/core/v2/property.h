@@ -39,7 +39,8 @@ class NilProperty: public Exception
 {
   public:
 	// Ctor
-	explicit NilProperty (PropertyPath const&);
+	explicit
+	NilProperty (PropertyPath const&);
 };
 
 
@@ -103,7 +104,8 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	/**
 	 * Create Property that doesn't have any data-source yet and is not coupled to any module.
 	 */
-	explicit BasicProperty (std::string const& path);
+	explicit
+	BasicProperty (std::string const& path);
 
 	/**
 	 * Create Property that's coupled by a Module.
@@ -111,11 +113,13 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	 * \param	owner
 	 *			Owner object for this property. May be nullptr.
 	 */
+	explicit
 	BasicProperty (Module* owner, std::string const& path);
 
   public:
 	// Dtor
-	virtual ~BasicProperty() = default;
+	virtual
+	~BasicProperty() = default;
 
 	/**
 	 * Return timestamp of the value (time when it was modified).
@@ -308,11 +312,13 @@ template<class pValue>
 		/**
 		 * Create Property that's coupled to given owner, but doesn't have any data source yet.
 		 */
+		explicit
 		PropertyIn (Module* owner, std::string const& path);
 
 		/**
 		 * Same as PropertyIn (Module*, std::string), but additionally set up the fallback value.
 		 */
+		explicit
 		PropertyIn (Module* owner, std::string const& path, Value&& fallback_value);
 
 		// Dtor
@@ -352,11 +358,13 @@ template<class pValue>
 		/**
 		 * Create Property that's not coupled to any module and don't have any data source yet.
 		 */
+		explicit
 		PropertyOut (std::string const& path);
 
 		/**
 		 * Create Property that's coupled to a module and set the module as data source.
 		 */
+		explicit
 		PropertyOut (Module* owner_and_data_source, std::string const& path);
 
 		using Property<Value>::operator=;

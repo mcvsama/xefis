@@ -30,6 +30,7 @@ class Cycle
 {
   public:
 	// Ctor
+	explicit
 	Cycle (Time update_time, Time update_dt);
 
 	/**

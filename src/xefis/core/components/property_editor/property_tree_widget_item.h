@@ -32,8 +32,12 @@ class PropertyTreeWidget;
 class PropertyTreeWidgetItem: public QTreeWidgetItem
 {
   public:
+	// Ctor
+	explicit
 	PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget* parent);
 
+	// Ctor
+	explicit
 	PropertyTreeWidgetItem (PropertyNode* node, QTreeWidgetItem* parent);
 
 	/**

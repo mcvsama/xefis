@@ -56,7 +56,8 @@ class AFCS_RollAutotrim: public x2::Module
 
   public:
 	// Ctor
-	explicit AFCS_RollAutotrim (std::string const& instance = {});
+	explicit
+	AFCS_RollAutotrim (std::string const& instance = {});
 
   protected:
 	// Module API

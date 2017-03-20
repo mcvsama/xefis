@@ -38,6 +38,7 @@ class SoundManager
 	{
 	  public:
 		// Ctor
+		explicit
 		Sound (QString const& wav_file_name);
 
 		// Dtor

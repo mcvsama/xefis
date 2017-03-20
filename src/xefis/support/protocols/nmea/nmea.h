@@ -30,6 +30,7 @@ namespace xf::nmea {
 class UnsupportedSentenceType: public Exception
 {
   public:
+	explicit
 	UnsupportedSentenceType (std::string const& sentence);
 };
 
@@ -57,7 +58,8 @@ class Sentence
 	 * \param	sentence
 	 *			String between the '$' and '*'.
 	 */
-	explicit Sentence (std::string const&);
+	explicit
+	Sentence (std::string const&);
 
   public:
 	/**
@@ -96,7 +98,7 @@ class Sentence
 	 * Read longitude (using standard read_next()).
 	 *
 	 * \return	false if read_next() returned false internally,
-	 * 			so it's time to finish.
+	 *			so it's time to finish.
 	 */
 	bool
 	read_longitude (Optional<Angle>& out_longitude);

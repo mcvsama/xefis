@@ -98,7 +98,8 @@ class CHRUM6:
 
   public:
 	// Ctor
-	explicit CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance = {});
+	explicit
+	CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance = {});
 
 	// Module API
 	void

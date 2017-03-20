@@ -59,7 +59,8 @@ class RemoteControlManagementSystem:
 
   public:
 	// Ctor
-	explicit RemoteControlManagementSystem (std::string const& instance = {});
+	explicit
+	RemoteControlManagementSystem (std::string const& instance = {});
 
 	// Module::HasConfiguratorWidget API
 	QWidget*

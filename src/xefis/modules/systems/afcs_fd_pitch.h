@@ -84,7 +84,8 @@ class AFCS_FD_Pitch: public x2::Module
 
   public:
 	// Ctor
-	explicit AFCS_FD_Pitch (std::string const& instance = {});
+	explicit
+	AFCS_FD_Pitch (std::string const& instance = {});
 
   protected:
 	// Module API

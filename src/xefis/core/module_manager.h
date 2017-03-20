@@ -38,6 +38,7 @@ class ModuleManager: public QObject
 	{
 	  public:
 		// Ctor
+		explicit
 		ModuleReloadRequest (Module::Pointer const&);
 
 		Module::Pointer const&
@@ -56,7 +57,8 @@ class ModuleManager: public QObject
 
   public:
 	// Ctor
-	explicit ModuleManager (Xefis*);
+	explicit
+	ModuleManager (Xefis*);
 
 	// Dtor
 	~ModuleManager();

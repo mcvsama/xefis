@@ -33,6 +33,7 @@ class Navaid
 	{
 	  public:
 		// Ctor
+		explicit
 		Runway (QString const& identifier_1, LonLat const& pos_1, QString const& identifier_2, LonLat const& pos_2) noexcept;
 
 		/**
@@ -101,9 +102,11 @@ class Navaid
 
   public:
 	// Ctor
+	explicit
 	Navaid (Type);
 
 	// Ctor
+	explicit
 	Navaid (Type, LonLat const&, QString const& identifier, QString const& name, Length range);
 
 	bool

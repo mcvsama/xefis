@@ -35,6 +35,7 @@ class GroupBox:
 {
   public:
 	// Ctor
+	explicit
 	GroupBox (QString const& label, QWidget* parent);
 
 	/**

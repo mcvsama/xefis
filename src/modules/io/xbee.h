@@ -413,7 +413,7 @@ class XBee:
 	std::string				_input_buffer;
 	std::string				_output_buffer;
 	std::string				_last_at_command;
-	xf::Smoother<double>	_rssi_smoother			= Time (200_ms);
+	xf::Smoother<double>	_rssi_smoother			{ 200_ms };
 	Time					_last_rssi_time;
 	uint8_t					_at_frame_id			= 0x00;
 

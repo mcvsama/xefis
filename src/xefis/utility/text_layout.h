@@ -49,6 +49,7 @@ class TextLayout
 	{
 	  public:
 		// Ctor
+		explicit
 		Fragment (QString const&, QFont const&, QColor const&, QPen const&, double line_height_factor);
 
 		/**
@@ -96,6 +97,7 @@ class TextLayout
 	{
 	  public:
 		// Ctor
+		explicit
 		Line (double line_height_factor);
 
 		/**

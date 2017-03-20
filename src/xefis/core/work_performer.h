@@ -42,6 +42,7 @@ class WorkPerformer: private Noncopyable
 	class Performer: public Thread
 	{
 	  public:
+		explicit
 		Performer (WorkPerformer*, unsigned int thread_id) noexcept;
 
 		void
@@ -62,7 +63,8 @@ class WorkPerformer: private Noncopyable
 		friend class WorkPerformer;
 
 	  public:
-		virtual ~Unit() = default;
+		virtual
+		~Unit() = default;
 
 		/**
 		 * Starts work.

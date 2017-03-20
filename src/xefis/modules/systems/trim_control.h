@@ -58,6 +58,7 @@ class TrimControl: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	TrimControl (xf::Xefis*, std::string const& instance = {});
 
 	// Module API

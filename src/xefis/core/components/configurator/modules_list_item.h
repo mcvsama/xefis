@@ -31,6 +31,8 @@ namespace xf {
 class ModulesListItem: public QTreeWidgetItem
 {
   public:
+	// Ctor
+	explicit
 	ModulesListItem (Module::Pointer const& module_pointer, ModuleManager* module_manager, QTreeWidget* parent);
 
 	/**

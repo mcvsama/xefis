@@ -285,6 +285,7 @@ class HT16K33: public QObject
 
   public:
 	// Ctor
+	explicit
 	HT16K33 (i2c::Device&&, xf::Logger* = nullptr);
 
 	/**

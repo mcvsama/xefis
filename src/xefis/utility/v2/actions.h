@@ -50,7 +50,8 @@ template<class pValue>
 
 	  public:
 		// Ctor
-		explicit PropChanged (Property& property):
+		explicit
+		PropChanged (Property& property):
 			_property (property),
 			_last_value (property.get_optional())
 		{ }

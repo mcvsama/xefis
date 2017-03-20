@@ -59,6 +59,7 @@ class IMU_CFF: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	IMU_CFF (std::string const& instance = {});
 
   protected:

@@ -72,7 +72,8 @@ class AFCS_AT: public x2::Module
 
   public:
 	// Ctor
-	explicit AFCS_AT (std::string const& instance = {});
+	explicit
+	AFCS_AT (std::string const& instance = {});
 
   protected:
 	// Module API

@@ -34,6 +34,8 @@ namespace xf {
 class GraphsStack: public QWidget
 {
   public:
+	// Ctor
+	explicit
 	GraphsStack (QWidget* parent);
 
 	/**

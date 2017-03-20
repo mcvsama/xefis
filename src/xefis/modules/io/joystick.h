@@ -82,6 +82,7 @@ class JoystickInput:
 	{
 	  public:
 		// Ctor
+		explicit
 		Button (QDomElement const& button_element, x2::PropertyOut<bool>&);
 
 		x2::PropertyOut<bool>&
@@ -105,6 +106,7 @@ class JoystickInput:
 	{
 	  public:
 		// Ctor
+		explicit
 		Axis (QDomElement const& axis_element, x2::PropertyOut<double>&, x2::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
 
 		/**
@@ -150,6 +152,7 @@ class JoystickInput:
 
   public:
 	// Ctor
+	explicit
 	JoystickInput (QDomElement const& config, std::string const& instance = {});
 
 	// Module API

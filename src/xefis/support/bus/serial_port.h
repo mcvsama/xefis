@@ -135,6 +135,7 @@ class SerialPort:
 	 * @data_ready is called when there's something to read.
 	 * @failure is called when failure is detected.
 	 */
+	explicit
 	SerialPort (DataReadyCallback data_ready = nullptr, FailureCallback failure = nullptr);
 
 	// Move ctor

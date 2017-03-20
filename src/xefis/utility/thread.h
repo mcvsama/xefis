@@ -49,6 +49,7 @@ class Thread: private Noncopyable
 	typedef pthread_t ID;
 
   public:
+	explicit
 	Thread() noexcept;
 
 	/**
@@ -56,7 +57,8 @@ class Thread: private Noncopyable
 	 * Be sure to call wait() in destructor in derived
 	 * class to be sure that derived object is not destructed before thread exits.
 	 */
-	virtual ~Thread();
+	virtual
+	~Thread();
 
 	/**
 	 * Starts thread.

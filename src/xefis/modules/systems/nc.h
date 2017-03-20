@@ -84,7 +84,8 @@ class NavigationComputer: public x2::Module
 
   public:
 	// Ctor
-	explicit NavigationComputer (std::string const& instance);
+	explicit
+	NavigationComputer (std::string const& instance);
 
   protected:
 	// Module API

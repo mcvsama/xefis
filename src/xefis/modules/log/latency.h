@@ -30,6 +30,7 @@ class Latency:
 
   public:
 	// Ctor
+	explicit
 	Latency (xf::Xefis*, std::string const& instance = {});
 
   private slots:

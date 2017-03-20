@@ -36,6 +36,7 @@ class Backtrace
   public:
 	struct Symbol
 	{
+		explicit
 		Symbol (std::string const& name, std::string const& location):
 			name (name), location (location)
 		{ }

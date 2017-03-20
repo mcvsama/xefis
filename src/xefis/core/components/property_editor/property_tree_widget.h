@@ -42,6 +42,8 @@ class PropertyTreeWidget: public QTreeWidget
 	constexpr static int ValueColumn	= 1;
 
   public:
+	// Ctor
+	explicit
 	PropertyTreeWidget (PropertyNode* root_node, QWidget* parent);
 
 	/**

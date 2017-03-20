@@ -76,6 +76,7 @@ class ETSAirspeed:
 
   public:
 	// Ctor
+	explicit
 	ETSAirspeed (xf::i2c::Device&&, std::string const& instance = {});
 
 	// Module API

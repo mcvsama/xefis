@@ -33,6 +33,8 @@ namespace xf {
 class DataRecorder: public QWidget
 {
   public:
+	// Ctor
+	explicit
 	DataRecorder (QWidget* parent);
 
   private:

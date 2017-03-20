@@ -163,12 +163,14 @@ class Message
 	 * Data is represented by range [data, data + size). Message does not
 	 * make a copy of the data.
 	 */
+	explicit
 	Message (Operation, Address const&, uint8_t* data, std::size_t size);
 
 	/**
 	 * Create I2C Message.
 	 * Data is read from given vector.
 	 */
+	explicit
 	Message (Operation, Address const&, std::vector<uint8_t>& vector);
 
 	/**
@@ -176,6 +178,7 @@ class Message
 	 * Data is read from given array.
 	 */
 	template<std::size_t SequenceSize>
+		explicit
 		Message (Operation, Address const&, std::array<uint8_t, SequenceSize>& array);
 
 	/**
@@ -202,6 +205,7 @@ class Device
 	Device() = default;
 
 	// Ctor
+	explicit
 	Device (Bus::ID bus_id, Address const&);
 
 	/**

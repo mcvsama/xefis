@@ -67,7 +67,8 @@ class EngineTorque: public x2::Module
 
   public:
 	// Ctor
-	explicit EngineTorque (std::string const& instance = {});
+	explicit
+	EngineTorque (std::string const& instance = {});
 
   protected:
 	// Module API

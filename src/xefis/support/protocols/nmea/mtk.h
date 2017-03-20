@@ -43,7 +43,8 @@ class PMTKACK: public Sentence
 	 * Parse PMTK ACK message.
 	 * \throws	InvalidType if message header isn't 'PMTK001'.
 	 */
-	explicit PMTKACK (std::string const&);
+	explicit
+	PMTKACK (std::string const&);
 
   public:
 	// Command to which this ACK responds to:

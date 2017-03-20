@@ -266,7 +266,8 @@ class AFCS: public x2::Module
 
   public:
 	// Ctor
-	explicit AFCS (std::string const& instance = {});
+	explicit
+	AFCS (std::string const& instance = {});
 
   protected:
 	// Module API

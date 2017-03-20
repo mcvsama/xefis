@@ -32,6 +32,7 @@ class DeltaDecoder
 
   public:
 	// Ctor
+	explicit
 	DeltaDecoder (xf::PropertyInteger value_property, Callback callback);
 
 	/**

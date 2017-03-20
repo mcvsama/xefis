@@ -32,6 +32,7 @@ class Lift
 {
   public:
 	// Ctor
+	explicit
 	Lift (QDomElement const& config);
 
 	/**

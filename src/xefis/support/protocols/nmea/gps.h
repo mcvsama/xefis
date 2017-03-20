@@ -97,7 +97,8 @@ class GPSTimeOfDay
 	 *			String taken from NMEA message,
 	 *			formatted: HHMMSS.
 	 */
-	explicit GPSTimeOfDay (std::string const& gps_time);
+	explicit
+	GPSTimeOfDay (std::string const& gps_time);
 
   public:
 	uint8_t		hours;
@@ -119,7 +120,8 @@ class GPSDate
 	 *			String taken from NMEA message,
 	 *			formatted: DDMMYY.
 	 */
-	explicit GPSDate (std::string const& gps_date);
+	explicit
+	GPSDate (std::string const& gps_date);
 
   public:
 	uint8_t		day;
@@ -139,7 +141,8 @@ class GPGGA: public Sentence
 	 * Parse NMEA sentence between '$' and '*'.
 	 * \throws	InvalidType if message header isn't 'GPGGA'.
 	 */
-	explicit GPGGA (std::string const&);
+	explicit
+	GPGGA (std::string const&);
 
   public:
 	// UTC time when fix was obtained:
@@ -201,7 +204,8 @@ class GPGSA: public Sentence
 	 * Parse NMEA sentence between '$' and '*'.
 	 * \throws	InvalidType if message header isn't 'GPGSA'.
 	 */
-	explicit GPGSA (std::string const&);
+	explicit
+	GPGSA (std::string const&);
 
   public:
 	// Fix mode:
@@ -235,7 +239,8 @@ class GPRMC: public Sentence
 	 * Parse NMEA sentence between '$' and '*'.
 	 * \throws	InvalidType if message header isn't 'GPRMC'.
 	 */
-	explicit GPRMC (std::string const&);
+	explicit
+	GPRMC (std::string const&);
 
   public:
 	// UTC time when fix was obtained:

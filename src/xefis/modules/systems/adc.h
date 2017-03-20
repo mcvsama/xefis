@@ -85,6 +85,7 @@ class AirDataComputer: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	AirDataComputer (xf::Airframe*, std::string const& instance = {});
 
   protected:

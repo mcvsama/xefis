@@ -73,6 +73,7 @@ class Parser: private Noncopyable
 	 * \param	Listener
 	 *			Callbacks object.
 	 */
+	explicit
 	Parser (Listener*);
 
 	/**

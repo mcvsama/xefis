@@ -40,6 +40,7 @@ class ModulesList: public QWidget
 
   public:
 	// Ctor
+	explicit
 	ModulesList (ModuleManager* module_manager, QWidget* parent);
 
 	/**

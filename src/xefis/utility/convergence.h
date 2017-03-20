@@ -36,6 +36,7 @@ template<class tValueType>
 
 	  public:
 		// Ctor
+		explicit
 		Convergence (ValueType delta, unsigned int max_iterations, FormulaFunction formula) noexcept;
 
 		/**

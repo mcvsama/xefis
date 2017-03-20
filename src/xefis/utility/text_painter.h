@@ -59,6 +59,7 @@ class TextPainter: public QPainter
 			/**
 			 * Generate all images for given character and font.
 			 */
+			explicit
 			Glyph (QFont const&, QColor, QChar, QPointF position_correction);
 
 			Glyph (Glyph const& other);
@@ -87,9 +88,11 @@ class TextPainter: public QPainter
 
   public:
 	// Ctor
+	explicit
 	TextPainter (Cache* cache);
 
 	// Ctor
+	explicit
 	TextPainter (QPaintDevice* device, Cache* cache);
 
 	/**

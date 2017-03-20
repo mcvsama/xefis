@@ -41,6 +41,7 @@ class QZDevice: public QIODevice
 	/**
 	 * File is a gzip file.
 	 */
+	explicit
 	QZDevice (QFile* gz_file, QObject* parent = nullptr);
 
 	// QIODevice API

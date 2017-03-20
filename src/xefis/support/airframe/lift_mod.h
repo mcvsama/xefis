@@ -45,6 +45,7 @@ class LiftMod
 		Setting();
 
 		// Ctor
+		explicit
 		Setting (QDomElement const& config);
 
 		/**
@@ -113,6 +114,7 @@ class LiftMod
 
   public:
 	// Ctor
+	explicit
 	LiftMod (QDomElement const& config);
 
 	/**

@@ -29,6 +29,7 @@ class Watchdog: public x2::Module
 {
   public:
 	// Ctor
+	explicit
 	Watchdog (xf::Xefis*, std::string const& instance = {});
 
   private:

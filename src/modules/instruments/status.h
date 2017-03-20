@@ -69,7 +69,8 @@ class Status: public xf::Instrument
 		{
 		  public:
 			// Ctor
-			explicit Observation (QDomElement const& observe_element);
+			explicit
+			Observation (QDomElement const& observe_element);
 
 			/**
 			 * Return true, if property has changed its value since
@@ -92,7 +93,8 @@ class Status: public xf::Instrument
 
 	  public:
 		// Ctor
-		explicit MessageDefinition (QDomElement const& message_element);
+		explicit
+		MessageDefinition (QDomElement const& message_element);
 
 		/**
 		 * Return severity of the message.

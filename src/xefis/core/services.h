@@ -62,6 +62,7 @@ class Services
 	class CallOutEvent: public QEvent
 	{
 	  public:
+		explicit
 		CallOutEvent (boost::function<void()> callback);
 
 		/**

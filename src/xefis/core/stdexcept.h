@@ -56,6 +56,7 @@ class MissingDomElement: public DomException
 {
   public:
 	// Ctor
+	explicit
 	MissingDomElement (QDomElement const& parent, QString const& child_name):
 		DomException ("missing subelement <" + child_name + "> in " + get_path (parent))
 	{
@@ -71,6 +72,7 @@ class BadDomElement: public DomException
 {
   public:
 	// Ctor
+	explicit
 	BadDomElement (QDomElement const& element, QString const& additional_message = QString()):
 		DomException ("element '" + element.tagName() + "' is not supported in " + get_path (element) +
 					  (additional_message.isEmpty() ? "" : ("; " + additional_message)))
@@ -94,6 +96,7 @@ class MissingDomAttribute: public DomException
 {
   public:
 	// Ctor
+	explicit
 	MissingDomAttribute (QDomElement const& element, QString const& attribute_name):
 		DomException ("element <" + element.tagName() + "> needs attribute '" + attribute_name + "'")
 	{
@@ -109,6 +112,7 @@ class BadDomAttribute: public DomException
 {
   public:
 	// Ctor
+	explicit
 	BadDomAttribute (QDomElement const& element, QString const& attribute_name, QString const& message = QString()):
 		DomException ("invalid value for attribute '" + attribute_name + "' in " + get_path (element) + ": " + message)
 	{
@@ -124,6 +128,7 @@ class BadConfiguration: public Exception
 {
   public:
 	// Ctor
+	explicit
 	BadConfiguration (const char* message, Exception const* inner = nullptr):
 		Exception (message, inner)
 	{
@@ -131,6 +136,7 @@ class BadConfiguration: public Exception
 	}
 
 	// Ctor
+	explicit
 	BadConfiguration (std::string const& message, Exception const* inner = nullptr):
 		Exception (message, inner)
 	{
@@ -138,6 +144,7 @@ class BadConfiguration: public Exception
 	}
 
 	// Ctor
+	explicit
 	BadConfiguration (QString const& message, Exception const* inner = nullptr):
 		Exception (message, inner)
 	{
@@ -167,7 +174,7 @@ class InvalidFormat: public Exception
 
 
 /**
- * Invalid call or wrong arguments.
+ * Invalid call (a function should not be called by user, etc).
  */
 class InvalidCall: public Exception
 {

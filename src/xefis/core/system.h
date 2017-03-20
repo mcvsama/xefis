@@ -28,7 +28,8 @@ class System
 {
   public:
 	// Ctor
-	explicit System();
+	explicit
+	System();
 
 	// Dtor
 	~System();

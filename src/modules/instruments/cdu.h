@@ -59,7 +59,8 @@ class CDU:
 	{
 	  public:
 		// Ctor
-		explicit Strip (CDU&, QString const& title, Column);
+		explicit
+		Strip (CDU&, QString const& title, Column);
 
 		QString const&
 		title() const noexcept;
@@ -151,7 +152,8 @@ class CDU:
 	{
 	  public:
 		// Ctor
-		explicit EmptyStrip (CDU&, Column);
+		explicit
+		EmptyStrip (CDU&, Column);
 
 		// Strip
 		void
@@ -165,7 +167,8 @@ class CDU:
 	{
 	  public:
 		// Ctor
-		explicit SettingStrip (CDU&, QDomElement const& setting_element, Column);
+		explicit
+		SettingStrip (CDU&, QDomElement const& setting_element, Column);
 
 		// Strip
 		bool
@@ -214,7 +217,8 @@ class CDU:
 	{
 	  public:
 		// Ctor
-		explicit GotoStrip (CDU&, QDomElement const& goto_element, Column);
+		explicit
+		GotoStrip (CDU&, QDomElement const& goto_element, Column);
 
 		QString const&
 		target_page_id() const noexcept;
@@ -253,7 +257,8 @@ class CDU:
 
 	  public:
 		// Ctor
-		explicit Page (CDU&, QDomElement const& page_element, Config&, xf::Logger const&);
+		explicit
+		Page (CDU&, QDomElement const& page_element, Config&, xf::Logger const&);
 
 		/**
 		 * Return unique page identifier.
@@ -348,7 +353,8 @@ class CDU:
 
 	  public:
 		// Ctor
-		explicit Config (CDU& cdu, QDomElement const& pages_element, xf::Logger const&);
+		explicit
+		Config (CDU& cdu, QDomElement const& pages_element, xf::Logger const&);
 
 		/**
 		 * Return true if any of the properties is fresh.

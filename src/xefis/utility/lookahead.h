@@ -31,7 +31,8 @@ template<class pValue>
 
 	  public:
 		// Ctor
-		explicit Lookahead (si::Time lookahead_time) noexcept;
+		explicit
+		Lookahead (si::Time lookahead_time) noexcept;
 
 		/**
 		 * Set lookahead time.

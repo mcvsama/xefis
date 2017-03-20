@@ -63,9 +63,11 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		PIDControl();
 
 		// Ctor
+		explicit
 		PIDControl (Settings const& settings, Input target);
 
 		// Ctor
+		explicit
 		PIDControl (Param p, Param i, Param d, Input target);
 
 		/**

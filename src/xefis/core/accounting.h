@@ -68,7 +68,8 @@ class Accounting: public QObject
 	{
 	  public:
 		// Ctor
-		explicit Stats (LatencySamples::size_type samples);
+		explicit
+		Stats (LatencySamples::size_type samples);
 
 		/**
 		 * Return minimum event handling latency.

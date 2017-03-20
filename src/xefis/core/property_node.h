@@ -74,7 +74,8 @@ class PropertyNode: private Noncopyable
 
   public:
 	// Dtor
-	virtual ~PropertyNode();
+	virtual
+	~PropertyNode();
 
 	/**
 	 * Return node name.

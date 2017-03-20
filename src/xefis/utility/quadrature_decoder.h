@@ -37,6 +37,7 @@ class QuadratureDecoder
 
   public:
 	// Ctor
+	explicit
 	QuadratureDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
 
 	/**

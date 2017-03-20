@@ -59,6 +59,7 @@ class FlapsBugs: public x2::Module
 
   public:
 	// Ctor
+	explicit
 	FlapsBugs (xf::Flaps const& flaps, std::string const& instance = {});
 
   protected:

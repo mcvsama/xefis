@@ -50,6 +50,7 @@ class Module: private Noncopyable
 	class Registrator
 	{
 	  public:
+		explicit
 		Registrator (std::string const& module_name, FactoryFunction);
 	};
 
@@ -91,10 +92,12 @@ class Module: private Noncopyable
 	 * \param	config
 	 *			DOM configuration element for the module.
 	 */
+	explicit
 	Module (ModuleManager*, QDomElement const& config);
 
 	// Dtor
-	virtual ~Module();
+	virtual
+	~Module();
 
 	/**
 	 * Signal that the data in property tree has been updated.

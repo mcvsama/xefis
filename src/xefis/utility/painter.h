@@ -37,9 +37,11 @@ class Painter: public TextPainter
 
   public:
 	// Ctor
+	explicit
 	Painter (TextPainter::Cache* cache);
 
 	// Ctor
+	explicit
 	Painter (QPaintDevice* device, TextPainter::Cache* cache);
 
 	void

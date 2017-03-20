@@ -59,7 +59,8 @@ class PropertyAccessError: public Exception
 class BadType: public Exception
 {
   public:
-	explicit BadType (std::string const& name);
+	explicit
+	BadType (std::string const& name);
 };
 
 
@@ -71,6 +72,7 @@ class BadType: public Exception
 class PropertyPathConflict: public Exception
 {
   public:
+	explicit
 	PropertyPathConflict (std::string const& message);
 };
 
@@ -83,7 +85,8 @@ class PropertyPathConflict: public Exception
 class PropertyNotFound: public Exception
 {
   public:
-	explicit PropertyNotFound (std::string const& message);
+	explicit
+	PropertyNotFound (std::string const& message);
 };
 
 
@@ -95,7 +98,8 @@ class PropertyNotFound: public Exception
 class SingularProperty: public Exception
 {
   public:
-	explicit SingularProperty (std::string const& message);
+	explicit
+	SingularProperty (std::string const& message);
 };
 
 
@@ -107,7 +111,8 @@ class SingularProperty: public Exception
 class InvalidOperation: public Exception
 {
   public:
-	explicit InvalidOperation (std::string const& message);
+	explicit
+	InvalidOperation (std::string const& message);
 };
 
 
@@ -119,7 +124,8 @@ class InvalidOperation: public Exception
 class TypeConflict: public Exception
 {
   public:
-	explicit TypeConflict (PropertyPath const& path);
+	explicit
+	TypeConflict (PropertyPath const& path);
 };
 
 
@@ -129,7 +135,8 @@ class TypeConflict: public Exception
 class StringifyError: public Exception
 {
   public:
-	explicit StringifyError (std::string const& message);
+	explicit
+	StringifyError (std::string const& message);
 };
 
 
@@ -143,13 +150,16 @@ class PropertyPath
 	PropertyPath() = default;
 
 	// Ctor
-	explicit PropertyPath (const char* path);
+	explicit
+	PropertyPath (const char* path);
 
 	// Ctor
-	explicit PropertyPath (std::string const& path);
+	explicit
+	PropertyPath (std::string const& path);
 
 	// Ctor
-	explicit PropertyPath (QString const& path);
+	explicit
+	PropertyPath (QString const& path);
 
 	// Ctor
 	PropertyPath (PropertyPath const&) = default;
@@ -188,13 +198,16 @@ class PropertyType
 	PropertyType() = default;
 
 	// Ctor
-	explicit PropertyType (const char* type);
+	explicit
+	PropertyType (const char* type);
 
 	// Ctor
-	explicit PropertyType (std::string const& type);
+	explicit
+	PropertyType (std::string const& type);
 
 	// Ctor
-	explicit PropertyType (QString const& type);
+	explicit
+	PropertyType (QString const& type);
 
 	// Ctor
 	PropertyType (PropertyType const&) = default;
