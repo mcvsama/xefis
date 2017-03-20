@@ -430,6 +430,7 @@ XEFIS_HEADERS			+= xefis/utility/semaphore.h
 XEFIS_HEADERS			+= xefis/utility/sequence.h
 XEFIS_HEADERS			+= xefis/utility/smoother.h
 XEFIS_HEADERS			+= xefis/utility/string.h
+XEFIS_HEADERS			+= xefis/utility/synchronized.h
 XEFIS_HEADERS			+= xefis/utility/temporal.h
 XEFIS_HEADERS			+= xefis/utility/text_layout.h
 XEFIS_HEADERS			+= xefis/utility/text_painter.h
