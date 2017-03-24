@@ -32,14 +32,12 @@ namespace xf {
  */
 template<class ConstIterator, class Value, class Accessor>
 	inline std::pair<ConstIterator, ConstIterator>
-	extended_adjacent_find (ConstIterator begin, ConstIterator end, Value value, Accessor access)
+	extended_adjacent_find (ConstIterator begin, ConstIterator end, Value const& value, Accessor access)
 	{
-		typedef decltype (*begin) DerefIterator;
-
 		if (begin == end)
 			return { end, end };
 
-		auto predicate = [&](DerefIterator a, DerefIterator b) {
+		auto predicate = [&](auto const& a, auto const& b) {
 			return access (a) <= value && value <= access (b);
 		};
 
