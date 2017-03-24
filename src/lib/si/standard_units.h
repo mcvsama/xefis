@@ -197,6 +197,7 @@ typedef ScaledUnit<Pascal, std::hecto>				HectoPascal;
 typedef ScaledUnit<Meter, std::ratio<1'200, 3'937>>													Foot;
 typedef ScaledUnit<Meter, std::ratio<1'609'344, 1'000>>												Mile;
 typedef ScaledUnit<Meter, std::ratio<1'852, 1>>														NauticalMile;
+typedef ScaledUnit<Meter, std::ratio<254, 10'000>>													Inch;
 typedef ScaledUnit<Kilogram, std::ratio<45'359'237, 100'000'000>>									PoundMass;
 typedef ScaledUnit<MeterPerSecondSquared, std::ratio<980'665, 100'000>>								Gravity;
 typedef ScaledUnit<Kelvin, std::ratio<5, 9>>														Rankine;
