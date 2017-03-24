@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <vector>
+#include <initializer_list>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -75,6 +76,12 @@ template<class pArgument, class pValue>
 		 */
 		explicit
 		Datatable2D (DataMap&&);
+
+		/**
+		 * Create a data-table from a list of key-value pairs.
+		 */
+		explicit
+		Datatable2D (std::initializer_list<typename DataMap::value_type>&&);
 
 		/**
 		 * Return value for given argument.
@@ -188,6 +195,16 @@ template<class A, class V>
 	inline
 	Datatable2D<A, V>::Datatable2D (DataMap&& map):
 		_data_map (std::move (map))
+	{
+		if (_data_map.empty())
+			throw EmptyDomainException();
+	}
+
+
+template<class A, class V>
+	inline
+	Datatable2D<A, V>::Datatable2D (std::initializer_list<typename DataMap::value_type>&& pairs):
+		_data_map (std::move (pairs))
 	{
 		if (_data_map.empty())
 			throw EmptyDomainException();
