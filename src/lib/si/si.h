@@ -14,6 +14,17 @@
 #ifndef SI__SI_H__INCLUDED
 #define SI__SI_H__INCLUDED
 
+// Standard:
+#include <type_traits>
+
+// Local:
+#include "si_config.h"
+
+
+// Configuration checks:
+static_assert (std::is_class<si_config::Exception>::value, "si_config::Exception class definition is required");
+
+
 // Local:
 #include "lonlat.h"
 #include "exception.h"

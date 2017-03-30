@@ -90,6 +90,8 @@ MATH_HEADERS			+= lib/math/traits.h
 
 ######## /lib/si ########
 
+XEFIS_HEADERS			+= lib/si/si_config.h
+
 SI_HEADERS				+= lib/si/exception.h
 SI_HEADERS				+= lib/si/lonlat.h
 SI_HEADERS				+= lib/si/quantity.h
