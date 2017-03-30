@@ -58,12 +58,10 @@ XEFIS_SOURCES			+= modules/instruments/vertical_trim.cc
 
 ######## /modules/io ########
 
-XEFIS_HEADERS_MOC		+= modules/io/pca9685.h
 XEFIS_HEADERS_MOC		+= modules/io/link.h
 XEFIS_HEADERS_MOC		+= modules/io/udp.h
 XEFIS_HEADERS_MOC		+= modules/io/xbee.h
 
-XEFIS_SOURCES			+= modules/io/pca9685.cc
 XEFIS_SOURCES			+= modules/io/link.cc
 XEFIS_SOURCES			+= modules/io/udp.cc
 XEFIS_SOURCES			+= modules/io/xbee.cc
@@ -353,9 +351,11 @@ XEFIS_SOURCES			+= xefis/support/airframe/lift_mod.cc
 
 XEFIS_HEADERS			+= xefis/support/devices/chr_um6.h
 XEFIS_HEADERS_MOC		+= xefis/support/devices/ht16k33.h
+XEFIS_HEADERS_MOC		+= xefis/support/devices/pca9685.h
 
 XEFIS_SOURCES			+= xefis/support/devices/chr_um6.cc
 XEFIS_SOURCES			+= xefis/support/devices/ht16k33.cc
+XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
 
 ######## /xefis/support/navigation ########
 

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__IO__PCA9685_H__INCLUDED
-#define XEFIS__MODULES__IO__PCA9685_H__INCLUDED
+#ifndef XEFIS__SUPPORT__DEVICES__PCA9685_H__INCLUDED
+#define XEFIS__SUPPORT__DEVICES__PCA9685_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -20,26 +20,26 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v2/property.h>
 #include <xefis/support/bus/i2c.h>
 #include <xefis/utility/smoother.h>
 
+
+namespace xf {
 
 /**
  * Warning: this module uses I2C I/O in main thread, which may block.
  *
  * Handles PCA9685-based Adafruit's 16-channel 12-bit PWM controller.
  */
-class PCA9685:
-	public QObject,
-	public xf::Module
+class PCA9685: public QObject
 {
 	Q_OBJECT
 
-	static constexpr Time			InitializationDelay	= 0.1_s;
-	static constexpr unsigned int	Channels			= 16;
-	static constexpr Frequency		InternalFrequency	= 25_MHz;
+  private:
+	static constexpr si::Time		kInitializationDelay	= 0.1_s;
+	static constexpr unsigned int	kChannels				= 16;
+	static constexpr si::Frequency	kInternalFrequency		= 25_MHz;
 
 	enum Register: uint8_t
 	{
@@ -85,33 +85,26 @@ class PCA9685:
 		Mode2_Invert			= 1u << 4,
 	};
 
-	struct Channel
-	{
-		xf::PropertyFloat		input;
-		xf::PropertyFloat::Type	input_default			= 0.0;
-		xf::PropertyFloat::Type	input_minimum			= 0.0;
-		xf::PropertyFloat::Type	input_maximum			= 1.0;
-		xf::PropertyFloat::Type	last_value				= input_default;
-		Time					output_minimum			= 1_ms;
-		Time					output_maximum			= 2_ms;
-		bool					fallback_to_last_valid	= false;
-		Time					smoothing_time			= 1_ms;
-		xf::Smoother<double>	smoother				{ smoothing_time };
-
-		Time
-		compute_duty_cycle();
-
-	  private:
-		Time						_last_computation_time	= 0_s;
-	};
-
   public:
 	// Ctor:
-	PCA9685 (xf::ModuleManager*, QDomElement const& config);
+	explicit
+	PCA9685 (i2c::Device&&, si::Time output_period, xf::Logger* = nullptr);
 
-	// Module API
+	/**
+	 * Return true if chip is serviceable.
+	 */
+	bool
+	serviceable() const;
+
+	/**
+	 * Set duty cycle for given channel.
+	 *
+	 * \param	channel_id
+	 *			Channel number between 0 and kChannels - 1.
+	 *			If out of range, throws std::out_of_range.
+	 */
 	void
-	data_updated() override;
+	set_duty_cycle (std::size_t channel_id, si::Time duty_cycle);
 
   private slots:
 	/**
@@ -128,10 +121,10 @@ class PCA9685:
 	reinitialize();
 
 	/**
-	 * Read values from properties and setup output.
+	 * Send updated PWM values and config to the chip.
 	 */
 	void
-	set_pwm_values();
+	update_chip();
 
 	/**
 	 * Get register number for given channel and offset.
@@ -144,13 +137,13 @@ class PCA9685:
 	 * for given duty cycle.
 	 */
 	std::array<uint8_t, 4>
-	get_config_for_pwm (Time duty_cycle);
+	get_config_for_pwm (si::Time duty_cycle);
 
 	/**
 	 * Compute value to be put to the pre-scale register of the chip.
 	 */
 	static uint8_t
-	calculate_pre_scale_register (Frequency frequency);
+	calculate_prescale_register (si::Frequency frequency);
 
 	/**
 	 * Guard and reinitialize on I2C error.
@@ -159,12 +152,22 @@ class PCA9685:
 	guard (std::function<void()> guarded_code);
 
   private:
-	xf::PropertyBoolean				_serviceable;
-	std::array<Channel, Channels>	_channels;
+	i2c::Device						_i2c_device;
 	QTimer*							_initialization_timer;
-	xf::i2c::Device					_i2c_device;
-	Time							_output_period		= 20_ms;
+	bool							_serviceable	{ false };
+	si::Time						_output_period;
+	std::array<si::Time, kChannels>	_duty_cycles;
+	xf::Logger*						_logger;
 };
+
+
+inline bool
+PCA9685::serviceable() const
+{
+	return _serviceable;
+}
+
+} // namespace xf
 
 #endif
 

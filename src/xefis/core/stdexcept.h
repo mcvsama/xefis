@@ -182,6 +182,16 @@ class InvalidCall: public Exception
 	using Exception::Exception;
 };
 
+
+/**
+ * Invalid argument passed to a function.
+ */
+class InvalidArgument: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
 } // namespace xf
 
 #endif
