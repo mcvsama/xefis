@@ -15,6 +15,7 @@
 #include <cstddef>
 
 // Local:
+#include "si_config.h"
 #include "exception.h"
 #include "unit.h"
 
@@ -23,6 +24,16 @@ namespace si {
 
 IncompatibleTypes::IncompatibleTypes (DynamicUnit const& got, DynamicUnit const& expected):
 	Exception ("incompatible types; expected '" + expected.symbol() + "', got '" + got.symbol() + "'")
+{ }
+
+
+UnparsableValue::UnparsableValue (std::string const& message):
+	Exception (message)
+{ }
+
+
+UnsupportedUnit::UnsupportedUnit (std::string const& message):
+	Exception (message)
 { }
 
 } // namespace si
