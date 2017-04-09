@@ -529,7 +529,7 @@ GPS::initialize()
 
 
 void
-GPS::process (x2::Cycle const&)
+GPS::process (v2::Cycle const&)
 {
 	// _power_cycle management is done here, since this method is called from main Qt event loop.
 

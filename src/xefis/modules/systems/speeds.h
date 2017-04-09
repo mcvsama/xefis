@@ -24,24 +24,24 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class Speeds: public x2::Module
+class Speeds: public v2::Module
 {
   public:
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Angle>		input_flaps_angle				{ this, "/flaps-angle" };
-	x2::PropertyIn<si::Velocity>	input_stall_speed_5deg			{ this, "/stall-speed" };
+	v2::PropertyIn<si::Angle>		input_flaps_angle				{ this, "/flaps-angle" };
+	v2::PropertyIn<si::Velocity>	input_stall_speed_5deg			{ this, "/stall-speed" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Velocity>	output_speed_minimum			{ this, "speed.minimum" };
-	x2::PropertyOut<si::Velocity>	output_speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
-	x2::PropertyOut<si::Velocity>	output_speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
-	x2::PropertyOut<si::Velocity>	output_speed_maximum			{ this, "speed.maximum" };
+	v2::PropertyOut<si::Velocity>	output_speed_minimum			{ this, "speed.minimum" };
+	v2::PropertyOut<si::Velocity>	output_speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
+	v2::PropertyOut<si::Velocity>	output_speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
+	v2::PropertyOut<si::Velocity>	output_speed_maximum			{ this, "speed.maximum" };
 
   public:
 	// Ctor
@@ -50,7 +50,7 @@ class Speeds: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	void
@@ -66,7 +66,7 @@ class Speeds: public x2::Module
 
   private:
 	xf::Airframe*			_airframe;
-	x2::PropertyObserver	_speeds_computer;
+	v2::PropertyObserver	_speeds_computer;
 };
 
 #endif

@@ -25,30 +25,30 @@
 #include <xefis/utility/smoother.h>
 
 
-class VOR: public x2::Module
+class VOR: public v2::Module
 {
   public:
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Angle>	input_magnetic_declination		{ this, "/magnetic-declination" };
-	x2::PropertyIn<si::Angle>	input_station_latitude			{ this, "/station-position/latitude" };
-	x2::PropertyIn<si::Angle>	input_station_longitude			{ this, "/station-position/longitude" };
-	x2::PropertyIn<si::Angle>	input_aircraft_latitude			{ this, "/aircraft-position/latitude" };
-	x2::PropertyIn<si::Angle>	input_aircraft_longitude		{ this, "/aircraft-position/longitude" };
-	x2::PropertyIn<si::Angle>	input_radial_magnetic			{ this, "/radial.magnetic" };
+	v2::PropertyIn<si::Angle>	input_magnetic_declination		{ this, "/magnetic-declination" };
+	v2::PropertyIn<si::Angle>	input_station_latitude			{ this, "/station-position/latitude" };
+	v2::PropertyIn<si::Angle>	input_station_longitude			{ this, "/station-position/longitude" };
+	v2::PropertyIn<si::Angle>	input_aircraft_latitude			{ this, "/aircraft-position/latitude" };
+	v2::PropertyIn<si::Angle>	input_aircraft_longitude		{ this, "/aircraft-position/longitude" };
+	v2::PropertyIn<si::Angle>	input_radial_magnetic			{ this, "/radial.magnetic" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>	output_radial_magnetic			{ this, "/radial.magnetic" };
-	x2::PropertyOut<si::Angle>	output_reciprocal_magnetic		{ this, "/reciprocal.magnetic" };
-	x2::PropertyOut<si::Angle>	output_initial_bearing_magnetic	{ this, "/initial-bearing.magnetic" };
-	x2::PropertyOut<si::Angle>	output_deviation				{ this, "/deviation" };
-	x2::PropertyOut<bool>		output_to_flag					{ this, "/to-flag" };
-	x2::PropertyOut<si::Length>	output_distance					{ this, "/distance" };
+	v2::PropertyOut<si::Angle>	output_radial_magnetic			{ this, "/radial.magnetic" };
+	v2::PropertyOut<si::Angle>	output_reciprocal_magnetic		{ this, "/reciprocal.magnetic" };
+	v2::PropertyOut<si::Angle>	output_initial_bearing_magnetic	{ this, "/initial-bearing.magnetic" };
+	v2::PropertyOut<si::Angle>	output_deviation				{ this, "/deviation" };
+	v2::PropertyOut<bool>		output_to_flag					{ this, "/to-flag" };
+	v2::PropertyOut<si::Length>	output_distance					{ this, "/distance" };
 
   public:
 	// Ctor
@@ -57,7 +57,7 @@ class VOR: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	/**
@@ -80,7 +80,7 @@ class VOR: public x2::Module
 
   private:
 	xf::Smoother<si::Angle>	_deviation_smoother	{ 500_ms };
-	x2::PropertyObserver	_vor_computer;
+	v2::PropertyObserver	_vor_computer;
 };
 
 #endif

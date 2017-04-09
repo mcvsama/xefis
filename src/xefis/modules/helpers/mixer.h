@@ -26,7 +26,7 @@
 
 
 template<class pValue>
-	class Mixer: public x2::Module
+	class Mixer: public v2::Module
 	{
 	  public:
 		using Value = pValue;
@@ -36,23 +36,23 @@ template<class pValue>
 		 * Settings
 		 */
 
-		x2::Setting<double>		setting_input_a_factor	{ this, 1.0 };
-		x2::Setting<double>		setting_input_b_factor	{ this, 1.0 };
-		x2::Setting<Value>		setting_output_minimum	{ this, x2::BasicSetting::Optional };
-		x2::Setting<Value>		setting_output_maximum	{ this, x2::BasicSetting::Optional };
+		v2::Setting<double>		setting_input_a_factor	{ this, 1.0 };
+		v2::Setting<double>		setting_input_b_factor	{ this, 1.0 };
+		v2::Setting<Value>		setting_output_minimum	{ this, v2::BasicSetting::Optional };
+		v2::Setting<Value>		setting_output_maximum	{ this, v2::BasicSetting::Optional };
 
 		/*
 		 * Input
 		 */
 
-		x2::PropertyIn<Value>	input_a_value			{ this, "/input.a" };
-		x2::PropertyIn<Value>	input_b_value			{ this, "/input.b" };
+		v2::PropertyIn<Value>	input_a_value			{ this, "/input.a" };
+		v2::PropertyIn<Value>	input_b_value			{ this, "/input.b" };
 
 		/*
 		 * Output
 		 */
 
-		x2::PropertyOut<Value>	output_value			{ this, "/value" };
+		v2::PropertyOut<Value>	output_value			{ this, "/value" };
 
 	  public:
 		// Ctor
@@ -66,11 +66,11 @@ template<class pValue>
 
 		// Module API
 		void
-		process (x2::Cycle const&) override;
+		process (v2::Cycle const&) override;
 
 	  private:
-		x2::PropChanged<Value>	_input_a_changed	{ input_a_value };
-		x2::PropChanged<Value>	_input_b_changed	{ input_b_value };
+		v2::PropChanged<Value>	_input_a_changed	{ input_a_value };
+		v2::PropChanged<Value>	_input_b_changed	{ input_b_value };
 	};
 
 
@@ -96,7 +96,7 @@ template<class V>
 
 template<class V>
 	void
-	Mixer<V>::process (x2::Cycle const&)
+	Mixer<V>::process (v2::Cycle const&)
 	{
 		if (_input_a_changed() || _input_b_changed())
 		{

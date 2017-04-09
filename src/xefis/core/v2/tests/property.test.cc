@@ -29,7 +29,7 @@ using namespace si::units;
 
 
 static xf::RuntimeTest t_1 ("TODO name me", []{
-	//x2::PropertyBool p1;
+	//v2::PropertyBool p1;
 });
 
 } // namespace test

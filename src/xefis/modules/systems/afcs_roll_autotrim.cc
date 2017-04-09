@@ -27,7 +27,7 @@ AFCS_RollAutotrim::AFCS_RollAutotrim (std::string const& instance):
 
 
 void
-AFCS_RollAutotrim::process (x2::Cycle const&)
+AFCS_RollAutotrim::process (v2::Cycle const&)
 {
 	if (input_measured_ias && input_measured_engine_torque)
 	{

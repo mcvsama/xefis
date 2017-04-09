@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace x2 {
+namespace v2 {
 
 /**
  * Holds useful information about the single processing cycle.
@@ -75,7 +75,7 @@ Cycle::update_dt() const noexcept
 	return _update_dt;
 }
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

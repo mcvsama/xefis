@@ -209,7 +209,7 @@ class HT16K33: public QObject
 	{
 	  public:
 		// Ctor
-		SingleSwitch (x2::Property<bool>&, Row, Column);
+		SingleSwitch (v2::Property<bool>&, Row, Column);
 
 		bool
 		key_matrix_updated (KeyMatrix const&) override;
@@ -218,7 +218,7 @@ class HT16K33: public QObject
 		invalidate() override;
 
 	  private:
-		x2::Property<bool>&	_property;
+		v2::Property<bool>&	_property;
 		Row					_row;
 		Column				_column;
 	};
@@ -231,13 +231,13 @@ class HT16K33: public QObject
 	{
 	  public:
 		// Ctor
-		SingleLED (x2::Property<bool>&, Row row, Column);
+		SingleLED (v2::Property<bool>&, Row row, Column);
 
 		void
 		update_led_matrix (LEDMatrix&) const override;
 
 	  private:
-		x2::Property<bool>&	_property;
+		v2::Property<bool>&	_property;
 		Row					_row;
 		Column				_column;
 	};
@@ -263,7 +263,7 @@ class HT16K33: public QObject
 
 		  public:
 			// Ctor
-			NumericDisplay (x2::Property<Value>&, DigitRows, bool rounding = false);
+			NumericDisplay (v2::Property<Value>&, DigitRows, bool rounding = false);
 
 			void
 			update_led_matrix (LEDMatrix&) const override;
@@ -274,7 +274,7 @@ class HT16K33: public QObject
 			get_integer_value() const;
 
 		  private:
-			x2::Property<Value>&	_property;
+			v2::Property<Value>&	_property;
 			DigitRows				_digit_rows;
 			bool					_rounding;
 		};
@@ -423,7 +423,7 @@ class HT16K33: public QObject
 
 
 template<class V, class U>
-	HT16K33::NumericDisplay<V, U>::NumericDisplay (x2::Property<Value>& property, DigitRows digit_rows, bool rounding):
+	HT16K33::NumericDisplay<V, U>::NumericDisplay (v2::Property<Value>& property, DigitRows digit_rows, bool rounding):
 		_property (property),
 		_digit_rows (digit_rows),
 		_rounding (rounding)

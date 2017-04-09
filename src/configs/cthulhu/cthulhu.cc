@@ -43,9 +43,9 @@ class WarthogStick: public JoystickInput
 	 * Output
 	 */
 
-	x2::PropertyOut<double>&	pitch_axis	= axis (3);
-	x2::PropertyOut<double>&	roll_axis	= axis (4);
-	x2::PropertyOut<bool>&		fire_button	= button (5);
+	v2::PropertyOut<double>&	pitch_axis	= axis (3);
+	v2::PropertyOut<double>&	roll_axis	= axis (4);
+	v2::PropertyOut<bool>&		fire_button	= button (5);
 
   public:
 	using JoystickInput::JoystickInput;
@@ -53,18 +53,18 @@ class WarthogStick: public JoystickInput
 
 
 // TODO temp
-class DummyModule: public x2::Module
+class DummyModule: public v2::Module
 {
   public:
-	x2::PropertyOut<int64_t>	output_int	{ this, "/output/int" };
-	x2::PropertyIn<int64_t>		input_int	{ this, "/input/int" };
+	v2::PropertyOut<int64_t>	output_int	{ this, "/output/int" };
+	v2::PropertyIn<int64_t>		input_int	{ this, "/input/int" };
 
   public:
 	DummyModule()
 	{ }
 
 	virtual void
-	process (x2::Cycle const&) override
+	process (v2::Cycle const&) override
 	{
 		if (output_int.is_nil())
 			output_int = 0;
@@ -78,19 +78,19 @@ class DummyModule: public x2::Module
 
 
 // TODO temp
-class TempModule: public x2::Module
+class TempModule: public v2::Module
 {
   public:
-	x2::PropertyOut<int64_t>	output_int		{ this, "/output/int" };
-	x2::PropertyIn<int64_t>		input_int		{ this, "/input/int" };
-	x2::PropertyIn<Temperature>	temperature_in	{ this, "/input/temperature" };
+	v2::PropertyOut<int64_t>	output_int		{ this, "/output/int" };
+	v2::PropertyIn<int64_t>		input_int		{ this, "/input/int" };
+	v2::PropertyIn<Temperature>	temperature_in	{ this, "/input/temperature" };
 
   public:
 	TempModule()
 	{ }
 
 	virtual void
-	process (x2::Cycle const&) override
+	process (v2::Cycle const&) override
 	{
 		if (output_int.is_nil())
 			output_int = 0;
@@ -106,7 +106,7 @@ class TempModule: public x2::Module
 TempModule* g_temp_module = nullptr;
 
 
-class MyLoop: public x2::ProcessingLoop
+class MyLoop: public v2::ProcessingLoop
 {
   public:
 	using ProcessingLoop::ProcessingLoop;
@@ -232,9 +232,9 @@ Cthulhu::setup_ht16k33s()
 	i2c_device.bus().set_bus_number (10);
 	i2c_device.set_address (xf::i2c::Address (0x11));
 
-	x2::PropertyOut<bool> switch_prop { "/switch-prop" };
-	x2::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
-	x2::PropertyOut<bool> led_prop { "/led-prop" };
+	v2::PropertyOut<bool> switch_prop { "/switch-prop" };
+	v2::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
+	v2::PropertyOut<bool> led_prop { "/led-prop" };
 
 	xf::HT16K33 chip (std::move (i2c_device));
 	chip.add_single_switch (switch_prop, 0, 1);

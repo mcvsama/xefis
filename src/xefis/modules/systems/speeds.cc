@@ -35,7 +35,7 @@ Speeds::Speeds (xf::Airframe* airframe, std::string const& instance):
 
 
 void
-Speeds::process (x2::Cycle const& cycle)
+Speeds::process (v2::Cycle const& cycle)
 {
 	_speeds_computer.process (cycle.update_time());
 }

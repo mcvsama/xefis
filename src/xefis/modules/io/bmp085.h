@@ -35,7 +35,7 @@
  */
 class BMP085:
 	public QObject,
-	public x2::Module
+	public v2::Module
 {
 	Q_OBJECT
 
@@ -44,18 +44,18 @@ class BMP085:
 	 * Settings
 	 */
 
-	x2::Setting<xf::i2c::Bus::ID>		setting_i2c_bus						{ this };
-	x2::Setting<xf::i2c::Address::ID>	setting_i2c_address					{ this };
-	x2::Setting<si::Time>				setting_temperature_update_interval	{ this, 500_ms };
-	x2::Setting<si::Time>				setting_pressure_update_interval	{ this, 50_ms };
+	v2::Setting<xf::i2c::Bus::ID>		setting_i2c_bus						{ this };
+	v2::Setting<xf::i2c::Address::ID>	setting_i2c_address					{ this };
+	v2::Setting<si::Time>				setting_temperature_update_interval	{ this, 500_ms };
+	v2::Setting<si::Time>				setting_pressure_update_interval	{ this, 50_ms };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<bool>				_serviceable						{ this, "/serviceable" };
-	x2::PropertyOut<si::Temperature>	_temperature						{ this, "/measured-temperature" };
-	x2::PropertyOut<si::Pressure>		_pressure							{ this, "/measured-pressure" };
+	v2::PropertyOut<bool>				_serviceable						{ this, "/serviceable" };
+	v2::PropertyOut<si::Temperature>	_temperature						{ this, "/measured-temperature" };
+	v2::PropertyOut<si::Pressure>		_pressure							{ this, "/measured-pressure" };
 
   public:
 	/**

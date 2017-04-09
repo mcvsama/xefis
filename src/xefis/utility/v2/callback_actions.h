@@ -22,7 +22,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-namespace x2 {
+namespace v2 {
 
 /**
  * Actions call provided callback when an action happens.
@@ -284,7 +284,7 @@ class ButtonOptionsAction: public CallbackAction
 };
 #endif
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

@@ -29,45 +29,45 @@
 #include <xefis/utility/range_smoother.h>
 
 
-class NavigationComputer: public x2::Module
+class NavigationComputer: public v2::Module
 {
   public:
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Angle>				input_position_longitude			{ this, "/position/longitude" };
-	x2::PropertyIn<si::Angle>				input_position_latitude				{ this, "/position/latitude" };
-	x2::PropertyIn<si::Length>				input_position_altitude_amsl		{ this, "/position/altitude.amsl" };
-	x2::PropertyIn<si::Length>				input_position_lateral_stddev		{ this, "/position/lateral.standard-deviation" };
-	x2::PropertyIn<si::Length>				input_position_vertical_stddev		{ this, "/position/vertical.standard-deviation" };
-	x2::PropertyIn<std::string>				input_position_source				{ this, "/position/source" };
-	x2::PropertyIn<si::Angle>				input_orientation_pitch				{ this, "/orientation/pitch" };
-	x2::PropertyIn<si::Angle>				input_orientation_roll				{ this, "/orientation/roll" };
-	x2::PropertyIn<si::Angle>				input_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
+	v2::PropertyIn<si::Angle>				input_position_longitude			{ this, "/position/longitude" };
+	v2::PropertyIn<si::Angle>				input_position_latitude				{ this, "/position/latitude" };
+	v2::PropertyIn<si::Length>				input_position_altitude_amsl		{ this, "/position/altitude.amsl" };
+	v2::PropertyIn<si::Length>				input_position_lateral_stddev		{ this, "/position/lateral.standard-deviation" };
+	v2::PropertyIn<si::Length>				input_position_vertical_stddev		{ this, "/position/vertical.standard-deviation" };
+	v2::PropertyIn<std::string>				input_position_source				{ this, "/position/source" };
+	v2::PropertyIn<si::Angle>				input_orientation_pitch				{ this, "/orientation/pitch" };
+	v2::PropertyIn<si::Angle>				input_orientation_roll				{ this, "/orientation/roll" };
+	v2::PropertyIn<si::Angle>				input_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>				output_position_longitude			{ this, "/position/longitude" };
-	x2::PropertyOut<si::Angle>				output_position_latitude			{ this, "/position/latitude" };
-	x2::PropertyOut<si::Length>				output_position_altitude_amsl		{ this, "/position/altitude.amsl" };
-	x2::PropertyOut<si::Length>				output_position_lateral_stddev		{ this, "/position/lateral.standard-deviation" };
-	x2::PropertyOut<si::Length>				output_position_vertical_stddev		{ this, "/position/vertical.standard-deviation" };
-	x2::PropertyOut<si::Length>				output_position_stddev				{ this, "/position/standard-deviation" };
-	x2::PropertyOut<std::string>			output_position_source				{ this, "/position/source" };
-	x2::PropertyOut<si::Angle>				output_orientation_pitch			{ this, "/orientation/pitch" };
-	x2::PropertyOut<si::Angle>				output_orientation_roll				{ this, "/orientation/roll" };
-	x2::PropertyOut<si::Angle>				output_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
-	x2::PropertyOut<si::Angle>				output_orientation_heading_true		{ this, "/orientation/heading.true" };
-	x2::PropertyOut<si::Angle>				output_track_vertical				{ this, "/track/vertical" };
-	x2::PropertyOut<si::Angle>				output_track_lateral_magnetic		{ this, "/track/lateral.magnetic" };
-	x2::PropertyOut<si::Angle>				output_track_lateral_true			{ this, "/track/lateral.true" };
-	x2::PropertyOut<si::AngularVelocity>	output_track_lateral_rotation		{ this, "/track/rotation" };
-	x2::PropertyOut<si::Velocity>			output_track_ground_speed			{ this, "/track/ground-speed" };
-	x2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/magnetic-declination" };
-	x2::PropertyOut<si::Angle>				output_magnetic_inclination			{ this, "/magnetic-inclination" };
+	v2::PropertyOut<si::Angle>				output_position_longitude			{ this, "/position/longitude" };
+	v2::PropertyOut<si::Angle>				output_position_latitude			{ this, "/position/latitude" };
+	v2::PropertyOut<si::Length>				output_position_altitude_amsl		{ this, "/position/altitude.amsl" };
+	v2::PropertyOut<si::Length>				output_position_lateral_stddev		{ this, "/position/lateral.standard-deviation" };
+	v2::PropertyOut<si::Length>				output_position_vertical_stddev		{ this, "/position/vertical.standard-deviation" };
+	v2::PropertyOut<si::Length>				output_position_stddev				{ this, "/position/standard-deviation" };
+	v2::PropertyOut<std::string>			output_position_source				{ this, "/position/source" };
+	v2::PropertyOut<si::Angle>				output_orientation_pitch			{ this, "/orientation/pitch" };
+	v2::PropertyOut<si::Angle>				output_orientation_roll				{ this, "/orientation/roll" };
+	v2::PropertyOut<si::Angle>				output_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
+	v2::PropertyOut<si::Angle>				output_orientation_heading_true		{ this, "/orientation/heading.true" };
+	v2::PropertyOut<si::Angle>				output_track_vertical				{ this, "/track/vertical" };
+	v2::PropertyOut<si::Angle>				output_track_lateral_magnetic		{ this, "/track/lateral.magnetic" };
+	v2::PropertyOut<si::Angle>				output_track_lateral_true			{ this, "/track/lateral.true" };
+	v2::PropertyOut<si::AngularVelocity>	output_track_lateral_rotation		{ this, "/track/rotation" };
+	v2::PropertyOut<si::Velocity>			output_track_ground_speed			{ this, "/track/ground-speed" };
+	v2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/magnetic-declination" };
+	v2::PropertyOut<si::Angle>				output_magnetic_inclination			{ this, "/magnetic-inclination" };
 
   private:
 	struct Position
@@ -90,7 +90,7 @@ class NavigationComputer: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	void
 	compute_position();
@@ -121,11 +121,11 @@ class NavigationComputer: public x2::Module
 	xf::Smoother<si::AngularVelocity>	_track_lateral_rotation_smoother		{ 1500_ms };
 	xf::Smoother<si::Velocity>			_track_ground_speed_smoother			{ 2_s };
 	si::Time							_track_accumulated_dt					{ 0_s };
-	x2::PropertyObserver				_position_computer;
-	x2::PropertyObserver				_magnetic_variation_computer;
-	x2::PropertyObserver				_headings_computer;
-	x2::PropertyObserver				_track_computer;
-	x2::PropertyObserver				_ground_speed_computer;
+	v2::PropertyObserver				_position_computer;
+	v2::PropertyObserver				_magnetic_variation_computer;
+	v2::PropertyObserver				_headings_computer;
+	v2::PropertyObserver				_track_computer;
+	v2::PropertyObserver				_ground_speed_computer;
 };
 
 #endif

@@ -65,7 +65,7 @@ AFCS_AP::initialize()
 
 
 void
-AFCS_AP::process (x2::Cycle const& cycle)
+AFCS_AP::process (v2::Cycle const& cycle)
 {
 	_ap_computer.process (cycle.update_time());
 }

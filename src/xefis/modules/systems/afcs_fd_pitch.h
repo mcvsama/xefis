@@ -37,7 +37,7 @@
 // TODO disengage if outside safe limits, unless autonomous flag is set
 // (autonomous flag tells whether user has still possibility to control the airplane,
 // that is he is in the range of radio communication).
-class AFCS_FD_Pitch: public x2::Module
+class AFCS_FD_Pitch: public v2::Module
 {
   private:
 	using IAS_PID		= xf::PIDControl<si::Velocity, si::Angle>;
@@ -51,36 +51,36 @@ class AFCS_FD_Pitch: public x2::Module
 	 * Settings
 	 */
 
-	x2::Setting<IAS_PID::Settings>			setting_ias_pid_settings		{ this };
-	x2::Setting<MachPID::Settings>			setting_mach_pid_settings		{ this };
-	x2::Setting<AltitudePID::Settings>		setting_altitude_pid_settings	{ this };
-	x2::Setting<VS_PID::Settings>			setting_vs_pid_settings			{ this };
-	x2::Setting<FPA_PID::Settings>			setting_fpa_pid_settings		{ this };
+	v2::Setting<IAS_PID::Settings>			setting_ias_pid_settings		{ this };
+	v2::Setting<MachPID::Settings>			setting_mach_pid_settings		{ this };
+	v2::Setting<AltitudePID::Settings>		setting_altitude_pid_settings	{ this };
+	v2::Setting<VS_PID::Settings>			setting_vs_pid_settings			{ this };
+	v2::Setting<FPA_PID::Settings>			setting_fpa_pid_settings		{ this };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<bool>					input_autonomous				{ this, "/autonomous" };
-	x2::PropertyIn<si::Angle>				input_pitch_limits				{ this, "/pitch-limits" };
-	x2::PropertyIn<afcs_api::PitchMode>		input_cmd_pitch_mode			{ this, "/cmd-pitch-mode" };
-	x2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd-ias" };
-	x2::PropertyIn<double>					input_cmd_mach					{ this, "/cmd-match" };
-	x2::PropertyIn<si::Length>				input_cmd_alt					{ this, "/cmd-altitude" };
-	x2::PropertyIn<si::Velocity>			input_cmd_vs					{ this, "/cmd-vs" };
-	x2::PropertyIn<si::Angle>				input_cmd_fpa					{ this, "/cmd-fpa" };
-	x2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measured-ias" };
-	x2::PropertyIn<double>					input_measured_mach				{ this, "/measured-mach" };
-	x2::PropertyIn<si::Length>				input_measured_alt				{ this, "/measured-altitude" };
-	x2::PropertyIn<si::Velocity>			input_measured_vs				{ this, "/measured-vs" };
-	x2::PropertyIn<si::Angle>				input_measured_fpa				{ this, "/measured-fpa" };
+	v2::PropertyIn<bool>					input_autonomous				{ this, "/autonomous" };
+	v2::PropertyIn<si::Angle>				input_pitch_limits				{ this, "/pitch-limits" };
+	v2::PropertyIn<afcs_api::PitchMode>		input_cmd_pitch_mode			{ this, "/cmd-pitch-mode" };
+	v2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd-ias" };
+	v2::PropertyIn<double>					input_cmd_mach					{ this, "/cmd-match" };
+	v2::PropertyIn<si::Length>				input_cmd_alt					{ this, "/cmd-altitude" };
+	v2::PropertyIn<si::Velocity>			input_cmd_vs					{ this, "/cmd-vs" };
+	v2::PropertyIn<si::Angle>				input_cmd_fpa					{ this, "/cmd-fpa" };
+	v2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measured-ias" };
+	v2::PropertyIn<double>					input_measured_mach				{ this, "/measured-mach" };
+	v2::PropertyIn<si::Length>				input_measured_alt				{ this, "/measured-altitude" };
+	v2::PropertyIn<si::Velocity>			input_measured_vs				{ this, "/measured-vs" };
+	v2::PropertyIn<si::Angle>				input_measured_fpa				{ this, "/measured-fpa" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>				output_pitch					{ this, "/output-pitch" };
-	x2::PropertyOut<bool>					output_operative				{ this, "/operative" };
+	v2::PropertyOut<si::Angle>				output_pitch					{ this, "/output-pitch" };
+	v2::PropertyOut<bool>					output_operative				{ this, "/operative" };
 
   public:
 	// Ctor
@@ -94,7 +94,7 @@ class AFCS_FD_Pitch: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	// Module API
 	void
@@ -113,8 +113,8 @@ class AFCS_FD_Pitch: public x2::Module
 	template<class Input, class Control>
 		Optional<si::Angle>
 		compute_pitch (xf::PIDControl<Input, Control>& pid,
-					   x2::PropertyIn<Input> const& cmd_param,
-					   x2::PropertyIn<Input> const& measured_param,
+					   v2::PropertyIn<Input> const& cmd_param,
+					   v2::PropertyIn<Input> const& measured_param,
 					   si::Time update_dt) const;
 
 	/**
@@ -130,7 +130,7 @@ class AFCS_FD_Pitch: public x2::Module
 	VS_PID							_vs_pid;
 	FPA_PID							_fpa_pid;
 	xf::RangeSmoother<si::Angle>	_output_pitch_smoother	{ { -180.0_deg, +180.0_deg }, 2.5_s };
-	x2::PropertyObserver			_pitch_computer;
+	v2::PropertyObserver			_pitch_computer;
 };
 
 #endif

@@ -30,29 +30,29 @@
  *
  * Works only for air speeds well below Mach 1.
  */
-class AFCS_RollAutotrim: public x2::Module
+class AFCS_RollAutotrim: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<double>				setting_ias_coefficient				{ this };
-	x2::Setting<double>				setting_engine_torque_coefficient	{ this };
-	x2::Setting<double>				setting_total_coefficient			{ this, 1.0 };
+	v2::Setting<double>				setting_ias_coefficient				{ this };
+	v2::Setting<double>				setting_engine_torque_coefficient	{ this };
+	v2::Setting<double>				setting_total_coefficient			{ this, 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Velocity>	input_measured_ias					{ this, "/measured-ias" };
-	x2::PropertyIn<si::Torque>		input_measured_engine_torque		{ this, "/measured-eng-torque" };
+	v2::PropertyIn<si::Velocity>	input_measured_ias					{ this, "/measured-ias" };
+	v2::PropertyIn<si::Torque>		input_measured_engine_torque		{ this, "/measured-eng-torque" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>		output_ailerons_correction			{ this, "/ailerons-correction" };
+	v2::PropertyOut<si::Angle>		output_ailerons_correction			{ this, "/ailerons-correction" };
 
   public:
 	// Ctor
@@ -62,7 +62,7 @@ class AFCS_RollAutotrim: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 };
 
 #endif

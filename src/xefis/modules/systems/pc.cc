@@ -116,9 +116,9 @@ PerformanceComputer::PerformanceComputer (xf::Airframe* airframe, std::string co
 
 
 void
-PerformanceComputer::process (x2::Cycle const& cycle)
+PerformanceComputer::process (v2::Cycle const& cycle)
 {
-	x2::PropertyObserver* computers[] = {
+	v2::PropertyObserver* computers[] = {
 		// Order is important:
 		&_wind_computer,
 		&_glide_ratio_computer,

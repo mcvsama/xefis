@@ -28,7 +28,7 @@
 #include <xefis/utility/smoother.h>
 
 
-namespace x2 {
+namespace v2 {
 
 /**
  * Observes a set of properties, and checks if their values have changed.
@@ -112,7 +112,7 @@ class PropertyObserver
 	 * Signal data update, so the observer will do its checks.
 	 */
 	void
-	process (Time update_time);
+	process (si::Time update_time);
 
 	/**
 	 * Return serial value.
@@ -250,7 +250,7 @@ PropertyObserver::touch() noexcept
 	_touch = true;
 }
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

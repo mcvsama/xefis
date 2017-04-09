@@ -27,7 +27,7 @@
 #include "processing_loop.h"
 
 
-namespace x2 {
+namespace v2 {
 
 ProcessingLoop::ProcessingLoop (Machine* machine, Frequency loop_frequency):
 	_machine (machine),
@@ -92,11 +92,11 @@ ProcessingLoop::execute_cycle()
 	compatibility_input();
 
 	for (auto& module: _modules)
-		x2::Module::ProcessingLoopAPI (module.get()).reset_cache();
+		v2::Module::ProcessingLoopAPI (module.get()).reset_cache();
 
 	// TODO module accounting
 	for (auto& module: _modules)
-		x2::Module::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
+		v2::Module::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
 
 	compatibility_output();
 
@@ -107,7 +107,7 @@ ProcessingLoop::execute_cycle()
 void
 ProcessingLoop::compatibility_input()
 {
-	// Copy all xf::Property<T> values to x2::PropertyIn/Out<T> objects.
+	// Copy all xf::Property<T> values to v2::PropertyIn/Out<T> objects.
 	for (auto& copy: g_copy_to_v2)
 		copy();
 }
@@ -116,10 +116,10 @@ ProcessingLoop::compatibility_input()
 void
 ProcessingLoop::compatibility_output()
 {
-	// Copy all x2::PropertyIn/Out<T> values to xf::Property<T> objects.
+	// Copy all v2::PropertyIn/Out<T> values to xf::Property<T> objects.
 	for (auto& copy: g_copy_to_v1)
 		copy();
 }
 
-} // namespace x2
+} // namespace v2
 

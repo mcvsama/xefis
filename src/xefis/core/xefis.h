@@ -31,12 +31,12 @@
 #include <xefis/utility/logger.h>
 
 
-namespace x2 { // XXX
+namespace v2 { // XXX
 	class Machine;
 }
 
 namespace xf {
-using namespace x2; // XXX
+using namespace v2; // XXX
 
 class NavaidStorage;
 class ModuleManager;

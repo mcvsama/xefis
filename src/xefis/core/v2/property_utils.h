@@ -22,7 +22,7 @@
 #include <xefis/core/v2/property.h>
 
 
-namespace x2 {
+namespace v2 {
 
 template<class Value>
 	inline std::string
@@ -57,7 +57,7 @@ to_blob (Property<bool> const& property)
 	return property.get() ? Blob ({ 0x01 }) : Blob ({ 0x00 });
 }
 
-} // namespace x2
+} // namespace v2
 
 #endif
 
