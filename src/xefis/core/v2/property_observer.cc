@@ -21,7 +21,7 @@
 #include "property_observer.h"
 
 
-namespace x2 {
+namespace v2 {
 
 void
 PropertyObserver::observe (BasicProperty& property)
@@ -139,5 +139,5 @@ PropertyObserver::longest_smoothing_time() noexcept
 	return _longest_smoother;
 }
 
-} // namespace x2
+} // namespace v2
 

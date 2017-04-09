@@ -29,7 +29,7 @@
 #include <xefis/utility/blob.h>
 
 
-namespace x2 {
+namespace v2 {
 using namespace xf; // XXX
 
 /**
@@ -809,7 +809,7 @@ template<class V>
 		boost::apply_visitor (Fetcher (this, cycle), _data_source);
 	}
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

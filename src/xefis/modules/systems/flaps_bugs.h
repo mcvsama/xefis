@@ -31,31 +31,31 @@
  * Computes two speed bugs - for two adjacent flap settings - that should
  * be displayed on EFIS' speed ladder.
  */
-class FlapsBugs: public x2::Module
+class FlapsBugs: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<double>				setting_margin_factor	{ this, 1.2 };
+	v2::Setting<double>				setting_margin_factor	{ this, 1.2 };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Angle>		input_flaps_setting		{ this, "/flaps-setting" };
+	v2::PropertyIn<si::Angle>		input_flaps_setting		{ this, "/flaps-setting" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<std::string>	output_flaps_up_label	{ this, "/flaps-up-label" };
-	x2::PropertyOut<si::Velocity>	output_flaps_up_speed	{ this, "/flaps-up-speed" };
-	x2::PropertyOut<std::string>	output_flaps_a_label	{ this, "/flaps-a-label" };
-	x2::PropertyOut<si::Velocity>	output_flaps_a_speed	{ this, "/flaps-a-speed" };
-	x2::PropertyOut<std::string>	output_flaps_b_label	{ this, "/flaps-b-label" };
-	x2::PropertyOut<si::Velocity>	output_flaps_b_speed	{ this, "/flaps-b-speed" };
+	v2::PropertyOut<std::string>	output_flaps_up_label	{ this, "/flaps-up-label" };
+	v2::PropertyOut<si::Velocity>	output_flaps_up_speed	{ this, "/flaps-up-speed" };
+	v2::PropertyOut<std::string>	output_flaps_a_label	{ this, "/flaps-a-label" };
+	v2::PropertyOut<si::Velocity>	output_flaps_a_speed	{ this, "/flaps-a-speed" };
+	v2::PropertyOut<std::string>	output_flaps_b_label	{ this, "/flaps-b-label" };
+	v2::PropertyOut<si::Velocity>	output_flaps_b_speed	{ this, "/flaps-b-speed" };
 
   public:
 	// Ctor
@@ -65,11 +65,11 @@ class FlapsBugs: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	xf::Flaps const&			_flaps;
-	x2::PropChanged<si::Angle>	_flaps_setting_changed	{ input_flaps_setting };
+	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ input_flaps_setting };
 };
 
 #endif

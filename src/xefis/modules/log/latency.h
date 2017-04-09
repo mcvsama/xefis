@@ -24,7 +24,7 @@
 
 class Latency:
 	public QObject,
-	public x2::Module
+	public v2::Module
 {
 	Q_OBJECT
 

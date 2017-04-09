@@ -23,7 +23,7 @@
 #include <xefis/core/v2/property.h>
 
 
-namespace x2 {
+namespace v2 {
 
 class DeltaDecoder
 {
@@ -48,7 +48,7 @@ class DeltaDecoder
 
   private:
 	int64_t						_prev;
-	x2::PropertyIn<int64_t>&	_property;
+	v2::PropertyIn<int64_t>&	_property;
 	Callback					_callback;
 };
 
@@ -59,7 +59,7 @@ DeltaDecoder::force_callback (int delta)
 	_callback (delta);
 }
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

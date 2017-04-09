@@ -21,7 +21,7 @@
 #include <xefis/config/all.h>
 
 
-namespace x2 {
+namespace v2 {
 
 /**
  * Checks if an action should be executed based on value of some properties and saved state.
@@ -46,7 +46,7 @@ template<class pValue>
 	  public:
 		using Value			= pValue;
 		using OptionalValue	= Optional<Value>;
-		using Property		= x2::Property<Value>;
+		using Property		= v2::Property<Value>;
 
 	  public:
 		// Ctor
@@ -159,7 +159,7 @@ template<class pValue>
 		}
 	};
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

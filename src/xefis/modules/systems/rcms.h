@@ -29,8 +29,8 @@
 
 class RemoteControlManagementSystem:
 	public QObject,
-	public x2::Module,
-	public x2::Module::HasConfiguratorWidget
+	public v2::Module,
+	public v2::Module::HasConfiguratorWidget
 {
 	Q_OBJECT
 
@@ -39,23 +39,23 @@ class RemoteControlManagementSystem:
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Length>		input_vlos_caution_distance		{ this, "/vlos-caution-distance" };
-	x2::PropertyIn<si::Length>		input_vlos_warning_distance		{ this, "/vlos-warning-distance" };
-	x2::PropertyIn<si::Angle>		input_home_longitude			{ this, "/home/longitude" };
-	x2::PropertyIn<si::Angle>		input_home_latitude				{ this, "/home/latitude" };
-	x2::PropertyIn<si::Length>		input_home_altitude_amsl		{ this, "/home/altitude-amsl" };
-	x2::PropertyIn<si::Angle>		input_position_longitude		{ this, "/position/longitude" };
-	x2::PropertyIn<si::Angle>		input_position_latitude			{ this, "/position/latitude" };
-	x2::PropertyIn<si::Length>		input_position_altitude_amsl	{ this, "/position/altitude.amsl" };
+	v2::PropertyIn<si::Length>		input_vlos_caution_distance		{ this, "/vlos-caution-distance" };
+	v2::PropertyIn<si::Length>		input_vlos_warning_distance		{ this, "/vlos-warning-distance" };
+	v2::PropertyIn<si::Angle>		input_home_longitude			{ this, "/home/longitude" };
+	v2::PropertyIn<si::Angle>		input_home_latitude				{ this, "/home/latitude" };
+	v2::PropertyIn<si::Length>		input_home_altitude_amsl		{ this, "/home/altitude-amsl" };
+	v2::PropertyIn<si::Angle>		input_position_longitude		{ this, "/position/longitude" };
+	v2::PropertyIn<si::Angle>		input_position_latitude			{ this, "/position/latitude" };
+	v2::PropertyIn<si::Length>		input_position_altitude_amsl	{ this, "/position/altitude.amsl" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Length>		output_distance_vlos			{ this, "/distance/vlos" };
-	x2::PropertyOut<si::Length>		output_distance_ground			{ this, "/distance/ground" };
-	x2::PropertyOut<si::Length>		output_distance_vertical		{ this, "/distance/vertical" };
-	x2::PropertyOut<si::Angle>		output_true_home_direction		{ this, "/home-direction.true" };
+	v2::PropertyOut<si::Length>		output_distance_vlos			{ this, "/distance/vlos" };
+	v2::PropertyOut<si::Length>		output_distance_ground			{ this, "/distance/ground" };
+	v2::PropertyOut<si::Length>		output_distance_vertical		{ this, "/distance/vertical" };
+	v2::PropertyOut<si::Angle>		output_true_home_direction		{ this, "/home-direction.true" };
 
   public:
 	// Ctor
@@ -68,7 +68,7 @@ class RemoteControlManagementSystem:
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private slots:
 	/**
@@ -96,7 +96,7 @@ class RemoteControlManagementSystem:
   private:
 	Unique<QWidget>			_configurator_widget;
 	bool					_home_acquired			= false;
-	x2::PropertyObserver	_distance_computer;
+	v2::PropertyObserver	_distance_computer;
 };
 
 #endif

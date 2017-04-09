@@ -21,11 +21,11 @@
 #include "machine.h"
 
 
-namespace x2 {
+namespace v2 {
 
 Machine::Machine (Xefis* xefis):
 	_xefis (xefis)
 { }
 
-} // namespace x2
+} // namespace v2
 

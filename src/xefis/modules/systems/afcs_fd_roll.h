@@ -37,7 +37,7 @@
 // TODO disengage if outside safe limits, unless autonomous flag is set
 // (autonomous flag tells whether user has still possibility to control the airplane,
 // that is he is in the range of radio communication).
-class AFCS_FD_Roll: public x2::Module
+class AFCS_FD_Roll: public v2::Module
 {
   private:
 	using DirectionPID = xf::PIDControl<si::Angle, si::Angle>;
@@ -47,27 +47,27 @@ class AFCS_FD_Roll: public x2::Module
 	 * Settings
 	 */
 
-	x2::Setting<DirectionPID::Settings>	setting_hdg_pid_settings	{ this };
-	x2::Setting<DirectionPID::Settings>	setting_trk_pid_settings	{ this };
+	v2::Setting<DirectionPID::Settings>	setting_hdg_pid_settings	{ this };
+	v2::Setting<DirectionPID::Settings>	setting_trk_pid_settings	{ this };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<bool>				input_autonomous			{ this, "/autonomous" };
-	x2::PropertyIn<si::Angle>			input_roll_limits			{ this, "/roll-limits" };
-	x2::PropertyIn<afcs_api::RollMode>	input_cmd_roll_mode			{ this, "/cmd-roll-mode" };
-	x2::PropertyIn<si::Angle>			input_cmd_magnetic_hdg		{ this, "/cmd-magnetic-heading" };
-	x2::PropertyIn<si::Angle>			input_cmd_magnetic_trk		{ this, "/cmd-magnetic-track" };
-	x2::PropertyIn<si::Angle>			input_measured_magnetic_hdg	{ this, "/measured-magnetic-heading" };
-	x2::PropertyIn<si::Angle>			input_measured_magnetic_trk	{ this, "/measured-magnetic-track" };
+	v2::PropertyIn<bool>				input_autonomous			{ this, "/autonomous" };
+	v2::PropertyIn<si::Angle>			input_roll_limits			{ this, "/roll-limits" };
+	v2::PropertyIn<afcs_api::RollMode>	input_cmd_roll_mode			{ this, "/cmd-roll-mode" };
+	v2::PropertyIn<si::Angle>			input_cmd_magnetic_hdg		{ this, "/cmd-magnetic-heading" };
+	v2::PropertyIn<si::Angle>			input_cmd_magnetic_trk		{ this, "/cmd-magnetic-track" };
+	v2::PropertyIn<si::Angle>			input_measured_magnetic_hdg	{ this, "/measured-magnetic-heading" };
+	v2::PropertyIn<si::Angle>			input_measured_magnetic_trk	{ this, "/measured-magnetic-track" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>			output_roll					{ this, "/output-roll" };
-	x2::PropertyOut<bool>				output_operative			{ this, "/operative" };
+	v2::PropertyOut<si::Angle>			output_roll					{ this, "/output-roll" };
+	v2::PropertyOut<bool>				output_operative			{ this, "/operative" };
 
   public:
 	// Ctor
@@ -81,7 +81,7 @@ class AFCS_FD_Roll: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	// Module API
 	void
@@ -99,8 +99,8 @@ class AFCS_FD_Roll: public x2::Module
 	 */
 	Optional<si::Angle>
 	compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
-				  x2::PropertyIn<si::Angle> const& cmd_direction,
-				  x2::PropertyIn<si::Angle> const& measured_direction,
+				  v2::PropertyIn<si::Angle> const& cmd_direction,
+				  v2::PropertyIn<si::Angle> const& measured_direction,
 				  si::Time update_dt) const;
 
 	/**
@@ -113,7 +113,7 @@ class AFCS_FD_Roll: public x2::Module
 	DirectionPID					_magnetic_hdg_pid;
 	DirectionPID					_magnetic_trk_pid;
 	xf::RangeSmoother<si::Angle>	_output_roll_smoother	{ { -180.0_deg, +180.0_deg }, 2.5_s };
-	x2::PropertyObserver			_roll_computer;
+	v2::PropertyObserver			_roll_computer;
 };
 
 #endif

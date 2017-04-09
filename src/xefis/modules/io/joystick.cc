@@ -31,12 +31,12 @@
 #include "joystick.h"
 
 
-JoystickInput::Button::Button (QDomElement const&, x2::PropertyOut<bool>& property):
+JoystickInput::Button::Button (QDomElement const&, v2::PropertyOut<bool>& property):
 	_property (property)
 { }
 
 
-x2::PropertyOut<bool>&
+v2::PropertyOut<bool>&
 JoystickInput::Button::property()
 {
 	return _property;
@@ -65,12 +65,12 @@ JoystickInput::Button::set_value (float value)
 }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, x2::PropertyOut<double>& property, x2::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range):
+JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<double>& property, v2::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range):
 	Axis (axis_element, property, angle_property, angle_range, { }, { })
 { }
 
 
-JoystickInput::Axis::Axis (QDomElement const& axis_element, x2::PropertyOut<double>& property, x2::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range,
+JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<double>& property, v2::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range,
 						   Optional<HandlerID> up_button_id, Optional<HandlerID> down_button_id):
 	_property (property),
 	_angle_property (angle_property),
@@ -106,7 +106,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, x2::PropertyOut<doub
 }
 
 
-x2::PropertyOut<double>&
+v2::PropertyOut<double>&
 JoystickInput::Axis::property()
 {
 	return _property;
@@ -174,14 +174,14 @@ JoystickInput::JoystickInput (QDomElement const& config, std::string const& inst
 	Module (instance)
 {
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_button_properties[handler_id] = std::make_unique<x2::PropertyOut<bool>> (this, "/buttons/" + std::to_string (handler_id));
+		_button_properties[handler_id] = std::make_unique<v2::PropertyOut<bool>> (this, "/buttons/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_axis_properties[handler_id] = std::make_unique<x2::PropertyOut<double>> (this, "/axes/" + std::to_string (handler_id));
+		_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<double>> (this, "/axes/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 	{
-		_angle_axis_properties[handler_id] = std::make_unique<x2::PropertyOut<si::Angle>> (this, "/axes(angle)/" + std::to_string (handler_id));
+		_angle_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<si::Angle>> (this, "/axes(angle)/" + std::to_string (handler_id));
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 

@@ -30,7 +30,7 @@ EngineTorque::EngineTorque (std::string const& instance):
 
 
 void
-EngineTorque::process (x2::Cycle const&)
+EngineTorque::process (v2::Cycle const&)
 {
 	struct TorqueComputer: public boost::static_visitor<>
 	{

@@ -86,7 +86,7 @@ CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance):
 
 
 void
-CHRUM6::process (x2::Cycle const&)
+CHRUM6::process (v2::Cycle const&)
 {
 	if (_sensor && _serial_port.good())
 	{

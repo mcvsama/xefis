@@ -80,7 +80,7 @@ AFCS::AFCS (std::string const& instance):
 
 
 void
-AFCS::process (x2::Cycle const&)
+AFCS::process (v2::Cycle const&)
 {
 	// TODO recheck
 	try {
@@ -571,7 +571,7 @@ AFCS::button_press_clb_con()
 void
 AFCS::check_input()
 {
-	std::array<x2::BasicProperty*, 7> checked_props = { {
+	std::array<v2::BasicProperty*, 7> checked_props = { {
 		&input_measured_ias,
 		&input_measured_mach,
 		&input_measured_heading_magnetic,
@@ -581,7 +581,7 @@ AFCS::check_input()
 		&input_measured_fpa,
 	} };
 
-	if (std::any_of (checked_props.begin(), checked_props.end(), [](x2::BasicProperty* p) { return !p->valid(); }))
+	if (std::any_of (checked_props.begin(), checked_props.end(), [](v2::BasicProperty* p) { return !p->valid(); }))
 	{
 		QStringList failed_props;
 		for (auto const& p: checked_props)
@@ -1058,9 +1058,9 @@ AFCS::transfer_airspeed_control_from_pitch_to_thrust()
 
 
 void
-AFCS::make_button_action (x2::PropertyIn<bool>& property, void (AFCS::* callback)())
+AFCS::make_button_action (v2::PropertyIn<bool>& property, void (AFCS::* callback)())
 {
-	auto action = std::make_unique<x2::PropChangedToAction<bool>> (property, true, [this,callback] {
+	auto action = std::make_unique<v2::PropChangedToAction<bool>> (property, true, [this,callback] {
 		try {
 			(this->*callback)();
 			solve();
@@ -1077,9 +1077,9 @@ AFCS::make_button_action (x2::PropertyIn<bool>& property, void (AFCS::* callback
 
 
 void
-AFCS::make_knob_action (x2::PropertyIn<int64_t>& property, void (AFCS::* callback)(int))
+AFCS::make_knob_action (v2::PropertyIn<int64_t>& property, void (AFCS::* callback)(int))
 {
-	auto action = std::make_unique<x2::DeltaDecoder> (property, [this,callback](int delta) {
+	auto action = std::make_unique<v2::DeltaDecoder> (property, [this,callback](int delta) {
 		try {
 			(this->*callback) (delta);
 			solve();

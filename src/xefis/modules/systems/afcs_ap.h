@@ -30,41 +30,41 @@
 /**
  * Steers control surfaces (ailerons, elevator) to obtain desired orientation (pitch, roll).
  */
-class AFCS_AP: public x2::Module
+class AFCS_AP: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<double>			setting_overall_gain			{ this, 1.0 };
-	x2::Setting<double>			setting_pitch_gain				{ this, 1.0 };
-	x2::Setting<double>			setting_roll_gain				{ this, 1.0 };
-	x2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
+	v2::Setting<double>			setting_overall_gain			{ this, 1.0 };
+	v2::Setting<double>			setting_pitch_gain				{ this, 1.0 };
+	v2::Setting<double>			setting_roll_gain				{ this, 1.0 };
+	v2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
 								setting_pitch_pid_settings		{ this };
-	x2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
+	v2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
 								setting_roll_pid_settings		{ this };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Angle>	input_cmd_pitch					{ this, "/cmd-pitch" };
-	x2::PropertyIn<si::Angle>	input_cmd_roll					{ this, "/cmd-roll" };
-	x2::PropertyIn<si::Angle>	input_measured_pitch			{ this, "/measured-pitch" };
-	x2::PropertyIn<si::Angle>	input_measured_roll				{ this, "/measured-roll" };
-	x2::PropertyIn<si::Angle>	input_elevator_minimum			{ this, "/limits/elevator/minimum" };
-	x2::PropertyIn<si::Angle>	input_elevator_maximum			{ this, "/limits/elevator/maximum" };
-	x2::PropertyIn<si::Angle>	input_ailerons_minimum			{ this, "/limits/ailerons/minimum" };
-	x2::PropertyIn<si::Angle>	input_ailerons_maximum			{ this, "/limits/ailerons/maximum" };
+	v2::PropertyIn<si::Angle>	input_cmd_pitch					{ this, "/cmd-pitch" };
+	v2::PropertyIn<si::Angle>	input_cmd_roll					{ this, "/cmd-roll" };
+	v2::PropertyIn<si::Angle>	input_measured_pitch			{ this, "/measured-pitch" };
+	v2::PropertyIn<si::Angle>	input_measured_roll				{ this, "/measured-roll" };
+	v2::PropertyIn<si::Angle>	input_elevator_minimum			{ this, "/limits/elevator/minimum" };
+	v2::PropertyIn<si::Angle>	input_elevator_maximum			{ this, "/limits/elevator/maximum" };
+	v2::PropertyIn<si::Angle>	input_ailerons_minimum			{ this, "/limits/ailerons/minimum" };
+	v2::PropertyIn<si::Angle>	input_ailerons_maximum			{ this, "/limits/ailerons/maximum" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<bool>		output_serviceable				{ this, "/serviceable" };
-	x2::PropertyOut<si::Angle>	output_elevator					{ this, "/elevator" };
-	x2::PropertyOut<si::Angle>	output_ailerons					{ this, "/ailerons" };
+	v2::PropertyOut<bool>		output_serviceable				{ this, "/serviceable" };
+	v2::PropertyOut<si::Angle>	output_elevator					{ this, "/elevator" };
+	v2::PropertyOut<si::Angle>	output_ailerons					{ this, "/ailerons" };
 
   public:
 	// Ctor
@@ -78,7 +78,7 @@ class AFCS_AP: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	// Module API
 	void
@@ -102,7 +102,7 @@ class AFCS_AP: public x2::Module
 	xf::PIDControl<si::Angle, si::Angle>	_ailerons_pid;
 	xf::Smoother<si::Angle>					_elevator_smoother	{ 50_ms };
 	xf::Smoother<si::Angle>					_ailerons_smoother	{ 50_ms };
-	x2::PropertyObserver					_ap_computer;
+	v2::PropertyObserver					_ap_computer;
 };
 
 #endif

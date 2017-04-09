@@ -24,7 +24,7 @@
 #include "module.h"
 
 
-namespace x2 {
+namespace v2 {
 
 UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
 	Exception (make_message (settings))
@@ -125,7 +125,7 @@ Module::initialize()
 
 
 void
-Module::process (x2::Cycle const&)
+Module::process (v2::Cycle const&)
 { }
 
 
@@ -157,5 +157,5 @@ module_identifier (Module* module)
 	return "(nullptr)";
 }
 
-} // namespace x2
+} // namespace v2
 

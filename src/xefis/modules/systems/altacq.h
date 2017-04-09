@@ -27,32 +27,32 @@
 #include <xefis/utility/smoother.h>
 
 
-class AltAcq: public x2::Module
+class AltAcq: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<si::Length>			setting_minimum_altitude_difference	{ this };
-	x2::Setting<si::Length>			setting_flag_diff_on				{ this, 1000_ft };
-	x2::Setting<si::Length>			setting_flag_diff_off				{ this, 100_ft };
+	v2::Setting<si::Length>			setting_minimum_altitude_difference	{ this };
+	v2::Setting<si::Length>			setting_flag_diff_on				{ this, 1000_ft };
+	v2::Setting<si::Length>			setting_flag_diff_off				{ this, 100_ft };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Length>		input_altitude_amsl					{ this, "/altitude-amsl" };
-	x2::PropertyIn<si::Length>		input_altitude_acquire_amsl			{ this, "/altitude-acquire-amsl" };
-	x2::PropertyIn<si::Velocity>	input_vertical_speed				{ this, "/vertical-speed" };
-	x2::PropertyIn<si::Velocity>	input_ground_speed					{ this, "/ground-speed" };
+	v2::PropertyIn<si::Length>		input_altitude_amsl					{ this, "/altitude-amsl" };
+	v2::PropertyIn<si::Length>		input_altitude_acquire_amsl			{ this, "/altitude-acquire-amsl" };
+	v2::PropertyIn<si::Velocity>	input_vertical_speed				{ this, "/vertical-speed" };
+	v2::PropertyIn<si::Velocity>	input_ground_speed					{ this, "/ground-speed" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Length>		output_altitude_acquire_distance	{ this, "/acquire-distance" };
-	x2::PropertyOut<bool>			output_altitude_acquire_flag		{ this, "/acquire-flag" };
+	v2::PropertyOut<si::Length>		output_altitude_acquire_distance	{ this, "/acquire-distance" };
+	v2::PropertyOut<bool>			output_altitude_acquire_flag		{ this, "/acquire-flag" };
 
   public:
 	// Ctor
@@ -62,7 +62,7 @@ class AltAcq: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	void
 	compute_altitude_acquire_distance();
@@ -72,9 +72,9 @@ class AltAcq: public x2::Module
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Length>	_output_smoother					{ 2_s };
-	x2::PropertyObserver		_output_computer;
-	x2::PropChanged<si::Length>	_altitude_amsl_changed				{ input_altitude_amsl };
-	x2::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ input_altitude_acquire_amsl };
+	v2::PropertyObserver		_output_computer;
+	v2::PropChanged<si::Length>	_altitude_amsl_changed				{ input_altitude_amsl };
+	v2::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ input_altitude_acquire_amsl };
 };
 
 #endif

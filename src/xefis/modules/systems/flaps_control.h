@@ -27,7 +27,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class FlapsControl: public x2::Module
+class FlapsControl: public v2::Module
 {
 	static constexpr si::Time kUpdateInterval = 10_ms;
 
@@ -37,25 +37,25 @@ class FlapsControl: public x2::Module
 	 */
 
 	// How fast flaps should extend/retract:
-	x2::Setting<si::AngularVelocity>	setting_angular_velocity	{ this, 10_deg / 1_s };
+	v2::Setting<si::AngularVelocity>	setting_angular_velocity	{ this, 10_deg / 1_s };
 	// Range of output_control property:
-	x2::Setting<xf::Range<double>>		setting_control_extents		{ this, { 0.0, 1.0 } };
+	v2::Setting<xf::Range<double>>		setting_control_extents		{ this, { 0.0, 1.0 } };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<bool>				input_up					{ this, "/input/up", false };
-	x2::PropertyIn<bool>				input_down					{ this, "/input/down", false };
-	x2::PropertyIn<si::Angle>			input_setting				{ this, "/input/setting", 0_deg };
+	v2::PropertyIn<bool>				input_up					{ this, "/input/up", false };
+	v2::PropertyIn<bool>				input_down					{ this, "/input/down", false };
+	v2::PropertyIn<si::Angle>			input_setting				{ this, "/input/setting", 0_deg };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>			output_setting				{ this, "/output/setting" };
-	x2::PropertyOut<si::Angle>			output_current				{ this, "/output/current" };
-	x2::PropertyOut<double>				output_control				{ this, "/output/control" };
+	v2::PropertyOut<si::Angle>			output_setting				{ this, "/output/setting" };
+	v2::PropertyOut<si::Angle>			output_current				{ this, "/output/current" };
+	v2::PropertyOut<double>				output_control				{ this, "/output/control" };
 
   public:
 	// Ctor
@@ -65,7 +65,7 @@ class FlapsControl: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	void
@@ -77,9 +77,9 @@ class FlapsControl: public x2::Module
 	si::Angle					_setting;
 	si::Angle					_current;
 	Unique<QTimer>				_timer;
-	x2::PropChangedTo<bool>		_input_up_clicked		{ input_up, true }; // TODO C++17 parameter deduction
-	x2::PropChangedTo<bool>		_input_down_clicked		{ input_down, true }; // TODO C++17 parameter deduction
-	x2::PropChanged<si::Angle>	_input_setting_changed	{ input_setting }; // TODO C++17 parameter deduction
+	v2::PropChangedTo<bool>		_input_up_clicked		{ input_up, true }; // TODO C++17 parameter deduction
+	v2::PropChangedTo<bool>		_input_down_clicked		{ input_down, true }; // TODO C++17 parameter deduction
+	v2::PropChanged<si::Angle>	_input_setting_changed	{ input_setting }; // TODO C++17 parameter deduction
 };
 
 #endif

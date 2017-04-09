@@ -40,7 +40,7 @@ AltAcq::AltAcq (std::string const& instance):
 
 
 void
-AltAcq::process (x2::Cycle const& cycle)
+AltAcq::process (v2::Cycle const& cycle)
 {
 	_output_computer.process (cycle.update_time());
 

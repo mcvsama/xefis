@@ -30,30 +30,30 @@
 /**
  * Controls rudder to obtain zero slip-skid value.
  */
-class AFCS_EAC_YD: public x2::Module
+class AFCS_EAC_YD: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
+	v2::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
 								setting_rudder_pid_settings	{ this };
-	x2::Setting<double>			setting_rudder_pid_gain		{ this, 1.0 };
-	x2::Setting<si::Angle>		setting_deflection_limit	{ this };
+	v2::Setting<double>			setting_rudder_pid_gain		{ this, 1.0 };
+	v2::Setting<si::Angle>		setting_deflection_limit	{ this };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<bool>		input_enabled				{ this, "/enabled" };
-	x2::PropertyIn<si::Force>	input_slip_skid				{ this, "/slip-skid" };
+	v2::PropertyIn<bool>		input_enabled				{ this, "/enabled" };
+	v2::PropertyIn<si::Force>	input_slip_skid				{ this, "/slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Angle>	output_rudder_deflection	{ this, "/rudder-deflection" };
+	v2::PropertyOut<si::Angle>	output_rudder_deflection	{ this, "/rudder-deflection" };
 
   public:
 	// Ctor
@@ -67,7 +67,7 @@ class AFCS_EAC_YD: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
 	/**
 	 * Compute rudder.
@@ -77,7 +77,7 @@ class AFCS_EAC_YD: public x2::Module
 
   private:
 	xf::PIDControl<si::Force, si::Angle>	_rudder_pid;
-	x2::PropertyObserver					_rudder_computer;
+	v2::PropertyObserver					_rudder_computer;
 };
 
 #endif

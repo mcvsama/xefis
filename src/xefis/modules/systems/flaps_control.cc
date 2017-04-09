@@ -46,7 +46,7 @@ FlapsControl::FlapsControl (xf::Airframe& airframe, std::string const& instance)
 
 
 void
-FlapsControl::process (x2::Cycle const&)
+FlapsControl::process (v2::Cycle const&)
 {
 	if (_input_up_clicked())
 	{

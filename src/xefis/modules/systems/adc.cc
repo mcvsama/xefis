@@ -158,9 +158,9 @@ AirDataComputer::AirDataComputer (xf::Airframe* airframe, std::string const& ins
 
 
 void
-AirDataComputer::process (x2::Cycle const& cycle)
+AirDataComputer::process (v2::Cycle const& cycle)
 {
-	x2::PropertyObserver* computers[] = {
+	v2::PropertyObserver* computers[] = {
 		// Order is important:
 		&_altitude_computer,
 		&_ias_computer,

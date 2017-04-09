@@ -29,7 +29,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class AFCS_AT: public x2::Module
+class AFCS_AT: public v2::Module
 {
   public:
 	enum class SpeedMode
@@ -44,31 +44,32 @@ class AFCS_AT: public x2::Module
 	 * Settings
 	 */
 
-	x2::Setting<xf::PIDControl<si::Velocity, si::Force>::Settings>
+	v2::Setting<xf::PIDControl<si::Velocity, si::Force>::Settings>
 											setting_ias_pid_settings		{ this };
-	x2::Setting<double>						setting_ias_pid_gain			{ this, 1.0 };
-	x2::Setting<si::Force>					setting_output_thrust_minimum	{ this, 0.0_N };
-	x2::Setting<si::Force>					setting_output_thrust_maximum	{ this, 1.0_N };
+	v2::Setting<double>						setting_ias_pid_gain			{ this, 1.0 };
+	v2::Setting<si::Force>					setting_output_thrust_minimum	{ this, 0.0_N };
+	v2::Setting<si::Force>					setting_output_thrust_maximum	{ this, 1.0_N };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<SpeedMode>				input_cmd_speed_mode			{ this, "/cmd/speed-mode" };
-	x2::PropertyIn<si::Force>				input_cmd_thrust				{ this, "/cmd/thrust" };
-	x2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd/ias" };
-	x2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measurements/ias" };
+	v2::PropertyIn<SpeedMode>				input_cmd_speed_mode			{ this, "/cmd/speed-mode" };
+	v2::PropertyIn<si::Force>				input_cmd_thrust				{ this, "/cmd/thrust" };
+	v2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd/ias" };
+	v2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measurements/ias" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Force>				output_thrust					{ this, "/thrust" };
+	v2::PropertyOut<si::Force>				output_thrust					{ this, "/thrust" };
 
 	/*
 	 * Input/Output
 	 */
-	x2::PropertyOut<bool>					io_disengage_at					{ this, "/disengage-at" };
+
+	v2::PropertyOut<bool>					io_disengage_at					{ this, "/disengage-at" };
 
   public:
 	// Ctor
@@ -82,7 +83,7 @@ class AFCS_AT: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	void
@@ -97,7 +98,7 @@ class AFCS_AT: public x2::Module
   private:
 	xf::PIDControl<si::Velocity, si::Force>	_ias_pid;
 	xf::Smoother<si::Force>					_ias_pid_smoother		{ 250_ms };
-	x2::PropertyObserver					_thrust_computer;
+	v2::PropertyObserver					_thrust_computer;
 };
 
 #endif

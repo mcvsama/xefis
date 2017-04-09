@@ -37,46 +37,46 @@
  */
 class CHRUM6:
 	public QObject,
-	public x2::Module
+	public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<si::Frequency>				setting_sample_rate					{ this, 20_Hz };
-	x2::Setting<float>						setting_ekf_process_variance		{ this, 0.5f };
+	v2::Setting<si::Frequency>				setting_sample_rate					{ this, 20_Hz };
+	v2::Setting<float>						setting_ekf_process_variance		{ this, 0.5f };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::Acceleration>		input_centripetal_x					{ this, "/centripetal-acceleration/x" };
-	x2::PropertyIn<si::Acceleration>		input_centripetal_y					{ this, "/centripetal-acceleration/y" };
-	x2::PropertyIn<si::Acceleration>		input_centripetal_z					{ this, "/centripetal-acceleration/z" };
+	v2::PropertyIn<si::Acceleration>		input_centripetal_x					{ this, "/centripetal-acceleration/x" };
+	v2::PropertyIn<si::Acceleration>		input_centripetal_y					{ this, "/centripetal-acceleration/y" };
+	v2::PropertyIn<si::Acceleration>		input_centripetal_z					{ this, "/centripetal-acceleration/z" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<bool>					output_serviceable					{ this, "/serviceable" };
-	x2::PropertyOut<bool>					output_caution						{ this, "/caution" };
-	x2::PropertyOut<int64_t>				output_failures						{ this, "/failures" };
-	x2::PropertyOut<si::Temperature>		output_internal_temperature			{ this, "/internal-temperature" };
-	x2::PropertyOut<si::Angle>				output_orientation_pitch			{ this, "/orientation/pitch" };
-	x2::PropertyOut<si::Angle>				output_orientation_roll				{ this, "/orientation/roll" };
-	x2::PropertyOut<si::Angle>				output_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
-	x2::PropertyOut<si::Acceleration>		output_acceleration_x				{ this, "/acceleration/x" };
-	x2::PropertyOut<si::Acceleration>		output_acceleration_y				{ this, "/acceleration/y" };
-	x2::PropertyOut<si::Acceleration>		output_acceleration_z				{ this, "/acceleration/z" };
-	x2::PropertyOut<si::AngularVelocity>	output_rotation_x					{ this, "/rotation/x" };
-	x2::PropertyOut<si::AngularVelocity>	output_rotation_y					{ this, "/rotation.y" };
-	x2::PropertyOut<si::AngularVelocity>	output_rotation_z					{ this, "/rotation.z" };
+	v2::PropertyOut<bool>					output_serviceable					{ this, "/serviceable" };
+	v2::PropertyOut<bool>					output_caution						{ this, "/caution" };
+	v2::PropertyOut<int64_t>				output_failures						{ this, "/failures" };
+	v2::PropertyOut<si::Temperature>		output_internal_temperature			{ this, "/internal-temperature" };
+	v2::PropertyOut<si::Angle>				output_orientation_pitch			{ this, "/orientation/pitch" };
+	v2::PropertyOut<si::Angle>				output_orientation_roll				{ this, "/orientation/roll" };
+	v2::PropertyOut<si::Angle>				output_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
+	v2::PropertyOut<si::Acceleration>		output_acceleration_x				{ this, "/acceleration/x" };
+	v2::PropertyOut<si::Acceleration>		output_acceleration_y				{ this, "/acceleration/y" };
+	v2::PropertyOut<si::Acceleration>		output_acceleration_z				{ this, "/acceleration/z" };
+	v2::PropertyOut<si::AngularVelocity>	output_rotation_x					{ this, "/rotation/x" };
+	v2::PropertyOut<si::AngularVelocity>	output_rotation_y					{ this, "/rotation.y" };
+	v2::PropertyOut<si::AngularVelocity>	output_rotation_z					{ this, "/rotation.z" };
 	// Note: it's _assumed_ that magnetic field strength returned by the device is in Teslas.
 	// TODO check that assumption!
-	x2::PropertyOut<si::MagneticField>		output_magnetic_x					{ this, "/magnetic/x" };
-	x2::PropertyOut<si::MagneticField>		output_magnetic_y					{ this, "/magnetic/y" };
-	x2::PropertyOut<si::MagneticField>		output_magnetic_z					{ this, "/magnetic/z" };
+	v2::PropertyOut<si::MagneticField>		output_magnetic_x					{ this, "/magnetic/x" };
+	v2::PropertyOut<si::MagneticField>		output_magnetic_y					{ this, "/magnetic/y" };
+	v2::PropertyOut<si::MagneticField>		output_magnetic_z					{ this, "/magnetic/z" };
 
   private:
 	Q_OBJECT
@@ -103,7 +103,7 @@ class CHRUM6:
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private slots:
 	/**
@@ -252,12 +252,12 @@ class CHRUM6:
 	Unique<xf::CHRUM6>					_sensor;
 	int									_failure_count						{ 0 };
 	Stage								_stage								{ Stage::Initialize };
-	x2::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ input_centripetal_x };
-	x2::PropChanged<si::Acceleration>	_input_centripetal_y_changed		{ input_centripetal_y };
-	x2::PropChanged<si::Acceleration>	_input_centripetal_z_changed		{ input_centripetal_z };
-	x2::PropChanged<si::Acceleration>	_output_acceleration_x_changed		{ output_acceleration_x };
-	x2::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ output_acceleration_y };
-	x2::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ output_acceleration_z };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ input_centripetal_x };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_y_changed		{ input_centripetal_y };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_z_changed		{ input_centripetal_z };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_x_changed		{ output_acceleration_x };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ output_acceleration_y };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ output_acceleration_z };
 	// Backup gyro bias values:
 	Optional<uint32_t>					_gyro_bias_xy;
 	Optional<uint32_t>					_gyro_bias_z;

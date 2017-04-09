@@ -40,24 +40,24 @@
  */
 class ETSAirspeed:
 	public QObject,
-	public x2::Module
+	public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<si::Time>			setting_read_interval		{ this, 100_ms };
-	x2::Setting<si::Time>			setting_smoothing_time		{ this, 100_ms };
+	v2::Setting<si::Time>			setting_read_interval		{ this, 100_ms };
+	v2::Setting<si::Time>			setting_smoothing_time		{ this, 100_ms };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<bool>			output_serviceable			{ this, "/serviceable" };
-	x2::PropertyOut<si::Velocity>	output_airspeed				{ this, "/airspeed" };
-	x2::PropertyOut<si::Velocity>	output_airspeed_minimum		{ this, "/airspeed.minimum" };
-	x2::PropertyOut<si::Velocity>	output_airspeed_maximum		{ this, "/airspeed.maximum" };
+	v2::PropertyOut<bool>			output_serviceable			{ this, "/serviceable" };
+	v2::PropertyOut<si::Velocity>	output_airspeed				{ this, "/airspeed" };
+	v2::PropertyOut<si::Velocity>	output_airspeed_minimum		{ this, "/airspeed.minimum" };
+	v2::PropertyOut<si::Velocity>	output_airspeed_maximum		{ this, "/airspeed.maximum" };
 
   private:
 	Q_OBJECT

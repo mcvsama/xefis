@@ -29,7 +29,7 @@
 
 class KLogMonitor:
 	public QObject,
-	public x2::Module
+	public v2::Module
 {
 	Q_OBJECT
 
@@ -38,10 +38,10 @@ class KLogMonitor:
 	 * Output
 	 */
 
-	x2::PropertyOut<bool>	output_flag_oom		{ this, "/flags/oom" };
-	x2::PropertyOut<bool>	output_flag_io		{ this, "/flags/io-error" };
-	x2::PropertyOut<bool>	output_flag_oops	{ this, "/flags/oops" };
-	x2::PropertyOut<bool>	output_flag_bug		{ this, "/flags/bug" };
+	v2::PropertyOut<bool>	output_flag_oom		{ this, "/flags/oom" };
+	v2::PropertyOut<bool>	output_flag_io		{ this, "/flags/io-error" };
+	v2::PropertyOut<bool>	output_flag_oops	{ this, "/flags/oops" };
+	v2::PropertyOut<bool>	output_flag_bug		{ this, "/flags/bug" };
 
   private:
 	static constexpr std::size_t	BufferSize = 1024 * 1024;

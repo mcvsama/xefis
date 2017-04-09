@@ -52,7 +52,7 @@ AFCS_AT::initialize()
 
 
 void
-AFCS_AT::process (x2::Cycle const& cycle)
+AFCS_AT::process (v2::Cycle const& cycle)
 {
 	_thrust_computer.process (cycle.update_time());
 }

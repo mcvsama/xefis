@@ -37,7 +37,7 @@
  * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Datatable2D,
  * as a function of motor rotational speed.
  */
-class EngineTorque: public x2::Module
+class EngineTorque: public v2::Module
 {
   private:
 	using EfficiencyDatatable	= xf::Datatable2D<si::AngularVelocity, double>;
@@ -49,21 +49,21 @@ class EngineTorque: public x2::Module
 	 * Settings
 	 */
 
-	x2::Setting<EngineEfficiency>		setting_motor_efficiency	{ this };
-	x2::Setting<MotorKv>				setting_motor_kv			{ this };
+	v2::Setting<EngineEfficiency>		setting_motor_efficiency	{ this };
+	v2::Setting<MotorKv>				setting_motor_kv			{ this };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<si::AngularVelocity>	input_engine_speed			{ this, "/engine-speed" };
-	x2::PropertyIn<si::Current>			input_engine_current		{ this, "/engine-current" };
+	v2::PropertyIn<si::AngularVelocity>	input_engine_speed			{ this, "/engine-speed" };
+	v2::PropertyIn<si::Current>			input_engine_current		{ this, "/engine-current" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<si::Torque>			output_engine_torque		{ this, "/engine-torque" };
+	v2::PropertyOut<si::Torque>			output_engine_torque		{ this, "/engine-torque" };
 
   public:
 	// Ctor
@@ -73,7 +73,7 @@ class EngineTorque: public x2::Module
   protected:
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	void

@@ -32,29 +32,29 @@
  * Controls trim value with two buttons or axis.
  * Generates appropriate trimming sound.
  */
-class TrimControl: public x2::Module
+class TrimControl: public v2::Module
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	x2::Setting<double>		setting_trim_step		{ this, 0.01 };
+	v2::Setting<double>		setting_trim_step		{ this, 0.01 };
 
 	/*
 	 * Input
 	 */
 
-	x2::PropertyIn<double>	input_trim_axis			{ this, "/axis" };
-	x2::PropertyIn<double>	input_trim_value		{ this, "/value" };
-	x2::PropertyIn<bool>	input_up_trim_button	{ this, "/up-button" };
-	x2::PropertyIn<bool>	input_down_trim_button	{ this, "/down-button" };
+	v2::PropertyIn<double>	input_trim_axis			{ this, "/axis" };
+	v2::PropertyIn<double>	input_trim_value		{ this, "/value" };
+	v2::PropertyIn<bool>	input_up_trim_button	{ this, "/up-button" };
+	v2::PropertyIn<bool>	input_down_trim_button	{ this, "/down-button" };
 
 	/*
 	 * Output
 	 */
 
-	x2::PropertyOut<double>	output_trim_value		{ this, "/trim-value" };
+	v2::PropertyOut<double>	output_trim_value		{ this, "/trim-value" };
 
   public:
 	// Ctor
@@ -63,7 +63,7 @@ class TrimControl: public x2::Module
 
 	// Module API
 	void
-	process (x2::Cycle const&) override;
+	process (v2::Cycle const&) override;
 
   private:
 	void
@@ -79,19 +79,19 @@ class TrimControl: public x2::Module
 	 * Return true if given button is 'pressed'.
 	 */
 	static bool
-	pressed (x2::Property<bool> const&);
+	pressed (v2::Property<bool> const&);
 
 	/**
 	 * Return true if given axis is moved 'up'.
 	 */
 	static bool
-	moved_up (x2::Property<double> const&);
+	moved_up (v2::Property<double> const&);
 
 	/**
 	 * Return true if given axis is moved 'down'.
 	 */
 	static bool
-	moved_down (x2::Property<double> const&);
+	moved_down (v2::Property<double> const&);
 
   private:
 	xf::Xefis*				_xefis;
@@ -99,8 +99,8 @@ class TrimControl: public x2::Module
 	bool					_trimming_up	{ false };
 	bool					_trimming_down	{ false };
 	Unique<QTimer>			_timer;
-	x2::PropertyObserver	_trim_computer;
-	x2::PropertyObserver	_mix_computer;
+	v2::PropertyObserver	_trim_computer;
+	v2::PropertyObserver	_mix_computer;
 };
 
 #endif

@@ -29,7 +29,7 @@
 
 class QWidget;
 
-namespace x2 {
+namespace v2 {
 using namespace xf; // XXX
 
 class BasicSetting;
@@ -234,7 +234,7 @@ module_identifier (Module&);
 std::string
 module_identifier (Module*);
 
-} // namespace x2
+} // namespace v2
 
 #endif
 

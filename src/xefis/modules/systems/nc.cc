@@ -89,9 +89,9 @@ NavigationComputer::NavigationComputer (std::string const& instance):
 
 
 void
-NavigationComputer::process (x2::Cycle const& cycle)
+NavigationComputer::process (v2::Cycle const& cycle)
 {
-	x2::PropertyObserver* computers[] = {
+	v2::PropertyObserver* computers[] = {
 		// Order is important:
 		&_position_computer,
 		&_magnetic_variation_computer,
