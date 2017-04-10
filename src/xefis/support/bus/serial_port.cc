@@ -347,9 +347,9 @@ SerialPort::set_device_options()
 	bzero (&options, sizeof (options));
 
 	// Min characters to be read:
-	options.c_cc[VMIN] = 0;
+	options.c_cc[VMIN] = _configuration._vmin;
 	// Time to wait for data (tenths of seconds):
-	options.c_cc[VTIME] = 0;
+	options.c_cc[VTIME] = _configuration._vtime;
 	// Set output and local modes to defaults:
 	options.c_cflag = CREAD | CLOCAL;
 
