@@ -20,6 +20,9 @@
 #include <vector>
 #include <functional>
 
+// Linux:
+#include <termios.h>
+
 // Qt:
 #include <QtCore/QSocketNotifier>
 
@@ -117,6 +120,19 @@ class SerialPort:
 		void
 		set_hardware_flow_control (bool enabled);
 
+		/**
+		 * Set minimum number of characters for noncanonical read.
+		 */
+		void
+		set_min_characters_to_read (cc_t num_characters);
+
+		/**
+		 * Set VTIME, timeout for noncanonical read.
+		 * Resolution will be limited to deciseconds.
+		 */
+		void
+		set_read_timeout (si::Time timeout);
+
 	  private:
 		std::string		_device_path;
 		unsigned int	_baud_rate;
@@ -124,6 +140,8 @@ class SerialPort:
 		Parity			_parity		= Parity::None;
 		unsigned int	_stop_bits	= 1;
 		bool			_rtscts		= false;
+		cc_t			_vmin		= 0;
+		cc_t			_vtime		= 0;
 	};
 
 	typedef std::function<void()>	DataReadyCallback;
@@ -383,6 +401,20 @@ inline void
 SerialPort::Configuration::set_hardware_flow_control (bool enabled)
 {
 	_rtscts = enabled;
+}
+
+
+inline void
+SerialPort::Configuration::set_min_characters_to_read (cc_t num_characters)
+{
+	_vmin = num_characters;
+}
+
+
+inline void
+SerialPort::Configuration::set_read_timeout (si::Time timeout)
+{
+	_vtime = std::lround (timeout * 10 / 1_s);
 }
 
 
