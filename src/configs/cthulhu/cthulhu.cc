@@ -194,7 +194,7 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 	i2c_device_for_ets_airspeed.bus().set_bus_number (10);
 	i2c_device_for_ets_airspeed.set_address (xf::i2c::Address (0x75));
 
-	//auto* ets_airspeed = loop->load_module<ETSAirspeed> (std::move (i2c_device_for_ets_airspeed), "ets-airspeed");
+	auto* ets_airspeed = loop->load_module<ETSAirspeed> (std::move (i2c_device_for_ets_airspeed), "ets-airspeed");
 
 	xf::SerialPort::Configuration gps_serial_config;
 	gps_serial_config.set_device_path ("/dev/ttyS1");
@@ -204,7 +204,15 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 	gps_serial_config.set_parity_bit (xf::SerialPort::Parity::None);
 	gps_serial_config.set_hardware_flow_control (false);
 
-	//auto* gps = loop->load_module<GPS> (xefis->system(), gps_serial_config, "gps");
+	xf::SerialPort::Configuration xbee_config;
+	xbee_config.set_device_path ("/dev/ttyS1");
+	xbee_config.set_baud_rate (9600);
+	xbee_config.set_data_bits (8);
+	xbee_config.set_stop_bits (1);
+	xbee_config.set_parity_bit (xf::SerialPort::Parity::None);
+	xbee_config.set_hardware_flow_control (false);
+
+	auto* gps = loop->load_module<GPS> (xefis->system(), gps_serial_config, "gps");
 
 	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-stick.xml"));
 	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-throttle.xml"));
