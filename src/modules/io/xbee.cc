@@ -448,6 +448,11 @@ XBee::set_device_options()
 {
 	log() << "Setting baud rate to " << _baud_rate << std::endl;
 
+#if 0 // TODO
+	SerialPort::Configuration configuration;
+	configuration.set_read_timeout (0.1_s);
+	configuration.set_baud_rate (_baud_rate);
+#else
 	termios options;
 	bzero (&options, sizeof (options));
 
@@ -478,6 +483,7 @@ XBee::set_device_options()
 		log() << "Could not enable flow: tcflow(): " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
 		return false;
 	}
+#endif
 
 	return true;
 }
