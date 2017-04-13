@@ -18,8 +18,6 @@ XEFIS_SOURCES			+= modules/helpers/transistor.cc
 
 ######## /modules/instruments ########
 
-XEFIS_HEADERS_MOC		+= modules/instruments/adi.h
-XEFIS_HEADERS_MOC		+= modules/instruments/adi_widget.h
 XEFIS_HEADERS			+= modules/instruments/cdu.h
 XEFIS_HEADERS			+= modules/instruments/datatable.h
 XEFIS_HEADERS			+= modules/instruments/debug_forces.h
@@ -37,8 +35,6 @@ XEFIS_HEADERS_MOC		+= modules/instruments/status.h
 XEFIS_HEADERS			+= modules/instruments/status_widget.h
 XEFIS_HEADERS			+= modules/instruments/vertical_trim.h
 
-XEFIS_SOURCES			+= modules/instruments/adi.cc
-XEFIS_SOURCES			+= modules/instruments/adi_widget.cc
 XEFIS_SOURCES			+= modules/instruments/cdu.cc
 XEFIS_SOURCES			+= modules/instruments/datatable.cc
 XEFIS_SOURCES			+= modules/instruments/debug_forces.cc
@@ -180,6 +176,7 @@ XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc
 
 XEFIS_HEADERS			+= xefis/core/v2/compatibility_v1_v2.h
 XEFIS_HEADERS			+= xefis/core/v2/cycle.h
+XEFIS_HEADERS			+= xefis/core/v2/instrument.h
 XEFIS_HEADERS			+= xefis/core/v2/machine.h
 XEFIS_HEADERS			+= xefis/core/v2/module.h
 XEFIS_HEADERS_MOC		+= xefis/core/v2/processing_loop.h
@@ -214,6 +211,7 @@ XEFIS_HEADERS			+= xefis/core/work_performer.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
 XEFIS_SOURCES			+= xefis/core/v2/compatibility_v1_v2.cc
+XEFIS_SOURCES			+= xefis/core/v2/instrument.cc
 XEFIS_SOURCES			+= xefis/core/v2/machine.cc
 XEFIS_SOURCES			+= xefis/core/v2/module.cc
 XEFIS_SOURCES			+= xefis/core/v2/processing_loop.cc
@@ -247,6 +245,14 @@ SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
 ######## /xefis/modules/helpers ########
 
 XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
+
+######## /xefis/modules/instruments ########
+
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
+
+XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
 
 ######## /xefis/modules/io ########
 

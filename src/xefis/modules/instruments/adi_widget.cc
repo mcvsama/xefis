@@ -471,7 +471,7 @@ ADIWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
 
 		if (_params.slip_skid_visible)
 		{
-			painter.translate (-xf::clamped (_params.slip_skid, -4.f, +4.f) * 0.08f * w, 0.f);
+			painter.translate (-xf::clamped (_params.slip_skid.quantity<si::Degree>(), -4.0, +4.0) * 0.08 * w, 0.0);
 
 			if (_params.roll_warning || _params.slip_skid_warning)
 				painter.setPen (warning_pen);
@@ -2361,7 +2361,7 @@ ADIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 			painter.drawRect (frame);
 		};
 
-		auto paint_small_rect = [&](QPointF point) -> void
+		auto paint_armed_rect = [&](QPointF point) -> void
 		{
 			float v = 0.025f * _q;
 			QRectF frame (point, QSizeF (1.9f * _q, _font_10_digit_height));
@@ -2390,12 +2390,12 @@ ADIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 			paint_big_rect (b3);
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
-		if (is_newly_set (_locals.fma_speed_small_ts))
-			paint_small_rect (s1);
-		if (is_newly_set (_locals.fma_lateral_small_ts))
-			paint_small_rect (s2);
-		if (is_newly_set (_locals.fma_vertical_small_ts))
-			paint_small_rect (s3);
+		if (is_newly_set (_locals.fma_speed_armed_ts))
+			paint_armed_rect (s1);
+		if (is_newly_set (_locals.fma_lateral_armed_ts))
+			paint_armed_rect (s2);
+		if (is_newly_set (_locals.fma_vertical_armed_ts))
+			paint_armed_rect (s3);
 
 		QFont font_big = _font_16;
 		font_big.setPixelSize (font_size (14.f));
@@ -2409,9 +2409,9 @@ ADIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 
 		painter.setPen (get_pen (Qt::white, 1.0f));
 		painter.setFont (font_small);
-		painter.fast_draw_text (s1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_small_hint);
-		painter.fast_draw_text (s2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_small_hint);
-		painter.fast_draw_text (s3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_small_hint);
+		painter.fast_draw_text (s1, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_speed_armed_hint);
+		painter.fast_draw_text (s2, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_lateral_armed_hint);
+		painter.fast_draw_text (s3, Qt::AlignVCenter | Qt::AlignHCenter, _params.fma_vertical_armed_hint);
 	}
 }
 
@@ -2782,20 +2782,20 @@ ADIWidget::push_params()
 	if (_params.fma_speed_hint != old.fma_speed_hint)
 		_locals.fma_speed_ts = now;
 
-	if (_params.fma_speed_small_hint != old.fma_speed_small_hint)
-		_locals.fma_speed_small_ts = now;
+	if (_params.fma_speed_armed_hint != old.fma_speed_armed_hint)
+		_locals.fma_speed_armed_ts = now;
 
 	if (_params.fma_lateral_hint != old.fma_lateral_hint)
 		_locals.fma_lateral_ts = now;
 
-	if (_params.fma_lateral_small_hint != old.fma_lateral_small_hint)
-		_locals.fma_lateral_small_ts = now;
+	if (_params.fma_lateral_armed_hint != old.fma_lateral_armed_hint)
+		_locals.fma_lateral_armed_ts = now;
 
 	if (_params.fma_vertical_hint != old.fma_vertical_hint)
 		_locals.fma_vertical_ts = now;
 
-	if (_params.fma_vertical_small_hint != old.fma_vertical_small_hint)
-		_locals.fma_vertical_small_ts = now;
+	if (_params.fma_vertical_armed_hint != old.fma_vertical_armed_hint)
+		_locals.fma_vertical_armed_ts = now;
 
 	_locals.speed_blinking_active = _speed_blinking_warning->isActive();
 	_locals.minimums_blinking_active = _minimums_blinking_warning->isActive();
