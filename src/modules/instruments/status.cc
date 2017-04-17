@@ -24,6 +24,7 @@
 #include <xefis/core/xefis.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
@@ -91,7 +92,7 @@ Status::MessageDefinition::MessageDefinition (QDomElement const& message_element
 			throw xf::BadDomAttribute (message_element, "severity", "must be 'caution' or 'warning'");
 	}
 
-	for (QDomElement o: message_element)
+	for (QDomElement const& o: xf::iterate_sub_elements (message_element))
 		if (o == "observe")
 			_observations.push_back (Observation (o));
 
@@ -164,9 +165,9 @@ Status::Status (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "output.master-warning", _output_master_warning, false },
 	});
 
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 		if (e == "messages")
-			for (QDomElement message_el: e)
+			for (QDomElement const& message_el: xf::iterate_sub_elements (e))
 				if (message_el == "message")
 					_messages.push_back (MessageDefinition (message_el));
 

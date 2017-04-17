@@ -26,6 +26,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/hash.h>
 #include <xefis/utility/hextable.h>
 #include <xefis/utility/blob.h>
@@ -37,9 +38,9 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/link", Link)
 
 
-Link::ItemSequence::ItemSequence (Link* link, QDomElement& element)
+Link::ItemSequence::ItemSequence (Link* link, QDomElement const& element)
 {
-	for (QDomElement& e: element)
+	for (QDomElement const& e: xf::iterate_sub_elements (element))
 	{
 		if (e == "property")
 			_items.push_back (new PropertyItem (link, e));
@@ -101,7 +102,7 @@ Link::ItemSequence::failsafe()
 }
 
 
-Link::PropertyItem::PropertyItem (Link* link, QDomElement& element)
+Link::PropertyItem::PropertyItem (Link* link, QDomElement const& element)
 {
 	if (!element.hasAttribute ("type"))
 		throw xf::MissingDomAttribute (element, "type");
@@ -550,9 +551,9 @@ template<class CastType, class SourceType>
 	}
 
 
-Link::BitfieldItem::BitfieldItem (Link* link, QDomElement& element)
+Link::BitfieldItem::BitfieldItem (Link* link, QDomElement const& element)
 {
-	for (QDomElement& e: element)
+	for (QDomElement const& e: xf::iterate_sub_elements (element))
 	{
 		if (e == "property")
 		{
@@ -699,7 +700,7 @@ Link::BitfieldItem::failsafe()
 }
 
 
-Link::SignatureItem::SignatureItem (Link* link, QDomElement& element):
+Link::SignatureItem::SignatureItem (Link* link, QDomElement const& element):
 	ItemSequence (link, element),
 	_rd(),
 	_rng (_rd())
@@ -796,7 +797,7 @@ Link::SignatureItem::eat (Blob::iterator begin, Blob::iterator end)
 }
 
 
-Link::Packet::Packet (Link* link, QDomElement& element):
+Link::Packet::Packet (Link* link, QDomElement const& element):
 	ItemSequence (link, element)
 {
 	if (!element.hasAttribute ("magic"))
@@ -864,7 +865,7 @@ Link::Link (xf::ModuleManager* module_manager, QDomElement const& config):
 		{ "frequency", output_frequency, false },
 	});
 
-	for (QDomElement& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "protocol")
 			parse_protocol (e);
@@ -1070,7 +1071,7 @@ Link::parse_protocol (QDomElement const& protocol)
 	else
 		_path_attribute_name = "path";
 
-	for (QDomElement& e: protocol)
+	for (QDomElement const& e: xf::iterate_sub_elements (protocol))
 	{
 		if (e == "packet")
 			_packets.push_back (std::make_shared<Packet> (this, e));

@@ -20,6 +20,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "airframe.h"
@@ -33,7 +34,7 @@ Airframe::Airframe (Xefis*, QDomElement const& config)
 
 	if (!config.isNull())
 	{
-		for (QDomElement const& e: config)
+		for (QDomElement const& e: xf::iterate_sub_elements (config))
 		{
 			if (e == "flaps")
 				_flaps = std::make_unique<Flaps> (e);

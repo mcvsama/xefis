@@ -37,6 +37,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -92,7 +93,7 @@ ConfigReader::SettingsParser::parse (QDomElement const& settings_element)
 			known_values.insert (element.name);
 		}
 
-		for (QDomElement& d: settings_element)
+		for (QDomElement const& d: xf::iterate_sub_elements (settings_element))
 		{
 			if (d == "setting")
 			{
@@ -255,7 +256,7 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 			QString orig_root = root;
 			QString subdir = e.attribute ("path");
 			root += subdir;
-			for (QDomElement const& sub: e)
+			for (QDomElement const& sub: xf::iterate_sub_elements (e))
 				parse_element (sub);
 			root = orig_root;
 		};
@@ -268,7 +269,7 @@ ConfigReader::PropertiesParser::parse (QDomElement const& properties_element)
 				parse_directory (e);
 		};
 
-		for (QDomElement& d: properties_element)
+		for (QDomElement const& d: xf::iterate_sub_elements (properties_element))
 			parse_element (d);
 
 		if (!unconfigured_values.empty())
@@ -395,7 +396,7 @@ ConfigReader::preprocess()
 	if (root != "xefis-config")
 		throw BadConfiguration (("config process error: unsupported root tag: " + root.tagName()).toStdString());
 
-	for (QDomElement& e: root)
+	for (QDomElement const& e: xf::iterate_sub_elements (root))
 	{
 		if (e == "settings")
 			_settings_elements.push_back (e);
@@ -416,7 +417,7 @@ ConfigReader::process_includes (QDomElement parent)
 {
 	std::list<QDomElement> to_remove;
 
-	for (QDomElement& e: parent)
+	for (QDomElement const& e: xf::iterate_sub_elements (parent))
 	{
 		if (e == "include")
 		{
@@ -433,7 +434,7 @@ ConfigReader::process_includes (QDomElement parent)
 			QDomDocument sub_doc = parse_file (basename);
 			process_includes (sub_doc.documentElement());
 
-			for (QDomElement& x: sub_doc.documentElement())
+			for (QDomElement const& x: xf::iterate_sub_elements (sub_doc.documentElement()))
 			{
 				QDomNode node = e.ownerDocument().importNode (x, true);
 				parent.insertBefore (node, e);
@@ -455,24 +456,27 @@ ConfigReader::process_ifs (QDomElement parent)
 {
 	std::list<QDomElement> to_remove;
 
-	for (QDomElement& e: parent)
+	for (QDomElement& e: xf::iterate_sub_elements (parent))
 	{
 		if (e == "if")
 		{
 			if (e.hasAttribute ("mode") && e.attribute ("mode") == _config_mode)
 			{
 				std::list<QDomElement> moveup;
-				for (QDomElement c: e)
+
+				for (QDomElement const& c: xf::iterate_sub_elements (e))
 					moveup.push_back (c);
-				for (QDomElement c: moveup)
+
+				for (QDomElement& c: moveup)
 				{
 					e.removeChild (c);
 					parent.insertAfter (c, e);
 				}
 
-				for (QDomElement c: e)
+				for (QDomElement const& c: xf::iterate_sub_elements (e))
 					process_ifs (c);
 			}
+
 			to_remove.push_back (e);
 		}
 		else
@@ -502,7 +506,7 @@ ConfigReader::process_settings_element (QDomElement const& settings_element)
 void
 ConfigReader::process_windows_element (QDomElement const& windows_element)
 {
-	for (QDomElement& e: windows_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (windows_element))
 	{
 		if (e == "window")
 			process_window_element (e);
@@ -530,7 +534,7 @@ ConfigReader::process_window_element (QDomElement const& window_element)
 void
 ConfigReader::process_modules_element (QDomElement const& modules_element)
 {
-	for (QDomElement& e: modules_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (modules_element))
 	{
 		if (e == "module")
 			process_module_element (e);

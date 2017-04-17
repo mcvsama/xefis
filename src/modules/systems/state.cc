@@ -27,6 +27,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/blob.h>
 
 // Local:
@@ -126,11 +127,11 @@ State::ConfigVariable::fresh() const noexcept
 State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement const& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "state")
 		{
-			for (QDomElement const& v: e)
+			for (QDomElement const& v: xf::iterate_sub_elements (e))
 			{
 				if (v == "variable")
 				{
@@ -218,7 +219,7 @@ State::load_state()
 
 		if (doc.documentElement() == "xefis-mod-systems-state")
 		{
-			for (QDomElement const& e: doc.documentElement())
+			for (QDomElement const& e: xf::iterate_sub_elements (doc.documentElement()))
 			{
 				if (e == "state-variable")
 				{

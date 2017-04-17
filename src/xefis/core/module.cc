@@ -26,6 +26,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "module.h"
@@ -64,7 +65,7 @@ Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser
 		settings_element = element;
 	else
 	{
-		for (QDomElement& e: element)
+		for (QDomElement const& e: xf::iterate_sub_elements (element))
 		{
 			if (e == "settings")
 			{
@@ -97,7 +98,7 @@ Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesPa
 		properties_element = element;
 	else
 	{
-		for (QDomElement& e: element)
+		for (QDomElement const& e: xf::iterate_sub_elements (element))
 		{
 			if (e == "properties")
 			{

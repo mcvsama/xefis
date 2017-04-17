@@ -23,6 +23,7 @@
 #include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "label.h"
@@ -35,7 +36,7 @@ Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):
 	xf::Instrument (module_manager, config),
 	InstrumentAids (1.f)
 {
-	for (QDomElement& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "label")
 			_label = e.text();

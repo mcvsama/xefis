@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "string_translator.h"
@@ -36,7 +37,7 @@ StringTranslator::StringsSet::StringsSet (QDomElement const& config)
 	_input.set_path (xf::PropertyPath (config.attribute ("input-path")));
 	_output.set_path (xf::PropertyPath (config.attribute ("output-path")));
 
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "string")
 		{
@@ -85,7 +86,7 @@ StringTranslator::StringsSet::update()
 StringTranslator::StringTranslator (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "translate")
 			_sets.emplace_back (e);

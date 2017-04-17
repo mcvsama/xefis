@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/datatable2d.h>
 
 // Local:
@@ -30,7 +31,7 @@ Drag::Drag (QDomElement const& config)
 {
 	decltype (_aoa_to_cd)::element_type::DataMap data;
 
-	for (QDomElement const& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "point")
 		{
