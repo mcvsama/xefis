@@ -95,7 +95,7 @@ class Link:
 
 	  public:
 		// Ctor
-		ItemSequence (Link*, QDomElement&);
+		ItemSequence (Link*, QDomElement const&);
 
 		// Dtor
 		virtual
@@ -152,7 +152,7 @@ class Link:
 		};
 
 	  public:
-		PropertyItem (Link*, QDomElement&);
+		PropertyItem (Link*, QDomElement const&);
 
 		Blob::size_type
 		size() const override;
@@ -235,7 +235,7 @@ class Link:
 		typedef std::vector<BitSource> BitSources;
 
 	  public:
-		BitfieldItem (Link*, QDomElement&);
+		BitfieldItem (Link*, QDomElement const&);
 
 		Blob::size_type
 		size() const override;
@@ -263,7 +263,7 @@ class Link:
 	class SignatureItem: public ItemSequence
 	{
 	  public:
-		SignatureItem (Link*, QDomElement&);
+		SignatureItem (Link*, QDomElement const&);
 
 		Blob::size_type
 		size() const override;
@@ -290,7 +290,7 @@ class Link:
 	{
 	  public:
 		// Ctor
-		Packet (Link*, QDomElement&);
+		Packet (Link*, QDomElement const&);
 
 		Blob const&
 		magic() const;

@@ -26,6 +26,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "joystick.h"
@@ -78,7 +79,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<doub
 	_up_button_id (up_button_id),
 	_down_button_id (down_button_id)
 {
-	for (QDomElement& v: axis_element)
+	for (QDomElement const& v: xf::iterate_sub_elements (axis_element))
 	{
 		if (v == "center")
 			_center = v.text().toFloat();
@@ -92,7 +93,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<doub
 			_power = v.text().toFloat();
 		else if (v == "output")
 		{
-			for (QDomElement& w: v)
+			for (QDomElement const& w: xf::iterate_sub_elements (v))
 			{
 				if (w == "minimum")
 					_output_minimum = w.text().toFloat();
@@ -185,7 +186,7 @@ JoystickInput::JoystickInput (QDomElement const& config, std::string const& inst
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 
-	for (QDomElement& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "axis")
 		{

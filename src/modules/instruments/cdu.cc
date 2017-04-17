@@ -28,6 +28,7 @@
 #include <xefis/core/window.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/text_layout.h>
 
 // Local:
@@ -615,7 +616,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 	{
 		bool has_fill_element = false;
 
-		for (QDomElement e: column_element)
+		for (QDomElement const& e: xf::iterate_sub_elements (column_element))
 		{
 			if (e == "setting")
 			{
@@ -687,7 +688,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 		}
 	};
 
-	for (QDomElement e: page_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (page_element))
 	{
 		if (e == "left")
 		{
@@ -859,7 +860,7 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, xf::Logger cons
 	if (pages_element.hasAttribute ("rows"))
 		_rows = pages_element.attribute ("rows").toUInt();
 
-	for (QDomElement e: pages_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (pages_element))
 	{
 		if (e == "page")
 		{
@@ -965,7 +966,7 @@ CDU::CDU (xf::ModuleManager* module_manager, QDomElement const& config):
 	setFocusPolicy (Qt::StrongFocus);
 	setMouseTracking (true);
 
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "pages")
 		{

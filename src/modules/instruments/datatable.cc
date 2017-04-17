@@ -27,6 +27,7 @@
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "datatable.h"
@@ -40,7 +41,7 @@ Datatable::LabelValue::LabelValue (QDomElement const& config, QColor default_lab
 	value_color (default_value_color),
 	format ("%d")
 {
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "label")
 		{
@@ -96,9 +97,9 @@ Datatable::Datatable (xf::ModuleManager* module_manager, QDomElement const& conf
 	_default_value_color = xf::parse_color (value_color_str);
 	_alignment = xf::parse_alignment (align_str);
 
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 		if (e == "table")
-			for (QDomElement f: e)
+			for (QDomElement const& f: xf::iterate_sub_elements (e))
 				if (f == "row")
 					_list.emplace_back (f, _default_label_color, _default_value_color);
 }

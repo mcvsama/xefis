@@ -22,6 +22,7 @@
 #include <xefis/core/module_manager.h>
 #include <xefis/core/sound_manager.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
@@ -99,7 +100,7 @@ Sound::Group::Group (QDomElement const& element, xf::SoundManager* sound_manager
 {
 	if (element == "group")
 	{
-		for (QDomElement e: element)
+		for (QDomElement const& e: xf::iterate_sub_elements (element))
 		{
 			if (e == "alarm")
 				_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
@@ -132,11 +133,11 @@ Sound::Group::check()
 Sound::Sound (xf::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	for (QDomElement e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "alarms")
 		{
-			for (QDomElement e2: e)
+			for (QDomElement const& e2: xf::iterate_sub_elements (e))
 			{
 				if (e2 == "group" || e2 == "alarm")
 					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->xefis()->sound_manager()));

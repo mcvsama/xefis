@@ -18,6 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/sequence.h>
 
@@ -52,7 +53,7 @@ LiftMod::Setting::link (Setting const* prev, Setting const* next)
 LiftMod::LiftMod (QDomElement const& config)
 {
 	// Parse config and populate _settings:
-	for (QDomElement const& e: config)
+	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
 		if (e == "setting")
 		{

@@ -32,6 +32,7 @@
 #include <xefis/support/ui/widgets/panel_numeric_display.h>
 #include <xefis/support/ui/widgets/group_box.h>
 #include <xefis/utility/qdom.h>
+#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -170,8 +171,10 @@ Window::InstrumentDecorator*
 Window::get_decorator_for (Module::Pointer const& ptr) const
 {
 	auto decorator = _decorators.find (ptr);
+
 	if (decorator != _decorators.end())
 		return decorator->second;
+
 	return nullptr;
 }
 
@@ -190,13 +193,15 @@ Window::unparent_modules()
 void
 Window::process_window_element (QDomElement const& window_element)
 {
-	for (QDomElement& e: window_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (window_element))
 	{
 		if (e == "layout")
 		{
 			QLayout* layout = process_layout_element (e, _instruments_panel, nullptr);
+
 			if (_instruments_panel->layout())
 				throw BadConfiguration ("a window can only have one layout");
+
 			_instruments_panel->setLayout (layout);
 		}
 		else
@@ -210,14 +215,16 @@ Window::process_panel_element (QDomElement const& panel_element, QWidget* parent
 {
 	Panel* panel = new Panel (parent_widget, _xefis);
 
-	for (QDomElement& e: panel_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (panel_element))
 	{
 		if (e == "layout")
 		{
 			QLayout* layout = process_layout_element (e, panel, panel);
 			layout->setMargin (5);
+
 			if (panel->layout())
 				throw BadConfiguration ("a panel can only have one layout");
+
 			panel->setLayout (layout);
 		}
 		else
@@ -252,7 +259,7 @@ Window::process_group_element (QDomElement const& group_element, QWidget* parent
 	}
 
 	// Children of <group>:
-	for (QDomElement& e: group_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (group_element))
 	{
 		if (e == "layout")
 		{
@@ -422,7 +429,7 @@ Window::process_layout_element (QDomElement const& layout_element, QWidget* pare
 	if (box_new_layout)
 		box_new_layout->setSpacing (spacing);
 
-	for (QDomElement& e: layout_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (layout_element))
 	{
 		if (e == "item")
 			process_item_element (e, new_layout, parent_widget, panel, stack);
@@ -478,7 +485,7 @@ Window::process_item_element (QDomElement const& item_element, QLayout* layout, 
 	int stretch = clamped (item_element.attribute ("stretch-factor").toInt(), 1, std::numeric_limits<int>::max());
 
 	// <item>'s children:
-	for (QDomElement& e: item_element)
+	for (QDomElement const& e: xf::iterate_sub_elements (item_element))
 	{
 		if (has_child)
 			throw BadConfiguration ("only one child element per <item> allowed");
