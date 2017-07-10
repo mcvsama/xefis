@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <typeinfo>
+#include <optional>
 
 // Qt:
 #include <QtCore/QDateTime>
@@ -27,15 +28,13 @@
 #include <xefis/config/all.h>
 #include <xefis/core/window.h>
 #include <xefis/core/stdexcept.h>
+#include <xefis/utility/format_exception.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/text_layout.h>
 
 // Local:
 #include "cdu.h"
-
-
-XEFIS_REGISTER_MODULE_CLASS ("instruments/cdu", CDU)
 
 
 constexpr double CDU::kButtonWidthForHeight;
@@ -333,34 +332,31 @@ CDU::EmptyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf:
 }
 
 
-CDU::SettingStrip::SettingStrip (CDU& cdu, QDomElement const& setting_element, Column column):
-	Strip (cdu, setting_element.attribute ("title"), column)
+CDU::PropertyStrip::PropertyStrip (CDU& cdu,
+								   v2::PropertyStringifier const& property_stringifier,
+								   QString const& title,
+								   Column column):
+	Strip (cdu, title, column),
+	_property_stringifier (property_stringifier)
+{ }
+
+
+void
+CDU::PropertyStrip::set_read_only (bool read_only)
 {
-	if (!setting_element.hasAttribute ("path"))
-		throw xf::MissingDomAttribute (setting_element, "path");
-
-	_nil_value = setting_element.attribute ("nil-value", "").toStdString();
-	_format = setting_element.attribute ("format", "%1%").toStdString();
-	_true_value = setting_element.attribute ("true-value", "ON").toStdString();
-	_false_value = setting_element.attribute ("false-value", "OFF").toStdString();
-	_read_only = setting_element.attribute ("read-only") == "true";
-	_property.set_path (xf::PropertyPath (setting_element.attribute ("path")));
-	_unit = setting_element.attribute ("unit").toStdString();
-
-	if (si::units_map().find (_unit) == si::units_map().end())
-		throw xf::BadConfiguration ("unsupported unit '" + _unit + "'");
+	_read_only = read_only;
 }
 
 
 bool
-CDU::SettingStrip::fresh() const noexcept
+CDU::PropertyStrip::fresh() const noexcept
 {
-	return _property.fresh();
+	return true; // TODO _property.fresh();
 }
 
 
 void
-CDU::SettingStrip::handle_mouse_press (QMouseEvent* event, CDU*)
+CDU::PropertyStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 {
 	if (!_read_only)
 		if (_button_rect.contains (event->pos()))
@@ -369,65 +365,45 @@ CDU::SettingStrip::handle_mouse_press (QMouseEvent* event, CDU*)
 
 
 void
-CDU::SettingStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
+CDU::PropertyStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 {
 	_button_state = ButtonState::Normal;
 
-	if (!_read_only &&
-		_button_rect.contains (event->pos()) &&
-		_property.configured())
+	if (!_read_only && _button_rect.contains (event->pos()))
 	{
-		if (_property.is_type<bool>())
-		{
-			xf::PropertyBoolean& property = static_cast<xf::PropertyBoolean&> (_property);
-			property = !*property;
-		}
+		auto* bool_property = dynamic_cast<v2::Property<bool>*> (&_property_stringifier.property());
+
+		if (bool_property)
+			*bool_property = !**bool_property;
 		else
 		{
 			std::string entry_value = cdu->entry_value().trimmed().toStdString();
-			std::exception_ptr eptr;
 
 			// Try first to parse the value just as is. If it fails, try to append default unit.
 			try {
-				_property.parse_existing (entry_value);
+				_property_stringifier.from_string (entry_value);
 			}
-			catch (...)
+			catch (si::UnsupportedUnit const&)
 			{
-				eptr = std::current_exception();
-
-				try {
-					_property.parse_existing (entry_value + " " + _unit);
-					eptr = nullptr;
-				}
-				catch (...)
-				{
-					try {
-						std::rethrow_exception (eptr);
-					}
-					catch (si::UnsupportedUnit const&)
-					{
-						cdu->post_message ("Unsupported unit");
-					}
-					catch (si::UnparsableValue const&)
-					{
-						cdu->post_message ("Invalid value");
-					}
-					catch (si::IncompatibleTypes const&)
-					{
-						cdu->post_message ("Incompatible unit");
-					}
-				}
+				cdu->post_message ("Unsupported unit");
+			}
+			catch (si::UnparsableValue const&)
+			{
+				cdu->post_message ("Invalid value");
+			}
+			catch (si::IncompatibleTypes const&)
+			{
+				cdu->post_message ("Incompatible unit");
 			}
 
-			if (!eptr)
-				cdu->clear_entry_value();
+			cdu->clear_entry_value();
 		}
 	}
 }
 
 
 void
-CDU::SettingStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::PropertyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	_button_rect = rect;
 	ButtonState button_state = ButtonState::Normal;
@@ -440,22 +416,28 @@ CDU::SettingStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, x
 
 
 void
-CDU::SettingStrip::paint_title (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::PropertyStrip::paint_title (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
 	paint_title_helper (rect, aids, painter, column, title(), QColor (0xcc, 0xd7, 0xe7));
 }
 
 
 void
-CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
+CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, bool)
 {
-	if (_property.valid())
+	if (_property_stringifier.property().valid())
 	{
-		if (_property.is_type<bool>())
+		auto* bool_property_ptr = dynamic_cast<v2::Property<bool>*> (&_property_stringifier.property());
+
+		if (bool_property_ptr)
 		{
-			bool p = *static_cast<xf::PropertyBoolean&> (_property);
-			std::string const act_val = p ? _true_value : _false_value;
-			std::string const inact_val = p ? _false_value : _true_value;
+			auto& bool_property = *bool_property_ptr;
+			auto p = bool_property ? *bool_property : false;
+			auto& converter = dynamic_cast<v2::PropertyStringifier::BoolConverter const&> (_property_stringifier.converter());
+
+			std::string const& nil_val = converter.nil_value();
+			std::string const act_val = p ? converter.true_value() : converter.false_value();
+			std::string const inact_val = p ? converter.false_value() : converter.true_value();
 
 			xf::TextLayout tl;
 			tl.set_alignment (Qt::AlignCenter);
@@ -466,12 +448,21 @@ CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf
 				case Column::Left:
 					tl.add_fragment (inact_val, aids._font_13, Qt::white);
 					tl.add_fragment ("\u2008⬌\u2008", aids._font_20, Qt::white);
-					tl.add_fragment (act_val, aids._font_20, Qt::green);
+
+					if (bool_property)
+						tl.add_fragment (nil_val, aids._font_20, Qt::green);
+					else
+						tl.add_fragment (act_val, aids._font_20, Qt::green);
+
 					tl.paint (QPointF (rect.left(), rect.center().y()), Qt::AlignLeft | Qt::AlignVCenter, painter);
 					break;
 
 				case Column::Right:
-					tl.add_fragment (act_val, aids._font_20, Qt::green);
+					if (bool_property)
+						tl.add_fragment (nil_val, aids._font_20, Qt::green);
+					else
+						tl.add_fragment (act_val, aids._font_20, Qt::green);
+
 					tl.add_fragment ("\u2008⬌\u2008", aids._font_20, Qt::white);
 					tl.add_fragment (inact_val, aids._font_13, Qt::white);
 					tl.paint (QPointF (rect.right(), rect.center().y()), Qt::AlignRight | Qt::AlignVCenter, painter);
@@ -481,35 +472,30 @@ CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf
 		else
 		{
 			QColor str_color = _read_only ? QColor (0x22, 0xcc, 0xff) : Qt::white;
-			QString str_val;
-			try {
-				str_val = QString::fromStdString (_property.stringify (boost::format (_format), _unit, _nil_value));
-			}
-			catch (xf::StringifyError const& exception)
+			std::string str_val;
+
+			auto error_str = xf::handle_format_exception ([&] {
+				str_val = _property_stringifier.to_string();
+			});
+
+			if (error_str)
 			{
 				str_color = Qt::red;
-				str_val = exception.what();
-			}
-			catch (boost::io::bad_format_string const&)
-			{
-				str_color = Qt::red;
-				str_val = "format: ill formed";
+				str_val = *error_str;
 			}
 
-			paint_value_helper (rect, aids, painter, column, str_val, str_color);
+			paint_value_helper (rect, aids, painter, column, QString::fromStdString (str_val), str_color);
 		}
 	}
-	else if (!_unit.empty())
+	else
 	{
 		bool left = column == Column::Left;
-		// At least paint information about units.
 		auto horz_alignment = left ? Qt::AlignLeft : Qt::AlignRight;
 		QPointF position {
 			(column == Column::Left) ? rect.left() : rect.right(),
 			rect.center().y()
 		};
-		std::string text = left ? ("― [" + _unit + "]") : ("[" + _unit + "] ―");
-
+		std::string text = "―";
 		xf::TextLayout tl;
 		tl.set_alignment (Qt::AlignCenter);
 		tl.set_background (Qt::NoBrush);
@@ -520,7 +506,7 @@ CDU::SettingStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, xf
 
 
 void
-CDU::SettingStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
+CDU::PropertyStrip::paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column)
 {
 	if (!_read_only)
 		paint_focus_helper (rect, button_rect, aids, painter, column);
@@ -614,13 +600,11 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 
 	auto parse_column = [&] (QDomElement const& column_element)
 	{
-		bool has_fill_element = false;
-
 		for (QDomElement const& e: xf::iterate_sub_elements (column_element))
 		{
 			if (e == "setting")
 			{
-				_strips.push_back (std::make_unique<SettingStrip> (cdu, e, current_column_dir));
+				_strips.push_back (std::make_unique<PropertyStrip> (cdu, e, current_column_dir));
 				current_column->push_back (_strips.back().get());
 			}
 			else if (e == "goto")
@@ -633,39 +617,8 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 				_strips.push_back (std::make_unique<EmptyStrip> (cdu, current_column_dir));
 				current_column->push_back (_strips.back().get());
 			}
-			else if (e == "fill")
-			{
-				if (has_fill_element)
-					logger << "Warning: <fill> already defined in the column, ignoring others." << std::endl;
-				else
-				{
-					_strips.push_back (std::make_unique<FillStrip> (cdu));
-					current_column->push_back (_strips.back().get());
-				}
-			}
 			else
 				throw xf::BadDomElement (e);
-		}
-
-		// Handle FillStrips:
-		for (std::size_t i = 0; i < current_column->size(); ++i)
-		{
-			if (dynamic_cast<FillStrip*> (current_column->at (i)))
-			{
-				// Replace with enough EmptyStrips so that the total size is equal to config.rows():
-				Strips::iterator it = current_column->begin() + i;
-				forget_strip (*it);
-				current_column->erase (it);
-				if (current_column->size() < config.rows())
-				{
-					for (std::size_t j = 0, n = config.rows() - current_column->size(); j < n; ++j)
-					{
-						_strips.push_back (std::make_unique<EmptyStrip> (cdu, current_column_dir));
-						it = current_column->insert (it, _strips.back().get());
-					}
-				}
-				break;
-			}
 		}
 
 		// Make sure that the column has exactly [rows] elements.
@@ -959,8 +912,8 @@ CDU::Config::check_reachability() const
 }
 
 
-CDU::CDU (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config),
+CDU::CDU (xf::Xefis*, QDomElement const& config, std::string const& instance):
+	v2::Instrument (instance),
 	InstrumentAids (0.5f)
 {
 	setFocusPolicy (Qt::StrongFocus);
@@ -978,10 +931,6 @@ CDU::CDU (xf::ModuleManager* module_manager, QDomElement const& config):
 	}
 
 	_current_page_id = _config->default_page_id();
-
-	parse_properties (config, {
-		{ "time.utc", _time_utc, false },
-	});
 
 	update();
 }

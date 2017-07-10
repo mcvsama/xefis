@@ -24,15 +24,24 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v2/instrument.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/property_stringifier.h>
+#include <xefis/core/v2/setting.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/property.h>
 
 
 class CDU:
-	public xf::Instrument,
+	public v2::Instrument,
 	protected xf::InstrumentAids
 {
+  public:
+	/*
+	 * Input
+	 */
+
+	v2::PropertyIn<si::Time>	time_utc { this, "/time/utc" };
+
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;
 
@@ -53,7 +62,7 @@ class CDU:
 
 	/**
 	 * Generic strip - something that's stacked vertically on both sides
-	 * of the CDU instrument. Each strip should have a button besides it.
+	 * of the CDU instrument. Each strip should have a button beside it.
 	 */
 	class Strip
 	{
@@ -133,19 +142,6 @@ class CDU:
 	};
 
 	/**
-	 * Fillstrip is used when <fill/> is in the configuration.
-	 * It get replaced with multiple EmptyStrips to fill space.
-	 */
-	class FillStrip: public Strip
-	{
-	  public:
-		// Ctor
-		FillStrip (CDU& cdu) noexcept:
-			Strip (cdu, "", Column::Left)
-		{ }
-	};
-
-	/**
 	 * Unused, empty strip in the config. Button is inactive for such strip.
 	 */
 	class EmptyStrip: public Strip
@@ -155,7 +151,7 @@ class CDU:
 		explicit
 		EmptyStrip (CDU&, Column);
 
-		// Strip
+		// Strip API
 		void
 		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 	};
@@ -163,51 +159,57 @@ class CDU:
 	/**
 	 * Strip that contains a value that can be configured.
 	 */
-	class SettingStrip: public Strip
+	class PropertyStrip: public Strip
 	{
 	  public:
 		// Ctor
 		explicit
-		SettingStrip (CDU&, QDomElement const& setting_element, Column);
+		PropertyStrip (CDU&, v2::PropertyStringifier const&, QString const& title, Column);
 
-		// Strip
+		void
+		set_read_only (bool read_only);
+
+		// Strip API
 		bool
 		fresh() const noexcept override;
 
-		// Strip
+		// Strip API
 		void
 		handle_mouse_press (QMouseEvent*, CDU*) override;
 
-		// Strip
+		// Strip API
 		void
 		handle_mouse_release (QMouseEvent*, CDU*) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_title (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
-		xf::GenericProperty	_property;
-		std::string			_format;
-		std::string			_unit;
-		std::string			_nil_value;
-		std::string			_true_value;
-		std::string			_false_value;
-		ButtonState			_button_state	= ButtonState::Normal;
-		bool				_read_only		= false;
-		QRectF				_button_rect;
+		v2::PropertyStringifier	_property_stringifier;
+		bool					_read_only		= false;
+		ButtonState				_button_state	= ButtonState::Normal;
+		QRectF					_button_rect;
+	};
+
+	/**
+	 * Takes std::function to execute when strip's button is clicked.
+	 */
+	class ActionStrip: public Strip
+	{
+		// TODO
 	};
 
 	/**
@@ -223,23 +225,23 @@ class CDU:
 		QString const&
 		target_page_id() const noexcept;
 
-		// Strip
+		// Strip API
 		void
 		handle_mouse_press (QMouseEvent*, CDU*) override;
 
-		// Strip
+		// Strip API
 		void
 		handle_mouse_release (QMouseEvent*, CDU*) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_button (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_value (QRectF const&, xf::InstrumentAids&, xf::Painter&, Column, bool focused) override;
 
-		// Strip
+		// Strip API
 		void
 		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
@@ -249,6 +251,9 @@ class CDU:
 		QRectF			_button_rect;
 	};
 
+	/**
+	 * A page of strips.
+	 */
 	class Page
 	{
 	  public:
@@ -404,11 +409,11 @@ class CDU:
 
   public:
 	// Ctor
-	CDU (xf::ModuleManager*, QDomElement const& config);
+	CDU (xf::Xefis*, QDomElement const& config, std::string const& instance = {});
 
 	// Module
 	void
-	data_updated() override;
+	process (v2::Cycle const&) override;
 
 	/**
 	 * Post message to the message board.
