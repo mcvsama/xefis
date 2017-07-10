@@ -114,9 +114,7 @@ Module::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut* propert
 
 Module::Module (std::string const& instance):
 	_instance (instance)
-{
-	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % demangle (typeid (this).name()) % _instance).str());
-}
+{ }
 
 
 void
