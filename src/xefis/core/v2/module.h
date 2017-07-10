@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <vector>
 #include <exception>
+#include <optional>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -186,7 +187,7 @@ class Module: private Noncopyable
 	std::vector<BasicSetting*>		_registered_settings;
 	std::vector<BasicPropertyIn*>	_registered_input_properties;
 	std::vector<BasicPropertyOut*>	_registered_output_properties;
-	Logger							_logger;
+	std::optional<Logger> mutable	_logger;
 };
 
 
@@ -213,7 +214,13 @@ Module::instance() const noexcept
 inline Logger const&
 Module::log() const
 {
-	return _logger;
+	if (!_logger)
+	{
+		_logger = Logger();
+		_logger->set_prefix ((boost::format ("[%-30s#%-20s]") % demangle (typeid (*this).name()) % _instance).str());
+	}
+
+	return *_logger;
 }
 
 
