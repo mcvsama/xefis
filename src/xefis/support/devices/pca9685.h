@@ -86,7 +86,7 @@ class PCA9685: public QObject
 	};
 
   public:
-	// Ctor:
+	// Ctor
 	explicit
 	PCA9685 (i2c::Device&&, si::Time output_period, xf::Logger* = nullptr);
 
