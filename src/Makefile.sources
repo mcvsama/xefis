@@ -18,7 +18,6 @@ XEFIS_SOURCES			+= modules/helpers/transistor.cc
 
 ######## /modules/instruments ########
 
-XEFIS_HEADERS			+= modules/instruments/cdu.h
 XEFIS_HEADERS			+= modules/instruments/datatable.h
 XEFIS_HEADERS			+= modules/instruments/debug_forces.h
 XEFIS_HEADERS			+= modules/instruments/flaps.h
@@ -35,7 +34,6 @@ XEFIS_HEADERS_MOC		+= modules/instruments/status.h
 XEFIS_HEADERS			+= modules/instruments/status_widget.h
 XEFIS_HEADERS			+= modules/instruments/vertical_trim.h
 
-XEFIS_SOURCES			+= modules/instruments/cdu.cc
 XEFIS_SOURCES			+= modules/instruments/datatable.cc
 XEFIS_SOURCES			+= modules/instruments/debug_forces.cc
 XEFIS_SOURCES			+= modules/instruments/flaps.cc
@@ -250,9 +248,11 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 
 XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
 XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
 
 XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
 
 ######## /xefis/modules/io ########
 
