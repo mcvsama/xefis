@@ -235,7 +235,7 @@ template<class pValue>
 
 		/**
 		 * Return contained value.
-		 * Throw exception NilProperty if value is nil and no fallback-value is et.
+		 * Throw exception NilProperty if value is nil and no fallback-value is set.
 		 */
 		Value const&
 		get() const;
