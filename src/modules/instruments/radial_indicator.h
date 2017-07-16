@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/v1/property.h>
 
 // Local:
 #include "radial_indicator_widget.h"
 
 
-class RadialIndicator: public xf::Instrument
+class RadialIndicator: public v1::Instrument
 {
   public:
 	// Ctor
-	RadialIndicator (xf::ModuleManager*, QDomElement const& config);
+	RadialIndicator (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -45,7 +45,7 @@ class RadialIndicator: public xf::Instrument
 	 * and configured unit name.
 	 */
 	Optional<double>
-	get_optional_value (xf::GenericProperty const& property);
+	get_optional_value (v1::GenericProperty const& property);
 
   private:
 	RadialIndicatorWidget*				_widget = nullptr;
@@ -54,15 +54,15 @@ class RadialIndicator: public xf::Instrument
 	int									_value_precision			= 0;
 	unsigned int						_value_modulo				= 0;
 	std::string							_unit;
-	xf::PropertyFloat::Type				_value_minimum;
-	Optional<xf::PropertyFloat::Type>	_value_maximum_warning;
-	Optional<xf::PropertyFloat::Type>	_value_maximum_critical;
-	xf::PropertyFloat::Type				_value_maximum;
+	v1::PropertyFloat::Type				_value_minimum;
+	Optional<v1::PropertyFloat::Type>	_value_maximum_warning;
+	Optional<v1::PropertyFloat::Type>	_value_maximum_critical;
+	v1::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	xf::GenericProperty					_value;
-	xf::GenericProperty					_value_target;
-	xf::GenericProperty					_value_reference;
-	xf::GenericProperty					_value_automatic;
+	v1::GenericProperty					_value;
+	v1::GenericProperty					_value_target;
+	v1::GenericProperty					_value_reference;
+	v1::GenericProperty					_value_automatic;
 };
 
 #endif

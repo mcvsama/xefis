@@ -32,7 +32,7 @@
 
 namespace xf {
 
-PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent):
+PropertyTreeWidget::PropertyTreeWidget (v1::PropertyNode* root_node, QWidget* parent):
 	QTreeWidget (parent),
 	_root_node (root_node)
 {
@@ -60,7 +60,7 @@ PropertyTreeWidget::PropertyTreeWidget (PropertyNode* root_node, QWidget* parent
 }
 
 
-PropertyNode*
+v1::PropertyNode*
 PropertyTreeWidget::selected_property_node() const
 {
 	QList<QTreeWidgetItem*> list = selectedItems();
@@ -74,9 +74,9 @@ PropertyTreeWidget::selected_property_node() const
 
 
 bool
-PropertyTreeWidget::contains_binary_data (TypedPropertyValueNode const* node)
+PropertyTreeWidget::contains_binary_data (v1::TypedPropertyValueNode const* node)
 {
-	PropertyValueNode<std::string> const* string_node = dynamic_cast<PropertyValueNode<std::string> const*> (node);
+	v1::PropertyValueNode<std::string> const* string_node = dynamic_cast<v1::PropertyValueNode<std::string> const*> (node);
 	if (string_node)
 	{
 		std::string data = node->stringify();
@@ -95,9 +95,9 @@ PropertyTreeWidget::read()
 
 
 void
-PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
+PropertyTreeWidget::read (QTreeWidgetItem* item, v1::PropertyNode* node)
 {
-	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+	v1::TypedPropertyValueNode* val_node = dynamic_cast<v1::TypedPropertyValueNode*> (node);
 
 	if (val_node)
 	{
@@ -116,12 +116,12 @@ PropertyTreeWidget::read (QTreeWidgetItem* item, PropertyNode* node)
 	}
 	else
 	{
-		PropertyDirectoryNode* dir_node = dynamic_cast<PropertyDirectoryNode*> (node);
+		v1::PropertyDirectoryNode* dir_node = dynamic_cast<v1::PropertyDirectoryNode*> (node);
 
 		if (dir_node)
 		{
-			PropertyNodeList subnodes_list = dir_node->children();
-			std::set<PropertyNode*> subnodes (subnodes_list.begin(), subnodes_list.end());
+			v1::PropertyNodeList subnodes_list = dir_node->children();
+			std::set<v1::PropertyNode*> subnodes (subnodes_list.begin(), subnodes_list.end());
 
 			// Find items that are no longer in @subnodes:
 			for (int ci = 0; ci < item->childCount(); ++ci)

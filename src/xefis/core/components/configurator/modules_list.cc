@@ -30,7 +30,7 @@
 
 namespace xf {
 
-ModulesList::ModulesList (ModuleManager* module_manager, QWidget* parent):
+ModulesList::ModulesList (v1::ModuleManager* module_manager, QWidget* parent):
 	QWidget (parent),
 	_module_manager (module_manager)
 {
@@ -81,7 +81,7 @@ ModulesList::deselect()
 void
 ModulesList::read()
 {
-	std::set<Module::Pointer> module_ptrs;
+	std::set<v1::Module::Pointer> module_ptrs;
 	for (auto m: _module_manager->modules())
 		module_ptrs.insert (m.first);
 

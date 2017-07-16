@@ -27,7 +27,8 @@
 #include <xefis/core/services.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 class ModuleManager;
 
@@ -47,11 +48,11 @@ Instrument::Instrument (ModuleManager* module_manager, QDomElement const& config
 	Module (module_manager, config),
 	QWidget (nullptr)
 {
-	setFont (xf::Services::instrument_font());
+	setFont (Services::instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

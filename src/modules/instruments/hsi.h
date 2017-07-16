@@ -25,20 +25,20 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/property.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/utility/smoother.h>
 
 // Local:
 #include "hsi_widget.h"
 
 
-class HSI: public xf::Instrument
+class HSI: public v1::Instrument
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	HSI (xf::ModuleManager*, QDomElement const& config);
+	HSI (v1::ModuleManager*, QDomElement const& config);
 
   public slots:
 	/**
@@ -63,66 +63,66 @@ class HSI: public xf::Instrument
 	std::array<Length, 3>	_trend_vector_min_ranges		= { { 5_nmi, 10_nmi, 15_nmi } };
 	Length					_trend_vector_max_range			= 30_nmi;
 	// Input:
-	xf::PropertyInteger		_display_mode;
-	xf::PropertyLength		_range;
-	xf::PropertySpeed		_speed_gs;
-	xf::PropertySpeed		_speed_tas;
-	xf::PropertyBoolean		_cmd_visible;
-	xf::PropertyBoolean		_cmd_line_visible;
-	xf::PropertyAngle		_cmd_heading_magnetic;
-	xf::PropertyAngle		_cmd_track_magnetic;
-	xf::PropertyBoolean		_cmd_use_trk;
-	xf::PropertyLength		_target_altitude_reach_distance;
-	xf::PropertyAngle		_orientation_heading_magnetic;
-	xf::PropertyAngle		_orientation_heading_true;
-	xf::PropertyBoolean		_use_true_heading;
-	xf::PropertyAngle		_home_true_direction;
-	xf::PropertyBoolean		_home_track_visible;
-	xf::PropertyLength		_home_distance_vlos;
-	xf::PropertyLength		_home_distance_ground;
-	xf::PropertyLength		_home_distance_vertical;
-	xf::PropertyAngle		_home_position_longitude;
-	xf::PropertyAngle		_home_position_latitude;
-	xf::PropertyAngle		_position_latitude;
-	xf::PropertyAngle		_position_longitude;
-	xf::PropertyString		_position_source;
-	xf::PropertyBoolean		_track_visible;
-	xf::PropertyAngle		_track_lateral_magnetic;
-	xf::Property<AngularVelocity>
+	v1::PropertyInteger		_display_mode;
+	v1::PropertyLength		_range;
+	v1::PropertySpeed		_speed_gs;
+	v1::PropertySpeed		_speed_tas;
+	v1::PropertyBoolean		_cmd_visible;
+	v1::PropertyBoolean		_cmd_line_visible;
+	v1::PropertyAngle		_cmd_heading_magnetic;
+	v1::PropertyAngle		_cmd_track_magnetic;
+	v1::PropertyBoolean		_cmd_use_trk;
+	v1::PropertyLength		_target_altitude_reach_distance;
+	v1::PropertyAngle		_orientation_heading_magnetic;
+	v1::PropertyAngle		_orientation_heading_true;
+	v1::PropertyBoolean		_use_true_heading;
+	v1::PropertyAngle		_home_true_direction;
+	v1::PropertyBoolean		_home_track_visible;
+	v1::PropertyLength		_home_distance_vlos;
+	v1::PropertyLength		_home_distance_ground;
+	v1::PropertyLength		_home_distance_vertical;
+	v1::PropertyAngle		_home_position_longitude;
+	v1::PropertyAngle		_home_position_latitude;
+	v1::PropertyAngle		_position_latitude;
+	v1::PropertyAngle		_position_longitude;
+	v1::PropertyString		_position_source;
+	v1::PropertyBoolean		_track_visible;
+	v1::PropertyAngle		_track_lateral_magnetic;
+	v1::Property<AngularVelocity>
 							_track_lateral_rotation;
-	xf::PropertyBoolean		_track_center_on_track;
-	xf::PropertyBoolean		_course_visible;
-	xf::PropertyAngle		_course_setting_magnetic;
-	xf::PropertyAngle		_course_deviation;
-	xf::PropertyBoolean		_course_to_flag;
-	xf::PropertyString		_navaid_selected_reference;
-	xf::PropertyString		_navaid_selected_identifier;
-	xf::PropertyLength		_navaid_selected_distance;
-	xf::PropertyTime		_navaid_selected_eta;
-	xf::PropertyAngle		_navaid_selected_course_magnetic;
-	xf::PropertyInteger		_navaid_left_type;
-	xf::PropertyString		_navaid_left_reference;
-	xf::PropertyString		_navaid_left_identifier;
-	xf::PropertyLength		_navaid_left_distance;
-	xf::PropertyAngle		_navaid_left_initial_bearing_magnetic;
-	xf::PropertyInteger		_navaid_right_type;
-	xf::PropertyString		_navaid_right_reference;
-	xf::PropertyString		_navaid_right_identifier;
-	xf::PropertyLength		_navaid_right_distance;
-	xf::PropertyAngle		_navaid_right_initial_bearing_magnetic;
-	xf::PropertyLength		_navigation_required_performance;
-	xf::PropertyLength		_navigation_actual_performance;
-	xf::PropertyAngle		_wind_from_magnetic;
-	xf::PropertySpeed		_wind_speed_tas;
-	xf::PropertyString		_localizer_id;
-	xf::PropertyBoolean		_tcas_on;
-	xf::PropertyLength		_tcas_range;
-	xf::PropertyBoolean		_features_fix;
-	xf::PropertyBoolean		_features_vor;
-	xf::PropertyBoolean		_features_dme;
-	xf::PropertyBoolean		_features_ndb;
-	xf::PropertyBoolean		_features_loc;
-	xf::PropertyBoolean		_features_arpt;
+	v1::PropertyBoolean		_track_center_on_track;
+	v1::PropertyBoolean		_course_visible;
+	v1::PropertyAngle		_course_setting_magnetic;
+	v1::PropertyAngle		_course_deviation;
+	v1::PropertyBoolean		_course_to_flag;
+	v1::PropertyString		_navaid_selected_reference;
+	v1::PropertyString		_navaid_selected_identifier;
+	v1::PropertyLength		_navaid_selected_distance;
+	v1::PropertyTime		_navaid_selected_eta;
+	v1::PropertyAngle		_navaid_selected_course_magnetic;
+	v1::PropertyInteger		_navaid_left_type;
+	v1::PropertyString		_navaid_left_reference;
+	v1::PropertyString		_navaid_left_identifier;
+	v1::PropertyLength		_navaid_left_distance;
+	v1::PropertyAngle		_navaid_left_initial_bearing_magnetic;
+	v1::PropertyInteger		_navaid_right_type;
+	v1::PropertyString		_navaid_right_reference;
+	v1::PropertyString		_navaid_right_identifier;
+	v1::PropertyLength		_navaid_right_distance;
+	v1::PropertyAngle		_navaid_right_initial_bearing_magnetic;
+	v1::PropertyLength		_navigation_required_performance;
+	v1::PropertyLength		_navigation_actual_performance;
+	v1::PropertyAngle		_wind_from_magnetic;
+	v1::PropertySpeed		_wind_speed_tas;
+	v1::PropertyString		_localizer_id;
+	v1::PropertyBoolean		_tcas_on;
+	v1::PropertyLength		_tcas_range;
+	v1::PropertyBoolean		_features_fix;
+	v1::PropertyBoolean		_features_vor;
+	v1::PropertyBoolean		_features_dme;
+	v1::PropertyBoolean		_features_ndb;
+	v1::PropertyBoolean		_features_loc;
+	v1::PropertyBoolean		_features_arpt;
 };
 
 

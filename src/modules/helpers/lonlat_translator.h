@@ -20,28 +20,28 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
 /**
  * Translate Property<Angle> to PropertyString in DMS format.
  */
-class LonLatTranslator: public xf::Module
+class LonLatTranslator: public v1::Module
 {
   public:
 	// Ctor
-	LonLatTranslator (xf::ModuleManager*, QDomElement const& config);
+	LonLatTranslator (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
 	data_updated() override;
 
   private:
-	xf::PropertyAngle	_input_longitude;
-	xf::PropertyAngle	_input_latitude;
-	xf::PropertyString	_output_longitude;
-	xf::PropertyString	_output_latitude;
+	v1::PropertyAngle	_input_longitude;
+	v1::PropertyAngle	_input_latitude;
+	v1::PropertyString	_output_longitude;
+	v1::PropertyString	_output_latitude;
 };
 
 #endif

@@ -25,7 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
@@ -35,7 +35,7 @@
 
 class Link:
 	public QObject,
-	public xf::Module
+	public v1::Module
 {
 	Q_OBJECT
 
@@ -188,29 +188,29 @@ class Link:
 		Type						_type				= Type::Unknown;
 		uint8_t						_bytes				= 0;
 		bool						_retained			= false;
-		xf::PropertyInteger			_property_integer;
-		xf::PropertyFloat			_property_float;
-		xf::PropertyAcceleration	_property_acceleration;
-		xf::PropertyAngle			_property_angle;
-		xf::PropertyArea			_property_area;
-		xf::PropertyCharge			_property_charge;
-		xf::PropertyCurrent			_property_current;
-		xf::PropertyDensity			_property_density;
-		xf::PropertyEnergy			_property_energy;
-		xf::PropertyForce			_property_force;
-		xf::PropertyPower			_property_power;
-		xf::PropertyPressure		_property_pressure;
-		xf::PropertyFrequency		_property_frequency;
-		xf::Property<AngularVelocity> _property_angular_velocity;
-		xf::PropertyLength			_property_length;
-		xf::PropertySpeed			_property_speed;
-		xf::PropertyTemperature		_property_temperature;
-		xf::PropertyTime			_property_time;
-		xf::PropertyTorque			_property_torque;
-		xf::PropertyVolume			_property_volume;
-		xf::PropertyMass			_property_mass;
-		xf::PropertyInteger::Type	_integer_value;
-		xf::PropertyFloat::Type		_float_value;
+		v1::PropertyInteger			_property_integer;
+		v1::PropertyFloat			_property_float;
+		v1::PropertyAcceleration	_property_acceleration;
+		v1::PropertyAngle			_property_angle;
+		v1::PropertyArea			_property_area;
+		v1::PropertyCharge			_property_charge;
+		v1::PropertyCurrent			_property_current;
+		v1::PropertyDensity			_property_density;
+		v1::PropertyEnergy			_property_energy;
+		v1::PropertyForce			_property_force;
+		v1::PropertyPower			_property_power;
+		v1::PropertyPressure		_property_pressure;
+		v1::PropertyFrequency		_property_frequency;
+		v1::Property<AngularVelocity> _property_angular_velocity;
+		v1::PropertyLength			_property_length;
+		v1::PropertySpeed			_property_speed;
+		v1::PropertyTemperature		_property_temperature;
+		v1::PropertyTime			_property_time;
+		v1::PropertyTorque			_property_torque;
+		v1::PropertyVolume			_property_volume;
+		v1::PropertyMass			_property_mass;
+		v1::PropertyInteger::Type	_integer_value;
+		v1::PropertyFloat::Type		_float_value;
 	};
 
 	/**
@@ -226,10 +226,10 @@ class Link:
 			bool						is_boolean			= false;
 			bool						retained			= false;
 			uint8_t						bits				= 0;
-			xf::PropertyBoolean			property_boolean;
-			xf::PropertyInteger			property_integer;
-			xf::PropertyBoolean::Type	boolean_value;
-			xf::PropertyInteger::Type	integer_value;
+			v1::PropertyBoolean			property_boolean;
+			v1::PropertyInteger			property_integer;
+			v1::PropertyBoolean::Type	boolean_value;
+			v1::PropertyInteger::Type	integer_value;
 		};
 
 		typedef std::vector<BitSource> BitSources;
@@ -313,7 +313,7 @@ class Link:
 
   public:
 	// Ctor
-	Link (xf::ModuleManager*, QDomElement const& config);
+	Link (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -362,14 +362,14 @@ class Link:
 	QTimer*				_reacquire_timer;
 	QTimer*				_output_timer;
 	bool				_link_valid				= false;
-	xf::PropertyString	_input;
-	xf::PropertyString	_output;
-	xf::PropertyBoolean	_link_valid_prop;
-	xf::PropertyInteger	_failsafes;
-	xf::PropertyInteger	_reacquires;
-	xf::PropertyInteger	_error_bytes;
-	xf::PropertyInteger	_valid_bytes;
-	xf::PropertyInteger	_valid_packets;
+	v1::PropertyString	_input;
+	v1::PropertyString	_output;
+	v1::PropertyBoolean	_link_valid_prop;
+	v1::PropertyInteger	_failsafes;
+	v1::PropertyInteger	_reacquires;
+	v1::PropertyInteger	_error_bytes;
+	v1::PropertyInteger	_valid_bytes;
+	v1::PropertyInteger	_valid_packets;
 	Packets				_packets;
 	PacketMagics		_packet_magics;
 	Blob::size_type		_magic_size				= 0;

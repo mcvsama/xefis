@@ -20,6 +20,7 @@
 
 // Qt:
 #include <QtCore/QString>
+#include <QtCore/QEvent>
 #include <QtXml/QDomElement>
 
 // Xefis:
@@ -28,9 +29,13 @@
 
 
 namespace xf {
+class Xefis;
+}
+
+namespace v1 {
+using namespace xf;
 
 class Module;
-class Xefis;
 
 class ModuleManager: public QObject
 {
@@ -203,7 +208,7 @@ ModuleManager::update_dt() const
 	return _update_dt;
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

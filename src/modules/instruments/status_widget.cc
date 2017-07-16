@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/core/v1/window.h>
 
 // Local:
 #include "status_widget.h"
@@ -173,7 +173,7 @@ StatusWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
 

@@ -22,19 +22,19 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
 class UDP:
 	public QObject,
-	public xf::Module
+	public v1::Module
 {
 	Q_OBJECT
 
   public:
 	// Ctor
-	UDP (xf::ModuleManager*, QDomElement const& config);
+	UDP (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -52,8 +52,8 @@ class UDP:
 	interfere (QByteArray& blob);
 
   private:
-	xf::PropertyString	_send;
-	xf::PropertyString	_receive;
+	v1::PropertyString	_send;
+	v1::PropertyString	_receive;
 	bool				_send_interference		= false;
 	bool				_receive_interference	= false;
 	QByteArray			_receive_datagram;

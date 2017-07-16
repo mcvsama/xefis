@@ -31,8 +31,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/radial-indicator", RadialIndicator)
 
 
-RadialIndicator::RadialIndicator (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config)
+RadialIndicator::RadialIndicator (v1::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager, config)
 {
 	_widget = new RadialIndicatorWidget (this);
 
@@ -82,7 +82,7 @@ RadialIndicator::data_updated()
 
 
 Optional<double>
-RadialIndicator::get_optional_value (xf::GenericProperty const& property)
+RadialIndicator::get_optional_value (v1::GenericProperty const& property)
 {
 	Optional<double> result;
 	if (property.valid())

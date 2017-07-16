@@ -35,7 +35,7 @@ constexpr int	PanelRotaryEncoder::Notches;
 
 
 PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label,
-										PropertyInteger value_property, PropertyBoolean click_property):
+										v1::PropertyInteger value_property, v1::PropertyBoolean click_property):
 	PanelWidget (parent, panel),
 	_knob_label (knob_label),
 	_value_property (value_property),
@@ -81,7 +81,7 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	}
 
 	float rot = 0;
-	PropertyInteger::Type value_mod = floored_mod<PropertyInteger::Type> (_value, 0, 4);
+	v1::PropertyInteger::Type value_mod = floored_mod<v1::PropertyInteger::Type> (_value, 0, 4);
 	if (value_mod == 1)
 		rot = 360.f / Notches / 4.f * 1.f;
 	else if (value_mod == 2)

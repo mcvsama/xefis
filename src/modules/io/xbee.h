@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 #include <xefis/utility/smoother.h>
 
@@ -39,7 +39,7 @@
  */
 class XBee:
 	public QObject,
-	public xf::Module
+	public v1::Module
 {
 	Q_OBJECT
 
@@ -132,7 +132,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (xf::ModuleManager*, QDomElement const& config);
+	XBee (v1::ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	~XBee();
@@ -417,13 +417,13 @@ class XBee:
 	Time					_last_rssi_time;
 	uint8_t					_at_frame_id			= 0x00;
 
-	xf::PropertyBoolean		_serviceable;
-	xf::PropertyString		_send;
-	xf::PropertyString		_receive;
-	xf::PropertyInteger		_input_errors;
-	xf::PropertyFloat		_rssi_dbm;
-	xf::PropertyInteger		_failures;
-	xf::PropertyInteger		_cca_failures;
+	v1::PropertyBoolean		_serviceable;
+	v1::PropertyString		_send;
+	v1::PropertyString		_receive;
+	v1::PropertyInteger		_input_errors;
+	v1::PropertyFloat		_rssi_dbm;
+	v1::PropertyInteger		_failures;
+	v1::PropertyInteger		_cca_failures;
 };
 
 

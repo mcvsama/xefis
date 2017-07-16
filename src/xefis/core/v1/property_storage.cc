@@ -22,7 +22,8 @@
 #include "property.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 Unique<PropertyStorage> PropertyStorage::_default_storage;
 
@@ -82,5 +83,5 @@ PropertyStorage::uncache_path (PropertyPath const& old_path)
 	_properties_by_path.erase (old_path.string());
 }
 
-} // namespace xf
+} // namespace v1
 

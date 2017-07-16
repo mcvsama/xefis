@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class Label:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Label (xf::ModuleManager*, QDomElement const& config);
+	Label (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

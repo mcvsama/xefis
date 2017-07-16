@@ -32,12 +32,13 @@
 
 
 #define XEFIS_REGISTER_MODULE_CLASS(module_name, klass) \
-	static xf::Module::Registrator module_registrator (module_name, [](xf::ModuleManager* module_manager, QDomElement const& config) -> xf::Module* { \
+	static v1::Module::Registrator module_registrator (module_name, [](v1::ModuleManager* module_manager, QDomElement const& config) -> v1::Module* { \
 		return new klass (module_manager, config); \
 	});
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 class ModuleManager;
 
@@ -184,7 +185,7 @@ class Module: private Noncopyable
 	 * \throw	xf::Exception if something's wrong.
 	 */
 	void
-	parse_settings (QDomElement const& element, ConfigReader::SettingsParser::SettingsList);
+	parse_settings (QDomElement const& element, v1::ConfigReader::SettingsParser::SettingsList);
 
 	/**
 	 * Parse the <properties> element and initialize properties
@@ -193,7 +194,7 @@ class Module: private Noncopyable
 	 * \throw	xf::Exception if something's wrong.
 	 */
 	void
-	parse_properties (QDomElement const& element, ConfigReader::PropertiesParser::PropertiesList);
+	parse_properties (QDomElement const& element, v1::ConfigReader::PropertiesParser::PropertiesList);
 
 	/**
 	 * Return true if given setting has been found in configuration.
@@ -234,12 +235,12 @@ class Module: private Noncopyable
 	factories();
 
   private:
-	ModuleManager*							_module_manager			= nullptr;
-	Unique<ConfigReader::SettingsParser>	_settings_parser;
-	Unique<ConfigReader::PropertiesParser>	_properties_parser;
-	std::string								_name;
-	std::string								_instance;
-	xf::Logger								_logger;
+	ModuleManager*								_module_manager			= nullptr;
+	Unique<v1::ConfigReader::SettingsParser>	_settings_parser;
+	Unique<v1::ConfigReader::PropertiesParser>	_properties_parser;
+	std::string									_name;
+	std::string									_instance;
+	xf::Logger									_logger;
 };
 
 
@@ -328,7 +329,7 @@ Module::module_manager() const noexcept
 std::ostream&
 operator<< (std::ostream&, Module::Pointer const&);
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

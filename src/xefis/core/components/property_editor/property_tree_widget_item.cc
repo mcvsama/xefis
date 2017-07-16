@@ -32,7 +32,7 @@
 
 namespace xf {
 
-PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget* parent):
+PropertyTreeWidgetItem::PropertyTreeWidgetItem (v1::PropertyNode* node, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { node->name().c_str() }),
 	_node (node)
 {
@@ -40,7 +40,7 @@ PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget*
 }
 
 
-PropertyTreeWidgetItem::PropertyTreeWidgetItem (PropertyNode* node, QTreeWidgetItem* parent):
+PropertyTreeWidgetItem::PropertyTreeWidgetItem (v1::PropertyNode* node, QTreeWidgetItem* parent):
 	QTreeWidgetItem (parent, { node->name().c_str() }),
 	_node (node)
 {
@@ -57,7 +57,7 @@ PropertyTreeWidgetItem::reload()
 	if (!_node)
 		return;
 
-	PropertyValueNode<bool>* node_bool = dynamic_cast<PropertyValueNode<bool>*> (_node);
+	v1::PropertyValueNode<bool>* node_bool = dynamic_cast<v1::PropertyValueNode<bool>*> (_node);
 	if (node_bool)
 	{
 		setFlags (flags() | Qt::ItemIsUserCheckable);
@@ -75,8 +75,8 @@ PropertyTreeWidgetItem::operator< (QTreeWidgetItem const& that_item) const
 
 	if (that)
 	{
-		bool const this_is_dir = !!dynamic_cast<PropertyDirectoryNode*> (this->_node);
-		bool const that_is_dir = !!dynamic_cast<PropertyDirectoryNode*> (that->_node);
+		bool const this_is_dir = !!dynamic_cast<v1::PropertyDirectoryNode*> (this->_node);
+		bool const that_is_dir = !!dynamic_cast<v1::PropertyDirectoryNode*> (that->_node);
 
 		if (this_is_dir != that_is_dir)
 			return this_is_dir;
@@ -99,7 +99,7 @@ PropertyTreeWidgetItem::convert_item (QTreeWidgetItem* item)
 void
 PropertyTreeWidgetItem::setup_appereance()
 {
-	if (dynamic_cast<PropertyDirectoryNode*> (_node))
+	if (dynamic_cast<v1::PropertyDirectoryNode*> (_node))
 		setIcon (0, resources::icons16::property_dir());
 	else
 		setIcon (0, resources::icons16::property_value());

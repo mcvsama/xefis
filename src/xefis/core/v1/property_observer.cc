@@ -21,7 +21,8 @@
 #include "property_observer.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 void
 PropertyObserver::observe (GenericProperty& property)
@@ -138,5 +139,5 @@ PropertyObserver::longest_smoothing_time() noexcept
 	return _longest_smoother;
 }
 
-} // namespace xf
+} // namespace v1
 

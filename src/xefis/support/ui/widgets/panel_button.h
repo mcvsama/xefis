@@ -50,7 +50,7 @@ class PanelButton: public PanelWidget
 	 * Create button with LED indicator.
 	 */
 	explicit
-	PanelButton (QWidget* parent, Panel*, LEDColor, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property);
+	PanelButton (QWidget* parent, Panel*, LEDColor, v1::PropertyBoolean click_property, v1::PropertyBoolean toggle_property, v1::PropertyBoolean led_property);
 
   protected:
 	void
@@ -77,12 +77,12 @@ class PanelButton: public PanelWidget
 	write();
 
   private:
-	QPushButton*	_button					= nullptr;
-	PropertyBoolean	_click_property;
-	PropertyBoolean	_toggle_property;
-	PropertyBoolean	_led_property;
-	QIcon			_icon_on;
-	QIcon			_icon_off;
+	QPushButton*		_button					= nullptr;
+	v1::PropertyBoolean	_click_property;
+	v1::PropertyBoolean	_toggle_property;
+	v1::PropertyBoolean	_led_property;
+	QIcon				_icon_on;
+	QIcon				_icon_off;
 };
 
 } // namespace xf

@@ -41,12 +41,12 @@ class ModulesList: public QWidget
   public:
 	// Ctor
 	explicit
-	ModulesList (ModuleManager* module_manager, QWidget* parent);
+	ModulesList (v1::ModuleManager* module_manager, QWidget* parent);
 
 	/**
 	 * Return ModuleManager.
 	 */
-	ModuleManager*
+	v1::ModuleManager*
 	module_manager() const noexcept;
 
 	/**
@@ -60,7 +60,7 @@ class ModulesList: public QWidget
 	 * Emitted when user changes module selection.
 	 */
 	void
-	module_selected (Module::Pointer const& module_pointer);
+	module_selected (v1::Module::Pointer const& module_pointer);
 
 	/**
 	 * Emitted when module selection is cleared.
@@ -82,13 +82,13 @@ class ModulesList: public QWidget
 	item_selected (QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
   private:
-	ModuleManager*	_module_manager	= nullptr;
-	QTreeWidget*	_list			= nullptr;
-	QTimer*			_refresh_timer	= nullptr;
+	v1::ModuleManager*	_module_manager	= nullptr;
+	QTreeWidget*		_list			= nullptr;
+	QTimer*				_refresh_timer	= nullptr;
 };
 
 
-inline ModuleManager*
+inline v1::ModuleManager*
 ModulesList::module_manager() const noexcept
 {
 	return _module_manager;

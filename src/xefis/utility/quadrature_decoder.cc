@@ -20,7 +20,7 @@
 
 namespace xf {
 
-QuadratureDecoder::QuadratureDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback):
+QuadratureDecoder::QuadratureDecoder (v1::PropertyBoolean& property_a, v1::PropertyBoolean& property_b, Callback callback):
 	_prev_a (property_a.read (false)),
 	_prev_b (property_b.read (false)),
 	_property_a (property_a),

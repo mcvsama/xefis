@@ -21,7 +21,8 @@
 #include <xefis/config/all.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 class Action
 {
@@ -219,7 +220,7 @@ class ButtonOptionsAction: public Action
 	PropertyInteger	_value_target;
 };
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

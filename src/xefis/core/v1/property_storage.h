@@ -25,7 +25,8 @@
 #include <xefis/utility/noncopyable.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 class PropertyNode;
 class PropertyDirectoryNode;
@@ -107,7 +108,7 @@ PropertyStorage::properties_map() const
 	return _properties_by_path;
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

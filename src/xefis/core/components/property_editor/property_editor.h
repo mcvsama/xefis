@@ -25,6 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v1/property_node.h>
 
 // Local:
 #include "property_tree_widget.h"
@@ -47,7 +48,7 @@ class PropertyEditor: public QWidget
   public:
 	// Ctor
 	explicit
-	PropertyEditor (PropertyNode* root_node, QWidget* parent);
+	PropertyEditor (v1::PropertyNode* root_node, QWidget* parent);
 
   public slots:
 	/**

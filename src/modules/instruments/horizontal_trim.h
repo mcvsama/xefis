@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class HorizontalTrim:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	HorizontalTrim (xf::ModuleManager*, QDomElement const& config);
+	HorizontalTrim (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -56,10 +56,10 @@ class HorizontalTrim:
 	QString				_label_min;
 	QString				_label_max;
 	// Properties:
-	xf::PropertyFloat	_input_trim_value;
-	xf::PropertyFloat	_input_trim_reference;
-	xf::PropertyFloat	_input_trim_reference_minimum;
-	xf::PropertyFloat	_input_trim_reference_maximum;
+	v1::PropertyFloat	_input_trim_value;
+	v1::PropertyFloat	_input_trim_reference;
+	v1::PropertyFloat	_input_trim_reference_minimum;
+	v1::PropertyFloat	_input_trim_reference_maximum;
 };
 
 #endif

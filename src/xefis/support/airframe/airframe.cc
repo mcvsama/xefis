@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/config_reader.h>
+#include <xefis/core/v1/config_reader.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
@@ -55,7 +55,7 @@ Airframe::Airframe (Xefis*, QDomElement const& config)
 			double min_g;
 			double max_g;
 
-			ConfigReader::SettingsParser settings_parser ({
+			v1::ConfigReader::SettingsParser settings_parser ({
 				{ "wings-area", _wings_area, true },
 				{ "wings-chord", _wings_chord, true },
 				{ "max-negative-load-factor", min_g, true },

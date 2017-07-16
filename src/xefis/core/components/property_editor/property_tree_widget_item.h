@@ -24,9 +24,12 @@
 #include <xefis/config/all.h>
 
 
+namespace v1 {
+class PropertyNode;
+}
+
 namespace xf {
 
-class PropertyNode;
 class PropertyTreeWidget;
 
 class PropertyTreeWidgetItem: public QTreeWidgetItem
@@ -34,11 +37,11 @@ class PropertyTreeWidgetItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	PropertyTreeWidgetItem (PropertyNode* node, QTreeWidget* parent);
+	PropertyTreeWidgetItem (v1::PropertyNode* node, QTreeWidget* parent);
 
 	// Ctor
 	explicit
-	PropertyTreeWidgetItem (PropertyNode* node, QTreeWidgetItem* parent);
+	PropertyTreeWidgetItem (v1::PropertyNode* node, QTreeWidgetItem* parent);
 
 	/**
 	 * Reads the node and update itself.
@@ -49,7 +52,7 @@ class PropertyTreeWidgetItem: public QTreeWidgetItem
 	/**
 	 * Return PropertyNode* associated with this item.
 	 */
-	PropertyNode*
+	v1::PropertyNode*
 	node() const;
 
 	bool
@@ -73,11 +76,11 @@ class PropertyTreeWidgetItem: public QTreeWidgetItem
 	setup_appereance();
 
   private:
-	PropertyNode* _node;
+	v1::PropertyNode* _node;
 };
 
 
-inline PropertyNode*
+inline v1::PropertyNode*
 PropertyTreeWidgetItem::node() const
 {
 	return _node;

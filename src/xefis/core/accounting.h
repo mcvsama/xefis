@@ -117,7 +117,7 @@ class Accounting: public QObject
 		Stats	e3	= Stats (1000);
 	};
 
-	typedef std::map<Module::Pointer, StatsSet> ModuleStats;
+	typedef std::map<v1::Module::Pointer, StatsSet> ModuleStats;
 
   public:
 	// Ctor
@@ -144,14 +144,14 @@ class Accounting: public QObject
 	 * \throw	ModuleNotFoundException if module can't be found.
 	 */
 	Stats const&
-	module_stats (Module::Pointer, Timespan) const;
+	module_stats (v1::Module::Pointer, Timespan) const;
 
 	/**
 	 * Add module accounting stats (usually called by the ModuleManager
 	 * which tracks how much time each module consumes on data_updated().
 	 */
 	void
-	add_module_stats (Module::Pointer, Time dt);
+	add_module_stats (v1::Module::Pointer, si::Time dt);
 
   private slots:
 	/**

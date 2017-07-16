@@ -25,14 +25,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
-#include <xefis/utility/actions.h>
+#include <xefis/utility/v1/actions.h>
 #include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
 
 
-class State: public xf::Module
+class State: public v1::Module
 {
 	static constexpr Length					MinimumsBaroStep		= 10_ft;
 	static constexpr Length					MinimumsRadioStep		= 1_ft;
@@ -134,7 +134,7 @@ class State: public xf::Module
 		};
 
   public:
-	State (xf::ModuleManager* module_manager, QDomElement const& config);
+	State (v1::ModuleManager* module_manager, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -174,19 +174,19 @@ class State: public xf::Module
 	 * Call given callback when button is pressed (property becomes true).
 	 */
 	void
-	make_switch (Observable<xf::PropertyBoolean>& bool_observable, std::function<void()>);
+	make_switch (Observable<v1::PropertyBoolean>& bool_observable, std::function<void()>);
 
 	/**
 	 * Set observable to toggle given target_switch.
 	 */
 	void
-	make_toggle (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyBoolean& target_switch);
+	make_toggle (Observable<v1::PropertyBoolean>& bool_observable, v1::PropertyBoolean& target_switch);
 
 	/**
 	 * Set observable to write given integer to target_property.
 	 */
 	void
-	make_int_writer (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyInteger& target_property, int value);
+	make_int_writer (Observable<v1::PropertyBoolean>& bool_observable, v1::PropertyInteger& target_property, int value);
 
   private:
 	MinimumsType					_minimums_type				= MinimumsType::Baro;
@@ -196,53 +196,53 @@ class State: public xf::Module
 	Angle							_course						= 0_deg;
 	bool							_course_visible				= false;
 	// Logic:
-	Unique<xf::ButtonAction>		_efis_mins_mode_button;
-	Unique<xf::ButtonOptionsAction>	_navaid_select_panel;
-	Unique<xf::ButtonOptionsAction>	_navaid_left_panel;
-	Unique<xf::ButtonOptionsAction>	_navaid_right_panel;
-	Unique<xf::ToggleButtonAction>	_afcs_ap_button;
-	Unique<xf::ButtonOptionsAction>	_mfd_panel;
+	Unique<v1::ButtonAction>		_efis_mins_mode_button;
+	Unique<v1::ButtonOptionsAction>	_navaid_select_panel;
+	Unique<v1::ButtonOptionsAction>	_navaid_left_panel;
+	Unique<v1::ButtonOptionsAction>	_navaid_right_panel;
+	Unique<v1::ToggleButtonAction>	_afcs_ap_button;
+	Unique<v1::ButtonOptionsAction>	_mfd_panel;
 	// Buttons, switches, knobs:
-	xf::PropertyInteger				_mcp_mins_value;
+	v1::PropertyInteger				_mcp_mins_value;
 	Unique<xf::DeltaDecoder>		_mcp_mins_decoder;
-	Observable<xf::PropertyBoolean>	_mcp_att;
-	Observable<xf::PropertyBoolean>	_mcp_appr;
-	Observable<xf::PropertyBoolean>	_mcp_fd;
-	Observable<xf::PropertyBoolean>	_mcp_htrk;
-	xf::PropertyInteger				_mcp_qnh_value;
+	Observable<v1::PropertyBoolean>	_mcp_att;
+	Observable<v1::PropertyBoolean>	_mcp_appr;
+	Observable<v1::PropertyBoolean>	_mcp_fd;
+	Observable<v1::PropertyBoolean>	_mcp_htrk;
+	v1::PropertyInteger				_mcp_qnh_value;
 	Unique<xf::DeltaDecoder>		_mcp_qnh_decoder;
-	Observable<xf::PropertyBoolean>	_mcp_qnh_hpa;
-	Observable<xf::PropertyBoolean>	_mcp_std;
-	Observable<xf::PropertyBoolean>	_mcp_metric;
-	Observable<xf::PropertyBoolean>	_mcp_fpv;
-	xf::PropertyInteger				_mcp_range_value;
+	Observable<v1::PropertyBoolean>	_mcp_qnh_hpa;
+	Observable<v1::PropertyBoolean>	_mcp_std;
+	Observable<v1::PropertyBoolean>	_mcp_metric;
+	Observable<v1::PropertyBoolean>	_mcp_fpv;
+	v1::PropertyInteger				_mcp_range_value;
 	Unique<xf::DeltaDecoder>		_mcp_range_decoder;
-	Observable<xf::PropertyBoolean>	_mcp_range_ctr;
-	Observable<xf::PropertyBoolean>	_mcp_hdg_trk;
-	Observable<xf::PropertyBoolean>	_mcp_mag_tru;
-	xf::PropertyInteger				_mcp_course_value;
+	Observable<v1::PropertyBoolean>	_mcp_range_ctr;
+	Observable<v1::PropertyBoolean>	_mcp_hdg_trk;
+	Observable<v1::PropertyBoolean>	_mcp_mag_tru;
+	v1::PropertyInteger				_mcp_course_value;
 	Unique<xf::DeltaDecoder>		_mcp_course_decoder;
-	Observable<xf::PropertyBoolean>	_mcp_course_hide;
+	Observable<v1::PropertyBoolean>	_mcp_course_hide;
 	// LEDs, displays:
-	xf::PropertyInteger				_mcp_course_display;
+	v1::PropertyInteger				_mcp_course_display;
 	// Controlled properties:
-	xf::PropertyBoolean				_setting_efis_fpv_visible;
-	xf::PropertyBoolean				_setting_efis_show_metric;
-	xf::PropertyBoolean				_setting_efis_fd_visible;
-	xf::PropertyBoolean				_setting_efis_appr_visible;
-	xf::PropertyPressure			_setting_pressure_qnh;
-	xf::PropertyBoolean				_setting_pressure_display_hpa;
-	xf::PropertyBoolean				_setting_pressure_use_std;
-	xf::PropertyLength				_setting_minimums_amsl;
-	xf::PropertyLength				_setting_minimums_setting;
-	xf::PropertyString				_setting_minimums_type;
-	xf::PropertyBoolean				_setting_hsi_display_true_heading;
-	xf::PropertyBoolean				_setting_hsi_center_on_track;
-	xf::PropertyInteger				_setting_hsi_display_mode_mfd;
-	xf::PropertyLength				_setting_hsi_range;
-	xf::PropertyBoolean				_setting_hsi_home_track_visible;
-	xf::PropertyAngle				_setting_course;
-	xf::PropertyBoolean				_setting_course_visible;
+	v1::PropertyBoolean				_setting_efis_fpv_visible;
+	v1::PropertyBoolean				_setting_efis_show_metric;
+	v1::PropertyBoolean				_setting_efis_fd_visible;
+	v1::PropertyBoolean				_setting_efis_appr_visible;
+	v1::PropertyPressure			_setting_pressure_qnh;
+	v1::PropertyBoolean				_setting_pressure_display_hpa;
+	v1::PropertyBoolean				_setting_pressure_use_std;
+	v1::PropertyLength				_setting_minimums_amsl;
+	v1::PropertyLength				_setting_minimums_setting;
+	v1::PropertyString				_setting_minimums_type;
+	v1::PropertyBoolean				_setting_hsi_display_true_heading;
+	v1::PropertyBoolean				_setting_hsi_center_on_track;
+	v1::PropertyInteger				_setting_hsi_display_mode_mfd;
+	v1::PropertyLength				_setting_hsi_range;
+	v1::PropertyBoolean				_setting_hsi_home_track_visible;
+	v1::PropertyAngle				_setting_course;
+	v1::PropertyBoolean				_setting_course_visible;
 	// Other:
 	std::vector<ObservableBase*>	_observables;
 	std::vector<xf::DeltaDecoder*>	_rotary_decoders;

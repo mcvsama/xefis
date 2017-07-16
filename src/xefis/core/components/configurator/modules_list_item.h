@@ -33,12 +33,12 @@ class ModulesListItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	ModulesListItem (Module::Pointer const& module_pointer, ModuleManager* module_manager, QTreeWidget* parent);
+	ModulesListItem (v1::Module::Pointer const& module_pointer, v1::ModuleManager* module_manager, QTreeWidget* parent);
 
 	/**
 	 * Return Module* associated with this item.
 	 */
-	Module::Pointer const&
+	v1::Module::Pointer const&
 	module_pointer() const noexcept;
 
 	/**
@@ -55,12 +55,12 @@ class ModulesListItem: public QTreeWidgetItem
 	setup_appereance();
 
   private:
-	Module::Pointer	_module_pointer;
-	ModuleManager*	_module_manager;
+	v1::Module::Pointer	_module_pointer;
+	v1::ModuleManager*	_module_manager;
 };
 
 
-inline Module::Pointer const&
+inline v1::Module::Pointer const&
 ModulesListItem::module_pointer() const noexcept
 {
 	return _module_pointer;

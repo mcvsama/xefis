@@ -39,7 +39,8 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 // Forward declarations:
 class PropertyDirectoryNode;
@@ -793,7 +794,7 @@ template<>
 			write (std::string (blob.begin() + 1, blob.end()));
 	}
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

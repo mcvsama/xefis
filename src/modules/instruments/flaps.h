@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class Flaps:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Flaps (xf::ModuleManager*, QDomElement const& config);
+	Flaps (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -53,8 +53,8 @@ class Flaps:
 	Angle				_maximum		= 0_deg;
 	bool				_hide_retracted	= false;
 	// Properties:
-	xf::PropertyAngle	_current;
-	xf::PropertyAngle	_setting;
+	v1::PropertyAngle	_current;
+	v1::PropertyAngle	_setting;
 };
 
 #endif

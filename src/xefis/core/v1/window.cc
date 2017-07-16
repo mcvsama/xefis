@@ -39,7 +39,8 @@
 #include "window.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 Window::Stack::Stack (Time delay)
 {
@@ -76,7 +77,7 @@ Window::InstrumentDecorator::set_instrument (Instrument* instrument)
 }
 
 
-Window::Window (Xefis* xefis, ConfigReader* config_reader, QDomElement const& element):
+Window::Window (Xefis* xefis, v1::ConfigReader* config_reader, QDomElement const& element):
 	_xefis (xefis),
 	_config_reader (config_reader)
 {
@@ -670,5 +671,5 @@ Window::parse_padding (QDomElement const& element, QString const& attribute_name
 	return parse_margin (element, attribute_name);
 }
 
-} // namespace xf
+} // namespace v1
 

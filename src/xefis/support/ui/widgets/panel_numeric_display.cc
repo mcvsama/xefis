@@ -60,7 +60,7 @@ PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigne
 }
 
 
-PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, PropertyString const& format_property):
+PanelNumericDisplay::PanelNumericDisplay (QWidget* parent, Panel* panel, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, v1::PropertyString const& format_property):
 	PanelNumericDisplay (parent, panel, num_digits, unit, value_property_path)
 {
 	_dynamic_format = format_property;

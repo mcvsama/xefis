@@ -23,13 +23,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
 namespace {
 
-class State: public xf::Module
+class State: public v1::Module
 {
 	class ConfigVariable
 	{
@@ -54,12 +54,12 @@ class State: public xf::Module
 		set_id (QString const&);
 
 		// Getter
-		xf::PropertyType const&
+		v1::PropertyType const&
 		type() const noexcept;
 
 		// Setter
 		void
-		set_type (xf::PropertyType const&);
+		set_type (v1::PropertyType const&);
 
 		// Getter
 		xf::PropertyPath const&
@@ -70,11 +70,11 @@ class State: public xf::Module
 		set_path (xf::PropertyPath const&);
 
 		// Getter
-		xf::GenericProperty&
+		v1::GenericProperty&
 		property() noexcept;
 
 		// Getter
-		xf::GenericProperty const&
+		v1::GenericProperty const&
 		property() const noexcept;
 
 		/**
@@ -85,16 +85,16 @@ class State: public xf::Module
 
 	  private:
 		QString				_id;
-		xf::PropertyType	_type;
+		v1::PropertyType	_type;
 		xf::PropertyPath	_path;
-		xf::GenericProperty	_property;
+		v1::GenericProperty	_property;
 	};
 
 	typedef std::map<QString, ConfigVariable> ConfigVariables;
 
   public:
 	// Ctor
-	State (xf::ModuleManager*, QDomElement const& config);
+	State (v1::ModuleManager*, QDomElement const& config);
 
 	// Dtor
 	~State();

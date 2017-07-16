@@ -26,10 +26,10 @@
 XEFIS_REGISTER_MODULE_CLASS ("helpers/ahrs-selector", AHRSSelector)
 
 
-AHRSSelector::AHRSSelector (xf::ModuleManager* module_manager, QDomElement const& config):
+AHRSSelector::AHRSSelector (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	xf::ConfigReader::PropertiesParser::PropertiesList properties_list;
+	v1::ConfigReader::PropertiesParser::PropertiesList properties_list;
 
 	parse_settings (config, {
 		{ "pitch-disagree-threshold", _setting_pitch_disagree_threshold, true },
@@ -109,7 +109,7 @@ AHRSSelector::data_updated()
 																		_setting_magnetic_heading_disagree_threshold);
 	}
 
-	_output_serviceable = std::any_of (_inputs_serviceable.begin(), _inputs_serviceable.end(), [](xf::PropertyBoolean const& x) { return *x; });
+	_output_serviceable = std::any_of (_inputs_serviceable.begin(), _inputs_serviceable.end(), [](v1::PropertyBoolean const& x) { return *x; });
 }
 
 
@@ -136,7 +136,7 @@ template<class PropertyType>
 
 
 inline bool
-AHRSSelector::compute_disagree_flag (xf::PropertyAngle const& first, xf::PropertyAngle const& second, Angle threshold)
+AHRSSelector::compute_disagree_flag (v1::PropertyAngle const& first, v1::PropertyAngle const& second, Angle threshold)
 {
 	using std::abs;
 	return !first.valid() || !second.valid() || abs (*first - *second) > threshold;

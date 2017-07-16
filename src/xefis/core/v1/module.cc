@@ -33,7 +33,8 @@
 #include "module_manager.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 Module::Module (ModuleManager* module_manager, QDomElement const& config):
 	_module_manager (module_manager),
@@ -41,8 +42,8 @@ Module::Module (ModuleManager* module_manager, QDomElement const& config):
 	_instance (config.attribute ("instance", "").toStdString())
 {
 	_logger.set_prefix ((boost::format ("[%-30s#%-20s]") % _name % _instance).str());
-	_settings_parser = std::make_unique<ConfigReader::SettingsParser>();
-	_properties_parser = std::make_unique<ConfigReader::PropertiesParser>();
+	_settings_parser = std::make_unique<v1::ConfigReader::SettingsParser>();
+	_properties_parser = std::make_unique<v1::ConfigReader::PropertiesParser>();
 }
 
 
@@ -58,7 +59,7 @@ Module::dump_debug_log()
 
 
 void
-Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser::SettingsList list)
+Module::parse_settings (QDomElement const& element, v1::ConfigReader::SettingsParser::SettingsList list)
 {
 	QDomElement settings_element;
 	if (element == "settings")
@@ -81,17 +82,17 @@ Module::parse_settings (QDomElement const& element, ConfigReader::SettingsParser
 	{
 		// If at least one of provided settings is required,
 		// throw an error.
-		if (std::any_of (list.begin(), list.end(), [](ConfigReader::SettingsParser::NameAndSetting const& s) { return s.required; }))
+		if (std::any_of (list.begin(), list.end(), [](v1::ConfigReader::SettingsParser::NameAndSetting const& s) { return s.required; }))
 			throw BadConfiguration ("missing <settings> element");
 	}
 
-	_settings_parser = std::make_unique<ConfigReader::SettingsParser> (list);
+	_settings_parser = std::make_unique<v1::ConfigReader::SettingsParser> (list);
 	_settings_parser->parse (settings_element);
 }
 
 
 void
-Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesParser::PropertiesList list)
+Module::parse_properties (QDomElement const& element, v1::ConfigReader::PropertiesParser::PropertiesList list)
 {
 	QDomElement properties_element;
 	if (element == "properties")
@@ -114,11 +115,11 @@ Module::parse_properties (QDomElement const& element, ConfigReader::PropertiesPa
 	{
 		// If at least one of provided properties is required,
 		// throw an error.
-		if (std::any_of (list.begin(), list.end(), [](ConfigReader::PropertiesParser::NameAndProperty const& s) { return s.required; }))
+		if (std::any_of (list.begin(), list.end(), [](v1::ConfigReader::PropertiesParser::NameAndProperty const& s) { return s.required; }))
 			throw BadConfiguration ("missing <properties> element");
 	}
 
-	_properties_parser = std::make_unique<ConfigReader::PropertiesParser> (list);
+	_properties_parser = std::make_unique<v1::ConfigReader::PropertiesParser> (list);
 	_properties_parser->parse (properties_element);
 }
 
@@ -211,5 +212,5 @@ operator<< (std::ostream& s, Module::Pointer const& module_ptr)
 	return s;
 }
 
-} // namespace xf
+} // namespace v1
 

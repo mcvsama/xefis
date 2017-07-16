@@ -24,13 +24,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/property.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/utility/delta_decoder.h>
 
 
 class StatusWidget;
 
-class Status: public xf::Instrument
+class Status: public v1::Instrument
 {
 	Q_OBJECT
 
@@ -86,9 +86,9 @@ class Status: public xf::Instrument
 			test() const;
 
 		  private:
-			xf::PropertyBoolean	_observed_property;
-			bool					_valid_state	= true;
-			bool					_fail_on_nil	= false;
+			v1::PropertyBoolean	_observed_property;
+			bool				_valid_state	= true;
+			bool				_fail_on_nil	= false;
 		};
 
 	  public:
@@ -156,7 +156,7 @@ class Status: public xf::Instrument
 
   public:
 	// Ctor
-	Status (xf::ModuleManager*, QDomElement const& config);
+	Status (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -164,15 +164,15 @@ class Status: public xf::Instrument
 
   private:
 	StatusWidget*					_status_widget			= nullptr;
-	xf::PropertyInteger				_input_cursor_value;
+	v1::PropertyInteger				_input_cursor_value;
 	Unique<xf::DeltaDecoder>		_input_cursor_decoder;
-	xf::PropertyBoolean				_input_button_cursor_del;
-	xf::PropertyBoolean				_input_button_recall;
-	xf::PropertyBoolean				_input_button_clear;
-	xf::PropertyBoolean				_input_button_master_caution;
-	xf::PropertyBoolean				_input_button_master_warning;
-	xf::PropertyBoolean				_output_master_caution;
-	xf::PropertyBoolean				_output_master_warning;
+	v1::PropertyBoolean				_input_button_cursor_del;
+	v1::PropertyBoolean				_input_button_recall;
+	v1::PropertyBoolean				_input_button_clear;
+	v1::PropertyBoolean				_input_button_master_caution;
+	v1::PropertyBoolean				_input_button_master_warning;
+	v1::PropertyBoolean				_output_master_caution;
+	v1::PropertyBoolean				_output_master_warning;
 	std::list<MessageDefinition>	_messages;
 	Time							_minimum_display_time	= 5_s;
 	Time							_last_message_timestamp;

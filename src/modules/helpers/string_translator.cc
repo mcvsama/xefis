@@ -83,7 +83,7 @@ StringTranslator::StringsSet::update()
 }
 
 
-StringTranslator::StringTranslator (xf::ModuleManager* module_manager, QDomElement const& config):
+StringTranslator::StringTranslator (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	for (QDomElement const& e: xf::iterate_sub_elements (config))

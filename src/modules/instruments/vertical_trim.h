@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class VerticalTrim:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	VerticalTrim (xf::ModuleManager*, QDomElement const& config);
+	VerticalTrim (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -54,10 +54,10 @@ class VerticalTrim:
 	// Settings:
 	QString				_label = "STAB";
 	// Properties:
-	xf::PropertyFloat	_input_trim_value;
-	xf::PropertyFloat	_input_trim_reference;
-	xf::PropertyFloat	_input_trim_reference_minimum;
-	xf::PropertyFloat	_input_trim_reference_maximum;
+	v1::PropertyFloat	_input_trim_value;
+	v1::PropertyFloat	_input_trim_reference;
+	v1::PropertyFloat	_input_trim_reference_minimum;
+	v1::PropertyFloat	_input_trim_reference_maximum;
 };
 
 #endif

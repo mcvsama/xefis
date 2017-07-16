@@ -23,13 +23,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class Datatable:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
 	class LabelValue
@@ -53,7 +53,7 @@ class Datatable:
 	  public:
 		QString				label;
 		QColor				label_color;
-		xf::GenericProperty	value;
+		v1::GenericProperty	value;
 		QColor				value_color;
 		QString				nil_value;
 		std::string			unit;
@@ -62,7 +62,7 @@ class Datatable:
 
   public:
 	// Ctor
-	Datatable (xf::ModuleManager*, QDomElement const& config);
+	Datatable (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;

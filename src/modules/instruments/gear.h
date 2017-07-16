@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v1/property.h>
 
 
 class Gear:
-	public xf::Instrument,
+	public v1::Instrument,
 	protected xf::InstrumentAids
 {
   public:
 	// Ctor
-	Gear (xf::ModuleManager*, QDomElement const& config);
+	Gear (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -48,13 +48,13 @@ class Gear:
 
   private:
 	// Properties:
-	xf::PropertyBoolean	_setting_down;
-	xf::PropertyBoolean	_nose_up;
-	xf::PropertyBoolean	_nose_down;
-	xf::PropertyBoolean	_left_up;
-	xf::PropertyBoolean	_left_down;
-	xf::PropertyBoolean	_right_up;
-	xf::PropertyBoolean	_right_down;
+	v1::PropertyBoolean	_setting_down;
+	v1::PropertyBoolean	_nose_up;
+	v1::PropertyBoolean	_nose_down;
+	v1::PropertyBoolean	_left_up;
+	v1::PropertyBoolean	_left_down;
+	v1::PropertyBoolean	_right_up;
+	v1::PropertyBoolean	_right_down;
 };
 
 #endif

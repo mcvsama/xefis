@@ -31,18 +31,21 @@
 #include <xefis/utility/logger.h>
 
 
+namespace v1 { // XXX
+class ModuleManager;
+class ConfigReader;
+class WindowManager;
+}
+
 namespace v2 { // XXX
-	class Machine;
+class Machine;
 }
 
 namespace xf {
 using namespace v2; // XXX
 
 class NavaidStorage;
-class ModuleManager;
-class WindowManager;
 class SoundManager;
-class ConfigReader;
 class WorkPerformer;
 class ConfiguratorWidget;
 class Accounting;
@@ -150,13 +153,13 @@ class Xefis: public QApplication
 	/**
 	 * Return ModuleManager object.
 	 */
-	ModuleManager*
+	v1::ModuleManager*
 	module_manager() const;
 
 	/**
 	 * Return WindowManager object.
 	 */
-	WindowManager*
+	v1::WindowManager*
 	window_manager() const;
 
 	/**
@@ -168,7 +171,7 @@ class Xefis: public QApplication
 	/**
 	 * Return ConfigReader object.
 	 */
-	ConfigReader*
+	v1::ConfigReader*
 	config_reader() const;
 
 	/**
@@ -258,15 +261,15 @@ class Xefis: public QApplication
 	Unique<Accounting>				_accounting;
 	Unique<SoundManager>			_sound_manager;
 	Unique<NavaidStorage>			_navaid_storage;
-	Unique<WindowManager>			_window_manager;
+	Unique<v1::WindowManager>		_window_manager;
 	// Note: it is important that the _module_manager is after _window_manager, so that
 	// upon destruction, _module_manager deletes all instruments first, and prevents
 	// _window_manager deleting them like they were managed by parent QObjects.
 	// Unfortunately Qt doesn't allow inserting a widget into a window without creating parent-child
 	// relationship, or at least marking such children not to be deleted by their parent,
 	// so we have to make workarounds like this.
-	Unique<ModuleManager>			_module_manager;
-	Unique<ConfigReader>			_config_reader;
+	Unique<v1::ModuleManager>		_module_manager;
+	Unique<v1::ConfigReader>		_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<Airframe>				_airframe;
 	Unique<OptionsHelper>			_options_helper;
@@ -328,7 +331,7 @@ Xefis::accounting() const
 }
 
 
-inline ModuleManager*
+inline v1::ModuleManager*
 Xefis::module_manager() const
 {
 	if (!_module_manager)
@@ -337,7 +340,7 @@ Xefis::module_manager() const
 }
 
 
-inline WindowManager*
+inline v1::WindowManager*
 Xefis::window_manager() const
 {
 	if (!_window_manager)
@@ -355,7 +358,7 @@ Xefis::sound_manager() const
 }
 
 
-inline ConfigReader*
+inline v1::ConfigReader*
 Xefis::config_reader() const
 {
 	if (!_config_reader)

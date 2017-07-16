@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module_manager.h>
+#include <xefis/core/v1/module_manager.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/painter.h>
@@ -147,7 +147,7 @@ Status::MessageDefinition::color() const noexcept
 }
 
 
-Status::Status (xf::ModuleManager* module_manager, QDomElement const& config):
+Status::Status (v1::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
 	parse_settings (config, {
@@ -200,7 +200,7 @@ Status::data_updated()
 {
 	_input_cursor_decoder->data_updated();
 
-	auto pressed = [](xf::PropertyBoolean& property) -> bool {
+	auto pressed = [](v1::PropertyBoolean& property) -> bool {
 		return property.valid_and_fresh() && *property;
 	};
 

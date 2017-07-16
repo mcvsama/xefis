@@ -25,7 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/core/v1/window.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>
@@ -2732,7 +2732,7 @@ ADIWidget::resizeEvent (QResizeEvent* event)
 {
 	InstrumentWidget::resizeEvent (event);
 
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		_local_paint_work_unit.set_scaling (xw->pen_scale(), xw->font_scale());
 }

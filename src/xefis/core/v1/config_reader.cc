@@ -31,7 +31,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/module_manager.h>
-#include <xefis/core/window_manager.h>
+#include <xefis/core/v1/window_manager.h>
 #include <xefis/core/v1/module.h>
 #include <xefis/core/v1/window.h>
 #include <xefis/core/stdexcept.h>
@@ -44,7 +44,8 @@
 #include "config_reader.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 ConfigReader::SettingsParser::NameAndSetting::NameAndSetting (NameAndSetting const& other):
 	name (other.name),
@@ -558,5 +559,5 @@ ConfigReader::process_module_element (QDomElement const& module_element, QWidget
 	return _module_manager->load_module (name, instance, module_element, parent_widget);
 }
 
-} // namespace xf
+} // namespace v1
 

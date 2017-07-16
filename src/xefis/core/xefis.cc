@@ -33,7 +33,7 @@
 #include <xefis/core/v1/property_storage.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/v1/module_manager.h>
-#include <xefis/core/window_manager.h>
+#include <xefis/core/v1/window_manager.h>
 #include <xefis/core/sound_manager.h>
 #include <xefis/core/v1/config_reader.h>
 #include <xefis/core/navaid_storage.h>
@@ -44,7 +44,7 @@
 #include <xefis/utility/time_helper.h>
 #include <xefis/utility/demangle.h>
 // TODO machine
-#include <configs/cthulhu/cthulhu.h>
+#include <configs/cthulhu_gcs/cthulhu_gcs.h>
 
 // Local:
 #include "xefis.h"
@@ -72,16 +72,16 @@ Xefis::Xefis (int& argc, char** argv):
 	// Init services:
 	Services::initialize();
 	// Init property storage:
-	PropertyStorage::initialize();
+	v1::PropertyStorage::initialize();
 
 	_system = std::make_unique<System>();
 	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
 	_accounting = std::make_unique<Accounting>();
 	_sound_manager = std::make_unique<SoundManager>();
 	_navaid_storage = std::make_unique<NavaidStorage>();
-	_window_manager = std::make_unique<WindowManager>();
-	_module_manager = std::make_unique<ModuleManager> (this);
-	_config_reader = std::make_unique<ConfigReader> (this, _module_manager.get());
+	_window_manager = std::make_unique<v1::WindowManager>();
+	_module_manager = std::make_unique<v1::ModuleManager> (this);
+	_config_reader = std::make_unique<v1::ConfigReader> (this, _module_manager.get());
 
 	signal (SIGHUP, s_quit);
 
@@ -112,7 +112,8 @@ Xefis::Xefis (int& argc, char** argv):
 	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
 	_data_updater->start();
 
-	_machine = std::make_unique<Cthulhu> (this);
+	// TODO this is a hack, make it configurable or runtime selectable
+	_machine = std::make_unique<CthulhuGCS> (this);
 }
 
 

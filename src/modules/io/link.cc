@@ -266,8 +266,8 @@ Link::PropertyItem::produce (Blob& blob)
 	enum class Kind { Integer, Float };
 
 	Kind kind = Kind::Integer;
-	xf::PropertyInteger::Type integer_value = 0;
-	xf::PropertyFloat::Type float_value = 0.f;
+	v1::PropertyInteger::Type integer_value = 0;
+	v1::PropertyFloat::Type float_value = 0.f;
 
 #define XEFIS_CASE_FLOAT(type, property) \
 	case Type::type: \
@@ -618,7 +618,7 @@ Link::BitfieldItem::produce (Blob& blob)
 			bits.push_back (*bs.property_boolean);
 		else
 		{
-			xf::PropertyInteger::Type value = *bs.property_integer;
+			v1::PropertyInteger::Type value = *bs.property_integer;
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				bits.push_back ((value >> b) & 1);
 		}
@@ -657,7 +657,7 @@ Link::BitfieldItem::eat (Blob::iterator begin, Blob::iterator end)
 			bs.boolean_value = *bit;
 		else
 		{
-			xf::PropertyInteger::Type value = 0;
+			v1::PropertyInteger::Type value = 0;
 			for (uint8_t b = 0; b < bs.bits; ++b)
 				if (*(bit + b))
 					value |= 1 << b;
@@ -841,7 +841,7 @@ Link::Packet::produce (Blob& blob)
 }
 
 
-Link::Link (xf::ModuleManager* module_manager, QDomElement const& config):
+Link::Link (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	Frequency output_frequency = 1_Hz;

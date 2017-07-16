@@ -27,7 +27,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("helpers/transistor", Transistor)
 
 
-Transistor::Transistor (xf::ModuleManager* module_manager, QDomElement const& config):
+Transistor::Transistor (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {
@@ -41,7 +41,7 @@ Transistor::Transistor (xf::ModuleManager* module_manager, QDomElement const& co
 		{ "output.value", _output_value, true },
 	});
 
-	_transistor = std::make_unique<xf::Transistor<xf::PropertyFloat::Type>> (_transition_time);
+	_transistor = std::make_unique<xf::Transistor<v1::PropertyFloat::Type>> (_transition_time);
 
 	_observer.set_callback (std::bind (&Transistor::input_changed, this));
 	_observer.observe ({

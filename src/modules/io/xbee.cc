@@ -62,7 +62,7 @@ constexpr Time		XBee::AfterRestartGraceTime;
 constexpr Time		XBee::RSSITimeout;
 
 
-XBee::XBee (xf::ModuleManager* module_manager, QDomElement const& config):
+XBee::XBee (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

@@ -20,7 +20,7 @@
 
 namespace xf {
 
-DeltaDecoder::DeltaDecoder (xf::PropertyInteger value_property, Callback callback):
+DeltaDecoder::DeltaDecoder (v1::PropertyInteger value_property, Callback callback):
 	_prev (value_property.read (0)),
 	_value_property (value_property),
 	_callback (callback)
