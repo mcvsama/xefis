@@ -36,12 +36,16 @@ template<class T>
 		auto source_ptr = &source;
 
 		g_copy_to_v1.push_back ([=]() {
+#if 0
 			std::cout << "COPYING v2 >> v1: ";
+
 			if (*source_ptr)
 				std::cout << *source_ptr;
 			else
 				std::cout << "(nil)";
+
 			std::cout << "\n";
+#endif
 			target = source_ptr->get_optional();
 		});
 	}
@@ -54,12 +58,16 @@ template<class T>
 		auto target_ptr = &target;
 
 		g_copy_to_v2.push_back ([=]() {
+#if 0
 			std::cout << "COPYING v1 >> v2: ";
+
 			if (source.valid())
 				std::cout << *source;
 			else
 				std::cout << "(nil)";
+
 			std::cout << "\n";
+#endif
 			*target_ptr = source.get_optional();
 		});
 	}
