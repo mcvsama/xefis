@@ -18,7 +18,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
-#include <xefis/core/module_manager.h>
+#include <xefis/core/v1/module_manager.h>
 #include <xefis/support/air/wind_triangle.h>
 #include <xefis/support/air/air.h>
 #include <xefis/support/airframe/airframe.h>

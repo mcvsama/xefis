@@ -22,7 +22,8 @@
 #include "property_node.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 void
 PropertyNode::update_path()
@@ -201,5 +202,5 @@ PropertyDirectoryNode::clear()
 	_children_by_name.clear();
 }
 
-} // namespace xf
+} // namespace v1
 

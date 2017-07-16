@@ -54,7 +54,7 @@ template<class P>
 	}
 
 
-State::State (xf::ModuleManager* module_manager, QDomElement const& config):
+State::State (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	// TODO not hardcoded
@@ -140,7 +140,7 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	// EFIS panel
 
-	_efis_mins_mode_button = std::make_unique<xf::ButtonAction> (xf::PropertyBoolean (xf::PropertyPath ("/panels/mcp/efis/button.mins-mode")), [&] {
+	_efis_mins_mode_button = std::make_unique<v1::ButtonAction> (v1::PropertyBoolean (xf::PropertyPath ("/panels/mcp/efis/button.mins-mode")), [&] {
 		if (_minimums_type == MinimumsType::Baro)
 			_minimums_type = MinimumsType::Radio;
 		else
@@ -150,7 +150,7 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	// COURSE panel
 
-	_navaid_select_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-main"), {
+	_navaid_select_panel = Unique<v1::ButtonOptionsAction> (new v1::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-main"), {
 		{ "/panels/mcp/navaid/button.off", "/panels/mcp/navaid/led.off", -1, true },
 		{ "/panels/mcp/navaid/button.ils", "/panels/mcp/navaid/led.ils", 0 },
 		{ "/panels/mcp/navaid/button.vor-l", "/panels/mcp/navaid/led.vor-l", 1 },
@@ -159,13 +159,13 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	// NAVAID L/R panel
 
-	_navaid_left_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-left"), {
+	_navaid_left_panel = Unique<v1::ButtonOptionsAction> (new v1::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-left"), {
 		{ "/panels/mcp/navaid-left/button.off", "/panels/mcp/navaid-left/led.off", -1, true },
 		{ "/panels/mcp/navaid-left/button.vor", "/panels/mcp/navaid-left/led.vor", 0 },
 		{ "/panels/mcp/navaid-left/button.home", "/panels/mcp/navaid-left/led.home", 1 },
 	}));
 
-	_navaid_right_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-right"), {
+	_navaid_right_panel = Unique<v1::ButtonOptionsAction> (new v1::ButtonOptionsAction (xf::PropertyPath ("/settings/navaid/selected-right"), {
 		{ "/panels/mcp/navaid-right/button.off", "/panels/mcp/navaid-right/led.off", -1, true },
 		{ "/panels/mcp/navaid-right/button.vor", "/panels/mcp/navaid-right/led.vor", 0 },
 		{ "/panels/mcp/navaid-right/button.home", "/panels/mcp/navaid-right/led.home", 1 },
@@ -173,7 +173,7 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	// MFD panel
 
-	_mfd_panel = Unique<xf::ButtonOptionsAction> (new xf::ButtonOptionsAction (xf::PropertyPath ("/settings/efis/mfd-mode"), {
+	_mfd_panel = Unique<v1::ButtonOptionsAction> (new v1::ButtonOptionsAction (xf::PropertyPath ("/settings/efis/mfd-mode"), {
 		{ "/panels/mcp/mfd/button.eicas", "/panels/mcp/mfd/led.eicas", 0, true },
 		{ "/panels/mcp/mfd/button.nd", "/panels/mcp/mfd/led.nd", 1 },
 		{ "/panels/mcp/mfd/button.chkl", "/panels/mcp/mfd/led.chkl", 2 },
@@ -183,7 +183,7 @@ State::State (xf::ModuleManager* module_manager, QDomElement const& config):
 
 	// AFCS/FBW panel
 
-	_afcs_ap_button = std::make_unique<xf::ToggleButtonAction> (xf::PropertyPath ("/panels/mcp/afcs/button.ap"), xf::PropertyPath ("/panels/mcp/afcs/led.ap"));
+	_afcs_ap_button = std::make_unique<v1::ToggleButtonAction> (xf::PropertyPath ("/panels/mcp/afcs/button.ap"), xf::PropertyPath ("/panels/mcp/afcs/led.ap"));
 	_afcs_ap_button->set_callback ([&](bool state) {
 		if (state)
 			_setting_efis_fd_visible.write (true);
@@ -199,7 +199,7 @@ State::data_updated()
 	for (xf::DeltaDecoder* r: _rotary_decoders)
 		r->data_updated();
 
-	std::vector<xf::Action*> actions = {
+	std::vector<v1::Action*> actions = {
 		_efis_mins_mode_button.get(),
 		_navaid_select_panel.get(),
 		_navaid_left_panel.get(),
@@ -351,9 +351,9 @@ State::solve_course()
 
 
 void
-State::make_switch (Observable<xf::PropertyBoolean>& bool_observable, std::function<void()> callback)
+State::make_switch (Observable<v1::PropertyBoolean>& bool_observable, std::function<void()> callback)
 {
-	bool_observable.set_callback ([callback,this](xf::PropertyBoolean& prop) {
+	bool_observable.set_callback ([callback,this](v1::PropertyBoolean& prop) {
 		if (*prop)
 			callback();
 	});
@@ -361,9 +361,9 @@ State::make_switch (Observable<xf::PropertyBoolean>& bool_observable, std::funct
 
 
 void
-State::make_toggle (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyBoolean& target_switch)
+State::make_toggle (Observable<v1::PropertyBoolean>& bool_observable, v1::PropertyBoolean& target_switch)
 {
-	bool_observable.set_callback ([&](xf::PropertyBoolean& prop) {
+	bool_observable.set_callback ([&](v1::PropertyBoolean& prop) {
 		if (*prop)
 			target_switch.write (!*target_switch);
 	});
@@ -371,9 +371,9 @@ State::make_toggle (Observable<xf::PropertyBoolean>& bool_observable, xf::Proper
 
 
 void
-State::make_int_writer (Observable<xf::PropertyBoolean>& bool_observable, xf::PropertyInteger& target_property, int value)
+State::make_int_writer (Observable<v1::PropertyBoolean>& bool_observable, v1::PropertyInteger& target_property, int value)
 {
-	bool_observable.set_callback ([&target_property,value,this](xf::PropertyBoolean& prop) {
+	bool_observable.set_callback ([&target_property,value,this](v1::PropertyBoolean& prop) {
 		if (*prop)
 			target_property.write (value);
 	});

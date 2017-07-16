@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/core/v1/window.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/string.h>
@@ -77,8 +77,8 @@ Datatable::LabelValue::stringify() const
 }
 
 
-Datatable::Datatable (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config),
+Datatable::Datatable (v1::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager, config),
 	InstrumentAids (0.5f)
 {
 	QString label_color_str;
@@ -116,7 +116,7 @@ Datatable::data_updated()
 void
 Datatable::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 
@@ -161,7 +161,7 @@ Datatable::paintEvent (QPaintEvent*)
 		try {
 			lv_s = lv.stringify();
 		}
-		catch (xf::StringifyError const& exception)
+		catch (v1::StringifyError const& exception)
 		{
 			painter().setPen (get_pen (Qt::red, 1.0));
 			lv_s = exception.what();

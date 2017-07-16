@@ -25,10 +25,10 @@
 XEFIS_REGISTER_MODULE_CLASS ("helpers/navaid-selector", NavaidSelector)
 
 
-NavaidSelector::NavaidSelector (xf::ModuleManager* module_manager, QDomElement const& config):
+NavaidSelector::NavaidSelector (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
-	xf::ConfigReader::PropertiesParser::PropertiesList properties_list;
+	v1::ConfigReader::PropertiesParser::PropertiesList properties_list;
 
 	for (std::size_t i = 0; i < MaxInputs; ++i)
 	{

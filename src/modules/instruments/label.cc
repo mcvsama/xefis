@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/core/v1/window.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/qdom.h>
@@ -32,8 +32,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/label", Label)
 
 
-Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config),
+Label::Label (v1::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager, config),
 	InstrumentAids (1.f)
 {
 	for (QDomElement const& e: xf::iterate_sub_elements (config))
@@ -53,7 +53,7 @@ Label::Label (xf::ModuleManager* module_manager, QDomElement const& config):
 void
 Label::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 

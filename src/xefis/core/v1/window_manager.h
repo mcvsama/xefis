@@ -11,45 +11,48 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+#ifndef XEFIS__CORE__WINDOW_MANAGER_H__INCLUDED
+#define XEFIS__CORE__WINDOW_MANAGER_H__INCLUDED
+
 // Standard:
 #include <cstddef>
+#include <set>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/window.h>
 
-// Local:
-#include "window_manager.h"
 
+namespace v1 {
+using namespace xf;
 
-namespace xf {
-
-WindowManager::WindowManager()
+class WindowManager: public QWidget
 {
-	_logger.set_prefix ("<window manager>");
-	_logger << "Creating WindowManager" << std::endl;
-}
+  public:
+	// Ctor
+	WindowManager();
 
+	// Dtor
+	~WindowManager();
 
-WindowManager::~WindowManager()
-{
-	_logger << "Destroying WindowManager" << std::endl;
-}
+	/**
+	 * Add window to be managed.
+	 */
+	void
+	add_window (Unique<Window>);
 
+	/**
+	 * Call data_updated() on all windows.
+	 */
+	void
+	data_updated (Time const& update_time);
 
-void
-WindowManager::add_window (Unique<Window> window)
-{
-	_windows.insert (std::move (window));
-}
+  private:
+	Logger						_logger;
+	std::set<Unique<Window>>	_windows;
+};
 
+} // namespace v1
 
-void
-WindowManager::data_updated (Time const& update_time)
-{
-	for (auto const& window: _windows)
-		window->data_updated (update_time);
-}
-
-} // namespace xf
+#endif
 

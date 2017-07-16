@@ -30,7 +30,7 @@
  */
 class Sound:
 	public QObject,
-	public xf::Module
+	public v1::Module
 {
 	Q_OBJECT
 
@@ -80,7 +80,7 @@ class Sound:
 
 	  private:
 		QString							_sound_file_path;
-		xf::PropertyBoolean				_property;
+		v1::PropertyBoolean				_property;
 		Weak<xf::SoundManager::Sound>	_sound;
 		int32_t							_priority;
 		bool							_repeat;
@@ -111,7 +111,7 @@ class Sound:
 
   public:
 	// Ctor
-	Sound (xf::ModuleManager*, QDomElement const& config);
+	Sound (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

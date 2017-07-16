@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/core/v1/window.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
@@ -29,8 +29,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/flaps", Flaps)
 
 
-Flaps::Flaps (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config),
+Flaps::Flaps (v1::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager, config),
 	InstrumentAids (2.f)
 {
 	parse_settings (config, {
@@ -58,7 +58,7 @@ Flaps::data_updated()
 void
 Flaps::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 

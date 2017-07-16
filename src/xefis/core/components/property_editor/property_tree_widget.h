@@ -26,9 +26,12 @@
 #include <xefis/core/v1/property_node.h>
 
 
+namespace v1 {
+class PropertyNode;
+}
+
 namespace xf {
 
-class PropertyNode;
 class PropertyTreeWidgetItem;
 
 class PropertyTreeWidget: public QTreeWidget
@@ -44,20 +47,20 @@ class PropertyTreeWidget: public QTreeWidget
   public:
 	// Ctor
 	explicit
-	PropertyTreeWidget (PropertyNode* root_node, QWidget* parent);
+	PropertyTreeWidget (v1::PropertyNode* root_node, QWidget* parent);
 
 	/**
 	 * Return PropertyNode for the selected item.
 	 * May return nullptr, if nothing is selected.
 	 */
-	PropertyNode*
+	v1::PropertyNode*
 	selected_property_node() const;
 
 	/**
 	 * Return true if given string contains "binary data".
 	 */
 	static bool
-	contains_binary_data (TypedPropertyValueNode const*);
+	contains_binary_data (v1::TypedPropertyValueNode const*);
 
   public slots:
 	/**
@@ -72,7 +75,7 @@ class PropertyTreeWidget: public QTreeWidget
 	 * Read data for the given item.
 	 */
 	void
-	read (QTreeWidgetItem*, PropertyNode*);
+	read (QTreeWidgetItem*, v1::PropertyNode*);
 
 	/**
 	 * Dynamically casts item to PropertyTreeWidgetItem.
@@ -119,8 +122,8 @@ class PropertyTreeWidget: public QTreeWidget
 	hideEvent (QHideEvent*) override;
 
   private:
-	QTimer*			_refresh_timer;
-	PropertyNode*	_root_node;
+	QTimer*				_refresh_timer;
+	v1::PropertyNode*	_root_node;
 };
 
 } // namespace xf

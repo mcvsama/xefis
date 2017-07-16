@@ -37,8 +37,12 @@
 
 
 namespace xf {
-
 class Panel;
+}
+
+namespace v1 {
+using namespace xf;
+
 class ConfigReader;
 class Instrument;
 
@@ -97,7 +101,7 @@ class Window: public QWidget
   public:
 	// Ctor
 	explicit
-	Window (Xefis*, ConfigReader*, QDomElement const&);
+	Window (Xefis*, v1::ConfigReader*, QDomElement const&);
 
 	// Dtor
 	~Window();
@@ -176,7 +180,7 @@ class Window: public QWidget
 	Decorators		_decorators;
 };
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

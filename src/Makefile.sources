@@ -182,6 +182,7 @@ XEFIS_HEADERS			+= xefis/core/v1/property_observer.h
 XEFIS_HEADERS			+= xefis/core/v1/property_storage.h
 XEFIS_HEADERS			+= xefis/core/v1/property_utils.h
 XEFIS_HEADERS_MOC		+= xefis/core/v1/window.h
+XEFIS_HEADERS			+= xefis/core/v1/window_manager.h
 XEFIS_HEADERS			+= xefis/core/v2/compatibility_v1_v2.h
 XEFIS_HEADERS			+= xefis/core/v2/cycle.h
 XEFIS_HEADERS			+= xefis/core/v2/instrument.h
@@ -207,7 +208,6 @@ XEFIS_HEADERS_MOC		+= xefis/core/services.h
 XEFIS_HEADERS			+= xefis/core/sound_manager.h
 XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
-XEFIS_HEADERS			+= xefis/core/window_manager.h
 XEFIS_HEADERS			+= xefis/core/work_performer.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
@@ -220,6 +220,7 @@ XEFIS_SOURCES			+= xefis/core/v1/property_observer.cc
 XEFIS_SOURCES			+= xefis/core/v1/property_storage.cc
 XEFIS_SOURCES			+= xefis/core/v1/property_utils.cc
 XEFIS_SOURCES			+= xefis/core/v1/window.cc
+XEFIS_SOURCES			+= xefis/core/v1/window_manager.cc
 XEFIS_SOURCES			+= xefis/core/v2/compatibility_v1_v2.cc
 XEFIS_SOURCES			+= xefis/core/v2/instrument.cc
 XEFIS_SOURCES			+= xefis/core/v2/machine.cc
@@ -238,7 +239,6 @@ XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/sound_manager.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
-XEFIS_SOURCES			+= xefis/core/window_manager.cc
 XEFIS_SOURCES			+= xefis/core/work_performer.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
@@ -410,10 +410,10 @@ XEFIS_HEADERS			+= xefis/test/test_asserts.h>
 
 ######## /xefis/utility ########
 
+XEFIS_HEADERS			+= xefis/utility/v1/actions.h
 XEFIS_HEADERS			+= xefis/utility/v2/actions.h
 XEFIS_HEADERS			+= xefis/utility/v2/callback_actions.h
 XEFIS_HEADERS			+= xefis/utility/v2/delta_decoder.h
-XEFIS_HEADERS			+= xefis/utility/actions.h
 XEFIS_HEADERS			+= xefis/utility/backtrace.h
 XEFIS_HEADERS			+= xefis/utility/blob.h
 XEFIS_HEADERS			+= xefis/utility/convergence.h

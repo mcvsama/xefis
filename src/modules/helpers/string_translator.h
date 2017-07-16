@@ -20,14 +20,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
 /**
  * Map input strings to output strings.
  */
-class StringTranslator: public xf::Module
+class StringTranslator: public v1::Module
 {
 	/**
 	 * Represents set of one translations
@@ -35,7 +35,7 @@ class StringTranslator: public xf::Module
 	 */
 	class StringsSet
 	{
-		typedef std::map<xf::PropertyInteger::Type, xf::PropertyString::Type> Map;
+		typedef std::map<v1::PropertyInteger::Type, v1::PropertyString::Type> Map;
 
 	  public:
 		// Ctor
@@ -55,15 +55,15 @@ class StringTranslator: public xf::Module
 		update();
 
 	  private:
-		xf::PropertyInteger			_input;
-		xf::PropertyString			_output;
+		v1::PropertyInteger			_input;
+		v1::PropertyString			_output;
 		Map							_map;
-		xf::PropertyString::Type	_default;
+		v1::PropertyString::Type	_default;
 	};
 
   public:
 	// Ctor
-	StringTranslator (xf::ModuleManager*, QDomElement const& config);
+	StringTranslator (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void

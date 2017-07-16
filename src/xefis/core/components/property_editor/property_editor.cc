@@ -31,7 +31,7 @@
 
 namespace xf {
 
-PropertyEditor::PropertyEditor (PropertyNode* root_node, QWidget* parent):
+PropertyEditor::PropertyEditor (v1::PropertyNode* root_node, QWidget* parent):
 	QWidget (parent)
 {
 	_property_tree_widget = new PropertyTreeWidget (root_node, this);
@@ -89,7 +89,7 @@ PropertyEditor::handle_context_menu_request (QTreeWidgetItem* item, QPoint const
 
 	QMenu* menu = new QMenu (this);
 	QAction* set_nil_action = menu->addAction ("Set <nil>", this, SLOT (context_item_set_nil()));
-	set_nil_action->setEnabled (!!dynamic_cast<TypedPropertyValueNode*> (prop_item->node()));
+	set_nil_action->setEnabled (!!dynamic_cast<v1::TypedPropertyValueNode*> (prop_item->node()));
 
 	_context_item = prop_item;
 	menu->exec (pos);
@@ -108,12 +108,12 @@ PropertyEditor::set_line_edit_color (QColor color)
 void
 PropertyEditor::item_selected()
 {
-	PropertyNode* node = _property_tree_widget->selected_property_node();
+	v1::PropertyNode* node = _property_tree_widget->selected_property_node();
 	if (node)
 	{
 		QWidget* widgets[] = { _editable_value, _update_button, _set_nil_button };
 
-		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+		v1::TypedPropertyValueNode* val_node = dynamic_cast<v1::TypedPropertyValueNode*> (node);
 		if (!val_node || PropertyTreeWidget::contains_binary_data (val_node))
 		{
 			_editable_value->setText ("");
@@ -139,10 +139,10 @@ PropertyEditor::item_changed (QTreeWidgetItem* item, int column)
 	PropertyTreeWidgetItem* prop_item = dynamic_cast<PropertyTreeWidgetItem*> (item);
 	if (!prop_item)
 		return;
-	PropertyNode* node = prop_item->node();
+	v1::PropertyNode* node = prop_item->node();
 	if (!node)
 		return;
-	PropertyValueNode<bool>* node_bool = dynamic_cast<PropertyValueNode<bool>*> (node);
+	v1::PropertyValueNode<bool>* node_bool = dynamic_cast<v1::PropertyValueNode<bool>*> (node);
 	if (node_bool)
 	{
 		bool checked = prop_item->checkState (column) == Qt::Checked;
@@ -159,10 +159,10 @@ PropertyEditor::item_changed (QTreeWidgetItem* item, int column)
 void
 PropertyEditor::update_item()
 {
-	PropertyNode* node = _property_tree_widget->selected_property_node();
+	v1::PropertyNode* node = _property_tree_widget->selected_property_node();
 	if (!node)
 		return;
-	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+	v1::TypedPropertyValueNode* val_node = dynamic_cast<v1::TypedPropertyValueNode*> (node);
 	if (!val_node)
 		return;
 
@@ -185,10 +185,10 @@ PropertyEditor::update_item()
 void
 PropertyEditor::reset_item()
 {
-	PropertyNode* node = _property_tree_widget->selected_property_node();
+	v1::PropertyNode* node = _property_tree_widget->selected_property_node();
 	if (!node)
 		return;
-	TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (node);
+	v1::TypedPropertyValueNode* val_node = dynamic_cast<v1::TypedPropertyValueNode*> (node);
 	if (!val_node)
 		return;
 
@@ -220,7 +220,7 @@ PropertyEditor::context_item_set_nil()
 {
 	if (_context_item)
 	{
-		TypedPropertyValueNode* val_node = dynamic_cast<TypedPropertyValueNode*> (_context_item->node());
+		v1::TypedPropertyValueNode* val_node = dynamic_cast<v1::TypedPropertyValueNode*> (_context_item->node());
 		if (!val_node)
 			return;
 

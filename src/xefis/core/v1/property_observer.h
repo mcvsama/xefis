@@ -27,7 +27,8 @@
 #include "property.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 /**
  * Observes a set of properties, and checks if their values have changed.
@@ -235,7 +236,7 @@ PropertyObserver::touch() noexcept
 	_touch = true;
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

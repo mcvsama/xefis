@@ -31,7 +31,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/hsi", HSI)
 
 
-HSI::HSI (xf::ModuleManager* module_manager, QDomElement const& config):
+HSI::HSI (v1::ModuleManager* module_manager, QDomElement const& config):
 	Instrument (module_manager, config)
 {
 	parse_settings (config, {

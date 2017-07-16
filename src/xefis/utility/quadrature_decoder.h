@@ -20,7 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v1/property.h>
 
 
 namespace xf {
@@ -38,7 +38,7 @@ class QuadratureDecoder
   public:
 	// Ctor
 	explicit
-	QuadratureDecoder (xf::PropertyBoolean& property_a, xf::PropertyBoolean& property_b, Callback callback);
+	QuadratureDecoder (v1::PropertyBoolean& property_a, v1::PropertyBoolean& property_b, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -62,8 +62,8 @@ class QuadratureDecoder
   private:
 	bool					_prev_a;
 	bool					_prev_b;
-	xf::PropertyBoolean&	_property_a;
-	xf::PropertyBoolean&	_property_b;
+	v1::PropertyBoolean&	_property_a;
+	v1::PropertyBoolean&	_property_b;
 	Callback				_callback;
 };
 

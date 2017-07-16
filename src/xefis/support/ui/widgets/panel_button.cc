@@ -26,7 +26,7 @@
 
 namespace xf {
 
-PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, PropertyBoolean click_property, PropertyBoolean toggle_property, PropertyBoolean led_property):
+PanelButton::PanelButton (QWidget* parent, Panel* panel, LEDColor color, v1::PropertyBoolean click_property, v1::PropertyBoolean toggle_property, v1::PropertyBoolean led_property):
 	PanelWidget (parent, panel),
 	_click_property (click_property),
 	_toggle_property (toggle_property),

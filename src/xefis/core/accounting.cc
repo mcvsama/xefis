@@ -102,17 +102,17 @@ Accounting::~Accounting()
 
 
 Accounting::Stats const&
-Accounting::module_stats (Module::Pointer modptr, Timespan timespan) const
+Accounting::module_stats (v1::Module::Pointer modptr, Timespan timespan) const
 {
 	ModuleStats::const_iterator ms = _module_stats.find (modptr);
 	if (ms != _module_stats.end())
 		return ms->second.select (timespan);
-	throw ModuleNotFoundException (QString ("stats for module '%1', instance '%2' can't be found").arg (modptr.name().c_str()).arg (modptr.instance().c_str()).toStdString());
+	throw v1::ModuleNotFoundException (QString ("stats for module '%1', instance '%2' can't be found").arg (modptr.name().c_str()).arg (modptr.instance().c_str()).toStdString());
 }
 
 
 void
-Accounting::add_module_stats (Module::Pointer modptr, Time dt)
+Accounting::add_module_stats (v1::Module::Pointer modptr, Time dt)
 {
 	StatsSet& ss = _module_stats[modptr];
 	for (Stats* s: { &ss.e1, &ss.e2, &ss.e3 })

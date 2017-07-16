@@ -46,7 +46,7 @@ GroupBox::set_padding (std::array<int, 4> const& padding)
 void
 GroupBox::resizeEvent (QResizeEvent*)
 {
-	auto xw = dynamic_cast<xf::Window*> (window());
+	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		set_scaling (xw->pen_scale(), xw->font_scale());
 

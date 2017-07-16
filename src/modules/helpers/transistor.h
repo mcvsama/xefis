@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 #include <xefis/core/v1/property_observer.h>
 #include <xefis/utility/transistor.h>
@@ -28,11 +28,11 @@
 /**
  * Linearly transition between two values.
  */
-class Transistor: public xf::Module
+class Transistor: public v1::Module
 {
   public:
 	// Ctor
-	Transistor (xf::ModuleManager*, QDomElement const& config);
+	Transistor (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -44,15 +44,15 @@ class Transistor: public xf::Module
   private:
 	Time					_transition_time	= 1_s;
 	// I/O:
-	xf::PropertyFloat		_input_0_value;
-	xf::PropertyFloat		_input_1_value;
-	xf::PropertyInteger		_input_selected;
-	xf::PropertyFloat		_output_value;
+	v1::PropertyFloat		_input_0_value;
+	v1::PropertyFloat		_input_1_value;
+	v1::PropertyInteger		_input_selected;
+	v1::PropertyFloat		_output_value;
 	// Other:
-	xf::PropertyFloat::Type	_last_0_value		= xf::PropertyFloat::Type();
-	xf::PropertyFloat::Type	_last_1_value		= xf::PropertyFloat::Type();
-	xf::PropertyObserver	_observer;
-	Unique<xf::Transistor<xf::PropertyFloat::Type>>
+	v1::PropertyFloat::Type	_last_0_value		= {};
+	v1::PropertyFloat::Type	_last_1_value		= {};
+	v1::PropertyObserver	_observer;
+	Unique<xf::Transistor<v1::PropertyFloat::Type>>
 							_transistor;
 };
 

@@ -51,7 +51,7 @@ ConfiguratorWidget::OwnershipBreakingDecorator::~OwnershipBreakingDecorator()
 }
 
 
-ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Xefis* xefis, Module* module, ConfiguratorWidget* configurator_widget, QWidget* parent):
+ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (Xefis* xefis, v1::Module* module, ConfiguratorWidget* configurator_widget, QWidget* parent):
 	QWidget (parent),
 	_xefis (xefis),
 	_module (module),
@@ -123,7 +123,7 @@ ConfiguratorWidget::ConfiguratorWidget (Xefis* xefis, QWidget* parent):
 	_no_module_selected = new QLabel ("No module selected", this);
 	_no_module_selected->setAlignment (Qt::AlignCenter);
 
-	_property_editor = new PropertyEditor (PropertyStorage::default_storage()->root(), this);
+	_property_editor = new PropertyEditor (v1::PropertyStorage::default_storage()->root(), this);
 
 	_modules_list = new ModulesList (_xefis->module_manager(), this);
 	_modules_list->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Minimum);
@@ -157,9 +157,9 @@ ConfiguratorWidget::ConfiguratorWidget (Xefis* xefis, QWidget* parent):
 
 
 void
-ConfiguratorWidget::module_selected (Module::Pointer const& module_pointer)
+ConfiguratorWidget::module_selected (v1::Module::Pointer const& module_pointer)
 {
-	Module* module = _xefis->module_manager()->find (module_pointer);
+	v1::Module* module = _xefis->module_manager()->find (module_pointer);
 	if (module)
 	{
 		auto gmw = _general_module_widgets.find (module);

@@ -33,7 +33,7 @@ class DeltaDecoder
   public:
 	// Ctor
 	explicit
-	DeltaDecoder (xf::PropertyInteger value_property, Callback callback);
+	DeltaDecoder (v1::PropertyInteger value_property, Callback callback);
 
 	/**
 	 * Signals that properties have been
@@ -55,8 +55,8 @@ class DeltaDecoder
 	call (int delta);
 
   private:
-	xf::PropertyInteger::Type	_prev;
-	xf::PropertyInteger			_value_property;
+	v1::PropertyInteger::Type	_prev;
+	v1::PropertyInteger			_value_property;
 	Callback					_callback;
 };
 

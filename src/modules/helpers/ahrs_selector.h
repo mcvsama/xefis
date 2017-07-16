@@ -19,20 +19,20 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
 
 
 /**
  * Select one of many AHRS data sources.
  */
-class AHRSSelector: public xf::Module
+class AHRSSelector: public v1::Module
 {
 	static constexpr std::size_t MaxInputs = 2;
 
   public:
 	// Ctor
-	AHRSSelector (xf::ModuleManager*, QDomElement const& config);
+	AHRSSelector (v1::ModuleManager*, QDomElement const& config);
 
   protected:
 	void
@@ -54,27 +54,27 @@ class AHRSSelector: public xf::Module
 		copy_if_different (PropertyType& input_property, PropertyType& output_property);
 
 	static bool
-	compute_disagree_flag (xf::PropertyAngle const& first, xf::PropertyAngle const& second, Angle threshold);
+	compute_disagree_flag (v1::PropertyAngle const& first, v1::PropertyAngle const& second, Angle threshold);
 
   private:
 	Angle											_setting_pitch_disagree_threshold;
 	Angle											_setting_roll_disagree_threshold;
 	Angle											_setting_magnetic_heading_disagree_threshold;
 	// Input:
-	xf::PropertyInteger								_selected_input;
-	std::array<xf::PropertyBoolean, MaxInputs>		_inputs_serviceable;
-	std::array<xf::PropertyAngle, MaxInputs>		_inputs_orientation_pitch;
-	std::array<xf::PropertyAngle, MaxInputs>		_inputs_orientation_roll;
-	std::array<xf::PropertyAngle, MaxInputs>		_inputs_orientation_magnetic_heading;
+	v1::PropertyInteger								_selected_input;
+	std::array<v1::PropertyBoolean, MaxInputs>		_inputs_serviceable;
+	std::array<v1::PropertyAngle, MaxInputs>		_inputs_orientation_pitch;
+	std::array<v1::PropertyAngle, MaxInputs>		_inputs_orientation_roll;
+	std::array<v1::PropertyAngle, MaxInputs>		_inputs_orientation_magnetic_heading;
 	// Output:
-	xf::PropertyBoolean								_output_serviceable;
-	xf::PropertyAngle								_output_orientation_pitch;
-	xf::PropertyAngle								_output_orientation_roll;
-	xf::PropertyAngle								_output_orientation_magnetic_heading;
-	xf::PropertyBoolean								_output_pitch_disagree_flag;
-	xf::PropertyBoolean								_output_roll_disagree_flag;
-	xf::PropertyBoolean								_output_magnetic_heading_disagree_flag;
-	xf::PropertyBoolean								_output_failover_flag;
+	v1::PropertyBoolean								_output_serviceable;
+	v1::PropertyAngle								_output_orientation_pitch;
+	v1::PropertyAngle								_output_orientation_roll;
+	v1::PropertyAngle								_output_orientation_magnetic_heading;
+	v1::PropertyBoolean								_output_pitch_disagree_flag;
+	v1::PropertyBoolean								_output_roll_disagree_flag;
+	v1::PropertyBoolean								_output_magnetic_heading_disagree_flag;
+	v1::PropertyBoolean								_output_failover_flag;
 };
 
 #endif

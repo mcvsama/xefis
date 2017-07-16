@@ -22,7 +22,8 @@
 #include "property_utils.h"
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 static xf::Mutex $check_validity_entry_mutex;
 
@@ -65,5 +66,5 @@ PropertyType::check_validity (std::string const& type)
 	return type;
 }
 
-} // namespace xf
+} // namespace v1
 

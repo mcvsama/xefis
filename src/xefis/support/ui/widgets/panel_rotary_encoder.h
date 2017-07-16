@@ -43,7 +43,7 @@ class PanelRotaryEncoder: public PanelWidget
 	 */
 	explicit
 	PanelRotaryEncoder (QWidget* parent, Panel*, QString const& knob_label,
-						PropertyInteger value_property, PropertyBoolean click_property);
+						v1::PropertyInteger value_property, v1::PropertyBoolean click_property);
 
   protected:
 	void
@@ -72,14 +72,14 @@ class PanelRotaryEncoder: public PanelWidget
 	write();
 
   private:
-	Unique<QTimer>			_click_timer;
-	QPoint					_mouse_last_position;
-	bool					_mouse_pressed			= false;
-	QString					_knob_label;
-	Angle					_angle					= 0_deg;
-	PropertyInteger::Type	_value					= 0;
-	PropertyInteger			_value_property;
-	PropertyBoolean			_click_property;
+	Unique<QTimer>				_click_timer;
+	QPoint						_mouse_last_position;
+	bool						_mouse_pressed			= false;
+	QString						_knob_label;
+	si::Angle					_angle					= 0_deg;
+	v1::PropertyInteger::Type	_value					= 0;
+	v1::PropertyInteger			_value_property;
+	v1::PropertyBoolean			_click_property;
 };
 
 } // namespace xf

@@ -31,8 +31,8 @@
 XEFIS_REGISTER_MODULE_CLASS ("instruments/linear-indicator", LinearIndicator)
 
 
-LinearIndicator::LinearIndicator (xf::ModuleManager* module_manager, QDomElement const& config):
-	xf::Instrument (module_manager, config)
+LinearIndicator::LinearIndicator (v1::ModuleManager* module_manager, QDomElement const& config):
+	Instrument (module_manager, config)
 {
 	_widget = new LinearIndicatorWidget (this);
 

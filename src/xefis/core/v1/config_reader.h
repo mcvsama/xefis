@@ -38,8 +38,12 @@
 
 
 namespace xf {
-
 class Xefis;
+}
+
+namespace v1 {
+using namespace xf;
+
 class ModuleManager;
 class Module;
 
@@ -464,7 +468,7 @@ ConfigReader::airframe_config() const
 	return _airframe_config;
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

@@ -71,12 +71,12 @@ class ConfiguratorWidget: public QWidget
 	  public:
 		// Ctor
 		explicit
-		GeneralModuleWidget (Xefis*, Module*, ConfiguratorWidget*, QWidget* parent);
+		GeneralModuleWidget (Xefis*, v1::Module*, ConfiguratorWidget*, QWidget* parent);
 
 		/**
 		 * Return module.
 		 */
-		Module*
+		v1::Module*
 		module() const noexcept;
 
 		/**
@@ -87,8 +87,8 @@ class ConfiguratorWidget: public QWidget
 
 	  private:
 		Xefis*				_xefis;
-		Module*				_module;
-		Module::Pointer		_module_ptr;
+		v1::Module*			_module;
+		v1::Module::Pointer	_module_ptr;
 		ConfiguratorWidget*	_configurator_widget;
 	};
 
@@ -97,15 +97,15 @@ class ConfiguratorWidget: public QWidget
 	explicit
 	ConfiguratorWidget (Xefis*, QWidget* parent);
 
-	Window*
+	v1::Window*
 	owning_window() const;
 
 	void
-	set_owning_window (Window*);
+	set_owning_window (v1::Window*);
 
   private:
 	void
-	module_selected (Module::Pointer const&);
+	module_selected (v1::Module::Pointer const&);
 
 	void
 	none_selected();
@@ -124,21 +124,21 @@ class ConfiguratorWidget: public QWidget
 	QStackedWidget*		_modules_stack			= nullptr;
 	DataRecorder*		_data_recorder			= nullptr;
 	QTabWidget*			_tabs					= nullptr;
-	Window*				_owning_window			= nullptr;
+	v1::Window*			_owning_window			= nullptr;
 	QLabel*				_no_module_selected		= nullptr;
-	std::map<Module*, Shared<GeneralModuleWidget>>
+	std::map<v1::Module*, Shared<GeneralModuleWidget>>
 						_general_module_widgets;
 };
 
 
-inline Module*
+inline v1::Module*
 ConfiguratorWidget::GeneralModuleWidget::module() const noexcept
 {
 	return _module;
 }
 
 
-inline Window*
+inline v1::Window*
 ConfiguratorWidget::owning_window() const
 {
 	return _owning_window;
@@ -146,7 +146,7 @@ ConfiguratorWidget::owning_window() const
 
 
 inline void
-ConfiguratorWidget::set_owning_window (Window* window)
+ConfiguratorWidget::set_owning_window (v1::Window* window)
 {
 	_owning_window = window;
 }

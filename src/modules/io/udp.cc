@@ -33,7 +33,7 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/udp", UDP)
 
 
-UDP::UDP (xf::ModuleManager* module_manager, QDomElement const& config):
+UDP::UDP (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	parse_settings (config, {

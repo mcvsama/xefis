@@ -55,7 +55,7 @@ class PanelNumericDisplay: public PanelWidget
 	 * Create 7-segment display for floatizable properties with display format provided in a property.
 	 */
 	explicit
-	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, PropertyString const& format_property);
+	PanelNumericDisplay (QWidget* parent, Panel*, unsigned int num_digits, std::string unit, PropertyPath const& value_property_path, v1::PropertyString const& format_property);
 
   protected:
 	void
@@ -84,9 +84,9 @@ class PanelNumericDisplay: public PanelWidget
 	unsigned int			_num_digits = 0;
 	std::string				_unit;
 	boost::format			_static_format;
-	PropertyString			_dynamic_format;
+	v1::PropertyString		_dynamic_format;
 	std::vector<QPixmap*>	_digits_to_display;	// Pointers not owned.
-	GenericProperty			_value_property;
+	v1::GenericProperty		_value_property;
 	std::array<QPixmap, 13>	_digit_images;		// [10] is minus sign, [11] is empty, [12] is dot.
 };
 

@@ -23,7 +23,8 @@
 #include <xefis/core/property_path.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 /**
  * Indicates a nil-node, for example when trying to read
@@ -269,7 +270,7 @@ PropertyType::string() const noexcept
 	return _type;
 }
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

@@ -31,7 +31,7 @@ extern std::list<std::function<void()>>	g_copy_to_v2;
 
 template<class T>
 	void
-	operator<< (Property<T> target, v2::PropertyOut<T>& source)
+	operator<< (v1::Property<T> target, v2::PropertyOut<T>& source)
 	{
 		auto source_ptr = &source;
 
@@ -53,7 +53,7 @@ template<class T>
 
 template<class T>
 	void
-	operator<< (v2::PropertyIn<T>& target, Property<T> source)
+	operator<< (v2::PropertyIn<T>& target, v1::Property<T> source)
 	{
 		auto target_ptr = &target;
 

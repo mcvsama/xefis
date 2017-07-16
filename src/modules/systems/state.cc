@@ -47,13 +47,13 @@ State::ConfigVariable::ConfigVariable (QDomElement const& config)
 
 	if (!config.hasAttribute ("type"))
 		throw xf::MissingDomAttribute (config, "type");
-	_type = xf::PropertyType (config.attribute ("type"));
+	_type = v1::PropertyType (config.attribute ("type"));
 
 	if (!config.hasAttribute ("path"))
 		throw xf::MissingDomAttribute (config, "path");
 	_path = xf::PropertyPath (config.attribute ("path"));
 
-	xf::GenericProperty::create (_path, _type);
+	v1::GenericProperty::create (_path, _type);
 	_property.set_path (_path);
 
 	if (config.hasAttribute ("default"))
@@ -89,7 +89,7 @@ State::ConfigVariable::set_path (xf::PropertyPath const& path)
 }
 
 
-inline xf::PropertyType const&
+inline v1::PropertyType const&
 State::ConfigVariable::type() const noexcept
 {
 	return _type;
@@ -97,20 +97,20 @@ State::ConfigVariable::type() const noexcept
 
 
 inline void
-State::ConfigVariable::set_type (xf::PropertyType const& type)
+State::ConfigVariable::set_type (v1::PropertyType const& type)
 {
 	_type = type;
 }
 
 
-inline xf::GenericProperty&
+inline v1::GenericProperty&
 State::ConfigVariable::property() noexcept
 {
 	return _property;
 }
 
 
-inline xf::GenericProperty const&
+inline v1::GenericProperty const&
 State::ConfigVariable::property() const noexcept
 {
 	return _property;
@@ -124,7 +124,7 @@ State::ConfigVariable::fresh() const noexcept
 }
 
 
-State::State (xf::ModuleManager* module_manager, QDomElement const& config):
+State::State (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	for (QDomElement const& e: xf::iterate_sub_elements (config))
@@ -228,7 +228,7 @@ State::load_state()
 					auto cv = _config_variables.find (id);
 					if (cv != _config_variables.end())
 					{
-						xf::PropertyType type (e.attribute ("type"));
+						v1::PropertyType type (e.attribute ("type"));
 						if (type == cv->second.type())
 						{
 							try {

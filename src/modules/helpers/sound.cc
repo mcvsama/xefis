@@ -21,6 +21,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/v1/module_manager.h>
 #include <xefis/core/sound_manager.h>
+#include <xefis/core/xefis.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/time_helper.h>
@@ -130,7 +131,7 @@ Sound::Group::check()
 }
 
 
-Sound::Sound (xf::ModuleManager* module_manager, QDomElement const& config):
+Sound::Sound (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
 	for (QDomElement const& e: xf::iterate_sub_elements (config))

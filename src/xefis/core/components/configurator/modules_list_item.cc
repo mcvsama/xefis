@@ -33,7 +33,7 @@
 
 namespace xf {
 
-ModulesListItem::ModulesListItem (Module::Pointer const& module_pointer, ModuleManager* module_manager, QTreeWidget* parent):
+ModulesListItem::ModulesListItem (v1::Module::Pointer const& module_pointer, v1::ModuleManager* module_manager, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { "", "", "" }),
 	_module_pointer (module_pointer),
 	_module_manager (module_manager)
@@ -49,7 +49,7 @@ ModulesListItem::ModulesListItem (Module::Pointer const& module_pointer, ModuleM
 void
 ModulesListItem::reload()
 {
-	Module* module = _module_manager->find (_module_pointer);
+	v1::Module* module = _module_manager->find (_module_pointer);
 	if (module)
 	{
 		try {

@@ -33,7 +33,8 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace xf {
+namespace v1 {
+using namespace xf;
 
 class GenericProperty
 {
@@ -1126,7 +1127,7 @@ typedef Property<Torque>		PropertyTorque;
 typedef Property<Volume>		PropertyVolume;
 typedef Property<Mass>			PropertyMass;
 
-} // namespace xf
+} // namespace v1
 
 #endif
 

@@ -165,7 +165,8 @@ QZDevice::decompress()
 
 		case Z_STREAM_END:
 			_z_at_eof = true;
-			// fall-through:
+			[[fallthrough]];
+
 		case Z_OK:
 			if (_ctx.avail_out != 0 || _ctx.avail_in == 0)
 				_need_pull = true;

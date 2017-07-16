@@ -23,18 +23,18 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/instrument.h>
+#include <xefis/core/v1/instrument.h>
 #include <xefis/core/v1/property.h>
 
 // Local:
 #include "linear_indicator_widget.h"
 
 
-class LinearIndicator: public xf::Instrument
+class LinearIndicator: public v1::Instrument
 {
   public:
 	// Ctor
-	LinearIndicator (xf::ModuleManager*, QDomElement const& config);
+	LinearIndicator (v1::ModuleManager*, QDomElement const& config);
 
 	void
 	data_updated() override;
@@ -48,14 +48,14 @@ class LinearIndicator: public xf::Instrument
 	unsigned int						_value_modulo				= 0;
 	unsigned int						_value_digits				= 3;
 	std::string							_unit;
-	xf::PropertyFloat::Type				_value_minimum;
-	Optional<xf::PropertyFloat::Type>	_value_minimum_critical;
-	Optional<xf::PropertyFloat::Type>	_value_minimum_warning;
-	Optional<xf::PropertyFloat::Type>	_value_maximum_warning;
-	Optional<xf::PropertyFloat::Type>	_value_maximum_critical;
-	xf::PropertyFloat::Type				_value_maximum;
+	v1::PropertyFloat::Type				_value_minimum;
+	Optional<v1::PropertyFloat::Type>	_value_minimum_critical;
+	Optional<v1::PropertyFloat::Type>	_value_minimum_warning;
+	Optional<v1::PropertyFloat::Type>	_value_maximum_warning;
+	Optional<v1::PropertyFloat::Type>	_value_maximum_critical;
+	v1::PropertyFloat::Type				_value_maximum;
 	// Properties:
-	xf::GenericProperty					_value;
+	v1::GenericProperty					_value;
 };
 
 #endif
