@@ -17,7 +17,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module_manager.h>
+#include <xefis/core/v1/module_manager.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:

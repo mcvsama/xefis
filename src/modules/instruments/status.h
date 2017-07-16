@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v1/property.h>
 #include <xefis/core/instrument.h>
 #include <xefis/utility/delta_decoder.h>
 

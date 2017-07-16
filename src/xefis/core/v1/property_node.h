@@ -31,13 +31,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v1/property_storage.h>
+#include <xefis/core/v1/property_utils.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/string.h>
 #include <xefis/utility/blob.h>
 #include <xefis/utility/time_helper.h>
-
-#include "property_storage.h"
-#include "property_utils.h"
 
 
 namespace xf {

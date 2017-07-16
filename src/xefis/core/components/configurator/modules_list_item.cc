@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/accounting.h>
 #include <xefis/core/services.h>
-#include <xefis/core/module_manager.h>
+#include <xefis/core/v1/module_manager.h>
 
 // Local:
 #include "modules_list.h"

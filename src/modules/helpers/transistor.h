@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
-#include <xefis/core/property_observer.h>
+#include <xefis/core/v1/property.h>
+#include <xefis/core/v1/property_observer.h>
 #include <xefis/utility/transistor.h>
 
 

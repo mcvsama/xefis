@@ -26,7 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v1/property.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>

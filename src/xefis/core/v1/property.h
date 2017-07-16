@@ -26,13 +26,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v1/property_node.h>
+#include <xefis/core/v1/property_storage.h>
+#include <xefis/core/v1/property_utils.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/time_helper.h>
-
-// Local:
-#include "property_node.h"
-#include "property_storage.h"
-#include "property_utils.h"
 
 
 namespace xf {

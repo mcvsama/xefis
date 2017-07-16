@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/config_reader.h>
 #include <xefis/core/v2/cycle.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
