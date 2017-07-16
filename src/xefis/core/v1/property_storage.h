@@ -21,10 +21,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v1/property_utils.h>
 #include <xefis/utility/noncopyable.h>
-
-// Local:
-#include "property_utils.h"
 
 
 namespace xf {

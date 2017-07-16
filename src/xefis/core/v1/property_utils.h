@@ -20,17 +20,14 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property_path.h>
 
 
 namespace xf {
 
-class PropertyPath;
-
-
 /**
  * Indicates a nil-node, for example when trying to read
  * the value of such node.
- * XXX
  */
 class NilNode: public Exception
 {
@@ -43,7 +40,6 @@ class NilNode: public Exception
  * Indicates invalid operation on node of a specific type,
  * for example attempt to read int value of a directory-type
  * node.
- * XXX
  */
 class PropertyAccessError: public Exception
 {
@@ -54,7 +50,6 @@ class PropertyAccessError: public Exception
 
 /**
  * Indicates that given string is not a valid supported type.
- * XXX
  */
 class BadType: public Exception
 {
@@ -67,7 +62,6 @@ class BadType: public Exception
 /**
  * Indicates that there was a path conflict while creating
  * directory path with mkpath().
- * XXX
  */
 class PropertyPathConflict: public Exception
 {
@@ -80,7 +74,6 @@ class PropertyPathConflict: public Exception
 /**
  * Indicates that property tried to be read
  * could not be found in the node tree.
- * XXX
  */
 class PropertyNotFound: public Exception
 {
@@ -93,7 +86,6 @@ class PropertyNotFound: public Exception
 /**
  * Indicates that the property is singular (not attached to any tree)
  * and can't be written or read.
- * XXX
  */
 class SingularProperty: public Exception
 {
@@ -106,7 +98,6 @@ class SingularProperty: public Exception
 /**
  * Indicates that the operation is invalid on certain
  * node type.
- * XXX
  */
 class InvalidOperation: public Exception
 {
@@ -119,7 +110,6 @@ class InvalidOperation: public Exception
 /**
  * Indicates that there's type conflict between existing property
  * and property requested to be created.
- * XXX
  */
 class TypeConflict: public Exception
 {
@@ -141,55 +131,7 @@ class StringifyError: public Exception
 
 
 /**
- * Encapsulates string used as path, for better type safety.
- */
-class PropertyPath
-{
-  public:
-	// Ctor
-	PropertyPath() = default;
-
-	// Ctor
-	explicit
-	PropertyPath (const char* path);
-
-	// Ctor
-	explicit
-	PropertyPath (std::string const& path);
-
-	// Ctor
-	explicit
-	PropertyPath (QString const& path);
-
-	// Ctor
-	PropertyPath (PropertyPath const&) = default;
-
-	// Ctor
-	PropertyPath (PropertyPath&&) = default;
-
-	PropertyPath&
-	operator= (PropertyPath const&) = default;
-
-	PropertyPath&
-	operator= (PropertyPath&&) = default;
-
-	bool
-	operator== (PropertyPath const& other) const noexcept;
-
-	/**
-	 * Return string reference.
-	 */
-	std::string const&
-	string() const noexcept;
-
-  private:
-	std::string _path;
-};
-
-
-/**
  * Encapsulates string used as property type, for better type safety.
- * XXX
  */
 class PropertyType
 {
@@ -294,38 +236,6 @@ inline
 StringifyError::StringifyError (std::string const& message):
 	Exception (message)
 { }
-
-
-inline
-PropertyPath::PropertyPath (const char* path):
-	_path (path)
-{ }
-
-
-inline
-PropertyPath::PropertyPath (std::string const& path):
-	_path (path)
-{ }
-
-
-inline
-PropertyPath::PropertyPath (QString const& path):
-	PropertyPath (path.toStdString())
-{ }
-
-
-inline bool
-PropertyPath::operator== (PropertyPath const& other) const noexcept
-{
-	return _path == other._path;
-}
-
-
-inline std::string const&
-PropertyPath::string() const noexcept
-{
-	return _path;
-}
 
 
 inline

@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/window.h>
+#include <xefis/utility/logger.h>
 
 
 namespace xf {

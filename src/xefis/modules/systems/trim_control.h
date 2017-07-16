@@ -26,6 +26,7 @@
 #include <xefis/core/v2/property.h>
 #include <xefis/core/v2/property_observer.h>
 #include <xefis/core/v2/setting.h>
+#include <xefis/core/xefis.h>
 
 
 /**

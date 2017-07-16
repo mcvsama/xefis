@@ -19,7 +19,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
-#include <xefis/core/module_manager.h>
+#include <xefis/core/v1/module_manager.h>
 #include <xefis/core/sound_manager.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>

@@ -33,7 +33,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v1/property.h>
 #include <xefis/utility/logger.h>
 
 

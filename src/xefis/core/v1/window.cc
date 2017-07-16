@@ -23,9 +23,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
-#include <xefis/core/module.h>
+#include <xefis/core/v1/module.h>
 #include <xefis/core/panel.h>
-#include <xefis/core/config_reader.h>
+#include <xefis/core/v1/config_reader.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/support/ui/widgets/panel_button.h>
 #include <xefis/support/ui/widgets/panel_rotary_encoder.h>
@@ -69,7 +69,7 @@ Window::InstrumentDecorator::InstrumentDecorator (QWidget* parent):
 
 
 void
-Window::InstrumentDecorator::set_instrument (Instrument * instrument)
+Window::InstrumentDecorator::set_instrument (Instrument* instrument)
 {
 	_instrument = instrument;
 	_layout->addWidget (instrument);
@@ -182,7 +182,7 @@ Window::get_decorator_for (Module::Pointer const& ptr) const
 void
 Window::unparent_modules()
 {
-	// Since children of type Module are managed by the ModuleManager, we must not delete them.
+	// Since children of type Module are managed by the ModuleManager, we must not let parent widget delete them.
 	// Find them and reparent to 0.
 	for (auto child: findChildren<QWidget*>())
 		if (dynamic_cast<Module*> (child))

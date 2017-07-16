@@ -23,7 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/services.h>
-#include <xefis/core/property_node.h>
+#include <xefis/core/v1/property_node.h>
 
 // Local:
 #include "property_tree_widget.h"

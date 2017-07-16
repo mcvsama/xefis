@@ -26,7 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/property.h>
+#include <xefis/core/v1/property.h>
 
 
 #define XEFIS_LINK_SEND_DEBUG 0
