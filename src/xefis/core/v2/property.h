@@ -45,6 +45,16 @@ class NilProperty: public Exception
 };
 
 
+/**
+ * Non-constructible type used in std::initializer_list for assigning a nil value to the property.
+ */
+class NonConstructible
+{
+  private:
+	NonConstructible();
+};
+
+
 template<class Value>
 	class PropertyIn;
 
@@ -72,6 +82,15 @@ class PropertyVirtualInterface
 	set_nil() = 0;
 
 	/**
+	 * Alias for set_nil().
+	 */
+	void
+	operator= (std::initializer_list<NonConstructible>)
+	{
+		set_nil();
+	}
+
+	/**
 	 * Valid means not nil. Equivalent to !is_nil().
 	 */
 	virtual bool
@@ -80,8 +99,10 @@ class PropertyVirtualInterface
 	/**
 	 * Alias for valid().
 	 */
-	virtual
-	operator bool() const noexcept = 0;
+	operator bool() const noexcept
+	{
+		return valid();
+	}
 
 	/**
 	 * Ensure that property's value is up to date in this processing loop.  If it's coupled to a Module, that process()
@@ -292,9 +313,6 @@ template<class pValue>
 		// BasicProperty API
 		bool
 		valid() const noexcept override;
-
-		// BasicProperty API
-		operator bool() const noexcept override;
 
 	  private:
 		Optional<Value>	_value;
@@ -639,14 +657,6 @@ template<class V>
 	Property<V>::valid() const noexcept
 	{
 		return !is_nil();
-	}
-
-
-template<class V>
-	inline
-	Property<V>::operator bool() const noexcept
-	{
-		return valid();
 	}
 
 
