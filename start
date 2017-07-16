@@ -42,5 +42,5 @@ execute()
 	popd
 }
 
-make -j4 -C src && execute
+make -j4 -C src && execute "$@"
 
