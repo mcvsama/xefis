@@ -24,6 +24,7 @@
 
 // Qt:
 #include <QtXml/QDomElement>
+#include <QtCore/QFile>
 
 
 /**
@@ -131,6 +132,39 @@ require_and_only_allow_attributes (QDomElement const& e, std::set<QString> const
 {
 	only_allow_attributes (e, attributes);
 	require_attributes (e, attributes);
+}
+
+
+/**
+ * Parse XML document and return QDomDocument.
+ */
+inline QDomDocument
+load_xml_doc (QFile&& xml_file)
+{
+	QDomDocument doc;
+	std::string path = xml_file.fileName().toStdString();
+
+	if (!xml_file.exists())
+		throw BadConfiguration ("file not found: " + path);
+
+	if (!xml_file.open (QFile::ReadOnly))
+		throw BadConfiguration ("file access error: " + path);
+
+	if (!doc.setContent (&xml_file, true))
+		throw BadConfiguration ("config parse error: " + path);
+
+	return doc;
+}
+
+
+/**
+ * Just like load_xml_doc, except it returns the document element of the doc,
+ * not QDomDocument.
+ */
+inline QDomElement
+load_xml (QFile&& xml_file)
+{
+	return load_xml_doc (std::forward<QFile> (xml_file)).documentElement();
 }
 
 } // namespace xf
