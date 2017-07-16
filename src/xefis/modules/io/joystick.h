@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <vector>
 #include <array>
+#include <set>
 
 // Qt:
 #include <QObject>
