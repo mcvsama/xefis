@@ -51,19 +51,19 @@ class PropertyObserver
 		// Ctor
 		Object (PropertyObserver*);
 
-		PropertyNode::Serial
+		BasicProperty::Serial
 		remote_serial() const noexcept;
 
 	  private:
 		boost::variant<BasicProperty*, PropertyObserver*>	_observable;
-		PropertyNode::Serial								_saved_serial	= 0;
+		BasicProperty::Serial								_saved_serial	= 0;
 	};
 
 	typedef std::list<Object>			ObjectsList;
 	typedef std::list<SmootherBase*>	SmoothersList;
 
   public:
-	typedef PropertyNode::Serial		Serial;
+	typedef BasicProperty::Serial		Serial;
 	typedef std::function<void()>		Callback;
 
   public:
@@ -201,7 +201,7 @@ PropertyObserver::Object::Object (PropertyObserver* observer):
 { }
 
 
-inline PropertyNode::Serial
+inline BasicProperty::Serial
 PropertyObserver::Object::remote_serial() const noexcept
 {
 	struct SerialGetter: public boost::static_visitor<BasicProperty::Serial>

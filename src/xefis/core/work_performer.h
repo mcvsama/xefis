@@ -118,6 +118,7 @@ class WorkPerformer: private Noncopyable
 	 * Create WorkPerformer with given number of threads.
 	 * The number of threads never changes.
 	 */
+	explicit
 	WorkPerformer (unsigned int threads_number);
 
 	/**
