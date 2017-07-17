@@ -65,17 +65,17 @@ ADI::process (v2::Cycle const& cycle)
 	// Speed
 	params.speed_failure = !speed_ias_serviceable.value_or (true);
 	params.speed_visible = speed_ias.valid();
-	params.speed = *speed_ias;
+	params.speed = speed_ias.value_or (0_kt);
 	params.speed_lookahead_visible = speed_ias_lookahead.valid();
-	params.speed_lookahead = *speed_ias_lookahead;
+	params.speed_lookahead = speed_ias_lookahead.value_or (0_kt);
 	params.speed_minimum_visible = speed_ias_minimum.valid();
-	params.speed_minimum = *speed_ias_minimum;
+	params.speed_minimum = speed_ias_minimum.value_or (0_kt);
 	params.speed_minimum_maneuver = speed_ias_minimum_maneuver.get_optional();
 	params.speed_maximum_maneuver = speed_ias_maximum_maneuver.get_optional();
 	params.speed_maximum_visible = speed_ias_maximum.valid();
-	params.speed_maximum = *speed_ias_maximum;
+	params.speed_maximum = speed_ias_maximum.value_or (0_kt);
 	params.speed_mach_visible = speed_mach && *speed_mach > show_mach_above;
-	params.speed_mach = *speed_mach;
+	params.speed_mach = speed_mach.value_or (0.0);
 	params.speed_ground = speed_ground.get_optional();
 	// V1
 	if (speed_v1)
@@ -119,15 +119,15 @@ ADI::process (v2::Cycle const& cycle)
 	// Orientation
 	params.orientation_failure = !orientation_serviceable.value_or (true);
 	params.orientation_pitch_visible = orientation_pitch.valid();
-	params.orientation_pitch = *orientation_pitch;
+	params.orientation_pitch = orientation_pitch.value_or (0_deg);
 	params.orientation_roll_visible = orientation_roll.valid();
-	params.orientation_roll = *orientation_roll;
+	params.orientation_roll = orientation_roll.value_or (0_deg);
 	params.orientation_heading_visible = orientation_heading_magnetic.valid();
-	params.orientation_heading = *orientation_heading_magnetic;
+	params.orientation_heading = orientation_heading_magnetic.value_or (0_deg);
 	params.orientation_heading_numbers_visible = orientation_heading_numbers_visible.value_or (false);
 	// Slip-skid
 	params.slip_skid_visible = slip_skid.valid();
-	params.slip_skid = *slip_skid;
+	params.slip_skid = slip_skid.value_or (0_deg);
 	// Flight path vector:
 	params.flight_path_marker_failure = _computed_fpv_failure;
 	params.flight_path_visible = _computed_fpv_visible;
@@ -136,36 +136,36 @@ ADI::process (v2::Cycle const& cycle)
 	// AOA limit
 	params.critical_aoa_visible = aoa_alpha && aoa_alpha_maximum && aoa_alpha_visible.value_or (false) &&
 								  (*aoa_alpha_maximum - *aoa_alpha <= *aoa_visibility_threshold);
-	params.critical_aoa = *aoa_alpha_maximum;
-	params.aoa_alpha = *aoa_alpha;
+	params.critical_aoa = aoa_alpha_maximum.value_or (0_deg);
+	params.aoa_alpha = aoa_alpha.value_or (0_deg);
 	// Altitude
 	params.altitude_failure = !altitude_amsl_serviceable.value_or (true);
 	params.altitude_visible = altitude_amsl.valid();
-	params.altitude = *altitude_amsl;
+	params.altitude = altitude_amsl.value_or (0_ft);
 	params.altitude_lookahead_visible = altitude_amsl_lookahead.valid();
-	params.altitude_lookahead = *altitude_amsl_lookahead;
+	params.altitude_lookahead = altitude_amsl_lookahead.value_or (0_ft);
 	params.altitude_agl_failure = !altitude_agl_serviceable.value_or (true);
 	params.altitude_agl_visible = altitude_agl.valid();
-	params.altitude_agl = *altitude_agl;
+	params.altitude_agl = altitude_agl.value_or (0_ft);
 	params.altitude_landing_visible = altitude_landing_amsl.valid();
-	params.altitude_landing_amsl = *altitude_landing_amsl;
+	params.altitude_landing_amsl = altitude_landing_amsl.value_or (0_ft);
 	params.altitude_landing_warning_hi = *altitude_landing_warning_hi;
 	params.altitude_landing_warning_lo = *altitude_landing_warning_lo;
 	// Minimums
 	params.minimums_altitude_visible = altitude_minimums_setting && altitude_minimums_amsl;
 	params.minimums_type = QString::fromStdString (altitude_minimums_type.value_or (""));
-	params.minimums_amsl = *altitude_minimums_amsl;
-	params.minimums_setting = *altitude_minimums_setting;
+	params.minimums_amsl = altitude_minimums_amsl.value_or (0_ft);
+	params.minimums_setting = altitude_minimums_setting.value_or (0_ft);
 	// Vertical speed
 	params.vertical_speed_failure = !vertical_speed_serviceable.value_or (true);
 	params.vertical_speed_visible = vertical_speed.valid();
-	params.vertical_speed = *vertical_speed;
+	params.vertical_speed = vertical_speed.value_or (0_fpm);
 	params.energy_variometer_visible = vertical_speed_energy_variometer.valid();
-	params.energy_variometer_rate = *vertical_speed_energy_variometer;
+	params.energy_variometer_rate = vertical_speed_energy_variometer.value_or (0_W);
 	params.energy_variometer_1000_fpm_power = *power_eq_1000_fpm;
 	// Pressure settings
 	params.pressure_visible = pressure_qnh.valid();
-	params.pressure_qnh = *pressure_qnh;
+	params.pressure_qnh = pressure_qnh.value_or (0_Pa);
 	params.pressure_display_hpa = pressure_display_hpa.value_or (false);
 	params.use_standard_pressure = pressure_use_std.value_or (false);
 	// Command settings
@@ -191,19 +191,19 @@ ADI::process (v2::Cycle const& cycle)
 	bool guidance_visible = flight_director_guidance_visible.value_or (false);
 	params.flight_director_failure = !flight_director_serviceable.value_or (true);
 	params.flight_director_pitch_visible = guidance_visible && flight_director_guidance_pitch.valid();
-	params.flight_director_pitch = *flight_director_guidance_pitch;
+	params.flight_director_pitch = flight_director_guidance_pitch.value_or (0_deg);
 	params.flight_director_roll_visible = guidance_visible && flight_director_guidance_roll.valid();
-	params.flight_director_roll = *flight_director_guidance_roll;
+	params.flight_director_roll = flight_director_guidance_roll.value_or (0_deg);
 	// Control stick
 	params.control_stick_visible = control_stick_visible.value_or (false) && control_stick_pitch && control_stick_roll;
-	params.control_stick_pitch = *control_stick_pitch;
-	params.control_stick_roll = *control_stick_roll;
+	params.control_stick_pitch = control_stick_pitch.value_or (0_deg);
+	params.control_stick_roll = control_stick_roll.value_or (0_deg);
 	// Approach/navaid reference
 	params.navaid_reference_visible = navaid_reference_visible.value_or (false);
 	params.navaid_course_magnetic = navaid_course_magnetic.get_optional();
 	params.navaid_distance = navaid_distance.get_optional();
 	params.navaid_hint = QString::fromStdString (navaid_type_hint.value_or (""));
-	params.navaid_identifier = QString::fromStdString (*navaid_identifier);
+	params.navaid_identifier = QString::fromStdString (navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure = !flight_path_deviation_vertical_serviceable.value_or (true);
 	params.deviation_vertical_approach = flight_path_deviation_vertical_app.get_optional();
@@ -215,7 +215,7 @@ ADI::process (v2::Cycle const& cycle)
 	// Raising runway
 	params.runway_visible = navaid_reference_visible.value_or (false) && altitude_agl &&
 							flight_path_deviation_lateral_app && *altitude_agl <= *raising_runway_visibility;
-	params.runway_position = xf::clamped<Length> (*altitude_agl, 0_ft, *raising_runway_threshold) / *raising_runway_threshold * 25_deg;
+	params.runway_position = xf::clamped<Length> (altitude_agl.value_or (0_ft), 0_ft, *raising_runway_threshold) / *raising_runway_threshold * 25_deg;
 	// Control hint
 	params.control_hint_visible = flight_mode_hint_visible.value_or (false);
 	params.control_hint = QString::fromStdString (flight_mode_hint.value_or (""));
