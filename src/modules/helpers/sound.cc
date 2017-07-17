@@ -20,8 +20,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/core/v1/module_manager.h>
-#include <xefis/core/sound_manager.h>
 #include <xefis/core/xefis.h>
+#include <xefis/support/ui/sound_manager.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/time_helper.h>

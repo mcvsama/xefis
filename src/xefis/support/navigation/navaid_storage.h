@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__NAVAID_STORAGE_H__INCLUDED
-#define XEFIS__CORE__NAVAID_STORAGE_H__INCLUDED
+#ifndef XEFIS__SUPPORT__NAVIGATION__NAVAID_STORAGE_H__INCLUDED
+#define XEFIS__SUPPORT__NAVIGATION__NAVAID_STORAGE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -123,7 +123,7 @@ class NavaidStorage
   private:
 	Logger			_logger;
 	NavaidsTree		_navaids_tree;
-	const char*		_nav_dat_file	= "share/nav/nav.dat.gz";
+	const char*		_nav_dat_file	= "share/nav/nav.dat.gz"; // TODO make it configurable
 	const char*		_fix_dat_file	= "share/nav/fix.dat.gz";
 	const char*		_apt_dat_file	= "share/nav/apt.dat.gz";
 	NavaidsByType	_navaids_by_type;

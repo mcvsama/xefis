@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/work_performer.h>
+#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/mutex.h>
 #include <xefis/utility/semaphore.h>
 

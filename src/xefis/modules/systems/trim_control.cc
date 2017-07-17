@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/sound_manager.h>
+#include <xefis/support/ui/sound_manager.h>
 
 // Local:
 #include "trim_control.h"

@@ -34,13 +34,13 @@
 #include <xefis/core/accounting.h>
 #include <xefis/core/v1/module_manager.h>
 #include <xefis/core/v1/window_manager.h>
-#include <xefis/core/sound_manager.h>
 #include <xefis/core/v1/config_reader.h>
-#include <xefis/core/navaid_storage.h>
-#include <xefis/core/work_performer.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
+#include <xefis/support/ui/sound_manager.h>
 #include <xefis/utility/time_helper.h>
 #include <xefis/utility/demangle.h>
 // TODO machine

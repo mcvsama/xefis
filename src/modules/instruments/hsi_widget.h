@@ -26,8 +26,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/navaid_storage.h>
-#include <xefis/core/work_performer.h>
+#include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/mutex.h>
