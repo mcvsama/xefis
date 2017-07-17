@@ -26,11 +26,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/navaid.h>
-#include <xefis/core/navaid_storage.h>
 #include <xefis/core/v1/window.h>
 #include <xefis/support/air/wind_triangle.h>
 #include <xefis/support/navigation/earth.h>
+#include <xefis/support/navigation/navaid.h>
+#include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>

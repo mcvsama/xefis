@@ -24,9 +24,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/navaid_storage.h>
 #include <xefis/core/v1/config_reader.h>
 #include <xefis/core/xefis.h>
+#include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
 

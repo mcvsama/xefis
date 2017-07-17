@@ -67,9 +67,9 @@ inline
 GzDataFileIterator::GzDataFileIterator (QString const& path):
 	_file (path)
 {
-	_file.open (QFile::ReadOnly);
+	_file.open (QFile::ReadOnly); // TODO check if result is true
 	_decompressor = std::make_unique<QZDevice> (&_file);
-	_decompressor->open (QZDevice::ReadOnly);
+	_decompressor->open (QZDevice::ReadOnly); // TODO check if result is true
 	_decompressed_stream = std::make_unique<QTextStream> (_decompressor.get());
 	// Skip two first lines (file origin and copyrights):
 	operator++();

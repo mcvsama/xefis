@@ -194,21 +194,16 @@ XEFIS_HEADERS			+= xefis/core/v2/property_observer.h
 XEFIS_HEADERS			+= xefis/core/v2/property_stringifier.h
 XEFIS_HEADERS			+= xefis/core/v2/property_utils.h
 XEFIS_HEADERS			+= xefis/core/v2/setting.h
-XEFIS_HEADERS_MOC		+= xefis/core/v2/window.h
 XEFIS_HEADERS_MOC		+= xefis/core/accounting.h
 XEFIS_HEADERS			+= xefis/core/fail.h
 XEFIS_HEADERS			+= xefis/core/instrument_aids.h
 XEFIS_HEADERS			+= xefis/core/instrument_widget.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
-XEFIS_HEADERS			+= xefis/core/navaid.h
-XEFIS_HEADERS			+= xefis/core/navaid_storage.h
 XEFIS_HEADERS_MOC		+= xefis/core/panel.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
 XEFIS_HEADERS_MOC		+= xefis/core/services.h
-XEFIS_HEADERS			+= xefis/core/sound_manager.h
 XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
-XEFIS_HEADERS			+= xefis/core/work_performer.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
 XEFIS_SOURCES			+= xefis/core/v1/config_reader.cc
@@ -227,19 +222,14 @@ XEFIS_SOURCES			+= xefis/core/v2/machine.cc
 XEFIS_SOURCES			+= xefis/core/v2/module.cc
 XEFIS_SOURCES			+= xefis/core/v2/processing_loop.cc
 XEFIS_SOURCES			+= xefis/core/v2/property_observer.cc
-XEFIS_SOURCES			+= xefis/core/v2/window.cc
 XEFIS_SOURCES			+= xefis/core/accounting.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/instrument_aids.cc
 XEFIS_SOURCES			+= xefis/core/instrument_widget.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
-XEFIS_SOURCES			+= xefis/core/navaid.cc
-XEFIS_SOURCES			+= xefis/core/navaid_storage.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
-XEFIS_SOURCES			+= xefis/core/sound_manager.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
-XEFIS_SOURCES			+= xefis/core/work_performer.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
 SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
@@ -371,9 +361,12 @@ XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
 
 XEFIS_HEADERS			+= xefis/support/navigation/magnetic_variation.h
 XEFIS_HEADERS			+= xefis/support/navigation/earth.h
+XEFIS_HEADERS			+= xefis/support/navigation/navaid.h
+XEFIS_HEADERS			+= xefis/support/navigation/navaid_storage.h
 
 XEFIS_SOURCES			+= xefis/support/navigation/magnetic_variation.cc
 XEFIS_SOURCES			+= xefis/support/navigation/earth.cc
+XEFIS_SOURCES			+= xefis/support/navigation/navaid_storage.cc
 
 ######## /xefis/support/protocols/nmea ########
 
@@ -388,6 +381,12 @@ XEFIS_SOURCES			+= xefis/support/protocols/nmea/mtk.cc
 XEFIS_SOURCES			+= xefis/support/protocols/nmea/nmea.cc
 XEFIS_SOURCES			+= xefis/support/protocols/nmea/parser.cc
 
+######## /xefis/support/system ########
+
+XEFIS_HEADERS			+= xefis/support/system/work_performer.h
+
+XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
+
 ######## /xefis/support/ui/widgets ########
 
 XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h
@@ -401,6 +400,14 @@ XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc
 XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc
 XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc
 XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc
+
+######## /xefis/support/ui ########
+
+XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
+XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h
+
+XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
+XEFIS_SOURCES			+= xefis/support/ui/window.cc
 
 ######## /xefis/test ########
 

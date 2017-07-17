@@ -22,7 +22,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v1/module.h>
 #include <xefis/core/v1/property.h>
-#include <xefis/core/sound_manager.h>
+#include <xefis/support/ui/sound_manager.h>
 
 
 /**
