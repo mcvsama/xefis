@@ -2,19 +2,9 @@
 
 ######## /modules/instruments ########
 
-XEFIS_HEADERS			+= modules/helpers/ahrs_selector.h
-XEFIS_HEADERS			+= modules/helpers/lonlat_translator.h
-XEFIS_HEADERS			+= modules/helpers/navaid_selector.h
 XEFIS_HEADERS_MOC		+= modules/helpers/sound.h
-XEFIS_HEADERS			+= modules/helpers/string_translator.h
-XEFIS_HEADERS			+= modules/helpers/transistor.h
 
-XEFIS_SOURCES			+= modules/helpers/ahrs_selector.cc
-XEFIS_SOURCES			+= modules/helpers/lonlat_translator.cc
-XEFIS_SOURCES			+= modules/helpers/navaid_selector.cc
 XEFIS_SOURCES			+= modules/helpers/sound.cc
-XEFIS_SOURCES			+= modules/helpers/string_translator.cc
-XEFIS_SOURCES			+= modules/helpers/transistor.cc
 
 ######## /modules/instruments ########
 
