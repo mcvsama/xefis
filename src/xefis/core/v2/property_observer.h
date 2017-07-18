@@ -94,6 +94,13 @@ class PropertyObserver
 	observe (std::initializer_list<Object> list);
 
 	/**
+	 * Add list of properties to be tracked, from a sequence.
+	 */
+	template<class Iterator>
+		void
+		observe (Iterator begin, Iterator end);
+
+	/**
 	 * Setup callback function.
 	 * This function will be called when one of observed properties is changed or observers is fired.
 	 */
@@ -221,6 +228,15 @@ PropertyObserver::Object::remote_serial() const noexcept
 
 	return boost::apply_visitor (SerialGetter(), _observable);
 }
+
+
+template<class Iterator>
+	void
+	PropertyObserver::observe (Iterator begin, Iterator end)
+	{
+		for (Iterator p = begin; p != end; ++p)
+			observe (*p);
+	}
 
 
 inline PropertyObserver::Serial

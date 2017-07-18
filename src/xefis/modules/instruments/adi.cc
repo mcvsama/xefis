@@ -29,7 +29,7 @@
 
 
 ADI::ADI (xf::Xefis* xefis, std::string const& instance):
-	v2::Instrument (instance)
+	Instrument (instance)
 {
 	_adi_widget = new ADIWidget (this, xefis->work_performer());
 
