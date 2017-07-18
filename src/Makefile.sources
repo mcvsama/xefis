@@ -8,7 +8,6 @@ XEFIS_SOURCES			+= modules/helpers/sound.cc
 
 ######## /modules/instruments ########
 
-XEFIS_HEADERS			+= modules/instruments/datatable.h
 XEFIS_HEADERS			+= modules/instruments/debug_forces.h
 XEFIS_HEADERS			+= modules/instruments/flaps.h
 XEFIS_HEADERS			+= modules/instruments/gear.h
@@ -24,7 +23,6 @@ XEFIS_HEADERS_MOC		+= modules/instruments/status.h
 XEFIS_HEADERS			+= modules/instruments/status_widget.h
 XEFIS_HEADERS			+= modules/instruments/vertical_trim.h
 
-XEFIS_SOURCES			+= modules/instruments/datatable.cc
 XEFIS_SOURCES			+= modules/instruments/debug_forces.cc
 XEFIS_SOURCES			+= modules/instruments/flaps.cc
 XEFIS_SOURCES			+= modules/instruments/gear.cc
@@ -233,10 +231,12 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
 XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
 #XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
+XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
 
 XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
 #XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
+XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
 
 ######## /xefis/modules/io ########
 
@@ -441,6 +441,7 @@ XEFIS_HEADERS			+= xefis/utility/semaphore.h
 XEFIS_HEADERS			+= xefis/utility/sequence.h
 XEFIS_HEADERS			+= xefis/utility/smoother.h
 XEFIS_HEADERS			+= xefis/utility/string.h
+XEFIS_HEADERS			+= xefis/utility/strong_type.h
 XEFIS_HEADERS			+= xefis/utility/synchronized.h
 XEFIS_HEADERS			+= xefis/utility/temporal.h
 XEFIS_HEADERS			+= xefis/utility/text_layout.h
@@ -449,6 +450,7 @@ XEFIS_HEADERS			+= xefis/utility/thread.h
 XEFIS_HEADERS			+= xefis/utility/time.h
 XEFIS_HEADERS			+= xefis/utility/time_helper.h
 XEFIS_HEADERS			+= xefis/utility/transistor.h
+XEFIS_HEADERS			+= xefis/utility/types.h
 
 XEFIS_SOURCES			+= xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc
