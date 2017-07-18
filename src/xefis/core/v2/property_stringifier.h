@@ -144,8 +144,10 @@ class PropertyStringifier
 			std::string
 			to_string() const override
 			{
+				auto format = _format;
+
 				if (_property)
-					return to_string ((_format % *_property).str());
+					return (format % *_property).str();
 				else
 					return _nil_value;
 			}
@@ -179,8 +181,10 @@ class PropertyStringifier
 			{
 				using si::to_string;
 
+				auto format = _format;
+
 				if (_property)
-					return to_string ((_format % si::Quantity<DesiredUnit> (*_property)).str());
+					return (format % to_string (si::Quantity<DesiredUnit> (*_property))).str();
 				else
 					return _nil_value;
 			}
