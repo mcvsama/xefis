@@ -264,7 +264,7 @@ FlightGearIO::read_input()
 		output_##x = 1_##unit * fg_data->x##_##unit;
 
 #define ASSIGN_UNITLESS(x) \
-		output_##x = fg_data->x;
+		output_##x = static_cast<decltype (fg_data->x)> (fg_data->x);
 
 		ASSIGN (ft,   cmd_alt_setting);
 		ASSIGN (fpm,  cmd_cbr_setting);
