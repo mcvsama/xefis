@@ -23,21 +23,41 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/instrument.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v2/instrument.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/property_observer.h>
+#include <xefis/core/v2/setting.h>
 
 
 class VerticalTrim:
-	public v1::Instrument,
+	public v2::Instrument,
 	protected xf::InstrumentAids
 {
   public:
-	// Ctor
-	VerticalTrim (v1::ModuleManager*, QDomElement const& config);
+	/*
+	 * Settings
+	 */
 
+	v2::Setting<QString>	label							{ this, "STAB" };
+
+	/*
+	 * Input
+	 */
+
+	v2::PropertyIn<double>	input_trim_value				{ this, "/trim/value" };
+	v2::PropertyIn<double>	input_trim_reference			{ this, "/trim/reference" };
+	v2::PropertyIn<double>	input_trim_reference_minimum	{ this, "/trim/reference.minimum" };
+	v2::PropertyIn<double>	input_trim_reference_maximum	{ this, "/trim/reference.maximum" };
+
+  public:
+	// Ctor
+	explicit
+	VerticalTrim (std::string const& instance = {});
+
+	// Module API
 	void
-	data_updated() override;
+	process (v2::Cycle const&) override;
 
   protected:
 	void
@@ -51,13 +71,7 @@ class VerticalTrim:
 	stringify (double value);
 
   private:
-	// Settings:
-	QString				_label = "STAB";
-	// Properties:
-	v1::PropertyFloat	_input_trim_value;
-	v1::PropertyFloat	_input_trim_reference;
-	v1::PropertyFloat	_input_trim_reference_minimum;
-	v1::PropertyFloat	_input_trim_reference_maximum;
+	v2::PropertyObserver	_inputs_observer;
 };
 
 #endif

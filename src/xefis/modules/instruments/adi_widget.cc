@@ -39,7 +39,7 @@ ADIWidget::Parameters::sanitize()
 {
 	sl_line_every = std::max (sl_line_every, 1);
 	sl_number_every = std::max (sl_number_every, 1);
-	sl_extent = std::max<Speed> (sl_extent, 1_kt);
+	sl_extent = std::max<si::Velocity> (sl_extent, 1_kt);
 	sl_minimum = std::max (sl_minimum, 0);
 	sl_maximum = std::min (sl_maximum, 9999);
 	al_line_every = std::max (al_line_every, 1);
@@ -655,14 +655,14 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 {
 	float const wh = this->wh();
 
-	_params.speed = xf::clamped<Speed> (_params.speed, 0_kt, 9999.99_kt);
+	_params.speed = xf::clamped<si::Velocity> (_params.speed, 0_kt, 9999.99_kt);
 	_params.speed_mach = xf::clamped (_params.speed_mach, 0.0, 9.99);
-	_params.speed_minimum = xf::clamped<Speed> (_params.speed_minimum, 0.0_kt, 9999.99_kt);
+	_params.speed_minimum = xf::clamped<si::Velocity> (_params.speed_minimum, 0.0_kt, 9999.99_kt);
 	if (_params.speed_minimum_maneuver)
-		_params.speed_minimum_maneuver = xf::clamped<Speed> (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
+		_params.speed_minimum_maneuver = xf::clamped<si::Velocity> (*_params.speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
 	if (_params.speed_maximum_maneuver)
-		_params.speed_maximum_maneuver = xf::clamped<Speed> (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
-	_params.speed_maximum = xf::clamped<Speed> (_params.speed_maximum, 0.0_kt, 9999.99_kt);
+		_params.speed_maximum_maneuver = xf::clamped<si::Velocity> (*_params.speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
+	_params.speed_maximum = xf::clamped<si::Velocity> (_params.speed_maximum, 0.0_kt, 9999.99_kt);
 
 	_sl_ladder_rect = QRectF (-0.0675f * wh, -0.375 * wh, 0.135 * wh, 0.75f * wh);
 	_sl_ladder_pen = QPen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -700,11 +700,11 @@ ADIWidget::PaintWorkUnit::sl_post_resize()
 void
 ADIWidget::PaintWorkUnit::sl_pre_paint()
 {
-	_params.speed = xf::clamped<Speed> (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
+	_params.speed = xf::clamped<si::Velocity> (_params.speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum);
 	_sl_min_shown = _params.speed - 0.5f * _params.sl_extent;
 	_sl_max_shown = _params.speed + 0.5f * _params.sl_extent;
-	_sl_min_shown = std::max<Speed> (_sl_min_shown, 1_kt * _params.sl_minimum);
-	_sl_max_shown = std::min<Speed> (_sl_max_shown, 1_kt * _params.sl_maximum);
+	_sl_min_shown = std::max<si::Velocity> (_sl_min_shown, 1_kt * _params.sl_minimum);
+	_sl_max_shown = std::min<si::Velocity> (_sl_max_shown, 1_kt * _params.sl_maximum);
 	if (_sl_min_shown < 0_kt)
 		_sl_min_shown = 0_kt;
 	_sl_rounded_speed = static_cast<int> (_params.speed.quantity<Knot>() + 0.5);
@@ -956,7 +956,7 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x
 	if (_params.speed_lookahead < _params.speed)
 		painter.scale (1.f, -1.f);
 	float length = std::min<float> (_sl_ladder_rect.height() / 2.f,
-									1.f * abs (kt_to_px (xf::clamped<Speed> (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
+									1.f * abs (kt_to_px (xf::clamped<si::Velocity> (_params.speed_lookahead, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)))) - 0.5f * x;
 
 	if (length > 0.2f * x)
 	{
@@ -1007,7 +1007,7 @@ ADIWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 	// Speed bug:
 	if (_params.cmd_speed)
 	{
-		float posy = xf::clamped<float> (kt_to_px (xf::clamped<Speed> (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
+		float posy = xf::clamped<float> (kt_to_px (xf::clamped<si::Velocity> (*_params.cmd_speed, 1_kt * _params.sl_minimum, 1_kt * _params.sl_maximum)),
 										 -_sl_ladder_rect.height() / 2.0, _sl_ladder_rect.height() / 2.0);
 		painter.setClipRect (_sl_ladder_rect.translated (2.5f * x, 0.f));
 		painter.translate (1.25f * x, posy);
@@ -1171,7 +1171,7 @@ void
 ADIWidget::PaintWorkUnit::al_pre_paint()
 {
 	_params.altitude = xf::clamped<Length> (_params.altitude, -99999_ft, +99999_ft);
-	_params.vertical_speed = xf::clamped<Speed> (_params.vertical_speed, -9999_fpm, +9999_fpm);
+	_params.vertical_speed = xf::clamped<si::Velocity> (_params.vertical_speed, -9999_fpm, +9999_fpm);
 
 	float sgn = _params.altitude < 0_ft ? -1.f : 1.f;
 	_al_min_shown = _params.altitude - 0.5f * _params.al_extent;
@@ -1652,7 +1652,7 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (Qt::red);
 
-	auto paint_red_lines = [&] (Speed speed1, Speed speed2)
+	auto paint_red_lines = [&] (si::Velocity speed1, si::Velocity speed2)
 	{
 		painter.setTransform (_al_transform);
 		painter.translate (4.f * x, 0.f);
@@ -1668,7 +1668,7 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 		});
 	};
 
-	Speed min_vspd = 5500_fpm;
+	si::Velocity min_vspd = 5500_fpm;
 
 	if (_params.tcas_ra_vertical_speed_minimum)
 		paint_red_lines (*_params.tcas_ra_vertical_speed_minimum - 20000_fpm,
@@ -1855,7 +1855,7 @@ ADIWidget::PaintWorkUnit::al_paint_ldgalt_flag (xf::Painter& painter, float x)
 
 
 float
-ADIWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_value) const
+ADIWidget::PaintWorkUnit::scale_vertical_speed (si::Velocity vertical_speed, float max_value) const
 {
 	float vspd = std::abs (vertical_speed.quantity<FootPerMinute>());
 
@@ -1878,7 +1878,7 @@ ADIWidget::PaintWorkUnit::scale_vertical_speed (Speed vertical_speed, float max_
 float
 ADIWidget::PaintWorkUnit::scale_energy_variometer (Power power, float max_value) const
 {
-	Speed equivalent_speed = power / _params.energy_variometer_1000_fpm_power * 1000_fpm;
+	si::Velocity equivalent_speed = power / _params.energy_variometer_1000_fpm_power * 1000_fpm;
 	return scale_vertical_speed (equivalent_speed, max_value);
 }
 

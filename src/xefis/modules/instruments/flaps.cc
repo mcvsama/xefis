@@ -14,9 +14,6 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtWidgets/QLayout>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/window.h>
@@ -26,32 +23,22 @@
 #include "flaps.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/flaps", Flaps)
-
-
-Flaps::Flaps (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
-	InstrumentAids (2.f)
+Flaps::Flaps (std::string const& instance):
+	Instrument (instance),
+	InstrumentAids (2.0f)
 {
-	parse_settings (config, {
-		{ "maximum", _maximum, true },
-		{ "hide-retracted", _hide_retracted, false },
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe ({
+		&current_angle,
+		&set_angle,
 	});
-
-	parse_properties (config, {
-		{ "current", _current, true },
-		{ "setting", _setting, true },
-	});
-
-	update();
 }
 
 
 void
-Flaps::data_updated()
+Flaps::process (xf::Cycle const& cycle)
 {
-	if (_current.fresh() || _setting.fresh())
-		update();
+	_inputs_observer.process (cycle.update_dt());
 }
 
 
@@ -72,9 +59,9 @@ Flaps::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	if (_hide_retracted)
-		if (_current.valid() && *_current < 0.1_deg)
-			if (_setting.valid() && *_setting < 0.5_deg)
+	if (*hide_retracted)
+		if (current_angle && *current_angle < 0.1_deg)
+			if (set_angle && *set_angle < 0.5_deg)
 				return;
 
 	QColor cyan { 0x44, 0xdd, 0xff };
@@ -99,23 +86,23 @@ Flaps::paintEvent (QPaintEvent*)
 	painter().drawRect (block);
 
 	// Filled block showing current value:
-	if (_current.valid())
+	if (current_angle)
 	{
-		Angle current = xf::clamped<Angle> (*_current, 0_deg, _maximum);
+		Angle current = xf::clamped<Angle> (*current_angle, 0_deg, *maximum_angle);
 		QRectF filled_block = block;
-		filled_block.setHeight (current / _maximum * filled_block.height());
+		filled_block.setHeight (current / *maximum_angle * filled_block.height());
 		painter().setPen (Qt::NoPen);
 		painter().setBrush (Qt::white);
 		painter().drawRect (filled_block);
 	}
 
 	// Target setting in green:
-	if (_setting.valid())
+	if (set_angle)
 	{
 		// Green line:
-		Angle setting = xf::clamped<Angle> (*_setting, 0_deg, _maximum);
+		Angle setting = xf::clamped<Angle> (*set_angle, 0_deg, *maximum_angle);
 		float w = 0.3f * block.width();
-		float s = block.top() + setting / _maximum * block.height();
+		float s = block.top() + setting / *maximum_angle * block.height();
 		painter().setPen (get_pen (Qt::green, 2.f));
 		painter().add_shadow ([&] {
 			painter().drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));

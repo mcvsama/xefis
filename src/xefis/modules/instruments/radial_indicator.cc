@@ -15,39 +15,46 @@
 #include <cstddef>
 #include <vector>
 
-// Qt:
-#include <QtGui/QPainter>
-
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/painter.h>
 
 // Local:
-#include "radial_indicator_widget.h"
+#include "radial_indicator.h"
 
 
-RadialIndicatorWidget::RadialIndicatorWidget (QWidget* parent):
-	InstrumentWidget (parent),
-	InstrumentAids (0.9f)
-{ }
-
-
-void
-RadialIndicatorWidget::resizeEvent (QResizeEvent* event)
+RadialIndicator::RadialIndicator (v2::PropertyDigitizer value_digitizer,
+								  v2::PropertyDigitizer value_target_digitizer,
+								  v2::PropertyDigitizer value_reference_digitizer,
+								  v2::PropertyDigitizer value_automatic_digitizer,
+								  std::string const& instance):
+	InstrumentAids (0.9f),
+	BasicIndicator (instance),
+	_value_digitizer (value_digitizer),
+	_value_target_digitizer (value_target_digitizer),
+	_value_reference_digitizer (value_reference_digitizer),
+	_value_automatic_digitizer (value_automatic_digitizer)
 {
-	InstrumentWidget::resizeEvent (event);
-
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
-
-	InstrumentAids::update_sizes (size(), window()->size());
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe ({
+		&_value_digitizer.property(),
+		&_value_target_digitizer.property(),
+		&_value_reference_digitizer.property(),
+		&_value_automatic_digitizer.property(),
+	});
 }
 
 
 void
-RadialIndicatorWidget::paintEvent (QPaintEvent*)
+RadialIndicator::process (v2::Cycle const& cycle)
+{
+	_inputs_observer.process (cycle.update_dt());
+}
+
+
+void
+RadialIndicator::paintEvent (QPaintEvent*)
 {
 	auto painting_token = get_token (this);
 
@@ -66,24 +73,15 @@ RadialIndicatorWidget::paintEvent (QPaintEvent*)
 }
 
 
-QString
-RadialIndicatorWidget::stringify_value (double value) const
-{
-	double numeric_value = value;
-	if (_precision < 0)
-		numeric_value /= std::pow (10.0, -_precision);
-	if (_modulo > 0)
-		numeric_value = static_cast<int> (numeric_value) / _modulo * _modulo;
-	return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, _precision));
-}
-
-
 void
-RadialIndicatorWidget::paint_text (float q, float)
+RadialIndicator::paint_text (float q, float)
 {
+	std::optional<double> value = _value_digitizer.to_numeric();
+	std::optional<double> reference_value = _value_reference_digitizer.to_numeric();
+
 	QString text;
-	if (_value)
-		text = stringify_value (*_value);
+	if (value)
+		text = stringify_value (*value);
 
 	QFont font (_font_20);
 	QFontMetricsF metrics (font);
@@ -104,7 +102,7 @@ RadialIndicatorWidget::paint_text (float q, float)
 	painter().save();
 
 	painter().setFont (font);
-	if (_value)
+	if (value)
 	{
 		painter().setPen (pen);
 		painter().drawRect (rect);
@@ -116,13 +114,13 @@ RadialIndicatorWidget::paint_text (float q, float)
 		painter().drawRect (rect);
 	}
 
-	if (_reference_value)
+	if (reference_value)
 	{
 		painter().setFont (small_font);
 		painter().setPen (get_pen (Qt::green, 1.0f));
 		painter().fast_draw_text (QPointF (text_rect.right() - zero_width + small_zero_width, text_rect.top()),
 								  Qt::AlignBottom | Qt::AlignRight,
-								  stringify_value (*_reference_value));
+								  stringify_value (*reference_value));
 	}
 
 	painter().restore();
@@ -130,8 +128,14 @@ RadialIndicatorWidget::paint_text (float q, float)
 
 
 void
-RadialIndicatorWidget::paint_indicator (float, float r)
+RadialIndicator::paint_indicator (float, float r)
 {
+	std::optional<double> value = _value_digitizer.to_numeric();
+	std::optional<double> value_target = _value_target_digitizer.to_numeric();
+	std::optional<double> value_reference = _value_reference_digitizer.to_numeric();
+	std::optional<double> value_automatic = _value_automatic_digitizer.to_numeric();
+	xf::Range<double> range { *this->value_minimum, *this->value_maximum };
+
 	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);
 	QColor yellow (255, 220, 0);
@@ -165,34 +169,37 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	QBrush brush (gray, Qt::SolidPattern);
 	QRectF rect (-r, -r, 2.f * r, 2.f * r);
 
-	float value_span_angle = 210.f;
-	float value = _value ? clamped (*_value, _range) : 0.f;
-	float warning = _warning_value ? clamped (*_warning_value, _range) : 0.f;
-	float critical = _critical_value ? clamped (*_critical_value, _range) : 0.f;
-	float reference = _reference_value ? clamped (*_reference_value, _range) : 0.f;
-	float target = _target_value ? clamped (*_target_value, _range) : 0.f;
-	float automatic = _automatic_value ? clamped (*_automatic_value, _range) : 0.f;
+	double value_span_angle = 210.f;
+	double v_value = value ? xf::clamped (*value, range) : 0.f;
+	double v_warning = *value_maximum_warning ? xf::clamped (**value_maximum_warning, range) : 0.f;
+	double v_critical = *value_maximum_critical ? xf::clamped (**value_maximum_critical, range) : 0.f;
+	double v_target = value_target ? xf::clamped (*value_target, range) : 0.f;
+	double v_reference = value_reference ? xf::clamped (*value_reference, range) : 0.f;
+	double v_automatic = value_automatic ? xf::clamped (*value_automatic, range) : 0.f;
 
-	if (!_warning_value)
-		warning = _range.max();
-	if (!_critical_value)
-		critical = _range.max();
+	if (!*value_maximum_warning)
+		v_warning = range.max();
+
+	if (!*value_maximum_critical)
+		v_critical = range.max();
+
 	// Fill colors:
-	if (_warning_value && value >= warning)
+	if (*value_maximum_warning && v_value >= v_warning)
 		brush.setColor (orange.darker (100));
-	if (_critical_value && value >= critical)
+
+	if (*value_maximum_critical && v_value >= v_critical)
 		brush.setColor (red);
 
-	double value_angle = value_span_angle * (value - _range.min()) / _range.extent();
-	double warning_angle = value_span_angle * (warning - _range.min()) / _range.extent();
-	double critical_angle = value_span_angle * (critical - _range.min()) / _range.extent();
-	double reference_angle = value_span_angle * (reference - _range.min()) / _range.extent();
-	double target_angle = value_span_angle * (target - _range.min()) / _range.extent();
-	double automatic_angle = value_span_angle * (automatic - _range.min()) / _range.extent();
+	double value_angle = value_span_angle * (v_value - range.min()) / range.extent();
+	double warning_angle = value_span_angle * (v_warning - range.min()) / range.extent();
+	double critical_angle = value_span_angle * (v_critical - range.min()) / range.extent();
+	double reference_angle = value_span_angle * (v_reference - range.min()) / range.extent();
+	double target_angle = value_span_angle * (v_target - range.min()) / range.extent();
+	double automatic_angle = value_span_angle * (v_automatic - range.min()) / range.extent();
 
 	painter().save();
 
-	if (_value)
+	if (value)
 	{
 		painter().save();
 		painter().setPen (Qt::NoPen);
@@ -207,32 +214,24 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 
 	painter().save();
 
-	struct PointInfo
-	{
-		PointInfo (float angle, QPen const& pen, float tick_len):
-			angle (angle), pen (pen), tick_len (tick_len)
-		{ }
-
-		float angle; QPen pen; float tick_len;
-	};
-
-	std::vector<PointInfo> points;
-	points.reserve (4);
-
 	float gap_degs = 4;
 
-	points.emplace_back (0.f, silver_pen, 0.f);
-	if (_warning_value)
-		points.emplace_back (warning_angle, warning_pen, 0.1f * r);
-	if (_critical_value)
-		points.emplace_back (critical_angle, critical_pen, 0.2f * r);
-	points.emplace_back (value_span_angle, critical_pen, 0.f);
+	_points.clear();
+	_points.emplace_back (0.f, silver_pen, 0.f);
 
-	for (auto i = 0u; i < points.size() - 1; ++i)
+	if (*value_maximum_warning)
+		_points.emplace_back (warning_angle, warning_pen, 0.1f * r);
+
+	if (*value_maximum_critical)
+		_points.emplace_back (critical_angle, critical_pen, 0.2f * r);
+
+	_points.emplace_back (value_span_angle, critical_pen, 0.f);
+
+	for (auto i = 0u; i < _points.size() - 1; ++i)
 	{
-		PointInfo curr = points[i];
-		PointInfo next = points[i + 1];
-		float is_last = i == points.size() - 2;
+		PointInfo curr = _points[i];
+		PointInfo next = _points[i + 1];
+		float is_last = i == _points.size() - 2;
 
 		painter().save();
 		painter().setPen (curr.pen);
@@ -245,7 +244,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	}
 
 	// Normal value bug:
-	if (_reference_value)
+	if (value_reference)
 	{
 		painter().setPen (green_pen);
 		painter().rotate (reference_angle);
@@ -257,7 +256,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 	painter().restore();
 
 	// Needle:
-	if (_value)
+	if (value)
 	{
 		painter().rotate (value_angle);
 		painter().set_shadow_color (Qt::black);
@@ -269,6 +268,7 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 				painter().draw_outlined_line (QPointF (0.0, 0.0), QPointF (extr, 0.0));
 			else
 				painter().draw_outlined_line (QPointF (1.0, 0.0), QPointF (extr, 0.0));
+
 			painter().rotate (angle - value_angle);
 			painter().draw_outlined_line (QPointF (intr, 0.0), QPointF (extr, 0.0));
 			painter().drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj), arc_degs (90_deg), arc_span (1_deg * (value_angle - angle)));
@@ -276,12 +276,14 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 
 		painter().save();
 		painter().setPen (automatic_pen);
-		if (_automatic_value)
+
+		if (value_automatic)
 			draw_outside_arc (automatic_angle, 0.10 * r, 0.95 * r, 1.10 * r, false);
 
 		painter().restore();
 		painter().setPen (pointer_pen);
-		if (_target_value)
+
+		if (value_target)
 			draw_outside_arc (target_angle, 0.15 * r, 1.01 * r, 1.15 * r, true);
 		else
 			painter().draw_outlined_line (QPointF (0.0, 0.0), QPointF (0.99f * r, 0.0));
@@ -289,4 +291,5 @@ RadialIndicatorWidget::paint_indicator (float, float r)
 
 	painter().restore();
 }
+
 

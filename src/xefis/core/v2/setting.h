@@ -209,7 +209,7 @@ template<class V>
 	inline auto
 	Setting<V>::operator->() const noexcept -> Value const*
 	{
-		return &_value.get();
+		return &_value.value();
 	}
 
 

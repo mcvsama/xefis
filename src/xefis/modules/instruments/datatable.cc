@@ -66,10 +66,10 @@ Datatable::Datatable (xf::Xefis*, std::string const& instance):
 	Instrument (instance),
 	InstrumentAids (0.5f)
 {
-	_change_observer.set_callback ([&]{ update(); });
+	_inputs_observer.set_callback ([&]{ update(); });
 
 	for (auto& line: _list)
-		_change_observer.observe (line.value.property());
+		_inputs_observer.observe (line.value.property());
 }
 
 
@@ -97,7 +97,7 @@ Datatable::set_alignment (Qt::Alignment alignment)
 void
 Datatable::process (v2::Cycle const& cycle)
 {
-	_change_observer.process (cycle.update_dt());
+	_inputs_observer.process (cycle.update_dt());
 }
 
 

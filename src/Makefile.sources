@@ -1,5 +1,112 @@
 # vim:ts=4
 
+# Let modules compile first
+######## /xefis/modules/helpers ########
+
+XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
+
+######## /xefis/modules/instruments ########
+
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
+XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
+XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
+XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
+XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
+XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
+XEFIS_HEADERS			+= xefis/modules/instruments/label.h
+XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
+XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/status.h
+XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
+
+XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
+XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
+
+######## /xefis/modules/io ########
+
+XEFIS_HEADERS_MOC		+= xefis/modules/io/bmp085.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/chr_um6.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/ets_airspeed.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/flight_gear.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
+
+XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
+XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
+XEFIS_SOURCES			+= xefis/modules/io/ets_airspeed.cc
+XEFIS_SOURCES			+= xefis/modules/io/flight_gear.cc
+XEFIS_SOURCES			+= xefis/modules/io/gps.cc
+XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
+
+######## /xefis/modules/log ########
+
+XEFIS_HEADERS_MOC		+= xefis/modules/log/klog_monitor.h
+XEFIS_HEADERS_MOC		+= xefis/modules/log/latency.h
+
+XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
+XEFIS_SOURCES			+= xefis/modules/log/latency.cc
+
+######## /xefis/modules/systems ########
+
+XEFIS_HEADERS			+= xefis/modules/systems/adc.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_ap.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_api.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_at.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_eac_yd.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_pitch.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_roll.h
+XEFIS_HEADERS			+= xefis/modules/systems/afcs_roll_autotrim.h
+XEFIS_HEADERS			+= xefis/modules/systems/altacq.h
+XEFIS_HEADERS			+= xefis/modules/systems/arrival_eta.h
+XEFIS_HEADERS			+= xefis/modules/systems/engine_torque.h
+XEFIS_HEADERS			+= xefis/modules/systems/flaps_bugs.h
+XEFIS_HEADERS			+= xefis/modules/systems/flaps_control.h
+XEFIS_HEADERS			+= xefis/modules/systems/imu_cff.h
+XEFIS_HEADERS			+= xefis/modules/systems/nc.h
+XEFIS_HEADERS			+= xefis/modules/systems/pc.h
+XEFIS_HEADERS_MOC		+= xefis/modules/systems/rcms.h
+XEFIS_HEADERS			+= xefis/modules/systems/speeds.h
+XEFIS_HEADERS			+= xefis/modules/systems/trim_control.h
+XEFIS_HEADERS			+= xefis/modules/systems/vor.h
+XEFIS_HEADERS			+= xefis/modules/systems/watchdog.h
+
+XEFIS_SOURCES			+= xefis/modules/systems/adc.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_ap.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_api.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_at.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_eac_yd.h
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_pitch.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_roll.cc
+XEFIS_SOURCES			+= xefis/modules/systems/afcs_roll_autotrim.cc
+XEFIS_SOURCES			+= xefis/modules/systems/altacq.cc
+XEFIS_SOURCES			+= xefis/modules/systems/arrival_eta.cc
+XEFIS_SOURCES			+= xefis/modules/systems/engine_torque.cc
+XEFIS_SOURCES			+= xefis/modules/systems/flaps_bugs.cc
+XEFIS_SOURCES			+= xefis/modules/systems/flaps_control.cc
+XEFIS_SOURCES			+= xefis/modules/systems/imu_cff.cc
+XEFIS_SOURCES			+= xefis/modules/systems/nc.cc
+XEFIS_SOURCES			+= xefis/modules/systems/pc.cc
+XEFIS_SOURCES			+= xefis/modules/systems/rcms.cc
+XEFIS_SOURCES			+= xefis/modules/systems/speeds.cc
+XEFIS_SOURCES			+= xefis/modules/systems/trim_control.cc
+XEFIS_SOURCES			+= xefis/modules/systems/vor.cc
+XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
+
 ######## /modules/instruments ########
 
 XEFIS_HEADERS_MOC		+= modules/helpers/sound.h
@@ -8,35 +115,11 @@ XEFIS_SOURCES			+= modules/helpers/sound.cc
 
 ######## /modules/instruments ########
 
-XEFIS_HEADERS			+= modules/instruments/debug_forces.h
-XEFIS_HEADERS			+= modules/instruments/flaps.h
-XEFIS_HEADERS			+= modules/instruments/gear.h
-XEFIS_HEADERS			+= modules/instruments/horizontal_trim.h
 XEFIS_HEADERS_MOC		+= modules/instruments/hsi.h
 XEFIS_HEADERS			+= modules/instruments/hsi_widget.h
-XEFIS_HEADERS			+= modules/instruments/label.h
-XEFIS_HEADERS			+= modules/instruments/linear_indicator.h
-XEFIS_HEADERS			+= modules/instruments/linear_indicator_widget.h
-XEFIS_HEADERS			+= modules/instruments/radial_indicator.h
-XEFIS_HEADERS			+= modules/instruments/radial_indicator_widget.h
-XEFIS_HEADERS_MOC		+= modules/instruments/status.h
-XEFIS_HEADERS			+= modules/instruments/status_widget.h
-XEFIS_HEADERS			+= modules/instruments/vertical_trim.h
 
-XEFIS_SOURCES			+= modules/instruments/debug_forces.cc
-XEFIS_SOURCES			+= modules/instruments/flaps.cc
-XEFIS_SOURCES			+= modules/instruments/gear.cc
-XEFIS_SOURCES			+= modules/instruments/horizontal_trim.cc
 XEFIS_SOURCES			+= modules/instruments/hsi.cc
 XEFIS_SOURCES			+= modules/instruments/hsi_widget.cc
-XEFIS_SOURCES			+= modules/instruments/label.cc
-XEFIS_SOURCES			+= modules/instruments/linear_indicator.cc
-XEFIS_SOURCES			+= modules/instruments/linear_indicator_widget.cc
-XEFIS_SOURCES			+= modules/instruments/radial_indicator.cc
-XEFIS_SOURCES			+= modules/instruments/radial_indicator_widget.cc
-XEFIS_SOURCES			+= modules/instruments/status.cc
-XEFIS_SOURCES			+= modules/instruments/status_widget.cc
-XEFIS_SOURCES			+= modules/instruments/vertical_trim.cc
 
 ######## /modules/io ########
 
@@ -178,6 +261,7 @@ XEFIS_HEADERS			+= xefis/core/v2/machine.h
 XEFIS_HEADERS			+= xefis/core/v2/module.h
 XEFIS_HEADERS_MOC		+= xefis/core/v2/processing_loop.h
 XEFIS_HEADERS			+= xefis/core/v2/property.h
+XEFIS_HEADERS			+= xefis/core/v2/property_digitizer.h
 XEFIS_HEADERS			+= xefis/core/v2/property_observer.h
 XEFIS_HEADERS			+= xefis/core/v2/property_stringifier.h
 XEFIS_HEADERS			+= xefis/core/v2/property_utils.h
@@ -221,94 +305,6 @@ XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
 SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
-
-######## /xefis/modules/helpers ########
-
-XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
-
-######## /xefis/modules/instruments ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
-XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
-
-XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
-XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
-
-######## /xefis/modules/io ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/io/bmp085.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/chr_um6.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/ets_airspeed.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/flight_gear.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
-
-XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
-XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
-XEFIS_SOURCES			+= xefis/modules/io/ets_airspeed.cc
-XEFIS_SOURCES			+= xefis/modules/io/flight_gear.cc
-XEFIS_SOURCES			+= xefis/modules/io/gps.cc
-XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
-
-######## /xefis/modules/log ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/log/klog_monitor.h
-XEFIS_HEADERS_MOC		+= xefis/modules/log/latency.h
-
-XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
-XEFIS_SOURCES			+= xefis/modules/log/latency.cc
-
-######## /xefis/modules/systems ########
-
-XEFIS_HEADERS			+= xefis/modules/systems/adc.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_ap.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_api.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_at.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_eac_yd.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_pitch.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_roll.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_roll_autotrim.h
-XEFIS_HEADERS			+= xefis/modules/systems/altacq.h
-XEFIS_HEADERS			+= xefis/modules/systems/arrival_eta.h
-XEFIS_HEADERS			+= xefis/modules/systems/engine_torque.h
-XEFIS_HEADERS			+= xefis/modules/systems/flaps_bugs.h
-XEFIS_HEADERS			+= xefis/modules/systems/flaps_control.h
-XEFIS_HEADERS			+= xefis/modules/systems/imu_cff.h
-XEFIS_HEADERS			+= xefis/modules/systems/nc.h
-XEFIS_HEADERS			+= xefis/modules/systems/pc.h
-XEFIS_HEADERS_MOC		+= xefis/modules/systems/rcms.h
-XEFIS_HEADERS			+= xefis/modules/systems/speeds.h
-XEFIS_HEADERS			+= xefis/modules/systems/trim_control.h
-XEFIS_HEADERS			+= xefis/modules/systems/vor.h
-XEFIS_HEADERS			+= xefis/modules/systems/watchdog.h
-
-XEFIS_SOURCES			+= xefis/modules/systems/adc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_ap.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_api.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_at.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_eac_yd.h
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_pitch.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_roll.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_roll_autotrim.cc
-XEFIS_SOURCES			+= xefis/modules/systems/altacq.cc
-XEFIS_SOURCES			+= xefis/modules/systems/arrival_eta.cc
-XEFIS_SOURCES			+= xefis/modules/systems/engine_torque.cc
-XEFIS_SOURCES			+= xefis/modules/systems/flaps_bugs.cc
-XEFIS_SOURCES			+= xefis/modules/systems/flaps_control.cc
-XEFIS_SOURCES			+= xefis/modules/systems/imu_cff.cc
-XEFIS_SOURCES			+= xefis/modules/systems/nc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/pc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/rcms.cc
-XEFIS_SOURCES			+= xefis/modules/systems/speeds.cc
-XEFIS_SOURCES			+= xefis/modules/systems/trim_control.cc
-XEFIS_SOURCES			+= xefis/modules/systems/vor.cc
-XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
 
 ######## /xefis/support/air ########
 

@@ -982,14 +982,14 @@ CDU::paintEvent (QPaintEvent*)
 	strips_rect.adjust (x_margin, y_margin, -x_margin, -x_margin);
 
 	// Paint date and time:
-	if (_time_utc.configured())
+	if (*show_time)
 	{
 		QString time_str = "NO TIME INFO";
 		QString date_str = "";
 
-		if (_time_utc.valid())
+		if (time_utc)
 		{
-			QDateTime datetime = QDateTime::fromTime_t (_time_utc->quantity<Second>());
+			QDateTime datetime = QDateTime::fromTime_t (time_utc->quantity<Second>());
 			datetime.setTimeZone (QTimeZone (0));
 			time_str = datetime.time().toString ("HH:mm:ss") + " z";
 			date_str = datetime.date().toString ("d MMM yy").toUpper();

@@ -40,13 +40,16 @@ class Datatable:
 	{
 	  public:
 		// Ctor
+		explicit
 		Line (std::string const& label, v2::PropertyStringifier const&);
 
 		// Ctor
+		explicit
 		Line (std::string const& label, v2::PropertyStringifier const&,
 			  QColor label_and_value_color);
 
 		// Ctor
+		explicit
 		Line (std::string const& label, v2::PropertyStringifier const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
@@ -66,6 +69,7 @@ class Datatable:
 
   public:
 	// Ctor
+	explicit
 	Datatable (xf::Xefis*, std::string const& instance = {});
 
 	/**
@@ -110,7 +114,7 @@ class Datatable:
 	xf::FontSize			_value_font_size	{ 18.0 };
 	Qt::Alignment			_alignment			{ Qt::AlignTop };
 	std::vector<Line>		_list;
-	v2::PropertyObserver	_change_observer;
+	v2::PropertyObserver	_inputs_observer;
 };
 
 

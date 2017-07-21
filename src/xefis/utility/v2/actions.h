@@ -108,7 +108,8 @@ template<class pValue>
 
 	  public:
 		// Ctor
-		constexpr PropChangedTo (Property& property, Value value):
+		constexpr
+		PropChangedTo (Property& property, Value value):
 			PropChanged<Value> (property),
 			_expected_value (value)
 		{ }

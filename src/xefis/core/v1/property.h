@@ -347,13 +347,6 @@ template<class tType>
 		operator->() const;
 
 		/**
-		 * Overload for write (Type&);
-		 * \return	*this
-		 */
-		Property<Type>&
-		operator= (Type const&);
-
-		/**
 		 * Overload for write (Optional<Type>&);
 		 * \return	*this
 		 */
@@ -362,25 +355,10 @@ template<class tType>
 
 		/**
 		 * Write to the property.
-		 * If node can't be found, create it.
-		 * If not possible, throw PropertyPathConflict.
-		 */
-		void
-		write (Type const&);
-
-		/**
-		 * Write to the property.
 		 * If Optional doesn't hold a value, set the property to nil.
 		 */
 		void
 		write (Optional<Type> const&);
-
-		/**
-		 * Write to the property.
-		 * If node can't be found, throw PropertyNotFound.
-		 */
-		void
-		write_signalling (Type const&);
 
 		/**
 		 * Write to the property.
@@ -916,15 +894,6 @@ template<class T>
 
 template<class T>
 	inline Property<T>&
-	Property<T>::operator= (Type const& value)
-	{
-		write (value);
-		return *this;
-	}
-
-
-template<class T>
-	inline Property<T>&
 	Property<T>::operator= (Optional<Type> const& value)
 	{
 		write (value);
@@ -934,45 +903,28 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write (Type const& value)
-	{
-		if (_root)
-		{
-			if (!_path.string().empty())
-			{
-				try {
-					get_value_node_signalling()->write (value);
-				}
-				catch (PropertyNotFound)
-				{
-					ensure_path (_path, value);
-				}
-			}
-		}
-		else
-			throw SingularProperty ("can't write to a singular property: " + _path.string());
-	}
-
-
-template<class T>
-	inline void
 	Property<T>::write (Optional<Type> const& value)
 	{
 		if (value)
-			write (*value);
+		{
+			if (_root)
+			{
+				if (!_path.string().empty())
+				{
+					try {
+						get_value_node_signalling()->write (*value);
+					}
+					catch (PropertyNotFound)
+					{
+						ensure_path (_path, *value);
+					}
+				}
+			}
+			else
+				throw SingularProperty ("can't write to a singular property: " + _path.string());
+		}
 		else
 			set_nil();
-	}
-
-
-template<class T>
-	inline void
-	Property<T>::write_signalling (Type const& value)
-	{
-		if (_root)
-			get_value_node_signalling()->write (value);
-		else
-			throw SingularProperty ("can't write to a singular property: " + _path.string());
 	}
 
 
@@ -981,7 +933,12 @@ template<class T>
 	Property<T>::write_signalling (Optional<Type> const& value)
 	{
 		if (value)
-			write_signalling (*value);
+		{
+			if (_root)
+				get_value_node_signalling()->write (*value);
+			else
+				throw SingularProperty ("can't write to a singular property: " + _path.string());
+		}
 		else
 			set_nil();
 	}

@@ -11,50 +11,47 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__GEAR_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__GEAR_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__LABEL_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__LABEL_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/instrument.h>
+#include <xefis/core/v2/instrument.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v2/setting.h>
+#include <xefis/utility/types.h>
 
 
-class Gear:
-	public v1::Instrument,
+class Label:
+	public v2::Instrument,
 	protected xf::InstrumentAids
 {
   public:
-	// Ctor
-	Gear (v1::ModuleManager*, QDomElement const& config);
+	/*
+	 * Settings
+	 */
 
-	void
-	data_updated() override;
+	v2::Setting<xf::FontSize>	font_size	{ this, xf::FontSize (10.0) };
+	v2::Setting<QString>		label		{ this };
+	v2::Setting<QColor>			color		{ this, Qt::white };
+	v2::Setting<Qt::Alignment>	alignment	{ this, Qt::AlignVCenter | Qt::AlignHCenter };
+
+  public:
+	// Ctor
+	explicit
+	Label (std::string const& instance = {});
 
   protected:
+	// QWidget API
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// QWidget API
 	void
 	paintEvent (QPaintEvent*) override;
-
-  private:
-	// Properties:
-	v1::PropertyBoolean	_setting_down;
-	v1::PropertyBoolean	_nose_up;
-	v1::PropertyBoolean	_nose_down;
-	v1::PropertyBoolean	_left_up;
-	v1::PropertyBoolean	_left_down;
-	v1::PropertyBoolean	_right_up;
-	v1::PropertyBoolean	_right_down;
 };
 
 #endif
