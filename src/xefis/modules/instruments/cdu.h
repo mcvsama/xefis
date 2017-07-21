@@ -37,10 +37,16 @@ class CDU:
 {
   public:
 	/*
+	 * Settings
+	 */
+
+	v2::Setting<bool>			show_time	{ this, true };
+
+	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Time>	time_utc { this, "/time/utc" };
+	v2::PropertyIn<si::Time>	time_utc	{ this, "/time/utc" };
 
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;
@@ -491,7 +497,6 @@ class CDU:
   private:
 	Unique<Config>			_config;
 	QString					_current_page_id;
-	xf::PropertyTime		_time_utc;
 	QString					_entry_value;
 	std::vector<QString>	_messages;
 };

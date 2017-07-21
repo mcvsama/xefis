@@ -17,9 +17,6 @@
 // Lib:
 #include <boost/format.hpp>
 
-// Qt:
-#include <QtWidgets/QLayout>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/window.h>
@@ -29,35 +26,24 @@
 #include "horizontal_trim.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/horizontal-trim", HorizontalTrim)
-
-
-HorizontalTrim::HorizontalTrim (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
+HorizontalTrim::HorizontalTrim (std::string const& instance):
+	Instrument (instance),
 	InstrumentAids (0.5f)
 {
-	parse_settings (config, {
-		{ "label", _label, false },
-		{ "label.minimum", _label_min, false },
-		{ "label.maximum", _label_max, false },
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe ({
+		&input_trim_value,
+		&input_trim_reference,
+		&input_trim_reference_minimum,
+		&input_trim_reference_maximum,
 	});
-
-	parse_properties (config, {
-		{ "input.trim-value", _input_trim_value, true },
-		{ "input.trim-reference", _input_trim_reference, false },
-		{ "input.trim-reference.minimum", _input_trim_reference_minimum, false },
-		{ "input.trim-reference.maximum", _input_trim_reference_maximum, false },
-	});
-
-	update();
 }
 
 
 void
-HorizontalTrim::data_updated()
+HorizontalTrim::process (xf::Cycle const& cycle)
 {
-	if (_input_trim_value.fresh())
-		update();
+	_inputs_observer.process (cycle.update_dt());
 }
 
 
@@ -78,12 +64,14 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	Optional<double> trim = _input_trim_value.get_optional();
+	auto trim = input_trim_value.get_optional();
+
 	if (trim)
 		trim = xf::clamped (*trim, -1.0, +1.0);
-	Optional<double> ref = _input_trim_reference.get_optional();
-	Optional<double> ref_min = _input_trim_reference_minimum.get_optional();
-	Optional<double> ref_max = _input_trim_reference_maximum.get_optional();
+
+	auto ref = input_trim_reference.get_optional();
+	auto ref_min = input_trim_reference_minimum.get_optional();
+	auto ref_max = input_trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = width() - h;
@@ -110,8 +98,8 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	painter().setTransform (center_point_transform);
 	painter().drawPolyline (line);
 	painter().drawLine (QPointF (0.0, -0.5 * h), QPointF (0.0, 0.0));
-	painter().fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, _label_min);
-	painter().fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, _label_max);
+	painter().fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, *this->label_min);
+	painter().fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, *this->label_max);
 
 	// Reference range:
 	if (ref_min && ref_max)
@@ -135,7 +123,7 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	// Cyan label:
 	painter().setFont (label_font);
 	painter().setPen (cyan);
-	painter().fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, _label);
+	painter().fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, *this->label);
 
 	// Pointer:
 	if (trim)

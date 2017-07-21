@@ -14,9 +14,6 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtWidgets/QLayout>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/window.h>
@@ -26,40 +23,27 @@
 #include "gear.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/gear", Gear)
-
-
-Gear::Gear (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
+Gear::Gear (std::string const& instance):
+	Instrument (instance),
 	InstrumentAids (0.5f)
 {
-	parse_properties (config, {
-		{ "setting.down", _setting_down, true },
-		{ "nose.up", _nose_up, true },
-		{ "nose.down", _nose_down, true },
-		{ "left.up", _left_up, true },
-		{ "left.down", _left_down, true },
-		{ "right.up", _right_up, true },
-		{ "right.down", _right_down, true },
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe ({
+		&requested_down,
+		&nose_up,
+		&nose_down,
+		&left_up,
+		&left_down,
+		&right_up,
+		&right_down,
 	});
-
-	update();
 }
 
 
 void
-Gear::data_updated()
+Gear::process (xf::Cycle const& cycle)
 {
-	if (_setting_down.fresh() ||
-		_nose_up.fresh() ||
-		_nose_down.fresh() ||
-		_left_up.fresh() ||
-		_left_down.fresh() ||
-		_right_up.fresh() ||
-		_right_down.fresh())
-	{
-		update();
-	}
+	_inputs_observer.process (cycle.update_dt());
 }
 
 
@@ -80,20 +64,19 @@ Gear::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	bool setting_down = _setting_down.read (false);
-	bool setting_invalid = _setting_down.is_nil();
-	bool nose_up = _nose_up.read (false);
-	bool nose_down = _nose_down.read (false);
-	bool left_up = _left_up.read (false);
-	bool left_down = _left_down.read (false);
-	bool right_up = _right_up.read (false);
-	bool right_down = _right_down.read (false);
+	bool v_requested_down = requested_down.value_or (false);
+	bool v_nose_up = nose_up.value_or (false);
+	bool v_nose_down = nose_down.value_or (false);
+	bool v_left_up = left_up.value_or (false);
+	bool v_left_down = left_down.value_or (false);
+	bool v_right_up = right_up.value_or (false);
+	bool v_right_down = right_down.value_or (false);
 
 	// If everything retracted according to setting, hide the widget:
-	if (_setting_down.valid() && !setting_down &&
-		nose_up && !nose_down &&
-		left_up && !left_down &&
-		right_up && !right_down)
+	if (requested_down && !v_requested_down &&
+		v_nose_up && !v_nose_down &&
+		v_left_up && !v_left_down &&
+		v_right_up && !v_right_down)
 	{
 		return;
 	}
@@ -138,7 +121,7 @@ Gear::paintEvent (QPaintEvent*)
 	};
 
 	auto should_paint_graybox = [&](bool gear_up, bool gear_down) -> bool {
-		return setting_invalid || (setting_down && (gear_up || !gear_down)) || (!setting_down && (gear_down || !gear_up));
+		return requested_down.is_nil() || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
 	};
 
 	painter().setBrush (Qt::NoBrush);
@@ -153,23 +136,23 @@ Gear::paintEvent (QPaintEvent*)
 	painter().setTransform (center_transform);
 	painter().translate (0.f, -1.3f * box.bottom());
 
-	if (should_paint_graybox (nose_up, nose_down))
+	if (should_paint_graybox (v_nose_up, v_nose_down))
 		paint_graybox();
-	else if (nose_down)
+	else if (v_nose_down)
 		paint_down();
 
 	painter().setTransform (center_transform);
 	painter().translate (-0.6f * box.width(), 0.75f * box.height());
-	if (should_paint_graybox (left_up, left_down))
+	if (should_paint_graybox (v_left_up, v_left_down))
 		paint_graybox();
-	else if (left_down)
+	else if (v_left_down)
 		paint_down();
 
 	painter().setTransform (center_transform);
 	painter().translate (+0.6f * box.width(), 0.75f * box.height());
-	if (should_paint_graybox (right_up, right_down))
+	if (should_paint_graybox (v_right_up, v_right_down))
 		paint_graybox();
-	else if (right_down)
+	else if (v_right_down)
 		paint_down();
 }
 

@@ -17,27 +17,41 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/instrument.h>
+#include <xefis/core/v2/instrument.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/property_observer.h>
+#include <xefis/core/v2/setting.h>
 
 
 class Flaps:
-	public v1::Instrument,
+	public v2::Instrument,
 	protected xf::InstrumentAids
 {
   public:
+	/*
+	 * Settings
+	 */
+
+	v2::Setting<si::Angle>		maximum_angle	{ this };
+	v2::Setting<bool>			hide_retracted	{ this, true };
+
+	/*
+	 * Input
+	 */
+
+	v2::PropertyIn<si::Angle>	current_angle	{ this, "/current-angle" };
+	v2::PropertyIn<si::Angle>	set_angle		{ this, "/set-angle" };
+
+  public:
 	// Ctor
-	Flaps (v1::ModuleManager*, QDomElement const& config);
+	explicit
+	Flaps (std::string const& instance = {});
 
 	void
-	data_updated() override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API
@@ -49,12 +63,7 @@ class Flaps:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	// Settings:
-	Angle				_maximum		= 0_deg;
-	bool				_hide_retracted	= false;
-	// Properties:
-	v1::PropertyAngle	_current;
-	v1::PropertyAngle	_setting;
+	v2::PropertyObserver	_inputs_observer;
 };
 
 #endif

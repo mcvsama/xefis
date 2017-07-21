@@ -17,9 +17,8 @@
 // Standard:
 #include <cstddef>
 #include <cstdint>
-
-// Boost:
-#include <boost/variant.hpp>
+#include <optional>
+#include <variant>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -32,6 +31,19 @@
 
 namespace v2 {
 using namespace xf; // XXX
+
+/**
+ * Helper type that indicates Nil values for properties.
+ */
+class Nil
+{ };
+
+
+/**
+ * Global nil object that when compared to a nil property, gives true.
+ */
+static constexpr Nil nil;
+
 
 /**
  * Exception object thrown when trying to read a nil property.
@@ -76,10 +88,28 @@ class PropertyVirtualInterface
 	is_nil() const noexcept = 0;
 
 	/**
+	 * Alias for is_nil().
+	 */
+	bool
+	operator== (Nil) const
+	{
+		return is_nil();
+	}
+
+	/**
 	 * Set property to the nil value.
 	 */
 	virtual void
 	set_nil() = 0;
+
+	/**
+	 * Alias for set_nil().
+	 */
+	void
+	operator= (Nil)
+	{
+		set_nil();
+	}
 
 	/**
 	 * Alias for set_nil().
@@ -232,10 +262,10 @@ template<class pValue>
 		set (Value);
 
 		/**
-		 * Set new value or set to nil, of Optional is empty.
+		 * Set new value or set to nil, of std::optional is empty.
 		 */
 		void
-		set (Optional<Value>);
+		set (std::optional<Value>);
 
 		/**
 		 * Copy value (or nil-state) from other proprety.
@@ -244,16 +274,10 @@ template<class pValue>
 		set (Property<Value> const&);
 
 		/**
-		 * Alias for set (Value).
+		 * Alias for set (std::optional<Value>)
 		 */
 		Property const&
-		operator= (Value);
-
-		/**
-		 * Alias for set (Optional<Value>)
-		 */
-		Property const&
-		operator= (Optional<Value>);
+		operator= (std::optional<Value>);
 
 		/**
 		 * Return contained value.
@@ -269,10 +293,10 @@ template<class pValue>
 		operator*() const;
 
 		/**
-		 * Return Optional that has value or is empty, if this property is nil.
-		 * If fallback-value is set, the returned Optional will contain the fall-back value, and will never be empty.
+		 * Return std::optional that has value or is empty, if this property is nil.
+		 * If fallback-value is set, the returned std::optional will contain the fall-back value, and will never be empty.
 		 */
-		Optional<Value>
+		std::optional<Value>
 		get_optional() const;
 
 		/**
@@ -297,10 +321,10 @@ template<class pValue>
 		 * Affects value-retrieving methods and their aliases: get(), get_optional(), is_nil(), *_timestamp(), *_age(),
 		 * valid(), serial().
 		 *
-		 * Pass empty Optional (or boost::none) to remove the fallback-value.
+		 * Pass empty std::optional (or std::nullopt) to remove the fallback-value.
 		 */
 		void
-		set_fallback (Optional<Value>);
+		set_fallback (std::optional<Value>);
 
 		// BasicProperty API
 		bool
@@ -315,8 +339,8 @@ template<class pValue>
 		valid() const noexcept override;
 
 	  private:
-		Optional<Value>	_value;
-		Optional<Value>	_fallback_value;
+		std::optional<Value>	_value;
+		std::optional<Value>	_fallback_value;
 	};
 
 
@@ -423,7 +447,7 @@ template<class pValue>
 		fetch (Cycle const&) override;
 
 	  private:
-		boost::variant<std::nullptr_t, Module*, PropertyOut<Value>*> _data_source = nullptr;
+		std::variant<std::nullptr_t, Module*, PropertyOut<Value>*> _data_source = nullptr;
 	};
 
 
@@ -526,7 +550,7 @@ template<class V>
 
 template<class V>
 	inline void
-	Property<V>::set (Optional<Value> value)
+	Property<V>::set (std::optional<Value> value)
 	{
 		if (value)
 			set (*value);
@@ -548,16 +572,7 @@ template<class V>
 
 template<class V>
 	inline Property<V> const&
-	Property<V>::operator= (Value value)
-	{
-		set (value);
-		return *this;
-	}
-
-
-template<class V>
-	inline Property<V> const&
-	Property<V>::operator= (Optional<Value> value)
+	Property<V>::operator= (std::optional<Value> value)
 	{
 		set (value);
 		return *this;
@@ -586,7 +601,7 @@ template<class V>
 
 
 template<class V>
-	inline Optional<typename Property<V>::Value>
+	inline std::optional<typename Property<V>::Value>
 	Property<V>::get_optional() const
 	{
 		if (_value)
@@ -619,7 +634,7 @@ template<class V>
 
 template<class V>
 	inline void
-	Property<V>::set_fallback (Optional<Value> fallback_value)
+	Property<V>::set_fallback (std::optional<Value> fallback_value)
 	{
 		if (_fallback_value != fallback_value)
 		{
@@ -646,7 +661,7 @@ template<class V>
 		if (_value)
 		{
 			_modification_timestamp = TimeHelper::now();
-			_value = boost::none;
+			_value.reset();
 			++_serial;
 		}
 	}
@@ -789,7 +804,7 @@ template<class V>
 	{
 		// TODO measure how often is this called for real-aircraft config,
 		// perhaps add a flag that the result is cached in current processing-loop.
-		struct Fetcher: public boost::static_visitor<>
+		struct Fetcher
 		{
 			Fetcher (PropertyOut<Value>* property_out, Cycle const& cycle):
 				_this (property_out),
@@ -817,7 +832,7 @@ template<class V>
 			Cycle const&		_cycle;
 		};
 
-		boost::apply_visitor (Fetcher (this, cycle), _data_source);
+		std::visit (Fetcher (this, cycle), _data_source);
 	}
 
 } // namespace v2

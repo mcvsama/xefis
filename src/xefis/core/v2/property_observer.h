@@ -17,10 +17,8 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <variant>
 #include <list>
-
-// Boost:
-#include <boost/variant.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -55,8 +53,8 @@ class PropertyObserver
 		remote_serial() const noexcept;
 
 	  private:
-		boost::variant<BasicProperty*, PropertyObserver*>	_observable;
-		BasicProperty::Serial								_saved_serial	= 0;
+		std::variant<BasicProperty*, PropertyObserver*>	_observable;
+		BasicProperty::Serial							_saved_serial	= 0;
 	};
 
 	typedef std::list<Object>			ObjectsList;
@@ -211,22 +209,22 @@ PropertyObserver::Object::Object (PropertyObserver* observer):
 inline BasicProperty::Serial
 PropertyObserver::Object::remote_serial() const noexcept
 {
-	struct SerialGetter: public boost::static_visitor<BasicProperty::Serial>
+	struct SerialGetter
 	{
 		BasicProperty::Serial
-		operator() (BasicProperty* property) const
+		operator() (BasicProperty* property) const noexcept
 		{
 			return property->serial();
 		}
 
 		BasicProperty::Serial
-		operator() (PropertyObserver* observer) const
+		operator() (PropertyObserver* observer) const noexcept
 		{
 			return observer->serial();
 		}
 	};
 
-	return boost::apply_visitor (SerialGetter(), _observable);
+	return std::visit (SerialGetter(), _observable);
 }
 
 

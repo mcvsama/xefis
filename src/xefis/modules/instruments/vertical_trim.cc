@@ -13,12 +13,10 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
 
 // Lib:
 #include <boost/format.hpp>
-
-// Qt:
-#include <QtWidgets/QLayout>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,33 +27,19 @@
 #include "vertical_trim.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/vertical-trim", VerticalTrim)
-
-
-VerticalTrim::VerticalTrim (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
+VerticalTrim::VerticalTrim (std::string const& instance):
+	Instrument (instance),
 	InstrumentAids (0.5f)
 {
-	parse_settings (config, {
-		{ "label", _label, false },
-	});
-
-	parse_properties (config, {
-		{ "input.trim-value", _input_trim_value, true },
-		{ "input.trim-reference", _input_trim_reference, false },
-		{ "input.trim-reference.minimum", _input_trim_reference_minimum, false },
-		{ "input.trim-reference.maximum", _input_trim_reference_maximum, false },
-	});
-
-	update();
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe (input_trim_value);
 }
 
 
 void
-VerticalTrim::data_updated()
+VerticalTrim::process (v2::Cycle const& cycle)
 {
-	if (_input_trim_value.fresh())
-		update();
+	_inputs_observer.process (cycle.update_dt());
 }
 
 
@@ -76,12 +60,14 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	Optional<double> trim = _input_trim_value.get_optional();
+	std::optional<double> trim = input_trim_value.get_optional();
+
 	if (trim)
 		xf::clamp (*trim, -1.0, +1.0);
-	Optional<double> ref = _input_trim_reference.get_optional();
-	Optional<double> ref_min = _input_trim_reference_minimum.get_optional();
-	Optional<double> ref_max = _input_trim_reference_maximum.get_optional();
+
+	std::optional<double> ref = input_trim_reference.get_optional();
+	std::optional<double> ref_min = input_trim_reference_minimum.get_optional();
+	std::optional<double> ref_max = input_trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = height() - h;
@@ -133,7 +119,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	// Cyan vertical text:
 	painter().setFont (label_font);
 	painter().setPen (cyan);
-	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, _label);
+	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *this->label);
 
 	// Pointer:
 	if (trim)

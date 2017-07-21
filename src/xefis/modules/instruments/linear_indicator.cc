@@ -13,31 +13,29 @@
 
 // Standard:
 #include <cstddef>
-#include <vector>
-
-// Qt:
-#include <QtGui/QPainter>
+#include <string>
+#include <algorithm>
+#include <cmath>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v1/window.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/painter.h>
 
 // Local:
-#include "linear_indicator_widget.h"
+#include "linear_indicator.h"
 
 
-LinearIndicatorWidget::LinearIndicatorWidget (QWidget* parent):
-	InstrumentWidget (parent),
-	InstrumentAids (0.8f)
+BasicIndicator::BasicIndicator (std::string const& instance):
+	xf::InstrumentAids (1.0f),
+	Instrument (instance)
 { }
 
 
 void
-LinearIndicatorWidget::resizeEvent (QResizeEvent* event)
+BasicIndicator::resizeEvent (QResizeEvent*)
 {
-	InstrumentWidget::resizeEvent (event);
-
 	auto xw = dynamic_cast<v1::Window*> (window());
 	if (xw)
 		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
@@ -46,9 +44,44 @@ LinearIndicatorWidget::resizeEvent (QResizeEvent* event)
 }
 
 
-void
-LinearIndicatorWidget::paintEvent (QPaintEvent*)
+QString
+BasicIndicator::stringify_value (double value) const
 {
+	double numeric_value = value;
+
+	if (*this->precision < 0)
+		numeric_value /= std::pow (10.0, -*this->precision);
+
+	if (*this->modulo > 0)
+		numeric_value = static_cast<int> (numeric_value) / *this->modulo * *this->modulo;
+
+	return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, *this->precision));
+}
+
+
+LinearIndicator::LinearIndicator (v2::PropertyDigitizer value_digitizer, std::string const& instance):
+	InstrumentAids (0.8f),
+	BasicIndicator (instance),
+	_value_digitizer (value_digitizer)
+{
+	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.observe (_value_digitizer.property());
+}
+
+
+void
+LinearIndicator::process (v2::Cycle const& cycle)
+{
+	_inputs_observer.process (cycle.update_dt());
+}
+
+
+void
+LinearIndicator::paintEvent (QPaintEvent*)
+{
+	std::optional<double> value = _value_digitizer.to_numeric();
+	xf::Range<double> range { *this->value_minimum, *this->value_maximum };
+
 	auto painting_token = get_token (this);
 
 	float const w = width();
@@ -59,7 +92,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 
 	clear_background();
 
-	if (_mirrored)
+	if (*this->mirrored_style)
 	{
 		painter().translate (w, 0.f);
 		painter().scale (-1.f, 1.f);
@@ -77,10 +110,10 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	painter().setPen (pen_silver);
 	painter().drawLine (p0, p1);
 
-	if (_value)
+	if (value)
 	{
-		auto value = xf::clamped (*_value, _range.min(), _range.max());
-		bool inbound = _range.includes (*_value);
+		auto v_value = xf::clamped (*value, range);
+		bool inbound = range.includes (*value);
 
 		if (inbound)
 			painter().setBrush (Qt::white);
@@ -92,7 +125,7 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 			<< QPointF (0.f, 0.f)
 			<< QPointF (1.9f * q, -0.5f * q)
 			<< QPointF (1.9f * q, +0.5f * q);
-		polygon.translate (p1.x(), xf::renormalize (value, _range.min(), _range.max(), p1.y(), p0.y()));
+		polygon.translate (p1.x(), xf::renormalize (v_value, range.min(), range.max(), p1.y(), p0.y()));
 		painter().add_shadow ([&] {
 			painter().drawPolygon (polygon);
 		});
@@ -106,8 +139,8 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	float hcorr = 0.025f * metrics.height();
 
 	QString text;
-	if (_value)
-		text = stringify_value (*_value);
+	if (value)
+		text = stringify_value (*value);
 	text = pad_string (text);
 
 	painter().setFont (font);
@@ -117,7 +150,8 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	painter().setBrush (Qt::NoBrush);
 	painter().drawRect (text_rect);
 	QPointF position;
-	if (_mirrored)
+
+	if (*this->mirrored_style)
 	{
 		position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
 		position = painter().transform().map (position);
@@ -125,25 +159,14 @@ LinearIndicatorWidget::paintEvent (QPaintEvent*)
 	}
 	else
 		position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
+
 	painter().fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, text);
 }
 
 
 QString
-LinearIndicatorWidget::stringify_value (double value) const
+LinearIndicator::pad_string (QString const& input) const
 {
-	double numeric_value = value;
-	if (_precision < 0)
-		numeric_value /= std::pow (10.0, -_precision);
-	if (_modulo > 0)
-		numeric_value = static_cast<int> (numeric_value) / _modulo * _modulo;
-	return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, _precision));
-}
-
-
-QString
-LinearIndicatorWidget::pad_string (QString const& input) const
-{
-	return QString ("%1").arg (input, _digits);
+	return QString ("%1").arg (input, *this->digits);
 }
 

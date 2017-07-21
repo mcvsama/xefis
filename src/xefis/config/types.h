@@ -19,9 +19,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-
-// Boost:
-#include <boost/optional.hpp>
+#include <optional>
 
 // Qt:
 #include <QtCore/QString>
@@ -61,7 +59,7 @@ typedef bool					_Bool;
 typedef std::vector<uint8_t>	Blob;
 
 template<class Value>
-	using Optional = boost::optional<Value>;
+	using Optional = std::optional<Value>;
 
 template<class Type>
 	using Shared = std::shared_ptr<Type>;
@@ -80,7 +78,7 @@ template<class Target, class SourceOptional>
 		if (source)
 			return Optional<Target> (*source);
 		else
-			return boost::none;
+			return std::nullopt;
 	}
 
 #endif

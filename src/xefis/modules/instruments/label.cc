@@ -22,32 +22,15 @@
 #include <xefis/core/v1/window.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "label.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/label", Label)
-
-
-Label::Label (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
+Label::Label (std::string const& instance):
+	Instrument (instance),
 	InstrumentAids (1.f)
-{
-	for (QDomElement const& e: xf::iterate_sub_elements (config))
-	{
-		if (e == "label")
-			_label = e.text();
-		else if (e == "align")
-			_alignment = xf::parse_alignment (e.text());
-		else if (e == "color")
-			_color = xf::parse_color (e.text());
-		else if (e == "font-size")
-			_font_size = e.text().toDouble();
-	}
-}
+{ }
 
 
 void
@@ -68,9 +51,9 @@ Label::paintEvent (QPaintEvent*)
 	clear_background();
 
 	QFont font (_font_10);
-	font.setPixelSize (font_size (_font_size));
+	font.setPixelSize (**this->font_size);
 	painter().setFont (font);
-	painter().setPen (_color);
-	painter().fast_draw_text (rect(), _alignment, _label);
+	painter().setPen (*this->color);
+	painter().fast_draw_text (rect(), *this->alignment, *this->label);
 }
 

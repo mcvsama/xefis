@@ -21,31 +21,14 @@
 #include "debug_forces.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("instruments/debug-forces", DebugForces)
-
-
-DebugForces::DebugForces (v1::ModuleManager* module_manager, QDomElement const& config):
-	Instrument (module_manager, config),
-	InstrumentAids (1.0)
-{
-	parse_properties (config, {
-		{ "input.orientation.pitch", _input_orientation_pitch, true },
-		{ "input.orientation.roll", _input_orientation_roll, true },
-		{ "input.orientation.heading.magnetic", _input_orientation_magnetic_heading, true },
-		{ "input.accel.measured.x", _input_measured_accel_x, true },
-		{ "input.accel.measured.y", _input_measured_accel_y, true },
-		{ "input.accel.measured.z", _input_measured_accel_z, true },
-		{ "input.accel.centrifugal.x", _input_centrifugal_accel_x, true },
-		{ "input.accel.centrifugal.y", _input_centrifugal_accel_y, true },
-		{ "input.accel.centrifugal.z", _input_centrifugal_accel_z, true },
-	});
-
-	update();
-}
+DebugForces::DebugForces (std::string const& instance):
+	Instrument (instance),
+	InstrumentAids (1.0f)
+{ }
 
 
 void
-DebugForces::data_updated()
+DebugForces::process (v2::Cycle const&)
 {
 	update();
 }
@@ -63,13 +46,13 @@ DebugForces::paintEvent (QPaintEvent*)
 	QPointF measured_accel;
 	QPointF earth_accel;
 
-	if (_input_centrifugal_accel_y.valid() && _input_centrifugal_accel_z.valid())
-		centrifugal_accel = QPointF (_input_centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
-									 _input_centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
+	if (input_centrifugal_accel_y && input_centrifugal_accel_z)
+		centrifugal_accel = QPointF (input_centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
+									 input_centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
 
-	if (_input_measured_accel_y.valid() && _input_measured_accel_z.valid())
-		measured_accel = QPointF (_input_measured_accel_y->quantity<Gravity>() * one_gravity_length,
-								  _input_measured_accel_z->quantity<Gravity>() * one_gravity_length);
+	if (input_measured_accel_y && input_measured_accel_z)
+		measured_accel = QPointF (input_measured_accel_y->quantity<Gravity>() * one_gravity_length,
+								  input_measured_accel_z->quantity<Gravity>() * one_gravity_length);
 
 	earth_accel = measured_accel - centrifugal_accel;
 
@@ -79,10 +62,10 @@ DebugForces::paintEvent (QPaintEvent*)
 	painter().setPen (get_pen (Qt::white, 0.5));
 	painter().drawLine (QPointF (-0.5 * width(), 0.0), QPointF (0.5 * width(), 0.0));
 
-	if (_input_orientation_roll.valid())
+	if (input_orientation_roll)
 	{
 		// Plane reference frame:
-		painter().rotate (_input_orientation_roll->quantity<Degree>());
+		painter().rotate (input_orientation_roll->quantity<Degree>());
 		// Plane:
 		painter().setPen (get_pen (Qt::white, 2.5));
 		painter().drawLine (QPointF (-0.25 * width(), 0.0), QPointF (0.25 * width(), 0.0));
