@@ -24,112 +24,109 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
-#include <xefis/core/v1/instrument.h>
-#include <xefis/utility/smoother.h>
+#include <xefis/core/v2/instrument.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/setting.h>
+#include <xefis/core/xefis.h>
+#include <xefis/support/navigation/navaid_storage.h>
 
 // Local:
 #include "hsi_widget.h"
 
 
-class HSI: public v1::Instrument
+class HSI: public v2::Instrument
 {
 	Q_OBJECT
 
   public:
-	// Ctor
-	HSI (v1::ModuleManager*, QDomElement const& config);
-
-  public slots:
-	/**
-	 * Force HSI to read data from properties.
+	/*
+	 * Settings
 	 */
-	void
-	read();
 
-  protected:
+	// At what ranve setting to start drawing airport circles:
+	v2::Setting<si::Length>					arpt_runways_range_threshold			{ this };
+	// At what range setting to start drawing runways instead of circles:
+	v2::Setting<si::Length>					arpt_map_range_threshold				{ this };
+	// Length of the runway extension line on the map:
+	v2::Setting<si::Length>					arpt_runway_extension_length			{ this };
+	v2::Setting<std::array<si::Time, 3>>	trend_vector_times						{ this, { 30_s, 60_s, 90_s } };
+	v2::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, { 5_nmi, 10_nmi, 15_nmi } };
+	v2::Setting<si::Length>					trend_vector_max_range					{ this, 30_nmi };
+
+	/*
+	 * Input
+	 */
+
+	v2::PropertyIn<int64_t>					display_mode							{ this, "/display-mode", 0 }; // TODO use enum
+	v2::PropertyIn<si::Length>				range									{ this, "/range", 5_nmi };
+	v2::PropertyIn<si::Velocity>			speed_gs								{ this, "/speeds/gs" };
+	v2::PropertyIn<si::Velocity>			speed_tas								{ this, "/speeds/tas" };
+	v2::PropertyIn<bool>					cmd_visible								{ this, "/cmd/visible" };
+	v2::PropertyIn<bool>					cmd_line_visible						{ this, "/cmd/line-visible" };
+	v2::PropertyIn<si::Angle>				cmd_heading_magnetic					{ this, "/cmd/heading-magnetic" };
+	v2::PropertyIn<si::Angle>				cmd_track_magnetic						{ this, "/cmd/track-magnetic" };
+	v2::PropertyIn<bool>					cmd_use_trk								{ this, "/cmd/use-trk" };
+	v2::PropertyIn<si::Length>				target_altitude_reach_distance			{ this, "/target-altitude-reach-distance" };
+	v2::PropertyIn<si::Angle>				orientation_heading_magnetic			{ this, "/orientation/heading-magnetic" };
+	v2::PropertyIn<si::Angle>				orientation_heading_true				{ this, "/orientation/heading-true" };
+	v2::PropertyIn<bool>					use_true_heading						{ this, "/use-true-heading" };
+	v2::PropertyIn<si::Angle>				home_true_direction						{ this, "/home/true-direction" };
+	v2::PropertyIn<bool>					home_track_visible						{ this, "/home/track-visible" };
+	v2::PropertyIn<si::Length>				home_distance_vlos						{ this, "/home/distance/vlos" };
+	v2::PropertyIn<si::Length>				home_distance_ground					{ this, "/home/distance/ground" };
+	v2::PropertyIn<si::Length>				home_distance_vertical					{ this, "/home/distance/vertical" };
+	v2::PropertyIn<si::Angle>				home_position_longitude					{ this, "/home/position/longitude" };
+	v2::PropertyIn<si::Angle>				home_position_latitude					{ this, "/home/position/latitude" };
+	v2::PropertyIn<si::Angle>				position_longitude						{ this, "/position/longitude" };
+	v2::PropertyIn<si::Angle>				position_latitude						{ this, "/position/latitude" };
+	v2::PropertyIn<std::string>				position_source							{ this, "/position/source" };
+	v2::PropertyIn<bool>					track_visible							{ this, "/track/visible" };
+	v2::PropertyIn<si::Angle>				track_lateral_magnetic					{ this, "/track/lateral-magnetic" };
+	v2::PropertyIn<si::AngularVelocity>		track_lateral_rotation					{ this, "/track/lateral-rotation" };
+	v2::PropertyIn<bool>					track_center_on_track					{ this, "/track/center-on-track" };
+	v2::PropertyIn<bool>					course_visible							{ this, "/course/visible" };
+	v2::PropertyIn<si::Angle>				course_setting_magnetic					{ this, "/course/setting-magnetic" };
+	v2::PropertyIn<si::Angle>				course_deviation						{ this, "/course/deviation" };
+	v2::PropertyIn<bool>					course_to_flag							{ this, "/course/to-flag" };
+	v2::PropertyIn<std::string>				navaid_selected_reference				{ this, "/navaid/selected/reference" };
+	v2::PropertyIn<std::string>				navaid_selected_identifier				{ this, "/navaid/selected/identifier" };
+	v2::PropertyIn<si::Length>				navaid_selected_distance				{ this, "/navaid/selected/distance" };
+	v2::PropertyIn<si::Time>				navaid_selected_eta						{ this, "/navaid/selected/eta" };
+	v2::PropertyIn<si::Angle>				navaid_selected_course_magnetic			{ this, "/navaid/selected/course-magnetic" };
+	v2::PropertyIn<int64_t>					navaid_left_type						{ this, "/navaid/left/type" };
+	v2::PropertyIn<std::string>				navaid_left_reference					{ this, "/navaid/left/reference" };
+	v2::PropertyIn<std::string>				navaid_left_identifier					{ this, "/navaid/left/identifier" };
+	v2::PropertyIn<si::Length>				navaid_left_distance					{ this, "/navaid/left/distance" };
+	v2::PropertyIn<si::Angle>				navaid_left_initial_bearing_magnetic	{ this, "/navaid/left/initial-bearing-magnetic" };
+	v2::PropertyIn<int64_t>					navaid_right_type						{ this, "/navaid/right/type" };
+	v2::PropertyIn<std::string>				navaid_right_reference					{ this, "/navaid/right/reference" };
+	v2::PropertyIn<std::string>				navaid_right_identifier					{ this, "/navaid/right/identifier" };
+	v2::PropertyIn<si::Length>				navaid_right_distance					{ this, "/navaid/right/distance" };
+	v2::PropertyIn<si::Angle>				navaid_right_initial_bearing_magnetic	{ this, "/navaid/right/initial-bearing-magnetic" };
+	v2::PropertyIn<si::Length>				navigation_required_performance			{ this, "/navigation/required-performance" };
+	v2::PropertyIn<si::Length>				navigation_actual_performance			{ this, "/navigation/actual-performance" };
+	v2::PropertyIn<si::Angle>				wind_from_magnetic						{ this, "/wind/from-magnetic" };
+	v2::PropertyIn<si::Velocity>			wind_speed_tas							{ this, "/wind/speed-tas" };
+	v2::PropertyIn<std::string>				localizer_id							{ this, "/localizer-id" };
+	v2::PropertyIn<bool>					tcas_on									{ this, "/tcas/on" };
+	v2::PropertyIn<si::Length>				tcas_range								{ this, "/tcas/range" };
+	v2::PropertyIn<bool>					features_fix							{ this, "/features/fix" };
+	v2::PropertyIn<bool>					features_vor							{ this, "/features/vor" };
+	v2::PropertyIn<bool>					features_dme							{ this, "/features/dme" };
+	v2::PropertyIn<bool>					features_ndb							{ this, "/features/ndb" };
+	v2::PropertyIn<bool>					features_loc							{ this, "/features/loc" };
+	v2::PropertyIn<bool>					features_arpt							{ this, "/features/arpt" };
+
+  public:
+	// Ctor
+	HSI (xf::Xefis*, xf::NavaidStorage*, std::string const& instance = {});
+
+	// Module API
 	void
-	data_updated() override;
+	process (v2::Cycle const&) override;
 
   private:
-	Unique<HSIWidget>		_hsi_widget;
-	std::array<LonLat, 3>	_positions;
-	bool					_positions_valid = false;
-	// Settings:
-	Length					_arpt_runways_range_threshold;
-	Length					_arpt_map_range_threshold;
-	Length					_arpt_runway_extension_length;
-	std::array<Time, 3>		_trend_vector_times				= { { 30_s, 60_s, 90_s } };
-	std::array<Length, 3>	_trend_vector_min_ranges		= { { 5_nmi, 10_nmi, 15_nmi } };
-	Length					_trend_vector_max_range			= 30_nmi;
-	// Input:
-	v1::PropertyInteger		_display_mode;
-	v1::PropertyLength		_range;
-	v1::PropertySpeed		_speed_gs;
-	v1::PropertySpeed		_speed_tas;
-	v1::PropertyBoolean		_cmd_visible;
-	v1::PropertyBoolean		_cmd_line_visible;
-	v1::PropertyAngle		_cmd_heading_magnetic;
-	v1::PropertyAngle		_cmd_track_magnetic;
-	v1::PropertyBoolean		_cmd_use_trk;
-	v1::PropertyLength		_target_altitude_reach_distance;
-	v1::PropertyAngle		_orientation_heading_magnetic;
-	v1::PropertyAngle		_orientation_heading_true;
-	v1::PropertyBoolean		_use_true_heading;
-	v1::PropertyAngle		_home_true_direction;
-	v1::PropertyBoolean		_home_track_visible;
-	v1::PropertyLength		_home_distance_vlos;
-	v1::PropertyLength		_home_distance_ground;
-	v1::PropertyLength		_home_distance_vertical;
-	v1::PropertyAngle		_home_position_longitude;
-	v1::PropertyAngle		_home_position_latitude;
-	v1::PropertyAngle		_position_latitude;
-	v1::PropertyAngle		_position_longitude;
-	v1::PropertyString		_position_source;
-	v1::PropertyBoolean		_track_visible;
-	v1::PropertyAngle		_track_lateral_magnetic;
-	v1::Property<AngularVelocity>
-							_track_lateral_rotation;
-	v1::PropertyBoolean		_track_center_on_track;
-	v1::PropertyBoolean		_course_visible;
-	v1::PropertyAngle		_course_setting_magnetic;
-	v1::PropertyAngle		_course_deviation;
-	v1::PropertyBoolean		_course_to_flag;
-	v1::PropertyString		_navaid_selected_reference;
-	v1::PropertyString		_navaid_selected_identifier;
-	v1::PropertyLength		_navaid_selected_distance;
-	v1::PropertyTime		_navaid_selected_eta;
-	v1::PropertyAngle		_navaid_selected_course_magnetic;
-	v1::PropertyInteger		_navaid_left_type;
-	v1::PropertyString		_navaid_left_reference;
-	v1::PropertyString		_navaid_left_identifier;
-	v1::PropertyLength		_navaid_left_distance;
-	v1::PropertyAngle		_navaid_left_initial_bearing_magnetic;
-	v1::PropertyInteger		_navaid_right_type;
-	v1::PropertyString		_navaid_right_reference;
-	v1::PropertyString		_navaid_right_identifier;
-	v1::PropertyLength		_navaid_right_distance;
-	v1::PropertyAngle		_navaid_right_initial_bearing_magnetic;
-	v1::PropertyLength		_navigation_required_performance;
-	v1::PropertyLength		_navigation_actual_performance;
-	v1::PropertyAngle		_wind_from_magnetic;
-	v1::PropertySpeed		_wind_speed_tas;
-	v1::PropertyString		_localizer_id;
-	v1::PropertyBoolean		_tcas_on;
-	v1::PropertyLength		_tcas_range;
-	v1::PropertyBoolean		_features_fix;
-	v1::PropertyBoolean		_features_vor;
-	v1::PropertyBoolean		_features_dme;
-	v1::PropertyBoolean		_features_ndb;
-	v1::PropertyBoolean		_features_loc;
-	v1::PropertyBoolean		_features_arpt;
+	Unique<HSIWidget>	_hsi_widget;
 };
-
-
-inline void
-HSI::data_updated()
-{
-	read();
-}
 
 #endif

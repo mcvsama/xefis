@@ -77,81 +77,72 @@ class HSIWidget: public xf::InstrumentWidget
 		friend class PaintWorkUnit;
 
 	  public:
-		DisplayMode			display_mode				= DisplayMode::Expanded;
-		HeadingMode			heading_mode				= HeadingMode::Magnetic;
-		Length				range						= 1_nmi;
-		bool				heading_visible				= false;
-		Angle				heading_magnetic			= 0_deg;
-		Angle				heading_true				= 0_deg;
-		bool				ap_visible					= false;
-		bool				ap_line_visible				= false;
-		Optional<Angle>		ap_heading_magnetic;
-		Optional<Angle>		ap_track_magnetic;
-		Optional<bool>		ap_use_trk;
-		bool				track_visible				= false;
-		Angle				track_magnetic				= 0_deg;
-		bool				course_visible				= false;
-		Optional<Angle>		course_setting_magnetic;
-		Optional<Angle>		course_deviation;
-		Optional<bool>		course_to_flag;
-		QString				navaid_selected_reference;
-		QString				navaid_selected_identifier;
-		Optional<Length>	navaid_selected_distance;
-		Optional<Time>		navaid_selected_eta;
-		Optional<Angle>		navaid_selected_course_magnetic;
-		int					navaid_left_type			= 0;
-		QString				navaid_left_reference;
-		QString				navaid_left_identifier;
-		Optional<Length>	navaid_left_distance;
-		Optional<Angle>		navaid_left_initial_bearing_magnetic;
-		int					navaid_right_type			= 0;
-		QString				navaid_right_reference;
-		QString				navaid_right_identifier;
-		Optional<Length>	navaid_right_distance;
-		Optional<Angle>		navaid_right_initial_bearing_magnetic;
-		Optional<Length>	navigation_required_performance;
-		Optional<Length>	navigation_actual_performance;
-		bool				center_on_track				= false;
-		bool				home_track_visible			= false;
-		Optional<Angle>		true_home_direction;
-		bool				dist_to_home_ground_visible	= false;
-		Length				dist_to_home_ground			= 0_nmi;
-		bool				dist_to_home_vlos_visible	= false;
-		Length				dist_to_home_vlos			= 0_nmi;
-		bool				dist_to_home_vert_visible	= false;
-		Length				dist_to_home_vert			= 0_nmi;
-		Optional<LonLat>	home;
-		Optional<Speed>		ground_speed;
-		Optional<Speed>		true_air_speed;
-		Optional<AngularVelocity>
-							track_lateral_rotation;
-		bool				altitude_reach_visible		= false;
-		Length				altitude_reach_distance		= 0_nmi;
-		bool				wind_information_visible	= false;
-		Angle				wind_from_magnetic_heading	= 0_deg;
-		Speed				wind_tas_speed				= 0_kt;
-		bool				position_valid				= false;
-		Optional<LonLat>	position;
-		bool				navaids_visible				= false;
-		bool				fix_visible					= false;
-		bool				vor_visible					= false;
-		bool				dme_visible					= false;
-		bool				ndb_visible					= false;
-		bool				loc_visible					= false;
-		bool				arpt_visible				= false;
-		QString				highlighted_loc;
-		bool				positioning_hint_visible	= false;
-		QString				positioning_hint;
-		Optional<bool>		tcas_on;
-		Optional<Length>	tcas_range;
-		Length				arpt_runways_range_threshold;
-		Length				arpt_map_range_threshold;
-		Length				arpt_runway_extension_length;
-		std::array<Time, 3>	trend_vector_times;
-		std::array<Length, 3>
-							trend_vector_min_ranges;
-		Length				trend_vector_max_range;
-		bool				round_clip					= false;
+		// TODO optionals must not have default values
+		DisplayMode						display_mode				= DisplayMode::Expanded;
+		HeadingMode						heading_mode				= HeadingMode::Magnetic;
+		Length							range						= 1_nmi;
+		std::optional<si::Angle>		heading_magnetic;
+		std::optional<si::Angle>		heading_true;
+		bool							ap_visible					= false;
+		bool							ap_line_visible				= false;
+		std::optional<Angle>			ap_heading_magnetic;
+		std::optional<Angle>			ap_track_magnetic;
+		std::optional<bool>				ap_use_trk;
+		bool							track_visible				= false;
+		std::optional<si::Angle>		track_magnetic;
+		bool							course_visible				= false;
+		std::optional<Angle>			course_setting_magnetic;
+		std::optional<Angle>			course_deviation;
+		std::optional<bool>				course_to_flag;
+		QString							navaid_selected_reference;
+		QString							navaid_selected_identifier;
+		std::optional<Length>			navaid_selected_distance;
+		std::optional<Time>				navaid_selected_eta;
+		std::optional<Angle>			navaid_selected_course_magnetic;
+		int								navaid_left_type			= 0;
+		QString							navaid_left_reference;
+		QString							navaid_left_identifier;
+		std::optional<Length>			navaid_left_distance;
+		std::optional<Angle>			navaid_left_initial_bearing_magnetic;
+		int								navaid_right_type			= 0;
+		QString							navaid_right_reference;
+		QString							navaid_right_identifier;
+		std::optional<Length>			navaid_right_distance;
+		std::optional<Angle>			navaid_right_initial_bearing_magnetic;
+		std::optional<Length>			navigation_required_performance;
+		std::optional<Length>			navigation_actual_performance;
+		bool							center_on_track				= false;
+		bool							home_track_visible			= false;
+		std::optional<Angle>			true_home_direction;
+		std::optional<si::Length>		dist_to_home_ground;
+		std::optional<si::Length>		dist_to_home_vlos;
+		std::optional<si::Length>		dist_to_home_vert;
+		std::optional<LonLat>			home;
+		std::optional<Speed>			ground_speed;
+		std::optional<Speed>			true_air_speed;
+		std::optional<AngularVelocity>	track_lateral_rotation;
+		std::optional<si::Length>		altitude_reach_distance;
+		std::optional<si::Angle>		wind_from_magnetic_heading;
+		std::optional<si::Velocity>		wind_tas_speed;
+		std::optional<si::LonLat>		position;
+		bool							navaids_visible				= false;
+		bool							fix_visible					= false;
+		bool							vor_visible					= false;
+		bool							dme_visible					= false;
+		bool							ndb_visible					= false;
+		bool							loc_visible					= false;
+		bool							arpt_visible				= false;
+		QString							highlighted_loc;
+		std::optional<QString>			positioning_hint;
+		std::optional<bool>				tcas_on;
+		std::optional<Length>			tcas_range;
+		Length							arpt_runways_range_threshold;
+		Length							arpt_map_range_threshold;
+		Length							arpt_runway_extension_length;
+		std::array<Time, 3>				trend_vector_times;
+		std::array<Length, 3>			trend_vector_min_ranges;
+		Length							trend_vector_max_range;
+		bool							round_clip					= false;
 
 	  private:
 		/**
@@ -165,17 +156,17 @@ class HSIWidget: public xf::InstrumentWidget
 	class LocalParameters
 	{
 	  public:
-		Angle			heading						= 0_deg;	// Computed mag or true, depending on heading mode.
-		Optional<Angle>	ap_bug_magnetic;						// Computed mag or true, depending on heading mode.
-		Optional<bool>	ap_use_trk;
-		Angle			course_heading				= 0_deg;	// Computed mag or true, depending on heading mode.
-		Angle			track_true					= 0_deg;	// Computed.
-		Angle			track						= 0_deg;	// Mag or true, depending on heading mode.
-		Angle			rotation					= 0_deg;
-		QDateTime		positioning_hint_ts			= QDateTime::fromTime_t (0);
-		bool			navaid_selected_visible		= false;
-		bool			navaid_left_visible			= false;
-		bool			navaid_right_visible		= false;
+		std::optional<si::Angle>	heading;					// Computed mag or true, depending on heading mode.
+		std::optional<si::Angle>	ap_bug_magnetic;			// Computed mag or true, depending on heading mode.
+		std::optional<bool>			ap_use_trk;
+		std::optional<si::Angle>	course_heading;				// Computed mag or true, depending on heading mode.
+		std::optional<si::Angle>	track_true;					// Computed.
+		std::optional<si::Angle>	track;						// Mag or true, depending on heading mode.
+		std::optional<si::Angle>	rotation;
+		QDateTime					positioning_hint_ts			= QDateTime::fromTime_t (0);
+		bool						navaid_selected_visible		= false;
+		bool						navaid_left_visible			= false;
+		bool						navaid_right_visible		= false;
 	};
 
 	class PaintWorkUnit:

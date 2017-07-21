@@ -50,16 +50,27 @@ HSIWidget::Parameters::sanitize()
 	using xf::floored_mod;
 
 	range = clamped<Length> (range, 1_ft, 5000_nmi);
-	heading_magnetic = floored_mod (heading_magnetic, 360_deg);
-	heading_true = floored_mod (heading_true, 360_deg);
+
+	if (heading_magnetic)
+		heading_magnetic = floored_mod (*heading_magnetic, 360_deg);
+
+	if (heading_true)
+		heading_true = floored_mod (*heading_true, 360_deg);
+
 	if (ap_heading_magnetic)
 		ap_heading_magnetic = floored_mod (*ap_heading_magnetic, 360_deg);
+
 	if (ap_track_magnetic)
 		ap_track_magnetic = floored_mod (*ap_track_magnetic, 360_deg);
-	track_magnetic = floored_mod (track_magnetic, 360_deg);
+
+	if (track_magnetic)
+		track_magnetic = floored_mod (*track_magnetic, 360_deg);
+
 	if (true_home_direction)
 		true_home_direction = floored_mod (*true_home_direction, 360_deg);
-	wind_from_magnetic_heading = floored_mod (wind_from_magnetic_heading, 360_deg);
+
+	if (wind_from_magnetic_heading)
+		wind_from_magnetic_heading = floored_mod (*wind_from_magnetic_heading, 360_deg);
 }
 
 
@@ -258,7 +269,10 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 		resized();
 	}
 
-	_locals.track_true = xf::floored_mod (_params.track_magnetic + (_params.heading_true - _params.heading_magnetic), 360_deg);
+	if (_params.track_magnetic && _params.heading_magnetic && _params.heading_true)
+		_locals.track_true = xf::floored_mod (*_params.track_magnetic + (*_params.heading_true - *_params.heading_magnetic), 360_deg);
+	else
+		_locals.track_true.reset();
 
 	_locals.track =
 		_params.heading_mode == HeadingMode::Magnetic
@@ -272,10 +286,14 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	_locals.rotation = _params.center_on_track ? _locals.track : _locals.heading;
 
 	_heading_transform.reset();
-	_heading_transform.rotate (-_locals.heading.quantity<Degree>());
+
+	if (_locals.heading)
+		_heading_transform.rotate (-_locals.heading->quantity<Degree>());
 
 	_track_transform.reset();
-	_track_transform.rotate (-_locals.track.quantity<Degree>());
+
+	if (_locals.track)
+		_track_transform.rotate (-_locals.track->quantity<Degree>());
 
 	_rotation_transform =
 		_params.center_on_track
@@ -283,12 +301,16 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 			: _heading_transform;
 
 	_features_transform = _rotation_transform;
+
 	if (_params.heading_mode == HeadingMode::Magnetic)
-		_features_transform.rotate ((_params.heading_magnetic - _params.heading_true).quantity<Degree>());
+		if (_params.heading_magnetic && _params.heading_true)
+			_features_transform.rotate ((*_params.heading_magnetic - *_params.heading_true).quantity<Degree>());
 
 	_pointers_transform = _rotation_transform;
+
 	if (_params.heading_mode == HeadingMode::True)
-		_pointers_transform.rotate ((_params.heading_true - _params.heading_magnetic).quantity<Degree>());
+		if (_params.heading_magnetic && _params.heading_true)
+			_pointers_transform.rotate ((*_params.heading_true - *_params.heading_magnetic).quantity<Degree>());
 
 	_locals.ap_use_trk = _params.ap_use_trk;
 	// If use_trk is not nil, use proper heading or track information to position cmd bug.
@@ -324,19 +346,22 @@ HSIWidget::PaintWorkUnit::paint (QImage& image)
 	}
 
 	// Finish up cmd bug setting:
-	if (_locals.ap_bug_magnetic)
+	if (_locals.ap_bug_magnetic && _params.heading_magnetic && _params.heading_true)
 	{
 		if (_params.heading_mode == HeadingMode::True)
-			*_locals.ap_bug_magnetic += _params.heading_true - _params.heading_magnetic;
+			*_locals.ap_bug_magnetic += *_params.heading_true - *_params.heading_magnetic;
+
 		_locals.ap_bug_magnetic = xf::floored_mod (*_locals.ap_bug_magnetic, 360_deg);
 	}
 
-	if (_params.course_setting_magnetic)
+	if (_params.course_setting_magnetic && _params.heading_magnetic && _params.heading_true)
 	{
 		_locals.course_heading = *_params.course_setting_magnetic;
+
 		if (_params.heading_mode == HeadingMode::True)
-			_locals.course_heading += _params.heading_true - _params.heading_magnetic;
-		_locals.course_heading = xf::floored_mod (_locals.course_heading, 360_deg);
+			*_locals.course_heading += *_params.heading_true - *_params.heading_magnetic;
+
+		_locals.course_heading = xf::floored_mod (*_locals.course_heading, 360_deg);
 	}
 
 	_locals.navaid_selected_visible = !_params.navaid_selected_reference.isEmpty() || !_params.navaid_selected_identifier.isEmpty() ||
@@ -404,9 +429,23 @@ HSIWidget::PaintWorkUnit::paint_aircraft (xf::Painter& painter)
 	}
 
 	// MAG/TRUE heading
-	if (_params.heading_visible)
+	if (_params.heading_magnetic && _params.heading_true)
 	{
-		int hdg = static_cast<int> ((_params.center_on_track ? _locals.track : _locals.heading).quantity<Degree>() + 0.5f) % 360;
+		int hdg = 0;
+
+		if (_params.center_on_track)
+		{
+			if (_locals.track)
+				hdg = _locals.track->quantity<Degree>() + 0.5f;
+		}
+		else
+		{
+			if (_locals.heading)
+				hdg = _locals.heading->quantity<Degree>() + 0.5f;
+		}
+
+		hdg %= 360;
+
 		if (hdg == 0)
 			hdg = 360;
 
@@ -528,14 +567,14 @@ HSIWidget::PaintWorkUnit::paint_navperf (xf::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_hints (xf::Painter& painter)
 {
-	if (!_params.positioning_hint_visible || !_params.position)
+	if (!_params.positioning_hint || !_params.position)
 		return;
 
 	painter.resetTransform();
 	painter.setClipping (false);
 
 	double x = _params.display_mode == DisplayMode::Auxiliary ? 0.775f * _w : 0.725f * _w;
-	QString hint = _params.positioning_hint;
+	QString hint = _params.positioning_hint.value_or ("");
 
 	// Box for emphasis:
 	QPen box_pen = Qt::NoPen;
@@ -566,11 +605,11 @@ HSIWidget::PaintWorkUnit::paint_track (xf::Painter& painter, bool paint_heading_
 	QFont font = _font_13;
 	QFontMetricsF metrics (font);
 
-	if (!paint_heading_triangle && _params.track_visible)
+	if (!paint_heading_triangle && _params.track_visible && _locals.track && _locals.rotation)
 	{
 		// Scale and track line:
 		painter.setPen (QPen (_silver, pen_width (1.3f), Qt::SolidLine, Qt::RoundCap));
-		painter.rotate ((_locals.track - _locals.rotation).quantity<Degree>());
+		painter.rotate ((*_locals.track - *_locals.rotation).quantity<Degree>());
 		float extension = 0.0;
 		if (_params.display_mode != DisplayMode::Auxiliary && _params.center_on_track)
 			extension = 0.6 * _q;
@@ -615,12 +654,12 @@ HSIWidget::PaintWorkUnit::paint_track (xf::Painter& painter, bool paint_heading_
 		}
 	}
 
-	if (_params.heading_visible && paint_heading_triangle)
+	if (_params.heading_magnetic && _params.heading_true && paint_heading_triangle && _locals.heading && _locals.rotation)
 	{
 		// Heading triangle:
 		painter.setClipRect (_map_clip_rect);
 		painter.setTransform (_aircraft_center_transform);
-		painter.rotate ((_locals.heading - _locals.rotation).quantity<Degree>());
+		painter.rotate ((*_locals.heading - *_locals.rotation).quantity<Degree>());
 
 		painter.setPen (get_pen (Qt::white, 2.2f));
 		painter.translate (0.f, -1.003f * _r);
@@ -635,11 +674,11 @@ HSIWidget::PaintWorkUnit::paint_track (xf::Painter& painter, bool paint_heading_
 void
 HSIWidget::PaintWorkUnit::paint_altitude_reach (xf::Painter& painter)
 {
-	if (!_params.altitude_reach_visible || (_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < _params.altitude_reach_distance))
+	if (!_params.altitude_reach_distance || (*_params.altitude_reach_distance < 0.005f * _params.range) || (0.8f * _params.range < *_params.altitude_reach_distance))
 		return;
 
 	float len = xf::clamped (to_px (6_nmi), 2.f * _q, 7.f * _q);
-	float pos = to_px (_params.altitude_reach_distance);
+	float pos = to_px (*_params.altitude_reach_distance);
 	QRectF rect (0.f, 0.f, len, len);
 	centrify (rect);
 	rect.moveTop (-pos);
@@ -666,6 +705,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 	painter.setPen (est_pen);
 
 	if (_params.track_lateral_rotation && _params.ground_speed &&
+		_locals.track && _locals.rotation &&
 		2.f * trend_time_gap() < _params.trend_vector_times[2] && _params.range <= _params.trend_vector_max_range)
 	{
 		painter.setPen (est_pen);
@@ -680,15 +720,16 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 		QPolygonF polygon;
 
 		// Initially rotate the transform to match HDG or TRK setting:
-		transform.rotate ((_locals.track - _locals.rotation).quantity<Degree>());
+		transform.rotate ((*_locals.track - *_locals.rotation).quantity<Degree>());
 
 		// Take wind into consideration if track info is available:
-		Optional<xf::WindTriangle> wt;
-		if (_params.true_air_speed && _params.heading_visible && _params.track_visible)
+		std::optional<xf::WindTriangle> wt;
+
+		if (_params.true_air_speed && _params.heading_magnetic && _params.heading_true && _params.track_visible && _params.track_magnetic)
 		{
 			wt = xf::WindTriangle();
-			wt->set_air_vector (*_params.true_air_speed, _params.heading_magnetic);
-			wt->set_ground_vector (*_params.ground_speed, _params.track_magnetic);
+			wt->set_air_vector (*_params.true_air_speed, *_params.heading_magnetic);
+			wt->set_ground_vector (*_params.ground_speed, *_params.track_magnetic);
 			wt->compute_wind_vector();
 		}
 
@@ -698,7 +739,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 			total_angle += angle_per_step;
 
 			Speed ground_speed = wt
-				? wt->get_ground_speed (_locals.track + total_angle)
+				? wt->get_ground_speed (*_locals.track + total_angle)
 				: *_params.ground_speed;
 
 			float px = to_px (ground_speed * step);
@@ -740,7 +781,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_ap_settings (xf::Painter& painter)
 {
-	if (!_params.ap_visible)
+	if (!_params.ap_visible || !_locals.rotation)
 		return;
 
 	// AP dashed line:
@@ -764,7 +805,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (xf::Painter& painter)
 
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipPath (_outer_map_clip);
-		painter.rotate ((*_locals.ap_bug_magnetic - _locals.rotation).quantity<Degree>());
+		painter.rotate ((*_locals.ap_bug_magnetic - *_locals.rotation).quantity<Degree>());
 
 		for (auto const& p: { shadow_pen, pen })
 		{
@@ -774,17 +815,17 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (xf::Painter& painter)
 	}
 
 	// A/P bug
-	if (_params.heading_visible && _locals.ap_bug_magnetic)
+	if (_params.heading_magnetic && _params.heading_true && _locals.ap_bug_magnetic)
 	{
 		Angle limited_rotation;
 		switch (_params.display_mode)
 		{
 			case DisplayMode::Auxiliary:
-				limited_rotation = xf::floored_mod (*_locals.ap_bug_magnetic - _locals.rotation + 180_deg, 360_deg) - 180_deg;
+				limited_rotation = xf::floored_mod (*_locals.ap_bug_magnetic - *_locals.rotation + 180_deg, 360_deg) - 180_deg;
 				break;
 
 			default:
-				limited_rotation = *_locals.ap_bug_magnetic - _locals.rotation;
+				limited_rotation = *_locals.ap_bug_magnetic - *_locals.rotation;
 				break;
 		}
 
@@ -811,7 +852,7 @@ HSIWidget::PaintWorkUnit::paint_ap_settings (xf::Painter& painter)
 void
 HSIWidget::PaintWorkUnit::paint_directions (xf::Painter& painter)
 {
-	if (!_params.heading_visible)
+	if (!_params.heading_magnetic || !_params.heading_true)
 		return;
 
 	QPen pen (Qt::white, pen_width (1.f), Qt::SolidLine, Qt::RoundCap);
@@ -906,11 +947,19 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (xf::Painter& painter)
 	layout.add_fragment (tas_str, _font_18, Qt::white);
 
 	// Wind data (direction/strength):
-	if (_params.wind_information_visible)
+	if (_params.wind_from_magnetic_heading || _params.wind_tas_speed)
 	{
-		QString wind_str = QString ("%1°/%2")
-			.arg (static_cast<long> (_params.wind_from_magnetic_heading.quantity<Degree>()), 3, 10, QChar ('0'))
-			.arg (static_cast<long> (_params.wind_tas_speed.quantity<Knot>()), 3, 10, QChar (L'\u2007'));
+		QString s_dir ("---°");
+
+		if (_params.wind_from_magnetic_heading)
+			s_dir = QString ("%1°").arg (static_cast<long> (_params.wind_from_magnetic_heading->quantity<Degree>()), 3, 10, QChar ('0'));
+
+		QString s_tas ("---");
+
+		if (_params.wind_tas_speed)
+			s_tas = QString ("%1").arg (static_cast<long> (_params.wind_tas_speed->quantity<Knot>()), 3, 10, QChar (L'\u2007'));
+
+		QString wind_str = s_dir + "/" + s_tas;
 		layout.add_new_line();
 		layout.add_fragment (wind_str, _font_16, Qt::white);
 	}
@@ -920,11 +969,11 @@ HSIWidget::PaintWorkUnit::paint_speeds_and_wind (xf::Painter& painter)
 	layout.paint (_rect.topLeft() + QPointF (_margin, 0.0), Qt::AlignTop | Qt::AlignLeft, painter);
 
 	// Wind arrow:
-	if (_params.wind_information_visible)
+	if (_params.wind_from_magnetic_heading && _params.heading_magnetic)
 	{
 		painter.setPen (get_pen (Qt::white, 0.6f));
 		painter.translate (0.8f * _q + _margin, 0.8f * _q + layout.height());
-		painter.rotate ((_params.wind_from_magnetic_heading - _params.heading_magnetic + 180_deg).quantity<Degree>());
+		painter.rotate ((*_params.wind_from_magnetic_heading - *_params.heading_magnetic + 180_deg).quantity<Degree>());
 		painter.setPen (get_pen (Qt::white, 1.0));
 		painter.add_shadow ([&] {
 			QPointF a = QPointF (0.f, -0.7f * _q);
@@ -953,7 +1002,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 	painter.setClipping (false);
 
 	// Home direction arrow:
-	if (_params.true_home_direction)
+	if (_params.true_home_direction && _params.heading_true)
 	{
 		bool at_home = xf::haversine_earth (*_params.home, *_params.position) < 10_m;
 		float z = 0.75f * _q;
@@ -977,7 +1026,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 				<< QPointF (0.0, -z)
 				<< QPointF (+0.2 * z, -0.8 * z)
 				<< QPointF (0.0, -0.8 * z);
-			painter.rotate ((*_params.true_home_direction - _params.heading_true).quantity<Degree>());
+			painter.rotate ((*_params.true_home_direction - *_params.heading_true).quantity<Degree>());
 			painter.add_shadow ([&] {
 				painter.drawPolyline (home_arrow);
 			});
@@ -985,7 +1034,7 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 	}
 
 	// Height/VLOS distance/ground distance:
-	if (_params.dist_to_home_ground_visible || _params.dist_to_home_vlos_visible || _params.dist_to_home_vert_visible)
+	if (_params.dist_to_home_ground || _params.dist_to_home_vlos || _params.dist_to_home_vert)
 	{
 		float z = 0.99f * _q;
 		float h = 0.66f * _q;
@@ -999,24 +1048,24 @@ HSIWidget::PaintWorkUnit::paint_home_direction (xf::Painter& painter)
 		layout.set_alignment (Qt::AlignRight);
 
 		std::string vert_str = "---";
-		if (_params.dist_to_home_vert_visible)
-			vert_str = (boost::format ("%+d") % static_cast<int> (_params.dist_to_home_vert.quantity<Foot>())).str();
+		if (_params.dist_to_home_vert)
+			vert_str = (boost::format ("%+d") % static_cast<int> (_params.dist_to_home_vert->quantity<Foot>())).str();
 		layout.add_fragment ("↑", _font_16, Qt::gray);
 		layout.add_fragment (vert_str, _font_16, Qt::white);
 		layout.add_fragment ("FT", _font_13, Qt::white);
 		layout.add_new_line();
 
 		QString vlos_str = "---";
-		if (_params.dist_to_home_vlos_visible)
-			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos.quantity<NauticalMile>(), 0, 'f', 2, QChar ('0'));
+		if (_params.dist_to_home_vlos)
+			vlos_str = QString ("%1").arg (_params.dist_to_home_vlos->quantity<NauticalMile>(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment ("VLOS ", _font_13, Qt::white);
 		layout.add_fragment (vlos_str, _font_16, Qt::white);
 		layout.add_fragment ("NM", _font_13, Qt::white);
 		layout.add_new_line();
 
 		QString ground_str = "---";
-		if (_params.dist_to_home_ground_visible)
-			ground_str = QString ("%1").arg (_params.dist_to_home_ground.quantity<NauticalMile>(), 0, 'f', 2, QChar ('0'));
+		if (_params.dist_to_home_ground)
+			ground_str = QString ("%1").arg (_params.dist_to_home_ground->quantity<NauticalMile>(), 0, 'f', 2, QChar ('0'));
 		layout.add_fragment (ground_str, _font_16, Qt::white);
 		layout.add_fragment ("NM", _font_13, Qt::white);
 
@@ -1031,13 +1080,16 @@ HSIWidget::PaintWorkUnit::paint_course (xf::Painter& painter)
 {
 	using std::abs;
 
-	if (!_params.heading_visible || !_params.course_setting_magnetic || !_params.course_visible)
+	if (!_params.heading_magnetic || !_params.heading_true || !_params.course_setting_magnetic || !_params.course_visible ||
+		!_locals.course_heading || !_locals.rotation)
+	{
 		return;
+	}
 
 	painter.setTransform (_aircraft_center_transform);
 	painter.setClipPath (_outer_map_clip);
 	painter.setTransform (_aircraft_center_transform);
-	painter.rotate ((_locals.course_heading - _locals.rotation).quantity<Degree>());
+	painter.rotate ((*_locals.course_heading - *_locals.rotation).quantity<Degree>());
 
 	double k = 1.0;
 	double z = 1.0;
@@ -1228,7 +1280,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 	painter().resetTransform();
 	painter().setClipping (false);
 
-	auto configure_layout = [&](xf::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, Optional<Length> const& distance) -> void
+	auto configure_layout = [&](xf::TextLayout& layout, QColor const& color, QString const& reference, QString const& identifier, std::optional<si::Length> const& distance) -> void
 	{
 		if (!reference.isEmpty())
 			layout.add_fragment (reference, _font_16, color);
@@ -1289,7 +1341,7 @@ HSIWidget::PaintWorkUnit::paint_tcas_and_navaid_info()
 void
 HSIWidget::PaintWorkUnit::paint_pointers (xf::Painter& painter)
 {
-	if (!_params.heading_visible)
+	if (!_params.heading_magnetic || !_params.heading_true)
 		return;
 
 	painter.resetTransform();
@@ -1297,10 +1349,10 @@ HSIWidget::PaintWorkUnit::paint_pointers (xf::Painter& painter)
 
 	struct Opts
 	{
-		bool			is_primary;
-		QColor			color;
-		Optional<Angle>	angle;
-		bool			visible;
+		bool						is_primary;
+		QColor						color;
+		std::optional<si::Angle>	angle;
+		bool						visible;
 	};
 
 	for (Opts const& opts: { Opts { true, (_params.navaid_left_type == 0 ? Qt::green : _cyan), _params.navaid_left_initial_bearing_magnetic, _locals.navaid_left_visible },
@@ -1951,9 +2003,6 @@ HSIWidget::push_params()
 		_local_paint_work_unit._recalculation_needed = true;
 
 	if (_params.positioning_hint != old.positioning_hint)
-		_locals.positioning_hint_ts = now;
-
-	if (_params.positioning_hint_visible != old.positioning_hint_visible)
 		_locals.positioning_hint_ts = now;
 
 	_local_paint_work_unit._params_next = _params;

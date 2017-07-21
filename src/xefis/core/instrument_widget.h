@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtWidgets/QWidget>
+#include <QtCore/QEvent>
 
 // Xefis:
 #include <xefis/config/all.h>
