@@ -15,6 +15,9 @@ XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
 XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
 XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
 XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
+XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h
+XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h
+
 XEFIS_HEADERS			+= xefis/modules/instruments/label.h
 XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
 XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
@@ -29,6 +32,8 @@ XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
@@ -112,14 +117,6 @@ XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
 XEFIS_HEADERS_MOC		+= modules/helpers/sound.h
 
 XEFIS_SOURCES			+= modules/helpers/sound.cc
-
-######## /modules/instruments ########
-
-XEFIS_HEADERS_MOC		+= modules/instruments/hsi.h
-XEFIS_HEADERS			+= modules/instruments/hsi_widget.h
-
-XEFIS_SOURCES			+= modules/instruments/hsi.cc
-XEFIS_SOURCES			+= modules/instruments/hsi_widget.cc
 
 ######## /modules/io ########
 
