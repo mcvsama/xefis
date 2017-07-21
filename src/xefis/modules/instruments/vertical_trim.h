@@ -60,9 +60,11 @@ class VerticalTrim:
 	process (v2::Cycle const&) override;
 
   protected:
+	// QWidget API
 	void
 	resizeEvent (QResizeEvent*) override;
 
+	// QWidget API
 	void
 	paintEvent (QPaintEvent*) override;
 
