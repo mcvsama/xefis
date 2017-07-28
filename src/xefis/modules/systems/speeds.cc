@@ -46,8 +46,8 @@ Speeds::compute()
 {
 	xf::Flaps const& flaps = _airframe->flaps();
 
-	Optional<si::Velocity> minimum;
-	Optional<si::Velocity> maximum;
+	std::optional<si::Velocity> minimum;
+	std::optional<si::Velocity> maximum;
 
 	// Flaps speed limits:
 	if (io.input_flaps_angle)
@@ -70,7 +70,7 @@ Speeds::compute()
 
 template<class T>
 	inline T
-	Speeds::max (Optional<T> opt_val, T val)
+	Speeds::max (std::optional<T> opt_val, T val)
 	{
 		if (opt_val)
 			return std::max (*opt_val, val);
@@ -80,7 +80,7 @@ template<class T>
 
 template<class T>
 	inline T
-	Speeds::min (Optional<T> opt_val, T val)
+	Speeds::min (std::optional<T> opt_val, T val)
 	{
 		if (opt_val)
 			return std::min (*opt_val, val);

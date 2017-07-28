@@ -135,7 +135,7 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		/**
 		 * I (integral) parameter limit.
 		 */
-		Optional<Range<Integral>>
+		std::optional<Range<Integral>>
 		integral_limit() const noexcept;
 
 		/**
@@ -148,7 +148,7 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		 * Set I (integral) parameter limit.
 		 */
 		void
-		set_integral_limit (Optional<Range<Integral>> limit) noexcept;
+		set_integral_limit (std::optional<Range<Integral>> limit) noexcept;
 
 		/**
 		 * Output limit.
@@ -214,18 +214,18 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		reset() noexcept;
 
 	  private:
-		bool						_winding					= false;
-		Input						_target						{ };
-		Input						_previous_error				{ };
-		Integral					_integral					{ };
-		Derivative					_derivative					{ };
-		Param						_p							= 0.0;
-		Param						_i							= 0.0;
-		Optional<Range<Integral>>	_integral_limit;
-		Param						_d							= 0.0;
-		Param						_gain						= 1.0;
-		Control						_output						{ };
-		Range<Control>				_output_limit				{ -std::numeric_limits<Control>::max(), std::numeric_limits<Control>::max() };
+		bool							_winding					= false;
+		Input							_target						{ };
+		Input							_previous_error				{ };
+		Integral						_integral					{ };
+		Derivative						_derivative					{ };
+		Param							_p							= 0.0;
+		Param							_i							= 0.0;
+		std::optional<Range<Integral>>	_integral_limit;
+		Param							_d							= 0.0;
+		Param							_gain						= 1.0;
+		Control							_output						{ };
+		Range<Control>					_output_limit				{ -std::numeric_limits<Control>::max(), std::numeric_limits<Control>::max() };
 	};
 
 
@@ -342,7 +342,7 @@ template<class V, class C, class P>
 
 
 template<class V, class C, class P>
-	inline Optional<Range<typename PIDControl<V, C, P>::Integral>>
+	inline std::optional<Range<typename PIDControl<V, C, P>::Integral>>
 	PIDControl<V, C, P>::integral_limit() const noexcept
 	{
 		return _integral_limit;
@@ -359,7 +359,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_integral_limit (Optional<Range<Integral>> limit) noexcept
+	PIDControl<V, C, P>::set_integral_limit (std::optional<Range<Integral>> limit) noexcept
 	{
 		_integral_limit = limit;
 	}

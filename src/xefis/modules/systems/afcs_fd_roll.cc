@@ -83,15 +83,15 @@ AFCS_FD_Roll::compute_roll()
 {
 	si::Time update_dt = _roll_computer.update_dt();
 	bool disengage = false;
-	Optional<si::Angle> roll;
+	std::optional<si::Angle> roll;
 
 	// Always compute both PIDs. Use their output only when it's needed.
-	Optional<si::Angle> roll_for_hdg = compute_roll (_magnetic_hdg_pid, io.input_cmd_magnetic_hdg, io.input_measured_magnetic_hdg, update_dt);
-	Optional<si::Angle> roll_for_trk = compute_roll (_magnetic_trk_pid, io.input_cmd_magnetic_trk, io.input_measured_magnetic_trk, update_dt);
+	std::optional<si::Angle> roll_for_hdg = compute_roll (_magnetic_hdg_pid, io.input_cmd_magnetic_hdg, io.input_measured_magnetic_hdg, update_dt);
+	std::optional<si::Angle> roll_for_trk = compute_roll (_magnetic_trk_pid, io.input_cmd_magnetic_trk, io.input_measured_magnetic_trk, update_dt);
 
 	// TODO use transistor for output
 
-	auto use_result = [&](Optional<si::Angle> const& use_roll) {
+	auto use_result = [&](std::optional<si::Angle> const& use_roll) {
 		if (use_roll)
 			roll = use_roll;
 		else
@@ -151,7 +151,7 @@ AFCS_FD_Roll::compute_roll()
 }
 
 
-Optional<si::Angle>
+std::optional<si::Angle>
 AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
 							v2::PropertyIn<si::Angle> const& cmd_direction,
 							v2::PropertyIn<si::Angle> const& measured_direction,

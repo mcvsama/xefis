@@ -19,9 +19,6 @@
 // System:
 #include <unistd.h>
 
-// Boost:
-#include <boost/lexical_cast.hpp>
-
 // Qt:
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>

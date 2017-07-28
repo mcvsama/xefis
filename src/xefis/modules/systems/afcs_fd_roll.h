@@ -104,7 +104,7 @@ class AFCS_FD_Roll: public v2::Module<AFCS_FD_Roll_IO>
 	/**
 	 * Compute roll angle for given PID and measured values and parameters.
 	 */
-	Optional<si::Angle>
+	std::optional<si::Angle>
 	compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
 				  v2::PropertyIn<si::Angle> const& cmd_direction,
 				  v2::PropertyIn<si::Angle> const& measured_direction,

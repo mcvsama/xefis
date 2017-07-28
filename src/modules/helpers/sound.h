@@ -87,7 +87,7 @@ class Sound:
 		Time							_repeat_period;
 		xf::SoundManager*				_sound_manager;
 		bool							_was_started = false;
-		Optional<Time>					_finished_timestamp;
+		std::optional<Time>				_finished_timestamp;
 	};
 
 	typedef std::set<Unique<Alarm>, Alarm::Compare> Alarms;

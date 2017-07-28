@@ -16,9 +16,7 @@
 
 // Standard:
 #include <cstddef>
-
-// Lib:
-#include <boost/function.hpp>
+#include <functional>
 
 // Qt:
 #include <QtCore/QObject>
@@ -57,13 +55,13 @@ class Services
   public:
 	/**
 	 * Allows calling out given function from within main Qt event queue.
-	 * You can use boost::bind() as function callback.
+	 * You can use std::bind() as function callback.
 	 */
 	class CallOutEvent: public QEvent
 	{
 	  public:
 		explicit
-		CallOutEvent (boost::function<void()> callback);
+		CallOutEvent (std::function<void()> callback);
 
 		/**
 		 * Cancel CallOut. Prevent calling callback from call_out() method.
@@ -80,7 +78,7 @@ class Services
 
 	  private:
 		bool					_cancelled;
-		boost::function<void()> _callback;
+		std::function<void()>	_callback;
 	};
 
   public:
@@ -109,7 +107,7 @@ class Services
 	 * \return	CallOutEvent object. This object is deleted after call has been made.
 	 */
 	static CallOutEvent*
-	call_out (boost::function<void()> callback);
+	call_out (std::function<void()> callback);
 
 	/**
 	 * Return number of pixels per point on the screen. Takes into account
@@ -151,7 +149,7 @@ class Services
 
 
 inline
-Services::CallOutEvent::CallOutEvent (boost::function<void()> callback):
+Services::CallOutEvent::CallOutEvent (std::function<void()> callback):
 	QEvent (QEvent::User),
 	_cancelled (false),
 	_callback (callback)

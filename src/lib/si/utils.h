@@ -23,7 +23,6 @@
 
 // Boost:
 #include <boost/endian/conversion.hpp>
-#include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 

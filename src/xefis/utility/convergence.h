@@ -122,7 +122,7 @@ template<class V>
  * Simpler API for convergence.
  */
 template<class ValueType>
-	inline Optional<ValueType>
+	inline std::optional<ValueType>
 	converge (ValueType initial_value, ValueType delta, unsigned int max_iterations, std::function<ValueType (ValueType)> formula) noexcept
 	{
 		Convergence<ValueType> comp (delta, max_iterations, formula);

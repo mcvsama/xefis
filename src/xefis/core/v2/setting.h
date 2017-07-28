@@ -42,7 +42,7 @@ class BasicSetting
 	 * Tag for creating a setting that doesn't not need to be set by user explicitly, but doesn't necessarily
 	 * have any default value.
 	 */
-	enum OptionalTag { Optional };
+	enum OptionalTag { Optional }; // XXX
 
   public:
 	/**
@@ -136,8 +136,8 @@ template<class pValue>
 		operator bool() const noexcept override;
 
 	  private:
-		::Optional<Value>	_value;
-		bool				_required;
+		std::optional<Value>	_value;
+		bool					_required;
 	};
 
 

@@ -92,7 +92,7 @@ class Sentence
 	 *			so it's time to finish.
 	 */
 	bool
-	read_latitude (Optional<Angle>& out_latitude);
+	read_latitude (std::optional<Angle>& out_latitude);
 
 	/**
 	 * Read longitude (using standard read_next()).
@@ -101,7 +101,7 @@ class Sentence
 	 *			so it's time to finish.
 	 */
 	bool
-	read_longitude (Optional<Angle>& out_longitude);
+	read_longitude (std::optional<Angle>& out_longitude);
 
   private:
 	std::string				_sentence;

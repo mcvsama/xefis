@@ -119,7 +119,8 @@ class JoystickInput:
 		/**
 		 * Make Axis that is emulated by two buttons on the joystick.
 		 */
-		Axis (QDomElement const& axis_element, v2::PropertyOut<double>&, v2::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range, Optional<HandlerID> up_button_id, Optional<HandlerID> down_button_id);
+		Axis (QDomElement const& axis_element, v2::PropertyOut<double>&, v2::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
+			  std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id);
 
 		v2::PropertyOut<double>&
 		property();
@@ -147,8 +148,8 @@ class JoystickInput:
 		float						_output_maximum	= +1.f;
 		// If these are present, Axis is emulated with those two buttons,
 		// that is when they're present, the property will be set to +1 or -1.
-		Optional<HandlerID>			_up_button_id;
-		Optional<HandlerID>			_down_button_id;
+		std::optional<HandlerID>	_up_button_id;
+		std::optional<HandlerID>	_down_button_id;
 	};
 
 	typedef std::array<std::vector<Shared<Handler>>, kMaxEventID>		Handlers;
@@ -219,18 +220,18 @@ class JoystickInput:
 	reset_properties();
 
   private:
-	Optional<std::string>	_device_path;
-	int						_device				= 0;
-	Unique<QSocketNotifier>	_notifier;
-	Unique<QTimer>			_reopen_timer;
-	std::set<HandlerID>		_available_buttons;
-	std::set<HandlerID>		_available_axes;
-	Handlers				_handlers;
-	ButtonProperties		_button_properties;
-	AxisProperties			_axis_properties;
-	AngleAxisProperties		_angle_axis_properties;
-	AngleAxisRanges			_angle_axis_ranges;
-	unsigned int			_failure_count		= 0;
+	std::optional<std::string>	_device_path;
+	int							_device				= 0;
+	Unique<QSocketNotifier>		_notifier;
+	Unique<QTimer>				_reopen_timer;
+	std::set<HandlerID>			_available_buttons;
+	std::set<HandlerID>			_available_axes;
+	Handlers					_handlers;
+	ButtonProperties			_button_properties;
+	AxisProperties				_axis_properties;
+	AngleAxisProperties			_angle_axis_properties;
+	AngleAxisRanges				_angle_axis_ranges;
+	unsigned int				_failure_count		= 0;
 };
 
 

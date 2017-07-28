@@ -146,25 +146,25 @@ class GPGGA: public Sentence
 
   public:
 	// UTC time when fix was obtained:
-	Optional<GPSTimeOfDay>	fix_time;
+	std::optional<GPSTimeOfDay>		fix_time;
 
 	// Latitude, positive is North:
-	Optional<Angle>			latitude;
+	std::optional<Angle>			latitude;
 
 	// Longitude, positive is East:
-	Optional<Angle>			longitude;
+	std::optional<Angle>			longitude;
 
 	// GPS fix quality information:
-	Optional<GPSFixQuality>	fix_quality;
+	std::optional<GPSFixQuality>	fix_quality;
 
 	// Number of satellites being tracked:
-	Optional<unsigned int>	tracked_satellites;
+	std::optional<unsigned int>		tracked_satellites;
 
 	// Horizontal dilution of precision:
-	Optional<float>			hdop;
+	std::optional<float>			hdop;
 
 	// Altitude, above mean sea level:
-	Optional<Length>		altitude_amsl;
+	std::optional<Length>			altitude_amsl;
 
 	/**
 	 * Height of geoid (mean sea level) above WGS84 ellipsoid
@@ -176,13 +176,13 @@ class GPGGA: public Sentence
 	 * Some units do not report negative altitudes at all.
 	 * This is the only sentence that reports altitude.
 	 */
-	Optional<Length>		geoid_height;
+	std::optional<Length>			geoid_height;
 
 	// Time since last DGPS update:
-	Optional<Time>			dgps_last_update_time;
+	std::optional<Time>				dgps_last_update_time;
 
 	// DGPS station ID number:
-	Optional<uint64_t>		dgps_station_id;
+	std::optional<uint64_t>			dgps_station_id;
 
   public:
 	/**
@@ -209,22 +209,22 @@ class GPGSA: public Sentence
 
   public:
 	// Fix mode:
-	Optional<GPSFixSelectionMode>			fix_selection_mode;
+	std::optional<GPSFixSelectionMode>			fix_selection_mode;
 
 	// Fix mode:
-	Optional<GPSFixMode>					fix_mode;
+	std::optional<GPSFixMode>					fix_mode;
 
 	// PRNs of satellites used in the solution:
-	std::array<Optional<unsigned int>, 12>	satellites;
+	std::array<std::optional<unsigned int>, 12>	satellites;
 
 	// PDOP (dilution of precision):
-	Optional<float>							pdop;
+	std::optional<float>						pdop;
 
 	// HDOP (horizontal dilution of precision):
-	Optional<float>							hdop;
+	std::optional<float>						hdop;
 
 	// VDOP (vertical dilution of precision):
-	Optional<float>							vdop;
+	std::optional<float>						vdop;
 };
 
 
@@ -244,28 +244,28 @@ class GPRMC: public Sentence
 
   public:
 	// UTC time when fix was obtained:
-	Optional<GPSTimeOfDay>			fix_time;
+	std::optional<GPSTimeOfDay>			fix_time;
 
 	// GPSReceiverStatus:
-	Optional<GPSReceiverStatus>		receiver_status;
+	std::optional<GPSReceiverStatus>	receiver_status;
 
 	// Latitude, positive is North:
-	Optional<Angle>					latitude;
+	std::optional<Angle>				latitude;
 
 	// Longitude, positive is East:
-	Optional<Angle>					longitude;
+	std::optional<Angle>				longitude;
 
 	// Ground-speed:
-	Optional<Speed>					ground_speed;
+	std::optional<Speed>				ground_speed;
 
 	// Track angle, True direction:
-	Optional<Angle>					track_true;
+	std::optional<Angle>				track_true;
 
 	// Date (UTC):
-	Optional<GPSDate>				fix_date;
+	std::optional<GPSDate>				fix_date;
 
 	// Magnetic variation;
-	Optional<Angle>					magnetic_variation;
+	std::optional<Angle>				magnetic_variation;
 };
 
 

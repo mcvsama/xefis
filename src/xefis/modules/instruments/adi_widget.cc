@@ -2140,7 +2140,7 @@ ADIWidget::PaintWorkUnit::paint_nav (xf::Painter& painter)
 
 		QPen ladder_pen (_ladder_border_color, pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
-		auto paint_ladder = [&](Optional<Angle> original_approach_deviation, Optional<Angle> original_path_deviation) -> void
+		auto paint_ladder = [&](std::optional<Angle> original_approach_deviation, std::optional<Angle> original_path_deviation) -> void
 		{
 			Angle approach_deviation;
 			if (original_approach_deviation)

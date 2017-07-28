@@ -236,7 +236,7 @@ AFCS::button_press_xchg_heading_step()
 void
 AFCS::button_press_xchg_hdg_trk()
 {
-	Optional<si::Angle> track_minus_heading;
+	std::optional<si::Angle> track_minus_heading;
 	if (io.input_measured_heading_magnetic && io.input_measured_track_magnetic)
 		track_minus_heading = *io.input_measured_track_magnetic - *io.input_measured_heading_magnetic;
 
@@ -1002,7 +1002,7 @@ AFCS::xchg_modes (PitchMode a, PitchMode b)
 }
 
 
-inline Optional<si::Velocity>
+inline std::optional<si::Velocity>
 AFCS::current_rounded_vs() const
 {
 	if (io.input_measured_vs)
@@ -1012,7 +1012,7 @@ AFCS::current_rounded_vs() const
 }
 
 
-inline Optional<si::Angle>
+inline std::optional<si::Angle>
 AFCS::current_rounded_fpa() const
 {
 	if (io.input_measured_fpa)
@@ -1092,7 +1092,7 @@ AFCS::make_knob_action (v2::PropertyIn<int64_t>& property, void (AFCS::* callbac
 }
 
 
-Optional<afcs_api::ThrustMode>
+std::optional<afcs_api::ThrustMode>
 AFCS::translate_thrust_mode() const
 {
 	switch (_thrust_mode)
@@ -1115,7 +1115,7 @@ AFCS::translate_thrust_mode() const
 }
 
 
-Optional<afcs_api::RollMode>
+std::optional<afcs_api::RollMode>
 AFCS::translate_roll_mode() const
 {
 	switch (_roll_mode)
@@ -1138,7 +1138,7 @@ AFCS::translate_roll_mode() const
 }
 
 
-Optional<afcs_api::PitchMode>
+std::optional<afcs_api::PitchMode>
 AFCS::translate_pitch_mode() const
 {
 	switch (_pitch_mode)
@@ -1176,8 +1176,8 @@ AFCS::translate_pitch_mode() const
 
 
 template<class Target, class Source>
-	Optional<Target>
-	AFCS::optional_cast (Optional<Source> const& source)
+	std::optional<Target>
+	AFCS::optional_cast (std::optional<Source> const& source)
 	{
 		if (!source)
 			return { };

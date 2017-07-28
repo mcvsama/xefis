@@ -70,7 +70,7 @@ Sentence::read_next()
 
 
 bool
-Sentence::read_latitude (Optional<Angle>& latitude)
+Sentence::read_latitude (std::optional<Angle>& latitude)
 {
 	if (!read_next())
 		return false;
@@ -103,7 +103,7 @@ Sentence::read_latitude (Optional<Angle>& latitude)
 
 
 bool
-Sentence::read_longitude (Optional<Angle>& longitude)
+Sentence::read_longitude (std::optional<Angle>& longitude)
 {
 	if (!read_next())
 		return false;

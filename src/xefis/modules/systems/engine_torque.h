@@ -16,9 +16,7 @@
 
 // Standard:
 #include <cstddef>
-
-// Boost:
-#include <boost/variant.hpp>
+#include <variant>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -33,7 +31,7 @@ class EngineTorqueIO: public v2::ModuleIO
 {
   public:
 	using EfficiencyDatatable	= xf::Datatable2D<si::AngularVelocity, double>;
-	using EngineEfficiency		= boost::variant<double, EfficiencyDatatable>;
+	using EngineEfficiency		= std::variant<double, EfficiencyDatatable>;
 	using MotorKv				= decltype (1.0_rpm / 1.0_V);
 
   public:

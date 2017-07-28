@@ -82,7 +82,7 @@ Lift::critical_aoa() const noexcept
 }
 
 
-Optional<Angle>
+std::optional<Angle>
 Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 {
 	auto aoas = _aoa_to_cl->arguments (cl, { _aoa_to_cl->min_argument().argument, _critical_aoa });

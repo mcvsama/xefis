@@ -15,9 +15,6 @@
 #include <cstddef>
 #include <memory>
 
-// Lib:
-#include <boost/lexical_cast.hpp>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>

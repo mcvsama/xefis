@@ -263,8 +263,8 @@ class CHRUM6:
 	v2::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ io.output_acceleration_y };
 	v2::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ io.output_acceleration_z };
 	// Backup gyro bias values:
-	Optional<uint32_t>					_gyro_bias_xy;
-	Optional<uint32_t>					_gyro_bias_z;
+	std::optional<uint32_t>				_gyro_bias_xy;
+	std::optional<uint32_t>				_gyro_bias_z;
 };
 
 #endif

@@ -483,13 +483,13 @@ class AFCS: public v2::Module<AFCS_IO>
 	/**
 	 * Return current V/S rounded to _vs_rounding.
 	 */
-	Optional<si::Velocity>
+	std::optional<si::Velocity>
 	current_rounded_vs() const;
 
 	/**
 	 * Return current FPA rounded to _fpa_rounding.
 	 */
-	Optional<si::Angle>
+	std::optional<si::Angle>
 	current_rounded_fpa() const;
 
 	/**
@@ -533,27 +533,27 @@ class AFCS: public v2::Module<AFCS_IO>
 	/**
 	 * Return string ID for a thrust mode.
 	 */
-	Optional<afcs_api::ThrustMode>
+	std::optional<afcs_api::ThrustMode>
 	translate_thrust_mode() const;
 
 	/**
 	 * Return string ID for a roll mode.
 	 */
-	Optional<afcs_api::RollMode>
+	std::optional<afcs_api::RollMode>
 	translate_roll_mode() const;
 
 	/**
 	 * Return string ID for a pitch mode.
 	 */
-	Optional<afcs_api::PitchMode>
+	std::optional<afcs_api::PitchMode>
 	translate_pitch_mode() const;
 
 	/**
-	 * Cast internal Optional types.
+	 * Cast internal std::optional types.
 	 */
 	template<class Target, class Source>
-		static Optional<Target>
-		optional_cast (Optional<Source> const& source);
+		static std::optional<Target>
+		optional_cast (std::optional<Source> const& source);
 
   private:
 	bool									_ap_on				{ false };
@@ -576,8 +576,8 @@ class AFCS: public v2::Module<AFCS_IO>
 	si::Angle								_mcp_heading		{ 0_deg };
 	si::Angle								_mcp_track			{ 0_deg };
 	si::Length								_mcp_altitude		{ 1000_ft };
-	Optional<si::Velocity>					_mcp_vs;
-	Optional<si::Angle>						_mcp_fpa;
+	std::optional<si::Velocity>				_mcp_vs;
+	std::optional<si::Angle>				_mcp_fpa;
 	std::set<Unique<v2::CallbackAction>>	_button_actions;
 	std::set<Unique<v2::DeltaDecoder>>		_rotary_decoders;
 };

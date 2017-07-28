@@ -122,7 +122,7 @@ class AFCS_FD_Pitch: public v2::Module<AFCS_FD_Pitch_IO>
 	 * Compute result angle from PID and parameters.
 	 */
 	template<class Input, class Control>
-		Optional<si::Angle>
+		std::optional<si::Angle>
 		compute_pitch (xf::PIDControl<Input, Control>& pid,
 					   v2::PropertyIn<Input> const& cmd_param,
 					   v2::PropertyIn<Input> const& measured_param,

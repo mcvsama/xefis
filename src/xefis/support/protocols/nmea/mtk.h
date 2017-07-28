@@ -48,10 +48,10 @@ class PMTKACK: public Sentence
 
   public:
 	// Command to which this ACK responds to:
-	Optional<std::string>	command;
+	std::optional<std::string>	command;
 
 	// Result:
-	Optional<MTKResult>		result;
+	std::optional<MTKResult>	result;
 };
 
 
