@@ -19,6 +19,8 @@
 #include <vector>
 #include <exception>
 #include <optional>
+#include <memory>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -33,8 +35,7 @@ namespace v2 {
 using namespace xf; // XXX
 
 class BasicSetting;
-class BasicPropertyIn;
-class BasicPropertyOut;
+class ModuleIO;
 
 
 /**
@@ -64,25 +65,18 @@ class UninitializedSettings: public Exception
  * Public method that computes the result is fetch_and_process(). It calls implementation-defined
  * process().
  */
-class Module: private Noncopyable
+class BasicModule: private Noncopyable
 {
   public:
 	/**
-	 * A set of methods for processing loop to
+	 * A set of methods for the processing loop to use on the module.
 	 */
 	class ProcessingLoopAPI
 	{
 	  public:
 		// Ctor
 		explicit
-		ProcessingLoopAPI (Module*);
-
-		/**
-		 * Iterate through registered settings and check that ones without default value have been initialized by user.
-		 * If uninitialized settings are found, UninitializedSettings is thrown.
-		 */
-		void
-		verify_settings();
+		ProcessingLoopAPI (BasicModule*);
 
 		/**
 		 * Request all connected input properties to be computed, and then
@@ -98,37 +92,13 @@ class Module: private Noncopyable
 		void
 		reset_cache();
 
-		/**
-		 * Register an input property with this module.
-		 */
-		void
-		register_input_property (BasicPropertyIn*);
-
-		/**
-		 * Unregister an input property.
-		 */
-		void
-		unregister_input_property (BasicPropertyIn*);
-
-		/**
-		 * Register an output property with this module.
-		 */
-		void
-		register_output_property (BasicPropertyOut*);
-
-		/**
-		 * Unregister an output property.
-		 */
-		void
-		unregister_output_property (BasicPropertyOut*);
-
 	  private:
-		Module* _module;
+		BasicModule* _module;
 	};
 
 	/**
 	 * Defines method for accessing configuration widget if a module decides to implement one.
-	 * This class should be inherited by the same class that inherits the Module class.
+	 * This class should be inherited by the same class that inherits the BasicModule class.
 	 */
 	class HasConfiguratorWidget
 	{
@@ -138,19 +108,32 @@ class Module: private Noncopyable
 	};
 
   public:
-	// Ctor
+	/**
+	 * Ctor
+	 *
+	 * \param	module_io
+	 *			Object that storess all Settings, PropertyIns and PropertyOuts.
+	 * \param	instance
+	 *			Instance name for GUI identification and debugging purposes.
+	 */
 	explicit
-	Module (std::string const& instance = {});
+	BasicModule (std::unique_ptr<ModuleIO>, std::string const& instance = {});
 
 	// Dtor
 	virtual
-	~Module() = default;
+	~BasicModule() = default;
 
 	/**
 	 * Return module instance name.
 	 */
 	std::string const&
 	instance() const noexcept;
+
+	/**
+	 * Return the IO object of this module.
+	 */
+	ModuleIO*
+	io_base() const noexcept;
 
 	/**
 	 * Initialize before starting the loop.
@@ -183,35 +166,65 @@ class Module: private Noncopyable
   private:
 	std::string						_instance;
 	bool							_cached = false;
-	std::vector<BasicSetting*>		_registered_settings;
-	std::vector<BasicPropertyIn*>	_registered_input_properties;
-	std::vector<BasicPropertyOut*>	_registered_output_properties;
 	std::optional<Logger> mutable	_logger;
+	std::unique_ptr<ModuleIO>		_io;
 };
 
 
+template<class IO = ModuleIO>
+	class Module: public BasicModule
+	{
+	  public:
+		/**
+		 * Ctor
+		 * Version for modules that do have their own IO class.
+		 */
+		template<class = std::enable_if_t<!std::is_same<IO, ModuleIO>::value>>
+			explicit
+			Module (std::unique_ptr<IO> io, std::string const& instance = {});
+
+		/**
+		 * Ctor
+		 * Version for modules that do not have any IO class.
+		 */
+		template<class = std::enable_if_t<std::is_same<IO, ModuleIO>::value>>
+			explicit
+			Module (std::string const& instance = {});
+
+	  protected:
+		IO& io;
+	};
+
+
 inline
-Module::ProcessingLoopAPI::ProcessingLoopAPI (Module* module):
+BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule* module):
 	_module (module)
 { }
 
 
 inline void
-Module::ProcessingLoopAPI::reset_cache()
+BasicModule::ProcessingLoopAPI::reset_cache()
 {
 	_module->_cached = false;
 }
 
 
 inline std::string const&
-Module::instance() const noexcept
+BasicModule::instance() const noexcept
 {
 	return _instance;
 }
 
 
+inline ModuleIO*
+BasicModule::io_base() const noexcept
+{
+	return _io.get();
+}
+
+
 inline Logger const&
-Module::log() const
+BasicModule::log() const
 {
 	if (!_logger)
 	{
@@ -223,6 +236,24 @@ Module::log() const
 }
 
 
+template<class IO>
+	template<class>
+		inline
+		Module<IO>::Module (std::unique_ptr<IO> module_io, std::string const& instance):
+			BasicModule (std::move (module_io), instance),
+			io (static_cast<IO&> (*io_base()))
+		{ }
+
+
+template<class IO>
+	template<class>
+		inline
+		Module<IO>::Module (std::string const& instance):
+			BasicModule (std::make_unique<IO>(), instance),
+			io (static_cast<IO&> (*io_base()))
+		{ }
+
+
 /*
  * Global functions
  */
@@ -232,13 +263,25 @@ Module::log() const
  * Return string identifying module and its instance.
  */
 std::string
-module_identifier (Module&);
+identifier (BasicModule&);
 
 /**
- * Same as module_identifier (Module&).
+ * Return string identifying module and its instance, if any module is associated with the ModuleIO object.
  */
 std::string
-module_identifier (Module*);
+identifier (ModuleIO&);
+
+/**
+ * Same as identifier (BasicModule&).
+ */
+std::string
+identifier (BasicModule*);
+
+/**
+ * Same as identifier (ModuleIO&).
+ */
+std::string
+identifier (ModuleIO*);
 
 } // namespace v2
 

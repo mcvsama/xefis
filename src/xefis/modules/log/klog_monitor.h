@@ -27,12 +27,8 @@
 #include <xefis/core/v2/property.h>
 
 
-class KLogMonitor:
-	public QObject,
-	public v2::Module
+class KLogMonitorIO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Output
@@ -42,14 +38,22 @@ class KLogMonitor:
 	v2::PropertyOut<bool>	output_flag_io		{ this, "/flags/io-error" };
 	v2::PropertyOut<bool>	output_flag_oops	{ this, "/flags/oops" };
 	v2::PropertyOut<bool>	output_flag_bug		{ this, "/flags/bug" };
+};
+
+
+class KLogMonitor:
+	public QObject,
+	public v2::Module<KLogMonitorIO>
+{
+	Q_OBJECT
 
   private:
-	static constexpr std::size_t	BufferSize = 1024 * 1024;
+	static constexpr std::size_t	kBufferSize = 1024 * 1024;
 
   public:
 	// Ctor
 	explicit
-	KLogMonitor (std::string const& instance = {});
+	KLogMonitor (std::unique_ptr<KLogMonitorIO>, std::string const& instance = {});
 
   private slots:
 	void
@@ -58,7 +62,7 @@ class KLogMonitor:
   private:
 	QTimer*							_timer		{ nullptr };
 	bool							_open		{ false };
-	std::array<char, BufferSize>	_buffer;
+	std::array<char, kBufferSize>	_buffer;
 };
 
 #endif

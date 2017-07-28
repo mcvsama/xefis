@@ -26,8 +26,8 @@
 #include "flaps_control.h"
 
 
-FlapsControl::FlapsControl (xf::Airframe& airframe, std::string const& instance):
-	Module (instance)
+FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airframe& airframe, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	for (auto s: airframe.flaps().settings())
 		_settings_list.insert (s.second.angle());
@@ -50,22 +50,25 @@ FlapsControl::process (v2::Cycle const&)
 {
 	if (_input_up_clicked())
 	{
-		auto prev_setting = _settings_list.lower_bound (*input_setting);
+		auto prev_setting = _settings_list.lower_bound (*io.input_setting);
+
 		if (prev_setting != _settings_list.begin())
 			prev_setting--;
-		input_setting = *prev_setting;
+
+		io.input_setting = *prev_setting;
 	}
 	else if (_input_down_clicked())
 	{
-		auto next_setting = _settings_list.upper_bound (*input_setting);
+		auto next_setting = _settings_list.upper_bound (*io.input_setting);
+
 		if (next_setting != _settings_list.end())
-			input_setting = *next_setting;
+			io.input_setting = *next_setting;
 	}
 
-	if (_input_setting_changed() && input_setting)
+	if (_input_setting_changed() && io.input_setting)
 	{
-		_setting = xf::clamped<si::Angle> (*input_setting, _extents);
-		output_setting = _setting;
+		_setting = xf::clamped<si::Angle> (*io.input_setting, _extents);
+		io.output_setting = _setting;
 		_timer->start();
 	}
 }
@@ -78,7 +81,7 @@ FlapsControl::update_flap_position()
 
 	double sgn = xf::sgn ((_setting - _current).quantity<Degree>());
 	si::Angle difference = _setting - _current;
-	si::Angle delta = kUpdateInterval * *setting_angular_velocity;
+	si::Angle delta = kUpdateInterval * *io.setting_angular_velocity;
 
 	if (abs (difference) > delta)
 	{
@@ -93,7 +96,7 @@ FlapsControl::update_flap_position()
 		_timer->stop();
 	}
 
-	output_current = _current;
-	output_control = xf::renormalize (_current, _extents, *setting_control_extents);
+	io.output_current = _current;
+	io.output_control = xf::renormalize (_current, _extents, *io.setting_control_extents);
 }
 

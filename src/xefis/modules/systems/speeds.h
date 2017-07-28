@@ -24,7 +24,7 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class Speeds: public v2::Module
+class SpeedsIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -42,11 +42,15 @@ class Speeds: public v2::Module
 	v2::PropertyOut<si::Velocity>	output_speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
 	v2::PropertyOut<si::Velocity>	output_speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
 	v2::PropertyOut<si::Velocity>	output_speed_maximum			{ this, "speed.maximum" };
+};
 
+
+class Speeds: public v2::Module<SpeedsIO>
+{
   public:
 	// Ctor
 	explicit
-	Speeds (xf::Airframe*, std::string const& instance = {});
+	Speeds (std::unique_ptr<SpeedsIO>, xf::Airframe*, std::string const& instance = {});
 
 	// Module API
 	void

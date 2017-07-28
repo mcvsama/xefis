@@ -24,9 +24,7 @@
 #include <xefis/core/v2/property.h>
 
 
-class DebugForces:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class DebugForcesIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -42,11 +40,17 @@ class DebugForces:
 	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_x			{ this, "/centrifugal-acceleration/x" };
 	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_y			{ this, "/centrifugal-acceleration/y" };
 	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_z			{ this, "/centrifugal-acceleration/z" };
+};
 
+
+class DebugForces:
+	public v2::Instrument<DebugForcesIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	DebugForces (std::string const& instance = {});
+	DebugForces (std::unique_ptr<DebugForcesIO>, std::string const& instance = {});
 
 	// Module API
 	void

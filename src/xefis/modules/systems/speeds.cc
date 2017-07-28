@@ -22,14 +22,14 @@
 #include "speeds.h"
 
 
-Speeds::Speeds (xf::Airframe* airframe, std::string const& instance):
-	Module (instance),
+Speeds::Speeds (std::unique_ptr<SpeedsIO> module_io, xf::Airframe* airframe, std::string const& instance):
+	Module (std::move (module_io), instance),
 	_airframe (airframe)
 {
 	_speeds_computer.set_callback (std::bind (&Speeds::compute, this));
 	_speeds_computer.observe ({
-		&input_flaps_angle,
-		&input_stall_speed_5deg,
+		&io.input_flaps_angle,
+		&io.input_stall_speed_5deg,
 	});
 }
 
@@ -50,21 +50,21 @@ Speeds::compute()
 	Optional<si::Velocity> maximum;
 
 	// Flaps speed limits:
-	if (input_flaps_angle)
+	if (io.input_flaps_angle)
 	{
-		auto flaps_range = flaps.get_speed_range (*input_flaps_angle);
+		auto flaps_range = flaps.get_speed_range (*io.input_flaps_angle);
 		minimum = max (minimum, flaps_range.min());
 		maximum = min (maximum, flaps_range.max());
 	}
 
 	// Stall speed:
-	if (input_stall_speed_5deg)
-		minimum = max (minimum, *input_stall_speed_5deg);
+	if (io.input_stall_speed_5deg)
+		minimum = max (minimum, *io.input_stall_speed_5deg);
 
 	// TODO compute output_speed_minimum, output_speed_maximum
 
-	output_speed_minimum_maneuver = minimum;
-	output_speed_maximum_maneuver = maximum;
+	io.output_speed_minimum_maneuver = minimum;
+	io.output_speed_maximum_maneuver = maximum;
 }
 
 

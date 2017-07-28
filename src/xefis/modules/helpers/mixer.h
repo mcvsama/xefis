@@ -25,12 +25,9 @@
 #include <xefis/utility/v2/actions.h>
 
 
-template<class pValue>
-	class Mixer: public v2::Module
+template<class Value>
+	class MixerIO: public v2::ModuleIO
 	{
-	  public:
-		using Value = pValue;
-
 	  public:
 		/*
 		 * Settings
@@ -53,11 +50,19 @@ template<class pValue>
 		 */
 
 		v2::PropertyOut<Value>	output_value			{ this, "/value" };
+	};
+
+
+template<class pValue>
+	class Mixer: public v2::Module<MixerIO<pValue>>
+	{
+	  public:
+		using Value = pValue;
 
 	  public:
 		// Ctor
 		explicit
-		Mixer (std::string const& instance = {});
+		Mixer (std::unique_ptr<MixerIO>, std::string const& instance = {});
 
 	  protected:
 		// Module API
@@ -80,8 +85,8 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (std::string const& instance):
-		Module (instance)
+	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, std::string const& instance):
+		Module (std::move (module_io), instance)
 	{ }
 
 
@@ -89,7 +94,7 @@ template<class V>
 	void
 	Mixer<V>::initialize()
 	{
-		if (setting_output_minimum && setting_output_maximum && *setting_output_minimum > *setting_output_maximum)
+		if (io.setting_output_minimum && io.setting_output_maximum && *io.setting_output_minimum > *io.setting_output_maximum)
 			log() << "Settings error: maximum value is less than the minimum value." << std::endl;
 	}
 
@@ -108,14 +113,14 @@ template<class V>
 				Value sum{};
 
 				if (a)
-					sum += *setting_input_a_factor * *a;
+					sum += *io.setting_input_a_factor * *a;
 				if (b)
-					sum += *setting_input_b_factor * *b;
+					sum += *io.setting_input_b_factor * *b;
 
-				if (setting_output_minimum && sum < *setting_output_minimum)
+				if (io.setting_output_minimum && sum < *io.setting_output_minimum)
 					sum = *setting_output_minimum;
 
-				if (setting_output_maximum && sum > *setting_output_maximum)
+				if (io.setting_output_maximum && sum > *io.setting_output_maximum)
 					sum = *setting_output_maximum;
 
 				output_value = sum;

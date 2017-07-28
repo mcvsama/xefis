@@ -23,19 +23,19 @@
 #include "gear.h"
 
 
-Gear::Gear (std::string const& instance):
-	Instrument (instance),
+Gear::Gear (std::unique_ptr<GearIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (0.5f)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
 	_inputs_observer.observe ({
-		&requested_down,
-		&nose_up,
-		&nose_down,
-		&left_up,
-		&left_down,
-		&right_up,
-		&right_down,
+		&io.requested_down,
+		&io.nose_up,
+		&io.nose_down,
+		&io.left_up,
+		&io.left_down,
+		&io.right_up,
+		&io.right_down,
 	});
 }
 
@@ -64,16 +64,16 @@ Gear::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	bool v_requested_down = requested_down.value_or (false);
-	bool v_nose_up = nose_up.value_or (false);
-	bool v_nose_down = nose_down.value_or (false);
-	bool v_left_up = left_up.value_or (false);
-	bool v_left_down = left_down.value_or (false);
-	bool v_right_up = right_up.value_or (false);
-	bool v_right_down = right_down.value_or (false);
+	bool v_requested_down = io.requested_down.value_or (false);
+	bool v_nose_up = io.nose_up.value_or (false);
+	bool v_nose_down = io.nose_down.value_or (false);
+	bool v_left_up = io.left_up.value_or (false);
+	bool v_left_down = io.left_down.value_or (false);
+	bool v_right_up = io.right_up.value_or (false);
+	bool v_right_down = io.right_down.value_or (false);
 
 	// If everything retracted according to setting, hide the widget:
-	if (requested_down && !v_requested_down &&
+	if (io.requested_down && !v_requested_down &&
 		v_nose_up && !v_nose_down &&
 		v_left_up && !v_left_down &&
 		v_right_up && !v_right_down)
@@ -121,7 +121,7 @@ Gear::paintEvent (QPaintEvent*)
 	};
 
 	auto should_paint_graybox = [&](bool gear_up, bool gear_down) -> bool {
-		return requested_down.is_nil() || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
+		return io.requested_down.is_nil() || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
 	};
 
 	painter().setBrush (Qt::NoBrush);

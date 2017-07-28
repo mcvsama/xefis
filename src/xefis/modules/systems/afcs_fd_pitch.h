@@ -30,16 +30,9 @@
 #include "afcs_api.h"
 
 
-/**
- * Computes desired pitch values to follow.
- * Output depends on pitch-mode setting.
- */
-// TODO disengage if outside safe limits, unless autonomous flag is set
-// (autonomous flag tells whether user has still possibility to control the airplane,
-// that is he is in the range of radio communication).
-class AFCS_FD_Pitch: public v2::Module
+class AFCS_FD_Pitch_IO: public v2::ModuleIO
 {
-  private:
+  public:
 	using IAS_PID		= xf::PIDControl<si::Velocity, si::Angle>;
 	using MachPID		= xf::PIDControl<double, si::Angle>;
 	using AltitudePID	= xf::PIDControl<si::Length, si::Angle>;
@@ -81,11 +74,29 @@ class AFCS_FD_Pitch: public v2::Module
 
 	v2::PropertyOut<si::Angle>				output_pitch					{ this, "/output-pitch" };
 	v2::PropertyOut<bool>					output_operative				{ this, "/operative" };
+};
+
+
+/**
+ * Computes desired pitch values to follow.
+ * Output depends on pitch-mode setting.
+ */
+// TODO disengage if outside safe limits, unless autonomous flag is set
+// (autonomous flag tells whether user has still possibility to control the airplane,
+// that is he is in the range of radio communication).
+class AFCS_FD_Pitch: public v2::Module<AFCS_FD_Pitch_IO>
+{
+  private:
+	using IAS_PID		= AFCS_FD_Pitch_IO::IAS_PID;
+	using MachPID		= AFCS_FD_Pitch_IO::MachPID;
+	using AltitudePID	= AFCS_FD_Pitch_IO::AltitudePID;
+	using VS_PID		= AFCS_FD_Pitch_IO::VS_PID;
+	using FPA_PID		= AFCS_FD_Pitch_IO::FPA_PID;
 
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Pitch (std::string const& instance = {});
+	AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

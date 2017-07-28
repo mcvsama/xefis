@@ -27,8 +27,8 @@
 #include "label.h"
 
 
-Label::Label (std::string const& instance):
-	Instrument (instance),
+Label::Label (std::unique_ptr<LabelIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (1.f)
 { }
 
@@ -51,9 +51,9 @@ Label::paintEvent (QPaintEvent*)
 	clear_background();
 
 	QFont font (_font_10);
-	font.setPixelSize (**this->font_size);
+	font.setPixelSize (**io.font_size);
 	painter().setFont (font);
-	painter().setPen (*this->color);
-	painter().fast_draw_text (rect(), *this->alignment, *this->label);
+	painter().setPen (*io.color);
+	painter().fast_draw_text (rect(), *io.alignment, *io.label);
 }
 

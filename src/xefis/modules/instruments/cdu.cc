@@ -37,9 +37,6 @@
 #include "cdu.h"
 
 
-constexpr double CDU::kButtonWidthForHeight;
-
-
 CDU::Strip::Strip (CDU& cdu, QString const& title, Column column):
 	_cdu (cdu),
 	_title (title),

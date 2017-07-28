@@ -27,12 +27,12 @@
 #include "vertical_trim.h"
 
 
-VerticalTrim::VerticalTrim (std::string const& instance):
-	Instrument (instance),
+VerticalTrim::VerticalTrim (std::unique_ptr<VerticalTrimIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (0.5f)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
-	_inputs_observer.observe (input_trim_value);
+	_inputs_observer.observe (io.input_trim_value);
 }
 
 
@@ -60,14 +60,14 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	std::optional<double> trim = input_trim_value.get_optional();
+	std::optional<double> trim = io.input_trim_value.get_optional();
 
 	if (trim)
 		xf::clamp (*trim, -1.0, +1.0);
 
-	std::optional<double> ref = input_trim_reference.get_optional();
-	std::optional<double> ref_min = input_trim_reference_minimum.get_optional();
-	std::optional<double> ref_max = input_trim_reference_maximum.get_optional();
+	std::optional<double> ref = io.input_trim_reference.get_optional();
+	std::optional<double> ref_min = io.input_trim_reference_minimum.get_optional();
+	std::optional<double> ref_max = io.input_trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = height() - h;
@@ -119,7 +119,7 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	// Cyan vertical text:
 	painter().setFont (label_font);
 	painter().setPen (cyan);
-	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *this->label);
+	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *io.label);
 
 	// Pointer:
 	if (trim)

@@ -26,9 +26,7 @@
 #include <xefis/core/v2/setting.h>
 
 
-class HorizontalTrim:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class HorizontalTrimIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -47,11 +45,17 @@ class HorizontalTrim:
 	v2::PropertyIn<double>	input_trim_reference			{ this, "/trim/reference" };
 	v2::PropertyIn<double>	input_trim_reference_minimum	{ this, "/trim/reference.minimum" };
 	v2::PropertyIn<double>	input_trim_reference_maximum	{ this, "/trim/reference.maximum" };
+};
 
+
+class HorizontalTrim:
+	public v2::Instrument<HorizontalTrimIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	HorizontalTrim (std::string const& instance = {});
+	HorizontalTrim (std::unique_ptr<HorizontalTrimIO>, std::string const& instance = {});
 
 	// Module API
 	void

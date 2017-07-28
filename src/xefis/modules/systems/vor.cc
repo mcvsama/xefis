@@ -23,20 +23,20 @@
 #include "vor.h"
 
 
-VOR::VOR (std::string const& instance):
-	Module (instance)
+VOR::VOR (std::unique_ptr<VOR_IO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	_vor_computer.set_callback (std::bind (&VOR::compute, this));
 	_vor_computer.add_depending_smoothers ({
 		&_deviation_smoother,
 	});
 	_vor_computer.observe ({
-		&input_magnetic_declination,
-		&input_station_latitude,
-		&input_station_longitude,
-		&input_aircraft_latitude,
-		&input_aircraft_longitude,
-		&input_radial_magnetic,
+		&io.input_magnetic_declination,
+		&io.input_station_latitude,
+		&io.input_station_longitude,
+		&io.input_aircraft_latitude,
+		&io.input_aircraft_longitude,
+		&io.input_radial_magnetic,
 	});
 }
 
@@ -55,34 +55,34 @@ VOR::compute()
 
 	si::Time dt = _vor_computer.update_dt();
 
-	if (input_magnetic_declination &&
-		input_station_latitude && input_station_longitude &&
-		input_aircraft_latitude && input_aircraft_longitude &&
-		input_radial_magnetic)
+	if (io.input_magnetic_declination &&
+		io.input_station_latitude && io.input_station_longitude &&
+		io.input_aircraft_latitude && io.input_aircraft_longitude &&
+		io.input_radial_magnetic)
 	{
 		// Convert magnetic radial to true radial:
-		si::Angle const declination = *input_magnetic_declination;
-		si::Angle const input_radial = *input_radial_magnetic + declination;
+		si::Angle const declination = *io.input_magnetic_declination;
+		si::Angle const input_radial = *io.input_radial_magnetic + declination;
 
-		si::LonLat const station_position (*input_station_longitude, *input_station_latitude);
-		si::LonLat const aircraft_position (*input_aircraft_longitude, *input_aircraft_latitude);
+		si::LonLat const station_position (*io.input_station_longitude, *io.input_station_latitude);
+		si::LonLat const aircraft_position (*io.input_aircraft_longitude, *io.input_aircraft_latitude);
 
 		si::Angle current_radial = normalize (xf::initial_bearing (station_position, aircraft_position));
 		si::Angle deviation = xf::floored_mod<Angle> (input_radial - current_radial, -180_deg, +180_deg);
 		if (abs (deviation) > 90_deg)
 			deviation = -denormalize (deviation + 180_deg);
 
-		output_radial_magnetic = normalize (current_radial - declination);
-		output_reciprocal_magnetic = normalize (current_radial + 180_deg - declination);
-		output_initial_bearing_magnetic = normalize (xf::initial_bearing (aircraft_position, station_position) - declination);
-		output_to_flag = abs (denormalize (current_radial - input_radial)) > 90_deg;
-		output_deviation = _deviation_smoother (deviation, dt);
-		output_distance = xf::haversine_earth (station_position, aircraft_position);
+		io.output_radial_magnetic = normalize (current_radial - declination);
+		io.output_reciprocal_magnetic = normalize (current_radial + 180_deg - declination);
+		io.output_initial_bearing_magnetic = normalize (xf::initial_bearing (aircraft_position, station_position) - declination);
+		io.output_to_flag = abs (denormalize (current_radial - input_radial)) > 90_deg;
+		io.output_deviation = _deviation_smoother (deviation, dt);
+		io.output_distance = xf::haversine_earth (station_position, aircraft_position);
 	}
 	else
 	{
-		output_deviation.set_nil();
-		output_to_flag.set_nil();
+		io.output_deviation.set_nil();
+		io.output_to_flag.set_nil();
 	}
 }
 

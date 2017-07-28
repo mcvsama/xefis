@@ -30,16 +30,9 @@
 #include "afcs_api.h"
 
 
-/**
- * Computes desired roll values to follow.
- * Output depends on roll-mode setting.
- */
-// TODO disengage if outside safe limits, unless autonomous flag is set
-// (autonomous flag tells whether user has still possibility to control the airplane,
-// that is he is in the range of radio communication).
-class AFCS_FD_Roll: public v2::Module
+class AFCS_FD_Roll_IO: public v2::ModuleIO
 {
-  private:
+  public:
 	using DirectionPID = xf::PIDControl<si::Angle, si::Angle>;
 
   public:
@@ -68,11 +61,25 @@ class AFCS_FD_Roll: public v2::Module
 
 	v2::PropertyOut<si::Angle>			output_roll					{ this, "/output-roll" };
 	v2::PropertyOut<bool>				output_operative			{ this, "/operative" };
+};
+
+
+/**
+ * Computes desired roll values to follow.
+ * Output depends on roll-mode setting.
+ */
+// TODO disengage if outside safe limits, unless autonomous flag is set
+// (autonomous flag tells whether user has still possibility to control the airplane,
+// that is he is in the range of radio communication).
+class AFCS_FD_Roll: public v2::Module<AFCS_FD_Roll_IO>
+{
+  private:
+	using DirectionPID = AFCS_FD_Roll_IO::DirectionPID;
 
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Roll (std::string const& instance = {});
+	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

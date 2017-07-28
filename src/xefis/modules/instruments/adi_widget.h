@@ -563,6 +563,7 @@ class ADIWidget: public xf::InstrumentWidget
 
   public:
 	// Ctor
+	explicit
 	ADIWidget (QWidget* parent, xf::WorkPerformer*);
 
 	// Dtor

@@ -97,19 +97,19 @@ class ProcessingLoop: public QObject
 
   private:
 	void
-	compatibility_input();
+	compatibility_input(); // XXX
 
 	void
-	compatibility_output();
+	compatibility_output(); // XXX
 
   private:
-	Machine*						_machine;
-	Xefis*							_xefis;
-	QTimer*							_loop_timer;
-	Time							_loop_period			= 0.01_s;
-	Optional<Timestamp>				_previous_timestamp;
-	std::vector<Unique<v2::Module>>	_modules;
-	std::vector<Module*>			_uninitialized_modules;
+	Machine*								_machine;
+	Xefis*									_xefis;
+	QTimer*									_loop_timer;
+	Time									_loop_period			= 0.01_s;
+	Optional<Timestamp>						_previous_timestamp;
+	std::vector<Unique<v2::BasicModule>>	_modules;
+	std::vector<BasicModule*>				_uninitialized_modules;
 };
 
 

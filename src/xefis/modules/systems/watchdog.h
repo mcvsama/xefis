@@ -23,9 +23,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/module.h>
+#include <xefis/core/v2/module_io.h>
 
 
-class Watchdog: public v2::Module
+class Watchdog: public v2::Module<>
 {
   public:
 	// Ctor

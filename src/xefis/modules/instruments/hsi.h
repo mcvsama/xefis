@@ -34,10 +34,8 @@
 #include "hsi_widget.h"
 
 
-class HSI: public v2::Instrument
+class HSI_IO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Settings
@@ -116,17 +114,23 @@ class HSI: public v2::Instrument
 	v2::PropertyIn<bool>					features_ndb							{ this, "/features/ndb" };
 	v2::PropertyIn<bool>					features_loc							{ this, "/features/loc" };
 	v2::PropertyIn<bool>					features_arpt							{ this, "/features/arpt" };
+};
+
+
+class HSI: public v2::Instrument<HSI_IO>
+{
+	Q_OBJECT
 
   public:
 	// Ctor
-	HSI (xf::Xefis*, xf::NavaidStorage*, std::string const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::Xefis*, xf::NavaidStorage*, std::string const& instance = {});
 
 	// Module API
 	void
 	process (v2::Cycle const&) override;
 
   private:
-	Unique<HSIWidget>	_hsi_widget;
+	HSIWidget*	_hsi_widget;
 };
 
 #endif

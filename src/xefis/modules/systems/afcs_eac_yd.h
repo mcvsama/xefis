@@ -27,10 +27,7 @@
 #include <xefis/utility/pid_control.h>
 
 
-/**
- * Controls rudder to obtain zero slip-skid value.
- */
-class AFCS_EAC_YD: public v2::Module
+class AFCS_EAC_YD_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -54,11 +51,18 @@ class AFCS_EAC_YD: public v2::Module
 	 */
 
 	v2::PropertyOut<si::Angle>	output_rudder_deflection	{ this, "/rudder-deflection" };
+};
 
+
+/**
+ * Controls rudder to obtain zero slip-skid value.
+ */
+class AFCS_EAC_YD: public v2::Module<AFCS_EAC_YD_IO>
+{
   public:
 	// Ctor
 	explicit
-	AFCS_EAC_YD (std::string const& instance = {});
+	AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO>, std::string const& instance = {});
 
   private:
 	// Module API

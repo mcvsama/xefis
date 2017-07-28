@@ -29,11 +29,7 @@
 #include <xefis/core/xefis.h>
 
 
-/**
- * Controls trim value with two buttons or axis.
- * Generates appropriate trimming sound.
- */
-class TrimControl: public v2::Module
+class TrimControlIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -56,11 +52,19 @@ class TrimControl: public v2::Module
 	 */
 
 	v2::PropertyOut<double>	output_trim_value		{ this, "/trim-value" };
+};
 
+
+/**
+ * Controls trim value with two buttons or axis.
+ * Generates appropriate trimming sound.
+ */
+class TrimControl: public v2::Module<TrimControlIO>
+{
   public:
 	// Ctor
 	explicit
-	TrimControl (xf::Xefis*, std::string const& instance = {});
+	TrimControl (std::unique_ptr<TrimControlIO>, xf::Xefis*, std::string const& instance = {});
 
 	// Module API
 	void

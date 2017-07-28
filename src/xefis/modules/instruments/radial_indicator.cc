@@ -24,13 +24,14 @@
 #include "radial_indicator.h"
 
 
-RadialIndicator::RadialIndicator (v2::PropertyDigitizer value_digitizer,
+RadialIndicator::RadialIndicator (std::unique_ptr<RadialIndicatorIO> module_io,
+								  v2::PropertyDigitizer value_digitizer,
 								  v2::PropertyDigitizer value_target_digitizer,
 								  v2::PropertyDigitizer value_reference_digitizer,
 								  v2::PropertyDigitizer value_automatic_digitizer,
 								  std::string const& instance):
 	InstrumentAids (0.9f),
-	BasicIndicator (instance),
+	BasicIndicator (std::move (module_io), instance),
 	_value_digitizer (value_digitizer),
 	_value_target_digitizer (value_target_digitizer),
 	_value_reference_digitizer (value_reference_digitizer),
@@ -134,7 +135,7 @@ RadialIndicator::paint_indicator (float, float r)
 	std::optional<double> value_target = _value_target_digitizer.to_numeric();
 	std::optional<double> value_reference = _value_reference_digitizer.to_numeric();
 	std::optional<double> value_automatic = _value_automatic_digitizer.to_numeric();
-	xf::Range<double> range { *this->value_minimum, *this->value_maximum };
+	xf::Range<double> range { *io.value_minimum, *io.value_maximum };
 
 	QColor silver (0xbb, 0xbd, 0xbf);
 	QColor gray (0x7a, 0x7a, 0x7a);
@@ -171,23 +172,23 @@ RadialIndicator::paint_indicator (float, float r)
 
 	double value_span_angle = 210.f;
 	double v_value = value ? xf::clamped (*value, range) : 0.f;
-	double v_warning = *value_maximum_warning ? xf::clamped (**value_maximum_warning, range) : 0.f;
-	double v_critical = *value_maximum_critical ? xf::clamped (**value_maximum_critical, range) : 0.f;
+	double v_warning = *io.value_maximum_warning ? xf::clamped (**io.value_maximum_warning, range) : 0.f;
+	double v_critical = *io.value_maximum_critical ? xf::clamped (**io.value_maximum_critical, range) : 0.f;
 	double v_target = value_target ? xf::clamped (*value_target, range) : 0.f;
 	double v_reference = value_reference ? xf::clamped (*value_reference, range) : 0.f;
 	double v_automatic = value_automatic ? xf::clamped (*value_automatic, range) : 0.f;
 
-	if (!*value_maximum_warning)
+	if (!*io.value_maximum_warning)
 		v_warning = range.max();
 
-	if (!*value_maximum_critical)
+	if (!*io.value_maximum_critical)
 		v_critical = range.max();
 
 	// Fill colors:
-	if (*value_maximum_warning && v_value >= v_warning)
+	if (*io.value_maximum_warning && v_value >= v_warning)
 		brush.setColor (orange.darker (100));
 
-	if (*value_maximum_critical && v_value >= v_critical)
+	if (*io.value_maximum_critical && v_value >= v_critical)
 		brush.setColor (red);
 
 	double value_angle = value_span_angle * (v_value - range.min()) / range.extent();
@@ -219,10 +220,10 @@ RadialIndicator::paint_indicator (float, float r)
 	_points.clear();
 	_points.emplace_back (0.f, silver_pen, 0.f);
 
-	if (*value_maximum_warning)
+	if (*io.value_maximum_warning)
 		_points.emplace_back (warning_angle, warning_pen, 0.1f * r);
 
-	if (*value_maximum_critical)
+	if (*io.value_maximum_critical)
 		_points.emplace_back (critical_angle, critical_pen, 0.2f * r);
 
 	_points.emplace_back (value_span_angle, critical_pen, 0.f);

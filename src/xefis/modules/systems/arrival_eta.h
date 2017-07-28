@@ -25,7 +25,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class ArrivalETA: public v2::Module
+class ArrivalETA_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -43,11 +43,15 @@ class ArrivalETA: public v2::Module
 	 */
 
 	v2::PropertyOut<si::Time>	output_eta					{ this, "/eta" };
+};
 
+
+class ArrivalETA: public v2::Module<ArrivalETA_IO>
+{
   public:
 	// Ctor
 	explicit
-	ArrivalETA (std::string const& instance = {});
+	ArrivalETA (std::unique_ptr<ArrivalETA_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

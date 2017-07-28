@@ -31,17 +31,8 @@
 #include <xefis/utility/v2/delta_decoder.h>
 
 
-class StatusWidget;
-
-/**
- * Widget showing status messages.
- */
-class Status:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class StatusIO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Settings
@@ -66,6 +57,17 @@ class Status:
 
 	v2::PropertyOut<bool>	output_master_caution			{ this, "/output/master-caution" };
 	v2::PropertyOut<bool>	output_master_warning			{ this, "/output/master-warning" };
+};
+
+
+/**
+ * Widget showing status messages.
+ */
+class Status:
+	public v2::Instrument<StatusIO>,
+	protected xf::InstrumentAids
+{
+	Q_OBJECT
 
   public:
 	/**
@@ -165,7 +167,7 @@ class Status:
   public:
 	// Ctor
 	explicit
-	Status (std::string const& instance = {});
+	Status (std::unique_ptr<StatusIO>, std::string const& instance = {});
 
 	/**
 	 * Configure new message.
@@ -231,11 +233,11 @@ class Status:
 	solve_scroll_and_cursor();
 
   private:
-	v2::PropChangedTo<bool>				_button_master_caution_pressed { input_button_master_caution, true };
-	v2::PropChangedTo<bool>				_button_master_warning_pressed { input_button_master_warning, true };
-	v2::PropChangedTo<bool>				_button_cursor_del_pressed { input_button_cursor_del, true };
-	v2::PropChangedTo<bool>				_button_recall_pressed { input_button_recall, true };
-	v2::PropChangedTo<bool>				_button_clear_pressed { input_button_clear, true };
+	v2::PropChangedTo<bool>				_button_cursor_del_pressed { io.input_button_cursor_del, true };
+	v2::PropChangedTo<bool>				_button_recall_pressed { io.input_button_recall, true };
+	v2::PropChangedTo<bool>				_button_clear_pressed { io.input_button_clear, true };
+	v2::PropChangedTo<bool>				_button_master_caution_pressed { io.input_button_master_caution, true };
+	v2::PropChangedTo<bool>				_button_master_warning_pressed { io.input_button_master_warning, true };
 	std::unique_ptr<v2::DeltaDecoder>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;

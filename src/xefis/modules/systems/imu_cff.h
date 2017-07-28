@@ -24,11 +24,7 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-/**
- * Compute centripetal force from IAS and gyro information.
- * TODO rename CFF -> centripetal
- */
-class IMU_CFF: public v2::Module
+class IMU_CFF_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -53,14 +49,22 @@ class IMU_CFF: public v2::Module
 	v2::PropertyOut<si::Force>			output_centripetal_force_x			{ this, "/force/x" };
 	v2::PropertyOut<si::Force>			output_centripetal_force_y			{ this, "/force/y" };
 	v2::PropertyOut<si::Force>			output_centripetal_force_z			{ this, "/force/z" };
+};
 
+
+/**
+ * Compute centripetal force from IAS and gyro information.
+ * TODO rename CFF -> centripetal
+ */
+class IMU_CFF: public v2::Module<IMU_CFF_IO>
+{
   private:
 	static constexpr si::Time kSmoothingTime = 1_s;
 
   public:
 	// Ctor
 	explicit
-	IMU_CFF (std::string const& instance = {});
+	IMU_CFF (std::unique_ptr<IMU_CFF_IO>, std::string const& instance = {});
 
   protected:
 	void

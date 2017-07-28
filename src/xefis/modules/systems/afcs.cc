@@ -28,52 +28,42 @@
 #include "afcs_api.h"
 
 
-constexpr xf::Range<si::Velocity>	AFCS::kSpeedRange;
-constexpr xf::Range<double>			AFCS::kMachRange;
-constexpr double					AFCS::kMachStep;
-constexpr xf::Range<si::Length>		AFCS::kAltitudeRange;
-constexpr si::Velocity				AFCS::kVSStep;
-constexpr xf::Range<si::Velocity>	AFCS::kVSRange;
-constexpr si::Angle					AFCS::kFPAStep;
-constexpr xf::Range<si::Angle>		AFCS::kFPARange;
-
-
-AFCS::AFCS (std::string const& instance):
-	Module (instance)
+AFCS::AFCS (std::unique_ptr<AFCS_IO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
-	make_button_action (input_button_ap, &AFCS::button_press_ap);
-	make_button_action (input_button_at, &AFCS::button_press_at);
-	make_button_action (input_button_yd, &AFCS::button_press_yd);
-	make_button_action (input_button_xchg_ias_mach, &AFCS::button_press_xchg_ias_mach);
-	make_button_action (input_button_toga, &AFCS::button_press_toga);
-	make_button_action (input_button_spd_sel, &AFCS::button_press_spd_sel);
-	make_button_action (input_button_spd_hold, &AFCS::button_press_spd_hold);
-	make_button_action (input_button_xchg_heading_step, &AFCS::button_press_xchg_heading_step);
-	make_button_action (input_button_xchg_hdg_trk, &AFCS::button_press_xchg_hdg_trk);
-	make_button_action (input_button_hdgtrk_sel, &AFCS::button_press_hdgtrk_sel);
-	make_button_action (input_button_hdgtrk_hold, &AFCS::button_press_hdgtrk_hold);
-	make_button_action (input_button_wng_lvl, &AFCS::button_press_wng_lvl);
-	make_button_action (input_button_loc, &AFCS::button_press_loc);
-	make_button_action (input_button_lnav, &AFCS::button_press_lnav);
-	make_button_action (input_button_vnav, &AFCS::button_press_vnav);
-	make_button_action (input_button_lvl_all, &AFCS::button_press_lvl_all);
-	make_button_action (input_button_to, &AFCS::button_press_to);
-	make_button_action (input_button_crz, &AFCS::button_press_crz);
-	make_button_action (input_button_app, &AFCS::button_press_app);
-	make_button_action (input_button_ils, &AFCS::button_press_ils);
-	make_button_action (input_button_xchg_altitude_step, &AFCS::button_press_xchg_altitude_step);
-	make_button_action (input_button_flch, &AFCS::button_press_flch);
-	make_button_action (input_button_altitude_hold, &AFCS::button_press_altitude_hold);
-	make_button_action (input_button_gs, &AFCS::button_press_gs);
-	make_button_action (input_button_xchg_vs_fpa, &AFCS::button_press_xchg_vs_fpa);
-	make_button_action (input_button_vertical_enable, &AFCS::button_press_vertical_enable);
-	make_button_action (input_button_vertical_sel, &AFCS::button_press_vertical_sel);
-	make_button_action (input_button_clb_con, &AFCS::button_press_clb_con);
+	make_button_action (io.input_button_ap, &AFCS::button_press_ap);
+	make_button_action (io.input_button_at, &AFCS::button_press_at);
+	make_button_action (io.input_button_yd, &AFCS::button_press_yd);
+	make_button_action (io.input_button_xchg_ias_mach, &AFCS::button_press_xchg_ias_mach);
+	make_button_action (io.input_button_toga, &AFCS::button_press_toga);
+	make_button_action (io.input_button_spd_sel, &AFCS::button_press_spd_sel);
+	make_button_action (io.input_button_spd_hold, &AFCS::button_press_spd_hold);
+	make_button_action (io.input_button_xchg_heading_step, &AFCS::button_press_xchg_heading_step);
+	make_button_action (io.input_button_xchg_hdg_trk, &AFCS::button_press_xchg_hdg_trk);
+	make_button_action (io.input_button_hdgtrk_sel, &AFCS::button_press_hdgtrk_sel);
+	make_button_action (io.input_button_hdgtrk_hold, &AFCS::button_press_hdgtrk_hold);
+	make_button_action (io.input_button_wng_lvl, &AFCS::button_press_wng_lvl);
+	make_button_action (io.input_button_loc, &AFCS::button_press_loc);
+	make_button_action (io.input_button_lnav, &AFCS::button_press_lnav);
+	make_button_action (io.input_button_vnav, &AFCS::button_press_vnav);
+	make_button_action (io.input_button_lvl_all, &AFCS::button_press_lvl_all);
+	make_button_action (io.input_button_to, &AFCS::button_press_to);
+	make_button_action (io.input_button_crz, &AFCS::button_press_crz);
+	make_button_action (io.input_button_app, &AFCS::button_press_app);
+	make_button_action (io.input_button_ils, &AFCS::button_press_ils);
+	make_button_action (io.input_button_xchg_altitude_step, &AFCS::button_press_xchg_altitude_step);
+	make_button_action (io.input_button_flch, &AFCS::button_press_flch);
+	make_button_action (io.input_button_altitude_hold, &AFCS::button_press_altitude_hold);
+	make_button_action (io.input_button_gs, &AFCS::button_press_gs);
+	make_button_action (io.input_button_xchg_vs_fpa, &AFCS::button_press_xchg_vs_fpa);
+	make_button_action (io.input_button_vertical_enable, &AFCS::button_press_vertical_enable);
+	make_button_action (io.input_button_vertical_sel, &AFCS::button_press_vertical_sel);
+	make_button_action (io.input_button_clb_con, &AFCS::button_press_clb_con);
 
-	make_knob_action (input_knob_speed, &AFCS::knob_speed_change);
-	make_knob_action (input_knob_heading, &AFCS::knob_heading_change);
-	make_knob_action (input_knob_altitude, &AFCS::knob_altitude_change);
-	make_knob_action (input_knob_vertical, &AFCS::knob_vertical_change);
+	make_knob_action (io.input_knob_speed, &AFCS::knob_speed_change);
+	make_knob_action (io.input_knob_heading, &AFCS::knob_heading_change);
+	make_knob_action (io.input_knob_altitude, &AFCS::knob_altitude_change);
+	make_knob_action (io.input_knob_vertical, &AFCS::knob_vertical_change);
 
 	solve();
 }
@@ -157,14 +147,14 @@ AFCS::button_press_xchg_ias_mach()
 	{
 		case SpeedControl::KIAS:
 			_speed_control = SpeedControl::Mach;
-			if (input_measured_mach)
-				output_cmd_mach = *input_measured_mach;
+			if (io.input_measured_mach)
+				io.output_cmd_mach = *io.input_measured_mach;
 			break;
 
 		case SpeedControl::Mach:
 			_speed_control = SpeedControl::KIAS;
-			if (input_measured_ias)
-				output_cmd_ias = *input_measured_ias;
+			if (io.input_measured_ias)
+				io.output_cmd_ias = *io.input_measured_ias;
 			break;
 	}
 }
@@ -178,7 +168,7 @@ AFCS::button_press_toga()
 	{
 		transfer_airspeed_control_from_thrust_to_pitch();
 		_thrust_mode = ThrustMode::TO_GA;
-		output_thr_ref = input_thr_ref_for_toga;
+		io.output_thr_ref = io.input_thr_ref_for_toga;
 	}
 	// Off?
 	else
@@ -247,8 +237,8 @@ void
 AFCS::button_press_xchg_hdg_trk()
 {
 	Optional<si::Angle> track_minus_heading;
-	if (input_measured_heading_magnetic && input_measured_track_magnetic)
-		track_minus_heading = *input_measured_track_magnetic - *input_measured_heading_magnetic;
+	if (io.input_measured_heading_magnetic && io.input_measured_track_magnetic)
+		track_minus_heading = *io.input_measured_track_magnetic - *io.input_measured_heading_magnetic;
 
 	switch (_lateral_control)
 	{
@@ -341,24 +331,24 @@ AFCS::button_press_lvl_all()
 void
 AFCS::button_press_to()
 {
-	output_thr_ref = input_thr_ref_for_toga;
-	output_spd_ref = input_spd_ref_for_climbout;
+	io.output_thr_ref = io.input_thr_ref_for_toga;
+	io.output_spd_ref = io.input_spd_ref_for_climbout;
 }
 
 
 void
 AFCS::button_press_crz()
 {
-	output_thr_ref = input_thr_ref_for_cruise;
-	output_spd_ref = input_spd_ref_for_cruise;
+	io.output_thr_ref = io.input_thr_ref_for_cruise;
+	io.output_spd_ref = io.input_spd_ref_for_cruise;
 }
 
 
 void
 AFCS::button_press_app()
 {
-	output_thr_ref = input_thr_ref_for_descent;
-	output_spd_ref = input_spd_ref_for_approach;
+	io.output_thr_ref = io.input_thr_ref_for_descent;
+	io.output_spd_ref = io.input_spd_ref_for_approach;
 }
 
 
@@ -563,8 +553,8 @@ AFCS::button_press_clb_con()
 {
 	transfer_airspeed_control_from_thrust_to_pitch();
 	_thrust_mode = ThrustMode::CONT;
-	output_thr_ref = input_thr_ref_for_cont;
-	output_spd_ref = input_spd_ref_for_climbout;
+	io.output_thr_ref = io.input_thr_ref_for_cont;
+	io.output_spd_ref = io.input_spd_ref_for_climbout;
 }
 
 
@@ -572,13 +562,13 @@ void
 AFCS::check_input()
 {
 	std::array<v2::BasicProperty*, 7> checked_props = { {
-		&input_measured_ias,
-		&input_measured_mach,
-		&input_measured_heading_magnetic,
-		&input_measured_track_magnetic,
-		&input_measured_altitude_amsl,
-		&input_measured_vs,
-		&input_measured_fpa,
+		&io.input_measured_ias,
+		&io.input_measured_mach,
+		&io.input_measured_heading_magnetic,
+		&io.input_measured_track_magnetic,
+		&io.input_measured_altitude_amsl,
+		&io.input_measured_vs,
+		&io.input_measured_fpa,
 	} };
 
 	if (std::any_of (checked_props.begin(), checked_props.end(), [](v2::BasicProperty* p) { return !p->valid(); }))
@@ -615,27 +605,28 @@ void
 AFCS::update_mcp()
 {
 	// LEDs:
-	output_mcp_led_ap = _ap_on;
-	output_mcp_led_at = _at_on;
-	output_mcp_led_yd = _yd_on;
+	io.output_mcp_led_ap = _ap_on;
+	io.output_mcp_led_at = _at_on;
+	io.output_mcp_led_yd = _yd_on;
 
 	// Speed window:
 	switch (_speed_control)
 	{
 		case SpeedControl::KIAS:
-			output_mcp_speed_format_out = *setting_mcp_speed_format_kias;
-			output_mcp_speed_display = xf::symmetric_round (_mcp_ias.quantity<Knot>());
+			io.output_mcp_speed_format_out = *io.setting_mcp_speed_format_kias;
+			io.output_mcp_speed_display = xf::symmetric_round (_mcp_ias.quantity<Knot>());
 			break;
 
 		case SpeedControl::Mach:
-			output_mcp_speed_format_out = *setting_mcp_speed_format_mach;
-			output_mcp_speed_display = _mcp_mach;
+			io.output_mcp_speed_format_out = *io.setting_mcp_speed_format_mach;
+			io.output_mcp_speed_display = _mcp_mach;
 			break;
 	}
 
 	// Heading window:
-	output_mcp_heading_format_out = *setting_mcp_heading_format;
+	io.output_mcp_heading_format_out = *io.setting_mcp_heading_format;
 	int lateral_angle = 0;
+
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
@@ -646,31 +637,35 @@ AFCS::update_mcp()
 			lateral_angle = xf::symmetric_round (_mcp_track.quantity<Degree>());
 			break;
 	}
+
 	if (lateral_angle == 0)
 		lateral_angle = 360;
-	output_mcp_heading_display = lateral_angle;
+
+	io.output_mcp_heading_display = lateral_angle;
 
 	// Altitude window:
-	output_mcp_altitude_format_out = *setting_mcp_altitude_format;
-	output_mcp_altitude_display = xf::symmetric_round (_mcp_altitude.quantity<Foot>());
+	io.output_mcp_altitude_format_out = *io.setting_mcp_altitude_format;
+	io.output_mcp_altitude_display = xf::symmetric_round (_mcp_altitude.quantity<Foot>());
 
 	// Vertical-control window:
 	switch (_vertical_control)
 	{
 		case VerticalControl::VS:
-			output_mcp_vertical_format_out = *setting_mcp_vertical_format_vs;
+			io.output_mcp_vertical_format_out = *io.setting_mcp_vertical_format_vs;
+
 			if (_mcp_vs)
-				output_mcp_vertical_display = xf::symmetric_round (_mcp_vs->quantity<FootPerMinute>());
+				io.output_mcp_vertical_display = xf::symmetric_round (_mcp_vs->quantity<FootPerMinute>());
 			else
-				output_mcp_vertical_display.set_nil();
+				io.output_mcp_vertical_display.set_nil();
 			break;
 
 		case VerticalControl::FPA:
-			output_mcp_vertical_format_out = *setting_mcp_vertical_format_fpa;
+			io.output_mcp_vertical_format_out = *io.setting_mcp_vertical_format_fpa;
+
 			if (_mcp_fpa)
-				output_mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->quantity<Degree>()) / 10.0;
+				io.output_mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->quantity<Degree>()) / 10.0;
 			else
-				output_mcp_vertical_display.set_nil();
+				io.output_mcp_vertical_display.set_nil();
 			break;
 	}
 }
@@ -684,79 +679,79 @@ AFCS::update_efis()
 	switch (_thrust_mode)
 	{
 		case ThrustMode::None:
-			output_fma_speed_hint = "";
+			io.output_fma_speed_hint = "";
 			break;
 
 		case ThrustMode::TO_GA:
-			output_fma_speed_hint = "TO/GA";
+			io.output_fma_speed_hint = "TO/GA";
 			break;
 
 		case ThrustMode::CONT:
-			output_fma_speed_hint = "CONT";
+			io.output_fma_speed_hint = "CONT";
 			break;
 
 		case ThrustMode::IDLE:
-			output_fma_speed_hint = "IDLE";
+			io.output_fma_speed_hint = "IDLE";
 			break;
 
 		case ThrustMode::MCP_SPD:
 			switch (_speed_control)
 			{
 				case SpeedControl::KIAS:
-					if (input_measured_ias)
+					if (io.input_measured_ias)
 					{
-						if (abs (*input_measured_ias - _mcp_ias) < *setting_acq_delta_ias)
-							output_fma_speed_hint = "MCP SPD";
+						if (abs (*io.input_measured_ias - _mcp_ias) < *io.setting_acq_delta_ias)
+							io.output_fma_speed_hint = "MCP SPD";
 						else
-							output_fma_speed_hint = "SPD";
+							io.output_fma_speed_hint = "SPD";
 					}
 					break;
 
 				case SpeedControl::Mach:
-					if (input_measured_mach)
+					if (io.input_measured_mach)
 					{
-						if (abs (*input_measured_mach - _mcp_mach) < *setting_acq_delta_mach)
-							output_fma_speed_hint = "MCP SPD";
+						if (abs (*io.input_measured_mach - _mcp_mach) < *io.setting_acq_delta_mach)
+							io.output_fma_speed_hint = "MCP SPD";
 						else
-							output_fma_speed_hint = "SPD";
+							io.output_fma_speed_hint = "SPD";
 					}
 			}
 			break;
 
 		case ThrustMode::SPD_HOLD:
-			output_fma_speed_hint = "SPD HOLD";
+			io.output_fma_speed_hint = "SPD HOLD";
 			break;
 
 		default:
-			output_fma_speed_hint = "X";
+			io.output_fma_speed_hint = "X";
 	}
 
 	switch (_roll_mode)
 	{
 		case RollMode::None:
-			output_fma_roll_hint = "";
+			io.output_fma_roll_hint = "";
 			break;
 
 		case RollMode::MCP:
 			switch (_lateral_control)
 			{
 				case LateralControl::Heading:
-					if (input_measured_heading_magnetic)
+					if (io.input_measured_heading_magnetic)
 					{
-						if (abs (*input_measured_heading_magnetic - _mcp_heading) < *setting_acq_delta_heading)
-							output_fma_roll_hint = "HDG";
+						if (abs (*io.input_measured_heading_magnetic - _mcp_heading) < *io.setting_acq_delta_heading)
+							io.output_fma_roll_hint = "HDG";
 						else
-							output_fma_roll_hint = "HDG SEL";
+							io.output_fma_roll_hint = "HDG SEL";
 					}
 					break;
 
 				case LateralControl::Track:
-					if (input_measured_track_magnetic)
+					if (io.input_measured_track_magnetic)
 					{
-						if (abs (*input_measured_track_magnetic - _mcp_track) < *setting_acq_delta_heading)
-							output_fma_roll_hint = "TRK";
+						if (abs (*io.input_measured_track_magnetic - _mcp_track) < *io.setting_acq_delta_heading)
+							io.output_fma_roll_hint = "TRK";
 						else
-							output_fma_roll_hint = "TRK SEL";
+							io.output_fma_roll_hint = "TRK SEL";
 					}
 					break;
 			}
@@ -766,73 +761,73 @@ AFCS::update_efis()
 			switch (_lateral_control)
 			{
 				case LateralControl::Heading:
-					output_fma_roll_hint = "HDG HOLD";
+					io.output_fma_roll_hint = "HDG HOLD";
 					break;
 
 				case LateralControl::Track:
-					output_fma_roll_hint = "TRK HOLD";
+					io.output_fma_roll_hint = "TRK HOLD";
 					break;
 			}
 			break;
 
 		case RollMode::WNG_LVL:
-			output_fma_roll_hint = "WNG LVL";
+			io.output_fma_roll_hint = "WNG LVL";
 			break;
 
 		case RollMode::LOC:
-			output_fma_roll_hint = "LOC";
+			io.output_fma_roll_hint = "LOC";
 			break;
 
 		case RollMode::LNAV:
-			output_fma_roll_hint = "LNAV";
+			io.output_fma_roll_hint = "LNAV";
 			break;
 
 		default:
-			output_fma_roll_hint = "X";
+			io.output_fma_roll_hint = "X";
 			break;
 	}
 
 	switch (_armed_roll_mode)
 	{
 		case RollMode::None:
-			output_fma_roll_armed_hint = "";
+			io.output_fma_roll_armed_hint = "";
 			break;
 
 		case RollMode::LOC:
-			output_fma_roll_armed_hint = "LOC";
+			io.output_fma_roll_armed_hint = "LOC";
 			break;
 
 		default:
-			output_fma_roll_armed_hint = "X";
+			io.output_fma_roll_armed_hint = "X";
 	}
 
 	switch (_pitch_mode)
 	{
 		case PitchMode::None:
-			output_fma_pitch_hint = "";
+			io.output_fma_pitch_hint = "";
 			break;
 
 		case PitchMode::MCP_SPD:
-			output_fma_pitch_hint = "SPD";
+			io.output_fma_pitch_hint = "SPD";
 			break;
 
 		case PitchMode::ALT_HOLD:
-			output_fma_pitch_hint = "ALT HOLD";
+			io.output_fma_pitch_hint = "ALT HOLD";
 			break;
 
 		case PitchMode::MCP_ALT:
-			if (input_measured_altitude_amsl)
+			if (io.input_measured_altitude_amsl)
 			{
-				if (abs (*input_measured_altitude_amsl - *output_cmd_altitude) <= *setting_acq_delta_altitude)
-					output_fma_pitch_hint = "ALT";
+				if (abs (*io.input_measured_altitude_amsl - *io.output_cmd_altitude) <= *io.setting_acq_delta_altitude)
+					io.output_fma_pitch_hint = "ALT";
 				else
 				{
-					if (output_cmd_vs)
-						output_fma_pitch_hint = "FLCH V/S";
-					else if (output_cmd_fpa)
-						output_fma_pitch_hint = "FLCH FPA";
+					if (io.output_cmd_vs)
+						io.output_fma_pitch_hint = "FLCH V/S";
+					else if (io.output_cmd_fpa)
+						io.output_fma_pitch_hint = "FLCH FPA";
 					else
-						output_fma_pitch_hint = "FLCH";
+						io.output_fma_pitch_hint = "FLCH";
 				}
 			}
 			break;
@@ -841,50 +836,50 @@ AFCS::update_efis()
 			switch (_vertical_control)
 			{
 				case VerticalControl::VS:
-					output_fma_pitch_hint = "V/S";
+					io.output_fma_pitch_hint = "V/S";
 					break;
 
 				case VerticalControl::FPA:
-					output_fma_pitch_hint = "FPA";
+					io.output_fma_pitch_hint = "FPA";
 					break;
 			}
 			break;
 
 		case PitchMode::VNAV_PTH:
-			output_fma_pitch_hint = "VNAV PTH";
+			io.output_fma_pitch_hint = "VNAV PTH";
 			break;
 
 		case PitchMode::GS:
-			output_fma_pitch_hint = "G/S";
+			io.output_fma_pitch_hint = "G/S";
 			break;
 
 		case PitchMode::FLARE:
-			output_fma_pitch_hint = "FLARE";
+			io.output_fma_pitch_hint = "FLARE";
 			break;
 
 		default:
-			output_fma_pitch_hint = "X";
+			io.output_fma_pitch_hint = "X";
 			break;
 	}
 
 	switch (_armed_pitch_mode)
 	{
 		case PitchMode::None:
-			output_fma_pitch_armed_hint = "";
+			io.output_fma_pitch_armed_hint = "";
 			break;
 
 		case PitchMode::GS:
-			output_fma_pitch_armed_hint = "G/S";
+			io.output_fma_pitch_armed_hint = "G/S";
 			break;
 
 		default:
-			output_fma_pitch_armed_hint = "X";
+			io.output_fma_pitch_armed_hint = "X";
 	}
 
 	if (_ap_on)
-		output_fma_hint = "A/P";
+		io.output_fma_hint = "A/P";
 	else
-		output_fma_hint = "F/D";
+		io.output_fma_hint = "F/D";
 }
 
 
@@ -892,31 +887,31 @@ void
 AFCS::update_output()
 {
 	// Modes:
-	output_cmd_thrust_mode = optional_cast<int64_t> (translate_thrust_mode());
-	output_cmd_roll_mode = optional_cast<int64_t> (translate_roll_mode());
-	output_cmd_pitch_mode = optional_cast<int64_t> (translate_pitch_mode());
+	io.output_cmd_thrust_mode = optional_cast<int64_t> (translate_thrust_mode());
+	io.output_cmd_roll_mode = optional_cast<int64_t> (translate_roll_mode());
+	io.output_cmd_pitch_mode = optional_cast<int64_t> (translate_pitch_mode());
 
 	// Settings:
 
 	if (_thrust_mode != ThrustMode::SPD_HOLD)
 	{
-		output_cmd_ias = _mcp_ias;
-		output_cmd_mach = _mcp_mach;
+		io.output_cmd_ias = _mcp_ias;
+		io.output_cmd_mach = _mcp_mach;
 	}
 
 	if (_roll_mode != RollMode::HOLD)
 	{
-		output_cmd_heading_magnetic = _mcp_heading;
-		output_cmd_track_magnetic = _mcp_track;
+		io.output_cmd_heading_magnetic = _mcp_heading;
+		io.output_cmd_track_magnetic = _mcp_track;
 
-		output_cmd_use_trk = (_lateral_control == LateralControl::Track);
+		io.output_cmd_use_trk = (_lateral_control == LateralControl::Track);
 	}
 
 	if (_pitch_mode != PitchMode::ALT_HOLD)
-		output_cmd_altitude = _mcp_altitude;
+		io.output_cmd_altitude = _mcp_altitude;
 
-	output_cmd_vs = _mcp_vs;
-	output_cmd_fpa = _mcp_fpa;
+	io.output_cmd_vs = _mcp_vs;
+	io.output_cmd_fpa = _mcp_fpa;
 }
 
 
@@ -955,13 +950,13 @@ AFCS::spd_hold_with_thrust()
 	switch (_speed_control)
 	{
 		case SpeedControl::KIAS:
-			if (input_measured_ias)
-				output_cmd_ias = *input_measured_ias;
+			if (io.input_measured_ias)
+				io.output_cmd_ias = *io.input_measured_ias;
 			break;
 
 		case SpeedControl::Mach:
-			if (input_measured_mach)
-				output_cmd_mach = *input_measured_mach;
+			if (io.input_measured_mach)
+				io.output_cmd_mach = *io.input_measured_mach;
 			break;
 	}
 }
@@ -975,13 +970,13 @@ AFCS::heading_hold_with_roll()
 	switch (_lateral_control)
 	{
 		case LateralControl::Heading:
-			if (input_measured_heading_magnetic)
-				output_cmd_heading_magnetic = *input_measured_heading_magnetic;
+			if (io.input_measured_heading_magnetic)
+				io.output_cmd_heading_magnetic = *io.input_measured_heading_magnetic;
 			break;
 
 		case LateralControl::Track:
-			if (input_measured_track_magnetic)
-				output_cmd_track_magnetic = *input_measured_track_magnetic;
+			if (io.input_measured_track_magnetic)
+				io.output_cmd_track_magnetic = *io.input_measured_track_magnetic;
 			break;
 	}
 }
@@ -992,8 +987,8 @@ AFCS::alt_hold_with_pitch()
 {
 	_pitch_mode = PitchMode::ALT_HOLD;
 
-	if (input_measured_altitude_amsl)
-		output_cmd_altitude = *input_measured_altitude_amsl;
+	if (io.input_measured_altitude_amsl)
+		io.output_cmd_altitude = *io.input_measured_altitude_amsl;
 }
 
 
@@ -1010,8 +1005,8 @@ AFCS::xchg_modes (PitchMode a, PitchMode b)
 inline Optional<si::Velocity>
 AFCS::current_rounded_vs() const
 {
-	if (input_measured_vs)
-		return std::round (*input_measured_vs / *setting_vs_rounding) * *setting_vs_rounding;
+	if (io.input_measured_vs)
+		return std::round (*io.input_measured_vs / *io.setting_vs_rounding) * *io.setting_vs_rounding;
 
 	return { };
 }
@@ -1020,8 +1015,8 @@ AFCS::current_rounded_vs() const
 inline Optional<si::Angle>
 AFCS::current_rounded_fpa() const
 {
-	if (input_measured_fpa)
-		return std::round (*input_measured_fpa / *setting_fpa_rounding) * *setting_fpa_rounding;
+	if (io.input_measured_fpa)
+		return std::round (*io.input_measured_fpa / *io.setting_fpa_rounding) * *io.setting_fpa_rounding;
 
 	return { };
 }
@@ -1158,9 +1153,9 @@ AFCS::translate_pitch_mode() const
 			break;
 		case PitchMode::ALT_HOLD:	return afcs_api::PitchMode::Altitude;
 		case PitchMode::MCP_ALT:
-			if (output_cmd_vs)
+			if (io.output_cmd_vs)
 				return afcs_api::PitchMode::VS;
-			else if (output_cmd_fpa)
+			else if (io.output_cmd_fpa)
 				return afcs_api::PitchMode::FPA;
 			else
 				return afcs_api::PitchMode::Altitude;

@@ -27,10 +27,7 @@
 #include <xefis/utility/smoother.h>
 
 
-/**
- * Steers control surfaces (ailerons, elevator) to obtain desired orientation (pitch, roll).
- */
-class AFCS_AP: public v2::Module
+class AFCS_AP_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -65,11 +62,18 @@ class AFCS_AP: public v2::Module
 	v2::PropertyOut<bool>		output_serviceable				{ this, "/serviceable" };
 	v2::PropertyOut<si::Angle>	output_elevator					{ this, "/elevator" };
 	v2::PropertyOut<si::Angle>	output_ailerons					{ this, "/ailerons" };
+};
 
+
+/**
+ * Steers control surfaces (ailerons, elevator) to obtain desired orientation (pitch, roll).
+ */
+class AFCS_AP: public v2::Module<AFCS_AP_IO>
+{
   public:
 	// Ctor
 	explicit
-	AFCS_AP (std::string const& instance = {});
+	AFCS_AP (std::unique_ptr<AFCS_AP_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

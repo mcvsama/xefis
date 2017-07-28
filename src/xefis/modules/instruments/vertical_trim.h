@@ -30,9 +30,7 @@
 #include <xefis/core/v2/setting.h>
 
 
-class VerticalTrim:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class VerticalTrimIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -49,11 +47,17 @@ class VerticalTrim:
 	v2::PropertyIn<double>	input_trim_reference			{ this, "/trim/reference" };
 	v2::PropertyIn<double>	input_trim_reference_minimum	{ this, "/trim/reference.minimum" };
 	v2::PropertyIn<double>	input_trim_reference_maximum	{ this, "/trim/reference.maximum" };
+};
 
+
+class VerticalTrim:
+	public v2::Instrument<VerticalTrimIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	VerticalTrim (std::string const& instance = {});
+	VerticalTrim (std::unique_ptr<VerticalTrimIO>, std::string const& instance = {});
 
 	// Module API
 	void

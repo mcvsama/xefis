@@ -27,13 +27,8 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class RemoteControlManagementSystem:
-	public QObject,
-	public v2::Module,
-	public v2::Module::HasConfiguratorWidget
+class RemoteControlManagementSystemIO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Input
@@ -56,11 +51,20 @@ class RemoteControlManagementSystem:
 	v2::PropertyOut<si::Length>		output_distance_ground			{ this, "/distance/ground" };
 	v2::PropertyOut<si::Length>		output_distance_vertical		{ this, "/distance/vertical" };
 	v2::PropertyOut<si::Angle>		output_true_home_direction		{ this, "/home-direction.true" };
+};
+
+
+class RemoteControlManagementSystem:
+	public QObject,
+	public v2::Module<RemoteControlManagementSystemIO>,
+	public v2::Module<RemoteControlManagementSystemIO>::HasConfiguratorWidget
+{
+	Q_OBJECT
 
   public:
 	// Ctor
 	explicit
-	RemoteControlManagementSystem (std::string const& instance = {});
+	RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO>, std::string const& instance = {});
 
 	// Module::HasConfiguratorWidget API
 	QWidget*

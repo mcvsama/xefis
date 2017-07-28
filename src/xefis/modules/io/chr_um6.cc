@@ -38,35 +38,29 @@
 #include "chr_um6.h"
 
 
-constexpr si::Time	CHRUM6::RestartDelay;
-constexpr si::Time	CHRUM6::AliveCheckInterval;
-constexpr si::Time	CHRUM6::StatusCheckInterval;
-constexpr si::Time	CHRUM6::InitializationDelay;
-
-
-CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance):
-	Module (instance),
+CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, std::string const& instance):
+	Module (std::move (module_io), instance),
 	_serial_port (std::move (serial_port))
 {
 	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);
-	_restart_timer->setInterval (RestartDelay.quantity<Millisecond>());
+	_restart_timer->setInterval (kRestartDelay.quantity<Millisecond>());
 	_restart_timer->setSingleShot (true);
 	QObject::connect (_restart_timer.get(), SIGNAL (timeout()), this, SLOT (open_device()));
 
 	_alive_check_timer = std::make_unique<QTimer> (this);
-	_alive_check_timer->setInterval (AliveCheckInterval.quantity<Millisecond>());
+	_alive_check_timer->setInterval (kAliveCheckInterval.quantity<Millisecond>());
 	_alive_check_timer->setSingleShot (false);
 	QObject::connect (_alive_check_timer.get(), SIGNAL (timeout()), this, SLOT (alive_check_failed()));
 
 	_status_check_timer = std::make_unique<QTimer> (this);
-	_status_check_timer->setInterval (StatusCheckInterval.quantity<Millisecond>());
+	_status_check_timer->setInterval (kStatusCheckInterval.quantity<Millisecond>());
 	_status_check_timer->setSingleShot (false);
 	QObject::connect (_status_check_timer.get(), &QTimer::timeout, this, &CHRUM6::status_check);
 
 	_initialization_timer = std::make_unique<QTimer> (this);
-	_initialization_timer->setInterval (InitializationDelay.quantity<Millisecond>());
+	_initialization_timer->setInterval (kInitializationDelay.quantity<Millisecond>());
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
@@ -77,9 +71,9 @@ CHRUM6::CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance):
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));
 	_sensor->set_auto_retry (true);
 
-	output_serviceable = false;
-	output_caution = false;
-	output_failures = 0;
+	io.output_serviceable = false;
+	io.output_caution = false;
+	io.output_failures = 0;
 
 	open_device();
 }
@@ -95,24 +89,24 @@ CHRUM6::process (v2::Cycle const&)
 		if (_output_acceleration_x_changed() || _input_centripetal_x_changed())
 		{
 			Acceleration earth_x = 0_g;
-			if (output_acceleration_x && input_centripetal_x)
-				earth_x = *output_acceleration_x + *input_centripetal_x;
+			if (io.output_acceleration_x && io.input_centripetal_x)
+				earth_x = *io.output_acceleration_x + *io.input_centripetal_x;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.quantity<Gravity>()));
 		}
 
 		if (_output_acceleration_y_changed() || _input_centripetal_y_changed())
 		{
 			Acceleration earth_y = 0_g;
-			if (output_acceleration_y && input_centripetal_y)
-				earth_y = *output_acceleration_y + *input_centripetal_y;
+			if (io.output_acceleration_y && io.input_centripetal_y)
+				earth_y = *io.output_acceleration_y + *io.input_centripetal_y;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.quantity<Gravity>()));
 		}
 
 		if (_output_acceleration_z_changed() || _input_centripetal_z_changed())
 		{
 			Acceleration earth_z = 1_g;
-			if (output_acceleration_z && input_centripetal_z)
-				earth_z = *output_acceleration_z + *input_centripetal_z;
+			if (io.output_acceleration_z && io.input_centripetal_z)
+				earth_z = *io.output_acceleration_z + *io.input_centripetal_z;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.quantity<Gravity>()));
 		}
 	}
@@ -141,7 +135,7 @@ void
 CHRUM6::failure (std::string const& reason)
 {
 	log() << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
-	output_failures = *output_failures + 1;
+	io.output_failures = *io.output_failures + 1;
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
 	_failure_count++;
@@ -202,7 +196,7 @@ CHRUM6::setup_communication()
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::MP);
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::TMP);
 	data |= xf::CHRUM6::bits_for_baud_rate (_serial_port.configuration().baud_rate()) << 8;
-	data |= xf::CHRUM6::sample_rate_setting (*setting_sample_rate);
+	data |= xf::CHRUM6::sample_rate_setting (*io.setting_sample_rate);
 
 	_sensor->write (ConfigurationAddress::Communication, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
@@ -246,7 +240,7 @@ CHRUM6::log_firmware_version()
 void
 CHRUM6::set_ekf_process_variance()
 {
-	_sensor->write (ConfigurationAddress::EKFProcessVariance, *setting_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::EKFProcessVariance, *io.setting_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			reset_ekf();
@@ -321,7 +315,7 @@ CHRUM6::initialization_complete()
 	log() << "Initialization complete." << std::endl;
 	_stage = Stage::Run;
 	_initialization_timer->stop();
-	output_serviceable = true;
+	io.output_serviceable = true;
 	_status_check_timer->start();
 }
 
@@ -329,19 +323,19 @@ CHRUM6::initialization_complete()
 void
 CHRUM6::reset()
 {
-	output_serviceable = false;
-	output_orientation_pitch.set_nil();
-	output_orientation_roll.set_nil();
-	output_orientation_heading_magnetic.set_nil();
-	output_acceleration_x.set_nil();
-	output_acceleration_y.set_nil();
-	output_acceleration_z.set_nil();
-	output_rotation_x.set_nil();
-	output_rotation_y.set_nil();
-	output_rotation_z.set_nil();
-	output_magnetic_x.set_nil();
-	output_magnetic_y.set_nil();
-	output_magnetic_z.set_nil();
+	io.output_serviceable = false;
+	io.output_orientation_pitch.set_nil();
+	io.output_orientation_roll.set_nil();
+	io.output_orientation_heading_magnetic.set_nil();
+	io.output_acceleration_x.set_nil();
+	io.output_acceleration_y.set_nil();
+	io.output_acceleration_z.set_nil();
+	io.output_rotation_x.set_nil();
+	io.output_rotation_y.set_nil();
+	io.output_rotation_z.set_nil();
+	io.output_magnetic_x.set_nil();
+	io.output_magnetic_y.set_nil();
+	io.output_magnetic_z.set_nil();
 
 	_stage = Stage::Initialize;
 }
@@ -369,27 +363,27 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		case static_cast<uint32_t> (DataAddress::Temperature):
 		{
 			if (req.success())
-				output_internal_temperature = Quantity<Celsius> (req.value_as_float());
+				io.output_internal_temperature = Quantity<Celsius> (req.value_as_float());
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPhiTheta):
 		{
-			if (req.success() && output_serviceable.value_or (false))
+			if (req.success() && io.output_serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				output_orientation_roll = factor * req.value_upper16();
-				output_orientation_pitch = factor * req.value_lower16();
+				io.output_orientation_roll = factor * req.value_upper16();
+				io.output_orientation_pitch = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPsi):
 		{
-			if (req.success() && output_serviceable.value_or (false))
+			if (req.success() && io.output_serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				output_orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
+				io.output_orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}
@@ -399,8 +393,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				output_acceleration_x = factor * req.value_upper16();
-				output_acceleration_y = factor * req.value_lower16();
+				io.output_acceleration_x = factor * req.value_upper16();
+				io.output_acceleration_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -410,7 +404,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				output_acceleration_z = factor * req.value_upper16();
+				io.output_acceleration_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -420,8 +414,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				output_rotation_x = factor * req.value_upper16();
-				output_rotation_y = factor * req.value_lower16();
+				io.output_rotation_x = factor * req.value_upper16();
+				io.output_rotation_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -431,7 +425,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				output_rotation_z = factor * req.value_upper16();
+				io.output_rotation_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -442,8 +436,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			{
 				// Assume values are expressed in Teslas (it's not specified in the documentation):
 				si::MagneticField const factor = 0.000305176_T;
-				output_magnetic_x = factor * req.value_upper16();
-				output_magnetic_y = factor * req.value_lower16();
+				io.output_magnetic_x = factor * req.value_upper16();
+				io.output_magnetic_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -453,7 +447,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::MagneticField const factor = 0.000305176_T;
-				output_magnetic_z = factor * req.value_upper16();
+				io.output_magnetic_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -638,10 +632,10 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	}
 
 	if (!serviceable)
-		output_serviceable = false;
+		io.output_serviceable = false;
 
 	if (caution)
-		output_caution = true;
+		io.output_caution = true;
 }
 
 

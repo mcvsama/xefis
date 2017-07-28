@@ -30,9 +30,7 @@
 #include <xefis/core/v2/setting.h>
 
 
-class FlightGearIO:
-	public QObject,
-	public v2::Module
+class FlightGearIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -136,14 +134,19 @@ class FlightGearIO:
 	v2::PropertyOut<bool>					output_gear_left_down				{ this, "/gear/left-down" };
 	v2::PropertyOut<bool>					output_gear_right_up				{ this, "/gear/right-up" };
 	v2::PropertyOut<bool>					output_gear_right_down				{ this, "/gear/right-down" };
+};
 
-  private:
+
+class FlightGear:
+	public QObject,
+	public v2::Module<FlightGearIO>
+{
 	Q_OBJECT
 
   public:
 	// Ctor
 	explicit
-	FlightGearIO (std::string const& instance = {});
+	FlightGear (std::unique_ptr<FlightGearIO>, std::string const& instance = {});
 
 	// Module API
 	void

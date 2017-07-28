@@ -74,9 +74,10 @@ HSIWidget::Parameters::sanitize()
 }
 
 
-HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget):
+HSIWidget::PaintWorkUnit::PaintWorkUnit (HSIWidget* hsi_widget, xf::NavaidStorage* navaid_storage):
 	InstrumentWidget::PaintWorkUnit (hsi_widget),
-	InstrumentAids (0.5f)
+	InstrumentAids (0.5f),
+	_navaid_storage (navaid_storage)
 { }
 
 
@@ -1959,9 +1960,9 @@ HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) c
 }
 
 
-HSIWidget::HSIWidget (QWidget* parent, xf::WorkPerformer* work_performer):
+HSIWidget::HSIWidget (QWidget* parent, xf::WorkPerformer* work_performer, xf::NavaidStorage* navaid_storage):
 	InstrumentWidget (parent, work_performer),
-	_local_paint_work_unit (this)
+	_local_paint_work_unit (this, navaid_storage)
 {
 	set_painter (&_local_paint_work_unit);
 }

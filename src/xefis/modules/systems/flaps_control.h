@@ -27,10 +27,8 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class FlapsControl: public v2::Module
+class FlapsControlIO: public v2::ModuleIO
 {
-	static constexpr si::Time kUpdateInterval = 10_ms;
-
   public:
 	/*
 	 * Settings
@@ -56,11 +54,17 @@ class FlapsControl: public v2::Module
 	v2::PropertyOut<si::Angle>			output_setting				{ this, "/output/setting" };
 	v2::PropertyOut<si::Angle>			output_current				{ this, "/output/current" };
 	v2::PropertyOut<double>				output_control				{ this, "/output/control" };
+};
+
+
+class FlapsControl: public v2::Module<FlapsControlIO>
+{
+	static constexpr si::Time kUpdateInterval = 10_ms;
 
   public:
 	// Ctor
 	explicit
-	FlapsControl (xf::Airframe&, std::string const& instance = {});
+	FlapsControl (std::unique_ptr<FlapsControlIO>, xf::Airframe&, std::string const& instance = {});
 
   protected:
 	// Module API
@@ -77,9 +81,9 @@ class FlapsControl: public v2::Module
 	si::Angle					_setting;
 	si::Angle					_current;
 	Unique<QTimer>				_timer;
-	v2::PropChangedTo<bool>		_input_up_clicked		{ input_up, true }; // TODO C++17 parameter deduction
-	v2::PropChangedTo<bool>		_input_down_clicked		{ input_down, true }; // TODO C++17 parameter deduction
-	v2::PropChanged<si::Angle>	_input_setting_changed	{ input_setting }; // TODO C++17 parameter deduction
+	v2::PropChangedTo<bool>		_input_up_clicked		{ io.input_up, true };
+	v2::PropChangedTo<bool>		_input_down_clicked		{ io.input_down, true };
+	v2::PropChanged<si::Angle>	_input_setting_changed	{ io.input_setting };
 };
 
 #endif
