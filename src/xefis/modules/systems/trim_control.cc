@@ -22,8 +22,8 @@
 #include "trim_control.h"
 
 
-TrimControl::TrimControl (xf::Xefis* xefis, std::string const& instance):
-	Module (instance),
+TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::Xefis* xefis, std::string const& instance):
+	Module (std::move (module_io), instance),
 	_xefis (xefis)
 {
 	_timer = std::make_unique<QTimer>();
@@ -33,10 +33,10 @@ TrimControl::TrimControl (xf::Xefis* xefis, std::string const& instance):
 
 	_trim_computer.set_callback (std::bind (&TrimControl::compute_trim, this));
 	_trim_computer.observe ({
-		&input_trim_axis,
-		&input_trim_value,
-		&input_up_trim_button,
-		&input_down_trim_button,
+		&io.input_trim_axis,
+		&io.input_trim_value,
+		&io.input_up_trim_button,
+		&io.input_down_trim_button,
 	});
 
 	update_trim_without_sound();
@@ -53,24 +53,24 @@ TrimControl::process (v2::Cycle const& cycle)
 void
 TrimControl::compute_trim()
 {
-	if (input_trim_value)
-		output_trim_value = *input_trim_value;
+	if (io.input_trim_value)
+		io.output_trim_value = *io.input_trim_value;
 	else
 	{
 		_trimming_up = false;
 		_trimming_down = false;
 
-		if (pressed (input_up_trim_button))
+		if (pressed (io.input_up_trim_button))
 			_trimming_up = true;
 
-		if (pressed (input_down_trim_button))
+		if (pressed (io.input_down_trim_button))
 			_trimming_down = true;
 
-		if (input_trim_axis)
+		if (io.input_trim_axis)
 		{
-			if (moved_up (input_trim_axis))
+			if (moved_up (io.input_trim_axis))
 				_trimming_up = true;
-			else if (moved_down (input_trim_axis))
+			else if (moved_down (io.input_trim_axis))
 				_trimming_down = true;
 		}
 
@@ -96,8 +96,8 @@ TrimControl::update_trim()
 void
 TrimControl::update_trim_without_sound()
 {
-	_trim_value = xf::clamped (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * *setting_trim_step, -1.0, 1.0);
-	output_trim_value = _trim_value;
+	_trim_value = xf::clamped (_trim_value + (_trimming_up ? 1 : _trimming_down ? -1 : 0) * *io.setting_trim_step, -1.0, 1.0);
+	io.output_trim_value = _trim_value;
 }
 
 

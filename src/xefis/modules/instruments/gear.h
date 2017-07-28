@@ -25,9 +25,7 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class Gear:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class GearIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -41,11 +39,17 @@ class Gear:
 	v2::PropertyIn<bool>	left_down		{ this, "" };
 	v2::PropertyIn<bool>	right_up		{ this, "" };
 	v2::PropertyIn<bool>	right_down		{ this, "" };
+};
 
+
+class Gear:
+	public v2::Instrument<GearIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	Gear (std::string const& instance = {});
+	Gear (std::unique_ptr<GearIO>, std::string const& instance = {});
 
 	// Module API
 	void

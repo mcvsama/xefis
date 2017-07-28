@@ -30,10 +30,7 @@
 #include <xefis/support/airframe/airframe.h>
 
 
-/**
- * Computations are reliable up to 36,000 ft of altitude and up to about speed of Mach 0.3.
- */
-class AirDataComputer: public v2::Module
+class AirDataComputerIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -82,11 +79,18 @@ class AirDataComputer: public v2::Module
 	v2::PropertyOut<si::Temperature>		output_static_air_temperature		{ this, "/air-temperature/static" };
 	v2::PropertyOut<si::DynamicViscosity>	output_dynamic_viscosity			{ this, "/viscosity/dynamic" };
 	v2::PropertyOut<double>					output_reynolds_number				{ this, "/reynolds-number" };
+};
 
+
+/**
+ * Computations are reliable up to 36,000 ft of altitude and up to about speed of Mach 0.3.
+ */
+class AirDataComputer: public v2::Module<AirDataComputerIO>
+{
   public:
 	// Ctor
 	explicit
-	AirDataComputer (xf::Airframe*, std::string const& instance = {});
+	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, std::string const& instance = {});
 
   protected:
 	// Module API

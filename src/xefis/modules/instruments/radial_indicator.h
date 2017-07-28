@@ -30,7 +30,11 @@
 #include "linear_indicator.h"
 
 
-class RadialIndicator: BasicIndicator
+class RadialIndicatorIO: public BasicIndicatorIO
+{ };
+
+
+class RadialIndicator: BasicIndicator<RadialIndicatorIO>
 {
   private:
 	struct PointInfo
@@ -45,7 +49,8 @@ class RadialIndicator: BasicIndicator
   public:
 	// Ctor
 	explicit
-	RadialIndicator (v2::PropertyDigitizer value_digitizer,
+	RadialIndicator (std::unique_ptr<RadialIndicatorIO>,
+					 v2::PropertyDigitizer value_digitizer,
 					 v2::PropertyDigitizer value_target_digitizer,
 					 v2::PropertyDigitizer value_reference_digitizer,
 					 v2::PropertyDigitizer value_automatic_digitizer,

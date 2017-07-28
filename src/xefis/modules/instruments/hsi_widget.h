@@ -176,12 +176,9 @@ class HSIWidget: public xf::InstrumentWidget
 		friend class HSIWidget;
 
 	  public:
-		PaintWorkUnit (HSIWidget*);
+		PaintWorkUnit (HSIWidget*, xf::NavaidStorage*);
 
 		~PaintWorkUnit() noexcept { }
-
-		void
-		set_navaid_storage (NavaidStorage*);
 
 	  private:
 		void
@@ -338,19 +335,11 @@ class HSIWidget: public xf::InstrumentWidget
 
   public:
 	// Ctor
-	HSIWidget (QWidget* parent, xf::WorkPerformer*);
+	explicit
+	HSIWidget (QWidget* parent, xf::WorkPerformer*, xf::NavaidStorage*);
 
 	// Dtor
 	~HSIWidget();
-
-	/**
-	 * Set reference to the nav storage, if you want navaids
-	 * displayed on the HSI.
-	 * Object must be live as long as HSIWidget is live.
-	 * Pass nullptr to deassign.
-	 */
-	void
-	set_navaid_storage (NavaidStorage*);
 
 	/**
 	 * Set HSI parameters.
@@ -372,21 +361,6 @@ class HSIWidget: public xf::InstrumentWidget
 	Parameters		_params;
 	LocalParameters	_locals;
 };
-
-
-inline void
-HSIWidget::PaintWorkUnit::set_navaid_storage (NavaidStorage* navaid_storage)
-{
-	_navaid_storage = navaid_storage;
-}
-
-
-inline void
-HSIWidget::set_navaid_storage (NavaidStorage* navaid_storage)
-{
-	_local_paint_work_unit.set_navaid_storage (navaid_storage);
-	request_repaint();
-}
 
 #endif
 

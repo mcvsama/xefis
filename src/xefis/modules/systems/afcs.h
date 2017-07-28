@@ -31,11 +31,7 @@
 #include "afcs_api.h"
 
 
-/**
- * Controls AFCS logic. Gets input from Mode Control Panel,
- * makes outputs for displays, LEDs, annunciators, also for commanded values (altitude, speed, etc).
- */
-class AFCS: public v2::Module
+class AFCS_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -172,7 +168,15 @@ class AFCS: public v2::Module
 	v2::PropertyOut<std::string>	output_fma_roll_armed_hint			{ this, "/fma/roll-armed-hint" };
 	v2::PropertyOut<std::string>	output_fma_pitch_hint				{ this, "/fma/pitch-hint" };
 	v2::PropertyOut<std::string>	output_fma_pitch_armed_hint			{ this, "/fma/pitch-armed-hint" };
+};
 
+
+/**
+ * Controls AFCS logic. Gets input from Mode Control Panel,
+ * makes outputs for displays, LEDs, annunciators, also for commanded values (altitude, speed, etc).
+ */
+class AFCS: public v2::Module<AFCS_IO>
+{
   private:
 	static constexpr xf::Range<si::Velocity>	kSpeedRange		{ 10_kt, 300_kt };
 	static constexpr xf::Range<double>			kMachRange		{ 0.000, 1.000 };
@@ -267,7 +271,7 @@ class AFCS: public v2::Module
   public:
 	// Ctor
 	explicit
-	AFCS (std::string const& instance = {});
+	AFCS (std::unique_ptr<AFCS_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

@@ -119,87 +119,87 @@ struct FGOutputData
 END_PACKED_STRUCT
 
 
-FlightGearIO::FlightGearIO (std::string const& instance):
-	Module (instance)
+FlightGear::FlightGear (std::unique_ptr<FlightGearIO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	_serviceable_flags = {
-		&output_ahrs_serviceable,
-		&output_ias_serviceable,
-		&output_radar_altimeter_serviceable,
-		&output_pressure_serviceable,
-		&output_gps_serviceable,
+		&io.output_ahrs_serviceable,
+		&io.output_ias_serviceable,
+		&io.output_radar_altimeter_serviceable,
+		&io.output_pressure_serviceable,
+		&io.output_gps_serviceable,
 	};
 
 	_output_properties = {
-		&output_rotation_x,
-		&output_rotation_y,
-		&output_rotation_z,
-		&output_acceleration_x,
-		&output_acceleration_y,
-		&output_acceleration_z,
-		&output_aoa_alpha_maximum,
-		&output_aoa_alpha_minimum,
-		&output_aoa_alpha,
-		&output_ias,
-		&output_ias_lookahead,
-		&output_minimum_ias,
-		&output_maximum_ias,
-		&output_gs,
-		&output_tas,
-		&output_mach,
-		&output_ahrs_pitch,
-		&output_ahrs_roll,
-		&output_ahrs_magnetic_heading,
-		&output_ahrs_true_heading,
-		&output_slip_skid,
-		&output_fpm_alpha,
-		&output_fpm_beta,
-		&output_magnetic_track,
-		&output_standard_pressure,
-		&output_altitude,
-		&output_radar_altimeter_altitude_agl,
-		&output_cbr,
-		&output_pressure,
-		&output_cmd_alt_setting,
-		&output_cmd_speed_setting,
-		&output_cmd_heading_setting,
-		&output_cmd_cbr_setting,
-		&output_flight_director_pitch,
-		&output_flight_director_roll,
-		&output_navigation_needles_visible,
-		&output_lateral_deviation,
-		&output_vertical_deviation,
-		&output_dme_distance,
-		&output_total_air_temperature,
-		&output_engine_throttle_pct,
-		&output_engine_1_thrust,
-		&output_engine_1_rpm,
-		&output_engine_1_pitch,
-		&output_engine_1_epr,
-		&output_engine_1_n1_pct,
-		&output_engine_1_n2_pct,
-		&output_engine_1_egt,
-		&output_engine_2_thrust,
-		&output_engine_2_rpm,
-		&output_engine_2_pitch,
-		&output_engine_2_epr,
-		&output_engine_2_n1_pct,
-		&output_engine_2_n2_pct,
-		&output_engine_2_egt,
-		&output_gps_latitude,
-		&output_gps_longitude,
-		&output_gps_amsl,
-		&output_gps_lateral_stddev,
-		&output_gps_vertical_stddev,
-		&output_wind_from_magnetic_heading,
-		&output_wind_tas,
-		&output_gear_setting_down,
-		&output_gear_nose_up,
-		&output_gear_nose_down,
-		&output_gear_left_up,
-		&output_gear_left_down,
-		&output_gear_right_up,
-		&output_gear_right_down,
+		&io.output_rotation_x,
+		&io.output_rotation_y,
+		&io.output_rotation_z,
+		&io.output_acceleration_x,
+		&io.output_acceleration_y,
+		&io.output_acceleration_z,
+		&io.output_aoa_alpha_maximum,
+		&io.output_aoa_alpha_minimum,
+		&io.output_aoa_alpha,
+		&io.output_ias,
+		&io.output_ias_lookahead,
+		&io.output_minimum_ias,
+		&io.output_maximum_ias,
+		&io.output_gs,
+		&io.output_tas,
+		&io.output_mach,
+		&io.output_ahrs_pitch,
+		&io.output_ahrs_roll,
+		&io.output_ahrs_magnetic_heading,
+		&io.output_ahrs_true_heading,
+		&io.output_slip_skid,
+		&io.output_fpm_alpha,
+		&io.output_fpm_beta,
+		&io.output_magnetic_track,
+		&io.output_standard_pressure,
+		&io.output_altitude,
+		&io.output_radar_altimeter_altitude_agl,
+		&io.output_cbr,
+		&io.output_pressure,
+		&io.output_cmd_alt_setting,
+		&io.output_cmd_speed_setting,
+		&io.output_cmd_heading_setting,
+		&io.output_cmd_cbr_setting,
+		&io.output_flight_director_pitch,
+		&io.output_flight_director_roll,
+		&io.output_navigation_needles_visible,
+		&io.output_lateral_deviation,
+		&io.output_vertical_deviation,
+		&io.output_dme_distance,
+		&io.output_total_air_temperature,
+		&io.output_engine_throttle_pct,
+		&io.output_engine_1_thrust,
+		&io.output_engine_1_rpm,
+		&io.output_engine_1_pitch,
+		&io.output_engine_1_epr,
+		&io.output_engine_1_n1_pct,
+		&io.output_engine_1_n2_pct,
+		&io.output_engine_1_egt,
+		&io.output_engine_2_thrust,
+		&io.output_engine_2_rpm,
+		&io.output_engine_2_pitch,
+		&io.output_engine_2_epr,
+		&io.output_engine_2_n1_pct,
+		&io.output_engine_2_n2_pct,
+		&io.output_engine_2_egt,
+		&io.output_gps_latitude,
+		&io.output_gps_longitude,
+		&io.output_gps_amsl,
+		&io.output_gps_lateral_stddev,
+		&io.output_gps_vertical_stddev,
+		&io.output_wind_from_magnetic_heading,
+		&io.output_wind_tas,
+		&io.output_gear_setting_down,
+		&io.output_gear_nose_up,
+		&io.output_gear_nose_down,
+		&io.output_gear_left_up,
+		&io.output_gear_left_down,
+		&io.output_gear_right_up,
+		&io.output_gear_right_down,
 	};
 
 	_timeout_timer = std::make_unique<QTimer>();
@@ -212,13 +212,13 @@ FlightGearIO::FlightGearIO (std::string const& instance):
 
 
 void
-FlightGearIO::initialize()
+FlightGear::initialize()
 {
-	_input_address = QHostAddress (QString::fromStdString (*setting_input_host));
-	_output_address = QHostAddress (QString::fromStdString (*setting_output_host));
+	_input_address = QHostAddress (QString::fromStdString (*io.setting_input_host));
+	_output_address = QHostAddress (QString::fromStdString (*io.setting_output_host));
 
 	_input = std::make_unique<QUdpSocket>();
-	_input->bind (_input_address, *setting_input_port, QUdpSocket::ShareAddress);
+	_input->bind (_input_address, *io.setting_input_port, QUdpSocket::ShareAddress);
 	QObject::connect (_input.get(), SIGNAL (readyRead()), this, SLOT (got_packet()));
 
 	_output = std::make_unique<QUdpSocket>();
@@ -226,7 +226,7 @@ FlightGearIO::initialize()
 
 
 void
-FlightGearIO::got_packet()
+FlightGear::got_packet()
 {
 	read_input();
 	write_output();
@@ -234,7 +234,7 @@ FlightGearIO::got_packet()
 
 
 void
-FlightGearIO::invalidate_all()
+FlightGear::invalidate_all()
 {
 	for (auto property: _output_properties)
 		property->set_nil();
@@ -245,7 +245,7 @@ FlightGearIO::invalidate_all()
 
 
 void
-FlightGearIO::read_input()
+FlightGear::read_input()
 {
 	while (_input->hasPendingDatagrams())
 	{
@@ -255,16 +255,16 @@ FlightGearIO::read_input()
 
 		_input->readDatagram (_input_datagram.data(), datagram_size, nullptr, nullptr);
 
-		if (!setting_input_enabled)
+		if (!io.setting_input_enabled)
 			continue;
 
 		FGInputData* fg_data = reinterpret_cast<FGInputData*> (_input_datagram.data());
 
 #define ASSIGN(unit, x) \
-		output_##x = 1_##unit * fg_data->x##_##unit;
+		io.output_##x = 1_##unit * fg_data->x##_##unit;
 
 #define ASSIGN_UNITLESS(x) \
-		output_##x = static_cast<decltype (fg_data->x)> (fg_data->x);
+		io.output_##x = static_cast<decltype (fg_data->x)> (fg_data->x);
 
 		ASSIGN (ft,   cmd_alt_setting);
 		ASSIGN (fpm,  cmd_cbr_setting);
@@ -318,76 +318,76 @@ FlightGearIO::read_input()
 #undef ASSIGN_UNITLESS
 #undef ASSIGN
 
-		output_rotation_x = 1_deg * fg_data->rotation_x_degps / 1_s;
-		output_rotation_y = 1_deg * fg_data->rotation_y_degps / 1_s;
-		output_rotation_z = 1_deg * fg_data->rotation_z_degps / 1_s;
+		io.output_rotation_x = 1_deg * fg_data->rotation_x_degps / 1_s;
+		io.output_rotation_y = 1_deg * fg_data->rotation_y_degps / 1_s;
+		io.output_rotation_z = 1_deg * fg_data->rotation_z_degps / 1_s;
 
-		output_acceleration_x = 1_ft * fg_data->acceleration_x_fps2 / 1_s / 1_s;
-		output_acceleration_y = 1_ft * fg_data->acceleration_y_fps2 / 1_s / 1_s;
-		output_acceleration_z = -1_ft * fg_data->acceleration_z_fps2 / 1_s / 1_s;
+		io.output_acceleration_x = 1_ft * fg_data->acceleration_x_fps2 / 1_s / 1_s;
+		io.output_acceleration_y = 1_ft * fg_data->acceleration_y_fps2 / 1_s / 1_s;
+		io.output_acceleration_z = -1_ft * fg_data->acceleration_z_fps2 / 1_s / 1_s;
 
-		output_vertical_deviation = 2_deg * fg_data->vertical_deviation_deg;
-		output_lateral_deviation = 2_deg * fg_data->lateral_deviation_deg;
+		io.output_vertical_deviation = 2_deg * fg_data->vertical_deviation_deg;
+		io.output_lateral_deviation = 2_deg * fg_data->lateral_deviation_deg;
 
 		if (!fg_data->vertical_deviation_ok)
-			output_vertical_deviation.set_nil();
+			io.output_vertical_deviation.set_nil();
 
 		if (!fg_data->lateral_deviation_ok)
-			output_lateral_deviation.set_nil();
+			io.output_lateral_deviation.set_nil();
 
 		if (!fg_data->navigation_dme_ok)
-			output_dme_distance.set_nil();
+			io.output_dme_distance.set_nil();
 
-		output_gear_nose_down = fg_data->gear_nose_position > 0.999;
-		output_gear_left_down = fg_data->gear_left_position > 0.999;
-		output_gear_right_down = fg_data->gear_right_position > 0.999;
+		io.output_gear_nose_down = fg_data->gear_nose_position > 0.999;
+		io.output_gear_left_down = fg_data->gear_left_position > 0.999;
+		io.output_gear_right_down = fg_data->gear_right_position > 0.999;
 
-		output_gear_nose_up = fg_data->gear_nose_position < 0.001;
-		output_gear_left_up = fg_data->gear_left_position < 0.001;
-		output_gear_right_up = fg_data->gear_right_position < 0.001;
+		io.output_gear_nose_up = fg_data->gear_nose_position < 0.001;
+		io.output_gear_left_up = fg_data->gear_left_position < 0.001;
+		io.output_gear_right_up = fg_data->gear_right_position < 0.001;
 
 		// TAT
-		output_total_air_temperature = Quantity<Celsius> (fg_data->total_air_temperature_degc);
+		io.output_total_air_temperature = Quantity<Celsius> (fg_data->total_air_temperature_degc);
 
 		// Convert EGT from °F to Kelvins:
-		output_engine_1_egt = Quantity<Fahrenheit> (fg_data->engine_1_egt_degf);
-		output_engine_2_egt = Quantity<Fahrenheit> (fg_data->engine_2_egt_degf);
+		io.output_engine_1_egt = Quantity<Fahrenheit> (fg_data->engine_1_egt_degf);
+		io.output_engine_2_egt = Quantity<Fahrenheit> (fg_data->engine_2_egt_degf);
 
 		// Engine thrust:
-		output_engine_1_thrust = 1_lb * fg_data->engine_1_thrust_lb * 1_g;
-		output_engine_2_thrust = 1_lb * fg_data->engine_2_thrust_lb * 1_g;
+		io.output_engine_1_thrust = 1_lb * fg_data->engine_1_thrust_lb * 1_g;
+		io.output_engine_2_thrust = 1_lb * fg_data->engine_2_thrust_lb * 1_g;
 	}
 
-	if (output_maximum_ias && *output_maximum_ias < 1_kt)
-		output_maximum_ias.set_nil();
+	if (io.output_maximum_ias && *io.output_maximum_ias < 1_kt)
+		io.output_maximum_ias.set_nil();
 
-	if (output_minimum_ias && *output_minimum_ias < 1_kt)
-		output_minimum_ias.set_nil();
+	if (io.output_minimum_ias && *io.output_minimum_ias < 1_kt)
+		io.output_minimum_ias.set_nil();
 
-	if (output_radar_altimeter_altitude_agl && *output_radar_altimeter_altitude_agl > 2500_ft)
-		output_radar_altimeter_altitude_agl.set_nil();
+	if (io.output_radar_altimeter_altitude_agl && *io.output_radar_altimeter_altitude_agl > 2500_ft)
+		io.output_radar_altimeter_altitude_agl.set_nil();
 
 	for (auto flag: _serviceable_flags)
 		*flag = true;
 
-	output_gps_lateral_stddev = 1_m;
-	output_gps_vertical_stddev = 1_m;
-	output_gps_source = "GPS";
+	io.output_gps_lateral_stddev = 1_m;
+	io.output_gps_vertical_stddev = 1_m;
+	io.output_gps_source = "GPS";
 
 	_timeout_timer->start();
 }
 
 
 void
-FlightGearIO::write_output()
+FlightGear::write_output()
 {
-	if (!setting_output_enabled)
+	if (!io.setting_output_enabled)
 		return;
 
 	FGOutputData fg_data;
 
 #define ASSIGN(x, def) \
-		fg_data.x = input_##x.value_or (def);
+		fg_data.x = io.input_##x.value_or (def);
 
 	ASSIGN (ailerons, 0.0);
 	ASSIGN (elevator, 0.0);
@@ -398,6 +398,6 @@ FlightGearIO::write_output()
 
 #undef ASSIGN
 
-	_output->writeDatagram (reinterpret_cast<const char*> (&fg_data), sizeof (fg_data), _output_address, *setting_output_port);
+	_output->writeDatagram (reinterpret_cast<const char*> (&fg_data), sizeof (fg_data), _output_address, *io.setting_output_port);
 }
 

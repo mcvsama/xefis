@@ -34,33 +34,31 @@
 #include "adi_widget.h"
 
 
-class ADI: public v2::Instrument
+class ADI_IO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Settings
 	 */
 
 	// TODO change to si::Velocity
-	v2::Setting<int64_t>			speed_ladder_line_every				{ this, 10 };
-	v2::Setting<int64_t>			speed_ladder_number_every			{ this, 20 };
-	v2::Setting<int64_t>			speed_ladder_extent					{ this, 124 };
-	v2::Setting<int64_t>			speed_ladder_minimum				{ this, 20 };
-	v2::Setting<int64_t>			speed_ladder_maximum				{ this, 350 };
-	v2::Setting<int64_t>			altitude_ladder_line_every			{ this, 100 };
-	v2::Setting<int64_t>			altitude_ladder_number_every		{ this, 200 };
-	v2::Setting<int64_t>			altitude_ladder_emphasis_every		{ this, 1000 };
-	v2::Setting<int64_t>			altitude_ladder_bold_every			{ this, 500 };
-	v2::Setting<int64_t>			altitude_ladder_extent				{ this, 825 };
-	v2::Setting<si::Length>			altitude_landing_warning_hi			{ this, 1000_ft };
-	v2::Setting<si::Length>			altitude_landing_warning_lo			{ this, 500_ft };
-	v2::Setting<si::Length>			raising_runway_visibility			{ this, 1000_ft };
-	v2::Setting<si::Length>			raising_runway_threshold			{ this, 250_ft };
-	v2::Setting<si::Angle>			aoa_visibility_threshold			{ this, 17.5_deg };
-	v2::Setting<double>				show_mach_above						{ this, 0.4 };
-	v2::Setting<si::Power>			power_eq_1000_fpm					{ this, 1000_W };
+	v2::Setting<int64_t>			speed_ladder_line_every								{ this, 10 };
+	v2::Setting<int64_t>			speed_ladder_number_every							{ this, 20 };
+	v2::Setting<int64_t>			speed_ladder_extent									{ this, 124 };
+	v2::Setting<int64_t>			speed_ladder_minimum								{ this, 20 };
+	v2::Setting<int64_t>			speed_ladder_maximum								{ this, 350 };
+	v2::Setting<int64_t>			altitude_ladder_line_every							{ this, 100 };
+	v2::Setting<int64_t>			altitude_ladder_number_every						{ this, 200 };
+	v2::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, 1000 };
+	v2::Setting<int64_t>			altitude_ladder_bold_every							{ this, 500 };
+	v2::Setting<int64_t>			altitude_ladder_extent								{ this, 825 };
+	v2::Setting<si::Length>			altitude_landing_warning_hi							{ this, 1000_ft };
+	v2::Setting<si::Length>			altitude_landing_warning_lo							{ this, 500_ft };
+	v2::Setting<si::Length>			raising_runway_visibility							{ this, 1000_ft };
+	v2::Setting<si::Length>			raising_runway_threshold							{ this, 250_ft };
+	v2::Setting<si::Angle>			aoa_visibility_threshold							{ this, 17.5_deg };
+	v2::Setting<double>				show_mach_above										{ this, 0.4 };
+	v2::Setting<si::Power>			power_eq_1000_fpm									{ this, 1000_W };
 
 	/*
 	 * Input
@@ -182,11 +180,17 @@ class ADI: public v2::Instrument
 	// Style
 	v2::PropertyIn<bool>			style_old											{ this, "/style/use-old-style" };
 	v2::PropertyIn<bool>			style_show_metric									{ this, "/style/show-metric-values" };
+};
+
+
+class ADI: public v2::Instrument<ADI_IO>
+{
+	Q_OBJECT
 
   public:
 	// Ctor
 	explicit
-	ADI (xf::Xefis*, std::string const& instance = {});
+	ADI (std::unique_ptr<ADI_IO>, xf::Xefis*, std::string const& instance = {});
 
   protected:
 	// Module API

@@ -26,9 +26,7 @@
 #include <xefis/core/v2/setting.h>
 
 
-class Flaps:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class FlapsIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -44,11 +42,17 @@ class Flaps:
 
 	v2::PropertyIn<si::Angle>	current_angle	{ this, "/current-angle" };
 	v2::PropertyIn<si::Angle>	set_angle		{ this, "/set-angle" };
+};
 
+
+class Flaps:
+	public v2::Instrument<FlapsIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	Flaps (std::string const& instance = {});
+	Flaps (std::unique_ptr<FlapsIO>, std::string const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;

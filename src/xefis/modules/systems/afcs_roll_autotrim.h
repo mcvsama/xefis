@@ -24,13 +24,7 @@
 #include <xefis/core/v2/setting.h>
 
 
-/**
- * Compute ailerons correction to apply to counter react engine's torque.
- * Depends on airspeed and engine RPM. Factors need to be obtained experimentally.
- *
- * Works only for air speeds well below Mach 1.
- */
-class AFCS_RollAutotrim: public v2::Module
+class AFCS_RollAutotrim_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -53,11 +47,21 @@ class AFCS_RollAutotrim: public v2::Module
 	 */
 
 	v2::PropertyOut<si::Angle>		output_ailerons_correction			{ this, "/ailerons-correction" };
+};
 
+
+/**
+ * Compute ailerons correction to apply to counter react engine's torque.
+ * Depends on airspeed and engine RPM. Factors need to be obtained experimentally.
+ *
+ * Works only for air speeds well below Mach 1.
+ */
+class AFCS_RollAutotrim: public v2::Module<AFCS_RollAutotrim_IO>
+{
   public:
 	// Ctor
 	explicit
-	AFCS_RollAutotrim (std::string const& instance = {});
+	AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

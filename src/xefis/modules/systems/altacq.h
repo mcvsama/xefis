@@ -27,7 +27,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class AltAcq: public v2::Module
+class AltAcqIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -53,11 +53,15 @@ class AltAcq: public v2::Module
 
 	v2::PropertyOut<si::Length>		output_altitude_acquire_distance	{ this, "/acquire-distance" };
 	v2::PropertyOut<bool>			output_altitude_acquire_flag		{ this, "/acquire-flag" };
+};
 
+
+class AltAcq: public v2::Module<AltAcqIO>
+{
   public:
 	// Ctor
 	explicit
-	AltAcq (std::string const& instance = {});
+	AltAcq (std::unique_ptr<AltAcqIO>, std::string const& instance = {});
 
   protected:
 	// Module API
@@ -73,8 +77,8 @@ class AltAcq: public v2::Module
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Length>	_output_smoother					{ 2_s };
 	v2::PropertyObserver		_output_computer;
-	v2::PropChanged<si::Length>	_altitude_amsl_changed				{ input_altitude_amsl };
-	v2::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ input_altitude_acquire_amsl };
+	v2::PropChanged<si::Length>	_altitude_amsl_changed				{ io.input_altitude_amsl };
+	v2::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.input_altitude_acquire_amsl };
 };
 
 #endif

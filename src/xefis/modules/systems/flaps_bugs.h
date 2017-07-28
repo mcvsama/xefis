@@ -27,11 +27,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-/**
- * Computes two speed bugs - for two adjacent flap settings - that should
- * be displayed on EFIS' speed ladder.
- */
-class FlapsBugs: public v2::Module
+class FlapsBugsIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -56,11 +52,19 @@ class FlapsBugs: public v2::Module
 	v2::PropertyOut<si::Velocity>	output_flaps_a_speed	{ this, "/flaps-a-speed" };
 	v2::PropertyOut<std::string>	output_flaps_b_label	{ this, "/flaps-b-label" };
 	v2::PropertyOut<si::Velocity>	output_flaps_b_speed	{ this, "/flaps-b-speed" };
+};
 
+
+/**
+ * Computes two speed bugs - for two adjacent flap settings - that should
+ * be displayed on EFIS' speed ladder.
+ */
+class FlapsBugs: public v2::Module<FlapsBugsIO>
+{
   public:
 	// Ctor
 	explicit
-	FlapsBugs (xf::Flaps const& flaps, std::string const& instance = {});
+	FlapsBugs (std::unique_ptr<FlapsBugsIO>, xf::Flaps const& flaps, std::string const& instance = {});
 
   protected:
 	// Module API
@@ -69,7 +73,7 @@ class FlapsBugs: public v2::Module
 
   private:
 	xf::Flaps const&			_flaps;
-	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ input_flaps_setting };
+	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ io.input_flaps_setting };
 };
 
 #endif

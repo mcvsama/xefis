@@ -29,15 +29,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-/**
- * Warning: this module uses I/O in main thread, which may block.
- *
- * CH-Robotics UM6 sensor driver.
- * Uses UART for communication.
- */
-class CHRUM6:
-	public QObject,
-	public v2::Module
+class CHRUM6_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -77,14 +69,26 @@ class CHRUM6:
 	v2::PropertyOut<si::MagneticField>		output_magnetic_x					{ this, "/magnetic/x" };
 	v2::PropertyOut<si::MagneticField>		output_magnetic_y					{ this, "/magnetic/y" };
 	v2::PropertyOut<si::MagneticField>		output_magnetic_z					{ this, "/magnetic/z" };
+};
 
-  private:
+
+/**
+ * Warning: this module uses I/O in main thread, which may block.
+ *
+ * CH-Robotics UM6 sensor driver.
+ * Uses UART for communication.
+ */
+class CHRUM6:
+	public QObject,
+	public v2::Module<CHRUM6_IO>
+{
 	Q_OBJECT
 
-	static constexpr si::Time	RestartDelay			= 200_ms;
-	static constexpr si::Time	AliveCheckInterval		= 500_ms;
-	static constexpr si::Time	StatusCheckInterval		= 200_ms;
-	static constexpr si::Time	InitializationDelay		= 3_s;
+  private:
+	static constexpr si::Time	kRestartDelay			= 200_ms;
+	static constexpr si::Time	kAliveCheckInterval		= 500_ms;
+	static constexpr si::Time	kStatusCheckInterval	= 200_ms;
+	static constexpr si::Time	kInitializationDelay	= 3_s;
 
 	typedef xf::CHRUM6::ConfigurationAddress	ConfigurationAddress;
 	typedef xf::CHRUM6::DataAddress				DataAddress;
@@ -99,7 +103,7 @@ class CHRUM6:
   public:
 	// Ctor
 	explicit
-	CHRUM6 (xf::SerialPort&& serial_port, std::string const& instance = {});
+	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, std::string const& instance = {});
 
 	// Module API
 	void
@@ -252,12 +256,12 @@ class CHRUM6:
 	Unique<xf::CHRUM6>					_sensor;
 	int									_failure_count						{ 0 };
 	Stage								_stage								{ Stage::Initialize };
-	v2::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ input_centripetal_x };
-	v2::PropChanged<si::Acceleration>	_input_centripetal_y_changed		{ input_centripetal_y };
-	v2::PropChanged<si::Acceleration>	_input_centripetal_z_changed		{ input_centripetal_z };
-	v2::PropChanged<si::Acceleration>	_output_acceleration_x_changed		{ output_acceleration_x };
-	v2::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ output_acceleration_y };
-	v2::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ output_acceleration_z };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ io.input_centripetal_x };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_y_changed		{ io.input_centripetal_y };
+	v2::PropChanged<si::Acceleration>	_input_centripetal_z_changed		{ io.input_centripetal_z };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_x_changed		{ io.output_acceleration_x };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_y_changed		{ io.output_acceleration_y };
+	v2::PropChanged<si::Acceleration>	_output_acceleration_z_changed		{ io.output_acceleration_z };
 	// Backup gyro bias values:
 	Optional<uint32_t>					_gyro_bias_xy;
 	Optional<uint32_t>					_gyro_bias_z;

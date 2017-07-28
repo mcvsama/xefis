@@ -27,37 +27,28 @@
 #include "ets_airspeed.h"
 
 
-// TODO Remove in C++17 (constexpr is inline, and those would be inline variables):
-constexpr uint8_t		ETSAirspeed::kValueRegister;
-constexpr float			ETSAirspeed::kValueScale;
-constexpr si::Time		ETSAirspeed::kInitializationDelay;
-constexpr unsigned int	ETSAirspeed::kOffsetCalculationSamples;
-constexpr uint16_t		ETSAirspeed::kRawValueMinimum;
-constexpr uint16_t		ETSAirspeed::kRawValueMaximum;
-
-
-ETSAirspeed::ETSAirspeed (xf::i2c::Device&& device, std::string const& instance):
-	Module (instance),
+ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, std::string const& instance):
+	Module (std::move (module_io), instance),
 	_device (std::move (device))
 {
 	_calibration_data.reserve (kOffsetCalculationSamples);
 
-	output_serviceable = false;
-	output_airspeed_minimum = 10_kt;
-	output_airspeed_maximum = 290_kt;
+	io.output_serviceable = false;
+	io.output_airspeed_minimum = 10_kt;
+	io.output_airspeed_maximum = 290_kt;
 }
 
 
 void
 ETSAirspeed::initialize()
 {
-	if (*setting_read_interval < 100_ms)
+	if (*io.setting_read_interval < 100_ms)
 	{
 		log() << "The setting airspeed.read-invterval is too low, setting it to 100 ms." << std::endl;
-		setting_read_interval = 100_ms;
+		io.setting_read_interval = 100_ms;
 	}
 
-	_airspeed_smoother.set_smoothing_time (*setting_smoothing_time);
+	_airspeed_smoother.set_smoothing_time (*io.setting_smoothing_time);
 
 	_device_initialization_timer = new QTimer (this);
 	_device_initialization_timer->setInterval (kInitializationDelay.quantity<Millisecond>());
@@ -66,7 +57,7 @@ ETSAirspeed::initialize()
 	_device_initialization_timer->start();
 
 	_periodic_read_timer = new QTimer (this);
-	_periodic_read_timer->setInterval (setting_read_interval->quantity<Millisecond>());
+	_periodic_read_timer->setInterval (io.setting_read_interval->quantity<Millisecond>());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));
 }
@@ -86,8 +77,8 @@ ETSAirspeed::device_initialize()
 void
 ETSAirspeed::reinitialize()
 {
-	output_serviceable = false;
-	output_airspeed.set_nil();
+	io.output_serviceable = false;
+	io.output_airspeed.set_nil();
 	_device.close();
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.
@@ -102,8 +93,8 @@ ETSAirspeed::read()
 		uint16_t raw_value = _device.read_register<uint16_t> (kValueRegister);
 		boost::endian::little_to_native (raw_value);
 
-		if (!output_serviceable.value_or (false))
-			output_serviceable = true;
+		if (!io.output_serviceable.value_or (false))
+			io.output_serviceable = true;
 
 		switch (_stage)
 		{
@@ -121,7 +112,7 @@ ETSAirspeed::read()
 				si::Velocity speed = 0_kt;
 				if (raw_value >= _offset)
 					speed = 1_mps * (kValueScale * std::sqrt (1.0f * (raw_value - _offset)));
-				output_airspeed = _airspeed_smoother (speed, *setting_read_interval);
+				io.output_airspeed = _airspeed_smoother (speed, *io.setting_read_interval);
 				break;
 		}
 	});

@@ -23,6 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/module.h>
+#include <xefis/core/v2/module_io.h>
 #include <xefis/core/property_path.h>
 #include <xefis/utility/time.h>
 #include <xefis/utility/time_helper.h>
@@ -135,8 +136,7 @@ class PropertyVirtualInterface
 	}
 
 	/**
-	 * Ensure that property's value is up to date in this processing loop.  If it's coupled to a Module, that process()
-	 * has been called, or if it's coupled to another property, then the value has been copied.
+	 * Ensure that property's value is up to date in this processing loop.
 	 */
 	virtual void
 	fetch (Cycle const&) = 0;
@@ -160,13 +160,13 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	BasicProperty (std::string const& path);
 
 	/**
-	 * Create Property that's coupled by a Module.
+	 * Create Property that's coupled by a ModuleIO.
 	 *
 	 * \param	owner
 	 *			Owner object for this property. May be nullptr.
 	 */
 	explicit
-	BasicProperty (Module* owner, std::string const& path);
+	BasicProperty (ModuleIO* owner, std::string const& path);
 
   public:
 	// Dtor
@@ -212,13 +212,13 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	serial() const noexcept;
 
 	/**
-	 * Return property owner (Module). May be nullptr.
+	 * Return property owner (an ModuleIO object). May be nullptr.
 	 */
-	Module*
-	owner() const;
+	ModuleIO*
+	io() const;
 
   protected:
-	Module*			_owner					= nullptr;
+	ModuleIO*		_owner					= nullptr;
 	PropertyPath	_path;
 	Timestamp		_modification_timestamp	= 0_s;
 	Timestamp		_valid_timestamp		= 0_s;
@@ -356,13 +356,13 @@ template<class pValue>
 		 * Create Property that's coupled to given owner, but doesn't have any data source yet.
 		 */
 		explicit
-		PropertyIn (Module* owner, std::string const& path);
+		PropertyIn (ModuleIO* owner, std::string const& path);
 
 		/**
-		 * Same as PropertyIn (Module*, std::string), but additionally set up the fallback value.
+		 * Same as PropertyIn (ModuleIO*, std::string), but additionally set up the fallback value.
 		 */
 		explicit
-		PropertyIn (Module* owner, std::string const& path, Value&& fallback_value);
+		PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value);
 
 		// Dtor
 		~PropertyIn();
@@ -399,16 +399,16 @@ template<class pValue>
 		typedef pValue Value;
 
 		/**
-		 * Create Property that's not coupled to any module and don't have any data source yet.
+		 * Create Property that's not coupled to any ModuleIO and don't have any data source yet.
 		 */
 		explicit
 		PropertyOut (std::string const& path);
 
 		/**
-		 * Create Property that's coupled to a module and set the module as data source.
+		 * Create Property that's coupled to a ModuleIO and set the module as data source.
 		 */
 		explicit
-		PropertyOut (Module* owner_and_data_source, std::string const& path);
+		PropertyOut (ModuleIO* owner_and_data_source, std::string const& path);
 
 		using Property<Value>::operator=;
 
@@ -447,7 +447,7 @@ template<class pValue>
 		fetch (Cycle const&) override;
 
 	  private:
-		std::variant<std::nullptr_t, Module*, PropertyOut<Value>*> _data_source = nullptr;
+		std::variant<std::nullptr_t, ModuleIO*, PropertyOut<Value>*> _data_source = nullptr;
 	};
 
 
@@ -474,7 +474,7 @@ BasicProperty::BasicProperty (std::string const& path):
 
 
 inline
-BasicProperty::BasicProperty (Module* owner, std::string const& path):
+BasicProperty::BasicProperty (ModuleIO* owner, std::string const& path):
 	_owner (owner),
 	_path (path)
 { }
@@ -522,8 +522,8 @@ BasicProperty::serial() const noexcept
 }
 
 
-inline Module*
-BasicProperty::owner() const
+inline ModuleIO*
+BasicProperty::io() const
 {
 	return _owner;
 }
@@ -682,16 +682,16 @@ template<class V>
 
 template<class V>
 	inline
-	PropertyIn<V>::PropertyIn (Module* owner, std::string const& path):
+	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path):
 		Property<V> (owner, path)
 	{
-		Module::ProcessingLoopAPI (this->owner()).register_input_property (this);
+		ModuleIO::ProcessingLoopAPI (this->io()).register_input_property (this);
 	}
 
 
 template<class V>
 	inline
-	PropertyIn<V>::PropertyIn (Module* owner, std::string const& path, Value&& fallback_value):
+	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value):
 		PropertyIn (owner, path)
 	{
 		this->set_fallback (std::forward<Value> (fallback_value));
@@ -702,7 +702,7 @@ template<class V>
 	inline
 	PropertyIn<V>::~PropertyIn()
 	{
-		Module::ProcessingLoopAPI (this->owner()).unregister_input_property (this);
+		ModuleIO::ProcessingLoopAPI (this->io()).unregister_input_property (this);
 	}
 
 
@@ -750,7 +750,7 @@ template<class V>
 
 template<class V>
 	inline
-	PropertyOut<V>::PropertyOut (Module* owner_and_data_source, std::string const& path):
+	PropertyOut<V>::PropertyOut (ModuleIO* owner_and_data_source, std::string const& path):
 		Property<V> (owner_and_data_source, path)
 	{
 		_data_source = owner_and_data_source;
@@ -816,9 +816,9 @@ template<class V>
 				_this->set_nil();
 			}
 
-			void operator() (Module* data_source) const
+			void operator() (ModuleIO* data_source) const
 			{
-				Module::ProcessingLoopAPI (data_source).fetch_and_process (_cycle);
+				BasicModule::ProcessingLoopAPI (data_source->module()).fetch_and_process (_cycle);
 			}
 
 			void operator() (PropertyOut<Value>* data_source) const

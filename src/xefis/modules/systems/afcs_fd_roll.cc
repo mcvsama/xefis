@@ -24,8 +24,8 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Roll::AFCS_FD_Roll (std::string const& instance):
-	Module (instance)
+AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	constexpr auto sec = 1.0_s;
 
@@ -41,13 +41,13 @@ AFCS_FD_Roll::AFCS_FD_Roll (std::string const& instance):
 		&_output_roll_smoother,
 	});
 	_roll_computer.observe ({
-		&input_autonomous,
-		&input_roll_limits,
-		&input_cmd_roll_mode,
-		&input_cmd_magnetic_hdg,
-		&input_cmd_magnetic_trk,
-		&input_measured_magnetic_hdg,
-		&input_measured_magnetic_trk,
+		&io.input_autonomous,
+		&io.input_roll_limits,
+		&io.input_cmd_roll_mode,
+		&io.input_cmd_magnetic_hdg,
+		&io.input_cmd_magnetic_trk,
+		&io.input_measured_magnetic_hdg,
+		&io.input_measured_magnetic_trk,
 	});
 }
 
@@ -55,8 +55,8 @@ AFCS_FD_Roll::AFCS_FD_Roll (std::string const& instance):
 void
 AFCS_FD_Roll::initialize()
 {
-	_magnetic_hdg_pid.set_pid (*setting_hdg_pid_settings);
-	_magnetic_trk_pid.set_pid (*setting_trk_pid_settings);
+	_magnetic_hdg_pid.set_pid (*io.setting_hdg_pid_settings);
+	_magnetic_trk_pid.set_pid (*io.setting_trk_pid_settings);
 }
 
 
@@ -71,8 +71,8 @@ AFCS_FD_Roll::process (v2::Cycle const& cycle)
 void
 AFCS_FD_Roll::rescue (std::exception_ptr)
 {
-	if (!input_autonomous.value_or (true))
-		output_operative = false;
+	if (!io.input_autonomous.value_or (true))
+		io.output_operative = false;
 
 	check_autonomous();
 }
@@ -86,8 +86,8 @@ AFCS_FD_Roll::compute_roll()
 	Optional<si::Angle> roll;
 
 	// Always compute both PIDs. Use their output only when it's needed.
-	Optional<si::Angle> roll_for_hdg = compute_roll (_magnetic_hdg_pid, input_cmd_magnetic_hdg, input_measured_magnetic_hdg, update_dt);
-	Optional<si::Angle> roll_for_trk = compute_roll (_magnetic_trk_pid, input_cmd_magnetic_trk, input_measured_magnetic_trk, update_dt);
+	Optional<si::Angle> roll_for_hdg = compute_roll (_magnetic_hdg_pid, io.input_cmd_magnetic_hdg, io.input_measured_magnetic_hdg, update_dt);
+	Optional<si::Angle> roll_for_trk = compute_roll (_magnetic_trk_pid, io.input_cmd_magnetic_trk, io.input_measured_magnetic_trk, update_dt);
 
 	// TODO use transistor for output
 
@@ -100,7 +100,7 @@ AFCS_FD_Roll::compute_roll()
 
 	using afcs_api::RollMode;
 
-	switch (*input_cmd_roll_mode)
+	switch (*io.input_cmd_roll_mode)
 	{
 		case RollMode::None:
 			roll.reset();
@@ -137,15 +137,15 @@ AFCS_FD_Roll::compute_roll()
 	}
 
 	if (roll)
-		output_roll = _output_roll_smoother (*roll, update_dt);
+		io.output_roll = _output_roll_smoother (*roll, update_dt);
 	else
 	{
-		output_roll.set_nil();
+		io.output_roll.set_nil();
 		_output_roll_smoother.reset();
 	}
 
-	if (disengage || output_operative.is_nil())
-		output_operative = !disengage;
+	if (disengage || io.output_operative.is_nil())
+		io.output_operative = !disengage;
 
 	check_autonomous();
 }
@@ -157,7 +157,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
 							v2::PropertyIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const
 {
-	xf::Range<si::Angle> roll_limits { -*input_roll_limits, +*input_roll_limits };
+	xf::Range<si::Angle> roll_limits { -*io.input_roll_limits, +*io.input_roll_limits };
 
 	if (cmd_direction && measured_direction)
 		return xf::clamped (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
@@ -172,7 +172,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
 void
 AFCS_FD_Roll::check_autonomous()
 {
-	if (input_autonomous.value_or (true))
-		output_operative = true;
+	if (io.input_autonomous.value_or (true))
+		io.output_operative = true;
 }
 

@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <algorithm>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -38,7 +39,7 @@ UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
 		return "uninitialized settings in a module";
 	else
 	{
-		std::string result = "uninitialized setting(s) found in module " + module_identifier (settings[0]->owner()) + ": ";
+		std::string result = "uninitialized setting(s) found for module " + identifier (settings[0]->io()) + ": ";
 
 		for (std::size_t i = 0; i < settings.size(); ++i)
 		{
@@ -54,27 +55,13 @@ UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
 
 
 void
-Module::ProcessingLoopAPI::verify_settings()
-{
-	std::vector<BasicSetting*> uninitialized_settings;
-
-	for (auto* setting: _module->_registered_settings)
-		if (!*setting)
-			uninitialized_settings.push_back (setting);
-
-	if (!uninitialized_settings.empty())
-		throw UninitializedSettings (uninitialized_settings);
-}
-
-
-void
-Module::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
+BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
 	if (!_module->_cached)
 	{
 		_module->_cached = true;
 
-		for (auto* prop: _module->_registered_input_properties)
+		for (auto* prop: _module->io_base()->_registered_input_properties)
 			prop->fetch (cycle);
 
 		_module->process (cycle);
@@ -82,77 +69,66 @@ Module::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 }
 
 
-void
-Module::ProcessingLoopAPI::register_input_property (BasicPropertyIn* property)
+BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string const& instance):
+	_instance (instance),
+	_io (std::move (io))
 {
-	_module->_registered_input_properties.push_back (property);
+	_io->set_module (this);
+	// TODO verify settings etc
 }
 
 
 void
-Module::ProcessingLoopAPI::unregister_input_property (BasicPropertyIn* property)
-{
-	auto new_end = std::remove (_module->_registered_input_properties.begin(), _module->_registered_input_properties.end(), property);
-	_module->_registered_input_properties.resize (new_end - _module->_registered_input_properties.begin());
-}
-
-
-void
-Module::ProcessingLoopAPI::register_output_property (BasicPropertyOut* property)
-{
-	_module->_registered_output_properties.push_back (property);
-}
-
-
-void
-Module::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut* property)
-{
-	auto new_end = std::remove (_module->_registered_output_properties.begin(), _module->_registered_output_properties.end(), property);
-	_module->_registered_output_properties.resize (new_end - _module->_registered_output_properties.begin());
-}
-
-
-Module::Module (std::string const& instance):
-	_instance (instance)
+BasicModule::initialize()
 { }
 
 
 void
-Module::initialize()
+BasicModule::process (v2::Cycle const&)
 { }
 
 
 void
-Module::process (v2::Cycle const&)
-{ }
-
-
-void
-Module::rescue (std::exception_ptr)
+BasicModule::rescue (std::exception_ptr)
 {
 	// TODO log the exception
 
 	// TODO the following needs to be OPT-IN!
 	// Set all output properties to nil.
-	for (auto* property: _registered_output_properties)
+	for (auto* property: _io->_registered_output_properties)
 		property->set_nil();
 }
 
 
 std::string
-module_identifier (Module& module)
+identifier (BasicModule& module)
 {
 	return demangle (typeid (module)) + "#" + module.instance();
 }
 
 
 std::string
-module_identifier (Module* module)
+identifier (ModuleIO& io)
 {
-	if (module)
-		return module_identifier (*module);
+	BasicModule* module = io.module();
 
-	return "(nullptr)";
+	if (module)
+		return identifier (*module);
+	else
+		return "<no module associated with the IO object>";
+}
+
+
+std::string
+identifier (BasicModule* module)
+{
+	return module ? identifier (*module) : "(nullptr)";
+}
+
+std::string
+identifier (ModuleIO* io)
+{
+	return io ? identifier (*io) : "(nullptr)";
 }
 
 } // namespace v2

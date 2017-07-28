@@ -20,14 +20,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/instrument.h>
+#include <xefis/core/v2/module_io.h>
 #include <xefis/core/instrument_aids.h>
 #include <xefis/core/v2/setting.h>
 #include <xefis/utility/types.h>
 
 
-class Label:
-	public v2::Instrument,
-	protected xf::InstrumentAids
+class LabelIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -38,11 +37,17 @@ class Label:
 	v2::Setting<QString>		label		{ this };
 	v2::Setting<QColor>			color		{ this, Qt::white };
 	v2::Setting<Qt::Alignment>	alignment	{ this, Qt::AlignVCenter | Qt::AlignHCenter };
+};
 
+
+class Label:
+	public v2::Instrument<LabelIO>,
+	protected xf::InstrumentAids
+{
   public:
 	// Ctor
 	explicit
-	Label (std::string const& instance = {});
+	Label (std::unique_ptr<LabelIO>, std::string const& instance = {});
 
   protected:
 	// QWidget API

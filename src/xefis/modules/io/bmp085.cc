@@ -29,23 +29,23 @@
 #include "bmp085.h"
 
 
-BMP085::BMP085 (std::string const& instance):
-	Module (instance)
+BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	_reinitialize_timer = std::make_unique<QTimer> (this);
 	_reinitialize_timer->setInterval (250);
 	_reinitialize_timer->setSingleShot (true);
 	QObject::connect (_reinitialize_timer.get(), SIGNAL (timeout()), this, SLOT (initialize()));
 
-	_serviceable = false;
+	io.serviceable = false;
 }
 
 
 void
 BMP085::initialize()
 {
-	_i2c_device.bus().set_bus_number (setting_i2c_bus);
-	_i2c_device.set_address (xf::i2c::Address (setting_i2c_address));
+	_i2c_device.bus().set_bus_number (io.setting_i2c_bus);
+	_i2c_device.set_address (xf::i2c::Address (io.setting_i2c_address));
 
 	guard ([&] {
 		hw_initialize();
@@ -72,7 +72,7 @@ BMP085::hw_initialize()
 		_md = read_s16 (MD_REG);
 
 		_temperature_timer = std::make_unique<QTimer> (this);
-		_temperature_timer->setInterval (setting_temperature_update_interval->quantity<Millisecond>());
+		_temperature_timer->setInterval (io.setting_temperature_update_interval->quantity<Millisecond>());
 		_temperature_timer->setSingleShot (false);
 		QObject::connect (_temperature_timer.get(), SIGNAL (timeout()), this, SLOT (request_temperature()));
 
@@ -82,7 +82,7 @@ BMP085::hw_initialize()
 		QObject::connect (_temperature_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_temperature()));
 
 		_pressure_timer = std::make_unique<QTimer> (this);
-		_pressure_timer->setInterval (setting_pressure_update_interval->quantity<Millisecond>());
+		_pressure_timer->setInterval (io.setting_pressure_update_interval->quantity<Millisecond>());
 		_pressure_timer->setSingleShot (false);
 		QObject::connect (_pressure_timer.get(), SIGNAL (timeout()), this, SLOT (request_pressure()));
 
@@ -100,9 +100,9 @@ BMP085::hw_initialize()
 void
 BMP085::hw_reinitialize()
 {
-	_serviceable = false;
-	_temperature.set_nil();
-	_pressure.set_nil();
+	io.serviceable = false;
+	io.temperature.set_nil();
+	io.pressure.set_nil();
 
 	_middle_of_request = false;
 	_request_other = false;
@@ -160,7 +160,7 @@ BMP085::read_temperature()
 		int32_t x2 = (_mc << 11) / (x1 + _md);
 		_b5 = x1 + x2;
 		_ct = (_b5 + 8) >> 4;
-		_temperature = Quantity<Celsius> (_ct / 10.0);
+		io.temperature = Quantity<Celsius> (_ct / 10.0);
 
 		handle_other (&BMP085::request_pressure);
 	});
@@ -193,11 +193,11 @@ BMP085::read_pressure()
 		x1 = (x1 * 3038) >> 16;
 		x2 = (-7357 * _cp) >> 16;
 		_cp = _cp + ((x1 + x2 + 3791) >> 4);
-		_pressure = 0.01_hPa * _cp;
+		io.pressure = 0.01_hPa * _cp;
 
 		handle_other (&BMP085::request_temperature);
 
-		_serviceable = true;
+		io.serviceable = true;
 	});
 }
 

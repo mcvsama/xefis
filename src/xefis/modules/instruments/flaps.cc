@@ -23,14 +23,14 @@
 #include "flaps.h"
 
 
-Flaps::Flaps (std::string const& instance):
-	Instrument (instance),
+Flaps::Flaps (std::unique_ptr<FlapsIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (2.0f)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
 	_inputs_observer.observe ({
-		&current_angle,
-		&set_angle,
+		&io.current_angle,
+		&io.set_angle,
 	});
 }
 
@@ -59,9 +59,9 @@ Flaps::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	if (*hide_retracted)
-		if (current_angle && *current_angle < 0.1_deg)
-			if (set_angle && *set_angle < 0.5_deg)
+	if (*io.hide_retracted)
+		if (io.current_angle && *io.current_angle < 0.1_deg)
+			if (io.set_angle && *io.set_angle < 0.5_deg)
 				return;
 
 	QColor cyan { 0x44, 0xdd, 0xff };
@@ -86,23 +86,23 @@ Flaps::paintEvent (QPaintEvent*)
 	painter().drawRect (block);
 
 	// Filled block showing current value:
-	if (current_angle)
+	if (io.current_angle)
 	{
-		Angle current = xf::clamped<Angle> (*current_angle, 0_deg, *maximum_angle);
+		Angle current = xf::clamped<Angle> (*io.current_angle, 0_deg, *io.maximum_angle);
 		QRectF filled_block = block;
-		filled_block.setHeight (current / *maximum_angle * filled_block.height());
+		filled_block.setHeight (current / *io.maximum_angle * filled_block.height());
 		painter().setPen (Qt::NoPen);
 		painter().setBrush (Qt::white);
 		painter().drawRect (filled_block);
 	}
 
 	// Target setting in green:
-	if (set_angle)
+	if (io.set_angle)
 	{
 		// Green line:
-		Angle setting = xf::clamped<Angle> (*set_angle, 0_deg, *maximum_angle);
+		Angle setting = xf::clamped<Angle> (*io.set_angle, 0_deg, *io.maximum_angle);
 		float w = 0.3f * block.width();
-		float s = block.top() + setting / *maximum_angle * block.height();
+		float s = block.top() + setting / *io.maximum_angle * block.height();
 		painter().setPen (get_pen (Qt::green, 2.f));
 		painter().add_shadow ([&] {
 			painter().drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));

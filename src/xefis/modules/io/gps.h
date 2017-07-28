@@ -32,15 +32,7 @@
 #include <xefis/support/protocols/nmea/parser.h>
 
 
-/**
- * Warning: this module uses I/O in main thread, which may block.
- *
- * Read NMEA 0183 GPS data from a serial port.
- * TODO make a thread-object that handles the device in a separate thread.
- */
-class GPS:
-	public QObject,
-	public v2::Module
+class GPS_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -83,10 +75,22 @@ class GPS:
 	v2::PropertyOut<int64_t>				output_dgps_station_id				{ this, "/gps/dgps-station-id" };
 	v2::PropertyOut<si::Time>				output_fix_system_timestamp			{ this, "/gps/fix/system-timestamp" };
 	v2::PropertyOut<si::Time>				output_fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
+};
 
-  private:
+
+/**
+ * Warning: this module uses I/O in main thread, which may block.
+ *
+ * Read NMEA 0183 GPS data from a serial port.
+ * TODO make a thread-object that handles the device in a separate thread.
+ */
+class GPS:
+	public QObject,
+	public v2::Module<GPS_IO>
+{
 	Q_OBJECT
 
+  private:
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
 	static constexpr Time			kPowerRestartDelay					= 1_s;
 	static constexpr Time			kAliveCheckInterval					= 2_s;
@@ -289,7 +293,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (xf::System*, xf::SerialPort::Configuration const&, std::string const& instance = {});
+	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, std::string const& instance = {});
 
 	// Dtor
 	~GPS();

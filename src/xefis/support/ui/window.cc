@@ -90,7 +90,7 @@ Window::unparent_modules()
 	// Since children of type Module are managed by the ModuleManager, we must not let parent widget delete them.
 	// Find them and reparent to 0.
 	for (auto child: findChildren<QWidget*>())
-		if (dynamic_cast<Module*> (child))
+		if (dynamic_cast<BasicModule*> (child))
 			child->setParent (nullptr);
 }
 

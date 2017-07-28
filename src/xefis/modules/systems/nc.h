@@ -29,7 +29,7 @@
 #include <xefis/utility/range_smoother.h>
 
 
-class NavigationComputer: public v2::Module
+class NavigationComputerIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -68,7 +68,11 @@ class NavigationComputer: public v2::Module
 	v2::PropertyOut<si::Velocity>			output_track_ground_speed			{ this, "/track/ground-speed" };
 	v2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/magnetic-declination" };
 	v2::PropertyOut<si::Angle>				output_magnetic_inclination			{ this, "/magnetic-inclination" };
+};
 
+
+class NavigationComputer: public v2::Module<NavigationComputerIO>
+{
   private:
 	struct Position
 	{
@@ -85,7 +89,7 @@ class NavigationComputer: public v2::Module
   public:
 	// Ctor
 	explicit
-	NavigationComputer (std::string const& instance);
+	NavigationComputer (std::unique_ptr<NavigationComputerIO>, std::string const& instance);
 
   protected:
 	// Module API

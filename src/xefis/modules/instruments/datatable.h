@@ -33,7 +33,7 @@
 
 
 class Datatable:
-	public v2::Instrument,
+	public v2::Instrument<v2::ModuleIO>,
 	protected xf::InstrumentAids
 {
 	class Line

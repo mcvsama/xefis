@@ -28,7 +28,7 @@
 #include <xefis/utility/range_smoother.h>
 
 
-class PerformanceComputer: public v2::Module
+class PerformanceComputerIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -108,11 +108,15 @@ class PerformanceComputer: public v2::Module
 	v2::PropertyOut<si::Angle>			output_estimated_aoa				{ this, "/estimated.aoa" };
 	v2::PropertyOut<si::Angle>			output_estimated_aoa_error			{ this, "/estimated.aoa-error" };
 	v2::PropertyOut<si::Angle>			output_slip_skid					{ this, "/slip-skid" };
+};
 
+
+class PerformanceComputer: public v2::Module<PerformanceComputerIO>
+{
   public:
 	// Ctor
 	explicit
-	PerformanceComputer (xf::Airframe*, std::string const& instance = {});
+	PerformanceComputer (std::unique_ptr<PerformanceComputerIO>, xf::Airframe*, std::string const& instance = {});
 
   protected:
 	void

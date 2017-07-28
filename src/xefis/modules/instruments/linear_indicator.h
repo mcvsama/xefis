@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v1/window.h>
 #include <xefis/core/v2/cycle.h>
 #include <xefis/core/v2/instrument.h>
 #include <xefis/core/v2/property.h>
@@ -29,9 +30,7 @@
 #include <xefis/core/instrument_aids.h>
 
 
-class BasicIndicator:
-	virtual protected xf::InstrumentAids,
-	public v2::Instrument
+class BasicIndicatorIO: public v2::ModuleIO
 {
   public:
 	/**
@@ -57,22 +56,10 @@ class BasicIndicator:
 	v2::Setting<std::optional<double>>	value_maximum_warning	{ this, std::nullopt };
 	v2::Setting<std::optional<double>>	value_maximum_critical	{ this, std::nullopt };
 	v2::Setting<double>					value_maximum			{ this };
-
-  public:
-	// Ctor
-	BasicIndicator (std::string const& instance);
-
-  protected:
-	// QWidget API
-	void
-	resizeEvent (QResizeEvent*) override;
-
-	QString
-	stringify_value (double value) const;
 };
 
 
-class LinearIndicator: public BasicIndicator
+class LinearIndicatorIO: public BasicIndicatorIO
 {
   public:
 	/*
@@ -80,11 +67,71 @@ class LinearIndicator: public BasicIndicator
 	 */
 
 	v2::Setting<bool>					mirrored_style			{ this, false };
+};
 
+
+template<class IO>
+	class BasicIndicator:
+		virtual protected xf::InstrumentAids,
+		public v2::Instrument<IO>
+	{
+	  public:
+		// Ctor
+		BasicIndicator (std::unique_ptr<IO>, std::string const& instance);
+
+	  protected:
+		// QWidget API
+		void
+		resizeEvent (QResizeEvent*) override;
+
+		QString
+		stringify_value (double value) const;
+	};
+
+
+template<class IO>
+	inline
+	BasicIndicator<IO>::BasicIndicator (std::unique_ptr<IO> module_io, std::string const& instance):
+		xf::InstrumentAids (1.0f),
+		v2::Instrument<IO> (std::move (module_io), instance)
+	{ }
+
+
+template<class IO>
+	inline void
+	BasicIndicator<IO>::resizeEvent (QResizeEvent*)
+	{
+		auto xw = dynamic_cast<v1::Window*> (this->window());
+		if (xw)
+			InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
+
+		InstrumentAids::update_sizes (this->size(), this->window()->size());
+	}
+
+
+template<class IO>
+	inline QString
+	BasicIndicator<IO>::stringify_value (double value) const
+	{
+		double numeric_value = value;
+		auto& io = this->io;
+
+		if (*io.precision < 0)
+			numeric_value /= std::pow (10.0, -*io.precision);
+
+		if (*io.modulo > 0)
+			numeric_value = static_cast<int> (numeric_value) / *io.modulo * *io.modulo;
+
+		return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, *io.precision));
+	}
+
+
+class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
+{
   public:
 	// Ctor
 	explicit
-	LinearIndicator (v2::PropertyDigitizer, std::string const& instance = {});
+	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, v2::PropertyDigitizer, std::string const& instance = {});
 
 	// Module API
 	void

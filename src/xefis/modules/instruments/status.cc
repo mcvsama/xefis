@@ -73,11 +73,11 @@ Status::Message::color() const noexcept
 }
 
 
-Status::Status (std::string const& instance):
-	Instrument (instance),
+Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (1.0)
 {
-	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder> (input_cursor_value, [this](int delta) {
+	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder> (io.input_cursor_value, [this](int delta) {
 		if (delta > 0)
 		{
 			for (int i = 0; i < delta; ++i)
@@ -136,10 +136,10 @@ Status::process (v2::Cycle const& cycle)
 		m.process (cycle.update_time());
 
 	if (_button_master_caution_pressed())
-		output_master_caution = false;
+		io.output_master_caution = false;
 
 	if (_button_master_warning_pressed())
-		output_master_warning = false;
+		io.output_master_warning = false;
 
 	if (_button_cursor_del_pressed())
 		cursor_del();
@@ -148,7 +148,7 @@ Status::process (v2::Cycle const& cycle)
 		recall();
 
 	if (_button_clear_pressed())
-		if (xf::TimeHelper::now() - _last_message_timestamp > *this->minimum_display_time)
+		if (xf::TimeHelper::now() - _last_message_timestamp > *io.minimum_display_time)
 			clear();
 
 	// Move messages that need to be shown to _visible_messages and hidden to _hidden_messages:
@@ -171,11 +171,11 @@ Status::process (v2::Cycle const& cycle)
 
 	// Update CAUTION and WARNING alarms:
 
-	output_master_caution =
+	io.output_master_caution =
 		std::any_of (_visible_messages.begin(), _visible_messages.end(),
 					 [](auto const& m) { return m->severity() == Severity::Caution; });
 
-	output_master_warning =
+	io.output_master_warning =
 		std::any_of (_visible_messages.begin(), _visible_messages.end(),
 					 [](auto const& m) { return m->severity() == Severity::Warning; });
 }

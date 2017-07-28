@@ -31,16 +31,7 @@
 #include <xefis/utility/smoother.h>
 
 
-/**
- * Warning: this module uses I2C I/O in main thread, which may block.
- * TODO The above has to be fixed.
- *
- * Handles EagleTree Airspeed V3 sensor.
- * The sensor must be in default mode, not in 3-rd party mode.
- */
-class ETSAirspeed:
-	public QObject,
-	public v2::Module
+class ETSAirspeedIO: public v2::ModuleIO
 {
   public:
 	/*
@@ -58,10 +49,23 @@ class ETSAirspeed:
 	v2::PropertyOut<si::Velocity>	output_airspeed				{ this, "/airspeed" };
 	v2::PropertyOut<si::Velocity>	output_airspeed_minimum		{ this, "/airspeed.minimum" };
 	v2::PropertyOut<si::Velocity>	output_airspeed_maximum		{ this, "/airspeed.maximum" };
+};
 
-  private:
+
+/**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ * TODO The above has to be fixed.
+ *
+ * Handles EagleTree Airspeed V3 sensor.
+ * The sensor must be in default mode, not in 3-rd party mode.
+ */
+class ETSAirspeed:
+	public QObject,
+	public v2::Module<ETSAirspeedIO>
+{
 	Q_OBJECT
 
+  private:
 	static constexpr uint8_t		kValueRegister				= 0xea;
 	static constexpr float			kValueScale					= 1.8f;
 	static constexpr si::Time		kInitializationDelay		= 0.2_s;
@@ -77,7 +81,7 @@ class ETSAirspeed:
   public:
 	// Ctor
 	explicit
-	ETSAirspeed (xf::i2c::Device&&, std::string const& instance = {});
+	ETSAirspeed (std::unique_ptr<ETSAirspeedIO>, xf::i2c::Device&&, std::string const& instance = {});
 
 	// Module API
 	void

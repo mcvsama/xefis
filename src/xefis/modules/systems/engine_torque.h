@@ -29,17 +29,9 @@
 #include <xefis/utility/datatable2d.h>
 
 
-/**
- * This module computes motor torque from the measured current drawn by motor.
- * These are the formulas:
- *   Kv = x [RPM / V]
- *   Kt = 1 / Kv = 1/x [Nm / A]
- * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Datatable2D,
- * as a function of motor rotational speed.
- */
-class EngineTorque: public v2::Module
+class EngineTorqueIO: public v2::ModuleIO
 {
-  private:
+  public:
 	using EfficiencyDatatable	= xf::Datatable2D<si::AngularVelocity, double>;
 	using EngineEfficiency		= boost::variant<double, EfficiencyDatatable>;
 	using MotorKv				= decltype (1.0_rpm / 1.0_V);
@@ -64,11 +56,26 @@ class EngineTorque: public v2::Module
 	 */
 
 	v2::PropertyOut<si::Torque>			output_engine_torque		{ this, "/engine-torque" };
+};
+
+
+/**
+ * This module computes motor torque from the measured current drawn by motor.
+ * These are the formulas:
+ *   Kv = x [RPM / V]
+ *   Kt = 1 / Kv = 1/x [Nm / A]
+ * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Datatable2D,
+ * as a function of motor rotational speed.
+ */
+class EngineTorque: public v2::Module<EngineTorqueIO>
+{
+  private:
+	using EfficiencyDatatable = EngineTorqueIO::EfficiencyDatatable;
 
   public:
 	// Ctor
 	explicit
-	EngineTorque (std::string const& instance = {});
+	EngineTorque (std::unique_ptr<EngineTorqueIO>, std::string const& instance = {});
 
   protected:
 	// Module API

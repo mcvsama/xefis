@@ -27,8 +27,8 @@
 #include "klog_monitor.h"
 
 
-KLogMonitor::KLogMonitor (std::string const& instance):
-	Module (instance)
+KLogMonitor::KLogMonitor (std::unique_ptr<KLogMonitorIO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	_timer = new QTimer (this);
 	_timer->setInterval (100);
@@ -36,10 +36,10 @@ KLogMonitor::KLogMonitor (std::string const& instance):
 	QObject::connect (_timer, SIGNAL (timeout()), this, SLOT (check_klog()));
 	_timer->start();
 
-	output_flag_oom = true;
-	output_flag_io = true;
-	output_flag_oops = true;
-	output_flag_bug = true;
+	io.output_flag_oom = true;
+	io.output_flag_io = true;
+	io.output_flag_oops = true;
+	io.output_flag_bug = true;
 }
 
 
@@ -53,18 +53,18 @@ KLogMonitor::check_klog()
 
 	// Search for OOMs:
 	if (buffer.find ("oom-killer") != std::string::npos)
-		output_flag_oom = true;
+		io.output_flag_oom = true;
 
 	// Search for I/O errors:
 	if (buffer.find ("i/o error") != std::string::npos)
-		output_flag_io = true;
+		io.output_flag_io = true;
 
 	// Search for Oopses:
 	if (buffer.find (" oops") != std::string::npos)
-		output_flag_oops = true;
+		io.output_flag_oops = true;
 
 	// Search for BUGs:
 	if (buffer.find (" bug") != std::string::npos)
-		output_flag_bug = true;
+		io.output_flag_bug = true;
 }
 

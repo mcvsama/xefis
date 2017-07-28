@@ -28,17 +28,8 @@
 #include <xefis/support/bus/i2c.h>
 
 
-/**
- * Warning: this module uses I2C I/O in main thread, which may block.
- *
- * This module interfaces Bochs' BMP085 presure and temperature sensor.
- */
-class BMP085:
-	public QObject,
-	public v2::Module
+class BMP085_IO: public v2::ModuleIO
 {
-	Q_OBJECT
-
   public:
 	/*
 	 * Settings
@@ -53,9 +44,22 @@ class BMP085:
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>				_serviceable						{ this, "/serviceable" };
-	v2::PropertyOut<si::Temperature>	_temperature						{ this, "/measured-temperature" };
-	v2::PropertyOut<si::Pressure>		_pressure							{ this, "/measured-pressure" };
+	v2::PropertyOut<bool>				serviceable							{ this, "/serviceable" };
+	v2::PropertyOut<si::Temperature>	temperature							{ this, "/measured-temperature" };
+	v2::PropertyOut<si::Pressure>		pressure							{ this, "/measured-pressure" };
+};
+
+
+/**
+ * Warning: this module uses I2C I/O in main thread, which may block.
+ *
+ * This module interfaces Bochs' BMP085 presure and temperature sensor.
+ */
+class BMP085:
+	public QObject,
+	public v2::Module<BMP085_IO>
+{
+	Q_OBJECT
 
   public:
 	/**
@@ -72,7 +76,7 @@ class BMP085:
   public:
 	// Ctor
 	explicit
-	BMP085 (std::string const& instance = {});
+	BMP085 (std::unique_ptr<BMP085_IO>, std::string const& instance = {});
 
 	// Module API
 	void

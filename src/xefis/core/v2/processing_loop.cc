@@ -45,7 +45,7 @@ void
 ProcessingLoop::start()
 {
 	for (auto* module: _uninitialized_modules)
-		Module::ProcessingLoopAPI (module).verify_settings();
+		ModuleIO::ProcessingLoopAPI (module->io_base()).verify_settings();
 
 	for (auto* module: _uninitialized_modules)
 		module->initialize();
@@ -92,11 +92,11 @@ ProcessingLoop::execute_cycle()
 	compatibility_input();
 
 	for (auto& module: _modules)
-		v2::Module::ProcessingLoopAPI (module.get()).reset_cache();
+		BasicModule::ProcessingLoopAPI (module.get()).reset_cache();
 
 	// TODO module accounting
 	for (auto& module: _modules)
-		v2::Module::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
+		BasicModule::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
 
 	compatibility_output();
 

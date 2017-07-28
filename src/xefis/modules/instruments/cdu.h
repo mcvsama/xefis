@@ -32,7 +32,7 @@
 
 
 class CDU:
-	public v2::Instrument,
+	public v2::Instrument<>,
 	protected xf::InstrumentAids
 {
   public:

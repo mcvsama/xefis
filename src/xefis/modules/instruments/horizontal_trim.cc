@@ -26,16 +26,16 @@
 #include "horizontal_trim.h"
 
 
-HorizontalTrim::HorizontalTrim (std::string const& instance):
-	Instrument (instance),
+HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (0.5f)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
 	_inputs_observer.observe ({
-		&input_trim_value,
-		&input_trim_reference,
-		&input_trim_reference_minimum,
-		&input_trim_reference_maximum,
+		&io.input_trim_value,
+		&io.input_trim_reference,
+		&io.input_trim_reference_minimum,
+		&io.input_trim_reference_maximum,
 	});
 }
 
@@ -64,14 +64,14 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	auto trim = input_trim_value.get_optional();
+	auto trim = io.input_trim_value.get_optional();
 
 	if (trim)
 		trim = xf::clamped (*trim, -1.0, +1.0);
 
-	auto ref = input_trim_reference.get_optional();
-	auto ref_min = input_trim_reference_minimum.get_optional();
-	auto ref_max = input_trim_reference_maximum.get_optional();
+	auto ref = io.input_trim_reference.get_optional();
+	auto ref_min = io.input_trim_reference_minimum.get_optional();
+	auto ref_max = io.input_trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = width() - h;
@@ -98,8 +98,8 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	painter().setTransform (center_point_transform);
 	painter().drawPolyline (line);
 	painter().drawLine (QPointF (0.0, -0.5 * h), QPointF (0.0, 0.0));
-	painter().fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, *this->label_min);
-	painter().fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, *this->label_max);
+	painter().fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, *io.label_min);
+	painter().fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, *io.label_max);
 
 	// Reference range:
 	if (ref_min && ref_max)
@@ -123,7 +123,7 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	// Cyan label:
 	painter().setFont (label_font);
 	painter().setPen (cyan);
-	painter().fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, *this->label);
+	painter().fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, *io.label);
 
 	// Pointer:
 	if (trim)

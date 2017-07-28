@@ -27,41 +27,9 @@
 #include "linear_indicator.h"
 
 
-BasicIndicator::BasicIndicator (std::string const& instance):
-	xf::InstrumentAids (1.0f),
-	Instrument (instance)
-{ }
-
-
-void
-BasicIndicator::resizeEvent (QResizeEvent*)
-{
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
-
-	InstrumentAids::update_sizes (size(), window()->size());
-}
-
-
-QString
-BasicIndicator::stringify_value (double value) const
-{
-	double numeric_value = value;
-
-	if (*this->precision < 0)
-		numeric_value /= std::pow (10.0, -*this->precision);
-
-	if (*this->modulo > 0)
-		numeric_value = static_cast<int> (numeric_value) / *this->modulo * *this->modulo;
-
-	return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, *this->precision));
-}
-
-
-LinearIndicator::LinearIndicator (v2::PropertyDigitizer value_digitizer, std::string const& instance):
+LinearIndicator::LinearIndicator (std::unique_ptr<LinearIndicatorIO> module_io, v2::PropertyDigitizer value_digitizer, std::string const& instance):
 	InstrumentAids (0.8f),
-	BasicIndicator (instance),
+	BasicIndicator (std::move (module_io), instance),
 	_value_digitizer (value_digitizer)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
@@ -80,7 +48,7 @@ void
 LinearIndicator::paintEvent (QPaintEvent*)
 {
 	std::optional<double> value = _value_digitizer.to_numeric();
-	xf::Range<double> range { *this->value_minimum, *this->value_maximum };
+	xf::Range<double> range { *io.value_minimum, *io.value_maximum };
 
 	auto painting_token = get_token (this);
 
@@ -92,7 +60,7 @@ LinearIndicator::paintEvent (QPaintEvent*)
 
 	clear_background();
 
-	if (*this->mirrored_style)
+	if (*io.mirrored_style)
 	{
 		painter().translate (w, 0.f);
 		painter().scale (-1.f, 1.f);
@@ -151,7 +119,7 @@ LinearIndicator::paintEvent (QPaintEvent*)
 	painter().drawRect (text_rect);
 	QPointF position;
 
-	if (*this->mirrored_style)
+	if (*io.mirrored_style)
 	{
 		position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
 		position = painter().transform().map (position);
@@ -167,6 +135,6 @@ LinearIndicator::paintEvent (QPaintEvent*)
 QString
 LinearIndicator::pad_string (QString const& input) const
 {
-	return QString ("%1").arg (input, *this->digits);
+	return QString ("%1").arg (input, *io.digits);
 }
 

@@ -25,7 +25,7 @@
 #include <xefis/utility/smoother.h>
 
 
-class VOR: public v2::Module
+class VOR_IO: public v2::ModuleIO
 {
   public:
 	/*
@@ -49,11 +49,15 @@ class VOR: public v2::Module
 	v2::PropertyOut<si::Angle>	output_deviation				{ this, "/deviation" };
 	v2::PropertyOut<bool>		output_to_flag					{ this, "/to-flag" };
 	v2::PropertyOut<si::Length>	output_distance					{ this, "/distance" };
+};
 
+
+class VOR: public v2::Module<VOR_IO>
+{
   public:
 	// Ctor
 	explicit
-	VOR (std::string const& instance = {});
+	VOR (std::unique_ptr<VOR_IO>, std::string const& instance = {});
 
 	// Module API
 	void

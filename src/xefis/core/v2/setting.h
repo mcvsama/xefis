@@ -29,7 +29,7 @@
 
 namespace v2 {
 
-class Module;
+class ModuleIO;
 
 
 /**
@@ -49,13 +49,13 @@ class BasicSetting
 	 * Store pointer to owning module.
 	 */
 	explicit
-	BasicSetting (Module* owner);
+	BasicSetting (ModuleIO* owner);
 
 	/**
 	 * Return owning module.
 	 */
-	Module*
-	owner() const noexcept;
+	ModuleIO*
+	io() const noexcept;
 
 	/**
 	 * Return true if setting has a value.
@@ -64,7 +64,7 @@ class BasicSetting
 	operator bool() const noexcept = 0;
 
   private:
-	Module* _owner;
+	ModuleIO* _owner;
 };
 
 
@@ -78,24 +78,29 @@ template<class pValue>
 	  public:
 		typedef pValue Value;
 
+		class Uninitialized: public xf::Exception
+		{
+			using Exception::Exception;
+		};
+
 	  public:
 		/**
 		 * Create a setting object that requires explicit setting of a value.
 		 */
 		explicit
-		Setting (Module* owner);
+		Setting (ModuleIO* owner);
 
 		/**
 		 * Creates a setting object that has an initial value.
 		 */
 		explicit
-		Setting (Module* owner, Value&& initial_value);
+		Setting (ModuleIO* owner, Value&& initial_value);
 
 		/**
 		 * Creates a setting that doesn't have and doesn't require any value.
 		 */
 		explicit
-		Setting (Module* owner, OptionalTag);
+		Setting (ModuleIO* owner, OptionalTag);
 
 		/**
 		 * Copy-assignment operator.
@@ -113,19 +118,19 @@ template<class pValue>
 		 * Read the setting value.
 		 */
 		Value&
-		operator*() noexcept;
+		operator*();
 
 		/**
 		 * Read the setting value.
 		 */
 		Value const&
-		operator*() const noexcept;
+		operator*() const;
 
 		/**
 		 * Read the setting value.
 		 */
 		Value const*
-		operator->() const noexcept;
+		operator->() const;
 
 		// BasicSetting API
 		operator bool() const noexcept override;
@@ -136,13 +141,13 @@ template<class pValue>
 	};
 
 
-inline BasicSetting::BasicSetting (Module* owner):
+inline BasicSetting::BasicSetting (ModuleIO* owner):
 	_owner (owner)
 { }
 
 
-inline Module*
-BasicSetting::owner() const noexcept
+inline ModuleIO*
+BasicSetting::io() const noexcept
 {
 	return _owner;
 }
@@ -150,14 +155,14 @@ BasicSetting::owner() const noexcept
 
 template<class V>
 	inline
-	Setting<V>::Setting (Module* owner):
+	Setting<V>::Setting (ModuleIO* owner):
 		BasicSetting (owner)
 	{ }
 
 
 template<class V>
 	inline
-	Setting<V>::Setting (Module* owner, Value&& initial_value):
+	Setting<V>::Setting (ModuleIO* owner, Value&& initial_value):
 		BasicSetting (owner),
 		_value (std::forward<Value> (initial_value)),
 		_required (true)
@@ -166,7 +171,7 @@ template<class V>
 
 template<class V>
 	inline
-	Setting<V>::Setting (Module* owner, OptionalTag):
+	Setting<V>::Setting (ModuleIO* owner, OptionalTag):
 		BasicSetting (owner),
 		_required (false)
 	{ }
@@ -191,24 +196,33 @@ template<class V>
 
 template<class V>
 	inline auto
-	Setting<V>::operator*() noexcept -> Value&
+	Setting<V>::operator*() -> Value&
 	{
+		if (!_value)
+			throw Uninitialized ("reading uninitialized setting");
+
 		return *_value;
 	}
 
 
 template<class V>
 	inline auto
-	Setting<V>::operator*() const noexcept -> Value const&
+	Setting<V>::operator*() const -> Value const&
 	{
+		if (!_value)
+			throw Uninitialized ("reading uninitialized setting");
+
 		return *_value;
 	}
 
 
 template<class V>
 	inline auto
-	Setting<V>::operator->() const noexcept -> Value const*
+	Setting<V>::operator->() const -> Value const*
 	{
+		if (!_value)
+			throw Uninitialized ("reading uninitialized setting");
+
 		return &_value.value();
 	}
 

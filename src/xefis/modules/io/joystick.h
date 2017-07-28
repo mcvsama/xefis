@@ -34,20 +34,26 @@
 #include <xefis/utility/range.h>
 
 
-class JoystickInput:
-	public QObject,
-	public v2::Module
+class JoystickInputIO: public v2::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<bool>			restart_on_failure		{ this, true };
+	v2::Setting<bool>	restart_on_failure	{ this, true };
 
-  private:
+	// TODO PropertyOuts for axes and buttons
+};
+
+
+class JoystickInput:
+	public QObject,
+	public v2::Module<JoystickInputIO>
+{
 	Q_OBJECT
 
+  private:
 	// This is defined by HID interface:
 	static constexpr size_t kMaxEventID = 256;
 
@@ -154,7 +160,7 @@ class JoystickInput:
   public:
 	// Ctor
 	explicit
-	JoystickInput (QDomElement const& config, std::string const& instance = {});
+	JoystickInput (std::unique_ptr<JoystickInputIO>, QDomElement const& config, std::string const& instance = {});
 
 	// Module API
 	void

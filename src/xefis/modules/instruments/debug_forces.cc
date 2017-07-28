@@ -21,8 +21,8 @@
 #include "debug_forces.h"
 
 
-DebugForces::DebugForces (std::string const& instance):
-	Instrument (instance),
+DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, std::string const& instance):
+	Instrument (std::move (module_io), instance),
 	InstrumentAids (1.0f)
 { }
 
@@ -46,13 +46,13 @@ DebugForces::paintEvent (QPaintEvent*)
 	QPointF measured_accel;
 	QPointF earth_accel;
 
-	if (input_centrifugal_accel_y && input_centrifugal_accel_z)
-		centrifugal_accel = QPointF (input_centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
-									 input_centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
+	if (io.input_centrifugal_accel_y && io.input_centrifugal_accel_z)
+		centrifugal_accel = QPointF (io.input_centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
+									 io.input_centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
 
-	if (input_measured_accel_y && input_measured_accel_z)
-		measured_accel = QPointF (input_measured_accel_y->quantity<Gravity>() * one_gravity_length,
-								  input_measured_accel_z->quantity<Gravity>() * one_gravity_length);
+	if (io.input_measured_accel_y && io.input_measured_accel_z)
+		measured_accel = QPointF (io.input_measured_accel_y->quantity<Gravity>() * one_gravity_length,
+								  io.input_measured_accel_z->quantity<Gravity>() * one_gravity_length);
 
 	earth_accel = measured_accel - centrifugal_accel;
 
@@ -62,10 +62,10 @@ DebugForces::paintEvent (QPaintEvent*)
 	painter().setPen (get_pen (Qt::white, 0.5));
 	painter().drawLine (QPointF (-0.5 * width(), 0.0), QPointF (0.5 * width(), 0.0));
 
-	if (input_orientation_roll)
+	if (io.input_orientation_roll)
 	{
 		// Plane reference frame:
-		painter().rotate (input_orientation_roll->quantity<Degree>());
+		painter().rotate (io.input_orientation_roll->quantity<Degree>());
 		// Plane:
 		painter().setPen (get_pen (Qt::white, 2.5));
 		painter().drawLine (QPointF (-0.25 * width(), 0.0), QPointF (0.25 * width(), 0.0));
@@ -79,5 +79,7 @@ DebugForces::paintEvent (QPaintEvent*)
 		painter().setPen (get_pen (Qt::blue, 1.0));
 		painter().drawLine (center, centrifugal_accel);
 	}
+
+	// TODO set output properties
 }
 

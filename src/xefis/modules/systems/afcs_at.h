@@ -29,7 +29,7 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class AFCS_AT: public v2::Module
+class AFCS_AT_IO: public v2::ModuleIO
 {
   public:
 	enum class SpeedMode
@@ -69,12 +69,16 @@ class AFCS_AT: public v2::Module
 	 * Input/Output
 	 */
 
-	v2::PropertyOut<bool>					io_disengage_at					{ this, "/disengage-at" };
+	v2::PropertyOut<bool>					disengage_at					{ this, "/disengage-at" };
+};
 
+
+class AFCS_AT: public v2::Module<AFCS_AT_IO>
+{
   public:
 	// Ctor
 	explicit
-	AFCS_AT (std::string const& instance = {});
+	AFCS_AT (std::unique_ptr<AFCS_AT_IO>, std::string const& instance = {});
 
   protected:
 	// Module API

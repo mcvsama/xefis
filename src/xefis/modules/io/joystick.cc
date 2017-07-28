@@ -171,18 +171,18 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (QDomElement const& config, std::string const& instance):
-	Module (instance)
+JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_button_properties[handler_id] = std::make_unique<v2::PropertyOut<bool>> (this, "/buttons/" + std::to_string (handler_id));
+		_button_properties[handler_id] = std::make_unique<v2::PropertyOut<bool>> (&io, "/buttons/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<double>> (this, "/axes/" + std::to_string (handler_id));
+		_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<double>> (&io, "/axes/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 	{
-		_angle_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<si::Angle>> (this, "/axes(angle)/" + std::to_string (handler_id));
+		_angle_axis_properties[handler_id] = std::make_unique<v2::PropertyOut<si::Angle>> (&io, "/axes(angle)/" + std::to_string (handler_id));
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 
@@ -303,7 +303,7 @@ JoystickInput::failure()
 void
 JoystickInput::restart()
 {
-	if (this->restart_on_failure)
+	if (io.restart_on_failure)
 		_reopen_timer->start();
 }
 
