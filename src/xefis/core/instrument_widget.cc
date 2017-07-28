@@ -68,7 +68,9 @@ InstrumentWidget::PaintWorkUnit::execute()
 		});
 
 		bool paint_again = false;
-		paint (_image);
+
+		if (!_image.isNull())
+			paint (_image);
 
 		m.synchronize ([&] {
 			_widget->_paint_buffer = _image;
