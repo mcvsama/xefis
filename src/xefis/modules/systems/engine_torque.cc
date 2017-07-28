@@ -13,9 +13,7 @@
 
 // Standard:
 #include <cstddef>
-
-// Boost:
-#include <boost/variant.hpp>
+#include <variant>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -32,7 +30,7 @@ EngineTorque::EngineTorque (std::unique_ptr<EngineTorqueIO> module_io, std::stri
 void
 EngineTorque::process (v2::Cycle const&)
 {
-	struct TorqueComputer: public boost::static_visitor<>
+	struct TorqueComputer
 	{
 		explicit
 		TorqueComputer (EngineTorque* module):
@@ -53,7 +51,7 @@ EngineTorque::process (v2::Cycle const&)
 		EngineTorque* _module;
 	};
 
-	boost::apply_visitor (TorqueComputer (this), *io.setting_motor_efficiency);
+	std::visit (TorqueComputer (this), *io.setting_motor_efficiency);
 }
 
 
@@ -70,7 +68,7 @@ EngineTorque::compute_torque (double motor_efficiency)
 void
 EngineTorque::compute_torque (EfficiencyDatatable const& motor_efficiency)
 {
-	Optional<double> efficiency;
+	std::optional<double> efficiency;
 
 	if (io.input_engine_speed && (efficiency = motor_efficiency.value (*io.input_engine_speed)))
 		compute_torque (*efficiency);

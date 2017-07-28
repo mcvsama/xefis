@@ -88,7 +88,7 @@ template<class pArgument, class pValue>
 		 * Result will be defined only if argument is within bounds of data-table arguments.
 		 * The result will be interpolated.
 		 */
-		Optional<Value>
+		std::optional<Value>
 		value (Argument const&) const noexcept;
 
 		/**
@@ -175,9 +175,9 @@ template<class pArgument, class pValue>
 		in_domain_value (Argument const&) const noexcept;
 
 	  private:
-		DataMap					_data_map;
-		mutable Optional<Point>	_cached_min_value;
-		mutable Optional<Point>	_cached_max_value;
+		DataMap							_data_map;
+		mutable std::optional<Point>	_cached_min_value;
+		mutable std::optional<Point>	_cached_max_value;
 	};
 
 
@@ -212,7 +212,7 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline Optional<typename Datatable2D<A, V>::Value>
+	inline std::optional<typename Datatable2D<A, V>::Value>
 	Datatable2D<A, V>::value (Argument const& argument) const noexcept
 	{
 		// Outside of domain?

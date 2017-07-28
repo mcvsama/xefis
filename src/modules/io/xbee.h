@@ -406,7 +406,7 @@ class XBee:
 	QString					_remote_address_string;
 	uint16_t				_local_address			= 0;
 	uint16_t				_remote_address			= 0;
-	Optional<int>			_power_level;
+	std::optional<int>		_power_level;
 	ConfigurationStep		_configuration_step		= ConfigurationStep::Unconfigured;
 	int						_read_failure_count		= 0;
 	int						_write_failure_count	= 0;

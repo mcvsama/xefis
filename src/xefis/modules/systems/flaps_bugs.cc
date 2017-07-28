@@ -37,10 +37,10 @@ FlapsBugs::process (v2::Cycle const&)
 			io.output_flaps_up_label = "UP";
 			io.output_flaps_up_speed = *io.setting_margin_factor * _flaps.find_setting (0_deg).speed_range().min();
 
-			Optional<std::string> label_a;
-			Optional<si::Velocity> speed_a;
-			Optional<std::string> label_b;
-			Optional<si::Velocity> speed_b;
+			std::optional<std::string> label_a;
+			std::optional<si::Velocity> speed_a;
+			std::optional<std::string> label_b;
+			std::optional<si::Velocity> speed_b;
 
 			auto sett_b = _flaps.find_setting (*io.input_flaps_setting);
 			auto sett_a = sett_b.prev();

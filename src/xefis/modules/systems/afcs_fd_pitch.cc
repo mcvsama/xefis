@@ -92,23 +92,23 @@ AFCS_FD_Pitch::compute_pitch()
 {
 	si::Time update_dt = _pitch_computer.update_dt();
 	bool disengage = false;
-	Optional<si::Angle> pitch;
+	std::optional<si::Angle> pitch;
 
 	// Always compute all PIDs. Use their output only when it's needed.
 
 	// TODO Change all Ranges here to settings.
-	Optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, io.input_cmd_ias, io.input_measured_ias, update_dt);
-	Optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, io.input_cmd_mach, io.input_measured_mach, update_dt);
-	Optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, io.input_cmd_alt, io.input_measured_alt, update_dt);
-	Optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, io.input_cmd_vs, io.input_measured_vs, update_dt);
-	Optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, io.input_cmd_fpa, io.input_measured_fpa, update_dt);
-	Optional<si::Angle> pitch_for_vnavpath;//TODO
-	Optional<si::Angle> pitch_for_gs;//TODO
-	Optional<si::Angle> pitch_for_flare;//TODO
+	std::optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, io.input_cmd_ias, io.input_measured_ias, update_dt);
+	std::optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, io.input_cmd_mach, io.input_measured_mach, update_dt);
+	std::optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, io.input_cmd_alt, io.input_measured_alt, update_dt);
+	std::optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, io.input_cmd_vs, io.input_measured_vs, update_dt);
+	std::optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, io.input_cmd_fpa, io.input_measured_fpa, update_dt);
+	std::optional<si::Angle> pitch_for_vnavpath;//TODO
+	std::optional<si::Angle> pitch_for_gs;//TODO
+	std::optional<si::Angle> pitch_for_flare;//TODO
 
 	// TODO use transistor
 
-	auto use_result = [&](Optional<si::Angle> const& use_pitch) {
+	auto use_result = [&](std::optional<si::Angle> const& use_pitch) {
 		if (use_pitch)
 			pitch = use_pitch;
 		else
@@ -177,7 +177,7 @@ AFCS_FD_Pitch::compute_pitch()
 
 
 template<class Input, class Control>
-	Optional<si::Angle>
+	std::optional<si::Angle>
 	AFCS_FD_Pitch::compute_pitch (xf::PIDControl<Input, Control>& pid,
 								  v2::PropertyIn<Input> const& cmd_param,
 								  v2::PropertyIn<Input> const& measured_param,

@@ -105,7 +105,7 @@ class Airframe
 	 * \param cl
 	 *        Lift coefficient.
 	 */
-	Optional<Angle>
+	std::optional<Angle>
 	get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&, SpoilersAngle const&) const;
 
 	/**

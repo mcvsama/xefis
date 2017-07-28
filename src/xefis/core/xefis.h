@@ -102,15 +102,15 @@ class Xefis: public QApplication
 		explicit
 		OptionsHelper (Xefis*);
 
-		Optional<int>
+		std::optional<int>
 		watchdog_write_fd() const noexcept;
 
-		Optional<int>
+		std::optional<int>
 		watchdog_read_fd() const noexcept;
 
 	  private:
-		Optional<int>	_watchdog_write_fd;
-		Optional<int>	_watchdog_read_fd;
+		std::optional<int>	_watchdog_write_fd;
+		std::optional<int>	_watchdog_read_fd;
 	};
 
 	// Options related to command line arguments.
@@ -308,14 +308,14 @@ Xefis::OptionsHelper::OptionsHelper (Xefis* xefis)
 }
 
 
-inline Optional<int>
+inline std::optional<int>
 Xefis::OptionsHelper::watchdog_write_fd() const noexcept
 {
 	return _watchdog_write_fd;
 }
 
 
-inline Optional<int>
+inline std::optional<int>
 Xefis::OptionsHelper::watchdog_read_fd() const noexcept
 {
 	return _watchdog_read_fd;

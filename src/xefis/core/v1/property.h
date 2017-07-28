@@ -315,9 +315,9 @@ template<class tType>
 		operator= (Property const& other);
 
 		/**
-		 * Get Optional value. Takes 'nil' value into account.
+		 * Get std::optional value. Takes 'nil' value into account.
 		 */
-		Optional<Type>
+		std::optional<Type>
 		get_optional() const;
 
 		/**
@@ -347,26 +347,26 @@ template<class tType>
 		operator->() const;
 
 		/**
-		 * Overload for write (Optional<Type>&);
+		 * Overload for write (std::optional<Type>&);
 		 * \return	*this
 		 */
 		Property<Type>&
-		operator= (Optional<Type> const&);
+		operator= (std::optional<Type> const&);
 
 		/**
 		 * Write to the property.
-		 * If Optional doesn't hold a value, set the property to nil.
+		 * If std::optional doesn't hold a value, set the property to nil.
 		 */
 		void
-		write (Optional<Type> const&);
+		write (std::optional<Type> const&);
 
 		/**
 		 * Write to the property.
-		 * If Optional doesn't hold a value, set the property to nil.
+		 * If std::optional doesn't hold a value, set the property to nil.
 		 * If node can't be found, throw PropertyNotFound.
 		 */
 		void
-		write_signalling (Optional<Type> const&);
+		write_signalling (std::optional<Type> const&);
 
 		/**
 		 * Sets value (like write) if property is not singular
@@ -834,12 +834,12 @@ template<class T>
 
 
 template<class T>
-	inline Optional<T>
+	inline std::optional<T>
 	Property<T>::get_optional() const
 	{
 		if (is_nil())
-			return Optional<T>();
-		return Optional<T> (**this);
+			return std::optional<T>();
+		return std::optional<T> (**this);
 	}
 
 
@@ -894,7 +894,7 @@ template<class T>
 
 template<class T>
 	inline Property<T>&
-	Property<T>::operator= (Optional<Type> const& value)
+	Property<T>::operator= (std::optional<Type> const& value)
 	{
 		write (value);
 		return *this;
@@ -903,7 +903,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write (Optional<Type> const& value)
+	Property<T>::write (std::optional<Type> const& value)
 	{
 		if (value)
 		{
@@ -930,7 +930,7 @@ template<class T>
 
 template<class T>
 	inline void
-	Property<T>::write_signalling (Optional<Type> const& value)
+	Property<T>::write_signalling (std::optional<Type> const& value)
 	{
 		if (value)
 		{

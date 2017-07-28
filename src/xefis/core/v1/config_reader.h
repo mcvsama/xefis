@@ -28,7 +28,7 @@
 #include <QtWidgets/QLayout>
 
 // Boost:
-#include <boost/any.hpp>
+#include <boost/lexical_cast.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -95,7 +95,7 @@ template<class Q,
 // Covers Optional<> types.
 template<class T>
 	static inline void
-	assign (Optional<T>& target, std::string const& value_str)
+	assign (std::optional<T>& target, std::string const& value_str)
 	{
 		T t;
 		assign (t, value_str);

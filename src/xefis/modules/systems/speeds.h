@@ -62,11 +62,11 @@ class Speeds: public v2::Module<SpeedsIO>
 
 	template<class T>
 		static T
-		max (Optional<T>, T);
+		max (std::optional<T>, T);
 
 	template<class T>
 		static T
-		min (Optional<T>, T);
+		min (std::optional<T>, T);
 
   private:
 	xf::Airframe*			_airframe;

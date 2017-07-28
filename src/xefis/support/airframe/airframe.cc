@@ -88,10 +88,11 @@ Airframe::get_cd (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle
 }
 
 
-Optional<Angle>
+std::optional<Angle>
 Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
 {
-	Optional<Angle> normal_aoa = lift().get_aoa_in_normal_regime (cl);
+	std::optional<Angle> normal_aoa = lift().get_aoa_in_normal_regime (cl);
+
 	if (normal_aoa)
 	{
 		Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle.value());

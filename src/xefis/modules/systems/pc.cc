@@ -307,7 +307,7 @@ PerformanceComputer::compute_speeds_vbg()
 
 		xf::Range<si::Angle> aoa_range = _airframe->get_defined_aoa_range();
 
-		Optional<si::Angle> v_bg_aoa;
+		std::optional<si::Angle> v_bg_aoa;
 		double v_bg_ratio = std::numeric_limits<double>::max();
 
 		for (si::Angle aoa = aoa_range.min(); aoa < aoa_range.max(); aoa += 0.25_deg)
@@ -340,7 +340,7 @@ PerformanceComputer::compute_speeds_vbg()
 }
 
 
-Optional<si::Velocity>
+std::optional<si::Velocity>
 PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 {
 	// Formula:
@@ -365,7 +365,7 @@ PerformanceComputer::get_stall_ias (Angle const& max_bank_angle) const
 }
 
 
-Optional<si::Velocity>
+std::optional<si::Velocity>
 PerformanceComputer::tas_to_ias (si::Velocity const& tas) const
 {
 	if (io.input_density_altitude)
@@ -494,8 +494,8 @@ PerformanceComputer::compute_slip_skid()
 }
 
 
-inline Optional<si::Velocity>
-PerformanceComputer::aoa_to_tas_now (Angle const& aoa, Optional<Acceleration> const& load) const
+inline std::optional<si::Velocity>
+PerformanceComputer::aoa_to_tas_now (Angle const& aoa, std::optional<Acceleration> const& load) const
 {
 	if (_airframe && io.input_load && io.input_aircraft_mass && io.input_air_density_static && io.input_flaps_angle && io.input_spoilers_angle)
 	{

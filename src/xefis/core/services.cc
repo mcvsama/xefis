@@ -91,7 +91,7 @@ Services::features()
 
 
 Services::CallOutEvent*
-Services::call_out (boost::function<void()> callback)
+Services::call_out (std::function<void()> callback)
 {
 	CallOutEvent* e = new CallOutEvent (callback);
 	QApplication::postEvent (_call_out_dispatcher.get(), e);

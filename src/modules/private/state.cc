@@ -250,7 +250,7 @@ State::prepare_efis_settings()
 	make_toggle (_mcp_fpv, _setting_efis_fpv_visible);
 
 	_mcp_range_decoder = std::make_unique<xf::DeltaDecoder> (_mcp_range_value, [this](int delta) {
-		Optional<Length> new_half_range;
+		std::optional<Length> new_half_range;
 		delta = -delta;
 
 		constexpr Length da = 0.01_nmi;

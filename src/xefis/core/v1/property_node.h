@@ -342,7 +342,7 @@ template<class tType>
 		 * doesn't hold any value, set node to nil.
 		 */
 		void
-		write (Optional<Type> const& value);
+		write (std::optional<Type> const& value);
 
 		/**
 		 * Return human-readable value for UI.
@@ -563,7 +563,7 @@ template<class T>
 
 template<class T>
 	inline void
-	PropertyValueNode<T>::write (Optional<Type> const& value)
+	PropertyValueNode<T>::write (std::optional<Type> const& value)
 	{
 		if (value)
 			write (*value);

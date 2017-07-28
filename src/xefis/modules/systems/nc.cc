@@ -275,7 +275,7 @@ NavigationComputer::compute_track()
 		io.output_track_lateral_magnetic.set_nil();
 	}
 
-	Optional<si::AngularVelocity> result_rotation_speed;
+	std::optional<si::AngularVelocity> result_rotation_speed;
 
 	if (pos_last.valid && pos_prev.valid && pos_prev_prev.valid)
 	{

@@ -62,9 +62,9 @@ class ArrivalETA: public v2::Module<ArrivalETA_IO>
 	compute();
 
   private:
-	xf::Smoother<si::Time>	_smoother { 3_s };
-	Optional<si::Length>	_prev_distance;
-	v2::PropertyObserver	_eta_computer;
+	xf::Smoother<si::Time>		_smoother { 3_s };
+	std::optional<si::Length>	_prev_distance;
+	v2::PropertyObserver		_eta_computer;
 };
 
 #endif

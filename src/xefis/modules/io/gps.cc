@@ -14,11 +14,8 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <ctime>
-
-// Lib:
-#include <boost/lexical_cast.hpp>
-#include <boost/optional.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -131,7 +128,7 @@ void
 GPS::Connection::request_new_baud_rate (unsigned int baud_rate)
 {
 	_gps_module.log() << "Requesting baud-rate switch from " << _serial_port_config.baud_rate() << " to " << baud_rate << std::endl;
-	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","_str + boost::lexical_cast<std::string> (baud_rate));
+	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","_str + std::to_string (baud_rate));
 	_serial_port->write (set_baud_rate_message);
 	_serial_port->flush();
 	_serial_port->close();
@@ -201,10 +198,10 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 	else
 		_gps_module.io.output_fix_quality.set_nil();
 
-	_gps_module.io.output_tracked_satellites = optional_cast_to<decltype (_gps_module.io.output_dgps_station_id)::Value> (sentence.tracked_satellites);
+	_gps_module.io.output_tracked_satellites = sentence.tracked_satellites;
 	_gps_module.io.output_altitude_amsl = sentence.altitude_amsl;
 	_gps_module.io.output_geoid_height = sentence.geoid_height;
-	_gps_module.io.output_dgps_station_id = optional_cast_to<decltype (_gps_module.io.output_dgps_station_id)::Value> (sentence.dgps_station_id);
+	_gps_module.io.output_dgps_station_id = sentence.dgps_station_id;
 	// Use system time as reference:
 	_gps_module.io.output_fix_system_timestamp = xf::TimeHelper::now();
 	_gps_module._reliable_fix_quality = sentence.reliable_fix_quality();
@@ -235,9 +232,9 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
 	else
 		_gps_module.io.output_fix_mode.set_nil();
 
-	_gps_module.io.output_pdop = optional_cast_to<double> (sentence.pdop);
-	_gps_module.io.output_vdop = optional_cast_to<double> (sentence.vdop);
-	_gps_module.io.output_hdop = optional_cast_to<double> (sentence.hdop);
+	_gps_module.io.output_pdop = sentence.pdop;
+	_gps_module.io.output_vdop = sentence.vdop;
+	_gps_module.io.output_hdop = sentence.hdop;
 
 	if (sentence.hdop)
 		_gps_module.io.output_lateral_stddev = *_gps_module.io.setting_receiver_accuracy * *sentence.hdop;

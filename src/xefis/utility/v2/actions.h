@@ -45,7 +45,7 @@ template<class pValue>
 	{
 	  public:
 		using Value			= pValue;
-		using OptionalValue	= Optional<Value>;
+		using OptionalValue	= std::optional<Value>;
 		using Property		= v2::Property<Value>;
 
 	  public:

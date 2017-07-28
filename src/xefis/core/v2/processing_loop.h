@@ -107,7 +107,7 @@ class ProcessingLoop: public QObject
 	Xefis*									_xefis;
 	QTimer*									_loop_timer;
 	Time									_loop_period			= 0.01_s;
-	Optional<Timestamp>						_previous_timestamp;
+	std::optional<Timestamp>				_previous_timestamp;
 	std::vector<Unique<v2::BasicModule>>	_modules;
 	std::vector<BasicModule*>				_uninitialized_modules;
 };

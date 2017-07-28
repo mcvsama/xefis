@@ -19,9 +19,6 @@
 #include <atomic>
 #include <map>
 
-// Boost:
-#include <boost/optional.hpp>
-
 // Qt:
 #include <QtCore/QTimer>
 #include <QtCore/QDateTime>
@@ -53,149 +50,149 @@ class ADIWidget: public xf::InstrumentWidget
 		friend class PaintWorkUnit;
 
 	  public:
-		bool					old_style							= false;
-		bool					show_metric							= false;
-		si::Angle				fov									= 120_deg;
-		bool					input_alert_visible					= false;
+		bool						old_style							= false;
+		bool						show_metric							= false;
+		si::Angle					fov									= 120_deg;
+		bool						input_alert_visible					= false;
 		// Velocity
-		bool					speed_failure						= false;
-		bool					speed_visible						= false;
-		si::Velocity			speed								= 0_kt;
-		bool					speed_lookahead_visible				= false;
-		si::Velocity			speed_lookahead						= 0_kt;
-		bool					speed_minimum_visible				= false;
-		Velocity				speed_minimum						= 0_kt;
-		Optional<si::Velocity>	speed_minimum_maneuver;
-		Optional<si::Velocity>	speed_maximum_maneuver;
-		bool					speed_maximum_visible				= false;
-		si::Velocity			speed_maximum						= 0_kt;
-		bool					speed_mach_visible					= false;
-		double					speed_mach							= 0.0;
-		Optional<si::Velocity>	speed_ground;
-		VelocityBugs			speed_bugs;
+		bool						speed_failure						= false;
+		bool						speed_visible						= false;
+		si::Velocity				speed								= 0_kt;
+		bool						speed_lookahead_visible				= false;
+		si::Velocity				speed_lookahead						= 0_kt;
+		bool						speed_minimum_visible				= false;
+		Velocity					speed_minimum						= 0_kt;
+		std::optional<si::Velocity>	speed_minimum_maneuver;
+		std::optional<si::Velocity>	speed_maximum_maneuver;
+		bool						speed_maximum_visible				= false;
+		si::Velocity				speed_maximum						= 0_kt;
+		bool						speed_mach_visible					= false;
+		double						speed_mach							= 0.0;
+		std::optional<si::Velocity>	speed_ground;
+		VelocityBugs				speed_bugs;
 		// Orientation
-		bool					orientation_failure					= false;
-		bool					orientation_pitch_visible			= false;
-		si::Angle				orientation_pitch					= 0_deg;
-		bool					orientation_roll_visible			= false;
-		si::Angle				orientation_roll					= 0_deg;
-		bool					orientation_heading_visible			= false;
-		si::Angle				orientation_heading					= 0_deg;
-		bool					orientation_heading_numbers_visible	= false;
+		bool						orientation_failure					= false;
+		bool						orientation_pitch_visible			= false;
+		si::Angle					orientation_pitch					= 0_deg;
+		bool						orientation_roll_visible			= false;
+		si::Angle					orientation_roll					= 0_deg;
+		bool						orientation_heading_visible			= false;
+		si::Angle					orientation_heading					= 0_deg;
+		bool						orientation_heading_numbers_visible	= false;
 		// Slip-skid
-		bool					slip_skid_visible					= false;
-		si::Angle				slip_skid							= 0_deg;
+		bool						slip_skid_visible					= false;
+		si::Angle					slip_skid							= 0_deg;
 		// Flight path vector
-		bool					flight_path_marker_failure			= false;
-		bool					flight_path_visible					= false;
-		si::Angle				flight_path_alpha					= 0_deg;
-		si::Angle				flight_path_beta					= 0_deg;
+		bool						flight_path_marker_failure			= false;
+		bool						flight_path_visible					= false;
+		si::Angle					flight_path_alpha					= 0_deg;
+		si::Angle					flight_path_beta					= 0_deg;
 		// AOA limit
-		bool					critical_aoa_visible				= false;
-		si::Angle				critical_aoa						= 0_deg;
-		si::Angle				aoa_alpha							= 0_deg;
+		bool						critical_aoa_visible				= false;
+		si::Angle					critical_aoa						= 0_deg;
+		si::Angle					aoa_alpha							= 0_deg;
 		// Altitude
-		bool					altitude_failure					= false;
-		bool					altitude_visible					= false;
-		si::Length				altitude							= 0_ft;
-		bool					altitude_lookahead_visible			= false;
-		si::Length				altitude_lookahead					= 0_ft;
-		bool					altitude_agl_failure				= false;
-		bool					altitude_agl_visible				= false;
-		si::Length				altitude_agl						= 0_ft;
-		bool					altitude_landing_visible			= false;
-		si::Length				altitude_landing_amsl				= 0_ft;
-		si::Length				altitude_landing_warning_hi			= 0_ft;
-		si::Length				altitude_landing_warning_lo			= 0_ft;
-		AltitudeBugs			altitude_bugs;
+		bool						altitude_failure					= false;
+		bool						altitude_visible					= false;
+		si::Length					altitude							= 0_ft;
+		bool						altitude_lookahead_visible			= false;
+		si::Length					altitude_lookahead					= 0_ft;
+		bool						altitude_agl_failure				= false;
+		bool						altitude_agl_visible				= false;
+		si::Length					altitude_agl						= 0_ft;
+		bool						altitude_landing_visible			= false;
+		si::Length					altitude_landing_amsl				= 0_ft;
+		si::Length					altitude_landing_warning_hi			= 0_ft;
+		si::Length					altitude_landing_warning_lo			= 0_ft;
+		AltitudeBugs				altitude_bugs;
 		// Minimums
-		bool					minimums_altitude_visible			= false;
-		QString					minimums_type;
-		si::Length				minimums_amsl						= 0_ft;
-		si::Length				minimums_setting					= 0_ft;
+		bool						minimums_altitude_visible			= false;
+		QString						minimums_type;
+		si::Length					minimums_amsl						= 0_ft;
+		si::Length					minimums_setting					= 0_ft;
 		// Vertical speed
-		bool					vertical_speed_failure				= false;
-		bool					vertical_speed_visible				= false;
-		si::Velocity			vertical_speed						= 0_fpm;
-		bool					energy_variometer_visible			= false;
-		si::Power				energy_variometer_rate				= 0_W;
-		si::Power				energy_variometer_1000_fpm_power	= 0_W;
+		bool						vertical_speed_failure				= false;
+		bool						vertical_speed_visible				= false;
+		si::Velocity				vertical_speed						= 0_fpm;
+		bool						energy_variometer_visible			= false;
+		si::Power					energy_variometer_rate				= 0_W;
+		si::Power					energy_variometer_1000_fpm_power	= 0_W;
 		// Pressure settings
-		bool					pressure_visible					= false;
-		si::Pressure			pressure_qnh						= 0_inHg;
-		bool					pressure_display_hpa				= false;
-		bool					use_standard_pressure				= false;
+		bool						pressure_visible					= false;
+		si::Pressure				pressure_qnh						= 0_inHg;
+		bool						pressure_display_hpa				= false;
+		bool						use_standard_pressure				= false;
 		// Command settings
-		Optional<si::Velocity>	cmd_speed;
-		Optional<double>		cmd_mach;
-		Optional<si::Length>	cmd_altitude;
-		Optional<si::Velocity>	cmd_vertical_speed;
-		Optional<si::Angle>		cmd_fpa;
-		bool					cmd_altitude_acquired				= false;
+		std::optional<si::Velocity>	cmd_speed;
+		std::optional<double>		cmd_mach;
+		std::optional<si::Length>	cmd_altitude;
+		std::optional<si::Velocity>	cmd_vertical_speed;
+		std::optional<si::Angle>	cmd_fpa;
+		bool						cmd_altitude_acquired				= false;
 		// Flight director
-		bool					flight_director_failure				= false;
-		bool					flight_director_pitch_visible		= false;
-		si::Angle				flight_director_pitch				= 0_deg;
-		bool					flight_director_roll_visible		= false;
-		si::Angle				flight_director_roll				= 0_deg;
+		bool						flight_director_failure				= false;
+		bool						flight_director_pitch_visible		= false;
+		si::Angle					flight_director_pitch				= 0_deg;
+		bool						flight_director_roll_visible		= false;
+		si::Angle					flight_director_roll				= 0_deg;
 		// Control stick
-		bool					control_stick_visible				= false;
-		si::Angle				control_stick_pitch					= 0_deg;
-		si::Angle				control_stick_roll					= 0_deg;
+		bool						control_stick_visible				= false;
+		si::Angle					control_stick_pitch					= 0_deg;
+		si::Angle					control_stick_roll					= 0_deg;
 		// Approach reference
-		bool					navaid_reference_visible			= false;
-		Optional<si::Angle>		navaid_course_magnetic;
-		QString					navaid_hint;
-		QString					navaid_identifier;
-		Optional<si::Length>	navaid_distance;
+		bool						navaid_reference_visible			= false;
+		std::optional<si::Angle>	navaid_course_magnetic;
+		QString						navaid_hint;
+		QString						navaid_identifier;
+		std::optional<si::Length>	navaid_distance;
 		// Approach, flight path deviations
-		bool					deviation_vertical_failure			= false;
-		Optional<si::Angle>		deviation_vertical_approach;
-		Optional<si::Angle>		deviation_vertical_flight_path;
-		bool					deviation_lateral_failure			= false;
-		Optional<si::Angle>		deviation_lateral_approach;
-		Optional<si::Angle>		deviation_lateral_flight_path;
-		bool					deviation_mixed_mode				= false;
+		bool						deviation_vertical_failure			= false;
+		std::optional<si::Angle>	deviation_vertical_approach;
+		std::optional<si::Angle>	deviation_vertical_flight_path;
+		bool						deviation_lateral_failure			= false;
+		std::optional<si::Angle>	deviation_lateral_approach;
+		std::optional<si::Angle>	deviation_lateral_flight_path;
+		bool						deviation_mixed_mode				= false;
 		// Raising runway
-		bool					runway_visible						= false;
-		si::Angle				runway_position						= 0_deg;
+		bool						runway_visible						= false;
+		si::Angle					runway_position						= 0_deg;
 		// Control hint
-		bool					control_hint_visible				= false;
-		QString					control_hint;
+		bool						control_hint_visible				= false;
+		QString						control_hint;
 		// FMA
-		bool					fma_visible							= false;
-		QString					fma_speed_hint;
-		QString					fma_speed_armed_hint;
-		QString					fma_lateral_hint;
-		QString					fma_lateral_armed_hint;
-		QString					fma_vertical_hint;
-		QString					fma_vertical_armed_hint;
+		bool						fma_visible							= false;
+		QString						fma_speed_hint;
+		QString						fma_speed_armed_hint;
+		QString						fma_lateral_hint;
+		QString						fma_lateral_armed_hint;
+		QString						fma_vertical_hint;
+		QString						fma_vertical_armed_hint;
 		// TCAS
-		Optional<si::Angle>		tcas_ra_pitch_minimum;
-		Optional<si::Angle>		tcas_ra_pitch_maximum;
-		Optional<si::Velocity>	tcas_ra_vertical_speed_minimum;
-		Optional<si::Velocity>	tcas_ra_vertical_speed_maximum;
+		std::optional<si::Angle>	tcas_ra_pitch_minimum;
+		std::optional<si::Angle>	tcas_ra_pitch_maximum;
+		std::optional<si::Velocity>	tcas_ra_vertical_speed_minimum;
+		std::optional<si::Velocity>	tcas_ra_vertical_speed_maximum;
 		// Warning flags
-		bool					novspd_flag							= false;
-		bool					ldgalt_flag							= false;
-		bool					pitch_disagree						= false;
-		bool					roll_disagree						= false;
-		bool					ias_disagree						= false;
-		bool					altitude_disagree					= false;
-		bool					roll_warning						= false;
-		bool					slip_skid_warning					= false;
+		bool						novspd_flag							= false;
+		bool						ldgalt_flag							= false;
+		bool						pitch_disagree						= false;
+		bool						roll_disagree						= false;
+		bool						ias_disagree						= false;
+		bool						altitude_disagree					= false;
+		bool						roll_warning						= false;
+		bool						slip_skid_warning					= false;
 		// Velocity ladder
-		si::Velocity			sl_extent							= 124_kt;
-		int						sl_minimum							= 0;
-		int						sl_maximum							= 9999;
-		int						sl_line_every						= 10;
-		int						sl_number_every						= 20;
+		si::Velocity				sl_extent							= 124_kt;
+		int							sl_minimum							= 0;
+		int							sl_maximum							= 9999;
+		int							sl_line_every						= 10;
+		int							sl_number_every						= 20;
 		// Altitude ladder
-		si::Length				al_extent							= 825_ft;
-		int						al_emphasis_every					= 1000;
-		int						al_bold_every						= 500;
-		int						al_number_every						= 200;
-		int						al_line_every						= 100;
+		si::Length					al_extent							= 825_ft;
+		int							al_emphasis_every					= 1000;
+		int							al_bold_every						= 500;
+		int							al_number_every						= 200;
+		int							al_line_every						= 100;
 
 	  private:
 		/**
@@ -209,19 +206,19 @@ class ADIWidget: public xf::InstrumentWidget
 	class LocalParameters
 	{
 	  public:
-		bool					speed_blink						= false;
-		bool					speed_blinking_active			= false;
-		bool					minimums_blink					= false;
-		bool					minimums_blinking_active		= false;
-		QDateTime				altitude_agl_ts					= QDateTime::fromTime_t (0);
-		QDateTime				minimums_altitude_ts			= QDateTime::fromTime_t (0);
-		QDateTime				control_hint_ts					= QDateTime::fromTime_t (0);
-		QDateTime				fma_speed_ts					= QDateTime::fromTime_t (0);
-		QDateTime				fma_speed_armed_ts				= QDateTime::fromTime_t (0);
-		QDateTime				fma_lateral_ts					= QDateTime::fromTime_t (0);
-		QDateTime				fma_lateral_armed_ts			= QDateTime::fromTime_t (0);
-		QDateTime				fma_vertical_ts					= QDateTime::fromTime_t (0);
-		QDateTime				fma_vertical_armed_ts			= QDateTime::fromTime_t (0);
+		bool						speed_blink							= false;
+		bool						speed_blinking_active				= false;
+		bool						minimums_blink						= false;
+		bool						minimums_blinking_active			= false;
+		QDateTime					altitude_agl_ts						= QDateTime::fromTime_t (0);
+		QDateTime					minimums_altitude_ts				= QDateTime::fromTime_t (0);
+		QDateTime					control_hint_ts						= QDateTime::fromTime_t (0);
+		QDateTime					fma_speed_ts						= QDateTime::fromTime_t (0);
+		QDateTime					fma_speed_armed_ts					= QDateTime::fromTime_t (0);
+		QDateTime					fma_lateral_ts						= QDateTime::fromTime_t (0);
+		QDateTime					fma_lateral_armed_ts				= QDateTime::fromTime_t (0);
+		QDateTime					fma_vertical_ts						= QDateTime::fromTime_t (0);
+		QDateTime					fma_vertical_armed_ts				= QDateTime::fromTime_t (0);
 	};
 
 	class PaintWorkUnit:

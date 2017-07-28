@@ -72,7 +72,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<doub
 
 
 JoystickInput::Axis::Axis (QDomElement const& axis_element, v2::PropertyOut<double>& property, v2::PropertyOut<si::Angle>& angle_property, xf::Range<si::Angle>& angle_range,
-						   Optional<HandlerID> up_button_id, Optional<HandlerID> down_button_id):
+						   std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id):
 	_property (property),
 	_angle_property (angle_property),
 	_angle_range (angle_range),

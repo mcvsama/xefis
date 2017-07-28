@@ -58,9 +58,6 @@ typedef bool					_Bool;
 
 typedef std::vector<uint8_t>	Blob;
 
-template<class Value>
-	using Optional = std::optional<Value>;
-
 template<class Type>
 	using Shared = std::shared_ptr<Type>;
 
@@ -69,17 +66,6 @@ template<class Type>
 
 template<class Type>
 	using Weak = std::weak_ptr<Type>;
-
-
-template<class Target, class SourceOptional>
-	Optional<Target>
-	optional_cast_to (SourceOptional const& source)
-	{
-		if (source)
-			return Optional<Target> (*source);
-		else
-			return std::nullopt;
-	}
 
 #endif
 

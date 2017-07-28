@@ -64,7 +64,7 @@ class Lift
 	/**
 	 * Return AOA in normal regime (not stalled) for given C_L.
 	 */
-	Optional<Angle>
+	std::optional<Angle>
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
