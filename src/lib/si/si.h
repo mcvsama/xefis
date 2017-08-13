@@ -22,7 +22,7 @@
 
 
 // Configuration checks:
-static_assert (std::is_class<si_config::Exception>::value, "si_config::Exception class definition is required");
+static_assert (std::is_class<si_config::Exception>(), "si_config::Exception class definition is required");
 
 
 // Local:

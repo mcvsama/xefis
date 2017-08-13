@@ -179,7 +179,7 @@ template<class IO = ModuleIO>
 		 * Ctor
 		 * Version for modules that do have their own IO class.
 		 */
-		template<class = std::enable_if_t<!std::is_same<IO, ModuleIO>::value>>
+		template<class = std::enable_if_t<!std::is_same_v<IO, ModuleIO>>>
 			explicit
 			Module (std::unique_ptr<IO> io, std::string const& instance = {});
 
@@ -187,7 +187,7 @@ template<class IO = ModuleIO>
 		 * Ctor
 		 * Version for modules that do not have any IO class.
 		 */
-		template<class = std::enable_if_t<std::is_same<IO, ModuleIO>::value>>
+		template<class = std::enable_if_t<std::is_same_v<IO, ModuleIO>>>
 			explicit
 			Module (std::string const& instance = {});
 

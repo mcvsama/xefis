@@ -48,7 +48,7 @@ using namespace ostream_fixes;
  * Return size (number of elements) of an array.
  */
 template<class T, std::size_t N>
-	inline constexpr std::size_t
+	constexpr std::size_t
 	countof (T(&)[N])
 	{
 		return N;
@@ -59,7 +59,7 @@ template<class T, std::size_t N>
  * Return size of an array. Can be used in const expressions.
  */
 template<class T, std::size_t N>
-	inline constexpr const char (&sizer (T (&)[N]))[N];
+	constexpr const char (&sizer (T (&)[N]))[N];
 
 
 inline void

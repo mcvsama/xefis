@@ -39,7 +39,7 @@ namespace si {
  * for Quantity types.
  */
 template<class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
 	base_quantity (Q value) noexcept;
 
@@ -48,7 +48,7 @@ template<class Q,
  * Overload of base_quantity() for handling non-Quantity types.
  */
 template<class T,
-		 class = std::enable_if_t<!is_quantity<T>::value>>
+		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
 	base_quantity (T value) noexcept;
 
@@ -57,7 +57,7 @@ template<class T,
  * Return quantity in units U for quantity Q, if Q is a Quantity type.
  */
 template<class U, class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
 	quantity_in_units (Q value) noexcept;
 
@@ -66,7 +66,7 @@ template<class U, class Q,
  * Return the argument (for non-Quantity arguments). Convenience overload.
  */
 template<class U, class T,
-		 class = std::enable_if_t<!is_quantity<T>::value>>
+		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
 	quantity_in_units (T value) noexcept;
 
@@ -80,7 +80,7 @@ template<class U, class T,
  *			If quantity can't be expressed in given units.
  */
 template<class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
 	quantity (Q value, std::string const& unit_str);
 
@@ -91,7 +91,7 @@ template<class Q,
  * The string argument is ignored.
  */
 template<class T,
-		 class = std::enable_if_t<!is_quantity<T>::value>>
+		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
 	quantity (T value, std::string const&) noexcept;
 
@@ -103,7 +103,7 @@ template<class T,
  *			If quantity can't be expressed in given units.
  */
 template<class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
 	quantity (Q value, DynamicUnit const& unit);
 
@@ -114,7 +114,7 @@ template<class Q,
  * The DynamicUnit argument is ignored.
  */
 template<class T,
-		 class = std::enable_if_t<!is_quantity<T>::value>>
+		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
 	quantity (T value, DynamicUnit const& unit) noexcept;
 
@@ -175,7 +175,7 @@ template<class pUnit, class pValue>
  * Returning version of parse (blob).
  */
 template<class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	inline Q
 	parse (std::vector<uint8_t> const& blob);
 
@@ -199,7 +199,7 @@ template<class pUnit, class pValue>
  * Returning version of parse (string).
  */
 template<class Q,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	inline Q
 	parse (std::experimental::string_view const& str);
 
@@ -287,7 +287,7 @@ template<class T, class>
  * Return quantity in units U if Q is a Quantity type.
  */
 template<class Q, class U = typename Q::Unit,
-		 class = std::enable_if_t<is_quantity<Q>::value>>
+		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
 	quantity (Q value) noexcept
 	{
@@ -300,7 +300,7 @@ template<class Q, class U = typename Q::Unit,
  * Overload of quantity() for handling non-Quantity types.
  */
 template<class T, class Unused = void,
-		 class = std::enable_if_t<!is_quantity<T>::value>>
+		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
 	quantity (T value) noexcept
 	{

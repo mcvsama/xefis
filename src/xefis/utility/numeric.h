@@ -30,11 +30,11 @@
 namespace xf {
 
 template<class A, class B,
-		 class = typename std::enable_if<
-			 (std::is_floating_point<A>::value || si::is_quantity<A>::value) &&
-			 (std::is_floating_point<B>::value || si::is_quantity<B>::value)
-		 >::type>
-	inline constexpr B
+		 class = typename std::enable_if_t<
+			 (std::is_floating_point_v<A> || si::is_quantity_v<A>) &&
+			 (std::is_floating_point_v<B> || si::is_quantity_v<B>)
+		 >>
+	constexpr B
 	renormalize (A a, A a_min, A a_max, B b_min, B b_max)
 	{
 		return a_min == a_max
@@ -44,7 +44,7 @@ template<class A, class B,
 
 
 template<class A, class B>
-	inline constexpr B
+	constexpr B
 	renormalize (A value, Range<A> range1, Range<B> range2) noexcept
 	{
 		return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
@@ -52,7 +52,7 @@ template<class A, class B>
 
 
 template<class T>
-	inline constexpr int
+	constexpr int
 	sgn (T x, std::false_type) noexcept
 	{
 		return T (0) < x;
@@ -60,7 +60,7 @@ template<class T>
 
 
 template<class T>
-	inline constexpr int
+	constexpr int
 	sgn (T x, std::true_type) noexcept
 	{
 		return (T (0) < x) - (x < T (0));
@@ -71,16 +71,16 @@ template<class T>
  * Return signum (x) (-1, 0 or 1).
  */
 template<class T>
-	inline constexpr int
+	constexpr int
 	sgn (T x) noexcept
 	{
 		return sgn (x, std::is_signed<T>());
 	}
 
 
-template<class T = int, class S>
-	inline constexpr T
-	symmetric_round (S s) noexcept
+template<class T = int>
+	constexpr T
+	symmetric_round (auto s) noexcept
 	{
 		return static_cast<T> (sgn (s) * 0.5 + s);
 	}
@@ -92,8 +92,8 @@ template<class T = int, class S>
  * \param	d - divisor
  */
 template<class Number>
-	inline constexpr Number
-	floored_mod (Number n, typename std::enable_if<std::is_floating_point<Number>::value || si::is_quantity<Number>::value, Number>::type d)
+	constexpr Number
+	floored_mod (Number n, std::enable_if_t<std::is_floating_point_v<Number> || si::is_quantity_v<Number>, Number> d)
 	{
 		return n - (d * std::floor (n / d));
 	}
@@ -105,8 +105,8 @@ template<class Number>
  * \param	d - divisor
  */
 template<class Number>
-	inline constexpr Number
-	floored_mod (Number n, typename std::enable_if<std::is_integral<Number>::value, Number>::type d)
+	constexpr Number
+	floored_mod (Number n, std::enable_if_t<std::is_integral_v<Number>, Number> d)
 	{
 		return (n % d) >= 0 ? (n % d) : (n % d) + std::abs (d);
 	}
@@ -118,7 +118,7 @@ template<class Number>
  * \param	d - divisor
  */
 template<template<class, class> class Quantity, class Unit, class Value>
-	inline constexpr Quantity<Unit, Value>
+	constexpr Quantity<Unit, Value>
 	floored_mod (Quantity<Unit, Value> n, Quantity<Unit, Value> d)
 	{
 		return n - (d * std::floor (n / d));
@@ -126,7 +126,7 @@ template<template<class, class> class Quantity, class Unit, class Value>
 
 
 template<class Number>
-	inline constexpr Number
+	constexpr Number
 	floored_mod (Number n, Number min, Number max)
 	{
 		return floored_mod (n - min, max - min) + min;
@@ -134,7 +134,7 @@ template<class Number>
 
 
 template<class Number>
-	inline constexpr Number
+	constexpr Number
 	floored_mod (Number n, Range<Number> range)
 	{
 		return floored_mod (n - range.min(), range.extent()) + range.min();
@@ -163,7 +163,7 @@ template<class Value>
 
 
 template<class Value>
-	inline constexpr Value
+	constexpr Value
 	clamped (Value value, Value min, Value max) noexcept
 	{
 		return value < min
@@ -175,7 +175,7 @@ template<class Value>
 
 
 template<class Value>
-	inline constexpr Value
+	constexpr Value
 	clamped (Value value, Range<Value> range) noexcept
 	{
 		return range.min() <= range.max()
@@ -185,14 +185,14 @@ template<class Value>
 
 
 template<class Value>
-	inline constexpr Value
+	constexpr Value
 	magnetic_to_true (Value mag, Value declination)
 	{
 		return floored_mod (mag + declination, 360.0);
 	}
 
 
-inline constexpr Angle
+constexpr Angle
 magnetic_to_true (Angle mag, Angle declination)
 {
 	return floored_mod (mag + declination, 360_deg);
@@ -200,14 +200,14 @@ magnetic_to_true (Angle mag, Angle declination)
 
 
 template<class Value>
-	inline constexpr Value
+	constexpr Value
 	true_to_magnetic (Value tru, Value declination)
 	{
 		return floored_mod (tru - declination, 360.0);
 	}
 
 
-inline constexpr Angle
+constexpr Angle
 true_to_magnetic (Angle tru, Angle declination)
 {
 	return floored_mod (tru - declination, 360_deg);

@@ -31,8 +31,8 @@ using namespace test_asserts;
 using namespace si::units;
 
 // Validity asserts:
-static_assert (std::is_literal_type<Dimensionless>::value, "Unit must be a literal type");
-static_assert (std::is_literal_type<si::Quantity<Dimensionless>>::value, "Quantity must be a literal type");
+static_assert (std::is_literal_type<Dimensionless>(), "Unit must be a literal type");
+static_assert (std::is_literal_type<si::Quantity<Dimensionless>>(), "Quantity must be a literal type");
 
 
 static xf::RuntimeTest t_expression ("SI expression validity assertions", []{

@@ -78,7 +78,7 @@ class LonLat
 };
 
 
-static_assert (std::is_literal_type<LonLat>::value, "LonLat must be a literal type");
+static_assert (std::is_literal_type<LonLat>(), "LonLat must be a literal type");
 
 
 constexpr

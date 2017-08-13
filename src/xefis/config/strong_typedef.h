@@ -68,7 +68,7 @@ template<class tValue>
 
 
 template<class V>
-	inline constexpr
+	constexpr
 	StrongWrapper<V>::StrongWrapper (Value const& value) noexcept (noexcept (Value (value))):
 		_value (value)
 	{ }

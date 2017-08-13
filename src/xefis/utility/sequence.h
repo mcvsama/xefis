@@ -80,7 +80,7 @@ template<class Container, typename ConstIterator>
  */
 template<class ForwardIt, class Value, class Compare>
 	inline std::pair<ForwardIt, ForwardIt>
-	find_range_exclusive (ForwardIt first, ForwardIt last, Range<Value> value_range, Compare compare)
+	find_range_exclusive (ForwardIt first, ForwardIt last, Range<Value> const& value_range, Compare compare)
 	{
 		auto a = std::upper_bound (first, last, value_range.min(), compare);
 
