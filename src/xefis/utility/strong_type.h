@@ -43,7 +43,7 @@ template<class Value, class DistinguisherType>
 	{
 	  public:
 		// Ctor
-		template<class = std::enable_if_t<std::is_default_constructible<Value>::value>>
+		template<class = std::enable_if_t<std::is_default_constructible_v<Value>>>
 			StrongType()
 			{ }
 

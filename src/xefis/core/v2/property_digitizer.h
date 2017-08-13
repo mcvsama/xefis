@@ -112,13 +112,13 @@ class PropertyDigitizer
   public:
 	// Ctor
 	template<class Value,
-			 class = std::enable_if_t<std::is_arithmetic<Value>::value>>
+			 class = std::enable_if_t<std::is_arithmetic_v<Value>>>
 		explicit
 		PropertyDigitizer (Property<Value>&);
 
 	// Ctor
 	template<class Quantity, class DesiredUnit,
-			 class = std::enable_if_t<is_quantity<Quantity>::value>>
+			 class = std::enable_if_t<is_quantity_v<Quantity>>>
 		explicit
 		PropertyDigitizer (Property<Quantity>&);
 
@@ -165,7 +165,7 @@ class PropertyDigitizer
 
 
 template<class Value,
-		 class = std::enable_if_t<std::is_arithmetic<Value>::value>>
+		 class = std::enable_if_t<std::is_arithmetic_v<Value>>>
 	inline
 	PropertyDigitizer::PropertyDigitizer (Property<Value>& property):
 		_converter (std::make_shared<ArithmeticConverter<Value>> (property)),
@@ -174,7 +174,7 @@ template<class Value,
 
 
 template<class Quantity, class DesiredUnit,
-		 class = std::enable_if_t<is_quantity<Quantity>::value>>
+		 class = std::enable_if_t<is_quantity_v<Quantity>>>
 	inline
 	PropertyDigitizer::PropertyDigitizer (Property<Quantity>& property):
 		_converter (std::make_shared<SIQuantityConverter<Quantity, DesiredUnit>> (property)),

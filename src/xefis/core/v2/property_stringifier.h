@@ -221,7 +221,7 @@ class PropertyStringifier
 
 	// Ctor
 	template<class Quantity, class DesiredUnit,
-			 class = std::enable_if_t<is_quantity<Quantity>::value>>
+			 class = std::enable_if_t<is_quantity_v<Quantity>>>
 		explicit
 		PropertyStringifier (Property<Quantity>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
 
@@ -296,7 +296,7 @@ PropertyStringifier::PropertyStringifier (Property<double>& property, boost::for
 
 
 template<class Quantity, class DesiredUnit,
-		 class = std::enable_if_t<is_quantity<Quantity>::value>>
+		 class = std::enable_if_t<is_quantity_v<Quantity>>>
 	inline
 	PropertyStringifier::PropertyStringifier (Property<Quantity>& property, boost::format const& format, std::string const& nil_value):
 		_converter (std::make_shared<SIQuantityConverter<Quantity, DesiredUnit>> (property, format, nil_value)),

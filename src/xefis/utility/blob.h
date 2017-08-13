@@ -46,7 +46,7 @@ to_hex_string (Blob const& blob)
 
 
 template<class Value,
-		 class = std::enable_if_t<std::is_integral<Value>::value || std::is_floating_point<Value>::value>>
+		 class = std::enable_if_t<std::is_integral_v<Value> || std::is_floating_point_v<Value>>>
 	inline Blob
 	to_blob (Value value)
 	{
