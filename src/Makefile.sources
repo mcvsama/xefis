@@ -414,6 +414,7 @@ XEFIS_HEADERS			+= xefis/utility/demangle.h
 XEFIS_HEADERS			+= xefis/utility/format_exception.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
+XEFIS_HEADERS			+= xefis/utility/hmac.h
 XEFIS_HEADERS			+= xefis/utility/logger.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
 XEFIS_HEADERS			+= xefis/utility/mutex.h
