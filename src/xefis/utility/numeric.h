@@ -252,6 +252,19 @@ template<class Argument, class Callable>
 		return sum;
 	}
 
+
+template<class T>
+	constexpr T
+	static_pow (T value, uint64_t power)
+	{
+		T result = value;
+
+		for (uint64_t i = 0; i < power - 1; ++i)
+			result *= value;
+
+		return result;
+	}
+
 } // namespace xf
 
 #endif

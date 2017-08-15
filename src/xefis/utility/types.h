@@ -26,6 +26,117 @@ namespace xf {
 
 using FontSize = StrongType<float, struct FontSizeType>;
 
+
+template<size_t Width>
+	struct float_for_width
+	{ };
+
+
+template<size_t Width>
+	using float_for_width_t = typename float_for_width<Width>::type;
+
+
+template<>
+	struct float_for_width<2>
+	{
+		using type = float16_t;
+	};
+
+
+template<>
+	struct float_for_width<4>
+	{
+		using type = float32_t;
+	};
+
+
+template<>
+	struct float_for_width<8>
+	{
+		using type = float64_t;
+	};
+
+
+template<>
+	struct float_for_width<16>
+	{
+		using type = float128_t;
+	};
+
+
+template<size_t Width>
+	struct int_for_width
+	{ };
+
+
+template<size_t Width>
+	using int_for_width_t = typename int_for_width<Width>::type;
+
+
+template<>
+	struct int_for_width<1>
+	{
+		using type = int8_t;
+	};
+
+
+template<>
+	struct int_for_width<2>
+	{
+		using type = int16_t;
+	};
+
+
+template<>
+	struct int_for_width<4>
+	{
+		using type = int32_t;
+	};
+
+
+template<>
+	struct int_for_width<8>
+	{
+		using type = int64_t;
+	};
+
+
+template<size_t Width>
+	struct uint_for_width
+	{ };
+
+
+template<size_t Width>
+	using uint_for_width_t = typename uint_for_width<Width>::type;
+
+
+template<>
+	struct uint_for_width<1>
+	{
+		using type = uint8_t;
+	};
+
+
+template<>
+	struct uint_for_width<2>
+	{
+		using type = uint16_t;
+	};
+
+
+template<>
+	struct uint_for_width<4>
+	{
+		using type = uint32_t;
+	};
+
+
+template<>
+	struct uint_for_width<8>
+	{
+		using type = uint64_t;
+	};
+
 } // namespace xf
 
 #endif
