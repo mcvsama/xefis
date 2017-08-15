@@ -35,6 +35,31 @@
 namespace si {
 
 /**
+ * Return inner basic type for Quantity or, if the parameter is not a Quantity type,
+ * return the same type as parameter.
+ */
+template<class Q, class = std::void_t<>>
+	struct decay_quantity
+	{
+		using type = Q;
+	};
+
+
+/**
+ * Specialization returns Q::type if Q is a Quantity type, or void otherwise.
+ */
+template<class Q>
+	struct decay_quantity<Q, std::void_t<typename Q::Value>>
+	{
+		using type = std::conditional_t<si::is_quantity_v<Q>, typename Q::Value, void>;
+	};
+
+
+template<class Q>
+	using decay_quantity_t = typename decay_quantity<Q>::type;
+
+
+/**
  * Returns unchanged argument for non-Quantity types and Quantity::base_quantity()
  * for Quantity types.
  */
