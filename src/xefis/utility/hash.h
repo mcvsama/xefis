@@ -74,7 +74,7 @@ class Hash
 	/**
 	 * Return hash value.
 	 */
-	std::vector<uint8_t>&&
+	std::vector<uint8_t>
 	result() const;
 
 	/**
@@ -88,6 +88,12 @@ class Hash
 	 */
 	uint8_t*
 	end() const;
+
+	/**
+	 * Return block-size for the hash function used.
+	 */
+	size_t
+	block_size() const;
 
   private:
 	hashid	_algorithm;
@@ -165,12 +171,12 @@ Hash::finalized() const
 }
 
 
-inline std::vector<uint8_t>&&
+inline std::vector<uint8_t>
 Hash::result() const
 {
 	std::vector<uint8_t> ret;
 	ret.insert (ret.end(), begin(), end());
-	return std::move (ret);
+	return ret;
 }
 
 
@@ -185,6 +191,13 @@ inline uint8_t*
 Hash::end() const
 {
 	return static_cast<uint8_t*> (_result) + mhash_get_block_size (_algorithm);
+}
+
+
+inline size_t
+Hash::block_size() const
+{
+	return mhash_get_block_size (_algorithm);
 }
 
 } // namespace xf
