@@ -44,17 +44,18 @@ template<class Value, class DistinguisherType>
 	  public:
 		// Ctor
 		template<class = std::enable_if_t<std::is_default_constructible_v<Value>>>
+			constexpr
 			StrongType()
 			{ }
 
 		// Ctor
-		explicit
+		explicit constexpr
 		StrongType (Value const& value):
 			_value (value)
 		{ }
 
 		// Ctor
-		explicit
+		explicit constexpr
 		StrongType (Value&& value):
 			_value (std::move (value))
 		{ }
@@ -66,7 +67,7 @@ template<class Value, class DistinguisherType>
 		}
 
 	  private:
-		Value	_value;
+		Value _value;
 	};
 
 } // namespace xf
