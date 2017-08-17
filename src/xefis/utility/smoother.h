@@ -252,7 +252,6 @@ template<class V>
 			for (std::size_t i = 0; i < _history.size(); ++i)
 				_z += _history[i] * _window[i];
 			_z /= _history.size() - 1; // Some coeffs are 0 in the window.
-			_z *= 2.0; // Window energy correction.
 
 			_accumulated_dt = 0_s;
 		}
@@ -290,8 +289,10 @@ template<class V>
 	Smoother<V>::recompute_window() noexcept
 	{
 		std::size_t N = _window.size();
+		// Note: this is without the usual 0.5 factor, so it's not normalized,
+		// but no energy correction (2.0 factor) will be needed later.
 		for (std::size_t n = 0; n < N; ++n)
-			_window[n] = 0.5 * (1.0 - std::cos (2.0 * M_PI * n / (N - 1)));
+			_window[n] = 1.0 - std::cos (2.0 * M_PI * n / (N - 1));
 	}
 
 } // namespace xf
