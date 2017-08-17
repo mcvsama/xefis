@@ -48,6 +48,7 @@ XEFIS_HEADERS_MOC		+= xefis/modules/io/ets_airspeed.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/flight_gear.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/link.h
 
 XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
 XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
@@ -55,6 +56,12 @@ XEFIS_SOURCES			+= xefis/modules/io/ets_airspeed.cc
 XEFIS_SOURCES			+= xefis/modules/io/flight_gear.cc
 XEFIS_SOURCES			+= xefis/modules/io/gps.cc
 XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
+XEFIS_SOURCES			+= xefis/modules/io/link.cc
+
+SELFTEST_HEADERS_MOC	+= xefis/modules/io/link.h
+
+SELFTEST_SOURCES		+= xefis/modules/io/link.cc
+SELFTEST_SOURCES		+= xefis/modules/io/tests/link.test.cc
 
 ######## /xefis/modules/log ########
 
@@ -120,11 +127,9 @@ XEFIS_SOURCES			+= modules/helpers/sound.cc
 
 ######## /modules/io ########
 
-XEFIS_HEADERS_MOC		+= modules/io/link.h
 XEFIS_HEADERS_MOC		+= modules/io/udp.h
 XEFIS_HEADERS_MOC		+= modules/io/xbee.h
 
-XEFIS_SOURCES			+= modules/io/link.cc
 XEFIS_SOURCES			+= modules/io/udp.cc
 XEFIS_SOURCES			+= modules/io/xbee.cc
 
@@ -302,6 +307,12 @@ XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
+SELFTEST_HEADERS		+= xefis/core/v2/module.h
+SELFTEST_HEADERS		+= xefis/core/v2/module_io.h
+SELFTEST_HEADERS		+= xefis/core/v2/property.h
+
+SELFTEST_SOURCES		+= xefis/core/v2/module.cc
+SELFTEST_SOURCES		+= xefis/core/v2/module_io.cc
 SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
 
 ######## /xefis/support/air ########
