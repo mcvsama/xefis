@@ -27,9 +27,6 @@
 
 namespace xf {
 
-constexpr std::array<uint8_t, 12> HT16K33::_digit_symbols;
-
-
 HT16K33::LEDMatrix::LEDMatrix()
 {
 	clear();

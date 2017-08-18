@@ -30,15 +30,6 @@
 XEFIS_REGISTER_MODULE_CLASS ("private/state", State)
 
 
-constexpr Length				State::MinimumsBaroStep;
-constexpr Length				State::MinimumsRadioStep;
-constexpr xf::Range<Length>		State::MinimumsBaroRange;
-constexpr xf::Range<Length>		State::MinimumsRadioRange;
-constexpr Pressure				State::QNHhPaStep;
-constexpr Pressure				State::QNHinHgStep;
-constexpr xf::Range<Pressure>	State::QNHRange;
-
-
 template<class P>
 	void
 	State::Observable<P>::process()

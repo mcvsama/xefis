@@ -26,11 +26,6 @@
 
 namespace xf {
 
-constexpr std::size_t QZDevice::kBufferSize;
-constexpr uint32_t QZDevice::kEnableGzip;
-constexpr uint32_t QZDevice::kWindowBits;
-
-
 QZDevice::QZDevice (QFile* gzip_file, QObject* parent):
 	QIODevice (parent),
 	_input (gzip_file)
