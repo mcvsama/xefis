@@ -30,10 +30,6 @@
 
 namespace xf {
 
-constexpr QSize	PanelRotaryEncoder::KnobSize;
-constexpr int	PanelRotaryEncoder::Notches;
-
-
 PanelRotaryEncoder::PanelRotaryEncoder (QWidget* parent, Panel* panel, QString const& knob_label,
 										v1::PropertyInteger value_property, v1::PropertyBoolean click_property):
 	PanelWidget (parent, panel),

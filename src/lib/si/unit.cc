@@ -21,9 +21,6 @@
 
 namespace si {
 
-constexpr const char* DynamicUnit::kDotProductSymbol_utf8;
-
-
 std::string
 DynamicUnit::symbol() const
 {

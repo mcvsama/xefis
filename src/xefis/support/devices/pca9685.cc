@@ -36,11 +36,6 @@
 
 namespace xf {
 
-constexpr si::Time		PCA9685::kInitializationDelay;
-constexpr unsigned int	PCA9685::kChannels;
-constexpr si::Frequency	PCA9685::kInternalFrequency;
-
-
 PCA9685::PCA9685 (i2c::Device&& device, si::Time output_period, xf::Logger* logger):
 	_i2c_device (std::move (device)),
 	_output_period (output_period),

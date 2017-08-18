@@ -45,23 +45,6 @@
 XEFIS_REGISTER_MODULE_CLASS ("io/xbee", XBee)
 
 
-constexpr int		XBee::MaxReadFailureCount;
-constexpr int		XBee::MaxWriteFailureCount;
-constexpr size_t	XBee::MaxOutputBufferSize;
-
-constexpr uint8_t	XBee::PacketDelimiter;
-constexpr uint8_t	XBee::PeriodicPingFrameID;
-constexpr uint8_t	XBee::ClearChannelFrameID;
-
-constexpr Time		XBee::CommandTimeout;
-constexpr Time		XBee::RestartAfter;
-constexpr Time		XBee::PeriodicAliveCheck;
-constexpr Time		XBee::PeriodicAliveCheckTimeout;
-constexpr Time		XBee::ClearChannelCheck;
-constexpr Time		XBee::AfterRestartGraceTime;
-constexpr Time		XBee::RSSITimeout;
-
-
 XBee::XBee (v1::ModuleManager* module_manager, QDomElement const& config):
 	Module (module_manager, config)
 {
