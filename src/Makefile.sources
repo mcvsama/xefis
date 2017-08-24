@@ -50,6 +50,7 @@ XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/link.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/udp.h
+XEFIS_HEADERS_MOC		+= xefis/modules/io/xbee.h
 
 XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
 XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
@@ -59,6 +60,7 @@ XEFIS_SOURCES			+= xefis/modules/io/gps.cc
 XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
 XEFIS_SOURCES			+= xefis/modules/io/link.cc
 XEFIS_SOURCES			+= xefis/modules/io/udp.cc
+XEFIS_SOURCES			+= xefis/modules/io/xbee.cc
 
 SELFTEST_HEADERS_MOC	+= xefis/modules/io/link.h
 
@@ -126,12 +128,6 @@ XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
 XEFIS_HEADERS_MOC		+= modules/helpers/sound.h
 
 XEFIS_SOURCES			+= modules/helpers/sound.cc
-
-######## /modules/io ########
-
-XEFIS_HEADERS_MOC		+= modules/io/xbee.h
-
-XEFIS_SOURCES			+= modules/io/xbee.cc
 
 ######## /modules/systems ########
 

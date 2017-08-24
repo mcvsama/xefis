@@ -23,41 +23,75 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/module.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/v2/module.h>
+#include <xefis/core/v2/property.h>
+#include <xefis/core/v2/setting.h>
+#include <xefis/utility/v2/actions.h>
 #include <xefis/utility/smoother.h>
 
 
+class XBeeIO: public v2::ModuleIO
+{
+  public:
+	/*
+	 * Settings
+	 */
+
+	v2::Setting<bool>				debug			{ this, false };
+	v2::Setting<std::string>		device_path		{ this };
+	v2::Setting<unsigned int>		baud_rate		{ this, 9600 };
+	v2::Setting<int>				channel			{ this };
+	v2::Setting<uint16_t>			pan_id			{ this, 0x0000 };
+	v2::Setting<uint16_t>			local_address	{ this };
+	v2::Setting<uint16_t>			remote_address	{ this };
+	v2::Setting<uint16_t>			power_level		{ this }; // TODO Optional
+
+	/*
+	 * Input
+	 */
+
+	v2::PropertyIn<std::string>		send			{ this, "/send" };
+	v2::PropertyIn<si::Power>		rssi			{ this, "/rssi" };
+
+	/*
+	 * Output
+	 */
+
+	v2::PropertyOut<bool>			serviceable		{ this, "/serviceable" };
+	v2::PropertyOut<std::string>	receive			{ this, "/receive" };
+	v2::PropertyOut<int64_t>		input_errors	{ this, "/input-errors" };
+	v2::PropertyOut<int64_t>		failures		{ this, "/failures" };
+	v2::PropertyOut<int64_t>		cca_failures	{ this, "/clear-channel-failures" };
+};
+
+
 /**
- * Warning: This module is not IO-safe: it uses IO commands in the main thread,
- * which may block.
+ * Warning: This module is not IO-safe: it uses IO commands in the main thread, which may block.
  *
- * XBee Pro modem. Supports only the API mode 1 (non-escaped chars).
- * Use XBee firmware that starts in correct API mode by default,
- * or prepare the modem by issuing "ATAP1" AT command and writing
- * config permanently with "ATWR".
+ * XBee Pro modem. Supports only the API mode 1 (non-escaped chars).  Use XBee firmware that starts in correct API mode
+ * by default, or prepare the modem by issuing "ATAP1" AT command and writing config permanently with "ATWR".
  */
 class XBee:
 	public QObject,
-	public v1::Module
+	public v2::Module<XBeeIO>
 {
 	Q_OBJECT
 
-	static constexpr int		MaxReadFailureCount			= 10;
-	static constexpr int		MaxWriteFailureCount		= 10;
-	static constexpr size_t		MaxOutputBufferSize			= 256;
+	static constexpr int		kMaxReadFailureCount		= 10;
+	static constexpr int		kMaxWriteFailureCount		= 10;
+	static constexpr size_t		kMaxOutputBufferSize		= 256;
 
-	static constexpr uint8_t	PacketDelimiter				= 0x7e;
-	static constexpr uint8_t	PeriodicPingFrameID			= 0xfd;
-	static constexpr uint8_t	ClearChannelFrameID			= 0xfe;
+	static constexpr uint8_t	kPacketDelimiter			= 0x7e;
+	static constexpr uint8_t	kPeriodicPingFrameID		= 0xfd;
+	static constexpr uint8_t	kClearChannelFrameID		= 0xfe;
 
-	static constexpr Time		CommandTimeout				= 200_ms;
-	static constexpr Time		RestartAfter				= 500_ms;
-	static constexpr Time		PeriodicAliveCheck			= 500_ms;
-	static constexpr Time		PeriodicAliveCheckTimeout	= 500_ms;
-	static constexpr Time		ClearChannelCheck			= 2_s;
-	static constexpr Time		AfterRestartGraceTime		= 500_ms;
-	static constexpr Time		RSSITimeout					= 1_s;
+	static constexpr Time		kCommandTimeout				= 200_ms;
+	static constexpr Time		kRestartAfter				= 500_ms;
+	static constexpr Time		kPeriodicAliveCheck			= 500_ms;
+	static constexpr Time		kPeriodicAliveCheckTimeout	= 500_ms;
+	static constexpr Time		kClearChannelCheck			= 2_s;
+	static constexpr Time		kAfterRestartGraceTime		= 500_ms;
+	static constexpr Time		kRSSITimeout				= 1_s;
 
 	// Modem API frame types:
 	enum class SendAPI: uint8_t
@@ -132,14 +166,13 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (v1::ModuleManager*, QDomElement const& config);
+	XBee (std::unique_ptr<XBeeIO>, std::string const& instance = {});
 
 	// Dtor
 	~XBee();
 
-  protected:
 	void
-	data_updated() override;
+	process (v2::Cycle const&) override;
 
   private slots:
 	/**
@@ -386,44 +419,26 @@ class XBee:
 	debug() const;
 
   private:
-	bool					_debug					= false;
-	Unique<QSocketNotifier>	_notifier;
-	QString					_device_path;
-	int						_device					= 0;
-	QTimer*					_restart_timer			= nullptr;
-	QTimer*					_pong_timer				= nullptr;
-	QTimer*					_periodic_ping_timer	= nullptr;
-	QTimer*					_periodic_pong_timer	= nullptr;
-	QTimer*					_clear_channel_timer	= nullptr;
-	QTimer*					_after_reset_timer		= nullptr;
-	QTimer*					_rssi_timer				= nullptr;
-	std::string				_baud_rate				= "9600";
-	std::string				_serial_number_bin;
-	int						_channel				= 0;
-	QString					_pan_id_string			= "00:00";
-	uint16_t				_pan_id					= 0;
-	QString					_local_address_string;
-	QString					_remote_address_string;
-	uint16_t				_local_address			= 0;
-	uint16_t				_remote_address			= 0;
-	std::optional<int>		_power_level;
-	ConfigurationStep		_configuration_step		= ConfigurationStep::Unconfigured;
-	int						_read_failure_count		= 0;
-	int						_write_failure_count	= 0;
-	std::string				_input_buffer;
-	std::string				_output_buffer;
-	std::string				_last_at_command;
-	xf::Smoother<double>	_rssi_smoother			{ 200_ms };
-	Time					_last_rssi_time;
-	uint8_t					_at_frame_id			= 0x00;
-
-	v1::PropertyBoolean		_serviceable;
-	v1::PropertyString		_send;
-	v1::PropertyString		_receive;
-	v1::PropertyInteger		_input_errors;
-	v1::PropertyFloat		_rssi_dbm;
-	v1::PropertyInteger		_failures;
-	v1::PropertyInteger		_cca_failures;
+	Unique<QSocketNotifier>			_notifier;
+	int								_device					= 0;
+	QTimer*							_restart_timer			= nullptr;
+	QTimer*							_pong_timer				= nullptr;
+	QTimer*							_periodic_ping_timer	= nullptr;
+	QTimer*							_periodic_pong_timer	= nullptr;
+	QTimer*							_clear_channel_timer	= nullptr;
+	QTimer*							_after_reset_timer		= nullptr;
+	QTimer*							_rssi_timer				= nullptr;
+	std::string						_serial_number_bin;
+	ConfigurationStep				_configuration_step		= ConfigurationStep::Unconfigured;
+	int								_read_failure_count		= 0;
+	int								_write_failure_count	= 0;
+	std::string						_input_buffer;
+	std::string						_output_buffer;
+	std::string						_last_at_command;
+	xf::Smoother<si::Power>			_rssi_smoother			{ 200_ms };
+	Time							_last_rssi_time;
+	uint8_t							_at_frame_id			{ 0x00 };
+	v2::PropChanged<std::string>	_send_changed			{ io.send };
 };
 
 

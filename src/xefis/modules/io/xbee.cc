@@ -26,7 +26,7 @@
 #include <errno.h>
 
 // Qt:
-#include <QtXml/QDomElement>
+#include <QtCore/QTimer>
 
 // Lib:
 #include <boost/endian/conversion.hpp>
@@ -42,53 +42,29 @@
 #include "xbee.h"
 
 
-XEFIS_REGISTER_MODULE_CLASS ("io/xbee", XBee)
-
-
-XBee::XBee (v1::ModuleManager* module_manager, QDomElement const& config):
-	Module (module_manager, config)
+XBee::XBee (std::unique_ptr<XBeeIO> module_io, std::string const& instance):
+	Module (std::move (module_io), instance)
 {
-	parse_settings (config, {
-		{ "debug", _debug, false },
-		{ "device", _device_path, true },
-		{ "baud-rate", _baud_rate, true },
-		{ "channel", _channel, true },
-		{ "pan-id", _pan_id_string, true },
-		{ "local-address", _local_address_string, true },
-		{ "remote-address", _remote_address_string, true },
-		{ "power-level", _power_level, false },
-	});
-
-	parse_properties (config, {
-		{ "serviceable", _serviceable, true },
-		{ "send", _send, true },
-		{ "receive", _receive, true },
-		{ "input-errors", _input_errors, true },
-		{ "rssi-dbm", _rssi_dbm, true },
-		{ "failures", _failures, true },
-		{ "cca-failures", _cca_failures, false },
-	});
-
 	_restart_timer = new QTimer (this);
-	_restart_timer->setInterval (RestartAfter.quantity<Millisecond>());
+	_restart_timer->setInterval (kRestartAfter.quantity<Millisecond>());
 	_restart_timer->setSingleShot (true);
 	QObject::connect (_restart_timer, SIGNAL (timeout()), this, SLOT (open_device()));
 
 	// Ping timer pings modem periodically. After each ping alive-check-timer is started
-	// to see if there's response. If there's none, failre() is called.
+	// to see if there's response. If there's none, failure() is called.
 	_periodic_ping_timer = new QTimer (this);
-	_periodic_ping_timer->setInterval (PeriodicAliveCheck.quantity<Millisecond>());
+	_periodic_ping_timer->setInterval (kPeriodicAliveCheck.quantity<Millisecond>());
 	_periodic_ping_timer->setSingleShot (false);
 	QObject::connect (_periodic_ping_timer, SIGNAL (timeout()), this, SLOT (periodic_ping()));
 
 	// Clear channel assessment timer.
 	_clear_channel_timer = new QTimer (this);
-	_clear_channel_timer->setInterval (ClearChannelCheck.quantity<Millisecond>());
+	_clear_channel_timer->setInterval (kClearChannelCheck.quantity<Millisecond>());
 	_clear_channel_timer->setSingleShot (false);
 	QObject::connect (_clear_channel_timer, SIGNAL (timeout()), this, SLOT (clear_channel_check()));
 
 	_periodic_pong_timer = new QTimer (this);
-	_periodic_pong_timer->setInterval (PeriodicAliveCheckTimeout.quantity<Millisecond>());
+	_periodic_pong_timer->setInterval (kPeriodicAliveCheckTimeout.quantity<Millisecond>());
 	_periodic_pong_timer->setSingleShot (true);
 	QObject::connect (_periodic_pong_timer, SIGNAL (timeout()), this, SLOT (periodic_pong_timeout()));
 
@@ -97,49 +73,32 @@ XBee::XBee (v1::ModuleManager* module_manager, QDomElement const& config):
 	QObject::connect (_pong_timer, SIGNAL (timeout()), this, SLOT (pong_timeout()));
 
 	_after_reset_timer = new QTimer (this);
-	_after_reset_timer->setInterval (AfterRestartGraceTime.quantity<Millisecond>());
+	_after_reset_timer->setInterval (kAfterRestartGraceTime.quantity<Millisecond>());
 	_after_reset_timer->setSingleShot (true);
 	QObject::connect (_after_reset_timer, SIGNAL (timeout()), this, SLOT (continue_after_reset()));
 
 	_rssi_timer = new QTimer (this);
-	_rssi_timer->setInterval (RSSITimeout.quantity<Millisecond>());
+	_rssi_timer->setInterval (kRSSITimeout.quantity<Millisecond>());
 	_rssi_timer->setSingleShot (true);
 	QObject::connect (_rssi_timer, SIGNAL (timeout()), this, SLOT (rssi_timeout()));
 	_rssi_timer->start();
 
-	if (!vector_to_uint16 (xf::parse_hex_string (_local_address_string), _local_address))
-	{
-		log() << "Error: local address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
-		_local_address = 0x0000;
-	}
-	else if (_local_address == 0xffff)
+	if (*io.local_address == 0xffff)
 	{
 		log() << "Can't use local address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
-		_local_address = 0x0000;
+		*io.local_address = 0x0000;
 	}
 
-	if (!vector_to_uint16 (xf::parse_hex_string (_remote_address_string), _remote_address))
-	{
-		log() << "Error: remote address must be 16-bit address in form 00:00 (eg. 12:34)." << std::endl;
-		_remote_address = 0x0000;
-	}
-	else if (_remote_address == 0xffff)
+	if (*io.remote_address == 0xffff)
 	{
 		log() << "Can't use remote address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
-		_remote_address = 0x0000;
+		*io.remote_address = 0x0000;
 	}
 
-	// PAN ID:
-	if (!vector_to_uint16 (xf::parse_hex_string (_pan_id_string), _pan_id))
-	{
-		log() << "Invalid pan-id setting: must be 2-byte binary string (eg. 01:23). Setting pan-id to default 00:00." << std::endl;
-		_pan_id = 0x0000;
-	}
-
-	_serviceable.set_default (false);
-	_input_errors.set_default (0);
-	_failures.set_default (0);
-	_cca_failures.set_default (0);
+	io.serviceable.set_fallback (false);
+	io.input_errors.set_fallback (0);
+	io.failures.set_fallback (0);
+	io.cca_failures.set_fallback (0);
 
 	open_device();
 }
@@ -153,15 +112,15 @@ XBee::~XBee()
 
 
 void
-XBee::data_updated()
+XBee::process (v2::Cycle const&)
 {
 	// If device is not open, skip.
 	if (!_notifier)
 		return;
 
-	if (_send.valid() && _send.fresh() && configured())
+	if (io.send && _send_changed() && configured())
 	{
-		std::string data = _output_buffer + *_send;
+		std::string data = _output_buffer + *io.send;
 		std::vector<std::string> packets = packetize (data, 100); // Max 100 bytes per packet according to XBee docs.
 
 		auto send_back_to_output_buffer = [&] (std::string const& front) -> void
@@ -176,7 +135,7 @@ XBee::data_updated()
 		while (!packets.empty())
 		{
 			std::string s = packets.front();
-			std::string frame = make_frame (make_tx16_command (_remote_address, s));
+			std::string frame = make_frame (make_tx16_command (*io.remote_address, s));
 			packets.erase (packets.begin());
 
 			int written = 0;
@@ -241,7 +200,7 @@ XBee::read()
 				if (n == 0)
 				{
 					_read_failure_count++;
-					if (_read_failure_count > MaxReadFailureCount)
+					if (_read_failure_count > kMaxReadFailureCount)
 					{
 						failure ("multiple read failures");
 						_read_failure_count = 0;
@@ -271,15 +230,15 @@ void
 XBee::open_device()
 {
 	try {
-		log() << "Opening device " << _device_path.toStdString() << std::endl;
+		log() << "Opening device " << *io.device_path << std::endl;
 
 		reset();
 
-		_device = ::open (_device_path.toStdString().c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+		_device = ::open (io.device_path->c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
 
 		if (_device < 0)
 		{
-			log() << "Could not open device file " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+			log() << "Could not open device file " << *io.device_path << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -306,14 +265,10 @@ XBee::open_device()
 void
 XBee::failure (std::string const& reason)
 {
-	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _device_path.toStdString() << std::endl;
-
+	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << *io.device_path << std::endl;
 	_notifier.reset();
 	::close (_device);
-
-	if (_failures.configured())
-		_failures.write (*_failures + 1);
-
+	io.failures = *io.failures + 1;
 	restart();
 }
 
@@ -324,12 +279,12 @@ XBee::reset()
 	pong();
 	stop_periodic_ping();
 	_configuration_step = ConfigurationStep::Unconfigured;
-	_serviceable.write (false);
+	io.serviceable = false;
 	_output_buffer.clear();
 	_restart_timer->stop();
 	_after_reset_timer->stop();
-	_send.set_nil();
-	_receive.set_nil();
+	io.send.set_nil();
+	io.receive.set_nil();
 }
 
 
@@ -351,7 +306,7 @@ XBee::periodic_ping()
 		_clear_channel_timer->start();
 
 	int written = 0;
-	switch (send_frame (make_frame (make_at_command ("AI", PeriodicPingFrameID)), written))
+	switch (send_frame (make_frame (make_at_command ("AI", kPeriodicPingFrameID)), written))
 	{
 		case SendResult::Success:
 			_periodic_pong_timer->start();
@@ -377,7 +332,7 @@ void
 XBee::clear_channel_check()
 {
 	int written = 0;
-	switch (send_frame (make_frame (make_at_command ("EC", ClearChannelFrameID)), written))
+	switch (send_frame (make_frame (make_at_command ("EC", kClearChannelFrameID)), written))
 	{
 		case SendResult::Success:
 			break;
@@ -422,19 +377,19 @@ XBee::continue_after_reset()
 void
 XBee::rssi_timeout()
 {
-	_rssi_dbm.set_nil();
+	io.rssi.set_nil();
 }
 
 
 bool
 XBee::set_device_options()
 {
-	log() << "Setting baud rate to " << _baud_rate << std::endl;
+	log() << "Setting baud rate to " << *io.baud_rate << std::endl;
 
 #if 0 // TODO
 	SerialPort::Configuration configuration;
 	configuration.set_read_timeout (0.1_s);
-	configuration.set_baud_rate (_baud_rate);
+	configuration.set_baud_rate (*io.baud_rate);
 #else
 	termios options;
 	bzero (&options, sizeof (options));
@@ -449,21 +404,20 @@ XBee::set_device_options()
 	options.c_oflag = 0;
 	options.c_lflag = 0;
 
-	int baud_rate_const = xf::SerialPort::termios_baud_rate (_baud_rate);
-	cfsetispeed (&options, baud_rate_const);
-	cfsetospeed (&options, baud_rate_const);
+	cfsetispeed (&options, *io.baud_rate);
+	cfsetospeed (&options, *io.baud_rate);
 
 	tcflush (_device, TCIOFLUSH);
 
 	if (tcsetattr (_device, TCSANOW, &options) != 0)
 	{
-		log() << "Could not setup serial port: " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+		log() << "Could not setup serial port: " << *io.device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
 	if (tcflow (_device, TCOON | TCION) != 0)
 	{
-		log() << "Could not enable flow: tcflow(): " << _device_path.toStdString() << ": " << strerror (errno) << std::endl;
+		log() << "Could not enable flow: tcflow(): " << *io.device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 #endif
@@ -483,7 +437,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 		for (uint8_t b: data_bytes)
 			full_at += static_cast<char> (b);
 
-		if (_debug)
+		if (*io.debug)
 			debug() << "Sending AT command " << at << ": " << xf::to_hex_string (full_at) << std::endl;
 
 		int written = 0;
@@ -491,7 +445,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 		if (send_frame (make_frame (make_at_command (full_at, static_cast<uint8_t> (next_step))), written) != SendResult::Success)
 			failure ("initialization: " + at);
 		else
-			ping (CommandTimeout);
+			ping (kCommandTimeout);
 	};
 
 	if (status != ATResponseStatus::OK && status != ATResponseStatus::StartConfig)
@@ -512,7 +466,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 		{
 			case ConfigurationStep::Unconfigured:
 				log() << "Starting modem configuration." << std::endl;
-				_serviceable.write (false);
+				io.serviceable = false;
 
 				request_at (ConfigurationStep::SoftwareReset, "FR");
 				// Note: this will cause immediate response and also 'watchdog reset' after a while.
@@ -521,7 +475,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 
 			case ConfigurationStep::SoftwareReset:
 				// Disregard this response. Wait for ModemStatus::WatchdogReset.
-				ping (CommandTimeout);
+				ping (kCommandTimeout);
 				break;
 
 			case ConfigurationStep::AfterSoftwareReset:
@@ -574,11 +528,11 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::SetAssociationParams:
-				request_at (ConfigurationStep::SetChannel, "CH", { static_cast<uint8_t> (_channel) });
+				request_at (ConfigurationStep::SetChannel, "CH", { static_cast<uint8_t> (*io.channel) });
 				break;
 
 			case ConfigurationStep::SetChannel:
-				request_at (ConfigurationStep::SetPersonalAreaNetworkID, "ID", { static_cast<uint8_t> (_pan_id >> 8), static_cast<uint8_t> (_pan_id) });
+				request_at (ConfigurationStep::SetPersonalAreaNetworkID, "ID", { static_cast<uint8_t> (*io.pan_id >> 8), static_cast<uint8_t> (*io.pan_id) });
 				break;
 
 			case ConfigurationStep::SetPersonalAreaNetworkID:
@@ -586,17 +540,17 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::SetDestinationAddressH:
-				request_at (ConfigurationStep::SetDestinationAddressL, "DL", { 0x00, 0x00, static_cast<uint8_t> (_remote_address >> 8), static_cast<uint8_t> (_remote_address) });
+				request_at (ConfigurationStep::SetDestinationAddressL, "DL", { 0x00, 0x00, static_cast<uint8_t> (*io.remote_address >> 8), static_cast<uint8_t> (*io.remote_address) });
 				break;
 
 			case ConfigurationStep::SetDestinationAddressL:
-				request_at (ConfigurationStep::SetLocalAddress, "MY", { static_cast<uint8_t> (_local_address >> 8), static_cast<uint8_t> (_local_address) });
+				request_at (ConfigurationStep::SetLocalAddress, "MY", { static_cast<uint8_t> (*io.local_address >> 8), static_cast<uint8_t> (*io.local_address) });
 				break;
 
 			case ConfigurationStep::SetLocalAddress:
-				if (_power_level)
+				if (io.power_level)
 				{
-					request_at (ConfigurationStep::SetPowerLevel, "PL", { static_cast<uint8_t> (*_power_level) });
+					request_at (ConfigurationStep::SetPowerLevel, "PL", { static_cast<uint8_t> (*io.power_level) });
 					break;
 				}
 				else
@@ -610,7 +564,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 			case ConfigurationStep::SetCoordinatorMode:
 				log() << "Modem configured." << std::endl;
 				_configuration_step = ConfigurationStep::Configured;
-				_serviceable.write (true);
+				io.serviceable = true;
 				periodic_ping();
 				break;
 
@@ -754,7 +708,7 @@ bool
 XBee::send_failed_with_retry()
 {
 	_write_failure_count++;
-	bool should_restart = _write_failure_count > MaxWriteFailureCount || _output_buffer.size() > MaxOutputBufferSize;
+	bool should_restart = _write_failure_count > kMaxWriteFailureCount || _output_buffer.size() > kMaxOutputBufferSize;
 	if (should_restart)
 		_write_failure_count = 0;
 	return should_restart;
@@ -824,7 +778,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 {
 	for (;;)
 	{
-		std::string::size_type p = input.find (PacketDelimiter);
+		std::string::size_type p = input.find (kPacketDelimiter);
 
 		if (p == std::string::npos)
 		{
@@ -835,8 +789,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 		// Discard non-parseable data:
 		input.erase (input.begin(), input.begin() + p);
 
-		if (_input_errors.configured())
-			_input_errors.write (*_input_errors + p);
+		io.input_errors = *io.input_errors + p;
 
 		// Delimiter (1B) + packet size (2B) + data (1B) + checksum (1B) gives
 		// at least 5 bytes:
@@ -875,7 +828,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 void
 XBee::process_rx64_frame (std::string const& frame)
 {
-	if (_debug)
+	if (*io.debug)
 		debug() << ">> RX64 data: " << xf::to_hex_string (frame) << std::endl;
 
 	// At least 11 bytes:
@@ -909,7 +862,7 @@ XBee::process_rx64_frame (std::string const& frame)
 void
 XBee::process_rx16_frame (std::string const& frame)
 {
-	if (_debug)
+	if (*io.debug)
 		debug() << ">> RX16 data: " << xf::to_hex_string (frame) << std::endl;
 
 	// At least 5 bytes:
@@ -919,7 +872,7 @@ XBee::process_rx16_frame (std::string const& frame)
 	// 16-bit address:
 	uint16_t address = (static_cast<uint16_t> (frame[0]) << 8) | frame[1];
 	// Address must match our peer's address:
-	if (address != _remote_address)
+	if (address != *io.remote_address)
 	{
 		log() << "Got packet from unknown address: " << xf::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
 		return;
@@ -947,7 +900,7 @@ XBee::process_rx16_frame (std::string const& frame)
 void
 XBee::process_modem_status_frame (std::string const& data)
 {
-	if (_debug)
+	if (*io.debug)
 		debug() << ">> Modem status: " << xf::to_hex_string (data) << std::endl;
 
 	if (data.size() < 1)
@@ -1006,7 +959,7 @@ XBee::process_modem_status_frame (std::string const& data)
 void
 XBee::process_at_response_frame (std::string const& frame)
 {
-	if (_debug)
+	if (*io.debug)
 		debug() << ">> AT status: " << xf::to_hex_string (frame) << std::endl;
 
 	// Response must be at least 4 bytes long:
@@ -1026,7 +979,7 @@ XBee::process_at_response_frame (std::string const& frame)
 	// Data:
 	std::string response_data = frame.substr (4);
 
-	if (_debug)
+	if (*io.debug)
 	{
 		std::ostream& os = debug();
 		os << "Command result: " << command << " ";
@@ -1042,9 +995,9 @@ XBee::process_at_response_frame (std::string const& frame)
 	}
 
 	// Response data: bytes
-	if (frame_id == PeriodicPingFrameID)
+	if (frame_id == kPeriodicPingFrameID)
 		periodic_pong (status, response_data);
-	else if (frame_id == ClearChannelFrameID)
+	else if (frame_id == kClearChannelFrameID)
 		clear_channel_result (status, response_data);
 	else
 		configure_modem (frame_id, status, response_data);
@@ -1054,8 +1007,8 @@ XBee::process_at_response_frame (std::string const& frame)
 void
 XBee::write_output_property (std::string const& data)
 {
-	if (_receive.configured() && configured())
-		_receive.write (data);
+	if (configured())
+		io.receive = data;
 }
 
 
@@ -1065,12 +1018,11 @@ XBee::report_rssi (int dbm)
 	// Restart timer:
 	_rssi_timer->start();
 
-	if (_rssi_dbm.configured())
-	{
-		Time now = xf::TimeHelper::now();
-		_rssi_dbm.write (_rssi_smoother.process (static_cast<double> (dbm), now - _last_rssi_time));
-		_last_rssi_time = now;
-	}
+	// Convert dBm to milliwatts:
+	si::Power power = 1_mW * std::pow (10.0, 0.1 * static_cast<double> (dbm));
+	Time now = xf::TimeHelper::now();
+	io.rssi = _rssi_smoother (power, now - _last_rssi_time);
+	_last_rssi_time = now;
 }
 
 
@@ -1119,11 +1071,8 @@ XBee::clear_channel_result (ATResponseStatus status, std::string const& result)
 {
 	if (status == ATResponseStatus::OK && result.size() >= 2)
 	{
-		if (_cca_failures.configured())
-		{
-			uint16_t failures = (static_cast<uint16_t> (result[0]) >> 8) | result[1];
-			_cca_failures.write (*_cca_failures + failures);
-		}
+		uint16_t failures = (static_cast<uint16_t> (result[0]) >> 8) | result[1];
+		io.cca_failures = *io.cca_failures + failures;
 	}
 }
 
