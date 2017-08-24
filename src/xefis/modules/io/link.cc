@@ -16,9 +16,6 @@
 #include <memory>
 #include <random>
 
-// Qt:
-#include <QtXml/QDomElement>
-
 // Lib:
 #include <boost/endian/conversion.hpp>
 
