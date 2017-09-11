@@ -28,8 +28,8 @@ using namespace test_asserts;
 using namespace si::units;
 
 
-static xf::RuntimeTest t_1 ("TODO name me", []{
-	//v2::PropertyBool p1;
+static xf::RuntimeTest t_1 ("unfinished v2::Property test", []{
+	// TODO
 });
 
 } // namespace test
