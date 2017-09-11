@@ -149,6 +149,17 @@ class PropertyVirtualInterface
 	property_to_blob (Blob&) const = 0;
 
 	/**
+	 * Convenience overload that returns the Blob object.
+	 */
+	Blob
+	property_to_blob() const
+	{
+		Blob result;
+		property_to_blob (result);
+		return result;
+	}
+
+	/**
 	 * Deserializes property value.
 	 * The blob has variable-length.
 	 * \throw	InvalidBlobSize
