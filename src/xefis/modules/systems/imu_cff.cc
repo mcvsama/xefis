@@ -32,12 +32,12 @@ IMU_CFF::IMU_CFF (std::unique_ptr<IMU_CFF_IO> module_io, std::string const& inst
 		&_smooth_accel_z,
 	});
 	_centripetal_computer.observe ({
-		&io.input_angular_velocity_x,
-		&io.input_angular_velocity_y,
-		&io.input_angular_velocity_z,
-		&io.input_tas_x,
-		&io.input_tas_y,
-		&io.input_tas_z,
+		&io.angular_velocity_x,
+		&io.angular_velocity_y,
+		&io.angular_velocity_z,
+		&io.tas_x,
+		&io.tas_y,
+		&io.tas_z,
 	});
 }
 
@@ -68,51 +68,51 @@ IMU_CFF::compute_centripetal()
 	 *   a[z] = v[x] * (2 * pi * +f[y])
 	 */
 
-	if (io.input_angular_velocity_x && io.input_angular_velocity_y && io.input_angular_velocity_z &&
-		io.input_tas_x && io.input_tas_y && io.input_tas_z)
+	if (io.angular_velocity_x && io.angular_velocity_y && io.angular_velocity_z &&
+		io.tas_x && io.tas_y && io.tas_z)
 	{
 		si::Time dt = _centripetal_computer.update_dt();
 
 		math::Vector<si::Velocity, 3> vec_v {
-			*io.input_tas_x,
-			*io.input_tas_y,
-			*io.input_tas_z,
+			*io.tas_x,
+			*io.tas_y,
+			*io.tas_z,
 		};
 
 		math::Vector<si::AngularVelocity, 3> vec_w {
-			*io.input_angular_velocity_x,
-			*io.input_angular_velocity_y,
-			*io.input_angular_velocity_z,
+			*io.angular_velocity_x,
+			*io.angular_velocity_y,
+			*io.angular_velocity_z,
 		};
 
 		auto acceleration = math::cross_product (vec_v, vec_w);
 
-		io.output_centripetal_acceleration_x = _smooth_accel_x (acceleration[0], dt);
-		io.output_centripetal_acceleration_y = _smooth_accel_y (acceleration[1], dt);
-		io.output_centripetal_acceleration_z = _smooth_accel_z (acceleration[2], dt);
+		io.centripetal_acceleration_x = _smooth_accel_x (acceleration[0], dt);
+		io.centripetal_acceleration_y = _smooth_accel_y (acceleration[1], dt);
+		io.centripetal_acceleration_z = _smooth_accel_z (acceleration[2], dt);
 
-		if (io.input_mass)
+		if (io.mass)
 		{
-			io.output_centripetal_force_x = *io.input_mass * *io.output_centripetal_acceleration_x;
-			io.output_centripetal_force_y = *io.input_mass * *io.output_centripetal_acceleration_y;
-			io.output_centripetal_force_z = *io.input_mass * *io.output_centripetal_acceleration_z;
+			io.centripetal_force_x = *io.mass * *io.centripetal_acceleration_x;
+			io.centripetal_force_y = *io.mass * *io.centripetal_acceleration_y;
+			io.centripetal_force_z = *io.mass * *io.centripetal_acceleration_z;
 		}
 		else
 		{
-			io.output_centripetal_force_x.set_nil();
-			io.output_centripetal_force_y.set_nil();
-			io.output_centripetal_force_z.set_nil();
+			io.centripetal_force_x.set_nil();
+			io.centripetal_force_y.set_nil();
+			io.centripetal_force_z.set_nil();
 		}
 	}
 	else
 	{
-		io.output_centripetal_force_x.set_nil();
-		io.output_centripetal_force_y.set_nil();
-		io.output_centripetal_force_z.set_nil();
+		io.centripetal_force_x.set_nil();
+		io.centripetal_force_y.set_nil();
+		io.centripetal_force_z.set_nil();
 
-		io.output_centripetal_acceleration_x.set_nil();
-		io.output_centripetal_acceleration_y.set_nil();
-		io.output_centripetal_acceleration_z.set_nil();
+		io.centripetal_acceleration_x.set_nil();
+		io.centripetal_acceleration_y.set_nil();
+		io.centripetal_acceleration_z.set_nil();
 	}
 }
 

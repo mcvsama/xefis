@@ -32,7 +32,7 @@ VerticalTrim::VerticalTrim (std::unique_ptr<VerticalTrimIO> module_io, std::stri
 	InstrumentAids (0.5f)
 {
 	_inputs_observer.set_callback ([&]{ update(); });
-	_inputs_observer.observe (io.input_trim_value);
+	_inputs_observer.observe (io.trim_value);
 }
 
 
@@ -60,14 +60,14 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	std::optional<double> trim = io.input_trim_value.get_optional();
+	std::optional<double> trim = io.trim_value.get_optional();
 
 	if (trim)
 		xf::clamp (*trim, -1.0, +1.0);
 
-	std::optional<double> ref = io.input_trim_reference.get_optional();
-	std::optional<double> ref_min = io.input_trim_reference_minimum.get_optional();
-	std::optional<double> ref_max = io.input_trim_reference_maximum.get_optional();
+	std::optional<double> ref = io.trim_reference.get_optional();
+	std::optional<double> ref_min = io.trim_reference_minimum.get_optional();
+	std::optional<double> ref_max = io.trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = height() - h;

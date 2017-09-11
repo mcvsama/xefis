@@ -39,21 +39,21 @@ class EngineTorqueIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<EngineEfficiency>		setting_motor_efficiency	{ this };
-	v2::Setting<MotorKv>				setting_motor_kv			{ this };
+	v2::Setting<EngineEfficiency>		motor_efficiency	{ this, "motor_efficiency" };
+	v2::Setting<MotorKv>				motor_kv			{ this, "motor_kv" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::AngularVelocity>	input_engine_speed			{ this, "/engine-speed" };
-	v2::PropertyIn<si::Current>			input_engine_current		{ this, "/engine-current" };
+	v2::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "/engine-speed" };
+	v2::PropertyIn<si::Current>			engine_current		{ this, "/engine-current" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Torque>			output_engine_torque		{ this, "/engine-torque" };
+	v2::PropertyOut<si::Torque>			engine_torque		{ this, "/engine-torque" };
 };
 
 

@@ -35,25 +35,25 @@ class FlapsControlIO: public v2::ModuleIO
 	 */
 
 	// How fast flaps should extend/retract:
-	v2::Setting<si::AngularVelocity>	setting_angular_velocity	{ this, 10_deg / 1_s };
+	v2::Setting<si::AngularVelocity>	angular_velocity	{ this, "angular_velocity", 10_deg / 1_s };
 	// Range of output_control property:
-	v2::Setting<xf::Range<double>>		setting_control_extents		{ this, { 0.0, 1.0 } };
+	v2::Setting<xf::Range<double>>		control_extents		{ this, "control_extents", { 0.0, 1.0 } };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>				input_up					{ this, "/input/up", false };
-	v2::PropertyIn<bool>				input_down					{ this, "/input/down", false };
-	v2::PropertyIn<si::Angle>			input_setting				{ this, "/input/setting", 0_deg };
+	v2::PropertyIn<bool>				up					{ this, "/input/up", false };
+	v2::PropertyIn<bool>				down				{ this, "/input/down", false };
+	v2::PropertyIn<si::Angle>			input_setting		{ this, "/input/setting", 0_deg };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>			output_setting				{ this, "/output/setting" };
-	v2::PropertyOut<si::Angle>			output_current				{ this, "/output/current" };
-	v2::PropertyOut<double>				output_control				{ this, "/output/control" };
+	v2::PropertyOut<si::Angle>			output_setting		{ this, "/output/setting" };
+	v2::PropertyOut<si::Angle>			current				{ this, "/output/current" };
+	v2::PropertyOut<double>				control				{ this, "/output/control" };
 };
 
 
@@ -81,8 +81,8 @@ class FlapsControl: public v2::Module<FlapsControlIO>
 	si::Angle					_setting;
 	si::Angle					_current;
 	Unique<QTimer>				_timer;
-	v2::PropChangedTo<bool>		_input_up_clicked		{ io.input_up, true };
-	v2::PropChangedTo<bool>		_input_down_clicked		{ io.input_down, true };
+	v2::PropChangedTo<bool>		_input_up_clicked		{ io.up, true };
+	v2::PropChangedTo<bool>		_input_down_clicked		{ io.down, true };
 	v2::PropChanged<si::Angle>	_input_setting_changed	{ io.input_setting };
 };
 

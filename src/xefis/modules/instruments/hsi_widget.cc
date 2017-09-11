@@ -707,13 +707,13 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 
 	if (_params.track_lateral_rotation && _params.ground_speed &&
 		_locals.track && _locals.rotation &&
-		2.f * trend_time_gap() < _params.trend_vector_times[2] && _params.range <= _params.trend_vector_max_range)
+		2.f * trend_time_gap() < _params.trend_vector_durations[2] && _params.range <= _params.trend_vector_max_range)
 	{
 		painter.setPen (est_pen);
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipRect (_trend_vector_clip_rect);
 
-		Time step = *std::min_element (_params.trend_vector_times.begin(), _params.trend_vector_times.end()) / 100.0;
+		Time step = *std::min_element (_params.trend_vector_durations.begin(), _params.trend_vector_durations.end()) / 100.0;
 		Angle const angle_per_step = step * *_params.track_lateral_rotation;
 		Angle total_angle = 0_deg;
 
@@ -734,7 +734,7 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 			wt->compute_wind_vector();
 		}
 
-		for (Time t = 0_s; t < _params.trend_vector_times[2]; t += step)
+		for (Time t = 0_s; t < _params.trend_vector_durations[2]; t += step)
 		{
 			transform.rotate (angle_per_step.quantity<Degree>());
 			total_angle += angle_per_step;
@@ -752,9 +752,9 @@ HSIWidget::PaintWorkUnit::paint_trend_vector (xf::Painter& painter)
 				break;
 			}
 
-			if ((_params.trend_vector_min_ranges[0] <= _params.range && trend_time_gap() <= t && t < _params.trend_vector_times[0]) ||
-				(_params.trend_vector_min_ranges[1] <= _params.range && trend_time_gap() + _params.trend_vector_times[0] <= t && t < _params.trend_vector_times[1]) ||
-				(_params.trend_vector_min_ranges[2] <= _params.range && trend_time_gap() + _params.trend_vector_times[1] <= t && t < _params.trend_vector_times[2]))
+			if ((_params.trend_vector_min_ranges[0] <= _params.range && trend_time_gap() <= t && t < _params.trend_vector_durations[0]) ||
+				(_params.trend_vector_min_ranges[1] <= _params.range && trend_time_gap() + _params.trend_vector_durations[0] <= t && t < _params.trend_vector_durations[1]) ||
+				(_params.trend_vector_min_ranges[2] <= _params.range && trend_time_gap() + _params.trend_vector_durations[1] <= t && t < _params.trend_vector_durations[2]))
 			{
 				polygon << transform.map (QPointF (0.f, -px));
 			}
@@ -1907,11 +1907,11 @@ HSIWidget::PaintWorkUnit::actual_trend_range() const
 		Time time = 0_s;
 
 		if (_params.range >= _params.trend_vector_min_ranges[2])
-			time = _params.trend_vector_times[2];
+			time = _params.trend_vector_durations[2];
 		else if (_params.range >= _params.trend_vector_min_ranges[1])
-			time = _params.trend_vector_times[1];
+			time = _params.trend_vector_durations[1];
 		else if (_params.range >= _params.trend_vector_min_ranges[0])
-			time = _params.trend_vector_times[0];
+			time = _params.trend_vector_durations[0];
 
 		return *_params.ground_speed * time;
 	}

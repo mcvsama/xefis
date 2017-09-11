@@ -63,7 +63,7 @@ GPS::Connection::~Connection()
 {
 	_gps_module.log() << "Stop GPS serial connection" << std::endl;
 	_gps_module.reset_data_properties();
-	_gps_module.io.output_serviceable = false;
+	_gps_module.io.serviceable = false;
 	_reliable_fix_quality = false;
 }
 
@@ -114,7 +114,7 @@ GPS::Connection::initialize_device()
 
 	_serial_port->write (xf::nmea::make_mtk_sentence (get_nmea_frequencies_setup_messages (_serial_port_config.baud_rate())));
 	// Now send user setup commands:
-	for (auto const& s: *_gps_module.io.setting_boot_pmtk_commands)
+	for (auto const& s: *_gps_module.io.boot_pmtk_commands)
 	{
 		std::string pmtk = xf::nmea::make_mtk_sentence (s);
 		_serial_port->write (pmtk);
@@ -169,7 +169,7 @@ GPS::Connection::serial_data_ready()
 		}
 		catch (...)
 		{
-			_gps_module.io.output_read_errors = *_gps_module.io.output_read_errors + 1;
+			_gps_module.io.read_errors = *_gps_module.io.read_errors + 1;
 			_gps_module.log() << "Exception when processing NMEA sentence: " << std::current_exception() << std::endl;
 		}
 	} while (processed);
@@ -188,22 +188,22 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 {
 	message_received();
 
-	_gps_module.io.output_latitude = sentence.latitude;
-	_gps_module.io.output_longitude = sentence.longitude;
+	_gps_module.io.latitude = sentence.latitude;
+	_gps_module.io.longitude = sentence.longitude;
 
 	using xf::nmea::to_string;
 
 	if (sentence.fix_quality)
-		_gps_module.io.output_fix_quality = to_string (*sentence.fix_quality);
+		_gps_module.io.fix_quality = to_string (*sentence.fix_quality);
 	else
-		_gps_module.io.output_fix_quality.set_nil();
+		_gps_module.io.fix_quality.set_nil();
 
-	_gps_module.io.output_tracked_satellites = sentence.tracked_satellites;
-	_gps_module.io.output_altitude_amsl = sentence.altitude_amsl;
-	_gps_module.io.output_geoid_height = sentence.geoid_height;
-	_gps_module.io.output_dgps_station_id = sentence.dgps_station_id;
+	_gps_module.io.tracked_satellites = sentence.tracked_satellites;
+	_gps_module.io.altitude_amsl = sentence.altitude_amsl;
+	_gps_module.io.geoid_height = sentence.geoid_height;
+	_gps_module.io.dgps_station_id = sentence.dgps_station_id;
 	// Use system time as reference:
-	_gps_module.io.output_fix_system_timestamp = xf::TimeHelper::now();
+	_gps_module.io.fix_system_timestamp = xf::TimeHelper::now();
 	_gps_module._reliable_fix_quality = sentence.reliable_fix_quality();
 }
 
@@ -218,38 +218,38 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
 		switch (*sentence.fix_mode)
 		{
 			case xf::nmea::GPSFixMode::Fix2D:
-				_gps_module.io.output_fix_mode = "2D";
+				_gps_module.io.fix_mode = "2D";
 				break;
 
 			case xf::nmea::GPSFixMode::Fix3D:
-				_gps_module.io.output_fix_mode = "3D";
+				_gps_module.io.fix_mode = "3D";
 				break;
 
 			default:
-				_gps_module.io.output_fix_mode.set_nil();
+				_gps_module.io.fix_mode.set_nil();
 		}
 	}
 	else
-		_gps_module.io.output_fix_mode.set_nil();
+		_gps_module.io.fix_mode.set_nil();
 
-	_gps_module.io.output_pdop = sentence.pdop;
-	_gps_module.io.output_vdop = sentence.vdop;
-	_gps_module.io.output_hdop = sentence.hdop;
+	_gps_module.io.pdop = sentence.pdop;
+	_gps_module.io.vdop = sentence.vdop;
+	_gps_module.io.hdop = sentence.hdop;
 
 	if (sentence.hdop)
-		_gps_module.io.output_lateral_stddev = *_gps_module.io.setting_receiver_accuracy * *sentence.hdop;
+		_gps_module.io.lateral_stddev = *_gps_module.io.receiver_accuracy * *sentence.hdop;
 	else
-		_gps_module.io.output_lateral_stddev.set_nil();
+		_gps_module.io.lateral_stddev.set_nil();
 
 	if (sentence.vdop)
-		_gps_module.io.output_vertical_stddev = *_gps_module.io.setting_receiver_accuracy * *sentence.vdop;
+		_gps_module.io.vertical_stddev = *_gps_module.io.receiver_accuracy * *sentence.vdop;
 	else
-		_gps_module.io.output_vertical_stddev.set_nil();
+		_gps_module.io.vertical_stddev.set_nil();
 
 	if (sentence.hdop && sentence.vdop)
-		_gps_module.io.output_position_stddev = *_gps_module.io.setting_receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
+		_gps_module.io.position_stddev = *_gps_module.io.receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
 	else
-		_gps_module.io.output_position_stddev.set_nil();
+		_gps_module.io.position_stddev.set_nil();
 }
 
 
@@ -260,20 +260,20 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPRMC const& sentence)
 
 	// If values weren't updated by GGA message, use
 	// position info from RMC:
-	if (_gps_module.io.output_latitude.valid_age() > 1.5_s)
-		_gps_module.io.output_latitude = sentence.latitude;
+	if (_gps_module.io.latitude.valid_age() > 1.5_s)
+		_gps_module.io.latitude = sentence.latitude;
 
-	if (_gps_module.io.output_longitude.valid_age() > 1.5_s)
-		_gps_module.io.output_longitude = sentence.longitude;
+	if (_gps_module.io.longitude.valid_age() > 1.5_s)
+		_gps_module.io.longitude = sentence.longitude;
 
-	_gps_module.io.output_ground_speed = sentence.ground_speed;
-	_gps_module.io.output_track_true = sentence.track_true;
-	_gps_module.io.output_magnetic_declination = sentence.magnetic_variation;
+	_gps_module.io.ground_speed = sentence.ground_speed;
+	_gps_module.io.track_true = sentence.track_true;
+	_gps_module.io.magnetic_declination = sentence.magnetic_variation;
 
 	if (sentence.fix_date && sentence.fix_time)
-		_gps_module.io.output_fix_gps_timestamp = to_unix_time (*sentence.fix_date, *sentence.fix_time);
+		_gps_module.io.fix_gps_timestamp = to_unix_time (*sentence.fix_date, *sentence.fix_time);
 	else
-		_gps_module.io.output_fix_gps_timestamp.set_nil();
+		_gps_module.io.fix_gps_timestamp.set_nil();
 
 	if (sentence.receiver_status == xf::nmea::GPSReceiverStatus::Active)
 		if (_gps_module._reliable_fix_quality)
@@ -408,7 +408,7 @@ GPS::PowerCycle::PowerCycle (GPS& gps_module):
 {
 	// Turn on power to the device.
 	_gps_module.log() << "GPS power on" << std::endl;
-	_gps_module.io.output_power_on = true;
+	_gps_module.io.power_on = true;
 
 	// Connection will be created in process().
 }
@@ -419,7 +419,7 @@ GPS::PowerCycle::~PowerCycle()
 	_connection.reset();
 	// Turn off power to the device.
 	_gps_module.log() << "GPS power off" << std::endl;
-	_gps_module.io.output_power_on = false;
+	_gps_module.io.power_on = false;
 }
 
 
@@ -440,8 +440,8 @@ GPS::PowerCycle::process()
 	{
 		++_connection_attempts;
 		unsigned int baud_rate = (_connection_attempts % 2 == 0)
-			? *_gps_module.io.setting_target_baud_rate
-			: *_gps_module.io.setting_default_baud_rate;
+			? *_gps_module.io.target_baud_rate
+			: *_gps_module.io.default_baud_rate;
 		_connection = std::make_unique<Connection> (_gps_module, *this, baud_rate);
 	}
 
@@ -465,7 +465,7 @@ void
 GPS::PowerCycle::notify_connection_established()
 {
 	_gps_module.log() << "Stable connection established." << std::endl;
-	_gps_module.io.output_serviceable = true;
+	_gps_module.io.serviceable = true;
 
 	// Try to use target baud rate.
 	// If power cycles goes beyond max allowed number, don't try to reconnect
@@ -474,9 +474,9 @@ GPS::PowerCycle::notify_connection_established()
 	{
 		// If connection attempts < kConnectionAttemptsPerPowerCycle and power cycles num <= kMaxRestartAttempts,
 		// then aim for the target-baud-rate. Otherwise try to settle at the default baud rate.
-		if ((_connection_attempts <= kConnectionAttemptsPerPowerCycle) == (_connection->requested_physical_baud_rate() != *_gps_module.io.setting_target_baud_rate))
+		if ((_connection_attempts <= kConnectionAttemptsPerPowerCycle) == (_connection->requested_physical_baud_rate() != *_gps_module.io.target_baud_rate))
 		{
-			_connection->request_new_baud_rate (*_gps_module.io.setting_target_baud_rate);
+			_connection->request_new_baud_rate (*_gps_module.io.target_baud_rate);
 			_restart_connection = true;
 		}
 	}
@@ -497,9 +497,9 @@ GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort:
 	_power_cycle_timer->setSingleShot (true);
 	QObject::connect (_power_cycle_timer.get(), SIGNAL (timeout()), this, SLOT (power_on()));
 
-	io.output_read_errors = 0;
-	io.output_serviceable = false;
-	io.output_power_on = false;
+	io.read_errors = 0;
+	io.serviceable = false;
+	io.power_on = false;
 }
 
 
@@ -552,25 +552,25 @@ GPS::request_power_cycle()
 void
 GPS::reset_data_properties()
 {
-	io.output_fix_quality.set_nil();
-	io.output_fix_mode.set_nil();
-	io.output_latitude.set_nil();
-	io.output_longitude.set_nil();
-	io.output_altitude_amsl.set_nil();
-	io.output_geoid_height.set_nil();
-	io.output_ground_speed.set_nil();
-	io.output_track_true.set_nil();
-	io.output_tracked_satellites.set_nil();
-	io.output_magnetic_declination.set_nil();
-	io.output_hdop.set_nil();
-	io.output_vdop.set_nil();
-	io.output_pdop.set_nil();
-	io.output_lateral_stddev.set_nil();
-	io.output_vertical_stddev.set_nil();
-	io.output_position_stddev.set_nil();
-	io.output_dgps_station_id.set_nil();
-	io.output_fix_system_timestamp.set_nil();
-	io.output_fix_gps_timestamp.set_nil();
+	io.fix_quality.set_nil();
+	io.fix_mode.set_nil();
+	io.latitude.set_nil();
+	io.longitude.set_nil();
+	io.altitude_amsl.set_nil();
+	io.geoid_height.set_nil();
+	io.ground_speed.set_nil();
+	io.track_true.set_nil();
+	io.tracked_satellites.set_nil();
+	io.magnetic_declination.set_nil();
+	io.hdop.set_nil();
+	io.vdop.set_nil();
+	io.pdop.set_nil();
+	io.lateral_stddev.set_nil();
+	io.vertical_stddev.set_nil();
+	io.position_stddev.set_nil();
+	io.dgps_station_id.set_nil();
+	io.fix_system_timestamp.set_nil();
+	io.fix_gps_timestamp.set_nil();
 }
 
 
@@ -580,7 +580,7 @@ GPS::update_clock (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& 
 	try {
 		si::Time unix_time = xf::nmea::to_unix_time (date, time);
 		// Synchronize OS clock only once:
-		if (*io.setting_synchronize_system_clock && !_clock_synchronized)
+		if (*io.synchronize_system_clock && !_clock_synchronized)
 		{
 			if (_system->set_clock (unix_time))
 				log() << "System clock synchronized from GPS." << std::endl;

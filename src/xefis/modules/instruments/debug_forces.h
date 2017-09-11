@@ -31,15 +31,15 @@ class DebugForcesIO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>			input_orientation_pitch				{ this, "/orientation/pitch" };
-	v2::PropertyIn<si::Angle>			input_orientation_roll				{ this, "/orientation/roll" };
-	v2::PropertyIn<si::Angle>			input_orientation_magnetic_heading	{ this, "/orientation/magnetic-heading" };
-	v2::PropertyIn<si::Acceleration>	input_measured_accel_x				{ this, "/acceleration/x" };
-	v2::PropertyIn<si::Acceleration>	input_measured_accel_y				{ this, "/acceleration/y" };
-	v2::PropertyIn<si::Acceleration>	input_measured_accel_z				{ this, "/acceleration/z" };
-	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_x			{ this, "/centrifugal-acceleration/x" };
-	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_y			{ this, "/centrifugal-acceleration/y" };
-	v2::PropertyIn<si::Acceleration>	input_centrifugal_accel_z			{ this, "/centrifugal-acceleration/z" };
+	v2::PropertyIn<si::Angle>			orientation_pitch				{ this, "/orientation/pitch" };
+	v2::PropertyIn<si::Angle>			orientation_roll				{ this, "/orientation/roll" };
+	v2::PropertyIn<si::Angle>			orientation_magnetic_heading	{ this, "/orientation/magnetic-heading" };
+	v2::PropertyIn<si::Acceleration>	measured_accel_x				{ this, "/acceleration/x" };
+	v2::PropertyIn<si::Acceleration>	measured_accel_y				{ this, "/acceleration/y" };
+	v2::PropertyIn<si::Acceleration>	measured_accel_z				{ this, "/acceleration/z" };
+	v2::PropertyIn<si::Acceleration>	centrifugal_accel_x				{ this, "/centrifugal-acceleration/x" };
+	v2::PropertyIn<si::Acceleration>	centrifugal_accel_y				{ this, "/centrifugal-acceleration/y" };
+	v2::PropertyIn<si::Acceleration>	centrifugal_accel_z				{ this, "/centrifugal-acceleration/z" };
 };
 
 

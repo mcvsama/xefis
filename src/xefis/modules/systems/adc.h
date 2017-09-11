@@ -37,48 +37,48 @@ class AirDataComputerIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Velocity>				setting_ias_valid_minimum			{ this };
-	v2::Setting<si::Velocity>				setting_ias_valid_maximum			{ this };
-	v2::Setting<bool>						setting_using_ias_sensor			{ this, false };
-	v2::Setting<double>						setting_ram_rise_factor				{ this, 0.2 };
+	v2::Setting<si::Velocity>				ias_valid_minimum			{ this, "ias_valid_minimum" };
+	v2::Setting<si::Velocity>				ias_valid_maximum			{ this, "ias_valid_maximum" };
+	v2::Setting<bool>						using_ias_sensor			{ this, "using_ias_sensor", false };
+	v2::Setting<double>						ram_rise_factor				{ this, "ram_rise_factor", 0.2 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>					input_pressure_use_std				{ this, "/settings/pressure/use-std", false };
-	v2::PropertyIn<si::Pressure>			input_pressure_qnh					{ this, "/settings/pressure/qnh" };
-	v2::PropertyIn<bool>					input_pressure_static_serviceable	{ this, "/sensors/pressure/serviceable" };
-	v2::PropertyIn<si::Pressure>			input_pressure_static				{ this, "/sensors/pressure/static" };
-	v2::PropertyIn<si::Pressure>			input_pressure_total				{ this, "/sensors/pressure/total" };
-	v2::PropertyIn<bool>					input_ias_serviceable				{ this, "/sensors/airspeed/serviceable" };
-	v2::PropertyIn<si::Velocity>			input_ias							{ this, "/sensors/airspeed/ias" };
-	v2::PropertyIn<si::Temperature>			input_total_air_temperature			{ this, "/sensors/air-temperature/total" };
+	v2::PropertyIn<bool>					pressure_use_std			{ this, "/settings/pressure/use-std", false };
+	v2::PropertyIn<si::Pressure>			pressure_qnh				{ this, "/settings/pressure/qnh" };
+	v2::PropertyIn<bool>					pressure_static_serviceable	{ this, "/sensors/pressure/serviceable" };
+	v2::PropertyIn<si::Pressure>			pressure_static				{ this, "/sensors/pressure/static" };
+	v2::PropertyIn<si::Pressure>			pressure_total				{ this, "/sensors/pressure/total" };
+	v2::PropertyIn<bool>					ias_serviceable				{ this, "/sensors/airspeed/serviceable" };
+	v2::PropertyIn<si::Velocity>			ias							{ this, "/sensors/airspeed/ias" };
+	v2::PropertyIn<si::Temperature>			total_air_temperature		{ this, "/sensors/air-temperature/total" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Pressure>			output_pressure_dynamic				{ this, "/pressure/dynamic" };
-	v2::PropertyOut<bool>					output_altitude_amsl_serviceable	{ this, "/altitude/amsl.serviceable" };
-	v2::PropertyOut<si::Length>				output_altitude_amsl				{ this, "/altitude/amsl" };
-	v2::PropertyOut<si::Length>				output_altitude_amsl_lookahead		{ this, "/altitude/amsl.lookahead" };
-	v2::PropertyOut<si::Length>				output_altitude_amsl_qnh			{ this, "/altitude/amsl.qnh" };
-	v2::PropertyOut<si::Length>				output_altitude_amsl_std			{ this, "/altitude/amsl.std" };
-	v2::PropertyOut<si::Length>				output_density_altitude				{ this, "/density-altitude" };
-	v2::PropertyOut<si::Density>			output_air_density_static			{ this, "/air-density/static" };
-	v2::PropertyOut<bool>					output_speed_ias_serviceable		{ this, "/speed/ias.serviceable" };
-	v2::PropertyOut<si::Velocity>			output_speed_ias					{ this, "/speed/ias" };
-	v2::PropertyOut<si::Velocity>			output_speed_ias_lookahead			{ this, "/speed/ias.lookahead" };
-	v2::PropertyOut<si::Velocity>			output_speed_tas					{ this, "/speed/tas" };
-	v2::PropertyOut<si::Velocity>			output_speed_eas					{ this, "/speed/eas" };
-	v2::PropertyOut<double>					output_speed_mach					{ this, "/speed/mach" };
-	v2::PropertyOut<si::Velocity>			output_speed_sound					{ this, "/speed/sound" };
-	v2::PropertyOut<bool>					output_vertical_speed_serviceable	{ this, "/vertical-speed/serviceable" };
-	v2::PropertyOut<si::Velocity>			output_vertical_speed				{ this, "/vertical-speed/speed" };
-	v2::PropertyOut<si::Temperature>		output_static_air_temperature		{ this, "/air-temperature/static" };
-	v2::PropertyOut<si::DynamicViscosity>	output_dynamic_viscosity			{ this, "/viscosity/dynamic" };
-	v2::PropertyOut<double>					output_reynolds_number				{ this, "/reynolds-number" };
+	v2::PropertyOut<si::Pressure>			pressure_dynamic			{ this, "/pressure/dynamic" };
+	v2::PropertyOut<bool>					altitude_amsl_serviceable	{ this, "/altitude/amsl.serviceable" };
+	v2::PropertyOut<si::Length>				altitude_amsl				{ this, "/altitude/amsl" };
+	v2::PropertyOut<si::Length>				altitude_amsl_lookahead		{ this, "/altitude/amsl.lookahead" };
+	v2::PropertyOut<si::Length>				altitude_amsl_qnh			{ this, "/altitude/amsl.qnh" };
+	v2::PropertyOut<si::Length>				altitude_amsl_std			{ this, "/altitude/amsl.std" };
+	v2::PropertyOut<si::Length>				density_altitude			{ this, "/density-altitude" };
+	v2::PropertyOut<si::Density>			air_density_static			{ this, "/air-density/static" };
+	v2::PropertyOut<bool>					speed_ias_serviceable		{ this, "/speed/ias.serviceable" };
+	v2::PropertyOut<si::Velocity>			speed_ias					{ this, "/speed/ias" };
+	v2::PropertyOut<si::Velocity>			speed_ias_lookahead			{ this, "/speed/ias.lookahead" };
+	v2::PropertyOut<si::Velocity>			speed_tas					{ this, "/speed/tas" };
+	v2::PropertyOut<si::Velocity>			speed_eas					{ this, "/speed/eas" };
+	v2::PropertyOut<double>					speed_mach					{ this, "/speed/mach" };
+	v2::PropertyOut<si::Velocity>			speed_sound					{ this, "/speed/sound" };
+	v2::PropertyOut<bool>					vertical_speed_serviceable	{ this, "/vertical-speed/serviceable" };
+	v2::PropertyOut<si::Velocity>			vertical_speed				{ this, "/vertical-speed/speed" };
+	v2::PropertyOut<si::Temperature>		static_air_temperature		{ this, "/air-temperature/static" };
+	v2::PropertyOut<si::DynamicViscosity>	dynamic_viscosity			{ this, "/viscosity/dynamic" };
+	v2::PropertyOut<double>					reynolds_number				{ this, "/reynolds-number" };
 };
 
 

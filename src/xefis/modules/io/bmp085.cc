@@ -44,8 +44,8 @@ BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, std::string const& instanc
 void
 BMP085::initialize()
 {
-	_i2c_device.bus().set_bus_number (io.setting_i2c_bus);
-	_i2c_device.set_address (xf::i2c::Address (io.setting_i2c_address));
+	_i2c_device.bus().set_bus_number (io.i2c_bus);
+	_i2c_device.set_address (xf::i2c::Address (io.i2c_address));
 
 	guard ([&] {
 		hw_initialize();
@@ -72,7 +72,7 @@ BMP085::hw_initialize()
 		_md = read_s16 (MD_REG);
 
 		_temperature_timer = std::make_unique<QTimer> (this);
-		_temperature_timer->setInterval (io.setting_temperature_update_interval->quantity<Millisecond>());
+		_temperature_timer->setInterval (io.temperature_update_interval->quantity<Millisecond>());
 		_temperature_timer->setSingleShot (false);
 		QObject::connect (_temperature_timer.get(), SIGNAL (timeout()), this, SLOT (request_temperature()));
 
@@ -82,7 +82,7 @@ BMP085::hw_initialize()
 		QObject::connect (_temperature_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_temperature()));
 
 		_pressure_timer = std::make_unique<QTimer> (this);
-		_pressure_timer->setInterval (io.setting_pressure_update_interval->quantity<Millisecond>());
+		_pressure_timer->setInterval (io.pressure_update_interval->quantity<Millisecond>());
 		_pressure_timer->setSingleShot (false);
 		QObject::connect (_pressure_timer.get(), SIGNAL (timeout()), this, SLOT (request_pressure()));
 

@@ -32,13 +32,13 @@ class GearIO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>	requested_down	{ this, "" };
-	v2::PropertyIn<bool>	nose_up			{ this, "" };
-	v2::PropertyIn<bool>	nose_down		{ this, "" };
-	v2::PropertyIn<bool>	left_up			{ this, "" };
-	v2::PropertyIn<bool>	left_down		{ this, "" };
-	v2::PropertyIn<bool>	right_up		{ this, "" };
-	v2::PropertyIn<bool>	right_down		{ this, "" };
+	v2::PropertyIn<bool>	requested_down	{ this, "/requested-down" };
+	v2::PropertyIn<bool>	nose_up			{ this, "/nose-up" };
+	v2::PropertyIn<bool>	nose_down		{ this, "/nose-down" };
+	v2::PropertyIn<bool>	left_up			{ this, "/left-up" };
+	v2::PropertyIn<bool>	left_down		{ this, "/left-down" };
+	v2::PropertyIn<bool>	right_up		{ this, "/right-up" };
+	v2::PropertyIn<bool>	right_down		{ this, "/right-down" };
 };
 
 

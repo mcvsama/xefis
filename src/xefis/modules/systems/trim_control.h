@@ -36,22 +36,22 @@ class TrimControlIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<double>		setting_trim_step		{ this, 0.01 };
+	v2::Setting<double>		trim_step			{ this, "trim_step", 0.01 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	input_trim_axis			{ this, "/axis" };
-	v2::PropertyIn<double>	input_trim_value		{ this, "/value" };
-	v2::PropertyIn<bool>	input_up_trim_button	{ this, "/up-button" };
-	v2::PropertyIn<bool>	input_down_trim_button	{ this, "/down-button" };
+	v2::PropertyIn<double>	trim_axis			{ this, "/axis" };
+	v2::PropertyIn<double>	trim_value			{ this, "/value" };
+	v2::PropertyIn<bool>	up_trim_button		{ this, "/up-button" };
+	v2::PropertyIn<bool>	down_trim_button	{ this, "/down-button" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<double>	output_trim_value		{ this, "/trim-value" };
+	v2::PropertyOut<double>	output_trim_value			{ this, "/trim-value" };
 };
 
 

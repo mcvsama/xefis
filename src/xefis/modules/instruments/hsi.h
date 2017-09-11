@@ -42,14 +42,14 @@ class HSI_IO: public v2::ModuleIO
 	 */
 
 	// At what ranve setting to start drawing airport circles:
-	v2::Setting<si::Length>					arpt_runways_range_threshold			{ this };
+	v2::Setting<si::Length>					arpt_runways_range_threshold			{ this, "arpt_runways_range_threshold" };
 	// At what range setting to start drawing runways instead of circles:
-	v2::Setting<si::Length>					arpt_map_range_threshold				{ this };
+	v2::Setting<si::Length>					arpt_map_range_threshold				{ this, "arpt_map_range_threshold" };
 	// Length of the runway extension line on the map:
-	v2::Setting<si::Length>					arpt_runway_extension_length			{ this };
-	v2::Setting<std::array<si::Time, 3>>	trend_vector_times						{ this, { 30_s, 60_s, 90_s } };
-	v2::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, { 5_nmi, 10_nmi, 15_nmi } };
-	v2::Setting<si::Length>					trend_vector_max_range					{ this, 30_nmi };
+	v2::Setting<si::Length>					arpt_runway_extension_length			{ this, "arpt_runway_extension_length" };
+	v2::Setting<std::array<si::Time, 3>>	trend_vector_durations					{ this, "trend_vector_durations", { 30_s, 60_s, 90_s } };
+	v2::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, "trend_vector_min_ranges", { 5_nmi, 10_nmi, 15_nmi } };
+	v2::Setting<si::Length>					trend_vector_max_range					{ this, "trend_vector_max_range", 30_nmi };
 
 	/*
 	 * Input

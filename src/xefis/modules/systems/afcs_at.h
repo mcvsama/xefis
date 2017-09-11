@@ -45,31 +45,31 @@ class AFCS_AT_IO: public v2::ModuleIO
 	 */
 
 	v2::Setting<xf::PIDControl<si::Velocity, si::Force>::Settings>
-											setting_ias_pid_settings		{ this };
-	v2::Setting<double>						setting_ias_pid_gain			{ this, 1.0 };
-	v2::Setting<si::Force>					setting_output_thrust_minimum	{ this, 0.0_N };
-	v2::Setting<si::Force>					setting_output_thrust_maximum	{ this, 1.0_N };
+									ias_pid_settings		{ this, "ias_pid_settings" };
+	v2::Setting<double>				ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
+	v2::Setting<si::Force>			output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
+	v2::Setting<si::Force>			output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<SpeedMode>				input_cmd_speed_mode			{ this, "/cmd/speed-mode" };
-	v2::PropertyIn<si::Force>				input_cmd_thrust				{ this, "/cmd/thrust" };
-	v2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd/ias" };
-	v2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measurements/ias" };
+	v2::PropertyIn<SpeedMode>		cmd_speed_mode			{ this, "/cmd/speed-mode" };
+	v2::PropertyIn<si::Force>		cmd_thrust				{ this, "/cmd/thrust" };
+	v2::PropertyIn<si::Velocity>	cmd_ias					{ this, "/cmd/ias" };
+	v2::PropertyIn<si::Velocity>	measured_ias			{ this, "/measurements/ias" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Force>				output_thrust					{ this, "/thrust" };
+	v2::PropertyOut<si::Force>		thrust					{ this, "/thrust" };
 
 	/*
 	 * Input/Output
 	 */
 
-	v2::PropertyOut<bool>					disengage_at					{ this, "/disengage-at" };
+	v2::PropertyOut<bool>			disengage_at			{ this, "/disengage-at" };
 };
 
 

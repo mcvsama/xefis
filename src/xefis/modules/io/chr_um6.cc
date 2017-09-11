@@ -71,9 +71,9 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));
 	_sensor->set_auto_retry (true);
 
-	io.output_serviceable = false;
-	io.output_caution = false;
-	io.output_failures = 0;
+	io.serviceable = false;
+	io.caution = false;
+	io.failures = 0;
 
 	open_device();
 }
@@ -89,24 +89,24 @@ CHRUM6::process (v2::Cycle const&)
 		if (_output_acceleration_x_changed() || _input_centripetal_x_changed())
 		{
 			Acceleration earth_x = 0_g;
-			if (io.output_acceleration_x && io.input_centripetal_x)
-				earth_x = *io.output_acceleration_x + *io.input_centripetal_x;
+			if (io.acceleration_x && io.centripetal_x)
+				earth_x = *io.acceleration_x + *io.centripetal_x;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefX, static_cast<float> (earth_x.quantity<Gravity>()));
 		}
 
 		if (_output_acceleration_y_changed() || _input_centripetal_y_changed())
 		{
 			Acceleration earth_y = 0_g;
-			if (io.output_acceleration_y && io.input_centripetal_y)
-				earth_y = *io.output_acceleration_y + *io.input_centripetal_y;
+			if (io.acceleration_y && io.centripetal_y)
+				earth_y = *io.acceleration_y + *io.centripetal_y;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefY, static_cast<float> (earth_y.quantity<Gravity>()));
 		}
 
 		if (_output_acceleration_z_changed() || _input_centripetal_z_changed())
 		{
 			Acceleration earth_z = 1_g;
-			if (io.output_acceleration_z && io.input_centripetal_z)
-				earth_z = *io.output_acceleration_z + *io.input_centripetal_z;
+			if (io.acceleration_z && io.centripetal_z)
+				earth_z = *io.acceleration_z + *io.centripetal_z;
 			_sensor->write (xf::CHRUM6::ConfigurationAddress::AccelRefZ, static_cast<float> (earth_z.quantity<Gravity>()));
 		}
 	}
@@ -135,7 +135,7 @@ void
 CHRUM6::failure (std::string const& reason)
 {
 	log() << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
-	io.output_failures = *io.output_failures + 1;
+	io.failures = *io.failures + 1;
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
 	_failure_count++;
@@ -196,7 +196,7 @@ CHRUM6::setup_communication()
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::MP);
 	data |= static_cast<uint32_t> (xf::CHRUM6::CommunicationRegister::TMP);
 	data |= xf::CHRUM6::bits_for_baud_rate (_serial_port.configuration().baud_rate()) << 8;
-	data |= xf::CHRUM6::sample_rate_setting (*io.setting_sample_rate);
+	data |= xf::CHRUM6::sample_rate_setting (*io.sample_rate);
 
 	_sensor->write (ConfigurationAddress::Communication, data, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
@@ -240,7 +240,7 @@ CHRUM6::log_firmware_version()
 void
 CHRUM6::set_ekf_process_variance()
 {
-	_sensor->write (ConfigurationAddress::EKFProcessVariance, *io.setting_ekf_process_variance, [this] (xf::CHRUM6::Write req) {
+	_sensor->write (ConfigurationAddress::EKFProcessVariance, *io.ekf_process_variance, [this] (xf::CHRUM6::Write req) {
 		describe_errors (req);
 		if (req.success())
 			reset_ekf();
@@ -315,7 +315,7 @@ CHRUM6::initialization_complete()
 	log() << "Initialization complete." << std::endl;
 	_stage = Stage::Run;
 	_initialization_timer->stop();
-	io.output_serviceable = true;
+	io.serviceable = true;
 	_status_check_timer->start();
 }
 
@@ -323,19 +323,19 @@ CHRUM6::initialization_complete()
 void
 CHRUM6::reset()
 {
-	io.output_serviceable = false;
-	io.output_orientation_pitch.set_nil();
-	io.output_orientation_roll.set_nil();
-	io.output_orientation_heading_magnetic.set_nil();
-	io.output_acceleration_x.set_nil();
-	io.output_acceleration_y.set_nil();
-	io.output_acceleration_z.set_nil();
-	io.output_rotation_x.set_nil();
-	io.output_rotation_y.set_nil();
-	io.output_rotation_z.set_nil();
-	io.output_magnetic_x.set_nil();
-	io.output_magnetic_y.set_nil();
-	io.output_magnetic_z.set_nil();
+	io.serviceable = false;
+	io.orientation_pitch.set_nil();
+	io.orientation_roll.set_nil();
+	io.orientation_heading_magnetic.set_nil();
+	io.acceleration_x.set_nil();
+	io.acceleration_y.set_nil();
+	io.acceleration_z.set_nil();
+	io.rotation_x.set_nil();
+	io.rotation_y.set_nil();
+	io.rotation_z.set_nil();
+	io.magnetic_x.set_nil();
+	io.magnetic_y.set_nil();
+	io.magnetic_z.set_nil();
 
 	_stage = Stage::Initialize;
 }
@@ -363,27 +363,27 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		case static_cast<uint32_t> (DataAddress::Temperature):
 		{
 			if (req.success())
-				io.output_internal_temperature = Quantity<Celsius> (req.value_as_float());
+				io.internal_temperature = Quantity<Celsius> (req.value_as_float());
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPhiTheta):
 		{
-			if (req.success() && io.output_serviceable.value_or (false))
+			if (req.success() && io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				io.output_orientation_roll = factor * req.value_upper16();
-				io.output_orientation_pitch = factor * req.value_lower16();
+				io.orientation_roll = factor * req.value_upper16();
+				io.orientation_pitch = factor * req.value_lower16();
 			}
 			break;
 		}
 
 		case static_cast<uint32_t> (DataAddress::EulerPsi):
 		{
-			if (req.success() && io.output_serviceable.value_or (false))
+			if (req.success() && io.serviceable.value_or (false))
 			{
 				si::Angle const factor = 0.0109863_deg;
-				io.output_orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
+				io.orientation_heading_magnetic = xf::floored_mod<si::Angle> (factor * req.value_upper16(), 0_deg, 360_deg);
 			}
 			break;
 		}
@@ -393,8 +393,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				io.output_acceleration_x = factor * req.value_upper16();
-				io.output_acceleration_y = factor * req.value_lower16();
+				io.acceleration_x = factor * req.value_upper16();
+				io.acceleration_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -404,7 +404,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::Acceleration const factor = 0.000183105_g;
-				io.output_acceleration_z = factor * req.value_upper16();
+				io.acceleration_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -414,8 +414,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				io.output_rotation_x = factor * req.value_upper16();
-				io.output_rotation_y = factor * req.value_lower16();
+				io.rotation_x = factor * req.value_upper16();
+				io.rotation_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -425,7 +425,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::AngularVelocity const factor = 0.0610352_deg / 1_s;
-				io.output_rotation_z = factor * req.value_upper16();
+				io.rotation_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -436,8 +436,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			{
 				// Assume values are expressed in Teslas (it's not specified in the documentation):
 				si::MagneticField const factor = 0.000305176_T;
-				io.output_magnetic_x = factor * req.value_upper16();
-				io.output_magnetic_y = factor * req.value_lower16();
+				io.magnetic_x = factor * req.value_upper16();
+				io.magnetic_y = factor * req.value_lower16();
 			}
 			break;
 		}
@@ -447,7 +447,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				si::MagneticField const factor = 0.000305176_T;
-				io.output_magnetic_z = factor * req.value_upper16();
+				io.magnetic_z = factor * req.value_upper16();
 			}
 			break;
 		}
@@ -632,10 +632,10 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	}
 
 	if (!serviceable)
-		io.output_serviceable = false;
+		io.serviceable = false;
 
 	if (caution)
-		io.output_caution = true;
+		io.caution = true;
 }
 
 

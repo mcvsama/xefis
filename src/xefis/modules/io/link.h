@@ -469,9 +469,9 @@ class LinkIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Frequency>		send_frequency			{ this };
-	v2::Setting<si::Time>			reacquire_after			{ this };
-	v2::Setting<si::Time>			failsafe_after			{ this };
+	v2::Setting<si::Frequency>		send_frequency			{ this, "send_frequency" };
+	v2::Setting<si::Time>			reacquire_after			{ this, "reacquire_after" };
+	v2::Setting<si::Time>			failsafe_after			{ this, "failsafe_after" };
 
 	/*
 	 * Input
@@ -490,6 +490,10 @@ class LinkIO: public v2::ModuleIO
 	v2::PropertyOut<int64_t>		link_error_bytes		{ this, "/error-bytes" };
 	v2::PropertyOut<int64_t>		link_valid_bytes		{ this, "/valid-bytes" };
 	v2::PropertyOut<int64_t>		link_valid_envelopes	{ this, "/valid-envelopes" };
+
+  public:
+	void
+	verify_settings() override;
 };
 
 
@@ -527,13 +531,13 @@ class Link:
 	reacquire();
 
   private:
-	QTimer*							_failsafe_timer;
-	QTimer*							_reacquire_timer;
-	QTimer*							_output_timer;
+	QTimer*							_failsafe_timer		{ nullptr };
+	QTimer*							_reacquire_timer	{ nullptr };
+	QTimer*							_output_timer		{ nullptr };
 	Blob							_input_blob;
 	Blob							_output_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
-	v2::PropChanged<std::string>	_input_changed { io.link_input };
+	v2::PropChanged<std::string>	_input_changed		{ io.link_input };
 };
 
 

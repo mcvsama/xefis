@@ -139,7 +139,7 @@ class HSIWidget: public xf::InstrumentWidget
 		Length							arpt_runways_range_threshold;
 		Length							arpt_map_range_threshold;
 		Length							arpt_runway_extension_length;
-		std::array<Time, 3>				trend_vector_times;
+		std::array<Time, 3>				trend_vector_durations;
 		std::array<Length, 3>			trend_vector_min_ranges;
 		Length							trend_vector_max_range;
 		bool							round_clip					= false;

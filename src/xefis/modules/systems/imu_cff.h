@@ -31,24 +31,24 @@ class IMU_CFF_IO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<si::AngularVelocity>	input_angular_velocity_x			{ this, "/angular-velocity/x" };
-	v2::PropertyIn<si::AngularVelocity>	input_angular_velocity_y			{ this, "/angular-velocity/y" };
-	v2::PropertyIn<si::AngularVelocity>	input_angular_velocity_z			{ this, "/angular-velocity/z" };
-	v2::PropertyIn<si::Velocity>		input_tas_x							{ this, "/tas/x" };
-	v2::PropertyIn<si::Velocity>		input_tas_y							{ this, "/tas/y" };
-	v2::PropertyIn<si::Velocity>		input_tas_z							{ this, "/tas/z" };
-	v2::PropertyIn<si::Mass>			input_mass							{ this, "/mass" };
+	v2::PropertyIn<si::AngularVelocity>	angular_velocity_x			{ this, "/angular-velocity/x" };
+	v2::PropertyIn<si::AngularVelocity>	angular_velocity_y			{ this, "/angular-velocity/y" };
+	v2::PropertyIn<si::AngularVelocity>	angular_velocity_z			{ this, "/angular-velocity/z" };
+	v2::PropertyIn<si::Velocity>		tas_x						{ this, "/tas/x" };
+	v2::PropertyIn<si::Velocity>		tas_y						{ this, "/tas/y" };
+	v2::PropertyIn<si::Velocity>		tas_z						{ this, "/tas/z" };
+	v2::PropertyIn<si::Mass>			mass						{ this, "/mass" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Acceleration>	output_centripetal_acceleration_x	{ this, "/centripetal/x" };
-	v2::PropertyOut<si::Acceleration>	output_centripetal_acceleration_y	{ this, "/centripetal/y" };
-	v2::PropertyOut<si::Acceleration>	output_centripetal_acceleration_z	{ this, "/centripetal/z" };
-	v2::PropertyOut<si::Force>			output_centripetal_force_x			{ this, "/force/x" };
-	v2::PropertyOut<si::Force>			output_centripetal_force_y			{ this, "/force/y" };
-	v2::PropertyOut<si::Force>			output_centripetal_force_z			{ this, "/force/z" };
+	v2::PropertyOut<si::Acceleration>	centripetal_acceleration_x	{ this, "/centripetal/x" };
+	v2::PropertyOut<si::Acceleration>	centripetal_acceleration_y	{ this, "/centripetal/y" };
+	v2::PropertyOut<si::Acceleration>	centripetal_acceleration_z	{ this, "/centripetal/z" };
+	v2::PropertyOut<si::Force>			centripetal_force_x			{ this, "/force/x" };
+	v2::PropertyOut<si::Force>			centripetal_force_y			{ this, "/force/y" };
+	v2::PropertyOut<si::Force>			centripetal_force_z			{ this, "/force/z" };
 };
 
 

@@ -41,7 +41,7 @@ class JoystickInputIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<bool>	restart_on_failure	{ this, true };
+	v2::Setting<bool>	restart_on_failure	{ this, "restart_on_failure", true };
 
 	// TODO PropertyOuts for axes and buttons
 };

@@ -33,15 +33,15 @@ class FlapsIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Angle>		maximum_angle	{ this };
-	v2::Setting<bool>			hide_retracted	{ this, true };
+	v2::Setting<si::Angle>		maximum_angle		{ this, "maximum_angle" };
+	v2::Setting<bool>			hide_retracted		{ this, "hide_retracted", true };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>	current_angle	{ this, "/current-angle" };
-	v2::PropertyIn<si::Angle>	set_angle		{ this, "/set-angle" };
+	v2::PropertyIn<si::Angle>	current_angle		{ this, "/current-angle" };
+	v2::PropertyIn<si::Angle>	set_angle			{ this, "/set-angle" };
 };
 
 

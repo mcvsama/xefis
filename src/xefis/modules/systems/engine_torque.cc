@@ -51,17 +51,17 @@ EngineTorque::process (v2::Cycle const&)
 		EngineTorque* _module;
 	};
 
-	std::visit (TorqueComputer (this), *io.setting_motor_efficiency);
+	std::visit (TorqueComputer (this), *io.motor_efficiency);
 }
 
 
 void
 EngineTorque::compute_torque (double motor_efficiency)
 {
-	if (io.input_engine_current)
-		io.output_engine_torque = motor_efficiency * *io.input_engine_current / *io.setting_motor_kv;
+	if (io.engine_current)
+		io.engine_torque = motor_efficiency * *io.engine_current / *io.motor_kv;
 	else
-		io.output_engine_torque.set_nil();
+		io.engine_torque.set_nil();
 }
 
 
@@ -70,9 +70,9 @@ EngineTorque::compute_torque (EfficiencyDatatable const& motor_efficiency)
 {
 	std::optional<double> efficiency;
 
-	if (io.input_engine_speed && (efficiency = motor_efficiency.value (*io.input_engine_speed)))
+	if (io.engine_speed && (efficiency = motor_efficiency.value (*io.engine_speed)))
 		compute_torque (*efficiency);
 	else
-		io.output_engine_torque.set_nil();
+		io.engine_torque.set_nil();
 }
 

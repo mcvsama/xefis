@@ -27,17 +27,59 @@
 
 namespace v2 {
 
+namespace module_io {
+
+UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
+	Exception (make_message (settings))
+{ }
+
+
+std::string
+UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
+{
+	if (settings.empty())
+		return "uninitialized settings in a module";
+	else
+	{
+		std::string result = "uninitialized setting(s) found for module-io " + identifier (*settings[0]->io()) + ": ";
+
+		for (std::size_t i = 0; i < settings.size(); ++i)
+		{
+			result += settings[i]->name();
+
+			if (i != settings.size() - 1)
+				result += ", ";
+		}
+
+		return result;
+	}
+}
+
+} // namespace module_io
+
+
 void
 ModuleIO::ProcessingLoopAPI::verify_settings()
 {
 	std::vector<BasicSetting*> uninitialized_settings;
 
 	for (auto* setting: _io->_registered_settings)
+	{
 		if (!*setting)
 			uninitialized_settings.push_back (setting);
+	}
 
 	if (!uninitialized_settings.empty())
-		throw UninitializedSettings (uninitialized_settings);
+		throw module_io::UninitializedSettings (uninitialized_settings);
+
+	_io->verify_settings();
+}
+
+
+void
+ModuleIO::ProcessingLoopAPI::register_setting (BasicSetting* setting)
+{
+	_io->_registered_settings.push_back (setting);
 }
 
 
@@ -68,6 +110,23 @@ ModuleIO::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut* prope
 {
 	auto new_end = std::remove (_io->_registered_output_properties.begin(), _io->_registered_output_properties.end(), property);
 	_io->_registered_output_properties.resize (new_end - _io->_registered_output_properties.begin());
+}
+
+
+std::string
+identifier (ModuleIO& io)
+{
+	BasicModule* module = io.module();
+	std::string module_name = module ? identifier (*module) : "<no module associated with the IO object>";
+
+	return demangle (typeid (io)) + " of " + module_name;
+}
+
+
+std::string
+identifier (ModuleIO* io)
+{
+	return io ? identifier (*io) : "(nullptr)";
 }
 
 } // namespace v2

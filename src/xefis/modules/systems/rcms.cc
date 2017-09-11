@@ -35,12 +35,12 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (std::unique_ptr<Re
 
 	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));
 	_distance_computer.observe ({
-		&io.input_home_longitude,
-		&io.input_home_latitude,
-		&io.input_home_altitude_amsl,
-		&io.input_position_longitude,
-		&io.input_position_latitude,
-		&io.input_position_altitude_amsl,
+		&io.home_longitude,
+		&io.home_latitude,
+		&io.home_altitude_amsl,
+		&io.position_longitude,
+		&io.position_latitude,
+		&io.position_altitude_amsl,
 	});
 }
 
@@ -65,11 +65,11 @@ RemoteControlManagementSystem::process (v2::Cycle const& cycle)
 void
 RemoteControlManagementSystem::acquire_home()
 {
-	if (io.input_position_longitude && io.input_position_latitude && io.input_position_altitude_amsl)
+	if (io.position_longitude && io.position_latitude && io.position_altitude_amsl)
 	{
-		io.input_home_longitude = io.input_position_longitude;
-		io.input_home_latitude = io.input_position_latitude;
-		io.input_home_altitude_amsl = io.input_position_altitude_amsl;
+		io.home_longitude = io.position_longitude;
+		io.home_latitude = io.position_latitude;
+		io.home_altitude_amsl = io.position_altitude_amsl;
 		_home_acquired = true;
 	}
 }
@@ -96,14 +96,14 @@ RemoteControlManagementSystem::prepare_configurator_widget()
 bool
 RemoteControlManagementSystem::home_is_valid() const
 {
-	return io.input_home_longitude && io.input_home_latitude && io.input_home_altitude_amsl;
+	return io.home_longitude && io.home_latitude && io.home_altitude_amsl;
 }
 
 
 bool
 RemoteControlManagementSystem::position_is_valid() const
 {
-	return io.input_position_longitude && io.input_position_latitude && io.input_position_altitude_amsl;
+	return io.position_longitude && io.position_latitude && io.position_altitude_amsl;
 }
 
 
@@ -112,22 +112,22 @@ RemoteControlManagementSystem::compute_distances_to_home()
 {
 	if (home_is_valid() && position_is_valid())
 	{
-		si::LonLat home (*io.input_home_longitude, *io.input_home_latitude);
-		si::LonLat curr (*io.input_position_longitude, *io.input_position_latitude);
+		si::LonLat home (*io.home_longitude, *io.home_latitude);
+		si::LonLat curr (*io.position_longitude, *io.position_latitude);
 		si::Length ground_dist = xf::haversine_earth (curr, home);
-		si::Length alt_diff = *io.input_position_altitude_amsl - *io.input_home_altitude_amsl;
+		si::Length alt_diff = *io.position_altitude_amsl - *io.home_altitude_amsl;
 
-		io.output_distance_vertical = alt_diff;
-		io.output_distance_ground = ground_dist;
-		io.output_distance_vlos = si::sqrt (ground_dist * ground_dist + alt_diff * alt_diff);
-		io.output_true_home_direction = xf::floored_mod (xf::initial_bearing (curr, home), 360_deg);
+		io.distance_vertical = alt_diff;
+		io.distance_ground = ground_dist;
+		io.distance_vlos = si::sqrt (ground_dist * ground_dist + alt_diff * alt_diff);
+		io.true_home_direction = xf::floored_mod (xf::initial_bearing (curr, home), 360_deg);
 	}
 	else
 	{
-		io.output_distance_vlos.set_nil();
-		io.output_distance_ground.set_nil();
-		io.output_distance_vertical.set_nil();
-		io.output_true_home_direction.set_nil();
+		io.distance_vlos.set_nil();
+		io.distance_ground.set_nil();
+		io.distance_vertical.set_nil();
+		io.true_home_direction.set_nil();
 	}
 }
 

@@ -36,12 +36,12 @@ class UDP_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<QString>			tx_udp_host			{ this }; // TODO express that this is optional
-	v2::Setting<int>				tx_udp_port			{ this };
-	v2::Setting<bool>				tx_interference		{ this };
-	v2::Setting<QString>			rx_udp_host			{ this }; // TODO OptionalSetting
-	v2::Setting<int>				rx_udp_port			{ this };
-	v2::Setting<bool>				rx_interference		{ this };
+	v2::Setting<QString>			tx_udp_host			{ this, "tx_udp_host" }; // TODO express that this is optional
+	v2::Setting<int>				tx_udp_port			{ this, "tx_udp_port" };
+	v2::Setting<bool>				tx_interference		{ this, "tx_interference", false };
+	v2::Setting<QString>			rx_udp_host			{ this, "rx_udp_host" }; // TODO OptionalSetting
+	v2::Setting<int>				rx_udp_port			{ this, "rx_udp_port" };
+	v2::Setting<bool>				rx_interference		{ this, "rx_interference", false };
 
 	/*
 	 * Input

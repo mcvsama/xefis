@@ -34,34 +34,34 @@ class AFCS_AP_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<double>			setting_overall_gain			{ this, 1.0 };
-	v2::Setting<double>			setting_pitch_gain				{ this, 1.0 };
-	v2::Setting<double>			setting_roll_gain				{ this, 1.0 };
+	v2::Setting<double>			overall_gain			{ this, "overall_gain", 1.0 };
 	v2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
-								setting_pitch_pid_settings		{ this };
+								pitch_pid_settings		{ this, "pitch_pid_settings" };
+	v2::Setting<double>			pitch_gain				{ this, "pitch_gain", 1.0 };
 	v2::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
-								setting_roll_pid_settings		{ this };
+								roll_pid_settings		{ this, "roll_pid_settings" };
+	v2::Setting<double>			roll_gain				{ this, "roll_gain", 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>	input_cmd_pitch					{ this, "/cmd-pitch" };
-	v2::PropertyIn<si::Angle>	input_cmd_roll					{ this, "/cmd-roll" };
-	v2::PropertyIn<si::Angle>	input_measured_pitch			{ this, "/measured-pitch" };
-	v2::PropertyIn<si::Angle>	input_measured_roll				{ this, "/measured-roll" };
-	v2::PropertyIn<si::Angle>	input_elevator_minimum			{ this, "/limits/elevator/minimum" };
-	v2::PropertyIn<si::Angle>	input_elevator_maximum			{ this, "/limits/elevator/maximum" };
-	v2::PropertyIn<si::Angle>	input_ailerons_minimum			{ this, "/limits/ailerons/minimum" };
-	v2::PropertyIn<si::Angle>	input_ailerons_maximum			{ this, "/limits/ailerons/maximum" };
+	v2::PropertyIn<si::Angle>	cmd_pitch				{ this, "/cmd-pitch" };
+	v2::PropertyIn<si::Angle>	cmd_roll				{ this, "/cmd-roll" };
+	v2::PropertyIn<si::Angle>	measured_pitch			{ this, "/measured-pitch" };
+	v2::PropertyIn<si::Angle>	measured_roll			{ this, "/measured-roll" };
+	v2::PropertyIn<si::Angle>	elevator_minimum		{ this, "/limits/elevator/minimum" };
+	v2::PropertyIn<si::Angle>	elevator_maximum		{ this, "/limits/elevator/maximum" };
+	v2::PropertyIn<si::Angle>	ailerons_minimum		{ this, "/limits/ailerons/minimum" };
+	v2::PropertyIn<si::Angle>	ailerons_maximum		{ this, "/limits/ailerons/maximum" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>		output_serviceable				{ this, "/serviceable" };
-	v2::PropertyOut<si::Angle>	output_elevator					{ this, "/elevator" };
-	v2::PropertyOut<si::Angle>	output_ailerons					{ this, "/ailerons" };
+	v2::PropertyOut<bool>		serviceable				{ this, "/serviceable" };
+	v2::PropertyOut<si::Angle>	elevator				{ this, "/elevator" };
+	v2::PropertyOut<si::Angle>	ailerons				{ this, "/ailerons" };
 };
 
 

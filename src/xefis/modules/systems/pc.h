@@ -35,79 +35,79 @@ class PerformanceComputerIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Velocity>			setting_tev_min_ias					{ this, 0_kt };
+	v2::Setting<si::Velocity>			tev_min_ias					{ this, "tev_min_ias", 0_kt };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Velocity>		input_speed_ias						{ this, "/speed.ias" };
-	v2::PropertyIn<si::Velocity>		input_speed_tas						{ this, "/speed.tas" };
-	v2::PropertyIn<si::Velocity>		input_speed_gs						{ this, "/speed.gs" };
-	v2::PropertyIn<si::Velocity>		input_vertical_speed				{ this, "/vertical-speed" };
-	v2::PropertyIn<si::Length>			input_altitude_amsl_std				{ this, "/altitude.amsl" };
-	v2::PropertyIn<si::Angle>			input_track_lateral_true			{ this, "/track.lateral.true" };
-	v2::PropertyIn<si::Angle>			input_orientation_heading_true		{ this, "/orientation.heading.true" };
-	v2::PropertyIn<si::Angle>			input_magnetic_declination			{ this, "/magnetic-declination" };
-	v2::PropertyIn<si::Length>			input_density_altitude				{ this, "/density-altitude" };
-	v2::PropertyIn<si::Density>			input_air_density_static			{ this, "/air-density.static" };
-	v2::PropertyIn<si::Mass>			input_aircraft_mass					{ this, "/aircraft-mass" };
-	v2::PropertyIn<si::Angle>			input_flaps_angle					{ this, "/flaps-angle" };
-	v2::PropertyIn<si::Angle>			input_spoilers_angle				{ this, "/spoilers-angle" };
-	v2::PropertyIn<si::Angle>			input_aoa_alpha						{ this, "/aoa.alpha" };
-	v2::PropertyIn<si::Acceleration>	input_load							{ this, "/load" };
-	v2::PropertyIn<si::Angle>			input_bank_angle					{ this, "/bank-angle" };
-	v2::PropertyIn<si::Acceleration>	input_y_acceleration				{ this, "/acceleration.y" };
-	v2::PropertyIn<si::Acceleration>	input_z_acceleration				{ this, "/acceleration.x" };
+	v2::PropertyIn<si::Velocity>		speed_ias					{ this, "/speed.ias" };
+	v2::PropertyIn<si::Velocity>		speed_tas					{ this, "/speed.tas" };
+	v2::PropertyIn<si::Velocity>		speed_gs					{ this, "/speed.gs" };
+	v2::PropertyIn<si::Velocity>		vertical_speed				{ this, "/vertical-speed" };
+	v2::PropertyIn<si::Length>			altitude_amsl_std			{ this, "/altitude.amsl" };
+	v2::PropertyIn<si::Angle>			track_lateral_true			{ this, "/track.lateral.true" };
+	v2::PropertyIn<si::Angle>			orientation_heading_true	{ this, "/orientation.heading.true" };
+	v2::PropertyIn<si::Angle>			magnetic_declination		{ this, "/magnetic-declination" };
+	v2::PropertyIn<si::Length>			density_altitude			{ this, "/density-altitude" };
+	v2::PropertyIn<si::Density>			air_density_static			{ this, "/air-density.static" };
+	v2::PropertyIn<si::Mass>			aircraft_mass				{ this, "/aircraft-mass" };
+	v2::PropertyIn<si::Angle>			flaps_angle					{ this, "/flaps-angle" };
+	v2::PropertyIn<si::Angle>			spoilers_angle				{ this, "/spoilers-angle" };
+	v2::PropertyIn<si::Angle>			aoa_alpha					{ this, "/aoa.alpha" };
+	v2::PropertyIn<si::Acceleration>	load						{ this, "/load" };
+	v2::PropertyIn<si::Angle>			bank_angle					{ this, "/bank-angle" };
+	v2::PropertyIn<si::Acceleration>	y_acceleration				{ this, "/acceleration.y" };
+	v2::PropertyIn<si::Acceleration>	z_acceleration				{ this, "/acceleration.x" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>			output_wind_from_true				{ this, "/wind.from.true" };
-	v2::PropertyOut<si::Angle>			output_wind_from_magnetic			{ this, "/wind.from.magnetic" };
-	v2::PropertyOut<si::Velocity>		output_wind_tas						{ this, "/wind.tas" };
-	v2::PropertyOut<double>				output_glide_ratio					{ this, "/glide-ratio" };
-	v2::PropertyOut<std::string>		output_glide_ratio_string			{ this, "/glide-ratio-string" };
-	v2::PropertyOut<si::Power>			output_total_energy_variometer		{ this, "/total-energy-variometer" };
+	v2::PropertyOut<si::Angle>			wind_from_true				{ this, "/wind.from.true" };
+	v2::PropertyOut<si::Angle>			wind_from_magnetic			{ this, "/wind.from.magnetic" };
+	v2::PropertyOut<si::Velocity>		wind_tas					{ this, "/wind.tas" };
+	v2::PropertyOut<double>				glide_ratio					{ this, "/glide-ratio" };
+	v2::PropertyOut<std::string>		glide_ratio_string			{ this, "/glide-ratio-string" };
+	v2::PropertyOut<si::Power>			total_energy_variometer		{ this, "/total-energy-variometer" };
 	// Current stall IAS (depends on current bank angle):
-	v2::PropertyOut<si::Velocity>		output_v_s							{ this, "/v.s" };
+	v2::PropertyOut<si::Velocity>		v_s							{ this, "/v.s" };
 	// Stall IAS with wings level:
-	v2::PropertyOut<si::Velocity>		output_v_s_0_deg					{ this, "/v.s-0-deg" };
+	v2::PropertyOut<si::Velocity>		v_s_0_deg					{ this, "/v.s-0-deg" };
 	// Stall IAS at 5° bank angle:
-	v2::PropertyOut<si::Velocity>		output_v_s_5_deg					{ this, "/v.s-5-deg" };
+	v2::PropertyOut<si::Velocity>		v_s_5_deg					{ this, "/v.s-5-deg" };
 	// Stall IAS at 30° bank angle:
-	v2::PropertyOut<si::Velocity>		output_v_s_30_deg					{ this, "/v.s-30-deg" };
+	v2::PropertyOut<si::Velocity>		v_s_30_deg					{ this, "/v.s-30-deg" };
 	// Rotation IAS on take-off:
-	v2::PropertyOut<si::Velocity>		output_v_r							{ this, "/v.r" };
+	v2::PropertyOut<si::Velocity>		v_r							{ this, "/v.r" };
 	// Max maneuvering IAS:
-	v2::PropertyOut<si::Velocity>		output_v_a							{ this, "/v.a" };
+	v2::PropertyOut<si::Velocity>		v_a							{ this, "/v.a" };
 	// Approach IAS:
-	v2::PropertyOut<si::Velocity>		output_v_approach					{ this, "/v.approach" };
+	v2::PropertyOut<si::Velocity>		v_approach					{ this, "/v.approach" };
 	// Take-off decision speed: TODO compute:
-	v2::PropertyOut<si::Velocity>		output_v_1							{ this, "/v.1" };
+	v2::PropertyOut<si::Velocity>		v_1							{ this, "/v.1" };
 	// One engine inoperative decision IAS: TODO compute:
-	v2::PropertyOut<si::Velocity>		output_v_2							{ this, "/v.2" };
+	v2::PropertyOut<si::Velocity>		v_2							{ this, "/v.2" };
 	// Best unpowered range IAS (best glide IAS): TODO compute:
-	v2::PropertyOut<si::Velocity>		output_v_bg							{ this, "/v.bg" };
+	v2::PropertyOut<si::Velocity>		v_bg						{ this, "/v.bg" };
 	// Best powered range IAS: TODO compute
-	v2::PropertyOut<si::Velocity>		output_v_br							{ this, "/v.br" };
+	v2::PropertyOut<si::Velocity>		v_br						{ this, "/v.br" };
 	// Maximum unpowered airborne time IAS (minimum descent IAS): TODO compute
-	v2::PropertyOut<si::Velocity>		output_v_md							{ this, "/v.md" };
+	v2::PropertyOut<si::Velocity>		v_md						{ this, "/v.md" };
 	// Maximum powered airborne time IAS (best endurance IAS): TODO compute
-	v2::PropertyOut<si::Velocity>		output_v_be							{ this, "/v.be" };
+	v2::PropertyOut<si::Velocity>		v_be						{ this, "/v.be" };
 	// Best angle of climb (shortest ground distance climb): TODO compute
-	v2::PropertyOut<si::Velocity>		output_v_x							{ this, "/v.x" };
+	v2::PropertyOut<si::Velocity>		v_x							{ this, "/v.x" };
 	// Best rate of climb (shortest time climb): TODO compute
-	v2::PropertyOut<si::Velocity>		output_v_y							{ this, "/v.y" };
-	v2::PropertyOut<si::Angle>			output_critical_aoa					{ this, "/aoa.critical" };
-	v2::PropertyOut<bool>				output_stall						{ this, "/stall" };
-	v2::PropertyOut<double>				output_lift_coefficient				{ this, "/lift-coefficient" };
-	v2::PropertyOut<si::Velocity>		output_estimated_ias				{ this, "/estimated.ias" };
-	v2::PropertyOut<si::Velocity>		output_estimated_ias_error			{ this, "/estimated.ias-error" };
-	v2::PropertyOut<si::Angle>			output_estimated_aoa				{ this, "/estimated.aoa" };
-	v2::PropertyOut<si::Angle>			output_estimated_aoa_error			{ this, "/estimated.aoa-error" };
-	v2::PropertyOut<si::Angle>			output_slip_skid					{ this, "/slip-skid" };
+	v2::PropertyOut<si::Velocity>		v_y							{ this, "/v.y" };
+	v2::PropertyOut<si::Angle>			critical_aoa				{ this, "/aoa.critical" };
+	v2::PropertyOut<bool>				stall						{ this, "/stall" };
+	v2::PropertyOut<double>				lift_coefficient			{ this, "/lift-coefficient" };
+	v2::PropertyOut<si::Velocity>		estimated_ias				{ this, "/estimated.ias" };
+	v2::PropertyOut<si::Velocity>		estimated_ias_error			{ this, "/estimated.ias-error" };
+	v2::PropertyOut<si::Angle>			estimated_aoa				{ this, "/estimated.aoa" };
+	v2::PropertyOut<si::Angle>			estimated_aoa_error			{ this, "/estimated.aoa-error" };
+	v2::PropertyOut<si::Angle>			slip_skid					{ this, "/slip-skid" };
 };
 
 

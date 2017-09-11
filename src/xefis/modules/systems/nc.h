@@ -50,24 +50,24 @@ class NavigationComputerIO: public v2::ModuleIO
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>				output_position_longitude			{ this, "/position/longitude" };
-	v2::PropertyOut<si::Angle>				output_position_latitude			{ this, "/position/latitude" };
-	v2::PropertyOut<si::Length>				output_position_altitude_amsl		{ this, "/position/altitude.amsl" };
-	v2::PropertyOut<si::Length>				output_position_lateral_stddev		{ this, "/position/lateral.standard-deviation" };
-	v2::PropertyOut<si::Length>				output_position_vertical_stddev		{ this, "/position/vertical.standard-deviation" };
-	v2::PropertyOut<si::Length>				output_position_stddev				{ this, "/position/standard-deviation" };
-	v2::PropertyOut<std::string>			output_position_source				{ this, "/position/source" };
-	v2::PropertyOut<si::Angle>				output_orientation_pitch			{ this, "/orientation/pitch" };
-	v2::PropertyOut<si::Angle>				output_orientation_roll				{ this, "/orientation/roll" };
-	v2::PropertyOut<si::Angle>				output_orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
-	v2::PropertyOut<si::Angle>				output_orientation_heading_true		{ this, "/orientation/heading.true" };
-	v2::PropertyOut<si::Angle>				output_track_vertical				{ this, "/track/vertical" };
-	v2::PropertyOut<si::Angle>				output_track_lateral_magnetic		{ this, "/track/lateral.magnetic" };
-	v2::PropertyOut<si::Angle>				output_track_lateral_true			{ this, "/track/lateral.true" };
-	v2::PropertyOut<si::AngularVelocity>	output_track_lateral_rotation		{ this, "/track/rotation" };
-	v2::PropertyOut<si::Velocity>			output_track_ground_speed			{ this, "/track/ground-speed" };
-	v2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/magnetic-declination" };
-	v2::PropertyOut<si::Angle>				output_magnetic_inclination			{ this, "/magnetic-inclination" };
+	v2::PropertyOut<si::Angle>				position_longitude					{ this, "/position/longitude" };
+	v2::PropertyOut<si::Angle>				position_latitude					{ this, "/position/latitude" };
+	v2::PropertyOut<si::Length>				position_altitude_amsl				{ this, "/position/altitude.amsl" };
+	v2::PropertyOut<si::Length>				position_lateral_stddev				{ this, "/position/lateral.standard-deviation" };
+	v2::PropertyOut<si::Length>				position_vertical_stddev			{ this, "/position/vertical.standard-deviation" };
+	v2::PropertyOut<si::Length>				position_stddev						{ this, "/position/standard-deviation" };
+	v2::PropertyOut<std::string>			position_source						{ this, "/position/source" };
+	v2::PropertyOut<si::Angle>				orientation_pitch					{ this, "/orientation/pitch" };
+	v2::PropertyOut<si::Angle>				orientation_roll					{ this, "/orientation/roll" };
+	v2::PropertyOut<si::Angle>				orientation_heading_magnetic		{ this, "/orientation/heading.magnetic" };
+	v2::PropertyOut<si::Angle>				orientation_heading_true			{ this, "/orientation/heading.true" };
+	v2::PropertyOut<si::Angle>				track_vertical						{ this, "/track/vertical" };
+	v2::PropertyOut<si::Angle>				track_lateral_magnetic				{ this, "/track/lateral.magnetic" };
+	v2::PropertyOut<si::Angle>				track_lateral_true					{ this, "/track/lateral.true" };
+	v2::PropertyOut<si::AngularVelocity>	track_lateral_rotation				{ this, "/track/rotation" };
+	v2::PropertyOut<si::Velocity>			track_ground_speed					{ this, "/track/ground-speed" };
+	v2::PropertyOut<si::Angle>				magnetic_declination				{ this, "/magnetic-declination" };
+	v2::PropertyOut<si::Angle>				magnetic_inclination				{ this, "/magnetic-inclination" };
 };
 
 

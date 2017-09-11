@@ -27,33 +27,6 @@
 
 namespace v2 {
 
-UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
-	Exception (make_message (settings))
-{ }
-
-
-std::string
-UninitializedSettings::make_message (std::vector<BasicSetting*> settings)
-{
-	if (settings.empty())
-		return "uninitialized settings in a module";
-	else
-	{
-		std::string result = "uninitialized setting(s) found for module " + identifier (settings[0]->io()) + ": ";
-
-		for (std::size_t i = 0; i < settings.size(); ++i)
-		{
-			result += demangle (typeid (*settings[i]));
-
-			if (i != settings.size() - 1)
-				result += ", ";
-		}
-
-		return result;
-	}
-}
-
-
 void
 BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
@@ -73,8 +46,9 @@ BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string const& insta
 	_instance (instance),
 	_io (std::move (io))
 {
-	_io->set_module (this);
-	// TODO verify settings etc
+	auto api = ModuleIO::ProcessingLoopAPI (_io.get());
+	api.set_module (this);
+	api.verify_settings();
 }
 
 
@@ -108,27 +82,9 @@ identifier (BasicModule& module)
 
 
 std::string
-identifier (ModuleIO& io)
-{
-	BasicModule* module = io.module();
-
-	if (module)
-		return identifier (*module);
-	else
-		return "<no module associated with the IO object>";
-}
-
-
-std::string
 identifier (BasicModule* module)
 {
 	return module ? identifier (*module) : "(nullptr)";
-}
-
-std::string
-identifier (ModuleIO* io)
-{
-	return io ? identifier (*io) : "(nullptr)";
 }
 
 } // namespace v2

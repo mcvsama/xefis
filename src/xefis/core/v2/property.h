@@ -140,6 +140,22 @@ class PropertyVirtualInterface
 	 */
 	virtual void
 	fetch (Cycle const&) = 0;
+
+	/**
+	 * Serializes property value, including nil-flag.
+	 * The blob has variable-length.
+	 */
+	virtual void
+	property_to_blob (Blob&) const = 0;
+
+	/**
+	 * Deserializes property value.
+	 * The blob has variable-length.
+	 * \throw	InvalidBlobSize
+	 *			If blob has size not corresponding to this property type.
+	 */
+	virtual void
+	blob_to_property (Blob const&) = 0;
 };
 
 
@@ -337,6 +353,14 @@ template<class pValue>
 		// BasicProperty API
 		bool
 		valid() const noexcept override;
+
+		// BasicProperty API
+		void
+		property_to_blob (Blob&) const;
+
+		// BasicProperty API
+		void
+		blob_to_property (Blob const&);
 
 	  private:
 		std::optional<Value>	_value;
@@ -672,6 +696,40 @@ template<class V>
 	Property<V>::valid() const noexcept
 	{
 		return !is_nil();
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::property_to_blob (Blob& blob) const
+	{
+		if (valid())
+		{
+			value_to_blob (**this, blob);
+			blob.insert (blob.begin(), 1);
+		}
+		else
+			blob.assign ({ 0 });
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::blob_to_property (Blob const& blob)
+	{
+		if (blob.empty())
+			throw InvalidBlobSize();
+		else
+		{
+			if (blob[0])
+			{
+				Value aux;
+				blob_to_value (Blob { std::next (blob.begin()), blob.end() }, aux);
+				*this = aux;
+			}
+			else
+				set_nil();
+		}
 	}
 
 

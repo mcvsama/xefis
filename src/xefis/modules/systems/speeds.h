@@ -31,17 +31,17 @@ class SpeedsIO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>		input_flaps_angle				{ this, "/flaps-angle" };
-	v2::PropertyIn<si::Velocity>	input_stall_speed_5deg			{ this, "/stall-speed" };
+	v2::PropertyIn<si::Angle>		flaps_angle				{ this, "/flaps-angle" };
+	v2::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "/stall-speed" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Velocity>	output_speed_minimum			{ this, "speed.minimum" };
-	v2::PropertyOut<si::Velocity>	output_speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
-	v2::PropertyOut<si::Velocity>	output_speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
-	v2::PropertyOut<si::Velocity>	output_speed_maximum			{ this, "speed.maximum" };
+	v2::PropertyOut<si::Velocity>	speed_minimum			{ this, "speed.minimum" };
+	v2::PropertyOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
+	v2::PropertyOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
+	v2::PropertyOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
 };
 
 

@@ -33,10 +33,10 @@ class LabelIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<xf::FontSize>	font_size	{ this, xf::FontSize (10.0) };
-	v2::Setting<QString>		label		{ this };
-	v2::Setting<QColor>			color		{ this, Qt::white };
-	v2::Setting<Qt::Alignment>	alignment	{ this, Qt::AlignVCenter | Qt::AlignHCenter };
+	v2::Setting<xf::FontSize>	font_size	{ this, "font_size", xf::FontSize (10.0) };
+	v2::Setting<QString>		label		{ this, "label" };
+	v2::Setting<QColor>			color		{ this, "color", Qt::white };
+	v2::Setting<Qt::Alignment>	alignment	{ this, "alignment", Qt::AlignVCenter | Qt::AlignHCenter };
 };
 
 
