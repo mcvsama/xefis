@@ -38,17 +38,17 @@ class ETSAirspeedIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Time>			setting_read_interval		{ this, 100_ms };
-	v2::Setting<si::Time>			setting_smoothing_time		{ this, 100_ms };
+	v2::Setting<si::Time>			read_interval		{ this, "read_interval", 100_ms };
+	v2::Setting<si::Time>			smoothing_time		{ this, "smoothing_time", 100_ms };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>			output_serviceable			{ this, "/serviceable" };
-	v2::PropertyOut<si::Velocity>	output_airspeed				{ this, "/airspeed" };
-	v2::PropertyOut<si::Velocity>	output_airspeed_minimum		{ this, "/airspeed.minimum" };
-	v2::PropertyOut<si::Velocity>	output_airspeed_maximum		{ this, "/airspeed.maximum" };
+	v2::PropertyOut<bool>			serviceable			{ this, "/serviceable" };
+	v2::PropertyOut<si::Velocity>	airspeed			{ this, "/airspeed" };
+	v2::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "/airspeed.minimum" };
+	v2::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "/airspeed.maximum" };
 };
 
 

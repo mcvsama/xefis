@@ -38,25 +38,25 @@ class StatusIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Time>	minimum_display_time			{ this, 5_s };
+	v2::Setting<si::Time>	status_minimum_display_time		{ this, "status_minimum_display_time", 5_s };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<int64_t>	input_cursor_value				{ this, "/input/cursor/value" };
-	v2::PropertyIn<bool>	input_button_cursor_del			{ this, "/input/button/cursor-del" };
-	v2::PropertyIn<bool>	input_button_recall				{ this, "/input/button/recall" };
-	v2::PropertyIn<bool>	input_button_clear				{ this, "/input/button/clear" };
-	v2::PropertyIn<bool>	input_button_master_caution		{ this, "/input/button/master-caution" };
-	v2::PropertyIn<bool>	input_button_master_warning		{ this, "/input/button/master-warning" };
+	v2::PropertyIn<int64_t>	cursor_value					{ this, "/input/cursor/value" };
+	v2::PropertyIn<bool>	button_cursor_del				{ this, "/input/button/cursor-del" };
+	v2::PropertyIn<bool>	button_recall					{ this, "/input/button/recall" };
+	v2::PropertyIn<bool>	button_clear					{ this, "/input/button/clear" };
+	v2::PropertyIn<bool>	button_master_caution			{ this, "/input/button/master-caution" };
+	v2::PropertyIn<bool>	button_master_warning			{ this, "/input/button/master-warning" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>	output_master_caution			{ this, "/output/master-caution" };
-	v2::PropertyOut<bool>	output_master_warning			{ this, "/output/master-warning" };
+	v2::PropertyOut<bool>	master_caution					{ this, "/output/master-caution" };
+	v2::PropertyOut<bool>	master_warning					{ this, "/output/master-warning" };
 };
 
 
@@ -233,11 +233,11 @@ class Status:
 	solve_scroll_and_cursor();
 
   private:
-	v2::PropChangedTo<bool>				_button_cursor_del_pressed { io.input_button_cursor_del, true };
-	v2::PropChangedTo<bool>				_button_recall_pressed { io.input_button_recall, true };
-	v2::PropChangedTo<bool>				_button_clear_pressed { io.input_button_clear, true };
-	v2::PropChangedTo<bool>				_button_master_caution_pressed { io.input_button_master_caution, true };
-	v2::PropChangedTo<bool>				_button_master_warning_pressed { io.input_button_master_warning, true };
+	v2::PropChangedTo<bool>				_button_cursor_del_pressed { io.button_cursor_del, true };
+	v2::PropChangedTo<bool>				_button_recall_pressed { io.button_recall, true };
+	v2::PropChangedTo<bool>				_button_clear_pressed { io.button_clear, true };
+	v2::PropChangedTo<bool>				_button_master_caution_pressed { io.button_master_caution, true };
+	v2::PropChangedTo<bool>				_button_master_warning_pressed { io.button_master_warning, true };
 	std::unique_ptr<v2::DeltaDecoder>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;

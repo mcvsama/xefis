@@ -34,10 +34,10 @@ class KLogMonitorIO: public v2::ModuleIO
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>	output_flag_oom		{ this, "/flags/oom" };
-	v2::PropertyOut<bool>	output_flag_io		{ this, "/flags/io-error" };
-	v2::PropertyOut<bool>	output_flag_oops	{ this, "/flags/oops" };
-	v2::PropertyOut<bool>	output_flag_bug		{ this, "/flags/bug" };
+	v2::PropertyOut<bool>	flag_oom	{ this, "/flags/oom" };
+	v2::PropertyOut<bool>	flag_io		{ this, "/flags/io-error" };
+	v2::PropertyOut<bool>	flag_oops	{ this, "/flags/oops" };
+	v2::PropertyOut<bool>	flag_bug	{ this, "/flags/bug" };
 };
 
 

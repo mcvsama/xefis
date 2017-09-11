@@ -39,25 +39,6 @@ class ModuleIO;
 
 
 /**
- * Exception object thrown when some settings in a module have not been initialized as required.
- */
-class UninitializedSettings: public Exception
-{
-  public:
-	// Ctor
-	explicit
-	UninitializedSettings (std::vector<BasicSetting*>);
-
-  private:
-	/**
-	 * Create a message for the exception.
-	 */
-	std::string
-	make_message (std::vector<BasicSetting*>);
-};
-
-
-/**
  * A "function" that takes input data in form of input properties, and computes result
  * in form of output properties. Implemented as a class since some modules will have to
  * store some sort of state.
@@ -266,22 +247,10 @@ std::string
 identifier (BasicModule&);
 
 /**
- * Return string identifying module and its instance, if any module is associated with the ModuleIO object.
- */
-std::string
-identifier (ModuleIO&);
-
-/**
  * Same as identifier (BasicModule&).
  */
 std::string
 identifier (BasicModule*);
-
-/**
- * Same as identifier (ModuleIO&).
- */
-std::string
-identifier (ModuleIO*);
 
 } // namespace v2
 

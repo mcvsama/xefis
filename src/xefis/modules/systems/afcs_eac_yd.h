@@ -35,22 +35,22 @@ class AFCS_EAC_YD_IO: public v2::ModuleIO
 	 */
 
 	v2::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
-								setting_rudder_pid_settings	{ this };
-	v2::Setting<double>			setting_rudder_pid_gain		{ this, 1.0 };
-	v2::Setting<si::Angle>		setting_deflection_limit	{ this };
+								rudder_pid_settings	{ this, "rudder_pid_settings" };
+	v2::Setting<double>			rudder_pid_gain		{ this, "rudder_pid_gain", 1.0 };
+	v2::Setting<si::Angle>		deflection_limit	{ this, "deflection_limit" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>		input_enabled				{ this, "/enabled" };
-	v2::PropertyIn<si::Force>	input_slip_skid				{ this, "/slip-skid" };
+	v2::PropertyIn<bool>		enabled				{ this, "/enabled" };
+	v2::PropertyIn<si::Force>	slip_skid			{ this, "/slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>	output_rudder_deflection	{ this, "/rudder-deflection" };
+	v2::PropertyOut<si::Angle>	rudder_deflection	{ this, "/rudder-deflection" };
 };
 
 

@@ -35,18 +35,18 @@ class BMP085_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<xf::i2c::Bus::ID>		setting_i2c_bus						{ this };
-	v2::Setting<xf::i2c::Address::ID>	setting_i2c_address					{ this };
-	v2::Setting<si::Time>				setting_temperature_update_interval	{ this, 500_ms };
-	v2::Setting<si::Time>				setting_pressure_update_interval	{ this, 50_ms };
+	v2::Setting<xf::i2c::Bus::ID>		i2c_bus						{ this, "i2c_bus" };
+	v2::Setting<xf::i2c::Address::ID>	i2c_address					{ this, "i2c_address" };
+	v2::Setting<si::Time>				temperature_update_interval	{ this, "temperature_update_interval", 500_ms };
+	v2::Setting<si::Time>				pressure_update_interval	{ this, "pressure_update_interval", 50_ms };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>				serviceable							{ this, "/serviceable" };
-	v2::PropertyOut<si::Temperature>	temperature							{ this, "/measured-temperature" };
-	v2::PropertyOut<si::Pressure>		pressure							{ this, "/measured-pressure" };
+	v2::PropertyOut<bool>				serviceable					{ this, "/serviceable" };
+	v2::PropertyOut<si::Temperature>	temperature					{ this, "/measured-temperature" };
+	v2::PropertyOut<si::Pressure>		pressure					{ this, "/measured-pressure" };
 };
 
 

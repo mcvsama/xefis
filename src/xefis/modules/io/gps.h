@@ -39,42 +39,42 @@ class GPS_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<std::vector<std::string>>	setting_boot_pmtk_commands			{ this, { } };
-	v2::Setting<unsigned int>				setting_default_baud_rate			{ this, 9600 };
-	v2::Setting<unsigned int>				setting_target_baud_rate			{ this, 9600 };
-	v2::Setting<si::Length>					setting_receiver_accuracy			{ this };
-	v2::Setting<bool>						setting_synchronize_system_clock	{ this, false };
+	v2::Setting<std::vector<std::string>>	boot_pmtk_commands			{ this, "boot_pmtk_commands", { } };
+	v2::Setting<unsigned int>				default_baud_rate			{ this, "default_baud_rate", 9600 };
+	v2::Setting<unsigned int>				target_baud_rate			{ this, "target_baud_rate", 9600 };
+	v2::Setting<si::Length>					receiver_accuracy			{ this, "receiver_accuracy" };
+	v2::Setting<bool>						synchronize_system_clock	{ this, "synchronize_system_clock", false };
 
 	/*
 	 * Output
 	 */
 
 	// Number of serial read failures.
-	v2::PropertyOut<int64_t>				output_read_errors					{ this, "/read-errors" };	// Managed by Connection object.
+	v2::PropertyOut<int64_t>				read_errors					{ this, "/read-errors" };	// Managed by Connection object.
 	// True if GPS device is serviceable:
-	v2::PropertyOut<bool>					output_serviceable					{ this, "/serviceable" };	// Managed by Connection object.
+	v2::PropertyOut<bool>					serviceable					{ this, "/serviceable" };	// Managed by Connection object.
 	// Manager power to the GPS device:
-	v2::PropertyOut<bool>					output_power_on						{ this, "/power-on" };		// Managed by PowerCycle object.
+	v2::PropertyOut<bool>					power_on					{ this, "/power-on" };		// Managed by PowerCycle object.
 
-	v2::PropertyOut<std::string>			output_fix_quality					{ this, "/gps/fix-quality" };
-	v2::PropertyOut<std::string>			output_fix_mode						{ this, "/gps/mode" };		// "2D" or "3D"
-	v2::PropertyOut<si::Angle>				output_latitude						{ this, "/gps/latitude" };
-	v2::PropertyOut<si::Angle>				output_longitude					{ this, "/gps/longitude" };
-	v2::PropertyOut<si::Length>				output_altitude_amsl				{ this, "/gps/altitude-amsl" };
-	v2::PropertyOut<si::Length>				output_geoid_height					{ this, "/gps/geoid-height" };
-	v2::PropertyOut<si::Velocity>			output_ground_speed					{ this, "/gps/ground-speed" };
-	v2::PropertyOut<si::Angle>				output_track_true					{ this, "/gps/track.true" };
-	v2::PropertyOut<int64_t>				output_tracked_satellites			{ this, "/gps/tracked-satellites" };
-	v2::PropertyOut<si::Angle>				output_magnetic_declination			{ this, "/gps/magnetic-declination" };
-	v2::PropertyOut<double>					output_hdop							{ this, "/gps/hdop" };
-	v2::PropertyOut<double>					output_vdop							{ this, "/gps/vdop" };
-	v2::PropertyOut<double>					output_pdop							{ this, "/gps/pdop" };
-	v2::PropertyOut<si::Length>				output_lateral_stddev				{ this, "/gps/lateral-stddev" };
-	v2::PropertyOut<si::Length>				output_vertical_stddev				{ this, "/gps/vertical-stddev" };
-	v2::PropertyOut<si::Length>				output_position_stddev				{ this, "/gps/position-stddev" };
-	v2::PropertyOut<int64_t>				output_dgps_station_id				{ this, "/gps/dgps-station-id" };
-	v2::PropertyOut<si::Time>				output_fix_system_timestamp			{ this, "/gps/fix/system-timestamp" };
-	v2::PropertyOut<si::Time>				output_fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
+	v2::PropertyOut<std::string>			fix_quality					{ this, "/gps/fix-quality" };
+	v2::PropertyOut<std::string>			fix_mode					{ this, "/gps/mode" };		// "2D" or "3D"
+	v2::PropertyOut<si::Angle>				latitude					{ this, "/gps/latitude" };
+	v2::PropertyOut<si::Angle>				longitude					{ this, "/gps/longitude" };
+	v2::PropertyOut<si::Length>				altitude_amsl				{ this, "/gps/altitude-amsl" };
+	v2::PropertyOut<si::Length>				geoid_height				{ this, "/gps/geoid-height" };
+	v2::PropertyOut<si::Velocity>			ground_speed				{ this, "/gps/ground-speed" };
+	v2::PropertyOut<si::Angle>				track_true					{ this, "/gps/track.true" };
+	v2::PropertyOut<int64_t>				tracked_satellites			{ this, "/gps/tracked-satellites" };
+	v2::PropertyOut<si::Angle>				magnetic_declination		{ this, "/gps/magnetic-declination" };
+	v2::PropertyOut<double>					hdop						{ this, "/gps/hdop" };
+	v2::PropertyOut<double>					vdop						{ this, "/gps/vdop" };
+	v2::PropertyOut<double>					pdop						{ this, "/gps/pdop" };
+	v2::PropertyOut<si::Length>				lateral_stddev				{ this, "/gps/lateral-stddev" };
+	v2::PropertyOut<si::Length>				vertical_stddev				{ this, "/gps/vertical-stddev" };
+	v2::PropertyOut<si::Length>				position_stddev				{ this, "/gps/position-stddev" };
+	v2::PropertyOut<int64_t>				dgps_station_id				{ this, "/gps/dgps-station-id" };
+	v2::PropertyOut<si::Time>				fix_system_timestamp		{ this, "/gps/fix/system-timestamp" };
+	v2::PropertyOut<si::Time>				fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
 };
 
 

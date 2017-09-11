@@ -32,17 +32,17 @@ class ArrivalETA_IO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>	input_station_latitude		{ this, "/station-position/latitude" };
-	v2::PropertyIn<si::Angle>	input_station_longitude		{ this, "/station-position/longitude" };
-	v2::PropertyIn<si::Angle>	input_aircraft_latitude		{ this, "/aircraft-position/latitude" };
-	v2::PropertyIn<si::Angle>	input_aircraft_longitude	{ this, "/aircraft-position/longitude" };
-	v2::PropertyIn<si::Angle>	input_track_lateral_true	{ this, "/track-lateral-true" };
+	v2::PropertyIn<si::Angle>	station_latitude	{ this, "/station-position/latitude" };
+	v2::PropertyIn<si::Angle>	station_longitude	{ this, "/station-position/longitude" };
+	v2::PropertyIn<si::Angle>	aircraft_latitude	{ this, "/aircraft-position/latitude" };
+	v2::PropertyIn<si::Angle>	aircraft_longitude	{ this, "/aircraft-position/longitude" };
+	v2::PropertyIn<si::Angle>	track_lateral_true	{ this, "/track-lateral-true" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Time>	output_eta					{ this, "/eta" };
+	v2::PropertyOut<si::Time>	eta					{ this, "/eta" };
 };
 
 

@@ -33,23 +33,23 @@ template<class Value>
 		 * Settings
 		 */
 
-		v2::Setting<double>		setting_input_a_factor	{ this, 1.0 };
-		v2::Setting<double>		setting_input_b_factor	{ this, 1.0 };
-		v2::Setting<Value>		setting_output_minimum	{ this, v2::BasicSetting::Optional };
-		v2::Setting<Value>		setting_output_maximum	{ this, v2::BasicSetting::Optional };
+		v2::Setting<double>		input_a_factor	{ this, "input_a_factor", 1.0 };
+		v2::Setting<double>		input_b_factor	{ this, "input_b_factor", 1.0 };
+		v2::Setting<Value>		output_minimum	{ this, "output_minimum", v2::BasicSetting::Optional };
+		v2::Setting<Value>		output_maximum	{ this, "output_maximum", v2::BasicSetting::Optional };
 
 		/*
 		 * Input
 		 */
 
-		v2::PropertyIn<Value>	input_a_value			{ this, "/input.a" };
-		v2::PropertyIn<Value>	input_b_value			{ this, "/input.b" };
+		v2::PropertyIn<Value>	input_a_value	{ this, "/input.a" };
+		v2::PropertyIn<Value>	input_b_value	{ this, "/input.b" };
 
 		/*
 		 * Output
 		 */
 
-		v2::PropertyOut<Value>	output_value			{ this, "/value" };
+		v2::PropertyOut<Value>	output_value	{ this, "/value" };
 	};
 
 

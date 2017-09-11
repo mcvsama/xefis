@@ -38,9 +38,9 @@ template<class Value>
 	inline Blob
 	to_blob (Property<Value> const& property)
 	{
-		using si::to_blob;
-
-		return to_blob (property.get());
+		Blob result;
+		property.property_to_blob (result);
+		return result;
 	}
 
 
@@ -48,13 +48,6 @@ inline std::string
 to_string (Property<bool> const& property)
 {
 	return property.get() ? "true" : "false";
-}
-
-
-inline Blob
-to_blob (Property<bool> const& property)
-{
-	return property.get() ? Blob ({ 0x01 }) : Blob ({ 0x00 });
 }
 
 } // namespace v2

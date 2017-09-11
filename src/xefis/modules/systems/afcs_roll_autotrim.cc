@@ -29,16 +29,16 @@ AFCS_RollAutotrim::AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO> modu
 void
 AFCS_RollAutotrim::process (v2::Cycle const&)
 {
-	if (io.input_measured_ias && io.input_measured_engine_torque)
+	if (io.measured_ias && io.measured_engine_torque)
 	{
 		// TODO Do this correctly, now it's just too simple.
-		auto ias_part = *io.setting_ias_coefficient / io.input_measured_ias->quantity<MeterPerSecond>();
-		auto torque_part = *io.setting_engine_torque_coefficient * io.input_measured_engine_torque->quantity<NewtonMeter>();
+		auto ias_part = *io.ias_coefficient / io.measured_ias->quantity<MeterPerSecond>();
+		auto torque_part = *io.engine_torque_coefficient * io.measured_engine_torque->quantity<NewtonMeter>();
 		si::Angle correction = 1_deg * (ias_part + torque_part);
 
-		io.output_ailerons_correction = *io.setting_total_coefficient * correction;
+		io.ailerons_correction = *io.total_coefficient * correction;
 	}
 	else
-		io.output_ailerons_correction.set_nil();
+		io.ailerons_correction.set_nil();
 }
 

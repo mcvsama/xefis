@@ -42,23 +42,23 @@ class ADI_IO: public v2::ModuleIO
 	 */
 
 	// TODO change to si::Velocity
-	v2::Setting<int64_t>			speed_ladder_line_every								{ this, 10 };
-	v2::Setting<int64_t>			speed_ladder_number_every							{ this, 20 };
-	v2::Setting<int64_t>			speed_ladder_extent									{ this, 124 };
-	v2::Setting<int64_t>			speed_ladder_minimum								{ this, 20 };
-	v2::Setting<int64_t>			speed_ladder_maximum								{ this, 350 };
-	v2::Setting<int64_t>			altitude_ladder_line_every							{ this, 100 };
-	v2::Setting<int64_t>			altitude_ladder_number_every						{ this, 200 };
-	v2::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, 1000 };
-	v2::Setting<int64_t>			altitude_ladder_bold_every							{ this, 500 };
-	v2::Setting<int64_t>			altitude_ladder_extent								{ this, 825 };
-	v2::Setting<si::Length>			altitude_landing_warning_hi							{ this, 1000_ft };
-	v2::Setting<si::Length>			altitude_landing_warning_lo							{ this, 500_ft };
-	v2::Setting<si::Length>			raising_runway_visibility							{ this, 1000_ft };
-	v2::Setting<si::Length>			raising_runway_threshold							{ this, 250_ft };
-	v2::Setting<si::Angle>			aoa_visibility_threshold							{ this, 17.5_deg };
-	v2::Setting<double>				show_mach_above										{ this, 0.4 };
-	v2::Setting<si::Power>			power_eq_1000_fpm									{ this, 1000_W };
+	v2::Setting<int64_t>			speed_ladder_line_every								{ this, "setting_speed_ladder_line_every", 10 };
+	v2::Setting<int64_t>			speed_ladder_number_every							{ this, "setting_speed_ladder_number_every", 20 };
+	v2::Setting<int64_t>			speed_ladder_extent									{ this, "setting_speed_ladder_extent", 124 };
+	v2::Setting<int64_t>			speed_ladder_minimum								{ this, "setting_speed_ladder_minimum", 20 };
+	v2::Setting<int64_t>			speed_ladder_maximum								{ this, "setting_speed_ladder_maximum", 350 };
+	v2::Setting<int64_t>			altitude_ladder_line_every							{ this, "setting_altitude_ladder_line_every", 100 };
+	v2::Setting<int64_t>			altitude_ladder_number_every						{ this, "setting_altitude_ladder_number_every", 200 };
+	v2::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, "setting_altitude_ladder_emphasis_every", 1000 };
+	v2::Setting<int64_t>			altitude_ladder_bold_every							{ this, "setting_altitude_ladder_bold_every", 500 };
+	v2::Setting<int64_t>			altitude_ladder_extent								{ this, "setting_altitude_ladder_extent", 825 };
+	v2::Setting<si::Length>			altitude_landing_warning_hi							{ this, "setting_altitude_landing_warning_hi", 1000_ft };
+	v2::Setting<si::Length>			altitude_landing_warning_lo							{ this, "setting_altitude_landing_warning_lo", 500_ft };
+	v2::Setting<si::Length>			raising_runway_visibility							{ this, "setting_raising_runway_visibility", 1000_ft };
+	v2::Setting<si::Length>			raising_runway_threshold							{ this, "setting_raising_runway_threshold", 250_ft };
+	v2::Setting<si::Angle>			aoa_visibility_threshold							{ this, "setting_aoa_visibility_threshold", 17.5_deg };
+	v2::Setting<double>				show_mach_above										{ this, "setting_show_mach_above", 0.4 };
+	v2::Setting<si::Power>			power_eq_1000_fpm									{ this, "setting_power_eq_1000_fpm", 1000_W };
 
 	/*
 	 * Input

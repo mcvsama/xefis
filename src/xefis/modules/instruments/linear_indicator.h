@@ -37,25 +37,25 @@ class BasicIndicatorIO: public v2::ModuleIO
 	 * Precision is number of digits after decimal point.
 	 * Negative values are accepted and have different meaning: value will be divided by 10^n.
 	 */
-	v2::Setting<int>					precision				{ this, 0 };
+	v2::Setting<int>					precision				{ this, "precision", 0 };
 
 	/**
 	 * Set modulo value. If > 0, value will be converted to int,
 	 * divided by n and the multipled by n again.
 	 */
-	v2::Setting<unsigned int>			modulo					{ this, false };
+	v2::Setting<unsigned int>			modulo					{ this, "modulo", false };
 
 	/**
 	 * Number of digits displayed.
 	 */
-	v2::Setting<unsigned int>			digits					{ this, 3 };
+	v2::Setting<unsigned int>			digits					{ this, "digits", 3 };
 
-	v2::Setting<double>					value_minimum			{ this };
-	v2::Setting<std::optional<double>>	value_minimum_critical	{ this, std::nullopt };
-	v2::Setting<std::optional<double>>	value_minimum_warning	{ this, std::nullopt };
-	v2::Setting<std::optional<double>>	value_maximum_warning	{ this, std::nullopt };
-	v2::Setting<std::optional<double>>	value_maximum_critical	{ this, std::nullopt };
-	v2::Setting<double>					value_maximum			{ this };
+	v2::Setting<double>					value_minimum			{ this, "value_minimum" };
+	v2::Setting<std::optional<double>>	value_minimum_critical	{ this, "value_minimum_critical", std::nullopt };
+	v2::Setting<std::optional<double>>	value_minimum_warning	{ this, "value_minimum_warning", std::nullopt };
+	v2::Setting<std::optional<double>>	value_maximum_warning	{ this, "value_maximum_warning", std::nullopt };
+	v2::Setting<std::optional<double>>	value_maximum_critical	{ this, "value_maximum_critical", std::nullopt };
+	v2::Setting<double>					value_maximum			{ this, "value_maximum" };
 };
 
 
@@ -66,7 +66,7 @@ class LinearIndicatorIO: public BasicIndicatorIO
 	 * Settings
 	 */
 
-	v2::Setting<bool>					mirrored_style			{ this, false };
+	v2::Setting<bool>					mirrored_style			{ this, "mirrored_style", false };
 };
 
 

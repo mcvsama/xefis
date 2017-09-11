@@ -32,10 +32,10 @@ HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std
 {
 	_inputs_observer.set_callback ([&]{ update(); });
 	_inputs_observer.observe ({
-		&io.input_trim_value,
-		&io.input_trim_reference,
-		&io.input_trim_reference_minimum,
-		&io.input_trim_reference_maximum,
+		&io.trim_value,
+		&io.trim_reference,
+		&io.trim_reference_minimum,
+		&io.trim_reference_maximum,
 	});
 }
 
@@ -64,14 +64,14 @@ HorizontalTrim::paintEvent (QPaintEvent*)
 	auto painting_token = get_token (this);
 	clear_background();
 
-	auto trim = io.input_trim_value.get_optional();
+	auto trim = io.trim_value.get_optional();
 
 	if (trim)
 		trim = xf::clamped (*trim, -1.0, +1.0);
 
-	auto ref = io.input_trim_reference.get_optional();
-	auto ref_min = io.input_trim_reference_minimum.get_optional();
-	auto ref_max = io.input_trim_reference_maximum.get_optional();
+	auto ref = io.trim_reference.get_optional();
+	auto ref_min = io.trim_reference_minimum.get_optional();
+	auto ref_max = io.trim_reference_maximum.get_optional();
 
 	double h = _font_13_digit_height;
 	double v = width() - h;

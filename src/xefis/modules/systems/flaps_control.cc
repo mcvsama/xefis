@@ -81,7 +81,7 @@ FlapsControl::update_flap_position()
 
 	double sgn = xf::sgn ((_setting - _current).quantity<Degree>());
 	si::Angle difference = _setting - _current;
-	si::Angle delta = kUpdateInterval * *io.setting_angular_velocity;
+	si::Angle delta = kUpdateInterval * *io.angular_velocity;
 
 	if (abs (difference) > delta)
 	{
@@ -96,7 +96,7 @@ FlapsControl::update_flap_position()
 		_timer->stop();
 	}
 
-	io.output_current = _current;
-	io.output_control = xf::renormalize (_current, _extents, *io.setting_control_extents);
+	io.current = _current;
+	io.control = xf::renormalize (_current, _extents, *io.control_extents);
 }
 

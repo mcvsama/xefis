@@ -40,27 +40,27 @@ class AFCS_FD_Roll_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<DirectionPID::Settings>	setting_hdg_pid_settings	{ this };
-	v2::Setting<DirectionPID::Settings>	setting_trk_pid_settings	{ this };
+	v2::Setting<DirectionPID::Settings>	hdg_pid_settings		{ this, "hdg_pid_settings" };
+	v2::Setting<DirectionPID::Settings>	trk_pid_settings		{ this, "trk_pid_settings" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>				input_autonomous			{ this, "/autonomous" };
-	v2::PropertyIn<si::Angle>			input_roll_limits			{ this, "/roll-limits" };
-	v2::PropertyIn<afcs_api::RollMode>	input_cmd_roll_mode			{ this, "/cmd-roll-mode" };
-	v2::PropertyIn<si::Angle>			input_cmd_magnetic_hdg		{ this, "/cmd-magnetic-heading" };
-	v2::PropertyIn<si::Angle>			input_cmd_magnetic_trk		{ this, "/cmd-magnetic-track" };
-	v2::PropertyIn<si::Angle>			input_measured_magnetic_hdg	{ this, "/measured-magnetic-heading" };
-	v2::PropertyIn<si::Angle>			input_measured_magnetic_trk	{ this, "/measured-magnetic-track" };
+	v2::PropertyIn<bool>				autonomous				{ this, "/autonomous" };
+	v2::PropertyIn<si::Angle>			roll_limits				{ this, "/roll-limits" };
+	v2::PropertyIn<afcs_api::RollMode>	cmd_roll_mode			{ this, "/cmd-roll-mode" };
+	v2::PropertyIn<si::Angle>			cmd_magnetic_hdg		{ this, "/cmd-magnetic-heading" };
+	v2::PropertyIn<si::Angle>			cmd_magnetic_trk		{ this, "/cmd-magnetic-track" };
+	v2::PropertyIn<si::Angle>			measured_magnetic_hdg	{ this, "/measured-magnetic-heading" };
+	v2::PropertyIn<si::Angle>			measured_magnetic_trk	{ this, "/measured-magnetic-track" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>			output_roll					{ this, "/output-roll" };
-	v2::PropertyOut<bool>				output_operative			{ this, "/operative" };
+	v2::PropertyOut<si::Angle>			roll					{ this, "/output-roll" };
+	v2::PropertyOut<bool>				operative				{ this, "/operative" };
 };
 
 

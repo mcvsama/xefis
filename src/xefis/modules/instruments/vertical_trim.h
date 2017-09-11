@@ -37,16 +37,16 @@ class VerticalTrimIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<QString>	label							{ this, "STAB" };
+	v2::Setting<QString>	label					{ this, "label", "STAB" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	input_trim_value				{ this, "/trim/value" };
-	v2::PropertyIn<double>	input_trim_reference			{ this, "/trim/reference" };
-	v2::PropertyIn<double>	input_trim_reference_minimum	{ this, "/trim/reference.minimum" };
-	v2::PropertyIn<double>	input_trim_reference_maximum	{ this, "/trim/reference.maximum" };
+	v2::PropertyIn<double>	trim_value				{ this, "/trim/value" };
+	v2::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
+	v2::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
+	v2::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
 };
 
 

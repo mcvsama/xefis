@@ -34,23 +34,23 @@ class RemoteControlManagementSystemIO: public v2::ModuleIO
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Length>		input_vlos_caution_distance		{ this, "/vlos-caution-distance" };
-	v2::PropertyIn<si::Length>		input_vlos_warning_distance		{ this, "/vlos-warning-distance" };
-	v2::PropertyIn<si::Angle>		input_home_longitude			{ this, "/home/longitude" };
-	v2::PropertyIn<si::Angle>		input_home_latitude				{ this, "/home/latitude" };
-	v2::PropertyIn<si::Length>		input_home_altitude_amsl		{ this, "/home/altitude-amsl" };
-	v2::PropertyIn<si::Angle>		input_position_longitude		{ this, "/position/longitude" };
-	v2::PropertyIn<si::Angle>		input_position_latitude			{ this, "/position/latitude" };
-	v2::PropertyIn<si::Length>		input_position_altitude_amsl	{ this, "/position/altitude.amsl" };
+	v2::PropertyIn<si::Length>		vlos_caution_distance	{ this, "/vlos-caution-distance" };
+	v2::PropertyIn<si::Length>		vlos_warning_distance	{ this, "/vlos-warning-distance" };
+	v2::PropertyIn<si::Angle>		home_longitude			{ this, "/home/longitude" };
+	v2::PropertyIn<si::Angle>		home_latitude			{ this, "/home/latitude" };
+	v2::PropertyIn<si::Length>		home_altitude_amsl		{ this, "/home/altitude-amsl" };
+	v2::PropertyIn<si::Angle>		position_longitude		{ this, "/position/longitude" };
+	v2::PropertyIn<si::Angle>		position_latitude		{ this, "/position/latitude" };
+	v2::PropertyIn<si::Length>		position_altitude_amsl	{ this, "/position/altitude.amsl" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Length>		output_distance_vlos			{ this, "/distance/vlos" };
-	v2::PropertyOut<si::Length>		output_distance_ground			{ this, "/distance/ground" };
-	v2::PropertyOut<si::Length>		output_distance_vertical		{ this, "/distance/vertical" };
-	v2::PropertyOut<si::Angle>		output_true_home_direction		{ this, "/home-direction.true" };
+	v2::PropertyOut<si::Length>		distance_vlos			{ this, "/distance/vlos" };
+	v2::PropertyOut<si::Length>		distance_ground			{ this, "/distance/ground" };
+	v2::PropertyOut<si::Length>		distance_vertical		{ this, "/distance/vertical" };
+	v2::PropertyOut<si::Angle>		true_home_direction		{ this, "/home-direction.true" };
 };
 
 

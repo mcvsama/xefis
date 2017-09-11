@@ -41,19 +41,19 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, std::
 		&_output_pitch_smoother,
 	});
 	_pitch_computer.observe ({
-		&io.input_autonomous,
-		&io.input_pitch_limits,
-		&io.input_cmd_pitch_mode,
-		&io.input_cmd_ias,
-		&io.input_cmd_mach,
-		&io.input_cmd_alt,
-		&io.input_cmd_vs,
-		&io.input_cmd_fpa,
-		&io.input_measured_ias,
-		&io.input_measured_mach,
-		&io.input_measured_alt,
-		&io.input_measured_vs,
-		&io.input_measured_fpa,
+		&io.autonomous,
+		&io.pitch_limits,
+		&io.cmd_pitch_mode,
+		&io.cmd_ias,
+		&io.cmd_mach,
+		&io.cmd_alt,
+		&io.cmd_vs,
+		&io.cmd_fpa,
+		&io.measured_ias,
+		&io.measured_mach,
+		&io.measured_alt,
+		&io.measured_vs,
+		&io.measured_fpa,
 	});
 }
 
@@ -61,11 +61,11 @@ AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, std::
 void
 AFCS_FD_Pitch::initialize()
 {
-	_ias_pid.set_pid (*io.setting_ias_pid_settings);
-	_mach_pid.set_pid (*io.setting_mach_pid_settings);
-	_altitude_pid.set_pid (*io.setting_altitude_pid_settings);
-	_vs_pid.set_pid (*io.setting_vs_pid_settings);
-	_fpa_pid.set_pid (*io.setting_fpa_pid_settings);
+	_ias_pid.set_pid (*io.ias_pid_settings);
+	_mach_pid.set_pid (*io.mach_pid_settings);
+	_altitude_pid.set_pid (*io.altitude_pid_settings);
+	_vs_pid.set_pid (*io.vs_pid_settings);
+	_fpa_pid.set_pid (*io.fpa_pid_settings);
 }
 
 
@@ -80,8 +80,8 @@ AFCS_FD_Pitch::process (v2::Cycle const& cycle)
 void
 AFCS_FD_Pitch::rescue (std::exception_ptr)
 {
-	if (!io.input_autonomous.value_or (true))
-		io.output_operative = false;
+	if (!io.autonomous.value_or (true))
+		io.operative = false;
 
 	check_autonomous();
 }
@@ -97,11 +97,11 @@ AFCS_FD_Pitch::compute_pitch()
 	// Always compute all PIDs. Use their output only when it's needed.
 
 	// TODO Change all Ranges here to settings.
-	std::optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, io.input_cmd_ias, io.input_measured_ias, update_dt);
-	std::optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, io.input_cmd_mach, io.input_measured_mach, update_dt);
-	std::optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, io.input_cmd_alt, io.input_measured_alt, update_dt);
-	std::optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, io.input_cmd_vs, io.input_measured_vs, update_dt);
-	std::optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, io.input_cmd_fpa, io.input_measured_fpa, update_dt);
+	std::optional<si::Angle> pitch_for_ias = compute_pitch (_ias_pid, io.cmd_ias, io.measured_ias, update_dt);
+	std::optional<si::Angle> pitch_for_mach = compute_pitch (_mach_pid, io.cmd_mach, io.measured_mach, update_dt);
+	std::optional<si::Angle> pitch_for_alt = compute_pitch (_altitude_pid, io.cmd_alt, io.measured_alt, update_dt);
+	std::optional<si::Angle> pitch_for_vs = compute_pitch (_vs_pid, io.cmd_vs, io.measured_vs, update_dt);
+	std::optional<si::Angle> pitch_for_fpa = compute_pitch (_fpa_pid, io.cmd_fpa, io.measured_fpa, update_dt);
 	std::optional<si::Angle> pitch_for_vnavpath;//TODO
 	std::optional<si::Angle> pitch_for_gs;//TODO
 	std::optional<si::Angle> pitch_for_flare;//TODO
@@ -117,7 +117,7 @@ AFCS_FD_Pitch::compute_pitch()
 
 	using afcs_api::PitchMode;
 
-	switch (*io.input_cmd_pitch_mode)
+	switch (*io.cmd_pitch_mode)
 	{
 		case PitchMode::None:
 			pitch.reset();
@@ -162,15 +162,15 @@ AFCS_FD_Pitch::compute_pitch()
 	}
 
 	if (pitch)
-		io.output_pitch = _output_pitch_smoother (*pitch, update_dt);
+		io.pitch = _output_pitch_smoother (*pitch, update_dt);
 	else
 	{
-		io.output_pitch.set_nil();
+		io.pitch.set_nil();
 		_output_pitch_smoother.reset();
 	}
 
-	if (disengage || io.output_operative.is_nil())
-		io.output_operative = !disengage;
+	if (disengage || io.operative.is_nil())
+		io.operative = !disengage;
 
 	check_autonomous();
 }
@@ -183,7 +183,7 @@ template<class Input, class Control>
 								  v2::PropertyIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
-		xf::Range<si::Angle> pitch_limits { -*io.input_pitch_limits, +*io.input_pitch_limits };
+		xf::Range<si::Angle> pitch_limits { -*io.pitch_limits, +*io.pitch_limits };
 
 		if (cmd_param && measured_param)
 			return xf::clamped (pid (*cmd_param, *measured_param, update_dt), pitch_limits);
@@ -198,7 +198,7 @@ template<class Input, class Control>
 void
 AFCS_FD_Pitch::check_autonomous()
 {
-	if (io.input_autonomous.value_or (true))
-		io.output_operative = true;
+	if (io.autonomous.value_or (true))
+		io.operative = true;
 }
 

@@ -42,6 +42,16 @@
 namespace v1 {
 using namespace xf;
 
+inline Blob
+make_blob (void const* pointer, std::size_t bytes)
+{
+	uint8_t const* begin = reinterpret_cast<uint8_t const*> (pointer);
+	uint8_t const* end = begin + bytes;
+
+	return Blob (begin, end);
+}
+
+
 // Forward declarations:
 class PropertyDirectoryNode;
 class PropertyStorage;

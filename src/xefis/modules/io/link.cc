@@ -465,6 +465,14 @@ LinkProtocol::to_string (Blob const& blob)
 }
 
 
+void
+LinkIO::verify_settings()
+{
+	if (!send_frequency || !(reacquire_after && failsafe_after))
+		throw v2::module_io::InvalidConfig ("either send_frequency or both reacquire_after and failsafe_after must be configured");
+}
+
+
 Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, std::string const& instance):
 	Module (std::move (module_io), instance),
 	_protocol (std::move (protocol))
@@ -472,21 +480,30 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 	_input_blob.reserve (2 * _protocol->size());
 	_output_blob.reserve (2 * _protocol->size());
 
-	_failsafe_timer = new QTimer (this);
-	_failsafe_timer->setSingleShot (true);
-	_failsafe_timer->setInterval (io.failsafe_after->quantity<Millisecond>());
-	QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
+	if (io.failsafe_after)
+	{
+		_failsafe_timer = new QTimer (this);
+		_failsafe_timer->setSingleShot (true);
+		_failsafe_timer->setInterval (io.failsafe_after->quantity<Millisecond>());
+		QObject::connect (_failsafe_timer, SIGNAL (timeout()), this, SLOT (failsafe()));
+	}
 
-	_reacquire_timer = new QTimer (this);
-	_reacquire_timer->setSingleShot (true);
-	_reacquire_timer->setInterval (io.reacquire_after->quantity<Millisecond>());
-	QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
+	if (io.reacquire_after)
+	{
+		_reacquire_timer = new QTimer (this);
+		_reacquire_timer->setSingleShot (true);
+		_reacquire_timer->setInterval (io.reacquire_after->quantity<Millisecond>());
+		QObject::connect (_reacquire_timer, SIGNAL (timeout()), this, SLOT (reacquire()));
+	}
 
-	_output_timer = new QTimer (this);
-	_output_timer->setSingleShot (false);
-	_output_timer->setInterval (1000_Hz / *io.send_frequency);
-	QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
-	_output_timer->start();
+	if (io.send_frequency)
+	{
+		_output_timer = new QTimer (this);
+		_output_timer->setSingleShot (false);
+		_output_timer->setInterval (1000_Hz / *io.send_frequency);
+		QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
+		_output_timer->start();
+	}
 }
 
 

@@ -33,18 +33,18 @@ class HorizontalTrimIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<QString>	label							{ this, "TRIM" };
-	v2::Setting<QString>	label_min						{ this };
-	v2::Setting<QString>	label_max						{ this };
+	v2::Setting<QString>	label					{ this, "label", "TRIM" };
+	v2::Setting<QString>	label_min				{ this, "label_min" };
+	v2::Setting<QString>	label_max				{ this, "label_max" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	input_trim_value				{ this, "/trim/value" };
-	v2::PropertyIn<double>	input_trim_reference			{ this, "/trim/reference" };
-	v2::PropertyIn<double>	input_trim_reference_minimum	{ this, "/trim/reference.minimum" };
-	v2::PropertyIn<double>	input_trim_reference_maximum	{ this, "/trim/reference.maximum" };
+	v2::PropertyIn<double>	trim_value				{ this, "/trim/value" };
+	v2::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
+	v2::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
+	v2::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
 };
 
 

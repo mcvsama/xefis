@@ -49,9 +49,9 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 
 	_magnetic_variation_computer.set_callback (std::bind (&NavigationComputer::compute_magnetic_variation, this));
 	_magnetic_variation_computer.observe ({
-		&io.output_position_longitude,
-		&io.output_position_latitude,
-		&io.output_position_altitude_amsl
+		&io.position_longitude,
+		&io.position_latitude,
+		&io.position_altitude_amsl
 	});
 
 	_headings_computer.set_callback (std::bind (&NavigationComputer::compute_headings, this));
@@ -64,7 +64,7 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 		&io.input_orientation_heading_magnetic,
 		&io.input_orientation_pitch,
 		&io.input_orientation_roll,
-		&io.output_magnetic_declination,
+		&io.magnetic_declination,
 	});
 
 	_track_computer.set_callback (std::bind (&NavigationComputer::compute_track, this));
@@ -75,7 +75,7 @@ NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> mo
 	});
 	_track_computer.observe ({
 		&_position_computer,
-		&io.output_magnetic_declination,
+		&io.magnetic_declination,
 	});
 
 	_ground_speed_computer.set_callback (std::bind (&NavigationComputer::compute_ground_speed, this));
@@ -110,32 +110,25 @@ NavigationComputer::compute_position()
 {
 	si::Time update_time = _position_computer.update_time();
 
-	io.output_position_longitude = io.input_position_longitude;
-	io.output_position_latitude = io.input_position_latitude;
-	io.output_position_altitude_amsl = io.input_position_altitude_amsl;
-	io.output_position_lateral_stddev = io.input_position_lateral_stddev;
-	io.output_position_vertical_stddev = io.input_position_vertical_stddev;
-	io.output_position_source = io.input_position_source;
-
 	// Larger of the two:
-	if (io.output_position_lateral_stddev && io.output_position_vertical_stddev)
-		io.output_position_stddev = std::max (*io.output_position_lateral_stddev, *io.output_position_vertical_stddev);
+	if (io.position_lateral_stddev && io.position_vertical_stddev)
+		io.position_stddev = std::max (*io.position_lateral_stddev, *io.position_vertical_stddev);
 	else
-		io.output_position_stddev.set_nil();
+		io.position_stddev.set_nil();
 
 	si::Length const failed_accuracy = 100_nmi;
 
 	Position position;
-	position.lateral_position = LonLat (*io.output_position_longitude, *io.output_position_latitude);
-	position.lateral_position_stddev = io.output_position_lateral_stddev.value_or (failed_accuracy);
-	position.altitude = io.output_position_altitude_amsl.value_or (0.0_ft);
-	position.altitude_stddev = io.output_position_vertical_stddev.value_or (failed_accuracy);
+	position.lateral_position = LonLat (*io.position_longitude, *io.position_latitude);
+	position.lateral_position_stddev = io.position_lateral_stddev.value_or (failed_accuracy);
+	position.altitude = io.position_altitude_amsl.value_or (0.0_ft);
+	position.altitude_stddev = io.position_vertical_stddev.value_or (failed_accuracy);
 	position.time = update_time;
-	position.valid = io.output_position_longitude &&
-					 io.output_position_latitude &&
-					 io.output_position_altitude_amsl &&
-					 io.output_position_lateral_stddev &&
-					 io.output_position_vertical_stddev;
+	position.valid = io.position_longitude &&
+					 io.position_latitude &&
+					 io.position_altitude_amsl &&
+					 io.position_lateral_stddev &&
+					 io.position_vertical_stddev;
 	_positions.push_back (position);
 
 	// Delayed positioning (after enough distance has been traveled):
@@ -168,24 +161,24 @@ NavigationComputer::compute_position()
 void
 NavigationComputer::compute_magnetic_variation()
 {
-	if (io.output_position_longitude && io.output_position_latitude)
+	if (io.position_longitude && io.position_latitude)
 	{
 		xf::MagneticVariation mv;
-		mv.set_position (LonLat (*io.output_position_longitude, *io.output_position_latitude));
-		if (io.output_position_altitude_amsl)
-			mv.set_altitude_amsl (*io.output_position_altitude_amsl);
+		mv.set_position (LonLat (*io.position_longitude, *io.position_latitude));
+		if (io.position_altitude_amsl)
+			mv.set_altitude_amsl (*io.position_altitude_amsl);
 		else
 			mv.set_altitude_amsl (0_ft);
 		QDate today = QDateTime::fromTime_t (xf::TimeHelper::now().quantity<Second>()).date();
 		mv.set_date (today.year(), today.month(), today.day());
 		mv.update();
-		io.output_magnetic_declination = mv.magnetic_declination();
-		io.output_magnetic_inclination = mv.magnetic_inclination();
+		io.magnetic_declination = mv.magnetic_declination();
+		io.magnetic_inclination = mv.magnetic_inclination();
 	}
 	else
 	{
-		io.output_magnetic_declination.set_nil();
-		io.output_magnetic_inclination.set_nil();
+		io.magnetic_declination.set_nil();
+		io.magnetic_inclination.set_nil();
 	}
 }
 
@@ -197,35 +190,35 @@ NavigationComputer::compute_headings()
 
 	if (io.input_orientation_heading_magnetic)
 	{
-		io.output_orientation_heading_magnetic = _orientation_heading_magnetic_smoother (*io.input_orientation_heading_magnetic, update_dt);
+		io.orientation_heading_magnetic = _orientation_heading_magnetic_smoother (*io.input_orientation_heading_magnetic, update_dt);
 
-		if (io.output_magnetic_declination)
-			io.output_orientation_heading_true = xf::magnetic_to_true (*io.output_orientation_heading_magnetic, *io.output_magnetic_declination);
+		if (io.magnetic_declination)
+			io.orientation_heading_true = xf::magnetic_to_true (*io.orientation_heading_magnetic, *io.magnetic_declination);
 		else
-			io.output_orientation_heading_true.set_nil();
+			io.orientation_heading_true.set_nil();
 	}
 	else
 	{
-		io.output_orientation_heading_magnetic.set_nil();
-		io.output_orientation_heading_true.set_nil();
+		io.orientation_heading_magnetic.set_nil();
+		io.orientation_heading_true.set_nil();
 		_orientation_heading_magnetic_smoother.invalidate();
 	}
 
 	// Smoothed pitch:
 	if (io.input_orientation_pitch)
-		io.output_orientation_pitch = _orientation_pitch_smoother (*io.input_orientation_pitch, update_dt);
+		io.orientation_pitch = _orientation_pitch_smoother (*io.input_orientation_pitch, update_dt);
 	else
 	{
-		io.output_orientation_pitch.set_nil();
+		io.orientation_pitch.set_nil();
 		_orientation_pitch_smoother.invalidate();
 	}
 
 	// Smoothed roll:
 	if (io.input_orientation_roll)
-		io.output_orientation_roll = _orientation_roll_smoother (*io.input_orientation_roll, update_dt);
+		io.orientation_roll = _orientation_roll_smoother (*io.input_orientation_roll, update_dt);
 	else
 	{
-		io.output_orientation_roll.set_nil();
+		io.orientation_roll.set_nil();
 		_orientation_roll_smoother.invalidate();
 	}
 }
@@ -247,32 +240,32 @@ NavigationComputer::compute_track()
 		if (distance > 2.0 * pos_last.lateral_position_stddev)
 		{
 			si::Length altitude_diff = pos_last.altitude - pos_prev.altitude;
-			io.output_track_vertical = _track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt);
+			io.track_vertical = _track_vertical_smoother (1_rad * std::atan (altitude_diff / distance), update_dt);
 
 			si::Angle initial_true_heading = xf::initial_bearing (pos_last.lateral_position, pos_prev.lateral_position);
 			si::Angle true_heading = xf::floored_mod (initial_true_heading + 180_deg, 360_deg);
-			io.output_track_lateral_true = _track_lateral_true_smoother (true_heading, update_dt);
+			io.track_lateral_true = _track_lateral_true_smoother (true_heading, update_dt);
 
-			if (io.output_magnetic_declination)
-				io.output_track_lateral_magnetic = xf::true_to_magnetic (*io.output_track_lateral_true, *io.output_magnetic_declination);
+			if (io.magnetic_declination)
+				io.track_lateral_magnetic = xf::true_to_magnetic (*io.track_lateral_true, *io.magnetic_declination);
 			else
-				io.output_track_lateral_magnetic.set_nil();
+				io.track_lateral_magnetic.set_nil();
 		}
 		else
 		{
-			io.output_track_vertical.set_nil();
-			io.output_track_lateral_true.set_nil();
-			io.output_track_lateral_magnetic.set_nil();
+			io.track_vertical.set_nil();
+			io.track_lateral_true.set_nil();
+			io.track_lateral_magnetic.set_nil();
 			_track_vertical_smoother.invalidate();
 			_track_lateral_true_smoother.invalidate();
 		}
 	}
 	else
 	{
-		_track_lateral_true_smoother.reset (*io.output_orientation_heading_true);
-		io.output_track_vertical.set_nil();
-		io.output_track_lateral_true.set_nil();
-		io.output_track_lateral_magnetic.set_nil();
+		_track_lateral_true_smoother.reset (*io.orientation_heading_true);
+		io.track_vertical.set_nil();
+		io.track_lateral_true.set_nil();
+		io.track_lateral_magnetic.set_nil();
 	}
 
 	std::optional<si::AngularVelocity> result_rotation_speed;
@@ -281,7 +274,7 @@ NavigationComputer::compute_track()
 	{
 		si::Length len_from_prev = xf::haversine_earth (pos_prev.lateral_position, pos_last.lateral_position);
 
-		if (len_from_prev >= *io.output_position_lateral_stddev)
+		if (len_from_prev >= *io.position_lateral_stddev)
 		{
 			using std::isinf;
 			using std::isnan;
@@ -305,7 +298,7 @@ NavigationComputer::compute_track()
 	else
 		_track_lateral_rotation_smoother.invalidate();
 
-	io.output_track_lateral_rotation = result_rotation_speed;
+	io.track_lateral_rotation = result_rotation_speed;
 }
 
 
@@ -321,11 +314,11 @@ NavigationComputer::compute_ground_speed()
 
 		si::Time dt = pos_last.time - pos_prev.time;
 		si::Length dl = xf::haversine_earth (pos_last.lateral_position, pos_prev.lateral_position);
-		io.output_track_ground_speed = _track_ground_speed_smoother (dl / dt, update_dt);
+		io.track_ground_speed = _track_ground_speed_smoother (dl / dt, update_dt);
 	}
 	else
 	{
-		io.output_track_ground_speed.set_nil();
+		io.track_ground_speed.set_nil();
 		_track_ground_speed_smoother.invalidate();
 	}
 }

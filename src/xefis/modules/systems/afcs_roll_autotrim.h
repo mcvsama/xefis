@@ -31,22 +31,22 @@ class AFCS_RollAutotrim_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<double>				setting_ias_coefficient				{ this };
-	v2::Setting<double>				setting_engine_torque_coefficient	{ this };
-	v2::Setting<double>				setting_total_coefficient			{ this, 1.0 };
+	v2::Setting<double>				ias_coefficient				{ this, "ias_coefficient" };
+	v2::Setting<double>				engine_torque_coefficient	{ this, "engine_torque_coefficient" };
+	v2::Setting<double>				total_coefficient			{ this, "total_coefficient", 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Velocity>	input_measured_ias					{ this, "/measured-ias" };
-	v2::PropertyIn<si::Torque>		input_measured_engine_torque		{ this, "/measured-eng-torque" };
+	v2::PropertyIn<si::Velocity>	measured_ias				{ this, "/measured-ias" };
+	v2::PropertyIn<si::Torque>		measured_engine_torque		{ this, "/measured-eng-torque" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>		output_ailerons_correction			{ this, "/ailerons-correction" };
+	v2::PropertyOut<si::Angle>		ailerons_correction			{ this, "/ailerons-correction" };
 };
 
 

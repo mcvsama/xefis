@@ -131,7 +131,7 @@ HSI::process (v2::Cycle const&)
 	params.arpt_runways_range_threshold = *io.arpt_runways_range_threshold;
 	params.arpt_map_range_threshold = *io.arpt_map_range_threshold;
 	params.arpt_runway_extension_length = *io.arpt_runway_extension_length;
-	params.trend_vector_times = *io.trend_vector_times;
+	params.trend_vector_durations = *io.trend_vector_durations;
 	params.trend_vector_min_ranges = *io.trend_vector_min_ranges;
 	params.trend_vector_max_range = *io.trend_vector_max_range;
 	params.round_clip = false;

@@ -40,7 +40,7 @@ class CDU:
 	 * Settings
 	 */
 
-	v2::Setting<bool>			show_time	{ this, true };
+	v2::Setting<bool>			show_time	{ this, "setting_show_time", true };
 
 	/*
 	 * Input

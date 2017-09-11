@@ -34,24 +34,24 @@ class FlapsBugsIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<double>				setting_margin_factor	{ this, 1.2 };
+	v2::Setting<double>				margin_factor	{ this, "margin_factor", 1.2 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>		input_flaps_setting		{ this, "/flaps-setting" };
+	v2::PropertyIn<si::Angle>		flaps_setting	{ this, "/flaps-setting" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<std::string>	output_flaps_up_label	{ this, "/flaps-up-label" };
-	v2::PropertyOut<si::Velocity>	output_flaps_up_speed	{ this, "/flaps-up-speed" };
-	v2::PropertyOut<std::string>	output_flaps_a_label	{ this, "/flaps-a-label" };
-	v2::PropertyOut<si::Velocity>	output_flaps_a_speed	{ this, "/flaps-a-speed" };
-	v2::PropertyOut<std::string>	output_flaps_b_label	{ this, "/flaps-b-label" };
-	v2::PropertyOut<si::Velocity>	output_flaps_b_speed	{ this, "/flaps-b-speed" };
+	v2::PropertyOut<std::string>	flaps_up_label	{ this, "/flaps-up-label" };
+	v2::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "/flaps-up-speed" };
+	v2::PropertyOut<std::string>	flaps_a_label	{ this, "/flaps-a-label" };
+	v2::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "/flaps-a-speed" };
+	v2::PropertyOut<std::string>	flaps_b_label	{ this, "/flaps-b-label" };
+	v2::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "/flaps-b-speed" };
 };
 
 
@@ -73,7 +73,7 @@ class FlapsBugs: public v2::Module<FlapsBugsIO>
 
   private:
 	xf::Flaps const&			_flaps;
-	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ io.input_flaps_setting };
+	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
 };
 
 #endif

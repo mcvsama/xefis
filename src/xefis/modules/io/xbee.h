@@ -37,21 +37,20 @@ class XBeeIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<bool>				debug			{ this, false };
-	v2::Setting<std::string>		device_path		{ this };
-	v2::Setting<unsigned int>		baud_rate		{ this, 9600 };
-	v2::Setting<int>				channel			{ this };
-	v2::Setting<uint16_t>			pan_id			{ this, 0x0000 };
-	v2::Setting<uint16_t>			local_address	{ this };
-	v2::Setting<uint16_t>			remote_address	{ this };
-	v2::Setting<uint16_t>			power_level		{ this }; // TODO Optional
+	v2::Setting<bool>				debug			{ this, "debug", false };
+	v2::Setting<std::string>		device_path		{ this, "device_path" };
+	v2::Setting<unsigned int>		baud_rate		{ this, "baud_rate", 9600 };
+	v2::Setting<int>				channel			{ this, "channel" };
+	v2::Setting<uint16_t>			pan_id			{ this, "pan_id", 0x0000 };
+	v2::Setting<uint16_t>			local_address	{ this, "local_address" };
+	v2::Setting<uint16_t>			remote_address	{ this, "remote_address" };
+	v2::Setting<uint16_t>			power_level		{ this, "power_level" }; // TODO Optional
 
 	/*
 	 * Input
 	 */
 
 	v2::PropertyIn<std::string>		send			{ this, "/send" };
-	v2::PropertyIn<si::Power>		rssi			{ this, "/rssi" };
 
 	/*
 	 * Output
@@ -62,6 +61,7 @@ class XBeeIO: public v2::ModuleIO
 	v2::PropertyOut<int64_t>		input_errors	{ this, "/input-errors" };
 	v2::PropertyOut<int64_t>		failures		{ this, "/failures" };
 	v2::PropertyOut<int64_t>		cca_failures	{ this, "/clear-channel-failures" };
+	v2::PropertyOut<si::Power>		rssi			{ this, "/rssi" };
 };
 
 

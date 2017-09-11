@@ -36,10 +36,10 @@ KLogMonitor::KLogMonitor (std::unique_ptr<KLogMonitorIO> module_io, std::string 
 	QObject::connect (_timer, SIGNAL (timeout()), this, SLOT (check_klog()));
 	_timer->start();
 
-	io.output_flag_oom = true;
-	io.output_flag_io = true;
-	io.output_flag_oops = true;
-	io.output_flag_bug = true;
+	io.flag_oom = true;
+	io.flag_io = true;
+	io.flag_oops = true;
+	io.flag_bug = true;
 }
 
 
@@ -53,18 +53,18 @@ KLogMonitor::check_klog()
 
 	// Search for OOMs:
 	if (buffer.find ("oom-killer") != std::string::npos)
-		io.output_flag_oom = true;
+		io.flag_oom = true;
 
 	// Search for I/O errors:
 	if (buffer.find ("i/o error") != std::string::npos)
-		io.output_flag_io = true;
+		io.flag_io = true;
 
 	// Search for Oopses:
 	if (buffer.find (" oops") != std::string::npos)
-		io.output_flag_oops = true;
+		io.flag_oops = true;
 
 	// Search for BUGs:
 	if (buffer.find (" bug") != std::string::npos)
-		io.output_flag_bug = true;
+		io.flag_bug = true;
 }
 

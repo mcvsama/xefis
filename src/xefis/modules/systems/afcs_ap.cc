@@ -41,14 +41,14 @@ AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, std::string const& inst
 		&_ailerons_smoother,
 	});
 	_ap_computer.observe ({
-		&io.input_cmd_pitch,
-		&io.input_cmd_roll,
-		&io.input_measured_pitch,
-		&io.input_measured_roll,
-		&io.input_elevator_minimum,
-		&io.input_elevator_maximum,
-		&io.input_ailerons_minimum,
-		&io.input_ailerons_maximum,
+		&io.cmd_pitch,
+		&io.cmd_roll,
+		&io.measured_pitch,
+		&io.measured_roll,
+		&io.elevator_minimum,
+		&io.elevator_maximum,
+		&io.ailerons_minimum,
+		&io.ailerons_maximum,
 	});
 }
 
@@ -56,11 +56,11 @@ AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, std::string const& inst
 void
 AFCS_AP::initialize()
 {
-	_elevator_pid.set_pid (*io.setting_pitch_pid_settings);
-	_elevator_pid.set_gain (*io.setting_overall_gain * *io.setting_pitch_gain);
+	_elevator_pid.set_pid (*io.pitch_pid_settings);
+	_elevator_pid.set_gain (*io.overall_gain * *io.pitch_gain);
 
-	_ailerons_pid.set_pid (*io.setting_roll_pid_settings);
-	_ailerons_pid.set_gain (*io.setting_overall_gain * *io.setting_roll_gain);
+	_ailerons_pid.set_pid (*io.roll_pid_settings);
+	_ailerons_pid.set_gain (*io.overall_gain * *io.roll_gain);
 }
 
 
@@ -75,9 +75,9 @@ void
 AFCS_AP::rescue (std::exception_ptr)
 {
 	diagnose();
-	io.output_serviceable = false;
-	io.output_elevator = 0_deg;
-	io.output_ailerons = 0_deg;
+	io.serviceable = false;
+	io.elevator = 0_deg;
+	io.ailerons = 0_deg;
 }
 
 
@@ -89,39 +89,39 @@ AFCS_AP::compute_ap()
 	si::Angle computed_elevator = 0.0_deg;
 	si::Angle computed_ailerons = 0.0_deg;
 
-	if (io.input_measured_pitch && io.input_measured_roll &&
-		io.input_elevator_minimum && io.input_elevator_maximum &&
-		io.input_ailerons_minimum && io.input_ailerons_maximum)
+	if (io.measured_pitch && io.measured_roll &&
+		io.elevator_minimum && io.elevator_maximum &&
+		io.ailerons_minimum && io.ailerons_maximum)
 	{
-		_elevator_pid.set_output_limit ({ *io.input_elevator_minimum, *io.input_elevator_maximum });
-		_elevator_pid (io.input_cmd_pitch.value_or (*io.input_measured_pitch), *io.input_measured_pitch, update_dt);
+		_elevator_pid.set_output_limit ({ *io.elevator_minimum, *io.elevator_maximum });
+		_elevator_pid (io.cmd_pitch.value_or (*io.measured_pitch), *io.measured_pitch, update_dt);
 
-		_ailerons_pid.set_output_limit ({ *io.input_ailerons_minimum, *io.input_ailerons_maximum });
-		_ailerons_pid (io.input_cmd_roll.value_or (*io.input_measured_roll), *io.input_measured_roll, update_dt);
+		_ailerons_pid.set_output_limit ({ *io.ailerons_minimum, *io.ailerons_maximum });
+		_ailerons_pid (io.cmd_roll.value_or (*io.measured_roll), *io.measured_roll, update_dt);
 
-		computed_elevator = _elevator_smoother (-si::cos (*io.input_measured_roll) * _elevator_pid.output(), update_dt);
+		computed_elevator = _elevator_smoother (-si::cos (*io.measured_roll) * _elevator_pid.output(), update_dt);
 		computed_ailerons = _ailerons_smoother (_ailerons_pid.output(), update_dt);
 
-		io.output_serviceable = true;
+		io.serviceable = true;
 	}
 	else
 	{
 		diagnose();
-		io.output_serviceable = false;
+		io.serviceable = false;
 	}
 
-	io.output_elevator = computed_elevator;
-	io.output_ailerons = computed_ailerons;
+	io.elevator = computed_elevator;
+	io.ailerons = computed_ailerons;
 }
 
 
 void
 AFCS_AP::diagnose()
 {
-	if (!io.input_measured_pitch)
+	if (!io.measured_pitch)
 		log() << "Measured pitch is nil!" << std::endl;
 
-	if (!io.input_measured_roll)
+	if (!io.measured_roll)
 		log() << "Measured roll is nil!" << std::endl;
 }
 

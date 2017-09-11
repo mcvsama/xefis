@@ -44,36 +44,36 @@ class AFCS_FD_Pitch_IO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<IAS_PID::Settings>			setting_ias_pid_settings		{ this };
-	v2::Setting<MachPID::Settings>			setting_mach_pid_settings		{ this };
-	v2::Setting<AltitudePID::Settings>		setting_altitude_pid_settings	{ this };
-	v2::Setting<VS_PID::Settings>			setting_vs_pid_settings			{ this };
-	v2::Setting<FPA_PID::Settings>			setting_fpa_pid_settings		{ this };
+	v2::Setting<IAS_PID::Settings>			ias_pid_settings		{ this, "ias_pid_settings" };
+	v2::Setting<MachPID::Settings>			mach_pid_settings		{ this, "mach_pid_settings" };
+	v2::Setting<AltitudePID::Settings>		altitude_pid_settings	{ this, "altitude_pid_settings" };
+	v2::Setting<VS_PID::Settings>			vs_pid_settings			{ this, "vs_pid_settings" };
+	v2::Setting<FPA_PID::Settings>			fpa_pid_settings		{ this, "fpa_pid_settings" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>					input_autonomous				{ this, "/autonomous" };
-	v2::PropertyIn<si::Angle>				input_pitch_limits				{ this, "/pitch-limits" };
-	v2::PropertyIn<afcs_api::PitchMode>		input_cmd_pitch_mode			{ this, "/cmd-pitch-mode" };
-	v2::PropertyIn<si::Velocity>			input_cmd_ias					{ this, "/cmd-ias" };
-	v2::PropertyIn<double>					input_cmd_mach					{ this, "/cmd-match" };
-	v2::PropertyIn<si::Length>				input_cmd_alt					{ this, "/cmd-altitude" };
-	v2::PropertyIn<si::Velocity>			input_cmd_vs					{ this, "/cmd-vs" };
-	v2::PropertyIn<si::Angle>				input_cmd_fpa					{ this, "/cmd-fpa" };
-	v2::PropertyIn<si::Velocity>			input_measured_ias				{ this, "/measured-ias" };
-	v2::PropertyIn<double>					input_measured_mach				{ this, "/measured-mach" };
-	v2::PropertyIn<si::Length>				input_measured_alt				{ this, "/measured-altitude" };
-	v2::PropertyIn<si::Velocity>			input_measured_vs				{ this, "/measured-vs" };
-	v2::PropertyIn<si::Angle>				input_measured_fpa				{ this, "/measured-fpa" };
+	v2::PropertyIn<bool>					autonomous				{ this, "/autonomous" };
+	v2::PropertyIn<si::Angle>				pitch_limits			{ this, "/pitch-limits" };
+	v2::PropertyIn<afcs_api::PitchMode>		cmd_pitch_mode			{ this, "/cmd-pitch-mode" };
+	v2::PropertyIn<si::Velocity>			cmd_ias					{ this, "/cmd-ias" };
+	v2::PropertyIn<double>					cmd_mach				{ this, "/cmd-match" };
+	v2::PropertyIn<si::Length>				cmd_alt					{ this, "/cmd-altitude" };
+	v2::PropertyIn<si::Velocity>			cmd_vs					{ this, "/cmd-vs" };
+	v2::PropertyIn<si::Angle>				cmd_fpa					{ this, "/cmd-fpa" };
+	v2::PropertyIn<si::Velocity>			measured_ias			{ this, "/measured-ias" };
+	v2::PropertyIn<double>					measured_mach			{ this, "/measured-mach" };
+	v2::PropertyIn<si::Length>				measured_alt			{ this, "/measured-altitude" };
+	v2::PropertyIn<si::Velocity>			measured_vs				{ this, "/measured-vs" };
+	v2::PropertyIn<si::Angle>				measured_fpa			{ this, "/measured-fpa" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>				output_pitch					{ this, "/output-pitch" };
-	v2::PropertyOut<bool>					output_operative				{ this, "/operative" };
+	v2::PropertyOut<si::Angle>				pitch					{ this, "/output-pitch" };
+	v2::PropertyOut<bool>					operative				{ this, "/operative" };
 };
 
 

@@ -37,6 +37,43 @@ class BasicPropertyIn;
 class BasicPropertyOut;
 
 
+namespace module_io {
+
+/**
+ * Exception object thrown when some settings in a module have not been initialized as required.
+ */
+class UninitializedSettings: public Exception
+{
+  public:
+	// Ctor
+	explicit
+	UninitializedSettings (std::vector<BasicSetting*>);
+
+  private:
+	/**
+	 * Create a message for the exception.
+	 */
+	std::string
+	make_message (std::vector<BasicSetting*>);
+};
+
+
+/**
+ * Exception thrown when there's general logic error in configuration.
+ */
+class InvalidConfig: public Exception
+{
+  public:
+	// Ctor
+	explicit
+	InvalidConfig (std::string const& message):
+		Exception ("logic error in ModuleIO configuration: " + message)
+	{ }
+};
+
+} // namespace module_io
+
+
 class ModuleIO
 {
 	friend class BasicModule;
@@ -54,11 +91,24 @@ class ModuleIO
 		ProcessingLoopAPI (ModuleIO*);
 
 		/**
-		 * Iterate through registered settings and check that ones without default value have been initialized by user.
-		 * If uninitialized settings are found, UninitializedSettings is thrown.
+		 * Set reference to the module object.
 		 */
 		void
+		set_module (BasicModule*);
+
+		/**
+		 * Iterate through registered settings and check that ones without default value have been initialized by user.
+		 * If uninitialized settings are found, UninitializedSettings is thrown.
+		 * Also call virtual ModuleIO::verify_settings().
+		 */
+		virtual void
 		verify_settings();
+
+		/**
+		 * Register setting.
+		 */
+		void
+		register_setting (BasicSetting*);
 
 		/**
 		 * Register an input property with this module.
@@ -90,16 +140,17 @@ class ModuleIO
 
   public:
 	/**
-	 * Set reference to the module object.
-	 */
-	void
-	set_module (BasicModule*);
-
-	/**
 	 * Return reference to the module that uses this ModuleIO object.
 	 */
 	BasicModule*
 	module() const noexcept;
+
+	/**
+	 * User settings verification procedure.
+	 */
+	virtual void
+	verify_settings()
+	{ }
 
   private:
 	BasicModule*					_module = nullptr;
@@ -116,9 +167,9 @@ ModuleIO::ProcessingLoopAPI::ProcessingLoopAPI (ModuleIO* io):
 
 
 inline void
-ModuleIO::set_module (BasicModule* module)
+ModuleIO::ProcessingLoopAPI::set_module (BasicModule* module)
 {
-	_module = module;
+	_io->_module = module;
 }
 
 
@@ -127,6 +178,25 @@ ModuleIO::module() const noexcept
 {
 	return _module;
 }
+
+
+/*
+ * Global functions
+ */
+
+
+/**
+ * Return string identifying module and its instance, if any module is associated with the ModuleIO object.
+ */
+std::string
+identifier (ModuleIO&);
+
+
+/**
+ * Same as identifier (ModuleIO&).
+ */
+std::string
+identifier (ModuleIO*);
 
 } // namespace v2
 
