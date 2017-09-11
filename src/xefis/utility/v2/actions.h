@@ -37,6 +37,39 @@ class PropAction
 };
 
 
+class SerialChanged: public PropAction
+{
+  public:
+	using Serial	= BasicProperty::Serial;
+
+  public:
+	// Ctor
+	explicit
+	SerialChanged (BasicProperty& property):
+		_property (property)
+	{ }
+
+	// PropAction API
+	bool
+	operator()() override
+	{
+		auto new_serial = _property.serial();
+
+		if (new_serial != _serial)
+		{
+			_serial = new_serial;
+			return true;
+		}
+
+		return false;
+	}
+
+  private:
+	Serial			_serial	{ 0 };
+	BasicProperty&	_property;
+};
+
+
 /**
  * Checks whether a property changed its value since last check.
  */
