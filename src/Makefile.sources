@@ -96,6 +96,7 @@ XEFIS_HEADERS			+= xefis/modules/systems/nc.h
 XEFIS_HEADERS			+= xefis/modules/systems/pc.h
 XEFIS_HEADERS_MOC		+= xefis/modules/systems/rcms.h
 XEFIS_HEADERS			+= xefis/modules/systems/speeds.h
+XEFIS_HEADERS			+= xefis/modules/systems/state.h
 XEFIS_HEADERS			+= xefis/modules/systems/trim_control.h
 XEFIS_HEADERS			+= xefis/modules/systems/vor.h
 XEFIS_HEADERS			+= xefis/modules/systems/watchdog.h
@@ -119,6 +120,7 @@ XEFIS_SOURCES			+= xefis/modules/systems/nc.cc
 XEFIS_SOURCES			+= xefis/modules/systems/pc.cc
 XEFIS_SOURCES			+= xefis/modules/systems/rcms.cc
 XEFIS_SOURCES			+= xefis/modules/systems/speeds.cc
+XEFIS_SOURCES			+= xefis/modules/systems/state.cc
 XEFIS_SOURCES			+= xefis/modules/systems/trim_control.cc
 XEFIS_SOURCES			+= xefis/modules/systems/vor.cc
 XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
@@ -128,12 +130,6 @@ XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
 XEFIS_HEADERS_MOC		+= modules/helpers/sound.h
 
 XEFIS_SOURCES			+= modules/helpers/sound.cc
-
-######## /modules/systems ########
-
-XEFIS_HEADERS			+= modules/systems/state.h
-
-XEFIS_SOURCES			+= modules/systems/state.cc
 
 ######## /modules/private ########
 
