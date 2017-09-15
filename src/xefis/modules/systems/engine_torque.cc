@@ -17,6 +17,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/variant.h>
 
 // Local:
 #include "engine_torque.h"
@@ -30,28 +31,9 @@ EngineTorque::EngineTorque (std::unique_ptr<EngineTorqueIO> module_io, std::stri
 void
 EngineTorque::process (v2::Cycle const&)
 {
-	struct TorqueComputer
-	{
-		explicit
-		TorqueComputer (EngineTorque* module):
-			_module (module)
-		{ }
-
-		void operator() (double motor_efficiency) const
-		{
-			_module->compute_torque (motor_efficiency);
-		}
-
-		void operator() (EfficiencyDatatable const& datatable) const
-		{
-			_module->compute_torque (datatable);
-		}
-
-	  private:
-		EngineTorque* _module;
-	};
-
-	std::visit (TorqueComputer (this), *io.motor_efficiency);
+	std::visit ([&] (auto&& efficiency) {
+		compute_torque (std::forward<decltype (efficiency)> (efficiency));
+	}, *io.motor_efficiency);
 }
 
 

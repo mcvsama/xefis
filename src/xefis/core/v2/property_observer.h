@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v2/property.h>
 #include <xefis/utility/smoother.h>
+#include <xefis/utility/variant.h>
 
 
 namespace v2 {
@@ -209,22 +210,9 @@ PropertyObserver::Object::Object (PropertyObserver* observer):
 inline BasicProperty::Serial
 PropertyObserver::Object::remote_serial() const noexcept
 {
-	struct SerialGetter
-	{
-		BasicProperty::Serial
-		operator() (BasicProperty* property) const noexcept
-		{
-			return property->serial();
-		}
-
-		BasicProperty::Serial
-		operator() (PropertyObserver* observer) const noexcept
-		{
-			return observer->serial();
-		}
-	};
-
-	return std::visit (SerialGetter(), _observable);
+	return std::visit ([](auto&& observable) noexcept {
+		return observable->serial();
+	}, _observable);
 }
 
 
