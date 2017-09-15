@@ -76,7 +76,7 @@ LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
 # This subst-hack is to hide warnings from Qt that happen from time to time and obscure compiler's output:
 CXXFLAGS		+= $(subst -I,-isystem ,$(shell pkg-config --cflags $(PKGCONFIGS)))
 
-.PHONY: first all dep help clean distclean release doc check
+.PHONY: first all dep help clean depclean distclean release doc check
 
 HEADERS =
 SOURCES =
@@ -214,17 +214,22 @@ dep: $(DEPFILES)
 
 help:
 	@echo 'Available targets:'
-	@echo '  all        Compiles program.'
-	@echo '  dep        Generates dependencies.'
-	@echo '  clean      Cleans source tree and dep files'
-	@echo '  distclean  Cleans build directory.'
-	@echo '  release    Creates release.'
-	@echo '  help       Shows this help.'
+	@echo '  all        Compile program.'
+	@echo '  dep        Generate dependencies.'
+	@echo '  clean      Clean source tree and dep files'
+	@echo '  depclean   Clean dependency files'
+	@echo '  distclean  Clean build directory.'
+	@echo '  release    Create release.'
+	@echo '  help       Show this help.'
 
 clean:
 	@rm -f $(SOURCES_MOC)
 	@rm -f $(OBJECTS)
 	@rm -f $(MOCOBJS)
+	@rm -f $(DEPFILES)
+	@rm -f $(MAINDEPFILE)
+
+depclean:
 	@rm -f $(DEPFILES)
 	@rm -f $(MAINDEPFILE)
 
