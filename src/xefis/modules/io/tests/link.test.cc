@@ -273,7 +273,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	blob[13] = 0xff;
 	blob[14] = 0x00;
 	blob[15] = 0xff;
-	// Careful not to touch the last envelope, which shouldn't be sent in second 
+	// Careful not to touch the last envelope, which shouldn't be sent in second:
 	blob[blob.size() - 6] = 0xff;
 	blob[blob.size() - 5] = 0x00;
 	blob[blob.size() - 4] = 0xff;

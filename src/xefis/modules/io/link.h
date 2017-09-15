@@ -264,7 +264,7 @@ class LinkProtocol
 			};
 
 		using SourceVariant	= std::variant<BitSource<bool>, BitSource<uint8_t>, BitSource<uint16_t>,
-			  							   BitSource<uint32_t>, BitSource<uint64_t>>;
+										   BitSource<uint32_t>, BitSource<uint64_t>>;
 
 	  public:
 		explicit

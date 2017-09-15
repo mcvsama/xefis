@@ -90,7 +90,7 @@ LinkProtocol::Bitfield::Bitfield (std::initializer_list<SourceVariant> sources):
 
 	for (auto const& bsvariant: _bit_sources)
 	{
-		std::visit ([&total_bits](auto&& bs) noexcept {
+		std::visit ([&total_bits] (auto&& bs) noexcept {
 			total_bits += bs.bits;
 		}, bsvariant);
 	}
@@ -114,7 +114,7 @@ LinkProtocol::Bitfield::produce (Blob& blob)
 
 	for (auto const& bsvariant: _bit_sources)
 	{
-		std::visit ([&bits](auto&& bs) {
+		std::visit ([&bits] (auto&& bs) {
 			uint_least64_t v = bs.fallback_value;
 
 			if (bs.property && fits_in_bits (*bs.property, Bits (bs.bits)))
@@ -157,7 +157,7 @@ LinkProtocol::Bitfield::eat (Blob::const_iterator begin, Blob::const_iterator en
 
 	for (auto& bsvariant: _bit_sources)
 	{
-		std::visit ([&bit, &bits](auto&& bs) {
+		std::visit ([&bit, &bits] (auto&& bs) {
 			uint_least64_t v = 0;
 
 			for (uint8_t b = 0; b < bs.bits; ++b)
