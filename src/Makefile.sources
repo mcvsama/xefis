@@ -449,6 +449,7 @@ XEFIS_HEADERS			+= xefis/utility/time.h
 XEFIS_HEADERS			+= xefis/utility/time_helper.h
 XEFIS_HEADERS			+= xefis/utility/transistor.h
 XEFIS_HEADERS			+= xefis/utility/types.h
+XEFIS_HEADERS			+= xefis/utility/variant.h
 
 XEFIS_SOURCES			+= xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc

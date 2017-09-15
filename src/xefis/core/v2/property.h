@@ -25,9 +25,10 @@
 #include <xefis/core/v2/module.h>
 #include <xefis/core/v2/module_io.h>
 #include <xefis/core/property_path.h>
+#include <xefis/utility/blob.h>
 #include <xefis/utility/time.h>
 #include <xefis/utility/time_helper.h>
-#include <xefis/utility/blob.h>
+#include <xefis/utility/variant.h>
 
 
 namespace v2 {
@@ -873,35 +874,18 @@ template<class V>
 	{
 		// TODO measure how often is this called for real-aircraft config,
 		// perhaps add a flag that the result is cached in current processing-loop.
-		struct Fetcher
-		{
-			Fetcher (PropertyOut<Value>* property_out, Cycle const& cycle):
-				_this (property_out),
-				_cycle (cycle)
-			{ }
-
-			void operator() (std::nullptr_t) const
-			{
-				_this->set_nil();
+		std::visit (xf::overload {
+			[&] (std::nullptr_t) {
+				this->set_nil();
+			},
+			[&] (ModuleIO* data_source) {
+				BasicModule::ProcessingLoopAPI (data_source->module()).fetch_and_process (cycle);
+			},
+			[&] (PropertyOut<Value>* data_source) {
+				data_source->fetch (cycle);
+				this->set (data_source->get_optional());
 			}
-
-			void operator() (ModuleIO* data_source) const
-			{
-				BasicModule::ProcessingLoopAPI (data_source->module()).fetch_and_process (_cycle);
-			}
-
-			void operator() (PropertyOut<Value>* data_source) const
-			{
-				data_source->fetch (_cycle);
-				_this->set (data_source->get_optional());
-			}
-
-		  private:
-			PropertyOut<Value>*	_this;
-			Cycle const&		_cycle;
-		};
-
-		std::visit (Fetcher (this, cycle), _data_source);
+		}, _data_source);
 	}
 
 } // namespace v2
