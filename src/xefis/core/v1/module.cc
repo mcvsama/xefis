@@ -152,27 +152,6 @@ Module::configurator_widget() const
 }
 
 
-NavaidStorage*
-Module::navaid_storage() const
-{
-	return _module_manager->xefis()->navaid_storage();
-}
-
-
-WorkPerformer*
-Module::work_performer() const
-{
-	return _module_manager->xefis()->work_performer();
-}
-
-
-Accounting*
-Module::accounting() const
-{
-	return _module_manager->xefis()->accounting();
-}
-
-
 xf::Logger const&
 Module::log() const
 {

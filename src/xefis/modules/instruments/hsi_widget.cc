@@ -1960,8 +1960,8 @@ HSIWidget::PaintWorkUnit::is_newly_set (QDateTime const& timestamp, Time time) c
 }
 
 
-HSIWidget::HSIWidget (QWidget* parent, xf::WorkPerformer* work_performer, xf::NavaidStorage* navaid_storage):
-	InstrumentWidget (parent, work_performer),
+HSIWidget::HSIWidget (QWidget* parent, xf::WorkPerformer& work_performer, xf::NavaidStorage* navaid_storage):
+	InstrumentWidget (parent, &work_performer),
 	_local_paint_work_unit (this, navaid_storage)
 {
 	set_painter (&_local_paint_work_unit);

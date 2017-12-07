@@ -28,6 +28,7 @@
 #include <xefis/core/components/property_editor/property_editor.h>
 #include <xefis/core/components/data_recorder/data_recorder.h>
 #include <xefis/core/v1/window.h>
+#include <xefis/core/v2/module.h>
 
 // Local:
 #include "modules_list.h"
@@ -71,25 +72,17 @@ class ConfiguratorWidget: public QWidget
 	  public:
 		// Ctor
 		explicit
-		GeneralModuleWidget (Xefis*, v1::Module*, ConfiguratorWidget*, QWidget* parent);
+		GeneralModuleWidget (v2::BasicModule&, ConfiguratorWidget&, QWidget* parent);
 
 		/**
 		 * Return module.
 		 */
-		v1::Module*
+		v2::BasicModule&
 		module() const noexcept;
 
-		/**
-		 * Reload module.
-		 */
-		void
-		reload_module();
-
 	  private:
-		Xefis*				_xefis;
-		v1::Module*			_module;
-		v1::Module::Pointer	_module_ptr;
-		ConfiguratorWidget*	_configurator_widget;
+		v2::BasicModule&	_module;
+		ConfiguratorWidget&	_configurator_widget;
 	};
 
   public:
@@ -105,7 +98,7 @@ class ConfiguratorWidget: public QWidget
 
   private:
 	void
-	module_selected (v1::Module::Pointer const&);
+	module_selected (v2::BasicModule&);
 
 	void
 	none_selected();
@@ -126,12 +119,12 @@ class ConfiguratorWidget: public QWidget
 	QTabWidget*			_tabs					= nullptr;
 	v1::Window*			_owning_window			= nullptr;
 	QLabel*				_no_module_selected		= nullptr;
-	std::map<v1::Module*, Shared<GeneralModuleWidget>>
+	std::map<v2::BasicModule*, Shared<GeneralModuleWidget>>
 						_general_module_widgets;
 };
 
 
-inline v1::Module*
+inline v2::BasicModule&
 ConfiguratorWidget::GeneralModuleWidget::module() const noexcept
 {
 	return _module;

@@ -31,12 +31,6 @@
 #include <xefis/utility/logger.h>
 
 
-namespace v1 { // XXX
-class ModuleManager;
-class ConfigReader;
-class WindowManager;
-}
-
 namespace v2 { // XXX
 class Machine;
 }
@@ -44,13 +38,8 @@ class Machine;
 namespace xf {
 using namespace v2; // XXX
 
-class NavaidStorage;
-class SoundManager;
-class WorkPerformer;
-class ConfiguratorWidget;
-class Accounting;
-class Airframe;
 class System;
+class ConfiguratorWidget;
 
 
 class Xefis: public QApplication
@@ -144,55 +133,6 @@ class Xefis: public QApplication
 	quit();
 
 	/**
-	 * Return Accounting object.
-	 * Used to track timings and overall response times.
-	 */
-	Accounting*
-	accounting() const;
-
-	/**
-	 * Return ModuleManager object.
-	 */
-	v1::ModuleManager*
-	module_manager() const;
-
-	/**
-	 * Return WindowManager object.
-	 */
-	v1::WindowManager*
-	window_manager() const;
-
-	/**
-	 * Return SoundManager object.
-	 */
-	SoundManager*
-	sound_manager() const;
-
-	/**
-	 * Return ConfigReader object.
-	 */
-	v1::ConfigReader*
-	config_reader() const;
-
-	/**
-	 * Return pointer to navaid storage.
-	 */
-	NavaidStorage*
-	navaid_storage() const;
-
-	/**
-	 * Return WorkPerformer.
-	 */
-	WorkPerformer*
-	work_performer() const;
-
-	/**
-	 * Return Airframe object.
-	 */
-	Airframe*
-	airframe() const;
-
-	/**
 	 * Return System object.
 	 */
 	System*
@@ -226,13 +166,6 @@ class Xefis: public QApplication
 	OptionsHelper const&
 	options() const noexcept;
 
-  private slots:
-	/**
-	 * Called by data updater. Causes call of data_updated() on all modules.
-	 */
-	void
-	data_updated();
-
   private:
 	/**
 	 * Parse command line options and fill _options map.
@@ -257,24 +190,9 @@ class Xefis: public QApplication
 	static Logger					_logger;
 
 	Unique<System>					_system;
-	Unique<WorkPerformer>			_work_performer;
-	Unique<Accounting>				_accounting;
-	Unique<SoundManager>			_sound_manager;
-	Unique<NavaidStorage>			_navaid_storage;
-	Unique<v1::WindowManager>		_window_manager;
-	// Note: it is important that the _module_manager is after _window_manager, so that
-	// upon destruction, _module_manager deletes all instruments first, and prevents
-	// _window_manager deleting them like they were managed by parent QObjects.
-	// Unfortunately Qt doesn't allow inserting a widget into a window without creating parent-child
-	// relationship, or at least marking such children not to be deleted by their parent,
-	// so we have to make workarounds like this.
-	Unique<v1::ModuleManager>		_module_manager;
-	Unique<v1::ConfigReader>		_config_reader;
 	Unique<ConfiguratorWidget>		_configurator_widget;
-	Unique<Airframe>				_airframe;
 	Unique<OptionsHelper>			_options_helper;
 	Unique<Machine>					_machine;
-	QTimer*							_data_updater = nullptr;
 	OptionsMap						_options;
 };
 
@@ -322,78 +240,6 @@ Xefis::OptionsHelper::watchdog_read_fd() const noexcept
 }
 
 
-inline Accounting*
-Xefis::accounting() const
-{
-	if (!_accounting)
-		throw UninitializedServiceException ("Accounting");
-	return _accounting.get();
-}
-
-
-inline v1::ModuleManager*
-Xefis::module_manager() const
-{
-	if (!_module_manager)
-		throw UninitializedServiceException ("ModuleManager");
-	return _module_manager.get();
-}
-
-
-inline v1::WindowManager*
-Xefis::window_manager() const
-{
-	if (!_window_manager)
-		throw UninitializedServiceException ("WindowManager");
-	return _window_manager.get();
-}
-
-
-inline SoundManager*
-Xefis::sound_manager() const
-{
-	if (!_sound_manager)
-		throw UninitializedServiceException ("SoundManager");
-	return _sound_manager.get();
-}
-
-
-inline v1::ConfigReader*
-Xefis::config_reader() const
-{
-	if (!_config_reader)
-		throw UninitializedServiceException ("ConfigReader");
-	return _config_reader.get();
-}
-
-
-inline NavaidStorage*
-Xefis::navaid_storage() const
-{
-	if (!_navaid_storage)
-		throw UninitializedServiceException ("NavaidStorage");
-	return _navaid_storage.get();
-}
-
-
-inline WorkPerformer*
-Xefis::work_performer() const
-{
-	if (!_work_performer)
-		throw UninitializedServiceException ("WorkPerformer");
-	return _work_performer.get();
-}
-
-
-inline Airframe*
-Xefis::airframe() const
-{
-	if (!_airframe)
-		throw UninitializedServiceException ("Airframe");
-	return _airframe.get();
-}
-
-
 inline System*
 Xefis::system() const
 {
@@ -422,8 +268,7 @@ Xefis::has_option (Option option) const
 inline std::string
 Xefis::option (Option option) const
 {
-	auto o = _options.find (option);
-	if (o != _options.end())
+	if (auto o = _options.find (option); o != _options.end())
 		return o->second;
 	else
 		return std::string();

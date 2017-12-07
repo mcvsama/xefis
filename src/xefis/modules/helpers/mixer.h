@@ -74,8 +74,8 @@ template<class pValue>
 		process (v2::Cycle const&) override;
 
 	  private:
-		v2::PropChanged<Value>	_input_a_changed	{ input_a_value };
-		v2::PropChanged<Value>	_input_b_changed	{ input_b_value };
+		v2::PropChanged<Value>	_input_a_changed	{ io.input_a_value };
+		v2::PropChanged<Value>	_input_b_changed	{ io.input_b_value };
 	};
 
 

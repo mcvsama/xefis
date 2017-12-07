@@ -2692,8 +2692,8 @@ ADIWidget::PaintWorkUnit::paint_vertical_failure_flag (xf::Painter& painter, QPo
 }
 
 
-ADIWidget::ADIWidget (QWidget* parent, xf::WorkPerformer* work_performer):
-	InstrumentWidget (parent, work_performer),
+ADIWidget::ADIWidget (QWidget* parent, xf::WorkPerformer& work_performer):
+	InstrumentWidget (parent, &work_performer),
 	_local_paint_work_unit (this)
 {
 	setAttribute (Qt::WA_NoBackground);

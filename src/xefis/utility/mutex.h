@@ -149,9 +149,9 @@ class Mutex: private Noncopyable
 
 	/**
 	 * Unlocks mutex. If calling thread is not the thread
-	 * that locked mutex, std::invalid_argument is thrown.
+	 * that locked mutex, MutexPermissionException is thrown.
 	 *
-	 * \throws	std::invalid_argument
+	 * \throws	MutexPermissionException
 	 *			When calling thread does not own the mutex.
 	 */
 	void

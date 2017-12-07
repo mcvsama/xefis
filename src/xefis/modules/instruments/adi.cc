@@ -28,10 +28,10 @@
 #include "adi.h"
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Xefis* xefis, std::string const& instance):
+ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::WorkPerformer& work_performer, std::string const& instance):
 	Instrument (std::move (module_io), instance)
 {
-	_adi_widget = new ADIWidget (this, xefis->work_performer());
+	_adi_widget = new ADIWidget (this, work_performer);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

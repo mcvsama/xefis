@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/string.h>
 
 
@@ -31,11 +32,11 @@ namespace xf {
 /**
  * Thrown by unserialize() functions.
  */
-class InvalidBlobSize: public std::invalid_argument
+class InvalidBlobSize: public InvalidArgument
 {
   public:
 	explicit InvalidBlobSize():
-		invalid_argument ("BlobSerializer: invalid blob size")
+		InvalidArgument ("BlobSerializer: invalid blob size")
 	{ }
 };
 

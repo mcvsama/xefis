@@ -22,9 +22,9 @@
 #include "trim_control.h"
 
 
-TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::Xefis* xefis, std::string const& instance):
+TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::SoundManager* sound_manager, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_xefis (xefis)
+	_sound_manager (sound_manager)
 {
 	_timer = std::make_unique<QTimer>();
 	_timer->setInterval (180);
@@ -89,7 +89,9 @@ void
 TrimControl::update_trim()
 {
 	update_trim_without_sound();
-	_xefis->sound_manager()->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
+
+	if (_sound_manager)
+		_sound_manager->play (XEFIS_SHARED_DIRECTORY "/sounds/trim-bip.wav");
 }
 
 

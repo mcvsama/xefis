@@ -34,6 +34,7 @@
 #include <xefis/core/v2/module_io.h>
 #include <xefis/core/v2/property.h>
 #include <xefis/core/v2/setting.h>
+#include <xefis/core/stdexcept.h>
 #include <xefis/utility/v2/actions.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/strong_type.h>
@@ -420,7 +421,7 @@ class LinkProtocol
 		bitfield_property (v2::Property<Unsigned>& property, Bits bits, Retained retained, Unsigned fallback_value)
 		{
 			if (!fits_in_bits (fallback_value, bits))
-				throw std::invalid_argument ("fallback_value doesn't fit in given number of bits");
+				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
 
 			return { property, *bits, *retained, fallback_value, 0 };
 		}

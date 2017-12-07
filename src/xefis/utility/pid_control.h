@@ -416,7 +416,7 @@ template<class V, class C, class P>
 			clamp (_integral, *_integral_limit);
 		// D:
 		_derivative = (error - _previous_error) / dt;
-		if (!si::isfinite (_derivative))
+		if (!isfinite (_derivative))
 			_derivative = Derivative();
 		// P and the rest:
 		auto computed = _gain * (_p * error + _i * _integral / 1_s + _d * _derivative * 1_s);

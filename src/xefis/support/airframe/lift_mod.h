@@ -18,9 +18,6 @@
 #include <cstddef>
 #include <map>
 
-// Qt:
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/range.h>

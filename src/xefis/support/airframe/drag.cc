@@ -29,7 +29,7 @@ namespace xf {
 
 Drag::Drag (QDomElement const& config)
 {
-	decltype (_aoa_to_cd)::element_type::DataMap data;
+	decltype (_aoa_to_cd)::DataMap data;
 
 	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
@@ -49,14 +49,14 @@ Drag::Drag (QDomElement const& config)
 	if (data.empty())
 		throw BadConfiguration ("drag module not properly configured");
 
-	_aoa_to_cd = std::make_unique<Datatable2D<Angle, DragCoefficient>> (std::move (data));
+	_aoa_to_cd = Datatable2D<Angle, DragCoefficient> (std::move (data));
 }
 
 
 DragCoefficient
 Drag::get_cd (Angle const& aoa) const
 {
-	return _aoa_to_cd->extrapolated_value (aoa);
+	return _aoa_to_cd.extrapolated_value (aoa);
 }
 
 } // namespace xf

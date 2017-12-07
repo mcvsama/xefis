@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/v2/accounting.h>
 #include <xefis/core/v2/module.h>
 #include <xefis/core/v2/module_io.h>
 #include <xefis/core/xefis.h>
@@ -33,7 +34,7 @@ class Latency:
   public:
 	// Ctor
 	explicit
-	Latency (xf::Xefis*, std::string const& instance = {});
+	Latency (v2::Accounting&, std::string const& instance = {});
 
   private slots:
 	/**
@@ -43,8 +44,8 @@ class Latency:
 	log_latency();
 
   private:
-	xf::Xefis*	_xefis;
-	QTimer*		_log_timer;
+	v2::Accounting&	_accounting;
+	QTimer*			_log_timer;
 };
 
 #endif

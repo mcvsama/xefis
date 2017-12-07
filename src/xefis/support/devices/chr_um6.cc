@@ -390,7 +390,6 @@ CHRUM6::process_packet (uint32_t address, bool failed, bool, uint32_t data)
 	}
 	else if (_incoming_messages_callback)
 	{
-		Time now = TimeHelper::now();
 		Read req (static_cast<DataAddress> (address));
 		req.data()->address = address;
 		req.data()->start_timestamp = now;

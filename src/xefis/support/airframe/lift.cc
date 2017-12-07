@@ -32,7 +32,7 @@ namespace xf {
 
 Lift::Lift (QDomElement const& config)
 {
-	decltype (_aoa_to_cl)::element_type::DataMap data;
+	decltype (_aoa_to_cl)::DataMap data;
 
 	for (QDomElement const& e: xf::iterate_sub_elements (config))
 	{
@@ -52,10 +52,10 @@ Lift::Lift (QDomElement const& config)
 	if (data.empty())
 		throw BadConfiguration ("lift module not properly configured");
 
-	_aoa_to_cl = std::make_unique<Datatable2D<Angle, LiftCoefficient>> (std::move (data));
+	_aoa_to_cl = Datatable2D<Angle, LiftCoefficient> (std::move (data));
 
 	// Find maximum C_L and AOA angle for maximum C_L (critical AOA):
-	auto max_cl_point = _aoa_to_cl->max_value();
+	auto max_cl_point = _aoa_to_cl.max_value();
 	_critical_aoa = max_cl_point.argument;
 	_max_cl = max_cl_point.value;
 }
@@ -64,7 +64,7 @@ Lift::Lift (QDomElement const& config)
 LiftCoefficient
 Lift::get_cl (Angle const& aoa) const
 {
-	return _aoa_to_cl->extrapolated_value (aoa);
+	return _aoa_to_cl.extrapolated_value (aoa);
 }
 
 
@@ -85,7 +85,7 @@ Lift::critical_aoa() const noexcept
 std::optional<Angle>
 Lift::get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept
 {
-	auto aoas = _aoa_to_cl->arguments (cl, { _aoa_to_cl->min_argument().argument, _critical_aoa });
+	auto aoas = _aoa_to_cl.arguments (cl, { _aoa_to_cl.min_argument().argument, _critical_aoa });
 
 	if (aoas.empty())
 		return { };
