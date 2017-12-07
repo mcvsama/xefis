@@ -157,23 +157,20 @@ ConfiguratorWidget::ConfiguratorWidget (Xefis* xefis, QWidget* parent):
 
 
 void
-ConfiguratorWidget::module_selected (v1::Module::Pointer const& module_pointer)
+ConfiguratorWidget::module_selected (v2::BasicModule const& module)
 {
-	v1::Module* module = _xefis->module_manager()->find (module_pointer);
-	if (module)
+	auto gmw = _general_module_widgets.find (module);
+
+	if (gmw == _general_module_widgets.end())
 	{
-		auto gmw = _general_module_widgets.find (module);
-		if (gmw == _general_module_widgets.end())
-		{
-			auto new_gmw = std::make_shared<GeneralModuleWidget> (_xefis, module, this, this);
-			gmw = _general_module_widgets.insert ({ module, new_gmw }).first;
-		}
-
-		if (_modules_stack->indexOf (gmw->second.get()) == -1)
-			_modules_stack->addWidget (gmw->second.get());
-
-		_modules_stack->setCurrentWidget (gmw->second.get());
+		auto new_gmw = std::make_shared<GeneralModuleWidget> (_xefis, module, this, this);
+		gmw = _general_module_widgets.insert ({ module, new_gmw }).first;
 	}
+
+	if (_modules_stack->indexOf (gmw->second.get()) == -1)
+		_modules_stack->addWidget (gmw->second.get());
+
+	_modules_stack->setCurrentWidget (gmw->second.get());
 }
 
 

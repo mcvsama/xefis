@@ -17,9 +17,6 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/types.h>
@@ -50,14 +47,14 @@ class Drag
 	get_cd (Angle const& aoa) const;
 
   private:
-	Unique<Datatable2D<Angle, DragCoefficient>>	_aoa_to_cd;
+	Datatable2D<Angle, DragCoefficient> _aoa_to_cd { };
 };
 
 
 inline Range<Angle>
 Drag::get_aoa_range() const noexcept
 {
-	return _aoa_to_cd->domain();
+	return _aoa_to_cd.domain();
 }
 
 } // namespace xf

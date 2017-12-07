@@ -29,6 +29,7 @@
 #include <xefis/core/v2/setting.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 
 // Local:
 #include "hsi_widget.h"
@@ -123,7 +124,7 @@ class HSI: public v2::Instrument<HSI_IO>
 
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::Xefis*, xf::NavaidStorage*, std::string const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::WorkPerformer&, xf::NavaidStorage*, std::string const& instance = {});
 
 	// Module API
 	void

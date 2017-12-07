@@ -64,7 +64,7 @@ class TrimControl: public v2::Module<TrimControlIO>
   public:
 	// Ctor
 	explicit
-	TrimControl (std::unique_ptr<TrimControlIO>, xf::Xefis*, std::string const& instance = {});
+	TrimControl (std::unique_ptr<TrimControlIO>, xf::SoundManager*, std::string const& instance = {});
 
 	// Module API
 	void
@@ -99,7 +99,7 @@ class TrimControl: public v2::Module<TrimControlIO>
 	moved_down (v2::Property<double> const&);
 
   private:
-	xf::Xefis*				_xefis;
+	xf::SoundManager*		_sound_manager	{ nullptr };
 	double					_trim_value		{ 0.0 };
 	bool					_trimming_up	{ false };
 	bool					_trimming_down	{ false };

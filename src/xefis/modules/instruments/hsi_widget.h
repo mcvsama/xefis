@@ -336,7 +336,7 @@ class HSIWidget: public xf::InstrumentWidget
   public:
 	// Ctor
 	explicit
-	HSIWidget (QWidget* parent, xf::WorkPerformer*, xf::NavaidStorage*);
+	HSIWidget (QWidget* parent, xf::WorkPerformer&, xf::NavaidStorage*);
 
 	// Dtor
 	~HSIWidget();

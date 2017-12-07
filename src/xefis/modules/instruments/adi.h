@@ -190,7 +190,7 @@ class ADI: public v2::Instrument<ADI_IO>
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, xf::Xefis*, std::string const& instance = {});
+	ADI (std::unique_ptr<ADI_IO>, xf::WorkPerformer&, std::string const& instance = {});
 
   protected:
 	// Module API

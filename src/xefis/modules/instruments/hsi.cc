@@ -28,10 +28,10 @@
 #include "hsi.h"
 
 
-HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Xefis* xefis, xf::NavaidStorage* navaid_storage, std::string const& instance):
+HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::WorkPerformer& work_performer, xf::NavaidStorage* navaid_storage, std::string const& instance):
 	Instrument (std::move (module_io), instance)
 {
-	_hsi_widget = new HSIWidget (this, xefis->work_performer(), navaid_storage);
+	_hsi_widget = new HSIWidget (this, work_performer, navaid_storage);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
 	layout->setMargin (0);

@@ -17,9 +17,6 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/types.h>
@@ -68,16 +65,16 @@ class Lift
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
-	Unique<Datatable2D<Angle, LiftCoefficient>>	_aoa_to_cl;
-	LiftCoefficient								_max_cl;
-	Angle										_critical_aoa;
+	Datatable2D<Angle, LiftCoefficient>	_aoa_to_cl		{ };
+	LiftCoefficient						_max_cl;
+	Angle								_critical_aoa;
 };
 
 
 inline Range<Angle>
 Lift::get_aoa_range() const noexcept
 {
-	return _aoa_to_cl->domain();
+	return _aoa_to_cl.domain();
 }
 
 } // namespace xf
