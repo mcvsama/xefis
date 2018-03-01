@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/datatable2d.h>
 
 
 namespace xf {
@@ -50,6 +51,10 @@ compute_indicated_airspeed (Speed true_airspeed, Length density_altitude)
 {
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.quantity<Foot>(), 2.127940);
 }
+
+
+xf::Datatable2D<si::Temperature, si::DynamicViscosity> const&
+temperature_to_dynamic_viscosity();
 
 } // namespace xf
 

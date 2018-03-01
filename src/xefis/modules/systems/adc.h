@@ -24,7 +24,6 @@
 #include <xefis/core/v2/property.h>
 #include <xefis/core/v2/property_observer.h>
 #include <xefis/core/v2/setting.h>
-#include <xefis/utility/datatable2d.h>
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/lookahead.h>
 #include <xefis/support/airframe/airframe.h>
@@ -137,8 +136,6 @@ class AirDataComputer: public v2::Module<AirDataComputerIO>
 	si::Time					_hide_alt_lookahead_until			= 0_s;
 	si::Length					_prev_altitude_amsl					= 0_ft;
 	xf::Airframe*				_airframe							= nullptr;
-	Unique<xf::Datatable2D<Temperature, DynamicViscosity>>
-								_temperature_to_dynamic_viscosity;
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Velocity>	_vertical_speed_smoother			{ 1_s };

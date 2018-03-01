@@ -274,6 +274,8 @@ SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
 XEFIS_HEADERS			+= xefis/support/air/air.h
 XEFIS_HEADERS			+= xefis/support/air/wind_triangle.h
 
+XEFIS_SOURCES			+= xefis/support/air/air.cc
+
 ######## /xefis/support/airframe ########
 
 XEFIS_HEADERS			+= xefis/support/airframe/airframe.h
