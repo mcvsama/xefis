@@ -20,7 +20,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/core/v2/cycle.h>
 #include <xefis/core/v2/instrument.h>
 #include <xefis/core/v2/property.h>

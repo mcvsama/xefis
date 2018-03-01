@@ -22,9 +22,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/accounting.h>
 #include <xefis/core/services.h>
-#include <xefis/core/v1/module_manager.h>
+#include <xefis/core/v2/module.h>
 
 // Local:
 #include "modules_list.h"
@@ -33,35 +32,26 @@
 
 namespace xf {
 
-ModulesListItem::ModulesListItem (v1::Module::Pointer const& module_pointer, v1::ModuleManager* module_manager, QTreeWidget* parent):
+ModulesListItem::ModulesListItem (v2::BasicModule& module, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { "", "", "" }),
-	_module_pointer (module_pointer),
-	_module_manager (module_manager)
+	_module (module)
 {
 	setup_appereance();
-
-	QString name = QString::fromStdString (module_pointer.name());
-	QString instance = QString::fromStdString (module_pointer.instance());
-	setText (ModulesList::ModuleColumn, name + (instance.isEmpty() ? QString() : (" • " + instance)));
+	setText (ModulesList::ModuleColumn, QString::fromStdString (identifier (_module)));
 }
 
 
 void
-ModulesListItem::reload()
+ModulesListItem::update_stats()
 {
-	v1::Module* module = _module_manager->find (_module_pointer);
-	if (module)
+	try {
+		setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg ("TODO"));
+		setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg ("TODO"));
+	}
+	catch (...)
 	{
-		try {
-			Accounting::Stats const& ms = _module_manager->xefis()->accounting()->module_stats (_module_pointer, Accounting::Timespan::Last100Samples);
-			setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg (ms.average().quantity<Second>(), 0, 'f', 6));
-			setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg (ms.maximum().quantity<Second>(), 0, 'f', 6));
-		}
-		catch (...)
-		{
-			setText (ModulesList::StatsAvgColumn, "?");
-			setText (ModulesList::StatsMaxColumn, "?");
-		}
+		setText (ModulesList::StatsAvgColumn, "error");
+		setText (ModulesList::StatsMaxColumn, "error");
 	}
 }
 

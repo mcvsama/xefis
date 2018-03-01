@@ -30,15 +30,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/core/services.h>
-#include <xefis/core/v1/property_storage.h>
-#include <xefis/core/accounting.h>
-#include <xefis/core/v1/module_manager.h>
-#include <xefis/core/v1/window_manager.h>
-#include <xefis/core/v1/config_reader.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
 #include <xefis/support/ui/sound_manager.h>
 #include <xefis/utility/time_helper.h>
@@ -61,6 +55,7 @@ Xefis::Xefis (int& argc, char** argv):
 {
 	if (_xefis)
 		throw std::runtime_error ("can create only one Xefis object");
+
 	_xefis = this;
 	_logger.set_prefix ("<xefis>");
 
@@ -71,49 +66,12 @@ Xefis::Xefis (int& argc, char** argv):
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 	// Init services:
 	Services::initialize();
-	// Init property storage:
-	v1::PropertyStorage::initialize();
 
 	_system = std::make_unique<System>();
-	_work_performer = std::make_unique<WorkPerformer> (std::thread::hardware_concurrency());
-	_accounting = std::make_unique<Accounting>();
-	_sound_manager = std::make_unique<SoundManager>();
-	_navaid_storage = std::make_unique<NavaidStorage>();
-	_window_manager = std::make_unique<v1::WindowManager>();
-	_module_manager = std::make_unique<v1::ModuleManager> (this);
-	_config_reader = std::make_unique<v1::ConfigReader> (this, _module_manager.get());
-
-	signal (SIGHUP, s_quit);
-
-	const char* config_file = getenv ("XEFIS_CONFIG");
-	if (!config_file)
-	{
-		_logger << "XEFIS_CONFIG not set, trying to read default ./xefis-config.xml" << std::endl;
-		config_file = "xefis-config.xml";
-	}
-	_config_reader->load (config_file);
-
-	_airframe = std::make_unique<Airframe> (this, _config_reader->airframe_config());
-
-	_config_reader->process_settings();
-
-	if (_config_reader->load_navaids())
-		_navaid_storage->load();
-
-	_config_reader->process_modules();
-	_config_reader->process_windows();
-
-	if (_config_reader->has_windows())
-		_configurator_widget = std::make_unique<ConfiguratorWidget> (this, nullptr);
-
-	_data_updater = new QTimer (this);
-	_data_updater->setInterval ((1.0 / _config_reader->update_frequency()).quantity<Millisecond>());
-	_data_updater->setSingleShot (false);
-	QObject::connect (_data_updater, SIGNAL (timeout()), this, SLOT (data_updated()));
-	_data_updater->start();
 
 	// TODO this is a hack, make it configurable or runtime selectable
 	_machine = std::make_unique<CthulhuGCS> (this);
+	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 }
 
 
@@ -156,15 +114,6 @@ Xefis::quit()
 {
 	closeAllWindows();
 	QApplication::quit();
-}
-
-
-void
-Xefis::data_updated()
-{
-	Time t = TimeHelper::now();
-	_module_manager->data_updated (t);
-	_window_manager->data_updated (t);
 }
 
 
@@ -257,6 +206,7 @@ void
 Xefis::s_quit (int)
 {
 	_logger << "HUP received, exiting." << std::endl;
+
 	if (_xefis)
 		_xefis->quit();
 }

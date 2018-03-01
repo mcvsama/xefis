@@ -18,7 +18,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/core/v2/compatibility_v1_v2.h>
 #include <xefis/core/v2/machine.h>
 #include <xefis/core/v2/module.h>
 #include <xefis/utility/time_helper.h>
@@ -89,8 +88,6 @@ ProcessingLoop::execute_cycle()
 
 	// TODO make lists of connected v1 and v2 properties
 
-	compatibility_input();
-
 	for (auto& module: _modules)
 		BasicModule::ProcessingLoopAPI (module.get()).reset_cache();
 
@@ -98,27 +95,7 @@ ProcessingLoop::execute_cycle()
 	for (auto& module: _modules)
 		BasicModule::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
 
-	compatibility_output();
-
 	_previous_timestamp = t;
-}
-
-
-void
-ProcessingLoop::compatibility_input()
-{
-	// Copy all xf::Property<T> values to v2::PropertyIn/Out<T> objects.
-	for (auto& copy: g_copy_to_v2)
-		copy();
-}
-
-
-void
-ProcessingLoop::compatibility_output()
-{
-	// Copy all v2::PropertyIn/Out<T> values to xf::Property<T> objects.
-	for (auto& copy: g_copy_to_v1)
-		copy();
 }
 
 } // namespace v2

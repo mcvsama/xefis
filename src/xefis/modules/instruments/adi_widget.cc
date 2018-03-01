@@ -25,7 +25,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>

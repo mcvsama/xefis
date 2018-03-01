@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
 

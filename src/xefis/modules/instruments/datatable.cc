@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/utility/format_exception.h>
 #include <xefis/utility/types.h>
 

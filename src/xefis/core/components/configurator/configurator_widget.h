@@ -25,9 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/property_editor/property_editor.h>
 #include <xefis/core/components/data_recorder/data_recorder.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/core/v2/module.h>
 
 // Local:
@@ -39,28 +37,6 @@ namespace xf {
 class ConfiguratorWidget: public QWidget
 {
 	Q_OBJECT
-
-	/**
-	 * OwnershipBreakingDecorator widget that ensures its child widget is NOT deleted
-	 * when decorator is deleted. Used to break Qt's parent-child relationship
-	 * when it comes to pointer ownership (since Qt doesn't have its own
-	 * mechanism for this).
-	 *
-	 * Also - lays out the child widget.
-	 */
-	class OwnershipBreakingDecorator: public QWidget
-	{
-	  public:
-		// Ctor
-		explicit
-		OwnershipBreakingDecorator (QWidget* child, QWidget* parent);
-
-		// Dtor
-		~OwnershipBreakingDecorator();
-
-	  private:
-		QWidget* _child;
-	};
 
 	/**
 	 * Configuration widget for module.
@@ -88,7 +64,7 @@ class ConfiguratorWidget: public QWidget
   public:
 	// Ctor
 	explicit
-	ConfiguratorWidget (Xefis*, QWidget* parent);
+	ConfiguratorWidget (v2::Machine& machine, QWidget* parent);
 
 	v1::Window*
 	owning_window() const;
@@ -111,8 +87,7 @@ class ConfiguratorWidget: public QWidget
 	reload_module_widget (GeneralModuleWidget*);
 
   private:
-	Xefis*				_xefis					= nullptr;
-	PropertyEditor*		_property_editor		= nullptr;
+	v2::Machine&		_machine;
 	ModulesList*		_modules_list			= nullptr;
 	QStackedWidget*		_modules_stack			= nullptr;
 	DataRecorder*		_data_recorder			= nullptr;

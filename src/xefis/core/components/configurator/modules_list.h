@@ -24,7 +24,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/module.h>
+#include <xefis/core/v2/machine.h>
+#include <xefis/core/v2/module.h>
 
 
 namespace xf {
@@ -41,13 +42,7 @@ class ModulesList: public QWidget
   public:
 	// Ctor
 	explicit
-	ModulesList (v1::ModuleManager* module_manager, QWidget* parent);
-
-	/**
-	 * Return ModuleManager.
-	 */
-	v1::ModuleManager*
-	module_manager() const noexcept;
+	ModulesList (v2::Machine&, QWidget* parent);
 
 	/**
 	 * Deselect any selected module.
@@ -57,10 +52,10 @@ class ModulesList: public QWidget
 
   signals:
 	/**
-	 * Emitted when user changes module selection.
+	 * Emitted when user selects another module.
 	 */
 	void
-	module_selected (v1::Module::Pointer const& module_pointer);
+	module_selected (v2::BasicModule&);
 
 	/**
 	 * Emitted when module selection is cleared.
@@ -82,17 +77,10 @@ class ModulesList: public QWidget
 	item_selected (QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
   private:
-	v1::ModuleManager*	_module_manager	= nullptr;
+	v2::Machine&		_machine;
 	QTreeWidget*		_list			= nullptr;
 	QTimer*				_refresh_timer	= nullptr;
 };
-
-
-inline v1::ModuleManager*
-ModulesList::module_manager() const noexcept
-{
-	return _module_manager;
-}
 
 } // namespace xf
 

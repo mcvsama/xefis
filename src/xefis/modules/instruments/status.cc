@@ -19,7 +19,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/core/v1/window.h>
 #include <xefis/utility/painter.h>
 #include <xefis/utility/time_helper.h>
 
