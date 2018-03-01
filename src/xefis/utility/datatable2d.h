@@ -166,6 +166,12 @@ template<class pArgument, class pValue>
 		Value
 		average (Range<Argument> domain) const;
 
+		/**
+		 * Return reference to underlying map of values used by this Datatable2D.
+		 */
+		DataMap const&
+		data_map() const;
+
 	  private:
 		/**
 		 * Return interpolated value.
@@ -454,6 +460,15 @@ template<class A, class V>
 		}
 		else
 			return _data_map.begin()->second;
+	}
+
+
+template<class A, class V>
+	inline auto
+	Datatable2D<A, V>::data_map() const
+		-> DataMap const&
+	{
+		return _data_map;
 	}
 
 
