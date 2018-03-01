@@ -59,6 +59,8 @@ Xefis::Xefis (int& argc, char** argv):
 	_xefis = this;
 	_logger.set_prefix ("<xefis>");
 
+	signal (SIGHUP, s_quit);
+
 	parse_args (argc, argv);
 
 	// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
