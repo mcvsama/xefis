@@ -22,8 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/module.h>
-#include <xefis/core/v1/module_manager.h>
+#include <xefis/core/v2/module.h>
 
 
 namespace xf {
@@ -33,19 +32,19 @@ class ModulesListItem: public QTreeWidgetItem
   public:
 	// Ctor
 	explicit
-	ModulesListItem (v1::Module::Pointer const& module_pointer, v1::ModuleManager* module_manager, QTreeWidget* parent);
+	ModulesListItem (v2::BasicModule& module, QTreeWidget* parent);
 
 	/**
 	 * Return Module* associated with this item.
 	 */
-	v1::Module::Pointer const&
-	module_pointer() const noexcept;
+	v2::BasicModule&
+	module() const noexcept;
 
 	/**
 	 * Update item (module stats).
 	 */
 	void
-	reload();
+	update_stats();
 
   private:
 	/**
@@ -55,15 +54,14 @@ class ModulesListItem: public QTreeWidgetItem
 	setup_appereance();
 
   private:
-	v1::Module::Pointer	_module_pointer;
-	v1::ModuleManager*	_module_manager;
+	v2::BasicModule& _module;
 };
 
 
-inline v1::Module::Pointer const&
-ModulesListItem::module_pointer() const noexcept
+inline v2::BasicModule&
+ModulesListItem::module() const noexcept
 {
-	return _module_pointer;
+	return _module;
 }
 
 } // namespace xf

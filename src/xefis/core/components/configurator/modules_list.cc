@@ -21,7 +21,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/services.h>
-#include <xefis/core/v1/module_manager.h>
 
 // Local:
 #include "modules_list.h"
@@ -30,9 +29,9 @@
 
 namespace xf {
 
-ModulesList::ModulesList (v1::ModuleManager* module_manager, QWidget* parent):
+ModulesList::ModulesList (v2::Machine& machine, QWidget* parent):
 	QWidget (parent),
-	_module_manager (module_manager)
+	_machine (machine)
 {
 	_list = new QTreeWidget (this);
 	_list->header()->setSectionsClickable (true);
@@ -81,31 +80,29 @@ ModulesList::deselect()
 void
 ModulesList::read()
 {
-	std::set<v1::Module::Pointer> module_ptrs;
-	for (auto m: _module_manager->modules())
-		module_ptrs.insert (m.first);
+	std::set<v2::BasicModule*> module_ptrs;
 
-	// Find items that are no longer listed in @modules:
+	// TODO add new top-level item representing a ProcessingLoop
+	// TODO fill module_ptrs
+
+	// Find tree widget items that are no longer listed in module_ptrs, to remove them from the tree:
 	for (int ci = 0; ci < _list->invisibleRootItem()->childCount(); ++ci)
 	{
-		ModulesListItem* mli = dynamic_cast<ModulesListItem*> (_list->invisibleRootItem()->child (ci));
-		if (!mli)
-			continue;
-
-		auto p = module_ptrs.find (mli->module_pointer());
-
-		if (p != module_ptrs.end())
+		if (ModulesListItem* mli = dynamic_cast<ModulesListItem*> (_list->invisibleRootItem()->child (ci)))
 		{
-			// Update module/remove from @module_ptrs:
-			mli->reload();
-			module_ptrs.erase (p);
+			if (auto p = module_ptrs.find (&mli->module()); p != module_ptrs.end())
+			{
+				// Remove from the list existing module, so that at the end module_ptrs will only contain new modules:
+				module_ptrs.erase (p);
+			}
+			else
+				delete _list->invisibleRootItem()->takeChild (ci--);
 		}
-		else
-			delete _list->invisibleRootItem()->takeChild (ci--);
 	}
 
+	// Add new modules:
 	for (auto p: module_ptrs)
-		_list->addTopLevelItem (new ModulesListItem (p, _module_manager, _list));
+		_list->addTopLevelItem (new ModulesListItem (*p, _list));
 }
 
 
@@ -115,8 +112,9 @@ ModulesList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
 	if (current)
 	{
 		ModulesListItem* mli = dynamic_cast<ModulesListItem*> (current);
+
 		if (mli)
-			emit module_selected (mli->module_pointer());
+			emit module_selected (mli->module());
 	}
 	else
 		emit none_selected();
