@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -33,6 +34,23 @@ class Xefis;
 
 
 /**
+ * Airframe definition object.
+ */
+struct AirframeDefinition
+{
+	Flaps			flaps;
+	Spoilers		spoilers;
+	Lift			lift;
+	Drag			drag;
+
+	si::Area		wings_area;
+	si::Length		wing_chord;
+	Range<double>	load_factor_limits;
+	si::Angle		safe_aoa_correction;
+};
+
+
+/**
  * Contains submodules that describe an airframe.
  */
 class Airframe
@@ -40,7 +58,7 @@ class Airframe
   public:
 	// Ctor
 	explicit
-	Airframe (Xefis*, QDomElement const& config);
+	Airframe (AirframeDefinition);
 
   public:
 	Flaps const&
@@ -128,51 +146,36 @@ class Airframe
 	load_factor_limits() const;
 
   private:
-	Unique<Flaps>		_flaps;
-	Unique<Spoilers>	_spoilers;
-	Unique<Lift>		_lift;
-	Unique<Drag>		_drag;
+	AirframeDefinition	_definition;
 	Range<Angle>		_defined_aoa_range;
-	Area				_wings_area;
-	Length				_wings_chord;
-	Range<double>		_load_factor_limits;
-	Angle				_safe_aoa_correction;
 };
 
 
 inline Flaps const&
 Airframe::flaps() const
 {
-	if (!_flaps)
-		throw BadConfiguration ("flaps submodule not configured");
-	return *_flaps;
+	return _definition.flaps;
 }
 
 
 inline Spoilers const&
 Airframe::spoilers() const
 {
-	if (!_spoilers)
-		throw BadConfiguration ("spoilers submodule not configured");
-	return *_spoilers;
+	return _definition.spoilers;
 }
 
 
 inline Lift const&
 Airframe::lift() const
 {
-	if (!_lift)
-		throw BadConfiguration ("lift submodule not configured");
-	return *_lift;
+	return _definition.lift;
 }
 
 
 inline Drag const&
 Airframe::drag() const
 {
-	if (!_drag)
-		throw BadConfiguration ("drag submodule not configured");
-	return *_drag;
+	return _definition.drag;
 }
 
 
@@ -186,28 +189,28 @@ Airframe::get_defined_aoa_range() const noexcept
 inline Area
 Airframe::wings_area() const
 {
-	return _wings_area;
+	return _definition.wings_area;
 }
 
 
 inline Length
 Airframe::wings_chord() const
 {
-	return _wings_chord;
+	return _definition.wing_chord;
 }
 
 
 inline Angle
 Airframe::safe_aoa_correction() const
 {
-	return _safe_aoa_correction;
+	return _definition.safe_aoa_correction;
 }
 
 
 inline Range<double>
 Airframe::load_factor_limits() const
 {
-	return _load_factor_limits;
+	return _definition.load_factor_limits;
 }
 
 } // namespace xf
