@@ -432,6 +432,7 @@ XEFIS_HEADERS			+= xefis/utility/range_smoother.h
 XEFIS_HEADERS			+= xefis/utility/semaphore.h
 XEFIS_HEADERS			+= xefis/utility/sequence.h
 XEFIS_HEADERS			+= xefis/utility/smoother.h
+XEFIS_HEADERS			+= xefis/utility/span.h
 XEFIS_HEADERS			+= xefis/utility/string.h
 XEFIS_HEADERS			+= xefis/utility/strong_type.h
 XEFIS_HEADERS			+= xefis/utility/synchronized.h
