@@ -96,13 +96,6 @@ class ProcessingLoop: public QObject
 	execute_cycle();
 
   private:
-	void
-	compatibility_input(); // XXX
-
-	void
-	compatibility_output(); // XXX
-
-  private:
 	Machine*								_machine;
 	Xefis*									_xefis;
 	QTimer*									_loop_timer;

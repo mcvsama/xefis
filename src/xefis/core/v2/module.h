@@ -57,7 +57,7 @@ class BasicModule: private Noncopyable
 	  public:
 		// Ctor
 		explicit
-		ProcessingLoopAPI (BasicModule*);
+		ProcessingLoopAPI (BasicModule&);
 
 		/**
 		 * Request all connected input properties to be computed, and then
@@ -74,7 +74,7 @@ class BasicModule: private Noncopyable
 		reset_cache();
 
 	  private:
-		BasicModule* _module;
+		BasicModule& _module;
 	};
 
 	/**
@@ -178,7 +178,7 @@ template<class IO = ModuleIO>
 
 
 inline
-BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule* module):
+BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule& module):
 	_module (module)
 { }
 
@@ -186,7 +186,7 @@ BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule* module):
 inline void
 BasicModule::ProcessingLoopAPI::reset_cache()
 {
-	_module->_cached = false;
+	_module._cached = false;
 }
 
 

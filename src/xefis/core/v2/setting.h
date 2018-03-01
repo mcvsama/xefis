@@ -175,7 +175,7 @@ template<class V>
 		BasicSetting (owner, name),
 		_required (true)
 	{
-		ModuleIO::ProcessingLoopAPI (owner).register_setting (this);
+		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
 
 
@@ -186,7 +186,7 @@ template<class V>
 		_value (std::forward<Value> (initial_value)),
 		_required (true)
 	{
-		ModuleIO::ProcessingLoopAPI (owner).register_setting (this);
+		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
 
 
@@ -196,7 +196,7 @@ template<class V>
 		BasicSetting (owner, name),
 		_required (false)
 	{
-		ModuleIO::ProcessingLoopAPI (owner).register_setting (this);
+		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
 
 

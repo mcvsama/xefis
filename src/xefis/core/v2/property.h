@@ -483,7 +483,7 @@ template<class pValue>
 		fetch (Cycle const&) override;
 
 	  private:
-		std::variant<std::nullptr_t, ModuleIO*, PropertyOut<Value>*> _data_source = nullptr;
+		std::variant<std::monostate, ModuleIO*, PropertyOut<Value>*> _data_source = std::monostate();
 	};
 
 
@@ -755,7 +755,7 @@ template<class V>
 	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path):
 		Property<V> (owner, path)
 	{
-		ModuleIO::ProcessingLoopAPI (this->io()).register_input_property (this);
+		ModuleIO::ProcessingLoopAPI (*this->io()).register_input_property (*this);
 	}
 
 
@@ -772,7 +772,7 @@ template<class V>
 	inline
 	PropertyIn<V>::~PropertyIn()
 	{
-		ModuleIO::ProcessingLoopAPI (this->io()).unregister_input_property (this);
+		ModuleIO::ProcessingLoopAPI (*this->io()).unregister_input_property (*this);
 	}
 
 
@@ -856,7 +856,7 @@ template<class V>
 	inline void
 	PropertyOut<V>::operator<< (std::nullptr_t)
 	{
-		_data_source = nullptr;
+		_data_source = std::monostate();
 	}
 
 
@@ -875,7 +875,7 @@ template<class V>
 		// TODO measure how often is this called for real-aircraft config,
 		// perhaps add a flag that the result is cached in current processing-loop.
 		std::visit (xf::overload {
-			[&] (std::nullptr_t) {
+			[&] (std::monostate) {
 				this->set_nil();
 			},
 			[&] (ModuleIO* data_source) {

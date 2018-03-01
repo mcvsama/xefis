@@ -44,7 +44,7 @@ void
 ProcessingLoop::start()
 {
 	for (auto* module: _uninitialized_modules)
-		ModuleIO::ProcessingLoopAPI (module->io_base()).verify_settings();
+		ModuleIO::ProcessingLoopAPI (*module->io_base()).verify_settings();
 
 	for (auto* module: _uninitialized_modules)
 		module->initialize();
@@ -89,11 +89,11 @@ ProcessingLoop::execute_cycle()
 	// TODO make lists of connected v1 and v2 properties
 
 	for (auto& module: _modules)
-		BasicModule::ProcessingLoopAPI (module.get()).reset_cache();
+		BasicModule::ProcessingLoopAPI (*module.get()).reset_cache();
 
 	// TODO module accounting
 	for (auto& module: _modules)
-		BasicModule::ProcessingLoopAPI (module.get()).fetch_and_process (cycle);
+		BasicModule::ProcessingLoopAPI (*module.get()).fetch_and_process (cycle);
 
 	_previous_timestamp = t;
 }
