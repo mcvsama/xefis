@@ -219,6 +219,7 @@ XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc
 
 ######## /xefis/core ########
 
+XEFIS_HEADERS_MOC		+= xefis/core/v2/accounting.h
 XEFIS_HEADERS			+= xefis/core/v2/cycle.h
 XEFIS_HEADERS			+= xefis/core/v2/instrument.h
 XEFIS_HEADERS			+= xefis/core/v2/machine.h
@@ -242,6 +243,7 @@ XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
+XEFIS_SOURCES			+= xefis/core/v2/accounting.cc
 XEFIS_SOURCES			+= xefis/core/v2/machine.cc
 XEFIS_SOURCES			+= xefis/core/v2/module.cc
 XEFIS_SOURCES			+= xefis/core/v2/module_io.cc
