@@ -218,8 +218,9 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline std::optional<typename Datatable2D<A, V>::Value>
+	inline auto
 	Datatable2D<A, V>::value (Argument const& argument) const noexcept
+		-> std::optional<Value>
 	{
 		// Outside of domain?
 		if (argument < _data_map.begin()->first ||
@@ -233,8 +234,9 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Value
+	inline auto
 	Datatable2D<A, V>::extrapolated_value (Argument const& argument) const noexcept
+		-> Value
 	{
 		if (_data_map.size() == 1)
 			return _data_map.begin()->second;
@@ -259,31 +261,35 @@ template<class A, class V>
 
 template<class A, class V>
 	inline auto
-	Datatable2D<A, V>::operator() (Argument const& argument) const noexcept -> Value
+	Datatable2D<A, V>::operator() (Argument const& argument) const noexcept
+		-> Value
 	{
 		return extrapolated_value (argument);
 	}
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Point
+	inline auto
 	Datatable2D<A, V>::min_argument() const noexcept
+		-> Point
 	{
 		return { _data_map.begin()->first, _data_map.begin()->second };
 	}
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Point
+	inline auto
 	Datatable2D<A, V>::max_argument() const noexcept
+		-> Point
 	{
 		return { _data_map.rbegin()->first, _data_map.rbegin()->second };
 	}
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Point
+	inline auto
 	Datatable2D<A, V>::min_value() const noexcept
+		-> Point
 	{
 		if (!_cached_min_value)
 		{
@@ -299,8 +305,9 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Point
+	inline auto
 	Datatable2D<A, V>::max_value() const noexcept
+		-> Point
 	{
 		if (!_cached_max_value)
 		{
@@ -316,32 +323,36 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline Range<typename Datatable2D<A, V>::Argument>
+	inline auto
 	Datatable2D<A, V>::domain() const noexcept
+		-> Range<Argument>
 	{
 		return { min_argument().argument, max_argument().argument };
 	}
 
 
 template<class A, class V>
-	inline Range<typename Datatable2D<A, V>::Value>
+	inline auto
 	Datatable2D<A, V>::codomain() const noexcept
+		-> Range<Value>
 	{
 		return { min_value().value, max_value().value };
 	}
 
 
 template<class A, class V>
-	inline std::vector<typename Datatable2D<A, V>::Point>
+	inline auto
 	Datatable2D<A, V>::arguments (Value const& value) const
+		-> std::vector<Point>
 	{
 		return arguments (value, domain());
 	}
 
 
 template<class A, class V>
-	inline std::vector<typename Datatable2D<A, V>::Point>
+	inline auto
 	Datatable2D<A, V>::arguments (Value const& value, Range<Argument> search_domain) const
+		-> std::vector<Point>
 	{
 		if (_data_map.size() >= 2)
 		{
@@ -390,16 +401,18 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Value
+	inline auto
 	Datatable2D<A, V>::average() const
+		-> Value
 	{
 		return average (domain());
 	}
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Value
+	inline auto
 	Datatable2D<A, V>::average (Range<Argument> search_domain) const
+		-> Value
 	{
 		if (_data_map.size() > 1)
 		{
@@ -473,8 +486,9 @@ template<class A, class V>
 
 
 template<class A, class V>
-	inline typename Datatable2D<A, V>::Value
+	inline auto
 	Datatable2D<A, V>::in_domain_value (Argument const& argument) const noexcept
+		-> Value
 	{
 		auto range = extended_adjacent_find (_data_map.begin(), _data_map.end(), argument,
 											 [](auto pair) { return pair.first; });
