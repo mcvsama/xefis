@@ -63,7 +63,7 @@ ModuleIO::ProcessingLoopAPI::verify_settings()
 {
 	std::vector<BasicSetting*> uninitialized_settings;
 
-	for (auto* setting: _io->_registered_settings)
+	for (auto* setting: _io._registered_settings)
 	{
 		if (!*setting)
 			uninitialized_settings.push_back (setting);
@@ -72,54 +72,51 @@ ModuleIO::ProcessingLoopAPI::verify_settings()
 	if (!uninitialized_settings.empty())
 		throw module_io::UninitializedSettings (uninitialized_settings);
 
-	_io->verify_settings();
+	_io.verify_settings();
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::register_setting (BasicSetting* setting)
+ModuleIO::ProcessingLoopAPI::register_setting (BasicSetting& setting)
 {
-	_io->_registered_settings.push_back (setting);
+	_io._registered_settings.push_back (&setting);
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::register_input_property (BasicPropertyIn* property)
+ModuleIO::ProcessingLoopAPI::register_input_property (BasicPropertyIn& property)
 {
-	_io->_registered_input_properties.push_back (property);
+	_io._registered_input_properties.push_back (&property);
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::unregister_input_property (BasicPropertyIn* property)
+ModuleIO::ProcessingLoopAPI::unregister_input_property (BasicPropertyIn& property)
 {
-	auto new_end = std::remove (_io->_registered_input_properties.begin(), _io->_registered_input_properties.end(), property);
-	_io->_registered_input_properties.resize (new_end - _io->_registered_input_properties.begin());
+	auto new_end = std::remove (_io._registered_input_properties.begin(), _io._registered_input_properties.end(), &property);
+	_io._registered_input_properties.resize (new_end - _io._registered_input_properties.begin());
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::register_output_property (BasicPropertyOut* property)
+ModuleIO::ProcessingLoopAPI::register_output_property (BasicPropertyOut& property)
 {
-	_io->_registered_output_properties.push_back (property);
+	_io._registered_output_properties.push_back (&property);
 }
 
 
 void
-ModuleIO::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut* property)
+ModuleIO::ProcessingLoopAPI::unregister_output_property (BasicPropertyOut& property)
 {
-	auto new_end = std::remove (_io->_registered_output_properties.begin(), _io->_registered_output_properties.end(), property);
-	_io->_registered_output_properties.resize (new_end - _io->_registered_output_properties.begin());
+	auto new_end = std::remove (_io._registered_output_properties.begin(), _io._registered_output_properties.end(), &property);
+	_io._registered_output_properties.resize (new_end - _io._registered_output_properties.begin());
 }
 
 
 std::string
 identifier (ModuleIO& io)
 {
-	BasicModule* module = io.module();
-	std::string module_name = module ? identifier (*module) : "<no module associated with the IO object>";
-
-	return demangle (typeid (io)) + " of " + module_name;
+	return demangle (typeid (io)) + " of " + identifier (io.module());
 }
 
 

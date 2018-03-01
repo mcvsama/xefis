@@ -30,14 +30,14 @@ namespace v2 {
 void
 BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
-	if (!_module->_cached)
+	if (!_module._cached)
 	{
-		_module->_cached = true;
+		_module._cached = true;
 
-		for (auto* prop: _module->io_base()->_registered_input_properties)
+		for (auto* prop: _module.io_base()->_registered_input_properties)
 			prop->fetch (cycle);
 
-		_module->process (cycle);
+		_module.process (cycle);
 	}
 }
 
@@ -46,8 +46,8 @@ BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string const& insta
 	_instance (instance),
 	_io (std::move (io))
 {
-	auto api = ModuleIO::ProcessingLoopAPI (_io.get());
-	api.set_module (this);
+	auto api = ModuleIO::ProcessingLoopAPI (*_io.get());
+	api.set_module (*this);
 	api.verify_settings();
 }
 

@@ -88,13 +88,13 @@ class ModuleIO
 	  public:
 		// Ctor
 		explicit
-		ProcessingLoopAPI (ModuleIO*);
+		ProcessingLoopAPI (ModuleIO&);
 
 		/**
 		 * Set reference to the module object.
 		 */
 		void
-		set_module (BasicModule*);
+		set_module (BasicModule&);
 
 		/**
 		 * Iterate through registered settings and check that ones without default value have been initialized by user.
@@ -108,41 +108,41 @@ class ModuleIO
 		 * Register setting.
 		 */
 		void
-		register_setting (BasicSetting*);
+		register_setting (BasicSetting&);
 
 		/**
 		 * Register an input property with this module.
 		 */
 		void
-		register_input_property (BasicPropertyIn*);
+		register_input_property (BasicPropertyIn&);
 
 		/**
 		 * Unregister an input property.
 		 */
 		void
-		unregister_input_property (BasicPropertyIn*);
+		unregister_input_property (BasicPropertyIn&);
 
 		/**
 		 * Register an output property with this module.
 		 */
 		void
-		register_output_property (BasicPropertyOut*);
+		register_output_property (BasicPropertyOut&);
 
 		/**
 		 * Unregister an output property.
 		 */
 		void
-		unregister_output_property (BasicPropertyOut*);
+		unregister_output_property (BasicPropertyOut&);
 
 	  private:
-		ModuleIO* _io;
+		ModuleIO& _io;
 	};
 
   public:
 	/**
 	 * Return reference to the module that uses this ModuleIO object.
 	 */
-	BasicModule*
+	BasicModule&
 	module() const noexcept;
 
 	/**
@@ -161,22 +161,22 @@ class ModuleIO
 
 
 inline
-ModuleIO::ProcessingLoopAPI::ProcessingLoopAPI (ModuleIO* io):
+ModuleIO::ProcessingLoopAPI::ProcessingLoopAPI (ModuleIO& io):
 	_io (io)
 { }
 
 
 inline void
-ModuleIO::ProcessingLoopAPI::set_module (BasicModule* module)
+ModuleIO::ProcessingLoopAPI::set_module (BasicModule& module)
 {
-	_io->_module = module;
+	_io._module = &module;
 }
 
 
-inline BasicModule*
+inline BasicModule&
 ModuleIO::module() const noexcept
 {
-	return _module;
+	return *_module;
 }
 
 
