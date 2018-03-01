@@ -74,8 +74,6 @@ InstrumentAids::update_sizes (QSize const& size, QSize const& window_size)
 	_w = size.width();
 	_h = size.height();
 	_rect = QRectF (QPointF (0.0, 0.0), size);
-	_window_w = window_size.width();
-	_window_h = window_size.height();
 
 	float const font_height_scale_factor = 0.7f;
 

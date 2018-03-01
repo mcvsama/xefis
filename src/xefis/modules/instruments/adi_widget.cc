@@ -1633,17 +1633,17 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 	{
 		painter.setClipping (false);
 		float posy = -2.f * y * scale_energy_variometer (_params.energy_variometer_rate);
-		float x = pen_width (2.0);
+		float pw = pen_width (2.0);
 		painter.setPen (QPen (_navigation_color, pen_width (1.0)));
 		painter.setBrush (_navigation_color);
 		QPolygonF rhomb = QPolygonF()
-			<< QPointF (0.f, +1.5f * x)
-			<< QPointF (-x, 0.f)
-			<< QPointF (0.f, -1.5f * x)
-			<< QPointF (+x, 0.f)
-			<< QPointF (0.f, +1.5f * x);
+			<< QPointF (0.f, +1.5f * pw)
+			<< QPointF (-pw, 0.f)
+			<< QPointF (0.f, -1.5f * pw)
+			<< QPointF (+pw, 0.f)
+			<< QPointF (0.f, +1.5f * pw);
 		painter.add_shadow ([&] {
-			painter.drawPolyline (rhomb.translated (1.25f * x, posy));
+			painter.drawPolyline (rhomb.translated (1.25f * pw, posy));
 		});
 	}
 
@@ -2614,10 +2614,10 @@ ADIWidget::PaintWorkUnit::paint_rotating_digit (xf::Painter& painter,
 								  QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
 								  bool two_zeros, bool zero_mark, bool black_zero)
 {
-	auto round_to = [] (float value, int to) -> float
+	auto round_to = [](float v, int to) -> float
 	{
-		float sgn = value >= 0.f ? +1.f : -1.f;
-		return static_cast<int> (value + sgn * to / 2.f) / to * to;
+		float sgn = v >= 0.f ? +1.f : -1.f;
+		return static_cast<int> (v + sgn * to / 2.f) / to * to;
 	};
 
 	float rounded = round_to (value + phase, round_target);

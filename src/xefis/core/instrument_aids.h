@@ -98,12 +98,6 @@ class InstrumentAids
 	float
 	wh() const;
 
-	/**
-	 * Return lesser dimension of the top-level window.
-	 */
-	float
-	win_wh() const;
-
 	QPen
 	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin) const;
 
@@ -160,8 +154,6 @@ class InstrumentAids
 	QPen					_autopilot_pen_2;
 	float					_w						= 0.f;
 	float					_h						= 0.f;
-	float					_window_w				= 0.f;
-	float					_window_h				= 0.f;
 	QRectF					_rect;
 
 	static const char		DIGITS[10];
@@ -195,13 +187,6 @@ inline float
 InstrumentAids::wh() const
 {
 	return std::min (_height_for_width * _w, _h);
-}
-
-
-inline float
-InstrumentAids::win_wh() const
-{
-	return std::min (_window_w, _window_h);
 }
 
 
