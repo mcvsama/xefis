@@ -269,14 +269,6 @@ SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
 XEFIS_HEADERS			+= xefis/support/air/air.h
 XEFIS_HEADERS			+= xefis/support/air/wind_triangle.h
 
-######## /xefis/support/bus ########
-
-XEFIS_HEADERS			+= xefis/support/bus/i2c.h
-XEFIS_HEADERS_MOC		+= xefis/support/bus/serial_port.h
-
-XEFIS_SOURCES			+= xefis/support/bus/i2c.cc
-XEFIS_SOURCES			+= xefis/support/bus/serial_port.cc
-
 ######## /xefis/support/airframe ########
 
 XEFIS_HEADERS			+= xefis/support/airframe/airframe.h
@@ -290,6 +282,14 @@ XEFIS_SOURCES			+= xefis/support/airframe/airframe.cc
 XEFIS_SOURCES			+= xefis/support/airframe/drag.cc
 XEFIS_SOURCES			+= xefis/support/airframe/lift.cc
 XEFIS_SOURCES			+= xefis/support/airframe/lift_mod.cc
+
+######## /xefis/support/bus ########
+
+XEFIS_HEADERS			+= xefis/support/bus/i2c.h
+XEFIS_HEADERS_MOC		+= xefis/support/bus/serial_port.h
+
+XEFIS_SOURCES			+= xefis/support/bus/i2c.cc
+XEFIS_SOURCES			+= xefis/support/bus/serial_port.cc
 
 ######## /xefis/support/devices ########
 
@@ -324,6 +324,12 @@ XEFIS_SOURCES			+= xefis/support/protocols/nmea/gps.cc
 XEFIS_SOURCES			+= xefis/support/protocols/nmea/mtk.cc
 XEFIS_SOURCES			+= xefis/support/protocols/nmea/nmea.cc
 XEFIS_SOURCES			+= xefis/support/protocols/nmea/parser.cc
+
+######## /xefis/support/qt ########
+
+XEFIS_HEADERS			+= xefis/support/qt/ownership_breaker.h
+
+XEFIS_SOURCES			+= xefis/support/qt/ownership_breaker.cc
 
 ######## /xefis/support/system ########
 
