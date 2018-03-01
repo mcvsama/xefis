@@ -4,6 +4,9 @@
 ######## /xefis/modules/helpers ########
 
 XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/helpers/sound.h
+
+#XEFIS_SOURCES			+= xefis/modules/helpers/sound.cc
 
 ######## /xefis/modules/instruments ########
 
