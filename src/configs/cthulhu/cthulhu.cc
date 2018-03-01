@@ -31,6 +31,7 @@
 #include <xefis/support/bus/i2c.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/devices/ht16k33.h>
+#include <xefis/utility/qdom.h>
 
 // Local:
 #include "cthulhu.h"
@@ -52,60 +53,6 @@ class WarthogStick: public JoystickInput
 };
 
 
-// TODO temp
-class DummyModule: public v2::Module
-{
-  public:
-	v2::PropertyOut<int64_t>	output_int	{ this, "/output/int" };
-	v2::PropertyIn<int64_t>		input_int	{ this, "/input/int" };
-
-  public:
-	DummyModule()
-	{ }
-
-	virtual void
-	process (v2::Cycle const&) override
-	{
-		if (output_int.is_nil())
-			output_int = 0;
-
-		if (input_int.valid())
-			output_int = *input_int + 1;
-
-		//std::cout << "DummyModule::process(" << input_int.value_or (-1) << ") -> " << *output_int << "\n";
-	}
-};
-
-
-// TODO temp
-class TempModule: public v2::Module
-{
-  public:
-	v2::PropertyOut<int64_t>	output_int		{ this, "/output/int" };
-	v2::PropertyIn<int64_t>		input_int		{ this, "/input/int" };
-	v2::PropertyIn<Temperature>	temperature_in	{ this, "/input/temperature" };
-
-  public:
-	TempModule()
-	{ }
-
-	virtual void
-	process (v2::Cycle const&) override
-	{
-		if (output_int.is_nil())
-			output_int = 0;
-
-		if (input_int.valid())
-			output_int = *input_int + 1;
-
-		//std::cout << "TempModule::process(" << input_int.value_or (-1) << ") -> " << *output_int << "\n";
-	}
-};
-
-
-TempModule* g_temp_module = nullptr;
-
-
 class MyLoop: public v2::ProcessingLoop
 {
   public:
@@ -115,52 +62,9 @@ class MyLoop: public v2::ProcessingLoop
 	execute_cycle() override
 	{
 		ProcessingLoop::execute_cycle();
-		std::cout << "CYCLE\n";
-
-		if (g_temp_module && g_temp_module->temperature_in.valid())
-			std::cout << "TEMP: " << *g_temp_module->temperature_in << "\n";
 	}
 };
 
-
-namespace xf {
-
-//TODO move to qdom or whatever (utility/xml)
-/**
- * Parse XML document and return QDomDocument.
- */
-QDomDocument
-load_xml_doc (QFile&& xml_file)
-{
-	QDomDocument doc;
-	std::string path = xml_file.fileName().toStdString();
-
-	if (!xml_file.exists())
-		throw BadConfiguration ("file not found: " + path);
-
-	if (!xml_file.open (QFile::ReadOnly))
-		throw BadConfiguration ("file access error: " + path);
-
-	if (!doc.setContent (&xml_file, true))
-		throw BadConfiguration ("config parse error: " + path);
-
-	return doc;
-}
-
-
-/**
- * Just like load_xml_doc, except it returns the document element of the doc,
- * not QDomDocument.
- */
-QDomElement
-load_xml (QFile&& xml_file)
-{
-	return load_xml_doc (std::forward<QFile> (xml_file)).documentElement();
-}
-
-} // namespace xf
-
-xf::i2c::Device g_i2c_device;
 
 Cthulhu::Cthulhu (xf::Xefis* xefis):
 	Machine (xefis)
@@ -174,8 +78,6 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 	flaps_control->setting_control_extents = { 0.0, 0.5 };
 	auto* adc = loop->load_module<AirDataComputer> (&airframe);
 	auto* afcs = loop->load_module<AFCS>();
-	auto* dummy_module = loop->load_module<DummyModule>();
-	auto* temp_module = loop->load_module<TempModule>();
 	auto* mixer = loop->load_module<Mixer<si::Angle>> ("mixer");
 
 	xf::SerialPort::Configuration chrum6_sp_config;
@@ -221,13 +123,6 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 	auto* joystick_input = loop->load_module<WarthogStick> (joystick_config, "stick");
 	auto* throttle_input = loop->load_module<JoystickInput> (throttle_config, "throttle");
 	auto* pedals_input = loop->load_module<JoystickInput> (pedals_config, "pedals");
-
-	g_temp_module = temp_module;
-
-	dummy_module->output_int >> temp_module->input_int;
-	dummy_module->input_int << temp_module->output_int;
-
-	temp_module->temperature_in << xf::Property<Temperature> (xf::PropertyPath ("/sensors/air-temperature/total"));
 
 	loop->start();
 }
