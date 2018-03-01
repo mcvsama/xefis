@@ -39,7 +39,7 @@ class HMAC
   public:
 	// Ctor
 	explicit
-	HMAC (Key const& key, Blob const& message);
+	HMAC (Key const& key, Blob const& message, Hash::Algorithm);
 
 	/**
 	 * Return the HMAC.
@@ -65,16 +65,16 @@ class HMAC
 
 
 inline
-HMAC::HMAC (Key const& pkey, Blob const& message)
+HMAC::HMAC (Key const& pkey, Blob const& message, Hash::Algorithm algorithm)
 {
-	Hash h1;
-	Hash h2;
+	Hash h1 (algorithm);
+	Hash h2 (algorithm);
 	Blob key = *pkey;
 
 	auto const block_size = h1.block_size();
 
 	if (key.size() > block_size)
-		key = Hash (key).result();
+		key = hash (algorithm, key);
 
 	if (key.size() < block_size)
 		key.resize (block_size, 0);
@@ -91,11 +91,9 @@ HMAC::HMAC (Key const& pkey, Blob const& message)
 
 	ipad.insert (ipad.end(), message.begin(), message.end());
 	h1.update (ipad);
-	h1.finalize();
-	opad.insert (opad.end(), h1.begin(), h1.end());
+	auto h1_result = h1.result();
+	opad.insert (opad.end(), h1_result.begin(), h1_result.end());
 	h2.update (opad);
-	h2.finalize();
-
 	_result = h2.result();
 }
 
