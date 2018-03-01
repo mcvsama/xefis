@@ -27,47 +27,10 @@
 
 namespace xf {
 
-Airframe::Airframe (Xefis*, QDomElement const& config)
+Airframe::Airframe (AirframeDefinition definition):
+	_definition (definition)
 {
-	QDomElement settings_element;
-
-	if (!config.isNull())
-	{
-		for (QDomElement const& e: xf::iterate_sub_elements (config))
-		{
-			if (e == "flaps")
-				_flaps = std::make_unique<Flaps> (e);
-			else if (e == "spoilers")
-				_spoilers = std::make_unique<Spoilers> (e);
-			else if (e == "lift")
-				_lift = std::make_unique<Lift> (e);
-			else if (e == "drag")
-				_drag = std::make_unique<Drag> (e);
-			else if (e == "settings")
-				settings_element = e;
-		}
-
-		if (settings_element.isNull())
-			throw MissingDomElement (config, "settings");
-		else
-		{
-			double min_g;
-			double max_g;
-
-			v1::ConfigReader::SettingsParser settings_parser ({
-				{ "wings-area", _wings_area, true },
-				{ "wings-chord", _wings_chord, true },
-				{ "max-negative-load-factor", min_g, true },
-				{ "max-positive-load-factor", max_g, true },
-				{ "safe-aoa-correction", _safe_aoa_correction, true },
-			});
-			settings_parser.parse (settings_element);
-
-			_load_factor_limits = { min_g, max_g };
-		}
-
-		_defined_aoa_range = lift().get_aoa_range().extended (drag().get_aoa_range());
-	}
+	_defined_aoa_range = lift().get_aoa_range().extended (drag().get_aoa_range());
 }
 
 
@@ -99,7 +62,7 @@ Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&
 		return *normal_aoa - flaps_aoa_correction - spoilers_aoa_correction;
 	}
 	else
-		return { };
+		return std::nullopt;
 }
 
 
