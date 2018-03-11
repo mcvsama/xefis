@@ -53,7 +53,7 @@ temperature_to_dynamic_viscosity()
 		{ 1500_degF, 455.050e-7_Pas },
 	};
 
-	static xf::Datatable2D<si::Temperature, si::DynamicViscosity>> const
+	static xf::Datatable2D<si::Temperature, si::DynamicViscosity> const
 	temperature_to_dynamic_viscosity { std::move (temperature_to_dynamic_viscosity_map) };
 
 	return temperature_to_dynamic_viscosity;

@@ -26,22 +26,22 @@
 #include <xefis/utility/types.h>
 
 
-class LabelIO: public v2::ModuleIO
+class LabelIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<xf::FontSize>	font_size	{ this, "font_size", xf::FontSize (10.0) };
-	v2::Setting<QString>		label		{ this, "label" };
-	v2::Setting<QColor>			color		{ this, "color", Qt::white };
-	v2::Setting<Qt::Alignment>	alignment	{ this, "alignment", Qt::AlignVCenter | Qt::AlignHCenter };
+	xf::Setting<xf::FontSize>	font_size	{ this, "font_size", xf::FontSize (10.0) };
+	xf::Setting<QString>		label		{ this, "label" };
+	xf::Setting<QColor>			color		{ this, "color", Qt::white };
+	xf::Setting<Qt::Alignment>	alignment	{ this, "alignment", Qt::AlignVCenter | Qt::AlignHCenter };
 };
 
 
 class Label:
-	public v2::Instrument<LabelIO>,
+	public xf::Instrument<LabelIO>,
 	protected xf::InstrumentAids
 {
   public:

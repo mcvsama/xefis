@@ -23,7 +23,7 @@
 #include <xefis/core/xefis.h>
 
 
-class Cthulhu: public v2::Machine
+class Cthulhu: public xf::Machine
 {
   public:
 	// Ctor

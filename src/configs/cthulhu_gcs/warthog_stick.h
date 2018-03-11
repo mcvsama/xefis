@@ -29,9 +29,9 @@ class WarthogStick: public JoystickInput
 	 * Output
 	 */
 
-	v2::PropertyOut<double>&	pitch_axis	= axis (3);
-	v2::PropertyOut<double>&	roll_axis	= axis (4);
-	v2::PropertyOut<bool>&		fire_button	= button (5);
+	xf::PropertyOut<double>&	pitch_axis	= axis (3);
+	xf::PropertyOut<double>&	roll_axis	= axis (4);
+	xf::PropertyOut<bool>&		fire_button	= button (5);
 
   public:
 	using JoystickInput::JoystickInput;

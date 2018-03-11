@@ -54,7 +54,7 @@ ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::WorkPerformer& work_performer, 
 
 
 void
-ADI::process (v2::Cycle const& cycle)
+ADI::process (xf::Cycle const& cycle)
 {
 	_fpv_computer.process (cycle.update_time());
 
@@ -269,8 +269,8 @@ ADI::process (v2::Cycle const& cycle)
 void
 ADI::compute_fpv()
 {
-	v2::PropertyIn<si::Angle>* heading = nullptr;
-	v2::PropertyIn<si::Angle>* track_lateral = nullptr;
+	xf::PropertyIn<si::Angle>* heading = nullptr;
+	xf::PropertyIn<si::Angle>* track_lateral = nullptr;
 
 	if (io.orientation_heading_magnetic && io.track_lateral_magnetic)
 	{

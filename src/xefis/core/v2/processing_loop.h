@@ -30,7 +30,7 @@ namespace xf { // XXX
 	class Xefis;
 }
 
-namespace v2 {
+namespace xf {
 
 class Machine;
 
@@ -43,8 +43,8 @@ class ProcessingLoop: public QObject
 	Q_OBJECT
 
   public:
-	v2::PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
-	v2::PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
+	xf::PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
+	xf::PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
 
   public:
 	// Ctor
@@ -101,7 +101,7 @@ class ProcessingLoop: public QObject
 	QTimer*									_loop_timer;
 	Time									_loop_period			= 0.01_s;
 	std::optional<Timestamp>				_previous_timestamp;
-	std::vector<Unique<v2::BasicModule>>	_modules;
+	std::vector<Unique<xf::BasicModule>>	_modules;
 	std::vector<BasicModule*>				_uninitialized_modules;
 };
 
@@ -133,7 +133,7 @@ ProcessingLoop::xefis() const noexcept
 	return _xefis;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

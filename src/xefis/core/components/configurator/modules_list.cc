@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <set>
 
 // Qt:
 #include <QtWidgets/QLayout>
@@ -29,7 +30,7 @@
 
 namespace xf {
 
-ModulesList::ModulesList (v2::Machine& machine, QWidget* parent):
+ModulesList::ModulesList (xf::Machine& machine, QWidget* parent):
 	QWidget (parent),
 	_machine (machine)
 {
@@ -80,7 +81,7 @@ ModulesList::deselect()
 void
 ModulesList::read()
 {
-	std::set<v2::BasicModule*> module_ptrs;
+	std::set<xf::BasicModule*> module_ptrs;
 
 	// TODO add new top-level item representing a ProcessingLoop
 	// TODO fill module_ptrs

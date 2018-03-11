@@ -28,7 +28,7 @@ using namespace test_asserts;
 using namespace si::units;
 
 
-static xf::RuntimeTest t_1 ("unfinished v2::Property test", []{
+static xf::RuntimeTest t_1 ("unfinished xf::Property test", []{
 	// TODO
 });
 

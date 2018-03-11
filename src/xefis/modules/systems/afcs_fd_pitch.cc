@@ -70,7 +70,7 @@ AFCS_FD_Pitch::initialize()
 
 
 void
-AFCS_FD_Pitch::process (v2::Cycle const& cycle)
+AFCS_FD_Pitch::process (xf::Cycle const& cycle)
 {
 	_pitch_computer.process (cycle.update_time());
 	check_autonomous();
@@ -179,8 +179,8 @@ AFCS_FD_Pitch::compute_pitch()
 template<class Input, class Control>
 	std::optional<si::Angle>
 	AFCS_FD_Pitch::compute_pitch (xf::PIDControl<Input, Control>& pid,
-								  v2::PropertyIn<Input> const& cmd_param,
-								  v2::PropertyIn<Input> const& measured_param,
+								  xf::PropertyIn<Input> const& cmd_param,
+								  xf::PropertyIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
 		xf::Range<si::Angle> pitch_limits { -*io.pitch_limits, +*io.pitch_limits };

@@ -25,8 +25,7 @@
 #include <xefis/config/all.h>
 
 
-namespace v2 {
-using namespace xf; // XXX
+namespace xf {
 
 class Window: public QWidget
 {
@@ -80,7 +79,7 @@ Window::instruments_panel() const noexcept
 	return _instruments_panel;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

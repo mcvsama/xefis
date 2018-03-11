@@ -28,25 +28,25 @@
 #include <xefis/support/bus/i2c.h>
 
 
-class BMP085_IO: public v2::ModuleIO
+class BMP085_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<xf::i2c::Bus::ID>		i2c_bus						{ this, "i2c_bus" };
-	v2::Setting<xf::i2c::Address::ID>	i2c_address					{ this, "i2c_address" };
-	v2::Setting<si::Time>				temperature_update_interval	{ this, "temperature_update_interval", 500_ms };
-	v2::Setting<si::Time>				pressure_update_interval	{ this, "pressure_update_interval", 50_ms };
+	xf::Setting<xf::i2c::Bus::ID>		i2c_bus						{ this, "i2c_bus" };
+	xf::Setting<xf::i2c::Address::ID>	i2c_address					{ this, "i2c_address" };
+	xf::Setting<si::Time>				temperature_update_interval	{ this, "temperature_update_interval", 500_ms };
+	xf::Setting<si::Time>				pressure_update_interval	{ this, "pressure_update_interval", 50_ms };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>				serviceable					{ this, "/serviceable" };
-	v2::PropertyOut<si::Temperature>	temperature					{ this, "/measured-temperature" };
-	v2::PropertyOut<si::Pressure>		pressure					{ this, "/measured-pressure" };
+	xf::PropertyOut<bool>				serviceable					{ this, "/serviceable" };
+	xf::PropertyOut<si::Temperature>	temperature					{ this, "/measured-temperature" };
+	xf::PropertyOut<si::Pressure>		pressure					{ this, "/measured-pressure" };
 };
 
 
@@ -57,7 +57,7 @@ class BMP085_IO: public v2::ModuleIO
  */
 class BMP085:
 	public QObject,
-	public v2::Module<BMP085_IO>
+	public xf::Module<BMP085_IO>
 {
 	Q_OBJECT
 

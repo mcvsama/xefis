@@ -25,25 +25,25 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class GearIO: public v2::ModuleIO
+class GearIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>	requested_down	{ this, "/requested-down" };
-	v2::PropertyIn<bool>	nose_up			{ this, "/nose-up" };
-	v2::PropertyIn<bool>	nose_down		{ this, "/nose-down" };
-	v2::PropertyIn<bool>	left_up			{ this, "/left-up" };
-	v2::PropertyIn<bool>	left_down		{ this, "/left-down" };
-	v2::PropertyIn<bool>	right_up		{ this, "/right-up" };
-	v2::PropertyIn<bool>	right_down		{ this, "/right-down" };
+	xf::PropertyIn<bool>	requested_down	{ this, "/requested-down" };
+	xf::PropertyIn<bool>	nose_up			{ this, "/nose-up" };
+	xf::PropertyIn<bool>	nose_down		{ this, "/nose-down" };
+	xf::PropertyIn<bool>	left_up			{ this, "/left-up" };
+	xf::PropertyIn<bool>	left_down		{ this, "/left-down" };
+	xf::PropertyIn<bool>	right_up		{ this, "/right-up" };
+	xf::PropertyIn<bool>	right_down		{ this, "/right-down" };
 };
 
 
 class Gear:
-	public v2::Instrument<GearIO>,
+	public xf::Instrument<GearIO>,
 	protected xf::InstrumentAids
 {
   public:
@@ -65,7 +65,7 @@ class Gear:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 #endif

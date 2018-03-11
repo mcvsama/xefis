@@ -126,9 +126,9 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 
 
 void
-AirDataComputer::process (v2::Cycle const& cycle)
+AirDataComputer::process (xf::Cycle const& cycle)
 {
-	v2::PropertyObserver* computers[] = {
+	xf::PropertyObserver* computers[] = {
 		// Order is important:
 		&_altitude_computer,
 		&_ias_computer,

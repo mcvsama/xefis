@@ -31,143 +31,143 @@
 #include "afcs_api.h"
 
 
-class AFCS_IO: public v2::ModuleIO
+class AFCS_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Velocity>		acq_delta_ias				{ this, "acq_delta_ias", 2_kt };
-	v2::Setting<double>				acq_delta_mach				{ this, "acq_delta_mach", 0.0033 };
-	v2::Setting<si::Angle>			acq_delta_heading			{ this, "acq_delta_heading", 2_deg };
-	v2::Setting<si::Length>			acq_delta_altitude			{ this, "acq_delta_altitude", 100_ft };
-	v2::Setting<si::Velocity>		vs_rounding					{ this, "vs_rounding", 100_fpm };
-	v2::Setting<si::Angle>			fpa_rounding				{ this, "fpa_rounding", 0.1_deg };
-	v2::Setting<std::string>		mcp_speed_format_kias		{ this, "mcp_speed_format_kias", "%d" };
-	v2::Setting<std::string>		mcp_speed_format_mach		{ this, "mcp_speed_format_mach", "%.3f" };
-	v2::Setting<std::string>		mcp_heading_format			{ this, "mcp_heading_format", "%03d" };
-	v2::Setting<std::string>		mcp_altitude_format			{ this, "mcp_altitude_format", "%d" };
-	v2::Setting<std::string>		mcp_vertical_format_vs		{ this, "mcp_vertical_format_vs", "%+d" };
-	v2::Setting<std::string>		mcp_vertical_format_fpa		{ this, "mcp_vertical_format_fpa", "%.1f" };
-	v2::Setting<si::Velocity>		default_ias					{ this, "default_ias" };
-	v2::Setting<double>				default_mach				{ this, "default_mach" };
+	xf::Setting<si::Velocity>		acq_delta_ias				{ this, "acq_delta_ias", 2_kt };
+	xf::Setting<double>				acq_delta_mach				{ this, "acq_delta_mach", 0.0033 };
+	xf::Setting<si::Angle>			acq_delta_heading			{ this, "acq_delta_heading", 2_deg };
+	xf::Setting<si::Length>			acq_delta_altitude			{ this, "acq_delta_altitude", 100_ft };
+	xf::Setting<si::Velocity>		vs_rounding					{ this, "vs_rounding", 100_fpm };
+	xf::Setting<si::Angle>			fpa_rounding				{ this, "fpa_rounding", 0.1_deg };
+	xf::Setting<std::string>		mcp_speed_format_kias		{ this, "mcp_speed_format_kias", "%d" };
+	xf::Setting<std::string>		mcp_speed_format_mach		{ this, "mcp_speed_format_mach", "%.3f" };
+	xf::Setting<std::string>		mcp_heading_format			{ this, "mcp_heading_format", "%03d" };
+	xf::Setting<std::string>		mcp_altitude_format			{ this, "mcp_altitude_format", "%d" };
+	xf::Setting<std::string>		mcp_vertical_format_vs		{ this, "mcp_vertical_format_vs", "%+d" };
+	xf::Setting<std::string>		mcp_vertical_format_fpa		{ this, "mcp_vertical_format_fpa", "%.1f" };
+	xf::Setting<si::Velocity>		default_ias					{ this, "default_ias" };
+	xf::Setting<double>				default_mach				{ this, "default_mach" };
 
 	/*
 	 * Input - measurements
 	 */
 
-	v2::PropertyIn<si::Velocity>	measured_ias				{ this, "/measurements/ias" };
-	v2::PropertyIn<double>			measured_mach				{ this, "/measurements/mach" };
-	v2::PropertyIn<si::Angle>		measured_heading_magnetic	{ this, "/measurements/heading/magnetic" };
-	v2::PropertyIn<si::Angle>		measured_track_magnetic		{ this, "/measurements/track/magnetic" };
-	v2::PropertyIn<si::Length>		measured_altitude_amsl		{ this, "/measurements/altitude/amsl" };
-	v2::PropertyIn<si::Velocity>	measured_vs					{ this, "/measurements/vertical-speed" };
-	v2::PropertyIn<si::Angle>		measured_fpa				{ this, "/measurements/flight-path-angle" };
+	xf::PropertyIn<si::Velocity>	measured_ias				{ this, "/measurements/ias" };
+	xf::PropertyIn<double>			measured_mach				{ this, "/measurements/mach" };
+	xf::PropertyIn<si::Angle>		measured_heading_magnetic	{ this, "/measurements/heading/magnetic" };
+	xf::PropertyIn<si::Angle>		measured_track_magnetic		{ this, "/measurements/track/magnetic" };
+	xf::PropertyIn<si::Length>		measured_altitude_amsl		{ this, "/measurements/altitude/amsl" };
+	xf::PropertyIn<si::Velocity>	measured_vs					{ this, "/measurements/vertical-speed" };
+	xf::PropertyIn<si::Angle>		measured_fpa				{ this, "/measurements/flight-path-angle" };
 
 	/*
 	 * Input - airplane configuration
 	 */
 
-	v2::PropertyIn<si::Force>		thr_ref_for_toga			{ this, "/configuration/thrust-reference-for-toga" };
-	v2::PropertyIn<si::Force>		thr_ref_for_cont			{ this, "/configuration/thrust-reference-for-max-cont" };
-	v2::PropertyIn<si::Force>		thr_ref_for_cruise			{ this, "/configuration/thrust-reference-for-cruise" };
-	v2::PropertyIn<si::Force>		thr_ref_for_descent			{ this, "/configuration/thrust-reference-for-descent" };
-	v2::PropertyIn<si::Velocity>	spd_ref_for_climbout		{ this, "/configuration/speed-reference-for-climbout" };
-	v2::PropertyIn<si::Velocity>	spd_ref_for_cruise			{ this, "/configuration/speed-reference-for-cruise" };
-	v2::PropertyIn<si::Velocity>	spd_ref_for_approach		{ this, "/configuration/speed-reference-for-approach" };
+	xf::PropertyIn<si::Force>		thr_ref_for_toga			{ this, "/configuration/thrust-reference-for-toga" };
+	xf::PropertyIn<si::Force>		thr_ref_for_cont			{ this, "/configuration/thrust-reference-for-max-cont" };
+	xf::PropertyIn<si::Force>		thr_ref_for_cruise			{ this, "/configuration/thrust-reference-for-cruise" };
+	xf::PropertyIn<si::Force>		thr_ref_for_descent			{ this, "/configuration/thrust-reference-for-descent" };
+	xf::PropertyIn<si::Velocity>	spd_ref_for_climbout		{ this, "/configuration/speed-reference-for-climbout" };
+	xf::PropertyIn<si::Velocity>	spd_ref_for_cruise			{ this, "/configuration/speed-reference-for-cruise" };
+	xf::PropertyIn<si::Velocity>	spd_ref_for_approach		{ this, "/configuration/speed-reference-for-approach" };
 
 	/*
 	 * Input - buttons
 	 */
 
-	v2::PropertyIn<bool>			button_ap					{ this, "/buttons/ap" };
-	v2::PropertyIn<bool>			button_at					{ this, "/buttons/at" };
-	v2::PropertyIn<bool>			button_yd					{ this, "/buttons/yd" };
-	v2::PropertyIn<bool>			button_xchg_ias_mach		{ this, "/buttons/xchg-ias-mach" };
-	v2::PropertyIn<bool>			button_toga					{ this, "/buttons/toga" };
-	v2::PropertyIn<bool>			button_spd_sel				{ this, "/buttons/spd-sel" };
-	v2::PropertyIn<bool>			button_spd_hold				{ this, "/buttons/spd-hold" };
-	v2::PropertyIn<bool>			button_xchg_heading_step	{ this, "/buttons/xchg-heading-step" };
-	v2::PropertyIn<bool>			button_xchg_hdg_trk			{ this, "/buttons/xchg-hdg-trk" };
-	v2::PropertyIn<bool>			button_hdgtrk_sel			{ this, "/buttons/hdgtrk-sel" };
-	v2::PropertyIn<bool>			button_hdgtrk_hold			{ this, "/buttons/hdgtrk-hold" };
-	v2::PropertyIn<bool>			button_wng_lvl				{ this, "/buttons/wng-lvl" };
-	v2::PropertyIn<bool>			button_loc					{ this, "/buttons/loc" };
-	v2::PropertyIn<bool>			button_lnav					{ this, "/buttons/lnav" };
-	v2::PropertyIn<bool>			button_vnav					{ this, "/buttons/vnav" };
-	v2::PropertyIn<bool>			button_lvl_all				{ this, "/buttons/lvl-all" };
-	v2::PropertyIn<bool>			button_to					{ this, "/buttons/to" };
-	v2::PropertyIn<bool>			button_crz					{ this, "/buttons/crz" };
-	v2::PropertyIn<bool>			button_app					{ this, "/buttons/app" };
-	v2::PropertyIn<bool>			button_ils					{ this, "/buttons/ils" };
-	v2::PropertyIn<bool>			button_xchg_altitude_step	{ this, "/buttons/xchg-altitude-step" };
-	v2::PropertyIn<bool>			button_flch					{ this, "/buttons/flch" };
-	v2::PropertyIn<bool>			button_altitude_hold		{ this, "/buttons/altitude-hold" };
-	v2::PropertyIn<bool>			button_gs					{ this, "/buttons/gs" };
-	v2::PropertyIn<bool>			button_xchg_vs_fpa			{ this, "/buttons/xchg-vs-fpa" };
-	v2::PropertyIn<bool>			button_vertical_enable		{ this, "/buttons/vertical-enable" };
-	v2::PropertyIn<bool>			button_vertical_sel			{ this, "/buttons/vertical-sel" };
-	v2::PropertyIn<bool>			button_clb_con				{ this, "/buttons/clb-con" };
+	xf::PropertyIn<bool>			button_ap					{ this, "/buttons/ap" };
+	xf::PropertyIn<bool>			button_at					{ this, "/buttons/at" };
+	xf::PropertyIn<bool>			button_yd					{ this, "/buttons/yd" };
+	xf::PropertyIn<bool>			button_xchg_ias_mach		{ this, "/buttons/xchg-ias-mach" };
+	xf::PropertyIn<bool>			button_toga					{ this, "/buttons/toga" };
+	xf::PropertyIn<bool>			button_spd_sel				{ this, "/buttons/spd-sel" };
+	xf::PropertyIn<bool>			button_spd_hold				{ this, "/buttons/spd-hold" };
+	xf::PropertyIn<bool>			button_xchg_heading_step	{ this, "/buttons/xchg-heading-step" };
+	xf::PropertyIn<bool>			button_xchg_hdg_trk			{ this, "/buttons/xchg-hdg-trk" };
+	xf::PropertyIn<bool>			button_hdgtrk_sel			{ this, "/buttons/hdgtrk-sel" };
+	xf::PropertyIn<bool>			button_hdgtrk_hold			{ this, "/buttons/hdgtrk-hold" };
+	xf::PropertyIn<bool>			button_wng_lvl				{ this, "/buttons/wng-lvl" };
+	xf::PropertyIn<bool>			button_loc					{ this, "/buttons/loc" };
+	xf::PropertyIn<bool>			button_lnav					{ this, "/buttons/lnav" };
+	xf::PropertyIn<bool>			button_vnav					{ this, "/buttons/vnav" };
+	xf::PropertyIn<bool>			button_lvl_all				{ this, "/buttons/lvl-all" };
+	xf::PropertyIn<bool>			button_to					{ this, "/buttons/to" };
+	xf::PropertyIn<bool>			button_crz					{ this, "/buttons/crz" };
+	xf::PropertyIn<bool>			button_app					{ this, "/buttons/app" };
+	xf::PropertyIn<bool>			button_ils					{ this, "/buttons/ils" };
+	xf::PropertyIn<bool>			button_xchg_altitude_step	{ this, "/buttons/xchg-altitude-step" };
+	xf::PropertyIn<bool>			button_flch					{ this, "/buttons/flch" };
+	xf::PropertyIn<bool>			button_altitude_hold		{ this, "/buttons/altitude-hold" };
+	xf::PropertyIn<bool>			button_gs					{ this, "/buttons/gs" };
+	xf::PropertyIn<bool>			button_xchg_vs_fpa			{ this, "/buttons/xchg-vs-fpa" };
+	xf::PropertyIn<bool>			button_vertical_enable		{ this, "/buttons/vertical-enable" };
+	xf::PropertyIn<bool>			button_vertical_sel			{ this, "/buttons/vertical-sel" };
+	xf::PropertyIn<bool>			button_clb_con				{ this, "/buttons/clb-con" };
 
 	/*
 	 * Input - knobs
 	 */
 
-	v2::PropertyIn<int64_t>			knob_speed					{ this, "/knobs/speed" };
-	v2::PropertyIn<int64_t>			knob_heading				{ this, "/knobs/heading" };
-	v2::PropertyIn<int64_t>			knob_altitude				{ this, "/knobs/altitude" };
-	v2::PropertyIn<int64_t>			knob_vertical				{ this, "/knobs/vertical" };
+	xf::PropertyIn<int64_t>			knob_speed					{ this, "/knobs/speed" };
+	xf::PropertyIn<int64_t>			knob_heading				{ this, "/knobs/heading" };
+	xf::PropertyIn<int64_t>			knob_altitude				{ this, "/knobs/altitude" };
+	xf::PropertyIn<int64_t>			knob_vertical				{ this, "/knobs/vertical" };
 
 	/*
 	 * Output - displays and LEDs
 	 */
 
-	v2::PropertyOut<double>			mcp_speed_display			{ this, "/mcp/speed-display" };
-	v2::PropertyOut<double>			mcp_heading_display			{ this, "/mcp/heading-display" };
-	v2::PropertyOut<double>			mcp_altitude_display		{ this, "/mcp/altitude-display" };
-	v2::PropertyOut<double>			mcp_vertical_display		{ this, "/mcp/vertical-display" };
-	v2::PropertyOut<std::string>	mcp_speed_format_out		{ this, "/mcp/speed-format" };		// String format for speed display on MCP.
-	v2::PropertyOut<std::string>	mcp_heading_format_out		{ this, "/mcp/heading-format" };	// String format for heading display on MCP.
-	v2::PropertyOut<std::string>	mcp_altitude_format_out		{ this, "/mcp/altitude-format" };	// String format for altitude display on MCP.
-	v2::PropertyOut<std::string>	mcp_vertical_format_out		{ this, "/mcp/vertical-format" };	// String format for vertical speed display on MCP.
-	v2::PropertyOut<bool>			mcp_led_ap					{ this, "/mcp/ap-led" };
-	v2::PropertyOut<bool>			mcp_led_at					{ this, "/mcp/at-led" };
-	v2::PropertyOut<bool>			mcp_led_yd					{ this, "/mcp/yd-led" };
+	xf::PropertyOut<double>			mcp_speed_display			{ this, "/mcp/speed-display" };
+	xf::PropertyOut<double>			mcp_heading_display			{ this, "/mcp/heading-display" };
+	xf::PropertyOut<double>			mcp_altitude_display		{ this, "/mcp/altitude-display" };
+	xf::PropertyOut<double>			mcp_vertical_display		{ this, "/mcp/vertical-display" };
+	xf::PropertyOut<std::string>	mcp_speed_format_out		{ this, "/mcp/speed-format" };		// String format for speed display on MCP.
+	xf::PropertyOut<std::string>	mcp_heading_format_out		{ this, "/mcp/heading-format" };	// String format for heading display on MCP.
+	xf::PropertyOut<std::string>	mcp_altitude_format_out		{ this, "/mcp/altitude-format" };	// String format for altitude display on MCP.
+	xf::PropertyOut<std::string>	mcp_vertical_format_out		{ this, "/mcp/vertical-format" };	// String format for vertical speed display on MCP.
+	xf::PropertyOut<bool>			mcp_led_ap					{ this, "/mcp/ap-led" };
+	xf::PropertyOut<bool>			mcp_led_at					{ this, "/mcp/at-led" };
+	xf::PropertyOut<bool>			mcp_led_yd					{ this, "/mcp/yd-led" };
 
 	/*
 	 * Output - settings forwarded to Flight Director (might be different than MCP settings)
 	 */
 
-	v2::PropertyOut<int64_t>		cmd_thrust_mode				{ this, "/cmd/thrust-mode" };
-	v2::PropertyOut<int64_t>		cmd_roll_mode				{ this, "/cmd/roll-mode" };
-	v2::PropertyOut<int64_t>		cmd_pitch_mode				{ this, "/cmd/pitch-mode" };
-	v2::PropertyOut<si::Velocity>	cmd_ias						{ this, "/cmd/ias" };
-	v2::PropertyOut<double>			cmd_mach					{ this, "/cmd/mach" };
-	v2::PropertyOut<si::Angle>		cmd_heading_magnetic		{ this, "/cmd/heading-magnetic" };
-	v2::PropertyOut<si::Angle>		cmd_track_magnetic			{ this, "/cmd/track-magnetic" };
-	v2::PropertyOut<si::Length>		cmd_altitude				{ this, "/cmd/altitude" };
-	v2::PropertyOut<si::Velocity>	cmd_vs						{ this, "/cmd/vs" };
-	v2::PropertyOut<si::Angle>		cmd_fpa						{ this, "/cmd/fpa" };
+	xf::PropertyOut<int64_t>		cmd_thrust_mode				{ this, "/cmd/thrust-mode" };
+	xf::PropertyOut<int64_t>		cmd_roll_mode				{ this, "/cmd/roll-mode" };
+	xf::PropertyOut<int64_t>		cmd_pitch_mode				{ this, "/cmd/pitch-mode" };
+	xf::PropertyOut<si::Velocity>	cmd_ias						{ this, "/cmd/ias" };
+	xf::PropertyOut<double>			cmd_mach					{ this, "/cmd/mach" };
+	xf::PropertyOut<si::Angle>		cmd_heading_magnetic		{ this, "/cmd/heading-magnetic" };
+	xf::PropertyOut<si::Angle>		cmd_track_magnetic			{ this, "/cmd/track-magnetic" };
+	xf::PropertyOut<si::Length>		cmd_altitude				{ this, "/cmd/altitude" };
+	xf::PropertyOut<si::Velocity>	cmd_vs						{ this, "/cmd/vs" };
+	xf::PropertyOut<si::Angle>		cmd_fpa						{ this, "/cmd/fpa" };
 
 	/*
 	 * Output - EFIS bugs
 	 */
 
-	v2::PropertyOut<si::Force>		thr_ref						{ this, "/bugs/thr-ref" };
-	v2::PropertyOut<si::Velocity>	spd_ref						{ this, "/bugs/spd-ref" };
-	v2::PropertyOut<bool>			cmd_use_trk					{ this, "/bugs/use-trk" };
+	xf::PropertyOut<si::Force>		thr_ref						{ this, "/bugs/thr-ref" };
+	xf::PropertyOut<si::Velocity>	spd_ref						{ this, "/bugs/spd-ref" };
+	xf::PropertyOut<bool>			cmd_use_trk					{ this, "/bugs/use-trk" };
 
 	/*
 	 * Output - FMA strings
 	 */
 
-	v2::PropertyOut<std::string>	fma_hint					{ this, "/fma/hint" };
-	v2::PropertyOut<std::string>	fma_speed_hint				{ this, "/fma/speed-hint" };
-	v2::PropertyOut<std::string>	fma_roll_hint				{ this, "/fma/roll-hint" };
-	v2::PropertyOut<std::string>	fma_roll_armed_hint			{ this, "/fma/roll-armed-hint" };
-	v2::PropertyOut<std::string>	fma_pitch_hint				{ this, "/fma/pitch-hint" };
-	v2::PropertyOut<std::string>	fma_pitch_armed_hint		{ this, "/fma/pitch-armed-hint" };
+	xf::PropertyOut<std::string>	fma_hint					{ this, "/fma/hint" };
+	xf::PropertyOut<std::string>	fma_speed_hint				{ this, "/fma/speed-hint" };
+	xf::PropertyOut<std::string>	fma_roll_hint				{ this, "/fma/roll-hint" };
+	xf::PropertyOut<std::string>	fma_roll_armed_hint			{ this, "/fma/roll-armed-hint" };
+	xf::PropertyOut<std::string>	fma_pitch_hint				{ this, "/fma/pitch-hint" };
+	xf::PropertyOut<std::string>	fma_pitch_armed_hint		{ this, "/fma/pitch-armed-hint" };
 };
 
 
@@ -175,7 +175,7 @@ class AFCS_IO: public v2::ModuleIO
  * Controls AFCS logic. Gets input from Mode Control Panel,
  * makes outputs for displays, LEDs, annunciators, also for commanded values (altitude, speed, etc).
  */
-class AFCS: public v2::Module<AFCS_IO>
+class AFCS: public xf::Module<AFCS_IO>
 {
   private:
 	static constexpr xf::Range<si::Velocity>	kSpeedRange		{ 10_kt, 300_kt };
@@ -276,7 +276,7 @@ class AFCS: public v2::Module<AFCS_IO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	void
@@ -521,14 +521,14 @@ class AFCS: public v2::Module<AFCS_IO>
 	 * Wrap button press callback and add call to solve() at the end.
 	 */
 	void
-	make_button_action (v2::PropertyIn<bool>&, void (AFCS::* callback)());
+	make_button_action (xf::PropertyIn<bool>&, void (AFCS::* callback)());
 
 	/**
 	 * Create and save a knob action for knob movement.
 	 * Wrap knob rotate callback and add call to solve() at the end.
 	 */
 	void
-	make_knob_action (v2::PropertyIn<int64_t>&, void (AFCS::* callback)(int));
+	make_knob_action (xf::PropertyIn<int64_t>&, void (AFCS::* callback)(int));
 
 	/**
 	 * Return string ID for a thrust mode.
@@ -578,8 +578,8 @@ class AFCS: public v2::Module<AFCS_IO>
 	si::Length								_mcp_altitude		{ 1000_ft };
 	std::optional<si::Velocity>				_mcp_vs;
 	std::optional<si::Angle>				_mcp_fpa;
-	std::set<Unique<v2::CallbackAction>>	_button_actions;
-	std::set<Unique<v2::DeltaDecoder>>		_rotary_decoders;
+	std::set<Unique<xf::CallbackAction>>	_button_actions;
+	std::set<Unique<xf::DeltaDecoder>>		_rotary_decoders;
 };
 
 #endif

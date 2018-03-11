@@ -27,31 +27,31 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class FlapsBugsIO: public v2::ModuleIO
+class FlapsBugsIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<double>				margin_factor	{ this, "margin_factor", 1.2 };
+	xf::Setting<double>				margin_factor	{ this, "margin_factor", 1.2 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>		flaps_setting	{ this, "/flaps-setting" };
+	xf::PropertyIn<si::Angle>		flaps_setting	{ this, "/flaps-setting" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<std::string>	flaps_up_label	{ this, "/flaps-up-label" };
-	v2::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "/flaps-up-speed" };
-	v2::PropertyOut<std::string>	flaps_a_label	{ this, "/flaps-a-label" };
-	v2::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "/flaps-a-speed" };
-	v2::PropertyOut<std::string>	flaps_b_label	{ this, "/flaps-b-label" };
-	v2::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "/flaps-b-speed" };
+	xf::PropertyOut<std::string>	flaps_up_label	{ this, "/flaps-up-label" };
+	xf::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "/flaps-up-speed" };
+	xf::PropertyOut<std::string>	flaps_a_label	{ this, "/flaps-a-label" };
+	xf::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "/flaps-a-speed" };
+	xf::PropertyOut<std::string>	flaps_b_label	{ this, "/flaps-b-label" };
+	xf::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "/flaps-b-speed" };
 };
 
 
@@ -59,7 +59,7 @@ class FlapsBugsIO: public v2::ModuleIO
  * Computes two speed bugs - for two adjacent flap settings - that should
  * be displayed on EFIS' speed ladder.
  */
-class FlapsBugs: public v2::Module<FlapsBugsIO>
+class FlapsBugs: public xf::Module<FlapsBugsIO>
 {
   public:
 	// Ctor
@@ -69,11 +69,11 @@ class FlapsBugs: public v2::Module<FlapsBugsIO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	xf::Flaps const&			_flaps;
-	v2::PropChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
+	xf::PropChanged<si::Angle>	_flaps_setting_changed	{ io.flaps_setting };
 };
 
 #endif

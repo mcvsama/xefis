@@ -53,7 +53,7 @@ RemoteControlManagementSystem::configurator_widget()
 
 
 void
-RemoteControlManagementSystem::process (v2::Cycle const& cycle)
+RemoteControlManagementSystem::process (xf::Cycle const& cycle)
 {
 	if (!home_is_valid())
 		acquire_home();

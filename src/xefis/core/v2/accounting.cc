@@ -27,7 +27,7 @@
 #include "accounting.h"
 
 
-namespace v2 {
+namespace xf {
 
 Accounting::Stats::Stats (LatencySamples::size_type samples):
 	_samples (samples, 0_s)
@@ -105,7 +105,7 @@ Accounting::~Accounting()
 
 
 Accounting::Stats const&
-Accounting::module_stats (v2::BasicModule* modptr, Timespan timespan) const
+Accounting::module_stats (xf::BasicModule* modptr, Timespan timespan) const
 {
 	ModuleStats::const_iterator ms = _module_stats.find (modptr);
 
@@ -117,7 +117,7 @@ Accounting::module_stats (v2::BasicModule* modptr, Timespan timespan) const
 
 
 void
-Accounting::add_module_stats (v2::BasicModule* modptr, Time dt)
+Accounting::add_module_stats (xf::BasicModule* modptr, Time dt)
 {
 	StatsSet& ss = _module_stats[modptr];
 

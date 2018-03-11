@@ -27,7 +27,7 @@ AFCS_RollAutotrim::AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO> modu
 
 
 void
-AFCS_RollAutotrim::process (v2::Cycle const&)
+AFCS_RollAutotrim::process (xf::Cycle const&)
 {
 	if (io.measured_ias && io.measured_engine_torque)
 	{

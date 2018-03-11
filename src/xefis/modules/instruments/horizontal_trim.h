@@ -26,30 +26,30 @@
 #include <xefis/core/v2/setting.h>
 
 
-class HorizontalTrimIO: public v2::ModuleIO
+class HorizontalTrimIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<QString>	label					{ this, "label", "TRIM" };
-	v2::Setting<QString>	label_min				{ this, "label_min" };
-	v2::Setting<QString>	label_max				{ this, "label_max" };
+	xf::Setting<QString>	label					{ this, "label", "TRIM" };
+	xf::Setting<QString>	label_min				{ this, "label_min" };
+	xf::Setting<QString>	label_max				{ this, "label_max" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	trim_value				{ this, "/trim/value" };
-	v2::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
-	v2::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
-	v2::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
+	xf::PropertyIn<double>	trim_value				{ this, "/trim/value" };
+	xf::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
+	xf::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
+	xf::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
 };
 
 
 class HorizontalTrim:
-	public v2::Instrument<HorizontalTrimIO>,
+	public xf::Instrument<HorizontalTrimIO>,
 	protected xf::InstrumentAids
 {
   public:
@@ -75,7 +75,7 @@ class HorizontalTrim:
 	stringify (double value);
 
   private:
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 #endif

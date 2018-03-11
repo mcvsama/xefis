@@ -25,28 +25,28 @@
 #include <xefis/utility/smoother.h>
 
 
-class ArrivalETA_IO: public v2::ModuleIO
+class ArrivalETA_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>	station_latitude	{ this, "/station-position/latitude" };
-	v2::PropertyIn<si::Angle>	station_longitude	{ this, "/station-position/longitude" };
-	v2::PropertyIn<si::Angle>	aircraft_latitude	{ this, "/aircraft-position/latitude" };
-	v2::PropertyIn<si::Angle>	aircraft_longitude	{ this, "/aircraft-position/longitude" };
-	v2::PropertyIn<si::Angle>	track_lateral_true	{ this, "/track-lateral-true" };
+	xf::PropertyIn<si::Angle>	station_latitude	{ this, "/station-position/latitude" };
+	xf::PropertyIn<si::Angle>	station_longitude	{ this, "/station-position/longitude" };
+	xf::PropertyIn<si::Angle>	aircraft_latitude	{ this, "/aircraft-position/latitude" };
+	xf::PropertyIn<si::Angle>	aircraft_longitude	{ this, "/aircraft-position/longitude" };
+	xf::PropertyIn<si::Angle>	track_lateral_true	{ this, "/track-lateral-true" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Time>	eta					{ this, "/eta" };
+	xf::PropertyOut<si::Time>	eta					{ this, "/eta" };
 };
 
 
-class ArrivalETA: public v2::Module<ArrivalETA_IO>
+class ArrivalETA: public xf::Module<ArrivalETA_IO>
 {
   public:
 	// Ctor
@@ -56,7 +56,7 @@ class ArrivalETA: public v2::Module<ArrivalETA_IO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
 	void
 	compute();
@@ -64,7 +64,7 @@ class ArrivalETA: public v2::Module<ArrivalETA_IO>
   private:
 	xf::Smoother<si::Time>		_smoother { 3_s };
 	std::optional<si::Length>	_prev_distance;
-	v2::PropertyObserver		_eta_computer;
+	xf::PropertyObserver		_eta_computer;
 };
 
 #endif

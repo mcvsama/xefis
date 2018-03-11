@@ -50,15 +50,15 @@ class RadialIndicator: BasicIndicator<RadialIndicatorIO>
 	// Ctor
 	explicit
 	RadialIndicator (std::unique_ptr<RadialIndicatorIO>,
-					 v2::PropertyDigitizer value_digitizer,
-					 v2::PropertyDigitizer value_target_digitizer,
-					 v2::PropertyDigitizer value_reference_digitizer,
-					 v2::PropertyDigitizer value_automatic_digitizer,
+					 xf::PropertyDigitizer value_digitizer,
+					 xf::PropertyDigitizer value_target_digitizer,
+					 xf::PropertyDigitizer value_reference_digitizer,
+					 xf::PropertyDigitizer value_automatic_digitizer,
 					 std::string const& instance = {});
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API
@@ -72,11 +72,11 @@ class RadialIndicator: BasicIndicator<RadialIndicatorIO>
 	paint_indicator (float q, float r);
 
   private:
-	v2::PropertyDigitizer	_value_digitizer;
-	v2::PropertyDigitizer	_value_target_digitizer;
-	v2::PropertyDigitizer	_value_reference_digitizer;
-	v2::PropertyDigitizer	_value_automatic_digitizer;
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyDigitizer	_value_digitizer;
+	xf::PropertyDigitizer	_value_target_digitizer;
+	xf::PropertyDigitizer	_value_reference_digitizer;
+	xf::PropertyDigitizer	_value_automatic_digitizer;
+	xf::PropertyObserver	_inputs_observer;
 	std::vector<PointInfo>	_points;
 };
 

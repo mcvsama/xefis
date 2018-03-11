@@ -25,7 +25,7 @@
 #include "module.h"
 
 
-namespace v2 {
+namespace xf {
 
 void
 BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
@@ -58,7 +58,7 @@ BasicModule::initialize()
 
 
 void
-BasicModule::process (v2::Cycle const&)
+BasicModule::process (xf::Cycle const&)
 { }
 
 
@@ -87,5 +87,5 @@ identifier (BasicModule* module)
 	return module ? identifier (*module) : "(nullptr)";
 }
 
-} // namespace v2
+} // namespace xf
 

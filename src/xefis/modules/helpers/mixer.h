@@ -26,35 +26,35 @@
 
 
 template<class Value>
-	class MixerIO: public v2::ModuleIO
+	class MixerIO: public xf::ModuleIO
 	{
 	  public:
 		/*
 		 * Settings
 		 */
 
-		v2::Setting<double>		input_a_factor	{ this, "input_a_factor", 1.0 };
-		v2::Setting<double>		input_b_factor	{ this, "input_b_factor", 1.0 };
-		v2::Setting<Value>		output_minimum	{ this, "output_minimum", v2::BasicSetting::Optional };
-		v2::Setting<Value>		output_maximum	{ this, "output_maximum", v2::BasicSetting::Optional };
+		xf::Setting<double>		input_a_factor	{ this, "input_a_factor", 1.0 };
+		xf::Setting<double>		input_b_factor	{ this, "input_b_factor", 1.0 };
+		xf::Setting<Value>		output_minimum	{ this, "output_minimum", xf::BasicSetting::Optional };
+		xf::Setting<Value>		output_maximum	{ this, "output_maximum", xf::BasicSetting::Optional };
 
 		/*
 		 * Input
 		 */
 
-		v2::PropertyIn<Value>	input_a_value	{ this, "/input.a" };
-		v2::PropertyIn<Value>	input_b_value	{ this, "/input.b" };
+		xf::PropertyIn<Value>	input_a_value	{ this, "/input.a" };
+		xf::PropertyIn<Value>	input_b_value	{ this, "/input.b" };
 
 		/*
 		 * Output
 		 */
 
-		v2::PropertyOut<Value>	output_value	{ this, "/value" };
+		xf::PropertyOut<Value>	output_value	{ this, "/value" };
 	};
 
 
 template<class pValue>
-	class Mixer: public v2::Module<MixerIO<pValue>>
+	class Mixer: public xf::Module<MixerIO<pValue>>
 	{
 	  public:
 		using Value = pValue;
@@ -71,11 +71,11 @@ template<class pValue>
 
 		// Module API
 		void
-		process (v2::Cycle const&) override;
+		process (xf::Cycle const&) override;
 
 	  private:
-		v2::PropChanged<Value>	_input_a_changed	{ io.input_a_value };
-		v2::PropChanged<Value>	_input_b_changed	{ io.input_b_value };
+		xf::PropChanged<Value>	_input_a_changed	{ io.input_a_value };
+		xf::PropChanged<Value>	_input_b_changed	{ io.input_b_value };
 	};
 
 
@@ -101,7 +101,7 @@ template<class V>
 
 template<class V>
 	void
-	Mixer<V>::process (v2::Cycle const&)
+	Mixer<V>::process (xf::Cycle const&)
 	{
 		if (_input_a_changed() || _input_b_changed())
 		{

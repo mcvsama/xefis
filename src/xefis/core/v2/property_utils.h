@@ -22,7 +22,7 @@
 #include <xefis/core/v2/property.h>
 
 
-namespace v2 {
+namespace xf {
 
 template<class Value>
 	inline std::string
@@ -50,7 +50,7 @@ to_string (Property<bool> const& property)
 	return property.get() ? "true" : "false";
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

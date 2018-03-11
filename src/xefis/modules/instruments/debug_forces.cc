@@ -28,7 +28,7 @@ DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, std::string 
 
 
 void
-DebugForces::process (v2::Cycle const&)
+DebugForces::process (xf::Cycle const&)
 {
 	update();
 }

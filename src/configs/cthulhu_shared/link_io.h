@@ -45,11 +45,11 @@ template<template<class> class PropertyType>
 	};
 
 
-using CthulhuGCS_Tx_LinkIO = CthulhuGCS2AircraftLinkIO<v2::PropertyIn>;
-using CthulhuGCS_Rx_LinkIO = CthulhuAircraft2GCSLinkIO<v2::PropertyOut>;
+using CthulhuGCS_Tx_LinkIO = CthulhuGCS2AircraftLinkIO<xf::PropertyIn>;
+using CthulhuGCS_Rx_LinkIO = CthulhuAircraft2GCSLinkIO<xf::PropertyOut>;
 
-using CthulhuAircraft_Tx_LinkIO = CthulhuAircraft2GCSLinkIO<v2::PropertyIn>;
-using CthulhuAircraft_Rx_LinkIO = CthulhuGCS2AircraftLinkIO<v2::PropertyOut>;
+using CthulhuAircraft_Tx_LinkIO = CthulhuAircraft2GCSLinkIO<xf::PropertyIn>;
+using CthulhuAircraft_Rx_LinkIO = CthulhuGCS2AircraftLinkIO<xf::PropertyOut>;
 
 #endif
 

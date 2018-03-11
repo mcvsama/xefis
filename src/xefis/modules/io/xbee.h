@@ -30,38 +30,38 @@
 #include <xefis/utility/smoother.h>
 
 
-class XBeeIO: public v2::ModuleIO
+class XBeeIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<bool>				debug			{ this, "debug", false };
-	v2::Setting<std::string>		device_path		{ this, "device_path" };
-	v2::Setting<unsigned int>		baud_rate		{ this, "baud_rate", 9600 };
-	v2::Setting<int>				channel			{ this, "channel" };
-	v2::Setting<uint16_t>			pan_id			{ this, "pan_id", 0x0000 };
-	v2::Setting<uint16_t>			local_address	{ this, "local_address" };
-	v2::Setting<uint16_t>			remote_address	{ this, "remote_address" };
-	v2::Setting<uint16_t>			power_level		{ this, "power_level" }; // TODO Optional
+	xf::Setting<bool>				debug			{ this, "debug", false };
+	xf::Setting<std::string>		device_path		{ this, "device_path" };
+	xf::Setting<unsigned int>		baud_rate		{ this, "baud_rate", 9600 };
+	xf::Setting<int>				channel			{ this, "channel" };
+	xf::Setting<uint16_t>			pan_id			{ this, "pan_id", 0x0000 };
+	xf::Setting<uint16_t>			local_address	{ this, "local_address" };
+	xf::Setting<uint16_t>			remote_address	{ this, "remote_address" };
+	xf::Setting<uint16_t>			power_level		{ this, "power_level" }; // TODO Optional
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<std::string>		send			{ this, "/send" };
+	xf::PropertyIn<std::string>		send			{ this, "/send" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>			serviceable		{ this, "/serviceable" };
-	v2::PropertyOut<std::string>	receive			{ this, "/receive" };
-	v2::PropertyOut<int64_t>		input_errors	{ this, "/input-errors" };
-	v2::PropertyOut<int64_t>		failures		{ this, "/failures" };
-	v2::PropertyOut<int64_t>		cca_failures	{ this, "/clear-channel-failures" };
-	v2::PropertyOut<si::Power>		rssi			{ this, "/rssi" };
+	xf::PropertyOut<bool>			serviceable		{ this, "/serviceable" };
+	xf::PropertyOut<std::string>	receive			{ this, "/receive" };
+	xf::PropertyOut<int64_t>		input_errors	{ this, "/input-errors" };
+	xf::PropertyOut<int64_t>		failures		{ this, "/failures" };
+	xf::PropertyOut<int64_t>		cca_failures	{ this, "/clear-channel-failures" };
+	xf::PropertyOut<si::Power>		rssi			{ this, "/rssi" };
 };
 
 
@@ -73,7 +73,7 @@ class XBeeIO: public v2::ModuleIO
  */
 class XBee:
 	public QObject,
-	public v2::Module<XBeeIO>
+	public xf::Module<XBeeIO>
 {
 	Q_OBJECT
 
@@ -172,7 +172,7 @@ class XBee:
 	~XBee();
 
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private slots:
 	/**
@@ -438,7 +438,7 @@ class XBee:
 	xf::Smoother<si::Power>			_rssi_smoother			{ 200_ms };
 	Time							_last_rssi_time;
 	uint8_t							_at_frame_id			{ 0x00 };
-	v2::PropChanged<std::string>	_send_changed			{ io.send };
+	xf::PropChanged<std::string>	_send_changed			{ io.send };
 };
 
 

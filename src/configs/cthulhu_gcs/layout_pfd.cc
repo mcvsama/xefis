@@ -23,7 +23,7 @@
 
 LayoutPFD::LayoutPFD (Loop* loop)
 {
-	_window = std::make_unique<v2::Window>();
+	_window = std::make_unique<xf::Window>();
 
 	auto* layout = new QVBoxLayout();
 	layout->addWidget (loop->adi, 8);

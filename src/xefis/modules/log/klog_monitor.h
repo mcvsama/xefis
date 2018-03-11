@@ -27,23 +27,23 @@
 #include <xefis/core/v2/property.h>
 
 
-class KLogMonitorIO: public v2::ModuleIO
+class KLogMonitorIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>	flag_oom	{ this, "/flags/oom" };
-	v2::PropertyOut<bool>	flag_io		{ this, "/flags/io-error" };
-	v2::PropertyOut<bool>	flag_oops	{ this, "/flags/oops" };
-	v2::PropertyOut<bool>	flag_bug	{ this, "/flags/bug" };
+	xf::PropertyOut<bool>	flag_oom	{ this, "/flags/oom" };
+	xf::PropertyOut<bool>	flag_io		{ this, "/flags/io-error" };
+	xf::PropertyOut<bool>	flag_oops	{ this, "/flags/oops" };
+	xf::PropertyOut<bool>	flag_bug	{ this, "/flags/bug" };
 };
 
 
 class KLogMonitor:
 	public QObject,
-	public v2::Module<KLogMonitorIO>
+	public xf::Module<KLogMonitorIO>
 {
 	Q_OBJECT
 

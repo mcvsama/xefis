@@ -115,9 +115,9 @@ PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO>
 
 
 void
-PerformanceComputer::process (v2::Cycle const& cycle)
+PerformanceComputer::process (xf::Cycle const& cycle)
 {
-	v2::PropertyObserver* computers[] = {
+	xf::PropertyObserver* computers[] = {
 		// Order is important:
 		&_wind_computer,
 		&_glide_ratio_computer,

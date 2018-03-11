@@ -23,8 +23,7 @@
 #include <xefis/core/v2/processing_loop.h>
 
 
-namespace v2 {
-using namespace xf; // XXX
+namespace xf {
 
 class Machine
 {
@@ -69,7 +68,7 @@ Machine::xefis() const noexcept
 	return _xefis;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

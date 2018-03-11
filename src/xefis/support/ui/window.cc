@@ -26,7 +26,7 @@
 #include "window.h"
 
 
-namespace v2 {
+namespace xf {
 
 Window::Window()
 {
@@ -101,5 +101,5 @@ Window::set_fullscreen()
 	setWindowState (windowState() | Qt::WindowFullScreen);
 }
 
-} // namespace v2
+} // namespace xf
 

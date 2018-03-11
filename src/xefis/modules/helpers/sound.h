@@ -30,7 +30,7 @@
  */
 class Sound:
 	public QObject,
-	public v2::Module
+	public xf::Module
 {
 	Q_OBJECT
 

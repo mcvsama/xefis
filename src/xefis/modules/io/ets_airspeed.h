@@ -31,24 +31,24 @@
 #include <xefis/utility/smoother.h>
 
 
-class ETSAirspeedIO: public v2::ModuleIO
+class ETSAirspeedIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Time>			read_interval		{ this, "read_interval", 100_ms };
-	v2::Setting<si::Time>			smoothing_time		{ this, "smoothing_time", 100_ms };
+	xf::Setting<si::Time>			read_interval		{ this, "read_interval", 100_ms };
+	xf::Setting<si::Time>			smoothing_time		{ this, "smoothing_time", 100_ms };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>			serviceable			{ this, "/serviceable" };
-	v2::PropertyOut<si::Velocity>	airspeed			{ this, "/airspeed" };
-	v2::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "/airspeed.minimum" };
-	v2::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "/airspeed.maximum" };
+	xf::PropertyOut<bool>			serviceable			{ this, "/serviceable" };
+	xf::PropertyOut<si::Velocity>	airspeed			{ this, "/airspeed" };
+	xf::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "/airspeed.minimum" };
+	xf::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "/airspeed.maximum" };
 };
 
 
@@ -61,7 +61,7 @@ class ETSAirspeedIO: public v2::ModuleIO
  */
 class ETSAirspeed:
 	public QObject,
-	public v2::Module<ETSAirspeedIO>
+	public xf::Module<ETSAirspeedIO>
 {
 	Q_OBJECT
 

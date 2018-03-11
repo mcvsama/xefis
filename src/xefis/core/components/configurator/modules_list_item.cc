@@ -32,7 +32,7 @@
 
 namespace xf {
 
-ModulesListItem::ModulesListItem (v2::BasicModule& module, QTreeWidget* parent):
+ModulesListItem::ModulesListItem (xf::BasicModule& module, QTreeWidget* parent):
 	QTreeWidgetItem (parent, { "", "", "" }),
 	_module (module)
 {

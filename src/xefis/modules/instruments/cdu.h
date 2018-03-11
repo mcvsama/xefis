@@ -32,7 +32,7 @@
 
 
 class CDU:
-	public v2::Instrument<>,
+	public xf::Instrument<>,
 	protected xf::InstrumentAids
 {
   public:
@@ -40,13 +40,13 @@ class CDU:
 	 * Settings
 	 */
 
-	v2::Setting<bool>			show_time	{ this, "setting_show_time", true };
+	xf::Setting<bool>			show_time	{ this, "setting_show_time", true };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Time>	time_utc	{ this, "/time/utc" };
+	xf::PropertyIn<si::Time>	time_utc	{ this, "/time/utc" };
 
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;
@@ -170,7 +170,7 @@ class CDU:
 	  public:
 		// Ctor
 		explicit
-		PropertyStrip (CDU&, v2::PropertyStringifier const&, QString const& title, Column);
+		PropertyStrip (CDU&, xf::PropertyStringifier const&, QString const& title, Column);
 
 		void
 		set_read_only (bool read_only);
@@ -204,7 +204,7 @@ class CDU:
 		paint_focus (QRectF const& rect, QRectF const& button_rect, xf::InstrumentAids&, xf::Painter&, Column) override;
 
 	  private:
-		v2::PropertyStringifier	_property_stringifier;
+		xf::PropertyStringifier	_property_stringifier;
 		bool					_read_only		= false;
 		ButtonState				_button_state	= ButtonState::Normal;
 		QRectF					_button_rect;
@@ -419,7 +419,7 @@ class CDU:
 
 	// Module
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
 	/**
 	 * Post message to the message board.

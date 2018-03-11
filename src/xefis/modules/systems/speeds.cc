@@ -35,7 +35,7 @@ Speeds::Speeds (std::unique_ptr<SpeedsIO> module_io, xf::Airframe* airframe, std
 
 
 void
-Speeds::process (v2::Cycle const& cycle)
+Speeds::process (xf::Cycle const& cycle)
 {
 	_speeds_computer.process (cycle.update_time());
 }

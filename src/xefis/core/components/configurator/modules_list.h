@@ -42,7 +42,7 @@ class ModulesList: public QWidget
   public:
 	// Ctor
 	explicit
-	ModulesList (v2::Machine&, QWidget* parent);
+	ModulesList (xf::Machine&, QWidget* parent);
 
 	/**
 	 * Deselect any selected module.
@@ -55,7 +55,7 @@ class ModulesList: public QWidget
 	 * Emitted when user selects another module.
 	 */
 	void
-	module_selected (v2::BasicModule&);
+	module_selected (xf::BasicModule&);
 
 	/**
 	 * Emitted when module selection is cleared.
@@ -77,7 +77,7 @@ class ModulesList: public QWidget
 	item_selected (QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
   private:
-	v2::Machine&		_machine;
+	xf::Machine&		_machine;
 	QTreeWidget*		_list			= nullptr;
 	QTimer*				_refresh_timer	= nullptr;
 };

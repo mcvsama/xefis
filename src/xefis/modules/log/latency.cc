@@ -25,7 +25,7 @@
 #include "latency.h"
 
 
-Latency::Latency (v2::Accounting& accounting, std::string const& instance):
+Latency::Latency (xf::Accounting& accounting, std::string const& instance):
 	Module (instance),
 	_accounting (accounting)
 {
@@ -40,19 +40,19 @@ Latency::Latency (v2::Accounting& accounting, std::string const& instance):
 void
 Latency::log_latency()
 {
-	v2::Accounting::StatsSet const& event_latency = _accounting.event_latency_stats();
+	xf::Accounting::StatsSet const& event_latency = _accounting.event_latency_stats();
 
 	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
 	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
 		% "event handling latency"
-		% static_cast<double> (event_latency.select (v2::Accounting::Timespan::Last100Samples).minimum().quantity<Second>())
-		% static_cast<double> (event_latency.select (v2::Accounting::Timespan::Last100Samples).average().quantity<Second>())
-		% static_cast<double> (event_latency.select (v2::Accounting::Timespan::Last100Samples).maximum().quantity<Second>())
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).minimum().quantity<Second>())
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).average().quantity<Second>())
+		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).maximum().quantity<Second>())
 		<< std::endl;
 
 	// Get module stats, sort by average latency and log.
 
-	typedef v2::Accounting::ModuleStats ModuleStats;
+	typedef xf::Accounting::ModuleStats ModuleStats;
 
 	ModuleStats const& mstats = _accounting.module_stats();
 	std::vector<ModuleStats::const_iterator> ordered_modules;
@@ -63,8 +63,8 @@ Latency::log_latency()
 	auto order_by_average = [](ModuleStats::const_iterator a, ModuleStats::const_iterator b)
 	{
 		return
-			a->second.select (v2::Accounting::Timespan::Last1000Samples).average() >
-			b->second.select (v2::Accounting::Timespan::Last1000Samples).average();
+			a->second.select (xf::Accounting::Timespan::Last1000Samples).average() >
+			b->second.select (xf::Accounting::Timespan::Last1000Samples).average();
 	};
 
 	std::sort (ordered_modules.begin(), ordered_modules.end(), order_by_average);
@@ -73,9 +73,9 @@ Latency::log_latency()
 	{
 		log() << boost::format ("[%-30s] %.06lf %.06lf %.06lf")
 			% identifier (m->first)
-			% static_cast<double> (m->second.select (v2::Accounting::Timespan::Last100Samples).minimum().quantity<Second>())
-			% static_cast<double> (m->second.select (v2::Accounting::Timespan::Last100Samples).average().quantity<Second>())
-			% static_cast<double> (m->second.select (v2::Accounting::Timespan::Last100Samples).maximum().quantity<Second>())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).minimum().quantity<Second>())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).average().quantity<Second>())
+			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).maximum().quantity<Second>())
 			<< std::endl;
 	}
 }

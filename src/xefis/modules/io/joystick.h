@@ -34,14 +34,14 @@
 #include <xefis/utility/range.h>
 
 
-class JoystickInputIO: public v2::ModuleIO
+class JoystickInputIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<bool>	restart_on_failure	{ this, "restart_on_failure", true };
+	xf::Setting<bool>	restart_on_failure	{ this, "restart_on_failure", true };
 
 	// TODO PropertyOuts for axes and buttons
 };
@@ -49,7 +49,7 @@ class JoystickInputIO: public v2::ModuleIO
 
 class JoystickInput:
 	public QObject,
-	public v2::Module<JoystickInputIO>
+	public xf::Module<JoystickInputIO>
 {
 	Q_OBJECT
 
@@ -90,9 +90,9 @@ class JoystickInput:
 	  public:
 		// Ctor
 		explicit
-		Button (QDomElement const& button_element, v2::PropertyOut<bool>&);
+		Button (QDomElement const& button_element, xf::PropertyOut<bool>&);
 
-		v2::PropertyOut<bool>&
+		xf::PropertyOut<bool>&
 		property();
 
 		void
@@ -106,7 +106,7 @@ class JoystickInput:
 		set_value (float value);
 
 	  private:
-		v2::PropertyOut<bool>&	_property;
+		xf::PropertyOut<bool>&	_property;
 	};
 
 	class Axis: public Handler
@@ -114,15 +114,15 @@ class JoystickInput:
 	  public:
 		// Ctor
 		explicit
-		Axis (QDomElement const& axis_element, v2::PropertyOut<double>&, v2::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
+		Axis (QDomElement const& axis_element, xf::PropertyOut<double>&, xf::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range);
 
 		/**
 		 * Make Axis that is emulated by two buttons on the joystick.
 		 */
-		Axis (QDomElement const& axis_element, v2::PropertyOut<double>&, v2::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
+		Axis (QDomElement const& axis_element, xf::PropertyOut<double>&, xf::PropertyOut<si::Angle>&, xf::Range<si::Angle>& angle_range,
 			  std::optional<HandlerID> up_button_id, std::optional<HandlerID> down_button_id);
 
-		v2::PropertyOut<double>&
+		xf::PropertyOut<double>&
 		property();
 
 		void
@@ -136,8 +136,8 @@ class JoystickInput:
 		set_value (float value);
 
 	  private:
-		v2::PropertyOut<double>&	_property;
-		v2::PropertyOut<si::Angle>&	_angle_property;
+		xf::PropertyOut<double>&	_property;
+		xf::PropertyOut<si::Angle>&	_angle_property;
 		xf::Range<si::Angle>&		_angle_range;
 		float						_center			= 0.f;
 		float						_dead_zone		= 0.f;
@@ -153,9 +153,9 @@ class JoystickInput:
 	};
 
 	typedef std::array<std::vector<Shared<Handler>>, kMaxEventID>		Handlers;
-	typedef std::array<Unique<v2::PropertyOut<bool>>, kMaxEventID>		ButtonProperties;
-	typedef std::array<Unique<v2::PropertyOut<double>>, kMaxEventID>	AxisProperties;
-	typedef std::array<Unique<v2::PropertyOut<si::Angle>>, kMaxEventID>	AngleAxisProperties;
+	typedef std::array<Unique<xf::PropertyOut<bool>>, kMaxEventID>		ButtonProperties;
+	typedef std::array<Unique<xf::PropertyOut<double>>, kMaxEventID>	AxisProperties;
+	typedef std::array<Unique<xf::PropertyOut<si::Angle>>, kMaxEventID>	AngleAxisProperties;
 	typedef std::array<xf::Range<si::Angle>, kMaxEventID>				AngleAxisRanges;
 
   public:
@@ -170,13 +170,13 @@ class JoystickInput:
 	/**
 	 * Return reference to a button property.
 	 */
-	v2::PropertyOut<bool>&
+	xf::PropertyOut<bool>&
 	button (HandlerID);
 
 	/**
 	 * Return reference to an axis property.
 	 */
-	v2::PropertyOut<double>&
+	xf::PropertyOut<double>&
 	axis (HandlerID);
 
 	/**
@@ -184,7 +184,7 @@ class JoystickInput:
 	 * The range is defined per-axis, and subsequent calls to the same axis with different ranges will overwrite
 	 * previous ranges.
 	 */
-	v2::PropertyOut<si::Angle>&
+	xf::PropertyOut<si::Angle>&
 	angle_axis (HandlerID, xf::Range<si::Angle>);
 
   private slots:
@@ -235,21 +235,21 @@ class JoystickInput:
 };
 
 
-inline v2::PropertyOut<bool>&
+inline xf::PropertyOut<bool>&
 JoystickInput::button (HandlerID id)
 {
 	return *_button_properties[id];
 }
 
 
-inline v2::PropertyOut<double>&
+inline xf::PropertyOut<double>&
 JoystickInput::axis (HandlerID id)
 {
 	return *_axis_properties[id];
 }
 
 
-inline v2::PropertyOut<si::Angle>&
+inline xf::PropertyOut<si::Angle>&
 JoystickInput::angle_axis (HandlerID id, xf::Range<si::Angle> range)
 {
 	_angle_axis_ranges[id] = range;

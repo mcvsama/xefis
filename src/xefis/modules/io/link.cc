@@ -468,8 +468,8 @@ LinkProtocol::to_string (Blob const& blob)
 void
 LinkIO::verify_settings()
 {
-	if (!send_frequency || !(reacquire_after && failsafe_after))
-		throw v2::module_io::InvalidConfig ("either send_frequency or both reacquire_after and failsafe_after must be configured");
+	if (!!send_frequency == (reacquire_after && failsafe_after))
+		throw xf::module_io::InvalidConfig ("either send_frequency or both reacquire_after and failsafe_after must be configured");
 }
 
 
@@ -508,7 +508,7 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 
 
 void
-Link::process (v2::Cycle const&)
+Link::process (xf::Cycle const&)
 {
 	try {
 		if (io.link_input && _input_changed())

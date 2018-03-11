@@ -27,7 +27,7 @@
 #include <xefis/utility/variant.h>
 
 
-namespace v2 {
+namespace xf {
 
 /**
  * Observes a set of properties, and checks if their values have changed.
@@ -252,7 +252,7 @@ PropertyObserver::touch() noexcept
 	_touch = true;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

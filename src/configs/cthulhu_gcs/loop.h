@@ -37,7 +37,7 @@
 #include "warthog_stick.h"
 
 
-class Loop: public v2::ProcessingLoop
+class Loop: public xf::ProcessingLoop
 {
   public:
 	/*

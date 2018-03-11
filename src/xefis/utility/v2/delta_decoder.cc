@@ -18,7 +18,7 @@
 #include "delta_decoder.h"
 
 
-namespace v2 {
+namespace xf {
 
 DeltaDecoder::DeltaDecoder (PropertyIn<int64_t>& value_property, Callback callback):
 	_prev (value_property.value_or (0)),
@@ -41,5 +41,5 @@ DeltaDecoder::operator()()
 	}
 }
 
-} // namespace v2
+} // namespace xf
 

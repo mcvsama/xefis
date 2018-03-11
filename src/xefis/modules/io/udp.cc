@@ -49,7 +49,7 @@ UDP::UDP (std::unique_ptr<UDP_IO> module_io, std::string const& instance):
 
 
 void
-UDP::process (v2::Cycle const&)
+UDP::process (xf::Cycle const&)
 {
 	if (io.send && _send_changed())
 	{

@@ -29,37 +29,37 @@
 #include <xefis/utility/v2/actions.h>
 
 
-class UDP_IO: public v2::ModuleIO
+class UDP_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<QString>			tx_udp_host			{ this, "tx_udp_host" }; // TODO express that this is optional
-	v2::Setting<int>				tx_udp_port			{ this, "tx_udp_port" };
-	v2::Setting<bool>				tx_interference		{ this, "tx_interference", false };
-	v2::Setting<QString>			rx_udp_host			{ this, "rx_udp_host" }; // TODO OptionalSetting
-	v2::Setting<int>				rx_udp_port			{ this, "rx_udp_port" };
-	v2::Setting<bool>				rx_interference		{ this, "rx_interference", false };
+	xf::Setting<QString>			tx_udp_host			{ this, "tx_udp_host" }; // TODO express that this is optional
+	xf::Setting<int>				tx_udp_port			{ this, "tx_udp_port" };
+	xf::Setting<bool>				tx_interference		{ this, "tx_interference", false };
+	xf::Setting<QString>			rx_udp_host			{ this, "rx_udp_host" }; // TODO OptionalSetting
+	xf::Setting<int>				rx_udp_port			{ this, "rx_udp_port" };
+	xf::Setting<bool>				rx_interference		{ this, "rx_interference", false };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<std::string>		send				{ this, "/send" };
+	xf::PropertyIn<std::string>		send				{ this, "/send" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<std::string>	receive				{ this, "/receive" };
+	xf::PropertyOut<std::string>	receive				{ this, "/receive" };
 };
 
 
 class UDP:
 	public QObject,
-	public v2::Module<UDP_IO>
+	public xf::Module<UDP_IO>
 {
 	Q_OBJECT
 
@@ -70,7 +70,7 @@ class UDP:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private slots:
 	/**
@@ -90,7 +90,7 @@ class UDP:
 	QByteArray						_received_datagram;
 	Unique<QUdpSocket>				_tx;
 	Unique<QUdpSocket>				_rx;
-	v2::PropChanged<std::string>	_send_changed	{ io.send };
+	xf::PropChanged<std::string>	_send_changed	{ io.send };
 };
 
 #endif

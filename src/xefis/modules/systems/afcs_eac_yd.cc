@@ -44,7 +44,7 @@ AFCS_EAC_YD::initialize()
 
 
 void
-AFCS_EAC_YD::process (v2::Cycle const& cycle)
+AFCS_EAC_YD::process (xf::Cycle const& cycle)
 {
 	_rudder_computer.process (cycle.update_time());
 }

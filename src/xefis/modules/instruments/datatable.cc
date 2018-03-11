@@ -29,13 +29,13 @@
 #include "datatable.h"
 
 
-Datatable::Line::Line (std::string const& label, v2::PropertyStringifier const& stringifier):
+Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier):
 	label (label),
 	value (stringifier)
 { }
 
 
-Datatable::Line::Line (std::string const& label, v2::PropertyStringifier const& stringifier,
+Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
@@ -44,7 +44,7 @@ Datatable::Line::Line (std::string const& label, v2::PropertyStringifier const& 
 { }
 
 
-Datatable::Line::Line (std::string const& label, v2::PropertyStringifier const& stringifier,
+Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
@@ -94,7 +94,7 @@ Datatable::set_alignment (Qt::Alignment alignment)
 
 
 void
-Datatable::process (v2::Cycle const& cycle)
+Datatable::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
 }

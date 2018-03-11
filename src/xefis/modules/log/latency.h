@@ -27,14 +27,14 @@
 
 class Latency:
 	public QObject,
-	public v2::Module<>
+	public xf::Module<>
 {
 	Q_OBJECT
 
   public:
 	// Ctor
 	explicit
-	Latency (v2::Accounting&, std::string const& instance = {});
+	Latency (xf::Accounting&, std::string const& instance = {});
 
   private slots:
 	/**
@@ -44,7 +44,7 @@ class Latency:
 	log_latency();
 
   private:
-	v2::Accounting&	_accounting;
+	xf::Accounting&	_accounting;
 	QTimer*			_log_timer;
 };
 
