@@ -308,6 +308,10 @@ XEFIS_SOURCES			+= xefis/support/devices/chr_um6.cc
 XEFIS_SOURCES			+= xefis/support/devices/ht16k33.cc
 XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
 
+######## /xefis/support/instrument ########
+
+XEFIS_HEADERS			+= xefis/support/instrument/painter_shadow.h
+
 ######## /xefis/support/navigation ########
 
 XEFIS_HEADERS			+= xefis/support/navigation/magnetic_variation.h
@@ -395,7 +399,6 @@ XEFIS_HEADERS			+= xefis/utility/noncopyable.h
 XEFIS_HEADERS			+= xefis/utility/numeric.h
 XEFIS_HEADERS			+= xefis/utility/owner_token.h
 XEFIS_HEADERS			+= xefis/utility/packet_reader.h
-XEFIS_HEADERS			+= xefis/utility/painter.h
 XEFIS_HEADERS			+= xefis/utility/pid_control.h
 XEFIS_HEADERS			+= xefis/utility/qdom.h
 XEFIS_HEADERS			+= xefis/utility/qdom_iterator.h
@@ -428,7 +431,6 @@ XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
-XEFIS_SOURCES			+= xefis/utility/painter.cc
 XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/semaphore.cc
