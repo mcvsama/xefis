@@ -22,12 +22,16 @@
 #include <xefis/core/v2/processing_loop.h>
 #include <xefis/core/v2/machine.h>
 #include <xefis/core/xefis.h>
+#if 0
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/hsi.h>
 #include <xefis/modules/instruments/horizontal_trim.h>
+#endif
 #include <xefis/modules/io/link.h>
 #include <xefis/modules/systems/adc.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 
 // Cthulhu:
 #include <configs/cthulhu_shared/link_io.h>
@@ -61,6 +65,7 @@ class Loop: public xf::ProcessingLoop
 
 	AirDataComputer*	adc;
 
+#if 0
 	/*
 	 * Instruments
 	 */
@@ -68,6 +73,7 @@ class Loop: public xf::ProcessingLoop
 	ADI*				adi;
 	HSI*				hsi_aux;
 	HorizontalTrim*		horizontal_trim;
+#endif
 
   public:
 	// Ctor
