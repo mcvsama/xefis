@@ -24,14 +24,10 @@
 #include "loop.h"
 
 
-template<class T>
-	T&
-	mydeclval(); // XXX temporary
-
-
 Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	ProcessingLoop (machine, 30_Hz)
 {
+#if 0
 	xf::AirframeDefinition airframe_definition {
 		mydeclval<xf::Flaps>(),
 		mydeclval<xf::Spoilers>(),
@@ -46,14 +42,17 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 		// Safe AOA correction from maximum AOA:
 		-1_deg,
 	};
+#endif
 
+#if 0
 	_airframe = std::make_unique<xf::Airframe> (airframe_definition);
+#endif
 	_navaid_storage = std::make_unique<xf::NavaidStorage>();
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency());
 
-	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-stick.xml"));
-	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-throttle.xml"));
-	QDomElement pedals_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-saitek-pedals.xml"));
+	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-hotas-stick.xml"));
+	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-hotas-throttle.xml"));
+	QDomElement pedals_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-saitek-pedals.xml"));
 
 	auto joystick_io = std::make_unique<JoystickInputIO>();
 	auto throttle_io = std::make_unique<JoystickInputIO>();
@@ -81,8 +80,11 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	this->link_tx = load_module<Link> (std::move (link_io_tx), std::move (link_protocol_tx), "link-tx");
 	this->link_rx = load_module<Link> (std::move (link_io_rx), std::move (link_protocol_rx), "link-rx");
 
+#if 0
 	this->adc = load_module<AirDataComputer> (std::move (adc_io), _airframe.get());
+#endif
 
+#if 0
 	auto adi_io = std::make_unique<ADI_IO>();
 	adi_io->speed_ias_serviceable.set_fallback (true);
 	adi_io->speed_ias.set_fallback (120_kt);
@@ -96,12 +98,12 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	adi_io->speed_v1.set_fallback (91_kt);
 	adi_io->speed_vr.set_fallback (99_kt);
 	adi_io->speed_vref.set_fallback (124_kt);
-	//v2::PropertyIn<std::string>		speed_flaps_up_label
-	//v2::PropertyIn<si::Velocity>	speed_flaps_up_speed
-	//v2::PropertyIn<std::string>		speed_flaps_a_label
-	//v2::PropertyIn<si::Velocity>	speed_flaps_a_speed
-	//v2::PropertyIn<std::string>		speed_flaps_b_label
-	//v2::PropertyIn<si::Velocity>	speed_flaps_b_speed
+	//xf::PropertyIn<std::string>		speed_flaps_up_label
+	//xf::PropertyIn<si::Velocity>	speed_flaps_up_speed
+	//xf::PropertyIn<std::string>		speed_flaps_a_label
+	//xf::PropertyIn<si::Velocity>	speed_flaps_a_speed
+	//xf::PropertyIn<std::string>		speed_flaps_b_label
+	//xf::PropertyIn<si::Velocity>	speed_flaps_b_speed
 	adi_io->orientation_serviceable.set_fallback (true);
 	adi_io->orientation_pitch.set_fallback (1_deg);
 	adi_io->orientation_roll.set_fallback (0_deg);
@@ -119,5 +121,6 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	this->adi->show();
 	//this->hsi_aux->show();
 	//this->horizontal_trim->show();
+#endif
 }
 
