@@ -52,8 +52,8 @@ class LinkProtocol
 {
   public:
 	using Bits				= xf::StrongType<uint8_t, struct BitsType>;
-	using Magic				= xf::StrongType<Blob, struct MagicType>;
-	using Key				= xf::StrongType<Blob, struct KeyType>;
+	using Magic				= xf::StrongType<Blob, struct MagicType>; // TODO make ConstBlob like Constring
+	using Key				= xf::StrongType<Blob, struct KeyType>; // TODO make ConstBlob
 	using SendEvery			= xf::StrongType<std::size_t, struct SendOffsetType>;
 	using SendOffset		= xf::StrongType<std::size_t, struct SendOffsetType>;
 	using Retained			= xf::StrongType<bool, struct RetainedType>;
@@ -187,7 +187,7 @@ class LinkProtocol
 			 */
 			template<class = std::enable_if_t<std::is_integral_v<Value>>>
 				explicit
-				Property (v2::Property<Value>&, Retained retained, Value fallback_value);
+				Property (xf::Property<Value>&, Retained retained, Value fallback_value);
 
 			/**
 			 * Ctor for floating-point values and SI values
@@ -202,7 +202,7 @@ class LinkProtocol
 			 */
 			template<class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
 				explicit
-				Property (v2::Property<Value>&, Retained retained, std::optional<Value> offset = {});
+				Property (xf::Property<Value>&, Retained retained, std::optional<Value> offset = {});
 
 			Blob::size_type
 			size() const override;
@@ -235,7 +235,7 @@ class LinkProtocol
 				unserialize (Blob::const_iterator begin, Blob::const_iterator end, SourceType&);
 
 		  private:
-			v2::Property<Value>&		_property;
+			xf::Property<Value>&		_property;
 			si::decay_quantity_t<Value>	_fallback_value {};
 			std::optional<Value>		_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
@@ -256,7 +256,7 @@ class LinkProtocol
 		template<class Value>
 			struct BitSource
 			{
-				v2::Property<Value>&	property;
+				xf::Property<Value>&	property;
 				// More than 1 bit only makes sense for integer Values:
 				uint8_t					bits			{ 1 };
 				bool					retained		{ false };
@@ -380,21 +380,21 @@ class LinkProtocol
 
 	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_integral_v<Value>>>
 		static auto
-		property (v2::Property<Value>& property, Retained retained, Value fallback_value)
+		property (xf::Property<Value>& property, Retained retained, Value fallback_value)
 		{
 			return std::make_shared<Property<Bytes, Value>> (property, retained, fallback_value);
 		}
 
 	template<size_t Bytes, class Value, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
 		static auto
-		property (v2::Property<Value>& property, Retained retained)
+		property (xf::Property<Value>& property, Retained retained)
 		{
 			return std::make_shared<Property<Bytes, Value>> (property, retained);
 		}
 
 	template<size_t Bytes, class Value, class Offset, class = std::enable_if_t<std::is_floating_point_v<Value> || si::is_quantity_v<Value>>>
 		static auto
-		property (v2::Property<Value>& property, Retained retained, Offset offset)
+		property (xf::Property<Value>& property, Retained retained, Offset offset)
 		{
 			// Allow Offset to be a Quantity specified over different but compatible Unit (eg. Feet instead of Meters).
 			return std::make_shared<Property<Bytes, Value>> (property, retained, std::optional<Value> (offset));
@@ -407,7 +407,7 @@ class LinkProtocol
 	}
 
 	static Bitfield::BitSource<bool>
-	bitfield_property (v2::Property<bool>& property, Retained retained, bool fallback_value)
+	bitfield_property (xf::Property<bool>& property, Retained retained, bool fallback_value)
 	{
 		return { property, 1, *retained, fallback_value, false };
 	}
@@ -418,7 +418,7 @@ class LinkProtocol
 	 */
 	template<class Unsigned>
 		static Bitfield::BitSource<Unsigned>
-		bitfield_property (v2::Property<Unsigned>& property, Bits bits, Retained retained, Unsigned fallback_value)
+		bitfield_property (xf::Property<Unsigned>& property, Bits bits, Retained retained, Unsigned fallback_value)
 		{
 			if (!fits_in_bits (fallback_value, bits))
 				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
@@ -463,34 +463,34 @@ class LinkProtocol
 };
 
 
-class LinkIO: public v2::ModuleIO
+class LinkIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Frequency>		send_frequency			{ this, "send_frequency" };
-	v2::Setting<si::Time>			reacquire_after			{ this, "reacquire_after" };
-	v2::Setting<si::Time>			failsafe_after			{ this, "failsafe_after" };
+	xf::Setting<si::Frequency>		send_frequency			{ this, "send_frequency", xf::BasicSetting::Optional };
+	xf::Setting<si::Time>			reacquire_after			{ this, "reacquire_after", xf::BasicSetting::Optional };
+	xf::Setting<si::Time>			failsafe_after			{ this, "failsafe_after", xf::BasicSetting::Optional };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<std::string>		link_input				{ this, "/input" };
+	xf::PropertyIn<std::string>		link_input				{ this, "/input" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<std::string>	link_output				{ this, "/output" };
-	v2::PropertyOut<bool>			link_valid				{ this, "/link-valid" };
-	v2::PropertyOut<int64_t>		link_failsafes			{ this, "/failsafes" };
-	v2::PropertyOut<int64_t>		link_reacquires			{ this, "/reacquires" };
-	v2::PropertyOut<int64_t>		link_error_bytes		{ this, "/error-bytes" };
-	v2::PropertyOut<int64_t>		link_valid_bytes		{ this, "/valid-bytes" };
-	v2::PropertyOut<int64_t>		link_valid_envelopes	{ this, "/valid-envelopes" };
+	xf::PropertyOut<std::string>	link_output				{ this, "/output" };
+	xf::PropertyOut<bool>			link_valid				{ this, "/link-valid" };
+	xf::PropertyOut<int64_t>		link_failsafes			{ this, "/failsafes" };
+	xf::PropertyOut<int64_t>		link_reacquires			{ this, "/reacquires" };
+	xf::PropertyOut<int64_t>		link_error_bytes		{ this, "/error-bytes" };
+	xf::PropertyOut<int64_t>		link_valid_bytes		{ this, "/valid-bytes" };
+	xf::PropertyOut<int64_t>		link_valid_envelopes	{ this, "/valid-envelopes" };
 
   public:
 	void
@@ -500,7 +500,7 @@ class LinkIO: public v2::ModuleIO
 
 class Link:
 	public QObject,
-	public v2::Module<LinkIO>
+	public xf::Module<LinkIO>
 {
 	Q_OBJECT
 
@@ -510,7 +510,7 @@ class Link:
 	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, std::string const& instance = {});
 
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private slots:
 	/**
@@ -538,14 +538,14 @@ class Link:
 	Blob							_input_blob;
 	Blob							_output_blob;
 	std::unique_ptr<LinkProtocol>	_protocol;
-	v2::PropChanged<std::string>	_input_changed		{ io.link_input };
+	xf::PropChanged<std::string>	_input_changed		{ io.link_input };
 };
 
 
 template<uint8_t B, class V>
 	template<class>
 		inline
-		LinkProtocol::Property<B, V>::Property (v2::Property<Value>& property, Retained retained, Value fallback_value):
+		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, Value fallback_value):
 			_property (property),
 			_fallback_value (fallback_value),
 			_retained (*retained)
@@ -570,7 +570,7 @@ template<uint8_t B, class V>
 template<uint8_t B, class V>
 	template<class>
 		inline
-		LinkProtocol::Property<B, V>::Property (v2::Property<Value>& property, Retained retained, std::optional<Value> offset):
+		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, std::optional<Value> offset):
 			_property (property),
 			_fallback_value (std::numeric_limits<decltype (_fallback_value)>::quiet_NaN()),
 			_retained (*retained),

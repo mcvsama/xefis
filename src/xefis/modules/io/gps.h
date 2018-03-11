@@ -32,49 +32,49 @@
 #include <xefis/support/protocols/nmea/parser.h>
 
 
-class GPS_IO: public v2::ModuleIO
+class GPS_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<std::vector<std::string>>	boot_pmtk_commands			{ this, "boot_pmtk_commands", { } };
-	v2::Setting<unsigned int>				default_baud_rate			{ this, "default_baud_rate", 9600 };
-	v2::Setting<unsigned int>				target_baud_rate			{ this, "target_baud_rate", 9600 };
-	v2::Setting<si::Length>					receiver_accuracy			{ this, "receiver_accuracy" };
-	v2::Setting<bool>						synchronize_system_clock	{ this, "synchronize_system_clock", false };
+	xf::Setting<std::vector<std::string>>	boot_pmtk_commands			{ this, "boot_pmtk_commands", { } };
+	xf::Setting<unsigned int>				default_baud_rate			{ this, "default_baud_rate", 9600 };
+	xf::Setting<unsigned int>				target_baud_rate			{ this, "target_baud_rate", 9600 };
+	xf::Setting<si::Length>					receiver_accuracy			{ this, "receiver_accuracy" };
+	xf::Setting<bool>						synchronize_system_clock	{ this, "synchronize_system_clock", false };
 
 	/*
 	 * Output
 	 */
 
 	// Number of serial read failures.
-	v2::PropertyOut<int64_t>				read_errors					{ this, "/read-errors" };	// Managed by Connection object.
+	xf::PropertyOut<int64_t>				read_errors					{ this, "/read-errors" };	// Managed by Connection object.
 	// True if GPS device is serviceable:
-	v2::PropertyOut<bool>					serviceable					{ this, "/serviceable" };	// Managed by Connection object.
+	xf::PropertyOut<bool>					serviceable					{ this, "/serviceable" };	// Managed by Connection object.
 	// Manager power to the GPS device:
-	v2::PropertyOut<bool>					power_on					{ this, "/power-on" };		// Managed by PowerCycle object.
+	xf::PropertyOut<bool>					power_on					{ this, "/power-on" };		// Managed by PowerCycle object.
 
-	v2::PropertyOut<std::string>			fix_quality					{ this, "/gps/fix-quality" };
-	v2::PropertyOut<std::string>			fix_mode					{ this, "/gps/mode" };		// "2D" or "3D"
-	v2::PropertyOut<si::Angle>				latitude					{ this, "/gps/latitude" };
-	v2::PropertyOut<si::Angle>				longitude					{ this, "/gps/longitude" };
-	v2::PropertyOut<si::Length>				altitude_amsl				{ this, "/gps/altitude-amsl" };
-	v2::PropertyOut<si::Length>				geoid_height				{ this, "/gps/geoid-height" };
-	v2::PropertyOut<si::Velocity>			ground_speed				{ this, "/gps/ground-speed" };
-	v2::PropertyOut<si::Angle>				track_true					{ this, "/gps/track.true" };
-	v2::PropertyOut<int64_t>				tracked_satellites			{ this, "/gps/tracked-satellites" };
-	v2::PropertyOut<si::Angle>				magnetic_declination		{ this, "/gps/magnetic-declination" };
-	v2::PropertyOut<double>					hdop						{ this, "/gps/hdop" };
-	v2::PropertyOut<double>					vdop						{ this, "/gps/vdop" };
-	v2::PropertyOut<double>					pdop						{ this, "/gps/pdop" };
-	v2::PropertyOut<si::Length>				lateral_stddev				{ this, "/gps/lateral-stddev" };
-	v2::PropertyOut<si::Length>				vertical_stddev				{ this, "/gps/vertical-stddev" };
-	v2::PropertyOut<si::Length>				position_stddev				{ this, "/gps/position-stddev" };
-	v2::PropertyOut<int64_t>				dgps_station_id				{ this, "/gps/dgps-station-id" };
-	v2::PropertyOut<si::Time>				fix_system_timestamp		{ this, "/gps/fix/system-timestamp" };
-	v2::PropertyOut<si::Time>				fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
+	xf::PropertyOut<std::string>			fix_quality					{ this, "/gps/fix-quality" };
+	xf::PropertyOut<std::string>			fix_mode					{ this, "/gps/mode" };		// "2D" or "3D"
+	xf::PropertyOut<si::Angle>				latitude					{ this, "/gps/latitude" };
+	xf::PropertyOut<si::Angle>				longitude					{ this, "/gps/longitude" };
+	xf::PropertyOut<si::Length>				altitude_amsl				{ this, "/gps/altitude-amsl" };
+	xf::PropertyOut<si::Length>				geoid_height				{ this, "/gps/geoid-height" };
+	xf::PropertyOut<si::Velocity>			ground_speed				{ this, "/gps/ground-speed" };
+	xf::PropertyOut<si::Angle>				track_true					{ this, "/gps/track.true" };
+	xf::PropertyOut<int64_t>				tracked_satellites			{ this, "/gps/tracked-satellites" };
+	xf::PropertyOut<si::Angle>				magnetic_declination		{ this, "/gps/magnetic-declination" };
+	xf::PropertyOut<double>					hdop						{ this, "/gps/hdop" };
+	xf::PropertyOut<double>					vdop						{ this, "/gps/vdop" };
+	xf::PropertyOut<double>					pdop						{ this, "/gps/pdop" };
+	xf::PropertyOut<si::Length>				lateral_stddev				{ this, "/gps/lateral-stddev" };
+	xf::PropertyOut<si::Length>				vertical_stddev				{ this, "/gps/vertical-stddev" };
+	xf::PropertyOut<si::Length>				position_stddev				{ this, "/gps/position-stddev" };
+	xf::PropertyOut<int64_t>				dgps_station_id				{ this, "/gps/dgps-station-id" };
+	xf::PropertyOut<si::Time>				fix_system_timestamp		{ this, "/gps/fix/system-timestamp" };
+	xf::PropertyOut<si::Time>				fix_gps_timestamp			{ this, "/gps/fix/gps-timestamp" };
 };
 
 
@@ -86,7 +86,7 @@ class GPS_IO: public v2::ModuleIO
  */
 class GPS:
 	public QObject,
-	public v2::Module<GPS_IO>
+	public xf::Module<GPS_IO>
 {
 	Q_OBJECT
 
@@ -304,7 +304,7 @@ class GPS:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private slots:
 	/**

@@ -41,7 +41,7 @@ ArrivalETA::ArrivalETA (std::unique_ptr<ArrivalETA_IO> module_io, std::string co
 
 
 void
-ArrivalETA::process (v2::Cycle const& cycle)
+ArrivalETA::process (xf::Cycle const& cycle)
 {
 	_eta_computer.process (cycle.update_time());
 }

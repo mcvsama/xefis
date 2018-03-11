@@ -28,7 +28,7 @@
 #include <xefis/core/v2/property_utils.h>
 
 
-namespace v2 {
+namespace xf {
 
 /**
  * Returns numerical value for a Property.
@@ -224,7 +224,7 @@ PropertyDigitizer::operator= (PropertyDigitizer const& other)
 	return *this;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

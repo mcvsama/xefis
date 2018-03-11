@@ -26,7 +26,7 @@
 #include <xefis/core/v2/property_utils.h>
 
 
-namespace v2 {
+namespace xf {
 
 /**
  * Formats Property value according to configuration.
@@ -346,7 +346,7 @@ PropertyStringifier::operator= (PropertyStringifier const& other)
 	return *this;
 }
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

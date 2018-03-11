@@ -29,29 +29,29 @@
 #include <xefis/core/xefis.h>
 
 
-class TrimControlIO: public v2::ModuleIO
+class TrimControlIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<double>		trim_step			{ this, "trim_step", 0.01 };
+	xf::Setting<double>		trim_step			{ this, "trim_step", 0.01 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	trim_axis			{ this, "/axis" };
-	v2::PropertyIn<double>	trim_value			{ this, "/value" };
-	v2::PropertyIn<bool>	up_trim_button		{ this, "/up-button" };
-	v2::PropertyIn<bool>	down_trim_button	{ this, "/down-button" };
+	xf::PropertyIn<double>	trim_axis			{ this, "/axis" };
+	xf::PropertyIn<double>	trim_value			{ this, "/value" };
+	xf::PropertyIn<bool>	up_trim_button		{ this, "/up-button" };
+	xf::PropertyIn<bool>	down_trim_button	{ this, "/down-button" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<double>	output_trim_value			{ this, "/trim-value" };
+	xf::PropertyOut<double>	output_trim_value			{ this, "/trim-value" };
 };
 
 
@@ -59,7 +59,7 @@ class TrimControlIO: public v2::ModuleIO
  * Controls trim value with two buttons or axis.
  * Generates appropriate trimming sound.
  */
-class TrimControl: public v2::Module<TrimControlIO>
+class TrimControl: public xf::Module<TrimControlIO>
 {
   public:
 	// Ctor
@@ -68,7 +68,7 @@ class TrimControl: public v2::Module<TrimControlIO>
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	void
@@ -84,19 +84,19 @@ class TrimControl: public v2::Module<TrimControlIO>
 	 * Return true if given button is 'pressed'.
 	 */
 	static bool
-	pressed (v2::Property<bool> const&);
+	pressed (xf::Property<bool> const&);
 
 	/**
 	 * Return true if given axis is moved 'up'.
 	 */
 	static bool
-	moved_up (v2::Property<double> const&);
+	moved_up (xf::Property<double> const&);
 
 	/**
 	 * Return true if given axis is moved 'down'.
 	 */
 	static bool
-	moved_down (v2::Property<double> const&);
+	moved_down (xf::Property<double> const&);
 
   private:
 	xf::SoundManager*		_sound_manager	{ nullptr };
@@ -104,8 +104,8 @@ class TrimControl: public v2::Module<TrimControlIO>
 	bool					_trimming_up	{ false };
 	bool					_trimming_down	{ false };
 	Unique<QTimer>			_timer;
-	v2::PropertyObserver	_trim_computer;
-	v2::PropertyObserver	_mix_computer;
+	xf::PropertyObserver	_trim_computer;
+	xf::PropertyObserver	_mix_computer;
 };
 
 #endif

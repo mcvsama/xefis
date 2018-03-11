@@ -28,8 +28,7 @@
 #include <xefis/core/services.h>
 
 
-namespace v2 {
-using namespace xf; // XXX
+namespace xf {
 
 template<class IO = ModuleIO>
 	class Instrument:
@@ -89,7 +88,7 @@ template<class IO>
 		setCursor (QCursor (Qt::CrossCursor));
 	}
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

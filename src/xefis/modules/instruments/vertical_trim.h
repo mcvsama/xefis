@@ -30,28 +30,28 @@
 #include <xefis/core/v2/setting.h>
 
 
-class VerticalTrimIO: public v2::ModuleIO
+class VerticalTrimIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<QString>	label					{ this, "label", "STAB" };
+	xf::Setting<QString>	label					{ this, "label", "STAB" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>	trim_value				{ this, "/trim/value" };
-	v2::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
-	v2::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
-	v2::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
+	xf::PropertyIn<double>	trim_value				{ this, "/trim/value" };
+	xf::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
+	xf::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
+	xf::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
 };
 
 
 class VerticalTrim:
-	public v2::Instrument<VerticalTrimIO>,
+	public xf::Instrument<VerticalTrimIO>,
 	protected xf::InstrumentAids
 {
   public:
@@ -61,7 +61,7 @@ class VerticalTrim:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API
@@ -77,7 +77,7 @@ class VerticalTrim:
 	stringify (double value);
 
   private:
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 #endif

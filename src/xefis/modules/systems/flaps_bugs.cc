@@ -28,7 +28,7 @@ FlapsBugs::FlapsBugs (std::unique_ptr<FlapsBugsIO> module_io, xf::Flaps const& f
 
 
 void
-FlapsBugs::process (v2::Cycle const&)
+FlapsBugs::process (xf::Cycle const&)
 {
 	if (_flaps_setting_changed())
 	{

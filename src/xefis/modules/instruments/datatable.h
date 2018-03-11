@@ -33,7 +33,7 @@
 
 
 class Datatable:
-	public v2::Instrument<v2::ModuleIO>,
+	public xf::Instrument<xf::ModuleIO>,
 	protected xf::InstrumentAids
 {
 	class Line
@@ -41,16 +41,16 @@ class Datatable:
 	  public:
 		// Ctor
 		explicit
-		Line (std::string const& label, v2::PropertyStringifier const&);
+		Line (std::string const& label, xf::PropertyStringifier const&);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, v2::PropertyStringifier const&,
+		Line (std::string const& label, xf::PropertyStringifier const&,
 			  QColor label_and_value_color);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, v2::PropertyStringifier const&,
+		Line (std::string const& label, xf::PropertyStringifier const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
 
@@ -63,7 +63,7 @@ class Datatable:
 	  public:
 		std::string				label;
 		QColor					label_color	{ Qt::white };
-		v2::PropertyStringifier	value;
+		xf::PropertyStringifier	value;
 		QColor					value_color	{ Qt::white };
 	};
 
@@ -100,7 +100,7 @@ class Datatable:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	void
@@ -114,7 +114,7 @@ class Datatable:
 	xf::FontSize			_value_font_size	{ 18.0 };
 	Qt::Alignment			_alignment			{ Qt::AlignTop };
 	std::vector<Line>		_list;
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 

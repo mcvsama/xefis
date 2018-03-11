@@ -43,8 +43,8 @@ template<template<class> class PropertyType>
 	};
 
 
-using GCS_Tx_LinkIO = GCS2AircraftLinkIO<v2::PropertyIn>;
-using Aircraft_Rx_LinkIO = GCS2AircraftLinkIO<v2::PropertyOut>;
+using GCS_Tx_LinkIO = GCS2AircraftLinkIO<xf::PropertyIn>;
+using Aircraft_Rx_LinkIO = GCS2AircraftLinkIO<xf::PropertyOut>;
 
 
 constexpr auto kFallbackBool	= true;

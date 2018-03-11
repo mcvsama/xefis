@@ -33,18 +33,18 @@
 class State;
 
 
-class StateIO: public v2::ModuleIO
+class StateIO: public xf::ModuleIO
 {
 	friend class State;
 
 	struct SavedProperty
 	{
-		SavedProperty (v2::BasicProperty& property):
+		SavedProperty (xf::BasicProperty& property):
 			property (property)
 		{ }
 
-		v2::BasicProperty&	property;
-		v2::SerialChanged	changed { property };
+		xf::BasicProperty&	property;
+		xf::SerialChanged	changed { property };
 	};
 
   public:
@@ -52,22 +52,22 @@ class StateIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<si::Time>		save_period		{ this, "save_period", 5_s };
-	v2::Setting<std::string>	file_name		{ this, "file_name" };
+	xf::Setting<si::Time>		save_period		{ this, "save_period", 5_s };
+	xf::Setting<std::string>	file_name		{ this, "file_name" };
 
   public:
 	/**
 	 * Register property for serialization/deserialization.
 	 */
 	void
-	register_property (std::string const& unique_identifier, v2::BasicProperty&);
+	register_property (std::string const& unique_identifier, xf::BasicProperty&);
 
   private:
 	std::map<std::string, SavedProperty>	_registered_properties;
 };
 
 
-class State: public v2::Module<StateIO>
+class State: public xf::Module<StateIO>
 {
   public:
 	// Ctor
@@ -80,7 +80,7 @@ class State: public v2::Module<StateIO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	/**

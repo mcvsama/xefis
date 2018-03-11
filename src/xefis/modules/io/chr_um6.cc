@@ -80,7 +80,7 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 
 
 void
-CHRUM6::process (v2::Cycle const&)
+CHRUM6::process (xf::Cycle const&)
 {
 	if (_sensor && _serial_port.good())
 	{

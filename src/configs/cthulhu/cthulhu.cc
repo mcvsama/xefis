@@ -44,16 +44,16 @@ class WarthogStick: public JoystickInput
 	 * Output
 	 */
 
-	v2::PropertyOut<double>&	pitch_axis	= axis (3);
-	v2::PropertyOut<double>&	roll_axis	= axis (4);
-	v2::PropertyOut<bool>&		fire_button	= button (5);
+	xf::PropertyOut<double>&	pitch_axis	= axis (3);
+	xf::PropertyOut<double>&	roll_axis	= axis (4);
+	xf::PropertyOut<bool>&		fire_button	= button (5);
 
   public:
 	using JoystickInput::JoystickInput;
 };
 
 
-class MyLoop: public v2::ProcessingLoop
+class MyLoop: public xf::ProcessingLoop
 {
   public:
 	using ProcessingLoop::ProcessingLoop;
@@ -135,9 +135,9 @@ Cthulhu::setup_ht16k33s()
 	i2c_device.bus().set_bus_number (10);
 	i2c_device.set_address (xf::i2c::Address (0x11));
 
-	v2::PropertyOut<bool> switch_prop { "/switch-prop" };
-	v2::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
-	v2::PropertyOut<bool> led_prop { "/led-prop" };
+	xf::PropertyOut<bool> switch_prop { "/switch-prop" };
+	xf::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
+	xf::PropertyOut<bool> led_prop { "/led-prop" };
 
 	xf::HT16K33 chip (std::move (i2c_device));
 	chip.add_single_switch (switch_prop, 0, 1);

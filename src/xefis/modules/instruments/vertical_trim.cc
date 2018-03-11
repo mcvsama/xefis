@@ -36,7 +36,7 @@ VerticalTrim::VerticalTrim (std::unique_ptr<VerticalTrimIO> module_io, std::stri
 
 
 void
-VerticalTrim::process (v2::Cycle const& cycle)
+VerticalTrim::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
 }

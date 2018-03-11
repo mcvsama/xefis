@@ -31,8 +31,7 @@
 #include <xefis/utility/time_helper.h>
 
 
-namespace v2 {
-using namespace xf; // XXX
+namespace xf {
 
 class Accounting: public QObject
 {
@@ -118,7 +117,7 @@ class Accounting: public QObject
 		Stats	e3	= Stats (1000);
 	};
 
-	using ModuleStats = std::map<v2::BasicModule*, StatsSet>;
+	using ModuleStats = std::map<xf::BasicModule*, StatsSet>;
 
   public:
 	// Ctor
@@ -145,14 +144,14 @@ class Accounting: public QObject
 	 * \throw	ModuleNotFoundException if module can't be found.
 	 */
 	Stats const&
-	module_stats (v2::BasicModule*, Timespan) const;
+	module_stats (xf::BasicModule*, Timespan) const;
 
 	/**
 	 * Add module accounting stats (usually called by the ModuleManager
 	 * which tracks how much time each module consumes on data_updated().
 	 */
 	void
-	add_module_stats (v2::BasicModule*, si::Time dt);
+	add_module_stats (xf::BasicModule*, si::Time dt);
 
   private slots:
 	/**

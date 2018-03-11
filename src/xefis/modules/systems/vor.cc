@@ -42,7 +42,7 @@ VOR::VOR (std::unique_ptr<VOR_IO> module_io, std::string const& instance):
 
 
 void
-VOR::process (v2::Cycle const& cycle)
+VOR::process (xf::Cycle const& cycle)
 {
 	_vor_computer.process (cycle.update_time());
 }

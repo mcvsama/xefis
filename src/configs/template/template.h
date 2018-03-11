@@ -23,7 +23,7 @@
 #include <xefis/core/xefis.h>
 
 
-class TemplateAircraft: public v2::Machine
+class TemplateAircraft: public xf::Machine
 {
   public:
 	// Ctor

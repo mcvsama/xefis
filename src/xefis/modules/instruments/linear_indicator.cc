@@ -26,7 +26,7 @@
 #include "linear_indicator.h"
 
 
-LinearIndicator::LinearIndicator (std::unique_ptr<LinearIndicatorIO> module_io, v2::PropertyDigitizer value_digitizer, std::string const& instance):
+LinearIndicator::LinearIndicator (std::unique_ptr<LinearIndicatorIO> module_io, xf::PropertyDigitizer value_digitizer, std::string const& instance):
 	InstrumentAids (0.8f),
 	BasicIndicator (std::move (module_io), instance),
 	_value_digitizer (value_digitizer)
@@ -37,7 +37,7 @@ LinearIndicator::LinearIndicator (std::unique_ptr<LinearIndicatorIO> module_io, 
 
 
 void
-LinearIndicator::process (v2::Cycle const& cycle)
+LinearIndicator::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
 }

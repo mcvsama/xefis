@@ -26,27 +26,27 @@
 #include <xefis/core/v2/setting.h>
 
 
-class FlapsIO: public v2::ModuleIO
+class FlapsIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Angle>		maximum_angle		{ this, "maximum_angle" };
-	v2::Setting<bool>			hide_retracted		{ this, "hide_retracted", true };
+	xf::Setting<si::Angle>		maximum_angle		{ this, "maximum_angle" };
+	xf::Setting<bool>			hide_retracted		{ this, "hide_retracted", true };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>	current_angle		{ this, "/current-angle" };
-	v2::PropertyIn<si::Angle>	set_angle			{ this, "/set-angle" };
+	xf::PropertyIn<si::Angle>	current_angle		{ this, "/current-angle" };
+	xf::PropertyIn<si::Angle>	set_angle			{ this, "/set-angle" };
 };
 
 
 class Flaps:
-	public v2::Instrument<FlapsIO>,
+	public xf::Instrument<FlapsIO>,
 	protected xf::InstrumentAids
 {
   public:
@@ -67,7 +67,7 @@ class Flaps:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 #endif

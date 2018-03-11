@@ -27,7 +27,7 @@
 #include <xefis/utility/datatable2d.h>
 
 
-class EngineTorqueIO: public v2::ModuleIO
+class EngineTorqueIO: public xf::ModuleIO
 {
   public:
 	using EfficiencyDatatable	= xf::Datatable2D<si::AngularVelocity, double>;
@@ -39,21 +39,21 @@ class EngineTorqueIO: public v2::ModuleIO
 	 * Settings
 	 */
 
-	v2::Setting<EngineEfficiency>		motor_efficiency	{ this, "motor_efficiency" };
-	v2::Setting<MotorKv>				motor_kv			{ this, "motor_kv" };
+	xf::Setting<EngineEfficiency>		motor_efficiency	{ this, "motor_efficiency" };
+	xf::Setting<MotorKv>				motor_kv			{ this, "motor_kv" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "/engine-speed" };
-	v2::PropertyIn<si::Current>			engine_current		{ this, "/engine-current" };
+	xf::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "/engine-speed" };
+	xf::PropertyIn<si::Current>			engine_current		{ this, "/engine-current" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Torque>			engine_torque		{ this, "/engine-torque" };
+	xf::PropertyOut<si::Torque>			engine_torque		{ this, "/engine-torque" };
 };
 
 
@@ -65,7 +65,7 @@ class EngineTorqueIO: public v2::ModuleIO
  * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Datatable2D,
  * as a function of motor rotational speed.
  */
-class EngineTorque: public v2::Module<EngineTorqueIO>
+class EngineTorque: public xf::Module<EngineTorqueIO>
 {
   private:
 	using EfficiencyDatatable = EngineTorqueIO::EfficiencyDatatable;
@@ -78,7 +78,7 @@ class EngineTorque: public v2::Module<EngineTorqueIO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	void

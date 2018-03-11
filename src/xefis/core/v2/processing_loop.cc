@@ -26,7 +26,7 @@
 #include "processing_loop.h"
 
 
-namespace v2 {
+namespace xf {
 
 ProcessingLoop::ProcessingLoop (Machine* machine, Frequency loop_frequency):
 	_machine (machine),
@@ -86,8 +86,6 @@ ProcessingLoop::execute_cycle()
 
 	// TODO check if all core properties are computable by modules; if not, show a warning.
 
-	// TODO make lists of connected v1 and v2 properties
-
 	for (auto& module: _modules)
 		BasicModule::ProcessingLoopAPI (*module.get()).reset_cache();
 
@@ -98,5 +96,5 @@ ProcessingLoop::execute_cycle()
 	_previous_timestamp = t;
 }
 
-} // namespace v2
+} // namespace xf
 

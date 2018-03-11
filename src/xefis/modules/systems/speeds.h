@@ -24,28 +24,28 @@
 #include <xefis/core/v2/property_observer.h>
 
 
-class SpeedsIO: public v2::ModuleIO
+class SpeedsIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>		flaps_angle				{ this, "/flaps-angle" };
-	v2::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "/stall-speed" };
+	xf::PropertyIn<si::Angle>		flaps_angle				{ this, "/flaps-angle" };
+	xf::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "/stall-speed" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Velocity>	speed_minimum			{ this, "speed.minimum" };
-	v2::PropertyOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
-	v2::PropertyOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
-	v2::PropertyOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
+	xf::PropertyOut<si::Velocity>	speed_minimum			{ this, "speed.minimum" };
+	xf::PropertyOut<si::Velocity>	speed_minimum_maneuver	{ this, "speed.minimum-maneuver" };
+	xf::PropertyOut<si::Velocity>	speed_maximum_maneuver	{ this, "speed.maximum-maneuver" };
+	xf::PropertyOut<si::Velocity>	speed_maximum			{ this, "speed.maximum" };
 };
 
 
-class Speeds: public v2::Module<SpeedsIO>
+class Speeds: public xf::Module<SpeedsIO>
 {
   public:
 	// Ctor
@@ -54,7 +54,7 @@ class Speeds: public v2::Module<SpeedsIO>
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   private:
 	void
@@ -70,7 +70,7 @@ class Speeds: public v2::Module<SpeedsIO>
 
   private:
 	xf::Airframe*			_airframe;
-	v2::PropertyObserver	_speeds_computer;
+	xf::PropertyObserver	_speeds_computer;
 };
 
 #endif

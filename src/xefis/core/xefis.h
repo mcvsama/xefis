@@ -31,13 +31,9 @@
 #include <xefis/utility/logger.h>
 
 
-namespace v2 { // XXX
-class Machine;
-}
-
 namespace xf {
-using namespace v2; // XXX
 
+class Machine;
 class System;
 class ConfiguratorWidget;
 

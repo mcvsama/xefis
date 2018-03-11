@@ -29,7 +29,7 @@ class LayoutPFD
 	LayoutPFD (Loop*);
 
   private:
-	std::unique_ptr<v2::Window>	_window;
+	std::unique_ptr<xf::Window>	_window;
 };
 
 #endif

@@ -27,7 +27,7 @@
 #include <xefis/utility/blob.h>
 
 
-namespace v2 {
+namespace xf {
 
 class ModuleIO;
 
@@ -257,7 +257,7 @@ template<class V>
 		return !!_value;
 	}
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

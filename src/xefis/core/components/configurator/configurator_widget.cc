@@ -34,7 +34,7 @@
 
 namespace xf {
 
-ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (v2::BasicModule& module, ConfiguratorWidget& configurator_widget, QWidget* parent):
+ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (xf::BasicModule& module, ConfiguratorWidget& configurator_widget, QWidget* parent):
 	QWidget (parent),
 	_module (module),
 	_configurator_widget (configurator_widget)
@@ -49,7 +49,7 @@ ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (v2::BasicModule& m
 
 	QTabWidget* tabs = new QTabWidget (this);
 
-	if (auto module_with_config_widget = dynamic_cast<v2::BasicModule::HasConfiguratorWidget*> (&module))
+	if (auto module_with_config_widget = dynamic_cast<xf::BasicModule::HasConfiguratorWidget*> (&module))
 	{
 		auto module_config_widget = module_with_config_widget->configurator_widget();
 		tabs->addTab (new OwnershipBreaker (module_config_widget, this), "Module config");
@@ -65,7 +65,7 @@ ConfiguratorWidget::GeneralModuleWidget::GeneralModuleWidget (v2::BasicModule& m
 }
 
 
-ConfiguratorWidget::ConfiguratorWidget (v2::Machine& machine, QWidget* parent):
+ConfiguratorWidget::ConfiguratorWidget (xf::Machine& machine, QWidget* parent):
 	QWidget (parent),
 	_machine (machine)
 {
@@ -104,7 +104,7 @@ ConfiguratorWidget::ConfiguratorWidget (v2::Machine& machine, QWidget* parent):
 
 
 void
-ConfiguratorWidget::module_selected (v2::BasicModule& module)
+ConfiguratorWidget::module_selected (xf::BasicModule& module)
 {
 	auto gmw = _general_module_widgets.find (&module);
 

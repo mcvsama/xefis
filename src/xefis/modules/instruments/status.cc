@@ -127,7 +127,7 @@ Status::add_message (std::string const& text, Severity severity)
 
 
 void
-Status::process (v2::Cycle const& cycle)
+Status::process (xf::Cycle const& cycle)
 {
 	(*_input_cursor_decoder)();
 

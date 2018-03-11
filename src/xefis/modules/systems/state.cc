@@ -33,7 +33,7 @@
 
 
 void
-StateIO::register_property (std::string const& unique_identifier, v2::BasicProperty& property)
+StateIO::register_property (std::string const& unique_identifier, xf::BasicProperty& property)
 {
 	if (auto f = _registered_properties.find (unique_identifier); f != _registered_properties.end())
 		throw xf::Exception ("StateIO::register_property: unique_identifier '" + unique_identifier + "' is not unique");
@@ -57,7 +57,7 @@ State::~State()
 
 
 void
-State::process (v2::Cycle const&)
+State::process (xf::Cycle const&)
 {
 	for (auto& rp: io._registered_properties)
 	{

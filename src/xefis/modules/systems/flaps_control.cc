@@ -46,7 +46,7 @@ FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airfr
 
 
 void
-FlapsControl::process (v2::Cycle const&)
+FlapsControl::process (xf::Cycle const&)
 {
 	if (_input_up_clicked())
 	{

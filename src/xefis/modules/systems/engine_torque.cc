@@ -29,7 +29,7 @@ EngineTorque::EngineTorque (std::unique_ptr<EngineTorqueIO> module_io, std::stri
 
 
 void
-EngineTorque::process (v2::Cycle const&)
+EngineTorque::process (xf::Cycle const&)
 {
 	std::visit ([&] (auto&& efficiency) {
 		compute_torque (std::forward<decltype (efficiency)> (efficiency));

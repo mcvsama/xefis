@@ -30,116 +30,116 @@
 #include <xefis/core/v2/setting.h>
 
 
-class FlightGearIO: public v2::ModuleIO
+class FlightGearIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<bool>						input_enabled					{ this, "input_enabled", true };
-	v2::Setting<std::string>				input_host						{ this, "input_host" };
-	v2::Setting<uint16_t>					input_port						{ this, "input_port" };
-	v2::Setting<bool>						output_enabled					{ this, "output_enabled", true };
-	v2::Setting<std::string>				output_host						{ this, "output_host" };
-	v2::Setting<uint16_t>					output_port						{ this, "output_port" };
+	xf::Setting<bool>						input_enabled					{ this, "input_enabled", true };
+	xf::Setting<std::string>				input_host						{ this, "input_host" };
+	xf::Setting<uint16_t>					input_port						{ this, "input_port" };
+	xf::Setting<bool>						output_enabled					{ this, "output_enabled", true };
+	xf::Setting<std::string>				output_host						{ this, "output_host" };
+	xf::Setting<uint16_t>					output_port						{ this, "output_port" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<double>					ailerons						{ this, "/ailerons" }; // TODO
-	v2::PropertyIn<double>					elevator						{ this, "/elevator" };
-	v2::PropertyIn<double>					rudder							{ this, "/rudder" };
-	v2::PropertyIn<double>					throttle_1						{ this, "/throttle-1" };
-	v2::PropertyIn<double>					throttle_2						{ this, "/throttle-2" };
-	v2::PropertyIn<double>					flaps							{ this, "/flaps" };
+	xf::PropertyIn<double>					ailerons						{ this, "/ailerons" }; // TODO
+	xf::PropertyIn<double>					elevator						{ this, "/elevator" };
+	xf::PropertyIn<double>					rudder							{ this, "/rudder" };
+	xf::PropertyIn<double>					throttle_1						{ this, "/throttle-1" };
+	xf::PropertyIn<double>					throttle_2						{ this, "/throttle-2" };
+	xf::PropertyIn<double>					flaps							{ this, "/flaps" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::AngularVelocity>	rotation_x						{ this, "/rotation/x" };
-	v2::PropertyOut<si::AngularVelocity>	rotation_y						{ this, "/rotation/y" };
-	v2::PropertyOut<si::AngularVelocity>	rotation_z						{ this, "/rotation/z" };
-	v2::PropertyOut<si::Acceleration>		acceleration_x					{ this, "/acceleration/x" };
-	v2::PropertyOut<si::Acceleration>		acceleration_y					{ this, "/acceleration/y" };
-	v2::PropertyOut<si::Acceleration>		acceleration_z					{ this, "/acceleration/z" };
-	v2::PropertyOut<si::Angle>				aoa_alpha_maximum				{ this, "/aoa/alpha.maximum" };
-	v2::PropertyOut<si::Angle>				aoa_alpha_minimum				{ this, "/aoa/alpha.minimum" };
-	v2::PropertyOut<si::Angle>				aoa_alpha						{ this, "/aoa/alpha" };
-	v2::PropertyOut<si::Velocity>			ias								{ this, "/speeds/ias" };
-	v2::PropertyOut<si::Velocity>			ias_lookahead					{ this, "/speeds/ias.lookahead" };
-	v2::PropertyOut<si::Velocity>			minimum_ias						{ this, "/speeds/ias.minimum" };
-	v2::PropertyOut<si::Velocity>			maximum_ias						{ this, "/speeds/ias.maximum" };
-	v2::PropertyOut<bool>					ias_serviceable					{ this, "/speeds/ias.serviceable" };
-	v2::PropertyOut<si::Velocity>			gs								{ this, "/speeds/gs" };
-	v2::PropertyOut<si::Velocity>			tas								{ this, "/speeds/tas" };
-	v2::PropertyOut<double>					mach							{ this, "/speeds/mach" };
-	v2::PropertyOut<si::Angle>				ahrs_pitch						{ this, "/orientation/pitch" };
-	v2::PropertyOut<si::Angle>				ahrs_roll						{ this, "/orientation/roll" };
-	v2::PropertyOut<si::Angle>				ahrs_magnetic_heading			{ this, "/orientation/heading.magnetic" };
-	v2::PropertyOut<si::Angle>				ahrs_true_heading				{ this, "/orientation/heading.true" };
-	v2::PropertyOut<bool>					ahrs_serviceable				{ this, "/orientation/serviceable" };
-	v2::PropertyOut<si::Acceleration>		slip_skid						{ this, "/slip-skid" };
-	v2::PropertyOut<si::Angle>				fpm_alpha						{ this, "/fpm/alpha" };
-	v2::PropertyOut<si::Angle>				fpm_beta						{ this, "/fpm/beta" };
-	v2::PropertyOut<si::Angle>				magnetic_track					{ this, "/track/magnetic" };
-	v2::PropertyOut<bool>					standard_pressure				{ this, "/standard-pressure" };
-	v2::PropertyOut<si::Length>				altitude						{ this, "/altitude" };
-	v2::PropertyOut<si::Length>				radar_altimeter_altitude_agl	{ this, "/radar-altimeter/altitude.agl" };
-	v2::PropertyOut<bool>					radar_altimeter_serviceable		{ this, "/radar-altimeter/serviceable" };
-	v2::PropertyOut<si::Velocity>			cbr								{ this, "/cbr" };
-	v2::PropertyOut<si::Pressure>			pressure						{ this, "/pressure/pressure" };
-	v2::PropertyOut<bool>					pressure_serviceable			{ this, "/pressure/serviceable" };
-	v2::PropertyOut<si::Length>				cmd_alt_setting					{ this, "/cmd/altitude-setting" };
-	v2::PropertyOut<si::Velocity>			cmd_speed_setting				{ this, "/cmd/speed-setting" };
-	v2::PropertyOut<si::Angle>				cmd_heading_setting				{ this, "/cmd/heading-setting" };
-	v2::PropertyOut<si::Velocity>			cmd_cbr_setting					{ this, "/cmd/cbr-setting" };
-	v2::PropertyOut<si::Angle>				flight_director_pitch			{ this, "/flight-director/pitch" };
-	v2::PropertyOut<si::Angle>				flight_director_roll			{ this, "/flight-director/roll" };
-	v2::PropertyOut<bool>					navigation_needles_visible		{ this, "/navigation-needles/visible" };
-	v2::PropertyOut<si::Angle>				lateral_deviation				{ this, "/navigation-needles/lateral-deviation" };
-	v2::PropertyOut<si::Angle>				vertical_deviation				{ this, "/navigation-needles/vertical-deviation" };
-	v2::PropertyOut<si::Length>				dme_distance					{ this, "/dme/distance" };
-	v2::PropertyOut<si::Temperature>		total_air_temperature			{ this, "/total-air-temperature" };
-	v2::PropertyOut<double>					engine_throttle_pct				{ this, "/engine-throttle-pct" };
-	v2::PropertyOut<si::Force>				engine_1_thrust					{ this, "/engine/1/thrust" };
-	v2::PropertyOut<si::AngularVelocity>	engine_1_rpm					{ this, "/engine/1/rpm" };
-	v2::PropertyOut<si::Angle>				engine_1_pitch					{ this, "/engine/1/pitch" };
-	v2::PropertyOut<double>					engine_1_epr					{ this, "/engine/1/epr" };
-	v2::PropertyOut<double>					engine_1_n1_pct					{ this, "/engine/1/n1-pct" };
-	v2::PropertyOut<double>					engine_1_n2_pct					{ this, "/engine/1/n2-pct" };
-	v2::PropertyOut<si::Temperature>		engine_1_egt					{ this, "/engine/1/egt" };
-	v2::PropertyOut<si::Force>				engine_2_thrust					{ this, "/engine/2/thrust" };
-	v2::PropertyOut<si::AngularVelocity>	engine_2_rpm					{ this, "/engine/2/rpm" };
-	v2::PropertyOut<si::Angle>				engine_2_pitch					{ this, "/engine/2/pitch" };
-	v2::PropertyOut<double>					engine_2_epr					{ this, "/engine/2/epr" };
-	v2::PropertyOut<double>					engine_2_n1_pct					{ this, "/engine/2/n1-pct" };
-	v2::PropertyOut<double>					engine_2_n2_pct					{ this, "/engine/2/n2-pct" };
-	v2::PropertyOut<si::Temperature>		engine_2_egt					{ this, "/engine/2/egt" };
-	v2::PropertyOut<si::Angle>				gps_latitude					{ this, "/gps/latitude" };
-	v2::PropertyOut<si::Angle>				gps_longitude					{ this, "/gps/longitude" };
-	v2::PropertyOut<si::Length>				gps_amsl						{ this, "/gps/amsl" };
-	v2::PropertyOut<si::Length>				gps_lateral_stddev				{ this, "/gps/lateral-stddev" };
-	v2::PropertyOut<si::Length>				gps_vertical_stddev				{ this, "/gps/vertical-stddev" };
-	v2::PropertyOut<bool>					gps_serviceable					{ this, "/gps/serviceable" };
-	v2::PropertyOut<std::string>			gps_source						{ this, "/gps/source" };
-	v2::PropertyOut<si::Angle>				wind_from_magnetic_heading		{ this, "/wind/heading-from.magnetic" };
-	v2::PropertyOut<si::Velocity>			wind_tas						{ this, "/wind/tas" };
-	v2::PropertyOut<bool>					gear_setting_down				{ this, "/gear/setting-down" };
-	v2::PropertyOut<bool>					gear_nose_up					{ this, "/gear/nose-up" };
-	v2::PropertyOut<bool>					gear_nose_down					{ this, "/gear/nose-down" };
-	v2::PropertyOut<bool>					gear_left_up					{ this, "/gear/left-up" };
-	v2::PropertyOut<bool>					gear_left_down					{ this, "/gear/left-down" };
-	v2::PropertyOut<bool>					gear_right_up					{ this, "/gear/right-up" };
-	v2::PropertyOut<bool>					gear_right_down					{ this, "/gear/right-down" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_x						{ this, "/rotation/x" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_y						{ this, "/rotation/y" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_z						{ this, "/rotation/z" };
+	xf::PropertyOut<si::Acceleration>		acceleration_x					{ this, "/acceleration/x" };
+	xf::PropertyOut<si::Acceleration>		acceleration_y					{ this, "/acceleration/y" };
+	xf::PropertyOut<si::Acceleration>		acceleration_z					{ this, "/acceleration/z" };
+	xf::PropertyOut<si::Angle>				aoa_alpha_maximum				{ this, "/aoa/alpha.maximum" };
+	xf::PropertyOut<si::Angle>				aoa_alpha_minimum				{ this, "/aoa/alpha.minimum" };
+	xf::PropertyOut<si::Angle>				aoa_alpha						{ this, "/aoa/alpha" };
+	xf::PropertyOut<si::Velocity>			ias								{ this, "/speeds/ias" };
+	xf::PropertyOut<si::Velocity>			ias_lookahead					{ this, "/speeds/ias.lookahead" };
+	xf::PropertyOut<si::Velocity>			minimum_ias						{ this, "/speeds/ias.minimum" };
+	xf::PropertyOut<si::Velocity>			maximum_ias						{ this, "/speeds/ias.maximum" };
+	xf::PropertyOut<bool>					ias_serviceable					{ this, "/speeds/ias.serviceable" };
+	xf::PropertyOut<si::Velocity>			gs								{ this, "/speeds/gs" };
+	xf::PropertyOut<si::Velocity>			tas								{ this, "/speeds/tas" };
+	xf::PropertyOut<double>					mach							{ this, "/speeds/mach" };
+	xf::PropertyOut<si::Angle>				ahrs_pitch						{ this, "/orientation/pitch" };
+	xf::PropertyOut<si::Angle>				ahrs_roll						{ this, "/orientation/roll" };
+	xf::PropertyOut<si::Angle>				ahrs_magnetic_heading			{ this, "/orientation/heading.magnetic" };
+	xf::PropertyOut<si::Angle>				ahrs_true_heading				{ this, "/orientation/heading.true" };
+	xf::PropertyOut<bool>					ahrs_serviceable				{ this, "/orientation/serviceable" };
+	xf::PropertyOut<si::Acceleration>		slip_skid						{ this, "/slip-skid" };
+	xf::PropertyOut<si::Angle>				fpm_alpha						{ this, "/fpm/alpha" };
+	xf::PropertyOut<si::Angle>				fpm_beta						{ this, "/fpm/beta" };
+	xf::PropertyOut<si::Angle>				magnetic_track					{ this, "/track/magnetic" };
+	xf::PropertyOut<bool>					standard_pressure				{ this, "/standard-pressure" };
+	xf::PropertyOut<si::Length>				altitude						{ this, "/altitude" };
+	xf::PropertyOut<si::Length>				radar_altimeter_altitude_agl	{ this, "/radar-altimeter/altitude.agl" };
+	xf::PropertyOut<bool>					radar_altimeter_serviceable		{ this, "/radar-altimeter/serviceable" };
+	xf::PropertyOut<si::Velocity>			cbr								{ this, "/cbr" };
+	xf::PropertyOut<si::Pressure>			pressure						{ this, "/pressure/pressure" };
+	xf::PropertyOut<bool>					pressure_serviceable			{ this, "/pressure/serviceable" };
+	xf::PropertyOut<si::Length>				cmd_alt_setting					{ this, "/cmd/altitude-setting" };
+	xf::PropertyOut<si::Velocity>			cmd_speed_setting				{ this, "/cmd/speed-setting" };
+	xf::PropertyOut<si::Angle>				cmd_heading_setting				{ this, "/cmd/heading-setting" };
+	xf::PropertyOut<si::Velocity>			cmd_cbr_setting					{ this, "/cmd/cbr-setting" };
+	xf::PropertyOut<si::Angle>				flight_director_pitch			{ this, "/flight-director/pitch" };
+	xf::PropertyOut<si::Angle>				flight_director_roll			{ this, "/flight-director/roll" };
+	xf::PropertyOut<bool>					navigation_needles_visible		{ this, "/navigation-needles/visible" };
+	xf::PropertyOut<si::Angle>				lateral_deviation				{ this, "/navigation-needles/lateral-deviation" };
+	xf::PropertyOut<si::Angle>				vertical_deviation				{ this, "/navigation-needles/vertical-deviation" };
+	xf::PropertyOut<si::Length>				dme_distance					{ this, "/dme/distance" };
+	xf::PropertyOut<si::Temperature>		total_air_temperature			{ this, "/total-air-temperature" };
+	xf::PropertyOut<double>					engine_throttle_pct				{ this, "/engine-throttle-pct" };
+	xf::PropertyOut<si::Force>				engine_1_thrust					{ this, "/engine/1/thrust" };
+	xf::PropertyOut<si::AngularVelocity>	engine_1_rpm					{ this, "/engine/1/rpm" };
+	xf::PropertyOut<si::Angle>				engine_1_pitch					{ this, "/engine/1/pitch" };
+	xf::PropertyOut<double>					engine_1_epr					{ this, "/engine/1/epr" };
+	xf::PropertyOut<double>					engine_1_n1_pct					{ this, "/engine/1/n1-pct" };
+	xf::PropertyOut<double>					engine_1_n2_pct					{ this, "/engine/1/n2-pct" };
+	xf::PropertyOut<si::Temperature>		engine_1_egt					{ this, "/engine/1/egt" };
+	xf::PropertyOut<si::Force>				engine_2_thrust					{ this, "/engine/2/thrust" };
+	xf::PropertyOut<si::AngularVelocity>	engine_2_rpm					{ this, "/engine/2/rpm" };
+	xf::PropertyOut<si::Angle>				engine_2_pitch					{ this, "/engine/2/pitch" };
+	xf::PropertyOut<double>					engine_2_epr					{ this, "/engine/2/epr" };
+	xf::PropertyOut<double>					engine_2_n1_pct					{ this, "/engine/2/n1-pct" };
+	xf::PropertyOut<double>					engine_2_n2_pct					{ this, "/engine/2/n2-pct" };
+	xf::PropertyOut<si::Temperature>		engine_2_egt					{ this, "/engine/2/egt" };
+	xf::PropertyOut<si::Angle>				gps_latitude					{ this, "/gps/latitude" };
+	xf::PropertyOut<si::Angle>				gps_longitude					{ this, "/gps/longitude" };
+	xf::PropertyOut<si::Length>				gps_amsl						{ this, "/gps/amsl" };
+	xf::PropertyOut<si::Length>				gps_lateral_stddev				{ this, "/gps/lateral-stddev" };
+	xf::PropertyOut<si::Length>				gps_vertical_stddev				{ this, "/gps/vertical-stddev" };
+	xf::PropertyOut<bool>					gps_serviceable					{ this, "/gps/serviceable" };
+	xf::PropertyOut<std::string>			gps_source						{ this, "/gps/source" };
+	xf::PropertyOut<si::Angle>				wind_from_magnetic_heading		{ this, "/wind/heading-from.magnetic" };
+	xf::PropertyOut<si::Velocity>			wind_tas						{ this, "/wind/tas" };
+	xf::PropertyOut<bool>					gear_setting_down				{ this, "/gear/setting-down" };
+	xf::PropertyOut<bool>					gear_nose_up					{ this, "/gear/nose-up" };
+	xf::PropertyOut<bool>					gear_nose_down					{ this, "/gear/nose-down" };
+	xf::PropertyOut<bool>					gear_left_up					{ this, "/gear/left-up" };
+	xf::PropertyOut<bool>					gear_left_down					{ this, "/gear/left-down" };
+	xf::PropertyOut<bool>					gear_right_up					{ this, "/gear/right-up" };
+	xf::PropertyOut<bool>					gear_right_down					{ this, "/gear/right-down" };
 };
 
 
 class FlightGear:
 	public QObject,
-	public v2::Module<FlightGearIO>
+	public xf::Module<FlightGearIO>
 {
 	Q_OBJECT
 
@@ -185,8 +185,8 @@ class FlightGear:
 	QByteArray							_input_datagram;
 	QHostAddress						_output_address;
 	Unique<QUdpSocket>					_output;
-	std::vector<v2::BasicProperty*>		_output_properties;
-	std::vector<v2::Property<bool>*>	_serviceable_flags;
+	std::vector<xf::BasicProperty*>		_output_properties;
+	std::vector<xf::Property<bool>*>	_serviceable_flags;
 };
 
 #endif

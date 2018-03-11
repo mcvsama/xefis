@@ -31,32 +31,32 @@
 #include <xefis/utility/v2/delta_decoder.h>
 
 
-class StatusIO: public v2::ModuleIO
+class StatusIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Time>	status_minimum_display_time		{ this, "status_minimum_display_time", 5_s };
+	xf::Setting<si::Time>	status_minimum_display_time		{ this, "status_minimum_display_time", 5_s };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<int64_t>	cursor_value					{ this, "/input/cursor/value" };
-	v2::PropertyIn<bool>	button_cursor_del				{ this, "/input/button/cursor-del" };
-	v2::PropertyIn<bool>	button_recall					{ this, "/input/button/recall" };
-	v2::PropertyIn<bool>	button_clear					{ this, "/input/button/clear" };
-	v2::PropertyIn<bool>	button_master_caution			{ this, "/input/button/master-caution" };
-	v2::PropertyIn<bool>	button_master_warning			{ this, "/input/button/master-warning" };
+	xf::PropertyIn<int64_t>	cursor_value					{ this, "/input/cursor/value" };
+	xf::PropertyIn<bool>	button_cursor_del				{ this, "/input/button/cursor-del" };
+	xf::PropertyIn<bool>	button_recall					{ this, "/input/button/recall" };
+	xf::PropertyIn<bool>	button_clear					{ this, "/input/button/clear" };
+	xf::PropertyIn<bool>	button_master_caution			{ this, "/input/button/master-caution" };
+	xf::PropertyIn<bool>	button_master_warning			{ this, "/input/button/master-warning" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<bool>	master_caution					{ this, "/output/master-caution" };
-	v2::PropertyOut<bool>	master_warning					{ this, "/output/master-warning" };
+	xf::PropertyOut<bool>	master_caution					{ this, "/output/master-caution" };
+	xf::PropertyOut<bool>	master_warning					{ this, "/output/master-warning" };
 };
 
 
@@ -64,7 +64,7 @@ class StatusIO: public v2::ModuleIO
  * Widget showing status messages.
  */
 class Status:
-	public v2::Instrument<StatusIO>,
+	public xf::Instrument<StatusIO>,
 	protected xf::InstrumentAids
 {
 	Q_OBJECT
@@ -108,7 +108,7 @@ class Status:
 		 */
 		template<class Value>
 			Message*
-			show_when (v2::Property<Value> const&, Value);
+			show_when (xf::Property<Value> const&, Value);
 
 		/**
 		 * Show message when given property has the nil value.
@@ -116,7 +116,7 @@ class Status:
 		 * \return	pointer to itself.
 		 */
 		Message*
-		show_when (v2::BasicProperty const&, v2::Nil);
+		show_when (xf::BasicProperty const&, xf::Nil);
 
 		/**
 		 * Show message when given function returns true.
@@ -178,7 +178,7 @@ class Status:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API
@@ -233,12 +233,12 @@ class Status:
 	solve_scroll_and_cursor();
 
   private:
-	v2::PropChangedTo<bool>				_button_cursor_del_pressed { io.button_cursor_del, true };
-	v2::PropChangedTo<bool>				_button_recall_pressed { io.button_recall, true };
-	v2::PropChangedTo<bool>				_button_clear_pressed { io.button_clear, true };
-	v2::PropChangedTo<bool>				_button_master_caution_pressed { io.button_master_caution, true };
-	v2::PropChangedTo<bool>				_button_master_warning_pressed { io.button_master_warning, true };
-	std::unique_ptr<v2::DeltaDecoder>	_input_cursor_decoder;
+	xf::PropChangedTo<bool>				_button_cursor_del_pressed { io.button_cursor_del, true };
+	xf::PropChangedTo<bool>				_button_recall_pressed { io.button_recall, true };
+	xf::PropChangedTo<bool>				_button_clear_pressed { io.button_clear, true };
+	xf::PropChangedTo<bool>				_button_master_caution_pressed { io.button_master_caution, true };
+	xf::PropChangedTo<bool>				_button_master_warning_pressed { io.button_master_warning, true };
+	std::unique_ptr<xf::DeltaDecoder>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;
 	std::vector<Message*>				_visible_messages;
@@ -273,7 +273,7 @@ Status::Message::severity() const noexcept
 
 template<class Value>
 	inline Status::Message*
-	Status::Message::show_when (v2::Property<Value> const& property, Value value)
+	Status::Message::show_when (xf::Property<Value> const& property, Value value)
 	{
 		_conditions.push_back ([&property,value] {
 			return property && *property == value;
@@ -283,10 +283,10 @@ template<class Value>
 
 
 inline Status::Message*
-Status::Message::show_when (v2::BasicProperty const& property, v2::Nil)
+Status::Message::show_when (xf::BasicProperty const& property, xf::Nil)
 {
 	_conditions.push_back ([&property] {
-		return property == v2::nil;
+		return property == xf::nil;
 	});
 	return this;
 }

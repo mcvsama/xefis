@@ -27,37 +27,37 @@
 #include <xefis/utility/pid_control.h>
 
 
-class AFCS_EAC_YD_IO: public v2::ModuleIO
+class AFCS_EAC_YD_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
+	xf::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
 								rudder_pid_settings	{ this, "rudder_pid_settings" };
-	v2::Setting<double>			rudder_pid_gain		{ this, "rudder_pid_gain", 1.0 };
-	v2::Setting<si::Angle>		deflection_limit	{ this, "deflection_limit" };
+	xf::Setting<double>			rudder_pid_gain		{ this, "rudder_pid_gain", 1.0 };
+	xf::Setting<si::Angle>		deflection_limit	{ this, "deflection_limit" };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<bool>		enabled				{ this, "/enabled" };
-	v2::PropertyIn<si::Force>	slip_skid			{ this, "/slip-skid" };
+	xf::PropertyIn<bool>		enabled				{ this, "/enabled" };
+	xf::PropertyIn<si::Force>	slip_skid			{ this, "/slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>	rudder_deflection	{ this, "/rudder-deflection" };
+	xf::PropertyOut<si::Angle>	rudder_deflection	{ this, "/rudder-deflection" };
 };
 
 
 /**
  * Controls rudder to obtain zero slip-skid value.
  */
-class AFCS_EAC_YD: public v2::Module<AFCS_EAC_YD_IO>
+class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
 {
   public:
 	// Ctor
@@ -71,7 +71,7 @@ class AFCS_EAC_YD: public v2::Module<AFCS_EAC_YD_IO>
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
 	/**
 	 * Compute rudder.
@@ -81,7 +81,7 @@ class AFCS_EAC_YD: public v2::Module<AFCS_EAC_YD_IO>
 
   private:
 	xf::PIDControl<si::Force, si::Angle>	_rudder_pid;
-	v2::PropertyObserver					_rudder_computer;
+	xf::PropertyObserver					_rudder_computer;
 };
 
 #endif

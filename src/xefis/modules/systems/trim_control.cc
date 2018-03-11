@@ -44,7 +44,7 @@ TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::SoundMan
 
 
 void
-TrimControl::process (v2::Cycle const& cycle)
+TrimControl::process (xf::Cycle const& cycle)
 {
 	_trim_computer.process (cycle.update_time());
 }
@@ -104,21 +104,21 @@ TrimControl::update_trim_without_sound()
 
 
 inline bool
-TrimControl::pressed (v2::Property<bool> const& property)
+TrimControl::pressed (xf::Property<bool> const& property)
 {
 	return property && *property;
 }
 
 
 inline bool
-TrimControl::moved_up (v2::Property<double> const& property)
+TrimControl::moved_up (xf::Property<double> const& property)
 {
 	return property.valid() && *property > 0.5;
 }
 
 
 inline bool
-TrimControl::moved_down (v2::Property<double> const& property)
+TrimControl::moved_down (xf::Property<double> const& property)
 {
 	return property.valid() && *property < -0.5;
 }

@@ -112,7 +112,7 @@ XBee::~XBee()
 
 
 void
-XBee::process (v2::Cycle const&)
+XBee::process (xf::Cycle const&)
 {
 	// If device is not open, skip.
 	if (!_notifier)

@@ -24,29 +24,29 @@
 #include <xefis/core/v2/setting.h>
 
 
-class AFCS_RollAutotrim_IO: public v2::ModuleIO
+class AFCS_RollAutotrim_IO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<double>				ias_coefficient				{ this, "ias_coefficient" };
-	v2::Setting<double>				engine_torque_coefficient	{ this, "engine_torque_coefficient" };
-	v2::Setting<double>				total_coefficient			{ this, "total_coefficient", 1.0 };
+	xf::Setting<double>				ias_coefficient				{ this, "ias_coefficient" };
+	xf::Setting<double>				engine_torque_coefficient	{ this, "engine_torque_coefficient" };
+	xf::Setting<double>				total_coefficient			{ this, "total_coefficient", 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Velocity>	measured_ias				{ this, "/measured-ias" };
-	v2::PropertyIn<si::Torque>		measured_engine_torque		{ this, "/measured-eng-torque" };
+	xf::PropertyIn<si::Velocity>	measured_ias				{ this, "/measured-ias" };
+	xf::PropertyIn<si::Torque>		measured_engine_torque		{ this, "/measured-eng-torque" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Angle>		ailerons_correction			{ this, "/ailerons-correction" };
+	xf::PropertyOut<si::Angle>		ailerons_correction			{ this, "/ailerons-correction" };
 };
 
 
@@ -56,7 +56,7 @@ class AFCS_RollAutotrim_IO: public v2::ModuleIO
  *
  * Works only for air speeds well below Mach 1.
  */
-class AFCS_RollAutotrim: public v2::Module<AFCS_RollAutotrim_IO>
+class AFCS_RollAutotrim: public xf::Module<AFCS_RollAutotrim_IO>
 {
   public:
 	// Ctor
@@ -66,7 +66,7 @@ class AFCS_RollAutotrim: public v2::Module<AFCS_RollAutotrim_IO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 };
 
 #endif

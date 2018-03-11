@@ -41,7 +41,7 @@ HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::WorkPerformer& work_performer, 
 
 
 void
-HSI::process (v2::Cycle const&)
+HSI::process (xf::Cycle const&)
 {
 	HSIWidget::Parameters params;
 

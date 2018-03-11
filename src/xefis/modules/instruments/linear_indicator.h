@@ -29,32 +29,32 @@
 #include <xefis/core/instrument_aids.h>
 
 
-class BasicIndicatorIO: public v2::ModuleIO
+class BasicIndicatorIO: public xf::ModuleIO
 {
   public:
 	/**
 	 * Precision is number of digits after decimal point.
 	 * Negative values are accepted and have different meaning: value will be divided by 10^n.
 	 */
-	v2::Setting<int>					precision				{ this, "precision", 0 };
+	xf::Setting<int>					precision				{ this, "precision", 0 };
 
 	/**
 	 * Set modulo value. If > 0, value will be converted to int,
 	 * divided by n and the multipled by n again.
 	 */
-	v2::Setting<unsigned int>			modulo					{ this, "modulo", false };
+	xf::Setting<unsigned int>			modulo					{ this, "modulo", false };
 
 	/**
 	 * Number of digits displayed.
 	 */
-	v2::Setting<unsigned int>			digits					{ this, "digits", 3 };
+	xf::Setting<unsigned int>			digits					{ this, "digits", 3 };
 
-	v2::Setting<double>					value_minimum			{ this, "value_minimum" };
-	v2::Setting<std::optional<double>>	value_minimum_critical	{ this, "value_minimum_critical", std::nullopt };
-	v2::Setting<std::optional<double>>	value_minimum_warning	{ this, "value_minimum_warning", std::nullopt };
-	v2::Setting<std::optional<double>>	value_maximum_warning	{ this, "value_maximum_warning", std::nullopt };
-	v2::Setting<std::optional<double>>	value_maximum_critical	{ this, "value_maximum_critical", std::nullopt };
-	v2::Setting<double>					value_maximum			{ this, "value_maximum" };
+	xf::Setting<double>					value_minimum			{ this, "value_minimum" };
+	xf::Setting<std::optional<double>>	value_minimum_critical	{ this, "value_minimum_critical", std::nullopt };
+	xf::Setting<std::optional<double>>	value_minimum_warning	{ this, "value_minimum_warning", std::nullopt };
+	xf::Setting<std::optional<double>>	value_maximum_warning	{ this, "value_maximum_warning", std::nullopt };
+	xf::Setting<std::optional<double>>	value_maximum_critical	{ this, "value_maximum_critical", std::nullopt };
+	xf::Setting<double>					value_maximum			{ this, "value_maximum" };
 };
 
 
@@ -65,14 +65,14 @@ class LinearIndicatorIO: public BasicIndicatorIO
 	 * Settings
 	 */
 
-	v2::Setting<bool>					mirrored_style			{ this, "mirrored_style", false };
+	xf::Setting<bool>					mirrored_style			{ this, "mirrored_style", false };
 };
 
 
 template<class IO>
 	class BasicIndicator:
 		virtual protected xf::InstrumentAids,
-		public v2::Instrument<IO>
+		public xf::Instrument<IO>
 	{
 	  public:
 		// Ctor
@@ -92,7 +92,7 @@ template<class IO>
 	inline
 	BasicIndicator<IO>::BasicIndicator (std::unique_ptr<IO> module_io, std::string const& instance):
 		xf::InstrumentAids (1.0f),
-		v2::Instrument<IO> (std::move (module_io), instance)
+		xf::Instrument<IO> (std::move (module_io), instance)
 	{ }
 
 
@@ -130,11 +130,11 @@ class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
   public:
 	// Ctor
 	explicit
-	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, v2::PropertyDigitizer, std::string const& instance = {});
+	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, xf::PropertyDigitizer, std::string const& instance = {});
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API
@@ -145,8 +145,8 @@ class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
 	pad_string (QString const& input) const;
 
   private:
-	v2::PropertyDigitizer	_value_digitizer;
-	v2::PropertyObserver	_inputs_observer;
+	xf::PropertyDigitizer	_value_digitizer;
+	xf::PropertyObserver	_inputs_observer;
 };
 
 #endif

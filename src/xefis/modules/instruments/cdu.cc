@@ -330,7 +330,7 @@ CDU::EmptyStrip::paint_button (QRectF const& rect, xf::InstrumentAids& aids, xf:
 
 
 CDU::PropertyStrip::PropertyStrip (CDU& cdu,
-								   v2::PropertyStringifier const& property_stringifier,
+								   xf::PropertyStringifier const& property_stringifier,
 								   QString const& title,
 								   Column column):
 	Strip (cdu, title, column),
@@ -368,7 +368,7 @@ CDU::PropertyStrip::handle_mouse_release (QMouseEvent* event, CDU* cdu)
 
 	if (!_read_only && _button_rect.contains (event->pos()))
 	{
-		auto* bool_property = dynamic_cast<v2::Property<bool>*> (&_property_stringifier.property());
+		auto* bool_property = dynamic_cast<xf::Property<bool>*> (&_property_stringifier.property());
 
 		if (bool_property)
 			*bool_property = !**bool_property;
@@ -424,13 +424,13 @@ CDU::PropertyStrip::paint_value (QRectF const& rect, xf::InstrumentAids& aids, x
 {
 	if (_property_stringifier.property().valid())
 	{
-		auto* bool_property_ptr = dynamic_cast<v2::Property<bool>*> (&_property_stringifier.property());
+		auto* bool_property_ptr = dynamic_cast<xf::Property<bool>*> (&_property_stringifier.property());
 
 		if (bool_property_ptr)
 		{
 			auto& bool_property = *bool_property_ptr;
 			auto p = bool_property ? *bool_property : false;
-			auto& converter = dynamic_cast<v2::PropertyStringifier::BoolConverter const&> (_property_stringifier.converter());
+			auto& converter = dynamic_cast<xf::PropertyStringifier::BoolConverter const&> (_property_stringifier.converter());
 
 			std::string const& nil_val = converter.nil_value();
 			std::string const act_val = p ? converter.true_value() : converter.false_value();
@@ -910,7 +910,7 @@ CDU::Config::check_reachability() const
 
 
 CDU::CDU (xf::Xefis*, QDomElement const& config, std::string const& instance):
-	v2::Instrument (instance),
+	xf::Instrument (instance),
 	InstrumentAids (0.5f)
 {
 	setFocusPolicy (Qt::StrongFocus);

@@ -24,27 +24,27 @@
 #include <xefis/core/v2/property.h>
 
 
-class DebugForcesIO: public v2::ModuleIO
+class DebugForcesIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Angle>			orientation_pitch				{ this, "/orientation/pitch" };
-	v2::PropertyIn<si::Angle>			orientation_roll				{ this, "/orientation/roll" };
-	v2::PropertyIn<si::Angle>			orientation_magnetic_heading	{ this, "/orientation/magnetic-heading" };
-	v2::PropertyIn<si::Acceleration>	measured_accel_x				{ this, "/acceleration/x" };
-	v2::PropertyIn<si::Acceleration>	measured_accel_y				{ this, "/acceleration/y" };
-	v2::PropertyIn<si::Acceleration>	measured_accel_z				{ this, "/acceleration/z" };
-	v2::PropertyIn<si::Acceleration>	centrifugal_accel_x				{ this, "/centrifugal-acceleration/x" };
-	v2::PropertyIn<si::Acceleration>	centrifugal_accel_y				{ this, "/centrifugal-acceleration/y" };
-	v2::PropertyIn<si::Acceleration>	centrifugal_accel_z				{ this, "/centrifugal-acceleration/z" };
+	xf::PropertyIn<si::Angle>			orientation_pitch				{ this, "/orientation/pitch" };
+	xf::PropertyIn<si::Angle>			orientation_roll				{ this, "/orientation/roll" };
+	xf::PropertyIn<si::Angle>			orientation_magnetic_heading	{ this, "/orientation/magnetic-heading" };
+	xf::PropertyIn<si::Acceleration>	measured_accel_x				{ this, "/acceleration/x" };
+	xf::PropertyIn<si::Acceleration>	measured_accel_y				{ this, "/acceleration/y" };
+	xf::PropertyIn<si::Acceleration>	measured_accel_z				{ this, "/acceleration/z" };
+	xf::PropertyIn<si::Acceleration>	centrifugal_accel_x				{ this, "/centrifugal-acceleration/x" };
+	xf::PropertyIn<si::Acceleration>	centrifugal_accel_y				{ this, "/centrifugal-acceleration/y" };
+	xf::PropertyIn<si::Acceleration>	centrifugal_accel_z				{ this, "/centrifugal-acceleration/z" };
 };
 
 
 class DebugForces:
-	public v2::Instrument<DebugForcesIO>,
+	public xf::Instrument<DebugForcesIO>,
 	protected xf::InstrumentAids
 {
   public:
@@ -54,7 +54,7 @@ class DebugForces:
 
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
   protected:
 	// QWidget API

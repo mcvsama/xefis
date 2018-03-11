@@ -31,8 +31,7 @@
 #include <xefis/utility/variant.h>
 
 
-namespace v2 {
-using namespace xf; // XXX
+namespace xf {
 
 /**
  * Helper type that indicates Nil values for properties.
@@ -888,7 +887,7 @@ template<class V>
 		}, _data_source);
 	}
 
-} // namespace v2
+} // namespace xf
 
 #endif
 

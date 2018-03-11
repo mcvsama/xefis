@@ -61,7 +61,7 @@ AFCS_FD_Roll::initialize()
 
 
 void
-AFCS_FD_Roll::process (v2::Cycle const& cycle)
+AFCS_FD_Roll::process (xf::Cycle const& cycle)
 {
 	_roll_computer.process (cycle.update_time());
 	check_autonomous();
@@ -153,8 +153,8 @@ AFCS_FD_Roll::compute_roll()
 
 std::optional<si::Angle>
 AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
-							v2::PropertyIn<si::Angle> const& cmd_direction,
-							v2::PropertyIn<si::Angle> const& measured_direction,
+							xf::PropertyIn<si::Angle> const& cmd_direction,
+							xf::PropertyIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const
 {
 	xf::Range<si::Angle> roll_limits { -*io.roll_limits, +*io.roll_limits };

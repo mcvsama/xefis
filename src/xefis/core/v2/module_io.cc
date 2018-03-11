@@ -25,7 +25,7 @@
 #include "module.h"
 
 
-namespace v2 {
+namespace xf {
 
 namespace module_io {
 
@@ -126,5 +126,5 @@ identifier (ModuleIO* io)
 	return io ? identifier (*io) : "(nullptr)";
 }
 
-} // namespace v2
+} // namespace xf
 

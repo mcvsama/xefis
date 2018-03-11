@@ -27,36 +27,36 @@
 #include <xefis/utility/smoother.h>
 
 
-class AltAcqIO: public v2::ModuleIO
+class AltAcqIO: public xf::ModuleIO
 {
   public:
 	/*
 	 * Settings
 	 */
 
-	v2::Setting<si::Length>			minimum_altitude_difference	{ this, "minimum_altitude_difference" };
-	v2::Setting<si::Length>			flag_diff_on				{ this, "flag_diff_on", 1000_ft };
-	v2::Setting<si::Length>			flag_diff_off				{ this, "flag_diff_off", 100_ft };
+	xf::Setting<si::Length>			minimum_altitude_difference	{ this, "minimum_altitude_difference" };
+	xf::Setting<si::Length>			flag_diff_on				{ this, "flag_diff_on", 1000_ft };
+	xf::Setting<si::Length>			flag_diff_off				{ this, "flag_diff_off", 100_ft };
 
 	/*
 	 * Input
 	 */
 
-	v2::PropertyIn<si::Length>		altitude_amsl				{ this, "/altitude-amsl" };
-	v2::PropertyIn<si::Length>		altitude_acquire_amsl		{ this, "/altitude-acquire-amsl" };
-	v2::PropertyIn<si::Velocity>	vertical_speed				{ this, "/vertical-speed" };
-	v2::PropertyIn<si::Velocity>	ground_speed				{ this, "/ground-speed" };
+	xf::PropertyIn<si::Length>		altitude_amsl				{ this, "/altitude-amsl" };
+	xf::PropertyIn<si::Length>		altitude_acquire_amsl		{ this, "/altitude-acquire-amsl" };
+	xf::PropertyIn<si::Velocity>	vertical_speed				{ this, "/vertical-speed" };
+	xf::PropertyIn<si::Velocity>	ground_speed				{ this, "/ground-speed" };
 
 	/*
 	 * Output
 	 */
 
-	v2::PropertyOut<si::Length>		altitude_acquire_distance	{ this, "/acquire-distance" };
-	v2::PropertyOut<bool>			altitude_acquire_flag		{ this, "/acquire-flag" };
+	xf::PropertyOut<si::Length>		altitude_acquire_distance	{ this, "/acquire-distance" };
+	xf::PropertyOut<bool>			altitude_acquire_flag		{ this, "/acquire-flag" };
 };
 
 
-class AltAcq: public v2::Module<AltAcqIO>
+class AltAcq: public xf::Module<AltAcqIO>
 {
   public:
 	// Ctor
@@ -66,7 +66,7 @@ class AltAcq: public v2::Module<AltAcqIO>
   protected:
 	// Module API
 	void
-	process (v2::Cycle const&) override;
+	process (xf::Cycle const&) override;
 
 	void
 	compute_altitude_acquire_distance();
@@ -76,9 +76,9 @@ class AltAcq: public v2::Module<AltAcqIO>
 	// Note: PropertyObservers depend on Smoothers, so first Smoothers must be defined,
 	// then PropertyObservers, to ensure correct order of destruction.
 	xf::Smoother<si::Length>	_output_smoother					{ 2_s };
-	v2::PropertyObserver		_output_computer;
-	v2::PropChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
-	v2::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
+	xf::PropertyObserver		_output_computer;
+	xf::PropChanged<si::Length>	_altitude_amsl_changed				{ io.altitude_amsl };
+	xf::PropChanged<si::Length>	_altitude_acquire_amsl_changed		{ io.altitude_acquire_amsl };
 };
 
 #endif

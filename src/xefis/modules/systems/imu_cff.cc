@@ -43,7 +43,7 @@ IMU_CFF::IMU_CFF (std::unique_ptr<IMU_CFF_IO> module_io, std::string const& inst
 
 
 void
-IMU_CFF::process (v2::Cycle const& cycle)
+IMU_CFF::process (xf::Cycle const& cycle)
 {
 	_centripetal_computer.process (cycle.update_time());
 }

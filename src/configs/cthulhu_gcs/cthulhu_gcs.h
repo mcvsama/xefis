@@ -26,7 +26,7 @@
 #include "loop.h"
 
 
-class CthulhuGCS: public v2::Machine
+class CthulhuGCS: public xf::Machine
 {
   public:
 	// Ctor

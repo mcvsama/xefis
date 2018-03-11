@@ -25,10 +25,10 @@
 
 
 RadialIndicator::RadialIndicator (std::unique_ptr<RadialIndicatorIO> module_io,
-								  v2::PropertyDigitizer value_digitizer,
-								  v2::PropertyDigitizer value_target_digitizer,
-								  v2::PropertyDigitizer value_reference_digitizer,
-								  v2::PropertyDigitizer value_automatic_digitizer,
+								  xf::PropertyDigitizer value_digitizer,
+								  xf::PropertyDigitizer value_target_digitizer,
+								  xf::PropertyDigitizer value_reference_digitizer,
+								  xf::PropertyDigitizer value_automatic_digitizer,
 								  std::string const& instance):
 	InstrumentAids (0.9f),
 	BasicIndicator (std::move (module_io), instance),
@@ -48,7 +48,7 @@ RadialIndicator::RadialIndicator (std::unique_ptr<RadialIndicatorIO> module_io,
 
 
 void
-RadialIndicator::process (v2::Cycle const& cycle)
+RadialIndicator::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
 }
