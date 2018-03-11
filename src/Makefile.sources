@@ -412,6 +412,7 @@ XEFIS_HEADERS			+= xefis/utility/string.h
 XEFIS_HEADERS			+= xefis/utility/strong_type.h
 XEFIS_HEADERS			+= xefis/utility/synchronized.h
 XEFIS_HEADERS			+= xefis/utility/temporal.h
+XEFIS_HEADERS			+= xefis/utility/temporary_change.h
 XEFIS_HEADERS			+= xefis/utility/text_layout.h
 XEFIS_HEADERS			+= xefis/utility/text_painter.h
 XEFIS_HEADERS			+= xefis/utility/thread.h
