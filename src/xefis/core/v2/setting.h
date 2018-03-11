@@ -42,14 +42,22 @@ class BasicSetting
 	 * Tag for creating a setting that doesn't not need to be set by user explicitly, but doesn't necessarily
 	 * have any default value.
 	 */
-	enum OptionalTag { Optional }; // XXX
+	enum OptionalTag { Optional };
 
   public:
 	/**
-	 * Store pointer to owning module.
+	 * Ctor
+	 * Stores pointer to owning module.
 	 */
 	explicit
 	BasicSetting (ModuleIO* owner, std::string const& name);
+
+	/**
+	 * Ctor
+	 * Stores pointer to owning module.
+	 */
+	explicit
+	BasicSetting (ModuleIO* owner, std::string const& name, OptionalTag);
 
 	/**
 	 * Return owning module.
@@ -69,15 +77,21 @@ class BasicSetting
 	std::string const&
 	name() const noexcept;
 
+	/**
+	 * Return true if setting is required to have a value.
+	 */
+	bool
+	required() const noexcept;
+
   private:
 	ModuleIO*	_owner;
 	std::string	_name;
+	bool		_required;
 };
 
 
 /**
  * Wrapper for setting variables.
- * Allows run-timer checking if required settings have been configured.
  */
 template<class pValue>
 	class Setting: public BasicSetting
@@ -116,12 +130,6 @@ template<class pValue>
 		operator= (Value&& new_value);
 
 		/**
-		 * Return true if setting is required to have a value.
-		 */
-		bool
-		required() const noexcept;
-
-		/**
 		 * Read the setting value.
 		 */
 		Value&
@@ -144,14 +152,22 @@ template<class pValue>
 
 	  private:
 		std::optional<Value>	_value;
-		bool					_required;
 	};
 
 
 inline
 BasicSetting::BasicSetting (ModuleIO* owner, std::string const& name):
 	_owner (owner),
-	_name (name)
+	_name (name),
+	_required (true)
+{ }
+
+
+inline
+BasicSetting::BasicSetting (ModuleIO* owner, std::string const& name, OptionalTag):
+	_owner (owner),
+	_name (name),
+	_required (false)
 { }
 
 
@@ -169,11 +185,17 @@ BasicSetting::name() const noexcept
 }
 
 
+inline bool
+BasicSetting::required() const noexcept
+{
+	return _required;
+}
+
+
 template<class V>
 	inline
 	Setting<V>::Setting (ModuleIO* owner, std::string const& name):
-		BasicSetting (owner, name),
-		_required (true)
+		BasicSetting (owner, name)
 	{
 		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
@@ -183,8 +205,7 @@ template<class V>
 	inline
 	Setting<V>::Setting (ModuleIO* owner, std::string const& name, Value&& initial_value):
 		BasicSetting (owner, name),
-		_value (std::forward<Value> (initial_value)),
-		_required (true)
+		_value (std::forward<Value> (initial_value))
 	{
 		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
@@ -192,9 +213,8 @@ template<class V>
 
 template<class V>
 	inline
-	Setting<V>::Setting (ModuleIO* owner, std::string const& name, OptionalTag):
-		BasicSetting (owner, name),
-		_required (false)
+	Setting<V>::Setting (ModuleIO* owner, std::string const& name, OptionalTag optional_tag):
+		BasicSetting (owner, name, optional_tag)
 	{
 		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
@@ -206,14 +226,6 @@ template<class V>
 	{
 		_value = std::forward<Value> (value);
 		return *this;
-	}
-
-
-template<class V>
-	inline bool
-	Setting<V>::required() const noexcept
-	{
-		return _required;
 	}
 
 
