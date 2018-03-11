@@ -145,7 +145,7 @@ class ModuleIO
 	module() const noexcept;
 
 	/**
-	 * User settings verification procedure.
+	 * User-provided settings verification procedure.
 	 */
 	virtual void
 	verify_settings()
