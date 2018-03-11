@@ -65,7 +65,7 @@ ModuleIO::ProcessingLoopAPI::verify_settings()
 
 	for (auto* setting: _io._registered_settings)
 	{
-		if (!*setting)
+		if (setting->required() && !*setting)
 			uninitialized_settings.push_back (setting);
 	}
 
