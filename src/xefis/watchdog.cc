@@ -48,7 +48,7 @@ ping_loop (int write_fd, int read_fd, pid_t xefis_pid)
 	::srand (::time (nullptr));
 
 	// First delay is slightly longer:
-	usleep ((1_s).quantity<Microsecond>());
+	usleep ((1_s).in<Microsecond>());
 
 	while (true)
 	{
@@ -59,7 +59,7 @@ ping_loop (int write_fd, int read_fd, pid_t xefis_pid)
 		fsync (write_fd);
 
 		// Give xefis some time:
-		usleep ((100_ms).quantity<Microsecond>());
+		usleep ((100_ms).in<Microsecond>());
 
 		// if Xefis exits normally, wait(), cleanup and return Exited
 		// otherwise return Timeout
@@ -172,7 +172,7 @@ watchdog (int argc, char** argv, char**)
 		}
 
 		// Wait a bit and try again:
-		usleep ((10_ms).quantity<Microsecond>());
+		usleep ((10_ms).in<Microsecond>());
 
 		::close (w_fd_for_watchdog);
 		::close (r_fd_for_watchdog);

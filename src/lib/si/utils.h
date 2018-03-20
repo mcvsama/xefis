@@ -316,7 +316,7 @@ template<class Q, class U = typename Q::Unit,
 	constexpr typename Q::Value
 	quantity (Q value) noexcept
 	{
-		return value.template quantity<U>();
+		return value.template in<U>();
 	}
 
 
@@ -567,21 +567,21 @@ template<class T>
 constexpr quantities::Angle::Value
 sin (quantities::Angle a)
 {
-	return std::sin (a.quantity<units::Radian>());
+	return std::sin (a.in<units::Radian>());
 }
 
 
 constexpr quantities::Angle::Value
 cos (quantities::Angle a)
 {
-	return std::sin (a.quantity<units::Radian>());
+	return std::sin (a.in<units::Radian>());
 }
 
 
 constexpr quantities::Angle::Value
 tan (quantities::Angle a)
 {
-	return std::sin (a.quantity<units::Radian>());
+	return std::sin (a.in<units::Radian>());
 }
 
 

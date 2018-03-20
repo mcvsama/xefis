@@ -51,7 +51,7 @@ static xf::RuntimeTest t_expression ("SI expression validity assertions", []{
 	verify_compilation (std::numeric_limits<si::quantities::Current>::max());
 	verify_compilation (si::quantities::Mass (1.0) * si::quantities::Mass (2.0));
 
-	verify_compilation (one_meter.quantity<Foot>());
+	verify_compilation (one_meter.in<Foot>());
 });
 
 
@@ -111,7 +111,7 @@ static xf::RuntimeTest t_angle ("SI angle tests", []{
 	si::Quantity<Degree> a2 { 57.295'779'513 };
 	si::Quantity<RadianPerSecond> s1 { 1.0 };
 	si::Quantity<Hertz> s2 { 1.0 / (2.0 * M_PI) };
-	si::Quantity<RadianPerSecond> s3 { s2.quantity<Hertz>() * (2.0 * M_PI) };
+	si::Quantity<RadianPerSecond> s3 { s2.in<Hertz>() * (2.0 * M_PI) };
 	si::Quantity<RadianPerSecond> s4 { 1.0_Hz / (2.0 * M_PI) };
 
 	verify_equal_with_epsilon ("radians/degrees equality test", a1, a2, 1e-9 * Radian());

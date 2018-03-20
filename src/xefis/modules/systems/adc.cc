@@ -160,8 +160,8 @@ AirDataComputer::compute_altitude()
 			// Good for heights below tropopause (36 kft):
 			double a = 6.8755856e-6;
 			double b = 5.2558797;
-			double p = io.pressure_static->quantity<si::InchOfMercury>();
-			double p0 = pressure_setting.quantity<si::InchOfMercury>();
+			double p = io.pressure_static->in<si::InchOfMercury>();
+			double p0 = pressure_setting.in<si::InchOfMercury>();
 			return 1_ft * -(std::pow (p / p0, 1.0 / b) - 1.0) / a;
 		};
 

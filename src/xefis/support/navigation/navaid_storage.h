@@ -133,7 +133,7 @@ class NavaidStorage
 inline Angle::Value
 NavaidStorage::access_position (Navaid const& navaid, std::size_t const dimension)
 {
-	return dimension == 0 ? navaid.position().lat().quantity<Degree>() : navaid.position().lon().quantity<Degree>();
+	return dimension == 0 ? navaid.position().lat().in<Degree>() : navaid.position().lon().in<Degree>();
 }
 
 } // namespace xf
