@@ -35,7 +35,7 @@ ProcessingLoop::ProcessingLoop (Machine* machine, Frequency loop_frequency):
 {
 	_loop_timer = new QTimer (this);
 	_loop_timer->setSingleShot (false);
-	_loop_timer->setInterval (_loop_period.quantity<Millisecond>());
+	_loop_timer->setInterval (_loop_period.in<Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
 }
 

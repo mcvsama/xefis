@@ -278,7 +278,7 @@ HT16K33::update_timers()
 {
 	// According to docs, each scan takes 20 ms, so limit sampling rate to 50 Hz:
 	auto scan_frequency = xf::clamped (_scan_frequency, 0_Hz, _reliable_mode ? 25_Hz : 50_Hz);
-	_scan_timer->setInterval ((1.0 / scan_frequency).quantity<Millisecond>());
+	_scan_timer->setInterval ((1.0 / scan_frequency).in<Millisecond>());
 	_scan_timer->start();
 }
 

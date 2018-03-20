@@ -86,7 +86,7 @@ template<class pUnit, class pValue = double>
 		 */
 		template<class OtherUnit>
 			constexpr Value
-			quantity() const noexcept
+			in() const noexcept
 			{
 				return Quantity<OtherUnit> (*this).quantity();
 			}

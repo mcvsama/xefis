@@ -80,7 +80,7 @@ template<class Item>
 	inline std::ostream&
 	Logger::operator<< (Item const& item) const
 	{
-		(*_stream) << boost::format ("%08.4lf %s ") % TimeHelper::now().quantity<Second>() % _prefix;
+		(*_stream) << boost::format ("%08.4lf %s ") % TimeHelper::now().in<Second>() % _prefix;
 		return (*_stream) << item;
 	}
 

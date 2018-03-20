@@ -51,13 +51,13 @@ ETSAirspeed::initialize()
 	_airspeed_smoother.set_smoothing_time (*io.smoothing_time);
 
 	_device_initialization_timer = new QTimer (this);
-	_device_initialization_timer->setInterval (kInitializationDelay.quantity<Millisecond>());
+	_device_initialization_timer->setInterval (kInitializationDelay.in<Millisecond>());
 	_device_initialization_timer->setSingleShot (true);
 	QObject::connect (_device_initialization_timer, SIGNAL (timeout()), this, SLOT (device_initialize()));
 	_device_initialization_timer->start();
 
 	_periodic_read_timer = new QTimer (this);
-	_periodic_read_timer->setInterval (io.read_interval->quantity<Millisecond>());
+	_periodic_read_timer->setInterval (io.read_interval->in<Millisecond>());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));
 }
