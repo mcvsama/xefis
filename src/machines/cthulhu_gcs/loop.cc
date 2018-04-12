@@ -50,9 +50,9 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	_navaid_storage = std::make_unique<xf::NavaidStorage>();
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency());
 
-	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-hotas-stick.xml"));
-	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-hotas-throttle.xml"));
-	QDomElement pedals_config = xf::load_xml (QFile ("configs/cthulhu_shared/xmls/joystick-saitek-pedals.xml"));
+	QDomElement joystick_config = xf::load_xml (QFile ("machines/cthulhu_shared/xmls/joystick-hotas-stick.xml"));
+	QDomElement throttle_config = xf::load_xml (QFile ("machines/cthulhu_shared/xmls/joystick-hotas-throttle.xml"));
+	QDomElement pedals_config = xf::load_xml (QFile ("machines/cthulhu_shared/xmls/joystick-saitek-pedals.xml"));
 
 	auto joystick_io = std::make_unique<JoystickInputIO>();
 	auto throttle_io = std::make_unique<JoystickInputIO>();

@@ -1,0 +1,4 @@
+XEFIS_HEADERS += machines/cthulhu/cthulhu.h
+
+XEFIS_SOURCES += machines/cthulhu/cthulhu.cc
+

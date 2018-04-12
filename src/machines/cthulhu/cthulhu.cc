@@ -69,7 +69,7 @@ class MyLoop: public xf::ProcessingLoop
 Cthulhu::Cthulhu (xf::Xefis* xefis):
 	Machine (xefis)
 {
-	xf::Airframe airframe (xefis, xf::load_xml (QFile ("configs/cthulhu/xmls/airframe.xml")));
+	xf::Airframe airframe (xefis, xf::load_xml (QFile ("machines/cthulhu/xmls/airframe.xml")));
 
 	auto* loop = make_processing_loop<MyLoop> (100_Hz);
 
@@ -116,9 +116,9 @@ Cthulhu::Cthulhu (xf::Xefis* xefis):
 
 	auto* gps = loop->load_module<GPS> (xefis->system(), gps_serial_config, "gps");
 
-	QDomElement joystick_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-stick.xml"));
-	QDomElement throttle_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-hotas-throttle.xml"));
-	QDomElement pedals_config = xf::load_xml (QFile ("configs/cthulhu/xmls/joystick-saitek-pedals.xml"));
+	QDomElement joystick_config = xf::load_xml (QFile ("machines/cthulhu/xmls/joystick-hotas-stick.xml"));
+	QDomElement throttle_config = xf::load_xml (QFile ("machines/cthulhu/xmls/joystick-hotas-throttle.xml"));
+	QDomElement pedals_config = xf::load_xml (QFile ("machines/cthulhu/xmls/joystick-saitek-pedals.xml"));
 
 	auto* joystick_input = loop->load_module<WarthogStick> (joystick_config, "stick");
 	auto* throttle_input = loop->load_module<JoystickInput> (throttle_config, "throttle");

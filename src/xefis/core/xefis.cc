@@ -38,7 +38,7 @@
 #include <xefis/utility/time_helper.h>
 #include <xefis/utility/demangle.h>
 // TODO machine
-#include <configs/cthulhu_gcs/cthulhu_gcs.h>
+#include <machines/cthulhu_gcs/cthulhu_gcs.h>
 
 // Local:
 #include "xefis.h"
