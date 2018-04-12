@@ -189,7 +189,7 @@ Hash::result()
 {
 	if (!_result)
 	{
-		std::unique_ptr<uint8_t> ptr (static_cast<uint8_t*> (mhash_end (_mhash_thread)));
+		std::unique_ptr<uint8_t, decltype (std::free)*> ptr (static_cast<uint8_t*> (mhash_end (_mhash_thread)), std::free);
 		_result = Blob (ptr.get(), ptr.get() + block_size());
 	}
 
