@@ -27,6 +27,8 @@ VERSION				:= alpha0.1dev
 RELEASE				:= 0
 # Set to 1 to disable some UB-generating optimizations:
 UB_OPTS_DISABLE		:= 0
+# Sanitizer?
+SANITIZER_FLAGS		:=
 
 # Predefined profiles:
 ifeq ($(PROFILE),rpi)
@@ -46,7 +48,7 @@ CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
 CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fconcepts -fnothrow-opt -pedantic-errors -D_GLIBCXX_USE_CXX11_ABI=1 -Wshadow-compatible-local
-CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
+CXXFLAGS		+= -pthread -rdynamic -I. -Ilib $(SANITIZER_FLAGS)
 endif
 ifeq ($(CXX),clang++)
 CLANG_DISABLED_WARNINGS = mismatched-tags disabled-macro-expansion c++98-compat-pedantic documentation-unknown-command
