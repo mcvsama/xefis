@@ -272,7 +272,9 @@ RadialIndicator::paint_indicator (float, float r)
 
 			painter().rotate (angle - value_angle);
 			painter().draw_outlined_line (QPointF (intr, 0.0), QPointF (extr, 0.0));
-			painter().drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj), arc_degs (90_deg), arc_span (1_deg * (value_angle - angle)));
+			painter().drawArc (rect.adjusted (-ext_adj, -ext_adj, +ext_adj, +ext_adj),
+							   angle_for_qpainter (0_deg),
+							   angle_for_qpainter (-1_deg * (value_angle - angle)));
 		};
 
 		painter().save();
