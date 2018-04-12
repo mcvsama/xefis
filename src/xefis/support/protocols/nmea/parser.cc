@@ -17,7 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/mutex.h>
-#include <xefis/utility/resource.h>
+#include <xefis/utility/responsibility.h>
 #include <xefis/utility/hextable.h>
 
 // Local:
@@ -65,7 +65,7 @@ Parser::process_one()
 	std::string::size_type parsed = 0;
 
 	// Make sure to remove parsed data from the input buffer:
-	Resource remove_parsed_properties ([&] {
+	Responsibility remove_parsed_properties ([&] {
 		_input_buffer.erase (0, parsed);
 	});
 
