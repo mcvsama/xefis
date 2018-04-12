@@ -153,7 +153,7 @@ mkobjs			= $(foreach file, $(1), $(objsdir)/$(dir $(file))$(shell basename '$(fi
 mkmocobjs		= $(foreach file, $(1), $(dir $(file))$(shell basename '$(file)' $(suffix $(file))).o)
 
 include machines/Makefile.machines
-include $(foreach config, $(XEFIS_CONFIGS), machines/$(config)/Makefile.sources)
+include $(foreach config, $(XEFIS_MACHINES), machines/$(config)/Makefile.sources)
 include Makefile.sources
 
 #### Commit ID support ####
