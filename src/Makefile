@@ -4,29 +4,29 @@ first: all
 
 # Override these variables in Makefile.local.
 
-LC_ALL			:= C
+LC_ALL				:= C
 export LC_ALL
 
 # Show verbose compilation commands?
-VERBOSE			:= 0
+VERBOSE				:= 0
 # How many threads use for compilation?
 THREADS			:= $(shell grep processor /proc/cpuinfo|wc -l)
 # Architecture:
-ARCH			:= $(shell uname -m)
+ARCH				:= $(shell uname -m)
 # Enable profiling?
-PROFILING		:= 0
+PROFILING			:= 0
 # Debugging enabled?
-DEBUG			:= 0
+DEBUG				:= 0
 # Where Qt is installed?
-QT_PREFIX		:= /usr/local
+QT_PREFIX			:= /usr/local
 # Profile name:
-PROFILE			:=
+PROFILE				:=
 # Version:
-VERSION			:= alpha0.1dev
+VERSION				:= alpha0.1dev
 # Release version? (no asserts, etc).
-RELEASE			:= 0
+RELEASE				:= 0
 # Set to 1 to disable some UB-generating optimizations:
-UB_OPTS_DISABLE	:= 0
+UB_OPTS_DISABLE		:= 0
 
 # Predefined profiles:
 ifeq ($(PROFILE),rpi)
