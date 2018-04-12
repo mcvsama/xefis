@@ -75,14 +75,14 @@ BasicModule::rescue (std::exception_ptr)
 
 
 std::string
-identifier (BasicModule& module)
+identifier (BasicModule const& module)
 {
 	return demangle (typeid (module)) + "#" + module.instance();
 }
 
 
 std::string
-identifier (BasicModule* module)
+identifier (BasicModule const* module)
 {
 	return module ? identifier (*module) : "(nullptr)";
 }

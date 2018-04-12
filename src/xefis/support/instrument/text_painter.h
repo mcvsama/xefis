@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__TEXT_PAINTER_H__INCLUDED
-#define XEFIS__UTILITY__TEXT_PAINTER_H__INCLUDED
+#ifndef XEFIS__SUPPORT__INSTRUMENT__TEXT_PAINTER_H__INCLUDED
+#define XEFIS__SUPPORT__INSTRUMENT__TEXT_PAINTER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -21,8 +21,8 @@
 #include <memory>
 
 // Qt:
-#include <QtGui/QPainter>
 #include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,7 +34,7 @@ namespace xf {
  * Draws bigger text and then scales it down to the destination area
  * for better quality fonts.
  */
-class TextPainter: public QPainter
+class TextPainter: virtual public QPainter
 {
   public:
 	/**
@@ -89,11 +89,11 @@ class TextPainter: public QPainter
   public:
 	// Ctor
 	explicit
-	TextPainter (Cache* cache);
+	TextPainter (Cache& cache);
 
 	// Ctor
 	explicit
-	TextPainter (QPaintDevice* device, Cache* cache);
+	TextPainter (QPaintDevice* device, Cache& cache);
 
 	/**
 	 * Set font position correction (value is relative to font's size, it's not represented in pixels).
@@ -127,7 +127,7 @@ class TextPainter: public QPainter
 	apply_alignment (QRectF& rect, Qt::Alignment flags);
 
   private:
-	Cache*	_cache;
+	Cache&	_cache;
 	QPointF	_position_correction;
 };
 

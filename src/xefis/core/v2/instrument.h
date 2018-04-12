@@ -16,24 +16,52 @@
 
 // Standard:
 #include <cstddef>
+#include <atomic>
 #include <string>
 #include <type_traits>
-
-// Qt:
-#include <QtWidgets/QWidget>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/module.h>
-#include <xefis/core/services.h>
+#include <xefis/utility/noncopyable.h>
 
 
 namespace xf {
 
+class BasicInstrument: public BasicModule
+{
+  public:
+	using BasicModule::BasicModule;
+
+	// Dtor
+	virtual ~BasicInstrument() = default;
+
+	/**
+	 * Paint the instrument onto given canvas.
+	 */
+	virtual void
+	paint (QImage& canvas) const = 0;
+
+	/**
+	 * Return true if instrument wants to be repainted.
+	 * Also unmark the instrument as dirty atomically.
+	 */
+	bool
+	dirty_since_last_check() noexcept;
+
+	/**
+	 * Mark instrument as dirty (to be repainted).
+	 */
+	void
+	mark_dirty() noexcept;
+
+  private:
+	std::atomic<bool>	_dirty	{ false };
+};
+
+
 template<class IO = ModuleIO>
-	class Instrument:
-		public Module<IO>,
-		public QWidget // XXX will not be a widget in the future - instead it will draw on a canvas.
+	class Instrument: public BasicInstrument
 	{
 	  public:
 		/**
@@ -52,41 +80,41 @@ template<class IO = ModuleIO>
 			explicit
 			Instrument (std::string const& instance = {});
 
-	  private:
-		void
-		configure();
+	  protected:
+		IO& io;
 	};
+
+
+inline bool
+BasicInstrument::dirty_since_last_check() noexcept
+{
+	return _dirty.exchange (false);
+}
+
+
+inline void
+BasicInstrument::mark_dirty() noexcept
+{
+	_dirty.store (true);
+}
 
 
 template<class IO>
 	template<class>
 		inline
-		Instrument<IO>::Instrument (std::unique_ptr<IO> io, std::string const& instance):
-			Module<IO> (std::move (io), instance),
-			QWidget (nullptr)
-		{
-			configure();
-		}
+		Instrument<IO>::Instrument (std::unique_ptr<IO> module_io, std::string const& instance):
+			BasicInstrument (std::move (module_io), instance),
+			io (static_cast<IO&> (*io_base()))
+		{ }
 
 
 template<class IO>
 	template<class>
 		inline
 		Instrument<IO>::Instrument (std::string const& instance):
-			Module<IO> (instance),
-			QWidget (nullptr)
-		{
-			configure();
-		}
-
-
-template<class IO>
-	inline void
-	Instrument<IO>::configure()
-	{
-		setFont (xf::Services::instrument_font());
-		setCursor (QCursor (Qt::CrossCursor));
-	}
+			BasicInstrument (std::make_unique<IO>(), instance),
+			io (static_cast<IO&> (*io_base()))
+		{ }
 
 } // namespace xf
 

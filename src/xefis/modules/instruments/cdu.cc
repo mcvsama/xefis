@@ -141,6 +141,8 @@ CDU::Strip::paint (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& pa
 void
 CDU::Strip::paint_button_helper (QRectF const& rect, xf::InstrumentAids& aids, xf::Painter& painter, Column column, ButtonState state)
 {
+	xf::PainterShadow painter_shadow;
+
 	QRectF btn_rect (rect.topLeft(), QSizeF (0.6 * rect.width(), rect.height()));
 	if (column == Column::Right)
 		btn_rect.translate (rect.width() - btn_rect.width(), 0.0);
@@ -175,7 +177,7 @@ CDU::Strip::paint_button_helper (QRectF const& rect, xf::InstrumentAids& aids, x
 		{
 			// White line:
 			painter.setPen (aids.get_pen (Qt::white, 1.0));
-			painter.add_shadow (2.0, [&] {
+			painter_shadow.add_shadow (painter, 2.0, [&] {
 				painter.drawLine (pa, pb);
 			});
 
@@ -208,7 +210,7 @@ CDU::Strip::paint_button_helper (QRectF const& rect, xf::InstrumentAids& aids, x
 			QColor cyan (0x22, 0xcc, 0xff);
 			painter.setPen (aids.get_pen (cyan, 1.0));
 			painter.setBrush (Qt::NoBrush);
-			painter.add_shadow (2.0, [&] {
+			painter_shadow.add_shadow (painter, 2.0, [&] {
 				painter.drawLine (pa, pb);
 				painter.drawRect (rect_2);
 			});

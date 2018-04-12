@@ -75,21 +75,15 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 }
 
 
-TextPainter::TextPainter (Cache* cache):
+TextPainter::TextPainter (Cache& cache):
 	_cache (cache)
-{
-	if (!_cache)
-		throw Exception ("attempted to create TextPainter with nullptr cache");
-}
+{ }
 
 
-TextPainter::TextPainter (QPaintDevice* device, Cache* cache):
+TextPainter::TextPainter (QPaintDevice* device, Cache& cache):
 	QPainter (device),
 	_cache (cache)
-{
-	if (!_cache)
-		throw Exception ("attempted to create TextPainter with nullptr cache");
-}
+{ }
 
 
 void
@@ -180,9 +174,9 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 
 	// TODO cache previous painting info { font, color }, and if the same, use cached glyphs_cache iterator.
 	// Find font cache:
-	Cache::Fonts::iterator glyphs_cache_it = _cache->fonts.find (Cache::Font { font(), color });
-	if (glyphs_cache_it == _cache->fonts.end())
-		glyphs_cache_it = _cache->fonts.insert ({ Cache::Font { font(), color }, Cache::Glyphs() }).first;
+	Cache::Fonts::iterator glyphs_cache_it = _cache.fonts.find (Cache::Font { font(), color });
+	if (glyphs_cache_it == _cache.fonts.end())
+		glyphs_cache_it = _cache.fonts.insert ({ Cache::Font { font(), color }, Cache::Glyphs() }).first;
 	Cache::Glyphs* glyphs_cache = &glyphs_cache_it->second;
 
 	for (QString::ConstIterator c = text.begin(); c != text.end(); ++c)

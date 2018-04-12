@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/painter.h>
 #include <xefis/utility/string.h>
 
 // Local:
@@ -27,32 +26,21 @@
 
 
 Label::Label (std::unique_ptr<LabelIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance),
-	InstrumentAids (1.f)
+	Instrument (std::move (module_io), instance)
 { }
 
 
 void
-Label::resizeEvent (QResizeEvent*)
+Label::paint (QImage& canvas) const
 {
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		set_scaling (xw->pen_scale(), xw->font_scale());
-
-	InstrumentAids::update_sizes (size(), window()->size());
-}
-
-
-void
-Label::paintEvent (QPaintEvent*)
-{
-	auto paint_token = get_token (this);
-	clear_background();
-
-	QFont font (_font_10);
+	// TODO add support for static instruments like this (only changes when some kind of update() method is called,
+	// eg. when canvas size changes.
+	auto p = get_painter (canvas);
+	QFont font (font_1);
+	// TODO how to interpret this xf::FontSize?
 	font.setPixelSize (**io.font_size);
-	painter().setFont (font);
-	painter().setPen (*io.color);
-	painter().fast_draw_text (rect(), *io.alignment, *io.label);
+	p.setFont (font);
+	p.setPen (*io.color);
+	p.fast_draw_text (canvas.rect(), *io.alignment, *io.label);
 }
 

@@ -21,8 +21,8 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v2/instrument.h>
 #include <xefis/core/v2/module_io.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/v2/setting.h>
+#include <xefis/support/instrument/instrument_aids.h>
 #include <xefis/utility/types.h>
 
 
@@ -42,21 +42,15 @@ class LabelIO: public xf::ModuleIO
 
 class Label:
 	public xf::Instrument<LabelIO>,
-	protected xf::InstrumentAids
+	private xf::InstrumentAids
 {
   public:
 	// Ctor
 	explicit
 	Label (std::unique_ptr<LabelIO>, std::string const& instance = {});
 
-  protected:
-	// QWidget API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (QImage& canvas) const override;
 };
 
 #endif
