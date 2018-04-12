@@ -89,12 +89,13 @@ Screen::paint_instruments_to_buffer()
 	// Ask instruments to paint themselves:
 	for (auto& disclosure: *this)
 	{
-		auto const& instrument = disclosure.registrant();
+		auto& instrument = disclosure.registrant();
 		auto& details = disclosure.details();
 
 		if (details.rect.isValid())
 		{
 			prepare_canvas_for_instrument (details.canvas, details.rect.size());
+			instrument.mark_dirty();
 			instrument.paint (details.canvas);
 		}
 		else
