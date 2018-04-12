@@ -10,7 +10,7 @@ export LC_ALL
 # Show verbose compilation commands?
 VERBOSE				:= 0
 # How many threads use for compilation?
-THREADS			:= $(shell grep processor /proc/cpuinfo|wc -l)
+THREADS				:= $(shell nproc)
 # Architecture:
 ARCH				:= $(shell uname -m)
 # Enable profiling?
