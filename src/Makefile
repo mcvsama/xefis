@@ -27,28 +27,15 @@ VERSION				:= alpha0.1dev
 RELEASE				:= 0
 # Set to 1 to disable some UB-generating optimizations:
 UB_OPTS_DISABLE		:= 0
-# Sanitizer?
-SANITIZER_FLAGS		:=
-
-# Predefined profiles:
-ifeq ($(PROFILE),rpi)
-CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
-endif
-
-# Undefined-Behaviour handling:
-ifeq ($(UB_OPTS_DISABLE),1)
-CXXFLAGS += -fno-strict-overflow -fno-delete-null-pointer-checks -fno-strict-aliasing -fsanitize=undefined
-endif
-
-ifeq ($(PROFILE),bbb)
-CXXFLAGS += -finline -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
-endif
+# Sanitizers?
+SANITIZE			:=
+# address, thread, leak or undefined
 
 CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
 CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fconcepts -fnothrow-opt -pedantic-errors -D_GLIBCXX_USE_CXX11_ABI=1 -Wshadow-compatible-local
-CXXFLAGS		+= -pthread -rdynamic -I. -Ilib $(SANITIZER_FLAGS)
+CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)
 CLANG_DISABLED_WARNINGS = mismatched-tags disabled-macro-expansion c++98-compat-pedantic documentation-unknown-command
@@ -57,9 +44,9 @@ CXXFLAGS		+= -pthread -I. -Ilib
 endif
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
 SO				:= $(CXX) -shared
-SOFLAGS			:=
+SOFLAGS			+=
 LD				:= $(CXX)
-LDFLAGS			:= -rdynamic
+LDFLAGS			+= -rdynamic
 AR				:= ar
 MOC				:= $(QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system pthread mhash
@@ -136,6 +123,25 @@ ifneq ($(PROFILE),)
 PROFILE_s = -$(PROFILE)
 else
 PROFILE_s =
+endif
+
+# Predefined profiles:
+ifeq ($(PROFILE),rpi)
+CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
+endif
+
+# Undefined-Behaviour handling:
+ifeq ($(UB_OPTS_DISABLE),1)
+CXXFLAGS += -fno-strict-overflow -fno-delete-null-pointer-checks -fno-strict-aliasing
+endif
+
+ifeq ($(PROFILE),bbb)
+CXXFLAGS += -finline -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
+endif
+
+ifneq ($(SANITIZE),)
+CXXFLAGS += -fsanitize=$(SANITIZE)
+LDFLAGS += -fsanitize=$(SANITIZE)
 endif
 
 dist			= $(ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
