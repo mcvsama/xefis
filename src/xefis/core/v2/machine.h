@@ -33,6 +33,14 @@ class Machine
 	Machine (Xefis*);
 
 	/**
+	 * Dtor
+	 * Has to be virtual since we'll possibly refer to machines thorugh base class
+	 * (that is Machine).
+	 */
+	virtual
+	~Machine() = default;
+
+	/**
 	 * Return main Xefis object.
 	 */
 	Xefis*
