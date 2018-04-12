@@ -182,8 +182,8 @@ class Xefis: public QApplication
 	s_quit (int);
 
   private:
-	static Xefis*					_xefis;
-	static Logger					_logger;
+	static inline Xefis*			_xefis	{ nullptr };
+	static inline Logger			_logger;
 
 	Unique<System>					_system;
 	Unique<ConfiguratorWidget>		_configurator_widget;

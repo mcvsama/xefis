@@ -46,10 +46,6 @@
 
 namespace xf {
 
-Xefis*	Xefis::_xefis = nullptr;
-Logger	Xefis::_logger;
-
-
 Xefis::Xefis (int& argc, char** argv):
 	QApplication (argc, argv)
 {
