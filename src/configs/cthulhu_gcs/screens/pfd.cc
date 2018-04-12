@@ -18,18 +18,6 @@
 #include <xefis/config/all.h>
 
 // Local:
-#include "layout_pfd.h"
+#include "pfd.h"
 
-
-LayoutPFD::LayoutPFD (Loop* loop)
-{
-	_window = std::make_unique<xf::Window>();
-
-	auto* layout = new QVBoxLayout();
-	layout->addWidget (loop->adi, 8);
-	// layout->setContentsMargins (left, top, right, bottom);
-	// TODO layout->addWidget (loop->hsi_aux, 5);
-
-	// TODO class InstrumentStack with InputProperties that control visible instrument
-}
 
