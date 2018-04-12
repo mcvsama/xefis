@@ -34,7 +34,8 @@ class BasicInstrument: public BasicModule
 	using BasicModule::BasicModule;
 
 	// Dtor
-	virtual ~BasicInstrument() = default;
+	virtual
+	~BasicInstrument() = default;
 
 	/**
 	 * Paint the instrument onto given canvas.

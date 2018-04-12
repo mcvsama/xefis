@@ -89,6 +89,10 @@ class ModuleIO
 		explicit
 		ProcessingLoopAPI (ModuleIO&);
 
+		// Dtor
+		virtual
+		~ProcessingLoopAPI() = default;
+
 		/**
 		 * Set reference to the module object.
 		 */
@@ -138,6 +142,10 @@ class ModuleIO
 	};
 
   public:
+	// Dtor
+	virtual
+	~ModuleIO() = default;
+
 	/**
 	 * Return reference to the module that uses this ModuleIO object.
 	 */

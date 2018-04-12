@@ -83,6 +83,10 @@ class BasicModule: private Noncopyable
 	class HasConfiguratorWidget
 	{
 	  public:
+		// Dtor
+		virtual
+		~HasConfiguratorWidget() = default;
+
 		virtual QWidget*
 		configurator_widget() = 0;
 	};
