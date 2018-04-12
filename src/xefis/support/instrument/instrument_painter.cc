@@ -31,7 +31,7 @@ InstrumentPainter::InstrumentPainter (QPaintDevice& device, TextPainter::Cache& 
 	setRenderHint (QPainter::TextAntialiasing, true);
 	setRenderHint (QPainter::SmoothPixmapTransform, true);
 	setRenderHint (QPainter::NonCosmeticDefaultPen, true);
-	// TODO set_font_position_correction ({ 0.0, 0.04 });
+	set_font_position_correction ({ 0.0, 0.04 });
 }
 
 } // namespace xf
