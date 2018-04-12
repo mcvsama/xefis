@@ -10,38 +10,38 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 
 ######## /xefis/modules/instruments ########
 
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
-XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
-XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
-XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
-XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
-XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h
-XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h
-
+#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
+##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
+#XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h
+#
 XEFIS_HEADERS			+= xefis/modules/instruments/label.h
-XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
-XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
-XEFIS_HEADERS_MOC		+= xefis/modules/instruments/status.h
-XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
-
-XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
-XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc
+#XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/status.h
+#XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
+#
+#XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
+##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
+#XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
 
 ######## /xefis/modules/io ########
 
@@ -359,25 +359,25 @@ XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
 
 ######## /xefis/support/ui/widgets ########
 
-XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h
-XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_button.h
-XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_rotary_encoder.h
-XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_numeric_display.h
-XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_widget.h
-
-XEFIS_SOURCES			+= xefis/support/ui/widgets/group_box.cc
-XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc
-XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc
-XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc
-XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_button.h
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_rotary_encoder.h
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_numeric_display.h
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_widget.h
+#
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/group_box.cc
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc
 
 ######## /xefis/support/ui ########
 
 XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
-XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h
 
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
-XEFIS_SOURCES			+= xefis/support/ui/window.cc
+#XEFIS_SOURCES			+= xefis/support/ui/window.cc
 
 ######## /xefis/test ########
 
@@ -394,7 +394,7 @@ XEFIS_HEADERS			+= xefis/utility/backtrace.h
 XEFIS_HEADERS			+= xefis/utility/blob.h
 XEFIS_HEADERS			+= xefis/utility/convergence.h
 XEFIS_HEADERS			+= xefis/utility/datatable2d.h
-XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
+#XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
 XEFIS_HEADERS			+= xefis/utility/demangle.h
 XEFIS_HEADERS			+= xefis/utility/format_exception.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
@@ -411,7 +411,7 @@ XEFIS_HEADERS			+= xefis/utility/packet_reader.h
 XEFIS_HEADERS			+= xefis/utility/pid_control.h
 XEFIS_HEADERS			+= xefis/utility/qdom.h
 XEFIS_HEADERS			+= xefis/utility/qdom_iterator.h
-XEFIS_HEADERS			+= xefis/utility/quadrature_decoder.h
+#XEFIS_HEADERS			+= xefis/utility/quadrature_decoder.h
 XEFIS_HEADERS			+= xefis/utility/qzdevice.h
 XEFIS_HEADERS			+= xefis/utility/range.h
 XEFIS_HEADERS			+= xefis/utility/registration_proof.h
@@ -437,11 +437,11 @@ XEFIS_HEADERS			+= xefis/utility/variant.h
 
 XEFIS_SOURCES			+= xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc
-XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
+#XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
-XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
+#XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/semaphore.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
