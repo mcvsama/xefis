@@ -43,6 +43,10 @@ class PropertyStringifier
 	class BasicConverter
 	{
 	  public:
+		// Dtor
+		virtual
+		~BasicConverter() = default;
+
 		virtual std::string
 		to_string() const = 0;
 

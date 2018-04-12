@@ -45,6 +45,10 @@ class BasicSetting
 	enum OptionalTag { Optional };
 
   public:
+	// Dtor
+	virtual
+	~BasicSetting() = default;
+
 	/**
 	 * Ctor
 	 * Stores pointer to owning module.

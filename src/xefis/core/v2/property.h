@@ -81,6 +81,10 @@ template<class Value>
 class PropertyVirtualInterface
 {
   public:
+	// Dtor
+	virtual
+	~PropertyVirtualInterface() = default;
+
 	/**
 	 * Return true if property is nil.
 	 * If a fallback-value is set, it will never return true.

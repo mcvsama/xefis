@@ -44,6 +44,10 @@ class PropertyDigitizer
 	class BasicConverter
 	{
 	  public:
+		// Dtor
+		virtual
+		~BasicConverter() = default;
+
 		virtual std::optional<double>
 		to_numeric() const = 0;
 
