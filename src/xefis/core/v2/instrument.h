@@ -57,7 +57,7 @@ class BasicInstrument: public BasicModule
 	mark_dirty() noexcept;
 
   private:
-	std::atomic<bool>	_dirty	{ false };
+	std::atomic<bool>	_dirty	{ true };
 };
 
 
