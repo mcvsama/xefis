@@ -239,6 +239,7 @@ XEFIS_HEADERS			+= xefis/core/fail.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
 XEFIS_HEADERS_MOC		+= xefis/core/panel.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
+XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS_MOC		+= xefis/core/services.h
 XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
@@ -253,6 +254,7 @@ XEFIS_SOURCES			+= xefis/core/v2/property_observer.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
+XEFIS_SOURCES			+= xefis/core/screen.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
@@ -306,7 +308,18 @@ XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
 
 ######## /xefis/support/instrument ########
 
-XEFIS_HEADERS			+= xefis/support/instrument/painter_shadow.h
+XEFIS_HEADERS			+= xefis/support/instrument/instrument_aids.h
+XEFIS_HEADERS			+= xefis/support/instrument/instrument_painter.h
+XEFIS_HEADERS			+= xefis/support/instrument/shadow.h
+XEFIS_HEADERS			+= xefis/support/instrument/shadow_painter.h
+XEFIS_HEADERS			+= xefis/support/instrument/text_layout.h
+XEFIS_HEADERS			+= xefis/support/instrument/text_painter.h
+
+XEFIS_SOURCES			+= xefis/support/instrument/instrument_aids.cc
+XEFIS_SOURCES			+= xefis/support/instrument/instrument_painter.cc
+XEFIS_SOURCES			+= xefis/support/instrument/shadow_painter.cc
+XEFIS_SOURCES			+= xefis/support/instrument/text_layout.cc
+XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
 ######## /xefis/support/navigation ########
 
@@ -415,8 +428,6 @@ XEFIS_HEADERS			+= xefis/utility/strong_type.h
 XEFIS_HEADERS			+= xefis/utility/synchronized.h
 XEFIS_HEADERS			+= xefis/utility/temporal.h
 XEFIS_HEADERS			+= xefis/utility/temporary_change.h
-XEFIS_HEADERS			+= xefis/utility/text_layout.h
-XEFIS_HEADERS			+= xefis/utility/text_painter.h
 XEFIS_HEADERS			+= xefis/utility/thread.h
 XEFIS_HEADERS			+= xefis/utility/time.h
 XEFIS_HEADERS			+= xefis/utility/time_helper.h
@@ -433,8 +444,6 @@ XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
 XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/semaphore.cc
-XEFIS_SOURCES			+= xefis/utility/text_layout.cc
-XEFIS_SOURCES			+= xefis/utility/text_painter.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
 
 SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc

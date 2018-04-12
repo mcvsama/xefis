@@ -66,12 +66,6 @@ class ConfiguratorWidget: public QWidget
 	explicit
 	ConfiguratorWidget (xf::Machine& machine, QWidget* parent);
 
-	v1::Window*
-	owning_window() const;
-
-	void
-	set_owning_window (v1::Window*);
-
   private:
 	void
 	module_selected (xf::BasicModule&);
@@ -92,7 +86,6 @@ class ConfiguratorWidget: public QWidget
 	QStackedWidget*		_modules_stack			= nullptr;
 	DataRecorder*		_data_recorder			= nullptr;
 	QTabWidget*			_tabs					= nullptr;
-	v1::Window*			_owning_window			= nullptr;
 	QLabel*				_no_module_selected		= nullptr;
 	std::map<xf::BasicModule*, Shared<GeneralModuleWidget>>
 						_general_module_widgets;
@@ -103,20 +96,6 @@ inline xf::BasicModule&
 ConfiguratorWidget::GeneralModuleWidget::module() const noexcept
 {
 	return _module;
-}
-
-
-inline v1::Window*
-ConfiguratorWidget::owning_window() const
-{
-	return _owning_window;
-}
-
-
-inline void
-ConfiguratorWidget::set_owning_window (v1::Window* window)
-{
-	_owning_window = window;
 }
 
 } // namespace xf

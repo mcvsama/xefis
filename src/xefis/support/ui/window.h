@@ -45,12 +45,6 @@ class Window: public QWidget
 	void
 	set_fullscreen();
 
-	/**
-	 * Reference the widget containing instruments.
-	 */
-	QWidget*
-	instruments_panel() const noexcept;
-
   private slots:
 	/**
 	 * Show configurator widget in current window. If shown in any other windows,
@@ -71,13 +65,6 @@ class Window: public QWidget
 	QWidget*		_instruments_panel;
 	QWidget*		_configurator_panel;
 };
-
-
-inline QWidget*
-Window::instruments_panel() const noexcept
-{
-	return _instruments_panel;
-}
 
 } // namespace xf
 

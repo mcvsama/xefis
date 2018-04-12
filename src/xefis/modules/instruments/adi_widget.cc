@@ -25,8 +25,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/instrument/painter_shadow.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/painter.h>
 #include <xefis/utility/text_layout.h>
 
 // Local:
@@ -443,57 +443,46 @@ ADIWidget::PaintWorkUnit::adi_paint_roll_scale (xf::Painter& painter)
 		<< b - x0 + y0;
 	QPolygonF bank_angle_polygon = QPolygonF() << b << a << c << b;
 
-	for (bool is_shadow: { true, false })
-	{
-		painter.setTransform (_roll_transform * _center_transform);
-		painter.translate (0.f, -0.79f * w);
+	painter.setTransform (_roll_transform * _center_transform);
+	painter.translate (0.f, -0.79f * w);
 
-		if (_params.roll_warning)
-		{
-			painter.setPen (warning_pen);
-			painter.setBrush (warning_pen.color());
-			if (is_shadow)
-				painter.configure_for_shadow();
+	if (_params.roll_warning)
+	{
+		painter.setPen (warning_pen);
+		painter.setBrush (warning_pen.color());
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolygon (bank_angle_polygon);
-			if (is_shadow)
-				painter.configure_normal();
+		});
+	}
+	else
+	{
+		painter.setPen (pen);
+		_default_shadow.add_shadow (painter, [&] {
+			painter.drawPolyline (bank_angle_polygon);
+		});
+	}
+
+	if (_params.slip_skid_visible)
+	{
+		painter.translate (-xf::clamped (_params.slip_skid.quantity<si::Degree>(), -4.0, +4.0) * 0.08 * w, 0.0);
+
+		if (_params.roll_warning || _params.slip_skid_warning)
+			painter.setPen (warning_pen);
+		else
+			painter.setPen (pen);
+
+		if (_params.slip_skid_warning)
+		{
+			painter.setBrush (warning_pen.color());
+			_default_shadow.add_shadow (painter, [&] {
+				painter.drawPolygon (slip_skid_polygon);
+			});
 		}
 		else
 		{
-			painter.setPen (pen);
-			if (is_shadow)
-				painter.configure_for_shadow();
-			painter.drawPolyline (bank_angle_polygon);
-			if (is_shadow)
-				painter.configure_normal();
-		}
-
-		if (_params.slip_skid_visible)
-		{
-			painter.translate (-xf::clamped (_params.slip_skid.quantity<si::Degree>(), -4.0, +4.0) * 0.08 * w, 0.0);
-
-			if (_params.roll_warning || _params.slip_skid_warning)
-				painter.setPen (warning_pen);
-			else
-				painter.setPen (pen);
-
-			if (_params.slip_skid_warning)
-			{
-				painter.setBrush (warning_pen.color());
-				if (is_shadow)
-					painter.configure_for_shadow();
-				painter.drawPolygon (slip_skid_polygon);
-				if (is_shadow)
-					painter.configure_normal();
-			}
-			else
-			{
-				if (is_shadow)
-					painter.configure_for_shadow();
+			_default_shadow.add_shadow (painter, [&] {
 				painter.drawPolyline (slip_skid_polygon);
-				if (is_shadow)
-					painter.configure_normal();
-			}
+			});
 		}
 	}
 }
@@ -584,7 +573,7 @@ ADIWidget::PaintWorkUnit::adi_paint_tcas_ra (xf::Painter& painter)
 			float const h1 = heading_to_px (6_deg);
 			float const h2 = heading_to_px (30_deg);
 			float const p2 = pitch_to_px (pitch2);
-			painter.add_shadow ([&] {
+			_default_shadow.add_shadow (painter, [&] {
 				painter.drawLine (-h1, 0.f, +h1, 0.f);
 				painter.drawLine (-h1, 0.f, -h2, p2);
 				painter.drawLine (+h1, 0.f, +h2, p2);
@@ -610,7 +599,7 @@ ADIWidget::PaintWorkUnit::adi_paint_pitch_disagree (xf::Painter& painter)
 	painter.setTransform (_center_transform);
 	painter.setPen (get_pen (_warning_color_1, 1.f));
 	painter.setFont (_font_16);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, [&] {
 		painter.fast_draw_text (QPointF (-0.225f * wh(), 0.285f * wh()), Qt::AlignVCenter | Qt::AlignLeft, "PITCH");
 	});
 }
@@ -626,7 +615,7 @@ ADIWidget::PaintWorkUnit::adi_paint_roll_disagree (xf::Painter& painter)
 	painter.setTransform (_center_transform);
 	painter.setPen (get_pen (_warning_color_1, 1.f));
 	painter.setFont (_font_16);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, [&] {
 		painter.fast_draw_text (QPointF (+0.225f * wh(), 0.285f * wh()), Qt::AlignVCenter | Qt::AlignRight, "ROLL");
 	});
 }
@@ -643,7 +632,7 @@ ADIWidget::PaintWorkUnit::adi_paint_flight_path_marker (xf::Painter& painter)
 	painter.translate (_flight_path_marker_position);
 	painter.setPen (get_pen (Qt::white, 1.25f));
 	painter.setBrush (Qt::NoBrush);
-	painter.add_shadow (1.8f, [&] {
+	_default_shadow.add_shadow (painter, 1.8f, [&] {
 		painter.drawPath (_flight_path_marker_shape);
 	});
 }
@@ -778,12 +767,9 @@ ADIWidget::PaintWorkUnit::sl_paint_black_box (xf::Painter& painter, float x)
 		<< _sl_black_box_rect.bottomRight()
 		<< QPointF (0.f, +0.5f * x);
 
-	QColor ps = painter.shadow_color();
-	painter.set_shadow_color (Qt::black);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, Qt::black, [&] {
 		painter.drawPolygon (black_box_polygon);
 	});
-	painter.set_shadow_color (ps);
 
 	QRectF box_1000 = _sl_black_box_rect.adjusted (_sl_margin, _sl_margin, -_sl_margin, -_sl_margin);
 	QRectF box_0100 =
@@ -820,7 +806,7 @@ ADIWidget::PaintWorkUnit::sl_paint_ias_disagree (xf::Painter& painter, float x)
 	painter.setFont (_font_8);
 	painter.setPen (get_pen (_warning_color_2, 1.f));
 	QPointF position (-1.75f * x, 9.5f * x);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, [&] {
 		painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS");
 		painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
 	});
@@ -902,7 +888,7 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
 			<< QPointF (_sl_ladder_rect.right() - p1w, min_man_posy)
 			<< min_point - QPointF (p1w, 0.f);
 		painter.setPen (pen_y);
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolyline (poly);
 		});
 	}
@@ -914,7 +900,7 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_limits (xf::Painter& painter, float x)
 			<< QPointF (_sl_ladder_rect.right() - p1w, max_man_posy)
 			<< max_point - QPointF (p1w, 0.f);
 		painter.setPen (pen_y);
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolyline (poly);
 		});
 	}
@@ -960,7 +946,7 @@ ADIWidget::PaintWorkUnit::sl_paint_speed_tendency (xf::Painter& painter, float x
 	if (length > 0.2f * x)
 	{
 		painter.setClipRect (QRectF (_sl_ladder_rect.topLeft(), QPointF (_sl_ladder_rect.right(), 0.f)));
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolygon (QPolygonF()
 				<< QPointF (0.f, 0.f)
 				<< QPointF (0.f, -length)
@@ -993,7 +979,7 @@ ADIWidget::PaintWorkUnit::sl_paint_bugs (xf::Painter& painter, float x)
 			float posy = kt_to_px (bug.second);
 			painter.setPen (_sl_speed_bug_pen);
 			painter.setClipRect (_sl_ladder_rect.translated (x, 0.f));
-			painter.add_shadow ([&] {
+			_default_shadow.add_shadow (painter, [&] {
 				painter.drawLine (QPointF (1.5f * x, posy), QPointF (2.25f * x, posy));
 			});
 			painter.setClipping (false);
@@ -1264,12 +1250,9 @@ ADIWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 		painter.setBrush (Qt::black);
 
 		// Metric box:
-		QColor ps = painter.shadow_color();
-		painter.set_shadow_color (Qt::black);
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, Qt::black, [&] {
 			painter.drawRect (_al_metric_box_rect);
 		});
-		painter.set_shadow_color (ps);
 
 		// Metric value:
 		float xcorr = 0.25f * m_metrics.width (" ");
@@ -1286,12 +1269,9 @@ ADIWidget::PaintWorkUnit::al_paint_black_box (xf::Painter& painter, float x)
 	painter.setBrush (Qt::black);
 
 	// Feet box:
-	QColor ps = painter.shadow_color();
-	painter.set_shadow_color (Qt::black);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, Qt::black, [&] {
 		painter.drawPolygon (black_box_polygon);
 	});
-	painter.set_shadow_color (ps);
 
 	// Feet value:
 	QRectF box_10000 = QRectF (_al_b_digits_box.topLeft(), QSizeF (b_digit_width, _al_b_digits_box.height()));
@@ -1326,7 +1306,7 @@ ADIWidget::PaintWorkUnit::al_paint_altitude_disagree (xf::Painter& painter, floa
 	painter.setFont (_font_8);
 	painter.setPen (get_pen (_warning_color_2, 1.f));
 	QPointF position (-1.75f * x, 9.5f * x);
-	painter.add_shadow ([&] {
+	_default_shadow.add_shadow (painter, [&] {
 		painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT");
 		painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
 	});
@@ -1435,7 +1415,7 @@ ADIWidget::PaintWorkUnit::al_paint_altitude_tendency (xf::Painter& painter, floa
 	if (length > 0.2f * x)
 	{
 		painter.setClipRect (QRectF (_al_ladder_rect.topLeft(), QPointF (_al_ladder_rect.right(), 0.f)));
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolygon (QPolygonF()
 				<< QPointF (0.f, 0.f)
 				<< QPointF (0.f, -length)
@@ -1470,7 +1450,7 @@ ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 				painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 
 				painter.setPen (_al_altitude_bug_pen);
-				painter.add_shadow ([&] {
+				_default_shadow.add_shadow (painter, [&] {
 					painter.drawLine (QPointF (-1.5f * x, posy), QPointF (-2.25f * x, posy));
 				});
 
@@ -1492,11 +1472,11 @@ ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 
 			painter.setClipRect (_al_ladder_rect.adjusted (-x, 0.f, 0.f, 0.f));
 			painter.setPen (w);
-			painter.add_shadow ([&] {
+			_default_shadow.add_shadow (painter, [&] {
 				painter.drawPolyline (QPolygonF() << p1 << p2 << p2 + QPointF (0.25f * x, 0.f));
 			});
 			painter.setPen (_al_ldg_alt_pen);
-			painter.add_shadow ([&] {
+			_default_shadow.add_shadow (painter, [&] {
 				painter.drawLine (p0, p1);
 			});
 
@@ -1557,7 +1537,7 @@ ADIWidget::PaintWorkUnit::al_paint_bugs (xf::Painter& painter, float x)
 					QPointF b (_al_ladder_rect.left() - 0.65f * x, posy - 0.65f * x);
 					QPointF c (_al_ladder_rect.left() - 0.65f * x, posy + 0.65f * x);
 					QPolygonF poly = QPolygonF() << a << b << c;
-					painter.add_shadow ([&] {
+					_default_shadow.add_shadow (painter, [&] {
 						painter.drawLine (a, QPointF (_al_ladder_rect.right(), posy));
 						painter.drawPolygon (poly);
 					});
@@ -1642,7 +1622,7 @@ ADIWidget::PaintWorkUnit::al_paint_vertical_speed (xf::Painter& painter, float x
 			<< QPointF (0.f, -1.5f * pw)
 			<< QPointF (+pw, 0.f)
 			<< QPointF (0.f, +1.5f * pw);
-		painter.add_shadow ([&] {
+		_default_shadow.add_shadow (painter, [&] {
 			painter.drawPolyline (rhomb.translated (1.25f * pw, posy));
 		});
 	}

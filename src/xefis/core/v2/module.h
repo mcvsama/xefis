@@ -243,13 +243,13 @@ template<class IO>
  * Return string identifying module and its instance.
  */
 std::string
-identifier (BasicModule&);
+identifier (BasicModule const&);
 
 /**
  * Same as identifier (BasicModule&).
  */
 std::string
-identifier (BasicModule*);
+identifier (BasicModule const*);
 
 } // namespace xf
 

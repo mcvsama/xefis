@@ -29,9 +29,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/instrument/painter_shadow.h>
 #include <xefis/core/instrument_widget.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/utility/painter.h>
 
 
 class ADIWidget: public xf::InstrumentWidget
@@ -505,6 +505,7 @@ class ADIWidget: public xf::InstrumentWidget
 		QTransform			_heading_transform;
 		QTransform			_horizon_transform;
 		QDateTime			_current_datetime;
+		xf::PainterShadow	_default_shadow;
 
 		/*
 		 * ADI
@@ -522,8 +523,8 @@ class ADIWidget: public xf::InstrumentWidget
 		 */
 
 		QTransform			_sl_transform;
-		Velocity				_sl_min_shown;
-		Velocity				_sl_max_shown;
+		Velocity			_sl_min_shown;
+		Velocity			_sl_max_shown;
 		int					_sl_rounded_speed;
 		QRectF				_sl_ladder_rect;
 		QPen				_sl_ladder_pen;
