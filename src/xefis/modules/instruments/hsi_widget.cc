@@ -688,7 +688,7 @@ HSIWidget::PaintWorkUnit::paint_altitude_reach (xf::Painter& painter)
 		painter.setTransform (_aircraft_center_transform);
 		painter.setClipping (false);
 		painter.setPen (get_pen (_navigation_color, 1.f));
-		painter.drawArc (rect, arc_degs (40_deg), arc_span (-80_deg));
+		painter.drawArc (rect, angle_for_qpainter (50_deg), angle_for_qpainter (80_deg));
 	}
 }
 

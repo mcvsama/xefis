@@ -27,11 +27,43 @@
 
 namespace xf {
 
-using AspectRatio = StrongType<float, struct AspectRatioType>;
+using WidthForHeight = StrongType<float, struct WidthForHeightType>;
+
 
 class InstrumentAids
 {
   public:
+	class FontInfo
+	{
+	  public:
+		QFont	font;
+		float	digit_width;
+		float	digit_height;
+
+	  public:
+		// Ctor
+		explicit
+		FontInfo (QFont const& font);
+
+		operator QFont const&() const noexcept;
+
+	  public:
+		static float
+		get_digit_width (QFont const& font);
+
+		static float
+		get_digit_height (QFont const& font);
+	};
+
+	static constexpr char			DIGITS[10]			= { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+	static constexpr char32_t		MINUS_SIGN			= U'−';
+	static constexpr char const*	MINUS_SIGN_STR_UTF8	= "−";
+
+  public:
+	// Ctor
+	explicit
+	InstrumentAids();
+
 	/**
 	 * Return an instrument painter with pointers to local caches, etc.
 	 * Not thread safe!
@@ -46,21 +78,51 @@ class InstrumentAids
 	QFont	font_2;
 	QFont	font_3;
 
+	/**
+	 * Return a centered rect inside whole_area that hold given
+	 * width-for-height ratio.
+	 */
 	static QRectF
-	centered_rect (QRectF whole_area, AspectRatio);
+	centered_rect (QRectF whole_area, WidthForHeight);
+
+	/**
+	 * Translate the rect so that its old top-left corner becomes its center.
+	 */
+	static void
+	centrify (QRectF& rectf);
+
+	/**
+	 * Convert angle to units proper for QPainter::drawArc (...) and QPainter::drawChord (...) functions.
+	 */
+	static float
+	angle_for_qpainter (Angle deg);
 
   private:
+	QFont							_default_font;
 	// FIXME this implies thread-safety:
-	TextPainter::Cache mutable	_text_painter_cache;
-	std::optional<AspectRatio>	_aspect_ratio;
+	TextPainter::Cache mutable		_text_painter_cache;
+	std::optional<WidthForHeight>	_aspect_ratio;
 };
 
 
-inline QRectF
-InstrumentAids::centered_rect (QRectF whole_area, AspectRatio)
+inline
+InstrumentAids::FontInfo::operator QFont const&() const noexcept
 {
-	// TODO
-	return { 0, 0, 1, 1 };
+	return font;
+}
+
+
+inline void
+InstrumentAids::centrify (QRectF& rectf)
+{
+	rectf.translate (-0.5f * rectf.width(), -0.5f * rectf.height());
+}
+
+
+inline float
+InstrumentAids::angle_for_qpainter (Angle deg)
+{
+	return 16 * deg.in<Degree>();
 }
 
 } // namespace xf
