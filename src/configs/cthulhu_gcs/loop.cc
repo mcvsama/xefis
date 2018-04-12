@@ -115,12 +115,21 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	//this->hsi_aux = load_module<HSI> (xefis, _navaid_storage.get(), "aux");
 	//this->horizontal_trim = load_module<HorizontalTrim>();
 
-	start();
-
 	this->adi->resize (QSize (680, 470));
 	this->adi->show();
 	//this->hsi_aux->show();
 	//this->horizontal_trim->show();
 #endif
+
+	_pfd_screen = std::make_unique<xf::Screen> (QRect (0, 0, 100, 100), 10_Hz);
+
+	auto some_label_io = std::make_unique<LabelIO>();
+	some_label_io->label = "Some text";
+
+	this->some_label = load_module<Label> (std::move (some_label_io), "some label");
+	this->some_label_registration_proof = _pfd_screen->register_object (*this->some_label);
+	_pfd_screen->set (*this->some_label, QRect (0, 0, 50, 50));
+
+	start();
 }
 

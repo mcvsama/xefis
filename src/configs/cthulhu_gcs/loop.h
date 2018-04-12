@@ -21,7 +21,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v2/processing_loop.h>
 #include <xefis/core/v2/machine.h>
+#include <xefis/core/screen.h>
 #include <xefis/core/xefis.h>
+#include <xefis/modules/instruments/label.h>
 #if 0
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/hsi.h>
@@ -48,22 +50,29 @@ class Loop: public xf::ProcessingLoop
 	 * Input modules
 	 */
 
-	WarthogStick*		joystick_input;
-	JoystickInput*		throttle_input;
-	JoystickInput*		pedals_input;
+	WarthogStick*					joystick_input;
+	JoystickInput*					throttle_input;
+	JoystickInput*					pedals_input;
 
 	/*
 	 * Communication modules
 	 */
 
-	Link*				link_tx;
-	Link*				link_rx;
+	Link*							link_tx;
+	Link*							link_rx;
 
 	/*
 	 * Computers
 	 */
 
-	AirDataComputer*	adc;
+	AirDataComputer*				adc;
+
+	/**
+	 * Instruments
+	 */
+
+	Label*							some_label;
+	xf::Screen::RegistrationProof	some_label_registration_proof;
 
 #if 0
 	/*
@@ -84,6 +93,7 @@ class Loop: public xf::ProcessingLoop
 	std::unique_ptr<xf::NavaidStorage>	_navaid_storage;
 	std::unique_ptr<xf::Airframe>		_airframe;
 	std::unique_ptr<xf::WorkPerformer>	_work_performer;
+	std::unique_ptr<xf::Screen>			_pfd_screen;
 };
 
 #endif

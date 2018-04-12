@@ -11,25 +11,19 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CONFIGS__CTHULHU_GCS__LAYOUT_PFD_H__INCLUDED
-#define XEFIS__CONFIGS__CTHULHU_GCS__LAYOUT_PFD_H__INCLUDED
+#ifndef XEFIS__CONFIGS__CTHULHU_GCS__SCREENS__PFD_H__INCLUDED
+#define XEFIS__CONFIGS__CTHULHU_GCS__SCREENS__PFD_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/screen.h>
 
 
-class LayoutPFD
+class PFD: public xf::Screen
 {
-  public:
-	// Ctor
-	explicit
-	LayoutPFD (Loop*);
-
-  private:
-	std::unique_ptr<xf::Window>	_window;
 };
 
 #endif
