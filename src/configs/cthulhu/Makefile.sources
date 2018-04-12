@@ -1,4 +1,0 @@
-XEFIS_HEADERS += configs/cthulhu/cthulhu.h
-
-XEFIS_SOURCES += configs/cthulhu/cthulhu.cc
-

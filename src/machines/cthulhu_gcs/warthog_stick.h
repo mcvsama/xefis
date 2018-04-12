@@ -11,19 +11,30 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CONFIGS__CTHULHU_GCS__SCREENS__PFD_H__INCLUDED
-#define XEFIS__CONFIGS__CTHULHU_GCS__SCREENS__PFD_H__INCLUDED
+#ifndef XEFIS__MACHINES__CTHULHU_GCS__WARTHOG_STICK_H__INCLUDED
+#define XEFIS__MACHINES__CTHULHU_GCS__WARTHOG_STICK_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/screen.h>
+#include <xefis/modules/io/joystick.h>
 
 
-class PFD: public xf::Screen
+class WarthogStick: public JoystickInput
 {
+  public:
+	/*
+	 * Output
+	 */
+
+	xf::PropertyOut<double>&	pitch_axis	= axis (3);
+	xf::PropertyOut<double>&	roll_axis	= axis (4);
+	xf::PropertyOut<bool>&		fire_button	= button (5);
+
+  public:
+	using JoystickInput::JoystickInput;
 };
 
 #endif

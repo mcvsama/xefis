@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CONFIGS__TEMPLATE__TEMPLATE_H__INCLUDED
-#define XEFIS__CONFIGS__TEMPLATE__TEMPLATE_H__INCLUDED
+#ifndef XEFIS__MACHINES__CTHULHU__CTHULHU_H__INCLUDED
+#define XEFIS__MACHINES__CTHULHU__CTHULHU_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -23,14 +23,15 @@
 #include <xefis/core/xefis.h>
 
 
-class TemplateAircraft: public xf::Machine
+class Cthulhu: public xf::Machine
 {
   public:
 	// Ctor
-	TemplateAircraft (xf::Xefis*);
+	Cthulhu (xf::Xefis*);
 
+  private:
 	void
-	process();
+	setup_ht16k33s();
 };
 
 #endif

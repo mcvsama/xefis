@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CONFIGS__CTHULHU_GCS__LOOP_H__INCLUDED
-#define XEFIS__CONFIGS__CTHULHU_GCS__LOOP_H__INCLUDED
+#ifndef XEFIS__MACHINES__CTHULHU_GCS__LOOP_H__INCLUDED
+#define XEFIS__MACHINES__CTHULHU_GCS__LOOP_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -36,8 +36,8 @@
 #include <xefis/support/system/work_performer.h>
 
 // Cthulhu:
-#include <configs/cthulhu_shared/link_io.h>
-#include <configs/cthulhu_shared/link_protocol.h>
+#include <machines/cthulhu_shared/link_io.h>
+#include <machines/cthulhu_shared/link_protocol.h>
 
 // Local:
 #include "warthog_stick.h"

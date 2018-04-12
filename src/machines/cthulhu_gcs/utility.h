@@ -1,6 +1,6 @@
 /* vim:ts=4
  *
- * Copyleft 2008…2013  Michał Gawron
+ * Copyleft 2008…2017  Michał Gawron
  * Marduk Unix Labs, http://mulabs.org/
  *
  * This program is free software: you can redistribute it and/or modify
@@ -11,28 +11,26 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CONFIGS__CTHULHU__CTHULHU_H__INCLUDED
-#define XEFIS__CONFIGS__CTHULHU__CTHULHU_H__INCLUDED
+#ifndef XEFIS__MACHINES__CTHULHU_GCS__UTILITY_H__INCLUDED
+#define XEFIS__MACHINES__CTHULHU_GCS__UTILITY_H__INCLUDED
 
 // Standard:
 #include <cstddef>
+#include <optional>
+#include <cmath>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/machine.h>
-#include <xefis/core/xefis.h>
+#include <xefis/core/v2/property.h>
 
 
-class Cthulhu: public xf::Machine
+inline bool
+compute_disagree_flag (std::optional<si::Angle> const& first, std::optional<si::Angle> const& second, si::Angle threshold)
 {
-  public:
-	// Ctor
-	Cthulhu (xf::Xefis*);
+	using std::abs;
 
-  private:
-	void
-	setup_ht16k33s();
-};
+	return !first || !second || abs (*first - *second) > threshold;
+}
 
 #endif
 
