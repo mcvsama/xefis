@@ -53,7 +53,15 @@ InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 
 
 InstrumentAids::InstrumentAids():
-	_default_font (xf::Services::instrument_font())
+	_default_font (xf::Services::instrument_font()),
+	font_0 (resized (_default_font, 10.0f)),
+	font_1 (resized (_default_font, 11.0f)),
+	font_2 (resized (_default_font, 13.0f)),
+	font_3 (resized (_default_font, 16.0f)),
+	font_4 (resized (_default_font, 18.0f)),
+	font_5 (resized (_default_font, 20.0f)),
+	autopilot_pen_1 (get_pen (kAutopilotColor.darker (300), 1.8f)),
+	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }
 
 
@@ -61,6 +69,15 @@ InstrumentPainter
 InstrumentAids::get_painter (QPaintDevice& canvas) const
 {
 	return xf::InstrumentPainter (canvas, _text_painter_cache);
+}
+
+
+QFont
+InstrumentPainter::resized (QFont const& font, xf::FontSize font_size)
+{
+	QFont copy { font };
+	copy.setPixelSize (*font_size);
+	return copy;
 }
 
 
