@@ -19,8 +19,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/processing_loop.h>
-#include <xefis/core/v2/machine.h>
+#include <xefis/core/processing_loop.h>
+#include <xefis/core/machine.h>
 #include <xefis/core/screen.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/instruments/label.h>
