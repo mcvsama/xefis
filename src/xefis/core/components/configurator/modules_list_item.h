@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/module.h>
+#include <xefis/core/module.h>
 
 
 namespace xf {

@@ -20,7 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/module.h>
+#include <xefis/core/module.h>
 #include <xefis/core/property_path.h>
 #include <xefis/utility/time.h>
 #include <xefis/utility/time_helper.h>

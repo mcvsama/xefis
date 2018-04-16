@@ -19,10 +19,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/instrument.h>
-#include <xefis/core/v2/module_io.h>
+#include <xefis/core/instrument.h>
+#include <xefis/core/module_io.h>
 #include <xefis/core/screen.h>
-#include <xefis/core/v2/setting.h>
+#include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/types.h>
 

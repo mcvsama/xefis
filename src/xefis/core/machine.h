@@ -20,7 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/processing_loop.h>
+#include <xefis/core/processing_loop.h>
 
 
 namespace xf {

@@ -16,9 +16,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/module.h>
-#include <xefis/core/v2/property.h>
-#include <xefis/core/v2/compatibility_v1_v2.h>
+#include <xefis/core/module.h>
+#include <xefis/core/property.h>
 #include <xefis/modules/helpers/mixer.h>
 #include <xefis/modules/io/chr_um6.h>
 #include <xefis/modules/io/ets_airspeed.h>

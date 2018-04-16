@@ -20,10 +20,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/module.h>
-#include <xefis/core/v2/property.h>
-#include <xefis/core/v2/property_observer.h>
-#include <xefis/core/v2/setting.h>
+#include <xefis/core/module.h>
+#include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
+#include <xefis/core/setting.h>
 #include <xefis/utility/pid_control.h>
 
 

@@ -30,10 +30,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/module.h>
-#include <xefis/core/v2/module_io.h>
-#include <xefis/core/v2/property.h>
-#include <xefis/core/v2/setting.h>
+#include <xefis/core/module.h>
+#include <xefis/core/module_io.h>
+#include <xefis/core/property.h>
+#include <xefis/core/setting.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/v2/actions.h>
 #include <xefis/utility/numeric.h>

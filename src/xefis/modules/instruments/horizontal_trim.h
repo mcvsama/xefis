@@ -19,11 +19,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/instrument.h>
+#include <xefis/core/instrument.h>
 #include <xefis/core/instrument_aids.h>
-#include <xefis/core/v2/property.h>
-#include <xefis/core/v2/property_observer.h>
-#include <xefis/core/v2/setting.h>
+#include <xefis/core/property.h>
+#include <xefis/core/property_observer.h>
+#include <xefis/core/setting.h>
 
 
 class HorizontalTrimIO: public xf::ModuleIO
