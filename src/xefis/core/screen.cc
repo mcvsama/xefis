@@ -94,9 +94,14 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.rect.isValid())
 		{
+			constexpr si::Length pen_width = 1_mm; // TODO user-configurable
+			constexpr si::Length font_height = 5_mm; // TODO user-configurable
+			PaintRequest::Metric metric { logicalDpiY() / 1_in, pen_width, font_height };
+			PaintRequest paint_request { details.canvas, metric };
+
 			prepare_canvas_for_instrument (details.canvas, details.rect.size());
 			instrument.mark_dirty();
-			instrument.paint (details.canvas);
+			instrument.paint (paint_request);
 		}
 		else
 			std::clog << "Instrument " << identifier (instrument) << " has invalid size/position." << std::endl;

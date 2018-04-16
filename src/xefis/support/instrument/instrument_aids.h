@@ -18,11 +18,15 @@
 #include <cstddef>
 #include <optional>
 
+// Qt:
+#include <QPen>
+#include <QFont>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/instrument/instrument_painter.h>
-#include <xefis/support/instrument/text_painter.h>
+#include <xefis/core/screen.h>
 #include <xefis/utility/strong_type.h>
+#include <xefis/utility/types.h>
 
 
 namespace xf {
@@ -58,30 +62,23 @@ class InstrumentAids
 	static constexpr char			DIGITS[10]				{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	static constexpr char32_t		MINUS_SIGN				{ U'−' };
 	static constexpr char const*	MINUS_SIGN_STR_UTF8		{ "−" };
-	static constexpr QColor			kAutopilotColor			{ 250, 20, 255 };
-	static constexpr QColor			kNavigationColor		{ 60, 255, 40 };
-	static constexpr QColor			kCautionColor			{ 255, 200, 50 };
-	static constexpr QColor			kWarningColor			{ 255, 40, 40 };
-	static constexpr QColor			kSilver					{ 0xcc, 0xca, 0xc2 };
-	static constexpr QColor			kCyan					{ 0x00, 0xcc, 0xff };
+	static inline QColor			kAutopilotColor			{ 250, 20, 255 };
+	static inline QColor			kNavigationColor		{ 60, 255, 40 };
+	static inline QColor			kCautionColor			{ 255, 200, 50 };
+	static inline QColor			kWarningColor			{ 255, 40, 40 };
+	static inline QColor			kSilver					{ 0xcc, 0xca, 0xc2 };
+	static inline QColor			kCyan					{ 0x00, 0xcc, 0xff };
 
   public:
 	// Ctor
 	explicit
-	InstrumentAids();
-
-	/**
-	 * Return an instrument painter with pointers to local caches, etc.
-	 * Not thread safe!
-	 */
-	InstrumentPainter
-	get_painter (QPaintDevice&) const;
+	InstrumentAids (PaintRequest const&);
 
 	/**
 	 * Return font modified to have given xf::FontSize.
 	 */
 	static QFont
-	resized (QFont const&, xf::FontSize);
+	resized (QFont const&, FontSize);
 
 	/**
 	 * Return a centered rect inside whole_area that hold given
@@ -103,6 +100,12 @@ class InstrumentAids
 	angle_for_qpainter (Angle deg);
 
 	/**
+	 * Return number of pixels for given Length and DPI.
+	 */
+	static float
+	pixels (si::Length, PixelDensity);
+
+	/**
 	 * Return value to use as pen width.
 	 */
 	float
@@ -122,10 +125,10 @@ class InstrumentAids
 
   private:
 	QFont							_default_font;
-	TextPainter::Cache mutable		_text_painter_cache; // FIXME this implies thread-safety:
 	std::optional<WidthForHeight>	_aspect_ratio;
+	PaintRequest::Metric			_canvas_metric;
 
-  protected:
+  public:
 	FontInfo	font_0;
 	FontInfo	font_1;
 	FontInfo	font_2;
@@ -159,16 +162,23 @@ InstrumentAids::angle_for_qpainter (Angle deg)
 
 
 inline float
+InstrumentAids::pixels (si::Length length, PixelDensity pixel_density)
+{
+	return length * pixel_density;
+}
+
+
+inline float
 InstrumentAids::pen_width (float scale) const
 {
-	return std::max (0.0f, 1.66f * scale * _master_pen_scale);
+	return std::max (0.0f, pixels (1.66f * scale * _canvas_metric.pen_width(), _canvas_metric.pixel_density()));
 }
 
 
 inline float
 InstrumentAids::font_pixel_size (float scale) const
 {
-	return std::max (1.0f, 1.26f * _master_font_scale * scale);
+	return std::max (1.0f, pixels (1.26f * scale * _canvas_metric.font_height(), _canvas_metric.pixel_density()));
 }
 
 

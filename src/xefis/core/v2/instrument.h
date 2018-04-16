@@ -23,10 +23,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/v2/module.h>
+#include <xefis/core/v2/paint_request.h>
 #include <xefis/utility/noncopyable.h>
 
 
 namespace xf {
+
+class Screen;
 
 class BasicInstrument: public BasicModule
 {
@@ -41,7 +44,7 @@ class BasicInstrument: public BasicModule
 	 * Paint the instrument onto given canvas.
 	 */
 	virtual void
-	paint (QImage& canvas) const = 0;
+	paint (PaintRequest&) const = 0;
 
 	/**
 	 * Return true if instrument wants to be repainted.
