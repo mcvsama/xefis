@@ -31,16 +31,16 @@ Label::Label (std::unique_ptr<LabelIO> module_io, std::string const& instance):
 
 
 void
-Label::paint (QImage& canvas) const
+Label::paint (xf::PaintRequest& paint_request) const
 {
-	// TODO add support for static instruments like this (only changes when some kind of update() method is called,
-	// eg. when canvas size changes.
-	auto p = get_painter (canvas);
-	QFont font (font_1);
-	// TODO how to interpret this xf::FontSize?
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
+
+	QFont font (aids->font_1);
 	font.setPixelSize (**io.font_size);
-	p.setFont (font);
-	p.setPen (*io.color);
-	p.fast_draw_text (canvas.rect(), *io.alignment, *io.label);
+
+	painter.setFont (font);
+	painter.setPen (*io.color);
+	painter.fast_draw_text (paint_request.canvas().rect(), *io.alignment, *io.label);
 }
 

@@ -25,8 +25,13 @@
 namespace xf {
 
 using FontSize = StrongType<float, struct FontSizeType>;
+using PixelDensity = decltype (1.0 / std::declval<si::Length>());
 
 
+/**
+ * Gives corresponding floating-point type (half, float, double, long double…) for required byte-width
+ * (number of bytes in the type).
+ */
 template<size_t Width>
 	struct float_for_width
 	{ };
@@ -64,6 +69,10 @@ template<>
 	};
 
 
+/**
+ * Gives corresponding integer type (signed char, short, int, …) for required byte-width
+ * (number of bytes in the type).
+ */
 template<size_t Width>
 	struct int_for_width
 	{ };

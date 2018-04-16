@@ -21,8 +21,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/v2/instrument.h>
 #include <xefis/core/v2/module_io.h>
+#include <xefis/core/screen.h>
 #include <xefis/core/v2/setting.h>
-#include <xefis/support/instrument/instrument_aids.h>
+#include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/types.h>
 
 
@@ -42,7 +43,7 @@ class LabelIO: public xf::ModuleIO
 
 class Label:
 	public xf::Instrument<LabelIO>,
-	private xf::InstrumentAids
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor
@@ -50,7 +51,7 @@ class Label:
 	Label (std::unique_ptr<LabelIO>, std::string const& instance = {});
 
 	void
-	paint (QImage& canvas) const override;
+	paint (xf::PaintRequest&) const override;
 };
 
 #endif
