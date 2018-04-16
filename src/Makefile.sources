@@ -222,51 +222,51 @@ XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc
 
 ######## /xefis/core ########
 
-XEFIS_HEADERS_MOC		+= xefis/core/v2/accounting.h
-XEFIS_HEADERS			+= xefis/core/v2/cycle.h
-XEFIS_HEADERS			+= xefis/core/v2/instrument.h
-XEFIS_HEADERS			+= xefis/core/v2/machine.h
-XEFIS_HEADERS			+= xefis/core/v2/module.h
-XEFIS_HEADERS			+= xefis/core/v2/module_io.h
-XEFIS_HEADERS			+= xefis/core/v2/paint_request.h
-XEFIS_HEADERS_MOC		+= xefis/core/v2/processing_loop.h
-XEFIS_HEADERS			+= xefis/core/v2/property.h
-XEFIS_HEADERS			+= xefis/core/v2/property_digitizer.h
-XEFIS_HEADERS			+= xefis/core/v2/property_observer.h
-XEFIS_HEADERS			+= xefis/core/v2/property_stringifier.h
-XEFIS_HEADERS			+= xefis/core/v2/property_utils.h
-XEFIS_HEADERS			+= xefis/core/v2/setting.h
+XEFIS_HEADERS_MOC		+= xefis/core/accounting.h
+XEFIS_HEADERS			+= xefis/core/cycle.h
 XEFIS_HEADERS			+= xefis/core/fail.h
+XEFIS_HEADERS			+= xefis/core/instrument.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
+XEFIS_HEADERS			+= xefis/core/machine.h
+XEFIS_HEADERS			+= xefis/core/module.h
+XEFIS_HEADERS			+= xefis/core/module_io.h
+XEFIS_HEADERS			+= xefis/core/paint_request.h
 XEFIS_HEADERS_MOC		+= xefis/core/panel.h
+XEFIS_HEADERS_MOC		+= xefis/core/processing_loop.h
+XEFIS_HEADERS			+= xefis/core/property.h
+XEFIS_HEADERS			+= xefis/core/property_digitizer.h
+XEFIS_HEADERS			+= xefis/core/property_observer.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
+XEFIS_HEADERS			+= xefis/core/property_stringifier.h
+XEFIS_HEADERS			+= xefis/core/property_utils.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS_MOC		+= xefis/core/services.h
+XEFIS_HEADERS			+= xefis/core/setting.h
 XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
-XEFIS_SOURCES			+= xefis/core/v2/accounting.cc
-XEFIS_SOURCES			+= xefis/core/v2/machine.cc
-XEFIS_SOURCES			+= xefis/core/v2/module.cc
-XEFIS_SOURCES			+= xefis/core/v2/module_io.cc
-XEFIS_SOURCES			+= xefis/core/v2/processing_loop.cc
-XEFIS_SOURCES			+= xefis/core/v2/property_observer.cc
+XEFIS_SOURCES			+= xefis/core/accounting.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
+XEFIS_SOURCES			+= xefis/core/machine.cc
+XEFIS_SOURCES			+= xefis/core/module.cc
+XEFIS_SOURCES			+= xefis/core/module_io.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
+XEFIS_SOURCES			+= xefis/core/processing_loop.cc
+XEFIS_SOURCES			+= xefis/core/property_observer.cc
 XEFIS_SOURCES			+= xefis/core/screen.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
-SELFTEST_HEADERS		+= xefis/core/v2/module.h
-SELFTEST_HEADERS		+= xefis/core/v2/module_io.h
-SELFTEST_HEADERS		+= xefis/core/v2/property.h
+SELFTEST_HEADERS		+= xefis/core/module.h
+SELFTEST_HEADERS		+= xefis/core/module_io.h
+SELFTEST_HEADERS		+= xefis/core/property.h
 
-SELFTEST_SOURCES		+= xefis/core/v2/module.cc
-SELFTEST_SOURCES		+= xefis/core/v2/module_io.cc
-SELFTEST_SOURCES		+= xefis/core/v2/tests/property.test.cc
+SELFTEST_SOURCES		+= xefis/core/module.cc
+SELFTEST_SOURCES		+= xefis/core/module_io.cc
+SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 
 ######## /xefis/support/air ########
 

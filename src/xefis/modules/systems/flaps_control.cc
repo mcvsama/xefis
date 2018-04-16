@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/property_utils.h>
+#include <xefis/core/property_utils.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/airframe/flaps.h>

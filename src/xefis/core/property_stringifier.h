@@ -22,8 +22,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/property.h>
-#include <xefis/core/v2/property_utils.h>
+#include <xefis/core/property.h>
+#include <xefis/core/property_utils.h>
 
 
 namespace xf {

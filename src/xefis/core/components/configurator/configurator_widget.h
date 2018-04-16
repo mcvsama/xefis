@@ -26,7 +26,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/data_recorder/data_recorder.h>
-#include <xefis/core/v2/module.h>
+#include <xefis/core/module.h>
 
 // Local:
 #include "modules_list.h"

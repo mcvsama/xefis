@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/instrument.h>
+#include <xefis/core/instrument.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/registration_proof.h>
 #include <xefis/utility/registry.h>

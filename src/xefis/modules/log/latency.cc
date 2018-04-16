@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/accounting.h>
+#include <xefis/core/accounting.h>
 
 // Local:
 #include "latency.h"

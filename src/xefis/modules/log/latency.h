@@ -19,9 +19,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v2/accounting.h>
-#include <xefis/core/v2/module.h>
-#include <xefis/core/v2/module_io.h>
+#include <xefis/core/accounting.h>
+#include <xefis/core/module.h>
+#include <xefis/core/module_io.h>
 #include <xefis/core/xefis.h>
 
 
