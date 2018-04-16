@@ -434,7 +434,7 @@ template<class pUnit, class pValue>
 			uint8_t* destination = reinterpret_cast<uint8_t*> (&parsed);
 			std::copy (begin, end, destination);
 			boost::endian::little_to_native (parsed);
-			quantity = Quantity<BaseUnit<pUnit>, pValue> { parsed };
+			quantity = Quantity<NormalizedUnit<pUnit>, pValue> { parsed };
 		}
 		else
 			throw UnparsableValue ("wrong size of binary data");

@@ -77,7 +77,7 @@ static xf::RuntimeTest t_comparison ("SI comparison operators", []{
 });
 
 
-static xf::RuntimeTest t_operators ("SI arithmetic operators", []{
+static xf::RuntimeTest t_basic_arithmetic_operators ("SI basic arithmetic operations", []{
 	// Adding quantities for differently scaled units:
 	auto len1 = 10.0 * Meter() + 1.0 * Foot();
 	auto len2 = 10.0 * Meter() - 1.0 * Foot();
@@ -90,6 +90,28 @@ static xf::RuntimeTest t_operators ("SI arithmetic operators", []{
 	verify_equal_with_epsilon ("10 m * 1 ft", area1, 3.048006096012 * SquareMeter(), 1e-9 * SquareMeter());
 	verify_equal_with_epsilon ("10 m / 1 ft", area2, 32.808333333333, 1e-9);
 	verify_equal_with_epsilon ("1 km * 1 km * 1 m", volume, 1'000'000.0 * CubicMeter(), 1e-9 * CubicMeter());
+});
+
+
+static xf::RuntimeTest t_multiplication_division ("SI multiplication, division and counting quantities", []{
+	using SquareMeter = decltype (1_m * 1_m)::Unit;
+	using SquareKilometer = decltype (1_km * 1_km)::Unit;
+	using InvMeter = decltype (1 / 1_m)::Unit;
+	using InvKilometer = decltype (1 / 1_km)::Unit;
+
+	verify_equal_with_epsilon ("1 m * 1 km = 1000.0 [in<SquareMeter>()]", (1_m * 1_km).in<SquareMeter>(), 1000.0, 1e-9);
+	verify_equal_with_epsilon ("1 m * 1 km = 1000 m² [static_cast<> to SquareMeter]", static_cast<si::Quantity<SquareMeter>> (1_m * 1_km), 1000_m2, 1e-9_m2);
+	verify_equal_with_epsilon ("1 m * 1 km = 1.0 [quantity()]", (1_m * 1_km).quantity(), 1.0, 1e-9);
+	verify_equal_with_epsilon ("1 m * 1 km = 1000.0 [normalized_quantity()]", (1_m * 1_km).normalized_quantity(), 1000.0, 1e-9);
+	verify_equal_with_epsilon ("1 m * 1 km = 0.001 [in<SquareKilometer>()]", (1_m * 1_km).in<SquareKilometer>(), 0.001, 1e-9);
+	verify_equal_with_epsilon ("1 m * 1 km = 0.001 [static_cast<> to SquareKilometer]", static_cast<si::Quantity<SquareKilometer>> (1_m * 1_km).quantity(), 0.001, 1e-9);
+	verify_equal_with_epsilon ("2 km * 1 km / 5 = 400'000 [quantity()]", (2_km * 1_km / 5_m).in<si::Meter>(), 400'000.0, 1e-9);
+	verify_equal_with_epsilon ("2 km * 1 km / 5 m = 400'000 m", 2_km * 1_km / 5_m, 400'000_m, 1e-9_m);
+	verify_equal_with_epsilon ("5 / 1_m == 5000 / km [in<InvKilometer>()]", (5 / 1_m).in<InvKilometer>(), 5000.0, 1e-9);
+	verify_equal_with_epsilon ("5 / 1_m == 5000 / km [static_cast<> to InvKilometer]", static_cast<si::Quantity<InvKilometer>> (5 / 1_m), 5000.0 * InvKilometer(), 1e-9 * InvMeter());
+	verify_equal_with_epsilon ("1_m / 5_m == 0.2", 1_m / 5_m, 0.2, 1e-9);
+	verify_equal_with_epsilon ("1_km / 5_m == 200.0", 1_km / 5_m, 200.0, 1e-9);
+	verify_equal_with_epsilon ("1 / 1_in * 5_in == 5.0", 1 / 1_in * 5_in, 5.0, 1e-9);
 });
 
 
