@@ -157,7 +157,7 @@ template<class pExistingUnit, class pScale, class pOffset= std::ratio<0>>
  * Shorthand for getting base-version of any unit (where scale = 1 and offset = 0).
  */
 template<class pExistingUnit>
-	using BaseUnit =
+	using NormalizedUnit =
 		Unit<
 			pExistingUnit::E0,
 			pExistingUnit::E1,

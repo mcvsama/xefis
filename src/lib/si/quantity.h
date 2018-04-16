@@ -53,8 +53,9 @@ template<class pUnit, class pValue = double>
 		static_assert (std::is_floating_point<pValue>(), "pValue must be floating-point");
 
 	  public:
-		typedef pUnit	Unit;
-		typedef pValue	Value;
+		using Unit				= pUnit;
+		using Value				= pValue;
+		using NormalizedUnit	= si::NormalizedUnit<Unit>;
 
 	  public:
 		// Ctor
@@ -73,12 +74,30 @@ template<class pUnit, class pValue = double>
 		}
 
 		/**
+		 * Return normalized version of this quantity.
+		 */
+		constexpr auto
+		normalized() const noexcept
+		{
+			return Quantity<NormalizedUnit, Value> (*this);
+		}
+
+		/**
 		 * Return value of the quantity measured in base units (where Scale is 1).
 		 */
 		constexpr Value
 		base_quantity() const noexcept
 		{
 			return _quantity * to_fp<typename Unit::Scale>() + to_fp<typename Unit::Offset>();
+		}
+
+		/**
+		 * Return value of the quantity measured in base units (where Scale is 1) with no offset.
+		 */
+		constexpr Value
+		normalized_quantity() const noexcept
+		{
+			return normalized().quantity();
 		}
 
 		/**
@@ -205,9 +224,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator== (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() == NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() == b.normalized_quantity();
 	}
 
 
@@ -232,9 +249,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator!= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() != NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() != b.normalized_quantity();
 	}
 
 
@@ -259,9 +274,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator< (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() < NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() < b.normalized_quantity();
 	}
 
 
@@ -310,9 +323,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator> (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() > NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() > b.normalized_quantity();
 	}
 
 
@@ -361,9 +372,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator<= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() <= NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() <= b.normalized_quantity();
 	}
 
 
@@ -412,9 +421,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator>= (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 				Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (a).quantity() >= NormalizedQuantity (b).quantity();
+		return a.normalized_quantity() >= b.normalized_quantity();
 	}
 
 
@@ -456,18 +463,15 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 /**
  * Adding quantities of the same unit, different scaling and offset = 0.
- * Result type has unit scaling of the first operand.
+ * Result type has base SI unit scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal_v<Sa, Sb>>>
-	constexpr
-	Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value>
+	constexpr auto
 	operator+ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (NormalizedQuantity (a).quantity() + NormalizedQuantity (b).quantity());
+		return a.normalized() + b.normalized();
 	}
 
 
@@ -509,18 +513,15 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 /**
  * Subtracting quantities of the same unit, different scaling and offset = 0.
- * Result type has unit scaling of the first operand.
+ * Result type has base SI unit scaling.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class Sa, class Sb, class Value,
 		 class = std::enable_if_t<std::ratio_not_equal_v<Sa, Sb>>>
-	constexpr
-	Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value>
+	constexpr auto
 	operator- (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
-
-		return NormalizedQuantity (NormalizedQuantity (a).quantity() - NormalizedQuantity (b).quantity());
+		return a.normalized() - b.normalized();
 	}
 
 
@@ -551,41 +552,19 @@ template<class Scale, class Value, class ScalarValue,
 
 
 /**
- * Multiplying quantities of same or different units, same scaling and offset = 0.
- * Result type has unit scaling of the first operand.
- */
-template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
-		 int Eb0, int Eb1, int Eb2, int Eb3, int Eb4, int Eb5, int Eb6, int Eb7,
-		 class S, class Value,
-		 class = std::enable_if_t<Ea0 != -Eb0 || Ea1 != -Eb1 || Ea2 != -Eb2 || Ea3 != -Eb3 ||
-								  Ea4 != -Eb4 || Ea5 != -Eb5 || Ea6 != -Eb6 || Ea7 != -Eb7>>
-	constexpr auto
-	operator* (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, S, std::ratio<0>>, Value> a,
-			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, S, std::ratio<0>>, Value> b) noexcept
-	{
-		return Quantity<Unit<Ea0 + Eb0, Ea1 + Eb1, Ea2 + Eb2, Ea3 + Eb3, Ea4 + Eb4, Ea5 + Eb5, Ea6 + Eb6, Ea7 + Eb7, S, std::ratio<0>>, Value> (a.quantity() * b.quantity());
-	}
-
-
-/**
- * Multiplying quantities of same or different units, different scaling and offset = 0.
- * Result type has unit scaling of the first operand.
+ * Multiplying quantities of same or different units, same or different scaling and offset = 0.
  */
 template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7, class Sa,
 		 int Eb0, int Eb1, int Eb2, int Eb3, int Eb4, int Eb5, int Eb6, int Eb7, class Sb,
 		 class Value,
-		 class = std::enable_if_t<std::ratio_not_equal_v<Sa, Sb>>,
 		 class = std::enable_if_t<Ea0 != -Eb0 || Ea1 != -Eb1 || Ea2 != -Eb2 || Ea3 != -Eb3 ||
 								  Ea4 != -Eb4 || Ea5 != -Eb5 || Ea6 != -Eb6 || Ea7 != -Eb7>>
 	constexpr auto
 	operator* (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7>, Value> NormalizedQuantity1;
-		typedef Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7>, Value> NormalizedQuantity2;
-
-		auto quantity = NormalizedQuantity1 (a).quantity() * NormalizedQuantity2 (b).quantity();
-		return Quantity<Unit<Ea0 + Eb0, Ea1 + Eb1, Ea2 + Eb2, Ea3 + Eb3, Ea4 + Eb4, Ea5 + Eb5, Ea6 + Eb6, Ea7 + Eb7, Sa, std::ratio<0>>, Value> (quantity);
+		using NewUnit = Unit<Ea0 + Eb0, Ea1 + Eb1, Ea2 + Eb2, Ea3 + Eb3, Ea4 + Eb4, Ea5 + Eb5, Ea6 + Eb6, Ea7 + Eb7, std::ratio_multiply<Sa, Sb>, std::ratio<0>>;
+		return Quantity<NewUnit, Value> (a.quantity() * b.quantity());
 	}
 
 
@@ -597,49 +576,24 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator* (Quantity<Unit< E0,  E1,  E2,  E3,  E4,  E5,  E6,  E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<-E0, -E1, -E2, -E3, -E4, -E5, -E6, -E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<+E0, +E1, +E2, +E3, +E4, +E5, +E6, +E7>, Value> NormalizedQuantity1;
-		typedef Quantity<Unit<-E0, -E1, -E2, -E3, -E4, -E5, -E6, -E7>, Value> NormalizedQuantity2;
-
-		return NormalizedQuantity1 (a).quantity() * NormalizedQuantity2 (b).quantity();
+		return Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, std::ratio_multiply<Sa, Sb>, std::ratio<0>>, Value> (a.quantity() * b.quantity()).normalized_quantity();
 	}
 
 
 /**
- * Dividing quantities of same or different units, same scaling and offset = 0.
- * Result type has unit scaling of the first operand.
- */
-template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7,
-		 int Eb0, int Eb1, int Eb2, int Eb3, int Eb4, int Eb5, int Eb6, int Eb7,
-		 class S, class Value,
-		 class = std::enable_if_t<Ea0 != Eb0 || Ea1 != Eb1 || Ea2 != Eb2 || Ea3 != Eb3 ||
-								  Ea4 != Eb4 || Ea5 != Eb5 || Ea6 != Eb6 || Ea7 != Eb7>>
-	constexpr auto
-	operator/ (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, S, std::ratio<0>>, Value> a,
-			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, S, std::ratio<0>>, Value> b) noexcept
-	{
-		return Quantity<Unit<Ea0 - Eb0, Ea1 - Eb1, Ea2 - Eb2, Ea3 - Eb3, Ea4 - Eb4, Ea5 - Eb5, Ea6 - Eb6, Ea7 - Eb7, S, std::ratio<0>>, Value> (a.quantity() / b.quantity());
-	}
-
-
-/**
- * Dividing quantities of same or different units, different scaling and offset = 0.
- * Result type has unit scaling of the first operand.
+ * Dividing quantities of same or different units, same or different scaling and offset = 0.
  */
 template<int Ea0, int Ea1, int Ea2, int Ea3, int Ea4, int Ea5, int Ea6, int Ea7, class Sa,
 		 int Eb0, int Eb1, int Eb2, int Eb3, int Eb4, int Eb5, int Eb6, int Eb7, class Sb,
 		 class Value,
-		 class = std::enable_if_t<std::ratio_not_equal_v<Sa, Sb>>,
 		 class = std::enable_if_t<Ea0 != Eb0 || Ea1 != Eb1 || Ea2 != Eb2 || Ea3 != Eb3 ||
 								  Ea4 != Eb4 || Ea5 != Eb5 || Ea6 != Eb6 || Ea7 != Eb7>>
 	constexpr auto
 	operator/ (Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<Ea0, Ea1, Ea2, Ea3, Ea4, Ea5, Ea6, Ea7>, Value> NormalizedQuantity1;
-		typedef Quantity<Unit<Eb0, Eb1, Eb2, Eb3, Eb4, Eb5, Eb6, Eb7>, Value> NormalizedQuantity2;
-
-		auto quantity = NormalizedQuantity1 (a).quantity() / NormalizedQuantity2 (b).quantity();
-		return Quantity<Unit<Ea0 - Eb0, Ea1 - Eb1, Ea2 - Eb2, Ea3 - Eb3, Ea4 - Eb4, Ea5 - Eb5, Ea6 - Eb6, Ea7 - Eb7, Sa, std::ratio<0>>, Value> (quantity);
+		using NewUnit = Unit<Ea0 - Eb0, Ea1 - Eb1, Ea2 - Eb2, Ea3 - Eb3, Ea4 - Eb4, Ea5 - Eb5, Ea6 - Eb6, Ea7 - Eb7, std::ratio_divide<Sa, Sb>, std::ratio<0>>;
+		return Quantity<NewUnit, Value> (a.quantity() / b.quantity());
 	}
 
 
@@ -651,17 +605,15 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	operator/ (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sa, std::ratio<0>>, Value> a,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, Sb, std::ratio<0>>, Value> b) noexcept
 	{
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity1;
-		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity2;
-
-		return NormalizedQuantity1 (a).quantity() / NormalizedQuantity2 (b).quantity();
+		return Quantity<Unit<0, 0, 0, 0, 0, 0, 0, 0, std::ratio_divide<Sa, Sb>, std::ratio<0>>, Value> (a.quantity() / b.quantity()).normalized_quantity();
 	}
 
 
 /**
  * Multiplying quantity by scalar.
  */
-template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
+template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue,
+		 class = std::enable_if_t<std::is_arithmetic_v<ScalarValue>>>
 	constexpr auto
 	operator* (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q,
 			   ScalarValue scalar) noexcept
@@ -673,7 +625,8 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 /**
  * Multiplying scalar by quantity.
  */
-template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
+template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue,
+		 class = std::enable_if_t<std::is_arithmetic_v<ScalarValue>>>
 	constexpr auto
 	operator* (ScalarValue scalar,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
@@ -696,13 +649,14 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 /**
  * Dividing scalar by quantity.
+ * Dividing inverts the scaler.
  */
 template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S, class Value, class ScalarValue>
 	constexpr auto
 	operator/ (ScalarValue scalar,
 			   Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
-		return Quantity<Unit<-E0, -E1, -E2, -E3, -E4, -E5, -E6, -E7, S, std::ratio<0>>, Value> (scalar / q.quantity());
+		return Quantity<Unit<-E0, -E1, -E2, -E3, -E4, -E5, -E6, -E7, std::ratio_divide<std::ratio<1>, S>, std::ratio<0>>, Value> (scalar / q.quantity());
 	}
 
 
