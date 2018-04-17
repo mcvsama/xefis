@@ -71,18 +71,18 @@ Gear::paint (xf::PaintRequest& paint_request) const
 		return;
 	}
 
-	QColor cyan { 0x44, 0xdd, 0xff };
-	QColor gray { 0xaa, 0xaa, 0xaa };
-	QFont box_font = _font_16;
-	QFont label_font = _font_13;
-	QFontMetricsF box_metrics (box_font);
-	QFontMetricsF label_metrics (label_font);
+	QColor const cyan { 0x44, 0xdd, 0xff };
+	QColor const gray { 0xaa, 0xaa, 0xaa };
+	QFont const box_font = aids->font_3;
+	QFont const label_font = aids->font_2;
+	QFontMetricsF const box_metrics (box_font);
+	QFontMetricsF const label_metrics (label_font);
 
 	// Positioning:
-	painter().setFont (box_font);
-	float vmargin = -0.015f * box_metrics.height();
-	float hmargin = 0.1f * box_metrics.height();
-	QRectF box = painter().get_text_box (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
+	painter.setFont (box_font);
+	float const vmargin = -0.015f * box_metrics.height();
+	float const hmargin = 0.1f * box_metrics.height();
+	QRectF box = painter.get_text_box (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
 	box.adjust (-hmargin, -vmargin, hmargin, vmargin);
 
 	auto paint_graybox = [&]() -> void {
