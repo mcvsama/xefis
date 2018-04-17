@@ -20,7 +20,7 @@
 #include <utility>
 
 // Local:
-#include "standard_literals.h"
+#include "quantity.h"
 #include "unit.h"
 
 

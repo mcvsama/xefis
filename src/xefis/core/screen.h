@@ -66,6 +66,12 @@ class Screen:
 	void
 	set (BasicInstrument const&, QRect);
 
+	/**
+	 * Return pixel density for this screen.
+	 */
+	PixelDensity
+	pixel_density() const;
+
   protected:
 	// QWidget API:
 	void
@@ -76,6 +82,12 @@ class Screen:
 	resizeEvent (QResizeEvent*) override;
 
   private:
+	/**
+	 * Update screen canvas if parameters changed.
+	 */
+	void
+	update_canvas (QSize);
+
 	/**
 	 * Request painting of all instruments on the canvas-buffer.
 	 */
@@ -89,6 +101,12 @@ class Screen:
 	void
 	prepare_canvas_for_instrument (QImage&, QSize);
 
+	/**
+	 * Create new image suitable for screen and instrument buffers.
+	 */
+	QImage
+	allocate_image (QSize) const;
+
   private slots:
 	/**
 	 * Called when next frame should be painted.
@@ -100,6 +118,13 @@ class Screen:
 	QTimer*	_refresh_timer;
 	QImage	_canvas;
 };
+
+
+inline PixelDensity
+Screen::pixel_density() const
+{
+	return logicalDpiY() / 1_in;
+}
 
 } // namespace xf
 

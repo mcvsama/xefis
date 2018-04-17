@@ -24,8 +24,7 @@
 
 namespace xf {
 
-using FontSize = StrongType<float, struct FontSizeType>;
-using PixelDensity = decltype (1.0 / std::declval<si::Length>());
+using FontPixelSize = StrongType<float, struct FontPixelSizeType>;
 
 
 /**

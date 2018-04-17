@@ -75,10 +75,64 @@ class InstrumentAids
 	InstrumentAids (PaintRequest const&);
 
 	/**
-	 * Return font modified to have given xf::FontSize.
+	 * Return value to use as pen width.
+	 */
+	float
+	pen_width (float scale) const;
+
+	/**
+	 * Return value to use as font pixel size.
+	 */
+	float
+	font_pixel_size (float scale) const;
+
+	/**
+	 * Return pen suitable for instrument drawing.
+	 */
+	QPen
+	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin) const;
+
+	/**
+	 * Shortcut width accessor.
+	 */
+	int
+	width() const;
+
+	/**
+	 * Shortcut height accessor.
+	 */
+	int
+	height() const;
+
+	/**
+	 * Return number of pixels for given Length and DPI.
+	 */
+	float
+	pixels (si::Length);
+
+	/**
+	 * Return number of pixels for given Length and DPI.
+	 */
+	static float
+	pixels (si::Length, si::PixelDensity);
+
+	/**
+	 * Return font modified to have given height.
+	 */
+	QFont
+	resized (QFont const& font, si::Length height);
+
+	/**
+	 * Return font modified to have given height.
+	 */
+	QFont
+	resized (QFont const& font, si::Length height, si::PixelDensity);
+
+	/**
+	 * Return font modified to have given xf::FontPixelSize.
 	 */
 	static QFont
-	resized (QFont const&, FontSize);
+	resized (QFont const&, FontPixelSize);
 
 	/**
 	 * Return a centered rect inside whole_area that hold given
@@ -99,33 +153,9 @@ class InstrumentAids
 	static float
 	angle_for_qpainter (Angle deg);
 
-	/**
-	 * Return number of pixels for given Length and DPI.
-	 */
-	static float
-	pixels (si::Length, PixelDensity);
-
-	/**
-	 * Return value to use as pen width.
-	 */
-	float
-	pen_width (float scale) const;
-
-	/**
-	 * Return value to use as font pixel size.
-	 */
-	float
-	font_pixel_size (float scale) const;
-
-	/**
-	 * Return pen suitable for instrument drawing.
-	 */
-	QPen
-	get_pen (QColor const& color, float width, Qt::PenStyle style = Qt::SolidLine, Qt::PenCapStyle cap = Qt::RoundCap, Qt::PenJoinStyle join = Qt::MiterJoin) const;
-
   private:
-	QFont							_default_font;
 	std::optional<WidthForHeight>	_aspect_ratio;
+	PaintRequest const&				_paint_request;
 	PaintRequest::Metric			_canvas_metric;
 
   public:
@@ -147,6 +177,57 @@ InstrumentAids::FontInfo::operator QFont const&() const noexcept
 }
 
 
+inline float
+InstrumentAids::pen_width (float scale) const
+{
+	return std::max (0.0f, pixels (scale * _canvas_metric.pen_width(), _canvas_metric.pixel_density()));
+}
+
+
+inline float
+InstrumentAids::font_pixel_size (float scale) const
+{
+	return std::max (1.0f, pixels (scale * _canvas_metric.font_height(), _canvas_metric.pixel_density()));
+}
+
+
+inline QPen
+InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Qt::PenCapStyle cap, Qt::PenJoinStyle join) const
+{
+	QPen pen { color, pen_width (width), style, cap, join };
+	pen.setMiterLimit (0.25);
+	return pen;
+}
+
+
+inline int
+InstrumentAids::width() const
+{
+	return _paint_request.canvas().width();
+}
+
+
+inline int
+InstrumentAids::height() const
+{
+	return _paint_request.canvas().height();
+}
+
+
+inline float
+InstrumentAids::pixels (si::Length length)
+{
+	return pixels (length, _canvas_metric.pixel_density());
+}
+
+
+inline float
+InstrumentAids::pixels (si::Length length, si::PixelDensity pixel_density)
+{
+	return length * pixel_density;
+}
+
+
 inline void
 InstrumentAids::centrify (QRectF& rectf)
 {
@@ -158,36 +239,6 @@ inline float
 InstrumentAids::angle_for_qpainter (Angle deg)
 {
 	return 16 * deg.in<Degree>();
-}
-
-
-inline float
-InstrumentAids::pixels (si::Length length, PixelDensity pixel_density)
-{
-	return length * pixel_density;
-}
-
-
-inline float
-InstrumentAids::pen_width (float scale) const
-{
-	return std::max (0.0f, pixels (1.66f * scale * _canvas_metric.pen_width(), _canvas_metric.pixel_density()));
-}
-
-
-inline float
-InstrumentAids::font_pixel_size (float scale) const
-{
-	return std::max (1.0f, pixels (1.26f * scale * _canvas_metric.font_height(), _canvas_metric.pixel_density()));
-}
-
-
-inline QPen
-InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Qt::PenCapStyle cap, Qt::PenJoinStyle join) const
-{
-	QPen pen { color, pen_width (width), style, cap, join };
-	pen.setMiterLimit (0.25);
-	return pen;
 }
 
 } // namespace xf
