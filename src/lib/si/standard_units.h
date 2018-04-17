@@ -193,22 +193,6 @@ typedef ScaledUnit<Watt, std::micro>				MicroWatt;
 typedef ScaledUnit<Pascal, std::kilo>				KiloPascal;
 typedef ScaledUnit<Pascal, std::hecto>				HectoPascal;
 
-// Often-used non-standard units:
-typedef ScaledUnit<Meter, std::ratio<1'200, 3'937>>													Foot;
-typedef ScaledUnit<Meter, std::ratio<1'609'344, 1'000>>												Mile;
-typedef ScaledUnit<Meter, std::ratio<1'852, 1>>														NauticalMile;
-typedef ScaledUnit<Meter, std::ratio<254, 10'000>>													Inch;
-typedef ScaledUnit<Kilogram, std::ratio<45'359'237, 100'000'000>>									PoundMass;
-typedef ScaledUnit<MeterPerSecondSquared, std::ratio<980'665, 100'000>>								Gravity;
-typedef ScaledUnit<Kelvin, std::ratio<5, 9>>														Rankine;
-typedef ScaledUnit<Radian, std::ratio_divide<SmallPi, std::ratio<180>>>								Degree;
-typedef ScaledUnit<RadianPerSecond, std::ratio_divide<Pi, std::ratio<30>>>							RotationPerMinute;
-typedef ScaledUnit<Pascal, std::ratio<3'386'389, 1000>>												InchOfMercury;
-typedef ScaledUnit<MeterPerSecond, std::ratio<10, 36>>												KilometerPerHour;
-typedef ScaledUnit<MeterPerSecond, Foot::Scale>														FootPerSecond;
-typedef ScaledUnit<FootPerSecond, std::ratio<1, 60>>												FootPerMinute;
-typedef ScaledUnit<MeterPerSecond, std::ratio_multiply<NauticalMile::Scale, std::ratio<1, 3600>>>	Knot;
-
 // Units with offset:
 typedef ScaledUnit<Kelvin, std::ratio<1>, std::ratio<27'315, 100>>			Celsius;
 typedef ScaledUnit<Celsius, std::ratio<5, 9>, std::ratio<-32 * 5, 9>>		Fahrenheit;
