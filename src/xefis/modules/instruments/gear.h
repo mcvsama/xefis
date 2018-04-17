@@ -20,9 +20,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
+#include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class GearIO: public xf::ModuleIO
@@ -44,7 +45,7 @@ class GearIO: public xf::ModuleIO
 
 class Gear:
 	public xf::Instrument<GearIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
   public:
 	// Ctor
@@ -55,14 +56,9 @@ class Gear:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
 	xf::PropertyObserver	_inputs_observer;

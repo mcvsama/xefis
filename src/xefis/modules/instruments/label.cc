@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/string.h>
 
 // Local:
 #include "label.h"
@@ -37,7 +36,7 @@ Label::paint (xf::PaintRequest& paint_request) const
 	auto painter = get_painter (paint_request);
 
 	QFont font (aids->font_1);
-	font.setPixelSize (**io.font_size);
+	font.setPixelSize (aids->font_pixel_size (*io.font_scale));
 
 	painter.setFont (font);
 	painter.setPen (*io.color);

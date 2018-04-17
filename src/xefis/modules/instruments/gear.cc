@@ -23,10 +23,11 @@
 
 
 Gear::Gear (std::unique_ptr<GearIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance),
-	InstrumentAids (0.5f)
+	Instrument (std::move (module_io), instance)
 {
-	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.set_callback ([&] {
+		mark_dirty();
+	});
 	_inputs_observer.observe ({
 		&io.requested_down,
 		&io.nose_up,
@@ -43,25 +44,15 @@ void
 Gear::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
+	mark_dirty();
 }
 
 
 void
-Gear::resizeEvent (QResizeEvent*)
+Gear::paint (xf::PaintRequest& paint_request) const
 {
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		set_scaling (xw->pen_scale(), xw->font_scale());
-
-	InstrumentAids::update_sizes (size(), window()->size());
-}
-
-
-void
-Gear::paintEvent (QPaintEvent*)
-{
-	auto painting_token = get_token (this);
-	clear_background();
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
 
 	bool v_requested_down = io.requested_down.value_or (false);
 	bool v_nose_up = io.nose_up.value_or (false);
@@ -95,60 +86,62 @@ Gear::paintEvent (QPaintEvent*)
 	box.adjust (-hmargin, -vmargin, hmargin, vmargin);
 
 	auto paint_graybox = [&]() -> void {
-		painter().setFont (box_font);
-		painter().setPen (get_pen (gray, 1.2f));
+		painter.setFont (box_font);
+		painter.setPen (aids->get_pen (gray, 1.0f));
 
 		float z = 0.61f * box_metrics.height();
 		float d = 1.5f * z;
 
 		// Painting:
-		painter().setClipping (false);
-		painter().drawRect (box);
-		painter().setClipRect (box);
+		painter.setClipping (false);
+		painter.drawRect (box);
+		painter.setClipRect (box);
 		for (float x = box.left(); x - d <= box.right(); x += z)
-			painter().drawLine (QPointF (x, box.top()), QPointF (x - d, box.bottom()));
+			painter.drawLine (QPointF (x, box.top()), QPointF (x - d, box.bottom()));
 	};
 
 	auto paint_down = [&]() -> void {
-		painter().setFont (box_font);
-		painter().setPen (get_pen (Qt::green, 1.2f));
+		painter.setFont (box_font);
+		painter.setPen (aids->get_pen (Qt::green, 1.0f));
 
 		// Painting:
-		painter().setClipping (false);
-		painter().fast_draw_text (box, Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
-		painter().drawRect (box);
+		painter.setClipping (false);
+		painter.fast_draw_text (box, Qt::AlignHCenter | Qt::AlignVCenter, "DOWN");
+		painter.drawRect (box);
 	};
 
 	auto should_paint_graybox = [&](bool gear_up, bool gear_down) -> bool {
 		return io.requested_down.is_nil() || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
 	};
 
-	painter().setBrush (Qt::NoBrush);
-	painter().translate (0.5f * width(), 0.5f * height());
-	QTransform center_transform = painter().transform();
+	painter.setBrush (Qt::NoBrush);
+	painter.translate (0.5f * aids->width(), 0.5f * aids->height());
+	QTransform center_transform = painter.transform();
 
-	painter().translate (0.f, 1.5f * box.height());
-	painter().setFont (label_font);
-	painter().setPen (get_pen (cyan, 1.f));
-	painter().fast_draw_text (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignTop, "GEAR");
+	painter.translate (0.f, 1.5f * box.height());
+	painter.setFont (label_font);
+	painter.setPen (aids->get_pen (cyan, 1.f));
+	painter.fast_draw_text (QPointF (0.f, 0.f), Qt::AlignHCenter | Qt::AlignTop, "GEAR");
 
-	painter().setTransform (center_transform);
-	painter().translate (0.f, -1.3f * box.bottom());
+	painter.setTransform (center_transform);
+	painter.translate (0.f, -1.3f * box.bottom());
 
 	if (should_paint_graybox (v_nose_up, v_nose_down))
 		paint_graybox();
 	else if (v_nose_down)
 		paint_down();
 
-	painter().setTransform (center_transform);
-	painter().translate (-0.6f * box.width(), 0.75f * box.height());
+	painter.setTransform (center_transform);
+	painter.translate (-0.6f * box.width(), 0.75f * box.height());
+
 	if (should_paint_graybox (v_left_up, v_left_down))
 		paint_graybox();
 	else if (v_left_down)
 		paint_down();
 
-	painter().setTransform (center_transform);
-	painter().translate (+0.6f * box.width(), 0.75f * box.height());
+	painter.setTransform (center_transform);
+	painter.translate (+0.6f * box.width(), 0.75f * box.height());
+
 	if (should_paint_graybox (v_right_up, v_right_down))
 		paint_graybox();
 	else if (v_right_down)
