@@ -19,6 +19,7 @@
 
 // Local:
 #include "standard_units.h"
+#include "additional_units.h"
 #include "quantity.h"
 
 
