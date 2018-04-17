@@ -21,7 +21,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
-#include <xefis/core/screen.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/types.h>
@@ -34,7 +33,7 @@ class LabelIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<xf::FontSize>	font_size	{ this, "font_size", xf::FontSize (10.0) };
+	xf::Setting<float>			font_scale	{ this, "font_scale", 1.0 };
 	xf::Setting<QString>		label		{ this, "label" };
 	xf::Setting<QColor>			color		{ this, "color", Qt::white };
 	xf::Setting<Qt::Alignment>	alignment	{ this, "alignment", Qt::AlignVCenter | Qt::AlignHCenter };
