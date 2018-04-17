@@ -53,25 +53,40 @@ InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 
 
 InstrumentAids::InstrumentAids (PaintRequest const& paint_request):
-	// TODO use screen DPI + widget size + other configs to determine actual font sizes, etc
-	_default_font (Services::instrument_font()),
+	_paint_request (paint_request),
 	_canvas_metric (paint_request.metric()),
-	font_0 (resized (_default_font, FontSize (10.0f))),
-	font_1 (resized (_default_font, FontSize (11.0f))),
-	font_2 (resized (_default_font, FontSize (13.0f))),
-	font_3 (resized (_default_font, FontSize (16.0f))),
-	font_4 (resized (_default_font, FontSize (18.0f))),
-	font_5 (resized (_default_font, FontSize (20.0f))),
+	font_0 (resized (Services::instrument_font(), 1.0f * paint_request.metric().font_height())),
+	font_1 (resized (Services::instrument_font(), 1.1f * paint_request.metric().font_height())),
+	font_2 (resized (Services::instrument_font(), 1.3f * paint_request.metric().font_height())),
+	font_3 (resized (Services::instrument_font(), 1.6f * paint_request.metric().font_height())),
+	font_4 (resized (Services::instrument_font(), 1.8f * paint_request.metric().font_height())),
+	font_5 (resized (Services::instrument_font(), 2.0f * paint_request.metric().font_height())),
 	autopilot_pen_1 (get_pen (kAutopilotColor.darker (300), 1.8f)),
 	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }
 
 
 QFont
-InstrumentAids::resized (QFont const& font, FontSize font_size)
+InstrumentAids::resized (QFont const& font, si::Length height)
+{
+	return resized (font, height, _canvas_metric.pixel_density());
+}
+
+
+QFont
+InstrumentAids::resized (QFont const& font, si::Length height, si::PixelDensity pixel_density)
 {
 	QFont copy { font };
-	copy.setPixelSize (*font_size);
+	copy.setPixelSize (pixels (height, pixel_density));
+	return copy;
+}
+
+
+QFont
+InstrumentAids::resized (QFont const& font, FontPixelSize font_pixel_size)
+{
+	QFont copy { font };
+	copy.setPixelSize (*font_pixel_size);
 	return copy;
 }
 

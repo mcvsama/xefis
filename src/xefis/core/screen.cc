@@ -34,6 +34,7 @@ namespace xf {
 Screen::Screen (QRect rect, si::Frequency refresh_rate):
 	QWidget (nullptr)
 {
+	update_canvas (size());
 	move (rect.topLeft());
 	resize (rect.size());
 	setFont (xf::Services::instrument_font());
@@ -74,8 +75,18 @@ Screen::paintEvent (QPaintEvent* paint_event)
 void
 Screen::resizeEvent (QResizeEvent* resize_event)
 {
-	_canvas = QImage (resize_event->size(), QImage::Format_ARGB32_Premultiplied);
-	_canvas.fill (Qt::black);
+	update_canvas (resize_event->size());
+}
+
+
+void
+Screen::update_canvas (QSize size)
+{
+	if (_canvas.isNull() || _canvas.size() != size)
+	{
+		_canvas = allocate_image (size);
+		_canvas.fill (Qt::black);
+	}
 }
 
 
@@ -94,9 +105,9 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.rect.isValid())
 		{
-			constexpr si::Length pen_width = 1_mm; // TODO user-configurable
+			constexpr si::Length pen_width = 0.5_mm; // TODO user-configurable
 			constexpr si::Length font_height = 5_mm; // TODO user-configurable
-			PaintRequest::Metric metric { logicalDpiY() / 1_in, pen_width, font_height };
+			PaintRequest::Metric metric { pixel_density(), pen_width, font_height };
 			PaintRequest paint_request { details.canvas, metric };
 
 			prepare_canvas_for_instrument (details.canvas, details.rect.size());
@@ -126,10 +137,22 @@ Screen::paint_instruments_to_buffer()
 void
 Screen::prepare_canvas_for_instrument (QImage& canvas, QSize size)
 {
-	if (canvas.size() != size)
-		canvas = QImage (size, QImage::Format_ARGB32_Premultiplied);
+	if (canvas.isNull() || canvas.size() != size)
+		canvas = allocate_image (size);
+}
 
-	canvas.fill (Qt::transparent);
+
+QImage
+Screen::allocate_image (QSize size) const
+{
+	QImage image (size, QImage::Format_ARGB32_Premultiplied);
+	int const dots_per_meter = pixel_density().in<si::DotsPerMeter>();
+
+	image.setDotsPerMeterX (dots_per_meter);
+	image.setDotsPerMeterY (dots_per_meter);
+	image.fill (Qt::transparent);
+
+	return image;
 }
 
 
