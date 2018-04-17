@@ -30,10 +30,9 @@ DynamicUnit::symbol() const
 		return s->second;
 	else
 	{
-		if (scale().numerator() != 1 || scale().denominator() != 1 ||
-			offset().numerator() != 0 || offset().denominator() != 1)
+		if (offset().numerator() != 0 || offset().denominator() != 1)
 		{
-			return "[unknown or scaled/offset unit]";
+			return "[unit with offset]";
 		}
 
 		std::string result;
@@ -46,6 +45,10 @@ DynamicUnit::symbol() const
 		add_single_unit_symbol (result, amount_exponent(), "mol");
 		add_single_unit_symbol (result, luminous_intensity_exponent(), "cd");
 		add_single_unit_symbol (result, angle_exponent(), "rad");
+
+		if (scale().numerator() != 1 || scale().denominator() != 1)
+			result += kDotProductSymbol_utf8 + std::to_string (scale().to_floating_point());
+
 		return result;
 	}
 }
