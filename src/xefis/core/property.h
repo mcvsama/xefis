@@ -59,13 +59,22 @@ class NilProperty: public Exception
 
 
 /**
- * Non-constructible type used in std::initializer_list for assigning a nil value to the property.
+ * Wrapper for values that are supposed to act as a constant source
+ * for PropertyIn objects.
  */
-class NonConstructible
-{
-  private:
-	NonConstructible();
-};
+template<class Value>
+	class ConstantSource
+	{
+	  public:
+		// Ctor
+		explicit
+		ConstantSource (Value value):
+			value (value)
+		{ }
+
+	  public:
+		Value value;
+	};
 
 
 template<class Value>
@@ -99,30 +108,6 @@ class PropertyVirtualInterface
 	operator== (Nil) const
 	{
 		return is_nil();
-	}
-
-	/**
-	 * Set property to the nil value.
-	 */
-	virtual void
-	set_nil() = 0;
-
-	/**
-	 * Alias for set_nil().
-	 */
-	void
-	operator= (Nil)
-	{
-		set_nil();
-	}
-
-	/**
-	 * Alias for set_nil().
-	 */
-	void
-	operator= (std::initializer_list<NonConstructible>)
-	{
-		set_nil();
 	}
 
 	/**
@@ -171,6 +156,13 @@ class PropertyVirtualInterface
 	 */
 	virtual void
 	blob_to_property (Blob const&) = 0;
+
+  protected:
+	/**
+	 * Set property to the nil value.
+	 */
+	virtual void
+	protected_set_nil() = 0;
 };
 
 
@@ -268,7 +260,14 @@ class BasicPropertyIn: virtual public PropertyVirtualInterface
  * Mixin base class for all PropertyOut<*>
  */
 class BasicPropertyOut: virtual public PropertyVirtualInterface
-{ };
+{
+  public:
+	/**
+	 * Set property to nil-value.
+	 */
+	virtual void
+	operator= (Nil) = 0;
+};
 
 
 /**
@@ -286,30 +285,6 @@ template<class pValue>
 		using BasicProperty::BasicProperty;
 
 	  public:
-		/**
-		 * Set new value.
-		 */
-		void
-		set (Value);
-
-		/**
-		 * Set new value or set to nil, of std::optional is empty.
-		 */
-		void
-		set (std::optional<Value>);
-
-		/**
-		 * Copy value (or nil-state) from other proprety.
-		 */
-		void
-		set (Property<Value> const&);
-
-		/**
-		 * Alias for set (std::optional<Value>)
-		 */
-		Property const&
-		operator= (std::optional<Value>);
-
 		/**
 		 * Return contained value.
 		 * Throw exception NilProperty if value is nil and no fallback-value is set.
@@ -362,10 +337,6 @@ template<class pValue>
 		is_nil() const noexcept override;
 
 		// BasicProperty API
-		void
-		set_nil() override;
-
-		// BasicProperty API
 		bool
 		valid() const noexcept override;
 
@@ -376,6 +347,29 @@ template<class pValue>
 		// BasicProperty API
 		void
 		blob_to_property (Blob const&);
+
+	  protected:
+		/**
+		 * Set new value.
+		 */
+		void
+		protected_set_value (Value);
+
+		/**
+		 * Set new value or set to nil, of std::optional is empty.
+		 */
+		void
+		protected_set (std::optional<Value>);
+
+		/**
+		 * Copy value (or nil-state) from other proprety.
+		 */
+		void
+		protected_set (Property<Value> const&);
+
+		// BasicProperty API
+		void
+		protected_set_nil() override;
 
 	  private:
 		std::optional<Value>	_value;
@@ -406,13 +400,11 @@ template<class pValue>
 		// Dtor
 		~PropertyIn();
 
-		using Property<Value>::operator=;
-
 		/**
 		 * Set no data source for this property.
 		 */
 		void
-		operator<< (std::nullptr_t);
+		operator<< (Nil);
 
 		/**
 		 * Set PropertyOut as a data source for this property.
@@ -420,12 +412,19 @@ template<class pValue>
 		void
 		operator<< (PropertyOut<Value>& other);
 
+		/**
+		 * Set a ConstantSource as a data source for this property.
+		 */
+		template<class ConstantValue>
+			void
+			operator<< (ConstantSource<ConstantValue> const&);
+
 		// BasicProperty API
 		void
 		fetch (Cycle const&) override;
 
 	  private:
-		PropertyOut<Value>* _data_source = nullptr;
+		std::variant<std::monostate, PropertyOut<Value>*, ConstantSource<Value>> _data_source = std::monostate();
 	};
 
 
@@ -450,6 +449,29 @@ template<class pValue>
 		PropertyOut (ModuleIO* owner_and_data_source, std::string const& path);
 
 		using Property<Value>::operator=;
+		void
+		set_nil()
+		{
+			*this = xf::nil;
+		}
+
+		/**
+		 * Alias for Property::protected_set_nil().
+		 */
+		void
+		operator= (Nil) override;
+
+		/**
+		 * Alias for Property::protected_set (std::optional<Value>)
+		 */
+		PropertyOut const&
+		operator= (std::optional<Value>);
+
+		/**
+		 * Alias for Property::protected_set (Property<Value> const&)
+		 */
+		PropertyOut const&
+		operator= (Property<Value> const&);
 
 		/**
 		 * Return true if any other property depends on this property.
@@ -473,7 +495,7 @@ template<class pValue>
 		 * Set no data source for this property.
 		 */
 		void
-		operator<< (std::nullptr_t);
+		operator<< (Nil);
 
 		/**
 		 * Set PropertyOut as a data source for this property.
@@ -574,51 +596,6 @@ BasicProperty::io() const
 
 
 template<class V>
-	inline void
-	Property<V>::set (Value value)
-	{
-		if (!_value || *_value != value)
-		{
-			_modification_timestamp = TimeHelper::now();
-			_valid_timestamp = _modification_timestamp;
-			_value = value;
-			++_serial;
-		}
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::set (std::optional<Value> value)
-	{
-		if (value)
-			set (*value);
-		else
-			set_nil();
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::set (Property<Value> const& value)
-	{
-		if (value)
-			set (*value);
-		else
-			set_nil();
-	}
-
-
-template<class V>
-	inline Property<V> const&
-	Property<V>::operator= (std::optional<Value> value)
-	{
-		set (value);
-		return *this;
-	}
-
-
-template<class V>
 	inline typename Property<V>::Value const&
 	Property<V>::get() const
 	{
@@ -694,19 +671,6 @@ template<class V>
 
 
 template<class V>
-	inline void
-	Property<V>::set_nil()
-	{
-		if (_value)
-		{
-			_modification_timestamp = TimeHelper::now();
-			_value.reset();
-			++_serial;
-		}
-	}
-
-
-template<class V>
 	inline bool
 	Property<V>::valid() const noexcept
 	{
@@ -740,10 +704,59 @@ template<class V>
 			{
 				Value aux;
 				blob_to_value (Blob { std::next (blob.begin()), blob.end() }, aux);
-				*this = aux;
+				protected_set_value (aux);
 			}
 			else
-				set_nil();
+				protected_set_nil();
+		}
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::protected_set_value (Value value)
+	{
+		if (!_value || *_value != value)
+		{
+			_modification_timestamp = TimeHelper::now();
+			_valid_timestamp = _modification_timestamp;
+			_value = value;
+			++_serial;
+		}
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::protected_set (std::optional<Value> value)
+	{
+		if (value)
+			protected_set_value (*value);
+		else
+			protected_set_nil();
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::protected_set (Property<Value> const& value)
+	{
+		if (value)
+			protected_set_value (*value);
+		else
+			protected_set_nil();
+	}
+
+
+template<class V>
+	inline void
+	Property<V>::protected_set_nil()
+	{
+		if (_value)
+		{
+			_modification_timestamp = TimeHelper::now();
+			_value.reset();
+			++_serial;
 		}
 	}
 
@@ -781,31 +794,48 @@ template<class V>
 
 template<class V>
 	inline void
-	PropertyIn<V>::operator<< (PropertyOut<Value>& other)
+	PropertyIn<V>::operator<< (Nil)
 	{
-		_data_source = &other;
+		_data_source = nullptr;
+		this->protected_set_nil();
 	}
 
 
 template<class V>
 	inline void
-	PropertyIn<V>::operator<< (std::nullptr_t)
+	PropertyIn<V>::operator<< (PropertyOut<Value>& other)
 	{
-		_data_source = nullptr;
+		_data_source = &other;
+		this->protected_set (*other);
 	}
+
+
+template<class V>
+	template<class C>
+		inline void
+		PropertyIn<V>::operator<< (ConstantSource<C> const& source)
+		{
+			_data_source = ConstantSource<Value> { source.value };
+			this->protected_set (source.value);
+		}
 
 
 template<class V>
 	inline void
 	PropertyIn<V>::fetch (Cycle const& cycle)
 	{
-		if (_data_source)
-		{
-			_data_source->fetch (cycle);
-			this->set (_data_source->get_optional());
-		}
-		else
-			this->set_nil();
+		std::visit (xf::overload {
+			[&] (std::monostate) {
+				this->protected_set_nil();
+			},
+			[&] (PropertyOut<Value>* property_source) {
+				property_source->fetch (cycle);
+				this->protected_set (*property_source);
+			},
+			[&] (ConstantSource<Value> constant_source) {
+				this->protected_set (constant_source.value);
+			}
+		}, _data_source);
 	}
 
 
@@ -827,6 +857,32 @@ template<class V>
 		Property<V> (owner_and_data_source, path)
 	{
 		_data_source = owner_and_data_source;
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::operator= (Nil)
+	{
+		this->protected_set_nil();
+	}
+
+
+template<class V>
+	inline PropertyOut<V> const&
+	PropertyOut<V>::operator= (std::optional<Value> value)
+	{
+		this->protected_set (value);
+		return *this;
+	}
+
+
+template<class V>
+	inline PropertyOut<V> const&
+	PropertyOut<V>::operator= (Property<Value> const& value)
+	{
+		this->protected_set (value);
+		return *this;
 	}
 
 
@@ -857,7 +913,7 @@ template<class V>
 
 template<class V>
 	inline void
-	PropertyOut<V>::operator<< (std::nullptr_t)
+	PropertyOut<V>::operator<< (Nil)
 	{
 		_data_source = std::monostate();
 	}
@@ -879,14 +935,14 @@ template<class V>
 		// perhaps add a flag that the result is cached in current processing-loop.
 		std::visit (xf::overload {
 			[&] (std::monostate) {
-				this->set_nil();
+				this->protected_set_nil();
 			},
-			[&] (ModuleIO* data_source) {
-				BasicModule::ProcessingLoopAPI (data_source->module()).fetch_and_process (cycle);
+			[&] (ModuleIO* module_source) {
+				BasicModule::ProcessingLoopAPI (module_source->module()).fetch_and_process (cycle);
 			},
-			[&] (PropertyOut<Value>* data_source) {
-				data_source->fetch (cycle);
-				this->set (data_source->get_optional());
+			[&] (PropertyOut<Value>* property_source) {
+				property_source->fetch (cycle);
+				this->protected_set (*property_source);
 			}
 		}, _data_source);
 	}

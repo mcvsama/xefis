@@ -58,6 +58,7 @@ class AirDataComputerIO: public xf::ModuleIO
 	 * Output
 	 */
 
+	xf::PropertyOut<si::Pressure>			recovered_pressure_total	{ this, "/pressure/total" };
 	xf::PropertyOut<si::Pressure>			pressure_dynamic			{ this, "/pressure/dynamic" };
 	xf::PropertyOut<bool>					altitude_amsl_serviceable	{ this, "/altitude/amsl.serviceable" };
 	xf::PropertyOut<si::Length>				altitude_amsl				{ this, "/altitude/amsl" };
@@ -86,6 +87,12 @@ class AirDataComputerIO: public xf::ModuleIO
  */
 class AirDataComputer: public xf::Module<AirDataComputerIO>
 {
+  private:
+	// Sound speed in STD sea level:
+	static constexpr si::Velocity const kStdSoundSpeed	= 661.4788_kt;
+	// STD sea level pressure:
+	static constexpr si::Pressure const kStdPressure	= 29.92126_inHg;
+
   public:
 	// Ctor
 	explicit
@@ -130,6 +137,9 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	void
 	compute_reynolds();
 
+	void
+	recover_total_pressure();
+
   private:
 	bool						_ias_in_valid_range					= false;
 	bool						_prev_use_standard_pressure			= false;
@@ -149,6 +159,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	xf::Smoother<si::Velocity>	_speed_ias_lookahead_o_smoother		{ 1000_ms };
 	xf::Lookahead<si::Length>	_altitude_amsl_estimator			{ 10_s };
 	xf::Lookahead<si::Velocity>	_speed_ias_estimator				{ 10_s };
+	xf::PropertyObserver		_total_pressure_computer;
 	xf::PropertyObserver		_altitude_computer;
 	xf::PropertyObserver		_density_altitude_computer;
 	xf::PropertyObserver		_ias_computer;

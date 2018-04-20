@@ -235,10 +235,10 @@ FlightGear::got_packet()
 void
 FlightGear::invalidate_all()
 {
-	for (auto property: _output_properties)
-		property->set_nil();
+	for (auto* property: _output_properties)
+		*property = xf::nil;
 
-	for (auto flag: _serviceable_flags)
+	for (auto* flag: _serviceable_flags)
 		*flag = false;
 }
 
@@ -329,13 +329,13 @@ FlightGear::read_input()
 		io.lateral_deviation = 2_deg * fg_data->lateral_deviation_deg;
 
 		if (!fg_data->vertical_deviation_ok)
-			io.vertical_deviation.set_nil();
+			io.vertical_deviation = xf::nil;
 
 		if (!fg_data->lateral_deviation_ok)
-			io.lateral_deviation.set_nil();
+			io.lateral_deviation = xf::nil;
 
 		if (!fg_data->navigation_dme_ok)
-			io.dme_distance.set_nil();
+			io.dme_distance = xf::nil;
 
 		io.gear_nose_down = fg_data->gear_nose_position > 0.999;
 		io.gear_left_down = fg_data->gear_left_position > 0.999;
@@ -358,15 +358,15 @@ FlightGear::read_input()
 	}
 
 	if (io.maximum_ias && *io.maximum_ias < 1_kt)
-		io.maximum_ias.set_nil();
+		io.maximum_ias = xf::nil;
 
 	if (io.minimum_ias && *io.minimum_ias < 1_kt)
-		io.minimum_ias.set_nil();
+		io.minimum_ias = xf::nil;
 
 	if (io.radar_altimeter_altitude_agl && *io.radar_altimeter_altitude_agl > 2500_ft)
-		io.radar_altimeter_altitude_agl.set_nil();
+		io.radar_altimeter_altitude_agl = xf::nil;
 
-	for (auto flag: _serviceable_flags)
+	for (auto* flag: _serviceable_flags)
 		*flag = true;
 
 	io.gps_lateral_stddev = 1_m;

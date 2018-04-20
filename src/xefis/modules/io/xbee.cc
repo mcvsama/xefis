@@ -283,7 +283,6 @@ XBee::reset()
 	_output_buffer.clear();
 	_restart_timer->stop();
 	_after_reset_timer->stop();
-	io.send.set_nil();
 	io.receive.set_nil();
 }
 
