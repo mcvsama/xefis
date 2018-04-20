@@ -48,17 +48,29 @@ class Details
 } // namespace detail
 
 
+/**
+ * Collects instrument images and composites them onto its own area.
+ */
 class Screen:
 	public QWidget,
-	public Registry<BasicInstrument, detail::Details>,
+	private Registry<BasicInstrument, detail::Details>,
 	private Noncopyable
 {
 	Q_OBJECT
 
   public:
+	using RegistrationProof = typename Registry::RegistrationProof;
+
+  public:
 	// Ctor
 	explicit
 	Screen (QRect, si::Frequency refresh_rate);
+
+	/**
+	 * Register instrument
+	 */
+	RegistrationProof
+	register_instrument (BasicInstrument&);
 
 	/**
 	 * Set position and size of an instrument.
@@ -106,6 +118,12 @@ class Screen:
 	 */
 	QImage
 	allocate_image (QSize) const;
+
+	void
+	instrument_registered (typename Registry::Disclosure&);
+
+	void
+	instrument_unregistered (typename Registry::Disclosure&);
 
   private slots:
 	/**

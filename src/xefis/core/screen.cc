@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <functional>
 
 // Qt:
 #include <QTimer>
@@ -46,6 +47,15 @@ Screen::Screen (QRect rect, si::Frequency refresh_rate):
 	_refresh_timer->setInterval ((1.0 / refresh_rate).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &Screen::refresh);
 	_refresh_timer->start();
+}
+
+
+Screen::RegistrationProof
+Screen::register_instrument (BasicInstrument& instrument)
+{
+	// Don't give access to public to Registry interface, so that user doesn't
+	// register instrument with some weird Details value.
+	return register_object (instrument);
 }
 
 

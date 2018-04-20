@@ -34,35 +34,68 @@ template<class pRegistrant, class pDetails = std::monostate>
 	class Registry
 	{
 	  public:
-		using Registrant		= pRegistrant;
-		using Details			= pDetails;
-		using RegistrationProof	= xf::RegistrationProof<Registrant, Details>;
+		class Disclosure;
 
-		/**
-		 * This class is used to access data inside RegistrationProof::Disclosure.
-		 */
-		struct RegistrationInfo
+		using Registrant			= pRegistrant;
+		using Details				= pDetails;
+		using RegistrationProof		= xf::RegistrationProof<Registrant, Details>;
+		using RegisteredCallback	= std::function<void (Disclosure&)>;
+		using UnregisteredCallback	= std::function<void (Disclosure&)>;
+
+		class Disclosure
 		{
-			Registrant&		registrant;
-			Details&		details;
+			template<class R, class D>
+				friend class xf::RegistrationProof;
+
+		  public:
+			explicit
+			Disclosure (Registrant& registrant, Details& details, std::weak_ptr<typename Registry::SharedData> registry_data):
+				_registrant (registrant),
+				_details (details),
+				_registry_data (registry_data)
+			{ }
+
+			Registrant&
+			registrant() const
+			{
+				return _registrant;
+			}
+
+			Details&
+			details()
+			{
+				return _details;
+			}
+
+		  private:
+			Registrant&										_registrant;
+			Details											_details;
+			std::weak_ptr<typename Registry::SharedData>	_registry_data;
 		};
 
 	  private:
-		using Disclosure		= typename xf::RegistrationProof<Registrant, Details>::Disclosure;
-		using DisclosuresVector	= std::vector<Disclosure*>;
+		using DisclosuresVector		= std::vector<Disclosure*>;
 
 		template<class R, class D>
 			friend class xf::RegistrationProof;
 
 		struct SharedData
 		{
-			DisclosuresVector unique_datas;
+			DisclosuresVector disclosures;
+
+			// Ctor
+			explicit
+			SharedData (RegisteredCallback, UnregisteredCallback);
 
 			void
-			insert (Disclosure& proof_unique_data);
+			insert (Disclosure&);
 
 			void
-			remove (Disclosure& proof_unique_data);
+			remove (Disclosure&);
+
+		  private:
+			RegisteredCallback			_registered_callback;
+			UnregisteredCallback		_unregistered_callback;
 		};
 
 	  public:
@@ -104,7 +137,7 @@ template<class pRegistrant, class pDetails = std::monostate>
 				operator*() const;
 
 			  private:
-				WrappedIterator _unique_data_iterator;
+				WrappedIterator _disclosure_iterator;
 			};
 
 		using Iterator		= IteratorWrapper<typename DisclosuresVector::iterator>;
@@ -114,6 +147,10 @@ template<class pRegistrant, class pDetails = std::monostate>
 		// Ctor
 		explicit
 		Registry();
+
+		// Ctor
+		explicit
+		Registry (RegisteredCallback, UnregisteredCallback);
 
 		/**
 		 * Register given object in this registry.
@@ -177,7 +214,7 @@ template<class R, class D>
 	template<class W>
 		inline
 		Registry<R, D>::IteratorWrapper<W>::IteratorWrapper (WrappedIterator wit):
-			_unique_data_iterator (wit)
+			_disclosure_iterator (wit)
 		{ }
 
 
@@ -185,7 +222,7 @@ template<class R, class D>
 	template<class W>
 		inline
 		Registry<R, D>::IteratorWrapper<W>::IteratorWrapper (IteratorWrapper const& other):
-			_unique_data_iterator (other._unique_data_iterator)
+			_disclosure_iterator (other._disclosure_iterator)
 		{ }
 
 
@@ -195,7 +232,7 @@ template<class R, class D>
 		Registry<R, D>::IteratorWrapper<W>::operator= (IteratorWrapper const& other)
 			-> IteratorWrapper&
 		{
-			_unique_data_iterator = other._unique_data_iterator;
+			_disclosure_iterator = other._disclosure_iterator;
 			return *this;
 		}
 
@@ -205,7 +242,7 @@ template<class R, class D>
 		inline bool
 		Registry<R, D>::IteratorWrapper<W>::operator== (IteratorWrapper const& other) const noexcept
 		{
-			return _unique_data_iterator == other._unique_data_iterator;
+			return _disclosure_iterator == other._disclosure_iterator;
 		}
 
 
@@ -224,7 +261,7 @@ template<class R, class D>
 		Registry<R, D>::IteratorWrapper<W>::operator*()
 			-> Disclosure&
 		{
-			return **_unique_data_iterator;
+			return **_disclosure_iterator;
 		}
 
 
@@ -234,7 +271,7 @@ template<class R, class D>
 		Registry<R, D>::IteratorWrapper<W>::operator*() const
 			-> Disclosure const&
 		{
-			return **_unique_data_iterator;
+			return **_disclosure_iterator;
 		}
 
 
@@ -244,25 +281,39 @@ template<class R, class D>
 		Registry<R, D>::IteratorWrapper<W>::operator++()
 			-> IteratorWrapper&
 		{
-			++_unique_data_iterator;
+			++_disclosure_iterator;
 			return *this;
 		}
 
 
 template<class R, class D>
+	inline
+	Registry<R, D>::SharedData::SharedData (RegisteredCallback registered_callback, UnregisteredCallback unregistered_callback):
+		_registered_callback (registered_callback),
+		_unregistered_callback (unregistered_callback)
+	{ }
+
+
+template<class R, class D>
 	inline void
-	Registry<R, D>::SharedData::insert (Disclosure& proof_unique_data)
+	Registry<R, D>::SharedData::insert (Disclosure& disclosure)
 	{
-		unique_datas.push_back (&proof_unique_data);
+		disclosures.push_back (&disclosure);
+
+		if (_registered_callback)
+			_registered_callback (disclosure);
 	}
 
 
 template<class R, class D>
 	inline void
-	Registry<R, D>::SharedData::remove (Disclosure& proof_unique_data)
+	Registry<R, D>::SharedData::remove (Disclosure& disclosure)
 	{
-		auto new_end = std::remove (unique_datas.begin(), unique_datas.end(), &proof_unique_data);
-		unique_datas.resize (std::distance (unique_datas.begin(), new_end));
+		if (_unregistered_callback)
+			_unregistered_callback (disclosure);
+
+		auto new_end = std::remove (disclosures.begin(), disclosures.end(), &disclosure);
+		disclosures.resize (std::distance (disclosures.begin(), new_end));
 	}
 
 
@@ -270,6 +321,13 @@ template<class R, class D>
 	inline
 	Registry<R, D>::Registry():
 		_shared_data (std::make_shared<SharedData>())
+	{ }
+
+
+template<class R, class D>
+	inline
+	Registry<R, D>::Registry (RegisteredCallback registered_callback, UnregisteredCallback unregistered_callback):
+		_shared_data (std::make_shared<SharedData> (registered_callback, unregistered_callback))
 	{ }
 
 
@@ -296,7 +354,7 @@ template<class R, class D>
 	Registry<R, D>::begin()
 		-> Iterator
 	{
-		return Iterator (_shared_data->unique_datas.begin());
+		return Iterator (_shared_data->disclosures.begin());
 	}
 
 
@@ -305,7 +363,7 @@ template<class R, class D>
 	Registry<R, D>::begin() const
 		-> ConstIterator
 	{
-		return ConstIterator (_shared_data->unique_datas.cbegin());
+		return ConstIterator (_shared_data->disclosures.cbegin());
 	}
 
 
@@ -314,7 +372,7 @@ template<class R, class D>
 	Registry<R, D>::cbegin() const
 		-> ConstIterator
 	{
-		return ConstIterator (_shared_data->unique_datas.cbegin());
+		return ConstIterator (_shared_data->disclosures.cbegin());
 	}
 
 
@@ -323,7 +381,7 @@ template<class R, class D>
 	Registry<R, D>::end()
 		-> Iterator
 	{
-		return Iterator (_shared_data->unique_datas.end());
+		return Iterator (_shared_data->disclosures.end());
 	}
 
 
@@ -332,7 +390,7 @@ template<class R, class D>
 	Registry<R, D>::end() const
 		-> ConstIterator
 	{
-		return ConstIterator (_shared_data->unique_datas.cend());
+		return ConstIterator (_shared_data->disclosures.cend());
 	}
 
 
@@ -341,7 +399,7 @@ template<class R, class D>
 	Registry<R, D>::cend() const
 		-> ConstIterator
 	{
-		return ConstIterator (_shared_data->unique_datas.cend());
+		return ConstIterator (_shared_data->disclosures.cend());
 	}
 
 } // namespace xf
