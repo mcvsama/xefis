@@ -44,37 +44,7 @@ template<class pRegistrant, class pDetails = std::monostate>
 		using Registrant	= pRegistrant;
 		using Details		= pDetails;
 		using Registry		= xf::Registry<Registrant, Details>;
-
-	  private:
-		class Disclosure
-		{
-			friend class RegistrationProof;
-
-		  public:
-			explicit
-			Disclosure (Registrant& registrant, Details& details, std::weak_ptr<typename Registry::SharedData> registry_data):
-				_registrant (registrant),
-				_details (details),
-				_registry_data (registry_data)
-			{ }
-
-			Registrant&
-			registrant() const
-			{
-				return _registrant;
-			}
-
-			Details&
-			details()
-			{
-				return _details;
-			}
-
-		  private:
-			Registrant&										_registrant;
-			Details											_details;
-			std::weak_ptr<typename Registry::SharedData>	_registry_data;
-		};
+		using Disclosure	= typename Registry::Disclosure;
 
 	  private:
 		// Ctor
@@ -113,24 +83,24 @@ template<class pRegistrant, class pDetails = std::monostate>
 		reset();
 
 	  private:
-		std::unique_ptr<Disclosure> _unique_data;
+		std::unique_ptr<Disclosure> _disclosure;
 	};
 
 
 template<class R, class D>
 	inline
 	RegistrationProof<R, D>::RegistrationProof (Registrant& registrant, Details details, Registry& registry):
-		_unique_data (std::make_unique<Disclosure> (registrant, details, registry._shared_data))
+		_disclosure (std::make_unique<Disclosure> (registrant, details, registry._shared_data))
 	{
-		if (auto ptr = _unique_data->_registry_data.lock())
-			ptr->insert (*_unique_data.get());
+		if (auto ptr = _disclosure->_registry_data.lock())
+			ptr->insert (*_disclosure.get());
 	}
 
 
 template<class R, class D>
 	inline
 	RegistrationProof<R, D>::RegistrationProof (RegistrationProof&& other):
-		_unique_data (std::move (other._unique_data))
+		_disclosure (std::move (other._disclosure))
 	{ }
 
 
@@ -138,9 +108,9 @@ template<class R, class D>
 	inline
 	RegistrationProof<R, D>::~RegistrationProof()
 	{
-		if (_unique_data)
-			if (auto ptr = _unique_data->_registry_data.lock())
-				ptr->remove (*_unique_data.get());
+		if (_disclosure)
+			if (auto ptr = _disclosure->_registry_data.lock())
+				ptr->remove (*_disclosure.get());
 	}
 
 
@@ -148,7 +118,7 @@ template<class R, class D>
 	inline RegistrationProof<R, D>&
 	RegistrationProof<R, D>::operator= (RegistrationProof&& other)
 	{
-		_unique_data = std::move (other._unique_data);
+		_disclosure = std::move (other._disclosure);
 		return *this;
 	}
 
@@ -157,7 +127,7 @@ template<class R, class D>
 	inline void
 	RegistrationProof<R, D>::reset()
 	{
-		_unique_data.reset();
+		_disclosure.reset();
 	}
 
 
@@ -165,7 +135,7 @@ template<class R, class D>
 	inline
 	RegistrationProof<R, D>::operator bool() const noexcept
 	{
-		return _unique_data;
+		return _disclosure;
 	}
 
 
@@ -174,7 +144,7 @@ template<class R, class D>
 	RegistrationProof<R, D>::registrant() noexcept
 		-> Registrant&
 	{
-		return _unique_data->registrant;
+		return _disclosure->registrant;
 	}
 
 
@@ -183,7 +153,7 @@ template<class R, class D>
 	RegistrationProof<R, D>::registrant() const noexcept
 		-> Registrant const&
 	{
-		return _unique_data->registrant;
+		return _disclosure->registrant;
 	}
 
 } // namespace xf
