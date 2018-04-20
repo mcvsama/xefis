@@ -179,7 +179,8 @@ LinkProtocol::Bitfield::apply()
 	for (auto& bsvariant: _bit_sources)
 	{
 		std::visit ([](auto&& bs) {
-			bs.property = bs.value;
+			if (bs.property_out)
+				*bs.property_out = bs.value;
 		}, bsvariant);
 	}
 }
@@ -191,8 +192,8 @@ LinkProtocol::Bitfield::failsafe()
 	for (auto& bsvariant: _bit_sources)
 	{
 		std::visit ([](auto&& bs) {
-			if (!bs.retained)
-				bs.property.set_nil();
+			if (bs.property_out && !bs.retained)
+				*bs.property_out = xf::nil;
 		}, bsvariant);
 	}
 }

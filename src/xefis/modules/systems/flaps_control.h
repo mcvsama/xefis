@@ -45,13 +45,12 @@ class FlapsControlIO: public xf::ModuleIO
 
 	xf::PropertyIn<bool>				up					{ this, "/input/up", false };
 	xf::PropertyIn<bool>				down				{ this, "/input/down", false };
-	xf::PropertyIn<si::Angle>			input_setting		{ this, "/input/setting", 0_deg };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			output_setting		{ this, "/output/setting" };
+	xf::PropertyOut<si::Angle>			requested_setting	{ this, "/output/requested-setting" };
 	xf::PropertyOut<si::Angle>			current				{ this, "/output/current" };
 	xf::PropertyOut<double>				control				{ this, "/output/control" };
 };
@@ -81,9 +80,9 @@ class FlapsControl: public xf::Module<FlapsControlIO>
 	si::Angle					_setting;
 	si::Angle					_current;
 	Unique<QTimer>				_timer;
-	xf::PropChangedTo<bool>		_input_up_clicked		{ io.up, true };
-	xf::PropChangedTo<bool>		_input_down_clicked		{ io.down, true };
-	xf::PropChanged<si::Angle>	_input_setting_changed	{ io.input_setting };
+	xf::PropChangedTo<bool>		_input_up_clicked			{ io.up, true };
+	xf::PropChangedTo<bool>		_input_down_clicked			{ io.down, true };
+	xf::PropChanged<si::Angle>	_requested_setting_changed	{ io.requested_setting };
 };
 
 #endif

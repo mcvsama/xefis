@@ -50,25 +50,24 @@ FlapsControl::process (xf::Cycle const&)
 {
 	if (_input_up_clicked())
 	{
-		auto prev_setting = _settings_list.lower_bound (*io.input_setting);
+		auto prev_setting = _settings_list.lower_bound (*io.requested_setting);
 
 		if (prev_setting != _settings_list.begin())
 			prev_setting--;
 
-		io.input_setting = *prev_setting;
+		io.requested_setting = *prev_setting;
 	}
 	else if (_input_down_clicked())
 	{
-		auto next_setting = _settings_list.upper_bound (*io.input_setting);
+		auto next_setting = _settings_list.upper_bound (*io.requested_setting);
 
 		if (next_setting != _settings_list.end())
-			io.input_setting = *next_setting;
+			io.requested_setting = *next_setting;
 	}
 
-	if (_input_setting_changed() && io.input_setting)
+	if (_requested_setting_changed() && io.requested_setting)
 	{
-		_setting = xf::clamped<si::Angle> (*io.input_setting, _extents);
-		io.output_setting = _setting;
+		_setting = xf::clamped<si::Angle> (*io.requested_setting, _extents);
 		_timer->start();
 	}
 }

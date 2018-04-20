@@ -185,8 +185,8 @@ class FlightGear:
 	QByteArray							_input_datagram;
 	QHostAddress						_output_address;
 	Unique<QUdpSocket>					_output;
-	std::vector<xf::BasicProperty*>		_output_properties;
-	std::vector<xf::Property<bool>*>	_serviceable_flags;
+	std::vector<xf::BasicPropertyOut*>	_output_properties;
+	std::vector<xf::PropertyOut<bool>*>	_serviceable_flags;
 };
 
 #endif

@@ -32,6 +32,13 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 	Module (std::move (module_io), instance),
 	_airframe (airframe)
 {
+	_total_pressure_computer.set_callback (std::bind (&AirDataComputer::recover_total_pressure, this));
+	_total_pressure_computer.observe ({
+		&io.pressure_total,
+		&io.ias,
+		&io.pressure_static,
+	});
+
 	_altitude_amsl_estimator.set_minimum_integration_time (0.2_s);
 	_speed_ias_estimator.set_minimum_integration_time (0.2_s);
 
@@ -72,7 +79,7 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 	_mach_computer.set_callback (std::bind (&AirDataComputer::compute_mach, this));
 	_mach_computer.observe ({
 		&io.pressure_static,
-		&io.pressure_total,
+		&io.recovered_pressure_total,
 	});
 
 	_sat_computer.set_callback (std::bind (&AirDataComputer::compute_sat_and_viscosity, this));
@@ -130,6 +137,7 @@ AirDataComputer::process (xf::Cycle const& cycle)
 {
 	xf::PropertyObserver* computers[] = {
 		// Order is important:
+		&_total_pressure_computer,
 		&_altitude_computer,
 		&_ias_computer,
 		&_ias_lookahead_computer,
@@ -252,38 +260,17 @@ void
 AirDataComputer::compute_ias()
 {
 	si::Time update_dt = _ias_computer.update_dt();
-	// Sound speed in STD sea level:
-	si::Velocity const a0 = 661.4788_kt;
-	// STD sea level pressure:
-	si::Pressure const p0 = 29.92126_inHg;
 
-	// If we're using ready-made IAS sensor, we need to recover total pressure
-	// from static pressure and TAS.
-	if (*io.using_ias_sensor)
-	{
-		if (io.ias && io.pressure_static)
-		{
-			si::Pressure p = *io.pressure_static;
-			// Formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
-			// solved for qc (dynamic (impact) pressure):
-			double ia0 = *io.ias / a0;
-			si::Pressure qc = p0 * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
-			io.pressure_total = qc + p;
-		}
-		else
-			io.pressure_total.set_nil();
-	}
-
-	if (io.pressure_static && io.pressure_total)
+	if (io.pressure_static && io.recovered_pressure_total)
 	{
 		// Compute dynamic pressure:
-		io.pressure_dynamic = *io.pressure_total - *io.pressure_static;
+		io.pressure_dynamic = *io.recovered_pressure_total - *io.pressure_static;
 
 		// Using formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
 		// Impact pressure (dynamic pressure) - difference between total pressure and static pressure:
-		si::Pressure qc = *io.pressure_total - *io.pressure_static;
+		si::Pressure qc = *io.recovered_pressure_total - *io.pressure_static;
 
-		si::Velocity tmp_ias = a0 * std::sqrt (5.0 * (std::pow (qc / p0 + 1.0, 2.0 / 7.0) - 1.0));
+		si::Velocity tmp_ias = kStdSoundSpeed * std::sqrt (5.0 * (std::pow (qc / kStdPressure + 1.0, 2.0 / 7.0) - 1.0));
 		io.speed_ias = _speed_ias_smoother (tmp_ias, update_dt);
 	}
 	else
@@ -374,7 +361,7 @@ AirDataComputer::compute_mach()
 	// Instead use algorithm described here:
 	// <http://en.wikipedia.org/wiki/Mach_number#Calculating_Mach_Number_from_Pitot_Tube_Pressure>
 
-	if (io.pressure_static && io.pressure_total && io.pressure_dynamic)
+	if (io.pressure_static && io.recovered_pressure_total && io.pressure_dynamic)
 	{
 		// Dynamic pressure behind the normal shock (no-one will ever fly above Mach 1, so doesn't really
 		// matter where the sensor is installed). Use normal total pressure source:
@@ -466,5 +453,32 @@ AirDataComputer::compute_reynolds()
 	}
 	else
 		io.reynolds_number.set_nil();
+}
+
+
+void
+AirDataComputer::recover_total_pressure()
+{
+	if (io.pressure_total)
+		io.recovered_pressure_total = io.pressure_total;
+	else
+	{
+		// If we're using ready-made IAS sensor, we need to recover total pressure
+		// from static pressure and TAS.
+		if (*io.using_ias_sensor)
+		{
+			if (io.ias && io.pressure_static)
+			{
+				si::Pressure p = *io.pressure_static;
+				// Formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
+				// solved for qc (dynamic (impact) pressure):
+				double ia0 = *io.ias / kStdSoundSpeed;
+				si::Pressure qc = kStdPressure * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
+				io.recovered_pressure_total = qc + p;
+			}
+			else
+				io.recovered_pressure_total = xf::nil;
+		}
+	}
 }
 

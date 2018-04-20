@@ -98,7 +98,7 @@ HT16K33::KeyMatrix::array() noexcept
 }
 
 
-HT16K33::SingleLED::SingleLED (xf::Property<bool>& property, Row row, Column column):
+HT16K33::SingleLED::SingleLED (xf::PropertyIn<bool>& property, Row row, Column column):
 	_property (property),
 	_row (row),
 	_column (column)
@@ -115,7 +115,7 @@ HT16K33::SingleLED::update_led_matrix (LEDMatrix& led_matrix) const
 }
 
 
-HT16K33::SingleSwitch::SingleSwitch (xf::Property<bool>& property, Row row, Column column):
+HT16K33::SingleSwitch::SingleSwitch (xf::PropertyOut<bool>& property, Row row, Column column):
 	_property (property),
 	_row (row),
 	_column (column)

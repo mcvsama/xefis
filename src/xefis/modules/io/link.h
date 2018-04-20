@@ -236,6 +236,7 @@ class LinkProtocol
 
 		  private:
 			xf::Property<Value>&		_property;
+			xf::PropertyOut<Value>*		_property_out;
 			si::decay_quantity_t<Value>	_fallback_value {};
 			std::optional<Value>		_value;
 			// Retain last valid value on error (when value is NaN or failsafe kicks in):
@@ -257,6 +258,7 @@ class LinkProtocol
 			struct BitSource
 			{
 				xf::Property<Value>&	property;
+				xf::PropertyOut<Value>*	property_out;
 				// More than 1 bit only makes sense for integer Values:
 				uint8_t					bits			{ 1 };
 				bool					retained		{ false };
@@ -409,7 +411,7 @@ class LinkProtocol
 	static Bitfield::BitSource<bool>
 	bitfield_property (xf::Property<bool>& property, Retained retained, bool fallback_value)
 	{
-		return { property, 1, *retained, fallback_value, false };
+		return { property, dynamic_cast<xf::PropertyOut<bool>*> (&property), 1, *retained, fallback_value, false };
 	}
 
 	/**
@@ -423,7 +425,7 @@ class LinkProtocol
 			if (!fits_in_bits (fallback_value, bits))
 				throw xf::InvalidArgument ("fallback_value doesn't fit in given number of bits");
 
-			return { property, *bits, *retained, fallback_value, 0 };
+			return { property, dynamic_cast<xf::PropertyOut<Unsigned>*> (&property), *bits, *retained, fallback_value, 0 };
 		}
 
 	static auto
@@ -547,6 +549,7 @@ template<uint8_t B, class V>
 		inline
 		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, Value fallback_value):
 			_property (property),
+			_property_out (dynamic_cast<xf::PropertyOut<Value>*> (&property)),
 			_fallback_value (fallback_value),
 			_retained (*retained)
 		{
@@ -572,6 +575,7 @@ template<uint8_t B, class V>
 		inline
 		LinkProtocol::Property<B, V>::Property (xf::Property<Value>& property, Retained retained, std::optional<Value> offset):
 			_property (property),
+			_property_out (dynamic_cast<xf::PropertyOut<Value>*> (&property)),
 			_fallback_value (std::numeric_limits<decltype (_fallback_value)>::quiet_NaN()),
 			_retained (*retained),
 			_offset (offset)
@@ -647,23 +651,26 @@ template<uint8_t B, class V>
 	inline void
 	LinkProtocol::Property<B, V>::apply()
 	{
-		if constexpr (std::is_integral<Value>())
+		if (_property_out)
 		{
-			if (_value)
-				_property = _value;
-			else if (!_retained)
-				_property.set_nil();
-		}
-		else if constexpr (std::is_floating_point<Value>() || si::is_quantity<Value>())
-		{
-			if (_value)
+			if constexpr (std::is_integral<Value>())
 			{
-				_property = _offset
-					? *_value + *_offset
-					: *_value;
+				if (_value)
+					*_property_out = _value;
+				else if (!_retained)
+					*_property_out = xf::nil;
 			}
-			else if (!_retained)
-				_property.set_nil();
+			else if constexpr (std::is_floating_point<Value>() || si::is_quantity<Value>())
+			{
+				if (_value)
+				{
+					*_property_out = _offset
+						? *_value + *_offset
+						: *_value;
+				}
+				else if (!_retained)
+					*_property_out = xf::nil;
+			}
 		}
 	}
 
@@ -672,8 +679,8 @@ template<uint8_t B, class V>
 	inline void
 	LinkProtocol::Property<B, V>::failsafe()
 	{
-		if (!_retained)
-			_property.set_nil();
+		if (_property_out && !_retained)
+			*_property_out = xf::nil;
 	}
 
 
