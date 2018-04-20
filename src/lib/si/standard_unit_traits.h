@@ -20,6 +20,7 @@
 // Local:
 #include "unit_traits.h"
 #include "standard_units.h"
+#include "additional_units.h"
 
 
 namespace si {
