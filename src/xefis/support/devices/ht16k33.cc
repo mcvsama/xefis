@@ -139,7 +139,7 @@ HT16K33::SingleSwitch::key_matrix_updated (KeyMatrix const& key_matrix)
 void
 HT16K33::SingleSwitch::invalidate()
 {
-	_property.set_nil();
+	_property = xf::nil;
 }
 
 

@@ -99,20 +99,20 @@ IMU_CFF::compute_centripetal()
 		}
 		else
 		{
-			io.centripetal_force_x.set_nil();
-			io.centripetal_force_y.set_nil();
-			io.centripetal_force_z.set_nil();
+			io.centripetal_force_x = xf::nil;
+			io.centripetal_force_y = xf::nil;
+			io.centripetal_force_z = xf::nil;
 		}
 	}
 	else
 	{
-		io.centripetal_force_x.set_nil();
-		io.centripetal_force_y.set_nil();
-		io.centripetal_force_z.set_nil();
+		io.centripetal_force_x = xf::nil;
+		io.centripetal_force_y = xf::nil;
+		io.centripetal_force_z = xf::nil;
 
-		io.centripetal_acceleration_x.set_nil();
-		io.centripetal_acceleration_y.set_nil();
-		io.centripetal_acceleration_z.set_nil();
+		io.centripetal_acceleration_x = xf::nil;
+		io.centripetal_acceleration_y = xf::nil;
+		io.centripetal_acceleration_z = xf::nil;
 	}
 }
 

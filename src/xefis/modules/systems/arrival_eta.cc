@@ -93,7 +93,7 @@ ArrivalETA::compute()
 			io.eta = _smoother (dt * (-distance / distance_diff), dt);
 		}
 		else
-			io.eta.set_nil();
+			io.eta = xf::nil;
 
 		_prev_distance = distance;
 	}
@@ -102,7 +102,7 @@ ArrivalETA::compute()
 		if (set_nil.reset_prev_distance)
 			_prev_distance.reset();
 
-		io.eta.set_nil();
+		io.eta = xf::nil;
 	}
 }
 

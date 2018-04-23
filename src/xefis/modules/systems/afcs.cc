@@ -656,7 +656,7 @@ AFCS::update_mcp()
 			if (_mcp_vs)
 				io.mcp_vertical_display = xf::symmetric_round (_mcp_vs->in<FootPerMinute>());
 			else
-				io.mcp_vertical_display.set_nil();
+				io.mcp_vertical_display = xf::nil;
 			break;
 
 		case VerticalControl::FPA:
@@ -665,7 +665,7 @@ AFCS::update_mcp()
 			if (_mcp_fpa)
 				io.mcp_vertical_display = xf::symmetric_round (10.0 * _mcp_fpa->in<Degree>()) / 10.0;
 			else
-				io.mcp_vertical_display.set_nil();
+				io.mcp_vertical_display = xf::nil;
 			break;
 	}
 }

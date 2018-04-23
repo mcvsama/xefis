@@ -61,10 +61,10 @@ FlapsBugs::process (xf::Cycle const&)
 		}
 		else
 		{
-			io.flaps_a_label.set_nil();
-			io.flaps_a_speed.set_nil();
-			io.flaps_b_label.set_nil();
-			io.flaps_b_speed.set_nil();
+			io.flaps_a_label = xf::nil;
+			io.flaps_a_speed = xf::nil;
+			io.flaps_b_label = xf::nil;
+			io.flaps_b_speed = xf::nil;
 		}
 	}
 }

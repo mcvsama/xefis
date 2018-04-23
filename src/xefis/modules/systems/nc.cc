@@ -114,7 +114,7 @@ NavigationComputer::compute_position()
 	if (io.position_lateral_stddev && io.position_vertical_stddev)
 		io.position_stddev = std::max (*io.position_lateral_stddev, *io.position_vertical_stddev);
 	else
-		io.position_stddev.set_nil();
+		io.position_stddev = xf::nil;
 
 	si::Length const failed_accuracy = 100_nmi;
 
@@ -177,8 +177,8 @@ NavigationComputer::compute_magnetic_variation()
 	}
 	else
 	{
-		io.magnetic_declination.set_nil();
-		io.magnetic_inclination.set_nil();
+		io.magnetic_declination = xf::nil;
+		io.magnetic_inclination = xf::nil;
 	}
 }
 
@@ -195,12 +195,12 @@ NavigationComputer::compute_headings()
 		if (io.magnetic_declination)
 			io.orientation_heading_true = xf::magnetic_to_true (*io.orientation_heading_magnetic, *io.magnetic_declination);
 		else
-			io.orientation_heading_true.set_nil();
+			io.orientation_heading_true = xf::nil;
 	}
 	else
 	{
-		io.orientation_heading_magnetic.set_nil();
-		io.orientation_heading_true.set_nil();
+		io.orientation_heading_magnetic = xf::nil;
+		io.orientation_heading_true = xf::nil;
 		_orientation_heading_magnetic_smoother.invalidate();
 	}
 
@@ -209,7 +209,7 @@ NavigationComputer::compute_headings()
 		io.orientation_pitch = _orientation_pitch_smoother (*io.input_orientation_pitch, update_dt);
 	else
 	{
-		io.orientation_pitch.set_nil();
+		io.orientation_pitch = xf::nil;
 		_orientation_pitch_smoother.invalidate();
 	}
 
@@ -218,7 +218,7 @@ NavigationComputer::compute_headings()
 		io.orientation_roll = _orientation_roll_smoother (*io.input_orientation_roll, update_dt);
 	else
 	{
-		io.orientation_roll.set_nil();
+		io.orientation_roll = xf::nil;
 		_orientation_roll_smoother.invalidate();
 	}
 }
@@ -249,13 +249,13 @@ NavigationComputer::compute_track()
 			if (io.magnetic_declination)
 				io.track_lateral_magnetic = xf::true_to_magnetic (*io.track_lateral_true, *io.magnetic_declination);
 			else
-				io.track_lateral_magnetic.set_nil();
+				io.track_lateral_magnetic = xf::nil;
 		}
 		else
 		{
-			io.track_vertical.set_nil();
-			io.track_lateral_true.set_nil();
-			io.track_lateral_magnetic.set_nil();
+			io.track_vertical = xf::nil;
+			io.track_lateral_true = xf::nil;
+			io.track_lateral_magnetic = xf::nil;
 			_track_vertical_smoother.invalidate();
 			_track_lateral_true_smoother.invalidate();
 		}
@@ -263,9 +263,9 @@ NavigationComputer::compute_track()
 	else
 	{
 		_track_lateral_true_smoother.reset (*io.orientation_heading_true);
-		io.track_vertical.set_nil();
-		io.track_lateral_true.set_nil();
-		io.track_lateral_magnetic.set_nil();
+		io.track_vertical = xf::nil;
+		io.track_lateral_true = xf::nil;
+		io.track_lateral_magnetic = xf::nil;
 	}
 
 	std::optional<si::AngularVelocity> result_rotation_speed;
@@ -318,7 +318,7 @@ NavigationComputer::compute_ground_speed()
 	}
 	else
 	{
-		io.track_ground_speed.set_nil();
+		io.track_ground_speed = xf::nil;
 		_track_ground_speed_smoother.invalidate();
 	}
 }

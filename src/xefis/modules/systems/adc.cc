@@ -208,9 +208,9 @@ AirDataComputer::compute_altitude()
 	}
 	else
 	{
-		io.altitude_amsl.set_nil();
-		io.altitude_amsl_qnh.set_nil();
-		io.altitude_amsl_std.set_nil();
+		io.altitude_amsl = xf::nil;
+		io.altitude_amsl_qnh = xf::nil;
+		io.altitude_amsl_std = xf::nil;
 		_altitude_amsl_smoother.invalidate();
 		_altitude_amsl_qnh_smoother.invalidate();
 		_altitude_amsl_std_smoother.invalidate();
@@ -227,7 +227,7 @@ AirDataComputer::compute_altitude()
 	}
 	else
 	{
-		io.altitude_amsl_lookahead.set_nil();
+		io.altitude_amsl_lookahead = xf::nil;
 		_altitude_amsl_estimator.invalidate();
 		_altitude_amsl_lookahead_i_smoother.invalidate();
 		_altitude_amsl_lookahead_o_smoother.invalidate();
@@ -243,7 +243,7 @@ AirDataComputer::compute_density_altitude()
 	if (io.static_air_temperature && io.altitude_amsl)
 		io.density_altitude = xf::compute_density_altitude (*io.altitude_amsl, *io.static_air_temperature);
 	else
-		io.density_altitude.set_nil();
+		io.density_altitude = xf::nil;
 
 	// Also compute air density:
 	if (io.pressure_static && io.static_air_temperature)
@@ -252,7 +252,7 @@ AirDataComputer::compute_density_altitude()
 		io.air_density_static = *io.pressure_static / (dry_air_specific_constant * *io.static_air_temperature);
 	}
 	else
-		io.air_density_static.set_nil();
+		io.air_density_static = xf::nil;
 }
 
 
@@ -275,7 +275,7 @@ AirDataComputer::compute_ias()
 	}
 	else
 	{
-		io.speed_ias.set_nil();
+		io.speed_ias = xf::nil;
 		_speed_ias_smoother.invalidate();
 	}
 
@@ -301,7 +301,7 @@ AirDataComputer::compute_ias_lookahead()
 	}
 	else
 	{
-		io.speed_ias_lookahead.set_nil();
+		io.speed_ias_lookahead = xf::nil;
 		_speed_ias_estimator.invalidate();
 		_speed_ias_lookahead_i_smoother.invalidate();
 		_speed_ias_lookahead_o_smoother.invalidate();
@@ -315,7 +315,7 @@ AirDataComputer::compute_sound_speed()
 	if (io.static_air_temperature)
 		io.speed_sound = xf::compute_sound_speed (*io.static_air_temperature);
 	else
-		io.speed_sound.set_nil();
+		io.speed_sound = xf::nil;
 }
 
 
@@ -333,7 +333,7 @@ AirDataComputer::compute_tas()
 			io.speed_tas = tmp_ias + 0.02 * tmp_ias * (*io.altitude_amsl / 1000_ft);
 	}
 	else
-		io.speed_tas.set_nil();
+		io.speed_tas = xf::nil;
 }
 
 
@@ -347,7 +347,7 @@ AirDataComputer::compute_eas()
 		io.speed_eas = *io.speed_tas * std::sqrt (rho / rho_0);
 	}
 	else
-		io.speed_eas.set_nil();
+		io.speed_eas = xf::nil;
 }
 
 
@@ -387,7 +387,7 @@ AirDataComputer::compute_mach()
 		}
 	}
 	else
-		io.speed_mach.set_nil();
+		io.speed_mach = xf::nil;
 }
 
 
@@ -406,8 +406,8 @@ AirDataComputer::compute_sat_and_viscosity()
 	}
 	else
 	{
-		io.static_air_temperature.set_nil();
-		io.dynamic_viscosity.set_nil();
+		io.static_air_temperature = xf::nil;
+		io.dynamic_viscosity = xf::nil;
 	}
 }
 
@@ -432,7 +432,7 @@ AirDataComputer::compute_vertical_speed()
 	}
 	else
 	{
-		io.vertical_speed.set_nil();
+		io.vertical_speed = xf::nil;
 		_vertical_speed_smoother.invalidate();
 	}
 
@@ -452,7 +452,7 @@ AirDataComputer::compute_reynolds()
 		io.reynolds_number = (*io.air_density_static) * (*io.speed_tas) * travelled_length / (*io.dynamic_viscosity);
 	}
 	else
-		io.reynolds_number.set_nil();
+		io.reynolds_number = xf::nil;
 }
 
 

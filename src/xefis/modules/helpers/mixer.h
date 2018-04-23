@@ -126,7 +126,7 @@ template<class V>
 				output_value = sum;
 			}
 			else
-				output_value.set_nil();
+				output_value = xf::nil;
 		}
 	}
 

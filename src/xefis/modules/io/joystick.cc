@@ -55,7 +55,7 @@ JoystickInput::Button::handle (EventType event_type, HandlerID, int32_t value)
 void
 JoystickInput::Button::reset()
 {
-	_property.set_nil();
+	_property = xf::nil;
 }
 
 
@@ -143,7 +143,7 @@ JoystickInput::Axis::handle (EventType event_type, HandlerID handler_id, int32_t
 void
 JoystickInput::Axis::reset()
 {
-	_property.set_nil();
+	_property = xf::nil;
 }
 
 
@@ -361,9 +361,9 @@ JoystickInput::reset_properties()
 			handler->reset();
 
 	for (auto& button: _button_properties)
-		button->set_nil();
+		*button = xf::nil;
 
 	for (auto& axis: _axis_properties)
-		axis->set_nil();
+		*axis = xf::nil;
 }
 

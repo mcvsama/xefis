@@ -101,8 +101,8 @@ void
 BMP085::hw_reinitialize()
 {
 	io.serviceable = false;
-	io.temperature.set_nil();
-	io.pressure.set_nil();
+	io.temperature = xf::nil;
+	io.pressure = xf::nil;
 
 	_middle_of_request = false;
 	_request_other = false;

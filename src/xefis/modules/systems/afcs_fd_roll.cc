@@ -140,7 +140,7 @@ AFCS_FD_Roll::compute_roll()
 		io.roll = _output_roll_smoother (*roll, update_dt);
 	else
 	{
-		io.roll.set_nil();
+		io.roll = xf::nil;
 		_output_roll_smoother.reset();
 	}
 
