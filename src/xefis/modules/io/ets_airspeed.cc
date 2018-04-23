@@ -78,7 +78,7 @@ void
 ETSAirspeed::reinitialize()
 {
 	io.serviceable = false;
-	io.airspeed.set_nil();
+	io.airspeed = xf::nil;
 	_device.close();
 	// Wait for module hardware initialization and try to read values again.
 	// There's nothing else we can do.

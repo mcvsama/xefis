@@ -283,7 +283,7 @@ XBee::reset()
 	_output_buffer.clear();
 	_restart_timer->stop();
 	_after_reset_timer->stop();
-	io.receive.set_nil();
+	io.receive = xf::nil;
 }
 
 
@@ -376,7 +376,7 @@ XBee::continue_after_reset()
 void
 XBee::rssi_timeout()
 {
-	io.rssi.set_nil();
+	io.rssi = xf::nil;
 }
 
 

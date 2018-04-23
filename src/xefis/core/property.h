@@ -448,13 +448,6 @@ template<class pValue>
 		explicit
 		PropertyOut (ModuleIO* owner_and_data_source, std::string const& path);
 
-		using Property<Value>::operator=;
-		void
-		set_nil()
-		{
-			*this = xf::nil;
-		}
-
 		/**
 		 * Alias for Property::protected_set_nil().
 		 */

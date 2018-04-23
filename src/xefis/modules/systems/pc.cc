@@ -150,9 +150,9 @@ PerformanceComputer::compute_wind()
 	}
 	else
 	{
-		io.wind_from_true.set_nil();
-		io.wind_from_magnetic.set_nil();
-		io.wind_tas.set_nil();
+		io.wind_from_true = xf::nil;
+		io.wind_from_magnetic = xf::nil;
+		io.wind_tas = xf::nil;
 		_wind_direction_smoother.invalidate();
 		_wind_speed_smoother.invalidate();
 	}
@@ -189,10 +189,10 @@ PerformanceComputer::compute_glide_ratio()
 	}
 	else
 	{
-		io.glide_ratio.set_nil();
+		io.glide_ratio = xf::nil;
 
 		if (io.glide_ratio_string.connected())
-			io.glide_ratio_string.set_nil();
+			io.glide_ratio_string = xf::nil;
 	}
 }
 
@@ -228,13 +228,13 @@ PerformanceComputer::compute_total_energy_variometer()
 			if (*io.speed_ias > *io.tev_min_ias)
 				io.total_energy_variometer = _total_energy_variometer_smoother.value();
 			else
-				io.total_energy_variometer.set_nil();
+				io.total_energy_variometer = xf::nil;
 
 			_prev_total_energy = total_energy;
 		}
 		else
 		{
-			io.total_energy_variometer.set_nil();
+			io.total_energy_variometer = xf::nil;
 			_total_energy_variometer_smoother.invalidate();
 		}
 	}
@@ -255,7 +255,7 @@ PerformanceComputer::compute_speeds()
 	if (io.v_s_0_deg)
 		io.v_r = 1.15 * *io.v_s_0_deg;
 	else
-		io.v_r.set_nil();
+		io.v_r = xf::nil;
 
 	// V_a; since the formula is almost identical as for V_s, use V_s_0_deg:
 	if (_airframe && io.v_s_0_deg)
@@ -265,13 +265,13 @@ PerformanceComputer::compute_speeds()
 		io.v_a = std::sqrt (max_lf) * *io.v_s_0_deg;
 	}
 	else
-		io.v_a.set_nil();
+		io.v_a = xf::nil;
 
 	// V_REF for landing:
 	if (io.v_s_0_deg)
 		io.v_approach = 1.3 * *io.v_s_0_deg;
 	else
-		io.v_approach.set_nil();
+		io.v_approach = xf::nil;
 
 	// Rest:
 	compute_speeds_vbg();
@@ -329,13 +329,13 @@ PerformanceComputer::compute_speeds_vbg()
 			if (tas)
 				io.v_bg = tas_to_ias (*tas);
 			else
-				io.v_bg.set_nil();
+				io.v_bg = xf::nil;
 		}
 		else
-			io.v_bg.set_nil();
+			io.v_bg = xf::nil;
 	}
 	else
-		io.v_bg.set_nil();
+		io.v_bg = xf::nil;
 }
 
 
@@ -387,12 +387,12 @@ PerformanceComputer::compute_critical_aoa()
 		if (io.aoa_alpha)
 			io.stall = *io.aoa_alpha >= *io.critical_aoa;
 		else
-			io.stall.set_nil();
+			io.stall = xf::nil;
 	}
 	else
 	{
-		io.critical_aoa.set_nil();
-		io.stall.set_nil();
+		io.critical_aoa = xf::nil;
+		io.stall = xf::nil;
 	}
 }
 
@@ -418,7 +418,7 @@ PerformanceComputer::compute_C_L()
 	}
 	else
 	{
-		io.lift_coefficient.set_nil();
+		io.lift_coefficient = xf::nil;
 		_cl_smoother.invalidate();
 	}
 }
@@ -452,7 +452,7 @@ PerformanceComputer::compute_estimations()
 			io.estimated_ias = tas_to_ias (tas);
 		}
 		else
-			io.estimated_ias.set_nil();
+			io.estimated_ias = xf::nil;
 
 		// Estimate AOA:
 		if (io.speed_tas)
@@ -462,23 +462,23 @@ PerformanceComputer::compute_estimations()
 			io.estimated_aoa = _airframe->get_aoa_in_normal_regime (cl, flaps_angle, spoilers_angle);
 		}
 		else
-			io.estimated_aoa.set_nil();
+			io.estimated_aoa = xf::nil;
 
 		// Compute errors:
 		if (io.speed_ias && io.estimated_ias)
 			io.estimated_ias_error = *io.estimated_ias - *io.speed_ias;
 		else
-			io.estimated_ias_error.set_nil();
+			io.estimated_ias_error = xf::nil;
 
 		if (io.aoa_alpha && io.estimated_aoa)
 			io.estimated_aoa_error = *io.estimated_aoa - *io.aoa_alpha;
 		else
-			io.estimated_aoa_error.set_nil();
+			io.estimated_aoa_error = xf::nil;
 	}
 	else
 	{
-		io.estimated_ias.set_nil();
-		io.estimated_aoa.set_nil();
+		io.estimated_ias = xf::nil;
+		io.estimated_aoa = xf::nil;
 	}
 }
 
@@ -489,7 +489,7 @@ PerformanceComputer::compute_slip_skid()
 	if (io.y_acceleration && io.z_acceleration)
 		io.slip_skid = si::atan2 (*io.y_acceleration, -*io.z_acceleration);
 	else
-		io.slip_skid.set_nil();
+		io.slip_skid = xf::nil;
 }
 
 

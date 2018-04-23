@@ -324,18 +324,18 @@ void
 CHRUM6::reset()
 {
 	io.serviceable = false;
-	io.orientation_pitch.set_nil();
-	io.orientation_roll.set_nil();
-	io.orientation_heading_magnetic.set_nil();
-	io.acceleration_x.set_nil();
-	io.acceleration_y.set_nil();
-	io.acceleration_z.set_nil();
-	io.rotation_x.set_nil();
-	io.rotation_y.set_nil();
-	io.rotation_z.set_nil();
-	io.magnetic_x.set_nil();
-	io.magnetic_y.set_nil();
-	io.magnetic_z.set_nil();
+	io.orientation_pitch = xf::nil;
+	io.orientation_roll = xf::nil;
+	io.orientation_heading_magnetic = xf::nil;
+	io.acceleration_x = xf::nil;
+	io.acceleration_y = xf::nil;
+	io.acceleration_z = xf::nil;
+	io.rotation_x = xf::nil;
+	io.rotation_y = xf::nil;
+	io.rotation_z = xf::nil;
+	io.magnetic_x = xf::nil;
+	io.magnetic_y = xf::nil;
+	io.magnetic_z = xf::nil;
 
 	_stage = Stage::Initialize;
 }

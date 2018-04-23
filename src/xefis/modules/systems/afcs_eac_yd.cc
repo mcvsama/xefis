@@ -60,7 +60,7 @@ AFCS_EAC_YD::compute()
 		if (io.slip_skid)
 			io.rudder_deflection = _rudder_pid (0.0_N, *io.slip_skid, dt);
 		else
-			io.rudder_deflection.set_nil();
+			io.rudder_deflection = xf::nil;
 	}
 	else
 		io.rudder_deflection = 0.0_deg;

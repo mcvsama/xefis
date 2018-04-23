@@ -81,8 +81,8 @@ VOR::compute()
 	}
 	else
 	{
-		io.output_deviation.set_nil();
-		io.output_to_flag.set_nil();
+		io.output_deviation = xf::nil;
+		io.output_to_flag = xf::nil;
 	}
 }
 

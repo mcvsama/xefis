@@ -165,7 +165,7 @@ AFCS_FD_Pitch::compute_pitch()
 		io.pitch = _output_pitch_smoother (*pitch, update_dt);
 	else
 	{
-		io.pitch.set_nil();
+		io.pitch = xf::nil;
 		_output_pitch_smoother.reset();
 	}
 

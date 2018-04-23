@@ -65,7 +65,7 @@ AltAcq::process (xf::Cycle const& cycle)
 		}
 	}
 	else
-		io.altitude_acquire_flag.set_nil();
+		io.altitude_acquire_flag = xf::nil;
 }
 
 
@@ -85,11 +85,11 @@ AltAcq::compute_altitude_acquire_distance()
 		if (!io.minimum_altitude_difference || abs (alt_diff) >= *io.minimum_altitude_difference)
 			io.altitude_acquire_distance = _output_smoother (distance, update_dt);
 		else
-			io.altitude_acquire_distance.set_nil();
+			io.altitude_acquire_distance = xf::nil;
 	}
 	else
 	{
-		io.altitude_acquire_distance.set_nil();
+		io.altitude_acquire_distance = xf::nil;
 		_output_smoother.invalidate();
 	}
 }

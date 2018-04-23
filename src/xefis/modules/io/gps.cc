@@ -196,7 +196,7 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGGA const& sentence)
 	if (sentence.fix_quality)
 		_gps_module.io.fix_quality = to_string (*sentence.fix_quality);
 	else
-		_gps_module.io.fix_quality.set_nil();
+		_gps_module.io.fix_quality = xf::nil;
 
 	_gps_module.io.tracked_satellites = sentence.tracked_satellites;
 	_gps_module.io.altitude_amsl = sentence.altitude_amsl;
@@ -226,11 +226,11 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
 				break;
 
 			default:
-				_gps_module.io.fix_mode.set_nil();
+				_gps_module.io.fix_mode = xf::nil;
 		}
 	}
 	else
-		_gps_module.io.fix_mode.set_nil();
+		_gps_module.io.fix_mode = xf::nil;
 
 	_gps_module.io.pdop = sentence.pdop;
 	_gps_module.io.vdop = sentence.vdop;
@@ -239,17 +239,17 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPGSA const& sentence)
 	if (sentence.hdop)
 		_gps_module.io.lateral_stddev = *_gps_module.io.receiver_accuracy * *sentence.hdop;
 	else
-		_gps_module.io.lateral_stddev.set_nil();
+		_gps_module.io.lateral_stddev = xf::nil;
 
 	if (sentence.vdop)
 		_gps_module.io.vertical_stddev = *_gps_module.io.receiver_accuracy * *sentence.vdop;
 	else
-		_gps_module.io.vertical_stddev.set_nil();
+		_gps_module.io.vertical_stddev = xf::nil;
 
 	if (sentence.hdop && sentence.vdop)
 		_gps_module.io.position_stddev = *_gps_module.io.receiver_accuracy * std::max (*sentence.hdop, *sentence.vdop);
 	else
-		_gps_module.io.position_stddev.set_nil();
+		_gps_module.io.position_stddev = xf::nil;
 }
 
 
@@ -273,7 +273,7 @@ GPS::Connection::process_nmea_sentence (xf::nmea::GPRMC const& sentence)
 	if (sentence.fix_date && sentence.fix_time)
 		_gps_module.io.fix_gps_timestamp = to_unix_time (*sentence.fix_date, *sentence.fix_time);
 	else
-		_gps_module.io.fix_gps_timestamp.set_nil();
+		_gps_module.io.fix_gps_timestamp = xf::nil;
 
 	if (sentence.receiver_status == xf::nmea::GPSReceiverStatus::Active)
 		if (_gps_module._reliable_fix_quality)
@@ -552,25 +552,25 @@ GPS::request_power_cycle()
 void
 GPS::reset_data_properties()
 {
-	io.fix_quality.set_nil();
-	io.fix_mode.set_nil();
-	io.latitude.set_nil();
-	io.longitude.set_nil();
-	io.altitude_amsl.set_nil();
-	io.geoid_height.set_nil();
-	io.ground_speed.set_nil();
-	io.track_true.set_nil();
-	io.tracked_satellites.set_nil();
-	io.magnetic_declination.set_nil();
-	io.hdop.set_nil();
-	io.vdop.set_nil();
-	io.pdop.set_nil();
-	io.lateral_stddev.set_nil();
-	io.vertical_stddev.set_nil();
-	io.position_stddev.set_nil();
-	io.dgps_station_id.set_nil();
-	io.fix_system_timestamp.set_nil();
-	io.fix_gps_timestamp.set_nil();
+	io.fix_quality = xf::nil;
+	io.fix_mode = xf::nil;
+	io.latitude = xf::nil;
+	io.longitude = xf::nil;
+	io.altitude_amsl = xf::nil;
+	io.geoid_height = xf::nil;
+	io.ground_speed = xf::nil;
+	io.track_true = xf::nil;
+	io.tracked_satellites = xf::nil;
+	io.magnetic_declination = xf::nil;
+	io.hdop = xf::nil;
+	io.vdop = xf::nil;
+	io.pdop = xf::nil;
+	io.lateral_stddev = xf::nil;
+	io.vertical_stddev = xf::nil;
+	io.position_stddev = xf::nil;
+	io.dgps_station_id = xf::nil;
+	io.fix_system_timestamp = xf::nil;
+	io.fix_gps_timestamp = xf::nil;
 }
 
 

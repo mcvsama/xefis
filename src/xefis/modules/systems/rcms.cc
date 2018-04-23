@@ -124,10 +124,10 @@ RemoteControlManagementSystem::compute_distances_to_home()
 	}
 	else
 	{
-		io.distance_vlos.set_nil();
-		io.distance_ground.set_nil();
-		io.distance_vertical.set_nil();
-		io.true_home_direction.set_nil();
+		io.distance_vlos = xf::nil;
+		io.distance_ground = xf::nil;
+		io.distance_vertical = xf::nil;
+		io.true_home_direction = xf::nil;
 	}
 }
 

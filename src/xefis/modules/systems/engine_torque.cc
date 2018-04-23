@@ -43,7 +43,7 @@ EngineTorque::compute_torque (double motor_efficiency)
 	if (io.engine_current)
 		io.engine_torque = motor_efficiency * *io.engine_current / *io.motor_kv;
 	else
-		io.engine_torque.set_nil();
+		io.engine_torque = xf::nil;
 }
 
 
@@ -55,6 +55,6 @@ EngineTorque::compute_torque (EfficiencyDatatable const& motor_efficiency)
 	if (io.engine_speed && (efficiency = motor_efficiency.value (*io.engine_speed)))
 		compute_torque (*efficiency);
 	else
-		io.engine_torque.set_nil();
+		io.engine_torque = xf::nil;
 }
 
