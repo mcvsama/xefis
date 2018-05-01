@@ -67,10 +67,10 @@ BasicModule::rescue (std::exception_ptr)
 {
 	// TODO log the exception
 
-	// TODO the following needs to be OPT-IN!
 	// Set all output properties to nil.
-	for (auto* property: _io->_registered_output_properties)
-		*property = xf::nil;
+	if (_set_nil_on_exception)
+		for (auto* property: _io->_registered_output_properties)
+			*property = xf::nil;
 }
 
 

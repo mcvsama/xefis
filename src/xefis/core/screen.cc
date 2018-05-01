@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <algorithm>
 
 // Qt:
 #include <QTimer>
@@ -33,7 +34,9 @@
 namespace xf {
 
 Screen::Screen (QRect rect, si::Frequency refresh_rate):
-	QWidget (nullptr)
+	QWidget (nullptr),
+	Registry ([&](typename Registry::Disclosure& disclosure) { instrument_registered (disclosure); },
+			  [&](typename Registry::Disclosure& disclosure) { instrument_unregistered (disclosure); })
 {
 	update_canvas (size());
 	move (rect.topLeft());
@@ -74,6 +77,20 @@ Screen::set (BasicInstrument const& instrument, QRect rect)
 
 
 void
+Screen::set_z_index (BasicInstrument const& instrument, int new_z_index)
+{
+	auto found = std::find_if (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
+							   [&instrument](auto const* disclosure) { return &disclosure->registrant() == &instrument; });
+
+	if (found != _z_index_sorted_disclosures.end())
+	{
+		(*found)->details().z_index = new_z_index;
+		sort_by_z_index();
+	}
+}
+
+
+void
 Screen::paintEvent (QPaintEvent* paint_event)
 {
 	QPainter painter (this);
@@ -108,10 +125,10 @@ Screen::paint_instruments_to_buffer()
 	_canvas.fill (Qt::black);
 
 	// Ask instruments to paint themselves:
-	for (auto& disclosure: *this)
+	for (auto* disclosure: _z_index_sorted_disclosures)
 	{
-		auto& instrument = disclosure.registrant();
-		auto& details = disclosure.details();
+		auto& instrument = disclosure->registrant();
+		auto& details = disclosure->details();
 
 		if (details.rect.isValid())
 		{
@@ -132,10 +149,10 @@ Screen::paint_instruments_to_buffer()
 	{
 		QPainter canvas_painter (&_canvas);
 
-		for (auto& disclosure: *this)
+		for (auto* disclosure: _z_index_sorted_disclosures)
 		{
-			auto& instrument = disclosure.registrant();
-			auto const& details = disclosure.details();
+			auto& instrument = disclosure->registrant();
+			auto const& details = disclosure->details();
 
 			if (details.rect.isValid() && instrument.dirty_since_last_check())
 				canvas_painter.drawImage (details.rect, details.canvas, QRect (QPoint (0, 0), details.rect.size()));
@@ -163,6 +180,30 @@ Screen::allocate_image (QSize size) const
 	image.fill (Qt::transparent);
 
 	return image;
+}
+
+
+void
+Screen::instrument_registered (typename Registry::Disclosure& disclosure)
+{
+	_z_index_sorted_disclosures.push_back (&disclosure);
+	sort_by_z_index();
+}
+
+
+void
+Screen::instrument_unregistered (typename Registry::Disclosure& disclosure)
+{
+	auto new_end = std::remove (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(), &disclosure);
+	_z_index_sorted_disclosures.resize (new_end - _z_index_sorted_disclosures.begin());
+}
+
+
+void
+Screen::sort_by_z_index()
+{
+	std::stable_sort (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
+					  [](auto const* a, auto const* b) { return a->details().z_index < b->details().z_index; });
 }
 
 

@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <vector>
 
 // Qt:
 #include <QSize>
@@ -43,6 +44,7 @@ class Details
   public:
 	QRect	rect;
 	QImage	canvas;
+	int		z_index	{ 0 };
 };
 
 } // namespace detail
@@ -79,9 +81,15 @@ class Screen:
 	set (BasicInstrument const&, QRect);
 
 	/**
+	 * Set z-index for an instrument
+	 */
+	void
+	set_z_index (BasicInstrument const&, int z_index);
+
+	/**
 	 * Return pixel density for this screen.
 	 */
-	PixelDensity
+	si::PixelDensity
 	pixel_density() const;
 
   protected:
@@ -125,6 +133,9 @@ class Screen:
 	void
 	instrument_unregistered (typename Registry::Disclosure&);
 
+	void
+	sort_by_z_index();
+
   private slots:
 	/**
 	 * Called when next frame should be painted.
@@ -133,12 +144,13 @@ class Screen:
 	refresh();
 
   private:
-	QTimer*	_refresh_timer;
-	QImage	_canvas;
+	QTimer*						_refresh_timer;
+	QImage						_canvas;
+	std::vector<Disclosure*>	_z_index_sorted_disclosures;
 };
 
 
-inline PixelDensity
+inline si::PixelDensity
 Screen::pixel_density() const
 {
 	return logicalDpiY() / 1_in;

@@ -56,13 +56,25 @@ template<class pRegistrant, class pDetails = std::monostate>
 			{ }
 
 			Registrant&
-			registrant() const
+			registrant() noexcept
+			{
+				return _registrant;
+			}
+
+			Registrant const&
+			registrant() const noexcept
 			{
 				return _registrant;
 			}
 
 			Details&
-			details()
+			details() noexcept
+			{
+				return _details;
+			}
+
+			Details const&
+			details() const noexcept
 			{
 				return _details;
 			}
