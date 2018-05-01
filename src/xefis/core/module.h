@@ -147,9 +147,19 @@ class BasicModule: private Noncopyable
 	Logger const&
 	log() const;
 
+	/**
+	 * Enable/disable option to set all output properties to xf::nil when
+	 * exception occurs within the process(Cycle) method.
+	 *
+	 * By default it's enabled.
+	 */
+	void
+	set_nil_on_exception (bool enable) noexcept;
+
   private:
 	std::string						_instance;
-	bool							_cached = false;
+	bool							_cached					{ false };
+	bool							_set_nil_on_exception	{ true };
 	std::optional<Logger> mutable	_logger;
 	std::unique_ptr<ModuleIO>		_io;
 };
@@ -217,6 +227,13 @@ BasicModule::log() const
 	}
 
 	return *_logger;
+}
+
+
+inline void
+BasicModule::set_nil_on_exception (bool enable) noexcept
+{
+	_set_nil_on_exception = enable;
 }
 
 
