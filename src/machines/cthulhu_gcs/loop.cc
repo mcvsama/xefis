@@ -73,12 +73,12 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	adc_io->ias_valid_minimum = 30_kt;
 	adc_io->ias_valid_maximum = 900_kt;
 
-	this->joystick_input = load_module<WarthogStick> (std::move (joystick_io), joystick_config, "stick");
-	this->throttle_input = load_module<JoystickInput> (std::move (throttle_io), throttle_config, "throttle");
-	this->pedals_input = load_module<JoystickInput> (std::move (pedals_io), pedals_config, "pedals");
+	this->joystick_input = load_module<WarthogStick> (std::move (joystick_io), joystick_config, _logger, "stick");
+	this->throttle_input = load_module<JoystickInput> (std::move (throttle_io), throttle_config, _logger, "throttle");
+	this->pedals_input = load_module<JoystickInput> (std::move (pedals_io), pedals_config, _logger, "pedals");
 
-	this->link_tx = load_module<Link> (std::move (link_io_tx), std::move (link_protocol_tx), "link-tx");
-	this->link_rx = load_module<Link> (std::move (link_io_rx), std::move (link_protocol_rx), "link-rx");
+	this->link_tx = load_module<Link> (std::move (link_io_tx), std::move (link_protocol_tx), _logger, "link-tx");
+	this->link_rx = load_module<Link> (std::move (link_io_rx), std::move (link_protocol_rx), _logger, "link-rx");
 
 #if 0
 	this->adc = load_module<AirDataComputer> (std::move (adc_io), _airframe.get());
@@ -121,14 +121,85 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	//this->horizontal_trim->show();
 #endif
 
-	_pfd_screen = std::make_unique<xf::Screen> (QRect (0, 0, 100, 100), 10_Hz);
+	_pfd_screen = std::make_unique<xf::Screen> (QRect (0, 0, 400, 400), 10_Hz);
 
 	auto some_label_io = std::make_unique<LabelIO>();
-	some_label_io->label = "Some text";
+	some_label_io->label = "Nergal i Hela";
+	some_label_io->font_scale = 1.0;
+	some_label_io->color = Qt::white;
+
+	auto gear_io = std::make_unique<GearIO>();
+	gear_io->requested_down << xf::ConstantSource (true);
+	gear_io->nose_up << xf::ConstantSource (false);
+	gear_io->nose_down << xf::ConstantSource (true);
+	gear_io->left_up << xf::ConstantSource (false);
+	gear_io->left_down << xf::ConstantSource (true);
+	gear_io->right_up << xf::ConstantSource (false);
+	gear_io->right_down << xf::ConstantSource (true);
+
+	// TODO wsparcie do rejestracji instrumentów tak, żeby nie trzeba było osobno trzymać RegistrationProof: patrz src/__registration__.cc
+	// TODO wrapper na Instrumenty, który ma w środku Instrument oraz RegistrationProof i przeciążony operator->(). Tak że w przypadku skasowania
+	// najpierw będzie skasowany RegistrationProof, a potem Instrument. NO CHYBA ŻE NIE OWNUJEMY INSTRUMENTU… :(
+	// Przykładowy kod do tego:
+	//struct Instrument
+	//{
+	//	void register_in (xf::Registry<Instrument, int> registry)
+	//	{
+	//		_proof = registry.register_object (*this, 25);
+	//	}
+	//
+	//	void f()
+	//	{
+	//		std::cout << "Instrument[" << this << "]::f()\n";
+	//	}
+	//
+	//	xf::RegistrationProof<Instrument, int> _proof;
+	//};
+	//
+	//
+	//struct Screen
+	//{
+	//	xf::Registry<Instrument, int> _registry;
+	//
+	//	void
+	//	register_instrument (Instrument& instrument)
+	//	{
+	//		instrument.register_in (_registry);
+	//	}
+	//
+	//	void
+	//	sweep()
+	//	{
+	//		for (auto& instrument: _registry)
+	//			instrument.f();
+	//	}
+	//};
+	//
+	//
+	//int main()
+	//{
+	//	auto s1 = std::make_unique<Screen>();
+	//
+	//	Instrument i1, i2, i3, i4, i5;
+	//
+	//	s1->register_instrument (i1);
+	//	s1->register_instrument (i2);
+	//	s1->register_instrument (i3);
+	//	s1->register_instrument (i4);
+	//	s1->register_instrument (i5);
+	//
+	//	s1->sweep();
+	//
+	//	return 0;
+	//}
 
 	this->some_label = load_module<Label> (std::move (some_label_io), "some label");
-	this->some_label_registration_proof = _pfd_screen->register_object (*this->some_label);
-	_pfd_screen->set (*this->some_label, QRect (0, 0, 50, 50));
+	this->some_label_registration_proof = _pfd_screen->register_instrument (*this->some_label);
+	_pfd_screen->set (*this->some_label, QRect (0, 0, 100, 200));
+
+	this->gear = load_module<Gear> (std::move (gear_io), "gear");
+	this->gear_registration_proof = _pfd_screen->register_instrument (*this->gear);
+	_pfd_screen->set (*this->gear, QRect (100, 0, 500, 500));
 
 	start();
 }

@@ -24,6 +24,7 @@
 #include <xefis/core/screen.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/instruments/label.h>
+#include <xefis/modules/instruments/gear.h>
 #if 0
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/hsi.h>
@@ -34,6 +35,7 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
+#include <xefis/utility/logger.h>
 
 // Cthulhu:
 #include <machines/cthulhu_shared/link_io.h>
@@ -73,6 +75,8 @@ class Loop: public xf::ProcessingLoop
 
 	Label*							some_label;
 	xf::Screen::RegistrationProof	some_label_registration_proof;
+	Gear*							gear;
+	xf::Screen::RegistrationProof	gear_registration_proof;
 
 #if 0
 	/*
@@ -90,6 +94,7 @@ class Loop: public xf::ProcessingLoop
 	Loop (xf::Machine*, xf::Xefis*);
 
   private:
+	xf::Logger							_logger { std::clog };
 	std::unique_ptr<xf::NavaidStorage>	_navaid_storage;
 	std::unique_ptr<xf::Airframe>		_airframe;
 	std::unique_ptr<xf::WorkPerformer>	_work_performer;
