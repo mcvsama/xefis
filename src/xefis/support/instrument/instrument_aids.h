@@ -105,13 +105,13 @@ class InstrumentAids
 	height() const;
 
 	/**
-	 * Return number of pixels for given Length and DPI.
+	 * Return number of pixels for given Length and current pixel density.
 	 */
 	float
 	pixels (si::Length);
 
 	/**
-	 * Return number of pixels for given Length and DPI.
+	 * Return number of pixels for given Length given pixel density.
 	 */
 	static float
 	pixels (si::Length, si::PixelDensity);
@@ -125,7 +125,7 @@ class InstrumentAids
 	/**
 	 * Return font modified to have given height.
 	 */
-	QFont
+	static QFont
 	resized (QFont const& font, si::Length height, si::PixelDensity);
 
 	/**
@@ -159,14 +159,14 @@ class InstrumentAids
 	PaintRequest::Metric			_canvas_metric;
 
   public:
-	FontInfo	font_0;
-	FontInfo	font_1;
-	FontInfo	font_2;
-	FontInfo	font_3;
-	FontInfo	font_4;
-	FontInfo	font_5;
-	QPen		autopilot_pen_1;
-	QPen		autopilot_pen_2;
+	FontInfo const	font_0;
+	FontInfo const	font_1;
+	FontInfo const	font_2;
+	FontInfo const	font_3;
+	FontInfo const	font_4;
+	FontInfo const	font_5;
+	QPen const		autopilot_pen_1;
+	QPen const		autopilot_pen_2;
 };
 
 
