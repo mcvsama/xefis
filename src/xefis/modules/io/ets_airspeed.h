@@ -28,6 +28,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/bus/i2c.h>
+#include <xefis/utility/logger.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -66,6 +67,7 @@ class ETSAirspeed:
 	Q_OBJECT
 
   private:
+	static constexpr char			kLoggerPrefix[]				= "mod::ETSAirspeed";
 	static constexpr uint8_t		kValueRegister				= 0xea;
 	static constexpr float			kValueScale					= 1.8f;
 	static constexpr si::Time		kInitializationDelay		= 0.2_s;
@@ -81,7 +83,7 @@ class ETSAirspeed:
   public:
 	// Ctor
 	explicit
-	ETSAirspeed (std::unique_ptr<ETSAirspeedIO>, xf::i2c::Device&&, std::string const& instance = {});
+	ETSAirspeed (std::unique_ptr<ETSAirspeedIO>, xf::i2c::Device&&, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Module API
 	void
@@ -122,6 +124,7 @@ class ETSAirspeed:
 	guard (std::function<void()> guarded_code);
 
   private:
+	xf::Logger					_logger;
 	xf::i2c::Device				_device;
 	Stage						_stage							{ Stage::Calibrating };
 	QTimer*						_device_initialization_timer;

@@ -444,6 +444,7 @@ XEFIS_SOURCES			+= xefis/utility/backtrace.cc
 #XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc
+XEFIS_SOURCES			+= xefis/utility/logger.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
 #XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
@@ -452,6 +453,7 @@ XEFIS_SOURCES			+= xefis/utility/thread.cc
 
 SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
+SELFTEST_SOURCES		+= xefis/utility/logger.cc
 
 ################
 

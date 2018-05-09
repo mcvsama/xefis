@@ -23,6 +23,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/xefis.h>
+#include <xefis/utility/logger.h>
 
 
 class Latency:
@@ -31,10 +32,13 @@ class Latency:
 {
 	Q_OBJECT
 
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::Latency";
+
   public:
 	// Ctor
 	explicit
-	Latency (xf::Accounting&, std::string const& instance = {});
+	Latency (xf::Accounting&, xf::Logger const& parent_logger, std::string const& instance = {});
 
   private slots:
 	/**
@@ -44,6 +48,7 @@ class Latency:
 	log_latency();
 
   private:
+	xf::Logger		_logger;
 	xf::Accounting&	_accounting;
 	QTimer*			_log_timer;
 };

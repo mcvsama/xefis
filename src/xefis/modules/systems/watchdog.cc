@@ -26,21 +26,24 @@
 #include "watchdog.h"
 
 
-Watchdog::Watchdog (xf::Xefis* xefis, std::string const& instance):
-	Module (instance)
+Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& parent_logger, std::string const& instance):
+	Module (instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	std::optional<int> watchdog_write_fd = xefis->options().watchdog_write_fd();
 	std::optional<int> watchdog_read_fd = xefis->options().watchdog_read_fd();
 
 	if (!watchdog_write_fd || *watchdog_write_fd < 3)
 	{
-		log() << "Warning: watchdog disabled: invalid watchdog-write file descriptor." << std::endl;
+		_logger << "Warning: watchdog disabled: invalid watchdog-write file descriptor." << std::endl;
 		return;
 	}
 
 	if (!watchdog_read_fd || *watchdog_read_fd < 3)
 	{
-		log() << "Warning: watchdog disabled: invalid watchdog-read file descriptor." << std::endl;
+		_logger << "Warning: watchdog disabled: invalid watchdog-read file descriptor." << std::endl;
 		return;
 	}
 

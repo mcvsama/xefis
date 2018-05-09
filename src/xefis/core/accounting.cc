@@ -86,7 +86,8 @@ Accounting::Stats::average() const noexcept
 }
 
 
-Accounting::Accounting()
+Accounting::Accounting (std::ostream& logger_stream):
+	_logger (logger_stream)
 {
 	_logger.set_prefix ("<accounting>");
 	_logger << "Creating Accounting" << std::endl;

@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <vector>
 #include <functional>
@@ -41,6 +42,9 @@ class SerialPort:
 	private Noncopyable
 {
 	Q_OBJECT
+
+  private:
+	static constexpr char kLoggerPrefix[] = "xf::SerialPort";
 
   public:
 	// Parity bit:
@@ -194,7 +198,7 @@ class SerialPort:
 	 * Set logger.
 	 */
 	void
-	set_logger (Logger const& logger);
+	set_parent_logger (Logger const& logger);
 
 	/**
 	 * Set number of read failures at which
@@ -317,12 +321,6 @@ class SerialPort:
 	set_device_options();
 
 	/**
-	 * Return logger object.
-	 */
-	Logger const&
-	log() const;
-
-	/**
 	 * Return prefix for logger messages.
 	 */
 	std::string
@@ -330,8 +328,7 @@ class SerialPort:
 
   private:
 	xf::OwnerToken			_owned;
-	Logger const*			_logger						= nullptr;
-	Logger					_internal_logger;
+	Logger					_logger						{ std::clog };
 	Configuration			_configuration;
 	DataReadyCallback		_data_ready;
 	FailureCallback			_failure;
@@ -339,10 +336,10 @@ class SerialPort:
 	int						_device;
 	bool					_good;
 	std::string				_error;
-	unsigned int			_read_failure_count			= 0;
-	unsigned int			_max_read_failure_count		= 0;
-	unsigned int			_write_failure_count		= 0;
-	unsigned int			_max_write_failure_count	= 0;
+	unsigned int			_read_failure_count			{ 0 };
+	unsigned int			_max_read_failure_count		{ 0 };
+	unsigned int			_write_failure_count		{ 0 };
+	unsigned int			_max_write_failure_count	{ 0 };
 	Blob					_input_buffer;				// Data from the device.
 	Blob					_output_buffer;				// Data to to sent to the device.
 };
@@ -447,9 +444,10 @@ SerialPort::configuration() const noexcept
 
 
 inline void
-SerialPort::set_logger (Logger const& logger)
+SerialPort::set_parent_logger (Logger const& logger)
 {
-	_logger = &logger;
+	_logger = xf::Logger (xf::Logger::Parent (logger));
+	_logger.set_prefix (kLoggerPrefix);
 }
 
 
@@ -478,13 +476,6 @@ inline bool
 SerialPort::flushed() const noexcept
 {
 	return _output_buffer.empty();
-}
-
-
-inline Logger const&
-SerialPort::log() const
-{
-	return *_logger;
 }
 
 } // namespace xf

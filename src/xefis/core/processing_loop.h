@@ -26,13 +26,11 @@
 #include <xefis/utility/time.h>
 
 
-namespace xf { // XXX
-	class Xefis;
-}
-
 namespace xf {
 
 class Machine;
+class Xefis;
+class Logger;
 
 
 /**
@@ -42,9 +40,30 @@ class ProcessingLoop: public QObject
 {
 	Q_OBJECT
 
+	class ModuleDetails
+	{
+	  public:
+		// Ctor
+		explicit
+		ModuleDetails (Unique<BasicModule>);
+
+		BasicModule&
+		module() noexcept;
+
+		BasicModule const&
+		module() const noexcept;
+
+	  public:
+		// TODO more time accounting
+		si::Time			last_processing_time	{ 0_ms };
+
+	  private:
+		Unique<BasicModule>	_module;
+	};
+
   public:
-	xf::PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
-	xf::PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
+	PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
+	PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
 
   public:
 	// Ctor
@@ -88,6 +107,13 @@ class ProcessingLoop: public QObject
 	void
 	stop();
 
+	/**
+	 * Return current processing cycle, if called during a processing cycle.
+	 * Otherwise return empty std::optional.
+	 */
+	Cycle const*
+	current_cycle() const;
+
   protected:
 	/**
 	 * Execute single loop cycle.
@@ -96,13 +122,16 @@ class ProcessingLoop: public QObject
 	execute_cycle();
 
   private:
-	Machine*								_machine;
-	Xefis*									_xefis;
-	QTimer*									_loop_timer;
-	Time									_loop_period			= 0.01_s;
-	std::optional<Timestamp>				_previous_timestamp;
-	std::vector<Unique<xf::BasicModule>>	_modules;
-	std::vector<BasicModule*>				_uninitialized_modules;
+	Machine*					_machine;
+	Xefis*						_xefis;
+	QTimer*						_loop_timer;
+	Time						_loop_period		{ 10_ms };
+	std::unique_ptr<Logger>		_logger;
+	std::optional<Timestamp>	_previous_timestamp;
+	std::vector<ModuleDetails>	_modules;
+	std::vector<BasicModule*>	_uninitialized_modules;
+	std::optional<Cycle>		_current_cycle;
+	uint64_t					_next_cycle_number	{ 0 };
 };
 
 
@@ -113,11 +142,31 @@ template<class pModule, class ...Arg>
 		auto module = std::make_unique<pModule> (std::forward<Arg> (args)...);
 		auto module_raw_ptr = module.get();
 
-		_modules.push_back (std::move (module));
+		_modules.push_back (ModuleDetails (std::move (module)));
 		_uninitialized_modules.push_back (module_raw_ptr);
 
 		return module_raw_ptr;
 	}
+
+
+inline
+ProcessingLoop::ModuleDetails::ModuleDetails (Unique<BasicModule> module):
+	_module (std::move (module))
+{ }
+
+
+inline BasicModule&
+ProcessingLoop::ModuleDetails::module() noexcept
+{
+	return *_module.get();
+}
+
+
+inline BasicModule const&
+ProcessingLoop::ModuleDetails::module() const noexcept
+{
+	return *_module.get();
+}
 
 
 inline Machine*
@@ -131,6 +180,15 @@ inline Xefis*
 ProcessingLoop::xefis() const noexcept
 {
 	return _xefis;
+}
+
+
+inline Cycle const*
+ProcessingLoop::current_cycle() const
+{
+	return _current_cycle
+		? &_current_cycle.value()
+		: nullptr;
 }
 
 } // namespace xf

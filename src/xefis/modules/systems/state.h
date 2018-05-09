@@ -28,6 +28,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 
 
 class State;
@@ -69,10 +70,13 @@ class StateIO: public xf::ModuleIO
 
 class State: public xf::Module<StateIO>
 {
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::State";
+
   public:
 	// Ctor
 	explicit
-	State (std::unique_ptr<StateIO>, std::string const& instance = {});
+	State (std::unique_ptr<StateIO>, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Dtor
 	~State();
@@ -103,8 +107,9 @@ class State: public xf::Module<StateIO>
 	do_save_state (QString content, QString file_name);
 
   private:
-	Unique<QTimer>							_save_delay_timer;
-	std::future<void>						_save_future;
+	xf::Logger			_logger;
+	Unique<QTimer>		_save_delay_timer;
+	std::future<void>	_save_future;
 };
 
 #endif

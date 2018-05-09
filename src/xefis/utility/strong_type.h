@@ -54,10 +54,11 @@ template<class Value, class DistinguisherType>
 		{ }
 
 		// Ctor
-		explicit constexpr
-		StrongType (Value&& value):
-			_value (std::move (value))
-		{ }
+		template<class = std::enable_if_t<!std::is_reference_v<Value>>>
+			explicit constexpr
+			StrongType (Value&& value):
+				_value (std::move (value))
+			{ }
 
 		constexpr Value
 		operator*() const

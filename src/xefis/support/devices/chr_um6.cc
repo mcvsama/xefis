@@ -104,10 +104,12 @@ CHRUM6::CHRUM6 (SerialPort* serial_port):
 
 
 void
-CHRUM6::set_logger (Logger const& logger)
+CHRUM6::set_parent_logger (Logger const& logger)
 {
-	_logger = logger;
-	_serial_port->set_logger (logger);
+	_logger = xf::Logger (xf::Logger::Parent (logger));
+	_logger.set_prefix (kLoggerPrefix);
+
+	_serial_port->set_parent_logger (_logger);
 }
 
 

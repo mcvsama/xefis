@@ -30,6 +30,7 @@
 #include <xefis/core/system.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/protocols/nmea/parser.h>
+#include <xefis/utility/logger.h>
 
 
 class GPS_IO: public xf::ModuleIO
@@ -91,6 +92,7 @@ class GPS:
 	Q_OBJECT
 
   private:
+	static constexpr char			kLoggerPrefix[]						= "mod::GPS";
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
 	static constexpr Time			kPowerRestartDelay					= 1_s;
 	static constexpr Time			kAliveCheckInterval					= 2_s;
@@ -293,7 +295,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, std::string const& instance = {});
+	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Dtor
 	~GPS();
@@ -338,17 +340,28 @@ class GPS:
 	void
 	update_clock (xf::nmea::GPSDate const&, xf::nmea::GPSTimeOfDay const&);
 
+	xf::Logger&
+	logger();
+
   private:
+	xf::Logger						_logger;
 	xf::System*						_system;
 	Unique<PowerCycle>				_power_cycle;
 	// Used to wait a bit after a failure:
 	Unique<QTimer>					_power_cycle_timer;
-	bool							_power_cycle_requested		= false;
-	bool							_reliable_fix_quality		= false;
-	unsigned int					_power_cycle_attempts		= 0;
+	bool							_power_cycle_requested		{ false };
+	bool							_reliable_fix_quality		{ false };
+	unsigned int					_power_cycle_attempts		{ 0 };
 	xf::SerialPort::Configuration	_serial_port_config;
-	bool							_clock_synchronized			= false;
+	bool							_clock_synchronized			{ false };
 };
+
+
+inline xf::Logger&
+GPS::logger()
+{
+	return _logger;
+}
 
 #endif
 

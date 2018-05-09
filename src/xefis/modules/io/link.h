@@ -36,6 +36,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/strong_type.h>
 #include <xefis/utility/types.h>
@@ -367,10 +368,10 @@ class LinkProtocol
 	size() const;
 
 	void
-	produce (Blob&);
+	produce (Blob&, xf::Logger const& logger);
 
 	Blob::const_iterator
-	eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer);
+	eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger);
 
 	void
 	failsafe();
@@ -460,7 +461,7 @@ class LinkProtocol
   private:
 	std::vector<std::shared_ptr<Envelope>>		_envelopes;
 	std::map<Blob, std::shared_ptr<Envelope>>	_envelope_magics;
-	Blob::size_type								_magic_size		{ 0 };
+	Blob::size_type								_magic_size			{ 0 };
 	Blob										_aux_magic_buffer;
 };
 
@@ -506,10 +507,13 @@ class Link:
 {
 	Q_OBJECT
 
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::Link";
+
   public:
 	// Ctor
 	explicit
-	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, std::string const& instance = {});
+	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;
@@ -534,6 +538,7 @@ class Link:
 	reacquire();
 
   private:
+	xf::Logger						_logger;
 	QTimer*							_failsafe_timer		{ nullptr };
 	QTimer*							_reacquire_timer	{ nullptr };
 	QTimer*							_output_timer		{ nullptr };

@@ -27,6 +27,7 @@
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/devices/chr_um6.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 
 
 class CHRUM6_IO: public xf::ModuleIO
@@ -85,6 +86,9 @@ class CHRUM6:
 	Q_OBJECT
 
   private:
+	static constexpr char kLoggerPrefix[] = "mod::CHRUM6";
+
+  private:
 	static constexpr si::Time	kRestartDelay			= 200_ms;
 	static constexpr si::Time	kAliveCheckInterval		= 500_ms;
 	static constexpr si::Time	kStatusCheckInterval	= 200_ms;
@@ -103,7 +107,7 @@ class CHRUM6:
   public:
 	// Ctor
 	explicit
-	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, std::string const& instance = {});
+	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Module API
 	void
@@ -248,6 +252,7 @@ class CHRUM6:
 	describe_errors (xf::CHRUM6::Request const&);
 
   private:
+	xf::Logger							_logger;
 	Unique<QTimer>						_restart_timer;
 	Unique<QTimer>						_alive_check_timer;
 	Unique<QTimer>						_status_check_timer;

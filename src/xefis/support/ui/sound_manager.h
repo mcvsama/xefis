@@ -81,7 +81,7 @@ class SoundManager
 	cleanup();
 
   private:
-	Logger					_logger;
+	Logger					_logger	{ std::clog };
 	std::set<Shared<Sound>>	_sounds;
 };
 

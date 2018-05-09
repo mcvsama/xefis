@@ -40,7 +40,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	// (align to nearest allowed baud rate):
 	_requested_physical_baud_rate (baud_rate)
 {
-	_gps_module.log() << "Create GPS serial connection" << std::endl;
+	_gps_module.logger() << "Create GPS serial connection" << std::endl;
 
 	_alive_check_timer = std::make_unique<QTimer> (this);
 	_alive_check_timer->setInterval (kAliveCheckInterval.in<Millisecond>());
@@ -53,7 +53,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_serial_port = std::make_unique<xf::SerialPort> (std::bind (&GPS::Connection::serial_data_ready, this),
 													 std::bind (&GPS::Connection::serial_failure, this));
 	_serial_port->set_max_read_failures (3);
-	_serial_port->set_logger (_gps_module.log());
+	_serial_port->set_parent_logger (_gps_module.logger());
 
 	open_device();
 }
@@ -61,7 +61,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 
 GPS::Connection::~Connection()
 {
-	_gps_module.log() << "Stop GPS serial connection" << std::endl;
+	_gps_module.logger() << "Stop GPS serial connection" << std::endl;
 	_gps_module.reset_data_properties();
 	_gps_module.io.serviceable = false;
 	_reliable_fix_quality = false;
@@ -92,7 +92,7 @@ GPS::Connection::open_device()
 		_alive_check_timer->start();
 
 
-		_gps_module.log() << "Opening device " << _gps_module._serial_port_config.device_path() << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
+		_gps_module.logger() << "Opening device " << _gps_module._serial_port_config.device_path() << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
 
 		if (_serial_port->open())
 			initialize_device();
@@ -110,7 +110,7 @@ GPS::Connection::initialize_device()
 {
 	_nmea_parser = std::make_unique<xf::nmea::Parser> (this);
 
-	_gps_module.log() << "Sending initialization commands." << std::endl;
+	_gps_module.logger() << "Sending initialization commands." << std::endl;
 
 	_serial_port->write (xf::nmea::make_mtk_sentence (get_nmea_frequencies_setup_messages (_serial_port_config.baud_rate())));
 	// Now send user setup commands:
@@ -127,7 +127,7 @@ GPS::Connection::initialize_device()
 void
 GPS::Connection::request_new_baud_rate (unsigned int baud_rate)
 {
-	_gps_module.log() << "Requesting baud-rate switch from " << _serial_port_config.baud_rate() << " to " << baud_rate << std::endl;
+	_gps_module.logger() << "Requesting baud-rate switch from " << _serial_port_config.baud_rate() << " to " << baud_rate << std::endl;
 	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","_str + std::to_string (baud_rate));
 	_serial_port->write (set_baud_rate_message);
 	_serial_port->flush();
@@ -145,7 +145,7 @@ GPS::Connection::alive_check_failed()
 void
 GPS::Connection::failure (std::string const& reason)
 {
-	_gps_module.log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
+	_gps_module.logger() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
 	_power_cycle.notify_connection_failure();
 }
 
@@ -170,7 +170,7 @@ GPS::Connection::serial_data_ready()
 		catch (...)
 		{
 			_gps_module.io.read_errors = *_gps_module.io.read_errors + 1;
-			_gps_module.log() << "Exception when processing NMEA sentence: " << std::current_exception() << std::endl;
+			_gps_module.logger() << "Exception when processing NMEA sentence: " << std::current_exception() << std::endl;
 		}
 	} while (processed);
 }
@@ -301,24 +301,24 @@ GPS::Connection::process_nmea_sentence (xf::nmea::PMTKACK const& sentence)
 		switch (*sentence.result)
 		{
 			case xf::nmea::MTKResult::InvalidCommand:
-				_gps_module.log() << "Invalid command/packet: " << command_hint << std::endl;
+				_gps_module.logger() << "Invalid command/packet: " << command_hint << std::endl;
 				break;
 
 			case xf::nmea::MTKResult::UnsupportedCommand:
-				_gps_module.log() << "Unsupported command/packet: " << command_hint << std::endl;
+				_gps_module.logger() << "Unsupported command/packet: " << command_hint << std::endl;
 				break;
 
 			case xf::nmea::MTKResult::Failure:
-				_gps_module.log() << "Valid command, but action failed for: " << command_hint << std::endl;
+				_gps_module.logger() << "Valid command, but action failed for: " << command_hint << std::endl;
 				break;
 
 			case xf::nmea::MTKResult::Success:
-				_gps_module.log() << "Command result: " << command_hint << ": OK" << std::endl;
+				_gps_module.logger() << "Command result: " << command_hint << ": OK" << std::endl;
 				break;
 		}
 	}
 	else
-		_gps_module.log() << "Unrecognizable MTK ACK message (no result flag): " << sentence.contents() << std::endl;
+		_gps_module.logger() << "Unrecognizable MTK ACK message (no result flag): " << sentence.contents() << std::endl;
 }
 
 
@@ -407,7 +407,7 @@ GPS::PowerCycle::PowerCycle (GPS& gps_module):
 	_gps_module (gps_module)
 {
 	// Turn on power to the device.
-	_gps_module.log() << "GPS power on" << std::endl;
+	_gps_module.logger() << "GPS power on" << std::endl;
 	_gps_module.io.power_on = true;
 
 	// Connection will be created in process().
@@ -418,7 +418,7 @@ GPS::PowerCycle::~PowerCycle()
 {
 	_connection.reset();
 	// Turn off power to the device.
-	_gps_module.log() << "GPS power off" << std::endl;
+	_gps_module.logger() << "GPS power off" << std::endl;
 	_gps_module.io.power_on = false;
 }
 
@@ -452,7 +452,7 @@ GPS::PowerCycle::process()
 void
 GPS::PowerCycle::notify_connection_failure()
 {
-	_gps_module.log() << "Serial connection failure." << std::endl;
+	_gps_module.logger() << "Serial connection failure." << std::endl;
 
 	if (_connection_attempts >= kConnectionAttemptsPerPowerCycle)
 		_gps_module.request_power_cycle();
@@ -464,7 +464,7 @@ GPS::PowerCycle::notify_connection_failure()
 void
 GPS::PowerCycle::notify_connection_established()
 {
-	_gps_module.log() << "Stable connection established." << std::endl;
+	_gps_module.logger() << "Stable connection established." << std::endl;
 	_gps_module.io.serviceable = true;
 
 	// Try to use target baud rate.
@@ -481,16 +481,19 @@ GPS::PowerCycle::notify_connection_established()
 		}
 	}
 	else
-		_gps_module.log() << "Max connection attempts achieved, not retrying anymore." << std::endl;
+		_gps_module.logger() << "Max connection attempts achieved, not retrying anymore." << std::endl;
 }
 
 
-GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, std::string const& instance):
+GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& parent_logger, std::string const& instance):
 	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger)),
 	_system (system),
 	_serial_port_config (serial_port_config)
 {
 	// TODO check logic that setting_target_baud_rate >= setting_default_baud_rate
+
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
 
 	_power_cycle_timer = std::make_unique<QTimer> (this);
 	_power_cycle_timer->setInterval (kPowerRestartDelay.in<Millisecond>());
@@ -583,14 +586,14 @@ GPS::update_clock (xf::nmea::GPSDate const& date, xf::nmea::GPSTimeOfDay const& 
 		if (*io.synchronize_system_clock && !_clock_synchronized)
 		{
 			if (_system->set_clock (unix_time))
-				log() << "System clock synchronized from GPS." << std::endl;
+				_logger << "System clock synchronized from GPS." << std::endl;
 			_clock_synchronized = true;
 		}
 	}
 	catch (xf::nmea::BadDateTime const& e)
 	{
-		log() << "Could not use date/time information from GPS (invalid data): error message follows:" << std::endl
-			  << "  " + std::string (e.what()) << std::endl;
+		_logger << "Could not use date/time information from GPS (invalid data): error message follows:" << std::endl
+				<< "  " + std::string (e.what()) << std::endl;
 	}
 }
 

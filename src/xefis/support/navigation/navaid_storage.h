@@ -121,11 +121,11 @@ class NavaidStorage
 	parse_apt_dat();
 
   private:
-	Logger			_logger;
+	Logger			_logger			{ std::clog };
 	NavaidsTree		_navaids_tree;
-	const char*		_nav_dat_file	= "share/nav/nav.dat.gz"; // TODO make it configurable
-	const char*		_fix_dat_file	= "share/nav/fix.dat.gz";
-	const char*		_apt_dat_file	= "share/nav/apt.dat.gz";
+	const char*		_nav_dat_file	{ "share/nav/nav.dat.gz" }; // TODO make it configurable
+	const char*		_fix_dat_file	{ "share/nav/fix.dat.gz" };
+	const char*		_apt_dat_file	{ "share/nav/apt.dat.gz" };
 	NavaidsByType	_navaids_by_type;
 };
 

@@ -28,6 +28,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
+#include <xefis/utility/logger.h>
 #include <xefis/utility/time_helper.h>
 
 
@@ -121,7 +122,8 @@ class Accounting: public QObject
 
   public:
 	// Ctor
-	Accounting();
+	explicit
+	Accounting (std::ostream& logger_stream);
 
 	// Dtor
 	~Accounting();

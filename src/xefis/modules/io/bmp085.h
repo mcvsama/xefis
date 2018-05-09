@@ -26,6 +26,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/bus/i2c.h>
+#include <xefis/utility/logger.h>
 
 
 class BMP085_IO: public xf::ModuleIO
@@ -61,6 +62,9 @@ class BMP085:
 {
 	Q_OBJECT
 
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::BMP085";
+
   public:
 	/**
 	 * BMP085 supports in-chip oversampling.
@@ -76,7 +80,7 @@ class BMP085:
   public:
 	// Ctor
 	explicit
-	BMP085 (std::unique_ptr<BMP085_IO>, std::string const& instance = {});
+	BMP085 (std::unique_ptr<BMP085_IO>, xf::Logger const&, std::string const& instance = {});
 
 	// Module API
 	void
@@ -133,6 +137,8 @@ class BMP085:
 	static constexpr uint8_t	MB_REG	= 0xba;
 	static constexpr uint8_t	MC_REG	= 0xbc;
 	static constexpr uint8_t	MD_REG	= 0xbe;
+
+	xf::Logger					_logger;
 	// Data:
 	xf::i2c::Device				_i2c_device;
 	Oversampling				_oversampling				{ Oversampling3 };
