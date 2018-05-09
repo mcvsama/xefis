@@ -30,7 +30,8 @@
 
 namespace xf {
 
-System::System()
+System::System (std::ostream& logger_stream):
+	_logger (logger_stream)
 {
 	_logger.set_prefix ("<system>");
 	_logger << "Creating System object" << std::endl;

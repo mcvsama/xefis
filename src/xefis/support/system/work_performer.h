@@ -176,7 +176,7 @@ class WorkPerformer: private Noncopyable
 	take_unit();
 
   private:
-	Logger							_logger;
+	Logger							_logger				{ std::clog };
 	// Current queue. Points either to _queues[1] or _queues[2]:
 	Units							_queue;
 	Mutex							_queue_mutex;

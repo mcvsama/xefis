@@ -42,9 +42,12 @@
 #include "xbee.h"
 
 
-XBee::XBee (std::unique_ptr<XBeeIO> module_io, std::string const& instance):
-	Module (std::move (module_io), instance)
+XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	_restart_timer = new QTimer (this);
 	_restart_timer->setInterval (kRestartAfter.in<Millisecond>());
 	_restart_timer->setSingleShot (true);
@@ -85,13 +88,13 @@ XBee::XBee (std::unique_ptr<XBeeIO> module_io, std::string const& instance):
 
 	if (*io.local_address == 0xffff)
 	{
-		log() << "Can't use local address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
+		_logger << "Can't use local address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
 		*io.local_address = 0x0000;
 	}
 
 	if (*io.remote_address == 0xffff)
 	{
-		log() << "Can't use remote address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
+		_logger << "Can't use remote address ff:ff, 64-bit addressing is unsupported. Setting to default 00:00." << std::endl;
 		*io.remote_address = 0x0000;
 	}
 
@@ -149,7 +152,7 @@ XBee::process (xf::Cycle const&)
 					{
 						// Probably too fast data transmission for given modem settings.
 						// Drop this packet.
-						log() << "Possibly too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
+						_logger << "Possibly too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
 						failure ("multiple EAGAIN during write, restarting");
 					}
 					break;
@@ -189,7 +192,7 @@ XBee::read()
 				}
 				else
 				{
-					log() << "Error while reading from serial port: " << strerror (errno) << std::endl;
+					_logger << "Error while reading from serial port: " << strerror (errno) << std::endl;
 					err = true;
 					break;
 				}
@@ -230,7 +233,7 @@ void
 XBee::open_device()
 {
 	try {
-		log() << "Opening device " << *io.device_path << std::endl;
+		_logger << "Opening device " << *io.device_path << std::endl;
 
 		reset();
 
@@ -238,7 +241,7 @@ XBee::open_device()
 
 		if (_device < 0)
 		{
-			log() << "Could not open device file " << *io.device_path << ": " << strerror (errno) << std::endl;
+			_logger << "Could not open device file " << *io.device_path << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -265,7 +268,7 @@ XBee::open_device()
 void
 XBee::failure (std::string const& reason)
 {
-	log() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << *io.device_path << std::endl;
+	_logger << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << *io.device_path << std::endl;
 	_notifier.reset();
 	::close (_device);
 	io.failures = *io.failures + 1;
@@ -315,7 +318,7 @@ XBee::periodic_ping()
 			if (send_failed_with_retry())
 			{
 				// Restart:
-				log() << "Could not send ATAI command. Probably too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
+				_logger << "Could not send ATAI command. Probably too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
 				failure ("multiple EAGAIN during write, restarting");
 			}
 			break;
@@ -340,7 +343,7 @@ XBee::clear_channel_check()
 			if (send_failed_with_retry())
 			{
 				// Restart:
-				log() << "Could not send ATEC command. Probably too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
+				_logger << "Could not send ATEC command. Probably too fast data transmission. Consider increasing baud rate of the modem." << std::endl;
 				failure ("multiple EAGAIN during write, restarting");
 			}
 			break;
@@ -383,7 +386,7 @@ XBee::rssi_timeout()
 bool
 XBee::set_device_options()
 {
-	log() << "Setting baud rate to " << *io.baud_rate << std::endl;
+	_logger << "Setting baud rate to " << *io.baud_rate << std::endl;
 
 #if 0 // TODO
 	SerialPort::Configuration configuration;
@@ -410,13 +413,13 @@ XBee::set_device_options()
 
 	if (tcsetattr (_device, TCSANOW, &options) != 0)
 	{
-		log() << "Could not setup serial port: " << *io.device_path << ": " << strerror (errno) << std::endl;
+		_logger << "Could not setup serial port: " << *io.device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 
 	if (tcflow (_device, TCOON | TCION) != 0)
 	{
-		log() << "Could not enable flow: tcflow(): " << *io.device_path << ": " << strerror (errno) << std::endl;
+		_logger << "Could not enable flow: tcflow(): " << *io.device_path << ": " << strerror (errno) << std::endl;
 		return false;
 	}
 #endif
@@ -453,7 +456,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 	}
 	else if (frame_id != static_cast<uint8_t> (_configuration_step))
 	{
-		log() << "Unexpected response from modem with wrong frame ID: 0x"
+		_logger << "Unexpected response from modem with wrong frame ID: 0x"
 			  << std::hex << std::setw (2) << std::setfill ('0') << frame_id << std::dec << std::endl;
 		failure ("communication protocol failure");
 	}
@@ -464,7 +467,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 		switch (_configuration_step)
 		{
 			case ConfigurationStep::Unconfigured:
-				log() << "Starting modem configuration." << std::endl;
+				_logger << "Starting modem configuration." << std::endl;
 				io.serviceable = false;
 
 				request_at (ConfigurationStep::SoftwareReset, "FR");
@@ -486,13 +489,13 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::ReadHardwareVersion:
-				log() << "Hardware version: " << xf::to_hex_string (response) << std::endl;
+				_logger << "Hardware version: " << xf::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadFirmwareVersion, "VR");
 				break;
 
 			case ConfigurationStep::ReadFirmwareVersion:
-				log() << "Firmware version: " << xf::to_hex_string (response) << std::endl;
+				_logger << "Firmware version: " << xf::to_hex_string (response) << std::endl;
 
 				request_at (ConfigurationStep::ReadSerialNumberH, "SH");
 				break;
@@ -504,7 +507,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 
 			case ConfigurationStep::ReadSerialNumberL:
 				_serial_number_bin += response;
-				log() << "Serial number: " << xf::to_hex_string (_serial_number_bin) << std::endl;
+				_logger << "Serial number: " << xf::to_hex_string (_serial_number_bin) << std::endl;
 
 				request_at (ConfigurationStep::DisableSleep, "SM", { 0x00 });
 				break;
@@ -561,7 +564,7 @@ XBee::configure_modem (uint8_t frame_id, ATResponseStatus status, std::string co
 				break;
 
 			case ConfigurationStep::SetCoordinatorMode:
-				log() << "Modem configured." << std::endl;
+				_logger << "Modem configured." << std::endl;
 				_configuration_step = ConfigurationStep::Configured;
 				io.serviceable = true;
 				periodic_ping();
@@ -685,7 +688,7 @@ XBee::send_frame (std::string const& frame, int& written)
 
 	if (written == -1)
 	{
-		log() << "Write error " << strerror (errno) << std::endl;
+		_logger << "Write error " << strerror (errno) << std::endl;
 
 		written = 0;
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -695,7 +698,7 @@ XBee::send_frame (std::string const& frame, int& written)
 	}
 	else if (written < static_cast<int> (frame.size()))
 	{
-		log() << "Write buffer overrun." << std::endl;
+		_logger << "Write buffer overrun." << std::endl;
 		return SendResult::Retry;
 	}
 
@@ -806,7 +809,7 @@ XBee::process_packet (std::string& input, ResponseAPI& api, std::string& data)
 			checksum += static_cast<uint8_t> (input[i]);
 		if (checksum != 0xff)
 		{
-			log() << "Checksum invalid on input packet." << std::endl;
+			_logger << "Checksum invalid on input packet." << std::endl;
 			// Checksum invalid. Discard data up to next packet delimiter.
 			input.erase (0);
 			// Try parsing again:
@@ -848,7 +851,7 @@ XBee::process_rx64_frame (std::string const& frame)
 	// We're not going to accept broadcast packets, sorry:
 	if (options & 0x06)
 	{
-		log() << "Got packet with broadcast " << (options & 0x02 ? "address" : "pan") << ". Ignoring." << std::endl;
+		_logger << "Got packet with broadcast " << (options & 0x02 ? "address" : "pan") << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -873,7 +876,7 @@ XBee::process_rx16_frame (std::string const& frame)
 	// Address must match our peer's address:
 	if (address != *io.remote_address)
 	{
-		log() << "Got packet from unknown address: " << xf::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
+		_logger << "Got packet from unknown address: " << xf::to_hex_string (frame.substr (0, 2)) << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -886,7 +889,7 @@ XBee::process_rx16_frame (std::string const& frame)
 	// We're not going to accept broadcast packets, sorry:
 	if (options & 0x06)
 	{
-		log() << "Got packet with broadcast " << (options & 0x02 ? "address" : "pan") << ". Ignoring." << std::endl;
+		_logger << "Got packet with broadcast " << (options & 0x02 ? "address" : "pan") << ". Ignoring." << std::endl;
 		return;
 	}
 
@@ -910,12 +913,12 @@ XBee::process_modem_status_frame (std::string const& data)
 	switch (status)
 	{
 		case ModemStatus::HardwareReset:
-			log() << "Modem reported hardware reset." << std::endl;
+			_logger << "Modem reported hardware reset." << std::endl;
 			failure ("unexpected hardware reset");
 			break;
 
 		case ModemStatus::WatchdogReset:
-			log() << "Modem reported watchdog reset." << std::endl;
+			_logger << "Modem reported watchdog reset." << std::endl;
 			// If caused by configuration process, continue with it.
 			if (_configuration_step == ConfigurationStep::SoftwareReset)
 			{
@@ -929,28 +932,28 @@ XBee::process_modem_status_frame (std::string const& data)
 			break;
 
 		case ModemStatus::Associated:
-			log() << "Associated." << std::endl;
+			_logger << "Associated." << std::endl;
 			break;
 
 		case ModemStatus::Disassociated:
-			log() << "Disassociated." << std::endl;
+			_logger << "Disassociated." << std::endl;
 			break;
 
 		case ModemStatus::SynchronizationLost:
-			log() << "Synchronization lost." << std::endl;
+			_logger << "Synchronization lost." << std::endl;
 			break;
 
 		case ModemStatus::CoordinatorRealignment:
-			log() << "Coordinator realignment." << std::endl;
+			_logger << "Coordinator realignment." << std::endl;
 			break;
 
 		case ModemStatus::CoordinatorStarted:
-			log() << "Coordinator started." << std::endl;
+			_logger << "Coordinator started." << std::endl;
 			break;
 
 		default:
-			log() << "Modem reported unknown status: 0x"
-				  << std::hex << static_cast<int> (data[0]) << std::dec << std::endl;
+			_logger << "Modem reported unknown status: 0x"
+					<< std::hex << static_cast<int> (data[0]) << std::dec << std::endl;
 	}
 }
 
@@ -1049,7 +1052,7 @@ XBee::periodic_pong (ATResponseStatus status, std::string const& data)
 	else if (data.size() >= 1)
 	{
 		if (data[0] != 0x00)
-			log() << "Association status: 0x" << std::hex << std::setw (2) << std::setfill ('0') << static_cast<int> (data[0]) << std::dec << std::endl;
+			_logger << "Association status: 0x" << std::hex << std::setw (2) << std::setfill ('0') << static_cast<int> (data[0]) << std::dec << std::endl;
 	}
 
 	_periodic_pong_timer->stop();

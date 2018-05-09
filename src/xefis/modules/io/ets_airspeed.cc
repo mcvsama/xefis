@@ -27,10 +27,12 @@
 #include "ets_airspeed.h"
 
 
-ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, std::string const& instance):
+ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, xf::Logger const& parent_logger, std::string const& instance):
 	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger)),
 	_device (std::move (device))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
 	_calibration_data.reserve (kOffsetCalculationSamples);
 
 	io.serviceable = false;
@@ -44,7 +46,7 @@ ETSAirspeed::initialize()
 {
 	if (*io.read_interval < 100_ms)
 	{
-		log() << "The setting airspeed.read-invterval is too low, setting it to 100 ms." << std::endl;
+		_logger << "The setting airspeed.read-invterval is too low, setting it to 100 ms." << std::endl;
 		io.read_interval = 100_ms;
 	}
 
@@ -136,13 +138,13 @@ ETSAirspeed::offset_collected()
 	for (auto s: _calibration_data)
 		sum += s;
 	_offset = std::round (sum / _calibration_data.size());
-	log() << "Calculated raw offset: " << _offset << std::endl;
+	_logger << "Calculated raw offset: " << _offset << std::endl;
 
 	// Limit offset:
 	uint16_t saved_offset = _offset;
 	xf::clamp (_offset, kRawValueMinimum, kRawValueMaximum);
 	if (saved_offset != _offset)
-		log() << "Offset clipped to: " << _offset << std::endl;
+		_logger << "Offset clipped to: " << _offset << std::endl;
 }
 
 
@@ -154,7 +156,7 @@ ETSAirspeed::guard (std::function<void()> guarded_code)
 	}
 	catch (xf::IOError& e)
 	{
-		log() << "I/O error: " << e.message() << std::endl;
+		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

@@ -23,6 +23,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/utility/logger.h>
 #include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
@@ -70,10 +71,13 @@ class AFCS_AP_IO: public xf::ModuleIO
  */
 class AFCS_AP: public xf::Module<AFCS_AP_IO>
 {
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::AFCS_AP";
+
   public:
 	// Ctor
 	explicit
-	AFCS_AP (std::unique_ptr<AFCS_AP_IO>, std::string const& instance = {});
+	AFCS_AP (std::unique_ptr<AFCS_AP_IO>, xf::Logger const& parent_logger, std::string const& instance = {});
 
   protected:
 	// Module API
@@ -102,6 +106,7 @@ class AFCS_AP: public xf::Module<AFCS_AP_IO>
 	diagnose();
 
   private:
+	xf::Logger								_logger;
 	xf::PIDControl<si::Angle, si::Angle>	_elevator_pid;
 	xf::PIDControl<si::Angle, si::Angle>	_ailerons_pid;
 	xf::Smoother<si::Angle>					_elevator_smoother	{ 50_ms };

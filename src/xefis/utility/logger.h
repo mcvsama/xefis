@@ -17,26 +17,67 @@
 // Standard:
 #include <cstddef>
 #include <ostream>
+#include <variant>
 
 // Lib:
 #include <boost/format.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/strong_type.h>
 #include <xefis/utility/time_helper.h>
 
 
 namespace xf {
 
+class ProcessingLoop;
+
+
 class Logger
 {
   public:
-	// Ctor
-	Logger();
+	using Output	= std::variant<std::ostream*, Logger const*>;
+	using Parent	= xf::StrongType<Logger const&, struct LoggerType>;
 
-	// Ctor
+  public:
+	/**
+	 * Ctor
+	 */
 	explicit
-	Logger (std::ostream& stream);
+	Logger (std::ostream&);
+
+	/**
+	 * Ctor
+	 * This object must NOT outlive parent logger.
+	 */
+	explicit
+	Logger (Parent const& parent);
+
+	/**
+	 * Ctor
+	 */
+	explicit
+	Logger (std::ostream&, ProcessingLoop const&);
+
+	/**
+	 * Copy ctor
+	 */
+	Logger (Logger const&) = default;
+
+	/**
+	 * Ctor
+	 * This object must NOT outlive parent logger.
+	 */
+	explicit
+	Logger (Parent const& parent, ProcessingLoop const&);
+
+	// Copy operator
+	Logger&
+	operator= (Logger const&) = default;
+
+	// Move operator
+	Logger&
+	operator= (Logger&&) = default;
 
 	/**
 	 * Sets prefix to be written.
@@ -49,39 +90,31 @@ class Logger
 	 */
 	template<class Item>
 		std::ostream&
-		operator<< (Item const&) const;
+		operator<< (Item&&) const;
 
   private:
-	std::string		_prefix;
-	std::ostream*	_stream;
+	/**
+	 * Prepare log line (add cycle number, prefix) and return
+	 * std::ostream to use.
+	 */
+	std::ostream&
+	prepare_line() const;
+
+	void
+	prepare_line (std::ostream&) const;
+
+  private:
+	std::string				_prefix;
+	Output					_output;
+	ProcessingLoop const*	_processing_loop	{ nullptr };
 };
-
-
-inline
-Logger::Logger():
-	Logger (std::clog)
-{ }
-
-
-inline
-Logger::Logger (std::ostream& stream):
-	_stream (&stream)
-{ }
-
-
-inline void
-Logger::set_prefix (std::string const& prefix)
-{
-	_prefix = prefix;
-}
 
 
 template<class Item>
 	inline std::ostream&
-	Logger::operator<< (Item const& item) const
+	Logger::operator<< (Item&& item) const
 	{
-		(*_stream) << boost::format ("%08.4lf %s ") % TimeHelper::now().in<Second>() % _prefix;
-		return (*_stream) << item;
+		return prepare_line() << item;
 	}
 
 } // namespace xf

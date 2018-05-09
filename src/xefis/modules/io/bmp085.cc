@@ -29,9 +29,12 @@
 #include "bmp085.h"
 
 
-BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, std::string const& instance):
-	Module (std::move (module_io), instance)
+BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	_reinitialize_timer = std::make_unique<QTimer> (this);
 	_reinitialize_timer->setInterval (250);
 	_reinitialize_timer->setSingleShot (true);
@@ -210,7 +213,7 @@ BMP085::guard (std::function<void()> guarded_code)
 	}
 	catch (xf::IOError& e)
 	{
-		log() << "I/O error: " << e.message() << std::endl;
+		_logger << "I/O error: " << e.message() << std::endl;
 		hw_reinitialize();
 	}
 	catch (...)

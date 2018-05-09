@@ -23,9 +23,12 @@
 #include "afcs_ap.h"
 
 
-AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, std::string const& instance):
-	Module (std::move (module_io), instance)
+AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	constexpr auto radian_second = 1.0_rad * 1.0_s;
 
 	_elevator_pid.set_integral_limit ({ -0.1 * radian_second, +0.1 * radian_second });
@@ -119,9 +122,9 @@ void
 AFCS_AP::diagnose()
 {
 	if (!io.measured_pitch)
-		log() << "Measured pitch is nil!" << std::endl;
+		_logger << "Measured pitch is nil!" << std::endl;
 
 	if (!io.measured_roll)
-		log() << "Measured roll is nil!" << std::endl;
+		_logger << "Measured roll is nil!" << std::endl;
 }
 

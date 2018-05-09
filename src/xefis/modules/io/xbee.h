@@ -27,6 +27,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -76,6 +77,8 @@ class XBee:
 	public xf::Module<XBeeIO>
 {
 	Q_OBJECT
+
+	static constexpr char		kLoggerPrefix[]				= "mod::XBee";
 
 	static constexpr int		kMaxReadFailureCount		= 10;
 	static constexpr int		kMaxWriteFailureCount		= 10;
@@ -166,7 +169,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (std::unique_ptr<XBeeIO>, std::string const& instance = {});
+	XBee (std::unique_ptr<XBeeIO>, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Dtor
 	~XBee();
@@ -413,12 +416,13 @@ class XBee:
 	clear_channel_result (ATResponseStatus, std::string const& result);
 
 	/**
-	 * Just like log() but adds "DEBUG" message.
+	 * A logger that adds "DEBUG" message.
 	 */
 	std::ostream&
 	debug() const;
 
   private:
+	xf::Logger						_logger;
 	Unique<QSocketNotifier>			_notifier;
 	int								_device					= 0;
 	QTimer*							_restart_timer			= nullptr;
@@ -452,7 +456,7 @@ XBee::configured() const noexcept
 inline std::ostream&
 XBee::debug() const
 {
-	return log() << "DEBUG ";
+	return _logger << "DEBUG ";
 }
 
 #endif

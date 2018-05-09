@@ -65,7 +65,7 @@ Xefis::Xefis (int& argc, char** argv):
 	// Init services:
 	Services::initialize();
 
-	_system = std::make_unique<System>();
+	_system = std::make_unique<System> (std::clog);
 
 	// TODO this is a hack, make it configurable or runtime selectable;
 	// TODO best: provide a separate config file to compile with all initialization

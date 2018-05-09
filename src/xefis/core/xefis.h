@@ -183,7 +183,7 @@ class Xefis: public QApplication
 
   private:
 	static inline Xefis*			_xefis	{ nullptr };
-	static inline Logger			_logger;
+	static inline Logger			_logger	{ std::clog };
 
 	Unique<System>					_system;
 	Unique<ConfiguratorWidget>		_configurator_widget;

@@ -26,7 +26,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/logger.h>
 
 
 class QWidget;
@@ -142,12 +141,6 @@ class BasicModule: private Noncopyable
 	rescue (std::exception_ptr);
 
 	/**
-	 * Add header with module name to the log stream and return the stream.
-	 */
-	Logger const&
-	log() const;
-
-	/**
 	 * Enable/disable option to set all output properties to xf::nil when
 	 * exception occurs within the process(Cycle) method.
 	 *
@@ -160,7 +153,6 @@ class BasicModule: private Noncopyable
 	std::string						_instance;
 	bool							_cached					{ false };
 	bool							_set_nil_on_exception	{ true };
-	std::optional<Logger> mutable	_logger;
 	std::unique_ptr<ModuleIO>		_io;
 };
 
@@ -214,19 +206,6 @@ inline ModuleIO*
 BasicModule::io_base() const noexcept
 {
 	return _io.get();
-}
-
-
-inline Logger const&
-BasicModule::log() const
-{
-	if (!_logger)
-	{
-		_logger = Logger();
-		_logger->set_prefix ((boost::format ("[%-30s#%-20s]") % demangle (typeid (*this).name()) % _instance).str());
-	}
-
-	return *_logger;
 }
 
 

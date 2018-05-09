@@ -171,9 +171,12 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, std::string const& instance):
-	Module (std::move (module_io), instance)
+JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 		_button_properties[handler_id] = std::make_unique<xf::PropertyOut<bool>> (&io, "/buttons/" + std::to_string (handler_id));
 
@@ -262,13 +265,13 @@ void
 JoystickInput::open_device()
 {
 	try {
-		log() << "Opening device " << *_device_path << std::endl;
+		_logger << "Opening device " << *_device_path << std::endl;
 
 		_device = ::open (_device_path->c_str(), O_RDONLY | O_NDELAY);
 
 		if (_device < 0)
 		{
-			log() << "Could not open device file " << *_device_path << ": " << strerror (errno) << std::endl;
+			_logger << "Could not open device file " << *_device_path << ": " << strerror (errno) << std::endl;
 			restart();
 		}
 		else
@@ -290,7 +293,7 @@ void
 JoystickInput::failure()
 {
 	if (_failure_count <= 1)
-		log() << "Failure detected, closing device " << *_device_path << std::endl;
+		_logger << "Failure detected, closing device " << *_device_path << std::endl;
 
 	_failure_count += 1;
 	_notifier.reset();
@@ -348,7 +351,7 @@ JoystickInput::read()
 				handler->handle (event_type, handler_id, ev.value);
 		}
 		else
-			log() << "Joystick event with ID " << handler_id << " greater than max supported " << kMaxEventID << std::endl;
+			_logger << "Joystick event with ID " << handler_id << " greater than max supported " << kMaxEventID << std::endl;
 	}
 }
 

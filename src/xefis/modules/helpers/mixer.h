@@ -23,6 +23,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 
 
 template<class Value>
@@ -56,13 +57,16 @@ template<class Value>
 template<class pValue>
 	class Mixer: public xf::Module<MixerIO<pValue>>
 	{
+	  private:
+		static constexpr char kLoggerPrefix[] = "mod::Mixer";
+
 	  public:
 		using Value = pValue;
 
 	  public:
 		// Ctor
 		explicit
-		Mixer (std::unique_ptr<MixerIO>, std::string const& instance = {});
+		Mixer (std::unique_ptr<MixerIO>, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	  protected:
 		// Module API
@@ -74,6 +78,7 @@ template<class pValue>
 		process (xf::Cycle const&) override;
 
 	  private:
+		xf::Logger				_logger;
 		xf::PropChanged<Value>	_input_a_changed	{ io.input_a_value };
 		xf::PropChanged<Value>	_input_b_changed	{ io.input_b_value };
 	};
@@ -85,9 +90,12 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, std::string const& instance):
-		Module (std::move (module_io), instance)
-	{ }
+	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+		Module (std::move (module_io), instance),
+		_logger (xf::Logger::Parent (parent_logger))
+	{
+		_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	}
 
 
 template<class V>
@@ -95,7 +103,7 @@ template<class V>
 	Mixer<V>::initialize()
 	{
 		if (io.setting_output_minimum && io.setting_output_maximum && *io.setting_output_minimum > *io.setting_output_maximum)
-			log() << "Settings error: maximum value is less than the minimum value." << std::endl;
+			_logger << "Settings error: maximum value is less than the minimum value." << std::endl;
 	}
 
 

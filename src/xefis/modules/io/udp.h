@@ -27,6 +27,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/v2/actions.h>
+#include <xefis/utility/logger.h>
 
 
 class UDP_IO: public xf::ModuleIO
@@ -63,10 +64,13 @@ class UDP:
 {
 	Q_OBJECT
 
+  private:
+	static constexpr char kLoggerPrefix[] = "mod::UDP";
+
   public:
 	// Ctor
 	explicit
-	UDP (std::unique_ptr<UDP_IO> module_io, std::string const& instance = {});
+	UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Module API
 	void
@@ -87,6 +91,7 @@ class UDP:
 	interfere (QByteArray& blob);
 
   private:
+	xf::Logger						_logger;
 	QByteArray						_received_datagram;
 	Unique<QUdpSocket>				_tx;
 	Unique<QUdpSocket>				_rx;

@@ -23,6 +23,9 @@
 
 namespace xf {
 
+class Logger;
+
+
 /**
  * Holds useful information about the single processing cycle.
  */
@@ -31,17 +34,21 @@ class Cycle
   public:
 	// Ctor
 	explicit
-	Cycle (Time update_time, Time update_dt);
+	Cycle (uint64_t number, Time update_time, Time update_dt, Logger&);
 
 	/**
-	 * TODO
+	 * Return this cycle serial number.
+	 */
+	uint64_t
+	number() const noexcept;
+
+	/**
 	 * Return last update time.
 	 */
 	Time
 	update_time() const noexcept;
 
 	/**
-	 * TODO
 	 * Return time difference between last and previous update.
 	 * Be sure not to use it if you're skipping some of the updates, because you're watching just one property or
 	 * something.
@@ -49,17 +56,34 @@ class Cycle
 	Time
 	update_dt() const noexcept;
 
+	/**
+	 * Return logger to use.
+	 */
+	Logger const&
+	logger() const noexcept;
+
   private:
-	Time	_update_time;
-	Time	_update_dt;
+	uint64_t	_number;
+	Time		_update_time;
+	Time		_update_dt;
+	Logger*		_logger;
 };
 
 
 inline
-Cycle::Cycle (Time update_time, Time update_dt):
+Cycle::Cycle (uint64_t number, Time update_time, Time update_dt, Logger& logger):
+	_number (number),
 	_update_time (update_time),
-	_update_dt (update_dt)
+	_update_dt (update_dt),
+	_logger (&logger)
 { }
+
+
+inline uint64_t
+Cycle::number() const noexcept
+{
+	return _number;
+}
 
 
 inline Time
@@ -73,6 +97,13 @@ inline Time
 Cycle::update_dt() const noexcept
 {
 	return _update_dt;
+}
+
+
+inline Logger const&
+Cycle::logger() const noexcept
+{
+	return *_logger;
 }
 
 } // namespace xf

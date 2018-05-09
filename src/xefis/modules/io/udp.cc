@@ -30,9 +30,12 @@
 #include "udp.h"
 
 
-UDP::UDP (std::unique_ptr<UDP_IO> module_io, std::string const& instance):
-	Module (std::move (module_io), instance)
+UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	if (io.tx_udp_host && io.tx_udp_port)
 		_tx = std::make_unique<QUdpSocket>();
 
@@ -41,7 +44,7 @@ UDP::UDP (std::unique_ptr<UDP_IO> module_io, std::string const& instance):
 		_rx = std::make_unique<QUdpSocket>();
 
 		if (!_rx->bind (QHostAddress (*io.rx_udp_host), *io.rx_udp_port, QUdpSocket::ShareAddress))
-			log() << "Failed to bind to address " << io.rx_udp_host->toStdString() << ":" << *io.rx_udp_port << std::endl;
+			_logger << "Failed to bind to address " << io.rx_udp_host->toStdString() << ":" << *io.rx_udp_port << std::endl;
 
 		QObject::connect (_rx.get(), SIGNAL (readyRead()), this, SLOT (got_udp_packet()));
 	}

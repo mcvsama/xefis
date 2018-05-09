@@ -24,9 +24,10 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/smoother.h>
-#include <xefis/utility/lookahead.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/utility/logger.h>
+#include <xefis/utility/lookahead.h>
+#include <xefis/utility/smoother.h>
 
 
 class AirDataComputerIO: public xf::ModuleIO
@@ -88,6 +89,7 @@ class AirDataComputerIO: public xf::ModuleIO
 class AirDataComputer: public xf::Module<AirDataComputerIO>
 {
   private:
+	static constexpr char kLoggerPrefix[] = "mod::AirDataComputer";
 	// Sound speed in STD sea level:
 	static constexpr si::Velocity const kStdSoundSpeed	= 661.4788_kt;
 	// STD sea level pressure:
@@ -96,7 +98,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
   public:
 	// Ctor
 	explicit
-	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, std::string const& instance = {});
+	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const& parent_logger, std::string const& instance = {});
 
   protected:
 	// Module API
@@ -141,6 +143,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	recover_total_pressure();
 
   private:
+	xf::Logger					_logger;
 	bool						_ias_in_valid_range					= false;
 	bool						_prev_use_standard_pressure			= false;
 	si::Time					_hide_alt_lookahead_until			= 0_s;

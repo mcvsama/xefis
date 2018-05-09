@@ -38,10 +38,12 @@
 #include "chr_um6.h"
 
 
-CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, std::string const& instance):
+CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& parent_logger, std::string const& instance):
 	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger)),
 	_serial_port (std::move (serial_port))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
 	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);
@@ -65,7 +67,7 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
 	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port);
-	_sensor->set_logger (log());
+	_sensor->set_parent_logger (_logger);
 	_sensor->set_alive_check_callback (std::bind (&CHRUM6::alive_check, this));
 	_sensor->set_communication_failure_callback (std::bind (&CHRUM6::communication_failure, this));
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));
@@ -134,7 +136,7 @@ CHRUM6::open_device()
 void
 CHRUM6::failure (std::string const& reason)
 {
-	log() << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
+	_logger << "Fatal: failure detected" << (reason.empty() ? "" : ": " + reason) << ", closing device " << _serial_port.configuration().device_path() << std::endl;
 	io.failures = *io.failures + 1;
 	_alive_check_timer->stop();
 	_status_check_timer->stop();
@@ -176,7 +178,7 @@ CHRUM6::status_check()
 void
 CHRUM6::initialize()
 {
-	log() << "Begin initialization." << std::endl;
+	_logger << "Begin initialization." << std::endl;
 
 	_stage = Stage::Initialize;
 	_initialization_timer->start();
@@ -230,7 +232,7 @@ CHRUM6::log_firmware_version()
 		describe_errors (req);
 		if (req.success())
 		{
-			log() << "Firmware version: " << req.firmware_version() << std::endl;
+			_logger << "Firmware version: " << req.firmware_version() << std::endl;
 			set_ekf_process_variance();
 		}
 	});
@@ -264,7 +266,7 @@ CHRUM6::restore_gyro_bias_xy()
 {
 	if (_gyro_bias_xy)
 	{
-		log() << "Restoring previously acquired gyro biases: XY" << std::endl;
+		_logger << "Restoring previously acquired gyro biases: XY" << std::endl;
 
 		_sensor->write (ConfigurationAddress::GyroBiasXY, *_gyro_bias_xy, [this] (xf::CHRUM6::Write req) {
 			describe_errors (req);
@@ -282,7 +284,7 @@ CHRUM6::restore_gyro_bias_z()
 {
 	if (_gyro_bias_z)
 	{
-		log() << "Restoring previously acquired gyro biases: Z" << std::endl;
+		_logger << "Restoring previously acquired gyro biases: Z" << std::endl;
 
 		_sensor->write (ConfigurationAddress::GyroBiasZ, *_gyro_bias_z, [this] (xf::CHRUM6::Write req) {
 			describe_errors (req);
@@ -302,7 +304,7 @@ CHRUM6::align_gyros()
 		describe_errors (req);
 		if (req.success())
 		{
-			log() << "Gyros aligned." << std::endl;
+			_logger << "Gyros aligned." << std::endl;
 			initialization_complete();
 		}
 	});
@@ -312,7 +314,7 @@ CHRUM6::align_gyros()
 void
 CHRUM6::initialization_complete()
 {
-	log() << "Initialization complete." << std::endl;
+	_logger << "Initialization complete." << std::endl;
 	_stage = Stage::Run;
 	_initialization_timer->stop();
 	io.serviceable = true;
@@ -458,8 +460,8 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success())
 			{
 				_gyro_bias_xy = req.value();
-				log() << "Gyro bias X: " << req.value_upper16() << std::endl;
-				log() << "Gyro bias Y: " << req.value_lower16() << std::endl;
+				_logger << "Gyro bias X: " << req.value_upper16() << std::endl;
+				_logger << "Gyro bias Y: " << req.value_lower16() << std::endl;
 			}
 			break;
 		}
@@ -470,7 +472,7 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 			if (req.success() && !_gyro_bias_z)
 			{
 				_gyro_bias_z = req.value();
-				log() << "Gyro bias Z: " << req.value_upper16() << std::endl;
+				_logger << "Gyro bias Z: " << req.value_upper16() << std::endl;
 			}
 			break;
 		}
@@ -480,25 +482,25 @@ CHRUM6::process_message (xf::CHRUM6::Read req)
 		 */
 
 		case static_cast<uint32_t> (CommandAddress::FlashCommit):
-			log() << "Unexpected FlashCommit packet." << std::endl;
+			_logger << "Unexpected FlashCommit packet." << std::endl;
 			break;
 
 		case static_cast<uint32_t> (CommandAddress::GetData):
-			log() << "Unexpected GetData packet." << std::endl;
+			_logger << "Unexpected GetData packet." << std::endl;
 			break;
 
 		case static_cast<uint32_t> (CommandAddress::ResetToFactory):
-			log() << "Unexpected ResetToFactory packet." << std::endl;
+			_logger << "Unexpected ResetToFactory packet." << std::endl;
 			break;
 
 		case static_cast<uint32_t> (CommandAddress::GPSSetHomePosition):
-			log() << "Unexpected GPSSetHomePosition packet." << std::endl;
+			_logger << "Unexpected GPSSetHomePosition packet." << std::endl;
 			break;
 
 		default:
-			log() << "Unexpected packet " << req.name() << " (0x"
-				<< std::hex << std::setfill ('0') << std::setprecision (2) << req.address()
-				<< ")." << std::endl;
+			_logger << "Unexpected packet " << req.name() << " (0x"
+					<< std::hex << std::setfill ('0') << std::setprecision (2) << req.address()
+					<< ")." << std::endl;
 			break;
 	}
 }
@@ -520,115 +522,115 @@ CHRUM6::status_verify (xf::CHRUM6::Read req)
 	if (isset (StatusRegister::MagDel))
 	{
 		caution = true;
-		log() << "Magnetic sensor timeout." << std::endl;
+		_logger << "Magnetic sensor timeout." << std::endl;
 	}
 
 	if (isset (StatusRegister::AccelDel))
 	{
 		caution = true;
-		log() << "Acceleration sensor timeout." << std::endl;
+		_logger << "Acceleration sensor timeout." << std::endl;
 	}
 
 	if (isset (StatusRegister::GyroDel))
 	{
 		caution = true;
-		log() << "Gyroscope sensor timeout." << std::endl;
+		_logger << "Gyroscope sensor timeout." << std::endl;
 	}
 
 	if (isset (StatusRegister::EKFDivergent))
 	{
 		caution = true;
-		log() << "Divergent EKF - reset performed." << std::endl;
+		_logger << "Divergent EKF - reset performed." << std::endl;
 	}
 
 	if (isset (StatusRegister::BusMagError))
 	{
 		caution = true;
-		log() << "Magnetic sensor bus error." << std::endl;
+		_logger << "Magnetic sensor bus error." << std::endl;
 	}
 
 	if (isset (StatusRegister::BusAccelError))
 	{
 		caution = true;
-		log() << "Acceleration sensor bus error." << std::endl;
+		_logger << "Acceleration sensor bus error." << std::endl;
 	}
 
 	if (isset (StatusRegister::BusGyroError))
 	{
 		caution = true;
-		log() << "Gyroscope sensor bus error." << std::endl;
+		_logger << "Gyroscope sensor bus error." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestMagZFail))
 	{
 		serviceable = false;
-		log() << "Magnetic sensor Z axis: self test failure." << std::endl;
+		_logger << "Magnetic sensor Z axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestMagYFail))
 	{
 		serviceable = false;
-		log() << "Magnetic sensor Y axis: self test failure." << std::endl;
+		_logger << "Magnetic sensor Y axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestMagXFail))
 	{
 		serviceable = false;
-		log() << "Magnetic sensor X axis: self test failure." << std::endl;
+		_logger << "Magnetic sensor X axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestAccelZFail))
 	{
 		serviceable = false;
-		log() << "Acceleration sensor Z axis: self test failure." << std::endl;
+		_logger << "Acceleration sensor Z axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestAccelYFail))
 	{
 		serviceable = false;
-		log() << "Acceleration sensor Y axis: self test failure." << std::endl;
+		_logger << "Acceleration sensor Y axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestAccelXFail))
 	{
 		serviceable = false;
-		log() << "Acceleration sensor X axis: self test failure." << std::endl;
+		_logger << "Acceleration sensor X axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestGyroZFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor Z axis: self test failure." << std::endl;
+		_logger << "Gyroscope sensor Z axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestGyroYFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor Y axis: self test failure." << std::endl;
+		_logger << "Gyroscope sensor Y axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::SelfTestGyroXFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor X axis: self test failure." << std::endl;
+		_logger << "Gyroscope sensor X axis: self test failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::GyroInitFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor initialization failure." << std::endl;
+		_logger << "Gyroscope sensor initialization failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::AccelInitFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor initialization failure." << std::endl;
+		_logger << "Gyroscope sensor initialization failure." << std::endl;
 	}
 
 	if (isset (StatusRegister::MagInitFail))
 	{
 		serviceable = false;
-		log() << "Gyroscope sensor initialization failure." << std::endl;
+		_logger << "Gyroscope sensor initialization failure." << std::endl;
 	}
 
 	if (!serviceable)
@@ -643,11 +645,11 @@ void
 CHRUM6::describe_errors (xf::CHRUM6::Request const& req)
 {
 	if (!req.success())
-		log() << "Command " << req.name() << " failed; protocol error: " << req.protocol_error_description() << "; retries: " << req.retries() << "." << std::endl;
+		_logger << "Command " << req.name() << " failed; protocol error: " << req.protocol_error_description() << "; retries: " << req.retries() << "." << std::endl;
 	else if (req.retries() > 0)
 	{
 		const char* str_retries = (req.retries() > 1) ? " retries" : " retry";
-		log() << "Command " << req.name() << " succeeded after " << req.retries() << str_retries << " (BadChecksum)." << std::endl;
+		_logger << "Command " << req.name() << " succeeded after " << req.retries() << str_retries << " (BadChecksum)." << std::endl;
 	}
 }
 

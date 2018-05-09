@@ -39,6 +39,9 @@ namespace xf {
  */
 class CHRUM6
 {
+  private:
+	static constexpr char kLoggerPrefix[] = "xf::CHRUM6";
+
   public:
 	// Fwd
 	class Request;
@@ -509,7 +512,7 @@ class CHRUM6
 	 * Set logger.
 	 */
 	void
-	set_logger (Logger const& logger);
+	set_parent_logger (Logger const& logger);
 
 	/**
 	 * Set callback indicating serial port failure.
@@ -626,15 +629,15 @@ class CHRUM6
 	packet_name (uint32_t address) noexcept;
 
   private:
-	SerialPort*					_serial_port	= nullptr;
+	SerialPort*					_serial_port	{ nullptr };
 	Unique<PacketReader>		_packet_reader;
 	std::function<void()>		_communication_failure_callback;
 	std::function<void()>		_alive_check_callback;
 	std::function<void (Read)>	_incoming_messages_callback;
-	bool						_auto_retry		= false;
+	bool						_auto_retry		{ false };
 	std::queue<Unique<Request>>	_requests;
 	Unique<Request>				_current_req;
-	Logger						_logger;
+	Logger						_logger			{ std::clog };
 };
 
 

@@ -22,6 +22,8 @@
 namespace xf {
 namespace test {
 
+xf::Logger g_logger (std::clog);
+
 template<template<class> class PropertyType>
 	class GCS2AircraftLinkIO: public LinkIO
 	{
@@ -110,8 +112,8 @@ class GCS_Rx_LinkProtocol: public LinkProtocol
 void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 {
 	Blob blob;
-	tx_protocol.produce (blob);
-	auto end = rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr);
+	tx_protocol.produce (blob, g_logger);
+	auto end = rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	xf::test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
 }
@@ -248,8 +250,8 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	tx_io.uint_prop_r << xf::ConstantSource (15u);
 
 	Blob blob;
-	tx_protocol.produce (blob);
-	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr);
+	tx_protocol.produce (blob, g_logger);
+	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Transmit invalid data:
 	tx_io.nil_prop << xf::ConstantSource (1_rad);
@@ -267,7 +269,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	tx_io.uint_prop_r << xf::ConstantSource (12u);
 
 	blob.clear();
-	tx_protocol.produce (blob);
+	tx_protocol.produce (blob, g_logger);
 	xf::test_asserts::verify ("blob is long enough", blob.size() >= 16);
 	// Mess with both messages:
 	blob[12] = 0x00;
@@ -278,7 +280,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	blob[blob.size() - 6] = 0xff;
 	blob[blob.size() - 5] = 0x00;
 	blob[blob.size() - 4] = 0xff;
-	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr);
+	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Test that values weren't changed during last invalid transmission:
 	xf::test_asserts::verify ("nil_prop didn't change", !rx_io.nil_prop);

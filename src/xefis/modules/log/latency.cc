@@ -25,10 +25,13 @@
 #include "latency.h"
 
 
-Latency::Latency (xf::Accounting& accounting, std::string const& instance):
+Latency::Latency (xf::Accounting& accounting, xf::Logger const& parent_logger, std::string const& instance):
 	Module (instance),
+	_logger (xf::Logger::Parent (parent_logger)),
 	_accounting (accounting)
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+
 	_log_timer = new QTimer (this);
 	_log_timer->setInterval (1000);
 	_log_timer->setSingleShot (false);
@@ -42,8 +45,8 @@ Latency::log_latency()
 {
 	xf::Accounting::StatsSet const& event_latency = _accounting.event_latency_stats();
 
-	log() << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
-	log() << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
+	_logger << boost::format ("%-53s min      avg      max") % "--- Latency information ---" << std::endl;
+	_logger << boost::format ("<%-51s> %0.6lf %.06lf %.06lf")
 		% "event handling latency"
 		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).minimum().in<Second>())
 		% static_cast<double> (event_latency.select (xf::Accounting::Timespan::Last100Samples).average().in<Second>())
@@ -71,7 +74,7 @@ Latency::log_latency()
 
 	for (auto m: ordered_modules)
 	{
-		log() << boost::format ("[%-30s] %.06lf %.06lf %.06lf")
+		_logger << boost::format ("[%-30s] %.06lf %.06lf %.06lf")
 			% identifier (m->first)
 			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).minimum().in<Second>())
 			% static_cast<double> (m->second.select (xf::Accounting::Timespan::Last100Samples).average().in<Second>())

@@ -42,9 +42,11 @@ StateIO::register_property (std::string const& unique_identifier, xf::BasicPrope
 }
 
 
-State::State (std::unique_ptr<StateIO> module_io, std::string const& instance):
-	Module (std::move (module_io), instance)
+State::State (std::unique_ptr<StateIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Module (std::move (module_io), instance),
+	_logger (xf::Logger::Parent (parent_logger))
 {
+	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
 	load_state();
 }
 
@@ -72,7 +74,7 @@ State::process (xf::Cycle const&)
 					}
 					catch (xf::Exception const& e)
 					{
-						log() << "Encountered error when saving state: " << e.message() << std::endl;
+						_logger << "Encountered error when saving state: " << e.message() << std::endl;
 					}
 
 					save_state();
@@ -114,20 +116,20 @@ State::load_state()
 						}
 						catch (xf::Exception const& e)
 						{
-							log() << "Failed to load setting '" << id << "': " << e.message() << std::endl;
+							_logger << "Failed to load setting '" << id << "': " << e.message() << std::endl;
 						}
 					}
 					else
-						log() << "Ignoring not configured setting '" << id << "'" << std::endl;
+						_logger << "Ignoring not configured setting '" << id << "'" << std::endl;
 				}
 				else
-					log() << "Unknown element <" << e.tagName().toStdString() << ">";
+					_logger << "Unknown element <" << e.tagName().toStdString() << ">";
 			}
 		}
 	}
 	catch (xf::Exception const& e)
 	{
-		log() << "Error when loading state: " << e.message() << std::endl;
+		_logger << "Error when loading state: " << e.message() << std::endl;
 	}
 }
 
@@ -156,11 +158,11 @@ State::save_state()
 	}
 	catch (xf::Exception const& e)
 	{
-		log() << "Error when saving state: " << e.message() << std::endl;
+		_logger << "Error when saving state: " << e.message() << std::endl;
 	}
 	catch (std::exception const& e)
 	{
-		log() << "System error: " << e.what() << std::endl;
+		_logger << "System error: " << e.what() << std::endl;
 	}
 }
 

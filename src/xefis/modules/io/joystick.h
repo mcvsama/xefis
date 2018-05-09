@@ -32,6 +32,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/range.h>
+#include <xefis/utility/logger.h>
 
 
 class JoystickInputIO: public xf::ModuleIO
@@ -54,8 +55,10 @@ class JoystickInput:
 	Q_OBJECT
 
   private:
+	static constexpr char	kLoggerPrefix[]	= "mod::Joystick";
+
 	// This is defined by HID interface:
-	static constexpr size_t kMaxEventID = 256;
+	static constexpr size_t	kMaxEventID		= 256;
 
 	// Events from HID device are identified by such an ID:
 	typedef std::size_t HandlerID;
@@ -161,7 +164,7 @@ class JoystickInput:
   public:
 	// Ctor
 	explicit
-	JoystickInput (std::unique_ptr<JoystickInputIO>, QDomElement const& config, std::string const& instance = {});
+	JoystickInput (std::unique_ptr<JoystickInputIO>, QDomElement const& config, xf::Logger const& parent_logger, std::string const& instance = {});
 
 	// Module API
 	void
@@ -220,6 +223,7 @@ class JoystickInput:
 	reset_properties();
 
   private:
+	xf::Logger					_logger;
 	std::optional<std::string>	_device_path;
 	int							_device				= 0;
 	Unique<QSocketNotifier>		_notifier;

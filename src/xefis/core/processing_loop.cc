@@ -37,6 +37,8 @@ ProcessingLoop::ProcessingLoop (Machine* machine, Frequency loop_frequency):
 	_loop_timer->setSingleShot (false);
 	_loop_timer->setInterval (_loop_period.in<Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
+
+	_logger = std::make_unique<Logger> (std::clog, *this);
 }
 
 
@@ -65,10 +67,8 @@ void
 ProcessingLoop::execute_cycle()
 {
 	Time t = TimeHelper::now();
-	Time dt = t - _previous_timestamp.value_or (t - 1_ms); // -1_ms to prevent division by zero in modules.
-	Cycle cycle { t, dt };
-
-	//XXX std::cout << "--- processing loop ---\n";
+	Time dt = t - _previous_timestamp.value_or (t - 0.1_ms); // -0.1_ms to prevent division by zero in modules.
+	_current_cycle = Cycle { _next_cycle_number++, t, dt, *_logger };
 
 	if (_previous_timestamp)
 	{
@@ -80,20 +80,26 @@ ProcessingLoop::execute_cycle()
 		if (dt > 1.1 * _loop_period)
 		{
 			// TODO log:
+			// auto entry = logger.add_entry();
+			// entry << "z" << "y"; // Automatically adds timestamp and processing loop cycle number
 			std::cout << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0);
 		}
 	}
 
 	// TODO check if all core properties are computable by modules; if not, show a warning.
 
-	for (auto& module: _modules)
-		BasicModule::ProcessingLoopAPI (*module.get()).reset_cache();
+	for (auto& module_details: _modules)
+		BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
 
-	// TODO module accounting
-	for (auto& module: _modules)
-		BasicModule::ProcessingLoopAPI (*module.get()).fetch_and_process (cycle);
+	for (auto& module_details: _modules)
+	{
+		module_details.last_processing_time = TimeHelper::measure ([&] {
+			BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);
+		});
+	}
 
 	_previous_timestamp = t;
+	_current_cycle.reset();
 }
 
 } // namespace xf

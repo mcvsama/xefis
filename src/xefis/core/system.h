@@ -29,7 +29,7 @@ class System
   public:
 	// Ctor
 	explicit
-	System();
+	System (std::ostream& logger_stream);
 
 	// Dtor
 	~System();
