@@ -49,7 +49,13 @@ template<class pRegistrant, class pDetails = std::monostate>
 
 		  public:
 			explicit
-			Disclosure (Registrant& registrant, Details& details, std::weak_ptr<typename Registry::SharedData> registry_data):
+			Disclosure (Registrant& registrant, std::weak_ptr<typename Registry::SharedData> registry_data):
+				_registrant (registrant),
+				_registry_data (registry_data)
+			{ }
+
+			explicit
+			Disclosure (Registrant& registrant, Details&& details, std::weak_ptr<typename Registry::SharedData> registry_data):
 				_registrant (registrant),
 				_details (details),
 				_registry_data (registry_data)
@@ -348,7 +354,7 @@ template<class R, class D>
 	Registry<R, D>::register_object (Registrant& registrant)
 		-> RegistrationProof
 	{
-		return RegistrationProof (registrant, Details(), *this);
+		return RegistrationProof (registrant, *this);
 	}
 
 
