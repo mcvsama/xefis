@@ -59,7 +59,7 @@ class PropertyStringifier
 	  public:
 		// Ctor
 		explicit
-		StringConverter (Property<std::string>& property, std::string const& nil_value):
+		StringConverter (PropertyIn<std::string>& property, std::string const& nil_value):
 			_property (property),
 			_nil_value (nil_value)
 		{ }
@@ -73,12 +73,12 @@ class PropertyStringifier
 		void
 		from_string (std::string const& s) override
 		{
-			_property = s;
+			_property << ConstantSource (s);
 		}
 
 	  private:
-		Property<std::string>&	_property;
-		std::string				_nil_value;
+		PropertyIn<std::string>&	_property;
+		std::string					_nil_value;
 	};
 
 	class BoolConverter: public BasicConverter
@@ -86,7 +86,7 @@ class PropertyStringifier
 	  public:
 		// Ctor
 		explicit
-		BoolConverter (Property<bool>& property, std::string const& true_value, std::string const& false_value, std::string const& nil_value):
+		BoolConverter (PropertyIn<bool>& property, std::string const& true_value, std::string const& false_value, std::string const& nil_value):
 			_property (property),
 			_true_value (true_value),
 			_false_value (false_value),
@@ -105,7 +105,7 @@ class PropertyStringifier
 		void
 		from_string (std::string const& s) override
 		{
-			_property = s == _true_value;
+			_property << ConstantSource (s == _true_value);
 		}
 
 		std::string const&
@@ -127,10 +127,10 @@ class PropertyStringifier
 		}
 
 	  private:
-		Property<bool>&	_property;
-		std::string		_true_value;
-		std::string		_false_value;
-		std::string		_nil_value;
+		PropertyIn<bool>&	_property;
+		std::string			_true_value;
+		std::string			_false_value;
+		std::string			_nil_value;
 	};
 
 	template<class Value>
@@ -139,7 +139,7 @@ class PropertyStringifier
 		  public:
 			// Ctor
 			explicit
-			FormatConverter (Property<Value>& property, boost::format const& format, std::string const& nil_value):
+			FormatConverter (PropertyIn<Value>& property, boost::format const& format, std::string const& nil_value):
 				_property (property),
 				_format (format),
 				_nil_value (nil_value)
@@ -159,11 +159,11 @@ class PropertyStringifier
 			void
 			from_string (std::string const& s) override
 			{
-				_property = boost::lexical_cast<Value> (s);
+				_property << ConstantSource (boost::lexical_cast<Value> (s));
 			}
 
 		  private:
-			Property<Value>&	_property;
+			PropertyIn<Value>&	_property;
 			boost::format		_format;
 			std::string			_nil_value;
 		};
@@ -174,7 +174,7 @@ class PropertyStringifier
 		  public:
 			// Ctor
 			explicit
-			SIQuantityConverter (Property<Quantity>& property, boost::format const& format, std::string const& nil_value):
+			SIQuantityConverter (PropertyIn<Quantity>& property, boost::format const& format, std::string const& nil_value):
 				_property (property),
 				_format (format),
 				_nil_value (nil_value)
@@ -200,34 +200,34 @@ class PropertyStringifier
 			}
 
 		  private:
-			Property<Quantity>&			_property;
-			boost::format				_format;
-			std::string					_nil_value;
+			PropertyIn<Quantity>&	_property;
+			boost::format			_format;
+			std::string				_nil_value;
 		};
 
   public:
 	// Ctor
 	// TODO add option { WithUnit, NoUnit }
 	explicit
-	PropertyStringifier (Property<std::string>&, std::string const& nil_value = kDefaultNilValue);
+	PropertyStringifier (PropertyIn<std::string>&, std::string const& nil_value = kDefaultNilValue);
 
 	// Ctor
 	explicit
-	PropertyStringifier (Property<bool>&, std::string const& true_value = "true", std::string const& false_value = "false", std::string const& nil_value = kDefaultNilValue);
+	PropertyStringifier (PropertyIn<bool>&, std::string const& true_value = "true", std::string const& false_value = "false", std::string const& nil_value = kDefaultNilValue);
 
 	// Ctor
 	explicit
-	PropertyStringifier (Property<int64_t>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
+	PropertyStringifier (PropertyIn<int64_t>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
 
 	// Ctor
 	explicit
-	PropertyStringifier (Property<double>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
+	PropertyStringifier (PropertyIn<double>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
 
 	// Ctor
 	template<class Quantity, class DesiredUnit,
 			 class = std::enable_if_t<is_quantity_v<Quantity>>>
 		explicit
-		PropertyStringifier (Property<Quantity>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
+		PropertyStringifier (PropertyIn<Quantity>&, boost::format const&, std::string const& nil_value = kDefaultNilValue);
 
 	// Ctor
 	PropertyStringifier (PropertyStringifier const& other) = default;
@@ -272,28 +272,28 @@ class PropertyStringifier
 
 
 inline
-PropertyStringifier::PropertyStringifier (Property<std::string>& property, std::string const& nil_value):
+PropertyStringifier::PropertyStringifier (PropertyIn<std::string>& property, std::string const& nil_value):
 	_converter (std::make_shared<StringConverter> (property, nil_value)),
 	_property (property)
 { }
 
 
 inline
-PropertyStringifier::PropertyStringifier (Property<bool>& property, std::string const& true_value, std::string const& false_value, std::string const& nil_value):
+PropertyStringifier::PropertyStringifier (PropertyIn<bool>& property, std::string const& true_value, std::string const& false_value, std::string const& nil_value):
 	_converter (std::make_shared<BoolConverter> (property, true_value, false_value, nil_value)),
 	_property (property)
 { }
 
 
 inline
-PropertyStringifier::PropertyStringifier (Property<int64_t>& property, boost::format const& format, std::string const& nil_value):
+PropertyStringifier::PropertyStringifier (PropertyIn<int64_t>& property, boost::format const& format, std::string const& nil_value):
 	_converter (std::make_shared<FormatConverter<int64_t>> (property, format, nil_value)),
 	_property (property)
 { }
 
 
 inline
-PropertyStringifier::PropertyStringifier (Property<double>& property, boost::format const& format, std::string const& nil_value):
+PropertyStringifier::PropertyStringifier (PropertyIn<double>& property, boost::format const& format, std::string const& nil_value):
 	_converter (std::make_shared<FormatConverter<double>> (property, format, nil_value)),
 	_property (property)
 { }
@@ -302,7 +302,7 @@ PropertyStringifier::PropertyStringifier (Property<double>& property, boost::for
 template<class Quantity, class DesiredUnit,
 		 class = std::enable_if_t<is_quantity_v<Quantity>>>
 	inline
-	PropertyStringifier::PropertyStringifier (Property<Quantity>& property, boost::format const& format, std::string const& nil_value):
+	PropertyStringifier::PropertyStringifier (PropertyIn<Quantity>& property, boost::format const& format, std::string const& nil_value):
 		_converter (std::make_shared<SIQuantityConverter<Quantity, DesiredUnit>> (property, format, nil_value)),
 		_property (property)
 { }

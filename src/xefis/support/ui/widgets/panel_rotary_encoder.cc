@@ -115,7 +115,7 @@ PanelRotaryEncoder::paintEvent (QPaintEvent*)
 	painter.setBrush (Qt::white);
 	painter.resetTransform();
 	painter.translate (width() / 2.f, height() / 2.f);
-	painter.rotate (_angle.quantity<Degree>());
+	painter.rotate (_angle.in<Degree>());
 	painter.drawPath (text_path);
 	painter.setPen (QPen (Qt::white, 0.5f));
 	painter.drawPath (text_path);

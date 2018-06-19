@@ -17,17 +17,13 @@
 // Standard:
 #include <cstddef>
 
-// Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class VerticalTrimIO: public xf::ModuleIO
@@ -52,7 +48,7 @@ class VerticalTrimIO: public xf::ModuleIO
 
 class VerticalTrim:
 	public xf::Instrument<VerticalTrimIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
   public:
 	// Ctor
@@ -63,14 +59,9 @@ class VerticalTrim:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
 	static QString

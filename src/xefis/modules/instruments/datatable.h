@@ -25,16 +25,17 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/property_stringifier.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/xefis.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class Datatable:
 	public xf::Instrument<xf::ModuleIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
 	class Line
 	{
@@ -76,13 +77,13 @@ class Datatable:
 	 * Set font size for all labels.
 	 */
 	void
-	set_label_font_size (xf::FontSize);
+	set_label_font_size (float);
 
 	/**
 	 * Set font size for all values.
 	 */
 	void
-	set_value_font_size (xf::FontSize);
+	set_value_font_size (float);
 
 	/**
 	 * Set table alignment within widget.
@@ -102,16 +103,13 @@ class Datatable:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
-	xf::FontSize			_label_font_size	{ 16.0 };
-	xf::FontSize			_value_font_size	{ 18.0 };
+	float					_label_font_size	{ 16.0 };
+	float					_value_font_size	{ 18.0 };
 	Qt::Alignment			_alignment			{ Qt::AlignTop };
 	std::vector<Line>		_list;
 	xf::PropertyObserver	_inputs_observer;

@@ -13,35 +13,34 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 #XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
 #XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
 ##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
-#XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
+XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
+XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
+XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
 XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
+XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
 #XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h
 #XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h
-#
 XEFIS_HEADERS			+= xefis/modules/instruments/label.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
-#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/status.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
+XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
+XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
+XEFIS_HEADERS			+= xefis/modules/instruments/status.h
+XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
 #
 #XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
 #XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
 ##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
-#XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
 #XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
 #XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
 
 ######## /xefis/modules/io ########
 

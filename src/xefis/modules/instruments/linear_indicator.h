@@ -20,15 +20,15 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/cycle.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_digitizer.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/instrument_aids.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
+// TODO extract as separate file
 class BasicIndicatorIO: public xf::ModuleIO
 {
   public:
@@ -71,41 +71,49 @@ class LinearIndicatorIO: public BasicIndicatorIO
 
 template<class IO>
 	class BasicIndicator:
-		virtual protected xf::InstrumentAids,
-		public xf::Instrument<IO>
+		public xf::Instrument<IO>,
+		virtual protected xf::InstrumentSupport
 	{
 	  public:
 		// Ctor
 		BasicIndicator (std::unique_ptr<IO>, std::string const& instance);
 
 	  protected:
-		// QWidget API
-		void
-		resizeEvent (QResizeEvent*) override;
-
 		QString
 		stringify_value (double value) const;
 	};
 
 
+class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
+{
+  public:
+	// Ctor
+	explicit
+	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, xf::PropertyDigitizer, std::string const& instance = {});
+
+	// Module API
+	void
+	process (xf::Cycle const&) override;
+
+	// Instrument API
+	void
+	paint (xf::PaintRequest&) const override;
+
+  protected:
+	QString
+	pad_string (QString const& input) const;
+
+  private:
+	xf::PropertyDigitizer	_value_digitizer;
+	xf::PropertyObserver	_inputs_observer;
+};
+
+
 template<class IO>
 	inline
 	BasicIndicator<IO>::BasicIndicator (std::unique_ptr<IO> module_io, std::string const& instance):
-		xf::InstrumentAids (1.0f),
 		xf::Instrument<IO> (std::move (module_io), instance)
 	{ }
-
-
-template<class IO>
-	inline void
-	BasicIndicator<IO>::resizeEvent (QResizeEvent*)
-	{
-		auto xw = dynamic_cast<v1::Window*> (this->window());
-		if (xw)
-			InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
-
-		InstrumentAids::update_sizes (this->size(), this->window()->size());
-	}
 
 
 template<class IO>
@@ -123,31 +131,6 @@ template<class IO>
 
 		return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, *io.precision));
 	}
-
-
-class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
-{
-  public:
-	// Ctor
-	explicit
-	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, xf::PropertyDigitizer, std::string const& instance = {});
-
-	// Module API
-	void
-	process (xf::Cycle const&) override;
-
-  protected:
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
-
-	QString
-	pad_string (QString const& input) const;
-
-  private:
-	xf::PropertyDigitizer	_value_digitizer;
-	xf::PropertyObserver	_inputs_observer;
-};
 
 #endif
 

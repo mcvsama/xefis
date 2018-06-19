@@ -988,7 +988,7 @@ CDU::paintEvent (QPaintEvent*)
 
 		if (time_utc)
 		{
-			QDateTime datetime = QDateTime::fromTime_t (time_utc->quantity<Second>());
+			QDateTime datetime = QDateTime::fromTime_t (time_utc->in<Second>());
 			datetime.setTimeZone (QTimeZone (0));
 			time_str = datetime.time().toString ("HH:mm:ss") + " z";
 			date_str = datetime.date().toString ("d MMM yy").toUpper();

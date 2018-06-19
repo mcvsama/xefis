@@ -30,7 +30,8 @@ namespace xf {
 class ShadowPainter: virtual public QPainter
 {
   public:
-	using PaintFunction = std::function<void (bool painting_shadow)>;
+	using DefaultPaintFunction	= std::function<void()>;
+	using PaintFunction			= std::function<void (bool painting_shadow)>;
 
   public:
 	/**
@@ -40,7 +41,20 @@ class ShadowPainter: virtual public QPainter
 	 */
 	void
 	paint (Shadow const&, PaintFunction);
+
+	/**
+	 * Overloaded for convenience.
+	 */
+	void
+	paint (Shadow const&, DefaultPaintFunction);
 };
+
+
+inline void
+ShadowPainter::paint (Shadow const& shadow, DefaultPaintFunction paint_function)
+{
+	paint (shadow, [&paint_function] (bool) { paint_function(); });
+}
 
 } // namespace xf
 

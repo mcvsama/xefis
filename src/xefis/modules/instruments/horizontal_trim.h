@@ -20,10 +20,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class HorizontalTrimIO: public xf::ModuleIO
@@ -50,7 +50,7 @@ class HorizontalTrimIO: public xf::ModuleIO
 
 class HorizontalTrim:
 	public xf::Instrument<HorizontalTrimIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
   public:
 	// Ctor
@@ -61,14 +61,9 @@ class HorizontalTrim:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
 	static QString

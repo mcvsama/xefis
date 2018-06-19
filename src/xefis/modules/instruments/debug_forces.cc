@@ -22,62 +22,62 @@
 
 
 DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance),
-	InstrumentAids (1.0f)
+	Instrument (std::move (module_io), instance)
 { }
 
 
 void
 DebugForces::process (xf::Cycle const&)
 {
-	update();
+	mark_dirty();
 }
 
 
 void
-DebugForces::paintEvent (QPaintEvent*)
+DebugForces::paint (xf::PaintRequest& paint_request) const
 {
-	auto painting_token = get_token (this);
-	clear_background (QColor (0x55, 0x63, 0x71));
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
+	paint_request.canvas().fill (QColor (0x55, 0x63, 0x71));
 
-	double one_gravity_length = 0.15 * height();
+	double one_gravity_length = 0.15 * aids->height();
 	QPointF center (0.0, 0.0);
 	QPointF centrifugal_accel;
 	QPointF measured_accel;
 	QPointF earth_accel;
 
 	if (io.centrifugal_accel_y && io.centrifugal_accel_z)
-		centrifugal_accel = QPointF (io.centrifugal_accel_y->quantity<Gravity>() * one_gravity_length,
-									 io.centrifugal_accel_z->quantity<Gravity>() * one_gravity_length);
+		centrifugal_accel = QPointF (io.centrifugal_accel_y->in<Gravity>() * one_gravity_length,
+									 io.centrifugal_accel_z->in<Gravity>() * one_gravity_length);
 
 	if (io.measured_accel_y && io.measured_accel_z)
-		measured_accel = QPointF (io.measured_accel_y->quantity<Gravity>() * one_gravity_length,
-								  io.measured_accel_z->quantity<Gravity>() * one_gravity_length);
+		measured_accel = QPointF (io.measured_accel_y->in<Gravity>() * one_gravity_length,
+								  io.measured_accel_z->in<Gravity>() * one_gravity_length);
 
 	earth_accel = measured_accel - centrifugal_accel;
 
-	painter().translate (0.5 * width(), 0.5 * height());
+	painter.translate (0.5 * aids->width(), 0.5 * aids->height());
 
 	// Horizon reference frame:
-	painter().setPen (get_pen (Qt::white, 0.5));
-	painter().drawLine (QPointF (-0.5 * width(), 0.0), QPointF (0.5 * width(), 0.0));
+	painter.setPen (aids->get_pen (Qt::white, 0.5));
+	painter.drawLine (QPointF (-0.5 * aids->width(), 0.0), QPointF (0.5 * aids->width(), 0.0));
 
 	if (io.orientation_roll)
 	{
 		// Plane reference frame:
-		painter().rotate (io.orientation_roll->quantity<Degree>());
+		painter.rotate (io.orientation_roll->in<Degree>());
 		// Plane:
-		painter().setPen (get_pen (Qt::white, 2.5));
-		painter().drawLine (QPointF (-0.25 * width(), 0.0), QPointF (0.25 * width(), 0.0));
+		painter.setPen (aids->get_pen (Qt::white, 2.5));
+		painter.drawLine (QPointF (-0.25 * aids->width(), 0.0), QPointF (0.25 * aids->width(), 0.0));
 		// Real acceleration:
-		painter().setPen (get_pen (Qt::yellow, 1.0));
-		painter().drawLine (center, earth_accel);
+		painter.setPen (aids->get_pen (Qt::yellow, 1.0));
+		painter.drawLine (center, earth_accel);
 		// Measured acceleration:
-		painter().setPen (get_pen (Qt::red, 1.0));
-		painter().drawLine (center, measured_accel);
+		painter.setPen (aids->get_pen (Qt::red, 1.0));
+		painter.drawLine (center, measured_accel);
 		// Centrifugal acceleration:
-		painter().setPen (get_pen (Qt::blue, 1.0));
-		painter().drawLine (center, centrifugal_accel);
+		painter.setPen (aids->get_pen (Qt::blue, 1.0));
+		painter.drawLine (center, centrifugal_accel);
 	}
 
 	// TODO set output properties

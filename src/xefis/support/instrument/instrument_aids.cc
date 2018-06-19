@@ -52,15 +52,14 @@ InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 }
 
 
-InstrumentAids::InstrumentAids (PaintRequest const& paint_request):
-	_paint_request (paint_request),
-	_canvas_metric (paint_request.metric()),
-	font_0 (resized (Services::instrument_font(), 1.0f * paint_request.metric().font_height())),
-	font_1 (resized (Services::instrument_font(), 1.1f * paint_request.metric().font_height())),
-	font_2 (resized (Services::instrument_font(), 1.3f * paint_request.metric().font_height())),
-	font_3 (resized (Services::instrument_font(), 1.6f * paint_request.metric().font_height())),
-	font_4 (resized (Services::instrument_font(), 1.8f * paint_request.metric().font_height())),
-	font_5 (resized (Services::instrument_font(), 2.0f * paint_request.metric().font_height())),
+InstrumentAids::InstrumentAids (PaintRequest::Metric const& canvas_metric):
+	_canvas_metric (canvas_metric),
+	font_0 (resized (Services::instrument_font(), 1.0f * canvas_metric.font_height())),
+	font_1 (resized (Services::instrument_font(), 1.1f * canvas_metric.font_height())),
+	font_2 (resized (Services::instrument_font(), 1.3f * canvas_metric.font_height())),
+	font_3 (resized (Services::instrument_font(), 1.6f * canvas_metric.font_height())),
+	font_4 (resized (Services::instrument_font(), 1.8f * canvas_metric.font_height())),
+	font_5 (resized (Services::instrument_font(), 2.0f * canvas_metric.font_height())),
 	autopilot_pen_1 (get_pen (kAutopilotColor.darker (300), 1.8f)),
 	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }

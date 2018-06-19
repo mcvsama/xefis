@@ -60,16 +60,16 @@ class RadialIndicator: BasicIndicator<RadialIndicatorIO>
 	void
 	process (xf::Cycle const&) override;
 
+	// Instrument API
+	void
+	paint (xf::PaintRequest&) const override;
+
   protected:
-	// QWidget API
 	void
-	paintEvent (QPaintEvent*) override;
+	paint_text (xf::InstrumentAids&, xf::InstrumentPainter&, float q, float r) const;
 
 	void
-	paint_text (float q, float r);
-
-	void
-	paint_indicator (float q, float r);
+	paint_indicator (xf::InstrumentAids&, xf::InstrumentPainter&, float q, float r) const;
 
   private:
 	xf::PropertyDigitizer	_value_digitizer;
@@ -77,7 +77,6 @@ class RadialIndicator: BasicIndicator<RadialIndicatorIO>
 	xf::PropertyDigitizer	_value_reference_digitizer;
 	xf::PropertyDigitizer	_value_automatic_digitizer;
 	xf::PropertyObserver	_inputs_observer;
-	std::vector<PointInfo>	_points;
 };
 
 #endif

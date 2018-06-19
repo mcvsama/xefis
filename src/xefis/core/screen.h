@@ -16,6 +16,8 @@
 
 // Standard:
 #include <cstddef>
+#include <atomic>
+#include <optional>
 #include <vector>
 
 // Qt:
@@ -42,9 +44,12 @@ namespace detail {
 class Details
 {
   public:
-	QRect	rect;
-	QImage	canvas;
-	int		z_index	{ 0 };
+	std::optional<PaintRequest>	paint_request;
+	QRect						rect;
+	QSize						previous_size;
+	std::unique_ptr<QImage>		canvas;
+	std::unique_ptr<QImage>		ready_canvas;
+	int							z_index { 0 };
 };
 
 } // namespace detail
@@ -119,7 +124,7 @@ class Screen:
 	 * Ensure it has requested size and set it to full alpha with color black.
 	 */
 	void
-	prepare_canvas_for_instrument (QImage&, QSize);
+	prepare_canvas_for_instrument (std::unique_ptr<QImage>&, QSize);
 
 	/**
 	 * Create new image suitable for screen and instrument buffers.

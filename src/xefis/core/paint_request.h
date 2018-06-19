@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <atomic>
 
 // Qt:
 #include <QImage>
@@ -36,13 +37,16 @@ class PaintRequest: private Noncopyable
 	  public:
 		// Ctor
 		explicit
-		Metric (PixelDensity, si::Length pen_width, si::Length font_height);
+		Metric (QSize, PixelDensity, si::Length pen_width, si::Length font_height);
 
 		bool
-		operator== (Metric const&);
+		operator== (Metric const&) const noexcept;
 
 		bool
-		operator!= (Metric const&);
+		operator!= (Metric const&) const noexcept;
+
+		QSize
+		canvas_size() const noexcept;
 
 		PixelDensity
 		pixel_density() const noexcept;
@@ -54,6 +58,7 @@ class PaintRequest: private Noncopyable
 		font_height() const noexcept;
 
 	  private:
+		QSize			_canvas_size;
 		PixelDensity	_pixel_density;
 		si::Length		_pen_width;
 		si::Length		_font_height;
@@ -62,25 +67,64 @@ class PaintRequest: private Noncopyable
   public:
 	// Ctor
 	explicit
-	PaintRequest (QImage&, Metric);
+	PaintRequest (QImage&, Metric, QSize previous_canvas_size);
 
+	// Move ctor
+	PaintRequest (PaintRequest&&) = default;
+
+	// Move operator
+	PaintRequest&
+	operator= (PaintRequest&&) = default;
+
+	/**
+	 * Access the canvas to paint on.
+	 */
 	QImage&
 	canvas() noexcept;
 
+	/**
+	 * Access the canvas to paint on.
+	 */
 	QImage const&
 	canvas() const noexcept;
 
+	/**
+	 * Return graphics metrics.
+	 */
 	Metric const&
 	metric() const noexcept;
 
+	/**
+	 * Return true if canvas size has changed since last painting request.
+	 */
+	bool
+	size_changed() const noexcept;
+
+	/**
+	 * Set the done flag. By default it's true, but tasks that want
+	 * to paint asynchronously should set it to false initially and to true
+	 * when they're done.
+	 */
+	void
+	set_done (bool done) noexcept;
+
+	/**
+	 * Return true if request was marked as done.
+	 */
+	bool
+	done() const noexcept;
+
   private:
-	QImage&	_canvas;
-	Metric	_metric;
+	std::atomic<bool>	_done { true };
+	QImage*				_canvas;
+	Metric				_metric;
+	bool				_size_changed;
 };
 
 
 inline
-PaintRequest::Metric::Metric (PixelDensity pixel_density, si::Length pen_width, si::Length font_height):
+PaintRequest::Metric::Metric (QSize canvas_size, PixelDensity pixel_density, si::Length pen_width, si::Length font_height):
+	_canvas_size (canvas_size),
 	_pixel_density (pixel_density),
 	_pen_width (pen_width),
 	_font_height (font_height)
@@ -88,7 +132,7 @@ PaintRequest::Metric::Metric (PixelDensity pixel_density, si::Length pen_width, 
 
 
 inline bool
-PaintRequest::Metric::operator== (PaintRequest::Metric const& other)
+PaintRequest::Metric::operator== (PaintRequest::Metric const& other) const noexcept
 {
 	return _pixel_density == other._pixel_density
 		&& _pen_width == other._pen_width
@@ -97,9 +141,16 @@ PaintRequest::Metric::operator== (PaintRequest::Metric const& other)
 
 
 inline bool
-PaintRequest::Metric::operator!= (PaintRequest::Metric const& other)
+PaintRequest::Metric::operator!= (PaintRequest::Metric const& other) const noexcept
 {
 	return !(*this == other);
+}
+
+
+inline QSize
+PaintRequest::Metric::canvas_size() const noexcept
+{
+	return _canvas_size;
 }
 
 
@@ -125,23 +176,24 @@ PaintRequest::Metric::font_height() const noexcept
 
 
 inline
-PaintRequest::PaintRequest (QImage& canvas, Metric metric):
-	_canvas (canvas),
-	_metric (metric)
+PaintRequest::PaintRequest (QImage& canvas, Metric metric, QSize previous_canvas_size):
+	_canvas (&canvas),
+	_metric (metric),
+	_size_changed (canvas.size() != previous_canvas_size)
 { }
 
 
 inline QImage&
 PaintRequest::canvas() noexcept
 {
-	return _canvas;
+	return *_canvas;
 }
 
 
 inline QImage const&
 PaintRequest::canvas() const noexcept
 {
-	return _canvas;
+	return *_canvas;
 }
 
 
@@ -149,6 +201,27 @@ inline PaintRequest::Metric const&
 PaintRequest::metric() const noexcept
 {
 	return _metric;
+}
+
+
+inline bool
+PaintRequest::size_changed() const noexcept
+{
+	return _size_changed;
+}
+
+
+inline void
+PaintRequest::set_done (bool done) noexcept
+{
+	_done.store (done);
+}
+
+
+inline bool
+PaintRequest::done() const noexcept
+{
+	return _done.load();
 }
 
 } // namespace xf
