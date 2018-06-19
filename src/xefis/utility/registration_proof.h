@@ -49,6 +49,10 @@ template<class pRegistrant, class pDetails = std::monostate>
 	  private:
 		// Ctor
 		explicit
+		RegistrationProof (Registrant&, Registry&);
+
+		// Ctor
+		explicit
 		RegistrationProof (Registrant&, Details, Registry&);
 
 	  public:
@@ -85,6 +89,16 @@ template<class pRegistrant, class pDetails = std::monostate>
 	  private:
 		std::unique_ptr<Disclosure> _disclosure;
 	};
+
+
+template<class R, class D>
+	inline
+	RegistrationProof<R, D>::RegistrationProof (Registrant& registrant, Registry& registry):
+		_disclosure (std::make_unique<Disclosure> (registrant, registry._shared_data))
+	{
+		if (auto ptr = _disclosure->_registry_data.lock())
+			ptr->insert (*_disclosure.get());
+	}
 
 
 template<class R, class D>
