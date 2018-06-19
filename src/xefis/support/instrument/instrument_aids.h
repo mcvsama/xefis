@@ -72,7 +72,7 @@ class InstrumentAids
   public:
 	// Ctor
 	explicit
-	InstrumentAids (PaintRequest const&);
+	InstrumentAids (PaintRequest::Metric const&);
 
 	/**
 	 * Return value to use as pen width.
@@ -103,6 +103,12 @@ class InstrumentAids
 	 */
 	int
 	height() const;
+
+	/**
+	 * Return smaller of the width/height sizes.
+	 */
+	int
+	lesser_dimension() const;
 
 	/**
 	 * Return number of pixels for given Length and current pixel density.
@@ -155,7 +161,6 @@ class InstrumentAids
 
   private:
 	std::optional<WidthForHeight>	_aspect_ratio;
-	PaintRequest const&				_paint_request;
 	PaintRequest::Metric			_canvas_metric;
 
   public:
@@ -203,14 +208,27 @@ InstrumentAids::get_pen (QColor const& color, float width, Qt::PenStyle style, Q
 inline int
 InstrumentAids::width() const
 {
-	return _paint_request.canvas().width();
+	return _canvas_metric.canvas_size().width();
 }
 
 
 inline int
 InstrumentAids::height() const
 {
-	return _paint_request.canvas().height();
+	return _canvas_metric.canvas_size().height();
+}
+
+
+inline int
+InstrumentAids::lesser_dimension() const
+{
+	auto const w = width();
+	auto const h = height();
+
+	if (w < h)
+		return w;
+	else
+		return h;
 }
 
 

@@ -13,7 +13,6 @@
 
 // Standard:
 #include <cstddef>
-#include <optional>
 
 // Lib:
 #include <boost/format.hpp>
@@ -27,10 +26,11 @@
 
 
 VerticalTrim::VerticalTrim (std::unique_ptr<VerticalTrimIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance),
-	InstrumentAids (0.5f)
+	Instrument (std::move (module_io), instance)
 {
-	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.set_callback ([&]{
+		mark_dirty();
+	});
 	_inputs_observer.observe (io.trim_value);
 }
 
@@ -43,82 +43,70 @@ VerticalTrim::process (xf::Cycle const& cycle)
 
 
 void
-VerticalTrim::resizeEvent (QResizeEvent*)
+VerticalTrim::paint (xf::PaintRequest& paint_request) const
 {
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		set_scaling (xw->pen_scale(), xw->font_scale());
-
-	InstrumentAids::update_sizes (size(), window()->size());
-}
-
-
-void
-VerticalTrim::paintEvent (QPaintEvent*)
-{
-	auto painting_token = get_token (this);
-	clear_background();
-
-	std::optional<double> trim = io.trim_value.get_optional();
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
+	auto trim = io.trim_value.get_optional();
 
 	if (trim)
 		xf::clamp (*trim, -1.0, +1.0);
 
-	std::optional<double> ref = io.trim_reference.get_optional();
-	std::optional<double> ref_min = io.trim_reference_minimum.get_optional();
-	std::optional<double> ref_max = io.trim_reference_maximum.get_optional();
+	auto ref = io.trim_reference.get_optional();
+	auto ref_min = io.trim_reference_minimum.get_optional();
+	auto ref_max = io.trim_reference_maximum.get_optional();
 
-	double h = _font_13_digit_height;
-	double v = height() - h;
+	double h = aids->font_2.digit_height;
+	double v = aids->height() - h;
 	bool within_reference = trim && ref_min && ref_max && (*ref_min <= *trim) && (*trim <= *ref_max);
 
-	QFont nu_nd_font = _font_13;
-	QFont label_font = _font_13;
-	QFont value_font = _font_18;
-	QFont reference_font = _font_13;
-	QColor cyan = _std_cyan;
+	QFont nu_nd_font = aids->font_2.font;
+	QFont label_font = aids->font_2.font;
+	QFont value_font = aids->font_4.font;
+	QFont reference_font = aids->font_2.font;
+	QColor cyan = aids->kCyan;
 	QTransform center_point_transform;
-	center_point_transform.translate (0.65 * width(), 0.5 * height());
+	center_point_transform.translate (0.65 * aids->width(), 0.5 * aids->height());
 
 	// Scale line:
-	QPointF nd (-h, 0.5 * (h - height()));
-	QPointF nu (-h, 0.5 * (height() - h));
+	QPointF nd (-h, 0.5 * (h - aids->height()));
+	QPointF nu (-h, 0.5 * (aids->height() - h));
 	QPolygonF line = QPolygonF()
 		<< nd + QPointF (0.5 * h, 0.0)
 		<< nd + QPointF (h, 0.0)
 		<< nu + QPointF (h, 0.0)
 		<< nu + QPointF (0.5 * h, 0.0);
-	painter().setPen (get_pen (Qt::white, 1.0));
-	painter().setFont (nu_nd_font);
-	painter().setTransform (center_point_transform);
-	painter().drawPolyline (line);
-	painter().drawLine (QPointF (-0.5 * h, 0.0), QPointF (+0.5 * h, 0.0));
-	painter().fast_draw_text (nd - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "ND");
-	painter().fast_draw_text (nu - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "NU");
+	painter.setPen (aids->get_pen (Qt::white, 1.0));
+	painter.setFont (nu_nd_font);
+	painter.setTransform (center_point_transform);
+	painter.drawPolyline (line);
+	painter.drawLine (QPointF (-0.5 * h, 0.0), QPointF (+0.5 * h, 0.0));
+	painter.fast_draw_text (nd - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "ND");
+	painter.fast_draw_text (nu - QPointF (0.25 * h, 0.0), Qt::AlignVCenter | Qt::AlignRight, "NU");
 
 	// Reference range:
 	if (ref_min && ref_max)
 	{
-		painter().setPen (Qt::NoPen);
-		painter().setBrush (Qt::green);
-		painter().drawRect (QRectF (QPointF (pen_width (0.5), -*ref_min * 0.5 * v),
-									QPointF (pen_width (5.0), -*ref_max * 0.5 * v)));
+		painter.setPen (Qt::NoPen);
+		painter.setBrush (Qt::green);
+		painter.drawRect (QRectF (QPointF (aids->pen_width (0.5), -*ref_min * 0.5 * v),
+									QPointF (aids->pen_width (5.0), -*ref_max * 0.5 * v)));
 	}
 
 	// Reference value:
 	if (ref)
 	{
-		painter().setPen (get_pen (_autopilot_color, 2.0));
-		painter().add_shadow ([&] {
-			painter().drawLine (QPointF (pen_width (0.5), -*ref * 0.5 * v),
-								QPointF (pen_width (7.5), -*ref * 0.5 * v));
+		painter.setPen (aids->get_pen (aids->kAutopilotColor, 2.0));
+		painter.paint (xf::Shadow(), [&] {
+			painter.drawLine (QPointF (aids->pen_width (0.5), -*ref * 0.5 * v),
+							  QPointF (aids->pen_width (7.5), -*ref * 0.5 * v));
 		});
 	}
 
 	// Cyan vertical text:
-	painter().setFont (label_font);
-	painter().setPen (cyan);
-	painter().fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *io.label);
+	painter.setFont (label_font);
+	painter.setPen (cyan);
+	painter.fast_draw_vertical_text (QPointF (1.5 * h, 0.0), Qt::AlignVCenter | Qt::AlignLeft, *io.label);
 
 	// Pointer:
 	if (trim)
@@ -129,10 +117,10 @@ VerticalTrim::paintEvent (QPaintEvent*)
 			<< QPointF (-1.0 * h, +0.35 * h);
 		triangle << triangle[0];
 		QColor color = within_reference ? Qt::green : Qt::white;
-		painter().setPen (get_pen (color, 1.0));
-		painter().setBrush (color);
-		painter().add_shadow ([&] {
-			painter().drawPolygon (triangle.translated (0.0, -*trim * 0.5 * v));
+		painter.setPen (aids->get_pen (color, 1.0));
+		painter.setBrush (color);
+		painter.paint (xf::Shadow(), [&] {
+			painter.drawPolygon (triangle.translated (0.0, -*trim * 0.5 * v));
 		});
 	}
 
@@ -143,20 +131,20 @@ VerticalTrim::paintEvent (QPaintEvent*)
 	double x = 0.25 * h;
 	QPointF text_hook = QPointF (-2.0 * h, 0.0);
 	Qt::Alignment alignment = Qt::AlignVCenter | Qt::AlignRight;
-	painter().setPen (get_pen (within_reference ? Qt::green : Qt::white, 1.0));
-	painter().setBrush (Qt::NoBrush);
-	painter().setFont (value_font);
-	QRectF box = painter().get_text_box (text_hook, alignment, value_str).adjusted (-x, 0.0, x, 0.0);
-	painter().fast_draw_text (text_hook, alignment, value_str);
-	painter().drawRect (box);
+	painter.setPen (aids->get_pen (within_reference ? Qt::green : Qt::white, 1.0));
+	painter.setBrush (Qt::NoBrush);
+	painter.setFont (value_font);
+	QRectF box = painter.get_text_box (text_hook, alignment, value_str).adjusted (-x, 0.0, x, 0.0);
+	painter.fast_draw_text (text_hook, alignment, value_str);
+	painter.drawRect (box);
 
 	// Numerical reference:
 	if (ref)
 	{
 		QString ref_str = stringify (-*ref);
-		painter().setPen (get_pen (_autopilot_color, 1.0));
-		painter().setFont (reference_font);
-		painter().fast_draw_text (QPointF (box.center().x(), box.top()), Qt::AlignBottom | Qt::AlignHCenter, ref_str);
+		painter.setPen (aids->get_pen (aids->kAutopilotColor, 1.0));
+		painter.setFont (reference_font);
+		painter.fast_draw_text (QPointF (box.center().x(), box.top()), Qt::AlignBottom | Qt::AlignHCenter, ref_str);
 	}
 }
 

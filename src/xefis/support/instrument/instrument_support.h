@@ -52,7 +52,6 @@ class InstrumentSupport
 	update_cache (PaintRequest const&) const;
 
   private:
-	QSize mutable									_cached_size;
 	std::optional<PaintRequest::Metric> mutable		_cached_canvas_metric;
 	std::shared_ptr<InstrumentAids> mutable			_cached_aids;
 	TextPainter::Cache mutable						_text_painter_cache; // FIXME this implies thread-safety:
@@ -62,11 +61,10 @@ class InstrumentSupport
 inline std::shared_ptr<InstrumentAids>
 InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 {
-	if (!_cached_aids || _cached_size != paint_request.canvas().size() ||
-		!_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
+	if (!_cached_aids || !_cached_canvas_metric || _cached_canvas_metric != paint_request.metric())
 	{
 		update_cache (paint_request);
-		_cached_aids = std::make_shared<InstrumentAids> (paint_request);
+		_cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
 		// TODO update Aids to reflect on new size
 	}
 
@@ -77,8 +75,7 @@ InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 inline InstrumentPainter
 InstrumentSupport::get_painter (PaintRequest& paint_request) const
 {
-	if (_cached_size != paint_request.canvas().size() ||
-		!_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
+	if (!_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
 	{
 		update_cache (paint_request);
 		_text_painter_cache = TextPainter::Cache();
@@ -91,7 +88,6 @@ InstrumentSupport::get_painter (PaintRequest& paint_request) const
 inline void
 InstrumentSupport::update_cache (PaintRequest const& paint_request) const
 {
-	_cached_size = paint_request.canvas().size();
 	_cached_canvas_metric = paint_request.metric();
 }
 

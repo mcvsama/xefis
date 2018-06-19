@@ -20,18 +20,16 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/painter.h>
 
 // Local:
 #include "linear_indicator.h"
 
 
 LinearIndicator::LinearIndicator (std::unique_ptr<LinearIndicatorIO> module_io, xf::PropertyDigitizer value_digitizer, std::string const& instance):
-	InstrumentAids (0.8f),
 	BasicIndicator (std::move (module_io), instance),
 	_value_digitizer (value_digitizer)
 {
-	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.set_callback ([&]{ mark_dirty(); });
 	_inputs_observer.observe (_value_digitizer.property());
 }
 
@@ -44,25 +42,24 @@ LinearIndicator::process (xf::Cycle const& cycle)
 
 
 void
-LinearIndicator::paintEvent (QPaintEvent*)
+LinearIndicator::paint (xf::PaintRequest& paint_request) const
 {
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
+
 	std::optional<double> value = _value_digitizer.to_numeric();
 	xf::Range<double> range { *io.value_minimum, *io.value_maximum };
 
-	auto painting_token = get_token (this);
+	float const w = aids->width();
+	float const h = aids->height();
 
-	float const w = width();
-	float const h = height();
-
-	QPen pen_white = get_pen (Qt::white, 1.f);
-	QPen pen_silver = get_pen (QColor (0xbb, 0xbd, 0xbf), 1.f);
-
-	clear_background();
+	QPen pen_white = aids->get_pen (Qt::white, 1.f);
+	QPen pen_silver = aids->get_pen (QColor (0xbb, 0xbd, 0xbf), 1.f);
 
 	if (*io.mirrored_style)
 	{
-		painter().translate (w, 0.f);
-		painter().scale (-1.f, 1.f);
+		painter.translate (w, 0.f);
+		painter.scale (-1.f, 1.f);
 	}
 
 	float q = 0.05f * w;
@@ -74,8 +71,8 @@ LinearIndicator::paintEvent (QPaintEvent*)
 
 	// Indicator
 
-	painter().setPen (pen_silver);
-	painter().drawLine (p0, p1);
+	painter.setPen (pen_silver);
+	painter.drawLine (p0, p1);
 
 	if (value)
 	{
@@ -83,24 +80,24 @@ LinearIndicator::paintEvent (QPaintEvent*)
 		bool inbound = range.includes (*value);
 
 		if (inbound)
-			painter().setBrush (Qt::white);
+			painter.setBrush (Qt::white);
 		else
-			painter().setBrush (Qt::NoBrush);
+			painter.setBrush (Qt::NoBrush);
 
-		painter().setPen (pen_white);
+		painter.setPen (pen_white);
 		QPolygonF polygon = QPolygonF()
 			<< QPointF (0.f, 0.f)
 			<< QPointF (1.9f * q, -0.5f * q)
 			<< QPointF (1.9f * q, +0.5f * q);
 		polygon.translate (p1.x(), xf::renormalize (v_value, range.min(), range.max(), p1.y(), p0.y()));
-		painter().add_shadow ([&] {
-			painter().drawPolygon (polygon);
+		painter.paint (xf::Shadow(), [&] {
+			painter.drawPolygon (polygon);
 		});
 	}
 
 	// Text
 
-	QFont font (_font_20);
+	QFont font (aids->font_5.font);
 	QFontMetricsF metrics (font);
 	float char_width = metrics.width ("0");
 	float hcorr = 0.025f * metrics.height();
@@ -110,24 +107,24 @@ LinearIndicator::paintEvent (QPaintEvent*)
 		text = stringify_value (*value);
 	text = pad_string (text);
 
-	painter().setFont (font);
-	QRectF text_rect = painter().get_text_box (QPointF (p0.x() - q, h / 2.f), Qt::AlignRight | Qt::AlignVCenter, text);
+	painter.setFont (font);
+	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, h / 2.f), Qt::AlignRight | Qt::AlignVCenter, text);
 	text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
-	painter().setPen (get_pen (Qt::white, 0.8f));
-	painter().setBrush (Qt::NoBrush);
-	painter().drawRect (text_rect);
+	painter.setPen (aids->get_pen (Qt::white, 0.8f));
+	painter.setBrush (Qt::NoBrush);
+	painter.drawRect (text_rect);
 	QPointF position;
 
 	if (*io.mirrored_style)
 	{
 		position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
-		position = painter().transform().map (position);
-		painter().resetTransform();
+		position = painter.transform().map (position);
+		painter.resetTransform();
 	}
 	else
 		position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
 
-	painter().fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, text);
+	painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, text);
 }
 
 

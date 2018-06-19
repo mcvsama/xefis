@@ -134,38 +134,66 @@ Screen::paint_instruments_to_buffer()
 		{
 			constexpr si::Length pen_width = 0.5_mm; // TODO user-configurable
 			constexpr si::Length font_height = 5_mm; // TODO user-configurable
-			PaintRequest::Metric metric { pixel_density(), pen_width, font_height };
-			PaintRequest paint_request { details.canvas, metric };
+			PaintRequest::Metric metric { details.rect.size(), pixel_density(), pen_width, font_height };
 
-			prepare_canvas_for_instrument (details.canvas, details.rect.size());
-			instrument.mark_dirty();
-			instrument.paint (paint_request);
+			if (!details.paint_request || details.paint_request->done())
+			{
+				if (details.paint_request)
+					std::swap (details.canvas, details.ready_canvas);
+
+				// If size changed:
+				if (details.canvas && details.canvas->size() != details.rect.size())
+					instrument.mark_dirty();
+
+				// If needs repainting:
+				if (instrument.dirty_since_last_check())
+				{
+					prepare_canvas_for_instrument (details.canvas, details.rect.size());
+					details.paint_request.emplace (*details.canvas, metric, details.previous_size);
+
+					instrument.paint (*details.paint_request);
+
+					if (details.paint_request->done())
+						std::swap (details.canvas, details.ready_canvas);
+
+					// Unfinished PaintRequests will be checked during next paint_instruments_to_buffer().
+				}
+
+				details.previous_size = details.rect.size();
+			}
 		}
 		else
 			std::clog << "Instrument " << identifier (instrument) << " has invalid size/position." << std::endl;
 	}
 
-	// Merge all images into our painting buffer:
+	// Compose all images into our painting buffer:
 	{
 		QPainter canvas_painter (&_canvas);
 
 		for (auto* disclosure: _z_index_sorted_disclosures)
 		{
-			auto& instrument = disclosure->registrant();
 			auto const& details = disclosure->details();
 
-			if (details.rect.isValid() && instrument.dirty_since_last_check())
-				canvas_painter.drawImage (details.rect, details.canvas, QRect (QPoint (0, 0), details.rect.size()));
+			if (details.rect.isValid() && details.ready_canvas)
+			{
+				// Discard images that have different size than requested rect.size(), beacuse
+				// it means a resize happened during async painting of the instrument.
+				if (details.rect.size() == details.ready_canvas->size())
+					canvas_painter.drawImage (details.rect, *details.ready_canvas, QRect (QPoint (0, 0), details.rect.size()));
+			}
 		}
 	}
 }
 
 
 void
-Screen::prepare_canvas_for_instrument (QImage& canvas, QSize size)
+Screen::prepare_canvas_for_instrument (std::unique_ptr<QImage>& canvas, QSize size)
 {
-	if (canvas.isNull() || canvas.size() != size)
-		canvas = allocate_image (size);
+	if (!canvas)
+		canvas = std::make_unique<QImage>();
+
+	if (canvas->isNull() || canvas->size() != size)
+		*canvas = allocate_image (size);
 }
 
 

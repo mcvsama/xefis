@@ -44,7 +44,6 @@ void
 Gear::process (xf::Cycle const& cycle)
 {
 	_inputs_observer.process (cycle.update_dt());
-	mark_dirty();
 }
 
 

@@ -37,6 +37,14 @@ class InstrumentPainter:
 	// Ctor
 	explicit
 	InstrumentPainter (QPaintDevice&, TextPainter::Cache&);
+
+	/**
+	 * Calls save(), then the provided callback and then restore().
+	 * It's exception-safe meaning that restore() will be called
+	 * if an exception is thrown from inside the callback.
+	 */
+	void
+	save_context (std::function<void()> paint_callback);
 };
 
 } // namespace xf

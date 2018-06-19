@@ -19,7 +19,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/painter.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
@@ -73,8 +72,7 @@ Status::Message::color() const noexcept
 
 
 Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance),
-	InstrumentAids (1.0)
+	Instrument (std::move (module_io), instance)
 {
 	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder> (io.cursor_value, [this](int delta) {
 		if (delta > 0)
@@ -91,14 +89,12 @@ Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance
 
 	_input_cursor_decoder->force_callback (0);
 
-	recompute_widget();
-
 	_blink_timer = std::make_unique<QTimer>();
 	_blink_timer->setInterval (200);
 	_blink_timer->setSingleShot (false);
 	QObject::connect (_blink_timer.get(), &QTimer::timeout, [&] {
 		_blink_show = !_blink_show;
-		update();
+		mark_dirty();
 	});
 	_blink_timer->start();
 
@@ -107,7 +103,7 @@ Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance
 	_cursor_hide_timer->setSingleShot (true);
 	QObject::connect (_cursor_hide_timer.get(), &QTimer::timeout, [&] {
 		_cursor_visible = false;
-		update();
+		mark_dirty();
 	});
 }
 
@@ -120,7 +116,7 @@ Status::add_message (std::string const& text, Severity severity)
 	_hidden_messages.push_back (m);
 
 	solve_scroll_and_cursor();
-	update();
+	mark_dirty();
 
 	return m;
 }
@@ -181,51 +177,58 @@ Status::process (xf::Cycle const& cycle)
 
 
 void
-Status::resizeEvent (QResizeEvent*)
+Status::paint (xf::PaintRequest& paint_request) const
 {
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		InstrumentAids::set_scaling (1.2f * xw->pen_scale(), 0.95f * xw->font_scale());
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
 
-	InstrumentAids::update_sizes (size(), window()->size());
+	if (paint_request.size_changed())
+	{
+		_font = aids->font_3.font;
+		float margin = aids->pen_width (2.f);
+		QFontMetricsF metrics (_font);
+		_line_height = 0.85 * metrics.height();
+		// Compute space needed for more-up/more-down arrows and actual
+		// messages viewport.
+		_arrow_height = 0.5f * _line_height;
+		_viewport = QRectF (margin, _arrow_height, aids->width() - 2.f * margin, aids->height() - 2.f * _arrow_height);
+		if (_viewport.height() <= 0)
+			_max_visible_messages = 0;
+		else
+			_max_visible_messages = static_cast<unsigned int> (_viewport.height() / _line_height);
+		// Fix viewport size to be integral number of shown messages:
+		_viewport.setHeight (_line_height * _max_visible_messages);
 
-	recompute_widget();
-}
-
-
-void
-Status::paintEvent (QPaintEvent*)
-{
-	auto painting_token = get_token (this);
-	clear_background();
+		solve_scroll_and_cursor();
+	}
 
 	// Messages:
-	painter().setBrush (Qt::NoBrush);
-	painter().setFont (_font);
+	painter.setBrush (Qt::NoBrush);
+	painter.setFont (_font);
 	int n = std::min<int> (static_cast<int> (_visible_messages.size()) - _scroll_pos, _max_visible_messages);
 	for (int i = 0; i < n; ++i)
 	{
 		Message const* message = _visible_messages[i + _scroll_pos];
-		painter().setPen (QPen (message->color()));
-		painter().fast_draw_text (QPointF (_viewport.left(),
-										   _viewport.top() + _line_height * (i + 0.5)),
-								  Qt::AlignVCenter | Qt::AlignLeft,
-								  QString::fromStdString (message->text()));
+		painter.setPen (QPen (message->color()));
+		painter.fast_draw_text (QPointF (_viewport.left(),
+										 _viewport.top() + _line_height * (i + 0.5)),
+								Qt::AlignVCenter | Qt::AlignLeft,
+								QString::fromStdString (message->text()));
 	}
 
 	// Cursor:
 	if (_cursor_visible)
 	{
-		float margin = pen_width (1.f);
+		float margin = aids->pen_width (1.f);
 		QRectF cursor (_viewport.left(), _viewport.top() + _line_height * (_cursor_pos - _scroll_pos), _viewport.width(), _line_height);
 		cursor.adjust (-margin, 0.0, margin, 0.0);
-		painter().setPen (get_pen (Qt::white, 1.2f));
-		painter().drawRect (cursor);
+		painter.setPen (aids->get_pen (Qt::white, 1.2f));
+		painter.drawRect (cursor);
 	}
 
 	// For up/down arrows:
-	painter().setPen (get_pen (Qt::white, 1.f));
-	painter().setBrush (Qt::white);
+	painter.setPen (aids->get_pen (Qt::white, 1.f));
+	painter.setBrush (Qt::white);
 
 	// Both arrows are blinking:
 	if (_blink_show)
@@ -238,7 +241,7 @@ Status::paintEvent (QPaintEvent*)
 				<< QPointF (-_arrow_height, 0.f)
 				<< QPointF (+_arrow_height, 0.f);
 
-			painter().drawPolygon (arrow.translated (_viewport.center().x(), _viewport.top()));
+			painter.drawPolygon (arrow.translated (_viewport.center().x(), _viewport.top()));
 		}
 
 		// Down arrow:
@@ -249,7 +252,7 @@ Status::paintEvent (QPaintEvent*)
 				<< QPointF (+_arrow_height, 0.f)
 				<< QPointF (0.f, _arrow_height);
 
-			painter().drawPolygon (arrow.translated (_viewport.center().x(), _viewport.bottom()));
+			painter.drawPolygon (arrow.translated (_viewport.center().x(), _viewport.bottom()));
 		}
 	}
 }
@@ -266,7 +269,7 @@ Status::cursor_up()
 		solve_scroll_and_cursor();
 	}
 
-	update();
+	mark_dirty();
 	_cursor_hide_timer->start();
 }
 
@@ -282,7 +285,7 @@ Status::cursor_down()
 		solve_scroll_and_cursor();
 	}
 
-	update();
+	mark_dirty();
 	_cursor_hide_timer->start();
 }
 
@@ -302,7 +305,7 @@ Status::cursor_del()
 	_cursor_hide_timer->start();
 
 	solve_scroll_and_cursor();
-	update();
+	mark_dirty();
 }
 
 
@@ -313,7 +316,7 @@ Status::recall()
 	_hidden_messages.clear();
 
 	solve_scroll_and_cursor();
-	update();
+	mark_dirty();
 }
 
 
@@ -324,34 +327,12 @@ Status::clear()
 	_visible_messages.clear();
 
 	solve_scroll_and_cursor();
-	update();
+	mark_dirty();
 }
 
 
 void
-Status::recompute_widget()
-{
-	float margin = pen_width (2.f);
-	_font = _font_16;
-	QFontMetricsF metrics (_font);
-	_line_height = 0.85 * metrics.height();
-	// Compute space needed for more-up/more-down arrows and actual
-	// messages viewport.
-	_arrow_height = 0.5f * _line_height;
-	_viewport = QRectF (margin, _arrow_height, width() - 2.f * margin, height() - 2.f * _arrow_height);
-	if (_viewport.height() <= 0)
-		_max_visible_messages = 0;
-	else
-		_max_visible_messages = static_cast<unsigned int> (_viewport.height() / _line_height);
-	// Fix viewport size to be integral number of shown messages:
-	_viewport.setHeight (_line_height * _max_visible_messages);
-
-	solve_scroll_and_cursor();
-}
-
-
-void
-Status::solve_scroll_and_cursor()
+Status::solve_scroll_and_cursor() const
 {
 	// Solve _cursor_pos:
 	if (_visible_messages.empty())

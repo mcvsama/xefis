@@ -34,5 +34,23 @@ InstrumentPainter::InstrumentPainter (QPaintDevice& device, TextPainter::Cache& 
 	set_font_position_correction ({ 0.0, 0.04 });
 }
 
+
+void
+InstrumentPainter::save_context (std::function<void()> paint_callback)
+{
+	save();
+
+	try {
+		paint_callback();
+	}
+	catch (...)
+	{
+		restore();
+		throw;
+	}
+
+	restore();
+}
+
 } // namespace xf
 

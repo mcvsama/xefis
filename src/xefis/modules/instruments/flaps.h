@@ -20,10 +20,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class FlapsIO: public xf::ModuleIO
@@ -47,24 +47,20 @@ class FlapsIO: public xf::ModuleIO
 
 class Flaps:
 	public xf::Instrument<FlapsIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
   public:
 	// Ctor
 	explicit
 	Flaps (std::unique_ptr<FlapsIO>, std::string const& instance = {});
 
+	// Module API
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
 	xf::PropertyObserver	_inputs_observer;

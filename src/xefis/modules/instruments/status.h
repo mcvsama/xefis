@@ -24,9 +24,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
+#include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/v2/actions.h>
 #include <xefis/utility/v2/delta_decoder.h>
 
@@ -65,10 +65,8 @@ class StatusIO: public xf::ModuleIO
  */
 class Status:
 	public xf::Instrument<StatusIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
-	Q_OBJECT
-
   public:
 	/**
 	 * Severity affects color of the message and resulting alert sound.
@@ -180,14 +178,9 @@ class Status:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	resizeEvent (QResizeEvent*) override;
-
-	// QWidget API
-	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 
   private:
 	/**
@@ -221,23 +214,17 @@ class Status:
 	clear();
 
 	/**
-	 * Calculate sizes, viewports, etc.
-	 */
-	void
-	recompute_widget();
-
-	/**
 	 * Compute scroll value needed to display messages.
 	 */
 	void
-	solve_scroll_and_cursor();
+	solve_scroll_and_cursor() const;
 
   private:
-	xf::PropChangedTo<bool>				_button_cursor_del_pressed { io.button_cursor_del, true };
-	xf::PropChangedTo<bool>				_button_recall_pressed { io.button_recall, true };
-	xf::PropChangedTo<bool>				_button_clear_pressed { io.button_clear, true };
-	xf::PropChangedTo<bool>				_button_master_caution_pressed { io.button_master_caution, true };
-	xf::PropChangedTo<bool>				_button_master_warning_pressed { io.button_master_warning, true };
+	xf::PropChangedTo<bool>				_button_cursor_del_pressed		{ io.button_cursor_del, true };
+	xf::PropChangedTo<bool>				_button_recall_pressed			{ io.button_recall, true };
+	xf::PropChangedTo<bool>				_button_clear_pressed			{ io.button_clear, true };
+	xf::PropChangedTo<bool>				_button_master_caution_pressed	{ io.button_master_caution, true };
+	xf::PropChangedTo<bool>				_button_master_warning_pressed	{ io.button_master_warning, true };
 	std::unique_ptr<xf::DeltaDecoder>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;
@@ -245,15 +232,16 @@ class Status:
 	si::Time							_last_message_timestamp;
 	Unique<QTimer>						_blink_timer;
 	Unique<QTimer>						_cursor_hide_timer;
-	double								_line_height			{ 0.0 };
-	double								_arrow_height			{ 0.0 };
-	int									_scroll_pos				{ 0 };
-	int									_cursor_pos				{ 0 };
-	int									_max_visible_messages	{ 0 };
 	bool								_blink_show				{ false };
-	bool								_cursor_visible			{ false };
-	QFont								_font;
-	QRectF								_viewport;
+	// Cache stuff:
+	mutable QFont						_font;
+	mutable float						_line_height			{ 0.0 };
+	mutable float						_arrow_height			{ 0.0 };
+	mutable QRectF						_viewport;
+	mutable int							_max_visible_messages	{ 0 };
+	mutable int							_scroll_pos				{ 0 };
+	mutable int							_cursor_pos				{ 0 };
+	mutable bool						_cursor_visible			{ false };
 };
 
 

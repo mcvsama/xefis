@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/instrument_aids.h>
 #include <xefis/core/property.h>
+#include <xefis/support/instrument/instrument_support.h>
 
 
 class DebugForcesIO: public xf::ModuleIO
@@ -45,7 +45,7 @@ class DebugForcesIO: public xf::ModuleIO
 
 class DebugForces:
 	public xf::Instrument<DebugForcesIO>,
-	protected xf::InstrumentAids
+	protected xf::InstrumentSupport
 {
   public:
 	// Ctor
@@ -56,10 +56,9 @@ class DebugForces:
 	void
 	process (xf::Cycle const&) override;
 
-  protected:
-	// QWidget API
+	// Instrument API
 	void
-	paintEvent (QPaintEvent*) override;
+	paint (xf::PaintRequest&) const override;
 };
 
 #endif

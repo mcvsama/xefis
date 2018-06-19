@@ -62,10 +62,9 @@ Datatable::Line::stringify() const
 
 
 Datatable::Datatable (xf::Xefis*, std::string const& instance):
-	Instrument (instance),
-	InstrumentAids (0.5f)
+	Instrument (instance)
 {
-	_inputs_observer.set_callback ([&]{ update(); });
+	_inputs_observer.set_callback ([&]{ mark_dirty(); });
 
 	for (auto& line: _list)
 		_inputs_observer.observe (line.value.property());
@@ -73,14 +72,14 @@ Datatable::Datatable (xf::Xefis*, std::string const& instance):
 
 
 void
-Datatable::set_label_font_size (xf::FontSize size)
+Datatable::set_label_font_size (float size)
 {
 	_label_font_size = size;
 }
 
 
 void
-Datatable::set_value_font_size (xf::FontSize size)
+Datatable::set_value_font_size (float size)
 {
 	_value_font_size = size;
 }
@@ -101,49 +100,38 @@ Datatable::process (xf::Cycle const& cycle)
 
 
 void
-Datatable::resizeEvent (QResizeEvent*)
+Datatable::paint (xf::PaintRequest& paint_request) const
 {
-	auto xw = dynamic_cast<v1::Window*> (window());
-	if (xw)
-		set_scaling (xw->pen_scale(), xw->font_scale());
+	auto aids = get_aids (paint_request);
+	auto painter = get_painter (paint_request);
 
-	InstrumentAids::update_sizes (size(), window()->size());
-}
-
-
-void
-Datatable::paintEvent (QPaintEvent*)
-{
-	auto painting_token = get_token (this);
-	clear_background();
-
-	QFont label_font = _font_10;
-	QFont value_font = _font_10;
-	label_font.setPixelSize (*_label_font_size * _master_font_scale);
-	value_font.setPixelSize (*_value_font_size * _master_font_scale);
+	QFont label_font = aids->font_1.font;
+	QFont value_font = aids->font_1.font;
+	label_font.setPixelSize (aids->font_pixel_size (_label_font_size));
+	value_font.setPixelSize (aids->font_pixel_size (_value_font_size));
 
 	double line_height = std::max (QFontMetricsF (label_font).height(), QFontMetricsF (value_font).height());
-	double empty_height = height() - line_height * _list.size();
+	double empty_height = aids->height() - line_height * _list.size();
 
 	if (_alignment & Qt::AlignVCenter)
-		painter().translate (QPointF (0.0, 0.5 * empty_height));
+		painter.translate (QPointF (0.0, 0.5 * empty_height));
 	else if (_alignment & Qt::AlignBottom)
-		painter().translate (QPointF (0.0, empty_height));
+		painter.translate (QPointF (0.0, empty_height));
 
 	for (std::size_t i = 0; i < _list.size(); ++i)
 	{
 		Line const& line = _list[i];
 
 		QPointF left (0.0, (i + 1) * line_height);
-		QPointF right (rect().width(), left.y());
+		QPointF right (aids->width(), left.y());
 
 		// Label:
-		painter().setFont (label_font);
-		painter().setPen (get_pen (line.label_color, 1.0));
-		painter().fast_draw_text (left, Qt::AlignLeft | Qt::AlignBottom, QString::fromStdString (line.label));
-		// Value:
-		painter().setFont (value_font);
-		painter().setPen (get_pen (line.value_color, 1.0));
+		painter.setFont (label_font);
+		painter.setPen (aids->get_pen (line.label_color, 1.0));
+		painter.fast_draw_text (left, Qt::AlignLeft | Qt::AlignBottom, QString::fromStdString (line.label));
+		// Valu
+		painter.setFont (value_font);
+		painter.setPen (aids->get_pen (line.value_color, 1.0));
 		std::string str_to_paint;
 
 		auto error = xf::handle_format_exception([&] {
@@ -152,11 +140,11 @@ Datatable::paintEvent (QPaintEvent*)
 
 		if (error)
 		{
-			painter().setPen (get_pen (Qt::red, 1.0));
+			painter.setPen (aids->get_pen (Qt::red, 1.0));
 			str_to_paint = *error;
 		}
 
-		painter().fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, QString::fromStdString (str_to_paint));
+		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, QString::fromStdString (str_to_paint));
 	}
 }
 
