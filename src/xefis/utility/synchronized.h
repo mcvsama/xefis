@@ -17,9 +17,90 @@
 // Standard:
 #include <cstddef>
 #include <mutex>
+#include <type_traits>
 
 
 namespace xf {
+
+template<class V, class M>
+	class Synchronized;
+
+
+/**
+ * This object allows you to access the resource protected by Synchronized.
+ * As long as it exists, the lock is held.
+ */
+template<class pValue, class pMutex>
+	class UniqueAccessor
+	{
+		template<class V, class M>
+			friend class Synchronized;
+
+	  public:
+		using Value	= pValue;
+		using Mutex	= pMutex;
+
+	  private:
+		/**
+		 * Constructor for UniqueAccessor for non-const values.
+		 */
+		template<class = std::enable_if_t<!std::is_const_v<Value>>>
+			explicit
+			UniqueAccessor (Synchronized<Value, Mutex>&);
+
+		/**
+		 * Constructor for UniqueAccessor for const values.
+		 */
+		template<class = std::enable_if_t<std::is_const_v<Value>>>
+			explicit
+			UniqueAccessor (Synchronized<std::remove_const_t<Value>, Mutex> const&);
+
+	  public:
+		// Move ctor
+		UniqueAccessor (UniqueAccessor&&) = default;
+
+		// Move operator
+		UniqueAccessor&
+		operator= (UniqueAccessor&&) noexcept = default;
+
+		/**
+		 * Access the value by reference.
+		 */
+		template<class = std::enable_if_t<!std::is_const_v<Value>>>
+			Value&
+			operator*() noexcept;
+
+		/**
+		 * Access the value by reference.
+		 */
+		Value const&
+		operator*() const noexcept;
+
+		/**
+		 * Access the value by pointer.
+		 */
+		template<class = std::enable_if_t<!std::is_const_v<Value>>>
+			Value*
+			operator->() noexcept;
+
+		/**
+		 * Access the value by pointer.
+		 */
+		Value const*
+		operator->() const noexcept;
+
+		/**
+		 * Unlock the mutex and deassociate this Accessor from a Synchronized object.
+		 * After calling this function, calling dereference operators is undefined-behaviour.
+		 */
+		void
+		unlock() noexcept;
+
+	  private:
+		Value*					_value;
+		std::unique_lock<Mutex>	_lock;
+	};
+
 
 /**
  * RAII-style safe lock. You need a token to access the resource, and if token exists, it guarantees
@@ -30,69 +111,15 @@ namespace xf {
  * \param	pMutex
  *			One of standard locks (eg. std::mutex, etc) that can be dealt with with std::unique_lock<pMutex>.
  */
-template<class pValue, class pMutex>
+template<class pValue, class pMutex = std::mutex>
 	class Synchronized
 	{
+		template<class V, class M>
+			friend class UniqueAccessor;
+
 	  public:
 		using Value	= pValue;
 		using Mutex	= pMutex;
-
-		/**
-		 * This object allows you to access the resource protected by Synchronized.
-		 * As long as it exists, the lock is held.
-		 */
-		class UniqueAccessor
-		{
-			friend class Synchronized;
-
-		  private:
-			// Ctor
-			explicit
-			UniqueAccessor (Synchronized&);
-
-		  public:
-			// Move ctor
-			UniqueAccessor (UniqueAccessor&&);
-
-			// Move operator
-			UniqueAccessor&
-			operator= (UniqueAccessor&&) noexcept;
-
-			/**
-			 * Access the value by reference.
-			 */
-			Value&
-			operator*() noexcept;
-
-			/**
-			 * Access the value by reference.
-			 */
-			Value const&
-			operator*() const noexcept;
-
-			/**
-			 * Access the value by pointer.
-			 */
-			Value*
-			operator->() noexcept;
-
-			/**
-			 * Access the value by pointer.
-			 */
-			Value const*
-			operator->() const noexcept;
-
-			/**
-			 * Unlock the mutex and deassociate this Accessor from a Synchronized object.
-			 * After calling this function, calling dereference operators is undefined-behaviour.
-			 */
-			void
-			unlock() noexcept;
-
-		  private:
-			Value*					_value;
-			std::unique_lock<Mutex>	_lock;
-		};
 
 	  public:
 		// Ctor
@@ -102,67 +129,68 @@ template<class pValue, class pMutex>
 		/**
 		 * Return unique access token.
 		 */
-		UniqueAccessor
+		UniqueAccessor<Value, Mutex>
 		unique_accessor();
 
+		/**
+		 * Return const unique access token.
+		 */
+		UniqueAccessor<Value const, Mutex>
+		unique_accessor() const;
+
 	  private:
-		Value	_value;
-		Mutex	_mutex;
+		Value			_value;
+		Mutex mutable	_mutex;
 	};
 
 
 template<class V, class M>
-	Synchronized<V, M>::UniqueAccessor::UniqueAccessor (Synchronized& synchronized):
-		_value (&synchronized._value),
-		_lock (synchronized._mutex)
-	{ }
+	template<class>
+		inline
+		UniqueAccessor<V, M>::UniqueAccessor (Synchronized<V, M>& synchronized):
+			_value (&synchronized._value),
+			_lock (synchronized._mutex)
+		{ }
 
 
 template<class V, class M>
-	inline
-	Synchronized<V, M>::UniqueAccessor::UniqueAccessor (UniqueAccessor&& other):
-		_value (other._value),
-		_lock (std::move (other._lock))
-	{ }
+	template<class>
+		inline
+		UniqueAccessor<V, M>::UniqueAccessor (Synchronized<std::remove_const_t<V>, M> const& synchronized):
+			_value (&synchronized._value),
+			_lock (synchronized._mutex)
+		{ }
 
 
 template<class V, class M>
-	inline auto
-	Synchronized<V, M>::UniqueAccessor::operator= (UniqueAccessor&& other) noexcept -> UniqueAccessor&
-	{
-		_value = &other;
-		_lock = std::move (other._lock);
-		return *this;
-	}
-
-
-template<class V, class M>
-	inline auto
-	Synchronized<V, M>::UniqueAccessor::operator*() noexcept -> Value&
-	{
-		return *_value;
-	}
+	template<class>
+		inline auto
+		UniqueAccessor<V, M>::operator*() noexcept -> Value&
+		{
+			return *_value;
+		}
 
 
 template<class V, class M>
 	inline auto
-	Synchronized<V, M>::UniqueAccessor::operator*() const noexcept -> Value const&
+	UniqueAccessor<V, M>::operator*() const noexcept -> Value const&
 	{
 		return *_value;
 	}
 
 
 template<class V, class M>
-	inline auto
-	Synchronized<V, M>::UniqueAccessor::operator->() noexcept -> Value*
-	{
-		return _value;
-	}
+	template<class>
+		inline auto
+		UniqueAccessor<V, M>::operator->() noexcept -> Value*
+		{
+			return _value;
+		}
 
 
 template<class V, class M>
 	inline auto
-	Synchronized<V, M>::UniqueAccessor::operator->() const noexcept -> Value const*
+	UniqueAccessor<V, M>::operator->() const noexcept -> Value const*
 	{
 		return _value;
 	}
@@ -170,7 +198,7 @@ template<class V, class M>
 
 template<class V, class M>
 	inline void
-	Synchronized<V, M>::UniqueAccessor::unlock() noexcept
+	UniqueAccessor<V, M>::unlock() noexcept
 	{
 		_value = nullptr;
 		_lock.unlock();
@@ -187,9 +215,17 @@ template<class V, class M>
 
 template<class V, class M>
 	inline auto
-	Synchronized<V, M>::unique_accessor() -> UniqueAccessor
+	Synchronized<V, M>::unique_accessor() -> UniqueAccessor<Value, Mutex>
 	{
-		return UniqueAccessor (*this);
+		return UniqueAccessor<Value, Mutex> (*this);
+	}
+
+
+template<class V, class M>
+	inline auto
+	Synchronized<V, M>::unique_accessor() const -> UniqueAccessor<Value const, Mutex>
+	{
+		return UniqueAccessor<Value const, Mutex> (*this);
 	}
 
 } // namespace xf
