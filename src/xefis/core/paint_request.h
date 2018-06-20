@@ -101,21 +101,28 @@ class PaintRequest: private Noncopyable
 	size_changed() const noexcept;
 
 	/**
-	 * Set the done flag. By default it's true, but tasks that want
-	 * to paint asynchronously should set it to false initially and to true
-	 * when they're done.
+	 * Inform the system that the result will be painted asynchronously.
+	 * After it's done, API user is required to call finished().
 	 */
 	void
-	set_done (bool done) noexcept;
+	will_finish_asynchronously() noexcept;
 
 	/**
-	 * Return true if request was marked as done.
+	 * Inform the system that the asynchronous painting has finished.
+	 * After calling this method, calling any other method on this object
+	 * is undefined-behaviour.
+	 */
+	void
+	set_finished() noexcept;
+
+	/**
+	 * Return true if request was marked as finished.
 	 */
 	bool
-	done() const noexcept;
+	finished() const noexcept;
 
   private:
-	std::atomic<bool>	_done { true };
+	std::atomic<bool>	_finished { true };
 	QImage*				_canvas;
 	Metric				_metric;
 	bool				_size_changed;
@@ -212,16 +219,23 @@ PaintRequest::size_changed() const noexcept
 
 
 inline void
-PaintRequest::set_done (bool done) noexcept
+PaintRequest::will_finish_asynchronously() noexcept
 {
-	_done.store (done);
+	_finished.store (false);
+}
+
+
+inline void
+PaintRequest::set_finished() noexcept
+{
+	_finished.store (true);
 }
 
 
 inline bool
-PaintRequest::done() const noexcept
+PaintRequest::finished() const noexcept
 {
-	return _done.load();
+	return _finished.load();
 }
 
 } // namespace xf

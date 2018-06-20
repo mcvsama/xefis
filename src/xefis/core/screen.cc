@@ -53,6 +53,12 @@ Screen::Screen (QRect rect, si::Frequency refresh_rate):
 }
 
 
+Screen::~Screen()
+{
+	// TODO wait for all async jobs to be finished
+}
+
+
 Screen::RegistrationProof
 Screen::register_instrument (BasicInstrument& instrument)
 {
@@ -136,13 +142,17 @@ Screen::paint_instruments_to_buffer()
 			constexpr si::Length font_height = 5_mm; // TODO user-configurable
 			PaintRequest::Metric metric { details.rect.size(), pixel_density(), pen_width, font_height };
 
-			if (!details.paint_request || details.paint_request->done())
+			if (!details.paint_request || details.paint_request->finished())
 			{
+				// If paint_request exists (and it's finished()), it means previous painting asynchronous.
 				if (details.paint_request)
+				{
 					std::swap (details.canvas, details.ready_canvas);
+					details.paint_request.reset();
+				}
 
 				// If size changed:
-				if (details.canvas && details.canvas->size() != details.rect.size())
+				if (!details.canvas || details.canvas->size() != details.rect.size())
 					instrument.mark_dirty();
 
 				// If needs repainting:
@@ -153,8 +163,11 @@ Screen::paint_instruments_to_buffer()
 
 					instrument.paint (*details.paint_request);
 
-					if (details.paint_request->done())
+					if (details.paint_request->finished())
+					{
 						std::swap (details.canvas, details.ready_canvas);
+						details.paint_request.reset();
+					}
 
 					// Unfinished PaintRequests will be checked during next paint_instruments_to_buffer().
 				}
@@ -194,6 +207,8 @@ Screen::prepare_canvas_for_instrument (std::unique_ptr<QImage>& canvas, QSize si
 
 	if (canvas->isNull() || canvas->size() != size)
 		*canvas = allocate_image (size);
+
+	canvas.fill (Qt::transparent);
 }
 
 
@@ -205,7 +220,6 @@ Screen::allocate_image (QSize size) const
 
 	image.setDotsPerMeterX (dots_per_meter);
 	image.setDotsPerMeterY (dots_per_meter);
-	image.fill (Qt::transparent);
 
 	return image;
 }
