@@ -73,6 +73,9 @@ class Screen:
 	explicit
 	Screen (QRect, si::Frequency refresh_rate);
 
+	// Dtor
+	~Screen();
+
 	/**
 	 * Register instrument
 	 */
