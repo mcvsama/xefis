@@ -28,7 +28,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/window.h>
 #include <xefis/core/stdexcept.h>
-#include <xefis/utility/format_exception.h>
+#include <xefis/utility/exception_support.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/text_layout.h>

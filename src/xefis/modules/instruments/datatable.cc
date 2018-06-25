@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/format_exception.h>
+#include <xefis/utility/exception_support.h>
 #include <xefis/utility/types.h>
 
 // Local:
