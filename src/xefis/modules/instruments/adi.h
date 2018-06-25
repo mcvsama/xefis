@@ -19,8 +19,8 @@
 #include <array>
 
 // Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
+#include <QtGui/QColor>
+#include <QtGui/QPainterPath>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -29,9 +29,9 @@
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/xefis.h>
-
-// Local:
-#include "adi_widget.h"
+#include <xefis/support/instrument/instrument_support.h>
+#include <xefis/utility/event_timestamper.h>
+#include <xefis/utility/synchronized.h>
 
 
 class ADI_IO: public xf::ModuleIO
@@ -41,7 +41,6 @@ class ADI_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	// TODO change to si::Velocity
 	xf::Setting<int64_t>			speed_ladder_line_every								{ this, "setting_speed_ladder_line_every", 10 };
 	xf::Setting<int64_t>			speed_ladder_number_every							{ this, "setting_speed_ladder_number_every", 20 };
 	xf::Setting<int64_t>			speed_ladder_extent									{ this, "setting_speed_ladder_extent", 124 };
@@ -123,6 +122,7 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>			pressure_display_hpa								{ this, "/pressure/display-hpa" };
 	xf::PropertyIn<bool>			pressure_use_std									{ this, "/pressure/use-std" };
 	// Flight director
+	// TODO xf::PropertyIn<std::string>	flight_director_active_name						{ ... } // "L", "R", "C"(enter)?
 	xf::PropertyIn<bool>			flight_director_serviceable							{ this, "/flight-director/serviceable" };
 	xf::PropertyIn<bool>			flight_director_cmd_visible							{ this, "/flight-director/cmd-visible" };
 	xf::PropertyIn<si::Length>		flight_director_cmd_altitude						{ this, "/flight-director/cmd.altitude" };
@@ -183,34 +183,602 @@ class ADI_IO: public xf::ModuleIO
 };
 
 
-class ADI: public xf::Instrument<ADI_IO>
+class Parameters
 {
-	Q_OBJECT
+	// TODO change to vector<> for speed
+	typedef std::map<QString, Velocity> VelocityBugs;
+	typedef std::map<QString, Length> AltitudeBugs;
 
+  public:
+	si::Time					timestamp;
+	// TODO perhaps remove _visible and use std::optional<>
+	bool						old_style							= false;
+	bool						show_metric							= false;
+	si::Angle					fov									= 120_deg;
+	bool						input_alert_visible					= false;
+	// Velocity
+	bool						speed_failure						= false;
+	bool						speed_visible						= false;
+	si::Velocity				speed								= 0_kt;
+	bool						speed_lookahead_visible				= false;
+	si::Velocity				speed_lookahead						= 0_kt;
+	bool						speed_minimum_visible				= false;
+	Velocity					speed_minimum						= 0_kt;
+	std::optional<si::Velocity>	speed_minimum_maneuver;
+	std::optional<si::Velocity>	speed_maximum_maneuver;
+	bool						speed_maximum_visible				= false;
+	si::Velocity				speed_maximum						= 0_kt;
+	bool						speed_mach_visible					= false;
+	double						speed_mach							= 0.0;
+	std::optional<si::Velocity>	speed_ground;
+	VelocityBugs				speed_bugs;
+	// Orientation
+	bool						orientation_failure					= false;
+	bool						orientation_pitch_visible			= false;
+	si::Angle					orientation_pitch					= 0_deg;
+	bool						orientation_roll_visible			= false;
+	si::Angle					orientation_roll					= 0_deg;
+	bool						orientation_heading_visible			= false;
+	si::Angle					orientation_heading					= 0_deg;
+	bool						orientation_heading_numbers_visible	= false;
+	// Slip-skid
+	bool						slip_skid_visible					= false;
+	si::Angle					slip_skid							= 0_deg;
+	// Flight path vector
+	bool						flight_path_marker_failure			= false;
+	bool						flight_path_visible					= false;
+	si::Angle					flight_path_alpha					= 0_deg;
+	si::Angle					flight_path_beta					= 0_deg;
+	// AOA limit
+	bool						critical_aoa_visible				= false;
+	si::Angle					critical_aoa						= 0_deg;
+	si::Angle					aoa_alpha							= 0_deg;
+	// Altitude
+	bool						altitude_failure					= false;
+	bool						altitude_visible					= false;
+	si::Length					altitude_amsl						= 0_ft;
+	bool						altitude_lookahead_visible			= false;
+	si::Length					altitude_lookahead					= 0_ft;
+	bool						altitude_agl_failure				= false;
+	bool						altitude_agl_visible				= false;
+	si::Length					altitude_agl						= 0_ft;
+	bool						altitude_agl_focus					= false;
+	bool						altitude_landing_visible			= false;
+	si::Length					altitude_landing_amsl				= 0_ft;
+	si::Length					altitude_landing_warning_hi			= 0_ft;
+	si::Length					altitude_landing_warning_lo			= 0_ft;
+	AltitudeBugs				altitude_bugs;
+	// Minimums
+	bool						minimums_altitude_visible			= false;
+	QString						minimums_type;
+	si::Length					minimums_amsl						= 0_ft;
+	bool						minimums_focus						= false;
+	bool						minimums_focus_short				= false;
+	si::Length					minimums_setting					= 0_ft;
+	// Vertical speed
+	bool						vertical_speed_failure				= false;
+	bool						vertical_speed_visible				= false;
+	si::Velocity				vertical_speed						= 0_fpm;
+	bool						energy_variometer_visible			= false;
+	si::Power					energy_variometer_rate				= 0_W;
+	si::Power					energy_variometer_1000_fpm_power	= 0_W;
+	// Pressure settings
+	bool						pressure_visible					= false;
+	si::Pressure				pressure_qnh						= 0_inHg;
+	bool						pressure_display_hpa				= false;
+	bool						use_standard_pressure				= false;
+	// Command settings
+	std::optional<si::Velocity>	cmd_speed;
+	std::optional<double>		cmd_mach;
+	std::optional<si::Length>	cmd_altitude;
+	std::optional<si::Velocity>	cmd_vertical_speed;
+	std::optional<si::Angle>	cmd_fpa;
+	bool						cmd_altitude_acquired				= false;
+	// Flight director
+	bool						flight_director_failure				= false;
+	bool						flight_director_pitch_visible		= false;
+	si::Angle					flight_director_pitch				= 0_deg;
+	bool						flight_director_roll_visible		= false;
+	si::Angle					flight_director_roll				= 0_deg;
+	// Control stick
+	bool						control_stick_visible				= false;
+	si::Angle					control_stick_pitch					= 0_deg;
+	si::Angle					control_stick_roll					= 0_deg;
+	// Approach reference
+	bool						navaid_reference_visible			= false;
+	std::optional<si::Angle>	navaid_course_magnetic;
+	QString						navaid_hint;
+	QString						navaid_identifier;
+	std::optional<si::Length>	navaid_distance;
+	// Approach, flight path deviations
+	bool						deviation_vertical_failure			= false;
+	std::optional<si::Angle>	deviation_vertical_approach;
+	std::optional<si::Angle>	deviation_vertical_flight_path;
+	bool						deviation_lateral_failure			= false;
+	std::optional<si::Angle>	deviation_lateral_approach;
+	std::optional<si::Angle>	deviation_lateral_flight_path;
+	bool						deviation_mixed_mode				= false;
+	// Raising runway
+	bool						runway_visible						= false;
+	si::Angle					runway_position						= 0_deg;
+	// Control hint
+	bool						control_hint_visible				= false;
+	QString						control_hint;
+	bool						control_hint_focus					= false;
+	// FMA
+	bool						fma_visible							= false;
+	QString						fma_speed_hint;
+	bool						fma_speed_focus						= false;
+	QString						fma_speed_armed_hint;
+	bool						fma_speed_armed_focus				= false;
+	QString						fma_lateral_hint;
+	bool						fma_lateral_focus					= false;
+	QString						fma_lateral_armed_hint;
+	bool						fma_lateral_armed_focus				= false;
+	QString						fma_vertical_hint;
+	bool						fma_vertical_focus					= false;
+	QString						fma_vertical_armed_hint;
+	bool						fma_vertical_armed_focus			= false;
+	// TCAS
+	std::optional<si::Angle>	tcas_ra_pitch_minimum;
+	std::optional<si::Angle>	tcas_ra_pitch_maximum;
+	std::optional<si::Velocity>	tcas_ra_vertical_speed_minimum;
+	std::optional<si::Velocity>	tcas_ra_vertical_speed_maximum;
+	// Warning flags
+	bool						novspd_flag							= false;
+	bool						ldgalt_flag							= false;
+	bool						pitch_disagree						= false;
+	bool						roll_disagree						= false;
+	bool						ias_disagree						= false;
+	bool						altitude_disagree					= false;
+	bool						roll_warning						= false;
+	bool						slip_skid_warning					= false;
+	// Velocity ladder
+	si::Velocity				sl_extent							= 124_kt;
+	int							sl_minimum							= 0;
+	int							sl_maximum							= 9999;
+	int							sl_line_every						= 10;
+	int							sl_number_every						= 20;
+	// Altitude ladder
+	si::Length					al_extent							= 825_ft;
+	int							al_emphasis_every					= 1000;
+	int							al_bold_every						= 500;
+	int							al_number_every						= 200;
+	int							al_line_every						= 100;
+
+  public:
+	/**
+	 * Sanitize all parameters.
+	 */
+	void
+	sanitize();
+};
+
+
+class Precomputed
+{
+  public:
+	QTransform	center_transform;
+};
+
+
+class Blinker
+{
+  public:
+	// Ctor
+	Blinker (si::Time period);
+
+	/**
+	 * True if blinking is active.
+	 */
+	bool
+	active() const noexcept;
+
+	/**
+	 * True if blinked object should be visible at the moment.
+	 */
+	bool
+	visibility_state() const noexcept;
+
+	/**
+	 * Update blinker with new condition to blink.
+	 * If it's true, blinker starts unless already blinking,
+	 * otherwise stops unless already stopped.
+	 */
+	void
+	update (bool condition);
+
+	/**
+	 * Update current time information, needed to properly blink
+	 * the blinker.
+	 */
+	void
+	update_current_time (si::Time now);
+
+  private:
+	si::Time const			_period;
+	std::optional<si::Time>	_start_timestamp;
+	bool					_active				{ false };
+	bool					_visibility_state	{ false };
+};
+
+
+class AdiPaintRequest
+{
+  public:
+	static inline QColor const	kLadderColor		{ 64, 51, 108, 0x80 };
+	static inline QColor const	kLadderBorderColor	{ kLadderColor.darker (120) };
+
+  public:
+	Parameters const&			params;
+	Precomputed const&			precomputed;
+	xf::PaintRequest&			paint_request;
+	xf::InstrumentPainter&		painter;
+	xf::InstrumentAids&			aids;
+	xf::Shadow const			default_shadow;
+	xf::Shadow const			black_shadow;
+	Blinker const&				speed_warning_blinker;
+	Blinker const&				minimums_warning_blinker;
+	float const					q;
+
+  public:
+	float
+	pitch_to_px (si::Angle degrees) const;
+
+	float
+	heading_to_px (si::Angle degrees) const;
+
+	/**
+	 * Render 'rotatable' value on speed/altitude black box.
+	 *
+	 * \param	painter
+	 *			Painter to use.
+	 * \param	position
+	 *			Text position, [-0.5, 0.5].
+	 * \param	next, curr, prev
+	 *			Texts to render. Special value "G" paints green dashed zone, "R" paints red dashed zone.
+	 */
+	void
+	paint_rotating_value (QRectF const& rect, float position, float height_scale,
+						  QString const& next, QString const& curr, QString const& prev);
+
+	/**
+	 * \param	two_zeros
+	 *			Two separate zeros, for positive and negative values.
+	 * \param	zero_mark
+	 *			Draw red/green/blank mark instead of zero.
+	 */
+	void
+	paint_rotating_digit (QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
+						  bool two_zeros, bool zero_mark, bool black_zero = false);
+
+	/**
+	 * Used by paint_rotating_value().
+	 */
+	void
+	paint_dashed_zone (QColor const&, QRectF const& target);
+
+	/**
+	 * Paint horizontal failure flag.
+	 */
+	void
+	paint_horizontal_failure_flag (QPointF const& center, QFont const&, QString const& message);
+
+	/**
+	 * Paint vertical failure flag.
+	 */
+	void
+	paint_vertical_failure_flag (QPointF const& center, QFont const&, QString const& message);
+
+	QColor
+	get_minimums_color() const;
+
+};
+
+
+class ArtificialHorizon
+{
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, xf::WorkPerformer&, std::string const& instance = {});
+	ArtificialHorizon();
 
-  protected:
+	void
+	paint (AdiPaintRequest&) const;
+
+  private:
+	void
+	update_cache (AdiPaintRequest&) const;
+
+	void
+	update_cache (AdiPaintRequest&);
+
+	void
+	clear (AdiPaintRequest&) const;
+
+	void
+	paint_horizon (AdiPaintRequest&) const;
+
+	void
+	paint_pitch_scale (AdiPaintRequest&) const;
+
+	void
+	paint_heading (AdiPaintRequest&) const;
+
+	void
+	paint_tcas_ra (AdiPaintRequest&) const;
+
+	void
+	paint_roll_scale (AdiPaintRequest&) const;
+
+	void
+	paint_pitch_disagree (AdiPaintRequest&) const;
+
+	void
+	paint_roll_disagree (AdiPaintRequest&) const;
+
+	void
+	paint_flight_path_marker (AdiPaintRequest&) const;
+
+	void
+	paint_attitude_failure (AdiPaintRequest&) const;
+
+	void
+	paint_flight_path_marker_failure (AdiPaintRequest&) const;
+
+	void
+	paint_flight_director_failure (AdiPaintRequest&) const;
+
+	xf::Shadow
+	get_shadow (AdiPaintRequest&, int degrees) const;
+
+  private:
+	QColor			_sky_color			{ QColor::fromHsv (213, 230, 255) };
+	QColor			_sky_shadow;
+	QColor			_ground_color		{ QColor::fromHsv (34, 255, 125) };
+	QColor			_ground_shadow;
+	QTransform		_pitch_transform;
+	QTransform		_roll_transform;
+	QTransform		_heading_transform;
+	QTransform		_horizon_transform;
+	QRectF			_sky_rect;
+	QRectF			_gnd_rect;
+	QPainterPath	_flight_path_marker_shape;
+	QPointF			_flight_path_marker_position;
+	QPainterPath	_old_horizon_clip;
+	QPainterPath	_pitch_scale_clipping_path;
+};
+
+
+class VelocityLadder
+{
+  public:
+	void
+	paint (AdiPaintRequest&) const;
+
+  private:
+	void
+	update_cache (AdiPaintRequest&) const;
+
+	void
+	update_cache (AdiPaintRequest&);
+
+	void
+	paint_black_box (AdiPaintRequest&, float x) const;
+
+	void
+	paint_ias_disagree (AdiPaintRequest&, float x) const;
+
+	void
+	paint_ladder_scale (AdiPaintRequest&, float x) const;
+
+	void
+	paint_speed_limits (AdiPaintRequest&, float x) const;
+
+	void
+	paint_speed_tendency (AdiPaintRequest&, float x) const;
+
+	void
+	paint_bugs (AdiPaintRequest&, float x) const;
+
+	void
+	paint_mach_or_gs (AdiPaintRequest&, float x) const;
+
+	void
+	paint_ap_setting (AdiPaintRequest&) const;
+
+	void
+	paint_novspd_flag (AdiPaintRequest&) const;
+
+	void
+	paint_failure (AdiPaintRequest&) const;
+
+	float
+	kt_to_px (AdiPaintRequest&, Velocity) const;
+
+  private:
+	QTransform	_transform;
+	Velocity	_min_shown;
+	Velocity	_max_shown;
+	int			_rounded_speed;
+	QRectF		_ladder_rect;
+	QPen		_ladder_pen;
+	QRectF		_black_box_rect;
+	QPen		_black_box_pen;
+	QPen		_scale_pen;
+	QPen		_speed_bug_pen;
+	float		_margin;
+	int			_digits;
+	QPolygonF	_bug_shape;
+};
+
+
+class AltitudeLadder
+{
+  public:
+	void
+	paint (AdiPaintRequest&) const;
+
+  private:
+	void
+	update_cache (AdiPaintRequest&) const;
+
+	void
+	update_cache (AdiPaintRequest&);
+
+	void
+	paint_black_box (AdiPaintRequest&, float x) const;
+
+	void
+	paint_altitude_disagree (AdiPaintRequest&, float x) const;
+
+	void
+	paint_ladder_scale (AdiPaintRequest&, float x) const;
+
+	void
+	paint_altitude_tendency (AdiPaintRequest&, float x) const;
+
+	void
+	paint_bugs (AdiPaintRequest&, float x) const;
+
+	void
+	paint_vertical_speed (AdiPaintRequest&, float x) const;
+
+	void
+	paint_pressure (AdiPaintRequest&, float x) const;
+
+	void
+	paint_ap_setting (AdiPaintRequest&) const;
+
+	void
+	paint_ldgalt_flag (AdiPaintRequest&, float x) const;
+
+	void
+	paint_vertical_speed_failure (AdiPaintRequest&, float x) const;
+
+	void
+	paint_failure (AdiPaintRequest&) const;
+
+	float
+	scale_vertical_speed (si::Velocity vertical_speed, float max_value = 1.f) const;
+
+	float
+	scale_energy_variometer (AdiPaintRequest&, si::Power power, float max_value = 1.f) const;
+
+	float
+	ft_to_px (AdiPaintRequest&, si::Length) const;
+
+  private:
+	QTransform	_transform;
+	Length		_min_shown;
+	Length		_max_shown;
+	int			_rounded_altitude;
+	QRectF		_ladder_rect;
+	QPen		_ladder_pen;
+	QRectF		_black_box_rect;
+	QRectF		_metric_box_rect;
+	QPen		_black_box_pen;
+	QPen		_scale_pen_1;
+	QPen		_scale_pen_2; // Bold one, each 500 ft
+	QPen		_negative_altitude_pen;
+	QPen		_altitude_bug_pen;
+	QPen		_ldg_alt_pen;
+	QRectF		_b_digits_box;
+	QRectF		_s_digits_box;
+	float		_margin;
+};
+
+
+class PaintingWork: public xf::InstrumentSupport
+{
+  public:
+	void
+	paint (xf::PaintRequest&, Parameters parameters) const;
+
+  private:
+	void
+	update_cache (AdiPaintRequest&, Parameters const&) const;
+
+	void
+	update_cache (AdiPaintRequest&, Parameters const&);
+
+	void
+	paint_center_cross (AdiPaintRequest&, bool center_box, bool rest) const;
+
+	void
+	paint_flight_director (AdiPaintRequest&) const;
+
+	void
+	paint_control_stick (AdiPaintRequest&) const;
+
+	void
+	paint_altitude_agl (AdiPaintRequest&) const;
+
+	void
+	paint_minimums_setting (AdiPaintRequest&) const;
+
+	void
+	paint_nav (AdiPaintRequest&) const;
+
+	void
+	paint_hints (AdiPaintRequest&) const;
+
+	void
+	paint_critical_aoa (AdiPaintRequest&) const;
+
+	void
+	paint_input_alert (AdiPaintRequest&) const;
+
+	void
+	paint_radar_altimeter_failure (AdiPaintRequest&) const;
+
+  private:
+	Parameters				_parameters;
+	Precomputed				_precomputed;
+	// Graphical elements:
+	ArtificialHorizon		_artificial_horizon;
+	VelocityLadder			_velocity_ladder;
+	AltitudeLadder			_altitude_ladder;
+	Blinker					_speed_warning_blinker		{ 200_ms };
+	Blinker					_minimums_warning_blinker	{ 200_ms };
+};
+
+
+class ADI: public xf::Instrument<ADI_IO>
+{
+  public:
+	// Ctor
+	explicit
+	ADI (std::unique_ptr<ADI_IO>, std::string const& instance = {});
+
+	// Dtor
+	~ADI();
+
 	// Module API
 	void
 	process (xf::Cycle const&) override;
+
+	// Instrument API
+	void
+	paint (xf::PaintRequest&) const override;
 
   private:
 	void
 	compute_fpv();
 
   private:
-	ADIWidget*				_adi_widget				{ nullptr };
-	xf::PropertyObserver	_fpv_computer;
-	bool					_computed_fpv_failure	{ false };
-	bool					_computed_fpv_visible	{ false };
-	Angle					_computed_fpv_alpha		{ 0_deg };
-	Angle					_computed_fpv_beta		{ 0_deg };
-	QString					_speed_flaps_up_current_label;
-	QString					_speed_flaps_a_current_label;
-	QString					_speed_flaps_b_current_label;
+	xf::PropertyObserver			_fpv_computer;
+	PaintingWork					_painting_work;
+	xf::Synchronized<Parameters>	_parameters;
+	xf::EventTimestamper			_minimums_became_visible;
+	bool							_computed_fpv_failure	{ false };
+	bool							_computed_fpv_visible	{ false };
+	Angle							_computed_fpv_alpha		{ 0_deg };
+	Angle							_computed_fpv_beta		{ 0_deg };
+	QString							_speed_flaps_up_current_label;
+	QString							_speed_flaps_a_current_label;
+	QString							_speed_flaps_b_current_label;
 };
 
 #endif
+
