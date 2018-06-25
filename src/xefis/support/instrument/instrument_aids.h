@@ -59,15 +59,15 @@ class InstrumentAids
 		get_digit_height (QFont const& font);
 	};
 
-	static constexpr char			DIGITS[10]				{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-	static constexpr char32_t		MINUS_SIGN				{ U'−' };
-	static constexpr char const*	MINUS_SIGN_STR_UTF8		{ "−" };
-	static inline QColor			kAutopilotColor			{ 250, 20, 255 };
-	static inline QColor			kNavigationColor		{ 60, 255, 40 };
-	static inline QColor			kCautionColor			{ 255, 200, 50 };
-	static inline QColor			kWarningColor			{ 255, 40, 40 };
-	static inline QColor			kSilver					{ 0xcc, 0xca, 0xc2 };
-	static inline QColor			kCyan					{ 0x00, 0xcc, 0xff };
+	static constexpr char			kDigits[10]				{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+	static constexpr char32_t		kMinusSign				{ U'−' };
+	static constexpr char const*	kMinusSignStrUTF8		{ "−" };
+	static inline QColor const		kAutopilotColor			{ 250, 20, 255 };
+	static inline QColor const		kNavigationColor		{ 60, 255, 40 };
+	static inline QColor const		kCautionColor			{ 255, 200, 50 };
+	static inline QColor const		kWarningColor			{ 255, 40, 40 };
+	static inline QColor const		kSilver					{ 0xcc, 0xca, 0xc2 };
+	static inline QColor const		kCyan					{ 0x00, 0xcc, 0xff };
 
   public:
 	// Ctor
@@ -111,6 +111,12 @@ class InstrumentAids
 	lesser_dimension() const;
 
 	/**
+	 * Return greater of the width/height sizes.
+	 */
+	int
+	greater_dimension() const;
+
+	/**
 	 * Return number of pixels for given Length and current pixel density.
 	 */
 	float
@@ -126,7 +132,7 @@ class InstrumentAids
 	 * Return font modified to have given height.
 	 */
 	QFont
-	resized (QFont const& font, si::Length height);
+	resized (QFont const& font, si::Length height) const;
 
 	/**
 	 * Return font modified to have given height.
@@ -139,6 +145,12 @@ class InstrumentAids
 	 */
 	static QFont
 	resized (QFont const&, FontPixelSize);
+
+	/**
+	 * Scale and return default instrument font.
+	 */
+	QFont
+	scaled_default_font (float scale) const;
 
 	/**
 	 * Return a centered rect inside whole_area that hold given
@@ -222,13 +234,14 @@ InstrumentAids::height() const
 inline int
 InstrumentAids::lesser_dimension() const
 {
-	auto const w = width();
-	auto const h = height();
+	return std::min (width(), height());
+}
 
-	if (w < h)
-		return w;
-	else
-		return h;
+
+inline int
+InstrumentAids::greater_dimension() const
+{
+	return std::max (width(), height());
 }
 
 
