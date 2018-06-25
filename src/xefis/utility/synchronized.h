@@ -29,6 +29,9 @@ template<class V, class M>
 /**
  * This object allows you to access the resource protected by Synchronized.
  * As long as it exists, the lock is held.
+ *
+ * You don't create it yourself, instead you use
+ * Synchronized<T>::unique_accessor() method.
  */
 template<class pValue, class pMutex>
 	class UniqueAccessor
