@@ -44,8 +44,8 @@ class Shadow
 	set_width (float);
 
   private:
-	float	_width	= kDefaultShadowWidth;
-	QColor	_color	= { 0x10, 0x20, 0x30, 127 };
+	float	_width	{ kDefaultShadowWidth };
+	QColor	_color	{ 0x10, 0x20, 0x30, 127 };
 };
 
 
