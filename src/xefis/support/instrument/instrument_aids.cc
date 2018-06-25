@@ -37,7 +37,7 @@ InstrumentAids::FontInfo::get_digit_width (QFont const& font)
 	QFontMetricsF font_metrics (font);
 	float digit_width = 0;
 
-	for (char c: InstrumentAids::DIGITS)
+	for (char c: InstrumentAids::kDigits)
 		digit_width = std::max<float> (digit_width, font_metrics.width (c));
 
 	return digit_width;
@@ -54,19 +54,19 @@ InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 
 InstrumentAids::InstrumentAids (PaintRequest::Metric const& canvas_metric):
 	_canvas_metric (canvas_metric),
-	font_0 (resized (Services::instrument_font(), 1.0f * canvas_metric.font_height())),
-	font_1 (resized (Services::instrument_font(), 1.1f * canvas_metric.font_height())),
-	font_2 (resized (Services::instrument_font(), 1.3f * canvas_metric.font_height())),
-	font_3 (resized (Services::instrument_font(), 1.6f * canvas_metric.font_height())),
-	font_4 (resized (Services::instrument_font(), 1.8f * canvas_metric.font_height())),
-	font_5 (resized (Services::instrument_font(), 2.0f * canvas_metric.font_height())),
+	font_0 (resized (Services::instrument_font(), 1.0f * _canvas_metric.font_height())),
+	font_1 (resized (Services::instrument_font(), 1.1f * _canvas_metric.font_height())),
+	font_2 (resized (Services::instrument_font(), 1.3f * _canvas_metric.font_height())),
+	font_3 (resized (Services::instrument_font(), 1.6f * _canvas_metric.font_height())),
+	font_4 (resized (Services::instrument_font(), 1.8f * _canvas_metric.font_height())),
+	font_5 (resized (Services::instrument_font(), 2.0f * _canvas_metric.font_height())),
 	autopilot_pen_1 (get_pen (kAutopilotColor.darker (300), 1.8f)),
 	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }
 
 
 QFont
-InstrumentAids::resized (QFont const& font, si::Length height)
+InstrumentAids::resized (QFont const& font, si::Length height) const
 {
 	return resized (font, height, _canvas_metric.pixel_density());
 }
@@ -87,6 +87,13 @@ InstrumentAids::resized (QFont const& font, FontPixelSize font_pixel_size)
 	QFont copy { font };
 	copy.setPixelSize (*font_pixel_size);
 	return copy;
+}
+
+
+QFont
+InstrumentAids::scaled_default_font (float scale) const
+{
+	return resized (Services::instrument_font(), scale * _canvas_metric.font_height());
 }
 
 
