@@ -208,7 +208,7 @@ Screen::prepare_canvas_for_instrument (std::unique_ptr<QImage>& canvas, QSize si
 	if (canvas->isNull() || canvas->size() != size)
 		*canvas = allocate_image (size);
 
-	canvas.fill (Qt::transparent);
+	canvas->fill (Qt::transparent);
 }
 
 
