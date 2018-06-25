@@ -20,6 +20,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/demangle.h>
+#include <xefis/utility/exception_support.h>
 
 // Local:
 #include "module.h"
@@ -30,14 +31,32 @@ namespace xf {
 void
 BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
-	if (!_module._cached)
+	try {
+		if (!_module._cached)
+		{
+			_module._cached = true;
+
+			for (auto* prop: _module.io_base()->_registered_input_properties)
+				prop->fetch (cycle);
+
+			_module.process (cycle);
+		}
+	}
+	catch (...)
 	{
-		_module._cached = true;
+		try {
+			_module.rescue (std::current_exception());
 
-		for (auto* prop: _module.io_base()->_registered_input_properties)
-			prop->fetch (cycle);
-
-		_module.process (cycle);
+			// Set all output properties to nil.
+			if (_module._set_nil_on_exception)
+				for (auto* property: _module._io->_registered_output_properties)
+					*property = xf::nil;
+		}
+		catch (...)
+		{
+			// TODO use logger
+			std::clog << "Exception '" << xf::describe_exception (std::current_exception()) << "' during handling exception from module " << identifier (_module) << "\n";
+		}
 	}
 }
 
@@ -65,12 +84,8 @@ BasicModule::process (xf::Cycle const&)
 void
 BasicModule::rescue (std::exception_ptr)
 {
-	// TODO log the exception
-
-	// Set all output properties to nil.
-	if (_set_nil_on_exception)
-		for (auto* property: _io->_registered_output_properties)
-			*property = xf::nil;
+	// TODO use logger
+	std::clog << "Unhandled exception '" << xf::describe_exception (std::current_exception()) << "' during processing of module " << identifier (*this) << "\n";
 }
 
 

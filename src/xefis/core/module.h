@@ -143,6 +143,7 @@ class BasicModule: private Noncopyable
 	/**
 	 * Enable/disable option to set all output properties to xf::nil when
 	 * exception occurs within the process(Cycle) method.
+	 * This happens after calling the rescue() method.
 	 *
 	 * By default it's enabled.
 	 */
