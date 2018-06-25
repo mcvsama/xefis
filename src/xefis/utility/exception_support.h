@@ -11,16 +11,14 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__FORMAT_EXCEPTION_H__INCLUDED
-#define XEFIS__UTILITY__FORMAT_EXCEPTION_H__INCLUDED
+#ifndef XEFIS__UTILITY__EXCEPTION_SUPPORT_H__INCLUDED
+#define XEFIS__UTILITY__EXCEPTION_SUPPORT_H__INCLUDED
 
 // Standard:
 #include <cstddef>
-#include <optional>
+#include <exception>
 #include <functional>
-
-// Boost:
-#include <boost/format.hpp>
+#include <optional>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -28,31 +26,17 @@
 
 namespace xf {
 
-std::optional<std::string>
-handle_format_exception (std::function<void()> try_block)
-{
-	try {
-		try_block();
-	}
-	catch (boost::io::too_few_args&)
-	{
-		return "format: too few args";
-	}
-	catch (boost::io::too_many_args&)
-	{
-		return "format: too many args";
-	}
-	catch (boost::io::bad_format_string const&)
-	{
-		return "format: ill formed";
-	}
-	catch (...)
-	{
-		return "general format error";
-	}
+/**
+ * Describe exception.
+ */
+extern std::string
+describe_exception (std::exception_ptr);
 
-	return std::nullopt;
-}
+/**
+ * Describe boost::format exceptions if provided block throws.
+ */
+extern std::optional<std::string>
+handle_format_exception (std::function<void()> try_block);
 
 } // namespace xf
 

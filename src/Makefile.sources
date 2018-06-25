@@ -185,10 +185,12 @@ WATCHDOG_SOURCES		+= xefis/watchdog.cc
 SELFTEST_HEADERS		+= $(SI_HEADERS)
 SELFTEST_HEADERS		+= xefis/utility/backtrace.h
 SELFTEST_HEADERS		+= xefis/utility/demangle.h
+SELFTEST_HEADERS		+= xefis/utility/exception_support.h
 
 SELFTEST_SOURCES		+= $(SI_SOURCES)
 SELFTEST_SOURCES		+= xefis/utility/backtrace.cc
 SELFTEST_SOURCES		+= xefis/utility/demangle.cc
+SELFTEST_SOURCES		+= xefis/utility/exception_support.cc
 SELFTEST_SOURCES		+= xefis/selftest.cc
 
 ######## /xefis/config ########
@@ -399,7 +401,7 @@ XEFIS_HEADERS			+= xefis/utility/convergence.h
 XEFIS_HEADERS			+= xefis/utility/datatable2d.h
 #XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
 XEFIS_HEADERS			+= xefis/utility/demangle.h
-XEFIS_HEADERS			+= xefis/utility/format_exception.h
+XEFIS_HEADERS			+= xefis/utility/exception_support.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
 XEFIS_HEADERS			+= xefis/utility/hmac.h
@@ -442,6 +444,7 @@ XEFIS_SOURCES			+= xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc
 #XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
+XEFIS_SOURCES			+= xefis/utility/exception_support.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc
 XEFIS_SOURCES			+= xefis/utility/logger.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
