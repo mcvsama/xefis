@@ -799,7 +799,7 @@ template<class V>
 	PropertyIn<V>::operator<< (PropertyOut<Value>& other)
 	{
 		_data_source = &other;
-		this->protected_set (*other);
+		this->protected_set (other);
 	}
 
 
