@@ -10,8 +10,7 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 
 ######## /xefis/modules/instruments ########
 
-#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi.h
-#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/adi_widget.h
+XEFIS_HEADERS			+= xefis/modules/instruments/adi.h
 ##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
 XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
 XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
@@ -25,9 +24,8 @@ XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
 XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
 XEFIS_HEADERS			+= xefis/modules/instruments/status.h
 XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
-#
-#XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/adi_widget.cc
+
+XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
 ##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
 XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
@@ -401,6 +399,7 @@ XEFIS_HEADERS			+= xefis/utility/convergence.h
 XEFIS_HEADERS			+= xefis/utility/datatable2d.h
 #XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
 XEFIS_HEADERS			+= xefis/utility/demangle.h
+XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
 XEFIS_HEADERS			+= xefis/utility/exception_support.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
