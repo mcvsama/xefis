@@ -25,7 +25,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/services.h>
-#include <xefis/utility/responsibility.h>
+#include <xefis/utility/qutils.h>
 
 // Local:
 #include "screen.h"
@@ -33,21 +33,27 @@
 
 namespace xf {
 
-Screen::Screen (QRect rect, si::Frequency refresh_rate):
+Screen::Screen (ScreenSpec const& spec):
 	QWidget (nullptr),
 	Registry ([&](typename Registry::Disclosure& disclosure) { instrument_registered (disclosure); },
-			  [&](typename Registry::Disclosure& disclosure) { instrument_unregistered (disclosure); })
+			  [&](typename Registry::Disclosure& disclosure) { instrument_unregistered (disclosure); }),
+	_screen_spec (spec)
 {
-	update_canvas (size());
-	move (rect.topLeft());
-	resize (rect.size());
+	auto rect = _screen_spec.position_and_size();
+
+	if (!rect)
+		rect = { 0, 0, 1920, 1080 }; // TODO unhardcode - read Screen information; use QDesktopWidget to read screen info.
+
+	move (rect->topLeft());
+	resize (rect->size());
+	update_canvas (rect->size());
 	setFont (xf::Services::instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
 	show();
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
-	_refresh_timer->setInterval ((1.0 / refresh_rate).in<si::Millisecond>());
+	_refresh_timer->setInterval ((1.0 / _screen_spec.refresh_rate()).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &Screen::refresh);
 	_refresh_timer->start();
 }
@@ -69,13 +75,14 @@ Screen::register_instrument (BasicInstrument& instrument)
 
 
 void
-Screen::set (BasicInstrument const& instrument, QRect rect)
+Screen::set (BasicInstrument const& instrument, QRectF const requested_position)
 {
 	for (auto& disclosure: *this)
 	{
 		if (&disclosure.registrant() == &instrument)
 		{
-			disclosure.details().rect = rect;
+			disclosure.details().requested_position = requested_position;
+			disclosure.details().computed_position.reset();
 			break;
 		}
 	}
@@ -83,7 +90,7 @@ Screen::set (BasicInstrument const& instrument, QRect rect)
 
 
 void
-Screen::set_z_index (BasicInstrument const& instrument, int new_z_index)
+Screen::set_z_index (BasicInstrument const& instrument, int const new_z_index)
 {
 	auto found = std::find_if (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
 							   [&instrument](auto const* disclosure) { return &disclosure->registrant() == &instrument; });
@@ -93,6 +100,19 @@ Screen::set_z_index (BasicInstrument const& instrument, int new_z_index)
 		(*found)->details().z_index = new_z_index;
 		sort_by_z_index();
 	}
+}
+
+
+inline si::PixelDensity
+Screen::pixel_density() const
+{
+	auto const pos = _screen_spec.position_and_size();
+	auto const dia = _screen_spec.diagonal_length();
+
+	if (pos && dia)
+		return xf::diagonal (pos->size()) / *dia;
+	else
+		return logicalDpiY() / 1_in;
 }
 
 
@@ -119,6 +139,9 @@ Screen::update_canvas (QSize size)
 	{
 		_canvas = allocate_image (size);
 		_canvas.fill (Qt::black);
+
+		for (auto& disclosure: *this)
+			disclosure.details().computed_position.reset();
 	}
 }
 
@@ -128,6 +151,9 @@ Screen::paint_instruments_to_buffer()
 {
 	// Collect images from all managed instruments.
 	// Compose them into one big image.
+
+	QSize const canvas_size = _canvas.size();
+
 	_canvas.fill (Qt::black);
 
 	// Ask instruments to paint themselves:
@@ -136,29 +162,42 @@ Screen::paint_instruments_to_buffer()
 		auto& instrument = disclosure->registrant();
 		auto& details = disclosure->details();
 
-		if (details.rect.isValid())
+		if (!details.computed_position)
 		{
-			constexpr si::Length pen_width = 0.5_mm; // TODO user-configurable
-			constexpr si::Length font_height = 5_mm; // TODO user-configurable
-			PaintRequest::Metric metric { details.rect.size(), pixel_density(), pen_width, font_height };
+			QPointF const top_left = details.requested_position.topLeft();
+			QPointF const bottom_right = details.requested_position.bottomRight();
+			auto const w = canvas_size.width();
+			auto const h = canvas_size.height();
+
+			details.computed_position = QRect {
+				QPoint (top_left.x() * w, top_left.y() * h),
+				QPoint (bottom_right.x() * w, bottom_right.y() * h),
+			};
+		}
+
+		if (details.computed_position->isValid())
+		{
+			PaintRequest::Metric metric { details.computed_position->size(), pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
 
 			if (!details.paint_request || details.paint_request->finished())
 			{
 				// If paint_request exists (and it's finished()), it means previous painting asynchronous.
 				if (details.paint_request)
 				{
+					// TODO DRY
 					std::swap (details.canvas, details.ready_canvas);
 					details.paint_request.reset();
+					details.previous_size = details.computed_position->size();
 				}
 
 				// If size changed:
-				if (!details.canvas || details.canvas->size() != details.rect.size())
+				if (!details.canvas || details.canvas->size() != details.computed_position->size())
 					instrument.mark_dirty();
 
 				// If needs repainting:
 				if (instrument.dirty_since_last_check())
 				{
-					prepare_canvas_for_instrument (details.canvas, details.rect.size());
+					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
 					details.paint_request.emplace (*details.canvas, metric, details.previous_size);
 
 					instrument.paint (*details.paint_request);
@@ -167,12 +206,11 @@ Screen::paint_instruments_to_buffer()
 					{
 						std::swap (details.canvas, details.ready_canvas);
 						details.paint_request.reset();
+						details.previous_size = details.computed_position->size();
 					}
 
 					// Unfinished PaintRequests will be checked during next paint_instruments_to_buffer().
 				}
-
-				details.previous_size = details.rect.size();
 			}
 		}
 		else
@@ -187,12 +225,12 @@ Screen::paint_instruments_to_buffer()
 		{
 			auto const& details = disclosure->details();
 
-			if (details.rect.isValid() && details.ready_canvas)
+			if (details.computed_position && details.computed_position->isValid() && details.ready_canvas)
 			{
-				// Discard images that have different size than requested rect.size(), beacuse
+				// Discard images that have different size than requested computed_position->size(), beacuse
 				// it means a resize happened during async painting of the instrument.
-				if (details.rect.size() == details.ready_canvas->size())
-					canvas_painter.drawImage (details.rect, *details.ready_canvas, QRect (QPoint (0, 0), details.rect.size()));
+				if (details.computed_position->size() == details.ready_canvas->size())
+					canvas_painter.drawImage (*details.computed_position, *details.ready_canvas, QRect (QPoint (0, 0), details.computed_position->size()));
 			}
 		}
 	}

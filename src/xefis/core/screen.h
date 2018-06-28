@@ -28,6 +28,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/screen_spec.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/registration_proof.h>
 #include <xefis/utility/registry.h>
@@ -45,7 +46,8 @@ class Details
 {
   public:
 	std::optional<PaintRequest>	paint_request;
-	QRect						rect;
+	QRectF						requested_position;
+	std::optional<QRect>		computed_position;
 	QSize						previous_size;
 	std::unique_ptr<QImage>		canvas;
 	std::unique_ptr<QImage>		ready_canvas;
@@ -71,7 +73,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (QRect, si::Frequency refresh_rate);
+	Screen (ScreenSpec const&);
 
 	// Dtor
 	~Screen();
@@ -84,9 +86,10 @@ class Screen:
 
 	/**
 	 * Set position and size of an instrument.
+	 * Values are factors, { 0, 0 } is top-left, { 1, 1 } is bottom-right.
 	 */
 	void
-	set (BasicInstrument const&, QRect);
+	set (BasicInstrument const&, QRectF requested_position);
 
 	/**
 	 * Set z-index for an instrument
@@ -155,14 +158,8 @@ class Screen:
 	QTimer*						_refresh_timer;
 	QImage						_canvas;
 	std::vector<Disclosure*>	_z_index_sorted_disclosures;
+	ScreenSpec					_screen_spec;
 };
-
-
-inline si::PixelDensity
-Screen::pixel_density() const
-{
-	return logicalDpiY() / 1_in;
-}
 
 } // namespace xf
 
