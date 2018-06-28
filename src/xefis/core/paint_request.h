@@ -141,7 +141,8 @@ PaintRequest::Metric::Metric (QSize canvas_size, PixelDensity pixel_density, si:
 inline bool
 PaintRequest::Metric::operator== (PaintRequest::Metric const& other) const noexcept
 {
-	return _pixel_density == other._pixel_density
+	return _canvas_size == other._canvas_size
+		&& _pixel_density == other._pixel_density
 		&& _pen_width == other._pen_width
 		&& _font_height == other._font_height;
 }
