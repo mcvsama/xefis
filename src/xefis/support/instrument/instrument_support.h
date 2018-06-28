@@ -61,11 +61,11 @@ class InstrumentSupport
 inline std::shared_ptr<InstrumentAids>
 InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 {
-	if (!_cached_aids || !_cached_canvas_metric || _cached_canvas_metric != paint_request.metric())
+	if (!_cached_aids || !_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
 	{
 		update_cache (paint_request);
 		_cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
-		// TODO update Aids to reflect on new size
+		// TODO ↑ screen ref may change between get_aids() calls
 	}
 
 	return _cached_aids;
