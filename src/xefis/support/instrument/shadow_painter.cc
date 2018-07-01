@@ -33,7 +33,7 @@ ShadowPainter::paint (Shadow const& shadow, PaintFunction paint_function)
 
 		QPen new_pen = saved_pen;
 		new_pen.setColor (shadow.color());
-		new_pen.setWidthF (new_pen.width() + shadow.width());
+		new_pen.setWidthF (new_pen.width() + 2.0f * shadow.width());
 		setPen (new_pen);
 
 		paint_function (true);
