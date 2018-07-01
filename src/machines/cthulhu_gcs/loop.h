@@ -23,15 +23,12 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/screen.h>
 #include <xefis/core/xefis.h>
-#include <xefis/modules/instruments/label.h>
-#include <xefis/modules/instruments/gear.h>
-#if 0
 #include <xefis/modules/instruments/adi.h>
-#include <xefis/modules/instruments/hsi.h>
-#include <xefis/modules/instruments/horizontal_trim.h>
-#endif
+#include <xefis/modules/instruments/gear.h>
+#include <xefis/modules/instruments/label.h>
 #include <xefis/modules/io/link.h>
 #include <xefis/modules/systems/adc.h>
+#include <xefis/modules/test/test_generator.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
@@ -68,15 +65,16 @@ class Loop: public xf::ProcessingLoop
 	 */
 
 	AirDataComputer*				adc;
+	TestGenerator*					test_generator;
 
 	/**
 	 * Instruments
 	 */
 
-	Label*							some_label;
-	xf::Screen::RegistrationProof	some_label_registration_proof;
 	Gear*							gear;
 	xf::Screen::RegistrationProof	gear_registration_proof;
+	ADI*							adi;
+	xf::Screen::RegistrationProof	adi_registration_proof;
 
 #if 0
 	/*
