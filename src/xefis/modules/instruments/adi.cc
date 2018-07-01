@@ -2793,10 +2793,13 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 		QPointF const s2 (x36, y23);
 		QPointF const s3 (x56, y23);
 
+		QFont const font_big = pr.aids.scaled_default_font (1.5f);
+		QFont const font_small = pr.aids.scaled_default_font (1.1f);
+
 		auto paint_big_rect = [&](QPointF point) -> void
 		{
 			float v = 0.03f * pr.q;
-			QRectF frame (point, QSizeF (1.9f * pr.q, pr.aids.font_2.digit_height));
+			QRectF frame (point, QSizeF (1.9f * pr.q, xf::InstrumentAids::FontInfo::get_digit_height (font_big)));
 			pr.aids.centrify (frame);
 			frame.adjust (0.f, -v, 0.f, +v);
 			pr.painter.drawRect (frame);
@@ -2805,7 +2808,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 		auto paint_armed_rect = [&](QPointF point) -> void
 		{
 			float v = 0.025f * pr.q;
-			QRectF frame (point, QSizeF (1.9f * pr.q, pr.aids.font_1.digit_height));
+			QRectF frame (point, QSizeF (1.9f * pr.q, xf::InstrumentAids::FontInfo::get_digit_height (font_small)));
 			pr.aids.centrify (frame);
 			frame.adjust (0.f, -v, 0.f, +v);
 			pr.painter.drawRect (frame);
@@ -2843,9 +2846,6 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 
 		if (pr.params.fma_vertical_armed_focus)
 			paint_armed_rect (s3);
-
-		QFont const font_big = pr.aids.scaled_default_font (1.4f);
-		QFont const font_small = pr.aids.scaled_default_font (1.3f);
 
 		pr.painter.setPen (pr.aids.get_pen (pr.aids.kNavigationColor, 1.0f));
 		pr.painter.setFont (font_big);
