@@ -819,7 +819,7 @@ ArtificialHorizon::paint_roll_disagree (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::paint_flight_path_marker (AdiPaintRequest& pr) const
 {
-	if (!pr.params.flight_path_visible)
+	if (pr.params.flight_path_visible)
 	{
 		auto const ld = pr.aids.lesser_dimension();
 
