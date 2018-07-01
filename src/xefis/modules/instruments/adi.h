@@ -63,6 +63,7 @@ class ADI_IO: public xf::ModuleIO
 	 * Input
 	 */
 
+	xf::PropertyIn<bool>			weight_on_wheels									{ this, "/weight-on-wheels" };
 	// Speed
 	xf::PropertyIn<bool>			speed_ias_serviceable								{ this, "/speed/ias.serviceable" };
 	xf::PropertyIn<si::Velocity>	speed_ias											{ this, "/speed/ias" };
@@ -94,11 +95,10 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Angle>		track_lateral_magnetic								{ this, "/track/lateral.magnetic" };
 	xf::PropertyIn<si::Angle>		track_lateral_true									{ this, "/track/lateral.true" };
 	xf::PropertyIn<si::Angle>		track_vertical										{ this, "/track/vertical" };
-	// Slip-skid indicator
-	xf::PropertyIn<si::Angle>		slip_skid											{ this, "/slip-skid/angle" };
 	// Flight Path Vector
 	xf::PropertyIn<bool>			fpv_visible											{ this, "/fpv/fpv-visible" };
-	xf::PropertyIn<bool>			weight_on_wheels									{ this, "/fpv/weight-on-wheels" };
+	// Slip-skid indicator
+	xf::PropertyIn<si::Angle>		slip_skid											{ this, "/slip-skid/angle" };
 	// Angle of Attack
 	xf::PropertyIn<si::Angle>		aoa_alpha											{ this, "/aoa/alpha" };
 	xf::PropertyIn<si::Angle>		aoa_alpha_maximum									{ this, "/aoa/alpha.maximum" };
