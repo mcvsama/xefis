@@ -1114,14 +1114,14 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 {
 	if (pr.params.speed_visible)
 	{
-		QPointF const ydif (0.f, pr.aids.pen_width (0.25f));
-		QPen pen_b (QColor (0, 0, 0), pr.aids.pen_width (8.f), Qt::SolidLine, Qt::FlatCap);
-		QPen pen_r (QColor (255, 0, 0), pr.aids.pen_width (8.f), Qt::DashLine, Qt::FlatCap);
-		pen_r.setDashPattern (QVector<qreal> { 0.5f, 0.75f });
-		QPen pen_y (pr.aids.kCautionColor, pr.aids.pen_width (1.2f), Qt::SolidLine, Qt::FlatCap);
+		float const tr_right = 0.45f * x;
+		float const p1w = 0.45f * pr.aids.pen_width (1.2f);
 
-		float tr_right = 0.45f * x;
-		float p1w = 0.45f * pr.aids.pen_width (1.2f);
+		QPointF const ydif (0.f, pr.aids.pen_width (0.25f));
+		QPen pen_b (QColor (0, 0, 0), pr.aids.pen_width (0.95f * tr_right), Qt::SolidLine, Qt::FlatCap);
+		QPen pen_r (QColor (255, 0, 0), pr.aids.pen_width (0.95f * tr_right), Qt::DashLine, Qt::FlatCap);
+		pen_r.setDashPattern (QVector<qreal> { 0.5f, 0.6f });
+		QPen pen_y (pr.aids.kCautionColor, pr.aids.pen_width (1.2f), Qt::SolidLine, Qt::FlatCap);
 
 		pr.painter.setTransform (_transform);
 		pr.painter.translate (tr_right, 0.f);
