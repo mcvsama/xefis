@@ -125,6 +125,12 @@ XEFIS_SOURCES			+= xefis/modules/systems/trim_control.cc
 XEFIS_SOURCES			+= xefis/modules/systems/vor.cc
 XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
 
+######## /xefis/modules/test ########
+
+XEFIS_HEADERS			+= xefis/modules/test/test_generator.h
+
+XEFIS_SOURCES			+= xefis/modules/test/test_generator.cc
+
 ######## /lib/math ########
 
 MATH_HEADERS			+= lib/math/math.h
