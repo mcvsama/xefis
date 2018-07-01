@@ -832,7 +832,6 @@ ArtificialHorizon::paint_flight_path_marker (AdiPaintRequest& pr) const
 		pr.painter.setBrush (Qt::NoBrush);
 
 		xf::Shadow shadow = pr.default_shadow;
-		shadow.set_width (1.8f);
 
 		pr.painter.paint (shadow, [&] {
 			pr.painter.drawPath (_flight_path_marker_shape);
@@ -2229,10 +2228,13 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) c
 	auto painter = get_painter (paint_request);
 	auto const q = 0.1f * aids->lesser_dimension();
 
-	xf::Shadow black_shadow;
+	xf::Shadow default_shadow;
+	default_shadow.set_width (0.15_mm * paint_request.metric().pixel_density());
+
+	xf::Shadow black_shadow = default_shadow;
 	black_shadow.set_color (Qt::black);
 
-	AdiPaintRequest pr { _parameters, _precomputed, paint_request, painter, *aids, {}, black_shadow, _speed_warning_blinker, _minimums_warning_blinker, q };
+	AdiPaintRequest pr { _parameters, _precomputed, paint_request, painter, *aids, default_shadow, black_shadow, _speed_warning_blinker, _minimums_warning_blinker, q };
 
 	update_cache (pr, params);
 
