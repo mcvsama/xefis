@@ -146,12 +146,12 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Length>		navaid_distance										{ this, "/navaid/distance" };
 	// Flight path deviation
 	xf::PropertyIn<bool>			flight_path_deviation_lateral_serviceable			{ this, "/flight-path-deviation/lateral/serviceable" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_app					{ this, "/flight-path-deviation/lateral/app" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_fp					{ this, "/flight-path-deviation/lateral/fp" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_approach				{ this, "/flight-path-deviation/lateral/approach" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_flight_path			{ this, "/flight-path-deviation/lateral/flight-path" };
 	xf::PropertyIn<bool>			flight_path_deviation_vertical_serviceable			{ this, "/flight-path-deviation/vertical/serviceable" };
 	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical						{ this, "/flight-path-deviation/vertical/deviation" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_app					{ this, "/flight-path-deviation/vertical/app" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_fp					{ this, "/flight-path-deviation/vertical/fp" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_approach				{ this, "/flight-path-deviation/vertical/approach" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_flight_path			{ this, "/flight-path-deviation/vertical/flight-path" };
 	xf::PropertyIn<bool>			flight_path_deviation_mixed_mode					{ this, "/flight-path-deviation/mixed-mode" };
 	// Flight mode information
 	xf::PropertyIn<bool>			flight_mode_hint_visible							{ this, "/flight-mode/hint-visible" };

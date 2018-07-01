@@ -3137,15 +3137,15 @@ ADI::process (xf::Cycle const& cycle)
 	params.navaid_identifier = QString::fromStdString (io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure = !io.flight_path_deviation_vertical_serviceable.value_or (true);
-	params.deviation_vertical_approach = io.flight_path_deviation_vertical_app.get_optional();
-	params.deviation_vertical_flight_path = io.flight_path_deviation_vertical_fp.get_optional();
+	params.deviation_vertical_approach = io.flight_path_deviation_vertical_approach.get_optional();
+	params.deviation_vertical_flight_path = io.flight_path_deviation_vertical_flight_path.get_optional();
 	params.deviation_lateral_failure = !io.flight_path_deviation_lateral_serviceable.value_or (true);
-	params.deviation_lateral_approach = io.flight_path_deviation_lateral_app.get_optional();
-	params.deviation_lateral_flight_path = io.flight_path_deviation_lateral_fp.get_optional();
+	params.deviation_lateral_approach = io.flight_path_deviation_lateral_approach.get_optional();
+	params.deviation_lateral_flight_path = io.flight_path_deviation_lateral_flight_path.get_optional();
 	params.deviation_mixed_mode = io.flight_path_deviation_mixed_mode.value_or (false);
 	// Raising runway
 	params.runway_visible = io.navaid_reference_visible.value_or (false) && io.altitude_agl &&
-							io.flight_path_deviation_lateral_app && *io.altitude_agl <= *io.raising_runway_visibility;
+							io.flight_path_deviation_lateral_approach && *io.altitude_agl <= *io.raising_runway_visibility;
 	params.runway_position = xf::clamped<Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
 	// Control hint
 	params.control_hint_visible = io.flight_mode_hint_visible.value_or (false);
