@@ -120,8 +120,10 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 	QFontMetricsF const font_metrics (font);
 	float height = height_scale * font_metrics.height();
 
-	QRectF box_next = rect.translated (0.f, -height);
-	QRectF box_prev = rect.translated (0.f, +height);
+	// A little bit father to ensure next/prev are hidden beyond clipping area:
+	auto const a_little_bit_farther = 1.0f;
+	QRectF box_next = rect.translated (0.f, -a_little_bit_farther * height);
+	QRectF box_prev = rect.translated (0.f, +a_little_bit_farther * height);
 
 	painter.save_context ([&] {
 		painter.setClipRect (rect);
