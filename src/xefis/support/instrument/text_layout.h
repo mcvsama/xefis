@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
 #include <vector>
 
 // Qt:
@@ -26,6 +27,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/instrument/shadow.h>
 #include <xefis/support/instrument/text_painter.h>
 
 
@@ -75,7 +77,7 @@ class TextLayout
 		 * Paint text at given top-left position.
 		 */
 		void
-		paint (QPointF top_left, TextPainter& painter) const;
+		paint (QPointF top_left, TextPainter& painter, std::optional<Shadow> shadow) const;
 
 	  private:
 		QString			_text;
@@ -124,7 +126,7 @@ class TextLayout
 		 * Paint line in given location.
 		 */
 		void
-		paint (QPointF top_left, TextPainter& painter) const;
+		paint (QPointF top_left, TextPainter& painter, std::optional<Shadow> shadow) const;
 
 	  private:
 		Fragments	_fragments;
@@ -220,7 +222,7 @@ class TextLayout
 	 * \param	painter is the painter to use.
 	 */
 	void
-	paint (QPointF position, Qt::Alignment alignment, TextPainter& painter) const;
+	paint (QPointF position, Qt::Alignment alignment, TextPainter& painter, std::optional<Shadow> shadow) const;
 
   private:
 	Qt::Alignment	_default_line_alignment		= Qt::AlignLeft | Qt::AlignTop;

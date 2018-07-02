@@ -19,6 +19,7 @@
 
 // Qt:
 #include <QtGui/QColor>
+#include <QtGui/QPen>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -42,6 +43,9 @@ class Shadow
 
 	void
 	set_width (float);
+
+	float
+	width_for_pen (QPen const& pen) const;
 
   private:
 	float	_width	{ kDefaultShadowWidthFactor };
@@ -74,6 +78,13 @@ inline void
 Shadow::set_width (float width)
 {
 	_width = width;
+}
+
+
+inline float
+Shadow::width_for_pen (QPen const& pen) const
+{
+	return pen.width() + 2 * width();
 }
 
 } // namespace xf

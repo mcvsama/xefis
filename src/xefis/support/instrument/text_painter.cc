@@ -24,7 +24,7 @@
 
 namespace xf {
 
-TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar character, QPointF position_correction):
+TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar character, QPointF position_correction, std::optional<Shadow> shadow):
 	data (std::make_shared<Data>())
 {
 	QFontMetricsF metrics (font);
@@ -38,9 +38,16 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 	painter.setRenderHint (QPainter::Antialiasing, true);
 	painter.setRenderHint (QPainter::TextAntialiasing, true);
 	painter.setRenderHint (QPainter::SmoothPixmapTransform, true);
-	QColor shadow_color = color.darker (800);
-	shadow_color.setAlpha (100);
-	QPen shadow_pen (shadow_color, 1.5);// TODO make width relative
+
+	QPen shadow_pen = painter.pen();
+
+	if (shadow)
+	{
+		QColor shadow_color = color.darker (800);
+		shadow_color.setAlpha (100);
+		shadow_pen.setColor (shadow_color);
+		shadow_pen.setWidth (shadow->width_for_pen (shadow_pen));
+	}
 
 	for (int x = 0; x < Rank; ++x)
 	{
@@ -61,9 +68,14 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 
 			image.fill (alpha);
 			painter.setClipPath (clip_path);
-			painter.setPen (shadow_pen);
-			painter.setBrush (Qt::NoBrush);
-			painter.drawPath (glyph_path);
+
+			if (shadow)
+			{
+				painter.setPen (shadow_pen);
+				painter.setBrush (Qt::NoBrush);
+				painter.drawPath (glyph_path);
+			}
+
 			painter.setClipping (false);
 			painter.setPen (Qt::NoPen);
 			painter.setBrush (color);
@@ -121,23 +133,23 @@ TextPainter::get_vertical_text_box (QPointF const& position, Qt::Alignment flags
 
 
 void
-TextPainter::fast_draw_text (QPointF const& position, QString const& text)
+TextPainter::fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> shadow)
 {
 	QFontMetricsF metrics (font());
 	QRectF target (position - QPointF (0.f, metrics.ascent()), QSizeF (metrics.width (text), metrics.height()));
-	fast_draw_text (target, 0, text);
+	fast_draw_text (target, 0, text, shadow);
 }
 
 
 void
-TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text)
+TextPainter::fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> shadow)
 {
-	fast_draw_text (get_text_box (position, flags, text), 0, text);
+	fast_draw_text (get_text_box (position, flags, text), 0, text, shadow);
 }
 
 
 void
-TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text)
+TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text, std::optional<Shadow> shadow)
 {
 	QFontMetricsF metrics (font());
 	QPointF target_center = target.center();
@@ -160,6 +172,7 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 	// Check if we need to take into account painter transform:
 	QTransform painter_transform = transform();
 	bool saved_transform = false;
+
 	if (painter_transform.isAffine() && !painter_transform.isRotating() && !painter_transform.isScaling() && painter_transform.isTranslating())
 	{
 		qreal x, y;
@@ -173,17 +186,18 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 	QColor color = pen().color();
 
 	// TODO cache previous painting info { font, color }, and if the same, use cached glyphs_cache iterator.
-	// Find font cache:
-	Cache::Fonts::iterator glyphs_cache_it = _cache.fonts.find (Cache::Font { font(), color });
-	if (glyphs_cache_it == _cache.fonts.end())
-		glyphs_cache_it = _cache.fonts.insert ({ Cache::Font { font(), color }, Cache::Glyphs() }).first;
+	// Find/insert to font cache:
+	float const shadow_width = shadow ? shadow->width_for_pen (pen()) : 0.0f;
+	auto [glyphs_cache_it, found] = _cache.fonts.emplace (Cache::Font { font(), color, shadow_width }, Cache::Glyphs());
 	Cache::Glyphs* glyphs_cache = &glyphs_cache_it->second;
 
 	for (QString::ConstIterator c = text.begin(); c != text.end(); ++c)
 	{
 		auto glyph = glyphs_cache->find (*c);
+
 		if (glyph == glyphs_cache->end())
-			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c, _position_correction) }).first;
+			glyph = glyphs_cache->insert ({ *c, Cache::Glyph (font(), color, *c, _position_correction, shadow) }).first;
+
 		float fx = floored_mod<float> (offset.x(), 1.f);
 		float fy = floored_mod<float> (offset.y(), 1.f);
 		int dx = clamped<int> (fx * Cache::Glyph::Rank, 0, Cache::Glyph::Rank - 1);
@@ -198,7 +212,7 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 
 
 void
-TextPainter::fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text)
+TextPainter::fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> shadow)
 {
 	QFontMetricsF metrics (font());
 	QRectF rect = get_vertical_text_box (position, flags, text);
@@ -207,7 +221,7 @@ TextPainter::fast_draw_vertical_text (QPointF const& position, Qt::Alignment fla
 	QPointF char_height (0.f, metrics.height());
 
 	for (int i = 0; i < text.size(); ++i)
-		fast_draw_text (top_char + i * char_height, Qt::AlignVCenter | Qt::AlignHCenter, text[i]);
+		fast_draw_text (top_char + i * char_height, Qt::AlignVCenter | Qt::AlignHCenter, text[i], shadow);
 }
 
 
