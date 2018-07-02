@@ -16,9 +16,10 @@
 
 // Standard:
 #include <cstddef>
-#include <tuple>
 #include <map>
 #include <memory>
+#include <optional>
+#include <tuple>
 
 // Qt:
 #include <QtGui/QImage>
@@ -26,6 +27,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/instrument/shadow.h>
 
 
 namespace xf {
@@ -60,7 +62,7 @@ class TextPainter: virtual public QPainter
 			 * Generate all images for given character and font.
 			 */
 			explicit
-			Glyph (QFont const&, QColor, QChar, QPointF position_correction);
+			Glyph (QFont const&, QColor, QChar, QPointF position_correction, std::optional<Shadow> shadow);
 
 			Glyph (Glyph const& other);
 
@@ -75,6 +77,7 @@ class TextPainter: virtual public QPainter
 		{
 			QFont	font;
 			QColor	color;
+			float	shadow_width;
 
 			bool
 			operator< (Font const& other) const;
@@ -108,16 +111,16 @@ class TextPainter: virtual public QPainter
 	get_vertical_text_box (QPointF const& position, Qt::Alignment flags, QString const& text) const;
 
 	void
-	fast_draw_text (QPointF const& position, QString const& text);
+	fast_draw_text (QPointF const& position, QString const& text, std::optional<Shadow> = {});
 
 	void
-	fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text);
+	fast_draw_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
 
 	void
-	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text);
+	fast_draw_text (QRectF const& target, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
 
 	void
-	fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text);
+	fast_draw_vertical_text (QPointF const& position, Qt::Alignment flags, QString const& text, std::optional<Shadow> = {});
 
   private:
 	/**
@@ -149,7 +152,7 @@ TextPainter::Cache::Glyph::operator= (Glyph const& other)
 inline bool
 TextPainter::Cache::Font::operator< (Font const& other) const
 {
-	return std::make_pair (font, color.rgba()) < std::make_pair (other.font, other.color.rgba());
+	return std::tuple (font, color.rgba(), shadow_width) < std::tuple (other.font, other.color.rgba(), other.shadow_width);
 }
 
 } // namespace xf

@@ -21,12 +21,12 @@
 namespace xf {
 
 void
-TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter) const
+TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter, std::optional<Shadow> shadow) const
 {
 	QPointF lh_corr (0.0, 0.5 * (_metrics.height() - _height));
 	painter.setFont (_font);
 	painter.setPen (QPen (_color, 1.0));
-	painter.fast_draw_text (top_left - lh_corr, Qt::AlignTop | Qt::AlignLeft, _text);
+	painter.fast_draw_text (top_left - lh_corr, Qt::AlignTop | Qt::AlignLeft, _text, shadow);
 	painter.setPen (_box_pen);
 	painter.setBrush (Qt::NoBrush);
 	double m = 0.15 * _height;
@@ -60,7 +60,7 @@ TextLayout::Line::height() const
 
 
 void
-TextLayout::Line::paint (QPointF top_left, TextPainter& painter) const
+TextLayout::Line::paint (QPointF top_left, TextPainter& painter, std::optional<Shadow> shadow) const
 {
 	// Make sure that baseline of all fonts used is at the same vertical location,
 	// determined by the fragment with the biggest font's ascent:
@@ -73,7 +73,7 @@ TextLayout::Line::paint (QPointF top_left, TextPainter& painter) const
 	for (Fragment const& fragment: _fragments)
 	{
 		corr.setY (biggest_ascent - fragment.metrics().ascent());
-		fragment.paint (top_left + offset + corr, painter);
+		fragment.paint (top_left + offset + corr, painter, shadow);
 		offset.rx() += fragment.width();
 	}
 }
@@ -119,7 +119,7 @@ TextLayout::height() const
 
 
 void
-TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& painter) const
+TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& painter, std::optional<Shadow> shadow) const
 {
 	QSizeF size = this->size();
 
@@ -137,9 +137,12 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 	painter.save();
 	painter.setPen (Qt::NoPen);
 	painter.setBrush (_background);
+
 	if (_background_mode == Whole)
 		painter.drawRect (QRectF (position - margin, size + 2 * _background_margin));
+
 	painter.translate (position);
+
 	for (Line const& line: _lines)
 	{
 		QPointF pos (0.0, 0.0);
@@ -155,7 +158,8 @@ TextLayout::paint (QPointF position, Qt::Alignment alignment, TextPainter& paint
 			painter.setBrush (_background);
 			painter.drawRect (QRectF (pos, QSizeF (line.width(), line.height())));
 		}
-		line.paint (pos, painter);
+
+		line.paint (pos, painter, shadow);
 		painter.translate (0.0, line.height());
 	}
 	painter.restore();

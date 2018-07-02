@@ -216,7 +216,7 @@ AdiPaintRequest::paint_horizontal_failure_flag (QPointF const& center, QFont con
 	painter.paint (default_shadow, [&] {
 		painter.drawRect (box);
 	});
-	painter.fast_draw_text (center, Qt::AlignHCenter | Qt::AlignVCenter, message);
+	painter.fast_draw_text (center, Qt::AlignHCenter | Qt::AlignVCenter, message, default_shadow);
 }
 
 
@@ -241,7 +241,7 @@ AdiPaintRequest::paint_vertical_failure_flag (QPointF const& center, QFont const
 	QPointF const top_letter = center + QPointF (0.f, -0.5f * digit_height * (message.size() - 1));
 
 	for (int i = 0; i < message.size(); ++i)
-		painter.fast_draw_text (top_letter + QPointF (0.f, i * digit_height), Qt::AlignHCenter | Qt::AlignVCenter, message[i]);
+		painter.fast_draw_text (top_letter + QPointF (0.f, i * digit_height), Qt::AlignHCenter | Qt::AlignVCenter, message[i], default_shadow);
 }
 
 
@@ -498,8 +498,8 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 				//// Text:
 				QRectF lbox (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
 				QRectF rbox (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-				pr.painter.fast_draw_text (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t);
-				pr.painter.fast_draw_text (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t);
+				pr.painter.fast_draw_text (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t, pr.default_shadow);
+				pr.painter.fast_draw_text (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t, pr.default_shadow);
 			}
 		}
 
@@ -727,7 +727,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 					else if (text == "27")
 						text = "W";
 					pr.painter.fast_draw_text (QRectF (d10 - 2.f * fpxs, 0.f, 4.f * fpxs, fpxs),
-											   Qt::AlignVCenter | Qt::AlignHCenter, text);
+											   Qt::AlignVCenter | Qt::AlignHCenter, text, pr.default_shadow);
 				}
 			}
 		}
@@ -794,7 +794,7 @@ ArtificialHorizon::paint_pitch_disagree (AdiPaintRequest& pr) const
 		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
 		pr.painter.setFont (pr.aids.font_3.font);
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (QPointF (-0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignLeft, "PITCH");
+			pr.painter.fast_draw_text (QPointF (-0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignLeft, "PITCH", pr.default_shadow);
 		});
 	}
 }
@@ -812,7 +812,7 @@ ArtificialHorizon::paint_roll_disagree (AdiPaintRequest& pr) const
 		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
 		pr.painter.setFont (pr.aids.font_3.font);
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (QPointF (+0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignRight, "ROLL");
+			pr.painter.fast_draw_text (QPointF (+0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignRight, "ROLL", pr.default_shadow);
 		});
 	}
 }
@@ -1055,8 +1055,8 @@ VelocityLadder::paint_ias_disagree (AdiPaintRequest& pr, float const x) const
 		QPointF const position (-1.75f * x, 9.5f * x);
 
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS");
-			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
+			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS", pr.default_shadow);
+			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.default_shadow);
 		});
 	}
 }
@@ -1102,7 +1102,8 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 			{
 				pr.painter.fast_draw_text (QRectF (-4.f * ladder_digit_width - 1.25f * x, -0.5f * ladder_digit_height + posy,
 												   +4.f * ladder_digit_width, ladder_digit_height),
-										   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt));
+										   Qt::AlignVCenter | Qt::AlignRight, QString::number (kt),
+										   pr.default_shadow);
 			}
 		}
 	}
@@ -1245,7 +1246,7 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 				pr.painter.setClipping (false);
 				pr.painter.fast_draw_text (QRectF (2.5f * x, posy - 0.5f * speed_bug_digit_height,
 												   2.f * x, speed_bug_digit_height),
-										   Qt::AlignVCenter | Qt::AlignLeft, bug.first);
+										   Qt::AlignVCenter | Qt::AlignLeft, bug.first, pr.default_shadow);
 			}
 		}
 
@@ -1286,7 +1287,7 @@ VelocityLadder::paint_mach_or_gs (AdiPaintRequest& pr, float const x) const
 
 			pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 			pr.painter.setFont (font);
-			pr.painter.fast_draw_text (paint_position, Qt::AlignCenter, mach_str);
+			pr.painter.fast_draw_text (paint_position, Qt::AlignCenter, mach_str, pr.default_shadow);
 		}
 		else if (pr.params.speed_ground)
 		{
@@ -1295,7 +1296,7 @@ VelocityLadder::paint_mach_or_gs (AdiPaintRequest& pr, float const x) const
 			layout.add_fragment ("GS", pr.aids.font_3.font, Qt::white);
 			layout.add_fragment (" ", pr.aids.font_1.font, Qt::white);
 			layout.add_fragment (QString::number (static_cast<int> (pr.params.speed_ground->in<Knot>())), pr.aids.font_5.font, Qt::white);
-			layout.paint (paint_position, Qt::AlignCenter, pr.painter);
+			layout.paint (paint_position, Qt::AlignCenter, pr.painter, pr.default_shadow);
 		}
 	}
 }
@@ -1343,7 +1344,7 @@ VelocityLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		pr.painter.setFont (actual_speed_font);
 
 		QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, value);
+		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignRight, value, pr.default_shadow);
 	}
 }
 
@@ -1375,10 +1376,10 @@ VelocityLadder::paint_novspd_flag (AdiPaintRequest& pr) const
 		QPointF const c (rect.center().x(), rect.top());
 		QPointF const h (0.f, font_height);
 
-		pr.painter.fast_draw_text (c + 0.5f * h, Qt::AlignHCenter | Qt::AlignVCenter, sa);
+		pr.painter.fast_draw_text (c + 0.5f * h, Qt::AlignHCenter | Qt::AlignVCenter, sa, pr.default_shadow);
 
 		for (int i = 0; i < sb.size(); ++i)
-			pr.painter.fast_draw_text (c + 1.5f * h + i * h, Qt::AlignHCenter | Qt::AlignVCenter, sb.mid (i, 1));
+			pr.painter.fast_draw_text (c + 1.5f * h + i * h, Qt::AlignHCenter | Qt::AlignVCenter, sb.mid (i, 1), pr.default_shadow);
 	}
 }
 
@@ -1542,10 +1543,10 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			QPointF m_pos (_metric_box_rect.right() - 1.5f * m_metrics.width ("M"), _metric_box_rect.center().y());
 			pr.painter.setPen (pr.aids.get_pen (QColor (0x00, 0xee, 0xff), 1.f));
 			pr.painter.setFont (m_font);
-			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
+			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
 			pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 			pr.painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-									   QString ("%1").arg (std::round (pr.params.altitude_amsl.in<Meter>()), 0, 'f', 0));
+									   QString ("%1").arg (std::round (pr.params.altitude_amsl.in<Meter>()), 0, 'f', 0), pr.default_shadow);
 		}
 
 		pr.painter.setPen (_black_box_pen);
@@ -1592,8 +1593,8 @@ AltitudeLadder::paint_altitude_disagree (AdiPaintRequest& pr, float const x) con
 		QPointF const position (-1.75f * x, 9.5f * x);
 
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT");
-			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE");
+			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT", pr.default_shadow);
+			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.default_shadow);
 		});
 	}
 }
@@ -1646,7 +1647,7 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 				{
 					QString big_text = QString::number (ft / 1000);
 					pr.painter.setFont (b_ladder_font);
-					pr.painter.fast_draw_text (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text);
+					pr.painter.fast_draw_text (big_text_box, Qt::AlignVCenter | Qt::AlignRight, big_text, pr.default_shadow);
 				}
 
 				QString small_text = QString ("%1").arg (QString::number (std::abs (ft % 1000)), 3, '0');
@@ -1655,13 +1656,13 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 				pr.painter.setFont (s_ladder_font);
 				QRectF small_text_box (1.1f * x + 2.1f * b_ladder_digit_width, -0.5f * s_ladder_digit_height + posy,
 									   3.f * s_ladder_digit_width, s_ladder_digit_height);
-				pr.painter.fast_draw_text (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text);
+				pr.painter.fast_draw_text (small_text_box, Qt::AlignVCenter | Qt::AlignRight, small_text, pr.default_shadow);
 				// Minus sign?
 				if (ft < 0)
 				{
 					if (ft > -1000)
 						pr.painter.fast_draw_text (small_text_box.adjusted (-s_ladder_digit_width, 0.f, 0.f, 0.f),
-												   Qt::AlignVCenter | Qt::AlignLeft, pr.aids.kMinusSignStrUTF8);
+												   Qt::AlignVCenter | Qt::AlignLeft, pr.aids.kMinusSignStrUTF8, pr.default_shadow);
 				}
 
 				// Additional lines above/below every 1000 ft:
@@ -1749,7 +1750,7 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 				});
 
 				pr.painter.setClipping (false);
-				pr.painter.fast_draw_text (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first);
+				pr.painter.fast_draw_text (text_rect, Qt::AlignVCenter | Qt::AlignRight, bug.first, pr.default_shadow);
 			}
 		}
 
@@ -1910,7 +1911,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		pr.painter.paint (pr.default_shadow, [&] {
 			pr.painter.drawLine (QPointF (0.f, posy), QPointF (line_w, posy));
 		});
-		pr.painter.fast_draw_text (num_rect, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (kfpm))));
+		pr.painter.fast_draw_text (num_rect, Qt::AlignVCenter | Qt::AlignRight, QString::number (std::abs (static_cast<int> (kfpm))), pr.default_shadow);
 	}
 
 	pr.painter.setPen (thin_white_pen);
@@ -2013,7 +2014,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		pr.painter.setClipping (false);
 		pr.painter.setFont (pr.aids.font_2.font);
 		pr.painter.translate (-1.05f * x, sgn * -2.35f * y);
-		pr.painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str);
+		pr.painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str, pr.default_shadow);
 	}
 }
 
@@ -2048,15 +2049,15 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		if (pr.params.use_standard_pressure)
 		{
 			pr.painter.setFont (pr.aids.font_3.font);
-			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD");
+			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD", pr.default_shadow);
 			pr.painter.translate (0.f, 0.9f * metrics_a.height());
 			pr.painter.setPen (QPen (Qt::white, 1.f, Qt::SolidLine, Qt::RoundCap));
 		}
 
 		pr.painter.setFont (font_a);
-		pr.painter.fast_draw_text (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str);
+		pr.painter.fast_draw_text (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str, pr.default_shadow);
 		pr.painter.setFont (font_b);
-		pr.painter.fast_draw_text (zz_rect, Qt::AlignBottom | Qt::AlignLeft, unit_str);
+		pr.painter.fast_draw_text (zz_rect, Qt::AlignBottom | Qt::AlignLeft, unit_str, pr.default_shadow);
 	}
 }
 
@@ -2108,10 +2109,10 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 			QPointF const m_pos (metric_rect.right() - 1.4f * m_metrics.width ("M"), metric_rect.center().y());
 			pr.painter.setPen (pr.aids.get_pen (QColor (0x00, 0xee, 0xff), 1.f));
 			pr.painter.setFont (m_font);
-			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M");
+			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
 			pr.painter.setPen (pr.aids.get_pen (pr.aids.kAutopilotColor, 1.f));
 			pr.painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-									   QString ("%1").arg (std::round (cmd_altitude.in<Meter>()), 0, 'f', 0));
+									   QString ("%1").arg (std::round (cmd_altitude.in<Meter>()), 0, 'f', 0), pr.default_shadow);
 		}
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::black, 0.5f));
@@ -2139,14 +2140,16 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 		QRectF box_11000 = b_digits_box.adjusted (margin, margin, 0.f, -margin);
 		QString minus_sign_s = cmd_altitude < -0.5_ft ? pr.aids.kMinusSignStrUTF8 : "";
 		pr.painter.fast_draw_text (box_11000, Qt::AlignVCenter | Qt::AlignRight,
-								   minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.in<Foot>()) / 1000)));
+								   minus_sign_s + QString::number (std::abs (xf::symmetric_round (cmd_altitude.in<Foot>()) / 1000)),
+								   pr.default_shadow);
 
 		pr.painter.setFont (s_font);
 
 		// 00111 part of the altitude setting:
 		QRectF box_00111 = s_digits_box.adjusted (0.f, margin, -margin, -margin);
 		pr.painter.fast_draw_text (box_00111, Qt::AlignVCenter | Qt::AlignLeft,
-								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<Foot>()))) % 1000, 3, 'f', 0, '0'));
+								   QString ("%1").arg (static_cast<int> (std::round (std::abs (cmd_altitude.in<Foot>()))) % 1000, 3, 'f', 0, '0'),
+								   pr.default_shadow);
 	}
 }
 
@@ -2160,8 +2163,8 @@ AltitudeLadder::paint_ldgalt_flag (AdiPaintRequest& pr, float const x) const
 		pr.painter.setTransform (_transform);
 		pr.painter.setPen (pr.aids.kCautionColor);
 		pr.painter.setFont (pr.aids.font_1.font);
-		pr.painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x), Qt::AlignVCenter | Qt::AlignLeft, "LDG");
-		pr.painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x + 1.1f * pr.aids.font_2.digit_height), Qt::AlignVCenter | Qt::AlignLeft, "ALT");
+		pr.painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x), Qt::AlignVCenter | Qt::AlignLeft, "LDG", pr.default_shadow);
+		pr.painter.fast_draw_text (QPoint (2.2f * x, 10.4f * x + 1.1f * pr.aids.font_2.digit_height), Qt::AlignVCenter | Qt::AlignLeft, "ALT", pr.default_shadow);
 	}
 }
 
@@ -2467,7 +2470,7 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 		pr.painter.setFont (radar_altimeter_font);
 
 		QRectF box = box_rect.adjusted (margin, margin, -margin, -margin);
-		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.in<Foot>())));
+		pr.painter.fast_draw_text (box, Qt::AlignVCenter | Qt::AlignHCenter, QString ("%1").arg (std::round (aagl.in<Foot>())), pr.default_shadow);
 	}
 }
 
@@ -2501,9 +2504,9 @@ PaintingWork::paint_minimums_setting (AdiPaintRequest& pr) const
 		{
 			pr.painter.setPen (minimums_pen);
 			pr.painter.setFont (font_a);
-			pr.painter.fast_draw_text (mins_rect, Qt::AlignVCenter | Qt::AlignRight, mins_str);
+			pr.painter.fast_draw_text (mins_rect, Qt::AlignVCenter | Qt::AlignRight, mins_str, pr.default_shadow);
 			pr.painter.setFont (font_b);
-			pr.painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str);
+			pr.painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str, pr.default_shadow);
 		}
 
 		if (pr.params.minimums_focus)
@@ -2543,13 +2546,13 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);
-		pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.3925f * ld), Qt::AlignTop | Qt::AlignLeft, loc_str);
+		pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.3925f * ld), Qt::AlignTop | Qt::AlignLeft, loc_str, pr.default_shadow);
 
 		if (pr.params.navaid_hint != "")
 		{
 			pr.painter.setPen (Qt::white);
 			pr.painter.setFont (pr.aids.font_3.font);
-			pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.32f * ld), Qt::AlignTop | Qt::AlignLeft, pr.params.navaid_hint);
+			pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.32f * ld), Qt::AlignTop | Qt::AlignLeft, pr.params.navaid_hint, pr.default_shadow);
 		}
 
 		QString dme_val = "DME ---";
@@ -2558,7 +2561,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		pr.painter.setPen (Qt::white);
 		pr.painter.setFont (pr.aids.font_1.font);
-		pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.36f * ld), Qt::AlignTop | Qt::AlignLeft, dme_val);
+		pr.painter.fast_draw_text (QPointF (-0.24f * ld, -0.36f * ld), Qt::AlignTop | Qt::AlignLeft, dme_val, pr.default_shadow);
 
 		QPen ladder_pen (pr.kLadderBorderColor, pr.aids.pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
 
@@ -2758,7 +2761,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 
 		QPointF const text_hook = QPointF (0.f, -3.1f * pr.q);
 
-		pr.painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.control_hint);
+		pr.painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.control_hint, pr.default_shadow);
 
 		if (pr.params.control_hint_focus)
 		{
@@ -2849,15 +2852,15 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 
 		pr.painter.setPen (pr.aids.get_pen (pr.aids.kNavigationColor, 1.0f));
 		pr.painter.setFont (font_big);
-		pr.painter.fast_draw_text (b1, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_speed_hint);
-		pr.painter.fast_draw_text (b2, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_lateral_hint);
-		pr.painter.fast_draw_text (b3, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_vertical_hint);
+		pr.painter.fast_draw_text (b1, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_speed_hint, pr.default_shadow);
+		pr.painter.fast_draw_text (b2, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_lateral_hint, pr.default_shadow);
+		pr.painter.fast_draw_text (b3, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_vertical_hint, pr.default_shadow);
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.0f));
 		pr.painter.setFont (font_small);
-		pr.painter.fast_draw_text (s1, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_speed_armed_hint);
-		pr.painter.fast_draw_text (s2, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_lateral_armed_hint);
-		pr.painter.fast_draw_text (s3, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_vertical_armed_hint);
+		pr.painter.fast_draw_text (s1, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_speed_armed_hint, pr.default_shadow);
+		pr.painter.fast_draw_text (s2, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_lateral_armed_hint, pr.default_shadow);
+		pr.painter.fast_draw_text (s3, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.fma_vertical_armed_hint, pr.default_shadow);
 	}
 }
 
@@ -2927,7 +2930,7 @@ PaintingWork::paint_input_alert (AdiPaintRequest& pr) const
 	QRectF rect (-0.6f * width, -0.5f * font_metrics.height(), 1.2f * width, 1.2f * font_metrics.height());
 
 	pr.painter.drawRect (rect);
-	pr.painter.fast_draw_text (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert);
+	pr.painter.fast_draw_text (rect, Qt::AlignVCenter | Qt::AlignHCenter, alert, pr.default_shadow);
 }
 
 
