@@ -28,9 +28,10 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (Machine* machine, Frequency loop_frequency):
+ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency):
 	_machine (machine),
 	_xefis (machine->xefis()),
+	_name (name),
 	_loop_period (1.0 / loop_frequency)
 {
 	_loop_timer = new QTimer (this);

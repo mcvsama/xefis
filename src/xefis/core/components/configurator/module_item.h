@@ -24,15 +24,18 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 
+// Local:
+#include "processing_loop_item.h"
+
 
 namespace xf {
 
-class ModulesListItem: public QTreeWidgetItem
+class ModuleItem: public QTreeWidgetItem
 {
   public:
 	// Ctor
 	explicit
-	ModulesListItem (xf::BasicModule& module, QTreeWidget* parent);
+	ModuleItem (xf::BasicModule& module, ProcessingLoopItem& parent);
 
 	/**
 	 * Return Module* associated with this item.
@@ -47,19 +50,12 @@ class ModulesListItem: public QTreeWidgetItem
 	update_stats();
 
   private:
-	/**
-	 * Sets up widget appereance.
-	 */
-	void
-	setup_appereance();
-
-  private:
 	xf::BasicModule& _module;
 };
 
 
 inline xf::BasicModule&
-ModulesListItem::module() const noexcept
+ModuleItem::module() const noexcept
 {
 	return _module;
 }

@@ -23,26 +23,26 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/services.h>
+#include <xefis/utility/qutils.h>
 
 // Local:
 #include "modules_list.h"
-#include "modules_list_item.h"
+#include "module_item.h"
 
 
 namespace xf {
 
-ModulesListItem::ModulesListItem (xf::BasicModule& module, QTreeWidget* parent):
-	QTreeWidgetItem (parent, { "", "", "" }),
+ModuleItem::ModuleItem (xf::BasicModule& module, ProcessingLoopItem& parent):
+	QTreeWidgetItem (&parent, { "", "", "" }),
 	_module (module)
 {
-	setup_appereance();
-	setText (ModulesList::ModuleColumn, QString::fromStdString (identifier (_module)));
+	xf::setup_appereance (*this);
+	setText (ModulesList::NameColumn, QString::fromStdString (identifier (_module)));
 }
 
 
 void
-ModulesListItem::update_stats()
+ModuleItem::update_stats()
 {
 	try {
 		setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg ("TODO"));
@@ -53,15 +53,6 @@ ModulesListItem::update_stats()
 		setText (ModulesList::StatsAvgColumn, "error");
 		setText (ModulesList::StatsMaxColumn, "error");
 	}
-}
-
-
-void
-ModulesListItem::setup_appereance()
-{
-	QSize s = sizeHint (0);
-	s.setHeight (Services::default_font_size (treeWidget()->physicalDpiY()));
-	setSizeHint (0, s);
 }
 
 } // namespace xf

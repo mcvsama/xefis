@@ -215,14 +215,16 @@ NODEP_SOURCES			+= $(VERSION_FILE)
 
 XEFIS_HEADERS_MOC		+= xefis/core/components/configurator/configurator_widget.h
 XEFIS_HEADERS_MOC		+= xefis/core/components/configurator/modules_list.h
-XEFIS_HEADERS			+= xefis/core/components/configurator/modules_list_item.h
+XEFIS_HEADERS			+= xefis/core/components/configurator/module_item.h
+XEFIS_HEADERS			+= xefis/core/components/configurator/processing_loop_item.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/data_recorder.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graph_widget.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graphs_stack.h
 
 XEFIS_SOURCES			+= xefis/core/components/configurator/configurator_widget.cc
 XEFIS_SOURCES			+= xefis/core/components/configurator/modules_list.cc
-XEFIS_SOURCES			+= xefis/core/components/configurator/modules_list_item.cc
+XEFIS_SOURCES			+= xefis/core/components/configurator/module_item.cc
+XEFIS_SOURCES			+= xefis/core/components/configurator/processing_loop_item.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/data_recorder.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graph_widget.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc

@@ -23,6 +23,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/sequence.h>
 #include <xefis/utility/time.h>
 
 
@@ -40,6 +41,7 @@ class ProcessingLoop: public QObject
 {
 	Q_OBJECT
 
+  public:
 	class ModuleDetails
 	{
 	  public:
@@ -61,6 +63,8 @@ class ProcessingLoop: public QObject
 		Unique<BasicModule>	_module;
 	};
 
+	using ModulesContainer = std::vector<ModuleDetails>;
+
   public:
 	PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
 	PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
@@ -68,7 +72,7 @@ class ProcessingLoop: public QObject
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine* machine, Frequency loop_frequency);
+	ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency);
 
 	// Dtor
 	virtual
@@ -95,6 +99,12 @@ class ProcessingLoop: public QObject
 	xefis() const noexcept;
 
 	/**
+	 * Processing loop UI name.
+	 */
+	std::string const&
+	name() const noexcept;
+
+	/**
 	 * Start looping.
 	 * On first call, initializes modules that were not initialized yet.
 	 */
@@ -114,6 +124,18 @@ class ProcessingLoop: public QObject
 	Cycle const*
 	current_cycle() const;
 
+	/**
+	 * A sequence of modules loaded into this processing loop.
+	 */
+	Sequence<ModulesContainer::iterator>
+	module_details_list() noexcept;
+
+	/**
+	 * A sequence of modules loaded into this processing loop.
+	 */
+	Sequence<ModulesContainer::const_iterator>
+	module_details_list() const noexcept;
+
   protected:
 	/**
 	 * Execute single loop cycle.
@@ -124,11 +146,12 @@ class ProcessingLoop: public QObject
   private:
 	Machine*					_machine;
 	Xefis*						_xefis;
+	std::string					_name;
 	QTimer*						_loop_timer;
 	Time						_loop_period		{ 10_ms };
 	std::unique_ptr<Logger>		_logger;
 	std::optional<Timestamp>	_previous_timestamp;
-	std::vector<ModuleDetails>	_modules;
+	ModulesContainer			_modules;
 	std::vector<BasicModule*>	_uninitialized_modules;
 	std::optional<Cycle>		_current_cycle;
 	uint64_t					_next_cycle_number	{ 0 };
@@ -183,12 +206,33 @@ ProcessingLoop::xefis() const noexcept
 }
 
 
+inline std::string const&
+ProcessingLoop::name() const noexcept
+{
+	return _name;
+}
+
+
 inline Cycle const*
 ProcessingLoop::current_cycle() const
 {
 	return _current_cycle
 		? &_current_cycle.value()
 		: nullptr;
+}
+
+
+inline auto
+ProcessingLoop::module_details_list() noexcept -> Sequence<ModulesContainer::iterator>
+{
+	return { _modules.begin(), _modules.end() };
+}
+
+
+inline auto
+ProcessingLoop::module_details_list() const noexcept -> Sequence<ModulesContainer::const_iterator>
+{
+	return { _modules.cbegin(), _modules.cend() };
 }
 
 } // namespace xf

@@ -21,12 +21,16 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/processing_loop.h>
+#include <xefis/utility/sequence.h>
 
 
 namespace xf {
 
 class Machine
 {
+  private:
+	using ProcessingLoopsContainer = std::vector<std::unique_ptr<ProcessingLoop>>;
+
   public:
 	// Ctor
 	explicit
@@ -46,6 +50,18 @@ class Machine
 	Xefis*
 	xefis() const noexcept;
 
+	/**
+	 * A sequence of processing loops.
+	 */
+	Sequence<ProcessingLoopsContainer::iterator>
+	processing_loops() noexcept;
+
+	/**
+	 * A sequence of processing loops.
+	 */
+	Sequence<ProcessingLoopsContainer::const_iterator>
+	processing_loops() const noexcept;
+
   protected:
 	/**
 	 * Create new processing loop with given frequency.
@@ -55,8 +71,8 @@ class Machine
 		make_processing_loop (Arg&& ...args);
 
   private:
-	Xefis*								_xefis;
-	std::vector<Unique<ProcessingLoop>>	_processing_loops;
+	Xefis*						_xefis;
+	ProcessingLoopsContainer	_processing_loops;
 };
 
 
@@ -74,6 +90,20 @@ inline Xefis*
 Machine::xefis() const noexcept
 {
 	return _xefis;
+}
+
+
+inline auto
+Machine::processing_loops() noexcept -> Sequence<ProcessingLoopsContainer::iterator>
+{
+	return { _processing_loops.begin(), _processing_loops.end() };
+}
+
+
+inline auto
+Machine::processing_loops() const noexcept -> Sequence<ProcessingLoopsContainer::const_iterator>
+{
+	return { _processing_loops.cbegin(), _processing_loops.cend() };
 }
 
 } // namespace xf
