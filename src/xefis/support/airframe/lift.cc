@@ -21,7 +21,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
-#include <xefis/utility/sequence.h>
+#include <xefis/utility/sequence_utils.h>
 #include <xefis/utility/datatable2d.h>
 
 // Local:

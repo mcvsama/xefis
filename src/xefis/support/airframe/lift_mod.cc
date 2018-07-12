@@ -20,7 +20,7 @@
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/sequence.h>
+#include <xefis/utility/sequence_utils.h>
 
 // Local:
 #include "lift_mod.h"

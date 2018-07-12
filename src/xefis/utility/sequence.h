@@ -16,80 +16,57 @@
 
 // Standard:
 #include <cstddef>
-#include <stdexcept>
-#include <map>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/range.h>
 
 
 namespace xf {
 
-/**
- * Find two adjacent iterators a and b that satisfy a <= value && value <= b.
- * Result might be two identical iterators, or two end iterators.
- */
-template<class ConstIterator, class Value, class Accessor>
-	inline std::pair<ConstIterator, ConstIterator>
-	extended_adjacent_find (ConstIterator begin, ConstIterator end, Value const& value, Accessor access)
+// TODO optional value-mapping function, to eg. take out raw pointer from unique_ptrs
+template<class pIterator>
+	class Sequence
 	{
-		if (begin == end)
-			return { end, end };
+	  public:
+		using Iterator = pIterator;
 
-		auto predicate = [&](auto const& a, auto const& b) {
-			return access (a) <= value && value <= access (b);
-		};
+	  public:
+		// Ctor
+		Sequence (Iterator begin, Iterator end);
 
-		ConstIterator it = std::adjacent_find (begin, end, predicate);
+		constexpr Iterator
+		begin() const noexcept;
 
-		if (it == end)
-		{
-			if (value < access (*begin))
-				return { begin, begin };
-			else
-			{
-				ConstIterator pre_end = end;
-				--pre_end;
-				return { pre_end, pre_end };
-			}
-		}
-		else
-		{
-			ConstIterator ne = it;
-			return { it, ++ne };
-		}
+		constexpr Iterator
+		end() const noexcept;
+
+	  private:
+		Iterator const	_begin;
+		Iterator const	_end;
+	};
+
+
+template<class I>
+	inline
+	Sequence<I>::Sequence (Iterator begin, Iterator end):
+		_begin (begin),
+		_end (end)
+	{ }
+
+
+template<class I>
+	constexpr auto
+	Sequence<I>::begin() const noexcept -> Iterator
+	{
+		return _begin;
 	}
 
 
-/**
- * A simple trick to change const_iterator to iterator.
- */
-template<class Container, typename ConstIterator>
-	inline typename Container::iterator
-	remove_constness (Container& container, ConstIterator iterator)
+template<class I>
+	constexpr auto
+	Sequence<I>::end() const noexcept -> Iterator
 	{
-		return container.erase (iterator, iterator);
-	}
-
-
-/**
- * Find a range of iterators which fall inside range of [min, max] values.
- * If no iterator matches inside [min, max] range, both result iterators
- * are set to 'last'.
- */
-template<class ForwardIt, class Value, class Compare>
-	inline std::pair<ForwardIt, ForwardIt>
-	find_range_exclusive (ForwardIt first, ForwardIt last, Range<Value> const& value_range, Compare compare)
-	{
-		auto a = std::upper_bound (first, last, value_range.min(), compare);
-
-		if (a == last)
-			return { last, last };
-
-		auto b = std::lower_bound (a, last, value_range.max(), compare);
-
-		return { a, b };
+		return _end;
 	}
 
 } // namespace xf
