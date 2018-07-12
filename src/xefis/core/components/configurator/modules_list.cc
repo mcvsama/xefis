@@ -25,7 +25,8 @@
 
 // Local:
 #include "modules_list.h"
-#include "modules_list_item.h"
+#include "module_item.h"
+#include "processing_loop_item.h"
 
 
 namespace xf {
@@ -36,7 +37,7 @@ ModulesList::ModulesList (xf::Machine& machine, QWidget* parent):
 {
 	_list = new QTreeWidget (this);
 	_list->header()->setSectionsClickable (true);
-	_list->sortByColumn (ModuleColumn, Qt::AscendingOrder);
+	_list->sortByColumn (NameColumn, Qt::AscendingOrder);
 	_list->setSortingEnabled (true);
 	_list->setSelectionMode (QTreeWidget::SingleSelection);
 	_list->setRootIsDecorated (true);
@@ -64,9 +65,12 @@ ModulesList::ModulesList (xf::Machine& machine, QWidget* parent):
 
 	read();
 
-	_list->header()->resizeSection (ModuleColumn, 14.f * Services::default_font_size (physicalDpiY()));
+	_list->header()->resizeSection (NameColumn, 14.f * Services::default_font_size (physicalDpiY()));
 	_list->header()->resizeSection (StatsAvgColumn, 5.f * Services::default_font_size (physicalDpiY()));
 	_list->header()->resizeSection (StatsMaxColumn, 5.f * Services::default_font_size (physicalDpiY()));
+
+	_processing_loop_ptrs.reserve (100);
+	_module_ptrs.reserve (1000);
 }
 
 
@@ -78,32 +82,66 @@ ModulesList::deselect()
 }
 
 
-void
-ModulesList::read()
-{
-	std::set<xf::BasicModule*> module_ptrs;
-
-	// TODO add new top-level item representing a ProcessingLoop
-	// TODO fill module_ptrs
-
-	// Find tree widget items that are no longer listed in module_ptrs, to remove them from the tree:
-	for (int ci = 0; ci < _list->invisibleRootItem()->childCount(); ++ci)
+template<class TempContainer, class ItemToPointerMapper>
+	inline void
+	populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer)
 	{
-		if (ModulesListItem* mli = dynamic_cast<ModulesListItem*> (_list->invisibleRootItem()->child (ci)))
+		for (int ci = 0; ci < tree.childCount(); ++ci)
 		{
-			if (auto p = module_ptrs.find (&mli->module()); p != module_ptrs.end())
+			if (auto ptr = item_to_pointer (tree.child (ci)))
 			{
-				// Remove from the list existing module, so that at the end module_ptrs will only contain new modules:
-				module_ptrs.erase (p);
+				auto new_end = std::remove (container.begin(), container.end(), ptr);
+
+				if (new_end != container.end())
+					container.resize (std::distance (container.begin(), new_end));
+				else
+					delete tree.takeChild (ci--);
 			}
-			else
-				delete _list->invisibleRootItem()->takeChild (ci--);
 		}
 	}
 
-	// Add new modules:
-	for (auto p: module_ptrs)
-		_list->addTopLevelItem (new ModulesListItem (*p, _list));
+
+void
+ModulesList::read()
+{
+	_processing_loop_ptrs.clear();
+
+	for (auto& processing_loop: _machine.processing_loops())
+		_processing_loop_ptrs.push_back (processing_loop.get());
+
+	populate_subtree (*_list->invisibleRootItem(), _processing_loop_ptrs, [](auto* item) -> ProcessingLoop* {
+		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (item))
+			return &pli->processing_loop();
+		else
+			return nullptr;
+	});
+
+	// Add new processing loops:
+	for (auto p: _processing_loop_ptrs)
+		new ProcessingLoopItem (*p, *_list);
+
+	for (int ci = 0; ci < _list->invisibleRootItem()->childCount(); ++ci)
+	{
+		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (_list->invisibleRootItem()->child (ci)))
+		{
+			_module_ptrs.clear();
+			ProcessingLoop& processing_loop = pli->processing_loop();
+
+			for (auto& module_details: processing_loop.module_details_list())
+				_module_ptrs.push_back (&module_details.module());
+
+			populate_subtree (*pli, _module_ptrs, [](auto* item) -> BasicModule* {
+				if (auto* mi = dynamic_cast<ModuleItem*> (item))
+					return &mi->module();
+				else
+					return nullptr;
+			});
+
+			// Add new modules:
+			for (auto p: _module_ptrs)
+				new ModuleItem (*p, *pli);
+		}
+	}
 }
 
 
@@ -112,10 +150,8 @@ ModulesList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
 {
 	if (current)
 	{
-		ModulesListItem* mli = dynamic_cast<ModulesListItem*> (current);
-
-		if (mli)
-			emit module_selected (mli->module());
+		if (ModuleItem* mi = dynamic_cast<ModuleItem*> (current))
+			emit module_selected (mi->module());
 	}
 	else
 		emit none_selected();

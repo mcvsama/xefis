@@ -35,7 +35,7 @@ class ModulesList: public QWidget
 	Q_OBJECT
 
   public:
-	constexpr static int ModuleColumn	= 0;
+	constexpr static int NameColumn		= 0;
 	constexpr static int StatsAvgColumn	= 1;
 	constexpr static int StatsMaxColumn	= 2;
 
@@ -77,9 +77,11 @@ class ModulesList: public QWidget
 	item_selected (QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
   private:
-	xf::Machine&		_machine;
-	QTreeWidget*		_list			= nullptr;
-	QTimer*				_refresh_timer	= nullptr;
+	xf::Machine&					_machine;
+	QTreeWidget*					_list			= nullptr;
+	QTimer*							_refresh_timer	= nullptr;
+	std::vector<ProcessingLoop*>	_processing_loop_ptrs;
+	std::vector<BasicModule*>		_module_ptrs;
 };
 
 } // namespace xf
