@@ -457,6 +457,7 @@ XEFIS_SOURCES			+= xefis/utility/mutex.cc
 XEFIS_SOURCES			+= xefis/utility/logger.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
 #XEFIS_SOURCES			+= xefis/utility/quadrature_decoder.cc
+XEFIS_SOURCES			+= xefis/utility/qutils.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/semaphore.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
