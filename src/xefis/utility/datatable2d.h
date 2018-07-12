@@ -22,7 +22,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/sequence.h>
+#include <xefis/utility/sequence_utils.h>
 
 
 namespace xf {
