@@ -186,8 +186,8 @@ class ADI_IO: public xf::ModuleIO
 class Parameters
 {
 	// TODO change to vector<> for speed
-	typedef std::map<QString, Velocity> VelocityBugs;
-	typedef std::map<QString, Length> AltitudeBugs;
+	using VelocityBugs	= std::map<QString, Velocity>;
+	using AltitudeBugs	= std::map<QString, Length>;
 
   public:
 	si::Time					timestamp;
