@@ -134,9 +134,9 @@ Cthulhu::setup_ht16k33s()
 	i2c_device.bus().set_bus_number (10);
 	i2c_device.set_address (xf::i2c::Address (0x11));
 
-	xf::PropertyOut<bool> switch_prop { "/switch-prop" };
-	xf::PropertyOut<si::Angle> angle_prop { "/angle-prop" };
-	xf::PropertyOut<bool> led_prop { "/led-prop" };
+	xf::PropertyOut<bool> switch_prop { "switch-prop" };
+	xf::PropertyOut<si::Angle> angle_prop { "angle-prop" };
+	xf::PropertyOut<bool> led_prop { "led-prop" };
 
 	xf::HT16K33 chip (std::move (i2c_device));
 	chip.add_single_switch (switch_prop, 0, 1);

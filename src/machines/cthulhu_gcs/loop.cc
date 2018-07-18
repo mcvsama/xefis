@@ -18,6 +18,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qutils.h>
 
@@ -26,7 +27,7 @@
 
 
 Loop::Loop (xf::Machine* machine, xf::Xefis*):
-	ProcessingLoop (machine, 30_Hz)
+	ProcessingLoop (machine, "Cthulhu GCS main", 30_Hz)
 {
 #if 0
 	xf::AirframeDefinition airframe_definition {
@@ -135,17 +136,17 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	// IO:
 	adi_io->weight_on_wheels									<< xf::ConstantSource (false);
 	adi_io->speed_ias_serviceable								<< xf::ConstantSource (true);
-	adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("/test/speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
-	adi_io->speed_ias_lookahead									<< test_generator_io->create_property<si::Velocity> ("/test/speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
-	adi_io->speed_ias_minimum									<< test_generator_io->create_property<si::Velocity> ("/speed/ias.minimum", 60_kt, { 50_kt, 70_kt }, 3_kt / 1_s);
-	adi_io->speed_ias_minimum_maneuver							<< test_generator_io->create_property<si::Velocity> ("/speed/ias.minimum.maneuver", 65_kt, { 55_kt, 72_kt }, 3_kt / 1_s);
-	adi_io->speed_ias_maximum_maneuver							<< test_generator_io->create_property<si::Velocity> ("/speed/ias.maximum.maneuver", 245_kt, { 238_kt, 245_kt }, 3_kt / 1_s);
-	adi_io->speed_ias_maximum									<< test_generator_io->create_property<si::Velocity> ("/speed/ias.maximum", 250_kt, { 240_kt, 260_kt }, 3_kt / 1_s);
-	adi_io->speed_mach											<< test_generator_io->create_property<double> ("/speed/mach", 0.0f, { 0.0f, 0.85f }, 0.025f / 1_s);
-	adi_io->speed_ground										<< test_generator_io->create_property<si::Velocity> ("/speed/ground-speed", 0_kt, { 0_kt, 400_kt }, 13_kt / 1_s);
-	adi_io->speed_v1											<< test_generator_io->create_property<si::Velocity> ("/test/speed-bugs/v1", 80_kt, { 78_kt, 82_kt }, 1_kt / 1_s);
-	adi_io->speed_vr											<< test_generator_io->create_property<si::Velocity> ("/test/speed-bugs/vr", 88_kt, { 86_kt, 89_kt }, 1_kt / 1_s);
-	adi_io->speed_vref											<< test_generator_io->create_property<si::Velocity> ("/test/speed-bugs/vref", 95_kt, { 94_kt, 96_kt }, 0.1_kt / 1_s);
+	adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("test/speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
+	adi_io->speed_ias_lookahead									<< test_generator_io->create_property<si::Velocity> ("test/speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
+	adi_io->speed_ias_minimum									<< test_generator_io->create_property<si::Velocity> ("speed/ias.minimum", 60_kt, { 50_kt, 70_kt }, 3_kt / 1_s);
+	adi_io->speed_ias_minimum_maneuver							<< test_generator_io->create_property<si::Velocity> ("speed/ias.minimum.maneuver", 65_kt, { 55_kt, 72_kt }, 3_kt / 1_s);
+	adi_io->speed_ias_maximum_maneuver							<< test_generator_io->create_property<si::Velocity> ("speed/ias.maximum.maneuver", 245_kt, { 238_kt, 245_kt }, 3_kt / 1_s);
+	adi_io->speed_ias_maximum									<< test_generator_io->create_property<si::Velocity> ("speed/ias.maximum", 250_kt, { 240_kt, 260_kt }, 3_kt / 1_s);
+	adi_io->speed_mach											<< test_generator_io->create_property<double> ("speed/mach", 0.0f, { 0.0f, 0.85f }, 0.025f / 1_s);
+	adi_io->speed_ground										<< test_generator_io->create_property<si::Velocity> ("speed/ground-speed", 0_kt, { 0_kt, 400_kt }, 13_kt / 1_s);
+	adi_io->speed_v1											<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/v1", 80_kt, { 78_kt, 82_kt }, 1_kt / 1_s);
+	adi_io->speed_vr											<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/vr", 88_kt, { 86_kt, 89_kt }, 1_kt / 1_s);
+	adi_io->speed_vref											<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/vref", 95_kt, { 94_kt, 96_kt }, 0.1_kt / 1_s);
 	adi_io->speed_flaps_up_label								<< xf::ConstantSource<std::string> ("UP");
 	adi_io->speed_flaps_up_speed								<< xf::ConstantSource (140_kt);
 	adi_io->speed_flaps_a_label									<< xf::ConstantSource<std::string> ("1"); // TODO _b_ and _a_? maybe "upper" and "lower"?
@@ -153,31 +154,31 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	adi_io->speed_flaps_b_label									<< xf::ConstantSource<std::string> ("5");
 	adi_io->speed_flaps_b_speed									<< xf::ConstantSource (110_kt);
 	adi_io->orientation_serviceable								<< xf::ConstantSource (true);
-	adi_io->orientation_pitch									<< test_generator_io->create_property<si::Angle> ("/test/orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
-	adi_io->orientation_roll									<< test_generator_io->create_property<si::Angle> ("/test/orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	adi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("/test/orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	adi_io->orientation_heading_true							<< test_generator_io->create_property<si::Angle> ("/test/orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	adi_io->orientation_pitch									<< test_generator_io->create_property<si::Angle> ("test/orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
+	adi_io->orientation_roll									<< test_generator_io->create_property<si::Angle> ("test/orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	adi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("test/orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	adi_io->orientation_heading_true							<< test_generator_io->create_property<si::Angle> ("test/orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	adi_io->orientation_heading_numbers_visible					<< xf::ConstantSource (true);
-	adi_io->track_lateral_magnetic								<< test_generator_io->create_property<si::Angle> ("/track/lateral.magnetic", 9_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	adi_io->track_lateral_true									<< test_generator_io->create_property<si::Angle> ("/track/lateral.true", 19_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	adi_io->track_vertical										<< test_generator_io->create_property<si::Angle> ("/track/vertical", 0_deg, { -13_deg, 13_deg }, 1_deg / 1_s);
+	adi_io->track_lateral_magnetic								<< test_generator_io->create_property<si::Angle> ("track/lateral.magnetic", 9_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	adi_io->track_lateral_true									<< test_generator_io->create_property<si::Angle> ("track/lateral.true", 19_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	adi_io->track_vertical										<< test_generator_io->create_property<si::Angle> ("track/vertical", 0_deg, { -13_deg, 13_deg }, 1_deg / 1_s);
 	adi_io->fpv_visible											<< xf::ConstantSource (true);
-	adi_io->slip_skid											<< test_generator_io->create_property<si::Angle> ("/slip-skid/angle", 0_deg, { -5_deg, 5_deg }, 0.5_deg / 1_s);
-	adi_io->aoa_alpha											<< test_generator_io->create_property<si::Angle> ("/aoa/alpha", 0_deg, { -2_deg, 15_deg }, 1_deg / 1_s);
-	adi_io->aoa_alpha_maximum									<< test_generator_io->create_property<si::Angle> ("/aoa/alpha.maximum", 13_deg, { 13_deg, 15_deg }, 0.25_deg / 1_s);
+	adi_io->slip_skid											<< test_generator_io->create_property<si::Angle> ("slip-skid/angle", 0_deg, { -5_deg, 5_deg }, 0.5_deg / 1_s);
+	adi_io->aoa_alpha											<< test_generator_io->create_property<si::Angle> ("aoa/alpha", 0_deg, { -2_deg, 15_deg }, 1_deg / 1_s);
+	adi_io->aoa_alpha_maximum									<< test_generator_io->create_property<si::Angle> ("aoa/alpha.maximum", 13_deg, { 13_deg, 15_deg }, 0.25_deg / 1_s);
 	adi_io->aoa_alpha_visible									<< xf::ConstantSource (true);
 	adi_io->altitude_amsl_serviceable							<< xf::ConstantSource (true);
-	adi_io->altitude_amsl										<< test_generator_io->create_property<si::Length> ("/altitude/amsl", -200_ft, { -200_ft, 2000_ft }, 2000_ft / 1_min);
-	adi_io->altitude_amsl_lookahead								<< test_generator_io->create_property<si::Length> ("/altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
+	adi_io->altitude_amsl										<< test_generator_io->create_property<si::Length> ("altitude/amsl", -200_ft, { -200_ft, 2000_ft }, 2000_ft / 1_min);
+	adi_io->altitude_amsl_lookahead								<< test_generator_io->create_property<si::Length> ("altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
 	adi_io->altitude_agl_serviceable							<< xf::ConstantSource (true);
-	adi_io->altitude_agl										<< test_generator_io->create_property<si::Length> ("/altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
+	adi_io->altitude_agl										<< test_generator_io->create_property<si::Length> ("altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
 	adi_io->altitude_minimums_type								<< xf::ConstantSource ("BARO");
 	adi_io->altitude_minimums_setting							<< xf::ConstantSource (300_ft);
 	adi_io->altitude_minimums_amsl								<< xf::ConstantSource (300_ft);
 	adi_io->altitude_landing_amsl								<< xf::ConstantSource (140_ft);
 	adi_io->vertical_speed_serviceable							<< xf::ConstantSource (true);
-	adi_io->vertical_speed										<< test_generator_io->create_property<si::Velocity> ("/vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
-	adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_property<si::Power> ("/vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);
+	adi_io->vertical_speed										<< test_generator_io->create_property<si::Velocity> ("vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
+	adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_property<si::Power> ("vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);
 	adi_io->pressure_qnh										<< xf::ConstantSource (1013_hPa);
 	adi_io->pressure_display_hpa								<< xf::ConstantSource (true);
 	adi_io->pressure_use_std									<< xf::ConstantSource (true);
@@ -202,12 +203,12 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	adi_io->navaid_identifier									<< xf::ConstantSource ("WRO");
 	adi_io->navaid_distance										<< xf::ConstantSource (1.5_nmi);
 	adi_io->flight_path_deviation_lateral_serviceable			<< xf::ConstantSource (true);
-	adi_io->flight_path_deviation_lateral_approach				<< test_generator_io->create_property<si::Angle> ("/flight-path-deviation/lateral/approach", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
-	adi_io->flight_path_deviation_lateral_flight_path			<< test_generator_io->create_property<si::Angle> ("/flight-path-deviation/lateral/flight-path", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
+	adi_io->flight_path_deviation_lateral_approach				<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/lateral/approach", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
+	adi_io->flight_path_deviation_lateral_flight_path			<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/lateral/flight-path", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
 	adi_io->flight_path_deviation_vertical_serviceable			<< xf::ConstantSource (true);
-	adi_io->flight_path_deviation_vertical						<< test_generator_io->create_property<si::Angle> ("/flight-path-deviation/vertical/deviation", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
-	adi_io->flight_path_deviation_vertical_approach				<< test_generator_io->create_property<si::Angle> ("/flight-path-deviation/vertical/approach", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
-	adi_io->flight_path_deviation_vertical_flight_path			<< test_generator_io->create_property<si::Angle> ("/flight-path-deviation/vertical/flight-path", 0_deg, { -5_deg, 5_deg }, 3_deg / 1_s);
+	adi_io->flight_path_deviation_vertical						<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/deviation", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
+	adi_io->flight_path_deviation_vertical_approach				<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/approach", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
+	adi_io->flight_path_deviation_vertical_flight_path			<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/flight-path", 0_deg, { -5_deg, 5_deg }, 3_deg / 1_s);
 	adi_io->flight_path_deviation_mixed_mode					<< xf::ConstantSource (true);
 	adi_io->flight_mode_hint_visible							<< xf::ConstantSource (true);
 	adi_io->flight_mode_hint									<< xf::ConstantSource ("TEST");
@@ -335,6 +336,9 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 	this->gear = load_module<Gear> (std::move (gear_io), "gear");
 	this->gear_registration_proof = _pfd_screen->register_instrument (*this->gear);
 	_pfd_screen->set (*this->gear, { 0.5, 0.0f, 0.5f, 1.0f });
+
+	auto configurator_widget = new xf::ConfiguratorWidget (*machine, nullptr);
+	configurator_widget->show();
 
 	start();
 }
