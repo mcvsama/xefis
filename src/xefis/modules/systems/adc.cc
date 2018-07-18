@@ -181,7 +181,7 @@ AirDataComputer::compute_altitude()
 
 		if (*io.pressure_use_std)
 		{
-			pressure_setting = 29.92_inHg;
+			pressure_setting = kStdPressure;
 
 			if (!_prev_use_standard_pressure)
 				hide_alt_lookahead = true;
@@ -203,7 +203,7 @@ AirDataComputer::compute_altitude()
 
 		si::Length height = do_compute_altitude (pressure_setting);
 		si::Length qnh_height = do_compute_altitude (*io.pressure_qnh);
-		si::Length std_height = do_compute_altitude (29.92_inHg);
+		si::Length std_height = do_compute_altitude (kStdPressure);
 
 		io.altitude_amsl = _altitude_amsl_smoother (height, update_dt);
 		io.altitude_amsl_qnh = _altitude_amsl_qnh_smoother (qnh_height, update_dt);

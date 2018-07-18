@@ -276,9 +276,6 @@ NavigationComputer::compute_track()
 
 		if (len_from_prev >= *io.position_lateral_stddev)
 		{
-			using std::isinf;
-			using std::isnan;
-
 			si::Time dt = pos_last.time - pos_prev.time;
 			si::Angle alpha = -180.0_deg + xf::great_arcs_angle (pos_prev_prev.lateral_position,
 																 pos_prev.lateral_position,
@@ -286,7 +283,7 @@ NavigationComputer::compute_track()
 			// Lateral (parallel to the ground) rotation:
 			si::AngularVelocity rotation_speed = alpha / dt;
 
-			if (!isinf (rotation_speed) && !isnan (rotation_speed))
+			if (si::isfinite (rotation_speed))
 			{
 				rotation_speed = _track_lateral_rotation_smoother (rotation_speed, update_dt);
 				result_rotation_speed = xf::clamped<si::AngularVelocity> (rotation_speed, -1_Hz, +1_Hz);
