@@ -26,11 +26,11 @@ template<template<class> class PropertyType>
 	class CthulhuGCS2AircraftLinkIO: public LinkIO
 	{
 	  public:
-		PropertyType<si::Angle>		stick_elevator		{ this, "/controls/stick-elevator" };
-		PropertyType<si::Angle>		stick_ailerons		{ this, "/controls/stick-ailerons" };
-		PropertyType<si::Angle>		rudder_pedals		{ this, "/controls/rudder-pedals" };
-		PropertyType<si::Force>		throttle_left		{ this, "/controls/throttle-left" };
-		PropertyType<si::Force>		throttle_right		{ this, "/controls/throttle-right" };
+		PropertyType<si::Angle>		stick_elevator		{ this, "controls/stick-elevator" };
+		PropertyType<si::Angle>		stick_ailerons		{ this, "controls/stick-ailerons" };
+		PropertyType<si::Angle>		rudder_pedals		{ this, "controls/rudder-pedals" };
+		PropertyType<si::Force>		throttle_left		{ this, "controls/throttle-left" };
+		PropertyType<si::Force>		throttle_right		{ this, "controls/throttle-right" };
 		PropertyType<bool>			test_bool			{ this, "" }; // XXX
 		PropertyType<uint64_t>		test_uint			{ this, "" }; // XXX
 	};
@@ -40,8 +40,8 @@ template<template<class> class PropertyType>
 	class CthulhuAircraft2GCSLinkIO: public LinkIO
 	{
 	  public:
-		PropertyType<si::Angle>		home_latitude		{ this, "/home/latitude" };
-		PropertyType<si::Angle>		home_longitude		{ this, "/home/longitude" };
+		PropertyType<si::Angle>		home_latitude		{ this, "home/latitude" };
+		PropertyType<si::Angle>		home_longitude		{ this, "home/longitude" };
 	};
 
 
