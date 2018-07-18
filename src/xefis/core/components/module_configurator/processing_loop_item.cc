@@ -11,56 +11,34 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__CONFIGURATOR__MODULES_LIST_ITEM_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__CONFIGURATOR__MODULES_LIST_ITEM_H__INCLUDED
-
 // Standard:
 #include <cstddef>
+#include <stdexcept>
 
 // Qt:
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/processing_loop.h>
+#include <xefis/core/services.h>
+#include <xefis/utility/qutils.h>
 
 // Local:
+#include "modules_list.h"
 #include "processing_loop_item.h"
 
 
 namespace xf {
 
-class ModuleItem: public QTreeWidgetItem
+ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWidget& parent):
+	QTreeWidgetItem (&parent, { "", "", "" }),
+	_processing_loop (processing_loop)
 {
-  public:
-	// Ctor
-	explicit
-	ModuleItem (xf::BasicModule& module, ProcessingLoopItem& parent);
-
-	/**
-	 * Return Module* associated with this item.
-	 */
-	xf::BasicModule&
-	module() const noexcept;
-
-	/**
-	 * Update item (module stats).
-	 */
-	void
-	update_stats();
-
-  private:
-	xf::BasicModule& _module;
-};
-
-
-inline xf::BasicModule&
-ModuleItem::module() const noexcept
-{
-	return _module;
+	setup_appereance (*this);
+	setText (ModulesList::NameColumn, QString::fromStdString (_processing_loop.name()));
 }
 
 } // namespace xf
-
-#endif
 

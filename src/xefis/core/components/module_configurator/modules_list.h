@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__CONFIGURATOR__MODULES_LIST_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__CONFIGURATOR__MODULES_LIST_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULES_LIST_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULES_LIST_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -42,7 +42,7 @@ class ModulesList: public QWidget
   public:
 	// Ctor
 	explicit
-	ModulesList (xf::Machine&, QWidget* parent);
+	ModulesList (Machine&, QWidget* parent);
 
 	/**
 	 * Deselect any selected module.
@@ -55,7 +55,7 @@ class ModulesList: public QWidget
 	 * Emitted when user selects another module.
 	 */
 	void
-	module_selected (xf::BasicModule&);
+	module_selected (BasicModule&);
 
 	/**
 	 * Emitted when module selection is cleared.
@@ -77,7 +77,12 @@ class ModulesList: public QWidget
 	item_selected (QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
   private:
-	xf::Machine&					_machine;
+	template<class TempContainer, class ItemToPointerMapper>
+		static void
+		populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer);
+
+  private:
+	Machine&						_machine;
 	QTreeWidget*					_list			= nullptr;
 	QTimer*							_refresh_timer	= nullptr;
 	std::vector<ProcessingLoop*>	_processing_loop_ptrs;

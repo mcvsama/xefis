@@ -28,10 +28,12 @@
 #include <xefis/utility/blob.h>
 #include <xefis/utility/time.h>
 #include <xefis/utility/time_helper.h>
-#include <xefis/utility/variant.h>
 
 
 namespace xf {
+
+class PropertyStringConverter;
+
 
 /**
  * Helper type that indicates Nil values for properties.
@@ -59,36 +61,14 @@ class NilProperty: public Exception
 
 
 /**
- * Wrapper for values that are supposed to act as a constant source
- * for PropertyIn objects.
- */
-template<class Value>
-	class ConstantSource
-	{
-	  public:
-		// Ctor
-		explicit
-		ConstantSource (Value value):
-			value (value)
-		{ }
-
-	  public:
-		Value value;
-	};
-
-
-template<class Value>
-	class PropertyIn;
-
-template<class Value>
-	class PropertyOut;
-
-
-/**
  * Virtual interface for all Property objects and for some mixin classes.
  */
 class PropertyVirtualInterface
 {
+  public:
+	// Used to tell if node value has changed:
+	typedef uint64_t Serial;
+
   public:
 	// Dtor
 	virtual
@@ -125,6 +105,44 @@ class PropertyVirtualInterface
 	}
 
 	/**
+	 * Return timestamp of the value (time when it was modified).
+	 */
+	virtual si::Time
+	modification_timestamp() const noexcept = 0;
+
+	/**
+	 * Return age of the value (time since it was last modified).
+	 */
+	virtual si::Time
+	modification_age() const noexcept = 0;
+
+	/**
+	 * Return timestamp of the last non-nil value.
+	 */
+	virtual si::Time
+	valid_timestamp() const noexcept = 0;
+
+	/**
+	 * Return age of the non-nil value (time since it was last set to a non-nil value).
+	 * Setting a fallback-value will essentially mean setting not-nil.
+	 */
+	virtual si::Time
+	valid_age() const noexcept = 0;
+
+	/**
+	 * Return property path.
+	 */
+	virtual PropertyPath const&
+	path() const noexcept = 0;
+
+	/**
+	 * Return the serial value of the property.
+	 * Serial value changes when property is updated.
+	 */
+	virtual Serial
+	serial() const noexcept = 0;
+
+	/**
 	 * Ensure that property's value is up to date in this processing loop.
 	 */
 	virtual void
@@ -157,6 +175,30 @@ class PropertyVirtualInterface
 	virtual void
 	blob_to_property (Blob const&) = 0;
 
+	/**
+	 * Increase use-count for this property.
+	 */
+	virtual void
+	inc_use_count() noexcept = 0;
+
+	/**
+	 * Decrease use-count for this property.
+	 */
+	virtual void
+	dec_use_count() noexcept = 0;
+
+	/**
+	 * Use-count for this property.
+	 */
+	virtual std::size_t
+	use_count() const noexcept = 0;
+
+	/**
+	 * Get new string converter associated with this property.
+	 */
+	virtual PropertyStringConverter
+	get_string_converter() = 0;
+
   protected:
 	/**
 	 * Set property to the nil value.
@@ -171,10 +213,6 @@ class PropertyVirtualInterface
  */
 class BasicProperty: virtual public PropertyVirtualInterface
 {
-  public:
-	// Used to tell if node value has changed:
-	typedef uint64_t Serial;
-
   protected:
 	/**
 	 * Create Property that doesn't have any data-source yet and is not coupled to any module.
@@ -197,76 +235,52 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	~BasicProperty() = default;
 
 	/**
-	 * Return timestamp of the value (time when it was modified).
-	 */
-	Time
-	modification_timestamp() const noexcept;
-
-	/**
-	 * Return age of the value (time since it was last modified).
-	 */
-	Time
-	modification_age() const noexcept;
-
-	/**
-	 * Return timestamp of the last non-nil value.
-	 */
-	Time
-	valid_timestamp() const noexcept;
-
-	/**
-	 * Return age of the non-nil value (time since it was last set to a non-nil value).
-	 * Setting a fallback-value will essentially mean setting not-nil.
-	 */
-	Time
-	valid_age() const noexcept;
-
-	/**
-	 * Return property path.
-	 */
-	PropertyPath const&
-	path() const noexcept;
-
-	/**
-	 * Return the serial value of the property.
-	 * Serial value changes when property is updated.
-	 */
-	Serial
-	serial() const noexcept;
-
-	/**
 	 * Return property owner (an ModuleIO object). May be nullptr.
 	 */
 	ModuleIO*
-	io() const;
+	io() const noexcept;
+
+	// PropertyVirtualInterface API
+	si::Time
+	modification_timestamp() const noexcept override;
+
+	// PropertyVirtualInterface API
+	si::Time
+	modification_age() const noexcept override;
+
+	// PropertyVirtualInterface API
+	si::Time
+	valid_timestamp() const noexcept override;
+
+	// PropertyVirtualInterface API
+	si::Time
+	valid_age() const noexcept override;
+
+	// PropertyVirtualInterface API
+	PropertyPath const&
+	path() const noexcept override;
+
+	// PropertyVirtualInterface API
+	Serial
+	serial() const noexcept override;
+
+	// PropertyVirtualInterface API
+	void
+	inc_use_count() noexcept override;
+
+	void
+	dec_use_count() noexcept override;
+
+	std::size_t
+	use_count() const noexcept override;
 
   protected:
 	ModuleIO*		_owner					= nullptr;
 	PropertyPath	_path;
-	Timestamp		_modification_timestamp	= 0_s;
-	Timestamp		_valid_timestamp		= 0_s;
+	si::Time		_modification_timestamp	= 0_s;
+	si::Time		_valid_timestamp		= 0_s;
 	Serial			_serial					= 0;
-};
-
-
-/**
- * Mixin base class for all PropertyIn<*>
- */
-class BasicPropertyIn: virtual public PropertyVirtualInterface
-{ };
-
-
-/**
- * Mixin base class for all PropertyOut<*>
- */
-class BasicPropertyOut: virtual public PropertyVirtualInterface
-{
-  public:
-	/**
-	 * Set property to nil-value.
-	 */
-	virtual void
-	operator= (Nil) = 0;
+	std::size_t		_use_count				= 0;
 };
 
 
@@ -348,6 +362,10 @@ template<class pValue>
 		void
 		blob_to_property (Blob const&);
 
+		// PropertyVirtualInterface API
+		PropertyStringConverter
+		get_string_converter() override;
+
 	  protected:
 		/**
 		 * Set new value.
@@ -376,571 +394,12 @@ template<class pValue>
 		std::optional<Value>	_fallback_value;
 	};
 
-
-template<class pValue>
-	class PropertyIn:
-		public BasicPropertyIn,
-		public Property<pValue>
-	{
-	  public:
-		typedef pValue Value;
-
-		/**
-		 * Create Property that's coupled to given owner, but doesn't have any data source yet.
-		 */
-		explicit
-		PropertyIn (ModuleIO* owner, std::string const& path);
-
-		/**
-		 * Same as PropertyIn (ModuleIO*, std::string), but additionally set up the fallback value.
-		 */
-		explicit
-		PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value);
-
-		// Dtor
-		~PropertyIn();
-
-		/**
-		 * Set no data source for this property.
-		 */
-		void
-		operator<< (Nil);
-
-		/**
-		 * Set PropertyOut as a data source for this property.
-		 */
-		void
-		operator<< (PropertyOut<Value>& other);
-
-		/**
-		 * Set a ConstantSource as a data source for this property.
-		 */
-		template<class ConstantValue>
-			void
-			operator<< (ConstantSource<ConstantValue> const&);
-
-		// BasicProperty API
-		void
-		fetch (Cycle const&) override;
-
-	  private:
-		std::variant<std::monostate, PropertyOut<Value>*, ConstantSource<Value>> _data_source = std::monostate();
-	};
-
-
-template<class pValue>
-	class PropertyOut:
-		public BasicPropertyOut,
-		public Property<pValue>
-	{
-	  public:
-		typedef pValue Value;
-
-		/**
-		 * Create Property that's not coupled to any ModuleIO and don't have any data source yet.
-		 */
-		explicit
-		PropertyOut (std::string const& path);
-
-		/**
-		 * Create Property that's coupled to a ModuleIO and set the module as data source.
-		 */
-		explicit
-		PropertyOut (ModuleIO* owner_and_data_source, std::string const& path);
-
-		/**
-		 * Alias for Property::protected_set_nil().
-		 */
-		void
-		operator= (Nil) override;
-
-		/**
-		 * Alias for Property::protected_set (std::optional<Value>)
-		 */
-		PropertyOut const&
-		operator= (std::optional<Value>);
-
-		/**
-		 * Alias for Property::protected_set (Property<Value> const&)
-		 */
-		PropertyOut const&
-		operator= (Property<Value> const&);
-
-		/**
-		 * Return true if any other property depends on this property.
-		 */
-		bool
-		connected() const noexcept;
-
-		/**
-		 * Set this property as data source for the other property.
-		 */
-		void
-		operator>> (PropertyIn<Value>& other);
-
-		/**
-		 * Set this property as data source for the other property.
-		 */
-		void
-		operator>> (PropertyOut<Value>& other);
-
-		/**
-		 * Set no data source for this property.
-		 */
-		void
-		operator<< (Nil);
-
-		/**
-		 * Set PropertyOut as a data source for this property.
-		 */
-		void
-		operator<< (PropertyOut<Value>& other);
-
-		// BasicProperty API
-		void
-		fetch (Cycle const&) override;
-
-	  private:
-		std::variant<std::monostate, ModuleIO*, PropertyOut<Value>*> _data_source = std::monostate();
-	};
-
-
-/*
- * NilProperty
- */
-
-
-inline
-NilProperty::NilProperty (PropertyPath const& path):
-	Exception ("tried to read a nil property " + path.string())
-{ }
-
-
-/*
- * BasicProperty
- */
-
-
-inline
-BasicProperty::BasicProperty (std::string const& path):
-	_path (path)
-{ }
-
-
-inline
-BasicProperty::BasicProperty (ModuleIO* owner, std::string const& path):
-	_owner (owner),
-	_path (path)
-{ }
-
-
-inline Timestamp
-BasicProperty::modification_timestamp() const noexcept
-{
-	return _modification_timestamp;
-}
-
-
-inline Time
-BasicProperty::modification_age() const noexcept
-{
-	return TimeHelper::now() - modification_timestamp();
-}
-
-
-inline Timestamp
-BasicProperty::valid_timestamp() const noexcept
-{
-	return _valid_timestamp;
-}
-
-
-inline Time
-BasicProperty::valid_age() const noexcept
-{
-	return TimeHelper::now() - valid_timestamp();
-}
-
-
-inline PropertyPath const&
-BasicProperty::path() const noexcept
-{
-	return _path;
-}
-
-
-inline BasicProperty::Serial
-BasicProperty::serial() const noexcept
-{
-	return _serial;
-}
-
-
-inline ModuleIO*
-BasicProperty::io() const
-{
-	return _owner;
-}
-
-
-/*
- * Property
- */
-
-
-template<class V>
-	inline typename Property<V>::Value const&
-	Property<V>::get() const
-	{
-		if (_value)
-			return *_value;
-		else if (_fallback_value)
-			return *_fallback_value;
-		else
-			throw NilProperty (path());
-	}
-
-
-template<class V>
-	inline typename Property<V>::Value const&
-	Property<V>::operator*() const
-	{
-		return get();
-	}
-
-
-template<class V>
-	inline std::optional<typename Property<V>::Value>
-	Property<V>::get_optional() const
-	{
-		if (_value)
-			return _value;
-		else
-			return _fallback_value;
-	}
-
-
-template<class V>
-	inline typename Property<V>::Value
-	Property<V>::value_or (Value fallback) const
-	{
-		if (_value)
-			return *_value;
-		else if (_fallback_value)
-			return *_fallback_value;
-		else
-			return fallback;
-	}
-
-
-template<class V>
-	inline typename Property<V>::Value const*
-	Property<V>::operator->() const
-	{
-		return &get();
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::set_fallback (std::optional<Value> fallback_value)
-	{
-		if (_fallback_value != fallback_value)
-		{
-			_modification_timestamp = TimeHelper::now();
-			_valid_timestamp = _modification_timestamp;
-			_fallback_value = fallback_value;
-			++_serial;
-		}
-	}
-
-
-template<class V>
-	inline bool
-	Property<V>::is_nil() const noexcept
-	{
-		return !_value && !_fallback_value;
-	}
-
-
-template<class V>
-	inline bool
-	Property<V>::valid() const noexcept
-	{
-		return !is_nil();
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::property_to_blob (Blob& blob) const
-	{
-		if (valid())
-		{
-			value_to_blob (**this, blob);
-			blob.insert (blob.begin(), 1);
-		}
-		else
-			blob.assign ({ 0 });
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::blob_to_property (Blob const& blob)
-	{
-		if (blob.empty())
-			throw InvalidBlobSize();
-		else
-		{
-			if (blob[0])
-			{
-				Value aux;
-				blob_to_value (Blob { std::next (blob.begin()), blob.end() }, aux);
-				protected_set_value (aux);
-			}
-			else
-				protected_set_nil();
-		}
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::protected_set_value (Value value)
-	{
-		if (!_value || *_value != value)
-		{
-			_modification_timestamp = TimeHelper::now();
-			_valid_timestamp = _modification_timestamp;
-			_value = value;
-			++_serial;
-		}
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::protected_set (std::optional<Value> value)
-	{
-		if (value)
-			protected_set_value (*value);
-		else
-			protected_set_nil();
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::protected_set (Property<Value> const& value)
-	{
-		if (value)
-			protected_set_value (*value);
-		else
-			protected_set_nil();
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::protected_set_nil()
-	{
-		if (_value)
-		{
-			_modification_timestamp = TimeHelper::now();
-			_value.reset();
-			++_serial;
-		}
-	}
-
-
-/*
- * PropertyIn
- */
-
-
-template<class V>
-	inline
-	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path):
-		Property<V> (owner, path)
-	{
-		ModuleIO::ProcessingLoopAPI (*this->io()).register_input_property (*this);
-	}
-
-
-template<class V>
-	inline
-	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value):
-		PropertyIn (owner, path)
-	{
-		this->set_fallback (std::forward<Value> (fallback_value));
-	}
-
-
-template<class V>
-	inline
-	PropertyIn<V>::~PropertyIn()
-	{
-		ModuleIO::ProcessingLoopAPI (*this->io()).unregister_input_property (*this);
-	}
-
-
-template<class V>
-	inline void
-	PropertyIn<V>::operator<< (Nil)
-	{
-		_data_source = nullptr;
-		this->protected_set_nil();
-	}
-
-
-template<class V>
-	inline void
-	PropertyIn<V>::operator<< (PropertyOut<Value>& other)
-	{
-		_data_source = &other;
-		this->protected_set (other);
-	}
-
-
-template<class V>
-	template<class C>
-		inline void
-		PropertyIn<V>::operator<< (ConstantSource<C> const& source)
-		{
-			_data_source = ConstantSource<Value> { source.value };
-			this->protected_set (source.value);
-		}
-
-
-template<class V>
-	inline void
-	PropertyIn<V>::fetch (Cycle const& cycle)
-	{
-		std::visit (xf::overload {
-			[&] (std::monostate) {
-				this->protected_set_nil();
-			},
-			[&] (PropertyOut<Value>* property_source) {
-				property_source->fetch (cycle);
-				this->protected_set (*property_source);
-			},
-			[&] (ConstantSource<Value> constant_source) {
-				this->protected_set (constant_source.value);
-			}
-		}, _data_source);
-	}
-
-
-/*
- * PropertyOut
- */
-
-
-template<class V>
-	inline
-	PropertyOut<V>::PropertyOut (std::string const& path):
-		Property<V> (path)
-	{ }
-
-
-template<class V>
-	inline
-	PropertyOut<V>::PropertyOut (ModuleIO* owner_and_data_source, std::string const& path):
-		Property<V> (owner_and_data_source, path)
-	{
-		_data_source = owner_and_data_source;
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::operator= (Nil)
-	{
-		this->protected_set_nil();
-	}
-
-
-template<class V>
-	inline PropertyOut<V> const&
-	PropertyOut<V>::operator= (std::optional<Value> value)
-	{
-		this->protected_set (value);
-		return *this;
-	}
-
-
-template<class V>
-	inline PropertyOut<V> const&
-	PropertyOut<V>::operator= (Property<Value> const& value)
-	{
-		this->protected_set (value);
-		return *this;
-	}
-
-
-template<class V>
-	inline bool
-	PropertyOut<V>::connected() const noexcept
-	{
-		// TODO
-		return true;
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::operator>> (PropertyIn<Value>& other)
-	{
-		other << *this;
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::operator>> (PropertyOut<Value>& other)
-	{
-		other << *this;
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::operator<< (Nil)
-	{
-		_data_source = std::monostate();
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::operator<< (PropertyOut<Value>& other)
-	{
-		_data_source = &other;
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::fetch (Cycle const& cycle)
-	{
-		// TODO measure how often is this called for real-aircraft config,
-		// perhaps add a flag that the result is cached in current processing-loop.
-		std::visit (xf::overload {
-			[&] (std::monostate) {
-				this->protected_set_nil();
-			},
-			[&] (ModuleIO* module_source) {
-				BasicModule::ProcessingLoopAPI (module_source->module()).fetch_and_process (cycle);
-			},
-			[&] (PropertyOut<Value>* property_source) {
-				property_source->fetch (cycle);
-				this->protected_set (*property_source);
-			}
-		}, _data_source);
-	}
-
 } // namespace xf
+
+
+#include "property.tcc"
+#include "property_in.h"
+#include "property_out.h"
 
 #endif
 

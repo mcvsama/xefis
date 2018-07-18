@@ -170,7 +170,7 @@ PerformanceComputer::compute_glide_ratio()
 			: 0;
 		io.glide_ratio = ratio;
 
-		if (io.glide_ratio_string.connected())
+		if (io.glide_ratio_string.use_count() > 0)
 		{
 			std::string arr;
 
@@ -190,9 +190,7 @@ PerformanceComputer::compute_glide_ratio()
 	else
 	{
 		io.glide_ratio = xf::nil;
-
-		if (io.glide_ratio_string.connected())
-			io.glide_ratio_string = xf::nil;
+		io.glide_ratio_string = xf::nil;
 	}
 }
 
@@ -200,8 +198,7 @@ PerformanceComputer::compute_glide_ratio()
 void
 PerformanceComputer::compute_total_energy_variometer()
 {
-	if (io.total_energy_variometer.connected())
-
+	if (io.total_energy_variometer.use_count() > 0)
 	{
 		si::Time update_dt = _total_energy_variometer_computer.update_dt();
 

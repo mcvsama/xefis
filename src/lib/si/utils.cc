@@ -25,9 +25,9 @@
 namespace si {
 
 DynamicUnit
-parse_unit (std::experimental::string_view const& str)
+parse_unit (std::string_view const& str)
 {
-	using std::experimental::string_view;
+	using std::string_view;
 
 	DynamicUnit result (0, 0, 0, 0, 0, 0, 0, 0, DynamicRatio (1, 1), DynamicRatio (0, 1));
 
@@ -60,16 +60,16 @@ parse_unit (std::experimental::string_view const& str)
 				}
 				catch (boost::bad_lexical_cast&)
 				{
-					throw UnsupportedUnit ("could not process exponent '" + exponent_str.to_string() + "'");
+					throw UnsupportedUnit ("could not process exponent '" + std::string (exponent_str) + "'");
 				}
 			}
 
 			exponent *= exponent_sign;
 
-			auto unit_it = units_map().find (unit_str.to_string());
+			auto unit_it = units_map().find (std::string (unit_str));
 
 			if (unit_it == units_map().end())
-				throw UnsupportedUnit ("could not process unit '" + unit_str.to_string() + "'");
+				throw UnsupportedUnit ("could not process unit '" + std::string (unit_str) + "'");
 
 			DynamicUnit unit = unit_it->second;
 

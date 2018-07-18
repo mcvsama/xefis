@@ -31,7 +31,7 @@
 
 namespace xf {
 
-ModulesList::ModulesList (xf::Machine& machine, QWidget* parent):
+ModulesList::ModulesList (Machine& machine, QWidget* parent):
 	QWidget (parent),
 	_machine (machine)
 {
@@ -84,7 +84,7 @@ ModulesList::deselect()
 
 template<class TempContainer, class ItemToPointerMapper>
 	inline void
-	populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer)
+	ModulesList::populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer)
 	{
 		for (int ci = 0; ci < tree.childCount(); ++ci)
 		{

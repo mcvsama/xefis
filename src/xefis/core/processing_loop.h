@@ -66,8 +66,8 @@ class ProcessingLoop: public QObject
 	using ModulesContainer = std::vector<ModuleDetails>;
 
   public:
-	PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
-	PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
+	//TODO PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
+	//TODO PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
 
   public:
 	// Ctor
@@ -76,7 +76,7 @@ class ProcessingLoop: public QObject
 
 	// Dtor
 	virtual
-	~ProcessingLoop() = default;
+	~ProcessingLoop();
 
 	/**
 	 * Load module by name and return a pointer.
@@ -149,12 +149,12 @@ class ProcessingLoop: public QObject
 	std::string					_name;
 	QTimer*						_loop_timer;
 	Time						_loop_period		{ 10_ms };
-	std::unique_ptr<Logger>		_logger;
 	std::optional<Timestamp>	_previous_timestamp;
-	ModulesContainer			_modules;
 	std::vector<BasicModule*>	_uninitialized_modules;
 	std::optional<Cycle>		_current_cycle;
-	uint64_t					_next_cycle_number	{ 0 };
+	Cycle::Number				_next_cycle_number	{ 1 };
+	std::unique_ptr<Logger>		_logger;
+	ModulesContainer			_modules;
 };
 
 

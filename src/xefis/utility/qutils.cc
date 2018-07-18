@@ -32,7 +32,7 @@ setup_appereance (QTreeWidgetItem& item)
 	if (!item.treeWidget())
 		throw InvalidArgument ("setup_appereance (QTreeWidgetItem&) requires item to be inserted into a tree");
 
-	s.setHeight (Services::default_font_size (item.treeWidget()->physicalDpiY()));
+	s.setHeight (1.75 * Services::default_font_size (item.treeWidget()->physicalDpiY()));
 	item.setSizeHint (0, s);
 }
 

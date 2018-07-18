@@ -29,27 +29,27 @@
 #include "datatable.h"
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier):
+Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter):
 	label (label),
-	value (stringifier)
+	value (converter)
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier,
+Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
-	value (stringifier),
+	value (converter),
 	value_color (label_and_value_color)
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringifier const& stringifier,
+Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
 	label_color (label_color.value_or (Qt::white)),
-	value (stringifier),
+	value (converter),
 	value_color (value_color.value_or (Qt::white))
 { }
 

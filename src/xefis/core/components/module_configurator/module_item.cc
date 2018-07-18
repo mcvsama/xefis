@@ -13,31 +13,43 @@
 
 // Standard:
 #include <cstddef>
-#include <stdexcept>
 
 // Qt:
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/processing_loop.h>
-#include <xefis/core/services.h>
+#include <xefis/core/module.h>
 #include <xefis/utility/qutils.h>
 
 // Local:
 #include "modules_list.h"
-#include "processing_loop_item.h"
+#include "module_item.h"
 
 
 namespace xf {
 
-ProcessingLoopItem::ProcessingLoopItem (xf::ProcessingLoop& processing_loop, QTreeWidget& parent):
+ModuleItem::ModuleItem (BasicModule& module, ProcessingLoopItem& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
-	_processing_loop (processing_loop)
+	_module (module)
 {
-	xf::setup_appereance (*this);
-	setText (ModulesList::NameColumn, QString::fromStdString (_processing_loop.name()));
+	setup_appereance (*this);
+	setText (ModulesList::NameColumn, QString::fromStdString (identifier (_module)));
+}
+
+
+void
+ModuleItem::update_stats()
+{
+	try {
+		setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg ("TODO"));
+		setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg ("TODO"));
+	}
+	catch (...)
+	{
+		setText (ModulesList::StatsAvgColumn, "error");
+		setText (ModulesList::StatsMaxColumn, "error");
+	}
 }
 
 } // namespace xf
