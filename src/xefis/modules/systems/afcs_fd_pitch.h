@@ -54,26 +54,26 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>					autonomous				{ this, "/autonomous" };
-	xf::PropertyIn<si::Angle>				pitch_limits			{ this, "/pitch-limits" };
-	xf::PropertyIn<afcs_api::PitchMode>		cmd_pitch_mode			{ this, "/cmd-pitch-mode" };
-	xf::PropertyIn<si::Velocity>			cmd_ias					{ this, "/cmd-ias" };
-	xf::PropertyIn<double>					cmd_mach				{ this, "/cmd-match" };
-	xf::PropertyIn<si::Length>				cmd_alt					{ this, "/cmd-altitude" };
-	xf::PropertyIn<si::Velocity>			cmd_vs					{ this, "/cmd-vs" };
-	xf::PropertyIn<si::Angle>				cmd_fpa					{ this, "/cmd-fpa" };
-	xf::PropertyIn<si::Velocity>			measured_ias			{ this, "/measured-ias" };
-	xf::PropertyIn<double>					measured_mach			{ this, "/measured-mach" };
-	xf::PropertyIn<si::Length>				measured_alt			{ this, "/measured-altitude" };
-	xf::PropertyIn<si::Velocity>			measured_vs				{ this, "/measured-vs" };
-	xf::PropertyIn<si::Angle>				measured_fpa			{ this, "/measured-fpa" };
+	xf::PropertyIn<bool>					autonomous				{ this, "autonomous" };
+	xf::PropertyIn<si::Angle>				pitch_limits			{ this, "pitch-limits" };
+	xf::PropertyIn<afcs_api::PitchMode>		cmd_pitch_mode			{ this, "cmd-pitch-mode" };
+	xf::PropertyIn<si::Velocity>			cmd_ias					{ this, "cmd-ias" };
+	xf::PropertyIn<double>					cmd_mach				{ this, "cmd-match" };
+	xf::PropertyIn<si::Length>				cmd_alt					{ this, "cmd-altitude" };
+	xf::PropertyIn<si::Velocity>			cmd_vs					{ this, "cmd-vs" };
+	xf::PropertyIn<si::Angle>				cmd_fpa					{ this, "cmd-fpa" };
+	xf::PropertyIn<si::Velocity>			measured_ias			{ this, "measured-ias" };
+	xf::PropertyIn<double>					measured_mach			{ this, "measured-mach" };
+	xf::PropertyIn<si::Length>				measured_alt			{ this, "measured-altitude" };
+	xf::PropertyIn<si::Velocity>			measured_vs				{ this, "measured-vs" };
+	xf::PropertyIn<si::Angle>				measured_fpa			{ this, "measured-fpa" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>				pitch					{ this, "/output-pitch" };
-	xf::PropertyOut<bool>					operative				{ this, "/operative" };
+	xf::PropertyOut<si::Angle>				pitch					{ this, "output-pitch" };
+	xf::PropertyOut<bool>					operative				{ this, "operative" };
 };
 
 

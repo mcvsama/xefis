@@ -32,23 +32,23 @@ class VOR_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	input_magnetic_declination		{ this, "/magnetic-declination" };
-	xf::PropertyIn<si::Angle>	input_station_latitude			{ this, "/station-position/latitude" };
-	xf::PropertyIn<si::Angle>	input_station_longitude			{ this, "/station-position/longitude" };
-	xf::PropertyIn<si::Angle>	input_aircraft_latitude			{ this, "/aircraft-position/latitude" };
-	xf::PropertyIn<si::Angle>	input_aircraft_longitude		{ this, "/aircraft-position/longitude" };
-	xf::PropertyIn<si::Angle>	input_radial_magnetic			{ this, "/radial.magnetic" };
+	xf::PropertyIn<si::Angle>	input_magnetic_declination		{ this, "magnetic-declination" };
+	xf::PropertyIn<si::Angle>	input_station_latitude			{ this, "station-position/latitude" };
+	xf::PropertyIn<si::Angle>	input_station_longitude			{ this, "station-position/longitude" };
+	xf::PropertyIn<si::Angle>	input_aircraft_latitude			{ this, "aircraft-position/latitude" };
+	xf::PropertyIn<si::Angle>	input_aircraft_longitude		{ this, "aircraft-position/longitude" };
+	xf::PropertyIn<si::Angle>	input_radial_magnetic			{ this, "radial.magnetic" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>	output_radial_magnetic			{ this, "/radial.magnetic" };
-	xf::PropertyOut<si::Angle>	output_reciprocal_magnetic		{ this, "/reciprocal.magnetic" };
-	xf::PropertyOut<si::Angle>	output_initial_bearing_magnetic	{ this, "/initial-bearing.magnetic" };
-	xf::PropertyOut<si::Angle>	output_deviation				{ this, "/deviation" };
-	xf::PropertyOut<bool>		output_to_flag					{ this, "/to-flag" };
-	xf::PropertyOut<si::Length>	output_distance					{ this, "/distance" };
+	xf::PropertyOut<si::Angle>	output_radial_magnetic			{ this, "radial.magnetic" };
+	xf::PropertyOut<si::Angle>	output_reciprocal_magnetic		{ this, "reciprocal.magnetic" };
+	xf::PropertyOut<si::Angle>	output_initial_bearing_magnetic	{ this, "initial-bearing.magnetic" };
+	xf::PropertyOut<si::Angle>	output_deviation				{ this, "deviation" };
+	xf::PropertyOut<bool>		output_to_flag					{ this, "to-flag" };
+	xf::PropertyOut<si::Length>	output_distance					{ this, "distance" };
 };
 
 

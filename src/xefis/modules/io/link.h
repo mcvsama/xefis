@@ -481,19 +481,19 @@ class LinkIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		link_input				{ this, "/input" };
+	xf::PropertyIn<std::string>		link_input				{ this, "input" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	link_output				{ this, "/output" };
-	xf::PropertyOut<bool>			link_valid				{ this, "/link-valid" };
-	xf::PropertyOut<int64_t>		link_failsafes			{ this, "/failsafes" };
-	xf::PropertyOut<int64_t>		link_reacquires			{ this, "/reacquires" };
-	xf::PropertyOut<int64_t>		link_error_bytes		{ this, "/error-bytes" };
-	xf::PropertyOut<int64_t>		link_valid_bytes		{ this, "/valid-bytes" };
-	xf::PropertyOut<int64_t>		link_valid_envelopes	{ this, "/valid-envelopes" };
+	xf::PropertyOut<std::string>	link_output				{ this, "output" };
+	xf::PropertyOut<bool>			link_valid				{ this, "link-valid" };
+	xf::PropertyOut<int64_t>		link_failsafes			{ this, "failsafes" };
+	xf::PropertyOut<int64_t>		link_reacquires			{ this, "reacquires" };
+	xf::PropertyOut<int64_t>		link_error_bytes		{ this, "error-bytes" };
+	xf::PropertyOut<int64_t>		link_valid_bytes		{ this, "valid-bytes" };
+	xf::PropertyOut<int64_t>		link_valid_envelopes	{ this, "valid-envelopes" };
 
   public:
 	void

@@ -40,8 +40,8 @@ class FlapsIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	current_angle		{ this, "/current-angle" };
-	xf::PropertyIn<si::Angle>	set_angle			{ this, "/set-angle" };
+	xf::PropertyIn<si::Angle>	current_angle		{ this, "current-angle" };
+	xf::PropertyIn<si::Angle>	set_angle			{ this, "set-angle" };
 };
 
 

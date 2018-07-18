@@ -46,10 +46,10 @@ class ETSAirspeedIO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>			serviceable			{ this, "/serviceable" };
-	xf::PropertyOut<si::Velocity>	airspeed			{ this, "/airspeed" };
-	xf::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "/airspeed.minimum" };
-	xf::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "/airspeed.maximum" };
+	xf::PropertyOut<bool>			serviceable			{ this, "serviceable" };
+	xf::PropertyOut<si::Velocity>	airspeed			{ this, "airspeed" };
+	xf::PropertyOut<si::Velocity>	airspeed_minimum	{ this, "airspeed.minimum" };
+	xf::PropertyOut<si::Velocity>	airspeed_maximum	{ this, "airspeed.maximum" };
 };
 
 

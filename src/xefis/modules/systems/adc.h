@@ -46,40 +46,40 @@ class AirDataComputerIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>					pressure_use_std			{ this, "/settings/pressure/use-std", false };
-	xf::PropertyIn<si::Pressure>			pressure_qnh				{ this, "/settings/pressure/qnh" };
-	xf::PropertyIn<bool>					pressure_static_serviceable	{ this, "/sensors/pressure/serviceable" };
-	xf::PropertyIn<si::Pressure>			pressure_static				{ this, "/sensors/pressure/static" };
-	xf::PropertyIn<si::Pressure>			pressure_total				{ this, "/sensors/pressure/total" };
-	xf::PropertyIn<bool>					ias_serviceable				{ this, "/sensors/airspeed/serviceable" };
-	xf::PropertyIn<si::Velocity>			ias							{ this, "/sensors/airspeed/ias" };
-	xf::PropertyIn<si::Temperature>			total_air_temperature		{ this, "/sensors/air-temperature/total" };
+	xf::PropertyIn<bool>					pressure_use_std			{ this, "settings/pressure/use-std", false };
+	xf::PropertyIn<si::Pressure>			pressure_qnh				{ this, "settings/pressure/qnh" };
+	xf::PropertyIn<bool>					pressure_static_serviceable	{ this, "sensors/pressure/serviceable" };
+	xf::PropertyIn<si::Pressure>			pressure_static				{ this, "sensors/pressure/static" };
+	xf::PropertyIn<si::Pressure>			pressure_total				{ this, "sensors/pressure/total" };
+	xf::PropertyIn<bool>					ias_serviceable				{ this, "sensors/airspeed/serviceable" };
+	xf::PropertyIn<si::Velocity>			ias							{ this, "sensors/airspeed/ias" };
+	xf::PropertyIn<si::Temperature>			total_air_temperature		{ this, "sensors/air-temperature/total" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Pressure>			recovered_pressure_total	{ this, "/pressure/total" };
-	xf::PropertyOut<si::Pressure>			pressure_dynamic			{ this, "/pressure/dynamic" };
-	xf::PropertyOut<bool>					altitude_amsl_serviceable	{ this, "/altitude/amsl.serviceable" };
-	xf::PropertyOut<si::Length>				altitude_amsl				{ this, "/altitude/amsl" };
-	xf::PropertyOut<si::Length>				altitude_amsl_lookahead		{ this, "/altitude/amsl.lookahead" };
-	xf::PropertyOut<si::Length>				altitude_amsl_qnh			{ this, "/altitude/amsl.qnh" };
-	xf::PropertyOut<si::Length>				altitude_amsl_std			{ this, "/altitude/amsl.std" };
-	xf::PropertyOut<si::Length>				density_altitude			{ this, "/density-altitude" };
-	xf::PropertyOut<si::Density>			air_density_static			{ this, "/air-density/static" };
-	xf::PropertyOut<bool>					speed_ias_serviceable		{ this, "/speed/ias.serviceable" };
-	xf::PropertyOut<si::Velocity>			speed_ias					{ this, "/speed/ias" };
-	xf::PropertyOut<si::Velocity>			speed_ias_lookahead			{ this, "/speed/ias.lookahead" };
-	xf::PropertyOut<si::Velocity>			speed_tas					{ this, "/speed/tas" };
-	xf::PropertyOut<si::Velocity>			speed_eas					{ this, "/speed/eas" };
-	xf::PropertyOut<double>					speed_mach					{ this, "/speed/mach" };
-	xf::PropertyOut<si::Velocity>			speed_sound					{ this, "/speed/sound" };
-	xf::PropertyOut<bool>					vertical_speed_serviceable	{ this, "/vertical-speed/serviceable" };
-	xf::PropertyOut<si::Velocity>			vertical_speed				{ this, "/vertical-speed/speed" };
-	xf::PropertyOut<si::Temperature>		static_air_temperature		{ this, "/air-temperature/static" };
-	xf::PropertyOut<si::DynamicViscosity>	dynamic_viscosity			{ this, "/viscosity/dynamic" };
-	xf::PropertyOut<double>					reynolds_number				{ this, "/reynolds-number" };
+	xf::PropertyOut<si::Pressure>			recovered_pressure_total	{ this, "pressure/total" };
+	xf::PropertyOut<si::Pressure>			pressure_dynamic			{ this, "pressure/dynamic" };
+	xf::PropertyOut<bool>					altitude_amsl_serviceable	{ this, "altitude/amsl.serviceable" };
+	xf::PropertyOut<si::Length>				altitude_amsl				{ this, "altitude/amsl" };
+	xf::PropertyOut<si::Length>				altitude_amsl_lookahead		{ this, "altitude/amsl.lookahead" };
+	xf::PropertyOut<si::Length>				altitude_amsl_qnh			{ this, "altitude/amsl.qnh" };
+	xf::PropertyOut<si::Length>				altitude_amsl_std			{ this, "altitude/amsl.std" };
+	xf::PropertyOut<si::Length>				density_altitude			{ this, "density-altitude" };
+	xf::PropertyOut<si::Density>			air_density_static			{ this, "air-density/static" };
+	xf::PropertyOut<bool>					speed_ias_serviceable		{ this, "speed/ias.serviceable" };
+	xf::PropertyOut<si::Velocity>			speed_ias					{ this, "speed/ias" };
+	xf::PropertyOut<si::Velocity>			speed_ias_lookahead			{ this, "speed/ias.lookahead" };
+	xf::PropertyOut<si::Velocity>			speed_tas					{ this, "speed/tas" };
+	xf::PropertyOut<si::Velocity>			speed_eas					{ this, "speed/eas" };
+	xf::PropertyOut<double>					speed_mach					{ this, "speed/mach" };
+	xf::PropertyOut<si::Velocity>			speed_sound					{ this, "speed/sound" };
+	xf::PropertyOut<bool>					vertical_speed_serviceable	{ this, "vertical-speed/serviceable" };
+	xf::PropertyOut<si::Velocity>			vertical_speed				{ this, "vertical-speed/speed" };
+	xf::PropertyOut<si::Temperature>		static_air_temperature		{ this, "air-temperature/static" };
+	xf::PropertyOut<si::DynamicViscosity>	dynamic_viscosity			{ this, "viscosity/dynamic" };
+	xf::PropertyOut<double>					reynolds_number				{ this, "reynolds-number" };
 };
 
 

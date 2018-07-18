@@ -41,10 +41,10 @@ class HorizontalTrimIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<double>	trim_value				{ this, "/trim/value" };
-	xf::PropertyIn<double>	trim_reference			{ this, "/trim/reference" };
-	xf::PropertyIn<double>	trim_reference_minimum	{ this, "/trim/reference.minimum" };
-	xf::PropertyIn<double>	trim_reference_maximum	{ this, "/trim/reference.maximum" };
+	xf::PropertyIn<double>	trim_value				{ this, "trim/value" };
+	xf::PropertyIn<double>	trim_reference			{ this, "trim/reference" };
+	xf::PropertyIn<double>	trim_reference_minimum	{ this, "trim/reference.minimum" };
+	xf::PropertyIn<double>	trim_reference_maximum	{ this, "trim/reference.maximum" };
 };
 
 

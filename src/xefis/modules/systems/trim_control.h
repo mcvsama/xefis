@@ -42,16 +42,16 @@ class TrimControlIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<double>	trim_axis			{ this, "/axis" };
-	xf::PropertyIn<double>	trim_value			{ this, "/value" };
-	xf::PropertyIn<bool>	up_trim_button		{ this, "/up-button" };
-	xf::PropertyIn<bool>	down_trim_button	{ this, "/down-button" };
+	xf::PropertyIn<double>	trim_axis			{ this, "axis" };
+	xf::PropertyIn<double>	trim_value			{ this, "value" };
+	xf::PropertyIn<bool>	up_trim_button		{ this, "up-button" };
+	xf::PropertyIn<bool>	down_trim_button	{ this, "down-button" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<double>	output_trim_value			{ this, "/trim-value" };
+	xf::PropertyOut<double>	output_trim_value	{ this, "trim-value" };
 };
 
 

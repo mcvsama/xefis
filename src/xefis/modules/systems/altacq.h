@@ -42,17 +42,17 @@ class AltAcqIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Length>		altitude_amsl				{ this, "/altitude-amsl" };
-	xf::PropertyIn<si::Length>		altitude_acquire_amsl		{ this, "/altitude-acquire-amsl" };
-	xf::PropertyIn<si::Velocity>	vertical_speed				{ this, "/vertical-speed" };
-	xf::PropertyIn<si::Velocity>	ground_speed				{ this, "/ground-speed" };
+	xf::PropertyIn<si::Length>		altitude_amsl				{ this, "altitude-amsl" };
+	xf::PropertyIn<si::Length>		altitude_acquire_amsl		{ this, "altitude-acquire-amsl" };
+	xf::PropertyIn<si::Velocity>	vertical_speed				{ this, "vertical-speed" };
+	xf::PropertyIn<si::Velocity>	ground_speed				{ this, "ground-speed" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Length>		altitude_acquire_distance	{ this, "/acquire-distance" };
-	xf::PropertyOut<bool>			altitude_acquire_flag		{ this, "/acquire-flag" };
+	xf::PropertyOut<si::Length>		altitude_acquire_distance	{ this, "acquire-distance" };
+	xf::PropertyOut<bool>			altitude_acquire_flag		{ this, "acquire-flag" };
 };
 
 

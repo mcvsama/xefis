@@ -47,22 +47,22 @@ class AFCS_AP_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	cmd_pitch				{ this, "/cmd-pitch" };
-	xf::PropertyIn<si::Angle>	cmd_roll				{ this, "/cmd-roll" };
-	xf::PropertyIn<si::Angle>	measured_pitch			{ this, "/measured-pitch" };
-	xf::PropertyIn<si::Angle>	measured_roll			{ this, "/measured-roll" };
-	xf::PropertyIn<si::Angle>	elevator_minimum		{ this, "/limits/elevator/minimum" };
-	xf::PropertyIn<si::Angle>	elevator_maximum		{ this, "/limits/elevator/maximum" };
-	xf::PropertyIn<si::Angle>	ailerons_minimum		{ this, "/limits/ailerons/minimum" };
-	xf::PropertyIn<si::Angle>	ailerons_maximum		{ this, "/limits/ailerons/maximum" };
+	xf::PropertyIn<si::Angle>	cmd_pitch				{ this, "cmd-pitch" };
+	xf::PropertyIn<si::Angle>	cmd_roll				{ this, "cmd-roll" };
+	xf::PropertyIn<si::Angle>	measured_pitch			{ this, "measured-pitch" };
+	xf::PropertyIn<si::Angle>	measured_roll			{ this, "measured-roll" };
+	xf::PropertyIn<si::Angle>	elevator_minimum		{ this, "limits/elevator/minimum" };
+	xf::PropertyIn<si::Angle>	elevator_maximum		{ this, "limits/elevator/maximum" };
+	xf::PropertyIn<si::Angle>	ailerons_minimum		{ this, "limits/ailerons/minimum" };
+	xf::PropertyIn<si::Angle>	ailerons_maximum		{ this, "limits/ailerons/maximum" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>		serviceable				{ this, "/serviceable" };
-	xf::PropertyOut<si::Angle>	elevator				{ this, "/elevator" };
-	xf::PropertyOut<si::Angle>	ailerons				{ this, "/ailerons" };
+	xf::PropertyOut<bool>		serviceable				{ this, "serviceable" };
+	xf::PropertyOut<si::Angle>	elevator				{ this, "elevator" };
+	xf::PropertyOut<si::Angle>	ailerons				{ this, "ailerons" };
 };
 
 

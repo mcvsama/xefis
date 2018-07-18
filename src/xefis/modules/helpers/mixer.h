@@ -43,14 +43,14 @@ template<class Value>
 		 * Input
 		 */
 
-		xf::PropertyIn<Value>	input_a_value	{ this, "/input.a" };
-		xf::PropertyIn<Value>	input_b_value	{ this, "/input.b" };
+		xf::PropertyIn<Value>	input_a_value	{ this, "input.a" };
+		xf::PropertyIn<Value>	input_b_value	{ this, "input.b" };
 
 		/*
 		 * Output
 		 */
 
-		xf::PropertyOut<Value>	output_value	{ this, "/value" };
+		xf::PropertyOut<Value>	output_value	{ this, "value" };
 	};
 
 

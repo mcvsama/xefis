@@ -46,14 +46,14 @@ class EngineTorqueIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "/engine-speed" };
-	xf::PropertyIn<si::Current>			engine_current		{ this, "/engine-current" };
+	xf::PropertyIn<si::AngularVelocity>	engine_speed		{ this, "engine-speed" };
+	xf::PropertyIn<si::Current>			engine_current		{ this, "engine-current" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Torque>			engine_torque		{ this, "/engine-torque" };
+	xf::PropertyOut<si::Torque>			engine_torque		{ this, "engine-torque" };
 };
 
 

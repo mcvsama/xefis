@@ -45,9 +45,9 @@ class BMP085_IO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>				serviceable					{ this, "/serviceable" };
-	xf::PropertyOut<si::Temperature>	temperature					{ this, "/measured-temperature" };
-	xf::PropertyOut<si::Pressure>		pressure					{ this, "/measured-pressure" };
+	xf::PropertyOut<bool>				serviceable					{ this, "serviceable" };
+	xf::PropertyOut<si::Temperature>	temperature					{ this, "measured-temperature" };
+	xf::PropertyOut<si::Pressure>		pressure					{ this, "measured-pressure" };
 };
 
 
