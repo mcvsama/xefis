@@ -11,37 +11,54 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__CONFIGURATOR__CONFIGURATOR_WIDGET_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__CONFIGURATOR__CONFIGURATOR_WIDGET_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULES_LIST_ITEM_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULES_LIST_ITEM_H__INCLUDED
 
 // Standard:
 #include <cstddef>
 
 // Qt:
-#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/components/data_recorder/data_recorder.h>
-#include <xefis/core/components/module_configurator/module_configurator.h>
 #include <xefis/core/module.h>
+
+// Local:
+#include "processing_loop_item.h"
 
 
 namespace xf {
 
-class ConfiguratorWidget: public QWidget
+class ModuleItem: public QTreeWidgetItem
 {
   public:
 	// Ctor
 	explicit
-	ConfiguratorWidget (Machine& machine, QWidget* parent);
+	ModuleItem (BasicModule& module, ProcessingLoopItem& parent);
+
+	/**
+	 * Return Module* associated with this item.
+	 */
+	BasicModule&
+	module() const noexcept;
+
+	/**
+	 * Update item (module stats).
+	 */
+	void
+	update_stats();
 
   private:
-	Machine&			_machine;
-	ModuleConfigurator*	_module_configurator	= nullptr;
-	DataRecorder*		_data_recorder			= nullptr;
-	QTabWidget*			_tabs					= nullptr;
+	BasicModule& _module;
 };
+
+
+inline BasicModule&
+ModuleItem::module() const noexcept
+{
+	return _module;
+}
 
 } // namespace xf
 

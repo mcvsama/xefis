@@ -43,6 +43,13 @@ ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequ
 }
 
 
+ProcessingLoop::~ProcessingLoop()
+{
+	// Make sure to destroy modules first, since in their destructors they can still need to access PropertyLoop via ProcessingLoopAPI or via other means.
+	_modules.clear();
+}
+
+
 void
 ProcessingLoop::start()
 {
@@ -75,8 +82,8 @@ ProcessingLoop::execute_cycle()
 	{
 		Time latency = dt - _loop_period;
 
-		_latency = latency;
-		_actual_frequency = 1.0 / dt;
+		// TODO _latency = latency;
+		// TODO _actual_frequency = 1.0 / dt;
 
 		if (dt > 1.1 * _loop_period)
 		{

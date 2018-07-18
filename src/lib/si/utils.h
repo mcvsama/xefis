@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <vector>
 #include <cmath>
-#include <experimental/string_view>
+#include <string_view>
 
 // Boost:
 #include <boost/endian/conversion.hpp>
@@ -182,7 +182,7 @@ to_string (DynamicUnit const& du);
  *			If unit can't be parsed to any known unit.
  */
 DynamicUnit
-parse_unit (std::experimental::string_view const& str);
+parse_unit (std::string_view const& str);
 
 
 /**
@@ -217,7 +217,7 @@ template<class Q,
  */
 template<class pUnit, class pValue>
 	inline void
-	parse (std::experimental::string_view const& str, Quantity<pUnit, pValue>& quantity);
+	parse (std::string_view const& str, Quantity<pUnit, pValue>& quantity);
 
 
 /**
@@ -226,7 +226,7 @@ template<class pUnit, class pValue>
 template<class Q,
 		 class = std::enable_if_t<is_quantity_v<Q>>>
 	inline Q
-	parse (std::experimental::string_view const& str);
+	parse (std::string_view const& str);
 
 
 /**
@@ -453,17 +453,17 @@ template<class Q, class>
 
 template<class pUnit, class pValue>
 	inline void
-	parse (std::experimental::string_view const& str, Quantity<pUnit, pValue>& quantity)
+	parse (std::string_view const& str, Quantity<pUnit, pValue>& quantity)
 	{
 		std::size_t p = str.find_first_of (' ');
 
-		if (p == std::experimental::string_view::npos)
-			throw UnparsableValue ("error while parsing: " + str.to_string());
+		if (p == std::string_view::npos)
+			throw UnparsableValue ("error while parsing: " + std::string (str));
 
 		try {
 			// float in "units" -> Quantity
 			pValue value = boost::lexical_cast<pValue> (str.substr (0, p));
-			std::experimental::string_view unit_str = str.substr (p + 1);
+			std::string_view unit_str = str.substr (p + 1);
 
 			DynamicUnit source_unit = parse_unit (unit_str);
 			DynamicUnit target_unit = pUnit::dynamic_unit();
@@ -476,14 +476,14 @@ template<class pUnit, class pValue>
 		}
 		catch (...)
 		{
-			throw UnparsableValue ("error while parsing: " + str.to_string());
+			throw UnparsableValue ("error while parsing: " + std::string (str));
 		}
 	}
 
 
 template<class Q, class>
 	inline Q
-	parse (std::experimental::string_view const& str)
+	parse (std::string_view const& str)
 	{
 		Q result;
 		parse (str, result);

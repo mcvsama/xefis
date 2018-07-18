@@ -213,21 +213,29 @@ NODEP_SOURCES			+= $(VERSION_FILE)
 
 ######## /xefis/core/components ########
 
-XEFIS_HEADERS_MOC		+= xefis/core/components/configurator/configurator_widget.h
-XEFIS_HEADERS_MOC		+= xefis/core/components/configurator/modules_list.h
-XEFIS_HEADERS			+= xefis/core/components/configurator/module_item.h
-XEFIS_HEADERS			+= xefis/core/components/configurator/processing_loop_item.h
+XEFIS_HEADERS			+= xefis/core/components/configurator/configurator_widget.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_configurator.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_item.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_widget.h
+XEFIS_HEADERS_MOC		+= xefis/core/components/module_configurator/modules_list.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/processing_loop_item.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/data_recorder.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graph_widget.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graphs_stack.h
+XEFIS_HEADERS			+= xefis/core/components/property_tree/property_item.h
+XEFIS_HEADERS			+= xefis/core/components/property_tree/property_tree.h
 
 XEFIS_SOURCES			+= xefis/core/components/configurator/configurator_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/configurator/modules_list.cc
-XEFIS_SOURCES			+= xefis/core/components/configurator/module_item.cc
-XEFIS_SOURCES			+= xefis/core/components/configurator/processing_loop_item.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_configurator.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_item.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_widget.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/modules_list.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/processing_loop_item.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/data_recorder.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graph_widget.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc
+XEFIS_SOURCES			+= xefis/core/components/property_tree/property_item.cc
+XEFIS_SOURCES			+= xefis/core/components/property_tree/property_tree.cc
 
 ######## /xefis/core ########
 
@@ -244,9 +252,12 @@ XEFIS_HEADERS_MOC		+= xefis/core/panel.h
 XEFIS_HEADERS_MOC		+= xefis/core/processing_loop.h
 XEFIS_HEADERS			+= xefis/core/property.h
 XEFIS_HEADERS			+= xefis/core/property_digitizer.h
+XEFIS_HEADERS			+= xefis/core/property_in.h
 XEFIS_HEADERS			+= xefis/core/property_observer.h
+XEFIS_HEADERS			+= xefis/core/property_out.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
-XEFIS_HEADERS			+= xefis/core/property_stringifier.h
+XEFIS_HEADERS			+= xefis/core/property_string_converter.h
+XEFIS_HEADERS			+= xefis/core/property_string_converter.tcc
 XEFIS_HEADERS			+= xefis/core/property_utils.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS			+= xefis/core/screen_spec.h
@@ -265,6 +276,7 @@ XEFIS_SOURCES			+= xefis/core/module_io.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/processing_loop.cc
 XEFIS_SOURCES			+= xefis/core/property_observer.cc
+XEFIS_SOURCES			+= xefis/core/property_string_converter.cc
 XEFIS_SOURCES			+= xefis/core/screen.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
@@ -273,9 +285,13 @@ XEFIS_SOURCES			+= xefis/core/xefis.cc
 SELFTEST_HEADERS		+= xefis/core/module.h
 SELFTEST_HEADERS		+= xefis/core/module_io.h
 SELFTEST_HEADERS		+= xefis/core/property.h
+SELFTEST_HEADERS		+= xefis/core/property.tcc
+SELFTEST_HEADERS		+= xefis/core/property_string_converter.h
+SELFTEST_HEADERS		+= xefis/core/property_string_converter.tcc
 
 SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
+SELFTEST_SOURCES		+= xefis/core/property_string_converter.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 
 ######## /xefis/support/air ########

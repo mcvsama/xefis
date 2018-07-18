@@ -28,17 +28,12 @@
 #include <xefis/utility/smoother.h>
 #include <xefis/utility/v2/actions.h>
 
+// Local:
+#include "afcs_api.h"
+
 
 class AFCS_AT_IO: public xf::ModuleIO
 {
-  public:
-	enum class SpeedMode
-	{
-		None		= 0,
-		Thrust		= 1,
-		Airspeed	= 2,
-	};
-
   public:
 	/*
 	 * Settings

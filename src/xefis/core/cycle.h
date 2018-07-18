@@ -32,14 +32,17 @@ class Logger;
 class Cycle
 {
   public:
+	using Number = uint64_t;
+
+  public:
 	// Ctor
 	explicit
-	Cycle (uint64_t number, Time update_time, Time update_dt, Logger&);
+	Cycle (Number number, Time update_time, Time update_dt, Logger&);
 
 	/**
 	 * Return this cycle serial number.
 	 */
-	uint64_t
+	Number
 	number() const noexcept;
 
 	/**
@@ -63,7 +66,7 @@ class Cycle
 	logger() const noexcept;
 
   private:
-	uint64_t	_number;
+	Number		_number;
 	Time		_update_time;
 	Time		_update_dt;
 	Logger*		_logger;
@@ -71,7 +74,7 @@ class Cycle
 
 
 inline
-Cycle::Cycle (uint64_t number, Time update_time, Time update_dt, Logger& logger):
+Cycle::Cycle (Number number, Time update_time, Time update_dt, Logger& logger):
 	_number (number),
 	_update_time (update_time),
 	_update_dt (update_dt),
@@ -79,7 +82,7 @@ Cycle::Cycle (uint64_t number, Time update_time, Time update_dt, Logger& logger)
 { }
 
 
-inline uint64_t
+inline Cycle::Number
 Cycle::number() const noexcept
 {
 	return _number;

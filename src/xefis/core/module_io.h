@@ -24,6 +24,7 @@
 #include <xefis/core/module.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
+#include <xefis/utility/sequence.h>
 
 
 class QWidget;
@@ -136,6 +137,24 @@ class ModuleIO
 		 */
 		void
 		unregister_output_property (BasicPropertyOut&);
+
+		/**
+		 * Return registered settings.
+		 */
+		Sequence<std::vector<BasicSetting*>::const_iterator>
+		settings() const noexcept;
+
+		/**
+		 * Return registered input properties.
+		 */
+		Sequence<std::vector<BasicPropertyIn*>::const_iterator>
+		input_properties() const noexcept;
+
+		/**
+		 * Return registered output properties.
+		 */
+		Sequence<std::vector<BasicPropertyOut*>::const_iterator>
+		output_properties() const noexcept;
 
 	  private:
 		ModuleIO& _io;

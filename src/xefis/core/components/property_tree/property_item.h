@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__CONFIGURATOR__PROCESSING_LOOP_ITEM_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__CONFIGURATOR__PROCESSING_LOOP_ITEM_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__PROPERTY_TREE__PROPERTY_ITEM_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__PROPERTY_TREE__PROPERTY_ITEM_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -22,34 +22,31 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/processing_loop.h>
+#include <xefis/core/module.h>
+#include <xefis/core/property.h>
 
 
 namespace xf {
 
-class ProcessingLoopItem: public QTreeWidgetItem
+class PropertyItem: public QTreeWidgetItem
 {
   public:
 	// Ctor
 	explicit
-	ProcessingLoopItem (xf::ProcessingLoop&, QTreeWidget& parent);
+	PropertyItem (BasicProperty*, QTreeWidgetItem& parent);
 
 	/**
-	 * Return ProcessingLoop* associated with this item.
+	 * Should be called after populating the tree with all properties.
 	 */
-	xf::ProcessingLoop&
-	processing_loop() const noexcept;
+	void
+	setup_appereance();
+
+	void
+	read();
 
   private:
-	xf::ProcessingLoop& _processing_loop;
-};
-
-
-inline xf::ProcessingLoop&
-ProcessingLoopItem::processing_loop() const noexcept
-{
-	return _processing_loop;
-}
+	BasicProperty* _property;
+ };
 
 } // namespace xf
 

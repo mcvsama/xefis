@@ -69,14 +69,14 @@ AFCS_AT::compute_thrust()
 	{
 		switch (*io.cmd_speed_mode)
 		{
-			case AFCS_AT_IO::SpeedMode::Thrust:
+			case afcs_api::SpeedMode::Thrust:
 				if (io.cmd_thrust)
 					computed_thrust = *io.cmd_thrust;
 				else
 					disengage = true;
 				break;
 
-			case AFCS_AT_IO::SpeedMode::Airspeed:
+			case afcs_api::SpeedMode::Airspeed:
 				if (io.cmd_ias && io.measured_ias)
 				{
 					// This is more tricky, since we measure IAS, but control thrust.
@@ -96,7 +96,7 @@ AFCS_AT::compute_thrust()
 				}
 				break;
 
-			case AFCS_AT_IO::SpeedMode::None:
+			case afcs_api::SpeedMode::None:
 				// Don't change current state:
 				break;
 		}

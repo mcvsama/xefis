@@ -28,7 +28,7 @@
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
-#include <xefis/core/property_stringifier.h>
+#include <xefis/core/property_string_converter.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 
@@ -42,16 +42,16 @@ class Datatable:
 	  public:
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringifier const&);
+		Line (std::string const& label, xf::PropertyStringConverter const&);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringifier const&,
+		Line (std::string const& label, xf::PropertyStringConverter const&,
 			  QColor label_and_value_color);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringifier const&,
+		Line (std::string const& label, xf::PropertyStringConverter const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
 
@@ -62,10 +62,10 @@ class Datatable:
 		stringify() const;
 
 	  public:
-		std::string				label;
-		QColor					label_color	{ Qt::white };
-		xf::PropertyStringifier	value;
-		QColor					value_color	{ Qt::white };
+		std::string					label;
+		QColor						label_color	{ Qt::white };
+		xf::PropertyStringConverter	value;
+		QColor						value_color	{ Qt::white };
 	};
 
   public:

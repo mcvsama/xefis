@@ -77,17 +77,130 @@ enum class PitchMode
 	Flare,
 };
 
+enum class SpeedMode
+{
+	// Manual A/T setting.
+	None		= 0,
+	// Maintain constant thrust.
+	Thrust		= 1,
+	// Maintain constant airspeed.
+	Airspeed	= 2,
+};
 
-std::string
-to_string (ThrustMode);
+
+static constexpr std::string_view	kThrustMode_None		= "None";
+static constexpr std::string_view	kThrustMode_TO_GA		= "TO/GA";
+static constexpr std::string_view	kThrustMode_Continuous	= "CONT";
+static constexpr std::string_view	kThrustMode_Idle		= "IDLE";
+static constexpr std::string_view	kThrustMode_KIAS		= "KIAS";
+static constexpr std::string_view	kThrustMode_Mach		= "MACH";
+
+static constexpr std::string_view	kRollMode_None			= "None";
+static constexpr std::string_view	kRollMode_Heading		= "HDG";
+static constexpr std::string_view	kRollMode_Track			= "TRK";
+static constexpr std::string_view	kRollMode_WingsLevel	= "WNG LVL";
+static constexpr std::string_view	kRollMode_Localizer		= "LOC";
+static constexpr std::string_view	kRollMode_LNAV			= "LNAV";
+
+static constexpr std::string_view	kPitchMode_None			= "None";
+static constexpr std::string_view	kPitchMode_TO_GA		= "TO/GA";
+static constexpr std::string_view	kPitchMode_KIAS			= "KIAS";
+static constexpr std::string_view	kPitchMode_Mach			= "MACH";
+static constexpr std::string_view	kPitchMode_Altitude		= "ALT";
+static constexpr std::string_view	kPitchMode_VS			= "V/S";
+static constexpr std::string_view	kPitchMode_FPA			= "FPA";
+static constexpr std::string_view	kPitchMode_VNAVPath		= "VNAV PTH";
+static constexpr std::string_view	kPitchMode_GS			= "G/S";
+static constexpr std::string_view	kPitchMode_Flare		= "FLARE";
+
+static constexpr std::string_view	kSpeedMode_None			= "None";
+static constexpr std::string_view	kSpeedMode_Thrust		= "Thrust";
+static constexpr std::string_view	kSpeedMode_Airspeed		= "Airspeed";
 
 
-std::string
-to_string (RollMode);
+constexpr std::string_view
+to_string (ThrustMode mode)
+{
+	switch (mode)
+	{
+		case ThrustMode::None:			return kThrustMode_None;
+		case ThrustMode::TO_GA:			return kThrustMode_TO_GA;
+		case ThrustMode::Continuous:	return kThrustMode_Continuous;
+		case ThrustMode::Idle:			return kThrustMode_Idle;
+		case ThrustMode::KIAS:			return kThrustMode_KIAS;
+		case ThrustMode::Mach:			return kThrustMode_Mach;
+	}
+
+	return "";
+}
 
 
-std::string
-to_string (PitchMode);
+constexpr std::string_view
+to_string (RollMode mode)
+{
+	switch (mode)
+	{
+		case RollMode::None:			return kRollMode_None;
+		case RollMode::Heading:			return kRollMode_Heading;
+		case RollMode::Track:			return kRollMode_Track;
+		case RollMode::WingsLevel:		return kRollMode_WingsLevel;
+		case RollMode::Localizer:		return kRollMode_Localizer;
+		case RollMode::LNAV:			return kRollMode_LNAV;
+	}
+
+	return "";
+}
+
+
+constexpr std::string_view
+to_string (PitchMode mode)
+{
+	switch (mode)
+	{
+		case PitchMode::None:			return kPitchMode_None;
+		case PitchMode::TO_GA:			return kPitchMode_TO_GA;
+		case PitchMode::KIAS:			return kPitchMode_KIAS;
+		case PitchMode::Mach:			return kPitchMode_Mach;
+		case PitchMode::Altitude:		return kPitchMode_Altitude;
+		case PitchMode::VS:				return kPitchMode_VS;
+		case PitchMode::FPA:			return kPitchMode_FPA;
+		case PitchMode::VNAVPath:		return kPitchMode_VNAVPath;
+		case PitchMode::GS:				return kPitchMode_GS;
+		case PitchMode::Flare:			return kPitchMode_Flare;
+	}
+
+	return "";
+}
+
+
+constexpr std::string_view
+to_string (SpeedMode mode)
+{
+	switch (mode)
+	{
+		case SpeedMode::None:			return kSpeedMode_None;
+		case SpeedMode::Thrust:			return kSpeedMode_Thrust;
+		case SpeedMode::Airspeed:		return kSpeedMode_Airspeed;
+	}
+
+	return "";
+}
+
+
+void
+parse (std::string_view const&, ThrustMode&);
+
+
+void
+parse (std::string_view const&, RollMode&);
+
+
+void
+parse (std::string_view const&, PitchMode&);
+
+
+void
+parse (std::string_view const&, SpeedMode&);
 
 } // namespace afcs_api
 

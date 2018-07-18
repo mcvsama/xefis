@@ -23,58 +23,77 @@
 
 namespace afcs_api {
 
-std::string
-to_string (ThrustMode mode)
+void
+parse (std::string_view const& str, ThrustMode& thrust_mode)
 {
-	switch (mode)
-	{
-		case ThrustMode::None:			return "None";
-		case ThrustMode::TO_GA:			return "TO/GA";
-		case ThrustMode::Continuous:	return "CONT";
-		case ThrustMode::Idle:			return "IDLE";
-		case ThrustMode::KIAS:			return "KIAS";
-		case ThrustMode::Mach:			return "MACH";
-	}
-
-	return "";
+	if (str == kThrustMode_TO_GA)
+		thrust_mode = ThrustMode::TO_GA;
+	else if (str == kThrustMode_Continuous)
+		thrust_mode = ThrustMode::Continuous;
+	else if (str == kThrustMode_Idle)
+		thrust_mode = ThrustMode::Idle;
+	else if (str == kThrustMode_KIAS)
+		thrust_mode = ThrustMode::KIAS;
+	else if (str == kThrustMode_Mach)
+		thrust_mode = ThrustMode::Mach;
+	else
+		thrust_mode = ThrustMode::None;
 }
 
 
-std::string
-to_string (RollMode mode)
+void
+parse (std::string_view const& str, RollMode& roll_mode)
 {
-	switch (mode)
-	{
-		case RollMode::None:			return "None";
-		case RollMode::Heading:			return "HDG";
-		case RollMode::Track:			return "TRK";
-		case RollMode::WingsLevel:		return "WNG LVL";
-		case RollMode::Localizer:		return "LOC";
-		case RollMode::LNAV:			return "LNAV";
-	}
-
-	return "";
+	if (str == kRollMode_Heading)
+		roll_mode = RollMode::Heading;
+	else if (str == kRollMode_Track)
+		roll_mode = RollMode::Track;
+	else if (str == kRollMode_WingsLevel)
+		roll_mode = RollMode::WingsLevel;
+	else if (str == kRollMode_Localizer)
+		roll_mode = RollMode::Localizer;
+	else if (str == kRollMode_LNAV)
+		roll_mode = RollMode::LNAV;
+	else
+		roll_mode = RollMode::None;
 }
 
 
-std::string
-to_string (PitchMode mode)
+void
+parse (std::string_view const& str, PitchMode& pitch_mode)
 {
-	switch (mode)
-	{
-		case PitchMode::None:			return "None";
-		case PitchMode::TO_GA:			return "TO/GA";
-		case PitchMode::KIAS:			return "KIAS";
-		case PitchMode::Mach:			return "MACH";
-		case PitchMode::Altitude:		return "ALT";
-		case PitchMode::VS:				return "V/S";
-		case PitchMode::FPA:			return "FPA";
-		case PitchMode::VNAVPath:		return "VNAV PTH";
-		case PitchMode::GS:				return "G/S";
-		case PitchMode::Flare:			return "FLARE";
-	}
+	if (str == kPitchMode_TO_GA)
+		pitch_mode = PitchMode::TO_GA;
+	else if (str == kPitchMode_KIAS)
+		pitch_mode = PitchMode::KIAS;
+	else if (str == kPitchMode_Mach)
+		pitch_mode = PitchMode::Mach;
+	else if (str == kPitchMode_Altitude)
+		pitch_mode = PitchMode::Altitude;
+	else if (str == kPitchMode_VS)
+		pitch_mode = PitchMode::VS;
+	else if (str == kPitchMode_FPA)
+		pitch_mode = PitchMode::FPA;
+	else if (str == kPitchMode_VNAVPath)
+		pitch_mode = PitchMode::VNAVPath;
+	else if (str == kPitchMode_GS)
+		pitch_mode = PitchMode::GS;
+	else if (str == kPitchMode_Flare)
+		pitch_mode = PitchMode::Flare;
+	else
+		pitch_mode = PitchMode::None;
+}
 
-	return "";
+
+void
+parse (std::string_view const& str, SpeedMode& speed_mode)
+{
+	if (str == kSpeedMode_Thrust)
+		speed_mode = SpeedMode::Thrust;
+	else if (str == kSpeedMode_Airspeed)
+		speed_mode = SpeedMode::Airspeed;
+	else
+		speed_mode = SpeedMode::None;
 }
 
 } // namespace afcs_api
