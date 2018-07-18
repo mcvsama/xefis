@@ -34,10 +34,10 @@ class KLogMonitorIO: public xf::ModuleIO
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>	flag_oom	{ this, "/flags/oom" };
-	xf::PropertyOut<bool>	flag_io		{ this, "/flags/io-error" };
-	xf::PropertyOut<bool>	flag_oops	{ this, "/flags/oops" };
-	xf::PropertyOut<bool>	flag_bug	{ this, "/flags/bug" };
+	xf::PropertyOut<bool>	flag_oom	{ this, "flags/oom" };
+	xf::PropertyOut<bool>	flag_io		{ this, "flags/io-error" };
+	xf::PropertyOut<bool>	flag_oops	{ this, "flags/oops" };
+	xf::PropertyOut<bool>	flag_bug	{ this, "flags/bug" };
 };
 
 

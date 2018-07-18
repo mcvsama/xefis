@@ -28,20 +28,20 @@ template<template<class> class PropertyType>
 	class GCS2AircraftLinkIO: public LinkIO
 	{
 	  public:
-		PropertyType<si::Angle>		nil_prop				{ this, "/nil" };
-		PropertyType<si::Angle>		angle_prop				{ this, "/angle" };
-		PropertyType<si::Angle>		angle_prop_r			{ this, "/angle_r" };
-		PropertyType<si::Velocity>	velocity_prop			{ this, "/velocity" };
-		PropertyType<si::Velocity>	velocity_prop_r			{ this, "/velocity_r" };
-		PropertyType<si::Velocity>	velocity_prop_offset	{ this, "/velocity_prop_offset" };
-		PropertyType<si::Velocity>	velocity_prop_offset_r	{ this, "/velocity_prop_offset_r" };
-		PropertyType<bool>			bool_prop				{ this, "/bool" };
-		PropertyType<bool>			bool_prop_r				{ this, "/bool_r" };
-		PropertyType<int64_t>		int_prop				{ this, "/int" };
-		PropertyType<int64_t>		int_prop_r				{ this, "/int_r" };
-		PropertyType<uint64_t>		uint_prop				{ this, "/uint" };
-		PropertyType<uint64_t>		uint_prop_r				{ this, "/uint_r" };
-		PropertyType<int64_t>		dummy					{ this, "/dummy" };
+		PropertyType<si::Angle>		nil_prop				{ this, "nil" };
+		PropertyType<si::Angle>		angle_prop				{ this, "angle" };
+		PropertyType<si::Angle>		angle_prop_r			{ this, "angle_r" };
+		PropertyType<si::Velocity>	velocity_prop			{ this, "velocity" };
+		PropertyType<si::Velocity>	velocity_prop_r			{ this, "velocity_r" };
+		PropertyType<si::Velocity>	velocity_prop_offset	{ this, "velocity_prop_offset" };
+		PropertyType<si::Velocity>	velocity_prop_offset_r	{ this, "velocity_prop_offset_r" };
+		PropertyType<bool>			bool_prop				{ this, "bool" };
+		PropertyType<bool>			bool_prop_r				{ this, "bool_r" };
+		PropertyType<int64_t>		int_prop				{ this, "int" };
+		PropertyType<int64_t>		int_prop_r				{ this, "int_r" };
+		PropertyType<uint64_t>		uint_prop				{ this, "uint" };
+		PropertyType<uint64_t>		uint_prop_r				{ this, "uint_r" };
+		PropertyType<int64_t>		dummy					{ this, "dummy" };
 	};
 
 

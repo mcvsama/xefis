@@ -51,18 +51,18 @@ class XBeeIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		send			{ this, "/send" };
+	xf::PropertyIn<std::string>		send			{ this, "send" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>			serviceable		{ this, "/serviceable" };
-	xf::PropertyOut<std::string>	receive			{ this, "/receive" };
-	xf::PropertyOut<int64_t>		input_errors	{ this, "/input-errors" };
-	xf::PropertyOut<int64_t>		failures		{ this, "/failures" };
-	xf::PropertyOut<int64_t>		cca_failures	{ this, "/clear-channel-failures" };
-	xf::PropertyOut<si::Power>		rssi			{ this, "/rssi" };
+	xf::PropertyOut<bool>			serviceable		{ this, "serviceable" };
+	xf::PropertyOut<std::string>	receive			{ this, "receive" };
+	xf::PropertyOut<int64_t>		input_errors	{ this, "input-errors" };
+	xf::PropertyOut<int64_t>		failures		{ this, "failures" };
+	xf::PropertyOut<int64_t>		cca_failures	{ this, "clear-channel-failures" };
+	xf::PropertyOut<si::Power>		rssi			{ this, "rssi" };
 };
 
 

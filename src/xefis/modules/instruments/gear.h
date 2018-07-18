@@ -33,13 +33,13 @@ class GearIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>	requested_down	{ this, "/requested-down" };
-	xf::PropertyIn<bool>	nose_up			{ this, "/nose-up" };
-	xf::PropertyIn<bool>	nose_down		{ this, "/nose-down" };
-	xf::PropertyIn<bool>	left_up			{ this, "/left-up" };
-	xf::PropertyIn<bool>	left_down		{ this, "/left-down" };
-	xf::PropertyIn<bool>	right_up		{ this, "/right-up" };
-	xf::PropertyIn<bool>	right_down		{ this, "/right-down" };
+	xf::PropertyIn<bool>	requested_down	{ this, "requested-down" };
+	xf::PropertyIn<bool>	nose_up			{ this, "nose-up" };
+	xf::PropertyIn<bool>	nose_down		{ this, "nose-down" };
+	xf::PropertyIn<bool>	left_up			{ this, "left-up" };
+	xf::PropertyIn<bool>	left_down		{ this, "left-down" };
+	xf::PropertyIn<bool>	right_up		{ this, "right-up" };
+	xf::PropertyIn<bool>	right_down		{ this, "right-down" };
 };
 
 

@@ -178,14 +178,14 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_button_properties[handler_id] = std::make_unique<xf::PropertyOut<bool>> (&io, "/buttons/" + std::to_string (handler_id));
+		_button_properties[handler_id] = std::make_unique<xf::PropertyOut<bool>> (&io, "buttons/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
-		_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<double>> (&io, "/axes/" + std::to_string (handler_id));
+		_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<double>> (&io, "axes/" + std::to_string (handler_id));
 
 	for (std::size_t handler_id = 0; handler_id < kMaxEventID; ++handler_id)
 	{
-		_angle_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<si::Angle>> (&io, "/axes(angle)/" + std::to_string (handler_id));
+		_angle_axis_properties[handler_id] = std::make_unique<xf::PropertyOut<si::Angle>> (&io, "axes(angle)/" + std::to_string (handler_id));
 		_angle_axis_ranges[handler_id] = { -45_deg, +45_deg };
 	}
 

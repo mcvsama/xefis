@@ -46,7 +46,7 @@ class CDU:
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Time>	time_utc	{ this, "/time/utc" };
+	xf::PropertyIn<si::Time>	time_utc	{ this, "time/utc" };
 
   private:
 	static constexpr double kButtonWidthForHeight = 0.9;

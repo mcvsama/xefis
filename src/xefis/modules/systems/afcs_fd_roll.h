@@ -47,20 +47,20 @@ class AFCS_FD_Roll_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>				autonomous				{ this, "/autonomous" };
-	xf::PropertyIn<si::Angle>			roll_limits				{ this, "/roll-limits" };
-	xf::PropertyIn<afcs_api::RollMode>	cmd_roll_mode			{ this, "/cmd-roll-mode" };
-	xf::PropertyIn<si::Angle>			cmd_magnetic_hdg		{ this, "/cmd-magnetic-heading" };
-	xf::PropertyIn<si::Angle>			cmd_magnetic_trk		{ this, "/cmd-magnetic-track" };
-	xf::PropertyIn<si::Angle>			measured_magnetic_hdg	{ this, "/measured-magnetic-heading" };
-	xf::PropertyIn<si::Angle>			measured_magnetic_trk	{ this, "/measured-magnetic-track" };
+	xf::PropertyIn<bool>				autonomous				{ this, "autonomous" };
+	xf::PropertyIn<si::Angle>			roll_limits				{ this, "roll-limits" };
+	xf::PropertyIn<afcs_api::RollMode>	cmd_roll_mode			{ this, "cmd-roll-mode" };
+	xf::PropertyIn<si::Angle>			cmd_magnetic_hdg		{ this, "cmd-magnetic-heading" };
+	xf::PropertyIn<si::Angle>			cmd_magnetic_trk		{ this, "cmd-magnetic-track" };
+	xf::PropertyIn<si::Angle>			measured_magnetic_hdg	{ this, "measured-magnetic-heading" };
+	xf::PropertyIn<si::Angle>			measured_magnetic_trk	{ this, "measured-magnetic-track" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			roll					{ this, "/output-roll" };
-	xf::PropertyOut<bool>				operative				{ this, "/operative" };
+	xf::PropertyOut<si::Angle>			roll					{ this, "output-roll" };
+	xf::PropertyOut<bool>				operative				{ this, "operative" };
 };
 
 

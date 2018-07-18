@@ -44,32 +44,32 @@ class CHRUM6_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Acceleration>		centripetal_x					{ this, "/centripetal-acceleration/x" };
-	xf::PropertyIn<si::Acceleration>		centripetal_y					{ this, "/centripetal-acceleration/y" };
-	xf::PropertyIn<si::Acceleration>		centripetal_z					{ this, "/centripetal-acceleration/z" };
+	xf::PropertyIn<si::Acceleration>		centripetal_x					{ this, "centripetal-acceleration/x" };
+	xf::PropertyIn<si::Acceleration>		centripetal_y					{ this, "centripetal-acceleration/y" };
+	xf::PropertyIn<si::Acceleration>		centripetal_z					{ this, "centripetal-acceleration/z" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>					serviceable						{ this, "/serviceable" };
-	xf::PropertyOut<bool>					caution							{ this, "/caution" };
-	xf::PropertyOut<int64_t>				failures						{ this, "/failures" };
-	xf::PropertyOut<si::Temperature>		internal_temperature			{ this, "/internal-temperature" };
-	xf::PropertyOut<si::Angle>				orientation_pitch				{ this, "/orientation/pitch" };
-	xf::PropertyOut<si::Angle>				orientation_roll				{ this, "/orientation/roll" };
-	xf::PropertyOut<si::Angle>				orientation_heading_magnetic	{ this, "/orientation/heading.magnetic" };
-	xf::PropertyOut<si::Acceleration>		acceleration_x					{ this, "/acceleration/x" };
-	xf::PropertyOut<si::Acceleration>		acceleration_y					{ this, "/acceleration/y" };
-	xf::PropertyOut<si::Acceleration>		acceleration_z					{ this, "/acceleration/z" };
-	xf::PropertyOut<si::AngularVelocity>	rotation_x						{ this, "/rotation/x" };
-	xf::PropertyOut<si::AngularVelocity>	rotation_y						{ this, "/rotation.y" };
-	xf::PropertyOut<si::AngularVelocity>	rotation_z						{ this, "/rotation.z" };
+	xf::PropertyOut<bool>					serviceable						{ this, "serviceable" };
+	xf::PropertyOut<bool>					caution							{ this, "caution" };
+	xf::PropertyOut<int64_t>				failures						{ this, "failures" };
+	xf::PropertyOut<si::Temperature>		internal_temperature			{ this, "internal-temperature" };
+	xf::PropertyOut<si::Angle>				orientation_pitch				{ this, "orientation/pitch" };
+	xf::PropertyOut<si::Angle>				orientation_roll				{ this, "orientation/roll" };
+	xf::PropertyOut<si::Angle>				orientation_heading_magnetic	{ this, "orientation/heading.magnetic" };
+	xf::PropertyOut<si::Acceleration>		acceleration_x					{ this, "acceleration/x" };
+	xf::PropertyOut<si::Acceleration>		acceleration_y					{ this, "acceleration/y" };
+	xf::PropertyOut<si::Acceleration>		acceleration_z					{ this, "acceleration/z" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_x						{ this, "rotation/x" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_y						{ this, "rotation.y" };
+	xf::PropertyOut<si::AngularVelocity>	rotation_z						{ this, "rotation.z" };
 	// Note: it's _assumed_ that magnetic field strength returned by the device is in Teslas.
 	// TODO check that assumption!
-	xf::PropertyOut<si::MagneticField>		magnetic_x						{ this, "/magnetic/x" };
-	xf::PropertyOut<si::MagneticField>		magnetic_y						{ this, "/magnetic/y" };
-	xf::PropertyOut<si::MagneticField>		magnetic_z						{ this, "/magnetic/z" };
+	xf::PropertyOut<si::MagneticField>		magnetic_x						{ this, "magnetic/x" };
+	xf::PropertyOut<si::MagneticField>		magnetic_y						{ this, "magnetic/y" };
+	xf::PropertyOut<si::MagneticField>		magnetic_z						{ this, "magnetic/z" };
 };
 
 

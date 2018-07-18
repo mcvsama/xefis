@@ -63,123 +63,123 @@ class ADI_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>			weight_on_wheels									{ this, "/weight-on-wheels" };
+	xf::PropertyIn<bool>			weight_on_wheels									{ this, "weight-on-wheels" };
 	// Speed
-	xf::PropertyIn<bool>			speed_ias_serviceable								{ this, "/speed/ias.serviceable" };
-	xf::PropertyIn<si::Velocity>	speed_ias											{ this, "/speed/ias" };
-	xf::PropertyIn<si::Velocity>	speed_ias_lookahead									{ this, "/speed/ias.lookahead" };
-	xf::PropertyIn<si::Velocity>	speed_ias_minimum									{ this, "/speed/ias.minimum" };
-	xf::PropertyIn<si::Velocity>	speed_ias_minimum_maneuver							{ this, "/speed/ias.minimum.maneuver" };
-	xf::PropertyIn<si::Velocity>	speed_ias_maximum_maneuver							{ this, "/speed/ias.maximum.maneuver" };
-	xf::PropertyIn<si::Velocity>	speed_ias_maximum									{ this, "/speed/ias.maximum" };
-	xf::PropertyIn<double>			speed_mach											{ this, "/speed/mach" };
-	xf::PropertyIn<si::Velocity>	speed_ground										{ this, "/speed/ground-speed" };
+	xf::PropertyIn<bool>			speed_ias_serviceable								{ this, "speed/ias.serviceable" };
+	xf::PropertyIn<si::Velocity>	speed_ias											{ this, "speed/ias" };
+	xf::PropertyIn<si::Velocity>	speed_ias_lookahead									{ this, "speed/ias.lookahead" };
+	xf::PropertyIn<si::Velocity>	speed_ias_minimum									{ this, "speed/ias.minimum" };
+	xf::PropertyIn<si::Velocity>	speed_ias_minimum_maneuver							{ this, "speed/ias.minimum.maneuver" };
+	xf::PropertyIn<si::Velocity>	speed_ias_maximum_maneuver							{ this, "speed/ias.maximum.maneuver" };
+	xf::PropertyIn<si::Velocity>	speed_ias_maximum									{ this, "speed/ias.maximum" };
+	xf::PropertyIn<double>			speed_mach											{ this, "speed/mach" };
+	xf::PropertyIn<si::Velocity>	speed_ground										{ this, "speed/ground-speed" };
 	// Velocity bugs
-	xf::PropertyIn<si::Velocity>	speed_v1											{ this, "/speed-bugs/v1" };
-	xf::PropertyIn<si::Velocity>	speed_vr											{ this, "/speed-bugs/vr" };
-	xf::PropertyIn<si::Velocity>	speed_vref											{ this, "/speed-bugs/vref" };
-	xf::PropertyIn<std::string>		speed_flaps_up_label								{ this, "/speed-bugs/flaps-up.label" };
-	xf::PropertyIn<si::Velocity>	speed_flaps_up_speed								{ this, "/speed-bugs/flaps-up.speed" };
-	xf::PropertyIn<std::string>		speed_flaps_a_label									{ this, "/speed-bugs/flaps.a.label" };
-	xf::PropertyIn<si::Velocity>	speed_flaps_a_speed									{ this, "/speed-bugs/flaps.a.speed" };
-	xf::PropertyIn<std::string>		speed_flaps_b_label									{ this, "/speed-bugs/flaps.b.label" };
-	xf::PropertyIn<si::Velocity>	speed_flaps_b_speed									{ this, "/speed-bugs/flaps.b.speed" };
+	xf::PropertyIn<si::Velocity>	speed_v1											{ this, "speed-bugs/v1" };
+	xf::PropertyIn<si::Velocity>	speed_vr											{ this, "speed-bugs/vr" };
+	xf::PropertyIn<si::Velocity>	speed_vref											{ this, "speed-bugs/vref" };
+	xf::PropertyIn<std::string>		speed_flaps_up_label								{ this, "speed-bugs/flaps-up.label" };
+	xf::PropertyIn<si::Velocity>	speed_flaps_up_speed								{ this, "speed-bugs/flaps-up.speed" };
+	xf::PropertyIn<std::string>		speed_flaps_a_label									{ this, "speed-bugs/flaps.a.label" };
+	xf::PropertyIn<si::Velocity>	speed_flaps_a_speed									{ this, "speed-bugs/flaps.a.speed" };
+	xf::PropertyIn<std::string>		speed_flaps_b_label									{ this, "speed-bugs/flaps.b.label" };
+	xf::PropertyIn<si::Velocity>	speed_flaps_b_speed									{ this, "speed-bugs/flaps.b.speed" };
 	// Attitude and heading
-	xf::PropertyIn<bool>			orientation_serviceable								{ this, "/orientation/serviceable" };
-	xf::PropertyIn<si::Angle>		orientation_pitch									{ this, "/orientation/pitch" };
-	xf::PropertyIn<si::Angle>		orientation_roll									{ this, "/orientation/roll" };
-	xf::PropertyIn<si::Angle>		orientation_heading_magnetic						{ this, "/orientation/heading.magnetic" };
-	xf::PropertyIn<si::Angle>		orientation_heading_true							{ this, "/orientation/heading.true" };
-	xf::PropertyIn<bool>			orientation_heading_numbers_visible					{ this, "/orientation/heading-numbers-visible" };
+	xf::PropertyIn<bool>			orientation_serviceable								{ this, "orientation/serviceable" };
+	xf::PropertyIn<si::Angle>		orientation_pitch									{ this, "orientation/pitch" };
+	xf::PropertyIn<si::Angle>		orientation_roll									{ this, "orientation/roll" };
+	xf::PropertyIn<si::Angle>		orientation_heading_magnetic						{ this, "orientation/heading.magnetic" };
+	xf::PropertyIn<si::Angle>		orientation_heading_true							{ this, "orientation/heading.true" };
+	xf::PropertyIn<bool>			orientation_heading_numbers_visible					{ this, "orientation/heading-numbers-visible" };
 	// Track
-	xf::PropertyIn<si::Angle>		track_lateral_magnetic								{ this, "/track/lateral.magnetic" };
-	xf::PropertyIn<si::Angle>		track_lateral_true									{ this, "/track/lateral.true" };
-	xf::PropertyIn<si::Angle>		track_vertical										{ this, "/track/vertical" };
+	xf::PropertyIn<si::Angle>		track_lateral_magnetic								{ this, "track/lateral.magnetic" };
+	xf::PropertyIn<si::Angle>		track_lateral_true									{ this, "track/lateral.true" };
+	xf::PropertyIn<si::Angle>		track_vertical										{ this, "track/vertical" };
 	// Flight Path Vector
-	xf::PropertyIn<bool>			fpv_visible											{ this, "/fpv/fpv-visible" };
+	xf::PropertyIn<bool>			fpv_visible											{ this, "fpv/fpv-visible" };
 	// Slip-skid indicator
-	xf::PropertyIn<si::Angle>		slip_skid											{ this, "/slip-skid/angle" };
+	xf::PropertyIn<si::Angle>		slip_skid											{ this, "slip-skid/angle" };
 	// Angle of Attack
-	xf::PropertyIn<si::Angle>		aoa_alpha											{ this, "/aoa/alpha" };
-	xf::PropertyIn<si::Angle>		aoa_alpha_maximum									{ this, "/aoa/alpha.maximum" };
-	xf::PropertyIn<bool>			aoa_alpha_visible									{ this, "/aoa/alpha.visible" };
+	xf::PropertyIn<si::Angle>		aoa_alpha											{ this, "aoa/alpha" };
+	xf::PropertyIn<si::Angle>		aoa_alpha_maximum									{ this, "aoa/alpha.maximum" };
+	xf::PropertyIn<bool>			aoa_alpha_visible									{ this, "aoa/alpha.visible" };
 	// Pressure and radio altitude
-	xf::PropertyIn<bool>			altitude_amsl_serviceable							{ this, "/altitude/amsl.serviceable" };
-	xf::PropertyIn<si::Length>		altitude_amsl										{ this, "/altitude/amsl" };
-	xf::PropertyIn<si::Length>		altitude_amsl_lookahead								{ this, "/altitude/amsl.lookahead" };
-	xf::PropertyIn<bool>			altitude_agl_serviceable							{ this, "/altitude/agl.serviceable" };
-	xf::PropertyIn<si::Length>		altitude_agl										{ this, "/altitude/agl" };
-	xf::PropertyIn<std::string>		altitude_minimums_type								{ this, "/altitude/minimums.type" };
-	xf::PropertyIn<si::Length>		altitude_minimums_setting							{ this, "/altitude/minimums.setting" };
-	xf::PropertyIn<si::Length>		altitude_minimums_amsl								{ this, "/altitude/minimums.amsl" };
-	xf::PropertyIn<si::Length>		altitude_landing_amsl								{ this, "/altitude/landing-altitude.amsl" };
+	xf::PropertyIn<bool>			altitude_amsl_serviceable							{ this, "altitude/amsl.serviceable" };
+	xf::PropertyIn<si::Length>		altitude_amsl										{ this, "altitude/amsl" };
+	xf::PropertyIn<si::Length>		altitude_amsl_lookahead								{ this, "altitude/amsl.lookahead" };
+	xf::PropertyIn<bool>			altitude_agl_serviceable							{ this, "altitude/agl.serviceable" };
+	xf::PropertyIn<si::Length>		altitude_agl										{ this, "altitude/agl" };
+	xf::PropertyIn<std::string>		altitude_minimums_type								{ this, "altitude/minimums.type" };
+	xf::PropertyIn<si::Length>		altitude_minimums_setting							{ this, "altitude/minimums.setting" };
+	xf::PropertyIn<si::Length>		altitude_minimums_amsl								{ this, "altitude/minimums.amsl" };
+	xf::PropertyIn<si::Length>		altitude_landing_amsl								{ this, "altitude/landing-altitude.amsl" };
 	// Vertical speed
-	xf::PropertyIn<bool>			vertical_speed_serviceable							{ this, "/vertical-speed/serviceable" };
-	xf::PropertyIn<si::Velocity>	vertical_speed										{ this, "/vertical-speed/speed" };
-	xf::PropertyIn<si::Power>		vertical_speed_energy_variometer					{ this, "/vertical-speed/energy-variometer" };
+	xf::PropertyIn<bool>			vertical_speed_serviceable							{ this, "vertical-speed/serviceable" };
+	xf::PropertyIn<si::Velocity>	vertical_speed										{ this, "vertical-speed/speed" };
+	xf::PropertyIn<si::Power>		vertical_speed_energy_variometer					{ this, "vertical-speed/energy-variometer" };
 	// Air pressure settings
-	xf::PropertyIn<si::Pressure>	pressure_qnh										{ this, "/pressure/qnh" };
-	xf::PropertyIn<bool>			pressure_display_hpa								{ this, "/pressure/display-hpa" };
-	xf::PropertyIn<bool>			pressure_use_std									{ this, "/pressure/use-std" };
+	xf::PropertyIn<si::Pressure>	pressure_qnh										{ this, "pressure/qnh" };
+	xf::PropertyIn<bool>			pressure_display_hpa								{ this, "pressure/display-hpa" };
+	xf::PropertyIn<bool>			pressure_use_std									{ this, "pressure/use-std" };
 	// Flight director
 	// TODO xf::PropertyIn<std::string>	flight_director_active_name						{ ... } // "L", "R", "C"(enter)?
-	xf::PropertyIn<bool>			flight_director_serviceable							{ this, "/flight-director/serviceable" };
-	xf::PropertyIn<bool>			flight_director_cmd_visible							{ this, "/flight-director/cmd-visible" };
-	xf::PropertyIn<si::Length>		flight_director_cmd_altitude						{ this, "/flight-director/cmd.altitude" };
-	xf::PropertyIn<bool>			flight_director_cmd_altitude_acquired				{ this, "/flight-director/cmd.altitude-acquired" };
-	xf::PropertyIn<si::Velocity>	flight_director_cmd_ias								{ this, "/flight-director/cmd.ias" };
-	xf::PropertyIn<double>			flight_director_cmd_mach							{ this, "/flight-director/cmd.mach" };
-	xf::PropertyIn<si::Velocity>	flight_director_cmd_vertical_speed					{ this, "/flight-director/cmd.vertical-speed" };
-	xf::PropertyIn<si::Angle>		flight_director_cmd_fpa								{ this, "/flight-director/cmd.fpa" };
-	xf::PropertyIn<bool>			flight_director_guidance_visible					{ this, "/flight-director/guidance.visible" };
-	xf::PropertyIn<si::Angle>		flight_director_guidance_pitch						{ this, "/flight-director/guidance.pitch" };
-	xf::PropertyIn<si::Angle>		flight_director_guidance_roll						{ this, "/flight-director/guidance.roll" };
+	xf::PropertyIn<bool>			flight_director_serviceable							{ this, "flight-director/serviceable" };
+	xf::PropertyIn<bool>			flight_director_cmd_visible							{ this, "flight-director/cmd-visible" };
+	xf::PropertyIn<si::Length>		flight_director_cmd_altitude						{ this, "flight-director/cmd.altitude" };
+	xf::PropertyIn<bool>			flight_director_cmd_altitude_acquired				{ this, "flight-director/cmd.altitude-acquired" };
+	xf::PropertyIn<si::Velocity>	flight_director_cmd_ias								{ this, "flight-director/cmd.ias" };
+	xf::PropertyIn<double>			flight_director_cmd_mach							{ this, "flight-director/cmd.mach" };
+	xf::PropertyIn<si::Velocity>	flight_director_cmd_vertical_speed					{ this, "flight-director/cmd.vertical-speed" };
+	xf::PropertyIn<si::Angle>		flight_director_cmd_fpa								{ this, "flight-director/cmd.fpa" };
+	xf::PropertyIn<bool>			flight_director_guidance_visible					{ this, "flight-director/guidance.visible" };
+	xf::PropertyIn<si::Angle>		flight_director_guidance_pitch						{ this, "flight-director/guidance.pitch" };
+	xf::PropertyIn<si::Angle>		flight_director_guidance_roll						{ this, "flight-director/guidance.roll" };
 	// Stick position indicator TODO rename to control_surfaces+deflection.ailerons+deflection.elevator
-	xf::PropertyIn<bool>			control_stick_visible								{ this, "/control-stick/visible" };
-	xf::PropertyIn<si::Angle>		control_stick_pitch									{ this, "/control-stick/pitch" };
-	xf::PropertyIn<si::Angle>		control_stick_roll									{ this, "/control-stick/roll" };
+	xf::PropertyIn<bool>			control_stick_visible								{ this, "control-stick/visible" };
+	xf::PropertyIn<si::Angle>		control_stick_pitch									{ this, "control-stick/pitch" };
+	xf::PropertyIn<si::Angle>		control_stick_roll									{ this, "control-stick/roll" };
 	// Approach information
-	xf::PropertyIn<bool>			navaid_reference_visible							{ this, "/navaid/reference-visible" };
-	xf::PropertyIn<si::Angle>		navaid_course_magnetic								{ this, "/navaid/course-magnetic" };
-	xf::PropertyIn<std::string>		navaid_type_hint									{ this, "/navaid/type-hint" };
-	xf::PropertyIn<std::string>		navaid_identifier									{ this, "/navaid/identifier" };
-	xf::PropertyIn<si::Length>		navaid_distance										{ this, "/navaid/distance" };
+	xf::PropertyIn<bool>			navaid_reference_visible							{ this, "navaid/reference-visible" };
+	xf::PropertyIn<si::Angle>		navaid_course_magnetic								{ this, "navaid/course-magnetic" };
+	xf::PropertyIn<std::string>		navaid_type_hint									{ this, "navaid/type-hint" };
+	xf::PropertyIn<std::string>		navaid_identifier									{ this, "navaid/identifier" };
+	xf::PropertyIn<si::Length>		navaid_distance										{ this, "navaid/distance" };
 	// Flight path deviation
-	xf::PropertyIn<bool>			flight_path_deviation_lateral_serviceable			{ this, "/flight-path-deviation/lateral/serviceable" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_approach				{ this, "/flight-path-deviation/lateral/approach" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_flight_path			{ this, "/flight-path-deviation/lateral/flight-path" };
-	xf::PropertyIn<bool>			flight_path_deviation_vertical_serviceable			{ this, "/flight-path-deviation/vertical/serviceable" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical						{ this, "/flight-path-deviation/vertical/deviation" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_approach				{ this, "/flight-path-deviation/vertical/approach" };
-	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_flight_path			{ this, "/flight-path-deviation/vertical/flight-path" };
-	xf::PropertyIn<bool>			flight_path_deviation_mixed_mode					{ this, "/flight-path-deviation/mixed-mode" };
+	xf::PropertyIn<bool>			flight_path_deviation_lateral_serviceable			{ this, "flight-path-deviation/lateral/serviceable" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_approach				{ this, "flight-path-deviation/lateral/approach" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_flight_path			{ this, "flight-path-deviation/lateral/flight-path" };
+	xf::PropertyIn<bool>			flight_path_deviation_vertical_serviceable			{ this, "flight-path-deviation/vertical/serviceable" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical						{ this, "flight-path-deviation/vertical/deviation" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_approach				{ this, "flight-path-deviation/vertical/approach" };
+	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_flight_path			{ this, "flight-path-deviation/vertical/flight-path" };
+	xf::PropertyIn<bool>			flight_path_deviation_mixed_mode					{ this, "flight-path-deviation/mixed-mode" };
 	// Flight mode information
-	xf::PropertyIn<bool>			flight_mode_hint_visible							{ this, "/flight-mode/hint-visible" };
-	xf::PropertyIn<std::string>		flight_mode_hint									{ this, "/flight-mode/hint" };
-	xf::PropertyIn<bool>			flight_mode_fma_visible								{ this, "/flight-mode/fma.visible" };
-	xf::PropertyIn<std::string>		flight_mode_fma_speed_hint							{ this, "/flight-mode/fma.speed-hint" };
-	xf::PropertyIn<std::string>		flight_mode_fma_speed_armed_hint					{ this, "/flight-mode/fma.speed-armed-hint" };
-	xf::PropertyIn<std::string>		flight_mode_fma_lateral_hint						{ this, "/flight-mode/fma.lateral-hint" };
-	xf::PropertyIn<std::string>		flight_mode_fma_lateral_armed_hint					{ this, "/flight-mode/fma.lateral-armed-hint" };
-	xf::PropertyIn<std::string>		flight_mode_fma_vertical_hint						{ this, "/flight-mode/fma.vertical-hint" };
-	xf::PropertyIn<std::string>		flight_mode_fma_vertical_armed_hint					{ this, "/flight-mode/fma.vertical-armed-hint" };
+	xf::PropertyIn<bool>			flight_mode_hint_visible							{ this, "flight-mode/hint-visible" };
+	xf::PropertyIn<std::string>		flight_mode_hint									{ this, "flight-mode/hint" };
+	xf::PropertyIn<bool>			flight_mode_fma_visible								{ this, "flight-mode/fma.visible" };
+	xf::PropertyIn<std::string>		flight_mode_fma_speed_hint							{ this, "flight-mode/fma.speed-hint" };
+	xf::PropertyIn<std::string>		flight_mode_fma_speed_armed_hint					{ this, "flight-mode/fma.speed-armed-hint" };
+	xf::PropertyIn<std::string>		flight_mode_fma_lateral_hint						{ this, "flight-mode/fma.lateral-hint" };
+	xf::PropertyIn<std::string>		flight_mode_fma_lateral_armed_hint					{ this, "flight-mode/fma.lateral-armed-hint" };
+	xf::PropertyIn<std::string>		flight_mode_fma_vertical_hint						{ this, "flight-mode/fma.vertical-hint" };
+	xf::PropertyIn<std::string>		flight_mode_fma_vertical_armed_hint					{ this, "flight-mode/fma.vertical-armed-hint" };
 	// TCAS
-	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_minimum				{ this, "/tcas/resolution-advisory/pitch.minimum" };
-	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_maximum				{ this, "/tcas/resolution-advisory/pitch.maximum" };
-	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_minimum		{ this, "/tcas/resolution-advisory/vertical-speed.minimum" };
-	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_maximum		{ this, "/tcas/resolution-advisory/vertical-speed.maximum" };
+	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_minimum				{ this, "tcas/resolution-advisory/pitch.minimum" };
+	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_maximum				{ this, "tcas/resolution-advisory/pitch.maximum" };
+	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_minimum		{ this, "tcas/resolution-advisory/vertical-speed.minimum" };
+	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_maximum		{ this, "tcas/resolution-advisory/vertical-speed.maximum" };
 	// General warning/failure flags
-	xf::PropertyIn<bool>			warning_novspd_flag									{ this, "/warnings/novspd-flag" };
-	xf::PropertyIn<bool>			warning_ldgalt_flag									{ this, "/warnings/ldgalt-flag" };
-	xf::PropertyIn<bool>			warning_pitch_disagree								{ this, "/warnings/pitch-disagree-flag" };
-	xf::PropertyIn<bool>			warning_roll_disagree								{ this, "/warnings/roll-disagree-flag" };
-	xf::PropertyIn<bool>			warning_ias_disagree								{ this, "/warnings/ias-disagree-flag" };
-	xf::PropertyIn<bool>			warning_altitude_disagree							{ this, "/warnings/altitude-disagree-flag" };
-	xf::PropertyIn<bool>			warning_roll										{ this, "/warnings/roll" };
-	xf::PropertyIn<bool>			warning_slip_skid									{ this, "/warnings/slip-skid" };
+	xf::PropertyIn<bool>			warning_novspd_flag									{ this, "warnings/novspd-flag" };
+	xf::PropertyIn<bool>			warning_ldgalt_flag									{ this, "warnings/ldgalt-flag" };
+	xf::PropertyIn<bool>			warning_pitch_disagree								{ this, "warnings/pitch-disagree-flag" };
+	xf::PropertyIn<bool>			warning_roll_disagree								{ this, "warnings/roll-disagree-flag" };
+	xf::PropertyIn<bool>			warning_ias_disagree								{ this, "warnings/ias-disagree-flag" };
+	xf::PropertyIn<bool>			warning_altitude_disagree							{ this, "warnings/altitude-disagree-flag" };
+	xf::PropertyIn<bool>			warning_roll										{ this, "warnings/roll" };
+	xf::PropertyIn<bool>			warning_slip_skid									{ this, "warnings/slip-skid" };
 	// Style
-	xf::PropertyIn<bool>			style_old											{ this, "/style/use-old-style" };
-	xf::PropertyIn<bool>			style_show_metric									{ this, "/style/show-metric-values" };
+	xf::PropertyIn<bool>			style_old											{ this, "style/use-old-style" };
+	xf::PropertyIn<bool>			style_show_metric									{ this, "style/show-metric-values" };
 };
 
 

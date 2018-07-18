@@ -39,14 +39,14 @@ class AFCS_RollAutotrim_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Velocity>	measured_ias				{ this, "/measured-ias" };
-	xf::PropertyIn<si::Torque>		measured_engine_torque		{ this, "/measured-eng-torque" };
+	xf::PropertyIn<si::Velocity>	measured_ias				{ this, "measured-ias" };
+	xf::PropertyIn<si::Torque>		measured_engine_torque		{ this, "measured-eng-torque" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>		ailerons_correction			{ this, "/ailerons-correction" };
+	xf::PropertyOut<si::Angle>		ailerons_correction			{ this, "ailerons-correction" };
 };
 
 

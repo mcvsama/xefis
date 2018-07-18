@@ -44,19 +44,19 @@ class StatusIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<int64_t>	cursor_value					{ this, "/input/cursor/value" };
-	xf::PropertyIn<bool>	button_cursor_del				{ this, "/input/button/cursor-del" };
-	xf::PropertyIn<bool>	button_recall					{ this, "/input/button/recall" };
-	xf::PropertyIn<bool>	button_clear					{ this, "/input/button/clear" };
-	xf::PropertyIn<bool>	button_master_caution			{ this, "/input/button/master-caution" };
-	xf::PropertyIn<bool>	button_master_warning			{ this, "/input/button/master-warning" };
+	xf::PropertyIn<int64_t>	cursor_value					{ this, "cursor/value" };
+	xf::PropertyIn<bool>	button_cursor_del				{ this, "button/cursor-del" };
+	xf::PropertyIn<bool>	button_recall					{ this, "button/recall" };
+	xf::PropertyIn<bool>	button_clear					{ this, "button/clear" };
+	xf::PropertyIn<bool>	button_master_caution			{ this, "button/master-caution" };
+	xf::PropertyIn<bool>	button_master_warning			{ this, "button/master-warning" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>	master_caution					{ this, "/output/master-caution" };
-	xf::PropertyOut<bool>	master_warning					{ this, "/output/master-warning" };
+	xf::PropertyOut<bool>	master_caution					{ this, "master-caution" };
+	xf::PropertyOut<bool>	master_warning					{ this, "master-warning" };
 };
 
 

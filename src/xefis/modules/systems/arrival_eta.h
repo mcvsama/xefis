@@ -32,17 +32,17 @@ class ArrivalETA_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	station_latitude	{ this, "/station-position/latitude" };
-	xf::PropertyIn<si::Angle>	station_longitude	{ this, "/station-position/longitude" };
-	xf::PropertyIn<si::Angle>	aircraft_latitude	{ this, "/aircraft-position/latitude" };
-	xf::PropertyIn<si::Angle>	aircraft_longitude	{ this, "/aircraft-position/longitude" };
-	xf::PropertyIn<si::Angle>	track_lateral_true	{ this, "/track-lateral-true" };
+	xf::PropertyIn<si::Angle>	station_latitude	{ this, "station-position/latitude" };
+	xf::PropertyIn<si::Angle>	station_longitude	{ this, "station-position/longitude" };
+	xf::PropertyIn<si::Angle>	aircraft_latitude	{ this, "aircraft-position/latitude" };
+	xf::PropertyIn<si::Angle>	aircraft_longitude	{ this, "aircraft-position/longitude" };
+	xf::PropertyIn<si::Angle>	track_lateral_true	{ this, "track-lateral-true" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Time>	eta					{ this, "/eta" };
+	xf::PropertyOut<si::Time>	eta					{ this, "eta" };
 };
 
 

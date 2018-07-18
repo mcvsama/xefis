@@ -34,23 +34,23 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Length>		vlos_caution_distance	{ this, "/vlos-caution-distance" };
-	xf::PropertyIn<si::Length>		vlos_warning_distance	{ this, "/vlos-warning-distance" };
-	xf::PropertyIn<si::Angle>		home_longitude			{ this, "/home/longitude" };
-	xf::PropertyIn<si::Angle>		home_latitude			{ this, "/home/latitude" };
-	xf::PropertyIn<si::Length>		home_altitude_amsl		{ this, "/home/altitude-amsl" };
-	xf::PropertyIn<si::Angle>		position_longitude		{ this, "/position/longitude" };
-	xf::PropertyIn<si::Angle>		position_latitude		{ this, "/position/latitude" };
-	xf::PropertyIn<si::Length>		position_altitude_amsl	{ this, "/position/altitude.amsl" };
+	xf::PropertyIn<si::Length>		vlos_caution_distance	{ this, "vlos-caution-distance" };
+	xf::PropertyIn<si::Length>		vlos_warning_distance	{ this, "vlos-warning-distance" };
+	xf::PropertyIn<si::Angle>		home_longitude			{ this, "home/longitude" };
+	xf::PropertyIn<si::Angle>		home_latitude			{ this, "home/latitude" };
+	xf::PropertyIn<si::Length>		home_altitude_amsl		{ this, "home/altitude-amsl" };
+	xf::PropertyIn<si::Angle>		position_longitude		{ this, "position/longitude" };
+	xf::PropertyIn<si::Angle>		position_latitude		{ this, "position/latitude" };
+	xf::PropertyIn<si::Length>		position_altitude_amsl	{ this, "position/altitude.amsl" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Length>		distance_vlos			{ this, "/distance/vlos" };
-	xf::PropertyOut<si::Length>		distance_ground			{ this, "/distance/ground" };
-	xf::PropertyOut<si::Length>		distance_vertical		{ this, "/distance/vertical" };
-	xf::PropertyOut<si::Angle>		true_home_direction		{ this, "/home-direction.true" };
+	xf::PropertyOut<si::Length>		distance_vlos			{ this, "distance/vlos" };
+	xf::PropertyOut<si::Length>		distance_ground			{ this, "distance/ground" };
+	xf::PropertyOut<si::Length>		distance_vertical		{ this, "distance/vertical" };
+	xf::PropertyOut<si::Angle>		true_home_direction		{ this, "home-direction.true" };
 };
 
 

@@ -40,31 +40,31 @@ class AFCS_AT_IO: public xf::ModuleIO
 	 */
 
 	xf::Setting<xf::PIDControl<si::Velocity, si::Force>::Settings>
-									ias_pid_settings		{ this, "ias_pid_settings" };
-	xf::Setting<double>				ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
-	xf::Setting<si::Force>			output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
-	xf::Setting<si::Force>			output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
+										ias_pid_settings		{ this, "ias_pid_settings" };
+	xf::Setting<double>					ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
+	xf::Setting<si::Force>				output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
+	xf::Setting<si::Force>				output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<SpeedMode>		cmd_speed_mode			{ this, "/cmd/speed-mode" };
-	xf::PropertyIn<si::Force>		cmd_thrust				{ this, "/cmd/thrust" };
-	xf::PropertyIn<si::Velocity>	cmd_ias					{ this, "/cmd/ias" };
-	xf::PropertyIn<si::Velocity>	measured_ias			{ this, "/measurements/ias" };
+	xf::PropertyIn<afcs_api::SpeedMode>	cmd_speed_mode			{ this, "cmd/speed-mode" };
+	xf::PropertyIn<si::Force>			cmd_thrust				{ this, "cmd/thrust" };
+	xf::PropertyIn<si::Velocity>		cmd_ias					{ this, "cmd/ias" };
+	xf::PropertyIn<si::Velocity>		measured_ias			{ this, "measurements/ias" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Force>		thrust					{ this, "/thrust" };
+	xf::PropertyOut<si::Force>			thrust					{ this, "thrust" };
 
 	/*
 	 * Input/Output
 	 */
 
-	xf::PropertyOut<bool>			disengage_at			{ this, "/disengage-at" };
+	xf::PropertyOut<bool>				disengage_at			{ this, "disengage-at" };
 };
 
 

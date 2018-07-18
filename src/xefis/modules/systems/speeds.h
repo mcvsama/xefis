@@ -31,8 +31,8 @@ class SpeedsIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>		flaps_angle				{ this, "/flaps-angle" };
-	xf::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "/stall-speed" };
+	xf::PropertyIn<si::Angle>		flaps_angle				{ this, "flaps-angle" };
+	xf::PropertyIn<si::Velocity>	stall_speed_5deg		{ this, "stall-speed" };
 
 	/*
 	 * Output

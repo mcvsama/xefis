@@ -43,14 +43,14 @@ class AFCS_EAC_YD_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>		enabled				{ this, "/enabled" };
-	xf::PropertyIn<si::Force>	slip_skid			{ this, "/slip-skid" };
+	xf::PropertyIn<bool>		enabled				{ this, "enabled" };
+	xf::PropertyIn<si::Force>	slip_skid			{ this, "slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>	rudder_deflection	{ this, "/rudder-deflection" };
+	xf::PropertyOut<si::Angle>	rudder_deflection	{ this, "rudder-deflection" };
 };
 
 

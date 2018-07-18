@@ -40,18 +40,18 @@ class FlapsBugsIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>		flaps_setting	{ this, "/flaps-setting" };
+	xf::PropertyIn<si::Angle>		flaps_setting	{ this, "flaps-setting" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	flaps_up_label	{ this, "/flaps-up-label" };
-	xf::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "/flaps-up-speed" };
-	xf::PropertyOut<std::string>	flaps_a_label	{ this, "/flaps-a-label" };
-	xf::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "/flaps-a-speed" };
-	xf::PropertyOut<std::string>	flaps_b_label	{ this, "/flaps-b-label" };
-	xf::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "/flaps-b-speed" };
+	xf::PropertyOut<std::string>	flaps_up_label	{ this, "flaps-up-label" };
+	xf::PropertyOut<si::Velocity>	flaps_up_speed	{ this, "flaps-up-speed" };
+	xf::PropertyOut<std::string>	flaps_a_label	{ this, "flaps-a-label" };
+	xf::PropertyOut<si::Velocity>	flaps_a_speed	{ this, "flaps-a-speed" };
+	xf::PropertyOut<std::string>	flaps_b_label	{ this, "flaps-b-label" };
+	xf::PropertyOut<si::Velocity>	flaps_b_speed	{ this, "flaps-b-speed" };
 };
 
 

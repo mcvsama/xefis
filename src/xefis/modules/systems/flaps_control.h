@@ -43,16 +43,16 @@ class FlapsControlIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>				up					{ this, "/input/up", false };
-	xf::PropertyIn<bool>				down				{ this, "/input/down", false };
+	xf::PropertyIn<bool>				up					{ this, "up", false };
+	xf::PropertyIn<bool>				down				{ this, "down", false };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>			requested_setting	{ this, "/output/requested-setting" };
-	xf::PropertyOut<si::Angle>			current				{ this, "/output/current" };
-	xf::PropertyOut<double>				control				{ this, "/output/control" };
+	xf::PropertyOut<si::Angle>			requested_setting	{ this, "requested-setting" };
+	xf::PropertyOut<si::Angle>			current				{ this, "current" };
+	xf::PropertyOut<double>				control				{ this, "control" };
 };
 
 

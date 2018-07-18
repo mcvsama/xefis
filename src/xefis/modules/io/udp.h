@@ -48,13 +48,13 @@ class UDP_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<std::string>		send				{ this, "/send" };
+	xf::PropertyIn<std::string>		send				{ this, "send" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<std::string>	receive				{ this, "/receive" };
+	xf::PropertyOut<std::string>	receive				{ this, "receive" };
 };
 
 
