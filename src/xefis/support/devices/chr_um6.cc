@@ -30,9 +30,6 @@
 
 namespace xf {
 
-static xf::Mutex $bits_for_baud_rate_entry_mutex;
-
-
 std::string
 CHRUM6::Request::protocol_error_description() const
 {
@@ -173,24 +170,20 @@ CHRUM6::sample_rate_setting (Frequency frequency) noexcept
 uint32_t
 CHRUM6::bits_for_baud_rate (unsigned int baud_rate)
 {
-	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = $bits_for_baud_rate_entry_mutex.acquire_lock();
-
-	static std::map<int, uint32_t> baud_rates_map;
-
-	if (baud_rates_map.empty())
-	{
-		baud_rates_map[9600] = 0;
-		baud_rates_map[14400] = 1;
-		baud_rates_map[19200] = 2;
-		baud_rates_map[38400] = 3;
-		baud_rates_map[57600] = 4;
-		baud_rates_map[115200] = 5;
-	}
+	static std::map<int, uint32_t> const baud_rates_map {
+		{ 9600, 0 },
+		{ 14400, 1 },
+		{ 19200, 2 },
+		{ 38400, 3 },
+		{ 57600, 4 },
+		{ 115200, 5 },
+	};
 
 	auto c = baud_rates_map.find (baud_rate);
+
 	if (c == baud_rates_map.end())
 		c = baud_rates_map.upper_bound (baud_rate);
+
 	if (c == baud_rates_map.end())
 		return 0;
 

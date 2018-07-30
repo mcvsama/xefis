@@ -36,9 +36,6 @@
 
 namespace xf {
 
-static Mutex termios_baud_rate_entry_mutex;
-
-
 SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 	_data_ready (data_ready),
 	_failure (failure)
@@ -213,50 +210,47 @@ SerialPort::close()
 int
 SerialPort::termios_baud_rate (unsigned int baud_rate)
 {
-	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = termios_baud_rate_entry_mutex.acquire_lock();
-
-	static std::map<int, int> baud_rates_map;
-
-	if (baud_rates_map.empty())
-	{
-		baud_rates_map[50] = B50;
-		baud_rates_map[75] = B75;
-		baud_rates_map[110] = B110;
-		baud_rates_map[134] = B134;
-		baud_rates_map[150] = B150;
-		baud_rates_map[200] = B200;
-		baud_rates_map[300] = B300;
-		baud_rates_map[600] = B600;
-		baud_rates_map[1200] = B1200;
-		baud_rates_map[1800] = B1800;
-		baud_rates_map[2400] = B2400;
-		baud_rates_map[4800] = B4800;
-		baud_rates_map[9600] = B9600;
-		baud_rates_map[19200] = B19200;
-		baud_rates_map[38400] = B38400;
-		baud_rates_map[57600] = B57600;
-		baud_rates_map[115200] = B115200;
-		baud_rates_map[230400] = B230400;
-		baud_rates_map[460800] = B460800;
-		baud_rates_map[500000] = B500000;
-		baud_rates_map[576000] = B576000;
-		baud_rates_map[921600] = B921600;
-		baud_rates_map[1000000] = B1000000;
-		baud_rates_map[1152000] = B1152000;
-		baud_rates_map[1500000] = B1500000;
-		baud_rates_map[2000000] = B2000000;
-		baud_rates_map[2500000] = B2500000;
-		baud_rates_map[3000000] = B3000000;
-		baud_rates_map[3500000] = B3500000;
-		baud_rates_map[4000000] = B4000000;
-	}
+	static std::map<int, int> const baud_rates_map {
+		{ 50, B50 },
+		{ 75, B75 },
+		{ 110, B110 },
+		{ 134, B134 },
+		{ 150, B150 },
+		{ 200, B200 },
+		{ 300, B300 },
+		{ 600, B600 },
+		{ 1200, B1200 },
+		{ 1800, B1800 },
+		{ 2400, B2400 },
+		{ 4800, B4800 },
+		{ 9600, B9600 },
+		{ 19200, B19200 },
+		{ 38400, B38400 },
+		{ 57600, B57600 },
+		{ 115200, B115200 },
+		{ 230400, B230400 },
+		{ 460800, B460800 },
+		{ 500000, B500000 },
+		{ 576000, B576000 },
+		{ 921600, B921600 },
+		{ 1000000, B1000000 },
+		{ 1152000, B1152000 },
+		{ 1500000, B1500000 },
+		{ 2000000, B2000000 },
+		{ 2500000, B2500000 },
+		{ 3000000, B3000000 },
+		{ 3500000, B3500000 },
+		{ 4000000, B4000000 },
+	};
 
 	auto c = baud_rates_map.find (baud_rate);
+
 	if (c == baud_rates_map.end())
 		c = baud_rates_map.upper_bound (baud_rate);
+
 	if (c == baud_rates_map.end())
 		return 0;
+
 	return c->second;
 }
 
