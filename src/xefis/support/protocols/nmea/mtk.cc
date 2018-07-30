@@ -27,9 +27,6 @@
 
 namespace xf::nmea {
 
-static Mutex $describe_mtk_command_entry_mutex;
-
-
 PMTKACK::PMTKACK (std::string const& sentence):
 	Sentence (sentence)
 {
@@ -60,32 +57,26 @@ PMTKACK::PMTKACK (std::string const& sentence):
 std::string
 describe_mtk_command_by_id (std::string command)
 {
-	// Must acquire lock before static variables initialization:
-	auto lock = $describe_mtk_command_entry_mutex.acquire_lock();
+	static std::map<std::string, std::string> const hints {
+		{ "101", "hot start" },
+		{ "102", "warm start" },
+		{ "103", "cold start" },
+		{ "104", "full cold start" },
+		{ "220", "set NMEA update rate" },
+		{ "251", "set baud rate" },
+		{ "286", "enable/disable AIC mode" },
+		{ "300", "set fixing rate" },
+		{ "301", "set DGPS mode" },
+		{ "313", "enable/disable SBAS" },
+		{ "314", "set NMEA frequencies" },
+		{ "319", "set SBAS mode" },
+		{ "513", "enable/disable SBAS" },
+	};
 
-	static std::map<std::string, std::string> hints;
-
-	if (hints.empty())
-	{
-		hints["101"] = "hot start";
-		hints["102"] = "warm start";
-		hints["103"] = "cold start";
-		hints["104"] = "full cold start";
-		hints["220"] = "set NMEA update rate";
-		hints["251"] = "set baud rate";
-		hints["286"] = "enable/disable AIC mode";
-		hints["300"] = "set fixing rate";
-		hints["301"] = "set DGPS mode";
-		hints["313"] = "enable/disable SBAS";
-		hints["314"] = "set NMEA frequencies";
-		hints["319"] = "set SBAS mode";
-		hints["513"] = "enable/disable SBAS";
-	}
-
-	auto h = hints.find (command);
-	if (h != hints.end())
+	if (auto h = hints.find (command); h != hints.end())
 		return h->second;
-	return std::string();
+	else
+		return {};
 }
 
 

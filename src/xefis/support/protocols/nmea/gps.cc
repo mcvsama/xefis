@@ -35,9 +35,6 @@ namespace xf::nmea {
 using std::to_string;
 
 
-static Mutex $fix_quality_strings_entry_mutex;
-
-
 static inline unsigned int
 mknum (uint8_t c10, uint8_t c01)
 {
@@ -368,29 +365,23 @@ GPRMC::GPRMC (std::string const& sentence):
 std::string
 to_string (GPSFixQuality code)
 {
-	// Must acquire lock before statically- and non-statically initializing static variables:
-	auto lock = $fix_quality_strings_entry_mutex.acquire_lock();
-
-	static std::array<std::string, 9> fix_quality_strings;
-	static bool initialized = false;
-
-	if (!initialized)
-	{
-		fix_quality_strings[0] = "invalid";
-		fix_quality_strings[1] = "GPS";
-		fix_quality_strings[2] = "DGPS";
-		fix_quality_strings[3] = "PPS";
-		fix_quality_strings[4] = "RTK";
-		fix_quality_strings[5] = "float RTK";
-		fix_quality_strings[6] = "estimated";
-		fix_quality_strings[7] = "manual input mode";
-		fix_quality_strings[8] = "simulated mode";
-		initialized = true;
-	}
+	static std::array<std::string, 9> const fix_quality_strings {
+		"invalid",
+		"GPS",
+		"DGPS",
+		"PPS",
+		"RTK",
+		"float RTK",
+		"estimated",
+		"manual input mode",
+		"simulated mode",
+	};
 
 	int code_int = static_cast<int> (code);
+
 	if (code_int < 0 || 8 < code_int)
 		code_int = static_cast<int> (GPSFixQuality::Invalid);
+
 	return fix_quality_strings[code_int];
 }
 
