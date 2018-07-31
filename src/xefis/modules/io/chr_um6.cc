@@ -118,7 +118,7 @@ CHRUM6::process (xf::Cycle const&)
 void
 CHRUM6::open_device()
 {
-	bool has_thrown = xf::Exception::guard ([&] {
+	bool has_thrown = xf::Exception::catch_and_log (_logger, [&] {
 		_alive_check_timer->start();
 
 		reset();

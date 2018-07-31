@@ -35,6 +35,9 @@
 
 namespace xf {
 
+class Logger;
+
+
 class Exception: public std::exception
 {
   public:
@@ -91,14 +94,6 @@ class Exception: public std::exception
 	backtrace_hidden() const noexcept;
 
 	/**
-	 * Same as guard_and_rethrow, but doesn't rethrow. Instead it returns
-	 * true if exception occured, and false otherwise.
-	 */
-	[[deprecated]]
-	static bool
-	guard (std::function<void()> guarded_code);
-
-	/**
 	 * Execute guarded_code and catch exceptions. If exception is catched,
 	 * it's logged and rethrown. If exception is of type xf::Exceptions,
 	 * it's full message is logged (backtrace, etc). Boost and standard
@@ -106,7 +101,14 @@ class Exception: public std::exception
 	 * just cause mentioning an exception.
 	 */
 	static void
-	guard_and_rethrow (std::function<void()> guarded_code);
+	log (Logger const&, std::function<void()> guarded_code);
+
+	/**
+	 * Similar to log, but doesn't rethrow.
+	 * Returns true if exception was thrown and catched.
+	 */
+	static bool
+	catch_and_log (Logger const&, std::function<void()> guarded_code);
 
   protected:
 	/**
@@ -177,21 +179,6 @@ Exception::backtrace_hidden() const noexcept
 }
 
 
-inline bool
-Exception::guard (std::function<void()> guarded_code)
-{
-	try {
-		guard_and_rethrow (guarded_code);
-	}
-	catch (...)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-
 inline void
 Exception::hide_backtrace() noexcept
 {
@@ -199,14 +186,13 @@ Exception::hide_backtrace() noexcept
 }
 
 
-// TODO maybe move to exception_ops namespace?
-std::ostream&
-operator<< (std::ostream& os, Exception const& e);
-
 namespace exception_ops {
 
 std::ostream&
-operator<< (std::ostream& out, std::exception_ptr const& eptr);
+operator<< (std::ostream&, Exception const&);
+
+std::ostream&
+operator<< (std::ostream&, std::exception_ptr const&);
 
 } // namespace exception_ops
 

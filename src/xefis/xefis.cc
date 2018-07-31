@@ -65,6 +65,8 @@ int main (int argc, char** argv, char**)
 	}
 	catch (xf::Exception& e)
 	{
+		using namespace xf::exception_ops;
+
 		std::cerr << "Fatal error: " << e << std::endl;
 	}
 
