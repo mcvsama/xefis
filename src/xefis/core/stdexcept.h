@@ -129,24 +129,24 @@ class BadConfiguration: public Exception
   public:
 	// Ctor
 	explicit
-	BadConfiguration (const char* message, Exception const* inner = nullptr):
-		Exception (message, inner)
+	BadConfiguration (const char* message):
+		Exception (message)
 	{
 		hide_backtrace();
 	}
 
 	// Ctor
 	explicit
-	BadConfiguration (std::string const& message, Exception const* inner = nullptr):
-		Exception (message, inner)
+	BadConfiguration (std::string const& message):
+		Exception (message)
 	{
 		hide_backtrace();
 	}
 
 	// Ctor
 	explicit
-	BadConfiguration (QString const& message, Exception const* inner = nullptr):
-		Exception (message, inner)
+	BadConfiguration (QString const& message):
+		Exception (message)
 	{
 		hide_backtrace();
 	}

@@ -66,7 +66,7 @@ GPSTimeOfDay::GPSTimeOfDay (std::string const& gps_time)
 	}
 	catch (InvalidFormat& e)
 	{
-		throw InvalidFormat ("invalid format of GPS time-of-day", &e);
+		std::throw_with_nested (InvalidFormat ("invalid format of GPS time-of-day"));
 	}
 }
 
@@ -83,7 +83,7 @@ GPSDate::GPSDate (std::string const& gps_date)
 	}
 	catch (InvalidFormat& e)
 	{
-		throw InvalidFormat ("invalid format of GPS date", &e);
+		std::throw_with_nested (InvalidFormat ("invalid format of GPS date"));
 	}
 }
 

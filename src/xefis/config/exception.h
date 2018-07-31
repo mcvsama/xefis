@@ -45,19 +45,19 @@ class Exception: public std::exception
 	 *			It should be a simple phrase, that can be embedded into a bigger sentence.
 	 */
 	explicit
-	Exception (const char* message, Exception const* inner = nullptr);
+	Exception (const char* message);
 
 	/**
 	 * Convenience function.
 	 */
 	explicit
-	Exception (std::string const& message, Exception const* inner = nullptr);
+	Exception (std::string const& message);
 
 	/**
 	 * Convenience function.
 	 */
 	explicit
-	Exception (QString const& message, Exception const* inner = nullptr);
+	Exception (QString const& message);
 
 	// Dtor
 	virtual
@@ -65,12 +65,6 @@ class Exception: public std::exception
 
 	// Ctor
 	Exception (Exception const&) = default;
-
-	/**
-	 * Return true if this exception wraps another exception.
-	 */
-	bool
-	has_inner() const noexcept;
 
 	/**
 	 * Return plain exception message.
@@ -83,13 +77,6 @@ class Exception: public std::exception
 	 */
 	std::string const&
 	message() const;
-
-	/**
-	 * Return message of the wrapped exception, if there's any.
-	 * If there is none, return empty string.
-	 */
-	std::string const&
-	inner_message() const;
 
 	/**
 	 * Return backtrace created when the exception was constructed.
@@ -107,6 +94,7 @@ class Exception: public std::exception
 	 * Same as guard_and_rethrow, but doesn't rethrow. Instead it returns
 	 * true if exception occured, and false otherwise.
 	 */
+	[[deprecated]]
 	static bool
 	guard (std::function<void()> guarded_code);
 
@@ -130,62 +118,35 @@ class Exception: public std::exception
 	hide_backtrace() noexcept;
 
   private:
-	bool		_has_inner		= false;
 	bool		_hide_backtrace	= false;
 	std::string	_what;
 	std::string	_message;
-	std::string	_inner_message;
 	Backtrace	_backtrace;
 };
 
 
-inline std::ostream&
-operator<< (std::ostream& os, Exception const& e)
-{
-	os << e.message();
-	if (!e.backtrace_hidden())
-		os << std::endl << e.backtrace();
-	return os;
-}
-
-
 inline
-Exception::Exception (const char* message, Exception const* inner):
-	Exception (std::string (message), inner)
+Exception::Exception (const char* message):
+	Exception (std::string (message))
 { }
 
 
 inline
-Exception::Exception (std::string const& message, Exception const* inner):
+Exception::Exception (std::string const& message):
 	_what (message),
 	_message (message)
-{
-	if (inner)
-	{
-		_message += "; cause: " + inner->message();
-		_inner_message = inner->message();
-		_hide_backtrace = inner->backtrace_hidden();
-		_backtrace = inner->backtrace();
-	}
-}
+{ }
 
 
 inline
-Exception::Exception (QString const& message, Exception const* inner):
-	Exception (message.toStdString(), inner)
+Exception::Exception (QString const& message):
+	Exception (message.toStdString())
 { }
 
 
 inline
 Exception::~Exception() noexcept
 { }
-
-
-inline bool
-Exception::has_inner() const noexcept
-{
-	return _has_inner;
-}
 
 
 inline const char*
@@ -199,13 +160,6 @@ inline std::string const&
 Exception::message() const
 {
 	return _message;
-}
-
-
-inline std::string const&
-Exception::inner_message() const
-{
-	return _inner_message;
 }
 
 
@@ -233,36 +187,8 @@ Exception::guard (std::function<void()> guarded_code)
 	{
 		return true;
 	}
+
 	return false;
-}
-
-
-inline void
-Exception::guard_and_rethrow (std::function<void()> guarded_code)
-{
-	try {
-		guarded_code();
-	}
-	catch (Exception const& e)
-	{
-		std::cerr << e << std::endl;
-		throw;
-	}
-	catch (boost::exception const& e)
-	{
-		std::cerr << "boost::exception " << demangle (typeid (e)) << std::endl;
-		throw;
-	}
-	catch (std::exception const& e)
-	{
-		std::cerr << "std::exception " << demangle (typeid (e)) << std::endl;
-		throw;
-	}
-	catch (...)
-	{
-		std::cerr << "unknown exception" << std::endl;
-		throw;
-	}
 }
 
 
@@ -273,34 +199,14 @@ Exception::hide_backtrace() noexcept
 }
 
 
+// TODO maybe move to exception_ops namespace?
+std::ostream&
+operator<< (std::ostream& os, Exception const& e);
+
 namespace exception_ops {
 
-inline std::ostream&
-operator<< (std::ostream& out, std::exception_ptr const& eptr)
-{
-	try {
-		if (eptr)
-			std::rethrow_exception (eptr);
-	}
-	catch (Exception const& e)
-	{
-		out << e << std::endl;
-	}
-	catch (boost::exception const& e)
-	{
-		out << "boost::exception " << demangle (typeid (e)) << std::endl;
-	}
-	catch (std::exception const& e)
-	{
-		out << "std::exception " << demangle (typeid (e)) << std::endl;
-	}
-	catch (...)
-	{
-		out << "unknown exception" << std::endl;
-	}
-
-	return out;
-}
+std::ostream&
+operator<< (std::ostream& out, std::exception_ptr const& eptr);
 
 } // namespace exception_ops
 
