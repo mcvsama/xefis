@@ -88,10 +88,8 @@ GPS::Connection::open_device()
 {
 	_serial_port->set_configuration (_serial_port_config);
 
-	bool has_thrown = xf::Exception::guard ([&] {
+	bool has_thrown = xf::Exception::catch_and_log (_gps_module._logger, [&] {
 		_alive_check_timer->start();
-
-
 		_gps_module.logger() << "Opening device " << _gps_module._serial_port_config.device_path() << " at " << _serial_port_config.baud_rate() << " bps" << std::endl;
 
 		if (_serial_port->open())
@@ -109,9 +107,7 @@ void
 GPS::Connection::initialize_device()
 {
 	_nmea_parser = std::make_unique<xf::nmea::Parser> (this);
-
 	_gps_module.logger() << "Sending initialization commands." << std::endl;
-
 	_serial_port->write (xf::nmea::make_mtk_sentence (get_nmea_frequencies_setup_messages (_serial_port_config.baud_rate())));
 	// Now send user setup commands:
 	for (auto const& s: *_gps_module.io.boot_pmtk_commands)

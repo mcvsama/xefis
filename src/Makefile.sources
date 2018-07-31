@@ -209,6 +209,10 @@ XEFIS_HEADERS			+= xefis/config/cpp14.h
 XEFIS_HEADERS			+= xefis/config/exception.h
 XEFIS_HEADERS			+= xefis/config/version.h
 
+XEFIS_SOURCES			+= xefis/config/exception.cc
+
+SELFTEST_SOURCES		+= xefis/config/exception.cc
+
 NODEP_SOURCES			+= $(VERSION_FILE)
 
 ######## /xefis/core/components ########

@@ -114,7 +114,7 @@ template<class Item>
 	inline std::ostream&
 	Logger::operator<< (Item&& item) const
 	{
-		return prepare_line() << item;
+		return prepare_line() << std::forward<Item> (item);
 	}
 
 } // namespace xf

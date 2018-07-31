@@ -370,7 +370,7 @@ LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO*
 		bool return_from_outer_function = false;
 		Blob::const_iterator outer_result = begin;
 
-		xf::Exception::guard ([&] {
+		xf::Exception::catch_and_log (logger, [&] {
 			try {
 				// Find the right magic and envelope:
 				std::copy (begin, begin + _magic_size, _aux_magic_buffer.begin());

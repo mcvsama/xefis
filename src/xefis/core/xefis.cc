@@ -88,21 +88,11 @@ Xefis::notify (QObject* receiver, QEvent* event)
 	try {
 		return QApplication::notify (receiver, event);
 	}
-	catch (Exception const& e)
-	{
-		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded xf::Exception:" << std::endl << e << std::endl;
-	}
-	catch (boost::exception const& e)
-	{
-		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded boost::exception " << demangle (typeid (e)) << std::endl;
-	}
-	catch (std::exception const& e)
-	{
-		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded std::exception " << demangle (typeid (e)) << std::endl;
-	}
 	catch (...)
 	{
-		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded unknown exception" << std::endl;
+		using namespace exception_ops;
+
+		_logger << demangle (typeid (*receiver)) << "/" << demangle (typeid (*event)) << " yielded exception: " << std::endl << std::current_exception() << std::endl;
 	}
 
 	return false;

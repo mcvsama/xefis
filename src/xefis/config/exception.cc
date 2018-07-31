@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/logger.h>
 
 // Local:
 #include "exception.h"
@@ -26,38 +27,8 @@
 
 namespace xf {
 
-void
-Exception::guard_and_rethrow (std::function<void()> guarded_code)
-{
-	try {
-		guarded_code();
-	}
-	catch (Exception const& e)
-	{
-		// TODO use print_exception instead
-		std::cerr << e << std::endl;
-		throw;
-	}
-	catch (boost::exception const& e)
-	{
-		std::cerr << "boost::exception " << demangle (typeid (e)) << std::endl;
-		throw;
-	}
-	catch (std::exception const& e)
-	{
-		std::cerr << "std::exception " << demangle (typeid (e)) << std::endl;
-		throw;
-	}
-	catch (...)
-	{
-		std::cerr << "unknown exception" << std::endl;
-		throw;
-	}
-}
-
-
 template<class E>
-	static void
+	static inline void
 	print_exception (std::ostream& os, E const& e)
 	{
 		if constexpr (std::is_base_of_v<Exception, E>)
@@ -94,6 +65,44 @@ template<class E>
 	}
 
 
+void
+Exception::log (Logger const& logger, std::function<void()> guarded_code)
+{
+	try {
+		guarded_code();
+	}
+	catch (...)
+	{
+		using namespace exception_ops;
+
+		logger << "Exception: " << std::current_exception() << std::endl;
+		throw;
+	}
+}
+
+
+bool
+Exception::catch_and_log (Logger const& logger, std::function<void()> guarded_code)
+{
+	bool has_thrown = false;
+
+	try {
+		guarded_code();
+	}
+	catch (...)
+	{
+		using namespace exception_ops;
+
+		has_thrown = true;
+		logger << "Exception: " << std::current_exception() << std::endl;
+	}
+
+	return has_thrown;
+}
+
+
+namespace exception_ops {
+
 std::ostream&
 operator<< (std::ostream& os, Exception const& e)
 {
@@ -106,10 +115,24 @@ operator<< (std::ostream& os, Exception const& e)
 }
 
 
-namespace exception_ops {
+std::ostream&
+operator<< (std::ostream& os, boost::exception const& e)
+{
+	print_exception (os, e);
+	return os;
+}
+
 
 std::ostream&
-operator<< (std::ostream& out, std::exception_ptr const& eptr)
+operator<< (std::ostream& os, std::exception const& e)
+{
+	print_exception (os, e);
+	return os;
+}
+
+
+std::ostream&
+operator<< (std::ostream& os, std::exception_ptr const& eptr)
 {
 	try {
 		if (eptr)
@@ -117,22 +140,22 @@ operator<< (std::ostream& out, std::exception_ptr const& eptr)
 	}
 	catch (Exception const& e)
 	{
-		out << e << std::endl;
+		os << e;
 	}
 	catch (boost::exception const& e)
 	{
-		out << "boost::exception " << demangle (typeid (e)) << std::endl;
+		os << e;
 	}
 	catch (std::exception const& e)
 	{
-		out << "std::exception " << demangle (typeid (e)) << std::endl;
+		os << e;
 	}
 	catch (...)
 	{
-		out << "unknown exception" << std::endl;
+		os << "unknown exception";
 	}
 
-	return out;
+	return os;
 }
 
 } // namespace exception_ops
