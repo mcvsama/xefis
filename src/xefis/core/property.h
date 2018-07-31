@@ -33,6 +33,7 @@
 namespace xf {
 
 class PropertyStringConverter;
+class PropertyDigitizer;
 
 
 /**
