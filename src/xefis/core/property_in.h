@@ -148,7 +148,7 @@ template<class V>
 	PropertyIn<V>::operator<< (Nil)
 	{
 		dec_source_use_count();
-		_data_source = nullptr;
+		_data_source = std::monostate{};
 		this->protected_set_nil();
 	}
 
