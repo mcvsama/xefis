@@ -481,6 +481,7 @@ XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/semaphore.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
 
+SELFTEST_SOURCES		+= xefis/utility/tests/blob.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
 SELFTEST_SOURCES		+= xefis/utility/logger.cc
