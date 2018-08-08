@@ -25,9 +25,21 @@
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/string.h>
+#include <xefis/utility/span.h>
 
 
 namespace xf {
+
+class BlobView: public Span<uint8_t const>
+{
+  public:
+	using Span<uint8_t const>::Span;
+
+	BlobView (Blob const& blob):
+		Span (blob)
+	{ }
+};
+
 
 /**
  * Thrown by unserialize() functions.
@@ -36,30 +48,17 @@ class InvalidBlobSize: public InvalidArgument
 {
   public:
 	explicit InvalidBlobSize():
-		InvalidArgument ("BlobSerializer: invalid blob size")
+		InvalidArgument ("invalid blob size")
 	{ }
 };
-
-
-inline void
-value_to_blob (bool value, Blob& blob)
-{
-	blob.resize (1);
-	blob[0] = !!value;
-}
-
-
-inline void
-value_to_blob (std::string const& value, Blob& blob)
-{
-	blob.assign (value.begin(), value.end());
-}
 
 
 template<class Trivial>
 	inline void
 	value_to_blob (Trivial value, std::enable_if_t<std::is_trivial_v<Trivial>, Blob>& blob)
 	{
+		boost::endian::native_to_little (value);
+
 		uint8_t const* const begin = reinterpret_cast<uint8_t const*> (&value);
 		uint8_t const* const end = begin + sizeof (value);
 
@@ -72,12 +71,12 @@ template<class Quantity>
 	inline void
 	value_to_blob (Quantity value, std::enable_if_t<si::is_quantity_v<Quantity>, Blob>& blob)
 	{
-		value_to_blob (value.quantity(), blob);
+		blob = si::to_blob (value);
 	}
 
 
 inline void
-blob_to_value (Blob const& blob, bool& value)
+blob_to_value (BlobView const blob, bool& value)
 {
 	if (blob.size() != sizeof (value))
 		throw InvalidBlobSize();
@@ -87,39 +86,38 @@ blob_to_value (Blob const& blob, bool& value)
 
 
 inline void
-blob_to_value (Blob const& blob, std::string& value)
+blob_to_value (BlobView const blob, std::string& value)
 {
-	value.assign (blob.begin(), blob.end());
+	value.assign (blob.cbegin(), blob.cend());
 }
 
 
 template<class Trivial>
 	inline void
-	blob_to_value (std::enable_if_t<std::is_trivial_v<Trivial>, Blob> const& blob, Trivial& value)
+	blob_to_value (std::enable_if_t<std::is_trivial_v<Trivial>, BlobView> const blob, Trivial& value)
 	{
 		if (blob.size() != sizeof (value))
 			throw InvalidBlobSize();
 
 		uint8_t* const output = reinterpret_cast<uint8_t*> (&value);
-
-		std::copy (blob.begin(), blob.end(), output);
+		std::copy (blob.cbegin(), blob.cend(), output);
+		boost::endian::little_to_native (value);
 	}
 
 
 template<class Quantity>
 	inline void
-	blob_to_value (std::enable_if_t<si::is_quantity_v<Quantity>, Blob> const& blob, Quantity& value)
+	blob_to_value (std::enable_if_t<si::is_quantity_v<Quantity>, BlobView> const blob, Quantity& value)
 	{
-		typename Quantity::Value aux;
-		blob_to_value (blob, aux);
-		value = Quantity (aux);
+		// TODO Inefficient, change to use BlobView.
+		si::parse (Blob { blob.cbegin(), blob.cend() }, value);
 	}
 
 
 inline std::string
-to_hex_string (Blob const& blob)
+to_hex_string (BlobView const blob)
 {
-	return to_hex_string (std::string (blob.begin(), blob.end()));
+	return to_hex_string (std::string (blob.cbegin(), blob.cend()));
 }
 
 } // namespace xf
