@@ -53,6 +53,36 @@ class InvalidBlobSize: public InvalidArgument
 };
 
 
+inline void
+value_to_blob (bool value, Blob& blob)
+{
+	blob.resize (1);
+	blob[0] = !!value;
+}
+
+
+inline void
+value_to_blob (float16_t value, Blob& blob)
+{
+	union {
+		float16_t	value;
+		uint16_t	equivalent_int;
+		uint8_t		data[sizeof (float16_t)];
+	} u { value };
+
+	boost::endian::native_to_little (u.equivalent_int);
+	blob.resize (sizeof (u));
+	std::copy (std::begin (u.data), std::end (u.data), blob.begin());
+}
+
+
+inline void
+value_to_blob (std::string_view const& str, Blob& blob)
+{
+	blob.assign (str.cbegin(), str.cend());
+}
+
+
 template<class Trivial>
 	inline void
 	value_to_blob (Trivial value, std::enable_if_t<std::is_trivial_v<Trivial>, Blob>& blob)
@@ -78,27 +108,30 @@ template<class Quantity>
 
 
 inline void
-value_to_blob (float16_t value, Blob& blob)
+blob_to_value (BlobView const blob, bool& value)
 {
-	union {
-		float16_t	value;
-		uint16_t	equivalent_int;
-		uint8_t		data[sizeof (float16_t)];
-	} u { value };
+	if (blob.size() != 1)
+		throw InvalidBlobSize();
 
-	boost::endian::native_to_little (u.equivalent_int);
-	blob.resize (sizeof (u));
-	std::copy (std::begin (u.data), std::end (u.data), blob.begin());
+	value = !!blob[0];
 }
 
 
 inline void
-blob_to_value (BlobView const blob, bool& value)
+blob_to_value (BlobView const blob, float16_t& value)
 {
 	if (blob.size() != sizeof (value))
 		throw InvalidBlobSize();
 
-	value = !!blob[0];
+	union {
+		float16_t	value;
+		uint16_t	equivalent_int;
+		uint8_t		data[sizeof (float16_t)];
+	} u { 0.0_half };
+
+	std::copy (blob.cbegin(), blob.cend(), u.data);
+	boost::endian::little_to_native (u.equivalent_int);
+	value = u.value;
 }
 
 
@@ -134,24 +167,6 @@ template<class Quantity>
 		// TODO Inefficient, change to use BlobView.
 		si::parse (Blob { blob.cbegin(), blob.cend() }, value);
 	}
-
-
-inline void
-blob_to_value (BlobView const blob, float16_t& value)
-{
-	if (blob.size() != sizeof (value))
-		throw InvalidBlobSize();
-
-	union {
-		float16_t	value;
-		uint16_t	equivalent_int;
-		uint8_t		data[sizeof (float16_t)];
-	} u { 0.0_half };
-
-	std::copy (blob.cbegin(), blob.cend(), u.data);
-	boost::endian::little_to_native (u.equivalent_int);
-	value = u.value;
-}
 
 
 inline std::string
