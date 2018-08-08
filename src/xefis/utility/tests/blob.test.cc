@@ -67,6 +67,10 @@ template<class Value>
 
 
 static xf::RuntimeTest t1 ("blob: value_to_blob", []{
+	enum class TestEnum {
+		Value1, Value2, Value3,
+	};
+
 	test_serialization<bool> (false);
 	test_serialization<bool> (true);
 	test_serialization<int8_t> (-5);
@@ -80,11 +84,8 @@ static xf::RuntimeTest t1 ("blob: value_to_blob", []{
 	test_serialization<float16_t> (0.15_half);
 	test_serialization<float32_t> (0.152534f);
 	test_serialization<float64_t> (0.15253452890394);
-
-	enum class TestEnum {
-		Value1, Value2, Value3,
-	};
-
+	test_serialization<si::Length> (1.15_m);
+	test_serialization<std::string> ("random string");
 	test_serialization<TestEnum> (TestEnum::Value1);
 	test_serialization<TestEnum> (TestEnum::Value3);
 });
@@ -92,17 +93,25 @@ static xf::RuntimeTest t1 ("blob: value_to_blob", []{
 
 static xf::RuntimeTest t2 ("blob: little-endianess of serialized int", []{
 	Blob result;
-	value_to_blob<uint32_t> (0x11223344, result);
+	value_to_blob<uint32_t> (0x44332211, result);
 
-	test_asserts::verify ("MSB byte is 0x11", result[3] == 0x11);
-	test_asserts::verify ("byte[2] is 0x22", result[2] == 0x22);
-	test_asserts::verify ("byte[1] is 0x33", result[1] == 0x33);
-	test_asserts::verify ("LSB byte is 0x44", result[0] == 0x44);
-	test_asserts::verify ("to_hex_string works correctly", to_hex_string (result) == "44:33:22:11");
+	test_asserts::verify ("byte[3] is 0x44", result[3] == 0x44);
+	test_asserts::verify ("byte[2] is 0x33", result[2] == 0x33);
+	test_asserts::verify ("byte[1] is 0x22", result[1] == 0x22);
+	test_asserts::verify ("byte[0] is 0x11", result[0] == 0x11);
+	test_asserts::verify ("to_hex_string works correctly", to_hex_string (result) == "11:22:33:44");
 });
 
 
 static xf::RuntimeTest t3 ("blob: test sizes of serialized data", []{
+	enum class TestEnum8: uint8_t {
+		Value,
+	};
+
+	enum class TestEnum32: uint32_t {
+		Value,
+	};
+
 	test_size<bool> (false, 1);
 	test_size<int8_t> (0, 1);
 	test_size<int16_t> (0, 2);
@@ -116,17 +125,8 @@ static xf::RuntimeTest t3 ("blob: test sizes of serialized data", []{
 	test_size<float32_t> (0.0f, 4);
 	test_size<float64_t> (0.0, 8);
 	test_size<si::Length> (0_m, 8);
-
-	enum class TestEnum8: uint8_t {
-		Value,
-	};
-
+	test_size<std::string> ("random string", 13);
 	test_size<TestEnum8> (TestEnum8::Value, 1);
-
-	enum class TestEnum32: uint32_t {
-		Value,
-	};
-
 	test_size<TestEnum32> (TestEnum32::Value, 4);
 });
 
