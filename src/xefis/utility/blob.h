@@ -59,11 +59,13 @@ template<class Trivial>
 	{
 		boost::endian::native_to_little (value);
 
-		uint8_t const* const begin = reinterpret_cast<uint8_t const*> (&value);
-		uint8_t const* const end = begin + sizeof (value);
+		union {
+			Trivial	value;
+			uint8_t	data[sizeof (Trivial)];
+		} u { value };
 
-		blob.resize (std::distance (begin, end));
-		std::copy (begin, end, blob.begin());
+		blob.resize (sizeof (u));
+		std::copy (std::begin (u.data), std::end (u.data), blob.begin());
 	}
 
 
@@ -73,6 +75,21 @@ template<class Quantity>
 	{
 		blob = si::to_blob (value);
 	}
+
+
+inline void
+value_to_blob (float16_t value, Blob& blob)
+{
+	union {
+		float16_t	value;
+		uint16_t	equivalent_int;
+		uint8_t		data[sizeof (float16_t)];
+	} u { value };
+
+	boost::endian::native_to_little (u.equivalent_int);
+	blob.resize (sizeof (u));
+	std::copy (std::begin (u.data), std::end (u.data), blob.begin());
+}
 
 
 inline void
@@ -99,9 +116,14 @@ template<class Trivial>
 		if (blob.size() != sizeof (value))
 			throw InvalidBlobSize();
 
-		uint8_t* const output = reinterpret_cast<uint8_t*> (&value);
-		std::copy (blob.cbegin(), blob.cend(), output);
-		boost::endian::little_to_native (value);
+		union {
+			Trivial	value;
+			uint8_t	data[sizeof (Trivial)];
+		} u;
+
+		std::copy (blob.cbegin(), blob.cend(), u.data);
+		boost::endian::little_to_native (u.value);
+		value = u.value;
 	}
 
 
@@ -112,6 +134,24 @@ template<class Quantity>
 		// TODO Inefficient, change to use BlobView.
 		si::parse (Blob { blob.cbegin(), blob.cend() }, value);
 	}
+
+
+inline void
+blob_to_value (BlobView const blob, float16_t& value)
+{
+	if (blob.size() != sizeof (value))
+		throw InvalidBlobSize();
+
+	union {
+		float16_t	value;
+		uint16_t	equivalent_int;
+		uint8_t		data[sizeof (float16_t)];
+	} u { 0.0_half };
+
+	std::copy (blob.cbegin(), blob.cend(), u.data);
+	boost::endian::little_to_native (u.equivalent_int);
+	value = u.value;
+}
 
 
 inline std::string
