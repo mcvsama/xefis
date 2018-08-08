@@ -217,9 +217,12 @@ true_to_magnetic (Angle tru, Angle declination)
 inline int
 digit_from_ascii (char c)
 {
+	using namespace std::literals;
+
 	if ('0' <= c && c <= '9')
 		return c - '0';
-	throw InvalidFormat ("non-numeric character '"_str + c + "'");
+
+	throw InvalidFormat ("non-numeric character '"s + c + "'");
 }
 
 
