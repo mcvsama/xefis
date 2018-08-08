@@ -98,11 +98,23 @@ template<class pElement>
 				_size (vector.size())
 			{ }
 
+		constexpr pointer
+		begin() noexcept;
+
+		constexpr const_pointer
+		cbegin() const noexcept;
+
+		constexpr pointer
+		end() noexcept;
+
+		constexpr const_pointer
+		cend() const noexcept;
+
 		constexpr reference
-		operator[] (size_type pos);
+		operator[] (size_type pos) noexcept;
 
 		constexpr const_reference
-		operator[] (size_type pos) const;
+		operator[] (size_type pos) const noexcept;
 
 		constexpr reference
 		front();
@@ -151,7 +163,39 @@ template<class pElement>
 
 template<class V>
 	constexpr auto
-	Span<V>::operator[] (size_type pos) -> reference
+	Span<V>::begin() noexcept -> pointer
+	{
+		return _data;
+	}
+
+
+template<class V>
+	constexpr auto
+	Span<V>::cbegin() const noexcept -> const_pointer
+	{
+		return _data;
+	}
+
+
+template<class V>
+	constexpr auto
+	Span<V>::end() noexcept -> pointer
+	{
+		return _data + _size;
+	}
+
+
+template<class V>
+	constexpr auto
+	Span<V>::cend() const noexcept -> const_pointer
+	{
+		return _data + _size;
+	}
+
+
+template<class V>
+	constexpr auto
+	Span<V>::operator[] (size_type pos) noexcept -> reference
 	{
 		return _data[pos];
 	}
@@ -159,7 +203,7 @@ template<class V>
 
 template<class V>
 	constexpr auto
-	Span<V>::operator[] (size_type pos) const -> const_reference
+	Span<V>::operator[] (size_type pos) const noexcept -> const_reference
 	{
 		return _data[pos];
 	}
