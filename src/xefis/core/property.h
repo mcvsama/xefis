@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
+#include <xefis/core/property_converter.h>
 #include <xefis/core/property_path.h>
 #include <xefis/utility/blob.h>
 #include <xefis/utility/time.h>
@@ -150,33 +151,6 @@ class PropertyVirtualInterface
 	fetch (Cycle const&) = 0;
 
 	/**
-	 * Serializes property value, including nil-flag.
-	 * The blob has variable-length.
-	 */
-	virtual void
-	property_to_blob (Blob&) const = 0;
-
-	/**
-	 * Convenience overload that returns the Blob object.
-	 */
-	Blob
-	property_to_blob() const
-	{
-		Blob result;
-		property_to_blob (result);
-		return result;
-	}
-
-	/**
-	 * Deserializes property value.
-	 * The blob has variable-length.
-	 * \throw	InvalidBlobSize
-	 *			If blob has size not corresponding to this property type.
-	 */
-	virtual void
-	blob_to_property (Blob const&) = 0;
-
-	/**
 	 * Increase use-count for this property.
 	 */
 	virtual void
@@ -195,10 +169,50 @@ class PropertyVirtualInterface
 	use_count() const noexcept = 0;
 
 	/**
-	 * Get new string converter associated with this property.
+	 * Return true if Blob returned by to_blob() is constant size.
 	 */
-	virtual PropertyStringConverter
-	get_string_converter() = 0;
+	virtual bool
+	has_constant_blob_size() const noexcept = 0;
+
+	/**
+	 * Return Blob size for this Property, provided that has_constant_blob_size() is true.
+	 * If has_constant_blob_size() gives false, return 0.
+	 */
+	virtual size_t
+	constant_blob_size() const noexcept = 0;
+
+	/**
+	 * Serialize property value to string.
+	 */
+	virtual std::string
+	to_string() const = 0;
+
+	/**
+	 * Serialize property value to string with given config.
+	 */
+	virtual std::string
+	to_string (PropertyConversionSettings const&) const = 0;
+
+	/**
+	 * Unserializes property from string.
+	 */
+	virtual void
+	from_string (std::string const&) = 0;
+
+	/**
+	 * Serializes property value, including nil-flag.
+	 */
+	virtual Blob
+	to_blob() const = 0;
+
+	/**
+	 * Unserializes property from Blob.
+	 *
+	 * \throw	InvalidBlobSize
+	 *			If blob has size not corresponding to this property type.
+	 */
+	virtual void
+	from_blob (BlobView) = 0;
 
   protected:
 	/**
@@ -331,6 +345,9 @@ template<class pValue>
 		/**
 		 * Pointer accessor if contained object is pointer-dereferencable.
 		 * Throws the same exception as get() under the same conditions.
+		 *
+		 * Note that only the const accessor is available to prevent accidental mutation of the inner value without Property knowing it
+		 * (and updating modification timestamps, etc).
 		 */
 		Value const*
 		operator->() const;
@@ -354,18 +371,6 @@ template<class pValue>
 		// BasicProperty API
 		bool
 		valid() const noexcept override;
-
-		// BasicProperty API
-		void
-		property_to_blob (Blob&) const;
-
-		// BasicProperty API
-		void
-		blob_to_property (Blob const&);
-
-		// PropertyVirtualInterface API
-		PropertyStringConverter
-		get_string_converter() override;
 
 	  protected:
 		/**
@@ -398,6 +403,7 @@ template<class pValue>
 } // namespace xf
 
 
+#include "property_traits.h"
 #include "property.tcc"
 #include "property_in.h"
 #include "property_out.h"

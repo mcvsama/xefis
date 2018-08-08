@@ -29,35 +29,35 @@
 #include "datatable.h"
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter):
+Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property):
 	label (label),
-	value (converter)
+	property (property)
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter,
+Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
-	value (converter),
-	value_color (label_and_value_color)
+	value_color (label_and_value_color),
+	property (property)
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::PropertyStringConverter const& converter,
+Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
 	label_color (label_color.value_or (Qt::white)),
-	value (converter),
-	value_color (value_color.value_or (Qt::white))
+	value_color (value_color.value_or (Qt::white)),
+	property (property)
 { }
 
 
 QString
 Datatable::Line::stringify() const
 {
-	return QString::fromStdString (value.to_string());
+	return QString::fromStdString (property.to_string());
 }
 
 
@@ -67,7 +67,7 @@ Datatable::Datatable (xf::Xefis*, std::string const& instance):
 	_inputs_observer.set_callback ([&]{ mark_dirty(); });
 
 	for (auto& line: _list)
-		_inputs_observer.observe (line.value.property());
+		_inputs_observer.observe (line.property);
 }
 
 
@@ -135,7 +135,7 @@ Datatable::paint (xf::PaintRequest& paint_request) const
 		std::string str_to_paint;
 
 		auto error = xf::handle_format_exception([&] {
-			str_to_paint = line.value.to_string();
+			str_to_paint = line.property.to_string();
 		});
 
 		if (error)

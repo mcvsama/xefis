@@ -17,10 +17,19 @@
 // Standard:
 #include <cstddef>
 
+// Xefis:
+#include <xefis/core/property.h>
+
 
 namespace afcs_api {
 
-enum class ThrustMode
+/*
+ * Warning: In all below enums, most significant bit is used to denote nil
+ * value in Blob (see xf::EnumPropertyTraits<>), so the maximum possible
+ * value is 127.
+ */
+
+enum class ThrustMode: uint8_t
 {
 	// No thrust control.
 	None,
@@ -36,7 +45,7 @@ enum class ThrustMode
 	Mach,
 };
 
-enum class RollMode
+enum class RollMode: uint8_t
 {
 	// No lateral movement control.
 	None,
@@ -53,7 +62,7 @@ enum class RollMode
 	LNAV,
 };
 
-enum class PitchMode
+enum class PitchMode: uint8_t
 {
 	// No vertical movement control.
 	None,
@@ -77,7 +86,7 @@ enum class PitchMode
 	Flare,
 };
 
-enum class SpeedMode
+enum class SpeedMode: uint8_t
 {
 	// Manual A/T setting.
 	None		= 0,
@@ -203,5 +212,29 @@ void
 parse (std::string_view const&, SpeedMode&);
 
 } // namespace afcs_api
+
+
+namespace xf {
+
+template<>
+	struct PropertyTraits<afcs_api::ThrustMode>: public EnumPropertyTraits<afcs_api::ThrustMode>
+	{ };
+
+
+template<>
+	struct PropertyTraits<afcs_api::RollMode>: public EnumPropertyTraits<afcs_api::RollMode>
+	{ };
+
+
+template<>
+	struct PropertyTraits<afcs_api::PitchMode>: public EnumPropertyTraits<afcs_api::PitchMode>
+	{ };
+
+
+template<>
+	struct PropertyTraits<afcs_api::SpeedMode>: public EnumPropertyTraits<afcs_api::SpeedMode>
+	{ };
+
+} // namespace xf
 
 #endif

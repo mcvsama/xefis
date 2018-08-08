@@ -25,6 +25,7 @@
 namespace xf {
 
 template<class Value>
+	[[deprecated]]
 	inline std::string
 	to_string (Property<Value> const& property)
 	{
@@ -35,6 +36,7 @@ template<class Value>
 
 
 template<class Value>
+	[[deprecated]]
 	inline Blob
 	to_blob (Property<Value> const& property)
 	{
@@ -44,6 +46,7 @@ template<class Value>
 	}
 
 
+[[deprecated]]
 inline std::string
 to_string (Property<bool> const& property)
 {

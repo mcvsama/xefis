@@ -24,6 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
+#include <xefis/core/property_traits.h>
 #include <xefis/utility/variant.h>
 
 
@@ -54,12 +55,6 @@ template<class pValue>
 	{
 	  public:
 		typedef pValue Value;
-
-		/**
-		 * Create Property that's not coupled to any ModuleIO and don't have any data source yet.
-		 */
-		//explicit
-		//TODO PropertyOut (std::string const& path);
 
 		/**
 		 * Create Property that's coupled to a ModuleIO and set the module as data source.
@@ -116,6 +111,34 @@ template<class pValue>
 		void
 		fetch (Cycle const&) override;
 
+		// BasicProperty API
+		bool
+		has_constant_blob_size() const noexcept override;
+
+		// BasicProperty API
+		size_t
+		constant_blob_size() const noexcept override;
+
+		// BasicProperty API
+		std::string
+		to_string() const override;
+
+		// BasicProperty API
+		std::string
+		to_string (PropertyConversionSettings const&) const override;
+
+		// BasicProperty API
+		void
+		from_string (std::string const&) override;
+
+		// BasicProperty API
+		Blob
+		to_blob() const override;
+
+		// BasicProperty API
+		void
+		from_blob (BlobView) override;
+
 	  private:
 		void
 		inc_source_use_count() noexcept;
@@ -127,16 +150,6 @@ template<class pValue>
 		std::variant<std::monostate, ModuleIO*, PropertyOut<Value>*>	_data_source;
 		Cycle::Number													_fetch_cycle_number { 0 };
 	};
-
-
-// TODO
-#if 0
-template<class V>
-	inline
-	PropertyOut<V>::PropertyOut (std::string const& path):
-		Property<V> (path)
-	{ }
-#endif
 
 
 template<class V>
@@ -241,6 +254,62 @@ template<class V>
 				}
 			}, _data_source);
 		}
+	}
+
+
+template<class V>
+	inline bool
+	PropertyOut<V>::has_constant_blob_size() const noexcept
+	{
+		return PropertyTraits<V>::has_constant_blob_size();
+	}
+
+
+template<class V>
+	inline size_t
+	PropertyOut<V>::constant_blob_size() const noexcept
+	{
+		return PropertyTraits<V>::constant_blob_size();
+	}
+
+
+template<class V>
+	inline std::string
+	PropertyOut<V>::to_string() const
+	{
+		return PropertyTraits<V>::to_string (*this, PropertyConversionSettings());
+	}
+
+
+template<class V>
+	inline std::string
+	PropertyOut<V>::to_string (PropertyConversionSettings const& settings) const
+	{
+		return PropertyTraits<V>::to_string (*this, settings);
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::from_string (std::string const& str)
+	{
+		PropertyTraits<V>::from_string (*this, str);
+	}
+
+
+template<class V>
+	inline Blob
+	PropertyOut<V>::to_blob() const
+	{
+		return PropertyTraits<V>::to_blob (*this);
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::from_blob (BlobView blob)
+	{
+		PropertyTraits<V>::from_blob (*this, blob);
 	}
 
 

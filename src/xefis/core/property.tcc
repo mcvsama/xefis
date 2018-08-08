@@ -21,8 +21,8 @@
 #include <variant>
 
 // Xefis:
-#include <xefis/core/property_string_converter.h>
 #include <xefis/core/property_digitizer.h> // TODO
+
 
 namespace xf {
 
@@ -211,57 +211,6 @@ template<class V>
 	{
 		return !is_nil();
 	}
-
-
-template<class V>
-	inline void
-	Property<V>::property_to_blob (Blob& blob) const
-	{
-		if (valid())
-		{
-			value_to_blob (**this, blob);
-			blob.insert (blob.begin(), 1);
-		}
-		else
-			blob.assign ({ 0 });
-	}
-
-
-template<class V>
-	inline void
-	Property<V>::blob_to_property (Blob const& blob)
-	{
-		if (blob.empty())
-			throw InvalidBlobSize();
-		else
-		{
-			if (blob[0])
-			{
-				Value aux;
-				blob_to_value (Blob { std::next (blob.begin()), blob.end() }, aux);
-				protected_set_value (aux);
-			}
-			else
-				protected_set_nil();
-		}
-	}
-
-
-template<class V>
-	inline PropertyStringConverter
-	Property<V>::get_string_converter()
-	{
-		return PropertyStringConverter (*this);
-	}
-
-
-//TODO
-//template<class V>
-//	inline PropertyDigitizer
-//	Property<V>::get_numeric_converter()
-//	{
-//		return PropertyDigitizer (*this);
-//	}
 
 
 template<class V>
