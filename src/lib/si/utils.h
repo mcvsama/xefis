@@ -161,6 +161,14 @@ template<class pUnit, class pValue>
 
 
 /**
+ * Returns unit name of given quantity.
+ */
+template<class pUnit, class pValue>
+	inline std::string
+	unit_to_string (Quantity<pUnit, pValue> quantity);
+
+
+/**
  * std::to_string implementation.
  */
 inline std::string
@@ -401,6 +409,14 @@ template<class pUnit, class pValue>
 	to_string (Quantity<pUnit, pValue> quantity)
 	{
 		return std::to_string (quantity.quantity()) + " " + UnitTraits<pUnit>::symbol();
+	}
+
+
+template<class pUnit, class pValue>
+	inline std::string
+	unit_to_string (Quantity<pUnit, pValue>)
+	{
+		return UnitTraits<pUnit>::symbol();
 	}
 
 
