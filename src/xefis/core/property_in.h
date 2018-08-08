@@ -23,6 +23,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
+#include <xefis/core/property_traits.h>
 #include <xefis/utility/variant.h>
 
 
@@ -103,6 +104,34 @@ template<class pValue>
 		// BasicProperty API
 		void
 		fetch (Cycle const&) override;
+
+		// BasicProperty API
+		bool
+		has_constant_blob_size() const noexcept override;
+
+		// BasicProperty API
+		size_t
+		constant_blob_size() const noexcept override;
+
+		// BasicProperty API
+		std::string
+		to_string() const override;
+
+		// BasicProperty API
+		std::string
+		to_string (PropertyConversionSettings const&) const override;
+
+		// BasicProperty API
+		void
+		from_string (std::string const&) override;
+
+		// BasicProperty API
+		Blob
+		to_blob() const override;
+
+		// BasicProperty API
+		void
+		from_blob (BlobView) override;
 
 	  private:
 		void
@@ -196,6 +225,62 @@ template<class V>
 				}
 			}, _data_source);
 		}
+	}
+
+
+template<class V>
+	inline bool
+	PropertyIn<V>::has_constant_blob_size() const noexcept
+	{
+		return PropertyTraits<V>::has_constant_blob_size();
+	}
+
+
+template<class V>
+	inline size_t
+	PropertyIn<V>::constant_blob_size() const noexcept
+	{
+		return PropertyTraits<V>::constant_blob_size();
+	}
+
+
+template<class V>
+	inline std::string
+	PropertyIn<V>::to_string() const
+	{
+		return PropertyTraits<V>::to_string (*this, PropertyConversionSettings());
+	}
+
+
+template<class V>
+	inline std::string
+	PropertyIn<V>::to_string (PropertyConversionSettings const& settings) const
+	{
+		return PropertyTraits<V>::to_string (*this, settings);
+	}
+
+
+template<class V>
+	inline void
+	PropertyIn<V>::from_string (std::string const& str)
+	{
+		PropertyTraits<V>::from_string (*this, str);
+	}
+
+
+template<class V>
+	inline Blob
+	PropertyIn<V>::to_blob() const
+	{
+		return PropertyTraits<V>::to_blob (*this);
+	}
+
+
+template<class V>
+	inline void
+	PropertyIn<V>::from_blob (BlobView blob)
+	{
+		PropertyTraits<V>::from_blob (*this, blob);
 	}
 
 

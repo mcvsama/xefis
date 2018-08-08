@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/property_string_converter.h>
 
 
 namespace xf {

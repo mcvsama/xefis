@@ -24,7 +24,7 @@
 namespace xf {
 
 void
-PropertyObserver::observe (BasicProperty& property)
+PropertyObserver::observe (BasicProperty const& property)
 {
 	_objects.push_back (Object (&property));
 }
@@ -67,6 +67,7 @@ PropertyObserver::process (Time update_time)
 	for (Object& o: _objects)
 	{
 		BasicProperty::Serial new_serial = o.remote_serial();
+
 		if (new_serial != o._saved_serial)
 		{
 			_need_callback = true;

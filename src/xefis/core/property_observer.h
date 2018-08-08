@@ -45,7 +45,7 @@ class PropertyObserver
 
 	  public:
 		// Ctor
-		Object (BasicProperty*);
+		Object (BasicProperty const*);
 
 		// Ctor
 		Object (PropertyObserver*);
@@ -54,8 +54,8 @@ class PropertyObserver
 		remote_serial() const noexcept;
 
 	  private:
-		std::variant<BasicProperty*, PropertyObserver*>	_observable;
-		BasicProperty::Serial							_saved_serial	= 0;
+		std::variant<BasicProperty const*, PropertyObserver*>	_observable;
+		BasicProperty::Serial									_saved_serial	= 0;
 	};
 
 	typedef std::list<Object>			ObjectsList;
@@ -68,12 +68,12 @@ class PropertyObserver
   public:
 	/**
 	 * Add property to be observed.
-	 * When property's value changes (that is the fresh() method returns true), the callback function is called.
+	 * When property's value changes the callback function is called.
 	 *
 	 * Property is held by reference, so the property object must live as long as the PropertyObserver.
 	 */
 	void
-	observe (BasicProperty& property);
+	observe (BasicProperty const& property);
 
 	/**
 	 * Add another PropertyObserver to observe.
@@ -196,7 +196,7 @@ class PropertyObserver
 
 
 inline
-PropertyObserver::Object::Object (BasicProperty* property):
+PropertyObserver::Object::Object (BasicProperty const* property):
 	_observable (property)
 { }
 

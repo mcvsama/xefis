@@ -112,7 +112,7 @@ State::load_state()
 					if (auto rp = io._registered_properties.find (id); rp != io._registered_properties.end())
 					{
 						try {
-							rp->second.property.blob_to_property (xf::parse_hex_string (e.attribute ("value")));
+							rp->second.property.from_blob (xf::parse_hex_string (e.attribute ("value")));
 						}
 						catch (xf::Exception const& e)
 						{
@@ -146,7 +146,7 @@ State::save_state()
 		{
 			QDomElement rp_element = doc.createElement ("state-variable");
 			rp_element.setAttribute ("id", QString::fromStdString (rp.first));
-			rp_element.setAttribute ("value", QString::fromStdString (xf::to_hex_string (rp.second.property.property_to_blob())));
+			rp_element.setAttribute ("value", QString::fromStdString (xf::to_hex_string (rp.second.property.to_blob())));
 			root.appendChild (rp_element);
 		}
 

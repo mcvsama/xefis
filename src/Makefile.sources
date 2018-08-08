@@ -255,13 +255,14 @@ XEFIS_HEADERS			+= xefis/core/paint_request.h
 XEFIS_HEADERS_MOC		+= xefis/core/panel.h
 XEFIS_HEADERS_MOC		+= xefis/core/processing_loop.h
 XEFIS_HEADERS			+= xefis/core/property.h
+XEFIS_HEADERS			+= xefis/core/property.tcc
+XEFIS_HEADERS			+= xefis/core/property_converter.h
 XEFIS_HEADERS			+= xefis/core/property_digitizer.h
 XEFIS_HEADERS			+= xefis/core/property_in.h
 XEFIS_HEADERS			+= xefis/core/property_observer.h
 XEFIS_HEADERS			+= xefis/core/property_out.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
-XEFIS_HEADERS			+= xefis/core/property_string_converter.h
-XEFIS_HEADERS			+= xefis/core/property_string_converter.tcc
+XEFIS_HEADERS			+= xefis/core/property_traits.h
 XEFIS_HEADERS			+= xefis/core/property_utils.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS			+= xefis/core/screen_spec.h
@@ -280,7 +281,6 @@ XEFIS_SOURCES			+= xefis/core/module_io.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/processing_loop.cc
 XEFIS_SOURCES			+= xefis/core/property_observer.cc
-XEFIS_SOURCES			+= xefis/core/property_string_converter.cc
 XEFIS_SOURCES			+= xefis/core/screen.cc
 XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
@@ -290,12 +290,9 @@ SELFTEST_HEADERS		+= xefis/core/module.h
 SELFTEST_HEADERS		+= xefis/core/module_io.h
 SELFTEST_HEADERS		+= xefis/core/property.h
 SELFTEST_HEADERS		+= xefis/core/property.tcc
-SELFTEST_HEADERS		+= xefis/core/property_string_converter.h
-SELFTEST_HEADERS		+= xefis/core/property_string_converter.tcc
 
 SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
-SELFTEST_SOURCES		+= xefis/core/property_string_converter.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 
 ######## /xefis/support/air ########

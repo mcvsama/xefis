@@ -28,7 +28,6 @@
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
-#include <xefis/core/property_string_converter.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 
@@ -42,16 +41,16 @@ class Datatable:
 	  public:
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringConverter const&);
+		Line (std::string const& label, xf::BasicProperty const&);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringConverter const&,
+		Line (std::string const& label, xf::BasicProperty const&,
 			  QColor label_and_value_color);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::PropertyStringConverter const&,
+		Line (std::string const& label, xf::BasicProperty const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
 
@@ -64,8 +63,8 @@ class Datatable:
 	  public:
 		std::string					label;
 		QColor						label_color	{ Qt::white };
-		xf::PropertyStringConverter	value;
 		QColor						value_color	{ Qt::white };
+		xf::BasicProperty const&	property;
 	};
 
   public:
