@@ -123,8 +123,10 @@ GPS::Connection::initialize_device()
 void
 GPS::Connection::request_new_baud_rate (unsigned int baud_rate)
 {
+	using namespace std::literals;
+
 	_gps_module.logger() << "Requesting baud-rate switch from " << _serial_port_config.baud_rate() << " to " << baud_rate << std::endl;
-	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","_str + std::to_string (baud_rate));
+	std::string set_baud_rate_message = xf::nmea::make_mtk_sentence (MTK_SET_NMEA_BAUDRATE + ","s + std::to_string (baud_rate));
 	_serial_port->write (set_baud_rate_message);
 	_serial_port->flush();
 	_serial_port->close();

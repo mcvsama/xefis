@@ -29,6 +29,9 @@
 
 namespace xf {
 
+using namespace std::literals;
+
+
 /**
  * MutexPermissionException
  */
@@ -37,7 +40,7 @@ class MutexPermissionException: public std::runtime_error
   public:
 	explicit
 	MutexPermissionException (const char* what, const char* details):
-		std::runtime_error ((what + ": "_str + details).c_str())
+		std::runtime_error ((what + ": "s + details).c_str())
 	{ }
 };
 

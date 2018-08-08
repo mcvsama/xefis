@@ -35,17 +35,17 @@ using namespace si::quantities;
 using namespace si::literals;
 
 
-inline std::string
-operator"" _str (const char* string, size_t len)
-{
-    return std::string (string, len);
-}
-
-
 inline QString
 operator"" _qstr (const char* string, size_t)
 {
     return QString (string);
+}
+
+
+inline half_float::half
+operator "" _half (long double value)
+{
+	return half_float::half (static_cast<float> (value));
 }
 
 
