@@ -40,7 +40,7 @@ class PropertyConversionSettings
 	std::string		false_value				{ "false" };
 
 	// int64_t, double and SI properties:
-	boost::format	numeric_format			{ "%1" };
+	boost::format	numeric_format			{ "%1%" };
 };
 
 } // namespace xf
