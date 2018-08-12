@@ -41,7 +41,31 @@ operator<< (std::ostream& os, signed char i)
 } // namespace ostream_fixes
 
 
+// Add std::basic_string_view + std::basic_string operators.
+namespace string_view_plus_string_fixes {
+
+template<class CharT, class Traits, class Allocator>
+	inline std::basic_string<CharT, Traits, Allocator>
+	operator+ (std::basic_string<CharT, Traits, Allocator> const& s,
+			   std::basic_string_view<CharT, Traits> const& sv)
+	{
+		return std::basic_string<CharT, Traits, Allocator> (s).append (sv);
+	}
+
+
+template<class CharT, class Traits, class Allocator>
+	inline std::basic_string<CharT, Traits, Allocator>
+	operator+ (std::basic_string_view<CharT, Traits> const& sv,
+			   std::basic_string<CharT, Traits, Allocator> const& s)
+	{
+		return std::basic_string<CharT, Traits, Allocator> (sv).append (s);
+	}
+
+} // namespace string_view_plus_string_fixes
+
+
 using namespace ostream_fixes;
+using namespace string_view_plus_string_fixes;
 
 
 inline void
