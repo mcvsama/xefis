@@ -26,6 +26,13 @@
 
 namespace xf {
 
+class WrongDestructionOrder: public Exception
+{
+  public:
+	using Exception::Exception;
+};
+
+
 class DomException: public Exception
 {
   public:

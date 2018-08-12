@@ -60,7 +60,7 @@ class BasicPropertyIn: virtual public PropertyVirtualInterface
 
 
 template<class pValue>
-	class PropertyIn:
+	class PropertyIn final:
 		public BasicPropertyIn,
 		public Property<pValue>
 	{
@@ -77,16 +77,22 @@ template<class pValue>
 		 * Same as PropertyIn (ModuleIO*, std::string), but additionally set up the fallback value.
 		 */
 		explicit
-		PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value);
+		PropertyIn (ModuleIO* owner, std::string const& path, Value fallback_value);
 
 		// Dtor
 		~PropertyIn();
 
-		/**
-		 * Set no data source for this property.
-		 */
+		// Forbid copying
+		PropertyIn<Value>&
+		operator= (PropertyIn<Value> const&) = delete;
+
+		// Move operator
+		PropertyIn<Value>&
+		operator= (PropertyIn<Value>&&) = default;
+
+		// BasicPropertyIn API
 		void
-		operator<< (Nil);
+		operator<< (NoDataSource) override;
 
 		/**
 		 * Set PropertyOut as a data source for this property.
@@ -100,6 +106,10 @@ template<class pValue>
 		template<class ConstantValue>
 			void
 			operator<< (ConstantSource<ConstantValue> const&);
+
+		// BasicProperty API
+		std::size_t
+		use_count() const noexcept override;
 
 		// BasicProperty API
 		void
@@ -133,6 +143,10 @@ template<class pValue>
 		void
 		from_blob (BlobView) override;
 
+		// PropertyVirtualInterface API
+		void
+		deregister() override;
+
 	  private:
 		void
 		inc_source_use_count() noexcept;
@@ -157,10 +171,10 @@ template<class V>
 
 template<class V>
 	inline
-	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path, Value&& fallback_value):
+	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path, Value fallback_value):
 		PropertyIn (owner, path)
 	{
-		this->set_fallback (std::forward<Value> (fallback_value));
+		this->set_fallback (fallback_value);
 	}
 
 
@@ -168,13 +182,13 @@ template<class V>
 	inline
 	PropertyIn<V>::~PropertyIn()
 	{
-		ModuleIO::ProcessingLoopAPI (*this->io()).unregister_input_property (*this);
+		deregister();
 	}
 
 
 template<class V>
 	inline void
-	PropertyIn<V>::operator<< (Nil)
+	PropertyIn<V>::operator<< (NoDataSource)
 	{
 		dec_source_use_count();
 		_data_source = std::monostate{};
@@ -203,6 +217,14 @@ template<class V>
 			inc_source_use_count();
 			this->protected_set (source.value);
 		}
+
+
+template<class V>
+	inline std::size_t
+	PropertyIn<V>::use_count() const noexcept
+	{
+		return 0;
+	}
 
 
 template<class V>
@@ -286,6 +308,19 @@ template<class V>
 
 template<class V>
 	inline void
+	PropertyIn<V>::deregister()
+	{
+		if (this->io())
+			ModuleIO::ProcessingLoopAPI (*this->io()).unregister_input_property (*this);
+
+		// Order is important:
+		(*this) << no_data_source;
+		this->_owner = nullptr;
+	}
+
+
+template<class V>
+	inline void
 	PropertyIn<V>::inc_source_use_count() noexcept
 	{
 		std::visit (overload {
@@ -293,7 +328,7 @@ template<class V>
 				// No action
 			},
 			[&] (PropertyOut<Value>* property_source) noexcept {
-				property_source->inc_use_count();
+				property_source->inc_use_count (this);
 			},
 			[&] (ConstantSource<Value>&) noexcept {
 				// No action
@@ -311,7 +346,7 @@ template<class V>
 				// No action
 			},
 			[&] (PropertyOut<Value>* property_source) noexcept {
-				property_source->dec_use_count();
+				property_source->dec_use_count (this);
 			},
 			[&] (ConstantSource<Value>&) noexcept {
 				// No action

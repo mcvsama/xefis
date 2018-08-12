@@ -17,6 +17,7 @@
 // Standard:
 #include <array>
 #include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <vector>
 
@@ -48,6 +49,13 @@ template<class pElement>
 		// Ctor
 		constexpr
 		Span (Span const&) = default;
+
+		// Ctor
+		constexpr
+		Span (element_type* begin, element_type* end):
+			_data (begin),
+			_size (std::distance (begin, end))
+		{ }
 
 		// Ctor
 		constexpr
@@ -286,6 +294,7 @@ template<class V>
 	Span<V>::remove_prefix (size_type n)
 	{
 		_data += n;
+		_size -= n;
 	}
 
 

@@ -25,6 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
+#include <xefis/core/module_io.h>
 #include <xefis/utility/noncopyable.h>
 
 
@@ -33,7 +34,13 @@ class QWidget;
 namespace xf {
 
 class BasicSetting;
-class ModuleIO;
+
+
+/**
+ * Type-tag used to indicate that Module<> doesn't have any ModuleIO class.
+ */
+class NoModuleIO: public ModuleIO
+{ };
 
 
 /**
@@ -158,7 +165,7 @@ class BasicModule: private Noncopyable
 };
 
 
-template<class IO = ModuleIO>
+template<class IO = NoModuleIO>
 	class Module: public BasicModule
 	{
 	  public:
@@ -166,7 +173,7 @@ template<class IO = ModuleIO>
 		 * Ctor
 		 * Version for modules that do have their own IO class.
 		 */
-		template<class = std::enable_if_t<!std::is_same_v<IO, ModuleIO>>>
+		template<class = std::enable_if_t<!std::is_same_v<IO, NoModuleIO>>>
 			explicit
 			Module (std::unique_ptr<IO> io, std::string const& instance = {});
 
@@ -174,7 +181,7 @@ template<class IO = ModuleIO>
 		 * Ctor
 		 * Version for modules that do not have any IO class.
 		 */
-		template<class = std::enable_if_t<std::is_same_v<IO, ModuleIO>>>
+		template<class = std::enable_if_t<std::is_same_v<IO, NoModuleIO>>>
 			explicit
 			Module (std::string const& instance = {});
 

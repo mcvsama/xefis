@@ -104,27 +104,6 @@ BasicProperty::serial() const noexcept
 }
 
 
-inline void
-BasicProperty::inc_use_count() noexcept
-{
-	++_use_count;
-}
-
-
-inline void
-BasicProperty::dec_use_count() noexcept
-{
-	--_use_count;
-}
-
-
-inline std::size_t
-BasicProperty::use_count() const noexcept
-{
-	return _use_count;
-}
-
-
 /*
  * Property
  */

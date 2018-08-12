@@ -21,8 +21,7 @@
 #include <xefis/utility/demangle.h>
 
 
-namespace xf {
-namespace test {
+namespace xf::test {
 
 template<class Value>
 	static void
@@ -44,9 +43,7 @@ template<class Value>
 				serialized[0] = 0;
 		}
 		else
-		{
 			serialized[0] = 0xff;
-		}
 
 		blob_to_value (serialized, deserialized);
 		test_asserts::verify ("deserialization of broken "s + demangle (typeid (Value).name()) + " works", value != deserialized);
@@ -130,6 +127,5 @@ static xf::RuntimeTest t3 ("blob: test sizes of serialized data", []{
 	test_size<TestEnum32> (TestEnum32::Value, 4);
 });
 
-} // namespace test
-} // namespace xf
+} // namespace xf::test
 

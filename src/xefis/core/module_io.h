@@ -21,7 +21,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
-#include <xefis/core/module.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/logger.h>
 #include <xefis/utility/sequence.h>
@@ -40,7 +39,7 @@ class BasicPropertyOut;
 namespace module_io {
 
 /**
- * Exception object thrown when some settings in a module have not been initialized as required.
+ * Exception thrown when some settings in a module have not been initialized as required.
  */
 class UninitializedSettings: public Exception
 {
@@ -71,13 +70,27 @@ class InvalidConfig: public Exception
 	{ }
 };
 
+
+/**
+ * Exception thrown when trying to use ModuleIO::module(), but no Module has been
+ * associated with the ModuleIO object.
+ */
+class ModuleNotAssigned: public Exception
+{
+  public:
+	// Ctor
+	explicit
+	ModuleNotAssigned():
+		Exception ("ModuleIO doesn't have assigned Module object")
+	{ };
+};
+
 } // namespace module_io
 
 
 class ModuleIO
 {
 	friend class BasicModule;
-	friend class BasicModule::ProcessingLoopAPI;
 
   public:
 	/**
@@ -163,13 +176,13 @@ class ModuleIO
   public:
 	// Dtor
 	virtual
-	~ModuleIO() = default;
+	~ModuleIO();
 
 	/**
 	 * Return reference to the module that uses this ModuleIO object.
 	 */
 	BasicModule&
-	module() const noexcept;
+	module() const;
 
 	/**
 	 * User-provided settings verification procedure.
@@ -200,8 +213,11 @@ ModuleIO::ProcessingLoopAPI::set_module (BasicModule& module)
 
 
 inline BasicModule&
-ModuleIO::module() const noexcept
+ModuleIO::module() const
 {
+	if (!_module)
+		throw module_io::ModuleNotAssigned();
+
 	return *_module;
 }
 
