@@ -101,6 +101,15 @@ Exception::catch_and_log (Logger const& logger, std::function<void()> guarded_co
 }
 
 
+[[noreturn]]
+void
+Exception::terminate (std::string_view message)
+{
+	std::cerr << "\n----- TERMINATE -----\n" << message << std::endl;
+	std::terminate();
+}
+
+
 namespace exception_ops {
 
 std::ostream&

@@ -110,6 +110,13 @@ class Exception: public std::exception
 	static bool
 	catch_and_log (Logger const&, std::function<void()> guarded_code);
 
+	/**
+	 * Terminate program after printing message on std::cerr.
+	 */
+	[[noreturn]]
+	static void
+	terminate (std::string_view message);
+
   protected:
 	/**
 	 * Hides backtrace when put to std::ostream.
