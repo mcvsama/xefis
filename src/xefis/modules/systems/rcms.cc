@@ -31,8 +31,6 @@
 RemoteControlManagementSystem::RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO> module_io, std::string const& instance):
 	Module (std::move (module_io), instance)
 {
-	prepare_configurator_widget();
-
 	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));
 	_distance_computer.observe ({
 		&io.home_longitude,
@@ -45,51 +43,10 @@ RemoteControlManagementSystem::RemoteControlManagementSystem (std::unique_ptr<Re
 }
 
 
-QWidget*
-RemoteControlManagementSystem::configurator_widget()
-{
-	return _configurator_widget.get();
-}
-
-
 void
 RemoteControlManagementSystem::process (xf::Cycle const& cycle)
 {
-	if (!home_is_valid())
-		acquire_home();
-
 	_distance_computer.process (cycle.update_time());
-}
-
-
-void
-RemoteControlManagementSystem::acquire_home()
-{
-	if (io.position_longitude && io.position_latitude && io.position_altitude_amsl)
-	{
-		//io.home_longitude = io.position_longitude;
-		//io.home_latitude = io.position_latitude;
-		//io.home_altitude_amsl = io.position_altitude_amsl;
-		_home_acquired = true;
-	}
-}
-
-
-void
-RemoteControlManagementSystem::prepare_configurator_widget()
-{
-	_configurator_widget = std::make_unique<QWidget> (nullptr);
-	_configurator_widget->setSizePolicy (QSizePolicy::Minimum, QSizePolicy::Minimum);
-
-	QPushButton* acquire_home_button = new QPushButton ("Acquire HOME position", _configurator_widget.get());
-	QObject::connect (acquire_home_button, SIGNAL (clicked (bool)), this, SLOT (acquire_home()));
-
-	QGridLayout* layout = new QGridLayout (_configurator_widget.get());
-	layout->setMargin (WidgetMargin);
-	layout->setSpacing (WidgetSpacing);
-	layout->addWidget (acquire_home_button, 0, 0);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 1);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 1, 0);
 }
 
 

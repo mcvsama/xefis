@@ -56,8 +56,7 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
 
 class RemoteControlManagementSystem:
 	public QObject,
-	public xf::Module<RemoteControlManagementSystemIO>,
-	public xf::Module<RemoteControlManagementSystemIO>::HasConfiguratorWidget
+	public xf::Module<RemoteControlManagementSystemIO>
 {
 	Q_OBJECT
 
@@ -66,25 +65,11 @@ class RemoteControlManagementSystem:
 	explicit
 	RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO>, std::string const& instance = {});
 
-	// Module::HasConfiguratorWidget API
-	QWidget*
-	configurator_widget() override;
-
 	// Module API
 	void
 	process (xf::Cycle const&) override;
 
-  private slots:
-	/**
-	 * Set current aircraft position as "HOME" position.
-	 */
-	void
-	acquire_home();
-
   private:
-	void
-	prepare_configurator_widget();
-
 	bool
 	home_is_valid() const;
 
@@ -98,8 +83,6 @@ class RemoteControlManagementSystem:
 	compute_true_home_direction();
 
   private:
-	Unique<QWidget>			_configurator_widget;
-	bool					_home_acquired			= false;
 	xf::PropertyObserver	_distance_computer;
 };
 
