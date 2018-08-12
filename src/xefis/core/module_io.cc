@@ -20,6 +20,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/demangle.h>
+#include <xefis/utility/types.h>
 
 // Local:
 #include "module.h"
@@ -131,6 +132,17 @@ Sequence<std::vector<BasicPropertyOut*>::const_iterator>
 ModuleIO::ProcessingLoopAPI::output_properties() const noexcept
 {
 	return { _io._registered_output_properties.begin(), _io._registered_output_properties.end() };
+}
+
+
+ModuleIO::~ModuleIO()
+{
+	// Operate on copies since the deregister() method modifies vectors in this class.
+	for (auto* property: clone (_registered_input_properties))
+		property->deregister();
+
+	for (auto* property: clone (_registered_output_properties))
+		property->deregister();
 }
 
 

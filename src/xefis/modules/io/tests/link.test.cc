@@ -19,8 +19,7 @@
 #include <xefis/modules/io/link.h>
 
 
-namespace xf {
-namespace test {
+namespace xf::test {
 
 xf::Logger g_logger (std::clog);
 
@@ -187,7 +186,7 @@ static xf::RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range val
 	transmit (tx_protocol, rx_protocol);
 	xf::test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
-	tx_io.bool_prop << xf::nil;
+	tx_io.bool_prop << xf::no_data_source;
 	transmit (tx_protocol, rx_protocol);
 	xf::test_asserts::verify ("nil bit-bool set to fall-back value", *rx_io.bool_prop == kFallbackBool);
 
@@ -205,7 +204,7 @@ static xf::RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range val
 	transmit (tx_protocol, rx_protocol);
 	xf::test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
-	tx_io.uint_prop << xf::nil;
+	tx_io.uint_prop << xf::no_data_source;
 	transmit (tx_protocol, rx_protocol);
 	xf::test_asserts::verify ("nil bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 });
@@ -235,7 +234,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	GCS_Tx_LinkProtocol rx_protocol (&rx_io);
 
 	// Transmit correctly first:
-	tx_io.nil_prop << xf::nil;
+	tx_io.nil_prop << xf::no_data_source;
 	tx_io.angle_prop << xf::ConstantSource (15_rad);
 	tx_io.angle_prop_r << xf::ConstantSource (15_rad);
 	tx_io.velocity_prop << xf::ConstantSource (100_mps);
@@ -310,7 +309,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 
 
 static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset works", []{
-	// The third envelope should be sent every two packets, starting from packed with index 1.
+	// The third envelope should be sent every two packets, starting from packet with index 1.
 
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
@@ -347,6 +346,5 @@ static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset wo
 	xf::test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
 });
 
-} // namespace test
-} // namespace xf
+} // namespace xf::test
 

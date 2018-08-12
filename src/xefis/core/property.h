@@ -33,8 +33,7 @@
 
 namespace xf {
 
-class PropertyStringConverter;
-class PropertyDigitizer;
+class BasicProperty;
 
 
 /**
@@ -45,9 +44,22 @@ class Nil
 
 
 /**
+ * Helper type that's used to reset data source for a property.
+ */
+class NoDataSource
+{ };
+
+
+/**
  * Global nil object that when compared to a nil property, gives true.
  */
 static constexpr Nil nil;
+
+
+/**
+ * Global NoDataSource object.
+ */
+static constexpr NoDataSource no_data_source;
 
 
 /**
@@ -75,6 +87,12 @@ class PropertyVirtualInterface
 	// Dtor
 	virtual
 	~PropertyVirtualInterface() = default;
+
+	/**
+	 * Set no data source for this property.
+	 */
+	virtual void
+	operator<< (NoDataSource) = 0;
 
 	/**
 	 * Return true if property is nil.
@@ -145,28 +163,16 @@ class PropertyVirtualInterface
 	serial() const noexcept = 0;
 
 	/**
-	 * Ensure that property's value is up to date in this processing loop.
-	 */
-	virtual void
-	fetch (Cycle const&) = 0;
-
-	/**
-	 * Increase use-count for this property.
-	 */
-	virtual void
-	inc_use_count() noexcept = 0;
-
-	/**
-	 * Decrease use-count for this property.
-	 */
-	virtual void
-	dec_use_count() noexcept = 0;
-
-	/**
 	 * Use-count for this property.
 	 */
 	virtual std::size_t
 	use_count() const noexcept = 0;
+
+	/**
+	 * Ensure that property's value is up to date in this processing loop.
+	 */
+	virtual void
+	fetch (Cycle const&) = 0;
 
 	/**
 	 * Return true if Blob returned by to_blob() is constant size.
@@ -213,6 +219,14 @@ class PropertyVirtualInterface
 	 */
 	virtual void
 	from_blob (BlobView) = 0;
+
+	/**
+	 * Deregisters property from ModuleIO: esets pointer to IO owner and makes it impossible
+	 * to use this property again. Use in preparation for destroy in non-standard order
+	 * (eg. when ModuleIO has to be destroyed first).
+	 */
+	virtual void
+	deregister() = 0;
 
   protected:
 	/**
@@ -279,23 +293,12 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	Serial
 	serial() const noexcept override;
 
-	// PropertyVirtualInterface API
-	void
-	inc_use_count() noexcept override;
-
-	void
-	dec_use_count() noexcept override;
-
-	std::size_t
-	use_count() const noexcept override;
-
   protected:
 	ModuleIO*		_owner					= nullptr;
 	PropertyPath	_path;
 	si::Time		_modification_timestamp	= 0_s;
 	si::Time		_valid_timestamp		= 0_s;
 	Serial			_serial					= 0;
-	std::size_t		_use_count				= 0;
 };
 
 

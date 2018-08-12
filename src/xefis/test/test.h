@@ -18,9 +18,11 @@
 #include <cstddef>
 #include <functional>
 #include <iostream>
+#include <sstream>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/logger.h>
 
 // Local:
 #include "test_asserts.h"
@@ -42,18 +44,19 @@ inline
 RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 {
 	std::cout << "Test: " << test_name << "…" << std::flush;
-	try {
+	std::ostringstream log_buffer;
+	xf::Logger logger (log_buffer);
+	logger.set_timestamps_enabled (false);
+
+	bool was_exception = Exception::catch_and_log (logger, [&]{
 		tf();
 		std::cout << " PASS" << std::endl;
-	}
-	catch (Exception& e)
+	});
+
+	if (was_exception)
 	{
 		std::cout << " FAIL" << std::endl;
-		std::cout << "Explanation: " << e.message() << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << " FAIL with unknown exception" << std::endl;
+		std::cout << "Explanation: " << log_buffer.str();
 	}
 }
 

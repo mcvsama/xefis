@@ -67,7 +67,7 @@ template<class PropertyInOut, class Value>
 		if constexpr (std::is_base_of<BasicPropertyIn, PropertyInOut>())
 		{
 			if constexpr (std::is_base_of<Nil, std::remove_cvref_t<Value>>())
-				property << xf::nil;
+				property << xf::no_data_source;
 			else
 				property << ConstantSource (std::forward<Value> (value));
 		}
@@ -80,7 +80,7 @@ template<class Value>
 	inline Blob
 	apply_generic_value_to_blob (Property<Value> const& property, size_t constant_blob_size)
 	{
-		Blob result (1 + constant_blob_size, 0);
+		Blob result (constant_blob_size, 0);
 		result[0] = property ? not_nil : nil;
 
 		if (property)
@@ -111,7 +111,7 @@ template<class PropertyInOut>
 				assign (property, xf::nil);
 		}
 		else
-			throw InvalidBlobSize();
+			throw InvalidBlobSize (blob.size(), constant_blob_size);
 	}
 
 } // namespace detail
@@ -133,7 +133,8 @@ template<class Enum>
 		static constexpr size_t
 		constant_blob_size()
 		{
-			return sizeof (Enum);
+			// 1 additional byte is for nil-indication:
+			return 1 + sizeof (Enum);
 		}
 
 		static inline std::string
@@ -221,7 +222,8 @@ template<class Integer>
 		static constexpr size_t
 		constant_blob_size()
 		{
-			return sizeof (Integer);
+			// 1 additional byte is for nil-indication:
+			return 1 + sizeof (Integer);
 		}
 
 		static inline std::string
@@ -265,8 +267,65 @@ template<class Integer>
 	};
 
 
-// TODO UNIT tests for all Traits serializing/deserializing stuff
-// TODO UNIT tests for BlobView
+// TODO for double/float use nan as nil indicator
+// TODO or just use generic IntegerPropertyTraits (renamed to NumericPropertyTraits)
+template<class FloatingPoint>
+	struct FloatingPointPropertyTraits
+	{
+		static constexpr bool
+		has_constant_blob_size()
+		{
+			return true;
+		}
+
+		static constexpr size_t
+		constant_blob_size()
+		{
+			// 1 additional byte is for nil-indication:
+			return 1 + sizeof (FloatingPoint);
+		}
+
+		static inline std::string
+		to_string (Property<FloatingPoint> const& property, PropertyConversionSettings const& settings)
+		{
+			if (property)
+				return std::to_string (*property);
+			else
+				return settings.nil_value;
+		}
+
+		static inline void
+		from_string (PropertyIn<FloatingPoint>&, std::string const&)
+		{
+			// TODO
+		}
+
+		static inline void
+		from_string (PropertyOut<FloatingPoint>&, std::string const&)
+		{
+			// TODO
+		}
+
+		static inline Blob
+		to_blob (Property<FloatingPoint> const& property)
+		{
+			return detail::apply_generic_value_to_blob (property, constant_blob_size());
+		}
+
+		static inline void
+		from_blob (PropertyIn<FloatingPoint>& property, BlobView blob)
+		{
+			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
+		}
+
+		static inline void
+		from_blob (PropertyOut<FloatingPoint>& property, BlobView blob)
+		{
+			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
+		}
+	};
+
+
 template<class Value>
 	struct PropertyTraits
 	{
@@ -366,7 +425,7 @@ template<>
 						detail::assign (property, !!blob[0]);
 				}
 				else
-					throw InvalidBlobSize();
+					throw InvalidBlobSize (blob.size(), constant_blob_size());
 			}
 	};
 
@@ -411,62 +470,19 @@ template<>
 	{ };
 
 
-// TODO for double/float use nan as nil indicator
-// TODO or just use generic IntegerPropertyTraits (renamed to NumericPropertyTraits)
 template<>
-	struct PropertyTraits<double>
-	{
-		static constexpr bool
-		has_constant_blob_size()
-		{
-			return true;
-		}
+	struct PropertyTraits<float16_t>: public FloatingPointPropertyTraits<float16_t>
+	{ };
 
-		static constexpr size_t
-		constant_blob_size()
-		{
-			return sizeof (double);
-		}
 
-		static inline std::string
-		to_string (Property<double> const& property, PropertyConversionSettings const& settings)
-		{
-			if (property)
-				return std::to_string (*property);
-			else
-				return settings.nil_value;
-		}
+template<>
+	struct PropertyTraits<float32_t>: public FloatingPointPropertyTraits<float32_t>
+	{ };
 
-		static inline void
-		from_string (PropertyIn<double>&, std::string const&)
-		{
-			// TODO
-		}
 
-		static inline void
-		from_string (PropertyOut<double>&, std::string const&)
-		{
-			// TODO
-		}
-
-		static inline Blob
-		to_blob (Property<double> const& property)
-		{
-			return detail::apply_generic_value_to_blob (property, constant_blob_size());
-		}
-
-		static inline void
-		from_blob (PropertyIn<double>& property, BlobView blob)
-		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
-		}
-
-		static inline void
-		from_blob (PropertyOut<double>& property, BlobView blob)
-		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
-		}
-	};
+template<>
+	struct PropertyTraits<float64_t>: public FloatingPointPropertyTraits<float64_t>
+	{ };
 
 
 template<>
@@ -537,7 +553,7 @@ template<>
 			generic_from_blob (PropertyInOut& property, BlobView blob)
 			{
 				if (blob.empty())
-					throw InvalidBlobSize();
+					throw InvalidBlobSize (0);
 				else
 				{
 					if (blob[0] == detail::not_nil)

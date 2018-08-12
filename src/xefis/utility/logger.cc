@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/core/processing_loop.h>
 #include <xefis/utility/variant.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "logger.h"
@@ -53,6 +54,13 @@ Logger::set_prefix (std::string const& prefix)
 }
 
 
+void
+Logger::set_timestamps_enabled (bool enabled)
+{
+	_add_timestamps = enabled;
+}
+
+
 std::ostream&
 Logger::prepare_line() const
 {
@@ -81,7 +89,10 @@ Logger::prepare_line (std::ostream& stream) const
 			stream << "[no cycle] ";
 	}
 
-	stream << boost::format ("%08.4lf %s ") % TimeHelper::now().in<Second>() % _prefix;
+	if (_add_timestamps)
+		stream << boost::format ("[%08.4lfs] %s ") % TimeHelper::now().in<Second>() % _prefix;
+	else
+		stream << _prefix;
 }
 
 } // namespace xf

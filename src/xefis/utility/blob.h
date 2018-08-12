@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
 #include <type_traits>
 
 // Boost:
@@ -47,8 +48,9 @@ class BlobView: public Span<uint8_t const>
 class InvalidBlobSize: public InvalidArgument
 {
   public:
-	explicit InvalidBlobSize():
-		InvalidArgument ("invalid blob size")
+	explicit InvalidBlobSize (size_t is, std::optional<size_t> should_be = {}):
+		InvalidArgument ("invalid blob size " + std::to_string (is) +
+						 (should_be ? ", should be " + std::to_string (*should_be) : ""))
 	{ }
 };
 
@@ -111,7 +113,7 @@ inline void
 blob_to_value (BlobView const blob, bool& value)
 {
 	if (blob.size() != 1)
-		throw InvalidBlobSize();
+		throw InvalidBlobSize (blob.size(), 1);
 
 	value = !!blob[0];
 }
@@ -121,7 +123,7 @@ inline void
 blob_to_value (BlobView const blob, float16_t& value)
 {
 	if (blob.size() != sizeof (value))
-		throw InvalidBlobSize();
+		throw InvalidBlobSize (blob.size(), sizeof (value));
 
 	union {
 		float16_t	value;
@@ -147,7 +149,7 @@ template<class Trivial>
 	blob_to_value (std::enable_if_t<std::is_trivial_v<Trivial>, BlobView> const blob, Trivial& value)
 	{
 		if (blob.size() != sizeof (value))
-			throw InvalidBlobSize();
+			throw InvalidBlobSize (blob.size(), sizeof (value));
 
 		union {
 			Trivial	value;

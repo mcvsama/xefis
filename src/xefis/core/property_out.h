@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <optional>
 #include <variant>
 
@@ -49,7 +50,7 @@ class BasicPropertyOut: virtual public PropertyVirtualInterface
 
 
 template<class pValue>
-	class PropertyOut:
+	class PropertyOut final:
 		public BasicPropertyOut,
 		public Property<pValue>
 	{
@@ -99,13 +100,31 @@ template<class pValue>
 		 * Set no data source for this property.
 		 */
 		void
-		operator<< (Nil);
+		operator<< (NoDataSource) override;
 
 		/**
 		 * Set PropertyOut as a data source for this property.
 		 */
 		void
 		operator<< (PropertyOut<Value>& other);
+
+		/**
+		 * Increase use-count of this property.
+		 * Add given property to list of users of this property.
+		 */
+		void
+		inc_use_count (BasicProperty*) noexcept;
+
+		/**
+		 * Decrease use-count of this property.
+		 * Remove given property from list of users of this property.
+		 */
+		void
+		dec_use_count (BasicProperty*) noexcept;
+
+		// BasicProperty API
+		std::size_t
+		use_count() const noexcept override;
 
 		// BasicProperty API
 		void
@@ -139,6 +158,10 @@ template<class pValue>
 		void
 		from_blob (BlobView) override;
 
+		// PropertyVirtualInterface API
+		void
+		deregister() override;
+
 	  private:
 		void
 		inc_source_use_count() noexcept;
@@ -148,6 +171,7 @@ template<class pValue>
 
 	  private:
 		std::variant<std::monostate, ModuleIO*, PropertyOut<Value>*>	_data_source;
+		std::vector<BasicProperty*>										_data_sinks;
 		Cycle::Number													_fetch_cycle_number { 0 };
 	};
 
@@ -158,6 +182,7 @@ template<class V>
 		Property<V> (owner_and_data_source, path)
 	{
 		_data_source = owner_and_data_source;
+		_data_sinks.reserve (8);
 		inc_source_use_count();
 		ModuleIO::ProcessingLoopAPI (*this->io()).register_output_property (*this);
 	}
@@ -167,8 +192,10 @@ template<class V>
 	inline
 	PropertyOut<V>::~PropertyOut()
 	{
-		if (this->io())
-			ModuleIO::ProcessingLoopAPI (*this->io()).unregister_output_property (*this);
+		for (auto* data_sink: _data_sinks)
+			(*data_sink) << no_data_source;
+
+		deregister();
 	}
 
 
@@ -216,7 +243,7 @@ template<class V>
 
 template<class V>
 	inline void
-	PropertyOut<V>::operator<< (Nil)
+	PropertyOut<V>::operator<< (NoDataSource)
 	{
 		dec_source_use_count();
 		_data_source = std::monostate();
@@ -231,6 +258,31 @@ template<class V>
 		dec_source_use_count();
 		_data_source = &other;
 		inc_source_use_count();
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::inc_use_count (BasicProperty* data_sink) noexcept
+	{
+		_data_sinks.push_back (data_sink);
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::dec_use_count (BasicProperty* data_sink) noexcept
+	{
+		auto new_end = std::remove (_data_sinks.begin(), _data_sinks.end(), data_sink);
+		_data_sinks.resize (std::distance (_data_sinks.begin(), new_end));
+	}
+
+
+template<class V>
+	inline std::size_t
+	PropertyOut<V>::use_count() const noexcept
+	{
+		return _data_sinks.size();
 	}
 
 
@@ -315,6 +367,19 @@ template<class V>
 
 template<class V>
 	inline void
+	PropertyOut<V>::deregister()
+	{
+		if (this->io())
+			ModuleIO::ProcessingLoopAPI (*this->io()).unregister_output_property (*this);
+
+		// Order is important:
+		(*this) << no_data_source;
+		this->_owner = nullptr;
+	}
+
+
+template<class V>
+	inline void
 	PropertyOut<V>::inc_source_use_count() noexcept
 	{
 		std::visit (overload {
@@ -325,7 +390,7 @@ template<class V>
 				// No action
 			},
 			[&] (PropertyOut<Value>* property_source) noexcept {
-				property_source->inc_use_count();
+				property_source->inc_use_count (this);
 			}
 		}, _data_source);
 	}
@@ -343,7 +408,7 @@ template<class V>
 				// No action
 			},
 			[&] (PropertyOut<Value>* property_source) noexcept {
-				property_source->dec_use_count();
+				property_source->dec_use_count (this);
 			}
 		}, _data_source);
 	}

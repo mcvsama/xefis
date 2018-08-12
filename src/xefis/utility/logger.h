@@ -25,7 +25,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/strong_type.h>
-#include <xefis/utility/time_helper.h>
 
 
 namespace xf {
@@ -86,6 +85,12 @@ class Logger
 	set_prefix (std::string const& prefix);
 
 	/**
+	 * Enable/disable timestamps in logs.
+	 */
+	void
+	set_timestamps_enabled (bool enabled);
+
+	/**
 	 * Log function. Adds prefix to all calls.
 	 */
 	template<class Item>
@@ -104,6 +109,7 @@ class Logger
 	prepare_line (std::ostream&) const;
 
   private:
+	bool					_add_timestamps		{ true };
 	std::string				_prefix;
 	Output					_output;
 	ProcessingLoop const*	_processing_loop	{ nullptr };

@@ -19,8 +19,7 @@
 #include <xefis/utility/numeric.h>
 
 
-namespace xf {
-namespace test {
+namespace xf::test {
 
 static xf::RuntimeTest t1 ("numeric: integral()", []{
 	using namespace xf::test_asserts;
@@ -30,6 +29,5 @@ static xf::RuntimeTest t1 ("numeric: integral()", []{
 	verify_equal_with_epsilon ("integrated sin() is correct", int1, -0.28948, 1e-5);
 });
 
-} // namespace test
-} // namespace xf
+} // namespace xf::test
 
