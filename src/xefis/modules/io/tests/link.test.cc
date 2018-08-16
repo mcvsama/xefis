@@ -115,7 +115,7 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 	tx_protocol.produce (blob, g_logger);
 	auto end = rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
-	xf::test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
+	test_asserts::verify ("rx_protocol ate all input bytes", end == blob.end());
 }
 
 
@@ -127,14 +127,14 @@ static xf::RuntimeTest t1 ("modules/io/link: protocol: valid data transmission",
 
 	auto test = [&] {
 		transmit (tx_protocol, rx_protocol);
-		xf::test_asserts::verify ("nil_prop transmitted properly", rx_io.nil_prop.get_optional() == tx_io.nil_prop.get_optional());
-		xf::test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop.get_optional() == tx_io.angle_prop.get_optional());
-		xf::test_asserts::verify ("angle_prop transmitted properly", *rx_io.angle_prop == *tx_io.angle_prop);
-		xf::test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx_io.velocity_prop, *tx_io.velocity_prop, 0.1_kph);
-		xf::test_asserts::verify_equal_with_epsilon ("velocity prop with offset transmitted properly", *rx_io.velocity_prop_offset, *tx_io.velocity_prop_offset, 0.1_mps);
-		xf::test_asserts::verify ("bool_prop transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
-		xf::test_asserts::verify ("int_prop transmitted properly", *rx_io.int_prop == *tx_io.int_prop);
-		xf::test_asserts::verify ("uint_prop transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+		test_asserts::verify ("nil_prop transmitted properly", rx_io.nil_prop.get_optional() == tx_io.nil_prop.get_optional());
+		test_asserts::verify ("angle_prop transmitted properly (optional() version)", rx_io.angle_prop.get_optional() == tx_io.angle_prop.get_optional());
+		test_asserts::verify ("angle_prop transmitted properly", *rx_io.angle_prop == *tx_io.angle_prop);
+		test_asserts::verify_equal_with_epsilon ("velocity transmitted properly", *rx_io.velocity_prop, *tx_io.velocity_prop, 0.1_kph);
+		test_asserts::verify_equal_with_epsilon ("velocity prop with offset transmitted properly", *rx_io.velocity_prop_offset, *tx_io.velocity_prop_offset, 0.1_mps);
+		test_asserts::verify ("bool_prop transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
+		test_asserts::verify ("int_prop transmitted properly", *rx_io.int_prop == *tx_io.int_prop);
+		test_asserts::verify ("uint_prop transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 	};
 
 	tx_io.angle_prop << xf::ConstantSource (1.99_rad);
@@ -181,33 +181,33 @@ static xf::RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range val
 
 	tx_io.bool_prop << xf::ConstantSource (true);
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("bit-bool 1 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
+	test_asserts::verify ("bit-bool 1 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
 	tx_io.bool_prop << xf::ConstantSource (false);
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
+	test_asserts::verify ("bit-bool 0 is transmitted properly", *rx_io.bool_prop == *tx_io.bool_prop);
 
 	tx_io.bool_prop << xf::no_data_source;
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("nil bit-bool set to fall-back value", *rx_io.bool_prop == kFallbackBool);
+	test_asserts::verify ("nil bit-bool set to fall-back value", *rx_io.bool_prop == kFallbackBool);
 
 	// Test bit-int:
 
 	tx_io.uint_prop << xf::ConstantSource (11u);
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("bit-int 11 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+	test_asserts::verify ("bit-int 11 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
 	tx_io.uint_prop << xf::ConstantSource (17u);
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
+	test_asserts::verify ("out-of-range bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 
 	tx_io.uint_prop << xf::ConstantSource (15u);
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
+	test_asserts::verify ("bit-int 15 transmitted properly", *rx_io.uint_prop == *tx_io.uint_prop);
 
 	tx_io.uint_prop << xf::no_data_source;
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("nil bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
+	test_asserts::verify ("nil bit-int set to fall-back value", *rx_io.uint_prop == kFallbackInt);
 });
 
 
@@ -222,7 +222,7 @@ static xf::RuntimeTest t3 ("modules/io/link: protocol: offsets increase precisio
 	transmit (tx_protocol, rx_protocol);
 	auto delta = si::abs (*rx_io.velocity_prop - *tx_io.velocity_prop);
 	auto delta_with_offset = si::abs (*rx_io.velocity_prop_offset - *tx_io.velocity_prop_offset);
-	xf::test_asserts::verify ("offsets increase precision", delta_with_offset < delta);
+	test_asserts::verify ("offsets increase precision", delta_with_offset < delta);
 });
 
 
@@ -270,7 +270,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 
 	blob.clear();
 	tx_protocol.produce (blob, g_logger);
-	xf::test_asserts::verify ("blob is long enough", blob.size() >= 16);
+	test_asserts::verify ("blob is long enough", blob.size() >= 16);
 	// Mess with both messages:
 	blob[12] = 0x00;
 	blob[13] = 0xff;
@@ -283,33 +283,33 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 	rx_protocol.eat (blob.begin(), blob.end(), nullptr, nullptr, nullptr, g_logger);
 
 	// Test that values weren't changed during last invalid transmission:
-	xf::test_asserts::verify ("nil_prop didn't change", !rx_io.nil_prop);
-	xf::test_asserts::verify ("angle_prop is didn't change", *rx_io.angle_prop == 15_rad);
-	xf::test_asserts::verify_equal_with_epsilon ("velocity_prop didn't change", *rx_io.velocity_prop, 100_mps, 0.1_mps);
-	xf::test_asserts::verify_equal_with_epsilon ("velocity_prop_offset didn't change", *rx_io.velocity_prop_offset, 102_mps, 0.1_mps);
-	xf::test_asserts::verify ("int_prop didn't change", *rx_io.int_prop == -5);
-	xf::test_asserts::verify ("bool_prop didn't change", *rx_io.bool_prop == false);
-	xf::test_asserts::verify ("uint_prop didn't change", *rx_io.uint_prop == 15u);
+	test_asserts::verify ("nil_prop didn't change", !rx_io.nil_prop);
+	test_asserts::verify ("angle_prop is didn't change", *rx_io.angle_prop == 15_rad);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop didn't change", *rx_io.velocity_prop, 100_mps, 0.1_mps);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset didn't change", *rx_io.velocity_prop_offset, 102_mps, 0.1_mps);
+	test_asserts::verify ("int_prop didn't change", *rx_io.int_prop == -5);
+	test_asserts::verify ("bool_prop didn't change", *rx_io.bool_prop == false);
+	test_asserts::verify ("uint_prop didn't change", *rx_io.uint_prop == 15u);
 
 	// Test fail-safe and retaining of original values:
 	rx_protocol.failsafe();
-	xf::test_asserts::verify ("nil_prop is nil", !rx_io.nil_prop);
-	xf::test_asserts::verify ("angle_prop is nil", !rx_io.angle_prop);
-	xf::test_asserts::verify ("angle_prop_r is retained", *rx_io.angle_prop_r == 15_rad);
-	xf::test_asserts::verify ("velocity_prop is nil", !rx_io.velocity_prop);
-	xf::test_asserts::verify_equal_with_epsilon ("velocity_prop_r is retained", *rx_io.velocity_prop_r, 100_mps, 0.1_mps);
-	xf::test_asserts::verify ("velocity_prop_offset is nil", !rx_io.velocity_prop_offset);
-	xf::test_asserts::verify_equal_with_epsilon ("velocity_prop_offset_r is retained", *rx_io.velocity_prop_offset_r, 102_mps, 0.1_mps);
-	xf::test_asserts::verify ("bool_prop is nil", !rx_io.bool_prop);
-	xf::test_asserts::verify ("bool_prop_r is retained", *rx_io.bool_prop_r == false);
-	xf::test_asserts::verify ("int_prop is nil", !rx_io.int_prop);
-	xf::test_asserts::verify ("int_prop_r is retained", *rx_io.int_prop_r == -5);
-	xf::test_asserts::verify ("uint_prop is nil", !!rx_io.uint_prop);
-	xf::test_asserts::verify ("uint_prop_r is retained", *rx_io.uint_prop_r == 15u);
+	test_asserts::verify ("nil_prop is nil", !rx_io.nil_prop);
+	test_asserts::verify ("angle_prop is nil", !rx_io.angle_prop);
+	test_asserts::verify ("angle_prop_r is retained", *rx_io.angle_prop_r == 15_rad);
+	test_asserts::verify ("velocity_prop is nil", !rx_io.velocity_prop);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_r is retained", *rx_io.velocity_prop_r, 100_mps, 0.1_mps);
+	test_asserts::verify ("velocity_prop_offset is nil", !rx_io.velocity_prop_offset);
+	test_asserts::verify_equal_with_epsilon ("velocity_prop_offset_r is retained", *rx_io.velocity_prop_offset_r, 102_mps, 0.1_mps);
+	test_asserts::verify ("bool_prop is nil", !rx_io.bool_prop);
+	test_asserts::verify ("bool_prop_r is retained", *rx_io.bool_prop_r == false);
+	test_asserts::verify ("int_prop is nil", !rx_io.int_prop);
+	test_asserts::verify ("int_prop_r is retained", *rx_io.int_prop_r == -5);
+	test_asserts::verify ("uint_prop is nil", !!rx_io.uint_prop);
+	test_asserts::verify ("uint_prop_r is retained", *rx_io.uint_prop_r == 15u);
 });
 
 
-static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset works", []{
+static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
 	GCS_Tx_LinkIO tx_io;
@@ -326,12 +326,12 @@ static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset wo
 	for (size_t i = 0; i < 8; ++i)
 	{
 		transmit (tx_protocol, rx_protocol);
-		xf::test_asserts::verify ("last envelope not sent in " + std::to_string (i) + "-th transmission", !rx_io.dummy);
+		test_asserts::verify ("last envelope not sent in " + std::to_string (i) + "-th transmission", !rx_io.dummy);
 	}
 
 	// 8th transmission (every 10th envelope is sent, but offset is 8 and this is the first time):
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("last envelope sent for the first time", *rx_io.dummy == *tx_io.dummy);
+	test_asserts::verify ("last envelope sent for the first time", *rx_io.dummy == *tx_io.dummy);
 
 	tx_io.dummy << xf::ConstantSource (kSecondInt);
 
@@ -339,12 +339,12 @@ static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset wo
 	for (size_t i = 0; i < 9; ++i)
 	{
 		transmit (tx_protocol, rx_protocol);
-		xf::test_asserts::verify ("last envelope not sent in subsequent transmissions", *rx_io.dummy == kFirstInt);
+		test_asserts::verify ("last envelope not sent in subsequent transmissions", *rx_io.dummy == kFirstInt);
 	}
 
 	// 10th transmission updates the property:
 	transmit (tx_protocol, rx_protocol);
-	xf::test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
+	test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
 });
 
 } // namespace
