@@ -18,15 +18,15 @@
 #include <string>
 
 // Xefis:
-#include <xefis/core/processing_loop.h>
+#include <xefis/core/cycle.h>
 #include <xefis/core/property.h>
 #include <xefis/test/test.h>
 #include <xefis/utility/demangle.h>
 
 
 namespace xf::test {
+namespace {
 
-using namespace test_asserts;
 using namespace si::units;
 using namespace std::literals;
 
@@ -35,19 +35,44 @@ static std::ostringstream g_logger_buffer;
 static xf::Logger g_null_logger (g_logger_buffer);
 
 
+class TestCycle: public Cycle
+{
+  public:
+	explicit
+	TestCycle():
+		Cycle (1, 0_s, 1_s, g_null_logger)
+	{ }
+
+	TestCycle&
+	operator+= (si::Time dt)
+	{
+		Cycle::operator= (Cycle (number() + 1, update_time() + dt, dt, g_null_logger));
+		return *this;
+	}
+};
+
+
+template<class T>
+	struct TestEnvironment
+	{
+	  private:
+		std::unique_ptr<ModuleIO>	io		{ std::make_unique<ModuleIO>() };
+
+	  public:
+		PropertyOut<T>				out		{ io.get(), "out" };
+		PropertyOut<T>				mid		{ io.get(), "mid" };
+		PropertyIn<T>				in		{ io.get(), "in" };
+		Module<ModuleIO>			module	{ std::move (io) };
+		TestCycle					cycle;
+	};
+
+
 template<class T>
 	static std::string
 	desc_type (std::string_view str)
 	{
 		return str + " <"s + xf::demangle (typeid (T).name()) + ">";
 	}
-
-
-Cycle
-get_cycle (size_t cycle_number)
-{
-	return Cycle (cycle_number, 1_s, 1_s, g_null_logger);
-}
 
 
 template<class T, template<class> class AnyProperty>
@@ -123,177 +148,249 @@ template<class T, template<class> class AnyProperty>
 		// String serialization:
 		{
 			property.from_string (property.to_string());
-			test_asserts::verify (desc_type<T> ("to_string() on nil-property deserializes correctly to nil-property"), !property);
+			test_asserts::verify (desc_type<T> ("from_string(to_string()) on nil-property deserializes correctly to nil-property"), !property);
 		}
 
 		// Blob serialization:
 		{
 			property.from_blob (property.to_blob());
-			test_asserts::verify (desc_type<T> ("to_blob() on nil-property deserializes correctly to nil-property"), !property);
+			test_asserts::verify (desc_type<T> ("from_blob(to_blob()) on nil-property deserializes correctly to nil-property"), !property);
 		}
 	}
 
 
-template<class T>
-	inline void
-	do_t1 (T value1, T value2)
+template<class Lambda>
+	std::function<void()>
+	for_all_types (Lambda lambda)
 	{
-		ModuleIO io;
-		PropertyOut<T> output (&io, "output");
-		PropertyIn<T> input (&io, "input");
+		return [lambda] {
+			lambda.template operator()<bool, bool> (true, false);
+			lambda.template operator()<int8_t, int8_t> (120, -5);
+			lambda.template operator()<int16_t, int16_t> (1337, -5);
+			lambda.template operator()<int32_t, int32_t> (1337, -5);
+			lambda.template operator()<int64_t, int64_t> (1337, -5);
+			lambda.template operator()<uint8_t, uint8_t> (133, 5);
+			lambda.template operator()<uint16_t, uint16_t> (1337, 5);
+			lambda.template operator()<uint32_t, uint32_t> (1337, 5);
+			lambda.template operator()<uint64_t, uint64_t> (1337, 5);
+			lambda.template operator()<float16_t, float16_t> (0.125_half, 0.0_half);
+			lambda.template operator()<float32_t, float32_t> (0.125f, 0.0f);
+			lambda.template operator()<float64_t, float64_t> (0.125, 0.0);
+			lambda.template operator()<std::string, std::string> ("value-1", "value-2");
+		};
+	}
 
-		// The property should initially be nil:
-		test_nil_values (input, value2);
-		test_nil_values (output, value2);
 
-		// Non-nil values:
-		input << ConstantSource (value1);
-		test_non_nil_values (input, value2, "non-nil property");
+static xf::RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
+	TestEnvironment<decltype (value1)> env;
 
-		output = value1;
-		test_non_nil_values (output, value2, "non-nil property");
+	// The property should initially be nil:
+	test_nil_values (env.in, value2);
+	test_nil_values (env.out, value2);
 
-		// Nil again:
-		input << xf::no_data_source;
-		test_nil_values (input, value2);
+	// Non-nil values:
+	env.in << ConstantSource (value1);
+	test_non_nil_values (env.in, value2, "non-nil property");
 
-		output = xf::nil;
-		test_nil_values (output, value2);
+	env.out = value1;
+	test_non_nil_values (env.out, value2, "non-nil property");
+
+	// Nil again:
+	env.in << xf::no_data_source;
+	test_nil_values (env.in, value2);
+
+	env.out = xf::nil;
+	test_nil_values (env.out, value2);
+}));
+
+
+static xf::RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
+	using T = decltype (value1);
+
+	{
+		TestEnvironment<T> env;
 
 		// Fallback values:
-		input.set_fallback (value1);
-		test_non_nil_values (input, value2, "property with fallback value");
+		env.in.set_fallback (value1);
+		test_non_nil_values (env.in, value2, "property with fallback value");
 
-		output.set_fallback (value1);
-		test_non_nil_values (output, value2, "property with fallback value");
+		env.out.set_fallback (value1);
+		test_non_nil_values (env.out, value2, "property with fallback value");
 
 		// No fallback again:
-		input.set_fallback (std::nullopt);
-		test_nil_values (input, value2);
+		env.in.set_fallback (std::nullopt);
+		test_nil_values (env.in, value2);
 
-		output.set_fallback (std::nullopt);
-		test_nil_values (output, value2);
+		env.out.set_fallback (std::nullopt);
+		test_nil_values (env.out, value2);
+	}
 
-		// Test fallback_value provided in ctor:
-		{
-			auto const fallback_value = value1;
-			PropertyIn<T> f (&io, "fallback-test", fallback_value);
-			test_asserts::verify (desc_type<T> ("fallback-value set in ctor works"), *f == fallback_value);
-		}
+	// Test fallback_value provided in ctor:
+	{
+		auto const fallback_value = value1;
+		ModuleIO io;
+		PropertyIn<T> tmp_prop (&io, "fallback-test", fallback_value);
+		test_asserts::verify (desc_type<T> ("fallback-value set in ctor works"), *tmp_prop == fallback_value);
+	}
 
-		// Serial number:
-		{
-			output = value1;
-			auto serial_0 = output.serial();
+	// Test fallback on connected properties:
+	{
+		TestEnvironment<T> env;
 
-			output = value2;
-			auto serial_1 = output.serial();
-			test_asserts::verify (desc_type<T> ("serial increments when value changes"), serial_1 == serial_0 + 1);
+		env.in << env.mid;
+		env.mid << env.out;
 
-			output = value2;
-			auto serial_2 = output.serial();
-			test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change"), serial_2 == serial_1);
-		}
+		// Fallback on output property:
+		env.out.set_fallback (value2);
 
-		// Test serial on connected properties:
-		{
-			auto io = std::make_unique<ModuleIO>();
-			PropertyIn<T> i (io.get(), "input");
-			PropertyOut<T> o (io.get(), "output");
-			PropertyOut<T> m (io.get(), "middle");
-			Module<ModuleIO> mod (std::move (io));
+		env.out = value1;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("non-fallback value on PropertyOut works", *env.in == value1);
 
-			i << m;
-			m << o;
+		env.out = xf::nil;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("fallback value on PropertyOut works", *env.in == value2);
 
-			o = value1;
-			i.fetch (get_cycle (1));
-			auto serial_0 = i.serial();
+		// Fallback on middle property:
+		env.out.set_fallback (std::nullopt);
+		env.mid.set_fallback (value2);
 
-			o = value2;
-			i.fetch (get_cycle (2));
-			auto serial_1 = i.serial();
-			test_asserts::verify (desc_type<T> ("serial increments when value changes over connected properties"), serial_1 == serial_0 + 1);
+		env.out = value1;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("non-fallback value on middle PropertyOut works", *env.in == value1);
 
-			o = value2;
-			i.fetch (get_cycle (3));
-			auto serial_2 = i.serial();
-			test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change over connected properties"), serial_2 == serial_1);
-		}
+		env.out = xf::nil;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("fallback value on PropertyIn works", *env.in == value2);
 
-		{
-			PropertyIn<T> i (&io, "input");
-			PropertyOut<T> o (&io, "output");
+		// Fallback on input property:
+		env.out.set_fallback (std::nullopt);
+		env.mid.set_fallback (std::nullopt);
+		env.in.set_fallback (value2);
 
-			i << o;
-			test_asserts::verify ("fetch() throws when no Module is assigned",
-								  Exception::catch_and_log (g_null_logger, [&]{ i.fetch (get_cycle (1)); }));
-		}
+		env.out = value1;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("non-fallback value on PropertyIn works", *env.in == value1);
 
-		// Test if data is transferred from output to input properties properly:
-		{
-			auto io = std::make_unique<ModuleIO>();
-			PropertyIn<T> i (io.get(), "input");
-			PropertyOut<T> o (io.get(), "output");
-			PropertyOut<T> m (io.get(), "middle");
-			Module<ModuleIO> mod (std::move (io));
+		env.out = xf::nil;
+		env.in.fetch (env.cycle += 1_s);
+		test_asserts::verify ("fallback value on PropertyIn works", *env.in == value2);
+	}
+}));
 
-			i << m;
-			m << o;
 
-			o = value1;
-			i.fetch (get_cycle (1));
-			test_asserts::verify ("transferring data from output to input properties works (1)", *i == value1);
+static xf::RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
+	using T = decltype (value1);
 
-			o = value2;
-			i.fetch (get_cycle (2));
-			test_asserts::verify ("transferring data from output to input properties works (2)", *i == value2);
+	// Serial number:
+	{
+		TestEnvironment<T> env;
 
-			o = value1;
-			i.fetch (get_cycle (2)); // Note the same cycle number as before; value should not change.
-			test_asserts::verify ("caching values if cycle-number doesn't change works", *i == value2);
+		env.out = value1;
+		auto serial_0 = env.out.serial();
 
-			o = xf::nil;
-			i.fetch (get_cycle (3));
-			test_asserts::verify ("transferring nil-values from output to input properties works", i.is_nil());
-		}
+		env.out = value2;
+		auto serial_1 = env.out.serial();
+		test_asserts::verify (desc_type<T> ("serial increments when value changes"), serial_1 == serial_0 + 1);
 
-		// Serialization:
+		env.out = value2;
+		auto serial_2 = env.out.serial();
+		test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change"), serial_2 == serial_1);
+	}
+
+	// Test serial on connected properties:
+	{
+		TestEnvironment<T> env;
+
+		env.in << env.mid;
+		env.mid << env.out;
+
+		env.out = value1;
+		env.in.fetch (env.cycle += 1_s);
+		auto serial_0 = env.in.serial();
+
+		env.out = value2;
+		env.in.fetch (env.cycle += 1_s);
+		auto serial_1 = env.in.serial();
+		test_asserts::verify (desc_type<T> ("serial increments when value changes over connected properties"), serial_1 == serial_0 + 1);
+
+		env.out = value2;
+		env.in.fetch (env.cycle += 1_s);
+		auto serial_2 = env.in.serial();
+		test_asserts::verify (desc_type<T> ("serial does not increment when value doesn't change over connected properties"), serial_2 == serial_1);
+	}
+}));
+
+
+static xf::RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
+	using T = decltype (value1);
+
+	TestEnvironment<T> env;
+
+	// Test if data is transferred from output to input properties properly:
+	env.in << env.mid;
+	env.mid << env.out;
+
+	env.out = value1;
+	env.in.fetch (env.cycle += 1_s);
+	test_asserts::verify ("transferring data from output to input properties works (1)", *env.in == value1);
+
+	env.out = value2;
+	env.in.fetch (env.cycle += 1_s);
+	test_asserts::verify ("transferring data from output to input properties works (2)", *env.in == value2);
+
+	env.out = value1;
+	env.in.fetch (env.cycle); // Note the same cycle as before; value should not change.
+	test_asserts::verify ("caching values if cycle-number doesn't change works", *env.in == value2);
+
+	env.out = xf::nil;
+	env.in.fetch (env.cycle += 1_s);
+	test_asserts::verify ("transferring nil-values from output to input properties works", env.in.is_nil());
+}));
+
+
+static xf::RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
+	using T = decltype (value1);
+
+	// Serialization:
+	{
+		TestEnvironment<T> env;
+
 		for (auto const& value: { value1, value2 })
 		{
-			input << ConstantSource (value);
-			test_serialization (input, value);
+			env.in << ConstantSource (value);
+			test_serialization (env.in, value);
 
-			output = value;
-			test_serialization (output, value);
-		}
-
-		// Serialization of nil-values:
-		{
-			input << xf::no_data_source;
-			test_nil_serialization (input);
-
-			output = xf::nil;
-			test_nil_serialization (output);
+			env.out = value;
+			test_serialization (env.out, value);
 		}
 	}
 
+	// Serialization of nil-values:
+	{
+		TestEnvironment<T> env;
 
-static xf::RuntimeTest t1 ("xf::Property behavior", []{
-	do_t1<bool> (true, false);
-	do_t1<int8_t> (120, -5);
-	do_t1<int16_t> (1337, -5);
-	do_t1<int32_t> (1337, -5);
-	do_t1<int64_t> (1337, -5);
-	do_t1<uint8_t> (133, 5);
-	do_t1<uint16_t> (1337, 5);
-	do_t1<uint32_t> (1337, 5);
-	do_t1<uint64_t> (1337, 5);
-	do_t1<float16_t> (0.125_half, 0.0_half);
-	do_t1<float32_t> (0.125f, 0.0f);
-	do_t1<float64_t> (0.125, 0.0);
-	do_t1<std::string> ("value-1", "value-2");
-});
+		env.in << xf::no_data_source;
+		test_nil_serialization (env.in);
 
+		env.out = xf::nil;
+		test_nil_serialization (env.out);
+	}
+}));
+
+
+static xf::RuntimeTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
+	using T = decltype (value1);
+
+	ModuleIO io;
+	PropertyOut<T> out { &io, "out" };
+	PropertyIn<T> in { &io, "in" };
+
+	in << out;
+	test_asserts::verify ("fetch() throws when no Module is assigned",
+						  Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
+}));
+
+} // namespace
 } // namespace xf::test
 
