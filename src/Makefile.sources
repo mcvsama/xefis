@@ -292,6 +292,7 @@ SELFTEST_HEADERS		+= xefis/core/property.h
 SELFTEST_HEADERS		+= xefis/core/property.tcc
 
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
+SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
 SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
 SELFTEST_SOURCES		+= xefis/core/property_observer.cc
