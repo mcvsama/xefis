@@ -58,8 +58,8 @@ class PropertyObserver
 		BasicProperty::Serial									_saved_serial	= 0;
 	};
 
-	typedef std::list<Object>			ObjectsList;
-	typedef std::list<SmootherBase*>	SmoothersList;
+	typedef std::vector<Object>			ObjectsList;
+	typedef std::vector<SmootherBase*>	SmoothersList;
 
   public:
 	typedef BasicProperty::Serial		Serial;
