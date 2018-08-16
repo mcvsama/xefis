@@ -213,28 +213,4 @@ parse (std::string_view const&, SpeedMode&);
 
 } // namespace afcs_api
 
-
-namespace xf {
-
-template<>
-	struct PropertyTraits<afcs_api::ThrustMode>: public EnumPropertyTraits<afcs_api::ThrustMode>
-	{ };
-
-
-template<>
-	struct PropertyTraits<afcs_api::RollMode>: public EnumPropertyTraits<afcs_api::RollMode>
-	{ };
-
-
-template<>
-	struct PropertyTraits<afcs_api::PitchMode>: public EnumPropertyTraits<afcs_api::PitchMode>
-	{ };
-
-
-template<>
-	struct PropertyTraits<afcs_api::SpeedMode>: public EnumPropertyTraits<afcs_api::SpeedMode>
-	{ };
-
-} // namespace xf
-
 #endif

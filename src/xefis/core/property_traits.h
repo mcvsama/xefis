@@ -326,7 +326,7 @@ template<class FloatingPoint>
 	};
 
 
-template<class Value>
+template<class Value, class Enabled = void>
 	struct PropertyTraits
 	{
 		static constexpr bool
@@ -619,6 +619,14 @@ template<class Unit>
 			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
 		}
 	};
+
+
+/**
+ * Automatically applies EnumPropertyTraits to all enum types.
+ */
+template<class Enum>
+	struct PropertyTraits<Enum, std::enable_if_t<std::is_enum_v<Enum>>>: public EnumPropertyTraits<Enum>
+	{ };
 
 } // namespace xf
 
