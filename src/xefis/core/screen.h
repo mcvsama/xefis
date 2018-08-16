@@ -35,7 +35,6 @@
 
 
 namespace xf {
-
 namespace detail {
 
 /**

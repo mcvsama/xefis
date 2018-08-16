@@ -21,6 +21,7 @@
 
 namespace si {
 namespace detail {
+namespace {
 
 template<class pUnit>
 	void
@@ -198,6 +199,7 @@ initialize_unit2symbol_map()
 	return result;
 }
 
+} // namespace
 } // namespace detail
 
 

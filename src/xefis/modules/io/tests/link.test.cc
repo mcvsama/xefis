@@ -119,7 +119,7 @@ void transmit (LinkProtocol& tx_protocol, LinkProtocol& rx_protocol)
 }
 
 
-static xf::RuntimeTest t1 ("modules/io/link: protocol: valid data transmission", []{
+RuntimeTest t1 ("modules/io/link: protocol: valid data transmission", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -171,7 +171,7 @@ static xf::RuntimeTest t1 ("modules/io/link: protocol: valid data transmission",
 });
 
 
-static xf::RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
+RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range values transmission", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -211,7 +211,7 @@ static xf::RuntimeTest t2 ("modules/io/link: protocol: nils and out-of range val
 });
 
 
-static xf::RuntimeTest t3 ("modules/io/link: protocol: offsets increase precision", []{
+RuntimeTest t3 ("modules/io/link: protocol: offsets increase precision", []{
 	GCS_Tx_LinkIO tx_io;
 	Aircraft_Rx_LinkIO rx_io;
 	GCS_Tx_LinkProtocol tx_protocol (&tx_io);
@@ -226,7 +226,7 @@ static xf::RuntimeTest t3 ("modules/io/link: protocol: offsets increase precisio
 });
 
 
-static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
+RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission (wrong signature)", []{
 	// This tests signature verification and checks if values are retained or not, according to the protocol.
 
 	GCS_Tx_LinkIO tx_io;
@@ -309,7 +309,7 @@ static xf::RuntimeTest t4 ("modules/io/link: protocol: invalid data transmission
 });
 
 
-static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
+RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset", []{
 	// The third envelope should be sent every two packets, starting from packet with index 1.
 
 	GCS_Tx_LinkIO tx_io;
