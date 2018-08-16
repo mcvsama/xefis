@@ -49,6 +49,7 @@
 class LinkIO;
 
 
+// This module belongs to systems rather than io
 class LinkProtocol
 {
   public:

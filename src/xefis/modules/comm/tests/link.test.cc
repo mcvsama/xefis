@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/test/test.h>
-#include <xefis/modules/io/link.h>
+#include <xefis/modules/comm/link.h>
 
 
 namespace xf::test {
