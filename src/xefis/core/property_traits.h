@@ -577,7 +577,7 @@ template<class Unit>
 		static constexpr size_t
 		constant_blob_size()
 		{
-			return sizeof (typename si::Quantity<Unit>::Value);
+			return 1 + sizeof (typename si::Quantity<Unit>::Value);
 		}
 
 		static inline std::string
