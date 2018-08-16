@@ -21,27 +21,20 @@
 #include "magnetic_variation.h"
 
 
-// Forward:
-unsigned long int
-yymmdd_to_julian_days (int yy, int mm, int dd);
-
-// Forward:
-double
-calc_magvar (double lat, double lon, double h, long dat, double* field);
-
+namespace xf {
 
 void
-xf::MagneticVariation::set_date (int year, int month, int day)
+MagneticVariation::set_date (int year, int month, int day)
 {
-	_julian_date = yymmdd_to_julian_days (year, month, day);
+	_julian_date = _implementation.yymmdd_to_julian_days (year, month, day);
 }
 
 
 void
-xf::MagneticVariation::update()
+MagneticVariation::update()
 {
     double field[6];
-    _magnetic_declination = 1_rad * calc_magvar (_position.lat().in<Radian>(), _position.lon().in<Radian>(), _altitude_amsl.in<Kilometer>(), _julian_date, field);
+    _magnetic_declination = 1_rad * _implementation.calc_magvar (_position.lat().in<Radian>(), _position.lon().in<Radian>(), _altitude_amsl.in<Kilometer>(), _julian_date, field);
 	_magnetic_inclination = 1_rad * std::atan (field[5] / std::sqrt (field[3] * field[3] + field[4] * field[4]));
 }
 
@@ -130,11 +123,11 @@ xf::MagneticVariation::update()
 #include <cmath>
 
 
-static const double a = 6378.137;       /* semi-major axis (equatorial radius) of WGS84 ellipsoid */
-static const double b = 6356.7523142;   /* semi-minor axis referenced to the WGS84 ellipsoid */
-static const double r_0 = 6371.2;       /* standard Earth magnetic reference radius  */
+static constexpr double a = 6378.137;       /* semi-major axis (equatorial radius) of WGS84 ellipsoid */
+static constexpr double b = 6356.7523142;   /* semi-minor axis referenced to the WGS84 ellipsoid */
+static constexpr double r_0 = 6371.2;       /* standard Earth magnetic reference radius  */
 
-static double gnm_wmm2005[13][13] =
+static constexpr double gnm_wmm2005[13][13] =
 {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {-29556.8, -1671.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -151,7 +144,7 @@ static double gnm_wmm2005[13][13] =
     {-2.4, -0.4, 0.2, 0.8, -0.3, 1.1, -0.5, 0.4, -0.3, -0.3, -0.1, -0.3, -0.1},
 };
 
-static double hnm_wmm2005[13][13]=
+static constexpr double hnm_wmm2005[13][13]=
 {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {0.0, 5079.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -168,7 +161,7 @@ static double hnm_wmm2005[13][13]=
     {0.0, -0.4, 0.3, 2.4, -2.6, 0.6, 0.3, 0.0, 0.0, 0.3, -0.9, -0.4, 0.8},
 };
 
-static double gtnm_wmm2005[13][13]=
+static constexpr double gtnm_wmm2005[13][13]=
 {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {8.0, 10.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -185,7 +178,7 @@ static double gtnm_wmm2005[13][13]=
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 };
 
-static double htnm_wmm2005[13][13]=
+static constexpr double htnm_wmm2005[13][13]=
 {
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     {0.0, -20.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -202,27 +195,35 @@ static double htnm_wmm2005[13][13]=
     {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
 };
 
-static const int nmax = 12;
+static constexpr int nmax = 12;
 
-static double P[13][13];
-static double DP[13][13];
-static double gnm[13][13];
-static double hnm[13][13];
-static double sm[13];
-static double cm[13];
 
-static double root[13];
-static double roots[13][13][2];
+MagneticVariationImpl::MagneticVariationImpl()
+{
+	for ( int n = 2; n <= nmax; n++ ) {
+		root[n] = sqrt((2.0*n-1) / (2.0*n));
+	}
+
+	for ( int m = 0; m <= nmax; m++ ) {
+		double mm = m*m;
+		for ( int n = std::max (m + 1, 2); n <= nmax; n++ ) {
+			roots[m][n][0] = sqrt((n-1)*(n-1) - mm);
+			roots[m][n][1] = 1.0 / sqrt( n*n - mm);
+		}
+	}
+}
+
 
 /* Convert date to Julian day    1950-2049 */
-unsigned long int yymmdd_to_julian_days( int yyyy, int mm, int dd )
+unsigned long int
+MagneticVariationImpl::yymmdd_to_julian_days( int yyyy, int mm, int dd )
 {
 	// Removed stupid hack with two-digit year. <mcv>
 
     unsigned long jd;
 	int yy;
 
-	yy = xf::clamped (yyyy, 1950, 2049);
+	yy = clamped (yyyy, 1950, 2049);
     jd = dd - 32075L + 1461L * (yy + 4800L + (mm - 14) / 12 ) / 4;
     jd = jd + 367L * (mm - 2 - (mm - 14) / 12*12) / 12;
     jd = jd - 3 * ((yy + 4900L + (mm - 14) / 12) / 100) / 4;
@@ -237,8 +238,8 @@ unsigned long int yymmdd_to_julian_days( int yyyy, int mm, int dd )
  * longitude(radians), height (km) and (Julian) date
  * N and E lat and long are positive, S and W negative
 */
-
-double calc_magvar( double lat, double lon, double h, long dat, double* field )
+double
+MagneticVariationImpl::calc_magvar( double lat, double lon, double h, long dat, double* field )
 {
     /* output field B_r,B_th,B_phi,B_x,B_y,B_z */
     int n,m;
@@ -247,8 +248,6 @@ double calc_magvar( double lat, double lon, double h, long dat, double* field )
 
     double yearfrac,sr,r,theta,c,s,psi,fn,fn_0,B_r,B_theta,B_phi,X,Y,Z;
     double sinpsi, cospsi, inv_s;
-
-    static int been_here = 0;
 
     double sinlat = sin(lat);
     double coslat = cos(lat);
@@ -288,22 +287,6 @@ double calc_magvar( double lat, double lon, double h, long dat, double* field )
     DP[1][1] = c;
     P[1][0] = c ;
     DP[1][0] = -s;
-
-    // these values will not change for subsequent function calls
-    if( !been_here ) {
-        for ( n = 2; n <= nmax; n++ ) {
-            root[n] = sqrt((2.0*n-1) / (2.0*n));
-        }
-
-        for ( m = 0; m <= nmax; m++ ) {
-            double mm = m*m;
-            for ( n = std::max (m + 1, 2); n <= nmax; n++ ) {
-                roots[m][n][0] = sqrt((n-1)*(n-1) - mm);
-                roots[m][n][1] = 1.0 / sqrt( n*n - mm);
-            }
-        }
-        been_here = 1;
-    }
 
     for ( n=2; n <= nmax; n++ ) {
         // double root = sqrt((2.0*n-1) / (2.0*n));
@@ -506,3 +489,6 @@ double SGMagVarOrig( double lat, double lon, double h, long dat, double* field )
     return atan2(Y, X);  /* E is positive */
 }
 #endif // TEST_NHV_HACKS
+
+} // namespace xf
+
