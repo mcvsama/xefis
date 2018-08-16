@@ -31,8 +31,44 @@ using namespace si::units;
 using namespace std::literals;
 
 
-static std::ostringstream g_logger_buffer;
-static xf::Logger g_null_logger (g_logger_buffer);
+inline namespace test_enum {
+
+enum class TestEnum
+{
+	Value1,
+	Value2,
+};
+
+
+constexpr std::string_view
+to_string (TestEnum value)
+{
+	switch (value)
+	{
+		case TestEnum::Value1:	return "Value1";
+		case TestEnum::Value2:	return "Value2";
+	}
+
+	return "";
+}
+
+
+void
+parse (std::string_view const& str, TestEnum& value)
+{
+	if (str == "Value1")
+		value = TestEnum::Value1;
+	else if (str == "Value2")
+		value = TestEnum::Value2;
+	else
+		throw Exception ("invalid enum string \""s + str + "\"");
+}
+
+} // namespace test_enum
+
+
+std::ostringstream g_logger_buffer;
+xf::Logger g_null_logger (g_logger_buffer);
 
 
 class TestCycle: public Cycle
@@ -67,8 +103,32 @@ template<class T>
 	};
 
 
+template<class Lambda>
+	std::function<void()>
+	for_all_types (Lambda lambda)
+	{
+		return [lambda] {
+			lambda.template operator()<bool, bool> (true, false);
+			lambda.template operator()<int8_t, int8_t> (120, -5);
+			lambda.template operator()<int16_t, int16_t> (1337, -5);
+			lambda.template operator()<int32_t, int32_t> (1337, -5);
+			lambda.template operator()<int64_t, int64_t> (1337, -5);
+			lambda.template operator()<uint8_t, uint8_t> (133, 5);
+			lambda.template operator()<uint16_t, uint16_t> (1337, 5);
+			lambda.template operator()<uint32_t, uint32_t> (1337, 5);
+			lambda.template operator()<uint64_t, uint64_t> (1337, 5);
+			lambda.template operator()<float16_t, float16_t> (0.125_half, 0.0_half);
+			lambda.template operator()<float32_t, float32_t> (0.125f, 0.0f);
+			lambda.template operator()<float64_t, float64_t> (0.125, 0.0);
+			lambda.template operator()<std::string, std::string> ("value-1", "value-2");
+			lambda.template operator()<si::Length> (1.15_m, -2.5_m);
+			lambda.template operator()<TestEnum> (TestEnum::Value1, TestEnum::Value2);
+		};
+	}
+
+
 template<class T>
-	static std::string
+	std::string
 	desc_type (std::string_view str)
 	{
 		return str + " <"s + xf::demangle (typeid (T).name()) + ">";
@@ -76,7 +136,7 @@ template<class T>
 
 
 template<class T, template<class> class AnyProperty>
-	static void
+	void
 	test_nil_values (AnyProperty<T> const& property, T test_value)
 	{
 		test_asserts::verify (desc_type<T> ("nil property is converted to false"),
@@ -100,7 +160,7 @@ template<class T, template<class> class AnyProperty>
 
 
 template<class T, template<class> class AnyProperty>
-	static void
+	void
 	test_non_nil_values (AnyProperty<T> const& property, T test_value, std::string_view what)
 	{
 		test_asserts::verify (desc_type<T> (what + " converts to true"s),
@@ -123,11 +183,22 @@ template<class T, template<class> class AnyProperty>
 	}
 
 
+template<class T>
+	constexpr bool
+	should_test_string_serialization()
+	{
+		// String-serialization is not symmetrical for all types, it doesn't have to, it's for user-interface anyway.
+		// So test this only if it makes sense for T to be symmetrically string-serialized.
+		return std::is_arithmetic<T>() || std::is_same<T, float16_t>() || std::is_same<T, bool>();
+	}
+
+
 template<class T, template<class> class AnyProperty>
-	static void
+	void
 	test_serialization (AnyProperty<T>& property, T value)
 	{
 		// String serialization:
+		if constexpr (should_test_string_serialization<T>())
 		{
 			property.from_string (property.to_string());
 			test_asserts::verify (desc_type<T> ("to_string() serialization works correctly for "), *property == value);
@@ -142,10 +213,11 @@ template<class T, template<class> class AnyProperty>
 
 
 template<class T, template<class> class AnyProperty>
-	static void
+	void
 	test_nil_serialization (AnyProperty<T>& property)
 	{
 		// String serialization:
+		if constexpr (should_test_string_serialization<T>())
 		{
 			property.from_string (property.to_string());
 			test_asserts::verify (desc_type<T> ("from_string(to_string()) on nil-property deserializes correctly to nil-property"), !property);
@@ -159,29 +231,7 @@ template<class T, template<class> class AnyProperty>
 	}
 
 
-template<class Lambda>
-	std::function<void()>
-	for_all_types (Lambda lambda)
-	{
-		return [lambda] {
-			lambda.template operator()<bool, bool> (true, false);
-			lambda.template operator()<int8_t, int8_t> (120, -5);
-			lambda.template operator()<int16_t, int16_t> (1337, -5);
-			lambda.template operator()<int32_t, int32_t> (1337, -5);
-			lambda.template operator()<int64_t, int64_t> (1337, -5);
-			lambda.template operator()<uint8_t, uint8_t> (133, 5);
-			lambda.template operator()<uint16_t, uint16_t> (1337, 5);
-			lambda.template operator()<uint32_t, uint32_t> (1337, 5);
-			lambda.template operator()<uint64_t, uint64_t> (1337, 5);
-			lambda.template operator()<float16_t, float16_t> (0.125_half, 0.0_half);
-			lambda.template operator()<float32_t, float32_t> (0.125f, 0.0f);
-			lambda.template operator()<float64_t, float64_t> (0.125, 0.0);
-			lambda.template operator()<std::string, std::string> ("value-1", "value-2");
-		};
-	}
-
-
-static xf::RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
+RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types ([](auto value1, auto value2) {
 	TestEnvironment<decltype (value1)> env;
 
 	// The property should initially be nil:
@@ -204,7 +254,7 @@ static xf::RuntimeTest t1 ("xf::Property nil and non-nil values", for_all_types 
 }));
 
 
-static xf::RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
+RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	{
@@ -279,7 +329,7 @@ static xf::RuntimeTest t2 ("xf::Property fallback values", for_all_types ([](aut
 }));
 
 
-static xf::RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
+RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serial number:
@@ -322,7 +372,7 @@ static xf::RuntimeTest t3 ("xf::Property serial numbers", for_all_types ([](auto
 }));
 
 
-static xf::RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
+RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	TestEnvironment<T> env;
@@ -349,7 +399,7 @@ static xf::RuntimeTest t4 ("xf::Property transferring data", for_all_types ([](a
 }));
 
 
-static xf::RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
+RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, auto value2) {
 	using T = decltype (value1);
 
 	// Serialization:
@@ -379,7 +429,7 @@ static xf::RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto 
 }));
 
 
-static xf::RuntimeTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
+RuntimeTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, auto) {
 	using T = decltype (value1);
 
 	ModuleIO io;
