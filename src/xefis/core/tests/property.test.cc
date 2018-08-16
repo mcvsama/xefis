@@ -40,6 +40,14 @@ enum class TestEnum
 };
 
 
+enum class TestEnumWithNil
+{
+	Value1,
+	Value2,
+	xf_nil_value,
+};
+
+
 constexpr std::string_view
 to_string (TestEnum value)
 {
@@ -60,6 +68,34 @@ parse (std::string_view const& str, TestEnum& value)
 		value = TestEnum::Value1;
 	else if (str == "Value2")
 		value = TestEnum::Value2;
+	else
+		throw Exception ("invalid enum string \""s + str + "\"");
+}
+
+
+constexpr std::string_view
+to_string (TestEnumWithNil value)
+{
+	switch (value)
+	{
+		case TestEnumWithNil::Value1:		return "Value1";
+		case TestEnumWithNil::Value2:		return "Value2";
+		case TestEnumWithNil::xf_nil_value:	return "";
+	}
+
+	return "";
+}
+
+
+void
+parse (std::string_view const& str, TestEnumWithNil& value)
+{
+	if (str == "Value1")
+		value = TestEnumWithNil::Value1;
+	else if (str == "Value2")
+		value = TestEnumWithNil::Value2;
+	else if (str == "")
+		value = TestEnumWithNil::xf_nil_value;
 	else
 		throw Exception ("invalid enum string \""s + str + "\"");
 }
@@ -123,6 +159,7 @@ template<class Lambda>
 			lambda.template operator()<std::string, std::string> ("value-1", "value-2");
 			lambda.template operator()<si::Length> (1.15_m, -2.5_m);
 			lambda.template operator()<TestEnum> (TestEnum::Value1, TestEnum::Value2);
+			lambda.template operator()<TestEnumWithNil> (TestEnumWithNil::Value1, TestEnumWithNil::Value2);
 		};
 	}
 
@@ -190,44 +227,6 @@ template<class T>
 		// String-serialization is not symmetrical for all types, it doesn't have to, it's for user-interface anyway.
 		// So test this only if it makes sense for T to be symmetrically string-serialized.
 		return std::is_arithmetic<T>() || std::is_same<T, float16_t>() || std::is_same<T, bool>();
-	}
-
-
-template<class T, template<class> class AnyProperty>
-	void
-	test_serialization (AnyProperty<T>& property, T value)
-	{
-		// String serialization:
-		if constexpr (should_test_string_serialization<T>())
-		{
-			property.from_string (property.to_string());
-			test_asserts::verify (desc_type<T> ("to_string() serialization works correctly for "), *property == value);
-		}
-
-		// Blob serialization:
-		{
-			property.from_blob (property.to_blob());
-			test_asserts::verify (desc_type<T> ("to_blob() serialization works correctly for "), *property == value);
-		}
-	}
-
-
-template<class T, template<class> class AnyProperty>
-	void
-	test_nil_serialization (AnyProperty<T>& property)
-	{
-		// String serialization:
-		if constexpr (should_test_string_serialization<T>())
-		{
-			property.from_string (property.to_string());
-			test_asserts::verify (desc_type<T> ("from_string(to_string()) on nil-property deserializes correctly to nil-property"), !property);
-		}
-
-		// Blob serialization:
-		{
-			property.from_blob (property.to_blob());
-			test_asserts::verify (desc_type<T> ("from_blob(to_blob()) on nil-property deserializes correctly to nil-property"), !property);
-		}
 	}
 
 
@@ -406,13 +405,25 @@ RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, aut
 	{
 		TestEnvironment<T> env;
 
-		for (auto const& value: { value1, value2 })
+		// String serialization:
+		if constexpr (should_test_string_serialization<T>())
 		{
-			env.in << ConstantSource (value);
-			test_serialization (env.in, value);
+			env.in << ConstantSource (value1);
+			auto serialized = env.in.to_string();
+			env.out = value2;
+			test_asserts::verify (desc_type<T> ("to_string(): property == value2"), *env.out == value2);
+			env.out.from_string (serialized);
+			test_asserts::verify (desc_type<T> ("to_string() serialization works correctly for"), *env.out == value1);
+		}
 
-			env.out = value;
-			test_serialization (env.out, value);
+		// Blob serialization:
+		{
+			env.in << ConstantSource (value1);
+			auto serialized = env.in.to_blob();
+			env.out = value2;
+			test_asserts::verify (desc_type<T> ("to_blob(): property == value2"), *env.out == value2);
+			env.out.from_blob (serialized);
+			test_asserts::verify (desc_type<T> ("to_blob() serialization works correctly for"), *env.out == value1);
 		}
 	}
 
@@ -420,11 +431,26 @@ RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, aut
 	{
 		TestEnvironment<T> env;
 
-		env.in << xf::no_data_source;
-		test_nil_serialization (env.in);
+		// String serialization:
+		if constexpr (should_test_string_serialization<T>())
+		{
+			env.in << xf::no_data_source;
+			auto serialized = env.in.to_string();
+			env.out = value1;
+			test_asserts::verify (desc_type<T> ("to_string() on nil: property == value1"), *env.out == value1);
+			env.out.from_string (serialized);
+			test_asserts::verify (desc_type<T> ("to_string() serialization on nil value works correctly for"), !env.out);
+		}
 
-		env.out = xf::nil;
-		test_nil_serialization (env.out);
+		// Blob serialization:
+		{
+			env.in << xf::no_data_source;
+			auto serialized = env.in.to_blob();
+			env.out = value1;
+			test_asserts::verify (desc_type<T> ("to_blob() on nil: property == value1"), *env.out == value1);
+			env.out.from_blob (serialized);
+			test_asserts::verify (desc_type<T> ("to_blob() serialization on nil value works correctly for"), !env.out);
+		}
 	}
 }));
 

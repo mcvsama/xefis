@@ -124,6 +124,28 @@ template<class PropertyInOut>
 template<class Enum>
 	struct EnumPropertyTraits
 	{
+	  private:
+		template<class E, class Enabler = void>
+			struct HasSpecialNilValue
+			{
+				constexpr
+				operator bool() const
+				{
+					return false;
+				};
+			};
+
+		template<class E>
+			struct HasSpecialNilValue<E, std::enable_if_t<std::is_enum_v<E> && std::is_void_v<std::void_t<decltype (E::Nil)>>>>
+			{
+				constexpr
+				operator bool() const
+				{
+					return true;
+				};
+			};
+
+	  public:
 		static constexpr bool
 		has_constant_blob_size()
 		{
@@ -134,7 +156,10 @@ template<class Enum>
 		constant_blob_size()
 		{
 			// 1 additional byte is for nil-indication:
-			return 1 + sizeof (Enum);
+			if constexpr (HasSpecialNilValue<Enum>())
+				return sizeof (Enum);
+			else
+				return 1 + sizeof (Enum);
 		}
 
 		static inline std::string
@@ -147,66 +172,61 @@ template<class Enum>
 		}
 
 		static inline void
-		from_string (PropertyIn<Enum>& property, std::string const& str)
+		from_string (PropertyOut<Enum>& property, std::string const& str, PropertyConversionSettings const&)
 		{
 			Enum value;
 			parse (str, value);
-			property << ConstantSource (value); // TODO detail::assign
-		}
-
-		static inline void
-		from_string (PropertyOut<Enum>& property, std::string const& str)
-		{
-			Enum value;
-			parse (str, value);
-			property = value; // TODO detail::assign
+			detail::assign (property, value);
 		}
 
 		static inline Blob
 		to_blob (Property<Enum> const& property)
 		{
-			Blob result;
+			Blob result (constant_blob_size(), 0);
 
-			if (property)
-				value_to_blob (static_cast<std::underlying_type_t<Enum>> (*property), result);
+			if constexpr (HasSpecialNilValue<Enum>())
+			{
+				if (property)
+					value_to_blob (static_cast<std::underlying_type_t<Enum>> (*property), result);
+				else
+					value_to_blob (static_cast<std::underlying_type_t<Enum>> (Enum::xf_nil_value), result);
+			}
 			else
 			{
-				// Store nil-value info in the most significant bit:
-				constexpr uint8_t shift = sizeof (Enum) * 8 - 1;
-				value_to_blob (std::make_unsigned_t<std::underlying_type_t<Enum>> (1) << shift, result);
+				result[0] = property ? detail::not_nil : detail::nil;
+
+				if (property)
+				{
+					Blob tmp;
+					value_to_blob (static_cast<std::underlying_type_t<Enum>> (*property), tmp);
+					std::copy (tmp.begin(), tmp.end(), std::next (result.begin()));
+				}
 			}
 
 			return result;
 		}
 
 		static inline void
-		from_blob (PropertyIn<Enum>& property, BlobView blob)
-		{
-			generic_from_blob (property, blob);
-		}
-
-		static inline void
 		from_blob (PropertyOut<Enum>& property, BlobView blob)
 		{
-			generic_from_blob (property, blob);
-		}
-
-	  private:
-		template<class PropertyInOut>
-			static inline void
-			generic_from_blob (PropertyInOut&, BlobView)
+			if constexpr (HasSpecialNilValue<Enum>())
 			{
-				// TODO if MSB is 1, it's a nil value
-				//if (blob.size() == constant_blob_size())
-				//{
-				//	if (blob[0] == 2)
-				//		detail::assign (property, xf::nil);
-				//	else
-				//		detail::assign (property, !!blob[0]);
-				//}
-				//else
-				//	throw InvalidBlobSize();
+				if (blob.size() == constant_blob_size())
+				{
+					Enum result;
+					blob_to_value (blob, result);
+
+					if (result == Enum::xf_nil_value)
+						detail::assign (property, xf::nil);
+					else
+						detail::assign (property, result);
+				}
+				else
+					throw InvalidBlobSize (blob.size(), constant_blob_size());
 			}
+			else
+				detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
+		}
 	};
 
 
@@ -236,13 +256,7 @@ template<class Integer>
 		}
 
 		static inline void
-		from_string (PropertyIn<Integer>&, std::string const&)
-		{
-			// TODO
-		}
-
-		static inline void
-		from_string (PropertyOut<Integer>&, std::string const&)
+		from_string (PropertyOut<Integer>&, std::string const&, PropertyConversionSettings const&)
 		{
 			// TODO
 		}
@@ -251,12 +265,6 @@ template<class Integer>
 		to_blob (Property<Integer> const& property)
 		{
 			return detail::apply_generic_value_to_blob (property, constant_blob_size());
-		}
-
-		static inline void
-		from_blob (PropertyIn<Integer>& property, BlobView blob)
-		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
 		}
 
 		static inline void
@@ -295,13 +303,7 @@ template<class FloatingPoint>
 		}
 
 		static inline void
-		from_string (PropertyIn<FloatingPoint>&, std::string const&)
-		{
-			// TODO
-		}
-
-		static inline void
-		from_string (PropertyOut<FloatingPoint>&, std::string const&)
+		from_string (PropertyOut<FloatingPoint>&, std::string const&, PropertyConversionSettings const&)
 		{
 			// TODO
 		}
@@ -310,12 +312,6 @@ template<class FloatingPoint>
 		to_blob (Property<FloatingPoint> const& property)
 		{
 			return detail::apply_generic_value_to_blob (property, constant_blob_size());
-		}
-
-		static inline void
-		from_blob (PropertyIn<FloatingPoint>& property, BlobView blob)
-		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
 		}
 
 		static inline void
@@ -339,16 +335,10 @@ template<class Value, class Enabled = void>
 		to_string (Property<Value> const&, PropertyConversionSettings const&);
 
 		static inline void
-		from_string (PropertyIn<Value>&, std::string const&);
-
-		static inline void
-		from_string (PropertyOut<Value>&, std::string const&);
+		from_string (PropertyOut<Value>&, std::string const&, PropertyConversionSettings const&);
 
 		static inline Blob
 		to_blob (Property<Value> const&);
-
-		static inline void
-		from_blob (PropertyIn<Value>&, BlobView);
 
 		static inline void
 		from_blob (PropertyOut<Value>&, BlobView);
@@ -380,15 +370,14 @@ template<>
 		}
 
 		static inline void
-		from_string (PropertyIn<bool>&, std::string const&)
+		from_string (PropertyOut<bool>& property, std::string const& str, PropertyConversionSettings const& settings)
 		{
-			// TODO _property << ConstantSource (s == _true_value);
-		}
-
-		static inline void
-		from_string (PropertyOut<bool>&, std::string const&)
-		{
-			// TODO _property = (s == _true_value); // TODO
+			if (str == settings.true_value)
+				detail::assign (property, true);
+			else if (str == settings.false_value)
+				detail::assign (property, false);
+			else
+				detail::assign (property, xf::nil);
 		}
 
 		static inline Blob
@@ -401,32 +390,18 @@ template<>
 		}
 
 		static inline void
-		from_blob (PropertyIn<bool>& property, BlobView blob)
-		{
-			generic_from_blob (property, blob);
-		}
-
-		static inline void
 		from_blob (PropertyOut<bool>& property, BlobView blob)
 		{
-			generic_from_blob (property, blob);
-		}
-
-	  private:
-		template<class PropertyInOut>
-			static inline void
-			generic_from_blob (PropertyInOut& property, BlobView blob)
+			if (blob.size() == constant_blob_size())
 			{
-				if (blob.size() == constant_blob_size())
-				{
-					if (blob[0] == 2)
-						detail::assign (property, xf::nil);
-					else
-						detail::assign (property, !!blob[0]);
-				}
+				if (blob[0] == 2)
+					detail::assign (property, xf::nil);
 				else
-					throw InvalidBlobSize (blob.size(), constant_blob_size());
+					detail::assign (property, !!blob[0]);
 			}
+			else
+				throw InvalidBlobSize (blob.size(), constant_blob_size());
+		}
 	};
 
 
@@ -510,13 +485,7 @@ template<>
 		}
 
 		static inline void
-		from_string (PropertyIn<std::string>&, std::string const&)
-		{
-			// TODO
-		}
-
-		static inline void
-		from_string (PropertyOut<std::string>&, std::string const&)
+		from_string (PropertyOut<std::string>&, std::string const&, PropertyConversionSettings const&)
 		{
 			// TODO
 		}
@@ -536,32 +505,18 @@ template<>
 		}
 
 		static inline void
-		from_blob (PropertyIn<std::string>& property, BlobView blob)
-		{
-			generic_from_blob (property, blob);
-		}
-
-		static inline void
 		from_blob (PropertyOut<std::string>& property, BlobView blob)
 		{
-			generic_from_blob (property, blob);
-		}
-
-	  private:
-		template<class PropertyInOut>
-			static inline void
-			generic_from_blob (PropertyInOut& property, BlobView blob)
+			if (blob.empty())
+				throw InvalidBlobSize (0);
+			else
 			{
-				if (blob.empty())
-					throw InvalidBlobSize (0);
+				if (blob[0] == detail::not_nil)
+					detail::assign (property, std::string (std::next (blob.begin()), blob.end()));
 				else
-				{
-					if (blob[0] == detail::not_nil)
-						detail::assign (property, std::string (std::next (blob.begin()), blob.end()));
-					else
-						detail::assign (property, xf::nil);
-				}
+					detail::assign (property, xf::nil);
 			}
+		}
 	};
 
 
@@ -590,13 +545,7 @@ template<class Unit>
 		}
 
 		static inline void
-		from_string (PropertyIn<si::Quantity<Unit>>&, std::string const&)
-		{
-			// TODO
-		}
-
-		static inline void
-		from_string (PropertyOut<si::Quantity<Unit>>&, std::string const&)
+		from_string (PropertyOut<si::Quantity<Unit>>&, std::string const&, PropertyConversionSettings const&)
 		{
 			// TODO
 		}
@@ -605,12 +554,6 @@ template<class Unit>
 		to_blob (Property<si::Quantity<Unit>> const& property)
 		{
 			return detail::apply_generic_value_to_blob (property, constant_blob_size());
-		}
-
-		static inline void
-		from_blob (PropertyIn<si::Quantity<Unit>>& property, BlobView blob)
-		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
 		}
 
 		static inline void
