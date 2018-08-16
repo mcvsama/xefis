@@ -55,7 +55,9 @@ template<class Value>
 /**
  * Mixin base class for all PropertyIn<*>
  */
-class BasicPropertyIn: virtual public PropertyVirtualInterface
+class BasicPropertyIn:
+	virtual public PropertyVirtualInterface,
+	virtual public BasicProperty
 { };
 
 
@@ -125,23 +127,11 @@ template<class pValue>
 
 		// BasicProperty API
 		std::string
-		to_string() const override;
-
-		// BasicProperty API
-		std::string
-		to_string (PropertyConversionSettings const&) const override;
-
-		// BasicProperty API
-		void
-		from_string (std::string const&) override;
+		to_string (PropertyConversionSettings const& = {}) const override;
 
 		// BasicProperty API
 		Blob
 		to_blob() const override;
-
-		// BasicProperty API
-		void
-		from_blob (BlobView) override;
 
 		// PropertyVirtualInterface API
 		void
@@ -163,7 +153,7 @@ template<class pValue>
 template<class V>
 	inline
 	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path):
-		Property<V> (owner, path)
+		BasicProperty (owner, path)
 	{
 		ModuleIO::ProcessingLoopAPI (*this->io()).register_input_property (*this);
 	}
@@ -268,25 +258,9 @@ template<class V>
 
 template<class V>
 	inline std::string
-	PropertyIn<V>::to_string() const
-	{
-		return PropertyTraits<V>::to_string (*this, PropertyConversionSettings());
-	}
-
-
-template<class V>
-	inline std::string
 	PropertyIn<V>::to_string (PropertyConversionSettings const& settings) const
 	{
 		return PropertyTraits<V>::to_string (*this, settings);
-	}
-
-
-template<class V>
-	inline void
-	PropertyIn<V>::from_string (std::string const& str)
-	{
-		PropertyTraits<V>::from_string (*this, str);
 	}
 
 
@@ -295,14 +269,6 @@ template<class V>
 	PropertyIn<V>::to_blob() const
 	{
 		return PropertyTraits<V>::to_blob (*this);
-	}
-
-
-template<class V>
-	inline void
-	PropertyIn<V>::from_blob (BlobView blob)
-	{
-		PropertyTraits<V>::from_blob (*this, blob);
 	}
 
 

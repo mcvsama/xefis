@@ -38,7 +38,9 @@ template<class Value>
 /**
  * Mixin base class for all PropertyOut<*>
  */
-class BasicPropertyOut: virtual public PropertyVirtualInterface
+class BasicPropertyOut:
+	virtual public PropertyVirtualInterface,
+	virtual public BasicProperty
 {
   public:
 	/**
@@ -46,6 +48,21 @@ class BasicPropertyOut: virtual public PropertyVirtualInterface
 	 */
 	virtual void
 	operator= (Nil) = 0;
+
+	/**
+	 * Unserializes property from string.
+	 */
+	virtual void
+	from_string (std::string const&, PropertyConversionSettings const& = {}) = 0;
+
+	/**
+	 * Unserializes property from Blob.
+	 *
+	 * \throw	InvalidBlobSize
+	 *			If blob has size not corresponding to this property type.
+	 */
+	virtual void
+	from_blob (BlobView) = 0;
 };
 
 
@@ -140,21 +157,17 @@ template<class pValue>
 
 		// BasicProperty API
 		std::string
-		to_string() const override;
-
-		// BasicProperty API
-		std::string
-		to_string (PropertyConversionSettings const&) const override;
-
-		// BasicProperty API
-		void
-		from_string (std::string const&) override;
+		to_string (PropertyConversionSettings const& = {}) const override;
 
 		// BasicProperty API
 		Blob
 		to_blob() const override;
 
-		// BasicProperty API
+		// BasicPropertyOut API
+		void
+		from_string (std::string const&, PropertyConversionSettings const& = {}) override;
+
+		// BasicPropertyOut API
 		void
 		from_blob (BlobView) override;
 
@@ -179,7 +192,7 @@ template<class pValue>
 template<class V>
 	inline
 	PropertyOut<V>::PropertyOut (ModuleIO* owner_and_data_source, std::string const& path):
-		Property<V> (owner_and_data_source, path)
+		BasicProperty (owner_and_data_source, path)
 	{
 		_data_source = owner_and_data_source;
 		_data_sinks.reserve (8);
@@ -327,25 +340,9 @@ template<class V>
 
 template<class V>
 	inline std::string
-	PropertyOut<V>::to_string() const
-	{
-		return PropertyTraits<V>::to_string (*this, PropertyConversionSettings());
-	}
-
-
-template<class V>
-	inline std::string
 	PropertyOut<V>::to_string (PropertyConversionSettings const& settings) const
 	{
 		return PropertyTraits<V>::to_string (*this, settings);
-	}
-
-
-template<class V>
-	inline void
-	PropertyOut<V>::from_string (std::string const& str)
-	{
-		PropertyTraits<V>::from_string (*this, str);
 	}
 
 
@@ -354,6 +351,14 @@ template<class V>
 	PropertyOut<V>::to_blob() const
 	{
 		return PropertyTraits<V>::to_blob (*this);
+	}
+
+
+template<class V>
+	inline void
+	PropertyOut<V>::from_string (std::string const& str, PropertyConversionSettings const& settings)
+	{
+		PropertyTraits<V>::from_string (*this, str, settings);
 	}
 
 

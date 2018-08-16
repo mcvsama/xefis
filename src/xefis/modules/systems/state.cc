@@ -33,7 +33,7 @@
 
 
 void
-StateIO::register_property (std::string const& unique_identifier, xf::BasicProperty& property)
+StateIO::register_property (std::string const& unique_identifier, xf::BasicPropertyOut& property)
 {
 	if (auto f = _registered_properties.find (unique_identifier); f != _registered_properties.end())
 		throw xf::Exception ("StateIO::register_property: unique_identifier '" + unique_identifier + "' is not unique");
