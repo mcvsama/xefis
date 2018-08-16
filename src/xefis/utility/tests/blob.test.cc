@@ -22,6 +22,7 @@
 
 
 namespace xf::test {
+namespace {
 
 template<class Value>
 	static void
@@ -127,5 +128,6 @@ static xf::RuntimeTest t3 ("blob: test sizes of serialized data", []{
 	test_size<TestEnum32> (TestEnum32::Value, 4);
 });
 
+} // namespace
 } // namespace xf::test
 

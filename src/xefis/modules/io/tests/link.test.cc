@@ -20,6 +20,7 @@
 
 
 namespace xf::test {
+namespace {
 
 xf::Logger g_logger (std::clog);
 
@@ -346,5 +347,6 @@ static xf::RuntimeTest t5 ("modules/io/link: protocol: send-every/send-offset wo
 	xf::test_asserts::verify ("last envelope sent for the second time", *rx_io.dummy == kSecondInt);
 });
 
+} // namespace
 } // namespace xf::test
 
