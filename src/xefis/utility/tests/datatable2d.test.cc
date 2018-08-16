@@ -22,7 +22,7 @@
 namespace xf::test {
 namespace {
 
-static xf::RuntimeTest t1 ("Datatable2D<>", []{
+RuntimeTest t1 ("Datatable2D<>", []{
 	using namespace xf::test_asserts;
 
 	std::map<double, double> m;

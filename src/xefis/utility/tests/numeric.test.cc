@@ -22,7 +22,7 @@
 namespace xf::test {
 namespace {
 
-static xf::RuntimeTest t1 ("numeric: integral()", []{
+RuntimeTest t1 ("numeric: integral()", []{
 	using namespace xf::test_asserts;
 
 	auto int1 = integral (static_cast<double (*)(double)> (std::sin), { -5.3, +12.0 }, 1e-5);

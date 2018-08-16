@@ -25,7 +25,7 @@ namespace xf::test {
 namespace {
 
 template<class Value>
-	static void
+	void
 	test_serialization (Value value)
 	{
 		using namespace std::literals;
@@ -52,7 +52,7 @@ template<class Value>
 
 
 template<class Value>
-	static void
+	void
 	test_size (Value value, size_t expected_size)
 	{
 		using namespace std::literals;
@@ -64,7 +64,7 @@ template<class Value>
 	}
 
 
-static xf::RuntimeTest t1 ("blob: value_to_blob", []{
+RuntimeTest t1 ("blob: value_to_blob", []{
 	enum class TestEnum {
 		Value1, Value2, Value3,
 	};
@@ -89,7 +89,7 @@ static xf::RuntimeTest t1 ("blob: value_to_blob", []{
 });
 
 
-static xf::RuntimeTest t2 ("blob: little-endianess of serialized int", []{
+RuntimeTest t2 ("blob: little-endianess of serialized int", []{
 	Blob result;
 	value_to_blob<uint32_t> (0x44332211, result);
 
@@ -101,7 +101,7 @@ static xf::RuntimeTest t2 ("blob: little-endianess of serialized int", []{
 });
 
 
-static xf::RuntimeTest t3 ("blob: test sizes of serialized data", []{
+RuntimeTest t3 ("blob: test sizes of serialized data", []{
 	enum class TestEnum8: uint8_t {
 		Value,
 	};
