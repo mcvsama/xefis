@@ -188,37 +188,16 @@ class PropertyVirtualInterface
 	constant_blob_size() const noexcept = 0;
 
 	/**
-	 * Serialize property value to string.
-	 */
-	virtual std::string
-	to_string() const = 0;
-
-	/**
 	 * Serialize property value to string with given config.
 	 */
 	virtual std::string
-	to_string (PropertyConversionSettings const&) const = 0;
-
-	/**
-	 * Unserializes property from string.
-	 */
-	virtual void
-	from_string (std::string const&) = 0;
+	to_string (PropertyConversionSettings const& = {}) const = 0;
 
 	/**
 	 * Serializes property value, including nil-flag.
 	 */
 	virtual Blob
 	to_blob() const = 0;
-
-	/**
-	 * Unserializes property from Blob.
-	 *
-	 * \throw	InvalidBlobSize
-	 *			If blob has size not corresponding to this property type.
-	 */
-	virtual void
-	from_blob (BlobView) = 0;
 
 	/**
 	 * Deregisters property from ModuleIO: esets pointer to IO owner and makes it impossible
@@ -308,13 +287,10 @@ class BasicProperty: virtual public PropertyVirtualInterface
  * perspective, but I guess it's OK enough as it is now.
  */
 template<class pValue>
-	class Property: public BasicProperty
+	class Property: virtual public BasicProperty
 	{
 	  public:
 		typedef pValue Value;
-
-	  protected:
-		using BasicProperty::BasicProperty;
 
 	  public:
 		/**

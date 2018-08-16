@@ -40,12 +40,12 @@ class StateIO: public xf::ModuleIO
 
 	struct SavedProperty
 	{
-		SavedProperty (xf::BasicProperty& property):
+		SavedProperty (xf::BasicPropertyOut& property):
 			property (property)
 		{ }
 
-		xf::BasicProperty&	property;
-		xf::SerialChanged	changed { property };
+		xf::BasicPropertyOut&	property;
+		xf::SerialChanged		changed { property };
 	};
 
   public:
@@ -61,7 +61,7 @@ class StateIO: public xf::ModuleIO
 	 * Register property for serialization/deserialization.
 	 */
 	void
-	register_property (std::string const& unique_identifier, xf::BasicProperty&);
+	register_property (std::string const& unique_identifier, xf::BasicPropertyOut&);
 
   private:
 	std::map<std::string, SavedProperty>	_registered_properties;
