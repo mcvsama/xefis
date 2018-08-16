@@ -119,7 +119,7 @@ template<class pValue>
 		 * Creates a setting object that has an initial value.
 		 */
 		explicit
-		Setting (ModuleIO* owner, std::string const& name, Value&& initial_value);
+		Setting (ModuleIO* owner, std::string const& name, Value const& initial_value);
 
 		/**
 		 * Creates a setting that doesn't have and doesn't require any value.
@@ -131,7 +131,7 @@ template<class pValue>
 		 * Copy-assignment operator.
 		 */
 		Setting const&
-		operator= (Value&& new_value);
+		operator= (Value const& new_value);
 
 		/**
 		 * Read the setting value.
@@ -207,9 +207,9 @@ template<class V>
 
 template<class V>
 	inline
-	Setting<V>::Setting (ModuleIO* owner, std::string const& name, Value&& initial_value):
+	Setting<V>::Setting (ModuleIO* owner, std::string const& name, Value const& initial_value):
 		BasicSetting (owner, name),
-		_value (std::forward<Value> (initial_value))
+		_value (initial_value)
 	{
 		ModuleIO::ProcessingLoopAPI (*owner).register_setting (*this);
 	}
@@ -226,9 +226,9 @@ template<class V>
 
 template<class V>
 	inline Setting<V> const&
-	Setting<V>::operator= (Value&& value)
+	Setting<V>::operator= (Value const& value)
 	{
-		_value = std::forward<Value> (value);
+		_value = value;
 		return *this;
 	}
 

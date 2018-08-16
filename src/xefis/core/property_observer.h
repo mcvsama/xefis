@@ -210,7 +210,7 @@ PropertyObserver::Object::Object (PropertyObserver* observer):
 inline BasicProperty::Serial
 PropertyObserver::Object::remote_serial() const noexcept
 {
-	return std::visit ([](auto&& observable) noexcept {
+	return std::visit ([](auto const& observable) noexcept {
 		return observable->serial();
 	}, _observable);
 }
