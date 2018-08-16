@@ -1,6 +1,21 @@
 # vim:ts=4
 
 # Let modules compile first
+######## /xefis/modules/comm ########
+
+XEFIS_HEADERS_MOC		+= xefis/modules/comm/flight_gear.h
+XEFIS_HEADERS_MOC		+= xefis/modules/comm/link.h
+XEFIS_HEADERS_MOC		+= xefis/modules/comm/udp.h
+
+XEFIS_SOURCES			+= xefis/modules/comm/flight_gear.cc
+XEFIS_SOURCES			+= xefis/modules/comm/link.cc
+XEFIS_SOURCES			+= xefis/modules/comm/udp.cc
+
+SELFTEST_HEADERS_MOC	+= xefis/modules/comm/link.h
+
+SELFTEST_SOURCES		+= xefis/modules/comm/tests/link.test.cc
+SELFTEST_SOURCES		+= xefis/modules/comm/link.cc
+
 ######## /xefis/modules/helpers ########
 
 XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
@@ -45,27 +60,16 @@ XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
 XEFIS_HEADERS_MOC		+= xefis/modules/io/bmp085.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/chr_um6.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/ets_airspeed.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/flight_gear.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/link.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/udp.h
 XEFIS_HEADERS_MOC		+= xefis/modules/io/xbee.h
 
 XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
 XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
 XEFIS_SOURCES			+= xefis/modules/io/ets_airspeed.cc
-XEFIS_SOURCES			+= xefis/modules/io/flight_gear.cc
 XEFIS_SOURCES			+= xefis/modules/io/gps.cc
 XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
-XEFIS_SOURCES			+= xefis/modules/io/link.cc
-XEFIS_SOURCES			+= xefis/modules/io/udp.cc
 XEFIS_SOURCES			+= xefis/modules/io/xbee.cc
-
-SELFTEST_HEADERS_MOC	+= xefis/modules/io/link.h
-
-SELFTEST_SOURCES		+= xefis/modules/io/link.cc
-SELFTEST_SOURCES		+= xefis/modules/io/tests/link.test.cc
 
 ######## /xefis/modules/log ########
 

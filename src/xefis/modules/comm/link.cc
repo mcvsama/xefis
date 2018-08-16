@@ -526,6 +526,7 @@ Link::process (xf::Cycle const& cycle)
 	}
 	catch (LinkProtocol::ParseError const&)
 	{
+		// TODO cycle logger vs link logger?
 		cycle.logger() << "Packet parse error. Couldn't synchronize." << std::endl;
 	}
 }
