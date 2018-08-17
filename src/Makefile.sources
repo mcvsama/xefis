@@ -19,21 +19,21 @@ SELFTEST_SOURCES		+= xefis/modules/comm/link.cc
 ######## /xefis/modules/helpers ########
 
 XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
-#XEFIS_HEADERS_MOC		+= xefis/modules/helpers/sound.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/helpers/sound.h TODO
 
-#XEFIS_SOURCES			+= xefis/modules/helpers/sound.cc
+#XEFIS_SOURCES			+= xefis/modules/helpers/sound.cc TODO
 
 ######## /xefis/modules/instruments ########
 
 XEFIS_HEADERS			+= xefis/modules/instruments/adi.h
-##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h NEEDS MIGRATION
+##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h TODO
 XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
 XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
 XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
 XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
 XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
-#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h
-#XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h
+#XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h TODO
+#XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h TODO
 XEFIS_HEADERS			+= xefis/modules/instruments/label.h
 XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
 XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
@@ -41,14 +41,14 @@ XEFIS_HEADERS			+= xefis/modules/instruments/status.h
 XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
 
 XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
-##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc NEEDS MIGRATION
+##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc TODO
 XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
-#XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc
+#XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc TODO
+#XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc TODO
 XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
@@ -394,25 +394,26 @@ XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
 
 ######## /xefis/support/ui/widgets ########
 
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_button.h
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_rotary_encoder.h
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_numeric_display.h
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_widget.h
+# TODO
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h TODO
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_button.h TODO
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_rotary_encoder.h TODO
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_numeric_display.h TODO
+#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_widget.h TODO
 #
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/group_box.cc
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/group_box.cc TODO
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc TODO
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc TODO
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc TODO
+#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc TODO
 
 ######## /xefis/support/ui ########
 
 XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h
+#XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h TODO
 
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
-#XEFIS_SOURCES			+= xefis/support/ui/window.cc
+#XEFIS_SOURCES			+= xefis/support/ui/window.cc TODO
 
 ######## /xefis/test ########
 
