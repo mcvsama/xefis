@@ -189,11 +189,16 @@ template<class Enum>
 		}
 
 		static inline void
-		from_string (PropertyOut<Enum>& property, std::string_view const& str, PropertyConversionSettings const&)
+		from_string (PropertyOut<Enum>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
-			Enum value;
-			parse (str, value);
-			detail::assign (property, value);
+			if (str == settings.nil_value)
+				detail::assign (property, xf::nil);
+			else
+			{
+				Enum value;
+				parse (str, value);
+				detail::assign (property, value);
+			}
 		}
 
 		static inline Blob
@@ -575,15 +580,22 @@ template<class Unit>
 		to_string (Property<si::Quantity<Unit>> const& property, PropertyConversionSettings const& settings)
 		{
 			if (property)
-				return (boost::format (settings.numeric_format) % *property).str() + " " + unit_to_string (*property);
+				return (boost::format (settings.numeric_format) % *property).str();
 			else
 				return settings.nil_value;
 		}
 
 		static inline void
-		from_string (PropertyOut<si::Quantity<Unit>>&, std::string_view const&, PropertyConversionSettings const&)
+		from_string (PropertyOut<si::Quantity<Unit>>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
-			// TODO need also check the unit or set xf::nil if not convertible
+			if (str == settings.nil_value)
+				detail::assign (property, xf::nil);
+			else
+			{
+				si::Quantity<Unit> result;
+				si::parse (str, result);
+				detail::assign (property, result);
+			}
 		}
 
 		static inline Blob

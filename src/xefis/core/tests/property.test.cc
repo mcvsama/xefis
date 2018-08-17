@@ -226,7 +226,7 @@ template<class T>
 	{
 		// String-serialization is not symmetrical for all types, it doesn't have to, it's for user-interface anyway.
 		// So test this only if it makes sense for T to be symmetrically string-serialized.
-		return std::is_arithmetic<T>() || std::is_same<T, float16_t>() || std::is_same<T, bool>();
+		return std::is_arithmetic<T>() || std::is_same<T, float16_t>() || std::is_same<T, bool>() || si::is_quantity<T>();
 	}
 
 
@@ -414,6 +414,13 @@ RuntimeTest t5 ("xf::Property serialization", for_all_types ([](auto value1, aut
 			test_asserts::verify (desc_type<T> ("to_string(): property == value2"), *env.out == value2);
 			env.out.from_string (serialized);
 			test_asserts::verify (desc_type<T> ("to_string() serialization works correctly for"), *env.out == value1);
+
+			// If this is si::Quantity, make sure that from_string() throws on incompatible types:
+			if constexpr (si::is_quantity<T>())
+			{
+				test_asserts::verify ("from_string() throws when units are incompatible",
+									  Exception::catch_and_log (g_null_logger, [&]{ env.out.from_string ("1.15 m^2"); }));
+			}
 		}
 
 		// Blob serialization:
