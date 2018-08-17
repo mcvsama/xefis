@@ -26,7 +26,7 @@
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/gear.h>
 #include <xefis/modules/instruments/label.h>
-#include <xefis/modules/io/link.h>
+#include <xefis/modules/comm/link.h>
 #include <xefis/modules/systems/adc.h>
 #include <xefis/modules/test/test_generator.h>
 #include <xefis/support/airframe/airframe.h>

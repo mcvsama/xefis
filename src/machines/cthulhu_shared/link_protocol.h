@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/modules/io/link.h>
+#include <xefis/modules/comm/link.h>
 
 
 class CthulhuGCS_Tx_LinkProtocol: public LinkProtocol
