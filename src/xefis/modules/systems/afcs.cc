@@ -1074,9 +1074,11 @@ AFCS::make_button_action (xf::PropertyIn<bool>& property, void (AFCS::* callback
 void
 AFCS::make_knob_action (xf::PropertyIn<int64_t>& property, void (AFCS::* callback)(int))
 {
-	auto action = std::make_unique<xf::DeltaDecoder> (property, [this,callback](int delta) {
+	auto action = std::make_unique<xf::DeltaDecoder<>> (property, [this,callback](auto delta) {
 		try {
-			(this->*callback) (delta);
+			if (delta)
+				(this->*callback) (*delta);
+
 			solve();
 		}
 		catch (...)

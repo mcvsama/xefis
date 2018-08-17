@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/airframe/flaps.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 
 
 class FlapsBugsIO: public xf::ModuleIO

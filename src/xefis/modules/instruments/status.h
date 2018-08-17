@@ -27,8 +27,8 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/utility/v2/actions.h>
-#include <xefis/utility/v2/delta_decoder.h>
+#include <xefis/utility/actions.h>
+#include <xefis/utility/delta_decoder.h>
 
 
 class StatusIO: public xf::ModuleIO
@@ -225,7 +225,7 @@ class Status:
 	xf::PropChangedTo<bool>				_button_clear_pressed			{ io.button_clear, true };
 	xf::PropChangedTo<bool>				_button_master_caution_pressed	{ io.button_master_caution, true };
 	xf::PropChangedTo<bool>				_button_master_warning_pressed	{ io.button_master_warning, true };
-	std::unique_ptr<xf::DeltaDecoder>	_input_cursor_decoder;
+	std::unique_ptr<xf::DeltaDecoder<>>	_input_cursor_decoder;
 	std::vector<Message>				_messages;
 	std::vector<Message*>				_hidden_messages;
 	std::vector<Message*>				_visible_messages;

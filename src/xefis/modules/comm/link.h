@@ -35,7 +35,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/stdexcept.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/logger.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/strong_type.h>

@@ -422,14 +422,13 @@ XEFIS_HEADERS			+= xefis/test/test_asserts.h>
 
 ######## /xefis/utility ########
 
-XEFIS_HEADERS			+= xefis/utility/v2/actions.h
-XEFIS_HEADERS			+= xefis/utility/v2/callback_actions.h
-XEFIS_HEADERS			+= xefis/utility/v2/delta_decoder.h
+XEFIS_HEADERS			+= xefis/utility/actions.h
 XEFIS_HEADERS			+= xefis/utility/backtrace.h
 XEFIS_HEADERS			+= xefis/utility/blob.h
+XEFIS_HEADERS			+= xefis/utility/callback_actions.h
 XEFIS_HEADERS			+= xefis/utility/convergence.h
 XEFIS_HEADERS			+= xefis/utility/datatable2d.h
-#XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
+XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
 XEFIS_HEADERS			+= xefis/utility/demangle.h
 XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
 XEFIS_HEADERS			+= xefis/utility/exception_support.h
@@ -473,9 +472,7 @@ XEFIS_HEADERS			+= xefis/utility/transistor.h
 XEFIS_HEADERS			+= xefis/utility/types.h
 XEFIS_HEADERS			+= xefis/utility/variant.h
 
-XEFIS_SOURCES			+= xefis/utility/v2/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc
-#XEFIS_SOURCES			+= xefis/utility/delta_decoder.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/exception_support.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc

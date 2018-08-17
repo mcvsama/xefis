@@ -26,7 +26,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/devices/chr_um6.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/logger.h>
 
 

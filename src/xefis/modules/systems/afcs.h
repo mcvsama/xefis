@@ -23,8 +23,8 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/v2/callback_actions.h>
-#include <xefis/utility/v2/delta_decoder.h>
+#include <xefis/utility/callback_actions.h>
+#include <xefis/utility/delta_decoder.h>
 #include <xefis/utility/range.h>
 
 // Local:
@@ -579,7 +579,7 @@ class AFCS: public xf::Module<AFCS_IO>
 	std::optional<si::Velocity>				_mcp_vs;
 	std::optional<si::Angle>				_mcp_fpa;
 	std::set<Unique<xf::CallbackAction>>	_button_actions;
-	std::set<Unique<xf::DeltaDecoder>>		_rotary_decoders;
+	std::set<Unique<xf::DeltaDecoder<>>>		_rotary_decoders;
 };
 
 #endif

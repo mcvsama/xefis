@@ -17,62 +17,85 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <optional>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/property.h>
+#include <xefis/utility/actions.h>
 
 
 namespace xf {
 
-class DeltaDecoder
-{
-  public:
-	typedef std::function<void (int delta)> Callback;
+template<class pInteger = int64_t>
+	class DeltaDecoder
+	{
+		static_assert (std::is_integral<pInteger>());
+		static_assert (std::is_signed<pInteger>());
 
-  public:
-	// Ctor
-	explicit
-	DeltaDecoder (v1::PropertyInteger value_property, Callback callback);
+	  public:
+		using Integer	= pInteger;
+		using Callback	= std::function<void (std::optional<Integer> delta)>;
 
-	/**
-	 * Signals that properties have been
-	 * updated. May call the callback.
-	 */
-	void
-	data_updated();
+	  public:
+		// Ctor
+		explicit
+		DeltaDecoder (Property<Integer> const& property, Callback callback, Integer initial_value = {});
 
-	/**
-	 * Force callback to be called with given delta value.
-	 */
-	void
-	operator() (int delta);
+		/**
+		 * Signals that properties have been updated. May call the callback.
+		 */
+		void
+		operator()();
 
-	/**
-	 * Alias for operator().
-	 */
-	void
-	call (int delta);
+		/**
+		 * Force callback to be called with given delta value.
+		 */
+		void
+		force_callback (std::optional<Integer> delta);
 
-  private:
-	v1::PropertyInteger::Type	_prev;
-	v1::PropertyInteger			_value_property;
-	Callback					_callback;
-};
-
-
-inline void
-DeltaDecoder::operator() (int delta)
-{
-	_callback (delta);
-}
+	  private:
+		Integer						_previous;
+		Property<Integer> const&	_value_property;
+		PropChanged<Integer>		_property_changed	{ _value_property };
+		Callback					_callback;
+	};
 
 
-inline void
-DeltaDecoder::call (int delta)
-{
-	_callback (delta);
-}
+template<class I>
+	inline
+	DeltaDecoder<I>::DeltaDecoder (Property<Integer> const& property, Callback callback, Integer initial_value):
+		_previous (initial_value),
+		_value_property (property),
+		_callback (callback)
+	{ }
+
+
+template<class I>
+	inline void
+	DeltaDecoder<I>::operator()()
+	{
+		if (_callback && _property_changed())
+		{
+			if (_value_property)
+			{
+				auto const current = *_value_property;
+				_callback (current - _previous);
+				_previous = current;
+			}
+			else
+				_callback (std::nullopt);
+		}
+	}
+
+
+template<class I>
+	inline void
+	DeltaDecoder<I>::force_callback (std::optional<Integer> delta)
+	{
+		_callback (delta);
+	}
 
 } // namespace xf
 
