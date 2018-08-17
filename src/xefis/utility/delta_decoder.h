@@ -53,7 +53,7 @@ template<class pInteger = int64_t>
 		 * Force callback to be called with given delta value.
 		 */
 		void
-		force_callback (std::optional<Integer> delta);
+		force_callback (std::optional<Integer> delta) const;
 
 	  private:
 		Integer						_previous;
@@ -92,7 +92,7 @@ template<class I>
 
 template<class I>
 	inline void
-	DeltaDecoder<I>::force_callback (std::optional<Integer> delta)
+	DeltaDecoder<I>::force_callback (std::optional<Integer> delta) const
 	{
 		_callback (delta);
 	}
