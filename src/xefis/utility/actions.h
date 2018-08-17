@@ -84,7 +84,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		PropChanged (Property& property):
+		PropChanged (Property const& property):
 			_property (property),
 			_last_value (property.get_optional())
 		{ }
@@ -113,17 +113,8 @@ template<class pValue>
 			return _property;
 		}
 
-		/**
-		 * Return reference to observed property.
-		 */
-		Property&
-		property() noexcept
-		{
-			return _property;
-		}
-
 	  private:
-		Property&		_property;
+		Property const&	_property;
 		OptionalValue	_last_value;
 	};
 
@@ -142,7 +133,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		constexpr
-		PropChangedTo (Property& property, Value value):
+		PropChangedTo (Property const& property, Value value):
 			PropChanged<Value> (property),
 			_expected_value (value)
 		{ }

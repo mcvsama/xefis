@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 
 
 namespace xf {

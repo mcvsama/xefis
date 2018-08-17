@@ -23,7 +23,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/smoother.h>
 
 

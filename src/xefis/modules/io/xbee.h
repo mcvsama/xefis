@@ -26,7 +26,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 #include <xefis/utility/logger.h>
 #include <xefis/utility/smoother.h>
 

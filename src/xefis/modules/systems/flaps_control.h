@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/range.h>
-#include <xefis/utility/v2/actions.h>
+#include <xefis/utility/actions.h>
 
 
 class FlapsControlIO: public xf::ModuleIO
