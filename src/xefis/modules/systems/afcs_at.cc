@@ -99,6 +99,10 @@ AFCS_AT::compute_thrust()
 			case afcs_api::SpeedMode::None:
 				// Don't change current state:
 				break;
+
+			case afcs_api::SpeedMode::xf_nil_value:
+				// Should not happen.
+				break;
 		}
 
 		io.thrust = computed_thrust;

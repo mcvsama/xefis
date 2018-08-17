@@ -43,6 +43,8 @@ enum class ThrustMode: uint8_t
 	KIAS,
 	// Try to follow speed set in CMD Mach property.
 	Mach,
+	// Special value for nil.
+	xf_nil_value = 0xff,
 };
 
 enum class RollMode: uint8_t
@@ -60,6 +62,8 @@ enum class RollMode: uint8_t
 	Localizer,
 	// Fly laterally according to heading supplied by LNAV module.
 	LNAV,
+	// Special value for nil.
+	xf_nil_value = 0xff,
 };
 
 enum class PitchMode: uint8_t
@@ -84,6 +88,8 @@ enum class PitchMode: uint8_t
 	GS,
 	// Control pitch to flare the aircraft before touchdown.
 	Flare,
+	// Special value for nil.
+	xf_nil_value = 0xff
 };
 
 enum class SpeedMode: uint8_t
@@ -94,6 +100,8 @@ enum class SpeedMode: uint8_t
 	Thrust		= 1,
 	// Maintain constant airspeed.
 	Airspeed	= 2,
+	// Special value for nil.
+	xf_nil_value = 0xff,
 };
 
 
@@ -126,6 +134,8 @@ static constexpr std::string_view	kSpeedMode_None			= "None";
 static constexpr std::string_view	kSpeedMode_Thrust		= "Thrust";
 static constexpr std::string_view	kSpeedMode_Airspeed		= "Airspeed";
 
+static constexpr std::string_view	kNilValue				= "-";
+
 
 constexpr std::string_view
 to_string (ThrustMode mode)
@@ -138,6 +148,7 @@ to_string (ThrustMode mode)
 		case ThrustMode::Idle:			return kThrustMode_Idle;
 		case ThrustMode::KIAS:			return kThrustMode_KIAS;
 		case ThrustMode::Mach:			return kThrustMode_Mach;
+		case ThrustMode::xf_nil_value:	return kNilValue;
 	}
 
 	return "";
@@ -155,6 +166,7 @@ to_string (RollMode mode)
 		case RollMode::WingsLevel:		return kRollMode_WingsLevel;
 		case RollMode::Localizer:		return kRollMode_Localizer;
 		case RollMode::LNAV:			return kRollMode_LNAV;
+		case RollMode::xf_nil_value:	return kNilValue;
 	}
 
 	return "";
@@ -176,6 +188,7 @@ to_string (PitchMode mode)
 		case PitchMode::VNAVPath:		return kPitchMode_VNAVPath;
 		case PitchMode::GS:				return kPitchMode_GS;
 		case PitchMode::Flare:			return kPitchMode_Flare;
+		case PitchMode::xf_nil_value:	return kNilValue;
 	}
 
 	return "";
@@ -190,6 +203,7 @@ to_string (SpeedMode mode)
 		case SpeedMode::None:			return kSpeedMode_None;
 		case SpeedMode::Thrust:			return kSpeedMode_Thrust;
 		case SpeedMode::Airspeed:		return kSpeedMode_Airspeed;
+		case SpeedMode::xf_nil_value:	return kNilValue;
 	}
 
 	return "";
