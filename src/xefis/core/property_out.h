@@ -53,7 +53,7 @@ class BasicPropertyOut:
 	 * Unserializes property from string.
 	 */
 	virtual void
-	from_string (std::string const&, PropertyConversionSettings const& = {}) = 0;
+	from_string (std::string_view const&, PropertyConversionSettings const& = {}) = 0;
 
 	/**
 	 * Unserializes property from Blob.
@@ -165,7 +165,7 @@ template<class pValue>
 
 		// BasicPropertyOut API
 		void
-		from_string (std::string const&, PropertyConversionSettings const& = {}) override;
+		from_string (std::string_view const&, PropertyConversionSettings const& = {}) override;
 
 		// BasicPropertyOut API
 		void
@@ -356,7 +356,7 @@ template<class V>
 
 template<class V>
 	inline void
-	PropertyOut<V>::from_string (std::string const& str, PropertyConversionSettings const& settings)
+	PropertyOut<V>::from_string (std::string_view const& str, PropertyConversionSettings const& settings)
 	{
 		PropertyTraits<V>::from_string (*this, str, settings);
 	}

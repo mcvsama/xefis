@@ -16,9 +16,11 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
+#include <utility>
 
 // Boost:
-#include <boost/endian/conversion.hpp>
+#include <boost/lexical_cast.hpp>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -60,19 +62,15 @@ template<class T>
 	}
 
 
-template<class PropertyInOut, class Value>
-	inline void
-	assign (PropertyInOut& property, Value&& value)
+/**
+ * Since PropertyOut is not defined yet at this point, use template function
+ * to allow compilation at all.
+ */
+template<class Property, class Value>
+	void
+	assign (Property& property, Value&& value)
 	{
-		if constexpr (std::is_base_of<BasicPropertyIn, PropertyInOut>())
-		{
-			if constexpr (std::is_base_of<Nil, std::remove_cvref_t<Value>>())
-				property << xf::no_data_source;
-			else
-				property << ConstantSource (std::forward<Value> (value));
-		}
-		else
-			property = std::forward<Value> (value);
+		property = std::forward<Value> (value);
 	}
 
 
@@ -94,16 +92,16 @@ template<class Value>
 	}
 
 
-template<class PropertyInOut>
+template<class Value, template<class> class PropertyOut>
 	inline void
-	apply_generic_blob_to_value (PropertyInOut& property, BlobView blob, size_t constant_blob_size)
+	apply_generic_blob_to_value (PropertyOut<Value>& property, BlobView blob, size_t constant_blob_size)
 	{
 		if (blob.size() == constant_blob_size)
 		{
 			if (blob[0] == not_nil)
 			{
 				blob.remove_prefix (1);
-				typename PropertyInOut::Value value;
+				Value value;
 				blob_to_value (blob, value);
 				assign (property, value);
 			}
@@ -112,6 +110,25 @@ template<class PropertyInOut>
 		}
 		else
 			throw InvalidBlobSize (blob.size(), constant_blob_size);
+	}
+
+
+template<class Value, template<class> class Property>
+	inline void
+	generic_from_string (Property<Value>& property, std::string_view const& str, PropertyConversionSettings const& settings)
+	{
+		if (str == settings.nil_value)
+			assign (property, xf::nil);
+		else
+		{
+			try {
+				assign (property, boost::lexical_cast<Value> (str));
+			}
+			catch (boost::bad_lexical_cast&)
+			{
+				assign (property, xf::nil);
+			}
+		}
 	}
 
 } // namespace detail
@@ -172,7 +189,7 @@ template<class Enum>
 		}
 
 		static inline void
-		from_string (PropertyOut<Enum>& property, std::string const& str, PropertyConversionSettings const&)
+		from_string (PropertyOut<Enum>& property, std::string_view const& str, PropertyConversionSettings const&)
 		{
 			Enum value;
 			parse (str, value);
@@ -256,9 +273,9 @@ template<class Integer>
 		}
 
 		static inline void
-		from_string (PropertyOut<Integer>&, std::string const&, PropertyConversionSettings const&)
+		from_string (PropertyOut<Integer>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
-			// TODO
+			detail::generic_from_string (property, str, settings);
 		}
 
 		static inline Blob
@@ -275,8 +292,6 @@ template<class Integer>
 	};
 
 
-// TODO for double/float use nan as nil indicator
-// TODO or just use generic IntegerPropertyTraits (renamed to NumericPropertyTraits)
 template<class FloatingPoint>
 	struct FloatingPointPropertyTraits
 	{
@@ -289,8 +304,8 @@ template<class FloatingPoint>
 		static constexpr size_t
 		constant_blob_size()
 		{
-			// 1 additional byte is for nil-indication:
-			return 1 + sizeof (FloatingPoint);
+			// NaN is used as a nil value.
+			return sizeof (FloatingPoint);
 		}
 
 		static inline std::string
@@ -303,21 +318,39 @@ template<class FloatingPoint>
 		}
 
 		static inline void
-		from_string (PropertyOut<FloatingPoint>&, std::string const&, PropertyConversionSettings const&)
+		from_string (PropertyOut<FloatingPoint>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
-			// TODO
+			detail::generic_from_string (property, str, settings);
 		}
 
 		static inline Blob
 		to_blob (Property<FloatingPoint> const& property)
 		{
-			return detail::apply_generic_value_to_blob (property, constant_blob_size());
+			Blob result;
+
+			if (property)
+				value_to_blob (*property, result);
+			else
+				value_to_blob (std::numeric_limits<FloatingPoint>::quiet_NaN(), result);
+
+			return result;
 		}
 
 		static inline void
 		from_blob (PropertyOut<FloatingPoint>& property, BlobView blob)
 		{
-			detail::apply_generic_blob_to_value (property, blob, constant_blob_size());
+			if (blob.size() == constant_blob_size())
+			{
+				FloatingPoint fp;
+				blob_to_value (blob, fp);
+
+				if (std::isnan (fp))
+					detail::assign (property, xf::nil);
+				else
+					detail::assign (property, fp);
+			}
+			else
+				throw InvalidBlobSize (blob.size(), constant_blob_size());
 		}
 	};
 
@@ -335,7 +368,7 @@ template<class Value, class Enabled = void>
 		to_string (Property<Value> const&, PropertyConversionSettings const&);
 
 		static inline void
-		from_string (PropertyOut<Value>&, std::string const&, PropertyConversionSettings const&);
+		from_string (PropertyOut<Value>&, std::string_view const&, PropertyConversionSettings const&);
 
 		static inline Blob
 		to_blob (Property<Value> const&);
@@ -370,7 +403,7 @@ template<>
 		}
 
 		static inline void
-		from_string (PropertyOut<bool>& property, std::string const& str, PropertyConversionSettings const& settings)
+		from_string (PropertyOut<bool>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
 			if (str == settings.true_value)
 				detail::assign (property, true);
@@ -485,9 +518,12 @@ template<>
 		}
 
 		static inline void
-		from_string (PropertyOut<std::string>&, std::string const&, PropertyConversionSettings const&)
+		from_string (PropertyOut<std::string>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
-			// TODO
+			if (str == settings.nil_value)
+				detail::assign (property, xf::nil);
+			else
+				detail::assign (property, std::string (str));
 		}
 
 		static inline Blob
@@ -545,9 +581,9 @@ template<class Unit>
 		}
 
 		static inline void
-		from_string (PropertyOut<si::Quantity<Unit>>&, std::string const&, PropertyConversionSettings const&)
+		from_string (PropertyOut<si::Quantity<Unit>>&, std::string_view const&, PropertyConversionSettings const&)
 		{
-			// TODO
+			// TODO need also check the unit or set xf::nil if not convertible
 		}
 
 		static inline Blob
