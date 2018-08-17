@@ -29,7 +29,7 @@ RELEASE				:= 0
 UB_OPTS_DISABLE		:= 0
 # Sanitizers?
 SANITIZE			:=
-# address, thread, leak or undefined
+NO_SANITIZE			:=
 
 CXX				:= g++
 DEPCC			:= $(CXX)
@@ -140,8 +140,18 @@ CXXFLAGS += -finline -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard
 endif
 
 ifneq ($(SANITIZE),)
-CXXFLAGS += -fsanitize=$(SANITIZE)
-LDFLAGS += -fsanitize=$(SANITIZE)
+CXXFLAGS += $(foreach sanitizer, $(SANITIZE), -fsanitize=$(sanitizer))
+LDFLAGS += $(foreach sanitizer, $(SANITIZE), -fsanitize=$(sanitizer))
+endif
+
+ifneq ($(NO_SANITIZE),)
+CXXFLAGS += $(foreach sanitizer, $(NO_SANITIZE), -fno-sanitize=$(sanitizer))
+LDFLAGS += $(foreach sanitizer, $(NO_SANITIZE), -fno-sanitize=$(sanitizer))
+endif
+
+ifeq ($(COVERAGE),1)
+CXXFLAGS += -fprofile-arcs -ftest-coverage
+LDFLAGS += -fprofile-arcs -ftest-coverage
 endif
 
 dist			= $(ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
