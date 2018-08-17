@@ -17,10 +17,13 @@
 // Standard:
 #include <cstddef>
 #include <functional>
+#include <optional>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/v1/property.h>
+#include <xefis/core/property.h>
+#include <xefis/utility/actions.h>
 
 
 namespace xf {
@@ -30,56 +33,94 @@ namespace xf {
  * calls 'up' or 'down' callbacks depending
  * on how these boolean values change.
  */
-class QuadratureDecoder
-{
-  public:
-	typedef std::function<void (int delta)> Callback;
+template<class pInteger = int64_t>
+	class QuadratureDecoder
+	{
+		static_assert (std::is_integral<pInteger>());
+		static_assert (std::is_signed<pInteger>());
 
-  public:
-	// Ctor
-	explicit
-	QuadratureDecoder (v1::PropertyBoolean& property_a, v1::PropertyBoolean& property_b, Callback callback);
+	  public:
+		using Integer	= pInteger;
+		using Callback	= std::function<void (std::optional<Integer> delta)>;
 
-	/**
-	 * Signals that properties have been
-	 * updated. May call the callback.
-	 */
-	void
-	data_updated();
+	  public:
+		// Ctor
+		explicit
+		QuadratureDecoder (Property<bool> const& property_a, Property<bool> const& property_b, Callback callback);
 
-	/**
-	 * Force callback to be called with given delta value.
-	 */
-	void
-	operator() (int delta);
+		/**
+		 * Signals that properties have been updated. May call the callback.
+		 */
+		void
+		operator()();
 
-	/**
-	 * Alias for operator().
-	 */
-	void
-	call (int delta);
+		/**
+		 * Force callback to be called with given delta value.
+		 */
+		void
+		force_callback (std::optional<Integer> delta) const;
 
-  private:
-	bool					_prev_a;
-	bool					_prev_b;
-	v1::PropertyBoolean&	_property_a;
-	v1::PropertyBoolean&	_property_b;
-	Callback				_callback;
-};
-
-
-inline void
-QuadratureDecoder::operator() (int delta)
-{
-	_callback (delta);
-}
+	  private:
+		bool					_prev_a;
+		bool					_prev_b;
+		Property<bool> const&	_property_a;
+		Property<bool> const&	_property_b;
+		PropChanged<Integer>	_prop_a_changed	{ _property_a };
+		PropChanged<Integer>	_prop_b_changed	{ _property_b };
+		Callback				_callback;
+	};
 
 
-inline void
-QuadratureDecoder::call (int delta)
-{
-	_callback (delta);
-}
+template<class I>
+	inline
+	QuadratureDecoder<I>::QuadratureDecoder (Property<bool> const& property_a, Property<bool> const& property_b, Callback callback):
+		_prev_a (property_a.value_or (false)),
+		_prev_b (property_b.value_or (false)),
+		_property_a (property_a),
+		_property_b (property_b),
+		_callback (callback)
+	{ }
+
+
+template<class I>
+	inline void
+	QuadratureDecoder<I>::operator()()
+	{
+		if (_callback)
+		{
+			if (_prop_a_changed() || _prop_b_changed())
+			{
+				if (_property_a && _property_b)
+				{
+					Integer const a = *_property_a;
+					Integer const b = *_property_b;
+					Integer const da = _prev_a - a;
+					Integer const db = _prev_b - b;
+
+					if (da == 0 && db == 0)
+						return; // No change.
+
+					if ((da == 1 && b == 0) || (a == 1 && db == 1) || (da == -1 && b == 1) || (a == 0 && db == -1))
+						_callback (+1);
+					else
+						_callback (-1);
+
+					_prev_a = a;
+					_prev_b = b;
+				}
+				else
+					_callback (std::nullopt);
+			}
+		}
+	}
+
+
+template<class I>
+	inline void
+	QuadratureDecoder<I>::force_callback (std::optional<Integer> delta) const
+	{
+		_callback (delta);
+	}
 
 } // namespace xf
 
