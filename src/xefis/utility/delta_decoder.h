@@ -50,7 +50,7 @@ template<class pInteger = int64_t>
 		operator()();
 
 		/**
-		 * Force callback to be called with given delta value.
+		 * Force callback to be called with given delta value, but don't change internal state of the decoder.
 		 */
 		void
 		force_callback (std::optional<Integer> delta) const;

@@ -29,9 +29,7 @@
 namespace xf {
 
 /**
- * Takes two boolean properties and
- * calls 'up' or 'down' callbacks depending
- * on how these boolean values change.
+ * Takes two boolean properties and calls 'up' or 'down' callbacks depending on how these boolean values change.
  */
 template<class pInteger = int64_t>
 	class QuadratureDecoder
@@ -55,7 +53,7 @@ template<class pInteger = int64_t>
 		operator()();
 
 		/**
-		 * Force callback to be called with given delta value.
+		 * Force callback to be called with given delta value, but don't change the internal state of the decoder.
 		 */
 		void
 		force_callback (std::optional<Integer> delta) const;
@@ -65,9 +63,39 @@ template<class pInteger = int64_t>
 		bool					_prev_b;
 		Property<bool> const&	_property_a;
 		Property<bool> const&	_property_b;
-		PropChanged<Integer>	_prop_a_changed	{ _property_a };
-		PropChanged<Integer>	_prop_b_changed	{ _property_b };
+		PropChanged<bool>		_prop_a_changed	{ _property_a };
+		PropChanged<bool>		_prop_b_changed	{ _property_b };
 		Callback				_callback;
+	};
+
+
+/**
+ * QuadratureDecoder with internal counter.
+ */
+template<class pInteger = int64_t>
+	class QuadratureCounter: public QuadratureDecoder<pInteger>
+	{
+		using typename QuadratureDecoder<pInteger>::Integer;
+		using Callback = std::function<void (std::optional<Integer> delta, Integer total)>;
+
+	  public:
+		// Ctor
+		explicit
+		QuadratureCounter (Property<bool> const& property_a, Property<bool> const& property_b, Integer initial_value, Callback callback = [](auto, auto){});
+
+		/**
+		 * Return stored counted value.
+		 */
+		Integer
+		value() const noexcept;
+
+	  private:
+		void
+		decoder_callback (std::optional<Integer> delta);
+
+	  private:
+		Integer		_total;
+		Callback	_callback;
 	};
 
 
@@ -88,22 +116,33 @@ template<class I>
 	{
 		if (_callback)
 		{
-			if (_prop_a_changed() || _prop_b_changed())
+			// Both PropChanged need to be called, to save new state:
+			auto const a_changed = _prop_a_changed();
+			auto const b_changed = _prop_b_changed();
+
+			if (a_changed || b_changed)
 			{
 				if (_property_a && _property_b)
 				{
 					Integer const a = *_property_a;
 					Integer const b = *_property_b;
-					Integer const da = _prev_a - a;
-					Integer const db = _prev_b - b;
+					Integer const da = a - _prev_a;
+					Integer const db = b - _prev_b;
 
+					// If nothing changed… nothing changed - do nothing:
 					if (da == 0 && db == 0)
 						return; // No change.
 
-					if ((da == 1 && b == 0) || (a == 1 && db == 1) || (da == -1 && b == 1) || (a == 0 && db == -1))
-						_callback (+1);
+					// If both inputs changed (it should not happen), don't call the callback:
+					if (da == 0 || db == 0)
+					{
+						if ((da == 1 && b == 0) || (a == 1 && db == 1) || (da == -1 && b == 1) || (a == 0 && db == -1))
+							_callback (-1);
+						else
+							_callback (+1);
+					}
 					else
-						_callback (-1);
+						_callback (std::nullopt);
 
 					_prev_a = a;
 					_prev_b = b;
@@ -117,9 +156,40 @@ template<class I>
 
 template<class I>
 	inline void
-	QuadratureDecoder<I>::force_callback (std::optional<Integer> delta) const
+	QuadratureDecoder<I>::force_callback (std::optional<Integer> const delta) const
 	{
 		_callback (delta);
+	}
+
+
+template<class I>
+	inline
+	QuadratureCounter<I>::QuadratureCounter (Property<bool> const& property_a, Property<bool> const& property_b, Integer initial_value, Callback callback):
+		QuadratureDecoder<I> (property_a, property_b, [this] (auto delta) { decoder_callback (delta); }),
+		_total (initial_value),
+		_callback (callback)
+	{ }
+
+
+template<class I>
+	inline auto
+	QuadratureCounter<I>::value() const noexcept -> Integer
+	{
+		return _total;
+	}
+
+
+template<class I>
+	inline void
+	QuadratureCounter<I>::decoder_callback (std::optional<Integer> const delta)
+	{
+		if (delta)
+		{
+			_total += *delta;
+			_callback (delta, _total);
+		}
+		else
+			_callback (std::nullopt, _total);
 	}
 
 } // namespace xf
