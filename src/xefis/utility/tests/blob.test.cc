@@ -82,6 +82,7 @@ RuntimeTest t1 ("blob: value_to_blob", []{
 	test_serialization<float16_t> (0.15_half);
 	test_serialization<float32_t> (0.152534f);
 	test_serialization<float64_t> (0.15253452890394);
+	test_serialization<float128_t> (0.152534503492039402890394L);
 	test_serialization<si::Length> (1.15_m);
 	test_serialization<std::string> ("random string");
 	test_serialization<TestEnum> (TestEnum::Value1);
@@ -122,6 +123,7 @@ RuntimeTest t3 ("blob: test sizes of serialized data", []{
 	test_size<float16_t> (0.0_half, 2);
 	test_size<float32_t> (0.0f, 4);
 	test_size<float64_t> (0.0, 8);
+	test_size<float128_t> (0.0L, 16);
 	test_size<si::Length> (0_m, 8);
 	test_size<std::string> ("random string", 13);
 	test_size<TestEnum8> (TestEnum8::Value, 1);
