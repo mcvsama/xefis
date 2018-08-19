@@ -499,6 +499,11 @@ template<>
 
 
 template<>
+	struct PropertyTraits<float128_t>: public FloatingPointPropertyTraits<float128_t>
+	{ };
+
+
+template<>
 	struct PropertyTraits<std::string>
 	{
 		static constexpr bool

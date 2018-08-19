@@ -156,6 +156,7 @@ template<class Lambda>
 			lambda.template operator()<float16_t, float16_t> (0.125_half, 0.0_half);
 			lambda.template operator()<float32_t, float32_t> (0.125f, 0.0f);
 			lambda.template operator()<float64_t, float64_t> (0.125, 0.0);
+			lambda.template operator()<float128_t, float128_t> (0.125L, 0.0L);
 			lambda.template operator()<std::string, std::string> ("value-1", "value-2");
 			lambda.template operator()<si::Length> (1.15_m, -2.5_m);
 			lambda.template operator()<TestEnum> (TestEnum::Value1, TestEnum::Value2);
