@@ -50,7 +50,7 @@ class HorizontalTrimIO: public xf::ModuleIO
 
 class HorizontalTrim:
 	public xf::Instrument<HorizontalTrimIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor

@@ -48,7 +48,7 @@ class VerticalTrimIO: public xf::ModuleIO
 
 class VerticalTrim:
 	public xf::Instrument<VerticalTrimIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor

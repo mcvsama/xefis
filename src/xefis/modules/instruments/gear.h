@@ -45,7 +45,7 @@ class GearIO: public xf::ModuleIO
 
 class Gear:
 	public xf::Instrument<GearIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor
