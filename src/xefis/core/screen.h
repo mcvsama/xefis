@@ -46,6 +46,7 @@ class Details
   public:
 	std::optional<PaintRequest>	paint_request;
 	QRectF						requested_position;
+	QPointF						anchor_position;
 	std::optional<QRect>		computed_position;
 	QSize						previous_size;
 	std::unique_ptr<QImage>		canvas;
@@ -88,7 +89,13 @@ class Screen:
 	 * Values are factors, { 0, 0 } is top-left, { 1, 1 } is bottom-right.
 	 */
 	void
-	set (BasicInstrument const&, QRectF requested_position);
+	set (BasicInstrument const&, QRectF requested_position, QPointF const anchor_position = { 0.0f, 0.0f });
+
+	/**
+	 * Set position and size of an instrument.
+	 */
+	void
+	set_centered (BasicInstrument const&, QRectF requested_position);
 
 	/**
 	 * Set z-index for an instrument
