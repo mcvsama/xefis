@@ -47,7 +47,7 @@ class FlapsIO: public xf::ModuleIO
 
 class Flaps:
 	public xf::Instrument<FlapsIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor

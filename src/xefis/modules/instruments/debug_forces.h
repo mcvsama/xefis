@@ -45,7 +45,7 @@ class DebugForcesIO: public xf::ModuleIO
 
 class DebugForces:
 	public xf::Instrument<DebugForcesIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	// Ctor

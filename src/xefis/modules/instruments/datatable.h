@@ -34,7 +34,7 @@
 
 class Datatable:
 	public xf::Instrument<xf::ModuleIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
 	class Line
 	{

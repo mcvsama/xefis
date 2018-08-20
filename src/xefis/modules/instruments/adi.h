@@ -689,7 +689,7 @@ class AltitudeLadder
 };
 
 
-class PaintingWork: public xf::InstrumentSupport
+class PaintingWork: private xf::InstrumentSupport
 {
   public:
 	void

@@ -65,7 +65,7 @@ class StatusIO: public xf::ModuleIO
  */
 class Status:
 	public xf::Instrument<StatusIO>,
-	protected xf::InstrumentSupport
+	private xf::InstrumentSupport
 {
   public:
 	/**
