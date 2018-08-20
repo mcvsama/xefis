@@ -45,10 +45,6 @@ class BasicSetting
 	enum OptionalTag { Optional };
 
   public:
-	// Dtor
-	virtual
-	~BasicSetting() = default;
-
 	/**
 	 * Ctor
 	 * Stores pointer to owning module.
@@ -62,6 +58,10 @@ class BasicSetting
 	 */
 	explicit
 	BasicSetting (ModuleIO* owner, std::string const& name, OptionalTag);
+
+	// Dtor
+	virtual
+	~BasicSetting() = default;
 
 	/**
 	 * Return owning module.
