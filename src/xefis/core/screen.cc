@@ -75,17 +75,25 @@ Screen::register_instrument (BasicInstrument& instrument)
 
 
 void
-Screen::set (BasicInstrument const& instrument, QRectF const requested_position)
+Screen::set (BasicInstrument const& instrument, QRectF const requested_position, QPointF const anchor_position)
 {
 	for (auto& disclosure: *this)
 	{
 		if (&disclosure.registrant() == &instrument)
 		{
 			disclosure.details().requested_position = requested_position;
+			disclosure.details().anchor_position = anchor_position;
 			disclosure.details().computed_position.reset();
 			break;
 		}
 	}
+}
+
+
+void
+Screen::set_centered (BasicInstrument const& instrument, QRectF const requested_position)
+{
+	set (instrument, requested_position, { 0.5f, 0.5f });
 }
 
 
@@ -164,15 +172,14 @@ Screen::paint_instruments_to_buffer()
 
 		if (!details.computed_position)
 		{
-			QPointF const top_left = details.requested_position.topLeft();
-			QPointF const bottom_right = details.requested_position.bottomRight();
 			auto const w = canvas_size.width();
 			auto const h = canvas_size.height();
+			QPointF const top_left { w * details.requested_position.left(), h * details.requested_position.top() };
+			QPointF const bottom_right { w * details.requested_position.right(), h * details.requested_position.bottom() };
+			QPointF const anchor_position { details.anchor_position.x() * details.requested_position.size().width() * w,
+											details.anchor_position.y() * details.requested_position.size().height() * h };
 
-			details.computed_position = QRect {
-				QPoint (top_left.x() * w, top_left.y() * h),
-				QPoint (bottom_right.x() * w, bottom_right.y() * h),
-			};
+			details.computed_position = QRectF { top_left, bottom_right }.translated (-anchor_position).toRect();
 		}
 
 		if (details.computed_position->isValid())
