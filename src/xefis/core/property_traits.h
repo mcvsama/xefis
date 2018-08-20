@@ -363,6 +363,7 @@ template<class FloatingPoint>
 template<class Value, class Enabled = void>
 	struct PropertyTraits
 	{
+	  private:
 		static constexpr bool
 		has_constant_blob_size();
 
