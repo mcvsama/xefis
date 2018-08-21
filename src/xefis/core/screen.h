@@ -104,6 +104,12 @@ class Screen:
 	set_z_index (BasicInstrument const&, int z_index);
 
 	/**
+	 * Enable/disable debug bounding boxes of instruments.
+	 */
+	void
+	set_paint_bounding_boxes (bool enable);
+
+	/**
 	 * Return pixel density for this screen.
 	 */
 	si::PixelDensity
@@ -165,6 +171,7 @@ class Screen:
 	QImage						_canvas;
 	std::vector<Disclosure*>	_z_index_sorted_disclosures;
 	ScreenSpec					_screen_spec;
+	bool						_paint_bounding_boxes	{ false };
 };
 
 } // namespace xf
