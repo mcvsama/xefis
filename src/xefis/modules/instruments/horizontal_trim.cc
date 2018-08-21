@@ -43,7 +43,7 @@ HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std
 void
 HorizontalTrim::process (xf::Cycle const& cycle)
 {
-	_inputs_observer.process (cycle.update_dt());
+	_inputs_observer.process (cycle.update_time());
 }
 
 
