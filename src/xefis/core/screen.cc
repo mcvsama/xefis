@@ -111,7 +111,14 @@ Screen::set_z_index (BasicInstrument const& instrument, int const new_z_index)
 }
 
 
-inline si::PixelDensity
+void
+Screen::set_paint_bounding_boxes (bool enable)
+{
+	_paint_bounding_boxes = enable;
+}
+
+
+si::PixelDensity
 Screen::pixel_density() const
 {
 	auto const pos = _screen_spec.position_and_size();
@@ -238,6 +245,12 @@ Screen::paint_instruments_to_buffer()
 				// it means a resize happened during async painting of the instrument.
 				if (details.computed_position->size() == details.ready_canvas->size())
 					canvas_painter.drawImage (*details.computed_position, *details.ready_canvas, QRect (QPoint (0, 0), details.computed_position->size()));
+
+				if (_paint_bounding_boxes)
+				{
+					canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
+					canvas_painter.drawRect (*details.computed_position);
+				}
 			}
 		}
 	}
