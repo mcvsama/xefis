@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/property_converter.h>
 
 // Local:
 #include "property_item.h"
@@ -48,11 +49,23 @@ PropertyItem::setup_appereance()
 void
 PropertyItem::read()
 {
-	// TODO call it periodically
-	setText (PropertyTree::ActualValueColumn, "x");
-	setText (PropertyTree::ForcedValueColumn, "x");
-	setText (PropertyTree::SetValueColumn, "x");
-	setText (PropertyTree::FallbackValueColumn, "x");
+	if (_property)
+	{
+		PropertyConversionSettings conv_settings;
+		conv_settings.numeric_format = boost::format ("%.12f");
+
+		setTextAlignment (PropertyTree::ActualValueColumn, Qt::AlignRight);
+		setText (PropertyTree::ActualValueColumn, QString::fromStdString (_property->to_string (conv_settings)));
+
+		setTextAlignment (PropertyTree::ForcedValueColumn, Qt::AlignRight);
+		setText (PropertyTree::ForcedValueColumn, "x");
+
+		setTextAlignment (PropertyTree::SetValueColumn, Qt::AlignRight);
+		setText (PropertyTree::SetValueColumn, QString::fromStdString (_property->to_string (conv_settings)));
+
+		setTextAlignment (PropertyTree::FallbackValueColumn, Qt::AlignRight);
+		setText (PropertyTree::FallbackValueColumn, "x");
+	}
 }
 
 } // namespace xf

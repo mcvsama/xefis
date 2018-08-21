@@ -56,7 +56,7 @@ PropertyTree::PropertyTree (QWidget* parent):
 	layout->addWidget (_tree);
 
 	_refresh_timer = new QTimer (this);
-	_refresh_timer->setInterval ((50_ms).in<si::Millisecond>());
+	_refresh_timer->setInterval ((100_ms).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &PropertyTree::read_values);
 
 	// TODO QObject::connect (this, &QTreeWidget::customContextMenuRequested, this, &PropertyTreeWidget::handle_context_menu_request);
