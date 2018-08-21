@@ -38,7 +38,7 @@ Flaps::Flaps (std::unique_ptr<FlapsIO> module_io, std::string const& instance):
 void
 Flaps::process (xf::Cycle const& cycle)
 {
-	_inputs_observer.process (cycle.update_dt());
+	_inputs_observer.process (cycle.update_time());
 }
 
 

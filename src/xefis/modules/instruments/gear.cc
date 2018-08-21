@@ -43,7 +43,7 @@ Gear::Gear (std::unique_ptr<GearIO> module_io, std::string const& instance):
 void
 Gear::process (xf::Cycle const& cycle)
 {
-	_inputs_observer.process (cycle.update_dt());
+	_inputs_observer.process (cycle.update_time());
 }
 
 
