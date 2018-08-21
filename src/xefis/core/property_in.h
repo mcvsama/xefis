@@ -130,6 +130,10 @@ template<class pValue>
 		to_string (PropertyConversionSettings const& = {}) const override;
 
 		// BasicProperty API
+		std::optional<float128_t>
+		to_floating_point (PropertyConversionSettings const& = {}) const override;
+
+		// BasicProperty API
 		Blob
 		to_blob() const override;
 
@@ -261,6 +265,14 @@ template<class V>
 	PropertyIn<V>::to_string (PropertyConversionSettings const& settings) const
 	{
 		return PropertyTraits<V>::to_string (*this, settings);
+	}
+
+
+template<class V>
+	inline std::optional<float128_t>
+	PropertyIn<V>::to_floating_point (PropertyConversionSettings const& settings) const
+	{
+		return PropertyTraits<V>::to_floating_point (*this, settings);
 	}
 
 
