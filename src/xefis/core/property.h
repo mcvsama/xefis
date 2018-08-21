@@ -194,6 +194,12 @@ class PropertyVirtualInterface
 	to_string (PropertyConversionSettings const& = {}) const = 0;
 
 	/**
+	 * Extract numeric value from the property, if applies.
+	 */
+	virtual std::optional<float128_t>
+	to_floating_point (PropertyConversionSettings const& = {}) const = 0;
+
+	/**
 	 * Serializes property value, including nil-flag.
 	 */
 	virtual Blob

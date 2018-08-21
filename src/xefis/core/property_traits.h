@@ -201,6 +201,12 @@ template<class Enum>
 			}
 		}
 
+		static inline std::optional<float128_t>
+		to_floating_point (Property<Enum> const&, PropertyConversionSettings const&)
+		{
+			return std::nullopt;
+		}
+
 		static inline Blob
 		to_blob (Property<Enum> const& property)
 		{
@@ -283,6 +289,15 @@ template<class Integer>
 			detail::generic_from_string (property, str, settings);
 		}
 
+		static inline std::optional<float128_t>
+		to_floating_point (Property<Integer> const& property, PropertyConversionSettings const&)
+		{
+			if (property)
+				return static_cast<float128_t> (*property);
+			else
+				return std::nullopt;
+		}
+
 		static inline Blob
 		to_blob (Property<Integer> const& property)
 		{
@@ -326,6 +341,15 @@ template<class FloatingPoint>
 		from_string (PropertyOut<FloatingPoint>& property, std::string_view const& str, PropertyConversionSettings const& settings)
 		{
 			detail::generic_from_string (property, str, settings);
+		}
+
+		static inline std::optional<float128_t>
+		to_floating_point (Property<FloatingPoint> const& property, PropertyConversionSettings const&)
+		{
+			if (property)
+				return static_cast<float128_t> (*property);
+			else
+				return std::nullopt;
 		}
 
 		static inline Blob
@@ -376,6 +400,9 @@ template<class Value, class Enabled = void>
 		static inline void
 		from_string (PropertyOut<Value>&, std::string_view const&, PropertyConversionSettings const&);
 
+		static inline std::optional<float128_t>
+		to_floating_point (Property<Value> const&, PropertyConversionSettings const&);
+
 		static inline Blob
 		to_blob (Property<Value> const&);
 
@@ -417,6 +444,12 @@ template<>
 				detail::assign (property, false);
 			else
 				detail::assign (property, xf::nil);
+		}
+
+		static inline std::optional<float128_t>
+		to_floating_point (Property<bool> const&, PropertyConversionSettings const&)
+		{
+			return std::nullopt;
 		}
 
 		static inline Blob
@@ -537,6 +570,12 @@ template<>
 				detail::assign (property, std::string (str));
 		}
 
+		static inline std::optional<float128_t>
+		to_floating_point (Property<std::string> const&, PropertyConversionSettings const&)
+		{
+			return std::nullopt;
+		}
+
 		static inline Blob
 		to_blob (Property<std::string> const& property)
 		{
@@ -602,6 +641,15 @@ template<class Unit>
 				si::parse (str, result);
 				detail::assign (property, result);
 			}
+		}
+
+		static inline std::optional<float128_t>
+		to_floating_point (Property<si::Quantity<Unit>> const& property, PropertyConversionSettings const&)
+		{
+			if (property)
+				return static_cast<float128_t> (property->quantity());
+			else
+				return std::nullopt;
 		}
 
 		static inline Blob
