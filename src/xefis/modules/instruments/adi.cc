@@ -135,7 +135,7 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 		{
 			if (x.second == "G" || x.second == "R")
 				paint_dashed_zone (x.second == "G" ? green : red, x.first);
-			else if (x.second == "-")
+			else if (x.second == " ")
 				; // Paint nothing.
 			else
 				painter.fast_draw_text (x.first, Qt::AlignVCenter | Qt::AlignLeft, x.second);
@@ -145,8 +145,8 @@ AdiPaintRequest::paint_rotating_value (QRectF const& rect, float position, float
 
 
 void
-AdiPaintRequest::paint_rotating_digit (QRectF const& box, float value, int round_target, float const height_scale, float const delta, float const phase,
-									   bool two_zeros, bool zero_mark, bool black_zero)
+AdiPaintRequest::paint_rotating_digit (QRectF const& box, float const value, int const round_target, float const height_scale, float const delta, float const phase,
+									   bool const two_zeros, bool const zero_mark, bool const black_zero)
 {
 	auto round_to = [](float v, int to) -> float
 	{
@@ -166,9 +166,9 @@ AdiPaintRequest::paint_rotating_digit (QRectF const& box, float value, int round
 	int b = static_cast<int> (std::abs (xb));
 	int c = static_cast<int> (std::abs (xc));
 
-	QString sa = zero_mark && a == 0 ? (black_zero ? "-" : (xa >= 0.f ? "G" : "R")) : QString::number (a);
-	QString sb = zero_mark && b == 0 ? (black_zero ? "-" : (xb >= 0.f ? "G" : "R")) : QString::number (b);
-	QString sc = zero_mark && c == 0 ? (black_zero ? "-" : (xc >= 0.f ? "G" : "R")) : QString::number (c);
+	QString sa = zero_mark && a == 0 ? (black_zero ? " " : (xa >= 0.f ? "G" : "-")) : QString::number (a);
+	QString sb = zero_mark && b == 0 ? (black_zero ? " " : (xb >= 0.f ? "G" : "-")) : QString::number (b);
+	QString sc = zero_mark && c == 0 ? (black_zero ? " " : (xc >= 0.f ? "G" : "-")) : QString::number (c);
 
 	if (std::abs (dtr) < delta && (two_zeros || std::abs (value) >= round_target / 2))
 		pos = xf::floored_mod (-dtr * (0.5f / delta), 1.f) - 0.5f;
