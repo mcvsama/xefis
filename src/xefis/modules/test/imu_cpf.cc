@@ -19,13 +19,13 @@
 #include <math/math.h>
 
 // Local:
-#include "imu_cff.h"
+#include "imu_cpf.h"
 
 
-IMU_CFF::IMU_CFF (std::unique_ptr<IMU_CFF_IO> module_io, std::string const& instance):
+IMU_CPF::IMU_CPF (std::unique_ptr<IMU_CPF_IO> module_io, std::string const& instance):
 	Module (std::move (module_io), instance)
 {
-	_centripetal_computer.set_callback (std::bind (&IMU_CFF::compute_centripetal, this));
+	_centripetal_computer.set_callback (std::bind (&IMU_CPF::compute_centripetal, this));
 	_centripetal_computer.add_depending_smoothers ({
 		&_smooth_accel_x,
 		&_smooth_accel_y,
@@ -43,14 +43,14 @@ IMU_CFF::IMU_CFF (std::unique_ptr<IMU_CFF_IO> module_io, std::string const& inst
 
 
 void
-IMU_CFF::process (xf::Cycle const& cycle)
+IMU_CPF::process (xf::Cycle const& cycle)
 {
 	_centripetal_computer.process (cycle.update_time());
 }
 
 
 void
-IMU_CFF::compute_centripetal()
+IMU_CPF::compute_centripetal()
 {
 	/*
 	 * Turn radius:
