@@ -54,12 +54,8 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
 };
 
 
-class RemoteControlManagementSystem:
-	public QObject,
-	public xf::Module<RemoteControlManagementSystemIO>
+class RemoteControlManagementSystem: public xf::Module<RemoteControlManagementSystemIO>
 {
-	Q_OBJECT
-
   public:
 	// Ctor
 	explicit
