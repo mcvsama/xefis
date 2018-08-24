@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__IMU_CFF_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__IMU_CFF_H__INCLUDED
+#ifndef XEFIS__MODULES__SYSTEMS__IMU_CPF_H__INCLUDED
+#define XEFIS__MODULES__SYSTEMS__IMU_CPF_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -24,7 +24,7 @@
 #include <xefis/core/property_observer.h>
 
 
-class IMU_CFF_IO: public xf::ModuleIO
+class IMU_CPF_IO: public xf::ModuleIO
 {
   public:
 	/*
@@ -54,9 +54,8 @@ class IMU_CFF_IO: public xf::ModuleIO
 
 /**
  * Compute centripetal force from IAS and gyro information.
- * TODO rename CFF -> centripetal
  */
-class IMU_CFF: public xf::Module<IMU_CFF_IO>
+class IMU_CPF: public xf::Module<IMU_CPF_IO>
 {
   private:
 	static constexpr si::Time kSmoothingTime = 1_s;
@@ -64,7 +63,7 @@ class IMU_CFF: public xf::Module<IMU_CFF_IO>
   public:
 	// Ctor
 	explicit
-	IMU_CFF (std::unique_ptr<IMU_CFF_IO>, std::string const& instance = {});
+	IMU_CPF (std::unique_ptr<IMU_CPF_IO>, std::string const& instance = {});
 
   protected:
 	void
