@@ -37,10 +37,10 @@ class UDP_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<QString>			tx_udp_host			{ this, "tx_udp_host" }; // TODO express that this is optional
+	xf::Setting<QString>			tx_udp_host			{ this, "tx_udp_host", xf::BasicSetting::Optional };
 	xf::Setting<int>				tx_udp_port			{ this, "tx_udp_port" };
 	xf::Setting<bool>				tx_interference		{ this, "tx_interference", false };
-	xf::Setting<QString>			rx_udp_host			{ this, "rx_udp_host" }; // TODO OptionalSetting
+	xf::Setting<QString>			rx_udp_host			{ this, "rx_udp_host", xf::BasicSetting::Optional };
 	xf::Setting<int>				rx_udp_port			{ this, "rx_udp_port" };
 	xf::Setting<bool>				rx_interference		{ this, "rx_interference", false };
 
