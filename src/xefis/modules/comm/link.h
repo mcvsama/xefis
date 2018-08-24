@@ -54,8 +54,8 @@ class LinkProtocol
 {
   public:
 	using Bits				= xf::StrongType<uint8_t, struct BitsType>;
-	using Magic				= xf::StrongType<Blob, struct MagicType>; // TODO make ConstBlob like Constring
-	using Key				= xf::StrongType<Blob, struct KeyType>; // TODO make ConstBlob
+	using Magic				= xf::StrongType<Blob, struct MagicType>;
+	using Key				= xf::StrongType<Blob, struct KeyType>;
 	using SendEvery			= xf::StrongType<std::size_t, struct SendOffsetType>;
 	using SendOffset		= xf::StrongType<std::size_t, struct SendOffsetType>;
 	using Retained			= xf::StrongType<bool, struct RetainedType>;

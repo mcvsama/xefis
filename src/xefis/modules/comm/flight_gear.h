@@ -48,7 +48,7 @@ class FlightGearIO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<double>					ailerons						{ this, "ailerons" }; // TODO
+	xf::PropertyIn<double>					ailerons						{ this, "ailerons" };
 	xf::PropertyIn<double>					elevator						{ this, "elevator" };
 	xf::PropertyIn<double>					rudder							{ this, "rudder" };
 	xf::PropertyIn<double>					throttle_1						{ this, "throttle-1" };
