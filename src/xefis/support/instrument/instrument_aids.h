@@ -62,7 +62,7 @@ class InstrumentAids
 	static constexpr char			kDigits[10]				{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 	static constexpr char32_t		kMinusSign				{ U'−' };
 	static constexpr char const*	kMinusSignStrUTF8		{ "−" };
-	static inline QColor const		kAutopilotColor			{ 250, 20, 255 };
+	static inline QColor const		kAutopilotColor			{ 252, 40, 255 };
 	static inline QColor const		kNavigationColor		{ 60, 255, 40 };
 	static inline QColor const		kCautionColor			{ 255, 200, 50 };
 	static inline QColor const		kWarningColor			{ 255, 40, 40 };
