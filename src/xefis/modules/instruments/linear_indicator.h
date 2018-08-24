@@ -22,7 +22,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
-#include <xefis/core/property_digitizer.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>

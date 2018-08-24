@@ -20,9 +20,6 @@
 #include <optional>
 #include <variant>
 
-// Xefis:
-#include <xefis/core/property_digitizer.h> // TODO
-
 
 namespace xf {
 

@@ -261,7 +261,6 @@ XEFIS_HEADERS_MOC		+= xefis/core/processing_loop.h
 XEFIS_HEADERS			+= xefis/core/property.h
 XEFIS_HEADERS			+= xefis/core/property.tcc
 XEFIS_HEADERS			+= xefis/core/property_converter.h
-XEFIS_HEADERS			+= xefis/core/property_digitizer.h
 XEFIS_HEADERS			+= xefis/core/property_in.h
 XEFIS_HEADERS			+= xefis/core/property_observer.h
 XEFIS_HEADERS			+= xefis/core/property_out.h
