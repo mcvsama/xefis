@@ -52,16 +52,16 @@ PropertyObserver::set_callback (Callback callback) noexcept
 
 
 void
-PropertyObserver::set_minimum_dt (Time dt) noexcept
+PropertyObserver::set_minimum_dt (si::Time dt) noexcept
 {
 	_minimum_dt = dt;
 }
 
 
 void
-PropertyObserver::process (Time update_time)
+PropertyObserver::process (si::Time update_time)
 {
-	Time obs_dt = update_time - _obs_update_time;
+	si::Time obs_dt = update_time - _obs_update_time;
 	_accumulated_dt += update_time - _fire_time;
 
 	for (Object& o: _objects)
@@ -121,14 +121,16 @@ PropertyObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> 
 }
 
 
-Time
+si::Time
 PropertyObserver::longest_smoothing_time() noexcept
 {
 	if (!_longest_smoothing_time)
 	{
-		Time longest = 0_s;
+		si::Time longest = 0_s;
+
 		for (auto const& smoother: _smoothers)
 			longest = std::max (longest, smoother->smoothing_time());
+
 		// Add 1.1 ms of margin, to be sure that the smoother's window
 		// is positioned _after_ the last interesting value change.
 		// This assumes that the smoother's precision is set to 1 ms.

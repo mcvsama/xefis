@@ -112,7 +112,7 @@ class PropertyObserver
 	 * Default is 0_s.
 	 */
 	void
-	set_minimum_dt (Time) noexcept;
+	set_minimum_dt (si::Time) noexcept;
 
 	/**
 	 * Signal data update, so the observer will do its checks.
@@ -131,13 +131,13 @@ class PropertyObserver
 	 * Return last update time.
 	 * This is the time of the last fire of the callback function.
 	 */
-	Time
+	si::Time
 	update_time() const noexcept;
 
 	/**
 	 * Return time delta since last fire of the callback function.
 	 */
-	Time
+	si::Time
 	update_dt() const noexcept;
 
 	/**
@@ -170,27 +170,27 @@ class PropertyObserver
 	 * Find longest smoothing time from all registered smoothers.
 	 * Return 0_s, if no smoothers are registered.
 	 */
-	Time
+	si::Time
 	longest_smoothing_time() noexcept;
 
   private:
-	ObjectsList		_objects;
-	SmoothersList	_smoothers;
-	Callback		_callback;
-	Serial			_serial						= 0;
+	ObjectsList				_objects;
+	SmoothersList			_smoothers;
+	Callback				_callback;
+	Serial					_serial						{ 0 };
 	// Time of last change of observed property:
-	Time			_obs_update_time			= 0_s;
+	si::Time				_obs_update_time			{ 0_s };
 	// Time of last firing of the callback function:
-	Time			_fire_time					= 0_s;
-	Time			_fire_dt					= 0_s;
-	Time			_accumulated_dt				= 0_s;
-	Time			_minimum_dt					= 0_s;
+	Time					_fire_time					= 0_s;
+	Time					_fire_dt					= 0_s;
+	Time					_accumulated_dt				= 0_s;
+	Time					_minimum_dt					= 0_s;
 	std::optional<si::Time>	_longest_smoothing_time;
 	// Set to true, when observed property is updated, but
 	// _minimum_dt prevented firing the callback.
-	bool			_need_callback				= false;
-	bool			_last_recompute				= false;
-	bool			_touch						= false;
+	bool					_need_callback				{ false };
+	bool					_last_recompute				{ false };
+	bool					_touch						{ false };
 };
 
 
@@ -231,14 +231,14 @@ PropertyObserver::serial() const noexcept
 }
 
 
-inline Time
+inline si::Time
 PropertyObserver::update_time() const noexcept
 {
 	return _fire_time;
 }
 
 
-inline Time
+inline si::Time
 PropertyObserver::update_dt() const noexcept
 {
 	return _fire_dt;
