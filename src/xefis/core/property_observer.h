@@ -185,8 +185,7 @@ class PropertyObserver
 	Time			_fire_dt					= 0_s;
 	Time			_accumulated_dt				= 0_s;
 	Time			_minimum_dt					= 0_s;
-	Time			_longest_smoother			= 0_s;
-	bool			_recompute_longest_smoother	= false;
+	std::optional<si::Time>	_longest_smoothing_time;
 	// Set to true, when observed property is updated, but
 	// _minimum_dt prevented firing the callback.
 	bool			_need_callback				= false;

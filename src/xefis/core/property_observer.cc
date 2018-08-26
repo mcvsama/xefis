@@ -109,7 +109,7 @@ void
 PropertyObserver::add_depending_smoother (SmootherBase& smoother)
 {
 	_smoothers.push_back (&smoother);
-	_recompute_longest_smoother = true;
+	_longest_smoothing_time.reset();
 }
 
 
@@ -117,14 +117,14 @@ void
 PropertyObserver::add_depending_smoothers (std::initializer_list<SmootherBase*> list)
 {
 	_smoothers.insert (_smoothers.end(), list.begin(), list.end());
-	_recompute_longest_smoother = true;
+	_longest_smoothing_time.reset();
 }
 
 
 Time
 PropertyObserver::longest_smoothing_time() noexcept
 {
-	if (_recompute_longest_smoother)
+	if (!_longest_smoothing_time)
 	{
 		Time longest = 0_s;
 		for (auto const& smoother: _smoothers)
@@ -132,12 +132,10 @@ PropertyObserver::longest_smoothing_time() noexcept
 		// Add 1.1 ms of margin, to be sure that the smoother's window
 		// is positioned _after_ the last interesting value change.
 		// This assumes that the smoother's precision is set to 1 ms.
-		_longest_smoother = longest + 1.1_ms;
-		_longest_smoother *= 2.0;
-		_recompute_longest_smoother = false;
+		_longest_smoothing_time = 2.0 * (longest + 1.1_ms);
 	}
 
-	return _longest_smoother;
+	return *_longest_smoothing_time;
 }
 
 } // namespace xf
