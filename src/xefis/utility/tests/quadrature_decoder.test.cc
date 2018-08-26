@@ -42,11 +42,9 @@ template<class T>
 	}
 
 
-RuntimeTest t1 ("utility: QuadratureDecoder", []{
-});
+RuntimeTest t1 ("utility: QuadratureDecoder + QuadratureCounter", []{
+	// QuadratureDecoder will be tested by testing QuadratureCounter, so no need for separate tests.
 
-
-RuntimeTest t2 ("utility: QuadratureCounter", []{
 	// Tuple is <input_a, input_b, delta, callback_expected>:
 	std::vector<std::tuple<std::optional<bool>, std::optional<bool>, std::optional<Integer>, bool>> const test_steps {
 		// Count up:
