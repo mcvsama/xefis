@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/support/bus/serial_port.h>
 
 
@@ -29,7 +30,7 @@ class System
   public:
 	// Ctor
 	explicit
-	System (std::ostream& logger_stream);
+	System (Logger const&);
 
 	// Dtor
 	~System();

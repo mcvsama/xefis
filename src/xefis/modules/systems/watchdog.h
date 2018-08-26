@@ -22,20 +22,20 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
-#include <xefis/utility/logger.h>
 
 
 class Watchdog: public xf::Module<>
 {
   private:
-	static constexpr char kLoggerPrefix[] = "mod::Watchdog";
+	static constexpr char kLoggerScope[] = "mod::Watchdog";
 
   public:
 	// Ctor
 	explicit
-	Watchdog (xf::Xefis*, xf::Logger const& parent_logger, std::string const& instance = {});
+	Watchdog (xf::Xefis*, xf::Logger const&, std::string const& instance = {});
 
   private:
 	/**

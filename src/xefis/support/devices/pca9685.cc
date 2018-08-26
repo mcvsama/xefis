@@ -36,7 +36,7 @@
 
 namespace xf {
 
-PCA9685::PCA9685 (i2c::Device&& device, si::Time output_period, xf::Logger* logger):
+PCA9685::PCA9685 (i2c::Device&& device, si::Time output_period, Logger const& logger):
 	_i2c_device (std::move (device)),
 	_output_period (output_period),
 	_logger (logger)
@@ -68,8 +68,7 @@ PCA9685::initialize()
 	guard ([&] {
 		_i2c_device.open();
 
-		if (_logger)
-			*_logger << "Resetting PCA9685." << std::endl;
+		_logger << "Resetting PCA9685." << std::endl;
 
 		_i2c_device.write_register (Register_Mode1, 0x00);
 		_i2c_device.write_register (Register_Mode2, Mode2_OutTotemPole | Mode2_UpdateOnAck);
@@ -162,9 +161,7 @@ PCA9685::guard (std::function<void()> guarded_code)
 	}
 	catch (xf::IOError& e)
 	{
-		if (_logger)
-			*_logger << "I/O error: " << e.message() << std::endl;
-
+		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

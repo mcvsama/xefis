@@ -20,11 +20,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/utility/mutex.h>
 #include <xefis/utility/semaphore.h>
 #include <xefis/utility/thread.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/logger.h>
 
 
 namespace xf {
@@ -119,7 +119,7 @@ class WorkPerformer: private Noncopyable
 	 * The number of threads never changes.
 	 */
 	explicit
-	WorkPerformer (unsigned int threads_number);
+	WorkPerformer (unsigned int threads_number, Logger const&);
 
 	/**
 	 * Waits for threads to finish before return.
@@ -176,7 +176,7 @@ class WorkPerformer: private Noncopyable
 	take_unit();
 
   private:
-	Logger							_logger				{ std::clog };
+	Logger							_logger;
 	// Current queue. Points either to _queues[1] or _queues[2]:
 	Units							_queue;
 	Mutex							_queue_mutex;

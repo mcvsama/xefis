@@ -53,7 +53,7 @@ Xefis::Xefis (int& argc, char** argv):
 		throw std::runtime_error ("can create only one Xefis object");
 
 	_xefis = this;
-	_logger.set_prefix ("<xefis>");
+	_logger.add_scope ("<xefis>");
 
 	signal (SIGHUP, s_quit);
 
@@ -65,7 +65,7 @@ Xefis::Xefis (int& argc, char** argv):
 	// Init services:
 	Services::initialize();
 
-	_system = std::make_unique<System> (std::clog);
+	_system = std::make_unique<System> (_logger);
 
 	// TODO this is a hack, make it configurable or runtime selectable;
 	// TODO best: provide a separate config file to compile with all initialization

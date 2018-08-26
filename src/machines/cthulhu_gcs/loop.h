@@ -19,8 +19,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/processing_loop.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/machine.h>
+#include <xefis/core/processing_loop.h>
 #include <xefis/core/screen.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/instruments/adi.h>
@@ -32,7 +33,6 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
-#include <xefis/utility/logger.h>
 
 // Cthulhu:
 #include <machines/cthulhu_shared/link_io.h>
@@ -89,10 +89,10 @@ class Loop: public xf::ProcessingLoop
   public:
 	// Ctor
 	explicit
-	Loop (xf::Machine*, xf::Xefis*);
+	Loop (xf::Machine*, xf::Xefis*, xf::Logger const&);
 
   private:
-	xf::Logger							_logger { std::clog };
+	xf::Logger							_logger;
 	std::unique_ptr<xf::NavaidStorage>	_navaid_storage;
 	std::unique_ptr<xf::Airframe>		_airframe;
 	std::unique_ptr<xf::WorkPerformer>	_work_performer;

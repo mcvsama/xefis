@@ -45,9 +45,10 @@ WorkPerformer::Performer::run()
 }
 
 
-WorkPerformer::WorkPerformer (unsigned int threads_number)
+WorkPerformer::WorkPerformer (unsigned int threads_number, Logger const& logger):
+	_logger (logger)
 {
-	_logger.set_prefix ("<work performer>");
+	_logger.add_scope ("<work performer>");
 	_logger << "Creating WorkPerformer" << std::endl;
 
 	threads_number = std::max (1u, threads_number);
@@ -67,6 +68,7 @@ WorkPerformer::~WorkPerformer()
 
 	for (decltype (_performers.size()) i = 0; i < _performers.size(); ++i)
 		_queue_semaphore.post();
+
 	for (auto p: _performers)
 		p->wait();
 }

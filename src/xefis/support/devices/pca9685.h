@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
 #include <xefis/support/bus/i2c.h>
 #include <xefis/utility/smoother.h>
@@ -88,7 +89,7 @@ class PCA9685: public QObject
   public:
 	// Ctor
 	explicit
-	PCA9685 (i2c::Device&&, si::Time output_period, xf::Logger* = nullptr);
+	PCA9685 (i2c::Device&&, si::Time output_period, Logger const&);
 
 	/**
 	 * Return true if chip is serviceable.
@@ -157,7 +158,7 @@ class PCA9685: public QObject
 	bool							_serviceable	{ false };
 	si::Time						_output_period;
 	std::array<si::Time, kChannels>	_duty_cycles;
-	xf::Logger*						_logger;
+	Logger							_logger;
 };
 
 

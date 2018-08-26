@@ -86,10 +86,10 @@ Accounting::Stats::average() const noexcept
 }
 
 
-Accounting::Accounting (std::ostream& logger_stream):
-	_logger (logger_stream)
+Accounting::Accounting (Logger const& logger):
+	_logger (logger)
 {
-	_logger.set_prefix ("<accounting>");
+	_logger.add_scope ("<accounting>");
 	_logger << "Creating Accounting" << std::endl;
 	_latency_check_timer = new QTimer (this);
 	_latency_check_timer->setSingleShot (false);

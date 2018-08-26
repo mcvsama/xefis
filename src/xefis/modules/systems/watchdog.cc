@@ -26,11 +26,11 @@
 #include "watchdog.h"
 
 
-Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& parent_logger, std::string const& instance):
+Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string const& instance):
 	Module (instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	std::optional<int> watchdog_write_fd = xefis->options().watchdog_write_fd();
 	std::optional<int> watchdog_read_fd = xefis->options().watchdog_read_fd();

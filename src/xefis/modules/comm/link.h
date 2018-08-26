@@ -30,13 +30,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/strong_type.h>
 #include <xefis/utility/types.h>
@@ -369,10 +369,10 @@ class LinkProtocol
 	size() const;
 
 	void
-	produce (Blob&, xf::Logger const& logger);
+	produce (Blob&, xf::Logger const&);
 
 	Blob::const_iterator
-	eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger);
+	eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const&);
 
 	void
 	failsafe();
@@ -509,12 +509,12 @@ class Link:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "mod::Link";
+	static constexpr char kLoggerScope[] = "mod::Link";
 
   public:
 	// Ctor
 	explicit
-	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const& parent_logger, std::string const& instance = {});
+	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;

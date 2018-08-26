@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/xefis.h>
 
@@ -33,7 +34,8 @@ class CthulhuGCS: public xf::Machine
 	CthulhuGCS (xf::Xefis*);
 
   private:
-	Loop*	_loop;
+	xf::LoggerOutput	_logger_output	{ std::cout };
+	Loop*				_loop;
 };
 
 #endif

@@ -30,11 +30,11 @@
 #include "udp.h"
 
 
-UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	if (io.tx_udp_host && io.tx_udp_port)
 		_tx = std::make_unique<QUdpSocket>();

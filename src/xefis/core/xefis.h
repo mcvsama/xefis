@@ -28,7 +28,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/logger.h>
+#include <xefis/core/logger.h>
 
 
 namespace xf {
@@ -182,8 +182,9 @@ class Xefis: public QApplication
 	s_quit (int);
 
   private:
-	static inline Xefis*			_xefis	{ nullptr };
-	static inline Logger			_logger	{ std::clog };
+	static inline Xefis*			_xefis			{ nullptr };
+	static inline LoggerOutput		_logger_output	{ std::clog };
+	static inline Logger			_logger			{ _logger_output };
 
 	Unique<System>					_system;
 	Unique<ConfiguratorWidget>		_configurator_widget;

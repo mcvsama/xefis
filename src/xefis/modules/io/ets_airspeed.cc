@@ -27,12 +27,13 @@
 #include "ets_airspeed.h"
 
 
-ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, xf::Logger const& parent_logger, std::string const& instance):
+ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger)),
+	_logger (logger),
 	_device (std::move (device))
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
+
 	_calibration_data.reserve (kOffsetCalculationSamples);
 
 	io.serviceable = false;

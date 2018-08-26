@@ -38,12 +38,13 @@
 #include "chr_um6.h"
 
 
-CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& parent_logger, std::string const& instance):
+CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger)),
+	_logger (logger),
 	_serial_port (std::move (serial_port))
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
+
 	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);
@@ -66,8 +67,8 @@ CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_po
 	_initialization_timer->setSingleShot (true);
 	QObject::connect (_initialization_timer.get(), SIGNAL (timeout()), this, SLOT (initialization_timeout()));
 
-	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port);
-	_sensor->set_parent_logger (_logger);
+	_sensor = std::make_unique<xf::CHRUM6> (&_serial_port, _logger.with_scope ("serial port"));
+	_sensor->set_logger (_logger);
 	_sensor->set_alive_check_callback (std::bind (&CHRUM6::alive_check, this));
 	_sensor->set_communication_failure_callback (std::bind (&CHRUM6::communication_failure, this));
 	_sensor->set_incoming_messages_callback (std::bind (&CHRUM6::process_message, this, std::placeholders::_1));

@@ -89,24 +89,27 @@ CHRUM6::Read::value_lower16() const noexcept
 }
 
 
-CHRUM6::CHRUM6 (SerialPort* serial_port):
+CHRUM6::CHRUM6 (SerialPort* serial_port, Logger const& logger):
 	_serial_port (serial_port)
 {
 	_serial_port->set_data_ready_callback (std::bind (&CHRUM6::serial_ready, this));
 	_serial_port->set_failure_callback (std::bind (&CHRUM6::serial_failure, this));
+
 	_packet_reader = std::make_unique<PacketReader> (Blob { 's', 'n', 'p' }, std::bind (&CHRUM6::parse_packet, this));
 	_packet_reader->set_minimum_packet_size (7);
 	_packet_reader->set_buffer_capacity (4096);
+
+	set_logger (logger);
 }
 
 
 void
-CHRUM6::set_parent_logger (Logger const& logger)
+CHRUM6::set_logger (Logger const& logger)
 {
-	_logger = xf::Logger (xf::Logger::Parent (logger));
-	_logger.set_prefix (kLoggerPrefix);
+	_logger = logger;
+	_logger.add_scope (kLoggerScope);
 
-	_serial_port->set_parent_logger (_logger);
+	_serial_port->set_logger (_logger);
 }
 
 

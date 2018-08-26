@@ -22,7 +22,9 @@
 namespace xf::test {
 namespace {
 
-xf::Logger g_logger (std::clog);
+xf::LoggerOutput g_logger_output (std::clog);
+xf::Logger g_logger (g_logger_output);
+
 
 template<template<class> class PropertyType>
 	class GCS2AircraftLinkIO: public LinkIO

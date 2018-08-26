@@ -24,11 +24,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 
 
 class State;
@@ -71,12 +71,12 @@ class StateIO: public xf::ModuleIO
 class State: public xf::Module<StateIO>
 {
   private:
-	static constexpr char kLoggerPrefix[] = "mod::State";
+	static constexpr char kLoggerScope[] = "mod::State";
 
   public:
 	// Ctor
 	explicit
-	State (std::unique_ptr<StateIO>, xf::Logger const& parent_logger, std::string const& instance = {});
+	State (std::unique_ptr<StateIO>, xf::Logger const&, std::string const& instance = {});
 
 	// Dtor
 	~State();

@@ -23,11 +23,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -78,7 +78,7 @@ class XBee:
 {
 	Q_OBJECT
 
-	static constexpr char		kLoggerPrefix[]				= "mod::XBee";
+	static constexpr char		kLoggerScope[]				= "mod::XBee";
 
 	static constexpr int		kMaxReadFailureCount		= 10;
 	static constexpr int		kMaxWriteFailureCount		= 10;
@@ -169,7 +169,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (std::unique_ptr<XBeeIO>, xf::Logger const& parent_logger, std::string const& instance = {});
+	XBee (std::unique_ptr<XBeeIO>, xf::Logger const&, std::string const& instance = {});
 
 	// Dtor
 	~XBee();

@@ -42,11 +42,11 @@
 #include "xbee.h"
 
 
-XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_restart_timer = new QTimer (this);
 	_restart_timer->setInterval (kRestartAfter.in<Millisecond>());

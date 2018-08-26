@@ -21,7 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/logger.h>
+#include <xefis/core/logger.h>
 #include <kdtree++/kdtree.hpp>
 
 // Local:
@@ -78,7 +78,7 @@ class NavaidStorage
   public:
 	// Ctor
 	explicit
-	NavaidStorage();
+	NavaidStorage (Logger const&);
 
 	// Dtor
 	~NavaidStorage();
@@ -121,7 +121,7 @@ class NavaidStorage
 	parse_apt_dat();
 
   private:
-	Logger			_logger			{ std::clog };
+	Logger			_logger;
 	NavaidsTree		_navaids_tree;
 	const char*		_nav_dat_file	{ "share/nav/nav.dat.gz" }; // TODO make it configurable
 	const char*		_fix_dat_file	{ "share/nav/fix.dat.gz" };

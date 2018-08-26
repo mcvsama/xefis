@@ -29,8 +29,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/owner_token.h>
 
@@ -44,7 +44,7 @@ class SerialPort:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "xf::SerialPort";
+	static constexpr char kLoggerScope[] = "xf::SerialPort";
 
   public:
 	// Parity bit:
@@ -198,7 +198,7 @@ class SerialPort:
 	 * Set logger.
 	 */
 	void
-	set_parent_logger (Logger const& logger);
+	set_logger (Logger const&);
 
 	/**
 	 * Set number of read failures at which
@@ -328,7 +328,7 @@ class SerialPort:
 
   private:
 	xf::OwnerToken			_owned;
-	Logger					_logger						{ std::clog };
+	Logger					_logger;
 	Configuration			_configuration;
 	DataReadyCallback		_data_ready;
 	FailureCallback			_failure;
@@ -444,10 +444,10 @@ SerialPort::configuration() const noexcept
 
 
 inline void
-SerialPort::set_parent_logger (Logger const& logger)
+SerialPort::set_logger (Logger const& logger)
 {
-	_logger = xf::Logger (xf::Logger::Parent (logger));
-	_logger.set_prefix (kLoggerPrefix);
+	_logger = logger;
+	_logger.add_scope(kLoggerScope);
 }
 
 

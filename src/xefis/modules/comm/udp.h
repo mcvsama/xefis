@@ -22,12 +22,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 
 
 class UDP_IO: public xf::ModuleIO
@@ -65,12 +65,12 @@ class UDP:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "mod::UDP";
+	static constexpr char kLoggerScope[] = "mod::UDP";
 
   public:
 	// Ctor
 	explicit
-	UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance = {});
+	UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const&, std::string const& instance = {});
 
 	// Module API
 	void

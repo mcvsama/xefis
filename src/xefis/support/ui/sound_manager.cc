@@ -50,9 +50,10 @@ SoundManager::Sound::stop()
 }
 
 
-SoundManager::SoundManager()
+SoundManager::SoundManager (Logger const& logger):
+	_logger (logger)
 {
-	_logger.set_prefix ("<sound manager>");
+	_logger.add_scope ("<sound manager>");
 	_logger << "Creating SoundManager" << std::endl;
 }
 

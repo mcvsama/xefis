@@ -22,7 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/logger.h>
+#include <xefis/core/logger.h>
 
 // Local:
 #include "test_asserts.h"
@@ -45,8 +45,9 @@ RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 {
 	std::cout << "Test: " << test_name << "…" << std::flush;
 	std::ostringstream log_buffer;
-	xf::Logger logger (log_buffer);
-	logger.set_timestamps_enabled (false);
+	LoggerOutput logger_output (log_buffer);
+	logger_output.set_timestamps_enabled (false);
+	Logger logger (logger_output);
 
 	bool was_exception = Exception::catch_and_log (logger, [&]{
 		tf();

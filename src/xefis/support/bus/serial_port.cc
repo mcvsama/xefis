@@ -39,9 +39,7 @@ namespace xf {
 SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 	_data_ready (data_ready),
 	_failure (failure)
-{
-	_logger.set_prefix (kLoggerPrefix);
-}
+{ }
 
 
 SerialPort::SerialPort (SerialPort&& other)

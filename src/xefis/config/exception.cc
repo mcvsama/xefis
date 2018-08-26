@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/logger.h>
+#include <xefis/core/logger.h>
 
 // Local:
 #include "exception.h"

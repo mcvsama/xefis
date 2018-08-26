@@ -23,7 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/logger.h>
+#include <xefis/core/logger.h>
 
 
 namespace xf {
@@ -63,7 +63,7 @@ class SoundManager
 
   public:
 	// Ctor
-	SoundManager();
+	SoundManager (Logger const&);
 
 	// Dtor
 	~SoundManager();
@@ -81,7 +81,7 @@ class SoundManager
 	cleanup();
 
   private:
-	Logger					_logger	{ std::clog };
+	Logger					_logger;
 	std::set<Shared<Sound>>	_sounds;
 };
 

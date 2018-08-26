@@ -30,10 +30,10 @@
 
 namespace xf {
 
-System::System (std::ostream& logger_stream):
-	_logger (logger_stream)
+System::System (Logger const& logger):
+	_logger (logger)
 {
-	_logger.set_prefix ("<system>");
+	_logger.add_scope ("<system>");
 	_logger << "Creating System object" << std::endl;
 }
 
