@@ -69,7 +69,7 @@ parse (std::string_view const& str, TestEnum& value)
 	else if (str == "Value2")
 		value = TestEnum::Value2;
 	else
-		throw Exception ("invalid enum string \""s + str + "\"");
+		throw Exception ("invalid enum string \"" + std::string (str) + "\"");
 }
 
 
@@ -97,7 +97,7 @@ parse (std::string_view const& str, TestEnumWithNil& value)
 	else if (str == "")
 		value = TestEnumWithNil::xf_nil_value;
 	else
-		throw Exception ("invalid enum string \""s + str + "\"");
+		throw Exception ("invalid enum string \"" + std::string (str) + "\"");
 }
 
 } // namespace test_enum
@@ -166,9 +166,9 @@ template<class Lambda>
 
 template<class T>
 	std::string
-	desc_type (std::string_view str)
+	desc_type (std::string str)
 	{
-		return str + " <"s + xf::demangle (typeid (T).name()) + ">";
+		return std::string (str) + " <" + xf::demangle (typeid (T).name()) + ">";
 	}
 
 
@@ -198,12 +198,12 @@ template<class T, template<class> class AnyProperty>
 
 template<class T, template<class> class AnyProperty>
 	void
-	test_non_nil_values (AnyProperty<T> const& property, T test_value, std::string_view what)
+	test_non_nil_values (AnyProperty<T> const& property, T test_value, std::string what)
 	{
-		test_asserts::verify (desc_type<T> (what + " converts to true"s),
+		test_asserts::verify (desc_type<T> (what + " converts to true"),
 							  !!property);
 
-		test_asserts::verify (desc_type<T> ("reading "s + what + " with operator*() does not throw"),
+		test_asserts::verify (desc_type<T> ("reading " + what + " with operator*() does not throw"),
 							  !Exception::catch_and_log (g_null_logger, [&]{ *property; }));
 
 		test_asserts::verify (desc_type<T> ("property's value != test_value"),
