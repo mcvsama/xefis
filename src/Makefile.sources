@@ -471,6 +471,7 @@ XEFIS_HEADERS			+= xefis/utility/time.h
 XEFIS_HEADERS			+= xefis/utility/time_helper.h
 XEFIS_HEADERS			+= xefis/utility/transistor.h
 XEFIS_HEADERS			+= xefis/utility/types.h
+XEFIS_HEADERS			+= xefis/utility/use_count.h
 XEFIS_HEADERS			+= xefis/utility/utility.h
 XEFIS_HEADERS			+= xefis/utility/variant.h
 
