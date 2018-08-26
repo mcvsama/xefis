@@ -101,10 +101,11 @@ GzDataFileIterator::operator*()
 }
 
 
-NavaidStorage::NavaidStorage():
+NavaidStorage::NavaidStorage (Logger const& logger):
+	_logger (logger),
 	_navaids_tree (access_position)
 {
-	_logger.set_prefix ("<navaid storage>");
+	_logger.add_scope ("<navaid storage>");
 	_logger << "Creating NavaidStorage" << std::endl;
 }
 

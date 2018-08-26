@@ -29,11 +29,11 @@
 #include "bmp085.h"
 
 
-BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_reinitialize_timer = std::make_unique<QTimer> (this);
 	_reinitialize_timer->setInterval (250);

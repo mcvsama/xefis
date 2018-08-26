@@ -23,11 +23,11 @@
 #include "afcs_ap.h"
 
 
-AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	constexpr auto radian_second = 1.0_rad * 1.0_s;
 

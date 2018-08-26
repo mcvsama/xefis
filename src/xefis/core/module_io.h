@@ -22,7 +22,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/sequence.h>
 
 

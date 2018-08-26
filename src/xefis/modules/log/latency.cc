@@ -25,12 +25,12 @@
 #include "latency.h"
 
 
-Latency::Latency (xf::Accounting& accounting, xf::Logger const& parent_logger, std::string const& instance):
+Latency::Latency (xf::Accounting& accounting, xf::Logger const& logger, std::string const& instance):
 	Module (instance),
-	_logger (xf::Logger::Parent (parent_logger)),
+	_logger (logger),
 	_accounting (accounting)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_log_timer = new QTimer (this);
 	_log_timer->setInterval (1000);

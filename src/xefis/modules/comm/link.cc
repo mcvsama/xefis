@@ -344,7 +344,7 @@ LinkProtocol::produce (Blob& blob, [[maybe_unused]] xf::Logger const& logger)
 
 
 Blob::const_iterator
-LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, [[maybe_unused]] xf::Logger const& logger)
+LinkProtocol::eat (Blob::const_iterator begin, Blob::const_iterator end, LinkIO* io, QTimer* reacquire_timer, QTimer* failsafe_timer, xf::Logger const& logger)
 {
 #if XEFIS_LINK_RECV_DEBUG
 	logger << "Recv: " << to_string (Blob (begin, end)) << std::endl;
@@ -474,12 +474,12 @@ LinkIO::verify_settings()
 }
 
 
-Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, xf::Logger const& parent_logger, std::string const& instance):
+Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger)),
+	_logger (logger),
 	_protocol (std::move (protocol))
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_input_blob.reserve (2 * _protocol->size());
 	_output_blob.reserve (2 * _protocol->size());
@@ -518,7 +518,7 @@ Link::process (xf::Cycle const& cycle)
 		if (io.link_input && _input_changed())
 		{
 			_input_blob.insert (_input_blob.end(), io.link_input->begin(), io.link_input->end());
-			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), &io, _reacquire_timer, _failsafe_timer, cycle.logger());
+			auto e = _protocol->eat (_input_blob.begin(), _input_blob.end(), &io, _reacquire_timer, _failsafe_timer, cycle.logger() + _logger);
 			auto valid_bytes = std::distance (_input_blob.cbegin(), e);
 			io.link_valid_bytes = io.link_valid_bytes.value_or (0) + valid_bytes;
 			_input_blob.erase (_input_blob.begin(), e);
@@ -526,8 +526,7 @@ Link::process (xf::Cycle const& cycle)
 	}
 	catch (LinkProtocol::ParseError const&)
 	{
-		// TODO cycle logger vs link logger?
-		cycle.logger() << "Packet parse error. Couldn't synchronize." << std::endl;
+		(cycle.logger() + _logger) << "Packet parse error. Couldn't synchronize." << std::endl;
 	}
 }
 

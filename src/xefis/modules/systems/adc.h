@@ -20,12 +20,12 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/lookahead.h>
 #include <xefis/utility/smoother.h>
 
@@ -89,7 +89,7 @@ class AirDataComputerIO: public xf::ModuleIO
 class AirDataComputer: public xf::Module<AirDataComputerIO>
 {
   private:
-	static constexpr char kLoggerPrefix[] = "mod::AirDataComputer";
+	static constexpr char kLoggerScope[]				= "mod::AirDataComputer";
 	// Sound speed in STD sea level:
 	static constexpr si::Velocity const kStdSoundSpeed	= 661.4788_kt;
 	// STD sea level pressure:
@@ -98,7 +98,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
   public:
 	// Ctor
 	explicit
-	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const& parent_logger, std::string const& instance = {});
+	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const&, std::string const& instance = {});
 
   protected:
 	// Module API

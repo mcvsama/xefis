@@ -22,11 +22,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/bus/i2c.h>
-#include <xefis/utility/logger.h>
 
 
 class BMP085_IO: public xf::ModuleIO
@@ -63,7 +63,7 @@ class BMP085:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "mod::BMP085";
+	static constexpr char kLoggerScope[] = "mod::BMP085";
 
   public:
 	/**

@@ -103,8 +103,7 @@ parse (std::string_view const& str, TestEnumWithNil& value)
 } // namespace test_enum
 
 
-std::ostringstream g_logger_buffer;
-xf::Logger g_null_logger (g_logger_buffer);
+xf::Logger g_null_logger;
 
 
 class TestCycle: public Cycle

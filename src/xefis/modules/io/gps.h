@@ -24,13 +24,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/system.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/protocols/nmea/parser.h>
-#include <xefis/utility/logger.h>
 
 
 class GPS_IO: public xf::ModuleIO
@@ -92,7 +92,7 @@ class GPS:
 	Q_OBJECT
 
   private:
-	static constexpr char			kLoggerPrefix[]						= "mod::GPS";
+	static constexpr char			kLoggerScope[]						= "mod::GPS";
 	static constexpr unsigned int	kConnectionAttemptsPerPowerCycle	= 4;
 	static constexpr Time			kPowerRestartDelay					= 1_s;
 	static constexpr Time			kAliveCheckInterval					= 2_s;
@@ -295,7 +295,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const& parent_logger, std::string const& instance = {});
+	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string const& instance = {});
 
 	// Dtor
 	~GPS();

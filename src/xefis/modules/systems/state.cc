@@ -42,11 +42,11 @@ StateIO::register_property (std::string const& unique_identifier, xf::BasicPrope
 }
 
 
-State::State (std::unique_ptr<StateIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+State::State (std::unique_ptr<StateIO> module_io, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger))
+	_logger (logger)
 {
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 	load_state();
 }
 

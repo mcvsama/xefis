@@ -19,11 +19,11 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 
 
 template<class Value>
@@ -58,7 +58,7 @@ template<class pValue>
 	class Mixer: public xf::Module<MixerIO<pValue>>
 	{
 	  private:
-		static constexpr char kLoggerPrefix[] = "mod::Mixer";
+		static constexpr char kLoggerScope[] = "mod::Mixer";
 
 	  public:
 		using Value = pValue;
@@ -66,7 +66,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		Mixer (std::unique_ptr<MixerIO>, xf::Logger const& parent_logger, std::string const& instance = {});
+		Mixer (std::unique_ptr<MixerIO>, xf::Logger const&, std::string const& instance = {});
 
 	  protected:
 		// Module API
@@ -90,11 +90,11 @@ template<class pValue>
 
 
 template<class V>
-	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, xf::Logger const& parent_logger, std::string const& instance):
+	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, xf::Logger const& logger, std::string const& instance):
 		Module (std::move (module_io), instance),
-		_logger (xf::Logger::Parent (parent_logger))
+		_logger (logger)
 	{
-		_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+		_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 	}
 
 

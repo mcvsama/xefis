@@ -26,6 +26,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
 #include <xefis/support/bus/i2c.h>
 #include <xefis/utility/numeric.h>
@@ -286,7 +287,7 @@ class HT16K33: public QObject
   public:
 	// Ctor
 	explicit
-	HT16K33 (i2c::Device&&, xf::Logger* = nullptr);
+	HT16K33 (i2c::Device&&, Logger const&);
 
 	/**
 	 * Turn on/off displays and LEDs.
@@ -401,7 +402,7 @@ class HT16K33: public QObject
 	static constexpr size_t kDotIndex		= 11;
 
 	i2c::Device						_i2c_device;
-	xf::Logger*						_logger;
+	Logger							_logger;
 	bool							_displays_enabled	= true;
 	uint8_t							_brightness			= 16;
 	bool							_blinking_enabled	= false;

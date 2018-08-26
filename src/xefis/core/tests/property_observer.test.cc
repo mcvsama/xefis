@@ -29,8 +29,7 @@ using TestedType = int64_t;
 constexpr TestedType kValue1 = 5;
 constexpr TestedType kValue2 = -100;
 
-std::ostringstream g_logger_buffer;
-xf::Logger g_null_logger (g_logger_buffer);
+xf::Logger g_null_logger;
 
 
 class TestCycle: public Cycle

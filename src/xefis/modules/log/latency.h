@@ -20,10 +20,10 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/accounting.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/logger.h>
 
 
 class Latency:
@@ -33,12 +33,12 @@ class Latency:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "mod::Latency";
+	static constexpr char kLoggerScope[] = "mod::Latency";
 
   public:
 	// Ctor
 	explicit
-	Latency (xf::Accounting&, xf::Logger const& parent_logger, std::string const& instance = {});
+	Latency (xf::Accounting&, xf::Logger const&, std::string const& instance = {});
 
   private slots:
 	/**

@@ -24,7 +24,7 @@
 CthulhuGCS::CthulhuGCS (xf::Xefis* xefis):
 	Machine (xefis)
 {
-	_loop = make_processing_loop<Loop> (xefis);
+	_loop = make_processing_loop<Loop> (xefis, xf::Logger (_logger_output));
 	_loop->start();
 }
 

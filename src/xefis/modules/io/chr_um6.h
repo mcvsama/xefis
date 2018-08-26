@@ -21,13 +21,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/support/devices/chr_um6.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/logger.h>
 
 
 class CHRUM6_IO: public xf::ModuleIO
@@ -86,7 +86,7 @@ class CHRUM6:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerPrefix[] = "mod::CHRUM6";
+	static constexpr char kLoggerScope[] = "mod::CHRUM6";
 
   private:
 	static constexpr si::Time	kRestartDelay			= 200_ms;
@@ -107,7 +107,7 @@ class CHRUM6:
   public:
 	// Ctor
 	explicit
-	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, xf::Logger const& parent_logger, std::string const& instance = {});
+	CHRUM6 (std::unique_ptr<CHRUM6_IO>, xf::SerialPort&& serial_port, xf::Logger const&, std::string const& instance = {});
 
 	// Module API
 	void

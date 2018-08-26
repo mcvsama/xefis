@@ -143,7 +143,7 @@ HT16K33::SingleSwitch::invalidate()
 }
 
 
-HT16K33::HT16K33 (i2c::Device&& i2c_device, Logger* logger):
+HT16K33::HT16K33 (i2c::Device&& i2c_device, Logger const& logger):
 	_i2c_device (std::move (i2c_device)),
 	_logger (logger)
 {
@@ -262,8 +262,7 @@ HT16K33::guard (std::function<void()> guarded_code)
 	}
 	catch (xf::IOError& e)
 	{
-		if (_logger)
-			(*_logger) << "I/O error: " << e.message() << std::endl;
+		_logger << "I/O error: " << e.message() << std::endl;
 		reinitialize();
 	}
 	catch (...)

@@ -26,8 +26,9 @@
 #include "loop.h"
 
 
-Loop::Loop (xf::Machine* machine, xf::Xefis*):
-	ProcessingLoop (machine, "Cthulhu GCS main", 30_Hz)
+Loop::Loop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
+	ProcessingLoop (machine, "Cthulhu GCS main", 30_Hz, logger),
+	_logger (logger)
 {
 #if 0
 	xf::AirframeDefinition airframe_definition {
@@ -49,8 +50,8 @@ Loop::Loop (xf::Machine* machine, xf::Xefis*):
 #if 0
 	_airframe = std::make_unique<xf::Airframe> (airframe_definition);
 #endif
-	_navaid_storage = std::make_unique<xf::NavaidStorage>();
-	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency());
+	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger);
+	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
 
 	QDomElement joystick_config = xf::load_xml (QFile ("machines/cthulhu_shared/xmls/joystick-hotas-stick.xml"));
 	QDomElement throttle_config = xf::load_xml (QFile ("machines/cthulhu_shared/xmls/joystick-hotas-throttle.xml"));

@@ -24,9 +24,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/support/bus/serial_port.h>
 #include <xefis/utility/packet_reader.h>
-#include <xefis/utility/logger.h>
 #include <xefis/utility/time_helper.h>
 
 
@@ -40,7 +40,7 @@ namespace xf {
 class CHRUM6
 {
   private:
-	static constexpr char kLoggerPrefix[] = "xf::CHRUM6";
+	static constexpr char kLoggerScope[] = "xf::CHRUM6";
 
   public:
 	// Fwd
@@ -506,13 +506,13 @@ class CHRUM6
   public:
 	// Ctor
 	explicit
-	CHRUM6 (SerialPort* serial_port);
+	CHRUM6 (SerialPort* serial_port, Logger const&);
 
 	/**
 	 * Set logger.
 	 */
 	void
-	set_parent_logger (Logger const& logger);
+	set_logger (Logger const&);
 
 	/**
 	 * Set callback indicating serial port failure.
@@ -637,7 +637,7 @@ class CHRUM6
 	bool						_auto_retry		{ false };
 	std::queue<Unique<Request>>	_requests;
 	Unique<Request>				_current_req;
-	Logger						_logger			{ std::clog };
+	Logger						_logger;
 };
 
 

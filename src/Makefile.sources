@@ -253,6 +253,7 @@ XEFIS_HEADERS			+= xefis/core/cycle.h
 XEFIS_HEADERS			+= xefis/core/fail.h
 XEFIS_HEADERS			+= xefis/core/instrument.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
+XEFIS_HEADERS			+= xefis/core/logger.h
 XEFIS_HEADERS			+= xefis/core/machine.h
 XEFIS_HEADERS			+= xefis/core/module.h
 XEFIS_HEADERS			+= xefis/core/module_io.h
@@ -279,6 +280,7 @@ XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 XEFIS_SOURCES			+= xefis/core/accounting.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
+XEFIS_SOURCES			+= xefis/core/logger.cc
 XEFIS_SOURCES			+= xefis/core/machine.cc
 XEFIS_SOURCES			+= xefis/core/module.cc
 XEFIS_SOURCES			+= xefis/core/module_io.cc
@@ -290,11 +292,13 @@ XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
+SELFTEST_HEADERS		+= xefis/core/logger.h
 SELFTEST_HEADERS		+= xefis/core/module.h
 SELFTEST_HEADERS		+= xefis/core/module_io.h
 SELFTEST_HEADERS		+= xefis/core/property.h
 SELFTEST_HEADERS		+= xefis/core/property.tcc
 
+SELFTEST_SOURCES		+= xefis/core/logger.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
 SELFTEST_SOURCES		+= xefis/core/module.cc
@@ -436,7 +440,6 @@ XEFIS_HEADERS			+= xefis/utility/exception_support.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
 XEFIS_HEADERS			+= xefis/utility/hmac.h
-XEFIS_HEADERS			+= xefis/utility/logger.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
 XEFIS_HEADERS			+= xefis/utility/mutex.h
 XEFIS_HEADERS			+= xefis/utility/navigation.h
@@ -479,7 +482,6 @@ XEFIS_SOURCES			+= xefis/utility/backtrace.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/exception_support.cc
 XEFIS_SOURCES			+= xefis/utility/mutex.cc
-XEFIS_SOURCES			+= xefis/utility/logger.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
 XEFIS_SOURCES			+= xefis/utility/qutils.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
@@ -491,7 +493,6 @@ SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/quadrature_decoder.test.cc
-SELFTEST_SOURCES		+= xefis/utility/logger.cc
 
 ################
 

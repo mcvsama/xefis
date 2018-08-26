@@ -22,6 +22,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/sequence.h>
 #include <xefis/utility/time.h>
@@ -72,7 +73,7 @@ class ProcessingLoop: public QObject
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency);
+	ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency, Logger const&);
 
 	// Dtor
 	virtual
@@ -153,7 +154,7 @@ class ProcessingLoop: public QObject
 	std::vector<BasicModule*>	_uninitialized_modules;
 	std::optional<Cycle>		_current_cycle;
 	Cycle::Number				_next_cycle_number	{ 1 };
-	std::unique_ptr<Logger>		_logger;
+	Logger						_logger;
 	ModulesContainer			_modules;
 };
 

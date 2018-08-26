@@ -28,18 +28,19 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency):
+ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency, Logger const& logger):
 	_machine (machine),
 	_xefis (machine->xefis()),
 	_name (name),
-	_loop_period (1.0 / loop_frequency)
+	_loop_period (1.0 / loop_frequency),
+	_logger (logger)
 {
 	_loop_timer = new QTimer (this);
 	_loop_timer->setSingleShot (false);
 	_loop_timer->setInterval (_loop_period.in<Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
 
-	_logger = std::make_unique<Logger> (std::clog, *this);
+	_logger.set_processing_loop (*this);
 }
 
 
@@ -76,7 +77,7 @@ ProcessingLoop::execute_cycle()
 {
 	Time t = TimeHelper::now();
 	Time dt = t - _previous_timestamp.value_or (t - 0.1_ms); // -0.1_ms to prevent division by zero in modules.
-	_current_cycle = Cycle { _next_cycle_number++, t, dt, *_logger };
+	_current_cycle = Cycle { _next_cycle_number++, t, dt, _logger };
 
 	if (_previous_timestamp)
 	{

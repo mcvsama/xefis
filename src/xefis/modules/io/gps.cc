@@ -53,7 +53,7 @@ GPS::Connection::Connection (GPS& gps_module, PowerCycle& power_cycle, unsigned 
 	_serial_port = std::make_unique<xf::SerialPort> (std::bind (&GPS::Connection::serial_data_ready, this),
 													 std::bind (&GPS::Connection::serial_failure, this));
 	_serial_port->set_max_read_failures (3);
-	_serial_port->set_parent_logger (_gps_module.logger());
+	_serial_port->set_logger (_gps_module.logger().with_scope ("serial port"));
 
 	open_device();
 }
@@ -483,15 +483,15 @@ GPS::PowerCycle::notify_connection_established()
 }
 
 
-GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& parent_logger, std::string const& instance):
+GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string const& instance):
 	Module (std::move (module_io), instance),
-	_logger (xf::Logger::Parent (parent_logger)),
+	_logger (logger),
 	_system (system),
 	_serial_port_config (serial_port_config)
 {
 	// TODO check logic that setting_target_baud_rate >= setting_default_baud_rate
 
-	_logger.set_prefix (std::string (kLoggerPrefix) + "#" + instance);
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_power_cycle_timer = std::make_unique<QTimer> (this);
 	_power_cycle_timer->setInterval (kPowerRestartDelay.in<Millisecond>());
