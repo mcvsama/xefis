@@ -471,6 +471,7 @@ XEFIS_HEADERS			+= xefis/utility/temporary_change.h
 XEFIS_HEADERS			+= xefis/utility/thread.h
 XEFIS_HEADERS			+= xefis/utility/time.h
 XEFIS_HEADERS			+= xefis/utility/time_helper.h
+XEFIS_HEADERS			+= xefis/utility/tracker.h
 XEFIS_HEADERS			+= xefis/utility/transistor.h
 XEFIS_HEADERS			+= xefis/utility/types.h
 XEFIS_HEADERS			+= xefis/utility/use_count.h
@@ -492,6 +493,7 @@ SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/quadrature_decoder.test.cc
+SELFTEST_SOURCES		+= xefis/utility/tests/tracker.test.cc
 
 ################
 
