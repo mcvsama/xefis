@@ -169,7 +169,23 @@ RuntimeTest t5 ("xf::PropertyObserver touch()", []{
 
 
 RuntimeTest t6 ("xf::PropertyObserver depending smoothers", []{
-	// TODO
+	TestEnvironment<TestedType> env;
+	xf::Smoother<TestedType> smoother { 5_s };
+
+	env.observer.add_depending_smoother (smoother);
+	env.out = kValue1;
+
+	// Verify that callback gets called multiple times even if property value doesn't change, to make sure that Smoother can continue to properly smooth and
+	// output the data.
+	for (size_t i = 0; i < 10; ++i)
+	{
+		env.in.fetch (env.cycle += 1_s);
+		env.observer.process (env.cycle.update_time());
+	}
+
+	// Expect total 7 calls, 1 for value change, 5 for 5 seconds of smoothing time plus one additional
+	// to ensure smoother has finished.
+	test_asserts::verify ("callback was called 5 times after last property change", env.calls == 7);
 });
 
 

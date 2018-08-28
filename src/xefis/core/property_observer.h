@@ -142,9 +142,8 @@ class PropertyObserver
 
 	/**
 	 * Register smoother with this observer.
-	 * Several smoothers can be registered. The longest smoothing time from those smoothers is collected every
-	 * time this Observer is updated (process(...) is called). Then, for that period of time, observer
-	 * will fire callback function several times. Frequency of fires is controlled by set_smoothing_frequency(...).
+	 * PropertyObserver will fire callbacks more than once after last property change to accommodate for period of time greater or equal to the smoothing-time
+	 * of the longest-smoothing Smoother. This is to ensure that smoothers continue to work and smooth data even after single-event property change occurs.
 	 *
 	 * Smoother is held by reference, so it must live as long as this object lives.
 	 */
@@ -189,7 +188,7 @@ class PropertyObserver
 	// Set to true, when observed property is updated, but
 	// _minimum_dt prevented firing the callback.
 	bool					_need_callback				{ false };
-	bool					_last_recompute				{ false };
+	bool					_additional_recompute		{ false };
 	bool					_touch						{ false };
 };
 

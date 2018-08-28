@@ -71,7 +71,7 @@ PropertyObserver::process (si::Time update_time)
 		if (new_serial != o._saved_serial)
 		{
 			_need_callback = true;
-			_last_recompute = !_smoothers.empty();
+			_additional_recompute = !_smoothers.empty();
 			o._saved_serial = new_serial;
 		}
 	}
@@ -79,10 +79,10 @@ PropertyObserver::process (si::Time update_time)
 	// Minimum time (granularity) for updates caused by working smoothers - 1 ms.
 	bool should_recompute = _need_callback || (obs_dt >= 1_ms && obs_dt <= longest_smoothing_time());
 
-	if (!should_recompute && _last_recompute)
+	if (!should_recompute && _additional_recompute)
 	{
 		should_recompute = true;
-		_last_recompute = false;
+		_additional_recompute = false;
 	}
 
 	if (should_recompute || _touch)
@@ -91,6 +91,7 @@ PropertyObserver::process (si::Time update_time)
 		{
 			if (_need_callback)
 				_obs_update_time = update_time;
+
 			_need_callback = false;
 			_touch = false;
 			_accumulated_dt = 0_ms;
@@ -100,7 +101,7 @@ PropertyObserver::process (si::Time update_time)
 			_callback();
 		}
 		else
-			_last_recompute = true;
+			_additional_recompute = true;
 	}
 }
 
@@ -134,7 +135,8 @@ PropertyObserver::longest_smoothing_time() noexcept
 		// Add 1.1 ms of margin, to be sure that the smoother's window
 		// is positioned _after_ the last interesting value change.
 		// This assumes that the smoother's precision is set to 1 ms.
-		_longest_smoothing_time = 2.0 * (longest + 1.1_ms);
+		// TODO assumption!
+		_longest_smoothing_time = longest + 1.1_ms;
 	}
 
 	return *_longest_smoothing_time;
