@@ -66,9 +66,9 @@ Logger::prepare_line() const
 		if (_processing_loop)
 		{
 			if (auto cycle = _processing_loop->current_cycle())
-				stream << boost::format ("[%08d] ") % cycle->number();
+				stream << boost::format ("[cycle=%08d] ") % cycle->number();
 			else
-				stream << "[no cycle] ";
+				stream << "[cycle=--------] ";
 		}
 
 		return stream << _computed_scope << " ";
