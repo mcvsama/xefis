@@ -22,7 +22,7 @@
 namespace xf::test {
 namespace {
 
-RuntimeTest t1 ("numeric: integral()", []{
+RuntimeTest t1 ("integral()", []{
 	auto int1 = integral (static_cast<double (*)(double)> (std::sin), { -5.3, +12.0 }, 1e-5);
 
 	test_asserts::verify_equal_with_epsilon ("integrated sin() is correct", int1, -0.28948, 1e-5);

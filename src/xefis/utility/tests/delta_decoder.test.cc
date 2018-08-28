@@ -24,7 +24,7 @@
 namespace xf::test {
 namespace {
 
-RuntimeTest t1 ("utility: DeltaDecoder", []{
+RuntimeTest t1 ("DeltaDecoder", []{
 	using Integer = int16_t;
 	using Callback = std::function<void (std::optional<Integer>)>;
 

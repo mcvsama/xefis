@@ -42,7 +42,7 @@ template<class T>
 	}
 
 
-RuntimeTest t1 ("utility: QuadratureDecoder + QuadratureCounter", []{
+RuntimeTest t1 ("QuadratureDecoder + QuadratureCounter", []{
 	// QuadratureDecoder will be tested by testing QuadratureCounter, so no need for separate tests.
 
 	// Tuple is <input_a, input_b, delta, callback_expected>:
