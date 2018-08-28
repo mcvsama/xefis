@@ -29,6 +29,7 @@
 namespace xf {
 
 ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency, Logger const& logger):
+	Module (std::make_unique<ProcessingLoopIO> (name), name),
 	_machine (machine),
 	_xefis (machine->xefis()),
 	_name (name),
@@ -81,16 +82,11 @@ ProcessingLoop::execute_cycle()
 	{
 		Time latency = dt - _loop_period;
 
-		// TODO _latency = latency;
-		// TODO _actual_frequency = 1.0 / dt;
+		io.latency = latency;
+		io.actual_frequency = 1.0 / dt;
 
 		if (dt > 1.1 * _loop_period)
-		{
-			// TODO log:
-			// auto entry = logger.add_entry();
-			// entry << "z" << "y"; // Automatically adds timestamp and processing loop cycle number
-			std::cout << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0);
-		}
+			_logger << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0);
 	}
 
 	// TODO check if all core properties are computable by modules; if not, show a warning.
