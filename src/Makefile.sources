@@ -268,7 +268,6 @@ XEFIS_HEADERS			+= xefis/core/property_observer.h
 XEFIS_HEADERS			+= xefis/core/property_out.h
 XEFIS_HEADERS			+= xefis/core/property_path.h
 XEFIS_HEADERS			+= xefis/core/property_traits.h
-XEFIS_HEADERS			+= xefis/core/property_utils.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS			+= xefis/core/screen_spec.h
 XEFIS_HEADERS_MOC		+= xefis/core/services.h
