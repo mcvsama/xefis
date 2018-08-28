@@ -24,8 +24,10 @@
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
 #include <xefis/core/property.h>
+#include <xefis/utility/noncopyable.h>
 #include <xefis/utility/sequence.h>
 #include <xefis/utility/time.h>
+#include <xefis/utility/tracker.h>
 
 
 namespace xf {
@@ -48,7 +50,7 @@ class ProcessingLoop: public QObject
 	  public:
 		// Ctor
 		explicit
-		ModuleDetails (Unique<BasicModule>);
+		ModuleDetails (BasicModule&);
 
 		BasicModule&
 		module() noexcept;
@@ -58,17 +60,13 @@ class ProcessingLoop: public QObject
 
 	  public:
 		// TODO more time accounting
-		si::Time			last_processing_time	{ 0_ms };
+		si::Time		last_processing_time	{ 0_ms };
 
 	  private:
-		Unique<BasicModule>	_module;
+		BasicModule*	_module;
 	};
 
-	using ModulesContainer = std::vector<ModuleDetails>;
-
-  public:
-	//TODO PropertyOut<si::Frequency>	_actual_frequency	{ "/system/processing-loop/x/actual-frequency" };
-	//TODO PropertyOut<si::Time>		_latency			{ "/system/processing-loop/x/latency" };
+	using ModuleDetailsList = std::vector<ModuleDetails>;
 
   public:
 	// Ctor
@@ -79,13 +77,9 @@ class ProcessingLoop: public QObject
 	virtual
 	~ProcessingLoop();
 
-	/**
-	 * Load module by name and return a pointer.
-	 * Module is owned by Machine object.
-	 */
-	template<class pModule, class ...Arg>
-		pModule*
-		load_module (Arg&& ...args);
+	template<class Compatible>
+		void
+		register_module (Registrant<Compatible>&);
 
 	/**
 	 * Return the machine object to which this ProcessingLoop belongs.
@@ -128,13 +122,13 @@ class ProcessingLoop: public QObject
 	/**
 	 * A sequence of modules loaded into this processing loop.
 	 */
-	Sequence<ModulesContainer::iterator>
+	Sequence<ModuleDetailsList::iterator>
 	module_details_list() noexcept;
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
 	 */
-	Sequence<ModulesContainer::const_iterator>
+	Sequence<ModuleDetailsList::const_iterator>
 	module_details_list() const noexcept;
 
   protected:
@@ -155,41 +149,38 @@ class ProcessingLoop: public QObject
 	std::optional<Cycle>		_current_cycle;
 	Cycle::Number				_next_cycle_number	{ 1 };
 	Logger						_logger;
-	ModulesContainer			_modules;
+	Tracker<BasicModule>		_modules_tracker; // TODO use ModuleDetails as Tracker<> second parameter
+	ModuleDetailsList			_module_details_list;
 };
 
 
-template<class pModule, class ...Arg>
-	inline pModule*
-	ProcessingLoop::load_module (Arg&& ...args)
+template<class Compatible>
+	inline void
+	ProcessingLoop::register_module (Registrant<Compatible>& registrant)
 	{
-		auto module = std::make_unique<pModule> (std::forward<Arg> (args)...);
-		auto module_raw_ptr = module.get();
-
-		_modules.push_back (ModuleDetails (std::move (module)));
-		_uninitialized_modules.push_back (module_raw_ptr);
-
-		return module_raw_ptr;
+		_modules_tracker.register_object (registrant);
+		_module_details_list.emplace_back (*registrant);
+		_uninitialized_modules.push_back (&*registrant);
 	}
 
 
 inline
-ProcessingLoop::ModuleDetails::ModuleDetails (Unique<BasicModule> module):
-	_module (std::move (module))
+ProcessingLoop::ModuleDetails::ModuleDetails (BasicModule& module):
+	_module (&module)
 { }
 
 
 inline BasicModule&
 ProcessingLoop::ModuleDetails::module() noexcept
 {
-	return *_module.get();
+	return *_module;
 }
 
 
 inline BasicModule const&
 ProcessingLoop::ModuleDetails::module() const noexcept
 {
-	return *_module.get();
+	return *_module;
 }
 
 
@@ -224,16 +215,16 @@ ProcessingLoop::current_cycle() const
 
 
 inline auto
-ProcessingLoop::module_details_list() noexcept -> Sequence<ModulesContainer::iterator>
+ProcessingLoop::module_details_list() noexcept -> Sequence<ModuleDetailsList::iterator>
 {
-	return { _modules.begin(), _modules.end() };
+	return { _module_details_list.begin(), _module_details_list.end() };
 }
 
 
 inline auto
-ProcessingLoop::module_details_list() const noexcept -> Sequence<ModulesContainer::const_iterator>
+ProcessingLoop::module_details_list() const noexcept -> Sequence<ModuleDetailsList::const_iterator>
 {
-	return { _modules.cbegin(), _modules.cend() };
+	return { _module_details_list.cbegin(), _module_details_list.cend() };
 }
 
 } // namespace xf

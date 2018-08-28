@@ -35,8 +35,8 @@ namespace xf {
 
 Screen::Screen (ScreenSpec const& spec):
 	QWidget (nullptr),
-	Registry ([&](typename Registry::Disclosure& disclosure) { instrument_registered (disclosure); },
-			  [&](typename Registry::Disclosure& disclosure) { instrument_unregistered (disclosure); }),
+	_instrument_tracker ([&](typename InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
+						 [&](typename InstrumentTracker::Disclosure& disclosure) { instrument_unregistered (disclosure); }),
 	_screen_spec (spec)
 {
 	auto rect = _screen_spec.position_and_size();
@@ -65,21 +65,12 @@ Screen::~Screen()
 }
 
 
-Screen::RegistrationProof
-Screen::register_instrument (BasicInstrument& instrument)
-{
-	// Don't give access to public to Registry interface, so that user doesn't
-	// register instrument with some weird Details value.
-	return register_object (instrument);
-}
-
-
 void
 Screen::set (BasicInstrument const& instrument, QRectF const requested_position, QPointF const anchor_position)
 {
-	for (auto& disclosure: *this)
+	for (auto& disclosure: _instrument_tracker)
 	{
-		if (&disclosure.registrant() == &instrument)
+		if (&disclosure.value() == &instrument)
 		{
 			disclosure.details().requested_position = requested_position;
 			disclosure.details().anchor_position = anchor_position;
@@ -101,7 +92,7 @@ void
 Screen::set_z_index (BasicInstrument const& instrument, int const new_z_index)
 {
 	auto found = std::find_if (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(),
-							   [&instrument](auto const* disclosure) { return &disclosure->registrant() == &instrument; });
+							   [&instrument](auto const* disclosure) { return &disclosure->value() == &instrument; });
 
 	if (found != _z_index_sorted_disclosures.end())
 	{
@@ -155,7 +146,7 @@ Screen::update_canvas (QSize size)
 		_canvas = allocate_image (size);
 		_canvas.fill (Qt::black);
 
-		for (auto& disclosure: *this)
+		for (auto& disclosure: _instrument_tracker)
 			disclosure.details().computed_position.reset();
 	}
 }
@@ -174,7 +165,7 @@ Screen::paint_instruments_to_buffer()
 	// Ask instruments to paint themselves:
 	for (auto* disclosure: _z_index_sorted_disclosures)
 	{
-		auto& instrument = disclosure->registrant();
+		auto& instrument = disclosure->value();
 		auto& details = disclosure->details();
 
 		if (!details.computed_position)
@@ -212,7 +203,7 @@ Screen::paint_instruments_to_buffer()
 				if (instrument.dirty_since_last_check())
 				{
 					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
-					details.paint_request.emplace (*details.canvas, metric, details.previous_size);
+					details.paint_request = std::make_unique<PaintRequest> (*details.canvas, metric, details.previous_size);
 
 					instrument.paint (*details.paint_request);
 
@@ -284,7 +275,7 @@ Screen::allocate_image (QSize size) const
 
 
 void
-Screen::instrument_registered (typename Registry::Disclosure& disclosure)
+Screen::instrument_registered (typename InstrumentTracker::Disclosure& disclosure)
 {
 	_z_index_sorted_disclosures.push_back (&disclosure);
 	sort_by_z_index();
@@ -292,7 +283,7 @@ Screen::instrument_registered (typename Registry::Disclosure& disclosure)
 
 
 void
-Screen::instrument_unregistered (typename Registry::Disclosure& disclosure)
+Screen::instrument_unregistered (typename InstrumentTracker::Disclosure& disclosure)
 {
 	auto new_end = std::remove (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(), &disclosure);
 	_z_index_sorted_disclosures.resize (new_end - _z_index_sorted_disclosures.begin());
