@@ -38,7 +38,6 @@
 #include <xefis/utility/time_helper.h>
 #include <xefis/utility/demangle.h>
 // TODO machine
-#include <machines/cthulhu_gcs/cthulhu_gcs.h>
 
 // Local:
 #include "xefis.h"
@@ -70,7 +69,6 @@ Xefis::Xefis (int& argc, char** argv):
 	// TODO this is a hack, make it configurable or runtime selectable;
 	// TODO best: provide a separate config file to compile with all initialization
 	// TODO functions, etc. Or: make xefis a library.
-	_machine = std::make_unique<CthulhuGCS> (this);
 	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 }
 
