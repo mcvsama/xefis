@@ -21,15 +21,17 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/processing_loop.h>
+#include <xefis/utility/noncopyable.h>
 #include <xefis/utility/sequence.h>
+#include <xefis/utility/tracker.h>
 
 
 namespace xf {
 
-class Machine
+class Machine: private Noncopyable
 {
   private:
-	using ProcessingLoopsContainer = std::vector<std::unique_ptr<ProcessingLoop>>;
+	using ProcessingLoopsTracker = Tracker<ProcessingLoop>;
 
   public:
 	// Ctor
@@ -53,37 +55,26 @@ class Machine
 	/**
 	 * A sequence of processing loops.
 	 */
-	Sequence<ProcessingLoopsContainer::iterator>
+	Sequence<ProcessingLoopsTracker::Iterator>
 	processing_loops() noexcept;
 
 	/**
 	 * A sequence of processing loops.
 	 */
-	Sequence<ProcessingLoopsContainer::const_iterator>
+	Sequence<ProcessingLoopsTracker::ConstIterator>
 	processing_loops() const noexcept;
 
-  protected:
 	/**
-	 * Create new processing loop with given frequency.
+	 * Register a processing loop.
 	 */
-	template<class pProcessingLoop = ProcessingLoop, class ...Arg>
-		pProcessingLoop*
-		make_processing_loop (Arg&& ...args);
+	template<class Compatible>
+		void
+		register_processing_loop (Registrant<Compatible>&);
 
   private:
 	Xefis*						_xefis;
-	ProcessingLoopsContainer	_processing_loops;
+	Tracker<ProcessingLoop>		_processing_loops;
 };
-
-
-template<class pProcessingLoop, class ...Arg>
-	inline pProcessingLoop*
-	Machine::make_processing_loop (Arg&& ...args)
-	{
-		_processing_loops.push_back (std::make_unique<pProcessingLoop> (this, std::forward<Arg> (args)...));
-
-		return static_cast<pProcessingLoop*> (_processing_loops.back().get());
-	}
 
 
 inline Xefis*
@@ -94,17 +85,27 @@ Machine::xefis() const noexcept
 
 
 inline auto
-Machine::processing_loops() noexcept -> Sequence<ProcessingLoopsContainer::iterator>
+Machine::processing_loops() noexcept -> Sequence<ProcessingLoopsTracker::Iterator>
 {
 	return { _processing_loops.begin(), _processing_loops.end() };
 }
 
 
 inline auto
-Machine::processing_loops() const noexcept -> Sequence<ProcessingLoopsContainer::const_iterator>
+Machine::processing_loops() const noexcept -> Sequence<ProcessingLoopsTracker::ConstIterator>
 {
 	return { _processing_loops.cbegin(), _processing_loops.cend() };
 }
+
+
+template<class Compatible>
+	inline void
+	Machine::register_processing_loop (Registrant<Compatible>& processing_loop)
+	{
+		// Don't give access to public to Registry interface, so that user doesn't
+		// register instrument with some weird Details value.
+		_processing_loops.register_object (processing_loop);
+	}
 
 } // namespace xf
 

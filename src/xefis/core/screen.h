@@ -30,8 +30,7 @@
 #include <xefis/core/instrument.h>
 #include <xefis/core/screen_spec.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/registration_proof.h>
-#include <xefis/utility/registry.h>
+#include <xefis/utility/tracker.h>
 
 
 namespace xf {
@@ -41,17 +40,17 @@ namespace detail {
  * Additional information for each instrument needed by the Screen object,
  * such as its position on the screen.
  */
-class Details
+class InstrumentDetails
 {
   public:
-	std::optional<PaintRequest>	paint_request;
-	QRectF						requested_position;
-	QPointF						anchor_position;
-	std::optional<QRect>		computed_position;
-	QSize						previous_size;
-	std::unique_ptr<QImage>		canvas;
-	std::unique_ptr<QImage>		ready_canvas;
-	int							z_index { 0 };
+	std::unique_ptr<PaintRequest>	paint_request;
+	QRectF							requested_position;
+	QPointF							anchor_position;
+	std::optional<QRect>			computed_position;
+	QSize							previous_size;
+	std::unique_ptr<QImage>			canvas;
+	std::unique_ptr<QImage>			ready_canvas;
+	int								z_index { 0 };
 };
 
 } // namespace detail
@@ -62,13 +61,12 @@ class Details
  */
 class Screen:
 	public QWidget,
-	private Registry<BasicInstrument, detail::Details>,
 	private Noncopyable
 {
 	Q_OBJECT
 
-  public:
-	using RegistrationProof = typename Registry::RegistrationProof;
+  private:
+	using InstrumentTracker = Tracker<BasicInstrument, detail::InstrumentDetails>;
 
   public:
 	// Ctor
@@ -81,8 +79,9 @@ class Screen:
 	/**
 	 * Register instrument
 	 */
-	RegistrationProof
-	register_instrument (BasicInstrument&);
+	template<class Instrument>
+		void
+		register_instrument (Registrant<Instrument>&);
 
 	/**
 	 * Set position and size of an instrument.
@@ -114,6 +113,18 @@ class Screen:
 	 */
 	si::PixelDensity
 	pixel_density() const;
+
+	/**
+	 * Return the instrument tracker object.
+	 */
+	InstrumentTracker&
+	instrument_tracker() noexcept;
+
+	/**
+	 * Return the instrument tracker object.
+	 */
+	InstrumentTracker const&
+	instrument_tracker() const noexcept;
 
   protected:
 	// QWidget API:
@@ -151,10 +162,10 @@ class Screen:
 	allocate_image (QSize) const;
 
 	void
-	instrument_registered (typename Registry::Disclosure&);
+	instrument_registered (typename InstrumentTracker::Disclosure&);
 
 	void
-	instrument_unregistered (typename Registry::Disclosure&);
+	instrument_unregistered (typename InstrumentTracker::Disclosure&);
 
 	void
 	sort_by_z_index();
@@ -167,12 +178,35 @@ class Screen:
 	refresh();
 
   private:
-	QTimer*						_refresh_timer;
-	QImage						_canvas;
-	std::vector<Disclosure*>	_z_index_sorted_disclosures;
-	ScreenSpec					_screen_spec;
-	bool						_paint_bounding_boxes	{ false };
+	InstrumentTracker							_instrument_tracker;
+	QTimer*										_refresh_timer;
+	QImage										_canvas;
+	std::vector<InstrumentTracker::Disclosure*>	_z_index_sorted_disclosures;
+	ScreenSpec									_screen_spec;
+	bool										_paint_bounding_boxes	{ false };
 };
+
+
+template<class Instrument>
+	inline void
+	Screen::register_instrument (Registrant<Instrument>& instrument)
+	{
+		_instrument_tracker.register_object (instrument);
+	}
+
+
+inline Screen::InstrumentTracker&
+Screen::instrument_tracker() noexcept
+{
+	return _instrument_tracker;
+}
+
+
+inline Screen::InstrumentTracker const&
+Screen::instrument_tracker() const noexcept
+{
+	return _instrument_tracker;
+}
 
 } // namespace xf
 

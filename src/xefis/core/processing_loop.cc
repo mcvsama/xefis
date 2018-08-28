@@ -46,8 +46,6 @@ ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequ
 
 ProcessingLoop::~ProcessingLoop()
 {
-	// Make sure to destroy modules first, since in their destructors they can still need to access PropertyLoop via ProcessingLoopAPI or via other means.
-	_modules.clear();
 }
 
 
@@ -97,10 +95,10 @@ ProcessingLoop::execute_cycle()
 
 	// TODO check if all core properties are computable by modules; if not, show a warning.
 
-	for (auto& module_details: _modules)
+	for (auto& module_details: _module_details_list)
 		BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
 
-	for (auto& module_details: _modules)
+	for (auto& module_details: _module_details_list)
 	{
 		module_details.last_processing_time = TimeHelper::measure ([&] {
 			BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);

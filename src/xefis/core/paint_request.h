@@ -69,13 +69,6 @@ class PaintRequest: private Noncopyable
 	explicit
 	PaintRequest (QImage&, Metric, QSize previous_canvas_size);
 
-	// Move ctor
-	PaintRequest (PaintRequest&&) = default;
-
-	// Move operator
-	PaintRequest&
-	operator= (PaintRequest&&) = default;
-
 	/**
 	 * Access the canvas to paint on.
 	 */

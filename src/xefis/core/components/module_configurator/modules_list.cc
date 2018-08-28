@@ -107,7 +107,7 @@ ModulesList::read()
 	_processing_loop_ptrs.clear();
 
 	for (auto& processing_loop: _machine.processing_loops())
-		_processing_loop_ptrs.push_back (processing_loop.get());
+		_processing_loop_ptrs.push_back (&processing_loop.value());
 
 	populate_subtree (*_list->invisibleRootItem(), _processing_loop_ptrs, [](auto* item) -> ProcessingLoop* {
 		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (item))
