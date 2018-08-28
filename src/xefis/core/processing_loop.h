@@ -37,10 +37,28 @@ class Xefis;
 class Logger;
 
 
+class ProcessingLoopIO: public ModuleIO
+{
+  private:
+	std::string const			_loop_name;
+
+  public:
+	PropertyOut<si::Frequency>	actual_frequency	{ this, "/system/processing-loop/" + _loop_name + "/actual_frequency" };
+	PropertyOut<si::Time>		latency				{ this, "/system/processing-loop/" + _loop_name + "/latency" };
+
+  public:
+	ProcessingLoopIO (std::string const& loop_name):
+		_loop_name (loop_name)
+	{ }
+};
+
+
 /**
  * A loop that periodically goes through all modules and calls process() method.
  */
-class ProcessingLoop: public QObject
+class ProcessingLoop:
+	public QObject,
+	public Module<ProcessingLoopIO>
 {
 	Q_OBJECT
 
