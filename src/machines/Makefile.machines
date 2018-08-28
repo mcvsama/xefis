@@ -1,3 +1,2 @@
 XEFIS_MACHINES += template
-XEFIS_MACHINES += cthulhu_gcs
 
