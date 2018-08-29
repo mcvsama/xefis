@@ -37,7 +37,7 @@
 #include <xefis/support/ui/sound_manager.h>
 #include <xefis/utility/time_helper.h>
 #include <xefis/utility/demangle.h>
-// TODO machine
+#include <xefis/xefis_machine.h>
 
 // Local:
 #include "xefis.h"
@@ -65,9 +65,7 @@ Xefis::Xefis (int& argc, char** argv):
 
 	_system = std::make_unique<System> (_logger);
 
-	// TODO this is a hack, make it configurable or runtime selectable;
-	// TODO best: provide a separate config file to compile with all initialization
-	// TODO functions, etc. Or: make xefis a library.
+	_machine = ::xefis_machine (this);
 	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 }
 

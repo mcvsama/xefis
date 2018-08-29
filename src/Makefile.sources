@@ -174,6 +174,7 @@ SELFTEST_SOURCES		+= lib/si/tests/basic.test.cc
 
 XEFIS_HEADERS			+= $(MATH_HEADERS)
 XEFIS_HEADERS			+= $(SI_HEADERS)
+XEFIS_HEADERS			+= xefis/xefis_machine.h
 
 XEFIS_SOURCES			+= $(SI_SOURCES)
 XEFIS_SOURCES			+= xefis/xefis.cc
@@ -497,7 +498,7 @@ SELFTEST_SOURCES		+= xefis/utility/tests/tracker.test.cc
 
 ################
 
-XEFIS_HEADER += $(addprefix machines/,$(XEFIS_MACHINE_HEADERS))
+XEFIS_HEADERS += $(addprefix machines/,$(XEFIS_MACHINE_HEADERS))
 XEFIS_HEADERS_MOC += $(addprefix machines/,$(XEFIS_MACHINE_HEADERS_MOC))
 XEFIS_SOURCES += $(addprefix machines/,$(XEFIS_MACHINE_SOURCES))
 XEFIS_SOURCES_MOC += $(addprefix machines/,$(XEFIS_MACHINE_SOURCES_MOC))
@@ -531,10 +532,10 @@ OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
 OBJECTS += $(call mkobjs, $(SOURCES))
 
 VERSION_FILE := xefis/config/version.cc
-TARGETS += $(distdir)/xefis $(distdir)/watchdog $(distdir)/selftest
-LINKEDS += $(distdir)/xefis $(distdir)/watchdog $(distdir)/selftest
+MACHINE_TARGETS += $(foreach machine_name, $(XEFIS_MACHINES), $(distdir)/xefis.$(machine_name))
+TARGETS += $(MACHINE_TARGETS) $(distdir)/watchdog $(distdir)/selftest
 
-$(distdir)/xefis: $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
+$(MACHINE_TARGETS): $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 
 $(distdir)/watchdog: $(WATCHDOG_OBJECTS) $(WATCHDOG_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 

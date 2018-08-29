@@ -318,7 +318,7 @@ $(mocsdir)/%.moc.cc: %.h
 	@echo $(_s) "MOC     " $(_l) $@
 	$(MOC) $< -o $@
 
-$(LINKEDS):
+$(TARGETS):
 	$(call prepdir, $@)
 	@echo $(_s) "LD      " $(_l) $@
 	$(LD) -o $@ $^ $(LDFLAGS)
