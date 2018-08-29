@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
 
 // Boost:
 #include <boost/iostreams/stream.hpp>
@@ -34,7 +35,7 @@ std::ostream&
 LoggerOutput::prepare_line() const
 {
 	if (_add_timestamps)
-		_stream << boost::format ("[%08.4lfs] ") % TimeHelper::now().in<Second>();
+		_stream << '[' << LoggerOutput::kTimestampColor << boost::format ("%08.4lfs") % TimeHelper::now().in<Second>() << LoggerOutput::kResetColor << ']';
 
 	return _stream;
 }
@@ -52,7 +53,9 @@ Logger::with_scope (std::string_view const& additional_scope)
 void
 Logger::compute_scope()
 {
-	_computed_scope = "[" + boost::algorithm::join (scopes(), "][") + "]";
+	using namespace std::literals;
+
+	_computed_scope = "["s + LoggerOutput::kScopeColor + boost::algorithm::join (scopes(), LoggerOutput::kResetColor + "]["s + LoggerOutput::kScopeColor) + LoggerOutput::kResetColor + "]";
 }
 
 
@@ -66,9 +69,9 @@ Logger::prepare_line() const
 		if (_processing_loop)
 		{
 			if (auto cycle = _processing_loop->current_cycle())
-				stream << boost::format ("[cycle=%08d] ") % cycle->number();
+				stream << '[' << LoggerOutput::kCycleColor << boost::format ("cycle=%08d") % cycle->number() << LoggerOutput::kResetColor << ']';
 			else
-				stream << "[cycle=--------] ";
+				stream << '[' << LoggerOutput::kCycleColor << "cycle=--------" << LoggerOutput::kResetColor << ']';
 		}
 
 		return stream << _computed_scope << " ";
