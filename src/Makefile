@@ -30,6 +30,8 @@ UB_OPTS_DISABLE		:= 0
 # Sanitizers?
 SANITIZE			:=
 NO_SANITIZE			:=
+# Coverage?
+COVERAGE			:= 0
 
 CXX				:= g++
 DEPCC			:= $(CXX)
