@@ -34,12 +34,12 @@ NO_SANITIZE			:=
 CXX				:= g++
 DEPCC			:= $(CXX)
 ifeq ($(CXX),g++)
-CXXFLAGS		+= -fPIC -O4 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fconcepts -fnothrow-opt -pedantic-errors -D_GLIBCXX_USE_CXX11_ABI=1 -Wshadow-compatible-local
+CXXFLAGS		+= -fPIC -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -Wnoexcept -fstrict-aliasing -Wstrict-aliasing=3 -fconcepts -fnothrow-opt -pedantic-errors -D_GLIBCXX_USE_CXX11_ABI=1 -Wshadow-compatible-local
 CXXFLAGS		+= -pthread -rdynamic -I. -Ilib
 endif
 ifeq ($(CXX),clang++)
 CLANG_DISABLED_WARNINGS = mismatched-tags disabled-macro-expansion c++98-compat-pedantic documentation-unknown-command
-CXXFLAGS		+= -fPIE -O3 -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -fconcepts -fstrict-aliasing $(foreach warning, $(CLANG_DISABLED_WARNINGS), -Wno-$(warning))
+CXXFLAGS		+= -fPIE -g -c -std=c++17 -Wall -Wall -Wextra -Wunused -Wunused-function -Wunused-label -fconcepts -fstrict-aliasing $(foreach warning, $(CLANG_DISABLED_WARNINGS), -Wno-$(warning))
 CXXFLAGS		+= -pthread -I. -Ilib
 endif
 CXXFLAGS		+= -finline -funroll-loops -fomit-frame-pointer
@@ -55,9 +55,9 @@ CXXFLAGS_s		:= $(CXXFLAGS)
 ifeq ($(DEBUG),1)
 XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
 XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
-CXXFLAGS		+= -O2 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
+CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
 else
-CXXFLAGS		+= -DQT_NO_DEBUG
+CXXFLAGS		+= -O4 -DQT_NO_DEBUG
 endif
 CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"' $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
 LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
