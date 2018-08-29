@@ -162,6 +162,12 @@ class Xefis: public QApplication
 	OptionsHelper const&
 	options() const noexcept;
 
+	/**
+	 * Return logger to use by machines.
+	 */
+	Logger const&
+	logger() const noexcept;
+
   private:
 	/**
 	 * Parse command line options and fill _options map.
@@ -276,6 +282,13 @@ inline Xefis::OptionsHelper const&
 Xefis::options() const noexcept
 {
 	return *_options_helper;
+}
+
+
+inline Logger const&
+Xefis::logger() const noexcept
+{
+	return _logger;
 }
 
 } // namespace xf
