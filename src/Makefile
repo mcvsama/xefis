@@ -260,9 +260,10 @@ release:
 doc:
 	@cd doc && doxygen doxygen-conf/doxygen.conf
 
-check:
-	cppcheck --force --std=c++17 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
-		lib modules xefis $(HEADERS) 2> check.log
+# This command is dangerous - overwrites source files
+#check:
+#	cppcheck --force --std=c++17 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
+#		lib modules xefis $(HEADERS) 2> check.log
 
 $(MAINDEPFILE): Makefile.sources $(DEPFILES)
 	$(call prepdir, $@)
