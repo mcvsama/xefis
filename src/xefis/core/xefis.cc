@@ -52,7 +52,6 @@ Xefis::Xefis (int& argc, char** argv):
 		throw std::runtime_error ("can create only one Xefis object");
 
 	_xefis = this;
-	_logger.add_scope ("<xefis>");
 
 	signal (SIGHUP, s_quit);
 
