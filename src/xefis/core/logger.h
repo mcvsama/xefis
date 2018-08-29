@@ -39,6 +39,13 @@ class LoggerOutput
 	friend class Logger;
 
   public:
+	static constexpr char kResetColor[]		= "\033[31;1;0m";
+	static constexpr char kTimestampColor[]	= "\033[38;2;100;120;220m";
+	static constexpr char kScopeColor[]		= "\033[38;2;200;240;140m";
+	static constexpr char kCycleColor[]		= "\033[38;2;200;140;240m";
+	static constexpr char kSpecialColor[]	= "\033[38;2;140;200;240m";
+
+  public:
 	// Ctor
 	explicit
 	LoggerOutput (std::ostream&);
