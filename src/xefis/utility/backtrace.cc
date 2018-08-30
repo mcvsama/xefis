@@ -21,6 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <map>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -45,6 +46,7 @@
 
 
 namespace xf {
+namespace {
 
 /**
  * Special name "" means base address of this executable.
@@ -64,6 +66,25 @@ get_dl_entry_points()
 }
 
 
+std::optional<size_t>
+base_address_for_location (std::string const& location)
+{
+	static auto const dl_entry_points = get_dl_entry_points();
+
+	auto found = dl_entry_points.find (location);
+
+	if (found == dl_entry_points.end())
+		found = dl_entry_points.find ("");
+
+	if (found != dl_entry_points.end())
+		return found->second;
+	else
+		return std::nullopt;
+}
+
+} // namespace
+
+
 Backtrace&
 Backtrace::resolve_sources()
 {
@@ -73,53 +94,40 @@ Backtrace::resolve_sources()
 		s.erase (std::remove (s.begin(), s.end(), '\n'), s.end());
 	};
 
-	auto dl_entry_points = get_dl_entry_points();
-
 	for (auto& symbol: _symbols)
 	{
 		if (!symbol.locations.empty())
 		{
-			auto const& location = symbol.locations[0];
-			auto found = dl_entry_points.find (location);
+			try {
+				auto hex_address = (boost::format ("0x%x") % *symbol.offset).str();
 
-			if (found == dl_entry_points.end())
-				found = dl_entry_points.find ("");
+				bp::ipstream child_out, child_err;
+				auto addr2line = bp::search_path ("addr2line");
+				auto child = bp::child (
+					addr2line,
+					"--inlines", "--exe=" + symbol.locations[0], hex_address,
+					bp::std_out > child_out,
+					bp::std_err > bp::null
+				);
 
-			if (found != dl_entry_points.end())
-			{
-				try {
-					auto base_address = found->second;
-					symbol.offset = symbol.address - base_address;
-					auto hex_address = (boost::format ("0x%x") % *symbol.offset).str();
+				std::string line;
+				std::vector<std::string> detailed_locations;
 
-					bp::ipstream child_out, child_err;
-					auto addr2line = bp::search_path ("addr2line");
-					auto child = bp::child (
-						addr2line,
-						"--inlines", "--exe=" + location, hex_address,
-						bp::std_out > child_out,
-						bp::std_err > bp::null
-					);
-
-					std::string line;
-					std::vector<std::string> detailed_locations;
-
-					while (child.running() && std::getline (child_out, line) && !line.empty())
-					{
-						rm_newlines (line);
-						detailed_locations.push_back (line);
-					}
-
-					// Don't bother using result of addr2line if it didn't return anything useful ("??:?" etc):
-					if (detailed_locations.size() > 1 || (detailed_locations[0].find ("??") == std::string::npos && detailed_locations[0] != ":?"))
-						symbol.locations = detailed_locations;
-
-					child.wait();
-				}
-				catch (...)
+				while (child.running() && std::getline (child_out, line) && !line.empty())
 				{
-					symbol.locations[0] += " [exception when calling addr2line]";
+					rm_newlines (line);
+					detailed_locations.push_back (line);
 				}
+
+				// Don't bother using result of addr2line if it didn't return anything useful ("??:?" etc):
+				if (detailed_locations.size() > 1 || (detailed_locations[0].find ("??") == std::string::npos && detailed_locations[0] != ":?"))
+					symbol.locations = detailed_locations;
+
+				child.wait();
+			}
+			catch (...)
+			{
+				symbol.locations[0] += " [exception when calling addr2line]";
 			}
 		}
 	}
@@ -149,10 +157,15 @@ backtrace()
 			if (b == std::string::npos)
 				b = symbol.find (')');
 
-			std::string demangled_name (symbol.substr (a, b - a));
-			size_t address = reinterpret_cast<size_t> (addresses[i]);
+			std::string const demangled_name (symbol.substr (a, b - a));
+			std::string const location = symbol.substr (0, a - 1);
+			std::optional<size_t> offset;
+			size_t const address = reinterpret_cast<size_t> (addresses[i]);
 
-			result._symbols.emplace_back (symbol, demangle (demangled_name), std::vector<std::string> { symbol.substr (0, a - 1) }, address);
+			if (auto const base_address = base_address_for_location (location))
+				offset = address - *base_address;
+
+			result._symbols.emplace_back (symbol, demangle (demangled_name), std::vector<std::string> { location }, address, offset);
 		}
 	}
 
@@ -174,9 +187,11 @@ operator<< (std::ostream& os, Backtrace const& backtrace)
 		os << std::setw (4) << pair.index() << ". ";
 		os << kFunctionColor << (symbol.demangled_name.empty() ? "<unknown function>" : symbol.demangled_name) << kResetColor << " ";
 		os << "at 0x" << std::setw (2 * sizeof (size_t)) << std::setfill ('0') << std::hex << symbol.address << " ";
+
 		if (symbol.offset)
-			os << "(offset 0x" << std::hex << *symbol.offset << ")" << std::endl;
-		os << std::setfill (' ') << std::dec;
+			os << "(offset 0x" << std::hex << *symbol.offset << ")";
+
+		os << std::endl << std::setfill (' ') << std::dec;
 
 		for (std::string const& location: symbol.locations)
 			os << "        in " << kFileColor << location << kResetColor << std::endl;
