@@ -20,6 +20,9 @@
 #include <cstdio>
 #include <iostream>
 
+// System:
+#include <signal.h>
+
 
 // Fixes for std::ostream which has broken support for unsigned/signed/char types
 // and prints 8-bit integers like they were characters.
