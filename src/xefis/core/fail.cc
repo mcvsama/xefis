@@ -38,19 +38,22 @@ std::atomic<bool> g_hup_received { false };
 void
 fail (int signum)
 {
+	using std::endl;
+
 	std::vector<const char*> features = xf::Services::features();
-	std::clog << "------------------------------------------------------------------------------------------------" << std::endl;
-	std::clog << "Xefis died by a signal." << std::endl << std::endl;
-	std::clog << "  signal: " << signum << std::endl;
-	std::clog << "  source info: " << std::endl;
-	std::cout << "    commit: " << ::xf::version::commit << std::endl;
-	std::cout << "    branch: " << ::xf::version::branch << std::endl;
-	std::clog << "  features: ";
+	std::clog << endl;
+	std::clog << "------------------------------------------------------------------------------------------------" << endl;
+	std::clog << "Xefis died by a signal." << endl << endl;
+	std::clog << "       signal: " << signum << endl;
+	std::clog << "  source info: " << endl;
+	std::cout << "       commit: " << ::xf::version::commit << endl;
+	std::cout << "       branch: " << ::xf::version::branch << endl;
+	std::clog << "     features: ";
 	std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
-	std::clog << std::endl;
-	std::clog << "  backtrace:" << std::endl;
-	Backtrace::clog();
-	std::clog << "  CXXFLAGS: " << CXXFLAGS << std::endl << std::endl;
+	std::clog << endl;
+	std::clog << "    backtrace:" << endl;
+	std::clog << backtrace() << endl;
+	std::clog << "     CXXFLAGS: " << CXXFLAGS << endl << endl;
 	// Force coredump if enabled:
 	signal (signum, SIG_DFL);
 	kill (getpid(), signum);

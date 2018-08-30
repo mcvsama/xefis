@@ -143,7 +143,8 @@ Exception::Exception (const char* message):
 inline
 Exception::Exception (std::string const& message):
 	_what (message),
-	_message (message)
+	_message (message),
+	_backtrace (xf::backtrace())
 { }
 
 

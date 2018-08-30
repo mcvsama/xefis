@@ -16,9 +16,10 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 
 #define SANITY_CHECK(x) \
@@ -31,37 +32,51 @@
 
 namespace xf {
 
+class Backtrace;
+
+
+extern Backtrace
+backtrace();
+
+
 class Backtrace
 {
+	friend Backtrace backtrace();
+
   public:
 	struct Symbol
 	{
 		explicit
-		Symbol (std::string const& name, std::string const& location):
-			name (name), location (location)
+		Symbol (std::string const& symbol, std::string const& demangled_name, std::vector<std::string> const& locations, size_t address, std::optional<size_t> offset = {}):
+			symbol (symbol),
+			demangled_name (demangled_name),
+			locations (locations),
+			address (address),
+			offset (offset)
 		{ }
 
-		std::string name;
-		std::string location;
+		std::string					symbol;
+		std::string					demangled_name;
+		std::vector<std::string>	locations;
+		size_t						address;
+		std::optional<size_t>		offset;
 	};
 
 	typedef std::vector<Symbol> Symbols;
 
   public:
-	Backtrace();
+	Backtrace&
+	resolve_sources();
 
 	Symbols const&
 	symbols() const { return _symbols; }
-
-	static void
-	clog();
 
   private:
 	Symbols _symbols;
 };
 
 
-std::ostream&
+extern std::ostream&
 operator<< (std::ostream& os, Backtrace const& backtrace);
 
 } // namespace xf
