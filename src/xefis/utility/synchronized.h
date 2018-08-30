@@ -31,7 +31,7 @@ template<class V, class M>
  * As long as it exists, the lock is held.
  *
  * You don't create it yourself, instead you use
- * Synchronized<T>::unique_accessor() method.
+ * Synchronized<T>::lock() method.
  */
 template<class pValue, class pMutex>
 	class UniqueAccessor
@@ -133,13 +133,13 @@ template<class pValue, class pMutex = std::mutex>
 		 * Return unique access token.
 		 */
 		UniqueAccessor<Value, Mutex>
-		unique_accessor();
+		lock();
 
 		/**
 		 * Return const unique access token.
 		 */
 		UniqueAccessor<Value const, Mutex>
-		unique_accessor() const;
+		lock() const;
 
 	  private:
 		Value			_value;
@@ -218,7 +218,7 @@ template<class V, class M>
 
 template<class V, class M>
 	inline auto
-	Synchronized<V, M>::unique_accessor() -> UniqueAccessor<Value, Mutex>
+	Synchronized<V, M>::lock() -> UniqueAccessor<Value, Mutex>
 	{
 		return UniqueAccessor<Value, Mutex> (*this);
 	}
@@ -226,7 +226,7 @@ template<class V, class M>
 
 template<class V, class M>
 	inline auto
-	Synchronized<V, M>::unique_accessor() const -> UniqueAccessor<Value const, Mutex>
+	Synchronized<V, M>::lock() const -> UniqueAccessor<Value const, Mutex>
 	{
 		return UniqueAccessor<Value const, Mutex> (*this);
 	}
