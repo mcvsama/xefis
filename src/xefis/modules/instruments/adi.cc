@@ -3195,7 +3195,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.al_line_every = *io.altitude_ladder_line_every;
 	params.al_number_every = *io.altitude_ladder_number_every;
 
-	*_parameters.unique_accessor() = params;
+	*_parameters.lock() = params;
 	mark_dirty();
 }
 
@@ -3203,7 +3203,7 @@ ADI::process (xf::Cycle const& cycle)
 void
 ADI::paint (xf::PaintRequest& paint_request) const
 {
-	_painting_work.paint (paint_request, *_parameters.unique_accessor());
+	_painting_work.paint (paint_request, *_parameters.lock());
 }
 
 
