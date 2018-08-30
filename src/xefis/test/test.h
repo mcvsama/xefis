@@ -43,6 +43,11 @@ class RuntimeTest
 inline
 RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 {
+	static constexpr char kResetColor[]			= "\033[31;1;0m";
+	static constexpr char kPassColor[]			= "\033[38;2;100;255;100m";
+	static constexpr char kFailColor[]			= "\033[38;2;255;0;0m";
+	static constexpr char kExplanationColor[]	= "\033[38;2;225;210;150m";
+
 	std::cout << "Test: " << test_name << "…" << std::flush;
 	std::ostringstream log_buffer;
 	LoggerOutput logger_output (log_buffer);
@@ -51,13 +56,13 @@ RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 
 	bool was_exception = Exception::catch_and_log (logger, [&]{
 		tf();
-		std::cout << " PASS" << std::endl;
+		std::cout << " " << kPassColor << "PASS" << kResetColor << std::endl;
 	});
 
 	if (was_exception)
 	{
-		std::cout << " FAIL" << std::endl;
-		std::cout << "Explanation: " << log_buffer.str();
+		std::cout << " " << kFailColor << "FAIL" << kResetColor << std::endl;
+		std::cout << kExplanationColor << "Explanation: " << log_buffer.str() << kResetColor;
 	}
 }
 
