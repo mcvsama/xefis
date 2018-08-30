@@ -14,7 +14,18 @@
 #ifndef XEFIS__CORE__FAIL_H__INCLUDED
 #define XEFIS__CORE__FAIL_H__INCLUDED
 
+// Standard:
+#include <atomic>
+#include <cstddef>
+
+
 namespace xf {
+
+/**
+ * Set to true when HUP signal is received.
+ */
+extern std::atomic<bool> g_hup_received;
+
 
 /**
  * Called as a UNIX signal handler.

@@ -29,6 +29,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
+#include <xefis/core/fail.h>
 #include <xefis/core/services.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
@@ -48,13 +49,6 @@ namespace xf {
 Xefis::Xefis (int& argc, char** argv):
 	QApplication (argc, argv)
 {
-	if (_xefis)
-		throw std::runtime_error ("can create only one Xefis object");
-
-	_xefis = this;
-
-	signal (SIGHUP, s_quit);
-
 	parse_args (argc, argv);
 
 	// Casting QString to std::string|const char* should yield UTF-8 encoded strings.
@@ -67,13 +61,24 @@ Xefis::Xefis (int& argc, char** argv):
 
 	_machine = ::xefis_machine (this);
 	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
+
+	_signals_check_timer = new QTimer (this);
+	_signals_check_timer->setSingleShot (false);
+	_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
+	QObject::connect (_signals_check_timer, &QTimer::timeout, [&] {
+		if (g_hup_received.load())
+		{
+			_logger << "HUP received, exiting." << std::endl;
+			quit();
+		}
+	});
+	_signals_check_timer->start();
 }
 
 
 Xefis::~Xefis()
 {
 	Services::deinitialize();
-	_xefis = nullptr;
 }
 
 
@@ -184,16 +189,6 @@ Xefis::print_copyrights (std::ostream& out)
 		<< endl
 		<< licenses::lib_kdtreeplusplus << endl
 		<< endl;
-}
-
-
-void
-Xefis::s_quit (int)
-{
-	_logger << "HUP received, exiting." << std::endl;
-
-	if (_xefis)
-		_xefis->quit();
 }
 
 } // namespace xf

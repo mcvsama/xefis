@@ -32,6 +32,9 @@
 
 namespace xf {
 
+std::atomic<bool> g_hup_received { false };
+
+
 void
 fail (int signum)
 {

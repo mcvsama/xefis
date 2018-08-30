@@ -12,6 +12,7 @@
  */
 
 // Standards:
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -38,6 +39,7 @@ int main (int argc, char** argv, char**)
 	signal (SIGILL, xf::fail);
 	signal (SIGFPE, xf::fail);
 	signal (SIGSEGV, xf::fail);
+	signal (SIGHUP, [](int) { xf::g_hup_received.store (true); });
 
 	setenv ("LC_ALL", "POSIX", 1);
 	setlocale (LC_ALL, "POSIX");
