@@ -181,22 +181,15 @@ class Xefis: public QApplication
 	static void
 	print_copyrights (std::ostream&);
 
-	/**
-	 * UNIX signal handler. Calls quit() on Xefis instance.
-	 */
-	static void
-	s_quit (int);
-
   private:
-	static inline Xefis*			_xefis			{ nullptr };
-	static inline LoggerOutput		_logger_output	{ std::clog };
-	static inline Logger			_logger			{ _logger_output };
-
+	LoggerOutput					_logger_output	{ std::clog };
+	Logger							_logger			{ _logger_output };
 	Unique<System>					_system;
 	Unique<ConfiguratorWidget>		_configurator_widget;
 	Unique<OptionsHelper>			_options_helper;
 	Unique<Machine>					_machine;
 	OptionsMap						_options;
+	QTimer*							_signals_check_timer;
 };
 
 
