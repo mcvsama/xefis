@@ -25,6 +25,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/utility/synchronized.h>
 
 // Local:
 #include "basic_indicator_io.h"
@@ -51,9 +52,14 @@ template<class Value>
 	};
 
 
-class BasicRadialIndicator: private xf::InstrumentSupport
+class BasicRadialIndicator:
+	protected BasicIndicator,
+	protected xf::InstrumentSupport
 {
-  private:
+  protected:
+	/**
+	 * Critical points (ie. minimum/maximum warning/critical values.
+	 */
 	struct PointInfo
 	{
 		enum Zone {
@@ -68,25 +74,15 @@ class BasicRadialIndicator: private xf::InstrumentSupport
 		float		tick_len;
 	};
 
-  protected:
-	struct IndicatorValues
+	struct IndicatorValues: public BasicIndicator::IndicatorValues
 	{
-		boost::format				format;
-		std::optional<std::string>	value_str;
 		std::optional<std::string>	reference_str;
-		std::optional<double>		normalized_value;
-		std::optional<double>		normalized_reference;
-		std::optional<double>		normalized_target;
-		std::optional<double>		normalized_automatic;
-		std::optional<double>		normalized_minimum_critical;
-		std::optional<double>		normalized_minimum_warning;
-		std::optional<double>		normalized_maximum_warning;
-		std::optional<double>		normalized_maximum_critical;
-		bool						critical_condition		{ false };
-		bool						warning_condition		{ false };
+		std::optional<float>		normalized_reference;
+		std::optional<float>		normalized_target;
+		std::optional<float>		normalized_automatic;
 		float						dial_scale				{ 1.f };
 
-		// Cached struff, to prevent allocation on heap:
+		// Cached struff, to prevent allocation on heap on every repaint:
 		std::vector<PointInfo>		point_infos;
 	};
 
@@ -99,7 +95,7 @@ class BasicRadialIndicator: private xf::InstrumentSupport
 	paint_text (IndicatorValues& values, xf::PaintRequest const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q) const;
 
 	void
-	paint_indicator (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, float r) const;
+	paint_indicator (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
 
   private:
 	std::optional<float> _box_text_width;
@@ -128,8 +124,9 @@ template<class Value>
 		paint (xf::PaintRequest&) const override;
 
 	  private:
-		xf::PropertyObserver	_inputs_observer;
-		Converter				_converter;
+		xf::PropertyObserver						_inputs_observer;
+		xf::Synchronized<IndicatorValues> mutable	_values;
+		Converter									_converter;
 	};
 
 
@@ -165,68 +162,25 @@ template<class Value>
 	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
-		constexpr xf::Range<double> kNormalizedRange { 0.0, 1.0 };
-		IndicatorValues values;
 
-		auto stringify = [&] (auto value) -> std::string {
-			if (value)
-			{
-				if (this->io.precision)
-				{
-					auto const prec = *this->io.precision;
-					value = std::llround (*value + 0.5f * prec) / prec * prec;
-				}
-
-				return (boost::format (*this->io.format) % *value).str();
-			}
-			else
-				return "";
-		};
-
-		values.format = *this->io.format;
-		values.dial_scale = *io.dial_scale;
-
-		if (io.value)
-		{
-			values.value_str = stringify (_converter ? _converter (io.value) : io.value.to_floating_point());
-			values.normalized_value = xf::renormalize (xf::clamped (*io.value, range), range, kNormalizedRange);
-		}
+		auto values = _values.lock();
+		values->get_from (io, range, _converter ? _converter (io.value) : io.value.to_floating_point());
+		values->dial_scale = *io.dial_scale;
 
 		if (io.reference)
 		{
-			values.reference_str = stringify (_converter ? _converter (io.reference) : io.reference.to_floating_point());
-			values.normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
+			auto v = _converter ? _converter (io.reference) : io.reference.to_floating_point();
+			values->reference_str = BasicIndicator::stringify (v, *io.format, io.precision);
+			values->normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
 		}
 
 		if (io.target)
-			values.normalized_target = xf::renormalize (xf::clamped (*io.target, range), range, kNormalizedRange);
+			values->normalized_target = xf::renormalize (xf::clamped (*io.target, range), range, kNormalizedRange);
 
 		if (io.automatic)
-			values.normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
+			values->normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
 
-		if (io.value_minimum_critical)
-			values.normalized_minimum_critical = xf::renormalize (*io.value_minimum_critical, range, kNormalizedRange);
-
-		if (io.value_minimum_warning)
-			values.normalized_minimum_warning = xf::renormalize (*io.value_minimum_warning, range, kNormalizedRange);
-
-		if (io.value_maximum_warning)
-			values.normalized_maximum_warning = xf::renormalize (*io.value_maximum_warning, range, kNormalizedRange);
-
-		if (io.value_maximum_critical)
-			values.normalized_maximum_critical = xf::renormalize (*io.value_maximum_critical, range, kNormalizedRange);
-
-		if (values.normalized_value)
-		{
-			values.critical_condition =
-				(values.normalized_maximum_critical && *values.normalized_value >= *values.normalized_maximum_critical) ||
-				(values.normalized_minimum_critical && *values.normalized_value <= *values.normalized_minimum_critical);
-			values.warning_condition =
-				(values.normalized_maximum_warning && *values.normalized_value >= *values.normalized_maximum_warning) ||
-				(values.normalized_minimum_warning && *values.normalized_value <= *values.normalized_minimum_warning);
-		}
-
-		BasicRadialIndicator::paint (paint_request, values);
+		BasicRadialIndicator::paint (paint_request, *values);
 	}
 
 #endif

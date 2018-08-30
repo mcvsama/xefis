@@ -16,7 +16,7 @@
 
 // Standard:
 #include <cstddef>
-#include <optional>
+#include <cmath>
 
 // Boost:
 #include <boost/format.hpp>
@@ -28,28 +28,119 @@
 #include <xefis/core/setting.h>
 
 
+class MostBasicIndicatorIO: public xf::ModuleIO
+{
+  public:
+	/**
+	 * How the value should be printed as text.
+	 */
+	xf::Setting<boost::format>	format					{ this, "format", boost::format ("%1%") };
+
+	/**
+	 * Set precision. If provided, value will be converted to int, divided
+	 * by n and the multipled by n again.
+	 */
+	xf::Setting<int32_t>		precision				{ this, "precision", xf::BasicSetting::Optional };
+};
+
+
 template<class Value>
-	class BasicIndicatorIO: public xf::ModuleIO
+	class BasicIndicatorIO: public MostBasicIndicatorIO
 	{
 	  public:
-		/**
-		 * How the value should be printed as text.
-		 */
-		xf::Setting<boost::format>	format					{ this, "format", boost::format ("%1%") };
-
-		/**
-		 * Set precision. If provided, value will be converted to int, divided
-		 * by n and the multipled by n again.
-		 */
-		xf::Setting<int32_t>		precision				{ this, "precision", xf::BasicSetting::Optional };
-
-		xf::Setting<Value>			value_minimum			{ this, "value_minimum" };
-		xf::Setting<Value>			value_minimum_critical	{ this, "value_minimum_critical", xf::BasicSetting::Optional };
-		xf::Setting<Value>			value_minimum_warning	{ this, "value_minimum_warning", xf::BasicSetting::Optional };
-		xf::Setting<Value>			value_maximum_warning	{ this, "value_maximum_warning", xf::BasicSetting::Optional };
-		xf::Setting<Value>			value_maximum_critical	{ this, "value_maximum_critical", xf::BasicSetting::Optional };
-		xf::Setting<Value>			value_maximum			{ this, "value_maximum" };
+		xf::Setting<Value>		value_minimum			{ this, "value_minimum" };
+		xf::Setting<Value>		value_minimum_critical	{ this, "value_minimum_critical", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_minimum_warning	{ this, "value_minimum_warning", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum_warning	{ this, "value_maximum_warning", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum_critical	{ this, "value_maximum_critical", xf::BasicSetting::Optional };
+		xf::Setting<Value>		value_maximum			{ this, "value_maximum" };
 	};
+
+
+class BasicIndicator
+{
+  protected:
+	/**
+	 * Normalized and preprocessed data trasferred to the painting object.
+	 */
+	class IndicatorValues
+	{
+	  public:
+		boost::format				format;
+		std::optional<std::string>	value_str;
+		std::optional<float>		normalized_value;
+		std::optional<float>		normalized_minimum_critical;
+		std::optional<float>		normalized_minimum_warning;
+		std::optional<float>		normalized_maximum_warning;
+		std::optional<float>		normalized_maximum_critical;
+		bool						critical_condition		{ false };
+		bool						warning_condition		{ false };
+
+	  public:
+		void
+		get_from (auto const& io, auto const& range, std::optional<float128_t> value);
+	};
+
+  protected:
+	static constexpr xf::Range<float> kNormalizedRange { 0.0, 1.0 };
+
+  protected:
+	static std::string
+	stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision);
+};
+
+
+inline void
+BasicIndicator::IndicatorValues::get_from (auto const& io, auto const& range, std::optional<float128_t> floating_point_value)
+{
+	format = *io.format;
+
+	if (io.value)
+	{
+		value_str = BasicIndicator::stringify (floating_point_value, *io.format, io.precision);
+		normalized_value = xf::renormalize (xf::clamped (*io.value, range), range, kNormalizedRange);
+	}
+
+	if (io.value_minimum_critical)
+		normalized_minimum_critical = xf::renormalize (*io.value_minimum_critical, range, kNormalizedRange);
+
+	if (io.value_minimum_warning)
+		normalized_minimum_warning = xf::renormalize (*io.value_minimum_warning, range, kNormalizedRange);
+
+	if (io.value_maximum_warning)
+		normalized_maximum_warning = xf::renormalize (*io.value_maximum_warning, range, kNormalizedRange);
+
+	if (io.value_maximum_critical)
+		normalized_maximum_critical = xf::renormalize (*io.value_maximum_critical, range, kNormalizedRange);
+
+	if (normalized_value)
+	{
+		critical_condition =
+			(normalized_maximum_critical && *normalized_value >= *normalized_maximum_critical) ||
+			(normalized_minimum_critical && *normalized_value <= *normalized_minimum_critical);
+		warning_condition =
+			(normalized_maximum_warning && *normalized_value >= *normalized_maximum_warning) ||
+			(normalized_minimum_warning && *normalized_value <= *normalized_minimum_warning);
+	}
+}
+
+
+inline std::string
+BasicIndicator::stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision)
+{
+	if (value)
+	{
+		if (precision)
+		{
+			auto const prec = *precision;
+			value = std::llround (*value + 0.5f * prec) / prec * prec;
+		}
+
+		return (boost::format (format) % *value).str();
+	}
+	else
+		return {};
+}
 
 #endif
 
