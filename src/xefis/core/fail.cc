@@ -52,7 +52,7 @@ fail (int signum)
 	std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
 	std::clog << endl;
 	std::clog << "    backtrace:" << endl;
-	std::clog << backtrace() << endl;
+	std::clog << backtrace().resolve_sources() << endl;
 	std::clog << "     CXXFLAGS: " << CXXFLAGS << endl << endl;
 	// Force coredump if enabled:
 	signal (signum, SIG_DFL);

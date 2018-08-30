@@ -167,10 +167,7 @@ operator<< (std::ostream& os, Backtrace const& backtrace)
 	static constexpr char kFileColor[]		= "\033[38;2;100;120;220m";
 	static constexpr char kFunctionColor[]	= "\033[38;2;120;220;100m";
 
-	auto resolved = backtrace;
-	resolved.resolve_sources();
-
-	for (auto const& pair: resolved.symbols() | boost::adaptors::indexed (0))
+	for (auto const& pair: backtrace.symbols() | boost::adaptors::indexed (0))
 	{
 		auto const& symbol = pair.value();
 
