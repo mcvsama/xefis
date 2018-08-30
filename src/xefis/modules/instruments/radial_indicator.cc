@@ -24,8 +24,8 @@
 
 
 static QColor const silver (0xbb, 0xbd, 0xbf);
-static QColor const normal_fill (0x3a, 0x3a, 0x3a);
-static QColor const warning_fill = QColor (255, 220, 0);
+static QColor const normal_fill (0x43, 0x49, 0x54);
+static QColor const warning_fill (255, 200, 0);
 static QColor const critical_fill (Qt::red);
 
 
@@ -40,7 +40,7 @@ BasicRadialIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& v
 
 	painter.translate (aids->width() / 2.f, aids->height() / 2.4f);
 	paint_text (values, paint_request, *aids, painter, q);
-	paint_indicator (values, *aids, painter, q, r);
+	paint_indicator (values, *aids, painter, r);
 }
 
 
@@ -53,7 +53,6 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 	QFontMetricsF const small_metrics (small_font);
 
 	QPen text_pen = aids.get_pen (Qt::white, 0.8f);
-	text_pen.setCapStyle (Qt::RoundCap);
 	QPen box_pen = text_pen;
 
 	if (values.critical_condition)
@@ -110,27 +109,23 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 
 
 void
-BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float, float r) const
+BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
 {
 	constexpr si::Angle kValueSpanAngle = 210_deg;
 
-	auto get_round_pen = [&aids](QColor color, float width) {
+	auto get_round_pen = [&aids] (QColor color, float width) {
 		QPen pen = aids.get_pen (color, width);
 		pen.setCapStyle (Qt::RoundCap);
 		return pen;
 	};
 
-	auto get_angle = [](std::optional<double> const& normalized) -> std::optional<si::Angle> {
+	auto get_angle = [](std::optional<float> const& normalized) -> std::optional<si::Angle> {
 		if (normalized)
 			return kValueSpanAngle * *normalized;
 		else
 			return std::nullopt;
 	};
 
-	std::optional<si::Angle> const minimum_critical_angle = get_angle (values.normalized_minimum_critical);
-	std::optional<si::Angle> const minimum_warning_angle = get_angle (values.normalized_minimum_warning);
-	std::optional<si::Angle> const maximum_warning_angle = get_angle (values.normalized_maximum_warning);
-	std::optional<si::Angle> const maximum_critical_angle = get_angle (values.normalized_maximum_critical);
 	std::optional<si::Angle> const value_angle = get_angle (values.normalized_value);
 	std::optional<si::Angle> const reference_angle = get_angle (values.normalized_reference);
 	std::optional<si::Angle> const target_angle = get_angle (values.normalized_target);
@@ -176,21 +171,18 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 		}
 
 		// Warning/critical bugs:
-
 		painter.save_context ([&] {
-			si::Angle const angle_gap = 4_deg;
-			QPen outer_pen = silver_pen;
+			constexpr si::Angle angle_gap = 4_deg;
 
-			if (values.critical_condition)
-				outer_pen = critical_pen;
-			else if (values.warning_condition)
-				outer_pen = warning_pen;
+			std::optional<si::Angle> const minimum_critical_angle = get_angle (values.normalized_minimum_critical);
+			std::optional<si::Angle> const minimum_warning_angle = get_angle (values.normalized_minimum_warning);
+			std::optional<si::Angle> const maximum_warning_angle = get_angle (values.normalized_maximum_warning);
+			std::optional<si::Angle> const maximum_critical_angle = get_angle (values.normalized_maximum_critical);
 
 			QPen const no_pen;
 			QColor const no_color;
-			si::Angle const no_angle;
-			float no_tick_len {};
-			float tick_dir = values.normalized_reference ? -1.5f : +1.f;
+			float const no_tick_len {};
+			float const tick_dir = values.normalized_reference ? -1.5f : +1.f;
 			auto& point_infos = values.point_infos;
 
 			point_infos.clear();
@@ -210,34 +202,41 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 
 			point_infos.push_back ({ PointInfo::Maximums, kValueSpanAngle, no_pen, no_tick_len });
 
+			// Actual painting:
 			for (size_t i = 0u; i < point_infos.size() - 1; ++i)
 			{
-				PointInfo prev = point_infos[i];
-				PointInfo next = point_infos[i + 1];
+				PointInfo const prev = point_infos[i];
+				PointInfo const next = point_infos[i + 1];
 				bool const add_min_gap = (prev.zone == PointInfo::Minimums) && (i > 0);
 				bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos.size() - 2);
 
 				painter.save_context ([&] {
 					auto const angle_0 = prev.angle + (add_min_gap ? angle_gap : 0_rad);
 					auto const angle_1 = next.angle - (add_max_gap ? angle_gap : 0_rad);
-					auto const length = angle_1 - angle_0;
+					auto const span = angle_1 - angle_0;
 
 					if (next.zone == PointInfo::Minimums)
 					{
 						painter.setPen (next.pen);
-						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (length));
+						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
 						painter.rotate (angle_1.in<si::Degree>());
 						painter.drawLine (QPointF (r, 0.f), QPointF (r + next.tick_len, 0.f));
 					}
 					else if (next.zone != PointInfo::Minimums && prev.zone != PointInfo::Maximums)
 					{
-						painter.setPen (outer_pen);
-						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (length));
+						if (values.critical_condition)
+							painter.setPen (critical_pen);
+						else if (values.warning_condition)
+							painter.setPen (warning_pen);
+						else
+							painter.setPen (silver_pen);
+
+						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
 					}
 					else if (prev.zone == PointInfo::Maximums)
 					{
 						painter.setPen (prev.pen);
-						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (length));
+						painter.drawArc (rect, -aids.angle_for_qpainter (angle_0), -aids.angle_for_qpainter (span));
 						painter.rotate (angle_0.in<si::Degree>());
 						painter.drawLine (QPointF (r, 0.f), QPointF (r + prev.tick_len, 0.f));
 					}
@@ -260,7 +259,7 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 		{
 			painter.rotate (value_angle->in<si::Degree>());
 
-			auto draw_outside_arc = [&] (si::Angle angle, double ext_adj, double intr, double extr, bool with_core_pointer)
+			auto draw_outside_arc = [&] (si::Angle angle, float ext_adj, float intr, float extr, bool with_core_pointer)
 			{
 				painter.paint (black_shadow, [&] {
 					painter.save_context ([&] {

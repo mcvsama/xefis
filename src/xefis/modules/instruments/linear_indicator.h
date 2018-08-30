@@ -25,110 +25,141 @@
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/utility/synchronized.h>
+
+// Local:
+#include "basic_indicator_io.h" // TODO rename to basic_indicator.h
 
 
-// TODO extract as separate file
-class BasicIndicatorIO: public xf::ModuleIO
-{
-  public:
-	/**
-	 * Precision is number of digits after decimal point.
-	 * Negative values are accepted and have different meaning: value will be divided by 10^n.
-	 */
-	xf::Setting<int>					precision				{ this, "precision", 0 };
-
-	/**
-	 * Set modulo value. If > 0, value will be converted to int,
-	 * divided by n and the multipled by n again.
-	 */
-	xf::Setting<unsigned int>			modulo					{ this, "modulo", false };
-
-	/**
-	 * Number of digits displayed.
-	 */
-	xf::Setting<unsigned int>			digits					{ this, "digits", 3 };
-
-	xf::Setting<double>					value_minimum			{ this, "value_minimum" };
-	xf::Setting<std::optional<double>>	value_minimum_critical	{ this, "value_minimum_critical", std::nullopt };
-	xf::Setting<std::optional<double>>	value_minimum_warning	{ this, "value_minimum_warning", std::nullopt };
-	xf::Setting<std::optional<double>>	value_maximum_warning	{ this, "value_maximum_warning", std::nullopt };
-	xf::Setting<std::optional<double>>	value_maximum_critical	{ this, "value_maximum_critical", std::nullopt };
-	xf::Setting<double>					value_maximum			{ this, "value_maximum" };
-};
-
-
-class LinearIndicatorIO: public BasicIndicatorIO
-{
-  public:
-	/*
-	 * Settings
-	 */
-
-	xf::Setting<bool>					mirrored_style			{ this, "mirrored_style", false };
-};
-
-
-template<class IO>
-	class BasicIndicator:
-		public xf::Instrument<IO>,
-		virtual protected xf::InstrumentSupport
+template<class Value>
+	class LinearIndicatorIO: public BasicIndicatorIO<Value>
 	{
 	  public:
-		// Ctor
-		BasicIndicator (std::unique_ptr<IO>, std::string const& instance);
+		/*
+		 * Settings
+		 */
 
-	  protected:
-		QString
-		stringify_value (double value) const;
+		xf::Setting<bool>		mirrored_style	{ this, "mirrored_style", false };
+
+		/*
+		 * Input
+		 */
+
+		xf::PropertyIn<Value>	value			{ this, "value" };
 	};
 
 
-class LinearIndicator: public BasicIndicator<LinearIndicatorIO>
+class BasicLinearIndicator:
+	protected BasicIndicator,
+	protected xf::InstrumentSupport
 {
-  public:
-	// Ctor
-	explicit
-	LinearIndicator (std::unique_ptr<LinearIndicatorIO>, xf::PropertyDigitizer, std::string const& instance = {});
+  protected:
+	/**
+	 * Critical points (ie. minimum/maximum warning/critical values.
+	 */
+	struct PointInfo
+	{
+		enum Zone {
+			Minimums,
+			Normal,
+			Maximums,
+		};
 
-	// Module API
-	void
-	process (xf::Cycle const&) override;
+		Zone	zone;
+		float	length;
+		QPen	pen;
+		float	tick_len;
+		bool	critical;
+	};
 
-	// Instrument API
-	void
-	paint (xf::PaintRequest&) const override;
+	struct IndicatorValues: public BasicIndicator::IndicatorValues
+	{
+		bool					mirrored_style;
+		bool					inbound;
+
+		// Cached struff, to prevent allocation on heap on every repaint:
+		std::vector<PointInfo>	point_infos;
+	};
 
   protected:
-	QString
-	pad_string (QString const& input) const;
+	void
+	paint (xf::PaintRequest&, IndicatorValues& value) const;
 
   private:
-	xf::PropertyDigitizer	_value_digitizer;
-	xf::PropertyObserver	_inputs_observer;
+	void
+	paint_indicator (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0, QPointF p1) const;
+
+	void
+	paint_text (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0) const;
 };
 
 
-template<class IO>
-	inline
-	BasicIndicator<IO>::BasicIndicator (std::unique_ptr<IO> module_io, std::string const& instance):
-		xf::Instrument<IO> (std::move (module_io), instance)
-	{ }
-
-
-template<class IO>
-	inline QString
-	BasicIndicator<IO>::stringify_value (double value) const
+template<class Value>
+	class LinearIndicator:
+		public xf::Instrument<LinearIndicatorIO<Value>>,
+		private BasicLinearIndicator
 	{
-		double numeric_value = value;
+	  public:
+		using Converter = std::function<float128_t (xf::Property<Value> const&)>;
+
+	  public:
+		// Ctor
+		explicit
+		LinearIndicator (std::unique_ptr<LinearIndicatorIO<Value>>, Converter = nullptr, std::string const& instance = {});
+
+		// Module API
+		void
+		process (xf::Cycle const&) override;
+
+		// Instrument API
+		void
+		paint (xf::PaintRequest&) const override;
+
+	  private:
+		xf::PropertyObserver						_inputs_observer;
+		xf::Synchronized<IndicatorValues> mutable	_values;
+		Converter									_converter;
+	};
+
+
+template<class Value>
+	inline
+	LinearIndicator<Value>::LinearIndicator (std::unique_ptr<LinearIndicatorIO<Value>> module_io, Converter converter, std::string const& instance):
+		xf::Instrument<LinearIndicatorIO<Value>> (std::move (module_io), instance),
+		_converter (converter)
+	{
+		_inputs_observer.set_callback ([&]{
+			this->mark_dirty();
+		});
+		_inputs_observer.observe ({
+			&this->io.value,
+		});
+	}
+
+
+template<class Value>
+	inline void
+	LinearIndicator<Value>::process (xf::Cycle const& cycle)
+	{
+		_inputs_observer.process (cycle.update_time());
+	}
+
+
+template<class Value>
+	inline void
+	LinearIndicator<Value>::paint (xf::PaintRequest& paint_request) const
+	{
 		auto& io = this->io;
+		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
 
-		if (*io.precision < 0)
-			numeric_value /= std::pow (10.0, -*io.precision);
+		auto values = _values.lock();
+		values->get_from (io, range, _converter ? _converter (io.value) : io.value.to_floating_point());
+		values->mirrored_style = *io.mirrored_style;
 
-		if (*io.modulo > 0)
-			numeric_value = static_cast<int> (numeric_value) / *io.modulo * *io.modulo;
+		if (io.value)
+			values->inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));
 
-		return QString ("%1").arg (numeric_value, 0, 'f', std::max (0, *io.precision));
+		BasicLinearIndicator::paint (paint_request, *values);
 	}
 
 #endif
