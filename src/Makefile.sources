@@ -26,7 +26,7 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 ######## /xefis/modules/instruments ########
 
 XEFIS_HEADERS			+= xefis/modules/instruments/adi.h
-XEFIS_HEADERS			+= xefis/modules/instruments/basic_indicator_io.h
+XEFIS_HEADERS			+= xefis/modules/instruments/basic_indicator.h
 ##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h TODO
 XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
 XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
