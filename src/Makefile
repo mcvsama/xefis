@@ -54,13 +54,6 @@ MOC				:= $(QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system boost_filesystem pthread mhash
 PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets zlib
 CXXFLAGS_s		:= $(CXXFLAGS)
-ifeq ($(DEBUG),1)
-XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
-XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
-CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
-else
-CXXFLAGS		+= -O4 -DQT_NO_DEBUG
-endif
 CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"' $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
 LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
 LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
@@ -89,6 +82,14 @@ endif
 #### Makefiles ####
 
 -include Makefile.local
+
+ifeq ($(DEBUG),1)
+XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
+XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
+CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
+else
+CXXFLAGS		+= -O4 -DQT_NO_DEBUG
+endif
 
 ifneq ($(VERBOSE),1)
 MAKEFLAGS += --silent
