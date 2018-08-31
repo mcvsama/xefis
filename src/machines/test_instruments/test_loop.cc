@@ -27,7 +27,7 @@
 
 
 TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
-	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger),
+	ProcessingLoop (machine, "Test Instruments", 100_Hz, logger),
 	_logger (logger)
 {
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, 0.235_mm, 2.1_mm };
@@ -151,6 +151,8 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
 
 	_test_screen->engine_l_power_io->value									<< test_generator_io->create_property<si::Power> ("engine/left/power", 0_W, { 0_W, 295_W }, 11_W / 1_s);
 
+	_test_screen->engine_l_current_io->value								<< test_generator_io->create_property<si::Current> ("engine/left/current", 0_A, { -5_A, 40_A }, 5_A / 1_s);
+
 	_test_screen->engine_r_thrust_io->value									<< test_generator_io->create_property<si::Force> ("engine/right/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
 	_test_screen->engine_r_thrust_io->reference								<< xf::ConstantSource (4.1_N);
 	_test_screen->engine_r_thrust_io->target								<< xf::ConstantSource (3.9_N);
@@ -161,6 +163,8 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
 	_test_screen->engine_r_temperature_io->value							<< test_generator_io->create_property<si::Temperature> ("engine/right/temperature", 0_degC, { -20_degC, 75_degC }, 5_K / 1_s);
 
 	_test_screen->engine_r_power_io->value									<< test_generator_io->create_property<si::Power> ("engine/right/power", 0_W, { 0_W, 295_W }, 10_W / 1_s);
+
+	_test_screen->engine_r_current_io->value								<< test_generator_io->create_property<si::Current> ("engine/right/current", 0_A, { -5_A, 40_A }, 5_A / 1_s);
 
 	_test_screen->gear_io->requested_down									<< xf::ConstantSource (true);
 	_test_screen->gear_io->nose_up											<< xf::ConstantSource (false);
