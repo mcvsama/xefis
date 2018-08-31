@@ -26,6 +26,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property_traits.h>
+#include <xefis/utility/utility.h>
 #include <xefis/utility/variant.h>
 
 
@@ -209,7 +210,7 @@ template<class V>
 	inline
 	PropertyOut<V>::~PropertyOut()
 	{
-		for (auto* data_sink: _data_sinks)
+		for (auto* data_sink: clone (_data_sinks))
 			(*data_sink) << no_data_source;
 
 		deregister();
