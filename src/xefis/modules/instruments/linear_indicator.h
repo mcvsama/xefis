@@ -28,7 +28,7 @@
 #include <xefis/utility/synchronized.h>
 
 // Local:
-#include "basic_indicator_io.h" // TODO rename to basic_indicator.h
+#include "basic_indicator.h"
 
 
 template<class Value>
