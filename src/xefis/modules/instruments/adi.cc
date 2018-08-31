@@ -301,8 +301,11 @@ Blinker::update_current_time (si::Time now)
 	if (_active && !_start_timestamp)
 		_start_timestamp = now;
 
-	uint64_t i = (now - *_start_timestamp) / _period;
-	_visibility_state = (i % 2) == 1;
+	if (_start_timestamp)
+	{
+		uint64_t i = (now - *_start_timestamp) / _period;
+		_visibility_state = (i % 2) == 1;
+	}
 }
 
 
