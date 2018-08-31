@@ -28,6 +28,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/utility.h>
 
 
 namespace xf {
@@ -390,9 +391,7 @@ template<class V>
 	Registrant<V>::~Registrant()
 	{
 		// Deregistration modifies _trackers, so iterate over a copy:
-		auto copy = _trackers;
-
-		for (auto& t: copy)
+		for (auto& t: clone (_trackers))
 			if (t.deregister)
 				t.deregister (*this);
 	}

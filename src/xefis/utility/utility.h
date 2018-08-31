@@ -35,6 +35,17 @@ template<class Value, class ...Rest>
 			return nullptr;
 	}
 
+
+/**
+ * Create a copy of an argument.
+ */
+template<class T>
+	inline T
+	clone (T t)
+	{
+		return T (t);
+	}
+
 } // namespace xf
 
 #endif

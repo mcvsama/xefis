@@ -145,17 +145,6 @@ template<>
 		using type = uint64_t;
 	};
 
-
-/**
- * Create a copy of an argument.
- */
-template<class T>
-	inline T
-	clone (T t)
-	{
-		return T (t);
-	}
-
 } // namespace xf
 
 #endif
