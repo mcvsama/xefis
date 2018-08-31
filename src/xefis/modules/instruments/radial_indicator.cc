@@ -25,8 +25,8 @@
 
 static QColor const silver (0xbb, 0xbd, 0xbf);
 static QColor const normal_fill (0x43, 0x49, 0x54);
-static QColor const warning_fill (255, 200, 0);
-static QColor const critical_fill (Qt::red);
+static QColor const warning_color (255, 200, 0);
+static QColor const critical_color (255, 35, 35);
 
 
 void
@@ -57,13 +57,13 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 
 	if (values.critical_condition)
 	{
-		text_pen.setColor (critical_fill);
+		text_pen = aids.get_pen (critical_color, 1.0f);
 		box_pen = text_pen;
 	}
 	else if (values.warning_condition)
 	{
-		text_pen.setColor (warning_fill);
-		box_pen.setColor (critical_fill);
+		text_pen = aids.get_pen (warning_color, 1.0f);
+		box_pen.setColor (critical_color);
 	}
 
 	float const margin = 0.4f * q;
@@ -72,7 +72,7 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 
 	if (paint_request.size_changed() || !_box_text_width)
 	{
-		QString sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
+		QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
 		const_cast<BasicRadialIndicator*> (this)->_box_text_width = metrics.width (sample_text);
 	}
 
@@ -134,8 +134,8 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 	QPen const silver_pen = get_round_pen (silver, 1.f);
 	QPen const pen = get_round_pen (Qt::white, 1.f);
 	QPen const pointer_pen = get_round_pen (Qt::white, 1.2f);
-	QPen const warning_pen = get_round_pen (warning_fill, 1.1f);
-	QPen const critical_pen = get_round_pen (critical_fill, 1.1f);
+	QPen const warning_pen = get_round_pen (warning_color, 1.1f);
+	QPen const critical_pen = get_round_pen (critical_color, 1.1f);
 	QPen const reference_pen = get_round_pen (QColor (0x00, 0xff, 0x00), 1.f);
 	QPen zero_point_pen = get_round_pen (normal_fill.lighter (150), 1.f);
 	QPen const automatic_pen = get_round_pen (QColor (0x22, 0xaa, 0xff), 1.1f);
@@ -153,13 +153,13 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 
 				if (values.critical_condition)
 				{
-					brush.setColor (critical_fill);
-					zero_point_pen.setColor (critical_fill.lighter (120));
+					brush.setColor (critical_color.darker (120));
+					zero_point_pen.setColor (critical_color.lighter (120));
 				}
 				else if (values.warning_condition)
 				{
-					brush.setColor (warning_fill);
-					zero_point_pen.setColor (warning_fill.lighter (120));
+					brush.setColor (warning_color.darker (120));
+					zero_point_pen.setColor (warning_color.lighter (120));
 				}
 
 				painter.setPen (Qt::NoPen);
