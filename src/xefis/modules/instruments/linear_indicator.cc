@@ -27,7 +27,7 @@
 
 static QColor const silver (0xbb, 0xbd, 0xbf);
 static QColor const warning_color (255, 200, 0);
-static QColor const critical_color (Qt::red);
+static QColor const critical_color (255, 35, 35);
 
 
 void
@@ -50,7 +50,9 @@ BasicLinearIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& v
 	QPointF p0 (area.right() - 3.f * q, area.bottom());
 	QPointF p1 (area.right() - 3.f * q, area.top());
 
-	paint_indicator (values, *aids, painter, q, p0, p1);
+	if (!values.line_hidden)
+		paint_indicator (values, *aids, painter, q, p0, p1);
+
 	paint_text (values, *aids, painter, q, p0);
 }
 
@@ -194,7 +196,8 @@ BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 void
 BasicLinearIndicator::paint_text (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF const p0) const
 {
-	QFont const font (aids.font_5.font);
+	QFont font (aids.font_5.font);
+	font.setPixelSize (font.pixelSize() * values.font_scale);
 	QFontMetricsF const metrics (font);
 	float const char_width = metrics.width ("0");
 	float const hcorr = 0.025f * metrics.height();
@@ -204,38 +207,40 @@ BasicLinearIndicator::paint_text (IndicatorValues& values, xf::InstrumentAids& a
 
 	if (values.critical_condition)
 	{
-		text_pen.setColor (critical_color);
+		text_pen = aids.get_pen (critical_color, 1.0f);
 		box_pen = text_pen;
 	}
 	else if (values.warning_condition)
 	{
-		text_pen.setColor (warning_color);
+		text_pen = aids.get_pen (warning_color, 1.0f);
 		box_pen.setColor (critical_color);
 	}
 
+	// Box:
+	QPointF text_position;
+	QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
+	painter.setFont (font);
+	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
+	text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
+	painter.setPen (box_pen);
+	painter.setBrush (Qt::NoBrush);
+	painter.drawRect (text_rect);
+
+	if (values.mirrored_style)
+	{
+		text_position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
+		text_position = painter.transform().map (text_position);
+		painter.resetTransform();
+	}
+	else
+		text_position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
+
+	// Text:
 	if (values.value_str)
 	{
 		auto const value_qstr = QString::fromStdString (*values.value_str);
-		QPointF position;
-
-		painter.setFont (font);
-		QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, value_qstr);
-		text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
-		painter.setPen (box_pen);
-		painter.setBrush (Qt::NoBrush);
-		painter.drawRect (text_rect);
-
-		if (values.mirrored_style)
-		{
-			position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
-			position = painter.transform().map (position);
-			painter.resetTransform();
-		}
-		else
-			position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
-
 		painter.setPen (text_pen);
-		painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignRight, value_qstr);
+		painter.fast_draw_text (text_position, Qt::AlignVCenter | Qt::AlignRight, value_qstr);
 	}
 }
 
