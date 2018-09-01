@@ -28,7 +28,7 @@
 #include <xefis/core/setting.h>
 
 
-class MostBasicIndicatorIO: public xf::ModuleIO
+class MostBasicGaugeIO: public xf::ModuleIO
 {
   public:
 	/**
@@ -45,7 +45,7 @@ class MostBasicIndicatorIO: public xf::ModuleIO
 
 
 template<class Value>
-	class BasicIndicatorIO: public MostBasicIndicatorIO
+	class BasicGaugeIO: public MostBasicGaugeIO
 	{
 	  public:
 		xf::Setting<Value>		value_minimum			{ this, "value_minimum" };
@@ -57,13 +57,13 @@ template<class Value>
 	};
 
 
-class BasicIndicator
+class BasicGauge
 {
   protected:
 	/**
 	 * Normalized and preprocessed data trasferred to the painting object.
 	 */
-	class IndicatorValues
+	class GaugeValues
 	{
 	  public:
 		boost::format				format;
@@ -82,7 +82,10 @@ class BasicIndicator
 	};
 
   protected:
-	static constexpr xf::Range<float> kNormalizedRange { 0.0, 1.0 };
+	static constexpr	xf::Range<float>	kNormalizedRange	{ 0.0, 1.0 };
+	static inline		QColor const		kSilver				{ 0xbb, 0xbd, 0xbf };
+	static inline		QColor const		kWarningColor		{ 255, 200, 0 };
+	static inline		QColor const		kCriticalColor		{ 255, 35, 35 };
 
   protected:
 	static std::string
@@ -91,13 +94,13 @@ class BasicIndicator
 
 
 inline void
-BasicIndicator::IndicatorValues::get_from (auto const& io, auto const& range, std::optional<float128_t> floating_point_value)
+BasicGauge::GaugeValues::get_from (auto const& io, auto const& range, std::optional<float128_t> floating_point_value)
 {
 	format = *io.format;
 
 	if (io.value)
 	{
-		value_str = BasicIndicator::stringify (floating_point_value, *io.format, io.precision);
+		value_str = BasicGauge::stringify (floating_point_value, *io.format, io.precision);
 		normalized_value = xf::renormalize (xf::clamped (*io.value, range), range, kNormalizedRange);
 	}
 
@@ -126,7 +129,7 @@ BasicIndicator::IndicatorValues::get_from (auto const& io, auto const& range, st
 
 
 inline std::string
-BasicIndicator::stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision)
+BasicGauge::stringify (auto value, boost::format const& format, xf::Setting<int32_t> const& precision)
 {
 	if (value)
 	{

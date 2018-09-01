@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__RADIAL_INDICATOR_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__RADIAL_GAUGE_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__RADIAL_GAUGE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,11 +28,11 @@
 #include <xefis/utility/synchronized.h>
 
 // Local:
-#include "basic_indicator.h"
+#include "basic_gauge.h"
 
 
 template<class Value>
-	class RadialIndicatorIO: public BasicIndicatorIO<Value>
+	class RadialGaugeIO: public BasicGaugeIO<Value>
 	{
 	  public:
 		/*
@@ -52,8 +52,8 @@ template<class Value>
 	};
 
 
-class BasicRadialIndicator:
-	protected BasicIndicator,
+class BasicRadialGauge:
+	protected BasicGauge,
 	protected xf::InstrumentSupport
 {
   protected:
@@ -74,7 +74,7 @@ class BasicRadialIndicator:
 		float		tick_len;
 	};
 
-	struct IndicatorValues: public BasicIndicator::IndicatorValues
+	struct GaugeValues: public BasicGauge::GaugeValues
 	{
 		std::optional<std::string>	reference_str;
 		std::optional<float>		normalized_reference;
@@ -88,14 +88,14 @@ class BasicRadialIndicator:
 
   protected:
 	void
-	paint (xf::PaintRequest&, IndicatorValues& values) const;
+	paint (xf::PaintRequest&, GaugeValues& values) const;
 
   private:
 	void
-	paint_text (IndicatorValues& values, xf::PaintRequest const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q) const;
+	paint_text (GaugeValues& values, xf::PaintRequest const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q) const;
 
 	void
-	paint_indicator (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
+	paint_indicator (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
 
   private:
 	std::optional<float> _box_text_width;
@@ -103,9 +103,9 @@ class BasicRadialIndicator:
 
 
 template<class Value>
-	class RadialIndicator:
-		public xf::Instrument<RadialIndicatorIO<Value>>,
-		private BasicRadialIndicator
+	class RadialGauge:
+		public xf::Instrument<RadialGaugeIO<Value>>,
+		private BasicRadialGauge
 	{
 	  public:
 		using Converter = std::function<float128_t (xf::Property<Value> const&)>;
@@ -113,7 +113,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		RadialIndicator (std::unique_ptr<RadialIndicatorIO<Value>>, Converter = nullptr, std::string const& instance = {});
+		RadialGauge (std::unique_ptr<RadialGaugeIO<Value>>, Converter = nullptr, std::string const& instance = {});
 
 		// Module API
 		void
@@ -124,16 +124,16 @@ template<class Value>
 		paint (xf::PaintRequest&) const override;
 
 	  private:
-		xf::PropertyObserver						_inputs_observer;
-		xf::Synchronized<IndicatorValues> mutable	_values;
-		Converter									_converter;
+		xf::PropertyObserver					_inputs_observer;
+		xf::Synchronized<GaugeValues> mutable	_values;
+		Converter								_converter;
 	};
 
 
 template<class Value>
 	inline
-	RadialIndicator<Value>::RadialIndicator (std::unique_ptr<RadialIndicatorIO<Value>> module_io, Converter converter, std::string const& instance):
-		xf::Instrument<RadialIndicatorIO<Value>> (std::move (module_io), instance),
+	RadialGauge<Value>::RadialGauge (std::unique_ptr<RadialGaugeIO<Value>> module_io, Converter converter, std::string const& instance):
+		xf::Instrument<RadialGaugeIO<Value>> (std::move (module_io), instance),
 		_converter (converter)
 	{
 		_inputs_observer.set_callback ([&]{
@@ -150,7 +150,7 @@ template<class Value>
 
 template<class Value>
 	inline void
-	RadialIndicator<Value>::process (xf::Cycle const& cycle)
+	RadialGauge<Value>::process (xf::Cycle const& cycle)
 	{
 		_inputs_observer.process (cycle.update_time());
 	}
@@ -158,7 +158,7 @@ template<class Value>
 
 template<class Value>
 	inline void
-	RadialIndicator<Value>::paint (xf::PaintRequest& paint_request) const
+	RadialGauge<Value>::paint (xf::PaintRequest& paint_request) const
 	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
@@ -170,7 +170,7 @@ template<class Value>
 		if (io.reference)
 		{
 			auto v = _converter ? _converter (io.reference) : io.reference.to_floating_point();
-			values->reference_str = BasicIndicator::stringify (v, *io.format, io.precision);
+			values->reference_str = BasicGauge::stringify (v, *io.format, io.precision);
 			values->normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
 		}
 
@@ -180,7 +180,7 @@ template<class Value>
 		if (io.automatic)
 			values->normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
 
-		BasicRadialIndicator::paint (paint_request, *values);
+		BasicRadialGauge::paint (paint_request, *values);
 	}
 
 #endif

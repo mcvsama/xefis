@@ -20,14 +20,14 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "radial_indicator.h"
+#include "radial_gauge.h"
 
 
 static QColor const normal_fill (0x43, 0x49, 0x54);
 
 
 void
-BasicRadialIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& values) const
+BasicRadialGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
@@ -42,7 +42,7 @@ BasicRadialIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& v
 
 
 void
-BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest const& paint_request, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q) const
+BasicRadialGauge::paint_text (GaugeValues& values, xf::PaintRequest const& paint_request, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q) const
 {
 	QFont const font (aids.font_5.font);
 	QFontMetricsF const metrics (font);
@@ -70,7 +70,7 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 	if (paint_request.size_changed() || !_box_text_width)
 	{
 		QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
-		const_cast<BasicRadialIndicator*> (this)->_box_text_width = metrics.width (sample_text);
+		const_cast<BasicRadialGauge*> (this)->_box_text_width = metrics.width (sample_text);
 	}
 
 	QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, *_box_text_width, 0.9f * metrics.height());
@@ -106,7 +106,7 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 
 
 void
-BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
+BasicRadialGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
 {
 	constexpr si::Angle kValueSpanAngle = 210_deg;
 
