@@ -47,7 +47,7 @@ template<class Value>
 		 * Input
 		 */
 
-		xf::PropertyIn<Value>	value			{ this, "value" };
+		xf::PropertyIn<Value>		value			{ this, "value" };
 	};
 
 
