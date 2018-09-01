@@ -25,11 +25,6 @@
 #include "linear_indicator.h"
 
 
-static QColor const silver (0xbb, 0xbd, 0xbf);
-static QColor const warning_color (255, 200, 0);
-static QColor const critical_color (255, 35, 35);
-
-
 void
 BasicLinearIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& values) const
 {
@@ -70,9 +65,9 @@ BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 			return std::nullopt;
 	};
 
-	QPen const silver_pen = aids.get_pen (silver, 1.0f);
-	QPen const warning_pen = aids.get_pen (warning_color, 1.1f);
-	QPen const critical_pen = aids.get_pen (critical_color, 1.1f);
+	QPen const silver_pen = aids.get_pen (kSilver, 1.0f);
+	QPen const warning_pen = aids.get_pen (kWarningColor, 1.1f);
+	QPen const critical_pen = aids.get_pen (kCriticalColor, 1.1f);
 
 	// Indicator line:
 	painter.save_context ([&] {
@@ -163,12 +158,12 @@ BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 	{
 		if (values.critical_condition)
 		{
-			painter.setBrush (critical_color);
+			painter.setBrush (kCriticalColor);
 			painter.setPen (critical_pen);
 		}
 		else if (values.warning_condition)
 		{
-			painter.setBrush (warning_color);
+			painter.setBrush (kWarningColor);
 			painter.setPen (warning_pen);
 		}
 		else
@@ -207,13 +202,13 @@ BasicLinearIndicator::paint_text (IndicatorValues& values, xf::InstrumentAids& a
 
 	if (values.critical_condition)
 	{
-		text_pen = aids.get_pen (critical_color, 1.0f);
+		text_pen = aids.get_pen (kCriticalColor, 1.0f);
 		box_pen = text_pen;
 	}
 	else if (values.warning_condition)
 	{
-		text_pen = aids.get_pen (warning_color, 1.0f);
-		box_pen.setColor (critical_color);
+		text_pen = aids.get_pen (kWarningColor, 1.0f);
+		box_pen.setColor (kCriticalColor);
 	}
 
 	// Box:
