@@ -14,6 +14,7 @@
 // Standard:
 #include <cstddef>
 #include <fstream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -32,9 +33,9 @@
 
 namespace xf {
 
-Unique<CallOutDispatcher>	Services::_call_out_dispatcher;
-QFont						Services::_instrument_font ("sans");
-QFont						Services::_panel_font ("sans");
+std::unique_ptr<CallOutDispatcher>	Services::_call_out_dispatcher;
+QFont								Services::_instrument_font ("sans");
+QFont								Services::_panel_font ("sans");
 
 
 void

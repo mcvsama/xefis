@@ -59,14 +59,5 @@ typedef bool					_Bool;
 
 typedef std::vector<uint8_t>	Blob;
 
-template<class Type>
-	using Shared = std::shared_ptr<Type>;
-
-template<class Type>
-	using Unique = std::unique_ptr<Type>;
-
-template<class Type>
-	using Weak = std::weak_ptr<Type>;
-
 #endif
 

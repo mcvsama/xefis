@@ -55,7 +55,7 @@ WorkPerformer::WorkPerformer (unsigned int threads_number, Logger const& logger)
 
 	for (unsigned int i = 0; i < threads_number; ++i)
 	{
-		Shared<Performer> p = std::make_shared<Performer> (this, i);
+		std::shared_ptr<Performer> p = std::make_shared<Performer> (this, i);
 		_performers.push_back (p);
 		p->start();
 	}

@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 
 // Qt:
 #include <QtCore/QTimer>
@@ -72,7 +73,7 @@ class PanelRotaryEncoder: public PanelWidget
 	write();
 
   private:
-	Unique<QTimer>				_click_timer;
+	std::unique_ptr<QTimer>		_click_timer;
 	QPoint						_mouse_last_position;
 	bool						_mouse_pressed			= false;
 	QString						_knob_label;

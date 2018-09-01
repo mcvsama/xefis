@@ -327,21 +327,21 @@ class SerialPort:
 	log_prefix() const;
 
   private:
-	xf::OwnerToken			_owned;
-	Logger					_logger;
-	Configuration			_configuration;
-	DataReadyCallback		_data_ready;
-	FailureCallback			_failure;
-	Unique<QSocketNotifier>	_notifier;
-	int						_device;
-	bool					_good;
-	std::string				_error;
-	unsigned int			_read_failure_count			{ 0 };
-	unsigned int			_max_read_failure_count		{ 0 };
-	unsigned int			_write_failure_count		{ 0 };
-	unsigned int			_max_write_failure_count	{ 0 };
-	Blob					_input_buffer;				// Data from the device.
-	Blob					_output_buffer;				// Data to to sent to the device.
+	xf::OwnerToken						_owned;
+	Logger								_logger;
+	Configuration						_configuration;
+	DataReadyCallback					_data_ready;
+	FailureCallback						_failure;
+	std::unique_ptr<QSocketNotifier>	_notifier;
+	int									_device;
+	bool								_good;
+	std::string							_error;
+	unsigned int						_read_failure_count			{ 0 };
+	unsigned int						_max_read_failure_count		{ 0 };
+	unsigned int						_write_failure_count		{ 0 };
+	unsigned int						_max_write_failure_count	{ 0 };
+	Blob								_input_buffer;				// Data from the device.
+	Blob								_output_buffer;				// Data to to sent to the device.
 };
 
 

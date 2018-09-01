@@ -143,11 +143,11 @@ class BMP085:
 	xf::i2c::Device				_i2c_device;
 	Oversampling				_oversampling				{ Oversampling3 };
 	si::Time					_pressure_waiting_times[4]	{ 4.5_ms, 7.5_ms, 13.5_ms, 25.5_ms };
-	Unique<QTimer>				_reinitialize_timer;
-	Unique<QTimer>				_temperature_timer;
-	Unique<QTimer>				_temperature_ready_timer;
-	Unique<QTimer>				_pressure_timer;
-	Unique<QTimer>				_pressure_ready_timer;
+	std::unique_ptr<QTimer>		_reinitialize_timer;
+	std::unique_ptr<QTimer>		_temperature_timer;
+	std::unique_ptr<QTimer>		_temperature_ready_timer;
+	std::unique_ptr<QTimer>		_pressure_timer;
+	std::unique_ptr<QTimer>		_pressure_ready_timer;
 	// Set to true, between request_ and read_ functions.
 	bool						_middle_of_request			{ false };
 	bool						_request_other				{ false };

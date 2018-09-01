@@ -281,8 +281,8 @@ class HT16K33: public QObject
 		};
 
   private:
-	typedef std::vector<Unique<Display>>	Displays;
-	typedef std::vector<Unique<Switch>>		Switches;
+	typedef std::vector<std::unique_ptr<Display>>	Displays;
+	typedef std::vector<std::unique_ptr<Switch>>	Switches;
 
   public:
 	// Ctor

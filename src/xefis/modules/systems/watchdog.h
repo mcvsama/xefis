@@ -45,11 +45,11 @@ class Watchdog: public xf::Module<>
 	ping();
 
   private:
-	xf::Logger				_logger;
-	Unique<QSocketNotifier>	_notifier;
-	bool					_enabled			= false;
-	int						_watchdog_write_fd	= 0;
-	int						_watchdog_read_fd	= 0;
+	xf::Logger							_logger;
+	std::unique_ptr<QSocketNotifier>	_notifier;
+	bool								_enabled			= false;
+	int									_watchdog_write_fd	= 0;
+	int									_watchdog_read_fd	= 0;
 };
 
 #endif

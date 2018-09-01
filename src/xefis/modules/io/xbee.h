@@ -422,27 +422,27 @@ class XBee:
 	debug() const;
 
   private:
-	xf::Logger						_logger;
-	Unique<QSocketNotifier>			_notifier;
-	int								_device					= 0;
-	QTimer*							_restart_timer			= nullptr;
-	QTimer*							_pong_timer				= nullptr;
-	QTimer*							_periodic_ping_timer	= nullptr;
-	QTimer*							_periodic_pong_timer	= nullptr;
-	QTimer*							_clear_channel_timer	= nullptr;
-	QTimer*							_after_reset_timer		= nullptr;
-	QTimer*							_rssi_timer				= nullptr;
-	std::string						_serial_number_bin;
-	ConfigurationStep				_configuration_step		= ConfigurationStep::Unconfigured;
-	int								_read_failure_count		= 0;
-	int								_write_failure_count	= 0;
-	std::string						_input_buffer;
-	std::string						_output_buffer;
-	std::string						_last_at_command;
-	xf::Smoother<si::Power>			_rssi_smoother			{ 200_ms };
-	Time							_last_rssi_time;
-	uint8_t							_at_frame_id			{ 0x00 };
-	xf::PropChanged<std::string>	_send_changed			{ io.send };
+	xf::Logger							_logger;
+	std::unique_ptr<QSocketNotifier>	_notifier;
+	int									_device					= 0;
+	QTimer*								_restart_timer			= nullptr;
+	QTimer*								_pong_timer				= nullptr;
+	QTimer*								_periodic_ping_timer	= nullptr;
+	QTimer*								_periodic_pong_timer	= nullptr;
+	QTimer*								_clear_channel_timer	= nullptr;
+	QTimer*								_after_reset_timer		= nullptr;
+	QTimer*								_rssi_timer				= nullptr;
+	std::string							_serial_number_bin;
+	ConfigurationStep					_configuration_step		= ConfigurationStep::Unconfigured;
+	int									_read_failure_count		= 0;
+	int									_write_failure_count	= 0;
+	std::string							_input_buffer;
+	std::string							_output_buffer;
+	std::string							_last_at_command;
+	xf::Smoother<si::Power>				_rssi_smoother			{ 200_ms };
+	Time								_last_rssi_time;
+	uint8_t								_at_frame_id			{ 0x00 };
+	xf::PropChanged<std::string>		_send_changed			{ io.send };
 };
 
 

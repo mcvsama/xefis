@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 
 // Qt:
 #include <QtCore/QFile>
@@ -55,11 +56,11 @@ class GzDataFileIterator
 	operator*();
 
   private:
-	QFile				_file;
-	Unique<QZDevice>	_decompressor;
-	Unique<QTextStream>	_decompressed_stream;
-	Unique<QTextStream>	_line_stream;
-	QString				_line;
+	QFile							_file;
+	std::unique_ptr<QZDevice>		_decompressor;
+	std::unique_ptr<QTextStream>	_decompressed_stream;
+	std::unique_ptr<QTextStream>	_line_stream;
+	QString							_line;
 };
 
 
@@ -332,7 +333,7 @@ NavaidStorage::parse_apt_dat()
 {
 	_logger << "Loading airports" << std::endl;
 
-	Unique<Navaid> cur_land_airport;
+	std::unique_ptr<Navaid> cur_land_airport;
 	Navaid::Runways runways;
 	std::size_t loaded_airports = 0;
 
