@@ -26,7 +26,7 @@ XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
 ######## /xefis/modules/instruments ########
 
 XEFIS_HEADERS			+= xefis/modules/instruments/adi.h
-XEFIS_HEADERS			+= xefis/modules/instruments/basic_indicator.h
+XEFIS_HEADERS			+= xefis/modules/instruments/basic_gauge.h
 ##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h TODO
 XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
 XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
@@ -36,8 +36,8 @@ XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
 #XEFIS_HEADERS_MOC		+= xefis/modules/instruments/hsi.h TODO
 #XEFIS_HEADERS			+= xefis/modules/instruments/hsi_widget.h TODO
 XEFIS_HEADERS			+= xefis/modules/instruments/label.h
-XEFIS_HEADERS			+= xefis/modules/instruments/linear_indicator.h
-XEFIS_HEADERS			+= xefis/modules/instruments/radial_indicator.h
+XEFIS_HEADERS			+= xefis/modules/instruments/linear_gauge.h
+XEFIS_HEADERS			+= xefis/modules/instruments/radial_gauge.h
 XEFIS_HEADERS			+= xefis/modules/instruments/status.h
 XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
 
@@ -51,8 +51,8 @@ XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
 #XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc TODO
 #XEFIS_SOURCES			+= xefis/modules/instruments/hsi_widget.cc TODO
 XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/linear_indicator.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/radial_indicator.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/linear_gauge.cc
+XEFIS_SOURCES			+= xefis/modules/instruments/radial_gauge.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
 XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
 

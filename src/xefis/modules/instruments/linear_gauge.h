@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__INSTRUMENTS__LINEAR_INDICATOR_H__INCLUDED
-#define XEFIS__MODULES__INSTRUMENTS__LINEAR_INDICATOR_H__INCLUDED
+#ifndef XEFIS__MODULES__INSTRUMENTS__LINEAR_GAUGE_H__INCLUDED
+#define XEFIS__MODULES__INSTRUMENTS__LINEAR_GAUGE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -28,11 +28,11 @@
 #include <xefis/utility/synchronized.h>
 
 // Local:
-#include "basic_indicator.h"
+#include "basic_gauge.h"
 
 
 template<class Value>
-	class LinearIndicatorIO: public BasicIndicatorIO<Value>
+	class LinearGaugeIO: public BasicGaugeIO<Value>
 	{
 	  public:
 		/*
@@ -51,8 +51,8 @@ template<class Value>
 	};
 
 
-class BasicLinearIndicator:
-	protected BasicIndicator,
+class BasicLinearGauge:
+	protected BasicGauge,
 	protected xf::InstrumentSupport
 {
   protected:
@@ -74,7 +74,7 @@ class BasicLinearIndicator:
 		bool	critical;
 	};
 
-	struct IndicatorValues: public BasicIndicator::IndicatorValues
+	struct GaugeValues: public BasicGauge::GaugeValues
 	{
 		bool					mirrored_style;
 		bool					line_hidden;
@@ -87,21 +87,21 @@ class BasicLinearIndicator:
 
   protected:
 	void
-	paint (xf::PaintRequest&, IndicatorValues& value) const;
+	paint (xf::PaintRequest&, GaugeValues& value) const;
 
   private:
 	void
-	paint_indicator (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0, QPointF p1) const;
+	paint_indicator (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0, QPointF p1) const;
 
 	void
-	paint_text (IndicatorValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0) const;
+	paint_text (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0) const;
 };
 
 
 template<class Value>
-	class LinearIndicator:
-		public xf::Instrument<LinearIndicatorIO<Value>>,
-		private BasicLinearIndicator
+	class LinearGauge:
+		public xf::Instrument<LinearGaugeIO<Value>>,
+		private BasicLinearGauge
 	{
 	  public:
 		using Converter = std::function<float128_t (xf::Property<Value> const&)>;
@@ -109,7 +109,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		LinearIndicator (std::unique_ptr<LinearIndicatorIO<Value>>, Converter = nullptr, std::string const& instance = {});
+		LinearGauge (std::unique_ptr<LinearGaugeIO<Value>>, Converter = nullptr, std::string const& instance = {});
 
 		// Module API
 		void
@@ -120,16 +120,16 @@ template<class Value>
 		paint (xf::PaintRequest&) const override;
 
 	  private:
-		xf::PropertyObserver						_inputs_observer;
-		xf::Synchronized<IndicatorValues> mutable	_values;
-		Converter									_converter;
+		xf::PropertyObserver					_inputs_observer;
+		xf::Synchronized<GaugeValues> mutable	_values;
+		Converter								_converter;
 	};
 
 
 template<class Value>
 	inline
-	LinearIndicator<Value>::LinearIndicator (std::unique_ptr<LinearIndicatorIO<Value>> module_io, Converter converter, std::string const& instance):
-		xf::Instrument<LinearIndicatorIO<Value>> (std::move (module_io), instance),
+	LinearGauge<Value>::LinearGauge (std::unique_ptr<LinearGaugeIO<Value>> module_io, Converter converter, std::string const& instance):
+		xf::Instrument<LinearGaugeIO<Value>> (std::move (module_io), instance),
 		_converter (converter)
 	{
 		_inputs_observer.set_callback ([&]{
@@ -143,7 +143,7 @@ template<class Value>
 
 template<class Value>
 	inline void
-	LinearIndicator<Value>::process (xf::Cycle const& cycle)
+	LinearGauge<Value>::process (xf::Cycle const& cycle)
 	{
 		_inputs_observer.process (cycle.update_time());
 	}
@@ -151,7 +151,7 @@ template<class Value>
 
 template<class Value>
 	inline void
-	LinearIndicator<Value>::paint (xf::PaintRequest& paint_request) const
+	LinearGauge<Value>::paint (xf::PaintRequest& paint_request) const
 	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
@@ -165,7 +165,7 @@ template<class Value>
 		if (io.value)
 			values->inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));
 
-		BasicLinearIndicator::paint (paint_request, *values);
+		BasicLinearGauge::paint (paint_request, *values);
 	}
 
 #endif

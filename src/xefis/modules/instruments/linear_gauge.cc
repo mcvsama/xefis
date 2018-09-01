@@ -22,11 +22,11 @@
 #include <xefis/utility/numeric.h>
 
 // Local:
-#include "linear_indicator.h"
+#include "linear_gauge.h"
 
 
 void
-BasicLinearIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& values) const
+BasicLinearGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
@@ -53,7 +53,7 @@ BasicLinearIndicator::paint (xf::PaintRequest& paint_request, IndicatorValues& v
 
 
 void
-BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF p0, QPointF p1) const
+BasicLinearGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF p0, QPointF p1) const
 {
 	float const r = 6.5f * q;
 	float const kValueSpanLength = (p1 - p0).y();
@@ -69,7 +69,7 @@ BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 	QPen const warning_pen = aids.get_pen (kWarningColor, 1.1f);
 	QPen const critical_pen = aids.get_pen (kCriticalColor, 1.1f);
 
-	// Indicator line:
+	// Gauge line:
 	painter.save_context ([&] {
 		float const length_gap = aids.pen_width (2.0);
 
@@ -189,7 +189,7 @@ BasicLinearIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 
 
 void
-BasicLinearIndicator::paint_text (IndicatorValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF const p0) const
+BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF const p0) const
 {
 	QFont font (aids.font_5.font);
 	font.setPixelSize (font.pixelSize() * values.font_scale);
