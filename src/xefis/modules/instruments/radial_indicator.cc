@@ -23,10 +23,7 @@
 #include "radial_indicator.h"
 
 
-static QColor const silver (0xbb, 0xbd, 0xbf);
 static QColor const normal_fill (0x43, 0x49, 0x54);
-static QColor const warning_color (255, 200, 0);
-static QColor const critical_color (255, 35, 35);
 
 
 void
@@ -57,13 +54,13 @@ BasicRadialIndicator::paint_text (IndicatorValues& values, xf::PaintRequest cons
 
 	if (values.critical_condition)
 	{
-		text_pen = aids.get_pen (critical_color, 1.0f);
+		text_pen = aids.get_pen (kCriticalColor, 1.0f);
 		box_pen = text_pen;
 	}
 	else if (values.warning_condition)
 	{
-		text_pen = aids.get_pen (warning_color, 1.0f);
-		box_pen.setColor (critical_color);
+		text_pen = aids.get_pen (kWarningColor, 1.0f);
+		box_pen.setColor (kCriticalColor);
 	}
 
 	float const margin = 0.4f * q;
@@ -131,11 +128,11 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 	std::optional<si::Angle> const target_angle = get_angle (values.normalized_target);
 	std::optional<si::Angle> const automatic_angle = get_angle (values.normalized_automatic);
 
-	QPen const silver_pen = get_round_pen (silver, 1.f);
+	QPen const silver_pen = get_round_pen (kSilver, 1.f);
 	QPen const pen = get_round_pen (Qt::white, 1.f);
 	QPen const pointer_pen = get_round_pen (Qt::white, 1.2f);
-	QPen const warning_pen = get_round_pen (warning_color, 1.1f);
-	QPen const critical_pen = get_round_pen (critical_color, 1.1f);
+	QPen const warning_pen = get_round_pen (kWarningColor, 1.1f);
+	QPen const critical_pen = get_round_pen (kCriticalColor, 1.1f);
 	QPen const reference_pen = get_round_pen (QColor (0x00, 0xff, 0x00), 1.f);
 	QPen zero_point_pen = get_round_pen (normal_fill.lighter (150), 1.f);
 	QPen const automatic_pen = get_round_pen (QColor (0x22, 0xaa, 0xff), 1.1f);
@@ -153,13 +150,13 @@ BasicRadialIndicator::paint_indicator (IndicatorValues& values, xf::InstrumentAi
 
 				if (values.critical_condition)
 				{
-					brush.setColor (critical_color.darker (120));
-					zero_point_pen.setColor (critical_color.lighter (120));
+					brush.setColor (kCriticalColor.darker (120));
+					zero_point_pen.setColor (kCriticalColor.lighter (120));
 				}
 				else if (values.warning_condition)
 				{
-					brush.setColor (warning_color.darker (120));
-					zero_point_pen.setColor (warning_color.lighter (120));
+					brush.setColor (kWarningColor.darker (120));
+					zero_point_pen.setColor (kWarningColor.lighter (120));
 				}
 
 				painter.setPen (Qt::NoPen);
