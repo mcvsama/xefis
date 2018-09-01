@@ -179,12 +179,12 @@ class FlightGear:
 	write_output();
 
   private:
-	Unique<QTimer>						_timeout_timer;
+	std::unique_ptr<QTimer>				_timeout_timer;
 	QHostAddress						_input_address;
-	Unique<QUdpSocket>					_input;
+	std::unique_ptr<QUdpSocket>			_input;
 	QByteArray							_input_datagram;
 	QHostAddress						_output_address;
-	Unique<QUdpSocket>					_output;
+	std::unique_ptr<QUdpSocket>			_output;
 	std::vector<xf::BasicPropertyOut*>	_output_properties;
 	std::vector<xf::PropertyOut<bool>*>	_serviceable_flags;
 };

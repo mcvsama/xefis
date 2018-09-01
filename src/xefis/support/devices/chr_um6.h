@@ -400,15 +400,14 @@ class CHRUM6
 	 */
 	class Command:
 		public Request,
-		public Shared<CommandData>
+		public std::shared_ptr<CommandData>
 	{
 		friend class CHRUM6;
 
-	  private:
+	  public:
 		// Ctor
 		Command (CommandAddress, CommandCallback = nullptr);
 
-	  public:
 		/**
 		 * Return value returned by the command.
 		 */
@@ -436,18 +435,17 @@ class CHRUM6
 	 */
 	class Read:
 		public Request,
-		public Shared<ReadData>
+		public std::shared_ptr<ReadData>
 	{
 		friend class CHRUM6;
 
-	  private:
+	  public:
 		// Ctor
 		Read (ConfigurationAddress, ReadCallback = nullptr);
 
 		// Ctor
 		Read (DataAddress, ReadCallback = nullptr);
 
-	  public:
 		/**
 		 * Return raw 32-bit register value.
 		 */
@@ -487,11 +485,11 @@ class CHRUM6
 	 */
 	class Write:
 		public Request,
-		public Shared<WriteData>
+		public std::shared_ptr<WriteData>
 	{
 		friend class CHRUM6;
 
-	  private:
+	  public:
 		// Ctor
 		Write (ConfigurationAddress, uint32_t value, WriteCallback = nullptr);
 
@@ -629,15 +627,15 @@ class CHRUM6
 	packet_name (uint32_t address) noexcept;
 
   private:
-	SerialPort*					_serial_port	{ nullptr };
-	Unique<PacketReader>		_packet_reader;
-	std::function<void()>		_communication_failure_callback;
-	std::function<void()>		_alive_check_callback;
-	std::function<void (Read)>	_incoming_messages_callback;
-	bool						_auto_retry		{ false };
-	std::queue<Unique<Request>>	_requests;
-	Unique<Request>				_current_req;
-	Logger						_logger;
+	SerialPort*								_serial_port	{ nullptr };
+	std::unique_ptr<PacketReader>			_packet_reader;
+	std::function<void()>					_communication_failure_callback;
+	std::function<void()>					_alive_check_callback;
+	std::function<void (Read)>				_incoming_messages_callback;
+	bool									_auto_retry		{ false };
+	std::queue<std::unique_ptr<Request>>	_requests;
+	std::unique_ptr<Request>				_current_req;
+	Logger									_logger;
 };
 
 
@@ -717,7 +715,7 @@ CHRUM6::Request::retries() const noexcept
 
 inline
 CHRUM6::Command::Command (CommandAddress address, CommandCallback callback):
-	Shared<CommandData> (new CommandData())
+	std::shared_ptr<CommandData> (new CommandData())
 {
 	setup (static_cast<uint32_t> (address), false, 0);
 	get()->command_callback = callback;
@@ -748,7 +746,7 @@ CHRUM6::Command::make_callback()
 
 inline
 CHRUM6::Read::Read (ConfigurationAddress address, ReadCallback callback):
-	Shared<ReadData> (new ReadData)
+	std::shared_ptr<ReadData> (new ReadData)
 {
 	setup (static_cast<uint32_t> (address), false, 0);
 	get()->read_callback = callback;
@@ -757,7 +755,7 @@ CHRUM6::Read::Read (ConfigurationAddress address, ReadCallback callback):
 
 inline
 CHRUM6::Read::Read (DataAddress address, ReadCallback callback):
-	Shared<ReadData> (new ReadData)
+	std::shared_ptr<ReadData> (new ReadData)
 {
 	setup (static_cast<uint32_t> (address), false, 0);
 	get()->read_callback = callback;
@@ -796,7 +794,7 @@ CHRUM6::Read::make_callback()
 
 inline
 CHRUM6::Write::Write (ConfigurationAddress address, uint32_t value, WriteCallback callback):
-	Shared<WriteData> (new WriteData())
+	std::shared_ptr<WriteData> (new WriteData())
 {
 	setup (static_cast<uint32_t> (address), true, value);
 	get()->value = value;

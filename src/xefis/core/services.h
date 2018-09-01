@@ -142,9 +142,9 @@ class Services
 	panel_font();
 
   private:
-	static Unique<CallOutDispatcher>	_call_out_dispatcher;
-	static QFont						_instrument_font;
-	static QFont						_panel_font;
+	static std::unique_ptr<CallOutDispatcher>	_call_out_dispatcher;
+	static QFont								_instrument_font;
+	static QFont								_panel_font;
 };
 
 

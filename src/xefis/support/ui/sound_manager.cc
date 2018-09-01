@@ -64,7 +64,7 @@ SoundManager::~SoundManager()
 }
 
 
-Shared<SoundManager::Sound>
+std::shared_ptr<SoundManager::Sound>
 SoundManager::play (QString const& wav_file_name)
 {
 	cleanup();

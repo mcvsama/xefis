@@ -103,7 +103,7 @@ class TrimControl: public xf::Module<TrimControlIO>
 	double					_trim_value		{ 0.0 };
 	bool					_trimming_up	{ false };
 	bool					_trimming_down	{ false };
-	Unique<QTimer>			_timer;
+	std::unique_ptr<QTimer>	_timer;
 	xf::PropertyObserver	_trim_computer;
 	xf::PropertyObserver	_mix_computer;
 };

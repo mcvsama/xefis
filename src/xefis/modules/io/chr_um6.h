@@ -253,12 +253,12 @@ class CHRUM6:
 
   private:
 	xf::Logger							_logger;
-	Unique<QTimer>						_restart_timer;
-	Unique<QTimer>						_alive_check_timer;
-	Unique<QTimer>						_status_check_timer;
-	Unique<QTimer>						_initialization_timer;
+	std::unique_ptr<QTimer>				_restart_timer;
+	std::unique_ptr<QTimer>				_alive_check_timer;
+	std::unique_ptr<QTimer>				_status_check_timer;
+	std::unique_ptr<QTimer>				_initialization_timer;
 	xf::SerialPort						_serial_port;
-	Unique<xf::CHRUM6>					_sensor;
+	std::unique_ptr<xf::CHRUM6>			_sensor;
 	int									_failure_count						{ 0 };
 	Stage								_stage								{ Stage::Initialize };
 	xf::PropChanged<si::Acceleration>	_input_centripetal_x_changed		{ io.centripetal_x };

@@ -93,8 +93,8 @@ class UDP:
   private:
 	xf::Logger						_logger;
 	QByteArray						_received_datagram;
-	Unique<QUdpSocket>				_tx;
-	Unique<QUdpSocket>				_rx;
+	std::unique_ptr<QUdpSocket>		_tx;
+	std::unique_ptr<QUdpSocket>		_rx;
 	xf::PropChanged<std::string>	_send_changed	{ io.send };
 };
 

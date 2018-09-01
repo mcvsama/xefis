@@ -57,8 +57,8 @@ class SoundManager
 		stop();
 
 	  private:
-		Unique<QProcess>	_play_process;
-		bool				_finished = false;
+		std::unique_ptr<QProcess>	_play_process;
+		bool						_finished = false;
 	};
 
   public:
@@ -71,7 +71,7 @@ class SoundManager
 	/**
 	 * Play sound.
 	 */
-	Shared<Sound>
+	std::shared_ptr<Sound>
 	play (QString const& wav_file_name);
 
 	/**
@@ -81,8 +81,8 @@ class SoundManager
 	cleanup();
 
   private:
-	Logger					_logger;
-	std::set<Shared<Sound>>	_sounds;
+	Logger								_logger;
+	std::set<std::shared_ptr<Sound>>	_sounds;
 };
 
 

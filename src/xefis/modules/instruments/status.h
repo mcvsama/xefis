@@ -230,8 +230,8 @@ class Status:
 	std::vector<Message*>				_hidden_messages;
 	std::vector<Message*>				_visible_messages;
 	si::Time							_last_message_timestamp;
-	Unique<QTimer>						_blink_timer;
-	Unique<QTimer>						_cursor_hide_timer;
+	std::unique_ptr<QTimer>				_blink_timer;
+	std::unique_ptr<QTimer>				_cursor_hide_timer;
 	bool								_blink_show				{ false };
 	// Cache stuff:
 	mutable QFont						_font;

@@ -70,7 +70,7 @@ class TextPainter: virtual public QPainter
 			operator= (Glyph const& other);
 
 		  public:
-			Shared<Data> data;
+			std::shared_ptr<Data> data;
 		};
 
 		struct Font

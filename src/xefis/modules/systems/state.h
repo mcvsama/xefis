@@ -107,9 +107,9 @@ class State: public xf::Module<StateIO>
 	do_save_state (QString content, QString file_name);
 
   private:
-	xf::Logger			_logger;
-	Unique<QTimer>		_save_delay_timer;
-	std::future<void>	_save_future;
+	xf::Logger				_logger;
+	std::unique_ptr<QTimer>	_save_delay_timer;
+	std::future<void>		_save_future;
 };
 
 #endif

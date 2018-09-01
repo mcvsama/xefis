@@ -176,12 +176,12 @@ class WorkPerformer: private Noncopyable
 	take_unit();
 
   private:
-	Logger							_logger;
+	Logger									_logger;
 	// Current queue. Points either to _queues[1] or _queues[2]:
-	Units							_queue;
-	Mutex							_queue_mutex;
-	Semaphore						_queue_semaphore;
-	std::vector<Shared<Performer>>	_performers;
+	Units									_queue;
+	Mutex									_queue_mutex;
+	Semaphore								_queue_semaphore;
+	std::vector<std::shared_ptr<Performer>>	_performers;
 };
 
 

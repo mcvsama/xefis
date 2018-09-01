@@ -79,7 +79,7 @@ class FlapsControl: public xf::Module<FlapsControlIO>
 	xf::Range<si::Angle>		_extents;
 	si::Angle					_setting;
 	si::Angle					_current;
-	Unique<QTimer>				_timer;
+	std::unique_ptr<QTimer>		_timer;
 	xf::PropChangedTo<bool>		_input_up_clicked			{ io.up, true };
 	xf::PropChangedTo<bool>		_input_down_clicked			{ io.down, true };
 	xf::PropChanged<si::Angle>	_requested_setting_changed	{ io.requested_setting };

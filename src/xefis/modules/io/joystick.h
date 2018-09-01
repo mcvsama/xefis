@@ -155,11 +155,11 @@ class JoystickInput:
 		std::optional<HandlerID>	_down_button_id;
 	};
 
-	typedef std::array<std::vector<Shared<Handler>>, kMaxEventID>		Handlers;
-	typedef std::array<Unique<xf::PropertyOut<bool>>, kMaxEventID>		ButtonProperties;
-	typedef std::array<Unique<xf::PropertyOut<double>>, kMaxEventID>	AxisProperties;
-	typedef std::array<Unique<xf::PropertyOut<si::Angle>>, kMaxEventID>	AngleAxisProperties;
-	typedef std::array<xf::Range<si::Angle>, kMaxEventID>				AngleAxisRanges;
+	typedef std::array<std::vector<std::shared_ptr<Handler>>, kMaxEventID>			Handlers;
+	typedef std::array<std::unique_ptr<xf::PropertyOut<bool>>, kMaxEventID>			ButtonProperties;
+	typedef std::array<std::unique_ptr<xf::PropertyOut<double>>, kMaxEventID>		AxisProperties;
+	typedef std::array<std::unique_ptr<xf::PropertyOut<si::Angle>>, kMaxEventID>	AngleAxisProperties;
+	typedef std::array<xf::Range<si::Angle>, kMaxEventID>							AngleAxisRanges;
 
   public:
 	// Ctor
@@ -223,19 +223,19 @@ class JoystickInput:
 	reset_properties();
 
   private:
-	xf::Logger					_logger;
-	std::optional<std::string>	_device_path;
-	int							_device				= 0;
-	Unique<QSocketNotifier>		_notifier;
-	Unique<QTimer>				_reopen_timer;
-	std::set<HandlerID>			_available_buttons;
-	std::set<HandlerID>			_available_axes;
-	Handlers					_handlers;
-	ButtonProperties			_button_properties;
-	AxisProperties				_axis_properties;
-	AngleAxisProperties			_angle_axis_properties;
-	AngleAxisRanges				_angle_axis_ranges;
-	unsigned int				_failure_count		= 0;
+	xf::Logger							_logger;
+	std::optional<std::string>			_device_path;
+	int									_device				= 0;
+	std::unique_ptr<QSocketNotifier>	_notifier;
+	std::unique_ptr<QTimer>				_reopen_timer;
+	std::set<HandlerID>					_available_buttons;
+	std::set<HandlerID>					_available_axes;
+	Handlers							_handlers;
+	ButtonProperties					_button_properties;
+	AxisProperties						_axis_properties;
+	AngleAxisProperties					_angle_axis_properties;
+	AngleAxisRanges						_angle_axis_ranges;
+	unsigned int						_failure_count		= 0;
 };
 
 

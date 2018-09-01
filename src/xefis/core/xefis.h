@@ -182,14 +182,14 @@ class Xefis: public QApplication
 	print_copyrights (std::ostream&);
 
   private:
-	LoggerOutput					_logger_output	{ std::clog };
-	Logger							_logger			{ _logger_output };
-	Unique<System>					_system;
-	Unique<ConfiguratorWidget>		_configurator_widget;
-	Unique<OptionsHelper>			_options_helper;
-	Unique<Machine>					_machine;
-	OptionsMap						_options;
-	QTimer*							_signals_check_timer;
+	LoggerOutput						_logger_output	{ std::clog };
+	Logger								_logger			{ _logger_output };
+	std::unique_ptr<System>				_system;
+	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
+	std::unique_ptr<OptionsHelper>		_options_helper;
+	std::unique_ptr<Machine>			_machine;
+	OptionsMap							_options;
+	QTimer*								_signals_check_timer;
 };
 
 

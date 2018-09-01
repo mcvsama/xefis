@@ -229,17 +229,17 @@ class GPS:
 
 	  private:
 		// Parents:
-		GPS&							_gps_module;
-		PowerCycle&						_power_cycle;
+		GPS&								_gps_module;
+		PowerCycle&							_power_cycle;
 
 		// Used to restart after a while if device doesn't respond:
-		Unique<QTimer>					_alive_check_timer;
-		unsigned int					_requested_physical_baud_rate;
-		xf::SerialPort::Configuration	_serial_port_config;
-		Unique<xf::SerialPort>			_serial_port;
-		Unique<xf::nmea::Parser>		_nmea_parser;
-		bool							_reliable_fix_quality	= false;
-		bool							_first_message_received	= false;
+		std::unique_ptr<QTimer>				_alive_check_timer;
+		unsigned int						_requested_physical_baud_rate;
+		xf::SerialPort::Configuration		_serial_port_config;
+		std::unique_ptr<xf::SerialPort>		_serial_port;
+		std::unique_ptr<xf::nmea::Parser>	_nmea_parser;
+		bool								_reliable_fix_quality	= false;
+		bool								_first_message_received	= false;
 	};
 
 	/**
@@ -282,14 +282,14 @@ class GPS:
 
 	  private:
 		// Parent:
-		GPS&				_gps_module;
+		GPS&						_gps_module;
 
-		Unique<Connection>	_connection;
+		std::unique_ptr<Connection>	_connection;
 		// On odd connection attempts, default baud-rate will be used,
 		// on even - target baud rate.
-		unsigned int		_connection_attempts	= 0;
+		unsigned int				_connection_attempts	= 0;
 		// Indicates that Connection restart has been requested:
-		bool				_restart_connection		= false;
+		bool						_restart_connection		= false;
 	};
 
   public:
@@ -346,9 +346,9 @@ class GPS:
   private:
 	xf::Logger						_logger;
 	xf::System*						_system;
-	Unique<PowerCycle>				_power_cycle;
+	std::unique_ptr<PowerCycle>		_power_cycle;
 	// Used to wait a bit after a failure:
-	Unique<QTimer>					_power_cycle_timer;
+	std::unique_ptr<QTimer>			_power_cycle_timer;
 	bool							_power_cycle_requested		{ false };
 	bool							_reliable_fix_quality		{ false };
 	unsigned int					_power_cycle_attempts		{ 0 };
