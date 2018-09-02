@@ -21,9 +21,12 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/modules/instruments/adi.h>
+#include <xefis/modules/instruments/flaps.h>
 #include <xefis/modules/instruments/gear.h>
+#include <xefis/modules/instruments/horizontal_trim.h>
 #include <xefis/modules/instruments/label.h>
 #include <xefis/modules/instruments/linear_gauge.h>
+#include <xefis/modules/instruments/vertical_trim.h>
 #include <xefis/modules/instruments/radial_gauge.h>
 #include <xefis/core/screen.h>
 
@@ -62,6 +65,9 @@ class TestScreen: public xf::Screen
 	std::unique_ptr<LabelIO>										label_vib_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<LabelIO>										label_volts_io				{ std::make_unique<LabelIO>() };
 	std::unique_ptr<GearIO>											gear_io						{ std::make_unique<GearIO>() };
+	std::unique_ptr<FlapsIO>										flaps_io					{ std::make_unique<FlapsIO>() };
+	std::unique_ptr<VerticalTrimIO>									vertical_trim_io			{ std::make_unique<VerticalTrimIO>() };
+	std::unique_ptr<HorizontalTrimIO>								horizontal_trim_io			{ std::make_unique<HorizontalTrimIO>() };
 
   private:
 	std::optional<xf::Registrant<ADI>>								_adi;
@@ -87,6 +93,9 @@ class TestScreen: public xf::Screen
 	std::optional<xf::Registrant<Label>>							_label_vib;
 	std::optional<xf::Registrant<Label>>							_label_volts;
 	std::optional<xf::Registrant<Gear>>								_gear;
+	std::optional<xf::Registrant<Flaps>>							_flaps;
+	std::optional<xf::Registrant<VerticalTrim>>						_vertical_trim;
+	std::optional<xf::Registrant<HorizontalTrim>>					_horizontal_trim;
 };
 
 #endif
