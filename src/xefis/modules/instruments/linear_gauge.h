@@ -42,6 +42,7 @@ template<class Value>
 		xf::Setting<bool>			mirrored_style	{ this, "mirrored_style", false };
 		xf::Setting<bool>			line_hidden		{ this, "line_hidden", false };
 		xf::Setting<float>			font_scale		{ this, "font_scale", 1.0f };
+		xf::Setting<std::string>	note			{ this, "note", "" };
 
 		/*
 		 * Input
@@ -79,6 +80,7 @@ class BasicLinearGauge:
 		bool					mirrored_style;
 		bool					line_hidden;
 		float					font_scale;
+		std::string				note_str;
 		bool					inbound;
 
 		// Cached struff, to prevent allocation on heap on every repaint:
@@ -161,6 +163,7 @@ template<class Value>
 		values->mirrored_style = *io.mirrored_style;
 		values->line_hidden = *io.line_hidden;
 		values->font_scale = *io.font_scale;
+		values->note_str = *io.note;
 
 		if (io.value)
 			values->inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));

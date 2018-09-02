@@ -212,7 +212,10 @@ BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf:
 	}
 
 	// Box:
+	auto const value_box_distance = 0.33f * char_width;
+	auto const note_distance = 0.5f * char_width;
 	QPointF text_position;
+	QPointF note_position;
 	QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
 	painter.setFont (font);
 	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
@@ -223,12 +226,18 @@ BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf:
 
 	if (values.mirrored_style)
 	{
-		text_position = QPointF (text_rect.left() + 0.25f * char_width, text_rect.center().y());
+		text_position = QPointF (text_rect.left() + value_box_distance, text_rect.center().y());
 		text_position = painter.transform().map (text_position);
-		painter.resetTransform();
+		note_position = QPointF (text_rect.left() - note_distance, text_rect.center().y());
+		note_position = painter.transform().map (note_position);
 	}
 	else
-		text_position = QPointF (text_rect.right() - 0.25f * char_width, text_rect.center().y());
+	{
+		text_position = QPointF (text_rect.right() - value_box_distance, text_rect.center().y());
+		note_position = QPointF (text_rect.left() - note_distance, text_rect.center().y());
+	}
+
+	painter.resetTransform();
 
 	// Text:
 	if (values.value_str)
@@ -236,6 +245,15 @@ BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf:
 		auto const value_qstr = QString::fromStdString (*values.value_str);
 		painter.setPen (text_pen);
 		painter.fast_draw_text (text_position, Qt::AlignVCenter | Qt::AlignRight, value_qstr);
+	}
+
+	// Note:
+	if (!values.note_str.empty())
+	{
+		auto const align_lr = values.mirrored_style ? Qt::AlignLeft : Qt::AlignRight;
+		auto const value_qstr = QString::fromStdString (values.note_str);
+		painter.setPen (text_pen);
+		painter.fast_draw_text (note_position, Qt::AlignVCenter | align_lr, value_qstr);
 	}
 }
 
