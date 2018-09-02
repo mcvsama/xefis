@@ -172,6 +172,11 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 	label_vib_io->label											= "VIB";
 	label_vib_io->color											= xf::InstrumentAids::kCyan;
 	label_vib_io->font_scale									= 1.1;
+
+	flaps_io->maximum_angle										= 30_deg;
+	flaps_io->hide_retracted									= false;
+
+	horizontal_trim_io->label									= "RUDDER TRIM";
 }
 
 
@@ -312,7 +317,19 @@ TestScreen::create_instruments()
 
 		_gear.emplace (std::move (gear_io), "gear");
 		register_instrument (*_gear);
-		set (**_gear, { 0.5, 0.0f, 0.5f, 1.0f });
+		set_centered (**_gear, { 0.8f, 0.5f, 0.1f, 0.15f });
+
+		_flaps.emplace (std::move (flaps_io), "flaps");
+		register_instrument (*_flaps);
+		set_centered (**_flaps, { 0.9f, 0.5f, 0.1f, 0.2f });
+
+		_vertical_trim.emplace (std::move (vertical_trim_io), "eicas.trim.vertical");
+		register_instrument (*_vertical_trim);
+		set_centered (**_vertical_trim, { 0.8f, 0.7f, 0.1f, 0.12f });
+
+		_horizontal_trim.emplace (std::move (horizontal_trim_io), "eicas.trim.horizontal");
+		register_instrument (*_horizontal_trim);
+		set_centered (**_horizontal_trim, { 0.9f, 0.7f, 0.08f, 0.12f });
 	}
 
 	set_paint_bounding_boxes (false);
