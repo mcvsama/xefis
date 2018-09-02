@@ -182,8 +182,8 @@ template<class pArgument, class pValue>
 
 	  private:
 		DataMap							_data_map;
-		mutable std::optional<Point>	_cached_min_value;
-		mutable std::optional<Point>	_cached_max_value;
+		std::optional<Point> mutable	_cached_min_value;
+		std::optional<Point> mutable	_cached_max_value;
 	};
 
 
