@@ -84,6 +84,7 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 	engine_l_vibration_io->value_maximum_warning				= 1_g;
 	engine_l_vibration_io->value_maximum						= 1.25_g;
 	engine_l_vibration_io->mirrored_style						= false;
+	engine_l_vibration_io->note									= "N₂";
 
 	engine_l_voltage_io->format									= boost::format ("%4.1f");
 	engine_l_voltage_io->font_scale								= 0.75;
@@ -134,6 +135,7 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 	engine_r_vibration_io->value_maximum_warning				= 1_g;
 	engine_r_vibration_io->value_maximum						= 1.25_g;
 	engine_r_vibration_io->mirrored_style						= true;
+	engine_r_vibration_io->note									= "N₂";
 
 	engine_r_voltage_io->format									= boost::format ("%4.1f");
 	engine_r_voltage_io->font_scale								= 0.75;
