@@ -212,28 +212,28 @@ BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf:
 	}
 
 	// Box:
-	auto const value_box_distance = 0.33f * char_width;
+	auto const value_box_inner_margin = 0.33f * char_width;
 	auto const note_distance = 0.5f * char_width;
 	QPointF text_position;
 	QPointF note_position;
 	QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
 	painter.setFont (font);
-	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
-	text_rect.adjust (-0.5f * char_width, 0, 0.f, -2.f * hcorr);
+	QRectF text_rect = painter.get_text_box (QPointF (p0.x() - 1.25 * q, aids.height() / 2.f), Qt::AlignRight | Qt::AlignVCenter, sample_text);
+	text_rect.adjust (-2 * value_box_inner_margin, 0, 0.f, -2.f * hcorr);
 	painter.setPen (box_pen);
 	painter.setBrush (Qt::NoBrush);
 	painter.drawRect (text_rect);
 
 	if (values.mirrored_style)
 	{
-		text_position = QPointF (text_rect.left() + value_box_distance, text_rect.center().y());
+		text_position = QPointF (text_rect.left() + value_box_inner_margin, text_rect.center().y());
 		text_position = painter.transform().map (text_position);
 		note_position = QPointF (text_rect.left() - note_distance, text_rect.center().y());
 		note_position = painter.transform().map (note_position);
 	}
 	else
 	{
-		text_position = QPointF (text_rect.right() - value_box_distance, text_rect.center().y());
+		text_position = QPointF (text_rect.right() - value_box_inner_margin, text_rect.center().y());
 		note_position = QPointF (text_rect.left() - note_distance, text_rect.center().y());
 	}
 
