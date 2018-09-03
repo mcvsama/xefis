@@ -142,6 +142,11 @@ template<class Value, class>
 							break;
 
 						case BorderCondition::Mirroring:
+							if (new_value > _value_range.max())
+								new_value = 2.0 * _value_range.max() - new_value;
+							else
+								new_value = 2.0 * _value_range.min() - new_value;
+
 							_rate_of_change = -_rate_of_change;
 							break;
 					}
