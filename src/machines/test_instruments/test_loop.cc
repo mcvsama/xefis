@@ -40,17 +40,17 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
 	// IO:
 	_test_screen->adi_io->weight_on_wheels									<< xf::ConstantSource (false);
 	_test_screen->adi_io->speed_ias_serviceable								<< xf::ConstantSource (true);
-	_test_screen->adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("test/speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
-	_test_screen->adi_io->speed_ias_lookahead								<< test_generator_io->create_property<si::Velocity> ("test/speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
+	_test_screen->adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
+	_test_screen->adi_io->speed_ias_lookahead								<< test_generator_io->create_property<si::Velocity> ("speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
 	_test_screen->adi_io->speed_ias_minimum									<< test_generator_io->create_property<si::Velocity> ("speed/ias.minimum", 60_kt, { 50_kt, 70_kt }, 3_kt / 1_s);
 	_test_screen->adi_io->speed_ias_minimum_maneuver						<< test_generator_io->create_property<si::Velocity> ("speed/ias.minimum.maneuver", 65_kt, { 55_kt, 72_kt }, 3_kt / 1_s);
 	_test_screen->adi_io->speed_ias_maximum_maneuver						<< test_generator_io->create_property<si::Velocity> ("speed/ias.maximum.maneuver", 245_kt, { 238_kt, 245_kt }, 3_kt / 1_s);
 	_test_screen->adi_io->speed_ias_maximum									<< test_generator_io->create_property<si::Velocity> ("speed/ias.maximum", 250_kt, { 240_kt, 260_kt }, 3_kt / 1_s);
 	_test_screen->adi_io->speed_mach										<< test_generator_io->create_property<double> ("speed/mach", 0.0f, { 0.0f, 0.85f }, 0.025f / 1_s);
 	_test_screen->adi_io->speed_ground										<< test_generator_io->create_property<si::Velocity> ("speed/ground-speed", 0_kt, { 0_kt, 400_kt }, 13_kt / 1_s);
-	_test_screen->adi_io->speed_v1											<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/v1", 80_kt, { 78_kt, 82_kt }, 1_kt / 1_s);
-	_test_screen->adi_io->speed_vr											<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/vr", 88_kt, { 86_kt, 89_kt }, 1_kt / 1_s);
-	_test_screen->adi_io->speed_vref										<< test_generator_io->create_property<si::Velocity> ("test/speed-bugs/vref", 95_kt, { 94_kt, 96_kt }, 0.1_kt / 1_s);
+	_test_screen->adi_io->speed_v1											<< test_generator_io->create_property<si::Velocity> ("speed-bugs/v1", 80_kt, { 78_kt, 82_kt }, 1_kt / 1_s);
+	_test_screen->adi_io->speed_vr											<< test_generator_io->create_property<si::Velocity> ("speed-bugs/vr", 88_kt, { 86_kt, 89_kt }, 1_kt / 1_s);
+	_test_screen->adi_io->speed_vref										<< test_generator_io->create_property<si::Velocity> ("speed-bugs/vref", 95_kt, { 94_kt, 96_kt }, 0.1_kt / 1_s);
 	_test_screen->adi_io->speed_flaps_up_label								<< xf::ConstantSource<std::string> ("UP");
 	_test_screen->adi_io->speed_flaps_up_speed								<< xf::ConstantSource (140_kt);
 	_test_screen->adi_io->speed_flaps_a_label								<< xf::ConstantSource<std::string> ("1"); // TODO _b_ and _a_? maybe "upper" and "lower"?
@@ -58,10 +58,10 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
 	_test_screen->adi_io->speed_flaps_b_label								<< xf::ConstantSource<std::string> ("5");
 	_test_screen->adi_io->speed_flaps_b_speed								<< xf::ConstantSource (110_kt);
 	_test_screen->adi_io->orientation_serviceable							<< xf::ConstantSource (true);
-	_test_screen->adi_io->orientation_pitch									<< test_generator_io->create_property<si::Angle> ("test/orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
-	_test_screen->adi_io->orientation_roll									<< test_generator_io->create_property<si::Angle> ("test/orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	_test_screen->adi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("test/orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
-	_test_screen->adi_io->orientation_heading_true							<< test_generator_io->create_property<si::Angle> ("test/orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->adi_io->orientation_pitch									<< test_generator_io->create_property<si::Angle> ("orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
+	_test_screen->adi_io->orientation_roll									<< test_generator_io->create_property<si::Angle> ("orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->adi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->adi_io->orientation_heading_true							<< test_generator_io->create_property<si::Angle> ("orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	_test_screen->adi_io->orientation_heading_numbers_visible				<< xf::ConstantSource (true);
 	_test_screen->adi_io->track_lateral_magnetic							<< test_generator_io->create_property<si::Angle> ("track/lateral.magnetic", 9_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	_test_screen->adi_io->track_lateral_true								<< test_generator_io->create_property<si::Angle> ("track/lateral.true", 19_deg, { 0_deg, 360_deg }, 22_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
