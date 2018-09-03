@@ -38,7 +38,7 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
 
 	// IO:
-	_test_screen->adi_io->weight_on_wheels									<< xf::ConstantSource (false);
+	_test_screen->adi_io->weight_on_wheels									<< xf::ConstantSource (true);
 	_test_screen->adi_io->speed_ias_serviceable								<< xf::ConstantSource (true);
 	_test_screen->adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
 	_test_screen->adi_io->speed_ias_lookahead								<< test_generator_io->create_property<si::Velocity> ("speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
