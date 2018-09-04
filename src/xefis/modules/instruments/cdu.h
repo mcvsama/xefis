@@ -40,7 +40,7 @@ class CDU:
 	 * Settings
 	 */
 
-	xf::Setting<bool>			show_time	{ this, "setting_show_time", true };
+	xf::Setting<bool>			show_time	{ this, "show_time", true };
 
 	/*
 	 * Input
