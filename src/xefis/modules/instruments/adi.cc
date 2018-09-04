@@ -24,6 +24,8 @@
 #include "adi.h"
 
 
+namespace adi_detail {
+
 void
 Parameters::sanitize()
 {
@@ -2946,6 +2948,8 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 	pr.paint_horizontal_failure_flag (QPointF (0.f, 0.35f * pr.aids.lesser_dimension()), pr.aids.scaled_default_font (2.0f), " RA ");
 }
 
+} // namespace adi_detail
+
 
 ADI::ADI (std::unique_ptr<ADI_IO> module_io, std::string const& instance):
 	Instrument (std::move (module_io), instance)
@@ -2983,7 +2987,7 @@ ADI::process (xf::Cycle const& cycle)
 			   *io.altitude_amsl < *io.altitude_minimums_amsl;
 	});
 
-	Parameters params;
+	adi_detail::Parameters params;
 	params.timestamp = cycle.update_time();
 	params.old_style = io.style_old.value_or (false);
 	params.show_metric = io.style_show_metric.value_or (false);

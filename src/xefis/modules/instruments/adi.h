@@ -183,6 +183,8 @@ class ADI_IO: public xf::ModuleIO
 };
 
 
+namespace adi_detail {
+
 class Parameters
 {
 	// TODO change to vector<> for speed
@@ -743,6 +745,8 @@ class PaintingWork: private xf::InstrumentSupport
 	Blinker					_minimums_warning_blinker	{ 200_ms };
 };
 
+} // namespace adi_detail
+
 
 class ADI: public xf::Instrument<ADI_IO>
 {
@@ -767,17 +771,17 @@ class ADI: public xf::Instrument<ADI_IO>
 	compute_fpv();
 
   private:
-	xf::PropertyObserver			_fpv_computer;
-	PaintingWork					_painting_work;
-	xf::Synchronized<Parameters>	_parameters;
-	xf::EventTimestamper			_minimums_became_visible;
-	bool							_computed_fpv_failure	{ false };
-	bool							_computed_fpv_visible	{ false };
-	Angle							_computed_fpv_alpha		{ 0_deg };
-	Angle							_computed_fpv_beta		{ 0_deg };
-	QString							_speed_flaps_up_current_label;
-	QString							_speed_flaps_a_current_label;
-	QString							_speed_flaps_b_current_label;
+	xf::PropertyObserver						_fpv_computer;
+	adi_detail::PaintingWork					_painting_work;
+	xf::Synchronized<adi_detail::Parameters>	_parameters;
+	xf::EventTimestamper						_minimums_became_visible;
+	bool										_computed_fpv_failure	{ false };
+	bool										_computed_fpv_visible	{ false };
+	Angle										_computed_fpv_alpha		{ 0_deg };
+	Angle										_computed_fpv_beta		{ 0_deg };
+	QString										_speed_flaps_up_current_label;
+	QString										_speed_flaps_a_current_label;
+	QString										_speed_flaps_b_current_label;
 };
 
 #endif
