@@ -34,8 +34,8 @@ class HorizontalTrimIO: public xf::ModuleIO
 	 */
 
 	xf::Setting<QString>	label					{ this, "label", "TRIM" };
-	xf::Setting<QString>	label_min				{ this, "label_min" };
-	xf::Setting<QString>	label_max				{ this, "label_max" };
+	xf::Setting<QString>	label_min				{ this, "label_min", "" };
+	xf::Setting<QString>	label_max				{ this, "label_max", "" };
 
 	/*
 	 * Input
