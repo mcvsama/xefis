@@ -58,6 +58,7 @@ class ADI_IO: public xf::ModuleIO
 	xf::Setting<si::Angle>			aoa_visibility_threshold							{ this, "setting_aoa_visibility_threshold", 17.5_deg };
 	xf::Setting<double>				show_mach_above										{ this, "setting_show_mach_above", 0.4 };
 	xf::Setting<si::Power>			power_eq_1000_fpm									{ this, "setting_power_eq_1000_fpm", 1000_W };
+	xf::Setting<bool>				show_minimum_speeds_only_if_no_weight_on_wheels		{ this, "setting_show_minimum_speeds_only_if_no_weight_on_wheels", true };
 
 	/*
 	 * Input

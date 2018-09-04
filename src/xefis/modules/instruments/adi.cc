@@ -2998,8 +2998,21 @@ ADI::process (xf::Cycle const& cycle)
 	params.speed_lookahead_visible = io.speed_ias_lookahead.valid();
 	params.speed_lookahead = io.speed_ias_lookahead.value_or (0_kt);
 	params.speed_minimum_visible = io.speed_ias_minimum.valid();
-	params.speed_minimum = io.speed_ias_minimum.value_or (0_kt);
-	params.speed_minimum_maneuver = io.speed_ias_minimum_maneuver.get_optional();
+
+	if (*io.show_minimum_speeds_only_if_no_weight_on_wheels)
+	{
+		if (io.weight_on_wheels.value_or (false))
+		{
+			params.speed_minimum_visible = false;
+			params.speed_minimum_maneuver.reset();
+		}
+		else
+		{
+			params.speed_minimum = io.speed_ias_minimum.value_or (0_kt);
+			params.speed_minimum_maneuver = io.speed_ias_minimum_maneuver.get_optional();
+		}
+	}
+
 	params.speed_maximum_maneuver = io.speed_ias_maximum_maneuver.get_optional();
 	params.speed_maximum_visible = io.speed_ias_maximum.valid();
 	params.speed_maximum = io.speed_ias_maximum.value_or (0_kt);
