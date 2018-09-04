@@ -41,24 +41,24 @@ class ADI_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<int64_t>			speed_ladder_line_every								{ this, "setting_speed_ladder_line_every", 10 };
-	xf::Setting<int64_t>			speed_ladder_number_every							{ this, "setting_speed_ladder_number_every", 20 };
-	xf::Setting<int64_t>			speed_ladder_extent									{ this, "setting_speed_ladder_extent", 124 };
-	xf::Setting<int64_t>			speed_ladder_minimum								{ this, "setting_speed_ladder_minimum", 20 };
-	xf::Setting<int64_t>			speed_ladder_maximum								{ this, "setting_speed_ladder_maximum", 350 };
-	xf::Setting<int64_t>			altitude_ladder_line_every							{ this, "setting_altitude_ladder_line_every", 100 };
-	xf::Setting<int64_t>			altitude_ladder_number_every						{ this, "setting_altitude_ladder_number_every", 200 };
-	xf::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, "setting_altitude_ladder_emphasis_every", 1000 };
-	xf::Setting<int64_t>			altitude_ladder_bold_every							{ this, "setting_altitude_ladder_bold_every", 500 };
-	xf::Setting<int64_t>			altitude_ladder_extent								{ this, "setting_altitude_ladder_extent", 825 };
-	xf::Setting<si::Length>			altitude_landing_warning_hi							{ this, "setting_altitude_landing_warning_hi", 1000_ft };
-	xf::Setting<si::Length>			altitude_landing_warning_lo							{ this, "setting_altitude_landing_warning_lo", 500_ft };
-	xf::Setting<si::Length>			raising_runway_visibility							{ this, "setting_raising_runway_visibility", 1000_ft };
-	xf::Setting<si::Length>			raising_runway_threshold							{ this, "setting_raising_runway_threshold", 250_ft };
-	xf::Setting<si::Angle>			aoa_visibility_threshold							{ this, "setting_aoa_visibility_threshold", 17.5_deg };
-	xf::Setting<double>				show_mach_above										{ this, "setting_show_mach_above", 0.4 };
-	xf::Setting<si::Power>			power_eq_1000_fpm									{ this, "setting_power_eq_1000_fpm", 1000_W };
-	xf::Setting<bool>				show_minimum_speeds_only_if_no_weight_on_wheels		{ this, "setting_show_minimum_speeds_only_if_no_weight_on_wheels", true };
+	xf::Setting<int64_t>			speed_ladder_line_every								{ this, "speed_ladder_line_every", 10 };
+	xf::Setting<int64_t>			speed_ladder_number_every							{ this, "speed_ladder_number_every", 20 };
+	xf::Setting<int64_t>			speed_ladder_extent									{ this, "speed_ladder_extent", 124 };
+	xf::Setting<int64_t>			speed_ladder_minimum								{ this, "speed_ladder_minimum", 20 };
+	xf::Setting<int64_t>			speed_ladder_maximum								{ this, "speed_ladder_maximum", 350 };
+	xf::Setting<int64_t>			altitude_ladder_line_every							{ this, "altitude_ladder_line_every", 100 };
+	xf::Setting<int64_t>			altitude_ladder_number_every						{ this, "altitude_ladder_number_every", 200 };
+	xf::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, "altitude_ladder_emphasis_every", 1000 };
+	xf::Setting<int64_t>			altitude_ladder_bold_every							{ this, "altitude_ladder_bold_every", 500 };
+	xf::Setting<int64_t>			altitude_ladder_extent								{ this, "altitude_ladder_extent", 825 };
+	xf::Setting<si::Length>			altitude_landing_warning_hi							{ this, "altitude_landing_warning_hi", 1000_ft };
+	xf::Setting<si::Length>			altitude_landing_warning_lo							{ this, "altitude_landing_warning_lo", 500_ft };
+	xf::Setting<si::Length>			raising_runway_visibility							{ this, "raising_runway_visibility", 1000_ft };
+	xf::Setting<si::Length>			raising_runway_threshold							{ this, "raising_runway_threshold", 250_ft };
+	xf::Setting<si::Angle>			aoa_visibility_threshold							{ this, "aoa_visibility_threshold", 17.5_deg };
+	xf::Setting<double>				show_mach_above										{ this, "show_mach_above", 0.4 };
+	xf::Setting<si::Power>			power_eq_1000_fpm									{ this, "power_eq_1000_fpm", 1000_W };
+	xf::Setting<bool>				show_minimum_speeds_only_if_no_weight_on_wheels		{ this, "show_minimum_speeds_only_if_no_weight_on_wheels", true };
 
 	/*
 	 * Input
