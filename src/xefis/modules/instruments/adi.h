@@ -416,13 +416,13 @@ class Blinker
 class AdiPaintRequest
 {
   public:
-	static inline QColor const	kLadderColor		{ 64, 51, 108, 0x80 };
-	static inline QColor const	kLadderBorderColor	{ kLadderColor.darker (120) };
-
-  public:
 	// Ctor
 	explicit
 	AdiPaintRequest (xf::PaintRequest&, xf::InstrumentSupport const&, Parameters const&, Precomputed const&, Blinker const&, Blinker const&);
+
+  public:
+	static inline QColor const				kLadderColor		{ 64, 51, 108, 0x80 };
+	static inline QColor const				kLadderBorderColor	{ kLadderColor.darker (120) };
 
   public:
 	xf::PaintRequest&						paint_request;
@@ -497,10 +497,6 @@ class AdiPaintRequest
 class ArtificialHorizon
 {
   public:
-	// Ctor
-	explicit
-	ArtificialHorizon();
-
 	void
 	paint (AdiPaintRequest&) const;
 
@@ -551,20 +547,31 @@ class ArtificialHorizon
 	get_shadow (AdiPaintRequest&, int degrees) const;
 
   private:
-	QColor const	_sky_color			{ QColor::fromHsv (213, 230, 255) };
-	QColor			_sky_shadow;
-	QColor const	_ground_color		{ QColor::fromHsv (34, 255, 125) };
-	QColor			_ground_shadow;
-	QTransform		_pitch_transform;
-	QTransform		_roll_transform;
-	QTransform		_heading_transform;
-	QTransform		_horizon_transform;
-	QRectF			_sky_rect;
-	QRectF			_gnd_rect;
-	QPainterPath	_flight_path_marker_shape;
-	QPointF			_flight_path_marker_position;
-	QPainterPath	_old_horizon_clip;
-	QPainterPath	_pitch_scale_clipping_path;
+	static QColor
+	get_darker_alpha (QColor color, int darker, int alpha)
+	{
+		color = color.darker (darker);
+		color.setAlpha (alpha);
+		return color;
+	}
+
+  private:
+	static inline QColor const	kSkyColor		{ QColor::fromHsv (213, 230, 255) };
+	static inline QColor const	kSkyShadow		{ get_darker_alpha (kSkyColor, 400, 127) };
+	static inline QColor const	kGroundColor	{ QColor::fromHsv (34, 255, 125) };
+	static inline QColor const	kGroundShadow	{ get_darker_alpha (kGroundColor, 400, 127) };
+
+  private:
+	QTransform					_pitch_transform;
+	QTransform					_roll_transform;
+	QTransform					_heading_transform;
+	QTransform					_horizon_transform;
+	QRectF						_sky_rect;
+	QRectF						_gnd_rect;
+	QPainterPath				_flight_path_marker_shape;
+	QPointF						_flight_path_marker_position;
+	QPainterPath				_old_horizon_clip;
+	QPainterPath				_pitch_scale_clipping_path;
 };
 
 
