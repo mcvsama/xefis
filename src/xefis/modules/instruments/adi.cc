@@ -341,7 +341,7 @@ ArtificialHorizon::ArtificialHorizon()
 void
 ArtificialHorizon::paint (AdiPaintRequest& pr) const
 {
-	update_cache (pr);
+	precompute (pr);
 
 	if (pr.params.orientation_failure)
 	{
@@ -370,14 +370,14 @@ ArtificialHorizon::paint (AdiPaintRequest& pr) const
 
 
 void
-ArtificialHorizon::update_cache (AdiPaintRequest& pr) const
+ArtificialHorizon::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<ArtificialHorizon*> (this)->update_cache (pr);
+	const_cast<ArtificialHorizon*> (this)->precompute (pr);
 }
 
 
 void
-ArtificialHorizon::update_cache (AdiPaintRequest& pr)
+ArtificialHorizon::precompute (AdiPaintRequest& pr)
 {
 	_pitch_transform.reset();
 	_pitch_transform.translate (0.f, -pr.pitch_to_px (pr.params.orientation_pitch));
@@ -908,7 +908,7 @@ ArtificialHorizon::get_shadow (AdiPaintRequest& pr, int degrees) const
 void
 VelocityLadder::paint (AdiPaintRequest& pr) const
 {
-	update_cache (pr);
+	precompute (pr);
 
 	float const x = _ladder_rect.width() / 4.0f;
 
@@ -938,14 +938,14 @@ VelocityLadder::paint (AdiPaintRequest& pr) const
 
 
 void
-VelocityLadder::update_cache (AdiPaintRequest& pr) const
+VelocityLadder::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<VelocityLadder*> (this)->update_cache (pr);
+	const_cast<VelocityLadder*> (this)->precompute (pr);
 }
 
 
 void
-VelocityLadder::update_cache (AdiPaintRequest& pr)
+VelocityLadder::precompute (AdiPaintRequest& pr)
 {
 	_min_shown = pr.params.speed - 0.5f * pr.params.sl_extent;
 	_max_shown = pr.params.speed + 0.5f * pr.params.sl_extent;
@@ -1425,7 +1425,7 @@ VelocityLadder::kt_to_px (AdiPaintRequest& pr, Velocity const speed) const
 void
 AltitudeLadder::paint (AdiPaintRequest& pr) const
 {
-	update_cache (pr);
+	precompute (pr);
 
 	float const x = _ladder_rect.width() / 4.0f;
 
@@ -1467,14 +1467,14 @@ AltitudeLadder::paint (AdiPaintRequest& pr) const
 
 
 void
-AltitudeLadder::update_cache (AdiPaintRequest& pr) const
+AltitudeLadder::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<AltitudeLadder*> (this)->update_cache (pr);
+	const_cast<AltitudeLadder*> (this)->precompute (pr);
 }
 
 
 void
-AltitudeLadder::update_cache (AdiPaintRequest& pr)
+AltitudeLadder::precompute (AdiPaintRequest& pr)
 {
 	float const sgn = pr.params.altitude_amsl < 0_ft ? -1.f : 1.f;
 	auto const ld = pr.aids.lesser_dimension();
@@ -2252,7 +2252,7 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) c
 {
 	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _minimums_warning_blinker);
 
-	update_cache (pr, params);
+	precompute (pr, params);
 
 	if (_parameters.input_alert_visible)
 		paint_input_alert (pr);
@@ -2282,14 +2282,14 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) c
 
 
 void
-PaintingWork::update_cache (AdiPaintRequest& pr, Parameters const& params) const
+PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params) const
 {
-	const_cast<PaintingWork*> (this)->update_cache (pr, params);
+	const_cast<PaintingWork*> (this)->precompute (pr, params);
 }
 
 
 void
-PaintingWork::update_cache (AdiPaintRequest& pr, Parameters const& params)
+PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params)
 {
 	_parameters = params;
 	_parameters.sanitize();

@@ -505,10 +505,10 @@ class ArtificialHorizon
 
   private:
 	void
-	update_cache (AdiPaintRequest&) const;
+	precompute (AdiPaintRequest&) const;
 
 	void
-	update_cache (AdiPaintRequest&);
+	precompute (AdiPaintRequest&);
 
 	void
 	clear (AdiPaintRequest&) const;
@@ -575,10 +575,10 @@ class VelocityLadder
 
   private:
 	void
-	update_cache (AdiPaintRequest&) const;
+	precompute (AdiPaintRequest&) const;
 
 	void
-	update_cache (AdiPaintRequest&);
+	precompute (AdiPaintRequest&);
 
 	void
 	paint_black_box (AdiPaintRequest&, float x) const;
@@ -638,10 +638,10 @@ class AltitudeLadder
 
   private:
 	void
-	update_cache (AdiPaintRequest&) const;
+	precompute (AdiPaintRequest&) const;
 
 	void
-	update_cache (AdiPaintRequest&);
+	precompute (AdiPaintRequest&);
 
 	void
 	paint_black_box (AdiPaintRequest&, float x) const;
@@ -714,10 +714,10 @@ class PaintingWork
 
   private:
 	void
-	update_cache (AdiPaintRequest&, Parameters const&) const;
+	precompute (AdiPaintRequest&, Parameters const&) const;
 
 	void
-	update_cache (AdiPaintRequest&, Parameters const&);
+	precompute (AdiPaintRequest&, Parameters const&);
 
 	void
 	paint_center_cross (AdiPaintRequest&, bool center_box, bool rest) const;
