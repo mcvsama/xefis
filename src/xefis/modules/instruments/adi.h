@@ -424,6 +424,7 @@ class AdiPaintRequest
 	explicit
 	AdiPaintRequest (xf::PaintRequest&, xf::InstrumentSupport const&, Parameters const&, Precomputed const&, Blinker const&, Blinker const&);
 
+  public:
 	xf::PaintRequest&						paint_request;
 	Parameters const&						params;
 	Precomputed const&						precomputed;
@@ -550,9 +551,9 @@ class ArtificialHorizon
 	get_shadow (AdiPaintRequest&, int degrees) const;
 
   private:
-	QColor			_sky_color			{ QColor::fromHsv (213, 230, 255) };
+	QColor const	_sky_color			{ QColor::fromHsv (213, 230, 255) };
 	QColor			_sky_shadow;
-	QColor			_ground_color		{ QColor::fromHsv (34, 255, 125) };
+	QColor const	_ground_color		{ QColor::fromHsv (34, 255, 125) };
 	QColor			_ground_shadow;
 	QTransform		_pitch_transform;
 	QTransform		_roll_transform;
