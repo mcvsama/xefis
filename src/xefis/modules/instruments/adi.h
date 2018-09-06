@@ -358,6 +358,10 @@ class Parameters
 };
 
 
+/**
+ * Data that gets changed when size changes or some majoro setting change.
+ * Otherwise does not need to be recomputed on each repaint.
+ */
 class Precomputed
 {
   public:
@@ -406,6 +410,9 @@ class Blinker
 };
 
 
+/**
+ * Includes some painting helpers and values that usually change between paints.
+ */
 class AdiPaintRequest
 {
   public:
@@ -473,9 +480,11 @@ class AdiPaintRequest
 	void
 	paint_vertical_failure_flag (QPointF const& center, QFont const&, QString const& message);
 
+	/**
+	 * Return green or yellow color for minimums marker, depending on current altitude and minimums settings.
+	 */
 	QColor
 	get_minimums_color() const;
-
 };
 
 
