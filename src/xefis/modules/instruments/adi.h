@@ -420,16 +420,21 @@ class AdiPaintRequest
 	static inline QColor const	kLadderBorderColor	{ kLadderColor.darker (120) };
 
   public:
-	Parameters const&			params;
-	Precomputed const&			precomputed;
-	xf::PaintRequest&			paint_request;
-	xf::InstrumentPainter&		painter;
-	xf::InstrumentAids&			aids;
-	xf::Shadow const			default_shadow;
-	xf::Shadow const			black_shadow;
-	Blinker const&				speed_warning_blinker;
-	Blinker const&				minimums_warning_blinker;
-	float const					q;
+	// Ctor
+	explicit
+	AdiPaintRequest (xf::PaintRequest&, xf::InstrumentSupport const&, Parameters const&, Precomputed const&, Blinker const&, Blinker const&);
+
+	xf::PaintRequest&						paint_request;
+	Parameters const&						params;
+	Precomputed const&						precomputed;
+	xf::InstrumentPainter					painter;
+	std::shared_ptr<xf::InstrumentAids>		aids_ptr;
+	xf::InstrumentAids&						aids;
+	Blinker const&							speed_warning_blinker;
+	Blinker const&							minimums_warning_blinker;
+	float const								q;
+	xf::Shadow								default_shadow; // TODO move to Precomputed TODO is it used?
+	xf::Shadow								black_shadow; // TODO move to Precomputed TODO is it used?
 
   public:
 	float
@@ -701,7 +706,7 @@ class AltitudeLadder
 };
 
 
-class PaintingWork: private xf::InstrumentSupport
+class PaintingWork
 {
   public:
 	void
@@ -747,6 +752,7 @@ class PaintingWork: private xf::InstrumentSupport
   private:
 	Parameters				_parameters;
 	Precomputed				_precomputed;
+	xf::InstrumentSupport	_instrument_support;
 	// Graphical elements:
 	ArtificialHorizon		_artificial_horizon;
 	VelocityLadder			_velocity_ladder;

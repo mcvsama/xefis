@@ -96,6 +96,23 @@ Parameters::sanitize()
 }
 
 
+AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& minimums_warning_blinker):
+	paint_request (paint_request),
+	params (params),
+	precomputed (precomputed),
+	painter (instrument_support.get_painter (paint_request)),
+	aids_ptr (instrument_support.get_aids (paint_request)),
+	aids (*aids_ptr),
+	speed_warning_blinker (speed_warning_blinker),
+	minimums_warning_blinker (minimums_warning_blinker),
+	q (0.1f * aids.lesser_dimension())
+{
+	this->default_shadow.set_width (0.15_mm * paint_request.metric().pixel_density());
+	this->black_shadow = default_shadow;
+	this->black_shadow.set_color (Qt::black);
+}
+
+
 inline float
 AdiPaintRequest::pitch_to_px (si::Angle degrees) const
 {
@@ -2233,17 +2250,7 @@ AltitudeLadder::ft_to_px (AdiPaintRequest& pr, si::Length const length) const
 void
 PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) const
 {
-	auto aids = get_aids (paint_request);
-	auto painter = get_painter (paint_request);
-	auto const q = 0.1f * aids->lesser_dimension();
-
-	xf::Shadow default_shadow;
-	default_shadow.set_width (0.15_mm * paint_request.metric().pixel_density());
-
-	xf::Shadow black_shadow = default_shadow;
-	black_shadow.set_color (Qt::black);
-
-	AdiPaintRequest pr { _parameters, _precomputed, paint_request, painter, *aids, default_shadow, black_shadow, _speed_warning_blinker, _minimums_warning_blinker, q };
+	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _minimums_warning_blinker);
 
 	update_cache (pr, params);
 
