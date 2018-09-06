@@ -328,16 +328,6 @@ Blinker::update_current_time (si::Time now)
 }
 
 
-ArtificialHorizon::ArtificialHorizon()
-{
-	_sky_shadow = _sky_color.darker (400);
-	_sky_shadow.setAlpha (127);
-
-	_ground_shadow = _ground_color.darker (400);
-	_ground_shadow.setAlpha (127);
-}
-
-
 void
 ArtificialHorizon::paint (AdiPaintRequest& pr) const
 {
@@ -472,8 +462,8 @@ ArtificialHorizon::paint_horizon (AdiPaintRequest& pr) const
 		}
 
 		pr.painter.setTransform (_horizon_transform);
-		pr.painter.fillRect (_sky_rect, _sky_color);
-		pr.painter.fillRect (_gnd_rect, _ground_color);
+		pr.painter.fillRect (_sky_rect, kSkyColor);
+		pr.painter.fillRect (_gnd_rect, kGroundColor);
 	}
 	else
 		clear (pr);
@@ -900,7 +890,7 @@ xf::Shadow
 ArtificialHorizon::get_shadow (AdiPaintRequest& pr, int degrees) const
 {
 	xf::Shadow shadow = pr.default_shadow;
-	shadow.set_color (degrees > 0 ? _sky_shadow : _ground_shadow);
+	shadow.set_color (degrees > 0 ? kSkyShadow : kGroundShadow);
 	return shadow;
 }
 
