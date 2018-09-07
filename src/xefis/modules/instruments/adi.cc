@@ -97,6 +97,61 @@ Parameters::sanitize()
 }
 
 
+Blinker::Blinker (si::Time period):
+	_period (period)
+{ }
+
+
+inline bool
+Blinker::active() const noexcept
+{
+	return _active;
+}
+
+
+inline bool
+Blinker::visibility_state() const noexcept
+{
+	return _visibility_state;
+}
+
+
+void
+Blinker::update (bool condition)
+{
+	if (condition)
+	{
+		if (!_active)
+		{
+			_active = true;
+			_visibility_state = true;
+		}
+	}
+	else
+	{
+		if (_active)
+		{
+			_active = false;
+			_start_timestamp.reset();
+		}
+	}
+}
+
+
+void
+Blinker::update_current_time (si::Time now)
+{
+	if (_active && !_start_timestamp)
+		_start_timestamp = now;
+
+	if (_start_timestamp)
+	{
+		uint64_t i = (now - *_start_timestamp) / _period;
+		_visibility_state = (i % 2) == 1;
+	}
+}
+
+
 AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& minimums_warning_blinker):
 	paint_request (paint_request),
 	params (params),
@@ -271,61 +326,6 @@ AdiPaintRequest::get_minimums_color() const
 	return params.altitude_amsl < params.minimums_amsl
 		? aids.kCautionColor
 		: aids.kNavigationColor;
-}
-
-
-Blinker::Blinker (si::Time period):
-	_period (period)
-{ }
-
-
-inline bool
-Blinker::active() const noexcept
-{
-	return _active;
-}
-
-
-inline bool
-Blinker::visibility_state() const noexcept
-{
-	return _visibility_state;
-}
-
-
-void
-Blinker::update (bool condition)
-{
-	if (condition)
-	{
-		if (!_active)
-		{
-			_active = true;
-			_visibility_state = true;
-		}
-	}
-	else
-	{
-		if (_active)
-		{
-			_active = false;
-			_start_timestamp.reset();
-		}
-	}
-}
-
-
-void
-Blinker::update_current_time (si::Time now)
-{
-	if (_active && !_start_timestamp)
-		_start_timestamp = now;
-
-	if (_start_timestamp)
-	{
-		uint64_t i = (now - *_start_timestamp) / _period;
-		_visibility_state = (i % 2) == 1;
-	}
 }
 
 
