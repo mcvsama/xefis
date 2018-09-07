@@ -108,7 +108,7 @@ template<class Value>
 		private BasicRadialGauge
 	{
 	  public:
-		using Converter = std::function<float128_t (xf::Property<Value> const&)>;
+		using Converter = std::function<float128_t (Value const&)>;
 
 	  public:
 		// Ctor
@@ -164,12 +164,12 @@ template<class Value>
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
 
 		auto values = _values.lock();
-		values->get_from (io, range, _converter ? _converter (io.value) : io.value.to_floating_point());
+		values->get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
 		values->dial_scale = *io.dial_scale;
 
 		if (io.reference)
 		{
-			auto v = _converter ? _converter (io.reference) : io.reference.to_floating_point();
+			auto v = (_converter && io.reference) ? _converter (*io.reference) : io.reference.to_floating_point();
 			values->reference_str = BasicGauge::stringify (v, *io.format, io.precision);
 			values->normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
 		}
