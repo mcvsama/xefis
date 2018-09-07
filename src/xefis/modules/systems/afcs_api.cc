@@ -36,7 +36,7 @@ parse (std::string_view const& str, ThrustMode& thrust_mode)
 		thrust_mode = ThrustMode::KIAS;
 	else if (str == kThrustMode_Mach)
 		thrust_mode = ThrustMode::Mach;
-	else
+	else if (str == "")
 		thrust_mode = ThrustMode::None;
 }
 
@@ -54,7 +54,7 @@ parse (std::string_view const& str, RollMode& roll_mode)
 		roll_mode = RollMode::Localizer;
 	else if (str == kRollMode_LNAV)
 		roll_mode = RollMode::LNAV;
-	else
+	else if (str == "")
 		roll_mode = RollMode::None;
 }
 
@@ -80,7 +80,7 @@ parse (std::string_view const& str, PitchMode& pitch_mode)
 		pitch_mode = PitchMode::GS;
 	else if (str == kPitchMode_Flare)
 		pitch_mode = PitchMode::Flare;
-	else
+	else if (str == "")
 		pitch_mode = PitchMode::None;
 }
 
@@ -92,7 +92,7 @@ parse (std::string_view const& str, SpeedMode& speed_mode)
 		speed_mode = SpeedMode::Thrust;
 	else if (str == kSpeedMode_Airspeed)
 		speed_mode = SpeedMode::Airspeed;
-	else
+	else if (str == "")
 		speed_mode = SpeedMode::None;
 }
 
