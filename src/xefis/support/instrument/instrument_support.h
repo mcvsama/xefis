@@ -62,11 +62,8 @@ inline std::shared_ptr<InstrumentAids>
 InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 {
 	if (!_cached_aids || !_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
-	{
 		update_cache (paint_request);
-		_cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
 		// TODO ↑ screen ref may change between get_aids() calls
-	}
 
 	return _cached_aids;
 }
@@ -76,10 +73,7 @@ inline InstrumentPainter
 InstrumentSupport::get_painter (PaintRequest& paint_request) const
 {
 	if (!_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
-	{
 		update_cache (paint_request);
-		_text_painter_cache = TextPainter::Cache();
-	}
 
 	return InstrumentPainter (paint_request.canvas(), _text_painter_cache);
 }
@@ -88,6 +82,8 @@ InstrumentSupport::get_painter (PaintRequest& paint_request) const
 inline void
 InstrumentSupport::update_cache (PaintRequest const& paint_request) const
 {
+	_cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
+	_text_painter_cache = TextPainter::Cache();
 	_cached_canvas_metric = paint_request.metric();
 }
 
