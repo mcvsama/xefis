@@ -362,7 +362,7 @@ ArtificialHorizon::paint (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<ArtificialHorizon*> (this)->precompute (pr);
+	(*_mutable_this.lock())->precompute (pr);
 }
 
 
@@ -930,7 +930,7 @@ VelocityLadder::paint (AdiPaintRequest& pr) const
 void
 VelocityLadder::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<VelocityLadder*> (this)->precompute (pr);
+	(*_mutable_this.lock())->precompute (pr);
 }
 
 
@@ -1459,7 +1459,7 @@ AltitudeLadder::paint (AdiPaintRequest& pr) const
 void
 AltitudeLadder::precompute (AdiPaintRequest& pr) const
 {
-	const_cast<AltitudeLadder*> (this)->precompute (pr);
+	(*_mutable_this.lock())->precompute (pr);
 }
 
 
@@ -2274,7 +2274,7 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) c
 void
 PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params) const
 {
-	const_cast<PaintingWork*> (this)->precompute (pr, params);
+	(*_mutable_this.lock())->precompute (pr, params);
 }
 
 

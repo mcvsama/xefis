@@ -67,13 +67,21 @@ BasicRadialGauge::paint_text (GaugeValues& values, xf::PaintRequest const& paint
 	float const zero_width = metrics.width ('0');
 	float const small_zero_width = small_metrics.width ('0');
 
-	if (paint_request.size_changed() || !_box_text_width)
+	float box_text_width_f = 0.0f;
+
 	{
-		QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
-		const_cast<BasicRadialGauge*> (this)->_box_text_width = metrics.width (sample_text);
+		auto box_text_width = _box_text_width.lock();
+
+		if (paint_request.size_changed() || !*box_text_width)
+		{
+			QString const sample_text = QString::fromStdString ((boost::format (values.format) % 0.0).str());
+			*box_text_width = metrics.width (sample_text);
+		}
+
+		box_text_width_f = **box_text_width;
 	}
 
-	QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, *_box_text_width, 0.9f * metrics.height());
+	QRectF text_rect (0.5f * text_pen.width(), -0.6f * q, box_text_width_f, 0.9f * metrics.height());
 	text_rect.translate (margin, -text_rect.height());
 	QRectF rect = text_rect.adjusted (-margin, 0, margin, 0);
 

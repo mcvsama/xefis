@@ -98,7 +98,7 @@ class BasicRadialGauge:
 	paint_indicator (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
 
   private:
-	std::optional<float> _box_text_width;
+	xf::Synchronized<std::optional<float>> mutable _box_text_width;
 };
 
 
