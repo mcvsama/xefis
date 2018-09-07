@@ -29,7 +29,7 @@ TextLayout::Fragment::paint (QPointF top_left, TextPainter& painter, std::option
 	painter.fast_draw_text (top_left - lh_corr, Qt::AlignTop | Qt::AlignLeft, _text, shadow);
 	painter.setPen (_box_pen);
 	painter.setBrush (Qt::NoBrush);
-	double m = 0.15 * _height;
+	float const m = 0.15 * _height;
 	painter.drawRect (QRectF (top_left - QPointF (m, 0.0), QSizeF (_width + 2.0 * m, _height)));
 }
 
