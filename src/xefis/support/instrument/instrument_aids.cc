@@ -60,7 +60,7 @@ InstrumentAids::InstrumentAids (PaintRequest::Metric const& canvas_metric):
 	font_3 (resized (Services::instrument_font(), 1.6f * _canvas_metric.font_height())),
 	font_4 (resized (Services::instrument_font(), 1.8f * _canvas_metric.font_height())),
 	font_5 (resized (Services::instrument_font(), 2.0f * _canvas_metric.font_height())),
-	autopilot_pen_1 (get_pen (kAutopilotColor.darker (300), 1.8f)),
+	autopilot_pen_1 (get_pen (kAutopilotDarkColor, 1.8f)),
 	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }
 
