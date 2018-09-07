@@ -562,16 +562,19 @@ class ArtificialHorizon
 	static inline QColor const	kGroundShadow	{ get_darker_alpha (kGroundColor, 400, 127) };
 
   private:
-	QTransform					_pitch_transform;
-	QTransform					_roll_transform;
-	QTransform					_heading_transform;
-	QTransform					_horizon_transform;
-	QRectF						_sky_rect;
-	QRectF						_gnd_rect;
-	QPainterPath				_flight_path_marker_shape;
-	QPointF						_flight_path_marker_position;
-	QPainterPath				_old_horizon_clip;
-	QPainterPath				_pitch_scale_clipping_path;
+	xf::Synchronized<ArtificialHorizon*> mutable
+					_mutable_this { this };
+
+	QTransform		_pitch_transform;
+	QTransform		_roll_transform;
+	QTransform		_heading_transform;
+	QTransform		_horizon_transform;
+	QRectF			_sky_rect;
+	QRectF			_gnd_rect;
+	QPainterPath	_flight_path_marker_shape;
+	QPointF			_flight_path_marker_position;
+	QPainterPath	_old_horizon_clip;
+	QPainterPath	_pitch_scale_clipping_path;
 };
 
 
@@ -622,6 +625,9 @@ class VelocityLadder
 	kt_to_px (AdiPaintRequest&, Velocity) const;
 
   private:
+	xf::Synchronized<VelocityLadder*> mutable
+				_mutable_this { this };
+
 	QTransform	_transform;
 	Velocity	_min_shown;
 	Velocity	_max_shown;
@@ -694,6 +700,9 @@ class AltitudeLadder
 	ft_to_px (AdiPaintRequest&, si::Length) const;
 
   private:
+	xf::Synchronized<AltitudeLadder*> mutable
+				_mutable_this { this };
+
 	QTransform	_transform;
 	Length		_min_shown;
 	Length		_max_shown;
@@ -758,10 +767,13 @@ class PaintingWork
 	paint_radar_altimeter_failure (AdiPaintRequest&) const;
 
   private:
+	xf::Synchronized<PaintingWork*>	mutable
+							_mutable_this				{ this };
+
 	Parameters				_parameters;
 	Precomputed				_precomputed;
 	xf::InstrumentSupport	_instrument_support;
-	// Graphical elements:
+
 	ArtificialHorizon		_artificial_horizon;
 	VelocityLadder			_velocity_ladder;
 	AltitudeLadder			_altitude_ladder;
