@@ -17,6 +17,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/services.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qutils.h>
@@ -26,13 +27,14 @@
 #include "test_screen.h"
 
 
-TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::Logger const& logger):
+TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
 	ProcessingLoop (machine, "Test Instruments", 100_Hz, logger),
+	_navaid_storage (navaid_storage),
 	_logger (logger)
 {
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, 0.235_mm, 2.1_mm };
 	spec.set_scale (1.5f);
-	_test_screen.emplace (spec);
+	_test_screen.emplace (spec, _navaid_storage);
 	_test_screen->set_paint_bounding_boxes (false);
 
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();

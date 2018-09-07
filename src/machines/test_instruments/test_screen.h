@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/screen.h>
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/flaps.h>
 #include <xefis/modules/instruments/gear.h>
@@ -28,7 +29,7 @@
 #include <xefis/modules/instruments/linear_gauge.h>
 #include <xefis/modules/instruments/vertical_trim.h>
 #include <xefis/modules/instruments/radial_gauge.h>
-#include <xefis/core/screen.h>
+#include <xefis/support/navigation/navaid_storage.h>
 
 
 class TestScreen: public xf::Screen
@@ -36,7 +37,7 @@ class TestScreen: public xf::Screen
   public:
 	// Ctor
 	explicit
-	TestScreen (xf::ScreenSpec const&);
+	TestScreen (xf::ScreenSpec const&, xf::NavaidStorage const&);
 
 	void
 	create_instruments();
@@ -70,6 +71,8 @@ class TestScreen: public xf::Screen
 	std::unique_ptr<HorizontalTrimIO>								horizontal_trim_io			{ std::make_unique<HorizontalTrimIO>() };
 
   private:
+	xf::NavaidStorage const&										_navaid_storage;
+	// Instruments:
 	std::optional<xf::Registrant<ADI>>								_adi;
 	std::optional<xf::Registrant<RadialGauge<si::Force>>>			_engine_l_thrust;
 	std::optional<xf::Registrant<RadialGauge<si::AngularVelocity>>>	_engine_l_speed;

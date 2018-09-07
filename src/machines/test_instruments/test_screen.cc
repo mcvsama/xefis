@@ -21,10 +21,10 @@
 #include "test_screen.h"
 
 
-TestScreen::TestScreen (xf::ScreenSpec const& spec):
-	Screen (spec)
+TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& navaid_storage):
+	Screen (spec),
+	_navaid_storage (navaid_storage)
 {
-	// Settings:
 	adi_io->speed_ladder_line_every								= 10;
 	adi_io->speed_ladder_number_every							= 20;
 	adi_io->speed_ladder_extent									= 124;
@@ -72,19 +72,11 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 
 	engine_l_temperature_io->format								= boost::format ("%5.1f");
 	engine_l_temperature_io->font_scale							= 0.75;
-	engine_l_temperature_io->value_minimum						= -20_degC;
+	engine_l_temperature_io->value_minimum						= 25_degC;
 	engine_l_temperature_io->value_maximum_warning				= 60_degC;
 	engine_l_temperature_io->value_maximum_critical				= 65_degC;
 	engine_l_temperature_io->value_maximum						= 65_degC;
 	engine_l_temperature_io->mirrored_style						= false;
-
-	engine_l_vibration_io->format								= boost::format ("%3.1f");
-	engine_l_vibration_io->font_scale							= 0.75;
-	engine_l_vibration_io->value_minimum						= 0_g;
-	engine_l_vibration_io->value_maximum_warning				= 1_g;
-	engine_l_vibration_io->value_maximum						= 1.25_g;
-	engine_l_vibration_io->mirrored_style						= false;
-	engine_l_vibration_io->note									= "N₂";
 
 	engine_l_voltage_io->format									= boost::format ("%4.1f");
 	engine_l_voltage_io->font_scale								= 0.75;
@@ -93,6 +85,14 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 	engine_l_voltage_io->value_minimum_warning					= 13.2_V;
 	engine_l_voltage_io->value_maximum							= 16.8_V;
 	engine_l_voltage_io->mirrored_style							= false;
+
+	engine_l_vibration_io->format								= boost::format ("%3.1f");
+	engine_l_vibration_io->font_scale							= 0.75;
+	engine_l_vibration_io->value_minimum						= 0_g;
+	engine_l_vibration_io->value_maximum_warning				= 1_g;
+	engine_l_vibration_io->value_maximum						= 1.25_g;
+	engine_l_vibration_io->mirrored_style						= false;
+	engine_l_vibration_io->note									= "N₂";
 
 	engine_r_thrust_io->dial_scale								= 0.9;
 	engine_r_thrust_io->format									= boost::format ("%5.2f");
@@ -123,19 +123,11 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 
 	engine_r_temperature_io->format								= boost::format ("%5.1f");
 	engine_r_temperature_io->font_scale							= 0.75;
-	engine_r_temperature_io->value_minimum						= -20_degC;
+	engine_r_temperature_io->value_minimum						= 25_degC;
 	engine_r_temperature_io->value_maximum_warning				= 60_degC;
 	engine_r_temperature_io->value_maximum_critical				= 65_degC;
 	engine_r_temperature_io->value_maximum						= 65_degC;
 	engine_r_temperature_io->mirrored_style						= true;
-
-	engine_r_vibration_io->format								= boost::format ("%3.1f");
-	engine_r_vibration_io->font_scale							= 0.75;
-	engine_r_vibration_io->value_minimum						= 0_g;
-	engine_r_vibration_io->value_maximum_warning				= 1_g;
-	engine_r_vibration_io->value_maximum						= 1.25_g;
-	engine_r_vibration_io->mirrored_style						= true;
-	engine_r_vibration_io->note									= "N₂";
 
 	engine_r_voltage_io->format									= boost::format ("%4.1f");
 	engine_r_voltage_io->font_scale								= 0.75;
@@ -145,33 +137,41 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec):
 	engine_r_voltage_io->value_maximum							= 16.8_V;
 	engine_r_voltage_io->mirrored_style							= true;
 
+	engine_r_vibration_io->format								= boost::format ("%3.1f");
+	engine_r_vibration_io->font_scale							= 0.75;
+	engine_r_vibration_io->value_minimum						= 0_g;
+	engine_r_vibration_io->value_maximum_warning				= 1_g;
+	engine_r_vibration_io->value_maximum						= 1.25_g;
+	engine_r_vibration_io->mirrored_style						= true;
+	engine_r_vibration_io->note									= "N₂";
+
 	label_thr_io->label											= "TRST";
 	label_thr_io->color											= xf::InstrumentAids::kCyan;
-	label_thr_io->font_scale									= 1.1;
+	label_thr_io->font_scale									= 1.3;
 
 	label_n1_io->label											= "N₁";
 	label_n1_io->color											= xf::InstrumentAids::kCyan;
-	label_n1_io->font_scale										= 1.1;
+	label_n1_io->font_scale										= 1.3;
 
 	label_temp_io->label										= "TEMP";
 	label_temp_io->color										= xf::InstrumentAids::kCyan;
-	label_temp_io->font_scale									= 1.1;
+	label_temp_io->font_scale									= 1.3;
 
 	label_pwr_io->label											= "PWR";
 	label_pwr_io->color											= xf::InstrumentAids::kCyan;
-	label_pwr_io->font_scale									= 1.1;
+	label_pwr_io->font_scale									= 1.3;
 
 	label_amps_io->label										= "AMPS";
 	label_amps_io->color										= xf::InstrumentAids::kCyan;
-	label_amps_io->font_scale									= 1.1;
+	label_amps_io->font_scale									= 1.3;
 
 	label_volts_io->label										= "VOLTS";
 	label_volts_io->color										= xf::InstrumentAids::kCyan;
-	label_volts_io->font_scale									= 1.1;
+	label_volts_io->font_scale									= 1.3;
 
 	label_vib_io->label											= "VIB";
 	label_vib_io->color											= xf::InstrumentAids::kCyan;
-	label_vib_io->font_scale									= 1.1;
+	label_vib_io->font_scale									= 1.3;
 
 	flaps_io->maximum_angle										= 30_deg;
 	flaps_io->hide_retracted									= false;
@@ -187,23 +187,23 @@ TestScreen::create_instruments()
 	register_instrument (*_adi);
 	set (**_adi, { 0.0f, 0.0f, 0.5f, 0.63f });
 
-	auto to_n1 = [](xf::Property<si::AngularVelocity> const& velocity) -> float128_t
-	{
-		if (velocity)
-			return 100.0 * *velocity / 11'500_rpm;
-		else
-			return 0.0L;
-	};
-
-	auto to_degrees = [](xf::Property<si::Temperature> const& temperature) -> float128_t
-	{
-		if (temperature)
-			return temperature->template in<si::Celsius>();
-		else
-			return 0.0L;
-	};
 
 	{
+		auto to_n1 = [](si::AngularVelocity velocity) -> float128_t
+		{
+			return 100.0 * velocity / 11'500_rpm;
+		};
+
+		auto to_degrees = [](si::Temperature temperature) -> float128_t
+		{
+			return temperature.template in<si::Celsius>();
+		};
+
+		auto to_g = [](si::Acceleration acceleration) -> float128_t
+		{
+			return acceleration.template in<si::Gravity>();
+		};
+
 		constexpr float ri_scale = 0.9f;
 		constexpr float li_scale = 1.0f;
 
@@ -223,7 +223,7 @@ TestScreen::create_instruments()
 
 		constexpr QSizeF ri_size = ri_scale * QSizeF { 0.13f, 0.17f };
 		constexpr QSizeF li_size = li_scale * QSizeF { 0.09f, 0.088f };
-		constexpr QSizeF label_size (0.1f, 0.1f);
+		constexpr QSizeF label_size (0.05f, 0.05f);
 
 		// Left engine
 
@@ -251,7 +251,7 @@ TestScreen::create_instruments()
 		register_instrument (*_engine_l_voltage);
 		set_centered (**_engine_l_voltage, { l_start_pos + l_go_voltage + l_go_left, li_size });
 
-		_engine_l_vibration.emplace (std::move (engine_l_vibration_io), nullptr, "engine.l.vibration");
+		_engine_l_vibration.emplace (std::move (engine_l_vibration_io), to_g, "engine.l.vibration");
 		register_instrument (*_engine_l_vibration);
 		set_centered (**_engine_l_vibration, { l_start_pos + l_go_vibration + l_go_left, li_size });
 
@@ -281,7 +281,7 @@ TestScreen::create_instruments()
 		register_instrument (*_engine_r_voltage);
 		set_centered (**_engine_r_voltage, { l_start_pos + l_go_voltage + l_go_right, li_size });
 
-		_engine_r_vibration.emplace (std::move (engine_r_vibration_io), nullptr, "engine.r.vibration");
+		_engine_r_vibration.emplace (std::move (engine_r_vibration_io), to_g, "engine.r.vibration");
 		register_instrument (*_engine_r_vibration);
 		set_centered (**_engine_r_vibration, { l_start_pos + l_go_vibration + l_go_right, li_size });
 
