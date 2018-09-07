@@ -127,7 +127,9 @@ template<class pValue, class pMutex = std::mutex>
 	  public:
 		// Ctor
 		template<class ...Arg>
-			Synchronized (Arg ...args);
+			Synchronized (Arg ...args) noexcept (noexcept (Value (std::forward<Arg> (args)...))):
+				_value (std::forward<Arg> (args)...)
+			{ }
 
 		/**
 		 * Return unique access token.
@@ -206,14 +208,6 @@ template<class V, class M>
 		_value = nullptr;
 		_lock.unlock();
 	}
-
-
-template<class V, class M>
-	template<class ...Arg>
-		inline
-		Synchronized<V, M>::Synchronized (Arg ...args):
-			_value (std::forward<Arg> (args)...)
-		{ }
 
 
 template<class V, class M>
