@@ -106,7 +106,7 @@ template<class Value>
 		private BasicLinearGauge
 	{
 	  public:
-		using Converter = std::function<float128_t (xf::Property<Value> const&)>;
+		using Converter = std::function<float128_t (Value const&)>;
 
 	  public:
 		// Ctor
@@ -159,7 +159,7 @@ template<class Value>
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
 
 		auto values = _values.lock();
-		values->get_from (io, range, _converter ? _converter (io.value) : io.value.to_floating_point());
+		values->get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
 		values->mirrored_style = *io.mirrored_style;
 		values->line_hidden = *io.line_hidden;
 		values->font_scale = *io.font_scale;
