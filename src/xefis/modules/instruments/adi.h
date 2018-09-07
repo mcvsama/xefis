@@ -727,7 +727,7 @@ class PaintingWork
 {
   public:
 	void
-	paint (xf::PaintRequest&, Parameters parameters) const;
+	paint (xf::PaintRequest&, Parameters const& parameters) const;
 
   private:
 	void

@@ -19,6 +19,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/instrument/text_layout.h>
 #include <xefis/utility/numeric.h>
+#include <xefis/utility/utility.h>
 
 // Local:
 #include "adi.h"
@@ -2238,7 +2239,7 @@ AltitudeLadder::ft_to_px (AdiPaintRequest& pr, si::Length const length) const
 
 
 void
-PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const params) const
+PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) const
 {
 	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _minimums_warning_blinker);
 
@@ -3220,7 +3221,7 @@ ADI::process (xf::Cycle const& cycle)
 void
 ADI::paint (xf::PaintRequest& paint_request) const
 {
-	_painting_work.paint (paint_request, *_parameters.lock());
+	_painting_work.paint (paint_request, xf::clone (*_parameters.lock()));
 }
 
 
