@@ -18,21 +18,113 @@
 #include <cstddef>
 #include <array>
 
-// Qt:
-#include <QtWidgets/QWidget>
-#include <QtXml/QDomElement>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/xefis.h>
+#include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/navigation/navaid_storage.h>
-#include <xefis/support/system/work_performer.h>
+#include <xefis/utility/event_timestamper.h>
+#include <xefis/utility/synchronized.h>
+#include <xefis/utility/temporal.h>
 
-// Local:
-#include "hsi_widget.h"
+
+namespace hsi {
+
+enum class DisplayMode
+{
+	/**
+	 * Map is expanded on the front of the aircraft.
+	 */
+	Expanded,
+
+	/**
+	 * Aircraft is shown in the center of the widget. Map covers all directions
+	 * of the aircraft. This is useful mode to use with VOR/ILS navigation.
+	 */
+	Rose,
+
+	/**
+	 * Similar to the Expanded mode, but less information is displayed.
+	 * This is useful mode to be displayed under the EFIS widget.
+	 */
+	Auxiliary
+};
+
+
+enum class HeadingMode
+{
+	/**
+	 * Display magnetic heading on scale.
+	 */
+	Magnetic,
+
+	/**
+	 * Display true heading on scale.
+	 */
+	True
+};
+
+
+static constexpr std::string_view	kDisplayMode_Expanded	= "expanded";
+static constexpr std::string_view	kDisplayMode_Rose		= "rose";
+static constexpr std::string_view	kDisplayMode_Auxiliary	= "auxiliary";
+
+static constexpr std::string_view	kHeadingMode_Magnetic	= "MAG";
+static constexpr std::string_view	kHeadingMode_True		= "TRU";
+
+
+constexpr std::string_view
+to_string (DisplayMode mode)
+{
+	switch (mode)
+	{
+		case DisplayMode::Expanded:		return kDisplayMode_Expanded;
+		case DisplayMode::Rose:			return kDisplayMode_Rose;
+		case DisplayMode::Auxiliary:	return kDisplayMode_Auxiliary;
+	}
+
+	return "";
+}
+
+
+constexpr std::string_view
+to_string (HeadingMode mode)
+{
+	switch (mode)
+	{
+		case HeadingMode::Magnetic:		return kHeadingMode_Magnetic;
+		case HeadingMode::True:			return kHeadingMode_True;
+	}
+
+	return "";
+}
+
+
+inline void
+parse (std::string_view const& str, DisplayMode& display_mode)
+{
+	if (str == kDisplayMode_Expanded)
+		display_mode = DisplayMode::Expanded;
+	else if (str == kDisplayMode_Rose)
+		display_mode = DisplayMode::Rose;
+	else if (str == kDisplayMode_Rose)
+		display_mode = DisplayMode::Auxiliary;
+}
+
+
+inline void
+parse (std::string_view const& str, HeadingMode& heading_mode)
+{
+	if (str == kHeadingMode_Magnetic)
+		heading_mode = HeadingMode::Magnetic;
+	else if (str == kHeadingMode_True)
+		heading_mode = HeadingMode::True;
+}
+
+} // namespace hsi
 
 
 class HSI_IO: public xf::ModuleIO
@@ -56,7 +148,7 @@ class HSI_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<int64_t>					display_mode							{ this, "display-mode", 0 }; // TODO use enum
+	xf::PropertyIn<hsi::DisplayMode>		display_mode							{ this, "display-mode", hsi::DisplayMode::Expanded };
 	xf::PropertyIn<si::Length>				range									{ this, "range", 5_nmi };
 	xf::PropertyIn<si::Velocity>			speed_gs								{ this, "speeds/gs" };
 	xf::PropertyIn<si::Velocity>			speed_tas								{ this, "speeds/tas" };
@@ -68,7 +160,7 @@ class HSI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Length>				target_altitude_reach_distance			{ this, "target-altitude-reach-distance" };
 	xf::PropertyIn<si::Angle>				orientation_heading_magnetic			{ this, "orientation/heading-magnetic" };
 	xf::PropertyIn<si::Angle>				orientation_heading_true				{ this, "orientation/heading-true" };
-	xf::PropertyIn<bool>					use_true_heading						{ this, "use-true-heading" };
+	xf::PropertyIn<hsi::HeadingMode>		heading_mode							{ this, "heading-mode" };
 	xf::PropertyIn<si::Angle>				home_true_direction						{ this, "home/true-direction" };
 	xf::PropertyIn<bool>					home_track_visible						{ this, "home/track-visible" };
 	xf::PropertyIn<si::Length>				home_distance_vlos						{ this, "home/distance/vlos" };
@@ -118,20 +210,304 @@ class HSI_IO: public xf::ModuleIO
 };
 
 
-class HSI: public xf::Instrument<HSI_IO>
+namespace hsi_detail {
+
+class Parameters
 {
-	Q_OBJECT
+  public:
+	si::Time								update_time								{ 0_s };
+	hsi::DisplayMode						display_mode							{ hsi::DisplayMode::Expanded };
+	hsi::HeadingMode						heading_mode							{ hsi::HeadingMode::Magnetic };
+	Length									range									{ 1_nmi };
+	std::optional<si::Angle>				heading_magnetic;
+	std::optional<si::Angle>				heading_true;
+	bool									ap_visible								{ false };
+	bool									ap_line_visible							{ false };
+	std::optional<Angle>					ap_heading_magnetic;
+	std::optional<Angle>					ap_track_magnetic;
+	std::optional<bool>						ap_use_trk;
+	bool									track_visible							{ false };
+	std::optional<si::Angle>				track_magnetic;
+	bool									course_visible							{ false };
+	std::optional<Angle>					course_setting_magnetic;
+	std::optional<Angle>					course_deviation;
+	std::optional<bool>						course_to_flag;
+	QString									navaid_selected_reference;
+	QString									navaid_selected_identifier;
+	std::optional<Length>					navaid_selected_distance;
+	std::optional<Time>						navaid_selected_eta;
+	std::optional<Angle>					navaid_selected_course_magnetic;
+	int										navaid_left_type						{ 0 };
+	QString									navaid_left_reference;
+	QString									navaid_left_identifier;
+	std::optional<Length>					navaid_left_distance;
+	std::optional<Angle>					navaid_left_initial_bearing_magnetic;
+	int										navaid_right_type						{ 0 };
+	QString									navaid_right_reference;
+	QString									navaid_right_identifier;
+	std::optional<Length>					navaid_right_distance;
+	std::optional<Angle>					navaid_right_initial_bearing_magnetic;
+	std::optional<Length>					navigation_required_performance;
+	std::optional<Length>					navigation_actual_performance;
+	bool									center_on_track							{ false };
+	bool									home_track_visible						{ false };
+	std::optional<Angle>					true_home_direction;
+	std::optional<si::Length>				dist_to_home_ground;
+	std::optional<si::Length>				dist_to_home_vlos;
+	std::optional<si::Length>				dist_to_home_vert;
+	std::optional<LonLat>					home;
+	std::optional<Speed>					ground_speed;
+	std::optional<Speed>					true_air_speed;
+	std::optional<AngularVelocity>			track_lateral_rotation;
+	std::optional<si::Length>				altitude_reach_distance;
+	std::optional<si::Angle>				wind_from_magnetic_heading;
+	std::optional<si::Velocity>				wind_tas_speed;
+	std::optional<si::LonLat>				position;
+	bool									navaids_visible							{ false };
+	bool									fix_visible								{ false };
+	bool									vor_visible								{ false };
+	bool									dme_visible								{ false };
+	bool									ndb_visible								{ false };
+	bool									loc_visible								{ false };
+	bool									arpt_visible							{ false };
+	QString									highlighted_loc;
+	xf::Temporal<std::optional<QString>>	positioning_hint;
+	std::optional<bool>						tcas_on;
+	std::optional<Length>					tcas_range;
+	Length									arpt_runways_range_threshold;
+	Length									arpt_map_range_threshold;
+	Length									arpt_runway_extension_length;
+	std::array<Time, 3>						trend_vector_durations;
+	std::array<Length, 3>					trend_vector_min_ranges;
+	Length									trend_vector_max_range;
+	bool									round_clip								{ false };
 
   public:
+	/**
+	 * Sanitize all parameters.
+	 */
+	void
+	sanitize();
+};
+
+
+/**
+ * Stuff in this class gets recomputed when widget is resized.
+ */
+struct ResizeCache
+{
+	float			r;
+	float			q;
+	float			margin;
+	QTransform		aircraft_center_transform;
+	QRectF			trend_vector_clip_rect;
+	QRectF			map_clip_rect;
+	QPainterPath	inner_map_clip;
+	QPainterPath	outer_map_clip;
+	QFont			radials_font;
+	QPen			lo_loc_pen;
+	QPen			hi_loc_pen;
+	QPen			ndb_pen;
+	QPen			vor_pen;
+	QPen			dme_pen;
+	QPen			fix_pen;
+	QPen			arpt_pen;
+	QPen			home_pen;
+	QPolygonF		dme_for_vor_shape;
+	QPolygonF		vor_shape;
+	QPolygonF		vortac_shape;
+	QPolygonF		home_shape;
+	QPolygonF		aircraft_shape;
+	QPolygonF		ap_bug_shape;
+	xf::Shadow		black_shadow;
+};
+
+
+/**
+ * Navaids retrieved for given aircraft position and HSI range setting.
+ */
+struct CurrentNavaids
+{
+	xf::NavaidStorage::Navaids	fix_navs;
+	xf::NavaidStorage::Navaids	vor_navs;
+	xf::NavaidStorage::Navaids	dme_navs;
+	xf::NavaidStorage::Navaids	ndb_navs;
+	xf::NavaidStorage::Navaids	loc_navs;
+	xf::NavaidStorage::Navaids	arpt_navs;
+
+	bool						retrieved			{ false };
+	LonLat						retrieve_position	{ 0_deg, 0_deg };
+	si::Length					retrieve_range		{ 0_nmi };
+};
+
+
+struct Mutable
+{
+	hsi::DisplayMode prev_display_mode { hsi::DisplayMode::Expanded };
+};
+
+
+class PaintingWork
+{
+  public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::WorkPerformer&, xf::NavaidStorage*, std::string const& instance = {});
+	explicit
+	PaintingWork (xf::PaintRequest&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&);
+
+	void
+	paint();
+
+  private:
+	void
+	paint_aircraft();
+
+	void
+	paint_navperf();
+
+	void
+	paint_hints();
+
+	void
+	paint_ap_settings();
+
+	void
+	paint_directions();
+
+	void
+	paint_track (bool paint_heading_triangle);
+
+	void
+	paint_altitude_reach();
+
+	void
+	paint_trend_vector();
+
+	void
+	paint_speeds_and_wind();
+
+	void
+	paint_home_direction();
+
+	void
+	paint_course();
+
+	void
+	paint_selected_navaid_info();
+
+	void
+	paint_tcas_and_navaid_info();
+
+	void
+	paint_pointers();
+
+	void
+	paint_range();
+
+	void
+	paint_navaids();
+
+	void
+	paint_locs();
+
+	void
+	paint_tcas();
+
+	/**
+	 * Retrieve navaids from navaid storage for current aircraft
+	 * position and populate _*_navs variables.
+	 */
+	void
+	retrieve_navaids();
+
+	/**
+	 * Compute position where navaid should be drawn on map
+	 * relative to the aircraft (assumes usage with aircraft-centered transform).
+	 */
+	QPointF
+	get_navaid_xy (LonLat const& navaid_position) const;
+
+	/**
+	 * Trend vector range.
+	 */
+	si::Length
+	actual_trend_range() const;
+
+	/**
+	 * Gap between lines on trend vector.
+	 */
+	si::Length
+	trend_gap() const;
+
+	/**
+	 * Time gap between lines on trend vector.
+	 */
+	Time
+	trend_time_gap() const;
+
+	float
+	to_px (si::Length miles) const;
+
+  private:
+	xf::PaintRequest&						_paint_request;
+	xf::NavaidStorage const&				_navaid_storage;
+	Parameters const&						_p;
+	ResizeCache&							_c;
+	CurrentNavaids&							_current_navaids;
+	Mutable&								_mutable;
+
+	xf::InstrumentPainter					_painter;
+	std::shared_ptr<xf::InstrumentAids>		_aids_ptr;
+	xf::InstrumentAids&						_aids;
+
+	std::optional<si::Angle>				_heading;						// Computed mag or true, depending on heading mode.
+	std::optional<si::Angle>				_ap_bug_magnetic;				// Computed mag or true, depending on heading mode.
+	std::optional<bool>						_ap_use_trk;
+	std::optional<si::Angle>				_course_heading;				// Computed mag or true, depending on heading mode.
+	std::optional<si::Angle>				_track_true;					// Computed.
+	std::optional<si::Angle>				_track;							// Mag or true, depending on heading mode.
+	std::optional<si::Angle>				_rotation;
+	si::Time								_positioning_hint_changed_ts	{ 0_s };
+	bool									_navaid_selected_visible		{ false };
+	bool									_navaid_left_visible			{ false };
+	bool									_navaid_right_visible			{ false };
+	QTransform								_heading_transform;
+	// TRK/HDG transform, depending if HDG or TRK is selected:
+	QTransform								_rotation_transform;
+	QTransform								_track_transform;
+	// Transform for ground objects:
+	QTransform								_features_transform;
+	// Transform used for VOR/ADF pointers, that are represented by magnetic heading:
+	QTransform								_pointers_transform;
+};
+
+} // namespace hsi_detail
+
+
+class HSI: public xf::Instrument<HSI_IO>
+{
+  public:
+	// Ctor
+	HSI (std::unique_ptr<HSI_IO>, xf::NavaidStorage const&, std::string const& instance = {});
+
+	// Dtor
+	~HSI();
 
 	// Module API
 	void
 	process (xf::Cycle const&) override;
 
+	// Instrument API
+	void
+	paint (xf::PaintRequest&) const override;
+
   private:
-	HSIWidget*	_hsi_widget;
+	xf::NavaidStorage const&								_navaid_storage;
+	xf::InstrumentSupport									_instrument_support;
+	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;
+	xf::Synchronized<hsi_detail::ResizeCache> mutable		_resize_cache;
+	xf::Synchronized<hsi_detail::CurrentNavaids> mutable	_current_navaids;
+	xf::Synchronized<hsi_detail::Mutable> mutable			_mutable;
 };
 
 #endif
+
