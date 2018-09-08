@@ -434,8 +434,8 @@ class AdiPaintRequest
 	Blinker const&							speed_warning_blinker;
 	Blinker const&							minimums_warning_blinker;
 	float const								q;
-	xf::Shadow								default_shadow; // TODO move to Precomputed TODO is it used?
-	xf::Shadow								black_shadow; // TODO move to Precomputed TODO is it used?
+	xf::Shadow								default_shadow;
+	xf::Shadow								black_shadow;
 
   public:
 	float
