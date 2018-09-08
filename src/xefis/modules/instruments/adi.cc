@@ -3220,7 +3220,8 @@ ADI::process (xf::Cycle const& cycle)
 void
 ADI::paint (xf::PaintRequest& paint_request) const
 {
-	_painting_work.paint (paint_request, xf::clone (*_parameters.lock()));
+	auto cloned_params = *_parameters.lock();
+	_painting_work.paint (paint_request, cloned_params);
 }
 
 
