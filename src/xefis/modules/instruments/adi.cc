@@ -19,7 +19,6 @@
 #include <xefis/config/all.h>
 #include <xefis/support/instrument/text_layout.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/utility.h>
 
 // Local:
 #include "adi.h"
@@ -2254,7 +2253,7 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) 
 		paint_nav (pr);
 		paint_center_cross (pr, false, true);
 		paint_flight_director (pr);
-		paint_control_stick (pr);
+		paint_control_surfaces (pr);
 		paint_center_cross (pr, true, false);
 
 		if (pr.params.altitude_agl_failure)
@@ -2358,7 +2357,7 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 	using std::abs;
 
 	float const w = pr.aids.lesser_dimension() * 1.4f / 9.f;
-	Angle range = pr.params.fov / 4.f;
+	Angle const range = pr.params.fov / 4.f;
 
 	Angle pitch = si::cos (pr.params.orientation_roll) * (pr.params.flight_director_pitch - pr.params.orientation_pitch);
 	pitch = xf::clamped (pitch, -range, +range);
@@ -2391,15 +2390,15 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 
 
 void
-PaintingWork::paint_control_stick (AdiPaintRequest& pr) const
+PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 {
-	if (pr.params.control_stick_visible)
+	if (pr.params.control_surfaces_visible)
 	{
 		float const w = pr.aids.lesser_dimension() * 0.2f / 9.f;
-		Angle range = 17.5_deg;
+		Angle const range = 17.5_deg;
 
-		Angle pitch = xf::clamped (pr.params.control_stick_pitch, -range, +range);
-		Angle roll = xf::clamped (pr.params.control_stick_roll, -range, +range);
+		Angle pitch = xf::renormalize (xf::clamped (pr.params.control_surfaces_elevator, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
+		Angle roll = xf::renormalize (xf::clamped (pr.params.control_surfaces_ailerons, -1.0f, +1.0f), -1.0f, +1.0f, -range, +range);
 
 		float ypos = pr.pitch_to_px (pitch);
 		float xpos = pr.heading_to_px (roll);
@@ -3148,9 +3147,9 @@ ADI::process (xf::Cycle const& cycle)
 	params.flight_director_roll_visible = guidance_visible && io.flight_director_guidance_roll.valid();
 	params.flight_director_roll = io.flight_director_guidance_roll.value_or (0_deg);
 	// Control stick
-	params.control_stick_visible = io.control_stick_visible.value_or (false) && io.control_stick_pitch && io.control_stick_roll;
-	params.control_stick_pitch = io.control_stick_pitch.value_or (0_deg);
-	params.control_stick_roll = io.control_stick_roll.value_or (0_deg);
+	params.control_surfaces_visible = io.control_surfaces_visible.value_or (false) && io.control_surfaces_elevator && io.control_surfaces_ailerons;
+	params.control_surfaces_elevator = io.control_surfaces_elevator.value_or (0.0f);
+	params.control_surfaces_ailerons = io.control_surfaces_ailerons.value_or (0.0f);
 	// Approach/navaid reference
 	params.navaid_reference_visible = io.navaid_reference_visible.value_or (false);
 	params.navaid_course_magnetic = io.navaid_course_magnetic.get_optional();
