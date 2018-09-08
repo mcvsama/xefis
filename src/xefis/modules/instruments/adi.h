@@ -135,10 +135,10 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>			flight_director_guidance_visible					{ this, "flight-director/guidance.visible" };
 	xf::PropertyIn<si::Angle>		flight_director_guidance_pitch						{ this, "flight-director/guidance.pitch" };
 	xf::PropertyIn<si::Angle>		flight_director_guidance_roll						{ this, "flight-director/guidance.roll" };
-	// Stick position indicator TODO rename to control_surfaces+deflection.ailerons+deflection.elevator
-	xf::PropertyIn<bool>			control_stick_visible								{ this, "control-stick/visible" };
-	xf::PropertyIn<si::Angle>		control_stick_pitch									{ this, "control-stick/pitch" };
-	xf::PropertyIn<si::Angle>		control_stick_roll									{ this, "control-stick/roll" };
+	// Control surfaces deflection indicator
+	xf::PropertyIn<bool>			control_surfaces_visible							{ this, "control-surfaces/visible" };
+	xf::PropertyIn<float>			control_surfaces_elevator							{ this, "control-surfaces/elevator" };
+	xf::PropertyIn<float>			control_surfaces_ailerons							{ this, "control-surfaces/ailerons" };
 	// Approach information
 	xf::PropertyIn<bool>			navaid_reference_visible							{ this, "navaid/reference-visible" };
 	xf::PropertyIn<si::Angle>		navaid_course_magnetic								{ this, "navaid/course-magnetic" };
@@ -284,9 +284,9 @@ class Parameters
 	bool						flight_director_roll_visible		= false;
 	si::Angle					flight_director_roll				= 0_deg;
 	// Control stick
-	bool						control_stick_visible				= false;
-	si::Angle					control_stick_pitch					= 0_deg;
-	si::Angle					control_stick_roll					= 0_deg;
+	bool						control_surfaces_visible			= false;
+	float						control_surfaces_elevator			= 0.0f;
+	float						control_surfaces_ailerons			= 0.0f;
 	// Approach reference
 	bool						navaid_reference_visible			= false;
 	std::optional<si::Angle>	navaid_course_magnetic;
@@ -743,7 +743,7 @@ class PaintingWork
 	paint_flight_director (AdiPaintRequest&) const;
 
 	void
-	paint_control_stick (AdiPaintRequest&) const;
+	paint_control_surfaces (AdiPaintRequest&) const;
 
 	void
 	paint_altitude_agl (AdiPaintRequest&) const;
