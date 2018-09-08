@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -34,6 +35,12 @@ template<class tValueType>
 		typedef tValueType ValueType;
 
 	  public:
+		// Ctor
+		template<class = std::enable_if_t<std::is_default_constructible_v<ValueType>>>
+			explicit
+			Temporal() noexcept (noexcept (ValueType()))
+			{ }
+
 		// Ctor
 		explicit
 		Temporal (ValueType&& value) noexcept (noexcept (ValueType (value)));
@@ -76,6 +83,12 @@ template<class tValueType>
 		 */
 		ValueType const&
 		operator*() const noexcept;
+
+		/**
+		 * Return contained value.
+		 */
+		ValueType const*
+		operator->() const noexcept;
 
 		/**
 		 * Return update timestamp.
@@ -136,6 +149,14 @@ template<class T>
 	Temporal<T>::operator*() const noexcept
 	{
 		return _value;
+	}
+
+
+template<class T>
+	inline typename Temporal<T>::ValueType const*
+	Temporal<T>::operator->() const noexcept
+	{
+		return &_value;
 	}
 
 
