@@ -28,7 +28,7 @@
 
 
 TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
-	ProcessingLoop (machine, "Test Instruments", 100_Hz, logger),
+	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger),
 	_navaid_storage (navaid_storage),
 	_logger (logger)
 {
@@ -100,9 +100,9 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->flight_director_guidance_visible					<< xf::ConstantSource (true);
 	_test_screen->adi_io->flight_director_guidance_pitch					<< xf::ConstantSource (2.5_deg);
 	_test_screen->adi_io->flight_director_guidance_roll						<< xf::ConstantSource (0_deg);
-	_test_screen->adi_io->control_stick_visible								<< xf::ConstantSource (true);
-	_test_screen->adi_io->control_stick_pitch								<< xf::ConstantSource (2_deg);
-	_test_screen->adi_io->control_stick_roll								<< xf::ConstantSource (2_deg);
+	_test_screen->adi_io->control_surfaces_visible							<< xf::ConstantSource (true);
+	_test_screen->adi_io->control_surfaces_elevator							<< test_generator_io->create_property<float> ("control-surfaces/elevator", 0.0f, { -1.0f, +1.0f }, 0.1f / 1_s);
+	_test_screen->adi_io->control_surfaces_ailerons							<< test_generator_io->create_property<float> ("control-surfaces/ailerons", 0.0f, { -1.0f, +1.0f }, 0.3f / 1_s);
 	_test_screen->adi_io->navaid_reference_visible							<< xf::ConstantSource (true);
 	_test_screen->adi_io->navaid_course_magnetic							<< xf::ConstantSource (150_deg);
 	_test_screen->adi_io->navaid_type_hint									<< xf::ConstantSource ("VOR");
@@ -185,6 +185,10 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 
 	_test_screen->engine_l_current_io->value								<< test_generator_io->create_property<si::Current> ("engine/left/current", 0_A, { -5_A, 40_A }, 5_A / 1_s);
 
+	_test_screen->engine_l_voltage_io->value								<< test_generator_io->create_property<si::Voltage> ("engine/left/voltage", 16.8_V, { 11.1_V, 16.8_V }, 0.07_V / 1_s);
+
+	_test_screen->engine_l_vibration_io->value								<< test_generator_io->create_property<si::Acceleration> ("engine/left/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s);
+
 	_test_screen->engine_r_thrust_io->value									<< test_generator_io->create_property<si::Force> ("engine/right/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
 	_test_screen->engine_r_thrust_io->reference								<< xf::ConstantSource (4.1_N);
 	_test_screen->engine_r_thrust_io->target								<< xf::ConstantSource (3.9_N);
@@ -197,6 +201,10 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->engine_r_power_io->value									<< test_generator_io->create_property<si::Power> ("engine/right/power", 0_W, { 0_W, 295_W }, 10_W / 1_s);
 
 	_test_screen->engine_r_current_io->value								<< test_generator_io->create_property<si::Current> ("engine/right/current", 0_A, { -5_A, 40_A }, 5_A / 1_s);
+
+	_test_screen->engine_r_voltage_io->value								<< test_generator_io->create_property<si::Voltage> ("engine/right/voltage", 16.8_V, { 11.1_V, 16.8_V }, 0.073_V / 1_s);
+
+	_test_screen->engine_r_vibration_io->value								<< test_generator_io->create_property<si::Acceleration> ("engine/right/vibration", 0.1_g, { 0.1_g, 1.2_g }, 0.025_g / 1_s);
 
 	_test_screen->gear_io->requested_down									<< xf::ConstantSource (true);
 	_test_screen->gear_io->nose_up											<< xf::ConstantSource (false);
@@ -218,6 +226,8 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	register_module (*_test_generator);
 
 	auto configurator_widget = new xf::ConfiguratorWidget (*machine, nullptr);
+	auto lh = xf::Services::default_font_size (configurator_widget->logicalDpiY());
+	configurator_widget->resize (50 * lh, 30 * lh);
 	configurator_widget->show();
 
 	start();
