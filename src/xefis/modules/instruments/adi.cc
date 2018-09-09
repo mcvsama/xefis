@@ -2951,9 +2951,12 @@ PaintingWork::paint_input_alert (AdiPaintRequest& pr) const
 void
 PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 {
+	auto const& font_info = pr.aids.font_5;
+	float const digit_height = font_info.digit_height;
+
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
-	pr.paint_horizontal_failure_flag (QPointF (0.f, 0.35f * pr.aids.lesser_dimension()), pr.aids.scaled_default_font (2.0f), " RA ");
+	pr.paint_horizontal_failure_flag (QPointF (0.f, 0.35f * pr.aids.lesser_dimension() + 0.5f * 1.3f * digit_height), font_info.font, " RA ");
 }
 
 } // namespace adi_detail
