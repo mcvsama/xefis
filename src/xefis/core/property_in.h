@@ -73,13 +73,13 @@ template<class pValue>
 		 * Create Property that's coupled to given owner, but doesn't have any data source yet.
 		 */
 		explicit
-		PropertyIn (ModuleIO* owner, std::string const& path);
+		PropertyIn (ModuleIO* owner, std::string_view const& path);
 
 		/**
-		 * Same as PropertyIn (ModuleIO*, std::string), but additionally set up the fallback value.
+		 * Same as PropertyIn (ModuleIO*, std::string_view), but additionally set up the fallback value.
 		 */
 		explicit
-		PropertyIn (ModuleIO* owner, std::string const& path, Value fallback_value);
+		PropertyIn (ModuleIO* owner, std::string_view const& path, Value fallback_value);
 
 		// Dtor
 		~PropertyIn();
@@ -156,7 +156,7 @@ template<class pValue>
 
 template<class V>
 	inline
-	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path):
+	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string_view const& path):
 		BasicProperty (owner, path)
 	{
 		ModuleIO::ProcessingLoopAPI (*this->io()).register_input_property (*this);
@@ -165,7 +165,7 @@ template<class V>
 
 template<class V>
 	inline
-	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string const& path, Value fallback_value):
+	PropertyIn<V>::PropertyIn (ModuleIO* owner, std::string_view const& path, Value fallback_value):
 		PropertyIn (owner, path)
 	{
 		this->set_fallback (fallback_value);

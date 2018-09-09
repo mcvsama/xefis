@@ -40,13 +40,13 @@ NilProperty::NilProperty (PropertyPath const& path):
 
 
 inline
-BasicProperty::BasicProperty (std::string const& path):
+BasicProperty::BasicProperty (std::string_view const& path):
 	_path (path)
 { }
 
 
 inline
-BasicProperty::BasicProperty (ModuleIO* owner, std::string const& path):
+BasicProperty::BasicProperty (ModuleIO* owner, std::string_view const& path):
 	_owner (owner),
 	_path (path)
 { }

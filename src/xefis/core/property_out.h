@@ -79,7 +79,7 @@ template<class pValue>
 		 * Create Property that's coupled to a ModuleIO and set the module as data source.
 		 */
 		explicit
-		PropertyOut (ModuleIO* owner_and_data_source, std::string const& path);
+		PropertyOut (ModuleIO* owner_and_data_source, std::string_view const& path);
 
 		// Dtor
 		~PropertyOut();
@@ -196,7 +196,7 @@ template<class pValue>
 
 template<class V>
 	inline
-	PropertyOut<V>::PropertyOut (ModuleIO* owner_and_data_source, std::string const& path):
+	PropertyOut<V>::PropertyOut (ModuleIO* owner_and_data_source, std::string_view const& path):
 		BasicProperty (owner_and_data_source, path)
 	{
 		_data_source = owner_and_data_source;
