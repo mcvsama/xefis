@@ -23,6 +23,7 @@
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/sequence_utils.h>
+#include <xefis/utility/synchronized.h>
 
 
 namespace xf {
@@ -82,6 +83,20 @@ template<class pArgument, class pValue>
 		 */
 		explicit
 		Datatable2D (std::initializer_list<typename DataMap::value_type>&&);
+
+		// Copy ctor
+		Datatable2D (Datatable2D const&) = default;
+
+		// Move ctor
+		Datatable2D (Datatable2D&&);
+
+		// Copy operator
+		Datatable2D&
+		operator= (Datatable2D const&) = default;
+
+		// Move operator
+		Datatable2D&
+		operator= (Datatable2D&&);
 
 		/**
 		 * Return value for given argument.
@@ -181,9 +196,9 @@ template<class pArgument, class pValue>
 		in_domain_value (Argument const&) const noexcept;
 
 	  private:
-		DataMap							_data_map;
-		std::optional<Point> mutable	_cached_min_value;
-		std::optional<Point> mutable	_cached_max_value;
+		DataMap											_data_map;
+		xf::Synchronized<std::optional<Point>> mutable	_cached_min_value;
+		xf::Synchronized<std::optional<Point>> mutable	_cached_max_value;
 	};
 
 
@@ -214,6 +229,26 @@ template<class A, class V>
 	{
 		if (_data_map.empty())
 			throw EmptyDomainException();
+	}
+
+
+template<class A, class V>
+	inline
+	Datatable2D<A, V>::Datatable2D (Datatable2D&& other):
+		_data_map (std::move (other._data_map)),
+		_cached_min_value (other._cached_min_value),
+		_cached_max_value (other._cached_max_value)
+	{ }
+
+
+template<class A, class V>
+	inline Datatable2D<A, V>&
+	Datatable2D<A, V>::operator= (Datatable2D&& other)
+	{
+		_data_map = std::move (other._data_map);
+		_cached_min_value = other._cached_min_value;
+		_cached_max_value = other._cached_max_value;
+		return *this;
 	}
 
 
@@ -291,16 +326,20 @@ template<class A, class V>
 	Datatable2D<A, V>::min_value() const noexcept
 		-> Point
 	{
-		if (!_cached_min_value)
+		auto cached_min_value = _cached_min_value.lock();
+
+		if (!*cached_min_value)
 		{
 			auto min = _data_map.begin();
+
 			for (auto i = min; i != _data_map.end(); ++i)
 				if (i->second < min->second)
 					min = i;
-			_cached_min_value = Point { min->first, min->second };
+
+			*cached_min_value = Point { min->first, min->second };
 		}
 
-		return *_cached_min_value;
+		return **cached_min_value;
 	}
 
 
@@ -309,16 +348,20 @@ template<class A, class V>
 	Datatable2D<A, V>::max_value() const noexcept
 		-> Point
 	{
-		if (!_cached_max_value)
+		auto cached_max_value = _cached_max_value.lock();
+
+		if (!*cached_max_value)
 		{
 			auto max = _data_map.begin();
+
 			for (auto i = max; i != _data_map.end(); ++i)
 				if (i->second > max->second)
 					max = i;
-			_cached_max_value = Point { max->first, max->second };
+
+			*cached_max_value = Point { max->first, max->second };
 		}
 
-		return *_cached_max_value;
+		return **cached_max_value;
 	}
 
 
