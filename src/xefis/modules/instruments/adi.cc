@@ -799,15 +799,20 @@ ArtificialHorizon::paint_pitch_disagree (AdiPaintRequest& pr) const
 {
 	if (pr.params.pitch_disagree)
 	{
+		float const margin = 0.075f * pr.q;
 		auto const ld = pr.aids.lesser_dimension();
+		QPointF const position (-0.225f * ld, 0.285f * ld);
+		auto const alignment = Qt::AlignVCenter | Qt::AlignLeft;
+		auto const text = "PITCH";
 
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
 		pr.painter.setFont (pr.aids.font_3.font);
-		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (QPointF (-0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignLeft, "PITCH", pr.default_shadow);
-		});
+		pr.painter.setPen (Qt::NoPen);
+		pr.painter.setBrush (Qt::black);
+		pr.painter.drawRect (pr.painter.get_text_box (position, alignment, text).adjusted (-margin, 0.0f, +margin, 0.0f));
+		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
+		pr.painter.fast_draw_text (position, alignment, text);
 	}
 }
 
@@ -817,15 +822,20 @@ ArtificialHorizon::paint_roll_disagree (AdiPaintRequest& pr) const
 {
 	if (pr.params.roll_disagree)
 	{
+		float const margin = 0.075f * pr.q;
 		auto const ld = pr.aids.lesser_dimension();
+		QPointF const position (+0.225f * ld, 0.285f * ld);
+		auto const alignment = Qt::AlignVCenter | Qt::AlignRight;
+		auto const text = "ROLL";
 
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
 		pr.painter.setFont (pr.aids.font_3.font);
-		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (QPointF (+0.225f * ld, 0.285f * ld), Qt::AlignVCenter | Qt::AlignRight, "ROLL", pr.default_shadow);
-		});
+		pr.painter.setPen (Qt::NoPen);
+		pr.painter.setBrush (Qt::black);
+		pr.painter.drawRect (pr.painter.get_text_box (position, alignment, text).adjusted (-margin, 0.0f, +margin, 0.0f));
+		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
+		pr.painter.fast_draw_text (position, alignment, text);
 	}
 }
 
