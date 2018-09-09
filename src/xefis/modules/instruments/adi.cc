@@ -1078,8 +1078,8 @@ VelocityLadder::paint_ias_disagree (AdiPaintRequest& pr, float const x) const
 		QPointF const position (-1.75f * x, 9.5f * x);
 
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS", pr.default_shadow);
-			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.default_shadow);
+			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "IAS", pr.black_shadow);
+			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.black_shadow);
 		});
 	}
 }
@@ -1616,8 +1616,8 @@ AltitudeLadder::paint_altitude_disagree (AdiPaintRequest& pr, float const x) con
 		QPointF const position (-1.75f * x, 9.5f * x);
 
 		pr.painter.paint (pr.default_shadow, [&] {
-			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT", pr.default_shadow);
-			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.default_shadow);
+			pr.painter.fast_draw_text (position, Qt::AlignVCenter | Qt::AlignLeft, "ALT", pr.black_shadow);
+			pr.painter.fast_draw_text (position + QPointF (0.f, 0.9f * x), Qt::AlignVCenter | Qt::AlignLeft, "DISAGREE", pr.black_shadow);
 		});
 	}
 }
