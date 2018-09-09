@@ -134,8 +134,8 @@ static constexpr std::string_view	kPitchMode_GS			= "G/S";
 static constexpr std::string_view	kPitchMode_Flare		= "FLARE";
 
 static constexpr std::string_view	kSpeedMode_None			= "None";
-static constexpr std::string_view	kSpeedMode_Thrust		= "Thrust";
-static constexpr std::string_view	kSpeedMode_Airspeed		= "Airspeed";
+static constexpr std::string_view	kSpeedMode_Thrust		= "THR REF";
+static constexpr std::string_view	kSpeedMode_Airspeed		= "SPD";
 
 static constexpr std::string_view	kNilValue				= "-";
 
