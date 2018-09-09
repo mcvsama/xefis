@@ -24,6 +24,7 @@
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/flaps.h>
 #include <xefis/modules/instruments/gear.h>
+#include <xefis/modules/instruments/hsi.h>
 #include <xefis/modules/instruments/horizontal_trim.h>
 #include <xefis/modules/instruments/label.h>
 #include <xefis/modules/instruments/linear_gauge.h>
@@ -44,6 +45,7 @@ class TestScreen: public xf::Screen
 
   public:
 	std::unique_ptr<ADI_IO>											adi_io						{ std::make_unique<ADI_IO>() };
+	std::unique_ptr<HSI_IO>											hsi_io						{ std::make_unique<HSI_IO>() };
 	std::unique_ptr<RadialGaugeIO<si::Force>>						engine_l_thrust_io			{ std::make_unique<RadialGaugeIO<si::Force>>() };
 	std::unique_ptr<RadialGaugeIO<si::AngularVelocity>>				engine_l_speed_io			{ std::make_unique<RadialGaugeIO<si::AngularVelocity>>() };
 	std::unique_ptr<RadialGaugeIO<si::Power>>						engine_l_power_io			{ std::make_unique<RadialGaugeIO<si::Power>>() };
@@ -74,6 +76,7 @@ class TestScreen: public xf::Screen
 	xf::NavaidStorage const&										_navaid_storage;
 	// Instruments:
 	std::optional<xf::Registrant<ADI>>								_adi;
+	std::optional<xf::Registrant<HSI>>								_hsi;
 	std::optional<xf::Registrant<RadialGauge<si::Force>>>			_engine_l_thrust;
 	std::optional<xf::Registrant<RadialGauge<si::AngularVelocity>>>	_engine_l_speed;
 	std::optional<xf::Registrant<RadialGauge<si::Power>>>			_engine_l_power;

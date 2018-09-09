@@ -43,6 +43,10 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& nav
 	adi_io->show_mach_above										= 0.4;
 	adi_io->power_eq_1000_fpm									= 1000_W;
 
+	hsi_io->arpt_runways_range_threshold						= 10_nmi;
+	hsi_io->arpt_map_range_threshold							= 1_nmi;
+	hsi_io->arpt_runway_extension_length						= 10_nmi;
+
 	engine_l_thrust_io->dial_scale								= 0.9;
 	engine_l_thrust_io->format									= boost::format ("%5.2f");
 	engine_l_thrust_io->value_minimum							= 0_N;
@@ -187,6 +191,9 @@ TestScreen::create_instruments()
 	register_instrument (*_adi);
 	set (**_adi, { 0.0f, 0.0f, 0.5f, 0.63f });
 
+	_hsi.emplace (std::move (hsi_io), _navaid_storage, "hsi");
+	register_instrument (*_hsi);
+	set (**_hsi, { 0.0f, 0.63f, 0.5f, 1.0f - 0.63f });
 
 	{
 		auto to_n1 = [](si::AngularVelocity velocity) -> float128_t

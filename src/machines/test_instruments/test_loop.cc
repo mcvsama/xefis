@@ -142,6 +142,36 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->style_old											<< xf::ConstantSource (false);
 	_test_screen->adi_io->style_show_metric									<< xf::ConstantSource (true);
 
+	_test_screen->hsi_io->display_mode										<< xf::ConstantSource (hsi::DisplayMode::Auxiliary);
+	_test_screen->hsi_io->range												<< xf::ConstantSource (60_nmi);
+	_test_screen->hsi_io->speed_gs											<< test_generator_io->create_property<si::Velocity> ("speed/ground-speed", 0_kt, { 0_kt, 400_kt }, 13_kt / 1_s);
+	_test_screen->hsi_io->speed_tas											<< test_generator_io->create_property<si::Velocity> ("speed/true-airspeed", 0_kt, { 0_kt, 400_kt }, 17_kt / 1_s);
+	_test_screen->hsi_io->cmd_visible										<< xf::ConstantSource (true);
+	_test_screen->hsi_io->cmd_line_visible									<< xf::ConstantSource (true);
+	_test_screen->hsi_io->cmd_heading_magnetic								<< xf::ConstantSource (90_deg);
+	_test_screen->hsi_io->cmd_track_magnetic								<< xf::ConstantSource (95_deg);
+	_test_screen->hsi_io->cmd_use_trk										<< xf::ConstantSource (true);
+	_test_screen->hsi_io->target_altitude_reach_distance					<< test_generator_io->create_property<si::Length> ("hsi/target-altitude-reach-distance", 12_nmi, { 12_nmi, 15_nmi }, 0.5_nmi / 1_s);
+	_test_screen->hsi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->hsi_io->orientation_heading_true							<< test_generator_io->create_property<si::Angle> ("orientation/heading.true", 10_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->hsi_io->heading_mode										<< xf::ConstantSource (hsi::HeadingMode::Magnetic);
+	_test_screen->hsi_io->home_true_direction								<< test_generator_io->create_property<si::Angle> ("home/true-direction", 0_deg, { 0_deg, 360_deg }, 5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->hsi_io->home_track_visible								<< xf::ConstantSource (true);
+	_test_screen->hsi_io->home_distance_vlos								<< test_generator_io->create_property<si::Length> ("home/distance/vlos", 0_m, { 0_m, 30_km }, 150_m / 1_s);
+	_test_screen->hsi_io->home_distance_ground								<< test_generator_io->create_property<si::Length> ("home/distance/ground", 0_m, { 0_m, 20_km }, 100_m / 1_s);
+	_test_screen->hsi_io->home_distance_vertical							<< test_generator_io->create_property<si::Length> ("home/distance/vertical", 0_m, { 0_m, 5_km }, 25_m / 1_s);
+	_test_screen->hsi_io->home_position_longitude							<< xf::ConstantSource (0_deg);
+	_test_screen->hsi_io->home_position_latitude							<< xf::ConstantSource (0_deg);
+	_test_screen->hsi_io->position_longitude								<< test_generator_io->create_property<si::Angle> ("position/longitude", 51.9_deg, { 51.9_deg, 60_deg }, 0.001_deg / 1_s);
+	_test_screen->hsi_io->position_latitude									<< test_generator_io->create_property<si::Angle> ("position/latitude", 19.14_deg, { 19.14_deg, 20.14_deg }, 0.001_deg / 1_s);
+	_test_screen->hsi_io->position_source									<< xf::ConstantSource ("GPS");
+	_test_screen->hsi_io->track_visible										<< xf::ConstantSource (true);
+	_test_screen->hsi_io->track_lateral_magnetic							<< test_generator_io->create_property<si::Angle> ("orientation/heading.magnetic", -5_deg, { -5_deg, 355_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
+	_test_screen->hsi_io->track_lateral_rotation							<< xf::ConstantSource (-1_deg / 1_s);
+	_test_screen->hsi_io->track_center_on_track								<< xf::ConstantSource (true);
+	_test_screen->hsi_io->navigation_required_performance					<< xf::ConstantSource (4_m);
+	_test_screen->hsi_io->navigation_actual_performance						<< xf::ConstantSource (1.2_m);
+
 	_test_screen->engine_l_thrust_io->value									<< test_generator_io->create_property<si::Force> ("engine/left/thrust", 0_N, { -0.3_N, 4.5_N }, 0.2_N / 1_s);
 	_test_screen->engine_l_thrust_io->reference								<< xf::ConstantSource (4.1_N);
 	_test_screen->engine_l_thrust_io->target								<< xf::ConstantSource (3.9_N);
