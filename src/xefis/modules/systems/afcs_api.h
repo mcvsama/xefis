@@ -21,7 +21,7 @@
 #include <xefis/core/property.h>
 
 
-namespace afcs_api {
+namespace afcs {
 
 /*
  * Warning: In all below enums, most significant bit is used to denote nil
@@ -47,6 +47,7 @@ enum class ThrustMode: uint8_t
 	xf_nil_value = 0xff,
 };
 
+
 enum class RollMode: uint8_t
 {
 	// No lateral movement control.
@@ -65,6 +66,7 @@ enum class RollMode: uint8_t
 	// Special value for nil.
 	xf_nil_value = 0xff,
 };
+
 
 enum class PitchMode: uint8_t
 {
@@ -91,6 +93,7 @@ enum class PitchMode: uint8_t
 	// Special value for nil.
 	xf_nil_value = 0xff
 };
+
 
 enum class SpeedMode: uint8_t
 {
@@ -225,6 +228,6 @@ parse (std::string_view const&, PitchMode&);
 void
 parse (std::string_view const&, SpeedMode&);
 
-} // namespace afcs_api
+} // namespace afcs
 
 #endif

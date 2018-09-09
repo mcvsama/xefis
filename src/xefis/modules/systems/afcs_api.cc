@@ -21,7 +21,7 @@
 #include "afcs_api.h"
 
 
-namespace afcs_api {
+namespace afcs {
 
 void
 parse (std::string_view const& str, ThrustMode& thrust_mode)
@@ -96,5 +96,5 @@ parse (std::string_view const& str, SpeedMode& speed_mode)
 		speed_mode = SpeedMode::None;
 }
 
-} // namespace afcs_api
+} // namespace afcs
 

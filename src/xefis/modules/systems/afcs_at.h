@@ -49,7 +49,7 @@ class AFCS_AT_IO: public xf::ModuleIO
 	 * Input
 	 */
 
-	xf::PropertyIn<afcs_api::SpeedMode>	cmd_speed_mode			{ this, "cmd/speed-mode" };
+	xf::PropertyIn<afcs::SpeedMode>		cmd_speed_mode			{ this, "cmd/speed-mode" };
 	xf::PropertyIn<si::Force>			cmd_thrust				{ this, "cmd/thrust" };
 	xf::PropertyIn<si::Velocity>		cmd_ias					{ this, "cmd/ias" };
 	xf::PropertyIn<si::Velocity>		measured_ias			{ this, "measurements/ias" };

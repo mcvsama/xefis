@@ -533,19 +533,19 @@ class AFCS: public xf::Module<AFCS_IO>
 	/**
 	 * Return string ID for a thrust mode.
 	 */
-	std::optional<afcs_api::ThrustMode>
+	std::optional<afcs::ThrustMode>
 	translate_thrust_mode() const;
 
 	/**
 	 * Return string ID for a roll mode.
 	 */
-	std::optional<afcs_api::RollMode>
+	std::optional<afcs::RollMode>
 	translate_roll_mode() const;
 
 	/**
 	 * Return string ID for a pitch mode.
 	 */
-	std::optional<afcs_api::PitchMode>
+	std::optional<afcs::PitchMode>
 	translate_pitch_mode() const;
 
 	/**

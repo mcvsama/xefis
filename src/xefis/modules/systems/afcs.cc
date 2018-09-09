@@ -1094,21 +1094,21 @@ AFCS::make_knob_action (xf::PropertyIn<int64_t>& property, void (AFCS::* callbac
 }
 
 
-std::optional<afcs_api::ThrustMode>
+std::optional<afcs::ThrustMode>
 AFCS::translate_thrust_mode() const
 {
 	switch (_thrust_mode)
 	{
-		case ThrustMode::None:		return afcs_api::ThrustMode::None;
-		case ThrustMode::TO_GA:		return afcs_api::ThrustMode::TO_GA;
-		case ThrustMode::CONT:		return afcs_api::ThrustMode::Continuous;
-		case ThrustMode::IDLE:		return afcs_api::ThrustMode::Idle;
+		case ThrustMode::None:		return afcs::ThrustMode::None;
+		case ThrustMode::TO_GA:		return afcs::ThrustMode::TO_GA;
+		case ThrustMode::CONT:		return afcs::ThrustMode::Continuous;
+		case ThrustMode::IDLE:		return afcs::ThrustMode::Idle;
 		case ThrustMode::MCP_SPD:
 		case ThrustMode::SPD_HOLD:
 			switch (_speed_control)
 			{
-				case SpeedControl::KIAS:	return afcs_api::ThrustMode::KIAS;
-				case SpeedControl::Mach:	return afcs_api::ThrustMode::Mach;
+				case SpeedControl::KIAS:	return afcs::ThrustMode::KIAS;
+				case SpeedControl::Mach:	return afcs::ThrustMode::Mach;
 			}
 			break;
 	};
@@ -1117,60 +1117,60 @@ AFCS::translate_thrust_mode() const
 }
 
 
-std::optional<afcs_api::RollMode>
+std::optional<afcs::RollMode>
 AFCS::translate_roll_mode() const
 {
 	switch (_roll_mode)
 	{
-		case RollMode::None:		return afcs_api::RollMode::None;
+		case RollMode::None:		return afcs::RollMode::None;
 		case RollMode::MCP:
 		case RollMode::HOLD:
 			switch (_lateral_control)
 			{
-				case LateralControl::Heading:	return afcs_api::RollMode::Heading;
-				case LateralControl::Track:		return afcs_api::RollMode::Track;
+				case LateralControl::Heading:	return afcs::RollMode::Heading;
+				case LateralControl::Track:		return afcs::RollMode::Track;
 			}
 			break;
-		case RollMode::WNG_LVL:		return afcs_api::RollMode::WingsLevel;
-		case RollMode::LOC:			return afcs_api::RollMode::Localizer;
-		case RollMode::LNAV:		return afcs_api::RollMode::LNAV;
+		case RollMode::WNG_LVL:		return afcs::RollMode::WingsLevel;
+		case RollMode::LOC:			return afcs::RollMode::Localizer;
+		case RollMode::LNAV:		return afcs::RollMode::LNAV;
 	}
 
 	return { };
 }
 
 
-std::optional<afcs_api::PitchMode>
+std::optional<afcs::PitchMode>
 AFCS::translate_pitch_mode() const
 {
 	switch (_pitch_mode)
 	{
-		case PitchMode::None:		return afcs_api::PitchMode::None;
+		case PitchMode::None:		return afcs::PitchMode::None;
 		case PitchMode::MCP_SPD:
 			switch (_speed_control)
 			{
-				case SpeedControl::KIAS:	return afcs_api::PitchMode::KIAS;
-				case SpeedControl::Mach:	return afcs_api::PitchMode::Mach;
+				case SpeedControl::KIAS:	return afcs::PitchMode::KIAS;
+				case SpeedControl::Mach:	return afcs::PitchMode::Mach;
 			}
 			break;
-		case PitchMode::ALT_HOLD:	return afcs_api::PitchMode::Altitude;
+		case PitchMode::ALT_HOLD:	return afcs::PitchMode::Altitude;
 		case PitchMode::MCP_ALT:
 			if (io.cmd_vs)
-				return afcs_api::PitchMode::VS;
+				return afcs::PitchMode::VS;
 			else if (io.cmd_fpa)
-				return afcs_api::PitchMode::FPA;
+				return afcs::PitchMode::FPA;
 			else
-				return afcs_api::PitchMode::Altitude;
+				return afcs::PitchMode::Altitude;
 		case PitchMode::VC:
 			switch (_vertical_control)
 			{
-				case VerticalControl::VS:	return afcs_api::PitchMode::VS;
-				case VerticalControl::FPA:	return afcs_api::PitchMode::FPA;
+				case VerticalControl::VS:	return afcs::PitchMode::VS;
+				case VerticalControl::FPA:	return afcs::PitchMode::FPA;
 			}
 			break;
-		case PitchMode::VNAV_PTH:	return afcs_api::PitchMode::VNAVPath;
-		case PitchMode::GS:			return afcs_api::PitchMode::GS;
-		case PitchMode::FLARE:		return afcs_api::PitchMode::Flare;
+		case PitchMode::VNAV_PTH:	return afcs::PitchMode::VNAVPath;
+		case PitchMode::GS:			return afcs::PitchMode::GS;
+		case PitchMode::FLARE:		return afcs::PitchMode::Flare;
 	}
 
 	return { };
