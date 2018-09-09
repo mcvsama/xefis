@@ -131,6 +131,20 @@ template<class pValue, class pMutex = std::mutex>
 				_value (std::forward<Arg> (args)...)
 			{ }
 
+		// Copy ctor
+		Synchronized (Synchronized const&);
+
+		// Move ctor
+		Synchronized (Synchronized&&) = delete;
+
+		// Copy operator
+		Synchronized&
+		operator= (Synchronized const&);
+
+		// Move ctor
+		Synchronized&
+		operator= (Synchronized&&) = delete;
+
 		/**
 		 * Return unique access token.
 		 */
@@ -207,6 +221,22 @@ template<class V, class M>
 	{
 		_value = nullptr;
 		_lock.unlock();
+	}
+
+
+template<class V, class M>
+	inline
+	Synchronized<V, M>::Synchronized (Synchronized const& other):
+		_value (*other.lock())
+	{ }
+
+
+template<class V, class M>
+	inline Synchronized<V, M>&
+	Synchronized<V, M>::operator= (Synchronized const& other)
+	{
+		*lock() = *other.lock();
+		return *this;
 	}
 
 
