@@ -905,6 +905,8 @@ VelocityLadder::paint (AdiPaintRequest& pr) const
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (_transform);
 
+	paint_novspd_flag (pr);
+
 	if (pr.params.speed_failure)
 		paint_failure (pr);
 	else
@@ -922,7 +924,6 @@ VelocityLadder::paint (AdiPaintRequest& pr) const
 	}
 
 	paint_mach_or_gs (pr, x);
-	paint_novspd_flag (pr);
 	paint_ap_setting (pr);
 }
 
