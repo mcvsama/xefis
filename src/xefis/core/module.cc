@@ -61,7 +61,7 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 }
 
 
-BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string const& instance):
+BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string_view const& instance):
 	_instance (instance),
 	_io (std::move (io))
 {

@@ -107,7 +107,7 @@ class BasicModule: private Noncopyable
 	 *			Instance name for GUI identification and debugging purposes.
 	 */
 	explicit
-	BasicModule (std::unique_ptr<ModuleIO>, std::string const& instance = {});
+	BasicModule (std::unique_ptr<ModuleIO>, std::string_view const& instance = {});
 
 	// Dtor
 	virtual
@@ -175,7 +175,7 @@ template<class IO = NoModuleIO>
 		 */
 		template<class = std::enable_if_t<!std::is_same_v<IO, NoModuleIO>>>
 			explicit
-			Module (std::unique_ptr<IO> io, std::string const& instance = {});
+			Module (std::unique_ptr<IO> io, std::string_view const& instance = {});
 
 		/**
 		 * Ctor
@@ -183,7 +183,7 @@ template<class IO = NoModuleIO>
 		 */
 		template<class = std::enable_if_t<std::is_same_v<IO, NoModuleIO>>>
 			explicit
-			Module (std::string const& instance = {});
+			Module (std::string_view const& instance = {});
 
 	  protected:
 		IO& io;
@@ -227,7 +227,7 @@ BasicModule::set_nil_on_exception (bool enable) noexcept
 template<class IO>
 	template<class>
 		inline
-		Module<IO>::Module (std::unique_ptr<IO> module_io, std::string const& instance):
+		Module<IO>::Module (std::unique_ptr<IO> module_io, std::string_view const& instance):
 			BasicModule (std::move (module_io), instance),
 			io (static_cast<IO&> (*io_base()))
 		{ }
@@ -236,7 +236,7 @@ template<class IO>
 template<class IO>
 	template<class>
 		inline
-		Module<IO>::Module (std::string const& instance):
+		Module<IO>::Module (std::string_view const& instance):
 			BasicModule (std::make_unique<IO>(), instance),
 			io (static_cast<IO&> (*io_base()))
 		{ }

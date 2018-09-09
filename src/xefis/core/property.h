@@ -18,6 +18,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <variant>
 
 // Xefis:
@@ -232,7 +234,7 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	 * Create Property that doesn't have any data-source yet and is not coupled to any module.
 	 */
 	explicit
-	BasicProperty (std::string const& path);
+	BasicProperty (std::string_view const& path);
 
 	/**
 	 * Create Property that's coupled by a ModuleIO.
@@ -241,7 +243,7 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	 *			Owner object for this property. May be nullptr.
 	 */
 	explicit
-	BasicProperty (ModuleIO* owner, std::string const& path);
+	BasicProperty (ModuleIO* owner, std::string_view const& path);
 
   public:
 	// Dtor

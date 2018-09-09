@@ -42,7 +42,7 @@ class PropertyPath
 
 	// Ctor
 	explicit
-	PropertyPath (std::string const& path);
+	PropertyPath (std::string_view const& path);
 
 	// Ctor
 	explicit
@@ -81,7 +81,7 @@ PropertyPath::PropertyPath (const char* path):
 
 
 inline
-PropertyPath::PropertyPath (std::string const& path):
+PropertyPath::PropertyPath (std::string_view const& path):
 	_path (path)
 { }
 
