@@ -129,16 +129,14 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->tcas_resolution_advisory_pitch_maximum			<< xf::ConstantSource (80_deg);
 	_test_screen->adi_io->tcas_resolution_advisory_vertical_speed_minimum	<< xf::ConstantSource (-3000_fpm);
 	_test_screen->adi_io->tcas_resolution_advisory_vertical_speed_maximum	<< xf::ConstantSource (10000_fpm);
-#if 0
-	_test_screen->adi_io->warning_novspd_flag								<< xf::ConstantSource (true); // TODO from time to time set to true
-	_test_screen->adi_io->warning_ldgalt_flag								<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_pitch_disagree							<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_roll_disagree								<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_ias_disagree								<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_altitude_disagree							<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_roll										<< xf::ConstantSource (true);
-	_test_screen->adi_io->warning_slip_skid									<< xf::ConstantSource (true);
-#endif
+	_test_screen->adi_io->warning_novspd_flag								<< test_generator_io->create_enum_property<bool> ("flags/novspd", { { false, 3_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_ldgalt_flag								<< test_generator_io->create_enum_property<bool> ("flags/ldgalt", { { false, 7_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_pitch_disagree							<< test_generator_io->create_enum_property<bool> ("flags/pitch-disagree", { { false, 5_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_roll_disagree								<< test_generator_io->create_enum_property<bool> ("flags/roll-disagree", { { false, 4_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_ias_disagree								<< test_generator_io->create_enum_property<bool> ("flags/ias-disagree", { { false, 9_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_altitude_disagree							<< test_generator_io->create_enum_property<bool> ("flags/altitude-disagree", { { false, 8_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_roll										<< test_generator_io->create_enum_property<bool> ("flags/roll", { { false, 11_s }, { true, 2_s } });
+	_test_screen->adi_io->warning_slip_skid									<< test_generator_io->create_enum_property<bool> ("flags/slip-skid", { { false, 7.5_s }, { true, 2_s } });
 	_test_screen->adi_io->style_old											<< xf::ConstantSource (false);
 	_test_screen->adi_io->style_show_metric									<< xf::ConstantSource (true);
 

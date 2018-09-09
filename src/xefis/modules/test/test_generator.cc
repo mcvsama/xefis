@@ -29,7 +29,7 @@ TestGeneratorIO::update_all (si::Time const update_dt)
 }
 
 
-TestGenerator::TestGenerator (std::unique_ptr<TestGeneratorIO> module_io, std::string const& instance):
+TestGenerator::TestGenerator (std::unique_ptr<TestGeneratorIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 { }
 
