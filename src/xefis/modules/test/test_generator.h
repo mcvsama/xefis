@@ -61,11 +61,19 @@ class TestGeneratorIO: public xf::ModuleIO
 			 class = std::void_t<decltype (xf::Range<Value>()),
 								 RateOfChange<Value>>>
 		xf::PropertyOut<Value>&
-		create_property (std::string const& identifier,
+		create_property (std::string_view const& identifier,
 						 Value initial_value,
 						 xf::Range<Value> value_range,
 						 RateOfChange<Value> rate_of_change,
 						 BorderCondition border_condition = BorderCondition::Mirroring);
+
+	/**
+	 * Create a property that enumerates all listed values for some period of time.
+	 */
+	template<class Value>
+		xf::PropertyOut<Value>&
+		create_enum_property (std::string_view const& identifier,
+							  std::vector<std::tuple<Value, si::Time>> const& values_and_intervals);
 
 	/**
 	 * Update all generators.
@@ -83,7 +91,7 @@ class TestGenerator: public xf::Module<TestGeneratorIO>
   public:
 	// Ctor
 	explicit
-	TestGenerator (std::unique_ptr<TestGeneratorIO>, std::string const& instance = {});
+	TestGenerator (std::unique_ptr<TestGeneratorIO>, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -94,7 +102,7 @@ class TestGenerator: public xf::Module<TestGeneratorIO>
 
 template<class Value, class>
 	inline xf::PropertyOut<Value>&
-	TestGeneratorIO::create_property (std::string const& identifier,
+	TestGeneratorIO::create_property (std::string_view const& identifier,
 									  Value const initial_value,
 									  xf::Range<Value> const value_range,
 									  RateOfChange<Value> const rate_of_change,
@@ -108,7 +116,7 @@ template<class Value, class>
 		  public:
 			// Ctor
 			RangeGenerator (TestGeneratorIO* io,
-							std::string const& identifier,
+							std::string_view const& identifier,
 							Value const initial_value,
 							xf::Range<Value> const value_range,
 							RateOfChange<Value> const rate_of_change,
@@ -155,7 +163,7 @@ template<class Value, class>
 				this->property = new_value;
 			}
 
-		  public:
+		  private:
 			Value const					_initial_value;
 			xf::Range<Value> const		_value_range;
 			RateOfChange<Value>			_rate_of_change;
@@ -164,6 +172,51 @@ template<class Value, class>
 
 		_generators.emplace_back (std::make_unique<RangeGenerator> (this, identifier, initial_value, value_range, rate_of_change, border_condition));
 		return static_cast<RangeGenerator&> (*_generators.back()).property;
+	}
+
+
+template<class Value>
+	inline xf::PropertyOut<Value>&
+	TestGeneratorIO::create_enum_property (std::string_view const& identifier,
+										   std::vector<std::tuple<Value, si::Time>> const& values_and_intervals)
+	{
+		class EnumGenerator: public PropertyGenerator
+		{
+		  public:
+			xf::PropertyOut<Value> property;
+
+		  public:
+			// Ctor
+			EnumGenerator (TestGeneratorIO* io,
+						   std::string_view const& identifier,
+						   std::vector<std::tuple<Value, si::Time>> const& values_and_intervals):
+				property (io, identifier),
+				_values_and_intervals (values_and_intervals)
+			{ }
+
+		  public:
+			void
+			update (si::Time const update_dt) override
+			{
+				_last_change_timestamp += update_dt;
+
+				if (_last_change_timestamp > std::get<1> (_values_and_intervals[_current_index]))
+				{
+					_current_index = (_current_index + 1) % _values_and_intervals.size();
+					_last_change_timestamp = 0_s;
+				}
+
+				this->property = std::get<0> (_values_and_intervals[_current_index]);
+			}
+
+		  private:
+			si::Time										_last_change_timestamp	{ 0_s };
+			std::size_t										_current_index			{ 0 };
+			std::vector<std::tuple<Value, si::Time>> const	_values_and_intervals;
+		};
+
+		_generators.emplace_back (std::make_unique<EnumGenerator> (this, identifier, values_and_intervals));
+		return static_cast<EnumGenerator&> (*_generators.back()).property;
 	}
 
 #endif
