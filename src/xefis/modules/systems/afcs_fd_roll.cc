@@ -98,7 +98,7 @@ AFCS_FD_Roll::compute_roll()
 			disengage = true;
 	};
 
-	using afcs_api::RollMode;
+	using afcs::RollMode;
 
 	switch (*io.cmd_roll_mode)
 	{

@@ -115,7 +115,7 @@ AFCS_FD_Pitch::compute_pitch()
 			disengage = true;
 	};
 
-	using afcs_api::PitchMode;
+	using afcs::PitchMode;
 
 	switch (*io.cmd_pitch_mode)
 	{

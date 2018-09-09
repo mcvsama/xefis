@@ -56,7 +56,7 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 
 	xf::PropertyIn<bool>					autonomous				{ this, "autonomous" };
 	xf::PropertyIn<si::Angle>				pitch_limits			{ this, "pitch-limits" };
-	xf::PropertyIn<afcs_api::PitchMode>		cmd_pitch_mode			{ this, "cmd-pitch-mode" };
+	xf::PropertyIn<afcs::PitchMode>			cmd_pitch_mode			{ this, "cmd-pitch-mode" };
 	xf::PropertyIn<si::Velocity>			cmd_ias					{ this, "cmd-ias" };
 	xf::PropertyIn<double>					cmd_mach				{ this, "cmd-match" };
 	xf::PropertyIn<si::Length>				cmd_alt					{ this, "cmd-altitude" };
