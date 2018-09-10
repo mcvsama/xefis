@@ -676,6 +676,9 @@ class AltitudeLadder
 	paint_vertical_speed (AdiPaintRequest&, float x) const;
 
 	void
+	paint_vertical_ap_setting (AdiPaintRequest&, float const x) const;
+
+	void
 	paint_pressure (AdiPaintRequest&, float x) const;
 
 	void
