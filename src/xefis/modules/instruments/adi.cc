@@ -2117,12 +2117,15 @@ AltitudeLadder::paint_ap_setting (AdiPaintRequest& pr) const
 
 		if (pr.params.show_metric)
 		{
-			auto background_color = pr.kLadderColor.darker (150);
-			pr.painter.setPen (pr.aids.get_pen (background_color, 0.5f));
-			pr.painter.setBrush (QBrush (background_color));
+			if (!pr.params.old_style)
+			{
+				auto background_color = pr.kLadderColor.darker (150);
+				pr.painter.setPen (pr.aids.get_pen (background_color, 0.5f));
+				pr.painter.setBrush (QBrush (background_color));
 
-			// Metric box:
-			pr.painter.drawRect (metric_rect);
+				// Metric box:
+				pr.painter.drawRect (metric_rect);
+			}
 
 			// Metric value:
 			float xcorr = 0.25f * m_metrics.width (" ");
