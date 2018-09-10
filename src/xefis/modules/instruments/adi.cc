@@ -487,6 +487,10 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 		// Clip rectangle before and after rotation:
 		pr.painter.setTransform (pr.precomputed.center_transform);
 		pr.painter.setClipPath (_pitch_scale_clipping_path);
+
+		if (pr.params.old_style)
+			pr.painter.setClipPath (_old_horizon_clip, Qt::IntersectClip);
+
 		pr.painter.setTransform (_roll_transform * pr.precomputed.center_transform);
 		pr.painter.setClipRect (QRectF (-w, -1.f * w, 2.f * w, 2.2f * w), Qt::IntersectClip);
 		pr.painter.setTransform (_horizon_transform);
@@ -700,6 +704,10 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 		// Clip rectangle before and after rotation:
 		pr.painter.setTransform (pr.precomputed.center_transform);
 		pr.painter.setClipPath (_pitch_scale_clipping_path);
+
+		if (pr.params.old_style)
+			pr.painter.setClipPath (_old_horizon_clip, Qt::IntersectClip);
+
 		pr.painter.setTransform (_roll_transform * pr.precomputed.center_transform);
 		pr.painter.setClipRect (QRectF (-1.1f * w, -0.8f * w, 2.2f * w, 1.9f * w), Qt::IntersectClip);
 
