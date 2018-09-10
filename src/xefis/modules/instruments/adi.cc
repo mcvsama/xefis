@@ -1438,6 +1438,7 @@ AltitudeLadder::paint (AdiPaintRequest& pr) const
 		pr.painter.setTransform (_transform);
 
 		paint_vertical_speed (pr, x);
+		paint_vertical_ap_setting (pr, x);
 	}
 
 	if (pr.params.altitude_failure)
@@ -1870,24 +1871,6 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 			}
 		}
 	}
-
-	// Vertical speed bug:
-	if (pr.params.cmd_vertical_speed && pr.params.vertical_speed_visible)
-	{
-		pr.painter.setClipping (false);
-		pr.painter.setTransform (_transform);
-		pr.painter.translate (4.15f * x, 0.f);
-
-		float const posy = -8.f * x * scale_vertical_speed (*pr.params.cmd_vertical_speed);
-
-		for (auto pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
-		{
-			pr.painter.setPen (pen);
-
-			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
-				pr.painter.drawLine (QPointF (-0.25 * x, y), QPointF (0.2f * x, y));
-		}
-	}
 }
 
 
@@ -2038,6 +2021,29 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		pr.painter.setFont (pr.aids.font_2.font);
 		pr.painter.translate (-1.05f * x, sgn * -2.35f * y);
 		pr.painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str, pr.default_shadow);
+	}
+}
+
+
+void
+AltitudeLadder::paint_vertical_ap_setting (AdiPaintRequest& pr, float const x) const
+{
+	// Vertical speed bug (vertical AP setting):
+	if (pr.params.cmd_vertical_speed && pr.params.vertical_speed_visible)
+	{
+		pr.painter.setClipping (false);
+		pr.painter.setTransform (_transform);
+		pr.painter.translate (4.15f * x, 0.f);
+
+		float const posy = -8.f * x * scale_vertical_speed (*pr.params.cmd_vertical_speed);
+
+		for (auto pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
+		{
+			pr.painter.setPen (pen);
+
+			for (auto y: { posy - 0.2f * x, posy + 0.2f * x })
+				pr.painter.drawLine (QPointF (-0.25 * x, y), QPointF (0.2f * x, y));
+		}
 	}
 }
 
