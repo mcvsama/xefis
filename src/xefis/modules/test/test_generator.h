@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -33,6 +34,9 @@ class TestGeneratorIO: public xf::ModuleIO
 	template<class Value>
 		using RateOfChange = decltype(std::declval<Value>() / 1_s);
 
+	template<class Value>
+		using EnumTuple = std::tuple<std::variant<Value, xf::Nil>, si::Time>;
+
 	enum class BorderCondition
 	{
 		Reset,
@@ -40,7 +44,6 @@ class TestGeneratorIO: public xf::ModuleIO
 		Mirroring,
 	};
 
-  public:
 	class PropertyGenerator
 	{
 	  public:
@@ -73,7 +76,7 @@ class TestGeneratorIO: public xf::ModuleIO
 	template<class Value>
 		xf::PropertyOut<Value>&
 		create_enum_property (std::string_view const& identifier,
-							  std::vector<std::tuple<Value, si::Time>> const& values_and_intervals);
+							  std::vector<EnumTuple<Value>> const& values_and_intervals);
 
 	/**
 	 * Update all generators.
@@ -178,7 +181,7 @@ template<class Value, class>
 template<class Value>
 	inline xf::PropertyOut<Value>&
 	TestGeneratorIO::create_enum_property (std::string_view const& identifier,
-										   std::vector<std::tuple<Value, si::Time>> const& values_and_intervals)
+										   std::vector<EnumTuple<Value>> const& values_and_intervals)
 	{
 		class EnumGenerator: public PropertyGenerator
 		{
@@ -189,7 +192,7 @@ template<class Value>
 			// Ctor
 			EnumGenerator (TestGeneratorIO* io,
 						   std::string_view const& identifier,
-						   std::vector<std::tuple<Value, si::Time>> const& values_and_intervals):
+						   std::vector<EnumTuple<Value>> const& values_and_intervals):
 				property (io, identifier),
 				_values_and_intervals (values_and_intervals)
 			{ }
@@ -206,13 +209,22 @@ template<class Value>
 					_last_change_timestamp = 0_s;
 				}
 
-				this->property = std::get<0> (_values_and_intervals[_current_index]);
+				auto const& variant = std::get<0> (_values_and_intervals[_current_index]);
+
+				std::visit (xf::overload {
+					[&] (Value const& value) {
+						this->property = value;
+					},
+					[&] (xf::Nil) {
+						this->property = xf::nil;
+					},
+				}, variant);
 			}
 
 		  private:
-			si::Time										_last_change_timestamp	{ 0_s };
-			std::size_t										_current_index			{ 0 };
-			std::vector<std::tuple<Value, si::Time>> const	_values_and_intervals;
+			si::Time							_last_change_timestamp	{ 0_s };
+			std::size_t							_current_index			{ 0 };
+			std::vector<EnumTuple<Value>> const	_values_and_intervals;
 		};
 
 		_generators.emplace_back (std::make_unique<EnumGenerator> (this, identifier, values_and_intervals));
