@@ -29,12 +29,11 @@ namespace adi_detail {
 void
 Parameters::sanitize()
 {
-	// TODO rename sl_s and al_s to something more sensible
-	sl_line_every = std::max (sl_line_every, 1);
-	sl_number_every = std::max (sl_number_every, 1);
-	sl_extent = std::max<si::Velocity> (sl_extent, 1_kt);
-	sl_minimum = std::max (sl_minimum, 0);
-	sl_maximum = std::min (sl_maximum, 9999);
+	vl_line_every = std::max (vl_line_every, 1);
+	vl_number_every = std::max (vl_number_every, 1);
+	vl_extent = std::max<si::Velocity> (vl_extent, 1_kt);
+	vl_minimum = std::max (vl_minimum, 0);
+	vl_maximum = std::min (vl_maximum, 9999);
 	al_line_every = std::max (al_line_every, 1);
 	al_number_every = std::max (al_number_every, 1);
 	al_emphasis_every = std::max (al_emphasis_every, 1);
@@ -73,7 +72,7 @@ Parameters::sanitize()
 
 	// Speed limits:
 	{
-		this->speed = std::clamp<si::Velocity> (this->speed, 1_kt * this->sl_minimum, 1_kt * this->sl_maximum);
+		this->speed = std::clamp<si::Velocity> (this->speed, 1_kt * this->vl_minimum, 1_kt * this->vl_maximum);
 
 		this->speed = xf::clamped<si::Velocity> (this->speed, 0_kt, 9999.99_kt);
 		this->speed_mach = xf::clamped (this->speed_mach, 0.0, 9.99);
@@ -931,10 +930,10 @@ VelocityLadder::precompute (AdiPaintRequest& pr) const
 void
 VelocityLadder::precompute (AdiPaintRequest& pr)
 {
-	_min_shown = pr.params.speed - 0.5f * pr.params.sl_extent;
-	_max_shown = pr.params.speed + 0.5f * pr.params.sl_extent;
-	_min_shown = std::max<si::Velocity> (_min_shown, 1_kt * pr.params.sl_minimum);
-	_max_shown = std::min<si::Velocity> (_max_shown, 1_kt * pr.params.sl_maximum);
+	_min_shown = pr.params.speed - 0.5f * pr.params.vl_extent;
+	_max_shown = pr.params.speed + 0.5f * pr.params.vl_extent;
+	_min_shown = std::max<si::Velocity> (_min_shown, 1_kt * pr.params.vl_minimum);
+	_max_shown = std::min<si::Velocity> (_max_shown, 1_kt * pr.params.vl_maximum);
 
 	if (_min_shown < 0_kt)
 		_min_shown = 0_kt;
@@ -1041,7 +1040,7 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 		pr.paint_rotating_value (box_0001, pos_0001, 0.7f,
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed, 10.f)))),
-								 pr.params.speed > (1_kt * pr.params.sl_minimum + 0.5_kt)
+								 pr.params.speed > (1_kt * pr.params.vl_minimum + 0.5_kt)
 									? QString::number (static_cast<int> (xf::floored_mod (1.f * _rounded_speed - 1.f, 10.f)))
 									: " ");
 	}
@@ -1092,11 +1091,11 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 
 		pr.painter.setPen (_scale_pen);
 		// -+line_every is to have drawn also numbers that barely fit the scale.
-		for (int kt = (static_cast<int> (_min_shown.in<Knot>()) / pr.params.sl_line_every) * pr.params.sl_line_every - pr.params.sl_line_every;
-			 kt <= _max_shown.in<Knot>() + pr.params.sl_line_every;
-			 kt += pr.params.sl_line_every)
+		for (int kt = (static_cast<int> (_min_shown.in<Knot>()) / pr.params.vl_line_every) * pr.params.vl_line_every - pr.params.vl_line_every;
+			 kt <= _max_shown.in<Knot>() + pr.params.vl_line_every;
+			 kt += pr.params.vl_line_every)
 		{
-			if (kt < pr.params.sl_minimum || kt > pr.params.sl_maximum)
+			if (kt < pr.params.vl_minimum || kt > pr.params.vl_maximum)
 				continue;
 
 			float posy = kt_to_px (pr, 1_kt * kt);
@@ -1104,7 +1103,7 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 				pr.painter.drawLine (QPointF (-0.8f * x, posy), QPointF (0.f, posy));
 			});
 
-			if ((kt - pr.params.sl_minimum) % pr.params.sl_number_every == 0)
+			if ((kt - pr.params.vl_minimum) % pr.params.vl_number_every == 0)
 			{
 				pr.painter.fast_draw_text (QRectF (-4.f * ladder_digit_width - 1.25f * x, -0.5f * ladder_digit_height + posy,
 												   +4.f * ladder_digit_width, ladder_digit_height),
@@ -1204,7 +1203,7 @@ VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 		if (pr.params.speed_lookahead < pr.params.speed)
 			pr.painter.scale (1.f, -1.f);
 
-		float const lookahead_pixels = abs (kt_to_px (pr, xf::clamped<si::Velocity> (pr.params.speed_lookahead, 1_kt * pr.params.sl_minimum, 1_kt * pr.params.sl_maximum)));
+		float const lookahead_pixels = abs (kt_to_px (pr, xf::clamped<si::Velocity> (pr.params.speed_lookahead, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum)));
 		float const length = std::min<float> (_ladder_rect.height() / 2.f, lookahead_pixels) - 0.5f * x;
 
 		if (length > 0.2f * x)
@@ -1259,7 +1258,7 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		// Speed bug:
 		if (pr.params.cmd_speed)
 		{
-			float const cmd_speed_pixels = kt_to_px (pr, xf::clamped<si::Velocity> (*pr.params.cmd_speed, 1_kt * pr.params.sl_minimum, 1_kt * pr.params.sl_maximum));
+			float const cmd_speed_pixels = kt_to_px (pr, xf::clamped<si::Velocity> (*pr.params.cmd_speed, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum));
 			float const posy = xf::clamped<float> (cmd_speed_pixels, -_ladder_rect.height() / 2.0, _ladder_rect.height() / 2.0);
 			pr.painter.setClipRect (_ladder_rect.translated (2.5f * x, 0.f));
 			pr.painter.translate (1.25f * x, posy);
@@ -1402,7 +1401,7 @@ VelocityLadder::paint_failure (AdiPaintRequest& pr) const
 inline float
 VelocityLadder::kt_to_px (AdiPaintRequest& pr, Velocity const speed) const
 {
-	return -0.5 * _ladder_rect.height() * (speed - pr.params.speed) / (0.5 * pr.params.sl_extent);
+	return -0.5 * _ladder_rect.height() * (speed - pr.params.speed) / (0.5 * pr.params.vl_extent);
 }
 
 
@@ -3249,11 +3248,11 @@ ADI::process (xf::Cycle const& cycle)
 	params.roll_warning = io.warning_roll.value_or (false);
 	params.slip_skid_warning = io.warning_slip_skid.value_or (false);
 	// Settings:
-	params.sl_extent = 1_kt * *io.speed_ladder_extent;
-	params.sl_minimum = *io.speed_ladder_minimum;
-	params.sl_maximum = *io.speed_ladder_maximum;
-	params.sl_line_every = *io.speed_ladder_line_every;
-	params.sl_number_every = *io.speed_ladder_number_every;
+	params.vl_extent = 1_kt * *io.speed_ladder_extent;
+	params.vl_minimum = *io.speed_ladder_minimum;
+	params.vl_maximum = *io.speed_ladder_maximum;
+	params.vl_line_every = *io.speed_ladder_line_every;
+	params.vl_number_every = *io.speed_ladder_number_every;
 	params.al_extent = 1_ft * *io.altitude_ladder_extent;
 	params.al_emphasis_every = *io.altitude_ladder_emphasis_every;
 	params.al_bold_every = *io.altitude_ladder_bold_every;
