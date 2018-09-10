@@ -23,7 +23,7 @@
 #include "engine_torque.h"
 
 
-EngineTorque::EngineTorque (std::unique_ptr<EngineTorqueIO> module_io, std::string const& instance):
+EngineTorque::EngineTorque (std::unique_ptr<EngineTorqueIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 { }
 

@@ -22,7 +22,7 @@
 #include "trim_control.h"
 
 
-TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::SoundManager* sound_manager, std::string const& instance):
+TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::SoundManager* sound_manager, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_sound_manager (sound_manager)
 {

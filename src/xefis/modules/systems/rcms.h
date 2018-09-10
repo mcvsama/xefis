@@ -59,7 +59,7 @@ class RemoteControlManagementSystem: public xf::Module<RemoteControlManagementSy
   public:
 	// Ctor
 	explicit
-	RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO>, std::string const& instance = {});
+	RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO>, std::string_view const& instance = {});
 
 	// Module API
 	void

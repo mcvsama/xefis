@@ -25,7 +25,7 @@
 #include "horizontal_trim.h"
 
 
-HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std::string const& instance):
+HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std::string_view const& instance):
 	Instrument (std::move (module_io), instance)
 {
 	_inputs_observer.set_callback ([&]{

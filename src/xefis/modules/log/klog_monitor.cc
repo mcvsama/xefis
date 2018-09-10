@@ -27,7 +27,7 @@
 #include "klog_monitor.h"
 
 
-KLogMonitor::KLogMonitor (std::unique_ptr<KLogMonitorIO> module_io, std::string const& instance):
+KLogMonitor::KLogMonitor (std::unique_ptr<KLogMonitorIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_timer = new QTimer (this);

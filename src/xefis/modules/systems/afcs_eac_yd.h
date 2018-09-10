@@ -62,7 +62,7 @@ class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO>, std::string const& instance = {});
+	AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO>, std::string_view const& instance = {});
 
   private:
 	// Module API

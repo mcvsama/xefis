@@ -28,7 +28,7 @@
 #include "adc.h"
 
 
-AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, xf::Airframe* airframe, xf::Logger const& logger, std::string const& instance):
+AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, xf::Airframe* airframe, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger),
 	_airframe (airframe)

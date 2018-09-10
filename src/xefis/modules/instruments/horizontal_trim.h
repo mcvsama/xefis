@@ -55,7 +55,7 @@ class HorizontalTrim:
   public:
 	// Ctor
 	explicit
-	HorizontalTrim (std::unique_ptr<HorizontalTrimIO>, std::string const& instance = {});
+	HorizontalTrim (std::unique_ptr<HorizontalTrimIO>, std::string_view const& instance = {});
 
 	// Module API
 	void

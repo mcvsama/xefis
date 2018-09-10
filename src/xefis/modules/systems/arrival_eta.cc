@@ -23,7 +23,7 @@
 #include "arrival_eta.h"
 
 
-ArrivalETA::ArrivalETA (std::unique_ptr<ArrivalETA_IO> module_io, std::string const& instance):
+ArrivalETA::ArrivalETA (std::unique_ptr<ArrivalETA_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_eta_computer.set_minimum_dt (1_s);

@@ -30,7 +30,7 @@
 #include "udp.h"
 
 
-UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::string const& instance):
+UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger)
 {

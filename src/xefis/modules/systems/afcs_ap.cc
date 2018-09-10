@@ -23,7 +23,7 @@
 #include "afcs_ap.h"
 
 
-AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& logger, std::string const& instance):
+AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger)
 {

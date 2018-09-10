@@ -113,7 +113,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		RadialGauge (std::unique_ptr<RadialGaugeIO<Value>>, Converter = nullptr, std::string const& instance = {});
+		RadialGauge (std::unique_ptr<RadialGaugeIO<Value>>, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -132,7 +132,7 @@ template<class Value>
 
 template<class Value>
 	inline
-	RadialGauge<Value>::RadialGauge (std::unique_ptr<RadialGaugeIO<Value>> module_io, Converter converter, std::string const& instance):
+	RadialGauge<Value>::RadialGauge (std::unique_ptr<RadialGaugeIO<Value>> module_io, Converter converter, std::string_view const& instance):
 		xf::Instrument<RadialGaugeIO<Value>> (std::move (module_io), instance),
 		_converter (converter)
 	{

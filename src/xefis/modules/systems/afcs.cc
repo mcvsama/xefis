@@ -28,7 +28,7 @@
 #include "afcs_api.h"
 
 
-AFCS::AFCS (std::unique_ptr<AFCS_IO> module_io, std::string const& instance):
+AFCS::AFCS (std::unique_ptr<AFCS_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	make_button_action (io.button_ap, &AFCS::button_press_ap);

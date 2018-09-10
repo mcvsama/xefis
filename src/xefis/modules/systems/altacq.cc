@@ -22,7 +22,7 @@
 #include "altacq.h"
 
 
-AltAcq::AltAcq (std::unique_ptr<AltAcqIO> module_io, std::string const& instance):
+AltAcq::AltAcq (std::unique_ptr<AltAcqIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_output_computer.set_minimum_dt (100_ms);

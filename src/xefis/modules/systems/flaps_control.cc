@@ -25,7 +25,7 @@
 #include "flaps_control.h"
 
 
-FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airframe& airframe, std::string const& instance):
+FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airframe& airframe, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	for (auto s: airframe.flaps().settings())

@@ -22,7 +22,7 @@
 #include "imu_cpf.h"
 
 
-IMU_CPF::IMU_CPF (std::unique_ptr<IMU_CPF_IO> module_io, std::string const& instance):
+IMU_CPF::IMU_CPF (std::unique_ptr<IMU_CPF_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_centripetal_computer.set_callback (std::bind (&IMU_CPF::compute_centripetal, this));

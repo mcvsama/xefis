@@ -169,7 +169,7 @@ class XBee:
 
   public:
 	// Ctor
-	XBee (std::unique_ptr<XBeeIO>, xf::Logger const&, std::string const& instance = {});
+	XBee (std::unique_ptr<XBeeIO>, xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~XBee();
@@ -195,7 +195,7 @@ class XBee:
 	 * transmission.
 	 */
 	void
-	failure (std::string const& reason);
+	failure (std::string_view const& reason);
 
 	/**
 	 * Reset to default state and resets properties.
@@ -262,7 +262,7 @@ class XBee:
 	 * from the modem from previous configuration step.
 	 */
 	void
-	configure_modem (uint8_t frame_id = 0x00, ATResponseStatus status = ATResponseStatus::StartConfig, std::string const& at_response = "");
+	configure_modem (uint8_t frame_id = 0x00, ATResponseStatus status = ATResponseStatus::StartConfig, std::string_view const& at_response = "");
 
 	/**
 	 * Return true if modem is configured.
@@ -280,7 +280,7 @@ class XBee:
 	 * Make API frame without escaped characters from given data.
 	 */
 	std::string
-	make_frame (std::string const& data) const;
+	make_frame (std::string_view const& data) const;
 
 	/**
 	 * Make API request to send data to 64-bit address.
@@ -288,13 +288,13 @@ class XBee:
 	 * Needs wrapping with make_frame().
 	 */
 	std::string
-	make_tx64_command (uint64_t address, std::string const& data) const;
+	make_tx64_command (uint64_t address, std::string_view const& data) const;
 
 	/**
 	 * Same as make_tx64_command(), but uses 16-bit addressing.
 	 */
 	std::string
-	make_tx16_command (uint16_t address, std::string const& data) const;
+	make_tx16_command (uint16_t address, std::string_view const& data) const;
 
 	/**
 	 * Make AT command.
@@ -302,13 +302,13 @@ class XBee:
 	 * Needs wrapping with make_frame().
 	 */
 	std::string
-	make_at_command (std::string const& at_command, uint8_t frame_id = 0x00);
+	make_at_command (std::string_view const& at_command, uint8_t frame_id = 0x00);
 
 	/**
 	 * Send frame.
 	 */
 	SendResult
-	send_frame (std::string const& frame, int& written);
+	send_frame (std::string_view const& frame, int& written);
 
 	/**
 	 * Should be called if send_frame() returns Retry.
@@ -321,7 +321,7 @@ class XBee:
 	 * Split data into packets no bigger than @size bytes.
 	 */
 	std::vector<std::string>
-	packetize (std::string const& data, std::size_t size) const;
+	packetize (std::string_view const& data, std::size_t size) const;
 
 	/**
 	 * Convert vector<uint8_t> to uint16_t.
@@ -349,31 +349,31 @@ class XBee:
 	 * Parse RX from 64-bit address.
 	 */
 	void
-	process_rx64_frame (std::string const& data);
+	process_rx64_frame (std::string_view const& data);
 
 	/**
 	 * Parse RX from 16-bit address.
 	 */
 	void
-	process_rx16_frame (std::string const& data);
+	process_rx16_frame (std::string_view const& data);
 
 	/**
 	 * Parse and process modem status packet.
 	 */
 	void
-	process_modem_status_frame (std::string const& data);
+	process_modem_status_frame (std::string_view const& data);
 
 	/**
 	 * Parse ATResponse packet.
 	 */
 	void
-	process_at_response_frame (std::string const& data);
+	process_at_response_frame (std::string_view const& data);
 
 	/**
 	 * Write output data to the output property.
 	 */
 	void
-	write_output_property (std::string const& data);
+	write_output_property (std::string_view const& data);
 
 	/**
 	 * Report RSSI. Add it to data smoother and
@@ -400,7 +400,7 @@ class XBee:
 	 * Reset alive-check-timer.
 	 */
 	void
-	periodic_pong (ATResponseStatus, std::string const& data);
+	periodic_pong (ATResponseStatus, std::string_view const& data);
 
 	/**
 	 * Cancel pending periodic ping, if there's any. Disable pinging
@@ -413,7 +413,7 @@ class XBee:
 	 * Called with result of ATEC command.
 	 */
 	void
-	clear_channel_result (ATResponseStatus, std::string const& result);
+	clear_channel_result (ATResponseStatus, std::string_view const& result);
 
 	/**
 	 * A logger that adds "DEBUG" message.

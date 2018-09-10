@@ -415,7 +415,7 @@ class CDU:
 
   public:
 	// Ctor
-	CDU (xf::Xefis*, QDomElement const& config, std::string const& instance = {});
+	CDU (xf::Xefis*, QDomElement const& config, std::string_view const& instance = {});
 
 	// Module
 	void

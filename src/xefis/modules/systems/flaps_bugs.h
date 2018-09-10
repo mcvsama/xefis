@@ -64,7 +64,7 @@ class FlapsBugs: public xf::Module<FlapsBugsIO>
   public:
 	// Ctor
 	explicit
-	FlapsBugs (std::unique_ptr<FlapsBugsIO>, xf::Flaps const& flaps, std::string const& instance = {});
+	FlapsBugs (std::unique_ptr<FlapsBugsIO>, xf::Flaps const& flaps, std::string_view const& instance = {});
 
   protected:
 	// Module API

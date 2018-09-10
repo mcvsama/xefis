@@ -30,7 +30,7 @@
 #include "pc.h"
 
 
-PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO> module_io, xf::Airframe* airframe, std::string const& instance):
+PerformanceComputer::PerformanceComputer (std::unique_ptr<PerformanceComputerIO> module_io, xf::Airframe* airframe, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_airframe (airframe)
 {
@@ -172,7 +172,7 @@ PerformanceComputer::compute_glide_ratio()
 
 		if (io.glide_ratio_string.use_count() > 0)
 		{
-			std::string arr;
+			std::string_view arr;
 
 			if (ratio > 0)
 				arr = "↑";

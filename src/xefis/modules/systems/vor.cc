@@ -23,7 +23,7 @@
 #include "vor.h"
 
 
-VOR::VOR (std::unique_ptr<VOR_IO> module_io, std::string const& instance):
+VOR::VOR (std::unique_ptr<VOR_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_vor_computer.set_callback (std::bind (&VOR::compute, this));

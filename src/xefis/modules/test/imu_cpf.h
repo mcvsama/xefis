@@ -63,7 +63,7 @@ class IMU_CPF: public xf::Module<IMU_CPF_IO>
   public:
 	// Ctor
 	explicit
-	IMU_CPF (std::unique_ptr<IMU_CPF_IO>, std::string const& instance = {});
+	IMU_CPF (std::unique_ptr<IMU_CPF_IO>, std::string_view const& instance = {});
 
   protected:
 	void

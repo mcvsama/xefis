@@ -80,7 +80,7 @@ class BMP085:
   public:
 	// Ctor
 	explicit
-	BMP085 (std::unique_ptr<BMP085_IO>, xf::Logger const&, std::string const& instance = {});
+	BMP085 (std::unique_ptr<BMP085_IO>, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void

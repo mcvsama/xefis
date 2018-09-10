@@ -70,7 +70,7 @@ class UDP:
   public:
 	// Ctor
 	explicit
-	UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const&, std::string const& instance = {});
+	UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void

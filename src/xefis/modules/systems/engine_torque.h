@@ -73,7 +73,7 @@ class EngineTorque: public xf::Module<EngineTorqueIO>
   public:
 	// Ctor
 	explicit
-	EngineTorque (std::unique_ptr<EngineTorqueIO>, std::string const& instance = {});
+	EngineTorque (std::unique_ptr<EngineTorqueIO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

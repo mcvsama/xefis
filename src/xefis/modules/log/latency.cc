@@ -25,7 +25,7 @@
 #include "latency.h"
 
 
-Latency::Latency (xf::Accounting& accounting, xf::Logger const& logger, std::string const& instance):
+Latency::Latency (xf::Accounting& accounting, xf::Logger const& logger, std::string_view const& instance):
 	Module (instance),
 	_logger (logger),
 	_accounting (accounting)

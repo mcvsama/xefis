@@ -487,7 +487,7 @@ class HSI: public xf::Instrument<HSI_IO>
 {
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::NavaidStorage const&, std::string const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::NavaidStorage const&, std::string_view const& instance = {});
 
 	// Dtor
 	~HSI();

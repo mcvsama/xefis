@@ -79,7 +79,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, std::string const& instance = {});
+	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

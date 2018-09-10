@@ -38,7 +38,7 @@ class Latency:
   public:
 	// Ctor
 	explicit
-	Latency (xf::Accounting&, xf::Logger const&, std::string const& instance = {});
+	Latency (xf::Accounting&, xf::Logger const&, std::string_view const& instance = {});
 
   private slots:
 	/**

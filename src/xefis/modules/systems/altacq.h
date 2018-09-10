@@ -61,7 +61,7 @@ class AltAcq: public xf::Module<AltAcqIO>
   public:
 	// Ctor
 	explicit
-	AltAcq (std::unique_ptr<AltAcqIO>, std::string const& instance = {});
+	AltAcq (std::unique_ptr<AltAcqIO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

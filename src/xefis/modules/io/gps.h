@@ -176,7 +176,7 @@ class GPS:
 		 * Indicate failure. Try to reopen device, perhaps with other baud-rate setting.
 		 */
 		void
-		failure (std::string const& reason);
+		failure (std::string_view const& reason);
 
 		/**
 		 * Callback from SerialPort.
@@ -295,7 +295,7 @@ class GPS:
   public:
 	// Ctor
 	explicit
-	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string const& instance = {});
+	GPS (std::unique_ptr<GPS_IO>, xf::System*, xf::SerialPort::Configuration const&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~GPS();

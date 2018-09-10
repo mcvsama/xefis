@@ -61,7 +61,7 @@ class AFCS_RollAutotrim: public xf::Module<AFCS_RollAutotrim_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO>, std::string const& instance = {});
+	AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

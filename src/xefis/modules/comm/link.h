@@ -514,7 +514,7 @@ class Link:
   public:
 	// Ctor
 	explicit
-	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string const& instance = {});
+	Link (std::unique_ptr<LinkIO>, std::unique_ptr<LinkProtocol>, xf::Logger const&, std::string_view const& instance = {});
 
 	void
 	process (xf::Cycle const&) override;

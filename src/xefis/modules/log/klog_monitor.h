@@ -53,7 +53,7 @@ class KLogMonitor:
   public:
 	// Ctor
 	explicit
-	KLogMonitor (std::unique_ptr<KLogMonitorIO>, std::string const& instance = {});
+	KLogMonitor (std::unique_ptr<KLogMonitorIO>, std::string_view const& instance = {});
 
   private slots:
 	void

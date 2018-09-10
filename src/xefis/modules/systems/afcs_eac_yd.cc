@@ -21,7 +21,7 @@
 #include "afcs_eac_yd.h"
 
 
-AFCS_EAC_YD::AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO> module_io, std::string const& instance):
+AFCS_EAC_YD::AFCS_EAC_YD (std::unique_ptr<AFCS_EAC_YD_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_rudder_pid.set_integral_limit ({ -0.1_Ns, +0.1_Ns });

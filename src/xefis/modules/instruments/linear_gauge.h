@@ -111,7 +111,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		LinearGauge (std::unique_ptr<LinearGaugeIO<Value>>, Converter = nullptr, std::string const& instance = {});
+		LinearGauge (std::unique_ptr<LinearGaugeIO<Value>>, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -130,7 +130,7 @@ template<class Value>
 
 template<class Value>
 	inline
-	LinearGauge<Value>::LinearGauge (std::unique_ptr<LinearGaugeIO<Value>> module_io, Converter converter, std::string const& instance):
+	LinearGauge<Value>::LinearGauge (std::unique_ptr<LinearGaugeIO<Value>> module_io, Converter converter, std::string_view const& instance):
 		xf::Instrument<LinearGaugeIO<Value>> (std::move (module_io), instance),
 		_converter (converter)
 	{

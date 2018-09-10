@@ -141,9 +141,14 @@ GPS::Connection::alive_check_failed()
 
 
 void
-GPS::Connection::failure (std::string const& reason)
+GPS::Connection::failure (std::string_view const& reason)
 {
-	_gps_module.logger() << "Failure detected" << (reason.empty() ? "" : (": " + reason)) << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
+	auto& logline = _gps_module.logger() << "Failure detected";
+
+	if (!reason.empty())
+		logline << ": " << reason;
+
+	logline << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
 	_power_cycle.notify_connection_failure();
 }
 
@@ -483,7 +488,7 @@ GPS::PowerCycle::notify_connection_established()
 }
 
 
-GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string const& instance):
+GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger),
 	_system (system),

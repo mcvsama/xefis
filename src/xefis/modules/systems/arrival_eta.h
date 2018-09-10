@@ -51,7 +51,7 @@ class ArrivalETA: public xf::Module<ArrivalETA_IO>
   public:
 	// Ctor
 	explicit
-	ArrivalETA (std::unique_ptr<ArrivalETA_IO>, std::string const& instance = {});
+	ArrivalETA (std::unique_ptr<ArrivalETA_IO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

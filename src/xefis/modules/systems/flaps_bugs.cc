@@ -21,7 +21,7 @@
 #include "flaps_bugs.h"
 
 
-FlapsBugs::FlapsBugs (std::unique_ptr<FlapsBugsIO> module_io, xf::Flaps const& flaps, std::string const& instance):
+FlapsBugs::FlapsBugs (std::unique_ptr<FlapsBugsIO> module_io, xf::Flaps const& flaps, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_flaps (flaps)
 { }

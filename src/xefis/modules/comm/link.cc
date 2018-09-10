@@ -474,7 +474,7 @@ LinkIO::verify_settings()
 }
 
 
-Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string const& instance):
+Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> protocol, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger),
 	_protocol (std::move (protocol))

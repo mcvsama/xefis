@@ -911,7 +911,7 @@ CDU::Config::check_reachability() const
 }
 
 
-CDU::CDU (xf::Xefis*, QDomElement const& config, std::string const& instance):
+CDU::CDU (xf::Xefis*, QDomElement const& config, std::string_view const& instance):
 	xf::Instrument (instance),
 	InstrumentAids (0.5f)
 {

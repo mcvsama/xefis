@@ -16,6 +16,8 @@
 
 // Standard:
 #include <cstddef>
+#include <string>
+#include <string_view>
 
 // Qt:
 #include <QtCore/QString>
@@ -84,13 +86,16 @@ parse_hex_string (QString const& string)
 
 
 inline std::string
-to_hex_string (std::string const& blob)
+to_hex_string (std::string_view const& blob)
 {
 	if (blob.empty())
 		return "";
+
 	std::string s;
+
 	for (auto v: blob)
 		s += QString ("%1").arg (static_cast<uint8_t> (v), 2, 16, QChar ('0')).toStdString() + ":";
+
 	s.pop_back();
 	return s;
 }

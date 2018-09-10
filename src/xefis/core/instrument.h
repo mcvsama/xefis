@@ -74,7 +74,7 @@ template<class IO = ModuleIO>
 		 */
 		template<class = std::enable_if_t<!std::is_same_v<IO, ModuleIO>>>
 			explicit
-			Instrument (std::unique_ptr<IO> io, std::string const& instance = {});
+			Instrument (std::unique_ptr<IO> io, std::string_view const& instance = {});
 
 		/**
 		 * Ctor
@@ -82,7 +82,7 @@ template<class IO = ModuleIO>
 		 */
 		template<class = std::enable_if_t<std::is_same_v<IO, ModuleIO>>>
 			explicit
-			Instrument (std::string const& instance = {});
+			Instrument (std::string_view const& instance = {});
 
 	  protected:
 		IO& io;
@@ -106,7 +106,7 @@ BasicInstrument::mark_dirty() noexcept
 template<class IO>
 	template<class>
 		inline
-		Instrument<IO>::Instrument (std::unique_ptr<IO> module_io, std::string const& instance):
+		Instrument<IO>::Instrument (std::unique_ptr<IO> module_io, std::string_view const& instance):
 			BasicInstrument (std::move (module_io), instance),
 			io (static_cast<IO&> (*io_base()))
 		{ }
@@ -115,7 +115,7 @@ template<class IO>
 template<class IO>
 	template<class>
 		inline
-		Instrument<IO>::Instrument (std::string const& instance):
+		Instrument<IO>::Instrument (std::string_view const& instance):
 			BasicInstrument (std::make_unique<IO>(), instance),
 			io (static_cast<IO&> (*io_base()))
 		{ }

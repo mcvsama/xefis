@@ -807,7 +807,7 @@ class ADI: public xf::Instrument<ADI_IO>
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, std::string const& instance = {});
+	ADI (std::unique_ptr<ADI_IO>, std::string_view const& instance = {});
 
 	// Dtor
 	~ADI();

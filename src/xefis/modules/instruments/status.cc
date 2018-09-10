@@ -25,7 +25,7 @@
 #include "status.h"
 
 
-Status::Message::Message (std::string const& text, Severity severity):
+Status::Message::Message (std::string_view const& text, Severity severity):
 	_text (text),
 	_severity (severity)
 { }
@@ -71,7 +71,7 @@ Status::Message::color() const noexcept
 }
 
 
-Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance):
+Status::Status (std::unique_ptr<StatusIO> module_io, std::string_view const& instance):
 	Instrument (std::move (module_io), instance)
 {
 	_input_cursor_decoder = std::make_unique<xf::DeltaDecoder<>> (io.cursor_value, [this](auto delta) {
@@ -109,7 +109,7 @@ Status::Status (std::unique_ptr<StatusIO> module_io, std::string const& instance
 
 
 Status::Message*
-Status::add_message (std::string const& text, Severity severity)
+Status::add_message (std::string_view const& text, Severity severity)
 {
 	_messages.emplace_back (text, severity);
 	auto* m = &_messages.back();

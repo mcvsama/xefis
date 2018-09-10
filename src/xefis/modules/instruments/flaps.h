@@ -52,7 +52,7 @@ class Flaps:
   public:
 	// Ctor
 	explicit
-	Flaps (std::unique_ptr<FlapsIO>, std::string const& instance = {});
+	Flaps (std::unique_ptr<FlapsIO>, std::string_view const& instance = {});
 
 	// Module API
 	void
