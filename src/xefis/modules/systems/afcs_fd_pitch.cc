@@ -24,7 +24,7 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, std::string const& instance):
+AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	constexpr auto sec = 1.0_s;

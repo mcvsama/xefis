@@ -24,7 +24,7 @@
 #include "label.h"
 
 
-Label::Label (std::unique_ptr<LabelIO> module_io, std::string const& instance):
+Label::Label (std::unique_ptr<LabelIO> module_io, std::string_view const& instance):
 	Instrument (std::move (module_io), instance)
 { }
 

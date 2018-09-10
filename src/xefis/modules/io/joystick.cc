@@ -171,7 +171,7 @@ JoystickInput::Axis::set_value (float value)
 }
 
 
-JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, xf::Logger const& logger, std::string const& instance):
+JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomElement const& config, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger)
 {

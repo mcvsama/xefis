@@ -22,7 +22,7 @@
 #include "speeds.h"
 
 
-Speeds::Speeds (std::unique_ptr<SpeedsIO> module_io, xf::Airframe* airframe, std::string const& instance):
+Speeds::Speeds (std::unique_ptr<SpeedsIO> module_io, xf::Airframe* airframe, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_airframe (airframe)
 {

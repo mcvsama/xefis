@@ -98,7 +98,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
   public:
 	// Ctor
 	explicit
-	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const&, std::string const& instance = {});
+	AirDataComputer (std::unique_ptr<AirDataComputerIO>, xf::Airframe*, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API

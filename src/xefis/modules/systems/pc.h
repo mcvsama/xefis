@@ -116,7 +116,7 @@ class PerformanceComputer: public xf::Module<PerformanceComputerIO>
   public:
 	// Ctor
 	explicit
-	PerformanceComputer (std::unique_ptr<PerformanceComputerIO>, xf::Airframe*, std::string const& instance = {});
+	PerformanceComputer (std::unique_ptr<PerformanceComputerIO>, xf::Airframe*, std::string_view const& instance = {});
 
   protected:
 	void

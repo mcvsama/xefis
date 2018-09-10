@@ -73,7 +73,7 @@ class AFCS_AT: public xf::Module<AFCS_AT_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_AT (std::unique_ptr<AFCS_AT_IO>, std::string const& instance = {});
+	AFCS_AT (std::unique_ptr<AFCS_AT_IO>, std::string_view const& instance = {});
 
   protected:
 	// Module API

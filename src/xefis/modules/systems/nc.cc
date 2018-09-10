@@ -29,7 +29,7 @@
 #include "nc.h"
 
 
-NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> module_io, std::string const& instance):
+NavigationComputer::NavigationComputer (std::unique_ptr<NavigationComputerIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	// Initialize _positions* with invalid vals, to get them non-empty:

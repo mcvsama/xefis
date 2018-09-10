@@ -24,7 +24,7 @@
 #include "afcs_at.h"
 
 
-AFCS_AT::AFCS_AT (std::unique_ptr<AFCS_AT_IO> module_io, std::string const& instance):
+AFCS_AT::AFCS_AT (std::unique_ptr<AFCS_AT_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_ias_pid.set_integral_limit ({ -5.0_m, +5.0_m });

@@ -53,7 +53,7 @@ class VerticalTrim:
   public:
 	// Ctor
 	explicit
-	VerticalTrim (std::unique_ptr<VerticalTrimIO>, std::string const& instance = {});
+	VerticalTrim (std::unique_ptr<VerticalTrimIO>, std::string_view const& instance = {});
 
 	// Module API
 	void

@@ -29,13 +29,13 @@
 #include "datatable.h"
 
 
-Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property):
+Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property):
 	label (label),
 	property (property)
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property,
+Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property,
 					   QColor label_and_value_color):
 	label (label),
 	label_color (label_and_value_color),
@@ -44,7 +44,7 @@ Datatable::Line::Line (std::string const& label, xf::BasicProperty const& proper
 { }
 
 
-Datatable::Line::Line (std::string const& label, xf::BasicProperty const& property,
+Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& property,
 					   std::optional<QColor> label_color,
 					   std::optional<QColor> value_color):
 	label (label),
@@ -61,7 +61,7 @@ Datatable::Line::stringify() const
 }
 
 
-Datatable::Datatable (xf::Xefis*, std::string const& instance):
+Datatable::Datatable (xf::Xefis*, std::string_view const& instance):
 	Instrument (instance)
 {
 	_inputs_observer.set_callback ([&]{ mark_dirty(); });

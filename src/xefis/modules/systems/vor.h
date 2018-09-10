@@ -57,7 +57,7 @@ class VOR: public xf::Module<VOR_IO>
   public:
 	// Ctor
 	explicit
-	VOR (std::unique_ptr<VOR_IO>, std::string const& instance = {});
+	VOR (std::unique_ptr<VOR_IO>, std::string_view const& instance = {});
 
 	// Module API
 	void

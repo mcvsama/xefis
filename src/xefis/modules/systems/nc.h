@@ -89,7 +89,7 @@ class NavigationComputer: public xf::Module<NavigationComputerIO>
   public:
 	// Ctor
 	explicit
-	NavigationComputer (std::unique_ptr<NavigationComputerIO>, std::string const& instance);
+	NavigationComputer (std::unique_ptr<NavigationComputerIO>, std::string_view const& instance);
 
   protected:
 	// Module API

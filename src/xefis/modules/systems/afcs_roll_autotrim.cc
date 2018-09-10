@@ -21,7 +21,7 @@
 #include "afcs_roll_autotrim.h"
 
 
-AFCS_RollAutotrim::AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO> module_io, std::string const& instance):
+AFCS_RollAutotrim::AFCS_RollAutotrim (std::unique_ptr<AFCS_RollAutotrim_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 { }
 

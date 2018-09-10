@@ -66,7 +66,7 @@ template<class pValue>
 	  public:
 		// Ctor
 		explicit
-		Mixer (std::unique_ptr<MixerIO>, xf::Logger const&, std::string const& instance = {});
+		Mixer (std::unique_ptr<MixerIO>, xf::Logger const&, std::string_view const& instance = {});
 
 	  protected:
 		// Module API

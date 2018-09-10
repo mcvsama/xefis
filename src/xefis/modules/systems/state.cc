@@ -42,7 +42,7 @@ StateIO::register_property (std::string const& unique_identifier, xf::BasicPrope
 }
 
 
-State::State (std::unique_ptr<StateIO> module_io, xf::Logger const& logger, std::string const& instance):
+State::State (std::unique_ptr<StateIO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger)
 {

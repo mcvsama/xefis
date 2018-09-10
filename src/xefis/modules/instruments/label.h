@@ -47,7 +47,7 @@ class Label:
   public:
 	// Ctor
 	explicit
-	Label (std::unique_ptr<LabelIO>, std::string const& instance = {});
+	Label (std::unique_ptr<LabelIO>, std::string_view const& instance = {});
 
 	void
 	paint (xf::PaintRequest&) const override;

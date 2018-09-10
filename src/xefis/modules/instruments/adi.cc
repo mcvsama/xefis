@@ -2952,7 +2952,7 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, std::string const& instance):
+ADI::ADI (std::unique_ptr<ADI_IO> module_io, std::string_view const& instance):
 	Instrument (std::move (module_io), instance)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));

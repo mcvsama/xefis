@@ -27,7 +27,7 @@
 #include "rcms.h"
 
 
-RemoteControlManagementSystem::RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO> module_io, std::string const& instance):
+RemoteControlManagementSystem::RemoteControlManagementSystem (std::unique_ptr<RemoteControlManagementSystemIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_distance_computer.set_callback (std::bind (&RemoteControlManagementSystem::compute_distances_to_home, this));

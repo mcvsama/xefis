@@ -64,7 +64,7 @@ class TrimControl: public xf::Module<TrimControlIO>
   public:
 	// Ctor
 	explicit
-	TrimControl (std::unique_ptr<TrimControlIO>, xf::SoundManager*, std::string const& instance = {});
+	TrimControl (std::unique_ptr<TrimControlIO>, xf::SoundManager*, std::string_view const& instance = {});
 
 	// Module API
 	void

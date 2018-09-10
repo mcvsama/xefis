@@ -118,7 +118,7 @@ struct FGOutputData
 END_PACKED_STRUCT
 
 
-FlightGear::FlightGear (std::unique_ptr<FlightGearIO> module_io, std::string const& instance):
+FlightGear::FlightGear (std::unique_ptr<FlightGearIO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	_serviceable_flags = {

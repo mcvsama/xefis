@@ -41,16 +41,16 @@ class Datatable:
 	  public:
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::BasicProperty const&);
+		Line (std::string_view const& label, xf::BasicProperty const&);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::BasicProperty const&,
+		Line (std::string_view const& label, xf::BasicProperty const&,
 			  QColor label_and_value_color);
 
 		// Ctor
 		explicit
-		Line (std::string const& label, xf::BasicProperty const&,
+		Line (std::string_view const& label, xf::BasicProperty const&,
 			  std::optional<QColor> label_color,
 			  std::optional<QColor> value_color);
 
@@ -70,7 +70,7 @@ class Datatable:
   public:
 	// Ctor
 	explicit
-	Datatable (xf::Xefis*, std::string const& instance = {});
+	Datatable (xf::Xefis*, std::string_view const& instance = {});
 
 	/**
 	 * Set font size for all labels.

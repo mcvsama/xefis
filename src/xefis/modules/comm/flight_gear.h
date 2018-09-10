@@ -146,7 +146,7 @@ class FlightGear:
   public:
 	// Ctor
 	explicit
-	FlightGear (std::unique_ptr<FlightGearIO>, std::string const& instance = {});
+	FlightGear (std::unique_ptr<FlightGearIO>, std::string_view const& instance = {});
 
 	// Module API
 	void

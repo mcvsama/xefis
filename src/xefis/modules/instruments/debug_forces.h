@@ -50,7 +50,7 @@ class DebugForces:
   public:
 	// Ctor
 	explicit
-	DebugForces (std::unique_ptr<DebugForcesIO>, std::string const& instance = {});
+	DebugForces (std::unique_ptr<DebugForcesIO>, std::string_view const& instance = {});
 
 	// Module API
 	void

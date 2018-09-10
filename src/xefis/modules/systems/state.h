@@ -76,7 +76,7 @@ class State: public xf::Module<StateIO>
   public:
 	// Ctor
 	explicit
-	State (std::unique_ptr<StateIO>, xf::Logger const&, std::string const& instance = {});
+	State (std::unique_ptr<StateIO>, xf::Logger const&, std::string_view const& instance = {});
 
 	// Dtor
 	~State();

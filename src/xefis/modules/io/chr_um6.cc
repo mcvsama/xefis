@@ -38,7 +38,7 @@
 #include "chr_um6.h"
 
 
-CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string const& instance):
+CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
 	_logger (logger),
 	_serial_port (std::move (serial_port))

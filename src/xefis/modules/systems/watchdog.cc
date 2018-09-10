@@ -26,7 +26,7 @@
 #include "watchdog.h"
 
 
-Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string const& instance):
+Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):
 	Module (instance),
 	_logger (logger)
 {

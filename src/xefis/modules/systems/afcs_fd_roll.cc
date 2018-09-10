@@ -24,7 +24,7 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, std::string const& instance):
+AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
 	constexpr auto sec = 1.0_s;

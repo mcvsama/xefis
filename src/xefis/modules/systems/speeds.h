@@ -50,7 +50,7 @@ class Speeds: public xf::Module<SpeedsIO>
   public:
 	// Ctor
 	explicit
-	Speeds (std::unique_ptr<SpeedsIO>, xf::Airframe*, std::string const& instance = {});
+	Speeds (std::unique_ptr<SpeedsIO>, xf::Airframe*, std::string_view const& instance = {});
 
 	// Module API
 	void
