@@ -352,11 +352,11 @@ class Parameters
 	bool						roll_warning						= false;
 	bool						slip_skid_warning					= false;
 	// Velocity ladder
-	si::Velocity				sl_extent							= 124_kt;
-	int							sl_minimum							= 0;
-	int							sl_maximum							= 9999;
-	int							sl_line_every						= 10;
-	int							sl_number_every						= 20;
+	si::Velocity				vl_extent							= 124_kt;
+	int							vl_minimum							= 0;
+	int							vl_maximum							= 9999;
+	int							vl_line_every						= 10;
+	int							vl_number_every						= 20;
 	// Altitude ladder
 	si::Length					al_extent							= 825_ft;
 	int							al_emphasis_every					= 1000;
