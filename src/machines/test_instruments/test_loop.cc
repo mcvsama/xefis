@@ -19,6 +19,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/services.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
+#include <xefis/modules/systems/afcs_api.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qutils.h>
 
@@ -40,8 +41,8 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
 
 	// IO:
-	_test_screen->adi_io->weight_on_wheels									<< xf::ConstantSource (true);
-	_test_screen->adi_io->speed_ias_serviceable								<< xf::ConstantSource (true);
+	_test_screen->adi_io->weight_on_wheels									<< test_generator_io->create_enum_property<bool> ("weight-on-wheels", { { true, 3_s }, { xf::nil, 2_s }, { false, 5_s } });
+	_test_screen->adi_io->speed_ias_serviceable								<< test_generator_io->create_enum_property<bool> ("speed/ias.serviceable", { { true, 10_s }, { false, 2_s } });
 	_test_screen->adi_io->speed_ias											<< test_generator_io->create_property<si::Velocity> ("speed/ias", 0_kt, { 0_kt, 300_kt }, 10_kt / 1_s);
 	_test_screen->adi_io->speed_ias_lookahead								<< test_generator_io->create_property<si::Velocity> ("speed/ias.lookahead", 25_kt, { 0_kt, 300_kt }, 8_kt / 1_s);
 	_test_screen->adi_io->speed_ias_minimum									<< test_generator_io->create_property<si::Velocity> ("speed/ias.minimum", 60_kt, { 50_kt, 70_kt }, 3_kt / 1_s);
@@ -59,7 +60,7 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->speed_flaps_a_speed								<< xf::ConstantSource (120_kt);
 	_test_screen->adi_io->speed_flaps_b_label								<< xf::ConstantSource<std::string> ("5");
 	_test_screen->adi_io->speed_flaps_b_speed								<< xf::ConstantSource (110_kt);
-	_test_screen->adi_io->orientation_serviceable							<< xf::ConstantSource (true);
+	_test_screen->adi_io->orientation_serviceable							<< test_generator_io->create_enum_property<bool> ("orientation/serviceable", { { true, 11.5_s }, { false, 2_s } });
 	_test_screen->adi_io->orientation_pitch									<< test_generator_io->create_property<si::Angle> ("orientation/pitch", 0_deg, { -90_deg, 90_deg }, 8_deg / 1_s);
 	_test_screen->adi_io->orientation_roll									<< test_generator_io->create_property<si::Angle> ("orientation/roll", 0_deg, { -180_deg, +180_deg }, 1.5_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
 	_test_screen->adi_io->orientation_heading_magnetic						<< test_generator_io->create_property<si::Angle> ("orientation/heading.magnetic", 0_deg, { 0_deg, 360_deg }, 2_deg / 1_s, TestGeneratorIO::BorderCondition::Periodic);
@@ -70,26 +71,26 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->track_vertical									<< test_generator_io->create_property<si::Angle> ("track/vertical", 0_deg, { -13_deg, 13_deg }, 1_deg / 1_s);
 	_test_screen->adi_io->fpv_visible										<< xf::ConstantSource (true);
 	_test_screen->adi_io->slip_skid											<< test_generator_io->create_property<si::Angle> ("slip-skid/angle", 0_deg, { -5_deg, 5_deg }, 0.5_deg / 1_s);
-	_test_screen->adi_io->aoa_alpha											<< test_generator_io->create_property<si::Angle> ("aoa/alpha", 0_deg, { -2_deg, 15_deg }, 1_deg / 1_s);
+	_test_screen->adi_io->aoa_alpha											<< test_generator_io->create_property<si::Angle> ("aoa/alpha", 0_deg, { -7_deg, 15_deg }, 1_deg / 1_s);
 	_test_screen->adi_io->aoa_alpha_maximum									<< test_generator_io->create_property<si::Angle> ("aoa/alpha.maximum", 13_deg, { 13_deg, 15_deg }, 0.25_deg / 1_s);
 	_test_screen->adi_io->aoa_alpha_visible									<< xf::ConstantSource (true);
-	_test_screen->adi_io->altitude_amsl_serviceable							<< xf::ConstantSource (true);
+	_test_screen->adi_io->altitude_amsl_serviceable							<< test_generator_io->create_enum_property<bool> ("altitude/amsl.serviceable", { { true, 15_s }, { false, 2_s } });
 	_test_screen->adi_io->altitude_amsl										<< test_generator_io->create_property<si::Length> ("altitude/amsl", -200_ft, { -200_ft, 2000_ft }, 2000_ft / 1_min);
 	_test_screen->adi_io->altitude_amsl_lookahead							<< test_generator_io->create_property<si::Length> ("altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
-	_test_screen->adi_io->altitude_agl_serviceable							<< xf::ConstantSource (true);
+	_test_screen->adi_io->altitude_agl_serviceable							<< test_generator_io->create_enum_property<bool> ("altitude/agl.serviceable", { { true, 16_s }, { false, 2_s } });
 	_test_screen->adi_io->altitude_agl										<< test_generator_io->create_property<si::Length> ("altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
 	_test_screen->adi_io->altitude_minimums_type							<< xf::ConstantSource ("BARO");
 	_test_screen->adi_io->altitude_minimums_setting							<< xf::ConstantSource (300_ft);
 	_test_screen->adi_io->altitude_minimums_amsl							<< xf::ConstantSource (300_ft);
 	_test_screen->adi_io->altitude_landing_amsl								<< xf::ConstantSource (140_ft);
-	_test_screen->adi_io->vertical_speed_serviceable						<< xf::ConstantSource (true);
+	_test_screen->adi_io->vertical_speed_serviceable						<< test_generator_io->create_enum_property<bool> ("vertical-speed/serviceable", { { true, 8_s }, { false, 2_s } });
 	_test_screen->adi_io->vertical_speed									<< test_generator_io->create_property<si::Velocity> ("vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
 	_test_screen->adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_property<si::Power> ("vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);
 	_test_screen->adi_io->pressure_qnh										<< xf::ConstantSource (1013_hPa);
 	_test_screen->adi_io->pressure_display_hpa								<< xf::ConstantSource (true);
 	_test_screen->adi_io->pressure_use_std									<< xf::ConstantSource (true);
 	// TODO xf::PropertyIn<std::string>	adi_io->flight_director_active_name { ... } // "L", "R", "C"(enter)?
-	_test_screen->adi_io->flight_director_serviceable						<< xf::ConstantSource (true);
+	_test_screen->adi_io->flight_director_serviceable						<< test_generator_io->create_enum_property<bool> ("flight-director/serviceable", { { true, 13_s }, { false, 2_s } });
 	_test_screen->adi_io->flight_director_cmd_visible						<< xf::ConstantSource (true);
 	_test_screen->adi_io->flight_director_cmd_altitude						<< xf::ConstantSource (1000_ft);
 	_test_screen->adi_io->flight_director_cmd_altitude_acquired				<< xf::ConstantSource (false);
@@ -108,23 +109,23 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->navaid_type_hint									<< xf::ConstantSource ("VOR");
 	_test_screen->adi_io->navaid_identifier									<< xf::ConstantSource ("WRO");
 	_test_screen->adi_io->navaid_distance									<< xf::ConstantSource (1.5_nmi);
-	_test_screen->adi_io->flight_path_deviation_lateral_serviceable			<< xf::ConstantSource (true);
+	_test_screen->adi_io->flight_path_deviation_lateral_serviceable			<< test_generator_io->create_enum_property<bool> ("flight-path-deviation/lateral/serviceable", { { true, 9.5_s }, { false, 2_s } });
 	_test_screen->adi_io->flight_path_deviation_lateral_approach			<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/lateral/approach", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
 	_test_screen->adi_io->flight_path_deviation_lateral_flight_path			<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/lateral/flight-path", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
-	_test_screen->adi_io->flight_path_deviation_vertical_serviceable		<< xf::ConstantSource (true);
+	_test_screen->adi_io->flight_path_deviation_vertical_serviceable		<< test_generator_io->create_enum_property<bool> ("flight-path-deviation/vertical/serviceable", { { true, 13.4_s }, { false, 2_s } });
 	_test_screen->adi_io->flight_path_deviation_vertical					<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/deviation", 0_deg, { -5_deg, 5_deg }, 1_deg / 1_s);
 	_test_screen->adi_io->flight_path_deviation_vertical_approach			<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/approach", 0_deg, { -5_deg, 5_deg }, 2_deg / 1_s);
 	_test_screen->adi_io->flight_path_deviation_vertical_flight_path		<< test_generator_io->create_property<si::Angle> ("flight-path-deviation/vertical/flight-path", 0_deg, { -5_deg, 5_deg }, 3_deg / 1_s);
 	_test_screen->adi_io->flight_path_deviation_mixed_mode					<< xf::ConstantSource (true);
 	_test_screen->adi_io->flight_mode_hint_visible							<< xf::ConstantSource (true);
-	_test_screen->adi_io->flight_mode_hint									<< xf::ConstantSource ("TEST");
+	_test_screen->adi_io->flight_mode_hint									<< test_generator_io->create_enum_property<std::string> ("fma/hint", { { "F/D", 11_s }, { "CMD", 15_s } });
 	_test_screen->adi_io->flight_mode_fma_visible							<< xf::ConstantSource (true);
-	_test_screen->adi_io->flight_mode_fma_speed_hint						<< xf::ConstantSource ("THR REF");
-	_test_screen->adi_io->flight_mode_fma_speed_armed_hint					<< xf::ConstantSource ("SPD");
-	_test_screen->adi_io->flight_mode_fma_lateral_hint						<< xf::ConstantSource ("CMD TRK");
-	_test_screen->adi_io->flight_mode_fma_lateral_armed_hint				<< xf::ConstantSource ("ILS TRK");
-	_test_screen->adi_io->flight_mode_fma_vertical_hint						<< xf::ConstantSource ("CMD FPA");
-	_test_screen->adi_io->flight_mode_fma_vertical_armed_hint				<< xf::ConstantSource ("G/S");
+	_test_screen->adi_io->flight_mode_fma_speed_hint						<< test_generator_io->create_enum_property<std::string> ("fma/speed-hint", { { std::string (afcs::kThrustMode_TO_GA), 15_s }, { std::string (afcs::kThrustMode_Continuous), 15_s } });
+	_test_screen->adi_io->flight_mode_fma_speed_armed_hint					<< test_generator_io->create_enum_property<std::string> ("fma/speed-armed-hint", { { std::string (afcs::kSpeedMode_Airspeed), 17_s }, { std::string (afcs::kSpeedMode_Thrust), 17_s } });
+	_test_screen->adi_io->flight_mode_fma_lateral_hint						<< test_generator_io->create_enum_property<std::string> ("fma/lateral-hint", { { std::string (afcs::kRollMode_Track), 12_s }, { std::string (afcs::kRollMode_WingsLevel), 12_s }, { std::string (afcs::kRollMode_LNAV), 15_s }, { std::string (afcs::kRollMode_Localizer), 12_s } });
+	_test_screen->adi_io->flight_mode_fma_lateral_armed_hint				<< test_generator_io->create_enum_property<std::string> ("fma/lateral-armed-hint", { { std::string (afcs::kRollMode_Track), 13_s }, { std::string (afcs::kRollMode_Heading), 13_s } });
+	_test_screen->adi_io->flight_mode_fma_vertical_hint						<< test_generator_io->create_enum_property<std::string> ("fma/vertical-hint", { { std::string (afcs::kPitchMode_Altitude), 11_s }, { std::string (afcs::kPitchMode_TO_GA), 17_s } });
+	_test_screen->adi_io->flight_mode_fma_vertical_armed_hint				<< test_generator_io->create_enum_property<std::string> ("fma/vertical-armed-hint", { { std::string (afcs::kPitchMode_GS), 14_s }, { std::string (afcs::kPitchMode_VNAVPath), 14_s } });
 	_test_screen->adi_io->tcas_resolution_advisory_pitch_minimum			<< xf::ConstantSource (-45_deg);
 	_test_screen->adi_io->tcas_resolution_advisory_pitch_maximum			<< xf::ConstantSource (80_deg);
 	_test_screen->adi_io->tcas_resolution_advisory_vertical_speed_minimum	<< xf::ConstantSource (-3000_fpm);
