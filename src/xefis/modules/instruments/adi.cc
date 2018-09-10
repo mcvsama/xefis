@@ -2885,27 +2885,25 @@ PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 				? pr.aids.kCautionColor
 				: pr.aids.kWarningColor;
 
-		auto paint = [&] (QColor color, float pen_width_scale) -> void
+		auto paint = [&] (QColor color, float pen_add) -> void
 		{
-			pr.painter.setPen (pr.aids.get_pen (color, pen_width_scale * 2.f));
+			pr.painter.setPen (pr.aids.get_pen (color, 1.8f + pen_add));
 			pr.painter.drawPolyline (QPolygonF ({
 				-11.f * x + y,
 				-11.f * x - y,
 				-17.f * x - y
 			}));
-			QPen pen = pr.aids.get_pen (color, pen_width_scale * 1.5f);
-			pen.setCapStyle (Qt::FlatCap);
-			pr.painter.setPen (pen);
+			pr.painter.setPen (pr.aids.get_pen (color, 1.35f + pen_add));
 			pr.painter.drawLine (-12.5f * x - y, -14.f * x - 3.65f * y);
 			pr.painter.drawLine (-14.f * x - y, -15.5f * x - 3.65f * y);
 			pr.painter.drawLine (-15.5f * x - y, -17.f * x - 3.65f * y);
 		};
 
-		paint (pr.default_shadow.color(), 1.25f);
-		paint (selected_color, 0.9f);
+		paint (pr.default_shadow.color(), 1.0f);
+		paint (selected_color, 0.0f);
 		pr.painter.scale (-1.f, 1.f);
-		paint (pr.default_shadow.color(), 1.25f);
-		paint (selected_color, 0.9f);
+		paint (pr.default_shadow.color(), 1.0f);
+		paint (selected_color, 0.0f);
 	}
 }
 
