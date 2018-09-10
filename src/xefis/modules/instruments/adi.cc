@@ -2825,7 +2825,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 		pr.painter.setPen (QPen (pr.kLadderBorderColor, pr.aids.pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin));
 		pr.painter.setBrush (pr.kLadderColor);
 		pr.painter.drawRect (rect);
-		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.2f));
+		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.2f, Qt::SolidLine, Qt::FlatCap));
 		pr.painter.drawLine (QPointF (x26, rect.top()), QPointF (x26, rect.bottom()));
 		pr.painter.drawLine (QPointF (x46, rect.top()), QPointF (x46, rect.bottom()));
 		pr.painter.setBrush (Qt::NoBrush);
