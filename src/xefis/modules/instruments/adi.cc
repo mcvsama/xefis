@@ -2880,6 +2880,10 @@ PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 
 		QPointF const x (0.025f * w, 0.f);
 		QPointF const y (0.f, 0.025f * w);
+		QColor const selected_color =
+			pr.params.critical_aoa > pr.params.aoa_alpha
+				? pr.aids.kCautionColor
+				: pr.aids.kWarningColor;
 
 		auto paint = [&] (QColor color, float pen_width_scale) -> void
 		{
@@ -2898,10 +2902,10 @@ PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 		};
 
 		paint (pr.default_shadow.color(), 1.25f);
-		paint (pr.aids.kCautionColor, 0.9f);
+		paint (selected_color, 0.9f);
 		pr.painter.scale (-1.f, 1.f);
 		paint (pr.default_shadow.color(), 1.25f);
-		paint (pr.aids.kCautionColor, 0.9f);
+		paint (selected_color, 0.9f);
 	}
 }
 
