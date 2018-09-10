@@ -82,6 +82,16 @@ base_address_for_location (std::string const& location)
 		return std::nullopt;
 }
 
+
+static void* check_addr2line = [] {
+	auto addr2line = boost::process::search_path ("addr2line");
+
+	if (addr2line.empty())
+		std::clog << "Note: install addr2line program to get more detailed backtraces" << std::endl;
+
+	return nullptr;
+}();
+
 } // namespace
 
 
