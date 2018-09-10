@@ -2186,7 +2186,7 @@ AltitudeLadder::paint_vertical_speed_failure (AdiPaintRequest& pr, float const x
 {
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (_transform);
-	pr.painter.translate (4.f * x, 0.f);
+	pr.painter.translate (4.75f * x, 0.0f);
 	pr.paint_vertical_failure_flag ("VERT", QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), pr.aids.kCautionColor, pr.params.vertical_speed_failure_focus);
 }
 
