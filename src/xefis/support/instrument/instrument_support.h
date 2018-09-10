@@ -28,12 +28,19 @@
 #include <xefis/support/instrument/instrument_aids.h>
 #include <xefis/support/instrument/instrument_painter.h>
 #include <xefis/support/instrument/text_painter.h>
+#include <xefis/utility/synchronized.h>
 
 
 namespace xf {
 
 class InstrumentSupport
 {
+	struct Data
+	{
+		std::optional<PaintRequest::Metric>	cached_canvas_metric;
+		std::shared_ptr<InstrumentAids>		cached_aids;
+	};
+
   public:
 	std::shared_ptr<InstrumentAids>
 	get_aids (PaintRequest const&) const;
@@ -42,49 +49,49 @@ class InstrumentSupport
 	 * Return an instrument painter with pointers to local caches, etc.
 	 * Use it in every paint() call, it will ensure that caches are reset
 	 * when instrument size changes.
-	 * Not thread safe!
 	 */
 	InstrumentPainter
 	get_painter (PaintRequest&) const;
 
   private:
-	void
-	update_cache (PaintRequest const&) const;
+	static void
+	update_cache (PaintRequest const&, Data&);
 
   private:
-	std::optional<PaintRequest::Metric> mutable		_cached_canvas_metric;
-	std::shared_ptr<InstrumentAids> mutable			_cached_aids;
-	TextPainter::Cache mutable						_text_painter_cache; // FIXME this implies thread-safety:
+	xf::Synchronized<Data> mutable					_data;
+	static inline thread_local TextPainter::Cache	_text_painter_cache;
 };
 
 
 inline std::shared_ptr<InstrumentAids>
 InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 {
-	if (!_cached_aids || !_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
-		update_cache (paint_request);
-		// TODO ↑ screen ref may change between get_aids() calls
+	auto data = _data.lock();
 
-	return _cached_aids;
+	if (!data->cached_aids || !data->cached_canvas_metric || *data->cached_canvas_metric != paint_request.metric())
+		update_cache (paint_request, *data);
+
+	return data->cached_aids;
 }
 
 
 inline InstrumentPainter
 InstrumentSupport::get_painter (PaintRequest& paint_request) const
 {
-	if (!_cached_canvas_metric || *_cached_canvas_metric != paint_request.metric())
-		update_cache (paint_request);
+	auto data = _data.lock();
+
+	if (!data->cached_canvas_metric || *data->cached_canvas_metric != paint_request.metric())
+		update_cache (paint_request, *data);
 
 	return InstrumentPainter (paint_request.canvas(), _text_painter_cache);
 }
 
 
 inline void
-InstrumentSupport::update_cache (PaintRequest const& paint_request) const
+InstrumentSupport::update_cache (PaintRequest const& paint_request, Data& data)
 {
-	_cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
-	_text_painter_cache = TextPainter::Cache();
-	_cached_canvas_metric = paint_request.metric();
+	data.cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
+	data.cached_canvas_metric = paint_request.metric();
 }
 
 } // namespace xf
