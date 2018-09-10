@@ -275,28 +275,32 @@ AdiPaintRequest::paint_dashed_zone (QColor const& color, QRectF const& target)
 
 
 void
-AdiPaintRequest::paint_horizontal_failure_flag (QPointF const& center, QFont const& font, QString const& message)
+AdiPaintRequest::paint_horizontal_failure_flag (QString const& message, QPointF const& center, QFont const& font, QColor const color, bool const focused)
 {
+	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	QFontMetricsF const metrics (font);
 	QRectF box (0.f, 0.f, metrics.width (message) + 0.65f * metrics.width ("0"), metrics.height());
 
 	aids.centrify (box);
 	box.translate (center);
 
-	painter.setPen (aids.get_pen (aids.kCautionColor, 1.f));
 	painter.setFont (font);
 	painter.setBrush (Qt::black);
+	painter.setPen (focused ? normal_pen : Qt::NoPen);
 
 	painter.paint (default_shadow, [&] {
 		painter.drawRect (box);
 	});
+
+	painter.setPen (normal_pen);
 	painter.fast_draw_text (center, Qt::AlignHCenter | Qt::AlignVCenter, message, default_shadow);
 }
 
 
 void
-AdiPaintRequest::paint_vertical_failure_flag (QPointF const& center, QFont const& font, QString const& message)
+AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF const& center, QFont const& font, QColor const color, bool const focused)
 {
+	QPen const normal_pen = aids.get_pen (color, 1.0f);
 	float const digit_width = 1.6f * xf::InstrumentAids::FontInfo::get_digit_width (font);
 	float const digit_height = 1.f * QFontMetricsF (font).height();
 
@@ -304,15 +308,16 @@ AdiPaintRequest::paint_vertical_failure_flag (QPointF const& center, QFont const
 	aids.centrify (box);
 	box.translate (center);
 
-	painter.setPen (aids.get_pen (aids.kCautionColor, 1.f));
 	painter.setFont (font);
 	painter.setBrush (Qt::black);
+	painter.setPen (focused ? normal_pen : Qt::NoPen);
 
 	painter.paint (default_shadow, [&] {
 		painter.drawRect (box);
 	});
-
 	QPointF const top_letter = center + QPointF (0.f, -0.5f * digit_height * (message.size() - 1));
+
+	painter.setPen (normal_pen);
 
 	for (int i = 0; i < message.size(); ++i)
 		painter.fast_draw_text (top_letter + QPointF (0.f, i * digit_height), Qt::AlignHCenter | Qt::AlignVCenter, message[i], default_shadow);
@@ -336,7 +341,7 @@ ArtificialHorizon::paint (AdiPaintRequest& pr) const
 	if (pr.params.orientation_failure)
 	{
 		clear (pr);
-		paint_attitude_failure (pr);
+		paint_orientation_failure (pr);
 	}
 	else
 	{
@@ -799,20 +804,9 @@ ArtificialHorizon::paint_pitch_disagree (AdiPaintRequest& pr) const
 {
 	if (pr.params.pitch_disagree)
 	{
-		float const margin = 0.075f * pr.q;
-		auto const ld = pr.aids.lesser_dimension();
-		QPointF const position (-0.225f * ld, 0.285f * ld);
-		auto const alignment = Qt::AlignVCenter | Qt::AlignLeft;
-		auto const text = "PITCH";
-
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.setFont (pr.aids.font_3.font);
-		pr.painter.setPen (Qt::NoPen);
-		pr.painter.setBrush (Qt::black);
-		pr.painter.drawRect (pr.painter.get_text_box (position, alignment, text).adjusted (-margin, 0.0f, +margin, 0.0f));
-		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
-		pr.painter.fast_draw_text (position, alignment, text);
+		pr.paint_horizontal_failure_flag ("PITCH", QPointF (-1.6f * pr.q, 2.9f * pr.q), pr.aids.scaled_default_font (1.6f), pr.aids.kWarningColor, pr.params.pitch_disagree_focus);
 	}
 }
 
@@ -822,20 +816,9 @@ ArtificialHorizon::paint_roll_disagree (AdiPaintRequest& pr) const
 {
 	if (pr.params.roll_disagree)
 	{
-		float const margin = 0.075f * pr.q;
-		auto const ld = pr.aids.lesser_dimension();
-		QPointF const position (+0.225f * ld, 0.285f * ld);
-		auto const alignment = Qt::AlignVCenter | Qt::AlignRight;
-		auto const text = "ROLL";
-
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.setFont (pr.aids.font_3.font);
-		pr.painter.setPen (Qt::NoPen);
-		pr.painter.setBrush (Qt::black);
-		pr.painter.drawRect (pr.painter.get_text_box (position, alignment, text).adjusted (-margin, 0.0f, +margin, 0.0f));
-		pr.painter.setPen (pr.aids.get_pen (pr.aids.kWarningColor, 1.f));
-		pr.painter.fast_draw_text (position, alignment, text);
+		pr.paint_horizontal_failure_flag ("ROLL", QPointF (+1.6f * pr.q, 2.9f * pr.q), pr.aids.scaled_default_font (1.6f), pr.aids.kWarningColor, pr.params.roll_disagree_focus);
 	}
 }
 
@@ -863,13 +846,13 @@ ArtificialHorizon::paint_flight_path_marker (AdiPaintRequest& pr) const
 
 
 void
-ArtificialHorizon::paint_attitude_failure (AdiPaintRequest& pr) const
+ArtificialHorizon::paint_orientation_failure (AdiPaintRequest& pr) const
 {
 	auto const ld = pr.aids.lesser_dimension();
 
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
-	pr.paint_horizontal_failure_flag (QPointF (0.f, -0.055f * ld), pr.aids.scaled_default_font (2.0f), "ATT");
+	pr.paint_horizontal_failure_flag ("ATT", QPointF (0.f, -0.055f * ld), pr.aids.scaled_default_font (2.0f), pr.aids.kCautionColor, pr.params.orientation_failure_focus);
 }
 
 
@@ -881,7 +864,7 @@ ArtificialHorizon::paint_flight_path_marker_failure (AdiPaintRequest& pr) const
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
 	// On Boeing EFIS FPM is called FPV - Flight Path Vector:
-	pr.paint_horizontal_failure_flag (QPointF (-0.175f * ld, -0.075f * ld), pr.aids.scaled_default_font (1.8f), "FPV");
+	pr.paint_horizontal_failure_flag ("FPV", QPointF (-0.175f * ld, -0.075f * ld), pr.aids.scaled_default_font (1.8f), pr.aids.kCautionColor, pr.params.flight_path_marker_failure_focus);
 }
 
 
@@ -892,7 +875,7 @@ ArtificialHorizon::paint_flight_director_failure (AdiPaintRequest& pr) const
 
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
-	pr.paint_horizontal_failure_flag (QPointF (+0.2f * ld, -0.075f * ld), pr.aids.scaled_default_font (1.8f), "FD");
+	pr.paint_horizontal_failure_flag ("FD", QPointF (+0.2f * ld, -0.075f * ld), pr.aids.scaled_default_font (1.8f), pr.aids.kCautionColor, pr.params.flight_director_failure_focus);
 }
 
 
@@ -1412,7 +1395,7 @@ VelocityLadder::paint_failure (AdiPaintRequest& pr) const
 {
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (_transform);
-	pr.paint_vertical_failure_flag (QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), "SPD");
+	pr.paint_vertical_failure_flag ("SPD", QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), pr.aids.kCautionColor, pr.params.speed_failure_focus);
 }
 
 
@@ -2205,7 +2188,7 @@ AltitudeLadder::paint_vertical_speed_failure (AdiPaintRequest& pr, float const x
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (_transform);
 	pr.painter.translate (4.f * x, 0.f);
-	pr.paint_vertical_failure_flag (QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), "VERT");
+	pr.paint_vertical_failure_flag ("VERT", QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), pr.aids.kCautionColor, pr.params.vertical_speed_failure_focus);
 }
 
 
@@ -2214,7 +2197,7 @@ AltitudeLadder::paint_failure (AdiPaintRequest& pr) const
 {
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (_transform);
-	pr.paint_vertical_failure_flag (QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), "ALT");
+	pr.paint_vertical_failure_flag ("ALT", QPointF (0.f, 0.f), pr.aids.scaled_default_font (2.0f), pr.aids.kCautionColor, pr.params.altitude_failure_focus);
 }
 
 
@@ -2712,7 +2695,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		pr.painter.translate (0.f, 0.452f * ld);
 
 		if (pr.params.deviation_lateral_failure)
-			pr.paint_horizontal_failure_flag (QPointF (0.f, 0.f), pr.aids.scaled_default_font (1.8f), "LOC");
+			pr.paint_horizontal_failure_flag ("LOC", QPointF (0.f, 0.f), pr.aids.scaled_default_font (1.8f), pr.aids.kCautionColor, pr.params.deviation_lateral_failure_focus);
 		else
 			paint_ladder (pr.params.deviation_lateral_approach, pr.params.deviation_lateral_flight_path);
 
@@ -2720,7 +2703,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		pr.painter.translate (0.28f * ld, 0.f);
 
 		if (pr.params.deviation_vertical_failure)
-			pr.paint_vertical_failure_flag (QPointF (0.f, 0.f), pr.aids.scaled_default_font (1.8f), "G/S");
+			pr.paint_vertical_failure_flag ("G/S", QPointF (0.f, 0.f), pr.aids.scaled_default_font (1.8f), pr.aids.kCautionColor, pr.params.deviation_vertical_failure_focus);
 		else
 		{
 			pr.painter.rotate (-90);
@@ -2962,7 +2945,7 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
-	pr.paint_horizontal_failure_flag (QPointF (0.f, 0.35f * pr.aids.lesser_dimension() + 0.5f * 1.3f * digit_height), font_info.font, " RA ");
+	pr.paint_horizontal_failure_flag (" RA ", QPointF (0.f, 0.35f * pr.aids.lesser_dimension() + 0.5f * 1.3f * digit_height), font_info.font, pr.aids.kCautionColor, pr.params.altitude_agl_failure_focus);
 }
 
 } // namespace adi_detail
@@ -2995,21 +2978,20 @@ ADI::~ADI()
 void
 ADI::process (xf::Cycle const& cycle)
 {
-	constexpr si::Time focus_duration = 10_s;
-	constexpr si::Time focus_short_duration = 5_s;
-
 	_fpv_computer.process (cycle.update_time());
-	_minimums_became_visible.update (cycle.update_time(), [&] {
-		return io.altitude_amsl.valid() && io.altitude_minimums_amsl.valid() &&
-			   *io.altitude_amsl < *io.altitude_minimums_amsl;
-	});
 
 	adi_detail::Parameters params;
 	params.timestamp = cycle.update_time();
+	params.focus_duration = *io.focus_duration;
+	params.focus_short_duration = *io.focus_short_duration;
 	params.old_style = io.style_old.value_or (false);
 	params.show_metric = io.style_show_metric.value_or (false);
 	// Speed
 	params.speed_failure = !io.speed_ias_serviceable.value_or (true);
+	_speed_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.speed_failure;
+	});
+	params.speed_failure_focus = _speed_failure_timestamp.shorter_than (*io.focus_duration);
 	params.speed_visible = io.speed_ias.valid();
 	params.speed = io.speed_ias.value_or (0_kt);
 	params.speed_lookahead_visible = io.speed_ias_lookahead.valid();
@@ -3084,6 +3066,10 @@ ADI::process (xf::Cycle const& cycle)
 
 	// Orientation
 	params.orientation_failure = !io.orientation_serviceable.value_or (true);
+	_orientation_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.orientation_failure;
+	});
+	params.orientation_failure_focus = _orientation_failure_timestamp.shorter_than (*io.focus_duration);
 	params.orientation_pitch_visible = io.orientation_pitch.valid();
 	params.orientation_pitch = io.orientation_pitch.value_or (0_deg);
 	params.orientation_roll_visible = io.orientation_roll.valid();
@@ -3096,6 +3082,10 @@ ADI::process (xf::Cycle const& cycle)
 	params.slip_skid = io.slip_skid.value_or (0_deg);
 	// Flight path vector:
 	params.flight_path_marker_failure = _computed_fpv_failure;
+	_flight_path_marker_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.flight_path_marker_failure;
+	});
+	params.flight_path_marker_failure_focus = _flight_path_marker_failure_timestamp.shorter_than (*io.focus_duration);
 	params.flight_path_visible = _computed_fpv_visible;
 	params.flight_path_alpha = _computed_fpv_alpha;
 	params.flight_path_beta = _computed_fpv_beta;
@@ -3106,14 +3096,25 @@ ADI::process (xf::Cycle const& cycle)
 	params.aoa_alpha = io.aoa_alpha.value_or (0_deg);
 	// Altitude
 	params.altitude_failure = !io.altitude_amsl_serviceable.value_or (true);
+	_altitude_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.altitude_failure;
+	});
+	params.altitude_failure_focus = _altitude_failure_timestamp.shorter_than (*io.focus_duration);
 	params.altitude_visible = io.altitude_amsl.valid();
 	params.altitude_amsl = io.altitude_amsl.value_or (0_ft);
 	params.altitude_lookahead_visible = io.altitude_amsl_lookahead.valid();
 	params.altitude_lookahead = io.altitude_amsl_lookahead.value_or (0_ft);
 	params.altitude_agl_failure = !io.altitude_agl_serviceable.value_or (true);
+	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.altitude_agl_failure;
+	});
+	params.altitude_agl_failure_focus = _altitude_agl_failure_timestamp.shorter_than (*io.focus_duration);
 	params.altitude_agl_visible = io.altitude_agl.valid();
 	params.altitude_agl = io.altitude_agl.value_or (0_ft);
-	params.altitude_agl_focus = io.altitude_agl.valid() && io.altitude_agl.modification_age() < focus_duration;
+	_altitude_agl_became_visible.update (cycle.update_time(), [&] {
+		return io.altitude_agl_serviceable && *io.altitude_agl_serviceable && io.altitude_agl;
+	});
+	params.altitude_agl_focus = _altitude_agl_became_visible.shorter_than (*io.focus_duration);
 	params.altitude_landing_visible = io.altitude_landing_amsl.valid();
 	params.altitude_landing_amsl = io.altitude_landing_amsl.value_or (0_ft);
 	params.altitude_landing_warning_hi = *io.altitude_landing_warning_hi;
@@ -3122,12 +3123,19 @@ ADI::process (xf::Cycle const& cycle)
 	params.minimums_altitude_visible = io.altitude_minimums_setting && io.altitude_minimums_amsl;
 	params.minimums_type = QString::fromStdString (io.altitude_minimums_type.value_or (""));
 	params.minimums_amsl = io.altitude_minimums_amsl.value_or (0_ft);
-	auto minimums_focus_stretch = _minimums_became_visible.stretch();
-	params.minimums_focus = minimums_focus_stretch && *minimums_focus_stretch < focus_duration;
-	params.minimums_focus_short = minimums_focus_stretch && *minimums_focus_stretch < focus_short_duration;
+	_minimums_became_visible.update (cycle.update_time(), [&] {
+		return io.altitude_amsl && io.altitude_minimums_amsl &&
+			   *io.altitude_amsl < *io.altitude_minimums_amsl;
+	});
+	params.minimums_focus = _minimums_became_visible.shorter_than (*io.focus_duration);
+	params.minimums_focus_short = _minimums_became_visible.shorter_than (*io.focus_short_duration);
 	params.minimums_setting = io.altitude_minimums_setting.value_or (0_ft);
 	// Vertical speed
 	params.vertical_speed_failure = !io.vertical_speed_serviceable.value_or (true);
+	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.vertical_speed_failure;
+	});
+	params.vertical_speed_failure_focus = _vertical_speed_failure_timestamp.shorter_than (*io.focus_duration);
 	params.vertical_speed_visible = io.vertical_speed.valid();
 	params.vertical_speed = io.vertical_speed.value_or (0_fpm);
 	params.energy_variometer_visible = io.vertical_speed_energy_variometer.valid();
@@ -3162,6 +3170,10 @@ ADI::process (xf::Cycle const& cycle)
 	// Flight director
 	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
 	params.flight_director_failure = !io.flight_director_serviceable.value_or (true);
+	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.flight_director_failure;
+	});
+	params.flight_director_failure_focus = _flight_director_failure_timestamp.shorter_than (*io.focus_duration);
 	params.flight_director_pitch_visible = guidance_visible && io.flight_director_guidance_pitch.valid();
 	params.flight_director_pitch = io.flight_director_guidance_pitch.value_or (0_deg);
 	params.flight_director_roll_visible = guidance_visible && io.flight_director_guidance_roll.valid();
@@ -3178,9 +3190,17 @@ ADI::process (xf::Cycle const& cycle)
 	params.navaid_identifier = QString::fromStdString (io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
 	params.deviation_vertical_failure = !io.flight_path_deviation_vertical_serviceable.value_or (true);
+	_deviation_vertical_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.deviation_vertical_failure;
+	});
+	params.deviation_vertical_failure_focus = _deviation_vertical_failure_timestamp.shorter_than (*io.focus_duration);
 	params.deviation_vertical_approach = io.flight_path_deviation_vertical_approach.get_optional();
 	params.deviation_vertical_flight_path = io.flight_path_deviation_vertical_flight_path.get_optional();
 	params.deviation_lateral_failure = !io.flight_path_deviation_lateral_serviceable.value_or (true);
+	_deviation_lateral_failure_timestamp.update (cycle.update_time(), [&] {
+		return params.deviation_lateral_failure;
+	});
+	params.deviation_lateral_failure_focus = _deviation_lateral_failure_timestamp.shorter_than (*io.focus_duration);
 	params.deviation_lateral_approach = io.flight_path_deviation_lateral_approach.get_optional();
 	params.deviation_lateral_flight_path = io.flight_path_deviation_lateral_flight_path.get_optional();
 	params.deviation_mixed_mode = io.flight_path_deviation_mixed_mode.value_or (false);
@@ -3191,21 +3211,21 @@ ADI::process (xf::Cycle const& cycle)
 	// Control hint
 	params.control_hint_visible = io.flight_mode_hint_visible.value_or (false);
 	params.control_hint = QString::fromStdString (io.flight_mode_hint.value_or (""));
-	params.control_hint_focus = io.flight_mode_hint_visible.modification_age() < focus_duration || io.flight_mode_hint.modification_age() < focus_duration;
+	params.control_hint_focus = io.flight_mode_hint_visible.modification_age() < *io.focus_duration || io.flight_mode_hint.modification_age() < *io.focus_duration;
 	// FMA
 	params.fma_visible = io.flight_mode_fma_visible.value_or (false);
 	params.fma_speed_hint = QString::fromStdString (io.flight_mode_fma_speed_hint.value_or (""));
-	params.fma_speed_focus = io.flight_mode_fma_speed_hint.modification_age() < focus_duration;
+	params.fma_speed_focus = io.flight_mode_fma_speed_hint.modification_age() < *io.focus_duration;
 	params.fma_speed_armed_hint = QString::fromStdString (io.flight_mode_fma_speed_armed_hint.value_or (""));
-	params.fma_speed_armed_focus = io.flight_mode_fma_speed_armed_hint.modification_age() < focus_duration;
+	params.fma_speed_armed_focus = io.flight_mode_fma_speed_armed_hint.modification_age() < *io.focus_duration;
 	params.fma_lateral_hint = QString::fromStdString (io.flight_mode_fma_lateral_hint.value_or (""));
-	params.fma_lateral_focus = io.flight_mode_fma_lateral_hint.modification_age() < focus_duration;
+	params.fma_lateral_focus = io.flight_mode_fma_lateral_hint.modification_age() < *io.focus_duration;
 	params.fma_lateral_armed_hint = QString::fromStdString (io.flight_mode_fma_lateral_armed_hint.value_or (""));
-	params.fma_lateral_armed_focus = io.flight_mode_fma_lateral_armed_hint.modification_age() < focus_duration;
+	params.fma_lateral_armed_focus = io.flight_mode_fma_lateral_armed_hint.modification_age() < *io.focus_duration;
 	params.fma_vertical_hint = QString::fromStdString (io.flight_mode_fma_vertical_hint.value_or (""));
-	params.fma_vertical_focus = io.flight_mode_fma_vertical_hint.modification_age() < focus_duration;
+	params.fma_vertical_focus = io.flight_mode_fma_vertical_hint.modification_age() < *io.focus_duration;
 	params.fma_vertical_armed_hint = QString::fromStdString (io.flight_mode_fma_vertical_armed_hint.value_or (""));
-	params.fma_vertical_armed_focus = io.flight_mode_fma_vertical_armed_hint.modification_age() < focus_duration;
+	params.fma_vertical_armed_focus = io.flight_mode_fma_vertical_armed_hint.modification_age() < *io.focus_duration;
 	// TCAS
 	params.tcas_ra_pitch_minimum = io.tcas_resolution_advisory_pitch_minimum.get_optional();
 	params.tcas_ra_pitch_maximum = io.tcas_resolution_advisory_pitch_maximum.get_optional();
@@ -3215,7 +3235,15 @@ ADI::process (xf::Cycle const& cycle)
 	params.novspd_flag = io.warning_novspd_flag.value_or (false);
 	params.ldgalt_flag = io.warning_ldgalt_flag.value_or (false);
 	params.pitch_disagree = io.warning_pitch_disagree.value_or (false);
+	_pitch_disagree_timestamp.update (cycle.update_time(), [&] {
+		return params.pitch_disagree;
+	});
+	params.pitch_disagree_focus = _pitch_disagree_timestamp.shorter_than (*io.focus_duration);
 	params.roll_disagree = io.warning_roll_disagree.value_or (false);
+	_roll_disagree_timestamp.update (cycle.update_time(), [&] {
+		return params.roll_disagree;
+	});
+	params.roll_disagree_focus = _roll_disagree_timestamp.shorter_than (*io.focus_duration);
 	params.ias_disagree = io.warning_ias_disagree.value_or (false);
 	params.altitude_disagree = io.warning_altitude_disagree.value_or (false);
 	params.roll_warning = io.warning_roll.value_or (false);

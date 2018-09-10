@@ -59,6 +59,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::Setting<double>				show_mach_above										{ this, "show_mach_above", 0.4 };
 	xf::Setting<si::Power>			power_eq_1000_fpm									{ this, "power_eq_1000_fpm", 1000_W };
 	xf::Setting<bool>				show_minimum_speeds_only_if_no_weight_on_wheels		{ this, "show_minimum_speeds_only_if_no_weight_on_wheels", true };
+	xf::Setting<si::Time>			focus_duration										{ this, "focus_duration", 10_s };
+	xf::Setting<si::Time>			focus_short_duration								{ this, "focus_short_duration", 5_s };
 
 	/*
 	 * Input
@@ -194,6 +196,8 @@ class Parameters
 
   public:
 	si::Time					timestamp;
+	si::Time					focus_duration;
+	si::Time					focus_short_duration;
 	// TODO perhaps remove _visible and use std::optional<>
 	bool						old_style							= false;
 	bool						show_metric							= false;
@@ -201,6 +205,7 @@ class Parameters
 	bool						input_alert_visible					= false;
 	// Velocity
 	bool						speed_failure						= false;
+	bool						speed_failure_focus					= false;
 	bool						speed_visible						= false;
 	si::Velocity				speed								= 0_kt;
 	bool						speed_lookahead_visible				= false;
@@ -217,6 +222,7 @@ class Parameters
 	VelocityBugs				speed_bugs;
 	// Orientation
 	bool						orientation_failure					= false;
+	bool						orientation_failure_focus			= false;
 	bool						orientation_pitch_visible			= false;
 	si::Angle					orientation_pitch					= 0_deg;
 	bool						orientation_roll_visible			= false;
@@ -229,6 +235,7 @@ class Parameters
 	si::Angle					slip_skid							= 0_deg;
 	// Flight path vector
 	bool						flight_path_marker_failure			= false;
+	bool						flight_path_marker_failure_focus	= false;
 	bool						flight_path_visible					= false;
 	si::Angle					flight_path_alpha					= 0_deg;
 	si::Angle					flight_path_beta					= 0_deg;
@@ -238,11 +245,13 @@ class Parameters
 	si::Angle					aoa_alpha							= 0_deg;
 	// Altitude
 	bool						altitude_failure					= false;
+	bool						altitude_failure_focus				= false;
 	bool						altitude_visible					= false;
 	si::Length					altitude_amsl						= 0_ft;
 	bool						altitude_lookahead_visible			= false;
 	si::Length					altitude_lookahead					= 0_ft;
 	bool						altitude_agl_failure				= false;
+	bool						altitude_agl_failure_focus			= false;
 	bool						altitude_agl_visible				= false;
 	si::Length					altitude_agl						= 0_ft;
 	bool						altitude_agl_focus					= false;
@@ -260,6 +269,7 @@ class Parameters
 	si::Length					minimums_setting					= 0_ft;
 	// Vertical speed
 	bool						vertical_speed_failure				= false;
+	bool						vertical_speed_failure_focus		= false;
 	bool						vertical_speed_visible				= false;
 	si::Velocity				vertical_speed						= 0_fpm;
 	bool						energy_variometer_visible			= false;
@@ -279,6 +289,7 @@ class Parameters
 	bool						cmd_altitude_acquired				= false;
 	// Flight director
 	bool						flight_director_failure				= false;
+	bool						flight_director_failure_focus		= false;
 	bool						flight_director_pitch_visible		= false;
 	si::Angle					flight_director_pitch				= 0_deg;
 	bool						flight_director_roll_visible		= false;
@@ -295,9 +306,11 @@ class Parameters
 	std::optional<si::Length>	navaid_distance;
 	// Approach, flight path deviations
 	bool						deviation_vertical_failure			= false;
+	bool						deviation_vertical_failure_focus	= false;
 	std::optional<si::Angle>	deviation_vertical_approach;
 	std::optional<si::Angle>	deviation_vertical_flight_path;
 	bool						deviation_lateral_failure			= false;
+	bool						deviation_lateral_failure_focus		= false;
 	std::optional<si::Angle>	deviation_lateral_approach;
 	std::optional<si::Angle>	deviation_lateral_flight_path;
 	bool						deviation_mixed_mode				= false;
@@ -331,7 +344,9 @@ class Parameters
 	bool						novspd_flag							= false;
 	bool						ldgalt_flag							= false;
 	bool						pitch_disagree						= false;
+	bool						pitch_disagree_focus				= false;
 	bool						roll_disagree						= false;
+	bool						roll_disagree_focus					= false;
 	bool						ias_disagree						= false;
 	bool						altitude_disagree					= false;
 	bool						roll_warning						= false;
@@ -478,13 +493,13 @@ class AdiPaintRequest
 	 * Paint horizontal failure flag.
 	 */
 	void
-	paint_horizontal_failure_flag (QPointF const& center, QFont const&, QString const& message);
+	paint_horizontal_failure_flag (QString const& message, QPointF const& center, QFont const&, QColor, bool focused);
 
 	/**
 	 * Paint vertical failure flag.
 	 */
 	void
-	paint_vertical_failure_flag (QPointF const& center, QFont const&, QString const& message);
+	paint_vertical_failure_flag (QString const& message, QPointF const& center, QFont const&, QColor, bool focused);
 
 	/**
 	 * Return green or yellow color for minimums marker, depending on current altitude and minimums settings.
@@ -535,7 +550,7 @@ class ArtificialHorizon
 	paint_flight_path_marker (AdiPaintRequest&) const;
 
 	void
-	paint_attitude_failure (AdiPaintRequest&) const;
+	paint_orientation_failure (AdiPaintRequest&) const;
 
 	void
 	paint_flight_path_marker_failure (AdiPaintRequest&) const;
@@ -814,6 +829,18 @@ class ADI: public xf::Instrument<ADI_IO>
 	adi_detail::PaintingWork					_painting_work;
 	xf::Synchronized<adi_detail::Parameters>	_parameters;
 	xf::EventTimestamper						_minimums_became_visible;
+	xf::EventTimestamper						_altitude_agl_became_visible;
+	xf::EventTimestamper						_speed_failure_timestamp;
+	xf::EventTimestamper						_orientation_failure_timestamp;
+	xf::EventTimestamper						_flight_path_marker_failure_timestamp;
+	xf::EventTimestamper						_altitude_failure_timestamp;
+	xf::EventTimestamper						_altitude_agl_failure_timestamp;
+	xf::EventTimestamper						_vertical_speed_failure_timestamp;
+	xf::EventTimestamper						_flight_director_failure_timestamp;
+	xf::EventTimestamper						_deviation_vertical_failure_timestamp;
+	xf::EventTimestamper						_deviation_lateral_failure_timestamp;
+	xf::EventTimestamper						_pitch_disagree_timestamp;
+	xf::EventTimestamper						_roll_disagree_timestamp;
 	bool										_computed_fpv_failure	{ false };
 	bool										_computed_fpv_visible	{ false };
 	Angle										_computed_fpv_alpha		{ 0_deg };
