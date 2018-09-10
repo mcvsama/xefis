@@ -48,6 +48,12 @@ class EventTimestamper
 	std::optional<si::Time>
 	stretch() const noexcept;
 
+	/**
+	 * True if the time since the event is less or equal to given argument.
+	 */
+	bool
+	shorter_than (si::Time) const noexcept;
+
   private:
 	bool						_last_test	{ false };
 	std::optional<si::Time>		_timestamp;
@@ -82,6 +88,15 @@ EventTimestamper::stretch() const noexcept
 		return _now - *_timestamp;
 	else
 		return std::nullopt;
+}
+
+
+inline bool
+EventTimestamper::shorter_than (si::Time time) const noexcept
+{
+	auto const s = stretch();
+
+	return s && *s < time;
 }
 
 } // namespace xf
