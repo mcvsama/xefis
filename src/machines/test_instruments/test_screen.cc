@@ -42,6 +42,8 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& nav
 	adi_io->aoa_visibility_threshold							= 17.5_deg;
 	adi_io->show_mach_above										= 0.4;
 	adi_io->power_eq_1000_fpm									= 1000_W;
+	adi_io->focus_duration										= 1_s;
+	adi_io->focus_short_duration								= 0.5_s;
 
 	hsi_io->arpt_runways_range_threshold						= 10_nmi;
 	hsi_io->arpt_map_range_threshold							= 1_nmi;
