@@ -79,7 +79,7 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->altitude_amsl_lookahead							<< test_generator_io->create_property<si::Length> ("altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
 	_test_screen->adi_io->altitude_agl_serviceable							<< test_generator_io->create_enum_property<bool> ("altitude/agl.serviceable", { { true, 16_s }, { false, 2_s } });
 	_test_screen->adi_io->altitude_agl										<< test_generator_io->create_property<si::Length> ("altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
-	_test_screen->adi_io->altitude_minimums_type							<< xf::ConstantSource ("BARO");
+	_test_screen->adi_io->altitude_minimums_type							<< test_generator_io->create_enum_property<std::string> ("altitude/minimums-type", { { "BARO", 5_s }, { "RADIO", 4_s } });
 	_test_screen->adi_io->altitude_minimums_setting							<< xf::ConstantSource (300_ft);
 	_test_screen->adi_io->altitude_minimums_amsl							<< xf::ConstantSource (300_ft);
 	_test_screen->adi_io->altitude_landing_amsl								<< xf::ConstantSource (140_ft);
@@ -87,10 +87,10 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_test_screen->adi_io->vertical_speed									<< test_generator_io->create_property<si::Velocity> ("vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
 	_test_screen->adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_property<si::Power> ("vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);
 	_test_screen->adi_io->pressure_qnh										<< xf::ConstantSource (1013_hPa);
-	_test_screen->adi_io->pressure_display_hpa								<< xf::ConstantSource (true);
-	_test_screen->adi_io->pressure_use_std									<< xf::ConstantSource (true);
-	// TODO xf::PropertyIn<std::string>	adi_io->flight_director_active_name { ... } // "L", "R", "C"(enter)?
+	_test_screen->adi_io->pressure_display_hpa								<< test_generator_io->create_enum_property<bool> ("pressure/display-hpa", { { true, 8_s }, { false, 8_s } });
+	_test_screen->adi_io->pressure_use_std									<< test_generator_io->create_enum_property<bool> ("pressure/use-std", { { true, 4_s }, { false, 4_s } });
 	_test_screen->adi_io->flight_director_serviceable						<< test_generator_io->create_enum_property<bool> ("flight-director/serviceable", { { true, 13_s }, { false, 2_s } });
+	_test_screen->adi_io->flight_director_active_name						<< test_generator_io->create_enum_property<std::string> ("flight-director/active-name", { { "L", 3_s }, { "R", 3_s }, { "", 2_s } });
 	_test_screen->adi_io->flight_director_cmd_visible						<< xf::ConstantSource (true);
 	_test_screen->adi_io->flight_director_cmd_altitude						<< xf::ConstantSource (1000_ft);
 	_test_screen->adi_io->flight_director_cmd_altitude_acquired				<< xf::ConstantSource (false);
