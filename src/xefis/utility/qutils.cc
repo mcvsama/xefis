@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QDesktopWidget>
+
 // Xefis:
 #include <xefis/core/services.h>
 #include <xefis/core/stdexcept.h>
@@ -24,6 +27,21 @@
 
 namespace xf {
 
+extern float
+default_line_height (QWidget* widget)
+{
+	QFont font = QApplication::font();
+
+	if (!widget)
+	{
+		QDesktopWidget* desktop = QApplication::desktop();
+		widget = desktop->screen (desktop->primaryScreen());
+	}
+
+	return font.pointSize() * pixels_per_point (si::PixelDensity (widget->logicalDpiY()));
+}
+
+
 extern void
 setup_appereance (QTreeWidgetItem& item)
 {
@@ -32,7 +50,7 @@ setup_appereance (QTreeWidgetItem& item)
 	if (!item.treeWidget())
 		throw InvalidArgument ("setup_appereance (QTreeWidgetItem&) requires item to be inserted into a tree");
 
-	s.setHeight (1.75 * Services::default_font_size (item.treeWidget()->physicalDpiY()));
+	s.setHeight (1.75 * default_line_height (item.treeWidget()));
 	item.setSizeHint (0, s);
 }
 
