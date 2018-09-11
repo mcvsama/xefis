@@ -80,13 +80,28 @@ class TextPainter: virtual public QPainter
 			float	shadow_width;
 
 			bool
-			operator< (Font const& other) const;
+			operator< (Font const&) const;
+
+			bool
+			operator== (Font const&) const;
+
+			bool
+			operator!= (Font const&) const;
 		};
 
-		typedef std::map<QChar, Glyph>	Glyphs;
-		typedef std::map<Font, Glyphs>	Fonts;
+		using Glyphs	= std::map<QChar, Glyph>;
+		using Fonts		= std::map<Font, Glyphs>;
 
-		Fonts fonts;
+		struct Last
+		{
+			Last (Font const&, Glyphs*);
+
+			Font	font;
+			Glyphs*	glyphs;
+		};
+
+		Fonts				fonts;
+		std::optional<Last>	last;
 	};
 
   public:
@@ -154,6 +169,29 @@ TextPainter::Cache::Font::operator< (Font const& other) const
 {
 	return std::tuple (font, color.rgba(), shadow_width) < std::tuple (other.font, other.color.rgba(), other.shadow_width);
 }
+
+
+inline bool
+TextPainter::Cache::Font::operator== (Font const& other) const
+{
+	return font == other.font
+		&& color == other.color
+		&& shadow_width == other.shadow_width;
+}
+
+
+inline bool
+TextPainter::Cache::Font::operator!= (Font const& other) const
+{
+	return !(*this == other);
+}
+
+
+inline
+TextPainter::Cache::Last::Last (Font const& font, Glyphs* glyphs):
+	font (font),
+	glyphs (glyphs)
+{ }
 
 } // namespace xf
 
