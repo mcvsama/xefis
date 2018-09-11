@@ -125,8 +125,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>			pressure_display_hpa								{ this, "pressure/display-hpa" };
 	xf::PropertyIn<bool>			pressure_use_std									{ this, "pressure/use-std" };
 	// Flight director
-	// TODO xf::PropertyIn<std::string>	flight_director_active_name						{ ... } // "L", "R", "C"(enter)?
 	xf::PropertyIn<bool>			flight_director_serviceable							{ this, "flight-director/serviceable" };
+	xf::PropertyIn<std::string>		flight_director_active_name							{ this, "flight-director/active-name" };
 	xf::PropertyIn<bool>			flight_director_cmd_visible							{ this, "flight-director/cmd-visible" };
 	xf::PropertyIn<si::Length>		flight_director_cmd_altitude						{ this, "flight-director/cmd.altitude" };
 	xf::PropertyIn<bool>			flight_director_cmd_altitude_acquired				{ this, "flight-director/cmd.altitude-acquired" };
@@ -281,6 +281,7 @@ class Parameters
 	bool						pressure_display_hpa				= false;
 	bool						use_standard_pressure				= false;
 	// Command settings
+	std::optional<std::string>	flight_director_active_name;
 	std::optional<si::Velocity>	cmd_speed;
 	std::optional<double>		cmd_mach;
 	std::optional<si::Length>	cmd_altitude;
