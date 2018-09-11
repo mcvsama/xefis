@@ -185,11 +185,19 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 
 	QColor color = pen().color();
 
-	// TODO cache previous painting info { font, color }, and if the same, use cached glyphs_cache iterator.
-	// Find/insert to font cache:
 	float const shadow_width = shadow ? shadow->width_for_pen (pen()) : 0.0f;
-	auto [glyphs_cache_it, found] = _cache.fonts.emplace (Cache::Font { font(), color, shadow_width }, Cache::Glyphs());
-	Cache::Glyphs* glyphs_cache = &glyphs_cache_it->second;
+
+	// Find/insert to font cache:
+	Cache::Font const required_font { font(), color, shadow_width };
+	Cache::Glyphs* glyphs_cache { nullptr };
+
+	if (!_cache.last || _cache.last->font != required_font)
+	{
+		auto [it, found] = _cache.fonts.emplace (required_font, Cache::Glyphs());
+		_cache.last = Cache::Last { required_font, &it->second };
+	}
+
+	glyphs_cache = _cache.last->glyphs;
 
 	for (QString::ConstIterator c = text.begin(); c != text.end(); ++c)
 	{
