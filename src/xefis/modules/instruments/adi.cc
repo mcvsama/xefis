@@ -2057,18 +2057,18 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh.in<HectoPascal>() : pr.params.pressure_qnh.in<InchOfMercury>(), 0, 'f', precision);
 
 		QRectF nn_rect (0.f, _ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * pr.aids.font_3.digit_height);
-		QRectF zz_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
-		nn_rect.moveLeft (-0.5f * (zz_rect.width() + nn_rect.width()));
-		// Correct position of zz_rect to get correct baseline position:
-		zz_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
-		zz_rect.moveLeft (nn_rect.right());
+		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
+		nn_rect.moveLeft (-0.5f * (uu_rect.width() + nn_rect.width()));
+		// Correct position of uu_rect to get correct baseline position:
+		uu_rect.translate (0.f, metrics_b.descent() - metrics_a.descent());
+		uu_rect.moveLeft (nn_rect.right());
 
 		pr.painter.setPen (QPen (pr.aids.kNavigationColor, pr.aids.pen_width (1.f), Qt::SolidLine, Qt::RoundCap));
 
 		if (pr.params.use_standard_pressure)
 		{
 			pr.painter.setFont (pr.aids.font_3.font);
-			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + zz_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD", pr.default_shadow);
+			pr.painter.fast_draw_text (QPointF (0.5f * (nn_rect.left() + uu_rect.right()), nn_rect.bottom()), Qt::AlignHCenter | Qt::AlignBottom, "STD", pr.default_shadow);
 			pr.painter.translate (0.f, 0.9f * metrics_a.height());
 			pr.painter.setPen (QPen (Qt::white, 1.f, Qt::SolidLine, Qt::RoundCap));
 		}
@@ -2076,7 +2076,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 		pr.painter.setFont (font_a);
 		pr.painter.fast_draw_text (nn_rect, Qt::AlignBottom | Qt::AlignRight, pressure_str, pr.default_shadow);
 		pr.painter.setFont (font_b);
-		pr.painter.fast_draw_text (zz_rect, Qt::AlignBottom | Qt::AlignLeft, unit_str, pr.default_shadow);
+		pr.painter.fast_draw_text (uu_rect, Qt::AlignBottom | Qt::AlignLeft, unit_str, pr.default_shadow);
 	}
 }
 
@@ -2395,6 +2395,16 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 
 		if (pr.params.flight_director_roll_visible && pr.params.orientation_roll_visible)
 			pr.painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
+	}
+
+	if (pr.params.flight_director_active_name)
+	{
+		pr.painter.setPen (pr.aids.kNavigationColor);
+		pr.painter.setFont (pr.aids.font_2.font);
+		pr.painter.fast_draw_text (QPointF (2.95 * pr.q, 4.385 * pr.q),
+								   Qt::AlignRight | Qt::AlignBottom,
+								   QString::fromStdString (*pr.params.flight_director_active_name),
+								   pr.default_shadow);
 	}
 }
 
@@ -3181,6 +3191,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.cmd_altitude_acquired = io.flight_director_cmd_altitude_acquired.value_or (false);
 	// Flight director
 	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
+	params.flight_director_active_name = io.flight_director_active_name.get_optional();
 	params.flight_director_failure = !io.flight_director_serviceable.value_or (true);
 	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_director_failure;
