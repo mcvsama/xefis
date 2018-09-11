@@ -7,31 +7,32 @@ first: all
 LC_ALL				:= C
 export LC_ALL
 
+MAKE_CONFIG_PROJECT_NAME		:= project
 # Show verbose compilation commands?
-VERBOSE				:= 0
+MAKE_CONFIG_VERBOSE				:= 0
 # How many threads use for compilation?
-THREADS				:= $(shell nproc)
+MAKE_CONFIG_THREADS				:= $(shell nproc)
 # Architecture:
-ARCH				:= $(shell uname -m)
+MAKE_CONFIG_ARCH				:= $(shell uname -m)
 # Enable profiling?
-PROFILING			:= 0
+MAKE_CONFIG_PROFILING			:= 0
 # Debugging enabled?
-DEBUG				:= 0
+MAKE_CONFIG_DEBUG				:= 0
 # Where Qt is installed?
-QT_PREFIX			:= /usr/local
+MAKE_CONFIG_QT_PREFIX			:= /usr/local
 # Profile name:
-PROFILE				:=
+MAKE_CONFIG_PROFILE				:=
 # Version:
-VERSION				:= alpha0.1dev
+MAKE_CONFIG_VERSION				:= alpha0.1dev
 # Release version? (no asserts, etc).
-RELEASE				:= 0
+MAKE_CONFIG_RELEASE				:= 0
 # Set to 1 to disable some UB-generating optimizations:
-UB_OPTS_DISABLE		:= 0
+MAKE_CONFIG_UB_OPTS_DISABLE		:= 0
 # Sanitizers?
-SANITIZE			:=
-NO_SANITIZE			:=
+MAKE_CONFIG_SANITIZERS			:=
+MAKE_CONFIG_NO_SANITIZE			:=
 # Coverage?
-COVERAGE			:= 0
+MAKE_CONFIG_COVERAGE			:= 0
 
 CXX				:= g++
 DEPCC			:= $(CXX)
@@ -50,7 +51,7 @@ SOFLAGS			+=
 LD				:= $(CXX)
 LDFLAGS			+= -rdynamic
 AR				:= ar
-MOC				:= $(QT_PREFIX)/bin/moc-qt5
+MOC				:= $(MAKE_CONFIG_QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system boost_filesystem pthread mhash
 PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets zlib
 CXXFLAGS_s		:= $(CXXFLAGS)
@@ -83,87 +84,80 @@ endif
 
 -include Makefile.local
 
-ifeq ($(DEBUG),1)
+ifeq ($(MAKE_CONFIG_DEBUG),1)
 XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
 XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
 CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
+DEBUG_s = -debug
 else
 CXXFLAGS		+= -O4 -DQT_NO_DEBUG
+DEBUG_s =
 endif
 
-ifneq ($(VERBOSE),1)
+ifneq ($(MAKE_CONFIG_VERBOSE),1)
 MAKEFLAGS += --silent
 endif
 
-ifneq ($(THREADS),)
-MAKEFLAGS += -j$(THREADS)
+ifneq ($(MAKE_CONFIG_THREADS),)
+MAKEFLAGS += -j$(MAKE_CONFIG_THREADS)
 endif
 
-ifeq ($(PROFILING),1)
+ifeq ($(MAKE_CONFIG_PROFILING),1)
 CXXFLAGS += -pg -fno-omit-frame-pointer
 LDFLAGS += -pg
-endif
-
-ifeq ($(PROFILING),1)
 PROFILING_s = -profiling
 else
 PROFILING_s =
 endif
 
-ifeq ($(DEBUG),1)
-DEBUG_s = -debug
-else
-DEBUG_s =
-endif
-
-ifeq ($(RELEASE),1)
+ifeq ($(MAKE_CONFIG_RELEASE),1)
 CXXFLAGS += -DBOOST_DISABLE_ASSERTS -DNDEBUG
 else
 CXXFLAGS += -DXEFIS_ENABLE_ASSERT
 endif
 
-ifneq ($(PROFILE),)
-PROFILE_s = -$(PROFILE)
+ifneq ($(MAKE_CONFIG_PROFILE),)
+PROFILE_s = -$(MAKE_CONFIG_PROFILE)
 else
 PROFILE_s =
 endif
 
 # Predefined profiles:
-ifeq ($(PROFILE),rpi)
+ifeq ($(MAKE_CONFIG_PROFILE),rpi)
 CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
 endif
 
 # Undefined-Behaviour handling:
-ifeq ($(UB_OPTS_DISABLE),1)
+ifeq ($(MAKE_CONFIG_UB_OPTS_DISABLE),1)
 CXXFLAGS += -fno-strict-overflow -fno-delete-null-pointer-checks -fno-strict-aliasing
 endif
 
-ifeq ($(PROFILE),bbb)
+ifeq ($(MAKE_CONFIG_PROFILE),bbb)
 CXXFLAGS += -finline -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
 endif
 
-ifneq ($(SANITIZE),)
-CXXFLAGS += $(foreach sanitizer, $(SANITIZE), -fsanitize=$(sanitizer))
-LDFLAGS += $(foreach sanitizer, $(SANITIZE), -fsanitize=$(sanitizer))
+ifneq ($(MAKE_CONFIG_SANITIZERS),)
+CXXFLAGS += $(foreach sanitizer, $(MAKE_CONFIG_SANITIZERS), -fsanitize=$(sanitizer))
+LDFLAGS += $(foreach sanitizer, $(MAKE_CONFIG_SANITIZERS), -fsanitize=$(sanitizer))
 endif
 
-ifneq ($(NO_SANITIZE),)
-CXXFLAGS += $(foreach sanitizer, $(NO_SANITIZE), -fno-sanitize=$(sanitizer))
-LDFLAGS += $(foreach sanitizer, $(NO_SANITIZE), -fno-sanitize=$(sanitizer))
+ifneq ($(MAKE_CONFIG_NO_SANITIZE),)
+CXXFLAGS += $(foreach sanitizer, $(MAKE_CONFIG_NO_SANITIZE), -fno-sanitize=$(sanitizer))
+LDFLAGS += $(foreach sanitizer, $(MAKE_CONFIG_NO_SANITIZE), -fno-sanitize=$(sanitizer))
 endif
 
-ifeq ($(COVERAGE),1)
+ifeq ($(MAKE_CONFIG_COVERAGE),1)
 CXXFLAGS += -fprofile-arcs -ftest-coverage
 LDFLAGS += -fprofile-arcs -ftest-coverage
 endif
 
-dist			= $(ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
+dist			= $(MAKE_CONFIG_ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
 distdir			:= build/$(dist)
 depsdir			= $(distdir)/deps
 objsdir			= $(distdir)/objects
 mocsdir			= $(distdir)/mocs
 reldir			= release/$(dist)
-relname			= xefis-$(VERSION)-$(dist)
+relname			= $(MAKE_CONFIG_PROJECT_NAME)-$(MAKE_CONFIG_VERSION)-$(dist)
 reldir_pkg		= $(reldir)/$(relname)
 prepdir			= $(shell mkdir -p "$$(dirname "$(strip $(1))")")
 mkmocs			= $(foreach file, $(1), $(mocsdir)/$(dir $(file))$(shell basename '$(file)' $(suffix $(file))).moc.cc)
@@ -217,8 +211,8 @@ $(VERSION_FILE): $(COMMIT_FILE) $(BRANCH_FILE)
 	@echo "namespace xf::version {" >>$@
 	@echo "	const char* commit = \"$(COMMIT_REAL)\";" >>$@
 	@echo "	const char* branch = \"$(BRANCH_REAL)\";" >>$@
-	@echo "	const char* version = \"$(VERSION)\";" >>$@
-	@echo "}" >>$@
+	@echo "	const char* version = \"$(MAKE_CONFIG_VERSION)\";" >>$@
+	@echo "} }" >>$@
 
 $(call mkobjs, $(VERSION_FILE)): $(VERSION_FILE)
 endif # GIT_AVAILABLE == OK
@@ -263,7 +257,7 @@ release:
 doc:
 	@cd doc && doxygen doxygen-conf/doxygen.conf
 
-# This command is dangerous - overwrites source files
+# This command is dangerous - overwrites source files (TODO FIXME)
 #check:
 #	cppcheck --force --std=c++17 --language=c++ --inconclusive --enable=all --template "{id}:{file}:{line} ({severity}): {message}" --suppressions-list=cppcheck.suppressions \
 #		lib modules xefis $(HEADERS) 2> check.log
