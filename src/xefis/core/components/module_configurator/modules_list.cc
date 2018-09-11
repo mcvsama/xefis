@@ -22,6 +22,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/services.h>
+#include <xefis/utility/qutils.h>
 
 // Local:
 #include "modules_list.h"
@@ -55,7 +56,8 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 	layout->setSpacing (WidgetSpacing);
 	layout->addWidget (_list);
 
-	setMinimumWidth (25.f * Services::default_font_size (physicalDpiY()));
+	auto lh = default_line_height (this);
+	setMinimumWidth (25.0f * lh);
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setInterval (100);
@@ -65,9 +67,9 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 
 	read();
 
-	_list->header()->resizeSection (NameColumn, 14.f * Services::default_font_size (physicalDpiY()));
-	_list->header()->resizeSection (StatsAvgColumn, 5.f * Services::default_font_size (physicalDpiY()));
-	_list->header()->resizeSection (StatsMaxColumn, 5.f * Services::default_font_size (physicalDpiY()));
+	_list->header()->resizeSection (NameColumn, 14.0f * lh);
+	_list->header()->resizeSection (StatsAvgColumn, 5.0f * lh);
+	_list->header()->resizeSection (StatsMaxColumn, 5.0f * lh);
 
 	_processing_loop_ptrs.reserve (100);
 	_module_ptrs.reserve (1000);

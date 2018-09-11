@@ -48,6 +48,20 @@ diagonal (QSizeF const& size)
 }
 
 
+inline float
+pixels_per_point (si::PixelDensity dpi)
+{
+	return dpi / (72 / 1_in);
+}
+
+
+/**
+ * Return default font line-height in pixels.
+ */
+extern float
+default_line_height (QWidget* = nullptr);
+
+
 extern void
 setup_appereance (QTreeWidgetItem&);
 
