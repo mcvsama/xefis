@@ -53,15 +53,19 @@ PropertyItem::read()
 	{
 		PropertyConversionSettings conv_settings;
 		conv_settings.numeric_format = boost::format ("%.12f");
+		conv_settings.preferred_units = {
+			si::Celsius::dynamic_unit(),
+			si::Degree::dynamic_unit(),
+		};
+
+		std::string const actual_value = _property->to_string (conv_settings);
+		std::string const set_value = _property->to_string (conv_settings);
 
 		setTextAlignment (PropertyTree::ActualValueColumn, Qt::AlignRight);
-		setText (PropertyTree::ActualValueColumn, QString::fromStdString (_property->to_string (conv_settings)));
-
-		setTextAlignment (PropertyTree::ForcedValueColumn, Qt::AlignRight);
-		setText (PropertyTree::ForcedValueColumn, "x");
+		setText (PropertyTree::ActualValueColumn, QString::fromStdString (actual_value));
 
 		setTextAlignment (PropertyTree::SetValueColumn, Qt::AlignRight);
-		setText (PropertyTree::SetValueColumn, QString::fromStdString (_property->to_string (conv_settings)));
+		setText (PropertyTree::SetValueColumn, QString::fromStdString (set_value));
 
 		setTextAlignment (PropertyTree::FallbackValueColumn, Qt::AlignRight);
 		setText (PropertyTree::FallbackValueColumn, "x");

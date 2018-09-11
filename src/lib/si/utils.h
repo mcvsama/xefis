@@ -287,14 +287,6 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept;
 
 
-/**
- * Convert value 'source' expressed in 'source_unit's to 'target_unit's.
- */
-template<class pValue>
-	constexpr pValue
-	convert (DynamicUnit const& source_unit, pValue source, DynamicUnit const& target_unit);
-
-
 /*
  * Implementations
  */
@@ -555,20 +547,6 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
 		return std::isfinite (q.quantity());
-	}
-
-
-template<class pValue>
-	constexpr pValue
-	convert (DynamicUnit const& source_unit, pValue source, DynamicUnit const& target_unit)
-	{
-		// Assert that units are convertible (exponents vector the same):
-		if (source_unit.exponents() != target_unit.exponents())
-			throw IncompatibleTypes (source_unit, target_unit);
-
-		pValue base_value = source * source_unit.scale().to_floating_point() + source_unit.offset().to_floating_point();
-		pValue result = (base_value - target_unit.offset().to_floating_point()) / target_unit.scale().to_floating_point();
-		return result;
 	}
 
 

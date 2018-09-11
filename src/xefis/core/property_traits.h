@@ -625,7 +625,18 @@ template<class Unit>
 		to_string (Property<si::Quantity<Unit>> const& property, PropertyConversionSettings const& settings)
 		{
 			if (property)
-				return (boost::format (settings.numeric_format) % *property).str();
+			{
+				if (settings.preferred_units.empty())
+					return (boost::format (settings.numeric_format) % *property).str();
+				else
+				{
+					for (si::DynamicUnit const& du: settings.preferred_units)
+						if (si::is_convertible (Unit::dynamic_unit(), du))
+							return (boost::format (settings.numeric_format) % si::convert (Unit::dynamic_unit(), property->quantity(), du)).str() + " " + du.symbol();
+
+					return (boost::format (settings.numeric_format) % *property).str();
+				}
+			}
 			else
 				return settings.nil_value;
 		}
