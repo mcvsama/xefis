@@ -48,7 +48,7 @@ PropertyTree::PropertyTree (QWidget* parent):
 	_tree->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	_tree->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 	_tree->setContextMenuPolicy (Qt::CustomContextMenu);
-	_tree->setHeaderLabels ({ "Property", "Use count", "Actual value", "Forced value", "Set value", "Fallback value" });
+	_tree->setHeaderLabels ({ "Property", "Use count", "Actual value",  "Set value", "Fallback value" });
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (WidgetMargin);

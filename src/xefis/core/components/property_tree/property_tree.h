@@ -42,9 +42,8 @@ class PropertyTree: public QWidget
 	constexpr static int NameColumn				= 0;
 	constexpr static int UseCountColumn			= 1;
 	constexpr static int ActualValueColumn		= 2;
-	constexpr static int ForcedValueColumn		= 3;
-	constexpr static int SetValueColumn			= 4;
-	constexpr static int FallbackValueColumn	= 5;
+	constexpr static int SetValueColumn			= 3;
+	constexpr static int FallbackValueColumn	= 4;
 
   private:
 	/**

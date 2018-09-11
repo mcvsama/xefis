@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <vector>
 
 // Boost:
 #include <boost/format.hpp>
@@ -33,14 +34,17 @@ class PropertyConversionSettings
 
   public:
 	// Common settings:
-	std::string		nil_value				{ kDefaultNilValue };
+	std::string						nil_value				{ kDefaultNilValue };
 
 	// Bool properties:
-	std::string		true_value				{ "true" };
-	std::string		false_value				{ "false" };
+	std::string						true_value				{ "true" };
+	std::string						false_value				{ "false" };
 
 	// int64_t, double and SI properties:
-	boost::format	numeric_format			{ "%1%" };
+	boost::format					numeric_format			{ "%1%" };
+
+	// Preferred unit:
+	std::vector<si::DynamicUnit>	preferred_units;
 };
 
 } // namespace xf
