@@ -15,50 +15,24 @@
 #include <cstddef>
 #include <utility>
 
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/thread.h>
+
 // Local:
 #include "work_performer.h"
 
 
 namespace xf {
 
-WorkPerformer::Performer::Performer (WorkPerformer* work_performer, unsigned int thread_id) noexcept:
-	_work_performer (work_performer),
-	_thread_id (thread_id)
-{
-	// 128k-words stack (512kB on 32-bit, 1MB on 64-bit system) should be sufficient for most operations:
-	set_stack_size (128 * sizeof (size_t) * 1024);
-}
-
-
-void
-WorkPerformer::Performer::run()
-{
-	Unit* unit = 0;
-	while ((unit = _work_performer->take_unit()))
-	{
-		unit->_is_ready.store (false);
-		unit->_thread_id = _thread_id;
-		unit->execute();
-		unit->_is_ready.store (true);
-		unit->_wait_sem.notify();
-	}
-}
-
-
-WorkPerformer::WorkPerformer (unsigned int threads_number, Logger const& logger):
+WorkPerformer::WorkPerformer (std::size_t threads_number, Logger const& logger):
 	_logger (logger)
 {
 	_logger.add_scope ("<work performer>");
 	_logger << "Creating WorkPerformer" << std::endl;
 
-	threads_number = std::max (1u, threads_number);
-
-	for (unsigned int i = 0; i < threads_number; ++i)
-	{
-		std::shared_ptr<Performer> p = std::make_shared<Performer> (this, i);
-		_performers.push_back (p);
-		p->start();
-	}
+	for (std::size_t i = 0; i < threads_number; ++i)
+		_threads.emplace_back (std::move (std::thread (&WorkPerformer::thread, this)));
 }
 
 
@@ -66,47 +40,49 @@ WorkPerformer::~WorkPerformer()
 {
 	_logger << "Destroying WorkPerformer" << std::endl;
 
-	for (decltype (_performers.size()) i = 0; i < _performers.size(); ++i)
-		_queue_semaphore.notify();
+	_terminating = true;
+	_tasks_semaphore.notify (_threads.size());
 
-	for (auto p: _performers)
-		p->wait();
+	for (auto& thread: _threads)
+		thread.join();
 }
 
 
 void
-WorkPerformer::add (Unit* unit)
+WorkPerformer::set (ThreadScheduler scheduler, int priority)
 {
-	{
-		auto queue = _queue.lock();
-		unit->added_to_queue();
-		queue->push (unit);
-	}
-	_queue_semaphore.notify();
+	for (auto& thread: _threads)
+		xf::set (thread, scheduler, priority);
+}
+
+
+std::size_t
+WorkPerformer::queued_tasks() const noexcept
+{
+	return _tasks.lock()->size();
 }
 
 
 void
-WorkPerformer::set_sched (Thread::SchedType sched_type, int priority) const noexcept
+WorkPerformer::thread()
 {
-	for (auto p: _performers)
-		p->set_sched (sched_type, priority);
-}
-
-
-WorkPerformer::Unit*
-WorkPerformer::take_unit()
-{
-	_queue_semaphore.wait();
-	auto queue = _queue.lock();
-
-	if (queue->empty())
-		return 0;
-	else
+	while (!_terminating)
 	{
-		Unit* u = queue->front();
-		queue->pop();
-		return u;
+		_tasks_semaphore.wait();
+		std::unique_ptr<AbstractTask> task;
+
+		{
+			auto tasks = _tasks.lock();
+
+			if (!tasks->empty())
+			{
+				task = std::move (tasks->front());
+				tasks->pop();
+			}
+		}
+
+		if (task)
+			(*task)();
 	}
 }
 

@@ -15,119 +15,43 @@
 #define XEFIS__UTILITY__THREAD_H__INCLUDED
 
 // Standard:
-#include <atomic>
 #include <cstddef>
-#include <mutex> // XXX
-
-// System:
-#include <pthread.h>
+#include <thread>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/noncopyable.h>
+#include <xefis/config/exception.h>
 
 
 namespace xf {
 
 /**
- * Thread is created in "detached" state, that means it will
- * automatically free its resources after exit.
+ * Available schedulers for threads.
  */
-class Thread: private Noncopyable
+enum class ThreadScheduler: int
+{
+	FIFO	= SCHED_FIFO,
+	RR		= SCHED_RR,
+	Other	= SCHED_OTHER
+};
+
+
+/**
+ * Thrown from thread scheduling config function.
+ */
+class SchedulerException: public Exception
 {
   public:
-	enum {
-		MinimumStackSize = PTHREAD_STACK_MIN
-	};
-
-	enum SchedType {
-		SchedFIFO	= SCHED_FIFO,
-		SchedRR		= SCHED_RR,
-		SchedOther	= SCHED_OTHER
-	};
-
-	typedef pthread_t ID;
-
-  public:
-	explicit
-	Thread() noexcept;
-
-	/**
-	 * Waits for thread to exit.
-	 * Be sure to call wait() in destructor in derived
-	 * class to be sure that derived object is not destructed before thread exits.
-	 */
-	virtual
-	~Thread();
-
-	/**
-	 * Starts thread.
-	 */
-	virtual void
-	start();
-
-	/**
-	 * Cancels thread.
-	 */
-	virtual void
-	cancel() noexcept;
-
-	/**
-	 * \returns	true if thread has finished.
-	 */
-	virtual bool
-	finished() noexcept;
-
-	/**
-	 * Set scheduling policy/parameter for thread.
-	 */
-	virtual void
-	set_sched (SchedType, int priority) noexcept;
-
-	/**
-	 * Sets stack size for new thread.
-	 * If 0, system default will be used.
-	 */
-	virtual void
-	set_stack_size (std::size_t size) noexcept;
-
-	/**
-	 * Waits for thread to finish.
-	 * May be called by many other threads, but MUST NOT
-	 * be called from within this thread.
-	 */
-	virtual void
-	wait();
-
-	/**
-	 * Forces calling thread to relinquish use of its processor,
-	 * and to wait in the run queue.
-	 */
-	static void
-	yield() noexcept;
-
-	static ID
-	id() noexcept;
-
-  protected:
-	virtual void
-	run() = 0;
-
-  private:
-	void
-	set_sched() noexcept;
-
-	static void*
-	callback (void *arg);
-
-	pthread_t			_pthread;
-	SchedType			_sched_type;
-	int					_priority;
-	std::size_t			_stack_size;
-	std::atomic<bool>	_started;
-	std::atomic<bool>	_finished;
-	std::mutex			_wait;
+	using Exception::Exception;
 };
+
+
+/**
+ * Set scheduling policy/parameter for thread.
+ * Has to be called when thread is running.
+ */
+void
+set (std::thread& thread, ThreadScheduler scheduler, int priority);
 
 } // namespace xf
 

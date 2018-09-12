@@ -394,6 +394,9 @@ XEFIS_HEADERS			+= xefis/support/system/work_performer.h
 
 XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
 
+SELFTEST_SOURCES		+= xefis/support/system/work_performer.cc
+SELFTEST_SOURCES		+= xefis/support/system/tests/work_performer.test.cc
+
 ######## /xefis/support/ui/widgets ########
 
 # TODO
@@ -482,6 +485,7 @@ XEFIS_SOURCES			+= xefis/utility/qutils.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
 
+SELFTEST_SOURCES		+= xefis/utility/thread.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/blob.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/datatable2d.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
