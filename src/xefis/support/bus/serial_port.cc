@@ -28,7 +28,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/numeric.h>
-#include <xefis/utility/mutex.h>
 
 // Local:
 #include "serial_port.h"
