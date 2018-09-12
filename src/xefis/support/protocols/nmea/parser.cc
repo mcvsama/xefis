@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/mutex.h>
 #include <xefis/utility/responsibility.h>
 #include <xefis/utility/hextable.h>
 

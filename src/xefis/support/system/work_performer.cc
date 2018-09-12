@@ -77,10 +77,11 @@ WorkPerformer::~WorkPerformer()
 void
 WorkPerformer::add (Unit* unit)
 {
-	_queue_mutex.synchronize ([&] {
+	{
+		auto queue = _queue.lock();
 		unit->added_to_queue();
-		_queue.push (unit);
-	});
+		queue->push (unit);
+	}
 	_queue_semaphore.post();
 }
 
@@ -97,14 +98,14 @@ WorkPerformer::Unit*
 WorkPerformer::take_unit()
 {
 	_queue_semaphore.wait();
-	Mutex::Lock lock (_queue_mutex);
+	auto queue = _queue.lock();
 
-	if (_queue.empty())
+	if (queue->empty())
 		return 0;
 	else
 	{
-		Unit* u = _queue.front();
-		_queue.pop();
+		Unit* u = queue->front();
+		queue->pop();
 		return u;
 	}
 }

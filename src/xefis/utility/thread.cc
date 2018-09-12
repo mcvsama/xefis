@@ -106,8 +106,8 @@ Thread::set_stack_size (std::size_t size) noexcept
 void
 Thread::wait()
 {
-	_wait.lock();
 	_wait.unlock();
+	_wait.lock();
 }
 
 
@@ -143,7 +143,7 @@ Thread::callback (void* arg)
 	Thread *k = reinterpret_cast<Thread*> (arg);
 	k->_started.store (true);
 	k->set_sched();
-	Mutex::Lock lock (k->_wait);
+	std::lock_guard wait_lock (k->_wait);
 	k->_finished.store (false);
 	k->run();
 	k->_finished.store (true);

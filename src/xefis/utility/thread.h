@@ -15,15 +15,15 @@
 #define XEFIS__UTILITY__THREAD_H__INCLUDED
 
 // Standard:
-#include <cstddef>
 #include <atomic>
+#include <cstddef>
+#include <mutex> // XXX
 
 // System:
 #include <pthread.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/mutex.h>
 #include <xefis/utility/noncopyable.h>
 
 
@@ -126,7 +126,7 @@ class Thread: private Noncopyable
 	std::size_t			_stack_size;
 	std::atomic<bool>	_started;
 	std::atomic<bool>	_finished;
-	Mutex				_wait;
+	std::mutex			_wait;
 };
 
 } // namespace xf

@@ -17,7 +17,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/mutex.h>
 
 // Local:
 #include "mtk.h"
