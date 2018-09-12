@@ -15,10 +15,9 @@
 #define XEFIS__UTILITY__SEMAPHORE_H__INCLUDED
 
 // Standard:
+#include <condition_variable>
 #include <cstddef>
-
-// System:
-#include <semaphore.h>
+#include <mutex>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -28,55 +27,73 @@
 namespace xf {
 
 /**
- * OO-oriented semaphore.
+ * Simple semaphore using standard mutex and condition_variable.
  */
 class Semaphore: private Noncopyable
 {
   public:
 	explicit
-	Semaphore (int value = 0) noexcept;
+	Semaphore (std::size_t initial_count = 0);
 
-	~Semaphore() noexcept;
-
-	/**
-	 * Reset semaphore to initial value.
-	 * No thead should wait on semaphore at the moment
-	 * of the call.
-	 */
 	void
-	reset() noexcept;
+	notify (std::size_t how_many = 1);
 
-	/**
-	 * Return semaphore value. If there are
-	 * threads waiting on a semaphore, it will still
-	 * return 0 instead of negative number.
-	 */
-	int
-	value() const noexcept;
-
-	/**
-	 * Locks semaphore.
-	 */
 	void
-	wait() const noexcept;
+	wait();
 
-	/**
-	 * Tries to lock semaphore. Returns true if semaphore was
-	 * locked successfully, false otherwise.
-	 */
 	bool
-	try_wait() const noexcept;
-
-	/**
-	 * Unlocks semaphore.
-	 */
-	void
-	post() const noexcept;
+	try_wait();
 
   private:
-	::sem_t mutable	_semaphore;
-	int				_initial_value;
+	std::mutex				_mutex;
+	std::condition_variable	_condition;
+	std::size_t				_count;
 };
+
+
+inline
+Semaphore::Semaphore (std::size_t initial_count):
+	_count (initial_count)
+{ }
+
+
+inline void
+Semaphore::notify (std::size_t how_many)
+{
+	std::unique_lock lock (_mutex);
+	_count += how_many;
+
+	for (std::size_t i = 0; i < how_many; ++i)
+		_condition.notify_one();
+}
+
+
+inline void
+Semaphore::wait()
+{
+	std::unique_lock lock (_mutex);
+
+	// Handle spurious wake-ups:
+	while (_count == 0)
+		_condition.wait (lock);
+
+	--_count;
+}
+
+
+inline bool
+Semaphore::try_wait()
+{
+	std::unique_lock lock (_mutex);
+
+	if (_count > 0)
+	{
+		--_count;
+		return true;
+	}
+	else
+		return false;
+}
 
 } // namespace xf
 
