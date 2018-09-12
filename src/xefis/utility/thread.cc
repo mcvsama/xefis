@@ -13,15 +13,9 @@
 
 // Standard:
 #include <cstddef>
-#include <stdexcept>
-#include <cstring>
 
 // System:
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <pthread.h>
-#include <errno.h>
 
 // Local:
 #include "thread.h"
@@ -29,125 +23,22 @@
 
 namespace xf {
 
-Thread::Thread() noexcept:
-	_sched_type (SchedOther),
-	_priority (50),
-	_stack_size (0),
-	_started (false),
-	_finished (false)
-{
-}
-
-
-Thread::~Thread()
-{
-	wait();
-}
-
-
 void
-Thread::start()
+set (std::thread& thread, ThreadScheduler scheduler, int priority)
 {
-	pthread_attr_t att;
-	pthread_attr_init (&att);
-	// Scheduling policy, doesn't work anyway.
-	// Will set_sched inside of callback(), before run().
-	pthread_attr_setschedpolicy (&att, _sched_type);
-	// Scheduling param:
-	struct sched_param p;
-	memset (&p, 0, sizeof p);
-	p.sched_priority = _priority;
-	pthread_attr_setschedparam (&att, &p);
-	pthread_attr_setdetachstate (&att, PTHREAD_CREATE_DETACHED);
-	if (_stack_size)
-	{
-		const std::size_t page_size = sysconf (_SC_PAGESIZE);
-		pthread_attr_setstacksize (&att, ((_stack_size / page_size) + 1) * page_size);
-	}
-	// Start thread:
-	switch (::pthread_create (&_pthread, &att, callback, this))
-	{
-		case EAGAIN:
-			throw Exception ("not enough system resources or maximum Threads count achieved");
-	}
-	pthread_attr_destroy (&att);
-}
-
-void
-Thread::cancel() noexcept
-{
-	::pthread_cancel (_pthread);
-}
-
-
-bool
-Thread::finished() noexcept
-{
-	return _finished.load();
-}
-
-
-void
-Thread::set_sched (SchedType type, int priority) noexcept
-{
-	_sched_type = type;
-	_priority = priority;
-	set_sched();
-}
-
-
-void
-Thread::set_stack_size (std::size_t size) noexcept
-{
-	_stack_size = size;
-}
-
-
-void
-Thread::wait()
-{
-	_wait.unlock();
-	_wait.lock();
-}
-
-
-void
-Thread::yield() noexcept
-{
-	::pthread_yield();
-}
-
-
-Thread::ID
-Thread::id() noexcept
-{
-	return ::pthread_self();
-}
-
-
-void
-Thread::set_sched() noexcept
-{
-	if (_started.load() && !_finished.load())
+	if (thread.joinable())
 	{
 		struct sched_param p;
-		p.sched_priority = _priority;
-		::pthread_setschedparam (_pthread, _sched_type, &p);
+		memset (&p, 0, sizeof (p));
+		p.sched_priority = priority;
+
+		switch (::pthread_setschedparam (thread.native_handle(), static_cast<int> (scheduler), &p))
+		{
+			case ESRCH:		throw SchedulerException ("specified thread not found");
+			case EINVAL:	throw SchedulerException ("unrecognized scheduling policy or invalid param for the policy");
+			case EPERM:		throw SchedulerException ("permission denied for setting thread scheduling policy");
+		}
 	}
-}
-
-
-void*
-Thread::callback (void* arg)
-{
-	Thread *k = reinterpret_cast<Thread*> (arg);
-	k->_started.store (true);
-	k->set_sched();
-	std::lock_guard wait_lock (k->_wait);
-	k->_finished.store (false);
-	k->run();
-	k->_finished.store (true);
-	return 0;
 }
 
 } // namespace xf

@@ -16,8 +16,12 @@
 
 // Standard:
 #include <cstddef>
-#include <mutex>
+#include <functional>
+#include <future>
+#include <optional>
 #include <queue>
+#include <tuple>
+#include <vector>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -31,165 +35,133 @@
 namespace xf {
 
 /**
- * WorkPerformer queues work units (WorkUnit) and executes them in the context
- * of separate thread.
+ * WorkPerformer queues packaged tasks and executes them in the context of separate threads. It's a good
+ * solution for CPU-intensive tasks.
+ *
+ * The threads are waiting for execution packaged tasks even if nothing is scheduled, so no time is lost
+ * for creating new threads. Also avoids creating too many threads at the same time.
+ *
+ * It's not a good solution for packaged tasks that do IO, since they will block execution units (threads).
  */
 class WorkPerformer: private Noncopyable
 {
-  private:
-	/**
-	 * Thread implementation.
-	 */
-	class Performer: public Thread
-	{
-	  public:
-		explicit
-		Performer (WorkPerformer*, unsigned int thread_id) noexcept;
-
-		void
-		run() override;
-
-	  private:
-		WorkPerformer*	_work_performer;
-		unsigned int	_thread_id;
-	};
-
   public:
-	/**
-	 * Implements code that needs to be executed in a separate thread.
-	 */
-	class Unit: private Noncopyable
-	{
-		friend class Performer;
-		friend class WorkPerformer;
-
-	  public:
-		virtual
-		~Unit() = default;
-
-		/**
-		 * Starts work.
-		 */
-		virtual void
-		execute() = 0;
-
-		/**
-		 * Return true if execute() method is finished.
-		 */
-		bool
-		is_ready() { return _is_ready.load(); }
-
-		/**
-		 * Wait for the task to be done.
-		 * There can be only one waiting thread.
-		 */
-		void
-		wait() { _wait_sem.wait(); }
-
-		/**
-		 * Return thread ID, which is a number between 0 and threads_num-1.
-		 * Tells to which executing thread this work unit has been assigned.
-		 *
-		 * Can be called only after WorkUnit has been started by the Performer
-		 * (in and after exit from execute() method).
-		 */
-		unsigned int
-		thread_id() const { return _thread_id; }
-
-	  private:
-		/**
-		 * Called by the WorkPerformer when unit is added to the queue.
-		 */
-		void
-		added_to_queue();
-
-	  private:
-		std::atomic<bool>	_is_ready;
-		Semaphore			_wait_sem;
-		unsigned int		_thread_id;
-	};
-
-  private:
-	typedef std::queue<Unit*> Units;
-
-	friend class Performer;
-
-  public:
-	/**
-	 * Create WorkPerformer with given number of threads.
-	 * The number of threads never changes.
-	 */
+	// Ctor
 	explicit
-	WorkPerformer (unsigned int threads_number, Logger const&);
+	WorkPerformer (std::size_t threads_number, Logger const&);
 
-	/**
-	 * Waits for threads to finish before return.
-	 */
+	// Dtor
 	~WorkPerformer();
-
-	/**
-	 * Add work unit to the queue. The same object may be used
-	 * over and over, but not simultaneously.
-	 * \threadsafe
-	 */
-	void
-	add (Unit*);
 
 	/**
 	 * Set scheduling parameter for all threads.
 	 */
 	void
-	set_sched (Thread::SchedType, int priority) const noexcept;
+	set (ThreadScheduler, int priority);
 
 	/**
 	 * Return number of threads created.
 	 */
-	unsigned int
-	threads_number() const { return _performers.size(); }
+	std::size_t
+	threads_number() const noexcept;
 
 	/**
-	 * Unit adaptor.
+	 * Return number of tasks which haven't started execution.
 	 */
-	template<class Function>
-		static Unit*
-		make_unit (Function fun)
-		{
-			struct Specialized: public Unit
-			{
-				Specialized (Function fun): _fun (fun) { }
+	std::size_t
+	queued_tasks() const noexcept;
 
-				void execute() override { _fun(); }
+	/**
+	 * Submit new task to execute.
+	 */
+	template<class Result, class ...Args>
+		std::future<Result>
+		submit (std::packaged_task<Result (Args...)>&&, Args&&...);
 
-			  private:
-				Function _fun;
-			};
-
-			return new Specialized (fun);
-		}
+	/**
+	 * Submit new task to execute.
+	 */
+	template<class Function, class ...Args>
+		std::future<std::invoke_result_t<Function&&, Args&&...>>
+		submit (Function&& function, Args&&...);
 
   private:
 	/**
-	 * Take unit from the queue. If there are no units ready, wait
-	 * until new unit arrives. Return 0 if thread should exit.
-	 * \threadsafe
+	 * Type-erasing container for tasks to execute.
 	 */
-	Unit*
-	take_unit();
+	struct AbstractTask
+	{
+		virtual
+		~AbstractTask() = default;
+
+		virtual void
+		operator()() = 0;
+	};
+
+	using TaskQueue = std::queue<std::unique_ptr<AbstractTask>>;
 
   private:
-	Logger									_logger;
-	// Current queue. Points either to _queues[1] or _queues[2]:
-	xf::Synchronized<Units>					_queue;
-	Semaphore								_queue_semaphore;
-	std::vector<std::shared_ptr<Performer>>	_performers;
+	/**
+	 * Function executed by all threads.
+	 * Waits for new tasks or exits when _terminating is true.
+	 */
+	void
+	thread();
+
+  private:
+	Logger								_logger;
+	std::atomic<bool>					_terminating { false };
+	xf::Synchronized<TaskQueue> mutable	_tasks;
+	Semaphore							_tasks_semaphore;
+	std::vector<std::thread>			_threads;
 };
 
 
-inline void
-WorkPerformer::Unit::added_to_queue()
+inline std::size_t
+WorkPerformer::threads_number() const noexcept
 {
-	_is_ready.store (false);
+	return _threads.size();
 }
+
+
+template<class Result, class ...Args>
+	inline std::future<Result>
+	WorkPerformer::submit (std::packaged_task<Result (Args...)>&& task, Args&&... args)
+	{
+		using PackagedTask = std::packaged_task<Result (Args...)>;
+
+		struct ConcreteTask: public AbstractTask
+		{
+			explicit
+			ConcreteTask (PackagedTask&& pt, Args&&... args):
+				packaged_task (std::move (pt)),
+				args (std::forward<Args> (args)...)
+			{ }
+
+			void
+			operator()() override
+			{
+				std::apply (packaged_task, std::forward<std::tuple<Args...>> (args));
+			}
+
+			PackagedTask		packaged_task;
+			std::tuple<Args...>	args;
+		};
+
+		std::future<Result> future = task.get_future();
+		_tasks.lock()->emplace (std::make_unique<ConcreteTask> (std::move (task), std::forward<Args> (args)...));
+		_tasks_semaphore.notify();
+		return future;
+	}
+
+
+template<class Function, class ...Args>
+	inline std::future<std::invoke_result_t<Function&&, Args&&...>>
+	WorkPerformer::submit (Function&& function, Args&&... args)
+	{
+		return submit (std::packaged_task<std::invoke_result_t<Function, Args...> (Args...)> (function),
+					   std::forward<Args> (args)...);
+	}
 
 } // namespace xf
 
