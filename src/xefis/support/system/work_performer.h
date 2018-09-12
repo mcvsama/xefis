@@ -16,15 +16,16 @@
 
 // Standard:
 #include <cstddef>
+#include <mutex>
 #include <queue>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
-#include <xefis/utility/mutex.h>
-#include <xefis/utility/semaphore.h>
-#include <xefis/utility/thread.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/semaphore.h>
+#include <xefis/utility/synchronized.h>
+#include <xefis/utility/thread.h>
 
 
 namespace xf {
@@ -178,8 +179,7 @@ class WorkPerformer: private Noncopyable
   private:
 	Logger									_logger;
 	// Current queue. Points either to _queues[1] or _queues[2]:
-	Units									_queue;
-	Mutex									_queue_mutex;
+	xf::Synchronized<Units>					_queue;
 	Semaphore								_queue_semaphore;
 	std::vector<std::shared_ptr<Performer>>	_performers;
 };

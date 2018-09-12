@@ -22,7 +22,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/stdexcept.h>
-#include <xefis/utility/mutex.h>
 #include <xefis/utility/numeric.h>
 
 // Local:
