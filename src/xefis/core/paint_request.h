@@ -72,24 +72,28 @@ class PaintRequest: private Noncopyable
 	/**
 	 * Access the canvas to paint on.
 	 */
+	[[nodiscard]]
 	QImage&
 	canvas() noexcept;
 
 	/**
 	 * Access the canvas to paint on.
 	 */
+	[[nodiscard]]
 	QImage const&
 	canvas() const noexcept;
 
 	/**
 	 * Return graphics metrics.
 	 */
+	[[nodiscard]]
 	Metric const&
 	metric() const noexcept;
 
 	/**
 	 * Return true if canvas size has changed since last painting request.
 	 */
+	[[nodiscard]]
 	bool
 	size_changed() const noexcept;
 
@@ -111,6 +115,7 @@ class PaintRequest: private Noncopyable
 	/**
 	 * Return true if request was marked as finished.
 	 */
+	[[nodiscard]]
 	bool
 	finished() const noexcept;
 
