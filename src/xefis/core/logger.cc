@@ -42,7 +42,7 @@ LoggerOutput::prepare_line() const
 
 
 Logger
-Logger::with_scope (std::string_view const& additional_scope)
+Logger::with_scope (std::string_view const& additional_scope) const
 {
 	Logger new_one (*this);
 	new_one.add_scope (additional_scope);

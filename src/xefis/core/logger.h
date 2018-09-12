@@ -104,7 +104,7 @@ class Logger
 	 * Derive new logger that uses scope of this one and a new one.
 	 */
 	Logger
-	with_scope (std::string_view const& additional_scope);
+	with_scope (std::string_view const& additional_scope) const;
 
 	/**
 	 * Return scope currently used.
