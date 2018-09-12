@@ -21,7 +21,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/mutex.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
