@@ -40,7 +40,7 @@ WorkPerformer::Performer::run()
 		unit->_thread_id = _thread_id;
 		unit->execute();
 		unit->_is_ready.store (true);
-		unit->_wait_sem.post();
+		unit->_wait_sem.notify();
 	}
 }
 
@@ -67,7 +67,7 @@ WorkPerformer::~WorkPerformer()
 	_logger << "Destroying WorkPerformer" << std::endl;
 
 	for (decltype (_performers.size()) i = 0; i < _performers.size(); ++i)
-		_queue_semaphore.post();
+		_queue_semaphore.notify();
 
 	for (auto p: _performers)
 		p->wait();
@@ -82,7 +82,7 @@ WorkPerformer::add (Unit* unit)
 		unit->added_to_queue();
 		queue->push (unit);
 	}
-	_queue_semaphore.post();
+	_queue_semaphore.notify();
 }
 
 
