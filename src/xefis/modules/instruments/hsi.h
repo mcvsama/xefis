@@ -15,8 +15,9 @@
 #define XEFIS__MODULES__INSTRUMENTS__HSI_H__INCLUDED
 
 // Standard:
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <future>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -26,6 +27,7 @@
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/synchronized.h>
 #include <xefis/utility/temporal.h>
@@ -487,7 +489,7 @@ class HSI: public xf::Instrument<HSI_IO>
 {
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::NavaidStorage const&, std::string_view const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::WorkPerformer&, xf::NavaidStorage const&, std::string_view const& instance = {});
 
 	// Dtor
 	~HSI();
@@ -501,12 +503,18 @@ class HSI: public xf::Instrument<HSI_IO>
 	paint (xf::PaintRequest&) const override;
 
   private:
+	void
+	async_paint (xf::AsyncPaintRequest) const;
+
+  private:
+	xf::WorkPerformer&										_work_performer;
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;
 	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;
 	xf::Synchronized<hsi_detail::ResizeCache> mutable		_resize_cache;
 	xf::Synchronized<hsi_detail::CurrentNavaids> mutable	_current_navaids;
 	xf::Synchronized<hsi_detail::Mutable> mutable			_mutable;
+	std::future<void> mutable								_painting_future;
 };
 
 #endif

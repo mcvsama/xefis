@@ -2973,8 +2973,9 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, std::string_view const& instance):
-	Instrument (std::move (module_io), instance)
+ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::WorkPerformer& work_performer, std::string_view const& instance):
+	Instrument (std::move (module_io), instance),
+	_work_performer (work_performer)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));
 	_fpv_computer.observe ({
@@ -2993,7 +2994,8 @@ ADI::ADI (std::unique_ptr<ADI_IO> module_io, std::string_view const& instance):
 
 ADI::~ADI()
 {
-	// TODO wait for painter to finish
+	if (_painting_future.valid())
+		_painting_future.wait();
 }
 
 
@@ -3291,8 +3293,19 @@ ADI::process (xf::Cycle const& cycle)
 void
 ADI::paint (xf::PaintRequest& paint_request) const
 {
+	// Make sure previous work is done:
+	if (_painting_future.valid())
+		_painting_future.wait();
+
+	_painting_future = _work_performer.submit (&ADI::async_paint, this, std::move (paint_request.make_async()));
+}
+
+
+void
+ADI::async_paint (xf::AsyncPaintRequest async_paint_request) const
+{
 	auto cloned_params = *_parameters.lock();
-	_painting_work.paint (paint_request, cloned_params);
+	_painting_work.paint (async_paint_request.paint_request(), cloned_params);
 }
 
 

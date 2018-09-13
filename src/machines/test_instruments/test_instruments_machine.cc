@@ -30,7 +30,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis* xefis):
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger);
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
 
-	_test_loop.emplace (this, xefis, *_navaid_storage, _logger);
+	_test_loop.emplace (this, xefis, *_work_performer, *_navaid_storage, _logger);
 	register_processing_loop (*_test_loop);
 	(*_test_loop)->start();
 }
