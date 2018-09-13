@@ -29,8 +29,60 @@
 
 namespace xf {
 
+class PaintRequest;
+
+
+/**
+ * RAII-style accessor to the PaintRequest object.
+ * Marks the PaintRequest as finished automatically when AsyncPaintRequest is destroyed.
+ */
+class AsyncPaintRequest
+{
+  public:
+	// Ctor
+	explicit
+	AsyncPaintRequest (PaintRequest&);
+
+	// Copy ctor
+	AsyncPaintRequest (AsyncPaintRequest const&) = delete;
+
+	// Move ctor
+	AsyncPaintRequest (AsyncPaintRequest&&);
+
+	// Copy operator
+	AsyncPaintRequest&
+	operator= (AsyncPaintRequest const&) = delete;
+
+	// Move operator
+	AsyncPaintRequest&
+	operator= (AsyncPaintRequest&&);
+
+	// Dtor
+	~AsyncPaintRequest();
+
+	/**
+	 * Access the PaintRequest object.
+	 */
+	[[nodiscard]]
+	PaintRequest&
+	paint_request() noexcept;
+
+	/**
+	 * Access the PaintRequest object.
+	 */
+	[[nodiscard]]
+	PaintRequest const&
+	paint_request() const noexcept;
+
+  private:
+	PaintRequest* _paint_request;
+};
+
+
 class PaintRequest: private Noncopyable
 {
+	friend class AsyncPaintRequest;
+
   public:
 	class Metric
 	{
@@ -107,16 +159,18 @@ class PaintRequest: private Noncopyable
 	 * Inform the system that the result will be painted asynchronously.
 	 * After it's done, API user is required to call finished().
 	 */
+	[[deprecated]]
 	void
 	will_finish_asynchronously() noexcept;
 
 	/**
-	 * Inform the system that the asynchronous painting has finished.
-	 * After calling this method, calling any other method on this object
-	 * is undefined-behaviour.
+	 * Get the token that will allow painting asynchronously.
+	 * This PaintRequest will be marked as finished when the returned token is destroyed.
+	 * When it happens, calling any method on this object is undefined-behaviour.
 	 */
-	void
-	set_finished() noexcept;
+	[[nodiscard]]
+	AsyncPaintRequest
+	make_async();
 
 	/**
 	 * Return true if request was marked as finished.
@@ -131,6 +185,44 @@ class PaintRequest: private Noncopyable
 	Metric				_metric;
 	bool				_size_changed;
 };
+
+
+inline
+AsyncPaintRequest::AsyncPaintRequest (PaintRequest& paint_request):
+	_paint_request (&paint_request)
+{
+	_paint_request->_finished = false;
+}
+
+
+inline
+AsyncPaintRequest::AsyncPaintRequest (AsyncPaintRequest&& other):
+	_paint_request (other._paint_request)
+{
+	other._paint_request = nullptr;
+}
+
+
+inline
+AsyncPaintRequest::~AsyncPaintRequest()
+{
+	if (_paint_request)
+		_paint_request->_finished = true;
+}
+
+
+inline PaintRequest&
+AsyncPaintRequest::paint_request() noexcept
+{
+	return *_paint_request;
+}
+
+
+inline PaintRequest const&
+AsyncPaintRequest::paint_request() const noexcept
+{
+	return *_paint_request;
+}
 
 
 inline
@@ -226,21 +318,21 @@ PaintRequest::size_changed() const noexcept
 inline void
 PaintRequest::will_finish_asynchronously() noexcept
 {
-	_finished.store (false);
+	_finished = false;
 }
 
 
-inline void
-PaintRequest::set_finished() noexcept
+inline AsyncPaintRequest
+PaintRequest::make_async()
 {
-	_finished.store (true);
+	return AsyncPaintRequest (*this);
 }
 
 
 inline bool
 PaintRequest::finished() const noexcept
 {
-	return _finished.load();
+	return _finished;
 }
 
 } // namespace xf
