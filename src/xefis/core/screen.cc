@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <functional>
 #include <algorithm>
+#include <thread>
 
 // Qt:
 #include <QTimer>
@@ -34,8 +35,8 @@ namespace xf {
 
 Screen::Screen (ScreenSpec const& spec):
 	QWidget (nullptr),
-	_instrument_tracker ([&](typename InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
-						 [&](typename InstrumentTracker::Disclosure& disclosure) { instrument_unregistered (disclosure); }),
+	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
+						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
 	_screen_spec (spec)
 {
 	QRect rect = _screen_spec.position_and_size();
@@ -57,7 +58,9 @@ Screen::Screen (ScreenSpec const& spec):
 
 Screen::~Screen()
 {
-	// TODO wait for all async jobs to be finished
+	// Make sure all async painting is finished:
+	for (auto& disclosure: _instrument_tracker)
+		wait_for_async_paint (disclosure);
 }
 
 
@@ -165,18 +168,22 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.computed_position->isValid())
 		{
-			PaintRequest::Metric metric { details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
+			auto update_details = [&details] {
+				std::swap (details.canvas, details.ready_canvas);
+
+				if (!details.paint_request)
+					details.previous_size = details.computed_position->size();
+				else
+					details.previous_size = details.paint_request->metric().canvas_size();
+
+				details.paint_request.reset();
+			};
 
 			if (!details.paint_request || details.paint_request->finished())
 			{
-				// If paint_request exists (and it's finished()), it means previous painting asynchronous.
+				// If paint_request exists (and it's finished()), it means previous painting was asynchronous.
 				if (details.paint_request)
-				{
-					// TODO DRY
-					std::swap (details.canvas, details.ready_canvas);
-					details.paint_request.reset();
-					details.previous_size = details.computed_position->size();
-				}
+					update_details();
 
 				// If size changed:
 				if (!details.canvas || details.canvas->size() != details.computed_position->size())
@@ -185,17 +192,15 @@ Screen::paint_instruments_to_buffer()
 				// If needs repainting:
 				if (instrument.dirty_since_last_check())
 				{
+					PaintRequest::Metric metric { details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
+
 					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
 					details.paint_request = std::make_unique<PaintRequest> (*details.canvas, metric, details.previous_size);
 
 					instrument.paint (*details.paint_request);
 
 					if (details.paint_request->finished())
-					{
-						std::swap (details.canvas, details.ready_canvas);
-						details.paint_request.reset();
-						details.previous_size = details.computed_position->size();
-					}
+						update_details();
 
 					// Unfinished PaintRequests will be checked during next paint_instruments_to_buffer().
 				}
@@ -232,6 +237,19 @@ Screen::paint_instruments_to_buffer()
 
 
 void
+Screen::wait_for_async_paint (InstrumentTracker::Disclosure& disclosure)
+{
+	using namespace std::chrono_literals;
+
+	auto const& paint_request = disclosure.details().paint_request;
+
+	// Wait actively for all painters to finish:
+	while (paint_request && !paint_request->finished())
+		std::this_thread::sleep_for (0.01s);
+}
+
+
+void
 Screen::prepare_canvas_for_instrument (std::unique_ptr<QImage>& canvas, QSize size)
 {
 	if (!canvas)
@@ -258,7 +276,7 @@ Screen::allocate_image (QSize size) const
 
 
 void
-Screen::instrument_registered (typename InstrumentTracker::Disclosure& disclosure)
+Screen::instrument_registered (InstrumentTracker::Disclosure& disclosure)
 {
 	_z_index_sorted_disclosures.push_back (&disclosure);
 	sort_by_z_index();
@@ -266,8 +284,9 @@ Screen::instrument_registered (typename InstrumentTracker::Disclosure& disclosur
 
 
 void
-Screen::instrument_unregistered (typename InstrumentTracker::Disclosure& disclosure)
+Screen::instrument_deregistered (InstrumentTracker::Disclosure& disclosure)
 {
+	wait_for_async_paint (disclosure);
 	auto new_end = std::remove (_z_index_sorted_disclosures.begin(), _z_index_sorted_disclosures.end(), &disclosure);
 	_z_index_sorted_disclosures.resize (new_end - _z_index_sorted_disclosures.begin());
 }

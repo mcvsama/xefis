@@ -143,6 +143,12 @@ class Screen:
 	paint_instruments_to_buffer();
 
 	/**
+	 * Wait for async paint to be done in an active loop.
+	 */
+	void
+	wait_for_async_paint (InstrumentTracker::Disclosure&);
+
+	/**
 	 * Prepare canvas for an instrument.
 	 * Ensure it has requested size and set it to full alpha with color black.
 	 */
@@ -156,10 +162,10 @@ class Screen:
 	allocate_image (QSize) const;
 
 	void
-	instrument_registered (typename InstrumentTracker::Disclosure&);
+	instrument_registered (InstrumentTracker::Disclosure&);
 
 	void
-	instrument_unregistered (typename InstrumentTracker::Disclosure&);
+	instrument_deregistered (InstrumentTracker::Disclosure&);
 
 	void
 	sort_by_z_index();
