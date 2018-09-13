@@ -39,21 +39,27 @@ class PaintRequest: private Noncopyable
 		explicit
 		Metric (QSize, PixelDensity, si::Length pen_width, si::Length font_height);
 
+		[[nodiscard]]
 		bool
 		operator== (Metric const&) const noexcept;
 
+		[[nodiscard]]
 		bool
 		operator!= (Metric const&) const noexcept;
 
+		[[nodiscard]]
 		QSize
 		canvas_size() const noexcept;
 
+		[[nodiscard]]
 		PixelDensity
 		pixel_density() const noexcept;
 
+		[[nodiscard]]
 		si::Length
 		pen_width() const noexcept;
 
+		[[nodiscard]]
 		si::Length
 		font_height() const noexcept;
 
