@@ -16,13 +16,13 @@
 
 // Standard:
 #include <cstddef>
-#include <optional>
 
 // Qt:
 #include <QRect>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/qutils.h>
 
 
 namespace xf {
@@ -35,8 +35,8 @@ class ScreenSpec
   public:
 	// Ctor
 	explicit
-	ScreenSpec (std::optional<QRect> position_and_size,
-				std::optional<si::Length> diagonal_length,
+	ScreenSpec (QRect position_and_size,
+				si::Length diagonal_length,
 				si::Frequency refresh_rate,
 				si::Length base_pen_width,
 				si::Length base_font_height);
@@ -45,13 +45,15 @@ class ScreenSpec
 	 * Position and size of the display area on the screen.
 	 * If not defined, whole screen area should be used.
 	 */
-	std::optional<QRect>
+	[[nodiscard]]
+	QRect
 	position_and_size() const noexcept;
 
 	/**
 	 * Diagonal length of the screen widget.
 	 */
-	std::optional<si::Length>
+	[[nodiscard]]
+	si::Length
 	diagonal_length() const noexcept;
 
 	/**
@@ -61,36 +63,44 @@ class ScreenSpec
 	refresh_rate() const noexcept;
 
 	/**
-	 * Set base pen width.
+	 * Base pen width.
 	 */
 	si::Length
 	base_pen_width() const noexcept;
 
 	/**
-	 * Set base font height.
+	 * Base font height.
 	 */
 	si::Length
 	base_font_height() const noexcept;
 
 	/**
-	 * Set screen scaling factor. Affects returned dimensions and diagonal length.
+	 * Return pixel density for this screen.
+	 */
+	[[nodiscard]]
+	si::PixelDensity
+	pixel_density() const noexcept;
+
+	/**
+	 * Set screen scaling factor. Affects returned dimensions, diagonal length and base sizes.
 	 */
 	void
 	set_scale (float factor);
 
   private:
-	float						_scale { 1.0f };
-	std::optional<QRect>		_position_and_size;
-	std::optional<si::Length>	_diagonal_length;
-	si::Frequency				_refresh_rate;
-	si::Length					_base_pen_width;
-	si::Length					_base_font_height;
+	float				_scale { 1.0f };
+	QRect				_position_and_size;
+	si::Length			_diagonal_length;
+	si::Frequency		_refresh_rate;
+	si::Length			_base_pen_width;
+	si::Length			_base_font_height;
+	si::PixelDensity	_pixel_density;
 };
 
 
 inline
-ScreenSpec::ScreenSpec (std::optional<QRect> position_and_size,
-						std::optional<si::Length> diagonal_length,
+ScreenSpec::ScreenSpec (QRect position_and_size,
+						si::Length diagonal_length,
 						si::Frequency refresh_rate,
 						si::Length base_pen_width,
 						si::Length base_font_height):
@@ -102,23 +112,17 @@ ScreenSpec::ScreenSpec (std::optional<QRect> position_and_size,
 { }
 
 
-inline std::optional<QRect>
+inline QRect
 ScreenSpec::position_and_size() const noexcept
 {
-	if (_position_and_size)
-		return QRect { _position_and_size->topLeft(), _position_and_size->size() * _scale };
-	else
-		return std::nullopt;
+	return QRect { _position_and_size.topLeft(), _position_and_size.size() * _scale };
 }
 
 
-inline std::optional<si::Length>
+inline si::Length
 ScreenSpec::diagonal_length() const noexcept
 {
-	if (_diagonal_length)
-		return *_diagonal_length / _scale;
-	else
-		return std::nullopt;
+	return _diagonal_length;
 }
 
 
@@ -140,6 +144,13 @@ inline si::Length
 ScreenSpec::base_font_height() const noexcept
 {
 	return _base_font_height;
+}
+
+
+inline si::PixelDensity
+ScreenSpec::pixel_density() const noexcept
+{
+	return xf::diagonal (_position_and_size.size()) / _diagonal_length * _scale;
 }
 
 

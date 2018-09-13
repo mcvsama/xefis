@@ -109,12 +109,6 @@ class Screen:
 	set_paint_bounding_boxes (bool enable);
 
 	/**
-	 * Return pixel density for this screen.
-	 */
-	si::PixelDensity
-	pixel_density() const;
-
-	/**
 	 * Return the instrument tracker object.
 	 */
 	InstrumentTracker&
