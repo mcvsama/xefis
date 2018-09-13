@@ -26,6 +26,7 @@
 #include <xefis/core/xefis.h>
 #include <xefis/modules/test/test_generator.h>
 #include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 
 // Local:
 #include "test_screen.h"
@@ -36,9 +37,10 @@ class TestLoop: public xf::ProcessingLoop
   public:
 	// Ctor
 	explicit
-	TestLoop (xf::Machine*, xf::Xefis*, xf::NavaidStorage const&, xf::Logger const&);
+	TestLoop (xf::Machine*, xf::Xefis*, xf::WorkPerformer&, xf::NavaidStorage const&, xf::Logger const&);
 
   private:
+	xf::WorkPerformer&								_work_performer;
 	xf::NavaidStorage const&						_navaid_storage;
 	xf::Logger										_logger;
 	std::optional<TestScreen>						_test_screen;

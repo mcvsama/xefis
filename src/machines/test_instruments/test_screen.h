@@ -31,6 +31,7 @@
 #include <xefis/modules/instruments/vertical_trim.h>
 #include <xefis/modules/instruments/radial_gauge.h>
 #include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/system/work_performer.h>
 
 
 class TestScreen: public xf::Screen
@@ -38,7 +39,7 @@ class TestScreen: public xf::Screen
   public:
 	// Ctor
 	explicit
-	TestScreen (xf::ScreenSpec const&, xf::NavaidStorage const&);
+	TestScreen (xf::ScreenSpec const&, xf::NavaidStorage const&, xf::Logger const& logger);
 
 	void
 	create_instruments();
@@ -73,6 +74,8 @@ class TestScreen: public xf::Screen
 	std::unique_ptr<HorizontalTrimIO>								horizontal_trim_io			{ std::make_unique<HorizontalTrimIO>() };
 
   private:
+	xf::WorkPerformer												_work_performer_adi;
+	xf::WorkPerformer												_work_performer_hsi;
 	xf::NavaidStorage const&										_navaid_storage;
 	// Instruments:
 	std::optional<xf::Registrant<ADI>>								_adi;

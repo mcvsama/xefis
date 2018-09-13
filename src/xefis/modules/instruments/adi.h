@@ -15,8 +15,9 @@
 #define XEFIS__MODULES__INSTRUMENTS__ADI_H__INCLUDED
 
 // Standard:
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <future>
 
 // Qt:
 #include <QtGui/QColor>
@@ -30,6 +31,7 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/synchronized.h>
 
@@ -808,7 +810,7 @@ class ADI: public xf::Instrument<ADI_IO>
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, std::string_view const& instance = {});
+	ADI (std::unique_ptr<ADI_IO>, xf::WorkPerformer&, std::string_view const& instance = {});
 
 	// Dtor
 	~ADI();
@@ -823,9 +825,13 @@ class ADI: public xf::Instrument<ADI_IO>
 
   private:
 	void
+	async_paint (xf::AsyncPaintRequest) const;
+
+	void
 	compute_fpv();
 
   private:
+	xf::WorkPerformer&							_work_performer;
 	xf::PropertyObserver						_fpv_computer;
 	adi_detail::PaintingWork					_painting_work;
 	xf::Synchronized<adi_detail::Parameters>	_parameters;
@@ -849,6 +855,7 @@ class ADI: public xf::Instrument<ADI_IO>
 	QString										_speed_flaps_up_current_label;
 	QString										_speed_flaps_a_current_label;
 	QString										_speed_flaps_b_current_label;
+	std::future<void> mutable					_painting_future;
 };
 
 #endif

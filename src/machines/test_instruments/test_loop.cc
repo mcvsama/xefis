@@ -28,8 +28,9 @@
 #include "test_screen.h"
 
 
-TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
+TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
 	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger),
+	_work_performer (work_performer),
 	_navaid_storage (navaid_storage),
 	_logger (logger)
 {

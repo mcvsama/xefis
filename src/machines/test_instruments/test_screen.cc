@@ -21,8 +21,10 @@
 #include "test_screen.h"
 
 
-TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& navaid_storage):
+TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
 	Screen (spec),
+	_work_performer_adi (1, logger.with_scope ("adi")),
+	_work_performer_hsi (1, logger.with_scope ("hsi")),
 	_navaid_storage (navaid_storage)
 {
 	adi_io->speed_ladder_line_every								= 10;
@@ -189,11 +191,11 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::NavaidStorage const& nav
 void
 TestScreen::create_instruments()
 {
-	_adi.emplace (std::move (adi_io), "adi");
+	_adi.emplace (std::move (adi_io), _work_performer_adi, "adi");
 	register_instrument (*_adi);
 	set (**_adi, { 0.0f, 0.0f, 0.5f, 0.63f });
 
-	_hsi.emplace (std::move (hsi_io), _navaid_storage, "hsi");
+	_hsi.emplace (std::move (hsi_io), _work_performer_hsi, _navaid_storage, "hsi");
 	register_instrument (*_hsi);
 	set (**_hsi, { 0.0f, 0.63f, 0.5f, 1.0f - 0.63f });
 
