@@ -25,7 +25,6 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/services.h>
-#include <xefis/utility/qutils.h>
 
 // Local:
 #include "screen.h"
@@ -39,14 +38,11 @@ Screen::Screen (ScreenSpec const& spec):
 						 [&](typename InstrumentTracker::Disclosure& disclosure) { instrument_unregistered (disclosure); }),
 	_screen_spec (spec)
 {
-	auto rect = _screen_spec.position_and_size();
+	QRect rect = _screen_spec.position_and_size();
 
-	if (!rect)
-		rect = { 0, 0, 1920, 1080 }; // TODO unhardcode - read Screen information; use QDesktopWidget to read screen info.
-
-	move (rect->topLeft());
-	resize (rect->size());
-	update_canvas (rect->size());
+	move (rect.topLeft());
+	resize (rect.size());
+	update_canvas (rect.size());
 	setFont (xf::Services::instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
 	show();
@@ -106,19 +102,6 @@ void
 Screen::set_paint_bounding_boxes (bool enable)
 {
 	_paint_bounding_boxes = enable;
-}
-
-
-si::PixelDensity
-Screen::pixel_density() const
-{
-	auto const pos = _screen_spec.position_and_size();
-	auto const dia = _screen_spec.diagonal_length();
-
-	if (pos && dia)
-		return xf::diagonal (pos->size()) / *dia;
-	else
-		return logicalDpiY() / 1_in;
 }
 
 
@@ -182,7 +165,7 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.computed_position->isValid())
 		{
-			PaintRequest::Metric metric { details.computed_position->size(), pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
+			PaintRequest::Metric metric { details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
 
 			if (!details.paint_request || details.paint_request->finished())
 			{
@@ -265,7 +248,7 @@ QImage
 Screen::allocate_image (QSize size) const
 {
 	QImage image (size, QImage::Format_ARGB32_Premultiplied);
-	int const dots_per_meter = pixel_density().in<si::DotsPerMeter>();
+	int const dots_per_meter = _screen_spec.pixel_density().in<si::DotsPerMeter>();
 
 	image.setDotsPerMeterX (dots_per_meter);
 	image.setDotsPerMeterY (dots_per_meter);

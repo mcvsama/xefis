@@ -33,9 +33,11 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::NavaidStorage const& n
 	_navaid_storage (navaid_storage),
 	_logger (logger)
 {
-	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, 0.235_mm, 2.1_mm };
-	spec.set_scale (1.5f);
-	_test_screen.emplace (spec, _navaid_storage);
+	auto line_width = 0.3525_mm;
+	auto font_height = 3.15_mm;
+	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
+	spec.set_scale (1.0f);
+	_test_screen.emplace (spec, _navaid_storage, logger.with_scope ("test screen"));
 	_test_screen->set_paint_bounding_boxes (false);
 
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
