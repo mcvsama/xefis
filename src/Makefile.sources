@@ -282,6 +282,7 @@ XEFIS_SOURCES			+= xefis/core/logger.cc
 XEFIS_SOURCES			+= xefis/core/machine.cc
 XEFIS_SOURCES			+= xefis/core/module.cc
 XEFIS_SOURCES			+= xefis/core/module_io.cc
+XEFIS_SOURCES			+= xefis/core/paint_request.cc
 XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/processing_loop.cc
 XEFIS_SOURCES			+= xefis/core/property_observer.cc
