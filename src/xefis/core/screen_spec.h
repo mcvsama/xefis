@@ -59,18 +59,21 @@ class ScreenSpec
 	/**
 	 * Requested repaint rate of the instruments.
 	 */
+	[[nodiscard]]
 	si::Frequency
 	refresh_rate() const noexcept;
 
 	/**
 	 * Base pen width.
 	 */
+	[[nodiscard]]
 	si::Length
 	base_pen_width() const noexcept;
 
 	/**
 	 * Base font height.
 	 */
+	[[nodiscard]]
 	si::Length
 	base_font_height() const noexcept;
 
