@@ -587,6 +587,7 @@ class ArtificialHorizon
 	QTransform		_roll_transform;
 	QTransform		_heading_transform;
 	QTransform		_horizon_transform;
+	QTransform		_fast_horizon_transform;
 	QRectF			_sky_rect;
 	QRectF			_gnd_rect;
 	QPainterPath	_flight_path_marker_shape;

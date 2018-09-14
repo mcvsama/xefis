@@ -383,8 +383,9 @@ ArtificialHorizon::precompute (AdiPaintRequest& pr)
 	_heading_transform.translate (-pr.heading_to_px (pr.params.orientation_heading), 0.f);
 
 	// Total transform of horizon (heading is not really necessary here):
-	_horizon_transform = _pitch_transform * _roll_transform * pr.precomputed.center_transform;
-	// Without the following, Qt did something weird sometimes, like aligning drawn points to display pixels (?).
+	_fast_horizon_transform = _pitch_transform * _roll_transform * pr.precomputed.center_transform;
+	// Without the shear, Qt did something weird sometimes, like aligning drawn points to display pixels (?).
+	_horizon_transform = _fast_horizon_transform;
 	_horizon_transform.shear (0.0001f, 0.f);
 
 	// Limit FPM position:
@@ -396,7 +397,7 @@ ArtificialHorizon::precompute (AdiPaintRequest& pr)
 		float const greater_dimension = pr.aids.greater_dimension();
 		float const lesser_dimension = pr.aids.lesser_dimension();
 		float const w_max = 2.f * greater_dimension;
-		float const h_max = 10.f * greater_dimension;
+		float const h_max = 2.f * greater_dimension;
 		_sky_rect = QRectF (-w_max, -h_max, 2.f * w_max, h_max + 1.f);
 		_gnd_rect = QRectF (-w_max, 0.f, 2.f * w_max, h_max);
 
@@ -465,8 +466,12 @@ ArtificialHorizon::paint_horizon (AdiPaintRequest& pr) const
 			pr.painter.setClipPath (_old_horizon_clip);
 		}
 
-		pr.painter.setTransform (_horizon_transform);
-		pr.painter.fillRect (_sky_rect, kSkyColor);
+		pr.painter.setPen (Qt::NoPen);
+		// Painting without transform is much faster:
+		pr.painter.resetTransform();
+		pr.painter.fillRect (QRectF (QPointF (0.0f, 0.0f), pr.paint_request.metric().canvas_size()), kSkyColor);
+
+		pr.painter.setTransform (_fast_horizon_transform);
 		pr.painter.fillRect (_gnd_rect, kGroundColor);
 	}
 	else
@@ -514,10 +519,10 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 				});
 				// Degs number:
 				int const abs_deg = std::abs (deg);
-				QString deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
+				QString const deg_t = QString::number (abs_deg > 90 ? 180 - abs_deg : abs_deg);
 				//// Text:
-				QRectF lbox (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
-				QRectF rbox (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+				QRectF const lbox (-z - 4.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
+				QRectF const rbox (+z + 0.25f * fpxs, d - 0.5f * fpxs, 4.f * fpxs, fpxs);
 				pr.painter.fast_draw_text (lbox, Qt::AlignVCenter | Qt::AlignRight, deg_t, pr.default_shadow);
 				pr.painter.fast_draw_text (rbox, Qt::AlignVCenter | Qt::AlignLeft, deg_t, pr.default_shadow);
 			}
