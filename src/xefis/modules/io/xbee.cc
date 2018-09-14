@@ -44,10 +44,8 @@
 
 XBee::XBee (std::unique_ptr<XBeeIO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_restart_timer = new QTimer (this);
 	_restart_timer->setInterval (kRestartAfter.in<Millisecond>());
 	_restart_timer->setSingleShot (true);

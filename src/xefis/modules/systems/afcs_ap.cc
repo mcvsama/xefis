@@ -25,10 +25,8 @@
 
 AFCS_AP::AFCS_AP (std::unique_ptr<AFCS_AP_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	constexpr auto radian_second = 1.0_rad * 1.0_s;
 
 	_elevator_pid.set_integral_limit ({ -0.1 * radian_second, +0.1 * radian_second });

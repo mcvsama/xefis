@@ -40,11 +40,9 @@
 
 CHRUM6::CHRUM6 (std::unique_ptr<CHRUM6_IO> module_io, xf::SerialPort&& serial_port, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_serial_port (std::move (serial_port))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_serial_port.set_max_read_failures (3);
 
 	_restart_timer = std::make_unique<QTimer> (this);

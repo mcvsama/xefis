@@ -28,10 +28,8 @@
 
 Watchdog::Watchdog (xf::Xefis* xefis, xf::Logger const& logger, std::string_view const& instance):
 	Module (instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	std::optional<int> watchdog_write_fd = xefis->options().watchdog_write_fd();
 	std::optional<int> watchdog_read_fd = xefis->options().watchdog_read_fd();
 

@@ -29,11 +29,9 @@
 
 ETSAirspeed::ETSAirspeed (std::unique_ptr<ETSAirspeedIO> module_io, xf::i2c::Device&& device, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_device (std::move (device))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_calibration_data.reserve (kOffsetCalculationSamples);
 
 	io.serviceable = false;

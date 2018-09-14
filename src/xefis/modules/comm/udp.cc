@@ -32,10 +32,8 @@
 
 UDP::UDP (std::unique_ptr<UDP_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	if (io.tx_udp_host && io.tx_udp_port)
 		_tx = std::make_unique<QUdpSocket>();
 

@@ -26,10 +26,8 @@
 
 AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	constexpr auto sec = 1.0_s;
 
 	for (auto* pid: { &_magnetic_hdg_pid, &_magnetic_trk_pid })

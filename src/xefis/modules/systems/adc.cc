@@ -30,11 +30,9 @@
 
 AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, xf::Airframe* airframe, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_airframe (airframe)
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_total_pressure_computer.set_callback (std::bind (&AirDataComputer::recover_total_pressure, this));
 	_total_pressure_computer.observe ({
 		&io.pressure_total,

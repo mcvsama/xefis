@@ -87,9 +87,8 @@ Accounting::Stats::average() const noexcept
 
 
 Accounting::Accounting (Logger const& logger):
-	_logger (logger)
+	_logger (logger.with_scope ("<accounting>"))
 {
-	_logger.add_scope ("<accounting>");
 	_logger << "Creating Accounting" << std::endl;
 	_latency_check_timer = new QTimer (this);
 	_latency_check_timer->setSingleShot (false);
