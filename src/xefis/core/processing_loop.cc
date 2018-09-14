@@ -88,7 +88,7 @@ ProcessingLoop::execute_cycle()
 		io.actual_frequency = 1.0 / dt;
 
 		if (dt > 1.1 * _loop_period)
-			_logger << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0);
+			_logger << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0 - 100.0);
 	}
 
 	// TODO check if all core properties are computable by modules; if not, show a warning.
