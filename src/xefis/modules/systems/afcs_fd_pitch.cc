@@ -24,9 +24,12 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
+	Module (std::move (module_io), instance),
+	_logger (logger)
 {
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
+
 	constexpr auto sec = 1.0_s;
 
 	_ias_pid.set_integral_limit ({ -0.05_m, +0.05_m });
@@ -78,12 +81,15 @@ AFCS_FD_Pitch::process (xf::Cycle const& cycle)
 
 
 void
-AFCS_FD_Pitch::rescue (std::exception_ptr)
+AFCS_FD_Pitch::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
+	using namespace xf::exception_ops;
+
 	if (!io.autonomous.value_or (true))
 		io.operative = false;
 
 	check_autonomous();
+	(cycle.logger() + _logger) << "" << eptr << std::endl;
 }
 
 

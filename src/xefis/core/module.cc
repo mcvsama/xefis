@@ -45,7 +45,7 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 	catch (...)
 	{
 		try {
-			_module.rescue (std::current_exception());
+			_module.rescue (cycle, std::current_exception());
 
 			// Set all output properties to nil.
 			if (_module._set_nil_on_exception)
@@ -54,8 +54,7 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 		}
 		catch (...)
 		{
-			// TODO use logger
-			std::clog << "Exception '" << xf::describe_exception (std::current_exception()) << "' during handling exception from module " << identifier (_module) << "\n";
+			cycle.logger() << "Exception '" << xf::describe_exception (std::current_exception()) << "' during handling exception from module " << identifier (_module) << "\n";
 		}
 	}
 }
@@ -82,10 +81,9 @@ BasicModule::process (xf::Cycle const&)
 
 
 void
-BasicModule::rescue (std::exception_ptr)
+BasicModule::rescue (Cycle const& cycle, std::exception_ptr eptr)
 {
-	// TODO use logger
-	std::clog << "Unhandled exception '" << xf::describe_exception (std::current_exception()) << "' during processing of module " << identifier (*this) << "\n";
+	cycle.logger() << "Unhandled exception '" << xf::describe_exception (eptr) << "' during processing of module " << identifier (*this) << "\n";
 }
 
 

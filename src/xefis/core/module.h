@@ -145,7 +145,7 @@ class BasicModule: private Noncopyable
 	 * Default implementation logs the exception and sets all output properties to nil.
 	 */
 	virtual void
-	rescue (std::exception_ptr);
+	rescue (Cycle const&, std::exception_ptr);
 
 	/**
 	 * Enable/disable option to set all output properties to xf::nil when
