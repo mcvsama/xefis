@@ -93,7 +93,7 @@ Flaps::paint (xf::PaintRequest& paint_request) const
 		float w = 0.3f * block.width();
 		float s = block.top() + setting / *io.maximum_angle * block.height();
 		painter.setPen (aids->get_pen (Qt::green, 2.f));
-		painter.paint (xf::Shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&] {
 			painter.drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));
 		});
 

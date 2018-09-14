@@ -25,6 +25,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/screen.h>
+#include <xefis/support/instrument/shadow.h>
 #include <xefis/utility/strong_type.h>
 #include <xefis/utility/types.h>
 
@@ -172,6 +173,12 @@ class InstrumentAids
 	static float
 	angle_for_qpainter (Angle deg);
 
+	/**
+	 * Return default shadow.
+	 */
+	Shadow
+	default_shadow() const;
+
   private:
 	std::optional<WidthForHeight>	_aspect_ratio;
 	PaintRequest::Metric			_canvas_metric;
@@ -271,6 +278,15 @@ inline float
 InstrumentAids::angle_for_qpainter (Angle deg)
 {
 	return 16 * deg.in<Degree>();
+}
+
+
+inline Shadow
+InstrumentAids::default_shadow() const
+{
+	Shadow shadow;
+	shadow.set_width (pen_width (0.75f));
+	return shadow;
 }
 
 } // namespace xf

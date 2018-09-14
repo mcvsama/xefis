@@ -346,7 +346,7 @@ PaintingWork::PaintingWork (xf::PaintRequest& paint_request, xf::InstrumentSuppo
 
 		_c.margin = 0.15f * _c.q;
 
-		_c.black_shadow.set_width (0.15_mm * _paint_request.metric().pixel_density());
+		_c.black_shadow = _aids.default_shadow();
 		_c.black_shadow.set_color (Qt::black);
 	}
 

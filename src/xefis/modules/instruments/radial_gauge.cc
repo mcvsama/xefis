@@ -146,7 +146,7 @@ BasicRadialGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 	QPen const automatic_pen = get_round_pen (QColor (0x22, 0xaa, 0xff), 1.1f);
 	QRectF const rect (-r, -r, 2.f * r, 2.f * r);
 
-	xf::Shadow black_shadow;
+	xf::Shadow black_shadow = aids.default_shadow();
 	black_shadow.set_color (Qt::black);
 
 	painter.save_context ([&] {
