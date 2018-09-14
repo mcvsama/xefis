@@ -74,12 +74,14 @@ class AFCS_FD_Roll_IO: public xf::ModuleIO
 class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 {
   private:
+	static constexpr char	kLoggerScope[]	= "mod::AFCS_FD_Roll";
+
 	using DirectionPID = AFCS_FD_Roll_IO::DirectionPID;
 
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, std::string_view const& instance = {});
+	AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO>, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -92,7 +94,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 
 	// Module API
 	void
-	rescue (std::exception_ptr) override;
+	rescue (xf::Cycle const&, std::exception_ptr) override;
 
   private:
 	/**
@@ -117,6 +119,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 	check_autonomous();
 
   private:
+	xf::Logger						_logger;
 	DirectionPID					_magnetic_hdg_pid;
 	DirectionPID					_magnetic_trk_pid;
 	xf::RangeSmoother<si::Angle>	_output_roll_smoother	{ { -180.0_deg, +180.0_deg }, 2.5_s };

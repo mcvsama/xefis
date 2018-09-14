@@ -75,12 +75,15 @@ AFCS_AP::process (xf::Cycle const& cycle)
 
 
 void
-AFCS_AP::rescue (std::exception_ptr)
+AFCS_AP::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
+	using namespace xf::exception_ops;
+
 	diagnose();
 	io.serviceable = false;
 	io.elevator = 0_deg;
 	io.ailerons = 0_deg;
+	(cycle.logger() + _logger) << "" << eptr << std::endl;
 }
 
 

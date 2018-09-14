@@ -87,6 +87,9 @@ class AFCS_FD_Pitch_IO: public xf::ModuleIO
 class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 {
   private:
+	static constexpr char	kLoggerScope[]	= "mod::AFCS_FD_Pitch";
+
+  private:
 	using IAS_PID		= AFCS_FD_Pitch_IO::IAS_PID;
 	using MachPID		= AFCS_FD_Pitch_IO::MachPID;
 	using AltitudePID	= AFCS_FD_Pitch_IO::AltitudePID;
@@ -96,7 +99,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
   public:
 	// Ctor
 	explicit
-	AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO>, std::string_view const& instance = {});
+	AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO>, xf::Logger const&, std::string_view const& instance = {});
 
   protected:
 	// Module API
@@ -109,7 +112,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 
 	// Module API
 	void
-	rescue (std::exception_ptr) override;
+	rescue (xf::Cycle const&, std::exception_ptr) override;
 
   private:
 	/**
@@ -135,6 +138,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 	check_autonomous();
 
   private:
+	xf::Logger						_logger;
 	IAS_PID							_ias_pid;
 	MachPID							_mach_pid;
 	AltitudePID						_altitude_pid;

@@ -24,9 +24,12 @@
 #include "afcs_api.h"
 
 
-AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, std::string_view const& instance):
-	Module (std::move (module_io), instance)
+AFCS_FD_Roll::AFCS_FD_Roll (std::unique_ptr<AFCS_FD_Roll_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
+	Module (std::move (module_io), instance),
+	_logger (logger)
 {
+	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
+
 	constexpr auto sec = 1.0_s;
 
 	for (auto* pid: { &_magnetic_hdg_pid, &_magnetic_trk_pid })
@@ -69,11 +72,14 @@ AFCS_FD_Roll::process (xf::Cycle const& cycle)
 
 
 void
-AFCS_FD_Roll::rescue (std::exception_ptr)
+AFCS_FD_Roll::rescue (xf::Cycle const& cycle, std::exception_ptr eptr)
 {
+	using namespace xf::exception_ops;
+
 	if (!io.autonomous.value_or (true))
 		io.operative = false;
 
+	(cycle.logger() + _logger) << "" << eptr << std::endl;
 	check_autonomous();
 }
 

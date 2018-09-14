@@ -90,7 +90,7 @@ class AFCS_AP: public xf::Module<AFCS_AP_IO>
 
 	// Module API
 	void
-	rescue (std::exception_ptr) override;
+	rescue (xf::Cycle const&, std::exception_ptr) override;
 
   private:
 	/**

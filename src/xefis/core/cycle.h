@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/logger.h>
 
 
 namespace xf {
@@ -37,7 +38,7 @@ class Cycle
   public:
 	// Ctor
 	explicit
-	Cycle (Number number, Time update_time, Time update_dt, Logger&);
+	Cycle (Number number, Time update_time, Time update_dt, Logger const&);
 
 	/**
 	 * Return this cycle serial number.
@@ -69,16 +70,16 @@ class Cycle
 	Number		_number;
 	Time		_update_time;
 	Time		_update_dt;
-	Logger*		_logger;
+	Logger		_logger;
 };
 
 
 inline
-Cycle::Cycle (Number number, Time update_time, Time update_dt, Logger& logger):
+Cycle::Cycle (Number number, Time update_time, Time update_dt, Logger const& logger):
 	_number (number),
 	_update_time (update_time),
 	_update_dt (update_dt),
-	_logger (&logger)
+	_logger (logger)
 { }
 
 
@@ -106,7 +107,7 @@ Cycle::update_dt() const noexcept
 inline Logger const&
 Cycle::logger() const noexcept
 {
-	return *_logger;
+	return _logger;
 }
 
 } // namespace xf
