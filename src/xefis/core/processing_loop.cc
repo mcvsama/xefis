@@ -91,8 +91,6 @@ ProcessingLoop::execute_cycle()
 			_logger << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0 - 100.0);
 	}
 
-	// TODO check if all core properties are computable by modules; if not, show a warning.
-
 	for (auto& module_details: _module_details_list)
 		BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
 
