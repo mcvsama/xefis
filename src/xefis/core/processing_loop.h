@@ -167,7 +167,7 @@ class ProcessingLoop:
 	std::optional<Cycle>		_current_cycle;
 	Cycle::Number				_next_cycle_number	{ 1 };
 	Logger						_logger;
-	Tracker<BasicModule>		_modules_tracker; // TODO use ModuleDetails as Tracker<> second parameter
+	Tracker<BasicModule>		_modules_tracker;
 	ModuleDetailsList			_module_details_list;
 };
 

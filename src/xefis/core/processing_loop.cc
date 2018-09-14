@@ -47,6 +47,8 @@ ProcessingLoop::ProcessingLoop (Machine* machine, std::string const& name, Frequ
 
 ProcessingLoop::~ProcessingLoop()
 {
+	if (!_modules_tracker.empty())
+		Exception::terminate ("ProcessingLoop destroyed while still having registered modules");
 }
 
 
