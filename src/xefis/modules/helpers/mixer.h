@@ -92,10 +92,8 @@ template<class pValue>
 template<class V>
 	Mixer<V>::Mixer (std::unique_ptr<MixerIO> module_io, xf::Logger const& logger, std::string const& instance):
 		Module (std::move (module_io), instance),
-		_logger (logger)
-	{
-		_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-	}
+		_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
+	{ }
 
 
 template<class V>

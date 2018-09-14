@@ -27,11 +27,9 @@
 
 Latency::Latency (xf::Accounting& accounting, xf::Logger const& logger, std::string_view const& instance):
 	Module (instance),
-	_logger (logger),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_accounting (accounting)
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_log_timer = new QTimer (this);
 	_log_timer->setInterval (1000);
 	_log_timer->setSingleShot (false);

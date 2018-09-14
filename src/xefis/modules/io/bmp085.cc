@@ -31,10 +31,8 @@
 
 BMP085::BMP085 (std::unique_ptr<BMP085_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	_reinitialize_timer = std::make_unique<QTimer> (this);
 	_reinitialize_timer->setInterval (250);
 	_reinitialize_timer->setSingleShot (true);

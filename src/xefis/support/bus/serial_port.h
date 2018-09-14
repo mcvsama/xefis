@@ -446,8 +446,7 @@ SerialPort::configuration() const noexcept
 inline void
 SerialPort::set_logger (Logger const& logger)
 {
-	_logger = logger;
-	_logger.add_scope(kLoggerScope);
+	_logger = logger.with_scope (kLoggerScope);
 }
 
 

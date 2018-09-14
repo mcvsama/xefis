@@ -26,10 +26,8 @@
 
 AFCS_FD_Pitch::AFCS_FD_Pitch (std::unique_ptr<AFCS_FD_Pitch_IO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger)
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance))
 {
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
-
 	constexpr auto sec = 1.0_s;
 
 	_ias_pid.set_integral_limit ({ -0.05_m, +0.05_m });

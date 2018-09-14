@@ -490,13 +490,11 @@ GPS::PowerCycle::notify_connection_established()
 
 GPS::GPS (std::unique_ptr<GPS_IO> module_io, xf::System* system, xf::SerialPort::Configuration const& serial_port_config, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance),
-	_logger (logger),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_system (system),
 	_serial_port_config (serial_port_config)
 {
 	// TODO check logic that setting_target_baud_rate >= setting_default_baud_rate
-
-	_logger.add_scope (std::string (kLoggerScope) + "#" + instance);
 
 	_power_cycle_timer = std::make_unique<QTimer> (this);
 	_power_cycle_timer->setInterval (kPowerRestartDelay.in<Millisecond>());
