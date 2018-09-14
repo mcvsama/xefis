@@ -46,7 +46,7 @@ TextPainter::Cache::Glyph::Glyph (QFont const& font, QColor color, QChar charact
 		QColor shadow_color = color.darker (800);
 		shadow_color.setAlpha (100);
 		shadow_pen.setColor (shadow_color);
-		shadow_pen.setWidth (shadow->width_for_pen (shadow_pen));
+		shadow_pen.setWidthF (shadow->width_for_pen (shadow_pen));
 	}
 
 	for (int x = 0; x < Rank; ++x)
