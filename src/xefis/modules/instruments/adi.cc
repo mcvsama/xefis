@@ -161,8 +161,8 @@ AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::Instrumen
 	minimums_warning_blinker (minimums_warning_blinker),
 	q (0.1f * aids.lesser_dimension())
 {
-	this->default_shadow.set_width (0.15_mm * paint_request.metric().pixel_density());
-	this->black_shadow = default_shadow;
+	this->default_shadow = aids.default_shadow();
+	this->black_shadow = aids.default_shadow();
 	this->black_shadow.set_color (Qt::black);
 }
 
@@ -886,7 +886,7 @@ ArtificialHorizon::paint_flight_director_failure (AdiPaintRequest& pr) const
 }
 
 
-xf::Shadow
+inline xf::Shadow
 ArtificialHorizon::get_shadow (AdiPaintRequest& pr, int degrees) const
 {
 	xf::Shadow shadow = pr.default_shadow;

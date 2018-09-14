@@ -102,7 +102,7 @@ HorizontalTrim::paint (xf::PaintRequest& paint_request) const
 	if (ref)
 	{
 		painter.setPen (aids->get_pen (aids->kAutopilotColor, 2.0));
-		painter.paint (xf::Shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&] {
 			painter.drawLine (QPointF (*ref * 0.5 * v, aids->pen_width (0.5)),
 							  QPointF (*ref * 0.5 * v, aids->pen_width (7.5)));
 		});
@@ -124,7 +124,7 @@ HorizontalTrim::paint (xf::PaintRequest& paint_request) const
 		QColor color = within_reference ? Qt::green : Qt::white;
 		painter.setPen (aids->get_pen (color, 1.0));
 		painter.setBrush (color);
-		painter.paint (xf::Shadow(), [&] {
+		painter.paint (aids->default_shadow(), [&] {
 			painter.drawPolygon (triangle.translated (*trim * 0.5 * v, 0.0));
 		});
 	}

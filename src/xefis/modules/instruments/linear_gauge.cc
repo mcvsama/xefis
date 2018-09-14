@@ -181,7 +181,7 @@ BasicLinearGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 			<< QPointF (1.5f * q, -0.5f * q)
 			<< QPointF (1.5f * q, +0.5f * q);
 		triangle.translate (p1.x() + 0.25f * q, xf::renormalize<qreal> (*values.normalized_value, 0.0f, 1.0f, p0.y(), p1.y()));
-		painter.paint (xf::Shadow(), [&] {
+		painter.paint (aids.default_shadow(), [&] {
 			painter.drawPolygon (triangle);
 		});
 	}

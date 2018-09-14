@@ -29,7 +29,7 @@ namespace xf {
 
 class Shadow
 {
-	constexpr static float kDefaultShadowWidthFactor = 1.0f;
+	constexpr static float kDefaultShadowWidth = 1.0f;
 
   public:
 	QColor
@@ -48,7 +48,7 @@ class Shadow
 	width_for_pen (QPen const& pen) const;
 
   private:
-	float	_width	{ kDefaultShadowWidthFactor };
+	float	_width	{ kDefaultShadowWidth };
 	QColor	_color	{ 0x10, 0x20, 0x30, 127 };
 };
 
