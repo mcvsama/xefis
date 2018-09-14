@@ -141,6 +141,9 @@ template<class pValue, class pDetails = std::monostate>
 			void
 			deregister_object (Registrant<CompatibleValue>&);
 
+		bool
+		empty() const noexcept;
+
 		std::size_t
 		size() const noexcept;
 
@@ -304,6 +307,14 @@ template<class V, class D>
 					return false;
 			});
 		}
+
+
+template<class V, class D>
+	inline bool
+	Tracker<V, D>::empty() const noexcept
+	{
+		return _disclosures.empty();
+	}
 
 
 template<class V, class D>
