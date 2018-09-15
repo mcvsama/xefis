@@ -23,19 +23,20 @@
 #include <boost/lexical_cast.hpp>
 
 // Qt:
-#include <QtCore/QTimer>
-#include <QtWidgets/QApplication>
+#include <QTimer>
+#include <QApplication>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/logger.h>
+#include <xefis/core/system.h>
+#include <xefis/core/components/configurator/configurator_widget.h>
 
 
 namespace xf {
 
 class Machine;
-class System;
-class ConfiguratorWidget;
 
 
 class Xefis: public QApplication
@@ -113,9 +114,6 @@ class Xefis: public QApplication
 	explicit
 	Xefis (int& argc, char** argv);
 
-	// Dtor
-	~Xefis();
-
 	/**
 	 * Override and catch exceptions.
 	 */
@@ -131,20 +129,29 @@ class Xefis: public QApplication
 	/**
 	 * Return System object.
 	 */
+	[[nodiscard]]
 	System*
 	system() const;
+
+	/**
+	 * Return the Graphics object.
+	 */
+	Graphics&
+	graphics() const;
 
 	/**
 	 * Return configurator widget.
 	 * May return nullptr, if configurator widget is disabled
 	 * (eg. for instrument-less configurations of XEFIS).
 	 */
+	[[nodiscard]]
 	ConfiguratorWidget*
 	configurator_widget() const;
 
 	/**
 	 * Return true if application was run with given command-line option.
 	 */
+	[[nodiscard]]
 	bool
 	has_option (Option) const;
 
@@ -152,6 +159,7 @@ class Xefis: public QApplication
 	 * Return value of given command-line options.
 	 * If no value was given, return empty string.
 	 */
+	[[nodiscard]]
 	std::string
 	option (Option) const;
 
@@ -159,12 +167,14 @@ class Xefis: public QApplication
 	 * Return Options object that contains methods for retrieving
 	 * various options with correct type.
 	 */
+	[[nodiscard]]
 	OptionsHelper const&
 	options() const noexcept;
 
 	/**
 	 * Return logger to use by machines.
 	 */
+	[[nodiscard]]
 	Logger const&
 	logger() const noexcept;
 
@@ -184,12 +194,15 @@ class Xefis: public QApplication
   private:
 	LoggerOutput						_logger_output	{ std::clog };
 	Logger								_logger			{ _logger_output };
+	OptionsMap							_options;
+	QTimer*								_posix_signals_check_timer;
+
+	// Basic subsystems:
 	std::unique_ptr<System>				_system;
 	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 	std::unique_ptr<OptionsHelper>		_options_helper;
+	std::unique_ptr<Graphics>			_graphics;
 	std::unique_ptr<Machine>			_machine;
-	OptionsMap							_options;
-	QTimer*								_signals_check_timer;
 };
 
 
@@ -242,6 +255,16 @@ Xefis::system() const
 	if (!_system)
 		throw UninitializedServiceException ("System");
 	return _system.get();
+}
+
+
+inline Graphics&
+Xefis::graphics() const
+{
+	if (!_graphics)
+		throw UninitializedServiceException ("Graphics");
+
+	return *_graphics.get();
 }
 
 

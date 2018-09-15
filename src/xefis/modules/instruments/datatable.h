@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
@@ -70,7 +71,7 @@ class Datatable:
   public:
 	// Ctor
 	explicit
-	Datatable (xf::Xefis*, std::string_view const& instance = {});
+	Datatable (xf::Graphics const&, std::string_view const& instance = {});
 
 	/**
 	 * Set font size for all labels.

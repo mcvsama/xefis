@@ -24,7 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/screen.h>
+#include <xefis/core/graphics.h>
 #include <xefis/support/instrument/instrument_aids.h>
 #include <xefis/support/instrument/instrument_painter.h>
 #include <xefis/support/instrument/text_painter.h>
@@ -42,6 +42,13 @@ class InstrumentSupport
 	};
 
   public:
+	// Ctor
+	explicit
+	InstrumentSupport (Graphics const&);
+
+	/**
+	 * Return shared InstrumentAids object.
+	 */
 	std::shared_ptr<InstrumentAids>
 	get_aids (PaintRequest const&) const;
 
@@ -54,13 +61,20 @@ class InstrumentSupport
 	get_painter (PaintRequest&) const;
 
   private:
-	static void
-	update_cache (PaintRequest const&, Data&);
+	void
+	update_cache (PaintRequest const&, Data&) const;
 
   private:
+	Graphics const&									_graphics;
 	xf::Synchronized<Data> mutable					_data;
 	static inline thread_local TextPainter::Cache	_text_painter_cache;
 };
+
+
+inline
+InstrumentSupport::InstrumentSupport (Graphics const& graphics):
+	_graphics (graphics)
+{ }
 
 
 inline std::shared_ptr<InstrumentAids>
@@ -88,9 +102,9 @@ InstrumentSupport::get_painter (PaintRequest& paint_request) const
 
 
 inline void
-InstrumentSupport::update_cache (PaintRequest const& paint_request, Data& data)
+InstrumentSupport::update_cache (PaintRequest const& paint_request, Data& data) const
 {
-	data.cached_aids = std::make_shared<InstrumentAids> (paint_request.metric());
+	data.cached_aids = std::make_shared<InstrumentAids> (paint_request.metric(), _graphics);
 	data.cached_canvas_metric = paint_request.metric();
 }
 

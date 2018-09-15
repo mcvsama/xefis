@@ -22,8 +22,9 @@
 #include "gear.h"
 
 
-Gear::Gear (std::unique_ptr<GearIO> module_io, std::string const& instance):
-	Instrument (std::move (module_io), instance)
+Gear::Gear (std::unique_ptr<GearIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
+	Instrument (std::move (module_io), instance),
+	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&] {
 		mark_dirty();

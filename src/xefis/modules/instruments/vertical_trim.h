@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
@@ -53,7 +54,7 @@ class VerticalTrim:
   public:
 	// Ctor
 	explicit
-	VerticalTrim (std::unique_ptr<VerticalTrimIO>, std::string_view const& instance = {});
+	VerticalTrim (std::unique_ptr<VerticalTrimIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

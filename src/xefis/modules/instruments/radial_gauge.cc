@@ -26,6 +26,11 @@
 static QColor const normal_fill (0x43, 0x49, 0x54);
 
 
+BasicRadialGauge::BasicRadialGauge (xf::Graphics const& graphics):
+	InstrumentSupport (graphics)
+{ }
+
+
 void
 BasicRadialGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
 {

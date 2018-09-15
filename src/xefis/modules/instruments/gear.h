@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
@@ -50,7 +51,7 @@ class Gear:
   public:
 	// Ctor
 	explicit
-	Gear (std::unique_ptr<GearIO>, std::string const& instance = {});
+	Gear (std::unique_ptr<GearIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

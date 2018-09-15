@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/support/instrument/instrument_support.h>
@@ -50,7 +51,7 @@ class DebugForces:
   public:
 	// Ctor
 	explicit
-	DebugForces (std::unique_ptr<DebugForcesIO>, std::string_view const& instance = {});
+	DebugForces (std::unique_ptr<DebugForcesIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

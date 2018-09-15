@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
@@ -489,7 +490,7 @@ class HSI: public xf::Instrument<HSI_IO>
 {
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::WorkPerformer&, xf::NavaidStorage const&, std::string_view const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::WorkPerformer&, xf::NavaidStorage const&, std::string_view const& instance = {});
 
 	// Dtor
 	~HSI();

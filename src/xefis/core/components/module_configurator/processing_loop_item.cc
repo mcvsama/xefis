@@ -22,7 +22,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/processing_loop.h>
-#include <xefis/core/services.h>
 #include <xefis/utility/qutils.h>
 
 // Local:

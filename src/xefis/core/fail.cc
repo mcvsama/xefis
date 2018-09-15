@@ -25,7 +25,6 @@
 // Local:
 #include <xefis/config/version.h>
 #include <xefis/utility/backtrace.h>
-#include <xefis/core/services.h>
 
 #include "fail.h"
 
@@ -40,7 +39,6 @@ fail (int signum)
 {
 	using std::endl;
 
-	std::vector<const char*> features = xf::Services::features();
 	std::clog << endl;
 	std::clog << "------------------------------------------------------------------------------------------------" << endl;
 	std::clog << "Xefis died by a signal." << endl << endl;
@@ -48,9 +46,6 @@ fail (int signum)
 	std::clog << "  source info: " << endl;
 	std::cout << "       commit: " << ::xf::version::commit << endl;
 	std::cout << "       branch: " << ::xf::version::branch << endl;
-	std::clog << "     features: ";
-	std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
-	std::clog << endl;
 	std::clog << "    backtrace:" << endl;
 	std::clog << backtrace().resolve_sources() << endl;
 	std::clog << "     CXXFLAGS: " << CXXFLAGS << endl << endl;

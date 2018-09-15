@@ -16,7 +16,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/services.h>
 
 // Local:
 #include "instrument_aids.h"
@@ -52,14 +51,15 @@ InstrumentAids::FontInfo::get_digit_height (QFont const& font)
 }
 
 
-InstrumentAids::InstrumentAids (PaintRequest::Metric const& canvas_metric):
+InstrumentAids::InstrumentAids (PaintRequest::Metric const& canvas_metric, Graphics const& graphics):
+	_graphics (graphics),
 	_canvas_metric (canvas_metric),
-	font_0 (resized (Services::instrument_font(), 1.0f * _canvas_metric.font_height())),
-	font_1 (resized (Services::instrument_font(), 1.1f * _canvas_metric.font_height())),
-	font_2 (resized (Services::instrument_font(), 1.3f * _canvas_metric.font_height())),
-	font_3 (resized (Services::instrument_font(), 1.6f * _canvas_metric.font_height())),
-	font_4 (resized (Services::instrument_font(), 1.8f * _canvas_metric.font_height())),
-	font_5 (resized (Services::instrument_font(), 2.0f * _canvas_metric.font_height())),
+	font_0 (resized (graphics.instrument_font(), 1.0f * _canvas_metric.font_height())),
+	font_1 (resized (graphics.instrument_font(), 1.1f * _canvas_metric.font_height())),
+	font_2 (resized (graphics.instrument_font(), 1.3f * _canvas_metric.font_height())),
+	font_3 (resized (graphics.instrument_font(), 1.6f * _canvas_metric.font_height())),
+	font_4 (resized (graphics.instrument_font(), 1.8f * _canvas_metric.font_height())),
+	font_5 (resized (graphics.instrument_font(), 2.0f * _canvas_metric.font_height())),
 	autopilot_pen_1 (get_pen (kAutopilotDarkColor, 1.8f)),
 	autopilot_pen_2 (get_pen (kAutopilotColor, 1.25f))
 { }
@@ -93,7 +93,7 @@ InstrumentAids::resized (QFont const& font, FontPixelSize font_pixel_size)
 QFont
 InstrumentAids::scaled_default_font (float scale) const
 {
-	return resized (Services::instrument_font(), scale * _canvas_metric.font_height());
+	return resized (_graphics.instrument_font(), scale * _canvas_metric.font_height());
 }
 
 

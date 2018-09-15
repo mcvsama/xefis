@@ -21,7 +21,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/services.h>
 #include <xefis/utility/qutils.h>
 
 // Local:

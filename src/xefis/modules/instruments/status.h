@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
@@ -165,7 +166,7 @@ class Status:
   public:
 	// Ctor
 	explicit
-	Status (std::unique_ptr<StatusIO>, std::string_view const& instance = {});
+	Status (std::unique_ptr<StatusIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	/**
 	 * Configure new message.

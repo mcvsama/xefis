@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/screen.h>
 #include <xefis/support/instrument/shadow.h>
 #include <xefis/utility/strong_type.h>
@@ -74,7 +75,7 @@ class InstrumentAids
   public:
 	// Ctor
 	explicit
-	InstrumentAids (PaintRequest::Metric const&);
+	InstrumentAids (PaintRequest::Metric const&, Graphics const&);
 
 	/**
 	 * Return value to use as pen width.
@@ -180,6 +181,7 @@ class InstrumentAids
 	default_shadow() const;
 
   private:
+	Graphics const&					_graphics;
 	std::optional<WidthForHeight>	_aspect_ratio;
 	PaintRequest::Metric			_canvas_metric;
 

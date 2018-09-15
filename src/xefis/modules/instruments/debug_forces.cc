@@ -21,8 +21,9 @@
 #include "debug_forces.h"
 
 
-DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, std::string_view const& instance):
-	Instrument (std::move (module_io), instance)
+DebugForces::DebugForces (std::unique_ptr<DebugForcesIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
+	Instrument (std::move (module_io), instance),
+	InstrumentSupport (graphics)
 { }
 
 

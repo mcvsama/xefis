@@ -72,15 +72,12 @@ using namespace string_view_plus_string_fixes;
 
 
 inline void
-assert_function (bool expression, const char* message = nullptr) noexcept
+dynamic_assert (bool expression, const char* message = nullptr) noexcept
 {
 	if (!expression)
 	{
 		if (message)
 			std::clog << "Assertion failed: " << message << std::endl;
-#ifdef XEFIS_ENABLE_FATAL_ASSERT
-		raise (SIGTRAP);
-#endif
 	}
 }
 
@@ -92,26 +89,25 @@ assert_function (bool expression, const char* message = nullptr) noexcept
 
 #endif
 
-
 /**
  * Packed structs.
  */
 #define BEGIN_PACKED_STRUCT
 #define END_PACKED_STRUCT __attribute__((packed));
+
 /**
  * Since most of standard headers override our assert, ensure
  * that it's redefined every possible time, when this
  * header is included.
  */
-
 #undef assert
 #if XEFIS_ENABLE_ASSERT
 # include <signal.h>
 # undef assert
-# define assert assert_function
+# define assert dynamic_assert
 #else // XEFIS_ENABLE_ASSERT
 # undef assert
-# define assert(a, b...)
+# define assert(a, ...)
 #endif // XEFIS_ENABLE_ASSERT
 
 #ifdef __GNUC__

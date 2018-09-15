@@ -25,8 +25,9 @@
 #include "horizontal_trim.h"
 
 
-HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, std::string_view const& instance):
-	Instrument (std::move (module_io), instance)
+HorizontalTrim::HorizontalTrim (std::unique_ptr<HorizontalTrimIO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
+	Instrument (std::move (module_io), instance),
+	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{
 		mark_dirty();
