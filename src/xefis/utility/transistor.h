@@ -31,11 +31,11 @@ namespace xf {
  * Transitions output value between two input values
  * over configured period of time.
  */
-template<class tValueType>
+template<class pValue>
 	class Transistor
 	{
 	  public:
-		typedef tValueType ValueType;
+		using Value = pValue;
 
 	  public:
 		/**
@@ -101,31 +101,31 @@ template<class tValueType>
 		 * \param	dt Time delta from last update.
 		 * \return	Computed output value.
 		 */
-		ValueType
-		process (ValueType s0, ValueType s1, Time dt) noexcept;
+		Value
+		process (Value s0, Value s1, Time dt) noexcept;
 
 		/**
 		 * Return last computed value.
 		 */
-		ValueType
+		Value
 		value() const noexcept;
 
 		/**
 		 * Return internal smoother.
 		 */
-		Smoother<ValueType>&
+		Smoother<Value>&
 		smoother() noexcept;
 
 		/**
 		 * Return internal smoother.
 		 */
-		Smoother<ValueType> const&
+		Smoother<Value> const&
 		smoother() const noexcept;
 
 	  private:
-		Smoother<ValueType>	_smoother;
-		bool				_selected_second	= false;
-		ValueType			_output				= ValueType();
+		Smoother<Value>	_smoother;
+		bool			_selected_second	{ false };
+		Value			_output				{ }
 	};
 
 
@@ -195,16 +195,16 @@ template<class T>
 
 
 template<class T>
-	inline typename Transistor<T>::ValueType
-	Transistor<T>::process (ValueType s0, ValueType s1, Time dt) noexcept
+	inline typename Transistor<T>::Value
+	Transistor<T>::process (Value s0, Value s1, Time dt) noexcept
 	{
-		ValueType f = _smoother.process (_selected_second ? 1.0 : 0.0, dt);
-		return _output = xf::renormalize (f, Range<double> (0.0, 1.0), Range<ValueType> (s0, s1));
+		Value f = _smoother.process (_selected_second ? 1.0 : 0.0, dt);
+		return _output = xf::renormalize (f, Range<double> (0.0, 1.0), Range<Value> (s0, s1));
 	}
 
 
 template<class T>
-	inline typename Transistor<T>::ValueType
+	inline typename Transistor<T>::Value
 	Transistor<T>::value() const noexcept
 	{
 		return _output;
@@ -212,7 +212,7 @@ template<class T>
 
 
 template<class T>
-	inline Smoother<typename Transistor<T>::ValueType>&
+	inline Smoother<typename Transistor<T>::Value>&
 	Transistor<T>::smoother() noexcept
 	{
 		return _smoother;
@@ -220,7 +220,7 @@ template<class T>
 
 
 template<class T>
-	inline Smoother<typename Transistor<T>::ValueType> const&
+	inline Smoother<typename Transistor<T>::Value> const&
 	Transistor<T>::smoother() const noexcept
 	{
 		return _smoother;
