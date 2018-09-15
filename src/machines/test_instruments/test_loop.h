@@ -37,7 +37,7 @@ class TestLoop: public xf::ProcessingLoop
   public:
 	// Ctor
 	explicit
-	TestLoop (xf::Machine*, xf::Xefis*, xf::WorkPerformer&, xf::NavaidStorage const&, xf::Logger const&);
+	TestLoop (xf::Machine&, xf::Xefis&, xf::WorkPerformer&, xf::NavaidStorage const&, xf::Logger const&);
 
   private:
 	xf::WorkPerformer&								_work_performer;

@@ -23,7 +23,7 @@
 
 namespace xf {
 
-Machine::Machine (Xefis* xefis):
+Machine::Machine (Xefis& xefis):
 	_xefis (xefis)
 { }
 

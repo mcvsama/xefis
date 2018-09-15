@@ -25,7 +25,7 @@
 
 
 extern std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis*);
+xefis_machine (xf::Xefis&);
 
 #endif
 

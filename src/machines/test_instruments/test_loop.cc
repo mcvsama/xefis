@@ -27,7 +27,7 @@
 #include "test_screen.h"
 
 
-TestLoop::TestLoop (xf::Machine* machine, xf::Xefis* xefis, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
+TestLoop::TestLoop (xf::Machine& machine, xf::Xefis& xefis, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
 	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger.with_scope ("TestLoop")),
 	_work_performer (work_performer),
 	_navaid_storage (navaid_storage),
@@ -37,7 +37,7 @@ TestLoop::TestLoop (xf::Machine* machine, xf::Xefis* xefis, xf::WorkPerformer& w
 	auto font_height = 3.15_mm;
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
 	spec.set_scale (1.0f);
-	_test_screen.emplace (spec, xefis->graphics(), _navaid_storage, logger);
+	_test_screen.emplace (spec, xefis.graphics(), _navaid_storage, logger);
 	_test_screen->set_paint_bounding_boxes (false);
 
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
