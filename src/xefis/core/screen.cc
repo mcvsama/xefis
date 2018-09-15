@@ -26,12 +26,41 @@
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/services.h>
+#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "screen.h"
 
 
 namespace xf {
+namespace detail {
+
+static constexpr float kMaxAvailableTimeFactor = 0.75f;
+
+
+void
+InstrumentDetails::handle_finish()
+{
+	if (paint_request && paint_request->finished())
+		get_ready();
+}
+
+
+inline void
+InstrumentDetails::get_ready()
+{
+	std::swap (canvas, ready_canvas);
+
+	if (!paint_request)
+		previous_size = computed_position->size();
+	else
+		previous_size = paint_request->metric().canvas_size();
+
+	paint_request.reset();
+}
+
+} // namespace detail
+
 
 Screen::Screen (ScreenSpec const& spec):
 	QWidget (nullptr),
@@ -141,6 +170,7 @@ Screen::update_canvas (QSize size)
 void
 Screen::paint_instruments_to_buffer()
 {
+	auto start_timestamp = TimeHelper::now();
 	// Collect images from all managed instruments.
 	// Compose them into one big image.
 
@@ -168,22 +198,10 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.computed_position->isValid())
 		{
-			auto update_details = [&details] {
-				std::swap (details.canvas, details.ready_canvas);
-
-				if (!details.paint_request)
-					details.previous_size = details.computed_position->size();
-				else
-					details.previous_size = details.paint_request->metric().canvas_size();
-
-				details.paint_request.reset();
-			};
-
 			if (!details.paint_request || details.paint_request->finished())
 			{
 				// If paint_request exists (and it's finished()), it means previous painting was asynchronous.
-				if (details.paint_request)
-					update_details();
+				details.handle_finish();
 
 				// If size changed:
 				if (!details.canvas || details.canvas->size() != details.computed_position->size())
@@ -196,13 +214,9 @@ Screen::paint_instruments_to_buffer()
 
 					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
 					details.paint_request = std::make_unique<PaintRequest> (*details.canvas, metric, details.previous_size);
-
 					instrument.paint (*details.paint_request);
-
-					if (details.paint_request->finished())
-						update_details();
-
-					// Unfinished PaintRequests will be checked during next paint_instruments_to_buffer().
+					details.handle_finish();
+					// Unfinished PaintRequests will be checked later and also during next paint_instruments_to_buffer().
 				}
 			}
 		}
@@ -210,13 +224,27 @@ Screen::paint_instruments_to_buffer()
 			std::clog << "Instrument " << identifier (instrument) << " has invalid size/position." << std::endl;
 	}
 
+	// Wait at most kMaxAvailableTimeFactor of available frame time to allow checking if
+	// asynchronous instruments painting is complete.
+	using namespace std::literals::chrono_literals;
+
+	auto const frame_time = 1 / _screen_spec.refresh_rate();
+	auto const sync_painting_done = TimeHelper::now();
+	auto const available_time = start_timestamp + detail::kMaxAvailableTimeFactor * frame_time - sync_painting_done;
+
+	if (available_time > 0_s)
+		std::this_thread::sleep_for (1s * available_time.in<Second>());
+
 	// Compose all images into our painting buffer:
 	{
 		QPainter canvas_painter (&_canvas);
 
 		for (auto* disclosure: _z_index_sorted_disclosures)
 		{
-			auto const& details = disclosure->details();
+			auto& details = disclosure->details();
+
+			// Perhaps the instrument has finished asynchronous painting?
+			details.handle_finish();
 
 			if (details.computed_position && details.computed_position->isValid() && details.ready_canvas)
 			{
