@@ -51,6 +51,20 @@ class InstrumentDetails
 	std::unique_ptr<QImage>			canvas;
 	std::unique_ptr<QImage>			ready_canvas;
 	int								z_index { 0 };
+
+  public:
+	/**
+	 * Check if the painting has been finished, and if so, get ready
+	 * for the next round.
+	 */
+	void
+	handle_finish();
+
+	/**
+	 * Get ready for the next painting round.
+	 */
+	void
+	get_ready();
 };
 
 } // namespace detail
