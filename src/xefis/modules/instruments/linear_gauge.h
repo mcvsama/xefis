@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
@@ -88,6 +89,10 @@ class BasicLinearGauge:
 	};
 
   protected:
+	// Ctor
+	explicit
+	BasicLinearGauge (xf::Graphics const&);
+
 	void
 	paint (xf::PaintRequest&, GaugeValues& value) const;
 
@@ -111,7 +116,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		LinearGauge (std::unique_ptr<LinearGaugeIO<Value>>, Converter = nullptr, std::string_view const& instance = {});
+		LinearGauge (std::unique_ptr<LinearGaugeIO<Value>>, xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -130,8 +135,9 @@ template<class Value>
 
 template<class Value>
 	inline
-	LinearGauge<Value>::LinearGauge (std::unique_ptr<LinearGaugeIO<Value>> module_io, Converter converter, std::string_view const& instance):
+	LinearGauge<Value>::LinearGauge (std::unique_ptr<LinearGaugeIO<Value>> module_io, xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
 		xf::Instrument<LinearGaugeIO<Value>> (std::move (module_io), instance),
+		BasicLinearGauge (graphics),
 		_converter (converter)
 	{
 		_inputs_observer.set_callback ([&]{

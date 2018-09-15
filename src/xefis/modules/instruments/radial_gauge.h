@@ -21,6 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
@@ -87,6 +88,10 @@ class BasicRadialGauge:
 	};
 
   protected:
+	// Ctor
+	explicit
+	BasicRadialGauge (xf::Graphics const&);
+
 	void
 	paint (xf::PaintRequest&, GaugeValues& values) const;
 
@@ -113,7 +118,7 @@ template<class Value>
 	  public:
 		// Ctor
 		explicit
-		RadialGauge (std::unique_ptr<RadialGaugeIO<Value>>, Converter = nullptr, std::string_view const& instance = {});
+		RadialGauge (std::unique_ptr<RadialGaugeIO<Value>>, xf::Graphics const&, Converter = nullptr, std::string_view const& instance = {});
 
 		// Module API
 		void
@@ -131,9 +136,9 @@ template<class Value>
 
 
 template<class Value>
-	inline
-	RadialGauge<Value>::RadialGauge (std::unique_ptr<RadialGaugeIO<Value>> module_io, Converter converter, std::string_view const& instance):
+	inline RadialGauge<Value>::RadialGauge (std::unique_ptr<RadialGaugeIO<Value>> module_io, xf::Graphics const& graphics, Converter converter, std::string_view const& instance):
 		xf::Instrument<RadialGaugeIO<Value>> (std::move (module_io), instance),
+		BasicRadialGauge (graphics),
 		_converter (converter)
 	{
 		_inputs_observer.set_callback ([&]{

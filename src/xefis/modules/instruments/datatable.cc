@@ -61,8 +61,9 @@ Datatable::Line::stringify() const
 }
 
 
-Datatable::Datatable (xf::Xefis*, std::string_view const& instance):
-	Instrument (instance)
+Datatable::Datatable (xf::Graphics const& graphics, std::string_view const& instance):
+	Instrument (instance),
+	InstrumentSupport (graphics)
 {
 	_inputs_observer.set_callback ([&]{ mark_dirty(); });
 

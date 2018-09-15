@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/setting.h>
@@ -47,7 +48,7 @@ class Label:
   public:
 	// Ctor
 	explicit
-	Label (std::unique_ptr<LabelIO>, std::string_view const& instance = {});
+	Label (std::unique_ptr<LabelIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	void
 	paint (xf::PaintRequest&) const override;

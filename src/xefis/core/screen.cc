@@ -25,7 +25,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/core/services.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:
@@ -62,7 +61,7 @@ InstrumentDetails::get_ready()
 } // namespace detail
 
 
-Screen::Screen (ScreenSpec const& spec):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics):
 	QWidget (nullptr),
 	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
 						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
@@ -73,7 +72,7 @@ Screen::Screen (ScreenSpec const& spec):
 	move (rect.topLeft());
 	resize (rect.size());
 	update_canvas (rect.size());
-	setFont (xf::Services::instrument_font());
+	setFont (graphics.instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
 	show();
 

@@ -55,7 +55,7 @@ MOC				:= $(MAKE_CONFIG_QT_PREFIX)/bin/moc-qt5
 LIBS			+= m boost_system boost_filesystem pthread mhash
 PKGCONFIGS		+= Qt5Core Qt5Gui Qt5Network Qt5Xml Qt5Widgets zlib
 CXXFLAGS_s		:= $(CXXFLAGS)
-CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"' $(foreach feature, $(XEFIS_FEATURES), -D$(feature))
+CXXFLAGS		+= -DCXXFLAGS='"$(CXXFLAGS_s)"'
 LDFLAGS			+= $(foreach lib, $(LIBS), -l$(lib))
 LDFLAGS			+= $(shell pkg-config --libs $(PKGCONFIGS))
 # This subst-hack is to hide warnings from Qt that happen from time to time and obscure compiler's output:
@@ -85,8 +85,6 @@ endif
 -include Makefile.local
 
 ifeq ($(MAKE_CONFIG_DEBUG),1)
-XEFIS_FEATURES	+= XEFIS_ENABLE_ASSERT
-XEFIS_FEATURES	+= XEFIS_ENABLE_FATAL_ASSERT
 CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
 DEBUG_s = -debug
 else
@@ -112,8 +110,6 @@ endif
 
 ifeq ($(MAKE_CONFIG_RELEASE),1)
 CXXFLAGS += -DBOOST_DISABLE_ASSERTS -DNDEBUG
-else
-CXXFLAGS += -DXEFIS_ENABLE_ASSERT
 endif
 
 ifneq ($(MAKE_CONFIG_PROFILE),)

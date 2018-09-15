@@ -27,6 +27,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/screen_spec.h>
 #include <xefis/utility/noncopyable.h>
@@ -85,7 +86,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&);
+	Screen (ScreenSpec const&, Graphics const&);
 
 	// Dtor
 	~Screen();

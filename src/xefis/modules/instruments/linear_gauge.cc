@@ -25,6 +25,11 @@
 #include "linear_gauge.h"
 
 
+BasicLinearGauge::BasicLinearGauge (xf::Graphics const& graphics):
+	InstrumentSupport (graphics)
+{ }
+
+
 void
 BasicLinearGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
 {

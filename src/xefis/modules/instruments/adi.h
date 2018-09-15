@@ -25,6 +25,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
@@ -748,6 +749,10 @@ class AltitudeLadder
 class PaintingWork
 {
   public:
+	// Ctor
+	explicit
+	PaintingWork (xf::Graphics const&);
+
 	void
 	paint (xf::PaintRequest&, Parameters const& parameters) const;
 
@@ -811,7 +816,7 @@ class ADI: public xf::Instrument<ADI_IO>
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, xf::WorkPerformer&, std::string_view const& instance = {});
+	ADI (std::unique_ptr<ADI_IO>, xf::Graphics const&, xf::WorkPerformer&, std::string_view const& instance = {});
 
 	// Dtor
 	~ADI();

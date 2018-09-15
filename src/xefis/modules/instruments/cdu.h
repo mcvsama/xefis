@@ -24,6 +24,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_stringifier.h>
@@ -415,7 +416,7 @@ class CDU:
 
   public:
 	// Ctor
-	CDU (xf::Xefis*, QDomElement const& config, std::string_view const& instance = {});
+	CDU (xf::Xefis*, QDomElement const& config, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module
 	void

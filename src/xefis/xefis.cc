@@ -29,7 +29,6 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/fail.h>
-#include <xefis/core/services.h>
 #include <xefis/core/xefis.h>
 #include <xefis/utility/backtrace.h>
 
@@ -50,9 +49,7 @@ int main (int argc, char** argv, char**)
 			std::cout << "Xefis" << std::endl;
 			std::cout << "Commit: " << xf::version::commit << std::endl;
 			std::cout << "Branch: " << xf::version::branch << std::endl;
-			std::clog << "Features: ";
-			std::vector<const char*> features = xf::Services::features();
-			std::copy (features.begin(), features.end(), std::ostream_iterator<const char*> (std::clog, " "));
+			std::clog << "CXXFLAGS: " << CXXFLAGS << std::endl;
 			std::clog << std::endl;
 		}
 		else

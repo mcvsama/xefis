@@ -179,13 +179,11 @@ XEFIS_SOURCES			+= xefis/xefis.cc
 
 WATCHDOG_HEADERS		+= $(SI_HEADERS)
 WATCHDOG_HEADERS		+= xefis/core/fail.h
-WATCHDOG_HEADERS_MOC	+= xefis/core/services.h
 WATCHDOG_HEADERS		+= xefis/utility/backtrace.h
 WATCHDOG_HEADERS		+= xefis/utility/demangle.h
 
 WATCHDOG_SOURCES		+= $(SI_SOURCES)
 WATCHDOG_SOURCES		+= xefis/core/fail.cc
-WATCHDOG_SOURCES		+= xefis/core/services.cc
 WATCHDOG_SOURCES		+= xefis/utility/backtrace.cc
 WATCHDOG_SOURCES		+= xefis/utility/demangle.cc
 WATCHDOG_SOURCES		+= xefis/watchdog.cc
@@ -250,6 +248,7 @@ XEFIS_SOURCES			+= xefis/core/components/property_tree/property_tree.cc
 XEFIS_HEADERS_MOC		+= xefis/core/accounting.h
 XEFIS_HEADERS			+= xefis/core/cycle.h
 XEFIS_HEADERS			+= xefis/core/fail.h
+XEFIS_HEADERS			+= xefis/core/graphics.h
 XEFIS_HEADERS			+= xefis/core/instrument.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
 XEFIS_HEADERS			+= xefis/core/logger.h
@@ -269,7 +268,6 @@ XEFIS_HEADERS			+= xefis/core/property_path.h
 XEFIS_HEADERS			+= xefis/core/property_traits.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS			+= xefis/core/screen_spec.h
-XEFIS_HEADERS_MOC		+= xefis/core/services.h
 XEFIS_HEADERS			+= xefis/core/setting.h
 XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
@@ -277,6 +275,7 @@ XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
 XEFIS_SOURCES			+= xefis/core/accounting.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
+XEFIS_SOURCES			+= xefis/core/graphics.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
 XEFIS_SOURCES			+= xefis/core/logger.cc
 XEFIS_SOURCES			+= xefis/core/machine.cc
@@ -287,7 +286,6 @@ XEFIS_SOURCES			+= xefis/core/panel.cc
 XEFIS_SOURCES			+= xefis/core/processing_loop.cc
 XEFIS_SOURCES			+= xefis/core/property_observer.cc
 XEFIS_SOURCES			+= xefis/core/screen.cc
-XEFIS_SOURCES			+= xefis/core/services.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 

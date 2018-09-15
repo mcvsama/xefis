@@ -2252,6 +2252,11 @@ AltitudeLadder::ft_to_px (AdiPaintRequest& pr, si::Length const length) const
 }
 
 
+PaintingWork::PaintingWork (xf::Graphics const& graphics):
+	_instrument_support (graphics)
+{ }
+
+
 void
 PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) const
 {
@@ -2978,9 +2983,10 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::WorkPerformer& work_performer, std::string_view const& instance):
+ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Graphics const& graphics, xf::WorkPerformer& work_performer, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
-	_work_performer (work_performer)
+	_work_performer (work_performer),
+	_painting_work (graphics)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));
 	_fpv_computer.observe ({

@@ -1984,10 +1984,11 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, std::string_view const& instance):
+HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
 	_work_performer (work_performer),
-	_navaid_storage (navaid_storage)
+	_navaid_storage (navaid_storage),
+	_instrument_support (graphics)
 { }
 
 

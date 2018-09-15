@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
@@ -52,7 +53,7 @@ class Flaps:
   public:
 	// Ctor
 	explicit
-	Flaps (std::unique_ptr<FlapsIO>, std::string_view const& instance = {});
+	Flaps (std::unique_ptr<FlapsIO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void

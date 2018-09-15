@@ -15,10 +15,10 @@
 #include <cstddef>
 
 // Qt:
+#include <QApplication>
 #include <QDesktopWidget>
 
 // Xefis:
-#include <xefis/core/services.h>
 #include <xefis/core/stdexcept.h>
 
 // Local:
