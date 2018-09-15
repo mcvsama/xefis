@@ -9,14 +9,15 @@
  * (at your option) any later version.
  *
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ * --
+ * Here be basic, global functions and macros like asserts, debugging helpers, etc.
  */
 
-#include "types.h"
-#include "system.h"
-#include "resources.h"
-#include "strong_typedef.h"
-#include "version.h"
-#include "exception.h"
-#include "constants.h"
-#include "debug.h"
+#ifndef XEFIS__CONFIG__DEBUG_H__INCLUDED
+#define XEFIS__CONFIG__DEBUG_H__INCLUDED
+
+// Xefis:
+#include <xefis/utility/debug_measure.h>
+
+#endif
 
