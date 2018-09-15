@@ -138,7 +138,7 @@ BasicRadialGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 
 	QPen const silver_pen = get_round_pen (kSilver, 1.f);
 	QPen const pen = get_round_pen (Qt::white, 1.f);
-	QPen const pointer_pen = get_round_pen (Qt::white, 1.2f);
+	QPen const pointer_pen = get_round_pen (Qt::white, 1.6f);
 	QPen const warning_pen = get_round_pen (kWarningColor, 1.1f);
 	QPen const critical_pen = get_round_pen (kCriticalColor, 1.1f);
 	QPen const reference_pen = get_round_pen (QColor (0x00, 0xff, 0x00), 1.f);
