@@ -17,7 +17,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/services.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
 #include <xefis/modules/systems/afcs_api.h>
 #include <xefis/utility/qdom.h>
@@ -28,17 +27,17 @@
 #include "test_screen.h"
 
 
-TestLoop::TestLoop (xf::Machine* machine, xf::Xefis*, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
-	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger),
+TestLoop::TestLoop (xf::Machine* machine, xf::Xefis* xefis, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
+	ProcessingLoop (machine, "Test Instruments", 30_Hz, logger.with_scope ("TestLoop")),
 	_work_performer (work_performer),
 	_navaid_storage (navaid_storage),
-	_logger (logger)
+	_logger (logger.with_scope ("TestLoop"))
 {
 	auto line_width = 0.3525_mm;
 	auto font_height = 3.15_mm;
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
 	spec.set_scale (1.0f);
-	_test_screen.emplace (spec, _navaid_storage, logger.with_scope ("test screen"));
+	_test_screen.emplace (spec, xefis->graphics(), _navaid_storage, logger);
 	_test_screen->set_paint_bounding_boxes (false);
 
 	auto test_generator_io = std::make_unique<TestGeneratorIO>();
