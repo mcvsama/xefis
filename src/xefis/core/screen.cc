@@ -170,6 +170,7 @@ void
 Screen::paint_instruments_to_buffer()
 {
 	auto start_timestamp = TimeHelper::now();
+
 	// Collect images from all managed instruments.
 	// Compose them into one big image.
 

@@ -254,6 +254,7 @@ Xefis::system() const
 {
 	if (!_system)
 		throw UninitializedServiceException ("System");
+
 	return _system.get();
 }
 
@@ -273,6 +274,7 @@ Xefis::configurator_widget() const
 {
 	if (!_configurator_widget)
 		throw UninitializedServiceException ("ConfiguratorWidget");
+
 	return _configurator_widget.get();
 }
 
