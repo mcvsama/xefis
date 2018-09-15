@@ -193,8 +193,13 @@ TextPainter::fast_draw_text (QRectF const& target, Qt::Alignment flags, QString 
 
 	if (!_cache.last || _cache.last->font != required_font)
 	{
-		auto [it, found] = _cache.fonts.emplace (required_font, Cache::Glyphs());
-		_cache.last = Cache::Last { required_font, &it->second };
+		if (auto it = _cache.fonts.find (required_font); it != _cache.fonts.end())
+			_cache.last = Cache::Last { required_font, &it->second };
+		else
+		{
+			it = _cache.fonts.emplace (required_font, Cache::Glyphs()).first;
+			_cache.last = Cache::Last { required_font, &it->second };
+		}
 	}
 
 	glyphs_cache = _cache.last->glyphs;
