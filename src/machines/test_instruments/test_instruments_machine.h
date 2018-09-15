@@ -37,7 +37,7 @@ class TestInstrumentsMachine: public xf::Machine
 {
   public:
 	// Ctor
-	TestInstrumentsMachine (xf::Xefis*);
+	TestInstrumentsMachine (xf::Xefis&);
 
   private:
 	xf::Logger								_logger;

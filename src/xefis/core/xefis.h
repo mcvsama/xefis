@@ -86,7 +86,7 @@ class Xefis: public QApplication
 	  public:
 		// Ctor
 		explicit
-		OptionsHelper (Xefis*);
+		OptionsHelper (Xefis const&);
 
 		std::optional<int>
 		watchdog_write_fd() const noexcept;
@@ -130,7 +130,7 @@ class Xefis: public QApplication
 	 * Return System object.
 	 */
 	[[nodiscard]]
-	System*
+	System&
 	system() const;
 
 	/**
@@ -145,7 +145,7 @@ class Xefis: public QApplication
 	 * (eg. for instrument-less configurations of XEFIS).
 	 */
 	[[nodiscard]]
-	ConfiguratorWidget*
+	ConfiguratorWidget&
 	configurator_widget() const;
 
 	/**
@@ -225,13 +225,13 @@ Xefis::UninitializedServiceException::UninitializedServiceException (std::string
 
 
 inline
-Xefis::OptionsHelper::OptionsHelper (Xefis* xefis)
+Xefis::OptionsHelper::OptionsHelper (Xefis const& xefis)
 {
-	if (xefis->has_option (Xefis::Option::WatchdogWriteFd))
-		_watchdog_write_fd = boost::lexical_cast<int> (xefis->option (Xefis::Option::WatchdogWriteFd));
+	if (xefis.has_option (Xefis::Option::WatchdogWriteFd))
+		_watchdog_write_fd = boost::lexical_cast<int> (xefis.option (Xefis::Option::WatchdogWriteFd));
 
-	if (xefis->has_option (Xefis::Option::WatchdogReadFd))
-		_watchdog_read_fd = boost::lexical_cast<int> (xefis->option (Xefis::Option::WatchdogReadFd));
+	if (xefis.has_option (Xefis::Option::WatchdogReadFd))
+		_watchdog_read_fd = boost::lexical_cast<int> (xefis.option (Xefis::Option::WatchdogReadFd));
 }
 
 
@@ -249,13 +249,13 @@ Xefis::OptionsHelper::watchdog_read_fd() const noexcept
 }
 
 
-inline System*
+inline System&
 Xefis::system() const
 {
 	if (!_system)
 		throw UninitializedServiceException ("System");
 
-	return _system.get();
+	return *_system.get();
 }
 
 
@@ -269,13 +269,13 @@ Xefis::graphics() const
 }
 
 
-inline ConfiguratorWidget*
+inline ConfiguratorWidget&
 Xefis::configurator_widget() const
 {
 	if (!_configurator_widget)
 		throw UninitializedServiceException ("ConfiguratorWidget");
 
-	return _configurator_widget.get();
+	return *_configurator_widget.get();
 }
 
 

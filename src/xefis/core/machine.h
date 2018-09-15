@@ -36,7 +36,7 @@ class Machine: private Noncopyable
   public:
 	// Ctor
 	explicit
-	Machine (Xefis*);
+	Machine (Xefis&);
 
 	/**
 	 * Dtor
@@ -49,7 +49,7 @@ class Machine: private Noncopyable
 	/**
 	 * Return main Xefis object.
 	 */
-	Xefis*
+	Xefis&
 	xefis() const noexcept;
 
 	/**
@@ -72,12 +72,12 @@ class Machine: private Noncopyable
 		register_processing_loop (Registrant<Compatible>&);
 
   private:
-	Xefis*						_xefis;
+	Xefis&						_xefis;
 	Tracker<ProcessingLoop>		_processing_loops;
 };
 
 
-inline Xefis*
+inline Xefis&
 Machine::xefis() const noexcept
 {
 	return _xefis;

@@ -89,7 +89,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine* machine, std::string const& name, Frequency loop_frequency, Logger const&);
+	ProcessingLoop (Machine& machine, std::string const& name, Frequency loop_frequency, Logger const&);
 
 	// Dtor
 	virtual
@@ -102,13 +102,13 @@ class ProcessingLoop:
 	/**
 	 * Return the machine object to which this ProcessingLoop belongs.
 	 */
-	Machine*
+	Machine&
 	machine() const noexcept;
 
 	/**
 	 * Return main Xefis object.
 	 */
-	Xefis*
+	Xefis&
 	xefis() const noexcept;
 
 	/**
@@ -132,7 +132,7 @@ class ProcessingLoop:
 
 	/**
 	 * Return current processing cycle, if called during a processing cycle.
-	 * Otherwise return empty std::optional.
+	 * Otherwise return nullptr.
 	 */
 	Cycle const*
 	current_cycle() const;
@@ -157,8 +157,8 @@ class ProcessingLoop:
 	execute_cycle();
 
   private:
-	Machine*					_machine;
-	Xefis*						_xefis;
+	Machine&					_machine;
+	Xefis&						_xefis;
 	std::string					_name;
 	QTimer*						_loop_timer;
 	Time						_loop_period		{ 10_ms };
@@ -202,14 +202,14 @@ ProcessingLoop::ModuleDetails::module() const noexcept
 }
 
 
-inline Machine*
+inline Machine&
 ProcessingLoop::machine() const noexcept
 {
 	return _machine;
 }
 
 
-inline Xefis*
+inline Xefis&
 ProcessingLoop::xefis() const noexcept
 {
 	return _xefis;

@@ -56,7 +56,7 @@ Xefis::Xefis (int& argc, char** argv):
 
 	_system = std::make_unique<System> (_logger);
 	_graphics = std::make_unique<Graphics> (_logger);
-	_machine = ::xefis_machine (this);
+	_machine = ::xefis_machine (*this);
 	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 
 	_posix_signals_check_timer = new QTimer (this);
@@ -152,7 +152,7 @@ Xefis::parse_args (int argc, char** argv)
 			throw Exception ("unrecognized option '" + arg_name + "', try --help");
 	}
 
-	_options_helper = std::make_unique<OptionsHelper> (this);
+	_options_helper = std::make_unique<OptionsHelper> (*this);
 }
 
 

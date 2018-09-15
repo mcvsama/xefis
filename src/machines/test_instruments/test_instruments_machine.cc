@@ -23,21 +23,21 @@
 #include "test_instruments_machine.h"
 
 
-TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis* xefis):
+TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	Machine (xefis),
-	_logger (xefis->logger())
+	_logger (xefis.logger())
 {
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger);
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
 
-	_test_loop.emplace (this, xefis, *_work_performer, *_navaid_storage, _logger);
+	_test_loop.emplace (*this, xefis, *_work_performer, *_navaid_storage, _logger);
 	register_processing_loop (*_test_loop);
 	(*_test_loop)->start();
 }
 
 
 std::unique_ptr<xf::Machine>
-xefis_machine (xf::Xefis* xefis)
+xefis_machine (xf::Xefis& xefis)
 {
 	return std::make_unique<TestInstrumentsMachine> (xefis);
 }
