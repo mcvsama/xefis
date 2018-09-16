@@ -15,10 +15,13 @@
 #define XEFIS__CORE__SCREEN_H__INCLUDED
 
 // Standard:
-#include <cstddef>
 #include <atomic>
+#include <cstddef>
 #include <optional>
 #include <vector>
+
+// Lib:
+#include <boost/circular_buffer.hpp>
 
 // Qt:
 #include <QSize>
@@ -44,6 +47,7 @@ namespace detail {
 class InstrumentDetails
 {
   public:
+	BasicInstrument&				instrument;
 	std::unique_ptr<PaintRequest>	paint_request;
 	QRectF							requested_position;
 	QPointF							anchor_position;
@@ -52,6 +56,11 @@ class InstrumentDetails
 	std::unique_ptr<QImage>			canvas;
 	std::unique_ptr<QImage>			ready_canvas;
 	int								z_index { 0 };
+
+  public:
+	// Ctor
+	explicit
+	InstrumentDetails (BasicInstrument&);
 
   public:
 	/**
@@ -206,7 +215,7 @@ template<class Instrument>
 	inline void
 	Screen::register_instrument (Registrant<Instrument>& instrument)
 	{
-		_instrument_tracker.register_object (instrument);
+		_instrument_tracker.register_object (instrument, detail::InstrumentDetails (*instrument));
 	}
 
 

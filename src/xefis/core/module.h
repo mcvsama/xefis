@@ -22,6 +22,9 @@
 #include <memory>
 #include <type_traits>
 
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
@@ -53,6 +56,8 @@ class NoModuleIO: public ModuleIO
  */
 class BasicModule: private Noncopyable
 {
+	static constexpr std::size_t kMaxProcessingTimesBackLog = 1000;
+
   public:
 	/**
 	 * A set of methods for the processing loop to use on the module.
@@ -77,6 +82,26 @@ class BasicModule: private Noncopyable
 		 */
 		void
 		reset_cache();
+
+	  private:
+		BasicModule& _module;
+	};
+
+	/**
+	 * Accesses accounting data (time spent on processing, etc.
+	 */
+	class AccountingAPI
+	{
+	  public:
+		// Ctor
+		explicit
+		AccountingAPI (BasicModule&);
+
+		/**
+		 * Add new measured processing time (time spent in the process() method).
+		 */
+		void
+		add_processing_time (si::Time);
 
 	  private:
 		BasicModule& _module;
@@ -158,10 +183,11 @@ class BasicModule: private Noncopyable
 	set_nil_on_exception (bool enable) noexcept;
 
   private:
-	std::string						_instance;
-	bool							_cached					{ false };
-	bool							_set_nil_on_exception	{ true };
-	std::unique_ptr<ModuleIO>		_io;
+	std::string							_instance;
+	bool								_cached					{ false };
+	bool								_set_nil_on_exception	{ true };
+	std::unique_ptr<ModuleIO>			_io;
+	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 };
 
 
@@ -200,6 +226,19 @@ inline void
 BasicModule::ProcessingLoopAPI::reset_cache()
 {
 	_module._cached = false;
+}
+
+
+inline
+BasicModule::AccountingAPI::AccountingAPI (BasicModule& module):
+	_module (module)
+{ }
+
+
+inline void
+BasicModule::AccountingAPI::add_processing_time (si::Time time)
+{
+	_module._processing_times.push_back (time);
 }
 
 

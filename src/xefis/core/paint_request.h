@@ -24,6 +24,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/time_helper.h>
 #include <xefis/utility/types.h>
 
 
@@ -156,14 +157,6 @@ class PaintRequest: private Noncopyable
 	size_changed() const noexcept;
 
 	/**
-	 * Inform the system that the result will be painted asynchronously.
-	 * After it's done, API user is required to call finished().
-	 */
-	[[deprecated]]
-	void
-	will_finish_asynchronously() noexcept;
-
-	/**
 	 * Get the token that will allow painting asynchronously.
 	 * This PaintRequest will be marked as finished when the returned token is destroyed.
 	 * When it happens, calling any method on this object is undefined-behaviour.
@@ -179,11 +172,33 @@ class PaintRequest: private Noncopyable
 	bool
 	finished() const noexcept;
 
+	/**
+	 * Setup the started-at timestamp.
+	 */
+	void
+	set_started_at (si::Time);
+
+	/**
+	 * Return the time at which rendering was started.
+	 */
+	[[nodiscard]]
+	std::optional<si::Time>
+	started_at() const noexcept;
+
+	/**
+	 * Return the time at which rendering was finished.
+	 */
+	[[nodiscard]]
+	std::optional<si::Time>
+	finished_at() const noexcept;
+
   private:
-	std::atomic<bool>	_finished { true };
-	QImage*				_canvas;
-	Metric				_metric;
-	bool				_size_changed;
+	std::atomic<bool>		_finished		{ true };
+	std::optional<si::Time>	_started_at;
+	std::optional<si::Time>	_finished_at;
+	QImage*					_canvas;
+	Metric					_metric;
+	bool					_size_changed;
 };
 
 
@@ -207,7 +222,10 @@ inline
 AsyncPaintRequest::~AsyncPaintRequest()
 {
 	if (_paint_request)
+	{
+		_paint_request->_finished_at = TimeHelper::now();
 		_paint_request->_finished = true;
+	}
 }
 
 
@@ -315,13 +333,6 @@ PaintRequest::size_changed() const noexcept
 }
 
 
-inline void
-PaintRequest::will_finish_asynchronously() noexcept
-{
-	_finished = false;
-}
-
-
 inline AsyncPaintRequest
 PaintRequest::make_async()
 {
@@ -333,6 +344,27 @@ inline bool
 PaintRequest::finished() const noexcept
 {
 	return _finished;
+}
+
+
+inline void
+PaintRequest::set_started_at (si::Time time)
+{
+	_started_at = time;
+}
+
+
+inline std::optional<si::Time>
+PaintRequest::started_at() const noexcept
+{
+	return _started_at;
+}
+
+
+inline std::optional<si::Time>
+PaintRequest::finished_at() const noexcept
+{
+	return _finished_at;
 }
 
 } // namespace xf
