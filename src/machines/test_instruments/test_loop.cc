@@ -226,7 +226,7 @@ TestLoop::TestLoop (xf::Machine& machine, xf::Xefis& xefis, xf::WorkPerformer& w
 	// Register the rest:
 	register_module (*_test_generator);
 
-	auto configurator_widget = new xf::ConfiguratorWidget (*machine, nullptr);
+	auto configurator_widget = new xf::ConfiguratorWidget (machine, nullptr);
 	auto lh = default_line_height (configurator_widget);
 	configurator_widget->resize (50 * lh, 30 * lh);
 	configurator_widget->show();
