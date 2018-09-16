@@ -26,15 +26,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/ui/widget_aids.h>
+#include <xefis/support/ui/widget.h>
 #include <xefis/utility/histogram.h>
 
 
 namespace xf {
 
-class HistogramWidget:
-	virtual public QWidget,
-	public xf::WidgetAids
+class HistogramWidget: public xf::Widget
 {
   public:
 	enum class Style

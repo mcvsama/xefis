@@ -27,9 +27,11 @@
 
 namespace xf {
 
-class WidgetAids: virtual public QWidget
+class Widget: public QWidget
 {
-  public:
+  protected:
+	using QWidget::QWidget;
+
 	/**
 	 * Return current PixelDensity.
 	 */
@@ -51,21 +53,21 @@ class WidgetAids: virtual public QWidget
 
 
 inline si::PixelDensity
-WidgetAids::pixel_density() const
+Widget::pixel_density() const
 {
 	return si::PixelDensity (this->logicalDpiY());
 }
 
 
 inline float
-WidgetAids::pixels (si::Length width) const
+Widget::pixels (si::Length width) const
 {
 	return xf::pixels (width, pixel_density());
 }
 
 
 inline float
-WidgetAids::em_pixels (float ems) const
+Widget::em_pixels (float ems) const
 {
 	int v = font().pixelSize();
 

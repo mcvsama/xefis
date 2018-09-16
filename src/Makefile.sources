@@ -415,7 +415,7 @@ SELFTEST_SOURCES		+= xefis/support/system/tests/work_performer.test.cc
 
 XEFIS_HEADERS			+= xefis/support/ui/histogram_widget.h
 XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
-XEFIS_HEADERS			+= xefis/support/ui/widget_aids.h
+XEFIS_HEADERS			+= xefis/support/ui/widget.h
 #XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h TODO
 
 XEFIS_SOURCES			+= xefis/support/ui/histogram_widget.cc
