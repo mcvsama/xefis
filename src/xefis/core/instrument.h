@@ -20,6 +20,9 @@
 #include <string>
 #include <type_traits>
 
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -33,6 +36,36 @@ class Screen;
 
 class BasicInstrument: public BasicModule
 {
+	static constexpr std::size_t kMaxPaintingTimesBackLog = 1000;
+
+  public:
+	/**
+	 * Accesses accounting data (time spent on processing, etc.
+	 */
+	class AccountingAPI
+	{
+	  public:
+		// Ctor
+		explicit
+		AccountingAPI (BasicInstrument&);
+
+		/**
+		 * Add new measured painting time (time spent in the paint() method).
+		 */
+		void
+		add_painting_time (si::Time);
+
+		/**
+		 * Painting times buffer.
+		 */
+		[[nodiscard]]
+		boost::circular_buffer<si::Time> const&
+		painting_times() const noexcept;
+
+	  private:
+		BasicInstrument& _instrument;
+	};
+
   public:
 	using BasicModule::BasicModule;
 
@@ -50,6 +83,7 @@ class BasicInstrument: public BasicModule
 	 * Return true if instrument wants to be repainted.
 	 * Also unmark the instrument as dirty atomically.
 	 */
+	[[nodiscard]]
 	bool
 	dirty_since_last_check() noexcept;
 
@@ -60,7 +94,8 @@ class BasicInstrument: public BasicModule
 	mark_dirty() noexcept;
 
   private:
-	std::atomic<bool>	_dirty	{ true };
+	std::atomic<bool>					_dirty			{ true };
+	boost::circular_buffer<si::Time>	_painting_times	{ kMaxPaintingTimesBackLog };
 };
 
 
@@ -87,6 +122,26 @@ template<class IO = ModuleIO>
 	  protected:
 		IO& io;
 	};
+
+
+inline
+BasicInstrument::AccountingAPI::AccountingAPI (BasicInstrument& instrument):
+	_instrument (instrument)
+{ }
+
+
+inline void
+BasicInstrument::AccountingAPI::add_painting_time (si::Time time)
+{
+	_instrument._painting_times.push_back (time);
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+BasicInstrument::AccountingAPI::painting_times() const noexcept
+{
+	return _instrument._painting_times;
+}
 
 
 inline bool

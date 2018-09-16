@@ -37,11 +37,25 @@ namespace detail {
 static constexpr float kMaxAvailableTimeFactor = 0.75f;
 
 
+InstrumentDetails::InstrumentDetails (BasicInstrument& instrument):
+	instrument (instrument)
+{ }
+
+
 void
 InstrumentDetails::handle_finish()
 {
 	if (paint_request && paint_request->finished())
+	{
+		auto accounting_api = BasicInstrument::AccountingAPI (instrument);
+
+		if (auto at = paint_request->finished_at())
+			accounting_api.add_painting_time (*at - *paint_request->started_at());
+		else
+			accounting_api.add_painting_time (TimeHelper::now() - *paint_request->started_at());
+
 		get_ready();
+	}
 }
 
 
@@ -214,6 +228,7 @@ Screen::paint_instruments_to_buffer()
 
 					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
 					details.paint_request = std::make_unique<PaintRequest> (*details.canvas, metric, details.previous_size);
+					details.paint_request->set_started_at (TimeHelper::now());
 					instrument.paint (*details.paint_request);
 					details.handle_finish();
 					// Unfinished PaintRequests will be checked later and also during next paint_instruments_to_buffer().
