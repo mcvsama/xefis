@@ -58,7 +58,7 @@ Flaps::paint (xf::PaintRequest& paint_request) const
 	QFont setting_font = aids->font_3.font;
 	QFont label_font = aids->font_2.font;
 
-	float block_height = aids->height() - QFontMetrics (setting_font).height();
+	float block_height = aids->height() - QFontMetricsF (setting_font).height();
 	float block_width = 6.0 / 40.0 * block_height;
 	QRectF block (0.f, 0.f, block_width, block_height);
 	aids->centrify (block);
@@ -68,7 +68,7 @@ Flaps::paint (xf::PaintRequest& paint_request) const
 	// Cyan vertical text:
 	painter.setFont (label_font);
 	painter.setPen (cyan);
-	painter.fast_draw_vertical_text (QPointF (block.left() - QFontMetrics (label_font).width ("0"), 0.f), Qt::AlignVCenter | Qt::AlignRight, "FLAPS");
+	painter.fast_draw_vertical_text (QPointF (block.left() - QFontMetricsF (label_font).width ("0"), 0.f), Qt::AlignVCenter | Qt::AlignRight, "FLAPS");
 
 	// Flaps white box:
 	painter.setPen (aids->get_pen (Qt::white, 1.f));
