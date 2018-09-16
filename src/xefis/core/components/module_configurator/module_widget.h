@@ -29,6 +29,7 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/components/property_tree/property_tree.h>
 #include <xefis/support/ui/histogram_widget.h>
+#include <xefis/support/ui/widget.h>
 
 // Local:
 #include "module_widget.h"
@@ -41,7 +42,7 @@ namespace xf {
  * Contains generic config widgets, module's configurator widget,
  * and other stuff.
  */
-class ModuleWidget: public QWidget
+class ModuleWidget: public xf::Widget
 {
   public:
 	// Ctor

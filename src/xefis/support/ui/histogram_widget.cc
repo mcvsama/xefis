@@ -33,7 +33,7 @@
 namespace xf {
 
 HistogramWidget::HistogramWidget (QWidget* parent):
-	QWidget (parent)
+	xf::Widget (parent)
 { }
 
 

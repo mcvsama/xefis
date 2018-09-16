@@ -30,7 +30,7 @@
 namespace xf {
 
 ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
-	QWidget (parent),
+	xf::Widget (parent),
 	_module (module),
 	_instrument (dynamic_cast<BasicInstrument*> (&_module))
 {
