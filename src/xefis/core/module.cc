@@ -39,7 +39,11 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 			for (auto* prop: _module.io_base()->_registered_input_properties)
 				prop->fetch (cycle);
 
-			_module.process (cycle);
+			auto processing_time = TimeHelper::measure ([&] {
+				_module.process (cycle);
+			});
+
+			AccountingAPI (_module).add_processing_time (processing_time);
 		}
 	}
 	catch (...)

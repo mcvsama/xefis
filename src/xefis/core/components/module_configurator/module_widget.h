@@ -66,6 +66,7 @@ class ModuleWidget: public QWidget
 	BasicInstrument*		_instrument					{ nullptr };
 	PropertyTree*			_inputs_property_tree;
 	PropertyTree*			_outputs_property_tree;
+	xf::HistogramWidget*	_processing_time_histogram	{ nullptr };
 	xf::HistogramWidget*	_painting_time_histogram	{ nullptr };
 	QTimer*					_refresh_timer;
 };
