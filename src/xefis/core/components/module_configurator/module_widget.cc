@@ -81,12 +81,20 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 void
 ModuleWidget::refresh()
 {
+	if (_processing_time_histogram)
+	{
+		auto const accounting_api = BasicModule::AccountingAPI (_module);
+		auto const& processing_times = accounting_api.processing_times();
+
+		_processing_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (processing_times.begin(), processing_times.end(), 0.05_ms, 0.0_ms, 10_ms));
+	}
+
 	if (_painting_time_histogram)
 	{
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
 		auto const& painting_times = accounting_api.painting_times();
 
-		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms));
+		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 0.5_ms, 0.0_ms, 100_ms));
 	}
 }
 
@@ -96,12 +104,16 @@ ModuleWidget::create_performance_widget()
 {
 	auto* widget = new QWidget (this);
 
+	_processing_time_histogram = new xf::HistogramWidget (widget);
+
 	if (_instrument)
 		_painting_time_histogram = new xf::HistogramWidget (widget);
 
 	auto layout = new QVBoxLayout (widget);
 
-	if (_instrument)
+	layout->addWidget (_processing_time_histogram);
+
+	if (_painting_time_histogram)
 		layout->addWidget (_painting_time_histogram);
 
 	return widget;

@@ -103,6 +103,13 @@ class BasicModule: private Noncopyable
 		void
 		add_processing_time (si::Time);
 
+		/**
+		 * Processing times buffer.
+		 */
+		[[nodiscard]]
+		boost::circular_buffer<si::Time> const&
+		processing_times() const noexcept;
+
 	  private:
 		BasicModule& _module;
 	};
@@ -239,6 +246,13 @@ inline void
 BasicModule::AccountingAPI::add_processing_time (si::Time time)
 {
 	_module._processing_times.push_back (time);
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+BasicModule::AccountingAPI::processing_times() const noexcept
+{
+	return _module._processing_times;
 }
 
 
