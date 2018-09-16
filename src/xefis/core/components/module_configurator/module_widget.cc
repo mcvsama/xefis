@@ -21,6 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/qt/ownership_breaker.h>
+#include <xefis/utility/histogram.h>
 
 // Local:
 #include "module_widget.h"
@@ -30,7 +31,8 @@ namespace xf {
 
 ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 	QWidget (parent),
-	_module (module)
+	_module (module),
+	_instrument (dynamic_cast<BasicInstrument*> (&_module))
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
 
@@ -42,6 +44,8 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 
 	auto tabs = new QTabWidget (this);
 
+	tabs->addTab (create_performance_widget(), "Performance");
+
 	if (auto* io_base = _module.io_base())
 	{
 		_inputs_property_tree = new PropertyTree (this);
@@ -52,7 +56,6 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 
 		tabs->addTab (_inputs_property_tree, "Data inputs");
 		tabs->addTab (_outputs_property_tree, "Data outputs");
-		tabs->addTab (new QLabel ("TODO", this), "Settings"); // TODO
 	}
 
 	if (auto module_with_config_widget = dynamic_cast<BasicModule::HasConfiguratorWidget*> (&_module))
@@ -66,6 +69,42 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 	layout->setSpacing (WidgetSpacing);
 	layout->addWidget (name_label);
 	layout->addWidget (tabs);
+
+	_refresh_timer = new QTimer (this);
+	_refresh_timer->setSingleShot (false);
+	_refresh_timer->setInterval ((0.1_s).in<si::Millisecond>());
+	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ModuleWidget::refresh);
+	_refresh_timer->start();
+}
+
+
+void
+ModuleWidget::refresh()
+{
+	if (_painting_time_histogram)
+	{
+		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
+		auto const& painting_times = accounting_api.painting_times();
+
+		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms));
+	}
+}
+
+
+QWidget*
+ModuleWidget::create_performance_widget()
+{
+	auto* widget = new QWidget (this);
+
+	if (_instrument)
+		_painting_time_histogram = new xf::HistogramWidget (widget);
+
+	auto layout = new QVBoxLayout (widget);
+
+	if (_instrument)
+		layout->addWidget (_painting_time_histogram);
+
+	return widget;
 }
 
 } // namespace xf

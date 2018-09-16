@@ -49,6 +49,13 @@ diagonal (QSizeF const& size)
 
 
 inline float
+pixels (si::Length length, si::PixelDensity pixel_density)
+{
+	return length * pixel_density;
+}
+
+
+inline float
 pixels_per_point (si::PixelDensity dpi)
 {
 	return dpi / (72 / 1_in);
