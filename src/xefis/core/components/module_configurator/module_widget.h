@@ -18,14 +18,17 @@
 #include <cstddef>
 
 // Qt:
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QLabel>
+#include <QLabel>
+#include <QStackedWidget>
+#include <QTimer>
+#include <QWidget>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/instrument.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/components/property_tree/property_tree.h>
+#include <xefis/support/ui/histogram_widget.h>
 
 // Local:
 #include "module_widget.h"
@@ -52,9 +55,19 @@ class ModuleWidget: public QWidget
 	module() const noexcept;
 
   private:
-	BasicModule&	_module;
-	PropertyTree*	_inputs_property_tree;
-	PropertyTree*	_outputs_property_tree;
+	void
+	refresh();
+
+	QWidget*
+	create_performance_widget();
+
+  private:
+	BasicModule&			_module;
+	BasicInstrument*		_instrument					{ nullptr };
+	PropertyTree*			_inputs_property_tree;
+	PropertyTree*			_outputs_property_tree;
+	xf::HistogramWidget*	_painting_time_histogram	{ nullptr };
+	QTimer*					_refresh_timer;
 };
 
 

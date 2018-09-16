@@ -413,9 +413,12 @@ SELFTEST_SOURCES		+= xefis/support/system/tests/work_performer.test.cc
 
 ######## /xefis/support/ui ########
 
+XEFIS_HEADERS			+= xefis/support/ui/histogram_widget.h
 XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
+XEFIS_HEADERS			+= xefis/support/ui/widget_aids.h
 #XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h TODO
 
+XEFIS_SOURCES			+= xefis/support/ui/histogram_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
 #XEFIS_SOURCES			+= xefis/support/ui/window.cc TODO
 
@@ -440,6 +443,7 @@ XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
 XEFIS_HEADERS			+= xefis/utility/exception_support.h
 XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
+XEFIS_HEADERS			+= xefis/utility/histogram.h
 XEFIS_HEADERS			+= xefis/utility/hmac.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
 XEFIS_HEADERS			+= xefis/utility/navigation.h
