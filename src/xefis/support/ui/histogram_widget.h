@@ -55,6 +55,18 @@ class HistogramWidget:
 		void
 		set_data (Histogram<Value> const&);
 
+	/**
+	 * Show/hide count on the Y-axis.
+	 */
+	void
+	set_y_legend_visible (bool);
+
+	/**
+	 * Set histogram style.
+	 */
+	void
+	set_style (Style);
+
   protected:
 	void
 	update_canvas();
@@ -66,13 +78,14 @@ class HistogramWidget:
 	paintEvent (QPaintEvent*) override;
 
   private:
-	Style						_style		{ Style::Bars };
+	Style						_style				{ Style::Bars };
 	std::optional<QImage>		_canvas;
 	std::vector<std::size_t>	_bins;
 	std::size_t					_y_max;
 	QString						_x_min_str;
 	QString						_x_max_str;
 	QString						_y_max_str;
+	bool						_y_legend_visible	{ false };
 };
 
 
@@ -90,6 +103,20 @@ template<class Value>
 		_canvas.reset();
 		update();
 	}
+
+
+inline void
+HistogramWidget::set_y_legend_visible (bool visible)
+{
+	_y_legend_visible = visible;
+}
+
+
+inline void
+HistogramWidget::set_style (Style style)
+{
+	_style = style;
+}
 
 } // namespace xf
 

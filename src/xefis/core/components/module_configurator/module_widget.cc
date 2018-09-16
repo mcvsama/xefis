@@ -72,7 +72,7 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
-	_refresh_timer->setInterval ((0.1_s).in<si::Millisecond>());
+	_refresh_timer->setInterval ((0.25_s).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ModuleWidget::refresh);
 	_refresh_timer->start();
 }
@@ -86,7 +86,7 @@ ModuleWidget::refresh()
 		auto const accounting_api = BasicModule::AccountingAPI (_module);
 		auto const& processing_times = accounting_api.processing_times();
 
-		_processing_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (processing_times.begin(), processing_times.end(), 0.05_ms, 0.0_ms, 10_ms));
+		_processing_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (processing_times.begin(), processing_times.end(), 0.01_ms, 0.0_ms, 1_ms));
 	}
 
 	if (_painting_time_histogram)
@@ -94,7 +94,7 @@ ModuleWidget::refresh()
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
 		auto const& painting_times = accounting_api.painting_times();
 
-		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 0.5_ms, 0.0_ms, 100_ms));
+		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms));
 	}
 }
 
@@ -105,16 +105,25 @@ ModuleWidget::create_performance_widget()
 	auto* widget = new QWidget (this);
 
 	_processing_time_histogram = new xf::HistogramWidget (widget);
+	_processing_time_histogram->setFixedSize (em_pixels (30.0), em_pixels (10.0));
 
 	if (_instrument)
+	{
 		_painting_time_histogram = new xf::HistogramWidget (widget);
+		_painting_time_histogram->setFixedSize (em_pixels (30.0), em_pixels (10.0));
+	}
 
 	auto layout = new QVBoxLayout (widget);
+	auto histograms_layout = new QHBoxLayout();
 
-	layout->addWidget (_processing_time_histogram);
+	histograms_layout->addWidget (_processing_time_histogram);
 
 	if (_painting_time_histogram)
-		layout->addWidget (_painting_time_histogram);
+		histograms_layout->addWidget (_painting_time_histogram);
+
+	histograms_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	layout->addLayout (histograms_layout);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	return widget;
 }

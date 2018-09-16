@@ -59,7 +59,7 @@ HistogramWidget::update_canvas()
 		painter.setRenderHint (QPainter::NonCosmeticDefaultPen, true);
 
 		QFontMetricsF const font_metrics (font());
-		auto const y_max_str_width = std::max (font_metrics.width (_y_max_str), font_metrics.width ("0000"));
+		float const y_max_str_width = _y_legend_visible ? std::max (font_metrics.width (_y_max_str), font_metrics.width ("0000")) : 0.0f;
 		auto const axes_width = em_pixels (0.1f);
 		auto const chart_width = em_pixels (0.05f);
 		auto const text_height = font_metrics.height();
@@ -101,7 +101,7 @@ HistogramWidget::update_canvas()
 
 				case Style::Bars:
 				{
-					auto const bar_width = 0.8 * chart_rect.width() / n_bins;
+					auto const bar_width = 0.6f * chart_rect.width() / n_bins;
 
 					painter.setPen (QPen (bar_color, bar_width, Qt::SolidLine, Qt::FlatCap));
 
@@ -126,8 +126,11 @@ HistogramWidget::update_canvas()
 			// Top-value bug:
 			painter.drawLine (axes_rect.topLeft(), axes_rect.topLeft() - QPointF (bug_length, 0.0f));
 			// Top-value text:
-			QRectF y_max_text_rect (rect().topLeft(), rect().topLeft() + QPointF (y_max_str_width, font_metrics.height()));
-			painter.drawText (y_max_text_rect, Qt::AlignVCenter | Qt::AlignRight, _y_max_str);
+			if (_y_legend_visible)
+			{
+				QRectF y_max_text_rect (rect().topLeft(), rect().topLeft() + QPointF (y_max_str_width, font_metrics.height()));
+				painter.drawText (y_max_text_rect, Qt::AlignVCenter | Qt::AlignRight, _y_max_str);
+			}
 
 			// Min/expected/max values:
 			auto paint_x_value = [&] (QString const& text, std::size_t bin_number, Qt::Alignment alignment) {
