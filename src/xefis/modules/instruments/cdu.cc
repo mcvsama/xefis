@@ -1100,7 +1100,7 @@ CDU::paint_entry_area (QRectF const& rect)
 	painter().drawRect (entry_rect);
 	painter().setFont (_font_20);
 	painter().setPen (get_pen (Qt::white, 1.0));
-	QFontMetrics metrics (_font_20);
+	QFontMetricsF metrics (_font_20);
 	if (metrics.width (_entry_value) > text_rect.width())
 	{
 		painter().setClipRect (text_rect);
