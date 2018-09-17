@@ -36,7 +36,7 @@ TestLoop::TestLoop (xf::Machine& machine, xf::Xefis& xefis, xf::WorkPerformer& w
 	auto line_width = 0.3525_mm;
 	auto font_height = 3.15_mm;
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
-	spec.set_scale (1.0f);
+	spec.set_scale (1.5f);
 	_test_screen.emplace (spec, xefis.graphics(), _navaid_storage, logger);
 	_test_screen->set_paint_bounding_boxes (false);
 
