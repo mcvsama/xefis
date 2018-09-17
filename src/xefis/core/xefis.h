@@ -227,6 +227,7 @@ Xefis::UninitializedServiceException::UninitializedServiceException (std::string
 inline
 Xefis::OptionsHelper::OptionsHelper (Xefis const& xefis)
 {
+	// TODO instead of has_option use std::optional<>
 	if (xefis.has_option (Xefis::Option::WatchdogWriteFd))
 		_watchdog_write_fd = boost::lexical_cast<int> (xefis.option (Xefis::Option::WatchdogWriteFd));
 
