@@ -95,11 +95,7 @@ ProcessingLoop::execute_cycle()
 		BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
 
 	for (auto& module_details: _module_details_list)
-	{
-		module_details.last_processing_time = TimeHelper::measure ([&] {
-			BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);
-		});
-	}
+		BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);
 
 	_previous_timestamp = t;
 	_current_cycle.reset();
