@@ -36,8 +36,6 @@ class ModulesList: public QWidget
 
   public:
 	constexpr static int NameColumn		= 0;
-	constexpr static int StatsAvgColumn	= 1;
-	constexpr static int StatsMaxColumn	= 2;
 
   public:
 	// Ctor

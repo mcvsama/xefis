@@ -47,7 +47,7 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 	_list->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	_list->setVerticalScrollMode (QAbstractItemView::ScrollPerPixel);
 	_list->setContextMenuPolicy (Qt::CustomContextMenu);
-	_list->setHeaderLabels ({ "Module", "Avg latency", "Max latency" });
+	_list->setHeaderLabels ({ "Module" });
 	QObject::connect (_list, SIGNAL (currentItemChanged (QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT (item_selected (QTreeWidgetItem*, QTreeWidgetItem*)));
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
@@ -65,10 +65,6 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 	_refresh_timer->start();
 
 	read();
-
-	_list->header()->resizeSection (NameColumn, 14.0f * lh);
-	_list->header()->resizeSection (StatsAvgColumn, 5.0f * lh);
-	_list->header()->resizeSection (StatsMaxColumn, 5.0f * lh);
 
 	_processing_loop_ptrs.reserve (100);
 	_module_ptrs.reserve (1000);

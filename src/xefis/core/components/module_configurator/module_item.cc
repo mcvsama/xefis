@@ -37,20 +37,5 @@ ModuleItem::ModuleItem (BasicModule& module, ProcessingLoopItem& parent):
 	setText (ModulesList::NameColumn, QString::fromStdString (identifier (_module)));
 }
 
-
-void
-ModuleItem::update_stats()
-{
-	try {
-		setText (ModulesList::StatsAvgColumn, QString ("%1 s").arg ("TODO"));
-		setText (ModulesList::StatsMaxColumn, QString ("%1 s").arg ("TODO"));
-	}
-	catch (...)
-	{
-		setText (ModulesList::StatsAvgColumn, "error");
-		setText (ModulesList::StatsMaxColumn, "error");
-	}
-}
-
 } // namespace xf
 
