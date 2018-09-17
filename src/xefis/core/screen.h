@@ -20,9 +20,6 @@
 #include <optional>
 #include <vector>
 
-// Lib:
-#include <boost/circular_buffer.hpp>
-
 // Qt:
 #include <QSize>
 #include <QImage>
