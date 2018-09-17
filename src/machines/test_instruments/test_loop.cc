@@ -81,10 +81,10 @@ TestLoop::TestLoop (xf::Machine& machine, xf::Xefis& xefis, xf::WorkPerformer& w
 	_test_screen->adi_io->altitude_amsl_lookahead							<< test_generator_io->create_property<si::Length> ("altitude/amsl.lookahead", 10_ft, { 0_ft, 2000_ft }, 100_ft / 1_min);
 	_test_screen->adi_io->altitude_agl_serviceable							<< test_generator_io->create_enum_property<bool> ("altitude/agl.serviceable", { { true, 16_s }, { false, 2_s } });
 	_test_screen->adi_io->altitude_agl										<< test_generator_io->create_property<si::Length> ("altitude/agl", -4_ft, { -4_ft, 30_m }, 100_ft / 1_min);
-	_test_screen->adi_io->altitude_minimums_type							<< test_generator_io->create_enum_property<std::string> ("altitude/minimums-type", { { "BARO", 5_s }, { "RADIO", 4_s } });
-	_test_screen->adi_io->altitude_minimums_setting							<< xf::ConstantSource (300_ft);
-	_test_screen->adi_io->altitude_minimums_amsl							<< xf::ConstantSource (300_ft);
-	_test_screen->adi_io->altitude_landing_amsl								<< xf::ConstantSource (140_ft);
+	_test_screen->adi_io->decision_height_type								<< test_generator_io->create_enum_property<std::string> ("decision-height/type", { { "BARO", 5_s }, { "RADIO", 4_s } });
+	_test_screen->adi_io->decision_height_setting							<< xf::ConstantSource (300_ft);
+	_test_screen->adi_io->decision_height_amsl								<< xf::ConstantSource (300_ft);
+	_test_screen->adi_io->landing_amsl										<< xf::ConstantSource (140_ft);
 	_test_screen->adi_io->vertical_speed_serviceable						<< test_generator_io->create_enum_property<bool> ("vertical-speed/serviceable", { { true, 8_s }, { false, 2_s } });
 	_test_screen->adi_io->vertical_speed									<< test_generator_io->create_property<si::Velocity> ("vertical-speed/speed", 0_fpm, { -6000_fpm, +6000_fpm }, 100_fpm / 1_s);
 	_test_screen->adi_io->vertical_speed_energy_variometer					<< test_generator_io->create_property<si::Power> ("vertical-speed/energy-variometer", 0_W, { -1000_W, +1000_W }, 100_W / 1_s);

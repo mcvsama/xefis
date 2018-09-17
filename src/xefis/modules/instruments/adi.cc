@@ -150,7 +150,7 @@ Blinker::update_current_time (si::Time now)
 }
 
 
-AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& minimums_warning_blinker):
+AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& decision_height_warning_blinker):
 	paint_request (paint_request),
 	params (params),
 	precomputed (precomputed),
@@ -158,7 +158,7 @@ AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::Instrumen
 	aids_ptr (instrument_support.get_aids (paint_request)),
 	aids (*aids_ptr),
 	speed_warning_blinker (speed_warning_blinker),
-	minimums_warning_blinker (minimums_warning_blinker),
+	decision_height_warning_blinker (decision_height_warning_blinker),
 	q (0.1f * aids.lesser_dimension())
 {
 	this->default_shadow = aids.default_shadow();
@@ -324,9 +324,9 @@ AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF co
 
 
 inline QColor
-AdiPaintRequest::get_minimums_color() const
+AdiPaintRequest::get_decision_height_color() const
 {
-	return params.altitude_amsl < params.minimums_amsl
+	return params.altitude_amsl < params.decision_height_amsl
 		? aids.kCautionColor
 		: aids.kNavigationColor;
 }
@@ -1774,11 +1774,11 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		}
 
 		// Altitude warning:
-		if (pr.params.altitude_landing_visible)
+		if (pr.params.landing_visible)
 		{
-			QPointF const p1 (-2.05f * x, ft_to_px (pr, pr.params.altitude_landing_amsl + pr.params.altitude_landing_warning_lo));
-			QPointF const p2 (-2.05f * x, ft_to_px (pr, pr.params.altitude_landing_amsl + pr.params.altitude_landing_warning_hi));
-			QPointF const p0 (-2.05f * x, ft_to_px (pr, pr.params.altitude_landing_amsl));
+			QPointF const p1 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl + pr.params.altitude_landing_warning_lo));
+			QPointF const p2 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl + pr.params.altitude_landing_warning_hi));
+			QPointF const p0 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl));
 
 			QPen w = _ldg_alt_pen;
 			w.setColor (Qt::white);
@@ -1795,10 +1795,10 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 			});
 
 			// Landing altitude bug (ground indicator):
-			if (pr.params.altitude_landing_amsl > _min_shown && pr.params.altitude_landing_amsl < _max_shown)
+			if (pr.params.landing_amsl > _min_shown && pr.params.landing_amsl < _max_shown)
 			{
 				pr.painter.setClipRect (_ladder_rect);
-				float posy = ft_to_px (pr, pr.params.altitude_landing_amsl);
+				float posy = ft_to_px (pr, pr.params.landing_amsl);
 
 				pr.painter.setPen (_ldg_alt_pen);
 				pr.painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
@@ -1836,18 +1836,18 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		}
 
 		// Baro bug:
-		if (pr.params.minimums_altitude_visible)
+		if (pr.params.decision_height_visible)
 		{
-			if (pr.params.minimums_amsl > _min_shown && pr.params.minimums_amsl < _max_shown)
+			if (pr.params.decision_height_amsl > _min_shown && pr.params.decision_height_amsl < _max_shown)
 			{
-				if (!pr.minimums_warning_blinker.active() || pr.minimums_warning_blinker.visibility_state())
+				if (!pr.decision_height_warning_blinker.active() || pr.decision_height_warning_blinker.visibility_state())
 				{
-					float const posy = ft_to_px (pr, pr.params.minimums_amsl);
+					float const posy = ft_to_px (pr, pr.params.decision_height_amsl);
 
 					pr.painter.setTransform (_transform);
 					pr.painter.setClipRect (_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
 
-					QPen pen = pr.aids.get_pen (pr.get_minimums_color(), 1.25f);
+					QPen pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.25f);
 					pen.setMiterLimit (0.35f);
 
 					pr.painter.setPen (pen);
@@ -2260,7 +2260,7 @@ PaintingWork::PaintingWork (xf::Graphics const& graphics):
 void
 PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) const
 {
-	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _minimums_warning_blinker);
+	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _decision_height_warning_blinker);
 
 	precompute (pr, params);
 
@@ -2281,7 +2281,7 @@ PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) 
 		else
 			paint_altitude_agl (pr);
 
-		paint_minimums_setting (pr);
+		paint_decision_height_setting (pr);
 		paint_hints (pr);
 		paint_critical_aoa (pr);
 
@@ -2314,10 +2314,10 @@ PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params)
 	_speed_warning_blinker.update (_parameters.speed_visible &&
 								   ((_parameters.speed_minimum_visible && _parameters.speed < _parameters.speed_minimum) ||
 									(_parameters.speed_maximum_visible && _parameters.speed > _parameters.speed_maximum)));
-	_minimums_warning_blinker.update_current_time (_parameters.timestamp);
-	_minimums_warning_blinker.update (_parameters.altitude_visible && _parameters.minimums_altitude_visible &&
-									  _parameters.altitude_amsl < _parameters.minimums_amsl &&
-									  _parameters.minimums_focus_short);
+	_decision_height_warning_blinker.update_current_time (_parameters.timestamp);
+	_decision_height_warning_blinker.update (_parameters.altitude_visible && _parameters.decision_height_visible &&
+											 _parameters.altitude_amsl < _parameters.decision_height_amsl &&
+											 _parameters.decision_height_focus_short);
 }
 
 
@@ -2509,9 +2509,9 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 
 
 void
-PaintingWork::paint_minimums_setting (AdiPaintRequest& pr) const
+PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 {
-	if (pr.params.minimums_altitude_visible)
+	if (pr.params.decision_height_visible)
 	{
 		float x = 0.18f * pr.aids.lesser_dimension();
 
@@ -2523,30 +2523,30 @@ PaintingWork::paint_minimums_setting (AdiPaintRequest& pr) const
 		QFontMetricsF const metrics_a (font_a);
 		QFontMetricsF const metrics_b (font_b);
 
-		QString mins_str = pr.params.minimums_type;
-		QString alt_str = QString ("%1").arg (pr.params.minimums_setting.in<Foot>(), 0, 'f', 0);
+		QString mins_str = pr.params.decision_height_type;
+		QString alt_str = QString ("%1").arg (pr.params.decision_height_setting.in<Foot>(), 0, 'f', 0);
 
 		QRectF mins_rect (1.35f * x, 1.8f * x, metrics_a.width (mins_str), metrics_a.height());
 		mins_rect.moveRight (mins_rect.left());
 		QRectF alt_rect (0.f, 0.f, metrics_b.width (alt_str), metrics_b.height());
 		alt_rect.moveTopRight (mins_rect.bottomRight());
 
-		QPen minimums_pen = pr.aids.get_pen (pr.get_minimums_color(), 1.f);
+		QPen decision_height_pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.f);
 
-		if (!pr.minimums_warning_blinker.active() || pr.minimums_warning_blinker.visibility_state())
+		if (!pr.decision_height_warning_blinker.active() || pr.decision_height_warning_blinker.visibility_state())
 		{
-			pr.painter.setPen (minimums_pen);
+			pr.painter.setPen (decision_height_pen);
 			pr.painter.setFont (font_a);
 			pr.painter.fast_draw_text (mins_rect, Qt::AlignVCenter | Qt::AlignRight, mins_str, pr.default_shadow);
 			pr.painter.setFont (font_b);
 			pr.painter.fast_draw_text (alt_rect, Qt::AlignVCenter | Qt::AlignRight, alt_str, pr.default_shadow);
 		}
 
-		if (pr.params.minimums_focus)
+		if (pr.params.decision_height_focus)
 		{
 			float v = 0.06f * pr.q;
 			QRectF frame = alt_rect.united (mins_rect).adjusted (-2.f * v, -0.75f * v, +2.f * v, 0.f);
-			pr.painter.setPen (minimums_pen);
+			pr.painter.setPen (decision_height_pen);
 			pr.painter.setBrush (Qt::NoBrush);
 			pr.painter.paint (pr.default_shadow, [&] {
 				pr.painter.drawRect (frame);
@@ -3150,21 +3150,22 @@ ADI::process (xf::Cycle const& cycle)
 		return io.altitude_agl_serviceable && *io.altitude_agl_serviceable && io.altitude_agl;
 	});
 	params.altitude_agl_focus = _altitude_agl_became_visible.shorter_than (*io.focus_duration);
-	params.altitude_landing_visible = io.altitude_landing_amsl.valid();
-	params.altitude_landing_amsl = io.altitude_landing_amsl.value_or (0_ft);
 	params.altitude_landing_warning_hi = *io.altitude_landing_warning_hi;
 	params.altitude_landing_warning_lo = *io.altitude_landing_warning_lo;
-	// Minimums
-	params.minimums_altitude_visible = io.altitude_minimums_setting && io.altitude_minimums_amsl;
-	params.minimums_type = QString::fromStdString (io.altitude_minimums_type.value_or (""));
-	params.minimums_amsl = io.altitude_minimums_amsl.value_or (0_ft);
-	_minimums_became_visible.update (cycle.update_time(), [&] {
-		return io.altitude_amsl && io.altitude_minimums_amsl &&
-			   *io.altitude_amsl < *io.altitude_minimums_amsl;
+	// Decision height
+	params.decision_height_visible = io.decision_height_setting && io.decision_height_amsl;
+	params.decision_height_type = QString::fromStdString (io.decision_height_type.value_or (""));
+	params.decision_height_amsl = io.decision_height_amsl.value_or (0_ft);
+	_decision_height_became_visible.update (cycle.update_time(), [&] {
+		return io.altitude_amsl && io.decision_height_amsl &&
+			   *io.altitude_amsl < *io.decision_height_amsl;
 	});
-	params.minimums_focus = _minimums_became_visible.shorter_than (*io.focus_duration);
-	params.minimums_focus_short = _minimums_became_visible.shorter_than (*io.focus_short_duration);
-	params.minimums_setting = io.altitude_minimums_setting.value_or (0_ft);
+	params.decision_height_focus = _decision_height_became_visible.shorter_than (*io.focus_duration);
+	params.decision_height_focus_short = _decision_height_became_visible.shorter_than (*io.focus_short_duration);
+	params.decision_height_setting = io.decision_height_setting.value_or (0_ft);
+	// Landing altitude:
+	params.landing_visible = io.landing_amsl.valid();
+	params.landing_amsl = io.landing_amsl.value_or (0_ft);
 	// Vertical speed
 	params.vertical_speed_failure = !io.vertical_speed_serviceable.value_or (true);
 	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {

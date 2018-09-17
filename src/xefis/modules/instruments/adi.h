@@ -115,10 +115,12 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Length>		altitude_amsl_lookahead								{ this, "altitude/amsl.lookahead" };
 	xf::PropertyIn<bool>			altitude_agl_serviceable							{ this, "altitude/agl.serviceable" };
 	xf::PropertyIn<si::Length>		altitude_agl										{ this, "altitude/agl" };
-	xf::PropertyIn<std::string>		altitude_minimums_type								{ this, "altitude/minimums.type" };
-	xf::PropertyIn<si::Length>		altitude_minimums_setting							{ this, "altitude/minimums.setting" };
-	xf::PropertyIn<si::Length>		altitude_minimums_amsl								{ this, "altitude/minimums.amsl" };
-	xf::PropertyIn<si::Length>		altitude_landing_amsl								{ this, "altitude/landing-altitude.amsl" };
+	// Decision height:
+	xf::PropertyIn<std::string>		decision_height_type								{ this, "decision-height/type" };
+	xf::PropertyIn<si::Length>		decision_height_setting								{ this, "decision-height/setting" };
+	xf::PropertyIn<si::Length>		decision_height_amsl								{ this, "decision-height/amsl" };
+	// Landing altitude:
+	xf::PropertyIn<si::Length>		landing_amsl										{ this, "landing-altitude/amsl" };
 	// Vertical speed
 	xf::PropertyIn<bool>			vertical_speed_serviceable							{ this, "vertical-speed/serviceable" };
 	xf::PropertyIn<si::Velocity>	vertical_speed										{ this, "vertical-speed/speed" };
@@ -258,18 +260,18 @@ class Parameters
 	bool						altitude_agl_visible				= false;
 	si::Length					altitude_agl						= 0_ft;
 	bool						altitude_agl_focus					= false;
-	bool						altitude_landing_visible			= false;
-	si::Length					altitude_landing_amsl				= 0_ft;
+	bool						landing_visible						= false;
+	si::Length					landing_amsl						= 0_ft;
 	si::Length					altitude_landing_warning_hi			= 0_ft;
 	si::Length					altitude_landing_warning_lo			= 0_ft;
 	AltitudeBugs				altitude_bugs;
-	// Minimums
-	bool						minimums_altitude_visible			= false;
-	QString						minimums_type;
-	si::Length					minimums_amsl						= 0_ft;
-	bool						minimums_focus						= false;
-	bool						minimums_focus_short				= false;
-	si::Length					minimums_setting					= 0_ft;
+	// Decision height
+	bool						decision_height_visible				= false;
+	QString						decision_height_type;
+	si::Length					decision_height_amsl				= 0_ft;
+	bool						decision_height_focus				= false;
+	bool						decision_height_focus_short			= false;
+	si::Length					decision_height_setting				= 0_ft;
 	// Vertical speed
 	bool						vertical_speed_failure				= false;
 	bool						vertical_speed_failure_focus		= false;
@@ -451,7 +453,7 @@ class AdiPaintRequest
 	std::shared_ptr<xf::InstrumentAids>		aids_ptr;
 	xf::InstrumentAids&						aids;
 	Blinker const&							speed_warning_blinker;
-	Blinker const&							minimums_warning_blinker;
+	Blinker const&							decision_height_warning_blinker;
 	float const								q;
 	xf::Shadow								default_shadow;
 	xf::Shadow								black_shadow;
@@ -509,7 +511,7 @@ class AdiPaintRequest
 	 * Return green or yellow color for minimums marker, depending on current altitude and minimums settings.
 	 */
 	QColor
-	get_minimums_color() const;
+	get_decision_height_color() const;
 };
 
 
@@ -776,7 +778,7 @@ class PaintingWork
 	paint_altitude_agl (AdiPaintRequest&) const;
 
 	void
-	paint_minimums_setting (AdiPaintRequest&) const;
+	paint_decision_height_setting (AdiPaintRequest&) const;
 
 	void
 	paint_nav (AdiPaintRequest&) const;
@@ -795,7 +797,7 @@ class PaintingWork
 
   private:
 	xf::Synchronized<PaintingWork*>	mutable
-							_mutable_this				{ this };
+							_mutable_this						{ this };
 
 	Parameters				_parameters;
 	Precomputed				_precomputed;
@@ -804,8 +806,8 @@ class PaintingWork
 	ArtificialHorizon		_artificial_horizon;
 	VelocityLadder			_velocity_ladder;
 	AltitudeLadder			_altitude_ladder;
-	Blinker					_speed_warning_blinker		{ 200_ms };
-	Blinker					_minimums_warning_blinker	{ 200_ms };
+	Blinker					_speed_warning_blinker				{ 200_ms };
+	Blinker					_decision_height_warning_blinker	{ 200_ms };
 };
 
 } // namespace adi_detail
@@ -841,7 +843,7 @@ class ADI: public xf::Instrument<ADI_IO>
 	xf::PropertyObserver						_fpv_computer;
 	adi_detail::PaintingWork					_painting_work;
 	xf::Synchronized<adi_detail::Parameters>	_parameters;
-	xf::EventTimestamper						_minimums_became_visible;
+	xf::EventTimestamper						_decision_height_became_visible;
 	xf::EventTimestamper						_altitude_agl_became_visible;
 	xf::EventTimestamper						_speed_failure_timestamp;
 	xf::EventTimestamper						_orientation_failure_timestamp;
