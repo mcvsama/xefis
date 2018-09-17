@@ -43,12 +43,6 @@ class ModuleItem: public QTreeWidgetItem
 	BasicModule&
 	module() const noexcept;
 
-	/**
-	 * Update item (module stats).
-	 */
-	void
-	update_stats();
-
   private:
 	BasicModule& _module;
 };
