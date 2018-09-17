@@ -76,10 +76,6 @@ class ProcessingLoop:
 		BasicModule const&
 		module() const noexcept;
 
-	  public:
-		// TODO more time accounting
-		si::Time		last_processing_time	{ 0_ms };
-
 	  private:
 		BasicModule*	_module;
 	};
