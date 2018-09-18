@@ -28,11 +28,10 @@
 
 namespace xf {
 
-ProcessingLoop::ProcessingLoop (Machine& machine, std::string const& name, Frequency loop_frequency, Logger const& logger):
-	Module (std::make_unique<ProcessingLoopIO> (name), name),
+ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instance, Frequency loop_frequency, Logger const& logger):
+	Module (std::make_unique<ProcessingLoopIO> (instance), instance),
 	_machine (machine),
 	_xefis (machine.xefis()),
-	_name (name),
 	_loop_period (1.0 / loop_frequency),
 	_logger (logger)
 {

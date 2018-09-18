@@ -447,6 +447,7 @@ XEFIS_HEADERS			+= xefis/utility/hextable.h
 XEFIS_HEADERS			+= xefis/utility/histogram.h
 XEFIS_HEADERS			+= xefis/utility/hmac.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
+XEFIS_HEADERS			+= xefis/utility/named_instance.h
 XEFIS_HEADERS			+= xefis/utility/navigation.h
 XEFIS_HEADERS			+= xefis/utility/noncopyable.h
 XEFIS_HEADERS			+= xefis/utility/numeric.h

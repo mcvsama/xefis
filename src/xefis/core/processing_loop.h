@@ -47,7 +47,7 @@ class ProcessingLoopIO: public ModuleIO
 	PropertyOut<si::Time>		latency				{ this, "/system/processing-loop/" + _loop_name + "/latency" };
 
   public:
-	ProcessingLoopIO (std::string const& loop_name):
+	ProcessingLoopIO (std::string_view const& loop_name):
 		_loop_name (loop_name)
 	{ }
 };
@@ -85,7 +85,7 @@ class ProcessingLoop:
   public:
 	// Ctor
 	explicit
-	ProcessingLoop (Machine& machine, std::string const& name, Frequency loop_frequency, Logger const&);
+	ProcessingLoop (Machine& machine, std::string_view const& instance, Frequency loop_frequency, Logger const&);
 
 	// Dtor
 	virtual
@@ -106,12 +106,6 @@ class ProcessingLoop:
 	 */
 	Xefis&
 	xefis() const noexcept;
-
-	/**
-	 * Processing loop UI name.
-	 */
-	std::string const&
-	name() const noexcept;
 
 	/**
 	 * Start looping.
@@ -155,7 +149,6 @@ class ProcessingLoop:
   private:
 	Machine&					_machine;
 	Xefis&						_xefis;
-	std::string					_name;
 	QTimer*						_loop_timer;
 	Time						_loop_period		{ 10_ms };
 	std::optional<Timestamp>	_previous_timestamp;
@@ -209,13 +202,6 @@ inline Xefis&
 ProcessingLoop::xefis() const noexcept
 {
 	return _xefis;
-}
-
-
-inline std::string const&
-ProcessingLoop::name() const noexcept
-{
-	return _name;
 }
 
 

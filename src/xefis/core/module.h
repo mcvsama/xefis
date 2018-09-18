@@ -30,6 +30,7 @@
 #include <xefis/core/cycle.h>
 #include <xefis/core/module_io.h>
 #include <xefis/utility/noncopyable.h>
+#include <xefis/utility/named_instance.h>
 
 
 class QWidget;
@@ -54,7 +55,9 @@ class NoModuleIO: public ModuleIO
  * Public method that computes the result is fetch_and_process(). It calls implementation-defined
  * process().
  */
-class BasicModule: private Noncopyable
+class BasicModule:
+	public NamedInstance,
+	private Noncopyable
 {
 	static constexpr std::size_t kMaxProcessingTimesBackLog = 1000;
 
@@ -159,12 +162,6 @@ class BasicModule: private Noncopyable
 	~BasicModule() = default;
 
 	/**
-	 * Return module instance name.
-	 */
-	std::string const&
-	instance() const noexcept;
-
-	/**
 	 * Return the IO object of this module.
 	 */
 	ModuleIO*
@@ -203,7 +200,6 @@ class BasicModule: private Noncopyable
 	set_nil_on_exception (bool enable) noexcept;
 
   private:
-	std::string							_instance;
 	bool								_cached					{ false };
 	bool								_set_nil_on_exception	{ true };
 	std::unique_ptr<ModuleIO>			_io;
@@ -281,13 +277,6 @@ inline boost::circular_buffer<si::Time> const&
 BasicModule::AccountingAPI::processing_times() const noexcept
 {
 	return _module._processing_times;
-}
-
-
-inline std::string const&
-BasicModule::instance() const noexcept
-{
-	return _instance;
 }
 
 
