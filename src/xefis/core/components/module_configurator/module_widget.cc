@@ -39,6 +39,7 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 	auto full_name_str = QString::fromStdString (identifier (module));
 
 	QLabel* name_label = new QLabel (full_name_str.toHtmlEscaped());
+	name_label->setStyleSheet ("QLabel { margin: 0.25em; }");
 	name_label->setAlignment (Qt::AlignLeft);
 	QFont font = name_label->font();
 	font.setPointSize (1.4 * font.pointSize());
