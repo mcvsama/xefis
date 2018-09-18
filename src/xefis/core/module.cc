@@ -95,7 +95,8 @@ BasicModule::rescue (Cycle const& cycle, std::exception_ptr eptr)
 std::string
 identifier (BasicModule const& module)
 {
-	return demangle (typeid (module)) + "#" + module.instance();
+	auto s = demangle (typeid (module));
+	return s.substr (0, s.find ("<")) + "#" + module.instance();
 }
 
 
