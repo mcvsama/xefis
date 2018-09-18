@@ -98,6 +98,19 @@ class BasicModule: private Noncopyable
 		AccountingAPI (BasicModule&);
 
 		/**
+		 * Cycle time of the ProcessingLoop that this module is being processed in.
+		 */
+		[[nodiscard]]
+		si::Time
+		cycle_time() const noexcept;
+
+		/**
+		 * Set cycle time of he ProcessingLoop that this module is being processed in.
+		 */
+		void
+		set_cycle_time (si::Time);
+
+		/**
 		 * Add new measured processing time (time spent in the process() method).
 		 */
 		void
@@ -195,6 +208,7 @@ class BasicModule: private Noncopyable
 	bool								_set_nil_on_exception	{ true };
 	std::unique_ptr<ModuleIO>			_io;
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
+	si::Time							_cycle_time				{ 0_s };
 };
 
 
@@ -242,10 +256,24 @@ BasicModule::AccountingAPI::AccountingAPI (BasicModule& module):
 { }
 
 
-inline void
-BasicModule::AccountingAPI::add_processing_time (si::Time time)
+inline si::Time
+BasicModule::AccountingAPI::cycle_time() const noexcept
 {
-	_module._processing_times.push_back (time);
+	return _module._cycle_time;
+}
+
+
+inline void
+BasicModule::AccountingAPI::set_cycle_time (si::Time cycle_time)
+{
+	_module._cycle_time = cycle_time;
+}
+
+
+inline void
+BasicModule::AccountingAPI::add_processing_time (si::Time processing_time)
+{
+	_module._processing_times.push_back (processing_time);
 }
 
 
