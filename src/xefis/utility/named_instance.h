@@ -11,33 +11,48 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
+#ifndef XEFIS__UTILITY__NAMED_INSTANCE_H__INCLUDED
+#define XEFIS__UTILITY__NAMED_INSTANCE_H__INCLUDED
+// TODO add to Makefile
+
 // Standard:
 #include <cstddef>
-#include <stdexcept>
-
-// Qt:
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QTreeWidgetItem>
+#include <string_view>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/processing_loop.h>
-#include <xefis/utility/qutils.h>
-
-// Local:
-#include "modules_list.h"
-#include "processing_loop_item.h"
 
 
 namespace xf {
 
-ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWidget& parent):
-	QTreeWidgetItem (&parent, { "", "", "" }),
-	_processing_loop (processing_loop)
+class NamedInstance
 {
-	setup_appereance (*this);
-	setText (ModulesList::NameColumn, QString::fromStdString (_processing_loop.instance()));
+  public:
+	// Ctor
+	explicit
+	NamedInstance (std::string_view const& instance):
+		_instance (instance)
+	{ }
+
+	/**
+	 * Return module instance name.
+	 */
+	[[nodiscard]]
+	std::string const&
+	instance() const noexcept;
+
+  private:
+	std::string _instance;
+};
+
+
+inline std::string const&
+NamedInstance::instance() const noexcept
+{
+	return _instance;
 }
 
 } // namespace xf
+
+#endif
 

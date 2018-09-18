@@ -66,7 +66,7 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 
 
 BasicModule::BasicModule (std::unique_ptr<ModuleIO> io, std::string_view const& instance):
-	_instance (instance),
+	NamedInstance (instance),
 	_io (std::move (io))
 {
 	auto api = ModuleIO::ProcessingLoopAPI (*_io.get());
