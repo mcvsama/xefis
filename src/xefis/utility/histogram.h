@@ -15,8 +15,13 @@
 #define XEFIS__UTILITY__HISTOGRAM_H__INCLUDED
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <vector>
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/utility/numeric.h>
 
 
 namespace xf {
@@ -31,56 +36,121 @@ template<class Value>
 		// Ctor
 		template<class Iterator>
 			explicit
-			Histogram (Iterator begin, Iterator end, Value bin_width, std::optional<Value> min = {}, std::optional<Value> max = {});
+			Histogram (Iterator begin, Iterator end, Value bin_width, std::optional<Value> x_min = {}, std::optional<Value> x_max = {});
 
+		/**
+		 * Return minimum value of the histogram (X-axis value).
+		 * For minimum recorded value use min().
+		 */
 		Value
 		x_min() const noexcept;
 
+		/**
+		 * Return maximum value of the histogram (X-axis value).
+		 * For maximum recorded value use max().
+		 */
 		Value
 		x_max() const noexcept;
 
+		/**
+		 * Return number of samples in the biggest bin.
+		 */
 		std::size_t
 		y_max() const noexcept;
 
+		/**
+		 * Return reference to bins vector.
+		 */
 		Bins const&
 		bins() const noexcept;
 
+		/**
+		 * Return number of samples in histogram.
+		 */
 		std::size_t
-		samples() const noexcept;
+		n_samples() const noexcept;
+
+		/**
+		 * Return bin index for given value.
+		 */
+		std::size_t
+		bin_index (Value const&);
+
+		/**
+		 * Minimum recorded value.
+		 */
+		Value
+		min() const noexcept;
+
+		/**
+		 * Maximum recorded value.
+		 */
+		Value
+		max() const noexcept;
+
+		/**
+		 * Mean value for the data.
+		 */
+		Value
+		mean() const noexcept;
+
+		/**
+		 * Median.
+		 */
+		Value
+		median() const noexcept;
+
+		/**
+		 * Standard deviation.
+		 */
+		Value
+		stddev() const noexcept;
+
+		/**
+		 * Return "normalized" percentile (in range 0..1) of values above
+		 * given argument.
+		 */
+		float
+		normalized_percentile_for (Value above) const;
 
 	  private:
+		Value const	_bin_width;
 		Value		_x_min;
 		Value		_x_max;
 		std::size_t	_y_max		{ 0 };
-		std::size_t	_samples	{ 0 };
+		std::size_t	_n_samples	{ 0 };
 		Bins		_bins;
+		Value		_min;
+		Value		_max;
+		Value		_mean;
+		Value		_median;
+		Value		_stddev;
 	};
 
 
 template<class Value>
 	template<class Iterator>
 		inline
-		Histogram<Value>::Histogram (Iterator begin, Iterator end, Value bin_width, std::optional<Value> min, std::optional<Value> max)
+		Histogram<Value>::Histogram (Iterator begin, Iterator end, Value bin_width, std::optional<Value> x_min, std::optional<Value> x_max):
+			_bin_width (bin_width)
 		{
-			if (!min)
-				for (Iterator v = begin; v != end; ++v)
-					if (!min || *min > *v)
-						min = *v;
+			if (begin == end)
+				throw std::length_error ("can't compute histogram for zero-length sequence");
 
-			if (!max)
-				for (Iterator v = begin; v != end; ++v)
-					if (!max || *max < *v)
-						max = *v;
+			auto [min_it, max_it] = std::minmax_element (begin, end);
+			_min = *min_it;
+			_max = *max_it;
 
-			_x_min = *min;
-			_x_max = *max;
-			_bins.resize (static_cast<std::size_t> (std::ceil ((*max - *min) / bin_width)), 0u);
+			_x_min = x_min.value_or (_min);
+			_x_max = x_max.value_or (_max);
+
+			_bins.resize (static_cast<std::size_t> (std::ceil ((_x_max - _x_min) / _bin_width)), 0u);
 			auto const bins = _bins.size();
 
 			for (Iterator v = begin; v != end; ++v)
 			{
-				std::size_t nth_bin = (*v - *min) / bin_width;
-				++_samples;
+				std::size_t nth_bin = bin_index (*v);
+				++_n_samples;
 
 				if (0 <= nth_bin && nth_bin < bins)
 				{
@@ -91,6 +161,10 @@ template<class Value>
 						_y_max = count;
 				}
 			}
+
+			_mean = xf::mean (begin, end);
+			_median = xf::median (begin, end);
+			_stddev = xf::stddev (begin, end);
 		}
 
 
@@ -123,6 +197,71 @@ template<class Value>
 	Histogram<Value>::bins() const noexcept -> Bins const&
 	{
 		return _bins;
+	}
+
+
+template<class Value>
+	inline std::size_t
+	Histogram<Value>::n_samples() const noexcept
+	{
+		return _n_samples;
+	}
+
+
+template<class Value>
+	inline std::size_t
+	Histogram<Value>::bin_index (Value const& value)
+	{
+		return (value - _x_min) / _bin_width;
+	}
+
+
+template<class Value>
+	inline Value
+	Histogram<Value>::min() const noexcept
+	{
+		return _min;
+	}
+
+
+template<class Value>
+	inline Value
+	Histogram<Value>::max() const noexcept
+	{
+		return _max;
+	}
+
+
+template<class Value>
+	inline Value
+	Histogram<Value>::mean() const noexcept
+	{
+		return _mean;
+	}
+
+
+template<class Value>
+	inline Value
+	Histogram<Value>::median() const noexcept
+	{
+		return _median;
+	}
+
+
+template<class Value>
+	inline Value
+	Histogram<Value>::stddev() const noexcept
+	{
+		return _stddev;
+	}
+
+
+template<class Value>
+	inline float
+	Histogram<Value>::normalized_percentile_for (Value above) const
+	{
+		// TODO
+		return 0.0f;
 	}
 
 } // namespace xf
