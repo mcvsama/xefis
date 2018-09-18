@@ -34,8 +34,17 @@ DebugForces::process (xf::Cycle const&)
 }
 
 
+std::packaged_task<void()>
+DebugForces::paint (xf::PaintRequest paint_request) const
+{
+	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+		async_paint (pr);
+	});
+}
+
+
 void
-DebugForces::paint (xf::PaintRequest& paint_request) const
+DebugForces::async_paint (xf::PaintRequest const& paint_request) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);

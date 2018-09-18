@@ -28,7 +28,6 @@
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/support/navigation/navaid_storage.h>
-#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/synchronized.h>
 #include <xefis/utility/temporal.h>
@@ -355,7 +354,7 @@ class PaintingWork
   public:
 	// Ctor
 	explicit
-	PaintingWork (xf::PaintRequest&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&);
+	PaintingWork (xf::PaintRequest const&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&);
 
 	void
 	paint();
@@ -451,7 +450,7 @@ class PaintingWork
 	to_px (si::Length miles) const;
 
   private:
-	xf::PaintRequest&						_paint_request;
+	xf::PaintRequest const&					_paint_request;
 	xf::NavaidStorage const&				_navaid_storage;
 	Parameters const&						_p;
 	ResizeCache&							_c;
@@ -490,25 +489,21 @@ class HSI: public xf::Instrument<HSI_IO>
 {
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::WorkPerformer&, xf::NavaidStorage const&, std::string_view const& instance = {});
-
-	// Dtor
-	~HSI();
+	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::NavaidStorage const&, std::string_view const& instance = {});
 
 	// Module API
 	void
 	process (xf::Cycle const&) override;
 
 	// Instrument API
-	void
-	paint (xf::PaintRequest&) const override;
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
 
   private:
 	void
-	async_paint (xf::AsyncPaintRequest) const;
+	async_paint (xf::PaintRequest const&) const;
 
   private:
-	xf::WorkPerformer&										_work_performer;
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;
 	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;

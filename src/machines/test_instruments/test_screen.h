@@ -76,9 +76,10 @@ class TestScreen: public xf::Screen
 
   private:
 	xf::Graphics const&												_graphics;
-	xf::WorkPerformer												_work_performer_adi;
-	xf::WorkPerformer												_work_performer_hsi;
 	xf::NavaidStorage const&										_navaid_storage;
+	xf::WorkPerformer												_adi_work_performer;
+	xf::WorkPerformer												_hsi_work_performer;
+	xf::WorkPerformer												_others_work_performer;
 	// Instruments:
 	std::optional<xf::Registrant<ADI>>								_adi;
 	std::optional<xf::Registrant<HSI>>								_hsi;

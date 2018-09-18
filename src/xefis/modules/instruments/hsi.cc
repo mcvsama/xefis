@@ -57,7 +57,7 @@ Parameters::sanitize()
 }
 
 
-PaintingWork::PaintingWork (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_):
+PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_):
 	_paint_request (paint_request),
 	_navaid_storage (navaid_storage),
 	_p (parameters),
@@ -1984,19 +1984,11 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::WorkPerformer& work_performer, xf::NavaidStorage const& navaid_storage, std::string_view const& instance):
+HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
-	_work_performer (work_performer),
 	_navaid_storage (navaid_storage),
 	_instrument_support (graphics)
 { }
-
-
-HSI::~HSI()
-{
-	if (_painting_future.valid())
-		_painting_future.wait();
-}
 
 
 void
@@ -2089,24 +2081,22 @@ HSI::process (xf::Cycle const& cycle)
 }
 
 
-void
-HSI::paint (xf::PaintRequest& paint_request) const
+std::packaged_task<void()>
+HSI::paint (xf::PaintRequest paint_request) const
 {
-	// Make sure previous work is done:
-	if (_painting_future.valid())
-		_painting_future.wait();
-
-	_painting_future = _work_performer.submit (&HSI::async_paint, this, std::move (paint_request.make_async()));
+	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+		async_paint (pr);
+	});
 }
 
 
 void
-HSI::async_paint (xf::AsyncPaintRequest async_paint_request) const
+HSI::async_paint (xf::PaintRequest const& paint_request) const
 {
-	auto parameters = _parameters.lock();
-	auto resize_cache = _resize_cache.lock();
-	auto current_navaids = _current_navaids.lock();
-	auto mutable_ = _mutable.lock();
-	hsi_detail::PaintingWork (async_paint_request.paint_request(), _instrument_support, _navaid_storage, *parameters, *resize_cache, *current_navaids, *mutable_).paint();
+	auto parameters = *_parameters.lock();
+	auto resize_cache = *_resize_cache.lock();
+	auto current_navaids = *_current_navaids.lock();
+	auto mutable_ = *_mutable.lock();
+	hsi_detail::PaintingWork (paint_request, _instrument_support, _navaid_storage, parameters, resize_cache, current_navaids, mutable_).paint();
 }
 

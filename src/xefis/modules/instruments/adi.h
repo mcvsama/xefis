@@ -17,7 +17,6 @@
 // Standard:
 #include <array>
 #include <cstddef>
-#include <future>
 
 // Qt:
 #include <QtGui/QColor>
@@ -32,7 +31,6 @@
 #include <xefis/core/setting.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/synchronized.h>
 
@@ -439,14 +437,14 @@ class AdiPaintRequest
   public:
 	// Ctor
 	explicit
-	AdiPaintRequest (xf::PaintRequest&, xf::InstrumentSupport const&, Parameters const&, Precomputed const&, Blinker const&, Blinker const&);
+	AdiPaintRequest (xf::PaintRequest const&, xf::InstrumentSupport const&, Parameters const&, Precomputed const&, Blinker const&, Blinker const&);
 
   public:
 	static inline QColor const				kLadderColor		{ 64, 51, 108, 0x80 };
 	static inline QColor const				kLadderBorderColor	{ kLadderColor.darker (120) };
 
   public:
-	xf::PaintRequest&						paint_request;
+	xf::PaintRequest const&					paint_request;
 	Parameters const&						params;
 	Precomputed const&						precomputed;
 	xf::InstrumentPainter					painter;
@@ -756,7 +754,7 @@ class PaintingWork
 	PaintingWork (xf::Graphics const&);
 
 	void
-	paint (xf::PaintRequest&, Parameters const& parameters) const;
+	paint (xf::PaintRequest const&, Parameters const& parameters) const;
 
   private:
 	void
@@ -818,28 +816,24 @@ class ADI: public xf::Instrument<ADI_IO>
   public:
 	// Ctor
 	explicit
-	ADI (std::unique_ptr<ADI_IO>, xf::Graphics const&, xf::WorkPerformer&, std::string_view const& instance = {});
-
-	// Dtor
-	~ADI();
+	ADI (std::unique_ptr<ADI_IO>, xf::Graphics const&, std::string_view const& instance = {});
 
 	// Module API
 	void
 	process (xf::Cycle const&) override;
 
 	// Instrument API
-	void
-	paint (xf::PaintRequest&) const override;
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
 
   private:
 	void
-	async_paint (xf::AsyncPaintRequest) const;
+	async_paint (xf::PaintRequest const&) const;
 
 	void
 	compute_fpv();
 
   private:
-	xf::WorkPerformer&							_work_performer;
 	xf::PropertyObserver						_fpv_computer;
 	adi_detail::PaintingWork					_painting_work;
 	xf::Synchronized<adi_detail::Parameters>	_parameters;
@@ -863,7 +857,6 @@ class ADI: public xf::Instrument<ADI_IO>
 	QString										_speed_flaps_up_current_label;
 	QString										_speed_flaps_a_current_label;
 	QString										_speed_flaps_b_current_label;
-	std::future<void> mutable					_painting_future;
 };
 
 #endif

@@ -63,10 +63,13 @@ class HorizontalTrim:
 	process (xf::Cycle const&) override;
 
 	// Instrument API
-	void
-	paint (xf::PaintRequest&) const override;
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
 
   private:
+	void
+	async_paint (xf::PaintRequest const&) const;
+
 	static QString
 	stringify (double value);
 

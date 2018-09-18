@@ -29,7 +29,9 @@
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
+#include <xefis/core/logger.h>
 #include <xefis/core/screen_spec.h>
+#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/tracker.h>
 
@@ -44,34 +46,24 @@ namespace detail {
 class InstrumentDetails
 {
   public:
-	BasicInstrument&				instrument;
-	std::unique_ptr<PaintRequest>	paint_request;
-	QRectF							requested_position;
-	QPointF							anchor_position;
-	std::optional<QRect>			computed_position;
-	QSize							previous_size;
-	std::unique_ptr<QImage>			canvas;
-	std::unique_ptr<QImage>			ready_canvas;
-	int								z_index { 0 };
+	BasicInstrument&			instrument;
+	QRectF						requested_position;
+	QPointF						anchor_position;
+	std::optional<QRect>		computed_position;
+	QSize						previous_size;
+	int							z_index			{ 0 };
+	// This future returns time it took to paint the instrument:
+	std::future<si::Time>		result;
+	// The canvas and canvas_to_use constitute a double-buffer. std::unique_ptr<> is used
+	// since it's not known if std::swap() on QImages is fast or not.
+	std::unique_ptr<QImage>		canvas;
+	std::unique_ptr<QImage>		canvas_to_use;
+	WorkPerformer*				work_performer;
 
   public:
 	// Ctor
 	explicit
-	InstrumentDetails (BasicInstrument&);
-
-  public:
-	/**
-	 * Check if the painting has been finished, and if so, get ready
-	 * for the next round.
-	 */
-	void
-	handle_finish();
-
-	/**
-	 * Get ready for the next painting round.
-	 */
-	void
-	get_ready();
+	InstrumentDetails (BasicInstrument&, WorkPerformer& work_performer);
 };
 
 } // namespace detail
@@ -92,7 +84,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&, Graphics const&);
+	Screen (ScreenSpec const&, Graphics const&, Logger const&);
 
 	// Dtor
 	~Screen();
@@ -102,7 +94,7 @@ class Screen:
 	 */
 	template<class Instrument>
 		void
-		register_instrument (Registrant<Instrument>&);
+		register_instrument (Registrant<Instrument>&, WorkPerformer&);
 
 	/**
 	 * Set position and size of an instrument.
@@ -128,6 +120,13 @@ class Screen:
 	 */
 	void
 	set_paint_bounding_boxes (bool enable);
+
+	/**
+	 * Wait for all asynchronous paintings to be finished.
+	 * Call it before trying to destroy any registered instrument.
+	 */
+	void
+	wait();
 
 	/**
 	 * Return the instrument tracker object.
@@ -199,20 +198,22 @@ class Screen:
 	refresh();
 
   private:
+	Logger										_logger;
 	InstrumentTracker							_instrument_tracker;
 	QTimer*										_refresh_timer;
 	QImage										_canvas;
 	std::vector<InstrumentTracker::Disclosure*>	_z_index_sorted_disclosures;
 	ScreenSpec									_screen_spec;
+	si::Time const								_frame_time;
 	bool										_paint_bounding_boxes	{ false };
 };
 
 
 template<class Instrument>
 	inline void
-	Screen::register_instrument (Registrant<Instrument>& instrument)
+	Screen::register_instrument (Registrant<Instrument>& instrument, WorkPerformer& work_performer)
 	{
-		_instrument_tracker.register_object (instrument, detail::InstrumentDetails (*instrument));
+		_instrument_tracker.register_object (instrument, detail::InstrumentDetails (*instrument, work_performer));
 	}
 
 

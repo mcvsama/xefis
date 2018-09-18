@@ -177,8 +177,17 @@ Status::process (xf::Cycle const& cycle)
 }
 
 
+std::packaged_task<void()>
+Status::paint (xf::PaintRequest paint_request) const
+{
+	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+		async_paint (pr);
+	});
+}
+
+
 void
-Status::paint (xf::PaintRequest& paint_request) const
+Status::async_paint (xf::PaintRequest const& paint_request) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);

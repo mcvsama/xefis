@@ -104,8 +104,12 @@ class Datatable:
 	process (xf::Cycle const&) override;
 
 	// Instrument API
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
+
+  private:
 	void
-	paint (xf::PaintRequest&) const override;
+	async_paint (xf::PaintRequest const&) const;
 
   private:
 	float					_label_font_size	{ 16.0 };

@@ -58,7 +58,7 @@ class InstrumentSupport
 	 * when instrument size changes.
 	 */
 	InstrumentPainter
-	get_painter (PaintRequest&) const;
+	get_painter (PaintRequest const&) const;
 
   private:
 	void
@@ -90,7 +90,7 @@ InstrumentSupport::get_aids (PaintRequest const& paint_request) const
 
 
 inline InstrumentPainter
-InstrumentSupport::get_painter (PaintRequest& paint_request) const
+InstrumentSupport::get_painter (PaintRequest const& paint_request) const
 {
 	auto data = _data.lock();
 

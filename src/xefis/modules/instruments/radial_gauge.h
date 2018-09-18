@@ -93,7 +93,7 @@ class BasicRadialGauge:
 	BasicRadialGauge (xf::Graphics const&);
 
 	void
-	paint (xf::PaintRequest&, GaugeValues& values) const;
+	async_paint (xf::PaintRequest const&, GaugeValues&) const;
 
   private:
 	void
@@ -125,8 +125,12 @@ template<class Value>
 		process (xf::Cycle const&) override;
 
 		// Instrument API
+		std::packaged_task<void()>
+		paint (xf::PaintRequest) const override;
+
+	  private:
 		void
-		paint (xf::PaintRequest&) const override;
+		async_paint (xf::PaintRequest const&) const;
 
 	  private:
 		xf::PropertyObserver					_inputs_observer;
@@ -162,8 +166,18 @@ template<class Value>
 
 
 template<class Value>
+	inline std::packaged_task<void()>
+	RadialGauge<Value>::paint (xf::PaintRequest paint_request) const
+	{
+		return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+			async_paint (pr);
+		});
+	}
+
+
+template<class Value>
 	inline void
-	RadialGauge<Value>::paint (xf::PaintRequest& paint_request) const
+	RadialGauge<Value>::async_paint (xf::PaintRequest const& paint_request) const
 	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
@@ -185,7 +199,7 @@ template<class Value>
 		if (io.automatic)
 			values->normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
 
-		BasicRadialGauge::paint (paint_request, *values);
+		BasicRadialGauge::async_paint (paint_request, *values);
 	}
 
 #endif

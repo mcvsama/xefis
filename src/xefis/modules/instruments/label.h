@@ -50,8 +50,13 @@ class Label:
 	explicit
 	Label (std::unique_ptr<LabelIO>, xf::Graphics const&, std::string_view const& instance = {});
 
+	// Instrument API
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
+
+  private:
 	void
-	paint (xf::PaintRequest&) const override;
+	async_paint (xf::PaintRequest const&) const;
 };
 
 #endif

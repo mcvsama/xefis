@@ -150,7 +150,7 @@ Blinker::update_current_time (si::Time now)
 }
 
 
-AdiPaintRequest::AdiPaintRequest (xf::PaintRequest& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& decision_height_warning_blinker):
+AdiPaintRequest::AdiPaintRequest (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, Parameters const& params, Precomputed const& precomputed, Blinker const& speed_warning_blinker, Blinker const& decision_height_warning_blinker):
 	paint_request (paint_request),
 	params (params),
 	precomputed (precomputed),
@@ -2258,7 +2258,7 @@ PaintingWork::PaintingWork (xf::Graphics const& graphics):
 
 
 void
-PaintingWork::paint (xf::PaintRequest& paint_request, Parameters const& params) const
+PaintingWork::paint (xf::PaintRequest const& paint_request, Parameters const& params) const
 {
 	AdiPaintRequest pr (paint_request, _instrument_support, _parameters, _precomputed, _speed_warning_blinker, _decision_height_warning_blinker);
 
@@ -2983,9 +2983,8 @@ PaintingWork::paint_radar_altimeter_failure (AdiPaintRequest& pr) const
 } // namespace adi_detail
 
 
-ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Graphics const& graphics, xf::WorkPerformer& work_performer, std::string_view const& instance):
+ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Graphics const& graphics, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
-	_work_performer (work_performer),
 	_painting_work (graphics)
 {
 	_fpv_computer.set_callback (std::bind (&ADI::compute_fpv, this));
@@ -3000,13 +2999,6 @@ ADI::ADI (std::unique_ptr<ADI_IO> module_io, xf::Graphics const& graphics, xf::W
 		&io.fpv_visible,
 		&io.weight_on_wheels,
 	});
-}
-
-
-ADI::~ADI()
-{
-	if (_painting_future.valid())
-		_painting_future.wait();
 }
 
 
@@ -3302,22 +3294,20 @@ ADI::process (xf::Cycle const& cycle)
 }
 
 
-void
-ADI::paint (xf::PaintRequest& paint_request) const
+std::packaged_task<void()>
+ADI::paint (xf::PaintRequest paint_request) const
 {
-	// Make sure previous work is done:
-	if (_painting_future.valid())
-		_painting_future.wait();
-
-	_painting_future = _work_performer.submit (&ADI::async_paint, this, std::move (paint_request.make_async()));
+	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+		async_paint (pr);
+	});
 }
 
 
 void
-ADI::async_paint (xf::AsyncPaintRequest async_paint_request) const
+ADI::async_paint (xf::PaintRequest const& paint_request) const
 {
 	auto cloned_params = *_parameters.lock();
-	_painting_work.paint (async_paint_request.paint_request(), cloned_params);
+	_painting_work.paint (paint_request, cloned_params);
 }
 
 

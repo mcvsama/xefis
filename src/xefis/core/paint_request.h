@@ -24,66 +24,13 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/noncopyable.h>
-#include <xefis/utility/time_helper.h>
 #include <xefis/utility/types.h>
 
 
 namespace xf {
 
-class PaintRequest;
-
-
-/**
- * RAII-style accessor to the PaintRequest object.
- * Marks the PaintRequest as finished automatically when AsyncPaintRequest is destroyed.
- */
-class AsyncPaintRequest
+class PaintRequest
 {
-  public:
-	// Ctor
-	explicit
-	AsyncPaintRequest (PaintRequest&);
-
-	// Copy ctor
-	AsyncPaintRequest (AsyncPaintRequest const&) = delete;
-
-	// Move ctor
-	AsyncPaintRequest (AsyncPaintRequest&&);
-
-	// Copy operator
-	AsyncPaintRequest&
-	operator= (AsyncPaintRequest const&) = delete;
-
-	// Move operator
-	AsyncPaintRequest&
-	operator= (AsyncPaintRequest&&);
-
-	// Dtor
-	~AsyncPaintRequest();
-
-	/**
-	 * Access the PaintRequest object.
-	 */
-	[[nodiscard]]
-	PaintRequest&
-	paint_request() noexcept;
-
-	/**
-	 * Access the PaintRequest object.
-	 */
-	[[nodiscard]]
-	PaintRequest const&
-	paint_request() const noexcept;
-
-  private:
-	PaintRequest* _paint_request;
-};
-
-
-class PaintRequest: private Noncopyable
-{
-	friend class AsyncPaintRequest;
-
   public:
 	class Metric
 	{
@@ -117,29 +64,29 @@ class PaintRequest: private Noncopyable
 		font_height() const noexcept;
 
 	  private:
-		QSize			_canvas_size;
-		PixelDensity	_pixel_density;
-		si::Length		_pen_width;
-		si::Length		_font_height;
+		QSize				_canvas_size;
+		si::PixelDensity	_pixel_density;
+		si::Length			_pen_width;
+		si::Length			_font_height;
 	};
 
   public:
 	// Ctor
 	explicit
-	PaintRequest (QImage&, Metric, QSize previous_canvas_size);
+	PaintRequest (QImage&, Metric const&, QSize previous_canvas_size);
+
+	// Move ctor
+	PaintRequest (PaintRequest&&) = default;
+
+	// Move operator
+	PaintRequest&
+	operator= (PaintRequest&&) = default;
 
 	/**
 	 * Access the canvas to paint on.
 	 */
 	[[nodiscard]]
 	QImage&
-	canvas() noexcept;
-
-	/**
-	 * Access the canvas to paint on.
-	 */
-	[[nodiscard]]
-	QImage const&
 	canvas() const noexcept;
 
 	/**
@@ -156,91 +103,11 @@ class PaintRequest: private Noncopyable
 	bool
 	size_changed() const noexcept;
 
-	/**
-	 * Get the token that will allow painting asynchronously.
-	 * This PaintRequest will be marked as finished when the returned token is destroyed.
-	 * When it happens, calling any method on this object is undefined-behaviour.
-	 */
-	[[nodiscard]]
-	AsyncPaintRequest
-	make_async();
-
-	/**
-	 * Return true if request was marked as finished.
-	 */
-	[[nodiscard]]
-	bool
-	finished() const noexcept;
-
-	/**
-	 * Setup the started-at timestamp.
-	 */
-	void
-	set_started_at (si::Time);
-
-	/**
-	 * Return the time at which rendering was started.
-	 */
-	[[nodiscard]]
-	std::optional<si::Time>
-	started_at() const noexcept;
-
-	/**
-	 * Return the time at which rendering was finished.
-	 */
-	[[nodiscard]]
-	std::optional<si::Time>
-	finished_at() const noexcept;
-
   private:
-	std::atomic<bool>		_finished		{ true };
-	std::optional<si::Time>	_started_at;
-	std::optional<si::Time>	_finished_at;
-	QImage*					_canvas;
-	Metric					_metric;
-	bool					_size_changed;
+	QImage*									_canvas;
+	Metric									_metric;
+	bool									_size_changed;
 };
-
-
-inline
-AsyncPaintRequest::AsyncPaintRequest (PaintRequest& paint_request):
-	_paint_request (&paint_request)
-{
-	_paint_request->_finished = false;
-}
-
-
-inline
-AsyncPaintRequest::AsyncPaintRequest (AsyncPaintRequest&& other):
-	_paint_request (other._paint_request)
-{
-	other._paint_request = nullptr;
-}
-
-
-inline
-AsyncPaintRequest::~AsyncPaintRequest()
-{
-	if (_paint_request)
-	{
-		_paint_request->_finished_at = TimeHelper::now();
-		_paint_request->_finished = true;
-	}
-}
-
-
-inline PaintRequest&
-AsyncPaintRequest::paint_request() noexcept
-{
-	return *_paint_request;
-}
-
-
-inline PaintRequest const&
-AsyncPaintRequest::paint_request() const noexcept
-{
-	return *_paint_request;
-}
 
 
 inline
@@ -298,7 +165,7 @@ PaintRequest::Metric::font_height() const noexcept
 
 
 inline
-PaintRequest::PaintRequest (QImage& canvas, Metric metric, QSize previous_canvas_size):
+PaintRequest::PaintRequest (QImage& canvas, Metric const& metric, QSize previous_canvas_size):
 	_canvas (&canvas),
 	_metric (metric),
 	_size_changed (canvas.size() != previous_canvas_size)
@@ -306,13 +173,6 @@ PaintRequest::PaintRequest (QImage& canvas, Metric metric, QSize previous_canvas
 
 
 inline QImage&
-PaintRequest::canvas() noexcept
-{
-	return *_canvas;
-}
-
-
-inline QImage const&
 PaintRequest::canvas() const noexcept
 {
 	return *_canvas;
@@ -330,41 +190,6 @@ inline bool
 PaintRequest::size_changed() const noexcept
 {
 	return _size_changed;
-}
-
-
-inline AsyncPaintRequest
-PaintRequest::make_async()
-{
-	return AsyncPaintRequest (*this);
-}
-
-
-inline bool
-PaintRequest::finished() const noexcept
-{
-	return _finished;
-}
-
-
-inline void
-PaintRequest::set_started_at (si::Time time)
-{
-	_started_at = time;
-}
-
-
-inline std::optional<si::Time>
-PaintRequest::started_at() const noexcept
-{
-	return _started_at;
-}
-
-
-inline std::optional<si::Time>
-PaintRequest::finished_at() const noexcept
-{
-	return _finished_at;
 }
 
 } // namespace xf

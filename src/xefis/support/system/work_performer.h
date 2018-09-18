@@ -159,7 +159,7 @@ template<class Function, class ...Args>
 	inline std::future<std::invoke_result_t<Function&&, Args&&...>>
 	WorkPerformer::submit (Function&& function, Args&&... args)
 	{
-		return submit (std::packaged_task<std::invoke_result_t<Function, Args...> (Args...)> (function),
+		return submit (std::packaged_task<std::invoke_result_t<Function, Args...> (Args...)> (std::forward<Function> (function)),
 					   std::forward<Args> (args)...);
 	}
 

@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <future>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -44,6 +45,17 @@ template<class T>
 	clone (T t)
 	{
 		return T (t);
+	}
+
+
+/**
+ * Return true if a std::future is ready.
+ */
+template<typename R>
+	inline bool
+	is_ready (std::future<R> const& future)
+	{
+		return future.wait_for (std::chrono::seconds (0)) == std::future_status::ready;
 	}
 
 } // namespace xf

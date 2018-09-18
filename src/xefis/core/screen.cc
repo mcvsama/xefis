@@ -34,52 +34,21 @@
 namespace xf {
 namespace detail {
 
-static constexpr float kMaxAvailableTimeFactor = 0.75f;
-
-
-InstrumentDetails::InstrumentDetails (BasicInstrument& instrument):
-	instrument (instrument)
+InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer& work_performer):
+	instrument (instrument),
+	work_performer (&work_performer)
 { }
-
-
-void
-InstrumentDetails::handle_finish()
-{
-	if (paint_request && paint_request->finished())
-	{
-		auto accounting_api = BasicInstrument::AccountingAPI (instrument);
-
-		if (auto at = paint_request->finished_at())
-			accounting_api.add_painting_time (*at - *paint_request->started_at());
-		else
-			accounting_api.add_painting_time (TimeHelper::now() - *paint_request->started_at());
-
-		get_ready();
-	}
-}
-
-
-inline void
-InstrumentDetails::get_ready()
-{
-	std::swap (canvas, ready_canvas);
-
-	if (!paint_request)
-		previous_size = computed_position->size();
-	else
-		previous_size = paint_request->metric().canvas_size();
-
-	paint_request.reset();
-}
 
 } // namespace detail
 
 
-Screen::Screen (ScreenSpec const& spec, Graphics const& graphics):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Logger const& logger):
 	QWidget (nullptr),
+	_logger (logger.with_scope ("<screen>")),
 	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
 						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
-	_screen_spec (spec)
+	_screen_spec (spec),
+	_frame_time (1 / spec.refresh_rate())
 {
 	QRect rect = _screen_spec.position_and_size();
 
@@ -100,9 +69,7 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics):
 
 Screen::~Screen()
 {
-	// Make sure all async painting is finished:
-	for (auto& disclosure: _instrument_tracker)
-		wait_for_async_paint (disclosure);
+	wait();
 }
 
 
@@ -151,6 +118,15 @@ Screen::set_paint_bounding_boxes (bool enable)
 
 
 void
+Screen::wait()
+{
+	// Make sure all async painting is finished:
+	for (auto& disclosure: _instrument_tracker)
+		wait_for_async_paint (disclosure);
+}
+
+
+void
 Screen::paintEvent (QPaintEvent* paint_event)
 {
 	QPainter painter (this);
@@ -183,11 +159,6 @@ Screen::update_canvas (QSize size)
 void
 Screen::paint_instruments_to_buffer()
 {
-	auto start_timestamp = TimeHelper::now();
-
-	// Collect images from all managed instruments.
-	// Compose them into one big image.
-
 	QSize const canvas_size = _canvas.size();
 
 	_canvas.fill (Qt::black);
@@ -212,43 +183,45 @@ Screen::paint_instruments_to_buffer()
 
 		if (details.computed_position->isValid())
 		{
-			if (!details.paint_request || details.paint_request->finished())
+			if (details.result.valid())
 			{
-				// If paint_request exists (and it's finished()), it means previous painting was asynchronous.
-				details.handle_finish();
-
-				// If size changed:
-				if (!details.canvas || details.canvas->size() != details.computed_position->size())
-					instrument.mark_dirty();
-
-				// If needs repainting:
-				if (instrument.dirty_since_last_check())
+				if (is_ready (details.result))
 				{
-					PaintRequest::Metric metric { details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height() };
+					Exception::catch_and_log (_logger, [&] {
+						auto const painting_time = details.result.get();
+						auto accounting_api = BasicInstrument::AccountingAPI (instrument);
+						accounting_api.set_frame_time (_frame_time);
+						accounting_api.add_painting_time (painting_time);
+					});
 
-					prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
-					details.paint_request = std::make_unique<PaintRequest> (*details.canvas, metric, details.previous_size);
-					details.paint_request->set_started_at (TimeHelper::now());
-					instrument.paint (*details.paint_request);
-					details.handle_finish();
-					// Unfinished PaintRequests will be checked later and also during next paint_instruments_to_buffer().
+					std::swap (details.canvas, details.canvas_to_use);
+
+					// If size changed:
+					if (!details.canvas || details.canvas->size() != details.computed_position->size())
+						instrument.mark_dirty();
 				}
+			}
+
+			// Start new painting job:
+			if (!details.result.valid() && instrument.dirty_since_last_check())
+			{
+				prepare_canvas_for_instrument (details.canvas, details.computed_position->size());
+
+				PaintRequest::Metric metric (details.computed_position->size(), _screen_spec.pixel_density(), _screen_spec.base_pen_width(), _screen_spec.base_font_height());
+				PaintRequest paint_request (*details.canvas, metric, details.previous_size);
+
+				details.previous_size = details.computed_position->size();
+
+				auto task = instrument.paint (std::move (paint_request));
+
+				details.result = details.work_performer->submit ([t = std::move (task)]() mutable noexcept {
+					return TimeHelper::measure (t);
+				});
 			}
 		}
 		else
 			std::clog << "Instrument " << identifier (instrument) << " has invalid size/position." << std::endl;
 	}
-
-	// Wait at most kMaxAvailableTimeFactor of available frame time to allow checking if
-	// asynchronous instruments painting is complete.
-	using namespace std::literals::chrono_literals;
-
-	auto const frame_time = 1 / _screen_spec.refresh_rate();
-	auto const sync_painting_done = TimeHelper::now();
-	auto const available_time = start_timestamp + detail::kMaxAvailableTimeFactor * frame_time - sync_painting_done;
-
-	if (available_time > 0_s)
-		std::this_thread::sleep_for (1s * available_time.in<Second>());
 
 	// Compose all images into our painting buffer:
 	{
@@ -258,20 +231,20 @@ Screen::paint_instruments_to_buffer()
 		{
 			auto& details = disclosure->details();
 
-			// Perhaps the instrument has finished asynchronous painting?
-			details.handle_finish();
-
-			if (details.computed_position && details.computed_position->isValid() && details.ready_canvas)
+			if (details.computed_position && details.computed_position->isValid())
 			{
-				// Discard images that have different size than requested computed_position->size(), beacuse
-				// it means a resize happened during async painting of the instrument.
-				if (details.computed_position->size() == details.ready_canvas->size())
-					canvas_painter.drawImage (*details.computed_position, *details.ready_canvas, QRect (QPoint (0, 0), details.computed_position->size()));
-
-				if (_paint_bounding_boxes)
+				if (auto* painted_image = details.canvas_to_use.get())
 				{
-					canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
-					canvas_painter.drawRect (*details.computed_position);
+					// Discard images that have different size than requested computed_position->size(), beacuse
+					// it means a resize happened during async painting of the instrument.
+					if (details.computed_position->size() == painted_image->size())
+						canvas_painter.drawImage (*details.computed_position, *painted_image, QRect (QPoint (0, 0), details.computed_position->size()));
+
+					if (_paint_bounding_boxes)
+					{
+						canvas_painter.setPen (QPen (QBrush (Qt::red), 2.0));
+						canvas_painter.drawRect (*details.computed_position);
+					}
 				}
 			}
 		}
@@ -282,13 +255,10 @@ Screen::paint_instruments_to_buffer()
 void
 Screen::wait_for_async_paint (InstrumentTracker::Disclosure& disclosure)
 {
-	using namespace std::chrono_literals;
+	auto const& result = disclosure.details().result;
 
-	auto const& paint_request = disclosure.details().paint_request;
-
-	// Wait actively for all painters to finish:
-	while (paint_request && !paint_request->finished())
-		std::this_thread::sleep_for (0.01s);
+	while (result.valid() && !is_ready (result))
+		result.wait();
 }
 
 

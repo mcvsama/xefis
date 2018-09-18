@@ -32,7 +32,7 @@ BasicRadialGauge::BasicRadialGauge (xf::Graphics const& graphics):
 
 
 void
-BasicRadialGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
+BasicRadialGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
