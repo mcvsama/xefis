@@ -15,13 +15,16 @@
 #define XEFIS__UTILITY__NUMERIC_H__INCLUDED
 
 // Standard:
-#include <cstddef>
-#include <type_traits>
+#include <algorithm>
 #include <complex>
 #include <cmath>
+#include <cstddef>
+#include <numeric>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/config/c++20.h>
 #include <xefis/config/types.h>
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/range.h>
@@ -266,6 +269,77 @@ template<class T>
 			result *= value;
 
 		return result;
+	}
+
+
+template<class Iterator>
+	inline auto
+	mean (Iterator begin, Iterator end)
+	{
+		using Value = std::remove_cvref_t<decltype (*std::declval<Iterator>())>;
+
+		return std::accumulate (begin, end, Value{}) / std::distance (begin, end);
+	}
+
+
+/**
+ * Compute median.
+ * Allocates memory, but doesn't modify the sequence.
+ */
+template<class Iterator>
+	inline auto
+	median (Iterator begin, Iterator end)
+	{
+		if (begin == end)
+			throw std::length_error ("can't compute median() of zero-length sequence");
+
+		using Value = std::remove_cvref_t<decltype (*std::declval<Iterator>())>;
+
+		std::vector<Value> data (begin, end);
+		auto const mid = data.size() / 2;
+		std::nth_element (data.begin(), data.begin() + mid, data.end());
+
+		if (data.size() % 2 == 0)
+			return 0.5 * (data[mid - 1] + data[mid]);
+		else
+			return data[mid];
+	}
+
+
+/**
+ * Compute median allowing range to get partially sorted during operation.
+ */
+template<class Iterator>
+	inline auto
+	sort_and_median (Iterator begin, Iterator end)
+	{
+		auto const size = std::distance (begin, end);
+		auto const mid = size / 2;
+		std::nth_element (begin, begin + mid, end);
+
+		if (size % 2 == 0)
+			return 0.5 * (*std::next (begin, mid - 1) + *std::next (begin, mid));
+		else
+			return *std::next (begin, mid);
+	}
+
+
+template<class Iterator>
+	inline auto
+	stddev (Iterator begin, Iterator end)
+	{
+		using std::sqrt;
+		using Value = std::remove_cvref_t<decltype (*std::declval<Iterator>())>;
+
+		std::size_t count = 0;
+		auto m = mean (begin, end);
+		auto sum = std::accumulate (begin, end, Value{} * Value{}, [&](auto accumulated, auto value) {
+			auto const diff = value - m;
+			++count;
+			return accumulated + diff * diff;
+		});
+
+		return sqrt (sum / (count - 1));
 	}
 
 } // namespace xf
