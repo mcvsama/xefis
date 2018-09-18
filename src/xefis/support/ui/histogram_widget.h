@@ -102,9 +102,15 @@ template<class Value>
 		_y_max_str = QString::fromStdString (boost::lexical_cast<std::string> (histogram.y_max()));
 
 		_marks.reserve (marks.size());
+		_marks.clear();
 
 		for (auto const& m: marks)
-			_marks.emplace_back (m / (histogram.x_max() - histogram.x_min()));
+		{
+			auto const pos = m / (histogram.x_max() - histogram.x_min());
+
+			if (0.0f <= pos && pos <= 1.0f)
+				_marks.emplace_back (pos);
+		}
 
 		_canvas.reset();
 		update();
