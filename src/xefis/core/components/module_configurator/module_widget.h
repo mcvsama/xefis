@@ -29,6 +29,7 @@
 #include <xefis/core/machine.h>
 #include <xefis/core/components/property_tree/property_tree.h>
 #include <xefis/support/ui/histogram_widget.h>
+#include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
 
 // Local:
@@ -60,16 +61,21 @@ class ModuleWidget: public xf::Widget
 	refresh();
 
 	QWidget*
-	create_performance_widget();
+	create_performance_tab();
+
+	std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
+	create_performance_widget (QWidget* parent, QString const& title);
 
   private:
-	BasicModule&			_module;
-	BasicInstrument*		_instrument					{ nullptr };
-	PropertyTree*			_inputs_property_tree;
-	PropertyTree*			_outputs_property_tree;
-	xf::HistogramWidget*	_processing_time_histogram	{ nullptr };
-	xf::HistogramWidget*	_painting_time_histogram	{ nullptr };
-	QTimer*					_refresh_timer;
+	BasicModule&				_module;
+	BasicInstrument*			_instrument					{ nullptr };
+	PropertyTree*				_inputs_property_tree;
+	PropertyTree*				_outputs_property_tree;
+	xf::HistogramWidget*		_processing_time_histogram	{ nullptr };
+	xf::HistogramStatsWidget*	_processing_time_stats		{ nullptr };
+	xf::HistogramWidget*		_painting_time_histogram	{ nullptr };
+	xf::HistogramStatsWidget*	_painting_time_stats		{ nullptr };
+	QTimer*						_refresh_timer;
 };
 
 

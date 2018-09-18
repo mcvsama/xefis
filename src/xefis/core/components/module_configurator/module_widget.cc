@@ -16,6 +16,8 @@
 
 // Qt:
 #include <QBoxLayout>
+#include <QGridLayout>
+#include <QGroupBox>
 #include <QTabWidget>
 
 // Xefis:
@@ -39,12 +41,12 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 	QLabel* name_label = new QLabel (full_name_str.toHtmlEscaped());
 	name_label->setAlignment (Qt::AlignLeft);
 	QFont font = name_label->font();
-	font.setPointSize (2.0 * font.pointSize());
+	font.setPointSize (1.4 * font.pointSize());
 	name_label->setFont (font);
 
 	auto tabs = new QTabWidget (this);
 
-	tabs->addTab (create_performance_widget(), "Performance");
+	tabs->addTab (create_performance_tab(), "Performance");
 
 	if (auto* io_base = _module.io_base())
 	{
@@ -85,47 +87,70 @@ ModuleWidget::refresh()
 	{
 		auto const accounting_api = BasicModule::AccountingAPI (_module);
 		auto const& processing_times = accounting_api.processing_times();
+		xf::Histogram<si::Quantity<si::Millisecond>> histogram (processing_times.begin(), processing_times.end(), 0.01_ms, 0.0_ms, 1_ms);
 
-		_processing_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (processing_times.begin(), processing_times.end(), 0.01_ms, 0.0_ms, 1_ms));
+		_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
+		_processing_time_stats->set_data (histogram);
 	}
 
 	if (_painting_time_histogram)
 	{
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
 		auto const& painting_times = accounting_api.painting_times();
+		xf::Histogram<si::Quantity<si::Millisecond>> histogram (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms);
 
-		_painting_time_histogram->set_data (xf::Histogram<si::Quantity<si::Millisecond>> (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms));
+		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
+		_painting_time_stats->set_data (histogram);
 	}
 }
 
 
 QWidget*
-ModuleWidget::create_performance_widget()
+ModuleWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
+	QWidget* processing_time_group {};
+	QWidget* painting_time_group {};
 
-	_processing_time_histogram = new xf::HistogramWidget (widget);
-	_processing_time_histogram->setFixedSize (em_pixels (30.0), em_pixels (10.0));
+	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = create_performance_widget (widget, "Processing time");
 
 	if (_instrument)
-	{
-		_painting_time_histogram = new xf::HistogramWidget (widget);
-		_painting_time_histogram->setFixedSize (em_pixels (30.0), em_pixels (10.0));
-	}
+		std::tie (_painting_time_histogram, _painting_time_stats, painting_time_group) = create_performance_widget (widget, "Painting time");
 
 	auto layout = new QVBoxLayout (widget);
-	auto histograms_layout = new QHBoxLayout();
+	auto histograms_layout = new QGridLayout();
+	histograms_layout->addWidget (processing_time_group, 0, 0);
 
-	histograms_layout->addWidget (_processing_time_histogram);
+	if (painting_time_group)
+		histograms_layout->addWidget (painting_time_group, 1, 0);
 
-	if (_painting_time_histogram)
-		histograms_layout->addWidget (_painting_time_histogram);
-
-	histograms_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	histograms_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
 	layout->addLayout (histograms_layout);
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
 	return widget;
+}
+
+
+std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
+ModuleWidget::create_performance_widget (QWidget* parent, QString const& title)
+{
+	QMargins const margins (em_pixels (0.5f), em_pixels (0.25f), em_pixels (0.5f), em_pixels (0.25f));
+
+	auto* group_box = new QGroupBox (title, parent);
+	group_box->setFixedSize (em_pixels (40.0), em_pixels (15.0));
+
+	auto* histogram_widget = new xf::HistogramWidget (group_box);
+	histogram_widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	auto* stats_widget = new xf::HistogramStatsWidget (group_box);
+
+	auto* group_layout = new QVBoxLayout (group_box);
+	group_layout->addWidget (histogram_widget);
+	group_layout->addWidget (stats_widget);
+	group_layout->setContentsMargins (margins);
+
+	return { histogram_widget, stats_widget, group_box };
 }
 
 } // namespace xf
