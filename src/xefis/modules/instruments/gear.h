@@ -58,8 +58,12 @@ class Gear:
 	process (xf::Cycle const&) override;
 
 	// Instrument API
+	std::packaged_task<void()>
+	paint (xf::PaintRequest) const override;
+
+  private:
 	void
-	paint (xf::PaintRequest&) const override;
+	async_paint (xf::PaintRequest const&) const;
 
   private:
 	xf::PropertyObserver	_inputs_observer;

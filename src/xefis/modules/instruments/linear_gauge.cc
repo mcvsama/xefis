@@ -31,7 +31,7 @@ BasicLinearGauge::BasicLinearGauge (xf::Graphics const& graphics):
 
 
 void
-BasicLinearGauge::paint (xf::PaintRequest& paint_request, GaugeValues& values) const
+BasicLinearGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);

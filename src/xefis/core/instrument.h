@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <atomic>
+#include <future>
 #include <string>
 #include <type_traits>
 
@@ -50,6 +51,19 @@ class BasicInstrument: public BasicModule
 		AccountingAPI (BasicInstrument&);
 
 		/**
+		 * Frame time of the Screen that this instrument is being painted on.
+		 */
+		[[nodiscard]]
+		si::Time
+		frame_time() const noexcept;
+
+		/**
+		 * Set frame time of the Screen that this instrument is being painted on.
+		 */
+		void
+		set_frame_time (si::Time);
+
+		/**
 		 * Add new measured painting time (time spent in the paint() method).
 		 */
 		void
@@ -76,8 +90,8 @@ class BasicInstrument: public BasicModule
 	/**
 	 * Paint the instrument onto given canvas.
 	 */
-	virtual void
-	paint (PaintRequest&) const = 0;
+	virtual std::packaged_task<void()>
+	paint (PaintRequest) const = 0;
 
 	/**
 	 * Return true if instrument wants to be repainted.
@@ -96,6 +110,7 @@ class BasicInstrument: public BasicModule
   private:
 	std::atomic<bool>					_dirty			{ true };
 	boost::circular_buffer<si::Time>	_painting_times	{ kMaxPaintingTimesBackLog };
+	si::Time							_frame_time		{ 0_s };
 };
 
 
@@ -128,6 +143,20 @@ inline
 BasicInstrument::AccountingAPI::AccountingAPI (BasicInstrument& instrument):
 	_instrument (instrument)
 { }
+
+
+inline si::Time
+BasicInstrument::AccountingAPI::frame_time() const noexcept
+{
+	return _instrument._frame_time;
+}
+
+
+inline void
+BasicInstrument::AccountingAPI::set_frame_time (si::Time frame_time)
+{
+	_instrument._frame_time = frame_time;
+}
 
 
 inline void

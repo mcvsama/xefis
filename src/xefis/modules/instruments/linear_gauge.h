@@ -94,7 +94,7 @@ class BasicLinearGauge:
 	BasicLinearGauge (xf::Graphics const&);
 
 	void
-	paint (xf::PaintRequest&, GaugeValues& value) const;
+	async_paint (xf::PaintRequest const&, GaugeValues&) const;
 
   private:
 	void
@@ -123,8 +123,12 @@ template<class Value>
 		process (xf::Cycle const&) override;
 
 		// Instrument API
+		std::packaged_task<void()>
+		paint (xf::PaintRequest) const override;
+
+	  private:
 		void
-		paint (xf::PaintRequest&) const override;
+		async_paint (xf::PaintRequest const&) const;
 
 	  private:
 		xf::PropertyObserver					_inputs_observer;
@@ -158,8 +162,18 @@ template<class Value>
 
 
 template<class Value>
+	inline std::packaged_task<void()>
+	LinearGauge<Value>::paint (xf::PaintRequest paint_request) const
+	{
+		return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+			async_paint (pr);
+		});
+	}
+
+
+template<class Value>
 	inline void
-	LinearGauge<Value>::paint (xf::PaintRequest& paint_request) const
+	LinearGauge<Value>::async_paint (xf::PaintRequest const& paint_request) const
 	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
@@ -174,7 +188,7 @@ template<class Value>
 		if (io.value)
 			values->inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));
 
-		BasicLinearGauge::paint (paint_request, *values);
+		BasicLinearGauge::async_paint (paint_request, *values);
 	}
 
 #endif

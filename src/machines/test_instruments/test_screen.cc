@@ -22,11 +22,12 @@
 
 
 TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
-	Screen (spec, graphics),
+	Screen (spec, graphics, logger.with_scope ("TestScren")),
 	_graphics (graphics),
-	_work_performer_adi (1, logger.with_scope ("TestScreen").with_scope ("adi")),
-	_work_performer_hsi (1, logger.with_scope ("TestScreen").with_scope ("hsi")),
-	_navaid_storage (navaid_storage)
+	_navaid_storage (navaid_storage),
+	_adi_work_performer (1, logger.with_scope ("ADI")),
+	_hsi_work_performer (1, logger.with_scope ("HSI")),
+	_others_work_performer (1, logger.with_scope ("generic"))
 {
 	adi_io->speed_ladder_line_every								= 10;
 	adi_io->speed_ladder_number_every							= 20;
@@ -192,12 +193,12 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::Graphics const& graphics
 void
 TestScreen::create_instruments()
 {
-	_adi.emplace (std::move (adi_io), _graphics, _work_performer_adi, "adi");
-	register_instrument (*_adi);
+	_adi.emplace (std::move (adi_io), _graphics, "adi");
+	register_instrument (*_adi, _adi_work_performer);
 	set (**_adi, { 0.0f, 0.0f, 0.5f, 0.63f });
 
-	_hsi.emplace (std::move (hsi_io), _graphics, _work_performer_hsi, _navaid_storage, "hsi");
-	register_instrument (*_hsi);
+	_hsi.emplace (std::move (hsi_io), _graphics, _navaid_storage, "hsi");
+	register_instrument (*_hsi, _hsi_work_performer);
 	set (**_hsi, { 0.0f, 0.63f, 0.5f, 1.0f - 0.63f });
 
 	{
@@ -240,107 +241,107 @@ TestScreen::create_instruments()
 		// Left engine
 
 		_engine_l_thrust.emplace (std::move (engine_l_thrust_io), _graphics, nullptr, "engine.l.thrust");
-		register_instrument (*_engine_l_thrust);
+		register_instrument (*_engine_l_thrust, _others_work_performer);
 		set_centered (**_engine_l_thrust, { r_start_pos + r_go_left + 0 * r_go_down, ri_size });
 
 		_engine_l_speed.emplace (std::move (engine_l_speed_io), _graphics, to_n1, "engine.l.n1");
-		register_instrument (*_engine_l_speed);
+		register_instrument (*_engine_l_speed, _others_work_performer);
 		set_centered (**_engine_l_speed, { r_start_pos + r_go_left + 1 * r_go_down, ri_size });
 
 		_engine_l_power.emplace (std::move (engine_l_power_io), _graphics, nullptr, "engine.l.power");
-		register_instrument (*_engine_l_power);
+		register_instrument (*_engine_l_power, _others_work_performer);
 		set_centered (**_engine_l_power, { r_start_pos + r_go_left + 2 * r_go_down, ri_size });
 
 		_engine_l_current.emplace (std::move (engine_l_current_io), _graphics, nullptr, "engine.l.current");
-		register_instrument (*_engine_l_current);
+		register_instrument (*_engine_l_current, _others_work_performer);
 		set_centered (**_engine_l_current, { l_start_pos + l_go_current + l_go_left, li_size });
 
 		_engine_l_temperature.emplace (std::move (engine_l_temperature_io), _graphics, to_degrees, "engine.l.temperature");
-		register_instrument (*_engine_l_temperature);
+		register_instrument (*_engine_l_temperature, _others_work_performer);
 		set_centered (**_engine_l_temperature, { l_start_pos + l_go_temperature + l_go_left, li_size });
 
 		_engine_l_voltage.emplace (std::move (engine_l_voltage_io), _graphics, nullptr, "engine.l.voltage");
-		register_instrument (*_engine_l_voltage);
+		register_instrument (*_engine_l_voltage, _others_work_performer);
 		set_centered (**_engine_l_voltage, { l_start_pos + l_go_voltage + l_go_left, li_size });
 
 		_engine_l_vibration.emplace (std::move (engine_l_vibration_io), _graphics, to_g, "engine.l.vibration");
-		register_instrument (*_engine_l_vibration);
+		register_instrument (*_engine_l_vibration, _others_work_performer);
 		set_centered (**_engine_l_vibration, { l_start_pos + l_go_vibration + l_go_left, li_size });
 
 		// Right engine
 
 		_engine_r_thrust.emplace (std::move (engine_r_thrust_io), _graphics, nullptr, "engine.r.thrust");
-		register_instrument (*_engine_r_thrust);
+		register_instrument (*_engine_r_thrust, _others_work_performer);
 		set_centered (**_engine_r_thrust, { r_start_pos + r_go_right + 0 * r_go_down, ri_size });
 
 		_engine_r_speed.emplace (std::move (engine_r_speed_io), _graphics, to_n1, "engine.r.n1");
-		register_instrument (*_engine_r_speed);
+		register_instrument (*_engine_r_speed, _others_work_performer);
 		set_centered (**_engine_r_speed, { r_start_pos + r_go_right + 1 * r_go_down, ri_size });
 
 		_engine_r_power.emplace (std::move (engine_r_power_io), _graphics, nullptr, "engine.r.power");
-		register_instrument (*_engine_r_power);
+		register_instrument (*_engine_r_power, _others_work_performer);
 		set_centered (**_engine_r_power, { r_start_pos + r_go_right + 2 * r_go_down, ri_size });
 
 		_engine_r_current.emplace (std::move (engine_r_current_io), _graphics, nullptr, "engine.r.current");
-		register_instrument (*_engine_r_current);
+		register_instrument (*_engine_r_current, _others_work_performer);
 		set_centered (**_engine_r_current, { l_start_pos + l_go_current + l_go_right, li_size });
 
 		_engine_r_temperature.emplace (std::move (engine_r_temperature_io), _graphics, to_degrees, "engine.r.temperature");
-		register_instrument (*_engine_r_temperature);
+		register_instrument (*_engine_r_temperature, _others_work_performer);
 		set_centered (**_engine_r_temperature, { l_start_pos + l_go_temperature + l_go_right, li_size });
 
 		_engine_r_voltage.emplace (std::move (engine_r_voltage_io), _graphics, nullptr, "engine.r.voltage");
-		register_instrument (*_engine_r_voltage);
+		register_instrument (*_engine_r_voltage, _others_work_performer);
 		set_centered (**_engine_r_voltage, { l_start_pos + l_go_voltage + l_go_right, li_size });
 
 		_engine_r_vibration.emplace (std::move (engine_r_vibration_io), _graphics, to_g, "engine.r.vibration");
-		register_instrument (*_engine_r_vibration);
+		register_instrument (*_engine_r_vibration, _others_work_performer);
 		set_centered (**_engine_r_vibration, { l_start_pos + l_go_vibration + l_go_right, li_size });
 
 		// Labels
 
 		_label_thr.emplace (std::move (label_thr_io), _graphics, "eicas.label.thr");
-		register_instrument (*_label_thr);
+		register_instrument (*_label_thr, _others_work_performer);
 		set_centered (**_label_thr, { r_start_pos + 0 * r_go_down + r_go_label, label_size });
 
 		_label_n1.emplace (std::move (label_n1_io), _graphics, "eicas.label.thr");
-		register_instrument (*_label_n1);
+		register_instrument (*_label_n1, _others_work_performer);
 		set_centered (**_label_n1, { r_start_pos + 1 * r_go_down + r_go_label, label_size });
 
 		_label_pwr.emplace (std::move (label_pwr_io), _graphics, "eicas.label.pwr");
-		register_instrument (*_label_pwr);
+		register_instrument (*_label_pwr, _others_work_performer);
 		set_centered (**_label_pwr, { r_start_pos + 2 * r_go_down + r_go_label, label_size });
 
 		_label_amps.emplace (std::move (label_amps_io), _graphics, "eicas.label.amps");
-		register_instrument (*_label_amps);
+		register_instrument (*_label_amps, _others_work_performer);
 		set_centered (**_label_amps, { l_start_pos + l_go_current + l_go_label, label_size });
 
 		_label_temp.emplace (std::move (label_temp_io), _graphics, "eicas.label.temp");
-		register_instrument (*_label_temp);
+		register_instrument (*_label_temp, _others_work_performer);
 		set_centered (**_label_temp, { l_start_pos + l_go_temperature + l_go_label, label_size });
 
 		_label_volts.emplace (std::move (label_volts_io), _graphics, "eicas.label.volts");
-		register_instrument (*_label_volts);
+		register_instrument (*_label_volts, _others_work_performer);
 		set_centered (**_label_volts, { l_start_pos + l_go_voltage + l_go_label, label_size });
 
 		_label_vib.emplace (std::move (label_vib_io), _graphics, "eicas.label.vib");
-		register_instrument (*_label_vib);
+		register_instrument (*_label_vib, _others_work_performer);
 		set_centered (**_label_vib, { l_start_pos + l_go_vibration + l_go_label, label_size });
 
 		_gear.emplace (std::move (gear_io), _graphics, "gear");
-		register_instrument (*_gear);
+		register_instrument (*_gear, _others_work_performer);
 		set_centered (**_gear, { 0.8f, 0.5f, 0.1f, 0.15f });
 
 		_flaps.emplace (std::move (flaps_io), _graphics, "flaps");
-		register_instrument (*_flaps);
+		register_instrument (*_flaps, _others_work_performer);
 		set_centered (**_flaps, { 0.9f, 0.5f, 0.1f, 0.2f });
 
 		_vertical_trim.emplace (std::move (vertical_trim_io), _graphics, "eicas.trim.vertical");
-		register_instrument (*_vertical_trim);
+		register_instrument (*_vertical_trim, _others_work_performer);
 		set_centered (**_vertical_trim, { 0.8f, 0.7f, 0.1f, 0.12f });
 
 		_horizontal_trim.emplace (std::move (horizontal_trim_io), _graphics, "eicas.trim.horizontal");
-		register_instrument (*_horizontal_trim);
+		register_instrument (*_horizontal_trim, _others_work_performer);
 		set_centered (**_horizontal_trim, { 0.9f, 0.7f, 0.08f, 0.12f });
 	}
 
