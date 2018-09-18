@@ -17,6 +17,7 @@
 // Standard:
 #include <cstddef>
 #include <optional>
+#include <vector>
 
 // Lib:
 #include <boost/lexical_cast.hpp>
@@ -51,7 +52,7 @@ class HistogramWidget: public xf::Widget
 	 */
 	template<class Value>
 		void
-		set_data (Histogram<Value> const&);
+		set_data (Histogram<Value> const&, std::vector<Value> marks = {});
 
 	/**
 	 * Show/hide count on the Y-axis.
@@ -78,9 +79,11 @@ class HistogramWidget: public xf::Widget
   private:
 	Style						_style				{ Style::Bars };
 	std::optional<QImage>		_canvas;
+	std::vector<float>			_marks;
 	std::vector<std::size_t>	_bins;
 	std::size_t					_y_max;
 	QString						_x_min_str;
+	QString						_x_mid_str;
 	QString						_x_max_str;
 	QString						_y_max_str;
 	bool						_y_legend_visible	{ false };
@@ -89,15 +92,20 @@ class HistogramWidget: public xf::Widget
 
 template<class Value>
 	inline void
-	HistogramWidget::set_data (Histogram<Value> const& histogram)
+	HistogramWidget::set_data (Histogram<Value> const& histogram, std::vector<Value> marks)
 	{
-		using std::to_string;
-
+		_bins = histogram.bins();
 		_y_max = histogram.y_max();
 		_x_min_str = QString::fromStdString (boost::lexical_cast<std::string> (histogram.x_min()));
+		_x_mid_str = QString::fromStdString (boost::lexical_cast<std::string> (0.5f * (histogram.x_min() + histogram.x_max())));
 		_x_max_str = QString::fromStdString (boost::lexical_cast<std::string> (histogram.x_max()));
 		_y_max_str = QString::fromStdString (boost::lexical_cast<std::string> (histogram.y_max()));
-		_bins = histogram.bins();
+
+		_marks.reserve (marks.size());
+
+		for (auto const& m: marks)
+			_marks.emplace_back (m / (histogram.x_max() - histogram.x_min()));
+
 		_canvas.reset();
 		update();
 	}
