@@ -421,6 +421,7 @@ XEFIS_HEADERS			+= xefis/support/ui/widget.h
 XEFIS_SOURCES			+= xefis/support/ui/histogram_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/histogram_stats_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
+XEFIS_SOURCES			+= xefis/support/ui/widget.cc
 #XEFIS_SOURCES			+= xefis/support/ui/window.cc TODO
 
 ######## /xefis/test ########

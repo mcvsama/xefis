@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <memory>
 
 // Qt:
 #include <QWidget>
@@ -49,6 +50,13 @@ class Widget: public QWidget
 	 */
 	float
 	em_pixels (float ems) const;
+
+  public:
+	/**
+	 * Return simple uniform-color widget.
+	 */
+	static QWidget*
+	create_color_widget (QColor, QWidget* parent);
 };
 
 
