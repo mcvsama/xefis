@@ -100,12 +100,14 @@ class PropertyVirtualInterface
 	 * Return true if property is nil.
 	 * If a fallback-value is set, it will never return true.
 	 */
+	[[nodiscard]]
 	virtual bool
 	is_nil() const noexcept = 0;
 
 	/**
 	 * Alias for is_nil().
 	 */
+	[[nodiscard]]
 	bool
 	operator== (Nil) const
 	{
@@ -115,12 +117,14 @@ class PropertyVirtualInterface
 	/**
 	 * Valid means not nil. Equivalent to !is_nil().
 	 */
+	[[nodiscard]]
 	virtual bool
 	valid() const noexcept = 0;
 
 	/**
 	 * Alias for valid().
 	 */
+	[[nodiscard]]
 	operator bool() const noexcept
 	{
 		return valid();
@@ -129,18 +133,21 @@ class PropertyVirtualInterface
 	/**
 	 * Return timestamp of the value (time when it was modified).
 	 */
+	[[nodiscard]]
 	virtual si::Time
 	modification_timestamp() const noexcept = 0;
 
 	/**
 	 * Return age of the value (time since it was last modified).
 	 */
+	[[nodiscard]]
 	virtual si::Time
 	modification_age() const noexcept = 0;
 
 	/**
 	 * Return timestamp of the last non-nil value.
 	 */
+	[[nodiscard]]
 	virtual si::Time
 	valid_timestamp() const noexcept = 0;
 
@@ -148,12 +155,14 @@ class PropertyVirtualInterface
 	 * Return age of the non-nil value (time since it was last set to a non-nil value).
 	 * Setting a fallback-value will essentially mean setting not-nil.
 	 */
+	[[nodiscard]]
 	virtual si::Time
 	valid_age() const noexcept = 0;
 
 	/**
 	 * Return property path.
 	 */
+	[[nodiscard]]
 	virtual PropertyPath const&
 	path() const noexcept = 0;
 
@@ -161,12 +170,14 @@ class PropertyVirtualInterface
 	 * Return the serial value of the property.
 	 * Serial value changes when property is updated.
 	 */
+	[[nodiscard]]
 	virtual Serial
 	serial() const noexcept = 0;
 
 	/**
 	 * Use-count for this property.
 	 */
+	[[nodiscard]]
 	virtual std::size_t
 	use_count() const noexcept = 0;
 
@@ -179,6 +190,7 @@ class PropertyVirtualInterface
 	/**
 	 * Return true if Blob returned by to_blob() is constant size.
 	 */
+	[[nodiscard]]
 	virtual bool
 	has_constant_blob_size() const noexcept = 0;
 
@@ -186,24 +198,28 @@ class PropertyVirtualInterface
 	 * Return Blob size for this Property, provided that has_constant_blob_size() is true.
 	 * If has_constant_blob_size() gives false, return 0.
 	 */
+	[[nodiscard]]
 	virtual size_t
 	constant_blob_size() const noexcept = 0;
 
 	/**
 	 * Serialize property value to string with given config.
 	 */
+	[[nodiscard]]
 	virtual std::string
 	to_string (PropertyConversionSettings const& = {}) const = 0;
 
 	/**
 	 * Extract numeric value from the property, if applies.
 	 */
+	[[nodiscard]]
 	virtual std::optional<float128_t>
 	to_floating_point (PropertyConversionSettings const& = {}) const = 0;
 
 	/**
 	 * Serializes property value, including nil-flag.
 	 */
+	[[nodiscard]]
 	virtual Blob
 	to_blob() const = 0;
 
@@ -253,30 +269,37 @@ class BasicProperty: virtual public PropertyVirtualInterface
 	/**
 	 * Return property owner (an ModuleIO object). May be nullptr.
 	 */
+	[[nodiscard]]
 	ModuleIO*
 	io() const noexcept;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	si::Time
 	modification_timestamp() const noexcept override;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	si::Time
 	modification_age() const noexcept override;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	si::Time
 	valid_timestamp() const noexcept override;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	si::Time
 	valid_age() const noexcept override;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	PropertyPath const&
 	path() const noexcept override;
 
 	// PropertyVirtualInterface API
+	[[nodiscard]]
 	Serial
 	serial() const noexcept override;
 
@@ -305,12 +328,14 @@ template<class pValue>
 		 * Return contained value.
 		 * Throw exception NilProperty if value is nil and no fallback-value is set.
 		 */
+		[[nodiscard]]
 		Value const&
 		get() const;
 
 		/**
 		 * Alias for get().
 		 */
+		[[nodiscard]]
 		Value const&
 		operator*() const;
 
@@ -318,6 +343,7 @@ template<class pValue>
 		 * Return std::optional that has value or is empty, if this property is nil.
 		 * If fallback-value is set, the returned std::optional will contain the fall-back value, and will never be empty.
 		 */
+		[[nodiscard]]
 		std::optional<Value>
 		get_optional() const;
 
@@ -326,6 +352,7 @@ template<class pValue>
 		 * If property has a fallback-value set, then value_or will never return its argument, it will fall back to the
 		 * fallback-value first.
 		 */
+		[[nodiscard]]
 		Value
 		value_or (Value fallback) const;
 
@@ -336,6 +363,7 @@ template<class pValue>
 		 * Note that only the const accessor is available to prevent accidental mutation of the inner value without Property knowing it
 		 * (and updating modification timestamps, etc).
 		 */
+		[[nodiscard]]
 		Value const*
 		operator->() const;
 
@@ -352,10 +380,12 @@ template<class pValue>
 		set_fallback (std::optional<Value>);
 
 		// BasicProperty API
+		[[nodiscard]]
 		bool
 		is_nil() const noexcept override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		bool
 		valid() const noexcept override;
 

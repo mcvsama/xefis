@@ -186,7 +186,7 @@ template<class T, template<class> class AnyProperty>
 							  !property.valid());
 
 		test_asserts::verify (desc_type<T> ("reading nil property with operator*() throws"),
-							  Exception::catch_and_log (g_null_logger, [&]{ *property; }));
+							  Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*property); }));
 
 		test_asserts::verify (desc_type<T> ("reading nil property with get_optional() returns empty std::optional"),
 							  !property.get_optional().has_value());
@@ -204,7 +204,7 @@ template<class T, template<class> class AnyProperty>
 							  !!property);
 
 		test_asserts::verify (desc_type<T> ("reading " + what + " with operator*() does not throw"),
-							  !Exception::catch_and_log (g_null_logger, [&]{ *property; }));
+							  !Exception::catch_and_log (g_null_logger, [&]{ static_cast<void> (*property); }));
 
 		test_asserts::verify (desc_type<T> ("property's value != test_value"),
 							  *property != test_value);
