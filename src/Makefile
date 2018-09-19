@@ -83,6 +83,13 @@ endif
 #### Makefiles ####
 
 -include Makefile.local
+-include Makefile.local.$(MAKE_CONFIG_PROFILE)
+
+Makefile.local:
+	false
+
+Makefile.local.%:
+	false
 
 ifeq ($(MAKE_CONFIG_DEBUG),1)
 CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
