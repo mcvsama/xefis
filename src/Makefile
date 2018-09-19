@@ -21,7 +21,7 @@ MAKE_CONFIG_DEBUG				:= 0
 # Where Qt is installed?
 MAKE_CONFIG_QT_PREFIX			:= /usr/local
 # Profile name:
-MAKE_CONFIG_PROFILE				:=
+MAKE_CONFIG_PROFILE				?= release
 # Version:
 MAKE_CONFIG_VERSION				:= alpha0.1dev
 # Release version? (no asserts, etc).
@@ -88,15 +88,13 @@ endif
 Makefile.local:
 	false
 
-Makefile.local.%:
+Makefile.local.$(MAKE_CONFIG_PROFILE):
 	false
 
 ifeq ($(MAKE_CONFIG_DEBUG),1)
 CXXFLAGS		+= -O0 -ggdb3 -fno-inline -fno-eliminate-unused-debug-types -D_GLIBCXX_DEBUG
-DEBUG_s = -debug
 else
 CXXFLAGS		+= -O4 -DQT_NO_DEBUG
-DEBUG_s =
 endif
 
 ifneq ($(MAKE_CONFIG_VERBOSE),1)
@@ -110,9 +108,6 @@ endif
 ifeq ($(MAKE_CONFIG_PROFILING),1)
 CXXFLAGS += -pg -fno-omit-frame-pointer
 LDFLAGS += -pg
-PROFILING_s = -profiling
-else
-PROFILING_s =
 endif
 
 ifeq ($(MAKE_CONFIG_RELEASE),1)
@@ -125,6 +120,7 @@ else
 PROFILE_s =
 endif
 
+# TODO remove predefined profiles
 # Predefined profiles:
 ifeq ($(MAKE_CONFIG_PROFILE),rpi)
 CXXFLAGS += -finline -marm -mfpu=vfp -mtune=arm1176jzf-s -march=armv6zk -mfloat-abi=hard -falign-functions=4 -funroll-loops -fomit-frame-pointer
@@ -154,7 +150,7 @@ CXXFLAGS += -fprofile-arcs -ftest-coverage
 LDFLAGS += -fprofile-arcs -ftest-coverage
 endif
 
-dist			= $(MAKE_CONFIG_ARCH)$(PROFILING_s)$(DEBUG_s)$(PROFILE_s)
+dist			= $(MAKE_CONFIG_ARCH)$(PROFILE_s)
 distdir			:= build/$(dist)
 depsdir			= $(distdir)/deps
 objsdir			= $(distdir)/objects
@@ -325,7 +321,4 @@ $(TARGETS):
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 -include $(MAINDEPFILE)
-ifneq ($(DIST),)
-	include Makefile.dist.$(DIST)
-endif
 
