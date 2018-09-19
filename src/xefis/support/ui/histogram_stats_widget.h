@@ -43,9 +43,9 @@ class HistogramStatsWidget: public xf::Widget
 	/**
 	 * Set histogram to use for stats.
 	 */
-	template<class Value>
+	template<class HistogramValue, class CriticalValue>
 		void
-		set_data (Histogram<Value> const&, std::optional<Value> critical_value = {});
+		set_data (Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = {});
 
   private:
 	QLabel*	_min_value;
@@ -58,9 +58,9 @@ class HistogramStatsWidget: public xf::Widget
 };
 
 
-template<class Value>
+template<class HistogramValue, class CriticalValue>
 	inline void
-	HistogramStatsWidget::set_data (Histogram<Value> const& histogram, std::optional<Value> critical_value)
+	HistogramStatsWidget::set_data (Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
 		_min_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.min())));
 		_max_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.max())));
@@ -70,8 +70,8 @@ template<class Value>
 
 		if (critical_value)
 		{
-			_critical_label->setText (QString::fromStdString ("Value > " + boost::lexical_cast<std::string> (*critical_value) + ": "));
-			_critical_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (static_cast<int> (100 * histogram.normalized_percentile_for (*critical_value)))));
+			_critical_label->setText (QString::fromStdString ("> " + boost::lexical_cast<std::string> (*critical_value) + ": "));
+			_critical_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (static_cast<int> (100 * histogram.normalized_percentile_for (*critical_value)))) + "%");
 		}
 		else
 		{

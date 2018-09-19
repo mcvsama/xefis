@@ -74,7 +74,7 @@ template<class Value>
 		 * Return bin index for given value.
 		 */
 		std::size_t
-		bin_index (Value const&);
+		bin_index (Value const&) const;
 
 		/**
 		 * Minimum recorded value.
@@ -107,11 +107,13 @@ template<class Value>
 		stddev() const noexcept;
 
 		/**
-		 * Return "normalized" percentile (in range 0..1) of values above
-		 * given argument.
+		 * Return "normalized" percentile (in range 0..1) of values above given argument.
+		 * That is what fraction of all samples constitute values above given [equal_or_above] value.
+		 *
+		 * It counts data already put in bins, so it's not exact. Its precision depends on bin width.
 		 */
 		float
-		normalized_percentile_for (Value above) const;
+		normalized_percentile_for (Value equal_or_above) const;
 
 	  private:
 		Value const	_bin_width;
@@ -210,7 +212,7 @@ template<class Value>
 
 template<class Value>
 	inline std::size_t
-	Histogram<Value>::bin_index (Value const& value)
+	Histogram<Value>::bin_index (Value const& value) const
 	{
 		return (value - _x_min) / _bin_width;
 	}
@@ -258,10 +260,14 @@ template<class Value>
 
 template<class Value>
 	inline float
-	Histogram<Value>::normalized_percentile_for (Value above) const
+	Histogram<Value>::normalized_percentile_for (Value equal_or_above) const
 	{
-		// TODO
-		return 0.0f;
+		std::size_t count = 0;
+
+		for (std::size_t b = bin_index (equal_or_above); b < _bins.size(); ++b)
+			count += _bins[b];
+
+		return 1.0f * count / n_samples();
 	}
 
 } // namespace xf

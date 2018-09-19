@@ -91,7 +91,7 @@ ModuleWidget::refresh()
 		xf::Histogram<si::Quantity<si::Millisecond>> histogram (processing_times.begin(), processing_times.end(), 0.01_ms, 0.0_ms, 1_ms);
 
 		_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
-		_processing_time_stats->set_data (histogram);
+		_processing_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.cycle_time()));
 	}
 
 	if (_painting_time_histogram)
@@ -101,7 +101,7 @@ ModuleWidget::refresh()
 		xf::Histogram<si::Quantity<si::Millisecond>> histogram (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
-		_painting_time_stats->set_data (histogram);
+		_painting_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.frame_time()));
 	}
 }
 
