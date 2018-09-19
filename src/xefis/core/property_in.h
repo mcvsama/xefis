@@ -89,6 +89,7 @@ template<class pValue>
 		operator= (PropertyIn<Value> const&) = delete;
 
 		// Move operator
+		[[nodiscard]]
 		PropertyIn<Value>&
 		operator= (PropertyIn<Value>&&) = default;
 
@@ -110,6 +111,7 @@ template<class pValue>
 			operator<< (ConstantSource<ConstantValue> const&);
 
 		// BasicProperty API
+		[[nodiscard]]
 		std::size_t
 		use_count() const noexcept override;
 
@@ -118,22 +120,27 @@ template<class pValue>
 		fetch (Cycle const&) override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		bool
 		has_constant_blob_size() const noexcept override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		size_t
 		constant_blob_size() const noexcept override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		std::string
 		to_string (PropertyConversionSettings const& = {}) const override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		std::optional<float128_t>
 		to_floating_point (PropertyConversionSettings const& = {}) const override;
 
 		// BasicProperty API
+		[[nodiscard]]
 		Blob
 		to_blob() const override;
 
