@@ -13,6 +13,7 @@
 
 // Standard:
 #include <cstddef>
+#include <optional>
 
 // Qt:
 #include <QBoxLayout>
@@ -38,8 +39,10 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
 
-	QLabel* name_label = new QLabel (full_name_str.toHtmlEscaped());
-	name_label->setStyleSheet ("QLabel { margin: 0.25em; }");
+	QString module_type = _instrument ? "Instrument " : "Module ";
+	QColor color = _instrument ? QColor (0xd8, 0x90, 0) : Qt::blue;
+	QLabel* name_label = new QLabel (module_type + full_name_str.toHtmlEscaped(), this);
+	name_label->setStyleSheet ("QLabel { margin: 0.15em; }");
 	name_label->setAlignment (Qt::AlignLeft);
 	QFont font = name_label->font();
 	font.setPointSize (1.4 * font.pointSize());
@@ -67,10 +70,17 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 		tabs->addTab (new OwnershipBreaker (module_config_widget, this), "Module config");
 	}
 
-	QVBoxLayout* layout = new QVBoxLayout (this);
+	auto* color_widget = Widget::create_color_widget (color, this);
+	color_widget->setFixedHeight (em_pixels (0.3f));
+
+	auto* label_layout = new QVBoxLayout();
+	label_layout->addWidget (color_widget);
+	label_layout->addWidget (name_label);
+
+	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->setSpacing (WidgetSpacing);
-	layout->addWidget (name_label);
+	layout->addLayout (label_layout);
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
