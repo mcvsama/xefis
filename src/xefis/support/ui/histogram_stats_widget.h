@@ -71,7 +71,7 @@ template<class HistogramValue, class CriticalValue>
 		if (critical_value)
 		{
 			_critical_label->setText (QString::fromStdString ("> " + boost::lexical_cast<std::string> (*critical_value) + ": "));
-			_critical_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (static_cast<int> (100 * histogram.normalized_percentile_for (*critical_value)))) + "%");
+			_critical_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (100 * histogram.normalized_percentile_for (*critical_value))) + "%");
 		}
 		else
 		{
