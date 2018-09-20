@@ -2084,19 +2084,13 @@ HSI::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 HSI::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
-	});
-}
-
-
-void
-HSI::async_paint (xf::PaintRequest const& paint_request) const
-{
 	auto parameters = *_parameters.lock();
-	auto resize_cache = *_resize_cache.lock();
 	auto current_navaids = *_current_navaids.lock();
 	auto mutable_ = *_mutable.lock();
-	hsi_detail::PaintingWork (paint_request, _instrument_support, _navaid_storage, parameters, resize_cache, current_navaids, mutable_).paint();
+	auto resize_cache_lock = _resize_cache.lock();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = parameters, rc_lock = std::move (resize_cache_lock), cn = current_navaids, mu = mutable_]() mutable {
+		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, cn, mu).paint();
+	});
 }
 

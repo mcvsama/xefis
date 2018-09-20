@@ -832,9 +832,6 @@ class ADI: public xf::Instrument<ADI_IO>
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
-
-	void
 	compute_fpv();
 
   private:

@@ -500,10 +500,6 @@ class HSI: public xf::Instrument<HSI_IO>
 	paint (xf::PaintRequest) const override;
 
   private:
-	void
-	async_paint (xf::PaintRequest const&) const;
-
-  private:
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;
 	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;
