@@ -162,7 +162,7 @@ template<
  *   // [C] = [°F] * 5/9 - 32 * 5/9
  *   typedef ScaledUnit<C, std::ratio<5, 9>, std::ratio<-32 * 5, 9>> F;
  */
-template<class pExistingUnit, class pScale, class pOffset= std::ratio<0>>
+template<class pExistingUnit, class pScale, class pOffset = std::ratio<0>>
 	using ScaledUnit =
 		Unit<
 			pExistingUnit::E0,
