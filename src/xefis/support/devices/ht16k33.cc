@@ -153,6 +153,7 @@ HT16K33::HT16K33 (i2c::Device&& i2c_device, Logger const& logger):
 	QObject::connect (_reinitialize_timer, SIGNAL (timeout()), this, SLOT (initialize()));
 
 	_scan_timer = new QTimer (this);
+	_scan_timer->setTimerType (Qt::PreciseTimer);
 	_scan_timer->setSingleShot (false);
 	QObject::connect (_scan_timer, SIGNAL (timeout()), this, SLOT (pool_keys()));
 

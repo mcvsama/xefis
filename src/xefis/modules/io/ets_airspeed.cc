@@ -58,6 +58,7 @@ ETSAirspeed::initialize()
 	_device_initialization_timer->start();
 
 	_periodic_read_timer = new QTimer (this);
+	_periodic_read_timer->setTimerType (Qt::PreciseTimer);
 	_periodic_read_timer->setInterval (io.read_interval->in<Millisecond>());
 	_periodic_read_timer->setSingleShot (false);
 	QObject::connect (_periodic_read_timer, SIGNAL (timeout()), this, SLOT (read()));

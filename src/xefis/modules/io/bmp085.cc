@@ -73,21 +73,25 @@ BMP085::hw_initialize()
 		_md = read_s16 (MD_REG);
 
 		_temperature_timer = std::make_unique<QTimer> (this);
+		_temperature_timer->setTimerType (Qt::PreciseTimer);
 		_temperature_timer->setInterval (io.temperature_update_interval->in<Millisecond>());
 		_temperature_timer->setSingleShot (false);
 		QObject::connect (_temperature_timer.get(), SIGNAL (timeout()), this, SLOT (request_temperature()));
 
 		_temperature_ready_timer = std::make_unique<QTimer> (this);
-		_temperature_ready_timer->setInterval (5);
+		_temperature_ready_timer->setTimerType (Qt::PreciseTimer);
+		_temperature_ready_timer->setInterval ((5_ms).in<si::Millisecond>());
 		_temperature_ready_timer->setSingleShot (true);
 		QObject::connect (_temperature_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_temperature()));
 
 		_pressure_timer = std::make_unique<QTimer> (this);
+		_pressure_timer->setTimerType (Qt::PreciseTimer);
 		_pressure_timer->setInterval (io.pressure_update_interval->in<Millisecond>());
 		_pressure_timer->setSingleShot (false);
 		QObject::connect (_pressure_timer.get(), SIGNAL (timeout()), this, SLOT (request_pressure()));
 
 		_pressure_ready_timer = std::make_unique<QTimer> (this);
+		_pressure_ready_timer->setTimerType (Qt::PreciseTimer);
 		_pressure_ready_timer->setInterval (_pressure_waiting_times[_oversampling].in<Millisecond>());
 		_pressure_ready_timer->setSingleShot (true);
 		QObject::connect (_pressure_ready_timer.get(), SIGNAL (timeout()), this, SLOT (read_pressure()));

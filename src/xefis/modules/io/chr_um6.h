@@ -19,6 +19,9 @@
 #include <string>
 #include <memory>
 
+// Qt:
+#include <QTimer>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
