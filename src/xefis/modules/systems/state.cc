@@ -200,7 +200,7 @@ State::do_save_state (QString content, QString file_name)
 	if (::rename (temp_file_name.toUtf8(), target_file_name.toUtf8()) == -1)
 	{
 		char buf[256];
-		strerror_r (errno, buf, std::size (buf));
+		static_cast<void> (strerror_r (errno, buf, std::size (buf)));
 		throw xf::IOError (QString ("couldn't save settings file: %1").arg (buf));
 	}
 }
