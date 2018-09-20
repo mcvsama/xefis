@@ -3312,17 +3312,9 @@ ADI::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 ADI::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = *_parameters.lock()] {
+		_painting_work.paint (pr, pp);
 	});
-}
-
-
-void
-ADI::async_paint (xf::PaintRequest const& paint_request) const
-{
-	auto cloned_params = *_parameters.lock();
-	_painting_work.paint (paint_request, cloned_params);
 }
 
 
