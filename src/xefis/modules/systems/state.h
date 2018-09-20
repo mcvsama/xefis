@@ -19,9 +19,6 @@
 #include <future>
 #include <map>
 
-// Qt:
-#include <QtCore/QTimer>
-
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
@@ -108,7 +105,6 @@ class State: public xf::Module<StateIO>
 
   private:
 	xf::Logger				_logger;
-	std::unique_ptr<QTimer>	_save_delay_timer;
 	std::future<void>		_save_future;
 };
 
