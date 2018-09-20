@@ -51,6 +51,16 @@ class VerticalTrim:
 	public xf::Instrument<VerticalTrimIO>,
 	private xf::InstrumentSupport
 {
+  private:
+	struct PaintingParams
+	{
+		std::optional<QString>	label;
+		std::optional<double>	trim_value;
+		std::optional<double>	trim_reference;
+		std::optional<double>	trim_reference_minimum;
+		std::optional<double>	trim_reference_maximum;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -66,13 +76,13 @@ class VerticalTrim:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
 	static QString
 	stringify (double value);
 
   private:
-	xf::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver _inputs_observer;
 };
 
 #endif

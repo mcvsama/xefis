@@ -83,9 +83,6 @@ class BasicLinearGauge:
 		float					font_scale;
 		std::string				note_str;
 		bool					inbound;
-
-		// Cached struff, to prevent allocation on heap on every repaint:
-		std::vector<PointInfo>	point_infos;
 	};
 
   protected:
@@ -94,14 +91,18 @@ class BasicLinearGauge:
 	BasicLinearGauge (xf::Graphics const&);
 
 	void
-	async_paint (xf::PaintRequest const&, GaugeValues&) const;
+	async_paint (xf::PaintRequest const&, GaugeValues const&) const;
 
   private:
 	void
-	paint_indicator (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0, QPointF p1) const;
+	paint_indicator (GaugeValues const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0, QPointF p1) const;
 
 	void
-	paint_text (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0) const;
+	paint_text (GaugeValues const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q, QPointF p0) const;
+
+  private:
+	// Cached stuff:
+	xf::Synchronized<std::vector<PointInfo>> mutable _point_infos;
 };
 
 
@@ -127,13 +128,8 @@ template<class Value>
 		paint (xf::PaintRequest) const override;
 
 	  private:
-		void
-		async_paint (xf::PaintRequest const&) const;
-
-	  private:
-		xf::PropertyObserver					_inputs_observer;
-		xf::Synchronized<GaugeValues> mutable	_values;
-		Converter								_converter;
+		xf::PropertyObserver	_inputs_observer;
+		Converter				_converter;
 	};
 
 
@@ -165,30 +161,22 @@ template<class Value>
 	inline std::packaged_task<void()>
 	LinearGauge<Value>::paint (xf::PaintRequest paint_request) const
 	{
-		return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-			async_paint (pr);
-		});
-	}
-
-
-template<class Value>
-	inline void
-	LinearGauge<Value>::async_paint (xf::PaintRequest const& paint_request) const
-	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
 
-		auto values = _values.lock();
-		values->get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
-		values->mirrored_style = *io.mirrored_style;
-		values->line_hidden = *io.line_hidden;
-		values->font_scale = *io.font_scale;
-		values->note_str = *io.note;
+		GaugeValues values;
+		values.get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
+		values.mirrored_style = *io.mirrored_style;
+		values.line_hidden = *io.line_hidden;
+		values.font_scale = *io.font_scale;
+		values.note_str = *io.note;
 
 		if (io.value)
-			values->inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));
+			values.inbound = xf::Range { 0.0f, 1.0f }.includes (xf::renormalize (*io.value, range, kNormalizedRange));
 
-		BasicLinearGauge::async_paint (paint_request, *values);
+		return std::packaged_task<void()> ([this, pr = std::move (paint_request), gv = std::move (values)] {
+			async_paint (pr, gv);
+		});
 	}
 
 #endif

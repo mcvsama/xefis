@@ -51,28 +51,37 @@ Gear::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 Gear::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.requested_down = io.requested_down.get_optional();
+	params.nose_up = io.nose_up.get_optional();
+	params.nose_down = io.nose_down.get_optional();
+	params.left_up = io.left_up.get_optional();
+	params.left_down = io.left_down.get_optional();
+	params.right_up = io.right_up.get_optional();
+	params.right_down = io.right_down.get_optional();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-Gear::async_paint (xf::PaintRequest const& paint_request) const
+Gear::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
 
-	bool v_requested_down = io.requested_down.value_or (false);
-	bool v_nose_up = io.nose_up.value_or (false);
-	bool v_nose_down = io.nose_down.value_or (false);
-	bool v_left_up = io.left_up.value_or (false);
-	bool v_left_down = io.left_down.value_or (false);
-	bool v_right_up = io.right_up.value_or (false);
-	bool v_right_down = io.right_down.value_or (false);
+	bool v_requested_down = pp.requested_down.value_or (false);
+	bool v_nose_up = pp.nose_up.value_or (false);
+	bool v_nose_down = pp.nose_down.value_or (false);
+	bool v_left_up = pp.left_up.value_or (false);
+	bool v_left_down = pp.left_down.value_or (false);
+	bool v_right_up = pp.right_up.value_or (false);
+	bool v_right_down = pp.right_down.value_or (false);
 
 	// If everything retracted according to setting, hide the widget:
-	if (io.requested_down && !v_requested_down &&
+	if (pp.requested_down && !v_requested_down &&
 		v_nose_up && !v_nose_down &&
 		v_left_up && !v_left_down &&
 		v_right_up && !v_right_down)
@@ -120,7 +129,7 @@ Gear::async_paint (xf::PaintRequest const& paint_request) const
 	};
 
 	auto should_paint_graybox = [&](bool gear_up, bool gear_down) -> bool {
-		return io.requested_down.is_nil() || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
+		return !pp.requested_down || (v_requested_down && (gear_up || !gear_down)) || (!v_requested_down && (gear_down || !gear_up));
 	};
 
 	painter.setBrush (Qt::NoBrush);

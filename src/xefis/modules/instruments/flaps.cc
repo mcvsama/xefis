@@ -46,21 +46,27 @@ Flaps::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 Flaps::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.maximum_angle = *io.maximum_angle;
+	params.hide_retracted = *io.hide_retracted;
+	params.current_angle = io.current_angle.get_optional();
+	params.set_angle = io.set_angle.get_optional();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-Flaps::async_paint (xf::PaintRequest const& paint_request) const
+Flaps::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
 
-	if (*io.hide_retracted)
-		if (io.current_angle && *io.current_angle < 0.1_deg)
-			if (io.set_angle && *io.set_angle < 0.5_deg)
+	if (pp.hide_retracted)
+		if (pp.current_angle && *pp.current_angle < 0.1_deg)
+			if (pp.set_angle && *pp.set_angle < 0.5_deg)
 				return;
 
 	QColor cyan { 0x44, 0xdd, 0xff };
@@ -85,23 +91,23 @@ Flaps::async_paint (xf::PaintRequest const& paint_request) const
 	painter.drawRect (block);
 
 	// Filled block showing current value:
-	if (io.current_angle)
+	if (pp.current_angle)
 	{
-		Angle current = xf::clamped<Angle> (*io.current_angle, 0_deg, *io.maximum_angle);
+		Angle current = xf::clamped<Angle> (*pp.current_angle, 0_deg, pp.maximum_angle);
 		QRectF filled_block = block;
-		filled_block.setHeight (current / *io.maximum_angle * filled_block.height());
+		filled_block.setHeight (current / pp.maximum_angle * filled_block.height());
 		painter.setPen (Qt::NoPen);
 		painter.setBrush (Qt::white);
 		painter.drawRect (filled_block);
 	}
 
 	// Target setting in green:
-	if (io.set_angle)
+	if (pp.set_angle)
 	{
 		// Green line:
-		Angle setting = xf::clamped<Angle> (*io.set_angle, 0_deg, *io.maximum_angle);
+		Angle setting = xf::clamped<Angle> (*pp.set_angle, 0_deg, pp.maximum_angle);
 		float w = 0.3f * block.width();
-		float s = block.top() + setting / *io.maximum_angle * block.height();
+		float s = block.top() + setting / pp.maximum_angle * block.height();
 		painter.setPen (aids->get_pen (Qt::green, 2.f));
 		painter.paint (aids->default_shadow(), [&] {
 			painter.drawLine (QPointF (block.left() - w, s), QPointF (block.right() + w, s));

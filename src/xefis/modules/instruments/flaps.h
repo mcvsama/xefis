@@ -50,6 +50,15 @@ class Flaps:
 	public xf::Instrument<FlapsIO>,
 	private xf::InstrumentSupport
 {
+  private:
+	struct PaintingParams
+	{
+		si::Angle					maximum_angle;
+		bool						hide_retracted;
+		std::optional<si::Angle>	current_angle;
+		std::optional<si::Angle>	set_angle;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -65,10 +74,10 @@ class Flaps:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
   private:
-	xf::PropertyObserver	_inputs_observer;
+	xf::PropertyObserver _inputs_observer;
 };
 
 #endif

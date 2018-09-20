@@ -31,6 +31,7 @@
 #include <xefis/core/property_observer.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
+#include <xefis/utility/synchronized.h>
 
 
 class Datatable:
@@ -56,16 +57,28 @@ class Datatable:
 			  std::optional<QColor> value_color);
 
 		/**
-		 * Return value to be painted.
+		 * Read the property value and cache it atomically, so that stringify()
+		 * can be later called from another thread.
 		 */
+		void
+		read();
+
+		/**
+		 * Return value to be painted.
+		 * \threadsafe
+		 */
+		[[nodiscard]]
 		QString
-		stringify() const;
+		stringified() const;
 
 	  public:
 		std::string					label;
 		QColor						label_color	{ Qt::white };
 		QColor						value_color	{ Qt::white };
 		xf::BasicProperty const&	property;
+
+	  private:
+		xf::Synchronized<QString>	_stringified;
 	};
 
   public:

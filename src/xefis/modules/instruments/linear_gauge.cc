@@ -31,7 +31,7 @@ BasicLinearGauge::BasicLinearGauge (xf::Graphics const& graphics):
 
 
 void
-BasicLinearGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues& values) const
+BasicLinearGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues const& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
@@ -58,7 +58,7 @@ BasicLinearGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValue
 
 
 void
-BasicLinearGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF p0, QPointF p1) const
+BasicLinearGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF p0, QPointF p1) const
 {
 	float const r = 6.5f * q;
 	float const kValueSpanLength = (p1 - p0).y();
@@ -87,32 +87,32 @@ BasicLinearGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 		QColor const no_color;
 		float const no_tick_len {};
 		float const tick_dir = 1.0f;
-		auto& point_infos = values.point_infos;
+		auto point_infos = _point_infos.lock();
 
-		point_infos.clear();
-		point_infos.push_back ({ PointInfo::Minimums, 0.0f, no_pen, no_tick_len, false });
+		point_infos->clear();
+		point_infos->push_back ({ PointInfo::Minimums, 0.0f, no_pen, no_tick_len, false });
 
 		if (minimum_critical_length)
-			point_infos.push_back ({ PointInfo::Minimums, *minimum_critical_length, critical_pen, tick_dir * 0.2f * r, true });
+			point_infos->push_back ({ PointInfo::Minimums, *minimum_critical_length, critical_pen, tick_dir * 0.2f * r, true });
 
 		if (minimum_warning_length)
-			point_infos.push_back ({ PointInfo::Minimums, *minimum_warning_length, warning_pen, tick_dir * (minimum_critical_length ? 0.1f : 0.2f) * r, false });
+			point_infos->push_back ({ PointInfo::Minimums, *minimum_warning_length, warning_pen, tick_dir * (minimum_critical_length ? 0.1f : 0.2f) * r, false });
 
 		if (maximum_warning_length)
-			point_infos.push_back ({ PointInfo::Maximums, *maximum_warning_length, warning_pen, tick_dir * (maximum_critical_length ? 0.1f : 0.2f) * r, false });
+			point_infos->push_back ({ PointInfo::Maximums, *maximum_warning_length, warning_pen, tick_dir * (maximum_critical_length ? 0.1f : 0.2f) * r, false });
 
 		if (maximum_critical_length)
-			point_infos.push_back ({ PointInfo::Maximums, *maximum_critical_length, critical_pen, tick_dir * 0.2f * r, true });
+			point_infos->push_back ({ PointInfo::Maximums, *maximum_critical_length, critical_pen, tick_dir * 0.2f * r, true });
 
-		point_infos.push_back ({ PointInfo::Maximums, kValueSpanLength, no_pen, no_tick_len, false });
+		point_infos->push_back ({ PointInfo::Maximums, kValueSpanLength, no_pen, no_tick_len, false });
 
 		// Actual painting:
-		for (size_t i = 0u; i < point_infos.size() - 1; ++i)
+		for (size_t i = 0u; i < point_infos->size() - 1; ++i)
 		{
-			PointInfo const prev = point_infos[i];
-			PointInfo const next = point_infos[i + 1];
+			PointInfo const prev = (*point_infos)[i];
+			PointInfo const next = (*point_infos)[i + 1];
 			bool const add_min_gap = (prev.zone == PointInfo::Minimums) && (i > 0);
-			bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos.size() - 2);
+			bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos->size() - 2);
 
 			painter.save_context ([&] {
 				auto const length_0 = prev.length - (add_min_gap ? length_gap : 0.0f);
@@ -194,7 +194,7 @@ BasicLinearGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 
 
 void
-BasicLinearGauge::paint_text (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF const p0) const
+BasicLinearGauge::paint_text (GaugeValues const& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q, QPointF const p0) const
 {
 	QFont font (aids.font_5.font);
 	font.setPixelSize (font.pixelSize() * values.font_scale);

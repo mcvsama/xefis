@@ -82,9 +82,6 @@ class BasicRadialGauge:
 		std::optional<float>		normalized_target;
 		std::optional<float>		normalized_automatic;
 		float						dial_scale				{ 1.f };
-
-		// Cached struff, to prevent allocation on heap on every repaint:
-		std::vector<PointInfo>		point_infos;
 	};
 
   protected:
@@ -93,17 +90,19 @@ class BasicRadialGauge:
 	BasicRadialGauge (xf::Graphics const&);
 
 	void
-	async_paint (xf::PaintRequest const&, GaugeValues&) const;
+	async_paint (xf::PaintRequest const&, GaugeValues const&) const;
 
   private:
 	void
-	paint_text (GaugeValues& values, xf::PaintRequest const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q) const;
+	paint_text (GaugeValues const&, xf::PaintRequest const&, xf::InstrumentAids&, xf::InstrumentPainter&, float q) const;
 
 	void
-	paint_indicator (GaugeValues& values, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
+	paint_indicator (GaugeValues const&, xf::InstrumentAids&, xf::InstrumentPainter&, float r) const;
 
   private:
-	xf::Synchronized<std::optional<float>> mutable _box_text_width;
+	// Cached struff, to prevent allocation on heap on every repaint:
+	xf::Synchronized<std::optional<float>> mutable		_box_text_width;
+	xf::Synchronized<std::vector<PointInfo>> mutable	_point_infos;
 };
 
 
@@ -129,13 +128,8 @@ template<class Value>
 		paint (xf::PaintRequest) const override;
 
 	  private:
-		void
-		async_paint (xf::PaintRequest const&) const;
-
-	  private:
-		xf::PropertyObserver					_inputs_observer;
-		xf::Synchronized<GaugeValues> mutable	_values;
-		Converter								_converter;
+		xf::PropertyObserver	_inputs_observer;
+		Converter				_converter;
 	};
 
 
@@ -169,37 +163,29 @@ template<class Value>
 	inline std::packaged_task<void()>
 	RadialGauge<Value>::paint (xf::PaintRequest paint_request) const
 	{
-		return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-			async_paint (pr);
-		});
-	}
-
-
-template<class Value>
-	inline void
-	RadialGauge<Value>::async_paint (xf::PaintRequest const& paint_request) const
-	{
 		auto& io = this->io;
 		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
 
-		auto values = _values.lock();
-		values->get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
-		values->dial_scale = *io.dial_scale;
+		GaugeValues values;
+		values.get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());
+		values.dial_scale = *io.dial_scale;
 
 		if (io.reference)
 		{
 			auto v = (_converter && io.reference) ? _converter (*io.reference) : io.reference.to_floating_point();
-			values->reference_str = BasicGauge::stringify (v, *io.format, io.precision);
-			values->normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
+			values.reference_str = BasicGauge::stringify (v, *io.format, io.precision);
+			values.normalized_reference = xf::renormalize (xf::clamped (*io.reference, range), range, kNormalizedRange);
 		}
 
 		if (io.target)
-			values->normalized_target = xf::renormalize (xf::clamped (*io.target, range), range, kNormalizedRange);
+			values.normalized_target = xf::renormalize (xf::clamped (*io.target, range), range, kNormalizedRange);
 
 		if (io.automatic)
-			values->normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
+			values.normalized_automatic = xf::renormalize (xf::clamped (*io.automatic, range), range, kNormalizedRange);
 
-		BasicRadialGauge::async_paint (paint_request, *values);
+		return std::packaged_task<void()> ([this, pr = std::move (paint_request), gv = std::move (values)] {
+			async_paint (pr, gv);
+		});
 	}
 
 #endif
