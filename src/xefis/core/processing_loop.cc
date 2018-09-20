@@ -37,6 +37,7 @@ ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instan
 {
 	_loop_timer = new QTimer (this);
 	_loop_timer->setSingleShot (false);
+	_loop_timer->setTimerType (Qt::PreciseTimer);
 	_loop_timer->setInterval (_loop_period.in<Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
 

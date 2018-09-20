@@ -92,7 +92,8 @@ Accounting::Accounting (Logger const& logger):
 	_logger << "Creating Accounting" << std::endl;
 	_latency_check_timer = new QTimer (this);
 	_latency_check_timer->setSingleShot (false);
-	_latency_check_timer->setInterval (10);
+	_latency_check_timer->setTimerType (Qt::PreciseTimer);
+	_latency_check_timer->setInterval ((10_ms).in<si::Millisecond>());
 	QObject::connect (_latency_check_timer, SIGNAL (timeout()), this, SLOT (latency_check()));
 	_latency_check_timer->start();
 }

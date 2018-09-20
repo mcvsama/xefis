@@ -27,6 +27,7 @@ TrimControl::TrimControl (std::unique_ptr<TrimControlIO> module_io, xf::SoundMan
 	_sound_manager (sound_manager)
 {
 	_timer = std::make_unique<QTimer>();
+	_timer->setTimerType (Qt::PreciseTimer);
 	_timer->setInterval (180);
 	_timer->setSingleShot (false);
 	QObject::connect (_timer.get(), &QTimer::timeout, std::bind (&TrimControl::update_trim, this));

@@ -61,6 +61,7 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Logger const& 
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
+	_refresh_timer->setTimerType (Qt::PreciseTimer);
 	_refresh_timer->setInterval ((1.0 / _screen_spec.refresh_rate()).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &Screen::refresh);
 	_refresh_timer->start();

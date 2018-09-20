@@ -35,6 +35,7 @@ FlapsControl::FlapsControl (std::unique_ptr<FlapsControlIO> module_io, xf::Airfr
 		throw xf::BadConfiguration ("missing flaps configuration");
 
 	_timer = std::make_unique<QTimer>();
+	_timer->setTimerType (Qt::PreciseTimer);
 	_timer->setInterval (kUpdateInterval.in<Millisecond>());
 	_timer->setSingleShot (false);
 	QObject::connect (_timer.get(), &QTimer::timeout, std::bind (&FlapsControl::update_flap_position, this));

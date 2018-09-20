@@ -502,6 +502,7 @@ Link::Link (std::unique_ptr<LinkIO> module_io, std::unique_ptr<LinkProtocol> pro
 	{
 		_output_timer = new QTimer (this);
 		_output_timer->setSingleShot (false);
+		_output_timer->setTimerType (Qt::PreciseTimer);
 		_output_timer->setInterval (1000_Hz / *io.send_frequency);
 		QObject::connect (_output_timer, SIGNAL (timeout()), this, SLOT (send_output()));
 		_output_timer->start();
