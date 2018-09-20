@@ -648,19 +648,20 @@ class VelocityLadder
 	xf::Synchronized<VelocityLadder*> mutable
 				_mutable_this { this };
 
-	QTransform	_transform;
-	Velocity	_min_shown;
-	Velocity	_max_shown;
-	int			_rounded_speed;
-	QRectF		_ladder_rect;
-	QPen		_ladder_pen;
-	QRectF		_black_box_rect;
-	QPen		_black_box_pen;
-	QPen		_scale_pen;
-	QPen		_speed_bug_pen;
-	float		_margin;
-	int			_digits;
-	QPolygonF	_bug_shape;
+	QTransform		_transform;
+	Velocity		_min_shown;
+	Velocity		_max_shown;
+	int				_rounded_speed;
+	QRectF			_ladder_rect;
+	QPainterPath	_ladder_clip_path;
+	QPen			_ladder_pen;
+	QRectF			_black_box_rect;
+	QPen			_black_box_pen;
+	QPen			_scale_pen;
+	QPen			_speed_bug_pen;
+	float			_margin;
+	int				_digits;
+	QPolygonF		_bug_shape;
 };
 
 
@@ -724,25 +725,28 @@ class AltitudeLadder
 
   private:
 	xf::Synchronized<AltitudeLadder*> mutable
-				_mutable_this { this };
+						_mutable_this { this };
 
-	QTransform	_transform;
-	Length		_min_shown;
-	Length		_max_shown;
-	int			_rounded_altitude;
-	QRectF		_ladder_rect;
-	QPen		_ladder_pen;
-	QRectF		_black_box_rect;
-	QRectF		_metric_box_rect;
-	QPen		_black_box_pen;
-	QPen		_scale_pen_1;
-	QPen		_scale_pen_2; // Bold one, each 500 ft
-	QPen		_negative_altitude_pen;
-	QPen		_altitude_bug_pen;
-	QPen		_ldg_alt_pen;
-	QRectF		_b_digits_box;
-	QRectF		_s_digits_box;
-	float		_margin;
+	QTransform			_transform;
+	Length				_min_shown;
+	Length				_max_shown;
+	int					_rounded_altitude;
+	QRectF				_ladder_rect;
+	QPainterPath		_ladder_clip_path;
+	QPainterPath		_decision_height_clip_path;
+	QPen				_ladder_pen;
+	QRectF				_black_box_rect;
+	QRectF				_metric_box_rect;
+	QPen				_black_box_pen;
+	QPen				_scale_pen_1;
+	QPen				_scale_pen_2; // Bold one, each 500 ft
+	QPen				_negative_altitude_pen;
+	QPen				_altitude_bug_pen;
+	QPen				_ldg_alt_pen;
+	QRectF				_b_digits_box;
+	QRectF				_s_digits_box;
+	float				_margin;
+	std::optional<bool>	_previous_show_metric;
 };
 
 
