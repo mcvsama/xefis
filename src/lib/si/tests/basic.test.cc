@@ -24,8 +24,8 @@
 #include "../si.h"
 
 
-namespace xf {
-namespace test {
+namespace xf::test {
+namespace {
 
 using namespace test_asserts;
 using namespace si::units;
@@ -221,7 +221,7 @@ static xf::RuntimeTest t_parsing ("SI parsing tests", []{
 	verify ("m / s kg == m s^-1 kg", parse_unit ("m / s kg") == parse_unit ("m s^-1 kg"));
 });
 
-} // namespace test
-} // namespace xf
+} // namespace
+} // namespace xf::test
 
 
