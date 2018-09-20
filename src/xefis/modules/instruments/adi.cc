@@ -975,10 +975,10 @@ VelocityLadder::precompute (AdiPaintRequest& pr)
 		_transform = pr.precomputed.center_transform;
 		_transform.translate (-0.4f * ld, 0.f);
 
+		float const x = _ladder_rect.width() / 4.0f;
+
 		// Speed bug shape:
 		{
-			float const x = _ladder_rect.width() / 4.0f;
-
 			_bug_shape = QPolygonF ({
 				QPointF (0.f, 0.f),
 				QPointF (+0.5f * x, -0.5f * x),
@@ -987,6 +987,14 @@ VelocityLadder::precompute (AdiPaintRequest& pr)
 				QPointF (+0.5f * x, +0.5f * x)
 			});
 		}
+
+		// Special clipping that leaves some clearance around black indicator:
+		QMarginsF const clearance_margins (0.f, +0.3f * x, 0.f, +0.3f * x);
+		QPainterPath black_box_clearance_path;
+		black_box_clearance_path.addRect (_black_box_rect.translated (x, 0.f) + clearance_margins);
+		_ladder_clip_path = QPainterPath();
+		_ladder_clip_path.addRect (_ladder_rect);
+		_ladder_clip_path -= black_box_clearance_path;
 	}
 }
 
@@ -1091,15 +1099,8 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 
 		pr.painter.setFont (ladder_font);
 
-		// Special clipping that leaves some margin around black indicator:
-		QPainterPath clip_path_m;
-		clip_path_m.addRect (_black_box_rect.translated (x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
-		QPainterPath clip_path;
-		clip_path.addRect (_ladder_rect);
-		clip_path -= clip_path_m;
-
 		pr.painter.setTransform (_transform);
-		pr.painter.setClipPath (clip_path, Qt::IntersectClip);
+		pr.painter.setClipPath (_ladder_clip_path, Qt::IntersectClip);
 		pr.painter.translate (2.f * x, 0.f);
 
 		pr.painter.setPen (_scale_pen);
@@ -1483,9 +1484,11 @@ AltitudeLadder::precompute (AdiPaintRequest& pr)
 	_transform = pr.precomputed.center_transform;
 	_transform.translate (+0.4f * ld, 0.f);
 
-	if (pr.paint_request.size_changed())
+	if (pr.paint_request.size_changed() || _previous_show_metric != pr.params.show_metric)
 	{
 		auto const ld = pr.aids.lesser_dimension();
+
+		_previous_show_metric = pr.params.show_metric;
 
 		_ladder_rect = QRectF (-0.0675f * ld, -0.375 * ld, 0.135 * ld, 0.75f * ld);
 		_ladder_pen = QPen (pr.kLadderBorderColor, pr.aids.pen_width (0.75f), Qt::SolidLine, Qt::RoundCap, Qt::MiterJoin);
@@ -1511,6 +1514,25 @@ AltitudeLadder::precompute (AdiPaintRequest& pr)
 		_metric_box_rect = QRectF (_black_box_rect.topLeft() - QPointF (0.f, 1.25f * pr.aids.font_3.digit_height), _black_box_rect.topRight());
 		_b_digits_box.translate (_margin, -0.5f * _b_digits_box.height());
 		_s_digits_box.translate (_margin + _b_digits_box.width(), -0.5f * _s_digits_box.height());
+
+		float const x = _ladder_rect.width() / 4.0f;
+
+		// Special clipping that leaves some margin around black indicator:
+		QMarginsF const clearance_margins (0.f, +0.3f * x, 0.f, +0.3f * x);
+		QPainterPath black_box_clearance_path;
+		QRectF clearance_rect = _black_box_rect;
+
+		if (pr.params.show_metric)
+			clearance_rect = clearance_rect.united (_metric_box_rect);
+
+		black_box_clearance_path.addRect (clearance_rect.translated (-x, 0.0f) + clearance_margins);
+		_ladder_clip_path = QPainterPath();
+		_ladder_clip_path.addRect (_ladder_rect);
+		_ladder_clip_path -= black_box_clearance_path;
+
+		_decision_height_clip_path = QPainterPath();
+		_decision_height_clip_path.addRect (_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
+		_decision_height_clip_path -= black_box_clearance_path;
 	}
 }
 
@@ -1632,15 +1654,8 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 		float const s_ladder_digit_width = pr.aids.font_1.digit_width;
 		float const s_ladder_digit_height = pr.aids.font_1.digit_height;
 
-		// Special clipping that leaves some margin around black indicator:
-		QPainterPath clip_path_m;
-		clip_path_m.addRect (_black_box_rect.translated (-x, 0.f).adjusted (0.f, -0.2f * x, 0.f, +0.2f * x));
-		QPainterPath clip_path;
-		clip_path.addRect (_ladder_rect);
-		clip_path -= clip_path_m;
-
 		pr.painter.setTransform (_transform);
-		pr.painter.setClipPath (clip_path, Qt::IntersectClip);
+		pr.painter.setClipPath (_ladder_clip_path, Qt::IntersectClip);
 		pr.painter.translate (-2.f * x, 0.f);
 
 		// -+line_every is to have drawn also numbers that barely fit the scale.
@@ -1794,12 +1809,12 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 				pr.painter.drawLine (p0, p1);
 			});
 
-			// Landing altitude bug (ground indicator):
+			// Landing altitude ground level:
 			if (pr.params.landing_amsl > _min_shown && pr.params.landing_amsl < _max_shown)
 			{
-				pr.painter.setClipRect (_ladder_rect);
-				float posy = ft_to_px (pr, pr.params.landing_amsl);
+				float const posy = ft_to_px (pr, pr.params.landing_amsl);
 
+				pr.painter.setClipPath (_ladder_clip_path, Qt::IntersectClip);
 				pr.painter.setPen (_ldg_alt_pen);
 				pr.painter.drawLine (QPointF (+2.25f * x, posy), QPointF (-2.25f * x, posy));
 
@@ -1845,7 +1860,7 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 					float const posy = ft_to_px (pr, pr.params.decision_height_amsl);
 
 					pr.painter.setTransform (_transform);
-					pr.painter.setClipRect (_ladder_rect.adjusted (-2.5f * x, 0.f, 0.f, 0.f));
+					pr.painter.setClipPath (_decision_height_clip_path);
 
 					QPen pen = pr.aids.get_pen (pr.get_decision_height_color(), 1.25f);
 					pen.setMiterLimit (0.35f);
