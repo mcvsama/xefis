@@ -48,6 +48,20 @@ class DebugForces:
 	public xf::Instrument<DebugForcesIO>,
 	private xf::InstrumentSupport
 {
+  private:
+	struct PaintingParams
+	{
+		std::optional<si::Angle>		orientation_pitch;
+		std::optional<si::Angle>		orientation_roll;
+		std::optional<si::Angle>		orientation_magnetic_heading;
+		std::optional<si::Acceleration>	measured_accel_x;
+		std::optional<si::Acceleration>	measured_accel_y;
+		std::optional<si::Acceleration>	measured_accel_z;
+		std::optional<si::Acceleration>	centrifugal_accel_x;
+		std::optional<si::Acceleration>	centrifugal_accel_y;
+		std::optional<si::Acceleration>	centrifugal_accel_z;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -63,7 +77,7 @@ class DebugForces:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 };
 
 #endif

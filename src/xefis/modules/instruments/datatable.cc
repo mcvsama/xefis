@@ -54,10 +54,17 @@ Datatable::Line::Line (std::string_view const& label, xf::BasicProperty const& p
 { }
 
 
-QString
-Datatable::Line::stringify() const
+void
+Datatable::Line::read()
 {
-	return QString::fromStdString (property.to_string());
+	*_stringified.lock() = QString::fromStdString (property.to_string());
+}
+
+
+QString
+Datatable::Line::stringified() const
+{
+	return *_stringified.lock();
 }
 
 
@@ -65,7 +72,13 @@ Datatable::Datatable (xf::Graphics const& graphics, std::string_view const& inst
 	Instrument (instance),
 	InstrumentSupport (graphics)
 {
-	_inputs_observer.set_callback ([&]{ mark_dirty(); });
+	_inputs_observer.set_callback ([&]{
+		// Read lines from main thread:
+		for (auto& line: _list)
+			line.read();
+
+		mark_dirty();
+	});
 
 	for (auto& line: _list)
 		_inputs_observer.observe (line.property);
@@ -103,7 +116,7 @@ Datatable::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 Datatable::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request)] {
 		async_paint (pr);
 	});
 }
@@ -142,19 +155,19 @@ Datatable::async_paint (xf::PaintRequest const& paint_request) const
 		// Valu
 		painter.setFont (value_font);
 		painter.setPen (aids->get_pen (line.value_color, 1.0));
-		std::string str_to_paint;
+		QString str_to_paint;
 
 		auto error = xf::handle_format_exception([&] {
-			str_to_paint = line.property.to_string();
+			str_to_paint = line.stringified();
 		});
 
 		if (error)
 		{
 			painter.setPen (aids->get_pen (Qt::red, 1.0));
-			str_to_paint = *error;
+			str_to_paint = QString::fromStdString (*error);
 		}
 
-		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, QString::fromStdString (str_to_paint));
+		painter.fast_draw_text (right, Qt::AlignRight | Qt::AlignBottom, str_to_paint);
 	}
 }
 

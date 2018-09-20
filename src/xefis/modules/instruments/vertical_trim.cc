@@ -46,25 +46,31 @@ VerticalTrim::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 VerticalTrim::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.label = *io.label;
+	params.trim_value = io.trim_value.get_optional();
+	params.trim_reference = io.trim_reference.get_optional();
+	params.trim_reference_minimum = io.trim_reference_minimum.get_optional();
+	params.trim_reference_maximum = io.trim_reference_maximum.get_optional();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-VerticalTrim::async_paint (xf::PaintRequest const& paint_request) const
+VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
-	auto trim = io.trim_value.get_optional();
+	auto trim = pp.trim_value;
+	auto& ref = pp.trim_reference;
+	auto& ref_min = pp.trim_reference_minimum;
+	auto& ref_max = pp.trim_reference_maximum;
 
 	if (trim)
 		xf::clamp (*trim, -1.0, +1.0);
-
-	auto ref = io.trim_reference.get_optional();
-	auto ref_min = io.trim_reference_minimum.get_optional();
-	auto ref_max = io.trim_reference_maximum.get_optional();
 
 	double h = aids->font_2.digit_height;
 	double v = aids->height() - h;

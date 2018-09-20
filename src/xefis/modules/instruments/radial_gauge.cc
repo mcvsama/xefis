@@ -32,7 +32,7 @@ BasicRadialGauge::BasicRadialGauge (xf::Graphics const& graphics):
 
 
 void
-BasicRadialGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues& values) const
+BasicRadialGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValues const& values) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
@@ -47,7 +47,7 @@ BasicRadialGauge::async_paint (xf::PaintRequest const& paint_request, GaugeValue
 
 
 void
-BasicRadialGauge::paint_text (GaugeValues& values, xf::PaintRequest const& paint_request, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q) const
+BasicRadialGauge::paint_text (GaugeValues const& values, xf::PaintRequest const& paint_request, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float q) const
 {
 	QFont const font (aids.font_5.font);
 	QFontMetricsF const metrics (font);
@@ -119,7 +119,7 @@ BasicRadialGauge::paint_text (GaugeValues& values, xf::PaintRequest const& paint
 
 
 void
-BasicRadialGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
+BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
 {
 	constexpr si::Angle kValueSpanAngle = 210_deg;
 
@@ -193,32 +193,32 @@ BasicRadialGauge::paint_indicator (GaugeValues& values, xf::InstrumentAids& aids
 			QColor const no_color;
 			float const no_tick_len {};
 			float const tick_dir = values.normalized_reference ? -1.5f : +1.f;
-			auto& point_infos = values.point_infos;
+			auto point_infos = _point_infos.lock();
 
-			point_infos.clear();
-			point_infos.push_back ({ PointInfo::Minimums, 0_deg, no_pen, no_tick_len });
+			point_infos->clear();
+			point_infos->push_back ({ PointInfo::Minimums, 0_deg, no_pen, no_tick_len });
 
 			if (minimum_critical_angle)
-				point_infos.push_back ({ PointInfo::Minimums, *minimum_critical_angle, critical_pen, tick_dir * 0.2f * r });
+				point_infos->push_back ({ PointInfo::Minimums, *minimum_critical_angle, critical_pen, tick_dir * 0.2f * r });
 
 			if (minimum_warning_angle)
-				point_infos.push_back ({ PointInfo::Minimums, *minimum_warning_angle, warning_pen, tick_dir * (minimum_critical_angle ? 0.1f : 0.2f) * r });
+				point_infos->push_back ({ PointInfo::Minimums, *minimum_warning_angle, warning_pen, tick_dir * (minimum_critical_angle ? 0.1f : 0.2f) * r });
 
 			if (maximum_warning_angle)
-				point_infos.push_back ({ PointInfo::Maximums, *maximum_warning_angle, warning_pen, tick_dir * (maximum_critical_angle ? 0.1f : 0.2f) * r });
+				point_infos->push_back ({ PointInfo::Maximums, *maximum_warning_angle, warning_pen, tick_dir * (maximum_critical_angle ? 0.1f : 0.2f) * r });
 
 			if (maximum_critical_angle)
-				point_infos.push_back ({ PointInfo::Maximums, *maximum_critical_angle, critical_pen, tick_dir * 0.2f * r });
+				point_infos->push_back ({ PointInfo::Maximums, *maximum_critical_angle, critical_pen, tick_dir * 0.2f * r });
 
-			point_infos.push_back ({ PointInfo::Maximums, kValueSpanAngle, no_pen, no_tick_len });
+			point_infos->push_back ({ PointInfo::Maximums, kValueSpanAngle, no_pen, no_tick_len });
 
 			// Actual painting:
-			for (size_t i = 0u; i < point_infos.size() - 1; ++i)
+			for (size_t i = 0u; i < point_infos->size() - 1; ++i)
 			{
-				PointInfo const prev = point_infos[i];
-				PointInfo const next = point_infos[i + 1];
+				PointInfo const prev = (*point_infos)[i];
+				PointInfo const next = (*point_infos)[i + 1];
 				bool const add_min_gap = (prev.zone == PointInfo::Minimums) && (i > 0);
-				bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos.size() - 2);
+				bool const add_max_gap = (next.zone == PointInfo::Maximums) && (i < point_infos->size() - 2);
 
 				painter.save_context ([&] {
 					auto const angle_0 = prev.angle + (add_min_gap ? angle_gap : 0_rad);

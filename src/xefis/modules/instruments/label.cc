@@ -33,23 +33,29 @@ Label::Label (std::unique_ptr<LabelIO> module_io, xf::Graphics const& graphics, 
 std::packaged_task<void()>
 Label::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.font_scale = *io.font_scale;
+	params.label = *io.label;
+	params.color = *io.color;
+	params.alignment = *io.alignment;
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-Label::async_paint (xf::PaintRequest const& paint_request) const
+Label::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
 
 	QFont font (aids->font_1);
-	font.setPixelSize (aids->font_pixel_size (*io.font_scale));
+	font.setPixelSize (aids->font_pixel_size (pp.font_scale));
 
 	painter.setFont (font);
-	painter.setPen (*io.color);
-	painter.fast_draw_text (paint_request.canvas().rect(), *io.alignment, *io.label);
+	painter.setPen (pp.color);
+	painter.fast_draw_text (paint_request.canvas().rect(), pp.alignment, pp.label);
 }
 

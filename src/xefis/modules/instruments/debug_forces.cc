@@ -37,14 +37,25 @@ DebugForces::process (xf::Cycle const&)
 std::packaged_task<void()>
 DebugForces::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.orientation_pitch = io.orientation_pitch.get_optional();
+	params.orientation_roll = io.orientation_roll.get_optional();
+	params.orientation_magnetic_heading = io.orientation_magnetic_heading.get_optional();
+	params.measured_accel_x = io.measured_accel_x.get_optional();
+	params.measured_accel_y = io.measured_accel_y.get_optional();
+	params.measured_accel_z = io.measured_accel_z.get_optional();
+	params.centrifugal_accel_x = io.centrifugal_accel_x.get_optional();
+	params.centrifugal_accel_y = io.centrifugal_accel_y.get_optional();
+	params.centrifugal_accel_z = io.centrifugal_accel_z.get_optional();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-DebugForces::async_paint (xf::PaintRequest const& paint_request) const
+DebugForces::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
@@ -56,13 +67,13 @@ DebugForces::async_paint (xf::PaintRequest const& paint_request) const
 	QPointF measured_accel;
 	QPointF earth_accel;
 
-	if (io.centrifugal_accel_y && io.centrifugal_accel_z)
-		centrifugal_accel = QPointF (io.centrifugal_accel_y->in<Gravity>() * one_gravity_length,
-									 io.centrifugal_accel_z->in<Gravity>() * one_gravity_length);
+	if (pp.centrifugal_accel_y && pp.centrifugal_accel_z)
+		centrifugal_accel = QPointF (pp.centrifugal_accel_y->in<Gravity>() * one_gravity_length,
+									 pp.centrifugal_accel_z->in<Gravity>() * one_gravity_length);
 
-	if (io.measured_accel_y && io.measured_accel_z)
-		measured_accel = QPointF (io.measured_accel_y->in<Gravity>() * one_gravity_length,
-								  io.measured_accel_z->in<Gravity>() * one_gravity_length);
+	if (pp.measured_accel_y && pp.measured_accel_z)
+		measured_accel = QPointF (pp.measured_accel_y->in<Gravity>() * one_gravity_length,
+								  pp.measured_accel_z->in<Gravity>() * one_gravity_length);
 
 	earth_accel = measured_accel - centrifugal_accel;
 
@@ -72,10 +83,10 @@ DebugForces::async_paint (xf::PaintRequest const& paint_request) const
 	painter.setPen (aids->get_pen (Qt::white, 0.5));
 	painter.drawLine (QPointF (-0.5 * aids->width(), 0.0), QPointF (0.5 * aids->width(), 0.0));
 
-	if (io.orientation_roll)
+	if (pp.orientation_roll)
 	{
 		// Plane reference frame:
-		painter.rotate (io.orientation_roll->in<Degree>());
+		painter.rotate (pp.orientation_roll->in<Degree>());
 		// Plane:
 		painter.setPen (aids->get_pen (Qt::white, 2.5));
 		painter.drawLine (QPointF (-0.25 * aids->width(), 0.0), QPointF (0.25 * aids->width(), 0.0));

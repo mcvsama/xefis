@@ -48,6 +48,18 @@ class Gear:
 	public xf::Instrument<GearIO>,
 	private xf::InstrumentSupport
 {
+  private:
+	struct PaintingParams
+	{
+		std::optional<bool>	requested_down;
+		std::optional<bool>	nose_up;
+		std::optional<bool>	nose_down;
+		std::optional<bool>	left_up;
+		std::optional<bool>	left_down;
+		std::optional<bool>	right_up;
+		std::optional<bool>	right_down;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -63,7 +75,7 @@ class Gear:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
   private:
 	xf::PropertyObserver	_inputs_observer;

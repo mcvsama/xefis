@@ -45,6 +45,15 @@ class Label:
 	public xf::Instrument<LabelIO>,
 	private xf::InstrumentSupport
 {
+  private:
+	struct PaintingParams
+	{
+		float			font_scale;
+		QString			label;
+		QColor			color;
+		Qt::Alignment	alignment;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -56,7 +65,7 @@ class Label:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 };
 
 #endif

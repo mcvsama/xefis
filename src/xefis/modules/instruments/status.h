@@ -30,6 +30,7 @@
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/actions.h>
 #include <xefis/utility/delta_decoder.h>
+#include <xefis/utility/synchronized.h>
 
 
 class StatusIO: public xf::ModuleIO
@@ -163,6 +164,32 @@ class Status:
 		bool								_deleted;
 	};
 
+  private:
+	class Cache
+	{
+	  public:
+		QFont	font;
+		float	line_height				{ 0.0 };
+		float	arrow_height			{ 0.0 };
+		QRectF	viewport;
+		int		max_visible_messages	{ 0 };
+		int		scroll_pos				{ 0 };
+		int		cursor_pos				{ 0 };
+		bool	cursor_visible			{ false };
+
+	  public:
+		/**
+		 * Compute scroll value needed to display messages.
+		 */
+		void
+		solve_scroll_and_cursor (std::vector<Message*> const& visible_messages);
+	};
+
+	struct PaintingParams
+	{
+		std::vector<Message*>	visible_messages;
+	};
+
   public:
 	// Ctor
 	explicit
@@ -172,7 +199,7 @@ class Status:
 	 * Configure new message.
 	 * Use returned pointer to operate on the Message object and add observers.
 	 */
-	Message*
+	Message&
 	add_message (std::string_view const& text, Severity);
 
 	// Module API
@@ -185,7 +212,7 @@ class Status:
 
   private:
 	void
-	async_paint (xf::PaintRequest const&) const;
+	async_paint (xf::PaintRequest const&, PaintingParams const&) const;
 
 	/**
 	 * Move cursor up.
@@ -217,12 +244,6 @@ class Status:
 	void
 	clear();
 
-	/**
-	 * Compute scroll value needed to display messages.
-	 */
-	void
-	solve_scroll_and_cursor() const;
-
   private:
 	xf::PropChangedTo<bool>				_button_cursor_del_pressed		{ io.button_cursor_del, true };
 	xf::PropChangedTo<bool>				_button_recall_pressed			{ io.button_recall, true };
@@ -236,16 +257,8 @@ class Status:
 	si::Time							_last_message_timestamp;
 	std::unique_ptr<QTimer>				_blink_timer;
 	std::unique_ptr<QTimer>				_cursor_hide_timer;
-	bool								_blink_show				{ false };
-	// Cache stuff:
-	mutable QFont						_font;
-	mutable float						_line_height			{ 0.0 };
-	mutable float						_arrow_height			{ 0.0 };
-	mutable QRectF						_viewport;
-	mutable int							_max_visible_messages	{ 0 };
-	mutable int							_scroll_pos				{ 0 };
-	mutable int							_cursor_pos				{ 0 };
-	mutable bool						_cursor_visible			{ false };
+	std::atomic<bool>					_blink_show						{ false };
+	xf::Synchronized<Cache> mutable		_cache;
 };
 
 

@@ -51,25 +51,33 @@ HorizontalTrim::process (xf::Cycle const& cycle)
 std::packaged_task<void()>
 HorizontalTrim::paint (xf::PaintRequest paint_request) const
 {
-	return std::packaged_task<void()> ([&, pr = std::move (paint_request)] {
-		async_paint (pr);
+	PaintingParams params;
+	params.label = *io.label;
+	params.label_min = *io.label_min;
+	params.label_max = *io.label_max;
+	params.trim_value = io.trim_value.get_optional();
+	params.trim_reference = io.trim_reference.get_optional();
+	params.trim_reference_minimum = io.trim_reference_minimum.get_optional();
+	params.trim_reference_maximum = io.trim_reference_maximum.get_optional();
+
+	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = std::move (params)] {
+		async_paint (pr, pp);
 	});
 }
 
 
 void
-HorizontalTrim::async_paint (xf::PaintRequest const& paint_request) const
+HorizontalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams const& pp) const
 {
 	auto aids = get_aids (paint_request);
 	auto painter = get_painter (paint_request);
-	auto trim = io.trim_value.get_optional();
+	auto trim = pp.trim_value;
+	auto& ref = pp.trim_reference;
+	auto& ref_min = pp.trim_reference_minimum;
+	auto& ref_max = pp.trim_reference_maximum;
 
 	if (trim)
 		trim = xf::clamped (*trim, -1.0, +1.0);
-
-	auto ref = io.trim_reference.get_optional();
-	auto ref_min = io.trim_reference_minimum.get_optional();
-	auto ref_max = io.trim_reference_maximum.get_optional();
 
 	double h = aids->font_2.digit_height;
 	double v = aids->width() - h;
@@ -96,8 +104,8 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request) const
 	painter.setTransform (center_point_transform);
 	painter.drawPolyline (line);
 	painter.drawLine (QPointF (0.0, -0.5 * h), QPointF (0.0, 0.0));
-	painter.fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, *io.label_min);
-	painter.fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, *io.label_max);
+	painter.fast_draw_text (lt + QPointF (-0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignLeft, *pp.label_min);
+	painter.fast_draw_text (rt + QPointF (+0.5 * h, -0.25 * h), Qt::AlignBottom | Qt::AlignRight, *pp.label_max);
 
 	// Reference range:
 	if (ref_min && ref_max)
@@ -121,7 +129,7 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request) const
 	// Cyan label:
 	painter.setFont (label_font);
 	painter.setPen (cyan);
-	painter.fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, *io.label);
+	painter.fast_draw_text (QPointF (0.0, 1.0 * h), Qt::AlignTop | Qt::AlignHCenter, *pp.label);
 
 	// Pointer:
 	if (trim)
@@ -141,8 +149,10 @@ HorizontalTrim::async_paint (xf::PaintRequest const& paint_request) const
 
 	// Numerical value:
 	QString value_str = "   ";
+
 	if (trim)
 		value_str = stringify (*trim);
+
 	double x = 0.25 * h;
 	QPointF text_hook = QPointF (0.0, -2.0 * h);
 	Qt::Alignment alignment = Qt::AlignHCenter | Qt::AlignBottom;
