@@ -52,7 +52,6 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (0);
-	layout->setSpacing (WidgetSpacing);
 	layout->addWidget (_list);
 
 	auto lh = default_line_height (this);

@@ -38,7 +38,6 @@ DataRecorder::DataRecorder (QWidget* parent):
 	_scroll_area->setWidget (_graphs_stack);
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
-	layout->setSpacing (WidgetSpacing);
 	layout->setMargin (0);
 	layout->addWidget (_scroll_area);
 }

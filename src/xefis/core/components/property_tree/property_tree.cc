@@ -51,8 +51,7 @@ PropertyTree::PropertyTree (QWidget* parent):
 	_tree->setHeaderLabels ({ "Property", "Use count", "Actual value",  "Set value", "Fallback value" });
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
-	layout->setMargin (WidgetMargin);
-	layout->setSpacing (WidgetSpacing);
+	layout->setMargin (0);
 	layout->addWidget (_tree);
 
 	_refresh_timer = new QTimer (this);

@@ -32,7 +32,7 @@
 namespace xf {
 
 // TODO rename to UNIQUE name, that makes sense
-class ModuleConfiguratorConfigWidget: public xf::Widget
+class ModuleConfiguratorConfigWidget: public Widget
 {
   protected:
 	using Widget::Widget;
