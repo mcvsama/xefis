@@ -24,6 +24,7 @@
 
 // Qt:
 #include <QWidget>
+#include <QLabel>
 
 // Xefis:
 #include <xefis/config/all.h>
