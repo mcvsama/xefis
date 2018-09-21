@@ -43,8 +43,9 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 				_module.process (cycle);
 			});
 
-			AccountingAPI (_module).set_cycle_time (cycle.update_dt());
-			AccountingAPI (_module).add_processing_time (processing_time);
+			auto accounting_api = AccountingAPI (_module);
+			accounting_api.set_cycle_time (cycle.update_dt());
+			accounting_api.add_processing_time (processing_time);
 		}
 	}
 	catch (...)
