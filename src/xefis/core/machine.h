@@ -20,6 +20,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/screen.h>
 #include <xefis/core/processing_loop.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/sequence.h>
@@ -31,7 +32,8 @@ namespace xf {
 class Machine: private Noncopyable
 {
   private:
-	using ProcessingLoopsTracker = Tracker<ProcessingLoop>;
+	using ProcessingLoopsTracker	= Tracker<ProcessingLoop>;
+	using ScreensTracker			= Tracker<Screen>;
 
   public:
 	// Ctor
@@ -53,27 +55,47 @@ class Machine: private Noncopyable
 	xefis() const noexcept;
 
 	/**
-	 * A sequence of processing loops.
+	 * A sequence of registered processing loops.
 	 */
 	Sequence<ProcessingLoopsTracker::Iterator>
 	processing_loops() noexcept;
 
 	/**
-	 * A sequence of processing loops.
+	 * A sequence of registered processing loops.
 	 */
 	Sequence<ProcessingLoopsTracker::ConstIterator>
 	processing_loops() const noexcept;
 
 	/**
+	 * A sequence of registered screens.
+	 */
+	Sequence<ScreensTracker::Iterator>
+	screens() noexcept;
+
+	/**
+	 * A sequence of registered processing loops.
+	 */
+	Sequence<ScreensTracker::ConstIterator>
+	screens() const noexcept;
+
+	/**
 	 * Register a processing loop.
 	 */
-	template<class Compatible>
+	template<class CompatibleProcessingLoop>
 		void
-		register_processing_loop (Registrant<Compatible>&);
+		register_processing_loop (Registrant<CompatibleProcessingLoop>&);
+
+	/**
+	 * Register a screen.
+	 */
+	template<class CompatibleScreen>
+		void
+		register_screen (Registrant<CompatibleScreen>&);
 
   private:
 	Xefis&						_xefis;
 	Tracker<ProcessingLoop>		_processing_loops;
+	Tracker<Screen>				_screens;
 };
 
 
@@ -98,13 +120,37 @@ Machine::processing_loops() const noexcept -> Sequence<ProcessingLoopsTracker::C
 }
 
 
-template<class Compatible>
+inline auto
+Machine::screens() noexcept -> Sequence<ScreensTracker::Iterator>
+{
+	return { _screens.begin(), _screens.end() };
+}
+
+
+inline auto
+Machine::screens() const noexcept -> Sequence<ScreensTracker::ConstIterator>
+{
+	return { _screens.cbegin(), _screens.cend() };
+}
+
+
+template<class CompatibleProcessingLoop>
 	inline void
-	Machine::register_processing_loop (Registrant<Compatible>& processing_loop)
+	Machine::register_processing_loop (Registrant<CompatibleProcessingLoop>& processing_loop)
 	{
 		// Don't give access to public to Registry interface, so that user doesn't
 		// register instrument with some weird Details value.
 		_processing_loops.register_object (processing_loop);
+	}
+
+
+template<class CompatibleScreen>
+	inline void
+	Machine::register_screen (Registrant<CompatibleScreen>& screen)
+	{
+		// Don't give access to public to Registry interface, so that user doesn't
+		// register instrument with some weird Details value.
+		_screens.register_object (screen);
 	}
 
 } // namespace xf
