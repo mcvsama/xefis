@@ -43,13 +43,15 @@ class Cycle
 	/**
 	 * Return this cycle serial number.
 	 */
+	[[nodiscard]]
 	Number
 	number() const noexcept;
 
 	/**
 	 * Return last update time.
 	 */
-	Time
+	[[nodiscard]]
+	si::Time
 	update_time() const noexcept;
 
 	/**
@@ -57,12 +59,14 @@ class Cycle
 	 * Be sure not to use it if you're skipping some of the updates, because you're watching just one property or
 	 * something.
 	 */
-	Time
+	[[nodiscard]]
+	si::Time
 	update_dt() const noexcept;
 
 	/**
 	 * Return logger to use.
 	 */
+	[[nodiscard]]
 	Logger const&
 	logger() const noexcept;
 
