@@ -49,6 +49,7 @@ class HistogramStatsWidget: public xf::Widget
 		set_data (Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = {});
 
   private:
+	QLabel*	_num_samples_value;
 	QLabel*	_min_value;
 	QLabel*	_max_value;
 	QLabel*	_mean_value;
@@ -63,6 +64,7 @@ template<class HistogramValue, class CriticalValue>
 	inline void
 	HistogramStatsWidget::set_data (Histogram<HistogramValue> const& histogram, std::optional<CriticalValue> critical_value)
 	{
+		_num_samples_value->setText (QString::number (histogram.n_samples()));
 		_min_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.min())));
 		_max_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.max())));
 		_mean_value->setText (QString::fromStdString (boost::lexical_cast<std::string> (histogram.mean())));
