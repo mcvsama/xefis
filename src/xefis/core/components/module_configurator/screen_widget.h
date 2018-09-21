@@ -11,19 +11,20 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__CONFIG_WIDGET_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__CONFIG_WIDGET_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_WIDGET_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_WIDGET_H__INCLUDED
 
 // Standard:
 #include <cstddef>
-#include <tuple>
 
 // Qt:
-#include <QString>
+#include <QTimer>
 #include <QWidget>
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/screen.h>
+#include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
 #include <xefis/support/ui/widget.h>
@@ -31,17 +32,28 @@
 
 namespace xf::configurator {
 
-class ConfigWidget: public Widget
+/**
+ * Configuration widget for a Screen.
+ */
+class ScreenWidget: public ConfigWidget
 {
-  protected:
-	static constexpr si::Frequency kDataRefreshRate = 5_Hz;
+  public:
+	// Ctor
+	explicit
+	ScreenWidget (Screen&, QWidget* parent);
 
-  protected:
-	using Widget::Widget;
+  private:
+	void
+	refresh();
 
-  protected:
-	std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-	create_performance_widget (QWidget* parent, QString const& title) const;
+	QWidget*
+	create_performance_tab();
+
+  private:
+	Screen&						_screen;
+	xf::HistogramWidget*		_painting_time_histogram	{ nullptr };
+	xf::HistogramStatsWidget*	_painting_time_stats		{ nullptr };
+	QTimer*						_refresh_timer;
 };
 
 } // namespace xf::configurator

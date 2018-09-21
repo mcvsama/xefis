@@ -15,6 +15,9 @@
 #include <cstddef>
 #include <functional>
 
+// Lib:
+#include <boost/circular_buffer.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
@@ -76,27 +79,29 @@ ProcessingLoop::stop()
 void
 ProcessingLoop::execute_cycle()
 {
-	Time t = TimeHelper::now();
-	Time dt = t - _previous_timestamp.value_or (t - 0.1_ms); // -0.1_ms to prevent division by zero in modules.
-	_current_cycle = Cycle { _next_cycle_number++, t, dt, _logger };
+	si::Time t = TimeHelper::now();
 
 	if (_previous_timestamp)
 	{
-		Time latency = dt - _loop_period;
+		si::Time dt = t - *_previous_timestamp;
+		si::Time latency = dt - _loop_period;
 
+		_current_cycle = Cycle (_next_cycle_number++, t, dt, _logger);
+		_processing_latencies.push_back (latency);
 		io.latency = latency;
 		io.actual_frequency = 1.0 / dt;
 
-		if (dt > 1.1 * _loop_period)
-			_logger << boost::format ("Latency! %.0f%% delay.\n") % (dt / _loop_period * 100.0 - 100.0);
+		for (auto& module_details: _module_details_list)
+			BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
+
+		for (auto& module_details: _module_details_list)
+			BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);
+
+		if (latency > kLatencyFactorLogThreshold * _loop_period)
+			_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
 	}
 
-	for (auto& module_details: _module_details_list)
-		BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
-
-	for (auto& module_details: _module_details_list)
-		BasicModule::ProcessingLoopAPI (module_details.module()).fetch_and_process (*_current_cycle);
-
+	_processing_times.push_back (TimeHelper::now() - t);
 	_previous_timestamp = t;
 	_current_cycle.reset();
 }

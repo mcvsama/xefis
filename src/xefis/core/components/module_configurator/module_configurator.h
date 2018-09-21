@@ -27,8 +27,10 @@
 #include <xefis/core/machine.h>
 
 // Local:
+#include "configurable_items_list.h"
 #include "module_widget.h"
-#include "modules_list.h"
+#include "processing_loop_widget.h"
+#include "screen_widget.h"
 
 
 namespace xf {
@@ -42,25 +44,25 @@ class ModuleConfigurator: public QWidget
 
   private:
 	void
+	processing_loop_selected (ProcessingLoop&);
+
+	void
+	screen_selected (Screen&);
+
+	void
 	module_selected (BasicModule&);
 
 	void
 	none_selected();
 
-	/**
-	 * Causes module widget to be reloaded.
-	 * The one passed in parameter will be deleted.
-	 */
-	void
-	reload_module_widget (ModuleWidget*);
-
   private:
-	Machine&		_machine;
-	ModulesList*	_modules_list			= nullptr;
-	QStackedWidget*	_modules_stack			= nullptr;
-	QLabel*			_no_module_selected		= nullptr;
-	std::map<BasicModule*, std::shared_ptr<ModuleWidget>>
-					_module_widgets;
+	Machine&														_machine;
+	configurator::ConfigurableItemsList*							_configurable_items_list	{ nullptr };
+	QStackedWidget*													_stack						{ nullptr };
+	QLabel*															_no_module_selected			{ nullptr };
+	std::map<ProcessingLoop*, configurator::ProcessingLoopWidget*>	_processing_loop_widgets;
+	std::map<Screen*, configurator::ScreenWidget*>					_screen_widgets;
+	std::map<BasicModule*, configurator::ModuleWidget*>				_module_widgets;
 };
 
 } // namespace xf

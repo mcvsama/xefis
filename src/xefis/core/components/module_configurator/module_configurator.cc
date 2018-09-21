@@ -27,6 +27,9 @@
 
 namespace xf {
 
+using namespace configurator;
+
+
 ModuleConfigurator::ModuleConfigurator (Machine& machine, QWidget* parent):
 	QWidget (parent),
 	_machine (machine)
@@ -34,19 +37,51 @@ ModuleConfigurator::ModuleConfigurator (Machine& machine, QWidget* parent):
 	_no_module_selected = new QLabel ("No module selected", this);
 	_no_module_selected->setAlignment (Qt::AlignCenter);
 
-	_modules_list = new ModulesList (_machine, this);
-	_modules_list->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Minimum);
-	QObject::connect (_modules_list, &ModulesList::module_selected, this, &ModuleConfigurator::module_selected);
-	QObject::connect (_modules_list, &ModulesList::none_selected, this, &ModuleConfigurator::none_selected);
+	_configurable_items_list = new ConfigurableItemsList (_machine, this);
+	_configurable_items_list->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Minimum);
+	QObject::connect (_configurable_items_list, &ConfigurableItemsList::processing_loop_selected, this, &ModuleConfigurator::processing_loop_selected);
+	QObject::connect (_configurable_items_list, &ConfigurableItemsList::screen_selected, this, &ModuleConfigurator::screen_selected);
+	QObject::connect (_configurable_items_list, &ConfigurableItemsList::module_selected, this, &ModuleConfigurator::module_selected);
+	QObject::connect (_configurable_items_list, &ConfigurableItemsList::none_selected, this, &ModuleConfigurator::none_selected);
 
-	_modules_stack = new QStackedWidget (this);
-	_modules_stack->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	_modules_stack->addWidget (_no_module_selected);
+	_stack = new QStackedWidget (this);
+	_stack->setSizePolicy (QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	_stack->addWidget (_no_module_selected);
 
 	QHBoxLayout* layout = new QHBoxLayout (this);
 	layout->setMargin (0);
-	layout->addWidget (_modules_list);
-	layout->addWidget (_modules_stack);
+	layout->addWidget (_configurable_items_list);
+	layout->addWidget (_stack);
+}
+
+
+void
+ModuleConfigurator::processing_loop_selected (ProcessingLoop& processing_loop)
+{
+	auto plw = _processing_loop_widgets.find (&processing_loop);
+
+	if (plw == _processing_loop_widgets.end())
+		plw = _processing_loop_widgets.insert ({ &processing_loop, new ProcessingLoopWidget (processing_loop, this) }).first;
+
+	if (_stack->indexOf (plw->second) == -1)
+		_stack->addWidget (plw->second);
+
+	_stack->setCurrentWidget (plw->second);
+}
+
+
+void
+ModuleConfigurator::screen_selected (Screen& screen)
+{
+	auto sw = _screen_widgets.find (&screen);
+
+	if (sw == _screen_widgets.end())
+		sw = _screen_widgets.insert ({ &screen, new ScreenWidget (screen, this) }).first;
+
+	if (_stack->indexOf (sw->second) == -1)
+		_stack->addWidget (sw->second);
+
+	_stack->setCurrentWidget (sw->second);
 }
 
 
@@ -56,31 +91,19 @@ ModuleConfigurator::module_selected (BasicModule& module)
 	auto gmw = _module_widgets.find (&module);
 
 	if (gmw == _module_widgets.end())
-	{
-		auto new_gmw = std::make_shared<ModuleWidget> (module, this);
-		gmw = _module_widgets.insert ({ &module, new_gmw }).first;
-	}
+		gmw = _module_widgets.insert ({ &module, new ModuleWidget (module, this) }).first;
 
-	if (_modules_stack->indexOf (gmw->second.get()) == -1)
-		_modules_stack->addWidget (gmw->second.get());
+	if (_stack->indexOf (gmw->second) == -1)
+		_stack->addWidget (gmw->second);
 
-	_modules_stack->setCurrentWidget (gmw->second.get());
+	_stack->setCurrentWidget (gmw->second);
 }
 
 
 void
 ModuleConfigurator::none_selected()
 {
-	_modules_stack->setCurrentWidget (_no_module_selected);
-}
-
-
-// TODO remove or add button for this function
-void
-ModuleConfigurator::reload_module_widget (ModuleWidget* module_widget)
-{
-	_modules_list->deselect();
-	_module_widgets.erase (&module_widget->module());
+	_stack->setCurrentWidget (_no_module_selected);
 }
 
 } // namespace xf

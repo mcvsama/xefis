@@ -16,7 +16,6 @@
 #include <stdexcept>
 
 // Qt:
-#include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:
@@ -25,19 +24,19 @@
 #include <xefis/utility/qutils.h>
 
 // Local:
-#include "modules_list.h"
+#include "configurable_items_list.h"
 #include "processing_loop_item.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
 ProcessingLoopItem::ProcessingLoopItem (ProcessingLoop& processing_loop, QTreeWidget& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_processing_loop (processing_loop)
 {
 	setup_appereance (*this);
-	setText (ModulesList::NameColumn, QString::fromStdString (_processing_loop.instance()));
+	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (_processing_loop.instance()));
 }
 
-} // namespace xf
+} // namespace xf::configurator
 

@@ -23,19 +23,19 @@
 #include <xefis/utility/qutils.h>
 
 // Local:
-#include "modules_list.h"
+#include "configurable_items_list.h"
 #include "module_item.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
-ModuleItem::ModuleItem (BasicModule& module, ProcessingLoopItem& parent):
+ModuleItem::ModuleItem (BasicModule& module, QTreeWidgetItem& parent):
 	QTreeWidgetItem (&parent, { "", "", "" }),
 	_module (module)
 {
 	setup_appereance (*this);
-	setText (ModulesList::NameColumn, QString::fromStdString (identifier (_module)));
+	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (identifier (_module)));
 }
 
-} // namespace xf
+} // namespace xf::configurator
 

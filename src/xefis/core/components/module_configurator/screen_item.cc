@@ -11,50 +11,32 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
-
 // Standard:
 #include <cstddef>
+#include <stdexcept>
 
 // Qt:
 #include <QtWidgets/QTreeWidgetItem>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
+#include <xefis/core/screen.h>
+#include <xefis/utility/qutils.h>
 
 // Local:
-#include "processing_loop_item.h"
+#include "configurable_items_list.h"
+#include "screen_item.h"
 
 
 namespace xf::configurator {
 
-class ModuleItem: public QTreeWidgetItem
+ScreenItem::ScreenItem (Screen& screen, QTreeWidget& parent):
+	QTreeWidgetItem (&parent, { "", "", "" }),
+	_screen (screen)
 {
-  public:
-	// Ctor
-	explicit
-	ModuleItem (BasicModule& module, QTreeWidgetItem& parent);
-
-	/**
-	 * Return Module* associated with this item.
-	 */
-	BasicModule&
-	module() const noexcept;
-
-  private:
-	BasicModule& _module;
-};
-
-
-inline BasicModule&
-ModuleItem::module() const noexcept
-{
-	return _module;
+	setup_appereance (*this);
+	setText (ConfigurableItemsList::NameColumn, QString::fromStdString (_screen.instance()));
 }
 
 } // namespace xf::configurator
-
-#endif
 

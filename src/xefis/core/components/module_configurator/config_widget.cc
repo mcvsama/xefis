@@ -26,10 +26,10 @@
 #include "config_widget.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
 std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-ModuleConfiguratorConfigWidget::create_performance_widget (QWidget* parent, QString const& title) const
+ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) const
 {
 	QMargins const margins (em_pixels (0.5f), em_pixels (0.25f), em_pixels (0.5f), em_pixels (0.25f));
 
@@ -50,5 +50,5 @@ ModuleConfiguratorConfigWidget::create_performance_widget (QWidget* parent, QStr
 	return { histogram_widget, stats_widget, group_box };
 }
 
-} // namespace xf
+} // namespace xf::configurator
 
