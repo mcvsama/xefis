@@ -15,6 +15,8 @@
 #include <cstddef>
 
 // Qt:
+#include <QGridLayout>
+#include <QLabel>
 #include <QWidget>
 
 // Xefis:
@@ -43,6 +45,51 @@ Widget::create_color_widget (QColor color, QWidget* parent)
 	palette.setColor (QPalette::Background, color);
 	widget->setPalette (palette);
 	widget->update();
+
+	return widget;
+}
+
+
+QWidget*
+Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Alignment strip_position, QWidget* parent) const
+{
+	auto* widget = new QWidget (parent);
+
+	auto* strip = create_color_widget (color, widget);
+	strip->setFixedHeight (em_pixels (0.3f));
+
+	auto* label = new QLabel (text, widget);
+	label->setStyleSheet ("QLabel { margin: 0.15em; }");
+	label->setAlignment (Qt::AlignLeft);
+
+	QFont font = label->font();
+	font.setPixelSize (em_pixels (1.4f));
+	label->setFont (font);
+
+	auto* layout = new QGridLayout (widget);
+	layout->setMargin (0);
+	layout->setSpacing (0);
+
+	if (strip_position & Qt::AlignLeft)
+	{
+		layout->addWidget (strip, 0, 0);
+		layout->addWidget (label, 0, 1);
+	}
+	else if (strip_position & Qt::AlignRight)
+	{
+		layout->addWidget (strip, 0, 1);
+		layout->addWidget (label, 0, 0);
+	}
+	else if (strip_position & Qt::AlignTop)
+	{
+		layout->addWidget (strip, 0, 0);
+		layout->addWidget (label, 1, 0);
+	}
+	else if (strip_position & Qt::AlignBottom)
+	{
+		layout->addWidget (strip, 1, 0);
+		layout->addWidget (label, 0, 0);
+	}
 
 	return widget;
 }

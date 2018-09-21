@@ -51,7 +51,7 @@ class Widget: public QWidget
 	 * Return number of pixels that correspond to the given line-heights of text.
 	 */
 	float
-	em_pixels (float ems) const;
+	em_pixels (float ems = 1.0f) const;
 
   public:
 	/**
@@ -59,6 +59,14 @@ class Widget: public QWidget
 	 */
 	static QWidget*
 	create_color_widget (QColor, QWidget* parent);
+
+	/**
+	 * Return label with colored strip.
+	 * \param	strip_position
+	 *			Qt::AlignTop, Qt::AlignBottom, Qt::AlignLeft or Qt::AlignRight.
+	 */
+	QWidget*
+	create_colored_strip_label (QString const& label, QColor color, Qt::Alignment strip_position, QWidget* parent) const;
 };
 
 
