@@ -82,7 +82,7 @@ class BasicGauge
 	};
 
   protected:
-	static constexpr	xf::Range<float>	kNormalizedRange	{ 0.0, 1.0 };
+	static constexpr	xf::Range<float>	kNormalizedRange	{ 0.0f, 1.0f };
 	static inline		QColor const		kSilver				{ 0xbb, 0xbd, 0xbf };
 	static inline		QColor const		kWarningColor		{ 255, 200, 0 };
 	static inline		QColor const		kCriticalColor		{ 255, 35, 35 };

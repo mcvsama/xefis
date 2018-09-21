@@ -161,7 +161,7 @@ AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
 							xf::PropertyIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const
 {
-	xf::Range<si::Angle> roll_limits { -*io.roll_limits, +*io.roll_limits };
+	xf::Range roll_limits { -*io.roll_limits, +*io.roll_limits };
 
 	if (cmd_direction && measured_direction)
 		return xf::clamped (pid (*cmd_direction, *measured_direction, update_dt), roll_limits);
