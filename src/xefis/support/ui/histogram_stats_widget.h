@@ -43,7 +43,7 @@ class HistogramStatsWidget: public xf::Widget
 	/**
 	 * Set histogram to use for stats.
 	 */
-	template<class HistogramValue, class CriticalValue>
+	template<class HistogramValue, class CriticalValue = HistogramValue>
 		void
 		set_data (Histogram<HistogramValue> const&, std::optional<CriticalValue> critical_value = {});
 
