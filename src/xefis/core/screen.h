@@ -32,6 +32,7 @@
 #include <xefis/core/logger.h>
 #include <xefis/core/screen_spec.h>
 #include <xefis/support/system/work_performer.h>
+#include <xefis/utility/named_instance.h>
 #include <xefis/utility/noncopyable.h>
 #include <xefis/utility/tracker.h>
 
@@ -74,6 +75,7 @@ class InstrumentDetails
  */
 class Screen:
 	public QWidget,
+	public NamedInstance,
 	private Noncopyable
 {
 	Q_OBJECT
@@ -84,7 +86,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&, Graphics const&, Logger const&);
+	Screen (ScreenSpec const&, Graphics const&, std::string_view const& instance, Logger const&);
 
 	// Dtor
 	~Screen();

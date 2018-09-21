@@ -42,8 +42,9 @@ InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer
 } // namespace detail
 
 
-Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Logger const& logger):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, std::string_view const& instance, Logger const& logger):
 	QWidget (nullptr),
+	NamedInstance (instance),
 	_logger (logger.with_scope ("<screen>")),
 	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
 						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
