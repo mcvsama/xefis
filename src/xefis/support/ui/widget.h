@@ -31,7 +31,9 @@ namespace xf {
 class Widget: public QWidget
 {
   protected:
-	using QWidget::QWidget;
+	// Ctor
+	explicit
+	Widget (QWidget* parent = nullptr, Qt::WindowFlags = Qt::Widget);
 
 	/**
 	 * Return current PixelDensity.
