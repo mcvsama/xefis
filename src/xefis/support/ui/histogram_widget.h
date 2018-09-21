@@ -29,6 +29,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/ui/widget.h>
 #include <xefis/utility/histogram.h>
+#include <xefis/utility/numeric.h>
 
 
 namespace xf {
@@ -106,7 +107,7 @@ template<class Value>
 
 		for (auto const& m: marks)
 		{
-			auto const pos = m / (histogram.x_max() - histogram.x_min());
+			auto const pos = renormalize (m, { histogram.x_min(), histogram.x_max() }, Range { 0.0f, 1.0f });
 
 			if (0.0f <= pos && pos <= 1.0f)
 				_marks.emplace_back (pos);
