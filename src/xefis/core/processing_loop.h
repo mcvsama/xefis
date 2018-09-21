@@ -62,6 +62,9 @@ class ProcessingLoop:
 {
 	Q_OBJECT
 
+	static constexpr std::size_t	kMaxProcessingTimesBackLog	= 1000;
+	static constexpr float			kLatencyFactorLogThreshold	= 2.0f;
+
   public:
 	class ModuleDetails
 	{
@@ -98,12 +101,14 @@ class ProcessingLoop:
 	/**
 	 * Return the machine object to which this ProcessingLoop belongs.
 	 */
+	[[nodiscard]]
 	Machine&
 	machine() const noexcept;
 
 	/**
 	 * Return main Xefis object.
 	 */
+	[[nodiscard]]
 	Xefis&
 	xefis() const noexcept;
 
@@ -124,20 +129,44 @@ class ProcessingLoop:
 	 * Return current processing cycle, if called during a processing cycle.
 	 * Otherwise return nullptr.
 	 */
+	[[nodiscard]]
 	Cycle const*
 	current_cycle() const;
 
 	/**
+	 * Processing cycle period.
+	 */
+	[[nodiscard]]
+	si::Time
+	loop_period();
+
+	/**
 	 * A sequence of modules loaded into this processing loop.
 	 */
+	[[nodiscard]]
 	Sequence<ModuleDetailsList::iterator>
 	module_details_list() noexcept;
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
 	 */
+	[[nodiscard]]
 	Sequence<ModuleDetailsList::const_iterator>
 	module_details_list() const noexcept;
+
+	/**
+	 * Processing times buffer.
+	 */
+	[[nodiscard]]
+	boost::circular_buffer<si::Time> const&
+	processing_times() const noexcept;
+
+	/**
+	 * Processing latencies buffer.
+	 */
+	[[nodiscard]]
+	boost::circular_buffer<si::Time> const&
+	processing_latencies() const noexcept;
 
   protected:
 	/**
@@ -147,17 +176,19 @@ class ProcessingLoop:
 	execute_cycle();
 
   private:
-	Machine&					_machine;
-	Xefis&						_xefis;
-	QTimer*						_loop_timer;
-	Time						_loop_period		{ 10_ms };
-	std::optional<Timestamp>	_previous_timestamp;
-	std::vector<BasicModule*>	_uninitialized_modules;
-	std::optional<Cycle>		_current_cycle;
-	Cycle::Number				_next_cycle_number	{ 1 };
-	Logger						_logger;
-	Tracker<BasicModule>		_modules_tracker;
-	ModuleDetailsList			_module_details_list;
+	Machine&							_machine;
+	Xefis&								_xefis;
+	QTimer*								_loop_timer;
+	si::Time							_loop_period;
+	std::optional<Timestamp>			_previous_timestamp;
+	std::vector<BasicModule*>			_uninitialized_modules;
+	std::optional<Cycle>				_current_cycle;
+	Tracker<BasicModule>				_modules_tracker;
+	ModuleDetailsList					_module_details_list;
+	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
+	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
+	Cycle::Number						_next_cycle_number		{ 1 };
+	Logger								_logger;
 };
 
 
@@ -214,6 +245,13 @@ ProcessingLoop::current_cycle() const
 }
 
 
+inline si::Time
+ProcessingLoop::loop_period()
+{
+	return _loop_period;
+}
+
+
 inline auto
 ProcessingLoop::module_details_list() noexcept -> Sequence<ModuleDetailsList::iterator>
 {
@@ -225,6 +263,20 @@ inline auto
 ProcessingLoop::module_details_list() const noexcept -> Sequence<ModuleDetailsList::const_iterator>
 {
 	return { _module_details_list.cbegin(), _module_details_list.cend() };
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+ProcessingLoop::processing_times() const noexcept
+{
+	return _processing_times;
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+ProcessingLoop::processing_latencies() const noexcept
+{
+	return _processing_latencies;
 }
 
 } // namespace xf

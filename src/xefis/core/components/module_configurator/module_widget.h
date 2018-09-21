@@ -27,6 +27,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/machine.h>
+#include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/core/components/property_tree/property_tree.h>
 #include <xefis/support/ui/histogram_widget.h>
 #include <xefis/support/ui/histogram_stats_widget.h>
@@ -36,14 +37,14 @@
 #include "module_widget.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
 /**
  * Configuration widget for module.
  * Contains generic config widgets, module's configurator widget,
  * and other stuff.
  */
-class ModuleWidget: public xf::Widget
+class ModuleWidget: public ConfigWidget
 {
   public:
 	// Ctor
@@ -62,9 +63,6 @@ class ModuleWidget: public xf::Widget
 
 	QWidget*
 	create_performance_tab();
-
-	std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-	create_performance_widget (QWidget* parent, QString const& title);
 
   private:
 	BasicModule&				_module;
@@ -85,7 +83,7 @@ ModuleWidget::module() const noexcept
 	return _module;
 }
 
-} // namespace xf
+} // namespace xf::configurator
 
 #endif
 

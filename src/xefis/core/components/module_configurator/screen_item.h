@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
-#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__MODULE_ITEM_H__INCLUDED
+#ifndef XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_ITEM_H__INCLUDED
+#define XEFIS__CORE__COMPONENTS__MODULE_CONFIGURATOR__SCREEN_ITEM_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -22,36 +22,33 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/module.h>
-
-// Local:
-#include "processing_loop_item.h"
+#include <xefis/core/screen.h>
 
 
 namespace xf::configurator {
 
-class ModuleItem: public QTreeWidgetItem
+class ScreenItem: public QTreeWidgetItem
 {
   public:
 	// Ctor
 	explicit
-	ModuleItem (BasicModule& module, QTreeWidgetItem& parent);
+	ScreenItem (Screen&, QTreeWidget& parent);
 
 	/**
-	 * Return Module* associated with this item.
+	 * Return Screen* associated with this item.
 	 */
-	BasicModule&
-	module() const noexcept;
+	Screen&
+	screen() const noexcept;
 
   private:
-	BasicModule& _module;
+	Screen& _screen;
 };
 
 
-inline BasicModule&
-ModuleItem::module() const noexcept
+inline Screen&
+ScreenItem::screen() const noexcept
 {
-	return _module;
+	return _screen;
 }
 
 } // namespace xf::configurator

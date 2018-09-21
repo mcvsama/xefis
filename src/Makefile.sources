@@ -220,11 +220,15 @@ NODEP_SOURCES			+= $(VERSION_FILE)
 ######## /xefis/core/components ########
 
 XEFIS_HEADERS			+= xefis/core/components/configurator/configurator_widget.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/config_widget.h
+XEFIS_HEADERS_MOC		+= xefis/core/components/module_configurator/configurable_items_list.h
 XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_configurator.h
 XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_item.h
 XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_widget.h
-XEFIS_HEADERS_MOC		+= xefis/core/components/module_configurator/modules_list.h
 XEFIS_HEADERS			+= xefis/core/components/module_configurator/processing_loop_item.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/processing_loop_widget.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/screen_item.h
+XEFIS_HEADERS			+= xefis/core/components/module_configurator/screen_widget.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/data_recorder.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graph_widget.h
 XEFIS_HEADERS			+= xefis/core/components/data_recorder/graphs_stack.h
@@ -232,11 +236,15 @@ XEFIS_HEADERS			+= xefis/core/components/property_tree/property_item.h
 XEFIS_HEADERS			+= xefis/core/components/property_tree/property_tree.h
 
 XEFIS_SOURCES			+= xefis/core/components/configurator/configurator_widget.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/config_widget.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/configurable_items_list.cc
 XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_configurator.cc
 XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_item.cc
 XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/modules_list.cc
 XEFIS_SOURCES			+= xefis/core/components/module_configurator/processing_loop_item.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/processing_loop_widget.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/screen_item.cc
+XEFIS_SOURCES			+= xefis/core/components/module_configurator/screen_widget.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/data_recorder.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graph_widget.cc
 XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc

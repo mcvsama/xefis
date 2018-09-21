@@ -24,14 +24,15 @@
 #include <xefis/utility/qutils.h>
 
 // Local:
-#include "modules_list.h"
+#include "configurable_items_list.h"
 #include "module_item.h"
 #include "processing_loop_item.h"
+#include "screen_item.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
-ModulesList::ModulesList (Machine& machine, QWidget* parent):
+ConfigurableItemsList::ConfigurableItemsList (Machine& machine, QWidget* parent):
 	QWidget (parent),
 	_machine (machine)
 {
@@ -65,13 +66,13 @@ ModulesList::ModulesList (Machine& machine, QWidget* parent):
 
 	read();
 
-	_processing_loop_ptrs.reserve (100);
-	_module_ptrs.reserve (1000);
+	_tmp_processing_loop_ptrs.reserve (100);
+	_tmp_module_ptrs.reserve (1000);
 }
 
 
 void
-ModulesList::deselect()
+ConfigurableItemsList::deselect()
 {
 	_list->clearSelection();
 	_list->setCurrentItem (nullptr);
@@ -80,7 +81,7 @@ ModulesList::deselect()
 
 template<class TempContainer, class ItemToPointerMapper>
 	inline void
-	ModulesList::populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer)
+	ConfigurableItemsList::populate_subtree (QTreeWidgetItem& tree, TempContainer& container, ItemToPointerMapper&& item_to_pointer)
 	{
 		for (int ci = 0; ci < tree.childCount(); ++ci)
 		{
@@ -98,14 +99,18 @@ template<class TempContainer, class ItemToPointerMapper>
 
 
 void
-ModulesList::read()
+ConfigurableItemsList::read()
 {
-	_processing_loop_ptrs.clear();
+	// Processing loops:
+	for (auto p: _tmp_processing_loop_ptrs)
+		new ProcessingLoopItem (*p, *_list);
+
+	_tmp_processing_loop_ptrs.clear();
 
 	for (auto& processing_loop: _machine.processing_loops())
-		_processing_loop_ptrs.push_back (&processing_loop.value());
+		_tmp_processing_loop_ptrs.push_back (&processing_loop.value());
 
-	populate_subtree (*_list->invisibleRootItem(), _processing_loop_ptrs, [](auto* item) -> ProcessingLoop* {
+	populate_subtree (*_list->invisibleRootItem(), _tmp_processing_loop_ptrs, [](auto* item) -> ProcessingLoop* {
 		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (item))
 			return &pli->processing_loop();
 		else
@@ -113,20 +118,44 @@ ModulesList::read()
 	});
 
 	// Add new processing loops:
-	for (auto p: _processing_loop_ptrs)
+	for (auto p: _tmp_processing_loop_ptrs)
 		new ProcessingLoopItem (*p, *_list);
+
+	// Screens:
+	_tmp_screen_ptrs.clear();
+
+	for (auto& screen: _machine.screens())
+		_tmp_screen_ptrs.push_back (&screen.value());
+
+	populate_subtree (*_list->invisibleRootItem(), _tmp_screen_ptrs, [](auto* item) -> Screen* {
+		if (auto* si = dynamic_cast<ScreenItem*> (item))
+			return &si->screen();
+		else
+			return nullptr;
+	});
+
+	// Add new processing loops:
+	for (auto s: _tmp_screen_ptrs)
+		new ScreenItem (*s, *_list);
 
 	for (int ci = 0; ci < _list->invisibleRootItem()->childCount(); ++ci)
 	{
+		// Add modules registered in a ProcessingLoop:
 		if (auto* pli = dynamic_cast<ProcessingLoopItem*> (_list->invisibleRootItem()->child (ci)))
 		{
-			_module_ptrs.clear();
+			_tmp_module_ptrs.clear();
 			ProcessingLoop& processing_loop = pli->processing_loop();
 
 			for (auto& module_details: processing_loop.module_details_list())
-				_module_ptrs.push_back (&module_details.module());
+			{
+				auto& module = module_details.module();
 
-			populate_subtree (*pli, _module_ptrs, [](auto* item) -> BasicModule* {
+				// Don't add Instruments. They will be children of Screen items.
+				if (!dynamic_cast<BasicInstrument*> (&module))
+					_tmp_module_ptrs.push_back (&module);
+			}
+
+			populate_subtree (*pli, _tmp_module_ptrs, [](auto* item) -> BasicModule* {
 				if (auto* mi = dynamic_cast<ModuleItem*> (item))
 					return &mi->module();
 				else
@@ -134,24 +163,49 @@ ModulesList::read()
 			});
 
 			// Add new modules:
-			for (auto p: _module_ptrs)
+			for (auto p: _tmp_module_ptrs)
 				new ModuleItem (*p, *pli);
+		}
+
+		// Add instruments registered in a Screen:
+		if (auto* si = dynamic_cast<ScreenItem*> (_list->invisibleRootItem()->child (ci)))
+		{
+			_tmp_module_ptrs.clear();
+			Screen& screen = si->screen();
+
+			for (auto& disclosure: screen.instrument_tracker())
+				_tmp_module_ptrs.push_back (&*disclosure.registrant());
+
+			populate_subtree (*si, _tmp_module_ptrs, [](auto* item) -> BasicModule* {
+				if (auto* mi = dynamic_cast<ModuleItem*> (item))
+					return &mi->module();
+				else
+					return nullptr;
+			});
+
+			// Add new instruments:
+			for (auto p: _tmp_module_ptrs)
+				new ModuleItem (*p, *si);
 		}
 	}
 }
 
 
 void
-ModulesList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
+ConfigurableItemsList::item_selected (QTreeWidgetItem* current, QTreeWidgetItem*)
 {
 	if (current)
 	{
 		if (ModuleItem* mi = dynamic_cast<ModuleItem*> (current))
 			emit module_selected (mi->module());
+		else if (ProcessingLoopItem* pli = dynamic_cast<ProcessingLoopItem*> (current))
+			emit processing_loop_selected (pli->processing_loop());
+		else if (ScreenItem* si = dynamic_cast<ScreenItem*> (current))
+			emit screen_selected (si->screen());
 	}
 	else
 		emit none_selected();
 }
 
-} // namespace xf
+} // namespace xf::configurator
 

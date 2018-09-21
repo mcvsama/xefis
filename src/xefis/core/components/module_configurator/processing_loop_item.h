@@ -25,7 +25,7 @@
 #include <xefis/core/processing_loop.h>
 
 
-namespace xf {
+namespace xf::configurator {
 
 class ProcessingLoopItem: public QTreeWidgetItem
 {
@@ -51,7 +51,7 @@ ProcessingLoopItem::processing_loop() const noexcept
 	return _processing_loop;
 }
 
-} // namespace xf
+} // namespace xf::configurator
 
 #endif
 

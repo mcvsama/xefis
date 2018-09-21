@@ -23,6 +23,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/qt/ownership_breaker.h>
 #include <xefis/utility/histogram.h>
 
@@ -30,26 +31,20 @@
 #include "module_widget.h"
 
 
-namespace xf {
+namespace xf::configurator {
 
 ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
-	xf::Widget (parent),
+	ConfigWidget (parent),
 	_module (module),
 	_instrument (dynamic_cast<BasicInstrument*> (&_module))
 {
 	auto full_name_str = QString::fromStdString (identifier (module));
 
 	QString module_type = _instrument ? "Instrument " : "Module ";
-	QColor color = _instrument ? QColor (0xd8, 0x90, 0) : Qt::blue;
-	QLabel* name_label = new QLabel (module_type + full_name_str.toHtmlEscaped(), this);
-	name_label->setStyleSheet ("QLabel { margin: 0.15em; }");
-	name_label->setAlignment (Qt::AlignLeft);
-	QFont font = name_label->font();
-	font.setPointSize (1.4 * font.pointSize());
-	name_label->setFont (font);
+	QColor color = _instrument ? QColor (0xff, 0x66, 0xff) : QColor (0x50, 0x79, 0xff);
+	QWidget* name_label = create_colored_strip_label (module_type + full_name_str.toHtmlEscaped(), color, Qt::AlignBottom, this);
 
 	auto tabs = new QTabWidget (this);
-
 	tabs->addTab (create_performance_tab(), "Performance");
 
 	if (auto* io_base = _module.io_base())
@@ -70,21 +65,14 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 		tabs->addTab (new OwnershipBreaker (module_config_widget, this), "Module config");
 	}
 
-	auto* color_widget = Widget::create_color_widget (color, this);
-	color_widget->setFixedHeight (em_pixels (0.3f));
-
-	auto* label_layout = new QVBoxLayout();
-	label_layout->addWidget (color_widget);
-	label_layout->addWidget (name_label);
-
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
-	layout->addLayout (label_layout);
+	layout->addWidget (name_label);
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
-	_refresh_timer->setInterval ((0.25_s).in<si::Millisecond>());
+	_refresh_timer->setInterval (1000_Hz / ConfigWidget::kDataRefreshRate);
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ModuleWidget::refresh);
 	_refresh_timer->start();
 }
@@ -93,11 +81,11 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 void
 ModuleWidget::refresh()
 {
-	if (_processing_time_histogram)
 	{
 		auto const accounting_api = BasicModule::AccountingAPI (_module);
-		auto const& processing_times = accounting_api.processing_times();
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (processing_times.begin(), processing_times.end(), 0.01_ms, 0.0_ms, 1_ms);
+		auto const& samples = accounting_api.processing_times();
+		// TODO auto histogram width (see __TODO__)
+		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 0.01_ms, 0.0_ms, 1_ms);
 
 		_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
 		_processing_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.cycle_time()));
@@ -106,8 +94,9 @@ ModuleWidget::refresh()
 	if (_painting_time_histogram)
 	{
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
-		auto const& painting_times = accounting_api.painting_times();
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (painting_times.begin(), painting_times.end(), 1_ms, 0.0_ms, 100_ms);
+		auto const& samples = accounting_api.painting_times();
+		// TODO auto histogram width (see __TODO__)
+		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 1_ms, 0.0_ms, 100_ms);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
 		_painting_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.frame_time()));
@@ -127,41 +116,18 @@ ModuleWidget::create_performance_tab()
 	if (_instrument)
 		std::tie (_painting_time_histogram, _painting_time_stats, painting_time_group) = create_performance_widget (widget, "Painting time");
 
-	auto layout = new QVBoxLayout (widget);
-	auto histograms_layout = new QGridLayout();
-	histograms_layout->addWidget (processing_time_group, 0, 0);
+	auto layout = new QGridLayout (widget);
+	layout->setMargin (0);
+	layout->addWidget (processing_time_group, 0, 0);
 
 	if (painting_time_group)
-		histograms_layout->addWidget (painting_time_group, 1, 0);
+		layout->addWidget (painting_time_group, 1, 0);
 
-	histograms_layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
-	layout->addLayout (histograms_layout);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding));
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
 
 	return widget;
 }
 
-
-std::tuple<xf::HistogramWidget*, xf::HistogramStatsWidget*, QWidget*>
-ModuleWidget::create_performance_widget (QWidget* parent, QString const& title)
-{
-	QMargins const margins (em_pixels (0.5f), em_pixels (0.25f), em_pixels (0.5f), em_pixels (0.25f));
-
-	auto* group_box = new QGroupBox (title, parent);
-	group_box->setFixedSize (em_pixels (40.0), em_pixels (15.0));
-
-	auto* histogram_widget = new xf::HistogramWidget (group_box);
-	histogram_widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-	auto* stats_widget = new xf::HistogramStatsWidget (group_box);
-
-	auto* group_layout = new QVBoxLayout (group_box);
-	group_layout->addWidget (histogram_widget);
-	group_layout->addWidget (stats_widget);
-	group_layout->setContentsMargins (margins);
-
-	return { histogram_widget, stats_widget, group_box };
-}
-
-} // namespace xf
+} // namespace xf::configurator
 
