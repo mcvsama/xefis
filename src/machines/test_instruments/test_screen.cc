@@ -22,7 +22,7 @@
 
 
 TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger):
-	Screen (spec, graphics, logger.with_scope ("TestScren")),
+	Screen (spec, graphics, "Test Screen", logger.with_scope ("TestScren")),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
 	_adi_work_performer (1, logger.with_scope ("ADI")),

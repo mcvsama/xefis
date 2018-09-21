@@ -23,14 +23,16 @@
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
 #include <xefis/core/machine.h>
+#include <xefis/core/processing_loop.h>
 #include <xefis/core/xefis.h>
+#include <xefis/modules/test/test_generator.h>
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
 #include <xefis/utility/tracker.h>
 
 // Local:
-#include "test_loop.h"
+#include "test_screen.h"
 
 
 class TestInstrumentsMachine: public xf::Machine
@@ -40,11 +42,13 @@ class TestInstrumentsMachine: public xf::Machine
 	TestInstrumentsMachine (xf::Xefis&);
 
   private:
-	xf::Logger								_logger;
-	std::unique_ptr<xf::NavaidStorage>		_navaid_storage;
-	std::unique_ptr<xf::Airframe>			_airframe;
-	std::unique_ptr<xf::WorkPerformer>		_work_performer;
-	std::optional<xf::Registrant<TestLoop>>	_test_loop;
+	xf::Logger											_logger;
+	std::unique_ptr<xf::NavaidStorage>					_navaid_storage;
+	std::unique_ptr<xf::Airframe>						_airframe;
+	std::unique_ptr<xf::WorkPerformer>					_work_performer;
+	std::optional<xf::Registrant<xf::ProcessingLoop>>	_test_loop;
+	std::optional<xf::Registrant<TestScreen>>			_test_screen;
+	std::optional<xf::Registrant<TestGenerator>>		_test_generator;
 };
 
 #endif
