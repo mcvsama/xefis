@@ -82,7 +82,7 @@ AFCS_AT::compute_thrust()
 					// This is more tricky, since we measure IAS, but control thrust.
 					// There's no 1:1 correlaction between them.
 					// TODO use _ias_pid.set_output_limit (...);
-					xf::Range<si::Force> output_extents { *io.output_thrust_minimum, *io.output_thrust_maximum };
+					xf::Range output_extents { *io.output_thrust_minimum, *io.output_thrust_maximum };
 					computed_thrust = xf::clamped (_ias_pid_smoother (_ias_pid (*io.cmd_ias, *io.measured_ias, dt), dt),
 												   output_extents);
 					// TODO make PID control the change rate of thrust, not the thrust directly. Maybe incorporate

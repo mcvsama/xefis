@@ -187,7 +187,7 @@ template<class Input, class Control>
 								  xf::PropertyIn<Input> const& measured_param,
 								  si::Time update_dt) const
 	{
-		xf::Range<si::Angle> pitch_limits { -*io.pitch_limits, +*io.pitch_limits };
+		xf::Range pitch_limits { -*io.pitch_limits, +*io.pitch_limits };
 
 		if (cmd_param && measured_param)
 			return xf::clamped (pid (*cmd_param, *measured_param, update_dt), pitch_limits);

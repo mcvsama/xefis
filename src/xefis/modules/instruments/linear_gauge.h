@@ -162,7 +162,7 @@ template<class Value>
 	LinearGauge<Value>::paint (xf::PaintRequest paint_request) const
 	{
 		auto& io = this->io;
-		xf::Range<Value> const range { *io.value_minimum, *io.value_maximum };
+		xf::Range const range { *io.value_minimum, *io.value_maximum };
 
 		GaugeValues values;
 		values.get_from (io, range, (_converter && io.value) ? _converter (*io.value) : io.value.to_floating_point());

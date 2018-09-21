@@ -459,7 +459,7 @@ template<class A, class V>
 	{
 		if (_data_map.size() > 1)
 		{
-			Range<std::pair<Argument, Value>> search_domain_2 {
+			Range search_domain_2 {
 				std::make_pair (search_domain.min(), Value()),
 				std::make_pair (search_domain.max(), Value()),
 			};
@@ -536,8 +536,8 @@ template<class A, class V>
 		auto range = extended_adjacent_find (_data_map.begin(), _data_map.end(), argument,
 											 [](auto pair) { return pair.first; });
 
-		Range<Argument> from { range.first->first, range.second->first };
-		Range<Value> to { range.first->second, range.second->second };
+		Range from { range.first->first, range.second->first };
+		Range to { range.first->second, range.second->second };
 
 		return renormalize (argument, from, to);
 	}

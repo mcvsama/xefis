@@ -448,7 +448,7 @@ AFCS::knob_vertical_change (int delta)
 			_mcp_vs = xf::clamped (*_mcp_vs + kVSStep * delta, kVSRange);
 
 			// Disengage on 0 crossing:
-			if (xf::Range<si::Velocity> ({ -0.5 * kVSStep, 0.5 * kVSStep }).includes (*_mcp_vs))
+			if (xf::Range (-0.5 * kVSStep, 0.5 * kVSStep).includes (*_mcp_vs))
 			{
 				_mcp_vs.reset();
 				perhaps_alt_hold();
@@ -461,7 +461,7 @@ AFCS::knob_vertical_change (int delta)
 			_mcp_fpa = xf::clamped (*_mcp_fpa + kFPAStep * delta, kFPARange);
 
 			// Disengage on 0 crossing:
-			if (xf::Range<si::Angle> ({ -0.5 * kFPAStep, +0.5 * kFPAStep }).includes (*_mcp_fpa))
+			if (xf::Range (-0.5 * kFPAStep, +0.5 * kFPAStep).includes (*_mcp_fpa))
 			{
 				_mcp_fpa.reset();
 				perhaps_alt_hold();

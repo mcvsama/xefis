@@ -164,7 +164,7 @@ JoystickInput::Axis::set_value (float value)
 	// Power:
 	value = xf::sgn (value) * std::pow (std::abs (value), _power);
 	// Renormalize from standard [-1.0, 1.0]:
-	value = xf::renormalize (value, xf::Range<float> (-1.f, 1.f), xf::Range<float> (_output_minimum, _output_maximum));
+	value = xf::renormalize (value, xf::Range (-1.f, 1.f), xf::Range (_output_minimum, _output_maximum));
 
 	_property = value;
 	_angle_property = xf::renormalize (value, { -1.0, +1.0 }, _angle_range);
