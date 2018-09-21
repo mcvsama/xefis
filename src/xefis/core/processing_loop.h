@@ -138,7 +138,7 @@ class ProcessingLoop:
 	 */
 	[[nodiscard]]
 	si::Time
-	loop_period();
+	period();
 
 	/**
 	 * A sequence of modules loaded into this processing loop.
@@ -246,7 +246,7 @@ ProcessingLoop::current_cycle() const
 
 
 inline si::Time
-ProcessingLoop::loop_period()
+ProcessingLoop::period()
 {
 	return _loop_period;
 }
