@@ -29,7 +29,7 @@
 namespace xf {
 
 ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
-	QWidget (parent),
+	Widget (parent),
 	_machine (machine)
 {
 	_module_configurator = new ModuleConfigurator (_machine, this);
@@ -40,8 +40,7 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	_tabs->addTab (_data_recorder, "&Data recorder");
 
 	QVBoxLayout* layout = new QVBoxLayout (this);
-	layout->setMargin (0);
-	layout->setSpacing (WidgetSpacing);
+	layout->setMargin (em_pixels (0.15f));
 	layout->addWidget (_tabs);
 }
 

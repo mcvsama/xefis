@@ -38,10 +38,5 @@ is_std_pressure (Pressure pressure)
 	return abs (STD_PRESSURE - pressure) < 0.01_inHg;
 }
 
-// UI constants:
-
-constexpr int WidgetSpacing	= 4;
-constexpr int WidgetMargin	= 4;
-
 #endif
 

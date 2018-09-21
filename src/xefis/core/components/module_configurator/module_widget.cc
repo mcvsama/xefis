@@ -79,7 +79,6 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
-	layout->setSpacing (WidgetSpacing);
 	layout->addLayout (label_layout);
 	layout->addWidget (tabs);
 
