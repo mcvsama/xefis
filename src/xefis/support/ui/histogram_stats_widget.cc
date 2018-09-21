@@ -31,6 +31,7 @@ namespace xf {
 HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 	xf::Widget (parent)
 {
+	auto* num_samples_label = new QLabel ("Samples: ", this);
 	auto* min_label = new QLabel ("Min: ", this);
 	auto* max_label = new QLabel ("Max: ", this);
 	auto* mean_label = new QLabel ("Mean: ", this);
@@ -38,6 +39,7 @@ HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 	auto* stddev_label = new QLabel (u8"σ: ", this);
 	_critical_label = new QLabel ("", this);
 
+	_num_samples_value = new QLabel (this);
 	_min_value = new QLabel (this);
 	_max_value = new QLabel (this);
 	_mean_value = new QLabel (this);
@@ -48,23 +50,26 @@ HistogramStatsWidget::HistogramStatsWidget (QWidget* parent):
 	auto* layout = new QGridLayout (this);
 	layout->setHorizontalSpacing (em_pixels (1.0f));
 
-	layout->addWidget (min_label, 0, 0);
-	layout->addWidget (_min_value, 0, 1);
+	layout->addWidget (num_samples_label, 0, 0);
+	layout->addWidget (_num_samples_value, 0, 1);
 
-	layout->addWidget (max_label, 1, 0);
-	layout->addWidget (_max_value, 1, 1);
+	layout->addWidget (min_label, 1, 0);
+	layout->addWidget (_min_value, 1, 1);
 
-	layout->addWidget (mean_label, 0, 2);
-	layout->addWidget (_mean_value, 0, 3);
+	layout->addWidget (max_label, 2, 0);
+	layout->addWidget (_max_value, 2, 1);
 
-	layout->addWidget (median_label, 1, 2);
-	layout->addWidget (_median_value, 1, 3);
+	layout->addWidget (mean_label, 1, 2);
+	layout->addWidget (_mean_value, 1, 3);
 
-	layout->addWidget (stddev_label, 0, 4);
-	layout->addWidget (_stddev_value, 0, 5);
+	layout->addWidget (median_label, 2, 2);
+	layout->addWidget (_median_value, 2, 3);
 
-	layout->addWidget (_critical_label, 1, 4);
-	layout->addWidget (_critical_value, 1, 5);
+	layout->addWidget (stddev_label, 1, 4);
+	layout->addWidget (_stddev_value, 1, 5);
+
+	layout->addWidget (_critical_label, 2, 4);
+	layout->addWidget (_critical_value, 2, 5);
 
 	layout->setColumnStretch (0, 0);
 	layout->setColumnStretch (1, 100);
