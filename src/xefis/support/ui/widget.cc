@@ -26,6 +26,13 @@
 
 namespace xf {
 
+Widget::Widget (QWidget* parent, Qt::WindowFlags flags):
+	QWidget (parent, flags)
+{
+	setStyleSheet ("QTabWidget::pane > QWidget { margin: 0.2em; }");
+}
+
+
 QWidget*
 Widget::create_color_widget (QColor color, QWidget* parent)
 {
