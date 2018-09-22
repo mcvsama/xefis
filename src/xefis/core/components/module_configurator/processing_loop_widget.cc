@@ -23,6 +23,7 @@
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/utility/histogram.h>
+#include <xefis/utility/numeric.h>
 
 // Local:
 #include "processing_loop_widget.h"
@@ -55,22 +56,33 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 void
 ProcessingLoopWidget::refresh()
 {
+	using Milliseconds = si::Quantity<si::Millisecond>;
+
 	{
 		auto const& samples = _processing_loop.processing_times();
-		// TODO auto histogram width (see __TODO__)
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 0.01_ms, 0.0_ms, 1_ms);
+		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
+		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
-		_processing_time_histogram->set_data (histogram, { _processing_loop.loop_period() });
-		_processing_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (_processing_loop.loop_period()));
+		_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
+		_processing_time_histogram->set_grid_lines (grid_lines);
+		_processing_time_stats->set_data (histogram, std::make_optional<Milliseconds> (_processing_loop.period()));
 	}
 
 	{
 		auto const& samples = _processing_loop.processing_latencies();
-		// TODO auto histogram width (see __TODO__)
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 0.2_ms, -10_ms, 10_ms);
 
-		_processing_latency_histogram->set_data (histogram, { -_processing_loop.loop_period(), _processing_loop.loop_period() });
-		_processing_latency_stats->set_data (histogram);
+		if (!samples.empty())
+		{
+			auto const minmax = std::minmax_element (samples.begin(), samples.end());
+			auto const min = *minmax.first;
+			auto const max = *minmax.second;
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (std::max (-min, max));
+			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 50, -range, range);
+
+			_processing_latency_histogram->set_data (histogram, { -_processing_loop.period(), _processing_loop.period() });
+			_processing_latency_histogram->set_grid_lines (2 * grid_lines);
+			_processing_latency_stats->set_data (histogram);
+		}
 	}
 }
 

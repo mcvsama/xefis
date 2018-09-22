@@ -56,6 +56,12 @@ class HistogramWidget: public xf::Widget
 		set_data (Histogram<Value> const&, std::vector<Value> marks = {});
 
 	/**
+	 * Set number of helper lines in the grid.
+	 */
+	void
+	set_grid_lines (std::size_t number);
+
+	/**
 	 * Show/hide count on the Y-axis.
 	 */
 	void
@@ -87,6 +93,7 @@ class HistogramWidget: public xf::Widget
 	QString						_x_mid_str;
 	QString						_x_max_str;
 	QString						_y_max_str;
+	std::size_t					_grid_lines			{ 10 };
 	bool						_y_legend_visible	{ false };
 };
 
@@ -116,6 +123,13 @@ template<class Value>
 		_canvas.reset();
 		update();
 	}
+
+
+inline void
+HistogramWidget::set_grid_lines (std::size_t number)
+{
+	_grid_lines = number;
+}
 
 
 inline void

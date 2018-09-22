@@ -26,6 +26,7 @@
 #include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/qt/ownership_breaker.h>
 #include <xefis/utility/histogram.h>
+#include <xefis/utility/numeric.h>
 
 // Local:
 #include "module_widget.h"
@@ -81,25 +82,33 @@ ModuleWidget::ModuleWidget (BasicModule& module, QWidget* parent):
 void
 ModuleWidget::refresh()
 {
+	using Milliseconds = si::Quantity<si::Millisecond>;
+
 	{
 		auto const accounting_api = BasicModule::AccountingAPI (_module);
 		auto const& samples = accounting_api.processing_times();
-		// TODO auto histogram width (see __TODO__)
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 0.01_ms, 0.0_ms, 1_ms);
 
-		_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
-		_processing_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.cycle_time()));
+		if (!samples.empty())
+		{
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+
+			_processing_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
+			_processing_time_histogram->set_grid_lines (grid_lines);
+			_processing_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.cycle_time()));
+		}
 	}
 
 	if (_painting_time_histogram)
 	{
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
+		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (accounting_api.frame_time());
 		auto const& samples = accounting_api.painting_times();
-		// TODO auto histogram width (see __TODO__)
-		xf::Histogram<si::Quantity<si::Millisecond>> histogram (samples.begin(), samples.end(), 1_ms, 0.0_ms, 100_ms);
+		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });
-		_painting_time_stats->set_data (histogram, std::make_optional<si::Quantity<si::Millisecond>> (accounting_api.frame_time()));
+		_painting_time_histogram->set_grid_lines (grid_lines);
+		_painting_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.frame_time()));
 	}
 }
 
