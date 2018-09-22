@@ -73,14 +73,38 @@ class MissingDomElement: public DomException
 
 
 /**
- * Throw when an element is not supported in given context.
+ * Throw when an element is malformed.
  */
-class BadDomElement: public DomException
+class MalformedDomElement: public DomException
 {
   public:
 	// Ctor
 	explicit
-	BadDomElement (QDomElement const& element, QString const& additional_message = QString()):
+	MalformedDomElement (QDomElement const& element, QString const& additional_message = QString()):
+		DomException ("element '" + element.tagName() + "' is malformed in " + get_path (element) +
+					  (additional_message.isEmpty() ? "" : ("; " + additional_message)))
+	{
+		hide_backtrace();
+	}
+
+	// Ctor
+	MalformedDomElement (QString const& message):
+		DomException (message)
+	{
+		hide_backtrace();
+	}
+};
+
+
+/**
+ * Throw when an element is not supported in given context.
+ */
+class UnexpectedDomElement: public DomException
+{
+  public:
+	// Ctor
+	explicit
+	UnexpectedDomElement (QDomElement const& element, QString const& additional_message = QString()):
 		DomException ("element '" + element.tagName() + "' is not supported in " + get_path (element) +
 					  (additional_message.isEmpty() ? "" : ("; " + additional_message)))
 	{
@@ -88,7 +112,7 @@ class BadDomElement: public DomException
 	}
 
 	// Ctor
-	BadDomElement (QString const& message):
+	UnexpectedDomElement (QString const& message):
 		DomException (message)
 	{
 		hide_backtrace();

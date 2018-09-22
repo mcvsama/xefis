@@ -617,7 +617,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 				current_column->push_back (_strips.back().get());
 			}
 			else
-				throw xf::BadDomElement (e);
+				throw xf::UnexpectedDomElement (e);
 		}
 
 		// Make sure that the column has exactly [rows] elements.
@@ -655,7 +655,7 @@ CDU::Page::Page (CDU& cdu, QDomElement const& page_element, Config& config, xf::
 			parse_column (e);
 		}
 		else
-			throw xf::BadDomElement (e);
+			throw xf::UnexpectedDomElement (e);
 	}
 }
 
@@ -821,7 +821,7 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, xf::Logger cons
 				throw xf::BadConfiguration ("duplicate page with id '" + page->id() + "'");
 		}
 		else
-			throw xf::BadDomElement (e);
+			throw xf::UnexpectedDomElement (e);
 	}
 
 	check_reachability();
@@ -926,7 +926,7 @@ CDU::CDU (xf::Xefis*, QDomElement const& config, xf::Graphics const& graphics, s
 			break;
 		}
 		else if (e != "settings" && e != "properties")
-			throw xf::BadDomElement (e);
+			throw xf::UnexpectedDomElement (e);
 	}
 
 	_current_page_id = _config->default_page_id();

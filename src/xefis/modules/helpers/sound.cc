@@ -108,13 +108,13 @@ Sound::Group::Group (QDomElement const& element, xf::SoundManager* sound_manager
 			if (e == "alarm")
 				_alarms.insert (std::make_unique<Alarm> (e, sound_manager));
 			else
-				throw xf::BadDomElement (e);
+				throw xf::UnexpectedDomElement (e);
 		}
 	}
 	else if (element == "alarm")
 		_alarms.insert (std::make_unique<Alarm> (element, sound_manager));
 	else
-		throw xf::BadDomElement (element);
+		throw xf::UnexpectedDomElement (element);
 }
 
 
@@ -145,11 +145,11 @@ Sound::Sound (v1::ModuleManager* module_manager, QDomElement const& config):
 				if (e2 == "group" || e2 == "alarm")
 					_groups.insert (std::make_unique<Group> (e2, this->module_manager()->xefis()->sound_manager()));
 				else
-					throw xf::BadDomElement (e2);
+					throw xf::UnexpectedDomElement (e2);
 			}
 		}
 		else
-			throw xf::BadDomElement (e);
+			throw xf::UnexpectedDomElement (e);
 	}
 }
 
