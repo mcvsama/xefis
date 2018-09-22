@@ -60,7 +60,8 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 	update_canvas (rect.size());
 	setFont (graphics.instrument_font());
 	setCursor (QCursor (Qt::CrossCursor));
-	show();
+	setMouseTracking (true);
+	setAttribute (Qt::WA_TransparentForMouseEvents);
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
