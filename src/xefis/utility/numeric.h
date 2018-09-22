@@ -342,6 +342,36 @@ template<class Iterator>
 		return sqrt (sum / (count - 1));
 	}
 
+
+/**
+ * Round value so that result can be used as a maximum value on a chart or histogram.
+ * Returns pair of Value and a number of helper lines for chart grid.
+ */
+template<class Value>
+	std::pair<Value, std::size_t>
+	get_max_for_axis (Value const& value)
+	{
+		Value fac (1);
+
+		while (Value (1e-6) <= fac && fac <= Value (1e+6))
+		{
+			if (value < 0.48 * fac)
+				fac /= 10.0;
+			else if (value < 0.8 * fac)
+				return { 1.0 * fac, 10 };
+			else if (value < 1.8 * fac)
+				return { 2.0 * fac, 2 };
+			else if (value < 2.8 * fac)
+				return { 3.0 * fac, 3 };
+			else if (value < 4.8 * fac)
+				return { 5.0 * fac, 5 };
+			else
+				fac *= 10.0;
+		};
+
+		return { fac, 10 };
+	}
+
 } // namespace xf
 
 #endif

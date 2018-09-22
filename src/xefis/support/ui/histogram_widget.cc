@@ -88,9 +88,9 @@ HistogramWidget::update_canvas()
 			{
 				painter.setPen (QPen (grid_color, grid_width, Qt::SolidLine, Qt::RoundCap));
 
-				for (std::size_t i = 1; i <= 10; ++i)
+				for (std::size_t i = 1; i <= _grid_lines; ++i)
 				{
-					auto const x = i * chart_rect.width() / 10;
+					auto const x = i * chart_rect.width() / _grid_lines;
 
 					painter.drawLine (x, 0.0f, x, chart_rect.height());
 				}
