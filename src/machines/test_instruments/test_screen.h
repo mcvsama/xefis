@@ -21,6 +21,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
+#include <xefis/core/machine.h>
 #include <xefis/core/screen.h>
 #include <xefis/modules/instruments/adi.h>
 #include <xefis/modules/instruments/flaps.h>
@@ -40,7 +41,7 @@ class TestScreen: public xf::Screen
   public:
 	// Ctor
 	explicit
-	TestScreen (xf::ScreenSpec const&, xf::Graphics const& graphics, xf::NavaidStorage const&, xf::Logger const& logger);
+	TestScreen (xf::ScreenSpec const&, xf::Graphics const& graphics, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
 
 	void
 	create_instruments();

@@ -38,7 +38,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	auto font_height = 3.15_mm;
 	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
 	spec.set_scale (1.0f);
-	auto& test_screen = _test_screen.emplace (spec, xefis.graphics(), *_navaid_storage, _logger.with_scope ("test screen"));
+	auto& test_screen = _test_screen.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen->set_paint_bounding_boxes (false);
 	register_screen (*_test_screen);
 
@@ -231,10 +231,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_loop.register_module (*_test_generator);
 	test_loop.start();
 
-	auto configurator_widget = new xf::ConfiguratorWidget (*this, nullptr);
-	auto lh = default_line_height (configurator_widget);
-	configurator_widget->resize (50 * lh, 30 * lh);
-	configurator_widget->show();
+	test_screen->show();
 }
 
 

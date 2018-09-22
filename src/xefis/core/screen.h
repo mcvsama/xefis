@@ -30,6 +30,7 @@
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
 #include <xefis/core/logger.h>
+#include <xefis/core/machine.h>
 #include <xefis/core/screen_spec.h>
 #include <xefis/support/system/work_performer.h>
 #include <xefis/utility/named_instance.h>
@@ -70,6 +71,9 @@ class InstrumentDetails
 } // namespace detail
 
 
+class Machine;
+
+
 /**
  * Collects instrument images and composites them onto its own area.
  */
@@ -86,7 +90,7 @@ class Screen:
   public:
 	// Ctor
 	explicit
-	Screen (ScreenSpec const&, Graphics const&, std::string_view const& instance, Logger const&);
+	Screen (ScreenSpec const&, Graphics const&, Machine&, std::string_view const& instance, Logger const&);
 
 	// Dtor
 	~Screen();
@@ -199,7 +203,11 @@ class Screen:
 	void
 	refresh();
 
+	void
+	show_configurator();
+
   private:
+	Machine&									_machine;
 	Logger										_logger;
 	InstrumentTracker							_instrument_tracker;
 	QTimer*										_refresh_timer;
