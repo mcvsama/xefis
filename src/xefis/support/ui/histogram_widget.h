@@ -83,6 +83,9 @@ class HistogramWidget: public xf::Widget
 	void
 	paintEvent (QPaintEvent*) override;
 
+	void
+	changeEvent (QEvent*) override;
+
   private:
 	Style						_style				{ Style::Bars };
 	std::optional<QImage>		_canvas;

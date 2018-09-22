@@ -41,9 +41,10 @@ void
 HistogramWidget::update_canvas()
 {
 	QPalette const pal = palette();
-	QColor const axes_color = pal.foreground().color();
-	QColor const line_color = pal.foreground().color();
-	QColor const bar_color = pal.foreground().color();
+	QColor foreground = pal.color (isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText);
+	QColor const axes_color = foreground;
+	QColor const line_color = foreground;
+	QColor const bar_color = foreground;
 	QColor const mark_color = Qt::blue;
 	QColor grid_color = axes_color;
 	grid_color.setAlpha (0x7f);
@@ -215,6 +216,17 @@ HistogramWidget::paintEvent (QPaintEvent* paint_event)
 	QPainter painter (this);
 	auto const rect = paint_event->region().boundingRect();
 	painter.drawImage (rect, *_canvas, rect);
+}
+
+
+void
+HistogramWidget::changeEvent (QEvent* event)
+{
+	if (event->type() == QEvent::EnabledChange)
+	{
+		_canvas.reset();
+		update();
+	}
 }
 
 } // namespace xf
