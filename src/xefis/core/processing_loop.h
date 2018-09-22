@@ -80,7 +80,7 @@ class ProcessingLoop:
 		module() const noexcept;
 
 	  private:
-		BasicModule*	_module;
+		BasicModule* _module;
 	};
 
 	using ModuleDetailsList = std::vector<ModuleDetails>;
@@ -159,6 +159,13 @@ class ProcessingLoop:
 	 */
 	[[nodiscard]]
 	boost::circular_buffer<si::Time> const&
+	communication_times() const noexcept;
+
+	/**
+	 * Processing times buffer.
+	 */
+	[[nodiscard]]
+	boost::circular_buffer<si::Time> const&
 	processing_times() const noexcept;
 
 	/**
@@ -185,6 +192,7 @@ class ProcessingLoop:
 	std::optional<Cycle>				_current_cycle;
 	Tracker<BasicModule>				_modules_tracker;
 	ModuleDetailsList					_module_details_list;
+	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_latencies	{ kMaxProcessingTimesBackLog };
 	Cycle::Number						_next_cycle_number		{ 1 };
@@ -263,6 +271,13 @@ inline auto
 ProcessingLoop::module_details_list() const noexcept -> Sequence<ModuleDetailsList::const_iterator>
 {
 	return { _module_details_list.cbegin(), _module_details_list.cend() };
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+ProcessingLoop::communication_times() const noexcept
+{
+	return _communication_times;
 }
 
 

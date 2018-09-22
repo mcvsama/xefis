@@ -29,6 +29,24 @@
 namespace xf {
 
 void
+BasicModule::ProcessingLoopAPI::communicate (Cycle const& cycle)
+{
+	try {
+		auto communication_time = TimeHelper::measure ([&] {
+			_module.communicate (cycle);
+		});
+
+		if (implements_communicate_method())
+			BasicModule::AccountingAPI (_module).add_communication_time (communication_time);
+	}
+	catch (...)
+	{
+		handle_exception (cycle, "communicate()");
+	}
+}
+
+
+void
 BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 {
 	try {
@@ -43,23 +61,31 @@ BasicModule::ProcessingLoopAPI::fetch_and_process (Cycle const& cycle)
 				_module.process (cycle);
 			});
 
-			BasicModule::AccountingAPI (_module).add_processing_time (processing_time);
+			if (implements_process_method())
+				BasicModule::AccountingAPI (_module).add_processing_time (processing_time);
 		}
 	}
 	catch (...)
 	{
-		try {
-			_module.rescue (cycle, std::current_exception());
+		handle_exception (cycle, "process()");
+	}
+}
 
-			// Set all output properties to nil.
-			if (_module._set_nil_on_exception)
-				for (auto* property: _module._io->_registered_output_properties)
-					*property = xf::nil;
-		}
-		catch (...)
-		{
-			cycle.logger() << "Exception '" << xf::describe_exception (std::current_exception()) << "' during handling exception from module " << identifier (_module) << "\n";
-		}
+
+void
+BasicModule::ProcessingLoopAPI::handle_exception (Cycle const& cycle, std::string_view const& context_info)
+{
+	try {
+		_module.rescue (cycle, std::current_exception());
+
+		// Set all output properties to nil.
+		if (_module._set_nil_on_exception)
+			for (auto* property: _module._io->_registered_output_properties)
+				*property = xf::nil;
+	}
+	catch (...)
+	{
+		cycle.logger() << "Exception (" << context_info << ") '" << xf::describe_exception (std::current_exception()) << "' during handling exception from module " << identifier (_module) << "\n";
 	}
 }
 
@@ -80,8 +106,17 @@ BasicModule::initialize()
 
 
 void
+BasicModule::communicate (xf::Cycle const&)
+{
+	_did_not_communicate = true;
+}
+
+
+void
 BasicModule::process (xf::Cycle const&)
-{ }
+{
+	_did_not_process = true;
+}
 
 
 void

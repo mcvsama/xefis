@@ -73,6 +73,29 @@ class BasicModule:
 		ProcessingLoopAPI (BasicModule&);
 
 		/**
+		 * True if module implements its own communicate() method.
+		 * Result is valid after the execution of first cycle, otherwise true is returned.
+		 */
+		[[nodiscard]]
+		bool
+		implements_communicate_method() const noexcept;
+
+		/**
+		 * True if module implements its own process() method.
+		 * Result is valid after the execution of first cycle, otherwise true is returned.
+		 */
+		[[nodiscard]]
+		bool
+		implements_process_method() const noexcept;
+
+		/**
+		 * Request all modules to communicate with external systems (hardware systems)
+		 * and store a snapshot of parameters that will be used in the process() method.
+		 */
+		void
+		communicate (Cycle const&);
+
+		/**
 		 * Request all connected input properties to be computed, and then
 		 * call the process() method. It will compute results only once, until
 		 * reset_cache() is called.
@@ -85,6 +108,13 @@ class BasicModule:
 		 */
 		void
 		reset_cache();
+
+	  private:
+		/**
+		 * Print current exception information.
+		 */
+		void
+		handle_exception (Cycle const&, std::string_view const& context_info);
 
 	  private:
 		BasicModule& _module;
@@ -114,10 +144,23 @@ class BasicModule:
 		set_cycle_time (si::Time);
 
 		/**
+		 * Add new measured communication time (time spent in the communicate() method).
+		 */
+		void
+		add_communication_time (si::Time);
+
+		/**
 		 * Add new measured processing time (time spent in the process() method).
 		 */
 		void
 		add_processing_time (si::Time);
+
+		/**
+		 * Communication times buffer.
+		 */
+		[[nodiscard]]
+		boost::circular_buffer<si::Time> const&
+		communication_times() const noexcept;
 
 		/**
 		 * Processing times buffer.
@@ -176,6 +219,14 @@ class BasicModule:
 
   protected:
 	/**
+	 * Communicate with sensors/actuators to send/receive processing data and results.
+	 * This method should be as fast as possible, actual data processing must happen
+	 * in process().
+	 */
+	virtual void
+	communicate (Cycle const& cycle);
+
+	/**
 	 * Compute output properties.
 	 * Default implementation does nothing.
 	 */
@@ -200,9 +251,12 @@ class BasicModule:
 	set_nil_on_exception (bool enable) noexcept;
 
   private:
+	bool								_did_not_communicate	{ false };
+	bool								_did_not_process		{ false };
 	bool								_cached					{ false };
 	bool								_set_nil_on_exception	{ true };
 	std::unique_ptr<ModuleIO>			_io;
+	boost::circular_buffer<si::Time>	_communication_times	{ kMaxProcessingTimesBackLog };
 	boost::circular_buffer<si::Time>	_processing_times		{ kMaxProcessingTimesBackLog };
 	si::Time							_cycle_time				{ 0_s };
 };
@@ -239,6 +293,20 @@ BasicModule::ProcessingLoopAPI::ProcessingLoopAPI (BasicModule& module):
 { }
 
 
+inline bool
+BasicModule::ProcessingLoopAPI::implements_communicate_method() const noexcept
+{
+	return !_module._did_not_communicate;
+}
+
+
+inline bool
+BasicModule::ProcessingLoopAPI::implements_process_method() const noexcept
+{
+	return !_module._did_not_process;
+}
+
+
 inline void
 BasicModule::ProcessingLoopAPI::reset_cache()
 {
@@ -267,9 +335,23 @@ BasicModule::AccountingAPI::set_cycle_time (si::Time cycle_time)
 
 
 inline void
-BasicModule::AccountingAPI::add_processing_time (si::Time processing_time)
+BasicModule::AccountingAPI::add_communication_time (si::Time t)
 {
-	_module._processing_times.push_back (processing_time);
+	_module._communication_times.push_back (t);
+}
+
+
+inline void
+BasicModule::AccountingAPI::add_processing_time (si::Time t)
+{
+	_module._processing_times.push_back (t);
+}
+
+
+inline boost::circular_buffer<si::Time> const&
+BasicModule::AccountingAPI::communication_times() const noexcept
+{
+	return _module._communication_times;
 }
 
 
