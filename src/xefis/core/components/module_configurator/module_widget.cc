@@ -86,9 +86,33 @@ ModuleWidget::refresh()
 {
 	using Milliseconds = si::Quantity<si::Millisecond>;
 
+	auto const processing_loop_api = BasicModule::ProcessingLoopAPI (_module);
+	auto const accounting_api = BasicModule::AccountingAPI (_module);
+
 	{
-		auto const accounting_api = BasicModule::AccountingAPI (_module);
+		auto const& samples = accounting_api.communication_times();
+		bool const enabled = processing_loop_api.implements_communicate_method();
+
+		_communication_time_histogram->setEnabled (enabled);
+		_communication_time_stats->setEnabled (enabled);
+
+		if (!samples.empty())
+		{
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
+			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+
+			_communication_time_histogram->set_data (histogram, { accounting_api.cycle_time() });
+			_communication_time_histogram->set_grid_lines (grid_lines);
+			_communication_time_stats->set_data (histogram, std::make_optional<Milliseconds> (accounting_api.cycle_time()));
+		}
+	}
+
+	{
 		auto const& samples = accounting_api.processing_times();
+		bool const enabled = processing_loop_api.implements_process_method();
+
+		_processing_time_histogram->setEnabled (enabled);
+		_processing_time_stats->setEnabled (enabled);
 
 		if (!samples.empty())
 		{
@@ -119,9 +143,11 @@ QWidget*
 ModuleWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
+	QWidget* communication_time_group {};
 	QWidget* processing_time_group {};
 	QWidget* painting_time_group {};
 
+	std::tie (_communication_time_histogram, _communication_time_stats, communication_time_group) = create_performance_widget (widget, "HW communication time");
 	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = create_performance_widget (widget, "Processing time");
 
 	if (_instrument)
@@ -129,13 +155,14 @@ ModuleWidget::create_performance_tab()
 
 	auto layout = new QGridLayout (widget);
 	layout->setMargin (0);
-	layout->addWidget (processing_time_group, 0, 0);
+	layout->addWidget (communication_time_group, 0, 0);
+	layout->addWidget (processing_time_group, 1, 0);
 
 	if (painting_time_group)
-		layout->addWidget (painting_time_group, 1, 0);
+		layout->addWidget (painting_time_group, 2, 0);
 
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0);
 
 	return widget;
 }
