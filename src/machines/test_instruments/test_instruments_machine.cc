@@ -218,6 +218,11 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen->gear_io->right_up											<< xf::ConstantSource (false);
 	test_screen->gear_io->right_down										<< xf::ConstantSource (true);
 
+	test_screen->vertical_trim_io->trim_value								<< test_generator_io->create_property<double> ("vertical-trim", 0.0, { 0.0, 1.0 }, 0.1 / 1_s);
+	test_screen->vertical_trim_io->trim_reference							<< xf::ConstantSource (0.5);
+	test_screen->vertical_trim_io->trim_reference_minimum					<< xf::ConstantSource (0.35);
+	test_screen->vertical_trim_io->trim_reference_maximum					<< xf::ConstantSource (0.6);
+
 	_test_generator.emplace (std::move (test_generator_io), "test generator");
 	test_screen->create_instruments();
 

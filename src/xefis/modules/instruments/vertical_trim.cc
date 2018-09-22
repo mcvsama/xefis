@@ -133,7 +133,7 @@ VerticalTrim::async_paint (xf::PaintRequest const& paint_request, PaintingParams
 			<< QPointF (-1.0 * h, +0.35 * h);
 		triangle << triangle[0];
 		QColor color = within_reference ? Qt::green : Qt::white;
-		painter.setPen (aids->get_pen (color, 1.0));
+		painter.setPen (aids->get_pen (color, 0.0f));
 		painter.setBrush (color);
 		painter.paint (aids->default_shadow(), [&] {
 			painter.drawPolygon (triangle.translated (0.0, -*trim * 0.5 * v));
