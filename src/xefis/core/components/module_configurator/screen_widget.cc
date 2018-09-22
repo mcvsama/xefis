@@ -42,6 +42,7 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (0);
 	layout->addWidget (name_label);
+	layout->addItem (new QSpacerItem (0, em_pixels (0.15f), QSizePolicy::Fixed, QSizePolicy::Fixed));
 	layout->addWidget (tabs);
 
 	_refresh_timer = new QTimer (this);
