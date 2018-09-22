@@ -37,7 +37,7 @@ Airframe::Airframe (AirframeDefinition definition):
 LiftCoefficient
 Airframe::get_cl (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
 {
-	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle.value()) + spoilers().get_aoa_correction (spoilers_angle.value());
+	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
 	return LiftCoefficient (lift().get_cl (total_aoa));
 }
 
@@ -45,7 +45,7 @@ Airframe::get_cl (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle
 DragCoefficient
 Airframe::get_cd (Angle const& aoa, FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
 {
-	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle.value()) + spoilers().get_aoa_correction (spoilers_angle.value());
+	Angle total_aoa = aoa + flaps().get_aoa_correction (flaps_angle) + spoilers().get_aoa_correction (spoilers_angle);
 	return DragCoefficient (drag().get_cd (total_aoa));
 }
 
@@ -57,8 +57,8 @@ Airframe::get_aoa_in_normal_regime (LiftCoefficient const& cl, FlapsAngle const&
 
 	if (normal_aoa)
 	{
-		Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle.value());
-		Angle spoilers_aoa_correction = spoilers().get_aoa_correction (spoilers_angle.value());
+		Angle flaps_aoa_correction = flaps().get_aoa_correction (flaps_angle);
+		Angle spoilers_aoa_correction = spoilers().get_aoa_correction (spoilers_angle);
 		return *normal_aoa - flaps_aoa_correction - spoilers_aoa_correction;
 	}
 	else
@@ -70,8 +70,8 @@ Angle
 Airframe::get_critical_aoa (FlapsAngle const& flaps_angle, SpoilersAngle const& spoilers_angle) const
 {
 	Angle critical_aoa = lift().critical_aoa();
-	critical_aoa -= flaps().find_setting (flaps_angle.value()).aoa_correction();
-	critical_aoa += spoilers().find_setting (spoilers_angle.value()).aoa_correction();
+	critical_aoa -= flaps().find_setting (flaps_angle).aoa_correction();
+	critical_aoa += spoilers().find_setting (spoilers_angle).aoa_correction();
 	return critical_aoa;
 }
 

@@ -14,7 +14,6 @@
 #include "types.h"
 #include "system.h"
 #include "resources.h"
-#include "strong_typedef.h"
 #include "version.h"
 #include "exception.h"
 #include "constants.h"

@@ -66,6 +66,18 @@ template<class Value, class DistinguisherType>
 			return _value;
 		}
 
+		constexpr
+		operator Value&() noexcept
+		{
+			return _value;
+		}
+
+		constexpr
+		operator Value const&() const noexcept
+		{
+			return _value;
+		}
+
 	  private:
 		Value _value;
 	};
