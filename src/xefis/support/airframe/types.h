@@ -19,17 +19,16 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/strong_type.h>
 
 
 namespace xf {
 
-XEFIS_STRONG_TYPEDEF (Angle, FlapsAngle)
-XEFIS_STRONG_TYPEDEF (Angle, SpoilersAngle)
-XEFIS_STRONG_TYPEDEF (Angle, AngleOfAttack)
-
-
-typedef double LiftCoefficient;
-typedef double DragCoefficient;
+using LiftCoefficient	= double;
+using DragCoefficient	= double;
+using FlapsAngle		= StrongType<si::Angle, struct FlapsAngleType>;
+using SpoilersAngle		= StrongType<si::Angle, struct SpoilersAngleType>;
+using AngleOfAttack		= StrongType<si::Angle, struct AngleOfAttackType>;
 
 } // namespace xf
 
