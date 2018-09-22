@@ -59,7 +59,7 @@ Widget::create_colored_strip_label (QString const& text, QColor color, Qt::Align
 	strip->setFixedHeight (em_pixels (0.3f));
 
 	auto* label = new QLabel (text, widget);
-	label->setStyleSheet ("QLabel { margin: 0.15em; }");
+	label->setStyleSheet ("margin: 0.15em;");
 	label->setAlignment (Qt::AlignLeft);
 
 	QFont font = label->font();
