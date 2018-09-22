@@ -128,8 +128,8 @@ ModuleWidget::refresh()
 	if (_painting_time_histogram)
 	{
 		auto const accounting_api = BasicInstrument::AccountingAPI (*_instrument);
-		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (accounting_api.frame_time());
 		auto const& samples = accounting_api.painting_times();
+		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
 		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 		_painting_time_histogram->set_data (histogram, { accounting_api.frame_time() });

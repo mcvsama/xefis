@@ -65,7 +65,7 @@ ProcessingLoopWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
 			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_communication_time_histogram->set_data (histogram, { _processing_loop.period() });
@@ -79,7 +79,7 @@ ProcessingLoopWidget::refresh()
 
 		if (!samples.empty())
 		{
-			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (*std::max_element (samples.begin(), samples.end()));
 			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
 
 			_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
