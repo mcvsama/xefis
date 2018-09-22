@@ -276,6 +276,9 @@ template<class Iterator>
 	inline auto
 	mean (Iterator begin, Iterator end)
 	{
+		if (begin == end)
+			throw std::length_error ("can't compute mean() of zero-length sequence");
+
 		using Value = std::remove_cvref_t<decltype (*std::declval<Iterator>())>;
 
 		return std::accumulate (begin, end, Value{}) / std::distance (begin, end);
@@ -313,6 +316,9 @@ template<class Iterator>
 	inline auto
 	sort_and_median (Iterator begin, Iterator end)
 	{
+		if (begin == end)
+			throw std::length_error ("can't compute sort_and_median() of zero-length sequence");
+
 		auto const size = std::distance (begin, end);
 		auto const mid = size / 2;
 		std::nth_element (begin, begin + mid, end);
@@ -328,6 +334,9 @@ template<class Iterator>
 	inline auto
 	stddev (Iterator begin, Iterator end)
 	{
+		if (begin == end)
+			throw std::length_error ("can't compute stddev() of zero-length sequence");
+
 		using std::sqrt;
 		using Value = std::remove_cvref_t<decltype (*std::declval<Iterator>())>;
 
