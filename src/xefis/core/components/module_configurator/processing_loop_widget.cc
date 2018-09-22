@@ -61,13 +61,31 @@ ProcessingLoopWidget::refresh()
 	using Milliseconds = si::Quantity<si::Millisecond>;
 
 	{
-		auto const& samples = _processing_loop.processing_times();
-		auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
-		xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+		auto const& samples = _processing_loop.communication_times();
 
-		_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
-		_processing_time_histogram->set_grid_lines (grid_lines);
-		_processing_time_stats->set_data (histogram, std::make_optional<Milliseconds> (_processing_loop.period()));
+		if (!samples.empty())
+		{
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
+			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+
+			_communication_time_histogram->set_data (histogram, { _processing_loop.period() });
+			_communication_time_histogram->set_grid_lines (grid_lines);
+			_communication_time_stats->set_data (histogram, std::make_optional<Milliseconds> (_processing_loop.period()));
+		}
+	}
+
+	{
+		auto const& samples = _processing_loop.processing_times();
+
+		if (!samples.empty())
+		{
+			auto const [range, grid_lines] = get_max_for_axis<Milliseconds> (_processing_loop.period());
+			xf::Histogram<Milliseconds> histogram (samples.begin(), samples.end(), range / 100, 0.0_ms, range);
+
+			_processing_time_histogram->set_data (histogram, { _processing_loop.period() });
+			_processing_time_histogram->set_grid_lines (grid_lines);
+			_processing_time_stats->set_data (histogram, std::make_optional<Milliseconds> (_processing_loop.period()));
+		}
 	}
 
 	{
@@ -93,19 +111,22 @@ QWidget*
 ProcessingLoopWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
+	QWidget* communication_time_group {};
 	QWidget* processing_time_group {};
 	QWidget* processing_latency_group {};
 
+	std::tie (_communication_time_histogram, _communication_time_stats, communication_time_group) = create_performance_widget (widget, "HW communication time");
 	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = create_performance_widget (widget, "Processing time");
 	std::tie (_processing_latency_histogram, _processing_latency_stats, processing_latency_group) = create_performance_widget (widget, "Processing latency");
 
 	auto layout = new QGridLayout (widget);
 	layout->setMargin (0);
-	layout->addWidget (processing_time_group, 0, 0);
-	layout->addWidget (processing_latency_group, 1, 0);
+	layout->addWidget (communication_time_group, 0, 0);
+	layout->addWidget (processing_time_group, 1, 0);
+	layout->addWidget (processing_latency_group, 2, 0);
 
 	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
-	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 2, 0);
+	layout->addItem (new QSpacerItem (0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding), 3, 0);
 
 	return widget;
 }

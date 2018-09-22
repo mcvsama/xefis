@@ -51,6 +51,8 @@ class ProcessingLoopWidget: public ConfigWidget
 
   private:
 	ProcessingLoop&				_processing_loop;
+	xf::HistogramWidget*		_communication_time_histogram	{ nullptr };
+	xf::HistogramStatsWidget*	_communication_time_stats		{ nullptr };
 	xf::HistogramWidget*		_processing_time_histogram		{ nullptr };
 	xf::HistogramStatsWidget*	_processing_time_stats			{ nullptr };
 	xf::HistogramWidget*		_processing_latency_histogram	{ nullptr };
