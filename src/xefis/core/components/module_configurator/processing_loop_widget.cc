@@ -50,6 +50,8 @@ ProcessingLoopWidget::ProcessingLoopWidget (ProcessingLoop& processing_loop, QWi
 	_refresh_timer->setInterval (1000_Hz / ConfigWidget::kDataRefreshRate);
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ProcessingLoopWidget::refresh);
 	_refresh_timer->start();
+
+	refresh();
 }
 
 
