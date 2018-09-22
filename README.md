@@ -15,3 +15,6 @@ boost-endian
 qt-5
 mhash-0.9.9.9
 
+Packages required on Ubuntu 18:
+	qtbase5-dev
+
