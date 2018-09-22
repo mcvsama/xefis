@@ -15,7 +15,8 @@
 #include <cstddef>
 
 // Qt:
-#include <QtWidgets/QBoxLayout>
+#include <QBoxLayout>
+#include <QShortcut>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -39,9 +40,13 @@ ConfiguratorWidget::ConfiguratorWidget (Machine& machine, QWidget* parent):
 	_tabs->addTab (_module_configurator, "Module &configuration");
 	_tabs->addTab (_data_recorder, "&Data recorder");
 
-	QVBoxLayout* layout = new QVBoxLayout (this);
+	auto* layout = new QVBoxLayout (this);
 	layout->setMargin (em_pixels (0.15f));
 	layout->addWidget (_tabs);
+
+	auto* esc = new QShortcut (this);
+	esc->setKey (Qt::Key_Escape);
+	QObject::connect (esc, &QShortcut::activated, this, &Screen::close);
 }
 
 } // namespace xf

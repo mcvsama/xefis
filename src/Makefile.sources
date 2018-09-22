@@ -19,9 +19,6 @@ SELFTEST_SOURCES		+= xefis/modules/comm/tests/link.test.cc
 ######## /xefis/modules/helpers ########
 
 XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
-#XEFIS_HEADERS_MOC		+= xefis/modules/helpers/sound.h TODO
-
-#XEFIS_SOURCES			+= xefis/modules/helpers/sound.cc TODO
 
 ######## /xefis/modules/instruments ########
 
@@ -424,13 +421,11 @@ XEFIS_HEADERS			+= xefis/support/ui/histogram_widget.h
 XEFIS_HEADERS			+= xefis/support/ui/histogram_stats_widget.h
 XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
 XEFIS_HEADERS			+= xefis/support/ui/widget.h
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/window.h TODO
 
 XEFIS_SOURCES			+= xefis/support/ui/histogram_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/histogram_stats_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
 XEFIS_SOURCES			+= xefis/support/ui/widget.cc
-#XEFIS_SOURCES			+= xefis/support/ui/window.cc TODO
 
 ######## /xefis/test ########
 

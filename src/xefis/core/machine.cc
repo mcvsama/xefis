@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/core/components/configurator/configurator_widget.h>
 
 // Local:
 #include "machine.h"
@@ -26,6 +27,20 @@ namespace xf {
 Machine::Machine (Xefis& xefis):
 	_xefis (xefis)
 { }
+
+
+void
+Machine::show_configurator()
+{
+	if (!_configurator_widget)
+	{
+		_configurator_widget = std::make_unique<ConfiguratorWidget> (*this, nullptr);
+		auto lh = default_line_height (_configurator_widget.get());
+		_configurator_widget->resize (50 * lh, 30 * lh);
+	}
+
+	_configurator_widget->show();
+}
 
 } // namespace xf
 

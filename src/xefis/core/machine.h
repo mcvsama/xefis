@@ -29,6 +29,9 @@
 
 namespace xf {
 
+class ConfiguratorWidget;
+
+
 class Machine: private Noncopyable
 {
   private:
@@ -92,10 +95,17 @@ class Machine: private Noncopyable
 		void
 		register_screen (Registrant<CompatibleScreen>&);
 
+	/**
+	 * Show configurator widget.
+	 */
+	void
+	show_configurator();
+
   private:
-	Xefis&						_xefis;
-	Tracker<ProcessingLoop>		_processing_loops;
-	Tracker<Screen>				_screens;
+	Xefis&								_xefis;
+	Tracker<ProcessingLoop>				_processing_loops;
+	Tracker<Screen>						_screens;
+	std::unique_ptr<ConfiguratorWidget>	_configurator_widget;
 };
 
 

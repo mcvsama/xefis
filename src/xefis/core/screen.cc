@@ -18,9 +18,10 @@
 #include <thread>
 
 // Qt:
-#include <QTimer>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QShortcut>
+#include <QTimer>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -42,9 +43,10 @@ InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer
 } // namespace detail
 
 
-Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, std::string_view const& instance, Logger const& logger):
+Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const& instance, Logger const& logger):
 	QWidget (nullptr),
 	NamedInstance (instance),
+	_machine (machine),
 	_logger (logger.with_scope ("<screen>")),
 	_instrument_tracker ([&](InstrumentTracker::Disclosure& disclosure) { instrument_registered (disclosure); },
 						 [&](InstrumentTracker::Disclosure& disclosure) { instrument_deregistered (disclosure); }),
@@ -66,6 +68,10 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, std::string_vi
 	_refresh_timer->setInterval ((1.0 / _screen_spec.refresh_rate()).in<si::Millisecond>());
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &Screen::refresh);
 	_refresh_timer->start();
+
+	auto* esc = new QShortcut (this);
+	esc->setKey (Qt::Key_Escape);
+	QObject::connect (esc, &QShortcut::activated, this, &Screen::show_configurator);
 }
 
 
@@ -314,6 +320,13 @@ Screen::refresh()
 {
 	paint_instruments_to_buffer();
 	update();
+}
+
+
+void
+Screen::show_configurator()
+{
+	_machine.show_configurator();
 }
 
 } // namespace xf
