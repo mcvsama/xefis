@@ -49,6 +49,8 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 	_refresh_timer->setInterval (1000_Hz / ConfigWidget::kDataRefreshRate);
 	QObject::connect (_refresh_timer, &QTimer::timeout, this, &ScreenWidget::refresh);
 	_refresh_timer->start();
+
+	refresh();
 }
 
 
