@@ -94,18 +94,24 @@ ProcessingLoop::execute_cycle()
 		for (auto& module_details: _module_details_list)
 			BasicModule::ProcessingLoopAPI (module_details.module()).reset_cache();
 
-		for (auto& module_details: _module_details_list)
-		{
-			auto& module = module_details.module();
-			BasicModule::AccountingAPI (module).set_cycle_time (period());
-			BasicModule::ProcessingLoopAPI (module).fetch_and_process (*_current_cycle);
-		}
+		_communication_times.push_back (TimeHelper::measure ([this] {
+			for (auto& module_details: _module_details_list)
+				BasicModule::ProcessingLoopAPI (module_details.module()).communicate (*_current_cycle);
+		}));
+
+		_processing_times.push_back (TimeHelper::measure ([this] {
+			for (auto& module_details: _module_details_list)
+			{
+				auto& module = module_details.module();
+				BasicModule::AccountingAPI (module).set_cycle_time (period());
+				BasicModule::ProcessingLoopAPI (module).fetch_and_process (*_current_cycle);
+			}
+		}));
 
 		if (latency > kLatencyFactorLogThreshold * _loop_period)
 			_logger << boost::format ("Latency! %.0f%% delay.\n") % (latency / _loop_period * 100.0);
 	}
 
-	_processing_times.push_back (TimeHelper::now() - t);
 	_previous_timestamp = t;
 	_current_cycle.reset();
 }
