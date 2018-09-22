@@ -181,27 +181,21 @@ Screen::paint_instruments_to_buffer()
 											details.anchor_position.y() * details.requested_position.size().height() * h };
 
 			details.computed_position = QRectF { top_left, bottom_right }.translated (-anchor_position).toRect();
+			details.instrument.mark_dirty();
 		}
 
 		if (details.computed_position->isValid())
 		{
-			if (details.result.valid())
+			if (details.result.valid() && is_ready (details.result))
 			{
-				if (is_ready (details.result))
-				{
-					Exception::catch_and_log (_logger, [&] {
-						auto const painting_time = details.result.get();
-						auto accounting_api = BasicInstrument::AccountingAPI (instrument);
-						accounting_api.set_frame_time (_frame_time);
-						accounting_api.add_painting_time (painting_time);
-					});
+				Exception::catch_and_log (_logger, [&] {
+					auto const painting_time = details.result.get();
+					auto accounting_api = BasicInstrument::AccountingAPI (instrument);
+					accounting_api.set_frame_time (_frame_time);
+					accounting_api.add_painting_time (painting_time);
+				});
 
-					std::swap (details.canvas, details.canvas_to_use);
-
-					// If size changed:
-					if (!details.canvas || details.canvas->size() != details.computed_position->size())
-						instrument.mark_dirty();
-				}
+				std::swap (details.canvas, details.canvas_to_use);
 			}
 
 			// Start new painting job:
