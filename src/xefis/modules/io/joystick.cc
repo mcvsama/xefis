@@ -102,7 +102,7 @@ JoystickInput::Axis::Axis (QDomElement const& axis_element, xf::PropertyOut<doub
 			}
 		}
 		else
-			throw xf::BadDomElement (v);
+			throw xf::UnexpectedDomElement (v);
 	}
 }
 
@@ -239,7 +239,7 @@ JoystickInput::JoystickInput (std::unique_ptr<JoystickInputIO> module_io, QDomEl
 		else if (e == "device")
 			_device_path = e.text().toStdString();
 		else
-			throw xf::BadDomElement (e);
+			throw xf::UnexpectedDomElement (e);
 	}
 
 	if (!_device_path)
