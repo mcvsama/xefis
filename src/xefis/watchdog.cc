@@ -55,7 +55,21 @@ ping_loop (int write_fd, int read_fd, pid_t xefis_pid)
 		// Send ping, receive pong.
 
 		uint8_t c = ::rand() % 0x100;
-		write (write_fd, &c, 1);
+		int n = 0;
+
+		while ((n = ::write (write_fd, &c, 1) == -1)
+		{
+			if (n == -1)
+			{
+				if (errno == EINTR)
+					continue;
+				else if (errno == EPIPE)
+					break;
+				else
+					std::cerr << "Error when writing ping to pipe: " << strerror (errno) << std::endl;
+			}
+		}
+
 		fsync (write_fd);
 
 		// Give xefis some time:

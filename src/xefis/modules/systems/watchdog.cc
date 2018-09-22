@@ -70,7 +70,22 @@ Watchdog::ping()
 	while ((n = ::read (_watchdog_read_fd, &c, 1)) > 0)
 	{
 		c ^= 0x55;
-		::write (_watchdog_write_fd, &c, 1);
+
+		while ((n = ::write (_watchdog_write_fd, &c, 1)) != 1)
+		{
+			if (n == -1)
+			{
+				switch (errno)
+				{
+					if (errno == EINTR)
+						continue;
+					else if (errno == EPIPE)
+						return;
+					else
+						_logger << "Error when writing pong: " << strerror (errno) << std::endl;
+				}
+			}
+		}
 	}
 
 	::fsync (_watchdog_write_fd);
