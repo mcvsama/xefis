@@ -57,20 +57,17 @@ ping_loop (int write_fd, int read_fd, pid_t xefis_pid)
 		uint8_t c = ::rand() % 0x100;
 		int n = 0;
 
-		while ((n = ::write (write_fd, &c, 1) == -1)
+		while ((n = ::write (write_fd, &c, 1)) == -1)
 		{
-			if (n == -1)
-			{
-				if (errno == EINTR)
-					continue;
-				else if (errno == EPIPE)
-					break;
-				else
-					std::cerr << "Error when writing ping to pipe: " << strerror (errno) << std::endl;
-			}
+			if (errno == EINTR)
+				continue;
+			else if (errno == EPIPE)
+				break;
+			else
+				std::cerr << "Error when writing ping to pipe: " << strerror (errno) << std::endl;
 		}
 
-		fsync (write_fd);
+		::fsync (write_fd);
 
 		// Give xefis some time:
 		usleep ((100_ms).in<Microsecond>());
@@ -78,7 +75,17 @@ ping_loop (int write_fd, int read_fd, pid_t xefis_pid)
 		// if Xefis exits normally, wait(), cleanup and return Exited
 		// otherwise return Timeout
 		uint8_t r = 0;
-		size_t n = read (read_fd, &r, 1);
+
+		while ((n = ::read (read_fd, &r, 1)) == -1)
+		{
+			if (errno == EINTR)
+				continue;
+			else if (errno == EPIPE)
+				break;
+			else
+				std::cerr << "Error when reading pong from pipe: " << strerror (errno) << std::endl;
+		}
+
 		if (n == 0 || (r ^ 0x55) != c)
 		{
 			int status = 0;
