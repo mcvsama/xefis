@@ -3,7 +3,7 @@ XEFIS
 
 Qt-based "glass cockpit" and model airplane control software.
 
-![XEFIS](http://mcv.mulabs.org/app/xefis/screenshot-005.png)
+![XEFIS](http://mcv.mulabs.org/app/xefis/screenshot-006.png)
 
 Required depenencies
 ====================
