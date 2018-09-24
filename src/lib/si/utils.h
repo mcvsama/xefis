@@ -568,14 +568,14 @@ sin (quantities::Angle a)
 constexpr quantities::Angle::Value
 cos (quantities::Angle a)
 {
-	return std::sin (a.in<units::Radian>());
+	return std::cos (a.in<units::Radian>());
 }
 
 
 constexpr quantities::Angle::Value
 tan (quantities::Angle a)
 {
-	return std::sin (a.in<units::Radian>());
+	return std::tan (a.in<units::Radian>());
 }
 
 
