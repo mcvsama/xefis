@@ -82,7 +82,9 @@ typedef Unit< 1,  0, -2,  0,  0,  0,  0,  0>	MeterPerSecondSquared;
 typedef Unit< 1,  0, -3,  0,  0,  0,  0,  0>	MeterPerSecondCubed;
 typedef Unit< 1,  0, -4,  0,  0,  0,  0,  0>	MeterPerQuarticSecond;
 typedef Unit< 0,  0, -1,  0,  0,  0,  0,  1>	RadianPerSecond;
+typedef Unit< 0,  0, -1,  0,  0,  0,  0,  0>	BaseRadianPerSecond;
 typedef Unit< 0,  0, -2,  0,  0,  0,  0,  1>	RadianPerSecondSquared;
+typedef Unit< 0,  0, -2,  0,  0,  0,  0,  0>	BaseRadianPerSecondSquared;
 typedef Unit< 1,  1, -1,  0,  0,  0,  0,  0>	NewtonSecond;
 //            m  kg   s   A   K mol  cd rad
 //            ↓   ↓   ↓   ↓   ↓   ↓   ↓   ↓
