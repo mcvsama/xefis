@@ -78,9 +78,12 @@ LonLat::rotated (LonLat const& rotation) const
 QPointF
 LonLat::project_flat() const
 {
+	auto const tan_lon = tan (lon());
+	auto const tan_lat = tan (lat());
+
 	return {
-		+tan (lon()) / (1.0 + tan (lon()) * tan (0.5 * lon())) * cos (lat()),
-		-tan (lat()) / (1.0 + tan (lat()) * tan (0.5 * lat())),
+		+tan_lon / (1.0 + tan_lon * tan (0.5 * lon())) * cos (lat()),
+		-tan_lat / (1.0 + tan_lat * tan (0.5 * lat())),
 	};
 }
 
