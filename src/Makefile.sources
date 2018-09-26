@@ -365,6 +365,11 @@ XEFIS_SOURCES			+= xefis/support/instrument/shadow_painter.cc
 XEFIS_SOURCES			+= xefis/support/instrument/text_layout.cc
 XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
+######## /xefis/support/math ########
+
+XEFIS_HEADERS			+= xefis/support/math/3d_space.h
+XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
+
 ######## /xefis/support/navigation ########
 
 XEFIS_HEADERS			+= xefis/support/navigation/magnetic_variation.h
