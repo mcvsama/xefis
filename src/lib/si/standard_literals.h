@@ -78,8 +78,10 @@ SI_DEFINE_LITERAL (MeterPerSecondSquared, _mps2)
 SI_DEFINE_LITERAL (RadianPerSecond, _radps)
 SI_DEFINE_LITERAL (RadianPerSecondSquared, _radps2)
 SI_DEFINE_LITERAL (NewtonMeter, _Nm)
+SI_DEFINE_LITERAL (KilogramPerCubicMeter, _kgpm3)
 SI_DEFINE_LITERAL (NewtonSecond, _Ns)
 SI_DEFINE_LITERAL (PascalSecond, _Pas)
+SI_DEFINE_LITERAL (KilogramSquareMeter, _kgm2)
 
 // Often-used scaled units:
 SI_DEFINE_LITERAL (Kilometer, _km)
