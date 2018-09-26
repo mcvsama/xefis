@@ -34,9 +34,9 @@ enum ZeroMatrixType
 
 
 // Used to call required Matrix' ctor.
-enum IdentityMatrixType
+enum UnitaryMatrixType
 {
-	IdentityMatrix = 0,
+	UnitaryMatrix = 0,
 };
 
 
@@ -84,7 +84,9 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		static constexpr std::size_t kColumns	= pColumns;
 		static constexpr std::size_t kRows		= pRows;
 
-		typedef pScalar Scalar;
+		using Scalar			= pScalar;
+		using InversedScalar	= decltype (1 / std::declval<pScalar>());
+		using InversedMatrix	= Matrix<InversedScalar, pColumns, pRows>;
 
 	  public:
 		static constexpr bool
@@ -107,7 +109,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		Matrix (ZeroMatrixType) noexcept;
 
 		// Ctor. Initializes to identity matrix.
-		Matrix (IdentityMatrixType) noexcept;
+		Matrix (UnitaryMatrixType) noexcept;
 
 		// Ctor. Doesn't initialize matrix at all.
 		constexpr
@@ -190,7 +192,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Return inversed matrix.
 		 * Throw NotInversible if determiant is 0.
 		 */
-		Matrix
+		InversedMatrix
 		inversed() const;
 
 		/**
@@ -209,7 +211,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Copy-assignment operator
 		 */
 		Matrix&
-		operator= (Matrix const&) noexcept (noexcept (Scalar{} = Scalar{}));
+		operator= (Matrix const&) noexcept (std::is_copy_assignable_v<Scalar>);
 
 		/**
 		 * Add another matrix to this one.
@@ -230,10 +232,6 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		operator*= (Scalar const&) noexcept (noexcept (Scalar{} * Scalar{}));
 
 	  private:
-		void
-		gauss_inverse();
-
-	  private:
 		std::array<Scalar, kColumns * kRows> _data;
 	};
 
@@ -244,6 +242,77 @@ template<class S, std::size_t N>
 
 template<class S, std::size_t N>
 	using SquareMatrix = Matrix<S, N, N>;
+
+
+/*
+ * Free functions
+ */
+
+
+template<class S, std::size_t C, std::size_t R>
+	inline typename Matrix<S, C, R>::InversedMatrix
+	gauss_inverse (Matrix<S, C, R> source)
+	{
+		static_assert (source.is_square(), "Matrix needs to be square");
+
+		using InversedMatrix = typename Matrix<S, C, R>::InversedMatrix;
+
+		InversedMatrix result = InversedMatrix (UnitaryMatrix);
+
+		// Make matrix triangular (with 0s under the diagonal and 1s
+		// on the diagonal).
+		for (std::size_t result_r = 0; result_r < source.kRows; ++result_r)
+		{
+			// Make coefficient at (result_r, result_r) == 1.0,
+			// divide row at (result_r) by its diagonal coefficient:
+			auto divider = source (result_r, result_r) / S (1);
+
+			if (divider == 0.0)
+				throw NotInversible();
+
+			for (std::size_t c = 0; c < source.kColumns; ++c)
+			{
+				source (c, result_r) /= divider;
+				// Mirror operation on result:
+				result (c, result_r) /= divider;
+			}
+
+			// Make the column at (result_r, (result_r + 1)...) == 0.0:
+			for (std::size_t r = result_r + 1; r < source.kRows; ++r)
+			{
+				// Zeroing element at column result_r in row r,
+				// subtract k * row[result_r] from row r, where
+				// k = at (result_r, r):
+				auto k = source (result_r, r) / S (1);
+
+				for (std::size_t c = 0; c < source.kColumns; ++c)
+				{
+					source (c, r) -= k * source (c, result_r);
+					// Mirror:
+					result (c, r) -= k * result (c, result_r);
+				}
+			}
+		}
+
+		// Use diagonal 1s multiplied by k (to be found) to reduce elements
+		// of previous row to 0 (except the diagonal 1 on that row).
+		for (std::size_t result_r = 0; result_r < source.kRows - 1; ++result_r)
+		{
+			for (std::size_t result_c = result_r + 1; result_c < source.kColumns; ++result_c)
+			{
+				auto k = source (result_c, result_r) / S (1);
+				// We want element at (result_c, result_r) to be 0.
+				for (std::size_t c = 0; c < source.kColumns; ++c)
+				{
+					source (c, result_r) -= k * source (c, result_c);
+					// Mirror operation on result:
+					result (c, result_r) -= k * result (c, result_c);
+				}
+			}
+		}
+
+		return result;
+	}
 
 
 /*
@@ -275,13 +344,13 @@ template<class S, std::size_t C, std::size_t R>
 
 template<class S, std::size_t C, std::size_t R>
 	inline
-	Matrix<S, C, R>::Matrix (IdentityMatrixType) noexcept:
+	Matrix<S, C, R>::Matrix (UnitaryMatrixType) noexcept:
 		Matrix (ZeroMatrix)
 	{
 		static_assert (is_square(), "Matrix needs to be square");
 
 		for (std::size_t i = 0; i < std::min (kColumns, kRows); ++i)
-			(*this) (i, i) = 1.0;
+			(*this)(i, i) = S (1);
 	}
 
 
@@ -425,27 +494,24 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<S, C, R>
-	Matrix<S, C, R>::inversed() const
+	inline auto
+	Matrix<S, C, R>::inversed() const -> InversedMatrix
 	{
 		static_assert (is_square(), "Matrix needs to be square");
 
-		auto self = *this;
-
-		if (is_scalar())
-			return { 1.0 / self (0, 0) };
-		else if (C == 2)
+		if constexpr (is_scalar())
 		{
-			Scalar scaler = 1.0 / (self (0, 0) * self (1, 1) - self (1, 0) * self (0, 1));
+			return { 1.0 / (*this)(0, 0) };
+		}
+		else if constexpr (C == 2)
+		{
+			auto const& self = *this;
+			auto scaler = 1.0 / (self (0, 0) * self (1, 1) - self (1, 0) * self (0, 1));
 			return { { scaler * self (1, 1), scaler * -self (1, 0),
 					   scaler * -self (0, 1), scaler * self (0, 0) } };
 		}
 		else
-		{
-			Matrix result = *this;
-			result.gauss_inverse();
-			return result;
-		}
+			return gauss_inverse (*this);
 	}
 
 
@@ -473,7 +539,7 @@ template<class S, std::size_t C, std::size_t R>
 
 template<class S, std::size_t C, std::size_t R>
 	inline Matrix<S, C, R>&
-	Matrix<S, C, R>::operator= (Matrix const& other) noexcept (noexcept (Scalar{} = Scalar{}))
+	Matrix<S, C, R>::operator= (Matrix const& other) noexcept (std::is_copy_assignable_v<Scalar>)
 	{
 		std::copy (other._data.begin(), other._data.end(), _data.begin());
 		return *this;
@@ -504,70 +570,6 @@ template<class S, std::size_t C, std::size_t R>
 	{
 		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind (std::multiplies<Scalar>(), scalar, std::placeholders::_1));
 		return *this;
-	}
-
-
-template<class S, std::size_t C, std::size_t R>
-	inline void
-	Matrix<S, C, R>::gauss_inverse()
-	{
-		static_assert (is_square(), "Matrix needs to be square");
-
-		auto self = *this;
-		Matrix result = IdentityMatrix;
-
-		// Make matrix triangular (with 0s under the diagonal and 1s
-		// on the diagonal).
-		for (std::size_t result_r = 0; result_r < kRows; ++result_r)
-		{
-			// Make coefficient at (result_r, result_r) == 1.0,
-			// divide row at (result_r) by its diagonal coefficient:
-			auto divider = self (result_r, result_r);
-			if (divider == 0.0)
-				throw NotInversible();
-
-			for (std::size_t c = 0; c < kColumns; ++c)
-			{
-				self (c, result_r) /= divider;
-				// Mirror operation on result:
-				result (c, result_r) /= divider;
-			}
-
-			// Make the column at (result_r, (result_r + 1)...) == 0.0:
-			for (std::size_t r = result_r + 1; r < kRows; ++r)
-			{
-				// Zeroing element at column result_r in row r,
-				// subtract k * row[result_r] from row r, where
-				// k = at (result_r, r):
-				auto k = self (result_r, r);
-
-				for (std::size_t c = 0; c < kColumns; ++c)
-				{
-					self (c, r) -= k * self (c, result_r);
-					// Mirror:
-					result (c, r) -= k * result (c, result_r);
-				}
-			}
-		}
-
-		// Use diagonal 1s multiplied by k (to be found) to reduce elements
-		// of previous row to 0 (except the diagonal 1 on that row).
-		for (std::size_t result_r = 0; result_r < kRows - 1; ++result_r)
-		{
-			for (std::size_t result_c = result_r + 1; result_c < kColumns; ++result_c)
-			{
-				auto k = self (result_c, result_r);
-				// We want element at (result_c, result_r) to be 0.
-				for (std::size_t c = 0; c < kColumns; ++c)
-				{
-					self (c, result_r) -= k * self (c, result_c);
-					// Mirror operation on result:
-					result (c, result_r) -= k * result (c, result_c);
-				}
-			}
-		}
-
-		*this = result;
 	}
 
 } // namespace math

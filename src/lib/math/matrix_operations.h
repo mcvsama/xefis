@@ -64,6 +64,20 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 
 template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 	constexpr auto
+	operator/ (Matrix<ScalarA, Columns, Rows> matrix,
+			   ScalarB const& scalar)
+	{
+		Matrix<decltype (ScalarA{} / ScalarB{}), Columns, Rows> result;
+
+		for (std::size_t i = 0; i < Columns * Rows; ++i)
+			result.data()[i] = matrix.data()[i] / scalar;
+
+		return result;
+	}
+
+
+template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
+	constexpr auto
 	operator* (ScalarA const& scalar,
 			   Matrix<ScalarB, Columns, Rows> const& matrix)
 	{
@@ -136,7 +150,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows>
 	inline auto
 	Traits<Matrix<Scalar, Columns, Rows>>::one() -> Value
 	{
-		return IdentityMatrix;
+		return UnitaryMatrix;
 	}
 
 
