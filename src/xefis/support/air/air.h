@@ -24,37 +24,53 @@
 
 namespace xf {
 
-inline Speed
-compute_sound_speed (Temperature static_air_temperature)
+si::Density
+standard_density (si::Length geometric_altitude_amsl);
+
+
+si::Pressure
+standard_pressure (si::Length geometric_altitude_amsl);
+
+
+si::Temperature
+standard_temperature (si::Length geometric_altitude_amsl);
+
+
+si::TemperatureGradient
+standard_temperature_gradient (si::Length geometric_altitude_amsl);
+
+
+si::DynamicViscosity
+dynamic_air_viscosity (si::Temperature);
+
+
+inline si::Velocity
+speed_of_sound (si::Temperature static_air_temperature)
 {
 	return 38.967854_kt * std::sqrt (static_air_temperature.in<Kelvin>());
 }
 
 
-inline Length
-compute_density_altitude (Length pressure_altitude, Temperature static_air_temperature)
+inline si::Length
+density_altitude (si::Length pressure_altitude, si::Temperature static_air_temperature)
 {
 	float t_s = 273.15 + (15.0 - (0.0019812 * pressure_altitude.in<Foot>()));
 	return pressure_altitude + 1_ft * (t_s / 0.0019812) * (1.0 - std::pow (t_s / static_air_temperature.in<Kelvin>(), 0.2349690));
 }
 
 
-inline Speed
-compute_true_airspeed (Speed indicated_airspeed, Length density_altitude)
+inline si::Velocity
+true_airspeed (si::Velocity indicated_airspeed, si::Length density_altitude)
 {
 	return indicated_airspeed / std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<Foot>(), 2.127940);
 }
 
 
-inline Speed
-compute_indicated_airspeed (Speed true_airspeed, Length density_altitude)
+inline si::Velocity
+indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 {
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<Foot>(), 2.127940);
 }
-
-
-xf::Datatable2D<si::Temperature, si::DynamicViscosity> const&
-temperature_to_dynamic_viscosity();
 
 } // namespace xf
 

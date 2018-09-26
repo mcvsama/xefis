@@ -23,7 +23,10 @@
 
 namespace xf {
 
-constexpr si::Length kEarthMeanRadius = 6367.46_km;
+constexpr si::Length			kEarthMeanRadius		= 6367.46_km;
+constexpr si::Mass				kEarthMass				= 5.9722e24_kg;
+constexpr si::Time				kSiderealDay			= 23_h + 56_min + 4.09_s;
+constexpr si::AngularVelocity	kEarthAngularVelocity	= 2_rad * M_PI / xf::kSiderealDay;
 
 
 /**

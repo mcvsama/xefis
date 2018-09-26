@@ -306,6 +306,10 @@ SELFTEST_SOURCES		+= xefis/core/property_observer.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
 
+######## /xefis/support ########
+
+XEFIS_HEADERS			+= xefis/support/nature.h
+
 ######## /xefis/support/air ########
 
 XEFIS_HEADERS			+= xefis/support/air/air.h

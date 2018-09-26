@@ -23,6 +23,7 @@
 #include <xefis/support/airframe/airframe.h>
 #include <xefis/support/airframe/lift.h>
 #include <xefis/support/airframe/types.h>
+#include <xefis/support/nature.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/numeric.h>
 
@@ -205,7 +206,7 @@ PerformanceComputer::compute_total_energy_variometer()
 		if (io.altitude_amsl_std && io.aircraft_mass && io.speed_ias)
 		{
 			si::Mass const m = *io.aircraft_mass;
-			si::Acceleration const g = 9.81_mps2;
+			si::Acceleration const g = xf::kStdGravitationalAcceleration;
 			si::Velocity const v = *io.speed_ias;
 			si::Energy const Ep = m * g * *io.altitude_amsl_std;
 			si::Energy const Ek = m * v * v * 0.5;
@@ -365,7 +366,7 @@ std::optional<si::Velocity>
 PerformanceComputer::tas_to_ias (si::Velocity const& tas) const
 {
 	if (io.density_altitude)
-		return xf::compute_indicated_airspeed (tas, *io.density_altitude);
+		return xf::indicated_airspeed (tas, *io.density_altitude);
 	else
 		return { };
 }

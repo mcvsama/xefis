@@ -90,10 +90,6 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 {
   private:
 	static constexpr char kLoggerScope[]				= "mod::AirDataComputer";
-	// Sound speed in STD sea level:
-	static constexpr si::Velocity const kStdSoundSpeed	= 661.4788_kt;
-	// STD sea level pressure:
-	static constexpr si::Pressure const kStdPressure	= 29.92126_inHg;
 
   public:
 	// Ctor
@@ -125,7 +121,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	compute_density_altitude();
 
 	void
-	compute_sound_speed();
+	compute_speed_of_sound();
 
 	void
 	compute_tas();
@@ -167,7 +163,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	xf::PropertyObserver		_density_altitude_computer;
 	xf::PropertyObserver		_ias_computer;
 	xf::PropertyObserver		_ias_lookahead_computer;
-	xf::PropertyObserver		_sound_speed_computer;
+	xf::PropertyObserver		_speed_of_sound_computer;
 	xf::PropertyObserver		_tas_computer;
 	xf::PropertyObserver		_eas_computer;
 	xf::PropertyObserver		_mach_computer;

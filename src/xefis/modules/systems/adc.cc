@@ -21,6 +21,7 @@
 #include <xefis/config/exception.h>
 #include <xefis/support/air/air.h>
 #include <xefis/support/airframe/airframe.h>
+#include <xefis/support/nature.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/convergence.h>
 
@@ -95,8 +96,8 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 		&io.altitude_amsl,
 	});
 
-	_sound_speed_computer.set_callback (std::bind (&AirDataComputer::compute_sound_speed, this));
-	_sound_speed_computer.observe ({
+	_speed_of_sound_computer.set_callback (std::bind (&AirDataComputer::compute_speed_of_sound, this));
+	_speed_of_sound_computer.observe ({
 		&io.static_air_temperature,
 	});
 
@@ -145,7 +146,7 @@ AirDataComputer::process (xf::Cycle const& cycle)
 		&_mach_computer,
 		&_sat_computer,
 		&_density_altitude_computer,
-		&_sound_speed_computer,
+		&_speed_of_sound_computer,
 		&_tas_computer,
 		&_eas_computer,
 		&_vertical_speed_computer,
@@ -179,7 +180,7 @@ AirDataComputer::compute_altitude()
 
 		if (*io.pressure_use_std)
 		{
-			pressure_setting = kStdPressure;
+			pressure_setting = xf::kStdAirPressure;
 
 			if (!_prev_use_standard_pressure)
 				hide_alt_lookahead = true;
@@ -201,7 +202,7 @@ AirDataComputer::compute_altitude()
 
 		si::Length height = do_compute_altitude (pressure_setting);
 		si::Length qnh_height = do_compute_altitude (*io.pressure_qnh);
-		si::Length std_height = do_compute_altitude (kStdPressure);
+		si::Length std_height = do_compute_altitude (xf::kStdAirPressure);
 
 		io.altitude_amsl = _altitude_amsl_smoother (height, update_dt);
 		io.altitude_amsl_qnh = _altitude_amsl_qnh_smoother (qnh_height, update_dt);
@@ -242,16 +243,13 @@ void
 AirDataComputer::compute_density_altitude()
 {
 	if (io.static_air_temperature && io.altitude_amsl)
-		io.density_altitude = xf::compute_density_altitude (*io.altitude_amsl, *io.static_air_temperature);
+		io.density_altitude = xf::density_altitude (*io.altitude_amsl, *io.static_air_temperature);
 	else
 		io.density_altitude = xf::nil;
 
 	// Also compute air density:
 	if (io.pressure_static && io.static_air_temperature)
-	{
-		si::SpecificHeatCapacity dry_air_specific_constant { 287.058 };
-		io.air_density_static = *io.pressure_static / (dry_air_specific_constant * *io.static_air_temperature);
-	}
+		io.air_density_static = *io.pressure_static / (xf::kDryAirSpecificConstant * *io.static_air_temperature);
 	else
 		io.air_density_static = xf::nil;
 }
@@ -271,7 +269,7 @@ AirDataComputer::compute_ias()
 		// Impact pressure (dynamic pressure) - difference between total pressure and static pressure:
 		si::Pressure qc = *io.recovered_pressure_total - *io.pressure_static;
 
-		si::Velocity tmp_ias = kStdSoundSpeed * std::sqrt (5.0 * (std::pow (qc / kStdPressure + 1.0, 2.0 / 7.0) - 1.0));
+		si::Velocity tmp_ias = xf::kStdSpeedOfSound * std::sqrt (5.0 * (std::pow (qc / xf::kStdAirPressure + 1.0, 2.0 / 7.0) - 1.0));
 		io.speed_ias = _speed_ias_smoother (tmp_ias, update_dt);
 	}
 	else
@@ -311,10 +309,10 @@ AirDataComputer::compute_ias_lookahead()
 
 
 void
-AirDataComputer::compute_sound_speed()
+AirDataComputer::compute_speed_of_sound()
 {
 	if (io.static_air_temperature)
-		io.speed_sound = xf::compute_sound_speed (*io.static_air_temperature);
+		io.speed_sound = xf::speed_of_sound (*io.static_air_temperature);
 	else
 		io.speed_sound = xf::nil;
 }
@@ -328,7 +326,7 @@ AirDataComputer::compute_tas()
 		si::Velocity tmp_ias = *io.speed_ias;
 
 		if (io.density_altitude)
-			io.speed_tas = xf::compute_true_airspeed (*io.speed_ias, *io.density_altitude);
+			io.speed_tas = xf::true_airspeed (*io.speed_ias, *io.density_altitude);
 		else
 			// Very simple equation for TAS when DA is unavailable:
 			io.speed_tas = tmp_ias + 0.02 * tmp_ias * (*io.altitude_amsl / 1000_ft);
@@ -344,8 +342,7 @@ AirDataComputer::compute_eas()
 	if (io.speed_tas && io.air_density_static)
 	{
 		auto rho = *io.air_density_static;
-		auto rho_0 = 1.225_kg / 1_m3 ; // Density at the sea level at 15°C according to Wikipedia.
-		io.speed_eas = *io.speed_tas * std::sqrt (rho / rho_0);
+		io.speed_eas = *io.speed_tas * std::sqrt (rho / xf::kStdAirDensity);
 	}
 	else
 		io.speed_eas = xf::nil;
@@ -403,7 +400,7 @@ AirDataComputer::compute_sat_and_viscosity()
 
 		io.static_air_temperature = sat;
 		// Unit is Poiseuville (Pascal * second):
-		io.dynamic_viscosity = xf::temperature_to_dynamic_viscosity().extrapolated_value (sat);
+		io.dynamic_viscosity = xf::dynamic_air_viscosity (sat);
 	}
 	else
 	{
@@ -473,8 +470,8 @@ AirDataComputer::recover_total_pressure()
 				si::Pressure p = *io.pressure_static;
 				// Formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
 				// solved for qc (dynamic (impact) pressure):
-				double ia0 = *io.ias / kStdSoundSpeed;
-				si::Pressure qc = kStdPressure * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
+				double ia0 = *io.ias / xf::kStdSpeedOfSound;
+				si::Pressure qc = xf::kStdAirPressure * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
 				io.recovered_pressure_total = qc + p;
 			}
 			else
