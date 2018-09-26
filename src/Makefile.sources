@@ -400,6 +400,15 @@ XEFIS_HEADERS			+= xefis/support/qt/ownership_breaker.h
 
 XEFIS_SOURCES			+= xefis/support/qt/ownership_breaker.cc
 
+######## /xefis/support/simulation ########
+
+XEFIS_HEADERS			+= xefis/support/simulation/atmosphere.h
+XEFIS_HEADERS			+= xefis/support/simulation/body.h
+XEFIS_HEADERS			+= xefis/support/simulation/body_functions.h
+
+XEFIS_SOURCES			+= xefis/support/simulation/atmosphere.cc
+XEFIS_SOURCES			+= xefis/support/simulation/body.cc
+
 ######## /xefis/support/system ########
 
 XEFIS_HEADERS			+= xefis/support/system/work_performer.h
