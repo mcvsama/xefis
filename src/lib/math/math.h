@@ -15,7 +15,6 @@
 #define MATH__MATH_H__INCLUDED
 
 #include "matrix.h"
-#include "matrix_implementation.h"
 #include "matrix_operations.h"
 #include "quaternion.h"
 #include "quaternion_operations.h"

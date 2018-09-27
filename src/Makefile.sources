@@ -135,7 +135,6 @@ XEFIS_SOURCES			+= xefis/modules/test/test_generator.cc
 
 MATH_HEADERS			+= lib/math/math.h
 MATH_HEADERS			+= lib/math/matrix.h
-MATH_HEADERS			+= lib/math/matrix_implementation.h
 MATH_HEADERS			+= lib/math/matrix_operations.h
 MATH_HEADERS			+= lib/math/quaternion.h
 MATH_HEADERS			+= lib/math/quaternion_operations.h
