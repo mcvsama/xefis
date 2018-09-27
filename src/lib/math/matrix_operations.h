@@ -38,8 +38,10 @@ template<class ScalarA, class ScalarB, std::size_t ARows, std::size_t Common, st
 			for (std::size_t r = 0; r < ARows; ++r)
 			{
 				ResultScalar scalar{};
+
 				for (std::size_t i = 0; i < Common; ++i)
 					scalar += a (i, r) * b (c, i);
+
 				result (c, r) = scalar;
 			}
 		}
@@ -64,6 +66,15 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 
 template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 	constexpr auto
+	operator* (ScalarA const& scalar,
+			   Matrix<ScalarB, Columns, Rows> const& matrix)
+	{
+		return matrix * scalar;
+	}
+
+
+template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
+	constexpr auto
 	operator/ (Matrix<ScalarA, Columns, Rows> matrix,
 			   ScalarB const& scalar)
 	{
@@ -73,15 +84,6 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 			result.data()[i] = matrix.data()[i] / scalar;
 
 		return result;
-	}
-
-
-template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
-	constexpr auto
-	operator* (ScalarA const& scalar,
-			   Matrix<ScalarB, Columns, Rows> const& matrix)
-	{
-		return matrix * scalar;
 	}
 
 
@@ -100,6 +102,18 @@ template<class Scalar, std::size_t Columns, std::size_t Rows>
 			   Matrix<Scalar, Columns, Rows> const& b) noexcept (noexcept (Scalar{} - Scalar{}))
 	{
 		return a -= b;
+	}
+
+
+template<class Scalar, std::size_t Columns, std::size_t Rows>
+	constexpr auto
+	operator- (Matrix<Scalar, Columns, Rows> m) noexcept (noexcept (-Scalar{}))
+	{
+		for (std::size_t c = 0; c < Columns; ++c)
+			for (std::size_t r = 0; r < Rows; ++r)
+				m (c, r) = -m (c, r);
+
+		return m;
 	}
 
 
