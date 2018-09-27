@@ -36,7 +36,8 @@ Body::evolve (SpaceVector<si::Force> const& force, SpaceVector<si::Torque> const
 	_angular_velocity += dw;
 
 	_position += _velocity * dt;
-	_orientation += _angular_velocity * dt;
+	_orientation += SpaceQuaternion (0.5 * _angular_velocity * dt) * _orientation;
+	_orientation.normalize();
 }
 
 } // namespace xf::sim

@@ -44,6 +44,15 @@ template<class pScalar>
 
 		// Ctor
 		constexpr
+		Quaternion (Vector<Scalar, 3> const&);
+
+		// Ctor
+		// Constructs proper quaternion.
+		constexpr
+		Quaternion (Vector<Scalar, 4> const&);
+
+		// Ctor
+		constexpr
 		Quaternion (std::array<Scalar, 4> const&);
 
 		// Ctor
@@ -238,6 +247,20 @@ template<class pScalar>
 	  private:
 		std::array<Scalar, 4> _components;
 	};
+
+
+template<class S>
+	constexpr
+	Quaternion<S>::Quaternion (Vector<Scalar, 3> const& vector):
+		_components ({ Scalar (0), vector[0], vector[1], vector[2] })
+	{ }
+
+
+template<class S>
+	constexpr
+	Quaternion<S>::Quaternion (Vector<Scalar, 4> const& vector):
+		_components ({ vector[0], vector[1], vector[2], vector[3] })
+	{ }
 
 
 template<class S>

@@ -82,11 +82,11 @@ class Body
 	 */
 
 	[[nodiscard]]
-	SpaceVector<double> const&
+	SpaceQuaternion const&
 	orientation() const noexcept;
 
 	void
-	set_orientation (SpaceVector<double> const&);
+	set_orientation (SpaceQuaternion const&);
 
 	/*
 	 * AngularVelocity
@@ -112,7 +112,7 @@ class Body
 	SpaceVector<si::Velocity>							_velocity;
 	SpaceMatrix<si::MomentOfInertia>					_moment_of_inertia;
 	SpaceMatrix<si::MomentOfInertia>::InversedMatrix	_inversed_moment_of_inertia;
-	SpaceVector<double>									_orientation;
+	SpaceQuaternion										_orientation;
 	SpaceVector<si::BaseAngularVelocity>				_angular_velocity;
 };
 
@@ -174,7 +174,7 @@ Body::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia> const& matrix)
 }
 
 
-inline SpaceVector<double> const&
+inline SpaceQuaternion const&
 Body::orientation() const noexcept
 {
 	return _orientation;
@@ -182,7 +182,7 @@ Body::orientation() const noexcept
 
 
 inline void
-Body::set_orientation (SpaceVector<double> const& orientation)
+Body::set_orientation (SpaceQuaternion const& orientation)
 {
 	_orientation = orientation;
 }
