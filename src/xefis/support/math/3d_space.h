@@ -35,6 +35,8 @@ template<class Value>
 template<class Value>
 	using SpaceMatrix = math::Matrix<Value, 3, 3>;
 
+using SpaceQuaternion = math::Quaternion<double>;
+
 
 /**
  * Return rotation matrix along the axis X for given angle.
