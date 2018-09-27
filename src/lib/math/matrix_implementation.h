@@ -87,28 +87,36 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		using Scalar			= pScalar;
 		using InversedScalar	= decltype (1 / std::declval<pScalar>());
 		using InversedMatrix	= Matrix<InversedScalar, pColumns, pRows>;
+		using TransposedMatrix	= Matrix<Scalar, pRows, pColumns>;
 
 	  public:
+		[[nodiscard]]
 		static constexpr bool
 		is_scalar();
 
+		[[nodiscard]]
 		static constexpr bool
 		is_vector();
 
+		[[nodiscard]]
 		static constexpr bool
 		is_square();
 
 	  public:
 		// Ctor. Initializes matrix using default constructor of Scalar.
-		constexpr Matrix() noexcept;
+		constexpr
+		Matrix() noexcept;
 
 		// Ctor. Copy constructor.
-		constexpr Matrix (Matrix const&) noexcept;
+		constexpr
+		Matrix (Matrix const&) noexcept;
 
 		// Ctor. Alias for default constructor (initialized to zero).
+		constexpr
 		Matrix (ZeroMatrixType) noexcept;
 
 		// Ctor. Initializes to identity matrix.
+		constexpr
 		Matrix (UnitaryMatrixType) noexcept;
 
 		// Ctor. Doesn't initialize matrix at all.
@@ -127,51 +135,67 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		constexpr
 		Matrix (std::array<Scalar, kColumns * kRows> values) noexcept;
 
+		// Copy operator
+		constexpr Matrix&
+		operator= (Matrix const&) noexcept (std::is_copy_assignable_v<Scalar>);
+
+		// Move operator
+		constexpr Matrix&
+		operator= (Matrix&&) noexcept (std::is_move_assignable_v<Scalar>) = default;
+
 		/**
 		 * Equality operator
 		 */
+		[[nodiscard]]
 		constexpr bool
-		operator== (Matrix const& other) const noexcept (noexcept (Scalar{} == Scalar{}));
+		operator== (Matrix const&) const noexcept (noexcept (Scalar{} == Scalar{}));
 
 		/**
 		 * Difference operator
 		 */
+		[[nodiscard]]
 		constexpr bool
-		operator!= (Matrix const& other) const noexcept (noexcept (Scalar{} != Scalar{}));
+		operator!= (Matrix const&) const noexcept (noexcept (Scalar{} != Scalar{}));
 
 		/**
 		 * Return pointer to the data stored in the matrix, row by row.
 		 */
+		[[nodiscard]]
 		constexpr Scalar*
 		data() noexcept;
 
 		/**
 		 * Return pointer to the data stored in the matrix, row by row.
 		 */
+		[[nodiscard]]
 		constexpr Scalar const*
 		data() const noexcept;
 
 		/**
 		 * Safe element accessor. Throws std::out_of_range when accessing elements outside matrix.
 		 */
+		[[nodiscard]]
 		Scalar&
 		at (std::size_t column, std::size_t row);
 
 		/**
 		 * Safe element accessor. Throws std::out_of_range when accessing elements outside matrix.
 		 */
+		[[nodiscard]]
 		Scalar const&
 		at (std::size_t column, std::size_t row) const;
 
 		/**
 		 * Fast element accessor. Doesn't perform range checks.
 		 */
+		[[nodiscard]]
 		constexpr Scalar&
 		operator() (std::size_t column, std::size_t row) noexcept;
 
 		/**
 		 * Fast element accessor. Doesn't perform range checks.
 		 */
+		[[nodiscard]]
 		constexpr Scalar const&
 		operator() (std::size_t column, std::size_t row) const noexcept;
 
@@ -179,12 +203,14 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Vector access operator.
 		 * Accesses only the first column of the matrix.
 		 */
+		[[nodiscard]]
 		Scalar&
 		operator[] (std::size_t index) noexcept;
 
 		/**
 		 * Vector access operator - const version.
 		 */
+		[[nodiscard]]
 		Scalar const&
 		operator[] (std::size_t index) const noexcept;
 
@@ -192,44 +218,47 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Return inversed matrix.
 		 * Throw NotInversible if determiant is 0.
 		 */
-		InversedMatrix
+		[[nodiscard]]
+		constexpr InversedMatrix
 		inversed() const;
 
 		/**
 		 * Return transposed matrix.
 		 */
-		Matrix<Scalar, kRows, kColumns>
+		[[nodiscard]]
+		constexpr TransposedMatrix
 		transposed() const noexcept;
 
 		/**
 		 * Alias for transposed().
 		 */
-		Matrix<Scalar, kRows, kColumns>
+		[[nodiscard]]
+		constexpr TransposedMatrix
 		operator~() const noexcept;
-
-		/**
-		 * Copy-assignment operator
-		 */
-		Matrix&
-		operator= (Matrix const&) noexcept (std::is_copy_assignable_v<Scalar>);
 
 		/**
 		 * Add another matrix to this one.
 		 */
-		Matrix&
+		constexpr Matrix&
 		operator+= (Matrix const&) noexcept (noexcept (Scalar{} + Scalar{}));
 
 		/**
 		 * Subtract another matrix from this one.
 		 */
-		Matrix&
+		constexpr Matrix&
 		operator-= (Matrix const&) noexcept (noexcept (Scalar{} - Scalar{}));
 
 		/**
 		 * Multiply this matrix by a scalar.
 		 */
-		Matrix&
+		constexpr Matrix&
 		operator*= (Scalar const&) noexcept (noexcept (Scalar{} * Scalar{}));
+
+		/**
+		 * Multiply this matrix by another matrix.
+		 */
+		constexpr Matrix&
+		operator*= (Matrix const&) noexcept (noexcept (Scalar{} * Scalar{}));
 
 	  private:
 		std::array<Scalar, kColumns * kRows> _data;
@@ -335,7 +364,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline
+	constexpr
 	Matrix<S, C, R>::Matrix (ZeroMatrixType) noexcept
 	{
 		_data.fill (Scalar());
@@ -343,7 +372,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline
+	constexpr
 	Matrix<S, C, R>::Matrix (UnitaryMatrixType) noexcept:
 		Matrix (ZeroMatrix)
 	{
@@ -494,7 +523,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline auto
+	constexpr auto
 	Matrix<S, C, R>::inversed() const -> InversedMatrix
 	{
 		static_assert (is_square(), "Matrix needs to be square");
@@ -516,29 +545,29 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<typename Matrix<S, C, R>::Scalar, Matrix<S, C, R>::kRows, Matrix<S, C, R>::kColumns>
-	Matrix<S, C, R>::transposed() const noexcept
+	constexpr auto
+	Matrix<S, C, R>::transposed() const noexcept -> TransposedMatrix
 	{
 		Matrix<Scalar, kRows, kColumns> result;
 
 		for (std::size_t r = 0; r < kRows; ++r)
 			for (std::size_t c = 0; c < kColumns; ++c)
-				result (c, r) = (*this) (r, c);
+				result (r, c) = (*this) (c, r);
 
 		return result;
 	}
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<typename Matrix<S, C, R>::Scalar, Matrix<S, C, R>::kRows, Matrix<S, C, R>::kColumns>
-	Matrix<S, C, R>::operator~() const noexcept
+	constexpr auto
+	Matrix<S, C, R>::operator~() const noexcept -> TransposedMatrix
 	{
 		return transposed();
 	}
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<S, C, R>&
+	constexpr Matrix<S, C, R>&
 	Matrix<S, C, R>::operator= (Matrix const& other) noexcept (std::is_copy_assignable_v<Scalar>)
 	{
 		std::copy (other._data.begin(), other._data.end(), _data.begin());
@@ -547,7 +576,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<S, C, R>&
+	constexpr Matrix<S, C, R>&
 	Matrix<S, C, R>::operator+= (Matrix const& other) noexcept (noexcept (Scalar{} + Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), other._data.begin(), _data.begin(), std::plus<Scalar>());
@@ -556,7 +585,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<S, C, R>&
+	constexpr Matrix<S, C, R>&
 	Matrix<S, C, R>::operator-= (Matrix const& other) noexcept (noexcept (Scalar{} - Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), other._data.begin(), _data.begin(), std::minus<Scalar>());
@@ -565,11 +594,22 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline Matrix<S, C, R>&
+	constexpr Matrix<S, C, R>&
 	Matrix<S, C, R>::operator*= (Scalar const& scalar) noexcept (noexcept (Scalar{} * Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind (std::multiplies<Scalar>(), scalar, std::placeholders::_1));
 		return *this;
+	}
+
+
+template<class S, std::size_t C, std::size_t R>
+	constexpr Matrix<S, C, R>&
+	Matrix<S, C, R>::operator*= (Matrix const& other) noexcept (noexcept (Scalar{} * Scalar{}))
+	{
+		static_assert (is_square(), "Matrix needs to be square");
+
+		// Use global operator*():
+		return *this = *this * other;
 	}
 
 } // namespace math
