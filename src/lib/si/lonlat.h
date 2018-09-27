@@ -32,6 +32,9 @@ using quantities::Angle;
 using quantities::Length;
 
 
+/**
+ * ECEF coordinates (Earth-centered Earth-fixed).
+ */
 class LonLat
 {
   public:
