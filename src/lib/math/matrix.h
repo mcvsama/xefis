@@ -85,7 +85,8 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		static constexpr std::size_t kRows		= pRows;
 
 		using Scalar			= pScalar;
-		using InversedScalar	= decltype (1 / std::declval<pScalar>());
+		using InversedScalar	= decltype (1.0 / std::declval<pScalar>());
+		using ColumnVector		= Matrix<Scalar, 1, pRows>;
 		using InversedMatrix	= Matrix<InversedScalar, pColumns, pRows>;
 		using TransposedMatrix	= Matrix<Scalar, pRows, pColumns>;
 
@@ -135,6 +136,10 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		constexpr
 		Matrix (std::array<Scalar, kColumns * kRows> values) noexcept;
 
+		// Ctor. Initializes columns from series of vectors.
+		constexpr
+		Matrix (std::array<ColumnVector, kColumns> vectors) noexcept;
+
 		// Copy operator
 		constexpr Matrix&
 		operator= (Matrix const&) noexcept (std::is_copy_assignable_v<Scalar>);
@@ -172,6 +177,13 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		data() const noexcept;
 
 		/**
+		 * If size is 1x1, then it should be convertible to scalar.
+		 */
+		template<class = std::enable_if_t<is_scalar()>>
+			constexpr
+			operator Scalar() const noexcept;
+
+		/**
 		 * Safe element accessor. Throws std::out_of_range when accessing elements outside matrix.
 		 */
 		[[nodiscard]]
@@ -204,15 +216,22 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Accesses only the first column of the matrix.
 		 */
 		[[nodiscard]]
-		Scalar&
+		constexpr Scalar&
 		operator[] (std::size_t index) noexcept;
 
 		/**
 		 * Vector access operator - const version.
 		 */
 		[[nodiscard]]
-		Scalar const&
+		constexpr Scalar const&
 		operator[] (std::size_t index) const noexcept;
+
+		/**
+		 * Return given column as a vector.
+		 */
+		[[nodiscard]]
+		constexpr Matrix<Scalar, 1, kRows>
+		column (std::size_t index) const noexcept;
 
 		/**
 		 * Return inversed matrix.
@@ -401,6 +420,16 @@ template<class S, std::size_t C, std::size_t R>
 
 template<class S, std::size_t C, std::size_t R>
 	constexpr
+	Matrix<S, C, R>::Matrix (std::array<ColumnVector, kColumns> vectors) noexcept
+	{
+		for (std::size_t c = 0; c < kColumns; ++c)
+			for (std::size_t r = 0; r < kRows; ++r)
+				at (c, r) = vectors[c][r];
+	}
+
+
+template<class S, std::size_t C, std::size_t R>
+	constexpr
 	Matrix<S, C, R>::Matrix (UninitializedMatrixType) noexcept
 	{ }
 
@@ -447,6 +476,15 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
+	template<class>
+		constexpr
+		Matrix<S, C, R>::operator Scalar() const noexcept
+		{
+			return at (0, 0);
+		}
+
+
+template<class S, std::size_t C, std::size_t R>
 	inline auto
 	Matrix<S, C, R>::at (std::size_t column, std::size_t row) -> Scalar&
 	{
@@ -481,7 +519,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline auto
+	constexpr auto
 	Matrix<S, C, R>::operator[] (std::size_t index) noexcept -> Scalar&
 	{
 		static_assert (is_vector(), "must be a vector to use []");
@@ -490,7 +528,7 @@ template<class S, std::size_t C, std::size_t R>
 
 
 template<class S, std::size_t C, std::size_t R>
-	inline auto
+	constexpr auto
 	Matrix<S, C, R>::operator[] (std::size_t index) const noexcept -> Scalar const&
 	{
 		static_assert (is_vector(), "must be a vector to use []");
@@ -519,6 +557,19 @@ template<class S, std::size_t C, std::size_t R>
 	Matrix<S, C, R>::is_square()
 	{
 		return kColumns == kRows;
+	}
+
+
+template<class S, std::size_t C, std::size_t R>
+	constexpr auto
+	Matrix<S, C, R>::column (std::size_t index) const noexcept -> Matrix<Scalar, 1, kRows>
+	{
+		Matrix<S, 1, R> result;
+
+		for (std::size_t r = 0; r < kRows; ++r)
+			result[r] = at (index, r);
+
+		return result;
 	}
 
 
