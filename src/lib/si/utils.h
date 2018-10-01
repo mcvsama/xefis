@@ -583,7 +583,7 @@ template<class Value>
 	constexpr quantities::Angle
 	atan2 (Value y, Value x)
 	{
-		return units::Radian() * std::atan2 (base_quantity (y), base_quantity (x));
+		return units::Radian() * std::atan2 (quantity (y), quantity (x));
 	}
 
 } // namespace si
