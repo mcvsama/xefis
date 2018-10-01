@@ -1,0 +1,57 @@
+/* vim:ts=4
+ *
+ * Copyleft 2012…2016  Michał Gawron
+ * Marduk Unix Labs, http://mulabs.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ */
+
+#ifndef XEFIS__UTILITY__DEBUG_PRINTS_H__INCLUDED
+#define XEFIS__UTILITY__DEBUG_PRINTS_H__INCLUDED
+
+// Standard:
+#include <cstddef>
+#include <ostream>
+
+// Lib:
+#include <math/math.h>
+
+
+namespace xf::debug {
+
+template<class Value, std::size_t Size>
+	std::ostream&
+	operator<< (std::ostream& os, math::Vector<Value, Size> const& vector)
+	{
+		for (std::size_t i = 0; i < Size; ++i)
+			os << std::setprecision (19) << si::quantity (vector[i]) << (i != Size - 1 ? " " : "");
+
+		return os;
+	}
+
+
+template<class Value, std::size_t Columns, std::size_t Rows>
+	std::ostream&
+	operator<< (std::ostream& os, math::Matrix<Value, Columns, Rows> const& matrix)
+	{
+		for (std::size_t r = 0; r < Rows; ++r)
+		{
+			for (std::size_t c = 0; c < Columns; ++c)
+				os << std::setprecision (19) << si::quantity (matrix (c, r)) << (c < Columns - 1 ? " " : "");
+
+			if (r < Rows - 1)
+				os << ", ";
+		}
+
+		return os;
+	}
+
+} // namespace xf::debug
+
+#endif
+

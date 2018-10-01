@@ -18,6 +18,7 @@
 
 // Xefis:
 #include <xefis/utility/debug_measure.h>
+#include <xefis/utility/debug_prints.h>
 
 #endif
 

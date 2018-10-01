@@ -461,6 +461,7 @@ XEFIS_HEADERS			+= xefis/utility/callback_actions.h
 XEFIS_HEADERS			+= xefis/utility/convergence.h
 XEFIS_HEADERS			+= xefis/utility/datatable2d.h
 XEFIS_HEADERS			+= xefis/utility/debug_measure.h
+XEFIS_HEADERS			+= xefis/utility/debug_prints.h
 XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
 XEFIS_HEADERS			+= xefis/utility/demangle.h
 XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
