@@ -24,16 +24,32 @@
 namespace math {
 
 template<class S>
+	constexpr Quaternion<S>
+	operator+ (Quaternion<S> q) noexcept
+	{
+		return q;
+	}
+
+
+template<class S>
 	constexpr auto
-	operator+ (Quaternion<S> a, Quaternion<S> const& b)
+	operator+ (Quaternion<S> a, Quaternion<S> const& b) noexcept
 	{
 		return a += b;
 	}
 
 
 template<class S>
+	constexpr Quaternion<S>
+	operator- (Quaternion<S> q) noexcept
+	{
+		return Quaternion (-q.w(), -q.x(), -q.y(), -q.z());
+	}
+
+
+template<class S>
 	constexpr auto
-	operator- (Quaternion<S> a, Quaternion<S> const& b)
+	operator- (Quaternion<S> a, Quaternion<S> const& b) noexcept
 	{
 		return a -= b;
 	}
@@ -41,7 +57,7 @@ template<class S>
 
 template<class S>
 	constexpr auto
-	operator* (Quaternion<S> q, typename Quaternion<S>::Scalar const& scalar)
+	operator* (Quaternion<S> q, typename Quaternion<S>::Scalar const& scalar) noexcept
 	{
 		return q *= scalar;
 	}
@@ -49,7 +65,7 @@ template<class S>
 
 template<class S>
 	constexpr auto
-	operator* (typename Quaternion<S>::Scalar const& scalar, Quaternion<S> q)
+	operator* (typename Quaternion<S>::Scalar const& scalar, Quaternion<S> q) noexcept
 	{
 		return q *= scalar;
 	}
@@ -57,7 +73,7 @@ template<class S>
 
 template<class S>
 	constexpr auto
-	operator* (Quaternion<S> a, Quaternion<S> const& b)
+	operator* (Quaternion<S> a, Quaternion<S> const& b) noexcept
 	{
 		return a *= b;
 	}

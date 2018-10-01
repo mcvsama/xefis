@@ -18,11 +18,25 @@
 #include <algorithm>
 #include <utility>
 
+// Xefis:
+#include <xefis/config/c++20.h>
+#include <xefis/utility/types.h>
+
 // Local:
 #include "traits.h"
 
 
 namespace math {
+
+template<class Test, template<class, std::size_t, std::size_t> class Ref>
+	struct is_matrix: public std::false_type
+	{ };
+
+
+template<template<class, std::size_t, std::size_t> class Ref, class Scalar, std::size_t Columns, std::size_t Rows>
+	struct is_matrix<Ref<Scalar, Columns, Rows>, Ref>: public std::true_type
+	{ };
+
 
 template<class ScalarA, class ScalarB, std::size_t ARows, std::size_t Common, std::size_t BColumns>
 	constexpr auto
@@ -88,20 +102,19 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows>
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows>
-	constexpr auto
-	operator+ (Matrix<Scalar, Columns, Rows> a,
-			   Matrix<Scalar, Columns, Rows> const& b) noexcept (noexcept (Scalar{} + Scalar{}))
+	constexpr Matrix<Scalar, Columns, Rows>
+	operator+ (Matrix<Scalar, Columns, Rows> m) noexcept
 	{
-		return a += b;
+		return m;
 	}
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows>
 	constexpr auto
-	operator- (Matrix<Scalar, Columns, Rows> a,
-			   Matrix<Scalar, Columns, Rows> const& b) noexcept (noexcept (Scalar{} - Scalar{}))
+	operator+ (Matrix<Scalar, Columns, Rows> a,
+			   Matrix<Scalar, Columns, Rows> const& b) noexcept (noexcept (Scalar{} + Scalar{}))
 	{
-		return a -= b;
+		return a += b;
 	}
 
 
@@ -114,6 +127,15 @@ template<class Scalar, std::size_t Columns, std::size_t Rows>
 				m (c, r) = -m (c, r);
 
 		return m;
+	}
+
+
+template<class Scalar, std::size_t Columns, std::size_t Rows>
+	constexpr auto
+	operator- (Matrix<Scalar, Columns, Rows> a,
+			   Matrix<Scalar, Columns, Rows> const& b) noexcept (noexcept (Scalar{} - Scalar{}))
+	{
+		return a -= b;
 	}
 
 
@@ -130,6 +152,22 @@ template<class ScalarA, class ScalarB, std::size_t Size>
 			a[2] * b[0] - a[0] * b[2],
 			a[0] * b[1] - a[1] * b[0],
 		};
+	}
+
+
+
+template<class Scalar, std::size_t Size>
+	constexpr auto
+	abs (Vector<Scalar, Size> const& v)
+	{
+		using std::sqrt;
+
+		decltype (Scalar() * Scalar()) sum_of_squares (0);
+
+		for (std::size_t i = 0; i < Size; ++i)
+			sum_of_squares += v[i] * v[i];
+
+		return sqrt (sum_of_squares);
 	}
 
 
