@@ -37,7 +37,7 @@ class TimeHelper
 
 	template<class Callable>
 		static si::Time
-		measure (Callable&& callback) noexcept;
+		measure (Callable&& callback);
 };
 
 
@@ -59,7 +59,7 @@ TimeHelper::epoch() noexcept
 
 template<class Callable>
 	inline si::Time
-	TimeHelper::measure (Callable&& callback) noexcept
+	TimeHelper::measure (Callable&& callback)
 	{
 		Time t = now();
 		callback();
