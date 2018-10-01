@@ -381,6 +381,28 @@ template<class Value>
 		return { fac, 10 };
 	}
 
+
+/**
+ * Return square of the argument.
+ */
+template<class Value>
+	decltype(std::declval<Value>() * std::declval<Value>())
+	square (Value a)
+	{
+		return a * a;
+	}
+
+
+/**
+ * Return cube of the argument.
+ */
+template<class Value>
+	decltype(std::declval<Value>() * std::declval<Value>() * std::declval<Value>())
+	cube (Value a)
+	{
+		return a * a * a;
+	}
+
 } // namespace xf
 
 #endif
