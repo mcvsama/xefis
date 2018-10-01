@@ -130,9 +130,6 @@ to_longitude_dms (Angle a)
 }
 
 
-/**
- * Mean value for two angles on a circle.
- */
 Angle
 mean (Angle lhs, Angle rhs)
 {
@@ -142,7 +139,28 @@ mean (Angle lhs, Angle rhs)
 
 	Angle::Value x = 0.5 * cos (lhs) + cos (rhs);
 	Angle::Value y = 0.5 * sin (lhs) + sin (rhs);
+
 	return 1_rad * atan2 (y, x);
 }
+
+
+NorthEastDown
+ned_matrix (si::LonLat const& position)
+{
+	auto const n0 = EquatorPrimeMeridian.north();
+	auto const e0 = EquatorPrimeMeridian.east();
+	auto const e1 = rotation_about (n0, +position.lon()) * e0;
+	auto const n1 = rotation_about (e1, -position.lat()) * n0;
+
+	return NorthEastDown ({ n1, e1, cross_product (n1, e1) });
+}
+
+
+NorthEastDown
+ned_matrix (SpaceVector<si::Length> const& position)
+{
+	return ned_matrix (polar (position));
+}
+
 } // namespace xf
 
