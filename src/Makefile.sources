@@ -370,6 +370,7 @@ XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
 XEFIS_HEADERS			+= xefis/support/math/3d_space.h
 XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
+XEFIS_HEADERS			+= xefis/support/math/physics.h
 
 ######## /xefis/support/navigation ########
 
