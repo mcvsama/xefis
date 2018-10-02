@@ -39,12 +39,12 @@ template<class Value, std::size_t Columns, std::size_t Rows>
 	std::ostream&
 	operator<< (std::ostream& os, math::Matrix<Value, Columns, Rows> const& matrix)
 	{
-		for (std::size_t r = 0; r < Rows; ++r)
+		for (std::size_t c = 0; c < Columns; ++c)
 		{
-			for (std::size_t c = 0; c < Columns; ++c)
-				os << std::setprecision (19) << si::quantity (matrix (c, r)) << (c < Columns - 1 ? " " : "");
+			for (std::size_t r = 0; r < Rows; ++r)
+				os << std::setprecision (19) << si::quantity (matrix (c, r)) << (r < Rows - 1 ? " " : "");
 
-			if (r < Rows - 1)
+			if (c < Columns - 1)
 				os << ", ";
 		}
 
