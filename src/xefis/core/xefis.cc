@@ -54,22 +54,24 @@ Xefis::Xefis (int& argc, char** argv):
 	// Also encode std::strings and const chars* in UTF-8:
 	QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF-8"));
 
-	_system = std::make_unique<System> (_logger);
-	_graphics = std::make_unique<Graphics> (_logger);
-	_machine = ::xefis_machine (*this);
-	_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
+	Exception::log (_logger, [&] {
+		_system = std::make_unique<System> (_logger);
+		_graphics = std::make_unique<Graphics> (_logger);
+		_machine = ::xefis_machine (*this);
+		_configurator_widget = std::make_unique<ConfiguratorWidget> (*_machine, nullptr);
 
-	_posix_signals_check_timer = new QTimer (this);
-	_posix_signals_check_timer->setSingleShot (false);
-	_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
-	QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
-		if (g_hup_received.load())
-		{
-			_logger << "HUP received, exiting." << std::endl;
-			quit();
-		}
+		_posix_signals_check_timer = new QTimer (this);
+		_posix_signals_check_timer->setSingleShot (false);
+		_posix_signals_check_timer->setInterval ((100_ms).in<si::Millisecond>());
+		QObject::connect (_posix_signals_check_timer, &QTimer::timeout, [&] {
+			if (g_hup_received.load())
+			{
+				_logger << "HUP received, exiting." << std::endl;
+				quit();
+			}
+		});
+		_posix_signals_check_timer->start();
 	});
-	_posix_signals_check_timer->start();
 }
 
 
