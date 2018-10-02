@@ -169,8 +169,14 @@ Body::moment_of_inertia() const noexcept
 inline void
 Body::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia> const& matrix)
 {
-	_moment_of_inertia = matrix;
-	_inversed_moment_of_inertia = matrix.inversed();
+	try {
+		_moment_of_inertia = matrix;
+		_inversed_moment_of_inertia = matrix.inversed();
+	}
+	catch (math::NotInversible& e)
+	{
+		std::throw_with_nested (xf::BadConfiguration ("invalid moment of inertia (masses are colinear/coplanar)"));
+	}
 }
 
 
