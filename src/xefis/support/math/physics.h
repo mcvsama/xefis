@@ -18,6 +18,7 @@
 #include <cstddef>
 
 // Lib:
+#include <boost/range.hpp>
 #include <lib/math/math.h>
 
 // Xefis:
@@ -27,9 +28,9 @@
 
 namespace xf {
 
-template<class MassIterator>
+template<class PointMassIterator>
 	xf::SpaceVector<si::Length>
-	center_of_gravity (MassIterator masses_begin, MassIterator masses_end)
+	center_of_gravity (PointMassIterator masses_begin, PointMassIterator masses_end)
 	{
 		xf::SpaceVector<decltype (si::Length{} * si::Mass{})> center (math::ZeroMatrix);
 		si::Mass total_mass = 0_kg;
@@ -47,9 +48,9 @@ template<class MassIterator>
 	}
 
 
-template<class MassIterator>
+template<class PointMassIterator>
 	xf::SpaceMatrix<si::MomentOfInertia>
-	moment_of_inertia (MassIterator masses_begin, MassIterator masses_end)
+	moment_of_inertia (PointMassIterator masses_begin, PointMassIterator masses_end)
 	{
 		xf::SpaceMatrix<si::MomentOfInertia> sum (math::ZeroMatrix);
 
@@ -60,6 +61,36 @@ template<class MassIterator>
 
 			sum += m * (-x * x.transposed());
 		}
+
+		return sum;
+	}
+
+
+/**
+ * Move mass distributions so that position [0, 0, 0] is in center of gravity.
+ */
+template<class PointMassIterator>
+	inline void
+	move_to_center_of_gravity (PointMassIterator begin, PointMassIterator end)
+	{
+		auto const cog = xf::center_of_gravity (begin, end);
+
+		for (auto& point_mass: boost::make_iterator_range (begin, end))
+			std::get<xf::SpaceVector<si::Length>> (point_mass) -= cog;
+	}
+
+
+/**
+ * Return sum of point masses.
+ */
+template<class PointMassIterator>
+	inline si::Mass
+	total_mass (PointMassIterator begin, PointMassIterator end)
+	{
+		auto sum = 0_kg;
+
+		for (auto& point_mass: boost::make_iterator_range (begin, end))
+			sum += std::get<si::Mass> (point_mass);
 
 		return sum;
 	}
