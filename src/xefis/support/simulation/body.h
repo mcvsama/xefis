@@ -82,28 +82,28 @@ class Body
 	 */
 
 	[[nodiscard]]
-	SpaceQuaternion const&
+	SpaceMatrix<> const&
 	orientation() const noexcept;
 
 	void
-	set_orientation (SpaceQuaternion const&);
+	set_orientation (SpaceMatrix<> const&);
 
 	/*
 	 * AngularVelocity
 	 */
 
 	[[nodiscard]]
-	SpaceVector<si::BaseAngularVelocity> const&
+	SpaceMatrix<si::BaseAngularVelocity> const&
 	angular_velocity() const noexcept;
 
 	void
-	set_angular_velocity (SpaceVector<si::BaseAngularVelocity> const&);
+	set_angular_velocity (SpaceMatrix<si::BaseAngularVelocity> const&);
 
 	/**
 	 * Update state of the object with given forces acting on it over the time dt.
 	 */
 	void
-	evolve (SpaceVector<si::Force> const&, SpaceVector<si::Torque> const&, si::Time dt);
+	evolve (SpaceVector<si::Force> const&, SpaceMatrix<si::Torque> const&, si::Time dt);
 
   public:
 	// Basic physics:
@@ -112,8 +112,8 @@ class Body
 	SpaceVector<si::Velocity>							_velocity;
 	SpaceMatrix<si::MomentOfInertia>					_moment_of_inertia;
 	SpaceMatrix<si::MomentOfInertia>::InversedMatrix	_inversed_moment_of_inertia;
-	SpaceQuaternion										_orientation;
-	SpaceVector<si::BaseAngularVelocity>				_angular_velocity;
+	SpaceMatrix<>										_orientation;
+	SpaceMatrix<si::BaseAngularVelocity>				_angular_velocity;
 };
 
 
@@ -174,7 +174,7 @@ Body::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia> const& matrix)
 }
 
 
-inline SpaceQuaternion const&
+inline SpaceMatrix<> const&
 Body::orientation() const noexcept
 {
 	return _orientation;
@@ -182,13 +182,13 @@ Body::orientation() const noexcept
 
 
 inline void
-Body::set_orientation (SpaceQuaternion const& orientation)
+Body::set_orientation (SpaceMatrix<> const& orientation)
 {
 	_orientation = orientation;
 }
 
 
-inline SpaceVector<si::BaseAngularVelocity> const&
+inline SpaceMatrix<si::BaseAngularVelocity> const&
 Body::angular_velocity() const noexcept
 {
 	return _angular_velocity;
@@ -196,7 +196,7 @@ Body::angular_velocity() const noexcept
 
 
 inline void
-Body::set_angular_velocity (SpaceVector<si::BaseAngularVelocity> const& angular_velocity)
+Body::set_angular_velocity (SpaceMatrix<si::BaseAngularVelocity> const& angular_velocity)
 {
 	_angular_velocity = angular_velocity;
 }

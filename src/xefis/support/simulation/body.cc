@@ -24,20 +24,19 @@
 namespace xf::sim {
 
 void
-Body::evolve (SpaceVector<si::Force> const& force, SpaceVector<si::Torque> const& torque, si::Time dt)
+Body::evolve (SpaceVector<si::Force> const& force, SpaceMatrix<si::Torque> const& torque, si::Time dt)
 {
 	SpaceVector<si::Acceleration> linear_a = force / _mass;
 	SpaceVector<si::Velocity> dv = linear_a * dt;
 
-	SpaceVector<si::BaseAngularAcceleration> angular_a = _inversed_moment_of_inertia * torque;
-	SpaceVector<si::BaseAngularVelocity> dw = angular_a * dt;
+	SpaceMatrix<si::BaseAngularAcceleration> angular_a = _inversed_moment_of_inertia * torque;
+	SpaceMatrix<si::BaseAngularVelocity> dw = angular_a * dt;
 
 	_velocity += dv;
 	_angular_velocity += dw;
 
 	_position += _velocity * dt;
-	_orientation += SpaceQuaternion (0.5 * _angular_velocity * dt) * _orientation;
-	_orientation.normalize();
+	_orientation += (_angular_velocity * dt) * _orientation;
 }
 
 } // namespace xf::sim
