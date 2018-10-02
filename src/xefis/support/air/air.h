@@ -72,6 +72,20 @@ indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<Foot>(), 2.127940);
 }
 
+
+constexpr double
+reynolds_number (si::Density fluid_density, si::Velocity fluid_speed, si::Length characteristic_dimension, si::DynamicViscosity mu)
+{
+	return fluid_density * fluid_speed * characteristic_dimension / mu;
+}
+
+
+constexpr double
+reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, si::KinematicViscosity nu)
+{
+	return fluid_speed * characteristic_dimension / nu;
+}
+
 } // namespace xf
 
 #endif

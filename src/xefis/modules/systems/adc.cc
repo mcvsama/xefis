@@ -447,7 +447,7 @@ AirDataComputer::compute_reynolds()
 		io.dynamic_viscosity)
 	{
 		si::Length const travelled_length = _airframe->wings_chord();
-		io.reynolds_number = (*io.air_density_static) * (*io.speed_tas) * travelled_length / (*io.dynamic_viscosity);
+		io.reynolds_number = xf::reynolds_number (*io.air_density_static, *io.speed_tas, travelled_length, *io.dynamic_viscosity);
 	}
 	else
 		io.reynolds_number = xf::nil;
