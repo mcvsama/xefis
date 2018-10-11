@@ -19,7 +19,7 @@
 #include <xefis/core/stdexcept.h>
 #include <xefis/utility/qdom.h>
 #include <xefis/utility/qdom_iterator.h>
-#include <xefis/utility/datatable2d.h>
+#include <xefis/utility/field.h>
 
 // Local:
 #include "drag.h"
@@ -49,7 +49,7 @@ Drag::Drag (QDomElement const& config)
 	if (data.empty())
 		throw BadConfiguration ("drag module not properly configured");
 
-	_aoa_to_cd = Datatable2D<Angle, DragCoefficient> (std::move (data));
+	_aoa_to_cd = Field<Angle, DragCoefficient> (std::move (data));
 }
 
 

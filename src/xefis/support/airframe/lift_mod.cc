@@ -116,7 +116,7 @@ LiftMod::prev_setting (Angle const& surface_angle) const
 Angle
 LiftMod::get_aoa_correction (Angle const& surface_angle) const
 {
-	auto range = extended_adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
 	Range<Angle> from (range.first->first, range.second->first);
 	Range<Angle> to (range.first->second.aoa_correction(), range.second->second.aoa_correction());
@@ -128,7 +128,7 @@ LiftMod::get_aoa_correction (Angle const& surface_angle) const
 Range<Speed>
 LiftMod::get_speed_range (Angle const& surface_angle) const
 {
-	auto range = extended_adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
 	Range<Angle> from (range.first->first, range.second->first);
 	Range<Speed> to_min (range.first->second.speed_range().min(), range.first->second.speed_range().min());
@@ -146,7 +146,7 @@ LiftMod::find_setting_iterator (Angle const& surface_angle) const
 {
 	using std::abs;
 
-	auto range = extended_adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
+	auto range = adjacent_find (_settings.begin(), _settings.end(), surface_angle, [](Settings::value_type pair) { return pair.first; });
 
 	if (abs (surface_angle - range.first->first) < abs (surface_angle - range.second->first))
 		return range.first;

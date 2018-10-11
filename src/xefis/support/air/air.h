@@ -19,7 +19,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/datatable2d.h>
 
 
 namespace xf {

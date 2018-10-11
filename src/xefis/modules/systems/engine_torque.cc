@@ -48,7 +48,7 @@ EngineTorque::compute_torque (double motor_efficiency)
 
 
 void
-EngineTorque::compute_torque (EfficiencyDatatable const& motor_efficiency)
+EngineTorque::compute_torque (EfficiencyField const& motor_efficiency)
 {
 	std::optional<double> efficiency;
 

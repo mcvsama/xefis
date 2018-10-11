@@ -23,16 +23,16 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
+#include <xefis/utility/field.h>
 #include <xefis/utility/temporal.h>
-#include <xefis/utility/datatable2d.h>
 
 
 class EngineTorqueIO: public xf::ModuleIO
 {
   public:
-	using EfficiencyDatatable	= xf::Datatable2D<si::AngularVelocity, double>;
-	using EngineEfficiency		= std::variant<double, EfficiencyDatatable>;
-	using MotorKv				= decltype (1.0_rpm / 1.0_V);
+	using EfficiencyField	= xf::Field<si::AngularVelocity, double>;
+	using EngineEfficiency	= std::variant<double, EfficiencyField>;
+	using MotorKv			= decltype (1.0_rpm / 1.0_V);
 
   public:
 	/*
@@ -62,13 +62,13 @@ class EngineTorqueIO: public xf::ModuleIO
  * These are the formulas:
  *   Kv = x [RPM / V]
  *   Kt = 1 / Kv = 1/x [Nm / A]
- * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Datatable2D,
+ * So Kv of the motor is needed as a setting. Also engine efficiency is needed either as a constant or a Field,
  * as a function of motor rotational speed.
  */
 class EngineTorque: public xf::Module<EngineTorqueIO>
 {
   private:
-	using EfficiencyDatatable = EngineTorqueIO::EfficiencyDatatable;
+	using EfficiencyField = EngineTorqueIO::EfficiencyField;
 
   public:
 	// Ctor
@@ -85,7 +85,7 @@ class EngineTorque: public xf::Module<EngineTorqueIO>
 	compute_torque (double motor_efficiency);
 
 	void
-	compute_torque (EfficiencyDatatable const& motor_efficiency);
+	compute_torque (EfficiencyField const& motor_efficiency);
 };
 
 #endif

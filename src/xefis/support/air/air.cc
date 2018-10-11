@@ -17,6 +17,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature.h>
+#include <xefis/utility/field.h>
 
 // Local:
 #include "air.h"
@@ -49,7 +50,7 @@ std::map<si::Length, InternationalStandardAtmosphereParams> const kInternational
 };
 
 
-Datatable2D<si::Length, si::Temperature> const kInternationalStandardAtmosphereTemperature {
+Field<si::Length, si::Temperature> const kInternationalStandardAtmosphereTemperature {
 	{ -0.61_km,  254.15_K },
 	{  0.0_km,   288.15_K },
 	{ 11.0_km,   216.65_K },
@@ -64,7 +65,7 @@ Datatable2D<si::Length, si::Temperature> const kInternationalStandardAtmosphereT
 
 // Map of temperature <-> dynamic viscosity taken from
 // <http://www.engineeringtoolbox.com/air-absolute-kinematic-viscosity-d_601.html>
-Datatable2D<si::Temperature, si::DynamicViscosity> const kAirTemperatureToDynamicViscosity {
+Field<si::Temperature, si::DynamicViscosity> const kAirTemperatureToDynamicViscosity {
 	{  -40_degF, 157.591e-7_Pas },
 	{  -20_degF, 159.986e-7_Pas },
 	{    0_degF, 157.591e-7_Pas },

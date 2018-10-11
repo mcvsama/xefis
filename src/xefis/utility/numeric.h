@@ -32,25 +32,46 @@
 
 namespace xf {
 
-template<class A, class B,
+template<class V, class B, class A = V,
 		 class = typename std::enable_if_t<
 			 (std::is_floating_point_v<A> || si::is_quantity_v<A>) &&
 			 (std::is_floating_point_v<B> || si::is_quantity_v<B>)
 		 >>
 	constexpr B
-	renormalize (A a, A a_min, A a_max, B b_min, B b_max)
+	renormalize (V v, A a_min, A a_max, B b_min, B b_max)
 	{
 		return a_min == a_max
 			? b_min
-			: ((a - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
+			: ((v - a_min) / (a_max - a_min)) * (b_max - b_min) + b_min;
 	}
 
 
-template<class A, class B>
+template<class V, class B, class A = V>
 	constexpr B
-	renormalize (A value, Range<A> range1, Range<B> range2) noexcept
+	renormalize (V value, Range<A> range1, Range<B> range2) noexcept
 	{
 		return renormalize (value, range1.min(), range1.max(), range2.min(), range2.max());
+	}
+
+
+template<class Value, std::size_t Size>
+	constexpr auto
+	renormalize (double v, double a_min, double a_max, math::Vector<Value, Size> const& b_min, math::Vector<Value, Size> const& b_max)
+	{
+		math::Vector<Value, Size> result { math::ZeroMatrix };
+
+		for (std::size_t i = 0; i < result.kRows; ++i)
+			result[i] = renormalize (v, a_min, a_max, b_min[i], b_max[i]);
+
+		return result;
+	}
+
+
+template<class Value, std::size_t Size>
+	constexpr auto
+	renormalize (Value v, Range<Value> const& range1, Range<math::Vector<Value, Size>> const& range2) noexcept
+	{
+		return renormalize (v, range1.min(), range1.max(), range2.min(), range2.max());
 	}
 
 

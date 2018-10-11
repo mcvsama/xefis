@@ -29,35 +29,83 @@ namespace xf {
 /**
  * Find two adjacent iterators a and b that satisfy a <= value && value <= b.
  * Result might be two identical iterators, or two end iterators.
+ * If value < *begin, { begin, begin } is returned.
+ * If value > *--end, { std::prev (end), std::prev (end) } is returned.
  */
 template<class ConstIterator, class Value, class Accessor>
 	inline std::pair<ConstIterator, ConstIterator>
-	extended_adjacent_find (ConstIterator begin, ConstIterator end, Value const& value, Accessor access)
+	adjacent_find (ConstIterator begin, ConstIterator end, Value const& value, Accessor&& get_value)
 	{
 		if (begin == end)
 			return { end, end };
 
 		auto predicate = [&](auto const& a, auto const& b) {
-			return access (a) <= value && value <= access (b);
+			return get_value (a) <= value && value <= get_value (b);
 		};
 
 		ConstIterator it = std::adjacent_find (begin, end, predicate);
 
 		if (it == end)
 		{
-			if (value < access (*begin))
+			if (value < get_value (*begin))
 				return { begin, begin };
 			else
-			{
-				ConstIterator pre_end = end;
-				--pre_end;
-				return { pre_end, pre_end };
-			}
+				return { std::prev (end), std::prev (end) };
 		}
 		else
 		{
 			ConstIterator ne = it;
 			return { it, ++ne };
+		}
+	}
+
+
+/**
+ * Find two adjacent iterators a and b that satisfy a <= value && value <= b.
+ * If no such iterators can be found, return two first or two last iterators from the sequence, as long
+ * as sequence has at least two iterators.
+ * If sequence has length 1, both returned iterators will point to the only element of the sequence.
+ *
+ * First value of returned tuple is true only if the iterators satisfy initial condition (a <= value && value <= b).
+ */
+template<class ConstIterator, class Value, class Accessor>
+	inline std::tuple<bool, ConstIterator, ConstIterator>
+	adjacent_find_for_extrapolation (ConstIterator begin, ConstIterator end, Value const& value, Accessor&& get_value)
+	{
+		switch (std::distance (begin, end))
+		{
+			case 0:
+				return { false, end, end };
+
+			case 1:
+				return { get_value (*begin) == value, begin, begin };
+
+			case 2:
+				return { get_value (*begin) <= value && value <= get_value (*std::prev (end)), begin, std::prev (end) };
+
+			default:
+			{
+				auto [a, b] = adjacent_find (begin, end, value, std::forward<Accessor> (get_value));
+
+				if (a == end && b == end)
+				{
+					if (value < get_value (*begin))
+						return { false, begin, std::next (begin) };
+					else
+						return { false, std::prev (end, 2), std::prev (end) };
+				}
+				else if (a == b)
+				{
+					if (value < get_value (*a))
+						return { false, begin, std::next (begin) };
+					else if (get_value (*b) < value)
+						return { false, std::prev (end, 2), std::prev (end) };
+					else
+						return { get_value (*a) == value, a, b };
+				}
+				else
+					return { true, a, b };
+			}
 		}
 	}
 

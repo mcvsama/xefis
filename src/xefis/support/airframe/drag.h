@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/types.h>
-#include <xefis/utility/datatable2d.h>
+#include <xefis/utility/field.h>
 
 
 namespace xf {
@@ -47,7 +47,7 @@ class Drag
 	get_cd (Angle const& aoa) const;
 
   private:
-	Datatable2D<Angle, DragCoefficient> _aoa_to_cd { };
+	Field<Angle, DragCoefficient> _aoa_to_cd { };
 };
 
 

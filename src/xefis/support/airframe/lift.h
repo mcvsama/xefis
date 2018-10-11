@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/types.h>
-#include <xefis/utility/datatable2d.h>
+#include <xefis/utility/field.h>
 
 
 namespace xf {
@@ -65,9 +65,10 @@ class Lift
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
-	Datatable2D<Angle, LiftCoefficient>	_aoa_to_cl		{ };
-	LiftCoefficient						_max_cl;
-	Angle								_critical_aoa;
+	Field<Angle, LiftCoefficient>	_aoa_to_cl					{ };
+	Field<LiftCoefficient, Angle>	_cl_to_aoa_normal_regime	{ };
+	LiftCoefficient					_max_cl;
+	Angle							_critical_aoa;
 };
 
 
