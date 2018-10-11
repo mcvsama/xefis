@@ -247,7 +247,7 @@ template<class Value>
 		auto const x_z_k = x * z * k;
 		auto const y_z_k = y * z * k;
 
-		return SpaceMatrix<> {
+		return {
 			x * x * k + cos_a, x_y_k - z_sin_a,   x_z_k + y_sin_a,
 			x_y_k + z_sin_a,   y * y * k + cos_a, y_z_k - x_sin_a,
 			x_z_k - y_sin_a,   y_z_k + x_sin_a,   z * z * k + cos_a,

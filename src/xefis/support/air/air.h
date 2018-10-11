@@ -19,9 +19,13 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/strong_type.h>
 
 
 namespace xf {
+
+using Reynolds = StrongType<double, struct ReynoldsType>;
+
 
 si::Density
 standard_density (si::Length geometric_altitude_amsl);
@@ -72,17 +76,17 @@ indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 }
 
 
-constexpr double
+constexpr Reynolds
 reynolds_number (si::Density fluid_density, si::Velocity fluid_speed, si::Length characteristic_dimension, si::DynamicViscosity mu)
 {
-	return fluid_density * fluid_speed * characteristic_dimension / mu;
+	return Reynolds (fluid_density * fluid_speed * characteristic_dimension / mu);
 }
 
 
-constexpr double
+constexpr Reynolds
 reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, si::KinematicViscosity nu)
 {
-	return fluid_speed * characteristic_dimension / nu;
+	return Reynolds (fluid_speed * characteristic_dimension / nu);
 }
 
 } // namespace xf
