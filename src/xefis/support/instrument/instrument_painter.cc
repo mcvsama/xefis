@@ -25,7 +25,7 @@ namespace xf {
 
 InstrumentPainter::InstrumentPainter (QPaintDevice& device, TextPainter::Cache& cache):
 	QPainter (&device),
-	TextPainter (&device, cache)
+	TextPainter (device, cache)
 {
 	setRenderHint (QPainter::Antialiasing, true);
 	setRenderHint (QPainter::TextAntialiasing, true);

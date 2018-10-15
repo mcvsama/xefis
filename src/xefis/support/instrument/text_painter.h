@@ -111,7 +111,7 @@ class TextPainter: virtual public QPainter
 
 	// Ctor
 	explicit
-	TextPainter (QPaintDevice* device, Cache& cache);
+	TextPainter (QPaintDevice& device, Cache& cache);
 
 	/**
 	 * Set font position correction (value is relative to font's size, it's not represented in pixels).

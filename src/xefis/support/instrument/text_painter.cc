@@ -92,8 +92,8 @@ TextPainter::TextPainter (Cache& cache):
 { }
 
 
-TextPainter::TextPainter (QPaintDevice* device, Cache& cache):
-	QPainter (device),
+TextPainter::TextPainter (QPaintDevice& device, Cache& cache):
+	QPainter (&device),
 	_cache (cache)
 { }
 

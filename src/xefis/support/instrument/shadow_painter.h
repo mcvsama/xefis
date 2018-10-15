@@ -34,6 +34,13 @@ class ShadowPainter: virtual public QPainter
 	using PaintFunction			= std::function<void (bool painting_shadow)>;
 
   public:
+	// Ctor
+	ShadowPainter() = default;
+
+	// Ctor
+	explicit
+	ShadowPainter (QPaintDevice&);
+
 	/**
 	 * Add a shadow under painted primitives.
 	 * The PaintFunction will be called twice with different state of the
@@ -48,6 +55,12 @@ class ShadowPainter: virtual public QPainter
 	void
 	paint (Shadow const&, DefaultPaintFunction);
 };
+
+
+inline
+ShadowPainter::ShadowPainter (QPaintDevice& device):
+	QPainter (&device)
+{ }
 
 
 inline void
