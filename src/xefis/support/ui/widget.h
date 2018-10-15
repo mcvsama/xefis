@@ -30,7 +30,7 @@ namespace xf {
 
 class Widget: public QWidget
 {
-  protected:
+  public:
 	// Ctor
 	explicit
 	Widget (QWidget* parent = nullptr, Qt::WindowFlags = Qt::Widget);
