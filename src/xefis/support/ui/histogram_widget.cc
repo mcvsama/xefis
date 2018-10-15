@@ -41,7 +41,7 @@ void
 HistogramWidget::update_canvas()
 {
 	QPalette const pal = palette();
-	QColor foreground = pal.color (isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText);
+	QColor const foreground = pal.color (isEnabled() ? QPalette::Active : QPalette::Disabled, QPalette::WindowText);
 	QColor const axes_color = foreground;
 	QColor const line_color = foreground;
 	QColor const bar_color = foreground;
