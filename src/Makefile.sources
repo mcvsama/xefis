@@ -75,6 +75,8 @@ XEFIS_HEADERS_MOC		+= xefis/modules/log/latency.h
 XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
 XEFIS_SOURCES			+= xefis/modules/log/latency.cc
 
+XEFIS_HEADERS			+= xefis/modules/simulation/virtual_joystick.h
+XEFIS_SOURCES			+= xefis/modules/simulation/virtual_joystick.cc
 ######## /xefis/modules/systems ########
 
 XEFIS_HEADERS			+= xefis/modules/systems/adc.h
@@ -471,6 +473,7 @@ XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
 XEFIS_HEADERS			+= xefis/utility/histogram.h
 XEFIS_HEADERS			+= xefis/utility/hmac.h
+XEFIS_HEADERS			+= xefis/utility/kde.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
 XEFIS_HEADERS			+= xefis/utility/map.h
 XEFIS_HEADERS			+= xefis/utility/named_instance.h
@@ -512,6 +515,7 @@ XEFIS_HEADERS			+= xefis/utility/variant.h
 XEFIS_SOURCES			+= xefis/utility/backtrace.cc
 XEFIS_SOURCES			+= xefis/utility/demangle.cc
 XEFIS_SOURCES			+= xefis/utility/exception_support.cc
+XEFIS_SOURCES			+= xefis/utility/kde.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
 XEFIS_SOURCES			+= xefis/utility/qutils.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc

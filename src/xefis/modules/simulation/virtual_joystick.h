@@ -1,0 +1,72 @@
+/* vim:ts=4
+ *
+ * Copyleft 2012…2016  Michał Gawron
+ * Marduk Unix Labs, http://mulabs.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ */
+
+#ifndef XEFIS__MODULES__SIMULATION__VIRTUAL_JOYSTICK_H__INCLUDED
+#define XEFIS__MODULES__SIMULATION__VIRTUAL_JOYSTICK_H__INCLUDED
+
+// Standard:
+#include <cstddef>
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/module.h>
+#include <xefis/core/property.h>
+#include <xefis/core/setting.h>
+
+
+class VirtualJoystickIO: public xf::ModuleIO
+{
+  public:
+	/*
+	 * Output
+	 */
+
+	xf::PropertyOut<double>		x_axis		{ this, "axis/x" };
+	xf::PropertyOut<double>		y_axis		{ this, "axis/y" };
+	xf::PropertyOut<double>		throttle	{ this, "throttle" };
+};
+
+
+class VirtualJoystickWidget;
+class VirtualThrottleWidget;
+
+
+class VirtualJoystick: public xf::Module<VirtualJoystickIO>
+{
+  public:
+	// Ctor
+	explicit
+	VirtualJoystick (std::unique_ptr<VirtualJoystickIO>, std::string_view const& instance = {});
+
+	QWidget*
+	widget() const noexcept;
+
+  protected:
+	// Module API
+	void
+	process (xf::Cycle const&) override;
+
+  private:
+	xf::Widget*				_widget;
+	VirtualJoystickWidget*	_joystick_widget;
+	VirtualThrottleWidget*	_throttle_widget;
+};
+
+
+inline QWidget*
+VirtualJoystick::widget() const noexcept
+{
+	return _widget;
+}
+
+#endif
