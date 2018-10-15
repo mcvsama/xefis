@@ -223,7 +223,7 @@ RuntimeTest t4 ("Field<..., math::Vector<...>>", []{
 		},
 	};
 
-	auto const epsilon = 0.000001 * Vector { math::UnitaryMatrix };
+	auto const epsilon = 0.000001 * Vector { 1.0, 1.0, 1.0 };
 
 	test_asserts::verify_equal_with_epsilon ("field.value (0.5) is vector { 0.5, 0.5, 0.0 }", abs (*field.value (0.5)), abs (Vector { 0.5, 0.5, 0.0 }), abs (epsilon));
 });

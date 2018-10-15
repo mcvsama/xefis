@@ -58,7 +58,7 @@ template<class Value, std::size_t Size>
 	constexpr auto
 	renormalize (double v, double a_min, double a_max, math::Vector<Value, Size> const& b_min, math::Vector<Value, Size> const& b_max)
 	{
-		math::Vector<Value, Size> result { math::ZeroMatrix };
+		math::Vector<Value, Size> result { math::zero };
 
 		for (std::size_t i = 0; i < result.kRows; ++i)
 			result[i] = renormalize (v, a_min, a_max, b_min[i], b_max[i]);

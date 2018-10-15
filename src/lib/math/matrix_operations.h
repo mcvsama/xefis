@@ -45,7 +45,7 @@ template<class ScalarA, class ScalarB, std::size_t ARows, std::size_t Common, st
 	{
 		using ResultScalar = decltype (ScalarA{} * ScalarB{});
 
-		Matrix<ResultScalar, BColumns, ARows> result = UninitializedMatrix;
+		Matrix<ResultScalar, BColumns, ARows> result { uninitialized };
 
 		for (std::size_t c = 0; c < BColumns; ++c)
 		{
@@ -183,7 +183,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows>
 		zero();
 
 		static Value
-		one();
+		unit();
 
 		static Value
 		inversed (Value const&);
@@ -194,15 +194,15 @@ template<class Scalar, std::size_t Columns, std::size_t Rows>
 	inline auto
 	Traits<Matrix<Scalar, Columns, Rows>>::zero() -> Value
 	{
-		return ZeroMatrix;
+		return math::zero;
 	}
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows>
 	inline auto
-	Traits<Matrix<Scalar, Columns, Rows>>::one() -> Value
+	Traits<Matrix<Scalar, Columns, Rows>>::unit() -> Value
 	{
-		return UnitaryMatrix;
+		return math::unit;
 	}
 
 

@@ -32,7 +32,7 @@ template<class PointMassIterator>
 	xf::SpaceVector<si::Length>
 	center_of_gravity (PointMassIterator masses_begin, PointMassIterator masses_end)
 	{
-		xf::SpaceVector<decltype (si::Length{} * si::Mass{})> center (math::ZeroMatrix);
+		xf::SpaceVector<decltype (si::Length{} * si::Mass{})> center (math::zero);
 		si::Mass total_mass = 0_kg;
 
 		for (auto const& mx: boost::make_iterator_range (masses_begin, masses_end))
@@ -52,7 +52,7 @@ template<class PointMassIterator>
 	xf::SpaceMatrix<si::MomentOfInertia>
 	moment_of_inertia (PointMassIterator masses_begin, PointMassIterator masses_end)
 	{
-		xf::SpaceMatrix<si::MomentOfInertia> sum (math::ZeroMatrix);
+		xf::SpaceMatrix<si::MomentOfInertia> sum (math::zero);
 
 		for (auto const& mx: boost::make_iterator_range (masses_begin, masses_end))
 		{

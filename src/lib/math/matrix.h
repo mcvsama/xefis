@@ -26,25 +26,24 @@
 
 namespace math {
 
-// Used to call required Matrix' ctor.
-enum ZeroMatrixType
-{
-	ZeroMatrix = 0,
-};
+// used to call specific matrix constructor.
+class ZeroMatrixType
+{ };
 
 
-// Used to call required Matrix' ctor.
-enum UnitaryMatrixType
-{
-	UnitaryMatrix = 0,
-};
+// used to call specific matrix constructor.
+class UnitaryMatrixType
+{ };
 
 
-// Used to call required Matrix' ctor.
-enum UninitializedMatrixType
-{
-	UninitializedMatrix = 0,
-};
+// used to call specific matrix constructor.
+class UninitializedMatrixType
+{ };
+
+
+static constexpr ZeroMatrixType				zero;
+static constexpr UnitaryMatrixType			unit;
+static constexpr UninitializedMatrixType	uninitialized;
 
 
 /**
@@ -104,7 +103,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		is_square();
 
 	  public:
-		// Ctor. Initializes matrix using default constructor of Scalar.
+		// Ctor. Same as using ZeroMatrixType.
 		constexpr
 		Matrix() noexcept;
 
@@ -305,7 +304,7 @@ template<class S, std::size_t C, std::size_t R>
 
 		using InversedMatrix = typename Matrix<S, C, R>::InversedMatrix;
 
-		InversedMatrix result = InversedMatrix (UnitaryMatrix);
+		InversedMatrix result = InversedMatrix (unit);
 
 		// Make matrix triangular (with 0s under the diagonal and 1s
 		// on the diagonal).
@@ -371,7 +370,7 @@ template<class S, std::size_t C, std::size_t R>
 template<class S, std::size_t C, std::size_t R>
 	constexpr
 	Matrix<S, C, R>::Matrix() noexcept:
-		Matrix (ZeroMatrix)
+		Matrix (zero)
 	{ }
 
 
@@ -393,7 +392,7 @@ template<class S, std::size_t C, std::size_t R>
 template<class S, std::size_t C, std::size_t R>
 	constexpr
 	Matrix<S, C, R>::Matrix (UnitaryMatrixType) noexcept:
-		Matrix (ZeroMatrix)
+		Matrix (zero)
 	{
 		static_assert (is_square(), "Matrix needs to be square");
 
