@@ -172,6 +172,17 @@ template<class Scalar, std::size_t Size>
 
 
 /**
+ * Return inversed matrix.
+ */
+template<class Scalar, std::size_t Columns, std::size_t Rows>
+	constexpr auto
+	inv (Matrix<Scalar, Columns, Rows> const& matrix)
+	{
+		return matrix.inversed();
+	}
+
+
+/**
  * Traits for Matrix<>
  */
 template<class Scalar, std::size_t Columns, std::size_t Rows>
