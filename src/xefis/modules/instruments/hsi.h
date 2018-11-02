@@ -70,12 +70,22 @@ enum class HeadingMode
 };
 
 
+enum class NavType
+{
+	A,
+	B
+};
+
+
 static constexpr std::string_view	kDisplayMode_Expanded	= "expanded";
 static constexpr std::string_view	kDisplayMode_Rose		= "rose";
 static constexpr std::string_view	kDisplayMode_Auxiliary	= "auxiliary";
 
 static constexpr std::string_view	kHeadingMode_Magnetic	= "MAG";
 static constexpr std::string_view	kHeadingMode_True		= "TRU";
+
+static constexpr std::string_view	kNavType_A				= "A";
+static constexpr std::string_view	kNavType_B				= "B";
 
 
 constexpr std::string_view
@@ -105,6 +115,19 @@ to_string (HeadingMode mode)
 }
 
 
+constexpr std::string_view
+to_string (NavType nav_type)
+{
+	switch (nav_type)
+	{
+		case NavType::A:	return kNavType_A;
+		case NavType::B:	return kNavType_B;
+	}
+
+	return "";
+}
+
+
 inline void
 parse (std::string_view const& str, DisplayMode& display_mode)
 {
@@ -124,6 +147,16 @@ parse (std::string_view const& str, HeadingMode& heading_mode)
 		heading_mode = HeadingMode::Magnetic;
 	else if (str == kHeadingMode_True)
 		heading_mode = HeadingMode::True;
+}
+
+
+inline void
+parse (std::string_view const& str, NavType& nav_type)
+{
+	if (str == kNavType_A)
+		nav_type = NavType::A;
+	else if (str == kNavType_B)
+		nav_type = NavType::B;
 }
 
 } // namespace hsi
@@ -186,12 +219,12 @@ class HSI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Length>				navaid_selected_distance				{ this, "navaid/selected/distance" };
 	xf::PropertyIn<si::Time>				navaid_selected_eta						{ this, "navaid/selected/eta" };
 	xf::PropertyIn<si::Angle>				navaid_selected_course_magnetic			{ this, "navaid/selected/course-magnetic" };
-	xf::PropertyIn<int64_t>					navaid_left_type						{ this, "navaid/left/type" };
+	xf::PropertyIn<hsi::NavType>			navaid_left_type						{ this, "navaid/left/type" };
 	xf::PropertyIn<std::string>				navaid_left_reference					{ this, "navaid/left/reference" };
 	xf::PropertyIn<std::string>				navaid_left_identifier					{ this, "navaid/left/identifier" };
 	xf::PropertyIn<si::Length>				navaid_left_distance					{ this, "navaid/left/distance" };
 	xf::PropertyIn<si::Angle>				navaid_left_initial_bearing_magnetic	{ this, "navaid/left/initial-bearing-magnetic" };
-	xf::PropertyIn<int64_t>					navaid_right_type						{ this, "navaid/right/type" };
+	xf::PropertyIn<hsi::NavType>			navaid_right_type						{ this, "navaid/right/type" };
 	xf::PropertyIn<std::string>				navaid_right_reference					{ this, "navaid/right/reference" };
 	xf::PropertyIn<std::string>				navaid_right_identifier					{ this, "navaid/right/identifier" };
 	xf::PropertyIn<si::Length>				navaid_right_distance					{ this, "navaid/right/distance" };
@@ -239,12 +272,12 @@ class Parameters
 	std::optional<Length>					navaid_selected_distance;
 	std::optional<Time>						navaid_selected_eta;
 	std::optional<Angle>					navaid_selected_course_magnetic;
-	int										navaid_left_type						{ 0 };
+	hsi::NavType							navaid_left_type						{ hsi::NavType::A };
 	QString									navaid_left_reference;
 	QString									navaid_left_identifier;
 	std::optional<Length>					navaid_left_distance;
 	std::optional<Angle>					navaid_left_initial_bearing_magnetic;
-	int										navaid_right_type						{ 0 };
+	hsi::NavType							navaid_right_type						{ hsi::NavType::A };
 	QString									navaid_right_reference;
 	QString									navaid_right_identifier;
 	std::optional<Length>					navaid_right_distance;

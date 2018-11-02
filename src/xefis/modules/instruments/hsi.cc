@@ -1341,7 +1341,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 		left_layout.add_skips (font_b, 2);
 
 	if (_navaid_left_visible)
-		configure_layout (left_layout, (_p.navaid_left_type == 0) ? Qt::green : xf::InstrumentAids::kCyan, _p.navaid_left_reference, _p.navaid_left_identifier, _p.navaid_left_distance);
+		configure_layout (left_layout, (_p.navaid_left_type == hsi::NavType::A) ? Qt::green : xf::InstrumentAids::kCyan, _p.navaid_left_reference, _p.navaid_left_identifier, _p.navaid_left_distance);
 	else
 		left_layout.add_skips (font_b, 2);
 
@@ -1350,7 +1350,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 	right_layout.set_background (Qt::black, { _c.margin, 0.0 });
 
 	if (_navaid_right_visible)
-		configure_layout (right_layout, (_p.navaid_right_type == 0) ? Qt::green : xf::InstrumentAids::kCyan, _p.navaid_right_reference, _p.navaid_right_identifier, _p.navaid_right_distance);
+		configure_layout (right_layout, (_p.navaid_right_type == hsi::NavType::A) ? Qt::green : xf::InstrumentAids::kCyan, _p.navaid_right_reference, _p.navaid_right_identifier, _p.navaid_right_distance);
 
 	auto const size = _paint_request.metric().canvas_size();
 
@@ -1376,8 +1376,8 @@ PaintingWork::paint_pointers()
 		bool						visible;
 	};
 
-	for (Opts const& opts: { Opts { true, (_p.navaid_left_type == 0 ? Qt::green : xf::InstrumentAids::kCyan), _p.navaid_left_initial_bearing_magnetic, _navaid_left_visible },
-							 Opts { false, (_p.navaid_right_type == 0 ? Qt::green : xf::InstrumentAids::kCyan), _p.navaid_right_initial_bearing_magnetic, _navaid_right_visible } })
+	for (Opts const& opts: { Opts { true, (_p.navaid_left_type == hsi::NavType::A ? Qt::green : xf::InstrumentAids::kCyan), _p.navaid_left_initial_bearing_magnetic, _navaid_left_visible },
+							 Opts { false, (_p.navaid_right_type == hsi::NavType::A ? Qt::green : xf::InstrumentAids::kCyan), _p.navaid_right_initial_bearing_magnetic, _navaid_right_visible } })
 	{
 		if (!opts.angle || !opts.visible)
 			continue;
@@ -2018,11 +2018,11 @@ HSI::process (xf::Cycle const& cycle)
 	params.navaid_selected_eta = io.navaid_selected_eta.get_optional();
 	params.navaid_selected_course_magnetic = io.navaid_selected_course_magnetic.get_optional();
 	params.navaid_left_reference = QString::fromStdString (io.navaid_left_reference.value_or (""));
-	params.navaid_left_type = io.navaid_left_type.value_or (0);
+	params.navaid_left_type = io.navaid_left_type.value_or (hsi::NavType::A);
 	params.navaid_left_identifier = QString::fromStdString (io.navaid_left_identifier.value_or (""));
 	params.navaid_left_distance = io.navaid_left_distance.get_optional();
 	params.navaid_left_initial_bearing_magnetic = io.navaid_left_initial_bearing_magnetic.get_optional();
-	params.navaid_right_type = io.navaid_right_type.value_or (0);
+	params.navaid_right_type = io.navaid_right_type.value_or (hsi::NavType::A);
 	params.navaid_right_reference = QString::fromStdString (io.navaid_right_reference.value_or (""));
 	params.navaid_right_identifier = QString::fromStdString (io.navaid_right_identifier.value_or (""));
 	params.navaid_right_distance = io.navaid_right_distance.get_optional();
