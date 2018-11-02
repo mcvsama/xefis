@@ -91,7 +91,9 @@ class ScreenSpec
 	set_scale (float factor);
 
   private:
-	float				_scale { 1.0f };
+	float				_scale				{ 1.0f };
+	// Qt doesn't seem to scale fonts correctly, this is to mitigate that problem:
+	float				_font_scale_fix		{ 1.0f };
 	QRect				_position_and_size;
 	si::Length			_diagonal_length;
 	si::Frequency		_refresh_rate;
@@ -146,7 +148,7 @@ ScreenSpec::base_pen_width() const noexcept
 inline si::Length
 ScreenSpec::base_font_height() const noexcept
 {
-	return _base_font_height;
+	return _base_font_height / _font_scale_fix;
 }
 
 
@@ -161,6 +163,7 @@ inline void
 ScreenSpec::set_scale (float factor)
 {
 	_scale = factor;
+	_font_scale_fix = std::pow (_scale, 0.3);
 }
 
 } // namespace xf
