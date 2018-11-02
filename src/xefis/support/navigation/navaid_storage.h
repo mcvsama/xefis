@@ -16,7 +16,9 @@
 
 // Standard:
 #include <cstddef>
+#include <future>
 #include <set>
+#include <string_view>
 #include <map>
 
 // Xefis:
@@ -78,20 +80,33 @@ class NavaidStorage
   public:
 	// Ctor
 	explicit
-	NavaidStorage (Logger const&);
+	NavaidStorage (Logger const&,
+				   std::string_view const& nav_file,
+				   std::string_view const& fix_file,
+				   std::string_view const& apt_file);
 
 	// Dtor
 	~NavaidStorage();
 
 	/**
 	 * Load navaids and fixes.
+	 * Either use load() or async_loader().
 	 */
 	void
 	load();
 
 	/**
+	 * Return a task to be run asynchronously (thread-safe) that loads the data.
+	 * Either use load() or async_loader().
+	 * You may use get_navs(), find_by_id() and find_by_frequency() even before async_loader() task finishes.
+	 */
+	std::packaged_task<void()>
+	async_loader();
+
+	/**
 	 * Return set of navaids withing the given @radius
 	 * from a @position.
+	 * \threadsafe
 	 */
 	Navaids
 	get_navs (LonLat const& position, Length radius) const;
@@ -99,6 +114,7 @@ class NavaidStorage
 	/**
 	 * Find navaid of given type by its @identifier.
 	 * Return nullptr if not found.
+	 * \threadsafe
 	 */
 	Navaid const*
 	find_by_id (Navaid::Type, QString const& identifier) const;
@@ -106,6 +122,7 @@ class NavaidStorage
 	/**
 	 * Return set of navaids, sorted by proximity to the @position
 	 * (first is the nearest).
+	 * \threadsafe
 	 */
 	Navaids
 	find_by_frequency (LonLat const& position, Navaid::Type, Frequency frequency) const;
@@ -121,12 +138,13 @@ class NavaidStorage
 	parse_apt_dat();
 
   private:
-	Logger			_logger;
-	NavaidsTree		_navaids_tree;
-	const char*		_nav_dat_file	{ "share/nav/nav.dat.gz" }; // TODO make it configurable
-	const char*		_fix_dat_file	{ "share/nav/fix.dat.gz" };
-	const char*		_apt_dat_file	{ "share/nav/apt.dat.gz" };
-	NavaidsByType	_navaids_by_type;
+	std::atomic<bool>	_loaded { false };
+	Logger				_logger;
+	std::string			_nav_dat_file;
+	std::string			_fix_dat_file;
+	std::string			_apt_dat_file;
+	NavaidsTree			_navaids_tree;
+	NavaidsByType		_navaids_by_type;
 };
 
 

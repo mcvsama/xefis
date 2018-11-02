@@ -16,8 +16,8 @@
 #include <memory>
 
 // Qt:
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
+#include <QFile>
+#include <QTextStream>
 
 // Xefis:
 #include <xefis/config/all.h>
@@ -36,7 +36,7 @@ class GzDataFileIterator
   public:
 	// Ctor
 	explicit
-	GzDataFileIterator (QString const& path);
+	GzDataFileIterator (std::string_view const& path);
 
 	/**
 	 * Return true if pointer doesn't point to the end of the line.
@@ -65,8 +65,8 @@ class GzDataFileIterator
 
 
 inline
-GzDataFileIterator::GzDataFileIterator (QString const& path):
-	_file (path)
+GzDataFileIterator::GzDataFileIterator (std::string_view const& path):
+	_file (QString::fromStdString (std::string (path)))
 {
 	_file.open (QFile::ReadOnly); // TODO check if result is true
 	_decompressor = std::make_unique<QZDevice> (&_file);
@@ -102,8 +102,14 @@ GzDataFileIterator::operator*()
 }
 
 
-NavaidStorage::NavaidStorage (Logger const& logger):
+NavaidStorage::NavaidStorage (Logger const& logger,
+							  std::string_view const& nav_file,
+							  std::string_view const& fix_file,
+							  std::string_view const& apt_file):
 	_logger (logger.with_scope ("<navaid storage>")),
+	_nav_dat_file (nav_file),
+	_fix_dat_file (fix_file),
+	_apt_dat_file (apt_file),
 	_navaids_tree (access_position)
 {
 	_logger << "Creating NavaidStorage" << std::endl;
@@ -119,6 +125,9 @@ NavaidStorage::~NavaidStorage()
 void
 NavaidStorage::load()
 {
+	if (_loaded)
+		return;
+
 	parse_nav_dat();
 	parse_fix_dat();
 	parse_apt_dat();
@@ -134,9 +143,23 @@ NavaidStorage::load()
 }
 
 
+std::packaged_task<void()>
+NavaidStorage::async_loader()
+{
+	// TODO called functions use Logger, that is not thread-safe!!!
+	return std::packaged_task<void()> ([this] {
+		load();
+		_loaded = true;
+	});
+}
+
+
 NavaidStorage::Navaids
 NavaidStorage::get_navs (LonLat const& position, Length radius) const
 {
+	if (!_loaded)
+		return {};
+
 	Navaids set;
 
 	auto inserter_and_predicate = [&] (Navaid const& navaid) -> bool
@@ -159,6 +182,9 @@ NavaidStorage::get_navs (LonLat const& position, Length radius) const
 Navaid const*
 NavaidStorage::find_by_id (Navaid::Type type, QString const& identifier) const
 {
+	if (!_loaded)
+		return {};
+
 	auto g = _navaids_by_type.find (type);
 	if (g != _navaids_by_type.end())
 	{
@@ -173,6 +199,9 @@ NavaidStorage::find_by_id (Navaid::Type type, QString const& identifier) const
 NavaidStorage::Navaids
 NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Frequency frequency) const
 {
+	if (!_loaded)
+		return {};
+
 	Navaids result;
 
 	auto g = _navaids_by_type.find (type);
