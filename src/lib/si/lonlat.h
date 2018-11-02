@@ -48,17 +48,21 @@ class LonLat
 	constexpr LonLat (Angle longitude, Angle latitude) noexcept;
 
   public:
-	Angle&
-	lat() noexcept;
+	constexpr Angle&
+	lat() noexcept
+		{ return _lat; }
 
-	Angle const&
-	lat() const noexcept;
+	constexpr Angle const&
+	lat() const noexcept
+		{ return _lat; }
 
-	Angle&
-	lon() noexcept;
+	constexpr Angle&
+	lon() noexcept
+		{ return _lon; }
 
-	Angle const&
-	lon() const noexcept;
+	constexpr Angle const&
+	lon() const noexcept
+		{ return _lon; }
 
 	/**
 	 * Change position of this point on a sphere by adding new angles.
@@ -95,34 +99,6 @@ LonLat::LonLat (Angle longitude, Angle latitude) noexcept:
 	_lon (longitude),
 	_lat (latitude)
 { }
-
-
-inline Angle&
-LonLat::lon() noexcept
-{
-	return _lon;
-}
-
-
-inline Angle const&
-LonLat::lon() const noexcept
-{
-	return _lon;
-}
-
-
-inline Angle&
-LonLat::lat() noexcept
-{
-	return _lat;
-}
-
-
-inline Angle const&
-LonLat::lat() const noexcept
-{
-	return _lat;
-}
 
 } // namespace si
 
