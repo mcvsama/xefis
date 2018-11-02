@@ -566,7 +566,9 @@ OBJECTS += $(call mkobjs, $(SOURCES))
 
 VERSION_FILE := xefis/config/version.cc
 MACHINE_TARGETS += $(foreach machine_name, $(XEFIS_MACHINES), $(distdir)/xefis.$(machine_name))
-TARGETS += $(MACHINE_TARGETS) $(distdir)/watchdog $(distdir)/selftest
+TARGETS += $(distdir)/selftest
+TARGETS += $(distdir)/watchdog
+TARGETS += $(MACHINE_TARGETS)
 
 $(MACHINE_TARGETS): $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 
