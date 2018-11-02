@@ -50,7 +50,8 @@ ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instan
 
 ProcessingLoop::~ProcessingLoop()
 {
-	if (!_modules_tracker.empty())
+	// The only allowed registered module during destruction is this ProcessingLoop itself:
+	if (_modules_tracker.size() > 1 || &_modules_tracker.begin()->value() != this)
 		Exception::terminate ("ProcessingLoop destroyed while still having registered modules");
 }
 

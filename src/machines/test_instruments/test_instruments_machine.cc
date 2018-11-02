@@ -264,6 +264,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 
 	// Register the rest:
 	test_loop.register_module (*_test_generator);
+	test_loop.register_module (*_test_loop);
 	test_loop.start();
 
 	test_screen->show();
