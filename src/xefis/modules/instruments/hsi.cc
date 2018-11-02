@@ -1187,7 +1187,7 @@ PaintingWork::paint_course()
 		_painter.setBrush (Qt::NoBrush);
 		_painter.drawRect (bar);
 
-		_painter.setPen (xf::InstrumentAids::kAutopilotColor);
+		_painter.setPen (_aids.get_pen (xf::InstrumentAids::kAutopilotColor, 1.0));
 
 		if (filled)
 			_painter.setBrush (xf::InstrumentAids::kAutopilotColor);
