@@ -1867,7 +1867,7 @@ PaintingWork::retrieve_navaids()
 	if (!_p.position)
 		return;
 
-	if (_current_navaids.retrieved && xf::haversine_earth (_current_navaids.retrieve_position, *_p.position) < 0.1f * _p.range && _p.range == _current_navaids.retrieve_range)
+	if (_current_navaids.retrieved && xf::haversine_earth (_current_navaids.retrieve_position, *_p.position) < 10_m && _p.range == _current_navaids.retrieve_range)
 		return;
 
 	_current_navaids.fix_navs.clear();
