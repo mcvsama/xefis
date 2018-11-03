@@ -1,6 +1,6 @@
-XEFIS_MACHINE_HEADERS += test_instruments/test_instruments_machine.h
-XEFIS_MACHINE_HEADERS += test_instruments/test_screen.h
+XEFIS_MACHINE_test_instruments_HEADERS += test_instruments/test_instruments_machine.h
+XEFIS_MACHINE_test_instruments_HEADERS += test_instruments/test_screen.h
 
-XEFIS_MACHINE_SOURCES += test_instruments/test_instruments_machine.cc
-XEFIS_MACHINE_SOURCES += test_instruments/test_screen.cc
+XEFIS_MACHINE_test_instruments_SOURCES += test_instruments/test_instruments_machine.cc
+XEFIS_MACHINE_test_instruments_SOURCES += test_instruments/test_screen.cc
 

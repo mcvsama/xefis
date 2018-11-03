@@ -531,10 +531,31 @@ SELFTEST_SOURCES		+= xefis/utility/tests/tracker.test.cc
 
 ################
 
-XEFIS_HEADERS += $(addprefix machines/,$(XEFIS_MACHINE_HEADERS))
-XEFIS_HEADERS_MOC += $(addprefix machines/,$(XEFIS_MACHINE_HEADERS_MOC))
-XEFIS_SOURCES += $(addprefix machines/,$(XEFIS_MACHINE_SOURCES))
-XEFIS_SOURCES_MOC += $(addprefix machines/,$(XEFIS_MACHINE_SOURCES_MOC))
+machine_headers						= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_HEADERS))
+machine_headers_moc					= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_HEADERS_MOC))
+machine_selftest_headers			= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_HEADERS))
+machine_selftest_headers_moc		= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_HEADERS_MOC))
+machine_sources						= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SOURCES))
+machine_sources_moc					= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SOURCES_MOC))
+machine_selftest_sources			= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_SOURCES))
+machine_selftest_sources_moc		= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_SOURCES_MOC))
+
+machine_objects						= $(call mkobjs,$(call machine_sources,$(1)))
+machine_objects_moc					= $(call mkobjs,$(call machine_sources_moc,$(1)))
+machine_selftest_objects			= $(call mkobjs,$(call machine_selftest_sources,$(1)))
+machine_selftest_objects_moc		= $(call mkobjs,$(call machine_selftest_sources_moc,$(1)))
+
+ALL_MACHINES_HEADERS				+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_headers,$(machine_name)))
+ALL_MACHINES_HEADERS_MOC			+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_headers_moc,$(machine_name)))
+ALL_MACHINES_SELFTEST_HEADERS		+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_headers,$(machine_name)))
+ALL_MACHINES_SELFTEST_HEADERS_MOC	+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_headers_moc,$(machine_name)))
+ALL_MACHINES_SOURCES				+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_sources,$(machine_name)))
+ALL_MACHINES_SOURCES_MOC			+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_sources_moc,$(machine_name)))
+ALL_MACHINES_SELFTEST_SOURCES		+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_sources,$(machine_name)))
+ALL_MACHINES_SELFTEST_SOURCES_MOC	+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_sources_moc,$(machine_name)))
+
+ALL_MACHINES_MOCOBJS				+= $(call mkmocobjs,$(ALL_MACHINES_SOURCES_MOC))
+ALL_MACHINES_SELFTEST_MOCOBJS		+= $(call mkmocobjs,$(ALL_MACHINES_SELFTEST_SOURCES_MOC))
 
 XEFIS_HEADERS += $(XEFIS_HEADERS_MOC)
 XEFIS_OBJECTS += $(call mkobjs, $(XEFIS_SOURCES))
@@ -546,33 +567,37 @@ WATCHDOG_OBJECTS += $(call mkobjs, $(WATCHDOG_SOURCES))
 WATCHDOG_SOURCES_MOC += $(call mkmocs, $(WATCHDOG_HEADERS_MOC))
 WATCHDOG_MOCOBJS += $(call mkmocobjs, $(WATCHDOG_SOURCES_MOC))
 
-SELFTEST_HEADER += $(addprefix machines/,$(SELFTEST_MACHINE_HEADERS))
-SELFTEST_HEADERS_MOC += $(addprefix machines/,$(SELFTEST_MACHINE_HEADERS_MOC))
-SELFTEST_SOURCES += $(addprefix machines/,$(SELFTEST_MACHINE_SOURCES))
-SELFTEST_SOURCES_MOC += $(addprefix machines/,$(SELFTEST_MACHINE_SOURCES_MOC))
+SELFTEST_HEADERS += $(ALL_MACHINES_SELFTEST_HEADERS)
+SELFTEST_HEADERS_MOC += $(ALL_MACHINES_SELFTEST_HEADERS_MOC)
+SELFTEST_SOURCES += $(ALL_MACHINES_SELFTEST_SOURCES)
+SELFTEST_SOURCES_MOC += $(ALL_MACHINES_SELFTEST_SOURCES_MOC)
 
 SELFTEST_HEADERS += $(SELFTEST_HEADERS_MOC)
 SELFTEST_OBJECTS += $(call mkobjs, $(SELFTEST_SOURCES))
 SELFTEST_SOURCES_MOC += $(call mkmocs, $(SELFTEST_HEADERS_MOC))
 SELFTEST_MOCOBJS += $(call mkmocobjs, $(SELFTEST_SOURCES_MOC))
 
-HEADERS += $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
-SOURCES += $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
-SOURCES_MOC += $(XEFIS_SOURCES_MOC) $(WATCHDOG_SOURCES_MOC) $(SELFTEST_SOURCES_MOC)
-MOCOBJS += $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
+HEADERS += $(ALL_MACHINES_HEADERS) $(ALL_MACHINES_SELFTEST_HEADERS) $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
+SOURCES += $(ALL_MACHINES_SOURCES) $(ALL_MACHINES_SELFTEST_SOURCES) $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
+SOURCES_MOC += $(ALL_MACHINES_SOURCES_MOC) $(ALL_MACHINES_SELFTEST_SOURCES_MOC) $(XEFIS_SOURCES_MOC) $(WATCHDOG_SOURCES_MOC) $(SELFTEST_SOURCES_MOC)
+MOCOBJS += $(ALL_MACHINES_MOCOBJS) $(ALL_MACHINES_SELFTEST_MOCOBJS) $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
 
 OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
 OBJECTS += $(call mkobjs, $(SOURCES))
 
+machine_to_executable = $(distdir)/xefis.$(1)
+executable_to_machine = $(1:$(distdir)/xefis.%=%)
+
 VERSION_FILE := xefis/config/version.cc
-MACHINE_TARGETS += $(foreach machine_name, $(XEFIS_MACHINES), $(distdir)/xefis.$(machine_name))
+MACHINE_TARGETS += $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_to_executable,$(machine_name)))
 TARGETS += $(distdir)/selftest
 TARGETS += $(distdir)/watchdog
 TARGETS += $(MACHINE_TARGETS)
 
-$(MACHINE_TARGETS): $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
+.SECONDEXPANSION:
+$(MACHINE_TARGETS): %: $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES)) $$(call machine_objects,$$(call executable_to_machine,%)) $$(call machine_objects_moc,$$(call executable_to_machine,%))
 
 $(distdir)/watchdog: $(WATCHDOG_OBJECTS) $(WATCHDOG_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
 
-$(distdir)/selftest: $(SELFTEST_OBJECTS) $(SELFTEST_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
+$(distdir)/selftest: $(SELFTEST_OBJECTS) $(SELFTEST_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES)) $(call machine_selftest_objects,$(@)) $(call machine_selftest_objects_moc,$(@))
 
