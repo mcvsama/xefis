@@ -42,6 +42,7 @@ template<template<class, std::size_t, std::size_t, class, class> class Ref,
 
 
 template<class ScalarA, class ScalarB, std::size_t ARows, std::size_t Common, std::size_t BColumns, class TargetFrame, class IntermediateFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator* (Matrix<ScalarA, Common, ARows, TargetFrame, IntermediateFrame> const& a,
 			   Matrix<ScalarB, BColumns, Common, IntermediateFrame, SourceFrame> const& b)
@@ -67,7 +68,28 @@ template<class ScalarA, class ScalarB, std::size_t ARows, std::size_t Common, st
 	}
 
 
+template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, class MatrixTargetFrame, class MatrixSourceFrame, class ScalarTargetFrame, class ScalarSourceFrame>
+	[[nodiscard]]
+	constexpr auto
+	operator* (Matrix<ScalarA, 1, 1, ScalarTargetFrame, ScalarSourceFrame> const& scalar,
+			   Matrix<ScalarB, Columns, Rows, MatrixTargetFrame, MatrixSourceFrame> const& matrix)
+	{
+		return matrix * scalar[0];
+	}
+
+
+template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, class ScalarTargetFrame, class ScalarSourceFrame, class MatrixTargetFrame, class MatrixSourceFrame>
+	[[nodiscard]]
+	constexpr auto
+	operator* (Matrix<ScalarB, Columns, Rows, MatrixTargetFrame, MatrixSourceFrame> const& matrix,
+			   Matrix<ScalarA, 1, 1, ScalarTargetFrame, ScalarSourceFrame> const& scalar)
+	{
+		return matrix * scalar[0];
+	}
+
+
 template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator* (Matrix<ScalarA, Columns, Rows, TargetFrame, SourceFrame> matrix,
 			   ScalarB const& scalar)
@@ -82,6 +104,7 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, cl
 
 
 template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator* (ScalarA const& scalar,
 			   Matrix<ScalarB, Columns, Rows, TargetFrame, SourceFrame> const& matrix)
@@ -91,6 +114,7 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, cl
 
 
 template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator/ (Matrix<ScalarA, Columns, Rows, TargetFrame, SourceFrame> matrix,
 			   ScalarB const& scalar)
@@ -105,6 +129,7 @@ template<class ScalarA, class ScalarB, std::size_t Columns, std::size_t Rows, cl
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame>
 	operator+ (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> m) noexcept
 	{
@@ -113,6 +138,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator+ (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> a,
 			   Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> const& b) noexcept (noexcept (Scalar{} + Scalar{}))
@@ -122,6 +148,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator- (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> m) noexcept (noexcept (-Scalar{}))
 	{
@@ -134,6 +161,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	operator- (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> a,
 			   Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> const& b) noexcept (noexcept (Scalar{} - Scalar{}))
@@ -146,6 +174,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
  * Return cross product of two vectors.
  */
 template<class ScalarA, class ScalarB, std::size_t Size, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr Vector<decltype (ScalarA{} * ScalarB{}), Size, TargetFrame, SourceFrame>
 	cross_product (Vector<ScalarA, Size, TargetFrame, SourceFrame> const& a,
 				   Vector<ScalarB, Size, TargetFrame, SourceFrame> const& b) noexcept (noexcept (ScalarA{} * ScalarB{} - ScalarA{} * ScalarB{}))
@@ -159,6 +188,7 @@ template<class ScalarA, class ScalarB, std::size_t Size, class TargetFrame, clas
 
 
 template<class Scalar, std::size_t Size, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	abs (Vector<Scalar, Size, TargetFrame, SourceFrame> const& v)
 	{
@@ -177,6 +207,7 @@ template<class Scalar, std::size_t Size, class TargetFrame, class SourceFrame>
  * Return inversed matrix.
  */
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	inv (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> const& matrix)
 	{
@@ -188,6 +219,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
  * Return matrix with remapped scalar.
  */
 template<class MapFunction, class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	constexpr auto
 	map (Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame> const& matrix, MapFunction&& mapper)
 	{
@@ -223,6 +255,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	inline auto
 	Traits<Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame>>::zero() -> Value
 	{
@@ -231,6 +264,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	inline auto
 	Traits<Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame>>::unit() -> Value
 	{
@@ -239,6 +273,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 
 
 template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame, class SourceFrame>
+	[[nodiscard]]
 	inline auto
 	Traits<Matrix<Scalar, Columns, Rows, TargetFrame, SourceFrame>>::inversed (Value const& v) -> Value
 	{
