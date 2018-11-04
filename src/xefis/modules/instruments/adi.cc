@@ -3217,14 +3217,14 @@ ADI::process (xf::Cycle const& cycle)
 	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
 	params.flight_director_active_name = io.flight_director_active_name.get_optional();
 	params.flight_director_failure =
-		!io.flight_director_serviceable.value_or (true) ||
-		!is_sane (io.flight_director_cmd_altitude) ||
-		!is_sane (io.flight_director_cmd_ias) ||
-		!is_sane (io.flight_director_cmd_mach) ||
-		!is_sane (io.flight_director_cmd_vertical_speed) ||
-		!is_sane (io.flight_director_cmd_fpa) ||
-		(io.flight_director_guidance_visible && (!is_sane (io.flight_director_guidance_pitch) ||
-												 !is_sane (io.flight_director_guidance_roll)));
+		guidance_visible &&
+		(!io.flight_director_serviceable.value_or (true) ||
+		 !is_sane (io.flight_director_cmd_altitude) ||
+		 !is_sane (io.flight_director_cmd_ias) ||
+		 !is_sane (io.flight_director_cmd_mach) ||
+		 !is_sane (io.flight_director_cmd_vertical_speed) ||
+		 !is_sane (io.flight_director_cmd_fpa) ||
+		 (!is_sane (io.flight_director_guidance_pitch) || !is_sane (io.flight_director_guidance_roll)));
 	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_director_failure;
 	});
