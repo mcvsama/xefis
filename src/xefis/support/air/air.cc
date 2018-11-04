@@ -112,9 +112,12 @@ air_temperature_to_dynamic_viscosity()
 
 
 inline si::TemperatureGradient
-standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosphereParams>::const_iterator lower_layer,
-							   std::map<si::Length, InternationalStandardAtmosphereParams>::const_iterator upper_layer)
+standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosphereParams>::const_iterator const& lower_layer,
+							   std::map<si::Length, InternationalStandardAtmosphereParams>::const_iterator const& upper_layer)
 {
+	if (lower_layer == upper_layer)
+		return 0_K / 0_m;
+
 	auto const delta_temperature = upper_layer->second.temperature - lower_layer->second.temperature;
 	auto const delta_altitude = upper_layer->first - lower_layer->first;
 
@@ -137,6 +140,8 @@ standard_density (si::Length geometric_altitude_amsl)
 
 	if (upper_layer_it == atmmap.begin())
 		upper_layer_it = std::next (atmmap.begin());
+	else if (upper_layer_it == atmmap.end())
+		--upper_layer_it;
 
 	auto const lower_layer_it = std::prev (upper_layer_it);
 	auto const& lower_layer = lower_layer_it->second;
@@ -171,6 +176,8 @@ standard_pressure (si::Length geometric_altitude_amsl)
 
 	if (upper_layer_it == atmmap.begin())
 		upper_layer_it = std::next (atmmap.begin());
+	else if (upper_layer_it == atmmap.end())
+		--upper_layer_it;
 
 	auto const lower_layer_it = std::prev (upper_layer_it);
 	auto const& lower_layer = lower_layer_it->second;
