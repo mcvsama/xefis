@@ -37,7 +37,7 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 	_total_pressure_computer.set_callback (std::bind (&AirDataComputer::recover_total_pressure, this));
 	_total_pressure_computer.observe ({
 		&io.pressure_total,
-		&io.ias,
+		&io.sensed_ias,
 		&io.pressure_static,
 	});
 
@@ -65,8 +65,10 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 		&_speed_ias_smoother,
 	});
 	_ias_computer.observe ({
-		&io.ias,
+		&io.sensed_ias,
 		&io.ias_serviceable,
+		&io.pressure_static,
+		&io.recovered_pressure_total,
 	});
 
 	_ias_lookahead_computer.set_callback (std::bind (&AirDataComputer::compute_ias_lookahead, this));
@@ -75,7 +77,7 @@ AirDataComputer::AirDataComputer (std::unique_ptr<AirDataComputerIO> module_io, 
 		&_speed_ias_lookahead_o_smoother,
 	});
 	_ias_lookahead_computer.observe ({
-		&io.ias,
+		&io.speed_ias,
 	});
 
 	_mach_computer.set_callback (std::bind (&AirDataComputer::compute_mach, this));
@@ -291,11 +293,11 @@ AirDataComputer::compute_ias_lookahead()
 	{
 		si::Time update_dt = _ias_lookahead_computer.update_dt();
 
-		si::Velocity est = _speed_ias_estimator (_speed_ias_lookahead_i_smoother (*io.ias, update_dt), update_dt);
+		si::Velocity est = _speed_ias_estimator (_speed_ias_lookahead_i_smoother (*io.speed_ias, update_dt), update_dt);
 		est = _speed_ias_lookahead_o_smoother (est, update_dt);
 		io.speed_ias_lookahead = est;
 
-		if (si::abs (est - *io.ias) > 1.0_kt)
+		if (si::abs (est - *io.speed_ias) > 1.0_kt)
 			_ias_lookahead_computer.touch();
 	}
 	else
@@ -465,12 +467,12 @@ AirDataComputer::recover_total_pressure()
 		// from static pressure and TAS.
 		if (*io.using_ias_sensor)
 		{
-			if (io.ias && io.pressure_static)
+			if (io.sensed_ias && io.pressure_static)
 			{
 				si::Pressure p = *io.pressure_static;
 				// Formula from <http://en.wikipedia.org/wiki/Airspeed#Calibrated_airspeed>
 				// solved for qc (dynamic (impact) pressure):
-				double ia0 = *io.ias / xf::kStdSpeedOfSound;
+				double ia0 = *io.sensed_ias / xf::kStdSpeedOfSound;
 				si::Pressure qc = xf::kStdAirPressure * (std::pow (ia0 * ia0 / 5.0 + 1.0, 7.0 / 2.0) - 1.0);
 				io.recovered_pressure_total = qc + p;
 			}

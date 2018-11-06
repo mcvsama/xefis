@@ -52,7 +52,7 @@ class AirDataComputerIO: public xf::ModuleIO
 	xf::PropertyIn<si::Pressure>			pressure_static				{ this, "sensors/pressure/static" };
 	xf::PropertyIn<si::Pressure>			pressure_total				{ this, "sensors/pressure/total" };
 	xf::PropertyIn<bool>					ias_serviceable				{ this, "sensors/airspeed/serviceable" };
-	xf::PropertyIn<si::Velocity>			ias							{ this, "sensors/airspeed/ias" };
+	xf::PropertyIn<si::Velocity>			sensed_ias					{ this, "sensors/airspeed/sensed-ias" };
 	xf::PropertyIn<si::Temperature>			total_air_temperature		{ this, "sensors/air-temperature/total" };
 
 	/*
