@@ -203,12 +203,13 @@ NavaidStorage::find_by_frequency (LonLat const& position, Navaid::Type type, Fre
 		return {};
 
 	Navaids result;
-
 	auto g = _navaids_by_type.find (type);
+
 	if (g != _navaids_by_type.end())
 	{
 		auto r0 = g->second.by_frequency.lower_bound (frequency - 5_kHz);
 		auto r1 = g->second.by_frequency.lower_bound (frequency + 5_kHz);
+
 		for (auto r = r0; r != r1; ++r)
 			result.push_back (*r->second);
 	}

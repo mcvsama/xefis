@@ -97,8 +97,8 @@ template<class tValueType>
 		extended (Range other) const;
 
 	  private:
-		ValueType	_min	= ValueType();
-		ValueType	_max	= ValueType();
+		ValueType	_min {};
+		ValueType	_max {};
 	};
 
 

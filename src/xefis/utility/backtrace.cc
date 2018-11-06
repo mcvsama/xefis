@@ -83,7 +83,7 @@ base_address_for_location (std::string const& location)
 }
 
 
-static void* check_addr2line = [] {
+static void* check_addr2line = []{
 	auto addr2line = boost::process::search_path ("addr2line");
 
 	if (addr2line.empty())

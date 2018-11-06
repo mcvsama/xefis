@@ -29,7 +29,7 @@ using namespace std::chrono_literals;
 xf::Logger g_null_logger;
 
 
-RuntimeTest t1 ("xf::WorkPerformer: execute 100'000 non-trivial tasks", [] {
+RuntimeTest t1 ("xf::WorkPerformer: execute 100'000 non-trivial tasks", []{
 	constexpr int kTasks = 100'000;
 	constexpr int kResult = 1337;
 
@@ -63,7 +63,7 @@ RuntimeTest t1 ("xf::WorkPerformer: execute 100'000 non-trivial tasks", [] {
 });
 
 
-RuntimeTest t2 ("xf::WorkPerformer abandons not-started tasks when destructed", [] {
+RuntimeTest t2 ("xf::WorkPerformer abandons not-started tasks when destructed", []{
 	auto sleeper = [] (auto time) {
 		std::this_thread::sleep_for (time);
 		return 0;
