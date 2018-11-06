@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./convert_polar.rb sim_airfoil sim_airfoil/*.csv > sim_airfoil.h
+./convert_foil.rb sim_airfoil sim_airfoil/ht12.dat > sim_airfoil_spline.h
+

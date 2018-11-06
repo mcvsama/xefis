@@ -16,9 +16,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/air/wind_triangle.h>
+#include <xefis/support/earth/earth.h>
+#include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/instrument/text_layout.h>
-#include <xefis/support/navigation/earth.h>
 #include <xefis/utility/numeric.h>
 
 // Local:

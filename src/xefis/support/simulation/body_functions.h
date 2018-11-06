@@ -29,19 +29,47 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/c++20.h>
-#include <xefis/support/math/3d_space.h>
-#include <xefis/support/nature.h>
+#include <xefis/support/math/lonlat_radius.h>
+#include <xefis/support/math/space.h>
+#include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/body.h>
 
 
 namespace xf::sim {
 
-template<class Iterator, class ForceVectorIterator>
+[[nodiscard]]
+inline Body
+make_earth()
+{
+	BodyShape shape;
+	shape.set_mass (kEarthMass);
+	// Simplified EGM96 model:
+	shape.set_moment_of_inertia ({
+		8.008085e37_kgm2,           0_kgm2,           0_kgm2,
+		          0_kgm2, 8.008262e37_kgm2,           0_kgm2,
+		          0_kgm2,           0_kgm2, 8.034476e37_kgm2,
+	});
+
+	Body earth (std::move (shape));
+	earth.set_position ({ 0_m, 0_m, 0_m });
+	earth.set_velocity ({ 0_mps, 0_mps, 0_mps });
+	earth.set_orientation (math::unit);
+	// Since we use ECEF coordinates, don't spin the Earth:
+	earth.set_angular_velocity ({ si::convert (0_radps), si::convert (0_radps), si::convert (0_radps) });
+
+	return earth;
+}
+
+
+/**
+ * Note: does not compute torques resulting from different gravitational pulls on different places on the body.
+ */
+template<class Frame, class Iterator, class ForceTorqueIterator>
 	void
-	n_body_problem_forces (Iterator bodies_begin, Iterator bodies_end, ForceVectorIterator forces_begin, ForceVectorIterator forces_end)
+	n_body_problem_forces (Iterator bodies_begin, Iterator bodies_end, ForceTorqueIterator forces_begin, ForceTorqueIterator forces_end)
 	{
-		static_assert (std::is_same_v<std::remove_cvref_t<decltype (*bodies_begin)>, sim::Body>, "body sequence must be iterators to xf::sim::Body");
-		static_assert (std::is_same_v<std::remove_cvref_t<decltype (*forces_begin)>, SpaceVector<si::Force>>, "force seaquence must be iterators to xf::SpaceVector<si::Force>");
+		static_assert (std::is_same_v<std::remove_cvref_t<decltype (*bodies_begin)>, Body*>, "body sequence must be iterators to xf::sim::Body*");
+		static_assert (std::is_same_v<std::remove_cvref_t<decltype (*forces_begin)>, ForceTorque<Frame>>, "force seaquence must be iterators to xf::ForceTorque");
 
 		auto bodies = boost::make_iterator_range (bodies_begin, bodies_end);
 		auto forces = boost::make_iterator_range (forces_begin, forces_end);
@@ -49,31 +77,34 @@ template<class Iterator, class ForceVectorIterator>
 		if (bodies.size() != forces.size())
 			throw std::out_of_range ("body and force sequences have different sizes");
 
-		std::fill (forces.begin(), forces.end(), xf::SpaceVector<si::Force> { 0_N, 0_N, 0_N });
+		std::fill (forces.begin(), forces.end(), ForceTorque<Frame>());
 
 		for (auto const i1: bodies | boost::adaptors::indexed())
 		{
 			for (auto const i2: bodies | boost::adaptors::indexed() | boost::adaptors::sliced (i1.index() + 1, bodies.size()))
 			{
-				auto const& b1 = i1.value();
-				auto const& b2 = i2.value();
+				auto const& b1 = *i1.value();
+				auto const& b2 = *i2.value();
 
-				auto const r = xf::abs (b2.position() - b1.position());
-				auto const force = xf::kGravitationalConstant * b1.mass() * b2.mass() * (b2.position() - b1.position()) / (r * r * r);
+				auto const r = abs (b2.position() - b1.position());
+				auto const force = kGravitationalConstant * b1.shape().mass() * b2.shape().mass() * (b2.position() - b1.position()) / (r * r * r);
 
-				forces[i1.index()] += force;
-				forces[i2.index()] -= force;
+				auto& f1 = forces[i1.index()];
+				auto& f2 = forces[i2.index()];
+				f1.set_force (f1.force() + force);
+				f2.set_force (f2.force() - force);
 			}
 		}
 	}
 
 
-template<class Iterator>
-	std::vector<xf::SpaceVector<si::Force>>
+template<class Frame, class Iterator>
+	[[nodiscard]]
+	std::vector<ForceTorque<Frame>>
 	n_body_problem_forces (Iterator bodies_begin, Iterator bodies_end)
 	{
-		std::vector<xf::SpaceVector<si::Force>> forces (std::distance (bodies_begin, bodies_end));
-		n_body_problem_forces (bodies_begin, bodies_end, forces.begin(), forces.end());
+		std::vector<ForceTorque<Frame>> forces (std::distance (bodies_begin, bodies_end));
+		n_body_problem_forces<Frame> (bodies_begin, bodies_end, forces.begin(), forces.end());
 		return forces;
 	}
 

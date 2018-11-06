@@ -1,0 +1,11 @@
+XEFIS_MACHINE_simulation_HEADERS += simulation/airplanes/airfoils/sim_airfoil.h
+XEFIS_MACHINE_simulation_HEADERS += simulation/airplanes/sim_airplane.h
+XEFIS_MACHINE_simulation_HEADERS += simulation/screens/backup.h
+XEFIS_MACHINE_simulation_HEADERS += simulation/screens/pfd.h
+XEFIS_MACHINE_simulation_HEADERS += simulation/simulation_machine.h
+
+XEFIS_MACHINE_simulation_SOURCES += simulation/airplanes/sim_airplane.cc
+XEFIS_MACHINE_simulation_SOURCES += simulation/screens/backup.cc
+XEFIS_MACHINE_simulation_SOURCES += simulation/screens/pfd.cc
+XEFIS_MACHINE_simulation_SOURCES += simulation/simulation_machine.cc
+

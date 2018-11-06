@@ -16,7 +16,7 @@
 #include <cmath>
 
 // Xefis:
-#include <xefis/support/air/air.h>
+#include <xefis/support/earth/air.h>
 #include <xefis/test/test.h>
 
 

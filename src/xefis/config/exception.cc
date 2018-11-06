@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
+#include <xefis/utility/backtrace.h>
 
 // Local:
 #include "exception.h"

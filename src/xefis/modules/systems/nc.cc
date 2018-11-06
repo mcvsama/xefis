@@ -21,8 +21,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/config/exception.h>
-#include <xefis/support/navigation/magnetic_variation.h>
-#include <xefis/support/navigation/earth.h>
+#include <xefis/support/earth/earth.h>
+#include <xefis/support/earth/navigation/magnetic_variation.h>
 #include <xefis/utility/time_helper.h>
 
 // Local:

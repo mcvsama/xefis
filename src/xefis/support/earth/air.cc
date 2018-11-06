@@ -16,7 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/nature.h>
+#include <xefis/support/nature/constants.h>
 #include <xefis/utility/field.h>
 
 // Local:

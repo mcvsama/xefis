@@ -32,7 +32,7 @@
 #include <xefis/modules/instruments/linear_gauge.h>
 #include <xefis/modules/instruments/vertical_trim.h>
 #include <xefis/modules/instruments/radial_gauge.h>
-#include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/earth/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
 
 

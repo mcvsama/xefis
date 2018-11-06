@@ -21,7 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/navigation/earth.h>
+#include <xefis/support/earth/earth.h>
 
 // Local:
 #include "rcms.h"

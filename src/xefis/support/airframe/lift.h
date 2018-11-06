@@ -65,6 +65,7 @@ class Lift
 	get_aoa_in_normal_regime (LiftCoefficient const& cl) const noexcept;
 
   private:
+	// TODO Reynolds to Angle to LiftCoefficient
 	Field<Angle, LiftCoefficient>	_aoa_to_cl					{ };
 	Field<LiftCoefficient, Angle>	_cl_to_aoa_normal_regime	{ };
 	LiftCoefficient					_max_cl;

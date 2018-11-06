@@ -19,8 +19,8 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/3d_space.h>
-#include <xefis/support/nature.h>
+#include <xefis/support/math/space.h>
+#include <xefis/support/nature/constants.h>
 
 
 namespace xf {
@@ -77,13 +77,6 @@ to_longitude_dms (si::Angle);
  */
 si::Angle
 mean (si::Angle a, si::Angle b);
-
-
-/**
- * Return NorthEastDown (local tangent plane) vectors for given position on Earth.
- */
-NorthEastDown
-ned_matrix (si::LonLat const& position);
 
 
 /*

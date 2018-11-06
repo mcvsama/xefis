@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Lib:
+#include <lib/math/math.h>
+
 // Xefis:
 #include <xefis/test/test.h>
 #include <xefis/utility/field.h>
@@ -37,6 +40,8 @@ RuntimeTest t1 ("Field<1 argument, 1 value>", []{
 
 	test_asserts::verify ("codomain().min() is correct", field.codomain().min() == 0.0);
 	test_asserts::verify ("codomain().max() is correct", field.codomain().max() == 20.0);
+
+	// TODO test_asserts::verify_equal_with_epsilon ("average ({ -2.0, 2.0 }) is correct", field.average ({ -2.0, 2.0 }), 0.0, 0.001);
 });
 
 
@@ -49,13 +54,13 @@ RuntimeTest t2 ("Field<2 arguments, 1 value>", []{
 				{ 1.0_deg, 10.0_s },
 				{ 2.0_deg, 20.0_s },
 				{ 3.0_deg, 30.0_s },
-				// 4.0_deg would extrapolate to 40.0_s.
+				// 4.0_deg would extrapolate to 30.0_s.
 			},
 		},
 		{
 			1.0,
 			{
-				// 0.0_deg would extrapolate to 0.0_s.
+				// 0.0_deg would extrapolate to 100.0_s.
 				{ 1.0_deg, 100.0_s },
 				{ 2.0_deg, 200.0_s },
 				{ 3.0_deg, 300.0_s },
@@ -70,32 +75,32 @@ RuntimeTest t2 ("Field<2 arguments, 1 value>", []{
 	test_asserts::verify ("min_argument (-1.0) == null", !field.min_argument (-1.0));
 	test_asserts::verify ("max_argument (-1.0) == null", !field.max_argument (-1.0));
 
-	test_asserts::verify_equal_with_epsilon ("min_argument (0.0) == 0°", field.min_argument (0.0).value_or (-1_deg), 0.0_deg, 0.000001_deg);
-	test_asserts::verify_equal_with_epsilon ("max_argument (0.0) == 3°", field.max_argument (0.0).value_or (-1_deg), 3.0_deg, 0.000001_deg);
+	test_asserts::verify_equal_with_epsilon ("min_argument (0.0) == 0°", field.min_argument (0.0).value_or (-1_deg), 0_deg, 0.000001_deg);
+	test_asserts::verify_equal_with_epsilon ("max_argument (0.0) == 3°", field.max_argument (0.0).value_or (-1_deg), 3_deg, 0.000001_deg);
 
-	test_asserts::verify_equal_with_epsilon ("min_argument (1.0) == 1°", field.min_argument (1.0).value_or (-1_deg), 1.0_deg, 0.000001_deg);
-	test_asserts::verify_equal_with_epsilon ("max_argument (1.0) == 4°", field.max_argument (1.0).value_or (-1_deg), 4.0_deg, 0.000001_deg);
+	test_asserts::verify_equal_with_epsilon ("min_argument (1.0) == 1°", field.min_argument (1.0).value_or (-1_deg), 1_deg, 0.000001_deg);
+	test_asserts::verify_equal_with_epsilon ("max_argument (1.0) == 4°", field.max_argument (1.0).value_or (-1_deg), 4_deg, 0.000001_deg);
 
 	test_asserts::verify ("returned value for outside of domain is std::nullopt", !field.value (100.0, 0.0_deg));
 
-	test_asserts::verify_equal_with_epsilon ("value (0.0, 1.0°) == 0 s", field.value (0.0, 1.0_deg).value_or (-1.0_s), 10.0_s, 0.000001_s);
-	test_asserts::verify_equal_with_epsilon ("value (0.0, 3.0°) == 30 s", field.value (0.0, 3.0_deg).value_or (-1.0_s), 30.0_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("value (0.0, 1.0°) == 0 s", field.value (0.0, 1.0_deg).value_or (-1.0_s), 10_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("value (0.0, 3.0°) == 30 s", field.value (0.0, 3.0_deg).value_or (-1.0_s), 30_s, 0.000001_s);
 
-	test_asserts::verify_equal_with_epsilon ("value (1.0, 1.0°) == 100 s", field.value (1.0, 1.0_deg).value_or (-1.0_s), 100.0_s, 0.000001_s);
-	test_asserts::verify_equal_with_epsilon ("value (1.0, 3.0°) == 300 s", field.value (1.0, 3.0_deg).value_or (-1.0_s), 300.0_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("value (1.0, 1.0°) == 100 s", field.value (1.0, 1.0_deg).value_or (-1.0_s), 100_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("value (1.0, 3.0°) == 300 s", field.value (1.0, 3.0_deg).value_or (-1.0_s), 300_s, 0.000001_s);
 
-	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.0, 0°) == 0 s", field.extrapolated_value (0.0, 0.0_deg), 0.0_s, 0.000001_s);
-	test_asserts::verify_equal_with_epsilon ("extrapolated_value (1.0, 0°) == 0 s", field.extrapolated_value (1.0, 0.0_deg), 0.0_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.0, 0°) == 0 s", field.extrapolated_value (0.0, 0.0_deg), 0_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("extrapolated_value (1.0, 0°) == 100 s", field.extrapolated_value (1.0, 0.0_deg), 100_s, 0.000001_s);
 
-	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.5, 0.0°) == 0 s", field.extrapolated_value (0.5, 0.0_deg), 0_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.5, 0.0°) == 50 s", field.extrapolated_value (0.5, 0.0_deg), 50_s, 0.000001_s);
 	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.5, 2.0°) == 110 s", field.extrapolated_value (0.5, 2.0_deg), 110_s, 0.000001_s);
-	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.5, 4.0°) == 220 s", field.extrapolated_value (0.5, 4.0_deg), 220_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("extrapolated_value (0.5, 4.0°) == 215 s", field.extrapolated_value (0.5, 4.0_deg), 215_s, 0.000001_s);
 
 	// 2D search:
 	test_asserts::verify_equal_with_epsilon ("min_value() == 0_s", field.min_value(), 0.0_s, 0.000001_s);
 
 	// 1D search:
-	test_asserts::verify_equal_with_epsilon ("min_value (0.0) == 10_s", field.min_value (0.0).value_or (-1_s), 10_s, 0.000001_s);
+	test_asserts::verify_equal_with_epsilon ("min_value (0.0) == 10_s", field.min_value (0.0).value_or (-1_s), 10_s, 0.000001_s); // TODO ensure arguments are {0.0, 1.0_deg}
 	test_asserts::verify_equal_with_epsilon ("min_value (0.5) == 50_s", field.min_value (0.5).value_or (-1_s), 55_s, 0.000001_s);
 	test_asserts::verify_equal_with_epsilon ("min_value (1.0) == 100_s", field.min_value (1.0).value_or (-1_s), 100_s, 0.000001_s);
 

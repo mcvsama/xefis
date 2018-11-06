@@ -32,10 +32,14 @@
 
 namespace xf {
 
+// TODO make class Subfield SubField sf = field.subfield (0.0, 10_deg);
+
 template<class Argument0, class ...RemainingArgumentsAndValue>
 	class Field
 	{
 		static_assert (sizeof...(RemainingArgumentsAndValue) >= 1, "Field<> needs at least two parameters, argument and value types");
+
+		static constexpr bool kLinearExtrapolate = false;
 
 	  public:
 		static constexpr std::size_t kNumArguments	= sizeof...(RemainingArgumentsAndValue);
@@ -254,6 +258,41 @@ template<class Argument0, class ...RemainingArgumentsAndValue>
 			[[nodiscard]]
 			CodomainType<Args...>
 			codomain (Args&&...) const;
+
+#if 0
+		/**
+		 * Return a vector of arguments for given value.
+		 * This is a primitive version that searches only the last dimension.
+		 */
+		[[nodiscard]]
+		std::vector<Point>
+		arguments (ArgumentsWithoutLast const&, Value const& value) const;
+
+		/**
+		 * Return a vector of arguments for given value.
+		 * Search only the given domain (range is inclusive).
+		 * This is a primitive version that searches only the last dimension.
+		 */
+		[[nodiscard]]
+		std::vector<Point>
+		arguments (ArgumentsWithoutLast const&, Value const& value, Range<LastArgument> search_domain) const;
+
+		/**
+		 * Compute average value of all points.
+		 */
+		template<class ...Args>
+			[[nodiscard]]
+			Value
+			average() const;
+
+		/**
+		 * Compute average value for given range of arguments.
+		 */
+		template<class = std::enable_if_t<dimensions() == 1>>
+			[[nodiscard]]
+			Value
+			average (Range<Argument> domain) const;
+#endif
 
 		/**
 		 * Return reference to underlying map of values used by this Field.
@@ -581,6 +620,146 @@ template<class A, class ...R>
 		}
 
 
+#if 0
+template<class A, class ...R>
+	inline auto
+	Field<A, R...>::arguments (ArgumentsWithoutLast const&, Value const& value) const
+		-> std::vector<Point>
+	{
+		return arguments (value, domain());
+	}
+
+
+template<class A, class ...R>
+	inline auto
+	Field<A, R...>::arguments (ArgumentsWithoutLast const&, Value const& value, Range<LastArgument> search_domain) const;
+		-> std::vector<Point>
+	{
+		if (_data_map.size() >= 2)
+		{
+			std::vector<Point> result;
+			auto a = std::begin (_data_map);
+			auto b = a;
+			++b;
+
+			// Handle the smallest argument in the domain:
+			if (value == a->second && search_domain.includes (a->first))
+				result.emplace_back (a->first, a->second);
+
+			// Find range [a, b] such that @value fits into it.
+			// Linearly interpolate the argument.
+			for (; b != std::end (_data_map); ++a, ++b)
+			{
+				auto const val_a = a->second;
+				auto const val_b = b->second;
+
+				if ((val_a < value && value <= val_b) || (val_b <= value && value < val_a))
+				{
+					auto const arg_a = a->first;
+					auto const arg_b = b->first;
+
+					auto const arg = renormalize (value, val_a, val_b, arg_a, arg_b);
+
+					if (search_domain.includes (arg))
+						result.emplace_back (arg, value);
+				}
+			}
+
+			return result;
+		}
+		else if (_data_map.size() == 1)
+		{
+			auto item = *_data_map.begin();
+
+			if (item.second == value && search_domain.includes (item.first))
+				return { Point (item.first, item.second) };
+			else
+				return { };
+		}
+		else
+			return { };
+	}
+
+
+template<class A, class ...R>
+	template<class>
+		inline auto
+		Field<A, R...>::average() const
+			-> Value
+		{
+			return average (domain());
+		}
+
+
+template<class A, class ...R>
+	template<class>
+		inline auto
+		Field<A, R...>::average (Range<Argument> search_domain) const
+			-> Value
+		{
+			if (_data_map.size() > 1)
+			{
+				Range search_domain_2 {
+					std::make_pair (search_domain.min(), Value()),
+					std::make_pair (search_domain.max(), Value()),
+				};
+				auto it_range = find_range_exclusive (_data_map.begin(), _data_map.end(), search_domain_2,
+													  [](auto const& a, auto const& b) { return a.first < b.first; });
+
+				// If there's at least one iterator in range:
+				if (it_range.first != _data_map.end())
+				{
+					typedef decltype (std::declval<Argument>() / std::declval<Argument>()) WeightType;
+					Value total_avg = Value (0);
+					WeightType total_weight = 0;
+
+					auto update_average = [&total_avg, &total_weight](Argument arg_a, Argument arg_b, Value val_a, Value val_b)
+					{
+						Value avg_value = 0.5 * (val_a + val_b);
+						WeightType weight = (arg_b - arg_a) / Argument (1);
+
+						total_avg += avg_value * weight;
+						total_weight += weight;
+					};
+
+					// Compute average value from domain.min() to first iterator:
+					{
+						auto iterator = it_range.first;
+						update_average (search_domain.min(), iterator->first, extrapolated_value (search_domain.min()), iterator->second);
+					}
+
+					// Compute average values between iterators:
+					{
+						auto a = it_range.first;
+						auto b = a;
+						++b;
+
+						for (; b != it_range.second; ++a, ++b)
+							update_average (a->first, b->first, a->second, b->second);
+					}
+
+					// Compute average value from (last iterator - 1) to search_domain.max():
+					{
+						auto iterator = it_range.second;
+						--iterator;
+
+						update_average (iterator->first, search_domain.max(), iterator->second, extrapolated_value (search_domain.max()));
+					}
+
+					return total_avg / total_weight;
+				}
+				else
+				{
+					// Compute average between search_domain.min() and search_domain.max():
+					return 0.5 * (extrapolated_value (search_domain.min()) + extrapolated_value (search_domain.max()));
+				}
+			}
+			else
+				return _data_map.begin()->second;
+		}
+#endif
+
+
 template<class A, class ...R>
 	inline auto
 	Field<A, R...>::data_map() const
@@ -838,7 +1017,12 @@ template<class A, class ...R>
 					if (!y_max)
 						return std::nullopt;
 
-					return renormalize (x, xrange, Range { *y_min, *y_max });
+					auto const yrange = Range { *y_min, *y_max };
+
+					if constexpr (kLinearExtrapolate)
+						return renormalize (x, xrange, yrange);
+					else
+						return renormalize (clamped (x, Range<std::remove_cvref_t<X>> (xrange)), xrange, yrange);
 				}
 			}
 			else
@@ -850,7 +1034,11 @@ template<class A, class ...R>
 				else if (inside_domain || extrapolate)
 				{
 					Range const yrange { submap_a, submap_b };
-					return renormalize (x, xrange, yrange);
+
+					if constexpr (kLinearExtrapolate)
+						return renormalize (x, xrange, yrange);
+					else
+						return renormalize (clamped (x, Range<std::remove_cvref_t<X>> (xrange)), xrange, yrange);
 				}
 				else
 					return std::nullopt;

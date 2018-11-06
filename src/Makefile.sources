@@ -73,8 +73,12 @@ XEFIS_HEADERS_MOC		+= xefis/modules/log/klog_monitor.h
 
 XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
 
+######## /xefis/modules/simulation ########
+
 XEFIS_HEADERS			+= xefis/modules/simulation/virtual_joystick.h
+
 XEFIS_SOURCES			+= xefis/modules/simulation/virtual_joystick.cc
+
 ######## /xefis/modules/systems ########
 
 XEFIS_HEADERS			+= xefis/modules/systems/adc.h
@@ -306,20 +310,6 @@ SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
 SELFTEST_SOURCES		+= xefis/core/property_observer.cc
 
-######## /xefis/support ########
-
-XEFIS_HEADERS			+= xefis/support/nature.h
-
-######## /xefis/support/air ########
-
-XEFIS_HEADERS			+= xefis/support/air/air.h
-XEFIS_HEADERS			+= xefis/support/air/wind_triangle.h
-
-XEFIS_SOURCES			+= xefis/support/air/air.cc
-
-SELFTEST_SOURCES		+= xefis/support/air/tests/air.test.cc
-SELFTEST_SOURCES		+= xefis/support/air/air.cc
-
 ######## /xefis/support/airframe ########
 
 XEFIS_HEADERS			+= xefis/support/airframe/airframe.h
@@ -356,6 +346,23 @@ XEFIS_SOURCES			+= xefis/support/devices/chr_um6.cc
 XEFIS_SOURCES			+= xefis/support/devices/ht16k33.cc
 XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
 
+######## /xefis/support/earth ########
+
+XEFIS_HEADERS			+= xefis/support/earth/navigation/magnetic_variation.h
+XEFIS_HEADERS			+= xefis/support/earth/navigation/navaid.h
+XEFIS_HEADERS			+= xefis/support/earth/navigation/navaid_storage.h
+XEFIS_HEADERS			+= xefis/support/earth/navigation/wind_triangle.h
+XEFIS_HEADERS			+= xefis/support/earth/air.h
+XEFIS_HEADERS			+= xefis/support/earth/earth.h
+
+XEFIS_SOURCES			+= xefis/support/earth/navigation/magnetic_variation.cc
+XEFIS_SOURCES			+= xefis/support/earth/navigation/navaid_storage.cc
+XEFIS_SOURCES			+= xefis/support/earth/air.cc
+XEFIS_SOURCES			+= xefis/support/earth/earth.cc
+
+SELFTEST_SOURCES		+= xefis/support/earth/tests/air.test.cc
+SELFTEST_SOURCES		+= xefis/support/earth/air.cc
+
 ######## /xefis/support/instrument ########
 
 XEFIS_HEADERS			+= xefis/support/instrument/instrument_aids.h
@@ -374,20 +381,16 @@ XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
 ######## /xefis/support/math ########
 
-XEFIS_HEADERS			+= xefis/support/math/3d_space.h
+XEFIS_HEADERS			+= xefis/support/math/geometry.h
 XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
-XEFIS_HEADERS			+= xefis/support/math/physics.h
+XEFIS_HEADERS			+= xefis/support/math/space.h
 
-######## /xefis/support/navigation ########
+XEFIS_SOURCES			+= xefis/support/math/space.cc
 
-XEFIS_HEADERS			+= xefis/support/navigation/magnetic_variation.h
-XEFIS_HEADERS			+= xefis/support/navigation/earth.h
-XEFIS_HEADERS			+= xefis/support/navigation/navaid.h
-XEFIS_HEADERS			+= xefis/support/navigation/navaid_storage.h
+######## /xefis/support/nature ########
 
-XEFIS_SOURCES			+= xefis/support/navigation/magnetic_variation.cc
-XEFIS_SOURCES			+= xefis/support/navigation/earth.cc
-XEFIS_SOURCES			+= xefis/support/navigation/navaid_storage.cc
+XEFIS_HEADERS			+= xefis/support/nature/constants.h
+XEFIS_HEADERS			+= xefis/support/nature/physics.h
 
 ######## /xefis/support/protocols/nmea ########
 
@@ -410,12 +413,30 @@ XEFIS_SOURCES			+= xefis/support/qt/ownership_breaker.cc
 
 ######## /xefis/support/simulation ########
 
+XEFIS_HEADERS			+= xefis/support/simulation/air_space.h
+XEFIS_HEADERS			+= xefis/support/simulation/airfoil.h
+XEFIS_HEADERS			+= xefis/support/simulation/airfoil_shape.h
+XEFIS_HEADERS			+= xefis/support/simulation/airfoil_spline.h
+XEFIS_HEADERS			+= xefis/support/simulation/airframe.h
 XEFIS_HEADERS			+= xefis/support/simulation/atmosphere.h
 XEFIS_HEADERS			+= xefis/support/simulation/body.h
 XEFIS_HEADERS			+= xefis/support/simulation/body_functions.h
+XEFIS_HEADERS			+= xefis/support/simulation/body_part.h
+XEFIS_HEADERS			+= xefis/support/simulation/body_shape.h
+XEFIS_HEADERS			+= xefis/support/simulation/engine.h
+XEFIS_HEADERS			+= xefis/support/simulation/flight_simulation.h
 
+XEFIS_SOURCES			+= xefis/support/simulation/air_space.cc
+XEFIS_SOURCES			+= xefis/support/simulation/airfoil.cc
+XEFIS_SOURCES			+= xefis/support/simulation/airfoil_shape.cc
+XEFIS_SOURCES			+= xefis/support/simulation/airfoil_spline.cc
+XEFIS_SOURCES			+= xefis/support/simulation/airframe.cc
 XEFIS_SOURCES			+= xefis/support/simulation/atmosphere.cc
 XEFIS_SOURCES			+= xefis/support/simulation/body.cc
+XEFIS_SOURCES			+= xefis/support/simulation/body_part.cc
+XEFIS_SOURCES			+= xefis/support/simulation/body_shape.cc
+XEFIS_SOURCES			+= xefis/support/simulation/engine.cc
+XEFIS_SOURCES			+= xefis/support/simulation/flight_simulation.cc
 
 ######## /xefis/support/system ########
 
@@ -481,7 +502,6 @@ XEFIS_HEADERS			+= xefis/utility/kde.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
 XEFIS_HEADERS			+= xefis/utility/map.h
 XEFIS_HEADERS			+= xefis/utility/named_instance.h
-XEFIS_HEADERS			+= xefis/utility/navigation.h
 XEFIS_HEADERS			+= xefis/utility/noncopyable.h
 XEFIS_HEADERS			+= xefis/utility/normal_distribution.h
 XEFIS_HEADERS			+= xefis/utility/normal_variable.h

@@ -23,15 +23,23 @@
 
 namespace xf {
 
+/*
+ * Physics
+ */
+
 constexpr auto						kGravitationalConstant			= 6.67408313131e-11 * 1_m3 / 1_kg / 1_s / 1_s;
 constexpr auto						kUniversalGasConstant			= 8.3144598_J / 1_mol / 1_K;
 constexpr si::MolarMass				kAirMolarMass					= 0.0289644_kg / 1_mol;
 constexpr si::SpecificHeatCapacity	kDryAirSpecificConstant			= 287.058_J / 1_kg / 1_K;
 
-// Sound speed in STD sea level:
+/*
+ * Earth
+ */
+
+// Earth's G:
 constexpr si::Acceleration			kStdGravitationalAcceleration	= 9.80665_mps2;
 
-// Sound speed in STD sea level at 15°C:
+// STD sea level speed of sound at 15°C:
 constexpr si::Velocity				kStdSpeedOfSound				= 661.4788_kt;
 
 // STD sea level pressure at 15°C:

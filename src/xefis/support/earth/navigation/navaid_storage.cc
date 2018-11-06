@@ -21,7 +21,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/navigation/earth.h>
+#include <xefis/support/earth/earth.h>
 #include <xefis/utility/numeric.h>
 #include <xefis/utility/qzdevice.h>
 

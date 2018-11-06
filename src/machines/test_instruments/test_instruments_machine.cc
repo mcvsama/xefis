@@ -28,16 +28,18 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	Machine (xefis),
 	_logger (xefis.logger())
 {
-	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger);
 	_work_performer = std::make_unique<xf::WorkPerformer> (std::thread::hardware_concurrency(), _logger);
+
+	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger, "share/nav/nav.dat.gz", "share/nav/fix.dat.gz", "share/nav/apt.dat.gz");
+	_work_performer->submit (_navaid_storage->async_loader());
 
 	_test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("TestLoop")),
 	register_processing_loop (*_test_loop);
 
 	auto line_width = 0.3525_mm;
 	auto font_height = 3.15_mm;
-	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 30_Hz, line_width, font_height };
-	spec.set_scale (1.0f);
+	xf::ScreenSpec spec { QRect { 0, 0, 1366, 768 }, 15_in, 60_Hz, line_width, font_height };
+	spec.set_scale (1.25f);
 	auto& test_screen = _test_screen.emplace (spec, xefis.graphics(), *_navaid_storage, *this, _logger.with_scope ("test screen"));
 	test_screen->set_paint_bounding_boxes (false);
 	register_screen (*_test_screen);

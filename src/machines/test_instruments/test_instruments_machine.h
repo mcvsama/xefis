@@ -26,8 +26,7 @@
 #include <xefis/core/processing_loop.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/test/test_generator.h>
-#include <xefis/support/airframe/airframe.h>
-#include <xefis/support/navigation/navaid_storage.h>
+#include <xefis/support/earth/navigation/navaid_storage.h>
 #include <xefis/support/system/work_performer.h>
 #include <xefis/utility/tracker.h>
 
@@ -44,7 +43,6 @@ class TestInstrumentsMachine: public xf::Machine
   private:
 	xf::Logger											_logger;
 	std::unique_ptr<xf::NavaidStorage>					_navaid_storage;
-	std::unique_ptr<xf::Airframe>						_airframe;
 	std::unique_ptr<xf::WorkPerformer>					_work_performer;
 	std::optional<xf::Registrant<xf::ProcessingLoop>>	_test_loop;
 	std::optional<xf::Registrant<TestScreen>>			_test_screen;

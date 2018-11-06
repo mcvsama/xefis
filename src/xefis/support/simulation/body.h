@@ -22,7 +22,10 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/3d_space.h>
+#include <xefis/support/math/geometry.h>
+#include <xefis/support/math/space.h>
+#include <xefis/support/nature/physics.h>
+#include <xefis/support/simulation/body_shape.h>
 
 
 namespace xf::sim {
@@ -33,178 +36,129 @@ namespace xf::sim {
 class Body
 {
   public:
+	// Ctor
+	explicit
+	Body (BodyShape&&);
+
 	/*
-	 * Mass
+	 * Shape of the body.
 	 */
-
 	[[nodiscard]]
-	si::Mass
-	mass() const noexcept;
+	BodyShape&
+	shape() noexcept
+		{ return _shape; }
 
+	/*
+	 * Shape of the body.
+	 */
+	[[nodiscard]]
+	BodyShape const&
+	shape() const noexcept
+		{ return _shape; }
+
+	/**
+	 * Set new shape of the body.
+	 */
 	void
-	set_mass (si::Mass);
+	set_shape (BodyShape&& shape)
+		{ _shape = std::move (shape); }
 
 	/*
 	 * Position (center of rest mass)
 	 */
 
 	[[nodiscard]]
-	SpaceVector<si::Length> const&
-	position() const noexcept;
+	SpaceVector<si::Length, ECEFFrame> const&
+	position() const noexcept
+		{ return _position; }
 
 	void
-	set_position (SpaceVector<si::Length> const&);
-
-	/*
-	 * Velocity
-	 */
-
-	[[nodiscard]]
-	SpaceVector<si::Velocity> const&
-	velocity() const noexcept;
-
-	void
-	set_velocity (SpaceVector<si::Velocity> const&);
-
-	/*
-	 * Moment of inertia
-	 */
-
-	[[nodiscard]]
-	SpaceMatrix<si::MomentOfInertia> const&
-	moment_of_inertia() const noexcept;
-
-	void
-	set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia> const&);
-
-	/*
-	 * Orientation
-	 */
-
-	[[nodiscard]]
-	SpaceMatrix<> const&
-	orientation() const noexcept;
-
-	void
-	set_orientation (SpaceMatrix<> const&);
-
-	/*
-	 * AngularVelocity
-	 */
-
-	[[nodiscard]]
-	SpaceMatrix<si::BaseAngularVelocity> const&
-	angular_velocity() const noexcept;
-
-	void
-	set_angular_velocity (SpaceMatrix<si::BaseAngularVelocity> const&);
+	set_position (SpaceVector<si::Length, ECEFFrame> const& position)
+		{ _position = position; }
 
 	/**
-	 * Update state of the object with given forces acting on it over the time dt.
+	 * Velocity.
+	 */
+	[[nodiscard]]
+	SpaceVector<si::Velocity, ECEFFrame> const&
+	velocity() const noexcept
+		{ return _velocity; }
+
+	/**
+	 * Set new velocity.
 	 */
 	void
-	evolve (SpaceVector<si::Force> const&, SpaceMatrix<si::Torque> const&, si::Time dt);
+	set_velocity (SpaceVector<si::Velocity, ECEFFrame> const& velocity)
+		{ _velocity = velocity; }
 
-  public:
+	/**
+	 * Angular velocity.
+	 */
+	[[nodiscard]]
+	SpaceVector<si::BaseAngularVelocity, ECEFFrame> const&
+	angular_velocity() const noexcept
+		{ return _angular_velocity; }
+
+	/**
+	 * Set new angular velocity.
+	 */
+	void
+	set_angular_velocity (SpaceVector<si::BaseAngularVelocity, ECEFFrame> const& angular_velocity)
+		{ _angular_velocity = angular_velocity; }
+
+	/**
+	 * Orientation tensor.
+	 * Since this is in ECEF frame, which is just basis vectors of matrix,
+	 * orientation tensor is the same as rotation matrix for this object.
+	 */
+	[[nodiscard]]
+	SpaceMatrix<double, ECEFFrame, BodyFrame> const&
+	orientation() const noexcept
+		{ return _body_to_ecef_transform; }
+
+	/**
+	 * Set new orientation tensor.
+	 */
+	void
+	set_orientation (SpaceMatrix<double, ECEFFrame, BodyFrame> const&);
+
+	/**
+	 * Return body-to-ecef transformation matrix.
+	 */
+	SpaceMatrix<double, ECEFFrame, BodyFrame> const&
+	body_to_ecef_transform() const noexcept
+		{ return _body_to_ecef_transform; }
+
+	/**
+	 * Return ecef-to-body transformation matrix.
+	 */
+	SpaceMatrix<double, BodyFrame, ECEFFrame> const&
+	ecef_to_body_transform() const noexcept
+		{ return _ecef_to_body_transform; }
+
+	/**
+	 * Act on the body with given forces over time dt.
+	 */
+	void
+	act (ForceTorque<ECEFFrame> const& force_torque, si::Time dt);
+
+  private:
+	BodyShape										_shape;
 	// Basic physics:
-	si::Mass											_mass;
-	SpaceVector<si::Length>								_position;
-	SpaceVector<si::Velocity>							_velocity;
-	SpaceMatrix<si::MomentOfInertia>					_moment_of_inertia;
-	SpaceMatrix<si::MomentOfInertia>::InversedMatrix	_inversed_moment_of_inertia;
-	SpaceMatrix<>										_orientation;
-	SpaceMatrix<si::BaseAngularVelocity>				_angular_velocity;
+	SpaceVector<si::Length, ECEFFrame>				_position;
+	SpaceVector<si::Velocity, ECEFFrame>			_velocity;
+	SpaceVector<si::BaseAngularVelocity, ECEFFrame>	_angular_velocity;
+	// Orientation transforms:
+	SpaceMatrix<double, ECEFFrame, BodyFrame>		_body_to_ecef_transform;
+	SpaceMatrix<double, BodyFrame, ECEFFrame>		_ecef_to_body_transform;
 };
 
 
-inline si::Mass
-Body::mass() const noexcept
-{
-	return _mass;
-}
-
-
 inline void
-Body::set_mass (si::Mass mass)
+Body::set_orientation (SpaceMatrix<double, ECEFFrame, BodyFrame> const& orientation)
 {
-	_mass = mass;
-}
-
-
-inline SpaceVector<si::Length> const&
-Body::position() const noexcept
-{
-	return _position;
-}
-
-
-inline void
-Body::set_position (SpaceVector<si::Length> const& position)
-{
-	_position = position;
-}
-
-
-inline SpaceVector<si::Velocity> const&
-Body::velocity() const noexcept
-{
-	return _velocity;
-}
-
-
-inline void
-Body::set_velocity (SpaceVector<si::Velocity> const& velocity)
-{
-	_velocity = velocity;
-}
-
-
-inline SpaceMatrix<si::MomentOfInertia> const&
-Body::moment_of_inertia() const noexcept
-{
-	return _moment_of_inertia;
-}
-
-
-inline void
-Body::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia> const& matrix)
-{
-	try {
-		_moment_of_inertia = matrix;
-		_inversed_moment_of_inertia = matrix.inversed();
-	}
-	catch (math::NotInversible& e)
-	{
-		std::throw_with_nested (xf::BadConfiguration ("invalid moment of inertia (masses are colinear/coplanar)"));
-	}
-}
-
-
-inline SpaceMatrix<> const&
-Body::orientation() const noexcept
-{
-	return _orientation;
-}
-
-
-inline void
-Body::set_orientation (SpaceMatrix<> const& orientation)
-{
-	_orientation = orientation;
-}
-
-
-inline SpaceMatrix<si::BaseAngularVelocity> const&
-Body::angular_velocity() const noexcept
-{
-	return _angular_velocity;
-}
-
-
-inline void
-Body::set_angular_velocity (SpaceMatrix<si::BaseAngularVelocity> const& angular_velocity)
-{
-	_angular_velocity = angular_velocity;
+	_body_to_ecef_transform = vector_normalized (orthogonalized (orientation));
+	_ecef_to_body_transform = inv (_body_to_ecef_transform);
 }
 
 } // namespace xf::sim

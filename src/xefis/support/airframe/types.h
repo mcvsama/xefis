@@ -28,7 +28,6 @@ using LiftCoefficient	= double;
 using DragCoefficient	= double;
 using FlapsAngle		= StrongType<si::Angle, struct FlapsAngleType>;
 using SpoilersAngle		= StrongType<si::Angle, struct SpoilersAngleType>;
-using AngleOfAttack		= StrongType<si::Angle, struct AngleOfAttackType>;
 
 } // namespace xf
 

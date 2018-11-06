@@ -1,0 +1,5 @@
+Cd:
+	double const cd = 2.0 * (1.0 - cos (2 * alpha));
+Cl:
+	double const cl = 1 * sin (2 * alpha);
+

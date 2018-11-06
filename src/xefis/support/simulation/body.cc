@@ -16,6 +16,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/geometry.h>
 
 // Local:
 #include "body.h"
@@ -23,20 +24,28 @@
 
 namespace xf::sim {
 
-void
-Body::evolve (SpaceVector<si::Force> const& force, SpaceMatrix<si::Torque> const& torque, si::Time dt)
-{
-	SpaceVector<si::Acceleration> linear_a = force / _mass;
-	SpaceVector<si::Velocity> dv = linear_a * dt;
+Body::Body (BodyShape&& shape):
+	_shape (std::move (shape))
+{ }
 
-	SpaceMatrix<si::BaseAngularAcceleration> angular_a = _inversed_moment_of_inertia * torque;
-	SpaceMatrix<si::BaseAngularVelocity> dw = angular_a * dt;
+
+void
+Body::act (ForceTorque<ECEFFrame> const& force_torque, si::Time dt)
+{
+	SpaceVector<si::Acceleration, ECEFFrame> const linear_a = force_torque.force() / _shape.mass();
+	SpaceVector<si::Velocity, ECEFFrame> const dv = linear_a * dt;
+
+	SpaceVector<si::BaseAngularAcceleration, ECEFFrame> const angular_a = _body_to_ecef_transform * _shape.inversed_moment_of_inertia() * (_ecef_to_body_transform * force_torque.torque());
+	SpaceVector<si::BaseAngularVelocity, ECEFFrame> const dw = angular_a * dt;
 
 	_velocity += dv;
 	_angular_velocity += dw;
 
 	_position += _velocity * dt;
-	_orientation += (_angular_velocity * dt) * _orientation;
+	_body_to_ecef_transform += make_pseudotensor (_angular_velocity * dt) * _body_to_ecef_transform;
+
+	_body_to_ecef_transform = vector_normalized (orthogonalized (_body_to_ecef_transform));
+	_ecef_to_body_transform = inv (_body_to_ecef_transform);
 }
 
 } // namespace xf::sim

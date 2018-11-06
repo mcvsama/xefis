@@ -26,8 +26,8 @@
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/core/xefis.h>
+#include <xefis/support/earth/navigation/navaid_storage.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/support/navigation/navaid_storage.h>
 #include <xefis/utility/event_timestamper.h>
 #include <xefis/utility/synchronized.h>
 #include <xefis/utility/temporal.h>
