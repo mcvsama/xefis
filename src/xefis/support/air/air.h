@@ -19,12 +19,23 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/utility/numeric.h>
 #include <xefis/utility/strong_type.h>
 
 
 namespace xf {
 
 using Reynolds = StrongType<double, struct ReynoldsType>;
+
+
+struct Air
+{
+	si::Density				density;
+	si::Pressure			pressure;
+	si::Temperature			temperature;
+	si::DynamicViscosity	dynamic_viscosity;
+	si::Velocity			speed_of_sound;
+};
 
 
 si::Density
@@ -87,6 +98,13 @@ constexpr Reynolds
 reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, si::KinematicViscosity nu)
 {
 	return Reynolds (fluid_speed * characteristic_dimension / nu);
+}
+
+
+constexpr si::Pressure
+dynamic_pressure (si::Density fluid_density, si::Velocity fluid_speed)
+{
+	return 0.5 * fluid_density * square (fluid_speed);
 }
 
 } // namespace xf

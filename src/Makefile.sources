@@ -321,6 +321,9 @@ XEFIS_HEADERS			+= xefis/support/air/wind_triangle.h
 
 XEFIS_SOURCES			+= xefis/support/air/air.cc
 
+SELFTEST_SOURCES		+= xefis/support/air/tests/air.test.cc
+SELFTEST_SOURCES		+= xefis/support/air/air.cc
+
 ######## /xefis/support/airframe ########
 
 XEFIS_HEADERS			+= xefis/support/airframe/airframe.h
