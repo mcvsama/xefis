@@ -378,7 +378,7 @@ template<class Iterator>
  * Returns pair of Value and a number of helper lines for chart grid.
  */
 template<class Value>
-	std::pair<Value, std::size_t>
+	inline std::pair<Value, std::size_t>
 	get_max_for_axis (Value const& value)
 	{
 		Value fac (1);
@@ -407,7 +407,7 @@ template<class Value>
  * Return square of the argument.
  */
 template<class Value>
-	decltype(std::declval<Value>() * std::declval<Value>())
+	constexpr decltype(std::declval<Value>() * std::declval<Value>())
 	square (Value a)
 	{
 		return a * a;
@@ -418,7 +418,7 @@ template<class Value>
  * Return cube of the argument.
  */
 template<class Value>
-	decltype(std::declval<Value>() * std::declval<Value>() * std::declval<Value>())
+	constexpr decltype(std::declval<Value>() * std::declval<Value>() * std::declval<Value>())
 	cube (Value a)
 	{
 		return a * a * a;
