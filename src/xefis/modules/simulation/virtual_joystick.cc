@@ -84,20 +84,40 @@ class VirtualJoystickWidget: public xf::Widget
 };
 
 
-class VirtualThrottleWidget: public xf::Widget
+class VirtualLinearWidget: public xf::Widget
 {
-	static constexpr float kMarginEm = 0.5;
+	static constexpr xf::Range	kInternalRange	{ 0.0f, 1.0f };
+	static constexpr float		kMarginEm		{ 0.5 };
+
+  public:
+	enum Orientation
+	{
+		Horizontal,
+		Vertical,
+	};
+
+	enum Style
+	{
+		Filled,
+		BarOnly,
+	};
 
   public:
 	// Ctor
 	explicit
-	VirtualThrottleWidget (QWidget* parent);
+	VirtualLinearWidget (xf::Range<float>, Orientation, Style, QWidget* parent);
+
+	/**
+	 * Set value.
+	 */
+	void
+	set_value (float);
 
 	/**
 	 * Value is in range [0, 1].
 	 */
 	float
-	throttle() const noexcept;
+	value() const noexcept;
 
   protected:
 	// QWidget API
@@ -117,7 +137,10 @@ class VirtualThrottleWidget: public xf::Widget
 	mouseMoveEvent (QMouseEvent*) override;
 
   private:
-	double						_throttle	{ 0.0 };
+	xf::Range<float>			_range;
+	Orientation					_orientation;
+	Style						_style;
+	float						_value { 0.0 };
 	std::optional<MouseControl>	_control;
 };
 
@@ -263,45 +286,89 @@ VirtualJoystickWidget::mouseMoveEvent (QMouseEvent* event)
 }
 
 
-VirtualThrottleWidget::VirtualThrottleWidget (QWidget* parent):
-	Widget (parent)
+VirtualLinearWidget::VirtualLinearWidget (xf::Range<float> range, Orientation orientation, Style style, QWidget* parent):
+	Widget (parent),
+	_range (range),
+	_orientation (orientation),
+	_style (style)
 {
 	setStyleSheet (kTransparentStyleSheet);
-	setFixedSize (em_pixels (5), em_pixels (20));
-}
 
+	switch (_orientation)
+	{
+		case Horizontal:
+			setFixedSize (em_pixels (20), em_pixels (5));
+			break;
 
-float
-VirtualThrottleWidget::throttle() const noexcept
-{
-	constexpr xf::Range range { 0.0, 1.0 };
-
-	if (_control)
-		return xf::clamped (_throttle - _control->delta().y() / height(), range);
-	else
-		return xf::clamped (_throttle, range);
+		case Vertical:
+			setFixedSize (em_pixels (5), em_pixels (20));
+			break;
+	}
 }
 
 
 void
-VirtualThrottleWidget::paintEvent (QPaintEvent*)
+VirtualLinearWidget::set_value (float v)
+{
+	_value = xf::renormalize (v, _range, kInternalRange);
+	update();
+}
+
+
+float
+VirtualLinearWidget::value() const noexcept
+{
+	float v = 0.0;
+
+	if (_control)
+	{
+		switch (_orientation)
+		{
+			case Horizontal:
+				v = xf::clamped<float> (_value + _control->delta().x() / width(), kInternalRange);
+				break;
+
+			case Vertical:
+				v = xf::clamped<float> (_value - _control->delta().y() / height(), kInternalRange);
+				break;
+		}
+	}
+	else
+		v = xf::clamped<float> (_value, kInternalRange);
+
+	return xf::renormalize (v, kInternalRange, _range);
+}
+
+
+void
+VirtualLinearWidget::paintEvent (QPaintEvent*)
 {
 	auto const m = em_pixels (kMarginEm);
-	QRectF r = rect().marginsRemoved (QMargins (m, m, m, m));
+	QRectF r = rect();
 
 	QPainter painter (this);
 	painter.setRenderHint (QPainter::Antialiasing);
+
+	if (_orientation == Horizontal)
+	{
+		painter.translate (+0.5 * QPointF (r.size().width(), r.size().height()));
+		painter.rotate (90);
+		painter.translate (-0.5 * QPointF (r.size().height(), r.size().width()));
+		r = r.transposed();
+	}
+
+	r = r.marginsRemoved (QMargins (m, m, m, m));
 
 	for (auto const outlining: { true, false })
 	{
 		auto const color = outlining ? Qt::black : Qt::white;
 		auto const added_width = outlining ? em_pixels (0.2) : 0.0;
-		auto const y = throttle() * r.height();
+		auto const y = xf::renormalize (value(), _range, kInternalRange) * r.height();
 
 		// Throttle:
 		painter.setPen (QPen (color, added_width + em_pixels (0.1), Qt::SolidLine, Qt::FlatCap));
 
-		if (outlining)
+		if (outlining && _style == Filled)
 			painter.fillRect (QRectF (QPointF (r.left(), r.bottom() - y), r.bottomRight()), QColor (0, 255, 0, 200));
 
 		painter.drawLine (QPointF (r.left(), r.bottom() - y), QPointF (r.right(), r.bottom() - y));
@@ -310,13 +377,12 @@ VirtualThrottleWidget::paintEvent (QPaintEvent*)
 		painter.setBrush (Qt::NoBrush);
 		painter.setPen (QPen (color, added_width + em_pixels (0.3), Qt::SolidLine, Qt::SquareCap));
 		painter.drawRect (r);
-
 	}
 }
 
 
 void
-VirtualThrottleWidget::mousePressEvent (QMouseEvent* event)
+VirtualLinearWidget::mousePressEvent (QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton)
 	{
@@ -330,16 +396,16 @@ VirtualThrottleWidget::mousePressEvent (QMouseEvent* event)
 
 
 void
-VirtualThrottleWidget::mouseReleaseEvent (QMouseEvent*)
+VirtualLinearWidget::mouseReleaseEvent (QMouseEvent*)
 {
-	_throttle = throttle();
+	set_value (value());
 	_control.reset();
 	update();
 }
 
 
 void
-VirtualThrottleWidget::mouseMoveEvent (QMouseEvent* event)
+VirtualLinearWidget::mouseMoveEvent (QMouseEvent* event)
 {
 	if (_control)
 		_control->current_point = event->pos();
@@ -358,13 +424,19 @@ VirtualJoystick::VirtualJoystick (std::unique_ptr<VirtualJoystickIO> module_io, 
 	xf::set_kde_blur_background (*_widget, true);
 
 	_joystick_widget = new VirtualJoystickWidget (_widget);
-	_throttle_widget = new VirtualThrottleWidget (_widget);
 
-	auto* layout = new QHBoxLayout (_widget);
+	_throttle_widget = new VirtualLinearWidget ({ 0.0f, 1.0f }, VirtualLinearWidget::Vertical, VirtualLinearWidget::Filled, _widget);
+	_throttle_widget->set_value (0.0f);
+
+	_rudder_widget = new VirtualLinearWidget ({ -1.0f, 1.0f }, VirtualLinearWidget::Horizontal, VirtualLinearWidget::BarOnly, _widget);
+	_rudder_widget->set_value (0.0f);
+
+	auto* layout = new QGridLayout (_widget);
 	layout->setMargin (0);
 	layout->setSpacing (0);
-	layout->addWidget (_throttle_widget);
-	layout->addWidget (_joystick_widget);
+	layout->addWidget (_throttle_widget, 0, 0);
+	layout->addWidget (_joystick_widget, 0, 1);
+	layout->addWidget (_rudder_widget, 1, 1);
 	layout->setSizeConstraint (QLayout::SetFixedSize);
 
 	_widget->show();
@@ -377,6 +449,7 @@ VirtualJoystick::process (xf::Cycle const&)
 	auto const jpos = _joystick_widget->position();
 	io.x_axis = jpos.x();
 	io.y_axis = jpos.y();
-	io.throttle = _throttle_widget->throttle();
+	io.throttle = _throttle_widget->value();
+	io.rudder = _rudder_widget->value();
 }
 
