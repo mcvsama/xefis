@@ -673,7 +673,7 @@ ArtificialHorizon::paint_roll_scale (AdiPaintRequest& pr) const
 
 		if (pr.params.slip_skid_visible)
 		{
-			pr.painter.translate (-xf::clamped (pr.params.slip_skid.in<si::Degree>(), -4.0, +4.0) * 0.08 * w, 0.0);
+			pr.painter.translate (-xf::clamped (pr.params.slip_skid.in<si::Degree>(), -4.0, +4.0) * 0.03 * w, 0.0);
 
 			if (pr.params.roll_warning || pr.params.slip_skid_warning)
 				pr.painter.setPen (warning_pen);
@@ -3029,7 +3029,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.old_style = io.style_old.value_or (false);
 	params.show_metric = io.style_show_metric.value_or (false);
 	// Speed
-	params.speed_failure = !io.speed_ias_serviceable.value_or (true);
+	params.speed_failure = !io.speed_ias_serviceable.value_or (true) || !is_sane (io.speed_ias, { 0_mps, 1000_mps });
 	_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.speed_failure;
 	});
@@ -3107,7 +3107,10 @@ ADI::process (xf::Cycle const& cycle)
 		params.speed_bugs.erase (_speed_flaps_b_current_label);
 
 	// Orientation
-	params.orientation_failure = !io.orientation_serviceable.value_or (true);
+	params.orientation_failure =
+		!io.orientation_serviceable.value_or (true) ||
+		!is_sane (io.orientation_pitch) ||
+		!is_sane (io.orientation_roll);
 	_orientation_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.orientation_failure;
 	});
@@ -3137,7 +3140,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.critical_aoa = io.aoa_alpha_maximum.value_or (0_deg);
 	params.aoa_alpha = io.aoa_alpha.value_or (0_deg);
 	// Altitude
-	params.altitude_failure = !io.altitude_amsl_serviceable.value_or (true);
+	params.altitude_failure = !io.altitude_amsl_serviceable.value_or (true) || !is_sane (io.altitude_amsl);
 	_altitude_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_failure;
 	});
@@ -3146,7 +3149,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.altitude_amsl = io.altitude_amsl.value_or (0_ft);
 	params.altitude_lookahead_visible = io.altitude_amsl_lookahead.valid();
 	params.altitude_lookahead = io.altitude_amsl_lookahead.value_or (0_ft);
-	params.altitude_agl_failure = !io.altitude_agl_serviceable.value_or (true);
+	params.altitude_agl_failure = !io.altitude_agl_serviceable.value_or (true) || !is_sane (io.altitude_agl);
 	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_agl_failure;
 	});
@@ -3174,7 +3177,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.landing_visible = io.landing_amsl.valid();
 	params.landing_amsl = io.landing_amsl.value_or (0_ft);
 	// Vertical speed
-	params.vertical_speed_failure = !io.vertical_speed_serviceable.value_or (true);
+	params.vertical_speed_failure = !io.vertical_speed_serviceable.value_or (true) || !is_sane (io.vertical_speed);
 	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.vertical_speed_failure;
 	});
@@ -3213,7 +3216,15 @@ ADI::process (xf::Cycle const& cycle)
 	// Flight director
 	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
 	params.flight_director_active_name = io.flight_director_active_name.get_optional();
-	params.flight_director_failure = !io.flight_director_serviceable.value_or (true);
+	params.flight_director_failure =
+		!io.flight_director_serviceable.value_or (true) ||
+		!is_sane (io.flight_director_cmd_altitude) ||
+		!is_sane (io.flight_director_cmd_ias) ||
+		!is_sane (io.flight_director_cmd_mach) ||
+		!is_sane (io.flight_director_cmd_vertical_speed) ||
+		!is_sane (io.flight_director_cmd_fpa) ||
+		(io.flight_director_guidance_visible && (!is_sane (io.flight_director_guidance_pitch) ||
+												 !is_sane (io.flight_director_guidance_roll)));
 	_flight_director_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_director_failure;
 	});
@@ -3233,14 +3244,21 @@ ADI::process (xf::Cycle const& cycle)
 	params.navaid_hint = QString::fromStdString (io.navaid_type_hint.value_or (""));
 	params.navaid_identifier = QString::fromStdString (io.navaid_identifier.value_or (""));
 	// Approach, flight path deviations
-	params.deviation_vertical_failure = !io.flight_path_deviation_vertical_serviceable.value_or (true);
+	params.deviation_vertical_failure =
+		!io.flight_path_deviation_vertical_serviceable.value_or (true) ||
+		!is_sane (io.flight_path_deviation_vertical) ||
+		!is_sane (io.flight_path_deviation_vertical_approach) ||
+		!is_sane (io.flight_path_deviation_vertical_flight_path);
 	_deviation_vertical_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.deviation_vertical_failure;
 	});
 	params.deviation_vertical_failure_focus = _deviation_vertical_failure_timestamp.shorter_than (*io.focus_duration);
 	params.deviation_vertical_approach = io.flight_path_deviation_vertical_approach.get_optional();
 	params.deviation_vertical_flight_path = io.flight_path_deviation_vertical_flight_path.get_optional();
-	params.deviation_lateral_failure = !io.flight_path_deviation_lateral_serviceable.value_or (true);
+	params.deviation_lateral_failure =
+		!io.flight_path_deviation_lateral_serviceable.value_or (true) ||
+		!is_sane (io.flight_path_deviation_lateral_approach) ||
+		!is_sane (io.flight_path_deviation_lateral_flight_path);
 	_deviation_lateral_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.deviation_lateral_failure;
 	});
@@ -3356,4 +3374,20 @@ ADI::compute_fpv()
 	if (io.weight_on_wheels && *io.weight_on_wheels)
 		_computed_fpv_visible = false;
 }
+
+
+template<class FloatingPoint>
+	bool
+	ADI::is_sane (xf::Property<FloatingPoint> const& property)
+	{
+		return property && isfinite (*property);
+	}
+
+
+template<class FloatingPoint>
+	bool
+	ADI::is_sane (xf::Property<FloatingPoint> const& property, xf::Range<FloatingPoint> const& sane_range)
+	{
+		return is_sane (property) && sane_range.includes (*property);
+	}
 

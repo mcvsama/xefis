@@ -142,8 +142,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Angle>		flight_director_guidance_roll						{ this, "flight-director/guidance.roll" };
 	// Control surfaces deflection indicator
 	xf::PropertyIn<bool>			control_surfaces_visible							{ this, "control-surfaces/visible" };
-	xf::PropertyIn<float>			control_surfaces_elevator							{ this, "control-surfaces/elevator" };
-	xf::PropertyIn<float>			control_surfaces_ailerons							{ this, "control-surfaces/ailerons" };
+	xf::PropertyIn<double>			control_surfaces_elevator							{ this, "control-surfaces/elevator" };
+	xf::PropertyIn<double>			control_surfaces_ailerons							{ this, "control-surfaces/ailerons" };
 	// Approach information
 	xf::PropertyIn<bool>			navaid_reference_visible							{ this, "navaid/reference-visible" };
 	xf::PropertyIn<si::Angle>		navaid_course_magnetic								{ this, "navaid/course-magnetic" };
@@ -833,6 +833,20 @@ class ADI: public xf::Instrument<ADI_IO>
   private:
 	void
 	compute_fpv();
+
+	/**
+	 * True if property is not nil and is finite.
+	 */
+	template<class FloatingPoint>
+		bool
+		is_sane (xf::Property<FloatingPoint> const&);
+
+	/**
+	 * True if property is in given range (which implies not nil and finite also).
+	 */
+	template<class FloatingPoint>
+		bool
+		is_sane (xf::Property<FloatingPoint> const&, xf::Range<FloatingPoint> const&);
 
   private:
 	xf::PropertyObserver						_fpv_computer;
