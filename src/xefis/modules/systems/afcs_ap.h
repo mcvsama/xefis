@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/pid_control.h>
+#include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/smoother.h>
 
 
@@ -35,34 +35,32 @@ class AFCS_AP_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<double>			overall_gain			{ this, "overall_gain", 1.0 };
-	xf::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
-								pitch_pid_settings		{ this, "pitch_pid_settings" };
-	xf::Setting<double>			pitch_gain				{ this, "pitch_gain", 1.0 };
-	xf::Setting<xf::PIDControl<si::Angle, si::Angle>::Settings>
-								roll_pid_settings		{ this, "roll_pid_settings" };
-	xf::Setting<double>			roll_gain				{ this, "roll_gain", 1.0 };
+	xf::Setting<double>				overall_gain			{ this, "overall_gain", 1.0 };
+	xf::Setting<xf::PIDSettings<>>	pitch_pid_settings		{ this, "pitch_pid_settings" };
+	xf::Setting<double>				pitch_gain				{ this, "pitch_gain", 1.0 };
+	xf::Setting<xf::PIDSettings<>>	roll_pid_settings		{ this, "roll_pid_settings" };
+	xf::Setting<double>				roll_gain				{ this, "roll_gain", 1.0 };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<si::Angle>	cmd_pitch				{ this, "cmd-pitch" };
-	xf::PropertyIn<si::Angle>	cmd_roll				{ this, "cmd-roll" };
-	xf::PropertyIn<si::Angle>	measured_pitch			{ this, "measured-pitch" };
-	xf::PropertyIn<si::Angle>	measured_roll			{ this, "measured-roll" };
-	xf::PropertyIn<si::Angle>	elevator_minimum		{ this, "limits/elevator/minimum" };
-	xf::PropertyIn<si::Angle>	elevator_maximum		{ this, "limits/elevator/maximum" };
-	xf::PropertyIn<si::Angle>	ailerons_minimum		{ this, "limits/ailerons/minimum" };
-	xf::PropertyIn<si::Angle>	ailerons_maximum		{ this, "limits/ailerons/maximum" };
+	xf::PropertyIn<si::Angle>		cmd_pitch				{ this, "cmd-pitch" };
+	xf::PropertyIn<si::Angle>		cmd_roll				{ this, "cmd-roll" };
+	xf::PropertyIn<si::Angle>		measured_pitch			{ this, "measured-pitch" };
+	xf::PropertyIn<si::Angle>		measured_roll			{ this, "measured-roll" };
+	xf::PropertyIn<si::Angle>		elevator_minimum		{ this, "limits/elevator/minimum" };
+	xf::PropertyIn<si::Angle>		elevator_maximum		{ this, "limits/elevator/maximum" };
+	xf::PropertyIn<si::Angle>		ailerons_minimum		{ this, "limits/ailerons/minimum" };
+	xf::PropertyIn<si::Angle>		ailerons_maximum		{ this, "limits/ailerons/maximum" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<bool>		serviceable				{ this, "serviceable" };
-	xf::PropertyOut<si::Angle>	elevator				{ this, "elevator" };
-	xf::PropertyOut<si::Angle>	ailerons				{ this, "ailerons" };
+	xf::PropertyOut<bool>			serviceable				{ this, "serviceable" };
+	xf::PropertyOut<si::Angle>		elevator				{ this, "elevator" };
+	xf::PropertyOut<si::Angle>		ailerons				{ this, "ailerons" };
 };
 
 
@@ -107,8 +105,8 @@ class AFCS_AP: public xf::Module<AFCS_AP_IO>
 
   private:
 	xf::Logger								_logger;
-	xf::PIDControl<si::Angle, si::Angle>	_elevator_pid;
-	xf::PIDControl<si::Angle, si::Angle>	_ailerons_pid;
+	xf::PIDController<si::Angle, si::Angle>	_elevator_pid;
+	xf::PIDController<si::Angle, si::Angle>	_ailerons_pid;
 	xf::Smoother<si::Angle>					_elevator_smoother	{ 50_ms };
 	xf::Smoother<si::Angle>					_ailerons_smoother	{ 50_ms };
 	xf::PropertyObserver					_ap_computer;

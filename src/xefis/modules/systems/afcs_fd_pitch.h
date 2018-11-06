@@ -23,7 +23,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/pid_control.h>
+#include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/range_smoother.h>
 
 // Local:
@@ -33,11 +33,11 @@
 class AFCS_FD_Pitch_IO: public xf::ModuleIO
 {
   public:
-	using IAS_PID		= xf::PIDControl<si::Velocity, si::Angle>;
-	using MachPID		= xf::PIDControl<double, si::Angle>;
-	using AltitudePID	= xf::PIDControl<si::Length, si::Angle>;
-	using VS_PID		= xf::PIDControl<si::Velocity, si::Angle>;
-	using FPA_PID		= xf::PIDControl<si::Angle, si::Angle>;
+	using IAS_PID		= xf::PIDController<si::Velocity, si::Angle>;
+	using MachPID		= xf::PIDController<double, si::Angle>;
+	using AltitudePID	= xf::PIDController<si::Length, si::Angle>;
+	using VS_PID		= xf::PIDController<si::Velocity, si::Angle>;
+	using FPA_PID		= xf::PIDController<si::Angle, si::Angle>;
 
   public:
 	/*
@@ -126,7 +126,7 @@ class AFCS_FD_Pitch: public xf::Module<AFCS_FD_Pitch_IO>
 	 */
 	template<class Input, class Control>
 		std::optional<si::Angle>
-		compute_pitch (xf::PIDControl<Input, Control>& pid,
+		compute_pitch (xf::PIDController<Input, Control>& pid,
 					   xf::PropertyIn<Input> const& cmd_param,
 					   xf::PropertyIn<Input> const& measured_param,
 					   si::Time update_dt) const;

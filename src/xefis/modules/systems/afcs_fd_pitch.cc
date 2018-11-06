@@ -182,7 +182,7 @@ AFCS_FD_Pitch::compute_pitch()
 
 template<class Input, class Control>
 	std::optional<si::Angle>
-	AFCS_FD_Pitch::compute_pitch (xf::PIDControl<Input, Control>& pid,
+	AFCS_FD_Pitch::compute_pitch (xf::PIDController<Input, Control>& pid,
 								  xf::PropertyIn<Input> const& cmd_param,
 								  xf::PropertyIn<Input> const& measured_param,
 								  si::Time update_dt) const

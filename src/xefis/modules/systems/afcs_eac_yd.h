@@ -24,7 +24,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/pid_control.h>
+#include <xefis/support/control/pid_controller.h>
 
 
 class AFCS_EAC_YD_IO: public xf::ModuleIO
@@ -34,23 +34,22 @@ class AFCS_EAC_YD_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<xf::PIDControl<si::Force, si::Angle>::Settings>
-								rudder_pid_settings	{ this, "rudder_pid_settings" };
-	xf::Setting<double>			rudder_pid_gain		{ this, "rudder_pid_gain", 1.0 };
-	xf::Setting<si::Angle>		deflection_limit	{ this, "deflection_limit" };
+	xf::Setting<xf::PIDSettings<>>	rudder_pid_settings	{ this, "rudder_pid_settings" };
+	xf::Setting<double>				rudder_pid_gain		{ this, "rudder_pid_gain", 1.0 };
+	xf::Setting<si::Angle>			deflection_limit	{ this, "deflection_limit" };
 
 	/*
 	 * Input
 	 */
 
-	xf::PropertyIn<bool>		enabled				{ this, "enabled" };
-	xf::PropertyIn<si::Force>	slip_skid			{ this, "slip-skid" };
+	xf::PropertyIn<bool>			enabled				{ this, "enabled" };
+	xf::PropertyIn<si::Force>		slip_skid			{ this, "slip-skid" };
 
 	/*
 	 * Output
 	 */
 
-	xf::PropertyOut<si::Angle>	rudder_deflection	{ this, "rudder-deflection" };
+	xf::PropertyOut<si::Angle>		rudder_deflection	{ this, "rudder-deflection" };
 };
 
 
@@ -80,7 +79,7 @@ class AFCS_EAC_YD: public xf::Module<AFCS_EAC_YD_IO>
 	compute();
 
   private:
-	xf::PIDControl<si::Force, si::Angle>	_rudder_pid;
+	xf::PIDController<si::Force, si::Angle>	_rudder_pid;
 	xf::PropertyObserver					_rudder_computer;
 };
 

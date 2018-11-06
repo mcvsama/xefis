@@ -24,8 +24,8 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
+#include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/pid_control.h>
 #include <xefis/utility/smoother.h>
 
 // Local:
@@ -39,8 +39,7 @@ class AFCS_AT_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<xf::PIDControl<si::Velocity, si::Force>::Settings>
-										ias_pid_settings		{ this, "ias_pid_settings" };
+	xf::Setting<xf::PIDSettings<>>		ias_pid_settings		{ this, "ias_pid_settings" };
 	xf::Setting<double>					ias_pid_gain			{ this, "ias_pid_gain", 1.0 };
 	xf::Setting<si::Force>				output_thrust_minimum	{ this, "output_thrust_minimum", 0.0_N };
 	xf::Setting<si::Force>				output_thrust_maximum	{ this, "output_thrust_maximum", 1.0_N };
@@ -95,9 +94,9 @@ class AFCS_AT: public xf::Module<AFCS_AT_IO>
 	clamp_speed_mode();
 
   private:
-	xf::PIDControl<si::Velocity, si::Force>	_ias_pid;
-	xf::Smoother<si::Force>					_ias_pid_smoother		{ 250_ms };
-	xf::PropertyObserver					_thrust_computer;
+	xf::PIDController<si::Velocity, si::Force>	_ias_pid;
+	xf::Smoother<si::Force>						_ias_pid_smoother		{ 250_ms };
+	xf::PropertyObserver						_thrust_computer;
 };
 
 #endif

@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__UTILITY__PID_CONTROL_H__INCLUDED
-#define XEFIS__UTILITY__PID_CONTROL_H__INCLUDED
+#ifndef XEFIS__UTILITY__PID_CONTROLLER_H__INCLUDED
+#define XEFIS__UTILITY__PID_CONTROLLER_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -26,12 +26,21 @@
 
 namespace xf {
 
+template<class Param = double>
+	struct PIDSettings
+	{
+		Param	p;	// Proportional term
+		Param	i;	// Integral term
+		Param	d;	// Derivative term
+	};
+
+
 /**
  * Proportional-Integral-Derivative controller.
  *
  * \param	pInput
- *			Type of set and measured quantity.
- * \param	pControl
+ *			Type of setpoint and measured quantity.
+ * \param	pProcessVariable
  *			Type of output value used to control the measured quantity. Default - same as pInput.
  * \param	pParam
  *			Floating-point type for internal computations, default is double.
@@ -39,36 +48,30 @@ namespace xf {
  * TODO safety functions: limit derivative or something so it's not 0/nan/inf and the result is limited to certain range.
  * TODO protect from infs and nans
  */
-template<class pInput, class pControl = pInput, class pParam = double>
-	class PIDControl
+template<class pInput, class pProcessVariable = pInput, class pParam = double>
+	class PIDController
 	{
 	  public:
-		using Input			= pInput;
-		using Control		= pControl;
-		using Param			= pParam;
+		using Input				= pInput;
+		using ProcessVariable	= pProcessVariable;
+		using Param				= pParam;
+
+		using Settings			= PIDSettings<pParam>;
 
 		using Integral		= decltype (std::declval<Input>() * std::declval<si::Time>());
 		using Derivative	= decltype (std::declval<Input>() / std::declval<si::Time>());
 
-		class Settings
-		{
-		  public:
-			Param	p;	// Proportional term
-			Param	i;	// Integral term
-			Param	d;	// Derivative term
-		};
-
 	  public:
 		// Ctor
-		PIDControl();
+		PIDController();
 
 		// Ctor
 		explicit
-		PIDControl (Settings const& settings, Input target);
+		PIDController (Settings const& settings, Input target);
 
 		// Ctor
 		explicit
-		PIDControl (Param p, Param i, Param d, Input target);
+		PIDController (Param p, Param i, Param d, Input target);
 
 		/**
 		 * Set winding. That is value -1.0 is equal to 1.0.
@@ -153,19 +156,20 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		/**
 		 * Output limit.
 		 */
-		Range<Control>
+		Range<ProcessVariable>
 		output_limit() const noexcept;
 
 		/**
 		 * Set output limit.
 		 */
 		void
-		set_output_limit (Range<Control> limit) noexcept;
+		set_output_limit (Range<ProcessVariable> limit) noexcept;
 
 		/**
 		 * Set target value. Set target value. If winding is enabled,
 		 * then the target should be normalized to [-1..1].
 		 */
+		// TODO rename to set_reference_point() or set_setpoint()
 		void
 		set_target (Input target) noexcept;
 
@@ -173,32 +177,32 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		 * Process value for given dt (timespan) and return new value.
 		 * Input value should be normalized to [-1..1].
 		 */
-		Control
+		ProcessVariable
 		process (Input measured, si::Time dt) noexcept;
 
 		/**
 		 * Same as process (Input, Time), but also provide target value to be set.
 		 */
-		Control
+		ProcessVariable
 		process (Input target, Input measured, Time dt) noexcept;
 
 		/**
 		 * Alias for process().
 		 */
-		Control
+		ProcessVariable
 		operator() (Input input, Time dt) noexcept;
 
 		/**
 		 * Alias for process().
 		 */
-		Control
+		ProcessVariable
 		operator() (Input target, Input measured, Time dt) noexcept;
 
 		/**
 		 * Return current controller output value.
 		 * TODO change to value() to be compatible with Smoother/RangeSmoother
 		 */
-		Control
+		ProcessVariable
 		output() const noexcept;
 
 		/**
@@ -224,20 +228,20 @@ template<class pInput, class pControl = pInput, class pParam = double>
 		std::optional<Range<Integral>>	_integral_limit;
 		Param							_d							= 0.0;
 		Param							_gain						= 1.0;
-		Control							_output						{ };
-		Range<Control>					_output_limit				{ -std::numeric_limits<Control>::max(), std::numeric_limits<Control>::max() };
+		ProcessVariable					_output						{ };
+		Range<ProcessVariable>			_output_limit				{ -std::numeric_limits<ProcessVariable>::max(), std::numeric_limits<ProcessVariable>::max() };
 	};
 
 
 template<class V, class C, class P>
 	inline
-	PIDControl<V, C, P>::PIDControl()
+	PIDController<V, C, P>::PIDController()
 	{ }
 
 
 template<class V, class C, class P>
 	inline
-	PIDControl<V, C, P>::PIDControl (Settings const& settings, Input target):
+	PIDController<V, C, P>::PIDController (Settings const& settings, Input target):
 		_target (target),
 		_p (settings.p),
 		_i (settings.i),
@@ -249,7 +253,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline
-	PIDControl<V, C, P>::PIDControl (Param p, Param i, Param d, Input target):
+	PIDController<V, C, P>::PIDController (Param p, Param i, Param d, Input target):
 		_target (target),
 		_p (p),
 		_i (i),
@@ -261,15 +265,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_winding (bool winding)
+	PIDController<V, C, P>::set_winding (bool winding)
 	{
 		_winding = winding;
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Param
-	PIDControl<V, C, P>::p() const noexcept
+	inline typename PIDController<V, C, P>::Param
+	PIDController<V, C, P>::p() const noexcept
 	{
 		return _p;
 	}
@@ -277,15 +281,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_p (Param p) noexcept
+	PIDController<V, C, P>::set_p (Param p) noexcept
 	{
 		_p = p;
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Param
-	PIDControl<V, C, P>::i() const noexcept
+	inline typename PIDController<V, C, P>::Param
+	PIDController<V, C, P>::i() const noexcept
 	{
 		return _i;
 	}
@@ -293,15 +297,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_i (Param i) noexcept
+	PIDController<V, C, P>::set_i (Param i) noexcept
 	{
 		_i = i;
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Param
-	PIDControl<V, C, P>::d() const noexcept
+	inline typename PIDController<V, C, P>::Param
+	PIDController<V, C, P>::d() const noexcept
 	{
 		return _d;
 	}
@@ -309,7 +313,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_d (Param d) noexcept
+	PIDController<V, C, P>::set_d (Param d) noexcept
 	{
 		_d = d;
 	}
@@ -317,7 +321,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_pid (Settings const& settings) noexcept
+	PIDController<V, C, P>::set_pid (Settings const& settings) noexcept
 	{
 		_p = settings.p;
 		_i = settings.i;
@@ -326,8 +330,8 @@ template<class V, class C, class P>
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Param
-	PIDControl<V, C, P>::gain() const noexcept
+	inline typename PIDController<V, C, P>::Param
+	PIDController<V, C, P>::gain() const noexcept
 	{
 		return _gain;
 	}
@@ -335,15 +339,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_gain (Param gain) noexcept
+	PIDController<V, C, P>::set_gain (Param gain) noexcept
 	{
 		_gain = gain;
 	}
 
 
 template<class V, class C, class P>
-	inline std::optional<Range<typename PIDControl<V, C, P>::Integral>>
-	PIDControl<V, C, P>::integral_limit() const noexcept
+	inline std::optional<Range<typename PIDController<V, C, P>::Integral>>
+	PIDController<V, C, P>::integral_limit() const noexcept
 	{
 		return _integral_limit;
 	}
@@ -351,7 +355,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_integral_limit (Range<Integral> limit) noexcept
+	PIDController<V, C, P>::set_integral_limit (Range<Integral> limit) noexcept
 	{
 		_integral_limit = limit;
 	}
@@ -359,15 +363,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_integral_limit (std::optional<Range<Integral>> limit) noexcept
+	PIDController<V, C, P>::set_integral_limit (std::optional<Range<Integral>> limit) noexcept
 	{
 		_integral_limit = limit;
 	}
 
 
 template<class V, class C, class P>
-	inline Range<typename PIDControl<V, C, P>::Control>
-	PIDControl<V, C, P>::output_limit() const noexcept
+	inline Range<typename PIDController<V, C, P>::ProcessVariable>
+	PIDController<V, C, P>::output_limit() const noexcept
 	{
 		return _output_limit;
 	}
@@ -375,7 +379,7 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_output_limit (Range<Control> limit) noexcept
+	PIDController<V, C, P>::set_output_limit (Range<ProcessVariable> limit) noexcept
 	{
 		_output_limit = limit;
 	}
@@ -383,15 +387,15 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::set_target (Input target) noexcept
+	PIDController<V, C, P>::set_target (Input target) noexcept
 	{
 		_target = target;
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Control
-	PIDControl<V, C, P>::process (Input measured, Time dt) noexcept
+	inline typename PIDController<V, C, P>::ProcessVariable
+	PIDController<V, C, P>::process (Input measured, Time dt) noexcept
 	{
 		using si::isfinite;
 		using si::abs;
@@ -420,7 +424,7 @@ template<class V, class C, class P>
 			_derivative = Derivative();
 		// P and the rest:
 		auto computed = _gain * (_p * error + _i * _integral / 1_s + _d * _derivative * 1_s);
-		_output = clamped<Control> (Control (si::quantity (computed)), _output_limit);
+		_output = clamped<ProcessVariable> (ProcessVariable (si::quantity (computed)), _output_limit);
 		_previous_error = error;
 
 		return _output;
@@ -428,8 +432,8 @@ template<class V, class C, class P>
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Control
-	PIDControl<V, C, P>::process (Input target, Input measured, Time dt) noexcept
+	inline typename PIDController<V, C, P>::ProcessVariable
+	PIDController<V, C, P>::process (Input target, Input measured, Time dt) noexcept
 	{
 		set_target (target);
 		return process (measured, dt);
@@ -437,32 +441,32 @@ template<class V, class C, class P>
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Control
-	PIDControl<V, C, P>::operator() (Input measured, Time dt) noexcept
+	inline typename PIDController<V, C, P>::ProcessVariable
+	PIDController<V, C, P>::operator() (Input measured, Time dt) noexcept
 	{
 		return process (measured, dt);
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Control
-	PIDControl<V, C, P>::operator() (Input target, Input measured, Time dt) noexcept
+	inline typename PIDController<V, C, P>::ProcessVariable
+	PIDController<V, C, P>::operator() (Input target, Input measured, Time dt) noexcept
 	{
 		return process (target, measured, dt);
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Control
-	PIDControl<V, C, P>::output() const noexcept
+	inline typename PIDController<V, C, P>::ProcessVariable
+	PIDController<V, C, P>::output() const noexcept
 	{
 		return _output;
 	}
 
 
 template<class V, class C, class P>
-	inline typename PIDControl<V, C, P>::Input
-	PIDControl<V, C, P>::error() const noexcept
+	inline typename PIDController<V, C, P>::Input
+	PIDController<V, C, P>::error() const noexcept
 	{
 		return _previous_error;
 	}
@@ -470,9 +474,9 @@ template<class V, class C, class P>
 
 template<class V, class C, class P>
 	inline void
-	PIDControl<V, C, P>::reset() noexcept
+	PIDController<V, C, P>::reset() noexcept
 	{
-		_output = Control();
+		_output = ProcessVariable();
 		_previous_error = Input();
 		_integral = Integral();
 		_derivative = Derivative();

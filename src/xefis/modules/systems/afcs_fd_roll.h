@@ -23,7 +23,7 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/pid_control.h>
+#include <xefis/support/control/pid_controller.h>
 #include <xefis/utility/range_smoother.h>
 
 // Local:
@@ -33,7 +33,7 @@
 class AFCS_FD_Roll_IO: public xf::ModuleIO
 {
   public:
-	using DirectionPID = xf::PIDControl<si::Angle, si::Angle>;
+	using DirectionPID = xf::PIDController<si::Angle, si::Angle>;
 
   public:
 	/*
@@ -107,7 +107,7 @@ class AFCS_FD_Roll: public xf::Module<AFCS_FD_Roll_IO>
 	 * Compute roll angle for given PID and measured values and parameters.
 	 */
 	std::optional<si::Angle>
-	compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
+	compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
 				  xf::PropertyIn<si::Angle> const& cmd_direction,
 				  xf::PropertyIn<si::Angle> const& measured_direction,
 				  si::Time update_dt) const;

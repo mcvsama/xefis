@@ -156,7 +156,7 @@ AFCS_FD_Roll::compute_roll()
 
 
 std::optional<si::Angle>
-AFCS_FD_Roll::compute_roll (xf::PIDControl<si::Angle, si::Angle>& pid,
+AFCS_FD_Roll::compute_roll (xf::PIDController<si::Angle, si::Angle>& pid,
 							xf::PropertyIn<si::Angle> const& cmd_direction,
 							xf::PropertyIn<si::Angle> const& measured_direction,
 							si::Time update_dt) const

@@ -346,6 +346,10 @@ XEFIS_HEADERS_MOC		+= xefis/support/bus/serial_port.h
 XEFIS_SOURCES			+= xefis/support/bus/i2c.cc
 XEFIS_SOURCES			+= xefis/support/bus/serial_port.cc
 
+######## /xefis/support/control ########
+
+XEFIS_HEADERS			+= xefis/support/control/pid_controller.h
+
 ######## /xefis/support/devices ########
 
 XEFIS_HEADERS			+= xefis/support/devices/chr_um6.h
@@ -486,7 +490,6 @@ XEFIS_HEADERS			+= xefis/utility/noncopyable.h
 XEFIS_HEADERS			+= xefis/utility/numeric.h
 XEFIS_HEADERS			+= xefis/utility/owner_token.h
 XEFIS_HEADERS			+= xefis/utility/packet_reader.h
-XEFIS_HEADERS			+= xefis/utility/pid_control.h
 XEFIS_HEADERS			+= xefis/utility/qdom.h
 XEFIS_HEADERS			+= xefis/utility/qdom_iterator.h
 XEFIS_HEADERS			+= xefis/utility/quadrature_decoder.h
