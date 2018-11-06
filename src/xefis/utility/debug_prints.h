@@ -24,25 +24,29 @@
 
 namespace xf::debug {
 
-template<class Value, std::size_t Size>
+template<class Value, std::size_t Size, class SourceFrame, class TargetFrame>
 	std::ostream&
-	operator<< (std::ostream& os, math::Vector<Value, Size> const& vector)
+	operator<< (std::ostream& os, math::Vector<Value, Size, SourceFrame, TargetFrame> const& vector)
 	{
+		auto const w = os.width();
+
 		for (std::size_t i = 0; i < Size; ++i)
-			os << std::setprecision (19) << si::quantity (vector[i]) << (i != Size - 1 ? " " : "");
+			os << std::setw (w) << vector[i] << (i != Size - 1 ? " " : "");
 
 		return os;
 	}
 
 
-template<class Value, std::size_t Columns, std::size_t Rows>
+template<class Value, std::size_t Columns, std::size_t Rows, class SourceFrame, class TargetFrame>
 	std::ostream&
-	operator<< (std::ostream& os, math::Matrix<Value, Columns, Rows> const& matrix)
+	operator<< (std::ostream& os, math::Matrix<Value, Columns, Rows, SourceFrame, TargetFrame> const& matrix)
 	{
+		auto const w = os.width();
+
 		for (std::size_t c = 0; c < Columns; ++c)
 		{
 			for (std::size_t r = 0; r < Rows; ++r)
-				os << std::setprecision (19) << si::quantity (matrix (c, r)) << (r < Rows - 1 ? " " : "");
+				os << std::setw (w) << matrix (c, r) << (r < Rows - 1 ? " " : "");
 
 			if (c < Columns - 1)
 				os << ", ";
