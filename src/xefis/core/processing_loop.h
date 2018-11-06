@@ -43,8 +43,8 @@ class ProcessingLoopIO: public ModuleIO
 	std::string const			_loop_name;
 
   public:
-	PropertyOut<si::Frequency>	actual_frequency	{ this, "/system/processing-loop/" + _loop_name + "/actual_frequency" };
-	PropertyOut<si::Time>		latency				{ this, "/system/processing-loop/" + _loop_name + "/latency" };
+	PropertyOut<si::Frequency>	actual_frequency	{ this, "actual_frequency" };
+	PropertyOut<si::Time>		latency				{ this, "latency" };
 
   public:
 	ProcessingLoopIO (std::string_view const& loop_name):
