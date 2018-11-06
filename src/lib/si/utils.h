@@ -15,6 +15,7 @@
 #define SI__UTILS_H__INCLUDED
 
 // Standard:
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -60,22 +61,22 @@ template<class Q>
 
 
 /**
- * Returns unchanged argument for non-Quantity types and Quantity::base_quantity()
+ * Returns unchanged argument for non-Quantity types and Quantity::base_value()
  * for Quantity types.
  */
 template<class Q,
 		 class = std::enable_if_t<is_quantity_v<Q>>>
 	constexpr typename Q::Value
-	base_quantity (Q value) noexcept;
+	base_value (Q value) noexcept;
 
 
 /**
- * Overload of base_quantity() for handling non-Quantity types.
+ * Overload of base_value() for handling non-Quantity types.
  */
 template<class T,
 		 class = std::enable_if_t<!is_quantity_v<T>>>
 	constexpr T
-	base_quantity (T value) noexcept;
+	base_value (T value) noexcept;
 
 
 /**
@@ -294,15 +295,15 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 
 template<class Q, class>
 	constexpr typename Q::Value
-	base_quantity (Q value) noexcept
+	base_value (Q value) noexcept
 	{
-		return value.base_quantity();
+		return value.base_value();
 	}
 
 
 template<class T, class>
 	constexpr T
-	base_quantity (T value) noexcept
+	base_value (T value) noexcept
 	{
 		return value;
 	}
@@ -367,9 +368,9 @@ template<class T, class>
 
 template<class Q, class>
 	constexpr typename Q::Value
-	quantity (Q value, DynamicUnit const& unit)
+	quantity (Q q, DynamicUnit const& unit)
 	{
-		return convert (Q::Unit::dynamic_unit(), value.quantity(), unit);
+		return convert (Q::Unit::dynamic_unit(), q.value(), unit);
 	}
 
 
@@ -386,7 +387,7 @@ template<class pUnit, class pValue>
 	to_blob (Quantity<pUnit, pValue> quantity)
 	{
 		std::vector<uint8_t> result (sizeof (pValue));
-		pValue copy = quantity.base_quantity();
+		pValue copy = quantity.base_value();
 		boost::endian::native_to_little (copy);
 		uint8_t const* begin = reinterpret_cast<uint8_t const*> (&copy);
 		uint8_t const* end = begin + sizeof (pValue);
@@ -400,7 +401,7 @@ template<class pUnit, class pValue>
 	inline std::string
 	to_string (Quantity<pUnit, pValue> quantity)
 	{
-		return std::to_string (quantity.quantity()) + " " + UnitTraits<pUnit>::symbol();
+		return std::to_string (quantity.value()) + " " + UnitTraits<pUnit>::symbol();
 	}
 
 
@@ -503,7 +504,10 @@ template<class pUnit, class pValue>
 	inline std::ostream&
 	operator<< (std::ostream& out, Quantity<pUnit, pValue> quantity)
 	{
-		return out << quantity.quantity() << " " << UnitTraits<pUnit>::symbol();
+		std::ptrdiff_t const additional_size = 1 + UnitTraits<pUnit>::symbol().size();
+		std::ptrdiff_t const w = out.width();
+
+		return out << std::setw (std::max<std::ptrdiff_t> (0, w - additional_size)) << quantity.value() << " " << UnitTraits<pUnit>::symbol();
 	}
 
 
@@ -511,7 +515,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	constexpr auto
 	abs (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
-		return Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> (std::abs (q.quantity()));
+		return Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> (std::abs (q.value()));
 	}
 
 
@@ -519,7 +523,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	constexpr auto
 	isinf (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
-		return std::isinf (q.quantity());
+		return std::isinf (q.value());
 	}
 
 
@@ -527,7 +531,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	constexpr auto
 	isnan (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
-		return std::isnan (q.quantity());
+		return std::isnan (q.value());
 	}
 
 
@@ -537,7 +541,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	{
 		typedef Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7>, Value> NormalizedQuantity;
 
-		auto value = std::sqrt (NormalizedQuantity (q).base_quantity());
+		auto value = std::sqrt (NormalizedQuantity (q).base_value());
 		return Quantity<Unit<E0 / 2, E1 / 2, E2 / 2, E3 / 2, E4 / 2, E5 / 2, E6 / 2, E7 / 2, S, std::ratio<0>>, Value> (value);
 	}
 
@@ -546,7 +550,7 @@ template<int E0, int E1, int E2, int E3, int E4, int E5, int E6, int E7, class S
 	constexpr bool
 	isfinite (Quantity<Unit<E0, E1, E2, E3, E4, E5, E6, E7, S, std::ratio<0>>, Value> q) noexcept
 	{
-		return std::isfinite (q.quantity());
+		return std::isfinite (q.value());
 	}
 
 

@@ -87,9 +87,9 @@ IMU_CPF::compute_centripetal()
 
 		auto acceleration = math::cross_product (vec_v, vec_w);
 
-		io.centripetal_acceleration_x = _smooth_accel_x (acceleration[0], dt);
-		io.centripetal_acceleration_y = _smooth_accel_y (acceleration[1], dt);
-		io.centripetal_acceleration_z = _smooth_accel_z (acceleration[2], dt);
+		io.centripetal_acceleration_x = _smooth_accel_x (si::convert (acceleration[0]), dt);
+		io.centripetal_acceleration_y = _smooth_accel_y (si::convert (acceleration[1]), dt);
+		io.centripetal_acceleration_z = _smooth_accel_z (si::convert (acceleration[2]), dt);
 
 		if (io.mass)
 		{

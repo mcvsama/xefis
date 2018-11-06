@@ -591,8 +591,8 @@ template<uint8_t B, class V>
 				{
 					typename Value::Value const value = _property
 						? _offset
-							? (*_property - *_offset).base_quantity()
-							: (*_property).base_quantity()
+							? (*_property - *_offset).base_value()
+							: (*_property).base_value()
 						: _fallback_value;
 
 					serialize<xf::float_for_width_t<kBytes>> (blob, value);

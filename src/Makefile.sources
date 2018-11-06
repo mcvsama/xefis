@@ -148,6 +148,7 @@ XEFIS_HEADERS			+= lib/si/si_config.h
 
 SI_HEADERS				+= lib/si/additional_quantities.h
 SI_HEADERS				+= lib/si/additional_units.h
+SI_HEADERS				+= lib/si/conversion.h
 SI_HEADERS				+= lib/si/exception.h
 SI_HEADERS				+= lib/si/lonlat.h
 SI_HEADERS				+= lib/si/quantity.h

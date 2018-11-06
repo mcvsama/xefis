@@ -632,7 +632,7 @@ template<class Unit>
 				{
 					for (si::DynamicUnit const& du: settings.preferred_units)
 						if (si::is_convertible (Unit::dynamic_unit(), du))
-							return (boost::format (settings.numeric_format) % si::convert (Unit::dynamic_unit(), property->quantity(), du)).str() + " " + du.symbol();
+							return (boost::format (settings.numeric_format) % si::convert (Unit::dynamic_unit(), property->value(), du)).str() + " " + du.symbol();
 
 					return (boost::format (settings.numeric_format) % *property).str();
 				}
@@ -658,7 +658,7 @@ template<class Unit>
 		to_floating_point (Property<si::Quantity<Unit>> const& property, PropertyConversionSettings const&)
 		{
 			if (property)
-				return static_cast<float128_t> (property->quantity());
+				return static_cast<float128_t> (property->value());
 			else
 				return std::nullopt;
 		}

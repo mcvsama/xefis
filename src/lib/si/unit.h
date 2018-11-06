@@ -135,9 +135,10 @@ template<
 		/**
 		 * Convert value from this unit to unit with scale=1 and offset=0.
 		 */
-		template<class Value>
+		template<class Value,
+				 class = std::enable_if_t<std::is_arithmetic_v<Value>>>
 			static constexpr Value
-			base_quantity (Value value) noexcept
+			base_value (Value value) noexcept
 			{
 				return value * to_floating_point<Scale, Value>() + to_floating_point<Offset, Value>();
 			}
@@ -673,59 +674,6 @@ is_convertible_with_angle (DynamicUnit const& source_unit, DynamicUnit const& ta
 		&& source_unit.e5() == target_unit.e5()
 		&& source_unit.e6() == target_unit.e6();
 }
-
-
-/**
- * Convert value 'source' expressed in SourceUnits to TargetUnits.
- */
-template<class SourceUnit, class TargetUnit, class Value,
-		 class = std::enable_if_t<is_convertible<SourceUnit, TargetUnit>() || is_convertible_with_angle<SourceUnit, TargetUnit>()>>
-	constexpr Value
-	convert (Value source_quantity)
-	{
-		if constexpr (is_convertible<SourceUnit, TargetUnit>())
-			return (SourceUnit::base_quantity (source_quantity) - to_floating_point<typename TargetUnit::Offset, Value>()) / to_floating_point<typename TargetUnit::Scale, Value>();
-		else if constexpr (is_convertible_with_angle<SourceUnit, TargetUnit>())
-		{
-			constexpr int other_angle_exp_diff = TargetUnit::AngleExponent - SourceUnit::AngleExponent;
-			// Conversion: cycles → radians (increasing AngleExponent) => return value * 2 * PI.
-			// Conversion: radians → cycles (decreasing AngleExponent) => return value / (2 * PI).
-			auto result = (SourceUnit::base_quantity (source_quantity) - to_floating_point<typename TargetUnit::Offset, Value>()) / to_floating_point<typename TargetUnit::Scale, Value>();
-
-			// Manual powering to ensure constexprness:
-			if (other_angle_exp_diff > 0)
-			{
-				for (int i = 0; i < other_angle_exp_diff; ++i)
-					result *= 2.0 * M_PI;
-			}
-			else if (other_angle_exp_diff < 0)
-			{
-				for (int i = 0; i > other_angle_exp_diff; --i)
-					result /= 2.0 * M_PI;
-			}
-
-			return result;
-		}
-	}
-
-
-/**
- * Convert value 'source' expressed in 'source_unit's to 'target_unit's.
- */
-template<class Value>
-	constexpr Value
-	convert (DynamicUnit const& source_unit, Value source_quantity, DynamicUnit const& target_unit)
-	{
-		// Assert that units are convertible (exponents vector the same):
-		if (source_unit.exponents() != target_unit.exponents())
-			throw IncompatibleTypes (source_unit, target_unit);
-
-		// TODO support AngleExponent-conversion
-
-		Value base_value = source_quantity * source_unit.scale().to_floating_point() + source_unit.offset().to_floating_point();
-		Value result = (base_value - target_unit.offset().to_floating_point()) / target_unit.scale().to_floating_point();
-		return result;
-	}
 
 } // namespace si
 

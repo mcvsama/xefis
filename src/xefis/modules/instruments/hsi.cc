@@ -2046,7 +2046,7 @@ HSI::process (xf::Cycle const& cycle)
 	params.track_lateral_rotation = io.track_lateral_rotation.get_optional();
 
 	if (params.track_lateral_rotation)
-		params.track_lateral_rotation = xf::clamped<si::AngularVelocity> (*params.track_lateral_rotation, -1_Hz, +1_Hz);
+		params.track_lateral_rotation = xf::clamped<si::AngularVelocity> (*params.track_lateral_rotation, si::convert (-1_Hz), si::convert (+1_Hz));
 
 	params.altitude_reach_distance = io.target_altitude_reach_distance.get_optional();
 	params.wind_from_magnetic_heading = io.wind_from_magnetic.get_optional();
