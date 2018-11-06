@@ -3057,7 +3057,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.speed_maximum_maneuver = io.speed_ias_maximum_maneuver.get_optional();
 	params.speed_maximum_visible = io.speed_ias_maximum.valid();
 	params.speed_maximum = io.speed_ias_maximum.value_or (0_kt);
-	params.speed_mach_visible = io.speed_mach && *io.speed_mach > io.show_mach_above;
+	params.speed_mach_visible = io.speed_mach && *io.speed_mach > *io.show_mach_above;
 	params.speed_mach = io.speed_mach.value_or (0.0);
 	params.speed_ground = io.speed_ground.get_optional();
 
