@@ -13,8 +13,8 @@ XEFIS_SOURCES			+= xefis/modules/comm/udp.cc
 
 SELFTEST_HEADERS_MOC	+= xefis/modules/comm/link.h
 
-SELFTEST_SOURCES		+= xefis/modules/comm/link.cc
 SELFTEST_SOURCES		+= xefis/modules/comm/tests/link.test.cc
+SELFTEST_SOURCES		+= xefis/modules/comm/link.cc
 
 ######## /xefis/modules/helpers ########
 
@@ -303,12 +303,12 @@ SELFTEST_HEADERS		+= xefis/core/module_io.h
 SELFTEST_HEADERS		+= xefis/core/property.h
 SELFTEST_HEADERS		+= xefis/core/property.tcc
 
+SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
+SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
 SELFTEST_SOURCES		+= xefis/core/logger.cc
 SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
 SELFTEST_SOURCES		+= xefis/core/property_observer.cc
-SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
-SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
 
 ######## /xefis/support ########
 
@@ -423,8 +423,8 @@ XEFIS_HEADERS			+= xefis/support/system/work_performer.h
 
 XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
 
-SELFTEST_SOURCES		+= xefis/support/system/work_performer.cc
 SELFTEST_SOURCES		+= xefis/support/system/tests/work_performer.test.cc
+SELFTEST_SOURCES		+= xefis/support/system/work_performer.cc
 
 ######## /xefis/support/ui/widgets ########
 
@@ -525,13 +525,13 @@ XEFIS_SOURCES			+= xefis/utility/qutils.cc
 XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
 XEFIS_SOURCES			+= xefis/utility/thread.cc
 
-SELFTEST_SOURCES		+= xefis/utility/thread.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/blob.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/field.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/quadrature_decoder.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/tracker.test.cc
+SELFTEST_SOURCES		+= xefis/utility/thread.cc
 
 ################
 
