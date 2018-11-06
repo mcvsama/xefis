@@ -44,7 +44,7 @@ template<class Value, class DistinguisherType>
 		// Ctor
 		template<class = std::enable_if_t<std::is_default_constructible_v<Value>>>
 			constexpr
-			StrongType()
+			StrongType() noexcept (noexcept (Value{}))
 			{ }
 
 		// Ctor
