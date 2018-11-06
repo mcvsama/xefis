@@ -27,6 +27,7 @@
 #include <xefis/support/instrument/instrument_support.h>
 
 
+// TODO handle nans
 class GearIO: public xf::ModuleIO
 {
   public:

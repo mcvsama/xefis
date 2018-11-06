@@ -25,6 +25,7 @@
 
 namespace xf {
 
+// TODO test and use this?
 Panel::Panel (QWidget* parent, Graphics const& graphics):
 	QWidget (parent)
 {

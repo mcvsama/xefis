@@ -25,6 +25,7 @@
 #include <xefis/support/instrument/instrument_support.h>
 
 
+// TODO handle nans
 class DebugForcesIO: public xf::ModuleIO
 {
   public:

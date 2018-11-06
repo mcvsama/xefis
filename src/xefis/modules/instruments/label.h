@@ -27,6 +27,7 @@
 #include <xefis/utility/types.h>
 
 
+// TODO handle nans
 class LabelIO: public xf::ModuleIO
 {
   public:

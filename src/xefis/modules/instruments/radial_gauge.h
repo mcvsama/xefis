@@ -32,6 +32,7 @@
 #include "basic_gauge.h"
 
 
+// TODO handle nans
 template<class Value>
 	class RadialGaugeIO: public BasicGaugeIO<Value>
 	{

@@ -32,6 +32,7 @@
 #include <xefis/core/instrument_aids.h>
 
 
+// TODO handle nans
 class CDU:
 	public xf::Instrument<>,
 	protected xf::InstrumentAids

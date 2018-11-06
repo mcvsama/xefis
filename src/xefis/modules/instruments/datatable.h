@@ -34,6 +34,7 @@
 #include <xefis/utility/synchronized.h>
 
 
+// TODO handle nans
 class Datatable:
 	public xf::Instrument<xf::ModuleIO>,
 	private xf::InstrumentSupport

@@ -58,6 +58,8 @@ ScreenWidget::ScreenWidget (Screen& screen, QWidget* parent):
 void
 ScreenWidget::refresh()
 {
+	using Milliseconds = si::Quantity<si::Millisecond>;
+
 	// TODO multiple painting threads
 }
 

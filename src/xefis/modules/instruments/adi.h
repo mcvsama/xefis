@@ -35,6 +35,7 @@
 #include <xefis/utility/synchronized.h>
 
 
+// TODO handle nans
 class ADI_IO: public xf::ModuleIO
 {
   public:

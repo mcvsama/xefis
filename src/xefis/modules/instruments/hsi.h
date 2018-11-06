@@ -33,6 +33,7 @@
 #include <xefis/utility/temporal.h>
 
 
+// TODO handle nans
 namespace hsi {
 
 enum class DisplayMode

@@ -27,6 +27,7 @@
 #include <xefis/support/instrument/instrument_support.h>
 
 
+// TODO handle nans
 class HorizontalTrimIO: public xf::ModuleIO
 {
   public:

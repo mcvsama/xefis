@@ -27,6 +27,7 @@
 #include <xefis/support/instrument/instrument_support.h>
 
 
+// TODO handle nans
 class VerticalTrimIO: public xf::ModuleIO
 {
   public:

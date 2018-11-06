@@ -27,6 +27,7 @@
 #include "accounting.h"
 
 
+// TODO candidate for removal
 namespace xf {
 
 Accounting::Stats::Stats (LatencySamples::size_type samples):
