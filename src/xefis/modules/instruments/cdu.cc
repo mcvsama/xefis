@@ -711,7 +711,7 @@ CDU::Page::handle_mouse_move (QMouseEvent* event)
 	Strip* old_focused_strip = _focused_strip;
 	_focused_strip = nullptr;
 
-	for (auto& strip: _strips)
+	for (auto const& strip: _strips)
 	{
 		if (strip->rect().contains (event->pos()))
 		{
@@ -831,7 +831,7 @@ CDU::Config::Config (CDU& cdu, QDomElement const& pages_element, xf::Logger cons
 bool
 CDU::Config::scan_properties() const noexcept
 {
-	for (auto page: _pages_by_id)
+	for (auto const& page: _pages_by_id)
 		if (page.second->scan_properties())
 			return true;
 	return false;
@@ -875,7 +875,7 @@ void
 CDU::Config::check_reachability() const
 {
 	std::set<Page*> all_pages;
-	for (auto pit: _pages_by_id)
+	for (auto const& pit: _pages_by_id)
 		all_pages.insert (pit.second.get());
 
 	std::function<void (Page*)> traverse = [&] (Page* page)
@@ -903,7 +903,7 @@ CDU::Config::check_reachability() const
 		if (!all_pages.empty())
 		{
 			QStringList pages;
-			for (auto& page: all_pages)
+			for (auto const& page: all_pages)
 				pages.push_back (page->id());
 			_logger << "Warning: the following pages are not reachable from the main page: " << pages.join (", ").toStdString() << "." << std::endl;
 		}

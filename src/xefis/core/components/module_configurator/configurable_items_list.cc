@@ -102,7 +102,7 @@ void
 ConfigurableItemsList::read()
 {
 	// Processing loops:
-	for (auto p: _tmp_processing_loop_ptrs)
+	for (auto* p: _tmp_processing_loop_ptrs)
 		new ProcessingLoopItem (*p, *_list);
 
 	_tmp_processing_loop_ptrs.clear();
@@ -118,7 +118,7 @@ ConfigurableItemsList::read()
 	});
 
 	// Add new processing loops:
-	for (auto p: _tmp_processing_loop_ptrs)
+	for (auto* p: _tmp_processing_loop_ptrs)
 		new ProcessingLoopItem (*p, *_list);
 
 	// Screens:

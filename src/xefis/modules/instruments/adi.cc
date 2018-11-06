@@ -568,7 +568,7 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 		// FPA bug:
 		if (pr.params.cmd_fpa)
 		{
-			for (auto pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
+			for (auto const& pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
 			{
 				Angle fpa = *pr.params.cmd_fpa;
 				pr.painter.setPen (pen);
@@ -1252,7 +1252,7 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		pr.painter.setTransform (_transform);
 		pr.painter.setFont (speed_bug_font);
 
-		for (auto& bug: pr.params.speed_bugs)
+		for (auto const& bug: pr.params.speed_bugs)
 		{
 			if (bug.second > _min_shown && bug.second < _max_shown)
 			{
@@ -2047,7 +2047,7 @@ AltitudeLadder::paint_vertical_ap_setting (AdiPaintRequest& pr, float const x) c
 
 		float const posy = -8.f * x * scale_vertical_speed (*pr.params.cmd_vertical_speed);
 
-		for (auto pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
+		for (auto const& pen: { pr.aids.autopilot_pen_1, pr.aids.autopilot_pen_2 })
 		{
 			pr.painter.setPen (pen);
 
@@ -2410,8 +2410,8 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 	pr.painter.setClipping (false);
 	pr.painter.setTransform (pr.precomputed.center_transform);
 
-	for (auto pen: { pr.aids.get_pen (pr.aids.autopilot_pen_1.color(), 2.3f),
-					 pr.aids.get_pen (pr.aids.autopilot_pen_2.color(), 1.65f) })
+	for (auto const& pen: { pr.aids.get_pen (pr.aids.autopilot_pen_1.color(), 2.3f),
+							pr.aids.get_pen (pr.aids.autopilot_pen_2.color(), 1.65f) })
 	{
 		pr.painter.setPen (pen);
 
@@ -2459,8 +2459,8 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 			QPointF (pr.heading_to_px (-range) + z, pr.pitch_to_px (-range))
 		});
 
-		for (auto pen: { pr.aids.get_pen (pr.aids.kNavigationColor.darker (300), 2.25f),
-						 pr.aids.get_pen (pr.aids.kNavigationColor, 1.25f) })
+		for (auto const& pen: { pr.aids.get_pen (pr.aids.kNavigationColor.darker (300), 2.25f),
+								pr.aids.get_pen (pr.aids.kNavigationColor, 1.25f) })
 		{
 			pr.painter.setPen (pen);
 			pr.painter.drawPolyline (corner);
@@ -2474,8 +2474,8 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 		}
 
 		// Pointer:
-		for (auto pen: { pr.aids.get_pen (pr.aids.kNavigationColor.darker (300), 2.5f),
-						 pr.aids.get_pen (pr.aids.kNavigationColor, 1.5f) })
+		for (auto const& pen: { pr.aids.get_pen (pr.aids.kNavigationColor.darker (300), 2.5f),
+								pr.aids.get_pen (pr.aids.kNavigationColor, 1.5f) })
 		{
 			pr.painter.setPen (pen);
 			pr.painter.drawLine (QPointF (xpos, ypos - w), QPointF (xpos, ypos + w));
@@ -2782,7 +2782,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 
 		pr.painter.setBrush (Qt::NoBrush);
 		for (auto pen: { QPen (pr.aids.kNavigationColor.darker (400), pr.aids.pen_width (2.f)),
-						 QPen (pr.aids.kNavigationColor, pr.aids.pen_width (1.33f)) })
+								QPen (pr.aids.kNavigationColor, pr.aids.pen_width (1.33f)) })
 		{
 			pen.setCapStyle (Qt::RoundCap);
 			pr.painter.setPen (pen);

@@ -130,7 +130,7 @@ XBee::process (xf::Cycle const&)
 			_output_buffer.clear();
 			_output_buffer += front;
 
-			for (auto s: packets)
+			for (auto const& s: packets)
 				_output_buffer += s;
 		};
 

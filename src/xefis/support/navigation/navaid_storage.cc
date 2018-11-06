@@ -372,9 +372,9 @@ NavaidStorage::parse_apt_dat()
 			// Compute position:
 			LonLat min_position = runways[0].pos_1();
 			LonLat max_position = min_position;
-			for (auto rwy: runways)
+			for (auto const& rwy: runways)
 			{
-				for (auto point: { rwy.pos_1(), rwy.pos_2() })
+				for (auto const& point: { rwy.pos_1(), rwy.pos_2() })
 				{
 					min_position.lon() = std::min (min_position.lon(), point.lon());
 					min_position.lat() = std::min (min_position.lat(), point.lat());
