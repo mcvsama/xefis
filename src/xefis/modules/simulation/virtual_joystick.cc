@@ -48,6 +48,8 @@ struct MouseControl
 
 class VirtualJoystickWidget: public xf::Widget
 {
+	static constexpr float kMarginEm = 0.5;
+
   public:
 	// Ctor
 	explicit
@@ -84,6 +86,8 @@ class VirtualJoystickWidget: public xf::Widget
 
 class VirtualThrottleWidget: public xf::Widget
 {
+	static constexpr float kMarginEm = 0.5;
+
   public:
 	// Ctor
 	explicit
@@ -141,7 +145,8 @@ VirtualJoystickWidget::position() const noexcept
 		using std::abs;
 		using xf::sgn;
 
-		auto const size = std::min (width(), height());
+		auto const m2 = 2 * em_pixels (kMarginEm);
+		auto const size = std::min (width() - m2, height() - m2);
 		auto const pos = _control->delta() / (0.5 * size);
 
 		if (abs (pos.x()) > 1.0 || abs (pos.y()) > 1.0)
@@ -165,7 +170,7 @@ VirtualJoystickWidget::position() const noexcept
 void
 VirtualJoystickWidget::paintEvent (QPaintEvent*)
 {
-	auto const m = em_pixels (0.5);
+	auto const m = em_pixels (kMarginEm);
 	QRectF r = rect().marginsRemoved (QMargins (m, m, m, m));
 
 	if (r.width() < r.height())
@@ -281,7 +286,7 @@ VirtualThrottleWidget::throttle() const noexcept
 void
 VirtualThrottleWidget::paintEvent (QPaintEvent*)
 {
-	auto const m = em_pixels (0.5);
+	auto const m = em_pixels (kMarginEm);
 	QRectF r = rect().marginsRemoved (QMargins (m, m, m, m));
 
 	QPainter painter (this);
