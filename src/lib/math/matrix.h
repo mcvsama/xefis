@@ -17,7 +17,6 @@
 // Standard:
 #include <algorithm>
 #include <array>
-#include <initializer_list>
 #include <type_traits>
 #include <utility>
 #include <functional>
@@ -76,7 +75,7 @@ class OutOfRange: public std::out_of_range
  * \param	pScalar
  *			Algebraic value type, probably a double or something.
  */
-template<class pScalar, std::size_t pColumns, std::size_t pRows>
+template<class pScalar, std::size_t pColumns, std::size_t pRows, class pTargetFrame = void, class pSourceFrame = pTargetFrame>
 	class Matrix
 	{
 	  public:
@@ -85,9 +84,11 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 
 		using Scalar			= pScalar;
 		using InversedScalar	= decltype (1.0 / std::declval<pScalar>());
-		using ColumnVector		= Matrix<Scalar, 1, pRows>;
-		using InversedMatrix	= Matrix<InversedScalar, pColumns, pRows>;
-		using TransposedMatrix	= Matrix<Scalar, pRows, pColumns>;
+		using ColumnVector		= Matrix<Scalar, 1, pRows, pTargetFrame, void>;
+		using InversedMatrix	= Matrix<InversedScalar, pColumns, pRows, pSourceFrame, pTargetFrame>;
+		using TransposedMatrix	= Matrix<Scalar, pRows, pColumns, pSourceFrame, pTargetFrame>;
+		using TargetFrame		= pTargetFrame;
+		using SourceFrame		= pSourceFrame;
 
 	  public:
 		[[nodiscard]]
@@ -124,12 +125,12 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		Matrix (UninitializedMatrixType) noexcept;
 
 		// Ctor. Initializes from scalar. Only for 1x1 matrices.
-		constexpr
-		Matrix (Scalar) noexcept;
-
-		// Ctor. Initializes from scalars initializer list.
-		constexpr
-		Matrix (std::initializer_list<Scalar> values) noexcept;
+		template<class T>
+			requires (is_scalar() && std::is_convertible_v<T, Scalar>)
+			constexpr
+			Matrix (T scalar) noexcept:
+				_data ({ scalar })
+			{ }
 
 		// Ctor. Initializes from std::array.
 		constexpr
@@ -138,6 +139,17 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		// Ctor. Initializes columns from series of vectors.
 		constexpr
 		Matrix (std::array<ColumnVector, kColumns> vectors) noexcept;
+
+		// Ctor. Initializes from scalars list.
+		template<class ...Ts>
+			requires (std::is_convertible_v<Ts, Scalar> && ...)
+			constexpr
+			Matrix (Ts&& ...initial_values) noexcept
+			{
+				static_assert (sizeof...(Ts) == kRows * kColumns, "Invalid number of arguments");
+
+				recursive_initialize (0, std::forward<Ts> (initial_values)...);
+			}
 
 		// Copy operator
 		constexpr Matrix&
@@ -162,18 +174,20 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		operator!= (Matrix const&) const noexcept (noexcept (Scalar{} != Scalar{}));
 
 		/**
-		 * Return pointer to the data stored in the matrix, row by row.
+		 * Array of data.
 		 */
 		[[nodiscard]]
-		constexpr Scalar*
-		data() noexcept;
+		constexpr std::array<Scalar, kColumns * kRows>&
+		array() noexcept
+			{ return _data; }
 
 		/**
-		 * Return pointer to the data stored in the matrix, row by row.
+		 * Array of data.
 		 */
 		[[nodiscard]]
-		constexpr Scalar const*
-		data() const noexcept;
+		constexpr std::array<Scalar, kColumns * kRows> const&
+		array() const noexcept
+			{ return _data; }
 
 		/**
 		 * If size is 1x1, then it should be convertible to scalar.
@@ -229,7 +243,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		 * Return given column as a vector.
 		 */
 		[[nodiscard]]
-		constexpr Matrix<Scalar, 1, kRows>
+		constexpr ColumnVector
 		column (std::size_t index) const noexcept;
 
 		/**
@@ -266,100 +280,44 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows>
 		constexpr Matrix&
 		operator-= (Matrix const&) noexcept (noexcept (Scalar{} - Scalar{}));
 
+#if 0
 		/**
 		 * Multiply this matrix by a scalar.
 		 */
-		constexpr Matrix&
-		operator*= (Scalar const&) noexcept (noexcept (Scalar{} * Scalar{}));
+		template<class DimensionlessScalar>
+			constexpr Matrix&
+			operator*= (DimensionlessScalar const&) noexcept (noexcept (Scalar{} * Scalar{}));
 
 		/**
 		 * Multiply this matrix by another matrix.
 		 */
-		constexpr Matrix&
-		operator*= (Matrix const&) noexcept (noexcept (Scalar{} * Scalar{}));
+		template<class DimensionlessScalar>
+			constexpr Matrix&
+			operator*= (Matrix const&) noexcept (noexcept (Scalar{} * Scalar{}));
+#endif
+
+	  private:
+		template<class ...Ts>
+			void
+			recursive_initialize (std::size_t first_position, Scalar const& first, Ts&& ...rest) noexcept
+			{
+				_data[first_position] = first;
+
+				if constexpr (sizeof...(rest) > 0)
+					recursive_initialize (first_position + 1, std::forward<Ts> (rest)...);
+			}
 
 	  private:
 		std::array<Scalar, kColumns * kRows> _data;
 	};
 
 
-template<class S, std::size_t N>
-	using Vector = Matrix<S, 1, N>;
+template<class S, std::size_t N, class TF = void, class SF = void>
+	using Vector = Matrix<S, 1, N, TF, SF>;
 
 
-template<class S, std::size_t N>
-	using SquareMatrix = Matrix<S, N, N>;
-
-
-/*
- * Free functions
- */
-
-
-template<class S, std::size_t C, std::size_t R>
-	inline typename Matrix<S, C, R>::InversedMatrix
-	gauss_inverse (Matrix<S, C, R> source)
-	{
-		static_assert (source.is_square(), "Matrix needs to be square");
-
-		using InversedMatrix = typename Matrix<S, C, R>::InversedMatrix;
-
-		InversedMatrix result = InversedMatrix (unit);
-
-		// Make matrix triangular (with 0s under the diagonal and 1s
-		// on the diagonal).
-		for (std::size_t result_r = 0; result_r < source.kRows; ++result_r)
-		{
-			// Make coefficient at (result_r, result_r) == 1.0,
-			// divide row at (result_r) by its diagonal coefficient:
-			auto divider = source (result_r, result_r) / S (1);
-
-			if (divider == 0.0)
-				throw NotInversible();
-
-			for (std::size_t c = 0; c < source.kColumns; ++c)
-			{
-				source (c, result_r) /= divider;
-				// Mirror operation on result:
-				result (c, result_r) /= divider;
-			}
-
-			// Make the column at (result_r, (result_r + 1)...) == 0.0:
-			for (std::size_t r = result_r + 1; r < source.kRows; ++r)
-			{
-				// Zeroing element at column result_r in row r,
-				// subtract k * row[result_r] from row r, where
-				// k = at (result_r, r):
-				auto k = source (result_r, r) / S (1);
-
-				for (std::size_t c = 0; c < source.kColumns; ++c)
-				{
-					source (c, r) -= k * source (c, result_r);
-					// Mirror:
-					result (c, r) -= k * result (c, result_r);
-				}
-			}
-		}
-
-		// Use diagonal 1s multiplied by k (to be found) to reduce elements
-		// of previous row to 0 (except the diagonal 1 on that row).
-		for (std::size_t result_r = 0; result_r < source.kRows - 1; ++result_r)
-		{
-			for (std::size_t result_c = result_r + 1; result_c < source.kColumns; ++result_c)
-			{
-				auto k = source (result_c, result_r) / S (1);
-				// We want element at (result_c, result_r) to be 0.
-				for (std::size_t c = 0; c < source.kColumns; ++c)
-				{
-					source (c, result_r) -= k * source (c, result_c);
-					// Mirror operation on result:
-					result (c, result_r) -= k * result (c, result_c);
-				}
-			}
-		}
-
-		return result;
-	}
+template<class S, std::size_t N, class TF = void, class SF = void>
+	using SquareMatrix = Matrix<S, N, N, TF, SF>;
 
 
 /*
@@ -367,203 +325,171 @@ template<class S, std::size_t C, std::size_t R>
  */
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix() noexcept:
+	Matrix<S, C, R, TF, SF>::Matrix() noexcept:
 		Matrix (zero)
 	{ }
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (Matrix const& other) noexcept:
+	Matrix<S, C, R, TF, SF>::Matrix (Matrix const& other) noexcept:
 		_data (other._data)
 	{ }
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (ZeroMatrixType) noexcept
+	Matrix<S, C, R, TF, SF>::Matrix (ZeroMatrixType) noexcept
 	{
 		_data.fill (Scalar());
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (UnitaryMatrixType) noexcept:
+	Matrix<S, C, R, TF, SF>::Matrix (UnitaryMatrixType) noexcept:
 		Matrix (zero)
 	{
-		static_assert (is_square(), "Matrix needs to be square");
+		static_assert (is_square(), "Matrix has to be square");
 
 		for (std::size_t i = 0; i < std::min (kColumns, kRows); ++i)
 			(*this)(i, i) = S (1);
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (std::initializer_list<Scalar> initial_values) noexcept
-	{
-		std::copy (initial_values.begin(), initial_values.end(), _data.begin());
-	}
+	Matrix<S, C, R, TF, SF>::Matrix (UninitializedMatrixType) noexcept
+	{ }
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (std::array<Scalar, kColumns * kRows> initial_values) noexcept
+	Matrix<S, C, R, TF, SF>::Matrix (std::array<Scalar, kColumns * kRows> initial_values) noexcept
 	{
 		_data = initial_values;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr
-	Matrix<S, C, R>::Matrix (std::array<ColumnVector, kColumns> vectors) noexcept
+	Matrix<S, C, R, TF, SF>::Matrix (std::array<ColumnVector, kColumns> vectors) noexcept
 	{
-		for (std::size_t c = 0; c < kColumns; ++c)
-			for (std::size_t r = 0; r < kRows; ++r)
+		for (std::size_t r = 0; r < kRows; ++r)
+			for (std::size_t c = 0; c < kColumns; ++c)
 				at (c, r) = vectors[c][r];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr
-	Matrix<S, C, R>::Matrix (UninitializedMatrixType) noexcept
-	{ }
-
-
-template<class S, std::size_t C, std::size_t R>
-	constexpr
-	Matrix<S, C, R>::Matrix (Scalar scalar) noexcept:
-		_data ({ scalar })
-	{
-		static_assert (is_scalar(), "must be a scalar (1x1 matrix) to use scalar constructor");
-	}
-
-
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr bool
-	Matrix<S, C, R>::operator== (Matrix const& other) const noexcept (noexcept (Scalar{} == Scalar{}))
+	Matrix<S, C, R, TF, SF>::operator== (Matrix const& other) const noexcept (noexcept (Scalar{} == Scalar{}))
 	{
 		return _data == other._data;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr bool
-	Matrix<S, C, R>::operator!= (Matrix const& other) const noexcept (noexcept (Scalar{} != Scalar{}))
+	Matrix<S, C, R, TF, SF>::operator!= (Matrix const& other) const noexcept (noexcept (Scalar{} != Scalar{}))
 	{
 		return _data != other._data;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr auto
-	Matrix<S, C, R>::data() noexcept -> Scalar*
-	{
-		return _data.data();
-	}
-
-
-template<class S, std::size_t C, std::size_t R>
-	constexpr auto
-	Matrix<S, C, R>::data() const noexcept -> Scalar const*
-	{
-		return _data.data();
-	}
-
-
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	template<class>
 		constexpr
-		Matrix<S, C, R>::operator Scalar() const noexcept
+		Matrix<S, C, R, TF, SF>::operator Scalar() const noexcept
 		{
 			return at (0, 0);
 		}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	inline auto
-	Matrix<S, C, R>::at (std::size_t column, std::size_t row) -> Scalar&
+	Matrix<S, C, R, TF, SF>::at (std::size_t column, std::size_t row) -> Scalar&
 	{
 		if (column >= kColumns || row >= kRows)
 			throw OutOfRange (column, row);
+
 		return _data[row * kColumns + column];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	inline auto
-	Matrix<S, C, R>::at (std::size_t column, std::size_t row) const -> Scalar const&
+	Matrix<S, C, R, TF, SF>::at (std::size_t column, std::size_t row) const -> Scalar const&
 	{
 		return const_cast<Matrix&> (*this).at (column, row);
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::operator() (std::size_t column, std::size_t row) noexcept -> Scalar&
+	Matrix<S, C, R, TF, SF>::operator() (std::size_t column, std::size_t row) noexcept -> Scalar&
 	{
 		return _data[row * kColumns + column];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::operator() (std::size_t column, std::size_t row) const noexcept -> Scalar const&
+	Matrix<S, C, R, TF, SF>::operator() (std::size_t column, std::size_t row) const noexcept -> Scalar const&
 	{
 		return _data[row * kColumns + column];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::operator[] (std::size_t index) noexcept -> Scalar&
+	Matrix<S, C, R, TF, SF>::operator[] (std::size_t index) noexcept -> Scalar&
 	{
 		static_assert (is_vector(), "must be a vector to use []");
 		return _data[index];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::operator[] (std::size_t index) const noexcept -> Scalar const&
+	Matrix<S, C, R, TF, SF>::operator[] (std::size_t index) const noexcept -> Scalar const&
 	{
 		static_assert (is_vector(), "must be a vector to use []");
 		return _data[index];
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr bool
-	Matrix<S, C, R>::is_scalar()
+	Matrix<S, C, R, TF, SF>::is_scalar()
 	{
 		return kColumns == 1 && kRows == 1;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr bool
-	Matrix<S, C, R>::is_vector()
+	Matrix<S, C, R, TF, SF>::is_vector()
 	{
 		return kColumns == 1;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr bool
-	Matrix<S, C, R>::is_square()
+	Matrix<S, C, R, TF, SF>::is_square()
 	{
 		return kColumns == kRows;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::column (std::size_t index) const noexcept -> Matrix<Scalar, 1, kRows>
+	Matrix<S, C, R, TF, SF>::column (std::size_t index) const noexcept -> ColumnVector
 	{
-		Matrix<S, 1, R> result;
+		ColumnVector result;
 
 		for (std::size_t r = 0; r < kRows; ++r)
 			result[r] = at (index, r);
@@ -572,33 +498,66 @@ template<class S, std::size_t C, std::size_t R>
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::inversed() const -> InversedMatrix
+	Matrix<S, C, R, TF, SF>::inversed() const -> InversedMatrix
 	{
 		static_assert (is_square(), "Matrix needs to be square");
+		static_assert (kColumns <= 3, "Inversion of rank > 3 is not implemented.\n");
 
 		if constexpr (is_scalar())
 		{
 			return { 1.0 / (*this)(0, 0) };
 		}
-		else if constexpr (C == 2)
+		else if constexpr (kColumns == 2)
 		{
 			auto const& self = *this;
-			auto scaler = 1.0 / (self (0, 0) * self (1, 1) - self (1, 0) * self (0, 1));
-			return { { scaler * self (1, 1), scaler * -self (1, 0),
-					   scaler * -self (0, 1), scaler * self (0, 0) } };
+			auto const det = (self (0, 0) * self (1, 1) - self (1, 0) * self (0, 1));
+			auto const scaler = 1.0 / det;
+
+			return InversedMatrix {
+				scaler * +self (1, 1), scaler * -self (1, 0),
+				scaler * -self (0, 1), scaler * +self (0, 0),
+			};
 		}
-		else
-			return gauss_inverse (*this);
+		else if constexpr (kColumns == 3)
+		{
+			auto const& self = *this;
+			auto const a = self (0, 0);
+			auto const b = self (1, 0);
+			auto const c = self (2, 0);
+			auto const d = self (0, 1);
+			auto const e = self (1, 1);
+			auto const f = self (2, 1);
+			auto const g = self (0, 2);
+			auto const h = self (1, 2);
+			auto const i = self (2, 2);
+			auto const kA = +(e * i - f * h);
+			auto const kB = -(d * i - f * g);
+			auto const kC = +(d * h - e * g);
+			auto const kD = -(b * i - c * h);
+			auto const kE = +(a * i - c * g);
+			auto const kF = -(a * h - b * g);
+			auto const kG = +(b * f - c * e);
+			auto const kH = -(a * f - c * d);
+			auto const kI = +(a * e - b * d);
+			auto const det = a * kA + b * kB + c * kC;
+			auto const scaler = 1.0 / det;
+
+			return InversedMatrix {
+				scaler * kA, scaler * kD, scaler * kG,
+				scaler * kB, scaler * kE, scaler * kH,
+				scaler * kC, scaler * kF, scaler * kI,
+			};
+		}
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::transposed() const noexcept -> TransposedMatrix
+	Matrix<S, C, R, TF, SF>::transposed() const noexcept -> TransposedMatrix
 	{
-		Matrix<Scalar, kRows, kColumns> result;
+		Matrix<Scalar, kRows, kColumns, SF, TF> result;
 
 		for (std::size_t r = 0; r < kRows; ++r)
 			for (std::size_t c = 0; c < kColumns; ++c)
@@ -608,59 +567,62 @@ template<class S, std::size_t C, std::size_t R>
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
 	constexpr auto
-	Matrix<S, C, R>::operator~() const noexcept -> TransposedMatrix
+	Matrix<S, C, R, TF, SF>::operator~() const noexcept -> TransposedMatrix
 	{
 		return transposed();
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr Matrix<S, C, R>&
-	Matrix<S, C, R>::operator= (Matrix const& other) noexcept (std::is_copy_assignable_v<Scalar>)
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, TF, SF>&
+	Matrix<S, C, R, TF, SF>::operator= (Matrix const& other) noexcept (std::is_copy_assignable_v<Scalar>)
 	{
 		std::copy (other._data.begin(), other._data.end(), _data.begin());
 		return *this;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr Matrix<S, C, R>&
-	Matrix<S, C, R>::operator+= (Matrix const& other) noexcept (noexcept (Scalar{} + Scalar{}))
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, TF, SF>&
+	Matrix<S, C, R, TF, SF>::operator+= (Matrix const& other) noexcept (noexcept (Scalar{} + Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), other._data.begin(), _data.begin(), std::plus<Scalar>());
 		return *this;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr Matrix<S, C, R>&
-	Matrix<S, C, R>::operator-= (Matrix const& other) noexcept (noexcept (Scalar{} - Scalar{}))
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, TF, SF>&
+	Matrix<S, C, R, TF, SF>::operator-= (Matrix const& other) noexcept (noexcept (Scalar{} - Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), other._data.begin(), _data.begin(), std::minus<Scalar>());
 		return *this;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr Matrix<S, C, R>&
-	Matrix<S, C, R>::operator*= (Scalar const& scalar) noexcept (noexcept (Scalar{} * Scalar{}))
+// TODO
+#if 0
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, TF, SF>&
+	Matrix<S, C, R, TF, SF>::operator*= (Scalar const& scalar) noexcept (noexcept (Scalar{} * Scalar{}))
 	{
 		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind (std::multiplies<Scalar>(), scalar, std::placeholders::_1));
 		return *this;
 	}
 
 
-template<class S, std::size_t C, std::size_t R>
-	constexpr Matrix<S, C, R>&
-	Matrix<S, C, R>::operator*= (Matrix const& other) noexcept (noexcept (Scalar{} * Scalar{}))
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, TF, SF>&
+	Matrix<S, C, R, TF, SF>::operator*= (Matrix const& other) noexcept (noexcept (Scalar{} * Scalar{}))
 	{
 		static_assert (is_square(), "Matrix needs to be square");
 
 		// Use global operator*():
 		return *this = *this * other;
 	}
+#endif
 
 } // namespace math
 

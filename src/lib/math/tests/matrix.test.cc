@@ -38,6 +38,10 @@ using namespace test_asserts;
 // TODO si::Angle * Vector<si::Frequency>
 // TODO Vector<si::Frequency> * si::Angle
 
+// TODO Frames of reference: M<z, x>    <- M<z, y> * M<y, x>
+// TODO Frames of reference: M<b, void> <- M<b, a> * M<a, void>
+// TODO Frames of reference: M<b, a>    <- M<b, b> * M<b, a>
+
 } // namespace test
 } // namespace xf
 
