@@ -104,6 +104,12 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows, class pTargetFr
 		using TargetFrame		= pTargetFrame;
 		using SourceFrame		= pSourceFrame;
 
+		template<std::size_t NewColumns, std::size_t NewRows>
+			using Resized		= Matrix<Scalar, NewColumns, NewRows, pTargetFrame, pSourceFrame>;
+
+		template<class NewScalar>
+			using Retyped		= Matrix<NewScalar, pColumns, pRows, pTargetFrame, pSourceFrame>;
+
 	  public:
 		[[nodiscard]]
 		static constexpr bool
@@ -317,21 +323,33 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows, class pTargetFr
 		constexpr Matrix&
 		operator-= (Matrix const&) noexcept (noexcept (Scalar{} - Scalar{}));
 
-#if 0
 		/**
 		 * Multiply this matrix by a scalar.
 		 */
-		template<class DimensionlessScalar>
+		template<class OtherScalar>
+			requires (sizeof (Scalar{} *= OtherScalar{}) > 0)
 			constexpr Matrix&
-			operator*= (DimensionlessScalar const&) noexcept (noexcept (Scalar{} * Scalar{}));
+			operator*= (OtherScalar const& scalar) noexcept (noexcept (Scalar{} *= OtherScalar{}))
+			{
+				for (auto& d: _data)
+					d *= scalar;
+
+				return *this;
+			}
 
 		/**
 		 * Multiply this matrix by another matrix.
 		 */
-		template<class DimensionlessScalar>
+		template<class OtherScalar>
+			requires (sizeof (Scalar{} *= OtherScalar{}) > 0)
 			constexpr Matrix&
-			operator*= (Matrix const&) noexcept (noexcept (Scalar{} * Scalar{}));
-#endif
+			operator*= (Retyped<OtherScalar> const& other) noexcept (noexcept (Scalar{} *= OtherScalar{}))
+			{
+				static_assert (is_square(), "Matrix needs to be square");
+
+				// Use global operator*():
+				return *this = *this * other;
+			}
 
 	  private:
 		template<class ...Ts>
@@ -549,29 +567,6 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
 		std::transform (_data.begin(), _data.end(), other._data.begin(), _data.begin(), std::minus<Scalar>());
 		return *this;
 	}
-
-
-// TODO
-#if 0
-template<class S, std::size_t C, std::size_t R, class TF, class SF>
-	constexpr Matrix<S, C, R, TF, SF>&
-	Matrix<S, C, R, TF, SF>::operator*= (Scalar const& scalar) noexcept (noexcept (Scalar{} * Scalar{}))
-	{
-		std::transform (_data.begin(), _data.end(), _data.begin(), std::bind (std::multiplies<Scalar>(), scalar, std::placeholders::_1));
-		return *this;
-	}
-
-
-template<class S, std::size_t C, std::size_t R, class TF, class SF>
-	constexpr Matrix<S, C, R, TF, SF>&
-	Matrix<S, C, R, TF, SF>::operator*= (Matrix const& other) noexcept (noexcept (Scalar{} * Scalar{}))
-	{
-		static_assert (is_square(), "Matrix needs to be square");
-
-		// Use global operator*():
-		return *this = *this * other;
-	}
-#endif
 
 } // namespace math
 
