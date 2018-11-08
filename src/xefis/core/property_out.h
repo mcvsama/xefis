@@ -84,6 +84,10 @@ template<class pValue>
 		// Dtor
 		~PropertyOut();
 
+		// Copy operator
+		PropertyOut<Value> const&
+		operator= (PropertyOut<Value> const&);
+
 		/**
 		 * Alias for Property::protected_set_nil().
 		 */
@@ -220,6 +224,15 @@ template<class V>
 			(*data_sink) << no_data_source;
 
 		deregister();
+	}
+
+
+template<class V>
+	inline PropertyOut<V> const&
+	PropertyOut<V>::operator= (PropertyOut<Value> const& other)
+	{
+		this->protected_set (other);
+		return *this;
 	}
 
 

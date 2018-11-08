@@ -16,6 +16,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 // Xefis:
 #include <xefis/core/cycle.h>
@@ -472,6 +473,39 @@ RuntimeTest t6 ("xf::Property various behavior", for_all_types ([](auto value1, 
 	in << out;
 	test_asserts::verify ("fetch() throws when no Module is assigned",
 						  Exception::catch_and_log (g_null_logger, [&]{ in.fetch (TestCycle()); }));
+}));
+
+
+// Primary template handles types that do not support T::operator= (T const&):
+template<class, class = std::void_t<>>
+	struct HasAssignmentOperator: public std::false_type
+	{ };
+
+
+// Specialization recognizes types that do support T::operator= (T const&):
+template<class T>
+	struct HasAssignmentOperator<T, std::void_t<decltype (std::declval<T&> = std::declval<T&>())>>: public std::true_type
+	{ };
+
+
+RuntimeTest t7 ("xf::Property operator=", for_all_types ([](auto value1, auto value2) {
+	using T = decltype (value1);
+
+	ModuleIO io;
+
+	// Make sure PropertyIn<T>::operator= is forbidden as it may be misleading:
+	test_asserts::verify ("PropertyIn<T>::operator= (PropertyIn<T>) is forbidden", !HasAssignmentOperator<PropertyIn<T>>::value);
+
+	// Make sure operator= copies value, not the identity of PropertyOut:
+	PropertyOut<T> out1 { &io, "out1" };
+	PropertyOut<T> out2 { &io, "out2" };
+	out1 = value1;
+	out2 = value2;
+	test_asserts::verify ("out1 has test value1", *out1 == value1);
+	test_asserts::verify ("out2 has test value2", *out2 == value2);
+	out1 = out2;
+	test_asserts::verify ("out1's identity haven't change", out1.path() == PropertyPath ("out1"));
+	test_asserts::verify ("out2 has test value2", *out1 == value2);
 }));
 
 } // namespace
