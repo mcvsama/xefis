@@ -48,19 +48,19 @@ class Exception: public std::exception
 	 *			It should be a simple phrase, that can be embedded into a bigger sentence.
 	 */
 	explicit
-	Exception (const char* message);
+	Exception (const char* message, bool include_backtrace = true);
 
 	/**
 	 * Convenience function.
 	 */
 	explicit
-	Exception (std::string const& message);
+	Exception (std::string const& message, bool include_backtrace = true);
 
 	/**
 	 * Convenience function.
 	 */
 	explicit
-	Exception (QString const& message);
+	Exception (QString const& message, bool include_backtrace = true);
 
 	// Dtor
 	virtual
@@ -134,23 +134,54 @@ class Exception: public std::exception
 };
 
 
+/**
+ * Does not save backtrace when created.
+ */
+class FastException: public Exception
+{
+  public:
+	// Ctor
+	explicit
+	FastException (const char* message):
+		Exception (message, false)
+	{ }
+
+	// Ctor
+	explicit
+	FastException (std::string const& message):
+		Exception (message, false)
+	{ }
+
+	// Ctor
+	explicit
+	FastException (QString const& message):
+		Exception (message, false)
+	{ }
+
+	// Ctor
+	FastException (FastException const&) = default;
+};
+
+
 inline
-Exception::Exception (const char* message):
-	Exception (std::string (message))
+Exception::Exception (const char* message, bool include_backtrace):
+	Exception (std::string (message), include_backtrace)
 { }
 
 
 inline
-Exception::Exception (std::string const& message):
+Exception::Exception (std::string const& message, bool include_backtrace):
 	_what (message),
-	_message (message),
-	_backtrace (xf::backtrace())
-{ }
+	_message (message)
+{
+	if (include_backtrace)
+		_backtrace = xf::backtrace();
+}
 
 
 inline
-Exception::Exception (QString const& message):
-	Exception (message.toStdString())
+Exception::Exception (QString const& message, bool include_backtrace):
+	Exception (message.toStdString(), include_backtrace)
 { }
 
 
