@@ -112,13 +112,13 @@ class TestCycle: public Cycle
   public:
 	explicit
 	TestCycle():
-		Cycle (1, 0_s, 1_s, g_null_logger)
+		Cycle (1, 0_s, 1_s, 1_s, g_null_logger)
 	{ }
 
 	TestCycle&
 	operator+= (si::Time dt)
 	{
-		Cycle::operator= (Cycle (number() + 1, update_time() + dt, dt, g_null_logger));
+		Cycle::operator= (Cycle (number() + 1, update_time() + dt, dt, dt, g_null_logger));
 		return *this;
 	}
 };

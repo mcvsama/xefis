@@ -38,21 +38,23 @@ class Cycle
   public:
 	// Ctor
 	explicit
-	Cycle (Number number, Time update_time, Time update_dt, Logger const&);
+	Cycle (Number number, Time update_time, Time update_dt, Time intended_update_dt, Logger const&);
 
 	/**
 	 * Return this cycle serial number.
 	 */
 	[[nodiscard]]
 	Number
-	number() const noexcept;
+	number() const noexcept
+		{ return _number; }
 
 	/**
 	 * Return last update time.
 	 */
 	[[nodiscard]]
 	si::Time
-	update_time() const noexcept;
+	update_time() const noexcept
+		{ return _update_time; }
 
 	/**
 	 * Return time difference between last and previous update.
@@ -61,58 +63,42 @@ class Cycle
 	 */
 	[[nodiscard]]
 	si::Time
-	update_dt() const noexcept;
+	update_dt() const noexcept
+		{ return _update_dt; }
+
+	/**
+	 * Return intended time difference between last and previous update as configured in the ProcessingLoop.
+	 */
+	[[nodiscard]]
+	si::Time
+	intended_update_dt() const noexcept
+		{ return _intended_update_dt; }
 
 	/**
 	 * Return logger to use.
 	 */
 	[[nodiscard]]
 	Logger const&
-	logger() const noexcept;
+	logger() const noexcept
+		{ return _logger; }
 
   private:
 	Number		_number;
-	Time		_update_time;
-	Time		_update_dt;
+	si::Time	_update_time;
+	si::Time	_update_dt;
+	si::Time	_intended_update_dt;
 	Logger		_logger;
 };
 
 
 inline
-Cycle::Cycle (Number number, Time update_time, Time update_dt, Logger const& logger):
+Cycle::Cycle (Number number, Time update_time, Time update_dt, Time intended_update_dt, Logger const& logger):
 	_number (number),
 	_update_time (update_time),
 	_update_dt (update_dt),
+	_intended_update_dt (intended_update_dt),
 	_logger (logger)
 { }
-
-
-inline Cycle::Number
-Cycle::number() const noexcept
-{
-	return _number;
-}
-
-
-inline Time
-Cycle::update_time() const noexcept
-{
-	return _update_time;
-}
-
-
-inline Time
-Cycle::update_dt() const noexcept
-{
-	return _update_dt;
-}
-
-
-inline Logger const&
-Cycle::logger() const noexcept
-{
-	return _logger;
-}
 
 } // namespace xf
 

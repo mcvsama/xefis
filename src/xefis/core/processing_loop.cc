@@ -87,7 +87,7 @@ ProcessingLoop::execute_cycle()
 		si::Time dt = t - *_previous_timestamp;
 		si::Time latency = dt - _loop_period;
 
-		_current_cycle = Cycle (_next_cycle_number++, t, dt, _logger);
+		_current_cycle = Cycle (_next_cycle_number++, t, dt, _loop_period, _logger);
 		_processing_latencies.push_back (latency);
 		io.latency = latency;
 		io.actual_frequency = 1.0 / dt;
