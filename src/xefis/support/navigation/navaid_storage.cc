@@ -146,7 +146,6 @@ NavaidStorage::load()
 std::packaged_task<void()>
 NavaidStorage::async_loader()
 {
-	// TODO called functions use Logger, that is not thread-safe!!!
 	return std::packaged_task<void()> ([this] {
 		load();
 		_loaded = true;

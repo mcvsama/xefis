@@ -267,12 +267,12 @@ XBee::open_device()
 void
 XBee::failure (std::string_view const& reason)
 {
-	auto& logline = _logger << "Failure detected";
+	auto log = _logger << "Failure detected";
 
 	if (!reason.empty())
-		logline << ": " << reason;
+		log << ": " << reason;
 
-	logline << ", closing device " << *io.device_path << std::endl;
+	log << ", closing device " << *io.device_path << std::endl;
 	_notifier.reset();
 	::close (_device);
 	io.failures = *io.failures + 1;
@@ -992,17 +992,17 @@ XBee::process_at_response_frame (std::string_view const& frame)
 
 	if (*io.debug)
 	{
-		std::ostream& os = debug();
-		os << "Command result: " << command << " ";
+		auto log = debug();
+		log << "Command result: " << command << " ";
 		switch (status)
 		{
-			case ATResponseStatus::OK:					os << "OK"; break;
-			case ATResponseStatus::ERROR:				os << "ERROR"; break;
-			case ATResponseStatus::InvalidCommand:		os << "Invalid command"; break;
-			case ATResponseStatus::InvalidParameter:	os << "Invalid parameter"; break;
-			default:									os << "?"; break;
+			case ATResponseStatus::OK:					log << "OK"; break;
+			case ATResponseStatus::ERROR:				log << "ERROR"; break;
+			case ATResponseStatus::InvalidCommand:		log << "Invalid command"; break;
+			case ATResponseStatus::InvalidParameter:	log << "Invalid parameter"; break;
+			default:									log << "?"; break;
 		}
-		os << ", data: " << xf::to_hex_string (response_data) << std::endl;
+		log << ", data: " << xf::to_hex_string (response_data) << std::endl;
 	}
 
 	// Response data: bytes

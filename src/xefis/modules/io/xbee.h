@@ -418,7 +418,7 @@ class XBee:
 	/**
 	 * A logger that adds "DEBUG" message.
 	 */
-	std::ostream&
+	xf::LogBlock
 	debug() const;
 
   private:
@@ -453,7 +453,7 @@ XBee::configured() const noexcept
 }
 
 
-inline std::ostream&
+inline xf::LogBlock
 XBee::debug() const
 {
 	return _logger << "DEBUG ";

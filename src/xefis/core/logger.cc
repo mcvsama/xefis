@@ -16,8 +16,6 @@
 #include <string>
 
 // Boost:
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/device/null.hpp>
 #include <boost/algorithm/string/join.hpp>
 
 // Xefis:
@@ -31,13 +29,15 @@
 
 namespace xf {
 
-std::ostream&
-LoggerOutput::prepare_line() const
+void
+LoggerOutput::log (LogBlock const& block)
 {
-	if (_add_timestamps)
-		_stream << '[' << LoggerOutput::kTimestampColor << boost::format ("%08.4lfs") % TimeHelper::now().in<Second>() << LoggerOutput::kResetColor << ']';
+	std::lock_guard lock (_stream_mutex);
 
-	return _stream;
+	if (_add_timestamps)
+		_stream << '[' << LoggerOutput::kTimestampColor << boost::format ("%08.4lfs") % block.timestamp().in<Second>() << LoggerOutput::kResetColor << ']';
+
+	_stream << block.string();
 }
 
 
@@ -59,28 +59,21 @@ Logger::compute_scope()
 }
 
 
-std::ostream&
+std::string
 Logger::prepare_line() const
 {
-	if (_output)
-	{
-		auto& stream = _output->prepare_line();
+	std::ostringstream prefix;
 
-		if (_processing_loop)
-		{
-			if (auto cycle = _processing_loop->current_cycle())
-				stream << '[' << LoggerOutput::kCycleColor << boost::format ("cycle=%08d") % cycle->number() << LoggerOutput::kResetColor << ']';
-			else
-				stream << '[' << LoggerOutput::kCycleColor << "cycle=--------" << LoggerOutput::kResetColor << ']';
-		}
-
-		return stream << _computed_scope << " ";
-	}
-	else
+	if (_processing_loop)
 	{
-		thread_local boost::iostreams::stream<boost::iostreams::null_sink> null_stream { boost::iostreams::null_sink() };
-		return null_stream;
+		if (auto cycle = _processing_loop->current_cycle())
+			prefix << '[' << LoggerOutput::kCycleColor << boost::format ("cycle=%08d") % cycle->number() << LoggerOutput::kResetColor << ']';
+		else
+			prefix << '[' << LoggerOutput::kCycleColor << "cycle=--------" << LoggerOutput::kResetColor << ']';
 	}
+
+	prefix << _computed_scope << " ";
+	return prefix.str();
 }
 
 } // namespace xf

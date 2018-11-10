@@ -143,12 +143,12 @@ GPS::Connection::alive_check_failed()
 void
 GPS::Connection::failure (std::string_view const& reason)
 {
-	auto& logline = _gps_module.logger() << "Failure detected";
+	auto log = _gps_module.logger() << "Failure detected";
 
 	if (!reason.empty())
-		logline << ": " << reason;
+		log << ": " << reason;
 
-	logline << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
+	log << ", closing device " << _gps_module._serial_port_config.device_path() << std::endl;
 	_power_cycle.notify_connection_failure();
 }
 

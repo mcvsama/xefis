@@ -16,7 +16,9 @@
 
 // Standard:
 #include <cstddef>
-#include <ostream>
+#include <iostream>
+#include <mutex>
+#include <sstream>
 #include <variant>
 
 // Boost:
@@ -31,9 +33,14 @@
 namespace xf {
 
 class ProcessingLoop;
+class LogBlock;
 class Logger;
 
 
+/**
+ * Represents a logger, prints stuff to some output stream.
+ * Threadsafe as long as no-one writes to the given std::ostream beyond the LoggerOutput/LogBlock/Logger.
+ */
 class LoggerOutput
 {
 	friend class Logger;
@@ -54,28 +61,93 @@ class LoggerOutput
 	 * True if timestamps are enabled.
 	 */
 	bool
-	timestamps_enabled() const noexcept;
+	timestamps_enabled() const noexcept
+		{ return _add_timestamps; }
 
 	/**
 	 * Enable/disable timestamps in logs.
 	 */
 	void
-	set_timestamps_enabled (bool enabled);
+	set_timestamps_enabled (bool enabled)
+		{ _add_timestamps = enabled; }
 
-  private:
 	/**
-	 * Prepare log line (add timestamp) and return std::ostream to use.
+	 * Log given LogBlock.
 	 */
-	std::ostream&
-	prepare_line() const;
+	void
+	log (LogBlock const&);
 
   private:
 	UseCount		_use_count			{ this };
+	std::mutex		_stream_mutex;
 	std::ostream&	_stream;
 	bool			_add_timestamps		{ true };
 };
 
 
+/**
+ * A block of data to be logged. Often just a line.
+ */
+class LogBlock
+{
+  public:
+	// Ctor
+	explicit
+	LogBlock (LoggerOutput*);
+
+	// Copy ctor: delete
+	LogBlock (LogBlock const&) = delete;
+
+	// Move ctor
+	LogBlock (LogBlock&&) = default;
+
+	// Dtor
+	~LogBlock();
+
+	/**
+	 * Return creation timestamp.
+	 */
+	si::Time
+	timestamp() const noexcept
+		{ return _timestamp; }
+
+	/**
+	 * Return the log data.
+	 */
+	std::string
+	string() const
+		{ return _sstream.str(); }
+
+	/**
+	 * Flush the collected data to the LoggerOutput.
+	 */
+	void
+	flush();
+
+	/**
+	 * Log function. Collects the string to be logged.
+	 */
+	template<class Item>
+		LogBlock&
+		operator<< (Item&&);
+
+	/**
+	 * Interface for stream manipulators.
+	 */
+	LogBlock&
+	operator<< (std::ostream& (*manipulator)(std::ostream&));
+
+  private:
+	LoggerOutput*		_output;
+	std::ostringstream	_sstream;
+	si::Time			_timestamp;
+};
+
+
+/**
+ * Accessor to the LoggerOutput object that adds tags to logged lines.
+ * Allows preparing LogBlocks that will be sent to LoggerOutput.
+ */
 class Logger
 {
   public:
@@ -134,8 +206,14 @@ class Logger
 	 * Log function. Adds scope to all calls.
 	 */
 	template<class Item>
-		std::ostream&
+		LogBlock
 		operator<< (Item&&) const;
+
+	/**
+	 * Interface for stream manipulators.
+	 */
+	LogBlock
+	operator<< (std::ostream& (*manipulator)(std::ostream&)) const;
 
   private:
 	/**
@@ -145,10 +223,9 @@ class Logger
 	compute_scope();
 
 	/**
-	 * Prepare log line (add cycle number, scope) and return std::ostream to
-	 * use.
+	 * Prepare log line (add cycle number, scope) and return as a string.
 	 */
-	std::ostream&
+	std::string
 	prepare_line() const;
 
   private:
@@ -166,17 +243,52 @@ LoggerOutput::LoggerOutput (std::ostream& stream):
 { }
 
 
-inline bool
-LoggerOutput::timestamps_enabled() const noexcept
+inline
+LogBlock::LogBlock (LoggerOutput* output):
+	_output (output),
+	_timestamp (TimeHelper::now())
+{ }
+
+
+inline
+LogBlock::~LogBlock()
 {
-	return _add_timestamps;
+	flush();
 }
 
 
 inline void
-LoggerOutput::set_timestamps_enabled (bool enabled)
+LogBlock::flush()
 {
-	_add_timestamps = enabled;
+	if (_output)
+		_output->log (*this);
+
+	_sstream.str ("");
+}
+
+
+template<class Item>
+	inline LogBlock&
+	LogBlock::operator<< (Item&& item)
+	{
+		if (_output)
+		{
+			using namespace exception_ops;
+
+			_sstream << std::forward<Item> (item);
+		}
+
+		return *this;
+	}
+
+
+inline LogBlock&
+LogBlock::operator<< (std::ostream& (*manipulator)(std::ostream&))
+{
+	if (_output)
+		_sstream << *manipulator;
+
+	return *this;
 }
 
 
@@ -230,11 +342,18 @@ Logger::set_processing_loop (ProcessingLoop const& processing_loop)
 
 
 template<class Item>
-	inline std::ostream&
+	inline LogBlock
 	Logger::operator<< (Item&& item) const
 	{
-		return prepare_line() << std::forward<Item> (item);
+		return std::move (LogBlock (_output) << prepare_line() << std::forward<Item> (item));
 	}
+
+
+inline LogBlock
+Logger::operator<< (std::ostream& (*manipulator)(std::ostream&)) const
+{
+	return std::move (LogBlock (_output) << prepare_line() << *manipulator);
+}
 
 
 /**
