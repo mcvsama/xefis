@@ -37,6 +37,7 @@ template<class V, class B, class A = V,
 			 (std::is_floating_point_v<A> || si::is_quantity_v<A>) &&
 			 (std::is_floating_point_v<B> || si::is_quantity_v<B>)
 		 >>
+	[[nodiscard]]
 	constexpr B
 	renormalize (V v, A a_min, A a_max, B b_min, B b_max)
 	{
@@ -47,6 +48,7 @@ template<class V, class B, class A = V,
 
 
 template<class V, class B, class A = V>
+	[[nodiscard]]
 	constexpr B
 	renormalize (V value, Range<A> range1, Range<B> range2) noexcept
 	{
@@ -55,6 +57,7 @@ template<class V, class B, class A = V>
 
 
 template<class Value, std::size_t Size>
+	[[nodiscard]]
 	constexpr auto
 	renormalize (double v, double a_min, double a_max, math::Vector<Value, Size> const& b_min, math::Vector<Value, Size> const& b_max)
 	{
@@ -68,6 +71,7 @@ template<class Value, std::size_t Size>
 
 
 template<class Value, std::size_t Size>
+	[[nodiscard]]
 	constexpr auto
 	renormalize (Value v, Range<Value> const& range1, Range<math::Vector<Value, Size>> const& range2) noexcept
 	{
@@ -76,6 +80,7 @@ template<class Value, std::size_t Size>
 
 
 template<class T>
+	[[nodiscard]]
 	constexpr int
 	sgn (T x, std::false_type) noexcept
 	{
@@ -84,6 +89,7 @@ template<class T>
 
 
 template<class T>
+	[[nodiscard]]
 	constexpr int
 	sgn (T x, std::true_type) noexcept
 	{
@@ -95,6 +101,7 @@ template<class T>
  * Return signum (x) (-1, 0 or 1).
  */
 template<class T>
+	[[nodiscard]]
 	constexpr int
 	sgn (T x) noexcept
 	{
@@ -103,6 +110,7 @@ template<class T>
 
 
 template<class T = int>
+	[[nodiscard]]
 	constexpr T
 	symmetric_round (auto s) noexcept
 	{
@@ -116,6 +124,7 @@ template<class T = int>
  * \param	d - divisor
  */
 template<class Number>
+	[[nodiscard]]
 	constexpr Number
 	floored_mod (Number n, std::enable_if_t<std::is_floating_point_v<Number> || si::is_quantity_v<Number>, Number> d)
 	{
@@ -129,6 +138,7 @@ template<class Number>
  * \param	d - divisor
  */
 template<class Number>
+	[[nodiscard]]
 	constexpr Number
 	floored_mod (Number n, std::enable_if_t<std::is_integral_v<Number>, Number> d)
 	{
@@ -142,6 +152,7 @@ template<class Number>
  * \param	d - divisor
  */
 template<template<class, class> class Quantity, class Unit, class Value>
+	[[nodiscard]]
 	constexpr Quantity<Unit, Value>
 	floored_mod (Quantity<Unit, Value> n, Quantity<Unit, Value> d)
 	{
@@ -150,6 +161,7 @@ template<template<class, class> class Quantity, class Unit, class Value>
 
 
 template<class Number>
+	[[nodiscard]]
 	constexpr Number
 	floored_mod (Number n, Number min, Number max)
 	{
@@ -158,6 +170,7 @@ template<class Number>
 
 
 template<class Number>
+	[[nodiscard]]
 	constexpr Number
 	floored_mod (Number n, Range<Number> range)
 	{
@@ -187,6 +200,7 @@ template<class Value>
 
 
 template<class Value>
+	[[nodiscard]]
 	constexpr Value
 	clamped (Value value, Value min, Value max) noexcept
 	{
@@ -199,6 +213,7 @@ template<class Value>
 
 
 template<class Value>
+	[[nodiscard]]
 	constexpr Value
 	clamped (Value value, Range<Value> range) noexcept
 	{
@@ -230,6 +245,7 @@ template<class V>
 
 
 template<class Value>
+	[[nodiscard]]
 	constexpr Value
 	magnetic_to_true (Value mag, Value declination)
 	{
@@ -237,6 +253,7 @@ template<class Value>
 	}
 
 
+[[nodiscard]]
 constexpr Angle
 magnetic_to_true (Angle mag, Angle declination)
 {
@@ -245,6 +262,7 @@ magnetic_to_true (Angle mag, Angle declination)
 
 
 template<class Value>
+	[[nodiscard]]
 	constexpr Value
 	true_to_magnetic (Value tru, Value declination)
 	{
@@ -252,6 +270,7 @@ template<class Value>
 	}
 
 
+[[nodiscard]]
 constexpr Angle
 true_to_magnetic (Angle tru, Angle declination)
 {
@@ -259,6 +278,7 @@ true_to_magnetic (Angle tru, Angle declination)
 }
 
 
+[[nodiscard]]
 inline int
 digit_from_ascii (char c)
 {
@@ -276,6 +296,7 @@ digit_from_ascii (char c)
  * Uses trapezoidal approximation.
  */
 template<class Argument, class Callable>
+	[[nodiscard]]
 	constexpr auto
 	integral (Callable function, Range<Argument> range, Argument delta)
 	{
@@ -302,6 +323,7 @@ template<class Argument, class Callable>
 
 
 template<class T>
+	[[nodiscard]]
 	constexpr T
 	static_pow (T value, uint64_t power)
 	{
@@ -315,6 +337,7 @@ template<class T>
 
 
 template<class Iterator>
+	[[nodiscard]]
 	inline auto
 	mean (Iterator begin, Iterator end)
 	{
@@ -332,6 +355,7 @@ template<class Iterator>
  * Allocates memory, but doesn't modify the sequence.
  */
 template<class Iterator>
+	[[nodiscard]]
 	inline auto
 	median (Iterator begin, Iterator end)
 	{
@@ -355,6 +379,7 @@ template<class Iterator>
  * Compute median allowing range to get partially sorted during operation.
  */
 template<class Iterator>
+	[[nodiscard]]
 	inline auto
 	sort_and_median (Iterator begin, Iterator end)
 	{
@@ -373,6 +398,7 @@ template<class Iterator>
 
 
 template<class Iterator>
+	[[nodiscard]]
 	inline auto
 	stddev (Iterator begin, Iterator end)
 	{
@@ -399,6 +425,7 @@ template<class Iterator>
  * Returns pair of Value and a number of helper lines for chart grid.
  */
 template<class Value>
+	[[nodiscard]]
 	inline std::pair<Value, std::size_t>
 	get_max_for_axis (Value const& value)
 	{
@@ -428,6 +455,7 @@ template<class Value>
  * Return square of the argument.
  */
 template<class Value>
+	[[nodiscard]]
 	constexpr decltype(std::declval<Value>() * std::declval<Value>())
 	square (Value a)
 	{
@@ -439,6 +467,7 @@ template<class Value>
  * Return cube of the argument.
  */
 template<class Value>
+	[[nodiscard]]
 	constexpr decltype(std::declval<Value>() * std::declval<Value>() * std::declval<Value>())
 	cube (Value a)
 	{
