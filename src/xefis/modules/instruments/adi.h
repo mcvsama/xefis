@@ -43,6 +43,7 @@ class ADI_IO: public xf::ModuleIO
 	 * Settings
 	 */
 
+	// Ladder sizes:
 	xf::Setting<int64_t>			speed_ladder_line_every								{ this, "speed_ladder_line_every", 10 };
 	xf::Setting<int64_t>			speed_ladder_number_every							{ this, "speed_ladder_number_every", 20 };
 	xf::Setting<int64_t>			speed_ladder_extent									{ this, "speed_ladder_extent", 124 };
@@ -53,14 +54,29 @@ class ADI_IO: public xf::ModuleIO
 	xf::Setting<int64_t>			altitude_ladder_emphasis_every						{ this, "altitude_ladder_emphasis_every", 1000 };
 	xf::Setting<int64_t>			altitude_ladder_bold_every							{ this, "altitude_ladder_bold_every", 500 };
 	xf::Setting<int64_t>			altitude_ladder_extent								{ this, "altitude_ladder_extent", 825 };
+
+	// Low AGL warning indicators:
 	xf::Setting<si::Length>			altitude_landing_warning_hi							{ this, "altitude_landing_warning_hi", 1000_ft };
 	xf::Setting<si::Length>			altitude_landing_warning_lo							{ this, "altitude_landing_warning_lo", 500_ft };
+
+	// Raising runway:
+	xf::Setting<bool>				enable_raising_runway								{ this, "enable_raising_runway", true };
 	xf::Setting<si::Length>			raising_runway_visibility							{ this, "raising_runway_visibility", 1000_ft };
 	xf::Setting<si::Length>			raising_runway_threshold							{ this, "raising_runway_threshold", 250_ft };
+
+	// AOA "moustache":
 	xf::Setting<si::Angle>			aoa_visibility_threshold							{ this, "aoa_visibility_threshold", 17.5_deg };
 	xf::Setting<double>				show_mach_above										{ this, "show_mach_above", 0.4 };
+
+	// Energy-variometer:
 	xf::Setting<si::Power>			power_eq_1000_fpm									{ this, "power_eq_1000_fpm", 1000_W };
+
+	// Speed ladder minimum speeds warnings:
 	xf::Setting<bool>				show_minimum_speeds_only_if_no_weight_on_wheels		{ this, "show_minimum_speeds_only_if_no_weight_on_wheels", true };
+
+	// Style:
+	xf::Setting<si::Angle>			field_of_view										{ this, "field_of_view", 120_deg };
+	xf::Setting<bool>				show_vertical_speed_ladder							{ this, "show_vertical_speed_ladder", true };
 	xf::Setting<si::Time>			focus_duration										{ this, "focus_duration", 10_s };
 	xf::Setting<si::Time>			focus_short_duration								{ this, "focus_short_duration", 5_s };
 
@@ -69,8 +85,7 @@ class ADI_IO: public xf::ModuleIO
 	 */
 
 	xf::PropertyIn<bool>			weight_on_wheels									{ this, "weight-on-wheels" };
-	// Speed
-	xf::PropertyIn<bool>			speed_ias_serviceable								{ this, "speed/ias.serviceable" };
+	// Speed:
 	xf::PropertyIn<si::Velocity>	speed_ias											{ this, "speed/ias" };
 	xf::PropertyIn<si::Velocity>	speed_ias_lookahead									{ this, "speed/ias.lookahead" };
 	xf::PropertyIn<si::Velocity>	speed_ias_minimum									{ this, "speed/ias.minimum" };
@@ -79,7 +94,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Velocity>	speed_ias_maximum									{ this, "speed/ias.maximum" };
 	xf::PropertyIn<double>			speed_mach											{ this, "speed/mach" };
 	xf::PropertyIn<si::Velocity>	speed_ground										{ this, "speed/ground-speed" };
-	// Velocity bugs
+
+	// Velocity bugs:
 	xf::PropertyIn<si::Velocity>	speed_v1											{ this, "speed-bugs/v1" };
 	xf::PropertyIn<si::Velocity>	speed_vr											{ this, "speed-bugs/vr" };
 	xf::PropertyIn<si::Velocity>	speed_vref											{ this, "speed-bugs/vref" };
@@ -89,46 +105,54 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Velocity>	speed_flaps_a_speed									{ this, "speed-bugs/flaps.a.speed" };
 	xf::PropertyIn<std::string>		speed_flaps_b_label									{ this, "speed-bugs/flaps.b.label" };
 	xf::PropertyIn<si::Velocity>	speed_flaps_b_speed									{ this, "speed-bugs/flaps.b.speed" };
-	// Attitude and heading
-	xf::PropertyIn<bool>			orientation_serviceable								{ this, "orientation/serviceable" };
+
+	// Attitude and heading:
 	xf::PropertyIn<si::Angle>		orientation_pitch									{ this, "orientation/pitch" };
 	xf::PropertyIn<si::Angle>		orientation_roll									{ this, "orientation/roll" };
 	xf::PropertyIn<si::Angle>		orientation_heading_magnetic						{ this, "orientation/heading.magnetic" };
 	xf::PropertyIn<si::Angle>		orientation_heading_true							{ this, "orientation/heading.true" };
 	xf::PropertyIn<bool>			orientation_heading_numbers_visible					{ this, "orientation/heading-numbers-visible" };
-	// Track
+
+	// Track:
 	xf::PropertyIn<si::Angle>		track_lateral_magnetic								{ this, "track/lateral.magnetic" };
 	xf::PropertyIn<si::Angle>		track_lateral_true									{ this, "track/lateral.true" };
 	xf::PropertyIn<si::Angle>		track_vertical										{ this, "track/vertical" };
-	// Flight Path Vector
+
+	// Flight Path Vector:
 	xf::PropertyIn<bool>			fpv_visible											{ this, "fpv/fpv-visible" };
-	// Slip-skid indicator
+
+	// Slip-skid indicator:
 	xf::PropertyIn<si::Angle>		slip_skid											{ this, "slip-skid/angle" };
-	// Angle of Attack
+
+	// Angle of Attack:
 	xf::PropertyIn<si::Angle>		aoa_alpha											{ this, "aoa/alpha" };
 	xf::PropertyIn<si::Angle>		aoa_alpha_maximum									{ this, "aoa/alpha.maximum" };
 	xf::PropertyIn<bool>			aoa_alpha_visible									{ this, "aoa/alpha.visible" };
-	// Pressure and radio altitude
-	xf::PropertyIn<bool>			altitude_amsl_serviceable							{ this, "altitude/amsl.serviceable" };
+
+	// Pressure and radio altitude:
 	xf::PropertyIn<si::Length>		altitude_amsl										{ this, "altitude/amsl" };
 	xf::PropertyIn<si::Length>		altitude_amsl_lookahead								{ this, "altitude/amsl.lookahead" };
 	xf::PropertyIn<bool>			altitude_agl_serviceable							{ this, "altitude/agl.serviceable" };
 	xf::PropertyIn<si::Length>		altitude_agl										{ this, "altitude/agl" };
+
 	// Decision height:
 	xf::PropertyIn<std::string>		decision_height_type								{ this, "decision-height/type" };
 	xf::PropertyIn<si::Length>		decision_height_setting								{ this, "decision-height/setting" };
 	xf::PropertyIn<si::Length>		decision_height_amsl								{ this, "decision-height/amsl" };
+
 	// Landing altitude:
 	xf::PropertyIn<si::Length>		landing_amsl										{ this, "landing-altitude/amsl" };
-	// Vertical speed
-	xf::PropertyIn<bool>			vertical_speed_serviceable							{ this, "vertical-speed/serviceable" };
+
+	// Vertical speed:
 	xf::PropertyIn<si::Velocity>	vertical_speed										{ this, "vertical-speed/speed" };
 	xf::PropertyIn<si::Power>		vertical_speed_energy_variometer					{ this, "vertical-speed/energy-variometer" };
-	// Air pressure settings
+
+	// Air pressure settings:
 	xf::PropertyIn<si::Pressure>	pressure_qnh										{ this, "pressure/qnh" };
 	xf::PropertyIn<bool>			pressure_display_hpa								{ this, "pressure/display-hpa" };
 	xf::PropertyIn<bool>			pressure_use_std									{ this, "pressure/use-std" };
-	// Flight director
+
+	// Flight director:
 	xf::PropertyIn<bool>			flight_director_serviceable							{ this, "flight-director/serviceable" };
 	xf::PropertyIn<std::string>		flight_director_active_name							{ this, "flight-director/active-name" };
 	xf::PropertyIn<bool>			flight_director_cmd_visible							{ this, "flight-director/cmd-visible" };
@@ -141,17 +165,20 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>			flight_director_guidance_visible					{ this, "flight-director/guidance.visible" };
 	xf::PropertyIn<si::Angle>		flight_director_guidance_pitch						{ this, "flight-director/guidance.pitch" };
 	xf::PropertyIn<si::Angle>		flight_director_guidance_roll						{ this, "flight-director/guidance.roll" };
-	// Control surfaces deflection indicator
+
+	// Control surfaces deflection indicator:
 	xf::PropertyIn<bool>			control_surfaces_visible							{ this, "control-surfaces/visible" };
 	xf::PropertyIn<double>			control_surfaces_elevator							{ this, "control-surfaces/elevator" };
 	xf::PropertyIn<double>			control_surfaces_ailerons							{ this, "control-surfaces/ailerons" };
-	// Approach information
+
+	// Approach information:
 	xf::PropertyIn<bool>			navaid_reference_visible							{ this, "navaid/reference-visible" };
 	xf::PropertyIn<si::Angle>		navaid_course_magnetic								{ this, "navaid/course-magnetic" };
 	xf::PropertyIn<std::string>		navaid_type_hint									{ this, "navaid/type-hint" };
 	xf::PropertyIn<std::string>		navaid_identifier									{ this, "navaid/identifier" };
 	xf::PropertyIn<si::Length>		navaid_distance										{ this, "navaid/distance" };
-	// Flight path deviation
+
+	// Flight path deviation:
 	xf::PropertyIn<bool>			flight_path_deviation_lateral_serviceable			{ this, "flight-path-deviation/lateral/serviceable" };
 	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_approach				{ this, "flight-path-deviation/lateral/approach" };
 	xf::PropertyIn<si::Angle>		flight_path_deviation_lateral_flight_path			{ this, "flight-path-deviation/lateral/flight-path" };
@@ -160,7 +187,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_approach				{ this, "flight-path-deviation/vertical/approach" };
 	xf::PropertyIn<si::Angle>		flight_path_deviation_vertical_flight_path			{ this, "flight-path-deviation/vertical/flight-path" };
 	xf::PropertyIn<bool>			flight_path_deviation_mixed_mode					{ this, "flight-path-deviation/mixed-mode" };
-	// Flight mode information
+
+	// Flight mode information:
 	xf::PropertyIn<bool>			flight_mode_hint_visible							{ this, "flight-mode/hint-visible" };
 	xf::PropertyIn<std::string>		flight_mode_hint									{ this, "flight-mode/hint" };
 	xf::PropertyIn<bool>			flight_mode_fma_visible								{ this, "flight-mode/fma.visible" };
@@ -170,12 +198,14 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<std::string>		flight_mode_fma_lateral_armed_hint					{ this, "flight-mode/fma.lateral-armed-hint" };
 	xf::PropertyIn<std::string>		flight_mode_fma_vertical_hint						{ this, "flight-mode/fma.vertical-hint" };
 	xf::PropertyIn<std::string>		flight_mode_fma_vertical_armed_hint					{ this, "flight-mode/fma.vertical-armed-hint" };
-	// TCAS
+
+	// TCAS:
 	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_minimum				{ this, "tcas/resolution-advisory/pitch.minimum" };
 	xf::PropertyIn<si::Angle>		tcas_resolution_advisory_pitch_maximum				{ this, "tcas/resolution-advisory/pitch.maximum" };
 	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_minimum		{ this, "tcas/resolution-advisory/vertical-speed.minimum" };
 	xf::PropertyIn<si::Velocity>	tcas_resolution_advisory_vertical_speed_maximum		{ this, "tcas/resolution-advisory/vertical-speed.maximum" };
-	// General warning/failure flags
+
+	// General warning/failure flags:
 	xf::PropertyIn<bool>			warning_novspd_flag									{ this, "warnings/novspd-flag" };
 	xf::PropertyIn<bool>			warning_ldgalt_flag									{ this, "warnings/ldgalt-flag" };
 	xf::PropertyIn<bool>			warning_pitch_disagree								{ this, "warnings/pitch-disagree-flag" };
@@ -184,7 +214,8 @@ class ADI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>			warning_altitude_disagree							{ this, "warnings/altitude-disagree-flag" };
 	xf::PropertyIn<bool>			warning_roll										{ this, "warnings/roll" };
 	xf::PropertyIn<bool>			warning_slip_skid									{ this, "warnings/slip-skid" };
-	// Style
+
+	// Style:
 	xf::PropertyIn<bool>			style_old											{ this, "style/use-old-style" };
 	xf::PropertyIn<bool>			style_show_metric									{ this, "style/show-metric-values" };
 };
@@ -192,6 +223,7 @@ class ADI_IO: public xf::ModuleIO
 
 namespace adi_detail {
 
+// TODO For booleans use bitfields (:1) when C++ supports bitfields and in-class initialization (to save cache memory).
 class Parameters
 {
 	// TODO change to vector<> for speed
@@ -202,89 +234,70 @@ class Parameters
 	si::Time					timestamp;
 	si::Time					focus_duration;
 	si::Time					focus_short_duration;
-	// TODO perhaps remove _visible and use std::optional<>
 	bool						old_style							= false;
 	bool						show_metric							= false;
 	si::Angle					fov									= 120_deg;
 	bool						input_alert_visible					= false;
-	// Velocity
+	bool						show_vertical_speed_ladder			= false;
+	// Velocity:
 	bool						speed_failure						= false;
 	bool						speed_failure_focus					= false;
-	bool						speed_visible						= false;
-	si::Velocity				speed								= 0_kt;
-	bool						speed_lookahead_visible				= false;
-	si::Velocity				speed_lookahead						= 0_kt;
-	bool						speed_minimum_visible				= false;
-	Velocity					speed_minimum						= 0_kt;
+	std::optional<si::Velocity>	speed;
+	std::optional<si::Velocity>	speed_lookahead;
+	std::optional<si::Velocity>	speed_minimum;
 	std::optional<si::Velocity>	speed_minimum_maneuver;
 	std::optional<si::Velocity>	speed_maximum_maneuver;
-	bool						speed_maximum_visible				= false;
-	si::Velocity				speed_maximum						= 0_kt;
-	bool						speed_mach_visible					= false;
-	double						speed_mach							= 0.0;
+	std::optional<si::Velocity>	speed_maximum;
+	std::optional<double>		speed_mach;
 	std::optional<si::Velocity>	speed_ground;
 	VelocityBugs				speed_bugs;
-	// Orientation
+	// Orientation:
 	bool						orientation_failure					= false;
 	bool						orientation_failure_focus			= false;
-	bool						orientation_pitch_visible			= false;
-	si::Angle					orientation_pitch					= 0_deg;
-	bool						orientation_roll_visible			= false;
-	si::Angle					orientation_roll					= 0_deg;
-	bool						orientation_heading_visible			= false;
-	si::Angle					orientation_heading					= 0_deg;
+	std::optional<si::Angle>	orientation_pitch;
+	std::optional<si::Angle>	orientation_roll;
+	std::optional<si::Angle>	orientation_heading;
 	bool						orientation_heading_numbers_visible	= false;
-	// Slip-skid
-	bool						slip_skid_visible					= false;
-	si::Angle					slip_skid							= 0_deg;
-	// Flight path vector
+	// Slip-skid:
+	std::optional<si::Angle>	slip_skid;
+	// Flight path vector:
 	bool						flight_path_marker_failure			= false;
 	bool						flight_path_marker_failure_focus	= false;
-	bool						flight_path_visible					= false;
-	si::Angle					flight_path_alpha					= 0_deg;
-	si::Angle					flight_path_beta					= 0_deg;
-	// AOA limit
-	bool						critical_aoa_visible				= false;
-	si::Angle					critical_aoa						= 0_deg;
-	si::Angle					aoa_alpha							= 0_deg;
-	// Altitude
+	std::optional<si::Angle>	flight_path_alpha;
+	std::optional<si::Angle>	flight_path_beta;
+	// AOA limit:
+	std::optional<si::Angle>	aoa_alpha;
+	std::optional<si::Angle>	critical_aoa;
+	// Altitude:
 	bool						altitude_failure					= false;
 	bool						altitude_failure_focus				= false;
-	bool						altitude_visible					= false;
-	si::Length					altitude_amsl						= 0_ft;
-	bool						altitude_lookahead_visible			= false;
-	si::Length					altitude_lookahead					= 0_ft;
+	std::optional<si::Length>	altitude_amsl;
+	std::optional<si::Length>	altitude_lookahead;
 	bool						altitude_agl_failure				= false;
 	bool						altitude_agl_failure_focus			= false;
-	bool						altitude_agl_visible				= false;
-	si::Length					altitude_agl						= 0_ft;
+	std::optional<si::Length>	altitude_agl;
 	bool						altitude_agl_focus					= false;
-	bool						landing_visible						= false;
-	si::Length					landing_amsl						= 0_ft;
+	std::optional<si::Length>	landing_amsl;
 	si::Length					altitude_landing_warning_hi			= 0_ft;
 	si::Length					altitude_landing_warning_lo			= 0_ft;
 	AltitudeBugs				altitude_bugs;
-	// Decision height
-	bool						decision_height_visible				= false;
+	// Decision height:
 	QString						decision_height_type;
-	si::Length					decision_height_amsl				= 0_ft;
+	std::optional<si::Length>	decision_height_amsl;
 	bool						decision_height_focus				= false;
 	bool						decision_height_focus_short			= false;
 	si::Length					decision_height_setting				= 0_ft;
-	// Vertical speed
+	// Vertical speed:
 	bool						vertical_speed_failure				= false;
 	bool						vertical_speed_failure_focus		= false;
-	bool						vertical_speed_visible				= false;
-	si::Velocity				vertical_speed						= 0_fpm;
-	bool						energy_variometer_visible			= false;
-	si::Power					energy_variometer_rate				= 0_W;
+	std::optional<si::Velocity>	vertical_speed;
+	std::optional<si::Power>	energy_variometer_rate;
 	si::Power					energy_variometer_1000_fpm_power	= 0_W;
-	// Pressure settings
-	bool						pressure_visible					= false;
-	si::Pressure				pressure_qnh						= 0_inHg;
+	// Pressure settings:
+	std::optional<si::Pressure>	pressure_qnh;
 	bool						pressure_display_hpa				= false;
 	bool						use_standard_pressure				= false;
-	// Command settings
+	// Command settings:
 	std::optional<std::string>	flight_director_active_name;
 	std::optional<si::Velocity>	cmd_speed;
 	std::optional<double>		cmd_mach;
@@ -292,24 +305,23 @@ class Parameters
 	std::optional<si::Velocity>	cmd_vertical_speed;
 	std::optional<si::Angle>	cmd_fpa;
 	bool						cmd_altitude_acquired				= false;
-	// Flight director
+	// Flight director:
+	bool						flight_director_guidance_visible	= false;
 	bool						flight_director_failure				= false;
 	bool						flight_director_failure_focus		= false;
-	bool						flight_director_pitch_visible		= false;
-	si::Angle					flight_director_pitch				= 0_deg;
-	bool						flight_director_roll_visible		= false;
-	si::Angle					flight_director_roll				= 0_deg;
-	// Control stick
+	std::optional<si::Angle>	flight_director_pitch;
+	std::optional<si::Angle>	flight_director_roll;
+	// Control stick:
 	bool						control_surfaces_visible			= false;
 	float						control_surfaces_elevator			= 0.0f;
 	float						control_surfaces_ailerons			= 0.0f;
-	// Approach reference
+	// Approach reference:
 	bool						navaid_reference_visible			= false;
 	std::optional<si::Angle>	navaid_course_magnetic;
 	QString						navaid_hint;
 	QString						navaid_identifier;
 	std::optional<si::Length>	navaid_distance;
-	// Approach, flight path deviations
+	// Approach, flight path deviations:
 	bool						deviation_vertical_failure			= false;
 	bool						deviation_vertical_failure_focus	= false;
 	std::optional<si::Angle>	deviation_vertical_approach;
@@ -319,12 +331,10 @@ class Parameters
 	std::optional<si::Angle>	deviation_lateral_approach;
 	std::optional<si::Angle>	deviation_lateral_flight_path;
 	bool						deviation_mixed_mode				= false;
-	// Raising runway
-	bool						runway_visible						= false;
-	si::Angle					runway_position						= 0_deg;
-	// Control hint
-	bool						control_hint_visible				= false;
-	QString						control_hint;
+	// Raising runway:
+	std::optional<si::Angle>	raising_runway_position;
+	// Control hint:
+	std::optional<QString>		control_hint;
 	bool						control_hint_focus					= false;
 	// FMA
 	bool						fma_visible							= false;
@@ -340,12 +350,12 @@ class Parameters
 	bool						fma_vertical_focus					= false;
 	QString						fma_vertical_armed_hint;
 	bool						fma_vertical_armed_focus			= false;
-	// TCAS
+	// TCAS:
 	std::optional<si::Angle>	tcas_ra_pitch_minimum;
 	std::optional<si::Angle>	tcas_ra_pitch_maximum;
 	std::optional<si::Velocity>	tcas_ra_vertical_speed_minimum;
 	std::optional<si::Velocity>	tcas_ra_vertical_speed_maximum;
-	// Warning flags
+	// Warning flags:
 	bool						novspd_flag							= false;
 	bool						ldgalt_flag							= false;
 	bool						pitch_disagree						= false;
@@ -356,13 +366,13 @@ class Parameters
 	bool						altitude_disagree					= false;
 	bool						roll_warning						= false;
 	bool						slip_skid_warning					= false;
-	// Velocity ladder
+	// Velocity ladder:
 	si::Velocity				vl_extent							= 124_kt;
 	int							vl_minimum							= 0;
 	int							vl_maximum							= 9999;
 	int							vl_line_every						= 10;
 	int							vl_number_every						= 20;
-	// Altitude ladder
+	// Altitude ladder:
 	si::Length					al_extent							= 825_ft;
 	int							al_emphasis_every					= 1000;
 	int							al_bold_every						= 500;
@@ -868,8 +878,8 @@ class ADI: public xf::Instrument<ADI_IO>
 	xf::EventTimestamper						_roll_disagree_timestamp;
 	bool										_computed_fpv_failure	{ false };
 	bool										_computed_fpv_visible	{ false };
-	Angle										_computed_fpv_alpha		{ 0_deg };
-	Angle										_computed_fpv_beta		{ 0_deg };
+	std::optional<si::Angle>					_computed_fpv_alpha;
+	std::optional<si::Angle>					_computed_fpv_beta;
 	QString										_speed_flaps_up_current_label;
 	QString										_speed_flaps_a_current_label;
 	QString										_speed_flaps_b_current_label;

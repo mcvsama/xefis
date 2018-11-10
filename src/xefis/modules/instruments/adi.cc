@@ -42,41 +42,60 @@ Parameters::sanitize()
 
 	// Set orientation angles to range -180…180°:
 	{
-		Angle p = xf::floored_mod (this->orientation_pitch + 180_deg, 360_deg) - 180_deg;
-		Angle r = xf::floored_mod (this->orientation_roll + 180_deg, 360_deg) - 180_deg;
-		Angle hdg = xf::floored_mod (this->orientation_heading, 360_deg);
+		std::optional<Angle> p;
+		std::optional<Angle> r;
 
-		// Mirroring, eg. -180° pitch is the same
-		// as 0° pitch with roll inverted:
-		if (p < -90_deg)
+		if (this->orientation_pitch)
+			p = xf::floored_mod (*this->orientation_pitch + 180_deg, 360_deg) - 180_deg;
+
+		if (this->orientation_roll)
+			r = xf::floored_mod (*this->orientation_roll + 180_deg, 360_deg) - 180_deg;
+
+		if (p && r)
 		{
-			p = -180_deg - p;
-			r = +180_deg - r;
-		}
-		else if (p > 90_deg)
-		{
-			p = +180_deg - p;
-			r = +180_deg - r;
+			// Mirroring, eg. -180° pitch is the same
+			// as 0° pitch with roll inverted:
+			if (*p < -90_deg)
+			{
+				p = -180_deg - *p;
+				r = +180_deg - *r;
+			}
+			else if (*p > 90_deg)
+			{
+				p = +180_deg - *p;
+				r = +180_deg - *r;
+			}
+
+			this->orientation_pitch = p;
+			this->orientation_roll = r;
 		}
 
-		this->orientation_pitch = p;
-		this->orientation_roll = r;
-		this->orientation_heading = hdg;
+		if (this->orientation_heading)
+			this->orientation_heading = xf::floored_mod (*this->orientation_heading, 360_deg);
 	}
 
 	// Limit FPM position:
 	{
-		this->flight_path_alpha = xf::clamped<Angle> (this->flight_path_alpha, -25.0_deg, +25.0_deg);
-		this->flight_path_beta = xf::clamped<Angle> (this->flight_path_beta, -25.0_deg, +25.0_deg);
+		if (this->flight_path_alpha)
+			this->flight_path_alpha = xf::clamped<Angle> (*this->flight_path_alpha, -25.0_deg, +25.0_deg);
+
+		if (this->flight_path_beta)
+			this->flight_path_beta = xf::clamped<Angle> (*this->flight_path_beta, -25.0_deg, +25.0_deg);
 	}
 
 	// Speed limits:
 	{
-		this->speed = std::clamp<si::Velocity> (this->speed, 1_kt * this->vl_minimum, 1_kt * this->vl_maximum);
+		if (this->speed)
+		{
+			this->speed = std::clamp<si::Velocity> (*this->speed, 1_kt * this->vl_minimum, 1_kt * this->vl_maximum);
+			this->speed = std::clamp<si::Velocity> (*this->speed, 0_kt, 9999.99_kt);
+		}
 
-		this->speed = xf::clamped<si::Velocity> (this->speed, 0_kt, 9999.99_kt);
-		this->speed_mach = xf::clamped (this->speed_mach, 0.0, 9.99);
-		this->speed_minimum = xf::clamped<si::Velocity> (this->speed_minimum, 0.0_kt, 9999.99_kt);
+		if (this->speed_mach)
+			this->speed_mach = xf::clamped (*this->speed_mach, 0.0, 9.99);
+
+		if (this->speed_minimum)
+			this->speed_minimum = xf::clamped<si::Velocity> (*this->speed_minimum, 0.0_kt, 9999.99_kt);
 
 		if (this->speed_minimum_maneuver)
 			this->speed_minimum_maneuver = xf::clamped<si::Velocity> (*this->speed_minimum_maneuver, 0.0_kt, 9999.99_kt);
@@ -84,13 +103,17 @@ Parameters::sanitize()
 		if (this->speed_maximum_maneuver)
 			this->speed_maximum_maneuver = xf::clamped<si::Velocity> (*this->speed_maximum_maneuver, 0.0_kt, 9999.99_kt);
 
-		this->speed_maximum = xf::clamped<si::Velocity> (this->speed_maximum, 0.0_kt, 9999.99_kt);
+		if (this->speed_maximum)
+			this->speed_maximum = xf::clamped<si::Velocity> (*this->speed_maximum, 0.0_kt, 9999.99_kt);
 	}
 
 	// Altitude limits:
 	{
-		this->altitude_amsl = xf::clamped<si::Length> (this->altitude_amsl, -99999_ft, +99999_ft);
-		this->vertical_speed = xf::clamped<si::Velocity> (this->vertical_speed, -9999_fpm, +9999_fpm);
+		if (this->altitude_amsl)
+			this->altitude_amsl = xf::clamped<si::Length> (*this->altitude_amsl, -99999_ft, +99999_ft);
+
+		if (this->vertical_speed)
+			this->vertical_speed = xf::clamped<si::Velocity> (*this->vertical_speed, -9999_fpm, +9999_fpm);
 	}
 }
 
@@ -326,7 +349,7 @@ AdiPaintRequest::paint_vertical_failure_flag (QString const& message, QPointF co
 inline QColor
 AdiPaintRequest::get_decision_height_color() const
 {
-	return params.altitude_amsl < params.decision_height_amsl
+	return params.altitude_amsl && params.decision_height_amsl && *params.altitude_amsl < *params.decision_height_amsl
 		? aids.kCautionColor
 		: aids.kNavigationColor;
 }
@@ -374,13 +397,13 @@ void
 ArtificialHorizon::precompute (AdiPaintRequest& pr)
 {
 	_pitch_transform.reset();
-	_pitch_transform.translate (0.f, -pr.pitch_to_px (pr.params.orientation_pitch));
+	_pitch_transform.translate (0.f, -pr.pitch_to_px (pr.params.orientation_pitch.value_or (0_deg)));
 
 	_roll_transform.reset();
-	_roll_transform.rotate (-pr.params.orientation_roll.in<Degree>());
+	_roll_transform.rotate (-pr.params.orientation_roll.value_or (0_deg).in<Degree>());
 
 	_heading_transform.reset();
-	_heading_transform.translate (-pr.heading_to_px (pr.params.orientation_heading), 0.f);
+	_heading_transform.translate (-pr.heading_to_px (pr.params.orientation_heading.value_or (0_deg)), 0.f);
 
 	// Total transform of horizon (heading is not really necessary here):
 	_fast_horizon_transform = _pitch_transform * _roll_transform * pr.precomputed.center_transform;
@@ -389,8 +412,11 @@ ArtificialHorizon::precompute (AdiPaintRequest& pr)
 	_horizon_transform.shear (0.0001f, 0.f);
 
 	// Limit FPM position:
-	_flight_path_marker_position = QPointF (-pr.heading_to_px (pr.params.flight_path_beta),
-											-pr.pitch_to_px (pr.params.flight_path_alpha));
+	if (pr.params.flight_path_alpha && pr.params.flight_path_beta)
+		_flight_path_marker_position = QPointF (-pr.heading_to_px (*pr.params.flight_path_beta),
+												-pr.pitch_to_px (*pr.params.flight_path_alpha));
+	else
+		_flight_path_marker_position = QPointF { 0.0, 0.0 };
 
 	if (pr.paint_request.size_changed())
 	{
@@ -455,7 +481,7 @@ ArtificialHorizon::clear (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::paint_horizon (AdiPaintRequest& pr) const
 {
-	if (pr.params.orientation_pitch_visible && pr.params.orientation_roll_visible)
+	if (pr.params.orientation_pitch && pr.params.orientation_roll)
 	{
 		pr.painter.setClipping (false);
 
@@ -482,7 +508,7 @@ ArtificialHorizon::paint_horizon (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 {
-	if (pr.params.orientation_pitch_visible)
+	if (pr.params.orientation_pitch)
 	{
 		float const lesser_dimension = pr.aids.lesser_dimension();
 		float const w = lesser_dimension * (2.0f / 9.0f);
@@ -503,8 +529,8 @@ ArtificialHorizon::paint_pitch_scale (AdiPaintRequest& pr) const
 
 		// Pitch scale is clipped to small rectangle, so narrow it even more:
 		float const clipped_pitch_factor = 0.45f;
-		xf::Range<Angle> deg_range (pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
-									pr.params.orientation_pitch + clipped_pitch_factor * 0.365f * pr.params.fov);
+		xf::Range<Angle> deg_range (*pr.params.orientation_pitch - clipped_pitch_factor * 0.485f * pr.params.fov,
+									*pr.params.orientation_pitch + clipped_pitch_factor * 0.365f * pr.params.fov);
 
 		pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 
@@ -633,7 +659,7 @@ ArtificialHorizon::paint_roll_scale (AdiPaintRequest& pr) const
 		}
 	}
 
-	if (pr.params.orientation_roll_visible)
+	if (pr.params.orientation_roll)
 	{
 		float const bold_width = pr.aids.pen_width (3.f);
 		QPointF const a (0, 0.01f * w); // Miter
@@ -671,9 +697,9 @@ ArtificialHorizon::paint_roll_scale (AdiPaintRequest& pr) const
 			});
 		}
 
-		if (pr.params.slip_skid_visible)
+		if (pr.params.slip_skid)
 		{
-			pr.painter.translate (-xf::clamped (pr.params.slip_skid.in<si::Degree>(), -4.0, +4.0) * 0.03 * w, 0.0);
+			pr.painter.translate (-xf::clamped (pr.params.slip_skid->in<si::Degree>(), -4.0, +4.0) * 0.03 * w, 0.0);
 
 			if (pr.params.roll_warning || pr.params.slip_skid_warning)
 				pr.painter.setPen (warning_pen);
@@ -704,7 +730,7 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 	float const w = pr.aids.lesser_dimension() * 2.25f / 9.f;
 	float const fpxs = pr.aids.font_1.font.pixelSize();
 
-	if (pr.params.orientation_pitch_visible && pr.params.orientation_roll_visible)
+	if (pr.params.orientation_pitch && pr.params.orientation_roll)
 	{
 		// Clip rectangle before and after rotation:
 		pr.painter.setTransform (pr.precomputed.center_transform);
@@ -721,11 +747,11 @@ ArtificialHorizon::paint_heading (AdiPaintRequest& pr) const
 		pr.painter.setPen (p);
 		pr.painter.setFont (pr.aids.font_1.font);
 
-		if (pr.params.orientation_heading_visible)
+		if (pr.params.orientation_heading)
 		{
 			float clipped_pitch_factor = 0.5f;
-			xf::Range<Angle> deg_range (pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
-										pr.params.orientation_heading + clipped_pitch_factor * 0.350f * pr.params.fov);
+			xf::Range<Angle> deg_range (*pr.params.orientation_heading - clipped_pitch_factor * 0.485f * pr.params.fov,
+										*pr.params.orientation_heading + clipped_pitch_factor * 0.350f * pr.params.fov);
 
 			pr.painter.setTransform (_heading_transform * _horizon_transform);
 			if (pr.params.orientation_heading_numbers_visible)
@@ -838,7 +864,7 @@ ArtificialHorizon::paint_roll_disagree (AdiPaintRequest& pr) const
 void
 ArtificialHorizon::paint_flight_path_marker (AdiPaintRequest& pr) const
 {
-	if (pr.params.flight_path_visible)
+	if (pr.params.flight_path_alpha && pr.params.flight_path_beta)
 	{
 		auto const ld = pr.aids.lesser_dimension();
 
@@ -943,15 +969,16 @@ VelocityLadder::precompute (AdiPaintRequest& pr) const
 void
 VelocityLadder::precompute (AdiPaintRequest& pr)
 {
-	_min_shown = pr.params.speed - 0.5f * pr.params.vl_extent;
-	_max_shown = pr.params.speed + 0.5f * pr.params.vl_extent;
+	auto const speed = pr.params.speed.value_or (0_mps);
+	_min_shown = speed - 0.5f * pr.params.vl_extent;
+	_max_shown = speed + 0.5f * pr.params.vl_extent;
 	_min_shown = std::max<si::Velocity> (_min_shown, 1_kt * pr.params.vl_minimum);
 	_max_shown = std::min<si::Velocity> (_max_shown, 1_kt * pr.params.vl_maximum);
 
 	if (_min_shown < 0_kt)
 		_min_shown = 0_kt;
 
-	_rounded_speed = static_cast<int> (pr.params.speed.in<Knot>() + 0.5);
+	_rounded_speed = static_cast<int> (speed.in<Knot>() + 0.5);
 
 	if (pr.paint_request.size_changed())
 	{
@@ -966,7 +993,7 @@ VelocityLadder::precompute (AdiPaintRequest& pr)
 		float const digit_width = pr.aids.font_5.digit_width;
 		float const digit_height = pr.aids.font_5.digit_height;
 		_margin = 0.25f * digit_width;
-		_digits = (pr.params.speed >= 1000_kt - 0.5_kt) ? 4 : 3;
+		_digits = (speed >= 1000_kt - 0.5_kt) ? 4 : 3;
 
 		float const box_height_factor = 2.35;
 		_black_box_rect = QRectF (-_digits * digit_width - 2.f * _margin, -0.5f * box_height_factor * digit_height,
@@ -1002,7 +1029,7 @@ VelocityLadder::precompute (AdiPaintRequest& pr)
 void
 VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_visible)
+	if (pr.params.speed)
 	{
 		QFont const& actual_speed_font = pr.aids.font_5.font;
 		float const digit_width = pr.aids.font_5.digit_width;
@@ -1013,8 +1040,8 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 
 		QPen border_pen = _black_box_pen;
 		bool const speed_is_in_warning_area =
-			(pr.params.speed_minimum < pr.params.speed && pr.params.speed_minimum_maneuver && pr.params.speed < *pr.params.speed_minimum_maneuver) ||
-			(pr.params.speed_maximum > pr.params.speed && pr.params.speed_maximum_maneuver && pr.params.speed > *pr.params.speed_maximum_maneuver);
+			(pr.params.speed_minimum && *pr.params.speed > *pr.params.speed_minimum && pr.params.speed_minimum_maneuver && *pr.params.speed < *pr.params.speed_minimum_maneuver) ||
+			(pr.params.speed_maximum && *pr.params.speed < *pr.params.speed_maximum && pr.params.speed_maximum_maneuver && *pr.params.speed > *pr.params.speed_maximum_maneuver);
 
 		if (pr.speed_warning_blinker.active() || speed_is_in_warning_area)
 		{
@@ -1053,15 +1080,15 @@ VelocityLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 		pr.painter.setFont (actual_speed_font);
 
 		if (_digits == 4)
-			pr.paint_rotating_digit (box_1000, pr.params.speed.in<Knot>(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
+			pr.paint_rotating_digit (box_1000, pr.params.speed->in<Knot>(), 1000, 1.25f, 0.0005f, 0.5f, false, true);
 
-		pr.paint_rotating_digit (box_0100, pr.params.speed.in<Knot>(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
-		pr.paint_rotating_digit (box_0010, pr.params.speed.in<Knot>(), 10, 1.25f, 0.05f, 0.5f, false, false);
-		float pos_0001 = _rounded_speed - pr.params.speed.in<Knot>();
+		pr.paint_rotating_digit (box_0100, pr.params.speed->in<Knot>(), 100, 1.25f, 0.005f, 0.5f, false, true, true);
+		pr.paint_rotating_digit (box_0010, pr.params.speed->in<Knot>(), 10, 1.25f, 0.05f, 0.5f, false, false);
+		float pos_0001 = _rounded_speed - pr.params.speed->in<Knot>();
 		pr.paint_rotating_value (box_0001, pos_0001, 0.7f,
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed + 1.f, 10.f)))),
 								 QString::number (static_cast<int> (std::abs (std::fmod (1.f * _rounded_speed, 10.f)))),
-								 pr.params.speed > (1_kt * pr.params.vl_minimum + 0.5_kt)
+								 *pr.params.speed > (1_kt * pr.params.vl_minimum + 0.5_kt)
 									? QString::number (static_cast<int> (xf::floored_mod (1.f * _rounded_speed - 1.f, 10.f)))
 									: " ");
 	}
@@ -1091,7 +1118,7 @@ VelocityLadder::paint_ias_disagree (AdiPaintRequest& pr, float const x) const
 void
 VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_visible)
+	if (pr.params.speed)
 	{
 		QFont const& ladder_font = pr.aids.font_2.font;
 		float const ladder_digit_width = pr.aids.font_2.digit_width;
@@ -1132,7 +1159,7 @@ VelocityLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 void
 VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_visible)
+	if (pr.params.speed)
 	{
 		float const tr_right = 0.45f * x;
 		float const p1w = pr.aids.pen_width (0.54f);
@@ -1147,10 +1174,10 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 		pr.painter.translate (tr_right, 0.f);
 		pr.painter.setClipRect (_ladder_rect.adjusted (0.f, -ydif.y(), 0.f, ydif.y()));
 
-		float const min_posy = kt_to_px (pr, pr.params.speed_minimum);
+		float const min_posy = kt_to_px (pr, pr.params.speed_minimum.value_or (0_mps));
 		float const min_man_posy = kt_to_px (pr, pr.params.speed_minimum_maneuver ? *pr.params.speed_minimum_maneuver : 0_mps);
 		float const max_man_posy = kt_to_px (pr, pr.params.speed_maximum_maneuver ? *pr.params.speed_maximum_maneuver : 0_mps);
-		float const max_posy = kt_to_px (pr, pr.params.speed_maximum);
+		float const max_posy = kt_to_px (pr, pr.params.speed_maximum.value_or (0_mps));
 		QPointF const min_point = _ladder_rect.bottomRight() + ydif;
 		QPointF const max_point = _ladder_rect.topRight() - ydif;
 
@@ -1180,7 +1207,7 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 			});
 		}
 
-		if (pr.params.speed_maximum_visible && pr.params.speed_maximum < _max_shown)
+		if (pr.params.speed_maximum && *pr.params.speed_maximum < _max_shown)
 		{
 			pr.painter.setPen (pen_b);
 			pr.painter.drawLine (QPointF (_ladder_rect.right(), max_posy), max_point);
@@ -1188,7 +1215,7 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 			pr.painter.drawLine (QPointF (_ladder_rect.right(), max_posy), max_point);
 		}
 
-		if (pr.params.speed_minimum_visible && pr.params.speed_minimum > _min_shown)
+		if (pr.params.speed_minimum && *pr.params.speed_minimum > _min_shown)
 		{
 			pr.painter.setPen (pen_b);
 			pr.painter.drawLine (QPointF (_ladder_rect.right(), min_posy), min_point);
@@ -1202,7 +1229,7 @@ VelocityLadder::paint_speed_limits (AdiPaintRequest& pr, float const x) const
 void
 VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_lookahead_visible && pr.params.speed_visible)
+	if (pr.params.speed_lookahead && pr.params.speed)
 	{
 		QPen pen (pr.aids.get_pen (pr.aids.kNavigationColor, 1.25f));
 		pen.setCapStyle (Qt::RoundCap);
@@ -1214,10 +1241,10 @@ VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 		pr.painter.setPen (pen);
 		pr.painter.translate (1.2f * x, 0.f);
 
-		if (pr.params.speed_lookahead < pr.params.speed)
+		if (*pr.params.speed_lookahead < *pr.params.speed)
 			pr.painter.scale (1.f, -1.f);
 
-		float const lookahead_pixels = abs (kt_to_px (pr, xf::clamped<si::Velocity> (pr.params.speed_lookahead, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum)));
+		float const lookahead_pixels = abs (kt_to_px (pr, xf::clamped<si::Velocity> (*pr.params.speed_lookahead, 1_kt * pr.params.vl_minimum, 1_kt * pr.params.vl_maximum)));
 		float const length = std::min<float> (_ladder_rect.height() / 2.f, lookahead_pixels) - 0.5f * x;
 
 		if (length > 0.2f * x)
@@ -1243,7 +1270,7 @@ VelocityLadder::paint_speed_tendency (AdiPaintRequest& pr, float const x) const
 void
 VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_visible)
+	if (pr.params.speed)
 	{
 		QFont const& speed_bug_font = pr.aids.font_1.font;
 		float const speed_bug_digit_height = pr.aids.font_1.digit_height;
@@ -1289,18 +1316,18 @@ VelocityLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 void
 VelocityLadder::paint_mach_or_gs (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.speed_mach_visible || pr.params.speed_ground)
+	if (pr.params.speed_mach || pr.params.speed_ground)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (_transform);
 		pr.painter.translate (0.f, 0.75f * x);
 		QPointF const paint_position (0.0, _ladder_rect.bottom() + 0.5 * pr.aids.font_5.digit_height);
 
-		if (pr.params.speed_mach_visible)
+		if (pr.params.speed_mach)
 		{
 			QFont const& font = pr.aids.font_5.font;
 
-			QString mach_str = QString ("%1").arg (pr.params.speed_mach, 0, 'f', 3);
+			QString mach_str = QString ("%1").arg (*pr.params.speed_mach, 0, 'f', 3);
 			if (mach_str.left (2) == "0.")
 				mach_str = mach_str.mid (1);
 
@@ -1415,7 +1442,7 @@ VelocityLadder::paint_failure (AdiPaintRequest& pr) const
 inline float
 VelocityLadder::kt_to_px (AdiPaintRequest& pr, Velocity const speed) const
 {
-	return -0.5 * _ladder_rect.height() * (speed - pr.params.speed) / (0.5 * pr.params.vl_extent);
+	return -0.5 * _ladder_rect.height() * (speed - pr.params.speed.value_or (0_mps)) / (0.5 * pr.params.vl_extent);
 }
 
 
@@ -1474,12 +1501,13 @@ AltitudeLadder::precompute (AdiPaintRequest& pr) const
 void
 AltitudeLadder::precompute (AdiPaintRequest& pr)
 {
-	float const sgn = pr.params.altitude_amsl < 0_ft ? -1.f : 1.f;
+	auto const altitude_amsl = pr.params.altitude_amsl.value_or (0_ft);
+	float const sgn = altitude_amsl < 0_ft ? -1.f : 1.f;
 	auto const ld = pr.aids.lesser_dimension();
 
-	_min_shown = pr.params.altitude_amsl - 0.5f * pr.params.al_extent;
-	_max_shown = pr.params.altitude_amsl + 0.5f * pr.params.al_extent;
-	_rounded_altitude = static_cast<int> (pr.params.altitude_amsl.in<Foot>() + sgn * 10.f) / 20 * 20;
+	_min_shown = altitude_amsl - 0.5f * pr.params.al_extent;
+	_max_shown = altitude_amsl + 0.5f * pr.params.al_extent;
+	_rounded_altitude = static_cast<int> (altitude_amsl.in<Foot>() + sgn * 10.f) / 20 * 20;
 
 	_transform = pr.precomputed.center_transform;
 	_transform.translate (+0.4f * ld, 0.f);
@@ -1553,7 +1581,7 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 	QFontMetricsF const s_metrics (s_font);
 	QFontMetricsF const m_metrics (m_font);
 
-	if (pr.params.altitude_visible)
+	if (pr.params.altitude_amsl)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (_transform);
@@ -1587,7 +1615,7 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 			pr.painter.fast_draw_text (m_pos, Qt::AlignLeft | Qt::AlignVCenter, "M", pr.default_shadow);
 			pr.painter.setPen (pr.aids.get_pen (Qt::white, 1.f));
 			pr.painter.fast_draw_text (m_pos + QPointF (-xcorr, 0.f), Qt::AlignRight | Qt::AlignVCenter,
-									   QString ("%1").arg (std::round (pr.params.altitude_amsl.in<Meter>()), 0, 'f', 0), pr.default_shadow);
+									   QString ("%1").arg (std::round (pr.params.altitude_amsl->in<Meter>()), 0, 'f', 0), pr.default_shadow);
 		}
 
 		pr.painter.setPen (_black_box_pen);
@@ -1606,13 +1634,13 @@ AltitudeLadder::paint_black_box (AdiPaintRequest& pr, float const x) const
 
 		// 11100 part:
 		pr.painter.setFont (b_font);
-		pr.paint_rotating_digit (box_10000, pr.params.altitude_amsl.in<Foot>(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
-		pr.paint_rotating_digit (box_01000, pr.params.altitude_amsl.in<Foot>(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
+		pr.paint_rotating_digit (box_10000, pr.params.altitude_amsl->in<Foot>(), 10000, 1.25f * s_digit_height / b_digit_height, 0.0005f, 5.f, true, true);
+		pr.paint_rotating_digit (box_01000, pr.params.altitude_amsl->in<Foot>(), 1000, 1.25f * s_digit_height / b_digit_height, 0.005f, 5.f, false, false);
 		pr.painter.setFont (s_font);
-		pr.paint_rotating_digit (box_00100, pr.params.altitude_amsl.in<Foot>(), 100, 1.25f, 0.05f, 5.f, false, false);
+		pr.paint_rotating_digit (box_00100, pr.params.altitude_amsl->in<Foot>(), 100, 1.25f, 0.05f, 5.f, false, false);
 
 		// 00011 part:
-		float pos_00011 = (_rounded_altitude - pr.params.altitude_amsl.in<Foot>()) / 20.f;
+		float pos_00011 = (_rounded_altitude - pr.params.altitude_amsl->in<Foot>()) / 20.f;
 		pr.paint_rotating_value (box_00011, pos_00011, 0.75f,
 								 QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 2.f, 10.f)))) + "0",
 								 QString::number (static_cast<int> (std::abs (std::fmod (_rounded_altitude / 10.f + 0.f, 10.f)))) + "0",
@@ -1644,7 +1672,7 @@ AltitudeLadder::paint_altitude_disagree (AdiPaintRequest& pr, float const x) con
 void
 AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.altitude_visible)
+	if (pr.params.altitude_amsl)
 	{
 		QFont const& b_ladder_font = pr.aids.font_2.font;
 		float const b_ladder_digit_width = pr.aids.font_2.digit_width;
@@ -1723,7 +1751,7 @@ AltitudeLadder::paint_ladder_scale (AdiPaintRequest& pr, float const x) const
 void
 AltitudeLadder::paint_altitude_tendency (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.altitude_lookahead_visible && pr.params.altitude_visible)
+	if (pr.params.altitude_lookahead && pr.params.altitude_amsl)
 	{
 		QPen pen (pr.aids.get_pen (pr.aids.kNavigationColor, 1.25f));
 		pen.setCapStyle (Qt::RoundCap);
@@ -1733,10 +1761,10 @@ AltitudeLadder::paint_altitude_tendency (AdiPaintRequest& pr, float const x) con
 		pr.painter.translate (-1.2f * x, 0.f);
 		pr.painter.setPen (pen);
 
-		if (pr.params.altitude_lookahead < pr.params.altitude_amsl)
+		if (*pr.params.altitude_lookahead < *pr.params.altitude_amsl)
 			pr.painter.scale (1.f, -1.f);
 
-		float length = std::min<float> (_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (pr, pr.params.altitude_lookahead))) - 0.5f * x;
+		float length = std::min<float> (_ladder_rect.height() / 2.f, 1.f * std::abs (ft_to_px (pr, *pr.params.altitude_lookahead))) - 0.5f * x;
 
 		if (length > 0.2f * x)
 		{
@@ -1760,7 +1788,7 @@ AltitudeLadder::paint_altitude_tendency (AdiPaintRequest& pr, float const x) con
 void
 AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.altitude_visible)
+	if (pr.params.altitude_amsl)
 	{
 		QFont const& altitude_bug_font = pr.aids.font_1.font;
 		float const altitude_bug_digit_height = pr.aids.font_1.digit_height;
@@ -1789,11 +1817,11 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		}
 
 		// Altitude warning:
-		if (pr.params.landing_visible)
+		if (pr.params.landing_amsl)
 		{
-			QPointF const p1 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl + pr.params.altitude_landing_warning_lo));
-			QPointF const p2 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl + pr.params.altitude_landing_warning_hi));
-			QPointF const p0 (-2.05f * x, ft_to_px (pr, pr.params.landing_amsl));
+			QPointF const p1 (-2.05f * x, ft_to_px (pr, *pr.params.landing_amsl + pr.params.altitude_landing_warning_lo));
+			QPointF const p2 (-2.05f * x, ft_to_px (pr, *pr.params.landing_amsl + pr.params.altitude_landing_warning_hi));
+			QPointF const p0 (-2.05f * x, ft_to_px (pr, *pr.params.landing_amsl));
 
 			QPen w = _ldg_alt_pen;
 			w.setColor (Qt::white);
@@ -1810,9 +1838,9 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 			});
 
 			// Landing altitude ground level:
-			if (pr.params.landing_amsl > _min_shown && pr.params.landing_amsl < _max_shown)
+			if (_min_shown < *pr.params.landing_amsl && *pr.params.landing_amsl < _max_shown)
 			{
-				float const posy = ft_to_px (pr, pr.params.landing_amsl);
+				float const posy = ft_to_px (pr, *pr.params.landing_amsl);
 
 				pr.painter.setClipPath (_ladder_clip_path, Qt::IntersectClip);
 				pr.painter.setPen (_ldg_alt_pen);
@@ -1851,13 +1879,13 @@ AltitudeLadder::paint_bugs (AdiPaintRequest& pr, float const x) const
 		}
 
 		// Baro bug:
-		if (pr.params.decision_height_visible)
+		if (pr.params.decision_height_amsl)
 		{
-			if (pr.params.decision_height_amsl > _min_shown && pr.params.decision_height_amsl < _max_shown)
+			if (_min_shown < *pr.params.decision_height_amsl && *pr.params.decision_height_amsl < _max_shown)
 			{
 				if (!pr.decision_height_warning_blinker.active() || pr.decision_height_warning_blinker.visibility_state())
 				{
-					float const posy = ft_to_px (pr, pr.params.decision_height_amsl);
+					float const posy = ft_to_px (pr, *pr.params.decision_height_amsl);
 
 					pr.painter.setTransform (_transform);
 					pr.painter.setClipPath (_decision_height_clip_path);
@@ -1942,11 +1970,11 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 	}
 
 	// Variometer:
-	if (pr.params.energy_variometer_visible)
+	if (pr.params.energy_variometer_rate)
 	{
 		pr.painter.setClipping (false);
 
-		float const posy = -2.f * y * scale_energy_variometer (pr, pr.params.energy_variometer_rate);
+		float const posy = -2.f * y * scale_energy_variometer (pr, *pr.params.energy_variometer_rate);
 		float const pw = pr.aids.pen_width (2.0);
 
 		pr.painter.setPen (QPen (pr.aids.kNavigationColor, pr.aids.pen_width (1.0)));
@@ -2001,7 +2029,7 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 						 std::min (*pr.params.tcas_ra_vertical_speed_maximum, +min_vspd));
 
 	// Pointer:
-	if (pr.params.vertical_speed_visible)
+	if (pr.params.vertical_speed)
 	{
 		pr.painter.setClipRect (QRectF (0.15f * x, -2.75f * y - x, (1.66f - 0.15f) * x, 5.5f * y + 2.f * x));
 		QPen indicator_pen = bold_white_pen;
@@ -2009,28 +2037,28 @@ AltitudeLadder::paint_vertical_speed (AdiPaintRequest& pr, float const x) const
 		pr.painter.setPen (indicator_pen);
 		pr.painter.paint (pr.default_shadow, [&] {
 			pr.painter.drawLine (QPointF (3.f * x, 0.f),
-								 QPointF (line_w, -2.f * y * scale_vertical_speed (pr.params.vertical_speed)));
+								 QPointF (line_w, -2.f * y * scale_vertical_speed (*pr.params.vertical_speed)));
 		});
-	}
 
-	// Numeric indicators above and below:
-	pr.painter.setPen (bold_white_pen);
-	int abs_vertical_speed = static_cast<int> (std::abs (pr.params.vertical_speed.in<FootPerMinute>())) / 10 * 10;
+		// Numeric indicators above and below:
+		pr.painter.setPen (bold_white_pen);
+		int abs_vertical_speed = static_cast<int> (std::abs (pr.params.vertical_speed->in<FootPerMinute>())) / 10 * 10;
 
-	if (abs_vertical_speed >= 100)
-	{
-		QString str = QString::number (abs_vertical_speed);
-		if (str.size() == 2)
-			str = "  " + str;
-		else if (str.size() == 3)
-			str = " " + str;
+		if (abs_vertical_speed >= 100)
+		{
+			QString str = QString::number (abs_vertical_speed);
+			if (str.size() == 2)
+				str = "  " + str;
+			else if (str.size() == 3)
+				str = " " + str;
 
-		float const fh = pr.aids.font_2.digit_height;
-		float const sgn = pr.params.vertical_speed > 0_fpm ? 1.f : -1.f;
-		pr.painter.setClipping (false);
-		pr.painter.setFont (pr.aids.font_2.font);
-		pr.painter.translate (-1.05f * x, sgn * -2.35f * y);
-		pr.painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str, pr.default_shadow);
+			float const fh = pr.aids.font_2.digit_height;
+			float const sgn = *pr.params.vertical_speed > 0_fpm ? 1.f : -1.f;
+			pr.painter.setClipping (false);
+			pr.painter.setFont (pr.aids.font_2.font);
+			pr.painter.translate (-1.05f * x, sgn * -2.35f * y);
+			pr.painter.fast_draw_text (QRectF (0.f, -0.5f * fh, 4.f * fh, fh), Qt::AlignVCenter | Qt::AlignLeft, str, pr.default_shadow);
+		}
 	}
 }
 
@@ -2039,7 +2067,7 @@ void
 AltitudeLadder::paint_vertical_ap_setting (AdiPaintRequest& pr, float const x) const
 {
 	// Vertical speed bug (vertical AP setting):
-	if (pr.params.cmd_vertical_speed && pr.params.vertical_speed_visible)
+	if (pr.params.cmd_vertical_speed && pr.params.vertical_speed)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (_transform);
@@ -2061,7 +2089,7 @@ AltitudeLadder::paint_vertical_ap_setting (AdiPaintRequest& pr, float const x) c
 void
 AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 {
-	if (pr.params.pressure_visible)
+	if (pr.params.pressure_qnh)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (_transform);
@@ -2074,7 +2102,7 @@ AltitudeLadder::paint_pressure (AdiPaintRequest& pr, float const x) const
 
 		QString unit_str = pr.params.pressure_display_hpa? " HPA" : " IN";
 		int precision = pr.params.pressure_display_hpa ? 0 : 2;
-		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh.in<HectoPascal>() : pr.params.pressure_qnh.in<InchOfMercury>(), 0, 'f', precision);
+		QString pressure_str = QString ("%1").arg (pr.params.pressure_display_hpa ? pr.params.pressure_qnh->in<HectoPascal>() : pr.params.pressure_qnh->in<InchOfMercury>(), 0, 'f', precision);
 
 		QRectF nn_rect (0.f, _ladder_rect.bottom(), metrics_a.width (pressure_str), 1.2f * pr.aids.font_3.digit_height);
 		QRectF uu_rect (0.f, nn_rect.top(), metrics_b.width (unit_str), nn_rect.height());
@@ -2263,7 +2291,7 @@ AltitudeLadder::scale_energy_variometer (AdiPaintRequest& pr, Power const power,
 inline float
 AltitudeLadder::ft_to_px (AdiPaintRequest& pr, si::Length const length) const
 {
-	return -0.5 * _ladder_rect.height() * (length - pr.params.altitude_amsl) / (0.5 * pr.params.al_extent);
+	return -0.5 * _ladder_rect.height() * (length - pr.params.altitude_amsl.value_or (0_ft)) / (0.5 * pr.params.al_extent);
 }
 
 
@@ -2326,12 +2354,12 @@ PaintingWork::precompute (AdiPaintRequest& pr, Parameters const& params)
 	}
 
 	_speed_warning_blinker.update_current_time (_parameters.timestamp);
-	_speed_warning_blinker.update (_parameters.speed_visible &&
-								   ((_parameters.speed_minimum_visible && _parameters.speed < _parameters.speed_minimum) ||
-									(_parameters.speed_maximum_visible && _parameters.speed > _parameters.speed_maximum)));
+	_speed_warning_blinker.update (_parameters.speed &&
+								   ((_parameters.speed_minimum && *_parameters.speed < *_parameters.speed_minimum) ||
+									(_parameters.speed_maximum && *_parameters.speed > *_parameters.speed_maximum)));
 	_decision_height_warning_blinker.update_current_time (_parameters.timestamp);
-	_decision_height_warning_blinker.update (_parameters.altitude_visible && _parameters.decision_height_visible &&
-											 _parameters.altitude_amsl < _parameters.decision_height_amsl &&
+	_decision_height_warning_blinker.update (_parameters.altitude_amsl && _parameters.decision_height_amsl &&
+											 *_parameters.altitude_amsl < *_parameters.decision_height_amsl &&
 											 _parameters.decision_height_focus_short);
 }
 
@@ -2394,32 +2422,46 @@ PaintingWork::paint_flight_director (AdiPaintRequest& pr) const
 	float const w = pr.aids.lesser_dimension() * 1.4f / 9.f;
 	Angle const range = pr.params.fov / 4.f;
 
-	Angle pitch = si::cos (pr.params.orientation_roll) * (pr.params.flight_director_pitch - pr.params.orientation_pitch);
-	pitch = xf::clamped (pitch, -range, +range);
-
-	Angle roll = pr.params.flight_director_roll - pr.params.orientation_roll;
-
-	if (abs (roll) > 180_deg)
-		roll = roll - sgn (roll.in<Degree>()) * 360_deg;
-
-	roll = xf::clamped (roll, -range, +range);
-
-	float ypos = pr.pitch_to_px (pitch);
-	float xpos = pr.heading_to_px (roll) / 2.f;
-
-	pr.painter.setClipping (false);
-	pr.painter.setTransform (pr.precomputed.center_transform);
-
-	for (auto const& pen: { pr.aids.get_pen (pr.aids.autopilot_pen_1.color(), 2.3f),
-							pr.aids.get_pen (pr.aids.autopilot_pen_2.color(), 1.65f) })
+	if (pr.params.flight_director_guidance_visible && pr.params.orientation_pitch && pr.params.orientation_roll)
 	{
-		pr.painter.setPen (pen);
+		auto const pens = {
+			pr.aids.get_pen (pr.aids.autopilot_pen_1.color(), 2.3f),
+			pr.aids.get_pen (pr.aids.autopilot_pen_2.color(), 1.65f)
+		};
 
-		if (pr.params.flight_director_pitch_visible && pr.params.orientation_pitch_visible)
-			pr.painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
+		pr.painter.setClipping (false);
+		pr.painter.setTransform (pr.precomputed.center_transform);
 
-		if (pr.params.flight_director_roll_visible && pr.params.orientation_roll_visible)
-			pr.painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
+		if (pr.params.flight_director_pitch)
+		{
+			Angle pitch = si::cos (*pr.params.orientation_roll) * (*pr.params.flight_director_pitch - *pr.params.orientation_pitch);
+			pitch = xf::clamped (pitch, -range, +range);
+			float const ypos = pr.pitch_to_px (pitch);
+
+			for (auto const& pen: pens)
+			{
+				pr.painter.setPen (pen);
+				pr.painter.drawLine (QPointF (-w, ypos), QPointF (+w, ypos));
+			}
+		}
+
+		if (pr.params.flight_director_roll)
+		{
+			Angle roll = *pr.params.flight_director_roll - *pr.params.orientation_roll;
+
+			if (abs (roll) > 180_deg)
+				roll = roll - sgn (roll.in<Degree>()) * 360_deg;
+
+			roll = xf::clamped (roll, -range, +range);
+
+			float const xpos = pr.heading_to_px (roll) / 2.f;
+
+			for (auto const& pen: pens)
+			{
+				pr.painter.setPen (pen);
+				pr.painter.drawLine (QPointF (xpos, -w), QPointF (xpos, +w));
+			}
+		}
 	}
 
 	if (pr.params.flight_director_active_name)
@@ -2488,15 +2530,15 @@ PaintingWork::paint_control_surfaces (AdiPaintRequest& pr) const
 void
 PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 {
-	if (pr.params.altitude_agl_visible)
+	if (pr.params.altitude_agl)
 	{
-		Length aagl = xf::clamped<Length> (pr.params.altitude_agl, -9999_ft, +99999_ft);
+		Length aagl = xf::clamped<Length> (*pr.params.altitude_agl, -9999_ft, +99999_ft);
 		QFont const& radar_altimeter_font = pr.aids.font_5.font;
 		float const digit_width = pr.aids.font_5.digit_width;
 		float const digit_height = pr.aids.font_5.digit_height;
 		float const v = 0.03f * pr.q;
 
-		int digits = pr.params.altitude_agl > 9999_ft ? 5 : 4;
+		int digits = *pr.params.altitude_agl > 9999_ft ? 5 : 4;
 		float const margin = 0.2f * digit_width;
 
 		QRectF box_rect (0.f, 0.f, digits * digit_width + 2.f * margin, 1.3f * digit_height);
@@ -2526,7 +2568,7 @@ PaintingWork::paint_altitude_agl (AdiPaintRequest& pr) const
 void
 PaintingWork::paint_decision_height_setting (AdiPaintRequest& pr) const
 {
-	if (pr.params.decision_height_visible)
+	if (pr.params.decision_height_amsl)
 	{
 		float x = 0.18f * pr.aids.lesser_dimension();
 
@@ -2756,13 +2798,13 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 		}
 	}
 
-	if (pr.params.runway_visible && !pr.params.deviation_lateral_failure && pr.params.deviation_lateral_approach)
+	if (pr.params.raising_runway_position && !pr.params.deviation_lateral_failure && pr.params.deviation_lateral_approach)
 	{
 		float w = 0.15f * ld;
 		float h = 0.05f * ld;
 		float p = 1.3f;
 		float offset = 0.5f * xf::clamped (pr.params.deviation_lateral_approach->in<Degree>(), -1.5, +1.5);
-		float ypos = -pr.pitch_to_px (xf::clamped<Angle> (pr.params.runway_position + 3.5_deg, 3.5_deg, 25_deg));
+		float ypos = -pr.pitch_to_px (xf::clamped<Angle> (*pr.params.raising_runway_position + 3.5_deg, 3.5_deg, 25_deg));
 
 		pr.painter.setTransform (pr.precomputed.center_transform);
 		pr.painter.translate (0.f, ypos);
@@ -2799,7 +2841,7 @@ PaintingWork::paint_nav (AdiPaintRequest& pr) const
 void
 PaintingWork::paint_hints (AdiPaintRequest& pr) const
 {
-	if (pr.params.control_hint_visible)
+	if (pr.params.control_hint)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
@@ -2809,7 +2851,7 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 
 		QPointF const text_hook = QPointF (0.f, -3.1f * pr.q);
 
-		pr.painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, pr.params.control_hint, pr.default_shadow);
+		pr.painter.fast_draw_text (text_hook, Qt::AlignVCenter | Qt::AlignHCenter, *pr.params.control_hint, pr.default_shadow);
 
 		if (pr.params.control_hint_focus)
 		{
@@ -2916,18 +2958,18 @@ PaintingWork::paint_hints (AdiPaintRequest& pr) const
 void
 PaintingWork::paint_critical_aoa (AdiPaintRequest& pr) const
 {
-	if (pr.params.critical_aoa_visible && pr.params.orientation_pitch_visible)
+	if (pr.params.critical_aoa && pr.params.aoa_alpha && pr.params.orientation_pitch)
 	{
 		pr.painter.setClipping (false);
 		pr.painter.setTransform (pr.precomputed.center_transform);
-		pr.painter.translate (0.f, pr.pitch_to_px (xf::clamped<Angle> (pr.params.critical_aoa - pr.params.aoa_alpha, -20_deg, +16_deg)));
+		pr.painter.translate (0.f, pr.pitch_to_px (xf::clamped<Angle> (*pr.params.critical_aoa - *pr.params.aoa_alpha, -20_deg, +16_deg)));
 
 		float const w = pr.aids.lesser_dimension() * 3.f / 9.f;
 
 		QPointF const x (0.025f * w, 0.f);
 		QPointF const y (0.f, 0.025f * w);
 		QColor const selected_color =
-			pr.params.critical_aoa > pr.params.aoa_alpha
+			*pr.params.critical_aoa > *pr.params.aoa_alpha
 				? pr.aids.kCautionColor
 				: pr.aids.kWarningColor;
 
@@ -3024,41 +3066,41 @@ ADI::process (xf::Cycle const& cycle)
 
 	adi_detail::Parameters params;
 	params.timestamp = cycle.update_time();
+	params.fov = *io.field_of_view;
+	params.show_vertical_speed_ladder = *io.show_vertical_speed_ladder;
 	params.focus_duration = *io.focus_duration;
 	params.focus_short_duration = *io.focus_short_duration;
 	params.old_style = io.style_old.value_or (false);
 	params.show_metric = io.style_show_metric.value_or (false);
 	// Speed
-	params.speed_failure = !io.speed_ias_serviceable.value_or (true) || !is_sane (io.speed_ias, { 0_mps, 1000_mps });
+	params.speed_failure = !is_sane (io.speed_ias, { 0_mps, 1000_mps });
 	_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.speed_failure;
 	});
 	params.speed_failure_focus = _speed_failure_timestamp.shorter_than (*io.focus_duration);
-	params.speed_visible = io.speed_ias.valid();
-	params.speed = io.speed_ias.value_or (0_kt);
-	params.speed_lookahead_visible = io.speed_ias_lookahead.valid();
-	params.speed_lookahead = io.speed_ias_lookahead.value_or (0_kt);
-	params.speed_minimum_visible = io.speed_ias_minimum.valid();
+	params.speed = io.speed_ias.get_optional();
+	params.speed_lookahead = io.speed_ias_lookahead.get_optional();
 
 	if (*io.show_minimum_speeds_only_if_no_weight_on_wheels)
 	{
 		if (io.weight_on_wheels.value_or (false))
 		{
-			params.speed_minimum_visible = false;
+			params.speed_minimum.reset();
 			params.speed_minimum_maneuver.reset();
 		}
 		else
 		{
-			params.speed_minimum = io.speed_ias_minimum.value_or (0_kt);
+			params.speed_minimum = io.speed_ias_minimum.get_optional();
 			params.speed_minimum_maneuver = io.speed_ias_minimum_maneuver.get_optional();
 		}
 	}
 
 	params.speed_maximum_maneuver = io.speed_ias_maximum_maneuver.get_optional();
-	params.speed_maximum_visible = io.speed_ias_maximum.valid();
-	params.speed_maximum = io.speed_ias_maximum.value_or (0_kt);
-	params.speed_mach_visible = io.speed_mach && *io.speed_mach > *io.show_mach_above;
-	params.speed_mach = io.speed_mach.value_or (0.0);
+	params.speed_maximum = io.speed_ias_maximum.get_optional();
+	params.speed_mach =
+		io.speed_mach && *io.speed_mach > *io.show_mach_above
+			? io.speed_mach.get_optional()
+			: std::nullopt;
 	params.speed_ground = io.speed_ground.get_optional();
 
 	// V1
@@ -3107,55 +3149,45 @@ ADI::process (xf::Cycle const& cycle)
 		params.speed_bugs.erase (_speed_flaps_b_current_label);
 
 	// Orientation
-	params.orientation_failure =
-		!io.orientation_serviceable.value_or (true) ||
-		!is_sane (io.orientation_pitch) ||
-		!is_sane (io.orientation_roll);
+	params.orientation_failure = !is_sane (io.orientation_pitch) || !is_sane (io.orientation_roll);
 	_orientation_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.orientation_failure;
 	});
 	params.orientation_failure_focus = _orientation_failure_timestamp.shorter_than (*io.focus_duration);
-	params.orientation_pitch_visible = io.orientation_pitch.valid();
-	params.orientation_pitch = io.orientation_pitch.value_or (0_deg);
-	params.orientation_roll_visible = io.orientation_roll.valid();
-	params.orientation_roll = io.orientation_roll.value_or (0_deg);
-	params.orientation_heading_visible = io.orientation_heading_magnetic.valid();
-	params.orientation_heading = io.orientation_heading_magnetic.value_or (0_deg);
+	params.orientation_pitch = io.orientation_pitch.get_optional();
+	params.orientation_roll = io.orientation_roll.get_optional();
+	params.orientation_heading = io.orientation_heading_magnetic.get_optional();
 	params.orientation_heading_numbers_visible = io.orientation_heading_numbers_visible.value_or (false);
 	// Slip-skid
-	params.slip_skid_visible = io.slip_skid.valid();
-	params.slip_skid = io.slip_skid.value_or (0_deg);
+	params.slip_skid = io.slip_skid.get_optional();
 	// Flight path vector:
 	params.flight_path_marker_failure = _computed_fpv_failure;
 	_flight_path_marker_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.flight_path_marker_failure;
 	});
 	params.flight_path_marker_failure_focus = _flight_path_marker_failure_timestamp.shorter_than (*io.focus_duration);
-	params.flight_path_visible = _computed_fpv_visible;
 	params.flight_path_alpha = _computed_fpv_alpha;
 	params.flight_path_beta = _computed_fpv_beta;
 	// AOA limit
-	params.critical_aoa_visible = io.aoa_alpha && io.aoa_alpha_maximum && io.aoa_alpha_visible.value_or (false) &&
-								  (*io.aoa_alpha_maximum - *io.aoa_alpha <= *io.aoa_visibility_threshold);
-	params.critical_aoa = io.aoa_alpha_maximum.value_or (0_deg);
-	params.aoa_alpha = io.aoa_alpha.value_or (0_deg);
+	params.aoa_alpha = io.aoa_alpha.get_optional();
+	params.critical_aoa =
+		io.aoa_alpha_visible.value_or (false) && io.aoa_alpha_maximum && (*io.aoa_alpha_maximum - *io.aoa_alpha <= *io.aoa_visibility_threshold)
+			? io.aoa_alpha_maximum.get_optional()
+			: std::nullopt;
 	// Altitude
-	params.altitude_failure = !io.altitude_amsl_serviceable.value_or (true) || !is_sane (io.altitude_amsl);
+	params.altitude_failure = !is_sane (io.altitude_amsl);
 	_altitude_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_failure;
 	});
 	params.altitude_failure_focus = _altitude_failure_timestamp.shorter_than (*io.focus_duration);
-	params.altitude_visible = io.altitude_amsl.valid();
-	params.altitude_amsl = io.altitude_amsl.value_or (0_ft);
-	params.altitude_lookahead_visible = io.altitude_amsl_lookahead.valid();
-	params.altitude_lookahead = io.altitude_amsl_lookahead.value_or (0_ft);
+	params.altitude_amsl = io.altitude_amsl.get_optional();
+	params.altitude_lookahead = io.altitude_amsl_lookahead.get_optional();
 	params.altitude_agl_failure = !io.altitude_agl_serviceable.value_or (true) || !is_sane (io.altitude_agl);
 	_altitude_agl_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.altitude_agl_failure;
 	});
 	params.altitude_agl_failure_focus = _altitude_agl_failure_timestamp.shorter_than (*io.focus_duration);
-	params.altitude_agl_visible = io.altitude_agl.valid();
-	params.altitude_agl = io.altitude_agl.value_or (0_ft);
+	params.altitude_agl = io.altitude_agl.get_optional();
 	_altitude_agl_became_visible.update (cycle.update_time(), [&] {
 		return io.altitude_agl_serviceable && *io.altitude_agl_serviceable && io.altitude_agl;
 	});
@@ -3163,9 +3195,11 @@ ADI::process (xf::Cycle const& cycle)
 	params.altitude_landing_warning_hi = *io.altitude_landing_warning_hi;
 	params.altitude_landing_warning_lo = *io.altitude_landing_warning_lo;
 	// Decision height
-	params.decision_height_visible = io.decision_height_setting && io.decision_height_amsl;
 	params.decision_height_type = QString::fromStdString (io.decision_height_type.value_or (""));
-	params.decision_height_amsl = io.decision_height_amsl.value_or (0_ft);
+	params.decision_height_amsl =
+		io.decision_height_setting
+			? io.decision_height_amsl.get_optional()
+			: std::nullopt;
 	_decision_height_became_visible.update (cycle.update_time(), [&] {
 		return io.altitude_amsl && io.decision_height_amsl &&
 			   *io.altitude_amsl < *io.decision_height_amsl;
@@ -3174,22 +3208,18 @@ ADI::process (xf::Cycle const& cycle)
 	params.decision_height_focus_short = _decision_height_became_visible.shorter_than (*io.focus_short_duration);
 	params.decision_height_setting = io.decision_height_setting.value_or (0_ft);
 	// Landing altitude:
-	params.landing_visible = io.landing_amsl.valid();
-	params.landing_amsl = io.landing_amsl.value_or (0_ft);
+	params.landing_amsl = io.landing_amsl.get_optional();
 	// Vertical speed
-	params.vertical_speed_failure = !io.vertical_speed_serviceable.value_or (true) || !is_sane (io.vertical_speed);
+	params.vertical_speed_failure = !is_sane (io.vertical_speed);
 	_vertical_speed_failure_timestamp.update (cycle.update_time(), [&] {
 		return params.vertical_speed_failure;
 	});
 	params.vertical_speed_failure_focus = _vertical_speed_failure_timestamp.shorter_than (*io.focus_duration);
-	params.vertical_speed_visible = io.vertical_speed.valid();
-	params.vertical_speed = io.vertical_speed.value_or (0_fpm);
-	params.energy_variometer_visible = io.vertical_speed_energy_variometer.valid();
-	params.energy_variometer_rate = io.vertical_speed_energy_variometer.value_or (0_W);
+	params.vertical_speed = io.vertical_speed.get_optional();
+	params.energy_variometer_rate = io.vertical_speed_energy_variometer.get_optional();
 	params.energy_variometer_1000_fpm_power = *io.power_eq_1000_fpm;
 	// Pressure settings
-	params.pressure_visible = io.pressure_qnh.valid();
-	params.pressure_qnh = io.pressure_qnh.value_or (0_Pa);
+	params.pressure_qnh = io.pressure_qnh.get_optional();
 	params.pressure_display_hpa = io.pressure_display_hpa.value_or (false);
 	params.use_standard_pressure = io.pressure_use_std.value_or (false);
 	// Command settings
@@ -3215,6 +3245,7 @@ ADI::process (xf::Cycle const& cycle)
 	params.cmd_altitude_acquired = io.flight_director_cmd_altitude_acquired.value_or (false);
 	// Flight director
 	bool guidance_visible = io.flight_director_guidance_visible.value_or (false);
+	params.flight_director_guidance_visible = guidance_visible;
 	params.flight_director_active_name = io.flight_director_active_name.get_optional();
 	params.flight_director_failure =
 		guidance_visible &&
@@ -3229,10 +3260,8 @@ ADI::process (xf::Cycle const& cycle)
 		return params.flight_director_failure;
 	});
 	params.flight_director_failure_focus = _flight_director_failure_timestamp.shorter_than (*io.focus_duration);
-	params.flight_director_pitch_visible = guidance_visible && io.flight_director_guidance_pitch.valid();
-	params.flight_director_pitch = io.flight_director_guidance_pitch.value_or (0_deg);
-	params.flight_director_roll_visible = guidance_visible && io.flight_director_guidance_roll.valid();
-	params.flight_director_roll = io.flight_director_guidance_roll.value_or (0_deg);
+	params.flight_director_pitch = io.flight_director_guidance_pitch.get_optional();
+	params.flight_director_roll = io.flight_director_guidance_roll.get_optional();
 	// Control stick
 	params.control_surfaces_visible = io.control_surfaces_visible.value_or (false) && io.control_surfaces_elevator && io.control_surfaces_ailerons;
 	params.control_surfaces_elevator = io.control_surfaces_elevator.value_or (0.0f);
@@ -3267,12 +3296,19 @@ ADI::process (xf::Cycle const& cycle)
 	params.deviation_lateral_flight_path = io.flight_path_deviation_lateral_flight_path.get_optional();
 	params.deviation_mixed_mode = io.flight_path_deviation_mixed_mode.value_or (false);
 	// Raising runway
-	params.runway_visible = io.navaid_reference_visible.value_or (false) && io.altitude_agl &&
-							io.flight_path_deviation_lateral_approach && *io.altitude_agl <= *io.raising_runway_visibility;
-	params.runway_position = xf::clamped<Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
+	if (*io.enable_raising_runway && io.navaid_reference_visible.value_or (false) && io.altitude_agl &&
+		io.flight_path_deviation_lateral_approach && *io.altitude_agl <= *io.raising_runway_visibility)
+	{
+		params.raising_runway_position = xf::clamped<Length> (io.altitude_agl.value_or (0_ft), 0_ft, *io.raising_runway_threshold) / *io.raising_runway_threshold * 25_deg;
+	}
+	else
+		params.raising_runway_position.reset();
 	// Control hint
-	params.control_hint_visible = io.flight_mode_hint_visible.value_or (false);
-	params.control_hint = QString::fromStdString (io.flight_mode_hint.value_or (""));
+	if (io.flight_mode_hint_visible.value_or (false))
+		params.control_hint = QString::fromStdString (io.flight_mode_hint.value_or (""));
+	else
+		params.control_hint.reset();
+
 	params.control_hint_focus = io.flight_mode_hint_visible.modification_age() < *io.focus_duration || io.flight_mode_hint.modification_age() < *io.focus_duration;
 	// FMA
 	params.fma_visible = io.flight_mode_fma_visible.value_or (false);
@@ -3353,7 +3389,10 @@ ADI::compute_fpv()
 		track_lateral = &io.track_lateral_true;
 	}
 
-	if (io.orientation_pitch && io.orientation_roll && io.track_vertical && heading && track_lateral)
+	// Hide FPV if weight-on-wheels:
+	bool const hidden = io.weight_on_wheels.value_or (false);
+
+	if (io.fpv_visible.value_or (false) && !hidden && io.orientation_pitch && io.orientation_roll && io.track_vertical && heading && track_lateral)
 	{
 		Angle vdiff = xf::floored_mod<Angle> (*io.orientation_pitch - *io.track_vertical, -180_deg, +180_deg);
 		Angle hdiff = xf::floored_mod<Angle> (**heading - **track_lateral, -180_deg, +180_deg);
@@ -3362,17 +3401,13 @@ ADI::compute_fpv()
 		_computed_fpv_alpha = vdiff * si::cos (roll) + hdiff * si::sin (roll);
 		_computed_fpv_beta = -vdiff * si::sin (roll) + hdiff * si::cos (roll);
 		_computed_fpv_failure = false;
-		_computed_fpv_visible = io.fpv_visible.value_or (false);
 	}
 	else
 	{
-		_computed_fpv_visible = false;
-		_computed_fpv_failure = io.fpv_visible.value_or (false);
+		_computed_fpv_failure = !hidden;
+		_computed_fpv_alpha.reset();
+		_computed_fpv_beta.reset();
 	}
-
-	// Hide FPV if weight-on-wheels:
-	if (io.weight_on_wheels && *io.weight_on_wheels)
-		_computed_fpv_visible = false;
 }
 
 
