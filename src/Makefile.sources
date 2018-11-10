@@ -70,10 +70,8 @@ XEFIS_SOURCES			+= xefis/modules/io/xbee.cc
 ######## /xefis/modules/log ########
 
 XEFIS_HEADERS_MOC		+= xefis/modules/log/klog_monitor.h
-XEFIS_HEADERS_MOC		+= xefis/modules/log/latency.h
 
 XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
-XEFIS_SOURCES			+= xefis/modules/log/latency.cc
 
 XEFIS_HEADERS			+= xefis/modules/simulation/virtual_joystick.h
 XEFIS_SOURCES			+= xefis/modules/simulation/virtual_joystick.cc
@@ -254,7 +252,6 @@ XEFIS_SOURCES			+= xefis/core/components/property_tree/property_tree.cc
 
 ######## /xefis/core ########
 
-XEFIS_HEADERS_MOC		+= xefis/core/accounting.h
 XEFIS_HEADERS			+= xefis/core/cycle.h
 XEFIS_HEADERS			+= xefis/core/fail.h
 XEFIS_HEADERS			+= xefis/core/graphics.h
@@ -282,7 +279,6 @@ XEFIS_HEADERS			+= xefis/core/stdexcept.h
 XEFIS_HEADERS			+= xefis/core/system.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
-XEFIS_SOURCES			+= xefis/core/accounting.cc
 XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/graphics.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
