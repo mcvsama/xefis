@@ -37,9 +37,9 @@ class AirDataComputerIO: public xf::ModuleIO
 	 * Settings
 	 */
 
-	xf::Setting<si::Velocity>				ias_valid_minimum			{ this, "ias_valid_minimum" };
-	xf::Setting<si::Velocity>				ias_valid_maximum			{ this, "ias_valid_maximum" };
-	xf::Setting<bool>						using_ias_sensor			{ this, "using_ias_sensor", false };
+	xf::Setting<si::Velocity>				ias_valid_minimum			{ this, "cas_valid_minimum" };
+	xf::Setting<si::Velocity>				ias_valid_maximum			{ this, "cas_valid_maximum" };
+	xf::Setting<bool>						using_cas_sensor			{ this, "using_cas_sensor", false };
 	xf::Setting<double>						ram_rise_factor				{ this, "ram_rise_factor", 0.2 };
 
 	/*
@@ -48,11 +48,9 @@ class AirDataComputerIO: public xf::ModuleIO
 
 	xf::PropertyIn<bool>					pressure_use_std			{ this, "settings/pressure/use-std", false };
 	xf::PropertyIn<si::Pressure>			pressure_qnh				{ this, "settings/pressure/qnh" };
-	xf::PropertyIn<bool>					pressure_static_serviceable	{ this, "sensors/pressure/serviceable" };
 	xf::PropertyIn<si::Pressure>			pressure_static				{ this, "sensors/pressure/static" };
 	xf::PropertyIn<si::Pressure>			pressure_total				{ this, "sensors/pressure/total" };
-	xf::PropertyIn<bool>					ias_serviceable				{ this, "sensors/airspeed/serviceable" };
-	xf::PropertyIn<si::Velocity>			sensed_ias					{ this, "sensors/airspeed/sensed-ias" };
+	xf::PropertyIn<si::Velocity>			sensed_cas					{ this, "sensors/airspeed/sensed-cas" };
 	xf::PropertyIn<si::Temperature>			total_air_temperature		{ this, "sensors/air-temperature/total" };
 
 	/*
@@ -61,21 +59,20 @@ class AirDataComputerIO: public xf::ModuleIO
 
 	xf::PropertyOut<si::Pressure>			recovered_pressure_total	{ this, "pressure/total" };
 	xf::PropertyOut<si::Pressure>			pressure_dynamic			{ this, "pressure/dynamic" };
-	xf::PropertyOut<bool>					altitude_amsl_serviceable	{ this, "altitude/amsl.serviceable" };
 	xf::PropertyOut<si::Length>				altitude_amsl				{ this, "altitude/amsl" };
 	xf::PropertyOut<si::Length>				altitude_amsl_lookahead		{ this, "altitude/amsl.lookahead" };
 	xf::PropertyOut<si::Length>				altitude_amsl_qnh			{ this, "altitude/amsl.qnh" };
 	xf::PropertyOut<si::Length>				altitude_amsl_std			{ this, "altitude/amsl.std" };
 	xf::PropertyOut<si::Length>				density_altitude			{ this, "density-altitude" };
-	xf::PropertyOut<si::Density>			air_density_static			{ this, "air-density/static" };
-	xf::PropertyOut<bool>					speed_ias_serviceable		{ this, "speed/ias.serviceable" };
+	xf::PropertyOut<si::Density>			air_density					{ this, "air-density" };
 	xf::PropertyOut<si::Velocity>			speed_ias					{ this, "speed/ias" };
 	xf::PropertyOut<si::Velocity>			speed_ias_lookahead			{ this, "speed/ias.lookahead" };
+	xf::PropertyOut<si::Velocity>			speed_cas					{ this, "speed/cas" };
+	xf::PropertyOut<si::Velocity>			speed_cas_lookahead			{ this, "speed/cas.lookahead" };
 	xf::PropertyOut<si::Velocity>			speed_tas					{ this, "speed/tas" };
 	xf::PropertyOut<si::Velocity>			speed_eas					{ this, "speed/eas" };
 	xf::PropertyOut<double>					speed_mach					{ this, "speed/mach" };
 	xf::PropertyOut<si::Velocity>			speed_sound					{ this, "speed/sound" };
-	xf::PropertyOut<bool>					vertical_speed_serviceable	{ this, "vertical-speed/serviceable" };
 	xf::PropertyOut<si::Velocity>			vertical_speed				{ this, "vertical-speed/speed" };
 	xf::PropertyOut<si::Temperature>		static_air_temperature		{ this, "air-temperature/static" };
 	xf::PropertyOut<si::DynamicViscosity>	dynamic_viscosity			{ this, "viscosity/dynamic" };
@@ -112,10 +109,19 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	compute_ias_lookahead();
 
 	void
+	compute_cas();
+
+	void
+	compute_cas_lookahead();
+
+	void
 	compute_mach();
 
 	void
 	compute_sat_and_viscosity();
+
+	void
+	compute_air_density();
 
 	void
 	compute_density_altitude();
@@ -141,6 +147,7 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
   private:
 	xf::Logger					_logger;
 	bool						_ias_in_valid_range					= false;
+	bool						_cas_in_valid_range					= false;
 	bool						_prev_use_standard_pressure			= false;
 	si::Time					_hide_alt_lookahead_until			= 0_s;
 	si::Length					_prev_altitude_amsl					= 0_ft;
@@ -152,17 +159,24 @@ class AirDataComputer: public xf::Module<AirDataComputerIO>
 	xf::Smoother<si::Length>	_altitude_amsl_qnh_smoother			{ 500_ms };
 	xf::Smoother<si::Length>	_altitude_amsl_std_smoother			{ 500_ms };
 	xf::Smoother<si::Velocity>	_speed_ias_smoother					{ 100_ms };
+	xf::Smoother<si::Velocity>	_speed_cas_smoother					{ 100_ms };
 	xf::Smoother<si::Length>	_altitude_amsl_lookahead_i_smoother	{ 100_ms };
 	xf::Smoother<si::Length>	_altitude_amsl_lookahead_o_smoother	{ 500_ms };
 	xf::Smoother<si::Velocity>	_speed_ias_lookahead_i_smoother		{ 100_ms };
 	xf::Smoother<si::Velocity>	_speed_ias_lookahead_o_smoother		{ 1000_ms };
+	xf::Smoother<si::Velocity>	_speed_cas_lookahead_i_smoother		{ 100_ms };
+	xf::Smoother<si::Velocity>	_speed_cas_lookahead_o_smoother		{ 1000_ms };
 	xf::Lookahead<si::Length>	_altitude_amsl_estimator			{ 10_s };
 	xf::Lookahead<si::Velocity>	_speed_ias_estimator				{ 10_s };
+	xf::Lookahead<si::Velocity>	_speed_cas_estimator				{ 10_s };
 	xf::PropertyObserver		_total_pressure_computer;
 	xf::PropertyObserver		_altitude_computer;
+	xf::PropertyObserver		_air_density_computer;
 	xf::PropertyObserver		_density_altitude_computer;
 	xf::PropertyObserver		_ias_computer;
 	xf::PropertyObserver		_ias_lookahead_computer;
+	xf::PropertyObserver		_cas_computer;
+	xf::PropertyObserver		_cas_lookahead_computer;
 	xf::PropertyObserver		_speed_of_sound_computer;
 	xf::PropertyObserver		_tas_computer;
 	xf::PropertyObserver		_eas_computer;
