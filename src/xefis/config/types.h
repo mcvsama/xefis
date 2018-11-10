@@ -49,6 +49,13 @@ operator "" _half (long double value)
 }
 
 
+constexpr std::size_t
+operator"" _bit (unsigned long long bits)
+{
+	return 1ull << bits;
+}
+
+
 typedef half_float::half		float16_t;
 typedef float					float32_t;
 typedef double					float64_t;
