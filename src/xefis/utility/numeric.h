@@ -208,6 +208,27 @@ template<class Value>
 	}
 
 
+template<class V>
+	[[nodiscard]]
+	constexpr V
+	quantized (V value, std::size_t steps, Range<V> range)
+	{
+		Range<V> const steps_range { 0, steps };
+		auto const r = std::round (renormalize (value, range, steps_range));
+		auto const c = xf::clamped (r, steps_range);
+		return renormalize (c, steps_range, range);
+	}
+
+
+template<class V>
+	[[nodiscard]]
+	constexpr V
+	quantized (V value, V resolution)
+	{
+		return resolution * std::round (value / resolution);
+	}
+
+
 template<class Value>
 	constexpr Value
 	magnetic_to_true (Value mag, Value declination)
