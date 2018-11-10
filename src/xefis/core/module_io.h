@@ -40,7 +40,7 @@ namespace module_io {
 /**
  * Exception thrown when some settings in a module have not been initialized as required.
  */
-class UninitializedSettings: public Exception
+class UninitializedSettings: public FastException
 {
   public:
 	// Ctor

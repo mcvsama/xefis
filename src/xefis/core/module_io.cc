@@ -31,7 +31,7 @@ namespace xf {
 namespace module_io {
 
 UninitializedSettings::UninitializedSettings (std::vector<BasicSetting*> settings):
-	Exception (make_message (settings))
+	FastException (make_message (settings))
 { }
 
 

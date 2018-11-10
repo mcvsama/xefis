@@ -103,9 +103,9 @@ template<class pValue>
 	  public:
 		typedef pValue Value;
 
-		class Uninitialized: public xf::Exception
+		class Uninitialized: public xf::FastException
 		{
-			using Exception::Exception;
+			using FastException::FastException;
 		};
 
 	  public:
