@@ -118,6 +118,16 @@ NavaidStorage::NavaidStorage (Logger const& logger,
 
 NavaidStorage::~NavaidStorage()
 {
+	if (_async_requested && !_loaded)
+	{
+		_logger << "Requested async load; waiting for completion." << std::endl;
+
+		using namespace std::literals;
+
+		while (!_loaded)
+			std::this_thread::sleep_for (0.1s);
+	}
+
 	_logger << "Destroying NavaidStorage" << std::endl;
 }
 
@@ -146,6 +156,7 @@ NavaidStorage::load()
 std::packaged_task<void()>
 NavaidStorage::async_loader()
 {
+	_async_requested = true;
 	return std::packaged_task<void()> ([this] {
 		load();
 		_loaded = true;

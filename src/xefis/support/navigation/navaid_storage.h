@@ -138,7 +138,8 @@ class NavaidStorage
 	parse_apt_dat();
 
   private:
-	std::atomic<bool>	_loaded { false };
+	std::atomic<bool>	_async_requested	{ false };
+	std::atomic<bool>	_loaded				{ false };
 	Logger				_logger;
 	std::string			_nav_dat_file;
 	std::string			_fix_dat_file;
