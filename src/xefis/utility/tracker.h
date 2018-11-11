@@ -243,17 +243,17 @@ template<class V, class D>
 	inline
 	Tracker<V, D>::~Tracker()
 	{
-		std::list<Disclosure*> copy;
+		// Do not iterate _disclosures as it will be modified in the loop, get only pointers to registrants:
+		std::list<BasicRegistrant*> registrant_ptrs;
 
 		for (auto& disclosure: _disclosures)
-			copy.push_back (&disclosure);
+			registrant_ptrs.push_back (disclosure._registrant);
 
 		// Deregister in reverse order:
-		for (auto disclosure_ptr = copy.rbegin(); disclosure_ptr != copy.rend(); ++disclosure_ptr)
-		{
-			auto* registrant_ptr = (*disclosure_ptr)->_registrant;
-			deregister_object (static_cast<Registrant<Value>&> (*registrant_ptr));
-		}
+		std::reverse (registrant_ptrs.begin(), registrant_ptrs.end());
+
+		for (auto r_ptr: registrant_ptrs)
+			deregister_object (static_cast<Registrant<Value>&> (*r_ptr));
 	}
 
 
