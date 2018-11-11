@@ -52,7 +52,14 @@ ProcessingLoop::~ProcessingLoop()
 {
 	// The only allowed registered module during destruction is this ProcessingLoop itself:
 	if (_modules_tracker.size() > 1 || (_modules_tracker.size() == 1 && &_modules_tracker.begin()->value() != this))
+	{
+		_logger << "Destroying ProcessingLoop. Registered modules:\n";
+
+		for (auto const& disclosure: _modules_tracker)
+			_logger << "  module " << identifier (disclosure.value()) << "\n";
+
 		Exception::terminate ("ProcessingLoop destroyed while still having registered modules");
+	}
 }
 
 
