@@ -77,9 +77,11 @@ XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
 
 XEFIS_HEADERS			+= xefis/modules/simulation/virtual_joystick.h
 XEFIS_HEADERS			+= xefis/modules/simulation/virtual_pressure_sensor.h
+XEFIS_HEADERS			+= xefis/modules/simulation/virtual_temperature_sensor.h
 
 XEFIS_SOURCES			+= xefis/modules/simulation/virtual_joystick.cc
 XEFIS_SOURCES			+= xefis/modules/simulation/virtual_pressure_sensor.cc
+XEFIS_SOURCES			+= xefis/modules/simulation/virtual_temperature_sensor.cc
 
 ######## /xefis/modules/systems ########
 
