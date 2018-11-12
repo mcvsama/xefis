@@ -2089,6 +2089,8 @@ HSI::paint (xf::PaintRequest paint_request) const
 	auto mutable_ = *_mutable.lock();
 	auto resize_cache_lock = _resize_cache.lock();
 
+	parameters.sanitize();
+
 	return std::packaged_task<void()> ([this, pr = std::move (paint_request), pp = parameters, rc_lock = std::move (resize_cache_lock), cn = current_navaids, mu = mutable_]() mutable {
 		hsi_detail::PaintingWork (pr, _instrument_support, _navaid_storage, pp, *rc_lock, cn, mu).paint();
 	});
