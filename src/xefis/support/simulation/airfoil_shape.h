@@ -20,6 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air.h>
+#include <xefis/support/math/angle_of_attack.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/physics.h>
 #include <xefis/support/simulation/airfoil_spline.h>
@@ -192,7 +193,7 @@ class AirfoilShape
 	 */
 	[[nodiscard]]
 	ForceTorque<AirfoilSplineFrame>
-	planar_aerodynamic_forces (Atmosphere::State<AirfoilSplineFrame> const& atm, AngleOfAttack& aoa) const;
+	planar_aerodynamic_forces (AtmosphereState<AirfoilSplineFrame> const& atm, AngleOfAttack& aoa) const;
 
   private:
 	/**
@@ -228,39 +229,6 @@ constexpr si::Angle
 AirfoilShape::wrap_angle_for_field (si::Angle angle)
 {
 	return floored_mod (angle, Range<si::Angle> { -180_deg, +180_deg });
-}
-
-
-/*
- * Global functions
- */
-
-
-/**
- * Return rotation matrix for rotating airfoil-shape's frame vectors to airframe's frame vectors, such that leading edge of the airfoil
- * points to the nose (positive X), and upper surface of the airfoil points up (negative Z).
- *
- * Useful for rotation of airfoils to typical airplane wing position.
- */
-[[nodiscard]]
-constexpr SpaceMatrix<double, BodyFrame, AirfoilSplineFrame>
-airfoil_shape_to_body_rotation_for_wing()
-{
-	return x_rotation<BodyFrame, void> (-90_deg) * y_rotation<void, AirfoilSplineFrame> (180_deg);
-}
-
-
-/**
- * Return rotation matrix for rotating airfoil-shape's frame vectors to airframe's frame vectors, such that leading edge of the airfoil
- * points to the nose (positive X), and the upper surface points to the right side/right wing (positive Y).
- *
- * Useful for rotation of airfoils to rudder position.
- */
-[[nodiscard]]
-constexpr SpaceMatrix<double, BodyFrame, AirfoilSplineFrame>
-airfoil_shape_to_body_rotation_for_rudder()
-{
-	return y_rotation<BodyFrame, AirfoilSplineFrame> (180_deg);
 }
 
 } // namespace xf::sim

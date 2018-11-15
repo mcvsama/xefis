@@ -77,7 +77,7 @@ AirfoilShape::pitching_moment (si::Angle alpha, Reynolds re, si::Pressure dynami
 
 
 ForceTorque<AirfoilSplineFrame>
-AirfoilShape::planar_aerodynamic_forces (Atmosphere::State<AirfoilSplineFrame> const& atm, AngleOfAttack& aoa) const
+AirfoilShape::planar_aerodynamic_forces (AtmosphereState<AirfoilSplineFrame> const& atm, AngleOfAttack& aoa) const
 {
 	aoa.alpha = atan2 (atm.wind[1], atm.wind[0]);
 	aoa.beta = atan2 (atm.wind[2], atm.wind[0]);

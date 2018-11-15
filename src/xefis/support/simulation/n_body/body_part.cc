@@ -23,13 +23,7 @@
 
 namespace xf::sim {
 
-void
-BodyShape::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia, BodyFrame> const& moment_of_inertia)
-{
-	// TODO should be recalculated from parts
-	_total_moment_of_inertia = moment_of_inertia;
-	_inversed_total_moment_of_inertia = inv (moment_of_inertia);
-}
+// TODO remove?
 
 } // namespace xf::sim
 

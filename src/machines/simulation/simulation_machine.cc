@@ -316,8 +316,8 @@ SimulationMachine::SimulationMachine (xf::Xefis& xefis):
 	_virtual_joystick.emplace (std::move (virtual_joystick_io), "virtual-joystick");
 	auto const& simulation = (*_sim_airplane)->simulation();
 
-	auto const prandtl_location = xf::SpaceVector<si::Length, xf::BodyFrame> { 0_m, -5_cm, 0_m };
-	auto const temperature_probe_location = xf::SpaceVector<si::Length, xf::BodyFrame> { 0_m, -2_cm, 0_m };
+	auto const prandtl_location = xf::SpaceVector<si::Length, xf::AirframeFrame> { 0_m, -5_cm, 0_m };
+	auto const temperature_probe_location = xf::SpaceVector<si::Length, xf::AirframeFrame> { 0_m, -2_cm, 0_m };
 
 	// Sensors:
 	_pressure_sensor_static.emplace (

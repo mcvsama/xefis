@@ -26,24 +26,25 @@
 namespace xf::sim {
 
 Airfoil::Airfoil (AirfoilShape const& shape,
-				  SpaceVector<si::Length, BodyFrame> const& position,
+				  PositionRotation<AirframeFrame, AirfoilFrame> const& position_rotation,
 				  si::Mass mass,
-				  SpaceMatrix<si::MomentOfInertia, PartFrame> const& moment_of_inertia):
-	BodyPart (position, mass, moment_of_inertia),
+				  SpaceMatrix<si::MomentOfInertia, AirfoilFrame> const& moment_of_inertia):
+	BodyPart (position_rotation, mass, moment_of_inertia),
 	_shape (shape)
 { }
 
 
-ForceTorque<BodyFrame>
-Airfoil::forces (Atmosphere::State<BodyFrame> const& atm_body)
+ForceTorque<AirframeFrame>
+Airfoil::forces (AtmosphereState<AirframeFrame> const& atm_body)
 {
-	auto const body_to_airfoil_shape = z_rotation<AirfoilSplineFrame> (-_control.deflection_angle) * _body_to_airfoil_shape_transform;
-	auto const airfoil_shape_to_body = inv (body_to_airfoil_shape);
-	auto const atm_airfoil = Atmosphere::State<AirfoilSplineFrame> { atm_body.air, body_to_airfoil_shape * atm_body.wind };
+	auto const airfoil_shape_to_part_rotation = x_rotation<AirfoilFrame, void> (-90_deg) * y_rotation<void, AirfoilSplineFrame> (180_deg);
+	auto const part_to_body_rotation = body_to_base_rotation() * airfoil_shape_to_part_rotation * z_rotation<AirfoilSplineFrame> (_control.deflection_angle);
+	auto const body_to_part_rotation = inv (part_to_body_rotation);
+	auto const atm_airfoil = AtmosphereState<AirfoilSplineFrame> { atm_body.air, body_to_part_rotation * atm_body.wind };
 	auto const planar_force_torque = _shape.planar_aerodynamic_forces (atm_airfoil, _control.angle_of_attack);
 	Wrench const wrench {
-		airfoil_shape_to_body * planar_force_torque.force(),
-		airfoil_shape_to_body * planar_force_torque.torque(),
+		part_to_body_rotation * planar_force_torque.force(),
+		part_to_body_rotation * planar_force_torque.torque(),
 		position(),
 	};
 

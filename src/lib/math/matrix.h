@@ -568,6 +568,27 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
 		return *this;
 	}
 
+
+/*
+ * Global functions
+ */
+
+
+template<class NewTF, class NewSF, class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, NewTF, NewSF>&
+	reframe (Matrix<S, C, R, TF, SF>& matrix)
+	{
+		return reinterpret_cast<Matrix<S, C, R, NewTF, NewSF>&> (matrix);
+	}
+
+
+template<class NewTF, class NewSF, class S, std::size_t C, std::size_t R, class TF, class SF>
+	constexpr Matrix<S, C, R, NewTF, NewSF> const&
+	reframe (Matrix<S, C, R, TF, SF> const& matrix)
+	{
+		return reinterpret_cast<Matrix<S, C, R, NewTF, NewSF> const&> (matrix);
+	}
+
 } // namespace math
 
 

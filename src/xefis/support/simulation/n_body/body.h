@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__BODY_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__BODY_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -25,7 +25,7 @@
 #include <xefis/support/math/geometry.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/physics.h>
-#include <xefis/support/simulation/body_shape.h>
+#include <xefis/support/simulation/n_body/body_shape.h>
 
 
 namespace xf::sim {
@@ -33,7 +33,7 @@ namespace xf::sim {
 /**
  * Using ECEF (Earth-centered Earth-fixed) coordinates when describing things positioned on Earth.
  */
-class Body
+class Body: public PositionRotation<ECEFFrame, AirframeFrame>
 {
   public:
 	// Ctor
@@ -62,19 +62,6 @@ class Body
 	void
 	set_shape (BodyShape&& shape)
 		{ _shape = std::move (shape); }
-
-	/*
-	 * Position (center of rest mass)
-	 */
-
-	[[nodiscard]]
-	SpaceVector<si::Length, ECEFFrame> const&
-	position() const noexcept
-		{ return _position; }
-
-	void
-	set_position (SpaceVector<si::Length, ECEFFrame> const& position)
-		{ _position = position; }
 
 	/**
 	 * Velocity.
@@ -107,36 +94,6 @@ class Body
 		{ _angular_velocity = angular_velocity; }
 
 	/**
-	 * Orientation tensor.
-	 * Since this is in ECEF frame, which is just basis vectors of matrix,
-	 * orientation tensor is the same as rotation matrix for this object.
-	 */
-	[[nodiscard]]
-	SpaceMatrix<double, ECEFFrame, BodyFrame> const&
-	orientation() const noexcept
-		{ return _body_to_ecef_transform; }
-
-	/**
-	 * Set new orientation tensor.
-	 */
-	void
-	set_orientation (SpaceMatrix<double, ECEFFrame, BodyFrame> const&);
-
-	/**
-	 * Return body-to-ecef transformation matrix.
-	 */
-	SpaceMatrix<double, ECEFFrame, BodyFrame> const&
-	body_to_ecef_transform() const noexcept
-		{ return _body_to_ecef_transform; }
-
-	/**
-	 * Return ecef-to-body transformation matrix.
-	 */
-	SpaceMatrix<double, BodyFrame, ECEFFrame> const&
-	ecef_to_body_transform() const noexcept
-		{ return _ecef_to_body_transform; }
-
-	/**
 	 * Act on the body with given forces over time dt.
 	 */
 	void
@@ -144,22 +101,9 @@ class Body
 
   private:
 	BodyShape										_shape;
-	// Basic physics:
-	SpaceVector<si::Length, ECEFFrame>				_position;
 	SpaceVector<si::Velocity, ECEFFrame>			_velocity;
 	SpaceVector<si::BaseAngularVelocity, ECEFFrame>	_angular_velocity;
-	// Orientation transforms:
-	SpaceMatrix<double, ECEFFrame, BodyFrame>		_body_to_ecef_transform;
-	SpaceMatrix<double, BodyFrame, ECEFFrame>		_ecef_to_body_transform;
 };
-
-
-inline void
-Body::set_orientation (SpaceMatrix<double, ECEFFrame, BodyFrame> const& orientation)
-{
-	_body_to_ecef_transform = vector_normalized (orthogonalized (orientation));
-	_ecef_to_body_transform = inv (_body_to_ecef_transform);
-}
 
 } // namespace xf::sim
 

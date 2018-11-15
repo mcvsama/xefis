@@ -24,9 +24,9 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/logger.h>
+#include <xefis/support/simulation/n_body/body.h>
 #include <xefis/support/simulation/airframe.h>
 #include <xefis/support/simulation/atmosphere.h>
-#include <xefis/support/simulation/body.h>
 
 
 namespace xf::sim {
@@ -70,11 +70,11 @@ class FlightSimulation
 		{ return _atmosphere; }
 
 	/**
-	 * Return Atmosphere::State at given point relative to the body center-of-mass and in body frame of reference.
+	 * Return AtmosphereState at given point relative to the body center-of-mass and in body frame of reference.
 	 * Note the wind will be a relative wind to the airframe.
 	 */
-	Atmosphere::State<BodyFrame>
-	complete_atmosphere_state_at (SpaceVector<si::Length, BodyFrame> const com_relative_part_position) const
+	AtmosphereState<AirframeFrame>
+	complete_atmosphere_state_at (SpaceVector<si::Length, AirframeFrame> const com_relative_part_position) const
 		{ return _airframe.complete_atmosphere_state_at (com_relative_part_position, _atmosphere); }
 
   private:

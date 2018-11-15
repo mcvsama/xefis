@@ -17,6 +17,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/geometry.h>
+#include <xefis/support/math/tait_bryan_angles.h>
+#include <xefis/support/math/transforms.h>
 #include <xefis/support/nature/constants.h>
 #include <xefis/support/simulation/airfoil_shape.h>
 
@@ -29,64 +31,27 @@
 SimAirplane::SimAirplane (std::unique_ptr<SimAirplaneIO> module_io, xf::Logger const& logger, std::string_view const& instance):
 	Module (std::move (module_io), instance)
 {
-	constexpr double kMassScaler = 1.0 / 6;
-
-	// TODO consider creating struct PointMass
-	std::vector<std::tuple<si::Mass, xf::SpaceVector<si::Length, xf::BodyFrame>>> point_masses {
-		{ kMassScaler * 1_kg, { +1_m, 0_m, 0_m } },
-		{ kMassScaler * 1_kg, { -1_m, 0_m, 0_m } },
-		{ kMassScaler * 1_kg, { 0_m, +1_m, 0_m } },
-		{ kMassScaler * 1_kg, { 0_m, -1_m, 0_m } },
-		{ kMassScaler * 1_kg, { 0_m, 0_m, +1_m } },
-		{ kMassScaler * 1_kg, { 0_m, 0_m, -1_m } },
-		// // Forward mass:
-		// { kMassScaler * 1_kg, { +0.5_m, 0_m, 0_m } },
-		// // Left wing:
-		// { kMassScaler * 0.2_kg, { +0.1_m, -1_m, 0_m } },
-		// // Right wing:
-		// { kMassScaler * 0.2_kg, { +0.1_m, +1_m, 0_m } },
-		// // Left engine:
-		// { kMassScaler * 1.00_kg, { +0.1_m, -0.5_m, 1_m } },
-		// // Right engine:
-		// { kMassScaler * 1.00_kg, { +0.1_m, +0.5_m, 1_m } },
-		// // Tail:
-		// { kMassScaler * 0.02_kg, { -1_m, 0_m, -0.2_m } },
-		// // Left wheel:
-		// //{ kMassScaler * 0.090_kg, { -0.1_m, -0.5_m, -0.05_m } },
-		// // Right wheel:
-		// //{ kMassScaler * 0.090_kg, { -0.1_m, +0.5_m, -0.05_m } },
-	};
-	auto const com = xf::move_to_center_of_gravity<xf::BodyFrame> (point_masses.begin(), point_masses.end());
-
 	xf::SpaceVector<si::Length, xf::ECEFFrame> const
-	airframe_ecef_position =
+	airframe_position =
 		xf::cartesian (xf::LonLatRadius (0_deg, 0_deg, xf::kEarthMeanRadius + 1_km));
 
 	xf::SpaceVector<si::Velocity, xf::ECEFFrame> const
-	airframe_ecef_velocity { 0_mps, 0_mps, 20_kt };
+	airframe_velocity { 0_mps, 0_mps, 20_kt };
 
-	xf::SpaceMatrix<double, xf::ECEFFrame, xf::BodyFrame> const
-	airframe_ecef_orientation =
-		xf::body_to_ecef_transform (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, airframe_ecef_position);
-
-	xf::SpaceMatrix<si::MomentOfInertia, xf::BodyFrame> const
-	airframe_moment_of_inertia =
-		xf::moment_of_inertia<xf::BodyFrame> (point_masses.begin(), point_masses.end());
+	xf::SpaceMatrix<double, xf::ECEFFrame, xf::AirframeFrame> const
+	airframe_rotation =
+		xf::airframe_to_ecef_rotation (xf::TaitBryanAngles { 0_deg, 0_deg, 0_deg }, airframe_position);
 
 	xf::SpaceVector<si::BaseAngularVelocity, xf::ECEFFrame> const
 	airframe_angular_velocity { math::zero };
 
-	auto shape = make_airframe_shape (com);
-	shape.set_mass (xf::total_mass (point_masses.begin(), point_masses.end()));
-	shape.set_moment_of_inertia (airframe_moment_of_inertia);
-
-	xf::sim::Airframe airframe (std::move (shape));
-	airframe.set_position (airframe_ecef_position);
-	airframe.set_velocity (airframe_ecef_velocity);
-	airframe.set_orientation (airframe_ecef_orientation);
+	xf::sim::Airframe airframe (make_airframe_shape());
+	airframe.set_position (airframe_position);
+	airframe.set_velocity (airframe_velocity);
+	airframe.set_rotation (airframe_rotation);
 	airframe.set_angular_velocity (airframe_angular_velocity);
 
-	_simulation = std::make_unique<xf::sim::FlightSimulation> (std::move (airframe), 240_Hz, logger.with_scope ("simulation")); // TODO want 600 Hz?
+	_simulation = std::make_unique<xf::sim::FlightSimulation> (std::move (airframe), 240_Hz, logger.with_scope ("simulation"));
 }
 
 
@@ -119,22 +84,22 @@ SimAirplane::set_outputs()
 	// Position:
 	si::Length const altitude_amsl = abs (airframe.position()) - xf::kEarthMeanRadius;
 	// Real velocities:
-	xf::SpaceVector<si::Velocity, xf::BodyFrame> const airframe_velocity = airframe.ecef_to_body_transform() * airframe.velocity();
-	xf::SpaceVector<si::Velocity, xf::NEDFrame> const ned_velocity = body_to_ned_transform (airframe.position(), airframe.orientation()) * airframe_velocity;
+	xf::SpaceVector<si::Velocity, xf::AirframeFrame> const airframe_velocity = airframe.base_to_body_rotation() * airframe.velocity();
+	xf::SpaceVector<si::Velocity, xf::NEDFrame> const ned_velocity = airframe_to_ned_rotation (airframe) * airframe_velocity;
 	xf::SpaceVector<si::Velocity, xf::NEDFrame> const ground_velocity { ned_velocity[0], ned_velocity[1], 0_mps };
 	si::Velocity const true_airspeed = abs (airframe.velocity());
 	// Atmosphere:
-	xf::sim::Atmosphere::State<xf::BodyFrame> const atmstate = _simulation->complete_atmosphere_state_at ({ math::zero });
+	xf::sim::AtmosphereState<xf::AirframeFrame> const atmstate = _simulation->complete_atmosphere_state_at ({ math::zero });
 	si::Pressure const pressure_total = atmstate.air.pressure + xf::dynamic_pressure (atmstate.air.density, true_airspeed);
 	// Real orientation:
-	xf::TaitBryanAngles const tba_orientation = xf::tait_bryan_angles (airframe.orientation(), airframe.position());
+	xf::TaitBryanAngles const tba_orientation = xf::tait_bryan_angles (airframe);
 	// Real track:
 	xf::SpaceVector<double, xf::ECEFFrame> x = airframe.velocity() / 1_mps;
 	xf::SpaceVector<double, xf::ECEFFrame> y = airframe.position() / 1_m;
 	xf::SpaceVector<double, xf::ECEFFrame> z = cross_product (x, y);
 	xf::SpaceMatrix<double, xf::ECEFFrame, void> const velocity_matrix_1 {{ x, y, z }};
 	xf::SpaceMatrix<double, xf::ECEFFrame, void> const velocity_matrix_2 (orthogonalized (velocity_matrix_1));
-	xf::SpaceMatrix<double, xf::ECEFFrame, xf::BodyFrame> const velocity_matrix (velocity_matrix_2.array());
+	xf::SpaceMatrix<double, xf::ECEFFrame, xf::AirframeFrame> const velocity_matrix (velocity_matrix_2.array());
 	xf::TaitBryanAngles const real_track = xf::tait_bryan_angles (velocity_matrix, airframe.position());
 	// AOA:
 	auto const aoa_l = _controls.wing_L->control().angle_of_attack;
@@ -142,7 +107,7 @@ SimAirplane::set_outputs()
 	// Position on Earth:
 	auto const earth_position = polar (airframe.position());
 	// IMU:
-	xf::SpaceVector<si::Force, xf::BodyFrame> const body_forces = airframe.ecef_to_body_transform() * _simulation->airframe_forces().force();
+	xf::SpaceVector<si::Force, xf::AirframeFrame> const body_forces = airframe.base_to_body_rotation() * _simulation->airframe_forces().force();
 
 	// Set output properties:
 	io.real_cas = sqrt (2 * (pressure_total - atmstate.air.pressure) / atmstate.air.density);
@@ -174,7 +139,7 @@ SimAirplane::set_outputs()
 
 
 xf::sim::BodyShape
-SimAirplane::make_airframe_shape (xf::SpaceVector<si::Length, xf::BodyFrame> const& center_of_mass)
+SimAirplane::make_airframe_shape()
 {
 	si::Angle const dihedral = 10_deg;
 	si::Angle const sweep_angle = 0_deg;
@@ -228,65 +193,81 @@ SimAirplane::make_airframe_shape (xf::SpaceVector<si::Length, xf::BodyFrame> con
 
 	auto wing_L = std::make_unique<xf::sim::Airfoil> (
 		wing_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -0.25 * wing_shape.chord_length(), -0.5_m, 0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -0.25 * wing_shape.chord_length(), -0.5_m, 0_m },
+			xf::x_rotation<xf::AirframeFrame> (+dihedral) * xf::z_rotation<xf::AirframeFrame> (-sweep_angle) * xf::sim::airfoil_to_airframe_rotation_for_wing(),
+		},
 		0.1_kg,
 		std_moi
 	);
-	wing_L->set_mount_rotation (xf::x_rotation<xf::BodyFrame> (+dihedral) * xf::z_rotation<xf::BodyFrame> (-sweep_angle) * xf::sim::airfoil_shape_to_body_rotation_for_wing());
 
 	auto wing_R = std::make_unique<xf::sim::Airfoil> (
 		wing_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -0.25 * wing_shape.chord_length(), +0.5_m, 0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -0.25 * wing_shape.chord_length(), +0.5_m, 0_m },
+			xf::x_rotation<xf::AirframeFrame> (-dihedral) * xf::z_rotation<xf::AirframeFrame> (+sweep_angle) * xf::sim::airfoil_to_airframe_rotation_for_wing(),
+		},
 		0.1_kg,
 		std_moi
 	);
-	wing_R->set_mount_rotation (xf::x_rotation<xf::BodyFrame> (-dihedral) * xf::z_rotation<xf::BodyFrame> (+sweep_angle) * xf::sim::airfoil_shape_to_body_rotation_for_wing());
 
 	auto aileron_L = std::make_unique<xf::sim::Airfoil> (
 		aileron_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -15_cm, -0.8_m, 0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -15_cm, -0.8_m, 0_m },
+			xf::x_rotation<xf::AirframeFrame> (+dihedral) * xf::z_rotation<xf::AirframeFrame> (-sweep_angle) * xf::sim::airfoil_to_airframe_rotation_for_wing(),
+		},
 		0.01_kg,
 		std_moi
 	);
-	aileron_L->set_mount_rotation (xf::x_rotation<xf::BodyFrame> (+dihedral) * xf::z_rotation<xf::BodyFrame> (-sweep_angle) * xf::sim::airfoil_shape_to_body_rotation_for_wing());
 
 	auto aileron_R = std::make_unique<xf::sim::Airfoil> (
 		aileron_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -15_cm, +0.8_m, 0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -15_cm, +0.8_m, 0_m },
+			xf::x_rotation<xf::AirframeFrame> (-dihedral) * xf::z_rotation<xf::AirframeFrame> (+sweep_angle) * xf::sim::airfoil_to_airframe_rotation_for_wing(),
+		},
 		0.01_kg,
 		std_moi
 	);
-	aileron_R->set_mount_rotation (xf::x_rotation<xf::BodyFrame> (-dihedral) * xf::z_rotation<xf::BodyFrame> (+sweep_angle) * xf::sim::airfoil_shape_to_body_rotation_for_wing());
 
 	auto elevator = std::make_unique<xf::sim::Airfoil> (
 		elevator_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -2_m, 0_m, 0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -2_m, 0_m, 0_m },
+			xf::sim::airfoil_to_airframe_rotation_for_wing(),
+		},
 		0.01_kg,
 		std_moi
 	);
-	elevator->set_mount_rotation (xf::sim::airfoil_shape_to_body_rotation_for_wing());
 
 	auto rudder = std::make_unique<xf::sim::Airfoil> (
 		rudder_shape,
-		xf::SpaceVector<si::Length, xf::BodyFrame> { -2_m, -0.2_m, 0.0_m },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ -2_m, -0.2_m, 0.0_m },
+			xf::sim::airfoil_to_airframe_rotation_for_rudder(),
+		},
 		0.01_kg,
 		std_moi
 	);
-	rudder->set_mount_rotation (xf::sim::airfoil_shape_to_body_rotation_for_rudder());
 
 	auto engine_L = std::make_unique<xf::sim::Engine> (
-		xf::SpaceVector<si::Length, xf::BodyFrame> { 10_cm, -30_cm, 1_cm },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ 10_cm, -30_cm, 1_cm },
+			xf::sim::engine_to_airframe_rotation(),
+		},
 		0.1_kg,
 		std_moi
 	);
-	engine_L->set_mount_rotation (math::unit);
 
 	auto engine_R = std::make_unique<xf::sim::Engine> (
-		xf::SpaceVector<si::Length, xf::BodyFrame> { 10_cm, +30_cm, 1_cm },
+		xf::PositionRotation<xf::AirframeFrame, xf::PartFrame> {
+			{ 10_cm, +30_cm, 1_cm },
+			xf::sim::engine_to_airframe_rotation(),
+		},
 		0.1_kg,
 		std_moi
 	);
-	engine_R->set_mount_rotation (math::unit);
 
 	xf::sim::BodyShape airframe_shape;
 

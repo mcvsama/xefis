@@ -18,7 +18,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/physics.h>
-#include <xefis/support/simulation/body_functions.h>
+#include <xefis/support/simulation/n_body/body_functions.h>
 
 // Local:
 #include "flight_simulation.h"

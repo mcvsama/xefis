@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__BODY_FUNCTIONS_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__BODY_FUNCTIONS_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_FUNCTIONS_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_FUNCTIONS_H__INCLUDED
 
 // Standard:
 #include <algorithm>
@@ -32,7 +32,8 @@
 #include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/support/simulation/body.h>
+#include <xefis/support/simulation/n_body/body.h>
+#include <xefis/support/simulation/n_body/body_part.h>
 
 
 namespace xf::sim {
@@ -41,19 +42,21 @@ namespace xf::sim {
 inline Body
 make_earth()
 {
-	BodyShape shape;
-	shape.set_mass (kEarthMass);
 	// Simplified EGM96 model:
-	shape.set_moment_of_inertia ({
+	SpaceMatrix<si::MomentOfInertia, PartFrame> const earth_moment_of_inertia {
 		8.008085e37_kgm2,           0_kgm2,           0_kgm2,
 		          0_kgm2, 8.008262e37_kgm2,           0_kgm2,
 		          0_kgm2,           0_kgm2, 8.034476e37_kgm2,
-	});
+	};
+
+	BodyShape shape;
+	shape.add (std::make_unique<BodyPart<AirframeFrame, PartFrame>> (PositionRotation<AirframeFrame, PartFrame>(),
+																	 kEarthMass,
+																	 earth_moment_of_inertia));
 
 	Body earth (std::move (shape));
 	earth.set_position ({ 0_m, 0_m, 0_m });
 	earth.set_velocity ({ 0_mps, 0_mps, 0_mps });
-	earth.set_orientation (math::unit);
 	// Since we use ECEF coordinates, don't spin the Earth:
 	earth.set_angular_velocity ({ si::convert (0_radps), si::convert (0_radps), si::convert (0_radps) });
 
@@ -65,7 +68,7 @@ make_earth()
  * Note: does not compute torques resulting from different gravitational pulls on different places on the body.
  */
 template<class Frame, class Iterator, class ForceTorqueIterator>
-	void
+	inline void
 	n_body_problem_forces (Iterator bodies_begin, Iterator bodies_end, ForceTorqueIterator forces_begin, ForceTorqueIterator forces_end)
 	{
 		static_assert (std::is_same_v<std::remove_cvref_t<decltype (*bodies_begin)>, Body*>, "body sequence must be iterators to xf::sim::Body*");
@@ -100,7 +103,7 @@ template<class Frame, class Iterator, class ForceTorqueIterator>
 
 template<class Frame, class Iterator>
 	[[nodiscard]]
-	std::vector<ForceTorque<Frame>>
+	inline std::vector<ForceTorque<Frame>>
 	n_body_problem_forces (Iterator bodies_begin, Iterator bodies_end)
 	{
 		std::vector<ForceTorque<Frame>> forces (std::distance (bodies_begin, bodies_end));

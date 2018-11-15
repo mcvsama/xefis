@@ -24,7 +24,7 @@
 
 VirtualPressureSensor::VirtualPressureSensor (xf::sim::FlightSimulation const& flight_simulation,
 											  Probe probe,
-											  xf::SpaceVector<si::Length, xf::BodyFrame> const& mount_location,
+											  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
 											  std::unique_ptr<VirtualPressureSensorIO> module_io,
 											  xf::Logger const& logger,
 											  std::string_view const& instance):

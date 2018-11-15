@@ -32,11 +32,6 @@ class SimAirplaneIO: public xf::ModuleIO
 {
   public:
 	/*
-	 * Settings
-	 */
-
-
-	/*
 	 * Input
 	 */
 
@@ -114,7 +109,7 @@ class SimAirplane: public xf::Module<SimAirplaneIO>
 	set_outputs();
 
 	xf::sim::BodyShape
-	make_airframe_shape (xf::SpaceVector<si::Length, xf::BodyFrame> const& center_of_mass);
+	make_airframe_shape();
 
   private:
 	std::unique_ptr<xf::sim::FlightSimulation>	_simulation;

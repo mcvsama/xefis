@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Lib:
+#include <boost/range/adaptors.hpp>
+
 // Xefis:
 #include <xefis/config/all.h>
 
@@ -23,21 +26,17 @@
 
 namespace xf::sim {
 
-BodyPart::BodyPart (SpaceVector<si::Length, BodyFrame> const& position,
-					si::Mass mass,
-					SpaceMatrix<si::MomentOfInertia, PartFrame> const& moment_of_inertia):
-	_position (position),
-	_mass (mass)
-{
-	set_moment_of_inertia (moment_of_inertia);
-}
-
-
 void
-BodyPart::set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia, PartFrame> const& moment_of_inertia)
+BodyShape::recompute()
 {
-	_moment_of_inertia = moment_of_inertia;
-	_inversed_moment_of_inertia = inv (moment_of_inertia);
+	_total_mass = std::accumulate (_parts.begin(), _parts.end(), 0_kg, [](auto const sum, auto const& part_ptr) {
+		return sum + part_ptr->mass();
+	});
+
+	auto const range = _parts | boost::adaptors::transformed ([](auto const& part_ptr) { return std::make_tuple (part_ptr->mass(), part_ptr->aircraft_relative_position()); });
+	_total_moment_of_inertia = xf::moment_of_inertia<AirframeFrame> (range.begin(), range.end());
+
+	_inversed_total_moment_of_inertia = inv (_total_moment_of_inertia);
 }
 
 } // namespace xf::sim

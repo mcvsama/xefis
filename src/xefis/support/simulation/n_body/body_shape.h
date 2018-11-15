@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__SUPPORT__SIMULATION__BODY_SHAPE_H__INCLUDED
-#define XEFIS__SUPPORT__SIMULATION__BODY_SHAPE_H__INCLUDED
+#ifndef XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_SHAPE_H__INCLUDED
+#define XEFIS__SUPPORT__SIMULATION__N_BODY__BODY_SHAPE_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/physics.h>
-#include <xefis/support/simulation/body_part.h>
+#include <xefis/support/simulation/n_body/body_part.h>
 
 
 namespace xf::sim {
@@ -36,11 +36,14 @@ class BodyShape
 	 * Add a part to the shape.
 	 */
 	template<class Part>
-		requires (std::is_base_of_v<BodyPart, Part>)
+		requires (std::is_base_of_v<BasicBodyPart, Part>)
 		Part&
 		add (std::unique_ptr<Part>&&);
 
-	std::vector<std::unique_ptr<BodyPart>> const&
+	/**
+	 * Vector of parts.
+	 */
+	std::vector<std::unique_ptr<BasicBodyPart>> const&
 	parts() const
 		{ return _parts; }
 
@@ -53,18 +56,10 @@ class BodyShape
 		{ return _total_mass; }
 
 	/**
-	 * Set new rest mass.
-	 * TODO deprecate, calculate mass from parts
-	 */
-	void
-	set_mass (si::Mass mass)
-		{ _total_mass = mass; }
-
-	/**
 	 * Moment of inertia tensor about the center of mass.
 	 */
 	[[nodiscard]]
-	SpaceMatrix<si::MomentOfInertia, BodyFrame> const&
+	SpaceMatrix<si::MomentOfInertia, AirframeFrame> const&
 	moment_of_inertia() const noexcept
 		{ return _total_moment_of_inertia; }
 
@@ -72,32 +67,35 @@ class BodyShape
 	 * Inversed moment of inertia.
 	 */
 	[[nodiscard]]
-	SpaceMatrix<si::MomentOfInertia, BodyFrame>::InversedMatrix const&
+	SpaceMatrix<si::MomentOfInertia, AirframeFrame>::InversedMatrix const&
 	inversed_moment_of_inertia() const noexcept
 		{ return _inversed_total_moment_of_inertia; }
 
-	/**
-	 * Set new moment of inertia tensor.
-	 * TODO deprecate, calculate mass from parts
-	 */
-	void
-	set_moment_of_inertia (SpaceMatrix<si::MomentOfInertia, BodyFrame> const&);
+	// TODO need a method to recompute total MOI, COM, angular velocity, etc. when part's position changes
 
   private:
-	std::vector<std::unique_ptr<BodyPart>>						_parts;
+	/**
+	 * Recompute total mass and total moment of inertia.
+	 */
+	void
+	recompute();
+
+  private:
+	std::vector<std::unique_ptr<BasicBodyPart>>						_parts;
 	// Stuff calculated from parts:
-	si::Mass													_total_mass;
-	SpaceMatrix<si::MomentOfInertia, BodyFrame>					_total_moment_of_inertia;
-	SpaceMatrix<si::MomentOfInertia, BodyFrame>::InversedMatrix	_inversed_total_moment_of_inertia;
+	si::Mass														_total_mass;
+	SpaceMatrix<si::MomentOfInertia, AirframeFrame>					_total_moment_of_inertia;
+	SpaceMatrix<si::MomentOfInertia, AirframeFrame>::InversedMatrix	_inversed_total_moment_of_inertia;
 };
 
 
 template<class Part>
-	requires (std::is_base_of_v<BodyPart, Part>)
-	Part&
+	requires (std::is_base_of_v<BasicBodyPart, Part>)
+	inline Part&
 	BodyShape::add (std::unique_ptr<Part>&& part)
 	{
 		_parts.push_back (std::move (part));
+		recompute();
 		return static_cast<Part&> (*_parts.back());
 	}
 

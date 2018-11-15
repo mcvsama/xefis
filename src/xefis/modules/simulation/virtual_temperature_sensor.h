@@ -56,7 +56,7 @@ class VirtualTemperatureSensor: public xf::Module<VirtualTemperatureSensorIO>
 	// Ctor
 	explicit
 	VirtualTemperatureSensor (xf::sim::FlightSimulation const&,
-							  xf::SpaceVector<si::Length, xf::BodyFrame> const& mount_location,
+							  xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
 							  std::unique_ptr<VirtualTemperatureSensorIO>,
 							  xf::Logger const&,
 							  std::string_view const& instance = {});
@@ -66,13 +66,13 @@ class VirtualTemperatureSensor: public xf::Module<VirtualTemperatureSensorIO>
 	process (xf::Cycle const&) override;
 
   private:
-	xf::Logger									_logger;
-	xf::sim::FlightSimulation const&			_flight_simulation;
-	xf::SpaceVector<si::Length, xf::BodyFrame>	_mount_location;
+	xf::Logger										_logger;
+	xf::sim::FlightSimulation const&				_flight_simulation;
+	xf::SpaceVector<si::Length, xf::AirframeFrame>	_mount_location;
 	// Device's noise:
-	std::default_random_engine					_random_generator;
-	xf::NormalDistribution<si::Temperature>		_noise				{ 0_K, 0_K };
-	si::Time									_last_measure_time	{ 0_s };
+	std::default_random_engine						_random_generator;
+	xf::NormalDistribution<si::Temperature>			_noise				{ 0_K, 0_K };
+	si::Time										_last_measure_time	{ 0_s };
 };
 
 #endif

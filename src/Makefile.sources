@@ -385,11 +385,19 @@ XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
 ######## /xefis/support/math ########
 
-XEFIS_HEADERS			+= xefis/support/math/geometry.h
-XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
-XEFIS_HEADERS			+= xefis/support/math/space.h
+XEFIS_HEADERS         += xefis/support/math/angle_of_attack.h
+XEFIS_HEADERS         += xefis/support/math/euler_angles.h
+XEFIS_HEADERS         += xefis/support/math/frame_of_reference.h
+XEFIS_HEADERS         += xefis/support/math/geometry.h
+XEFIS_HEADERS         += xefis/support/math/lonlat_radius.h
+XEFIS_HEADERS         += xefis/support/math/north_east_down.h
+XEFIS_HEADERS         += xefis/support/math/position_rotation.h
+XEFIS_HEADERS         += xefis/support/math/position_rotation.tcc
+XEFIS_HEADERS         += xefis/support/math/space.h
+XEFIS_HEADERS         += xefis/support/math/tait_bryan_angles.h
+XEFIS_HEADERS         += xefis/support/math/transforms.h
 
-XEFIS_SOURCES			+= xefis/support/math/space.cc
+XEFIS_SOURCES         += xefis/support/math/transforms.cc
 
 ######## /xefis/support/nature ########
 
@@ -415,6 +423,17 @@ XEFIS_HEADERS			+= xefis/support/qt/ownership_breaker.h
 
 XEFIS_SOURCES			+= xefis/support/qt/ownership_breaker.cc
 
+######## /xefis/support/simulation/n_body ########
+
+XEFIS_HEADERS			+= xefis/support/simulation/n_body/body.h
+XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_functions.h
+XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_part.h
+XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_shape.h
+
+XEFIS_SOURCES			+= xefis/support/simulation/n_body/body.cc
+XEFIS_SOURCES			+= xefis/support/simulation/n_body/body_part.cc
+XEFIS_SOURCES			+= xefis/support/simulation/n_body/body_shape.cc
+
 ######## /xefis/support/simulation ########
 
 XEFIS_HEADERS			+= xefis/support/simulation/air_space.h
@@ -423,10 +442,6 @@ XEFIS_HEADERS			+= xefis/support/simulation/airfoil_shape.h
 XEFIS_HEADERS			+= xefis/support/simulation/airfoil_spline.h
 XEFIS_HEADERS			+= xefis/support/simulation/airframe.h
 XEFIS_HEADERS			+= xefis/support/simulation/atmosphere.h
-XEFIS_HEADERS			+= xefis/support/simulation/body.h
-XEFIS_HEADERS			+= xefis/support/simulation/body_functions.h
-XEFIS_HEADERS			+= xefis/support/simulation/body_part.h
-XEFIS_HEADERS			+= xefis/support/simulation/body_shape.h
 XEFIS_HEADERS			+= xefis/support/simulation/engine.h
 XEFIS_HEADERS			+= xefis/support/simulation/flight_simulation.h
 
@@ -436,9 +451,6 @@ XEFIS_SOURCES			+= xefis/support/simulation/airfoil_shape.cc
 XEFIS_SOURCES			+= xefis/support/simulation/airfoil_spline.cc
 XEFIS_SOURCES			+= xefis/support/simulation/airframe.cc
 XEFIS_SOURCES			+= xefis/support/simulation/atmosphere.cc
-XEFIS_SOURCES			+= xefis/support/simulation/body.cc
-XEFIS_SOURCES			+= xefis/support/simulation/body_part.cc
-XEFIS_SOURCES			+= xefis/support/simulation/body_shape.cc
 XEFIS_SOURCES			+= xefis/support/simulation/engine.cc
 XEFIS_SOURCES			+= xefis/support/simulation/flight_simulation.cc
 

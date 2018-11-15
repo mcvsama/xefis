@@ -59,7 +59,7 @@ Atmosphere::wind_at (SpaceVector<si::Length, ECEFFrame> const&) const
 }
 
 
-Atmosphere::State<ECEFFrame>
+AtmosphereState<ECEFFrame>
 Atmosphere::state_at (SpaceVector<si::Length, ECEFFrame> const& position) const
 {
 	return {

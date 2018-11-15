@@ -24,8 +24,8 @@
 
 namespace xf::sim {
 
-ForceTorque<BodyFrame>
-Engine::forces (Atmosphere::State<BodyFrame> const& atm_body)
+ForceTorque<AirframeFrame>
+Engine::forces (AtmosphereState<AirframeFrame> const& atm_body)
 {
 	// TODO engines have limited efficiency (0.8 * power?)
 	// TODO engines cause drag
@@ -34,15 +34,15 @@ Engine::forces (Atmosphere::State<BodyFrame> const& atm_body)
 	// TODO engines cause torque:
 	//   TODO 1. when spooling up
 	//   TODO 2. when working at constant speed (drag induced by blades)
-	Atmosphere::State<EngineFrame> const atm_engine = Atmosphere::State<EngineFrame> { atm_body.air, _body_to_engine * atm_body.wind };
+	AtmosphereState<EngineFrame> const atm_engine { atm_body.air, this->base_to_body_rotation() * atm_body.wind };
 	SpaceVector<si::Velocity, AirfoilSplineFrame> const planar_wind { atm_engine.wind[0], 0_mps, 0_mps }; // TODO AirfoilSplineFrame? What's happening here?
 	auto const efficiency = 0.85;
 	SpaceVector<si::Force, EngineFrame> const thrust_vec { _control.power / abs (planar_wind) * efficiency, 0_N, 0_N }; // P(t)=F⃗(t)⋅v⃗(t); F=P/v
 	auto const thrust = thrust_vec * (atm_body.air.density / kStdAirDensity);
 	Wrench const wrench {
-		_engine_to_body * thrust,
+		this->body_to_base_rotation() * thrust,
 		{ 0_Nm, 0_Nm, 0_Nm },
-		//SpaceVector<si::Torque, BodyFrame> (math::zero),
+		//SpaceVector<si::Torque, AirframeFrame> (math::zero),
 		position(),
 	};
 

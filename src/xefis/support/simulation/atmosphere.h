@@ -26,6 +26,17 @@
 namespace xf::sim {
 
 /**
+ * Atmosphere state at some given position.
+ */
+template<class Frame>
+	struct AtmosphereState
+	{
+		Air									air;
+		SpaceVector<si::Velocity, Frame>	wind;
+	};
+
+
+/**
  * General atmosphwere model.
  * TODO use Perlin noise for winds. http://flafla2.github.io/2014/08/09/perlinnoise.html
  * TODO use winds to affect density/pressure at that point.
@@ -33,16 +44,6 @@ namespace xf::sim {
  */
 class Atmosphere
 {
-	/**
-	 * Atmosphere state at some given position.
-	 */
-	template<class Frame>
-		struct State
-		{
-			Air									air;
-			SpaceVector<si::Velocity, Frame>	wind;
-		};
-
   public:
 	[[nodiscard]]
 	Air
@@ -61,7 +62,7 @@ class Atmosphere
 	wind_at (SpaceVector<si::Length, ECEFFrame> const& position) const;
 
 	[[nodiscard]]
-	State<ECEFFrame>
+	AtmosphereState<ECEFFrame>
 	state_at (SpaceVector<si::Length, ECEFFrame> const& position) const;
 };
 

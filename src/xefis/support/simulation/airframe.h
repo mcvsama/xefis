@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air.h>
+#include <xefis/support/simulation/n_body/body.h>
 #include <xefis/support/simulation/atmosphere.h>
-#include <xefis/support/simulation/body.h>
 
 
 namespace xf::sim {
@@ -53,7 +53,7 @@ class Airframe: public Body
 	 * Note the wind will be a relative wind to the airframe.
 	 */
 	[[nodiscard]]
-	Atmosphere::State<BodyFrame>
+	AtmosphereState<BodyFrame>
 	complete_atmosphere_state_at (SpaceVector<si::Length, BodyFrame> com_relative_part_position, Atmosphere const& atmosphere) const;
 };
 

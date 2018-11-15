@@ -32,20 +32,20 @@ Body::Body (BodyShape&& shape):
 void
 Body::act (ForceTorque<ECEFFrame> const& force_torque, si::Time dt)
 {
-	SpaceVector<si::Acceleration, ECEFFrame> const linear_a = force_torque.force() / _shape.mass();
-	SpaceVector<si::Velocity, ECEFFrame> const dv = linear_a * dt;
+	auto const a = force_torque.force() / _shape.mass();
+	auto const dv = a * dt;
 
-	SpaceVector<si::BaseAngularAcceleration, ECEFFrame> const angular_a = _body_to_ecef_transform * _shape.inversed_moment_of_inertia() * (_ecef_to_body_transform * force_torque.torque());
-	SpaceVector<si::BaseAngularVelocity, ECEFFrame> const dw = angular_a * dt;
+	auto const& o2b = body_to_base_rotation();
+	auto const& b2o = base_to_body_rotation();
+
+	auto const angular_a = o2b * _shape.inversed_moment_of_inertia() * (b2o * force_torque.torque());
+	auto const dw = angular_a * dt;
 
 	_velocity += dv;
 	_angular_velocity += dw;
 
-	_position += _velocity * dt;
-	_body_to_ecef_transform += make_pseudotensor (_angular_velocity * dt) * _body_to_ecef_transform;
-
-	_body_to_ecef_transform = vector_normalized (orthogonalized (_body_to_ecef_transform));
-	_ecef_to_body_transform = inv (_body_to_ecef_transform);
+	translate_frame (_velocity * dt);
+	rotate_frame (_angular_velocity * dt);
 }
 
 } // namespace xf::sim

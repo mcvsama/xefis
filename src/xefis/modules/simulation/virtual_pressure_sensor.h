@@ -64,7 +64,7 @@ class VirtualPressureSensor: public xf::Module<VirtualPressureSensorIO>
 	explicit
 	VirtualPressureSensor (xf::sim::FlightSimulation const&,
 						   Probe,
-						   xf::SpaceVector<si::Length, xf::BodyFrame> const& mount_location,
+						   xf::SpaceVector<si::Length, xf::AirframeFrame> const& mount_location,
 						   std::unique_ptr<VirtualPressureSensorIO>,
 						   xf::Logger const&,
 						   std::string_view const& instance = {});
@@ -74,14 +74,14 @@ class VirtualPressureSensor: public xf::Module<VirtualPressureSensorIO>
 	process (xf::Cycle const&) override;
 
   private:
-	xf::Logger									_logger;
-	xf::sim::FlightSimulation const&			_flight_simulation;
-	Probe										_probe;
-	xf::SpaceVector<si::Length, xf::BodyFrame>	_mount_location;
+	xf::Logger										_logger;
+	xf::sim::FlightSimulation const&				_flight_simulation;
+	Probe											_probe;
+	xf::SpaceVector<si::Length, xf::AirframeFrame>	_mount_location;
 	// Device's noise:
-	std::default_random_engine					_random_generator;
-	xf::NormalDistribution<si::Pressure>		_noise				{ 0_Pa, 0_Pa };
-	si::Time									_last_measure_time	{ 0_s };
+	std::default_random_engine						_random_generator;
+	xf::NormalDistribution<si::Pressure>			_noise				{ 0_Pa, 0_Pa };
+	si::Time										_last_measure_time	{ 0_s };
 };
 
 #endif

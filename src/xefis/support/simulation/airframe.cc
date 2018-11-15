@@ -34,27 +34,27 @@ Airframe::Airframe (BodyShape&& body_shape):
 ForceTorque<ECEFFrame>
 Airframe::forces (Atmosphere const& atmosphere) const
 {
-	ForceTorque<BodyFrame> body_total;
+	ForceTorque<AirframeFrame> body_total;
 
 	for (auto& part: shape().parts())
 	{
-		auto const atm = complete_atmosphere_state_at (part->position(), atmosphere);
+		auto const atm = complete_atmosphere_state_at (part->aircraft_relative_position(), atmosphere);
 		auto const part_force_torque = part->forces (atm);
 
 		body_total += part_force_torque;
 	}
 
-	return body_to_ecef_transform() * body_total;
+	return body_to_base_rotation() * body_total;
 }
 
 
-Atmosphere::State<BodyFrame>
-Airframe::complete_atmosphere_state_at (SpaceVector<si::Length, BodyFrame> const com_relative_part_position, Atmosphere const& atmosphere) const
+AtmosphereState<AirframeFrame>
+Airframe::complete_atmosphere_state_at (SpaceVector<si::Length, AirframeFrame> const com_relative_part_position, Atmosphere const& atmosphere) const
 {
-	auto const ecef_part_position = position() + body_to_ecef_transform() * com_relative_part_position;
+	auto const ecef_part_position = position() + body_to_base_rotation() * com_relative_part_position;
 	auto const ecef_relative_wind = atmosphere.wind_at (ecef_part_position) - velocity();
-	auto const body_relative_wind = ecef_to_body_transform() * ecef_relative_wind;
-	auto const body_angular_velocity = ecef_to_body_transform() * angular_velocity();
+	auto const body_relative_wind = base_to_body_rotation() * ecef_relative_wind;
+	auto const body_angular_velocity = base_to_body_rotation() * angular_velocity();
 	auto const body_rotation_wind = cross_product (-body_angular_velocity, com_relative_part_position);
 
 	auto const air = atmosphere.air_at (ecef_part_position);
