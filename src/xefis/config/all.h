@@ -14,6 +14,7 @@
 // Neutrino:
 #include <neutrino/core.h>
 #include <neutrino/si/si.h>
+#include <neutrino/math/debug_prints.h>
 
 // Local:
 #include "resources.h"

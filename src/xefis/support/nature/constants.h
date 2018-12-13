@@ -19,9 +19,19 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/math/geometry.h>
 
 
 namespace xf {
+
+/*
+ * Frames of reference
+ */
+
+
+// Earth-centered, Earth-fixed frame:
+struct ECEFSpace;
+
 
 /*
  * Physics
@@ -54,6 +64,13 @@ constexpr si::Time					kSiderealDay					= 23_h + 56_min + 4.09_s;
 constexpr si::Length				kEarthMeanRadius				= 6367.46_km;
 constexpr si::Mass					kEarthMass						= 5.9722e24_kg;
 constexpr si::AngularVelocity		kEarthAngularVelocity			= 2_rad * M_PI / xf::kSiderealDay;
+// Simplified EGM96 model:
+constexpr SpaceMatrix<si::MomentOfInertia, ECEFSpace>
+									kEarthMomentOfInertia {
+	8.008085e37_kgm2,           0_kgm2,           0_kgm2,
+			  0_kgm2, 8.008262e37_kgm2,           0_kgm2,
+			  0_kgm2,           0_kgm2, 8.034476e37_kgm2,
+};
 
 } // namespace xf
 

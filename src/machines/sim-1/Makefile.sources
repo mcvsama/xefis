@@ -1,0 +1,3 @@
+XEFIS_MACHINES.sim-1.files += sim-1_machine.cc
+XEFIS_MACHINES.sim-1.files += sim-1_machine.h
+

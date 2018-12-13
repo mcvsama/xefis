@@ -19,6 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
+#include <xefis/support/aerodynamics/reynolds.h>
 
 // Local:
 #include "virtual_pressure_sensor.h"

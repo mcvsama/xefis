@@ -58,6 +58,10 @@ class RemoteControlManagementSystemIO: public xf::ModuleIO
 };
 
 
+/**
+ * Computes VLOS/ground distances and direction to the "home" (base station or whatever
+ * configured) from actual basestation and aircraft coordinates.
+ */
 class RemoteControlManagementSystem: public xf::Module<RemoteControlManagementSystemIO>
 {
   public:

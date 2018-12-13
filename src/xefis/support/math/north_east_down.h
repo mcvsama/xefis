@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/space.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/math/position_rotation.h>
 
 
@@ -32,7 +32,7 @@ namespace xf {
 
 [[nodiscard]]
 constexpr auto
-north_vector (RotationMatrix<NEDFrame, ECEFFrame> const& ned_matrix)
+north_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
 	return ned_matrix.column (0);
 }
@@ -40,7 +40,7 @@ north_vector (RotationMatrix<NEDFrame, ECEFFrame> const& ned_matrix)
 
 [[nodiscard]]
 constexpr auto
-east_vector (RotationMatrix<NEDFrame, ECEFFrame> const& ned_matrix)
+east_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
 	return ned_matrix.column (1);
 }
@@ -48,13 +48,13 @@ east_vector (RotationMatrix<NEDFrame, ECEFFrame> const& ned_matrix)
 
 [[nodiscard]]
 constexpr auto
-down_vector (RotationMatrix<NEDFrame, ECEFFrame> const& ned_matrix)
+down_vector (RotationMatrix<NEDSpace, ECEFSpace> const& ned_matrix)
 {
 	return ned_matrix.column (2);
 }
 
 
-static inline RotationMatrix<NEDFrame, ECEFFrame> const EquatorPrimeMeridian {
+static inline RotationMatrix<NEDSpace, ECEFSpace> const EquatorPrimeMeridian {
 //  N   E   D
 	0,  0, -1,  // x
 	0,  1,  0,  // y

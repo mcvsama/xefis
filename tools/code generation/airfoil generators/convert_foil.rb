@@ -27,7 +27,7 @@ filename = ARGV[1]
 if namespace and filename
 	spline = convert_input(File.open(filename))
 
-	puts "#include <xefis/support/simulation/airfoil_spline.h>"
+	puts "#include <xefis/support/aerodynamics/airfoil_spline.h>"
 	puts
 	puts "namespace #{namespace} {"
 	puts

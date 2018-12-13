@@ -37,6 +37,7 @@ class LonLatRadius: public si::LonLat
 	explicit constexpr
 	LonLatRadius (si::Angle longitude, si::Angle latitude, si::Length radius);
 
+	[[nodiscard]]
 	constexpr si::Length&
 	radius() noexcept;
 

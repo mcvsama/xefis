@@ -26,7 +26,7 @@
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/support/simulation/flight_simulation.h>
+#include <xefis/support/simulation/aerodynamic.v0/flight_simulation.h>
 
 
 class VirtualTemperatureSensorIO: public xf::ModuleIO

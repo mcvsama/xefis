@@ -19,8 +19,9 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/space.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/math/position_rotation.h>
+#include <xefis/support/nature/constants.h>
 
 
 namespace xf {
@@ -29,34 +30,34 @@ class TaitBryanAngles;
 
 
 [[nodiscard]]
-RotationMatrix<ECEFFrame, AirframeFrame>
+RotationMatrix<ECEFSpace, AirframeSpace>
 airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position);
 
 
 [[nodiscard]]
-inline RotationMatrix<ECEFFrame, AirframeFrame>
-airframe_to_ecef_rotation (TaitBryanAngles const& angles, SpaceVector<si::Length, ECEFFrame> const& position)
+inline RotationMatrix<ECEFSpace, AirframeSpace>
+airframe_to_ecef_rotation (TaitBryanAngles const& angles, SpaceVector<si::Length, ECEFSpace> const& position)
 {
 	return airframe_to_ecef_rotation (angles, polar (position));
 }
 
 
 [[nodiscard]]
-RotationMatrix<NEDFrame, ECEFFrame>
+RotationMatrix<NEDSpace, ECEFSpace>
 ecef_to_ned_rotation (si::LonLat const& position);
 
 
 [[nodiscard]]
-inline RotationMatrix<NEDFrame, ECEFFrame>
-ecef_to_ned_rotation (SpaceVector<si::Length, ECEFFrame> const& position)
+inline RotationMatrix<NEDSpace, ECEFSpace>
+ecef_to_ned_rotation (SpaceVector<si::Length, ECEFSpace> const& position)
 {
 	return ecef_to_ned_rotation (polar (position));
 }
 
 
 [[nodiscard]]
-inline RotationMatrix<NEDFrame, AirframeFrame>
-airframe_to_ned_rotation (PositionRotation<ECEFFrame, AirframeFrame> const& pr)
+inline RotationMatrix<NEDSpace, AirframeSpace>
+airframe_to_ned_rotation (PositionRotation<ECEFSpace, AirframeSpace> const& pr)
 {
 	return ecef_to_ned_rotation (pr.position()) * pr.body_to_base_rotation();
 }

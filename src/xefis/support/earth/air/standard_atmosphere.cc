@@ -128,7 +128,7 @@ standard_temperature_gradient (std::map<si::Length, InternationalStandardAtmosph
 } // namespace
 
 Air
-StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFFrame> const& position) const
+StandardAtmosphere::air_at (SpaceVector<si::Length, ECEFSpace> const& position) const
 {
 	return air_at_radius (abs (position));
 }
@@ -154,16 +154,16 @@ StandardAtmosphere::air_at_amsl (si::Length geometric_altitude_amsl) const
 }
 
 
-SpaceVector<si::Velocity, ECEFFrame>
-StandardAtmosphere::wind_at (SpaceVector<si::Length, ECEFFrame> const&) const
+SpaceVector<si::Velocity, ECEFSpace>
+StandardAtmosphere::wind_at (SpaceVector<si::Length, ECEFSpace> const&) const
 {
-	// TODO model
+	// TODO model it.
 	return { 0_mps, 0_mps, 0_mps };
 }
 
 
-AtmosphereState<ECEFFrame>
-StandardAtmosphere::state_at (SpaceVector<si::Length, ECEFFrame> const& position) const
+AtmosphereState<ECEFSpace>
+StandardAtmosphere::state_at (SpaceVector<si::Length, ECEFSpace> const& position) const
 {
 	return {
 		air_at (position),

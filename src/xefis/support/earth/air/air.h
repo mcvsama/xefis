@@ -19,16 +19,12 @@
 
 // Neutrino:
 #include <neutrino/numeric.h>
-#include <neutrino/strong_type.h>
 
 // Xefis:
 #include <xefis/config/all.h>
 
 
 namespace xf {
-
-using Reynolds = StrongType<double, struct ReynoldsType>;
-
 
 inline si::Velocity
 speed_of_sound (si::Temperature static_air_temperature)
@@ -56,27 +52,6 @@ inline si::Velocity
 indicated_airspeed (si::Velocity true_airspeed, si::Length density_altitude)
 {
 	return true_airspeed * std::pow (1.0 - 6.8755856 * 1e-6 * density_altitude.in<si::Foot>(), 2.127940);
-}
-
-
-constexpr Reynolds
-reynolds_number (si::Density fluid_density, si::Velocity fluid_speed, si::Length characteristic_dimension, si::DynamicViscosity mu)
-{
-	return Reynolds (fluid_density * fluid_speed * characteristic_dimension / mu);
-}
-
-
-constexpr Reynolds
-reynolds_number (si::Velocity fluid_speed, si::Length characteristic_dimension, si::KinematicViscosity nu)
-{
-	return Reynolds (fluid_speed * characteristic_dimension / nu);
-}
-
-
-constexpr si::Pressure
-dynamic_pressure (si::Density fluid_density, si::Velocity fluid_speed)
-{
-	return 0.5 * fluid_density * square (fluid_speed);
 }
 
 } // namespace xf

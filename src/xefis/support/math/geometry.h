@@ -20,32 +20,188 @@
 
 // Neutrino:
 #include <neutrino/math/math.h>
+#include <neutrino/numeric.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/space.h>
+#include <xefis/support/math/lonlat_radius.h>
 
 
 namespace xf {
 
+// Earth-centered Earth-fixed frame of reference:
+struct ECEFSpace;
+
+// Local-tangent-plane frame of reference:
+struct NEDSpace;
+
+// Simulated body frame of reference (X points to the front, Y to the right, Z down the body):
+struct AirframeSpace;
+
+
+template<class Scalar = double, class Frame = void>
+	using PlaneVector = math::Vector<Scalar, 2, Frame, void>;
+
+template<class Scalar = double, class Frame = void>
+	using SpaceVector = math::Vector<Scalar, 3, Frame, void>;
+
+template<class Scalar = double, class TargetFrame = void, class SourceFrame = TargetFrame>
+	using PlaneMatrix = math::Matrix<Scalar, 2, 2, TargetFrame, SourceFrame>;
+
+template<class Scalar = double, class TargetFrame = void, class SourceFrame = TargetFrame>
+	using SpaceMatrix = math::Matrix<Scalar, 3, 3, TargetFrame, SourceFrame>;
+
+template<class TargetFrame = void, class SourceFrame = TargetFrame>
+	using RotationMatrix = SpaceMatrix<double, TargetFrame, SourceFrame>;
+
+template<class TargetFrame = void, class SourceFrame = TargetFrame>
+	RotationMatrix<TargetFrame, SourceFrame> const kNoRotation = math::unit;
+
+template<class Scalar = double, class Frame = void>
+	using PlaneTriangle = std::array<PlaneVector<Scalar, Frame>, 3>;
+
+template<class Scalar = double, class Frame = void>
+	using SpaceTriangle = std::array<SpaceVector<Scalar, Frame>, 3>;
+
+// Typical units used in space:
+
+template<class Frame = void>
+	using SpaceLength = SpaceVector<si::Length, Frame>;
+
+template<class Frame = void>
+	using SpaceForce = SpaceVector<si::Force, Frame>;
+
+template<class Frame = void>
+	using SpaceTorque = SpaceVector<si::Torque, Frame>;
+
+
 /**
- * Make a tensor W from vector v⃗, so that it acts as it was v⃗× operator:
- * v⃗ × Z = W * Z.
+ * Return rotation matrix along the axis X for given angle.
  */
-template<class S, class TF = void, class SF = TF>
-	SpaceMatrix<S, TF, SF>
-	make_pseudotensor (SpaceVector<S, TF> const& v)
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	x_rotation (si::Angle const angle)
 	{
+		double const sin_a = sin (angle);
+		double const cos_a = cos (angle);
+
 		return {
-			    0, -v[2], +v[1],
-			+v[2],     0, -v[0],
-			-v[1], +v[0],     0,
+			1.0,    0.0,    0.0,
+			0.0, +cos_a, -sin_a,
+			0.0, +sin_a, +cos_a,
 		};
 	}
 
 
+/**
+ * Return rotation matrix along the axis Y for given angle.
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	y_rotation (si::Angle const angle)
+	{
+		double const sin_a = sin (angle);
+		double const cos_a = cos (angle);
+
+		return {
+			+cos_a, 0.0, +sin_a,
+			   0.0, 1.0,    0.0,
+			-sin_a, 0.0, +cos_a,
+		};
+	}
+
+
+/**
+ * Return rotation matrix along the axis Z for given angle.
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	z_rotation (si::Angle const angle)
+	{
+		double const sin_a = sin (angle);
+		double const cos_a = cos (angle);
+
+		return {
+			+cos_a, -sin_a, 0.0,
+			+sin_a, +cos_a, 0.0,
+			   0.0,    0.0, 1.0,
+		};
+	}
+
+
+template<class TF, class SF>
+	static auto const kXRotationPlus45	= x_rotation<TF, SF> (45_deg);
+
+template<class TF, class SF>
+	static auto const kYRotationPlus45	= y_rotation<TF, SF> (45_deg);
+
+template<class TF, class SF>
+	static auto const kZRotationPlus45	= z_rotation<TF, SF> (45_deg);
+
+template<class TF, class SF>
+	static auto const kXRotationPlus90	= x_rotation<TF, SF> (90_deg);
+
+template<class TF, class SF>
+	static auto const kYRotationPlus90	= y_rotation<TF, SF> (90_deg);
+
+template<class TF, class SF>
+	static auto const kZRotationPlus90	= z_rotation<TF, SF> (90_deg);
+
+template<class TF, class SF>
+	static auto const kXRotationPlus180	= x_rotation<TF, SF> (180_deg);
+
+template<class TF, class SF>
+	static auto const kYRotationPlus180	= y_rotation<TF, SF> (180_deg);
+
+template<class TF, class SF>
+	static auto const kZRotationPlus180	= z_rotation<TF, SF> (180_deg);
+
+
+// Forward:
+template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	[[nodiscard]]
+	constexpr math::Matrix<S, C, R, TF, SF>
+	vector_normalized (math::Matrix<S, C, R, TF, SF> matrix);
+
+
+/**
+ * Return tangential velocity for given angular velocity and arm.
+ */
+template<class Frame>
+	[[nodiscard]]
+	inline SpaceVector<si::Velocity, Frame>
+	tangential_velocity (SpaceVector<si::AngularVelocity, Frame> const& w, SpaceLength<Frame> const& r)
+	{
+		return cross_product (w, r) / 1_rad;
+	}
+
+
+/**
+ * Make a skew-symmetric matrix (pseudotensor) W from vector v⃗, so that it acts as it was v⃗× operator:
+ * v⃗ × Z = W * Z.
+ */
 template<class S, class TF = void, class SF = TF>
-	SpaceMatrix<S, TF, SF>
+	[[nodiscard]]
+	constexpr SpaceMatrix<S, TF, SF>
+	make_pseudotensor (SpaceVector<S, TF> const& v)
+	{
+		return {
+			S (0), -v[2], +v[1],
+			+v[2], S (0), -v[0],
+			-v[1], +v[0], S (0),
+		};
+	}
+
+
+/**
+ * Lay given vector as diagonal of the newly created matrix.
+ */
+template<class S, class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr SpaceMatrix<S, TF, SF>
 	make_diagonal_matrix (SpaceVector<S, TF> const& v)
 	{
 		return {
@@ -79,6 +235,7 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
  * Use for orientation matrices.
  */
 template<class S, std::size_t C, std::size_t R, class TF, class SF>
+	[[nodiscard]]
 	constexpr math::Matrix<S, C, R, TF, SF>
 	vector_normalized (math::Matrix<S, C, R, TF, SF> matrix)
 	{
@@ -91,10 +248,11 @@ template<class S, std::size_t C, std::size_t R, class TF, class SF>
  * Return vector orthogonalized onto another vector.
  */
 template<class S, class F>
-	SpaceVector<S, F>
+	[[nodiscard]]
+	constexpr SpaceVector<S, F>
 	orthogonalized (SpaceVector<S, F> const& vector, SpaceVector<S, F> const& onto)
 	{
-		return vector - (static_cast<S> (~vector * onto) * onto / square (abs (onto)));
+		return vector - ((~vector * onto).scalar() * onto / square (abs (onto)));
 	}
 
 
@@ -102,7 +260,8 @@ template<class S, class F>
  * Make matrix orthogonal so that X stays unchanged.
  */
 template<class S, class TF, class SF>
-	SpaceMatrix<S, TF, SF>
+	[[nodiscard]]
+	constexpr SpaceMatrix<S, TF, SF>
 	orthogonalized (SpaceMatrix<S, TF, SF> const& m)
 	{
 		auto const new_y = orthogonalized (m.column (1), m.column (0));
@@ -113,48 +272,352 @@ template<class S, class TF, class SF>
 
 
 template<class T, class F>
-	SpaceVector<T, F>
+	[[nodiscard]]
+	constexpr SpaceVector<T, F>
 	length_limited (SpaceVector<T, F> vector, T const& max_length)
 	{
 		auto const length = abs (vector);
 
 		if (length > max_length)
-			vector = vector * max_length / length; // TODO *=
+			vector = vector * max_length / length;
 
 		return vector;
 	}
 
 
 template<class T, class F>
-	auto
+	[[nodiscard]]
+	constexpr auto
 	normalized (SpaceVector<T, F> const& vector)
 	{
-		return vector / abs (vector);
+		return T (1) * vector / abs (vector);
 	}
 
 
-template<class T, class F>
-	// TODO check types?
-	SpaceVector<T, F>
-	projection (SpaceVector<T, F> const& vector, SpaceVector<T, F> const& onto)
+/**
+ * Project vector "vector" onto "onto" vector.
+ */
+template<class T1, class T2, class Frame>
+	[[nodiscard]]
+	constexpr auto
+	projection (SpaceVector<T1, Frame> const& vector, SpaceVector<T2, Frame> const& onto)
 	{
-		return (~vector * normalized (onto)) * onto;
+		return (~vector * normalized (onto)).scalar() * onto;
+	}
+
+
+/**
+ * This version takes normalized "onto" vector, if caller has one, to save on computing time.
+ */
+template<class T1, class T2, class Frame>
+	[[nodiscard]]
+	constexpr auto
+	projection_onto_normalized (SpaceVector<T1, Frame> const& vector, SpaceVector<T2, Frame> const& normalized_onto)
+	{
+		return (~vector * normalized_onto).scalar() * normalized_onto;
+	}
+
+
+/**
+ * Find a vector that is non-colinear with given input vector.
+ */
+template<class Scalar, class Frame>
+	[[nodiscard]]
+	constexpr SpaceVector<Scalar, Frame>
+	find_non_colinear (SpaceVector<Scalar, Frame> input)
+	{
+		input = normalized (input);
+
+		auto output = kXRotationPlus90<Frame, Frame> * input;
+
+		if (abs (cross_product (input, output)) > 0)
+			return output;
+		else
+			return kYRotationPlus90<Frame, Frame> * input;
+	}
+
+
+/**
+ * Find any non-normalized perpendicular vector to given vector.
+ */
+template<class T, class F>
+	[[nodiscard]]
+	constexpr SpaceVector<T, F>
+	find_any_perpendicular (SpaceVector<T, F> const& input)
+	{
+		return cross_product (input, find_non_colinear (input));
+	}
+
+
+/**
+ * Create orthonormal basis matrix from given vector Z.
+ * Two orthonormal vectors to Z will be chosen randomly.
+ */
+template<class Scalar, class TF, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	make_basis_from_z (SpaceVector<Scalar, TF> const& z)
+	{
+		auto const x = normalized (find_any_perpendicular (z));
+		auto const y = normalized (cross_product (z, x));
+
+		return RotationMatrix<TF, SF> {
+			x[0], y[0], z[0],
+			x[1], y[1], z[1],
+			x[2], y[2], z[2],
+		};
+	}
+
+
+/**
+ * Return rotation matrix about the given axis vector for given angle.
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	rotation_about (SpaceVector<double, TF> const& axis, si::Angle const angle)
+	{
+		auto const sin_a = sin (angle);
+		auto const cos_a = cos (angle);
+		auto const k = 1.0 - cos_a;
+		auto const x = axis[0];
+		auto const y = axis[1];
+		auto const z = axis[2];
+		auto const x_sin_a = x * sin_a;
+		auto const y_sin_a = y * sin_a;
+		auto const z_sin_a = z * sin_a;
+		auto const x_y_k = x * y * k;
+		auto const x_z_k = x * z * k;
+		auto const y_z_k = y * z * k;
+
+		return {
+			x * x * k + cos_a, x_y_k - z_sin_a,   x_z_k + y_sin_a,
+			x_y_k + z_sin_a,   y * y * k + cos_a, y_z_k - x_sin_a,
+			x_z_k - y_sin_a,   y_z_k + x_sin_a,   z * z * k + cos_a,
+		};
+	}
+
+
+/**
+ * Determine the non-normalized rotation axis from the matrix.
+ * FIXME has problems with 0° (nans) and 180° (also nans)
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	inline SpaceVector<double, TF>
+	rotation_axis (RotationMatrix<TF, SF> const& m)
+	{
+		SpaceVector<double, TF> result {
+			m (1, 2) - m (2, 1),
+			m (2, 0) - m (0, 2),
+			m (0, 1) - m (1, 0),
+		};
+
+		// FIXME What a hack, better use quaternions:
+		if (abs (result) == 0.0)
+			return { 1, 0, 0 };
+		else
+			return result;
+	}
+
+
+/**
+ * Determine the rotation angle about any axis from the matrix.
+ */
+template<class TF = void, class SF = TF>
+	inline si::Angle
+	rotation_angle_about_matrix_axis (RotationMatrix<TF, SF> const& m, SpaceVector<double, TF> normalized_axis)
+	{
+		SpaceVector<double> const x = math::reframe<void, void> (normalized (find_any_perpendicular (normalized_axis)));
+		SpaceVector<double> const y = math::reframe<void, void> (m) * x;
+
+		auto const sin_theta = abs (cross_product (x, y));
+		auto const cos_theta = (~x * y).scalar();
+
+		return 1_rad * atan2 (sin_theta, cos_theta);
+	}
+
+
+/**
+ * Determine the rotation angle about the rotaion axis of the matrix.
+ */
+template<class TF = void, class SF = TF>
+	inline si::Angle
+	rotation_angle (RotationMatrix<TF, SF> const& m)
+	{
+		auto const axis = normalized (rotation_axis (m));
+		return rotation_angle_about_matrix_axis (m, axis);
+	}
+
+
+/**
+ * Return rotation matrix for given vector-expressed rotation (right-hand rule,
+ * length of vector corresponds to angle). Length of rotation_vector should be
+ * expressed in radians.
+ * FIXME has numerical instabilities at small rotations
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr RotationMatrix<TF, SF>
+	to_rotation_matrix (SpaceVector<si::Angle, TF> const& rotation_vector)
+	{
+		if (abs (rotation_vector) > 0.0_rad)
+			return rotation_about (vector_normalized (rotation_vector) / 1_rad, abs (rotation_vector));
+		else
+			return math::unit;
+	}
+
+
+/**
+ * Return rotation vector from rotation matrix.
+ */
+template<class TF = void, class SF = TF>
+	[[nodiscard]]
+	constexpr SpaceVector<si::Angle, TF>
+	to_rotation_vector (RotationMatrix<TF, SF> const& matrix)
+	{
+		auto const axis = normalized (rotation_axis (matrix));
+		return rotation_angle_about_matrix_axis (matrix, axis) * axis;
 	}
 
 
 /**
  * Return normal vector for given triangle (front face is defined by CCW vertex order).
  */
-inline SpaceVector<double>
-triangle_surface_normal (auto const& triangle)
+template<class Triangle>
+	inline auto
+	triangle_surface_normal (Triangle const& triangle)
+	{
+		if (std::size (triangle) != 3)
+			throw InvalidArgument ("triangle_surface_normal(): std::size (triangle) must be 3");
+
+		auto const scalar = decltype (triangle[0].position()[0]) { 1 };
+
+		return normalized (cross_product (triangle[1].position() - triangle[0].position(),
+										  triangle[2].position() - triangle[0].position()) / scalar / scalar);
+	}
+
+
+/**
+ * Return area of the 2D triangle.
+ */
+template<class Point>
+	inline auto
+	area_2d (Point const& a, Point const& b, Point const& c)
+	{
+		using std::abs;
+		using std::sqrt;
+
+		auto const len_ab = abs (b - a);
+		auto const len_ac = abs (c - a);
+		auto const len_bc = abs (c - b);
+		auto const s = 0.5 * (len_ab + len_ac + len_bc);
+
+		return sqrt (s * (s - len_ab) * (s - len_ac) * (s - len_bc));
+	}
+
+
+/**
+ * Return area of the 2D triangle.
+ */
+template<class Triangle>
+	inline auto
+	area_2d (Triangle const& triangle)
+	{
+		using std::abs;
+		using std::size;
+
+		if (size (triangle) != 3)
+			throw InvalidArgument ("area(): std::size (triangle) must be 3");
+
+		return area_2d (triangle[0], triangle[1], triangle[2]);
+	}
+
+
+/**
+ * Return a predicate that returns true if its argument (point) is inside of the triangle.
+ */
+template<class Triangle>
+	inline auto
+	is_point_2d_inside_triangle_tester (Triangle const& triangle)
+	{
+		using Point = decltype (triangle[0]);
+		using Scalar = decltype (std::declval<Point>()[0]);
+
+		constexpr size_t x = 0;
+		constexpr size_t y = 1;
+
+		auto const p0 = triangle[0];
+		auto const p1 = triangle[1];
+		auto const p2 = triangle[2];
+
+		auto const y12 = p1[y] - p2[y];
+		auto const x21 = p2[x] - p1[x];
+		auto const y20 = p2[y] - p0[y];
+		auto const x02 = p0[x] - p2[x];
+
+		// If det == 0, triangle is collinear:
+		auto const det = y12 * x02 - x21 * y20;
+		auto const min_d = std::min (det, Scalar (0));
+		auto const max_d = std::max (det, Scalar (0));
+
+		return [=] (Point const& p) -> bool
+		{
+			auto const dx = p[x] - p2[x];
+			auto const dy = p[y] - p2[y];
+
+			auto a = y12 * dx + x21 * dy;
+
+			if (a <= min_d || a >= max_d)
+				return false;
+
+			auto b = y20 * dx + x02 * dy;
+
+			if (b <= min_d || b >= max_d)
+				return false;
+
+			auto c = det - a - b;
+
+			if (c <= min_d || c >= max_d)
+				return false;
+
+			return true;
+		};
+	}
+
+
+/*
+ * Polar-cartesian conversions
+ */
+
+
+[[nodiscard]]
+inline SpaceVector<si::Length, ECEFSpace>
+cartesian (LonLatRadius const& position)
 {
-	if (triangle.size() != 3)
-		throw InvalidArgument ("triangle_surface_normal(): triangle.size() must be 3");
+	auto const r = si::Length (position.radius()).value();
+	auto const wz = std::polar (r, position.lat().in<si::Radian>());
+	auto const xy = std::polar (wz.real(), position.lon().in<si::Radian>());
 
-	auto const scalar = decltype (triangle[0].position()[0]) { 1 };
+	return {
+		si::Length (xy.real()),
+		si::Length (xy.imag()),
+		si::Length (wz.imag()),
+	};
+}
 
-	return normalized (cross_product (triangle[1].position() - triangle[0].position(),
-									  triangle[2].position() - triangle[0].position()) / scalar / scalar);
+
+[[nodiscard]]
+inline LonLatRadius
+polar (SpaceVector<si::Length, ECEFSpace> const& vector)
+{
+	std::complex<double> const xy (vector[0].value(), vector[1].value());
+	std::complex<double> const wz (std::abs (xy), vector[2].value());
+
+	return LonLatRadius {
+		si::LonLat (1_rad * std::arg (xy), 1_rad * std::arg (wz)),
+		si::Length (std::abs (wz))
+	};
 }
 
 } // namespace xf

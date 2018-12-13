@@ -56,6 +56,10 @@ class VOR_IO: public xf::ModuleIO
 };
 
 
+/**
+ * Computes information for VOR display (radials, TO/FROM flag, deviation, etc)
+ * from actual VOR's coordinates and aircraft coordinates.
+ */
 class VOR: public xf::Module<VOR_IO>
 {
   public:

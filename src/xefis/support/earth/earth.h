@@ -19,7 +19,7 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/math/space.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/nature/constants.h>
 
 

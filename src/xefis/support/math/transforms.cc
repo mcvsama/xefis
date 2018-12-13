@@ -17,37 +17,35 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/math/north_east_down.h>
 #include <xefis/support/math/tait_bryan_angles.h>
-
-// Local:
-#include "space.h"
 
 
 namespace xf {
 
-RotationMatrix<NEDFrame, ECEFFrame>
+RotationMatrix<NEDSpace, ECEFSpace>
 ecef_to_ned_rotation (si::LonLat const& position)
 {
-	SpaceVector<double, NEDFrame> const n0 = north_vector (EquatorPrimeMeridian);
-	SpaceVector<double, NEDFrame> const e0 = east_vector (EquatorPrimeMeridian);
-	SpaceVector<double, NEDFrame> const e1 = rotation_about (n0, +position.lon()) * e0;
-	SpaceVector<double, NEDFrame> const n1 = rotation_about (e1, -position.lat()) * n0;
-	SpaceVector<double, NEDFrame> const d1 = cross_product (n1, e1);
+	SpaceVector<double, NEDSpace> const n0 = north_vector (EquatorPrimeMeridian);
+	SpaceVector<double, NEDSpace> const e0 = east_vector (EquatorPrimeMeridian);
+	SpaceVector<double, NEDSpace> const e1 = rotation_about (n0, +position.lon()) * e0;
+	SpaceVector<double, NEDSpace> const n1 = rotation_about (e1, -position.lat()) * n0;
+	SpaceVector<double, NEDSpace> const d1 = cross_product (n1, e1);
 
 	return { n1, e1, d1 };
 }
 
 
-RotationMatrix<ECEFFrame, AirframeFrame>
+RotationMatrix<ECEFSpace, AirframeSpace>
 airframe_to_ecef_rotation (TaitBryanAngles const& angles, si::LonLat const& position)
 {
-	RotationMatrix<NEDFrame, ECEFFrame> const ned0 = ecef_to_ned_rotation (position);
-	RotationMatrix<NEDFrame, ECEFFrame> const ned1 = rotation_about<NEDFrame> (down_vector (ned0), angles.yaw()) * ned0;
-	RotationMatrix<NEDFrame, ECEFFrame> const ned2 = rotation_about<NEDFrame> (east_vector (ned1), angles.pitch()) * ned1;
-	RotationMatrix<NEDFrame, ECEFFrame> const ned3 = rotation_about<NEDFrame> (north_vector (ned2), angles.roll()) * ned2;
+	RotationMatrix<NEDSpace, ECEFSpace> const ned0 = ecef_to_ned_rotation (position);
+	RotationMatrix<NEDSpace, ECEFSpace> const ned1 = rotation_about<NEDSpace> (down_vector (ned0), angles.yaw()) * ned0;
+	RotationMatrix<NEDSpace, ECEFSpace> const ned2 = rotation_about<NEDSpace> (east_vector (ned1), angles.pitch()) * ned1;
+	RotationMatrix<NEDSpace, ECEFSpace> const ned3 = rotation_about<NEDSpace> (north_vector (ned2), angles.roll()) * ned2;
 
-	return RotationMatrix<ECEFFrame, NEDFrame> { math::unit } * ned3 * RotationMatrix<ECEFFrame, AirframeFrame> { math::unit };
+	return RotationMatrix<ECEFSpace, NEDSpace> { math::unit } * ned3 * RotationMatrix<ECEFSpace, AirframeSpace> { math::unit };
 }
 
 } // namespace xf

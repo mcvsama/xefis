@@ -20,8 +20,8 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/euler_angles.h>
+#include <xefis/support/math/geometry.h>
 #include <xefis/support/math/position_rotation.h>
-#include <xefis/support/math/space.h>
 #include <xefis/support/math/transforms.h>
 
 
@@ -41,18 +41,21 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 		SpaceVector<si::Angle> (other)
 	{ }
 
+	[[nodiscard]]
 	constexpr auto
 	pitch() const noexcept
 	{
 		return (*this)[0];
 	}
 
+	[[nodiscard]]
 	constexpr auto
 	roll() const noexcept
 	{
 		return (*this)[1];
 	}
 
+	[[nodiscard]]
 	constexpr auto
 	yaw() const noexcept
 	{
@@ -63,10 +66,10 @@ struct TaitBryanAngles: public SpaceVector<si::Angle>
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (RotationMatrix<ECEFFrame, AirframeFrame> const& rotation, si::LonLat const& position)
+tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& rotation, si::LonLat const& position)
 {
-	auto const diff = angle_difference (RotationMatrix<> { ecef_to_ned_rotation (position).array() },
-										RotationMatrix<> { rotation.array() });
+	auto const diff = euler_angle_difference (RotationMatrix<> { ecef_to_ned_rotation (position).array() },
+											  RotationMatrix<> { rotation.array() });
 
 	return TaitBryanAngles (diff);
 }
@@ -74,7 +77,7 @@ tait_bryan_angles (RotationMatrix<ECEFFrame, AirframeFrame> const& rotation, si:
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (RotationMatrix<ECEFFrame, AirframeFrame> const& rotation, SpaceVector<si::Length, ECEFFrame> const& position)
+tait_bryan_angles (RotationMatrix<ECEFSpace, AirframeSpace> const& rotation, SpaceVector<si::Length, ECEFSpace> const& position)
 {
 	return tait_bryan_angles (rotation, polar (position));
 }
@@ -82,7 +85,7 @@ tait_bryan_angles (RotationMatrix<ECEFFrame, AirframeFrame> const& rotation, Spa
 
 [[nodiscard]]
 inline TaitBryanAngles
-tait_bryan_angles (PositionRotation<ECEFFrame, AirframeFrame> const& pr)
+tait_bryan_angles (PositionRotation<ECEFSpace, AirframeSpace> const& pr)
 {
 	return tait_bryan_angles (pr.body_to_base_rotation(), polar (pr.position()));
 }

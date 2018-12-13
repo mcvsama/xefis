@@ -20,7 +20,7 @@
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air/air.h>
-#include <xefis/support/math/space.h>
+#include <xefis/support/math/geometry.h>
 
 
 namespace xf {
@@ -57,7 +57,7 @@ class StandardAtmosphere
   public:
 	[[nodiscard]]
 	Air
-	air_at (SpaceVector<si::Length, ECEFFrame> const& position) const;
+	air_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
 
 	[[nodiscard]]
 	Air
@@ -68,12 +68,12 @@ class StandardAtmosphere
 	air_at_amsl (si::Length amsl_height) const;
 
 	[[nodiscard]]
-	SpaceVector<si::Velocity, ECEFFrame>
-	wind_at (SpaceVector<si::Length, ECEFFrame> const& position) const;
+	SpaceVector<si::Velocity, ECEFSpace>
+	wind_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
 
 	[[nodiscard]]
-	AtmosphereState<ECEFFrame>
-	state_at (SpaceVector<si::Length, ECEFFrame> const& position) const;
+	AtmosphereState<ECEFSpace>
+	state_at (SpaceVector<si::Length, ECEFSpace> const& position) const;
 };
 
 
