@@ -51,7 +51,7 @@ template<class SourceUnit, class Value>
 			operator Quantity<TargetUnit, Value>() const noexcept
 			{
 				if constexpr (is_convertible<SourceUnit, TargetUnit>())
-					return (SourceUnit::base_value (_quantity.quantity()) - to_floating_point<typename TargetUnit::Offset, Value>()) / to_floating_point<typename TargetUnit::Scale, Value>();
+					return (SourceUnit::base_value (_quantity.value()) - to_floating_point<typename TargetUnit::Offset, Value>()) / to_floating_point<typename TargetUnit::Scale, Value>();
 				else if constexpr (is_convertible_with_angle<SourceUnit, TargetUnit>())
 				{
 					int other_angle_exp_diff = TargetUnit::AngleExponent - SourceUnit::AngleExponent;
