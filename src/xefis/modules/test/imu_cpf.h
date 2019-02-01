@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MODULES__SYSTEMS__IMU_CPF_H__INCLUDED
-#define XEFIS__MODULES__SYSTEMS__IMU_CPF_H__INCLUDED
+#ifndef XEFIS__MODULES__TEST__IMU_CPF_H__INCLUDED
+#define XEFIS__MODULES__TEST__IMU_CPF_H__INCLUDED
 
 // Standard:
 #include <cstddef>
