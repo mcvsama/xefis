@@ -353,7 +353,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows, class pTargetFr
 
 	  private:
 		template<class ...Ts>
-			void
+			constexpr void
 			recursive_initialize_from_scalars (std::size_t position, Scalar const& scalar, Ts&& ...rest) noexcept
 			{
 				_data[position] = scalar;
@@ -363,7 +363,7 @@ template<class pScalar, std::size_t pColumns, std::size_t pRows, class pTargetFr
 			}
 
 		template<class ...Ts>
-			void
+			constexpr void
 			recursive_initialize_from_vectors (std::size_t position, ColumnVector const& vector, Ts&& ...rest) noexcept
 			{
 				for (std::size_t r = 0; r < kRows; ++r)
