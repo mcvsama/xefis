@@ -48,8 +48,9 @@ template<class T1, class T2, class T3>
 	inline void
 	verify_equal_with_epsilon (std::string const& test_explanation, T1 const& value1, T2 const& value2, T3 const& epsilon)
 	{
-		if (value1 - value2 > epsilon ||
-			value2 - value1 > epsilon)
+		using std::isfinite;
+
+		if (!isfinite (value1) || !isfinite (value2) || value1 - value2 > epsilon || value2 - value1 > epsilon)
 		{
 			using std::to_string;
 

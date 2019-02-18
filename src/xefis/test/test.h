@@ -22,7 +22,6 @@
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 
 // Local:
 #include "test_asserts.h"
@@ -50,16 +49,12 @@ RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 
 	std::cout << "Test: " << test_name << "…" << std::flush;
 	std::ostringstream log_buffer;
-	LoggerOutput logger_output (log_buffer);
-	logger_output.set_timestamps_enabled (false);
-	Logger logger (logger_output);
 
-	bool was_exception = Exception::catch_and_log (logger, [&]{
+	try {
 		tf();
 		std::cout << " " << kPassColor << "PASS" << kResetColor << std::endl;
-	});
-
-	if (was_exception)
+	}
+	catch (...)
 	{
 		std::cout << " " << kFailColor << "FAIL" << kResetColor << std::endl;
 		std::cout << kExplanationColor << "Explanation: " << log_buffer.str() << kResetColor;
