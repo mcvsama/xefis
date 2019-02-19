@@ -25,17 +25,19 @@
 #include <QImage>
 #include <QWidget>
 
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/noncopyable.h>
+#include <neutrino/tracker.h>
+#include <neutrino/work_performer.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/instrument.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/screen_spec.h>
-#include <xefis/support/system/work_performer.h>
 #include <xefis/utility/named_instance.h>
-#include <xefis/utility/noncopyable.h>
-#include <xefis/utility/tracker.h>
 
 
 namespace xf {

@@ -18,12 +18,14 @@
 #include <QtCore/QDate>
 #include <QtCore/QDateTime>
 
+// Neutrino:
+#include <neutrino/exception.h>
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/config/exception.h>
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/earth/navigation/magnetic_variation.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "nc.h"

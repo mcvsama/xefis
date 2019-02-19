@@ -20,13 +20,16 @@
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qdom_iterator.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/qdom_iterator.h>
 #include <xefis/utility/blob.h>
+#include <xefis/utility/string.h>
 
 // Local:
 #include "state.h"

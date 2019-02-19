@@ -17,13 +17,16 @@
 
 // Lib:
 #include <boost/circular_buffer.hpp>
+#include <boost/format.hpp>
+
+// Neutrino:
+#include <neutrino/time_helper.h>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/module.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "processing_loop.h"
@@ -44,7 +47,7 @@ ProcessingLoop::ProcessingLoop (Machine& machine, std::string_view const& instan
 	_loop_timer->setInterval (_loop_period.in<Millisecond>());
 	QObject::connect (_loop_timer, &QTimer::timeout, this, &ProcessingLoop::execute_cycle);
 
-	_logger.set_processing_loop (*this);
+	_logger.set_logger_tag_provider (*this);
 }
 
 
@@ -122,6 +125,16 @@ ProcessingLoop::execute_cycle()
 
 	_previous_timestamp = t;
 	_current_cycle.reset();
+}
+
+
+std::optional<std::string>
+ProcessingLoop::logger_tag() const
+{
+	if (auto cycle = current_cycle())
+		return (boost::format ("cycle=%08d") % cycle->number()).str();
+	else
+		return "cycle=--------";
 }
 
 } // namespace xf

@@ -18,11 +18,13 @@
 #include <cstddef>
 #include <vector>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
-#include <xefis/utility/noncopyable.h>
-#include <xefis/utility/sequence.h>
 
 
 class QWidget;

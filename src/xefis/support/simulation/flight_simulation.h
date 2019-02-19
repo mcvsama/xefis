@@ -18,12 +18,12 @@
 #include <cstddef>
 #include <functional>
 
-// Lib:
-#include <lib/math/math.h>
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/math/math.h>
 
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/support/simulation/n_body/body.h>
 #include <xefis/support/simulation/airframe.h>
 #include <xefis/support/simulation/atmosphere.h>

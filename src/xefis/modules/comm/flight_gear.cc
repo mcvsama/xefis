@@ -14,11 +14,13 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/qdom.h>
 
 // Local:
 #include "flight_gear.h"

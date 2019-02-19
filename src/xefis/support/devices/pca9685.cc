@@ -23,12 +23,14 @@
 // Qt:
 #include <QTimer>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/time_helper.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "pca9685.h"

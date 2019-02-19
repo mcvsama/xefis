@@ -18,10 +18,12 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLayout>
 
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "afcs.h"

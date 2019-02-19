@@ -17,10 +17,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/logger.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
-#include <xefis/support/bus/serial_port.h>
 
 
 namespace xf {

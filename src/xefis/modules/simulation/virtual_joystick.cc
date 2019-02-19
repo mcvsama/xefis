@@ -20,12 +20,14 @@
 #include <QPainter>
 #include <QWidget>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/range.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/widget.h>
-#include <xefis/utility/numeric.h>
 #include <xefis/utility/kde.h>
-#include <xefis/utility/range.h>
 
 // Local:
 #include "virtual_joystick.h"

@@ -22,13 +22,15 @@
 // Qt:
 #include <QtGui/QPainter>
 
+// Neutrino:
+#include <neutrino/synchronized.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/support/instrument/instrument_aids.h>
 #include <xefis/support/instrument/instrument_painter.h>
 #include <xefis/support/instrument/text_painter.h>
-#include <xefis/utility/synchronized.h>
 
 
 namespace xf {

@@ -18,8 +18,10 @@
 // Boost:
 #include <boost/range/adaptor/indexed.hpp>
 
+// Neutrino:
+#include <neutrino/test/test.h>
+
 // Xefis:
-#include <xefis/test/test.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/quadrature_decoder.h>

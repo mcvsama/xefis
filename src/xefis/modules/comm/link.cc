@@ -19,14 +19,16 @@
 // Lib:
 #include <boost/endian/conversion.hpp>
 
+// Neutrino:
+#include <neutrino/crypto/hmac.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qdom_iterator.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/qdom_iterator.h>
-#include <xefis/utility/hextable.h>
-#include <xefis/utility/hmac.h>
 #include <xefis/utility/blob.h>
+#include <xefis/utility/hextable.h>
 
 // Local:
 #include "link.h"

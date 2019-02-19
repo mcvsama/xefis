@@ -22,11 +22,13 @@
 // Boost:
 #include <boost/lexical_cast.hpp>
 
+// Neutrino:
+#include <neutrino/c++20.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/config/c++20.h>
 #include <xefis/core/property.h>
-#include <xefis/core/stdexcept.h>
 #include <xefis/utility/blob.h>
 
 

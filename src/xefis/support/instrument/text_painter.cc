@@ -15,8 +15,11 @@
 #include <cstddef>
 #include <cmath>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
-#include <xefis/utility/numeric.h>
+#include <xefis/config/all.h>
 
 // Local:
 #include "text_painter.h"

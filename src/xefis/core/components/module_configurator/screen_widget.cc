@@ -19,10 +19,12 @@
 #include <QGridLayout>
 #include <QTabWidget>
 
+// Neutrino:
+#include <neutrino/math/histogram.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
-#include <xefis/utility/histogram.h>
 
 // Local:
 #include "screen_widget.h"

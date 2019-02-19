@@ -18,10 +18,12 @@
 #include <cstddef>
 #include <cmath>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/range.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/range.h>
 
 
 namespace xf {

@@ -28,17 +28,19 @@
 // Qt:
 #include <QtCore/QTimer>
 
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/numeric.h>
+#include <neutrino/stdexcept.h>
+#include <neutrino/strong_type.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/core/stdexcept.h>
 #include <xefis/utility/actions.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/strong_type.h>
 #include <xefis/utility/types.h>
 
 

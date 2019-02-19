@@ -28,9 +28,11 @@
 #include <string.h>
 #include <errno.h>
 
+// Neutrino:
+#include <neutrino/fail.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/fail.h>
 
 
 enum class PingLoopResult

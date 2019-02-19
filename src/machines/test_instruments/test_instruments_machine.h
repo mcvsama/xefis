@@ -19,16 +19,18 @@
 #include <optional>
 #include <memory>
 
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/tracker.h>
+#include <neutrino/work_performer.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/machine.h>
 #include <xefis/core/processing_loop.h>
 #include <xefis/core/xefis.h>
 #include <xefis/modules/test/test_generator.h>
 #include <xefis/support/earth/navigation/navaid_storage.h>
-#include <xefis/support/system/work_performer.h>
-#include <xefis/utility/tracker.h>
 
 // Local:
 #include "test_screen.h"

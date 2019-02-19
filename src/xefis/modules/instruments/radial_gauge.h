@@ -19,6 +19,9 @@
 #include <string>
 #include <optional>
 
+// Neutrino:
+#include <neutrino/synchronized.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -26,7 +29,6 @@
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/utility/synchronized.h>
 
 // Local:
 #include "basic_gauge.h"

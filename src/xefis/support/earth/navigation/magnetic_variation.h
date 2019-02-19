@@ -20,9 +20,11 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
 
 
 namespace xf {

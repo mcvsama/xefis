@@ -14,9 +14,11 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
 #include <xefis/support/ui/widgets/panel_widget.h>
 
 // Local:

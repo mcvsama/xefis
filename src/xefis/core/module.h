@@ -25,11 +25,13 @@
 // Lib:
 #include <boost/circular_buffer.hpp>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/cycle.h>
 #include <xefis/core/module_io.h>
-#include <xefis/utility/noncopyable.h>
 #include <xefis/utility/named_instance.h>
 
 

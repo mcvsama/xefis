@@ -19,9 +19,11 @@
 #include <vector>
 #include <functional>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/noncopyable.h>
 
 
 namespace xf {

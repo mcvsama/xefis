@@ -18,12 +18,14 @@
 #include <cstddef>
 #include <set>
 
+// Neutrino:
+#include <neutrino/range.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/range.h>
 #include <xefis/utility/actions.h>
 
 

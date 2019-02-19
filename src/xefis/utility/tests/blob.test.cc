@@ -15,10 +15,13 @@
 #include <cstddef>
 #include <string>
 
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/test/test.h>
+
 // Xefis:
-#include <xefis/test/test.h>
 #include <xefis/utility/blob.h>
-#include <xefis/utility/demangle.h>
+#include <xefis/utility/string.h>
 
 
 namespace xf::test {

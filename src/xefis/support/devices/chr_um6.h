@@ -19,12 +19,14 @@
 #include <functional>
 #include <queue>
 
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/logger.h>
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
-#include <xefis/support/bus/serial_port.h>
 #include <xefis/utility/packet_reader.h>
-#include <xefis/utility/time_helper.h>
 
 
 namespace xf {

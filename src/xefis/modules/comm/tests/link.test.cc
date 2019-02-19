@@ -14,8 +14,10 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/test/test.h>
+
 // Xefis:
-#include <xefis/test/test.h>
 #include <xefis/modules/comm/link.h>
 
 

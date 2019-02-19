@@ -1,5 +1,8 @@
 # vim:ts=4
 
+include machines/Makefile.machines
+include $(foreach config, $(XEFIS_MACHINES), machines/$(config)/Makefile.sources)
+
 # Let modules compile first
 ######## /xefis/modules/comm ########
 
@@ -139,88 +142,33 @@ XEFIS_HEADERS			+= xefis/modules/test/test_generator.h
 XEFIS_SOURCES			+= xefis/modules/test/imu_cpf.cc
 XEFIS_SOURCES			+= xefis/modules/test/test_generator.cc
 
-######## /lib/math ########
-
-MATH_HEADERS			+= lib/math/math.h
-MATH_HEADERS			+= lib/math/matrix.h
-MATH_HEADERS			+= lib/math/matrix_operations.h
-MATH_HEADERS			+= lib/math/quaternion.h
-MATH_HEADERS			+= lib/math/quaternion_operations.h
-MATH_HEADERS			+= lib/math/traits.h
-
-######## /lib/si ########
-
-XEFIS_HEADERS			+= lib/si/si_config.h
-
-SI_HEADERS				+= lib/si/additional_quantities.h
-SI_HEADERS				+= lib/si/additional_units.h
-SI_HEADERS				+= lib/si/conversion.h
-SI_HEADERS				+= lib/si/exception.h
-SI_HEADERS				+= lib/si/lonlat.h
-SI_HEADERS				+= lib/si/quantity.h
-SI_HEADERS				+= lib/si/si.h
-SI_HEADERS				+= lib/si/standard_literals.h
-SI_HEADERS				+= lib/si/standard_quantities.h
-SI_HEADERS				+= lib/si/standard_unit_traits.h
-SI_HEADERS				+= lib/si/standard_units.h
-SI_HEADERS				+= lib/si/unit.h
-SI_HEADERS				+= lib/si/unit_traits.h
-SI_HEADERS				+= lib/si/utils.h
-
-SI_SOURCES				+= lib/si/exception.cc
-SI_SOURCES				+= lib/si/standard_unit_traits.cc
-SI_SOURCES				+= lib/si/lonlat.cc
-SI_SOURCES				+= lib/si/unit.cc
-SI_SOURCES				+= lib/si/utils.cc
-
-SELFTEST_SOURCES		+= lib/si/tests/basic.test.cc
-
 ######## /xefis ########
 
-XEFIS_HEADERS			+= $(MATH_HEADERS)
-XEFIS_HEADERS			+= $(SI_HEADERS)
+XEFIS_HEADERS			+= $(NEUTRINO_HEADERS)
+XEFIS_HEADERS_MOC		+= $(NEUTRINO_HEADERS_MOC)
 XEFIS_HEADERS			+= xefis/xefis_machine.h
 
-XEFIS_SOURCES			+= $(SI_SOURCES)
+XEFIS_SOURCES			+= $(NEUTRINO_SOURCES)
+XEFIS_SOURCES_MOC		+= $(NEUTRINO_SOURCES_MOC)
 XEFIS_SOURCES			+= xefis/xefis.cc
 
-WATCHDOG_HEADERS		+= $(SI_HEADERS)
-WATCHDOG_HEADERS		+= xefis/core/fail.h
-WATCHDOG_HEADERS		+= xefis/utility/backtrace.h
-WATCHDOG_HEADERS		+= xefis/utility/demangle.h
+WATCHDOG_HEADERS		+= $(NEUTRINO_HEADERS)
+WATCHDOG_HEADERS_MOC	+= $(NEUTRINO_HEADERS_MOC)
 
-WATCHDOG_SOURCES		+= $(SI_SOURCES)
-WATCHDOG_SOURCES		+= xefis/core/fail.cc
-WATCHDOG_SOURCES		+= xefis/utility/backtrace.cc
-WATCHDOG_SOURCES		+= xefis/utility/demangle.cc
+WATCHDOG_SOURCES		+= $(NEUTRINO_SOURCES)
 WATCHDOG_SOURCES		+= xefis/watchdog.cc
 
-SELFTEST_HEADERS		+= $(SI_HEADERS)
-SELFTEST_HEADERS		+= xefis/utility/backtrace.h
-SELFTEST_HEADERS		+= xefis/utility/demangle.h
-SELFTEST_HEADERS		+= xefis/utility/exception_support.h
+SELFTEST_HEADERS		+= $(NEUTRINO_HEADERS)
+SELFTEST_HEADERS_MOC	+= $(NEUTRINO_HEADERS_MOC)
 
-SELFTEST_SOURCES		+= $(SI_SOURCES)
-SELFTEST_SOURCES		+= xefis/utility/backtrace.cc
-SELFTEST_SOURCES		+= xefis/utility/demangle.cc
-SELFTEST_SOURCES		+= xefis/utility/exception_support.cc
+SELFTEST_SOURCES		+= $(NEUTRINO_SOURCES)
 SELFTEST_SOURCES		+= xefis/selftest.cc
 
 ######## /xefis/config ########
 
 XEFIS_HEADERS			+= xefis/config/all.h
-XEFIS_HEADERS			+= xefis/config/constants.h
+XEFIS_HEADERS			+= xefis/config/core_types.h
 XEFIS_HEADERS			+= xefis/config/resources.h
-XEFIS_HEADERS			+= xefis/config/strong_typedef.h
-XEFIS_HEADERS			+= xefis/config/system.h
-XEFIS_HEADERS			+= xefis/config/types.h
-XEFIS_HEADERS			+= xefis/config/cpp14.h
-XEFIS_HEADERS			+= xefis/config/exception.h
-XEFIS_HEADERS			+= xefis/config/version.h
-
-XEFIS_SOURCES			+= xefis/config/exception.cc
-
-SELFTEST_SOURCES		+= xefis/config/exception.cc
 
 NODEP_SOURCES			+= $(VERSION_FILE)
 
@@ -261,11 +209,9 @@ XEFIS_SOURCES			+= xefis/core/components/property_tree/property_tree.cc
 ######## /xefis/core ########
 
 XEFIS_HEADERS			+= xefis/core/cycle.h
-XEFIS_HEADERS			+= xefis/core/fail.h
 XEFIS_HEADERS			+= xefis/core/graphics.h
 XEFIS_HEADERS			+= xefis/core/instrument.h
 XEFIS_HEADERS			+= xefis/core/licenses.h
-XEFIS_HEADERS			+= xefis/core/logger.h
 XEFIS_HEADERS			+= xefis/core/machine.h
 XEFIS_HEADERS			+= xefis/core/module.h
 XEFIS_HEADERS			+= xefis/core/module_io.h
@@ -283,14 +229,10 @@ XEFIS_HEADERS			+= xefis/core/property_traits.h
 XEFIS_HEADERS_MOC		+= xefis/core/screen.h
 XEFIS_HEADERS			+= xefis/core/screen_spec.h
 XEFIS_HEADERS			+= xefis/core/setting.h
-XEFIS_HEADERS			+= xefis/core/stdexcept.h
-XEFIS_HEADERS			+= xefis/core/system.h
 XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
 
-XEFIS_SOURCES			+= xefis/core/fail.cc
 XEFIS_SOURCES			+= xefis/core/graphics.cc
 XEFIS_SOURCES			+= xefis/core/licenses.cc
-XEFIS_SOURCES			+= xefis/core/logger.cc
 XEFIS_SOURCES			+= xefis/core/machine.cc
 XEFIS_SOURCES			+= xefis/core/module.cc
 XEFIS_SOURCES			+= xefis/core/module_io.cc
@@ -301,7 +243,6 @@ XEFIS_SOURCES			+= xefis/core/screen.cc
 XEFIS_SOURCES			+= xefis/core/system.cc
 XEFIS_SOURCES			+= xefis/core/xefis.cc
 
-SELFTEST_HEADERS		+= xefis/core/logger.h
 SELFTEST_HEADERS		+= xefis/core/module.h
 SELFTEST_HEADERS		+= xefis/core/module_io.h
 SELFTEST_HEADERS		+= xefis/core/property.h
@@ -309,7 +250,6 @@ SELFTEST_HEADERS		+= xefis/core/property.tcc
 
 SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
 SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
-SELFTEST_SOURCES		+= xefis/core/logger.cc
 SELFTEST_SOURCES		+= xefis/core/module.cc
 SELFTEST_SOURCES		+= xefis/core/module_io.cc
 SELFTEST_SOURCES		+= xefis/core/property_observer.cc
@@ -327,14 +267,6 @@ XEFIS_SOURCES			+= xefis/support/airframe/airframe.cc
 XEFIS_SOURCES			+= xefis/support/airframe/drag.cc
 XEFIS_SOURCES			+= xefis/support/airframe/lift.cc
 XEFIS_SOURCES			+= xefis/support/airframe/lift_mod.cc
-
-######## /xefis/support/bus ########
-
-XEFIS_HEADERS			+= xefis/support/bus/i2c.h
-XEFIS_HEADERS_MOC		+= xefis/support/bus/serial_port.h
-
-XEFIS_SOURCES			+= xefis/support/bus/i2c.cc
-XEFIS_SOURCES			+= xefis/support/bus/serial_port.cc
 
 ######## /xefis/support/control ########
 
@@ -385,19 +317,19 @@ XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
 
 ######## /xefis/support/math ########
 
-XEFIS_HEADERS         += xefis/support/math/angle_of_attack.h
-XEFIS_HEADERS         += xefis/support/math/euler_angles.h
-XEFIS_HEADERS         += xefis/support/math/frame_of_reference.h
-XEFIS_HEADERS         += xefis/support/math/geometry.h
-XEFIS_HEADERS         += xefis/support/math/lonlat_radius.h
-XEFIS_HEADERS         += xefis/support/math/north_east_down.h
-XEFIS_HEADERS         += xefis/support/math/position_rotation.h
-XEFIS_HEADERS         += xefis/support/math/position_rotation.tcc
-XEFIS_HEADERS         += xefis/support/math/space.h
-XEFIS_HEADERS         += xefis/support/math/tait_bryan_angles.h
-XEFIS_HEADERS         += xefis/support/math/transforms.h
+XEFIS_HEADERS			+= xefis/support/math/angle_of_attack.h
+XEFIS_HEADERS			+= xefis/support/math/euler_angles.h
+XEFIS_HEADERS			+= xefis/support/math/frame_of_reference.h
+XEFIS_HEADERS			+= xefis/support/math/geometry.h
+XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
+XEFIS_HEADERS			+= xefis/support/math/north_east_down.h
+XEFIS_HEADERS			+= xefis/support/math/position_rotation.h
+XEFIS_HEADERS			+= xefis/support/math/position_rotation.tcc
+XEFIS_HEADERS			+= xefis/support/math/space.h
+XEFIS_HEADERS			+= xefis/support/math/tait_bryan_angles.h
+XEFIS_HEADERS			+= xefis/support/math/transforms.h
 
-XEFIS_SOURCES         += xefis/support/math/transforms.cc
+XEFIS_SOURCES			+= xefis/support/math/transforms.cc
 
 ######## /xefis/support/nature ########
 
@@ -454,15 +386,6 @@ XEFIS_SOURCES			+= xefis/support/simulation/atmosphere.cc
 XEFIS_SOURCES			+= xefis/support/simulation/engine.cc
 XEFIS_SOURCES			+= xefis/support/simulation/flight_simulation.cc
 
-######## /xefis/support/system ########
-
-XEFIS_HEADERS			+= xefis/support/system/work_performer.h
-
-XEFIS_SOURCES			+= xefis/support/system/work_performer.cc
-
-SELFTEST_SOURCES		+= xefis/support/system/tests/work_performer.test.cc
-SELFTEST_SOURCES		+= xefis/support/system/work_performer.cc
-
 ######## /xefis/support/ui/widgets ########
 
 # TODO
@@ -490,85 +413,33 @@ XEFIS_SOURCES			+= xefis/support/ui/histogram_stats_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
 XEFIS_SOURCES			+= xefis/support/ui/widget.cc
 
-######## /xefis/test ########
-
-XEFIS_HEADERS			+= xefis/test/stdexcept.h
-XEFIS_HEADERS			+= xefis/test/test.h
-XEFIS_HEADERS			+= xefis/test/test_asserts.h>
-
 ######## /xefis/utility ########
 
 XEFIS_HEADERS			+= xefis/utility/actions.h
-XEFIS_HEADERS			+= xefis/utility/backtrace.h
 XEFIS_HEADERS			+= xefis/utility/blob.h
 XEFIS_HEADERS			+= xefis/utility/callback_actions.h
 XEFIS_HEADERS			+= xefis/utility/convergence.h
-XEFIS_HEADERS			+= xefis/utility/debug_measure.h
-XEFIS_HEADERS			+= xefis/utility/debug_prints.h
 XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
-XEFIS_HEADERS			+= xefis/utility/demangle.h
 XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
-XEFIS_HEADERS			+= xefis/utility/exception_support.h
-XEFIS_HEADERS			+= xefis/utility/field.h
-XEFIS_HEADERS			+= xefis/utility/hash.h
 XEFIS_HEADERS			+= xefis/utility/hextable.h
-XEFIS_HEADERS			+= xefis/utility/histogram.h
-XEFIS_HEADERS			+= xefis/utility/hmac.h
 XEFIS_HEADERS			+= xefis/utility/kde.h
 XEFIS_HEADERS			+= xefis/utility/lookahead.h
-XEFIS_HEADERS			+= xefis/utility/map.h
 XEFIS_HEADERS			+= xefis/utility/named_instance.h
-XEFIS_HEADERS			+= xefis/utility/noncopyable.h
-XEFIS_HEADERS			+= xefis/utility/normal_distribution.h
-XEFIS_HEADERS			+= xefis/utility/normal_variable.h
-XEFIS_HEADERS			+= xefis/utility/numeric.h
-XEFIS_HEADERS			+= xefis/utility/owner_token.h
 XEFIS_HEADERS			+= xefis/utility/packet_reader.h
-XEFIS_HEADERS			+= xefis/utility/qdom.h
-XEFIS_HEADERS			+= xefis/utility/qdom_iterator.h
 XEFIS_HEADERS			+= xefis/utility/quadrature_decoder.h
-XEFIS_HEADERS			+= xefis/utility/qutils.h
-XEFIS_HEADERS			+= xefis/utility/qzdevice.h
-XEFIS_HEADERS			+= xefis/utility/range.h
-XEFIS_HEADERS			+= xefis/utility/responsibility.h
-XEFIS_HEADERS			+= xefis/utility/resource.h
 XEFIS_HEADERS			+= xefis/utility/range_smoother.h
-XEFIS_HEADERS			+= xefis/utility/semaphore.h
-XEFIS_HEADERS			+= xefis/utility/sequence.h
-XEFIS_HEADERS			+= xefis/utility/sequence_utils.h
 XEFIS_HEADERS			+= xefis/utility/smoother.h
-XEFIS_HEADERS			+= xefis/utility/span.h
 XEFIS_HEADERS			+= xefis/utility/string.h
-XEFIS_HEADERS			+= xefis/utility/strong_type.h
-XEFIS_HEADERS			+= xefis/utility/synchronized.h
 XEFIS_HEADERS			+= xefis/utility/temporal.h
-XEFIS_HEADERS			+= xefis/utility/temporary_change.h
-XEFIS_HEADERS			+= xefis/utility/thread.h
-XEFIS_HEADERS			+= xefis/utility/time.h
-XEFIS_HEADERS			+= xefis/utility/time_helper.h
-XEFIS_HEADERS			+= xefis/utility/tracker.h
 XEFIS_HEADERS			+= xefis/utility/transistor.h
 XEFIS_HEADERS			+= xefis/utility/types.h
-XEFIS_HEADERS			+= xefis/utility/use_count.h
-XEFIS_HEADERS			+= xefis/utility/utility.h
-XEFIS_HEADERS			+= xefis/utility/variant.h
 
-XEFIS_SOURCES			+= xefis/utility/backtrace.cc
-XEFIS_SOURCES			+= xefis/utility/demangle.cc
-XEFIS_SOURCES			+= xefis/utility/exception_support.cc
 XEFIS_SOURCES			+= xefis/utility/kde.cc
 XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
-XEFIS_SOURCES			+= xefis/utility/qutils.cc
-XEFIS_SOURCES			+= xefis/utility/qzdevice.cc
-XEFIS_SOURCES			+= xefis/utility/thread.cc
 
 SELFTEST_SOURCES		+= xefis/utility/tests/blob.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
-SELFTEST_SOURCES		+= xefis/utility/tests/field.test.cc
-SELFTEST_SOURCES		+= xefis/utility/tests/numeric.test.cc
 SELFTEST_SOURCES		+= xefis/utility/tests/quadrature_decoder.test.cc
-SELFTEST_SOURCES		+= xefis/utility/tests/tracker.test.cc
-SELFTEST_SOURCES		+= xefis/utility/thread.cc
 
 ################
 
@@ -598,30 +469,30 @@ ALL_MACHINES_SELFTEST_SOURCES_MOC	+= $(foreach machine_name,$(XEFIS_MACHINES),$(
 ALL_MACHINES_MOCOBJS				+= $(call mkmocobjs,$(ALL_MACHINES_SOURCES_MOC))
 ALL_MACHINES_SELFTEST_MOCOBJS		+= $(call mkmocobjs,$(ALL_MACHINES_SELFTEST_SOURCES_MOC))
 
-XEFIS_HEADERS += $(XEFIS_HEADERS_MOC)
-XEFIS_OBJECTS += $(call mkobjs, $(XEFIS_SOURCES))
-XEFIS_SOURCES_MOC += $(call mkmocs, $(XEFIS_HEADERS_MOC))
-XEFIS_MOCOBJS += $(call mkmocobjs, $(XEFIS_SOURCES_MOC))
+XEFIS_HEADERS						+= $(XEFIS_HEADERS_MOC)
+XEFIS_OBJECTS						+= $(call mkobjs, $(XEFIS_SOURCES))
+XEFIS_SOURCES_MOC					+= $(call mkmocs, $(XEFIS_HEADERS_MOC))
+XEFIS_MOCOBJS						+= $(call mkmocobjs, $(XEFIS_SOURCES_MOC))
 
-WATCHDOG_HEADERS += $(WATCHDOG_HEADERS_MOC)
-WATCHDOG_OBJECTS += $(call mkobjs, $(WATCHDOG_SOURCES))
-WATCHDOG_SOURCES_MOC += $(call mkmocs, $(WATCHDOG_HEADERS_MOC))
-WATCHDOG_MOCOBJS += $(call mkmocobjs, $(WATCHDOG_SOURCES_MOC))
+WATCHDOG_HEADERS					+= $(WATCHDOG_HEADERS_MOC)
+WATCHDOG_OBJECTS					+= $(call mkobjs, $(WATCHDOG_SOURCES))
+WATCHDOG_SOURCES_MOC				+= $(call mkmocs, $(WATCHDOG_HEADERS_MOC))
+WATCHDOG_MOCOBJS					+= $(call mkmocobjs, $(WATCHDOG_SOURCES_MOC))
 
-SELFTEST_HEADERS += $(ALL_MACHINES_SELFTEST_HEADERS)
-SELFTEST_HEADERS_MOC += $(ALL_MACHINES_SELFTEST_HEADERS_MOC)
-SELFTEST_SOURCES += $(ALL_MACHINES_SELFTEST_SOURCES)
-SELFTEST_SOURCES_MOC += $(ALL_MACHINES_SELFTEST_SOURCES_MOC)
+SELFTEST_HEADERS					+= $(ALL_MACHINES_SELFTEST_HEADERS)
+SELFTEST_HEADERS_MOC				+= $(ALL_MACHINES_SELFTEST_HEADERS_MOC)
+SELFTEST_SOURCES					+= $(ALL_MACHINES_SELFTEST_SOURCES)
+SELFTEST_SOURCES_MOC				+= $(ALL_MACHINES_SELFTEST_SOURCES_MOC)
 
-SELFTEST_HEADERS += $(SELFTEST_HEADERS_MOC)
-SELFTEST_OBJECTS += $(call mkobjs, $(SELFTEST_SOURCES))
-SELFTEST_SOURCES_MOC += $(call mkmocs, $(SELFTEST_HEADERS_MOC))
-SELFTEST_MOCOBJS += $(call mkmocobjs, $(SELFTEST_SOURCES_MOC))
+SELFTEST_HEADERS					+= $(SELFTEST_HEADERS_MOC)
+SELFTEST_OBJECTS					+= $(call mkobjs, $(SELFTEST_SOURCES))
+SELFTEST_SOURCES_MOC				+= $(call mkmocs, $(SELFTEST_HEADERS_MOC))
+SELFTEST_MOCOBJS					+= $(call mkmocobjs, $(SELFTEST_SOURCES_MOC))
 
-HEADERS += $(ALL_MACHINES_HEADERS) $(ALL_MACHINES_SELFTEST_HEADERS) $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
-SOURCES += $(ALL_MACHINES_SOURCES) $(ALL_MACHINES_SELFTEST_SOURCES) $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
-SOURCES_MOC += $(ALL_MACHINES_SOURCES_MOC) $(ALL_MACHINES_SELFTEST_SOURCES_MOC) $(XEFIS_SOURCES_MOC) $(WATCHDOG_SOURCES_MOC) $(SELFTEST_SOURCES_MOC)
-MOCOBJS += $(ALL_MACHINES_MOCOBJS) $(ALL_MACHINES_SELFTEST_MOCOBJS) $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
+HEADERS								+= $(ALL_MACHINES_HEADERS) $(ALL_MACHINES_SELFTEST_HEADERS) $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
+SOURCES								+= $(ALL_MACHINES_SOURCES) $(ALL_MACHINES_SELFTEST_SOURCES) $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
+SOURCES_MOC							+= $(ALL_MACHINES_SOURCES_MOC) $(ALL_MACHINES_SELFTEST_SOURCES_MOC) $(XEFIS_SOURCES_MOC) $(WATCHDOG_SOURCES_MOC) $(SELFTEST_SOURCES_MOC)
+MOCOBJS								+= $(ALL_MACHINES_MOCOBJS) $(ALL_MACHINES_SELFTEST_MOCOBJS) $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
 
 OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
 OBJECTS += $(call mkobjs, $(SOURCES))
@@ -629,7 +500,7 @@ OBJECTS += $(call mkobjs, $(SOURCES))
 machine_to_executable = $(distdir)/xefis.$(1)
 executable_to_machine = $(1:$(distdir)/xefis.%=%)
 
-VERSION_FILE := xefis/config/version.cc
+VERSION_FILE := neutrino/core/version.cc
 MACHINE_TARGETS += $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_to_executable,$(machine_name)))
 TARGETS += $(distdir)/selftest
 TARGETS += $(distdir)/watchdog

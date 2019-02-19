@@ -19,11 +19,13 @@
 #include <QFile>
 #include <QTextStream>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qzdevice.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/qzdevice.h>
 
 // Local:
 #include "navaid_storage.h"

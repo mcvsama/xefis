@@ -20,9 +20,11 @@
 // Lib:
 #include <boost/format.hpp>
 
+// Neutrino:
+#include <neutrino/exception_support.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/exception_support.h>
 #include <xefis/utility/types.h>
 
 // Local:

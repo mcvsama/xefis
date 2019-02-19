@@ -19,9 +19,11 @@
 // System:
 #include <sys/klog.h>
 
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
 
 // Local:
 #include "klog_monitor.h"

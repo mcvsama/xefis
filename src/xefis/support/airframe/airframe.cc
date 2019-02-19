@@ -14,12 +14,14 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qdom_iterator.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/qdom_iterator.h>
 
 // Local:
 #include "airframe.h"

@@ -21,9 +21,11 @@
 // Qt:
 #include <QtCore/QProcess>
 
+// Neutrino:
+#include <neutrino/logger.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 
 
 namespace xf {

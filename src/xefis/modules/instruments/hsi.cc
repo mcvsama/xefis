@@ -14,12 +14,14 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
 #include <xefis/support/earth/navigation/wind_triangle.h>
 #include <xefis/support/instrument/text_layout.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "hsi.h"

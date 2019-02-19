@@ -17,9 +17,11 @@
 // Lib:
 #include <boost/format.hpp>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "vertical_trim.h"

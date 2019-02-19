@@ -19,9 +19,11 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QHeaderView>
 
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qutils.h>
 
 // Local:
 #include "configurable_items_list.h"

@@ -18,6 +18,9 @@
 #include <cstddef>
 #include <string>
 
+// Neutrino:
+#include <neutrino/range.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -25,7 +28,6 @@
 #include <xefis/core/setting.h>
 #include <xefis/utility/callback_actions.h>
 #include <xefis/utility/delta_decoder.h>
-#include <xefis/utility/range.h>
 
 // Local:
 #include "afcs_api.h"

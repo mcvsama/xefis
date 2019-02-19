@@ -14,8 +14,10 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/test/test.h>
+
 // Xefis:
-#include <xefis/test/test.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/delta_decoder.h>

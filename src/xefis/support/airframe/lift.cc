@@ -16,13 +16,15 @@
 #include <algorithm>
 #include <map>
 
+// Neutrino:
+#include <neutrino/math/field.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/qt/qdom_iterator.h>
+#include <neutrino/sequence_utils.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/field.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/qdom_iterator.h>
-#include <xefis/utility/sequence_utils.h>
 
 // Local:
 #include "lift.h"

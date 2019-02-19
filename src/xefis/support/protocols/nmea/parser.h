@@ -17,9 +17,11 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/noncopyable.h>
 #include <xefis/support/protocols/nmea/nmea.h>
 
 // Local:

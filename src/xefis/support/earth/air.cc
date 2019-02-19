@@ -14,10 +14,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/math/field.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/nature/constants.h>
-#include <xefis/utility/field.h>
 
 // Local:
 #include "air.h"

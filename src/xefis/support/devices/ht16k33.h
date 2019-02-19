@@ -24,12 +24,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
+// Neutrino:
+#include <neutrino/bus/i2c.h>
+#include <neutrino/logger.h>
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
-#include <xefis/support/bus/i2c.h>
-#include <xefis/utility/numeric.h>
 
 
 namespace xf {

@@ -11,11 +11,11 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#include "types.h"
-#include "system.h"
+// Neutrino:
+#include <neutrino/core.h>
+#include <neutrino/si/si.h>
+
+// Local:
 #include "resources.h"
-#include "version.h"
-#include "exception.h"
-#include "constants.h"
-#include "debug.h"
+#include "core_types.h"
 

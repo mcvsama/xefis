@@ -14,9 +14,11 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/responsibility.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/responsibility.h>
 #include <xefis/utility/hextable.h>
 
 // Local:

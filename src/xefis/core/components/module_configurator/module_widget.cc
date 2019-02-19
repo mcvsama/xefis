@@ -21,12 +21,14 @@
 #include <QGroupBox>
 #include <QTabWidget>
 
+// Neutrino:
+#include <neutrino/math/histogram.h>
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/module_configurator/config_widget.h>
 #include <xefis/support/qt/ownership_breaker.h>
-#include <xefis/utility/histogram.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "module_widget.h"

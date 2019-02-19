@@ -21,9 +21,11 @@
 // Qt:
 #include <QImage>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/noncopyable.h>
 #include <xefis/utility/types.h>
 
 

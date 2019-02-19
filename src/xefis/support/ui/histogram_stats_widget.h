@@ -26,10 +26,12 @@
 #include <QWidget>
 #include <QLabel>
 
+// Neutrino:
+#include <neutrino/math/histogram.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/ui/widget.h>
-#include <xefis/utility/histogram.h>
 
 
 namespace xf {

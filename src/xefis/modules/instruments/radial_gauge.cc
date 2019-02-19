@@ -15,9 +15,11 @@
 #include <cstddef>
 #include <vector>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "radial_gauge.h"

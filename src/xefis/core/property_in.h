@@ -19,12 +19,14 @@
 #include <cstdint>
 #include <variant>
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 #include <xefis/core/property_traits.h>
-#include <xefis/utility/variant.h>
 
 
 namespace xf {

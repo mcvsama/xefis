@@ -22,6 +22,10 @@
 #include <string_view>
 #include <variant>
 
+// Neutrino:
+#include <neutrino/time.h>
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
@@ -29,8 +33,6 @@
 #include <xefis/core/property_converter.h>
 #include <xefis/core/property_path.h>
 #include <xefis/utility/blob.h>
-#include <xefis/utility/time.h>
-#include <xefis/utility/time_helper.h>
 
 
 namespace xf {

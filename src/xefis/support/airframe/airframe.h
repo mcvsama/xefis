@@ -18,9 +18,11 @@
 #include <cstddef>
 #include <optional>
 
+// Neutrino:
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
 #include <xefis/support/airframe/flaps.h>
 #include <xefis/support/airframe/spoilers.h>
 #include <xefis/support/airframe/lift.h>

@@ -19,11 +19,13 @@
 // Lib:
 #include <boost/endian/conversion.hpp>
 
+// Neutrino:
+#include <neutrino/qt/qdom.h>
+#include <neutrino/stdexcept.h>
+#include <neutrino/time.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/time.h>
 
 // Local:
 #include "bmp085.h"

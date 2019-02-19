@@ -21,10 +21,14 @@
 #include <string_view>
 #include <map>
 
+// Lib:
+#include <kdtree++/kdtree.hpp>
+
+// Neutrino:
+#include <neutrino/logger.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
-#include <kdtree++/kdtree.hpp>
 
 // Local:
 #include "navaid.h"

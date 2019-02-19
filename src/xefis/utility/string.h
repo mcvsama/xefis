@@ -23,6 +23,9 @@
 #include <QtCore/QString>
 #include <QtGui/QColor>
 
+// Neutrino:
+#include <neutrino/blob.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/utility/hextable.h>
@@ -98,6 +101,13 @@ to_hex_string (std::string_view const& blob)
 
 	s.pop_back();
 	return s;
+}
+
+
+inline std::string
+to_hex_string (BlobView const blob)
+{
+	return to_hex_string (std::string (blob.cbegin(), blob.cend()));
 }
 
 

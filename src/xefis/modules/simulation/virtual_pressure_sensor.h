@@ -18,13 +18,15 @@
 #include <cstddef>
 #include <random>
 
+// Neutrino:
+#include <neutrino/math/normal_distribution.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
 #include <xefis/support/simulation/flight_simulation.h>
-#include <xefis/utility/normal_distribution.h>
 
 
 class VirtualPressureSensorIO: public xf::ModuleIO

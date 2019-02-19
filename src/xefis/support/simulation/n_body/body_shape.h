@@ -17,8 +17,8 @@
 // Standard:
 #include <cstddef>
 
-// Lib:
-#include <lib/math/math.h>
+// Neutrino:
+#include <neutrino/math/math.h>
 
 // Xefis:
 #include <xefis/config/all.h>

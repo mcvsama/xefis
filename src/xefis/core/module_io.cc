@@ -15,11 +15,13 @@
 #include <cstddef>
 #include <algorithm>
 
+// Neutrino:
+#include <neutrino/demangle.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/demangle.h>
 #include <xefis/utility/types.h>
 
 // Local:

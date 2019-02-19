@@ -15,10 +15,12 @@
 #include <cstddef>
 #include <algorithm>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/instrument/text_layout.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "adi.h"

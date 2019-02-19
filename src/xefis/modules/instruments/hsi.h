@@ -19,6 +19,9 @@
 #include <cstddef>
 #include <future>
 
+// Neutrino:
+#include <neutrino/synchronized.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -29,7 +32,6 @@
 #include <xefis/support/earth/navigation/navaid_storage.h>
 #include <xefis/support/instrument/instrument_support.h>
 #include <xefis/utility/event_timestamper.h>
-#include <xefis/utility/synchronized.h>
 #include <xefis/utility/temporal.h>
 
 

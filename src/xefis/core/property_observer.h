@@ -20,11 +20,13 @@
 #include <variant>
 #include <list>
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/property.h>
 #include <xefis/utility/smoother.h>
-#include <xefis/utility/variant.h>
 
 
 namespace xf {

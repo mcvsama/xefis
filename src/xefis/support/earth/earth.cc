@@ -19,8 +19,11 @@
 // Boost:
 #include <boost/format.hpp>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
-#include <xefis/utility/numeric.h>
+#include <xefis/config/all.h>
 
 // Local:
 #include "earth.h"

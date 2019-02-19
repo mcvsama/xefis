@@ -17,6 +17,9 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/math/field.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/air.h>
@@ -25,7 +28,6 @@
 #include <xefis/support/nature/physics.h>
 #include <xefis/support/simulation/airfoil_spline.h>
 #include <xefis/support/simulation/atmosphere.h>
-#include <xefis/utility/field.h>
 
 
 namespace xf::sim {

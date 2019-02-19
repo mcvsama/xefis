@@ -18,13 +18,13 @@
 #include <cstddef>
 #include <cmath>
 
-// Lib:
-#include <lib/math/math.h>
+// Neutrino:
+#include <neutrino/math/math.h>
+#include <neutrino/numeric.h>
 
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/math/lonlat_radius.h>
-#include <xefis/utility/numeric.h>
 
 
 namespace xf {

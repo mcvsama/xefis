@@ -14,9 +14,11 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/math/math.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <math/math.h>
 
 // Local:
 #include "imu_cpf.h"

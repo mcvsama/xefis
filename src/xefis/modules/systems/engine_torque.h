@@ -18,12 +18,14 @@
 #include <cstddef>
 #include <variant>
 
+// Neutrino:
+#include <neutrino/math/field.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/property.h>
 #include <xefis/core/setting.h>
-#include <xefis/utility/field.h>
 #include <xefis/utility/temporal.h>
 
 

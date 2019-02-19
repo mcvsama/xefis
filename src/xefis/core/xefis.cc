@@ -26,17 +26,19 @@
 // Qt:
 #include <QtCore/QTextCodec>
 
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/fail.h>
+#include <neutrino/time_helper.h>
+#include <neutrino/work_performer.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/components/configurator/configurator_widget.h>
-#include <xefis/core/fail.h>
 #include <xefis/core/system.h>
 #include <xefis/core/licenses.h>
 #include <xefis/support/airframe/airframe.h>
-#include <xefis/support/system/work_performer.h>
 #include <xefis/support/ui/sound_manager.h>
-#include <xefis/utility/time_helper.h>
-#include <xefis/utility/demangle.h>
 #include <xefis/xefis_machine.h>
 
 // Local:

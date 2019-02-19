@@ -17,10 +17,12 @@
 // Qt:
 #include <QtWidgets/QTreeWidgetItem>
 
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/utility/qutils.h>
 
 // Local:
 #include "configurable_items_list.h"

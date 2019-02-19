@@ -17,10 +17,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/math/field.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/airframe/types.h>
-#include <xefis/utility/field.h>
 
 
 namespace xf {

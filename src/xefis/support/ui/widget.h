@@ -21,9 +21,11 @@
 // Qt:
 #include <QWidget>
 
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qutils.h>
 
 
 namespace xf {

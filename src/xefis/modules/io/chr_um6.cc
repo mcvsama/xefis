@@ -28,11 +28,13 @@
 // Lib:
 #include <boost/endian/conversion.hpp>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/system.h>
 #include <xefis/utility/string.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "chr_um6.h"

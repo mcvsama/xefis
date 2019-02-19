@@ -20,9 +20,11 @@
 // Qt:
 #include <QtCore/QSocketNotifier>
 
+// Neutrino:
+#include <neutrino/logger.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/module.h>
 #include <xefis/core/module_io.h>
 

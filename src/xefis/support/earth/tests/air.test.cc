@@ -15,9 +15,11 @@
 #include <cstddef>
 #include <cmath>
 
+// Neutrino:
+#include <neutrino/test/test.h>
+
 // Xefis:
 #include <xefis/support/earth/air.h>
-#include <xefis/test/test.h>
 
 
 namespace xf::test {

@@ -19,9 +19,11 @@
 // Lib:
 #include <boost/endian/conversion.hpp>
 
+// Neutrino:
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "chr_um6.h"

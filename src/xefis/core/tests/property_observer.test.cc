@@ -14,11 +14,13 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/test/test.h>
+
 // Xefis:
 #include <xefis/core/cycle.h>
 #include <xefis/core/property.h>
 #include <xefis/core/property_observer.h>
-#include <xefis/test/test.h>
 
 
 namespace xf::test {

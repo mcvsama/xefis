@@ -18,11 +18,13 @@
 #include <cstddef>
 #include <array>
 
+// Neutrino:
+#include <neutrino/bus/i2c.h>
+#include <neutrino/logger.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
-#include <xefis/support/bus/i2c.h>
 #include <xefis/utility/smoother.h>
 
 

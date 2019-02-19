@@ -21,14 +21,16 @@
 #include <vector>
 
 // Lib:
-#include <lib/math/math.h>
 #include <boost/range.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/adaptor/sliced.hpp>
 
+// Neutrino:
+#include <neutrino/c++20.h>
+#include <neutrino/math/math.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/config/c++20.h>
 #include <xefis/support/math/lonlat_radius.h>
 #include <xefis/support/math/space.h>
 #include <xefis/support/nature/constants.h>

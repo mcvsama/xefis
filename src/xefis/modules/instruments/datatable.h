@@ -22,6 +22,9 @@
 #include <QtWidgets/QWidget>
 #include <QtXml/QDomElement>
 
+// Neutrino:
+#include <neutrino/synchronized.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
@@ -31,7 +34,6 @@
 #include <xefis/core/property_observer.h>
 #include <xefis/core/xefis.h>
 #include <xefis/support/instrument/instrument_support.h>
-#include <xefis/utility/synchronized.h>
 
 
 // TODO handle nans

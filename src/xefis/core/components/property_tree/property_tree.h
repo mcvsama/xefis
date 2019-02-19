@@ -24,11 +24,13 @@
 #include <QTreeWidget>
 #include <QTimer>
 
+// Neutrino:
+#include <neutrino/qt/qutils.h>
+#include <neutrino/sequence.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
-#include <xefis/utility/qutils.h>
-#include <xefis/utility/sequence.h>
 
 // Local:
 #include "property_item.h"

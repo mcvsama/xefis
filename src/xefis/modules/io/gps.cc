@@ -17,14 +17,16 @@
 #include <string>
 #include <ctime>
 
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/stdexcept.h>
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/support/bus/serial_port.h>
 #include <xefis/support/protocols/nmea/parser.h>
 #include <xefis/support/protocols/nmea/mtk.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "gps.h"

@@ -14,11 +14,13 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/range.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/range.h>
 
 // Local:
 #include "afcs_at.h"

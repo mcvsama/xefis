@@ -14,10 +14,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/qt/qdom.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/qdom.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "afcs_fd_roll.h"

@@ -22,12 +22,14 @@
 #include <QPen>
 #include <QFont>
 
+// Neutrino:
+#include <neutrino/strong_type.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/graphics.h>
 #include <xefis/core/screen.h>
 #include <xefis/support/instrument/shadow.h>
-#include <xefis/utility/strong_type.h>
 #include <xefis/utility/types.h>
 
 

@@ -20,14 +20,16 @@
 // Qt:
 #include <QTimer>
 
+// Neutrino:
+#include <neutrino/logger.h>
+#include <neutrino/noncopyable.h>
+#include <neutrino/sequence.h>
+#include <neutrino/time.h>
+#include <neutrino/tracker.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/logger.h>
 #include <xefis/core/property.h>
-#include <xefis/utility/noncopyable.h>
-#include <xefis/utility/sequence.h>
-#include <xefis/utility/time.h>
-#include <xefis/utility/tracker.h>
 
 
 namespace xf {
@@ -58,7 +60,8 @@ class ProcessingLoopIO: public ModuleIO
  */
 class ProcessingLoop:
 	public QObject,
-	public Module<ProcessingLoopIO>
+	public Module<ProcessingLoopIO>,
+	public LoggerTagProvider
 {
 	Q_OBJECT
 
@@ -181,6 +184,10 @@ class ProcessingLoop:
 	 */
 	virtual void
 	execute_cycle();
+
+	// LoggerTagProvider API
+	std::optional<std::string>
+	logger_tag() const override;
 
   private:
 	Machine&							_machine;

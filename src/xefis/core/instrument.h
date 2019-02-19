@@ -24,11 +24,13 @@
 // Lib:
 #include <boost/circular_buffer.hpp>
 
+// Neutrino:
+#include <neutrino/noncopyable.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/module.h>
 #include <xefis/core/paint_request.h>
-#include <xefis/utility/noncopyable.h>
 
 
 namespace xf {

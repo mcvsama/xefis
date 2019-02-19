@@ -18,11 +18,13 @@
 #include <string>
 #include <type_traits>
 
+// Neutrino:
+#include <neutrino/demangle.h>
+#include <neutrino/test/test.h>
+
 // Xefis:
 #include <xefis/core/cycle.h>
 #include <xefis/core/property.h>
-#include <xefis/test/test.h>
-#include <xefis/utility/demangle.h>
 
 
 namespace xf::test {

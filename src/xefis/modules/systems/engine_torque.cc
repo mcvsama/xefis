@@ -15,9 +15,11 @@
 #include <cstddef>
 #include <variant>
 
+// Neutrino:
+#include <neutrino/variant.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/variant.h>
 
 // Local:
 #include "engine_torque.h"

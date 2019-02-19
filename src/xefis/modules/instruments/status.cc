@@ -16,10 +16,12 @@
 #include <algorithm>
 #include <iterator>
 
+// Neutrino:
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/time_helper.h>
 
 // Local:
 #include "status.h"

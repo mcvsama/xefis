@@ -17,10 +17,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/strong_type.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/utility/numeric.h>
-#include <xefis/utility/strong_type.h>
 
 
 namespace xf {

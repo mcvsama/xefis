@@ -14,10 +14,12 @@
 // Standard:
 #include <cstddef>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+
 // Xefis:
 #include <xefis/config/all.h>
 #include <xefis/support/earth/earth.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "arrival_eta.h"

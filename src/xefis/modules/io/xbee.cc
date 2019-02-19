@@ -31,12 +31,15 @@
 // Lib:
 #include <boost/endian/conversion.hpp>
 
+// Neutrino:
+#include <neutrino/bus/serial_port.h>
+#include <neutrino/qt/qdom.h>
+#include <neutrino/time_helper.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/support/bus/serial_port.h>
-#include <xefis/utility/qdom.h>
 #include <xefis/utility/blob.h>
-#include <xefis/utility/time_helper.h>
+#include <xefis/utility/string.h>
 
 // Local:
 #include "xbee.h"

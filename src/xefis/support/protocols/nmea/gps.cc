@@ -18,10 +18,12 @@
 // Boost:
 #include <boost/lexical_cast.hpp>
 
+// Neutrino:
+#include <neutrino/numeric.h>
+#include <neutrino/stdexcept.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/stdexcept.h>
-#include <xefis/utility/numeric.h>
 
 // Local:
 #include "gps.h"

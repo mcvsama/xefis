@@ -26,11 +26,13 @@
 // Qt:
 #include <QtCore/QTextCodec>
 
+// Neutrino:
+#include <neutrino/backtrace.h>
+#include <neutrino/fail.h>
+
 // Xefis:
 #include <xefis/config/all.h>
-#include <xefis/core/fail.h>
 #include <xefis/core/xefis.h>
-#include <xefis/utility/backtrace.h>
 
 
 int main (int argc, char** argv, char**)
