@@ -27,7 +27,7 @@
 #include "traits.h"
 
 
-namespace math {
+namespace neutrino::math {
 
 template<class Test,
 		 template<class, std::size_t, std::size_t, class, class> class Ref>
@@ -280,7 +280,7 @@ template<class Scalar, std::size_t Columns, std::size_t Rows, class TargetFrame,
 		return v.inversed();
 	}
 
-} // namespace math
+} // namespace neutrino::math
 
 #endif
 

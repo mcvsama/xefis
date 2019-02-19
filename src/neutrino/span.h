@@ -22,7 +22,7 @@
 #include <vector>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class pElement>
 	class Span
@@ -314,7 +314,7 @@ template<class V>
 			_data[i] = value;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

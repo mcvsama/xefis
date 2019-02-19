@@ -20,7 +20,7 @@
 #include <neutrino/test/test.h>
 
 
-namespace xf::test {
+namespace neutrino::test {
 namespace {
 
 RuntimeTest t1 ("Field<1 argument, 1 value>", []{
@@ -232,5 +232,5 @@ RuntimeTest t4 ("Field<..., math::Vector<...>>", []{
 });
 
 } // namespace
-} // namespace xf::test
+} // namespace neutrino::test
 

@@ -30,7 +30,7 @@
 #include <neutrino/time_helper.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class LogBlock;
 class Logger;
@@ -380,7 +380,7 @@ operator+ (Logger const& a, Logger const& b)
 	return new_one;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -20,7 +20,7 @@
 #include <type_traits>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class V, class M>
 	class Synchronized;
@@ -255,7 +255,7 @@ template<class V, class M>
 		return UniqueAccessor<Value const, Mutex> (*this);
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

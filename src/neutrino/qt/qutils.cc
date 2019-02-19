@@ -25,7 +25,7 @@
 #include "qutils.h"
 
 
-namespace xf {
+namespace neutrino {
 
 extern float
 default_line_height (QWidget* widget)
@@ -54,5 +54,5 @@ setup_appereance (QTreeWidgetItem& item)
 	item.setSizeHint (0, s);
 }
 
-} // namespace xf
+} // namespace neutrino
 

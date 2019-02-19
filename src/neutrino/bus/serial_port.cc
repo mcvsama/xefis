@@ -33,7 +33,7 @@
 #include "serial_port.h"
 
 
-namespace xf {
+namespace neutrino {
 
 SerialPort::SerialPort (DataReadyCallback data_ready, FailureCallback failure):
 	_data_ready (data_ready),
@@ -268,7 +268,7 @@ SerialPort::read()
 	std::string buffer;
 
 	bool err = false;
-	bool exc = xf::Exception::catch_and_log (_logger, [&] {
+	bool exc = Exception::catch_and_log (_logger, [&] {
 		// Read as much as possible:
 		for (;;)
 		{
@@ -411,5 +411,5 @@ SerialPort::log_prefix() const
 	return (boost::format ("SerialPort<%p>: ") % static_cast<void const*> (this)).str();
 }
 
-} // namespace xf
+} // namespace neutrino
 

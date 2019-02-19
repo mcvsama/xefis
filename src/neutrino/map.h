@@ -21,7 +21,7 @@
 #include <neutrino/types.h>
 
 
-namespace xf {
+namespace neutrino {
 namespace detail {
 
 template<class Arguments, class Value, std::size_t N, std::size_t I>
@@ -82,7 +82,7 @@ template<class Map>
 	using RecursiveMapKeysTuple = typename detail::RecursiveMapKeysTupleH<Map, is_specialization_v<typename Map::mapped_type, std::map>>::tuple;
 
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

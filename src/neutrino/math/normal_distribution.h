@@ -22,7 +22,7 @@
 #include <neutrino/math/normal_variable.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * A wrapper for std::normal_distribution that allows using non-fundamental types as values.
@@ -82,7 +82,7 @@ template<class V>
 		_dist (var.mean().value(), var.stddev().value())
 	{ }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

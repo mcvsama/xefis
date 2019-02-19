@@ -23,7 +23,7 @@
 #include <neutrino/stdexcept.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class UseCount
 {
@@ -159,7 +159,7 @@ UseToken::operator= (UseToken const& other)
 	return *this;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

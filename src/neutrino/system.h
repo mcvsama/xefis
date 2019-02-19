@@ -24,6 +24,8 @@
 #include <signal.h>
 
 
+namespace neutrino {
+
 // Fixes for std::ostream which has broken support for unsigned/signed/char types
 // and prints 8-bit integers like they were characters.
 namespace ostream_fixes {
@@ -67,10 +69,6 @@ template<class CharT, class Traits, class Allocator>
 } // namespace string_view_plus_string_fixes
 
 
-using namespace ostream_fixes;
-using namespace string_view_plus_string_fixes;
-
-
 inline void
 dynamic_assert (bool expression, const char* message = nullptr) noexcept
 {
@@ -80,6 +78,8 @@ dynamic_assert (bool expression, const char* message = nullptr) noexcept
 			std::clog << "Assertion failed: " << message << std::endl;
 	}
 }
+
+} // namespace neutrino
 
 
 /**

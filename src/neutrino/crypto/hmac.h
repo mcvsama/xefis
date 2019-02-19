@@ -22,7 +22,7 @@
 #include <neutrino/strong_type.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * HMAC function
@@ -114,7 +114,7 @@ HMAC::end() const
 	return _result.cend();
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

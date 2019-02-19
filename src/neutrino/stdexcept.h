@@ -24,7 +24,7 @@
 #include <neutrino/exception.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class WrongDestructionOrder: public Exception
 {
@@ -223,7 +223,7 @@ class InvalidArgument: public Exception
 	using Exception::Exception;
 };
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

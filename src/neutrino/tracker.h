@@ -30,7 +30,7 @@
 #include <neutrino/utility.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class BasicRegistrant;
 
@@ -174,7 +174,7 @@ template<class pValue, class pDetails = std::monostate>
 class BasicRegistrant
 {
 	template<class V>
-		friend class xf::Tracker;
+		friend class neutrino::Tracker;
 
   protected:
 	std::list<detail::TrackerInfo> _trackers;
@@ -187,7 +187,7 @@ template<class pValue>
 		private Noncopyable
 	{
 		template<class V>
-			friend class xf::Tracker;
+			friend class neutrino::Tracker;
 
 	  public:
 		using Value = pValue;
@@ -455,7 +455,7 @@ template<class V>
 		return &*_value;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

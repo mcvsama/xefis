@@ -34,7 +34,7 @@
 #include <neutrino/owner_token.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class SerialPort:
 	public QObject,
@@ -43,7 +43,7 @@ class SerialPort:
 	Q_OBJECT
 
   private:
-	static constexpr char kLoggerScope[] = "xf::SerialPort";
+	static constexpr char kLoggerScope[] = "neutrino::SerialPort";
 
   public:
 	// Parity bit:
@@ -326,7 +326,7 @@ class SerialPort:
 	log_prefix() const;
 
   private:
-	xf::OwnerToken						_owned;
+	OwnerToken							_owned;
 	Logger								_logger;
 	Configuration						_configuration;
 	DataReadyCallback					_data_ready;
@@ -476,7 +476,7 @@ SerialPort::flushed() const noexcept
 	return _output_buffer.empty();
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

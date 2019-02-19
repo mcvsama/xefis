@@ -36,7 +36,6 @@ namespace xf {
 
 class Machine;
 class Xefis;
-class Logger;
 
 
 class ProcessingLoopIO: public ModuleIO

@@ -25,7 +25,7 @@
 #include "stdexcept.h"
 
 
-namespace xf {
+namespace neutrino {
 
 class RuntimeTest
 {
@@ -58,7 +58,7 @@ RuntimeTest::RuntimeTest (std::string const& test_name, TestFunction tf)
 	}
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

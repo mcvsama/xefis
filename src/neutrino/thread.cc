@@ -21,7 +21,7 @@
 #include "thread.h"
 
 
-namespace xf {
+namespace neutrino {
 
 void
 set (std::thread& thread, ThreadScheduler scheduler, int priority)
@@ -41,5 +41,5 @@ set (std::thread& thread, ThreadScheduler scheduler, int priority)
 	}
 }
 
-} // namespace xf
+} // namespace neutrino
 

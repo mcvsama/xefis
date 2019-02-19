@@ -24,7 +24,7 @@
 #include <xefis/config/all.h>
 
 
-namespace xf {
+namespace neutrino {
 
 inline void
 value_to_blob (float16_t value, Blob& blob)
@@ -58,7 +58,7 @@ blob_to_value (BlobView const blob, float16_t& value)
 	value = u.value;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

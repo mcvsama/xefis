@@ -21,7 +21,7 @@
 #include "matrix.h"
 
 
-namespace math {
+namespace neutrino::math {
 
 template<class S>
 	constexpr Quaternion<S>
@@ -102,7 +102,7 @@ template<class S>
 		return a /= b;
 	}
 
-} // namespace math
+} // namespace neutrino::math
 
 #endif
 

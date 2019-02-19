@@ -19,7 +19,7 @@
 #include <type_traits>
 
 
-namespace math {
+namespace neutrino::math {
 
 template<class pValue>
 	struct Traits
@@ -73,7 +73,7 @@ template<class Value>
 		return Traits<Value>::inversed (value);
 	}
 
-} // namespace math
+} // namespace neutrino::math
 
 #endif
 

@@ -18,7 +18,7 @@
 #include <cstddef>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class tValueType>
 	class Range
@@ -198,7 +198,7 @@ template<class T>
 		return { std::min (min(), other.min()), std::max (max(), other.max()) };
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

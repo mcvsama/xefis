@@ -22,7 +22,7 @@
 #include "work_performer.h"
 
 
-namespace xf {
+namespace neutrino {
 
 WorkPerformer::WorkPerformer (std::size_t threads_number, Logger const& logger):
 	_logger (logger.with_scope ("<work performer>"))
@@ -50,7 +50,7 @@ void
 WorkPerformer::set (ThreadScheduler scheduler, int priority)
 {
 	for (auto& thread: _threads)
-		xf::set (thread, scheduler, priority);
+		neutrino::set (thread, scheduler, priority);
 }
 
 
@@ -84,5 +84,5 @@ WorkPerformer::thread()
 	}
 }
 
-} // namespace xf
+} // namespace neutrino
 

@@ -30,7 +30,7 @@
 	}
 
 
-namespace xf {
+namespace neutrino {
 
 class Backtrace;
 
@@ -79,7 +79,7 @@ class Backtrace
 extern std::ostream&
 operator<< (std::ostream& os, Backtrace const& backtrace);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -23,7 +23,7 @@
 #include <neutrino/numeric.h>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class Value>
 	class Histogram
@@ -163,9 +163,9 @@ template<class Value>
 				}
 			}
 
-			_mean = xf::mean (begin, end);
-			_median = xf::median (begin, end);
-			_stddev = xf::stddev (begin, end);
+			_mean = neutrino::mean (begin, end);
+			_median = neutrino::median (begin, end);
+			_stddev = neutrino::stddev (begin, end);
 		}
 
 
@@ -269,7 +269,7 @@ template<class Value>
 		return 1.0f * count / n_samples();
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -20,16 +20,16 @@
 #include <neutrino/exception.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class Exception;
 
-} // namespace xf
+} // namespace neutrino
 
 
 namespace si_config {
 
-using Exception = xf::Exception;
+using Exception = neutrino::Exception;
 
 } // namespace si_config
 

@@ -21,7 +21,7 @@
 #include <optional>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Describe exception.
@@ -35,7 +35,7 @@ describe_exception (std::exception_ptr);
 extern std::optional<std::string>
 handle_format_exception (std::function<void()> try_block);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

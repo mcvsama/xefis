@@ -22,7 +22,7 @@
 #include <math/math.h>
 
 
-namespace xf::debug {
+namespace neutrino::debug {
 
 template<class Value, std::size_t Size, class SourceFrame, class TargetFrame>
 	std::ostream&
@@ -55,7 +55,7 @@ template<class Value, std::size_t Columns, std::size_t Rows, class SourceFrame, 
 		return os;
 	}
 
-} // namespace xf::debug
+} // namespace neutrino::debug
 
 #endif
 

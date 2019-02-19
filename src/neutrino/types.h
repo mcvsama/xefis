@@ -24,7 +24,7 @@
 #include <neutrino/strong_type.h>
 
 
-namespace xf {
+namespace neutrino {
 
 using FontPixelSize = StrongType<float, struct FontPixelSizeType>;
 
@@ -301,7 +301,7 @@ template<std::size_t Begin, std::size_t End, class Tuple>
 template<class Tuple1, class Tuple2>
 	using TupleCat = decltype (std::tuple_cat (std::declval<Tuple1>(), std::declval<Tuple2>()));
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

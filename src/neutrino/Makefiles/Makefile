@@ -196,7 +196,7 @@ endif
 
 $(VERSION_FILE): $(COMMIT_FILE) $(BRANCH_FILE)
 	@echo "// Do not edit - automatically generated." >$@
-	@echo "namespace xf::version {" >>$@
+	@echo "namespace neutrino::version {" >>$@
 	@echo "	const char* commit = \"$(COMMIT_REAL)\";" >>$@
 	@echo "	const char* branch = \"$(BRANCH_REAL)\";" >>$@
 	@echo "	const char* version = \"$(MAKE_CONFIG_VERSION)\";" >>$@

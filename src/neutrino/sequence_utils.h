@@ -23,7 +23,7 @@
 #include <neutrino/range.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Find two adjacent iterators a and b that satisfy a <= value && value <= b.
@@ -139,7 +139,7 @@ template<class ForwardIt, class Value, class Compare>
 		return { a, b };
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

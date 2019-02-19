@@ -23,7 +23,7 @@
 
 
 #define MEASURE(code) do { \
-	auto duration = xf::TimeHelper::measure ([&] { (code); }); \
+	auto duration = neutrino::TimeHelper::measure ([&] { (code); }); \
 	\
 	if (duration > 0.001_ms) \
 	{ \
@@ -34,7 +34,7 @@
 } while (false)
 
 
-namespace xf::debug {
+namespace neutrino::debug {
 
 class Timer
 {
@@ -83,7 +83,7 @@ operator<< (std::ostream& os, Timer& t)
 	return os << std::setprecision (6) << std::fixed << t.get();
 }
 
-} // namespace xf::debug
+} // namespace neutrino::debug
 
 #endif
 

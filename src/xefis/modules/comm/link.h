@@ -597,7 +597,7 @@ template<uint8_t B, class V>
 							: (*_property).base_value()
 						: _fallback_value;
 
-					serialize<xf::float_for_width_t<kBytes>> (blob, value);
+					serialize<ne::float_for_width_t<kBytes>> (blob, value);
 				}
 				else if constexpr (std::is_floating_point<Value>())
 				{
@@ -607,14 +607,14 @@ template<uint8_t B, class V>
 							: *_property
 						: _fallback_value;
 
-					serialize<xf::float_for_width_t<kBytes>> (blob, value);
+					serialize<ne::float_for_width_t<kBytes>> (blob, value);
 				}
 			};
 
 			_eat = [this](Blob::const_iterator begin, Blob::const_iterator end) -> Blob::const_iterator {
-				xf::float_for_width_t<kBytes> float_value;
+				ne::float_for_width_t<kBytes> float_value;
 
-				auto result = unserialize<xf::float_for_width_t<kBytes>> (begin, end, float_value);
+				auto result = unserialize<ne::float_for_width_t<kBytes>> (begin, end, float_value);
 
 				if (std::isnan (float_value))
 					_value.reset();

@@ -15,7 +15,7 @@
 #define NEUTRINO__NONCOPYABLE_H__INCLUDED
 
 
-namespace xf {
+namespace neutrino {
 
 class Noncopyable
 {
@@ -26,7 +26,7 @@ class Noncopyable
 	constexpr Noncopyable() noexcept { }
 };
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

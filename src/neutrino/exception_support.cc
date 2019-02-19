@@ -29,7 +29,7 @@
 #include "exception_support.h"
 
 
-namespace xf {
+namespace neutrino {
 
 std::string
 describe_exception (std::exception_ptr eptr)
@@ -178,5 +178,5 @@ handle_format_exception (std::function<void()> try_block)
 	return std::nullopt;
 }
 
-} // namespace xf
+} // namespace neutrino
 

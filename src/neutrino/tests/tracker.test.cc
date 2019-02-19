@@ -20,7 +20,7 @@
 #include <neutrino/tracker.h>
 
 
-namespace xf::test {
+namespace neutrino::test {
 namespace {
 
 class BasicInstrument
@@ -237,5 +237,5 @@ RuntimeTest t6 ("Tracker re-registration doesn't unregister from previous Tracke
 });
 
 } // namespace
-} // namespace xf::test
+} // namespace neutrino::test
 

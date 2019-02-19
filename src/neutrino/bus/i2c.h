@@ -27,7 +27,7 @@
 #include <neutrino/noncopyable.h>
 
 
-namespace xf::i2c {
+namespace neutrino::i2c {
 
 class Bus;
 class Address;
@@ -467,7 +467,7 @@ template<std::size_t Size>
 		_bus.execute ({ Message (Write, _address, data_to_write) });
 	}
 
-} // namespace xf::i2c
+} // namespace neutrino::i2c
 
 #endif
 

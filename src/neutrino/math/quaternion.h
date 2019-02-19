@@ -21,7 +21,7 @@
 #include "matrix.h"
 
 
-namespace math {
+namespace neutrino::math {
 
 template<class pScalar>
 	class Quaternion
@@ -466,7 +466,7 @@ template<class S>
 		return (*this) *= other.inversed();
 	}
 
-} // namespace math
+} // namespace neutrino::math
 
 
 #include "quaternion_operations.h"

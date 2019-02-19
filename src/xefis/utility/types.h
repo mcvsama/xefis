@@ -22,7 +22,7 @@
 #include <xefis/config/all.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Gives corresponding floating-point type (half, float, double, long double…) for required byte-width
@@ -38,7 +38,7 @@ template<>
 		using type = float16_t;
 	};
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

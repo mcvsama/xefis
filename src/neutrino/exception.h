@@ -33,7 +33,7 @@
 #include <neutrino/demangle.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class Logger;
 
@@ -95,7 +95,7 @@ class Exception: public std::exception
 
 	/**
 	 * Execute guarded_code and catch exceptions. If exception is catched,
-	 * it's logged and rethrown. If exception is of type xf::Exceptions,
+	 * it's logged and rethrown. If exception is of type neutrino::Exceptions,
 	 * it's full message is logged (backtrace, etc). Boost and standard
 	 * exceptions are logged just by their typeid().name. Other types
 	 * just cause mentioning an exception.
@@ -175,7 +175,7 @@ Exception::Exception (std::string const& message, bool include_backtrace):
 	_message (message)
 {
 	if (include_backtrace)
-		_backtrace = xf::backtrace();
+		_backtrace = neutrino::backtrace();
 }
 
 
@@ -234,7 +234,6 @@ std::ostream&
 operator<< (std::ostream&, std::exception_ptr const&);
 
 } // namespace exception_ops
-
-} // namespace xf
+} // namespace neutrino
 
 #endif

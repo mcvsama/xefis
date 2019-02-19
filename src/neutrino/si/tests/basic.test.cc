@@ -24,7 +24,7 @@
 #include "../si.h"
 
 
-namespace xf::test {
+namespace neutrino::test {
 namespace {
 
 using namespace test_asserts;
@@ -36,7 +36,7 @@ static_assert (std::is_literal_type<Dimensionless>(), "Unit must be a literal ty
 static_assert (std::is_literal_type<si::Quantity<Dimensionless>>(), "Quantity must be a literal type");
 
 
-static xf::RuntimeTest t_expression ("SI expression validity assertions", []{
+static RuntimeTest t_expression ("SI expression validity assertions", []{
 	si::Quantity<Meter> one_meter;
 
 	verify_compilation (5.0 * Meter());
@@ -56,7 +56,7 @@ static xf::RuntimeTest t_expression ("SI expression validity assertions", []{
 });
 
 
-static xf::RuntimeTest t_comparison ("SI comparison operators", []{
+static RuntimeTest t_comparison ("SI comparison operators", []{
 	si::Quantity<Meter> m1 { 10.0 };
 	si::Quantity<Meter> m2 { 10.1 };
 
@@ -78,7 +78,7 @@ static xf::RuntimeTest t_comparison ("SI comparison operators", []{
 });
 
 
-static xf::RuntimeTest t_basic_arithmetic_operators ("SI basic arithmetic operations", []{
+static RuntimeTest t_basic_arithmetic_operators ("SI basic arithmetic operations", []{
 	// Adding quantities for differently scaled units:
 	auto len1 = 10.0 * Meter() + 1.0 * Foot();
 	auto len2 = 10.0 * Meter() - 1.0 * Foot();
@@ -94,7 +94,7 @@ static xf::RuntimeTest t_basic_arithmetic_operators ("SI basic arithmetic operat
 });
 
 
-static xf::RuntimeTest t_multiplication_division ("SI multiplication, division and counting quantities", []{
+static RuntimeTest t_multiplication_division ("SI multiplication, division and counting quantities", []{
 	using SquareMeter = decltype (1_m * 1_m)::Unit;
 	using SquareKilometer = decltype (1_km * 1_km)::Unit;
 	using InvMeter = decltype (1 / 1_m)::Unit;
@@ -116,7 +116,7 @@ static xf::RuntimeTest t_multiplication_division ("SI multiplication, division a
 });
 
 
-static xf::RuntimeTest t_temperature ("SI temperature tests", []{
+static RuntimeTest t_temperature ("SI temperature tests", []{
 	si::Quantity<Kelvin> t1 { 273.15 - 40.0 };
 	si::Quantity<Celsius> t2 { -40.0 };
 	si::Quantity<Fahrenheit> t3 { -40.0 };
@@ -129,7 +129,7 @@ static xf::RuntimeTest t_temperature ("SI temperature tests", []{
 });
 
 
-static xf::RuntimeTest t_angle ("SI angle tests", []{
+static RuntimeTest t_angle ("SI angle tests", []{
 	si::Quantity<Radian> a1 { 1.0 };
 	si::Quantity<Degree> a2 { 57.295'779'513 };
 	si::Quantity<RadianPerSecond> s1 { 1.0 };
@@ -143,7 +143,7 @@ static xf::RuntimeTest t_angle ("SI angle tests", []{
 });
 
 
-static xf::RuntimeTest t_velocity ("SI velocity tests", []{
+static RuntimeTest t_velocity ("SI velocity tests", []{
 	si::Quantity<MeterPerSecond> s1 { 1.0 };
 	si::Quantity<FootPerMinute> s2 { 196.85 };
 	si::Quantity<FootPerSecond> s3 { 3.280833333333333 };
@@ -158,7 +158,7 @@ static xf::RuntimeTest t_velocity ("SI velocity tests", []{
 });
 
 
-static xf::RuntimeTest t_parsing ("SI parsing tests", []{
+static RuntimeTest t_parsing ("SI parsing tests", []{
 	si::DynamicUnit unit;
 
 	unit = si::parse_unit (" m^2 ");
@@ -223,6 +223,6 @@ static xf::RuntimeTest t_parsing ("SI parsing tests", []{
 });
 
 } // namespace
-} // namespace xf::test
+} // namespace neutrino::test
 
 

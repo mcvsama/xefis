@@ -18,7 +18,7 @@
 #include <cstddef>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * A pair of values, mean (expected value) and standard deviation.
@@ -63,7 +63,7 @@ template<class V>
 		_stddev (stddev)
 	{ }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -31,7 +31,7 @@
 #include "i2c.h"
 
 
-namespace xf::i2c {
+namespace neutrino::i2c {
 
 Message::Message (Operation operation, Address const& address, uint8_t* data, std::size_t size):
 	_operation (operation),
@@ -199,5 +199,5 @@ Device::ensure_open()
 		_bus.open();
 }
 
-} // namespace xf::i2c
+} // namespace neutrino::i2c
 

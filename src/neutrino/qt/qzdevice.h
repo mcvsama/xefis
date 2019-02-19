@@ -28,7 +28,7 @@
 #include <QtCore/QIODevice>
 
 
-namespace xf {
+namespace neutrino {
 
 class QZDevice: public QIODevice
 {
@@ -94,7 +94,7 @@ class QZDevice: public QIODevice
 	bool					_need_pull			= true;
 };
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

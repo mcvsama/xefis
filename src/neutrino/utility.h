@@ -19,7 +19,7 @@
 #include <future>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class Value, class ...Rest>
 	Value*
@@ -55,7 +55,7 @@ template<typename R>
 		return future.wait_for (std::chrono::seconds (0)) == std::future_status::ready;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

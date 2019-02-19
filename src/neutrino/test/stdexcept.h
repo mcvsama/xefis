@@ -22,7 +22,7 @@
 #include <neutrino/exception.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class TestAssertFailed: public Exception
 {
@@ -37,7 +37,7 @@ class TestAssertFailed: public Exception
 	}
 };
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

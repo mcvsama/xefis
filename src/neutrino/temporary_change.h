@@ -19,7 +19,7 @@
 #include <utility>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Sets a new value to given object. Restores its original value
@@ -95,7 +95,7 @@ template<class V, class N>
 		}
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

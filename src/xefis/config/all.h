@@ -19,3 +19,17 @@
 #include "resources.h"
 #include "core_types.h"
 
+namespace xf {
+
+using namespace neutrino;
+
+} // namespace xf
+
+using namespace neutrino::ostream_fixes;
+using namespace neutrino::string_view_plus_string_fixes;
+
+namespace neutrino::math { }
+
+namespace ne = neutrino;
+namespace math = neutrino::math;
+

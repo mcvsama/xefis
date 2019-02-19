@@ -45,7 +45,7 @@
 #include "backtrace.h"
 
 
-namespace xf {
+namespace neutrino {
 namespace {
 
 /**
@@ -210,5 +210,5 @@ operator<< (std::ostream& os, Backtrace const& backtrace)
 	return os;
 }
 
-} // namespace xf
+} // namespace neutrino
 

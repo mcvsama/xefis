@@ -18,7 +18,7 @@
 #include <cstddef>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class ...Ts>
 	struct overload: Ts...
@@ -30,7 +30,7 @@ template<class ...Ts>
 template<class ...Ts>
 	overload (Ts...) -> overload<Ts...>;
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

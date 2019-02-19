@@ -18,7 +18,7 @@
 #include <cstddef>
 
 
-namespace xf {
+namespace neutrino {
 
 // TODO optional value-mapping function, to eg. take out raw pointer from unique_ptrs
 template<class pIterator>
@@ -66,7 +66,7 @@ template<class I>
 		return _end;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

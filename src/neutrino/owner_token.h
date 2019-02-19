@@ -21,7 +21,7 @@
 #include <neutrino/noncopyable.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Utility class for objects that can be moved, but not copied and want to have the default move constructor
@@ -92,7 +92,7 @@ OwnerToken::operator bool() const noexcept
 	return _has_token;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

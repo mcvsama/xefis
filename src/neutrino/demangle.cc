@@ -20,7 +20,7 @@
 #include "demangle.h"
 
 
-namespace xf {
+namespace neutrino {
 
 std::string
 demangle (std::string mangled_cxx_name)
@@ -45,5 +45,5 @@ demangle (std::type_info const& type_info)
 	return demangle (type_info.name());
 }
 
-} // namespace xf
+} // namespace neutrino
 

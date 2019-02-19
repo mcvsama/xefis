@@ -19,7 +19,7 @@
 #include <neutrino/numeric.h>
 
 
-namespace xf::test {
+namespace neutrino::test {
 namespace {
 
 RuntimeTest t1 ("integral()", []{
@@ -29,5 +29,5 @@ RuntimeTest t1 ("integral()", []{
 });
 
 } // namespace
-} // namespace xf::test
+} // namespace neutrino::test
 

@@ -19,7 +19,7 @@
 #include <type_traits>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Strong type to distinguish meaning of a type, when the representation
@@ -79,7 +79,7 @@ template<class Value, class DistinguisherType>
 		Value _value;
 	};
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

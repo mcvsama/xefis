@@ -24,9 +24,7 @@
 #include <neutrino/si/si.h>
 
 
-namespace xf {
-
-using namespace si;
+namespace neutrino {
 
 // TODO Make Timestamp absolute and create operators for dealing with si::Time
 using Timestamp = si::Time;
@@ -35,6 +33,8 @@ using Timestamp = si::Time;
 inline void
 sleep (si::Time time)
 {
+	using namespace si::literals;
+
 	struct timespec ts;
 	ts.tv_sec = static_cast<decltype (ts.tv_sec)> (time.in<si::Second>());
 	ts.tv_nsec = (time - ts.tv_sec * 1_s).in<si::Nanosecond>();
@@ -46,7 +46,7 @@ sleep (si::Time time)
 	} while (false);
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -23,7 +23,7 @@
 #include <neutrino/noncopyable.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Simple semaphore using standard mutex and condition_variable.
@@ -94,7 +94,7 @@ Semaphore::try_wait()
 		return false;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

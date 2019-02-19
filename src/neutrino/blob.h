@@ -28,7 +28,7 @@
 #include <neutrino/stdexcept.h>
 
 
-namespace xf {
+namespace neutrino {
 
 class BlobView: public Span<uint8_t const>
 {
@@ -136,7 +136,7 @@ template<class Quantity>
 		si::parse (Blob { blob.cbegin(), blob.cend() }, value);
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

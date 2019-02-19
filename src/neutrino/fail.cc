@@ -30,7 +30,7 @@
 #include "fail.h"
 
 
-namespace xf {
+namespace neutrino {
 
 std::atomic<bool> g_hup_received { false };
 
@@ -45,8 +45,8 @@ fail (int signum)
 	std::clog << "Program died by a signal." << endl << endl;
 	std::clog << "       signal: " << signum << endl;
 	std::clog << "  source info: " << endl;
-	std::cout << "       commit: " << ::xf::version::commit << endl;
-	std::cout << "       branch: " << ::xf::version::branch << endl;
+	std::cout << "       commit: " << ::neutrino::version::commit << endl;
+	std::cout << "       branch: " << ::neutrino::version::branch << endl;
 	std::clog << "    backtrace:" << endl;
 	std::clog << backtrace().resolve_sources() << endl;
 	std::clog << "     CXXFLAGS: " << CXXFLAGS << endl << endl;
@@ -55,5 +55,5 @@ fail (int signum)
 	kill (getpid(), signum);
 }
 
-} // namespace xf
+} // namespace neutrino
 

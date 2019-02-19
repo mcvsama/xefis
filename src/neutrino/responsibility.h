@@ -19,7 +19,7 @@
 #include <functional>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Define an object which executes given function upon destruction.
@@ -127,7 +127,7 @@ Responsibility::release()
 	_callback = nullptr;
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

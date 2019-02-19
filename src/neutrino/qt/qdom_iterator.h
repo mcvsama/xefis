@@ -25,7 +25,7 @@
 #include <QtXml/QDomElement>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Sequence iterator for use with for(:) loops.
@@ -118,10 +118,10 @@ iterate_sub_elements (QDomElement element)
  * Support for generic iterating over element's children
  * with range-for.
  */
-inline xf::QDomSubElementsIterator
-begin (xf::QDomSubElementsIterator element_iterator)
+inline QDomSubElementsIterator
+begin (QDomSubElementsIterator element_iterator)
 {
-	return xf::QDomSubElementsIterator (element_iterator->firstChildElement());
+	return QDomSubElementsIterator (element_iterator->firstChildElement());
 }
 
 
@@ -129,13 +129,13 @@ begin (xf::QDomSubElementsIterator element_iterator)
  * Support for generic iterating over element's children
  * with range-for.
  */
-inline xf::QDomSubElementsIterator
-end (xf::QDomSubElementsIterator)
+inline QDomSubElementsIterator
+end (QDomSubElementsIterator)
 {
-	return xf::QDomSubElementsIterator();
+	return neutrino::QDomSubElementsIterator();
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -14,7 +14,7 @@
 #ifndef NEUTRINO__CORE__VERSION_H__INCLUDED
 #define NEUTRINO__CORE__VERSION_H__INCLUDED
 
-namespace xf::version {
+namespace neutrino::version {
 
 /**
  * References to dynamically created commit ID and branch name.
@@ -24,7 +24,7 @@ extern const char* commit;
 extern const char* branch;
 extern const char* version;
 
-} // namespace xf::version
+} // namespace neutrino::version
 
 #endif
 

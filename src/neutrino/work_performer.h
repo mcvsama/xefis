@@ -31,7 +31,7 @@
 #include <neutrino/thread.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * WorkPerformer queues packaged tasks and executes them in the context of separate threads. It's a good
@@ -108,11 +108,11 @@ class WorkPerformer: private Noncopyable
 	thread();
 
   private:
-	Logger								_logger;
-	std::atomic<bool>					_terminating { false };
-	xf::Synchronized<TaskQueue> mutable	_tasks;
-	Semaphore							_tasks_semaphore;
-	std::vector<std::thread>			_threads;
+	Logger							_logger;
+	std::atomic<bool>				_terminating { false };
+	Synchronized<TaskQueue> mutable	_tasks;
+	Semaphore						_tasks_semaphore;
+	std::vector<std::thread>		_threads;
 };
 
 
@@ -162,7 +162,7 @@ template<class Function, class ...Args>
 					   std::forward<Args> (args)...);
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

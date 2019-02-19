@@ -20,7 +20,7 @@
 #include <typeinfo>
 
 
-namespace xf {
+namespace neutrino {
 
 std::string
 demangle (std::string mangled_cxx_name);
@@ -29,7 +29,7 @@ demangle (std::string mangled_cxx_name);
 std::string
 demangle (std::type_info const& type_info);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

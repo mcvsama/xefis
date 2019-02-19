@@ -24,10 +24,7 @@
 #include <neutrino/si/si.h>
 
 
-namespace xf {
-
-using namespace si::literals;
-
+namespace neutrino {
 
 class TimeHelper
 {
@@ -47,6 +44,8 @@ class TimeHelper
 inline si::Time
 TimeHelper::now() noexcept
 {
+	using namespace si::literals;
+
 	struct timeval tv;
 	::gettimeofday (&tv, 0);
 	return 1_us * static_cast<si::Time::Value> (tv.tv_sec * 1000000ull + tv.tv_usec);
@@ -56,6 +55,8 @@ TimeHelper::now() noexcept
 inline si::Time
 TimeHelper::epoch() noexcept
 {
+	using namespace si::literals;
+
 	return 0_s;
 }
 
@@ -69,7 +70,7 @@ template<class Callable>
 		return now() - t;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

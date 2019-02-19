@@ -29,7 +29,7 @@
 #include <neutrino/types.h>
 
 
-namespace xf {
+namespace neutrino {
 
 // TODO make class Subfield SubField sf = field.subfield (0.0, 10_deg);
 
@@ -1044,7 +1044,7 @@ template<class A, class ...R>
 			}
 		}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

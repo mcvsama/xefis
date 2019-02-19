@@ -26,9 +26,6 @@
 
 namespace xf {
 
-class Logger;
-
-
 /**
  * Holds useful information about the single processing cycle.
  */

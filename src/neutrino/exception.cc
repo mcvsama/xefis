@@ -25,7 +25,7 @@
 #include "exception.h"
 
 
-namespace xf {
+namespace neutrino {
 
 template<class E>
 	static inline void
@@ -168,5 +168,5 @@ operator<< (std::ostream& os, std::exception_ptr const& eptr)
 }
 
 } // namespace exception_ops
-} // namespace xf
+} // namespace neutrino
 

@@ -27,7 +27,7 @@
 #include "logger.h"
 
 
-namespace xf {
+namespace neutrino {
 
 void
 LoggerOutput::log (LogBlock const& block)
@@ -72,5 +72,5 @@ Logger::prepare_line() const
 	return prefix.str();
 }
 
-} // namespace xf
+} // namespace neutrino
 

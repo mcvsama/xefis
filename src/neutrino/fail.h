@@ -19,7 +19,7 @@
 #include <cstddef>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Set to true when HUP signal is received.
@@ -34,7 +34,7 @@ extern std::atomic<bool> g_hup_received;
 extern void
 fail (int signum);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

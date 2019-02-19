@@ -26,7 +26,7 @@
 #include <neutrino/si/si.h>
 
 
-namespace xf {
+namespace neutrino {
 
 using namespace si::literals;
 
@@ -75,7 +75,7 @@ default_line_height (QWidget* = nullptr);
 extern void
 setup_appereance (QTreeWidgetItem&);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -22,7 +22,7 @@
 #include <neutrino/exception.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Available schedulers for threads.
@@ -52,7 +52,7 @@ class SchedulerException: public Exception
 void
 set (std::thread& thread, ThreadScheduler scheduler, int priority);
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

@@ -24,7 +24,7 @@
 #include "qzdevice.h"
 
 
-namespace xf {
+namespace neutrino {
 
 QZDevice::QZDevice (QFile* gzip_file, QObject* parent):
 	QIODevice (parent),
@@ -150,13 +150,13 @@ QZDevice::decompress()
 	switch (::inflate (&_ctx, Z_SYNC_FLUSH))
 	{
 		case Z_NEED_DICT:
-			throw xf::IOError ("failed to decompress input file: Z_NEED_DICT");
+			throw IOError ("failed to decompress input file: Z_NEED_DICT");
 
 		case Z_DATA_ERROR:
-			throw xf::IOError ("failed to decompress input file: Z_DATA_ERROR");
+			throw IOError ("failed to decompress input file: Z_DATA_ERROR");
 
 		case Z_MEM_ERROR:
-			throw xf::IOError ("failed to decompress input file: Z_MEM_ERROR");
+			throw IOError ("failed to decompress input file: Z_MEM_ERROR");
 
 		case Z_STREAM_END:
 			_z_at_eof = true;
@@ -172,5 +172,5 @@ QZDevice::decompress()
 	}
 }
 
-} // namespace xf
+} // namespace neutrino
 

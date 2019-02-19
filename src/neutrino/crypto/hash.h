@@ -27,7 +27,7 @@
 #include <neutrino/span.h>
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Interface to mhash library.
@@ -237,7 +237,7 @@ hash (Hash::Algorithm algorithm, Span<uint8_t const> vector)
 	return Hash (algorithm, vector).result();
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

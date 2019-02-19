@@ -30,7 +30,7 @@
 #include <neutrino/range.h>
 
 
-namespace xf {
+namespace neutrino {
 
 template<class V, class B, class A = V,
 		 class = typename std::enable_if_t<
@@ -230,7 +230,7 @@ template<class V>
 	{
 		Range<V> const steps_range { 0, steps };
 		auto const r = std::round (renormalize (value, range, steps_range));
-		auto const c = xf::clamped (r, steps_range);
+		auto const c = neutrino::clamped (r, steps_range);
 		return renormalize (c, steps_range, range);
 	}
 
@@ -474,7 +474,7 @@ template<class Value>
 		return a * a * a;
 	}
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 

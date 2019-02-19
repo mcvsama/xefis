@@ -22,7 +22,7 @@
 #include "stdexcept.h"
 
 
-namespace xf::test_asserts {
+namespace neutrino::test_asserts {
 
 /**
  * Accept any expression without generating 'unused variable' warning.
@@ -59,7 +59,7 @@ template<class T1, class T2, class T3>
 		}
 	}
 
-} // namespace xf::test_asserts
+} // namespace neutrino::test_asserts
 
 #endif
 

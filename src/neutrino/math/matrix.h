@@ -27,7 +27,7 @@
 #include <neutrino/c++20.h>
 
 
-namespace math {
+namespace neutrino::math {
 
 // used to call specific matrix constructor.
 class ZeroMatrixType
@@ -589,7 +589,7 @@ template<class NewTF, class NewSF, class S, std::size_t C, std::size_t R, class 
 		return reinterpret_cast<Matrix<S, C, R, NewTF, NewSF> const&> (matrix);
 	}
 
-} // namespace math
+} // namespace neutrino::math
 
 
 // Local:

@@ -91,7 +91,7 @@ operator!= (QDomElement const& element, QString const& string) noexcept
  */
 
 
-namespace xf {
+namespace neutrino {
 
 /**
  * Throw BadDomAttribute if there are attributes in the element
@@ -166,7 +166,7 @@ load_xml (QFile&& xml_file)
 	return load_xml_doc (std::forward<QFile> (xml_file)).documentElement();
 }
 
-} // namespace xf
+} // namespace neutrino
 
 #endif
 
