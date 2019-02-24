@@ -1,0 +1,3 @@
+[submodule "src/neutrino"]
+	path = src/neutrino
+	url = git@github.com:mcvsama/neutrino.git
