@@ -123,6 +123,8 @@ BasicRadialGauge::paint_text (GaugeValues const& values, xf::PaintRequest const&
 void
 BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids& aids, xf::InstrumentPainter& painter, float r) const
 {
+	using namespace xf::literals;
+
 	constexpr si::Angle kValueSpanAngle = 210_deg;
 
 	auto get_round_pen = [&aids] (QColor color, float width) {
@@ -176,7 +178,7 @@ BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids
 
 				painter.setPen (Qt::NoPen);
 				painter.setBrush (brush);
-				painter.drawPie (rect, aids.angle_for_qpainter (0_deg), -aids.angle_for_qpainter (*value_angle));
+				painter.drawPie (rect, 0_qdeg, -aids.angle_for_qpainter (*value_angle));
 				painter.setPen (zero_point_pen);
 				painter.drawLine (QPointF (0.f, 0.f), QPointF (r, 0.f));
 			});

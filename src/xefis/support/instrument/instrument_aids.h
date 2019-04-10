@@ -173,7 +173,7 @@ class InstrumentAids
 	/**
 	 * Convert angle to units proper for QPainter::drawArc (...) and QPainter::drawChord (...) functions.
 	 */
-	static float
+	static constexpr float
 	angle_for_qpainter (Angle deg);
 
 	/**
@@ -278,7 +278,7 @@ InstrumentAids::centrify (QRectF& rectf)
 }
 
 
-inline float
+constexpr float
 InstrumentAids::angle_for_qpainter (Angle deg)
 {
 	return 16 * deg.in<Degree>();
@@ -293,6 +293,28 @@ InstrumentAids::default_shadow() const
 	return shadow;
 }
 
+
+/*
+ * Global functions
+ */
+
+
+namespace literals {
+
+constexpr float
+operator"" _qdeg (long double angle)
+{
+	return InstrumentAids::angle_for_qpainter (1_deg * angle);
+}
+
+
+constexpr float
+operator"" _qdeg (unsigned long long angle)
+{
+	return InstrumentAids::angle_for_qpainter (1_deg * angle);
+}
+
+} // namespace literals
 } // namespace xf
 
 #endif

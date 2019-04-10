@@ -832,6 +832,8 @@ PaintingWork::paint_track (bool paint_heading_triangle)
 void
 PaintingWork::paint_altitude_reach()
 {
+	using namespace xf::literals;
+
 	if (!_p.altitude_reach_distance || (*_p.altitude_reach_distance < 0.005f * _p.range) || (0.8f * _p.range < *_p.altitude_reach_distance))
 		return;
 
@@ -846,7 +848,7 @@ PaintingWork::paint_altitude_reach()
 		_painter.setTransform (_c.aircraft_center_transform);
 		_painter.setClipping (false);
 		_painter.setPen (_aids.get_pen (xf::InstrumentAids::kNavigationColor, 1.f));
-		_painter.drawArc (rect, _aids.angle_for_qpainter (50_deg), _aids.angle_for_qpainter (80_deg));
+		_painter.drawArc (rect, 50_qdeg, 80_qdeg);
 	}
 }
 

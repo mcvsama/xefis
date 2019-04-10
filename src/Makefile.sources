@@ -413,6 +413,12 @@ XEFIS_SOURCES			+= xefis/support/ui/histogram_stats_widget.cc
 XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
 XEFIS_SOURCES			+= xefis/support/ui/widget.cc
 
+SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer.cc
+SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer_widget.cc
+
+SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer.cc
+SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer_widget.cc
+
 ######## /xefis/utility ########
 
 XEFIS_HEADERS			+= xefis/utility/actions.h
