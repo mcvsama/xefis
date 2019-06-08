@@ -73,6 +73,8 @@ IMU_CPF::compute_centripetal()
 	if (io.angular_velocity_x && io.angular_velocity_y && io.angular_velocity_z &&
 		io.tas_x && io.tas_y && io.tas_z)
 	{
+		using namespace neutrino;
+
 		si::Time dt = _centripetal_computer.update_dt();
 
 		math::Vector<si::Velocity, 3> vec_v {
