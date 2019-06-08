@@ -34,7 +34,7 @@ ConfigWidget::create_performance_widget (QWidget* parent, QString const& title) 
 	QMargins const margins (em_pixels (0.5f), em_pixels (0.25f), em_pixels (0.5f), em_pixels (0.25f));
 
 	auto* group_box = new QGroupBox (title, parent);
-	group_box->setFixedSize (em_pixels (40.0f), em_pixels (15.0f));
+	group_box->setFixedSize (em_pixels (50.0f), em_pixels (17.0f));
 
 	auto* histogram_widget = new xf::HistogramWidget (group_box);
 	histogram_widget->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Expanding);

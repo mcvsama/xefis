@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <unordered_map>
 
 // Qt:
 #include <QTimer>
@@ -37,6 +38,20 @@ namespace xf::configurator {
  */
 class ScreenWidget: public ConfigWidget
 {
+	class Widgets
+	{
+	  public:
+		WorkPerformer const*		work_performer			{ nullptr };
+		// List of modules that use given WorkPerformer:
+		std::string					module_names;
+		xf::HistogramWidget*		start_latency_histogram	{ nullptr };
+		xf::HistogramStatsWidget*	start_latency_stats		{ nullptr };
+		QWidget*					start_latency_group		{ nullptr };
+		xf::HistogramWidget*		total_latency_histogram	{ nullptr };
+		xf::HistogramStatsWidget*	total_latency_stats		{ nullptr };
+		QWidget*					total_latency_group		{ nullptr };
+	};
+
   public:
 	// Ctor
 	explicit
@@ -54,6 +69,8 @@ class ScreenWidget: public ConfigWidget
 	xf::HistogramWidget*		_painting_time_histogram	{ nullptr };
 	xf::HistogramStatsWidget*	_painting_time_stats		{ nullptr };
 	QTimer*						_refresh_timer;
+	std::unordered_map<WorkPerformer const*, Widgets>
+								_work_performer_widgets		{ 10 };
 };
 
 } // namespace xf::configurator

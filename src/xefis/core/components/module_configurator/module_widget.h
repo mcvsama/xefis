@@ -69,8 +69,10 @@ class ModuleWidget: public ConfigWidget
 	BasicInstrument*			_instrument						{ nullptr };
 	PropertyTree*				_inputs_property_tree;
 	PropertyTree*				_outputs_property_tree;
+	QWidget*					_communication_time_group		{ nullptr };
 	xf::HistogramWidget*		_communication_time_histogram	{ nullptr };
 	xf::HistogramStatsWidget*	_communication_time_stats		{ nullptr };
+	QWidget*					_processing_time_group			{ nullptr };
 	xf::HistogramWidget*		_processing_time_histogram		{ nullptr };
 	xf::HistogramStatsWidget*	_processing_time_stats			{ nullptr };
 	xf::HistogramWidget*		_painting_time_histogram		{ nullptr };

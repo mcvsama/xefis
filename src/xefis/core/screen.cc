@@ -137,6 +137,19 @@ Screen::wait()
 }
 
 
+WorkPerformerMetrics const*
+Screen::work_performer_metrics_for (WorkPerformer const* work_performer)
+{
+	if (auto metrics = _work_performer_metrics.find (work_performer);
+		metrics != _work_performer_metrics.end())
+	{
+		return &metrics->second;
+	}
+	else
+		return nullptr;
+}
+
+
 void
 Screen::paintEvent (QPaintEvent* paint_event)
 {
@@ -198,10 +211,16 @@ Screen::paint_instruments_to_buffer()
 			if (details.result.valid() && is_ready (details.result))
 			{
 				Exception::catch_and_log (_logger, [&] {
-					auto const painting_time = details.result.get();
-					auto accounting_api = BasicInstrument::AccountingAPI (instrument);
-					accounting_api.set_frame_time (_frame_time);
-					accounting_api.add_painting_time (painting_time);
+					auto const perf_metrics = details.result.get();
+					// Update per-instrument metrics:
+					{
+						auto accounting_api = BasicInstrument::AccountingAPI (instrument);
+						accounting_api.set_frame_time (_frame_time);
+						accounting_api.add_painting_time (perf_metrics.painting_time);
+					}
+					// Update per-WorkPerformer metrics:
+					_work_performer_metrics[details.work_performer].start_latencies.push_back (perf_metrics.start_latency);
+					_work_performer_metrics[details.work_performer].total_latencies.push_back (perf_metrics.start_latency + perf_metrics.painting_time);
 				});
 
 				std::swap (details.canvas, details.canvas_to_use);
@@ -218,10 +237,18 @@ Screen::paint_instruments_to_buffer()
 				details.previous_size = details.computed_position->size();
 
 				auto task = instrument.paint (std::move (paint_request));
+				auto request_time = TimeHelper::now();
+				auto measured_task = [t = std::move (task), request_time]() mutable noexcept {
+					auto const start_time = TimeHelper::now();
+					auto const painting_time = TimeHelper::measure (t);
 
-				details.result = details.work_performer->submit ([t = std::move (task)]() mutable noexcept {
-					return TimeHelper::measure (t);
-				});
+					return detail::PaintPerformanceMetrics {
+						start_time - request_time,
+						painting_time,
+					};
+				};
+
+				details.result = details.work_performer->submit (std::move (measured_task));
 			}
 		}
 		else

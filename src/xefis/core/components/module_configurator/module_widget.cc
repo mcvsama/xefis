@@ -96,8 +96,7 @@ ModuleWidget::refresh()
 		auto const& samples = accounting_api.communication_times();
 		bool const enabled = processing_loop_api.implements_communicate_method();
 
-		_communication_time_histogram->setEnabled (enabled);
-		_communication_time_stats->setEnabled (enabled);
+		_communication_time_group->setEnabled (enabled);
 
 		if (!samples.empty())
 		{
@@ -114,8 +113,7 @@ ModuleWidget::refresh()
 		auto const& samples = accounting_api.processing_times();
 		bool const enabled = processing_loop_api.implements_process_method();
 
-		_processing_time_histogram->setEnabled (enabled);
-		_processing_time_stats->setEnabled (enabled);
+		_processing_time_group->setEnabled (enabled);
 
 		if (!samples.empty())
 		{
@@ -146,20 +144,18 @@ QWidget*
 ModuleWidget::create_performance_tab()
 {
 	auto* widget = new QWidget (this);
-	QWidget* communication_time_group {};
-	QWidget* processing_time_group {};
 	QWidget* painting_time_group {};
 
-	std::tie (_communication_time_histogram, _communication_time_stats, communication_time_group) = create_performance_widget (widget, "HW communication time");
-	std::tie (_processing_time_histogram, _processing_time_stats, processing_time_group) = create_performance_widget (widget, "Processing time");
+	std::tie (_communication_time_histogram, _communication_time_stats, _communication_time_group) = create_performance_widget (widget, "HW communication time");
+	std::tie (_processing_time_histogram, _processing_time_stats, _processing_time_group) = create_performance_widget (widget, "Processing time");
 
 	if (_instrument)
 		std::tie (_painting_time_histogram, _painting_time_stats, painting_time_group) = create_performance_widget (widget, "Painting time");
 
 	auto layout = new QGridLayout (widget);
 	layout->setMargin (0);
-	layout->addWidget (communication_time_group, 0, 0);
-	layout->addWidget (processing_time_group, 1, 0);
+	layout->addWidget (_communication_time_group, 0, 0);
+	layout->addWidget (_processing_time_group, 1, 0);
 
 	if (painting_time_group)
 		layout->addWidget (painting_time_group, 2, 0);

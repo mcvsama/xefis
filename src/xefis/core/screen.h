@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstddef>
 #include <optional>
+#include <unordered_map>
 #include <vector>
 
 // Qt:
@@ -44,25 +45,36 @@ namespace xf {
 namespace detail {
 
 /**
+ * Metrics of asynchronous (on-work-performer) painting.
+ */
+class PaintPerformanceMetrics
+{
+  public:
+	si::Time	start_latency;
+	si::Time	painting_time;
+};
+
+
+/**
  * Additional information for each instrument needed by the Screen object,
  * such as its position on the screen.
  */
 class InstrumentDetails
 {
   public:
-	BasicInstrument&			instrument;
-	QRectF						requested_position;
-	QPointF						anchor_position;
-	std::optional<QRect>		computed_position;
-	QSize						previous_size;
-	int							z_index			{ 0 };
+	BasicInstrument&						instrument;
+	QRectF									requested_position;
+	QPointF									anchor_position;
+	std::optional<QRect>					computed_position;
+	QSize									previous_size;
+	int										z_index			{ 0 };
 	// This future returns time it took to paint the instrument:
-	std::future<si::Time>		result;
+	std::future<PaintPerformanceMetrics>	result;
 	// The canvas and canvas_to_use constitute a double-buffer. std::unique_ptr<> is used
 	// since it's not known if std::swap() on QImages is fast or not.
-	std::unique_ptr<QImage>		canvas;
-	std::unique_ptr<QImage>		canvas_to_use;
-	WorkPerformer*				work_performer;
+	std::unique_ptr<QImage>					canvas;
+	std::unique_ptr<QImage>					canvas_to_use;
+	WorkPerformer*							work_performer;
 
   public:
 	// Ctor
@@ -74,6 +86,22 @@ class InstrumentDetails
 
 
 class Machine;
+
+
+/**
+ * Stores per-WorkPerformer performance metrics.
+ */
+class WorkPerformerMetrics
+{
+  public:
+	static constexpr std::size_t kMaxBackLog = 1000;
+
+  public:
+	// Time between issuing a paint request and actual start of painting:
+	boost::circular_buffer<si::Time>	start_latencies	{ kMaxBackLog };
+	// Metrics of how much time it took to finish the painting since the request was issued:
+	boost::circular_buffer<si::Time>	total_latencies	{ kMaxBackLog };
+};
 
 
 /**
@@ -140,13 +168,21 @@ class Screen:
 	 * Return the instrument tracker object.
 	 */
 	InstrumentTracker&
-	instrument_tracker() noexcept;
+	instrument_tracker() noexcept
+		{ return _instrument_tracker; }
 
 	/**
 	 * Return the instrument tracker object.
 	 */
 	InstrumentTracker const&
-	instrument_tracker() const noexcept;
+	instrument_tracker() const noexcept
+		{ return _instrument_tracker; }
+
+	/**
+	 * Return WorkPerformerMetrics object for given WorkPerformer object or nullptr.
+	 */
+	WorkPerformerMetrics const*
+	work_performer_metrics_for (WorkPerformer const*);
 
   protected:
 	// QWidget API:
@@ -209,15 +245,18 @@ class Screen:
 	show_configurator();
 
   private:
-	Machine&									_machine;
-	Logger										_logger;
-	InstrumentTracker							_instrument_tracker;
-	QTimer*										_refresh_timer;
-	QImage										_canvas;
-	std::vector<InstrumentTracker::Disclosure*>	_z_index_sorted_disclosures;
-	ScreenSpec									_screen_spec;
-	si::Time const								_frame_time;
-	bool										_paint_bounding_boxes	{ false };
+	Machine&					_machine;
+	Logger						_logger;
+	InstrumentTracker			_instrument_tracker;
+	QTimer*						_refresh_timer;
+	QImage						_canvas;
+	std::vector<InstrumentTracker::Disclosure*>
+								_z_index_sorted_disclosures;
+	ScreenSpec					_screen_spec;
+	si::Time const				_frame_time;
+	bool						_paint_bounding_boxes	{ false };
+	std::unordered_map<WorkPerformer const*, WorkPerformerMetrics>
+								_work_performer_metrics	{ 10 };
 };
 
 
@@ -227,20 +266,6 @@ template<class Instrument>
 	{
 		_instrument_tracker.register_object (instrument, detail::InstrumentDetails (*instrument, work_performer));
 	}
-
-
-inline Screen::InstrumentTracker&
-Screen::instrument_tracker() noexcept
-{
-	return _instrument_tracker;
-}
-
-
-inline Screen::InstrumentTracker const&
-Screen::instrument_tracker() const noexcept
-{
-	return _instrument_tracker;
-}
 
 } // namespace xf
 
