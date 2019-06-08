@@ -33,7 +33,8 @@
 #include <xefis/support/earth/navigation/navaid_storage.h>
 
 // Local:
-#include "test_screen.h"
+#include "test_screen_1.h"
+#include "test_screen_2.h"
 
 
 class TestInstrumentsMachine: public xf::Machine
@@ -47,7 +48,8 @@ class TestInstrumentsMachine: public xf::Machine
 	std::unique_ptr<xf::NavaidStorage>					_navaid_storage;
 	std::unique_ptr<xf::WorkPerformer>					_work_performer;
 	std::optional<xf::Registrant<xf::ProcessingLoop>>	_test_loop;
-	std::optional<xf::Registrant<TestScreen>>			_test_screen;
+	std::optional<xf::Registrant<TestScreen1>>			_test_screen_1;
+	std::optional<xf::Registrant<TestScreen2>>			_test_screen_2;
 	std::optional<xf::Registrant<TestGenerator>>		_test_generator;
 };
 

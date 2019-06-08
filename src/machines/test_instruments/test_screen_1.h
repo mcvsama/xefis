@@ -11,8 +11,8 @@
  * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
  */
 
-#ifndef XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_H__INCLUDED
-#define XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_H__INCLUDED
+#ifndef XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_1_H__INCLUDED
+#define XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_1_H__INCLUDED
 
 // Standard:
 #include <cstddef>
@@ -38,12 +38,12 @@
 #include <xefis/support/earth/navigation/navaid_storage.h>
 
 
-class TestScreen: public xf::Screen
+class TestScreen1: public xf::Screen
 {
   public:
 	// Ctor
 	explicit
-	TestScreen (xf::ScreenSpec const&, xf::Graphics const& graphics, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
+	TestScreen1 (xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
 
 	void
 	create_instruments();

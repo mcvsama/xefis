@@ -18,11 +18,11 @@
 #include <xefis/config/all.h>
 
 // Local:
-#include "test_screen.h"
+#include "test_screen_1.h"
 
 
-TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
-	Screen (spec, graphics, machine, "Test Screen", logger.with_scope ("TestScren")),
+TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
+	Screen (spec, graphics, machine, "Test Screen 1", logger.with_scope ("TestScreen1")),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
 	_adi_work_performer (1, logger.with_scope ("ADI")),
@@ -191,7 +191,7 @@ TestScreen::TestScreen (xf::ScreenSpec const& spec, xf::Graphics const& graphics
 
 
 void
-TestScreen::create_instruments()
+TestScreen1::create_instruments()
 {
 	_adi.emplace (std::move (adi_io), _graphics, "adi");
 	register_instrument (*_adi, _adi_work_performer);

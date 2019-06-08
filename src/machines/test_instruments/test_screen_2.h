@@ -1,0 +1,65 @@
+/* vim:ts=4
+ *
+ * Copyleft 2008…2017  Michał Gawron
+ * Marduk Unix Labs, http://mulabs.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Visit http://www.gnu.org/licenses/gpl-3.0.html for more information on licensing.
+ */
+
+#ifndef XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_2_H__INCLUDED
+#define XEFIS__MACHINES__TEST_INSTRUMENTS__TEST_SCREEN_2_H__INCLUDED
+
+// Standard:
+#include <cstddef>
+#include <memory>
+
+// Neutrino:
+#include <neutrino/work_performer.h>
+
+// Xefis:
+#include <xefis/config/all.h>
+#include <xefis/core/graphics.h>
+#include <xefis/core/machine.h>
+#include <xefis/core/screen.h>
+#include <xefis/modules/instruments/adi.h>
+#include <xefis/modules/instruments/flaps.h>
+#include <xefis/modules/instruments/gear.h>
+#include <xefis/modules/instruments/hsi.h>
+#include <xefis/modules/instruments/horizontal_trim.h>
+#include <xefis/modules/instruments/label.h>
+#include <xefis/modules/instruments/linear_gauge.h>
+#include <xefis/modules/instruments/vertical_trim.h>
+#include <xefis/modules/instruments/radial_gauge.h>
+#include <xefis/support/earth/navigation/navaid_storage.h>
+
+
+class TestScreen2: public xf::Screen
+{
+  public:
+	// Ctor
+	explicit
+	TestScreen2 (xf::ScreenSpec const&, xf::Graphics const&, xf::NavaidStorage const&, xf::Machine&, xf::Logger const& logger);
+
+	void
+	create_instruments();
+
+  public:
+	std::unique_ptr<HSI_IO>				hsi_1_io { std::make_unique<HSI_IO>() };
+	std::unique_ptr<HSI_IO>				hsi_2_io { std::make_unique<HSI_IO>() };
+
+  private:
+	xf::Graphics const&					_graphics;
+	xf::NavaidStorage const&			_navaid_storage;
+	xf::WorkPerformer					_hsi_work_performer;
+	// Instruments:
+	std::optional<xf::Registrant<HSI>>	_hsi_1;
+	std::optional<xf::Registrant<HSI>>	_hsi_2;
+};
+
+#endif
+
