@@ -78,7 +78,7 @@ HistogramWidget::update_canvas()
 		auto const inv_y_max = chart_rect.height() / _y_max;
 		auto const bin_width = chart_rect.width() / n_bins;
 
-		canvas.fill (pal.background().color());
+		canvas.fill (pal.color (QPalette::Active, QPalette::Window));
 
 		if (chart_rect.isValid())
 		{
