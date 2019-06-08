@@ -150,7 +150,7 @@ BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids
 	QPen const critical_pen = get_round_pen (kCriticalColor, 1.1f);
 	QPen const reference_pen = get_round_pen (QColor (0x00, 0xff, 0x00), 1.f);
 	QPen zero_point_pen = get_round_pen (normal_fill.lighter (150), 1.f);
-	QPen const automatic_pen = get_round_pen (QColor (0x22, 0xaa, 0xff), 1.1f);
+	QPen const automatic_pen = get_round_pen (aids.kAutopilotColor, 1.6f);
 	QRectF const rect (-r, -r, 2.f * r, 2.f * r);
 
 	xf::Shadow black_shadow = aids.default_shadow();
@@ -289,12 +289,21 @@ BasicRadialGauge::paint_indicator (GaugeValues const& values, xf::InstrumentAids
 				});
 			};
 
-			painter.save_context ([&] {
-				painter.setPen (automatic_pen);
+			if (automatic_angle)
+			{
+				painter.save_context ([&] {
+					painter.setPen (automatic_pen);
+					painter.rotate ((*automatic_angle - *value_angle).in<si::Degree>());
 
-				if (automatic_angle)
-					draw_outside_arc (*automatic_angle, 0.10 * r, 0.95 * r, 1.10 * r, false);
-			});
+					painter.paint (black_shadow, [&] {
+						float const e = 0.075;
+						float const p = 1.3 * pointer_pen.width();
+
+						painter.drawLine (QPointF ((1.0 - e) * r, +p), QPointF ((1.0 + e) * r, +p));
+						painter.drawLine (QPointF ((1.0 - e) * r, -p), QPointF ((1.0 + e) * r, -p));
+					});
+				});
+			}
 
 			if (values.critical_condition)
 				painter.setPen (critical_pen);
