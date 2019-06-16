@@ -33,9 +33,21 @@ ShadowPainter::paint (Shadow const& shadow, PaintFunction paint_function)
 		auto saved_pen = pen();
 		Responsibility pen_restore ([&] { setPen (saved_pen); });
 
+		auto const new_width = shadow.width_for_pen (saved_pen);
+		auto const old_width = saved_pen.widthF();
+
 		QPen new_pen = saved_pen;
 		new_pen.setColor (shadow.color());
-		new_pen.setWidthF (shadow.width_for_pen (new_pen));
+		new_pen.setWidthF (new_width);
+		{
+			auto dash_pattern = saved_pen.dashPattern();
+			auto const factor = old_width / new_width;
+
+			for (auto& v: dash_pattern)
+				v *= factor;
+
+			new_pen.setDashPattern (dash_pattern);
+		}
 		setPen (new_pen);
 
 		paint_function (true);
