@@ -1814,8 +1814,10 @@ PaintingWork::paint_locs()
 	auto paint_texts_to_paint = [&]() -> void
 	{
 		_painter.resetTransform();
+
 		for (auto const& text_and_xy: texts_to_paint)
 			_painter.fast_draw_text (text_and_xy.first, text_and_xy.second);
+
 		texts_to_paint.clear();
 	};
 
@@ -1830,9 +1832,9 @@ PaintingWork::paint_locs()
 		float const line_1 = to_px (navaid.range());
 		float const line_2 = 1.03f * line_1;
 
-		QPointF pt_0 (0.f, line_1);
-		QPointF pt_1 (rot_1.map (QPointF (0.f, line_2)));
-		QPointF pt_2 (rot_2.map (QPointF (0.f, line_2)));
+		QPointF const pt_0 (0.f, line_1);
+		QPointF const pt_1 (rot_1.map (QPointF (0.f, line_2)));
+		QPointF const pt_2 (rot_2.map (QPointF (0.f, line_2)));
 
 		_painter.setTransform (transform);
 
