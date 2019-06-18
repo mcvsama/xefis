@@ -88,7 +88,7 @@ class AirDataComputerIO: public xf::ModuleIO
 class AirDataComputer: public xf::Module<AirDataComputerIO>
 {
   private:
-	static constexpr char kLoggerScope[]				= "mod::AirDataComputer";
+	static constexpr char kLoggerScope[] = "mod::AirDataComputer";
 
   public:
 	// Ctor
