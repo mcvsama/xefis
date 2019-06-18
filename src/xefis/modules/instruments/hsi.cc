@@ -14,6 +14,9 @@
 // Standard:
 #include <cstddef>
 
+// Qt:
+#include <QRadialGradient>
+
 // Neutrino:
 #include <neutrino/numeric.h>
 
@@ -59,7 +62,8 @@ Parameters::sanitize()
 }
 
 
-PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_):
+PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::InstrumentSupport const& instrument_support, xf::NavaidStorage const& navaid_storage, Parameters const& parameters, ResizeCache& resize_cache, CurrentNavaids& current_navaids, Mutable& mutable_, xf::Logger const& logger):
+	_logger (logger),
 	_paint_request (paint_request),
 	_navaid_storage (navaid_storage),
 	_p (parameters),
@@ -352,14 +356,20 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 		_c.black_shadow.set_color (Qt::black);
 	}
 
+	if (_p.range != _mutable.prev_range || _paint_request.size_changed()) // TODO or input property radio_range_warning/_critical changes by more than… say, 100_m?
+		update_radio_range_heat_map();
+
 	_mutable.prev_display_mode = _p.display_mode;
+	_mutable.prev_range = _p.range;
 }
 
 
 void
 PaintingWork::paint()
 {
+	paint_radio_range_map();
 	paint_navaids();
+	paint_flight_ranges();
 	paint_altitude_reach();
 	paint_track (false);
 	paint_directions();
@@ -1508,9 +1518,11 @@ PaintingWork::paint_navaids()
 	paint_locs();
 
 	// Return feature position on screen relative to _c.aircraft_center_transform.
+	// Essentially does get_feature_xy() but it may additionally "limit-to-range" (which is used by eg. Home feature)
+	// to be drawn on the edge even if it so far that it shouldn't be visible at all).
 	auto position_feature = [&](LonLat const& position, bool* limit_to_range = nullptr) -> QPointF
 	{
-		QPointF mapped_pos = get_navaid_xy (position);
+		QPointF mapped_pos = get_feature_xy (position);
 
 		if (limit_to_range)
 		{
@@ -1626,7 +1638,7 @@ PaintingWork::paint_navaids()
 						float const extended_length_px = to_px (_p.arpt_runway_extension_length);
 						// Create transform so that the first end of the runway
 						// is at (0, 0) and runway extends to the top.
-						QPointF point_1 = get_navaid_xy (runway.pos_1());
+						QPointF point_1 = get_feature_xy (runway.pos_1());
 						QTransform transform = _c.aircraft_center_transform;
 						transform.translate (point_1.x(), point_1.y());
 						transform = _features_transform * transform;
@@ -1735,6 +1747,55 @@ PaintingWork::paint_navaids()
 
 
 void
+PaintingWork::paint_radio_range_map()
+{
+	if (_p.radio_position)
+	{
+		auto const scale = _p.radio_range_pattern_scale;
+		auto const source_rect = QRectF (_c.radio_range_heat_map.rect());
+		auto target_rect = source_rect;
+		target_rect.setRight (target_rect.right() * scale);
+		target_rect.setBottom (target_rect.bottom() * scale);
+		target_rect.moveCenter (get_feature_xy (*_p.radio_position));
+
+		_painter.setTransform (_c.aircraft_center_transform);
+		_painter.setClipPath (_c.outer_map_clip);
+		_painter.drawImage (target_rect, _c.radio_range_heat_map, source_rect);
+	}
+}
+
+
+void
+PaintingWork::paint_flight_ranges()
+{
+	if (_p.flight_range_warning)
+		paint_circle (*_p.flight_range_warning, QColor (0xff, 0xaa, 0x00));
+
+	if (_p.flight_range_critical)
+		paint_circle (*_p.flight_range_critical, QColor (0xff, 0x00, 0x00));
+}
+
+
+void
+PaintingWork::paint_circle (CircularArea const& area, QColor const color)
+{
+	QPointF const center_pos = get_feature_xy (area.center);
+	auto const radius_px = to_px (area.radius);
+	QPointF const radius_vect (radius_px, radius_px);
+
+	_painter.setTransform (_c.aircraft_center_transform);
+	_painter.setClipPath (_c.outer_map_clip);
+	auto pen = _aids.get_pen (color, 1.0);
+	pen.setDashPattern (QVector<qreal>() << 5 << 3);
+	_painter.setPen (pen);
+	_painter.setBrush (Qt::NoBrush);
+	_painter.paint (_c.black_shadow, [&]() {
+		_painter.drawEllipse (QRectF (center_pos - radius_vect, center_pos + radius_vect));
+	});
+}
+
+
+void
 PaintingWork::paint_locs()
 {
 	if (!_p.loc_visible)
@@ -1760,7 +1821,7 @@ PaintingWork::paint_locs()
 
 	auto paint_loc = [&] (xf::Navaid const& navaid) -> void
 	{
-		QPointF navaid_pos = get_navaid_xy (navaid.position());
+		QPointF const navaid_pos = get_feature_xy (navaid.position());
 		QTransform transform = _c.aircraft_center_transform;
 		transform.translate (navaid_pos.x(), navaid_pos.y());
 		transform = _features_transform * transform;
@@ -1864,6 +1925,49 @@ PaintingWork::paint_tcas()
 
 
 void
+PaintingWork::update_radio_range_heat_map()
+{
+	if (_p.radio_range_warning && _p.radio_range_critical)
+	{
+		auto const yellow_start = *_p.radio_range_warning / *_p.radio_range_critical;
+		auto const yellow_stop = 0.5 * (yellow_start + 1.0);
+		auto const red_stop = 1.3;
+		auto const black_stop = 1.6;
+		auto const scale = _p.radio_range_pattern_scale;
+		auto const max_range_px = to_px (black_stop * *_p.radio_range_critical);
+		auto const canvas_size = QSize (2 * max_range_px, 2 * max_range_px) / scale;
+
+		if (canvas_size.width() * canvas_size.height() > 100'000'000)
+			_logger << "Radio-range heat map pixmap too big, not rendering.\n";
+
+		auto canvas = QImage (canvas_size, QImage::Format_ARGB32_Premultiplied);
+
+		{
+			QVector<QGradientStop> palette {
+				{ 0.00, Qt::black },
+				{ yellow_start / black_stop, Qt::black },
+				{ yellow_stop / black_stop, Qt::yellow },
+				{ red_stop / black_stop, Qt::red },
+				{ 1.00, Qt::black },
+			};
+
+			for (auto& stop: palette)
+				stop.second = stop.second.darker (150);
+
+			QRadialGradient gradient (canvas.rect().center(), max_range_px / scale);
+			gradient.setStops (palette);
+
+			QPainter canvas_painter (&canvas);
+			canvas_painter.fillRect (canvas.rect(), QBrush (gradient));
+			canvas_painter.fillRect (canvas.rect(), QBrush (Qt::black, Qt::Dense2Pattern));
+		}
+
+		_c.radio_range_heat_map = canvas;
+	}
+}
+
+
+void
 PaintingWork::retrieve_navaids()
 {
 	if (!_p.position)
@@ -1920,7 +2024,7 @@ PaintingWork::retrieve_navaids()
 
 
 QPointF
-PaintingWork::get_navaid_xy (LonLat const& navaid_position) const
+PaintingWork::get_feature_xy (LonLat const& navaid_position) const
 {
 	if (!_p.position)
 		return QPointF();
@@ -1986,8 +2090,9 @@ PaintingWork::to_px (si::Length const length) const
 } // namespace hsi_detail
 
 
-HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, std::string_view const& instance):
+HSI::HSI (std::unique_ptr<HSI_IO> module_io, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Logger const& logger, std::string_view const& instance):
 	Instrument (std::move (module_io), instance),
+	_logger (logger.with_scope (std::string (kLoggerScope) + "#" + instance)),
 	_navaid_storage (navaid_storage),
 	_instrument_support (graphics)
 { }
@@ -2076,7 +2181,39 @@ HSI::process (xf::Cycle const& cycle)
 	params.trend_vector_durations = *io.trend_vector_durations;
 	params.trend_vector_min_ranges = *io.trend_vector_min_ranges;
 	params.trend_vector_max_range = *io.trend_vector_max_range;
+	params.radio_range_pattern_scale = *io.radio_range_pattern_scale;
 	params.round_clip = false;
+
+	if (io.flight_range_warning_longitude && io.flight_range_warning_latitude && io.flight_range_warning_radius)
+	{
+		params.flight_range_warning = {
+			LonLat (*io.flight_range_warning_longitude, *io.flight_range_warning_latitude),
+			*io.flight_range_warning_radius,
+		};
+	}
+	else
+		params.flight_range_warning.reset();
+
+	if (io.flight_range_critical_longitude && io.flight_range_critical_latitude && io.flight_range_critical_radius)
+	{
+		params.flight_range_critical = {
+			LonLat (*io.flight_range_critical_longitude, *io.flight_range_critical_latitude),
+			*io.flight_range_critical_radius,
+		};
+	}
+	else
+		params.flight_range_critical.reset();
+
+	if (io.radio_position_longitude && io.radio_position_latitude)
+		params.radio_position = LonLat (*io.radio_position_longitude, *io.radio_position_latitude);
+	else
+		params.radio_position.reset();
+
+	if (params.radio_position)
+	{
+		params.radio_range_warning = io.radio_range_warning.get_optional();
+		params.radio_range_critical = io.radio_range_critical.get_optional();
+	}
 
 	*_parameters.lock() = params;
 	mark_dirty();

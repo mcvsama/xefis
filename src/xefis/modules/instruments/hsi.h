@@ -181,6 +181,8 @@ class HSI_IO: public xf::ModuleIO
 	xf::Setting<std::array<si::Time, 3>>	trend_vector_durations					{ this, "trend_vector_durations", { 30_s, 60_s, 90_s } };
 	xf::Setting<std::array<si::Length, 3>>	trend_vector_min_ranges					{ this, "trend_vector_min_ranges", { 5_nmi, 10_nmi, 15_nmi } };
 	xf::Setting<si::Length>					trend_vector_max_range					{ this, "trend_vector_max_range", 30_nmi };
+	// How big should be dots on the radio range heat map? 1.0 means 1x1 hardware pixel. Value 2…3 is recommended.
+	xf::Setting<double>						radio_range_pattern_scale				{ this, "radio_range_pattern_scale", 2.5 };
 
 	/*
 	 * Input
@@ -245,10 +247,28 @@ class HSI_IO: public xf::ModuleIO
 	xf::PropertyIn<bool>					features_ndb							{ this, "features/ndb" };
 	xf::PropertyIn<bool>					features_loc							{ this, "features/loc" };
 	xf::PropertyIn<bool>					features_arpt							{ this, "features/arpt" };
+	xf::PropertyIn<si::Angle>				flight_range_warning_longitude			{ this, "range/warning/longitude" };
+	xf::PropertyIn<si::Angle>				flight_range_warning_latitude			{ this, "range/warning/latitude" };
+	xf::PropertyIn<si::Length>				flight_range_warning_radius				{ this, "range/warning/radius" };
+	xf::PropertyIn<si::Angle>				flight_range_critical_longitude			{ this, "range/critical/longitude" };
+	xf::PropertyIn<si::Angle>				flight_range_critical_latitude			{ this, "range/critical/latitude" };
+	xf::PropertyIn<si::Length>				flight_range_critical_radius			{ this, "range/critical/radius" };
+	xf::PropertyIn<si::Angle>				radio_position_longitude				{ this, "radio-range/position/longitude" };
+	xf::PropertyIn<si::Angle>				radio_position_latitude					{ this, "radio-range/position/latitude" };
+	xf::PropertyIn<si::Length>				radio_range_warning						{ this, "radio-range/radius.warning" };
+	xf::PropertyIn<si::Length>				radio_range_critical					{ this, "radio-range/radius.critical" };
 };
 
 
 namespace hsi_detail {
+
+class CircularArea
+{
+  public:
+	si::LonLat	center;
+	si::Length	radius;
+};
+
 
 class Parameters
 {
@@ -318,7 +338,13 @@ class Parameters
 	std::array<Time, 3>						trend_vector_durations;
 	std::array<Length, 3>					trend_vector_min_ranges;
 	Length									trend_vector_max_range;
+	double									radio_range_pattern_scale;
 	bool									round_clip								{ false };
+	std::optional<CircularArea>				flight_range_warning;
+	std::optional<CircularArea>				flight_range_critical;
+	std::optional<si::LonLat>				radio_position;
+	std::optional<si::Length>				radio_range_warning;
+	std::optional<si::Length>				radio_range_critical;
 
   public:
 	/**
@@ -358,6 +384,7 @@ struct ResizeCache
 	QPolygonF		aircraft_shape;
 	QPolygonF		ap_bug_shape;
 	xf::Shadow		black_shadow;
+	QImage			radio_range_heat_map;
 };
 
 
@@ -381,7 +408,8 @@ struct CurrentNavaids
 
 struct Mutable
 {
-	hsi::DisplayMode prev_display_mode { hsi::DisplayMode::Expanded };
+	hsi::DisplayMode	prev_display_mode	{ hsi::DisplayMode::Expanded };
+	si::Length			prev_range			{ 0_nmi };
 };
 
 
@@ -390,7 +418,7 @@ class PaintingWork
   public:
 	// Ctor
 	explicit
-	PaintingWork (xf::PaintRequest const&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&);
+	PaintingWork (xf::PaintRequest const&, xf::InstrumentSupport const&, xf::NavaidStorage const&, Parameters const&, ResizeCache&, CurrentNavaids&, Mutable&, xf::Logger const&);
 
 	void
 	paint();
@@ -445,10 +473,26 @@ class PaintingWork
 	paint_navaids();
 
 	void
+	paint_radio_range_map();
+
+	void
+	paint_flight_ranges();
+
+	void
+	paint_circle (CircularArea const&, QColor color);
+
+	void
 	paint_locs();
 
 	void
 	paint_tcas();
+
+	/**
+	 * Paint radio range heat map into cached canvas.
+	 * Needs update after each range parameter change.
+	 */
+	void
+	update_radio_range_heat_map();
 
 	/**
 	 * Retrieve navaids from navaid storage for current aircraft
@@ -458,11 +502,11 @@ class PaintingWork
 	retrieve_navaids();
 
 	/**
-	 * Compute position where navaid should be drawn on map
+	 * Compute position where a feature should be drawn on map
 	 * relative to the aircraft (assumes usage with aircraft-centered transform).
 	 */
 	QPointF
-	get_navaid_xy (LonLat const& navaid_position) const;
+	get_feature_xy (LonLat const& navaid_position) const;
 
 	/**
 	 * Trend vector range.
@@ -486,6 +530,7 @@ class PaintingWork
 	to_px (si::Length miles) const;
 
   private:
+	xf::Logger const&						_logger;
 	xf::PaintRequest const&					_paint_request;
 	xf::NavaidStorage const&				_navaid_storage;
 	Parameters const&						_p;
@@ -523,9 +568,12 @@ class PaintingWork
 
 class HSI: public xf::Instrument<HSI_IO>
 {
+  private:
+	static constexpr char kLoggerScope[] = "mod::AirDataComputer";
+
   public:
 	// Ctor
-	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::NavaidStorage const&, std::string_view const& instance = {});
+	HSI (std::unique_ptr<HSI_IO>, xf::Graphics const&, xf::NavaidStorage const&, xf::Logger const&, std::string_view const& instance = {});
 
 	// Module API
 	void
@@ -536,6 +584,7 @@ class HSI: public xf::Instrument<HSI_IO>
 	paint (xf::PaintRequest) const override;
 
   private:
+	xf::Logger												_logger;
 	xf::NavaidStorage const&								_navaid_storage;
 	xf::InstrumentSupport									_instrument_support;
 	xf::Synchronized<hsi_detail::Parameters> mutable		_parameters;
