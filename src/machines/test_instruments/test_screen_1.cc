@@ -187,6 +187,28 @@ TestScreen1::TestScreen1 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 	flaps_io->hide_retracted									= false;
 
 	horizontal_trim_io->label									= "RUDDER TRIM";
+
+	glide_ratio_io->format										= boost::format ("%3.0f");
+	glide_ratio_io->font_scale									= 0.75;
+	glide_ratio_io->value_minimum								= 0.0;
+	glide_ratio_io->value_maximum								= 100.0;
+	glide_ratio_io->mirrored_style								= false;
+
+	glide_ratio_label_io->label									= "G/R";
+	glide_ratio_label_io->color									= xf::InstrumentAids::kCyan;
+	glide_ratio_label_io->font_scale							= 1.3;
+
+	load_factor_io->format										= boost::format ("%1.1f");
+	load_factor_io->font_scale									= 0.75;
+	load_factor_io->value_minimum								= -1.0;
+	load_factor_io->value_maximum_warning						= +2.0;
+	load_factor_io->value_maximum_critical						= +3.0;
+	load_factor_io->value_maximum								= +3.0;
+	load_factor_io->mirrored_style								= false;
+
+	load_factor_label_io->label									= "L/F";
+	load_factor_label_io->color									= xf::InstrumentAids::kCyan;
+	load_factor_label_io->font_scale							= 1.3;
 }
 
 
@@ -228,11 +250,11 @@ TestScreen1::create_instruments()
 		constexpr QPointF l_start_pos (r_start_pos.x(), r_start_pos.y() + 0.375f);
 		constexpr QPointF l_go_left = li_scale * QPointF (-0.060f, 0.0f);
 		constexpr QPointF l_go_right = li_scale * QPointF (+0.060f, 0.0f);
-		constexpr QPointF l_go_label = QPointF (0.0f, 0.0f);
-		constexpr QPointF l_go_current = QPointF (0.0f, 0.0f);
-		constexpr QPointF l_go_temperature = QPointF (0.0f, 0.085f);
-		constexpr QPointF l_go_voltage = QPointF (0.0f, 0.185f);
-		constexpr QPointF l_go_vibration = QPointF (0.0f, 0.285f);
+		constexpr QPointF l_go_label (0.0f, 0.0f);
+		constexpr QPointF l_go_current (0.0f, 0.0f);
+		constexpr QPointF l_go_temperature (0.0f, 0.085f);
+		constexpr QPointF l_go_voltage (0.0f, 0.185f);
+		constexpr QPointF l_go_vibration (0.0f, 0.285f);
 
 		constexpr QSizeF ri_size = ri_scale * QSizeF { 0.13f, 0.17f };
 		constexpr QSizeF li_size = li_scale * QSizeF { 0.09f, 0.088f };
@@ -328,21 +350,43 @@ TestScreen1::create_instruments()
 		register_instrument (*_label_vib, _others_work_performer);
 		set_centered (**_label_vib, { l_start_pos + l_go_vibration + l_go_label, label_size });
 
+		constexpr QPointF trims_sect_top_left (0.8f, 0.4f);
+
 		_gear.emplace (std::move (gear_io), _graphics, "gear");
 		register_instrument (*_gear, _others_work_performer);
-		set_centered (**_gear, { 0.8f, 0.5f, 0.1f, 0.15f });
+		set_centered (**_gear, { trims_sect_top_left, QSizeF (0.1f, 0.15f) });
 
 		_flaps.emplace (std::move (flaps_io), _graphics, "flaps");
 		register_instrument (*_flaps, _others_work_performer);
-		set_centered (**_flaps, { 0.9f, 0.5f, 0.1f, 0.2f });
+		set_centered (**_flaps, { trims_sect_top_left + QPointF (0.1f, 0.0f), QSizeF (0.1f, 0.2f) });
 
 		_vertical_trim.emplace (std::move (vertical_trim_io), _graphics, "eicas.trim.vertical");
 		register_instrument (*_vertical_trim, _others_work_performer);
-		set_centered (**_vertical_trim, { 0.8f, 0.7f, 0.1f, 0.12f });
+		set_centered (**_vertical_trim, { trims_sect_top_left + QPointF (0.0f, 0.2f), QSizeF (0.1f, 0.12f) });
 
 		_horizontal_trim.emplace (std::move (horizontal_trim_io), _graphics, "eicas.trim.horizontal");
 		register_instrument (*_horizontal_trim, _others_work_performer);
-		set_centered (**_horizontal_trim, { 0.9f, 0.7f, 0.08f, 0.12f });
+		set_centered (**_horizontal_trim, { trims_sect_top_left + QPointF (0.1f, 0.2f), QSizeF (0.08f, 0.12f) });
+
+		constexpr QPointF perf_meters_to_left (0.75f, 0.75f);
+		constexpr QSizeF perf_meter_size = li_size;
+		constexpr QSizeF perf_label_size = label_size;
+
+		_glide_ratio.emplace (std::move (glide_ratio_io), _graphics, nullptr, "eicas.glide-ratio");
+		register_instrument (*_glide_ratio, _others_work_performer);
+		set_centered (**_glide_ratio, { perf_meters_to_left, perf_meter_size });
+
+		_glide_ratio_label.emplace (std::move (glide_ratio_label_io), _graphics, "eicas.label.glide-ratio");
+		register_instrument (*_glide_ratio_label, _others_work_performer);
+		set_centered (**_glide_ratio_label, { perf_meters_to_left + QPointF (0.05f, 0.0f), perf_label_size });
+
+		_load_factor.emplace (std::move (load_factor_io), _graphics, nullptr, "eicas.load-factor");
+		register_instrument (*_load_factor, _others_work_performer);
+		set_centered (**_load_factor, { perf_meters_to_left + QPointF (0.0f, 0.1f), perf_meter_size });
+
+		_load_factor_label.emplace (std::move (load_factor_label_io), _graphics, "eicas.label.load-factor");
+		register_instrument (*_load_factor_label, _others_work_performer);
+		set_centered (**_load_factor_label, { perf_meters_to_left + QPointF (0.05f, 0.1f), perf_label_size });
 	}
 
 	set_paint_bounding_boxes (false);

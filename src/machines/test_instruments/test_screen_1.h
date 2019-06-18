@@ -76,8 +76,13 @@ class TestScreen1: public xf::Screen
 	std::unique_ptr<FlapsIO>										flaps_io					{ std::make_unique<FlapsIO>() };
 	std::unique_ptr<VerticalTrimIO>									vertical_trim_io			{ std::make_unique<VerticalTrimIO>() };
 	std::unique_ptr<HorizontalTrimIO>								horizontal_trim_io			{ std::make_unique<HorizontalTrimIO>() };
+	std::unique_ptr<LinearGaugeIO<double>>							glide_ratio_io				{ std::make_unique<LinearGaugeIO<double>>() };
+	std::unique_ptr<LabelIO>										glide_ratio_label_io		{ std::make_unique<LabelIO>() };
+	std::unique_ptr<LinearGaugeIO<double>>							load_factor_io				{ std::make_unique<LinearGaugeIO<double>>() };
+	std::unique_ptr<LabelIO>										load_factor_label_io		{ std::make_unique<LabelIO>() };
 
   private:
+	xf::Logger														_logger;
 	xf::Graphics const&												_graphics;
 	xf::NavaidStorage const&										_navaid_storage;
 	xf::WorkPerformer												_adi_work_performer;
@@ -111,6 +116,10 @@ class TestScreen1: public xf::Screen
 	std::optional<xf::Registrant<Flaps>>							_flaps;
 	std::optional<xf::Registrant<VerticalTrim>>						_vertical_trim;
 	std::optional<xf::Registrant<HorizontalTrim>>					_horizontal_trim;
+	std::optional<xf::Registrant<LinearGauge<double>>>				_glide_ratio;
+	std::optional<xf::Registrant<Label>>							_glide_ratio_label;
+	std::optional<xf::Registrant<LinearGauge<double>>>				_load_factor;
+	std::optional<xf::Registrant<Label>>							_load_factor_label;
 };
 
 #endif

@@ -336,6 +336,9 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	test_screen_1->vertical_trim_io->trim_reference_minimum					<< xf::ConstantSource (0.35);
 	test_screen_1->vertical_trim_io->trim_reference_maximum					<< xf::ConstantSource (0.6);
 
+	test_screen_1->glide_ratio_io->value									<< test_generator_io->create_property<double> ("perf/glide-ratio", 50.0, { 15, 75 }, 3 / 1_s);
+	test_screen_1->load_factor_io->value									<< test_generator_io->create_property<double> ("perf/load-factor", 1.0, { 0.4, 3.3 }, 0.2 / 1_s);
+
 	test_screen_2->hsi_1_io->display_mode									<< xf::ConstantSource (hsi::DisplayMode::Expanded);
 	test_screen_2->hsi_1_io->range											<< test_generator_hsi_range;
 	test_screen_2->hsi_1_io->speed_gs										<< test_generator_hsi_speed_gs;
