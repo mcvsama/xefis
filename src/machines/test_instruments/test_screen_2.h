@@ -53,6 +53,7 @@ class TestScreen2: public xf::Screen
 	std::unique_ptr<HSI_IO>				hsi_2_io { std::make_unique<HSI_IO>() };
 
   private:
+	xf::Logger							_logger;
 	xf::Graphics const&					_graphics;
 	xf::NavaidStorage const&			_navaid_storage;
 	xf::WorkPerformer					_hsi_work_performer;

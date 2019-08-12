@@ -33,7 +33,7 @@ TestInstrumentsMachine::TestInstrumentsMachine (xf::Xefis& xefis):
 	_navaid_storage = std::make_unique<xf::NavaidStorage> (_logger, "share/nav/nav.dat.gz", "share/nav/fix.dat.gz", "share/nav/apt.dat.gz");
 	_work_performer->submit (_navaid_storage->async_loader());
 
-	_test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("TestLoop")),
+	_test_loop.emplace (*this, "Main loop", 120_Hz, _logger.with_scope ("short computations loop")),
 	register_processing_loop (*_test_loop);
 
 	auto line_width = 0.3525_mm;

@@ -23,9 +23,10 @@
 
 TestScreen2::TestScreen2 (xf::ScreenSpec const& spec, xf::Graphics const& graphics, xf::NavaidStorage const& navaid_storage, xf::Machine& machine, xf::Logger const& logger):
 	Screen (spec, graphics, machine, "Test Screen 2", logger.with_scope ("TestScreen2")),
+	_logger (logger),
 	_graphics (graphics),
 	_navaid_storage (navaid_storage),
-	_hsi_work_performer (2, logger.with_scope ("big-HSI"))
+	_hsi_work_performer (2, _logger.with_scope ("big-HSI"))
 {
 	hsi_1_io->arpt_runways_range_threshold	= 2_nmi;
 	hsi_1_io->arpt_map_range_threshold		= 1_nmi;
@@ -40,11 +41,11 @@ TestScreen2::TestScreen2 (xf::ScreenSpec const& spec, xf::Graphics const& graphi
 void
 TestScreen2::create_instruments()
 {
-	_hsi_1.emplace (std::move (hsi_1_io), _graphics, _navaid_storage, "big-hsi-1");
+	_hsi_1.emplace (std::move (hsi_1_io), _graphics, _navaid_storage, _logger, "big-hsi-1");
 	register_instrument (*_hsi_1, _hsi_work_performer);
 	set (**_hsi_1, { 0.0f, 0.0f, 0.5f, 1.0f });
 
-	_hsi_2.emplace (std::move (hsi_2_io), _graphics, _navaid_storage, "big-hsi-2");
+	_hsi_2.emplace (std::move (hsi_2_io), _graphics, _navaid_storage, _logger, "big-hsi-2");
 	register_instrument (*_hsi_2, _hsi_work_performer);
 	set (**_hsi_2, { 0.5f, 0.0f, 0.5f, 1.0f });
 
