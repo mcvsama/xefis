@@ -39,7 +39,7 @@ class PaintRequest
 	  public:
 		// Ctor
 		explicit
-		Metric (QSize, PixelDensity, si::Length pen_width, si::Length font_height);
+		Metric (QSize canvas_size, PixelDensity, si::Length pen_width, si::Length font_height);
 
 		[[nodiscard]]
 		bool
@@ -106,9 +106,9 @@ class PaintRequest
 	size_changed() const noexcept;
 
   private:
-	QImage*									_canvas;
-	Metric									_metric;
-	bool									_size_changed;
+	QImage*	_canvas;
+	Metric	_metric;
+	bool	_size_changed;
 };
 
 

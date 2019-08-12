@@ -188,6 +188,7 @@ class LinkProtocol
 			 * \param	fallback_value
 			 *			Value that should be used for nil-values, because integers don't have any special values
 			 *			that could be used as nil.
+			 *			Note this fallback_value is only used on transmitting side only, if property is nil.
 			 */
 			template<class = std::enable_if_t<std::is_integral_v<Value>>>
 				explicit
@@ -300,8 +301,8 @@ class LinkProtocol
 	/**
 	 * A packet that adds or verifies simple digital signature of the contained
 	 * packets.
-	 * HMAC is not required since the Signature packets have fixed size
-	 * (length-extension attacks are not possible).  Each Signature must use
+	 * HMAC is not required since the Signature packets have fixed size, so
+	 * length-extension attacks are not possible. Each Signature must use
 	 * different Key.
 	 */
 	class Signature: public Sequence
