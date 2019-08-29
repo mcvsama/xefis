@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QShortcut>
+#include <QSvgRenderer>
 #include <QTimer>
 
 // Neutrino:
@@ -45,6 +46,10 @@ InstrumentDetails::InstrumentDetails (BasicInstrument& instrument, WorkPerformer
 } // namespace detail
 
 
+static constexpr char		kLogoPath[]			= "share/images/xefis.svg";
+static constexpr si::Time	kLogoDisplayTime	= 2_s;
+
+
 Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machine, std::string_view const& instance, Logger const& logger):
 	QWidget (nullptr),
 	NamedInstance (instance),
@@ -64,6 +69,13 @@ Screen::Screen (ScreenSpec const& spec, Graphics const& graphics, Machine& machi
 	setCursor (QCursor (Qt::CrossCursor));
 	setMouseTracking (true);
 	setAttribute (Qt::WA_TransparentForMouseEvents);
+
+	_hide_logo_timer = new QTimer (this);
+	_hide_logo_timer->setSingleShot (true);
+	_hide_logo_timer->setInterval (kLogoDisplayTime.in<si::Millisecond>());
+	QObject::connect (_hide_logo_timer, &QTimer::timeout, this, &Screen::hide_logo);
+	// TODO start should be called first time show() is called (or each time?)
+	_hide_logo_timer->start();
 
 	_refresh_timer = new QTimer (this);
 	_refresh_timer->setSingleShot (false);
@@ -177,6 +189,20 @@ Screen::update_canvas (QSize size)
 		for (auto& disclosure: _instrument_tracker)
 			disclosure.details().computed_position.reset();
 	}
+}
+
+
+void
+Screen::paint_logo_to_buffer()
+{
+	auto const lesser_dim = 0.5 * std::min (_canvas.width(), _canvas.height());
+	_canvas.fill (Qt::black);
+	auto logo_image = allocate_image (QSize (lesser_dim, lesser_dim));
+	logo_image.fill (Qt::transparent);
+    QPainter logo_image_painter (&logo_image);
+	QSvgRenderer (QString (kLogoPath)).render (&logo_image_painter);
+	QPainter canvas_painter (&_canvas);
+	canvas_painter.drawImage (_canvas.rect().center() - 0.5 * QPoint (lesser_dim, lesser_dim), logo_image);
 }
 
 
@@ -346,9 +372,23 @@ Screen::sort_by_z_index()
 
 
 void
+Screen::hide_logo()
+{
+	_displaying_logo = false;
+}
+
+
+void
 Screen::refresh()
 {
-	paint_instruments_to_buffer();
+	if (_displaying_logo)
+	{
+		paint_instruments_to_buffer();
+		paint_logo_to_buffer();
+	}
+	else
+		paint_instruments_to_buffer();
+
 	update();
 }
 

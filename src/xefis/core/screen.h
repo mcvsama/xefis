@@ -201,6 +201,12 @@ class Screen:
 	update_canvas (QSize);
 
 	/**
+	 * Paint SVG logo.
+	 */
+	void
+	paint_logo_to_buffer();
+
+	/**
 	 * Request painting of all instruments on the canvas-buffer.
 	 */
 	void
@@ -236,6 +242,12 @@ class Screen:
 
   private slots:
 	/**
+	 * Called when logo should be hidden and instrument painting should be done.
+	 */
+	void
+	hide_logo();
+
+	/**
 	 * Called when next frame should be painted.
 	 */
 	void
@@ -248,12 +260,14 @@ class Screen:
 	Machine&					_machine;
 	Logger						_logger;
 	InstrumentTracker			_instrument_tracker;
+	QTimer*						_hide_logo_timer;
 	QTimer*						_refresh_timer;
 	QImage						_canvas;
 	std::vector<InstrumentTracker::Disclosure*>
 								_z_index_sorted_disclosures;
 	ScreenSpec					_screen_spec;
 	si::Time const				_frame_time;
+	bool						_displaying_logo		{ true };
 	bool						_paint_bounding_boxes	{ false };
 	std::unordered_map<WorkPerformer const*, WorkPerformerMetrics>
 								_work_performer_metrics	{ 10 };
