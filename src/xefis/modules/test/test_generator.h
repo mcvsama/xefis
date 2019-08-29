@@ -34,7 +34,7 @@ class TestGeneratorIO: public xf::ModuleIO
 {
   public:
 	template<class Value>
-		using RateOfChange = decltype(std::declval<Value>() / 1_s);
+		using RateOfChange = decltype (std::declval<Value>() / 1_s);
 
 	template<class Value>
 		using EnumTuple = std::tuple<std::variant<Value, xf::Nil>, si::Time>;

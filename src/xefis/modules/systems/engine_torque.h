@@ -34,7 +34,7 @@ class EngineTorqueIO: public xf::ModuleIO
   public:
 	using EfficiencyField	= xf::Field<si::AngularVelocity, double>;
 	using EngineEfficiency	= std::variant<double, EfficiencyField>;
-	using MotorKv			= decltype (1.0_rpm / 1.0_V);
+	using MotorKv			= decltype (1_rpm / 1_V);
 
   public:
 	/*
