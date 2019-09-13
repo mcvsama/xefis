@@ -362,7 +362,8 @@ struct ResizeCache
 {
 	float			r;
 	float			q;
-	float			margin;
+	float			vmargin;
+	float			hmargin;
 	QTransform		aircraft_center_transform;
 	QRectF			trend_vector_clip_rect;
 	QRectF			map_clip_rect;

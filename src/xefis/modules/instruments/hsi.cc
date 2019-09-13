@@ -350,7 +350,8 @@ PaintingWork::PaintingWork (xf::PaintRequest const& paint_request, xf::Instrumen
 			point.ry() *= -0.5f;
 		}
 
-		_c.margin = 0.15f * _c.q;
+		_c.hmargin = 0.15f * _c.q;
+		_c.vmargin = 0.02f * _c.q;
 
 		_c.black_shadow = _aids.default_shadow();
 		_c.black_shadow.set_color (Qt::black);
@@ -416,10 +417,10 @@ PaintingWork::paint_aircraft()
 		QString str = *_ap_use_trk ? "SEL TRK " : "SEL HDG ";
 		// AP heading always set as magnetic, but can be displayed as true:
 		xf::TextLayout layout;
-		layout.set_background (Qt::black, { _c.margin, 0.0f });
+		layout.set_background (Qt::black, { _c.hmargin, 0.0f });
 		layout.add_fragment (str, _aids.font_2.font, _aids.autopilot_pen_2.color());
 		layout.add_fragment (QString ("%1").arg (sel_hdg, 3, 10, QChar ('0')), _aids.font_3.font, _aids.autopilot_pen_2.color());
-		layout.paint (QPointF (0.5f * _aids.width() - _c.q, _aids.height() - 0.1f * layout.height()), Qt::AlignBottom | Qt::AlignRight, _painter);
+		layout.paint (QPointF (0.5f * _aids.width() - _c.q, _aids.height() - _c.vmargin), Qt::AlignBottom | Qt::AlignRight, _painter);
 	}
 
 	// MAG/TRUE heading
@@ -457,10 +458,10 @@ PaintingWork::paint_aircraft()
 					box_pen = _aids.get_pen (xf::InstrumentAids::kNavigationColor, 1.0f);
 
 				xf::TextLayout layout;
-				layout.set_background (Qt::black, { _c.margin, 0.0f });
+				layout.set_background (Qt::black, { _c.hmargin, 0.0f });
 				layout.add_fragment (text_1 + " ", _aids.font_2.font, xf::InstrumentAids::kNavigationColor);
 				layout.add_fragment (QString ("%1").arg (hdg, 3, 10, QChar ('0')), _aids.font_3.font, xf::InstrumentAids::kNavigationColor, box_pen);
-				layout.paint (QPointF (0.5f * _aids.width() + _c.q, _aids.height() - _c.margin), Qt::AlignBottom | Qt::AlignLeft, _painter);
+				layout.paint (QPointF (0.5f * _aids.width() + _c.q, _aids.height() - _c.vmargin), Qt::AlignBottom | Qt::AlignLeft, _painter);
 				break;
 			}
 
@@ -528,7 +529,7 @@ PaintingWork::paint_navperf()
 				auto val = QString ("%1").arg (_p.navigation_required_performance->in<Meter>(), 0, 'f', 2);
 
 				xf::TextLayout layout;
-				layout.set_background (Qt::black, { _c.margin, 0.0f });
+				layout.set_background (Qt::black, { _c.hmargin, 0.0f });
 				layout.set_alignment (Qt::AlignHCenter);
 				layout.add_fragment ("RNP", font, xf::InstrumentAids::kNavigationColor);
 				layout.add_new_line();
@@ -550,7 +551,7 @@ PaintingWork::paint_navperf()
 						text_color = xf::InstrumentAids::kWarningColor;
 
 				xf::TextLayout layout;
-				layout.set_background (Qt::black, { _c.margin, 0.0f });
+				layout.set_background (Qt::black, { _c.hmargin, 0.0f });
 				layout.set_alignment (Qt::AlignHCenter);
 				layout.add_fragment ("ANP", font, text_color);
 				layout.add_new_line();
@@ -588,11 +589,11 @@ PaintingWork::paint_hints()
 	}
 
 	xf::TextLayout layout;
-	layout.set_background (Qt::black, { 2 * _c.margin, 0.0f });
+	layout.set_background (Qt::black, { 2 * _c.hmargin, 0.0f });
 	// This is needed for correct v-alignment with other layouts that use mixed font_2/font_3 sizes:
 	layout.add_fragment ("", _aids.font_3.font, xf::InstrumentAids::kNavigationColor);
 	layout.add_fragment (hint, _aids.font_2.font, xf::InstrumentAids::kNavigationColor, box_pen);
-	layout.paint (QPointF (x, size.height() - _c.margin), Qt::AlignBottom | Qt::AlignHCenter, _painter);
+	layout.paint (QPointF (x, size.height() - _c.vmargin), Qt::AlignBottom | Qt::AlignHCenter, _painter);
 }
 
 
@@ -988,13 +989,13 @@ PaintingWork::paint_speeds_and_wind()
 
 	_painter.resetTransform();
 	_painter.setClipping (false);
-	layout.paint (QPointF (_c.margin, 0.0), Qt::AlignTop | Qt::AlignLeft, _painter);
+	layout.paint (QPointF (_c.hmargin, 0.0), Qt::AlignTop | Qt::AlignLeft, _painter);
 
 	// Wind arrow:
 	if (_p.wind_from_magnetic_heading && _p.heading_magnetic)
 	{
 		_painter.setPen (_aids.get_pen (Qt::white, 0.6f));
-		_painter.translate (0.8f * _c.q + _c.margin, 0.8f * _c.q + layout.height());
+		_painter.translate (0.8f * _c.q + _c.hmargin, 0.8f * _c.q + layout.height());
 		_painter.rotate ((*_p.wind_from_magnetic_heading - *_p.heading_magnetic + 180_deg).in<Degree>());
 		_painter.setPen (_aids.get_pen (Qt::white, 1.0));
 		_painter.paint (_c.black_shadow, [&] {
@@ -1002,8 +1003,8 @@ PaintingWork::paint_speeds_and_wind()
 			QPointF b = QPointF (0.f, +0.7f * _c.q);
 
 			_painter.drawLine (a + QPointF (0.f, 0.05f * _c.q), b);
-			_painter.drawLine (a, a + QPointF (+_c.margin, +_c.margin));
-			_painter.drawLine (a, a + QPointF (-_c.margin, +_c.margin));
+			_painter.drawLine (a, a + QPointF (+_c.hmargin, +_c.vmargin));
+			_painter.drawLine (a, a + QPointF (-_c.hmargin, +_c.vmargin));
 		});
 	}
 }
@@ -1020,7 +1021,7 @@ PaintingWork::paint_home_direction()
 
 	auto const size = _paint_request.metric().canvas_size();
 	QTransform base_transform;
-	base_transform.translate (size.width() - _c.margin, 0.55f * size.height());
+	base_transform.translate (size.width() - _c.hmargin, 0.55f * size.height());
 
 	_painter.resetTransform();
 	_painter.setClipping (false);
@@ -1071,7 +1072,7 @@ PaintingWork::paint_home_direction()
 			<< QPointF (z, -h);
 
 		xf::TextLayout layout;
-		layout.set_background (Qt::black, { _c.margin, 0.0 });
+		layout.set_background (Qt::black, { _c.hmargin, 0.0 });
 		layout.set_alignment (Qt::AlignRight);
 
 		std::string vert_str = "---";
@@ -1269,7 +1270,7 @@ PaintingWork::paint_selected_navaid_info()
 		distance_str = (boost::format ("%3.1f") % _p.navaid_selected_distance->in<NauticalMile>()).str();
 
 	xf::TextLayout layout;
-	layout.set_background (Qt::black, { _c.margin, 0.0 });
+	layout.set_background (Qt::black, { _c.hmargin, 0.0 });
 	layout.set_background_mode (xf::TextLayout::PerLine);
 	layout.set_alignment (Qt::AlignRight);
 
@@ -1300,7 +1301,7 @@ PaintingWork::paint_selected_navaid_info()
 	layout.add_new_line();
 	layout.add_fragment (distance_str, font_c, Qt::white);
 	layout.add_fragment ("NM", font_b, Qt::white);
-	layout.paint (QPointF (_aids.width() - _c.margin, 0.0), Qt::AlignTop | Qt::AlignRight, _painter);
+	layout.paint (QPointF (_aids.width() - _c.hmargin, 0.0), Qt::AlignTop | Qt::AlignRight, _painter);
 }
 
 
@@ -1326,7 +1327,7 @@ PaintingWork::paint_tcas_and_navaid_info()
 
 	xf::TextLayout left_layout;
 	left_layout.set_alignment (Qt::AlignLeft);
-	left_layout.set_background (Qt::black, { _c.margin, 0.0 });
+	left_layout.set_background (Qt::black, { _c.hmargin, 0.0 });
 
 	if (_p.loc_visible)
 		left_layout.add_fragment ("LOC", font_a, xf::InstrumentAids::kCyan);
@@ -1361,15 +1362,15 @@ PaintingWork::paint_tcas_and_navaid_info()
 
 	xf::TextLayout right_layout;
 	right_layout.set_alignment (Qt::AlignRight);
-	right_layout.set_background (Qt::black, { _c.margin, 0.0 });
+	right_layout.set_background (Qt::black, { _c.hmargin, 0.0 });
 
 	if (_navaid_right_visible)
 		configure_layout (right_layout, (_p.navaid_right_type == hsi::NavType::A) ? Qt::green : xf::InstrumentAids::kCyan, _p.navaid_right_reference, _p.navaid_right_identifier, _p.navaid_right_distance);
 
 	auto const size = _paint_request.metric().canvas_size();
 
-	left_layout.paint (QPointF (_c.margin, size.height()), Qt::AlignBottom | Qt::AlignLeft, _painter);
-	right_layout.paint (QPointF (size.width() -_c.margin, size.height()), Qt::AlignBottom | Qt::AlignRight, _painter);
+	left_layout.paint (QPointF (_c.hmargin, size.height() - _c.vmargin), Qt::AlignBottom | Qt::AlignLeft, _painter);
+	right_layout.paint (QPointF (size.width() -_c.hmargin, size.height() - _c.vmargin), Qt::AlignBottom | Qt::AlignRight, _painter);
 }
 
 
