@@ -29,6 +29,8 @@ namespace xf {
 
 constexpr auto						kGravitationalConstant			= 6.67408313131e-11 * 1_m3 / 1_kg / 1_s / 1_s;
 constexpr auto						kUniversalGasConstant			= 8.3144598_J / 1_mol / 1_K;
+constexpr auto						kBoltzmannConstant				= 1.380649e-23_J / 1_K;
+constexpr si::Charge				kElementaryCharge				= 1.602176634e-19_C;
 constexpr si::MolarMass				kAirMolarMass					= 0.0289644_kg / 1_mol;
 constexpr si::SpecificHeatCapacity	kDryAirSpecificConstant			= 287.058_J / 1_kg / 1_K;
 
