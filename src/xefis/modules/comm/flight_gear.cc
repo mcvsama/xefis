@@ -258,13 +258,14 @@ FlightGear::read_input()
 		if (!io.input_enabled)
 			continue;
 
-		FGInputData* fg_data = reinterpret_cast<FGInputData*> (_input_datagram.data());
+		FGInputData fg_data;
+		std::memcpy (&fg_data, _input_datagram.data(), sizeof (fg_data));
 
 #define ASSIGN(unit, x) \
-		io.x = 1_##unit * fg_data->x##_##unit;
+		io.x = 1_##unit * fg_data.x##_##unit;
 
 #define ASSIGN_UNITLESS(x) \
-		io.x = static_cast<decltype (fg_data->x)> (fg_data->x);
+		io.x = static_cast<decltype (fg_data.x)> (fg_data.x);
 
 		ASSIGN (ft,   cmd_alt_setting);
 		ASSIGN (fpm,  cmd_cbr_setting);
@@ -318,44 +319,44 @@ FlightGear::read_input()
 #undef ASSIGN_UNITLESS
 #undef ASSIGN
 
-		io.rotation_x = 1_deg * fg_data->rotation_x_degps / 1_s;
-		io.rotation_y = 1_deg * fg_data->rotation_y_degps / 1_s;
-		io.rotation_z = 1_deg * fg_data->rotation_z_degps / 1_s;
+		io.rotation_x = 1_deg * fg_data.rotation_x_degps / 1_s;
+		io.rotation_y = 1_deg * fg_data.rotation_y_degps / 1_s;
+		io.rotation_z = 1_deg * fg_data.rotation_z_degps / 1_s;
 
-		io.acceleration_x = 1_ft * fg_data->acceleration_x_fps2 / 1_s / 1_s;
-		io.acceleration_y = 1_ft * fg_data->acceleration_y_fps2 / 1_s / 1_s;
-		io.acceleration_z = -1_ft * fg_data->acceleration_z_fps2 / 1_s / 1_s;
+		io.acceleration_x = 1_ft * fg_data.acceleration_x_fps2 / 1_s / 1_s;
+		io.acceleration_y = 1_ft * fg_data.acceleration_y_fps2 / 1_s / 1_s;
+		io.acceleration_z = -1_ft * fg_data.acceleration_z_fps2 / 1_s / 1_s;
 
-		io.vertical_deviation = 2_deg * fg_data->vertical_deviation_deg;
-		io.lateral_deviation = 2_deg * fg_data->lateral_deviation_deg;
+		io.vertical_deviation = 2_deg * fg_data.vertical_deviation_deg;
+		io.lateral_deviation = 2_deg * fg_data.lateral_deviation_deg;
 
-		if (!fg_data->vertical_deviation_ok)
+		if (!fg_data.vertical_deviation_ok)
 			io.vertical_deviation = xf::nil;
 
-		if (!fg_data->lateral_deviation_ok)
+		if (!fg_data.lateral_deviation_ok)
 			io.lateral_deviation = xf::nil;
 
-		if (!fg_data->navigation_dme_ok)
+		if (!fg_data.navigation_dme_ok)
 			io.dme_distance = xf::nil;
 
-		io.gear_nose_down = fg_data->gear_nose_position > 0.999;
-		io.gear_left_down = fg_data->gear_left_position > 0.999;
-		io.gear_right_down = fg_data->gear_right_position > 0.999;
+		io.gear_nose_down = fg_data.gear_nose_position > 0.999;
+		io.gear_left_down = fg_data.gear_left_position > 0.999;
+		io.gear_right_down = fg_data.gear_right_position > 0.999;
 
-		io.gear_nose_up = fg_data->gear_nose_position < 0.001;
-		io.gear_left_up = fg_data->gear_left_position < 0.001;
-		io.gear_right_up = fg_data->gear_right_position < 0.001;
+		io.gear_nose_up = fg_data.gear_nose_position < 0.001;
+		io.gear_left_up = fg_data.gear_left_position < 0.001;
+		io.gear_right_up = fg_data.gear_right_position < 0.001;
 
 		// TAT
-		io.total_air_temperature = Quantity<Celsius> (fg_data->total_air_temperature_degc);
+		io.total_air_temperature = Quantity<Celsius> (fg_data.total_air_temperature_degc);
 
 		// Convert EGT from °F to Kelvins:
-		io.engine_1_egt = Quantity<Fahrenheit> (fg_data->engine_1_egt_degf);
-		io.engine_2_egt = Quantity<Fahrenheit> (fg_data->engine_2_egt_degf);
+		io.engine_1_egt = Quantity<Fahrenheit> (fg_data.engine_1_egt_degf);
+		io.engine_2_egt = Quantity<Fahrenheit> (fg_data.engine_2_egt_degf);
 
 		// Engine thrust:
-		io.engine_1_thrust = 1_lb * fg_data->engine_1_thrust_lb * 1_g;
-		io.engine_2_thrust = 1_lb * fg_data->engine_2_thrust_lb * 1_g;
+		io.engine_1_thrust = 1_lb * fg_data.engine_1_thrust_lb * 1_g;
+		io.engine_2_thrust = 1_lb * fg_data.engine_2_thrust_lb * 1_g;
 	}
 
 	if (io.maximum_ias && *io.maximum_ias < 1_kt)
