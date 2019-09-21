@@ -31,11 +31,6 @@ namespace xf::nmea {
 static HexTable	$hextable;
 
 
-Parser::Parser (Listener* listener):
-	_listener (listener)
-{ }
-
-
 void
 Parser::feed (Blob const& data)
 {
@@ -43,8 +38,8 @@ Parser::feed (Blob const& data)
 }
 
 
-bool
-Parser::process_one()
+std::variant<std::monostate, GPGGA, GPGSA, GPRMC, PMTKACK>
+Parser::process_next()
 {
 	// Skip cut-in-half messages, wait for '$' if not yet synchronized:
 	if (!_synchronized)
@@ -52,7 +47,7 @@ Parser::process_one()
 		auto pos = _input_buffer.find ("$");
 
 		if (pos == std::string::npos)
-			return false;
+			return std::monostate();
 		else
 		{
 			_input_buffer.erase (0, pos);
@@ -71,8 +66,10 @@ Parser::process_one()
 	});
 
 	crlf = _input_buffer.find ("\r\n", start);
+
 	if (crlf == std::string::npos)
-		return false;
+		return std::monostate();
+
 	parsed = crlf + 2;
 
 	std::string sentence_str = _input_buffer.substr (start, crlf - start);
@@ -91,20 +88,16 @@ Parser::process_one()
 		switch (get_sentence_type (sentence_str))
 		{
 			case SentenceType::GPGGA:
-				_listener->process_nmea_sentence (GPGGA (sentence_meat));
-				break;
+				return GPGGA (sentence_meat);
 
 			case SentenceType::GPGSA:
-				_listener->process_nmea_sentence (GPGSA (sentence_meat));
-				break;
+				return GPGSA (sentence_meat);
 
 			case SentenceType::GPRMC:
-				_listener->process_nmea_sentence (GPRMC (sentence_meat));
-				break;
+				return GPRMC (sentence_meat);
 
 			case SentenceType::PMTKACK:
-				_listener->process_nmea_sentence (PMTKACK (sentence_meat));
-				break;
+				return PMTKACK (sentence_meat);
 		}
 	}
 	catch (UnsupportedSentenceType const&)
@@ -112,7 +105,7 @@ Parser::process_one()
 		// Ignore unsupported sentences.
 	}
 
-	return true;
+	return std::monostate();
 }
 
 

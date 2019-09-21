@@ -108,7 +108,6 @@ GPS::Connection::open_device()
 void
 GPS::Connection::initialize_device()
 {
-	_nmea_parser = std::make_unique<xf::nmea::Parser> (this);
 	_gps_module.logger() << "Sending initialization commands." << std::endl;
 	_serial_port->write (xf::nmea::make_mtk_sentence (get_nmea_frequencies_setup_messages (_serial_port_config.baud_rate())));
 	// Now send user setup commands:
@@ -158,18 +157,36 @@ GPS::Connection::failure (std::string_view const& reason)
 void
 GPS::Connection::serial_data_ready()
 {
-	_nmea_parser->feed (_serial_port->input_buffer());
+	_nmea_parser.feed (_serial_port->input_buffer());
 	_serial_port->input_buffer().clear();
 
-	bool processed = true;
+	bool try_next = true;
 
 	do {
-		processed = true;
+		try_next = true;
 
 		try {
-			processed = _nmea_parser->process_one();
+			auto const gps_message = _nmea_parser.process_next();
 
-			if (processed)
+			std::visit (xf::overload {
+				[&] (xf::nmea::GPGGA const& msg) {
+					process_nmea_sentence (msg);
+				},
+				[&] (xf::nmea::GPGSA const& msg) {
+					process_nmea_sentence (msg);
+				},
+				[&] (xf::nmea::GPRMC const& msg) {
+					process_nmea_sentence (msg);
+				},
+				[&] (xf::nmea::PMTKACK const& msg) {
+					process_nmea_sentence (msg);
+				},
+				[&] (std::monostate) noexcept {
+					try_next = false;
+				},
+			}, gps_message);
+
+			if (try_next)
 				_alive_check_timer->start();
 		}
 		catch (...)
@@ -177,7 +194,7 @@ GPS::Connection::serial_data_ready()
 			_gps_module.io.read_errors = *_gps_module.io.read_errors + 1;
 			_gps_module.logger() << "Exception when processing NMEA sentence: " << std::current_exception() << std::endl;
 		}
-	} while (processed);
+	} while (try_next);
 }
 
 

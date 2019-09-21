@@ -110,9 +110,7 @@ class GPS:
 	 * Serializes instructions for connecting to GPS with SerialPort, initializing it, switching
 	 * baud-rates, etc.
 	 */
-	class Connection:
-		public QObject,
-		public xf::nmea::Parser::Listener
+	class Connection: public QObject
 	{
 	  public:
 		/**
@@ -239,7 +237,7 @@ class GPS:
 		unsigned int						_requested_physical_baud_rate;
 		xf::SerialPort::Configuration		_serial_port_config;
 		std::unique_ptr<xf::SerialPort>		_serial_port;
-		std::unique_ptr<xf::nmea::Parser>	_nmea_parser;
+		xf::nmea::Parser					_nmea_parser;
 		bool								_reliable_fix_quality	= false;
 		bool								_first_message_received	= false;
 	};

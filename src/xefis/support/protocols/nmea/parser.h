@@ -16,6 +16,7 @@
 
 // Standard:
 #include <cstddef>
+#include <variant>
 
 // Neutrino:
 #include <neutrino/noncopyable.h>
@@ -38,47 +39,6 @@ class Parser: private Noncopyable
 {
   public:
 	/**
-	 * Listener class which methods will be called
-	 * back when parsing NMEA sentences.
-	 */
-	class Listener
-	{
-	  public:
-		/**
-		 * GPGGA sentence was parsed.
-		 */
-		virtual void
-		process_nmea_sentence (GPGGA const&) = 0;
-
-		/**
-		 * GPGSA sentence was parsed.
-		 */
-		virtual void
-		process_nmea_sentence (GPGSA const&) = 0;
-
-		/**
-		 * GPRMC sentence was parsed.
-		 */
-		virtual void
-		process_nmea_sentence (GPRMC const&) = 0;
-
-		/**
-		 * PMTK ACK sentence was parsed.
-		 */
-		virtual void
-		process_nmea_sentence (PMTKACK const&) = 0;
-	};
-
-  public:
-	/**
-	 * Ctor
-	 * \param	Listener
-	 *			Callbacks object.
-	 */
-	explicit
-	Parser (Listener*);
-
-	/**
 	 * Feed the parser with data received from GPS module.
 	 * Don't parse it and don't call any listeners. For that,
 	 * use the process_one() method.
@@ -91,13 +51,12 @@ class Parser: private Noncopyable
 	 * \throws	Any exception thrown by sentence constructor.
 	 * \return	True if there was any sentence processed.
 	 */
-	bool
-	process_one();
+	std::variant<std::monostate, GPGGA, GPGSA, GPRMC, PMTKACK>
+	process_next();
 
   public:
 	/**
-	 * Verify that NMEA sentence is valid and has proper
-	 * checksum.
+	 * Verify that NMEA sentence is valid and has proper checksum.
 	 * \throws	NMEA exceptions: InvalidType, InvalidChecksum, InvalidMessage.
 	 */
 	void
@@ -106,7 +65,6 @@ class Parser: private Noncopyable
   private:
 	std::string		_input_buffer;
 	bool			_synchronized	= false;
-	Listener*		_listener;
 };
 
 } // namespace xf::nmea
