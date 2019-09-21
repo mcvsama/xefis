@@ -2,4 +2,4 @@
 /.branch
 /.commit
 /release
-/Makefile.local
+/Makefile.local*
