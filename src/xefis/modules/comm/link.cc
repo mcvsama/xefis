@@ -206,8 +206,7 @@ LinkProtocol::Signature::Signature (NonceBytes nonce_bytes, SignatureBytes signa
 	_nonce_bytes (*nonce_bytes),
 	_signature_bytes (*signature_bytes),
 	_key (*key),
-	_random_device(),
-	_rng (_random_device())
+	_rng (std::random_device{}())
 {
 	_temp.reserve (size());
 }

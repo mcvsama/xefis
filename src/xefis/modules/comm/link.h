@@ -321,12 +321,11 @@ class LinkProtocol
 		eat (Blob::const_iterator, Blob::const_iterator) override;
 
 	  private:
-		uint8_t				_nonce_bytes		{ 0 };
-		uint8_t				_signature_bytes	{ 0 };
-		Blob				_key;
-		std::random_device	_random_device;
-		std::mt19937		_rng;
-		Blob				_temp;
+		uint8_t			_nonce_bytes		{ 0 };
+		uint8_t			_signature_bytes	{ 0 };
+		Blob			_key;
+		std::mt19937	_rng;
+		Blob			_temp;
 	};
 
 	/**
