@@ -1,521 +1,405 @@
-# vim:ts=4
-
-include machines/Makefile.machines
-include $(foreach config, $(XEFIS_MACHINES), machines/$(config)/Makefile.sources)
-
-# Let modules compile first
-######## /xefis/modules/comm ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/comm/flight_gear.h
-XEFIS_HEADERS_MOC		+= xefis/modules/comm/link.h
-XEFIS_HEADERS_MOC		+= xefis/modules/comm/udp.h
-
-XEFIS_SOURCES			+= xefis/modules/comm/flight_gear.cc
-XEFIS_SOURCES			+= xefis/modules/comm/link.cc
-XEFIS_SOURCES			+= xefis/modules/comm/udp.cc
-
-SELFTEST_HEADERS_MOC	+= xefis/modules/comm/link.h
-
-SELFTEST_SOURCES		+= xefis/modules/comm/tests/link.test.cc
-SELFTEST_SOURCES		+= xefis/modules/comm/link.cc
-
-######## /xefis/modules/helpers ########
-
-XEFIS_HEADERS			+= xefis/modules/helpers/mixer.h
-
-######## /xefis/modules/instruments ########
-
-XEFIS_HEADERS			+= xefis/modules/instruments/adi.h
-XEFIS_HEADERS			+= xefis/modules/instruments/basic_gauge.h
-##XEFIS_HEADERS			+= xefis/modules/instruments/cdu.h TODO
-XEFIS_HEADERS			+= xefis/modules/instruments/datatable.h
-XEFIS_HEADERS			+= xefis/modules/instruments/debug_forces.h
-XEFIS_HEADERS			+= xefis/modules/instruments/flaps.h
-XEFIS_HEADERS			+= xefis/modules/instruments/gear.h
-XEFIS_HEADERS			+= xefis/modules/instruments/horizontal_trim.h
-XEFIS_HEADERS			+= xefis/modules/instruments/hsi.h
-XEFIS_HEADERS			+= xefis/modules/instruments/label.h
-XEFIS_HEADERS			+= xefis/modules/instruments/linear_gauge.h
-XEFIS_HEADERS			+= xefis/modules/instruments/radial_gauge.h
-XEFIS_HEADERS			+= xefis/modules/instruments/status.h
-XEFIS_HEADERS			+= xefis/modules/instruments/vertical_trim.h
-
-XEFIS_SOURCES			+= xefis/modules/instruments/adi.cc
-##XEFIS_SOURCES			+= xefis/modules/instruments/cdu.cc TODO
-XEFIS_SOURCES			+= xefis/modules/instruments/datatable.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/debug_forces.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/flaps.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/gear.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/horizontal_trim.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/hsi.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/label.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/linear_gauge.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/radial_gauge.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/status.cc
-XEFIS_SOURCES			+= xefis/modules/instruments/vertical_trim.cc
-
-######## /xefis/modules/io ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/io/bmp085.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/chr_um6.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/ets_airspeed.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/gps.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/joystick.h
-XEFIS_HEADERS_MOC		+= xefis/modules/io/xbee.h
-
-XEFIS_SOURCES			+= xefis/modules/io/bmp085.cc
-XEFIS_SOURCES			+= xefis/modules/io/chr_um6.cc
-XEFIS_SOURCES			+= xefis/modules/io/ets_airspeed.cc
-XEFIS_SOURCES			+= xefis/modules/io/gps.cc
-XEFIS_SOURCES			+= xefis/modules/io/joystick.cc
-XEFIS_SOURCES			+= xefis/modules/io/xbee.cc
-
-######## /xefis/modules/log ########
-
-XEFIS_HEADERS_MOC		+= xefis/modules/log/klog_monitor.h
-
-XEFIS_SOURCES			+= xefis/modules/log/klog_monitor.cc
-
-######## /xefis/modules/simulation ########
-
-XEFIS_HEADERS			+= xefis/modules/simulation/virtual_joystick.h
-XEFIS_HEADERS			+= xefis/modules/simulation/virtual_pressure_sensor.h
-XEFIS_HEADERS			+= xefis/modules/simulation/virtual_temperature_sensor.h
-
-XEFIS_SOURCES			+= xefis/modules/simulation/virtual_joystick.cc
-XEFIS_SOURCES			+= xefis/modules/simulation/virtual_pressure_sensor.cc
-XEFIS_SOURCES			+= xefis/modules/simulation/virtual_temperature_sensor.cc
-
-######## /xefis/modules/systems ########
-
-XEFIS_HEADERS			+= xefis/modules/systems/adc.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_ap.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_api.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_at.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_eac_yd.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_pitch.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_fd_roll.h
-XEFIS_HEADERS			+= xefis/modules/systems/afcs_roll_autotrim.h
-XEFIS_HEADERS			+= xefis/modules/systems/altacq.h
-XEFIS_HEADERS			+= xefis/modules/systems/arrival_eta.h
-XEFIS_HEADERS			+= xefis/modules/systems/engine_torque.h
-XEFIS_HEADERS			+= xefis/modules/systems/flaps_bugs.h
-XEFIS_HEADERS			+= xefis/modules/systems/flaps_control.h
-XEFIS_HEADERS			+= xefis/modules/systems/nc.h
-XEFIS_HEADERS			+= xefis/modules/systems/pc.h
-XEFIS_HEADERS			+= xefis/modules/systems/rcms.h
-XEFIS_HEADERS			+= xefis/modules/systems/speeds.h
-XEFIS_HEADERS			+= xefis/modules/systems/state.h
-XEFIS_HEADERS			+= xefis/modules/systems/trim_control.h
-XEFIS_HEADERS			+= xefis/modules/systems/vor.h
-XEFIS_HEADERS			+= xefis/modules/systems/watchdog.h
-
-XEFIS_SOURCES			+= xefis/modules/systems/adc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_ap.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_api.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_at.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_eac_yd.h
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_pitch.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_fd_roll.cc
-XEFIS_SOURCES			+= xefis/modules/systems/afcs_roll_autotrim.cc
-XEFIS_SOURCES			+= xefis/modules/systems/altacq.cc
-XEFIS_SOURCES			+= xefis/modules/systems/arrival_eta.cc
-XEFIS_SOURCES			+= xefis/modules/systems/engine_torque.cc
-XEFIS_SOURCES			+= xefis/modules/systems/flaps_bugs.cc
-XEFIS_SOURCES			+= xefis/modules/systems/flaps_control.cc
-XEFIS_SOURCES			+= xefis/modules/systems/nc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/pc.cc
-XEFIS_SOURCES			+= xefis/modules/systems/rcms.cc
-XEFIS_SOURCES			+= xefis/modules/systems/speeds.cc
-XEFIS_SOURCES			+= xefis/modules/systems/state.cc
-XEFIS_SOURCES			+= xefis/modules/systems/trim_control.cc
-XEFIS_SOURCES			+= xefis/modules/systems/vor.cc
-XEFIS_SOURCES			+= xefis/modules/systems/watchdog.cc
-
-######## /xefis/modules/test ########
-
-XEFIS_HEADERS			+= xefis/modules/test/imu_cpf.h
-XEFIS_HEADERS			+= xefis/modules/test/test_generator.h
-
-XEFIS_SOURCES			+= xefis/modules/test/imu_cpf.cc
-XEFIS_SOURCES			+= xefis/modules/test/test_generator.cc
-
-######## /xefis ########
-
-XEFIS_HEADERS			+= $(NEUTRINO_HEADERS)
-XEFIS_HEADERS_MOC		+= $(NEUTRINO_HEADERS_MOC)
-XEFIS_HEADERS			+= xefis/xefis_machine.h
-
-XEFIS_SOURCES			+= $(NEUTRINO_SOURCES)
-XEFIS_SOURCES_MOC		+= $(NEUTRINO_SOURCES_MOC)
-XEFIS_SOURCES			+= xefis/xefis.cc
-
-WATCHDOG_HEADERS		+= $(NEUTRINO_HEADERS)
-WATCHDOG_HEADERS_MOC	+= $(NEUTRINO_HEADERS_MOC)
-
-WATCHDOG_SOURCES		+= $(NEUTRINO_SOURCES)
-WATCHDOG_SOURCES		+= xefis/watchdog.cc
-
-SELFTEST_HEADERS		+= $(NEUTRINO_HEADERS)
-SELFTEST_HEADERS_MOC	+= $(NEUTRINO_HEADERS_MOC)
-
-SELFTEST_SOURCES		+= $(NEUTRINO_SOURCES)
-SELFTEST_SOURCES		+= xefis/selftest.cc
-
-######## /xefis/config ########
-
-XEFIS_HEADERS			+= xefis/config/all.h
-XEFIS_HEADERS			+= xefis/config/core_types.h
-XEFIS_HEADERS			+= xefis/config/resources.h
-
-NODEP_SOURCES			+= $(VERSION_FILE)
-
-######## /xefis/core/components ########
-
-XEFIS_HEADERS			+= xefis/core/components/configurator/configurator_widget.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/config_widget.h
-XEFIS_HEADERS_MOC		+= xefis/core/components/module_configurator/configurable_items_list.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_configurator.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_item.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/module_widget.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/processing_loop_item.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/processing_loop_widget.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/screen_item.h
-XEFIS_HEADERS			+= xefis/core/components/module_configurator/screen_widget.h
-XEFIS_HEADERS			+= xefis/core/components/data_recorder/data_recorder.h
-XEFIS_HEADERS			+= xefis/core/components/data_recorder/graph_widget.h
-XEFIS_HEADERS			+= xefis/core/components/data_recorder/graphs_stack.h
-XEFIS_HEADERS			+= xefis/core/components/property_tree/property_item.h
-XEFIS_HEADERS			+= xefis/core/components/property_tree/property_tree.h
-
-XEFIS_SOURCES			+= xefis/core/components/configurator/configurator_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/config_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/configurable_items_list.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_configurator.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_item.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/module_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/processing_loop_item.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/processing_loop_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/screen_item.cc
-XEFIS_SOURCES			+= xefis/core/components/module_configurator/screen_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/data_recorder/data_recorder.cc
-XEFIS_SOURCES			+= xefis/core/components/data_recorder/graph_widget.cc
-XEFIS_SOURCES			+= xefis/core/components/data_recorder/graphs_stack.cc
-XEFIS_SOURCES			+= xefis/core/components/property_tree/property_item.cc
-XEFIS_SOURCES			+= xefis/core/components/property_tree/property_tree.cc
-
-######## /xefis/core ########
-
-XEFIS_HEADERS			+= xefis/core/cycle.h
-XEFIS_HEADERS			+= xefis/core/graphics.h
-XEFIS_HEADERS			+= xefis/core/instrument.h
-XEFIS_HEADERS			+= xefis/core/licenses.h
-XEFIS_HEADERS			+= xefis/core/machine.h
-XEFIS_HEADERS			+= xefis/core/module.h
-XEFIS_HEADERS			+= xefis/core/module_io.h
-XEFIS_HEADERS			+= xefis/core/paint_request.h
-XEFIS_HEADERS_MOC		+= xefis/core/panel.h
-XEFIS_HEADERS_MOC		+= xefis/core/processing_loop.h
-XEFIS_HEADERS			+= xefis/core/property.h
-XEFIS_HEADERS			+= xefis/core/property.tcc
-XEFIS_HEADERS			+= xefis/core/property_converter.h
-XEFIS_HEADERS			+= xefis/core/property_in.h
-XEFIS_HEADERS			+= xefis/core/property_observer.h
-XEFIS_HEADERS			+= xefis/core/property_out.h
-XEFIS_HEADERS			+= xefis/core/property_path.h
-XEFIS_HEADERS			+= xefis/core/property_traits.h
-XEFIS_HEADERS_MOC		+= xefis/core/screen.h
-XEFIS_HEADERS			+= xefis/core/screen_spec.h
-XEFIS_HEADERS			+= xefis/core/setting.h
-XEFIS_HEADERS_MOC		+= xefis/core/xefis.h
-
-XEFIS_SOURCES			+= xefis/core/graphics.cc
-XEFIS_SOURCES			+= xefis/core/licenses.cc
-XEFIS_SOURCES			+= xefis/core/machine.cc
-XEFIS_SOURCES			+= xefis/core/module.cc
-XEFIS_SOURCES			+= xefis/core/module_io.cc
-XEFIS_SOURCES			+= xefis/core/panel.cc
-XEFIS_SOURCES			+= xefis/core/processing_loop.cc
-XEFIS_SOURCES			+= xefis/core/property_observer.cc
-XEFIS_SOURCES			+= xefis/core/screen.cc
-XEFIS_SOURCES			+= xefis/core/system.cc
-XEFIS_SOURCES			+= xefis/core/xefis.cc
-
-SELFTEST_HEADERS		+= xefis/core/module.h
-SELFTEST_HEADERS		+= xefis/core/module_io.h
-SELFTEST_HEADERS		+= xefis/core/property.h
-SELFTEST_HEADERS		+= xefis/core/property.tcc
-
-SELFTEST_SOURCES		+= xefis/core/tests/property.test.cc
-SELFTEST_SOURCES		+= xefis/core/tests/property_observer.test.cc
-SELFTEST_SOURCES		+= xefis/core/module.cc
-SELFTEST_SOURCES		+= xefis/core/module_io.cc
-SELFTEST_SOURCES		+= xefis/core/property_observer.cc
-
-######## /xefis/support/airframe ########
-
-XEFIS_HEADERS			+= xefis/support/airframe/airframe.h
-XEFIS_HEADERS			+= xefis/support/airframe/drag.h
-XEFIS_HEADERS			+= xefis/support/airframe/flaps.h
-XEFIS_HEADERS			+= xefis/support/airframe/lift.h
-XEFIS_HEADERS			+= xefis/support/airframe/lift_mod.h
-XEFIS_HEADERS			+= xefis/support/airframe/spoilers.h
-
-XEFIS_SOURCES			+= xefis/support/airframe/airframe.cc
-XEFIS_SOURCES			+= xefis/support/airframe/drag.cc
-XEFIS_SOURCES			+= xefis/support/airframe/lift.cc
-XEFIS_SOURCES			+= xefis/support/airframe/lift_mod.cc
-
-######## /xefis/support/control ########
-
-XEFIS_HEADERS			+= xefis/support/control/pid_controller.h
-
-######## /xefis/support/devices ########
-
-XEFIS_HEADERS			+= xefis/support/devices/chr_um6.h
-XEFIS_HEADERS_MOC		+= xefis/support/devices/ht16k33.h
-XEFIS_HEADERS_MOC		+= xefis/support/devices/pca9685.h
-
-XEFIS_SOURCES			+= xefis/support/devices/chr_um6.cc
-XEFIS_SOURCES			+= xefis/support/devices/ht16k33.cc
-XEFIS_SOURCES			+= xefis/support/devices/pca9685.cc
-
-######## /xefis/support/earth ########
-
-XEFIS_HEADERS			+= xefis/support/earth/navigation/magnetic_variation.h
-XEFIS_HEADERS			+= xefis/support/earth/navigation/navaid.h
-XEFIS_HEADERS			+= xefis/support/earth/navigation/navaid_storage.h
-XEFIS_HEADERS			+= xefis/support/earth/navigation/wind_triangle.h
-XEFIS_HEADERS			+= xefis/support/earth/air.h
-XEFIS_HEADERS			+= xefis/support/earth/earth.h
-
-XEFIS_SOURCES			+= xefis/support/earth/navigation/magnetic_variation.cc
-XEFIS_SOURCES			+= xefis/support/earth/navigation/navaid_storage.cc
-XEFIS_SOURCES			+= xefis/support/earth/air.cc
-XEFIS_SOURCES			+= xefis/support/earth/earth.cc
-
-SELFTEST_SOURCES		+= xefis/support/earth/tests/air.test.cc
-SELFTEST_SOURCES		+= xefis/support/earth/air.cc
-
-######## /xefis/support/instrument ########
-
-XEFIS_HEADERS			+= xefis/support/instrument/instrument_aids.h
-XEFIS_HEADERS			+= xefis/support/instrument/instrument_painter.h
-XEFIS_HEADERS			+= xefis/support/instrument/instrument_support.h
-XEFIS_HEADERS			+= xefis/support/instrument/shadow.h
-XEFIS_HEADERS			+= xefis/support/instrument/shadow_painter.h
-XEFIS_HEADERS			+= xefis/support/instrument/text_layout.h
-XEFIS_HEADERS			+= xefis/support/instrument/text_painter.h
-
-XEFIS_SOURCES			+= xefis/support/instrument/instrument_aids.cc
-XEFIS_SOURCES			+= xefis/support/instrument/instrument_painter.cc
-XEFIS_SOURCES			+= xefis/support/instrument/shadow_painter.cc
-XEFIS_SOURCES			+= xefis/support/instrument/text_layout.cc
-XEFIS_SOURCES			+= xefis/support/instrument/text_painter.cc
-
-######## /xefis/support/math ########
-
-XEFIS_HEADERS			+= xefis/support/math/angle_of_attack.h
-XEFIS_HEADERS			+= xefis/support/math/euler_angles.h
-XEFIS_HEADERS			+= xefis/support/math/frame_of_reference.h
-XEFIS_HEADERS			+= xefis/support/math/geometry.h
-XEFIS_HEADERS			+= xefis/support/math/lonlat_radius.h
-XEFIS_HEADERS			+= xefis/support/math/north_east_down.h
-XEFIS_HEADERS			+= xefis/support/math/position_rotation.h
-XEFIS_HEADERS			+= xefis/support/math/position_rotation.tcc
-XEFIS_HEADERS			+= xefis/support/math/space.h
-XEFIS_HEADERS			+= xefis/support/math/tait_bryan_angles.h
-XEFIS_HEADERS			+= xefis/support/math/transforms.h
-
-XEFIS_SOURCES			+= xefis/support/math/transforms.cc
-
-######## /xefis/support/nature ########
-
-XEFIS_HEADERS			+= xefis/support/nature/constants.h
-XEFIS_HEADERS			+= xefis/support/nature/physics.h
-
-######## /xefis/support/protocols/nmea ########
-
-XEFIS_HEADERS			+= xefis/support/protocols/nmea/exceptions.h
-XEFIS_HEADERS			+= xefis/support/protocols/nmea/gps.h
-XEFIS_HEADERS			+= xefis/support/protocols/nmea/mtk.h
-XEFIS_HEADERS			+= xefis/support/protocols/nmea/nmea.h
-XEFIS_HEADERS			+= xefis/support/protocols/nmea/parser.h
-
-XEFIS_SOURCES			+= xefis/support/protocols/nmea/gps.cc
-XEFIS_SOURCES			+= xefis/support/protocols/nmea/mtk.cc
-XEFIS_SOURCES			+= xefis/support/protocols/nmea/nmea.cc
-XEFIS_SOURCES			+= xefis/support/protocols/nmea/parser.cc
-
-######## /xefis/support/qt ########
-
-XEFIS_HEADERS			+= xefis/support/qt/ownership_breaker.h
-
-XEFIS_SOURCES			+= xefis/support/qt/ownership_breaker.cc
-
-######## /xefis/support/simulation/n_body ########
-
-XEFIS_HEADERS			+= xefis/support/simulation/n_body/body.h
-XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_functions.h
-XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_part.h
-XEFIS_HEADERS			+= xefis/support/simulation/n_body/body_shape.h
-
-XEFIS_SOURCES			+= xefis/support/simulation/n_body/body.cc
-XEFIS_SOURCES			+= xefis/support/simulation/n_body/body_part.cc
-XEFIS_SOURCES			+= xefis/support/simulation/n_body/body_shape.cc
-
-######## /xefis/support/simulation ########
-
-XEFIS_HEADERS			+= xefis/support/simulation/air_space.h
-XEFIS_HEADERS			+= xefis/support/simulation/airfoil.h
-XEFIS_HEADERS			+= xefis/support/simulation/airfoil_shape.h
-XEFIS_HEADERS			+= xefis/support/simulation/airfoil_spline.h
-XEFIS_HEADERS			+= xefis/support/simulation/airframe.h
-XEFIS_HEADERS			+= xefis/support/simulation/atmosphere.h
-XEFIS_HEADERS			+= xefis/support/simulation/engine.h
-XEFIS_HEADERS			+= xefis/support/simulation/flight_simulation.h
-
-XEFIS_SOURCES			+= xefis/support/simulation/air_space.cc
-XEFIS_SOURCES			+= xefis/support/simulation/airfoil.cc
-XEFIS_SOURCES			+= xefis/support/simulation/airfoil_shape.cc
-XEFIS_SOURCES			+= xefis/support/simulation/airfoil_spline.cc
-XEFIS_SOURCES			+= xefis/support/simulation/airframe.cc
-XEFIS_SOURCES			+= xefis/support/simulation/atmosphere.cc
-XEFIS_SOURCES			+= xefis/support/simulation/engine.cc
-XEFIS_SOURCES			+= xefis/support/simulation/flight_simulation.cc
-
-######## /xefis/support/ui/widgets ########
-
-# TODO
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/group_box.h TODO
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_button.h TODO
-#XEFIS_HEADERS_MOC		+= xefis/support/ui/widgets/panel_rotary_encoder.h TODO
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_numeric_display.h TODO
-#XEFIS_HEADERS			+= xefis/support/ui/widgets/panel_widget.h TODO
-#
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/group_box.cc TODO
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_button.cc TODO
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_rotary_encoder.cc TODO
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_numeric_display.cc TODO
-#XEFIS_SOURCES			+= xefis/support/ui/widgets/panel_widget.cc TODO
-
-######## /xefis/support/ui ########
-
-XEFIS_HEADERS			+= xefis/support/ui/histogram_widget.h
-XEFIS_HEADERS			+= xefis/support/ui/histogram_stats_widget.h
-XEFIS_HEADERS			+= xefis/support/ui/sound_manager.h
-XEFIS_HEADERS			+= xefis/support/ui/widget.h
-
-XEFIS_SOURCES			+= xefis/support/ui/histogram_widget.cc
-XEFIS_SOURCES			+= xefis/support/ui/histogram_stats_widget.cc
-XEFIS_SOURCES			+= xefis/support/ui/sound_manager.cc
-XEFIS_SOURCES			+= xefis/support/ui/widget.cc
-
-SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer.cc
-SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer_widget.cc
-
-SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer.cc
-SELFTEST_SOURCES		+= xefis/support/ui/n_body_viewer_widget.cc
-
-######## /xefis/utility ########
-
-XEFIS_HEADERS			+= xefis/utility/actions.h
-XEFIS_HEADERS			+= xefis/utility/blob.h
-XEFIS_HEADERS			+= xefis/utility/callback_actions.h
-XEFIS_HEADERS			+= xefis/utility/convergence.h
-XEFIS_HEADERS			+= xefis/utility/delta_decoder.h
-XEFIS_HEADERS			+= xefis/utility/event_timestamper.h
-XEFIS_HEADERS			+= xefis/utility/hextable.h
-XEFIS_HEADERS			+= xefis/utility/kde.h
-XEFIS_HEADERS			+= xefis/utility/lookahead.h
-XEFIS_HEADERS			+= xefis/utility/named_instance.h
-XEFIS_HEADERS			+= xefis/utility/packet_reader.h
-XEFIS_HEADERS			+= xefis/utility/quadrature_decoder.h
-XEFIS_HEADERS			+= xefis/utility/range_smoother.h
-XEFIS_HEADERS			+= xefis/utility/smoother.h
-XEFIS_HEADERS			+= xefis/utility/string.h
-XEFIS_HEADERS			+= xefis/utility/temporal.h
-XEFIS_HEADERS			+= xefis/utility/transistor.h
-XEFIS_HEADERS			+= xefis/utility/types.h
-
-XEFIS_SOURCES			+= xefis/utility/kde.cc
-XEFIS_SOURCES			+= xefis/utility/packet_reader.cc
-
-SELFTEST_SOURCES		+= xefis/utility/tests/blob.test.cc
-SELFTEST_SOURCES		+= xefis/utility/tests/delta_decoder.test.cc
-SELFTEST_SOURCES		+= xefis/utility/tests/quadrature_decoder.test.cc
+VERSION_FILE						:= neutrino/core/version.cc
+
+PROJECTS += xefis
+PROJECTS.xefis.files				+= $(PROJECTS.neutrino.files)
+PROJECTS.xefis.files_moc			+= $(PROJECTS.neutrino.files_moc)
+PROJECTS.xefis.files				+= $(VERSION_FILE)
+PROJECTS.xefis.files				+= xefis/config/all.h
+PROJECTS.xefis.files				+= xefis/config/core_types.h
+PROJECTS.xefis.files				+= xefis/config/resources.h
+PROJECTS.xefis.files				+= xefis/core/components/configurator/configurator_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/configurator/configurator_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/data_recorder.cc
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/data_recorder.h
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/graphs_stack.cc
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/graphs_stack.h
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/graph_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/data_recorder/graph_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/configurable_items_list.cc
+PROJECTS.xefis.files_moc			+= xefis/core/components/module_configurator/configurable_items_list.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/config_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/config_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_configurator.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_configurator.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_item.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_item.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/module_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/processing_loop_item.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/processing_loop_item.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/processing_loop_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/processing_loop_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/screen_item.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/screen_item.h
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/screen_widget.cc
+PROJECTS.xefis.files				+= xefis/core/components/module_configurator/screen_widget.h
+PROJECTS.xefis.files				+= xefis/core/components/property_tree/property_item.cc
+PROJECTS.xefis.files				+= xefis/core/components/property_tree/property_item.h
+PROJECTS.xefis.files				+= xefis/core/components/property_tree/property_tree.cc
+PROJECTS.xefis.files				+= xefis/core/components/property_tree/property_tree.h
+PROJECTS.xefis.files				+= xefis/core/cycle.h
+PROJECTS.xefis.files				+= xefis/core/graphics.cc
+PROJECTS.xefis.files				+= xefis/core/graphics.h
+PROJECTS.xefis.files				+= xefis/core/instrument.h
+PROJECTS.xefis.files				+= xefis/core/licenses.cc
+PROJECTS.xefis.files				+= xefis/core/licenses.h
+PROJECTS.xefis.files				+= xefis/core/machine.cc
+PROJECTS.xefis.files				+= xefis/core/machine.h
+PROJECTS.xefis.files				+= xefis/core/module.cc
+PROJECTS.xefis.files				+= xefis/core/module.h
+PROJECTS.xefis.files				+= xefis/core/module_io.cc
+PROJECTS.xefis.files				+= xefis/core/module_io.h
+PROJECTS.xefis.files				+= xefis/core/paint_request.h
+PROJECTS.xefis.files				+= xefis/core/panel.cc
+PROJECTS.xefis.files_moc			+= xefis/core/panel.h
+PROJECTS.xefis.files				+= xefis/core/processing_loop.cc
+PROJECTS.xefis.files_moc			+= xefis/core/processing_loop.h
+PROJECTS.xefis.files				+= xefis/core/property_converter.h
+PROJECTS.xefis.files				+= xefis/core/property.h
+PROJECTS.xefis.files				+= xefis/core/property_in.h
+PROJECTS.xefis.files				+= xefis/core/property_observer.cc
+PROJECTS.xefis.files				+= xefis/core/property_observer.h
+PROJECTS.xefis.files				+= xefis/core/property_out.h
+PROJECTS.xefis.files				+= xefis/core/property_path.h
+PROJECTS.xefis.files				+= xefis/core/property.tcc
+PROJECTS.xefis.files				+= xefis/core/property_traits.h
+PROJECTS.xefis.files				+= xefis/core/screen.cc
+PROJECTS.xefis.files_moc			+= xefis/core/screen.h
+PROJECTS.xefis.files				+= xefis/core/screen_spec.h
+PROJECTS.xefis.files				+= xefis/core/setting.h
+PROJECTS.xefis.files				+= xefis/core/system.cc
+PROJECTS.xefis.files				+= xefis/core/xefis.cc
+PROJECTS.xefis.files_moc			+= xefis/core/xefis.h
+PROJECTS.xefis.files				+= xefis/modules/comm/flight_gear.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/comm/flight_gear.h
+PROJECTS.xefis.files				+= xefis/modules/comm/link.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/comm/link.h
+PROJECTS.xefis.files				+= xefis/modules/comm/udp.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/comm/udp.h
+PROJECTS.xefis.files				+= xefis/modules/helpers/mixer.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/adi.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/adi.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/basic_gauge.h
+#PROJECTS.xefis.files				+= xefis/modules/instruments/cdu.cc TODO
+#PROJECTS.xefis.files				+= xefis/modules/instruments/cdu.h TODO
+PROJECTS.xefis.files				+= xefis/modules/instruments/datatable.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/datatable.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/debug_forces.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/debug_forces.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/flaps.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/flaps.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/gear.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/gear.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/horizontal_trim.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/horizontal_trim.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/hsi.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/hsi.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/label.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/label.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/linear_gauge.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/linear_gauge.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/radial_gauge.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/radial_gauge.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/status.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/status.h
+PROJECTS.xefis.files				+= xefis/modules/instruments/vertical_trim.cc
+PROJECTS.xefis.files				+= xefis/modules/instruments/vertical_trim.h
+PROJECTS.xefis.files				+= xefis/modules/io/bmp085.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/bmp085.h
+PROJECTS.xefis.files				+= xefis/modules/io/chr_um6.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/chr_um6.h
+PROJECTS.xefis.files				+= xefis/modules/io/ets_airspeed.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/ets_airspeed.h
+PROJECTS.xefis.files				+= xefis/modules/io/gps.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/gps.h
+PROJECTS.xefis.files				+= xefis/modules/io/joystick.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/joystick.h
+PROJECTS.xefis.files				+= xefis/modules/io/xbee.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/io/xbee.h
+PROJECTS.xefis.files				+= xefis/modules/log/klog_monitor.cc
+PROJECTS.xefis.files_moc			+= xefis/modules/log/klog_monitor.h
+PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_joystick.cc
+PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_joystick.h
+#PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_pressure_sensor.cc
+#PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_pressure_sensor.h
+#PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_temperature_sensor.cc
+#PROJECTS.xefis.files				+= xefis/modules/simulation/virtual_temperature_sensor.h
+PROJECTS.xefis.files				+= xefis/modules/systems/adc.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/adc.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_ap.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_ap.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_api.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_api.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_at.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_at.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_eac_yd.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_eac_yd.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_fd_pitch.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_fd_pitch.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_fd_roll.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_fd_roll.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs.h
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_roll_autotrim.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/afcs_roll_autotrim.h
+PROJECTS.xefis.files				+= xefis/modules/systems/altacq.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/altacq.h
+PROJECTS.xefis.files				+= xefis/modules/systems/arrival_eta.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/arrival_eta.h
+PROJECTS.xefis.files				+= xefis/modules/systems/engine_torque.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/engine_torque.h
+PROJECTS.xefis.files				+= xefis/modules/systems/flaps_bugs.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/flaps_bugs.h
+PROJECTS.xefis.files				+= xefis/modules/systems/flaps_control.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/flaps_control.h
+PROJECTS.xefis.files				+= xefis/modules/systems/nc.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/nc.h
+PROJECTS.xefis.files				+= xefis/modules/systems/pc.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/pc.h
+PROJECTS.xefis.files				+= xefis/modules/systems/rcms.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/rcms.h
+PROJECTS.xefis.files				+= xefis/modules/systems/speeds.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/speeds.h
+PROJECTS.xefis.files				+= xefis/modules/systems/state.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/state.h
+PROJECTS.xefis.files				+= xefis/modules/systems/trim_control.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/trim_control.h
+PROJECTS.xefis.files				+= xefis/modules/systems/vor.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/vor.h
+PROJECTS.xefis.files				+= xefis/modules/systems/watchdog.cc
+PROJECTS.xefis.files				+= xefis/modules/systems/watchdog.h
+PROJECTS.xefis.files				+= xefis/modules/test/imu_cpf.cc
+PROJECTS.xefis.files				+= xefis/modules/test/imu_cpf.h
+PROJECTS.xefis.files				+= xefis/modules/test/test_generator.cc
+PROJECTS.xefis.files				+= xefis/modules/test/test_generator.h
+PROJECTS.xefis.files				+= xefis/support/airframe/airframe.cc
+PROJECTS.xefis.files				+= xefis/support/airframe/airframe.h
+PROJECTS.xefis.files				+= xefis/support/airframe/drag.cc
+PROJECTS.xefis.files				+= xefis/support/airframe/drag.h
+PROJECTS.xefis.files				+= xefis/support/airframe/flaps.h
+PROJECTS.xefis.files				+= xefis/support/airframe/lift.cc
+PROJECTS.xefis.files				+= xefis/support/airframe/lift.h
+PROJECTS.xefis.files				+= xefis/support/airframe/lift_mod.cc
+PROJECTS.xefis.files				+= xefis/support/airframe/lift_mod.h
+PROJECTS.xefis.files				+= xefis/support/airframe/spoilers.h
+PROJECTS.xefis.files				+= xefis/support/control/pid_controller.h
+PROJECTS.xefis.files				+= xefis/support/devices/chr_um6.cc
+PROJECTS.xefis.files				+= xefis/support/devices/chr_um6.h
+PROJECTS.xefis.files				+= xefis/support/devices/ht16k33.cc
+PROJECTS.xefis.files_moc			+= xefis/support/devices/ht16k33.h
+PROJECTS.xefis.files				+= xefis/support/devices/pca9685.cc
+PROJECTS.xefis.files_moc			+= xefis/support/devices/pca9685.h
+PROJECTS.xefis.files				+= xefis/support/earth/air.cc
+PROJECTS.xefis.files				+= xefis/support/earth/air.h
+PROJECTS.xefis.files				+= xefis/support/earth/earth.cc
+PROJECTS.xefis.files				+= xefis/support/earth/earth.h
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/magnetic_variation.cc
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/magnetic_variation.h
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/navaid.h
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/navaid_storage.cc
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/navaid_storage.h
+PROJECTS.xefis.files				+= xefis/support/earth/navigation/wind_triangle.h
+PROJECTS.xefis.files				+= xefis/support/instrument/instrument_aids.cc
+PROJECTS.xefis.files				+= xefis/support/instrument/instrument_aids.h
+PROJECTS.xefis.files				+= xefis/support/instrument/instrument_painter.cc
+PROJECTS.xefis.files				+= xefis/support/instrument/instrument_painter.h
+PROJECTS.xefis.files				+= xefis/support/instrument/instrument_support.h
+PROJECTS.xefis.files				+= xefis/support/instrument/shadow.h
+PROJECTS.xefis.files				+= xefis/support/instrument/shadow_painter.cc
+PROJECTS.xefis.files				+= xefis/support/instrument/shadow_painter.h
+PROJECTS.xefis.files				+= xefis/support/instrument/text_layout.cc
+PROJECTS.xefis.files				+= xefis/support/instrument/text_layout.h
+PROJECTS.xefis.files				+= xefis/support/instrument/text_painter.cc
+PROJECTS.xefis.files				+= xefis/support/instrument/text_painter.h
+PROJECTS.xefis.files				+= xefis/support/math/angle_of_attack.h
+PROJECTS.xefis.files				+= xefis/support/math/euler_angles.h
+PROJECTS.xefis.files				+= xefis/support/math/geometry.h
+PROJECTS.xefis.files				+= xefis/support/math/lonlat_radius.h
+PROJECTS.xefis.files				+= xefis/support/math/north_east_down.h
+PROJECTS.xefis.files				+= xefis/support/math/position_rotation.h
+PROJECTS.xefis.files				+= xefis/support/math/position_rotation.tcc
+PROJECTS.xefis.files				+= xefis/support/math/space.h
+PROJECTS.xefis.files				+= xefis/support/math/tait_bryan_angles.h
+PROJECTS.xefis.files				+= xefis/support/math/transforms.cc
+PROJECTS.xefis.files				+= xefis/support/math/transforms.h
+PROJECTS.xefis.files				+= xefis/support/nature/acceleration_moments.h
+PROJECTS.xefis.files				+= xefis/support/nature/constants.h
+PROJECTS.xefis.files				+= xefis/support/nature/force_moments.h
+PROJECTS.xefis.files				+= xefis/support/nature/mass_moments.h
+PROJECTS.xefis.files				+= xefis/support/nature/physics.h
+PROJECTS.xefis.files				+= xefis/support/nature/velocity_moments.h
+PROJECTS.xefis.files				+= xefis/support/nature/wrench.h
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/exceptions.h
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/gps.cc
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/gps.h
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/mtk.cc
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/mtk.h
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/nmea.cc
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/nmea.h
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/parser.cc
+PROJECTS.xefis.files				+= xefis/support/protocols/nmea/parser.h
+PROJECTS.xefis.files				+= xefis/support/qt/ownership_breaker.cc
+PROJECTS.xefis.files				+= xefis/support/qt/ownership_breaker.h
+PROJECTS.xefis.files				+= xefis/support/simulation/components/capacitor.h
+PROJECTS.xefis.files				+= xefis/support/simulation/components/inductor.h
+PROJECTS.xefis.files				+= xefis/support/simulation/components/resistor.h
+PROJECTS.xefis.files				+= xefis/support/simulation/components/shockley_diode.h
+PROJECTS.xefis.files				+= xefis/support/simulation/components/voltage_source.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/angular_servo_constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/fixed_constraint.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/fixed_constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge_constraint.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge_constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge_spring_constraint.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/hinge_spring_constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/slider_constraint.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/constraints/slider_constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/aerodynamic/airfoil_spline.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/aerodynamic/airfoil_spline.h
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/aerodynamic/atmosphere.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/aerodynamic/atmosphere.h
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/angular_servo.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/devices/angular_servo.h
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/element.h
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/exception.h
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/network.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/network.h
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/node.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/node.h
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/node_voltage_solver.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/electrical/node_voltage_solver.h
+PROJECTS.xefis.files				+= xefis/support/simulation/failure/sigmoidal_temperature_failure.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/failure/sigmoidal_temperature_failure.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/body.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/constraint.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/frames.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/rigid_body_simulation.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/rigid_body_simulation.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/rigid_body_system.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/rigid_body_system.h
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/utility.cc
+PROJECTS.xefis.files				+= xefis/support/simulation/rigid_body/utility.h
+PROJECTS.xefis.files				+= xefis/support/ui/histogram_stats_widget.cc
+PROJECTS.xefis.files				+= xefis/support/ui/histogram_stats_widget.h
+PROJECTS.xefis.files				+= xefis/support/ui/histogram_widget.cc
+PROJECTS.xefis.files				+= xefis/support/ui/histogram_widget.h
+PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_painter.cc
+PROJECTS.xefis.files				+= xefis/support/ui/rigid_body_painter.h
+PROJECTS.xefis.files				+= xefis/support/ui/sound_manager.cc
+PROJECTS.xefis.files				+= xefis/support/ui/sound_manager.h
+PROJECTS.xefis.files				+= xefis/support/ui/widget.cc
+PROJECTS.xefis.files				+= xefis/support/ui/widget.h
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/group_box.cc TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/group_box.h TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_button.cc TODO
+#PROJECTS.xefis.files_moc			+= xefis/support/ui/widgets/panel_button.h TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_numeric_display.cc TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_numeric_display.h TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_rotary_encoder.cc TODO
+#PROJECTS.xefis.files_moc			+= xefis/support/ui/widgets/panel_rotary_encoder.h TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_widget.cc TODO
+#PROJECTS.xefis.files				+= xefis/support/ui/widgets/panel_widget.h TODO
+PROJECTS.xefis.files				+= xefis/utility/actions.h
+PROJECTS.xefis.files				+= xefis/utility/blob.h
+PROJECTS.xefis.files				+= xefis/utility/callback_actions.h
+PROJECTS.xefis.files				+= xefis/utility/convergence.h
+PROJECTS.xefis.files				+= xefis/utility/delta_decoder.h
+PROJECTS.xefis.files				+= xefis/utility/event_timestamper.h
+PROJECTS.xefis.files				+= xefis/utility/hextable.h
+PROJECTS.xefis.files				+= xefis/utility/kde.cc
+PROJECTS.xefis.files				+= xefis/utility/kde.h
+PROJECTS.xefis.files				+= xefis/utility/lookahead.h
+PROJECTS.xefis.files				+= xefis/utility/named_instance.h
+PROJECTS.xefis.files				+= xefis/utility/packet_reader.cc
+PROJECTS.xefis.files				+= xefis/utility/packet_reader.h
+PROJECTS.xefis.files				+= xefis/utility/quadrature_decoder.h
+PROJECTS.xefis.files				+= xefis/utility/range_smoother.h
+PROJECTS.xefis.files				+= xefis/utility/smoother.h
+PROJECTS.xefis.files				+= xefis/utility/string.h
+PROJECTS.xefis.files				+= xefis/utility/temporal.h
+PROJECTS.xefis.files				+= xefis/utility/transistor.h
+PROJECTS.xefis.files				+= xefis/utility/types.h
+PROJECTS.xefis.files				+= xefis/xefis.cc
+PROJECTS.xefis.files				+= xefis/xefis_machine.h
+
+PROJECTS += xefis_selftest
+PROJECTS.xefis_selftest.executable	= selftest
+PROJECTS.xefis_selftest.files		+= $(PROJECTS.neutrino.files)
+PROJECTS.xefis_selftest.files_moc	+= $(PROJECTS.neutrino.files_moc)
+PROJECTS.xefis_selftest.files		+= $(VERSION_FILE)
+PROJECTS.xefis_selftest.files		+= xefis/core/module.cc
+PROJECTS.xefis_selftest.files		+= xefis/core/module.h
+PROJECTS.xefis_selftest.files		+= xefis/core/module_io.cc
+PROJECTS.xefis_selftest.files		+= xefis/core/module_io.h
+PROJECTS.xefis_selftest.files		+= xefis/core/property.h
+PROJECTS.xefis_selftest.files		+= xefis/core/property_observer.cc
+PROJECTS.xefis_selftest.files		+= xefis/core/property.tcc
+PROJECTS.xefis_selftest.files		+= xefis/core/tests/property_observer.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/core/tests/property.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/modules/comm/link.cc
+PROJECTS.xefis_selftest.files_moc	+= xefis/modules/comm/link.h
+PROJECTS.xefis_selftest.files		+= xefis/modules/comm/tests/link.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/selftest.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/earth/air.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/earth/tests/air.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/math/transforms.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/nature/tests/nature.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/angular_servo_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/angular_servo_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/fixed_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/hinge.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/hinge_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/hinge_spring_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/constraints/slider_constraint.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/devices/angular_servo.cc
+#PROJECTS.xefis_selftest.files		+= xefis/support/simulation/electrical/loop_current_solver.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/electrical/network.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/electrical/node.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/electrical/node_voltage_solver.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/electrical/tests/network.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/failure/sigmoidal_temperature_failure.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/failure/tests/sigmoidal_temperature_failure.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/rigid_body/rigid_body_simulation.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/rigid_body/rigid_body_system.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/rigid_body/tests/rigid_body_simulation.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/rigid_body/tests/rigid_body_system.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/simulation/rigid_body/utility.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/ui/rigid_body_painter.cc
+PROJECTS.xefis_selftest.files		+= xefis/support/ui/widget.cc
+PROJECTS.xefis_selftest.files		+= xefis/utility/tests/blob.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/utility/tests/delta_decoder.test.cc
+PROJECTS.xefis_selftest.files		+= xefis/utility/tests/quadrature_decoder.test.cc
+
+# TODO move xefis/selftest.cc to neutrino
+# TODO rename selftest to autotest
+# TODO create new manualtest?
+#PROJECTS.neutrino_selftest.executable	= neutrino_selftest
+#PROJECTS.neutrino_selftest.files		+= xefis/selftest.cc
+PROJECTS.xefis_selftest.files		+= $(PROJECTS.neutrino_selftest.files)
+PROJECTS.xefis_selftest.files_moc	+= $(PROJECTS.neutrino_selftest.files_moc)
+
+PROJECTS += watchdog
+PROJECTS.watchdog.executable		= watchdog
+PROJECTS.watchdog.files				+= $(PROJECTS.neutrino.files)
+PROJECTS.watchdog.files_moc			+= $(PROJECTS.neutrino.files_moc)
+PROJECTS.watchdog.files				+= $(VERSION_FILE)
+PROJECTS.watchdog.files				+= xefis/watchdog.cc
 
 ################
 
-machine_headers						= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_HEADERS))
-machine_headers_moc					= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_HEADERS_MOC))
-machine_selftest_headers			= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_HEADERS))
-machine_selftest_headers_moc		= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_HEADERS_MOC))
-machine_sources						= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SOURCES))
-machine_sources_moc					= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SOURCES_MOC))
-machine_selftest_sources			= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_SOURCES))
-machine_selftest_sources_moc		= $(addprefix machines/,$(XEFIS_MACHINE_$(1)_SELFTEST_SOURCES_MOC))
+include machines/Makefile.machines
+include $(foreach machine,$(XEFIS_MACHINES), machines/$(machine)/Makefile.sources)
 
-machine_objects						= $(call mkobjs,$(call machine_sources,$(1)))
-machine_objects_moc					= $(call mkobjs,$(call machine_sources_moc,$(1)))
-machine_selftest_objects			= $(call mkobjs,$(call machine_selftest_sources,$(1)))
-machine_selftest_objects_moc		= $(call mkobjs,$(call machine_selftest_sources_moc,$(1)))
+define MACHINE_TEMPLATE =
+ PROJECTS += machine.$(1)
+ PROJECTS.machine.$(1).executable	= machine.$(1)
+ PROJECTS.machine.$(1).files		+= $$(PROJECTS.xefis.files)
+ PROJECTS.machine.$(1).files_moc	+= $$(PROJECTS.xefis.files_moc)
+ PROJECTS.machine.$(1).files		+= $$(addprefix machines/,$$(XEFIS_MACHINES.$(1).files))
+ PROJECTS.machine.$(1).files_moc	+= $$(addprefix machines/,$$(XEFIS_MACHINES.$(1).files_moc))
+endef
 
-ALL_MACHINES_HEADERS				+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_headers,$(machine_name)))
-ALL_MACHINES_HEADERS_MOC			+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_headers_moc,$(machine_name)))
-ALL_MACHINES_SELFTEST_HEADERS		+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_headers,$(machine_name)))
-ALL_MACHINES_SELFTEST_HEADERS_MOC	+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_headers_moc,$(machine_name)))
-ALL_MACHINES_SOURCES				+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_sources,$(machine_name)))
-ALL_MACHINES_SOURCES_MOC			+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_sources_moc,$(machine_name)))
-ALL_MACHINES_SELFTEST_SOURCES		+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_sources,$(machine_name)))
-ALL_MACHINES_SELFTEST_SOURCES_MOC	+= $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_selftest_sources_moc,$(machine_name)))
-
-ALL_MACHINES_MOCOBJS				+= $(call mkmocobjs,$(ALL_MACHINES_SOURCES_MOC))
-ALL_MACHINES_SELFTEST_MOCOBJS		+= $(call mkmocobjs,$(ALL_MACHINES_SELFTEST_SOURCES_MOC))
-
-XEFIS_HEADERS						+= $(XEFIS_HEADERS_MOC)
-XEFIS_OBJECTS						+= $(call mkobjs, $(XEFIS_SOURCES))
-XEFIS_SOURCES_MOC					+= $(call mkmocs, $(XEFIS_HEADERS_MOC))
-XEFIS_MOCOBJS						+= $(call mkmocobjs, $(XEFIS_SOURCES_MOC))
-
-WATCHDOG_HEADERS					+= $(WATCHDOG_HEADERS_MOC)
-WATCHDOG_OBJECTS					+= $(call mkobjs, $(WATCHDOG_SOURCES))
-WATCHDOG_SOURCES_MOC				+= $(call mkmocs, $(WATCHDOG_HEADERS_MOC))
-WATCHDOG_MOCOBJS					+= $(call mkmocobjs, $(WATCHDOG_SOURCES_MOC))
-
-SELFTEST_HEADERS					+= $(ALL_MACHINES_SELFTEST_HEADERS)
-SELFTEST_HEADERS_MOC				+= $(ALL_MACHINES_SELFTEST_HEADERS_MOC)
-SELFTEST_SOURCES					+= $(ALL_MACHINES_SELFTEST_SOURCES)
-SELFTEST_SOURCES_MOC				+= $(ALL_MACHINES_SELFTEST_SOURCES_MOC)
-
-SELFTEST_HEADERS					+= $(SELFTEST_HEADERS_MOC)
-SELFTEST_OBJECTS					+= $(call mkobjs, $(SELFTEST_SOURCES))
-SELFTEST_SOURCES_MOC				+= $(call mkmocs, $(SELFTEST_HEADERS_MOC))
-SELFTEST_MOCOBJS					+= $(call mkmocobjs, $(SELFTEST_SOURCES_MOC))
-
-HEADERS								+= $(ALL_MACHINES_HEADERS) $(ALL_MACHINES_SELFTEST_HEADERS) $(XEFIS_HEADERS) $(WATCHDOG_HEADERS) $(SELFTEST_HEADERS)
-SOURCES								+= $(ALL_MACHINES_SOURCES) $(ALL_MACHINES_SELFTEST_SOURCES) $(XEFIS_SOURCES) $(WATCHDOG_SOURCES) $(SELFTEST_SOURCES)
-SOURCES_MOC							+= $(ALL_MACHINES_SOURCES_MOC) $(ALL_MACHINES_SELFTEST_SOURCES_MOC) $(XEFIS_SOURCES_MOC) $(WATCHDOG_SOURCES_MOC) $(SELFTEST_SOURCES_MOC)
-MOCOBJS								+= $(ALL_MACHINES_MOCOBJS) $(ALL_MACHINES_SELFTEST_MOCOBJS) $(XEFIS_MOCOBJS) $(WATCHDOG_MOCOBJS) $(SELFTEST_MOCOBJS)
-
-OBJECTS += $(call mkobjs, $(NODEP_SOURCES))
-OBJECTS += $(call mkobjs, $(SOURCES))
-
-machine_to_executable = $(distdir)/xefis.$(1)
-executable_to_machine = $(1:$(distdir)/xefis.%=%)
-
-VERSION_FILE := neutrino/core/version.cc
-MACHINE_TARGETS += $(foreach machine_name,$(XEFIS_MACHINES),$(call machine_to_executable,$(machine_name)))
-TARGETS += $(distdir)/selftest
-TARGETS += $(distdir)/watchdog
-TARGETS += $(MACHINE_TARGETS)
-
-.SECONDEXPANSION:
-$(MACHINE_TARGETS): %: $(XEFIS_OBJECTS) $(XEFIS_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES)) $$(call machine_objects,$$(call executable_to_machine,%)) $$(call machine_objects_moc,$$(call executable_to_machine,%))
-
-$(distdir)/watchdog: $(WATCHDOG_OBJECTS) $(WATCHDOG_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES))
-
-$(distdir)/selftest: $(SELFTEST_OBJECTS) $(SELFTEST_MOCOBJS) $(call mkobjs, $(NODEP_SOURCES)) $(call machine_selftest_objects,$(@)) $(call machine_selftest_objects_moc,$(@))
+$(foreach machine,$(XEFIS_MACHINES),$(eval $(call MACHINE_TEMPLATE,$(machine))))
 

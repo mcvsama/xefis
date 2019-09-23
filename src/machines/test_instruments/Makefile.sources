@@ -1,8 +1,7 @@
-XEFIS_MACHINE_test_instruments_HEADERS += test_instruments/test_instruments_machine.h
-XEFIS_MACHINE_test_instruments_HEADERS += test_instruments/test_screen_1.h
-XEFIS_MACHINE_test_instruments_HEADERS += test_instruments/test_screen_2.h
-
-XEFIS_MACHINE_test_instruments_SOURCES += test_instruments/test_instruments_machine.cc
-XEFIS_MACHINE_test_instruments_SOURCES += test_instruments/test_screen_1.cc
-XEFIS_MACHINE_test_instruments_SOURCES += test_instruments/test_screen_2.cc
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_instruments_machine.cc
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_instruments_machine.h
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_screen_1.cc
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_screen_1.h
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_screen_2.cc
+XEFIS_MACHINES.test_instruments.files += test_instruments/test_screen_2.h
 
