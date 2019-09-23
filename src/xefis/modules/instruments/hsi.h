@@ -592,7 +592,6 @@ class HSI: public xf::Instrument<HSI_IO>
 	xf::Synchronized<hsi_detail::ResizeCache> mutable		_resize_cache;
 	xf::Synchronized<hsi_detail::CurrentNavaids> mutable	_current_navaids;
 	xf::Synchronized<hsi_detail::Mutable> mutable			_mutable;
-	std::future<void> mutable								_painting_future;
 };
 
 #endif
